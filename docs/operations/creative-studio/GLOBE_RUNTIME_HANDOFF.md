@@ -188,19 +188,26 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
 - G0 workspace authorization quedó code-complete local: API Platform preserva `workspaceBindings` del OAuth y
   los aplica antes del broker; las rutas admin resuelven la misma proyección Greenhouse y también fallan cerradas.
   Evidencia: 19 tests focales y `pnpm typecheck` verdes. No está desplegado todavía.
+- Primer slice del kernel TASK-1482 quedó code-complete local en Globe: `CreditDecisionSnapshotV2` publica período,
+  spent+holds, remaining, funding elegible, capacidad efectiva, blockers, coverage y freshness; preview y reserve
+  consumen los mismos facts/evaluator; pool/grant respetan período y capability scope; `fundingPriority` ordena
+  candidatos; los caps mensual/proyecto descuentan holds; reserve pinnea período, fingerprint, máximo autorizado y
+  versión de settlement; `actual > reserved` falla cerrado. La migración aditiva es `0043_credit_decision_snapshot_v2.sql`.
+  Evidencia local: `pnpm check && pnpm build` terminó con exit 0; 42 tests de contracts, 389 de domain, 126 de
+  database y 284 de studio-web, además de los gates/clientes del monorepo. No se aplicó la migración ni hubo deploy.
+  Commit local de Globe `develop`: `8e2c0cb feat(credits): unify decision snapshot and reserve policy`.
 - Estado de repos: Greenhouse en `develop` con WIP ajeno preservado. Globe ahora tiene `develop` creado desde
   `origin/main@001ce1b`, publicado y activo en el checkout compartido; `main` permanece como rama predeterminada
   y de release. El commit `9dc166c` agrega el contrato no-worktree/develop y CI para pushes a `develop`; su frase
   inicial sobre default branch se corrigió inmediatamente después. El JSON ajeno no versionado sigue intacto.
   GitHub branch protection no está disponible para este repo privado en el plan actual (API 403); no se falsea
   ese control. `main` sigue release-only y sus workflows de deploy exigen SHA exacto.
-- Acciones todavía no realizadas: no migración aplicada, no deploy, no fondeo, no generación, no push y no
-  release completo. La verificación browser futura debe usar la sesión Chrome autenticada anclada a
-  `jreyes@efeonce.cl`.
-- Próximo punto seguro de continuación: commitear G0 en Greenhouse e implementar en Globe el contrato exacto de
-  snapshot/evaluator V2 con tests de conformance y concurrencia. El orden interno del kernel es:
-  período/snapshot/evaluator puro → facts con spent+holds+eligibility → reserve común → fail-closed para
-  `actual > reserved` → settlement/expiry reconciliada → `ensure-funded` sobre `propose → confirm`.
+- Acciones todavía no realizadas: no migración aplicada, no deploy, no fondeo, no generación ni release completo.
+  El slice de kernel queda en commit local de `develop`; su push/promoción se decide sólo dentro del rollout.
+  La verificación browser futura debe usar la sesión Chrome autenticada anclada a `jreyes@efeonce.cl`.
+- Próximo punto seguro de continuación: cerrar TASK-1468+1579 con outcomes explícitos de settlement y expiry
+  reconciliada antes de liberar holds; luego implementar `ensure-funded` idempotente sobre `propose → confirm`.
+  TASK-1482 sigue `in-progress`: código local no equivale a migración aplicada ni operación live.
 
 ## Siguiente paso ejecutable
 

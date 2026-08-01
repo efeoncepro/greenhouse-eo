@@ -278,3 +278,15 @@ consumir los DTOs actuales ni reconstruir caps en browser/adapters.
 La task no absorbe settlement/rating de TASK-1579, UI de TASK-1483, identidad/recovery Greenhouse de TASK-1629 ni
 billing de TASK-1484. El command compuesto sigue siendo gobernado `propose → confirm`; la fachada one-command
 orquesta esas fases para una sesión autorizada, no las elimina.
+
+### Progreso verificable 2026-08-01
+
+- Implementado localmente `CreditDecisionSnapshotV2` y un evaluator puro compartido por preview y reserve.
+- Los facts autoritativos incorporan período, funding elegible, scopes, prioridad y spent+holds para caps mensual
+  y de proyecto; pool/grant fuera de vigencia falla cerrado.
+- Reserve pinnea período, capability, fingerprint de decisión, máximo autorizado y versión de settlement mediante
+  la migración aditiva `0043_credit_decision_snapshot_v2.sql`.
+- Settlement rechaza `actual > reserved`; la policy completa de outcomes/reconciliación continúa en TASK-1579.
+- `pnpm check && pnpm build` pasó en Globe con exit 0. La migración no se ha aplicado y no hubo deploy, fondeo,
+  generación ni release. `ensure-funded` y el canary de concurrencia/runtime siguen pendientes; la task permanece
+  `in-progress`.
