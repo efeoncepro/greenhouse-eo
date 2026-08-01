@@ -44,6 +44,10 @@
   writes. El cliente PKCE actual recibe ambos scopes aunque solicite el base: antes de clientes externos hay que
   separar entitlement/emisión de scopes y repetir el deny real. Las demás tools conservan gates de
   `TASK-1469`/`TASK-1472`.
+- `TASK-1631` sigue `to-do`: WorkOS staging sólo tiene discovery MCP, sin login público ni bindings. La primera
+  cohorte externa será por invitación de organizaciones cliente ya existentes y explícitamente allowlisted en
+  Account 360; un dominio o email nunca crea acceso. La UI propia de `auth.efeonce.org` queda separada del gateway
+  y requiere aceptar el ADR, el plan y el contrato de binding/revocación antes de implementación.
 
 ## TASK-1614/TASK-1629/TASK-1630 — recuperación y convergencia del carril Globe (2026-08-01)
 

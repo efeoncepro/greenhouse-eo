@@ -8,10 +8,10 @@
 - Effort: `Alto`
 - Type: `implementation`
 - Execution profile: `backend-data`
-- UI impact: `none`
-- UI ready: `n/a`
-- Wireframe: `none`
-- Flow: `none`
+- UI impact: `customer-facing auth surface`
+- UI ready: `not started`
+- Wireframe: `required before implementation`
+- Flow: `required before implementation`
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `none`
@@ -25,9 +25,10 @@
 
 ## Summary
 
-Habilitar una identidad B2B de Efeonce para que organizaciones cliente se autentiquen en clientes MCP sin requerir
-una cuenta Entra de Efeonce. Account 360 conserva la organización comercial canónica; la identidad externa sólo se
-enlaza explícitamente y Globe conserva workspace, capacidades, créditos y policy.
+Habilitar una identidad B2B de Efeonce para que organizaciones cliente existentes se autentiquen en clientes MCP
+sin requerir una cuenta Entra de Efeonce. Account 360 conserva la organización comercial canónica; la identidad
+externa sólo se enlaza explícitamente y Globe conserva workspace, capacidades, créditos y policy. El primer corte
+es por invitación y allowlist de clientes existentes, nunca por signup público o dominio de correo.
 
 ## Why This Task Exists
 
@@ -44,6 +45,11 @@ Account 360 en el gateway.
   revocación, sin crear una segunda entidad comercial.
 - Hacer que gateway y Globe denieguen por defecto y revaliden organización, membership y capability antes de exponer
   la primera herramienta Globe read-only a un cliente.
+- Iniciar la cohorte externa sólo desde organizaciones cliente ya existentes en Account 360: selección explícita,
+  administrador designado, invitación auditable y grant read-only antes de OAuth. Ningún email o dominio crea
+  membership, organización o acceso.
+- Entregar una UI de acceso propia en `auth.efeonce.org`, aislada del gateway y de Greenhouse; WorkOS/AuthKit
+  opera autenticación mediante APIs server-side y WorkOS Connect sigue emitiendo OAuth para MCP.
 
 ## Architecture Alignment
 
@@ -62,12 +68,14 @@ Reglas obligatorias:
 
 - Account 360 y `greenhouse_core.organizations` son el único ancla comercial/customer; un ID WorkOS u otro IDP es
   un binding externo, no un tenant paralelo.
+- La primera cohorte usa exclusivamente clientes existentes y allowlisted de Account 360. No hay signup público,
+  import automático masivo ni admisión basada en el dominio de correo.
 - El gateway valida autenticación/transport y delega. Globe conserva workspace, creative policy, credits y
   entitlement de la capacidad; ningún claim libre de organización/workspace autoriza una tool.
 - Entra sigue siendo exclusivamente el canary interno durante la transición. No se deshabilita
   `globe.producer.fleet.list` ni se usa ese cliente como evidencia de acceso cliente.
-- No provisionar un proveedor, comprar un plan, cambiar DNS, crear secretos ni desplegar una ruta pública mientras
-  el ADR propuesto no tenga aceptación explícita.
+- La configuración de WorkOS staging y discovery MCP no constituye acceso cliente. No crear producción, DNS,
+  secretos, bindings ni desplegar la ruta pública de login mientras el ADR propuesto no tenga aceptación explícita.
 
 ## Normative Docs
 
@@ -110,7 +118,8 @@ Reglas obligatorias:
 
 ### Gap
 
-- No existe un issuer B2B de clientes, binding canónico de organización externa a Account 360, ni una prueba real
+- Existe una configuración WorkOS de staging para discovery MCP; no existe un issuer B2B activo para clientes,
+  binding canónico de organización externa a Account 360, UI propia de login ni una prueba real
   base-only/allow/revoke por capacidad.
 - El cliente Entra interno actual emite ambos scopes y por ello no demuestra denial por persona ni por cliente.
 
@@ -120,9 +129,9 @@ Reglas obligatorias:
 - Current home: `Greenhouse para Account 360/identity binding; ../efeonce-mcp para OAuth validation y dispatch; ../efeonce-globe para provider policy`
 - Future candidate home: `remain-shared`
 - Boundary: `binding server-side Account 360 ↔ identity organization, entitlement resolver y provider policy revalidation`
-- Server/browser split: `server-only; tokens, binding stores, identity-provider admin APIs, provider clients and secrets never reach browser code`
-- Build impact: `identity-provider SDK/configuration isolated behind server adapter; gateway/container deployment remains independent`
-- Extraction blocker: `authentication/session and Account 360 binding are cross-runtime contracts; no new app/package is created before an approved topology decision`
+- Server/browser split: `auth browser UI is isolated at auth.efeonce.org; its server adapter alone accesses AuthKit APIs. Tokens, binding stores, identity-provider admin APIs, provider clients and secrets never reach browser code`
+- Build impact: `dedicated auth UI/session deployment is independent from the MCP gateway; identity-provider SDK/configuration remains behind its server adapter`
+- Extraction blocker: `authentication/session and Account 360 binding are cross-runtime contracts; implementation begins only after an approved topology, UI contract and identity plan`
 
 ## Backend/Data Contract
 
@@ -146,6 +155,8 @@ Reglas obligatorias:
 - Entidades/tablas/views afectadas: `greenhouse_core.organizations plus the canonical identity/membership surface selected during discovery; no duplicate customer organization table`
 - Invariantes que no se pueden romper:
   - `Account 360 organization remains the commercial/customer source of truth.`
+  - `Only an existing Account 360 customer explicitly allowlisted by an audited operator command may receive an external identity binding or invitation.`
+  - `An email address, email domain or WorkOS organization without that binding never creates customer membership, a capability grant or a Globe workspace right.`
   - `An external identity organization is usable only through an explicit audited binding to one canonical organization.`
   - `Gateway scopes do not replace Globe workspace/capability/credits/rights enforcement.`
   - `Revocation fails closed in both gateway dispatch and provider policy.`
@@ -157,7 +168,7 @@ Reglas obligatorias:
 
 - Migration posture: `additive migration after schema discovery; no automatic backfill or customer grant`
 - Default state: `external customer issuer and all external provider capabilities OFF; internal Entra canary ON`
-- Backfill plan: `dry-run inventory of existing organizations only; operator allowlist creates each first binding after review`
+- Backfill plan: `dry-run inventory of existing client organizations only; no bulk enrollment. An operator allowlist creates each first binding, designated administrator and invitation after review`
 - Rollback path: `disable external issuer/provider flag, revoke binding/grant, retain append-only audit; Entra canary and existing Globe fleet reader stay available`
 - External coordination: `explicit operator approval, identity-provider tenant/plan, auth.efeonce.org DNS/TLS, secrets, client registrations, provider configuration and staged customer consent`
 
@@ -186,17 +197,22 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 0 — Decision and schema discovery
+### Slice 0 — Decision, cohort policy and schema discovery
 
 - Obtain explicit acceptance of the ADR and selected identity-provider plan before external provisioning.
 - Inventory Account 360 organization, canonical person/membership and Globe workspace contracts; propose the minimal
   additive binding schema, command/reader/audit and invalidation contract.
+- Define the first existing-client eligibility read, operator allowlist command, designated-administrator input and
+  invitation/revocation audit. Explicitly prohibit public signup, email-domain inference and automatic enrollment.
+- Produce the design/flow and deployment contract for the custom `auth.efeonce.org` surface before browser code.
 
 ### Slice 1 — External identity and Account 360 binding
 
 - Provision the accepted customer identity issuer and custom domain with configuration/secrets managed outside source.
-- Implement audited, idempotent organization/person/grant binding primitives with additive migration and no automatic
-  customer backfill.
+- Implement the isolated custom Efeonce auth UI/session service; it uses AuthKit APIs server-side and does not turn
+  the MCP gateway into a browser/session host.
+- Implement audited, idempotent organization/person/grant binding primitives with additive migration, no automatic
+  customer backfill and invitation only after an explicit existing-client allowlist review.
 
 ### Slice 2 — Gateway/provider enforcement
 
@@ -212,10 +228,11 @@ Reglas obligatorias:
 
 ## Out of Scope
 
-- A customer administration UI, SCIM, broad SSO rollout or self-service entitlement management.
+- Customer public signup, automatic enrollment by email domain, a customer administration UI, SCIM, broad SSO
+  rollout or self-service entitlement management.
 - Globe writes, credit/spend, approvals, rights-sensitive tooling or any capability not separately approved.
 - Replacing Account 360, moving Globe policy into the gateway, or disabling the Entra internal reader/canary.
-- Provisioning WorkOS or any other provider before ADR acceptance and commercial approval.
+- Production provisioning of WorkOS or any other provider before ADR acceptance and commercial approval.
 
 ## Rollout Plan & Risk Matrix
 
@@ -252,7 +269,8 @@ Slice 3 MUST prove base-only denial and revocation before it allows a second org
 ### Production verification sequence
 
 1. Verify no behavior changes with external issuer and capabilities OFF.
-2. Create one reviewed, audited binding for a non-production or explicitly allowlisted organization.
+2. Select one existing Account 360 client organization and create one reviewed, audited binding, designated
+   administrator and invitation; do not use a synthetic customer or a domain-only match.
 3. Complete OAuth/PKCE and MCP initialize from each target client.
 4. Prove permitted reader access, base-only denial, expired token denial and revoked-grant denial.
 5. Verify Globe workspace/capability revalidation and redacted telemetry.

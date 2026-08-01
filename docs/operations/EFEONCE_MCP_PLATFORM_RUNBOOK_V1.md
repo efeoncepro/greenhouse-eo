@@ -266,12 +266,15 @@ Cada promoción registra:
 - Límite conocido: el cliente interno Entra recibe ambos scopes; no habilites clientes hasta separar la emisión
   de scope/entitlement y repetir el deny real con una identidad base-only.
 
-### Identidad cliente externa — propuesta, no configuración activa
+### Identidad cliente externa — propuesta; sin acceso cliente activo
 
 Entra permanece como identidad del canary interno. No crees usuarios cliente en ese tenant ni expongas una
-capacidad Globe por haber pasado el canary. La propuesta de un issuer B2B en `auth.efeonce.org`, el binding con la
-organización de Account 360 y el rollout allow/base-only/revoke viven en
+capacidad Globe por haber pasado el canary. WorkOS tiene sólo una configuración de staging para discovery MCP; no
+hay cliente, binding, secreto productivo ni login público operativo. La propuesta de un issuer B2B con UI propia
+de Efeonce en `auth.efeonce.org`, el binding con la organización de Account 360 y el rollout
+allow/base-only/revoke viven en
 [`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`](../architecture/EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md)
-y [`TASK-1631`](../tasks/to-do/TASK-1631-efeonce-customer-identity-mcp-federation.md). Hasta la aceptación
-explícita del ADR y el plan de proveedor, no hay DNS, tenant, secreto, client registration ni acceso cliente que
-configurar.
+y [`TASK-1631`](../tasks/to-do/TASK-1631-efeonce-customer-identity-mcp-federation.md). La primera cohorte será
+por invitación de organizaciones cliente ya existentes y explícitamente allowlisted en Account 360: un email o
+dominio no basta. Hasta la aceptación explícita del ADR y el plan de proveedor, no hay DNS productivo, secreto,
+binding ni acceso cliente que configurar.

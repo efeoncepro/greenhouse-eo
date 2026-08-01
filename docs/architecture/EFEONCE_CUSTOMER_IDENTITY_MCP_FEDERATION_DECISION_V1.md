@@ -6,7 +6,7 @@
 > **Scope:** customer identity, B2B federation, MCP OAuth, Account 360 organization binding and Globe access
 > **Reversibility:** `two-way-but-slow`
 > **Confidence:** `medium`
-> **Validated as of:** 2026-08-01 — gateway MCP, Entra canary and Account 360 contracts verified; no external identity provider has been provisioned.
+> **Validated as of:** 2026-08-01 — gateway MCP, Entra canary and Account 360 contracts verified; WorkOS has a staging project with MCP discovery configuration only. There is no external customer binding, public login, production domain, production secret or customer access.
 > **Implementation:** [`TASK-1631`](../tasks/to-do/TASK-1631-efeonce-customer-identity-mcp-federation.md)
 
 ## Context
@@ -26,8 +26,15 @@ credits and capability decisions.
 Introduce a dedicated Efeonce customer identity plane at `auth.efeonce.org`, separate from the internal Entra
 canary and from the gateway's downstream workload identity. The leading candidate is **WorkOS AuthKit + WorkOS
 Connect**, because it exposes OAuth authorization-server metadata and dynamic client registration suited to remote
-MCP clients while supporting B2B organization federation. This is a recommendation, not an accepted vendor
-commitment: no tenant, billing plan, DNS record, secret or production configuration is authorized by this proposal.
+MCP clients while supporting B2B organization federation. A WorkOS staging project has only the compatible MCP
+discovery settings enabled; it is not customer access or a production commitment. Billing/production approval,
+DNS, production secrets, an external binding and customer authorization remain separately gated.
+
+The selected experience direction is an **Efeonce-owned custom login UI**. A dedicated browser-facing identity
+service at `auth.efeonce.org` will use AuthKit Authentication APIs server-side and WorkOS Connect for MCP OAuth;
+the gateway remains a resource server, not a session/UI host. This is not WorkOS Standalone Connect in the first
+cut: Efeonce does not yet have an independent customer authentication stack to reuse. WorkOS continues to own
+credential and authentication mechanics; the browser never receives a WorkOS API key.
 
 The durable ownership model is:
 
@@ -48,6 +55,12 @@ Globe capability. The gateway validates issuer, audience, expiry, authorized cli
 the organization through the verified binding, and delegates to the provider. Globe revalidates the organization,
 workspace and capability against its canonical policy before returning data or executing a tool.
 
+The first external cohort is **existing Efeonce clients already represented in Account 360**. There is no public
+self-signup, domain-based admission or automatic backfill. An operator must explicitly allowlist an existing
+organization, establish its audited external-identity binding, designate its initial administrators and grant its
+read-only Globe capability before an invitation can be issued. An email address alone never establishes customer
+membership or access.
+
 ## Invariants
 
 - `greenhouse_core.organizations` remains the canonical commercial/customer organization. An identity-provider
@@ -56,6 +69,11 @@ workspace and capability against its canonical policy before returning data or e
   scope or a documented server-side binding primitive; they do not reconstruct tenant membership from a JWT claim.
 - Globe owns Globe workspace membership, creative policy, credits, rights and tool/capability entitlement. The
   identity plane does not own them and the gateway does not duplicate them.
+- Only an existing, explicitly allowlisted Account 360 organization may enter the first customer cohort. An
+  identity-provider organization, email domain or self-registered user cannot create a commercial customer,
+  membership or Globe grant.
+- Invitations and revocations originate from audited canonical Account 360/identity commands. They must bind a
+  person to the selected organization and never infer access from an unverified email domain or JWT field.
 - Entra remains available only for the internal canary during the transition. It neither onboards external customers
   nor demonstrates their deny/revocation behavior.
 - External authorization uses OAuth 2.1 authorization code with PKCE. Remote MCP clients must have public
@@ -75,6 +93,10 @@ relate authenticated people to an organization-scoped membership/grant without s
 or credit policy in the identity provider. The exact table and identifier choice remain intentionally undecided until
 that discovery confirms the current schema and avoids a parallel identity model.
 
+The initial cohort flow must additionally record the Account 360 organization, designated customer administrator,
+operator authorizing the invitation, external identity subject/organization IDs, permitted capability, timestamps
+and revocation state. It is an explicit, idempotent enrollment command; it is not a bulk import of existing clients.
+
 ## Alternatives considered
 
 ### Keep Entra as the customer identity provider
@@ -93,6 +115,11 @@ to Globe releases and make Globe own a cross-product commercial identity.
 Rejected. It duplicates Account 360 and provider policy, then drifts. The gateway remains an authentication,
 transport and routing adapter with a narrow verified binding lookup.
 
+### Open public signup or infer membership from an email domain
+
+Rejected for the first customer rollout. Existing customers must be deliberately enrolled from Account 360 so that
+commercial relationship, identity, capability and Globe workspace policy remain correlated and revocable.
+
 ### Choose an identity provider before an explicit commercial approval
 
 Rejected. WorkOS is the leading technical candidate, but an external account, plan, custom domain and production
@@ -101,18 +128,21 @@ secrets are an irreversible operational commitment and require explicit operator
 ## Consequences
 
 - Customers can connect from compatible MCP clients without an Efeonce Entra account.
-- Customer onboarding has a clear order: create/verify Account 360 organization, establish the explicit identity
-  binding, grant the provider capability, then run organization-scoped OAuth and provider canaries.
+- Customer onboarding has a clear order: select/verify an existing Account 360 organization, allowlist it,
+  establish the explicit identity binding, designate/invite its administrators, grant the provider capability,
+  then run organization-scoped OAuth and provider canaries.
 - The gateway needs dual-issuer transition support and a binding/entitlement resolver; providers need an
   organization-aware revalidation contract.
-- A customer self-service administration UI is intentionally not required for the first allowlisted rollout. Initial
-  grants may be operator-managed only through audited, canonical Greenhouse primitives.
+- The initial login surface is a dedicated custom Efeonce UI, but customer self-service administration is not
+  required for the first allowlisted rollout. Initial enrollments and grants remain operator-managed through
+  audited, canonical Greenhouse primitives.
 
 ## Rollout gates
 
-1. Accept this decision and approve the selected identity-provider commercial plan before provisioning it.
+1. Accept this decision and approve the selected identity-provider commercial plan before production provisioning.
 2. Discover and implement the Account 360 binding with migration, audit and revocation semantics.
-3. Configure the external issuer at `auth.efeonce.org`, OAuth metadata, PKCE and supported MCP client registration.
+3. Implement the isolated `auth.efeonce.org` custom UI/session service with server-only AuthKit API access, then
+   configure the external issuer, OAuth metadata, PKCE and supported MCP client registration.
 4. Add the gateway's gated dual-issuer validation and provider entitlement revalidation; retain the Entra internal
    canary unchanged.
 5. Run Claude, Codex and ChatGPT compatibility canaries with one allowlisted customer organization, one
@@ -124,7 +154,8 @@ secrets are an irreversible operational commitment and require explicit operator
 
 - WorkOS cannot meet the verified metadata/registration, B2B federation, data-residency or commercial requirements.
 - A second MCP provider requires a materially different organization or entitlement model.
-- Customer self-service administration, SCIM, enterprise SSO or contractual audit requirements expand the binding.
+- Customer self-service administration, public signup, SCIM, enterprise SSO or contractual audit requirements
+  expand the binding.
 - The canonical Account 360 organization/membership model changes.
 
 ## References
