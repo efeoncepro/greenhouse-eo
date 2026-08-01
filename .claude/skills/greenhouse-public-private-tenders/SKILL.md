@@ -89,6 +89,23 @@ En una licitación de contenidos **todas las ofertas dicen lo mismo** ("optimiza
 
 9. **El deal vive en un workspace canónico (el "DSR interno").** Arráncalo con `pnpm tender:new <slug>`: carpeta con `bases/` (RFP) · `research/` (investigación 🔒) · `oferta-tecnica.md` (fuente + ledger de evidencia) · `deck-plan.json` · `artifact-manifest.json` (piezas vivas por enlace) · `anexos/` · `*-INTERNO`. El discriminador que manda es **audiencia**: `research/` + `*-INTERNO` **nunca** cruzan al cliente. Las fuentes son archivos git (NO `proposal_assets`); el aggregate `Proposal` referencia la carpeta por `proposal_id`. Contrato: `docs/commercial/tenders/TENDER_WORKSPACE_TEMPLATE.md`.
 
+### Reglas generales aprendidas para la propuesta y el deck
+
+10. **Separa los artefactos técnicos y económicos.** Cuando una licitación use decks, produce un deck
+    técnico y un deck económico independientes, con narrativa, `deck-plan`, output, manifest y
+    capturas propios. Nunca reemplaces el deck de otra licitación ni mezcles sus assets.
+11. **Usa `PricingFull` para presentar la inversión.** La oferta económica debe mostrar la opción
+    recomendada, el desglose cotizado y las condiciones comerciales desde una cotización aprobada;
+    no autorices una tabla libre que omita la estructura del catálogo.
+12. **Declara siempre la base fiscal.** Cada monto client-facing debe indicar de forma visible si es
+    neto y si el IVA está excluido o incluido. La propuesta económica y el deck deben decir lo mismo.
+13. **Cuando aplique, presenta HubSpot CRM como beneficio incluido.** Especifica la configuración
+    inicial obsequiada, sus límites y las licencias o módulos pagados que quedan a cargo del cliente;
+    no lo confundas con una licencia ilimitada ni con una implementación enterprise.
+14. **Cierra con revisión visual completa.** Después de componer, inspecciona todos los frames
+    exportados de cada deck y verifica recortes, legibilidad, jerarquía, condiciones fiscales, assets
+    y consistencia. Los tests técnicos no bastan para declarar la oferta lista.
+
 ## Sinergias — tabla de hand-off
 
 Esta skill **decide y estructura**; delega el craft especializado. Declara siempre a quién pasas la posta:

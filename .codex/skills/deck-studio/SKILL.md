@@ -313,6 +313,23 @@ Este patrón fue validado por la segunda licitación de referencia, Brightcell, 
 deck producido con el Composer para SKY. La referencia sirve para repetir el método, no para copiar
 datos, branding, screenshots, equipo, métricas ni assets entre propuestas.
 
+### Reglas generales para decks de licitación
+
+- **Separa el deck técnico del económico.** El técnico desarrolla el desafío, la solución, la
+  metodología, el equipo y la evidencia; el económico permite comparar alcance, inversión y
+  condiciones sin esconder el precio dentro de la narrativa técnica.
+- **Usa `PricingFull` para la oferta económica.** La lámina debe mostrar la opción recomendada, el
+  desglose cotizado y las condiciones comerciales desde el snapshot aprobado de la cotización; no
+  se reemplaza por una tabla improvisada ni por texto de otra plantilla.
+- **Haz visibles los valores fiscales.** Cada monto client-facing debe declarar explícitamente si es
+  neto y si el IVA está excluido o incluido. La condición no puede quedar solo en una nota escondida.
+- **Conserva outputs y planes separados.** Cada licitación y cada deck tiene su propio `deck-plan`,
+  output, manifest y carpeta de captura; nunca se reutilizan ni se sobrescriben artefactos de otra
+  licitación.
+- **Revisa visualmente todos los frames antes del cierre.** Inspecciona cada lámina exportada:
+  recortes, jerarquía, legibilidad, captions, assets, firmas y consistencia. Los tests del Composer
+  son necesarios, pero no sustituyen mirar todos los frames.
+
 ---
 
 ## Router — qué cargar según lo que estés haciendo

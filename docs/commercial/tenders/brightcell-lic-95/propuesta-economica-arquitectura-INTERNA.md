@@ -1,6 +1,7 @@
 # Arquitectura económica interna — Brightcell Chile
 
-> **Estado:** hipótesis de packaging; no es documento client-facing ni autoriza precios.
+> **Estado:** arquitectura económica y precios de propuesta preparados para validación final; no es documento
+> client-facing, no sustituye la aprobación comercial y **no autoriza envío** antes de Finance.
 > **Licitación:** LIC-95 · Wherex
 > **Fecha:** 31 de julio de 2026
 
@@ -25,6 +26,56 @@ implementación inicial
 La unidad pública no debe ser “horas”, “posts”, “páginas” ni “artículos”. Es un alcance gobernado con capacidad,
 cadencia, dependencias y límites explícitos.
 
+## Decisión actualizada: landing única + operación mensual
+
+La oferta de Brightcell se separa en una implementación única y una operación mensual. La landing no se trata
+como una página commodity: nace con estrategia, copy, SEO de lanzamiento, medición, GA4, GTM, eventos,
+formularios y conexión con HubSpot. La operación mensual agrega estrategia, RRSS, SEO/AEO, contenidos,
+optimización de conversión y reporting según la capacidad contratada.
+
+No se debe imponer un programa de 90 días ni una permanencia mínima si el cliente no lo solicita. La propuesta
+debe ser comprensible como inversión inicial + mensualidad, con condiciones de término claras y sin esconder
+licencias o terceros dentro del fee.
+
+### Una implementación y tres paquetes mensuales
+
+Todos los valores son netos, sin IVA, en CLP:
+
+La landing tiene una implementación común de **$1.100.000 netos, pago único**. Los paquetes cambian la capacidad
+mensual, no el precio de esa misma implementación:
+
+| Paquete mensual | Operación mensual | Rol comercial |
+|---|---:|---|
+| **Growth Core** | $1.250.000 | Base sólida de conversión, contenido y medición |
+| **Demand & Authority** | $1.650.000 | Opción recomendada; mayor profundidad y optimización |
+| **Regional Growth** | $2.200.000 | Mayor capacidad editorial, SEO/AEO y escala regional |
+
+La diferencia de precio debe corresponder a más capacidad y profundidad: piezas y adaptaciones por canal,
+iniciativas SEO/AEO, contenidos web, video derivado de material disponible, automatizaciones y reporting. No
+debe presentarse como una promesa de resultados garantizados.
+
+### HubSpot CRM Free incluido
+
+HubSpot CRM Free se obsequia como diferenciador dentro de los tres paquetes y no se cobra como activación
+separada. El alcance incluido es:
+
+- portal CRM Free y pipeline comercial inicial;
+- propiedades básicas de contacto, empresa, servicio, industria y fuente;
+- formularios conectados a la landing;
+- vistas, notificaciones y dashboard básico;
+- documentación y capacitación inicial.
+
+HubSpot Starter, módulos pagados, límites ampliados, migraciones complejas e integraciones avanzadas no están
+incluidos. Si se requieren, deben ser contratados y pagados directamente por Brightcell.
+
+### Deck económico separado
+
+La económica tiene un deck propio, separado del deck técnico. `deck-plan-economic.json` es la fuente de
+composición y debe producir una salida versionada independiente. La narrativa económica debe explicar primero
+la separación entre implementación única y operación mensual, luego comparar los tres paquetes y finalmente
+aclarar HubSpot, exclusiones y condiciones. No se debe alterar el deck de SKY ni reutilizar su salida como
+fuente.
+
 ## 1. Implementación inicial — cobro único
 
 ### Qué compra Brightcell
@@ -45,7 +96,8 @@ sin rehacer la base.
 - QA responsive, funcional, accesibilidad y rendimiento;
 - documentación y transferencia;
 - publicación y acompañamiento de lanzamiento;
-- activación inicial de HubSpot, si se contrata como módulo.
+- activación inicial de HubSpot CRM Free incluida como beneficio del paquete, con alcance básico definido en
+  la sección de HubSpot.
 
 ### Frontera
 
@@ -105,7 +157,8 @@ garantía de posiciones, citaciones o leads.
 
 ### Condiciones recomendadas
 
-- mínimo inicial de tres meses para producir señales comparables;
+- contrato mensual y término con aviso definido; no imponer un mínimo inicial de tres meses si la licitación
+  no lo solicita;
 - capacidad y límites definidos en el SOW;
 - no usar cantidad de artículos como unidad principal de precio;
 - separar traducción, producción audiovisual, medios, proveedores y páginas adicionales;
@@ -137,11 +190,12 @@ YouTube condicionado a material aprobado e Instagram como soporte visual.
 - cobertura 24/7 o manejo de crisis;
 - canales, idiomas y mercados adicionales.
 
-Se recomienda un mínimo inicial de tres meses. El fee debe vender capacidad y governance, no un precio por post.
+El fee debe vender capacidad y governance, no un precio por post. La contratación debe ser mensual, con término
+y aviso definidos en la propuesta, salvo que Brightcell solicite otra condición.
 
-## 6. HubSpot — dos líneas separadas
+## 6. HubSpot — CRM Free incluido; licencias pagadas separadas
 
-### Activación inicial — cobro único
+### Configuración incluida en la implementación/paquete
 
 - configuración de portal y usuarios acordados;
 - propiedades básicas de contacto, empresa, servicio, industria y fuente;
@@ -151,7 +205,7 @@ Se recomienda un mínimo inicial de tres meses. El fee debe vender capacidad y g
 - dashboard inicial;
 - documentación y transferencia.
 
-### Licencia y operación — recurrente opcional
+### Licencia y operación — fuera del fee cuando corresponda
 
 - HubSpot Suite Starter y cualquier componente adicional deben aparecer como línea separada;
 - idealmente la cuenta debe ser propiedad de Brightcell y Efeonce operar como partner/administrador;

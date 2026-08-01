@@ -1,0 +1,192 @@
+{
+  "_readme": [
+    "Deck económico client-facing de Brightcell Logistics Chile — LIC-95 / Wherex.",
+    "Artefacto separado del deck técnico: no modificar el plan ni la salida técnica de Brightcell o SKY.",
+    "La propuesta económica se lee sin narrador y presenta valores netos, sin IVA.",
+    "HubSpot CRM Free se presenta como beneficio incluido; licencias pagadas y terceros quedan fuera.",
+    "Componer: pnpm deck:compose docs/commercial/tenders/brightcell-lic-95/deck-plan-economic.json --out .captures/brightcell-bid-economic-v1"
+  ],
+  "tenderId": "BRIGHTCELL-LIC-95-ECONOMIC",
+  "slides": [
+    {
+      "slideId": "portada-economica",
+      "contentType": "cover",
+      "template": "CoverFull",
+      "slots": {
+        "clientLogo": { "src": "assets/clients/brightcell.svg" },
+        "proposalKind": "economic"
+      }
+    },
+    {
+      "slideId": "agenda-economica",
+      "contentType": "agenda",
+      "template": "AgendaFull",
+      "slots": {
+        "sectionLabel": "LO QUE VAMOS A REVISAR",
+        "title": "Inversión",
+        "deckMeta": "<b>5</b> decisiones para contratar",
+        "chapters": [
+          { "number": "01", "title": "La base", "description": "Una landing preparada para convertir y medir", "targetSlideId": "base-medible" },
+          { "number": "02", "title": "La operación", "description": "Qué ocurre mes a mes después del lanzamiento", "targetSlideId": "operacion-mensual" },
+          { "number": "03", "title": "Las alternativas", "description": "Tres niveles de capacidad y acompañamiento", "targetSlideId": "planes-mensuales" },
+          { "number": "04", "title": "La recomendación", "description": "El equilibrio entre profundidad y alcance", "targetSlideId": "recomendacion" },
+          { "number": "05", "title": "Las condiciones", "description": "Qué incluye, qué queda fuera y cómo se contrata", "targetSlideId": "condiciones" }
+        ],
+        "footerLabel": "Propuesta económica · Brightcell Chile"
+      }
+    },
+    {
+      "slideId": "base-medible",
+      "contentType": "narrative",
+      "template": "NarrativeSplit",
+      "slots": {
+        "sectionLabel": "LA INVERSIÓN INICIAL",
+        "title": "La landing nace como una <em>base comercial medible</em>",
+        "body": [
+          "<b>El pago único de $1.100.000 netos no cubre solo diseño y publicación.</b> Incluye estrategia de conversión, copy, fundamentos SEO/AEO, GA4, GTM, eventos y formularios conectados.",
+          "<b>El resultado es una primera puerta de entrada para Chile.</b> Brightcell puede comenzar con una experiencia clara y medir qué ocurre después del contacto."
+        ],
+        "closing": "Una landing que se publica con <span class='ac'>instrumentación desde el día uno</span>.",
+        "conceptLabel": "PAGO ÚNICO",
+        "conceptTitle": "$1.100.000 netos",
+        "conceptLegend": [
+          { "layer": "Estrategia", "definition": "Propuesta, arquitectura y conversión", "tone": "outer" },
+          { "layer": "Medición", "definition": "GA4, GTM, eventos y fuentes", "tone": "middle" },
+          { "layer": "Captación", "definition": "Formulario, CTA y HubSpot Free", "tone": "core" }
+        ]
+      }
+    },
+    {
+      "slideId": "operacion-mensual",
+      "contentType": "dual-list",
+      "template": "DualListSplit",
+      "slots": {
+        "leftEyebrow": "UNA VEZ",
+        "leftTitle": "Se construye la base que Brightcell necesita",
+        "leftItems": [
+          { "lead": "Landing estratégica", "body": "UX/UI, copy y arquitectura para servicios y contacto." },
+          { "lead": "SEO de lanzamiento", "body": "Estructura técnica y semántica preparada para buscadores." },
+          { "lead": "Medición", "body": "GA4, GTM, eventos y conversiones configuradas." },
+          { "lead": "HubSpot CRM Free", "body": "Pipeline, formulario, propiedades y dashboard inicial." }
+        ],
+        "rightEyebrow": "CADA MES",
+        "rightTitle": "Se opera y mejora la capacidad comercial",
+        "rightItems": [
+          { "lead": "Estrategia editorial", "body": "Prioridades, calendario, mensajes y próximos focos." },
+          { "lead": "RRSS", "body": "LinkedIn, Instagram y adaptación de contenidos para YouTube." },
+          { "lead": "SEO/AEO", "body": "Optimización, contenido, entidades y citabilidad priorizada." },
+          { "lead": "Medición y decisión", "body": "Dashboard, reporte y recomendaciones para el siguiente ciclo." }
+        ]
+      }
+    },
+    {
+      "slideId": "planes-mensuales",
+      "contentType": "pricing",
+      "template": "PricingFull",
+      "slots": {
+        "sectionLabel": "OPERACIÓN MENSUAL",
+        "title": "Tres niveles de capacidad para <em>crecer con Brightcell</em>",
+        "summary": {
+          "amount": "$1.650.000",
+          "period": "mensual · opción recomendada",
+          "taxNote": "CLP, valores netos sin IVA · HubSpot CRM Free incluido"
+        },
+        "pricingOptions": [
+          {
+            "label": "Growth Core",
+            "status": "BASE",
+            "scope": "Estrategia + RRSS + SEO/AEO + medición · hasta 8 piezas principales al mes",
+            "amount": "$1.250.000",
+            "isProposed": false
+          },
+          {
+            "label": "Demand & Authority",
+            "status": "RECOMENDADO",
+            "scope": "Mayor producción, dos focos SEO/AEO y acompañamiento mensual de performance",
+            "amount": "$1.650.000",
+            "isProposed": true
+          },
+          {
+            "label": "Regional Growth",
+            "status": "AMPLIADO",
+            "scope": "Operación de mayor autoridad, hasta 16 piezas y preparación para expansión",
+            "amount": "$2.200.000",
+            "isProposed": false
+          }
+        ],
+        "commercialTerms": [
+          { "label": "Implementación", "value": "$1.100.000 netos, pago único" },
+          { "label": "Facturación", "value": "Mensual por adelantado, pago a 30 días según procedimiento" },
+          { "label": "HubSpot", "value": "CRM Free incluido; licencias pagadas por cuenta de Brightcell" }
+        ]
+      }
+    },
+    {
+      "slideId": "que-compra-brightcell",
+      "contentType": "capabilities-grid",
+      "template": "CardGridFull",
+      "slots": {
+        "eyebrow": "QUÉ SE OPERA",
+        "headline": "El fee mensual compra una <em>capacidad integrada</em>",
+        "intro": "Estrategia, contenido, visibilidad y conversión operan como un mismo sistema.",
+        "highlight": "La capacidad aumenta por paquete; los valores siguen siendo <em>netos y sin IVA</em>.",
+        "panelQuestion": "¿Qué queda funcionando cada mes?",
+        "capabilities": [
+          { "kind": "governance", "title": "Estrategia", "description": "Prioridades, calendario y decisiones del ciclo." },
+          { "kind": "conversation", "title": "RRSS", "description": "Contenido B2B para descubrir y sostener conversaciones." },
+          { "kind": "search", "title": "SEO/AEO", "description": "Encontrabilidad, comprensión y citabilidad." },
+          { "kind": "data", "title": "Medición", "description": "GA4, GTM, conversiones y reporte ejecutivo." },
+          { "kind": "measurement", "title": "HubSpot", "description": "Contacto, pipeline y siguiente acción visibles." }
+        ]
+      }
+    },
+    {
+      "slideId": "recomendacion",
+      "contentType": "dual-text",
+      "template": "DualTextSplit",
+      "slots": {
+        "title": "Demand & Authority concentra el mejor equilibrio",
+        "leftConcept": {
+          "label": "LA INVERSIÓN",
+          "title": "$1.100.000 + $1.650.000",
+          "paragraphs": [
+            "<strong>Implementación inicial:</strong> landing estratégica, medición, conversión y HubSpot CRM Free.",
+            "<strong>Operación mensual:</strong> RRSS, SEO/AEO, estrategia, contenido y lectura de resultados."
+          ],
+          "icon": "target"
+        },
+        "rightConcept": {
+          "label": "LA RAZÓN",
+          "title": "Profundidad suficiente sin sobredimensionar",
+          "paragraphs": [
+            "Permite sostener LinkedIn, Instagram y YouTube mediante adaptaciones, sin financiar desde el inicio una operación regional completa.",
+            "Deja una ruta clara para ampliar volumen, contenidos, mercados o automatizaciones cuando exista evidencia comercial."
+          ],
+          "icon": "data"
+        },
+        "outcome": { "label": "RECOMENDACIÓN", "text": "Una base sólida para decidir la siguiente inversión con <strong>datos reales</strong>." }
+      }
+    },
+    {
+      "slideId": "condiciones",
+      "contentType": "comparison",
+      "template": "ComparisonSplit",
+      "slots": {
+        "leftTitle": "Incluido en la propuesta",
+        "rightTitle": "Se cotiza por separado cuando corresponda",
+        "rows": [
+          { "left": { "lead": "HubSpot CRM Free", "body": "Configuración inicial, pipeline, formularios, propiedades y dashboard." }, "right": { "lead": "HubSpot Starter", "body": "Licencia, impuestos, renovación y módulos pagados por cuenta de Brightcell." } },
+          { "left": { "lead": "Contenido mensual", "body": "Capacidad definida por el paquete contratado y adaptaciones entre canales." }, "right": { "lead": "Producción especial", "body": "Grabaciones, fotografía, talento, viajes y jornadas audiovisuales en terreno." } },
+          { "left": { "lead": "Medición y reporte", "body": "GA4, GTM, eventos, dashboard y lectura ejecutiva mensual." }, "right": { "lead": "Medios y terceros", "body": "Pauta, hosting, dominio, traducciones e integraciones operacionales." } },
+          { "left": { "lead": "Contrato mensual", "body": "Operación recurrente con aviso de término de 30 días." }, "right": { "lead": "Evoluciones", "body": "Nuevas páginas, países, idiomas o funcionalidades mediante cambio de alcance." } }
+        ]
+      }
+    },
+    {
+      "slideId": "cierre-economico",
+      "contentType": "back-cover",
+      "template": "BackCoverFull",
+      "slots": {}
+    }
+  ]
+}

@@ -14,7 +14,9 @@
 |---|---|---|---|
 | Investigación | `research/brightcell-contexto-INTERNO.md` | Interna | Contexto, lectura estratégica, benchmark y supuestos |
 | Oferta técnica | `oferta-tecnica.md` | Client-facing | Fuente narrativa y ledger de evidencia |
+| Propuesta económica | `propuesta-economica.md` | Client-facing | Inversión inicial, tres paquetes mensuales, beneficios, límites y condiciones |
 | Arquitectura económica | `propuesta-economica-arquitectura-INTERNA.md` | Interna | Packaging, límites, recurrencia y dependencias |
+| Plan deck económico | `deck-plan-economic.json` | Fuente de composición | Deck client-facing separado, con precios netos sin IVA |
 | Plan del deck | `deck-plan.json` | Fuente de composición | Slots y orden narrativo del PDF |
 | Artefactos vivos | `artifact-manifest.json`, cuando existan enlaces | Mixta, con gate | Procedencia y uso de piezas externas/interactivas |
 | PDF compuesto | `.captures/brightcell-bid-v*` | Entregable | Salida versionada de Artifact Composer; no es la fuente |
@@ -22,6 +24,50 @@
 El discriminador de audiencia manda: los archivos `research/` y `*-INTERNO` nunca se entregan al cliente.
 El deck puede mostrar mockups conceptuales, pero deben estar rotulados como tales y nunca simular resultados
 reales de Brightcell.
+
+## Aprendizajes comerciales consolidados — 31 de julio de 2026
+
+> **Gate comercial:** borrador listo para revisión; **no enviar ni presentar** hasta aprobación final de Finance
+> y del owner comercial. Los valores de este expediente no constituyen un pricing reutilizable para otros deals.
+
+La económica evolucionó desde una suma de servicios hacia una escalera de capacidades. La landing es un
+proyecto único y la operación de crecimiento se contrata mensualmente; no se debe imponer una permanencia o
+un programa de 90 días si el cliente no lo solicita.
+
+### Separación de la inversión
+
+- **Implementación única:** landing estratégica preparada para conversión, SEO de lanzamiento, medición,
+  GA4, GTM, eventos, formularios y conexión inicial con HubSpot.
+- **Operación mensual:** estrategia, RRSS, SEO/AEO, contenidos, optimización de conversión, medición y
+  reporting, con capacidades crecientes según el paquete.
+- **HubSpot CRM Free:** beneficio incluido dentro de la propuesta, no una línea adicional de activación.
+  La configuración se limita a un portal/pipeline básico, formularios, propiedades, dashboard y transferencia.
+  Licencias pagadas, upgrades e integraciones avanzadas quedan fuera y son costo del cliente.
+
+### Paquetes definidos para el deck económico
+
+Todos los valores son **netos, sin IVA**, en CLP:
+
+La implementación es una sola línea común a las tres alternativas: **$1.100.000 netos, pago único**. El cliente
+elige después una capacidad mensual; cambiar de paquete no cambia retrospectivamente el precio de la landing.
+
+| Paquete mensual | Operación mensual |
+|---|---:|
+| **Growth Core** | $1.250.000 |
+| **Demand & Authority** — recomendado | $1.650.000 |
+| **Regional Growth** | $2.200.000 |
+
+El aumento entre paquetes debe explicar capacidad adicional —volumen y adaptación de piezas, profundidad
+SEO/AEO, contenidos web, audiovisual derivado, automatización, reporting y acompañamiento estratégico— y no
+solo cambiar el nombre del servicio. El alcance cuantitativo y las exclusiones deben permanecer explícitos.
+
+### Presentación económica separada
+
+La propuesta económica se presenta en un deck independiente del deck técnico. El deck técnico demuestra la
+solución; el económico permite comparar inversión inicial, operación mensual y niveles de capacidad sin
+enterrar el precio dentro de la narrativa técnica. El plan fuente es `deck-plan-economic.json` y su salida
+compuesta debe conservar un identificador y una carpeta de captura propios, sin modificar los artefactos de
+SKY ni sustituir el deck técnico de Brightcell.
 
 ## Método observado, paso a paso
 
