@@ -238,3 +238,5 @@ Cada promoción registra:
 - runtime: revisión `efeonce-mcp-gateway-00007-d79`, 100% traffic, `MCP_ALLOWED_HOSTS` y
   `MCP_ALLOWED_ORIGINS` restringidos a `mcp.efeonce.org`;
 - smoke posterior: health y metadata `200`; `POST /mcp` anónimo `401` con `resource_metadata` y scope base.
+  El request autenticado de `globe.capabilities.list` también devolvió el manifest esperado por el hostname
+  canónico.
