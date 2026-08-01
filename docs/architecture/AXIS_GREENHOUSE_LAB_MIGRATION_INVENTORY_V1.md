@@ -37,7 +37,8 @@ Cada candidato requiere auditoría transitive de imports antes de migrarse.
 | `motion` | candidate parity | seis duraciones, cuatro easings, cuatro variantes, replay y estado manual sin motion; faltan canary visual/computed y compare del consumidor |
 | `border-beam` | skeleton reference | faltan interacción completa y coreografía de beam |
 | `microinteractions` | excluded first slice | composite product feedback; extract per primitive |
-| `team-avatar-group`, `surface-recipes`, `roadmap-timeline`, `charts` | skeleton reference | contracts + fixtures mínimas; parity pendiente |
+| `team-avatar-group`, `surface-recipes`, `roadmap-timeline` | skeleton reference | contracts + fixtures mínimas; parity pendiente |
+| `charts` | candidate parity | cinco composiciones reales, stage selector, metric tabs, add-metric, estados, tabla fallback, responsive y reduced-motion; falta canary visual/computed |
 | `brand-logos` | gate parcial | `efeonce.brand-logos`; assets reales y compare pendientes |
 | `axis-adapters` | excluded from reference | stays in consumers; compare by evidence |
 | `efeonce-brand` | skeleton reference | `efeonce.brand-motion`; asset experimental, SVG nodes y GSAP siguen fuera |
