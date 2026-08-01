@@ -23,6 +23,11 @@
 - Pendiente inmediato: gates premium/automatizados, migración/deploy y smoke real. El path OAuth/API/CLI permanece
   separado pero usa la misma authority state machine y ledger. Typecheck, ESLint focal y 38 tests dirigidos pasan.
   No hubo push, deploy ni release.
+- TASK-1628 está en ejecución sobre Globe `main`: el self reader ya separa capacidad efectiva de ledger histórico,
+  agrega funding redactado, estado low resuelto server-side y un daily fence durable de solo lectura. El SDK usa una
+  query self sin `requestedCredits`; `/v1/session` entrega el deep link Greenhouse desde `GREENHOUSE_BASE_URL`.
+  Domain 419/419, database 143/143, SDK 18/18 y studio-web 286/286 pasan. Greenhouse ya prepara el movimiento OAuth
+  1/4 (`allowedScopes` solamente); coverage UI continúa `policy-blocked` hasta completar los cuatro movimientos.
 
 ## Checkout compartido único — worktrees prohibidos (2026-08-01)
 

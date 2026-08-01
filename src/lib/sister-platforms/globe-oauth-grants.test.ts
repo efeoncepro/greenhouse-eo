@@ -15,6 +15,7 @@ const {
   GLOBE_OAUTH_CODE_TTL_SECONDS,
   GLOBE_OAUTH_REVALIDATE_AFTER_SECONDS,
   GLOBE_PRODUCER_CAPABILITY_SCOPES,
+  GLOBE_TRANSITIONAL_ALLOWED_SCOPES,
   buildGlobeOAuthGrantContract,
   updateGlobeOAuthGrantContract,
   updateGlobeOAuthSessionContract
@@ -140,6 +141,12 @@ describe('Globe OAuth grant contract', () => {
       expect(PRODUCER_CONTRACT.policy.requiredScopes).toContain(attestScope)
       expect(PRODUCER_CONTRACT.policy.capabilityScopes).toContain(attestScope)
       expect(PRODUCER_CONTRACT.allowedScopes).toContain(attestScope)
+    }
+
+    for (const scope of GLOBE_TRANSITIONAL_ALLOWED_SCOPES) {
+      expect(PRODUCER_CONTRACT.allowedScopes).toContain(scope)
+      expect(PRODUCER_CONTRACT.policy.requiredScopes).not.toContain(scope)
+      expect(PRODUCER_CONTRACT.policy.capabilityScopes).not.toContain(scope)
     }
   })
 

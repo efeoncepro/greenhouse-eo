@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -15,13 +15,13 @@
 - Wireframe: `docs/ui/wireframes/TASK-1628-globe-producer-credit-capacity-self-view.md`
 - Flow: `docs/ui/flows/TASK-1628-globe-producer-credit-capacity-self-view-flow.md`
 - Motion: `docs/ui/motion/TASK-1628-globe-producer-credit-capacity-self-view-motion.md`
-- Backend impact: `none`
+- Backend impact: `contract-extension`
 - Epic: `EPIC-028`
-- Status real: `Rebaselinada por TASK-1630; bloqueada por snapshot/self-status correctos`
+- Status real: `Reader/proyección self-status code-complete en Globe main; implementación UI y rollout coordinado activos`
 - Rank: `next.6`
 - Domain: `creative|ui|finance`
-- Blocked by: `TASK-1482, TASK-1586`
-- Branch: `task/TASK-1628-globe-producer-credit-capacity-self-view`
+- Blocked by: `none`
+- Branch: `Globe main (trabajo + default/integración/release); Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -67,16 +67,16 @@ Reglas obligatorias:
 ## Normative Docs
 
 - `docs/tasks/in-progress/TASK-1482-globe-credit-pools-grants-budget-administration.md`
-- `docs/tasks/to-do/TASK-1586-globe-credit-denial-disambiguator-operator.md`
-- `docs/tasks/to-do/TASK-1483-globe-credits-operations-workbench.md`
+- `docs/tasks/in-progress/TASK-1586-globe-credit-denial-disambiguator-operator.md`
+- `docs/tasks/in-progress/TASK-1483-globe-credits-operations-workbench.md`
 - `docs/tasks/in-progress/TASK-1559-globe-client-feed-viewer-search-arrivals.md`
 
 ## Dependencies & Impact
 
 ### Depends on
 
-- TASK-1482 publica un snapshot con período y decisión coherentes con reserve.
-- TASK-1586 publica `CreditCapacitySelfStatusV1`, redactado y workspace-scoped.
+- TASK-1482 ya publica un snapshot con período y decisión coherentes con reserve en Globe `main`.
+- TASK-1586 ya publica `CreditCapacitySelfStatusV1`, redactado y workspace-scoped, además de SDK y wiring.
 - Producer React/Tailwind y `CreditsPopover` existentes.
 
 ### Blocks / Impacts
@@ -86,12 +86,16 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `../efeonce-globe/apps/studio-client/src/surfaces/producer/ProducerHeader.tsx`
+- `../efeonce-globe/packages/contracts/src/credit-administration.ts`
+- `../efeonce-globe/packages/domain/src/credit-capacity.ts`
+- `../efeonce-globe/packages/database/src/stores/spend-fence.ts`
+- `../efeonce-globe/apps/studio-web/src/app.ts`
 - `../efeonce-globe/apps/studio-client/src/surfaces/producer/ProducerHeader.tsx` (`CreditsPopover` local)
 - tests/fixtures de la surface Producer asociados al status.
 - wireframe, flow y evidencia GVC de TASK-1628 en Greenhouse.
 
-No posee contracts/readers de crédito, grants OAuth, commands de fondeo, pools, policy ni ledger.
+No posee commands de fondeo, pools, policy ni ledger. Sólo extiende de forma aditiva el reader self existente y
+su read port no mutante del daily fence; no crea otra autoridad económica.
 
 ## Current Repo State
 
@@ -116,6 +120,13 @@ No posee contracts/readers de crédito, grants OAuth, commands de fondeo, pools,
 - Server/browser split: `policy/readers/auth server-side; status redactado y render browser-side`
 - Build impact: `none`
 - Extraction blocker: `Producer vive en el payload React/Tailwind de Globe y consume su BFF/session`
+
+## Hybrid Execution Justification
+
+La UI no puede representar funding, ledger histórico, daily fence ni el umbral low sin inventar matemática o
+exponer DTOs administrativos. La extensión backend es aditiva, read-only y pertenece al mismo reader self que la
+surface consume; separarla dejaría una task UI bloqueada por otro artefacto sin valor autónomo. No modifica schema,
+ledger ni commands y se verifica como una sola unidad contractual reader → BFF → Producer.
 
 ## UI/UX Contract
 
@@ -225,11 +236,13 @@ Contrato detallado:
 
 ## Backend/Data Contract
 
-- Backend impact sigue siendo `none`: esta task no crea schema, migration, reader, command, OAuth scope ni
-  capability. TASK-1482 entrega el snapshot; `CreditCapacitySelfStatusV1` y su adapter BFF son entregables target
-  de TASK-1586 y todavía no están live.
-- La implementación UI sólo consume ese DTO browser-safe cuando TASK-1586 lo entregue. Si no existe o no pasa
-  conformance reader↔reserve, TASK-1628 permanece bloqueada y no introduce un fallback local.
+- Backend impact es una extensión aditiva del reader existente, sin migration ni command nuevo: el self-status
+  incorpora agregados redactados de funding/ledger, clasificación server-side y una lectura no mutante del daily
+  fence. Activa coverage `ui` sólo al final y coordina el scope humano read-only
+  `globe.credits.capacity.self.read`. TASK-1482/TASK-1586 ya entregaron la autoridad económica y el wiring base en
+  Globe `main`; todavía no están live.
+- La implementación UI consume exclusivamente ese DTO browser-safe. Si el rollout coordinado de scope o la
+  conformance reader↔reserve falla, la surface permanece fail-closed y no introduce un fallback local.
 - No se agregan write paths, secretos, cookies exportadas, queries directas ni derivaciones de autoridad en el
   cliente.
 
@@ -279,6 +292,13 @@ Contrato detallado:
 ## Rollout Plan & Risk Matrix
 
 Slice 1 → Slice 2 → Slice 3. Self-status debe pasar conformance antes de cambiar la cifra primaria.
+
+El scope OAuth se promueve en cuatro movimientos sin downtime:
+
+1. Greenhouse agrega el scope sólo a `allowedScopes`; todavía no lo requiere ni lo concede.
+2. Globe despliega el request del scope con coverage UI aún `policy-blocked`; login debe seguir sano.
+3. Greenhouse agrega el scope a `requiredScopes` y `capabilityScopes`; token/login se verifican nuevamente.
+4. Globe activa coverage UI y la surface; hasta entonces el reader no aparece disponible en el browser.
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 | --- | --- | --- | --- | --- |
