@@ -18,7 +18,7 @@
 - Globe conserva `main` como rama predeterminada/integración/release; Greenhouse permanece en `develop`. No se
   creó ningún worktree ni se ejecutó un release completo de Greenhouse. El contrato quedó endurecido en el
   `AGENTS.md` y CI de Globe, el proceso/template/planners de tasks y las 97 tasks activas de EPIC-028; el helper
-  histórico de sincronización de worktrees quedó retirado fail-closed.
+  histórico de sincronización de worktrees quedó retirado fail-closed y el harness Codex ahora detecta regresiones.
 - El worker de expiry quedó promovido desde Globe `main` con scheduler minutely, flag y observabilidad activos.
   El digest `sha256:d8295862…bae9` pasó deploy exacto, canary y OpenTofu sin drift. Dos holds históricos
   `submission_unknown` se reconcilian/difieren con `failed=0`; no se liberan a ciegas.

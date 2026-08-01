@@ -14,7 +14,11 @@ const files = {
   skill: '.codex/skills/greenhouse-task-execution-hook/SKILL.md',
   taskPlannerSkill: '.codex/skills/greenhouse-task-planner/SKILL.md',
   architectSkill: '.codex/skills/software-architect-2026/SKILL.md',
+  architectOverlay: '.codex/skills/software-architect-2026/efeonce-overlay/router.md',
   modularOperatingModel: 'docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md',
+  taskProcess: 'docs/tasks/TASK_PROCESS.md',
+  taskTemplate: 'docs/tasks/TASK_TEMPLATE.md',
+  worktreeScript: 'scripts/worktree-sync.sh',
   agents: 'AGENTS.md',
   claude: 'CLAUDE.md',
   claudeCommand: '.claude/commands/implement-task.md',
@@ -52,6 +56,7 @@ requireIncludes('CODEX prompt', sources.prompt, 'fork recomendado, no autorizado
 requireIncludes('CODEX prompt', sources.prompt, 'MODULAR PLACEMENT CONTRACT')
 requireIncludes('CODEX prompt', sources.prompt, 'MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md')
 requireIncludes('CODEX prompt', sources.prompt, 'Future candidate home')
+requireIncludes('CODEX prompt', sources.prompt, 'Greenhouse trabaja en `develop`; Globe trabaja directamente')
 requireIncludes('CODEX hook', sources.hook, '--subagents')
 requireIncludes('CODEX skill', sources.skill, '/implement-task ###')
 requireIncludes('CODEX skill', sources.skill, 'Goal Preflight')
@@ -59,8 +64,11 @@ requireIncludes('CODEX skill', sources.skill, '--subagents')
 requireIncludes('CODEX skill', sources.skill, 'Modular Placement Contract')
 requireIncludes('CODEX task planner', sources.taskPlannerSkill, 'EPIC-026 Modular Placement Contract')
 requireIncludes('CODEX task planner', sources.taskPlannerSkill, 'MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md')
-requireIncludes('CODEX architect', sources.architectSkill, 'Greenhouse EPIC-026 transitional rule')
-requireIncludes('CODEX architect', sources.architectSkill, 'MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md')
+requireIncludes('CODEX architect', sources.architectSkill, 'efeonce-overlay/router.md')
+requireIncludes('CODEX architect overlay', sources.architectOverlay, 'MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md')
+requireIncludes('task process', sources.taskProcess, 'Greenhouse `develop` and Globe `main`')
+requireIncludes('task template', sources.taskTemplate, 'Greenhouse develop; Globe main; sin worktrees')
+requireIncludes('worktree tombstone', sources.worktreeScript, 'scripts/worktree-sync.sh is retired')
 requireIncludes('modular operating model', sources.modularOperatingModel, '## Mechanical enforcement')
 requireIncludes('modular operating model', sources.modularOperatingModel, 'pnpm task:lint --task TASK-###')
 requireIncludes('AGENTS.md', sources.agents, '/implement-task ###')
@@ -76,6 +84,10 @@ requireIncludes('Claude command', sources.claudeCommand, 'Modular Placement Cont
 requireIncludes('project_context.md', sources.projectContext, '/implement-task ###')
 
 rejectIncludes('CODEX prompt stale branch rule', sources.prompt, 'crea branch `task/TASK-###-short-slug`')
+rejectIncludes('task process stale branch rule', sources.taskProcess, 'Crear branch: `task/TASK-###-short-slug`')
+rejectIncludes('task template stale branch rule', sources.taskTemplate, 'Branch: `task/TASK-###-short-slug`')
+rejectIncludes('package stale worktree command', sources.packageJson, '"worktrees:sync"')
+rejectIncludes('worktree tombstone active git worktree call', sources.worktreeScript, 'git worktree')
 rejectIncludes('CODEX prompt stale skill', sources.prompt, 'vercel:nextjs')
 rejectIncludes('CODEX prompt stale skill', sources.prompt, 'modern-ui-architect')
 rejectIncludes('CODEX prompt stale slice rule', sources.prompt, 'llevas más de 3 slices sin commit')
