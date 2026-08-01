@@ -1,17 +1,18 @@
 # Fondeo gobernado de créditos de Globe — cómo se le pone presupuesto al mes
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-07-26 por Claude (TASK-1566)
-> **Ultima actualizacion:** 2026-07-26 por Claude
+> **Ultima actualizacion:** 2026-07-31 por Codex (TASK-1629)
 > **Documentacion tecnica:** [ADR-015](../../architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md)
 
 ## Qué es
 
 Globe genera imagen, video y audio gastando **créditos**. Cada mes ese gasto tiene un presupuesto, y
 este documento explica cómo se **agrega presupuesto**: el **fondeo gobernado**. Funciona en dos
-pasos — alguien **propone** un plan, y una **persona** (con su sesión real de Greenhouse) lo
-**confirma**. Sin confirmación humana no se mueve nada.
+pasos — un usuario autenticado **propone** un plan y un usuario autorizado lo **confirma**. Ese
+usuario puede ser una persona o un agente delegado; sin confirmación atribuida y autorizada no se
+mueve nada.
 
 Antes de esto, agregar presupuesto exigía un procedimiento de emergencia («break-glass»: prestarle
 temporalmente poderes de administrador a una cuenta técnica). Se usó tres veces para lo mismo, y ese
@@ -45,11 +46,12 @@ demuestra por qué el plan importa: un fondeo **sin** subir el tope mostraba que
 | Acto | Quién |
 |---|---|
 | Proponer un plan | Una persona o un agente (es de solo lectura: registra la intención, no muta nada) |
-| **Confirmar** | **Solo una persona**, con su sesión real de Greenhouse. Un agente o proceso de servicio es rechazado por la base de datos misma |
+| **Confirmar** | Una persona autorizada o un agente autenticado con delegación explícita del workspace, scopes, entitlements y límites vigentes |
 | Un segundo confirmador | Es **política por workspace** (apagada en el workspace interno, donde el aprobador es el dueño del presupuesto), no una regla fija |
 
 Cada fase queda registrada con **quién** la hizo y **con qué derecho**, en una tabla que no se puede
-editar ni borrar (append-only). Ésa es la evidencia para cualquier revisión posterior.
+editar ni borrar (append-only), incluido el modo de autenticación (`human` o `agent`). Un principal
+de servicio o workload genérico no puede confirmar: carece de una delegación atribuible a usuario.
 
 ## Protecciones que trae el carril
 
@@ -60,6 +62,8 @@ editar ni borrar (append-only). Ésa es la evidencia para cualquier revisión po
   la clave que sea — puede generar un segundo fondeo.
 - **La firma nunca sale del servidor**: ningún cliente, script ni persona maneja el secreto de
   aprobación. Eso es lo que vuelve innecesario el break-glass.
+- **Delegación agente acotada**: cada workspace decide si la habilita, el máximo por grant y el
+  máximo mensual. La política nace apagada y la base de datos rechaza cualquier exceso.
 
 > Detalle técnico: comandos `globe.credits.month.fund.propose` / `.confirm` (surface
 > `sister-platform`), dominio en `efeonce-globe/packages/domain/src/credit-funding.ts`, rutas en

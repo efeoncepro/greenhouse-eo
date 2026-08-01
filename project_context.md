@@ -23,6 +23,12 @@ La flota de modelos de Globe se resuelve y promueve por identidad exacta de ruta
 evaluación/derechos/readbacks y una generación real desde la UI autenticada. Un MIME de transporte genérico nunca
 amplía la allowlist global: sólo puede aceptarse para una salida exacta esperada después de verificar sus bytes.
 
+La administración de créditos de Globe usa el carril gobernado `propose → confirm` de ADR-015 mediante OAuth
+público + PKCE (`TASK-1629`; los archivos de migración conservan la etiqueta histórica `task-1616`). Ante una
+contradicción de presupuesto, el primer acto es read-only: reconciliar propuesta, pool, grant, policy efectiva,
+availability/evaluate, balance, usage, ledger e intents append-only para el mismo workspace/período. `propose`
+también crea estado durable; no se ejecuta durante discovery ni se fondea cuando los readers prueban suficiencia.
+
 ### Lectura mínima obligatoria
 
 1. [AGENTS.md](AGENTS.md): reglas transversales y router de dominios.

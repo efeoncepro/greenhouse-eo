@@ -48,6 +48,8 @@ export type GlobeCreditFundingActor = Readonly<{
   userId: string
   /** El entitlement con el que actúa, para que la evidencia diga con qué autoridad se aprobó. */
   entitlement: string
+  /** Proveniencia autenticada de la sesión; gobierna la delegación de agentes. */
+  authMode: string
 }>
 
 export type GlobeCreditFundingProposeInput = Readonly<{
@@ -76,6 +78,10 @@ export class GlobeCreditFundingBrokerError extends Error {
     | 'proposal_not_found'
     | 'confirmer_is_proposer'
     | 'already_recorded'
+    | 'agent_confirmation_forbidden'
+    | 'agent_funding_limit_exceeded'
+    | 'fingerprint_mismatch'
+    | 'actor_auth_mode_not_allowed'
     | 'globe_unavailable'
     /** Globe respondió 4xx: negó la operación. Estructural — reintentar no la resuelve. */
     | 'rejected_by_globe'
@@ -172,45 +178,125 @@ export async function confirmGlobeCreditFunding(
 
   if (!proposed) throw new GlobeCreditFundingBrokerError('proposal_not_found')
 
-  await recordIntent({
-    globeWorkspaceId: input.globeWorkspaceId,
-    proposalId: input.proposalId,
-    phase: 'confirmed',
-    actor: input.actor,
-    proposedByUserId: proposed.actorUserId,
-    planFingerprint: input.fingerprint,
-    plan: proposed.plan,
-    correlationId,
-    idempotencyKey: input.idempotencyKey
-  })
+  if (input.fingerprint !== proposed.planFingerprint) {
+    throw new GlobeCreditFundingBrokerError('fingerprint_mismatch')
+  }
+
+  let decision = await readConfirmationDecision(input.globeWorkspaceId, input.proposalId)
+
+  if (decision?.terminalPhase === 'completed') return decision.outcome
+
+  if (decision?.terminalPhase === 'confirm_failed') {
+    throw new GlobeCreditFundingBrokerError('rejected_by_globe')
+  }
+
+  if (decision) {
+    if (
+      decision.actorUserId !== input.actor.userId ||
+      decision.actorAuthMode !== input.actor.authMode ||
+      decision.planFingerprint !== input.fingerprint
+    ) {
+      throw new GlobeCreditFundingBrokerError('already_recorded')
+    }
+  } else {
+    try {
+      await recordIntent({
+        globeWorkspaceId: input.globeWorkspaceId,
+        proposalId: input.proposalId,
+        phase: 'confirmed',
+        actor: input.actor,
+        proposedByUserId: proposed.actorUserId,
+        planFingerprint: input.fingerprint,
+        plan: proposed.plan,
+        correlationId,
+        idempotencyKey: input.idempotencyKey
+      })
+    } catch (error) {
+      if (!(error instanceof GlobeCreditFundingBrokerError) || error.code !== 'already_recorded') throw error
+
+      decision = await readConfirmationDecision(input.globeWorkspaceId, input.proposalId)
+
+      if (
+        !decision ||
+        decision.actorUserId !== input.actor.userId ||
+        decision.actorAuthMode !== input.actor.authMode ||
+        decision.planFingerprint !== input.fingerprint ||
+        decision.idempotencyKey !== input.idempotencyKey
+      ) {
+        throw error
+      }
+    }
+  }
+
+  if (decision?.terminalPhase === 'completed') return decision.outcome
+
+  if (decision?.terminalPhase === 'confirm_failed') {
+    throw new GlobeCreditFundingBrokerError('rejected_by_globe')
+  }
+
+  const dispatchIdempotencyKey = decision?.idempotencyKey ?? input.idempotencyKey
 
   const { client } = createGreenhouseGlobeClient(process.env, dependencies)
 
-  return dispatch(
-    () =>
-      client.dispatchCommand(
-        CONFIRM_COMMAND,
-        {
-          proposalId: input.proposalId,
-          fingerprint: input.fingerprint,
-          // Mismo contrato que `proposedBy`: `attribution()` exige `at`. Sin él, el `confirm` moría
-          // en `400 invalid_request` — y como el broker colapsaba todo a `globe_unavailable`, se
-          // leía como "Globe no respondió" cuando Globe respondía perfectamente que el payload
-          // estaba incompleto.
-          confirmedBy: {
-            principalId: input.actor.userId,
-            entitlement: input.actor.entitlement,
-            at: new Date().toISOString()
+  try {
+    const outcome = await dispatch(
+      () =>
+        client.dispatchCommand(
+          CONFIRM_COMMAND,
+          {
+            proposalId: input.proposalId,
+            fingerprint: input.fingerprint,
+            // Mismo contrato que `proposedBy`: `attribution()` exige `at`. Sin él, el `confirm` moría
+            // en `400 invalid_request` — y como el broker colapsaba todo a `globe_unavailable`, se
+            // leía como "Globe no respondió" cuando Globe respondía perfectamente que el payload
+            // estaba incompleto.
+            confirmedBy: {
+              principalId: input.actor.userId,
+              entitlement: input.actor.entitlement,
+              at: new Date().toISOString()
+            }
+          },
+          {
+            workspaceId: input.globeWorkspaceId,
+            idempotencyKey: dispatchIdempotencyKey,
+            correlationId
           }
-        },
-        {
-          workspaceId: input.globeWorkspaceId,
-          idempotencyKey: input.idempotencyKey,
-          correlationId
-        }
-      ),
-    'confirm'
-  )
+        ),
+      'confirm'
+    )
+
+    await recordTerminalIntent({
+      globeWorkspaceId: input.globeWorkspaceId,
+      proposalId: input.proposalId,
+      phase: 'completed',
+      actor: input.actor,
+      proposedByUserId: proposed.actorUserId,
+      planFingerprint: input.fingerprint,
+      plan: proposed.plan,
+      outcome,
+      correlationId,
+      idempotencyKey: dispatchIdempotencyKey
+    })
+
+    return outcome
+  } catch (error) {
+    if (error instanceof GlobeCreditFundingBrokerError && error.code === 'rejected_by_globe') {
+      await recordTerminalIntent({
+        globeWorkspaceId: input.globeWorkspaceId,
+        proposalId: input.proposalId,
+        phase: 'confirm_failed',
+        actor: input.actor,
+        proposedByUserId: proposed.actorUserId,
+        planFingerprint: input.fingerprint,
+        plan: proposed.plan,
+        outcome: { code: 'rejected_by_globe' },
+        correlationId,
+        idempotencyKey: dispatchIdempotencyKey
+      })
+    }
+
+    throw error
+  }
 }
 
 async function dispatch<T>(operation: () => Promise<T>, phase: 'propose' | 'confirm'): Promise<T> {
@@ -261,9 +347,9 @@ async function dispatch<T>(operation: () => Promise<T>, phase: 'propose' | 'conf
 async function readProposedIntent(
   globeWorkspaceId: string,
   proposalId: string
-): Promise<Readonly<{ actorUserId: string; plan: unknown }> | undefined> {
-  const rows = await query<{ actor_user_id: string; plan: unknown }>(
-    `SELECT actor_user_id, plan
+): Promise<Readonly<{ actorUserId: string; planFingerprint: string; plan: unknown }> | undefined> {
+  const rows = await query<{ actor_user_id: string; plan_fingerprint: string; plan: unknown }>(
+    `SELECT actor_user_id, plan_fingerprint, plan
        FROM greenhouse_core.globe_credit_funding_intents
       WHERE globe_workspace_id = $1 AND proposal_id = $2 AND phase = 'proposed'
       LIMIT 1`,
@@ -272,14 +358,49 @@ async function readProposedIntent(
 
   const row = rows[0]
 
-  return row ? { actorUserId: row.actor_user_id, plan: row.plan } : undefined
+  return row ? { actorUserId: row.actor_user_id, planFingerprint: row.plan_fingerprint, plan: row.plan } : undefined
+}
+
+async function readConfirmationDecision(globeWorkspaceId: string, proposalId: string) {
+  const rows = await query<{
+    phase: 'confirmed' | 'completed' | 'confirm_failed'
+    actor_user_id: string
+    actor_auth_mode: string
+    plan_fingerprint: string
+    plan: unknown
+    idempotency_key: string
+  }>(
+    `SELECT phase, actor_user_id, actor_auth_mode, plan_fingerprint, plan, idempotency_key
+       FROM greenhouse_core.globe_credit_funding_intents
+      WHERE globe_workspace_id = $1
+        AND proposal_id = $2
+        AND phase IN ('confirmed', 'completed', 'confirm_failed')
+      ORDER BY CASE phase WHEN 'completed' THEN 1 WHEN 'confirm_failed' THEN 2 ELSE 3 END
+      LIMIT 1`,
+    [globeWorkspaceId, proposalId]
+  )
+
+  const row = rows[0]
+
+  if (!row) return undefined
+
+  const plan = row.plan && typeof row.plan === 'object' ? (row.plan as Record<string, unknown>) : {}
+
+  return {
+    actorUserId: row.actor_user_id,
+    actorAuthMode: row.actor_auth_mode,
+    planFingerprint: row.plan_fingerprint,
+    idempotencyKey: row.idempotency_key.replace(/^terminal:(?:completed|confirm_failed):/, ''),
+    terminalPhase: row.phase === 'confirmed' ? undefined : row.phase,
+    outcome: row.phase === 'completed' ? plan.confirmationOutcome : undefined
+  } as const
 }
 
 async function recordIntent(
   input: Readonly<{
     globeWorkspaceId: string
     proposalId: string
-    phase: 'proposed' | 'confirmed'
+    phase: 'proposed' | 'confirmed' | 'completed' | 'confirm_failed'
     actor: GlobeCreditFundingActor
     proposedByUserId?: string
     planFingerprint: string
@@ -291,15 +412,16 @@ async function recordIntent(
   try {
     await query(
       `INSERT INTO greenhouse_core.globe_credit_funding_intents
-         (globe_workspace_id, proposal_id, phase, actor_user_id, actor_entitlement,
+         (globe_workspace_id, proposal_id, phase, actor_user_id, actor_entitlement, actor_auth_mode,
           proposed_by_user_id, plan_fingerprint, plan, correlation_id, idempotency_key)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
       [
         input.globeWorkspaceId,
         input.proposalId,
         input.phase,
         input.actor.userId,
         input.actor.entitlement,
+        input.actor.authMode,
         input.proposedByUserId ?? null,
         input.planFingerprint,
         JSON.stringify(input.plan ?? {}),
@@ -312,8 +434,26 @@ async function recordIntent(
     // accionables en vez de propagar el error de Postgres, que llevaría detalle de esquema.
     const message = error instanceof Error ? error.message : ''
 
-    if (message.includes('globe_credit_funding_intents_confirmer_not_proposer')) {
+    if (
+      message.includes('globe_credit_funding_intents_confirmer_not_proposer') ||
+      message.includes('globe_credit_funding_second_confirmer_required')
+    ) {
       throw new GlobeCreditFundingBrokerError('confirmer_is_proposer')
+    }
+
+    if (message.includes('globe_credit_funding_agent_confirmation_forbidden')) {
+      throw new GlobeCreditFundingBrokerError('agent_confirmation_forbidden')
+    }
+
+    if (message.includes('globe_credit_funding_agent_limit_exceeded')) {
+      throw new GlobeCreditFundingBrokerError('agent_funding_limit_exceeded')
+    }
+
+    if (
+      message.includes('globe_credit_funding_intent_actor_must_be_authenticated_user') ||
+      message.includes('globe_credit_funding_intent_auth_mode_not_allowed')
+    ) {
+      throw new GlobeCreditFundingBrokerError('actor_auth_mode_not_allowed')
     }
 
     if (message.includes('globe_credit_funding_intents')) {
@@ -324,10 +464,37 @@ async function recordIntent(
   }
 }
 
+async function recordTerminalIntent(
+  input: Readonly<{
+    globeWorkspaceId: string
+    proposalId: string
+    phase: 'completed' | 'confirm_failed'
+    actor: GlobeCreditFundingActor
+    proposedByUserId: string
+    planFingerprint: string
+    plan: unknown
+    outcome: unknown
+    correlationId: string
+    idempotencyKey: string
+  }>
+) {
+  try {
+    await recordIntent({
+      ...input,
+      plan: {
+        ...(input.plan && typeof input.plan === 'object' ? (input.plan as Record<string, unknown>) : {}),
+        confirmationOutcome: input.outcome
+      },
+      idempotencyKey: `terminal:${input.phase}:${input.idempotencyKey}`
+    })
+  } catch (error) {
+    if (error instanceof GlobeCreditFundingBrokerError && error.code === 'already_recorded') return
+    throw error
+  }
+}
+
 /** Estrecha el error del SDK sin importar su clase: el paquete es del repo hermano. */
-function asGlobeSdkError(
-  error: unknown
-): Readonly<{ status: number | undefined; code: string }> | undefined {
+function asGlobeSdkError(error: unknown): Readonly<{ status: number | undefined; code: string }> | undefined {
   if (!(error instanceof Error) || error.name !== 'GlobeSdkError') return undefined
 
   const candidate = error as Error & { status?: unknown; code?: unknown }

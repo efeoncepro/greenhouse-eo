@@ -43,7 +43,7 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 | `ref/motion/loop-v1` | Seedance · 2.0 | Fal | video-generate | ✅ 07-19 | ✅ driver Fal | — |
 | `ref/motion/reference-v1` | Gemini Omni Flash · Preview | Vertex (Omni, Interactions API) | video-generate | ✅ 07-20 (40cr) | ⏳ **solo Lab** — Omni NO está en el path gobernado | ver "Delta" abajo |
 | `ref/video/frames-v1` | Veo · 2.0 | Vertex (`veo-…:predictLongRunning`) | video-frames | ✅ 07-20 (MP4 real, 32cr) | ✅ driver Veo gobernado (`vertex-video`, `us-central1`) desde 07-22 | — |
-| `ref/video/motion-v1` | Seedance · 2.0 | Fal | video-motion-control | ✅ 07-19 | ✅ driver Fal | — |
+| `ref/video/motion-v1` | Seedance · 2.0 | Fal | video-motion-control | ✅ evaluación/report 08-01 | ✅ driver + readiness + binding/promoción 08-01 | TASK-1614: selector live disponible; pieza nueva/playback/governance final pendiente por presupuesto agosto |
 | `ref/audio/foley-v1` | Seed Audio | Fal | audio-generate | ✅ 07-19 | ✅ driver Fal | atestación comercial firmada |
 | `ref/voice/tts-v1` | ElevenLabs · Multilingual v2 | ElevenLabs | speech-synthesize | ✅ 07-19 | ✅ driver Fal | — |
 | `ref/voice/change-v1` | ElevenLabs · Voice Changer | ElevenLabs | audio-change-voice | ✅ 07-20 | ✅ | — |
@@ -73,6 +73,29 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 | 2026-07-30 | TASK-1553 | **GPT Image 2 + 1.5 promovidos** mediante el driver oficial OpenAI Images; generaciones reales desde Producer |
 | 2026-07-30 | TASK-1553 | **Nano Banana 2 promovido** tras despejar el allowlist; generación UI real y recuperación idempotente del mismo run después del fix `1fb5728` |
 | 2026-07-30 | TASK-1553 | **Recraft v4.1 promovido**; contrato SVG, evaluación/revisión/derechos, binding/readiness/circuito y generación real desde Producer; fix fail-closed `84d6a8e` |
+| 2026-08-01 | TASK-1614 | Seedance R2V: evaluación/report, governance, atestación, readiness y saga de promoción completos; selector live disponible. Canary de pieza nueva pendiente por reconciliar presupuesto agosto `0 / 0` contra fondeo y balance durables |
+
+## Evidencia Seedance R2V — promoción completa, canary final pendiente (2026-08-01)
+
+- Identidad exacta: `ref/video/motion-v1 / fal / seedance-2.0-r2v / 2.0`. Policy
+  `seedance-r2v-evaluation` v2, `purpose=evaluation`, `appliesTo=derived`.
+- Fuente canónica private-ingested: `asset_6e9c95d3-7b94-473d-b91a-00f8b35d9eec`, `video/mp4`, 773.219 bytes,
+  SHA-256 `69cbc966999963ed2959c9adedf409560097dce06700d4fe5c9719292a392509`, retención `working-30d` hasta
+  `2026-08-30T23:27:57.776Z`. Governance quedó elegible después del rollout/replay durable.
+- Evaluación `eval_16272c31b11f75be3e0369870f89746b`, attempt
+  `9361550f-6ce3-456d-b710-d5cd3ded6217`: reporte `candidate_ready`, output retenido
+  `sha256:58cc144e0092dbbcd585bdaff44046c7df83df6071ba32bcfc3e05191b28be41`. Fal no se repitió.
+- PRs `#74…#82` cerraron authority revision, scheduler lifecycle/recovery, replay de derived rights y grant mínimo
+  del report writer. Migraciones hasta `0042`, API, worker y Asset Governance están aplicados; Studio no se desplegó.
+- Atestación `mcra_abf61584-46b2-4aa1-adb5-1374d46a6966`, revisión
+  `review_8561c3a9-67ed-4a51-a777-5d7d98746d9f`, readiness
+  `readiness:3fec1f4037aad02f6eb07f471bc7c949`, policy productiva
+  `arp_77a9a0efe8b3f6d3d66a635bfcb05fba2e5268e07baa637ad1bfbe829a301dc4` y saga
+  `promotion_4bda2e0f-6264-4633-a370-4aecf5deaa1a` están completos. Binding revision 2 habilitado; circuito
+  revision 2 cerrado.
+- El Producer muestra **Video → Movimiento/control cámara → Seedance 2.0**. El candidato reproduce
+  (`readyState=4`, 0→1,738 s, sin error). Falta una pieza nueva porque agosto aparece `0 / 0`, pese a balance
+  `available=500836` y fondeo durable previo. Discovery debe reconciliar policy/grants/budget antes de mutar.
 
 ## Evidencia de Nano Banana Pro — canary y promoción gobernada
 

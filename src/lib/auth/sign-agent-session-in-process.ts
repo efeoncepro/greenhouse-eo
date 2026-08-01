@@ -107,7 +107,8 @@ export const signAgentSessionInProcess = async (
     featureFlags: tenant.featureFlags,
     timezone: tenant.timezone,
     portalHomePath,
-    authMode: tenant.authMode || 'agent',
+    // Preserve the authentication ceremony, not the account's base login capability.
+    authMode: 'agent',
     provider: 'agent',
     microsoftEmail: tenant.microsoftEmail,
     googleEmail: tenant.googleEmail,

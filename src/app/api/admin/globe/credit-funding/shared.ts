@@ -16,6 +16,10 @@ const BROKER_ERROR_CODES = {
   proposal_not_found: 'globe_funding_proposal_not_found',
   confirmer_is_proposer: 'globe_funding_confirmer_is_proposer',
   already_recorded: 'globe_funding_already_recorded',
+  fingerprint_mismatch: 'globe_funding_invalid_request',
+  actor_auth_mode_not_allowed: 'forbidden',
+  agent_confirmation_forbidden: 'globe_funding_agent_confirmation_forbidden',
+  agent_funding_limit_exceeded: 'globe_funding_agent_limit_exceeded',
   globe_unavailable: 'globe_unavailable',
   rejected_by_globe: 'globe_funding_rejected'
 } as const satisfies Record<GlobeCreditFundingBrokerError['code'], string>
@@ -35,10 +39,7 @@ export const brokerErrorResponse = (error: GlobeCreditFundingBrokerError) =>
  * La línea de servidor va acá y no queda a criterio del caller (ISSUE-127): sin ella, el operador ve
  * un código honesto pero nadie puede decir QUÉ variable falta.
  */
-export const globeConfigurationErrorResponse = (
-  error: GreenhouseGlobeConfigurationError,
-  operation: string
-) => {
+export const globeConfigurationErrorResponse = (error: GreenhouseGlobeConfigurationError, operation: string) => {
   // `error.code` es un enum cerrado de configuración: no lleva secreto, host ni payload.
   console.error(
     JSON.stringify({
@@ -59,63 +60,15 @@ export const requireIdempotencyKey = (request: Request): string | undefined => {
   return value && value.length >= 8 ? value : undefined
 }
 
-export type ParsedFundingBody = Readonly<{
-  globeWorkspaceId: string
-  poolId: string
-  grantCredits: number
-  monthlyCap?: number
-  periodStart: string
-  periodEnd: string
-}>
+export const resolveFundingActorAuthMode = ({
+  provider,
+  authMode
+}: {
+  provider?: string | null
+  authMode?: string | null
+}) => {
+  const normalizedProvider = provider?.trim().toLowerCase() || ''
+  const normalizedAuthMode = authMode?.trim().toLowerCase() || ''
 
-export const parseFundingBody = (raw: unknown): ParsedFundingBody | undefined => {
-  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return undefined
-
-  const value = raw as Record<string, unknown>
-  const globeWorkspaceId = text(value.globeWorkspaceId)
-  const poolId = text(value.poolId)
-  const periodStart = text(value.periodStart)
-  const periodEnd = text(value.periodEnd)
-  const grantCredits = value.grantCredits
-
-  if (!globeWorkspaceId || !poolId || !periodStart || !periodEnd) return undefined
-  if (!Number.isSafeInteger(grantCredits) || (grantCredits as number) <= 0) return undefined
-  if (Date.parse(periodStart) >= Date.parse(periodEnd)) return undefined
-
-  const monthlyCap = value.monthlyCap
-
-  if (monthlyCap !== undefined && (!Number.isSafeInteger(monthlyCap) || (monthlyCap as number) <= 0)) {
-    return undefined
-  }
-
-  return {
-    globeWorkspaceId,
-    poolId,
-    grantCredits: grantCredits as number,
-    ...(monthlyCap === undefined ? {} : { monthlyCap: monthlyCap as number }),
-    periodStart,
-    periodEnd
-  }
+  return normalizedProvider === 'agent' || normalizedAuthMode === 'agent' ? 'agent' : normalizedAuthMode || 'unknown'
 }
-
-export type ParsedConfirmBody = Readonly<{
-  globeWorkspaceId: string
-  proposalId: string
-  fingerprint: string
-}>
-
-export const parseConfirmBody = (raw: unknown): ParsedConfirmBody | undefined => {
-  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return undefined
-
-  const value = raw as Record<string, unknown>
-  const globeWorkspaceId = text(value.globeWorkspaceId)
-  const proposalId = text(value.proposalId)
-  const fingerprint = text(value.fingerprint)
-
-  if (!globeWorkspaceId || !proposalId || !fingerprint) return undefined
-
-  return { globeWorkspaceId, proposalId, fingerprint }
-}
-
-const text = (value: unknown): string | undefined =>
-  typeof value === 'string' && value.trim().length > 0 ? value.trim() : undefined

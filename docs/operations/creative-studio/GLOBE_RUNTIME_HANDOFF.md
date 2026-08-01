@@ -6,8 +6,9 @@
 > permanece auditable en el git log y en las tasks/ADRs enlazadas.
 >
 > **Corte verificado:** 2026-08-01 · Globe `main`
-> `001ce1b7da9cb896ecfbc32ea3b64a99f8e2fdfc`; API interna
-> `globe-api-internal-00179-qcz` al 100%.
+> `001ce1b7da9cb896ecfbc32ea3b64a99f8e2fdfc` (incluye PR `#82` y el reader MCP de PR `#84`).
+> Migraciones hasta `0042` aplicadas; API interna `globe-api-internal-00179-qcz` al 100%, producer
+> worker y Asset Governance desplegados. Studio no se desplegó para TASK-1614.
 
 ## Estado activo
 
@@ -126,6 +127,35 @@ Las capturas son evidencia de la UI autenticada, no autoridad de estado por sí 
 una ruta disponible deben concordar: reader live, identidad de ruta, rate vigente, evaluación,
 revisión/rights, readiness, binding, circuito, run terminal, output retenido y readback/diagnóstico.
 
+## TASK-1614 — Seedance R2V durable evaluation (2026-08-01)
+
+- PRs `#74…#82` están mergeados. El lifecycle keyless del scheduler quedó provisionado y ejercido; migraciones
+  `0040`, `0041` y `0042`, API interna, producer worker y Asset Governance están aplicados. PR `#81` cerró
+  replay de derived rights y PR `#82` el grant mínimo de persistencia del reporte.
+- Policy de evaluación `seedance-r2v-evaluation` v2 permanece publicada para
+  `ref/video/motion-v1 / fal / seedance-2.0-r2v / 2.0`, `purpose=evaluation`, `appliesTo=derived`.
+- Fuente canónica private-ingested: `asset_6e9c95d3-7b94-473d-b91a-00f8b35d9eec`, SHA-256
+  `69cbc966999963ed2959c9adedf409560097dce06700d4fe5c9719292a392509`, retención hasta
+  `2026-08-30T23:27:57.776Z`. Output exacto retenido:
+  `sha256:58cc144e0092dbbcd585bdaff44046c7df83df6071ba32bcfc3e05191b28be41`, retención hasta 2026-08-31.
+- Evaluación `eval_16272c31b11f75be3e0369870f89746b`, attempt
+  `9361550f-6ce3-456d-b710-d5cd3ded6217`, terminó con reporte `candidate_ready`. Fal no se volvió a invocar.
+- Atestación `mcra_abf61584-46b2-4aa1-adb5-1374d46a6966`, revisión
+  `review_8561c3a9-67ed-4a51-a777-5d7d98746d9f` y readiness
+  `readiness:3fec1f4037aad02f6eb07f471bc7c949` están firmados.
+- Policy productiva `arp_77a9a0efe8b3f6d3d66a635bfcb05fba2e5268e07baa637ad1bfbe829a301dc4` y saga
+  `promotion_4bda2e0f-6264-4633-a370-4aecf5deaa1a` están activadas: binding revision 2 habilitado y circuito
+  revision 2 cerrado.
+- Playwright verificó el candidato retenido (`readyState=4`, duración 5,06195 s, reproducción 0→1,738 s, sin
+  error) y la selección exacta **Video → Movimiento/control cámara → Seedance 2.0**. La generación final nueva no se
+  ejecutó porque el composer muestra presupuesto de agosto `0 / 0`.
+- Contradicción pendiente: balance live `available=500836`; usage agosto `allocated=0`, `spent=0`; fondeo
+  durable anterior `+500`, cap `800→1500`, disponible `836`. No ejecutar otro fondeo hasta reconciliar policy,
+  grants, budget y período por readers canónicos.
+- Identidad Google/Chrome: `jreyes@efeonce.cl`. Identidad Greenhouse verificada:
+  `jreyes@efeoncepro.com` / `user-efeonce-admin-julio-reyes`. Los intentos fallidos de OAuth y adapter no
+  crearon propuesta, grant, run ni gasto.
+
 ## Riesgos abiertos
 
 - Rollout externo/comercial sigue gated por `TASK-1480`; `internal_smoke` describe el estadio, no
@@ -134,6 +164,9 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
   `TASK-1578`.
 - Gemini Omni continúa sólo en Model Lab para su ruta gobernada; no extrapoles la promoción de
   Vertex imagen a Interactions video.
+- TASK-1614 permanece `in-progress` sólo por el canary de una pieza nueva. Antes de mutar presupuesto se debe
+  explicar la divergencia entre fondeo durable, balance, usage agosto y el `0 / 0` visible. No asumir saldo Fal,
+  ausencia de grant ni UI stale sin reader.
 - La identidad temporal usada para consumo privado de AXIS debe sustituirse por una identidad de
   máquina antes del rollout externo; no recrees el secreto legacy de Globe.
 - El cliente Entra interno del gateway MCP recibe hoy ambos scopes aun cuando solicita el base. Antes de acceso
@@ -141,14 +174,17 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
 
 ## Siguiente paso ejecutable
 
-1. Ejecuta `TASK-1578` para las seis rutas de imagen y emite por cada identidad exacta el onboarding
-   receipt que enlace route, rate version vigente de `TASK-1468`, evaluación, rights, binding,
-   readiness, circuito y canary.
-2. Reconcilia esos receipts contra `globe.producer.fleet.list`; cualquier divergencia se trata como
-   incidente documental/runtime y falla cerrado.
-3. Actualiza el criterio 7 de `TASK-1553`; ciérrala sólo cuando los seis receipts estén presentes y
-   los readers sigan `available`.
-4. Mantén toda prueba de gasto real por el Producer autenticado o por el canary canónico; ante un
-   timeout, lee primero `run-get`/diagnóstico y no reintentes a ciegas.
-5. Antes de ofrecer el reader por MCP a un cliente, implementa el entitlement B2B y ejecuta un canary real con
-   identidad base-only; no infieras esa separación del cliente interno actual.
+1. Formalizar `TASK-1630` como umbrella de convergencia del control plane de créditos y corregir primero la
+   correspondencia entre readers, período, funding y enforcement. No fondear, desplegar ni usar SQL mientras el
+   status autoritativo y el readback de operaciones sigan incompletos.
+2. Reconciliar las propuestas ambiguas de `TASK-1629` mediante primitives canónicas. Una instrucción explícita del
+   CEO puede autorizar `preview → propose → confirm → readback` por un agente autenticado; el segundo confirmador
+   permanece como política opcional, OFF para el workspace owner-operated.
+3. Con presupuesto admitido y evidencia terminal, completar el canary pendiente de `TASK-1614` exclusivamente con
+   **Video → Movimiento/control cámara → Seedance 2.0**. Ante timeout, leer primero estado/run; nunca reintentar a
+   ciegas ni tocar Omni, Seed Audio, Seedance Loop, Veo o Seedream.
+4. Ejecutar `TASK-1578` para las seis rutas de imagen y emitir por cada identidad exacta el onboarding receipt que
+   enlace route, rate version vigente de `TASK-1468`, evaluación, rights, binding, readiness, circuito y canary;
+   reconciliar los receipts contra `globe.producer.fleet.list` antes de cerrar `TASK-1553`.
+5. Antes de ofrecer el reader por MCP a un cliente, implementar el entitlement B2B y ejecutar un canary real con
+   identidad base-only; no inferir esa separación del cliente interno actual.
