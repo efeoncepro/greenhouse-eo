@@ -115,11 +115,13 @@ Canary Entra vigente:
 
 - resource parameter: `https://mcp.efeonce.org/mcp`;
 - cliente público PKCE de diagnóstico: `32617b87-e7ef-493a-838f-1ff3f0213b93`, sin secreto;
-- token v2: issuer del tenant Efeonce, `aud=c5363215-b9a6-4bf1-bb1c-e61963b37dac` y
-  `scp=efeonce.mcp.read`;
-- canary público end-to-end aprobado por `mcp.efeonce.org`: initialize autenticado `200`; llamada `globe.*`
-  sin scope Globe `403` antes del dispatch; el manifest Globe read-only con scope autorizado respondió por el
-  mismo hostname.
+- canary público end-to-end aprobado por `mcp.efeonce.org`: initialize autenticado `200` y
+  `globe.producer.fleet.list` `200` con rutas derivadas de Globe.
+
+El cliente PKCE interno actual recibe `efeonce.mcp.read` **y** `efeonce.mcp.globe.read` aunque solicite sólo el
+scope base. Por eso no es evidencia válida de una persona con Globe denegado: el test unitario del gateway sí
+comprueba el rechazo antes del downstream, pero la prueba de persona/cliente debe usar una aplicación, rol o
+consentimiento Entra que pueda recibir sólo el scope base. Ese es un gate obligatorio antes de acceso de clientes.
 
 ### Incidente de callback local resuelto — 2026-08-01
 
@@ -134,12 +136,15 @@ atribuyen al hostname canónico `mcp.efeonce.org`.
 
 ## Globe canary
 
-- El canary end-to-end verificó el manifest de tools Globe por el hostname público con caller/scopes autorizados.
-- El manifiesto actual es exclusivamente read-only; no expone writes, datos directos de Globe, storage ni
-  proveedores creativos.
-- Retira temporalmente el invoker/allowlist en un entorno controlado y confirma deny.
-- Fuerza timeout o endpoint inválido y confirma `provider_unavailable` sanitizado.
-- Correlaciona request ID gateway → Globe sin registrar token ni body.
+- El canary PKCE por `https://mcp.efeonce.org/mcp` verificó `initialize`, `globe.capabilities.list` y la tool
+  real `globe.producer.fleet.list`; la última respondió rutas derivadas de readiness/binding, no un manifiesto.
+- El único permiso downstream es `globe.producer.catalog.read` sobre `greenhouse-org:efeonce`; no hay selección
+  de workspace, runs, assets, review, delivery, créditos ni reveal-house.
+- La respuesta no entrega house, provider slug, costo de vendor ni margen. La taxonomía pública
+  `Bajo|Estándar|Premium` se conserva porque no representa costo de proveedor.
+- Los tests del gateway cubren rechazo por scope antes del dispatch, timeout/fallo upstream como
+  `provider_unavailable` sanitizado y correlación. No fuerces una caída ni retires IAM de producción para
+  demostrarlos: ejecútalos en test o canary aislado.
 
 El canary habilita una prueba interna acotada, no disponibilidad general. Clientes externos requieren una
 decisión explícita de B2B/multitenancy y entitlements por tenant/capability antes de recibir acceso. No conviertas
@@ -184,7 +189,7 @@ por minuto por IP** y respuesta `429` al excederlo. Cloud Armor protege el serve
 no reemplaza OAuth, entitlements, cuotas por workspace ni límites de gasto. Es un control de abuso y continuidad,
 por lo que no debe usarse para cobrar, licenciar o decidir autorización de un cliente.
 
-Cloud Run mantiene `concurrency=80` y `maxScale=20`. Esa capacidad sirve al tráfico de transporte; cada provider
+Cloud Run mantiene `concurrency=80` y `maxScale=5` efectivo inicialmente. Esa capacidad sirve al tráfico de transporte; cada provider
 debe declarar sus propios límites de concurrencia, cuotas y circuit breakers antes de exponer trabajo de dominio.
 
 ## Rollback
@@ -240,3 +245,19 @@ Cada promoción registra:
 - smoke posterior: health y metadata `200`; `POST /mcp` anónimo `401` con `resource_metadata` y scope base.
   El request autenticado de `globe.capabilities.list` también devolvió el manifest esperado por el hostname
   canónico.
+
+### Globe fleet reader habilitado 2026-08-01
+
+- Globe: PR `#84`, merge `001ce1b7da9cb896ecfbc32ea3b64a99f8e2fdfc`, workflow `30702895278` verde y
+  revisión `globe-api-internal-00179-qcz` al 100%. El principal `globe:service:mcp-provider` quedó limitado a
+  `globe.producer.catalog.read` y al workspace interno exacto.
+- Gateway: `ce593f2`, workflow de deploy `30703022114` verde y revisión
+  `efeonce-mcp-gateway-00009-9c6` al 100%. La herramienta pública es sólo
+  `globe.producer.fleet.list`, sobre `POST /v1/readers` con el envelope versionado.
+- Canary: el flujo Entra authorization-code + PKCE real pasó en Chrome autenticado; `initialize`, discovery y
+  fleet reader devolvieron `200`. Health y protected-resource metadata siguen `200`; request anónimo a `/mcp`
+  sigue `401`.
+- Capacidad: `concurrency=80`, `maxScale=5` efectivo. Rollback del gateway: `00008-fwj` o provider OFF y
+  deploy. Rollback de Globe: revisión previa `globe-api-internal-00178-f5s`.
+- Límite conocido: el cliente interno Entra recibe ambos scopes; no habilites clientes hasta separar la emisión
+  de scope/entitlement y repetir el deny real con una identidad base-only.

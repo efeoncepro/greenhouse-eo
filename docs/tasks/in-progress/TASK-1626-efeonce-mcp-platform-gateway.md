@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `none`
-- Status real: `gateway público verificado end-to-end (DNS/TLS/OAuth); manifest Globe read-only verificado; acceso externo B2B/multitenant y tools Globe de dominio siguen gated`
+- Status real: `gateway público y fleet reader Globe verificados end-to-end; acceso externo B2B/multitenant y tools Globe de dominio siguen gated`
 - Rank: `TBD`
 - Domain: `platform|agentic|integration|cloud|identity`
 - Blocked by: `acceso externo requiere decisión B2B/multitenant + entitlements; federación Globe de dominio depende de TASK-1473 y sus gates`
@@ -68,7 +68,7 @@ Reglas obligatorias:
 - `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`
 - `docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md`
 - `docs/tasks/TASK_BACKEND_DATA_ADDENDUM.md`
-- `docs/tasks/to-do/TASK-1473-globe-contract-packaging-parity-certification.md`
+- `docs/tasks/in-progress/TASK-1473-globe-contract-packaging-parity-certification.md`
 
 ## Dependencies & Impact
 
@@ -105,10 +105,11 @@ Reglas obligatorias:
 
 ### Gap
 
-- El repo, runtime, hostname, resource server OAuth y pipeline ya están desplegados y verificados hasta los
-  smokes públicos anónimos; falta el canary OAuth autenticado por el hostname público.
-- La identidad dedicada y allowlist cross-project hacia Globe aún no existen; su habilitación queda bloqueada
-  por `TASK-1473` y sus gates de dominio.
+- El repo, runtime, hostname, resource server OAuth y pipeline están desplegados; el canary OAuth autenticado
+  por el hostname público ya invocó el fleet reader real de Globe.
+- La identidad dedicada y allowlist cross-project ya están limitadas a la capability de catálogo y al workspace
+  interno exacto. Falta la separación B2B de entitlements/emisión de scopes antes de clientes externos y la
+  paridad de capacidades Globe que no pertenecen al reader.
 
 ## Modular Placement Contract
 
@@ -290,10 +291,11 @@ DNS en HostGator requieren acceso del operador. No se sustituyen con tokens est�
 - [x] `https://mcp.efeonce.org/mcp` sirve Streamable HTTP sobre TLS y discovery OAuth correcto.
 - [x] Requests sin token, expirados, audience/scope incorrectos fallan antes de ejecutar tools.
 - [x] Runtime usa service account dedicada y WIF; no hay keys persistentes ni roles de datos de Globe.
-- [ ] Globe aporta al menos una capacidad read-only real mediante `TASK-1473`, con paridad y redaction certificadas.
+- [x] Globe aporta `globe.producer.fleet.list` como capacidad read-only real mediante `TASK-1473`, con
+      redacción y canary de cliente MCP. La paridad amplia de las demás capabilities sigue en `TASK-1473`.
 - [x] Gateway no importa DB/provider/storage de Globe y un fallo de Globe queda aislado.
 - [ ] Smokes live cubren protocolo, auth, provider, DNS/cert, carga mínima y rollback.
-- [ ] Runbook, ADR, registry, handoff, changelog y estado de rollout quedan sincronizados.
+- [x] Runbook, ADR, registry, handoff, changelog y estado de rollout quedan sincronizados.
 
 ### Estado de rollout — 2026-08-01
 
@@ -301,14 +303,15 @@ DNS en HostGator requieren acceso del operador. No se sustituyen con tokens est�
 - El certificado `efeonce-mcp-gateway-cert` y su dominio están `ACTIVE`; el SNI presenta un certificado válido
   para `mcp.efeonce.org`.
 - Los smokes públicos aprobaron: health `200`, metadata OAuth `200`, `POST /mcp` sin token `401` con challenge,
-  OAuth PKCE autenticado y manifest Globe read-only por el hostname canónico.
+  OAuth PKCE autenticado, discovery y `globe.producer.fleet.list` por el hostname canónico.
 - Hardening posterior: Cloud Armor quedó adjunto al backend con throttle aproximado de 600 requests/minuto por
-  IP; la revisión `efeonce-mcp-gateway-00007-d79` restringe host/origin a `mcp.efeonce.org`. No sustituye las
-  cuotas, entitlements ni límites de gasto de los products providers.
+  IP; la revisión `efeonce-mcp-gateway-00009-9c6` restringe host/origin a `mcp.efeonce.org`, tiene tráfico 100%
+  y `maxScale=5` efectivo. No sustituye las cuotas, entitlements ni límites de gasto de los products providers.
 - El primer callback localhost venció con un listener de 180 segundos; el canary ahora admite una ventana de 10
   minutos configurable. Su override DNS se usa sólo para diagnóstico, conserva SNI público y no modifica runtime.
-- Límite actual: auth de tenant único y manifest Globe read-only. La exposición a clientes externos requiere
-  decisión B2B/multitenant y entitlements; las tools Globe de dominio siguen bajo `TASK-1473`.
+- Límite actual: auth de tenant único y un reader Globe read-only. El cliente PKCE interno recibe ambos scopes
+  incluso cuando solicita sólo el base: la exposición a clientes exige separación B2B de entitlements/emisión de
+  scopes y una prueba real base-only. Las demás tools Globe siguen bajo `TASK-1473`.
 
 ## Verification
 

@@ -21,9 +21,15 @@
 - Health, discovery OAuth, rechazo anónimo, OAuth autenticado y manifest Globe pasaron por el hostname público.
   El primer callback local venció a los 180 segundos; el listener ahora usa una ventana configurable de 10
   minutos. El override DNS del canary sólo sirvió para diagnóstico con SNI público y no modifica el runtime.
-- Estado honesto: gateway operativo para el tenant Entra único y el manifest Globe read-only verificado. No hay
-  acceso externo general: exige una decisión B2B/multitenant y entitlements por tenant/capability. La federación
-  Globe completa, sus tools de dominio y cualquier write conservan los gates de `TASK-1473`.
+- Globe quedó habilitado end-to-end: PR `efeonce-globe#84` (`001ce1b`) desplegado como
+  `globe-api-internal-00179-qcz`; gateway `ce593f2` desplegado como `efeonce-mcp-gateway-00009-9c6`. El canary
+  PKCE real invocó `globe.producer.fleet.list` y recibió rutas sin house, provider, costo de vendor ni margen.
+  Cloud Run conserva `concurrency=80` y `maxScale=5` efectivo inicialmente.
+- Estado honesto: operativo para el tenant Entra único y este único reader read-only. El principal downstream
+  tiene sólo `globe.producer.catalog.read` sobre `greenhouse-org:efeonce`; no hay runs, assets, delivery ni
+  writes. El cliente PKCE actual recibe ambos scopes aunque solicite el base: antes de clientes externos hay que
+  separar entitlement/emisión de scopes y repetir el deny real. Las demás tools conservan gates de
+  `TASK-1469`/`TASK-1472`.
 
 
 ## AXIS — guía visual agent-facing publicada (2026-08-01)

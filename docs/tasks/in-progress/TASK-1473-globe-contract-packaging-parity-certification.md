@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -17,10 +17,10 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Diseño gobernado; implementación pendiente`
+- Status real: `Fleet reader MCP desplegado y verificado end-to-end; packaging/paridad amplia pendiente`
 - Rank: `TBD`
 - Domain: `platform|agentic|integration`
-- Blocked by: `TASK-1469, TASK-1472`
+- Blocked by: `none`
 - Branch: `task/TASK-1473-globe-contract-packaging-parity-certification`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -59,7 +59,12 @@ Demostrar que las capabilities promovidas son operables por SDK/MCP sobre los mi
 
 ### Depends on
 
-- `TASK-1469`, `TASK-1472`.
+- El Slice 2a no depende de `TASK-1469` ni `TASK-1472`: adapta exclusivamente el reader canónico ya
+  promovido `globe.producer.fleet.list`. No crea runs, no consulta artefactos, no publica ni entrega
+  creatividad, no usa créditos y no introduce un command.
+- `TASK-1469`, `TASK-1472` conservan el gate de los adapters de lifecycle, review, release, delivery y
+  cualquier write de Globe. Esta task no puede declarar paridad amplia ni cerrar esos transports hasta que
+  dichas dependencias aporten sus contracts/evidencia.
 - `TASK-1626` no bloquea el packaging local: consume el provider cuando su contract esté certificado y posee el gateway público, OAuth, Cloud Run y DNS.
 
 ### Blocks / Impacts
@@ -167,6 +172,19 @@ pertenecen a `TASK-1626`; Globe conserva sólo su transport/provider adapter y l
 
 - Implementar MCP tools/resources como adapters delgados sobre SDK/commands existentes, con scopes, policy-blocked states y redaction; cero imports de DB/provider/storage.
 
+### Slice 2a — Fleet availability reader (autorizado en esta ejecución)
+
+- Exponer únicamente `globe.producer.fleet.list` a través del gateway `efeonce-mcp` como adapter de
+  `/v1/readers`; el payload usa el envelope versionado y el reader de dominio existente, sin lógica nueva.
+- El principal downstream `globe:service:mcp-provider` recibe sólo
+  `globe.producer.catalog.read` y el binding interno exacto `greenhouse-org:efeonce`; no acepta selección de
+  workspace desde el cliente MCP y no recibe grants de runs, assets, review, delivery, créditos ni
+  `globe.producer.route.reveal_house`.
+- Mantener el corte internal-only: el scope OAuth existente del gateway abre el reader para el tenant Entra
+  actual; el acceso de clientes/multitenant exige su task de entitlements y rollout posterior.
+- El canary cubre allow, scope-deny antes de downstream, upstream fault sanitizado, redaction, correlación y
+  un cliente MCP real. Ningún write se habilita como parte de este slice.
+
 ### Slice 3 — Parity certification
 
 - Ejecutar el conformance harness acumulado y emitir coverage/certification por capability para UI, HTTP, SDK, MCP, CLI, worker/event, sister platform y E2E.
@@ -177,6 +195,8 @@ pertenecen a `TASK-1626`; Globe conserva sólo su transport/provider adapter y l
 - Crear, corregir o duplicar business primitives que debieron nacer en su capability task.
 - Mover runtime creativo, datos, provider secrets o lógica de Globe a Greenhouse.
 - Crear un segundo harness o namespace de tasks dentro de Globe.
+- Convertir los estados `policy-blocked` de otras capabilities, SDK packaging general o distribución externa:
+  continúan bloqueados por sus contracts y por `TASK-1469`/`TASK-1472` cuando correspondan.
 
 ## Detailed Spec
 
@@ -220,9 +240,37 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 
 ## Acceptance Criteria
 
+- [x] Sólo `globe.producer.fleet.list` cambia de `mcp: policy-blocked` a `mcp: available`; cualquier otro
+      reader/command permanece con su policy vigente.
+- [x] El tool del gateway llama el envelope canónico `POST /v1/readers` y nunca importa DB, storage, provider
+      SDK ni lógica de catálogo/routing.
+- [x] El principal downstream MCP tiene exactamente `globe.producer.catalog.read` y el binding
+      `greenhouse-org:efeonce`; no tiene grants de runs, assets, review, delivery, créditos ni reveal-house.
+- [x] La respuesta no expone provider slug, house, costo de proveedor, margen, secretos, workspace alternativo
+      ni errores raw; la guía pública `Bajo|Estándar|Premium` no representa costo de vendor y puede conservarse.
+      La respuesta conserva correlation ID entre gateway y Globe.
+- [~] El scope Globe ausente se rechaza antes de llamar downstream; una caída/timeout upstream devuelve un
+      error sanitizado y no degrada discovery del gateway. Los tests del gateway lo verifican; la demostración
+      live con persona base-only requiere corregir la emisión actual de ambos scopes por Entra.
+- [x] El canary autenticado de un cliente MCP real invoca `globe.producer.fleet.list` y recibe rutas con
+      disponibilidad derivada de readiness + binding, no un manifiesto estático.
 - [ ] MCP/SDK no importan ni llaman providers, DB o storage directamente.
 - [ ] Una misma acción produce el mismo command/result/error/audit en UI, HTTP, SDK, MCP y CLI habilitados.
 - [ ] Coverage machine-readable no contiene `missing`; surfaces deshabilitadas están `policy-blocked` o `not-applicable` con razón.
+
+## Execution evidence — Slice 2a (2026-08-01)
+
+- Globe: commit `e80f47f` integrado como `001ce1b`; `pnpm build`, domain tests (`387`) y studio-web tests
+  (`284`) verdes. CI y Terraform Check de PR verdes; deploy interno `30702895278` a
+  `globe-api-internal-00179-qcz` (100%).
+- Gateway: commit `ce593f2`, `pnpm check` (`8/8`) y CI verde; deploy `30703022114` a
+  `efeonce-mcp-gateway-00009-9c6` (100%). La configuración efectiva es `concurrency=80`, `maxScale=5`.
+- Canary: authorization code + PKCE con Chrome autenticado aprobó `initialize`, discovery y
+  `globe.producer.fleet.list` por `https://mcp.efeonce.org/mcp`. La respuesta recibió rutas y mantuvo la
+  redacción esperada.
+- No se fuerzan fallas ni se retira IAM de producción para crear evidencia negativa. Los tests cubren esa
+  frontera; el deny con una identidad real base-only queda bloqueado por la configuración actual de Entra y es
+  requisito antes de abrir acceso B2B/multitenant.
 - [ ] Smokes cubren allow, deny, replay, revoke, redaction y correlation.
 - [ ] La task no introduce business logic, schema de dominio nuevo ni endpoint model-specific.
 - [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
