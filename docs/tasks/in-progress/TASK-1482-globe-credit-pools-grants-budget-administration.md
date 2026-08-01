@@ -5,7 +5,7 @@
 ## Status
 
 - Lifecycle: `in-progress`
-- Priority: `P1`
+- Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
@@ -17,8 +17,8 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-028`
-- Status real: `Implementación en ejecución sobre el ledger append-only de TASK-1468; rollout permanece gated por migraciones/runtime`
-- Rank: `TBD`
+- Status real: `Kernel administrativo existe; readers/períodos/cap math no corresponden aún con reserve y bloquean consumers`
+- Rank: `next.1`
 - Domain: `finance|creative|data|reliability`
 - Blocked by: `none`
 - Branch: `task/TASK-1482-globe-credit-pools-grants-budget-administration`
@@ -67,7 +67,8 @@ maker-checker, trazabilidad y enforcement atómico dentro de `reserveCredits`.
 
 ### Blocks / Impacts
 
-- `TASK-1483` consume estos commands/readers; `TASK-1480` exige este control plane para readiness externo.
+- `TASK-1586`, `TASK-1483` y `TASK-1628` consumen estos commands/readers y quedan bloqueadas hasta el snapshot V2;
+  `TASK-1480` exige este control plane para readiness externo.
 - `TASK-1469` liga approval a pool, funding breakdown y budget policy version cuando aplique.
 
 ### Files owned
@@ -83,12 +84,21 @@ No posee apps UI, provider adapters, runner ni tablas kernel de ledger salvo el 
 
 ### Already exists
 
-- Modelo canónico de credits, kernel task y contrato Full API Parity aprobados documentalmente.
+- Schema, 14 commands, 10 readers, SDK/contracts y enforcement dentro de `reserveCredits` existen en Globe.
+- Pools, grants, policies y budgets ya se ejercieron internal-only; TASK-1566 compone grant + allocation + policy.
 
 ### Gap
 
-- No existe primitive formal para crear pools/grants, delegar project budgets ni hacer enforcement
-  transaccional de esas policies.
+- `getCreditBudgetAvailability.spentInPeriod` suma gasto histórico completo; `policyAvailable` suma grants y no
+  representa monthly/project remaining.
+- `evaluateCreditBudget` no comparte el algoritmo con `reserveCredits`, por lo que puede permitir algo que reserve
+  niega o atribuir una razón incorrecta.
+- El período del pool, `fundingPriority` y `capabilityScopes` no se aplican de manera consistente; un pool vencido
+  puede seguir aceptando grants.
+- Los caps usan gasto liquidado + nueva reserva, pero omiten holds vigentes. `actual > reserved` puede asentarse sin
+  reautorizar caps.
+- El fondeo mensual exige un pool existente y no asegura/rota el ciclo; por eso cada cambio de mes necesita actos
+  manuales fuera del happy path.
 
 ## Modular Placement Contract
 
@@ -134,7 +144,11 @@ No posee apps UI, provider adapters, runner ni tablas kernel de ledger salvo el 
 - Pool pausado bloquea nuevas reservations, pero no settlement/release de holds existentes.
 - Project budget no crea credits; cierre/pause no borra historia ni transfiere saldo entre tenants.
 - Purchased grants, expiry comercial, rollover y top-up fallan cerrado mientras Finance/Legal sigan TBD.
-- `evaluateCreditBudget` es informativo; el check autoritativo ocurre atómicamente dentro de `reserveCredits`.
+- `CreditDecisionSnapshot` y `reserveCredits` usan el mismo evaluador puro. El snapshot informa una decisión al
+  `asOf` declarado; `reserveCredits` reevalúa y aplica atómicamente para cerrar concurrencia.
+- La capacidad comprometida es `spent liquidado + holds vigentes`; ambos reducen caps de período y proyecto.
+- Un grant temporal debe referenciar el período y quedar contenido en la ventana del pool; un pool vencido o fuera
+  de período falla cerrado.
 
 ### Migration, backfill and rollout
 
@@ -169,18 +183,25 @@ No posee apps UI, provider adapters, runner ni tablas kernel de ledger salvo el 
 
 - Definir schemas, entities, capabilities y commands/readers de pool/grant/policy/budget.
 - Implementar private API/SDK desde `TASK-1481` y migraciones tenant-scoped.
+- Introducir `CreditPeriodV1` y `CreditDecisionSnapshotV2` con timezone, `[start,end)`, cap/spent/held/remaining,
+  funding eligible, effective available, blockers, coverage y freshness.
 
 ### Slice 2 — Transactional kernel seam
 
 - Postear cada grant una sola vez mediante `allocateCredits` internal con source ref durable.
 - Implementar BudgetPolicyPort fail-closed dentro de la transacción de `reserveCredits`.
 - Pinnear funding breakdown/policy version y preservar settlement/release de holds existentes.
+- Compartir el evaluator con snapshot/reserve, incluir holds en caps y reautorizar cualquier
+  `actualCredits > reservedCredits` según TASK-1579.
+- Aplicar período/prioridad/scopes del pool y asegurar grant ⊆ pool cuando la fuente sea temporal.
 
 ### Slice 3 — Forecast, alerts and conformance
 
 - Producir availability/forecast server-side con freshness/coverage y estado `insufficient-data`.
 - Emitir low/exhausted/expiry-policy-disabled/anomaly/projection-drift signals y recovery seguro.
 - Completar reconciliation, negative tests y cross-surface coverage.
+- Agregar la operación target-based `ensure-funded` que resuelve/crea/activa el ciclo y aplica un solo delta
+  idempotente de pool + grant + allocation + policy.
 
 ## Out of Scope
 
@@ -219,6 +240,14 @@ schema/locking sin debilitar el posting único ni el enforcement transaccional.
 - [ ] Trusted context, tenant isolation, redaction y capability denies tienen evidencia.
 - [ ] API/SDK/MCP/CLI/worker/E2E están implemented, policy-blocked o not-applicable; nunca missing.
 - [ ] No se habilitan purchased grants, expiry, rollover, top-up ni clientes externos.
+- [ ] Mismo workspace/proyecto/instante/créditos produce la misma decisión en snapshot y reserve, salvo conflicto
+  concurrente explícito.
+- [ ] `monthlySpent` filtra el período y `monthlyRemaining`/`projectRemaining` descuentan holds vigentes.
+- [ ] Pool/grant fuera de período, priority no elegible o capability scope incompatible falla cerrado.
+- [ ] Un rollover `current|next` puede asegurar el ciclo sin `poolId` ni fechas calculadas por el caller.
+- [ ] Dos `ensure-funded` equivalentes producen un único delta y el readback confirma pool, grant, allocation,
+  policy y capacidad efectiva.
+- [ ] `actual > reserved` no puede superar funding/caps sin reautorización o policy de settlement explícita.
 
 ## Verification
 
@@ -237,3 +266,14 @@ schema/locking sin debilitar el posting único ni el enforcement transaccional.
 ## Follow-ups
 
 - `TASK-1483` implementa el workbench; `TASK-1484` implementa monetización sólo tras `TASK-1480`.
+
+## Delta 2026-08-01 — P0 de correspondencia y ciclo temporal (TASK-1630)
+
+El primitive ya existe; esta task deja de ser una foundation hipotética y pasa a corregir la correspondencia del
+runtime. Sus dueños nuevos son: período explícito, un solo evaluator para snapshot/reserve, caps que incluyen
+holds, semántica pool/grant temporal y `ensure-funded` target-based. TASK-1586, TASK-1483 y TASK-1628 no pueden
+consumir los DTOs actuales ni reconstruir caps en browser/adapters.
+
+La task no absorbe settlement/rating de TASK-1579, UI de TASK-1483, identidad/recovery Greenhouse de TASK-1629 ni
+billing de TASK-1484. El command compuesto sigue siendo gobernado `propose → confirm`; la fachada one-command
+orquesta esas fases para una sesión autorizada, no las elimina.

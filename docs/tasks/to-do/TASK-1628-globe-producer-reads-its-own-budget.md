@@ -1,351 +1,331 @@
-# TASK-1628 — El Producer puede leer su propio presupuesto
+# TASK-1628 — Globe Producer Credit Capacity Self-View
 
-<!-- ═══════════════════════════════════════════════════════════
-     ZONE 0 — IDENTITY & TRIAGE
-     "Que task es y puedo tomarla?"
-     Un agente lee esto primero. Si Lifecycle = complete, STOP.
-     ═══════════════════════════════════════════════════════════ -->
+<!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
 
 - Lifecycle: `to-do`
-- Priority: `P2`
-- Impact: `Medio`
+- Priority: `P1`
+- Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
-- Execution profile: `backend-data`
-- UI impact: `none`
-- UI ready: `n/a`
-- Wireframe: `none`
-- Flow: `none`
-- Motion: `none`
-- Backend impact: `api`
+- Execution profile: `ui-ux`
+- UI impact: `interaction`
+- UI ready: `no`
+- Wireframe: `docs/ui/wireframes/TASK-1628-globe-producer-credit-capacity-self-view.md`
+- Flow: `docs/ui/flows/TASK-1628-globe-producer-credit-capacity-self-view-flow.md`
+- Motion: `docs/ui/motion/TASK-1628-globe-producer-credit-capacity-self-view-motion.md`
+- Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Diseno`
-- Rank: `TBD`
-- Domain: `platform`
-- Blocked by: `none`
-- Branch: `task/TASK-1628-globe-producer-reads-its-own-budget`
+- Status real: `Rebaselinada por TASK-1630; bloqueada por snapshot/self-status correctos`
+- Rank: `next.6`
+- Domain: `creative|ui|finance`
+- Blocked by: `TASK-1482, TASK-1586`
+- Branch: `task/TASK-1628-globe-producer-credit-capacity-self-view`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
 
-El tope mensual de crédito existe, está publicado y el runtime lo aplica — pero la superficie `ui` no
-puede leerlo, así que el panel de créditos del Producer muestra el dato equivocado. Esta task abre los
-dos readers de presupuesto a `ui` **sin** abrir las capabilities de mutación que hoy comparten su
-`COVERAGE`, agrega la capability al grant humano por el rollout de tres pasos, y reconecta el anillo del
-header al tope real.
+Corrige el panel de créditos del Producer para mostrar capacidad efectiva, consumo/cap del período, funding
+vigente y fence diario como dimensiones separadas. Producer permanece read-only: consume
+`CreditCapacitySelfStatusV1`, nunca abre readers administrativos ni calcula el cap en browser.
 
 ## Why This Task Exists
 
-`TASK-1566` declaró en su alcance que `globe.credits.budget.evaluate` y
-`globe.credits.budget.availability.get` pasaban a `ui: available`. La task está `complete` y **esa parte
-no se aplicó**: `packages/domain/src/credit-administration.ts:34` sigue con
-`COVERAGE={ui:'policy-blocked',…}`.
-
-La consecuencia es visible y fue reportada por el operador el 2026-08-01: el panel del header muestra
-`Uso del mes: 0 / —` mientras la política activa declara un tope de **1.500 créditos**. El header cayó
-en `globe.credits.usage.get` —el **ledger**, que responde *"cuánto se acreditó en esta ventana"*— porque
-es el único disponible en su superficie. Ese número es 0 en cualquier mes sin recarga, y el fondeo es
-esporádico: hay 501.110 créditos acreditados en julio y ninguno en agosto.
-
-Medido en `globe-pg` el 2026-08-01 (sólo lectura, vía Cloud SQL proxy con IAM):
-
-| Dato | Valor |
-|---|---|
-| `credit_admin_policy_versions` activa → `monthlyCap` | **1.500** |
-| `lowBalanceThreshold` | 20 |
-| `GLOBE_LAB_DAILY_CAP_CREDITS` (`globe-api-internal`) | **500** |
-| Historial de la política | 100 → 110 → 400 → 800 → 1.500 |
-| Gastado julio / agosto | 244 / 0 |
-
-Con el reader correcto el anillo mostraría `0 / 1.500` hoy y habría mostrado `244 / 1.500` (16 %) en
-julio — un medidor que se mueve. Es la **tercera** aparición del mismo patrón en una sola sesión: la
-capability existe y la superficie no la consume (las otras dos: el diálogo de compare del feed y el
-`nextCursor` de la paginación).
+El header actual usa el saldo/usage del ledger para derivar el ciclo y llegó a mostrar `0 / —` o una cifra
+histórica como disponible. La auditoría comprobó que `spentInPeriod` y `policyAvailable` actuales tampoco sirven
+como sustituto: el primero agrega toda la historia y el segundo sólo suma grants. Abrir esos DTOs a `ui` haría
+visible un número incorrecto y ampliaría innecesariamente la superficie administrativa.
 
 ## Goal
 
-- Los dos readers de presupuesto son consumibles desde `ui` **sin** que ninguna capability de mutación
-  de crédito cambie de coverage.
-- El grant humano del Producer lleva `globe.credits.budget.read`, aplicado sin romper el login.
-- El anillo del header mide gasto del período contra el tope real de la política, y el aro neutro queda
-  reservado para la ausencia genuina de política.
+- Mostrar como cifra primaria la capacidad efectiva para producir ahora.
+- Explicar separadamente ledger histórico, cap/spent/held, funding vigente y daily fence.
+- Mostrar una razón tipada y una acción segura ante bloqueo, partial o stale.
+- Mantener fondeo/pools/grants/policies fuera de Globe; usuarios autorizados reciben deep link a Greenhouse.
 
-<!-- ═══════════════════════════════════════════════════════════
-     ZONE 1 — CONTEXT & CONSTRAINTS
-     "Que necesito entender antes de planificar?"
-     El agente lee cada doc referenciado aqui. Si un doc no
-     existe en el repo, reporta antes de continuar.
-     ═══════════════════════════════════════════════════════════ -->
+<!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
 
 ## Architecture Alignment
 
-Revisar y respetar:
-
-- `docs/architecture/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md`
-- `docs/architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md` (ADR-015)
-- `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`
+- `docs/architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md`
+- `docs/architecture/creative-studio/EFEONCE_GLOBE_CLIENT_APPLICATION_DECISION_V1.md`
+- `docs/architecture/creative-studio/EFEONCE_GLOBE_CLIENT_STYLING_ENGINE_DECISION_V1.md`
+- `docs/architecture/creative-studio/EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md`
+- `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md`
+- `docs/ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md`
 
 Reglas obligatorias:
 
-- Una surface que no se implementa es `policy-blocked`, nunca "sin contrato": `missing` no es
-  representable en `SurfaceCoverageState`.
-- **NUNCA** ampliar el coverage de una capability de mutación de crédito para desbloquear una lectura.
-  El `COVERAGE` compartido es una coincidencia de implementación, no una decisión.
-- **NUNCA** agregar un capability scope al grant del broker en un solo movimiento: el broker impone
-  `capabilityScopes ⊆ requiredScopes`, así que otorgar un scope lo vuelve **requerido**, y un cliente
-  desplegado que no lo pida deja de poder iniciar sesión — pasó con ADR-010 y tumbó todo el login.
-- El header no computa autoridad: lee lo que el reader publica y degrada honesto si su gate no está
-  `available`.
+- Greenhouse administra; Globe Producer sólo observa su propia capacidad y enlaza al control plane.
+- El browser no deriva monthly cap, remaining, funding eligibility ni effective available.
+- `partial|stale|unknown` nunca se transforma en cero.
+- Studio Credits, daily fence y saldo ledger son conceptos distintos y no usan metáforas de wallet/token/dinero.
+- Tailwind v4 consume únicamente tokens del theme; cero valores visuales literales en `className`.
 
 ## Normative Docs
 
-- `docs/tasks/complete/TASK-1566-globe-governed-credit-funding-command.md` — declaró este cambio en su
-  alcance (líneas 183 y 267) y advierte que abrir el coverage **sin** la capability en el grant no
-  arregla nada: sólo renombra `policy_blocked` como `access_denied`.
-- `docs/issues/open/ISSUE-124-globe-credit-grant-canonical-409-root-cause-hidden.md`
+- `docs/tasks/in-progress/TASK-1482-globe-credit-pools-grants-budget-administration.md`
+- `docs/tasks/to-do/TASK-1586-globe-credit-denial-disambiguator-operator.md`
+- `docs/tasks/to-do/TASK-1483-globe-credits-operations-workbench.md`
+- `docs/tasks/in-progress/TASK-1559-globe-client-feed-viewer-search-arrivals.md`
 
 ## Dependencies & Impact
 
 ### Depends on
 
-- `packages/domain/src/credit-administration.ts` — registro de commands/readers y su `COVERAGE`.
-- `packages/contracts/src/credit-administration.ts` — `CreditBudgetAvailabilityV1`,
-  `CreditBudgetEvaluationV1`.
-- `apps/studio-web/src/app.ts` — `PRODUCER_HUMAN_CAPABILITY_SCOPES`.
-- `greenhouse-eo` → `src/lib/sister-platforms/globe-oauth-grants.ts` — `GLOBE_PRODUCER_CAPABILITY_SCOPES`.
+- TASK-1482 publica un snapshot con período y decisión coherentes con reserve.
+- TASK-1586 publica `CreditCapacitySelfStatusV1`, redactado y workspace-scoped.
+- Producer React/Tailwind y `CreditsPopover` existentes.
 
 ### Blocks / Impacts
 
-- `ISSUE-124` — el desambiguador de la negación deja de ser inalcanzable desde la superficie humana.
-- Cualquier superficie futura que quiera mostrar presupuesto (Workbench, Nexa) hereda el reader abierto.
+- Corrige la comprensión del gasto antes de TASK-1532 one-click generate.
+- No bloquea el workbench Greenhouse TASK-1483.
 
 ### Files owned
 
-- `packages/domain/src/credit-administration.ts`
-- `apps/studio-web/src/app.ts`
-- `apps/studio-client/src/surfaces/producer/ProducerHeader.tsx`
-- `src/lib/sister-platforms/globe-oauth-grants.ts` (repo `greenhouse-eo`)
+- `../efeonce-globe/apps/studio-client/src/surfaces/producer/ProducerHeader.tsx`
+- `../efeonce-globe/apps/studio-client/src/surfaces/producer/ProducerHeader.tsx` (`CreditsPopover` local)
+- tests/fixtures de la surface Producer asociados al status.
+- wireframe, flow y evidencia GVC de TASK-1628 en Greenhouse.
+
+No posee contracts/readers de crédito, grants OAuth, commands de fondeo, pools, policy ni ledger.
 
 ## Current Repo State
 
 ### Already exists
 
-- `CreditBudgetAvailabilityV1` publica `policyAvailable`, `ledgerAvailable`, `effectiveAvailable`,
-  `spentInPeriod` y `policyVersion` — exactamente el dato que el anillo necesita.
-- `CreditBudgetEvaluationV1` publica `reason` tipado, incluido `month_cap_exceeded`.
-- La política activa con `monthlyCap` está publicada y el runtime la aplica.
-- El anillo del header ya mide el ciclo y ya cae a aro neutro sin denominador (PR #66 de `efeonce-globe`);
-  sólo está conectado a la fuente equivocada.
+- Producer tiene chip/anillo, popover y estados visuales de créditos en `ProducerHeader.tsx`.
+- El payload React/Tailwind y sus gates están desplegados internal-only.
+- Greenhouse puede actuar como destino administrativo y TASK-1483 define `/admin/globe/credits`.
 
 ### Gap
 
-- `COVERAGE` es **uno solo** para las tres registraciones del módulo (`command`, `reader` de política y
-  `reader` de presupuesto): no existe forma de abrir un reader sin abrir las mutaciones.
-- `globe.credits.budget.read` no está en `PRODUCER_HUMAN_CAPABILITY_SCOPES` ni en el grant del broker.
-- El header usa `globe.credits.usage.get` como denominador del período.
+- El header deriva el ciclo desde `usage.allocated + usage.adjusted` y presenta saldo ledger como cifra primaria.
+- No distingue funding vigente, monthly cap, holds y daily fence.
+- No representa coverage/freshness ni razones tipadas de bloqueo.
 
 ## Modular Placement Contract
 
-- Topology impact: `cross-runtime`
-- Current home: `efeonce-globe` (`packages/domain`, `apps/studio-web`, `apps/studio-client`) + `greenhouse-eo` (broker OAuth)
-- Future candidate home: `remain-shared`
-- Boundary: el reader de presupuesto es el primitive; los consumers autorizados son las superficies humanas de Globe con la capability en su grant.
-- Server/browser split: la autoridad y el cálculo quedan server-side; el browser recibe una proyección ya resuelta y nunca deriva disponibilidad.
+- Topology impact: `ui-package`
+- Current home: `../efeonce-globe/apps/studio-client/src/surfaces/producer/**`
+- Future candidate home: `ui-package`
+- Boundary: `CreditCapacitySelfStatusV1` browser-safe; Producer sólo formatea y navega
+- Server/browser split: `policy/readers/auth server-side; status redactado y render browser-side`
 - Build impact: `none`
-- Extraction blocker: `none`
+- Extraction blocker: `Producer vive en el payload React/Tailwind de Globe y consume su BFF/session`
+
+## UI/UX Contract
+
+### Experience brief
+
+- UI rigor: `ui-standard`
+- Usuario / rol: creative user, creative lead y operador con acceso administrativo.
+- Momento del flujo: antes de generar y al inspeccionar capacidad desde el header.
+- Resultado perceptible esperado: saber si puede producir ahora y por qué no, sin interpretar contabilidad.
+- Fricción que debe reducir: cifra ledger engañosa, `0 / —`, límites mezclados y CTA administrativo ausente.
+- No-goals UX: fondear dentro de Producer, administrar pools o exponer vendor cost/margin.
+
+### Surface & system decision
+
+- Surface: `ProducerHeader` + extensión del `CreditsPopover` existente.
+- Composition Shell: `no aplica` — es un control contextual del header existente.
+- Primitive decision: `extend` — extender el popover/chip actual, no crear otro widget.
+- Adaptive density / The Seam: `aplica` — compact header + popover rico en desktop/mobile.
+- Floating/Sidecar/Dialog decision: popover existente; sin drawer/modal administrativo.
+- Copy source: copy locale-keyed del payload Globe.
+- Access impact: self-status workspace-scoped; deep link sólo si la sesión proyecta entitlement administrativo.
+
+### State inventory
+
+- Default: effective available, período y estado `Disponible|Bajo`.
+- Loading: skeleton estable sin cero provisional.
+- Empty: policy/funding ausentes con razón y acción segura.
+- Error: sanitized, retry sólo para read.
+- Degraded / partial: conserva unknown y freshness; nunca inventa cap.
+- Permission denied: sin detalles de otros workspaces.
+- Long content: reasons/copy sin truncar evidencia necesaria.
+- Mobile / compact: chip compacto y popover dentro del viewport.
+- Keyboard / focus: trigger/escape/click-away/focus restore.
+- Reduced motion: actualización instantánea sin count-up desde null.
+
+### Interaction contract
+
+- Primary interaction: abrir popover para descomponer capacidad.
+- Hover / focus / active: tokens AXIS y focus visible.
+- Pending / disabled: trigger sigue accesible mientras refresca; muestra freshness.
+- Escape / click-away: cierra y restaura foco.
+- Focus restore: al trigger del header.
+- Latency feedback: status settle reemplaza skeleton; no optimistic capacity.
+- Toast / alert behavior: cambios de read no usan toast; bloqueo material usa reason inline.
+
+### Motion & microinteractions
+
+- Motion primitive: `CSS`
+- Enter / exit: transición existente del popover.
+- Layout morph: `none`.
+- Stagger: `none`.
+- Timing / easing token: token existente del payload.
+- Reduced-motion fallback: apertura/cierre inmediato.
+- Non-goal motion: count-up, donut animado desde cero o celebración.
+
+Contrato detallado:
+`docs/ui/motion/TASK-1628-globe-producer-credit-capacity-self-view-motion.md`.
+
+### Implementation mapping
+
+- Route / surface: Globe `/producer`, `ProducerHeader` y `CreditsPopover`.
+- Primitive / variant / kind: extensión del chip/popover actual.
+- Component candidates: `ProducerHeader.tsx`; extraer sólo si el tamaño/coverage justifica un componente local.
+- Copy source: locale/copy del payload Globe.
+- Data reader / command: `CreditCapacitySelfStatusV1`; cero commands.
+- API parity: self-status deriva del mismo snapshot de TASK-1482/TASK-1586.
+- Access / capability: lectura propia; deep link admin condicionado por entitlement.
+- States to implement: healthy, low, blocked, no-policy, partial/stale, daily fence, permission/error.
+
+### GVC scenario plan
+
+- Scenario file: `scripts/frontend/scenarios/globe-producer-credit-capacity-self-view.scenario.ts`
+- Route: `/producer`
+- Viewports: `1440x1000|390x844`
+- Quality profile: `premium`
+- Required steps: abrir popover, navegar teclado, verificar deep link cuando corresponde.
+- Required captures: todos los estados del inventory.
+- Required `data-capture` markers: trigger, effective, period-cap, funding, ledger, fence, blocker/action.
+- Assertions: cifra primaria effective, zero-math, no admin actions, redaction.
+- Scroll-width checks: `scrollWidth === clientWidth` a 390 px.
+- Reduced-motion / focus evidence: apertura/cierre y restore.
+- Review dossier: `docs/ui/reviews/TASK-1628-globe-producer-credit-capacity-self-view.scorecard.json`
+- Baseline decision / surface ID: `globe.producer.credit-capacity-self-view` tras primera captura aceptada.
+
+### Design decision log
+
+- Decision: extender el control existente y cambiar la cifra primaria a effective available.
+- Alternatives considered: abrir los DTOs admin actuales; crear una pantalla admin en Globe; mantener ledger.
+- Why this pattern: menor superficie, frontera ADR-015 correcta y comprensión inmediata.
+- Reuse / extend / new primitive: extend; no nueva primitive base.
+- Open risks: status self-view debe existir antes de JSX y no puede degradar unknown a cero.
+
+### Visual verification
+
+- GVC scenario: `globe-producer-credit-capacity-self-view`.
+- Viewports: 1440×1000 y 390×844.
+- Required captures: healthy, ledger-positive/effective-zero, expired funding, cap exhausted, stale/partial, fence.
+- Required `data-capture` markers: los declarados en el scenario plan.
+- Scroll-width check: obligatorio.
+- Accessibility/focus checks: keyboard, escape, click-away, restore y labels no cromáticos.
+- Before/after evidence: ledger primario/denominador derivado → effective/status semántico.
+- Known visual debt: none accepted without task/owner.
+- Visual scorecard: `docs/ui/reviews/TASK-1628-globe-producer-credit-capacity-self-view.scorecard.json`
+- Quality threshold: `average >= 4.5; floor >= 4; hierarchy/surface economy/visual impact/fidelity/template resistance >= 4.5`
 
 ## Backend/Data Contract
 
-- **Contrato tocado:** ninguno cambia de forma. Se modifica el `coverage` declarado de dos readers
-  existentes y se agrega una capability a un grant. Los tipos de respuesta quedan idénticos.
-- **Migraciones:** ninguna.
-- **Autorización:** `globe.credits.budget.read` (ya existente en `capabilities.ts`). El reader sigue
-  workspace-scoped por trusted context.
-- **Idempotencia:** n/a — son lecturas.
-- **Observabilidad:** el gate del header ya reporta su razón cuando el reader no está `available`; al
-  abrirlo, esa razón deja de aparecer y el dato se muestra.
+- Backend impact sigue siendo `none`: esta task no crea schema, migration, reader, command, OAuth scope ni
+  capability. `CreditCapacitySelfStatusV1` y su adapter BFF son entregables de TASK-1482/TASK-1586.
+- La implementación UI sólo consume el DTO browser-safe ya aceptado por esas tasks. Si el DTO no existe o no pasa
+  conformance reader↔reserve, TASK-1628 permanece bloqueada y no introduce un fallback local.
+- No se agregan write paths, secretos, cookies exportadas, queries directas ni derivaciones de autoridad en el
+  cliente.
 
-<!-- ═══════════════════════════════════════════════════════════
-     ZONE 2 — PLAN MODE
-     El agente que toma esta task ejecuta Discovery y produce
-     plan.md segun TASK_PROCESS.md. No llenar al crear la task.
-     ═══════════════════════════════════════════════════════════ -->
-
-<!-- ═══════════════════════════════════════════════════════════
-     ZONE 3 — EXECUTION SPEC
-     "Que construyo exactamente, slice por slice?"
-     El agente solo lee esta zona DESPUES de que el plan este
-     aprobado. Ejecuta un slice, verifica, commitea, y avanza.
-     ═══════════════════════════════════════════════════════════ -->
-
-## Scope
-
-### Slice 1 — Separar el coverage de lectura del de mutación
-
-- Introducir un `READ_COVERAGE` con `ui: 'available'` aplicado **sólo** a
-  `globe.credits.budget.evaluate` y `globe.credits.budget.availability.get`.
-- `COVERAGE` actual queda intacto para commands y para el resto de los readers del módulo.
-- Test que afirma la disyunción: ninguna capability cuyo `kind` sea `command` puede tener
-  `ui: 'available'` en este módulo. Es el guard que impide que un cambio futuro los vuelva a fundir.
-
-### Slice 2 — Rollout del scope en tres pasos, verificando login entre cada uno
-
-- Paso 1 — `greenhouse-eo`: `globe.credits.budget.read` a `allowedScopes` **solamente**. Verificar
-  `/auth/start` y `authorize`; el login debe seguir intacto.
-- Paso 2 — `efeonce-globe`: agregar el scope a `PRODUCER_HUMAN_CAPABILITY_SCOPES` y desplegar.
-  Verificar login otra vez.
-- Paso 3 — `greenhouse-eo`: mover el scope a `capabilityScopes` + `requiredScopes`. Verificar login y
-  que el token ya lleve la capability.
-
-### Slice 3 — El anillo lee el tope real
-
-- El header consume `globe.credits.budget.availability.get` detrás de su gate.
-- Denominador = tope de la política; numerador = `spentInPeriod`.
-- El aro neutro queda **sólo** para `policy_unavailable` — la ausencia genuina de política, no la
-  ausencia de recarga en el mes.
-- El cap diario (`500`) se expone en el panel junto al mensual: son dos límites que niegan por separado.
-
-## Out of Scope
-
-- Cambiar el `monthlyCap`, emitir grants o fondear: esta task **lee**, no administra.
-- Abrir cualquier capability de mutación de crédito a `ui`.
-- El guard de "un solo grant activo" que `ISSUE-124` descarta.
-- La píldora de llegadas y la paginación del feed — ya entregadas, sin relación.
+<!-- ZONE 2 — PLAN MODE: se completa al tomar la task -->
+<!-- ZONE 3 — EXECUTION SPEC -->
 
 ## Detailed Spec
 
-### El coverage compartido, y por qué no se toca
+1. Resolver el self-status por el BFF/session existente y conservar `coverage`, `asOf`, período y blocking reasons
+   como tipos explícitos; ninguna cifra desconocida se normaliza a cero.
+2. Sustituir la lectura primaria del chip por `effectiveAvailable` y un estado semántico; mantener el ledger como
+   contexto histórico/contable secundario.
+3. Extender `CreditsPopover` dentro de `ProducerHeader.tsx` con filas separadas para período
+   (`spent|held|cap|remaining`), funding vigente, ledger y daily fence.
+4. Resolver la acción recomendada desde el reason tipado. La única navegación administrativa es el deep link a
+   Greenhouse y sólo se renderiza cuando la sesión proyecta el entitlement correspondiente.
+5. Reusar la transición CSS existente del popover con tokens del payload, apertura inmediata bajo reduced motion,
+   foco restaurado y cero count-up/donut animado.
+6. Validar los estados definidos en wireframe/flow/motion con fixtures, GVC premium desktop/mobile y una lectura
+   real en Chrome autenticado antes de habilitar el cutover interno.
 
-`packages/domain/src/credit-administration.ts:34` declara **un** `COVERAGE` y lo aplican las tres
-registraciones del módulo: `command(...)`, el `reader` de política y el `reader` de presupuesto. Cambiar
-`ui` ahí abriría también `createPool`, `issueGrant` y `publishPolicy` a la superficie humana.
+## Scope
 
-La forma correcta es una segunda constante aplicada sólo a los dos readers de presupuesto:
+### Slice 1 — Self-status adapter in Producer
 
-```ts
-const COVERAGE      = { ui:'policy-blocked', http:'available', … } as const; // commands + policy reader
-const READ_COVERAGE = { ...COVERAGE, ui:'available' } as const;              // budget readers only
-```
+- Consumir `CreditCapacitySelfStatusV1` por el BFF/session existente.
+- Mantener datos parciales/stale tipados y tests de redacción/shape.
 
-`READ_COVERAGE` se deriva de `COVERAGE` a propósito: si mañana alguien cierra `sdk` o `cli` en el
-módulo, la lectura lo hereda y no queda una segunda tabla divergiendo en silencio. Lo único que la
-lectura decide por su cuenta es `ui`.
+### Slice 2 — Header y popover
 
-El guard que impide la regresión afirma la disyunción sobre los descriptores REGISTRADOS, no sobre las
-constantes: ninguna capability de `kind: 'command'` del módulo puede tener `ui: 'available'`. Un test
-sobre las constantes pasaría aunque alguien aplicara `READ_COVERAGE` a un command por error.
+- Cifra primaria effective available y estado semántico.
+- Descomposición ledger, cap/spent/held, funding y daily fence.
+- Reason + recommended action; deep link a `/admin/globe/credits` sólo con entitlement.
 
-### El dato que consume el header
+### Slice 3 — Visual/runtime evidence
 
-`globe.credits.budget.availability.get` → `CreditBudgetAvailabilityV1`:
+- Tests de estados, keyboard/focus/reduced motion y no local math.
+- GVC premium desktop/mobile y canary interno con status real.
 
-| Campo | Uso en el anillo |
-|---|---|
-| `spentInPeriod` | numerador |
-| `policyAvailable` | el resto disponible bajo la política |
-| `policyVersion` | qué política se está midiendo |
-| `ledgerAvailable` | el saldo del espacio — sigue en la cifra del chip, no en el aro |
+## Out of Scope
 
-El denominador es `spentInPeriod + policyAvailable`, no un campo propio: es el tope vigente derivado de
-lo que el reader publica, y evita que el header tenga que leer la política por separado y arriesgar dos
-fuentes desincronizadas.
-
-`globe.credits.budget.evaluate` aporta `reason` tipado; su valor `policy_unavailable` es la ÚNICA
-condición que deja el aro neutro. Un mes sin recarga ya no lo es.
+- Cambiar caps, fondear, emitir grants, administrar pools/policies o reconciliar ledger.
+- Abrir los DTOs administrativos actuales a `ui`.
+- Calcular `monthlyCap = spentInPeriod + policyAvailable`.
+- Checkout, pricing, payment, clientes externos o automatización de rollover.
 
 ## Rollout Plan & Risk Matrix
 
-### Slice ordering hard rule
-
-- Slice 1 → Slice 2 → Slice 3, sin excepción.
-- Slice 2 tiene su propio orden interno **inviolable**: broker-permitido → cliente-pide →
-  broker-otorga. Invertirlo tumba el login de todos los usuarios de Globe.
-- Slice 3 no puede ejecutarse antes de que el paso 3 del Slice 2 esté verificado: sin la capability en
-  el token, el reader responde `access_denied` y el header mostraría un error donde antes había un dato
-  incompleto — peor que el estado actual.
-
-### Risk matrix
+Slice 1 → Slice 2 → Slice 3. Self-status debe pasar conformance antes de cambiar la cifra primaria.
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
-|---|---|---|---|---|
-| Abrir mutaciones de crédito a `ui` al tocar el `COVERAGE` compartido | identity / crédito | medium | Coverage separado + test de disyunción command/ui | Test rojo en `pnpm check` |
-| Romper el login de Globe al mover el scope | SSO | high si se hace en un paso | Rollout de 3 pasos con verificación de `/auth/start` y `authorize` entre cada uno | `400 invalid_scope` en authorize; "Acceso no disponible" en login |
-| El header muestra `access_denied` donde antes mostraba un dato parcial | UI | medium | Slice 3 después del paso 3 verificado; el gate ya degrada honesto | Razón del gate visible en el panel |
-| Exponer disponibilidad de presupuesto a un principal que no debería verla | crédito | low | El reader es workspace-scoped por trusted context y la capability va sólo al grant humano del Producer | Auditoría del grant |
+| --- | --- | --- | --- | --- |
+| Mostrar ledger como spendable | UI/credits | high | self-status semántico + source scan | GVC/contract test |
+| Unknown aparece como cero | UI | medium | union tipada + fixtures partial | state test |
+| Filtrar admin internals | access | low | DTO redactado + shape test | redaction test |
+| Romper header mobile | UI | medium | extend existente + GVC 390 px | overflow assertion |
 
-### Feature flags / cutover
+- Feature flags / cutover: usar gate/canary del payload Producer existente; no abrir admin writes.
+- Rollback: revert UI/adaptor y volver al estado neutro, nunca al saldo histórico como “disponible”.
+- Production verification: local → GVC → internal canary → release gobernado si corresponde.
+- Out-of-band coordination required: none; browser testing usa Chrome autenticado del perfil indicado por el operador.
 
-Sin flag. El cambio de coverage es declarativo y su revert es un PR; el scope tiene su propio rollback
-por paso (ver abajo). Un flag adicional daría una tercera fuente de verdad sobre si la capability está
-disponible, que es justamente la confusión que esta task cierra.
-
-### Rollback plan per slice
-
-| Slice | Rollback | Tiempo | Reversible? |
-|---|---|---|---|
-| Slice 1 | Revert del PR; el coverage vuelve a `policy-blocked` | < 10 min | sí |
-| Slice 2 paso 1 | Quitar el scope de `allowedScopes` con `pnpm sister-platform:redirect`-equivalente del grant | < 10 min | sí |
-| Slice 2 paso 2 | Revert del deploy de `studio-web` a la revisión anterior | < 15 min | sí |
-| Slice 2 paso 3 | Mover el scope de vuelta a `allowedScopes` — **nunca** quitarlo del todo mientras el cliente desplegado lo pida | < 10 min | sí |
-| Slice 3 | Revert del PR; el header vuelve al denominador del ledger | < 10 min | sí |
-
-### Production verification sequence
-
-1. Slice 1 desplegado; `/v1/capabilities` muestra los dos readers en `ui: available` y **ningún** command del módulo cambiado.
-2. Slice 2 paso 1; `authorize` responde `303` y el login funciona.
-3. Slice 2 paso 2 desplegado; login funciona y `/auth/start` anuncia el scope nuevo.
-4. Slice 2 paso 3; login funciona y `/v1/session` muestra la capability en el principal.
-5. Slice 3 desplegado; el panel muestra el tope real (hoy `0 / 1.500`) y el cap diario.
-6. Generar una pieza y verificar que el anillo avanza.
-
-### Out-of-band coordination required
-
-Ninguna fuera de los dos repos. El cambio no toca Azure, GCP secrets ni proveedores.
-
-<!-- ═══════════════════════════════════════════════════════════
-     ZONE 4 — VERIFICATION & CLOSING
-     "Como compruebo que termine y que actualizo?"
-     El agente ejecuta estos checks al cerrar cada slice y
-     al cerrar la task completa.
-     ═══════════════════════════════════════════════════════════ -->
+<!-- ZONE 4 — VERIFICATION & CLOSING -->
 
 ## Acceptance Criteria
 
-- [ ] `globe.credits.budget.evaluate` y `globe.credits.budget.availability.get` están `ui: available`
-- [ ] Ninguna capability `kind: command` del módulo de crédito quedó `ui: available`, y hay un test que lo afirma
-- [ ] El login de Globe funciona verificado después de **cada** paso del Slice 2
-- [ ] El panel muestra el tope mensual real y el cap diario
-- [ ] El aro neutro aparece sólo ante `policy_unavailable`, no ante un mes sin recarga
-- [ ] Una generación real hace avanzar el anillo
+- [ ] `Execution profile`, UI impact, wireframe y flow reflejan el cambio visible real.
+- [ ] Producer consume `CreditCapacitySelfStatusV1` y no los DTOs administrativos ambiguos.
+- [ ] La cifra primaria es effective available; ledger histórico se muestra sólo como dimensión secundaria.
+- [ ] Cap/spent/held, funding y daily fence aparecen separados y con razones tipadas.
+- [ ] `partial|stale|unknown` nunca se convierte en cero ni en estado healthy.
+- [ ] No existe command/CTA de fondeo en Globe; deep link Greenhouse sólo aparece con entitlement.
+- [ ] El browser no calcula cap, remaining, funding eligibility ni effective available.
+- [ ] Loading, healthy, low, blocked, no-policy, expired, partial/stale, permission y error están cubiertos.
+- [ ] Keyboard, focus restore, reduced motion y 390 px sin overflow pasan.
+- [ ] GVC desktop/mobile y canary real usan la sesión Chrome autenticada indicada por el operador.
 
 ## Verification
 
-- `pnpm check` y `pnpm build` en `efeonce-globe`
-- `pnpm local:check` en `greenhouse-eo`
-- Login humano verificado entre cada paso del Slice 2
-- Lectura del panel contra los valores de `credit_admin_policy_versions`
+- `pnpm task:lint --task TASK-1628`
+- `pnpm ui:wireframe-check --task TASK-1628`
+- `pnpm ui:flow-check --task TASK-1628`
+- `cd ../efeonce-globe && pnpm check && pnpm build`
+- GVC `globe-producer-credit-capacity-self-view` en 1440×1000 y 390×844.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] Delta en `TASK-1566` registrando que su alcance declarado se completó acá y por qué quedó fuera
+- [ ] `UI ready: yes` sólo después de mapping, GVC plan, decision log y checks verdes.
+- [ ] Lifecycle/carpeta, README, registry, EPIC-028, changelog y Handoff sincronizados.
+- [ ] QA release auditor y documentation governor ejecutados.
+- [ ] No se crea ni usa un worktree aislado.
 
 ## Follow-ups
 
-- Auditar si otras tasks `complete` declararon cambios de coverage que tampoco se aplicaron: este gap
-  sobrevivió a un cierre documental porque nadie compara lo declarado contra `/v1/capabilities`.
-- La proyección de agotamiento (`CreditExhaustionForecastV1`) sigue en `insufficient-data`; con el tope
-  legible, el aro podría además señalar estado además de proporción.
+- TASK-1532 consume estimate/revalidación antes de generar; no redefine la capacidad.
+- Cualquier administración adicional pertenece a TASK-1483 en Greenhouse.
 
-## Open Questions
+## Delta 2026-08-01 — rebaseline completo por TASK-1630
 
-- ¿El cap diario merece su propio indicador o basta con exponerlo en el panel? Hoy niega por separado
-  del mensual y el operador no tiene forma de verlo venir.
+La premisa anterior `monthlyCap = spentInPeriod + policyAvailable` quedó invalidada por auditoría de código. La
+task ya no abre los readers administrativos existentes ni modifica grants OAuth. Se convierte en consumer UI del
+self-status corregido, preserva Producer como read-only y reubica toda administración en Greenhouse.

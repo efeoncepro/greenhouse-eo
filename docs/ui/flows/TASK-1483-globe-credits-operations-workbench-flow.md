@@ -1,18 +1,21 @@
-# TASK-1483 — Globe Credits Operations Workbench Flow
+# TASK-1483 — Greenhouse Globe Credits Operations Workbench Flow
+
+Surface: `/admin/globe/credits`. Globe Producer no administra y sólo enlaza a esta ruta cuando el actor tiene
+entitlement.
 
 ## Primary flow
 
 1. Resolver actor, workspace, audience y capability server-side.
-2. Seleccionar workspace/período; leer runway, pools, risks y freshness.
-3. Abrir pool/grant/entry; reader devuelve detalle redactado y actions permitidas.
-4. Solicitar proposal de cambio; servidor calcula impacto, preconditions, fingerprint y TTL.
-5. Confirmar con reason/evidence; command canónico ejecuta o devuelve error tipado.
-6. Refrescar readers y mostrar ledger entry/audit; restore focus al origen.
+2. Seleccionar workspace/período; leer capacity status, operations, pools, risks y freshness.
+3. Abrir `Asegurar capacidad`; preview server-side resuelve ciclo/target/delta y devuelve before/after.
+4. Crear proposal durable con operation key, fingerprint y TTL.
+5. Confirmar manualmente o mediante agente autenticado bajo instrucción/delegación; segundo actor sólo por policy.
+6. Consultar operation/status hasta terminal; mostrar grant/policy/ledger/readback y restaurar foco.
 
 ## Secondary and recovery
 
 - Ledger -> run/deep link; anomaly -> evidence -> safe remediation disponible.
-- Proposal expired/stale -> repropose; conflict -> refrescar sin ocultar cambios ajenos.
+- Proposal expired/stale -> preview nuevo; outcome unknown -> status/reconcile con la misma operation key.
 - Permission/redaction -> explicar boundary sin revelar existencia cross-tenant.
 - Drift -> no corregir localmente; sólo command gobernado expuesto por backend.
 - Dirty drawer bloquea escape/click-away accidental; error preserva input no sensible.

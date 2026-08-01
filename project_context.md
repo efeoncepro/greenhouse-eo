@@ -28,6 +28,10 @@ público + PKCE (`TASK-1629`; los archivos de migración conservan la etiqueta h
 contradicción de presupuesto, el primer acto es read-only: reconciliar propuesta, pool, grant, policy efectiva,
 availability/evaluate, balance, usage, ledger e intents append-only para el mismo workspace/período. `propose`
 también crea estado durable; no se ejecuta durante discovery ni se fondea cuando los readers prueban suficiencia.
+`TASK-1630` gobierna la convergencia del control plane: una instrucción explícita y atribuida del CEO puede
+autorizar una operación acotada y permitir que el mismo agente autenticado proponga y confirme end-to-end cuando
+la política del workspace no exige segundo confirmante. La instrucción no es una delegación permanente; las
+delegaciones persistentes conservan límites versionados, vigencia y revocación, y workloads nunca confirman.
 
 ### Lectura mínima obligatoria
 

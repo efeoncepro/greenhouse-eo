@@ -320,6 +320,12 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 - [ ] Costos vendor y margen sólo aparecen en readers de audiencia autorizada; client-facing recibe credits,
       modelo/ruta transparente y razones legibles sin secretos ni economía confidencial.
 - [ ] Reliability detecta holds vencidos/stuck, duplicados, projection drift, saldo bajo y desviación estimate/actual.
+- [ ] Existe un caller periódico gobernado para `expire`; una reservation vencida no puede retener saldo
+      indefinidamente y su liberación deja ledger/audit idempotente.
+- [ ] La proyección distingue saldo ledger histórico, funding elegible y capacidad efectiva; ninguno se presenta
+      como sinónimo de los otros.
+- [ ] Settlement con `actual > reserved` exige reautorización, settlement parcial o policy explícita de TASK-1579;
+      nunca excede caps/funding silenciosamente.
 - [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
 - [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
 
@@ -340,3 +346,10 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 ## Follow-ups
 
 - Las dependencias sucesoras se leen desde EPIC-028 y `docs/tasks/README.md`.
+
+## Delta 2026-08-01 — invariantes de cierre exigidos por TASK-1630
+
+La auditoría encontró que el command `globe.credits.expire` no tiene scheduler/caller operativo y que settlement
+puede aceptar `actual > reserved` mirando el saldo agregado sin reautorizar funding/caps. TASK-1468 sigue abierta
+hasta cerrar expiry/reconciliation y probar el enlace con la policy normativa de TASK-1579. Los 500.000 créditos
+históricos permanecen append-only: se clasifican en proyección, no se borran ni se duplican.

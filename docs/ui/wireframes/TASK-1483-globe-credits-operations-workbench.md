@@ -1,13 +1,16 @@
-# TASK-1483 — Globe Credits Operations Workbench Wireframe
+# TASK-1483 — Greenhouse Globe Credits Operations Workbench Wireframe
+
+Canonical route: `/admin/globe/credits`. Globe Producer is a separate read-only consumer owned by TASK-1628.
 
 ## Desktop 1440
 
 ```text
-┌ Globe / Credits ─ Workspace ─ Period ─ Freshness ─ Audience ───────────┐
-│ RUNWAY:  Available ━━ Reserved ━━ Consumed     Horizon / confidence      │
+┌ Admin / Globe / Credits ─ Workspace ─ Period ─ Freshness ─────────────┐
+│ CAPACIDAD: Effective ━━ Cap / spent / held ━━ Funding ━━ Ledger history │
+│ BLOCKER / NEXT ACTION                                      [Ensure cycle] │
 ├───────────────────────────────────────────────┬──────────────────────┤
-│ POOLS / PROJECT BUDGETS                       │ RISK RAIL            │
-│ Workspace pool > Campaign A > Social         │ low / hold / drift   │
+│ OPERATIONS / POOLS / PROJECT BUDGETS          │ RISK RAIL            │
+│ Pending · expired · outcome unknown           │ low / hold / drift   │
 ├───────────────────────────────────────────────┴──────────────────────┤
 │ LEDGER  filters: period project source type capability run          │
 │ time | entry | credits | pool/project | actor | run | status        │
@@ -30,8 +33,34 @@ idempotent replay; denied; redacted; cross-workspace deny; sanitized error; succ
 
 ## Command sidecar
 
-`select target -> propose -> server impact/preconditions/fingerprint/TTL -> confirm + reason/evidence -> execute
--> canonical refresh -> ledger/audit link`. No optimistic balance ni UI rollback.
+`status -> preview exacto -> proposal durable -> confirm humano/agente según policy -> execute -> operation/status
+readback -> ledger/audit link`. Un solo `operationKey`; no optimistic balance ni retry ciego.
+
+`outcome_unknown` conserva el sidecar y ofrece `Verificar estado`; nunca `Reintentar fondeo`.
+
+## Implementation Mapping
+
+- Route: `src/app/(dashboard)/admin/globe/credits/page.tsx`.
+- View: `src/views/greenhouse/admin/globe/credits/**`.
+- Reuse: `CompositionShell`, `WorkbenchHeader`, `SignalStrip`, `OperationalSection`, `InventoryList`,
+  `SelectionRow`, `AdaptiveSidecarLayout`, `ContextualSidecar`, `ContextCommandBar` y `Dialog`.
+- Route-local composition: capacity/runway plane; no primitive base nueva hasta existir un segundo consumer.
+- Data: TASK-1586 status/preview/operations + TASK-1629 confirm/readback.
+
+## GVC Scenario Plan
+
+- Route: `/admin/globe/credits` con sesión admin autenticada.
+- Viewports: 1440×1000 y 390×844; `qualityProfile: premium`.
+- Captures: healthy, ledger positivo/effective cero, pool vencido, monthly cap, project cap/paused,
+  stale/partial, proposal pending/expired, human confirm, agent confirm/deny/over-limit, outcome unknown y reconcile.
+- Assertions: una CTA primaria, cero raw error/secret/cost/margin, focus restore, reduced motion y
+  `scrollWidth === clientWidth`.
+
+## Design Decision Log
+
+- Se conserva Runway Control Plane porque prioriza operabilidad y evita metáforas wallet/crypto.
+- Se reubica de Globe a Greenhouse por ADR-015.
+- Se reusan primitives Greenhouse; el runway permanece composición local hasta demostrar reuso real.
 
 ## Accessibility
 

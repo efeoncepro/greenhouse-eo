@@ -174,9 +174,9 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
 
 ## Siguiente paso ejecutable
 
-1. Formalizar `TASK-1630` como umbrella de convergencia del control plane de créditos y corregir primero la
-   correspondencia entre readers, período, funding y enforcement. No fondear, desplegar ni usar SQL mientras el
-   status autoritativo y el readback de operaciones sigan incompletos.
+1. `TASK-1630` ya quedó formalizada. Ejecutar primero `TASK-1482`: corregir la correspondencia entre readers,
+   período, funding, holds y enforcement, y entregar `ensure-funded` idempotente. No fondear, desplegar ni usar
+   SQL mientras el status autoritativo y el readback de operaciones sigan incompletos.
 2. Reconciliar las propuestas ambiguas de `TASK-1629` mediante primitives canónicas. Una instrucción explícita del
    CEO puede autorizar `preview → propose → confirm → readback` por un agente autenticado; el segundo confirmador
    permanece como política opcional, OFF para el workspace owner-operated.

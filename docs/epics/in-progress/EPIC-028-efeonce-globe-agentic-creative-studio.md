@@ -474,6 +474,24 @@ catálogo, bindings y resolución por ruta; `TASK-1578` certifica route → rate
 → promotion y declara coverage API/SDK/MCP/UI. Ningún modelo nuevo se considera disponible sólo por existir en el
 catálogo.
 
+## Delta 2026-08-01 — TASK-1630 converge el control plane de créditos
+
+`TASK-1630` coordina las tasks existentes sin crear un tercer ledger ni absorber sus archivos. La auditoría del
+runtime comprobó que availability/evaluate no aplican aún la misma semántica que reservation: gasto histórico se
+publica como `spentInPeriod`, los caps no incluyen holds vigentes, el período del pool no se exige y el rollover
+mensual presupone un pool preparado. Por eso `TASK-1586`, `TASK-1483` y `TASK-1628` no pueden ejecutarse sobre los
+DTOs actuales.
+
+El orden normativo queda: `TASK-1482` corrige período, funding y decisión compartida; `TASK-1468` + `TASK-1579`
+cierran holds/expiry/settlement; `TASK-1629` completa operation status/readback y el one-command; `TASK-1586`
+publica el read/recovery plane; `TASK-1483` implementa `/admin/globe/credits` en Greenhouse; `TASK-1628` conserva
+Producer como self-view read-only; MCP llega después por `TASK-1473`/`TASK-1626`.
+
+La autoridad owner-operated queda explícita: una instrucción atribuida del CEO puede autorizar a un humano o
+agente autenticado para completar `preview → propose → confirm → readback` sin un segundo humano.
+`requireSecondConfirmer` es policy opcional por workspace/umbral y permanece OFF en
+`greenhouse-org:efeonce`; un workload genérico nunca confirma y un agente no puede ampliar su propia delegación.
+
 ## Delta 2026-07-19 — TASK-1458 complete (Golden Briefs & Evaluation Harness)
 
 `TASK-1458` quedó **complete** (fake canary), sumándose a `TASK-1481` (spine), `TASK-1457` (Model Lab) y

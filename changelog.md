@@ -15,6 +15,19 @@
 - El contrato se canonizó en `REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md`, con routers, prompts, skills y la
   memoria global de Claude alineados; el modelo histórico de worktrees quedó explícitamente superseded.
 
+## 2026-08-01 — TASK-1630: convergencia del control plane de créditos de Globe
+
+- Se registró `TASK-1630` como umbrella P0 y se rebaselinaron TASK-1468/1482/1483/1586/1628/1629 contra el runtime
+  observado: ledger histórico, funding vigente, caps/holds y operaciones de fondeo dejan de tratarse como una sola
+  cifra implícita.
+- La secuencia queda fijada como truth de período/enforcement → status/recovery → one-command → workbench
+  Greenhouse → self-view Producer → paridad MCP/comercial. No se crea otro ledger ni se mueve administración al
+  Producer.
+- ADR-015 ahora explicita que una instrucción atribuida del CEO puede autorizar una operación acotada y que el
+  mismo agente autenticado puede proponer y confirmar end-to-end cuando la política del workspace no exige segundo
+  confirmante. Workloads siguen sin poder confirmar; delegaciones persistentes conservan límites y revocación.
+- Este cambio fue sólo documental: no hubo fondeo, deploy, migración, push, release ni promoción a `main`.
+
 ## 2026-08-01 — Efeonce MCP: Globe fleet reader end-to-end
 
 - Se habilitó únicamente `globe.producer.fleet.list`: el gateway llama el reader canónico `POST /v1/readers`,
@@ -689,32 +702,3 @@ Corrección de fuente de verdad: el cliente inicial es **SKY Agencia Creativa**,
   reduce a Globe; Digital Services & Engineering no se reduce a Wave; RevOps & CRM no es una quinta unidad; Reach,
   Wave, Globe, Kortex y Verk nombran productos/sistemas cuando corresponde; Greenhouse es el control plane.
 - No hubo cambios de runtime, schema, catálogo productivo ni configuración externa.
-
-## 2026-07-26 — Globe genera de verdad: Producer React vivo y carril de fondeo gobernado
-
-- **Generación desbloqueada.** Las tres modalidades producen desde la UI con principal humano por el BFF:
-  imagen (Seedream 5 Pro), video (Seedance 2.0) y audio (ElevenLabs Multilingual v2). Lo que lo bloqueaba
-  era un falso positivo del sanitizador, que leía `"Key visual…"` —término de dirección de arte— como una
-  credencial (`ISSUE-127` capa 8). Se corrigió el **control**, no el prompt: una credencial serializada es
-  un token opaco, no una frase.
-- **Producer React en runtime** (`globe-studio-internal` rev `00094-pr8`). El código ya estaba desplegado;
-  lo tapaba `GLOBE_CLIENT_PRODUCER_ENABLED=false`, con su gate de paridad ya verde. Se corrigieron además
-  el viewer (la pieza no llenaba su celda por una herencia del share board), las acciones muertas en una
-  corrida fallida y los enums crudos (`with-audio`/`silent`) que salían como copy visible.
-- **Carril gobernado de fondeo de crédito vivo** (`globe-api-internal` rev `00106-b6w`, 176 capabilities).
-  La atribución humana pasó de convención de payload a control exigible: tabla append-only en Greenhouse
-  con trigger en la base que rechaza que un principal de servicio figure como el humano que aprueba. La
-  mutación (grant + asiento + política) corre en **una** transacción.
-- **El segundo confirmador humano quedó como política por workspace** (default OFF en el interno) más
-  techo por operación, no como invariante — coherente con ADR-015. Un control que su único usuario no
-  puede satisfacer no protege: desvía al break-glass.
-- Pendiente para cerrar `TASK-1566`: ejercer `propose`→`confirm` con Greenhouse desplegado. El ADC local
-  no puede impersonar al workload caller, por diseño.
-
-## 2026-07-26 — Routing económico y creativo de modelos generativos
-
-- Las skills de diseño/motion y Business Model Operator documentan la selección por caso de uso entre Seedance 2.0,
-  Gemini Omni y FLUX 3, además de la comparación de consumo directo vs. Fal.
-- FLUX 3 queda explícitamente como early access sin API pública general ni precio público al corte; no entra en
-  compromisos de producción ni en unit economics aprobados.
-- Se sincronizaron las fuentes `.codex`/`.claude` correspondientes; no hubo cambios de runtime.

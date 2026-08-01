@@ -1,9 +1,9 @@
 # Manual — Fondear los créditos de Globe por el carril gobernado (propose → confirm)
 
 > **Tipo de documento:** Manual de uso / runbook (orientado al operador)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-07-26 por Claude (TASK-1566)
-> **Ultima actualizacion:** 2026-07-31 por Codex (TASK-1629)
+> **Ultima actualizacion:** 2026-08-01 por Codex (TASK-1630)
 > **Documentacion tecnica:** [ADR-015](../../architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md) · [TASK-1566](../../tasks/complete/TASK-1566-globe-governed-credit-funding-command.md)
 
 ## Para qué sirve
@@ -27,8 +27,8 @@ runbook que salieron de medirlo.
   típico), un grant sin `monthlyCap` deja `policyAvailableAfter` igual o menor que antes. El plan lo
   dice antes de confirmar; léelo.
 - **Quién hace qué:** un usuario humano puede confirmar con sus entitlements; un usuario agente
-  puede hacerlo cuando el workspace le delega expresamente esa facultad y el acto cabe en sus
-  límites por grant y por mes. Un workload, API key o principal de servicio genérico nunca confirma.
+  puede hacerlo cuando el runtime reconoce una autoridad one-shot o una delegación expresa del workspace y el
+  acto cabe en sus límites. Un workload, API key o principal de servicio genérico nunca confirma.
 - **Necesitas:** una sesión autenticada en Google Chrome para completar OAuth, los scopes
   `globe.credits.funding.propose` y `globe.credits.funding.confirm`, los entitlements de
   administración de créditos, el `poolId` vigente (ver
@@ -56,7 +56,13 @@ pnpm globe:credit-funding -- \
 ```
 
 Sin `--yes true`, el CLI muestra el plan y pide confirmación interactiva. `--yes true` es válido para
-un agente cuando el operador ya autorizó la acción; no omite ninguna verificación server-side.
+un agente sólo cuando la autoridad/delegación ya existe en el runtime; la instrucción textual del operador no
+omite ninguna verificación server-side.
+
+> **Estado de convergencia:** este comando es el carril V1 recuperado por TASK-1629. Todavía exige `poolId` y dos
+> claves de idempotencia; no ofrece `status/list/reconcile` ni asegura por sí solo el pool del período. TASK-1630
+> ordena corregir primero la verdad de período/enforcement (TASK-1482) y luego entregar one-command/readback. No
+> tratar este comando crudo como la experiencia final.
 
 ### 2. Revisar el plan — éste es el punto entero del carril
 
@@ -115,7 +121,7 @@ tope) y `allocationEntryId`. Todo ocurre en **una** transacción: grant + asient
 |---|---|---|
 | `409 globe_funding_already_recorded` | Reusaste una clave, o esa propuesta ya tiene decisión registrada (el anti-replay del broker es **por propuesta**: ningún confirm repetido pasa, con cualquier clave) | Leer el estado de la propuesta; si `completed`, ya está |
 | `422 globe_funding_rejected` | Globe rechazó el payload (4xx real, no un problema de red) | Leer `code`; no reintentar igual |
-| `503 globe_unavailable` | El puente falló (red/WIF) | Reintentar; si persiste, `GET /api/internal/globe/health` |
+| `503 globe_unavailable` | El puente falló (red/WIF); si ocurrió durante confirm, el outcome puede ser desconocido | No repetir confirm a ciegas. Verificar health y reconciliar la propuesta/intent; TASK-1629 agrega el readback canónico |
 | `401` | Sin sesión válida | Renovar sesión del portal |
 | `403 agent_confirmation_forbidden` | El usuario agente no tiene delegación activa para ese workspace | Habilitar la política gobernada; no usar una identidad humana como bypass |
 | `422 agent_funding_limit_exceeded` | El grant o el tope mensual excede la delegación del agente | Reducir el acto o elevar la política mediante el dueño del workspace |
@@ -125,6 +131,7 @@ tope) y `allocationEntryId`. Todo ocurre en **una** transacción: grant + asient
 ## Referencias técnicas
 
 - Decisión: [ADR-015 — Greenhouse administra Globe](../../architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md)
+- Programa de convergencia y autoridad CEO/agente: [TASK-1630](../../tasks/to-do/TASK-1630-globe-credits-control-plane-convergence.md)
 - Implementación + evidencia del primer fondeo real: [TASK-1566](../../tasks/complete/TASK-1566-globe-governed-credit-funding-command.md) (Deltas 4–6)
 - Estado vivo (revisiones, pool, flags): [`GLOBE_RUNTIME_HANDOFF.md`](../../operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md)
 - Explicación en simple: [documentación funcional](../../documentation/creative-studio/fondeo-gobernado-creditos-globe.md)

@@ -1,9 +1,9 @@
 # Fondeo gobernado de créditos de Globe — cómo se le pone presupuesto al mes
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-07-26 por Claude (TASK-1566)
-> **Ultima actualizacion:** 2026-07-31 por Codex (TASK-1629)
+> **Ultima actualizacion:** 2026-08-01 por Codex (TASK-1630)
 > **Documentacion tecnica:** [ADR-015](../../architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md)
 
 ## Qué es
@@ -46,7 +46,7 @@ demuestra por qué el plan importa: un fondeo **sin** subir el tope mostraba que
 | Acto | Quién |
 |---|---|
 | Proponer un plan | Una persona o un agente (es de solo lectura: registra la intención, no muta nada) |
-| **Confirmar** | Una persona autorizada o un agente autenticado con delegación explícita del workspace, scopes, entitlements y límites vigentes |
+| **Confirmar** | Una persona autorizada o un agente autenticado con autoridad one-shot o delegación explícita del workspace, scopes, entitlements y límites vigentes |
 | Un segundo confirmador | Es **política por workspace** (apagada en el workspace interno, donde el aprobador es el dueño del presupuesto), no una regla fija |
 
 Cada fase queda registrada con **quién** la hizo y **con qué derecho**, en una tabla que no se puede
@@ -65,8 +65,24 @@ de servicio o workload genérico no puede confirmar: carece de una delegación a
 - **Delegación agente acotada**: cada workspace decide si la habilita, el máximo por grant y el
   máximo mensual. La política nace apagada y la base de datos rechaza cualquier exceso.
 
+## Contrato aprobado y estado operativo
+
+TASK-1630 distingue dos formas de autoridad agente:
+
+- **Instrucción one-shot del CEO:** autoriza una operación exacta por workspace, período, target, cap,
+  fingerprint y vencimiento. Permite que el mismo agente autenticado proponga y confirme cuando el segundo
+  confirmador está OFF; no se reutiliza para otro payload.
+- **Delegación persistente:** sirve para operación rutinaria y queda versionada, revocable y limitada por
+  workspace, período, monto por operación/acumulado, cap, vigencia y cantidad de ejecuciones.
+
+El runtime recuperado por TASK-1629 ya soporta OAuth PKCE, scopes, entitlements, provenance y confirmación agente
+con la policy vigente. La autoridad one-shot, el `status/list/get/reconcile`, la selección automática del ciclo y
+la fachada one-command siguen pendientes de implementación. Hasta ese cierre, una instrucción en texto no se
+interpreta por sí sola como credencial de runtime y el CLI actual continúa exigiendo el pool y las claves de cada
+fase.
+
 > Detalle técnico: comandos `globe.credits.month.fund.propose` / `.confirm` (surface
 > `sister-platform`), dominio en `efeonce-globe/packages/domain/src/credit-funding.ts`, rutas en
 > `src/app/api/admin/globe/credit-funding/*`, evidencia en
-> `greenhouse_core.globe_credit_funding_intents`. Decisión completa: ADR-015. Runbook:
+> `greenhouse_core.globe_credit_funding_intents`. Programa de convergencia: TASK-1630. Decisión completa: ADR-015. Runbook:
 > [manual de uso](../../manual-de-uso/creative-studio/fondear-creditos-globe.md).

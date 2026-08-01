@@ -17,23 +17,24 @@
 - Motion: `docs/ui/motion/TASK-1483-globe-credits-operations-workbench-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Dirección y contrato UI definidos; implementación pendiente`
-- Rank: `TBD`
+- Status real: `Dirección preservada; surface reubicada en Greenhouse y bloqueada por snapshot/read-recovery plane`
+- Rank: `next.5`
 - Domain: `finance|creative|ui|operations`
-- Blocked by: `TASK-1481, TASK-1466, TASK-1468, TASK-1482, TASK-1485`
+- Blocked by: `TASK-1468, TASK-1482, TASK-1586, TASK-1629`
 - Branch: `task/TASK-1483-globe-credits-operations-workbench`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
 
-Crear `/studio/credits` como control plane visual internal-first para runway, pools, grants, sub-budgets,
-alerts, ledger y reconciliación, consumiendo exclusivamente commands/readers canónicos.
+Crear `/admin/globe/credits` en Greenhouse como control plane visual internal-first para capacidad efectiva,
+ciclos de fondeo, operaciones/recovery, pools, grants, budgets, ledger y reconciliación, consumiendo
+exclusivamente status/commands canónicos.
 
 ## Why This Task Exists
 
-El workbench creativo de `TASK-1474` necesita contexto de gasto por run, pero mezclar allí administración
-financiera degradaría el flujo creativo y los controles de acceso.
+ADR-015 fija Greenhouse como superficie administrativa y Globe como autoridad. La ubicación histórica
+`/studio/credits` contradice esa frontera y mezclaría operación financiera con Producer/Workbench creativo.
 
 ## Goal
 
@@ -45,7 +46,10 @@ recuperable sin representar Studio Credits como dinero/token ni calcular busines
 ## Architecture Alignment
 
 - `docs/architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md`
+- `docs/architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md`
 - `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`
+- `docs/architecture/agent-invariants/UI_PLATFORM_AGENT_INVARIANTS.md`
+- `docs/architecture/ui-platform/README.md`
 - `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md`
 - `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
 
@@ -59,18 +63,20 @@ recuperable sin representar Studio Credits como dinero/token ni calcular busines
 
 ### Depends on
 
-- `TASK-1481` trusted context/parity, `TASK-1466` responsibility, `TASK-1468` ledger, `TASK-1482` admin y
-  `TASK-1485` pattern registry/foundation propio de Globe.
+- `TASK-1468` ledger/expiry, `TASK-1482` snapshot/cycle, `TASK-1586` status/recovery y `TASK-1629`
+  identity/operation adapters.
 
 ### Blocks / Impacts
 
 - Evidencia necesaria para `TASK-1480` si el go incluye client-operated/budget manager externo.
-- No depende de `TASK-1474`; comparten identidad/shell Globe, no ownership de dominio.
+- No depende de `TASK-1474`; Producer/Workbench creativo sólo conserva contexto/deep link read-only.
 
 ### Files owned
 
-- `../efeonce-globe/apps/studio-web/` exclusivamente para la surface/copy/fixtures de credits.
-- Scenario GVC y reviews de `TASK-1483` en Greenhouse.
+- `src/app/(dashboard)/admin/globe/credits/**`
+- `src/views/greenhouse/admin/globe/credits/**`
+- copy reutilizable bajo `src/lib/copy/**`
+- scenario GVC y reviews de `TASK-1483` en Greenhouse.
 
 Contracts/SDK permanecen bajo `TASK-1468`, `TASK-1482`, `TASK-1473` y `TASK-1481`.
 
@@ -78,22 +84,23 @@ Contracts/SDK permanecen bajo `TASK-1468`, `TASK-1482`, `TASK-1473` y `TASK-1481
 
 ### Already exists
 
-- Globe tiene shell branded HTML/CSS/TS server-rendered y construirá su propia biblioteca incremental de
-  patterns; compartir un color de marca no implica heredar el sistema UI Greenhouse.
+- Greenhouse ya tiene shell `/admin`, CompositionShell, WorkbenchHeader, InventoryList/SelectionRow,
+  AdaptiveSidecarLayout, ContextualSidecar, OperationalSection, SignalStrip y Dialog.
+- La dirección visual Runway Control Plane, wireframe, flow y motion de TASK-1483 ya existen y se preservan.
 
 ### Gap
 
-- Falta una surface operativa y su evidencia multi-role/state; el backend canónico vive en tasks previas.
+- Falta mapear la dirección visual a primitives Greenhouse y consumir los DTOs corregidos de TASK-1586.
 
 ## Modular Placement Contract
 
 - Topology impact: `cross-runtime`
-- Current home: `Globe UI; Greenhouse task/GVC evidence`
-- Future candidate home: `remain-shared`
-- Boundary: `credits administration thin client`
+- Current home: `Greenhouse portal bajo src/app/(dashboard)/admin/globe/credits/**`
+- Future candidate home: `portal`
+- Boundary: `thin client de CreditCapacityStatusV1 y CreditFundingOperationV1; Globe sigue como autoridad`
 - Server/browser split: `browser sólo renderiza DTOs y envía commands; policy/forecast/impact server-side`
-- Build impact: `Globe UI + GVC Greenhouse`
-- Extraction blocker: `ninguno`
+- Build impact: `none; portal y primitives existentes`
+- Extraction blocker: `sesión/entitlements Greenhouse y broker cross-runtime hacia Globe`
 
 ## UI/UX Contract
 
@@ -102,11 +109,11 @@ Contracts/SDK permanecen bajo `TASK-1468`, `TASK-1482`, `TASK-1473` y `TASK-1481
 - Flow: `docs/ui/flows/TASK-1483-globe-credits-operations-workbench-flow.md`
 - Motion: `docs/ui/motion/TASK-1483-globe-credits-operations-workbench-motion.md`
 - Selected direction: `Runway Control Plane`.
-- Surface architecture: `Runway Control Plane compuesto sólo con patterns Globe: runway plane, risk rail,
-  pool navigator, ledger list-detail y governed command panel`.
-- Primitive decision: `reuse | extend | new sobre el registry Globe; cada pattern nueva documenta anatomy,
-  states, accessibility, responsive behavior y evidence antes de promoción`.
-- Full API parity: `thin client de DTOs/commands 1468/1482; cero balance/rate/forecast/auth/margin local`.
+- Surface architecture: `Runway Control Plane en Greenhouse con CompositionShell operationalWorkbench,
+  inventory/list-detail, risk strip y sidecar de operación/recovery`.
+- Primitive decision: `reuse CompositionShell, WorkbenchHeader, SignalStrip, OperationalSection, InventoryList,
+  SelectionRow, AdaptiveSidecarLayout, ContextualSidecar, ContextCommandBar y Dialog; runway es composición local`.
+- Full API parity: `thin client de TASK-1586/TASK-1629; cero balance/rate/forecast/auth/margin local`.
 - Copy/access: `copy centralizada; estados honestos por audience/capability; external client policy-blocked`.
 - Accessibility: `WCAG AA, keyboard, focus restore, text alternative del runway, reduced motion, 390 px sin overflow`.
 - Visual evidence: scenario `globe-credits-operations-workbench`, desktop 1440×1000 y mobile 390×844;
@@ -122,6 +129,10 @@ owner y no se resuelve con endpoint o cálculo ad hoc en UI.
 
 - Credit Operator: lectura, proposal y pause/resume dentro de policy; sin vendor cost/margin.
 - Budget owner/approver: runway/holds y confirmación de grants/limits; sin rates/adjustments contables.
+- CEO owner-operated: una confirmación manual o instrucción a agente puede completar la operación sin segundo
+  humano cuando `requireSecondConfirmer` está OFF.
+- Agente autenticado: preview/propose/confirm/readback sólo bajo instrucción/delegación server-side; no puede
+  editar su propia autoridad.
 - Finance Ops: grants/correcciones/reconciliation y proyección interna restringida.
 - Creative/project lead: usage/forecast/deep links read-only.
 - Auditor: ledger/audit/evidence read-only.
@@ -135,13 +146,15 @@ owner y no se resuelve con endpoint o cálculo ad hoc en UI.
 ### Slice 1 — Shell, runway and states
 
 - Implementar header con workspace/período/freshness/audience y plano dominante
-  available/reserved/consumed/runway.
+  effective available/monthly cap-spent-held/funding/ledger histórico.
 - Implementar empty, healthy, low/exhausted, paused, expiring, stale/partial, denied/redacted y error.
 
 ### Slice 2 — Pools, ledger and governed actions
 
 - Navegador de pools/sub-budgets, risk rail, ledger filtrable y detail sidecar.
-- Drawers propose->confirm->execute para allocate/grant/limit/pause/resume/adjust según capability.
+- Drawer `Asegurar capacidad del período` con status → preview → propose → confirm → readback; otras acciones sólo
+  aparecen cuando su command y entitlement existen.
+- Bandeja de operaciones para pending/expired/confirm_failed/outcome_unknown/reconciled, con recovery seguro.
 - Mostrar impact/preconditions/fingerprint server-side, refrescar readers y enlazar ledger/run/audit.
 
 ### Slice 3 — Reliability and visual acceptance
@@ -154,7 +167,7 @@ owner y no se resuelve con endpoint o cálculo ad hoc en UI.
 - Brief/candidates/review/release (`TASK-1474`).
 - Cálculo de balance, rates, forecast, auth, expiry o adjustment impact en browser.
 - UI pública, checkout, pricing, payment o habilitación externa.
-- Imports de layouts, components, recipes o primitives de Greenhouse; la identidad/pattern library es Globe.
+- Implementar administración dentro de Globe Producer o importar primitives Greenhouse en Globe.
 
 ## Detailed Spec
 
@@ -185,6 +198,10 @@ se valida first fold contra visual direction y fixtures; `UI ready` permanece `n
 - [ ] Estado success enlaza ledger entry; undo sólo existe si hay command compensatorio.
 - [ ] Desktop/mobile/reduced-motion/keyboard pasan GVC y no hay page overflow a 390 px.
 - [ ] External client, public pricing y checkout permanecen policy-blocked.
+- [ ] La ruta canónica es `/admin/globe/credits`; no existe CTA de fondeo dentro de Globe Producer.
+- [ ] El first fold distingue `effectiveAvailable`, funding vigente, cap/spent/held y ledger histórico.
+- [ ] El drawer permite confirmación humana o agente y sólo muestra éxito tras readback terminal.
+- [ ] `outcome_unknown` ofrece verificar/reconciliar y nunca retry ciego.
 
 ## Verification
 
@@ -203,3 +220,10 @@ se valida first fold contra visual direction y fixtures; `UI ready` permanece `n
 ## Follow-ups
 
 - Checkout o pricing externo no entra aquí; `TASK-1484` implementa el backend comercial tras approval.
+
+## Delta 2026-08-01 — reubicación Greenhouse por ADR-015/TASK-1630
+
+Se preserva la dirección `Runway Control Plane`, pero se supersede su placement original. La administración vive
+en Greenhouse `/admin/globe/credits` y reusa la plataforma UI Greenhouse; Globe Producer sólo conserva el
+self-view de TASK-1628. TASK-1485 deja de ser dependencia de esta surface porque gobierna el payload UI de Globe,
+no el portal Greenhouse.

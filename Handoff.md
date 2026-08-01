@@ -45,16 +45,18 @@
   separar entitlement/emisión de scopes y repetir el deny real. Las demás tools conservan gates de
   `TASK-1469`/`TASK-1472`.
 
-## TASK-1614/TASK-1629 — recuperación Git del carril Globe (2026-08-01)
+## TASK-1614/TASK-1629/TASK-1630 — recuperación y convergencia del carril Globe (2026-08-01)
 
-- Rama de integración: `codex/TASK-1614-credit-lane-integration`, construida desde `develop` sin cambiar el
-  checkout compartido y sin worktrees aislados.
-- Recupera el código faltante del cliente OAuth público + PKCE, API Platform y fondeo delegado ya ejercido en
-  runtime, además de los checkpoints documentales de evaluación durable de TASK-1614.
-- La antigua etiqueta `TASK-1616` del Admin CLI colisionaba con la task vigente de MiniMax H3; ese trabajo ahora
-  es `TASK-1629`. Las migraciones ya aplicadas conservan sus nombres históricos `task-1616-*`.
-- Estado honesto: código y runtime histórico verificados; integración a `develop` pendiente de PR/CI. No se hizo
-  deploy, migración, fondeo, generación ni promoción a `main` durante esta recuperación.
+- PR #176 (`626eda751`) integró OAuth PKCE, API Platform, provenance y confirmación agente en `origin/develop`;
+  `d804c1169` sincronizó el checkout sin worktrees ni pérdida de WIP. El dueño vigente es TASK-1629 y
+  las migraciones conservan sus nombres históricos `task-1616-*`.
+- TASK-1630 ordena: TASK-1482 truth/enforcement → TASK-1586 status/recovery → TASK-1629 one-command/readback →
+  TASK-1483 workbench Greenhouse → TASK-1628 self-view Producer.
+- En `greenhouse-org:efeonce`, una instrucción del CEO puede autorizar una operación acotada y el mismo agente
+  autenticado puede proponer/confirmar con `requireSecondConfirmer=OFF`. Workloads no confirman; las delegaciones
+  persistentes siguen limitadas y revocables.
+- Estado honesto: formalización documental; no se hizo deploy, migración, fondeo, generación, push ni promoción
+  a `main` durante este cierre.
 
 ## AXIS — guía visual agent-facing publicada (2026-08-01)
 
@@ -147,8 +149,9 @@ las trampas operativas) y el `Delta 2026-08-01` de
 [`TASK-1559`](docs/tasks/in-progress/TASK-1559-globe-feed-viewer-client-port.md).
 
 **Abierto:** (1) la píldora «N nuevas» — las novedades siguen entrando solas y empujando el contenido;
-(2) **el anillo de créditos hoy no comunica nada** porque el ciclo no tiene tope (`allocated + adjusted` viene
-vacío y el panel muestra `0 / —`): quién asigna cuánto por período es decisión del **credit model**, no de UI;
+(2) **el anillo de créditos hoy no comunica capacidad operativa** porque el reader no expresa correctamente
+período, funding, caps y holds. La decisión ya no está abierta: TASK-1482 corrige la verdad, TASK-1586 publica el
+self-status y TASK-1628 lo consume sin matemática local;
 (3) el `main` local del operador sigue divergente con 2 duplicados de trabajo ya mergeado.
 
 ## MiniMax H3 — documentación y task de integración Globe (2026-07-31)

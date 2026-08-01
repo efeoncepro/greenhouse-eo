@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Código y runtime ejercidos; recuperación de source of truth en PR pendiente`
+- Status real: `PR #176 integrado; OAuth/API/CLI y agent-confirm recuperados, pero status/list/reconcile y one-command convergente siguen pendientes`
 - Rank: `TBD`
 - Domain: `platform|identity|finance|globe`
 - Blocked by: `none`
@@ -102,7 +102,7 @@ Reglas obligatorias:
 - `src/app/api/platform/app/globe/credit-funding/**`
 - `src/app/api/admin/globe/credit-funding/**`
 - `src/lib/globe/credit-administration-broker.ts`
-- `scripts/globe-credit-funding.mjs`
+- `scripts/globe-credit-funding.ts`
 - `migrations/*task-1616*`
 - `docs/manual-de-uso/creative-studio/fondear-creditos-globe.md`
 - `docs/architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md`
@@ -118,12 +118,19 @@ ownership operativo vigente de ese trabajo es `TASK-1629`.
 - El broker sister-platform ya implementa Authorization Code, PKCE S256, códigos one-time, auditoría,
   revocación y access tokens opacos.
 - API Platform `app` ya valida bearer tokens, rehidrata permisos y registra requests.
+- PR `#176` agregó el cliente público, routes API Platform, CLI first-party, provenance de auth mode, policy
+  agente por workspace y reanudación con la idempotency key original.
 
 ### Gap
 
-- El broker exige `client_secret`, por lo que no admite un CLI instalado de forma segura.
-- El fondeo no está expuesto en API Platform `app` y no existe CLI tipado.
-- No existe una política delegada y acotada para que los agentes confirmen sin fabricar identidad humana.
+- El source of truth OAuth PKCE/API Platform/CLI fue integrado por PR `#176`; la rama histórica
+  `codex/TASK-1616-globe-admin-cli-pkce` no se integra completa ni se renombran migraciones aplicadas.
+- Sólo existen adapters `propose`/`confirm`; faltan status/list/get/reconcile para resolver outcomes ambiguos y
+  operar las propuestas stale individualmente.
+- El CLI todavía expone plomería de pool/período y dos idempotency keys; falta la fachada `ensure-funded` con una
+  operation key y resolución server-side del ciclo.
+- La delegación persistente acota grant/tope, pero aún falta modelar la instrucción one-shot del CEO con período,
+  target, vigencia, fingerprint y receipt, coordinada por TASK-1630.
 
 ## Modular Placement Contract
 
@@ -302,10 +309,28 @@ Sin flag global: el cliente OAuth no existe hasta registrarlo y puede suspenders
 - [ ] CLI completa PKCE y fondeo sin cookies/passwords/secrets persistidos.
 - [ ] Fondeo real staging conserva identidad + auth mode y tiene readback correlacionado.
 - [ ] Tests, task gate, docs y verificación UI de Globe quedan verdes.
+- [ ] API Platform y el broker exponen `status/list/get/reconcile` sobre operaciones sin revelar errores crudos.
+- [ ] El CLI ofrece `status`, `preview`, `ensure` y `operations reconcile` usando una sola operation key visible.
+- [ ] Una instrucción one-shot atribuida del CEO puede autorizar al mismo usuario agente para proponer y confirmar
+  cuando `requireSecondConfirmer` está OFF; una policy que lo active sigue exigiendo actor distinto.
+- [ ] Los comentarios, errores y manuales dejan de presentar `confirmante ≠ proponente` como invariante universal.
 
 ## Follow-ups
 
 - Evaluar refresh token en Keychain sólo si la frecuencia operativa lo justifica.
+
+## Delta 2026-08-01 — PR integrado; cierre rebaselinado por TASK-1630
+
+PR `#176` fue mergeada a `develop` en `626eda751`. Quedaron integrados OAuth public client + PKCE, API Platform,
+CLI tipado, provenance `actor_auth_mode`, policy de agent-confirm y terminalización local
+`completed|confirm_failed`. La etiqueta histórica `TASK-1616` permanece únicamente en nombres de migraciones ya
+aplicadas; el owner vigente es TASK-1629.
+
+La task no cierra todavía: el control plane necesita readers de operación, recuperación ante timeout, preview
+puro y la fachada `ensure-funded` coordinada por TASK-1630. El requisito del operador queda explícito: en el
+workspace owner-operated, una instrucción atribuida del CEO permite que el mismo usuario agente autenticado
+complete `preview → propose → confirm → readback`; el segundo actor sólo se exige cuando una policy del
+workspace/umbral lo activa.
 
 ## Closing Protocol
 
