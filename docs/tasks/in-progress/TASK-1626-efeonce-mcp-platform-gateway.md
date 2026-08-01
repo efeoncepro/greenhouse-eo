@@ -17,11 +17,11 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `none`
-- Status real: `gateway público y fleet reader Globe verificados end-to-end; acceso externo B2B/multitenant y tools Globe de dominio siguen gated`
+- Status real: `gateway público y fleet reader Globe verificados; write interno de fondeo en ejecución, acceso externo B2B/multitenant sigue gated`
 - Rank: `TBD`
 - Domain: `platform|agentic|integration|cloud|identity`
-- Blocked by: `acceso externo requiere decisión B2B/multitenant + entitlements; federación Globe de dominio depende de TASK-1473 y sus gates`
-- Branch: `task/TASK-1626-efeonce-mcp-platform-gateway`
+- Blocked by: `none`
+- Branch: `Greenhouse develop; MCP main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -41,6 +41,24 @@ auth, observabilidad, escalado y rollback independientes sin mover lógica ni da
 - Publicar un gateway MCP interoperable y fail-closed en `https://mcp.efeonce.org/mcp`.
 - Operarlo con OAuth para humanos y service identity keyless para providers.
 - Entregar la primera federación Globe read-only sin acceso directo a DB, storage o providers creativos.
+- Entregar el primer write interno gobernado, `globe.credits.funding.ensure`, mediante identidad Greenhouse
+  atribuida y el command ya operativo; no crear autoridad financiera en el gateway.
+
+## Delta 2026-08-01 — write interno de fondeo autorizado por TASK-1630
+
+El bloqueo B2B/multitenant aplica a clientes externos, no al operador interno Entra ya autenticado. La instrucción
+del CEO autoriza completar la paridad MCP antes de volver a TASK-1614. La implementación amplía esta task y
+`TASK-1473`; no crea una task adicional.
+
+- Tool: `globe.credits.funding.ensure`; input estricto `{ authorityId }`.
+- Scope: `efeonce.mcp.globe.credits.funding.ensure`, separado del reader.
+- Identidad: token exchange Entra → Greenhouse con workload identity exacta del gateway; binding exclusivo por
+  `(microsoft_tenant_id, microsoft_oid)`, sin fallback por email.
+- Downstream: `POST /api/platform/app/globe/credit-funding/ensure`; nunca `/v1/commands` Globe directo.
+- Autoridad: one-shot exacta, expirable/revocable, canal `mcp`, actor Greenhouse y workspace binding revalidados.
+- Recovery: repetir la misma `authorityId` sólo lee/reanuda la misma ejecución durable; no crea otra operación.
+- Rollout: feature flag OFF por defecto; allow/deny, scope, mapping, timeout/readback y canary real antes de ON.
+- El gateway no recibe DB, provider, grant, pool, balance ni permiso directo de confirmación.
 
 <!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
 

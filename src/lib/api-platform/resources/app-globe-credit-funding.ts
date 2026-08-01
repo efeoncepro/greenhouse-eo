@@ -33,6 +33,7 @@ const READ_SCOPE = 'globe.credits.funding.read'
 const RECONCILE_SCOPE = 'globe.credits.funding.reconcile'
 const ENSURE_ENTITLEMENT = 'platform.globe_credit_funding.ensure'
 const ENSURE_SCOPE = 'globe.credits.funding.ensure'
+const MCP_GATEWAY_CLIENT_ID = 'efeonce-mcp-gateway'
 
 const assertBearerFundingAccess = (
   context: AppPlatformRequestContext,
@@ -270,17 +271,36 @@ export const ensureAppGlobeCreditFunding = async ({
   }
 
   try {
+    const executorChannel = context.oauthClientId === MCP_GATEWAY_CLIENT_ID ? 'mcp' : 'oauth'
+
+    const funding = await executeOneShotGlobeCreditFunding({
+      authorityId,
+      executorUserId: context.tenant.userId,
+      executorChannel,
+      executorClientId: context.oauthClientId,
+      authEvidenceRef: context.oauthAccessTokenId,
+      actorAuthMode: context.oauthSessionAuthMode,
+      correlationId: context.oauthCorrelationId || context.requestId,
+      allowedGlobeWorkspaceIds: context.oauthWorkspaceBindings.map(binding => binding.workspaceId)
+    })
+
     return {
-      funding: await executeOneShotGlobeCreditFunding({
-        authorityId,
-        executorUserId: context.tenant.userId,
-        executorChannel: 'oauth',
-        executorClientId: context.oauthClientId,
-        authEvidenceRef: context.oauthAccessTokenId,
-        actorAuthMode: context.oauthSessionAuthMode,
-        correlationId: context.oauthCorrelationId || context.requestId,
-        allowedGlobeWorkspaceIds: context.oauthWorkspaceBindings.map(binding => binding.workspaceId)
-      })
+      funding,
+      ...(executorChannel === 'mcp'
+        ? {
+            mcpProjection: {
+              schemaVersion: '1' as const,
+              authorityId: funding.authorityId,
+              executionId: funding.execution.executionId,
+              state: funding.execution.state,
+              outcome: funding.outcome,
+              operationId: funding.operationId ?? null,
+              updatedAt: funding.execution.updatedAt,
+              replaySafe: true as const,
+              recoveryMode: 'readback_first' as const
+            }
+          }
+        : {})
     }
   } catch (error) {
     return mapFundingError(error)

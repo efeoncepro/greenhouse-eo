@@ -53,8 +53,7 @@ export const GH_GLOBE_CREDITS = {
   signals: {
     effective: 'Disponible efectivo',
     monthly: 'Disponible del período',
-    funding: 'Fondeo elegible',
-    ledger: 'Ledger histórico'
+    funding: 'Fondeo elegible'
   },
   runway: {
     eyebrow: 'Runway del período',
@@ -100,15 +99,6 @@ export const GH_GLOBE_CREDITS = {
     cap: 'Tope',
     period: 'Vigencia',
     project: 'Proyecto'
-  },
-  historical: {
-    title: 'Ledger histórico agregado',
-    description: 'Dimensión contable separada de la capacidad efectiva.',
-    allocated: 'Asignado',
-    reserved: 'Reservado',
-    spent: 'Consumido',
-    adjusted: 'Ajustado',
-    available: 'Disponible contable'
   },
   forecast: {
     title: 'Cobertura y proyección',

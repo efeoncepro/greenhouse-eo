@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Fleet reader MCP desplegado y verificado end-to-end; packaging/paridad amplia pendiente`
+- Status real: `Fleet reader MCP live; adapter de fondeo interno vía Greenhouse en ejecución, packaging amplio pendiente`
 - Rank: `TBD`
 - Domain: `platform|agentic|integration`
 - Blocked by: `none`
@@ -184,6 +184,17 @@ pertenecen a `TASK-1626`; Globe conserva sólo su transport/provider adapter y l
   actual; el acceso de clientes/multitenant exige su task de entitlements y rollout posterior.
 - El canary cubre allow, scope-deny antes de downstream, upstream fault sanitizado, redaction, correlación y
   un cliente MCP real. Ningún write se habilita como parte de este slice.
+
+### Slice 2b — Internal funding ensure adapter (autorizado por TASK-1630)
+
+- Exponer `globe.credits.funding.ensure` únicamente en el gateway existente `mcp.efeonce.org`.
+- La tool acepta sólo una `authorityId` one-shot emitida por Greenhouse; no acepta hechos económicos ni tenant.
+- El gateway intercambia identidad Entra por un token Greenhouse corto y llama el endpoint canónico Greenhouse;
+  Greenhouse ejecuta el carril live y Globe conserva toda autoridad económica.
+- `globe:service:mcp-provider` conserva su grant read-only; el adapter write no llama Globe directo.
+- Scope MCP, feature flag, mapping de Persona, workspace binding, entitlement, idempotencia, redacción y recovery
+  fallan cerrado y tienen conformance allow/deny/timeout/replay.
+- Esta autorización es internal-only. No abre clientes externos ni cambia el gate B2B/multitenant.
 
 ### Slice 3 — Parity certification
 

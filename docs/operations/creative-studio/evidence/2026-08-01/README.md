@@ -25,6 +25,13 @@
 Las capturas son evidencia visual, no autoridad económica aislada. La causalidad se sostiene con el receipt de
 la operación, el reader CLI/API y el self-reader de Producer sobre el mismo runtime.
 
+## Decisiones Finance históricas
+
+[`STUDIO_CREDITS_FINANCE_DECISIONS.md`](STUDIO_CREDITS_FINANCE_DECISIONS.md) clasifica los 500.000 de julio como
+bootstrap histórico no monetario, período cerrado y nunca elegible para funding vigente. También acepta la
+adjudicación `historical_submission_unknown_no_deliverable` para los dos holds antiguos, condicionada a una
+primitive gobernada y readback append-only; no autoriza SQL manual ni liberación ciega.
+
 ## Rollout de las surfaces enriquecidas
 
 - API Globe: workflow `30721563575`, revisión `globe-api-internal-00183-cml`, imagen

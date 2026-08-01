@@ -8,8 +8,10 @@ import { withTransaction } from '@/lib/db'
 
 const HUMAN_AUTH_MODES = new Set(['credentials', 'both', 'microsoft_sso', 'google_sso'])
 const EXECUTOR_AUTH_MODES = new Set([...HUMAN_AUTH_MODES, 'agent'])
-const EXECUTOR_CHANNELS = new Set(['oauth', 'browser'])
+const EXECUTOR_CHANNELS = new Set(['oauth', 'browser', 'mcp'])
 const GREENHOUSE_BROWSER_CLIENT_ID = 'greenhouse-portal'
+const EFEONCE_MCP_GATEWAY_CLIENT_ID = 'efeonce-mcp-gateway'
+const MCP_ENSURE_SCOPE = 'globe.credits.funding.ensure'
 const SAFE_REF = /^[A-Za-z0-9][A-Za-z0-9._:@/-]{2,511}$/
 
 const TRANSITIONS = {
@@ -23,7 +25,7 @@ const TRANSITIONS = {
 } as const
 
 export type GlobeCreditFundingAuthorityExecutionState = keyof typeof TRANSITIONS
-export type GlobeCreditFundingExecutorChannel = 'oauth' | 'browser'
+export type GlobeCreditFundingExecutorChannel = 'oauth' | 'browser' | 'mcp'
 
 export type GlobeCreditFundingOneShotAuthority = Readonly<{
   schemaVersion: '1'
@@ -178,6 +180,31 @@ export class GlobeCreditFundingOneShotAuthorityStore {
         }
       }
 
+      if (normalized.executorChannel === 'mcp') {
+        const executorClient = await client.query<{ allowed: boolean }>(
+          `SELECT EXISTS (
+            SELECT 1
+              FROM greenhouse_core.sister_platform_oauth_clients oauth
+              JOIN greenhouse_core.sister_platform_consumers consumer
+                ON consumer.sister_platform_consumer_id = oauth.sister_platform_consumer_id
+             WHERE oauth.client_id = $1
+               AND oauth.client_status = 'active'
+               AND oauth.client_type = 'confidential'
+               AND consumer.sister_platform_key = 'mcp'
+               AND consumer.credential_status = 'active'
+               AND (consumer.expires_at IS NULL OR consumer.expires_at > CURRENT_TIMESTAMP)
+               AND oauth.allowed_scopes = ARRAY[$2]::text[]
+               AND oauth.policy_json #> '{capabilityScopes}' = jsonb_build_array($2::text)
+               AND oauth.metadata_json->>'workspaceBindingProvider' = 'globe'
+          ) AS allowed`,
+          [EFEONCE_MCP_GATEWAY_CLIENT_ID, MCP_ENSURE_SCOPE]
+        )
+
+        if (!executorClient.rows[0]?.allowed) {
+          throw new GlobeCreditFundingAuthorityError('authority_binding_mismatch')
+        }
+      }
+
       const instructionFingerprint = fingerprint({
         schemaVersion: '1',
         globeWorkspaceId: normalized.globeWorkspaceId,
@@ -311,6 +338,13 @@ export class GlobeCreditFundingOneShotAuthorityStore {
     input.allowedGlobeWorkspaceIds.forEach(value => refs(value))
 
     if (!EXECUTOR_CHANNELS.has(input.executorChannel) || !EXECUTOR_AUTH_MODES.has(input.actorAuthMode)) {
+      throw new GlobeCreditFundingAuthorityError('authority_binding_mismatch')
+    }
+
+    if (
+      input.executorChannel === 'mcp' &&
+      (input.executorClientId !== EFEONCE_MCP_GATEWAY_CLIENT_ID || input.actorAuthMode !== 'agent')
+    ) {
       throw new GlobeCreditFundingAuthorityError('authority_binding_mismatch')
     }
 
@@ -740,6 +774,13 @@ function parseIssue(input: Parameters<GlobeCreditFundingOneShotAuthorityStore['i
     (input.executorClientId !== GREENHOUSE_BROWSER_CLIENT_ID ||
       input.executorUserId !== input.issuerUserId ||
       !HUMAN_AUTH_MODES.has(input.executorAuthMode))
+  ) {
+    throw new GlobeCreditFundingAuthorityError('authority_binding_mismatch')
+  }
+
+  if (
+    input.executorChannel === 'mcp' &&
+    (input.executorClientId !== EFEONCE_MCP_GATEWAY_CLIENT_ID || input.executorAuthMode !== 'agent')
   ) {
     throw new GlobeCreditFundingAuthorityError('authority_binding_mismatch')
   }

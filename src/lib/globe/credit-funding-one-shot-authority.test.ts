@@ -203,6 +203,13 @@ const browserIssueInput = {
   executorAuthMode: 'microsoft_sso'
 } as const
 
+const mcpIssueInput = {
+  ...issueInput,
+  executorChannel: 'mcp',
+  executorClientId: 'efeonce-mcp-gateway',
+  executorAuthMode: 'agent'
+} as const
+
 describe('Globe credit funding one-shot authority', () => {
   it('replays issuance by operation key even when the HTTP retry arrives later', async () => {
     const { store, setNow } = harness()
@@ -277,6 +284,63 @@ describe('Globe credit funding one-shot authority', () => {
     await expect(store.issue({ ...browserIssueInput, executorAuthMode: 'agent' })).rejects.toMatchObject({
       code: 'authority_binding_mismatch'
     })
+  })
+
+  it('issues and replays an MCP authority only for the exact gateway client and bound agent actor', async () => {
+    const { store, getOauthClientChecks } = harness()
+    const authority = await store.issue(mcpIssueInput)
+
+    const first = await store.claim({
+      authorityId: authority.authorityId,
+      executorUserId: mcpIssueInput.executorUserId,
+      executorChannel: 'mcp',
+      executorClientId: 'efeonce-mcp-gateway',
+      authEvidenceRef: 'spoauth-token-mcp-1',
+      actorAuthMode: 'agent',
+      correlationId: 'correlation:mcp-1',
+      allowedGlobeWorkspaceIds: [mcpIssueInput.globeWorkspaceId]
+    })
+
+    const replay = await store.claim({
+      authorityId: authority.authorityId,
+      executorUserId: mcpIssueInput.executorUserId,
+      executorChannel: 'mcp',
+      executorClientId: 'efeonce-mcp-gateway',
+      authEvidenceRef: 'spoauth-token-mcp-2',
+      actorAuthMode: 'agent',
+      correlationId: 'correlation:mcp-replay',
+      allowedGlobeWorkspaceIds: [mcpIssueInput.globeWorkspaceId]
+    })
+
+    expect(getOauthClientChecks()).toBe(1)
+    expect(authority.executorChannel).toBe('mcp')
+    expect(replay.execution.executionId).toBe(first.execution.executionId)
+  })
+
+  it('rejects MCP channel aliases, wrong clients, human auth mode and actor A using actor B authority', async () => {
+    const { store } = harness()
+
+    await expect(store.issue({ ...mcpIssueInput, executorClientId: 'greenhouse-admin-cli' })).rejects.toMatchObject({
+      code: 'authority_binding_mismatch'
+    })
+    await expect(store.issue({ ...mcpIssueInput, executorAuthMode: 'microsoft_sso' })).rejects.toMatchObject({
+      code: 'authority_binding_mismatch'
+    })
+
+    const authority = await store.issue(mcpIssueInput)
+
+    await expect(
+      store.claim({
+        authorityId: authority.authorityId,
+        executorUserId: 'actor-a-cannot-use-actor-b-authority',
+        executorChannel: 'mcp',
+        executorClientId: 'efeonce-mcp-gateway',
+        authEvidenceRef: 'spoauth-token-mcp-other',
+        actorAuthMode: 'agent',
+        correlationId: 'correlation:mcp-other',
+        allowedGlobeWorkspaceIds: [mcpIssueInput.globeWorkspaceId]
+      })
+    ).rejects.toMatchObject({ code: 'authority_binding_mismatch' })
   })
 
   it('requires the exact issuer attestation when the browser claims the authority', async () => {

@@ -85,6 +85,7 @@ describe('Globe credit funding one-shot authority admin routes', () => {
           targetAvailableCredits: 800,
           maxGrantCredits: 500,
           maxResultingCapCredits: 1500,
+          executorChannel: 'oauth',
           executorClientId: 'greenhouse-admin-cli',
           evidenceRef: 'instruction:TASK-1629',
           issuerUserId: 'forged'
@@ -98,10 +99,73 @@ describe('Globe credit funding one-shot authority admin routes', () => {
         issuerUserId: tenant.userId,
         operationKey: 'fund-august',
         executorUserId: tenant.userId,
+        executorChannel: 'oauth',
         executorAuthMode: 'microsoft_sso',
         globeWorkspaceId: 'greenhouse-org:efeonce'
       })
     )
+  })
+
+  it('issues an MCP authority only for the exact gateway client and explicit agent actor', async () => {
+    const response = await issuePost(
+      new Request('https://greenhouse.test/api/admin/globe/credits/funding/authorities', {
+        method: 'POST',
+        headers: { 'idempotency-key': 'fund-august-mcp' },
+        body: JSON.stringify({
+          globeWorkspaceId: 'greenhouse-org:efeonce',
+          periodKey: '2026-08',
+          periodStart: '2026-08-01T00:00:00.000Z',
+          periodEnd: '2026-09-01T00:00:00.000Z',
+          targetAvailableCredits: 800,
+          maxGrantCredits: 500,
+          maxResultingCapCredits: 1500,
+          executorUserId: tenant.userId,
+          executorChannel: 'mcp',
+          executorAuthMode: 'agent',
+          executorClientId: 'efeonce-mcp-gateway',
+          evidenceRef: 'instruction:TASK-1630:mcp'
+        })
+      })
+    )
+
+    expect(response.status).toBe(201)
+    expect(authority.issue).toHaveBeenCalledWith(
+      expect.objectContaining({
+        executorUserId: tenant.userId,
+        executorChannel: 'mcp',
+        executorAuthMode: 'agent',
+        executorClientId: 'efeonce-mcp-gateway'
+      })
+    )
+  })
+
+  it.each([
+    [{ executorChannel: 'mcp', executorClientId: 'greenhouse-admin-cli', executorAuthMode: 'agent' }],
+    [{ executorChannel: 'mcp', executorClientId: 'efeonce-mcp-gateway', executorAuthMode: 'microsoft_sso' }],
+    [{ executorChannel: 'oauth', executorClientId: 'efeonce-mcp-gateway', executorAuthMode: 'agent' }],
+    [{ executorChannel: 'mcp-alias', executorClientId: 'efeonce-mcp-gateway', executorAuthMode: 'agent' }]
+  ])('rejects an invalid channel/client/auth combination before persistence', async override => {
+    const response = await issuePost(
+      new Request('https://greenhouse.test/api/admin/globe/credits/funding/authorities', {
+        method: 'POST',
+        headers: { 'idempotency-key': 'fund-invalid-mcp' },
+        body: JSON.stringify({
+          globeWorkspaceId: 'greenhouse-org:efeonce',
+          periodKey: '2026-08',
+          periodStart: '2026-08-01T00:00:00.000Z',
+          periodEnd: '2026-09-01T00:00:00.000Z',
+          targetAvailableCredits: 800,
+          maxGrantCredits: 500,
+          maxResultingCapCredits: 1500,
+          executorUserId: tenant.userId,
+          evidenceRef: 'instruction:TASK-1630:mcp-invalid',
+          ...override
+        })
+      })
+    )
+
+    expect(response.status).toBe(400)
+    expect(authority.issue).not.toHaveBeenCalled()
   })
 
   it('fails before persistence when the workspace is not bound', async () => {
@@ -120,6 +184,7 @@ describe('Globe credit funding one-shot authority admin routes', () => {
           maxGrantCredits: 500,
           maxResultingCapCredits: 1500,
           executorUserId: 'user-agent-e2e-001',
+          executorChannel: 'oauth',
           executorAuthMode: 'agent',
           executorClientId: 'greenhouse-admin-cli',
           evidenceRef: 'instruction:1'

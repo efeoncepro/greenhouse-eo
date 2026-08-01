@@ -68,7 +68,7 @@ export const POST = async (request: Request) => {
       issuerAuthProvider: session.user.provider,
       issuerAuthCorrelationId: correlationId,
       executorUserId: input.executorUserId ?? tenant.userId,
-      executorChannel: 'oauth',
+      executorChannel: input.executorChannel,
       executorAuthMode: input.executorAuthMode ?? authMode
     })
 
@@ -103,6 +103,7 @@ function parseIssueBody(raw: unknown) {
   const periodStart = text('periodStart')
   const periodEnd = text('periodEnd')
   const executorUserId = text('executorUserId')
+  const executorChannel = text('executorChannel')
   const executorAuthMode = text('executorAuthMode')
   const executorClientId = text('executorClientId')
   const evidenceRef = text('evidenceRef')
@@ -112,8 +113,19 @@ function parseIssueBody(raw: unknown) {
   const ttlSeconds = value.ttlSeconds === undefined ? undefined : integer('ttlSeconds')
 
   if (
+    !executorChannel ||
+    !['oauth', 'browser', 'mcp'].includes(executorChannel) ||
     executorAuthMode &&
     !['agent', 'credentials', 'both', 'microsoft_sso', 'google_sso'].includes(executorAuthMode)
+  ) {
+    return undefined
+  }
+
+  if (
+    (executorChannel === 'mcp' &&
+      (executorClientId !== 'efeonce-mcp-gateway' || !executorUserId || executorAuthMode !== 'agent')) ||
+    (executorChannel === 'browser' && executorClientId !== 'greenhouse-portal') ||
+    (executorChannel === 'oauth' && executorClientId === 'efeonce-mcp-gateway')
   ) {
     return undefined
   }
@@ -138,6 +150,7 @@ function parseIssueBody(raw: unknown) {
     periodStart,
     periodEnd,
     executorUserId,
+    executorChannel: executorChannel as 'oauth' | 'browser' | 'mcp',
     executorClientId,
     evidenceRef,
     targetAvailableCredits,

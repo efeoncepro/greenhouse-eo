@@ -217,7 +217,7 @@ autoridad o secuencia se actualizan primero aquí y en ADR-015, y después en la
 | P1.1 | `TASK-1483` | `/admin/globe/credits` | workbench Greenhouse con GVC/a11y |
 | P1.2 | `TASK-1628` | self-view read-only Producer | capacidad efectiva y razones sin admin writes |
 | P1.3 | `TASK-1578` | onboarding route→rate→estimate/actual | cada ruta promoted tiene receipt completo |
-| P2.1 | `TASK-1473` + `TASK-1626` | extender el gateway existente `https://mcp.efeonce.org/mcp`; nunca crear otro MCP | identidad agente propagada y conformance de write |
+| P2.1 | `TASK-1473` + `TASK-1626` | extender el gateway existente `https://mcp.efeonce.org/mcp`; token exchange Entra→Greenhouse y `ensure` one-shot, nunca Globe directo ni otro MCP | identidad agente propagada y conformance de write |
 | P2.2 | `TASK-1584` + `TASK-1585` | KMS/break-glass/HMAC | disyunción física y retiro verificado |
 | posterior | `TASK-1484` | funding originado por pago liquidado | no bloquea operación interna |
 

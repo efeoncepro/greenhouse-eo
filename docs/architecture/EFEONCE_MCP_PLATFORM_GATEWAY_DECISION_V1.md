@@ -51,6 +51,14 @@ duplica lógica de negocio.
 11. Codex y Claude usan el router compartido `efeonce-mcp-platform` para componer las skills de arquitectura,
     cloud/secret hygiene, provider, QA y documentación. El router no sustituye esas skills ni sus fuentes de
     verdad; su contrato vive en `EFEONCE_MCP_AGENT_SKILL_ROUTER_V1.md`.
+12. El primer write interno autorizado es `globe.credits.funding.ensure`, como extensión de `TASK-1630` sobre
+    `TASK-1626` + `TASK-1473`. El gateway no llama el command financiero de Globe ni amplía la autoridad de
+    `globe:service:mcp-provider`: intercambia el token Entra verificado por un token Greenhouse corto, mapeado por
+    `(microsoft_tenant_id, microsoft_oid)` a una Persona activa, y llama exclusivamente el endpoint canónico
+    Greenhouse `POST /api/platform/app/globe/credit-funding/ensure` con una `authorityId` one-shot ya sellada.
+    El intercambio exige workload identity exacta del gateway, scope MCP de write separado, audience exacta,
+    workspace binding y entitlement Greenhouse. No acepta workspace, monto, período, cap, actor ni instrucciones
+    libres en la tool. Default OFF y rollback por flag/provider; acceso B2B/multitenant continúa bloqueado.
 
 ## Ownership Contract
 

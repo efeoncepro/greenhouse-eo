@@ -260,8 +260,7 @@ const GlobeCreditsOperationsWorkbenchView = ({ model }: { model: GlobeCreditsWor
   const signals = [
     { id: 'effective', label: C.signals.effective, value: credits(status?.effectiveAvailable), tone: 'primary' as const },
     { id: 'monthly', label: C.signals.monthly, value: credits(status?.monthly?.remaining), tone: 'success' as const },
-    { id: 'funding', label: C.signals.funding, value: credits(status?.eligibleFunding), tone: 'info' as const },
-    { id: 'ledger', label: C.signals.ledger, value: credits(status?.historicalLedger.available), tone: 'default' as const }
+    { id: 'funding', label: C.signals.funding, value: credits(status?.eligibleFunding), tone: 'info' as const }
   ]
 
   const header = (
@@ -375,35 +374,6 @@ const GlobeCreditsOperationsWorkbenchView = ({ model }: { model: GlobeCreditsWor
             </Stack>
             <Typography variant='caption'>
               {C.runway.freshness.replace('{seconds}', String(status.freshnessSeconds))}
-            </Typography>
-          </Stack>
-        ) : <Typography variant='body2'>{C.risks.unavailable}</Typography>}
-      </OperationalSection>
-
-      <OperationalSection
-        title={C.historical.title}
-        description={C.historical.description}
-        variant='open'
-        dataCapture='globe-credits-historical-ledger'
-      >
-        {status ? (
-          <Stack spacing={2}>
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, minmax(0, 1fr))', md: 'repeat(5, minmax(0, 1fr))' }, gap: 2, '& > *': { minWidth: 0 } }}>
-              {[
-                [C.historical.allocated, status.historicalLedger.allocated],
-                [C.historical.reserved, status.historicalLedger.reserved],
-                [C.historical.spent, status.historicalLedger.spent],
-                [C.historical.adjusted, status.historicalLedger.adjusted],
-                [C.historical.available, status.historicalLedger.available]
-              ].map(([label, value]) => (
-                <Box key={String(label)}>
-                  <Typography variant='caption' color='text.secondary'>{label}</Typography>
-                  <Typography variant='h6' sx={{ fontVariantNumeric: 'tabular-nums' }}>{credits(value as number)}</Typography>
-                </Box>
-              ))}
-            </Box>
-            <Typography variant='caption' color='text.secondary'>
-              {C.context.coverage.replace('{count}', String(status.coverage.candidateCount))} · {dateTime(status.historicalLedger.asOf)}
             </Typography>
           </Stack>
         ) : <Typography variant='body2'>{C.risks.unavailable}</Typography>}

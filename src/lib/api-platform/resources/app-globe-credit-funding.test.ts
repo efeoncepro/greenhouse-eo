@@ -147,7 +147,16 @@ describe('API Platform Globe credit funding resource', () => {
     recovery.list.mockResolvedValue({ schemaVersion: '1', items: [] })
     recovery.get.mockResolvedValue({ schemaVersion: '1', operationId: 'op-1' })
     recovery.reconcile.mockResolvedValue({ schemaVersion: '1', operationId: 'op-1', state: 'reconciled' })
-    oneShot.execute.mockResolvedValue({ authorityId: 'authority-1', outcome: 'completed' })
+    oneShot.execute.mockResolvedValue({
+      authorityId: 'authority-1',
+      outcome: 'completed',
+      operationId: 'operation-1',
+      execution: {
+        executionId: 'execution-1',
+        state: 'completed',
+        updatedAt: '2026-08-01T12:00:00.000Z'
+      }
+    })
   })
 
   it('derives the actor from OAuth tenant and forwards the standard idempotency key', async () => {
@@ -196,6 +205,39 @@ describe('API Platform Globe credit funding resource', () => {
     expect(oneShot.execute).toHaveBeenCalledWith(
       expect.objectContaining({ actorAuthMode: 'microsoft_sso', executorUserId: 'user-1' })
     )
+  })
+
+  it('uses the exact MCP channel and returns a stable curated readback projection for the gateway only', async () => {
+    const result = await ensureAppGlobeCreditFunding({
+      context: context({ oauthClientId: 'efeonce-mcp-gateway', oauthSessionAuthMode: 'agent' }),
+      body: { authorityId: 'authority-1' }
+    })
+
+    expect(oneShot.execute).toHaveBeenCalledWith(
+      expect.objectContaining({
+        executorChannel: 'mcp',
+        executorClientId: 'efeonce-mcp-gateway',
+        actorAuthMode: 'agent'
+      })
+    )
+    expect(result.mcpProjection).toEqual({
+      schemaVersion: '1',
+      authorityId: 'authority-1',
+      executionId: 'execution-1',
+      state: 'completed',
+      outcome: 'completed',
+      operationId: 'operation-1',
+      updatedAt: '2026-08-01T12:00:00.000Z',
+      replaySafe: true,
+      recoveryMode: 'readback_first'
+    })
+  })
+
+  it('does not expose the MCP projection or channel to the existing CLI OAuth client', async () => {
+    const result = await ensureAppGlobeCreditFunding({ context: context(), body: { authorityId: 'authority-1' } })
+
+    expect(result).not.toHaveProperty('mcpProjection')
+    expect(oneShot.execute).toHaveBeenCalledWith(expect.objectContaining({ executorChannel: 'oauth' }))
   })
 
   it('refuses one-shot ensure without authenticated OAuth provenance', async () => {

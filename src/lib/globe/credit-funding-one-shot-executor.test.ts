@@ -212,4 +212,53 @@ describe('one-shot Globe credit funding executor', () => {
     expect(operations.reconcile).toHaveBeenCalledOnce()
     expect(broker.confirm).not.toHaveBeenCalled()
   })
+
+  it('keeps MCP retries on the same authority execution and performs readback before any redispatch', async () => {
+    const mcpAuthority = {
+      ...authority,
+      executorChannel: 'mcp',
+      executorClientId: 'efeonce-mcp-gateway'
+    } as const
+
+    const mcpExecution = {
+      ...execution,
+      state: 'confirming',
+      proposalId: 'proposal-mcp-1',
+      planFingerprint: 'fp-mcp-1',
+      executorChannel: 'mcp',
+      executorClientId: 'efeonce-mcp-gateway'
+    } as const
+
+    const fake = store(mcpExecution as never)
+
+    fake.claim.mockResolvedValue({ authority: mcpAuthority, execution: mcpExecution } as never)
+    operations.get.mockResolvedValue({
+      schemaVersion: '1',
+      operationId: 'proposal-mcp-1',
+      proposalId: 'proposal-mcp-1',
+      state: 'completed',
+      plan: {},
+      receipt: { outcome: 'completed' }
+    })
+
+    const result = await executeOneShotGlobeCreditFunding(
+      {
+        ...input,
+        executorChannel: 'mcp',
+        executorClientId: 'efeonce-mcp-gateway'
+      },
+      { store: fake as never }
+    )
+
+    expect(result.outcome).toBe('completed')
+    expect(fake.claim).toHaveBeenCalledWith(
+      expect.objectContaining({
+        authorityId: 'authority-1',
+        executorChannel: 'mcp',
+        executorClientId: 'efeonce-mcp-gateway'
+      })
+    )
+    expect(operations.get).toHaveBeenCalledOnce()
+    expect(broker.confirm).not.toHaveBeenCalled()
+  })
 })
