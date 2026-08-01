@@ -93,6 +93,13 @@ fixtures visuales completos por contrato y la migración ordenada del catálogo 
 - El Lab genera 22 páginas estáticas y 16 contratos publicados; los E2E Chromium/mobile pasan. La paridad visual
   con los canaries consumidores sigue pendiente antes de retirar cualquier ruta Greenhouse.
 
+### Delta 2026-08-01 (h) — gradients y utilities
+
+- AXIS publica `efeonce.gradients` como fixture de superficie tokenizada con intensidad y modo estático.
+- `utilities` queda explícitamente fuera del primer traslado: Activity Timeline mezcla evidencia operativa,
+  personas, adjuntos, timestamps y semántica de auditoría; requiere un contrato de producto separado.
+- El Lab genera 23 páginas estáticas y 17 contratos publicados; los E2E Chromium/mobile pasan.
+
 ### Plan futuro para portar el Lab Greenhouse a AXIS
 
 1. Inventariar las rutas actuales de `/design-system` y clasificarlas como contrato puro, fixture visual,

@@ -26,8 +26,8 @@ Cada candidato requiere auditoría transitive de imports antes de migrarse.
 | `typography` | primer slice | `/references/typography/` — migrada desde la escala canónica |
 | `geometry` | migrada | `/references/geometry/` — `axisGeometry` |
 | `elevation` | migrada | `/references/elevation/` — `axisElevation` |
-| `gradients` | token/reference candidate | referencia AXIS tras provenance |
-| `utilities` | token/reference candidate | primitives/recipes AXIS |
+| `gradients` | migrada | static gradient contract + reduced-motion fixture |
+| `utilities` | excluded first slice | Activity Timeline mixes operational evidence and product data |
 | `buttons`, `chips`, `breadcrumbs` | migrada | `DesignPatternContract` + static fixtures |
 | `disclosure`, `loaders`, `floating-surfaces` | migrada | headless/motion contracts + static fixtures |
 | `card-density`, `composition-shell` | migrada | density/shell contracts; no Portal shell |
@@ -73,6 +73,10 @@ components.
 The catalog block now also publishes `efeonce.charts`, `efeonce.roadmap-timeline`, `efeonce.team-avatar-group`
 and `efeonce.surface-recipes`. These are reference fixtures for data shape, sequence, overflow and surface roles;
 they do not copy chart engines, product data, Portal state or consumer adapters.
+
+`efeonce.gradients` completes the portable token/reference group with intensity and static-mode semantics. The
+Greenhouse `utilities` page remains excluded: its Activity Timeline is an operational evidence primitive with
+attachments, people, timestamps and audit semantics, so it needs a separate product contract before migration.
 
 ## Gate for each next route
 
