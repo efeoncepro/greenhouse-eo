@@ -2,10 +2,7 @@ import { randomUUID } from 'node:crypto'
 
 import { ApiPlatformError, normalizeApiPlatformError } from '@/lib/api-platform/core/errors'
 import { buildApiPlatformErrorResponse, buildApiPlatformSuccessResponse } from '@/lib/api-platform/core/responses'
-import {
-  createFirstPartyAppSession,
-  refreshFirstPartyAppSession
-} from '@/lib/api-platform/core/app-sessions'
+import { createFirstPartyAppSession, refreshFirstPartyAppSession } from '@/lib/api-platform/core/app-sessions'
 import {
   getApiPlatformIpHash,
   getApiPlatformUserAgentHash,
@@ -17,7 +14,9 @@ import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 
 export const dynamic = 'force-dynamic'
 
-const tenantRecordToContext = (tenant: Awaited<ReturnType<typeof createFirstPartyAppSession>>['tenant']): TenantContext => ({
+const tenantRecordToContext = (
+  tenant: Awaited<ReturnType<typeof createFirstPartyAppSession>>['tenant']
+): TenantContext => ({
   userId: tenant.userId,
   clientId: tenant.clientId,
   clientName: tenant.clientName,
@@ -49,7 +48,7 @@ const tenantRecordToContext = (tenant: Awaited<ReturnType<typeof createFirstPart
 
 const parseJson = async (request: Request) => {
   try {
-    return await request.json() as Record<string, unknown>
+    return (await request.json()) as Record<string, unknown>
   } catch {
     throw new ApiPlatformError('Invalid JSON body.', {
       statusCode: 400,
@@ -74,6 +73,8 @@ const buildSessionData = (result: Awaited<ReturnType<typeof createFirstPartyAppS
       version: DEFAULT_API_PLATFORM_VERSION,
       tenant,
       appSessionId: result.appSessionId,
+      authSource: 'first_party_app',
+      oauthCapabilities: [],
       rateLimit: {
         limitPerMinute: 120,
         limitPerHour: 5000

@@ -2,10 +2,8 @@ import { canonicalErrorResponse } from '@/lib/api/canonical-error-response'
 import { getServerAuthSession } from '@/lib/auth'
 import { buildTenantEntitlementSubject } from '@/lib/commercial/party/route-entitlement-subject'
 import { can } from '@/lib/entitlements/runtime'
-import {
-  GlobeCreditFundingBrokerError,
-  proposeGlobeCreditFunding
-} from '@/lib/globe/credit-administration-broker'
+import { GlobeCreditFundingBrokerError, proposeGlobeCreditFunding } from '@/lib/globe/credit-administration-broker'
+import { parseFundingBody } from '@/lib/globe/credit-funding-request'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 
@@ -14,7 +12,7 @@ import { GreenhouseGlobeConfigurationError } from '@/lib/globe/client'
 import {
   brokerErrorResponse,
   globeConfigurationErrorResponse,
-  parseFundingBody,
+  resolveFundingActorAuthMode,
   requireIdempotencyKey
 } from '../shared'
 
@@ -61,7 +59,14 @@ export const POST = async (request: Request) => {
       periodEnd: parsed.periodEnd,
       // La atribución sale de la SESIÓN, nunca del cuerpo: si el caller pudiera declararla, este
       // carril valdría exactamente lo mismo que el que reemplaza.
-      actor: { userId: tenant.userId, entitlement: 'platform.globe_credit_funding.propose' },
+      actor: {
+        userId: tenant.userId,
+        entitlement: 'platform.globe_credit_funding.propose',
+        authMode: resolveFundingActorAuthMode({
+          provider: session.user.provider,
+          authMode: session.user.authMode || tenant.authMode
+        })
+      },
       idempotencyKey
     })
 

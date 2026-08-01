@@ -78,6 +78,8 @@ export type CanonicalErrorCode =
   | 'globe_funding_invalid_request'
   | 'globe_funding_proposal_not_found'
   | 'globe_funding_confirmer_is_proposer'
+  | 'globe_funding_agent_confirmation_forbidden'
+  | 'globe_funding_agent_limit_exceeded'
   | 'globe_funding_already_recorded'
   | 'globe_unavailable'
   | 'globe_not_configured'
@@ -326,6 +328,16 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
     message: 'No puedes confirmar un fondeo que propusiste. Pídele a otra persona con autorización que lo confirme.',
     actionable: false
   },
+  globe_funding_agent_confirmation_forbidden: {
+    status: 403,
+    message: 'La política de este workspace no permite que una sesión de agente confirme el fondeo.',
+    actionable: false
+  },
+  globe_funding_agent_limit_exceeded: {
+    status: 422,
+    message: 'El fondeo supera el límite delegado a agentes para este workspace.',
+    actionable: false
+  },
   globe_funding_already_recorded: {
     status: 409,
     message: 'Esta propuesta ya tiene esa decisión registrada. Revisa su estado antes de volver a intentarlo.',
@@ -448,7 +460,8 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   },
   grader_report_not_releasable: {
     status: 409,
-    message: 'El reporte no es publicable en su estado actual (requiere cobertura suficiente o aprobación de revisión).',
+    message:
+      'El reporte no es publicable en su estado actual (requiere cobertura suficiente o aprobación de revisión).',
     actionable: false
   },
   grader_report_not_reviewable: {
@@ -480,22 +493,26 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   },
   aeo_profile_required: {
     status: 409,
-    message: 'Aún falta configurar la marca a analizar de tu organización. Tu equipo de Efeonce la activa antes del primer análisis.',
+    message:
+      'Aún falta configurar la marca a analizar de tu organización. Tu equipo de Efeonce la activa antes del primer análisis.',
     actionable: false
   },
   aeo_category_unresolved: {
     status: 409,
-    message: 'Todavía no pudimos clasificar la categoría de esta marca. Tu equipo de Efeonce la confirma antes de correr el análisis.',
+    message:
+      'Todavía no pudimos clasificar la categoría de esta marca. Tu equipo de Efeonce la confirma antes de correr el análisis.',
     actionable: false
   },
   aeo_business_model_unconfirmed: {
     status: 409,
-    message: 'Falta confirmar el modelo de negocio de esta marca antes de correr o enviar el análisis a un prospecto. Tu equipo de Efeonce lo confirma primero.',
+    message:
+      'Falta confirmar el modelo de negocio de esta marca antes de correr o enviar el análisis a un prospecto. Tu equipo de Efeonce lo confirma primero.',
     actionable: false
   },
   aeo_quota_exhausted: {
     status: 429,
-    message: 'Agotaste los análisis AEO incluidos este mes. Se renuevan el próximo período o puedes ampliar tu plan con Efeonce.',
+    message:
+      'Agotaste los análisis AEO incluidos este mes. Se renuevan el próximo período o puedes ampliar tu plan con Efeonce.',
     actionable: false
   },
   aeo_cost_blocked: {
@@ -520,8 +537,7 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   },
   aeo_assignment_website_required: {
     status: 422,
-    message:
-      'Esta organización aún no tiene una web canónica. Completa website_url antes de activar AEO.',
+    message: 'Esta organización aún no tiene una web canónica. Completa website_url antes de activar AEO.',
     actionable: false
   },
   aeo_assignment_org_not_found: {
@@ -577,7 +593,8 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   },
   search_console_property_not_accessible: {
     status: 409,
-    message: 'Esa propiedad no está disponible en la cuenta de Google con la que conectaste. Elige una de las propiedades que aparecen en la lista.',
+    message:
+      'Esa propiedad no está disponible en la cuenta de Google con la que conectaste. Elige una de las propiedades que aparecen en la lista.',
     actionable: true
   },
   search_console_sites_unavailable: {
@@ -608,7 +625,8 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   },
   proposal_quote_gate_failed: {
     status: 409,
-    message: 'La decisión de participar exige una cotización vinculada con margen suficiente. Vincula la cotización antes de continuar.',
+    message:
+      'La decisión de participar exige una cotización vinculada con margen suficiente. Vincula la cotización antes de continuar.',
     actionable: false
   },
   proposal_not_entitled: {
@@ -624,7 +642,8 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   },
   proposal_render_conflict: {
     status: 409,
-    message: 'Ya existe un job de render para ese mismo manifest y propósito. Consulta su estado o reintenta el existente.',
+    message:
+      'Ya existe un job de render para ese mismo manifest y propósito. Consulta su estado o reintenta el existente.',
     actionable: false
   }
 }
