@@ -147,6 +147,82 @@ letra en pantalla. Mirar el frame renderizado no es la cortesía del cierre: par
 - **Ningún aserto compara la proporción de un control contra sus hermanos.** Un stepper midió 768 px donde
   sus pares miden 68, con todo verde.
 
+#### Seis defectos de superficie medidos el 2026-08-01, y ninguno lo veía un gate
+
+El operador señaló cuatro cosas mirando la pantalla; las cuatro tenían causa distinta de la aparente. Sirven
+como catálogo porque **cada una es una CLASE, no un caso**.
+
+- 🔴 **Sin preflight, el `padding: 1px 6px` que el navegador le da a todo `<button>` sigue vivo y ninguna
+  clase lo declara.** Rompe **sólo** cuando la caja es tan chica que el glifo no entra: con 26 px de botón y
+  borde de 1 px quedan **12 px** de contenido para un glifo de **15**, y el control queda 1,5 px corrido. De
+  **219 botones** de la superficie era el ÚNICO afectado — los de 30 px absorben el mismo padding. **El
+  umbral es 29 px para un glifo de 15**; cualquier control de ícono nuevo por debajo hereda el defecto. Misma
+  familia que `b, strong { font-weight: bolder }`: el defecto lo inyecta el UA y los gates escanean
+  `className`, así que le son **estructuralmente invisibles**.
+- 🔴 **`margin-inline-start: auto` + `flex-wrap` deja un hueco muerto al envolver.** El empuje a la derecha es
+  correcto mientras el elemento quepa en la línea; cuando baja a la suya **se lleva el empuje** y queda pegado
+  a la derecha (medido: 239 px de hueco bajo el título). Se resuelve con `justify-content: space-between` en
+  el contenedor, que separa a los extremos cuando comparten línea y alinea al inicio cuando cada uno queda
+  solo — sin una media query que adivine el punto de quiebre.
+- 🔴 **…pero `space-between` reparte HIJOS.** Aplicarlo a un contenedor con **cuatro** hijos sueltos separó
+  también el contador de su título (196 px → 463 px, con 267 px entre un dato y la palabra que lo explica).
+  **Arreglar la alineación creó una regresión de agrupamiento.** Lo correcto es envolver lo que es un grupo
+  para que el contenedor tenga los dos hijos que el reparto supone.
+- 🔴 **Un velo por alfa NO es un hueco.** El centro del anillo de créditos usaba `bg-surface-soft`
+  (`rgba(255,255,255,.03)`): funciona sobre el canvas oscuro y sobre un `conic-gradient` saturado **deja pasar
+  el color entero**. Con el glifo en `text-action` —el MISMO naranja— el resultado era un disco liso. **El
+  popover del mismo componente ya lo había resuelto con `surface-solid`, y el trigger no heredó su token**:
+  antes de inventar una solución, mirar si la pieza hermana ya la tiene.
+- 🔴 **Una forma puede estar bien elegida para el dato equivocado.** Ese anillo además era correcto: con
+  500.836 disponibles de 501.110, el arco de «no disponible» mide **0,197° de 360** — 0,05 px de trazo. Para
+  mover UN grado hay que gastar 1.392 créditos. **Un donut responde «¿qué fracción queda?» y con un stock
+  grande esa respuesta es 99,9 % durante meses.** Se cambió el eje: mide el CICLO (consumo del período), que
+  arranca en cero. Y cuando el período no tiene tope, **no se sustituye el denominador por el consumo
+  observado** —«gastado / gastado» daría 100 % y diría «agotado» cuando no se sabe nada—: aro neutro.
+- ⚠️ **Un ícono no es decoración cuando nombra qué se mide.** `sparkles` es con lo que TODO producto anuncia
+  «esto tiene IA»: no dice nada del dato. Se eligió `flame` —el quemador que mantiene el globo en el aire—
+  por metáfora del producto y no de la categoría, sin reusar el isotipo, que ya significa Globe y «generando».
+  Descartados con su motivo: `gauge` (círculo con aguja dentro de un anillo = ruido), `coins` (dinero literal,
+  y Globe no revende tokens), `battery` (lenguaje de dispositivo). **Los ocho candidatos se renderizaron a
+  tamaño real en el runtime antes de decidir** — a 16 px varias hipótesis mueren solas.
+
+#### El feed: el backend paginaba y el cliente usaba medio contrato (2026-08-01)
+
+Segunda vez en el mismo día que aparece el patrón «la capability existe y la UI no la consume» (la primera
+fue el compare de las cards). `globe.producer.feed.live.*` pagina por **cursor keyset** (`updatedAt` +
+`stableKey`) con `nextCursor` desde TASK-1525; `nextFeedRead` sólo resolvía el eje del FUTURO (marca →
+`changes`) y **el `nextCursor` para retroceder se ignoraba**. El feed crecía sin techo por arriba y el
+histórico era inalcanzable. **No faltaba paginación: estaba a medio cablear.**
+
+- 🔴 **Una página hacia atrás NO puede mover el `watermark`.** El backend lo calcula desde el **último** item
+  de la página, y en dirección `older` el último es el **MÁS VIEJO**: adoptarlo hace retroceder la marca y el
+  próximo ciclo re-trae todo lo ya visto, con la pantalla viéndose perfecta. Los dos ejes viven en el mismo
+  objeto y avanzan en direcciones **opuestas**, así que el modo (`sync` | `changes` | `older`) viaja
+  explícito y nunca se infiere. Simétrico: un delta de novedades no toca el cursor del pasado. E invalidar la
+  marca **conserva** el cursor del pasado — son fallos de ejes distintos.
+- **NUNCA scroll infinito en el Producer:** vuelve inalcanzable el pie de la aplicación y, con piezas
+  generándose y reordenándose en vivo, mueve el contenido bajo el cursor. **Ni páginas numeradas:** con items
+  entrando por arriba, la página 2 cambia de contenido sola — offset es incorrecto por construcción, y por eso
+  el backend eligió cursor.
+
+#### Trampas operativas de la sesión (cuestan tiempo, no código)
+
+- 🔴 **`gh pr merge --delete-branch` te deja en `main` LOCAL**, que en este repo suele estar viejo y
+  divergente. Se siguió editando sobre esa base sin notarlo, y los cambios quedaron sobre archivos que no
+  tenían los fixes previos. Después de cualquier merge: **`git rev-parse --abbrev-ref HEAD`** antes de seguir
+  editando. La salida es `git diff > patch` → rama nueva desde `origin/main` → `git apply --3way`.
+- 🔴 **El CSP del payload bloquea el atributo `style` de HTML parseado, pero NO el CSSOM.** Un
+  `innerHTML` con `style="…"` se ignora en silencio (los estilos no aplican y nada falla); `el.style.setProperty(…)`
+  sí funciona. Vale para cualquier verificación visual inyectada desde el browser.
+- ⚠️ **Los estilos inline no sobreviven al feed vivo.** Con `GLOBE_PRODUCER_LIVE_FEED_ENABLED=true` React
+  re-renderiza solo cada 4 s y borra lo inyectado; para mirar un fix antes de desplegarlo hay que inyectar una
+  **hoja `<style>`**, que sí sobrevive.
+- 🔴 **Merge a `main` NO despliega.** `deploy-internal.yml` es `workflow_dispatch` manual y toma el servicio
+  como input. Un operador que mira la pantalla después de un merge ve la revisión ANTERIOR — y eso es
+  indistinguible de «el cambio no funcionó». Confirmar siempre con
+  `gcloud run services describe … --format='value(status.latestReadyRevisionName)'` y comparar el commit de la
+  imagen contra `origin/main`.
+
 ## Boundary: Globe es plataforma hermana, no un módulo de Greenhouse
 
 Esta es la regla que gobierna todo lo demás. Interiorízala antes de tocar código.
@@ -697,6 +773,14 @@ cuando esa sea la sesión autorizada; no abras un perfil Playwright nuevo y lo p
 evidencia debe mostrar el modelo/ruta seleccionados, operación, créditos, estado terminal, `Guardada`/retenida,
 preview de los bytes reales y descarga habilitada. API, runner, CI y canary técnico son evidencia necesaria, pero
 no sustituyen esta prueba cuando el criterio es “funciona en Producer”.
+
+**Sesión operativa del operador — regla obligatoria.** Cuando el operador indique que su sesión autenticada de
+`jreyes@efeonce.cl` ya contiene los accesos necesarios, reclama u abre una pestaña dentro de **ese Chrome
+autenticado** mediante el control de navegador y opera allí. No inicies el flujo en un perfil Playwright efímero,
+en el navegador interno vacío ni en una sesión de Vercel/GitHub distinta para luego pedir un login evitable. Antes
+de declarar un bloqueo de autenticación, verifica una navegación same-origin al portal desde ese Chrome. Esta regla
+aplica tanto a la evidencia UI del Producer como a los actos administrativos de Globe que exigen atribución humana;
+no inspecciones ni extraigas cookies, contraseñas o secretos para trasladar la sesión a otro cliente.
 
 **Referencias ejercitadas del portafolio still/vector** (consulta el reader antes de actuar): Seedream 5 Pro
 `ref/still/rrss-v1`; Nano Banana Pro `ref/still/nanobanana-pro-v1`; Nano Banana 2
@@ -1374,3 +1458,36 @@ un secreto, el primitive es el **exit code**, nunca una máscara sobre la salida
 
 **Método:** `gcloud` CLI y ADC son credenciales **distintas** — el token del CLI puede estar vencido y ADC seguir
 viva (o al revés). No des por bloqueado un diagnóstico de infra sin probar las dos.
+
+### Runbook reusable — atestación y promoción con evidencia UI
+
+Para una promoción de modelo, sigue siempre esta secuencia y conserva los identificadores; no la reconstruyas de
+memoria ni repitas una etapa que ya tiene readback terminal:
+
+1. **Inventario exacto:** consulta `globe.producer.fleet.list` y el runtime handoff; fija una tabla con
+   `routeId/capability/provider/model/version`, estado actual, reporte, attempt, rate-version y attestation. Si una
+   ruta ya está promovida, sólo verifica su reader y su asset UI: no la repromuevas.
+2. **Cobertura comercial:** para cada shape que la UI puede enviar, resuelve el rate exacto
+   `modality/resolution/duration/aspect/audio`. La cobertura se prueba contra el catálogo real (incluidos límites
+   mínimo/máximo y pasos); un rate faltante es un defecto de datos que se corrige con migración forward-only,
+   `ON CONFLICT DO NOTHING` y test registrado, nunca relajando validación ni agregando un fallback de precio.
+3. **Derechos y revisión:** persiste evidencia durable para el endpoint/modelo exactos, attestation append-only,
+   evaluation report y revisión humana. La promoción operator-only encadena propuesta, readiness, binding y
+   circuito; cada etapa se verifica por reader. Un reporte objetivo no equivale a aprobación humana ni a derechos
+   comerciales.
+4. **Deploy/migración:** despliega desde el SHA exacto de `main`; aplica migraciones sólo mediante el workflow
+   keyless con verificación de SHA remoto y readback limpio. No uses SQL manual ni reintentos ciegos después de un
+   409; primero lee el estado durable.
+5. **Prueba UI real:** en la sesión autenticada existente, selecciona ruta, configura un shape válido, adjunta una
+   referencia autorizada, confirma estimate y créditos, genera una pieza y verifica estado terminal, `retained`,
+   preview/playback, MIME/hash y descarga. La evidencia mínima es `experimentId + attemptId + sha256`; API/CI no
+   sustituyen este paso.
+6. **Cierre y limpieza:** actualiza el handoff/ledger humano, registra bloqueos externos con la razón exacta y
+   elimina sólo worktrees, archivos temporales y procesos creados por esta sesión. No borres recursos de Claude ni
+   del operador; detén proxies que tú hayas iniciado.
+
+**Uso de subagentes:** divide únicamente trabajo independiente y de lectura: (a) identidad/readiness/rates, (b)
+derechos/evidencia legal, (c) UI/Playwright y asset. Cada subagente recibe una ruta explícita, no escribe sobre el
+árbol de otro agente y devuelve IDs/evidencia o un bloqueo verificable. El agente principal conserva el ownership
+de mutaciones, migraciones, promoción, decisión de no repromover y cierre; antes de ejecutar una mutación reconcilia
+los hallazgos para evitar dos sagas sobre la misma identidad.

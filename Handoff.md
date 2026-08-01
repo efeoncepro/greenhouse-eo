@@ -1,5 +1,44 @@
 # Handoff activo
 
+## Globe Producer — seis defectos de superficie, el pie de la app y la paginación del feed (2026-08-01)
+
+Sesión reportada por el operador **mirando la pantalla**. Tres PRs mergeados y **desplegados**:
+[#66](https://github.com/efeoncepro/efeonce-globe/pull/66), [#69](https://github.com/efeoncepro/efeonce-globe/pull/69),
+[#73](https://github.com/efeoncepro/efeonce-globe/pull/73) — main `8989074`, verificado en vivo en
+`globe.efeoncepro.com`.
+
+**Lo entregado:** barra del documento tokenizada + `scroll-behavior: smooth` y barra del composer que se revela
+en hover; anillo de créditos con hueco opaco que ahora mide el **ciclo** y no el stock, con `flame` en vez del
+`sparkles` genérico de IA; `⌘K` como unidad (8 px → 2); controles de selección de las cards centrados y
+honestamente apagados; **pie de la aplicación** con el wordmark de Efeonce, que el port a React había perdido;
+barra del feed con alturas uniformes y alineada; y **paginación hacia atrás** del feed (25 → 50 piezas
+verificado en vivo).
+
+🔴 **Dos veces el mismo patrón en un día: la capability existe y la UI consume la mitad.** El compare de las
+cards tiene su diálogo sólo en el legacy, y el feed tenía cursor keyset en el backend desde `TASK-1525` con el
+`nextCursor` ignorado. Antes de declarar que «falta» una capacidad en el Producer, **verificar si ya está en el
+contrato y sólo falta cablearla**.
+
+🔴 **Regla del feed que no se ve desde el cliente:** una página hacia atrás no puede mover el `watermark` — el
+backend lo calcula desde el último item, que hacia atrás es el más viejo, y adoptarlo hace re-traer todo lo ya
+visto con la pantalla viéndose perfecta. Por eso el modo (`sync`/`changes`/`older`) viaja explícito.
+
+⚠️ **Trampa operativa que costó reencauzar trabajo:** `gh pr merge --delete-branch` deja al agente en `main`
+**local**, que en `efeonce-globe` suele estar viejo y divergente; se siguió editando sobre esa base sin notarlo.
+Después de cualquier merge, `git rev-parse --abbrev-ref HEAD` antes de seguir.
+
+⚠️ **Merge a `main` NO despliega.** `deploy-internal.yml` es `workflow_dispatch` manual: el operador vio el
+`sparkles` viejo después del merge y eso es indistinguible de «el cambio no funcionó».
+
+**Documentado en:** la skill `greenhouse-globe` (ambas copias, con el catálogo de las seis clases de defecto y
+las trampas operativas) y el `Delta 2026-08-01` de
+[`TASK-1559`](docs/tasks/in-progress/TASK-1559-globe-feed-viewer-client-port.md).
+
+**Abierto:** (1) la píldora «N nuevas» — las novedades siguen entrando solas y empujando el contenido;
+(2) **el anillo de créditos hoy no comunica nada** porque el ciclo no tiene tope (`allocated + adjusted` viene
+vacío y el panel muestra `0 / —`): quién asigna cuánto por período es decisión del **credit model**, no de UI;
+(3) el `main` local del operador sigue divergente con 2 duplicados de trabajo ya mergeado.
+
 ## MiniMax H3 — documentación y task de integración Globe (2026-07-31)
 
 - Fal live confirmó tres endpoints comerciales activos: `minimax/h3/text-to-video`,
