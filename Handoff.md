@@ -9,9 +9,9 @@
   pedir dirección al operador. Canon:
   `docs/architecture/agent-invariants/REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md`.
 
-## Globe — ADR-018: continuidad móvil como dirección, no rollout (2026-08-01)
+## Globe — ADR-018: continuidad móvil native-first como dirección, no rollout (2026-08-01)
 
-- [ADR-018](docs/architecture/creative-studio/EFEONCE_GLOBE_MOBILE_CONTINUITY_APPLICATION_DECISION_V1.md) fija Globe como **continuity-first**: mobile web/PWA primero; no se creó una skill nueva, no hay app/runtime rollout y Phase 1 requiere evidencia, task, policy, owner y gates. Funcional/manual: [`mobile continuity`](docs/documentation/creative-studio/efeonce-globe-mobile-continuidad.md) · [`validación`](docs/manual-de-uso/creative-studio/operar-globe-continuidad-movil.md).
+- [ADR-018](docs/architecture/creative-studio/EFEONCE_GLOBE_MOBILE_CONTINUITY_APPLICATION_DECISION_V1.md) fija Globe como **continuity-first y native-first para Android/iOS**: React Native + Expo development builds/CNG es la dirección tecnológica de la companion; web/PWA queda como fallback. No se creó una skill nueva, no hay app/runtime rollout y el vertical slice requiere PKCE, deep links, captura, upload interrumpible, push reconciliable, handoff, compatibilidad binary/API, task, policy, owner y gates. Funcional/manual: [`mobile continuity`](docs/documentation/creative-studio/efeonce-globe-mobile-continuidad.md) · [`validación`](docs/manual-de-uso/creative-studio/operar-globe-continuidad-movil.md).
 
 ## Efeonce MCP — gateway público y canary Globe read-only verificados (2026-08-01)
 

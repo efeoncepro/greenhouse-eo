@@ -18,7 +18,7 @@ composer, shell, diálogos, feed, viewer, share board, primitives y capas base/m
 payload Tailwind. El renderer vanilla y `producerStyles` permanecen sólo como fallback de rollout hasta
 `TASK-1560`; no confundir esa frontera con una hoja activa en la ruta React.
 
-La dirección de producto móvil de Globe es continuity-first según [ADR-018](docs/architecture/creative-studio/EFEONCE_GLOBE_MOBILE_CONTINUITY_APPLICATION_DECISION_V1.md): mobile web/PWA valida captura, drafts, deep links, estados asíncronos, review y handoff antes de considerar un companion nativo; no cambia el runtime ni el rollout internal-only.
+La dirección de producto móvil de Globe es continuity-first y native-first según [ADR-018](docs/architecture/creative-studio/EFEONCE_GLOBE_MOBILE_CONTINUITY_APPLICATION_DECISION_V1.md): React Native + Expo development builds/CNG es la dirección tecnológica de una companion Android/iOS; web/PWA queda como fallback. El vertical slice debe validar PKCE, deep links, captura, upload interrumpible, push reconciliable, handoff y compatibilidad binary/API; no cambia todavía el runtime ni el rollout internal-only.
 
 La flota de modelos de Globe se resuelve y promueve por identidad exacta de ruta. El estado live se consulta en
 `globe.producer.fleet.list` y el mapa humano en `GLOBE_MODEL_FLEET_STATUS.md`; una promoción se cierra con

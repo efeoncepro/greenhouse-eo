@@ -984,9 +984,10 @@ DESPACHA**.
 
 Globe es **continuity-first**, no `desktop-first` con un breakpoint. La promesa del producto es devolverle al
 creativo tiempo y atención; la intención puede aparecer en cualquier lugar y un job puede terminar lejos del
-Producer. La estrategia móvil vigente es **mobile web/PWA para validar continuidad → companion acotado → app nativa
-sólo con evidencia**. No se crea una skill nueva para este dominio: esta sección es la guía operativa canónica de
-`greenhouse-globe` y el detalle contractual vive en [ADR-018](../../../docs/architecture/creative-studio/EFEONCE_GLOBE_MOBILE_CONTINUITY_APPLICATION_DECISION_V1.md).
+Producer. Android e iOS son canales de producto de primera clase: la estrategia es **native-first con una companion
+cross-platform → web/PWA como fallback → full mobile studio sólo con evidencia**. No se crea una skill nueva para
+este dominio: esta sección es la guía operativa canónica de `greenhouse-globe` y el detalle contractual vive en
+[ADR-018](../../../docs/architecture/creative-studio/EFEONCE_GLOBE_MOBILE_CONTINUITY_APPLICATION_DECISION_V1.md).
 
 ### Boundary operativo
 
@@ -999,8 +1000,14 @@ sólo con evidencia**. No se crea una skill nueva para este dominio: esta secci�
 
 ### Invariantes obligatorias
 
-- **NUNCA** construyas una app nativa completa, app ID, OAuth client, push provider, store listing o native bundle
-  por esta dirección: primero baseline mobile web y una task con evidencia.
+- **NUNCA** implementes una app, app ID, OAuth client, push provider, store listing o native bundle sin una task y
+  ADR/contrato de identity/media/notifications aprobados. La dirección es native-first, pero ADR-018 sigue Proposed
+  y no autoriza runtime.
+- **SIEMPRE** usa React Native + Expo development builds/CNG como dirección de la companion inicial; no trates Expo Go
+  ni un WebView/Capacitor como arquitectura de producción. Comparar Flutter o KMP + UI nativa si el full mobile
+  studio exige canvas, timeline, 3D, AR o integración OS que cambie el balance.
+- **SIEMPRE** comparte contracts, SDK neutral, operation keys, reconciliadores, tokens y copy gobernado; no importes
+  componentes DOM ni crees una UI o backend paralelo para móvil.
 - **NUNCA** crees backend, feed, viewer, library, notification ledger, credits ledger ni provider SDK paralelo.
   Todo cliente usa los mismos commands/readers/policies del API Contract Spine; si requiere otra surface o SDK, abre
   un ADR de contrato.
@@ -1013,15 +1020,21 @@ sólo con evidencia**. No se crea una skill nueva para este dominio: esta secci�
   no autorizado o asset sin rights; nunca uses fallback permisivo ni conviertas bytes locales en asset autorizado.
 - **SIEMPRE** valida la continuidad en 390 px y desktop, teclado/lector de pantalla, reduced motion, red intermitente,
   handoff y scroll-width antes de proponer Phase 1.
+- **SIEMPRE** trata el BFF browser same-origin/cookie/CSRF como una frontera distinta: una app nativa requiere ADR de
+  OAuth/OIDC + PKCE, sesión móvil, revocación y front door; nunca llama directamente a `globe-api-internal`.
+- **SIEMPRE** asume que background work y push son best-effort del OS. Uploads críticos necesitan protocolo resumible,
+  idempotencia y, si corresponde, un módulo nativo; una notificación sólo despierta/reconcilia readers.
+- **SIEMPRE** gobierna binary/API skew con runtime versions, canales, compatibilidad N-1 y kill switch; OTA no sustituye
+  un nuevo build cuando cambia la capa nativa.
 
 ### Secuencia de inversión
 
-1. **Phase 0:** instrumenta responsive actual, capture/drafts, deep links, estados de job, handoff y baseline de
-   abandono/decisión.
+1. **Phase 0:** instrumenta responsive como fallback y construye un vertical slice Android/iOS con PKCE, deep link,
+   inbox/job status, captura, upload interrumpible, push reconciliable y handoff.
 2. **Phase 1:** entrega companion para capture/inbox/review/comentarios/decisiones acotadas sólo con task, owner,
-   entitlements, policy y métricas.
-3. **Phase 2:** evalúa cámara, voz, reference packs, background upload, share sheet, push y secure storage; cada
-   frontera exige ADR de identity/media/privacy/notifications cuando aplique.
+   entitlements, policy, compatibilidad binary/API y métricas.
+3. **Phase 2:** evalúa cámara, voz, reference packs, background upload, share sheet, push, secure storage y MDM/DLP;
+   cada frontera exige ADR de identity/media/privacy/notifications cuando aplique.
 4. **Phase 3:** considera full mobile studio sólo si los datos demuestran un trabajo móvil propio y un caso económico
    y operativo; no conviertas el desktop comprimido en roadmap automático.
 

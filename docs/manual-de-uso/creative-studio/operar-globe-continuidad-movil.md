@@ -1,14 +1,14 @@
 # Validar continuidad móvil de Efeonce Globe
 
 > **Tipo:** manual de discovery y validación; no es un manual de una app disponible.
-> **Estado:** propuesta; no existe todavía una superficie móvil nativa ni una PWA habilitada como producto independiente.
+> **Estado:** propuesta tecnológica native-first; no existe todavía una superficie móvil nativa ni una PWA habilitada como producto independiente.
 
-Este manual sirve para evaluar la dirección de [ADR-018](../../architecture/creative-studio/EFEONCE_GLOBE_MOBILE_CONTINUITY_APPLICATION_DECISION_V1.md) sin fingir que el runtime ya la implementa. Para operar Globe hoy, usa los runbooks vigentes del Producer, créditos, media, SSO y runtime handoff; este documento sólo añade el lente de continuidad.
+Este manual sirve para evaluar la dirección de [ADR-018](../../architecture/creative-studio/EFEONCE_GLOBE_MOBILE_CONTINUITY_APPLICATION_DECISION_V1.md) sin fingir que el runtime ya la implementa. La dirección tecnológica es una app companion native-first para Android/iOS con React Native + Expo development builds/CNG; la web/PWA queda como fallback. Para operar Globe hoy, usa los runbooks vigentes del Producer, créditos, media, SSO y runtime handoff; este documento sólo añade el lente de continuidad.
 
 ## Antes de validar
 
 - Trabaja con una identidad y workspace internos autorizados. El rollout externo continúa bloqueado por TASK-1480.
-- Usa el browser móvil actual sólo como evidencia de responsive y navegación; no instales builds, perfiles, APKs ni apps no aprobadas.
+- Usa el browser móvil actual como fallback y evidencia de responsive/navegación; no instales builds, perfiles, APKs ni apps no aprobadas. Una futura prueba nativa requiere task, app IDs, identidad y distribución aprobadas.
 - Confirma que cualquier generación, refine, approval, delivery o gasto siga el flujo existente y su estimate/policy. No hagas pruebas de spend para demostrar una hipótesis móvil.
 - Registra dispositivo, ancho, red, sesión, workspace, rol, estado del job y resultado. No registres tokens, cookies, bytes privados ni provider credentials.
 
@@ -42,10 +42,26 @@ Con una cuenta de prueba autorizada, documenta la experiencia esperada para sesi
 
 Clasifica el resultado en una de estas salidas:
 
-- **Mantener Phase 0:** responsive y handoff necesitan instrumentación, pero no hay patrón suficiente para una app.
-- **Abrir Phase 1:** hay uso repetido y una companion surface acotada puede reducir fricción; crear task, owner, métricas y contrato.
+- **Mantener baseline:** responsive y handoff necesitan instrumentación, pero no hay patrón suficiente para abrir el slice nativo.
+- **Abrir vertical slice nativo:** hay uso repetido o una necesidad explícita de Android/iOS; crear task, owner, métricas y contratos para PKCE, deep links, drafts, upload y reconciliación.
+- **Abrir Phase 1:** el vertical slice pasa en ambos sistemas y una companion surface acotada puede reducir fricción; crear task de entrega, entitlements, policy y rollout.
 - **Abrir un ADR específico:** cámara, voz, push, background upload, OAuth nativo, MDM/DLP, billing o media cache cambian la frontera de seguridad.
 - **No-go:** el problema es de información, policy o API parity y no se resuelve con otra superficie.
+
+## Validación del vertical slice Android/iOS
+
+Cuando exista una task aprobada, prueba en dispositivos reales y conserva evidencia de:
+
+1. OAuth/OIDC con PKCE y regreso por deep link autorizado.
+2. Apertura del workspace/project/session/run exacto desde web, correo o notificación.
+3. Draft de texto, imagen o audio con SQLite/outbox local y sync idempotente.
+4. Upload privado interrumpido por pérdida de red, background y terminación de la app.
+5. Push que abre y reconcilia el reader; nunca ejecuta un command por sí mismo.
+6. Revocación de sesión, cambio de workspace y entitlement ausente con deny/redacted state.
+7. Binary antiguo contra API compatible y actualización obligatoria cuando cambia el runtime nativo.
+
+No uses el scheduler genérico de background como garantía de finalización: el sistema operativo controla cuándo
+ejecuta esas tareas. Un upload crítico necesita protocolo resumible y, si corresponde, un módulo nativo dedicado.
 
 ## No hagas
 
@@ -58,7 +74,10 @@ Clasifica el resultado en una de estas salidas:
 
 ## Evidencia mínima para una futura task
 
-Una task de Phase 1 debe enlazar este manual y aportar: journey reproducible, cohort/role, baseline desktop y móvil, métrica objetivo, contrato de deep link o draft, policy/entitlement, comportamiento offline, threat model, plan de rollback y criterio de no-go. Sin eso, la solicitud “hagamos la app” sigue siendo discovery.
+Una task del vertical slice o Phase 1 debe enlazar este manual y aportar: journey reproducible, cohort/role,
+baseline desktop y móvil, métrica objetivo, contrato de deep link y sesión, policy/entitlement, comportamiento
+offline, threat model, compatibilidad binary/API, plan de rollback y criterio de no-go. Sin eso, la solicitud
+“hagamos la app” sigue siendo discovery.
 
 ## Referencias
 

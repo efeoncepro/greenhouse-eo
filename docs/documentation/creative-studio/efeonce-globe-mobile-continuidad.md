@@ -1,7 +1,7 @@
 # Efeonce Globe — continuidad móvil
 
 > **Tipo:** documentación funcional de producto
-> **Estado:** dirección propuesta; validación pendiente
+> **Estado:** dirección tecnológica propuesta; validación pendiente
 > **Runtime:** no existe todavía una app nativa ni un rollout móvil independiente. Globe permanece internal-only/internal_smoke y los externos siguen gated por TASK-1480.
 
 ## Propósito
@@ -9,6 +9,8 @@
 Globe debe liberar al creativo de la ingeniería también entre contextos: una idea puede aparecer lejos del escritorio, un job puede terminar mientras la persona está en movimiento y una decisión puede necesitar sólo un minuto. Continuidad móvil significa que el contexto viaja con el trabajo, no que el Producer desktop se reduzca hasta caber en una pantalla pequeña.
 
 La decisión canónica es [ADR-018 — continuidad móvil y aplicación companion](../../architecture/creative-studio/EFEONCE_GLOBE_MOBILE_CONTINUITY_APPLICATION_DECISION_V1.md). Este documento explica qué significa para producto, diseño y operación sin afirmar que una capacidad futura ya está disponible.
+
+La dirección tecnológica es **native-first para Android/iOS**. La web/PWA conserva el fallback universal y la continuidad sin instalación; no es la arquitectura móvil principal. La companion futura se orienta a **React Native + Expo development builds/CNG + TypeScript**, con Expo Router para deep links y módulos nativos propios cuando media o background upload lo requieran. Se comparte el core gobernado (contracts, readers, commands, policies, idempotencia y reconciliación), no los componentes DOM del Producer web.
 
 ## Modelo mental
 
@@ -19,6 +21,12 @@ La decisión canónica es [ADR-018 — continuidad móvil y aplicación companio
 | **Globe cloud** | “¿Qué es verdad y qué está autorizado?” | identidad, entitlements, policy, estimate, credits, run, asset, rights, provenance y lineage |
 
 El móvil es una ventana al mismo sistema. No crea una copia del proyecto ni una autoridad económica propia.
+
+## Qué significa native-first
+
+Native-first no significa construir el Producer completo en un teléfono. Significa que Android e iOS son superficies de producto reales desde el diseño, con lifecycle, permisos, almacenamiento seguro, deep links, notificaciones y media tratados como capacidades nativas. El desktop conserva la creación profunda; la app móvil comienza con continuidad de baja densidad.
+
+La tecnología queda sujeta a un vertical slice real en ambos sistemas. Flutter y Kotlin Multiplatform + UI nativa son alternativas de revisión si el full mobile studio exige canvas, timeline, 3D, AR o integración de sistema que cambie el balance.
 
 ## Recorrido de continuidad
 
@@ -59,19 +67,21 @@ El móvil es una ventana al mismo sistema. No crea una copia del proyecto ni una
 
 | Capacidad | Estado actual | Evidencia / siguiente gate |
 | --- | --- | --- |
-| Payload web React + Vite | En migración según ADR-014; no equivale a una app nativa | Validar continuidad sobre la superficie web antes de abrir una task móvil |
+| Payload web React + Vite | En migración según ADR-014; sigue siendo la superficie web y fallback | Mantener paridad de contratos; no convertirlo en una app móvil por wrapper |
 | Responsive a 390 px | Existe como validación de UI | Instrumentar journeys, no sólo snapshots |
 | Jobs, assets, rights, provenance, credits y lineage server-side | Existe como arquitectura y runtime interno | Reusar readers/commands; no crear proyecciones móviles |
-| Deep links contextuales | Dirección de diseño; no hay contrato móvil aprobado | Definir identidad canónica y revocación en una task |
-| Draft/offline sync | No implementado como capacidad de Globe | Diseñar sólo para captura; nunca para spend |
-| Push/background upload/cámara/voz | No implementado como superficie móvil | Requiere evidencia y ADRs de identity/media/privacy/notifications |
-| App Store/Play Store | No aprobado | Sólo después de Phase 0/1 y gates enterprise |
+| Deep links contextuales | Dirección de diseño; no hay contrato móvil aprobado | Definir identidad canónica, universal/app links y revocación en una task |
+| Draft/offline sync | No implementado como capacidad de Globe | Diseñar sólo para captura, SQLite/outbox y sync idempotente; nunca para spend |
+| Auth nativo | El BFF web actual usa cookies same-origin/CSRF; no existe sesión móvil | ADR de identity para OAuth/OIDC + PKCE y front door autenticado; no llamar `globe-api-internal` desde la app |
+| Push/background upload/cámara/voz | No implementado como superficie móvil | Requiere evidencia, módulos nativos y ADRs de identity/media/privacy/notifications |
+| App Store/Play Store | No aprobado | Sólo después del vertical slice Android/iOS y gates enterprise |
 
 ## Señales que justifican invertir
 
 La inversión móvil debe seguir datos de continuidad, no una comparación superficial con competidores. Las señales principales son:
 
 - una tasa repetida de capturas o revisiones desde móvil;
+- un vertical slice Android/iOS que pase auth, deep link, captura, upload interrumpido, push reconciliable y handoff;
 - abandono móvil que desaparece al introducir draft, deep link o inbox;
 - reducción medible del tiempo entre resultado listo y decisión;
 - handoffs móvil → desktop que conservan session/asset/lineage sin reconstrucción;
@@ -88,6 +98,7 @@ La inversión móvil debe seguir datos de continuidad, no una comparación super
 5. Toda notificación deriva de un evento/reader canónico y se puede reconciliar.
 6. Todo cambio de contexto conserva workspace y revocación; los errores no hacen fallback permisivo.
 7. El diseño móvil se valida en 390 px, teclado, reduced motion, lector de pantalla y red intermitente, además de desktop.
+8. Un update JavaScript no puede requerir APIs nativas ausentes; la compatibilidad de binary/API y el kill switch son parte del rollout.
 
 ## Referencias
 

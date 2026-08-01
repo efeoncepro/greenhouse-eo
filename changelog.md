@@ -14,10 +14,12 @@
   preservar el checkout compartido y pedir dirección al operador.
 - El contrato se canonizó en `REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md`, con routers, prompts, skills y la
   memoria global de Claude alineados; el modelo histórico de worktrees quedó explícitamente superseded.
-- Globe ADR-018 queda documentado como dirección **continuity-first**: mobile web/PWA para validar captura, drafts,
-  deep links, inbox, estados asíncronos, review y handoff; desktop conserva composición profunda y Globe cloud la
-  autoridad. La skill existente `greenhouse-globe`, los docs funcional/manual y Handoff contienen las invariantes;
-  no hay cambios de runtime, flags, auth, push, billing, créditos, providers, distribución ni rollout externo.
+- Globe ADR-018 queda actualizado como dirección **continuity-first y native-first para Android/iOS**: React Native +
+  Expo development builds/CNG para la companion, web/PWA como fallback, desktop para composición profunda y Globe
+  cloud como autoridad. El vertical slice debe validar PKCE, deep links, captura, upload interrumpible, push
+  reconciliable, handoff y compatibilidad binary/API; la skill existente `greenhouse-globe`, los docs
+  funcional/manual y Handoff contienen las invariantes. No hay app publicada ni cambios de runtime, flags, auth,
+  push, billing, créditos, providers, distribución ni rollout externo.
 
 ## 2026-08-01 — TASK-1630: convergencia del control plane de créditos de Globe
 
