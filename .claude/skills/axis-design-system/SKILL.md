@@ -18,6 +18,7 @@ canonical source:
 - Distribution and credentials: [private package runbook](../../docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
 - Current continuity and evidence: [AXIS continuity map](../../docs/operations/AXIS_CONTINUITY_MAP_2026-07-29.md).
 - Ownership decision: [AXIS ownership ADR](../../docs/architecture/EFEONCE_AXIS_DESIGN_SYSTEM_OWNERSHIP_DECISION_V1.md).
+- Agent-facing visual guide: [AXIS `DESIGN.md`](https://github.com/efeoncepro/axis-design-system/blob/main/DESIGN.md), generated from the token package and pushed at commit `0e3c4d6`.
 - Color ownership cutover: [TASK-1600](../../docs/tasks/in-progress/TASK-1600-axis-color-ownership-inversion.md).
 - Foundation history and task status: [TASK-1589](../../docs/tasks/in-progress/TASK-1589-efeonce-ui-package-foundation.md) when present.
 - Release procedure: \`.codex/skills/greenhouse-production-release/SKILL.md\`.
@@ -50,6 +51,31 @@ canonical source:
 3. Keep package version, contract version and lifecycle metadata distinct.
 4. Run the AXIS repository's build, typecheck, tests and promotion gates.
 5. Record the published package version and consumer evidence in the runbook.
+
+### Agent-facing visual guide
+
+`../axis-design-system/DESIGN.md` is the AXIS visual guide for humans and coding agents. It follows the
+Google `DESIGN.md` alpha format and passes the official linter with zero errors and warnings. It is a
+generated projection, not a second source of truth: standard frontmatter values come from
+`packages/tokens/src/tokens.ts`, while AXIS-specific brand, mode and role mappings remain governed by the
+packages and ADRs.
+
+When token values change, run `pnpm design:generate` in the AXIS repository and verify
+`pnpm design:check`. Do not edit generated frontmatter by hand. Do not treat the AXIS guide as a replacement
+for Greenhouse's root `DESIGN.md`, which remains the product-specific MUI/Vuexy contract.
+
+### AXIS Lab
+
+The Lab lives in `../axis-design-system/apps/lab`, not in Greenhouse. Its current runtime is Astro 7.1.6
+with `output: 'static'`, public Vercel delivery, and no consumer adapter imports. The static reference is
+derived from the published/workspace registry and tokens. Astro Content Loader validates contracts and generates
+the catalog, per-pattern routes, MDX usage docs and sitemap; search uses a minimal vanilla script rather than a
+hydrated React application.
+
+For Lab work, run `pnpm --filter @efeonce/axis-design-system-lab build`, `typecheck`, `test` and `lint` in
+the AXIS repository. `astro check` is the type/lint gate; `test` runs Vitest and `test:e2e` runs Playwright
+desktop/mobile smoke. Do not add SSR, Actions, secrets, Greenhouse imports or product-specific adapters to
+the Lab; a missing portable contract is an AXIS gap.
 
 ### Color ownership cutover (TASK-1600)
 

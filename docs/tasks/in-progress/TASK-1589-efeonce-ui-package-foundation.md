@@ -28,6 +28,15 @@
 Crear el foundation portable de AXIS —tokens, contracts y registry— en `../axis-design-system`.
 La capa portable no puede importar MUI, Vuexy, Next, browser globals ni lógica de producto.
 
+## Delta 2026-08-01 — guía visual agent-facing
+
+El repositorio AXIS publicó [`DESIGN.md`](https://github.com/efeoncepro/axis-design-system/blob/main/DESIGN.md)
+en `main` mediante el commit `0e3c4d6`. El documento sigue la estructura alpha de Google y se genera desde
+`packages/tokens`; `pnpm design:check` y el CI del repo AXIS verifican que no haya drift del frontmatter.
+No es un segundo SSOT: la semántica multi-brand, modos, roles y contratos siguen gobernados por los
+packages y las decisiones de arquitectura. Greenhouse conserva su `DESIGN.md` propio como contrato de
+producto MUI/Vuexy.
+
 ## Delta 2026-07-29 — V1.1: endurecimiento de distribución y gobierno
 
 La foundation quedó publicada y operativa, pero su **distribución** no tenía gobierno: el repo AXIS

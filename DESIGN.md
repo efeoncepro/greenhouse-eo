@@ -2,7 +2,7 @@
 version: alpha
 name: Greenhouse EO Portal
 designSystem: AXIS
-description: Greenhouse design contract for coding agents. Derived from the live MUI theme and canonical token docs. AXIS Figma is upstream for mirrored families; accepted Greenhouse overrides such as Tidal Teal remain code-first until explicitly reconciled upstream.
+description: Greenhouse product design contract for coding agents. Derived from the live MUI theme and canonical token docs. The shared AXIS agent guide lives in the sibling package repository at https://github.com/efeoncepro/axis-design-system/blob/main/DESIGN.md; this file remains the Greenhouse-specific MUI/Vuexy contract.
 colors:
   primary: "#0375DB"
   primary-light: "#3691E3"

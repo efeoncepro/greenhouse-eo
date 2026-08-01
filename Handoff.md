@@ -1,5 +1,29 @@
 # Handoff activo
 
+## AXIS — guía visual agent-facing publicada (2026-08-01)
+
+- `efeoncepro/axis-design-system` publicó `DESIGN.md` en `main` mediante `0e3c4d6`.
+- El documento sigue el formato alpha de Google, pero es una proyección generada desde `packages/tokens`,
+  no un segundo SSOT. `pnpm design:generate` lo regenera y `pnpm design:check` detecta drift; CI lo valida.
+- Las skills AXIS de Codex y Claude, el runbook, la arquitectura UI y `project_context.md` ya apuntan a la
+  guía. Greenhouse conserva su `DESIGN.md` separado como contrato específico MUI/Vuexy.
+- `TASK-1590` llevó el Lab desde Vite vanilla a Astro `7.1.6`: salida estática, Content Loader tipado,
+  catálogo y rutas por pattern, documentación MDX, sitemap, metadata SEO, script vanilla mínimo, Vitest y
+  Playwright desktop/mobile. No hay React, SSR, Actions, secretos ni imports desde Greenhouse/Globe.
+- Verificado en el repo AXIS: `pnpm install --frozen-lockfile`, `pnpm design:check`, `pnpm build`,
+  `pnpm typecheck`, `pnpm test`, `pnpm lint`, `git diff --check` y preview local HTTP 200.
+- Estado honesto: `code complete, rollout pendiente`. Faltan fixtures/evidencia visual completa por contrato,
+  despliegue público de esta revisión y la migración futura del catálogo Greenhouse; no se hizo commit ni push
+  de esta migración. `TASK-1382` no es dependencia: permanece pausada hasta elegir otro build unit dentro de
+  Greenhouse.
+- Rollout realizado el 2026-08-01: deployment `dpl_8TohYh27fJizvDVC3MV5aoemvFPK`, alias público
+  `https://axis-design-system-lab.vercel.app`, `READY`, Astro/output `apps/lab/dist`, Node 24. Se retiró la
+  protección SSO del proyecto porque el Lab ya tenía decisión explícita de ser público; `/`, `/docs/`,
+  `/references/colors/` y `/sitemap-index.xml` responden `200`.
+- Empezó la migración Greenhouse → AXIS: `colors` es el primer slice, con referencia token-backed en
+  `/references/colors/`; el inventario y el triage están en
+  [`AXIS_GREENHOUSE_LAB_MIGRATION_INVENTORY_V1.md`](docs/architecture/AXIS_GREENHOUSE_LAB_MIGRATION_INVENTORY_V1.md).
+
 ## Globe Producer — seis defectos de superficie, el pie de la app y la paginación del feed (2026-08-01)
 
 Sesión reportada por el operador **mirando la pantalla**. Tres PRs mergeados y **desplegados**:

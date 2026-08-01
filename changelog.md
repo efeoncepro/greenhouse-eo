@@ -7,6 +7,17 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-01 — AXIS Lab: Astro 7 con foundation documental y testing
+
+- `axis-design-system/apps/lab` dejó Vite vanilla y ahora usa Astro `7.1.6` con salida estática para Vercel,
+  Content Loader, rutas por pattern, MDX, sitemap/SEO, Vitest y Playwright desktop/mobile.
+- La referencia se genera desde tokens/registry publicados; conserva HTML/CSS y un script vanilla mínimo,
+  sin adapters de Greenhouse/Globe, Actions ni SSR.
+- Se actualizaron la task `TASK-1590`, las skills AXIS, la arquitectura, el runbook y el handoff. Fixtures
+  visuales completos por contrato siguen pendientes.
+- Rollout público completado en `axis-design-system-lab.vercel.app`; el primer slice Greenhouse `colors`
+  ya tiene referencia token-backed en `/references/colors/` y su inventario de migración quedó documentado.
+
 ## 2026-08-01 — Globe Producer: pie de la aplicación, paginación del feed y seis defectos de superficie
 
 - El **pie de la aplicación volvió al Producer**: el port a React había perdido el `.producer-footer` del payload legacy y con él el wordmark de Efeonce. Se trajo `efeonce-positive.svg` desde `public/branding/logo-full.svg` como par exacto del negativo (mismo `viewBox` y trazados, sólo cambia la tinta) y se registró en el allowlist de `assets.ts` y en `PROVENANCE.md`; el logo cambia de tinta con el tema, que es tematizable desde TASK-1613.

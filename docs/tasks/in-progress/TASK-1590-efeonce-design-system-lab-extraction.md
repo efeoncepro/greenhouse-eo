@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -15,18 +15,63 @@
 - Motion: `docs/ui/motion/TASK-1590-efeonce-design-system-lab-motion.md`
 - Backend impact: `none`
 - Epic: `optional`
-- Status real: `A MEDIAS, no pendiente (medido 2026-07-30). STACK DECIDIDO 2026-07-30: el Lab se reescribe en ASTRO (no React/Next/Storybook: no atar la doc del DS al framework de un consumidor; islas sólo donde hagan falta) y renderiza una IMPLEMENTACION DE REFERENCIA en HTML+CSS derivada de la spec, NUNCA importando los adapters (seria el cross-repo de ISSUE-128). DESTINO Y ACCESO DECIDIDOS 2026-07-30: el Lab vive en el Vercel de AXIS (consume lo publicado, nunca importa de greenhouse-eo) y queda PUBLICO por decision explicita, lo que supersede el internal-only de la spec original. El Lab independiente YA EXISTE y está desplegado (apps/lab en axis-design-system → axis-design-system-lab.vercel.app), con la estructura de su dirección visual ya implementada: registry searchable + preview + panel de evidencia. Lo que falta es el CONTENIDO: 2 contratos en el Lab contra 43 rutas de /design-system en Greenhouse. Y dos desalineaciones con su propia spec: el Lab es PUBLICO (200 sin auth) cuando la task pide internal-only, y su acceptance criterion 1 ("Lab corre fuera de Greenhouse") ya se cumple. CONTRADICCION ABIERTA con TASK-1382, que quiere Labs como build unit DENTRO de Greenhouse: son dos destinos incompatibles para la misma superficie y ninguna declara a la otra`
+- Status real: `EN EJECUCIÓN 2026-08-01`. El Lab ya existe en `../axis-design-system/apps/lab`, pero hoy es Vite + TypeScript vanilla. Esta ejecución migra ese contenedor a Astro 7, mantiene el despliegue público en el Vercel de AXIS y conserva la frontera: sólo tokens/registry publicados o workspace del repo AXIS; nunca imports desde Greenhouse/Globe. La referencia se renderiza en HTML/CSS; la interactividad se limita a islas o scripts mínimos. La contradicción con TASK-1382 queda resuelta para esta superficie: Labs no es build unit de Greenhouse.
 - Rank: `TBD`
 - Domain: `ui-platform|cross-runtime`
-- Blocked by: `none` (foundation publicada; extracción del Lab sigue pendiente)
+- Blocked by: `none`
 - Branch: `task/TASK-1590-efeonce-design-system-lab-extraction`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
 
-Separar el Pattern Lab del runtime Greenhouse y desplegarlo como proyecto Vercel
-internal-only. `/design-system` seguirá siendo catálogo/control plane durante la migración.
+Separar el Pattern Lab del runtime Greenhouse y migrarlo a Astro 7 en el repo AXIS, desplegado en su
+proyecto Vercel público. `/design-system` seguirá siendo catálogo/control plane de Greenhouse durante la
+migración.
+
+## Delta 2026-08-01 — migración Vite → Astro 7 y foundation documental
+
+Implementación realizada en `efeoncepro/axis-design-system`:
+
+- `apps/lab` usa `astro@7.1.6`, `@astrojs/check@0.9.10` y `output: 'static'`.
+- Astro Content Loader valida el registry publicado y genera el catálogo, rutas estáticas por pattern y documentación MDX.
+- `@astrojs/sitemap` genera el sitemap público; metadata canonical/Open Graph vive en el layout compartido.
+- Búsqueda usa un script vanilla mínimo; Vitest cubre helpers y Playwright cubre Chromium/WebKit desktop/mobile,
+  navegación, estado vacío y screenshot de smoke. No hay React, Next, Actions, adapters de Greenhouse/Globe ni SSR.
+- `vercel.json` declara `framework: "astro"`, conserva `apps/lab/dist` y mantiene el sitio público.
+- `pnpm design:check`, `pnpm build`, `pnpm typecheck`, `pnpm test`, `pnpm lint` y `pnpm test:e2e` del workspace
+  AXIS pasan; `astro check` devuelve 0 errores, warnings y hints.
+
+Este slice cierra la foundation de infraestructura/documentación, no la cobertura total del Lab: todavía faltan
+fixtures visuales completos por contrato y la migración ordenada del catálogo que hoy vive en Greenhouse.
+
+### Delta 2026-08-01 (b) — rollout público y primer slice Greenhouse
+
+- Deployment Vercel `dpl_8TohYh27fJizvDVC3MV5aoemvFPK` quedó `READY` con framework Astro, Node 24 y salida
+  `apps/lab/dist`; alias público: `https://axis-design-system-lab.vercel.app`.
+- `/`, `/docs/`, `/patterns/efeonce.status/`, `/patterns/efeonce.progress/`,
+  `/references/colors/` y `/sitemap-index.xml` responden `200` sin protección SSO.
+- El primer slice migrado desde Greenhouse es `colors`: una referencia HTML/CSS que lee `axisRamp` desde
+  `@efeoncepro/axis-tokens`, sin copiar `AxisColorLabView` ni importar Greenhouse.
+- El inventario de rutas y la clasificación inicial están en
+  [`AXIS_GREENHOUSE_LAB_MIGRATION_INVENTORY_V1.md`](../../architecture/AXIS_GREENHOUSE_LAB_MIGRATION_INVENTORY_V1.md).
+
+### Plan futuro para portar el Lab Greenhouse a AXIS
+
+1. Inventariar las rutas actuales de `/design-system` y clasificarlas como contrato puro, fixture visual,
+   consumidor MUI/Vuexy o superficie con API/dominio.
+2. Llevar primero al AXIS Lab el inventario y las páginas pure-UI, transformando cada página en documentación
+   derivada del registry; no copiar imports, datos, auth, adapters ni el shell de Greenhouse.
+3. Para cada pattern, publicar en AXIS la spec/fixture mínima que falte y validar la implementación de referencia
+   contra los canaries MUI/Vuexy y Tailwind mediante capturas y propiedades computadas.
+4. Mantener `/design-system` como fallback hasta que el catálogo AXIS tenga parity de rutas, estados, copy,
+   accesibilidad y evidencia; después retirar páginas una por una, nunca mediante un cutover masivo.
+
+`TASK-1382` no participa en este traslado: su piloto necesita otro sujeto interno de Greenhouse para probar la
+frontera de build units y la matriz de builds afectados.
+
+El inventario operativo del traslado está en
+[`AXIS_GREENHOUSE_LAB_MIGRATION_INVENTORY_V1.md`](../../architecture/AXIS_GREENHOUSE_LAB_MIGRATION_INVENTORY_V1.md).
 
 ## Architecture Alignment
 
@@ -38,12 +83,12 @@ internal-only. `/design-system` seguirá siendo catálogo/control plane durante 
 ## Modular Placement Contract
 
 - Topology impact: `cross-runtime`
-- Current home: `src/app/(dashboard)/design-system` en Greenhouse
-- Future candidate home: `ui-package`
-- Boundary: Lab consume packages y fixtures; no lógica de dominio ni secretos
-- Server/browser split: browser-safe fixtures; Vercel estático/React en primera wave
-- Build impact: proyecto Vercel separado y build reproducible
-- Extraction blocker: rutas internas y handoff Figma siguen viviendo en Greenhouse
+- Current home: `../axis-design-system/apps/lab` (Vite + TypeScript vanilla)
+- Future candidate home: `../axis-design-system/apps/lab` (Astro 7)
+- Boundary: Lab consume tokens/registry publicados o workspace AXIS; no importa Greenhouse/Globe, lógica de dominio ni secretos
+- Server/browser split: `output: 'static'`; HTML/CSS de referencia por defecto, islas sólo para interacción del catálogo
+- Build impact: build reproducible de Astro 7 dentro del workspace AXIS; no construye Greenhouse
+- Extraction blocker: contenido completo de contratos y fixtures cross-runtime, no la infraestructura del Lab
 
 ## UI/UX Contract
 
@@ -54,10 +99,10 @@ internal-only. `/design-system` seguirá siendo catálogo/control plane durante 
 
 ## Acceptance Criteria
 
-- [ ] Lab corre fuera de Greenhouse.
+- [x] Lab corre fuera de Greenhouse.
 - [ ] Tiene catálogo searchable con owner, SoT, lifecycle y consumers.
 - [ ] Tiene fixtures desktop/mobile/keyboard/reduced-motion.
-- [ ] Preview Vercel definida sin mover producción ni retirar `/design-system`.
+- [x] Preview/Vercel existe en AXIS, es pública por decisión explícita y no retira `/design-system`.
 
 ## Delta 2026-07-30 — el estado real, el rol que le da el ADR y una contradicción abierta
 
