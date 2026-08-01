@@ -1268,7 +1268,7 @@ export const buildSisterPlatformOAuthIdentityPayload = ({
     }
   }
 
-  if (client.sisterPlatformKey === 'globe' && workspaceBindings) {
+  if (usesGlobeOAuthWorkspaceBindings(client) && workspaceBindings) {
     identity.workspaceBindings = workspaceBindings
   }
 
@@ -1288,8 +1288,9 @@ export const buildBrokerSisterPlatformOAuthIdentityPayload = async ({
   expiresAt: string
   authMode?: string
 }): Promise<SisterPlatformOAuthIdentityPayload> => {
-  const workspaceBindings =
-    client.sisterPlatformKey === 'globe' ? await resolveGlobeOAuthWorkspaceBindings(tenant) : undefined
+  const workspaceBindings = usesGlobeOAuthWorkspaceBindings(client)
+    ? await resolveGlobeOAuthWorkspaceBindings(tenant)
+    : undefined
 
   return buildSisterPlatformOAuthIdentityPayload({
     tenant,
@@ -1300,6 +1301,9 @@ export const buildBrokerSisterPlatformOAuthIdentityPayload = async ({
     authMode
   })
 }
+
+export const usesGlobeOAuthWorkspaceBindings = (client: SisterPlatformOAuthClient) =>
+  client.sisterPlatformKey === 'globe' || client.metadata?.workspaceBindingProvider === 'globe'
 
 export const recordSisterPlatformOAuthAuditEvent = async ({
   client,
@@ -1880,6 +1884,8 @@ export const resolveSisterPlatformOAuthUserinfo = async ({
         oauth.client_id,
         oauth.client_name,
         oauth.client_status,
+        oauth.client_type,
+        oauth.require_human_session,
         oauth.redirect_uris,
         oauth.allowed_scopes,
         oauth.code_ttl_seconds,

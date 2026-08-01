@@ -7,16 +7,26 @@ export const GLOBE_ADMIN_OAUTH_ACCESS_TOKEN_TTL_SECONDS = 5 * 60
 
 export const GLOBE_ADMIN_OAUTH_CAPABILITY_SCOPES = [
   'globe.credits.funding.propose',
-  'globe.credits.funding.confirm'
+  'globe.credits.funding.confirm',
+  'globe.credits.funding.read',
+  'globe.credits.funding.reconcile',
+  'globe.credits.funding.ensure'
 ] as const
 
 export const buildGlobeAdminOAuthGrantContract = () => {
   const allowedScopes = ['openid', 'profile', 'email', ...GLOBE_ADMIN_OAUTH_CAPABILITY_SCOPES]
 
+  const metadata = {
+    resourceFamily: 'globe',
+    workspaceBindingProvider: 'globe'
+  } as const
+
   const policy: SisterPlatformOAuthPolicyV1 = {
     schemaVersion: '1',
     audience: { tenantTypes: ['efeonce_internal'] },
-    requiredScopes: ['openid', ...GLOBE_ADMIN_OAUTH_CAPABILITY_SCOPES],
+    // Capability scopes are opt-in. Each route enforces its exact scope, so adding `ensure` does
+    // not invalidate five-minute tokens already issued for read/reconcile/propose/confirm.
+    requiredScopes: ['openid'],
     capabilityScopes: [...GLOBE_ADMIN_OAUTH_CAPABILITY_SCOPES],
     claims: { includeGreenhouseRoles: false },
     revocation: {
@@ -26,5 +36,5 @@ export const buildGlobeAdminOAuthGrantContract = () => {
     }
   }
 
-  return { allowedScopes, policy }
+  return { allowedScopes, policy, metadata }
 }

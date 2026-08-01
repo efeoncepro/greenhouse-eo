@@ -19,6 +19,7 @@ const BROKER_ERROR_CODES = {
   fingerprint_mismatch: 'globe_funding_invalid_request',
   actor_auth_mode_not_allowed: 'forbidden',
   agent_confirmation_forbidden: 'globe_funding_agent_confirmation_forbidden',
+  agent_one_shot_authority_required: 'globe_funding_agent_one_shot_authority_required',
   agent_funding_limit_exceeded: 'globe_funding_agent_limit_exceeded',
   globe_unavailable: 'globe_unavailable',
   rejected_by_globe: 'globe_funding_rejected'

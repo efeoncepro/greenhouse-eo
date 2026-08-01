@@ -1587,7 +1587,8 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     // operación. Se grantean las DOS en el mismo rol a propósito — la protección real no es
     // repartirlas entre roles distintos (hoy no hay un segundo actor con esta autoridad, y un
     // control que nadie puede satisfacer desvía al break-glass, ADR-015 Delta 2026-07-26) sino
-    // que confirmante ≠ proponente lo imponga un CHECK en la tabla de intenciones.
+    // El segundo confirmador es policy opcional. La autoridad one-shot se intersecta además con el
+    // issuer exacto configurado en DB; el rol por sí solo nunca prueba que el actor sea el CEO.
     addEntitlement(entries, {
       module: 'platform',
       capability: 'platform.globe_credit_funding.propose',
@@ -1615,6 +1616,30 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     addEntitlement(entries, {
       module: 'platform',
       capability: 'platform.globe_credit_funding.reconcile',
+      action: 'execute',
+      scope: 'all',
+      source: 'role'
+    })
+
+    addEntitlement(entries, {
+      module: 'platform',
+      capability: 'platform.globe_credit_funding.ensure',
+      action: 'execute',
+      scope: 'all',
+      source: 'role'
+    })
+
+    addEntitlement(entries, {
+      module: 'platform',
+      capability: 'platform.globe_credit_funding.authority.issue',
+      action: 'execute',
+      scope: 'all',
+      source: 'role'
+    })
+
+    addEntitlement(entries, {
+      module: 'platform',
+      capability: 'platform.globe_credit_funding.authority.revoke',
       action: 'execute',
       scope: 'all',
       source: 'role'

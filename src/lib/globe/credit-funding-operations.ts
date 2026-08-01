@@ -25,7 +25,7 @@ export type GlobeCreditFundingOperation = Readonly<{
   proposalId: string
   state: string
   plan: Readonly<{
-    poolId: string
+    poolId?: string
     grantCredits: number
     monthlyCapAfter?: number
     monthlyCapBefore: number
@@ -218,8 +218,8 @@ export function parseGlobeCreditFundingOperation(raw: unknown): GlobeCreditFundi
     proposalId: bounded(value.proposalId),
     state,
     plan: {
-      poolId: bounded(rawPlan.poolId),
-      grantCredits: positive(rawPlan.grantCredits),
+      ...(rawPlan.poolId === undefined ? {} : { poolId: bounded(rawPlan.poolId) }),
+      grantCredits: nonNegative(rawPlan.grantCredits),
       ...(rawPlan.monthlyCapAfter === undefined ? {} : { monthlyCapAfter: nonNegative(rawPlan.monthlyCapAfter) }),
       monthlyCapBefore: nonNegative(rawPlan.monthlyCapBefore),
       spentInPeriod: nonNegative(rawPlan.spentInPeriod),
@@ -263,14 +263,6 @@ function nonNegative(raw: unknown): number {
   if (typeof raw !== 'number' || !Number.isSafeInteger(raw) || raw < 0) invalid()
   
 return raw
-}
-
-function positive(raw: unknown): number {
-  const value = nonNegative(raw)
-
-  if (value === 0) invalid()
-  
-return value
 }
 
 function invalid(): never {

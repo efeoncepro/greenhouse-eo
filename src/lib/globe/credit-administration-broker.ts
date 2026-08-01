@@ -5,6 +5,7 @@ import { randomUUID } from 'node:crypto'
 import { query } from '@/lib/db'
 
 import { createGreenhouseGlobeClient, type GreenhouseGlobeClientDependencies } from './client'
+import { parseGlobeCreditFundingOperation, type GlobeCreditFundingOperation } from './credit-funding-operations'
 
 /**
  * Broker del carril gobernado de fondeo de crédito de Globe (TASK-1566 / ADR-015 Slice 5).
@@ -12,20 +13,21 @@ import { createGreenhouseGlobeClient, type GreenhouseGlobeClientDependencies } f
  * ¿Por qué existe del lado de Greenhouse y no como un comando más de Globe?
  *
  * Globe ya tiene `propose`/`confirm` y su propia máquina de estados, pero su
- * `assertHumanAttribution` es **shape-only**: rechaza `globe:service:` y exige un entitlement no
- * vacío, y **no puede** verificar que la atribución humana venga de una sesión autenticada, porque
+ * el guard de atribución es **shape-only**: rechaza principals técnicos y exige un entitlement no
+ * vacío, y **no puede** verificar que la atribución venga de una sesión autenticada, porque
  * Globe no tiene las sesiones. Sin este broker, el caller de workload que Greenhouse puede asumir
- * confirmaría con una atribución humana **fabricada** — el mismo maker-checker vacuo que ADR-015
+ * confirmaría con una atribución de usuario **fabricada** — el mismo maker-checker vacuo que ADR-015
  * documenta, movido un nivel.
  *
- * Acá la atribución se vuelve exigible: sale de la sesión del operador, se persiste append-only, y
- * la disyunción confirmante ≠ proponente la impone un `CHECK` en la base, no una convención.
+ * Acá la atribución se vuelve exigible: sale de la sesión del operador, se persiste append-only y
+ * la separación confirmante/proponente se aplica sólo cuando la política del workspace la exige.
  *
  * **NUNCA** un cliente paralelo: reusa `createGreenhouseGlobeClient`, que es el único seam con
  * credenciales, audiencia y reintentos gobernados.
  */
 
 const PROPOSE_COMMAND = 'globe.credits.month.fund.propose'
+const ENSURE_COMMAND = 'globe.credits.month.ensure.propose'
 const CONFIRM_COMMAND = 'globe.credits.month.fund.confirm'
 
 /**
@@ -52,6 +54,11 @@ export type GlobeCreditFundingActor = Readonly<{
   authMode: string
 }>
 
+export type GlobeCreditFundingAuthorityEvidence = Readonly<{
+  authorityId: string
+  executionId: string
+}>
+
 export type GlobeCreditFundingProposeInput = Readonly<{
   globeWorkspaceId: string
   poolId: string
@@ -62,6 +69,7 @@ export type GlobeCreditFundingProposeInput = Readonly<{
   actor: GlobeCreditFundingActor
   idempotencyKey: string
   correlationId?: string
+  authority?: GlobeCreditFundingAuthorityEvidence
 }>
 
 export type GlobeCreditFundingConfirmInput = Readonly<{
@@ -71,6 +79,20 @@ export type GlobeCreditFundingConfirmInput = Readonly<{
   actor: GlobeCreditFundingActor
   idempotencyKey: string
   correlationId?: string
+  authority?: GlobeCreditFundingAuthorityEvidence
+}>
+
+export type GlobeCreditFundingEnsurePlanInput = Readonly<{
+  globeWorkspaceId: string
+  targetAvailableCredits: number
+  maxGrantCredits: number
+  maxResultingCapCredits: number
+  periodStart: string
+  periodEnd: string
+  actor: GlobeCreditFundingActor
+  idempotencyKey: string
+  correlationId?: string
+  authority: GlobeCreditFundingAuthorityEvidence
 }>
 
 export class GlobeCreditFundingBrokerError extends Error {
@@ -79,6 +101,7 @@ export class GlobeCreditFundingBrokerError extends Error {
     | 'confirmer_is_proposer'
     | 'already_recorded'
     | 'agent_confirmation_forbidden'
+    | 'agent_one_shot_authority_required'
     | 'agent_funding_limit_exceeded'
     | 'fingerprint_mismatch'
     | 'actor_auth_mode_not_allowed'
@@ -97,7 +120,8 @@ export class GlobeCreditFundingBrokerError extends Error {
  * Propone un plan de fondeo. **No muta nada en Globe** — devuelve el plan para que un humano lo
  * revise, y deja la intención registrada.
  *
- * Un agente puede llegar hasta acá; confirmar es de una persona.
+ * La propuesta puede venir de una persona o de un agente autenticado. Cuando la política exige
+ * autoridad one-shot, el agente debe adjuntar la ejecución ya reclamada.
  */
 export async function proposeGlobeCreditFunding(
   input: GlobeCreditFundingProposeInput,
@@ -147,18 +171,149 @@ export async function proposeGlobeCreditFunding(
     plan: unknown
   }>
 
-  await recordIntent({
-    globeWorkspaceId: input.globeWorkspaceId,
-    proposalId: proposal.proposalId,
-    phase: 'proposed',
-    actor: input.actor,
-    planFingerprint: proposal.fingerprint,
-    plan: proposal.plan,
-    correlationId,
-    idempotencyKey: input.idempotencyKey
-  })
+  try {
+    await recordIntent({
+      globeWorkspaceId: input.globeWorkspaceId,
+      proposalId: proposal.proposalId,
+      phase: 'proposed',
+      actor: input.actor,
+      planFingerprint: proposal.fingerprint,
+      plan: proposal.plan,
+      correlationId,
+      idempotencyKey: input.idempotencyKey,
+      authority: input.authority
+    })
+  } catch (error) {
+    if (!(error instanceof GlobeCreditFundingBrokerError) || error.code !== 'already_recorded') throw error
+    const replay = await readProposedIntent(input.globeWorkspaceId, proposal.proposalId)
+
+    const authorityMatches = input.authority
+      ? replay?.authorityId === input.authority.authorityId &&
+        replay.authorityExecutionId === input.authority.executionId
+      : replay?.authorityId === null && replay.authorityExecutionId === null
+
+    if (!replay || replay.planFingerprint !== proposal.fingerprint || !authorityMatches) throw error
+  }
 
   return proposal
+}
+
+/**
+ * Pide a Globe alcanzar un disponible objetivo. Globe, como autoridad económica, deriva el pool,
+ * el grant y el tope; Greenhouse solamente conserva la atribución OAuth y la autoridad one-shot.
+ */
+export async function ensureGlobeCreditFundingPlan(
+  input: GlobeCreditFundingEnsurePlanInput,
+  dependencies: GreenhouseGlobeClientDependencies = {}
+): Promise<
+  Readonly<
+    | {
+        status: 'already_funded'
+        effectiveAvailable: number
+        asOf: string
+        operation: GlobeCreditFundingOperation
+      }
+    | {
+        status: 'proposed'
+        proposalId: string
+        fingerprint: string
+        plan: unknown
+      }
+  >
+> {
+  const correlationId = input.correlationId ?? randomUUID()
+  const { client } = createGreenhouseGlobeClient(process.env, dependencies)
+
+  const envelope = await dispatch(
+    () =>
+      client.dispatchCommand(
+        ENSURE_COMMAND,
+        {
+          targetAvailableCredits: input.targetAvailableCredits,
+          maxGrantCredits: input.maxGrantCredits,
+          maxResultingCapCredits: input.maxResultingCapCredits,
+          periodStart: input.periodStart,
+          periodEnd: input.periodEnd,
+          sourceId: fundingSourceId(input.idempotencyKey),
+          reasonCode: FUNDING_REASON_CODE,
+          proposedBy: {
+            principalId: input.actor.userId,
+            entitlement: input.actor.entitlement,
+            at: new Date().toISOString()
+          }
+        },
+        {
+          workspaceId: input.globeWorkspaceId,
+          idempotencyKey: input.idempotencyKey,
+          correlationId
+        }
+      ),
+    'propose'
+  )
+
+  const outcome = (envelope as { outcome?: unknown }).outcome
+
+  if (!outcome || typeof outcome !== 'object') {
+    throw new GlobeCreditFundingBrokerError('rejected_by_globe')
+  }
+
+  const value = outcome as Record<string, unknown>
+
+  if (
+    value.status === 'already_funded' &&
+    typeof value.effectiveAvailable === 'number' &&
+    typeof value.asOf === 'string' &&
+    value.operation
+  ) {
+    return {
+      status: 'already_funded',
+      effectiveAvailable: value.effectiveAvailable,
+      asOf: value.asOf,
+      operation: parseGlobeCreditFundingOperation(value.operation)
+    }
+  }
+
+  if (value.status !== 'proposed' || !value.proposal || typeof value.proposal !== 'object') {
+    throw new GlobeCreditFundingBrokerError('rejected_by_globe')
+  }
+
+  const proposal = value.proposal as Record<string, unknown>
+
+  if (typeof proposal.proposalId !== 'string' || typeof proposal.fingerprint !== 'string') {
+    throw new GlobeCreditFundingBrokerError('rejected_by_globe')
+  }
+
+  try {
+    await recordIntent({
+      globeWorkspaceId: input.globeWorkspaceId,
+      proposalId: proposal.proposalId,
+      phase: 'proposed',
+      actor: input.actor,
+      planFingerprint: proposal.fingerprint,
+      plan: proposal.plan,
+      correlationId,
+      idempotencyKey: input.idempotencyKey,
+      authority: input.authority
+    })
+  } catch (error) {
+    if (!(error instanceof GlobeCreditFundingBrokerError) || error.code !== 'already_recorded') throw error
+    const replay = await readProposedIntent(input.globeWorkspaceId, proposal.proposalId)
+
+    if (
+      !replay ||
+      replay.planFingerprint !== proposal.fingerprint ||
+      replay.authorityId !== input.authority.authorityId ||
+      replay.authorityExecutionId !== input.authority.executionId
+    )
+      throw error
+  }
+
+  return {
+    status: 'proposed',
+    proposalId: proposal.proposalId,
+    fingerprint: proposal.fingerprint,
+    plan: proposal.plan
+  }
 }
 
 /**
@@ -180,6 +335,16 @@ export async function confirmGlobeCreditFunding(
 
   if (input.fingerprint !== proposed.planFingerprint) {
     throw new GlobeCreditFundingBrokerError('fingerprint_mismatch')
+  }
+
+  if (proposed.authorityId || input.authority) {
+    if (
+      !input.authority ||
+      proposed.authorityId !== input.authority.authorityId ||
+      proposed.authorityExecutionId !== input.authority.executionId
+    ) {
+      throw new GlobeCreditFundingBrokerError('already_recorded')
+    }
   }
 
   let decision = await readConfirmationDecision(input.globeWorkspaceId, input.proposalId)
@@ -209,7 +374,8 @@ export async function confirmGlobeCreditFunding(
         planFingerprint: input.fingerprint,
         plan: proposed.plan,
         correlationId,
-        idempotencyKey: input.idempotencyKey
+        idempotencyKey: input.idempotencyKey,
+        authority: input.authority
       })
     } catch (error) {
       if (!(error instanceof GlobeCreditFundingBrokerError) || error.code !== 'already_recorded') throw error
@@ -275,7 +441,8 @@ export async function confirmGlobeCreditFunding(
       plan: proposed.plan,
       outcome,
       correlationId,
-      idempotencyKey: dispatchIdempotencyKey
+      idempotencyKey: dispatchIdempotencyKey,
+      authority: input.authority
     })
 
     return outcome
@@ -291,7 +458,8 @@ export async function confirmGlobeCreditFunding(
         plan: proposed.plan,
         outcome: { code: 'rejected_by_globe' },
         correlationId,
-        idempotencyKey: dispatchIdempotencyKey
+        idempotencyKey: dispatchIdempotencyKey,
+        authority: input.authority
       })
     }
 
@@ -347,9 +515,24 @@ async function dispatch<T>(operation: () => Promise<T>, phase: 'propose' | 'conf
 async function readProposedIntent(
   globeWorkspaceId: string,
   proposalId: string
-): Promise<Readonly<{ actorUserId: string; planFingerprint: string; plan: unknown }> | undefined> {
-  const rows = await query<{ actor_user_id: string; plan_fingerprint: string; plan: unknown }>(
-    `SELECT actor_user_id, plan_fingerprint, plan
+): Promise<
+  | Readonly<{
+      actorUserId: string
+      planFingerprint: string
+      plan: unknown
+      authorityId: string | null
+      authorityExecutionId: string | null
+    }>
+  | undefined
+> {
+  const rows = await query<{
+    actor_user_id: string
+    plan_fingerprint: string
+    plan: unknown
+    authority_id: string | null
+    authority_execution_id: string | null
+  }>(
+    `SELECT actor_user_id, plan_fingerprint, plan, authority_id, authority_execution_id
        FROM greenhouse_core.globe_credit_funding_intents
       WHERE globe_workspace_id = $1 AND proposal_id = $2 AND phase = 'proposed'
       LIMIT 1`,
@@ -358,7 +541,15 @@ async function readProposedIntent(
 
   const row = rows[0]
 
-  return row ? { actorUserId: row.actor_user_id, planFingerprint: row.plan_fingerprint, plan: row.plan } : undefined
+  return row
+    ? {
+        actorUserId: row.actor_user_id,
+        planFingerprint: row.plan_fingerprint,
+        plan: row.plan,
+        authorityId: row.authority_id,
+        authorityExecutionId: row.authority_execution_id
+      }
+    : undefined
 }
 
 async function readConfirmationDecision(globeWorkspaceId: string, proposalId: string) {
@@ -407,14 +598,16 @@ async function recordIntent(
     plan: unknown
     correlationId: string
     idempotencyKey: string
+    authority?: GlobeCreditFundingAuthorityEvidence
   }>
 ): Promise<void> {
   try {
     await query(
       `INSERT INTO greenhouse_core.globe_credit_funding_intents
          (globe_workspace_id, proposal_id, phase, actor_user_id, actor_entitlement, actor_auth_mode,
-          proposed_by_user_id, plan_fingerprint, plan, correlation_id, idempotency_key)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+          proposed_by_user_id, plan_fingerprint, plan, correlation_id, idempotency_key,
+          authority_id, authority_execution_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
       [
         input.globeWorkspaceId,
         input.proposalId,
@@ -426,7 +619,9 @@ async function recordIntent(
         input.planFingerprint,
         JSON.stringify(input.plan ?? {}),
         input.correlationId,
-        input.idempotencyKey
+        input.idempotencyKey,
+        input.authority?.authorityId ?? null,
+        input.authority?.executionId ?? null
       ]
     )
   } catch (error) {
@@ -443,6 +638,10 @@ async function recordIntent(
 
     if (message.includes('globe_credit_funding_agent_confirmation_forbidden')) {
       throw new GlobeCreditFundingBrokerError('agent_confirmation_forbidden')
+    }
+
+    if (message.includes('globe_credit_funding_agent_one_shot_authority_required')) {
+      throw new GlobeCreditFundingBrokerError('agent_one_shot_authority_required')
     }
 
     if (message.includes('globe_credit_funding_agent_limit_exceeded')) {
@@ -476,6 +675,7 @@ async function recordTerminalIntent(
     outcome: unknown
     correlationId: string
     idempotencyKey: string
+    authority?: GlobeCreditFundingAuthorityEvidence
   }>
 ) {
   try {

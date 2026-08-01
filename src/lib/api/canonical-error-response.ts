@@ -79,6 +79,7 @@ export type CanonicalErrorCode =
   | 'globe_funding_proposal_not_found'
   | 'globe_funding_confirmer_is_proposer'
   | 'globe_funding_agent_confirmation_forbidden'
+  | 'globe_funding_agent_one_shot_authority_required'
   | 'globe_funding_agent_limit_exceeded'
   | 'globe_funding_already_recorded'
   | 'globe_unavailable'
@@ -325,12 +326,17 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   },
   globe_funding_confirmer_is_proposer: {
     status: 409,
-    message: 'No puedes confirmar un fondeo que propusiste. Pídele a otra persona con autorización que lo confirme.',
+    message: 'La política de este workspace o monto exige que otra persona autorizada confirme el fondeo.',
     actionable: false
   },
   globe_funding_agent_confirmation_forbidden: {
     status: 403,
     message: 'La política de este workspace no permite que una sesión de agente confirme el fondeo.',
+    actionable: false
+  },
+  globe_funding_agent_one_shot_authority_required: {
+    status: 403,
+    message: 'El agente necesita una autorización one-shot vigente y emitida para esta operación exacta.',
     actionable: false
   },
   globe_funding_agent_limit_exceeded: {

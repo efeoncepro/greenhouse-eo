@@ -1520,6 +1520,24 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['execute'] as const,
     defaultScope: 'all'
   },
+  {
+    key: 'platform.globe_credit_funding.ensure',
+    module: 'platform',
+    actions: ['execute'] as const,
+    defaultScope: 'all'
+  },
+  {
+    key: 'platform.globe_credit_funding.authority.issue',
+    module: 'platform',
+    actions: ['execute'] as const,
+    defaultScope: 'all'
+  },
+  {
+    key: 'platform.globe_credit_funding.authority.revoke',
+    module: 'platform',
+    actions: ['execute'] as const,
+    defaultScope: 'all'
+  },
   // TASK-850 — Production Preflight CLI: 3 sub-capabilities granulares.
   // Mismo patron least-privilege que TASK-848 — NO reusar `platform.release.execute`
   // (preflight es validation read-mostly; execute es write-mostly de release).

@@ -35,6 +35,19 @@ describe('Globe credit funding operation projection', () => {
     expect(parsed.nextCursor).toBe('opaque')
   })
 
+  it('accepts a cap-only no-effect plan without inventing a funding pool', () => {
+    const parsed = parseGlobeCreditFundingOperation({
+      ...operation,
+      state: 'completed',
+      plan: { ...operation.plan, poolId: undefined, grantCredits: 0 },
+      receipt: { schemaVersion: '1', outcome: 'no_effect', reasonCode: 'confirmed_no_effect' }
+    })
+
+    expect(parsed.plan).not.toHaveProperty('poolId')
+    expect(parsed.plan.grantCredits).toBe(0)
+    expect(parsed.receipt?.outcome).toBe('no_effect')
+  })
+
   it('fails closed on unknown states and outcomes', () => {
     expect(() => parseGlobeCreditFundingOperation({ ...operation, state: 'surprise' }))
       .toThrow(GlobeCreditFundingOperationError)

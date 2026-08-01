@@ -33,6 +33,12 @@ export type AppPlatformRequestContext = {
   oauthCapabilities: readonly string[]
   oauthWorkspaceBindings: readonly GlobeOAuthWorkspaceBindingV1[]
   oauthSessionAuthMode?: string | null
+  /** OAuth client that minted the bearer; null outside the sister-platform OAuth lane. */
+  oauthClientId?: string | null
+  /** Durable bearer identity for provenance/revocation evidence; never the raw token. */
+  oauthAccessTokenId?: string | null
+  /** Correlation preserved from token issuance/userinfo for downstream evidence. */
+  oauthCorrelationId?: string | null
   rateLimit: ApiPlatformRateLimit
 }
 
@@ -117,7 +123,10 @@ const resolveAppTenantContext = async (request: Request) => {
         appSessionId: payload.sid,
         authSource: 'first_party_app' as const,
         oauthCapabilities: [] as readonly string[],
-        oauthWorkspaceBindings: [] as readonly GlobeOAuthWorkspaceBindingV1[]
+        oauthWorkspaceBindings: [] as readonly GlobeOAuthWorkspaceBindingV1[],
+        oauthClientId: null,
+        oauthAccessTokenId: null,
+        oauthCorrelationId: null
       }
     } catch (appTokenError) {
       try {
@@ -142,7 +151,10 @@ const resolveAppTenantContext = async (request: Request) => {
           authSource: 'sister_platform_oauth' as const,
           oauthCapabilities: oauth.identity.capabilities,
           oauthWorkspaceBindings: oauth.identity.workspaceBindings ?? [],
-          oauthSessionAuthMode: oauth.identity.authMode
+          oauthSessionAuthMode: oauth.identity.authMode,
+          oauthClientId: oauth.client.clientId,
+          oauthAccessTokenId: oauth.accessTokenId,
+          oauthCorrelationId: oauth.correlationId
         }
       } catch (oauthError) {
         if (oauthError instanceof SisterPlatformOAuthError) {
@@ -176,7 +188,10 @@ const resolveAppTenantContext = async (request: Request) => {
     appSessionId: null,
     authSource: 'cookie_session' as const,
     oauthCapabilities: [] as readonly string[],
-    oauthWorkspaceBindings: [] as readonly GlobeOAuthWorkspaceBindingV1[]
+    oauthWorkspaceBindings: [] as readonly GlobeOAuthWorkspaceBindingV1[],
+    oauthClientId: null,
+    oauthAccessTokenId: null,
+    oauthCorrelationId: null
   }
 }
 
@@ -317,6 +332,9 @@ export const runAppRoute = async <T>({
       oauthCapabilities: appContext.oauthCapabilities,
       oauthWorkspaceBindings: appContext.oauthWorkspaceBindings,
       oauthSessionAuthMode: appContext.oauthSessionAuthMode,
+      oauthClientId: appContext.oauthClientId,
+      oauthAccessTokenId: appContext.oauthAccessTokenId,
+      oauthCorrelationId: appContext.oauthCorrelationId,
       rateLimit
     })
 

@@ -17,11 +17,11 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `PR #176 integrado; base OAuth/API/CLI viva; autoridad one-shot y adapters one-command/readback pendientes`
+- Status real: `Base OAuth/API/CLI viva; status/readback/reconcile code-complete local; autoridad one-shot + ensure end-to-end en implementación local; rollout pendiente`
 - Rank: `next.4`
 - Domain: `platform|identity|finance|globe`
-- Blocked by: `TASK-1482, TASK-1586`
-- Branch: `none — base integrada por PR #176; crear branch TASK-1629 sólo al retomar el delta pendiente`
+- Blocked by: `none`
+- Branch: `Greenhouse en develop; Globe en main (trabajo + default/release); sin worktrees ni ramas aisladas`
 - Legacy ID: `TASK-1616` (etiqueta histórica de la rama; colisionó y fue reasignada a MiniMax H3)
 - GitHub Issue: `none`
 
@@ -123,6 +123,21 @@ ownership operativo vigente de ese trabajo es `TASK-1629`.
 
 ## Current Repo State
 
+### Checkpoint 2026-08-01 — continuidad y topología Git
+
+- Greenhouse se implementa en el checkout compartido `develop`.
+- Globe se implementa directamente en el checkout compartido `main`; `origin/HEAD` y la rama predeterminada/release
+  también permanecen en `main`. Esta es una excepción explícita a la convención `develop` de Greenhouse.
+- No se crean ni usan worktrees aislados. No hay push, deploy ni release autorizado como cierre automático.
+- Commits locales ya preservados: Globe `85570bf` (status/recovery), `341f8da` (atribución de usuario
+  autenticado); Greenhouse `1d3a871cd` (API status/recovery).
+- Delta actual: planner `ensure-funded` en Globe preservado en el commit local `a35121f`; autoridad CEO one-shot, evidencia OAuth completa,
+  API/CLI `ensure`, lifecycle recuperable y migración aditiva en Greenhouse.
+- Auditoría P0/P1 del 2026-08-01 corregida: el PKCE de Chrome conserva el modo humano real y puede ejecutar una
+  autoridad ligada exactamente al mismo usuario/client/mode; `agent` sólo se acepta con identidad agente real. El
+  lease usa CAS por owner + generación + vigencia, y el trigger exige el mismo fingerprint en proposal, execution
+  e intent confirmado.
+
 ### Already exists
 
 - TASK-1566 entregó commands, broker Greenhouse, rutas NextAuth y transacción única.
@@ -132,22 +147,12 @@ ownership operativo vigente de ese trabajo es `TASK-1629`.
 - PR `#176` agregó el cliente público, routes API Platform, CLI first-party, provenance de auth mode, policy
   agente por workspace y reanudación con la idempotency key original.
 
-### Gap
+### Gap vigente
 
-- El source of truth OAuth PKCE/API Platform/CLI fue integrado por PR `#176`; la rama histórica
-  `codex/TASK-1616-globe-admin-cli-pkce` no se integra completa ni se renombran migraciones aplicadas.
-- Sólo existen adapters `propose`/`confirm`; faltan adapters API Platform/CLI sobre el status/list/get/reconcile
-  que entregará TASK-1586 para resolver outcomes ambiguos y operar propuestas stale individualmente.
-- El CLI todavía expone plomería de pool/período y dos idempotency keys; falta la fachada `ensure-funded` con una
-  operation key y resolución server-side del ciclo.
-- La delegación persistente acota grant/tope, pero aún falta modelar la instrucción one-shot del CEO con período,
-  target, vigencia, fingerprint y receipt, coordinada por TASK-1630.
-- El contrato Globe todavía llama `HumanAttributionV1`/`assertHumanAttribution` a un guard que en realidad rechaza
-  service principals y acepta usuarios agentes ya autorizados por Greenhouse; el nombre/comentarios deben converger.
-- Greenhouse ya aplica en DB que `confirmante != proponente` depende de `requireSecondConfirmer`, pero comentarios y
-  copy de error en `entitlements-catalog.ts`, `entitlements/runtime.ts`, `credit-administration-broker.ts`, la route
-  admin, API Platform y `canonical-error-response.ts` todavía la presentan como invariante universal; TASK-1629
-  debe alinearlos sin borrar el error condicional que sigue siendo válido cuando la policy está activa.
+- Código local completo para `status/preview/ensure/list/get/reconcile`, autoridad one-shot y recuperación; falta
+  aplicar migración, seed OAuth, deploy y prueba real en staging.
+- Falta la UI administrativa de TASK-1483 y el self-view de Producer de TASK-1628.
+- Falta reauditoría final, gates de cierre, manual con evidencia runtime y promoción gobernada posterior.
 
 ## Modular Placement Contract
 
@@ -350,13 +355,15 @@ Sin flag global: el cliente OAuth no existe hasta registrarlo y puede suspenders
 - [x] CLI completa PKCE y fondeo sin cookies/passwords/secrets persistidos.
 - [x] Fondeo real staging conserva identidad + auth mode y tiene readback correlacionado.
 - [x] Tests y evidencia de la base integrada quedaron asociados a PR `#176`/TASK-1566.
-- [ ] API Platform y CLI adaptan `status/list/get/reconcile` de TASK-1586 sin duplicar lifecycle ni errores crudos.
-- [ ] El CLI ofrece `status`, `preview`, `ensure` y `operations reconcile` usando una sola operation key visible.
-- [ ] Una instrucción one-shot atribuida del CEO puede autorizar al mismo usuario agente para proponer y confirmar
-  cuando `requireSecondConfirmer` está OFF; una policy que lo active sigue exigiendo actor distinto.
-- [ ] Los comentarios, errores y manuales dejan de presentar `confirmante ≠ proponente` como invariante universal.
-- [ ] El contrato y guard de Globe describen “usuario autenticado” y no “humano”; principals de servicio siguen
+- [x] API Platform y CLI adaptan `status/list/get/reconcile` de TASK-1586 sin duplicar lifecycle ni errores crudos.
+- [x] El CLI ofrece `status`, `preview`, `ensure` y `operations reconcile` usando una sola operation key visible.
+- [x] Una instrucción one-shot atribuida del CEO liga exactamente usuario, OAuth client, modo, período, objetivo y
+  techos; esa autoridad exacta sustituye el segundo actor para esa sola ejecución. Fuera de ella, la policy manual
+  conserva su maker-checker configurado.
+- [x] Los comentarios, errores y manuales dejan de presentar `confirmante ≠ proponente` como invariante universal.
+- [x] El contrato y guard de Globe describen “usuario autenticado” y no “humano”; principals de servicio siguen
   fallando cerrados y la evidencia conserva `actor_auth_mode`.
+- [ ] Migración, seed OAuth, deploy y smoke PKCE con Chrome autenticado prueban el carril en staging.
 
 ## Follow-ups
 

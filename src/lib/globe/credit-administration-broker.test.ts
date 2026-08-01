@@ -14,13 +14,66 @@ vi.mock('./client', () => ({
   }))
 }))
 
-const { confirmGlobeCreditFunding, proposeGlobeCreditFunding } = await import('./credit-administration-broker')
+const { confirmGlobeCreditFunding, ensureGlobeCreditFundingPlan, proposeGlobeCreditFunding } =
+  await import('./credit-administration-broker')
 
 beforeEach(() => {
   vi.clearAllMocks()
 })
 
 describe('Globe delegated agent funding evidence', () => {
+  it('preserves Globe durable no-effect operation evidence for an already-funded ensure', async () => {
+    mocks.dispatchCommand.mockResolvedValue({
+      outcome: {
+        schemaVersion: '1',
+        status: 'already_funded',
+        effectiveAvailable: 900,
+        asOf: '2026-08-01T00:01:00.000Z',
+        operation: {
+          schemaVersion: '1',
+          operationId: 'operation-no-effect-1',
+          proposalId: 'operation-no-effect-1',
+          state: 'completed',
+          plan: {
+            schemaVersion: '1',
+            grantCredits: 0,
+            monthlyCapBefore: 1200,
+            spentInPeriod: 300,
+            policyAvailableBefore: 900,
+            policyAvailableAfter: 900,
+            periodStart: '2026-08-01T00:00:00.000Z',
+            periodEnd: '2026-09-01T00:00:00.000Z'
+          },
+          receipt: { schemaVersion: '1', outcome: 'no_effect', reasonCode: 'confirmed_no_effect' },
+          expiresAt: '2026-08-01T00:11:00.000Z',
+          createdAt: '2026-08-01T00:01:00.000Z',
+          updatedAt: '2026-08-01T00:01:00.000Z'
+        }
+      }
+    })
+
+    const result = await ensureGlobeCreditFundingPlan({
+      globeWorkspaceId: 'greenhouse-org:efeonce',
+      targetAvailableCredits: 800,
+      maxGrantCredits: 500,
+      maxResultingCapCredits: 1500,
+      periodStart: '2026-08-01T00:00:00.000Z',
+      periodEnd: '2026-09-01T00:00:00.000Z',
+      actor: {
+        userId: 'agent-1',
+        entitlement: 'platform.globe_credit_funding.ensure',
+        authMode: 'agent'
+      },
+      idempotencyKey: 'ensure-key',
+      authority: { authorityId: 'authority-1', executionId: 'execution-1' }
+    })
+
+    expect(result).toMatchObject({
+      status: 'already_funded',
+      operation: { operationId: 'operation-no-effect-1', receipt: { outcome: 'no_effect' } }
+    })
+  })
+
   it('persists authenticated agent provenance with the proposal intent', async () => {
     mocks.dispatchCommand.mockResolvedValue({
       outcome: { proposalId: 'proposal-1', fingerprint: 'fp-1', plan: { grantCredits: 500 } }

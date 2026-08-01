@@ -24,8 +24,8 @@ import {
  * TASK-1566 Slice 5 — `POST /api/admin/globe/credit-funding/confirm`.
  *
  * **Único punto que dispara la mutación en Globe.** Lleva su propia capability porque confirmar es
- * una autoridad distinta de proponer, y la disyunción confirmante ≠ proponente la impone un `CHECK`
- * en `globe_credit_funding_intents` — no esta ruta, y no una convención de payload.
+ * una autoridad distinta de proponer. La separación entre proponente y confirmante es una política
+ * por workspace/techo, no un requisito universal.
  *
  * Un agente autenticado puede confirmar sólo cuando la política delegada del workspace y sus límites
  * lo permiten. La base aplica esa decisión usando la proveniencia firmada de la sesión.
@@ -68,7 +68,7 @@ export const POST = async (request: Request) => {
       proposalId: parsed.proposalId,
       fingerprint: parsed.fingerprint,
       // Igual que en `propose`: la identidad sale de la sesión. Es lo único que hace que la
-      // atribución humana signifique algo del otro lado.
+      // atribución del usuario autenticado signifique algo del otro lado.
       actor: {
         userId: tenant.userId,
         entitlement: 'platform.globe_credit_funding.confirm',

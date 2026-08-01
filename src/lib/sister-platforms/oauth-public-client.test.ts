@@ -1,3 +1,5 @@
+import { readFile } from 'node:fs/promises'
+
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { SisterPlatformOAuthPolicyV1 } from './oauth-policy'
@@ -111,6 +113,18 @@ describe('public OAuth client RFC 8252 loopback behavior', () => {
 })
 
 describe('public OAuth client authentication', () => {
+  it('projects client type and session policy during userinfo revalidation', async () => {
+    const source = await readFile(new URL('./oauth-broker.ts', import.meta.url), 'utf8')
+
+    const userinfo = source.slice(
+      source.indexOf('export const resolveSisterPlatformOAuthUserinfo'),
+      source.indexOf('export type RevokeSisterPlatformOAuthTokensInput')
+    )
+
+    expect(userinfo).toContain('oauth.client_type')
+    expect(userinfo).toContain('oauth.require_human_session')
+  })
+
   it('does not consult consumer token hashes and rejects a supplied secret', async () => {
     const client = {
       oauthClientId: CLIENT_ROW.oauth_client_id,

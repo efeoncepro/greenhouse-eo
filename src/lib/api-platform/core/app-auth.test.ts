@@ -75,6 +75,9 @@ describe('API Platform app bearer authentication', () => {
   it('accepts a revalidated sister-platform OAuth token and exposes only its capabilities', async () => {
     mocks.decodeAppAccessToken.mockRejectedValue(new Error('not_first_party_app_token'))
     mocks.resolveOAuthUserinfo.mockResolvedValue({
+      client: { clientId: 'greenhouse-admin-cli' },
+      accessTokenId: 'spoauth-token-1',
+      correlationId: 'oauth-correlation-1',
       identity: {
         sub: 'greenhouse:user:human-1',
         capabilities: ['globe.credits.funding.propose', 'globe.credits.funding.confirm'],
@@ -93,7 +96,10 @@ describe('API Platform app bearer authentication', () => {
           authSource: context.authSource,
           appSessionId: context.appSessionId,
           capabilities: context.oauthCapabilities,
-          authMode: context.oauthSessionAuthMode
+          authMode: context.oauthSessionAuthMode,
+          oauthClientId: context.oauthClientId,
+          oauthAccessTokenId: context.oauthAccessTokenId,
+          oauthCorrelationId: context.oauthCorrelationId
         }
       })
     })
@@ -104,7 +110,10 @@ describe('API Platform app bearer authentication', () => {
         authSource: 'sister_platform_oauth',
         appSessionId: null,
         capabilities: ['globe.credits.funding.propose', 'globe.credits.funding.confirm'],
-        authMode: 'both'
+        authMode: 'both',
+        oauthClientId: 'greenhouse-admin-cli',
+        oauthAccessTokenId: 'spoauth-token-1',
+        oauthCorrelationId: 'oauth-correlation-1'
       }
     })
     expect(mocks.getTenantAccessRecordByUserId).toHaveBeenCalledWith('human-1')
@@ -119,12 +128,26 @@ describe('API Platform app bearer authentication', () => {
         headers: { authorization: 'Bearer app-token' }
       }),
       routeKey: 'platform.app.test',
-      handler: async context => ({ data: { authSource: context.authSource, appSessionId: context.appSessionId } })
+      handler: async context => ({
+        data: {
+          authSource: context.authSource,
+          appSessionId: context.appSessionId,
+          oauthClientId: context.oauthClientId,
+          oauthAccessTokenId: context.oauthAccessTokenId,
+          oauthCorrelationId: context.oauthCorrelationId
+        }
+      })
     })
 
     expect(response.status).toBe(200)
     expect(await response.json()).toMatchObject({
-      data: { authSource: 'first_party_app', appSessionId: 'app-session-1' }
+      data: {
+        authSource: 'first_party_app',
+        appSessionId: 'app-session-1',
+        oauthClientId: null,
+        oauthAccessTokenId: null,
+        oauthCorrelationId: null
+      }
     })
     expect(mocks.resolveOAuthUserinfo).not.toHaveBeenCalled()
   })

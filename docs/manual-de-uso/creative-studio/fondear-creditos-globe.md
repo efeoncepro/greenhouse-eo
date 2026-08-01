@@ -1,7 +1,7 @@
-# Manual — Fondear los créditos de Globe por el carril gobernado (propose → confirm)
+# Manual — Fondear los créditos de Globe por el carril gobernado
 
 > **Tipo de documento:** Manual de uso / runbook (orientado al operador)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-07-26 por Claude (TASK-1566)
 > **Ultima actualizacion:** 2026-08-01 por Codex (TASK-1630)
 > **Documentacion tecnica:** [ADR-015](../../architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md) · [TASK-1566](../../tasks/complete/TASK-1566-globe-governed-credit-funding-command.md)
@@ -18,6 +18,10 @@ Ejercido end-to-end por primera vez el 2026-07-26: `confirm` en 905 ms, grant +1
 atribuido al operador real. Este manual documenta ese camino verificado, con las dos correcciones de
 runbook que salieron de medirlo.
 
+> **Estado 2026-08-01:** `status`, `preview`, `list/get/reconcile` y el flujo one-shot `ensure` están
+> code-complete en los checkouts compartidos: Greenhouse en `develop` y Globe directamente en `main`, que también
+> es su rama predeterminada/release. Todavía requieren migración, seed OAuth y deploy antes de usarse en staging.
+
 ## Antes de empezar
 
 - **Las dos capas de crédito NO son lo mismo.** El **ledger** (`credits.allocate`) es la caja; la
@@ -26,19 +30,63 @@ runbook que salieron de medirlo.
 - **Un fondeo útil casi siempre sube `monthlyCap`.** Si el tope vigente es lo que restringe (caso
   típico), un grant sin `monthlyCap` deja `policyAvailableAfter` igual o menor que antes. El plan lo
   dice antes de confirmar; léelo.
-- **Quién hace qué hoy:** un usuario humano puede confirmar con sus entitlements; un usuario agente puede hacerlo
-  únicamente mediante la delegación persistente ya materializada para el workspace y dentro de sus límites. La
-  autoridad one-shot por instrucción del CEO está aprobada, pero todavía no está implementada. Un workload, API
-  key o principal de servicio genérico nunca confirma.
+- **Quién hace qué:** una persona autenticada puede usar el carril manual con sus entitlements. El carril one-shot
+  liga exactamente usuario, modo de autenticación y OAuth client: funciona con la sesión humana real de Chrome y
+  también con `agent` cuando existe una identidad agente autenticada real. Nunca convierte una sesión humana en
+  agente por parámetro. Un workload, API key o principal de servicio genérico nunca confirma.
 - **Necesitas:** una sesión autenticada en Google Chrome para completar OAuth, los scopes
-  `globe.credits.funding.propose` y `globe.credits.funding.confirm`, los entitlements de
+  `globe.credits.funding.propose`, `confirm`, `read`, `reconcile` y `ensure`, los entitlements de
   administración de créditos, el `poolId` vigente (ver
   [`GLOBE_RUNTIME_HANDOFF.md`](../../operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md)), y que
   `GLOBE_CREDIT_ADMIN_LANE_ENABLED=true` esté en la revisión activa de `globe-api-internal`.
 - **La propuesta vence en 15 minutos.** Se confirma sobre el estado que se vio; si venció, se
   propone de nuevo.
 
-## Paso a paso
+## Camino recomendado: instrucción CEO → ensure one-shot
+
+Este camino evita que el agente calcule `poolId`, grant o tope. El CEO emite una autoridad con objetivo y techos;
+Globe lee su estado real, deriva el delta y devuelve `no_effect` si el sistema ya tenía fondos suficientes.
+
+1. Desde una sesión humana autenticada del CEO, emitir `POST
+   /api/admin/globe/credits/funding/authorities` con un cuerpo como éste:
+
+```json
+{
+  "globeWorkspaceId": "greenhouse-org:efeonce",
+  "periodKey": "2026-08",
+  "periodStart": "2026-08-01T00:00:00.000Z",
+  "periodEnd": "2026-09-01T00:00:00.000Z",
+  "targetAvailableCredits": 800,
+  "maxGrantCredits": 500,
+  "maxResultingCapCredits": 1500,
+  "executorOauthClientId": "greenhouse-admin-cli",
+  "evidenceRef": "instruction:TASK-1629"
+}
+```
+
+Usa `Idempotency-Key: globe-funding-2026-08-evaluation` en ese request. El servidor la conserva como
+`operationKey`; repetir el mismo request devuelve la misma autoridad incluso después de un timeout. Si omites
+`executorUserId` y `executorAuthMode`, la autoridad queda ligada al mismo usuario y modo autenticado que la emitió;
+éste es el camino correcto para ejecutar el CLI mediante la sesión Chrome de `jreyes@efeonce.cl`. Para una identidad
+agente real, envía ambos campos explícitamente y usa `executorAuthMode: "agent"`.
+
+2. Entregar únicamente el `authorityId` al agente. El agente ejecuta:
+
+```bash
+GREENHOUSE_API_BASE_URL=https://dev-greenhouse.efeoncepro.com \
+GLOBE_ADMIN_OAUTH_CLIENT_ID=greenhouse-admin-cli \
+pnpm tsx scripts/globe-credit-funding.ts ensure --authority-id <authority-id>
+```
+
+3. El resultado devuelve el mismo `authorityId`, un `executionId`, `outcome` (`completed`, `no_effect` u
+   `outcome_unknown`) y, cuando existe, el `operationId` autoritativo de Globe. Para un timeout, vuelve a ejecutar
+   el mismo comando: reclama la misma ejecución y lee/reconcilia antes de cualquier redispatch.
+
+4. Antes de reclamarla, el CEO puede revocar la autoridad con `POST
+   /api/admin/globe/credits/funding/authorities/<authorityId>/revoke`. Una vez reclamada, no se libera ni se
+   reemplaza: se recupera con la misma ejecución e idempotency keys derivadas.
+
+## Camino manual compatible: propose → confirm
 
 ### 1. Ejecutar el cliente OAuth gobernado
 
@@ -60,10 +108,8 @@ Sin `--yes true`, el CLI muestra el plan y pide confirmación interactiva. `--ye
 un agente sólo cuando la autoridad/delegación ya existe en el runtime; la instrucción textual del operador no
 omite ninguna verificación server-side.
 
-> **Estado de convergencia:** este comando es el carril V1 recuperado por TASK-1629. Todavía exige `poolId` y dos
-> claves de idempotencia; no ofrece `status/list/reconcile` ni asegura por sí solo el pool del período. TASK-1630
-> ordena corregir primero la verdad de período/enforcement (TASK-1482) y luego entregar one-command/readback. No
-> tratar este comando crudo como la experiencia final.
+Este comando sigue disponible para una persona autorizada y para diagnóstico controlado. Para agentes, usa
+`ensure --authority-id`: el gate one-shot impide que el carril crudo se convierta en delegación permanente.
 
 ### 2. Revisar el plan — éste es el punto entero del carril
 
@@ -86,13 +132,22 @@ tope) y `allocationEntryId`. Todo ocurre en **una** transacción: grant + asient
 
 ### 4. Verificar
 
-El carril V1 todavía no tiene status/readback canónico de operador. Hasta que TASK-1586/TASK-1629 lo entreguen,
-las consultas directas siguientes son **diagnóstico privilegiado transitorio** para un operador autorizado, no el
-happy path, no una API de producto y no autorización para editar tablas:
+Tras el deploy de TASK-1586/TASK-1629, usa los comandos canónicos:
+
+```bash
+pnpm tsx scripts/globe-credit-funding.ts status --workspace-id greenhouse-org:efeonce --requested-credits 1
+pnpm tsx scripts/globe-credit-funding.ts operations list --workspace-id greenhouse-org:efeonce --limit 25
+pnpm tsx scripts/globe-credit-funding.ts operations get --workspace-id greenhouse-org:efeonce --operation-id <id>
+pnpm tsx scripts/globe-credit-funding.ts operations reconcile --workspace-id greenhouse-org:efeonce \
+  --operation-id <id> --idempotency-key <clave-estable>
+```
+
+Antes del deploy, las consultas directas siguientes siguen siendo sólo **diagnóstico privilegiado transitorio**:
 
 1. **Intents** (Greenhouse PG): `SELECT phase, actor_user_id FROM
    greenhouse_core.globe_credit_funding_intents ORDER BY created_at DESC LIMIT 2` → `proposed` +
-   `confirmed` con el user id real y `actor_auth_mode` (`human` o `agent`).
+   `confirmed` con el user id real y `actor_auth_mode` (`credentials`, `both`, `microsoft_sso`, `google_sso` o
+   `agent`).
 2. **Globe PG**: grant `posted`, política nueva `active` (la anterior `superseded`), asiento
    `allocation` con los créditos.
 
@@ -130,7 +185,8 @@ target de TASK-1586/TASK-1628 y todavía no está live.
 | `422 globe_funding_rejected` | Globe rechazó el payload (4xx real, no un problema de red) | Leer `code`; no reintentar igual |
 | `503 globe_unavailable` | El puente falló (red/WIF); si ocurrió durante confirm, el outcome puede ser desconocido | No repetir confirm a ciegas. Hoy: escalar a diagnóstico privilegiado. Target: TASK-1586 entrega lifecycle/readback/reconcile y TASK-1629 sus adapters CLI/API |
 | `401` | Sin sesión válida | Renovar sesión del portal |
-| `403 agent_confirmation_forbidden` | El usuario agente no tiene delegación activa para ese workspace | Habilitar la política gobernada; no usar una identidad humana como bypass |
+| `403 agent_confirmation_forbidden` | El usuario agente no tiene delegación persistente activa para ese workspace | Revisar la política gobernada; no usar una identidad humana como bypass |
+| `403 agent_one_shot_authority_required` | Falta una autoridad vigente, exacta o ligada al mismo agente/OAuth client | Emitir una autoridad nueva desde la sesión del CEO; no reutilizar otra |
 | `422 agent_funding_limit_exceeded` | El grant o el tope mensual excede la delegación del agente | Reducir el acto o elevar la política mediante el dueño del workspace |
 | `400 invalid_request` en propose | Tope < gastado, período inválido, o payload incompleto | Corregir el plan |
 | Plan con `currentDenialReason: pool_exhausted` | Los grants activos no cubren lo pedido | El plan igual se puede confirmar; la razón es el estado VIGENTE, no el resultante |

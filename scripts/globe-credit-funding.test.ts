@@ -4,6 +4,11 @@ import {
   buildAuthorizationUrl,
   buildPkceChallenge,
   createPkceVerifier,
+  runCreditCapacityStatus,
+  runCreditFundingOperationGet,
+  runCreditFundingOperationReconcile,
+  runCreditFundingOperationsList,
+  runOneShotCreditFundingEnsure,
   runFundingFlow,
   validateFundingInput
 } from './globe-credit-funding'
@@ -161,4 +166,147 @@ describe('Globe credit funding CLI', () => {
 
     expect(openBrowser).not.toHaveBeenCalled()
   })
+
+  it('adapts status and preview through OAuth bearer requests without an idempotency key', async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify({ access_token: 'status-token' }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ data: { status: { state: 'ready' } } }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ access_token: 'preview-token' }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ data: { preview: { state: 'limited' } } }), { status: 200 }))
+
+    const config = cliConfig(fetchImpl)
+
+    await runCreditCapacityStatus({
+      config,
+      input: { globeWorkspaceId: 'greenhouse-org:efeonce', requestedCredits: 25 }
+    })
+    await runCreditCapacityStatus({
+      config,
+      input: { globeWorkspaceId: 'greenhouse-org:efeonce', requestedCredits: 50 },
+      preview: true
+    })
+
+    expect(fetchImpl.mock.calls[1]?.[0]).toBe(
+      'https://greenhouse.example.test/api/platform/app/globe/credit-funding/status?globeWorkspaceId=greenhouse-org%3Aefeonce&requestedCredits=25'
+    )
+    expect(fetchImpl.mock.calls[1]?.[1]).toEqual(
+      expect.objectContaining({
+        method: 'GET',
+        headers: expect.objectContaining({ authorization: 'Bearer status-token' })
+      })
+    )
+    expect(fetchImpl.mock.calls[1]?.[1]?.headers).not.toEqual(
+      expect.objectContaining({ 'idempotency-key': expect.anything() })
+    )
+    expect(fetchImpl.mock.calls[3]?.[0]).toBe(
+      'https://greenhouse.example.test/api/platform/app/globe/credit-funding/preview'
+    )
+    expect(fetchImpl.mock.calls[3]?.[1]).toEqual(
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ globeWorkspaceId: 'greenhouse-org:efeonce', requestedCredits: 50 })
+      })
+    )
+  })
+
+  it('adapts operation list and reconcile with encoded filters and command idempotency', async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify({ access_token: 'list-token' }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ data: { operations: { items: [] } } }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ access_token: 'get-token' }), { status: 200 }))
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ data: { operation: { operationId: 'op/1' } } }), { status: 200 })
+      )
+      .mockResolvedValueOnce(new Response(JSON.stringify({ access_token: 'reconcile-token' }), { status: 200 }))
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ data: { operation: { operationId: 'op/1' } } }), { status: 200 })
+      )
+
+    const config = cliConfig(fetchImpl)
+
+    await runCreditFundingOperationsList({
+      config,
+      globeWorkspaceId: 'greenhouse-org:efeonce',
+      limit: 20,
+      state: 'outcome_unknown',
+      cursor: 'cursor value'
+    })
+    await runCreditFundingOperationGet({
+      config,
+      globeWorkspaceId: 'greenhouse-org:efeonce',
+      operationId: 'op/1'
+    })
+    await runCreditFundingOperationReconcile({
+      config,
+      globeWorkspaceId: 'greenhouse-org:efeonce',
+      operationId: 'op/1',
+      idempotencyKey: 'reconcile-key'
+    })
+
+    expect(fetchImpl.mock.calls[1]?.[0]).toBe(
+      'https://greenhouse.example.test/api/platform/app/globe/credit-funding/operations?globeWorkspaceId=greenhouse-org%3Aefeonce&limit=20&state=outcome_unknown&cursor=cursor+value'
+    )
+    expect(fetchImpl.mock.calls[3]?.[0]).toBe(
+      'https://greenhouse.example.test/api/platform/app/globe/credit-funding/operations/op%2F1?globeWorkspaceId=greenhouse-org%3Aefeonce'
+    )
+    expect(fetchImpl.mock.calls[5]?.[0]).toBe(
+      'https://greenhouse.example.test/api/platform/app/globe/credit-funding/operations/op%2F1/reconcile'
+    )
+    expect(fetchImpl.mock.calls[5]?.[1]).toEqual(
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({
+          authorization: 'Bearer reconcile-token',
+          'idempotency-key': 'reconcile-key'
+        }),
+        body: JSON.stringify({ globeWorkspaceId: 'greenhouse-org:efeonce' })
+      })
+    )
+  })
+
+  it('executes one-shot ensure with only the opaque authority id', async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify({ access_token: 'ensure-token' }), { status: 200 }))
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            data: { funding: { authorityId: 'authority-1', outcome: 'completed' } }
+          }),
+          { status: 200 }
+        )
+      )
+
+    await runOneShotCreditFundingEnsure({ config: cliConfig(fetchImpl), authorityId: 'authority-1' })
+
+    expect(fetchImpl.mock.calls[1]?.[0]).toBe(
+      'https://greenhouse.example.test/api/platform/app/globe/credit-funding/ensure'
+    )
+    expect(fetchImpl.mock.calls[1]?.[1]).toEqual(
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({ authorization: 'Bearer ensure-token' }),
+        body: JSON.stringify({ authorityId: 'authority-1' })
+      })
+    )
+  })
+})
+
+const cliConfig = (fetchImpl: ReturnType<typeof vi.fn>) => ({
+  apiBaseUrl: 'https://greenhouse.example.test',
+  clientId: 'public-cli',
+  scope: 'openid globe.credits.funding.read globe.credits.funding.reconcile',
+  authorizeUrl: 'https://greenhouse.example.test/authorize',
+  tokenUrl: 'https://greenhouse.example.test/token',
+  openBrowser: vi.fn(async (url: string) => {
+    const parsed = new URL(url)
+    const callback = parsed.searchParams.get('redirect_uri')
+
+    if (!callback) throw new Error('missing_callback')
+    await fetch(`${callback}?code=test-code&state=${parsed.searchParams.get('state')}`)
+  }),
+  fetchImpl: fetchImpl as unknown as typeof fetch,
+  timeoutMs: 1000
 })

@@ -23,7 +23,7 @@ export type CreditFundingProposal = Readonly<{
   plan: Record<string, unknown>
 }>
 
-type CliConfig = Readonly<{
+export type CliConfig = Readonly<{
   apiBaseUrl: string
   clientId: string
   scope: string
@@ -35,7 +35,17 @@ type CliConfig = Readonly<{
   vercelBypassSecret?: string
 }>
 
-const DEFAULT_SCOPE = 'openid profile email globe.credits.funding.propose globe.credits.funding.confirm'
+const DEFAULT_SCOPE = [
+  'openid',
+  'profile',
+  'email',
+  'globe.credits.funding.propose',
+  'globe.credits.funding.confirm',
+  'globe.credits.funding.read',
+  'globe.credits.funding.reconcile',
+  'globe.credits.funding.ensure'
+].join(' ')
+
 const DEFAULT_TIMEOUT_MS = 180_000
 
 const vercelBypassHeaders = (config: CliConfig): Record<string, string> =>
@@ -267,31 +277,33 @@ export const authorizeWithLoopbackPkce = async (config: CliConfig): Promise<stri
   }
 }
 
-const requestFunding = async <T>({
+const requestApi = async <T>({
   config,
   accessToken,
   path,
   idempotencyKey,
-  body
+  body,
+  method = body === undefined ? 'GET' : 'POST'
 }: Readonly<{
   config: CliConfig
   accessToken: string
   path: string
-  idempotencyKey: string
-  body: unknown
+  idempotencyKey?: string
+  body?: unknown
+  method?: 'GET' | 'POST'
 }>): Promise<T> => {
-  if (!idempotencyKey.trim()) throw new Error('idempotency_key_required')
+  if (idempotencyKey !== undefined && !idempotencyKey.trim()) throw new Error('idempotency_key_required')
 
   const response = await config.fetchImpl(`${config.apiBaseUrl}${path}`, {
-    method: 'POST',
+    method,
     headers: {
       authorization: `Bearer ${accessToken}`,
-      'content-type': 'application/json',
-      'idempotency-key': idempotencyKey,
       accept: 'application/json',
+      ...(body === undefined ? {} : { 'content-type': 'application/json' }),
+      ...(idempotencyKey === undefined ? {} : { 'idempotency-key': idempotencyKey }),
       ...vercelBypassHeaders(config)
     },
-    body: JSON.stringify(body)
+    ...(body === undefined ? {} : { body: JSON.stringify(body) })
   })
 
   const payload = (await response.json().catch(() => null)) as { data?: T; errors?: readonly { code?: unknown }[] }
@@ -303,6 +315,113 @@ const requestFunding = async <T>({
   }
 
   return payload.data
+}
+
+const queryString = (values: Readonly<Record<string, string | number | undefined>>) => {
+  const search = new URLSearchParams()
+
+  for (const [key, value] of Object.entries(values)) {
+    if (value !== undefined && String(value).length > 0) search.set(key, String(value))
+  }
+
+  return search.toString()
+}
+
+export type CreditCapacityInput = Readonly<{
+  globeWorkspaceId: string
+  requestedCredits: number
+  projectId?: string
+  capabilityScope?: string
+}>
+
+export const runCreditCapacityStatus = async ({
+  config,
+  input,
+  preview = false
+}: Readonly<{ config: CliConfig; input: CreditCapacityInput; preview?: boolean }>) => {
+  const accessToken = await authorizeWithLoopbackPkce(config)
+
+  if (preview) {
+    return requestApi<{ preview: unknown }>({
+      config,
+      accessToken,
+      path: '/api/platform/app/globe/credit-funding/preview',
+      body: input
+    })
+  }
+
+  return requestApi<{ status: unknown }>({
+    config,
+    accessToken,
+    path: `/api/platform/app/globe/credit-funding/status?${queryString(input)}`
+  })
+}
+
+export const runCreditFundingOperationsList = async ({
+  config,
+  globeWorkspaceId,
+  limit,
+  state,
+  cursor
+}: Readonly<{
+  config: CliConfig
+  globeWorkspaceId: string
+  limit?: number
+  state?: string
+  cursor?: string
+}>) => {
+  const accessToken = await authorizeWithLoopbackPkce(config)
+
+  return requestApi<{ operations: unknown }>({
+    config,
+    accessToken,
+    path: `/api/platform/app/globe/credit-funding/operations?${queryString({ globeWorkspaceId, limit, state, cursor })}`
+  })
+}
+
+export const runCreditFundingOperationGet = async ({
+  config,
+  globeWorkspaceId,
+  operationId
+}: Readonly<{ config: CliConfig; globeWorkspaceId: string; operationId: string }>) => {
+  const accessToken = await authorizeWithLoopbackPkce(config)
+
+  return requestApi<{ operation: unknown }>({
+    config,
+    accessToken,
+    path: `/api/platform/app/globe/credit-funding/operations/${encodeURIComponent(operationId)}?${queryString({ globeWorkspaceId })}`
+  })
+}
+
+export const runCreditFundingOperationReconcile = async ({
+  config,
+  globeWorkspaceId,
+  operationId,
+  idempotencyKey
+}: Readonly<{ config: CliConfig; globeWorkspaceId: string; operationId: string; idempotencyKey: string }>) => {
+  const accessToken = await authorizeWithLoopbackPkce(config)
+
+  return requestApi<{ operation: unknown }>({
+    config,
+    accessToken,
+    path: `/api/platform/app/globe/credit-funding/operations/${encodeURIComponent(operationId)}/reconcile`,
+    idempotencyKey,
+    body: { globeWorkspaceId }
+  })
+}
+
+export const runOneShotCreditFundingEnsure = async ({
+  config,
+  authorityId
+}: Readonly<{ config: CliConfig; authorityId: string }>) => {
+  const accessToken = await authorizeWithLoopbackPkce(config)
+
+  return requestApi<{ funding: unknown }>({
+    config,
+    accessToken,
+    path: '/api/platform/app/globe/credit-funding/ensure',
+    body: { authorityId }
+  })
 }
 
 export const runFundingFlow = async ({
@@ -324,7 +443,7 @@ export const runFundingFlow = async ({
 
   const accessToken = await authorizeWithLoopbackPkce(config)
 
-  const proposed = await requestFunding<{ proposal: CreditFundingProposal }>({
+  const proposed = await requestApi<{ proposal: CreditFundingProposal }>({
     config,
     accessToken,
     path: '/api/platform/app/globe/credit-funding/propose',
@@ -334,7 +453,7 @@ export const runFundingFlow = async ({
 
   if (!(await confirm(proposed.proposal))) return { proposal: proposed.proposal, confirmed: false as const }
 
-  const confirmed = await requestFunding<{ outcome: unknown }>({
+  const confirmed = await requestApi<{ outcome: unknown }>({
     config,
     accessToken,
     path: '/api/platform/app/globe/credit-funding/confirm',
@@ -374,6 +493,28 @@ const requiredArg = (args: Map<string, string>, key: string) => {
   return value
 }
 
+const optionalPositiveIntegerArg = (args: Map<string, string>, key: string) => {
+  const value = args.get(key)?.trim()
+
+  if (value === undefined) return undefined
+  const parsed = Number(value)
+
+  if (!Number.isSafeInteger(parsed) || parsed <= 0) throw new Error(`invalid_integer:${key}`)
+
+  return parsed
+}
+
+const capacityInputFromArgs = (args: Map<string, string>): CreditCapacityInput => ({
+  globeWorkspaceId: requiredArg(args, 'workspace-id'),
+  requestedCredits:
+    optionalPositiveIntegerArg(args, 'requested-credits') ??
+    (() => {
+      throw new Error('missing:requested-credits')
+    })(),
+  ...(args.get('project-id')?.trim() ? { projectId: args.get('project-id')?.trim() } : {}),
+  ...(args.get('capability-scope')?.trim() ? { capabilityScope: args.get('capability-scope')?.trim() } : {})
+})
+
 const defaultConfig = async (): Promise<CliConfig> => {
   const apiBaseUrl = process.env.GREENHOUSE_API_BASE_URL?.trim()
   const clientId = process.env.GLOBE_ADMIN_OAUTH_CLIENT_ID?.trim()
@@ -382,8 +523,7 @@ const defaultConfig = async (): Promise<CliConfig> => {
 
   const base = new URL(apiBaseUrl)
 
-  const needsVercelBypass =
-    base.hostname === 'dev-greenhouse.efeoncepro.com' || base.hostname.endsWith('.vercel.app')
+  const needsVercelBypass = base.hostname === 'dev-greenhouse.efeoncepro.com' || base.hostname.endsWith('.vercel.app')
 
   const vercelBypassSecret = needsVercelBypass
     ? await resolveBypassSecret({ persist: false })
@@ -423,23 +563,66 @@ const promptForConfirmation = async (proposal: CreditFundingProposal) => {
 
 const main = async () => {
   const [command = 'run', ...rest] = process.argv.slice(2)
-
-  if (command !== 'run') throw new Error('only_run_command_supported')
-
-  const args = parseArgs(rest)
-  const input = validateFundingInput(await readJsonFileOrValue(requiredArg(args, 'input')))
-  const proposeIdempotencyKey = requiredArg(args, 'propose-idempotency-key')
-  const confirmIdempotencyKey = requiredArg(args, 'confirm-idempotency-key')
   const config = await defaultConfig()
-  const autoConfirm = args.get('yes') === 'true' || args.get('yes') === '1'
+  let result: unknown
 
-  const result = await runFundingFlow({
-    config,
-    input,
-    proposeIdempotencyKey,
-    confirmIdempotencyKey,
-    confirm: proposal => (autoConfirm ? Promise.resolve(true) : promptForConfirmation(proposal))
-  })
+  if (command === 'run') {
+    const args = parseArgs(rest)
+    const input = validateFundingInput(await readJsonFileOrValue(requiredArg(args, 'input')))
+    const proposeIdempotencyKey = requiredArg(args, 'propose-idempotency-key')
+    const confirmIdempotencyKey = requiredArg(args, 'confirm-idempotency-key')
+    const autoConfirm = args.get('yes') === 'true' || args.get('yes') === '1'
+
+    result = await runFundingFlow({
+      config,
+      input,
+      proposeIdempotencyKey,
+      confirmIdempotencyKey,
+      confirm: proposal => (autoConfirm ? Promise.resolve(true) : promptForConfirmation(proposal))
+    })
+  } else if (command === 'status' || command === 'preview') {
+    result = await runCreditCapacityStatus({
+      config,
+      input: capacityInputFromArgs(parseArgs(rest)),
+      preview: command === 'preview'
+    })
+  } else if (command === 'ensure') {
+    result = await runOneShotCreditFundingEnsure({
+      config,
+      authorityId: requiredArg(parseArgs(rest), 'authority-id')
+    })
+  } else if (command === 'operations') {
+    const [operationCommand, ...operationArgs] = rest
+    const args = parseArgs(operationArgs)
+    const globeWorkspaceId = requiredArg(args, 'workspace-id')
+
+    if (operationCommand === 'list') {
+      result = await runCreditFundingOperationsList({
+        config,
+        globeWorkspaceId,
+        ...(optionalPositiveIntegerArg(args, 'limit') ? { limit: optionalPositiveIntegerArg(args, 'limit') } : {}),
+        ...(args.get('state')?.trim() ? { state: args.get('state')?.trim() } : {}),
+        ...(args.get('cursor')?.trim() ? { cursor: args.get('cursor')?.trim() } : {})
+      })
+    } else if (operationCommand === 'get') {
+      result = await runCreditFundingOperationGet({
+        config,
+        globeWorkspaceId,
+        operationId: requiredArg(args, 'operation-id')
+      })
+    } else if (operationCommand === 'reconcile') {
+      result = await runCreditFundingOperationReconcile({
+        config,
+        globeWorkspaceId,
+        operationId: requiredArg(args, 'operation-id'),
+        idempotencyKey: requiredArg(args, 'idempotency-key')
+      })
+    } else {
+      throw new Error('operations_command_invalid')
+    }
+  } else {
+    throw new Error('command_invalid')
+  }
 
   process.stdout.write(`${JSON.stringify(result, null, 2)}\n`)
 }

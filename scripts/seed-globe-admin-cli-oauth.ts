@@ -51,6 +51,12 @@ async function main() {
 
   const contract = buildGlobeAdminOAuthGrantContract()
 
+  const clientMetadata = {
+    source: 'scripts/seed-globe-admin-cli-oauth.ts',
+    taskId: 'TASK-1629',
+    ...contract.metadata
+  }
+
   const consumer = await upsertSisterPlatformConsumer({
     sisterPlatformKey: GLOBE_ADMIN_OAUTH_CLIENT_ID,
     consumerName: 'Greenhouse Globe Admin CLI',
@@ -76,26 +82,72 @@ async function main() {
   }
 
   if (existing) {
-    const exactConfiguration =
+    const stableConfiguration =
       existing.consumerId === consumer.consumer.consumerId &&
       existing.clientType === 'public' &&
       !existing.requireHumanSession &&
       existing.requirePkce &&
       existing.clientStatus === 'active' &&
-      sameStrings(existing.redirectUris, [GLOBE_ADMIN_OAUTH_REDIRECT_URI]) &&
+      sameStrings(existing.redirectUris, [GLOBE_ADMIN_OAUTH_REDIRECT_URI])
+
+    const exactGrant =
       sameStrings(existing.allowedScopes, contract.allowedScopes) &&
       stableJson(existing.policy) === stableJson(contract.policy)
 
-    if (!exactConfiguration) {
-      throw new Error('globe_admin_oauth_client_configuration_drift')
+    const exactMetadata = stableJson(existing.metadata) === stableJson(clientMetadata)
+    const exactConfiguration = stableConfiguration && exactGrant && exactMetadata
+
+    if (exactConfiguration) {
+      process.stdout.write(
+        `${JSON.stringify({ clientId: existing.clientId, status: existing.clientStatus, created: false, secretPrinted: false })}\n`
+      )
+
+      return
     }
 
-    process.stdout.write(
-      `${JSON.stringify({ clientId: existing.clientId, status: existing.clientStatus, created: false, secretPrinted: false })}\n`
+    const previousCapabilityScopes = contract.policy.capabilityScopes.filter(
+      scope => scope !== 'globe.credits.funding.ensure'
     )
 
-    return
+    const previousAllowedScopes = contract.allowedScopes.filter(scope => scope !== 'globe.credits.funding.ensure')
+
+    const previousPolicy = {
+      ...contract.policy,
+      requiredScopes: ['openid', ...previousCapabilityScopes],
+      capabilityScopes: previousCapabilityScopes
+    }
+
+    const legacyCapabilityScopes = previousCapabilityScopes.filter(
+      scope => scope !== 'globe.credits.funding.read' && scope !== 'globe.credits.funding.reconcile'
+    )
+
+    const legacyAllowedScopes = previousAllowedScopes.filter(
+      scope => scope !== 'globe.credits.funding.read' && scope !== 'globe.credits.funding.reconcile'
+    )
+
+    const legacyPolicy = {
+      ...contract.policy,
+      requiredScopes: ['openid', ...legacyCapabilityScopes],
+      capabilityScopes: legacyCapabilityScopes
+    }
+
+    const legacyMetadata = { source: 'scripts/seed-globe-admin-cli-oauth.ts', taskId: 'TASK-1629' }
+
+    const knownGrant =
+      exactGrant ||
+      (sameStrings(existing.allowedScopes, previousAllowedScopes) &&
+        stableJson(existing.policy) === stableJson(previousPolicy)) ||
+      (sameStrings(existing.allowedScopes, legacyAllowedScopes) &&
+        stableJson(existing.policy) === stableJson(legacyPolicy))
+
+    const knownMetadata = exactMetadata || stableJson(existing.metadata) === stableJson(legacyMetadata)
+
+    if (!stableConfiguration || !knownGrant || !knownMetadata) {
+      throw new Error('globe_admin_oauth_client_configuration_drift')
+    }
   }
+
+  const created = !existing
 
   const client = await upsertSisterPlatformOAuthClient({
     sisterPlatformConsumerId: consumer.consumer.consumerId,
@@ -111,12 +163,12 @@ async function main() {
     requirePkce: true,
     issueIdentityInline: true,
     policy: contract.policy,
-    metadata: { source: 'scripts/seed-globe-admin-cli-oauth.ts', taskId: 'TASK-1629' },
+    metadata: clientMetadata,
     actorUserId
   })
 
   process.stdout.write(
-    `${JSON.stringify({ clientId: client.clientId, status: client.clientStatus, created: true, secretPrinted: false })}\n`
+    `${JSON.stringify({ clientId: client.clientId, status: client.clientStatus, created, secretPrinted: false })}\n`
   )
 }
 
