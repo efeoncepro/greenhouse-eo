@@ -56,8 +56,8 @@
   token-backed en `/references/colors/`, `/references/typography/`, `/references/geometry/` y
   `/references/elevation/`; el inventario y el triage están en
   [`AXIS_GREENHOUSE_LAB_MIGRATION_INVENTORY_V1.md`](docs/architecture/AXIS_GREENHOUSE_LAB_MIGRATION_INVENTORY_V1.md).
-- El primer bloque pure-UI tiene contratos publicados; `button`, `chip`, `breadcrumbs`, `floating-surface` y
-  `motion` están documentados como `candidate parity`; `disclosure` y `loaders` siguen siendo skeletons. La
+- El primer bloque pure-UI tiene contratos publicados; `button`, `chip`, `breadcrumbs`, `floating-surface`, `motion` y
+  `charts` y `disclosure` están documentados como `candidate parity`; `loaders` sigue siendo skeleton. La
   migración continúa y `/design-system` permanece como fallback hasta cerrar parity visual y de consumidores.
 - También quedaron publicados `motion` y `border-beam` como contratos portables; `motion` ya tiene una reconstrucción
   de candidate parity en AXIS (`95bc3f2`): seis duraciones, cuatro easings, cuatro variantes, replay, estado
@@ -81,9 +81,12 @@
 - `floating-surface` ya tiene una reconstrucción de candidate parity en AXIS (`72d03f4`): seis variantes V1, roles
   tooltip/menu/dialog, menú, editor dirty-safe, motion anchored y reduced-motion; falta compare visual/computed y
   focus return real contra el consumer Greenhouse.
+- `disclosure` ya tiene una reconstrucción de candidate parity en AXIS (`0.1.1`): cuatro triggers con rotación/morph,
+  contextualEditor, actionMenu, Escape, outside press, focus return, dirty guard y quickPeek explícitamente fuera de
+  scope; falta compare visual/computed contra Greenhouse y canary del consumer.
 - `leaderboard` ya tiene contrato y fixture estática con datos sintéticos; `brand-motion` ya tiene contrato y
   referencia orbital HTML/CSS sin SVG privado ni GSAP. El Lab queda en 27 páginas y 21 contratos; build, lint,
-  typecheck, tests y 28 E2E pasan. `axis.efeonce.org` ya resuelve a `76.76.21.21` y el smoke HTTPS devuelve `200`.
+  typecheck, tests y 32 E2E pasan (4 escenarios con skip por proyecto). `axis.efeonce.org` ya resuelve a `76.76.21.21` y el smoke HTTPS devuelve `200`.
   La siguiente continuidad debe continuar con `handoff`, `microinteractions` y las superficies con API.
 
 ## Globe Producer — seis defectos de superficie, el pie de la app y la paginación del feed (2026-08-01)

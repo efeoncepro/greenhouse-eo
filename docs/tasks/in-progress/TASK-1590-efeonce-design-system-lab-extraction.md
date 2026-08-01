@@ -388,3 +388,29 @@ necesita que la `spec` exista.
   typecheck y tests. Publicado en `72d03f4` y desplegado en `https://axis.efeonce.org/patterns/efeonce.floating-surface/`.
 - Estado honesto: `candidate parity`; falta comparación visual/computed y focus return real contra el consumer
   Greenhouse. `/design-system/floating-surfaces` continúa como fallback.
+
+### Delta 2026-08-01 (p) — reconstrucción fiel de charts
+
+- `efeonce.charts` se reconstruyó desde `ChartsLabView` como una familia de cinco composiciones: Creative Pipeline,
+  Team Health Signal, Weekly Earnings, Vehicles Overview y Yearly Earnings. No se sustituyó el funnel por una
+  preview decorativa: conserva etapas, selección `aria-pressed`, diagnósticos, series, tabs `aria-selected` y
+  la acción `Agregar métrica`.
+- AXIS añadió estados loading/empty/neutral/negative, tabla HTML de fallback, tooltips nativos por foco/título,
+  barras y donut token-backed, comportamiento responsive sin overflow de página y reduced-motion estático.
+  El contrato pasó a `0.1.1`; build, typecheck, lint, tests y 30 E2E (desktop/mobile, con 2 skips por proyecto)
+  pasan. La captura dedicada quedó revisada visualmente en `charts-desktop-chromium.png` y
+  `charts-mobile-reduced-motion.png`.
+- Estado honesto: `candidate parity`; falta comparación visual/computed contra los cinco canaries Greenhouse y
+  evidencia de consumidor antes de retirar `/design-system/charts`.
+
+### Delta 2026-08-01 (q) — reconstrucción fiel de disclosure
+
+- `efeonce.disclosure` se reconstruyó desde `DisclosureLabView` y sus controllers: cuatro triggers (`addToggle`,
+  `expand`, `reveal`, `nexaMark`), `contextualEditor` y `actionMenu` con semántica `aria-expanded`, Escape,
+  outside press, retorno de foco y dirty guard. `quickPeek` queda visible como fuera de alcance de esta referencia
+  pública hasta contar con evidencia de placement/focus del consumer.
+- La referencia conserva rotaciones 45°/90°/180°, morph de Nexa, companion, editor abierto por defecto y fallback
+  estático para reduced-motion. El contrato pasó a `0.1.1`; build, typecheck, lint, tests y 32 E2E desktop/mobile
+  pasan. La suite específica valida teclado, foco, outside press, cambios dirty y ausencia de overflow.
+- Estado honesto: `candidate parity`; falta comparación visual/computed contra Greenhouse y canary del consumer antes
+  de retirar `/design-system/disclosure`.

@@ -48,13 +48,13 @@ del Lab Greenhouse. Las fixtures actuales son válidas como punto de partida té
 | `/buttons` | variantes, estados y acciones | `efeonce.button` | 🟡 candidate parity | AXIS ya reproduce las dos boards y 152 controles; falta compare visual/computed contra canary MUI/Vuexy |
 | `/chips` | tonos, kinds, avatar y delete action | `efeonce.chip` | 🟡 candidate parity | AXIS reproduce boards light/dark, 72 especímenes, feedback atoms, chips animados y reduced-motion; faltan compare visual/computed y provenance del avatar |
 | `/breadcrumbs` | jerarquía, overflow y motion | `efeonce.breadcrumbs` | 🟡 candidate parity | AXIS reproduce cuatro ports, overflow nativo, variantes, cuatro kinds, hit area cómoda y reduced-motion; falta compare visual/computed contra Greenhouse |
-| `/disclosure` | disclosure/modal con estado y guardrails | `efeonce.disclosure` | 🟡 skeleton | fixture nativa no cubre el flujo real ni motion |
+| `/disclosure` | disclosure/modal con estado y guardrails | `efeonce.disclosure` | 🟡 candidate parity | AXIS reproduce cuatro triggers, contextualEditor, actionMenu, focus return, Escape, outside press, dirty guard, quickPeek fuera de scope documentado y reduced-motion; falta compare visual/computed y canary del consumer |
 | `/loaders` | loading section con variantes y estados | `efeonce.loaders` | 🟡 skeleton | faltan escenas, anuncios, skeletons y motion real |
 | `/floating-surfaces` | tooltip/popover/menu y focus return | `efeonce.floating-surface` | 🟡 candidate parity | AXIS reproduce seis variantes, roles, menú/editor, motion y reduced-motion; falta compare visual/computed y focus return real del consumer |
 | `/composition-shell` | composiciones y morph de layout | `efeonce.composition-shell` | 🟡 skeleton | fixture no reproduce regiones ni View Transitions |
 | `/surface-recipes` | workbench/report/config con recetas compuestas | `efeonce.surface-recipes` | 🟡 skeleton | falta la experiencia multi-escena completa |
 | `/card-density` | driver de ancho, composiciones y replay | `efeonce.card-density` | 🟡 skeleton | falta driver interactivo, morph y charts |
-| `/charts` | charts con engine, tooltip y fallback | `efeonce.charts` | 🟡 skeleton | fixture no tiene engine, tooltip ni data-table |
+| `/charts` | charts con engine, tooltip y fallback | `efeonce.charts` | 🟡 candidate parity | AXIS reproduce las cinco composiciones reales, selección de etapas, tabs, add-metric, estados, tabla accesible, motion y reduced-motion; falta compare visual/computed contra Greenhouse y canary del consumidor |
 | `/roadmap-timeline` | secuencia con variants y estados | `efeonce.roadmap-timeline` | 🟡 skeleton | falta matriz de estados, overflow y motion |
 | `/team-avatar-group` | avatars, overflow y labels | `efeonce.team-avatar-group` | 🟡 skeleton | faltan assets/variants/overflow semantics |
 | `/utilities` | activity/evidence utilities compuestas | `efeonce.activity-timeline` | 🟡 skeleton | falta la suite de utilities; timeline no equivale a toda la ruta |
