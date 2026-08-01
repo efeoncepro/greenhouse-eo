@@ -19,8 +19,9 @@
 - Hardening posterior: Cloud Armor protege el backend con throttle aproximado de 600 requests/minuto por IP;
   la revisión vigente `efeonce-mcp-gateway-00009-9c6` acepta sólo el hostname/origin canónico
   `mcp.efeonce.org`.
-- Se agregó la skill espejo `efeonce-mcp-platform` para Codex/Claude, con router de sinergias hacia arquitectura,
-  cloud/secret hygiene, Globe, QA y documentación. `pnpm skills:mirrors` detecta drift entre ambos bundles.
+- La skill espejo `efeonce-mcp-platform` y las skills de arquitectura (`arch-architect` global de Claude y
+  `software-architect-2026` de Codex) componen ahora el router MCP con arquitectura, cloud/secret hygiene,
+  Globe, QA y documentación. `pnpm skills:mirrors` detecta drift entre los bundles MCP.
 - Health, metadata OAuth, rechazo anónimo, OAuth autenticado y la tool Globe de fleet pasaron por el hostname
   público.
   El primer callback local venció a los 180 segundos; el listener ahora usa una ventana configurable de 10

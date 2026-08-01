@@ -22,6 +22,9 @@
   separar asignación/consentimiento de entitlements y repetir el deny con identidad base-only.
 - La skill espejo `efeonce-mcp-platform` y sus matrices de verificación ahora codifican esa excepción internal-only
   y exigen evidencia real de entitlement/revocación base-only antes de cualquier rollout B2B.
+- Las skills de arquitectura globales y locales (`arch-architect` de Claude y `software-architect-2026` de Codex)
+  ahora cargan el router MCP, el provider dueño y este mismo gate antes de proponer otra tool, OAuth surface o
+  binding cross-runtime.
 
 ## 2026-08-01 — Efeonce MCP: gateway independiente, OAuth Entra y front door
 

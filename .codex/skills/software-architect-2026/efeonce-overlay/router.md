@@ -45,6 +45,7 @@ Do not infer authorization to create an `apps/*`, `packages/*`, service, deploya
 | Public WordPress site | `efeonce-public-site-wordpress` and `docs/public-site/README.md` |
 | Think/Astro | `seo-aeo`, `seo-aeo-practice`, and `astro`; runtime is outside this repo |
 | Globe/Creative Studio | `greenhouse-globe`; preserve sister-platform ownership boundaries |
+| Efeonce MCP / `mcp.efeonce.org` / OAuth protected resource / provider federation | `efeonce-mcp-platform`, then the provider skill; load the MCP router, gateway decision, runbook and active gateway/provider tasks |
 | Cloud/deploy/secrets | applicable cloud skill, `greenhouse-secret-hygiene`, and release/runtime canon |
 | QA/closure | `greenhouse-qa-release-auditor`, then `greenhouse-documentation-governor` |
 
@@ -61,3 +62,16 @@ Verify rather than assume:
 - reuse of canonical readers, commands, primitives, capabilities, routes, copy, and signals.
 
 If a current repository fact is missing from the router, find the canonical owner and update that owner/router through the repository workflow. Do not add the fact here as a shortcut.
+
+## Efeonce MCP architecture boundary
+
+`efeonce-mcp` is a sister gateway, not a Greenhouse or Globe runtime. It owns MCP transport, OAuth validation,
+discovery, routing, redaction and provider isolation; the provider remains owner of the canonical reader/command,
+policy, tenancy, data, provider credentials and domain audit. Architecture proposals must preserve that split and
+must not add direct database, storage, creative-provider or free-form workspace access to the gateway.
+
+The current operational exception is only internal read-only `globe.producer.fleet.list`, delegated to Globe's
+canonical fleet reader. Treat any new reader as disabled until its provider contract, least-privilege binding,
+allow/deny/fault/redaction evidence and public-gateway canary pass. Customer B2B/multitenant access is a separate
+decision: require tenant/capability entitlements with revocation plus a real base-only identity that proves Globe
+denial; the current internal Entra client receives both scopes and cannot establish that proof.
