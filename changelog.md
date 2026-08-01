@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-01 — Globe: recuperación del source of truth OAuth/PKCE y evaluación durable
+
+- Se reconstruyó sobre `develop` el código preservado del Admin CLI OAuth público + PKCE, las rutas API Platform,
+  la procedencia autenticada y la recuperación idempotente de fondeo, sin repetir ninguna mutación de runtime.
+- El trabajo administrativo que usó históricamente `TASK-1616` se renumeró a `TASK-1629` para no colisionar con
+  MiniMax H3. Las migraciones ya aplicadas conservan sus nombres históricos `task-1616-*`.
+- Se reconciliaron los checkpoints de TASK-1614 sobre evaluación durable, lineage/rights, recuperación sistémica
+  y el requisito de un canary nuevo desde Producer; el candidato retenido no sustituye esa prueba.
+
 ## 2026-08-01 — AXIS Lab: Astro 7 con foundation documental y testing
 
 - `axis-design-system/apps/lab` dejó Vite vanilla y ahora usa Astro `7.1.6` con salida estática para Vercel,

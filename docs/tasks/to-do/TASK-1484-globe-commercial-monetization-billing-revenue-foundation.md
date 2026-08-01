@@ -38,7 +38,9 @@ al cajero que apruebe cada compra con tarjeta.
    `CreditGrantKindV1` / el vocabulario de administración). Borrar evidencia de dinero es exactamente
    lo que la tabla append-only impide.
 
-**Y el invariante que sobrevive a los dos carriles:** el agente/LLM **nunca** confirma ninguno.
+**Invariante vigente tras TASK-1629:** un workload o LLM sin identidad delegada **nunca** confirma.
+Un usuario agente autenticado puede confirmar el fondeo interno únicamente dentro de la política
+acotada del workspace; la autorización comercial de cobros conserva su propio gate.
 
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 

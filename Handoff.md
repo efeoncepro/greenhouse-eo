@@ -1,5 +1,16 @@
 # Handoff activo
 
+## TASK-1614/TASK-1629 — recuperación Git del carril Globe (2026-08-01)
+
+- Rama de integración: `codex/TASK-1614-credit-lane-integration`, construida desde `develop` sin cambiar el
+  checkout compartido y sin worktrees aislados.
+- Recupera el código faltante del cliente OAuth público + PKCE, API Platform y fondeo delegado ya ejercido en
+  runtime, además de los checkpoints documentales de evaluación durable de TASK-1614.
+- La antigua etiqueta `TASK-1616` del Admin CLI colisionaba con la task vigente de MiniMax H3; ese trabajo ahora
+  es `TASK-1629`. Las migraciones ya aplicadas conservan sus nombres históricos `task-1616-*`.
+- Estado honesto: código y runtime histórico verificados; integración a `develop` pendiente de PR/CI. No se hizo
+  deploy, migración, fondeo, generación ni promoción a `main` durante esta recuperación.
+
 ## AXIS — guía visual agent-facing publicada (2026-08-01)
 
 - `efeoncepro/axis-design-system` publicó `DESIGN.md` en `main` mediante `0e3c4d6`.
