@@ -6,8 +6,8 @@
 > permanece auditable en el git log y en las tasks/ADRs enlazadas.
 >
 > **Corte de código verificado:** 2026-08-01 · Globe `main`
-> `9e6325ccf4747944119e0f3cb5e0d1f9a0d5899b` (PR `#77`). El runtime está deliberadamente mixto mientras
-> termina TASK-1614: API interna y producer worker en `1a810df`; Asset Governance aún en su digest anterior.
+> `90d0d48861d03e17ef95e2b7cbabdb14b7c1af47` (PR `#82`). Migraciones hasta `0042` aplicadas; API
+> interna, producer worker y Asset Governance desplegados. Studio no se desplegó para TASK-1614.
 
 ## Estado activo
 
@@ -123,41 +123,32 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
 
 ## TASK-1614 — Seedance R2V durable evaluation (2026-08-01)
 
-- Migración Globe `0040` aplicada; API interna y producer worker desplegados. No se desplegó Studio.
-- Policy `seedance-r2v-evaluation` v2 publicada para `ref/video/motion-v1 / fal / seedance-2.0-r2v / 2.0`,
-  `purpose=evaluation`, `appliesTo=derived`.
+- PRs `#74…#82` están mergeados. El lifecycle keyless del scheduler quedó provisionado y ejercido; migraciones
+  `0040`, `0041` y `0042`, API interna, producer worker y Asset Governance están aplicados. PR `#81` cerró
+  replay de derived rights y PR `#82` el grant mínimo de persistencia del reporte.
+- Policy de evaluación `seedance-r2v-evaluation` v2 permanece publicada para
+  `ref/video/motion-v1 / fal / seedance-2.0-r2v / 2.0`, `purpose=evaluation`, `appliesTo=derived`.
 - Fuente canónica private-ingested: `asset_6e9c95d3-7b94-473d-b91a-00f8b35d9eec`, SHA-256
-  `69cbc966999963ed2959c9adedf409560097dce06700d4fe5c9719292a392509`, 773.219 bytes, `video/mp4`,
-  `working-30d`. El readback elegible `clean / verified / active / eligibleForGeneration=true` de `30682664152`
-  precede la escritura terminal stale; el readback actual `30684654795` muestra la proyección persistida
-  `rights=rejected / lifecycle=rejected / eligibleForGeneration=false`, que debe reconciliar PR `#74` sin repetir
-  ingest ni provider spend.
-- Run `eval_16272c31b11f75be3e0369870f89746b`, attempt `9361550f-6ce3-456d-b710-d5cd3ded6217`: Fal completó;
-  estado `completion_received/finalizing`. No repetir provider spend: recuperar por readback/outbox.
-- El diagnóstico allowlisted de PR `#72` confirmó que `generatedAssetParents` y la policy eran correctos. La causa
-  era una carrera de autoridad: una proyección terminal stale de Asset Governance podía escribir rights antiguos
-  después de una revisión más nueva. El reader compuesto mostraba el parent elegible, pero
-  `registerGeneratedAsset` consumía la proyección persistida degradada y rechazaba `asset_rights_denied`.
-- PR `#74` (`1a810df`) corrige la causa con `rights_revision` por asset/job, evidencia append-only y merge terminal
-  independiente de malware, C2PA y rights. Una revisión stale ya no degrada derechos nuevos ni cuarenteniza por un
-  fallo antiguo sólo de rights. `pnpm check`, `pnpm build`, CI PR `30684242455` y CI main `30684380636` pasaron.
-- Migración `0041_asset_governance_authority_revision.sql`: plan `30684391269` limpio y apply/readback
-  `30684420198` exitoso. API interna `30684456492` y producer worker `30684472892` se desplegaron desde `1a810df`;
-  Studio no se desplegó.
-- Asset Governance no se desplegó todavía. `30684456659` falló cerrado porque el scheduler estaba activo. PR `#75`
-  (`353aa3b`) agregó lifecycle keyless `managed_reconcile`: captura baseline, pausa un scheduler activo, despliega
-  el digest, ejecuta una reconciliación y restaura el estado inicial. CI `30684633070` pasó.
-- El retry `30684770248` falló antes de build/deploy con
-  `PERMISSION_DENIED cloudscheduler.jobs.pause`. PR `#76`
-  (`37b6f7ddd99bbf348613c5cc9e68dae7a5393cd7`) añadió un rol custom mínimo con sólo
-  `cloudscheduler.jobs.pause` + `cloudscheduler.jobs.enable`; CI `30684915496` y Terraform Check `30684915503`
-  pasaron. El rol está mergeado en HCL pero aún no provisionado. Hasta aplicar IaC, desplegar/reconciliar el Job y
-  recuperar el run no existen report, atestación, readiness, promoción ni prueba UI válidos.
-- Antes del apply se cerró una brecha adicional de recovery. PR `#77` (`9e6325c`) separó un preflight durable que
-  termina antes de mutar, movió build/baseline antes del fence y agregó un job independiente que restaura el estado
-  inicial con `needs + always`, reintentos y readback convergente. `pnpm check`, CI `30685780585` y Terraform Check
-  `30685780571` pasaron; revisión independiente sin hallazgos bloqueantes. Esto no provisiona IAM ni despliega el
-  Job por sí solo.
+  `69cbc966999963ed2959c9adedf409560097dce06700d4fe5c9719292a392509`, retención hasta
+  `2026-08-30T23:27:57.776Z`. Output exacto retenido:
+  `sha256:58cc144e0092dbbcd585bdaff44046c7df83df6071ba32bcfc3e05191b28be41`, retención hasta 2026-08-31.
+- Evaluación `eval_16272c31b11f75be3e0369870f89746b`, attempt
+  `9361550f-6ce3-456d-b710-d5cd3ded6217`, terminó con reporte `candidate_ready`. Fal no se volvió a invocar.
+- Atestación `mcra_abf61584-46b2-4aa1-adb5-1374d46a6966`, revisión
+  `review_8561c3a9-67ed-4a51-a777-5d7d98746d9f` y readiness
+  `readiness:3fec1f4037aad02f6eb07f471bc7c949` están firmados.
+- Policy productiva `arp_77a9a0efe8b3f6d3d66a635bfcb05fba2e5268e07baa637ad1bfbe829a301dc4` y saga
+  `promotion_4bda2e0f-6264-4633-a370-4aecf5deaa1a` están activadas: binding revision 2 habilitado y circuito
+  revision 2 cerrado.
+- Playwright verificó el candidato retenido (`readyState=4`, duración 5,06195 s, reproducción 0→1,738 s, sin
+  error) y la selección exacta **Video → Movimiento/control cámara → Seedance 2.0**. La generación final nueva no se
+  ejecutó porque el composer muestra presupuesto de agosto `0 / 0`.
+- Contradicción pendiente: balance live `available=500836`; usage agosto `allocated=0`, `spent=0`; fondeo
+  durable anterior `+500`, cap `800→1500`, disponible `836`. No ejecutar otro fondeo hasta reconciliar policy,
+  grants, budget y período por readers canónicos.
+- Identidad Google/Chrome: `jreyes@efeonce.cl`. Identidad Greenhouse verificada:
+  `jreyes@efeoncepro.com` / `user-efeonce-admin-julio-reyes`. Los intentos fallidos de OAuth y adapter no
+  crearon propuesta, grant, run ni gasto.
 
 ## Riesgos abiertos
 
@@ -167,25 +158,20 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
   `TASK-1578`.
 - Gemini Omni continúa sólo en Model Lab para su ruta gobernada; no extrapoles la promoción de
   Vertex imagen a Interactions video.
-- TASK-1614 permanece bloqueada operativamente en el rollout de Asset Governance: el deployer aún no tiene en vivo
-  el rol mínimo de scheduler que PR `#76` declara. La única ceremonia pendiente antes del plan es reautenticar por
-  MFA al Owner `julio.reyes@efeonce.org`; no uses IAM amplio ni pausa manual como sustituto del apply.
+- TASK-1614 permanece `in-progress` sólo por el canary de una pieza nueva. Antes de mutar presupuesto se debe
+  explicar la divergencia entre fondeo durable, balance, usage agosto y el `0 / 0` visible. No asumir saldo Fal,
+  ausencia de grant ni UI stale sin reader.
 - La identidad temporal usada para consumo privado de AXIS debe sustituirse por una identidad de
   máquina antes del rollout externo; no recrees el secreto legacy de Globe.
 
 ## Siguiente paso ejecutable
 
-1. Completar la reautenticación MFA del Owner, planear y aplicar el HCL de PR `#76`; aceptar sólo cero
-   destroy/replace y verificar por readback que
-   `globe-deployer` recibió el rol custom mínimo, sin permisos create/delete/update de Scheduler.
-2. Reejecutar `Deploy Asset Governance Job (keyless)` desde el SHA exacto de `main`, modo `deploy` +
-   `managed_reconcile`. Exigir digest exacto, topología `parallelism=1/taskCount=1`, reconciliación exitosa y estado
-   final del scheduler igual al inicial.
-3. Leer y recuperar `eval_16272c31b11f75be3e0369870f89746b` hasta report
-   `objective_pass_pending_human` y output retenido/elegible. No volver a invocar Fal.
-4. Completar revisión/atestación, readiness, binding, promoción, reader live y generación UI sólo para
-   `ref/video/motion-v1 / fal / seedance-2.0-r2v / 2.0`. La prueba final es Chrome autenticado como
-   `jreyes@efeonce.cl` en **Video → control de movimiento/cámara → Seedance 2.0**, con pieza nueva, playback,
-   retención y governance. Omni, Seed Audio, Seedance Loop e Imagen/Seedream quedan fuera de la evidencia.
-5. Después de TASK-1614, retomar los receipts de `TASK-1578`/`TASK-1553`; no confundir ese backlog de imagen con el
-   bloqueo P0 actual.
+1. Empezar sólo con discovery: leer TASK-1614, TASK-1566, TASK-1616 y el manual de fondeo. No desplegar, fondear,
+   generar ni usar SQL.
+2. Consultar policy efectiva, grants, budget/availability y usage de agosto mediante primitives canónicas. Reconciliar
+   los IDs del fondeo previo registrados en TASK-1614 y clasificar la causa antes de proponer nada.
+3. Autorizar `propose → confirm` únicamente si el plan legible demuestra un déficit real; recuperar primero intents
+   ambiguos y verificar actor humano `jreyes@efeoncepro.com`.
+4. Con presupuesto admitido, generar una sola pieza en Playwright con **Video → Movimiento/control cámara →
+   Seedance 2.0** y verificar run, playback, retención, governance y canary de la saga.
+5. No tocar Omni, Seed Audio, Seedance Loop, Veo ni Seedream. Cerrar TASK-1614 sólo con esa evidencia.

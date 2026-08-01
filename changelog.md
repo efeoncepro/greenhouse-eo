@@ -7,24 +7,17 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
-## 2026-08-01 — TASK-1614: evaluación Seedance R2V llegó a provider completion con fuente gobernada
+## 2026-08-01 — TASK-1614: Seedance R2V promovido; canary de pieza nueva pendiente
 
-- Se integró y desplegó en API + worker internos el lifecycle de output rights/lineage; la migración `0040` quedó
-  aplicada y la policy exacta de Seedance R2V está publicada con `purpose=evaluation`.
-- El video fuente quedó private-ingested, retenido y gobernado (`clean / verified / active / eligible`). Fal completó
-  la evaluación nueva y el sistema preservó el resultado para finalización idempotente, sin confundir timeout,
-  webhook o saldo con un fallo del proveedor.
-- La causa de `asset_rights_denied` fue una carrera de authority ordering: una proyección terminal stale podía
-  sobrescribir rights nuevos. PR `#74` la corrige con `rights_revision` y merge independiente por dimensión;
-  `pnpm check`, `pnpm build`, CI, migración `0041`, API y producer worker quedaron verdes.
-- PR `#75` convirtió el deploy de Asset Governance en un lifecycle keyless administrado que pausa, despliega,
-  reconcilia una vez y restaura el scheduler. El rollout falló cerrado porque `globe-deployer` carece de
-  `cloudscheduler.jobs.pause`; PR `#76` agregó un rol custom mínimo `pause` + `enable`, mergeado pero aún no
-  provisionado.
-- PR `#77` endureció el lifecycle antes de provisionarlo: preflight durable previo a cualquier mutación, build antes
-  del fence y recovery en un job independiente con reintentos/readback convergente. `pnpm check`, CI y Terraform
-  Check quedaron verdes. Promoción y prueba UI siguen pendientes; no se repitió gasto ni se tocaron Omni, Seed
-  Audio o Seedance Loop.
+- PRs Globe `#74…#82` cerraron authority ordering, lifecycle/recovery del scheduler, replay de derived rights y
+  persistencia del reporte. Migraciones `0040…0042`, API, producer worker y Asset Governance quedaron aplicados
+  sin desplegar Studio.
+- La evaluación exacta terminó `candidate_ready`; fuente y output quedaron retenidos/gobernados y Fal no se
+  repitió. Atestación, revisión humana, readiness, policy productiva, binding y circuito quedaron promovidos.
+- El Producer muestra y selecciona explícitamente **Video → Movimiento/control cámara → Seedance 2.0**; el candidato
+  retenido reproduce sin error. Omni, Seed Audio, Seedance Loop, Veo y Seedream no se tocaron.
+- Falta el canary con una pieza nueva. Agosto aparece con presupuesto `0 / 0` pese a balance y fondeo durables; la
+  siguiente sesión debe reconciliar policy/grants/budget/usage en modo read-only antes de autorizar otro fondeo.
 
 ## 2026-07-31 — TASK-1614: handoff de Seedance R2V y output rights de evaluación
 

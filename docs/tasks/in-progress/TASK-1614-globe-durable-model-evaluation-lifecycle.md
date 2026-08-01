@@ -11,10 +11,10 @@
 - UI impact: `verification-only`
 - Backend impact: `yes`
 - Epic: `EPIC-028`
-- Status real: `Código sistémico y migración aplicados; rollout de Asset Governance bloqueado por IAM`
+- Status real: `Evaluación, governance y promoción completas; canary final pendiente por reconciliación de presupuesto de agosto`
 - Domain: `Globe / Model Lab / evaluation / worker`
 - Owner: `Efeonce Globe runtime`
-- Runtime code: Globe `main` hasta PR `#77` (`9e6325ccf4747944119e0f3cb5e0d1f9a0d5899b`)
+- Runtime code: Globe `main` hasta PR `#82` (merge `90d0d48861d03e17ef95e2b7cbabdb14b7c1af47`)
 - ADRs: [Evaluation Harness](../../architecture/creative-studio/EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md) y
   [Asset Governance Worker](../../architecture/creative-studio/EFEONCE_GLOBE_ASSET_GOVERNANCE_WORKER_DECISION_V1.md)
 
@@ -43,7 +43,43 @@ Make long-running model evaluations durable and provider-neutral so an upstream 
 
 Do not alter already promoted Omni, Seed Audio or Seedance Loop; do not bypass the daily spend cap; do not add provider-specific timeout patches; do not write direct SQL or create a second ledger/catalog.
 
-## Live progress — 2026-07-31
+## Checkpoint vigente — 2026-08-01
+
+- PRs Globe `#74…#82` quedaron integrados por PR/CI. Las migraciones `0040`, `0041` y `0042` están aplicadas;
+  API interna, producer worker y Asset Governance se desplegaron y reconciliaron sin desplegar Studio. PR `#81`
+  cerró la continuidad inmutable de derived rights y PR `#82` otorgó al worker el grant mínimo para persistir el
+  reporte de evaluación.
+- La evaluación `eval_16272c31b11f75be3e0369870f89746b`, attempt
+  `9361550f-6ce3-456d-b710-d5cd3ded6217`, terminó con reporte `candidate_ready`. El output retenido exacto es
+  `sha256:58cc144e0092dbbcd585bdaff44046c7df83df6071ba32bcfc3e05191b28be41`. Se recuperó el mismo run y no
+  se repitió la llamada ni el gasto Fal.
+- Fuente y output quedaron gobernados. La fuente canónica
+  `asset_6e9c95d3-7b94-473d-b91a-00f8b35d9eec` conserva SHA-256
+  `69cbc966999963ed2959c9adedf409560097dce06700d4fe5c9719292a392509` y retención hasta
+  `2026-08-30T23:27:57.776Z`; el output conserva retención hasta 2026-08-31.
+- Atestación comercial `mcra_abf61584-46b2-4aa1-adb5-1374d46a6966`, revisión humana
+  `review_8561c3a9-67ed-4a51-a777-5d7d98746d9f` y readiness
+  `readiness:3fec1f4037aad02f6eb07f471bc7c949` quedaron firmados para la identidad exacta
+  `ref/video/motion-v1 / fal / seedance-2.0-r2v / 2.0`.
+- Policy de producción `arp_77a9a0efe8b3f6d3d66a635bfcb05fba2e5268e07baa637ad1bfbe829a301dc4`
+  y saga `promotion_4bda2e0f-6264-4633-a370-4aecf5deaa1a` quedaron activadas: readiness promovido, binding
+  revision 2 habilitado y circuito revision 2 cerrado.
+- Playwright verificó el output candidato: un `video`, `readyState=4`, duración 5,06195 s, reproducción
+  0→1,738 s y cero error. En el Producer autenticado se seleccionó explícitamente
+  **Video → Movimiento/control cámara → Seedance 2.0**; Omni, Seed Audio, Seedance Loop, Veo y Seedream no se
+  seleccionaron ni mutaron.
+- La pieza final nueva todavía no se generó. El composer estima 16 créditos y muestra presupuesto mensual
+  `0 / 0` para agosto, mientras los readers live muestran balance `available=500836` y usage de
+  `2026-08-01…2026-09-01` con `allocated=0`, `spent=0`. Existe además evidencia durable del fondeo previo
+  `+500`, cap `800→1500`, disponible `836`. Esta contradicción debe reconciliarse antes de cualquier nuevo
+  `propose/confirm`; no asumir que falta saldo ni crear otro grant por el síntoma visual.
+- Identidades: la sesión Google/Chrome es `jreyes@efeonce.cl`; la sesión de Greenhouse verificada por
+  `/api/auth/session` es `jreyes@efeoncepro.com`, user
+  `user-efeonce-admin-julio-reyes`. Los intentos de esta sesión no crearon propuesta, fondeo, provider run ni
+  gasto: staging OAuth fue bloqueado por `ERR_BLOCKED_BY_CLIENT`/Vercel Protection y el adapter de producción
+  respondió `globe_not_configured` antes de mutar.
+
+## Live progress histórico — 2026-07-31
 
 - The evaluation command now returns a durable receipt and schedules provider work at the evaluation boundary;
   the operator client unwraps the canonical command envelope and waits for the retained report or a classified
@@ -78,7 +114,7 @@ Do not alter already promoted Omni, Seed Audio or Seedance Loop; do not bypass t
 - El workspace ya fue fondeado por el command API canónico: +500, cap 800→1500, disponible 836; IDs durables están
   registrados en la skill `greenhouse-globe` bajo “Último fondeo real verificado”.
 
-## Live progress — 2026-08-01
+## Live progress histórico — 2026-08-01, antes del checkpoint vigente
 
 - La implementación de output rights y lineage se integró por PR/CI en Globe. La migración
   `0040_generated_rights_policy_purpose.sql` se aplicó mediante el workflow `30679292565`; API interna y producer
@@ -105,7 +141,7 @@ Do not alter already promoted Omni, Seed Audio or Seedance Loop; do not bypass t
   exclusivamente **Video → control de movimiento/cámara → Seedance 2.0** en la sesión autenticada de
   `jreyes@efeonce.cl`; no se toca Omni, Seed Audio ni Seedance Loop, y Seedream no cuenta como evidencia.
 
-## Root cause y rollout sistémico — 2026-08-01
+## Root cause y rollout sistémico histórico — 2026-08-01, ya desplegado
 
 - El diagnóstico allowlisted confirmó que el bloqueo no estaba en Fal, saldo, webhook, policy ni parent lineage.
   Un job terminal de Asset Governance podía proyectar una revisión antigua después de una escritura de rights más
@@ -144,22 +180,19 @@ Do not alter already promoted Omni, Seed Audio or Seedance Loop; do not bypass t
   al recuperar el estado inicial. `pnpm check` local, CI `30685780585` y Terraform Check `30685780571` terminaron
   `success`; una revisión independiente dio `MERGE` sin hallazgos bloqueantes.
 
-## Handoff ejecutable
+## Handoff ejecutable — discovery primero, cero mutaciones iniciales
 
-1. Completar la reautenticación MFA de `julio.reyes@efeonce.org` abierta por `gcloud --force --update-adc` y
-   provisionar por el carril IaC el rol custom de PR `#76`; leer el plan y exigir cero destroy/replace antes del
-   apply. Verificar por readback que `globe-deployer` puede pausar/reanudar sólo schedulers existentes. No entregar
-   autoridad IAM amplia al WIF actual.
-2. Reejecutar `Deploy Asset Governance Job (keyless)` sobre el SHA exacto de `main`, modo `deploy` +
-   `managed_reconcile`. Exigir digest desplegado, scheduler restaurado a su estado inicial y ejecución one-shot
-   exitosa; no pausar ni reanudar manualmente fuera del workflow.
-3. Reanudar/finalizar el mismo run provider-completed `eval_16272c31b11f75be3e0369870f89746b`; no invocar Fal
-   nuevamente. Exigir report
-   `objective_pass_pending_human` y un activo retenido/elegible antes de attestation/promoción.
-4. Completar rights comerciales, revisión humana, readiness, binding y promoción sólo para la identidad exacta de
-   Seedance R2V. No tocar Omni, Seed Audio ni Seedance Loop.
-5. Criterio final: en la sesión Chrome autenticada de `jreyes@efeonce.cl`, abrir explícitamente **Video**, elegir el
-   control de movimiento/cámara y **Seedance 2.0**, generar una pieza nueva, reproducirla y verificar retención y
-   governance. La captura previa estaba en **Imagen → Seedream** y no cuenta como prueba.
-6. Limpiar proxies, artefactos/worktrees temporales y cerrar subagentes sólo después de preservar
-   cambios y evidencia.
+1. Leer este checkpoint, `GLOBE_RUNTIME_HANDOFF.md`, TASK-1566, TASK-1616 y el manual de fondeo. No ejecutar
+   deploy, `propose/confirm`, generación, SQL ni provider API durante el discovery.
+2. Releer por commands/readers canónicos la policy efectiva, grants activos, budget/availability y usage del período
+   exacto `2026-08-01T00:00:00Z…2026-09-01T00:00:00Z`. Reconciliar esos resultados con proposal
+   `ef775b1b-ebe0-411f-95e6-eff1000cbf62`, grant `3ef983b4-e41e-4d83-8a53-c02ae00fccdc`, policy
+   `eca7c50e-563e-4174-b508-be244e85783b` y ledger `24ecb9a7-e7fc-4338-a9b3-9c12a5441d45`.
+3. Clasificar con evidencia una sola causa: período del grant, policy efectiva, proyección/reader o UI stale. Sólo si
+   el plan canónico demuestra un déficit real se autoriza un nuevo `propose → revisión del delta → confirm`;
+   recuperar primero cualquier intent ambiguo y usar claves distintas.
+4. Con presupuesto admitido, volver a la sesión Playwright existente: Greenhouse
+   `jreyes@efeoncepro.com`, Google/Chrome `jreyes@efeonce.cl`. Generar exactamente una pieza con
+   **Video → Movimiento/control cámara → Seedance 2.0** y el reference gobernado ya añadido.
+5. Verificar la pieza nueva por identidad exacta, playback real, retención, governance y canary de la saga. Sólo
+   entonces mover TASK-1614 a `complete`. No tocar Omni, Seed Audio, Seedance Loop, Veo ni Seedream.
