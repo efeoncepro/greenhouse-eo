@@ -1,5 +1,9 @@
 # Handoff activo
 
+## WIP saneado — Globe, Brightcell y Polpaico (2026-08-01)
+
+- ADR-019 `Accepted`; ADR-020 `Proposed`. Brightcell: **no enviar** hasta Finance. Polpaico: `HOLD / NO-BID`, sin precio/deck emitible. Detalle en `changelog.md`.
+
 ## Studio Credits — fondeo live y readback convergente (2026-08-01)
 
 - Rama correcta: Globe opera directamente en `main`; Greenhouse en `develop`; un solo checkout por repo, cero

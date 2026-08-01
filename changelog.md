@@ -7,6 +7,18 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-01 — Cierre de WIP documental y comercial
+
+- Se registraron ADR-019 (evaluación asíncrona durable de Globe, Accepted e implementada) y ADR-020 (export a
+  Salesforce Marketing Cloud Content Builder, Proposed y sin autorización runtime), ambos enlazados desde los
+  índices canónicos.
+- Brightcell LIC-95 quedó consistente: implementación única + tres paquetes mensuales, propuesta/deck económico
+  separados, IVA explícito, HubSpot Free acotado y gate de Finance. El Composer produjo 9 láminas y todas fueron
+  revisadas visualmente sin recortes antes del cierre.
+- Polpaico LIC-6533 quedó clasificada como discovery interno en HOLD/NO-BID provisional. Se retiró el stub
+  económico renderizable de monto cero, se corrigieron referencias a decks inexistentes y se minimizaron enlaces
+  profundos/identificadores personales; no se emitió ni envió una oferta.
+
 ## 2026-08-01 — Studio Credits operativo por UI y OAuth PKCE
 
 - Greenhouse `develop` y Globe `main` quedaron desplegados con migraciones y OAuth activos. La operación live
@@ -710,14 +722,3 @@ Corrección de fuente de verdad: el cliente inicial es **SKY Agencia Creativa**,
 - Se creó el business model canónico `docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md`
   y se sincronizaron context pack, estrategia de capital, Creative Practice, public/private tenders y squad design.
 - Se agregó el benchmark [`PERFORMANCE_COMMERCE_DISTRIBUTION_MARKET_RESEARCH_2026-07-26.md`](docs/audits/commercial/PERFORMANCE_COMMERCE_DISTRIBUTION_MARKET_RESEARCH_2026-07-26.md) y se robusteció Performance & Commerce alrededor de señales first-party, medición, commerce, creative performance y governance algorítmico. MMM e incrementality quedan como escalera avanzada y no como promesa general.
-
-## 2026-07-26 — Creative Services: catálogo y skills sincronizados
-
-- Se formalizó el catálogo de Creative Services como línea de negocio de Efeonce: Creative Strategy & Brand
-  Systems, Campaign & Creative Platform Systems, Content & Social Operations, Audiovisual/Motion/Audio Production,
-  Run-and-Gun Production, Managed Creative Capacity y AI Creative Operations/Studio Access.
-- Se sincronizaron las skills gemelas de `creative-practice`, incluyendo el hand-off a studios, la frontera
-  Run-and-Gun Studio/capability versus Run-and-Gun Production/servicio y las composiciones con Wave, Reach y
-  Search Visibility.
-- Globe conserva el rol de product brand habilitante; no se convierte en la línea creativa completa. No hubo cambios
-  de runtime ni de pricing aprobado.
