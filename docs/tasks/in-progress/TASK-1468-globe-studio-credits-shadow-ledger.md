@@ -353,3 +353,17 @@ La auditoría encontró que el command `globe.credits.expire` no tiene scheduler
 puede aceptar `actual > reserved` mirando el saldo agregado sin reautorizar funding/caps. TASK-1468 sigue abierta
 hasta cerrar expiry/reconciliation y probar el enlace con la policy normativa de TASK-1579. Los 500.000 créditos
 históricos permanecen append-only: se clasifican en proyección, no se borran ni se duplican.
+
+## Checkpoint 2026-08-01 — expiry reconciliada code-complete local
+
+- Globe incorpora un caller periódico en el `globe-producer-worker` existente; no se creó otro scheduler.
+- El worker ejecuta primero finalización/recovery de governed runs y después expiry, nunca en paralelo.
+- Las reservas vencidas se reclaman con lease, fencing y `FOR UPDATE SKIP LOCKED`. Sólo un run/experimento
+  terminal `failed|cancelled` puede liberar mediante `globe.credits.expire`; `completed`, `timed_out`, estados
+  activos o ausencia de evidencia conservan el hold y entran a conciliación/defer.
+- `0044_credit_reservation_expiry_claims.sql` agrega metadatos operativos reconstruibles y no otra autoridad
+  económica. El flag de rollout permanece apagado por defecto.
+- Existe métrica de edad del hold vencido más antiguo y alerta WARNING a 900 segundos. Verificación focal:
+  399 tests domain, 132 database y 285 studio-web verdes; el gate completo de Globe se registra en TASK-1579.
+- Estado honesto: `code complete, rollout pendiente`; faltan aplicar `0043/0044`, deploy, activar el flag y
+  verificar el comportamiento live antes de marcar los criterios operativos como completos.

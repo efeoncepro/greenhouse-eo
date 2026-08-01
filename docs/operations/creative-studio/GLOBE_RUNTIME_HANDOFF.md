@@ -214,6 +214,13 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
   local de Globe `develop`: `9acfa58`. El próximo slice
   es expiry periódica en el `globe-producer-worker` existente, secuencial después del governed batch, con
   claim/lease/fencing y reconciliación obligatoria; no se libera por TTL a ciegas.
+- El slice de expiry ya quedó code-complete local: migración `0044_credit_reservation_expiry_claims.sql`, claim
+  tenant-scoped con `FOR UPDATE SKIP LOCKED`, lease/fencing, ejecución posterior al governed batch y liberación
+  exclusiva ante evidencia terminal `failed|cancelled`. `completed|timed_out|unknown|partial` conserva el hold;
+  estados activos solicitan cancelación o conciliación. El worker expone summary y edad del hold vencido más
+  antiguo, con alerta WARNING a 900 segundos. Flag Terraform default `false`; no se aplicó migración ni deploy.
+- La rama predeterminada de `efeonce-globe` es y debe seguir siendo `main`. El checkout compartido trabaja en
+  `develop`; no usar worktrees ni cambiar el default branch como parte de esta ejecución.
 
 ## Siguiente paso ejecutable
 

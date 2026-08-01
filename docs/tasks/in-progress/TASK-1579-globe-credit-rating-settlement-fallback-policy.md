@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Policy V1 y conformance local en implementación; expiry/worker, calibración y rollout pendientes`
+- Status real: `Policy V1, settlement y expiry worker code-complete local; receipts, calibración y rollout pendientes`
 - Rank: `next.2`
 - Domain: `finance|creative|platform|reliability`
 - Blocked by: `none`
@@ -371,10 +371,21 @@ una route cuando su rate version y receipt apuntan a esa misma policy; ningún a
   síncrono, con outcomes `settle | release | keep-held-for-reconciliation | requires-reauthorization`.
 - Un timeout aceptado, un output parcial o un fallback fuera del envelope conserva el hold; un fallo definitivo
   libera y un candidato completo liquida la rate semántica pinneada, no unidades crudas del provider.
-- Verificación: typecheck de contracts/domain, 396 tests de domain y `pnpm check && pnpm build` monorepo verdes.
+- Verificación del settlement: typecheck de contracts/domain, 396 tests de domain y `pnpm check && pnpm build`
+  monorepo verdes.
   Commit local de Globe `develop`: `9acfa58 feat(credits): govern settlement fallback outcomes`.
-- Pendiente antes de cerrar: expiry con claim/lease/fencing y reconciliación previa, policy receipts/readers,
-  observabilidad, calibración/onboarding, migración/deploy y canary runtime.
+- Expiry periódica quedó implementada localmente en el `globe-producer-worker` existente, siempre después del
+  governed batch. Reclama reservas vencidas mediante lease, `FOR UPDATE SKIP LOCKED` y fencing tenant-scoped;
+  sólo evidencia terminal `failed|cancelled` ejecuta el command canónico `expire`. Estados activos solicitan
+  cancelación/conciliación y `completed|timed_out|unknown|partial` conservan el hold.
+- La migración aditiva `0044_credit_reservation_expiry_claims.sql` agrega únicamente coordinación y outcome
+  curado; no crea un segundo saldo ni muta el ledger. El flag `GLOBE_CREDIT_EXPIRY_ENABLED` permanece `false`
+  por defecto hasta migración y rollout explícitos.
+- La observabilidad publica summary por batch y `creditExpiryOldestAgeSeconds`; existe métrica/alerta WARNING
+  para un hold vencido por más de 900 segundos. Verificación focal: 399 tests domain, 132 database y 285
+  studio-web verdes; OpenTofu format y `git diff --check` verdes.
+- Pendiente antes de cerrar: policy receipts/readers, calibración/onboarding, aplicar migraciones, deploy,
+  activar flag y verificar canary/reconciliation live.
 - Contract fixtures/conformance en `efeonce-globe` cuando la policy se implemente.
 
 ## Closing Protocol
