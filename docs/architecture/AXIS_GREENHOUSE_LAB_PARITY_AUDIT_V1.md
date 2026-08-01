@@ -44,7 +44,7 @@ del Lab Greenhouse. Las fixtures actuales son válidas como punto de partida té
 | `/elevation` | roles de sombra y escenarios | `/references/elevation/` | 🟡 skeleton | falta parity de composición, forced-colors y captura |
 | `/gradients` | presets, intensidad, selector y animación | `efeonce.gradients` | 🟡 skeleton | faltan presets reales, controles, motion y reduced-motion comparable |
 | `/border-beam` | kinds, variants, intensity y replay | `efeonce.border-beam` | 🟡 skeleton | falta interacción completa y coreografía de beam |
-| `/motion` | escala, replay y diagnóstico de motion | `efeonce.motion` | 🟡 skeleton | falta reproducción real, medición y evidencia |
+| `/motion` | escala, replay y diagnóstico de motion | `efeonce.motion` | 🟡 candidate parity | AXIS reproduce seis duraciones, cuatro easings, las cuatro variantes oficiales, replay y estado manual sin motion; falta compare visual/computed y canary del consumidor |
 | `/buttons` | variantes, estados y acciones | `efeonce.button` | 🟡 candidate parity | AXIS ya reproduce las dos boards y 152 controles; falta compare visual/computed contra canary MUI/Vuexy |
 | `/chips` | tonos, kinds, avatar y delete action | `efeonce.chip` | 🟡 candidate parity | AXIS reproduce boards light/dark, 72 especímenes, feedback atoms, chips animados y reduced-motion; faltan compare visual/computed y provenance del avatar |
 | `/breadcrumbs` | jerarquía, overflow y motion | `efeonce.breadcrumbs` | 🟡 candidate parity | AXIS reproduce cuatro ports, overflow nativo, variantes, cuatro kinds, hit area cómoda y reduced-motion; falta compare visual/computed contra Greenhouse |

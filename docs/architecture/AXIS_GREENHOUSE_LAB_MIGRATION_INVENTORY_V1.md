@@ -1,6 +1,6 @@
 # AXIS / Greenhouse Lab migration inventory
 
-**Estado:** 21 reference skeletons publicados · parity pendiente · migración en curso 2026-08-01
+**Estado:** 21 reference entries publicados · parity pendiente · migración en curso 2026-08-01
 **Dueño:** AXIS Design System + Greenhouse UI Platform
 **Fuente:** `src/app/(dashboard)/design-system/**` en `greenhouse-eo`
 **Destino:** `axis-design-system/apps/lab` (Astro 7, static, público)
@@ -34,7 +34,8 @@ Cada candidato requiere auditoría transitive de imports antes de migrarse.
 | `disclosure`, `loaders` | skeleton reference | faltan flujos, focus management y estados completos |
 | `floating-surfaces` | candidate parity | seis variantes, roles tooltip/menu/dialog, editor dirty-safe, motion y reduced-motion; falta canary visual/computed y focus return real |
 | `card-density`, `composition-shell` | skeleton reference | faltan drivers, morph y composición real |
-| `motion`, `border-beam` | skeleton reference | faltan replay, escenas y medición de motion |
+| `motion` | candidate parity | seis duraciones, cuatro easings, cuatro variantes, replay y estado manual sin motion; faltan canary visual/computed y compare del consumidor |
+| `border-beam` | skeleton reference | faltan interacción completa y coreografía de beam |
 | `microinteractions` | excluded first slice | composite product feedback; extract per primitive |
 | `team-avatar-group`, `surface-recipes`, `roadmap-timeline`, `charts` | skeleton reference | contracts + fixtures mínimas; parity pendiente |
 | `brand-logos` | gate parcial | `efeonce.brand-logos`; assets reales y compare pendientes |

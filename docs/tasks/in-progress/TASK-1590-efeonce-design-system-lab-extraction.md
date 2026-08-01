@@ -105,6 +105,17 @@ fixtures visuales completos por contrato y la migración ordenada del catálogo 
 
 - `utilities` se extrae como `efeonce.activity-timeline`, con eventos ordenados, timestamps legibles, estados,
   persona y adjunto de fixture; no se trasladan datos operativos ni registros de auditoría.
+
+### Delta 2026-08-01 (j) — reconstrucción real de motion
+
+- `efeonce.motion` dejó de ser una fixture mínima: AXIS ahora reproduce la escala Greenhouse de seis duraciones,
+  cuatro easings, `entrance`, `stagger`, `timeline` y `scrollReveal`, controles de replay y el estado manual
+  `motion-off` que mantiene el contenido visible.
+- Se actualizó el contrato a `0.1.1`, se conectaron las variables CSS a `axisMotion` y se añadió E2E responsive
+  en Chromium/mobile con `prefers-reduced-motion`, keyboard-safe y captura visual. Build, typecheck, tests y
+  el smoke público pasan; commit AXIS: `95bc3f2`, ruta: `https://axis.efeonce.org/patterns/efeonce.motion/`.
+- El estado correcto es `candidate parity`, no retiro: aún falta comparar visual/computed contra el canary
+  Greenhouse y registrar evidencia del consumidor antes de cambiar el fallback `/design-system`.
 - El Lab genera 24 páginas estáticas y 18 contratos publicados; build, typecheck, tests y 16 E2E Chromium/mobile
   pasan.
 
