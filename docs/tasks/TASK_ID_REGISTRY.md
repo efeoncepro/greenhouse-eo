@@ -1709,13 +1709,17 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-1623` | `to-do` | Globe Qwen Image 2/Pro: generate/edit challenger con seed, negative prompt, outputs múltiples, formatos y benchmark cancelable. | `docs/tasks/to-do/TASK-1623-globe-qwen-image-2-fleet-producer-integration.md` |
 | `TASK-1624` | `to-do` | Globe Grok Imagine Image: generate/edit, references, 1K/2K, outputs múltiples, policy receipt y safety/rights gate. | `docs/tasks/to-do/TASK-1624-globe-grok-imagine-image-fleet-producer-integration.md` |
 | `TASK-1625` | `to-do` | Payroll correctness and operational hardening; umbrella de issues de integridad, concurrencia, reglas legales, ajustes, proyección y UI. | `docs/tasks/to-do/TASK-1625-payroll-correctness-and-operational-hardening.md` |
+| `TASK-1628` | `to-do` | El Producer puede leer su propio presupuesto: abre los readers de presupuesto a `ui` sin exponer las mutaciones de crédito. | `docs/tasks/to-do/TASK-1628-globe-producer-reads-its-own-budget.md` |
+| `TASK-1626` | `to-do` | **Efeonce MCP Platform Gateway and Globe Federation.** Repo neutral `efeonce-mcp`, OAuth protected resource, Streamable HTTP, Cloud Run, front door `mcp.efeonce.org` y primera federación Globe read-only. | `docs/tasks/to-do/TASK-1626-efeonce-mcp-platform-gateway.md` |
 
 ## Siguiente ID disponible
 
-`TASK-1626`
+`TASK-1627`
 
 > **Corrección 2026-07-30.** Este pie declaraba `TASK-1587`, pero la tabla de este mismo archivo ya
 > registraba hasta `TASK-1598` y esos archivos existen en disco: el pie estaba obsoleto respecto de su
 > propia tabla. Antes de reservar un ID, **verificar contra el sistema de archivos**
 > (`ls docs/tasks/*/TASK-*.md`), no sólo contra este pie. Reservados `TASK-1599`, `TASK-1600`, `TASK-1601` y
-> `TASK-1602`…`TASK-1611`; `TASK-1614` fue reservado para el ciclo durable de evaluación; `TASK-1616`…`TASK-1624` fueron reservadas para la flota challenger de Fal; `TASK-1625` fue reservado para payroll correctness; Runway queda fuera de esta expansión; el siguiente ID libre es `TASK-1626`.
+> `TASK-1602`…`TASK-1611`; `TASK-1614` fue reservado para el ciclo durable de evaluación; `TASK-1616`…`TASK-1624` fueron reservadas para la flota challenger de Fal; `TASK-1625` fue reservado para payroll correctness; `TASK-1626` fue reservado para Efeonce MCP Platform; Runway queda fuera de esta expansión; `TASK-1627` sigue reservado y `TASK-1628` quedó tomado por el presupuesto legible del Producer; el siguiente ID libre es `TASK-1629`.
+
+> `TASK-1628` quedó tomado por «El Producer puede leer su propio presupuesto» (EPIC-028); `TASK-1626` y `TASK-1627` ya estaban reservados, así que el siguiente ID libre es `TASK-1629`.
