@@ -100,6 +100,13 @@ fixtures visuales completos por contrato y la migración ordenada del catálogo 
   personas, adjuntos, timestamps y semántica de auditoría; requiere un contrato de producto separado.
 - El Lab genera 23 páginas estáticas y 17 contratos publicados; los E2E Chromium/mobile pasan.
 
+### Delta 2026-08-01 (i) — activity timeline
+
+- `utilities` se extrae como `efeonce.activity-timeline`, con eventos ordenados, timestamps legibles, estados,
+  persona y adjunto de fixture; no se trasladan datos operativos ni registros de auditoría.
+- El Lab genera 24 páginas estáticas y 18 contratos publicados; build, typecheck, tests y 16 E2E Chromium/mobile
+  pasan.
+
 ### Plan futuro para portar el Lab Greenhouse a AXIS
 
 1. Inventariar las rutas actuales de `/design-system` y clasificarlas como contrato puro, fixture visual,

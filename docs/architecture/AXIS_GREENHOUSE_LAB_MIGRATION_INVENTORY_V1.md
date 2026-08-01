@@ -27,7 +27,7 @@ Cada candidato requiere auditoría transitive de imports antes de migrarse.
 | `geometry` | migrada | `/references/geometry/` — `axisGeometry` |
 | `elevation` | migrada | `/references/elevation/` — `axisElevation` |
 | `gradients` | migrada | static gradient contract + reduced-motion fixture |
-| `utilities` | excluded first slice | Activity Timeline mixes operational evidence and product data |
+| `utilities` | migrada | `efeonce.activity-timeline`; no operational data |
 | `buttons`, `chips`, `breadcrumbs` | migrada | `DesignPatternContract` + static fixtures |
 | `disclosure`, `loaders`, `floating-surfaces` | migrada | headless/motion contracts + static fixtures |
 | `card-density`, `composition-shell` | migrada | density/shell contracts; no Portal shell |
@@ -75,8 +75,8 @@ and `efeonce.surface-recipes`. These are reference fixtures for data shape, sequ
 they do not copy chart engines, product data, Portal state or consumer adapters.
 
 `efeonce.gradients` completes the portable token/reference group with intensity and static-mode semantics. The
-Greenhouse `utilities` page remains excluded: its Activity Timeline is an operational evidence primitive with
-attachments, people, timestamps and audit semantics, so it needs a separate product contract before migration.
+Greenhouse `utilities` is represented by `efeonce.activity-timeline`: an operational evidence primitive with
+ordered events, people, timestamps and attachments, but no product data or audit records.
 
 ## Gate for each next route
 

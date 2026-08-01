@@ -33,8 +33,8 @@
   siguen excluidos del Lab público.
 - El catálogo pure-UI también cubre `charts`, `roadmap-timeline`, `team-avatar-group` y `surface-recipes`; aún
   faltan las comparaciones visuales contra consumidores antes de retirar el fallback Greenhouse.
-- `gradients` ya tiene fixture portable; `utilities` sigue fuera por su dependencia de evidencia operativa y
-  auditoría, no por una limitación de Astro.
+- `gradients` ya tiene fixture portable y `utilities` ahora se representa mediante `efeonce.activity-timeline`,
+  sin datos operativos ni registros de auditoría.
 
 ## Globe Producer — seis defectos de superficie, el pie de la app y la paginación del feed (2026-08-01)
 
