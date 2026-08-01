@@ -23,7 +23,7 @@ Cada candidato requiere auditoría transitive de imports antes de migrarse.
 | Ruta Greenhouse | Triage | Próximo destino |
 |---|---|---|
 | `colors` | primer slice | `/references/colors/` — migrada desde tokens AXIS |
-| `typography` | token/reference candidate | contrato de typography AXIS |
+| `typography` | primer slice | `/references/typography/` — migrada desde la escala canónica |
 | `geometry` | token/reference candidate | contrato de geometry AXIS |
 | `elevation` | token/reference candidate | contrato de surface/elevation AXIS |
 | `gradients` | token/reference candidate | referencia AXIS tras provenance |
@@ -41,12 +41,16 @@ Cada candidato requiere auditoría transitive de imports antes de migrarse.
 | `mockup/*` and `typography/mockup` | excluded first slice | proposal/mockup artifacts |
 | `figma-link/mockup` | excluded first slice | private Figma integration |
 
-## First slice moved
+## First slices moved
 
-`colors` now renders at `https://axis-design-system-lab-efeonce-7670142f.vercel.app/references/colors/`.
+`colors` renders at `https://axis-design-system-lab.vercel.app/references/colors/`.
 The page reads `axisRamp` from `@efeoncepro/axis-tokens`; it does not copy Greenhouse theme values or import
 `AxisColorLabView`. It is a reference slice, not a claim of complete parity with the old internal page. Its
 E2E smoke verifies the public route and a published token value.
+
+`typography` now renders at `https://axis-design-system-lab.vercel.app/references/typography/`.
+Its semantic scale, families, weights and line-heights are published by `axisTypography`; the page does not
+import `CanonicalTypographyView` or Greenhouse typography runtime.
 
 ## Gate for each next route
 

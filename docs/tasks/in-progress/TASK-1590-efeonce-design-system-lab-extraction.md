@@ -51,8 +51,9 @@ fixtures visuales completos por contrato y la migración ordenada del catálogo 
   `apps/lab/dist`; alias público: `https://axis-design-system-lab.vercel.app`.
 - `/`, `/docs/`, `/patterns/efeonce.status/`, `/patterns/efeonce.progress/`,
   `/references/colors/` y `/sitemap-index.xml` responden `200` sin protección SSO.
-- El primer slice migrado desde Greenhouse es `colors`: una referencia HTML/CSS que lee `axisRamp` desde
-  `@efeoncepro/axis-tokens`, sin copiar `AxisColorLabView` ni importar Greenhouse.
+- Los primeros slices migrados desde Greenhouse son `colors` y `typography`: referencias HTML/CSS que leen
+  `axisRamp` y `axisTypography` desde `@efeoncepro/axis-tokens`, sin copiar `AxisColorLabView` ni
+  `CanonicalTypographyView`, ni importar Greenhouse.
 - El inventario de rutas y la clasificación inicial están en
   [`AXIS_GREENHOUSE_LAB_MIGRATION_INVENTORY_V1.md`](../../architecture/AXIS_GREENHOUSE_LAB_MIGRATION_INVENTORY_V1.md).
 
