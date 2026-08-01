@@ -132,6 +132,7 @@ async function main() {
     }
 
     const legacyMetadata = { source: 'scripts/seed-globe-admin-cli-oauth.ts', taskId: 'TASK-1629' }
+    const historicalMetadata = { source: 'scripts/seed-globe-admin-cli-oauth.ts', taskId: 'TASK-1616' }
 
     const knownGrant =
       exactGrant ||
@@ -140,7 +141,10 @@ async function main() {
       (sameStrings(existing.allowedScopes, legacyAllowedScopes) &&
         stableJson(existing.policy) === stableJson(legacyPolicy))
 
-    const knownMetadata = exactMetadata || stableJson(existing.metadata) === stableJson(legacyMetadata)
+    const knownMetadata =
+      exactMetadata ||
+      stableJson(existing.metadata) === stableJson(legacyMetadata) ||
+      stableJson(existing.metadata) === stableJson(historicalMetadata)
 
     if (!stableConfiguration || !knownGrant || !knownMetadata) {
       throw new Error('globe_admin_oauth_client_configuration_drift')

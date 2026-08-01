@@ -24,9 +24,9 @@ export const buildGlobeAdminOAuthGrantContract = () => {
   const policy: SisterPlatformOAuthPolicyV1 = {
     schemaVersion: '1',
     audience: { tenantTypes: ['efeonce_internal'] },
-    // Capability scopes are opt-in. Each route enforces its exact scope, so adding `ensure` does
-    // not invalidate five-minute tokens already issued for read/reconcile/propose/confirm.
-    requiredScopes: ['openid'],
+    // The broker contract requires every capability scope to be required. The CLI requests this
+    // exact bounded set and its access token lasts only five minutes.
+    requiredScopes: ['openid', ...GLOBE_ADMIN_OAUTH_CAPABILITY_SCOPES],
     capabilityScopes: [...GLOBE_ADMIN_OAUTH_CAPABILITY_SCOPES],
     claims: { includeGreenhouseRoles: false },
     revocation: {
