@@ -79,6 +79,13 @@ fixtures visuales completos por contrato y la migración ordenada del catálogo 
 - El Lab genera 16 páginas estáticas, con 10 contratos publicados; pasan 19 tests de tokens y 16 E2E en Chromium
   y mobile. La referencia Greenhouse permanece como fallback para comparar consumidores.
 
+### Delta 2026-08-01 (f) — shell y density
+
+- AXIS publica `efeonce.composition-shell` y `efeonce.card-density` como fixtures de layout estático, con orden
+  de landmarks, composición responsive y prioridad de contenido documentados.
+- El Lab genera 18 páginas estáticas y 12 contratos publicados; los E2E Chromium/mobile pasan después de verificar
+  las nuevas rutas. No se trasladaron Portal context, telemetry ni componentes MUI.
+
 ### Plan futuro para portar el Lab Greenhouse a AXIS
 
 1. Inventariar las rutas actuales de `/design-system` y clasificarlas como contrato puro, fixture visual,

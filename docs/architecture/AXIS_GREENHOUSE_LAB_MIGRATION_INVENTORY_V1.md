@@ -30,7 +30,7 @@ Cada candidato requiere auditoría transitive de imports antes de migrarse.
 | `utilities` | token/reference candidate | primitives/recipes AXIS |
 | `buttons`, `chips`, `breadcrumbs` | migrada | `DesignPatternContract` + static fixtures |
 | `disclosure`, `loaders`, `floating-surfaces` | migrada | headless/motion contracts + static fixtures |
-| `card-density`, `composition-shell` | pure-UI candidate | density/shell contracts; no Portal shell |
+| `card-density`, `composition-shell` | migrada | density/shell contracts; no Portal shell |
 | `motion`, `border-beam` | migrada | motion contract + reduced-motion evidence |
 | `microinteractions` | excluded first slice | composite product feedback; extract per primitive |
 | `team-avatar-group`, `surface-recipes`, `roadmap-timeline`, `charts` | pure-UI candidate | contract after transitive import audit |
@@ -65,6 +65,10 @@ the Greenhouse primitives remain the fallback implementation until consumer pari
 The motion block additionally publishes `efeonce.motion` and `efeonce.border-beam`. Motion values come from the
 dependency-free scale; the beam is represented as a framework-agnostic surface-boundary fixture with a static
 reduced-motion mode. Greenhouse's Nexa-specific beam palettes and GSAP runtime are not copied into AXIS.
+
+`efeonce.composition-shell` and `efeonce.card-density` now expose layout-only fixtures. They preserve landmark
+order, responsive composition and content priority without copying Greenhouse Portal context, telemetry or MUI
+components.
 
 ## Gate for each next route
 

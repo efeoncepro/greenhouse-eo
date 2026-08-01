@@ -29,6 +29,8 @@
   fallback hasta cerrar parity visual y de consumidores.
 - También quedaron publicados `motion` y `border-beam` como contratos portables; `microinteractions` sigue fuera
   del traslado inicial porque mezcla múltiples primitivas y estados de producto.
+- `composition-shell` y `card-density` ya tienen fixtures estáticos en AXIS; el shell de Portal y su telemetría
+  siguen excluidos del Lab público.
 
 ## Globe Producer — seis defectos de superficie, el pie de la app y la paginación del feed (2026-08-01)
 
