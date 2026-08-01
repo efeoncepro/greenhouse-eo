@@ -11,7 +11,7 @@ const period = { schemaVersion: '1', timezone: 'UTC', start: '2026-08-01T00:00:0
 const coverage = { periodStart: period.start, periodEnd: period.end, candidateCount: 1 }
 
 describe('Globe credit capacity operator projection', () => {
-  it('allowlists the decision fields and keeps historical ledger separate from effective capacity', () => {
+  it('allowlists only operational capacity and excludes historical ledger aggregates', () => {
     const status = parseCapacityStatus({
       schemaVersion: '1', audience: 'operator', state: 'ready', historicalLedger,
       decision: { schemaVersion: '2', workspaceId: 'hidden', policyVersion: 'hidden', requestedCredits: 10,
@@ -20,9 +20,10 @@ describe('Globe credit capacity operator projection', () => {
         asOf: historicalLedger.asOf, fundingBreakdown: [{ grantId: 'hidden' }] }
     })
 
-    expect(status.historicalLedger.available).toBe(499870)
     expect(status.effectiveAvailable).toBe(70)
+    expect(status).not.toHaveProperty('historicalLedger')
     expect(JSON.stringify(status)).not.toContain('hidden')
+    expect(JSON.stringify(status)).not.toContain('500000')
   })
 
   it('keeps unknown amounts absent instead of converting missing authority to zero', () => {

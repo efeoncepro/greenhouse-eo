@@ -25,14 +25,6 @@ export type GlobeCreditCapacityStatus = Readonly<{
   coverage: Readonly<{ periodStart: string; periodEnd: string; candidateCount: number }>
   freshnessSeconds: number
   asOf: string
-  historicalLedger: Readonly<{
-    allocated: number
-    reserved: number
-    spent: number
-    adjusted: number
-    available: number
-    asOf: string
-  }>
 }>
 
 export type ReadGlobeCreditCapacityInput = Readonly<{
@@ -81,7 +73,6 @@ export function parseCapacityStatus(raw: unknown): GlobeCreditCapacityStatus {
 
   if (root.schemaVersion !== '1' || root.audience !== 'operator') invalid()
   const state = oneOf(root.state, ['ready', 'limited', 'blocked', 'unknown'] as const)
-  const historicalLedger = ledger(root.historicalLedger)
 
   if (state === 'unknown') {
     if (root.decision !== undefined) invalid()
@@ -94,8 +85,7 @@ return {
       blockers: blockers(unavailable.blockers),
       coverage: coverage(unavailable.coverage),
       freshnessSeconds: nonNegative(unavailable.freshnessSeconds),
-      asOf: iso(unavailable.asOf),
-      historicalLedger
+      asOf: iso(unavailable.asOf)
     }
   }
 
@@ -115,18 +105,8 @@ return {
     blockers: blockers(decision.blockers),
     coverage: coverage(decision.coverage),
     freshnessSeconds: nonNegative(decision.freshnessSeconds),
-    asOf: iso(decision.asOf),
-    historicalLedger
+    asOf: iso(decision.asOf)
   }
-}
-
-function ledger(raw: unknown): GlobeCreditCapacityStatus['historicalLedger'] {
-  const value = record(raw)
-
-  
-return { allocated: nonNegative(value.allocated), reserved: nonNegative(value.reserved),
-    spent: nonNegative(value.spent), adjusted: finite(value.adjusted), available: nonNegative(value.available),
-    asOf: iso(value.asOf) }
 }
 
 function capacityBand(raw: unknown) {

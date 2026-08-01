@@ -27,15 +27,7 @@ export const globeCreditsWorkbenchFixture: GlobeCreditsWorkbenchModel = {
       candidateCount: 3
     },
     freshnessSeconds: 14,
-    asOf: '2026-08-01T15:42:00.000Z',
-    historicalLedger: {
-      allocated: 1400,
-      reserved: 118,
-      spent: 626,
-      adjusted: 0,
-      available: 656,
-      asOf: '2026-08-01T15:42:00.000Z'
-    }
+    asOf: '2026-08-01T15:42:00.000Z'
   },
   projection: {
     unavailable: [],
