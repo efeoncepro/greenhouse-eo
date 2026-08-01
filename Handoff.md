@@ -47,6 +47,8 @@
 
 ## TASK-1614/TASK-1629/TASK-1630 — recuperación y convergencia del carril Globe (2026-08-01)
 
+- Goal activo confirmado por el operador: dejar Studio Credits operativo, funcional y enterprise end-to-end;
+  no se limita a documentación ni termina hasta verificar código, migraciones, runtime y superficies reales.
 - PR #176 (`626eda751`) integró OAuth PKCE, API Platform, provenance y confirmación agente en `origin/develop`;
   `d804c1169` sincronizó el checkout sin worktrees ni pérdida de WIP. El dueño vigente es TASK-1629 y
   las migraciones conservan sus nombres históricos `task-1616-*`.
@@ -54,8 +56,10 @@
   one-shot/adapters → 1483 workbench Greenhouse → 1628 self-view Producer.
 - La autoridad CEO one-shot está aprobada pero pendiente en TASK-1629. Live: delegación agente persistente,
   límites vigentes, `requireSecondConfirmer=OFF`; workloads no confirman.
-- Estado honesto: formalización documental; no se hizo deploy, migración, fondeo, generación, push ni promoción
-  a `main` durante este cierre.
+- Ejecución activa: preflight TASK-1482 completado; auditoría confirma bloqueos P0 de verdad económica y un
+  `workspaceBinding` OAuth no aplicado. Estado de repos, hallazgos con detalle, acciones no realizadas y siguiente
+  comando seguro quedan en
+  [`GLOBE_RUNTIME_HANDOFF.md`](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md#checkpoint-de-ejecución--studio-credits-enterprise-2026-08-01).
 
 ## AXIS — guía visual agent-facing publicada (2026-08-01)
 

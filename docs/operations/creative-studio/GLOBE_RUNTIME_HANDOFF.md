@@ -172,6 +172,33 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
 - El cliente Entra interno del gateway MCP recibe hoy ambos scopes aun cuando solicita el base. Antes de acceso
   B2B debe existir entitlement por tenant/capability y una identidad base-only que pruebe la denegación de Globe.
 
+## Checkpoint de ejecución — Studio Credits enterprise (2026-08-01)
+
+- Goal activo: completar TASK-1482 → TASK-1468+1579 → TASK-1586 → TASK-1629 → TASK-1483 → TASK-1628 con
+  migraciones, runtime, observabilidad, runbooks y evidencia local/staging/live; no basta código ni documentación.
+- Preflight ejecutado: `pnpm codex:task-hook TASK-1482 --develop --subagents` sobre el checkout compartido.
+- Auditoría inicial Globe: el kernel durable, reservas y fondeo `propose → confirm` existen; no se crea otro
+  ledger. `evaluateCreditBudget` no comparte el evaluador transaccional de `reserve`; `getAvailability` mezcla
+  historia completa con período; caps de proyecto/período omiten holds; candidatos no aplican período/scopes ni
+  `fundingPriority`; `settle` no reautoriza `actual > reserved`; no hay caller operativo de expiry ni
+  `ensure-funded` por objetivo.
+- Auditoría inicial Greenhouse: están vivos intents, provenance, delegación agente persistente, API Platform y CLI.
+  La regla de segundo confirmador ya es condicional en base de datos, aunque quedan mensajes/comentarios stale.
+  La autoridad one-shot CEO→agente y los adapters de readback/ensure-funded aún no están implementados. Además,
+  `workspaceBindings` entra por OAuth pero hoy se descarta antes del adapter; el body controla
+  `globeWorkspaceId` sin cotejo. Es un gate de autorización P0 previo a ampliar el surface.
+- Estado de repos: Greenhouse en `develop` con WIP ajeno preservado; Globe en
+  `feat/producer-feed-new-items-pill` (`18f3e60`), rama ya fusionada, con
+  `scripts/evidence/vertex-omni-commercial-terms.json` no versionado. No se cambió branch ni se creó worktree.
+- Acciones todavía no realizadas: no migración aplicada, no deploy, no fondeo, no generación, no push y no
+  release completo. La verificación browser futura debe usar la sesión Chrome autenticada anclada a
+  `jreyes@efeonce.cl`.
+- Próximo punto seguro de continuación: cerrar el workspace binding en Greenhouse; documentar el contrato exacto
+  de snapshot/evaluator V2; obtener autorización antes de cambiar el checkout compartido de Globe y luego
+  implementar la unidad TASK-1482 con tests de conformance y concurrencia. El orden interno del kernel es:
+  período/snapshot/evaluator puro → facts con spent+holds+eligibility → reserve común → fail-closed para
+  `actual > reserved` → settlement/expiry reconciliada → `ensure-funded` sobre `propose → confirm`.
+
 ## Siguiente paso ejecutable
 
 1. `TASK-1630` ya quedó formalizada. Ejecutar primero `TASK-1482` para período/funding/decisión y
