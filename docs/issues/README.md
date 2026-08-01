@@ -64,7 +64,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-126`
+`ISSUE-135`
 
 ## Open
 
@@ -75,6 +75,12 @@ Tasks, docs de arquitectura, o commits relacionados.
 | `ISSUE-124` | [Globe: grant adicional de créditos devuelve 409 sin causa de fase](open/ISSUE-124-globe-credit-grant-canonical-409-root-cause-hidden.md) | production (Globe API internal) | 2026-07-24 | open — causa identificada 2026-07-26 (taxonomía de crédito colapsada en `conflict` + `budget.evaluate` fuera de `ui`); solución = Slice 1 de `TASK-1566` |
 | `ISSUE-127` | [Cuatro códigos genéricos de Globe esconden causas accionables distintas](open/ISSUE-127-globe-generic-error-codes-hide-actionable-causes.md) | production (Globe API) | 2026-07-26 | open — 3 de 4 cerrados (`409` de crédito, `runner_error`, `ProductionRouteDependencyError` con 12 razones); `authentication_required` pendiente. **Descubrimiento en cadena: arreglar uno destapó el siguiente** |
 | `ISSUE-126` | [La reconciliación de tenancy Greenhouse→Globe lleva 2 días fallando cada 5 minutos, con su scheduler en verde](open/ISSUE-126-globe-tenancy-reconcile-broken-two-days-by-vendored-contracts-drift.md) | production (ops-worker → Globe API) | 2026-07-26 | open — **sangrado cerrado y verificado en runtime 2026-07-26** (re-vendorizado 51→65 + guard probado en rojo + `ops-worker` desplegado + 2 reconciles consecutivos `done`). Faltan: señal de frescura, degradación por-capability y bump de versión del tarball. **Sigue bloqueando flipear `tenancy_mode=enforced`** hasta que exista la señal |
+| `ISSUE-129` | [Payroll adjustments: cross-record authorization and tenant/capability guards](open/ISSUE-129-payroll-adjustment-cross-record-authorization.md) | Dev/staging | 2026-08-01 | open — GitHub [#170](https://github.com/efeoncepro/greenhouse-eo/issues/170) |
+| `ISSUE-130` | [Payroll calculation: atomic materialization and period concurrency](open/ISSUE-130-payroll-calculation-non-atomic-period-race.md) | Dev/staging/production | 2026-08-01 | open — GitHub [#171](https://github.com/efeoncepro/greenhouse-eo/issues/171) |
+| `ISSUE-131` | [Payroll official calculation: fail-closed readiness and legal data](open/ISSUE-131-payroll-readiness-legal-data-fail-open.md) | Dev/staging/production | 2026-08-01 | open — GitHub [#172](https://github.com/efeoncepro/greenhouse-eo/issues/172) |
+| `ISSUE-132` | [Payroll adjustments: derive complete breakdown from one source](open/ISSUE-132-payroll-adjustment-breakdown-not-derived-from-one-source.md) | Dev/staging | 2026-08-01 | open — GitHub [#173](https://github.com/efeoncepro/greenhouse-eo/issues/173) |
+| `ISSUE-133` | [Payroll projected view ignores active adjustments](open/ISSUE-133-payroll-projected-view-ignores-active-adjustments.md) | Dev/staging | 2026-08-01 | open — GitHub [#174](https://github.com/efeoncepro/greenhouse-eo/issues/174) |
+| `ISSUE-134` | [Payroll UI offers invalid revert and self-service error state](open/ISSUE-134-payroll-ui-offers-invalid-revert-and-self-service-error.md) | Dev/staging | 2026-08-01 | open — GitHub [#175](https://github.com/efeoncepro/greenhouse-eo/issues/175) |
 | `ISSUE-125` | [La evidencia GVC del Producer se produjo contra un DOM de Globe que nunca se commiteó](open/ISSUE-125-gvc-evidence-against-uncommitted-globe-dom.md) | local (evidencia GVC de una superficie de otro repo) | 2026-07-25 | open |
 | `ISSUE-118` | [Los readers del watchdog usan un resolver PAT-only e ignoran el GitHub App ya provisionado](open/ISSUE-118-watchdog-readers-sync-resolver-ignore-github-app.md) | local + Vercel (no afecta GH Actions) | 2026-07-10 | open |
 | `ISSUE-117` | [Offboarding ejecutado nunca desactiva `greenhouse_core.members` (active/status) → desvinculados filtran a rosters/nómina/360](open/ISSUE-117-offboarding-executed-never-deactivates-member-canonical.md) | production + staging (identity canónico) | 2026-07-06 | open |
