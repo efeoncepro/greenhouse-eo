@@ -50,7 +50,7 @@ del Lab Greenhouse. Las fixtures actuales son válidas como punto de partida té
 | `/breadcrumbs` | jerarquía, overflow y motion | `efeonce.breadcrumbs` | 🟡 candidate parity | AXIS reproduce cuatro ports, overflow nativo, variantes, cuatro kinds, hit area cómoda y reduced-motion; falta compare visual/computed contra Greenhouse |
 | `/disclosure` | disclosure/modal con estado y guardrails | `efeonce.disclosure` | 🟡 skeleton | fixture nativa no cubre el flujo real ni motion |
 | `/loaders` | loading section con variantes y estados | `efeonce.loaders` | 🟡 skeleton | faltan escenas, anuncios, skeletons y motion real |
-| `/floating-surfaces` | tooltip/popover/menu y focus return | `efeonce.floating-surface` | 🟡 skeleton | falta positioning, escape, focus return y viewport safety |
+| `/floating-surfaces` | tooltip/popover/menu y focus return | `efeonce.floating-surface` | 🟡 candidate parity | AXIS reproduce seis variantes, roles, menú/editor, motion y reduced-motion; falta compare visual/computed y focus return real del consumer |
 | `/composition-shell` | composiciones y morph de layout | `efeonce.composition-shell` | 🟡 skeleton | fixture no reproduce regiones ni View Transitions |
 | `/surface-recipes` | workbench/report/config con recetas compuestas | `efeonce.surface-recipes` | 🟡 skeleton | falta la experiencia multi-escena completa |
 | `/card-density` | driver de ancho, composiciones y replay | `efeonce.card-density` | 🟡 skeleton | falta driver interactivo, morph y charts |

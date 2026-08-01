@@ -60,10 +60,12 @@ Demostrar que las capabilities promovidas son operables por SDK/MCP sobre los mi
 ### Depends on
 
 - `TASK-1469`, `TASK-1472`.
+- `TASK-1626` no bloquea el packaging local: consume el provider cuando su contract esté certificado y posee el gateway público, OAuth, Cloud Run y DNS.
 
 ### Blocks / Impacts
 
 - Las tasks downstream declaradas en el grafo de EPIC-028 y el execution plan de Globe.
+- `TASK-1626`, que necesita un provider Globe versionado y read-only para la primera federación pública de Efeonce MCP.
 - No habilita producción ni clientes externos por sí sola.
 
 ### Files owned
@@ -71,6 +73,9 @@ Demostrar que las capabilities promovidas son operables por SDK/MCP sobre los mi
 - `../efeonce-globe/packages/sdk/`
 - `../efeonce-globe/packages/contracts/`
 - `../efeonce-globe/apps/studio-web/`
+
+No posee `../efeonce-mcp/**`, `mcp.efeonce.org`, OAuth del gateway ni su infraestructura. Esas superficies
+pertenecen a `TASK-1626`; Globe conserva sólo su transport/provider adapter y los contratos de dominio.
 
 ## Current Repo State
 

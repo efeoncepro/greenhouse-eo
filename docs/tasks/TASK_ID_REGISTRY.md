@@ -1711,7 +1711,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-1624` | `to-do` | Globe Grok Imagine Image: generate/edit, references, 1K/2K, outputs múltiples, policy receipt y safety/rights gate. | `docs/tasks/to-do/TASK-1624-globe-grok-imagine-image-fleet-producer-integration.md` |
 | `TASK-1625` | `to-do` | Payroll correctness and operational hardening; umbrella de issues de integridad, concurrencia, reglas legales, ajustes, proyección y UI. | `docs/tasks/to-do/TASK-1625-payroll-correctness-and-operational-hardening.md` |
 | `TASK-1628` | `to-do` | El Producer puede leer su propio presupuesto: abre los readers de presupuesto a `ui` sin exponer las mutaciones de crédito. | `docs/tasks/to-do/TASK-1628-globe-producer-reads-its-own-budget.md` |
-| `TASK-1626` | `to-do` | **Efeonce MCP Platform Gateway and Globe Federation.** Repo neutral `efeonce-mcp`, OAuth protected resource, Streamable HTTP, Cloud Run, front door `mcp.efeonce.org` y primera federación Globe read-only. | `docs/tasks/to-do/TASK-1626-efeonce-mcp-platform-gateway.md` |
+| `TASK-1626` | `in-progress` | **Efeonce MCP Platform Gateway and Globe Federation.** Repo neutral `efeonce-mcp`, OAuth protected resource, Streamable HTTP, Cloud Run, front door `mcp.efeonce.org` y primera federación Globe read-only. | `docs/tasks/in-progress/TASK-1626-efeonce-mcp-platform-gateway.md` |
 
 ## Siguiente ID disponible
 

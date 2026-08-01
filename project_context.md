@@ -45,6 +45,11 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 - Este repo corresponde al `starter-kit` Greenhouse. `full-version` es referencia visual/funcional, no
   source of truth ni producto activo.
 - Greenhouse es plataforma/subproducto de Efeonce; `EO` es abreviación del repo, no nomenclatura visible.
+- El gateway MCP federado vive en el repo hermano `efeonce-mcp`, no en Greenhouse ni Globe. Su recurso canónico
+  es `https://mcp.efeonce.org/mcp`, corre en Cloud Run dentro de `efeonce-group` y conserva cada provider
+  deshabilitado hasta sus gates propios. Greenhouse mantiene sólo ADRs, tasks y handoff de ecosistema.
+- La operación o evolución MCP se enruta por las skills espejo `.codex/skills/efeonce-mcp-platform/` y
+  `.claude/skills/efeonce-mcp-platform/`; estas componen la skill dueña de cada provider y no duplican su policy.
 - Wave es una product house hermana para la capa de producto de sus Product Services; sus runtimes y plataformas no se crean dentro de Greenhouse. Greenhouse administra transversalmente las plataformas Efeonce mediante contratos de sister platform. Los productos nuevos nacen Agent Native y con Full API Parity. Canon: [`EFEONCE_WAVE_PRODUCT_PLATFORM_GREENHOUSE_ADMINISTRATION_DECISION_V1.md`](docs/architecture/EFEONCE_WAVE_PRODUCT_PLATFORM_GREENHOUSE_ADMINISTRATION_DECISION_V1.md).
 - Greenhouse evolucionará hacia un Ecosystem Work Registry + Federated Execution Harness: mantendrá la visibilidad y coordinación global del trabajo; cada repo conservará ejecución, evidencia primaria, runtime y ownership local mediante contratos, manifests y adapters. Canon: [`GREENHOUSE_ECOSYSTEM_WORK_REGISTRY_FEDERATED_EXECUTION_DECISION_V1.md`](docs/architecture/GREENHOUSE_ECOSYSTEM_WORK_REGISTRY_FEDERATED_EXECUTION_DECISION_V1.md). La implementación está gated; no hay transporte, schema, adapter ni mutación cross-repo autorizados todavía.
 - Arquitectura vigente + código/schema/runtime verificados prevalecen sobre tasks o handoffs stale.

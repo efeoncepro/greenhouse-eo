@@ -1,5 +1,27 @@
 # Handoff activo
 
+## Efeonce MCP — gateway core y TLS verificados; OAuth público y Globe pendientes de cierre (2026-08-01)
+
+- Se creó el repo privado independiente `efeoncepro/efeonce-mcp`; Greenhouse y Globe no hospedan el gateway.
+  El PR `#2` fue fusionado a `main` en `d9c0c69` y su CI pasó.
+- Runtime: Cloud Run `efeonce-mcp-gateway` en `efeonce-group/southamerica-west1`, service account dedicada,
+  Artifact Registry inmutable, GitHub WIF sin keys y Global External ALB sobre `34.111.78.237`.
+- OAuth Entra pasó un canary real de authorization code + PKCE con resource
+  `https://mcp.efeonce.org/mcp`: initialize `200`; una llamada Globe sin su scope fue rechazada `403` antes
+  del dispatch. Entra v2 emite el App ID del recurso en `aud`, no la URL pública.
+- `mcp.efeonce.org` ya resuelve a la IP global desde ambos NS de HostGator y resolvers públicos; HTTP responde
+  `301` a HTTPS. El certificado administrado está `ACTIVE` y TLS presentó un certificado válido para el hostname.
+- El servicio quedó detrás del load balancer; el acceso directo `run.app` devuelve `404`. `/mcp` permanece
+  OAuth-protegido y Globe está `GLOBE_PROVIDER_ENABLED=false`.
+- Se agregó la skill espejo `efeonce-mcp-platform` para Codex/Claude, con router de sinergias hacia arquitectura,
+  cloud/secret hygiene, Globe, QA y documentación. `pnpm skills:mirrors` detecta drift entre ambos bundles.
+- Health, discovery OAuth y rechazo anónimo del MCP pasaron por el hostname público. El resolver local conserva
+  una caché negativa, pero los autoritativos y resolvers públicos ya devuelven la IP correcta; el smoke usó SNI.
+- Estado honesto: falta repetir el canary OAuth autenticado por hostname antes de declarar el gateway operativo
+  públicamente. Un intento controlado no recibió el callback de Entra dentro de la ventana de autorización,
+  por lo que este último canary debe ejecutarse desde una sesión de Entra autorizada. La federación Globe real
+  continúa bajo `TASK-1473`; no habilitarla sin package/API/IAM y canary.
+
 ## TASK-1614/TASK-1629 — recuperación Git del carril Globe (2026-08-01)
 
 - Rama de integración: `codex/TASK-1614-credit-lane-integration`, construida desde `develop` sin cambiar el
@@ -54,9 +76,12 @@
   provenance del avatar sintético.
 - `breadcrumbs` ya tiene una reconstrucción de candidate parity en AXIS (`6979641`): cuatro ports, overflow nativo,
   variantes/kinds, hit area cómoda, motion sutil y reduced-motion; falta el compare visual/computed contra Greenhouse.
+- `floating-surface` ya tiene una reconstrucción de candidate parity en AXIS (`72d03f4`): seis variantes V1, roles
+  tooltip/menu/dialog, menú, editor dirty-safe, motion anchored y reduced-motion; falta compare visual/computed y
+  focus return real contra el consumer Greenhouse.
 - `leaderboard` ya tiene contrato y fixture estática con datos sintéticos; `brand-motion` ya tiene contrato y
   referencia orbital HTML/CSS sin SVG privado ni GSAP. El Lab queda en 27 páginas y 21 contratos; build, lint,
-  typecheck, tests y 24 E2E pasan. `axis.efeonce.org` ya resuelve a `76.76.21.21` y el smoke HTTPS devuelve `200`.
+  typecheck, tests y 26 E2E pasan. `axis.efeonce.org` ya resuelve a `76.76.21.21` y el smoke HTTPS devuelve `200`.
   La siguiente continuidad debe continuar con `handoff`, `microinteractions` y las superficies con API.
 
 ## Globe Producer — seis defectos de superficie, el pie de la app y la paginación del feed (2026-08-01)

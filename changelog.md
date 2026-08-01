@@ -7,6 +7,21 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-01 — Efeonce MCP: gateway independiente, OAuth Entra y front door
+
+- Se creó `efeoncepro/efeonce-mcp` como repo privado independiente con Node 24, TypeScript, Fastify, SDK MCP
+  v2, CI, container no-root, OpenTofu y delivery keyless por GitHub WIF. El PR `#2` quedó fusionado a `main`
+  en `d9c0c69` con CI verde.
+- El gateway corre en Cloud Run `efeonce-group/southamerica-west1`; un canary Entra authorization code + PKCE
+  validó resource, issuer, audience y scope reales: initialize `200` y Globe sin scope `403`.
+- Se promovió el Global External ALB sobre `34.111.78.237`; Cloud Run acepta sólo tráfico del load balancer y
+  `mcp.efeonce.org` ya resuelve desde HostGator y resolvers públicos. El certificado administrado quedó `ACTIVE`;
+  health/discovery OAuth respondieron `200` y `/mcp` anónimo rechazó `401` como corresponde.
+- Globe permanece intencionalmente OFF hasta que `TASK-1473` entregue y certifique package/API/IAM; el gateway
+  no importa lógica, DB, storage ni credenciales de Globe.
+- Se incorporó la skill espejo `efeonce-mcp-platform` para Codex y Claude: enruta gateway, OAuth, edge e
+  integración de providers hacia las skills dueñas, y mantiene una verificación mecánica de paridad.
+
 ## 2026-08-01 — Globe: recuperación del source of truth OAuth/PKCE y evaluación durable
 
 - Se reconstruyó sobre `develop` el código preservado del Admin CLI OAuth público + PKCE, las rutas API Platform,
