@@ -19,7 +19,7 @@
 - Rank: `TBD`
 - Domain: `commercial|security|legal|finance|creative`
 - Blocked by: `TASK-1476, TASK-1477, TASK-1478, TASK-1479`
-- Branch: `task/TASK-1593-enterprise-icp-design-partner-readiness`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

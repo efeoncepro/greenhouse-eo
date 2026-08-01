@@ -21,7 +21,7 @@
 - Rank: `TBD`
 - Domain: `finance|creative|data`
 - Blocked by: `TASK-1468, TASK-1469, TASK-1470, TASK-1471, TASK-1472`
-- Branch: `task/TASK-1478-globe-shadow-calibration-unit-economics`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

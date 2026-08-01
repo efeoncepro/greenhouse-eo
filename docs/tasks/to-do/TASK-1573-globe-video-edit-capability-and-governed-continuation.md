@@ -21,7 +21,7 @@
 - Rank: `TBD`
 - Domain: `creative|video|ai`
 - Blocked by: `TASK-1490`, `TASK-1553`; external-video slice additionally `TASK-1539`
-- Branch: `task/TASK-1573-globe-video-edit-capability-and-governed-continuation`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 
 ## Summary

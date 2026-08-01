@@ -35,7 +35,7 @@ Nota de frontera, alineada con el Goal ("separar probar de autorizar") y la AC "
 - Rank: `TBD`
 - Domain: `creative|platform|data`
 - Blocked by: `none`
-- Branch: `task/TASK-1463-globe-model-promotion-readiness-registry`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

@@ -21,7 +21,7 @@
 - Rank: `TBD`
 - Domain: `creative|ui-platform|governance|accessibility`
 - Blocked by: `TASK-1455`
-- Branch: `task/TASK-1485-globe-design-system-governance-pattern-registry`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

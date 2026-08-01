@@ -126,7 +126,7 @@ Before writing files, present:
 - execution profile and UI impact
 - backend impact
 - inferred priority/effort if applicable
-- derived branch: `task/TASK-###-short-slug`
+- repository branch contract (currently Greenhouse `develop`; Globe `main`; no per-task branch or worktree)
 - any open questions
 - any `[verificar]` items
 - any collision with active tasks

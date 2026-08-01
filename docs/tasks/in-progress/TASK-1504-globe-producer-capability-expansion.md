@@ -59,7 +59,7 @@
 - Rank: `TBD`
 - Domain: `creative|ai|platform`
 - Blocked by: `none`
-- Branch: `task/TASK-1504-globe-producer-capability-expansion`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

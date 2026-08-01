@@ -33,7 +33,7 @@
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none` (TASK-1558 LIVE 2026-07-25; las primitives existen)
-- Branch: `task/TASK-1559-globe-feed-viewer-client-port`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - GitHub Issue: `TBD`
 
 ## Corrección de contrato 2026-07-25 — `Motion: none` era falso

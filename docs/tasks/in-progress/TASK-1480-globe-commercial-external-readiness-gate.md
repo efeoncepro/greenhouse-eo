@@ -21,7 +21,7 @@
 - Rank: `TBD`
 - Domain: `commercial|legal|finance|security`
 - Blocked by: `none`
-- Branch: `task/TASK-1480-globe-commercial-external-readiness-gate`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

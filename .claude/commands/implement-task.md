@@ -5,7 +5,7 @@ argument-hint: TASK-###|### [notas opcionales, ej. "crea preview remoto" o "mant
 
 # Implementar `$ARGUMENTS`
 
-Vas a implementar la task indicada en `$ARGUMENTS` (formato `TASK-###` o número desnudo `###`; el resto son notas del operador). Por defecto **trabajas en `develop`, local-first, SIN push** (`local = taller`; el push remoto NO es cierre automático — espera instrucción explícita). Si toca UI, levanta `pnpm dev` y entrega la URL `localhost` exacta antes de pedir push.
+Vas a implementar la task indicada en `$ARGUMENTS` (formato `TASK-###` o número desnudo `###`; el resto son notas del operador). Resuelve la rama desde el contrato del repositorio: **Greenhouse `develop`; Globe `main`; local-first y SIN push automático**. Una task no crea ramas `task/*`. Si toca UI, levanta `pnpm dev` y entrega la URL `localhost` exacta antes de pedir push.
 
 > **Fuente de verdad = `CLAUDE.md` + `AGENTS.md` (ya en tu contexto) + las skills + la spec de la task.** Este command es solo el **harness de proceso + checklist de gates**. NO re-declara reglas: aplica las canónicas vigentes de esos documentos. Si este harness contradice a `CLAUDE.md`, gana `CLAUDE.md` — y avísame para corregir el command (ver "Auto-mantenimiento" al final).
 
@@ -23,8 +23,8 @@ Comunicación: español neutro latinoamericano (sin voseo/modismos argentinos). 
   Usa `project_context.md` como router vigente y `Handoff.md` como continuidad activa; no cargues snapshots
   completos al arranque. Si falta contexto load-bearing, busca por keyword en task/issue/ADR/runtime y luego en
   `docs/operations/agent-context-history/`; revalida cualquier hallazgo histórico antes de obedecerlo.
-- **`in-progress/`**: lee el `.md` + `Handoff.md` + busca trabajo previo (commits en `develop`, WIP con `git status --short`). Continúa desde el primer slice incompleto; NO repitas fases ya hechas salvo drift (commits nuevos en `main`, schema cambiado, archivos owned movidos). Cuidado con orphan uncommitted de sesiones previas (clase TASK-943): ciérralo o stashealo antes de acoplar commits que dependan de él.
-- **`to-do/`**: verifica que nadie la trabaja (`gh pr list --search "TASK-###"` + `git branch -a | grep TASK-###` vacíos) → mueve a `in-progress/`, `Lifecycle: in-progress`, sync `docs/tasks/README.md`, anota en `Handoff.md` (trabajo en develop local-first; sin branch salvo que el operador pida preview remoto), confirma bloque `## Dependencies & Impact`.
+- **`in-progress/`**: lee el `.md` + `Handoff.md` + busca trabajo previo en la rama canónica del repositorio y con `git status --short`. Continúa desde el primer slice incompleto; NO repitas fases ya hechas salvo drift. Si hay WIP huérfano o ajeno, preserva sus archivos y coordina ownership/secuencia; nunca uses stash, clean, restore, otra rama o checkout para apartarlo.
+- **`to-do/`**: verifica que nadie la trabaja (`gh pr list --search "TASK-###"` + handoff/ownership vigente) → mueve a `in-progress/`, `Lifecycle: in-progress`, sync `docs/tasks/README.md`, anota en `Handoff.md` sobre la rama canónica y confirma `## Dependencies & Impact`. No crees una rama por task.
 - Si la spec tiene `## Open Questions`: resuélvelas con la opción más robusta + documenta rationale antes de FASE 1. Bloqueante → detente y reporta.
 
 ## Subagentes

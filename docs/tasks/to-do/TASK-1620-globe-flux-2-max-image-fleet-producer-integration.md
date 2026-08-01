@@ -18,7 +18,7 @@
 - Status real: `Diseño documental; FLUX.2 activo en Fal, Globe no integrado`
 - Domain: `platform|producer|image`
 - Blocked by: `TASK-1553`, `TASK-1578`, `TASK-1535`; coordinar `TASK-1616` solo para referencias compartidas
-- Branch: `task/TASK-1620-globe-flux-2-max-image-fleet`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 
 ## Summary
 

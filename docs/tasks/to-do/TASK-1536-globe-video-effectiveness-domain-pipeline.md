@@ -19,7 +19,7 @@
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
-- Branch: `task/TASK-1536-globe-video-effectiveness-domain-pipeline`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 
 ## Summary

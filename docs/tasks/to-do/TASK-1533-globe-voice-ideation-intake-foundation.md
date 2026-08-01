@@ -21,7 +21,7 @@
 - Rank: `TBD`
 - Domain: `creative|ai|audio|privacy`
 - Blocked by: `none`
-- Branch: `task/TASK-1533-globe-voice-ideation-intake-foundation`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

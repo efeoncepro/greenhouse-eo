@@ -21,7 +21,7 @@
 - Rank: `TBD`
 - Domain: `platform|agentic|integration`
 - Blocked by: `none`
-- Branch: `task/TASK-1473-globe-contract-packaging-parity-certification`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

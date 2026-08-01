@@ -19,7 +19,7 @@
 - Rank: `TBD`
 - Domain: `creative|data|platform`
 - Blocked by: `none`
-- Branch: `task/TASK-1580-globe-creative-project-session-element-contract`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 
 ## Summary
 

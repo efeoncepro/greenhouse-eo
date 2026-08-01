@@ -25,7 +25,7 @@
 - Rank: `TBD`
 - Domain: `creative|ai`
 - Blocked by: `none`
-- Branch: `task/TASK-1497-globe-regional-edit-inpaint`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

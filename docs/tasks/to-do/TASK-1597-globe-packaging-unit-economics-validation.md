@@ -19,7 +19,7 @@
 - Rank: `TBD`
 - Domain: `finance|delivery|agency|commercial`
 - Blocked by: `TASK-1478, TASK-1479, TASK-1480, TASK-1482`
-- Branch: `task/TASK-1597-packaging-unit-economics-validation`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

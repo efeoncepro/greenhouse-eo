@@ -19,7 +19,7 @@
 - Rank: `TBD`
 - Domain: `platform|producer|video`
 - Blocked by: `TASK-1553`, `TASK-1554`, `TASK-1578`, `TASK-1579`, `TASK-1535`; coordinar `TASK-1504`, `TASK-1569`, `TASK-1570`
-- Branch: `task/TASK-1616-globe-minimax-h3-fleet-producer-integration`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

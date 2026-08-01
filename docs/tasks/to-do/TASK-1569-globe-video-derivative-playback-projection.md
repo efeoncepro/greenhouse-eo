@@ -19,7 +19,7 @@
 - Rank: `TBD`
 - Domain: `platform|data|creative`
 - Blocked by: `none`
-- Branch: `task/TASK-1569-globe-video-derivative-playback-projection`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 
 ## Summary
 

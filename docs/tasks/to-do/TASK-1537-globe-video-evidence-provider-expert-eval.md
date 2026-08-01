@@ -19,7 +19,7 @@
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `TASK-1536`
-- Branch: `task/TASK-1537-globe-video-evidence-provider-expert-eval`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 
 ## Summary

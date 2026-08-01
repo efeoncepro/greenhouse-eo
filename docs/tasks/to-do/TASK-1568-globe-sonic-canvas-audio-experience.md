@@ -19,7 +19,7 @@
 - Rank: `TBD`
 - Domain: `ui|creative|product`
 - Blocked by: `TASK-1567`
-- Branch: `task/TASK-1568-globe-sonic-canvas-audio-experience`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 
 ## Summary
 

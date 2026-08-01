@@ -19,7 +19,7 @@
 - Rank: `TBD`
 - Domain: `agency|delivery|rights|commercial`
 - Blocked by: `TASK-1595, TASK-1480`
-- Branch: `task/TASK-1594-agency-workflow-sprint`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

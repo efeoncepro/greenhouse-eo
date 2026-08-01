@@ -81,7 +81,7 @@ canary ya tiene owner: **ADR-004** (`TASK-1506`, complete) fijó el front door y
 - Rank: `TBD`
 - Domain: `creative|platform|ops`
 - Blocked by: `none`
-- Branch: `task/TASK-1469-globe-governed-run-lifecycle-submission-fence`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

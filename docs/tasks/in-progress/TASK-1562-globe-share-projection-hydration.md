@@ -33,7 +33,7 @@
 - Rank: `TBD`
 - Domain: `creative-studio`
 - Blocked by: `none`
-- Branch: `task/TASK-1562-globe-share-projection-hydration`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - GitHub Issue: `TBD`
 
 ## Summary

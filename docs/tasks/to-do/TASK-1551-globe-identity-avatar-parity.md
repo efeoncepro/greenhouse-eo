@@ -21,7 +21,7 @@
 - Rank: `TBD`
 - Domain: `identity|creative|ui|platform`
 - Blocked by: `none`
-- Branch: `task/TASK-1551-globe-identity-avatar-parity`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

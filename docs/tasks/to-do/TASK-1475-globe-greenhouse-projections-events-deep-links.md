@@ -36,7 +36,7 @@ decisión diferida (ADR-004) — no asumir dominio comercial acá.
 - Rank: `TBD`
 - Domain: `platform|integration|greenhouse`
 - Blocked by: `TASK-1472, TASK-1473`
-- Branch: `task/TASK-1475-globe-greenhouse-projections-events-deep-links`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

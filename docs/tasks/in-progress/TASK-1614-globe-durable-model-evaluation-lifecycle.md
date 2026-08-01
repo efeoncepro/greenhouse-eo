@@ -13,6 +13,7 @@
 - Epic: `EPIC-028`
 - Status real: `Evaluación, governance y promoción completas; canary final pendiente por reconciliación de presupuesto de agosto`
 - Domain: `Globe / Model Lab / evaluation / worker`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Owner: `Efeonce Globe runtime`
 - Runtime code: Globe `main` hasta PR `#82` (merge `90d0d48861d03e17ef95e2b7cbabdb14b7c1af47`)
 - ADRs: [Evaluation Harness](../../architecture/creative-studio/EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md) y

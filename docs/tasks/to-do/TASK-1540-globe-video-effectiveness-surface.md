@@ -19,7 +19,7 @@
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `TASK-1536`, `TASK-1537`, `TASK-1539`
-- Branch: `task/TASK-1540-globe-video-effectiveness-surface`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 
 ## Summary

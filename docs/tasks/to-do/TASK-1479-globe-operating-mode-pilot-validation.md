@@ -21,7 +21,7 @@
 - Rank: `TBD`
 - Domain: `creative|commercial|ops`
 - Blocked by: `TASK-1473, TASK-1474, TASK-1476, TASK-1477, TASK-1478, TASK-1482, TASK-1483`
-- Branch: `task/TASK-1479-globe-operating-mode-pilot-validation`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

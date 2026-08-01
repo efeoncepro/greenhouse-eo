@@ -63,7 +63,7 @@ acotada del workspace; la autorización comercial de cobros conserva su propio g
 - Rank: `TBD`
 - Domain: `commercial|finance|tax|payments|legal|reliability`
 - Blocked by: `TASK-1481, TASK-1468, TASK-1478, TASK-1480, TASK-1482`
-- Branch: `task/TASK-1484-globe-commercial-monetization-billing-revenue-foundation`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

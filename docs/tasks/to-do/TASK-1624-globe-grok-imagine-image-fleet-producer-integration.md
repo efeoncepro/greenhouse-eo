@@ -18,7 +18,7 @@
 - Status real: `Diseño documental; Fal activo, Globe no integrado`
 - Domain: `platform|producer|image|rights`
 - Blocked by: `TASK-1553`, `TASK-1578`, `TASK-1535`; coordinar `TASK-1618`
-- Branch: `task/TASK-1624-globe-grok-imagine-image-fleet`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 
 ## Summary
 

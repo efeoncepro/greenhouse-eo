@@ -21,7 +21,7 @@
 - Rank: `TBD`
 - Domain: `creative|ui|product`
 - Blocked by: `none`
-- Branch: `task/TASK-1523-globe-creative-suite-experience-logic`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

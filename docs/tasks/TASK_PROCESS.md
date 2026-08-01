@@ -27,7 +27,9 @@ Para tasks con impacto backend/data, ver [`TASK_BACKEND_DATA_ADDENDUM.md`](TASK_
   - `- Legacy ID: CODEX_TASK_Finance_Dashboard_Calculation_Correction_v1`
 - Consultar `docs/tasks/TASK_ID_REGISTRY.md` para reservar el siguiente ID disponible antes de crear una task nueva
 - Si la task pertenece a un programa mayor, declarar `Epic: EPIC-###` dentro de `## Status` y sincronizarla con `docs/epics/`
-- Branch convention: `task/TASK-###-short-slug` (e.g., `task/TASK-003-finance-dashboard-fix`)
+- Branch follows the repository's own startup contract; a task never invents or overrides it. Current governed
+  repositories use Greenhouse `develop` and Globe `main`, both in their single shared checkout. Per-task branches,
+  isolated checkouts and worktrees are not part of task execution.
 - Las tasks con UI visible usan el mismo `TASK-###`, pero declaran `Execution profile: ui-ux`, `UI impact`, `UI ready`, `Wireframe: docs/ui/wireframes/...`, `Flow: docs/ui/flows/...|none`, `Motion: docs/ui/motion/...|none` y completan `## UI/UX Contract`.
 - Las tasks con backend/data usan el mismo `TASK-###`, pero declaran `Execution profile: backend-data`, `Backend impact` y completan `## Backend/Data Contract`.
 - Toda task nueva completa `## Modular Placement Contract` con current home, future candidate home, boundary, server/browser split, build impact y extraction blocker. Un fix local usa `Topology impact: none`; no se omite el bloque.
@@ -174,7 +176,7 @@ ZONE 4 — Verification & Closing     "Como compruebo que termine y que actualiz
 ### Regla de lectura secuencial para agentes
 
 1. **Leer Zone 0.** Si `Lifecycle = complete` -> STOP, la task ya cerro. Si `Blocked by` tiene items -> STOP, no es ejecutable aun.
-2. **Leer Zone 1.** Abrir y leer cada documento listado en `Architecture Alignment` y `Normative Docs`. Si algun doc no existe en el repo -> reportar antes de continuar. Crear branch: `task/TASK-###-short-slug`.
+2. **Leer Zone 1.** Abrir y leer cada documento listado en `Architecture Alignment` y `Normative Docs`. Si algun doc no existe en el repo -> reportar antes de continuar. Verificar la rama exigida por el `AGENTS.md` del repositorio y permanecer en ella; no crear ni cambiar a una rama por task.
 3. **Tomar ownership operativo.** Antes del primer cambio de codigo o de docs de la task:
    - mover el archivo a `docs/tasks/in-progress/`
    - cambiar `Lifecycle` a `in-progress`
@@ -205,7 +207,7 @@ Usar estos campos dentro de `## Status`:
 - `Rank`: posicion actual en backlog operativo
 - `Domain`: modulo o area principal
 - `Blocked by`: lista de TASK-### que deben completarse antes, o `none`
-- `Branch`: `task/TASK-###-short-slug`
+- `Branch`: contrato explícito por repositorio (por ejemplo, `Greenhouse develop; Globe main; sin worktrees`)
 
 Reglas:
 
@@ -692,13 +694,14 @@ Reclasificar a spec y no dejarlo como task si:
 - Ejecutar Discovery checklist completo — no saltar items
 - **Skill scan obligatorio** — consultar skills disponibles en el entorno (global o repo) ANTES de escribir codigo
 - **Subagent assessment obligatorio** — decidir `sequential` o `fork` y documentar en plan.md
-- Commitear `plan.md` al branch SIEMPRE, incluso en auto-approved
+- Registrar el plan según el contrato de la task; no crear una rama ni un checkout separado para alojarlo
 - Despues de cada slice: lint + type-check + commit
 - Si algo cambio materialmente durante ejecucion -> actualizar `plan.md` con Delta
 - Si el Delta es material (nueva tabla, nueva ruta) -> re-aplicar regla de checkpoint
 - Si se usaron subagentes -> el agente principal consolida y corre verificacion completa sobre el resultado combinado
 - Al cerrar: ejecutar cierre segun `CLAUDE.md` § Task Lifecycle Protocol
-- Nunca merge directo a `main` o `develop`
+- Nunca inferir deploy, release o promoción desde un commit. Trabajar en la rama canónica del repositorio y usar
+  el control plane de release aplicable sólo cuando el operador haya autorizado ese rollout.
 
 ---
 

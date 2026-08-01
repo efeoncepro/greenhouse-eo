@@ -25,7 +25,7 @@
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
-- Branch: `task/TASK-1584-globe-credit-admin-kms-disjoint-identities`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

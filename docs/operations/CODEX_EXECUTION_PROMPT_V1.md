@@ -126,13 +126,16 @@ pendiente` u `operativamente bloqueado`) y si conviene `mantente en develop` o
 MODO DE RAMA / WORKTREE
 
 - No cambies de rama por iniciativa propia.
+- Resuelve la rama desde el contrato del repositorio: Greenhouse trabaja en `develop`; Globe trabaja directamente
+  en `main`. Una task no puede crear ni sobreescribir esa política con una rama `task/*`.
 - Trabaja sólo en el checkout compartido actual. Nunca crees, uses ni muevas trabajo a `git worktree`,
   checkouts aislados o carpetas clonadas; ante WIP, conflicto o divergencia, detente y pide decisión al operador.
 - No toques ni limpies worktrees preexistentes salvo autorización explícita que indique ruta y acción exactas.
 - Si el operador pide `mantente en develop`, no cambies de rama y documenta la excepción en Audit/Plan/Handoff.
 - Si el operador pide subagentes, delegación o trabajo paralelo, pasa `--subagents` al hook para que la autorización quede impresa en el prompt.
-- Si la task declara otra branch o parece haber ownership activo, verifica `git status --short`, PRs/branches/handoff y decide con cuidado. Pide confirmación solo si el estado bloquea avanzar sin pisar trabajo ajeno.
-- No hagas push a `develop` ni a ramas remotas como cierre automático sin instrucción explícita.
+- Si la task declara una branch distinta del contrato del repositorio, trátala como drift documental: permanece en
+  la rama canónica, preserva el WIP y corrige/escala el contrato antes de implementar.
+- No hagas push ni deploy como cierre automático sin instrucción explícita.
 
 INTAKE DE TASK
 

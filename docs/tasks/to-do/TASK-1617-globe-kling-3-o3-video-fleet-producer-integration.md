@@ -18,7 +18,7 @@
 - Status real: `Diseño documental; Fal activo, Globe no integrado`
 - Domain: `platform|producer|video`
 - Blocked by: `TASK-1553`, `TASK-1573`, `TASK-1578`, `TASK-1535`, `TASK-1614`; coordinar `TASK-1616`
-- Branch: `task/TASK-1617-globe-kling-3-o3-video-fleet`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 
 ## Summary
 

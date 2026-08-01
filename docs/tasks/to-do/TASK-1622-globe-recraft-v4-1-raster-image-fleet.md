@@ -18,7 +18,7 @@
 - Status real: `Diseño documental; Recraft vector ya promovido, raster no integrado`
 - Domain: `platform|producer|image|content`
 - Blocked by: `TASK-1553`, `TASK-1578`, `TASK-1535`
-- Branch: `task/TASK-1622-globe-recraft-v4-1-raster-image-fleet`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 
 ## Summary
 

@@ -19,7 +19,7 @@
 - Rank: `TBD`
 - Domain: `platform|ai|creative-studio`
 - Blocked by: `none`
-- Branch: `task/TASK-1587-globe-governed-skill-system-and-orchestration`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

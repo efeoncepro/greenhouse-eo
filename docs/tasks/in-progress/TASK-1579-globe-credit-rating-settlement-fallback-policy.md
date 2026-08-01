@@ -21,7 +21,7 @@
 - Rank: `next.2`
 - Domain: `finance|creative|platform|reliability`
 - Blocked by: `none`
-- Branch: `task/TASK-1579-globe-credit-rating-settlement-fallback-policy`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

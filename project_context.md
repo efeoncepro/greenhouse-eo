@@ -72,8 +72,8 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 
 ## Ambientes, ramas y despliegue
 
-- Desarrollo normal: local-first sobre `develop`; no hacer push, merge, release ni promoción automática sin
-  instrucción humana explícita.
+- Greenhouse: desarrollo normal local-first sobre `develop`. Globe: trabajo directo sobre su rama única `main`.
+  Ninguna de las dos ramas autoriza push, deploy, release o promoción automática sin instrucción humana explícita.
 - Producción: `main` y `https://greenhouse.efeoncepro.com`; promoción mediante el release control plane.
 - Staging/preview y producción tienen configuración separada. Flags, secrets y migraciones deben verificarse
   en cada runtime consumidor, no solo en Vercel.

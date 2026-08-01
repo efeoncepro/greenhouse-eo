@@ -21,7 +21,7 @@
 - Rank: `TBD`
 - Domain: `commercial|research|product`
 - Blocked by: `TASK-1476`
-- Branch: `task/TASK-1477-globe-buyer-discovery-package-comprehension`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

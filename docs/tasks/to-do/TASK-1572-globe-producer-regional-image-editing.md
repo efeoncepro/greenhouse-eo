@@ -21,7 +21,7 @@
 - Rank: `TBD`
 - Domain: `creative|ui|product`
 - Blocked by: `TASK-1497`, `TASK-1571`
-- Branch: `task/TASK-1572-globe-producer-regional-image-editing`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

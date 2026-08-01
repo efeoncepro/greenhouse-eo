@@ -21,7 +21,7 @@
 - Rank: `TBD`
 - Domain: `creative|ui|credits`
 - Blocked by: `none`
-- Branch: `task/TASK-1532-globe-one-click-generate-automatic-estimate`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

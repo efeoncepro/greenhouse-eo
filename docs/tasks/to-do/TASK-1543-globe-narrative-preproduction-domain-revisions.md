@@ -21,7 +21,7 @@
 - Rank: `TBD`
 - Domain: `creative-studio`
 - Blocked by: `TASK-1542`
-- Branch: `task/TASK-1543-globe-narrative-preproduction-revisions`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 
 ## Summary

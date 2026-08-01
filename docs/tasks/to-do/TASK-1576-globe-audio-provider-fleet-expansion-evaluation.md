@@ -19,7 +19,7 @@
 - Rank: `TBD`
 - Domain: `creative|audio|providers`
 - Blocked by: `TASK-1575`, `TASK-1553`, `TASK-1554`, `TASK-1535`
-- Branch: `task/TASK-1576-globe-audio-provider-fleet-expansion-evaluation`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 
 ## Summary

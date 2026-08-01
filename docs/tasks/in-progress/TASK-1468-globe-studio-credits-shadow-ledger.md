@@ -36,7 +36,7 @@ Lab) ≠ `estimateCredits`/`getCreditEstimate` (credits) — son capabilities de
 - Rank: `next.2`
 - Domain: `finance|creative|data`
 - Blocked by: `none`
-- Branch: `task/TASK-1468-globe-studio-credits-shadow-ledger`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

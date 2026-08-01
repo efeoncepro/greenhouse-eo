@@ -41,7 +41,7 @@ Parte del cluster **Creative Producer** de EPIC-028
 - Rank: `TBD`
 - Domain: `creative|ai|platform`
 - Blocked by: `none`
-- Branch: `task/TASK-1495-globe-target-formats-multiformat-set`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

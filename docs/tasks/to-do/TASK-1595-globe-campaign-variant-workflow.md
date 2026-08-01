@@ -19,7 +19,7 @@
 - Rank: `TBD`
 - Domain: `creative-studio|delivery|rights|content`
 - Blocked by: `TASK-1481, TASK-1535, TASK-1553, TASK-1554, TASK-1498, TASK-1522, TASK-1480`
-- Branch: `task/TASK-1595-campaign-variant-workflow`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

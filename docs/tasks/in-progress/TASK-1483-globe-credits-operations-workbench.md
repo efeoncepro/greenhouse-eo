@@ -21,7 +21,7 @@
 - Rank: `next.5`
 - Domain: `finance|creative|ui|operations`
 - Blocked by: `none`
-- Branch: `develop compartida por autorización explícita del operador`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

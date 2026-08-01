@@ -23,7 +23,7 @@
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `TASK-1468, TASK-1578` (sólo receipts de cierre; no bloquean el runtime live)
-- Branch: `task/TASK-1553-globe-extensible-multi-model-provider-catalog`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 
 ## Summary

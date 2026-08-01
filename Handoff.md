@@ -14,7 +14,9 @@
   `reconciliationRequested=2`, `deferred=2`, `failed=0`. `e369ef8` fija ese digest en IaC y OpenTofu devuelve
   `No changes`.
 - ISSUE-124 está resolved. TASK-1482, TASK-1586 y TASK-1629 están `complete` con aceptación funcional/runtime.
-  TASK-1483/TASK-1628 conservan únicamente QA visual de estados; TASK-1468/TASK-1579
+  TASK-1483/TASK-1628 siguen `in-progress`: además del GVC/scorecard exhaustivo, TASK-1483 debe resolver o
+  re-scopear pools/ledger/forecast/coverage/audiences todavía no renderizados; TASK-1628 debe cerrar estados
+  loading/error/unknown, freshness, interacción/foco y el escenario premium dedicado. TASK-1468/TASK-1579
   conservan receipts/calibración más amplia, sin volver a bloquear el fondeo interno.
 - Dos holds históricos `submission_unknown` sin `providerOperationId` permanecen diferidos y observables en
   TASK-1630; no deben force-release ni contarse como capacidad disponible.
@@ -33,6 +35,9 @@ rollout, migrations y Producer viven en `docs/operations/creative-studio/GLOBE_R
   eliminar worktrees, checkouts aislados o carpetas clonadas; si el estado compartido bloquea, debe detenerse y
   pedir dirección al operador. Canon:
   `docs/architecture/agent-invariants/REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md`.
+- Se retiró el drift que todavía inducía Globe `develop`: `efeonce-globe/AGENTS.md` ahora fija `main` como rama
+  única de trabajo/integración/release, CI sólo acepta push a `main`, EPIC-028 declara el contrato por repositorio
+  y el helper `worktree-sync` quedó retirado fail-closed. Un commit no autoriza deploy automáticamente.
 
 ## Globe — ADR-018: continuidad móvil native-first como dirección, no rollout (2026-08-01)
 

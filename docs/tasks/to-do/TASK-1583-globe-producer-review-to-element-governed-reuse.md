@@ -19,7 +19,7 @@
 - Rank: `TBD`
 - Domain: `ui|creative|review`
 - Blocked by: `TASK-1522`, `TASK-1580`, `TASK-1582`
-- Branch: `task/TASK-1583-globe-producer-review-to-element-governed-reuse`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 
 ## Summary
 
