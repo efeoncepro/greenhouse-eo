@@ -1493,12 +1493,9 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['read'] as const,
     defaultScope: 'all'
   },
-  // TASK-1566 (ADR-015 Slice 5) — carril gobernado de fondeo de credito de Globe.
-  // DOS capabilities, no una: proponer es read-only sobre Globe (devuelve el plan para revisar) y
-  // confirmar es el UNICO punto que dispara la mutacion. Colapsarlas daria a quien solo necesita ver
-  // el plan la autoridad de mover dinero.
-  // El agente puede proponer; confirmar es de una persona, y la disyuncion confirmante != proponente
-  // la impone un CHECK en `globe_credit_funding_intents` — no una convencion de payload.
+  // TASK-1566 + TASK-1586 — carril gobernado y recuperable de fondeo de crédito de Globe.
+  // Mutación, lectura y recovery conservan autoridad separada. La política owner-operated puede permitir
+  // confirmación end-to-end por un agente autorizado; el segundo confirmador es opcional y proporcional.
   {
     key: 'platform.globe_credit_funding.propose',
     module: 'platform',
@@ -1507,6 +1504,18 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   },
   {
     key: 'platform.globe_credit_funding.confirm',
+    module: 'platform',
+    actions: ['execute'] as const,
+    defaultScope: 'all'
+  },
+  {
+    key: 'platform.globe_credit_funding.read',
+    module: 'platform',
+    actions: ['read'] as const,
+    defaultScope: 'all'
+  },
+  {
+    key: 'platform.globe_credit_funding.reconcile',
     module: 'platform',
     actions: ['execute'] as const,
     defaultScope: 'all'

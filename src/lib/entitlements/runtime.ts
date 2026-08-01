@@ -1604,6 +1604,22 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source: 'role'
     })
 
+    addEntitlement(entries, {
+      module: 'platform',
+      capability: 'platform.globe_credit_funding.read',
+      action: 'read',
+      scope: 'all',
+      source: 'role'
+    })
+
+    addEntitlement(entries, {
+      module: 'platform',
+      capability: 'platform.globe_credit_funding.reconcile',
+      action: 'execute',
+      scope: 'all',
+      source: 'role'
+    })
+
     // TASK-935 — platform + client_portal admin endpoints (latent 403). Roles
     // documentados inexistentes (DEVOPS_OPERATOR, commercial_admin) colapsan a
     // EFEONCE_ADMIN, el único que pasa requireAdminTenantContext en estos paths.

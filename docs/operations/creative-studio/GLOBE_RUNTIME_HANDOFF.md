@@ -221,6 +221,13 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
   antiguo, con alerta WARNING a 900 segundos. Flag Terraform default `false`; no se aplicó migración ni deploy.
 - La rama predeterminada de `efeonce-globe` es y debe seguir siendo `main`. El checkout compartido trabaja en
   `develop`; no usar worktrees ni cambiar el default branch como parte de esta ejecución.
+- TASK-1586 quedó code-complete local a nivel de contrato/read-recovery: capacity admin/self comparte evaluator
+  con reserve; lifecycle de funding tiene operation list/get, expiry bounded, receipt append-only y reconcile
+  readback-first que jamás repite la mutación económica. Globe agrega migración `0045`; SDK tiene wrappers tipados.
+  Greenhouse agrega status/preview/operations/reconcile con entitlement y binding OAuth exacto, más la migración
+  de catálogo `20260801130000000_task-1586-globe-credit-recovery-entitlements.sql`. Evidencia focal: Globe
+  contracts 44/44, domain 406/406, database 139/139, SDK 18/18 y studio-web 286/286; Greenhouse 9/9, migration
+  marker gate y typecheck verdes. Sigue pendiente migrar, desplegar, activar el worker y verificar staging/live.
 
 ## Siguiente paso ejecutable
 

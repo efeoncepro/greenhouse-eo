@@ -384,3 +384,24 @@ la proyección self-status que consume TASK-1628, sin abrir los DTOs administrat
   readers y recovery.
 - Preflight autorizado para checkout compartido `develop` y subagentes; no usar worktrees. Globe conserva
   `main` como rama predeterminada y de release.
+
+## Checkpoint de implementación local 2026-08-01
+
+- Globe ya publica `CreditCapacityStatusV1` y `CreditCapacitySelfStatusV1` desde el mismo evaluator/facts que
+  `reserveCredits`. El estado administrativo separa ledger histórico de capacidad efectiva; cuando la política
+  no está disponible, los montos de decisión se omiten y el estado es `unknown`, nunca cero inventado.
+- El lifecycle de fondeo usa `proposalId` como `operationId`; ofrece list/get con cursor opaco tenant-bound,
+  expiración bounded con `FOR UPDATE SKIP LOCKED` y receipts append-only. Reconcile es readback-first: nunca
+  reejecuta grant, ledger o policy; evidencia parcial termina `outcome_unknown` y exige recuperación manual.
+- La migración aditiva Globe es `0045_credit_funding_operation_recovery.sql`. El worker ejecuta expiración de
+  propuestas antes de evaluar holds de reservations, bajo el flag de expiry existente; no se creó otro ledger,
+  otra máquina de estados ni otro flag.
+- El SDK tipado ya cubre capacity admin/self y funding operation get/list/reconcile. Greenhouse ya tiene adapters
+  allowlist, entitlements internos y rutas status, preview, operations list/get/reconcile con sesión, binding OAuth
+  exacto e idempotency obligatoria para reconcile. La migración Greenhouse
+  `20260801130000000_task-1586-globe-credit-recovery-entitlements.sql` registra read/reconcile en el catálogo DB.
+- Evidencia local hasta este checkpoint: contracts Globe 44/44, domain 406/406, database 139/139, SDK 18/18,
+  studio-web 286/286; Greenhouse adapters/status 9/9, migration marker gate y typecheck verdes. El gate completo Globe continúa registrado
+  en el checkpoint de commit.
+- Estado honesto: `code complete, rollout pendiente`. No se aplicaron 0043/0044/0045, no hubo deploy, push,
+  release, fondeo ni smoke live. Producer self-status continúa `policy-blocked` hasta TASK-1628.
