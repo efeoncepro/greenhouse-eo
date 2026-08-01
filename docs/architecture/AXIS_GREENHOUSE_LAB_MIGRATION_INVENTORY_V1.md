@@ -1,6 +1,6 @@
 # AXIS / Greenhouse Lab migration inventory
 
-**Estado:** 4 referencias portables migradas · migración en curso 2026-08-01
+**Estado:** 21 contratos portables migrados · migración en curso 2026-08-01
 **Dueño:** AXIS Design System + Greenhouse UI Platform
 **Fuente:** `src/app/(dashboard)/design-system/**` en `greenhouse-eo`
 **Destino:** `axis-design-system/apps/lab` (Astro 7, static, público)
@@ -36,7 +36,9 @@ Cada candidato requiere auditoría transitive de imports antes de migrarse.
 | `team-avatar-group`, `surface-recipes`, `roadmap-timeline`, `charts` | migrada | static contracts + framework-agnostic fixtures |
 | `brand-logos` | gate migrado | `efeonce.brand-logos`; assets reales pendientes de provenance |
 | `axis-adapters` | excluded from reference | stays in consumers; compare by evidence |
-| `efeonce-brand`, `gamification`, `handoff` | excluded first slice | brand/workflow/product surface |
+| `efeonce-brand` | `efeonce.brand-motion` migrada | el asset experimental privado y GSAP siguen fuera; AXIS publica la referencia portable |
+| `gamification` | `efeonce.leaderboard` migrada | fixture estática; sin participantes ni datos operativos reales |
+| `handoff` | excluded first slice | workflow/product surface; requiere parity de API/readers |
 | `growth-forms-renderer`, `native-meeting-scheduler`, `talent-profile` | excluded first slice | API/workforce/product surface |
 | `nexa-*` | excluded first slice | Nexa product/runtime surface |
 | `mockup/*` and `typography/mockup` | excluded first slice | proposal/mockup artifacts |
@@ -81,6 +83,14 @@ ordered events, people, timestamps and attachments, but no product data or audit
 `efeonce.brand-logos` migrates the governance surface before the assets: every logo must expose accessible name,
 source/provenance and approval status. The public fixture intentionally renders status-only specimens until each
 third-party asset has an approved source, license and versioned checksum.
+
+`efeonce.brand-motion` migrates the portable motion contract behind `efeonce-brand`: AXIS renders a static
+HTML/CSS orbital reference with idle, single-orbit, ambient and reduced-motion semantics. The Greenhouse SVG
+experiment, GSAP runtime and private asset copy remain consumer-side and are not imported by AXIS.
+
+`efeonce.leaderboard` migrates the portable gamification shape: period, run status, podium, ordered ranking and
+score formatting. Its AXIS fixture uses synthetic names and values only; the Greenhouse leaderboard remains the
+fallback until consumer state, pagination and capture evidence are compared.
 
 ## Gate for each next route
 

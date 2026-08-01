@@ -115,6 +115,19 @@ fixtures visuales completos por contrato y la migración ordenada del catálogo 
   licencia y checksum versionado.
 - El Lab genera 25 páginas estáticas y 19 contratos publicados; build, typecheck, tests y 16 E2E pasan.
 
+### Delta 2026-08-01 (k) — leaderboard y brand motion
+
+- AXIS publica `efeonce.leaderboard` como contrato de referencia para periodo, estado de run, podium, ranking
+  ordenado y score; la fixture usa valores sintéticos y no traslada participantes ni datos operativos.
+- AXIS publica `efeonce.brand-motion` como referencia HTML/CSS estática para la firma orbital, con estado de
+  órbita única, variante ambiental y fallback `prefers-reduced-motion`. No se copian el SVG experimental ni GSAP
+  desde Greenhouse.
+- El Lab genera 27 páginas estáticas y 21 contratos publicados. Build, typecheck, tests, lint y 16 E2E Chromium/
+  mobile pasan. `axis.efeonce.org` está asociado al proyecto Vercel; la resolución DNS de HostGator aún debe
+  propagarse antes de cerrar el smoke por dominio custom.
+- Commit AXIS: `4b661db` (`feat(lab): add leaderboard reference contract`), publicado en `main`. La slice
+  `brand-motion` queda pendiente de commit y despliegue en esta continuidad.
+
 ### Plan futuro para portar el Lab Greenhouse a AXIS
 
 1. Inventariar las rutas actuales de `/design-system` y clasificarlas como contrato puro, fixture visual,

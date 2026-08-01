@@ -37,6 +37,10 @@
   sin datos operativos ni registros de auditoría.
 - `brand-logos` ya tiene el gate público de provenance; los assets reales no se trasladan hasta tener source,
   licencia y checksum aprobados.
+- `leaderboard` ya tiene contrato y fixture estática con datos sintéticos; `brand-motion` ya tiene contrato y
+  referencia orbital HTML/CSS sin SVG privado ni GSAP. El Lab queda en 27 páginas y 21 contratos; la siguiente
+  continuidad debe ejecutar E2E/deploy de esta slice, actualizar el smoke del dominio `axis.efeonce.org` cuando
+  HostGator propague el registro A y continuar con `handoff`, `microinteractions` y las superficies con API.
 
 ## Globe Producer — seis defectos de superficie, el pie de la app y la paginación del feed (2026-08-01)
 
