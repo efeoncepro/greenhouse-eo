@@ -130,6 +130,18 @@ fixtures visuales completos por contrato y la migración ordenada del catálogo 
   (`feat(lab): add brand motion reference contract`), publicados en `main`. Deployment público actualizado:
   `axis-design-system-ijrh0xqh9-efeonce-7670142f.vercel.app`, alias `https://axis.efeonce.org`.
 
+### Delta 2026-08-01 (l) — reconstrucción fiel de buttons
+
+- La referencia `efeonce.button` se reconstruyó leyendo `ButtonsLabView` completo: boards light/dark, header/copy,
+  token strip, matrices de variants, icons, sizes, colors y states; conserva 48/38/30 px, seis tonos, cinco estados,
+  icon placement y active/focus/disabled visual states.
+- El fixture contiene 152 controles nativos, no genera overflow de página a 390 px y tiene evidencia Playwright para
+  focus, reduced-motion y responsive; el suite completo queda en 20 E2E verdes.
+- Commit AXIS `b1c9869` (`feat(lab): rebuild button board reference`) y deployment
+  `dpl_8nchXkznMJzVE9FQ6zuVTaNabQSf`, alias `https://axis.efeonce.org`; `/patterns/efeonce.button/` responde `200`.
+- Estado honesto: `candidate parity`; falta comparación visual/computed contra el canary Greenhouse MUI/Vuexy.
+  `/design-system/buttons` continúa como fallback y no se retira.
+
 ### Plan futuro para portar el Lab Greenhouse a AXIS
 
 1. Inventariar las rutas actuales de `/design-system` y clasificarlas como contrato puro, fixture visual,

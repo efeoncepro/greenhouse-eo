@@ -28,7 +28,8 @@ Cada candidato requiere auditoría transitive de imports antes de migrarse.
 | `elevation` | skeleton reference | `/references/elevation/`; parity de escenarios pendiente |
 | `gradients` | skeleton reference | contract + fixture mínima; faltan presets/controles/motion real |
 | `utilities` | skeleton reference | `efeonce.activity-timeline`; no equivale a toda la suite Utilities |
-| `buttons`, `chips`, `breadcrumbs` | skeleton reference | faltan matrices de estados, acciones y canaries |
+| `buttons` | candidate parity | dos boards, matrices y 152 controles en AXIS; falta canary visual/computed |
+| `chips`, `breadcrumbs` | skeleton reference | faltan matrices de estados, acciones y canaries |
 | `disclosure`, `loaders`, `floating-surfaces` | skeleton reference | faltan flujos, focus management y estados completos |
 | `card-density`, `composition-shell` | skeleton reference | faltan drivers, morph y composición real |
 | `motion`, `border-beam` | skeleton reference | faltan replay, escenas y medición de motion |

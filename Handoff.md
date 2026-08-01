@@ -37,6 +37,8 @@
   sin datos operativos ni registros de auditoría.
 - `brand-logos` ya tiene el gate público de provenance; los assets reales no se trasladan hasta tener source,
   licencia y checksum aprobados.
+- `buttons` ya tiene una reconstrucción de candidate parity en AXIS (`b1c9869`): boards light/dark, 152 controles,
+  matrices completas y E2E responsive/reduced-motion; falta el compare visual/computed contra Greenhouse MUI/Vuexy.
 - `leaderboard` ya tiene contrato y fixture estática con datos sintéticos; `brand-motion` ya tiene contrato y
   referencia orbital HTML/CSS sin SVG privado ni GSAP. El Lab queda en 27 páginas y 21 contratos; build, lint,
   typecheck, tests y 16 E2E pasan. `axis.efeonce.org` ya resuelve a `76.76.21.21` y el smoke HTTPS devuelve `200`.
