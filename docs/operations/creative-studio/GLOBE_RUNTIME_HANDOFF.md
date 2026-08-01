@@ -270,7 +270,8 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
 
 ## Siguiente paso ejecutable
 
-1. Mantener MCP write gated hasta contar con identidad agente propagada, scopes y conformance equivalentes.
+1. Extender exclusivamente el gateway existente `https://mcp.efeonce.org/mcp` para MCP write cuando tenga
+   identidad agente propagada, scopes y conformance equivalentes; no crear otro servidor MCP.
 2. Completar receipts/calibración de TASK-1468/TASK-1579 y la decisión Finance sobre los 500.000 históricos.
 3. Reconciliar los dos outcomes históricos sólo con evidencia de provider/receipt o procedimiento Finance
    explícito; mientras tanto permanecen diferidos, observables y nunca force-released.

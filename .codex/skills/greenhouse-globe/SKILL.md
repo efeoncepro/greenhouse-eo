@@ -1331,6 +1331,8 @@ Ocho reglas medidas contra el runtime, no razonadas. Las tres primeras cuestan u
   histórico y daily fence. `partial`, `stale` o `unknown` nunca se representa como cero ni como healthy.
 - `timeout` u `outcome_unknown` obliga a consultar la misma operation key y reconciliar; nunca abre un fondeo
   nuevo ni repite la mutación económica. La UI considera éxito únicamente `completed|no_effect`.
+- La paridad MCP se implementa extendiendo `https://mcp.efeonce.org/mcp`, no creando otro gateway. Mientras el
+  adapter write no tenga identidad agente, scopes, límites, auditoría y conformance, permanece read-only.
 - Revisions, digests, deployment IDs, último fondeo y cifras del período son estado mutable: consúltalos en
   `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`. No los conviertas en regla reusable de la skill.
 

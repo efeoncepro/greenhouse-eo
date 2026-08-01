@@ -86,6 +86,8 @@
 - Se habilitó únicamente `globe.producer.fleet.list`: el gateway llama el reader canónico `POST /v1/readers`,
   sin importar base de datos, storage ni SDKs de proveedor. La respuesta conserva rutas de disponibilidad pero no
   house, provider slug, costo de vendor ni margen.
+- Studio Credits reutilizará este mismo gateway para su futuro write; no se creará otro MCP. Ese adapter sigue
+  gated por identidad agente, scopes, límites, auditoría y conformance de los primitives existentes.
 - Globe `#84` (`001ce1b`) quedó desplegado como `globe-api-internal-00179-qcz`; el gateway `ce593f2` como
   `efeonce-mcp-gateway-00009-9c6`, ambos con tráfico 100%. El canary Entra PKCE real pasó initialize, discovery
   y la tool de fleet por `https://mcp.efeonce.org/mcp`.

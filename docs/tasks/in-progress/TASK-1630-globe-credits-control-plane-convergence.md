@@ -217,7 +217,7 @@ autoridad o secuencia se actualizan primero aquí y en ADR-015, y después en la
 | P1.1 | `TASK-1483` | `/admin/globe/credits` | workbench Greenhouse con GVC/a11y |
 | P1.2 | `TASK-1628` | self-view read-only Producer | capacidad efectiva y razones sin admin writes |
 | P1.3 | `TASK-1578` | onboarding route→rate→estimate/actual | cada ruta promoted tiene receipt completo |
-| P2.1 | `TASK-1473` + `TASK-1626` | adapters MCP | identidad agente propagada y conformance |
+| P2.1 | `TASK-1473` + `TASK-1626` | extender el gateway existente `https://mcp.efeonce.org/mcp`; nunca crear otro MCP | identidad agente propagada y conformance de write |
 | P2.2 | `TASK-1584` + `TASK-1585` | KMS/break-glass/HMAC | disyunción física y retiro verificado |
 | posterior | `TASK-1484` | funding originado por pago liquidado | no bloquea operación interna |
 
@@ -231,7 +231,7 @@ autoridad o secuencia se actualizan primero aquí y en ADR-015, y después en la
 5. **Administration UI:** Greenhouse `/admin/globe/credits`.
 6. **Self-view:** Producer read-only.
 7. **Onboarding:** TASK-1578 consume rating/settlement ya cerrados.
-8. **Parity/hardening:** MCP, KMS e identidades disjuntas.
+8. **Parity/hardening:** agregar write al gateway MCP existente, más KMS e identidades disjuntas.
 9. **Commercial:** TASK-1484 sólo cuando su authority source sea un pago liquidado.
 
 ## Out of Scope

@@ -50,9 +50,8 @@ rollout, migrations y Producer viven en `docs/operations/creative-studio/GLOBE_R
 
 ## Efeonce MCP — gateway público y canary Globe read-only verificados (2026-08-01)
 
-- Gateway independiente `efeoncepro/efeonce-mcp`, OAuth Entra PKCE y el reader Globe read-only están operativos
-  en `https://mcp.efeonce.org/mcp`; runs/assets/writes y clientes externos siguen gated. La continuidad completa,
-  riesgos de scopes y TASK-1631 viven en el repo del gateway y en el runtime handoff de Globe.
+- `https://mcp.efeonce.org/mcp` y el reader Globe read-only están operativos; Studio Credits extenderá ese gateway,
+  nunca otro MCP. Writes/clientes externos siguen gated; detalle en el repo MCP y el runtime handoff de Globe.
 
 ## AXIS — guía visual agent-facing publicada (2026-08-01)
 

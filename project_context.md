@@ -63,7 +63,8 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 - El gateway MCP federado vive en el repo hermano `efeonce-mcp`, no en Greenhouse ni Globe. Su recurso canónico
   es `https://mcp.efeonce.org/mcp`, corre en Cloud Run dentro de `efeonce-group` y habilita sólo el reader
   internal-only `globe.producer.fleet.list`, verificado por OAuth PKCE real; todo provider/capability adicional
-  conserva sus gates propios. Clientes externos continúan bloqueados hasta separar entitlements/emisión de scopes
+  conserva sus gates propios. Un futuro write de Studio Credits extiende este gateway; nunca crea otro MCP y
+  permanece bloqueado hasta probar identidad agente, scopes, límites, auditoría y conformance. Clientes externos continúan bloqueados hasta separar entitlements/emisión de scopes
   B2B y probar una identidad base-only. Greenhouse mantiene sólo ADRs, tasks y handoff de ecosistema.
 - La operación o evolución MCP se enruta por las skills espejo `.codex/skills/efeonce-mcp-platform/` y
   `.claude/skills/efeonce-mcp-platform/`; estas componen la skill dueña de cada provider y no duplican su policy.
