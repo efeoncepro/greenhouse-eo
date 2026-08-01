@@ -366,3 +366,14 @@ necesita que la `spec` exista.
   typecheck y tests. Publicado en `6979641` y desplegado en `https://axis.efeonce.org/patterns/efeonce.breadcrumbs/`.
 - Estado honesto: `candidate parity`; falta comparación visual/computed contra Greenhouse. `/design-system/breadcrumbs`
   continúa como fallback.
+
+### Delta 2026-08-01 (o) — reconstrucción fiel de floating surfaces
+
+- `efeonce.floating-surface` se reconstruyó desde `FloatingSurfaceLabView` con las seis variantes V1 reales:
+  `richTooltip`, `actionMenu`, `evidencePeek`, `inlineEditor`, `validationBubble` y `commandPreview`.
+- Se trasladaron las diferencias funcionales visibles: roles tooltip/menu/dialog, contenido de evidencia con chips,
+  menú de acciones, editor con estado dirty-safe, labels nombrados y motion anchored con reduced-motion.
+- El contrato pasó a `0.1.1`; la suite completa de AXIS pasa con 26 E2E desktop/mobile, además de build,
+  typecheck y tests. Publicado en `72d03f4` y desplegado en `https://axis.efeonce.org/patterns/efeonce.floating-surface/`.
+- Estado honesto: `candidate parity`; falta comparación visual/computed y focus return real contra el consumer
+  Greenhouse. `/design-system/floating-surfaces` continúa como fallback.
