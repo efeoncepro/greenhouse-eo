@@ -9,6 +9,11 @@ retención `working-30d` hasta `2026-08-30T23:27:57.776Z`. La policy exacta cont
 `eval_16272c31b11f75be3e0369870f89746b` (attempt `9361550f-6ce3-456d-b710-d5cd3ded6217`); esa completion se
 preserva y no se debe crear otro gasto.
 
+El readback elegible (`clean / verified / active / eligibleForGeneration=true`) fue válido antes de la escritura
+terminal stale. El reader live más reciente (`30684654795`) ya expone la proyección persistida degradada:
+`rights=rejected`, `lifecycle=rejected`, `eligibleForGeneration=false`. Esa divergencia es precisamente el estado
+que PR `#74` debe reconciliar; no implica pérdida del objeto private-ingested ni autoriza un nuevo ingest.
+
 El diagnóstico de PR `#72` confirmó la causa sistémica: una proyección terminal stale de Asset Governance podía
 sobrescribir una revisión de rights posterior, aunque el reader compuesto mostrara el parent elegible. PR `#74`
 (`1a810df`) introdujo `rights_revision` y merge independiente de malware/C2PA/rights; `pnpm check`, `pnpm build` y CI

@@ -81,7 +81,9 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
   `seedance-r2v-evaluation` v2, `purpose=evaluation`, `appliesTo=derived`.
 - Fuente canónica private-ingested: `asset_6e9c95d3-7b94-473d-b91a-00f8b35d9eec`, `video/mp4`, 773.219 bytes,
   SHA-256 `69cbc966999963ed2959c9adedf409560097dce06700d4fe5c9719292a392509`, retención `working-30d` hasta
-  `2026-08-30T23:27:57.776Z`; readback observado `clean / verified / active / eligibleForGeneration=true`.
+  `2026-08-30T23:27:57.776Z`. `30682664152` observó `clean / verified / active / eligibleForGeneration=true` antes
+  de la escritura stale; el readback live posterior `30684654795` muestra
+  `rights=rejected / lifecycle=rejected / eligibleForGeneration=false` hasta desplegar y reconciliar PR `#74`.
 - Evaluación `eval_16272c31b11f75be3e0369870f89746b`, attempt
   `9361550f-6ce3-456d-b710-d5cd3ded6217`: Fal completó y la completion permanece preservada. No repetir provider
   spend; el bloqueo posterior pertenece al finalizer/governance.

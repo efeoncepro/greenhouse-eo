@@ -111,6 +111,10 @@ Do not alter already promoted Omni, Seed Audio or Seedance Loop; do not bypass t
   Un job terminal de Asset Governance podía proyectar una revisión antigua después de una escritura de rights más
   nueva y sobrescribir esa dimensión con evidencia stale. El reader componía el estado más reciente y podía mostrar
   el parent elegible mientras `registerGeneratedAsset` consumía la proyección persistida degradada.
+- La divergencia también es visible sin inferencia en los readers: `30682664152` leyó el asset elegible antes de
+  la carrera y `30684654795` leyó después `rights=rejected`, `lifecycle=rejected` y
+  `eligibleForGeneration=false`. El objeto private-ingested y su retención permanecen intactos; el recovery debe
+  reproyectar autoridad, no crear otro asset fuente.
 - Globe PR `#74` (`1a810dfbd189eeb7130ba30e01d90370734f1bd0`) corrige la autoridad por causa raíz. La migración
   `0041_asset_governance_authority_revision.sql` agrega `rights_revision` a assets/jobs y evidencia append-only;
   los jobs quedan pineados a su revisión y la proyección terminal fusiona malware, C2PA y rights como dimensiones

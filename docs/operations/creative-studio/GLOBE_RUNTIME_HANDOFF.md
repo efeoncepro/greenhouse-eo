@@ -128,7 +128,10 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
   `purpose=evaluation`, `appliesTo=derived`.
 - Fuente canónica private-ingested: `asset_6e9c95d3-7b94-473d-b91a-00f8b35d9eec`, SHA-256
   `69cbc966999963ed2959c9adedf409560097dce06700d4fe5c9719292a392509`, 773.219 bytes, `video/mp4`,
-  `working-30d`; Asset Governance relee `clean / verified / active / eligibleForGeneration=true`.
+  `working-30d`. El readback elegible `clean / verified / active / eligibleForGeneration=true` de `30682664152`
+  precede la escritura terminal stale; el readback actual `30684654795` muestra la proyección persistida
+  `rights=rejected / lifecycle=rejected / eligibleForGeneration=false`, que debe reconciliar PR `#74` sin repetir
+  ingest ni provider spend.
 - Run `eval_16272c31b11f75be3e0369870f89746b`, attempt `9361550f-6ce3-456d-b710-d5cd3ded6217`: Fal completó;
   estado `completion_received/finalizing`. No repetir provider spend: recuperar por readback/outbox.
 - El diagnóstico allowlisted de PR `#72` confirmó que `generatedAssetParents` y la policy eran correctos. La causa
