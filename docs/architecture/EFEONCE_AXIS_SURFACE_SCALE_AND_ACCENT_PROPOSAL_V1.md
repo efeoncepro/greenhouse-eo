@@ -11,23 +11,27 @@
 
 ## Dónde está cada punto hoy
 
-La primera versión de este documento abrió cuatro huecos. **Tres se resolvieron** y ya están publicados
-en el paquete. El trabajo del modo claro de Globe abrió cuatro hallazgos nuevos, y **tres siguen sin
-decidir**.
+**Todo lo que era trabajo está hecho. Lo que queda son tres decisiones**, y desde el 2026-07-31 cada una
+llega con una recomendación concreta para aprobar o corregir — no para partir de cero.
 
 | # | Punto | Estado |
 |---|---|---|
 | 0 | Estructura multi-marca del paquete | ✅ **Adoptado** — `axisBrandRamp` / `axisBrandSemantic` |
 | 1 | Escala de superficie nombrada por nivel | ✅ **Adoptado** — `axisSurface` (`sunk / base / paper / raised`) |
 | 2 | Mapeo de `secondary` por modo | ✅ **Adoptado** — `axisBrandRole` |
-| 3 | **Coral y magenta nunca llegaron al código** | 🔴 **Pendiente** — sólo `orchid` está en `axisAccentRamp` |
-| 4 | **Rol de coral y magenta** (¿para qué existen?) | 🔴 **Pendiente de decisión del equipo de diseño** |
-| 5 | **Scrim y escenario NO son superficie** | 🔴 **Pendiente** — ¿se canoniza el grupo en AXIS? |
-| 6 | Las dos familias de sombra no son intercambiables | 🔴 **Pendiente** — una línea de contrato de uso |
+| 3 | Coral y magenta nunca llegaron al código | ✅ **Cerrado** — las tres familias están en `axisAccentRamp` desde **`0.2.4`**, publicado y consumido por Globe |
+| 4 | **Rol de coral y magenta** (¿para qué existen?) | 🔴 **Decisión** — §3 · *recomendación escrita: orchid mantiene el acento · magenta se declara escenario/medio · coral sin token semántico* |
+| 5 | **Scrim y escenario NO son superficie** | 🔴 **Decisión** — §1 · *recomendación escrita: `axisScrim` como grupo plano, sin eje de modo* |
+| 6 | Las dos familias de sombra no son intercambiables | 🔴 **Decisión** — §4 · *recomendación escrita: renombrar por rol (`action` / `surface`), no por ingrediente* |
 
-Nota de adopción: publicar no es adoptar. Greenhouse todavía consume `@efeoncepro/axis-tokens` **0.2.1**,
-anterior a estos exports; los usa Globe. Eso no cambia ninguna decisión de este documento, pero conviene
-tenerlo presente al hablar de "el sistema ya lo tiene".
+Las tres decisiones son de **significado**, no de implementación: los valores ya están en el paquete. Lo
+que falta es declarar qué prometen — y hasta que se declare, cada consumidor nuevo lo deduce por su
+cuenta, que es exactamente cómo nacieron los defectos de §1 y §4.
+
+Nota de adopción: publicar no es adoptar. Greenhouse todavía consume `@efeoncepro/axis-tokens` **0.2.1**
+—anterior a estos exports, y sin usar `axisAccentRamp` en ningún archivo (verificado 2026-07-31)—;
+quien los consume es Globe, en `0.2.4`. Eso no cambia ninguna decisión de este documento, pero conviene
+tenerlo presente al hablar de "el sistema ya lo tiene": hoy lo tiene **un** consumidor de dos.
 
 Todo lo que sigue está **medido o leído del archivo**, no estimado. Los contrastes son WCAG 2.x sobre
 color compuesto (con alpha resuelto contra su fondo real), y los matices en grados HSL.
@@ -114,6 +118,31 @@ Forma propuesta —a criterio de ustedes—: un **grupo separado que no tenga va
 ausencia de `light` / `dark` en su firma sea lo que impida el error, en vez de un comentario que hay que
 leer. Globe hoy resuelve el scrim tomando `axisSurface.dark.sunk` en **ambos** modos; eso funciona, pero
 deja la regla en el consumidor en vez de en el sistema.
+
+#### Recomendación — aprobar o corregir
+
+**Publicar `axisScrim` como grupo plano, sin eje de modo.** No un valor oscuro dentro del tema claro
+—que el próximo lector leerá como un bug y "arreglará"—, sino un grupo cuya firma **no tiene** dónde
+poner `light` / `dark`:
+
+```ts
+export const axisScrim = {
+  stageTop, stageBottom, media, vignette,   // ← sin .light / .dark
+} as const
+```
+
+Dos razones para preferir esta forma sobre documentarlo:
+
+1. **Hace el error imposible en vez de desaconsejado.** El defecto que llegó a producción no fue por
+   ignorar una regla: fue por derivar el scrim de la escala de superficie, que es lo que cualquiera hace
+   cuando el grupo ofrece un eje de modo. Si el eje no existe, la derivación equivocada no compila.
+2. **Es la única defensa disponible para esta clase.** El barrido de contraste declara los gradientes
+   «no medibles» a propósito, y el bug cayó justo en ese hueco. Un defecto que ningún instrumento puede
+   ver necesita volverse inexpresable, porque no habrá un test que lo atrape.
+
+Los valores se derivan internamente de `axisSurface.dark.*` —un dueño por dato, sin repetirlos— pero
+esa derivación queda dentro del paquete y no se expone. Globe ya opera así; esto mueve la regla del
+consumidor al sistema, que es donde protege también a Greenhouse y a Wave.
 
 ### Nota de API que ya se cobró su valor
 
@@ -234,6 +263,29 @@ Este documento no propone un valor concreto sin saber el propósito. Lo que sí 
 los dos escenarios: **portar las tres al paquete** (`TASK-1615`). Que una familia exista en Figma y no en
 el código es lo que produjo el descarte equivocado, independientemente del rol que se le termine dando.
 
+#### Recomendación — aprobar o corregir
+
+Conviene separar dos preguntas que se venían tratando como una. Las rampas ya son **primitivas** y ya
+están en el paquete desde `0.2.4`. Lo que está en disputa no es si existen, sino **cuáles se ganan un
+token semántico** — y un token semántico es una promesa de significado, no un color disponible.
+
+| Familia | Recomendación | Por qué |
+|---|---|---|
+| **orchid** | **Mantiene su rol de acento.** Sin cambios. | Ya alimenta `--accent`, `--accent-ink`, `--accent-wash`, `--accent-line`. Y es el único de los tres al 40 % de saturación: el único que sostiene superficie amplia sin gritar. |
+| **magenta** | **Se le declara rol: familia de escenario/medio.** | No es un rol nuevo — es el que **ya cumple** en Globe (`--media-wash` sale de magenta 300/400/700/800/900). Declararlo convierte un uso accidental en un contrato legible. |
+| **coral** | **Ningún token semántico, deliberadamente.** Queda como primitiva disponible, marcada «sin rol asignado». | Está a **14° del `danger`**. Cualquier significado que se le dé compite con el estado de error del producto: una serie, un chip o un badge coral se leerá como alarma. Un segundo acento se justifica sólo con un significado claro, y coral no lo tiene todavía. |
+
+Y esto responde de paso la pregunta abierta arriba —*«¿para qué existen?»*—, con la medición del propio
+documento en la mano: **no son categóricas.** Dos familias a 5° entre sí son indistinguibles como
+categorías, y una a 14° del error convierte un dato en una alarma. Si en el futuro hacen falta series de
+gráfico, el presupuesto correcto está en los **115° de espectro vacío** entre warning y success —un teal
+o un lima—, no en subdividir el rojo-rosa.
+
+**Lo que esta recomendación evita explícitamente:** inventarle un trabajo a coral para justificar que
+esté. Una familia sin rol en la paleta no cuesta nada; una familia con un rol inventado que colisiona con
+`danger` cuesta un incidente de lectura. Si mañana aparece un trabajo real para coral, se le declara el
+token entonces — el valor ya está en el paquete esperando.
+
 ---
 
 ## 4 · Las dos familias de sombra no son intercambiables, y nada lo dice
@@ -249,8 +301,32 @@ Elevar un header o una card con la sombra de marca produce un **halo naranja** q
 elemento estuviera encendido. Ocurrió al construir el mockup de Globe, eligiendo la familia equivocada
 porque el nombre parecía el correcto.
 
-**Propuesta:** declararlo en el contrato de uso de las sombras. Es una línea de documentación, no un
-cambio de valor. Sigue pendiente.
+#### Recomendación — aprobar o corregir
+
+**Renombrar por rol, no por ingrediente.** `Primary/Globe` describe **de qué está hecha** la sombra;
+`gray` también. Ninguno de los dos dice **para qué sirve**, que es lo único que el consumidor necesita
+saber en el momento de elegir:
+
+| Hoy | Propuesto | Trabajo |
+|---|---|---|
+| `Dark/elevation/Primary/Globe/*` | `Dark/elevation/action/*` | Elevar un elemento **accionable** — el tinte de marca es intencional |
+| `Dark/elevation/gray/*` | `Dark/elevation/surface/*` | Elevar una **superficie** — card, header, panel |
+
+Los nombres actuales quedan como alias, igual que `bodyBg` y `paper` en §1: renombrar no puede romper a
+un consumidor vigente.
+
+Esto es deliberadamente **más que la línea de documentación** que proponía la versión anterior de este
+documento, y la razón es la evidencia del propio incidente: la familia equivocada se eligió **porque el
+nombre parecía el correcto**. Quien construyó el mockup no se saltó una regla — leyó el nombre, le
+calzó, y obtuvo un halo naranja que se lee como si el elemento estuviera encendido. Un contrato escrito
+en otro archivo no habría cambiado esa elección, porque el error ocurre en el instante de leer el
+nombre. El nombre es el único lugar donde la corrección llega a tiempo.
+
+Es el mismo criterio que ya se aplicó al resolver §1 y la nota de API: **nombrar por la razón, no por el
+caso ni por el material.** Ahí se descartó nombrar por región (`body-bg`) en favor de nombrar por nivel,
+porque un nombre de región condena a todo consumidor cuya composición no coincida con la del primero.
+Acá pasa lo mismo un escalón más arriba: un nombre de ingrediente condena a todo consumidor que no sepa
+de antemano qué hace ese ingrediente.
 
 ---
 
@@ -302,14 +378,22 @@ que por ahora es doctrina de revisión: **mirar el render, en los dos modos.**
 
 🔴 **Y NO propone que Globe avance con valores locales como práctica.** Declarar el valor en Globe «por
 ahora» es teclearlo dos veces, que es el defecto exacto que el Delta 2026-07-29 (a) documenta. La rampa de
-magenta local de Globe es la excepción que confirma la regla: existe con **comentario, dueño y task de
-retiro** (`TASK-1615`), y se borra el día que el paquete la publique. Sin esas tres cosas no es deuda
-declarada — es un design system paralelo con fecha de caducidad optimista.
+magenta local de Globe fue la excepción que confirmó la regla: existió con **comentario, dueño y task de
+retiro** (`TASK-1615`), y se borró el día que el paquete la publicó. Ese día llegó: `0.2.4` trae las tres
+familias y `apps/studio-client/src/tokens/tokens.ts` consume `axisAccentRamp.magenta` directamente
+(verificado 2026-07-31). La deuda declarada se pagó en el plazo que declaró — que es la diferencia entre
+deuda y un design system paralelo con fecha de caducidad optimista.
 
 ---
 
 ## Version
 
+- **v1.2** — 2026-07-31 — Las tres decisiones abiertas pasan de pregunta a **recomendación concreta**, para
+  que el equipo apruebe o corrija en vez de partir de cero: `axisScrim` como grupo plano sin eje de modo
+  (§1), el reparto de rol entre orchid / magenta / coral (§3), y el renombre de las sombras por rol en vez
+  de por ingrediente (§4). Se cierra el punto 3 de la tabla: coral y magenta **sí** llegaron al código
+  (`0.2.4`), y la rampa local de Globe se retiró como estaba comprometido. Verificado contra el paquete y
+  contra los dos consumidores: Globe en `0.2.4`, Greenhouse todavía en `0.2.1` y sin usar `axisAccentRamp`.
 - **v1.1** — 2026-07-31 — Actualizada tras el modo claro de Globe. §0/§1/§2 pasan a `Adoptado` (publicados
   en `@efeoncepro/axis-tokens` 0.2.2–0.2.3). Nuevo: coral y magenta no llegaron al código (§3, con los
   valores de magenta y la advertencia de lectura de coral), la pregunta de rol para coral y magenta (§3),
