@@ -107,6 +107,14 @@ fixtures visuales completos por contrato y la migración ordenada del catálogo 
 - El Lab genera 24 páginas estáticas y 18 contratos publicados; build, typecheck, tests y 16 E2E Chromium/mobile
   pasan.
 
+### Delta 2026-08-01 (j) — brand logo provenance gate
+
+- AXIS publica `efeonce.brand-logos` como fixture de gobernanza con estados `approved`, `pending-provenance` y
+  `rejected`, accessible names y status visible.
+- No se copian SVGs de terceros ni nodos privados de Figma: los assets reales quedan pendientes de source,
+  licencia y checksum versionado.
+- El Lab genera 25 páginas estáticas y 19 contratos publicados; build, typecheck, tests y 16 E2E pasan.
+
 ### Plan futuro para portar el Lab Greenhouse a AXIS
 
 1. Inventariar las rutas actuales de `/design-system` y clasificarlas como contrato puro, fixture visual,

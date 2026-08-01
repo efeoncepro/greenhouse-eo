@@ -35,6 +35,8 @@
   faltan las comparaciones visuales contra consumidores antes de retirar el fallback Greenhouse.
 - `gradients` ya tiene fixture portable y `utilities` ahora se representa mediante `efeonce.activity-timeline`,
   sin datos operativos ni registros de auditoría.
+- `brand-logos` ya tiene el gate público de provenance; los assets reales no se trasladan hasta tener source,
+  licencia y checksum aprobados.
 
 ## Globe Producer — seis defectos de superficie, el pie de la app y la paginación del feed (2026-08-01)
 

@@ -34,7 +34,7 @@ Cada candidato requiere auditoría transitive de imports antes de migrarse.
 | `motion`, `border-beam` | migrada | motion contract + reduced-motion evidence |
 | `microinteractions` | excluded first slice | composite product feedback; extract per primitive |
 | `team-avatar-group`, `surface-recipes`, `roadmap-timeline`, `charts` | migrada | static contracts + framework-agnostic fixtures |
-| `brand-logos` | candidate after provenance | AXIS asset/provenance gate |
+| `brand-logos` | gate migrado | `efeonce.brand-logos`; assets reales pendientes de provenance |
 | `axis-adapters` | excluded from reference | stays in consumers; compare by evidence |
 | `efeonce-brand`, `gamification`, `handoff` | excluded first slice | brand/workflow/product surface |
 | `growth-forms-renderer`, `native-meeting-scheduler`, `talent-profile` | excluded first slice | API/workforce/product surface |
@@ -77,6 +77,10 @@ they do not copy chart engines, product data, Portal state or consumer adapters.
 `efeonce.gradients` completes the portable token/reference group with intensity and static-mode semantics. The
 Greenhouse `utilities` is represented by `efeonce.activity-timeline`: an operational evidence primitive with
 ordered events, people, timestamps and attachments, but no product data or audit records.
+
+`efeonce.brand-logos` migrates the governance surface before the assets: every logo must expose accessible name,
+source/provenance and approval status. The public fixture intentionally renders status-only specimens until each
+third-party asset has an approved source, license and versioned checksum.
 
 ## Gate for each next route
 
