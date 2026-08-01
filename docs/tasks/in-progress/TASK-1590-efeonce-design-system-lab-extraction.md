@@ -64,6 +64,14 @@ fixtures visuales completos por contrato y la migración ordenada del catálogo 
   los roles semánticos `none`, `raised`, `floating`, `overlay`, `modal` y `overflow` reservado.
 - El bloque pasó build, typecheck, tests unitarios, lint y 14 pruebas E2E en Chromium y mobile.
 
+### Delta 2026-08-01 (d) — primer bloque pure-UI
+
+- AXIS publica contratos y fixtures para `button`, `chip`, `breadcrumbs`, `disclosure`, `loaders` y
+  `floating-surface`, sin importar primitives Greenhouse/MUI, auth, API o dominio.
+- El Lab Astro genera 14 páginas estáticas y el catálogo contiene 8 contratos publicados.
+- La verificación actual pasa build, typecheck, tests, lint y 16 E2E en Chromium y mobile; `/design-system`
+  sigue siendo fallback porque aún falta comparación visual/consumer parity ruta por ruta.
+
 ### Plan futuro para portar el Lab Greenhouse a AXIS
 
 1. Inventariar las rutas actuales de `/design-system` y clasificarlas como contrato puro, fixture visual,

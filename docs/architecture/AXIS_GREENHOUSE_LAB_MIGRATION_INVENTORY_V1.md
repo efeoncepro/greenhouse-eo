@@ -28,8 +28,8 @@ Cada candidato requiere auditoría transitive de imports antes de migrarse.
 | `elevation` | migrada | `/references/elevation/` — `axisElevation` |
 | `gradients` | token/reference candidate | referencia AXIS tras provenance |
 | `utilities` | token/reference candidate | primitives/recipes AXIS |
-| `buttons`, `chips`, `breadcrumbs` | pure-UI candidate | `DesignPatternContract` + fixtures |
-| `disclosure`, `loaders`, `floating-surfaces` | pure-UI candidate | headless/motion contracts + fixtures |
+| `buttons`, `chips`, `breadcrumbs` | migrada | `DesignPatternContract` + static fixtures |
+| `disclosure`, `loaders`, `floating-surfaces` | migrada | headless/motion contracts + static fixtures |
 | `card-density`, `composition-shell` | pure-UI candidate | density/shell contracts; no Portal shell |
 | `motion`, `microinteractions`, `border-beam` | pure-UI candidate | motion contract + reduced-motion evidence |
 | `team-avatar-group`, `surface-recipes`, `roadmap-timeline`, `charts` | pure-UI candidate | contract after transitive import audit |
@@ -55,6 +55,11 @@ import `CanonicalTypographyView` or Greenhouse typography runtime.
 `geometry` and `elevation` now render at `/references/geometry/` and `/references/elevation/`. Geometry publishes
 the 4px spacing scale and radius roles; elevation publishes semantic roles (`none` through `modal`, plus reserved
 `overflow`). Both are static and token-backed. The raw Greenhouse MUI theme remains outside AXIS.
+
+The first pure-UI block now publishes `efeonce.button`, `efeonce.chip`, `efeonce.breadcrumbs`,
+`efeonce.disclosure`, `efeonce.loaders` and `efeonce.floating-surface` through the AXIS Content Loader. Their
+routes are framework-agnostic HTML/CSS fixtures and include keyboard, responsive and reduced-motion evidence;
+the Greenhouse primitives remain the fallback implementation until consumer parity is recorded.
 
 ## Gate for each next route
 

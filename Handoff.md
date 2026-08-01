@@ -24,6 +24,9 @@
   token-backed en `/references/colors/`, `/references/typography/`, `/references/geometry/` y
   `/references/elevation/`; el inventario y el triage están en
   [`AXIS_GREENHOUSE_LAB_MIGRATION_INVENTORY_V1.md`](docs/architecture/AXIS_GREENHOUSE_LAB_MIGRATION_INVENTORY_V1.md).
+- El primer bloque pure-UI ya tiene contratos y fixtures estáticos para `button`, `chip`, `breadcrumbs`,
+  `disclosure`, `loaders` y `floating-surface`; la migración sigue en curso y `/design-system` continúa como
+  fallback hasta cerrar parity visual y de consumidores.
 
 ## Globe Producer — seis defectos de superficie, el pie de la app y la paginación del feed (2026-08-01)
 
