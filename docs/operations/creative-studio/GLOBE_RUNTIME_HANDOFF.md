@@ -5,8 +5,9 @@
 > conserva sólo el estado mutable, los riesgos abiertos y el siguiente paso. La historia anterior
 > permanece auditable en el git log y en las tasks/ADRs enlazadas.
 >
-> **Corte verificado:** 2026-07-30 · Globe `main`
-> `84d6a8e2a1201a9e41cc2ede71acda31e52e43f9`.
+> **Corte verificado:** 2026-08-01 · Globe `main`
+> `001ce1b7da9cb896ecfbc32ea3b64a99f8e2fdfc`; API interna
+> `globe-api-internal-00179-qcz` al 100%.
 
 ## Estado activo
 
@@ -16,6 +17,10 @@
   same-origin; no recibe credenciales de workload ni llama providers directamente.
 - El reader `globe.producer.fleet.list` es el SoT live. El ledger humano es
   [`GLOBE_MODEL_FLEET_STATUS.md`](GLOBE_MODEL_FLEET_STATUS.md).
+- El gateway federado `https://mcp.efeonce.org/mcp` consume ese mismo reader desde el 2026-08-01, pero sólo
+  expone lectura interna: principal `globe:service:mcp-provider`, capability
+  `globe.producer.catalog.read` y workspace `greenhouse-org:efeonce` exacto. No entrega selección de workspace,
+  ejecuciones, assets, revisiones, delivery, créditos ni datos de proveedor.
 - Seis rutas de imagen están simultáneamente `available`: Seedream 5 Pro, Nano Banana Pro,
   Nano Banana 2, GPT Image 2, GPT Image 1.5 y Recraft v4.1.
 - `TASK-1553` permanece `in-progress` únicamente por el criterio transversal de rate-version
@@ -29,6 +34,7 @@
 | Producer autenticado | revisión humana, atestación cuando corresponde y generación real | sesión del operador → BFF; la prueba de usuario debe iniciarse aquí |
 | `Globe Operator Lane (keyless)` | evaluación, readiness, routing, auto-promoción, circuito, derechos y confirmación de canary | workflow federado con service accounts disjuntas por acto; combinaciones acción↔lane están allowlisted |
 | `Diagnose Governed Run (keyless)` | leer estado final de un run/attempt sin mutarlo | read-only, tenant-scoped y sanitizado; publica artefacto diagnóstico sin mensajes, stack, body upstream ni secretos |
+| Efeonce MCP Gateway | consultar la disponibilidad de rutas desde un cliente MCP OAuth | adapter externo de lectura; llama sólo `globe.producer.fleet.list` mediante el principal acotado, no reemplaza el BFF ni el policy de Globe |
 
 El operator lane no es un command genérico. La matriz vigente separa `caller`,
 `tenancy-operator`, `auto-lane`, `routing`, `promoter` y `checker`; sólo permite actos explícitos,
@@ -130,6 +136,8 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
   Vertex imagen a Interactions video.
 - La identidad temporal usada para consumo privado de AXIS debe sustituirse por una identidad de
   máquina antes del rollout externo; no recrees el secreto legacy de Globe.
+- El cliente Entra interno del gateway MCP recibe hoy ambos scopes aun cuando solicita el base. Antes de acceso
+  B2B debe existir entitlement por tenant/capability y una identidad base-only que pruebe la denegación de Globe.
 
 ## Siguiente paso ejecutable
 
@@ -142,3 +150,5 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
    los readers sigan `available`.
 4. Mantén toda prueba de gasto real por el Producer autenticado o por el canary canónico; ante un
    timeout, lee primero `run-get`/diagnóstico y no reintentes a ciegas.
+5. Antes de ofrecer el reader por MCP a un cliente, implementa el entitlement B2B y ejecuta un canary real con
+   identidad base-only; no infieras esa separación del cliente interno actual.

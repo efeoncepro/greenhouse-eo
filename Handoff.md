@@ -7,18 +7,22 @@
 - Runtime: Cloud Run `efeonce-mcp-gateway` en `efeonce-group/southamerica-west1`, service account dedicada,
   Artifact Registry inmutable, GitHub WIF sin keys y Global External ALB sobre `34.111.78.237`.
 - OAuth Entra pasó el canary real end-to-end de authorization code + PKCE por
-  `https://mcp.efeonce.org/mcp`: initialize `200`; una llamada Globe sin su scope fue rechazada `403` antes
-  del dispatch y el manifest Globe read-only respondió con el scope autorizado. Entra v2 emite el App ID del
-  recurso en `aud`, no la URL pública.
+  `https://mcp.efeonce.org/mcp`: initialize, discovery y `globe.producer.fleet.list` respondieron `200` con
+  rutas redaccionadas. Los tests del gateway verifican que un scope Globe ausente se rechaza antes del dispatch.
+  El cliente interno actual de Entra recibe ambos scopes aun cuando solicita sólo el base, por lo que ese deny
+  todavía no tiene evidencia live con una identidad base-only. Entra v2 emite el App ID del recurso en `aud`, no
+  la URL pública.
 - `mcp.efeonce.org` ya resuelve a la IP global desde ambos NS de HostGator y resolvers públicos; HTTP responde
   `301` a HTTPS. El certificado administrado está `ACTIVE` y TLS presentó un certificado válido para el hostname.
 - El servicio quedó detrás del load balancer; el acceso directo `run.app` devuelve `404`. `/mcp` permanece
   OAuth-protegido y el único surface Globe comprobado es su manifest read-only.
 - Hardening posterior: Cloud Armor protege el backend con throttle aproximado de 600 requests/minuto por IP;
-  la revisión `efeonce-mcp-gateway-00007-d79` acepta sólo el hostname/origin canónico `mcp.efeonce.org`.
+  la revisión vigente `efeonce-mcp-gateway-00009-9c6` acepta sólo el hostname/origin canónico
+  `mcp.efeonce.org`.
 - Se agregó la skill espejo `efeonce-mcp-platform` para Codex/Claude, con router de sinergias hacia arquitectura,
   cloud/secret hygiene, Globe, QA y documentación. `pnpm skills:mirrors` detecta drift entre ambos bundles.
-- Health, discovery OAuth, rechazo anónimo, OAuth autenticado y manifest Globe pasaron por el hostname público.
+- Health, metadata OAuth, rechazo anónimo, OAuth autenticado y la tool Globe de fleet pasaron por el hostname
+  público.
   El primer callback local venció a los 180 segundos; el listener ahora usa una ventana configurable de 10
   minutos. El override DNS del canary sólo sirvió para diagnóstico con SNI público y no modifica el runtime.
 - Globe quedó habilitado end-to-end: PR `efeonce-globe#84` (`001ce1b`) desplegado como

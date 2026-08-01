@@ -5,10 +5,10 @@
 - **Owner:** Efeonce Platform
 - **Scope:** repositorio `efeonce-mcp`, transporte MCP remoto, autenticación, federación de productos, Cloud Run, front door y dominio público
 - **Reversibility:** two-way-but-slow
-- **Confidence:** high para boundary, hosting, hostname y authorization server después del canary PKCE real
+- **Confidence:** high para boundary, hosting, hostname, authorization server y el primer reader Globe después del canary PKCE real
 - **Validated as of:** 2026-08-01
 - **Implementation owner:** [`TASK-1626`](../tasks/in-progress/TASK-1626-efeonce-mcp-platform-gateway.md)
-- **First provider owner:** [`TASK-1473`](../tasks/to-do/TASK-1473-globe-contract-packaging-parity-certification.md)
+- **First provider owner:** [`TASK-1473`](../tasks/in-progress/TASK-1473-globe-contract-packaging-parity-certification.md)
 
 ## Context
 
@@ -44,7 +44,8 @@ duplica lógica de negocio.
    Globe con su service account dedicada, ID token con audience exacta y allowlist del runtime de Globe.
 9. Globe es el primer provider, pero conserva ownership de sus tools/resources en `efeonce-globe` mediante
    contracts/SDK/adapters delgados gobernados por `TASK-1473`. El gateway sólo descubre, monta, filtra y enruta
-   esas capacidades.
+   esas capacidades. El primer corte operativo habilita exclusivamente el reader `globe.producer.fleet.list`,
+   interno y read-only; no habilita generaciones, assets, review, delivery, créditos ni reveal-house.
 10. No se habilitan writes en el primer corte. Cada write futuro exige command canónico, autorización fina,
     idempotencia, auditoría, cuotas y clasificación de impacto.
 11. Codex y Claude usan el router compartido `efeonce-mcp-platform` para componer las skills de arquitectura,
@@ -111,8 +112,9 @@ Cloud Run: efeonce-mcp-gateway (efeonce-group / southamerica-west1)
     └──► future Efeonce providers
 ```
 
-El servicio escala a cero inicialmente. La configuración de producción fija máximos de instancias y
-concurrencia para limitar costo y blast radius; esos valores se ajustan con telemetría, no por suposición.
+El servicio escala a cero inicialmente. La configuración operativa inicial fija `concurrency=80` y
+`maxScale=5` efectivo para limitar costo y blast radius; esos valores se ajustan con telemetría, no por
+suposición.
 
 ## Quality Scenarios and Fitness Functions
 
@@ -170,7 +172,9 @@ corporativa neutral; `efeoncepro.com` queda como compatibilidad opcional.
 - el authorization server y los clientes deben registrarse/probarse de forma explícita;
 - la federación introduce versionado y health por provider;
 - el load balancer global tiene costo fijo mayor que exponer directamente la URL `run.app`;
-- Globe no puede integrarse hasta que su adapter y allowlist de service account estén listos en una rama limpia.
+- La apertura a clientes externos requiere un modelo B2B/multitenant y entitlements que pueda emitir y revocar
+  acceso por tenant y capability; el cliente Entra interno actual no prueba esa separación porque recibe ambos
+  scopes delegados.
 
 ## Rollout and rollback
 
@@ -180,7 +184,8 @@ corporativa neutral; `efeoncepro.com` queda como compatibilidad opcional.
 4. Aplicar load balancer/certificado, publicar DNS y esperar que el certificado pase a `ACTIVE`.
 5. Habilitar el hostname canónico y mantener la revisión anterior de Cloud Run lista para rollback.
 6. Integrar Globe read-only desde `TASK-1473`; probar allow, deny, timeout y redaction antes de habilitar el
-   provider. El gateway base puede operar públicamente con Globe `policy-blocked`.
+   provider. El corte inicial ya habilitó sólo `globe.producer.fleet.list` para uso interno; todo reader adicional
+   empieza `policy-blocked` y todo acceso externo conserva el gate B2B/multitenant.
 
 Rollback: quitar tráfico a la revisión defectuosa o deshabilitar el provider/servicio; conservar DNS y devolver
 `503` fail-closed es preferible a exponer una ruta sin auth. Cambiar de dominio o runtime exige un nuevo ADR.
@@ -193,6 +198,7 @@ Rollback: quitar tráfico a la revisión defectuosa o deshabilitar el provider/s
 - el authorization server elegido no sea interoperable con al menos dos clientes MCP objetivo;
 - una región distinta reduzca latencia material sin degradar la llamada a providers;
 - exista necesidad contractual de un segundo dominio canónico o residencia regional.
+- se defina el modelo B2B/multitenant que permite asignar, verificar y revocar scopes/capabilities por cliente.
 
 ## References
 

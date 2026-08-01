@@ -24,7 +24,8 @@ No uses la URL `run.app`: el acceso público pasa por el front door y el hostnam
    costo de vendor ni margen.
 
 Para una prueba release-controlada desde el repo `efeonce-mcp`, usa `pnpm oauth:canary`. En macOS abre Google
-Chrome y se debe ejecutar con el perfil autenticado autorizado; cierra la sesión de prueba al terminar.
+Chrome y debe ejecutarse con el perfil autenticado autorizado. Al terminar, cierra sólo la ventana de prueba; no
+cierres la sesión compartida del perfil.
 
 ## Operación segura
 

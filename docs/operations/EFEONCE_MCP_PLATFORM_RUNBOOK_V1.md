@@ -35,6 +35,10 @@ Un front door con DNS publicado pero certificado no `ACTIVE` no califica como `p
 rollout TLS pendiente. No presentar `private_canary`, `edge_ready` ni ese estado transitorio como producción
 pública.
 
+**Estado vigente:** `public_read_only`, con OAuth obligatorio y el único reader federado
+`globe.producer.fleet.list`. El provider Globe continúa limitado al workspace interno exacto; este estado no
+habilita clientes externos ni multitenancy.
+
 ## Preflight
 
 1. Verifica `git status --short` en `efeonce-mcp` y no despliega cambios no versionados.

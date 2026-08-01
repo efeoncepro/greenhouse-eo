@@ -7,7 +7,7 @@
 > sustenta en `globe.production-routing` + `globe.model-readiness.*`. Este documento es el mapa
 > legible que reconcilia ambas autoridades.
 >
-> **Creado:** 2026-07-24 (TASK-1553). **Última actualización:** 2026-07-30.
+> **Creado:** 2026-07-24 (TASK-1553). **Última actualización:** 2026-08-01.
 > **Contrato técnico:** `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md`,
 > `EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md`, `EFEONCE_GLOBE_ROUTE_BASED_MODEL_RESOLUTION_DECISION_V1.md` (ADR-013).
 
@@ -173,6 +173,12 @@ Manual: [operar la flota](../../manual-de-uso/creative-studio/operar-flota-model
 
 ## Consumers vivos de la flota
 
+- **Efeonce MCP Gateway (2026-08-01)** — `https://mcp.efeonce.org/mcp` consulta el reader canónico a través de
+  la tool `globe.producer.fleet.list`. Está limitado al workspace interno `greenhouse-org:efeonce` y a
+  `globe.producer.catalog.read`; no permite elegir workspace ni accede a runs, assets, review, delivery, créditos,
+  house, provider slug, costo de vendor o margen. El OAuth actual es internal-only: antes de cualquier cliente
+  externo debe existir entitlement B2B por tenant/capability y un canary con identidad base-only realmente
+  denegada para Globe.
 - **Producer Model Selector (TASK-1555, `efeonce-globe` `0258534`)** — la región **"Modelo"** del
   composer renderiza un **desplegable con el isotipo real de cada modelo** desde
   `globe.producer.fleet.list`. Lista **toda la flota de la modalidad activa** con su `availability`

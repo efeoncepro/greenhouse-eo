@@ -20,6 +20,8 @@
 - El gateway limita inicialmente Cloud Run a `concurrency=80` y `maxScale=5` efectivo. Clientes externos siguen
   bloqueados: el cliente interno Entra emite ambos scopes incluso cuando solicita el base, por lo que falta
   separar asignación/consentimiento de entitlements y repetir el deny con identidad base-only.
+- La skill espejo `efeonce-mcp-platform` y sus matrices de verificación ahora codifican esa excepción internal-only
+  y exigen evidencia real de entitlement/revocación base-only antes de cualquier rollout B2B.
 
 ## 2026-08-01 — Efeonce MCP: gateway independiente, OAuth Entra y front door
 

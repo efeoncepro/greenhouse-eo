@@ -886,6 +886,24 @@ Tres decisiones que quedaron fijadas al crear estas tasks:
   es peor que el color: un peso sin archivo cargado **lo sintetiza el browser** deformando las letras,
   sin fallar ningún gate.
 
+## Delta 2026-08-01 — primer reader Globe federado por MCP, internal-only
+
+`TASK-1473` y `TASK-1626` habilitaron el primer corte real de MCP sin mover el dominio creativo: el gateway
+independiente `efeonce-mcp` publica únicamente `globe.producer.fleet.list` y lo delega al reader canónico de
+Globe. El principal downstream queda limitado a `globe.producer.catalog.read` y al workspace
+`greenhouse-org:efeonce`; no obtiene grants de runs, assets, review, delivery, créditos ni reveal-house.
+
+La evidencia operativa es Globe `001ce1b` / `globe-api-internal-00179-qcz`, gateway `ce593f2` /
+`efeonce-mcp-gateway-00009-9c6` y canary OAuth authorization-code + PKCE por
+`https://mcp.efeonce.org/mcp`: initialize, discovery y la tool respondieron sin provider slug, house, costo de
+vendor ni margen. El gateway es un adapter: no importa DB, storage ni SDKs de proveedores y Cloud Run conserva
+`concurrency=80` con `maxScale=5` efectivo.
+
+Esto **no habilita clientes externos ni completa la paridad MCP de Globe**. El cliente interno Entra recibe ambos
+scopes incluso cuando solicita el base; antes de B2B/multitenant debe separarse la emisión/asignación de
+entitlements y repetirse el deny con una identidad base-only. La paridad de lifecycle, assets, review, delivery y
+writes conserva sus tasks y gates propios.
+
 ## Delta 2026-07-25 — ADR-014 avanza cuatro superficies, y un fallo de gobernanza que vale más que el código
 
 Este delta registra dos cosas de peso muy distinto: **lo que shippeó** del payload cliente, y **un fallo de

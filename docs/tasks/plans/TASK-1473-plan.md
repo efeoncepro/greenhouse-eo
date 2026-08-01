@@ -69,6 +69,21 @@
 4. Añadir tests de allow/deny/fault/redaction/correlación y actualizar el canary OAuth para llamar la tool real.
 5. Validar, desplegar gateway, ejecutar el canary autenticado y documentar evidencia/rollback.
 
+## Execution outcome — 2026-08-01
+
+- [x] Globe limitó el principal `globe:service:mcp-provider` a
+  `globe.producer.catalog.read` y `greenhouse-org:efeonce`; sólo el reader de fleet quedó `mcp: available`.
+- [x] Globe `001ce1b` se desplegó internamente como `globe-api-internal-00179-qcz` con 100% del tráfico.
+- [x] El gateway `ce593f2` publicó la tool sin argumentos sobre el envelope canónico `/v1/readers`; no importa
+  DB, storage ni SDKs de proveedores.
+- [x] El gateway `efeonce-mcp-gateway-00009-9c6` quedó con 100% de tráfico, `concurrency=80` y `maxScale=5`
+  efectivo.
+- [x] El canary authorization code + PKCE real completó initialize, discovery y la invocación autenticada de
+  `globe.producer.fleet.list`, con rutas disponibles y sin house, provider slug, costo de vendor ni margen.
+- [~] Los tests cubren deny antes del downstream y fault sanitizado. Entra entrega ambos scopes al cliente
+  interno incluso ante una solicitud del scope base, por lo que la evidencia live de una persona base-only es un
+  requisito previo al acceso B2B/multitenant, no una condición fallida del corte internal-only.
+
 ## Files to create
 
 - Ninguno previsto fuera de pruebas o evidencia de canary que el runtime ya gestione.
@@ -92,5 +107,6 @@
 
 ## Open questions
 
-- Ninguna para el corte internal-only. La extensión a clientes requiere decidir el modelo B2B/multitenant y
-  entitlements antes de ampliar workspace bindings.
+- El corte internal-only no tiene bloqueo operativo. La extensión a clientes requiere separar la asignación o
+  consentimiento de scopes en Entra, decidir el modelo B2B/multitenant y repetir el deny con una identidad
+  base-only antes de ampliar workspace bindings.

@@ -19,6 +19,10 @@ The two versioned bundles are intentionally mirrored:
 
 `pnpm skills:mirrors` makes drift in the declared mirrors a failing local check.
 
+El gateway público ya opera el reader interno y read-only `globe.producer.fleet.list`. Eso no cambia la postura
+por defecto de una capacidad nueva ni autoriza acceso de clientes: el acceso B2B/multitenant sigue bloqueado hasta
+que Entra y el provider puedan aplicar entitlements por tenant y capability.
+
 ## Invocation boundary
 
 Use the router for `mcp.efeonce.org`, remote MCP transport, protected-resource OAuth, tools/resources/prompts,
@@ -47,14 +51,17 @@ database, storage or upstream-provider access, chooses domain policy, or substit
 1. Classify the work as gateway-only, provider-only or cross-runtime; name its owner and source of truth.
 2. For each capability, record scope, verified tenant boundary, canonical downstream reader/command/API, redaction,
    timeout, concurrency, error contract, evidence and rollback.
-3. Keep provider default `OFF`, read-only and fail-closed until package/API version, IAM allowlist, allow/deny,
-   fault isolation and provider canary pass.
+3. Keep every provider o capability nueva `OFF`, read-only and fail-closed until package/API version, IAM allowlist,
+   allow/deny, fault isolation and provider canary pass. La excepción operativa actual es sólo
+   `globe.producer.fleet.list`, interno; mantenerla habilitada exige conservar esa evidencia, no extenderla.
 4. Keep OAuth caller identity separate from downstream workload identity. Never log bearer tokens, auth codes,
    sensitive prompts, raw payloads or upstream errors.
 5. Treat writes, approvals, spend, rights-sensitive actions, new auth surfaces and webhooks as independent
    ADR/task work.
 6. Before calling a public runtime operational, require DNS/TLS, discovery, unauthenticated denial and authenticated
-   MCP client evidence. A compiled adapter is not rollout evidence.
+   MCP client evidence. Para acceso externo, además prueba una identidad que reciba sólo los scopes/entitlements
+   concedidos; el cliente Entra interno actual recibe ambos scopes y no demuestra ese deny por persona. A compiled
+   adapter is not rollout evidence.
 
 ## Maintenance
 

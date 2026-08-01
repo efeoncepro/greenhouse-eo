@@ -289,7 +289,9 @@ DNS en HostGator requieren acceso del operador. No se sustituyen con tokens est�
 
 - [x] `efeoncepro/efeonce-mcp` existe como repo privado independiente con CI y container reproducibles.
 - [x] `https://mcp.efeonce.org/mcp` sirve Streamable HTTP sobre TLS y discovery OAuth correcto.
-- [x] Requests sin token, expirados, audience/scope incorrectos fallan antes de ejecutar tools.
+- [x] Requests sin token fallan en el hostname público antes de ejecutar tools; los casos de expiración,
+      audience y scope se cubren antes del dispatch en la suite del gateway. La prueba live de una identidad
+      base-only permanece pendiente hasta separar la emisión de scopes de Entra.
 - [x] Runtime usa service account dedicada y WIF; no hay keys persistentes ni roles de datos de Globe.
 - [x] Globe aporta `globe.producer.fleet.list` como capacidad read-only real mediante `TASK-1473`, con
       redacción y canary de cliente MCP. La paridad amplia de las demás capabilities sigue en `TASK-1473`.

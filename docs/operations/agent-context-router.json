@@ -114,13 +114,14 @@
     },
     {
       "id": "efeonce-mcp-platform",
-      "triggers": ["MCP", "mcp.efeonce.org", "Streamable HTTP", "OAuth protected resource", "provider federation", "MCP tool", "MCP resource", "MCP prompt", "MCP Cloud Run", "MCP TLS", "MCP DNS"],
+      "triggers": ["MCP", "mcp.efeonce.org", "Streamable HTTP", "OAuth protected resource", "provider federation", "MCP tool", "MCP resource", "MCP prompt", "MCP Cloud Run", "MCP TLS", "MCP DNS", "Globe MCP provider", "MCP B2B entitlements"],
       "skills": ["efeonce-mcp-platform", "software-architect-2026", "greenhouse-secret-hygiene"],
       "sources": [
         "docs/architecture/EFEONCE_MCP_AGENT_SKILL_ROUTER_V1.md",
         "docs/architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md",
         "docs/operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md",
         "docs/tasks/in-progress/TASK-1626-efeonce-mcp-platform-gateway.md",
+        "docs/tasks/in-progress/TASK-1473-globe-contract-packaging-parity-certification.md",
         "docs/architecture/agent-invariants/INTEGRATIONS_INFRA_AGENT_INVARIANTS.md"
       ]
     },

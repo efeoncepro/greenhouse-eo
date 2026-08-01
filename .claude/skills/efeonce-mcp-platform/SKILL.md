@@ -25,13 +25,17 @@ If a source conflicts with remembered behavior, the verified runtime and its can
 ## Hard rules
 
 - Keep `https://mcp.efeonce.org/mcp` as the single canonical resource. Do not create a second OAuth resource for an alias.
-- Default every provider to disabled, read-only and fail-closed. An absent or degraded provider must not expose data,
-  execute a tool or make discovery fail for healthy providers.
+- Default every provider or capability to disabled, read-only and fail-closed. The only enabled initial exception is
+  internal `globe.producer.fleet.list`; it is not a customer-access precedent. An absent or degraded provider must
+  not expose data, execute a tool or make discovery fail for healthy providers.
 - A tool delegates only to a provider's canonical API, reader or command. Never add domain business logic, direct DB,
   storage or creative-provider SDK access to the gateway.
 - Keep human OAuth separate from the gateway's downstream service identity. Validate issuer, audience, expiry and
   scopes before MCP dispatch; never log tokens, auth codes, raw bodies or secrets.
 - Derive tenant/workspace from verified identity and provider policy. Never accept a free-form tenant boundary.
+- Before customer access, require B2B/multitenant entitlements that can issue and revoke access per tenant and
+  capability. The current internal Entra client receives both delegated MCP scopes, so it cannot prove base-only
+  persona denial; retain a dispatch-level deny test and add a real base-only client before that rollout.
 - Treat writes, approvals, spending, rights-sensitive creative work, webhooks and new public auth surfaces as new
   ADR/task work. Do not infer permission from a read-only MCP capability.
 - Do not call a product deployment successful because its MCP adapter compiled. Require provider allow/deny/fault
@@ -44,7 +48,7 @@ If a source conflicts with remembered behavior, the verified runtime and its can
 | --- | --- | --- |
 | Gateway, provider registry, API boundary or shared contract | `software-architect-2026` | Architecture + ADR/task before code |
 | Cloud Run, ALB, DNS, TLS, WIF, OAuth config or secrets | `cloud-run-basics`, `greenhouse-secret-hygiene` | Runbook; no keys or unsafe bypasses |
-| Globe capability, creative asset, model or workspace policy | `greenhouse-globe`, `greenhouse-ai-creative-rights-governance` | Globe owns API/SDK/policy; `TASK-1473` gates federation |
+| Globe capability, creative asset, model or workspace policy | `greenhouse-globe`, `greenhouse-ai-creative-rights-governance` | Globe owns API/SDK/policy; `TASK-1473` gates federation. Only the internal fleet reader is currently enabled. |
 | HubSpot or service-intake capability | `hubspot-greenhouse-bridge` or `hubspot-as-a-service` | Provider owns CRM contract and consent |
 | Teams-facing capability | `teams-bot-platform` | Teams platform owns tenant, consent and delivery |
 | Product UI/agent parity | Relevant product skill plus `software-architect-2026` | UI/API/MCP consume the same command or reader |
