@@ -18,3 +18,13 @@ Motion explica causalidad entre command, ledger y nueva proyección; nunca simul
 
 Reduced motion salta a idéntico estado final, conserva focus/live-region y elimina reveal/morph/highlight.
 Verificar interrupción, close/reopen, rapid selection, proposal expiry y 390 px sin overflow.
+
+## GVC / Micro Evidence
+
+Los scenarios desktop y mobile verifican estado final idéntico con reduced motion, Escape, focus restore,
+selección rápida, ausencia de overflow y cero loops ambientales. La evidencia local está enlazada desde el review.
+
+## Design Decision Log
+
+Se conserva motion sólo para explicar transición de selección y causalidad command→receipt. Se rechazaron
+count-up, progreso simulado y animación decorativa persistente porque confundirían estado con valor económico.

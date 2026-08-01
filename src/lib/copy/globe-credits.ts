@@ -20,6 +20,15 @@ export const GH_GLOBE_CREDITS = {
     cancel: 'Cancelar',
     confirm: 'Autorizar y ejecutar',
     submitting: 'Ejecutando…',
+    review: 'Revisar operación',
+    reviewing: 'Actualizando preview…',
+    reviewTitle: 'Preview autoritativo',
+    reviewHelp: 'Globe volvió a leer capacidad, topes y fondeo. La ejecución revalida estos límites antes de mutar.',
+    currentEffective: 'Disponible efectivo actual',
+    currentCap: 'Tope mensual actual',
+    currentFunding: 'Fondeo elegible actual',
+    edit: 'Editar límites',
+    previewFailed: 'No fue posible obtener el preview. No se habilitó la ejecución.',
     invalid: 'Revisa los límites: deben ser enteros positivos y el objetivo no puede superar el tope.',
     completed: 'Capacidad asegurada y verificada en Globe.',
     noEffect: 'Globe verificó que la capacidad objetivo ya estaba disponible; no se aplicaron cambios.',
@@ -44,7 +53,8 @@ export const GH_GLOBE_CREDITS = {
   signals: {
     effective: 'Disponible efectivo',
     monthly: 'Disponible del período',
-    funding: 'Fondeo elegible'
+    funding: 'Fondeo elegible',
+    ledger: 'Ledger histórico'
   },
   runway: {
     eyebrow: 'Runway del período',
@@ -55,6 +65,57 @@ export const GH_GLOBE_CREDITS = {
     remaining: 'Disponible',
     ledger: 'Ledger histórico',
     freshness: 'Actualizado hace {seconds} s'
+  },
+  context: {
+    audience: 'Audiencia: operador interno',
+    period: 'Período {start} – {end}',
+    coverage: 'Cobertura: {count} fuentes elegibles'
+  },
+  ledger: {
+    title: 'Ledger auditable',
+    description: 'Asientos append-only emitidos por Globe. Los filtros no recalculan saldos.',
+    empty: 'No hay asientos para este filtro.',
+    all: 'Todos',
+    allocation: 'Asignación',
+    reservation: 'Reserva',
+    settlement: 'Consumo',
+    release: 'Liberación',
+    expiration: 'Expiración',
+    adjustment: 'Ajuste',
+    allocated: 'Asignado Δ',
+    reserved: 'Reservado Δ',
+    spent: 'Consumido Δ',
+    adjusted: 'Ajuste Δ',
+    run: 'Run',
+    correlation: 'Correlación'
+  },
+  resources: {
+    title: 'Pools, grants y subpresupuestos',
+    description: 'Inventario autoritativo y tenant-scoped publicado por Globe.',
+    pools: 'Pools',
+    grants: 'Grants',
+    budgets: 'Subpresupuestos',
+    empty: 'Sin registros publicados.',
+    partial: 'Algunas proyecciones no están disponibles: {sections}.',
+    cap: 'Tope',
+    period: 'Vigencia',
+    project: 'Proyecto'
+  },
+  historical: {
+    title: 'Ledger histórico agregado',
+    description: 'Dimensión contable separada de la capacidad efectiva.',
+    allocated: 'Asignado',
+    reserved: 'Reservado',
+    spent: 'Consumido',
+    adjusted: 'Ajustado',
+    available: 'Disponible contable'
+  },
+  forecast: {
+    title: 'Cobertura y proyección',
+    available: '{days} días estimados · confianza {confidence}',
+    insufficient: 'Globe necesita más historial para publicar una proyección.',
+    unavailable: 'La proyección no está disponible en esta lectura.',
+    alerts: '{count} alertas operativas abiertas.'
   },
   operations: {
     title: 'Operaciones recientes',
@@ -85,6 +146,11 @@ export const GH_GLOBE_CREDITS = {
     expired: 'Expirada',
     no_effect: 'Sin cambios',
     outcome_unknown: 'Resultado por verificar'
+  },
+  resourceState: {
+    draft: 'Borrador', active: 'Activo', paused: 'Pausado', closed: 'Cerrado',
+    pending: 'Pendiente', posted: 'Publicado', cancelled: 'Cancelado', corrected: 'Corregido',
+    superseded: 'Reemplazado'
   },
   blocker: {
     pool_paused: 'Pool pausado',

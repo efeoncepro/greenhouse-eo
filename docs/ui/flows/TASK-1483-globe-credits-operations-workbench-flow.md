@@ -30,3 +30,14 @@ entitlement.
 UI, SDK y CLI reciben igual command/result/error/audit. MCP/Nexa son adapters futuros del mismo primitive y no
 bloquean esta UI ni obtienen autoridad adicional. Operating mode informa responsabilidad, no capability.
 External budget manager sigue policy-blocked hasta `TASK-1480` y rollout posterior.
+
+## GVC Scenario Plan
+
+- Quality profile: premium; desktop 1440×1000 y mobile 390×844.
+- Ejercer selección, preview, confirmación bloqueada, recovery readback-first, Escape y focus restore.
+- El dossier vive en `docs/ui/reviews/TASK-1483-globe-credits-operations-workbench-first-fold-review-2026-08-01.md`.
+
+## Design Decision Log
+
+Se eligió un flujo read-before-write con propuesta durable y readback terminal. Se rechazó un submit directo y
+un retry automático porque ambos ocultarían el plan o podrían duplicar una mutación económica.

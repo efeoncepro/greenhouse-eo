@@ -27,11 +27,13 @@ import { GH_GLOBE_CREDITS as C } from '@/lib/copy/globe-credits'
 import { formatDateTime, formatNumber } from '@/lib/format'
 import type { GlobeCreditCapacityStatus } from '@/lib/globe/credit-capacity-status'
 import type { GlobeCreditFundingOperation } from '@/lib/globe/credit-funding-operations'
+import type { GlobeCreditOperationsProjection } from '@/lib/globe/credit-operations-projection'
 
 export interface GlobeCreditsWorkbenchModel {
   workspace: Readonly<{ id: string; name: string }>
   status: GlobeCreditCapacityStatus | null
   operations: readonly GlobeCreditFundingOperation[]
+  projection: GlobeCreditOperationsProjection
   loadError: boolean
   canEnsure: boolean
   canReconcile: boolean
@@ -52,6 +54,11 @@ const receiptOutcome = (outcome: string | undefined) =>
   outcome ? C.receiptOutcome[outcome as keyof typeof C.receiptOutcome] ?? outcome : '—'
 
 const blockerLabel = (blocker: string) => C.blocker[blocker as keyof typeof C.blocker] ?? blocker
+const resourceState = (state: string) => C.resourceState[state as keyof typeof C.resourceState] ?? state
+
+const ledgerKinds = ['allocation', 'reservation', 'settlement', 'release', 'expiration', 'adjustment'] as const
+
+type LedgerKind = (typeof ledgerKinds)[number]
 
 type FundingFeedback = Readonly<{
   severity: 'success' | 'warning' | 'error'
@@ -70,8 +77,11 @@ const GlobeCreditsOperationsWorkbenchView = ({ model }: { model: GlobeCreditsWor
   const [selectedId, setSelectedId] = useState(model.operations[0]?.operationId ?? null)
   const [fundingOpen, setFundingOpen] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [previewing, setPreviewing] = useState(false)
+  const [fundingPreview, setFundingPreview] = useState<GlobeCreditCapacityStatus | null>(null)
   const [reconcilingId, setReconcilingId] = useState<string | null>(null)
   const [feedback, setFeedback] = useState<FundingFeedback | null>(null)
+  const [ledgerFilter, setLedgerFilter] = useState<'all' | LedgerKind>('all')
   const operationKeyRef = useRef<string | null>(null)
 
   const [targetAvailableCredits, setTargetAvailableCredits] = useState(() =>
@@ -89,6 +99,11 @@ const GlobeCreditsOperationsWorkbenchView = ({ model }: { model: GlobeCreditsWor
   const selected = useMemo(
     () => model.operations.find(operation => operation.operationId === selectedId) ?? null,
     [model.operations, selectedId]
+  )
+
+  const ledgerEntries = useMemo(
+    () => ledgerFilter === 'all' ? model.projection.ledger : model.projection.ledger.filter(entry => entry.kind === ledgerFilter),
+    [ledgerFilter, model.projection.ledger]
   )
 
   const status = model.status
@@ -136,6 +151,34 @@ const GlobeCreditsOperationsWorkbenchView = ({ model }: { model: GlobeCreditsWor
       setFeedback({ severity: 'error', message: C.recovery.failed, operationId: operation.operationId })
     } finally {
       setReconcilingId(null)
+    }
+  }
+
+  const previewFunding = async () => {
+    if (!target || !maxGrant || !maxCap || target > maxCap) return
+    setPreviewing(true)
+    setFeedback(null)
+
+    try {
+      const response = await fetch('/api/admin/globe/credits/funding/preview', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ globeWorkspaceId: model.workspace.id, requestedCredits: target })
+      })
+
+      const payload = (await response.json().catch(() => null)) as { preview?: GlobeCreditCapacityStatus } | null
+
+      if (!response.ok || !payload?.preview) {
+        setFeedback({ severity: 'error', message: C.funding.previewFailed })
+
+        return
+      }
+
+      setFundingPreview(payload.preview)
+    } catch {
+      setFeedback({ severity: 'error', message: C.funding.previewFailed })
+    } finally {
+      setPreviewing(false)
     }
   }
 
@@ -217,7 +260,8 @@ const GlobeCreditsOperationsWorkbenchView = ({ model }: { model: GlobeCreditsWor
   const signals = [
     { id: 'effective', label: C.signals.effective, value: credits(status?.effectiveAvailable), tone: 'primary' as const },
     { id: 'monthly', label: C.signals.monthly, value: credits(status?.monthly?.remaining), tone: 'success' as const },
-    { id: 'funding', label: C.signals.funding, value: credits(status?.eligibleFunding), tone: 'info' as const }
+    { id: 'funding', label: C.signals.funding, value: credits(status?.eligibleFunding), tone: 'info' as const },
+    { id: 'ledger', label: C.signals.ledger, value: credits(status?.historicalLedger.available), tone: 'default' as const }
   ]
 
   const header = (
@@ -228,16 +272,23 @@ const GlobeCreditsOperationsWorkbenchView = ({ model }: { model: GlobeCreditsWor
       description={C.description}
       statusLabel={status ? C.status[status.state] : C.status.unknown}
       statusTone={status ? stateTone(status.state) : 'default'}
-      meta={<Box component='span' sx={{ color: 'primary.contrastText', opacity: 0.76, typography: 'caption' }}>{model.workspace.name}</Box>}
+      meta={
+        <Stack component='span' direction={{ xs: 'column', sm: 'row' }} gap={{ xs: 0.25, sm: 1.5 }} sx={{ color: 'primary.contrastText', opacity: 0.8, typography: 'caption' }}>
+          <Box component='span'>{model.workspace.name}</Box>
+          <Box component='span'>{C.context.audience}</Box>
+          {status ? <Box component='span'>{C.context.period.replace('{start}', status.period.start.slice(0, 10)).replace('{end}', status.period.end.slice(0, 10))}</Box> : null}
+        </Stack>
+      }
       primaryAction={
         <GreenhouseButton
           kind='primaryAction'
           leadingIconClassName='tabler-bolt'
           disabled={!canOpenFunding}
           title={!canOpenFunding ? C.actionUnavailable : undefined}
-          data-capture='globe-credit-funding-open'
+          dataCapture='globe-credit-funding-open'
           onClick={() => {
             operationKeyRef.current = null
+            setFundingPreview(null)
             setFundingOpen(true)
           }}
         >
@@ -279,9 +330,9 @@ const GlobeCreditsOperationsWorkbenchView = ({ model }: { model: GlobeCreditsWor
               })}
             >
               <Stack spacing={1}>
-                <Stack direction='row' justifyContent='space-between' spacing={2} alignItems='center'>
-                  <Typography variant='subtitle2' noWrap>{operation.operationId}</Typography>
-                  <GreenhouseChip label={operationState(operation.state)} kind='status' variant='label' size='small' />
+                <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent='space-between' gap={1} alignItems={{ xs: 'flex-start', sm: 'center' }}>
+                  <Typography variant='subtitle2' color='text.primary' sx={{ overflowWrap: 'anywhere' }}>{operation.operationId}</Typography>
+                  <GreenhouseChip label={operationState(operation.state)} kind='status' variant='label' size='small' sx={{ maxWidth: '100%' }} />
                 </Stack>
                 <Typography variant='caption' color='text.secondary'>{dateTime(operation.updatedAt)}</Typography>
                 <Typography variant='body2'>{credits(operation.plan.grantCredits)} créditos</Typography>
@@ -329,12 +380,154 @@ const GlobeCreditsOperationsWorkbenchView = ({ model }: { model: GlobeCreditsWor
         ) : <Typography variant='body2'>{C.risks.unavailable}</Typography>}
       </OperationalSection>
 
+      <OperationalSection
+        title={C.historical.title}
+        description={C.historical.description}
+        variant='open'
+        dataCapture='globe-credits-historical-ledger'
+      >
+        {status ? (
+          <Stack spacing={2}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, minmax(0, 1fr))', md: 'repeat(5, minmax(0, 1fr))' }, gap: 2, '& > *': { minWidth: 0 } }}>
+              {[
+                [C.historical.allocated, status.historicalLedger.allocated],
+                [C.historical.reserved, status.historicalLedger.reserved],
+                [C.historical.spent, status.historicalLedger.spent],
+                [C.historical.adjusted, status.historicalLedger.adjusted],
+                [C.historical.available, status.historicalLedger.available]
+              ].map(([label, value]) => (
+                <Box key={String(label)}>
+                  <Typography variant='caption' color='text.secondary'>{label}</Typography>
+                  <Typography variant='h6' sx={{ fontVariantNumeric: 'tabular-nums' }}>{credits(value as number)}</Typography>
+                </Box>
+              ))}
+            </Box>
+            <Typography variant='caption' color='text.secondary'>
+              {C.context.coverage.replace('{count}', String(status.coverage.candidateCount))} · {dateTime(status.historicalLedger.asOf)}
+            </Typography>
+          </Stack>
+        ) : <Typography variant='body2'>{C.risks.unavailable}</Typography>}
+      </OperationalSection>
+
       <OperationalSection title={C.risks.title} description={C.risks.description} variant='band'>
         {status?.blockers.length ? (
           <Stack direction='row' gap={1} flexWrap='wrap'>
             {status.blockers.map(blocker => <GreenhouseChip key={blocker} label={blockerLabel(blocker)} kind='status' tone='warning' />)}
           </Stack>
         ) : <Typography variant='body2'>{status ? C.risks.none : C.risks.unavailable}</Typography>}
+        <Divider sx={{ my: 2 }} />
+        <Stack spacing={0.75} data-capture='globe-credits-forecast'>
+          <Typography variant='subtitle2'>{C.forecast.title}</Typography>
+          <Typography variant='body2'>
+            {model.projection.forecast?.status === 'available'
+              ? C.forecast.available
+                  .replace('{days}', String(Math.floor(model.projection.forecast.estimatedDaysRemaining ?? 0)))
+                  .replace('{confidence}', model.projection.forecast.confidence)
+              : model.projection.forecast?.status === 'insufficient-data'
+                ? C.forecast.insufficient
+                : C.forecast.unavailable}
+          </Typography>
+          <Typography variant='caption' color='text.secondary'>
+            {C.forecast.alerts.replace('{count}', String(model.projection.alerts.filter(alert => alert.status === 'open').length))}
+          </Typography>
+        </Stack>
+      </OperationalSection>
+
+      <OperationalSection title={C.resources.title} description={C.resources.description} variant='open'>
+        <Stack spacing={3} data-capture='globe-credits-resources'>
+          {model.projection.unavailable.length > 0 ? (
+            <Alert severity='warning'>
+              {C.resources.partial.replace('{sections}', model.projection.unavailable.join(', '))}
+            </Alert>
+          ) : null}
+          {[
+            {
+              title: C.resources.pools,
+              items: model.projection.pools.map(pool => ({
+                id: pool.poolId,
+                title: pool.name,
+                status: resourceState(pool.status),
+                detail: `${dateTime(pool.periodStart)} — ${dateTime(pool.periodEnd)}`
+              }))
+            },
+            {
+              title: C.resources.grants,
+              items: model.projection.grants.map(grant => ({
+                id: grant.grantId,
+                title: `${credits(grant.credits)} créditos`,
+                status: resourceState(grant.status),
+                detail: `${grant.poolId} · ${dateTime(grant.periodStart)} — ${dateTime(grant.periodEnd)}`
+              }))
+            },
+            {
+              title: C.resources.budgets,
+              items: model.projection.budgets.map(budget => ({
+                id: budget.budgetId,
+                title: `${C.resources.project}: ${budget.projectId}`,
+                status: resourceState(budget.status),
+                detail: `${C.resources.cap}: ${credits(budget.capCredits)} · ${dateTime(budget.periodStart)} — ${dateTime(budget.periodEnd)}`
+              }))
+            }
+          ].map(group => (
+            <Box key={group.title}>
+              <Typography variant='subtitle2' color='text.primary' sx={{ mb: 1 }}>{group.title}</Typography>
+              {group.items.length === 0 ? <Typography variant='body2' color='text.secondary'>{C.resources.empty}</Typography> : (
+                <Stack divider={<Divider flexItem />}>
+                  {group.items.map(item => (
+                    <Stack key={item.id} direction={{ xs: 'column', sm: 'row' }} justifyContent='space-between' gap={1} sx={{ py: 1.25, minWidth: 0 }}>
+                      <Box sx={{ minWidth: 0 }}>
+                        <Typography variant='body2' sx={{ overflowWrap: 'anywhere' }}>{item.title}</Typography>
+                        <Typography variant='caption' color='text.secondary' sx={{ overflowWrap: 'anywhere' }}>{item.detail}</Typography>
+                      </Box>
+                      <GreenhouseChip label={item.status} kind='status' variant='label' size='small' />
+                    </Stack>
+                  ))}
+                </Stack>
+              )}
+            </Box>
+          ))}
+        </Stack>
+      </OperationalSection>
+
+      <OperationalSection title={C.ledger.title} description={C.ledger.description} variant='open'>
+        <Stack spacing={2} data-capture='globe-credits-ledger'>
+          <Stack direction='row' gap={1} flexWrap='wrap' role='group' aria-label={C.ledger.title}>
+            {(['all', ...ledgerKinds] as const).map(kind => (
+              <GreenhouseButton
+                key={kind}
+                kind={ledgerFilter === kind ? 'primaryAction' : 'secondaryAction'}
+                size='small'
+                aria-pressed={ledgerFilter === kind}
+                onClick={() => setLedgerFilter(kind)}
+              >
+                {kind === 'all' ? C.ledger.all : C.ledger[kind]}
+              </GreenhouseButton>
+            ))}
+          </Stack>
+          {ledgerEntries.length === 0 ? <Typography variant='body2' color='text.secondary'>{C.ledger.empty}</Typography> : (
+            <Stack divider={<Divider flexItem />}>
+              {ledgerEntries.map(entry => (
+                <Box key={entry.entryId} sx={{ py: 2, minWidth: 0 }} data-capture={`globe-credit-ledger-${entry.entryId}`}>
+                  <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent='space-between' gap={1}>
+                    <Box sx={{ minWidth: 0 }}>
+                      <Typography variant='subtitle2' color='text.primary' sx={{ overflowWrap: 'anywhere' }}>{entry.entryId}</Typography>
+                      <Typography variant='caption' color='text.secondary'>{C.ledger[entry.kind]} · {dateTime(entry.createdAt)}</Typography>
+                    </Box>
+                    <Stack direction='row' gap={1} flexWrap='wrap'>
+                      <GreenhouseChip label={`${C.ledger.allocated}: ${credits(entry.allocatedDelta)}`} kind='status' variant='label' size='small' />
+                      <GreenhouseChip label={`${C.ledger.reserved}: ${credits(entry.reservedDelta)}`} kind='status' variant='label' size='small' />
+                      <GreenhouseChip label={`${C.ledger.spent}: ${credits(entry.spentDelta)}`} kind='status' variant='label' size='small' />
+                      <GreenhouseChip label={`${C.ledger.adjusted}: ${credits(entry.adjustmentDelta)}`} kind='status' variant='label' size='small' />
+                    </Stack>
+                  </Stack>
+                  <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 1, overflowWrap: 'anywhere' }}>
+                    {entry.runId ? `${C.ledger.run}: ${entry.runId} · ` : ''}{C.ledger.correlation}: {entry.correlationId}
+                  </Typography>
+                </Box>
+              ))}
+            </Stack>
+          )}
+        </Stack>
       </OperationalSection>
 
       <OperationalSection title={C.operations.detail} variant='open'>
@@ -408,6 +601,7 @@ const GlobeCreditsOperationsWorkbenchView = ({ model }: { model: GlobeCreditsWor
               value={targetAvailableCredits}
               onChange={event => {
                 operationKeyRef.current = null
+                setFundingPreview(null)
                 setTargetAvailableCredits(event.target.value)
               }}
               type='number'
@@ -422,6 +616,7 @@ const GlobeCreditsOperationsWorkbenchView = ({ model }: { model: GlobeCreditsWor
               value={maxGrantCredits}
               onChange={event => {
                 operationKeyRef.current = null
+                setFundingPreview(null)
                 setMaxGrantCredits(event.target.value)
               }}
               type='number'
@@ -436,6 +631,7 @@ const GlobeCreditsOperationsWorkbenchView = ({ model }: { model: GlobeCreditsWor
               value={maxResultingCapCredits}
               onChange={event => {
                 operationKeyRef.current = null
+                setFundingPreview(null)
                 setMaxResultingCapCredits(event.target.value)
               }}
               type='number'
@@ -446,20 +642,56 @@ const GlobeCreditsOperationsWorkbenchView = ({ model }: { model: GlobeCreditsWor
               fullWidth
             />
             {!fundingInputValid ? <Alert severity='warning'>{C.funding.invalid}</Alert> : null}
+            {fundingPreview ? (
+              <Box data-capture='globe-credit-funding-preview'>
+                <Alert severity={fundingPreview.state === 'blocked' || fundingPreview.state === 'unknown' ? 'warning' : 'success'}>
+                  <Typography variant='subtitle2'>{C.funding.reviewTitle}</Typography>
+                  <Typography variant='body2'>{C.funding.reviewHelp}</Typography>
+                </Alert>
+                <Stack spacing={1.25} sx={{ mt: 2 }}>
+                  {[
+                    [C.funding.currentEffective, credits(fundingPreview.effectiveAvailable)],
+                    [C.funding.currentCap, credits(fundingPreview.monthly?.cap)],
+                    [C.funding.currentFunding, credits(fundingPreview.eligibleFunding)]
+                  ].map(([label, value]) => (
+                    <Stack key={label} direction='row' justifyContent='space-between' gap={2}>
+                      <Typography variant='body2' color='text.secondary'>{label}</Typography>
+                      <Typography variant='body2' sx={{ fontVariantNumeric: 'tabular-nums' }}>{value}</Typography>
+                    </Stack>
+                  ))}
+                </Stack>
+              </Box>
+            ) : null}
           </Stack>
         </DialogContent>
         <DialogActions>
-          <GreenhouseButton kind='secondaryAction' onClick={() => setFundingOpen(false)} disabled={submitting}>
-            {C.funding.cancel}
-          </GreenhouseButton>
           <GreenhouseButton
-            kind='primaryAction'
-            leadingIconClassName='tabler-shield-check'
-            onClick={submitFunding}
-            disabled={submitting || !fundingInputValid}
+            kind='secondaryAction'
+            onClick={() => fundingPreview ? setFundingPreview(null) : setFundingOpen(false)}
+            disabled={submitting || previewing}
           >
-            {submitting ? C.funding.submitting : C.funding.confirm}
+            {fundingPreview ? C.funding.edit : C.funding.cancel}
           </GreenhouseButton>
+          {fundingPreview ? (
+            <GreenhouseButton
+              kind='primaryAction'
+              leadingIconClassName='tabler-shield-check'
+              onClick={submitFunding}
+              disabled={submitting || !fundingInputValid || fundingPreview.state === 'unknown'}
+            >
+              {submitting ? C.funding.submitting : C.funding.confirm}
+            </GreenhouseButton>
+          ) : (
+            <GreenhouseButton
+              kind='primaryAction'
+              leadingIconClassName='tabler-eye-check'
+              onClick={previewFunding}
+              disabled={previewing || !fundingInputValid}
+              dataCapture='globe-credit-funding-preview-action'
+            >
+              {previewing ? C.funding.reviewing : C.funding.review}
+            </GreenhouseButton>
+          )}
         </DialogActions>
       </Dialog>
     </>

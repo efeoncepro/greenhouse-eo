@@ -58,6 +58,10 @@ Camino verificado y recomendado para una persona autorizada:
 5. Considera éxito únicamente `completed` o `no_effect`. Si aparece `Resultado por verificar`, selecciona la
    operación y usa `Verificar y reconciliar`; no abras un fondeo nuevo.
 
+El workbench ampliado también permite inspeccionar pools, grants, budgets, forecast, alertas y ledger. Cada bloque
+declara su cobertura: si uno aparece no disponible, conserva el resto y no asumas que el valor faltante es cero.
+Antes de ejecutar, revisa el preview server-side; el servidor vuelve a validar el plan al confirmar.
+
 La UI exige simultáneamente la view `administracion.globe_credits` y los entitlements de emisión/ejecución. La
 operation key se conserva ante timeout o reintento incierto. Fue ejercido live el 2026-08-01 con la sesión Chrome
 de `jreyes@efeonce.cl`; la operación `23db5b0e-89dd-4661-9b8d-c12f9be4ad7a` terminó `completed`.
@@ -173,6 +177,10 @@ normal ni condición para operar:
 
 Producer ya consume el self-status autoritativo. Úsalo como verificación independiente de experiencia, pero
 conserva el `operationId` y el reader `status/get` como evidencia causal de la operación.
+
+En Producer, `Parcial` o `Desactualizado` significa que debes reintentar la lectura antes de interpretar la
+cifra; el último valor válido puede permanecer visible, rotulado como stale. Un daily fence agotado bloquea
+producción sin reescribir la capacidad económica ni habilitar un CTA de fondeo dentro de Globe.
 
 ## Qué significan los estados de una propuesta
 

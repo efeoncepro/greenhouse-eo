@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Carril interno y expiry reconciliada operativos live; QA UI, MCP write, Finance 500k y dos outcomes históricos desconocidos permanecen abiertos`
+- Status real: `Carril interno live y QA UI local completos; rollout UI puntual, MCP write, Finance 500k y dos outcomes históricos desconocidos permanecen abiertos`
 - Rank: `next`
 - Domain: `platform|finance|globe`
 - Blocked by: `none`
@@ -299,8 +299,10 @@ autoritativo.
 - El worker de expiry quedó live con scheduler minutely y least privilege exacto. El canary `fmspk` reclamó dos
   holds: `claimed=2`, `reconciliationRequested=2`, `deferred=2`, `failed=0`; ambos runs históricos carecen de
   `providerOperationId`, por lo que permanecen diferidos y observables, nunca force-released.
-- Permanecen abiertos en esta umbrella: el GVC exhaustivo de `TASK-1483`/`TASK-1628`, la paridad MCP de escritura,
-  la decisión Finance sobre los 500.000 históricos y la resolución autoritativa de esos dos outcomes antiguos.
+- El GVC exhaustivo local de `TASK-1483`/`TASK-1628` pasó desktop/mobile, teclado, reduced motion,
+  accesibilidad, overflow y runtime. Permanece pendiente desplegar esa ampliación puntual y repetir smoke.
+- Permanecen abiertos: la paridad MCP de escritura, la decisión Finance sobre los 500.000 históricos y la
+  resolución autoritativa de esos dos outcomes antiguos.
 - Evidencia canónica: `docs/operations/creative-studio/evidence/2026-08-01/README.md`.
 
 ## Closing Protocol

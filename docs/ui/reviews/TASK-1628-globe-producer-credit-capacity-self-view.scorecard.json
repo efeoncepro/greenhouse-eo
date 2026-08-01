@@ -1,0 +1,16 @@
+{
+  "task": "TASK-1628",
+  "surface": "globe.producer.credit-capacity-self-view",
+  "verdict": "pass-local",
+  "evidence": ".captures/2026-08-01T21-45-11_globe-producer-credit-capacity-self-view",
+  "scores": {
+    "hierarchy": 4.8,
+    "surfaceEconomy": 4.7,
+    "visualImpact": 4.6,
+    "fidelity": 4.8,
+    "templateResistance": 4.6
+  },
+  "average": 4.7,
+  "floor": 4.6,
+  "rollout": "pending"
+}

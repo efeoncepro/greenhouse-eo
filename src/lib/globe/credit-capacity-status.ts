@@ -12,6 +12,7 @@ const BLOCKERS = new Set([
 
 export type GlobeCreditCapacityStatus = Readonly<{
   schemaVersion: '1'
+  audience: 'operator'
   state: 'ready' | 'limited' | 'blocked' | 'unknown'
   period: Readonly<{ timezone: 'UTC'; start: string; end: string }>
   requestedCredits?: number
@@ -88,7 +89,7 @@ export function parseCapacityStatus(raw: unknown): GlobeCreditCapacityStatus {
 
     
 return {
-      schemaVersion: '1', state,
+      schemaVersion: '1', audience: 'operator', state,
       period: period(unavailable.period),
       blockers: blockers(unavailable.blockers),
       coverage: coverage(unavailable.coverage),
@@ -103,7 +104,7 @@ return {
 
   
 return {
-    schemaVersion: '1', state,
+    schemaVersion: '1', audience: 'operator', state,
     period: period(decision.period),
     requestedCredits: positive(decision.requestedCredits),
     allowed: boolean(decision.allowed),

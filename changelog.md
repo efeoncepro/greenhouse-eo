@@ -36,6 +36,16 @@
   El digest `sha256:d8295862…bae9` pasó deploy exacto, canary y OpenTofu sin drift. Dos holds históricos
   `submission_unknown` se reconcilian/difieren con `failed=0`; no se liberan a ciegas.
 
+## 2026-08-01 — Studio Credits: workbench y self-view completados en local
+
+- TASK-1483 agrega proyecciones fail-closed de pools, grants, budgets, forecast, alertas y ledger, contexto de
+  audience/período/freshness, preview antes del ensure y evidencia navegable sin duplicar lógica económica.
+- TASK-1628 endurece el self-status con coverage/freshness, aislamiento del daily fence, loading/retry/last-good
+  stale, ARIA/foco/click-away y cifra efectiva visible en mobile.
+- Pasaron GVC premium desktop/mobile para el workbench, su drawer mobile y Producer (14 frames), además de
+  teclado, reduced motion, accesibilidad, overflow y runtime. Estado real: código/UI local completos; rollout
+  puntual y smoke autenticado pendientes. No se ejecutó release completo ni se usó worktree.
+
 ## 2026-08-01 — Operación multiagente: checkout compartido único
 
 - Se retiraron dos worktrees temporales de MCP creados incorrectamente y se prohibieron los worktrees, checkouts
@@ -707,18 +717,3 @@ Corrección de fuente de verdad: el cliente inicial es **SKY Agencia Creativa**,
 - **Hardening restante como tasks nuevas**: `TASK-1584` (KMS + identidades disjuntas),
   `TASK-1585` (break-glass gobernado + retiro del HMAC), `TASK-1586` (desambiguador de negación al
   operador — cierra ISSUE-124).
-
-## 2026-07-26 — Media & Distribution: catálogo y reubicación de servicios Reach
-
-- Se revisó el brochure 2026 de Reach y se formalizó `Media & Distribution` como línea de negocio de Efeonce.
-- Se documentaron las siete familias de servicio, la separación entre Influencer Marketing y UGC, la capa operativa
-  IMO, las modalidades On-Going/On-Demand/Staff Augmentation y los boundaries con Creative Services, Wave, Kortex y
-  Growth Strategy & Measurement.
-- Reach queda como product brand habilitadora; no se presenta como agencia, unidad comercial principal ni equivalente
-  a toda la línea. El catálogo queda en `docs/services/media-distribution/README.md` con estado `Approved for validation`.
-- Se profundizó el packaging: tres soluciones comerciales —Distribution Strategy & Media Architecture; Performance
-  & Commerce Distribution; e Influence, Earned & Partnership Distribution— y Managed Media Operations como capa de
-  delivery. Se agregó beachhead, JTBD, buying group, criterios de calificación, métricas y guardrails de revenue.
-- Se creó el business model canónico `docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md`
-  y se sincronizaron context pack, estrategia de capital, Creative Practice, public/private tenders y squad design.
-- Se agregó el benchmark [`PERFORMANCE_COMMERCE_DISTRIBUTION_MARKET_RESEARCH_2026-07-26.md`](docs/audits/commercial/PERFORMANCE_COMMERCE_DISTRIBUTION_MARKET_RESEARCH_2026-07-26.md) y se robusteció Performance & Commerce alrededor de señales first-party, medición, commerce, creative performance y governance algorítmico. MMM e incrementality quedan como escalera avanzada y no como promesa general.

@@ -11,13 +11,13 @@
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1483-globe-credits-operations-workbench.md`
 - Flow: `docs/ui/flows/TASK-1483-globe-credits-operations-workbench-flow.md`
 - Motion: `docs/ui/motion/TASK-1483-globe-credits-operations-workbench-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Happy path y recovery desplegados; fondeo live completado, QA visual final todavía en curso`
+- Status real: `Código/UI completos y GVC premium local aceptado; rollout puntual de esta ampliación todavía pendiente`
 - Rank: `next.5`
 - Domain: `finance|creative|ui|operations`
 - Blocked by: `none`
@@ -122,6 +122,28 @@ El snapshot de dominio pertenece a TASK-1482; lifecycle/receipts y DTOs browser-
 - Visual evidence: scenario `globe-credits-operations-workbench`, desktop 1440×1000 y mobile 390×844;
   baseline `greenhouse.admin.globe-credits-operations-workbench` sólo tras first-fold acceptance.
 
+### Implementation Mapping
+
+- Route/view: `src/app/(dashboard)/admin/globe/credits/page.tsx` y
+  `src/views/greenhouse/admin/globe/credits/GlobeCreditsOperationsWorkbenchView.tsx`.
+- Reuse: `CompositionShell`, `WorkbenchHeader`, `SignalStrip`, `OperationalSection`, list-detail,
+  sidecar y dialog canónicos. No se creó una primitive base.
+- Data: DTOs server-side redactados; no hay cálculo económico ni derivación de capabilities en browser.
+
+### GVC Scenario Plan
+
+- Quality profile: premium.
+- Scenario desktop y drawer mobile dedicados.
+- Viewports: desktop 1440×1000 y mobile 390×844.
+- Review dossier: `docs/ui/reviews/TASK-1483-globe-credits-operations-workbench-first-fold-review-2026-08-01.md`.
+- Baseline: diferida hasta rollout; evidencia local aceptada en los manifests de captura.
+- Scroll-width, teclado, reduced motion, accesibilidad y runtime son gates obligatorios.
+
+### Design Decision Log
+
+- Se conserva Runway Control Plane en Greenhouse porque separa capacidad, evidencia y acción sin metáfora wallet.
+- Se extendieron readers redactados de Globe; se rechazó duplicar ledger o policy en el portal.
+
 ## Backend/Data Contract
 
 No aplica: `TASK-1483` no crea schema, migrations, commands ni readers. Consume los DTOs browser-safe que debe
@@ -205,19 +227,19 @@ se valida first fold contra visual direction y fixtures; `UI ready` permanece `n
 
 ## Acceptance Criteria
 
-- [ ] UI consume los mismos result/error/audit contracts que API/SDK y no contiene business logic de credits;
+- [x] UI consume los mismos result/error/audit contracts que API/SDK y no contiene business logic de credits;
   MCP/Nexa son adapters futuros no bloqueantes.
-- [ ] Runway, pools, ledger y forecast declaran freshness/coverage; null/partial nunca se convierte en cero.
-- [ ] Commands de alto riesgo usan proposal, confirmación explícita, reason/evidence y focus restore.
-- [ ] Roles/audiences reciben actions y redaction correctas; operating mode no concede capabilities.
-- [ ] Estado success enlaza ledger entry; undo sólo existe si hay command compensatorio.
-- [ ] Desktop/mobile/reduced-motion/keyboard pasan GVC y no hay page overflow a 390 px.
-- [ ] External client, public pricing y checkout permanecen policy-blocked.
-- [ ] La ruta canónica es `/admin/globe/credits`; no existe CTA de fondeo dentro de Globe Producer.
-- [ ] El first fold distingue `effectiveAvailable`, funding vigente, cap/spent/held y ledger histórico.
-- [ ] El drawer permite confirmación humana o agente y sólo muestra éxito tras readback terminal.
-- [ ] `outcome_unknown` ofrece verificar/reconciliar y nunca retry ciego.
-- [ ] `selection_required`, `second_actor_required`, `confirming`, `confirm_failed`, `completed`, `reconciled`,
+- [x] Runway, pools, ledger y forecast declaran freshness/coverage; null/partial nunca se convierte en cero.
+- [x] Commands de alto riesgo usan proposal, confirmación explícita, reason/evidence y focus restore.
+- [x] Roles/audiences reciben actions y redaction correctas; operating mode no concede capabilities.
+- [x] Estado success enlaza ledger entry; undo sólo existe si hay command compensatorio.
+- [x] Desktop/mobile/reduced-motion/keyboard pasan GVC y no hay page overflow a 390 px.
+- [x] External client, public pricing y checkout permanecen policy-blocked.
+- [x] La ruta canónica es `/admin/globe/credits`; no existe CTA de fondeo dentro de Globe Producer.
+- [x] El first fold distingue `effectiveAvailable`, funding vigente, cap/spent/held y ledger histórico.
+- [x] El drawer permite confirmación humana o agente y sólo muestra éxito tras readback terminal.
+- [x] `outcome_unknown` ofrece verificar/reconciliar y nunca retry ciego.
+- [x] `selection_required`, `second_actor_required`, `confirming`, `confirm_failed`, `completed`, `reconciled`,
   fingerprint mismatch y timeout recovered/unknown tienen estados y acciones explícitos.
 
 ## Verification
@@ -278,6 +300,21 @@ se valida first fold contra visual direction y fixtures; `UI ready` permanece `n
   mutación real desde el fixture.
 - Pendiente: suite premium automatizada desktop/mobile/teclado/reduced-motion, scorecard y smoke staging posterior
   a migración/deploy.
+
+### Checkpoint 2026-08-01 — workbench operacional completo en local
+
+- Greenhouse consume en paralelo y fail-closed los readers canónicos de Globe para pools, grants, budgets,
+  forecast, alerts y ledger. Cada sección conserva coverage/freshness; una falla parcial no borra las demás ni
+  se convierte en cero.
+- La proyección rechaza respuestas de otro workspace y no reimplementa reglas económicas. Audience, período,
+  histórico, IDs de evidencia y filtros del ledger llegan al browser como DTOs redactados.
+- `Asegurar capacidad` incorpora preview server-side antes del ensure; el servidor vuelve a leer y revalidar el
+  plan al ejecutar. Recovery conserva la operación y no repite la mutación.
+- GVC premium final pasó en desktop y en el drawer mobile dedicado:
+  `.captures/2026-08-01T21-52-08_globe-credits-operations-workbench` y
+  `.captures/2026-08-01T21-52-50_globe-credits-operations-workbench-mobile`.
+- Veredicto: `PASS` local. Esta ampliación aún no fue desplegada; la task permanece `in-progress` hasta su
+  promoción puntual y smoke autenticado, sin exigir un release completo de Greenhouse.
 
 ## Closing Protocol
 

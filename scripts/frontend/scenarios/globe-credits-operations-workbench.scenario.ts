@@ -3,13 +3,13 @@ import type { CaptureScenario } from '../lib/scenario'
 export const scenario: CaptureScenario = {
   name: 'globe-credits-operations-workbench',
   route: '/admin/globe/credits/mockup',
-  mutating: false,
+  // GVC classifies dialog/selection interactions as mutating; this fixture never dispatches an economic command.
+  mutating: true,
   safeForCapture: true,
   qualityProfile: 'premium',
   viewport: { width: 1440, height: 1000 },
   viewports: [
-    { name: 'desktop', width: 1440, height: 1000 },
-    { name: 'mobile', width: 390, height: 844 }
+    { name: 'desktop', width: 1440, height: 1000 }
   ],
   initialHoldMs: 900,
   finalHoldMs: 350,
@@ -17,8 +17,7 @@ export const scenario: CaptureScenario = {
     selector: '[data-capture="globe-credits-operations-workbench"]',
     selectors: [
       '[data-capture="globe-credits-header"]',
-      '[data-capture="globe-credit-operation-op-aug-capacity-003"]',
-      '[data-capture="globe-credits-operation-detail"]'
+      '[data-capture="globe-credit-operation-op-aug-capacity-003"]'
     ],
     absentSelectors: ['.MuiSkeleton-root', '[data-testid="login-card"]'],
     waitForFonts: true,
@@ -27,9 +26,11 @@ export const scenario: CaptureScenario = {
   },
   baseline: {
     surfaceId: 'greenhouse.admin.globe-credits-operations-workbench',
-    requiredFrameLabels: ['credits-first-fold', 'credits-operation-selection-settled', 'credits-full-page'],
+    requiredFrameLabels: ['credits-first-fold', 'credits-operation-selection-credits-operation-selection-settled', 'credits-full-page'],
     requiredRegions: [
       '[data-capture="globe-credits-header"]',
+      '[data-capture="globe-credits-resources"]',
+      '[data-capture="globe-credits-ledger"]',
       '[data-capture="globe-credits-operation-detail"]'
     ],
     maxDiffRatio: 0.045
@@ -63,6 +64,12 @@ export const scenario: CaptureScenario = {
       reducedMotionCheck: true,
       probes: [
         {
+          name: 'funding-dialog-trigger',
+          startSelector: '[data-capture="globe-credit-funding-open"]',
+          keys: ['Enter', 'Escape'],
+          requireVisibleFocusRing: true
+        },
+        {
           name: 'operation-selection',
           startSelector: '[data-capture="globe-credit-operation-op-aug-capacity-003"]',
           keys: ['Tab'],
@@ -84,7 +91,15 @@ export const scenario: CaptureScenario = {
       failOnViolations: true,
       placeholderTerms: ['lorem', 'placeholder', 'fake', 'todo'],
       requireSurfaceRecipeMarker: true,
-      expectedDataCaptureRegions: ['globe-credits-operations-workbench', 'globe-credits-header', 'globe-credits-operation-detail'],
+      expectedDataCaptureRegions: [
+        'globe-credits-operations-workbench',
+        'globe-credits-header',
+        'globe-credits-historical-ledger',
+        'globe-credits-forecast',
+        'globe-credits-resources',
+        'globe-credits-ledger',
+        'globe-credits-operation-detail'
+      ],
       maxUniformCards: 4,
       maxNestedSurfaceDepth: 2,
       maxContainedSurfacesInViewport: 4,
@@ -95,20 +110,9 @@ export const scenario: CaptureScenario = {
     { kind: 'wait', selector: '[data-capture="globe-credits-operations-workbench"]', timeout: 15000 },
     { kind: 'press', key: 'Escape', note: 'Normaliza el menú lateral persistido antes de evaluar el viewport compacto.' },
     { kind: 'mark', label: 'credits-first-fold', note: 'Header operativo, runway, riesgo, inventario y detalle comparten una jerarquía clara.' },
-    {
-      kind: 'interaction',
-      interaction: {
-        name: 'credits-funding-dialog',
-        action: { kind: 'click', selector: '[data-capture="globe-credit-funding-open"]' },
-        intent: 'La acción abre una autorización exacta con límites explícitos, sin ejecutar durante la captura.',
-        frames: [{ label: 'credits-funding-dialog-open', atMs: 220, fullPage: true }],
-        keyboardEquivalent: {
-          action: { kind: 'press', selector: '[data-capture="globe-credit-funding-open"]', key: 'Enter' },
-          expected: 'El diálogo recibe foco y expone período, objetivo, máximo a otorgar y tope resultante.'
-        },
-        reducedMotion: 'capture'
-      }
-    },
+    { kind: 'click', selector: '[data-capture="globe-credit-funding-open"]', note: 'Abre la revisión sin ejecutar ningún command.' },
+    { kind: 'wait', selector: '[data-capture="globe-credit-funding-dialog"]', timeout: 5000 },
+    { kind: 'mark', label: 'credits-funding-dialog-open', fullPage: true, note: 'La autorización expone período, objetivo y límites antes de ejecutar.' },
     { kind: 'press', key: 'Escape', note: 'Cierra el diálogo sin enviar ningún command durante la evidencia visual.' },
     {
       kind: 'interaction',

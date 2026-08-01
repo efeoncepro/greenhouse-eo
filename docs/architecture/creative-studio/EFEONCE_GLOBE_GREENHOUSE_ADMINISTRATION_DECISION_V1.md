@@ -583,6 +583,17 @@ Esto **cierra la mitad de diagnóstico de `ISSUE-124`** y evita que el carril nu
 > Runbook operativo: `docs/manual-de-uso/creative-studio/fondear-creditos-globe.md`; explicación funcional:
 > `docs/documentation/creative-studio/fondeo-gobernado-creditos-globe.md`.
 
+### Delta de evidencia 2026-08-01 — proyecciones UI sin nueva autoridad
+
+TASK-1483 habilita para `sister-platform` únicamente readers redactados de pools, grants, budgets, forecast,
+alerts y ledger; los writes administrativos permanecen bloqueados. Greenhouse combina esas lecturas por secciones
+fail-closed y nunca crea un ledger o cálculo económico alternativo. TASK-1628 amplía sólo el self-status
+browser-safe: coverage/freshness y daily fence no mutante. Producer continúa sin commands administrativos.
+
+Los tres escenarios GVC premium pasaron localmente; este delta registra evidencia de implementación y no declara
+rollout. La frontera aprobada de esta ADR permanece intacta: Globe es autoridad económica y Greenhouse es control
+plane de identidad, intents y superficie.
+
 > **Delta 2026-08-01 — rollover mensual sin dependencia circular, verificado live.** La fachada acotada
 > `ensure-funded` deriva el ciclo UTC y crea o reutiliza `internal-month:AAAA-MM` dentro de la misma transacción
 > que grant, allocation, policy y terminalización. No relaja el maker-checker de los comandos genéricos de pool.

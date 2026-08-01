@@ -1,5 +1,30 @@
 # TASK-1483 — Globe Credits Operations Workbench Visual Direction
 
+## Decision
+
+Adoptar Runway Control Plane como dirección repo-native de Greenhouse: una lectura dominante de capacidad,
+riesgo y evidencia con una sola acción gobernada, sin metáforas monetarias.
+
+## Desktop target
+
+A 1440×1000, capacidad y estado ocupan el first fold; operaciones/pools usan list-detail y el ledger conserva
+densidad auditable debajo. El sidecar mantiene el contexto sin cubrir la cifra primaria.
+
+## Mobile target
+
+A 390×844, la cifra, estado y período siguen visibles; inventario y detalle se convierten en drawer temporal
+con focus restore y sin overflow horizontal.
+
+## Token mapping
+
+Superficies, elevation, color semántico, typography, spacing y motion provienen de AXIS/Greenhouse. El runway
+reusa `SurfaceRecipe operationalWorkbench`, primitives canónicas y copy centralizada.
+
+## Anti-patterns
+
+No usar wallets, monedas, tickers, donuts decorativos, card wallpaper, count-up desde null, raw errors, valores
+desconocidos convertidos en cero ni actions sin capability/precondition.
+
 ## Benchmark and intent
 
 Dirección Greenhouse-native para una capacidad de Globe: conserva el concepto Runway Control Plane, pero se

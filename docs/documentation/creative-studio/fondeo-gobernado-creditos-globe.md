@@ -86,6 +86,12 @@ Ambos ligan usuario, workspace, client, modo de autenticación, fingerprint y l�
 carril está operativo para el workspace interno: las migraciones están aplicadas, el cliente OAuth está activo,
 Greenhouse `develop` y Globe `main` están desplegados, y UI + API/CLI + Producer pasaron smoke autenticado.
 
+La ampliación local deja dos vistas complementarias sobre esa misma autoridad. Greenhouse proyecta capacidad,
+pools, grants, budgets, forecast, alertas y ledger por secciones independientes: una fuente degradada no borra
+las demás ni se representa como cero. Producer sólo muestra su propia capacidad, con estados
+loading/partial/stale/error recuperables y daily fence separado. Estas mejoras pasaron GVC premium local y no
+crean un segundo ledger; su rollout puntual todavía está pendiente.
+
 El ciclo mensual ya no exige que el operador conozca un `poolId`. `ensure` deriva el mes UTC y, dentro de la
 misma transacción del grant, crea o reutiliza `internal-month:AAAA-MM`. Un pool determinístico pausado, cerrado o
 incompatible falla cerrado; no se fabrica un reemplazo para evadir el kill switch. Esta excepción es sólo del

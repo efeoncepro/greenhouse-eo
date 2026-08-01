@@ -30,3 +30,14 @@
 - Escape y click-away restauran foco.
 - A 390 px el popover permanece dentro del viewport y la página no adquiere scroll horizontal.
 - Reduced motion elimina transición sin ocultar feedback de loading/status.
+
+## GVC Scenario Plan
+
+- Quality profile: premium; desktop 1440×1000 y mobile 390×844.
+- Ejercer open/close, click-away, Escape, focus restore, retry, stale/partial y ausencia de admin writes.
+- Review dossier: `docs/ui/reviews/TASK-1628-globe-producer-credit-capacity-self-view-review-2026-08-01.md`.
+
+## Design Decision Log
+
+Se extendió el control existente y se mantuvo el flujo estrictamente read-only. Se rechazó trasladar commands o
+authority a Producer; la única salida administrativa navega a Greenhouse, que revalida acceso.

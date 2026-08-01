@@ -68,3 +68,8 @@ paralelos: todos salen de los tokens vigentes del payload React/Tailwind.
 - Reduced-motion: verificar apertura inmediata, foco restaurado, texto/status íntegros y ausencia de count-up.
 - Fixture evidence: scenario determinista sin hardcodear/leer perfiles; live canary exclusivamente con la sesión
   Chrome autenticada indicada por el operador.
+
+## Design Decision Log
+
+Se reutilizó la transición anclada del popover y se limitaron cambios a opacity/transform tokenizados. Se
+rechazaron count-up, shimmer obligatorio y loops ambientales porque podrían fingir precisión o actividad.

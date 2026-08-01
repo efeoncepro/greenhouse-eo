@@ -11,13 +11,13 @@
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `interaction`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1628-globe-producer-credit-capacity-self-view.md`
 - Flow: `docs/ui/flows/TASK-1628-globe-producer-credit-capacity-self-view-flow.md`
 - Motion: `docs/ui/motion/TASK-1628-globe-producer-credit-capacity-self-view-motion.md`
 - Backend impact: `contract-extension`
 - Epic: `EPIC-028`
-- Status real: `Self-view desplegado en Globe main y verificado live; cierre GVC de estados todavía en curso`
+- Status real: `Contrato/UI endurecidos y GVC premium local aceptado; rollout puntual de esta ampliación pendiente`
 - Rank: `next.6`
 - Domain: `creative|ui|finance`
 - Blocked by: `none`
@@ -317,16 +317,16 @@ El scope OAuth se promueve en cuatro movimientos sin downtime:
 
 ## Acceptance Criteria
 
-- [ ] `Execution profile`, UI impact, wireframe y flow reflejan el cambio visible real.
-- [ ] Producer consume `CreditCapacitySelfStatusV1` y no los DTOs administrativos ambiguos.
-- [ ] La cifra primaria es effective available; ledger histórico se muestra sólo como dimensión secundaria.
-- [ ] Cap/spent/held, funding y daily fence aparecen separados y con razones tipadas.
-- [ ] `partial|stale|unknown` nunca se convierte en cero ni en estado healthy.
-- [ ] No existe command/CTA de fondeo en Globe; el deep link no transporta authority y Greenhouse revalida acceso.
-- [ ] El browser no calcula cap, remaining, funding eligibility ni effective available.
-- [ ] Loading, healthy, low, blocked, no-policy, expired, partial/stale, permission y error están cubiertos.
-- [ ] Keyboard, focus restore, reduced motion y 390 px sin overflow pasan.
-- [ ] GVC desktop/mobile usa fixtures deterministas sin perfil; el canary live usa exclusivamente la sesión
+- [x] `Execution profile`, UI impact, wireframe y flow reflejan el cambio visible real.
+- [x] Producer consume `CreditCapacitySelfStatusV1` y no los DTOs administrativos ambiguos.
+- [x] La cifra primaria es effective available; ledger histórico se muestra sólo como dimensión secundaria.
+- [x] Cap/spent/held, funding y daily fence aparecen separados y con razones tipadas.
+- [x] `partial|stale|unknown` nunca se convierte en cero ni en estado healthy.
+- [x] No existe command/CTA de fondeo en Globe; el deep link no transporta authority y Greenhouse revalida acceso.
+- [x] El browser no calcula cap, remaining, funding eligibility ni effective available.
+- [x] Loading, healthy, low, blocked, no-policy, expired, partial/stale, permission y error están cubiertos.
+- [x] Keyboard, focus restore, reduced motion y 390 px sin overflow pasan.
+- [x] GVC desktop/mobile usa fixtures deterministas sin perfil; el canary live usa exclusivamente la sesión
   Chrome autenticada indicada por el operador.
 
 ## Verification
@@ -354,3 +354,16 @@ El scope OAuth se promueve en cuatro movimientos sin downtime:
 La premisa anterior `monthlyCap = spentInPeriod + policyAvailable` quedó invalidada por auditoría de código. La
 task ya no abre los readers administrativos existentes ni modifica grants OAuth. Se convierte en consumer UI del
 self-status corregido, preserva Producer como read-only y reubica toda administración en Greenhouse.
+
+## Checkpoint 2026-08-01 — self-view enterprise completo en local
+
+- `CreditCapacitySelfStatusV1` distingue `complete|partial|unavailable` y freshness real. Un fallo del daily
+  fence degrada sólo esa dimensión; un fence agotado agrega blocker tipado sin falsear la capacidad económica.
+- El popover implementa loading, retry, last-good stale, partial, denied y error; Escape/click-away cierran,
+  restauran foco y exponen ARIA de expansión, busy/live y progressbar semántico.
+- Mobile conserva la cifra efectiva. El detalle muestra período UTC real, cap/spent/held, funding, ledger,
+  daily cap y freshness; no contiene comandos administrativos.
+- Tests de dominio/fecha/fixture y GVC premium desktop + 390 px pasaron. Evidencia local:
+  `.captures/2026-08-01T21-45-11_globe-producer-credit-capacity-self-view`.
+- Veredicto: `PASS` local. La task permanece `in-progress` hasta desplegar esta ampliación desde Globe
+  `main` y repetir el smoke en la sesión Chrome autenticada.

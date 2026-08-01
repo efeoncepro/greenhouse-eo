@@ -51,3 +51,14 @@ También se corrigieron:
 - GVC canónico staging con la sesión humana indicada, una vez desplegada la surface.
 - Axe/keyboard/reduced-motion automatizados, dossier y scorecard final con `pnpm ui:quality --task TASK-1483`.
 - Revisión `greenhouse-ui-review` y `greenhouse-ui-enterprise-review` sin `BLOCK`.
+
+## Gate premium final — PASS local
+
+- GVC: `.captures/2026-08-01T21-52-08_globe-credits-operations-workbench`.
+- Drawer mobile: `.captures/2026-08-01T21-52-50_globe-credits-operations-workbench-mobile`.
+- Pasaron keyboard, reduced motion, accesibilidad, overflow y runtime. La inspección visual confirmó jerarquía,
+  contraste, densidad y detalle legible a 390 px.
+- UI review: `PASS`; primitives canónicas, copy centralizada y cero lógica económica en browser.
+- Enterprise review: promedio `4.7/5`, floor `4.5/5`; hierarchy 4.8, surface economy 4.7, visual impact 4.6,
+  fidelity 4.8 y template resistance 4.5.
+- Estado honesto: `UI ready: yes` en local; falta rollout puntual y smoke autenticado.

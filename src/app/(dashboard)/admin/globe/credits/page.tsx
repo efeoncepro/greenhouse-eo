@@ -7,6 +7,7 @@ import { GH_GLOBE_CREDITS as C } from '@/lib/copy/globe-credits'
 import { can } from '@/lib/entitlements/runtime'
 import { readGlobeCreditCapacityStatus } from '@/lib/globe/credit-capacity-status'
 import { listGlobeCreditFundingOperations } from '@/lib/globe/credit-funding-operations'
+import { readGlobeCreditOperationsProjection } from '@/lib/globe/credit-operations-projection'
 import { resolveGlobeOAuthWorkspaceBindings } from '@/lib/sister-platforms/oauth-workspace-bindings'
 import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
@@ -44,22 +45,31 @@ export default async function Page() {
       workspace: { id: 'unbound', name: C.workspaceMissing },
       status: null,
       operations: [],
+      projection: {
+        pools: [], grants: [], budgets: [], forecast: null, alerts: [], ledger: [],
+        unavailable: ['pools', 'grants', 'budgets', 'forecast', 'alerts', 'ledger']
+      },
       loadError: true,
       canEnsure: false,
       canReconcile: false
     }} />
   }
 
-  const [statusResult, operationsResult] = await Promise.allSettled([
+  const [statusResult, operationsResult, projectionResult] = await Promise.allSettled([
     readGlobeCreditCapacityStatus({ globeWorkspaceId: workspace.workspaceId, requestedCredits: C.requestedUnit }),
-    listGlobeCreditFundingOperations({ globeWorkspaceId: workspace.workspaceId, limit: 25 })
+    listGlobeCreditFundingOperations({ globeWorkspaceId: workspace.workspaceId, limit: 25 }),
+    readGlobeCreditOperationsProjection({ globeWorkspaceId: workspace.workspaceId, limit: 50 })
   ])
 
   return <GlobeCreditsOperationsWorkbenchView model={{
     workspace: { id: workspace.workspaceId, name: workspace.displayName },
     status: statusResult.status === 'fulfilled' ? statusResult.value : null,
     operations: operationsResult.status === 'fulfilled' ? operationsResult.value.items : [],
-    loadError: statusResult.status === 'rejected' || operationsResult.status === 'rejected',
+    projection: projectionResult.status === 'fulfilled' ? projectionResult.value : {
+      pools: [], grants: [], budgets: [], forecast: null, alerts: [], ledger: [],
+      unavailable: ['pools', 'grants', 'budgets', 'forecast', 'alerts', 'ledger']
+    },
+    loadError: statusResult.status === 'rejected' || operationsResult.status === 'rejected' || projectionResult.status === 'rejected',
     canEnsure,
     canReconcile: can(subject, 'platform.globe_credit_funding.reconcile', 'execute', 'all')
   }} />
