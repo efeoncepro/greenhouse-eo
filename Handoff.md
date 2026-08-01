@@ -1,5 +1,14 @@
 # Handoff activo
 
+## Checkout compartido único — worktrees prohibidos (2026-08-01)
+
+- Se eliminaron los dos worktrees temporales creados erróneamente bajo `/private/tmp/greenhouse-mcp-push.*`.
+  El checkout principal no fue modificado por esa limpieza; el worktree de rescate preexistente no se tocó.
+- Todo agente debe operar sólo en el checkout compartido actual. No puede crear, usar, integrar, limpiar ni
+  eliminar worktrees, checkouts aislados o carpetas clonadas; si el estado compartido bloquea, debe detenerse y
+  pedir dirección al operador. Canon:
+  `docs/architecture/agent-invariants/REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md`.
+
 ## Efeonce MCP — gateway público y canary Globe read-only verificados (2026-08-01)
 
 - Se creó el repo privado independiente `efeoncepro/efeonce-mcp`; Greenhouse y Globe no hospedan el gateway.

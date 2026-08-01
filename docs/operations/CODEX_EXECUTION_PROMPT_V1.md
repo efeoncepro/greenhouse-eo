@@ -126,7 +126,9 @@ pendiente` u `operativamente bloqueado`) y si conviene `mantente en develop` o
 MODO DE RAMA / WORKTREE
 
 - No cambies de rama por iniciativa propia.
-- No crees `git worktree` ni carpetas clon por iniciativa propia.
+- Trabaja sólo en el checkout compartido actual. Nunca crees, uses ni muevas trabajo a `git worktree`,
+  checkouts aislados o carpetas clonadas; ante WIP, conflicto o divergencia, detente y pide decisión al operador.
+- No toques ni limpies worktrees preexistentes salvo autorización explícita que indique ruta y acción exactas.
 - Si el operador pide `mantente en develop`, no cambies de rama y documenta la excepción en Audit/Plan/Handoff.
 - Si el operador pide subagentes, delegación o trabajo paralelo, pasa `--subagents` al hook para que la autorización quede impresa en el prompt.
 - Si la task declara otra branch o parece haber ownership activo, verifica `git status --short`, PRs/branches/handoff y decide con cuidado. Pide confirmación solo si el estado bloquea avanzar sin pisar trabajo ajeno.

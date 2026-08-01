@@ -9,6 +9,10 @@ Vas a implementar la task indicada en `$ARGUMENTS` (formato `TASK-###` o número
 
 > **Fuente de verdad = `CLAUDE.md` + `AGENTS.md` (ya en tu contexto) + las skills + la spec de la task.** Este command es solo el **harness de proceso + checklist de gates**. NO re-declara reglas: aplica las canónicas vigentes de esos documentos. Si este harness contradice a `CLAUDE.md`, gana `CLAUDE.md` — y avísame para corregir el command (ver "Auto-mantenimiento" al final).
 
+> **Workspace obligatorio:** usa exclusivamente el checkout compartido actual. Nunca crees, uses, limpies ni
+> muevas trabajo a worktrees, checkouts aislados o carpetas clonadas; ante WIP, conflicto o divergencia, detente y
+> pide decisión al operador.
+
 Comunicación: español neutro latinoamericano (sin voseo/modismos argentinos). Calidad por defecto: robusta, segura, resiliente, escalable — causa raíz, no parches (`SOLUTION_QUALITY_OPERATING_MODEL_V1`).
 
 ---

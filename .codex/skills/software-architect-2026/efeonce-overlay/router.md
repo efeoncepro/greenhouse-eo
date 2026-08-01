@@ -28,6 +28,10 @@ For structural work, load:
 
 Do not infer authorization to create an `apps/*`, `packages/*`, service, deployable, repository, shared database/session, or cross-runtime secret from a candidate future home.
 
+The current shared checkout is the only authorized execution environment. Never create, use, prescribe or clean a
+`git worktree`, isolated checkout or cloned folder; if concurrent WIP, a conflict or divergence blocks work,
+preserve it and request operator direction.
+
 ## Concern routing
 
 | Concern | Load next |

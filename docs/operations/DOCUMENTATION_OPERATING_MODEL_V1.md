@@ -345,3 +345,10 @@ requerido, intencionalmente no requerido, o si el cierre debe quedar como
 - Regla de compresión:
   - la explicación canónica de estructura y ubicación vive aquí
   - `Handoff.md`, `changelog.md` y `project_context.md` solo registran la nueva skill, su propósito y el impacto contractual
+
+## Checkout compartido obligatorio
+
+La documentación se edita sólo en el checkout compartido actual. Nunca crear, usar, limpiar ni mover trabajo a
+worktrees, checkouts aislados o carpetas clonadas. Si WIP ajeno, una divergencia o un conflicto bloquea el cierre,
+preservarlo y pedir decisión al operador. Canon:
+[`REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md`](../architecture/agent-invariants/REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md).

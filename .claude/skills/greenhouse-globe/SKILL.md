@@ -1475,8 +1475,8 @@ memoria ni repitas una etapa que ya tiene readback terminal:
    preview/playback, MIME/hash y descarga. La evidencia mínima es `experimentId + attemptId + sha256`; API/CI no
    sustituyen este paso.
 6. **Cierre y limpieza:** actualiza el handoff/ledger humano, registra bloqueos externos con la razón exacta y
-   elimina sólo worktrees, archivos temporales y procesos creados por esta sesión. No borres recursos de Claude ni
-   del operador; detén proxies que tú hayas iniciado.
+   elimina sólo archivos temporales y procesos creados por esta sesión. Nunca crees, uses ni elimines worktrees;
+   no borres recursos de Claude ni del operador y detén únicamente proxies que tú hayas iniciado.
 
 **Uso de subagentes:** divide únicamente trabajo independiente y de lectura: (a) identidad/readiness/rates, (b)
 derechos/evidencia legal, (c) UI/Playwright y asset. Cada subagente recibe una ruta explícita, no escribe sobre el

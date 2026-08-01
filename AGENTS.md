@@ -188,7 +188,12 @@ y [`GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md`](docs/ui/GREENHOUSE_PREMIUM_U
 ## Git, verificación y cierre
 
 - Preservar cambios ajenos; usar cambios mínimos coherentes y commits enfocados.
-- No ejecutar comandos destructivos ni cambiar de branch/worktree compartido sin autorización.
+- **Prohibición absoluta de worktrees aislados:** trabajar sólo en el checkout compartido actual. Nunca crear,
+  usar, mover trabajo a, ni operar desde `git worktree`, checkouts aislados o carpetas clonadas; tampoco tocar
+  worktrees preexistentes salvo autorización explícita que indique ruta y acción exactas. Si el estado compartido
+  bloquea, detenerse y pedir decisión al operador. Canon:
+  [`REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md`](docs/architecture/agent-invariants/REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md).
+- No ejecutar comandos destructivos ni cambiar de branch en el checkout compartido sin autorización.
 - Validar proporcionalmente: tests/lint/build/manual/runtime según riesgo y dominio.
 - Implementaciones no triviales: `greenhouse-qa-release-auditor` + `pnpm qa:gates --changed`.
 - Cierre documental: `greenhouse-documentation-governor` + `pnpm docs:closure-check`.

@@ -68,7 +68,8 @@ Ejecutar local-first por defecto:
 - reutilizar primitives canonicas;
 - respetar source of truth vigente;
 - no mezclar refactors no relacionados;
-- no crear worktrees/clones salvo aprobacion explicita del operador.
+- no crear, usar ni tocar worktrees/checkouts aislados o carpetas clonadas; si el checkout compartido bloquea,
+  detenerse y pedir decisión al operador.
 - durante EPIC-026, construir en la topologia actual pero extraction-ready según `MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`; no anticipar candidate homes.
 
 ### 5. Verification

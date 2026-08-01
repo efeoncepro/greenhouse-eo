@@ -52,8 +52,11 @@ Hechos de marca canónicos — NO hardcodear en otro lado, importar del SSOT. Do
   - `docs/architecture/GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md`
   - `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
 - Fuente canónica para trabajo multi-agente (Claude + Codex en paralelo):
-  - `docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md` — incluye higiene de worktrees, `rebase --onto`, `force-push-with-lease`, CI como gate compartido, squash merge policy, background watcher pattern para auto-merge sin branch protection
-- Regla dura de convivencia: en un checkout compartido, el WIP `untracked`/unstaged de otro agente es estado vivo. No usar `git stash -u`, `git clean`, `git restore`, moves ni pathspecs amplios para apartarlo y pasar hooks. Si bloquea tu push, coordina con el owner, usa worktree propio o pide bypass explícito ya verificado.
+  - `docs/operations/MULTI_AGENT_SHARED_WORKSPACE_OPERATING_MODEL_V1.md` y
+    `docs/architecture/agent-invariants/REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md`.
+- Regla dura de convivencia: en el checkout compartido, el WIP `untracked`/unstaged de otro agente es estado vivo.
+  No usar `git stash -u`, `git clean`, `git restore`, moves ni pathspecs amplios para apartarlo y pasar hooks. Si
+  bloquea una operación, detenerse y pedir decisión al operador; nunca crear o usar un worktree propio.
 - Fuente canonica para calidad de solucion:
   - `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md` — regla anti-parche: causa raiz, primitives canonicas, resiliencia, seguridad, escalabilidad y workaround solo temporal/documentado
 - Convenciones de skills locales:

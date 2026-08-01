@@ -228,7 +228,7 @@ Bug class recurrente: agentes corriendo `vercel` CLI desde local crean proyectos
 
 1. **`.vercel/project.json` checked-in al repo** (desde 2026-05-13): pinea `projectId` + `orgId` al canonical. Vercel CLI lo lee automáticamente — operadores/agentes locales NO necesitan pasar `--scope` explícito porque el directory contiene el link.
 2. **`.gitignore` ajustado** `.vercel/*` + `!.vercel/project.json`: permite trackear el pin pero preserva `.env*.local` files (secrets) ignorados.
-3. **Regla operativa documentada** (esta sección): aún con `.vercel/project.json` checked-in, cualquier comando ad-hoc desde un directory que NO sea la raíz del repo (e.g. agente en un worktree, script standalone) DEBE pasar `--scope efeonce-7670142f` explícito.
+3. Todo comando Vercel ad-hoc fuera de la raíz usa `--scope efeonce-7670142f`.
 
 **⚠️ Reglas duras**:
 
@@ -236,7 +236,7 @@ Bug class recurrente: agentes corriendo `vercel` CLI desde local crean proyectos
 - **NUNCA** modificar `.vercel/project.json` para apuntar a un scope distinto. Si emerge necesidad legítima (testing personal experimental), trabajar en un fork del repo o usar un dir separado.
 - **NUNCA** committear archivos `.vercel/*.local` (contienen secretos). El `.gitignore` con `.vercel/*` los protege, pero verificar con `git status --short` antes de cualquier commit que toque `.vercel/`.
 - **NUNCA** delete project sin verify-then-delete defensive pattern: resolve ID via `vercel project inspect` y compare con expected ID antes del `rm`. Pattern fuente: TASK-827 follow-up live 2026-05-13.
-- **SIEMPRE** que un agente nuevo emerja necesitando Vercel CLI access, asegurar que primero corre `cat .vercel/project.json` para confirmar canonical link. Si está en un fork/worktree donde `.vercel/project.json` no está clonado, hacer `vercel link --scope efeonce-7670142f --project greenhouse-eo --yes`.
+- **SIEMPRE** validar `.vercel/project.json` antes de usar Vercel CLI; si falta, pedir instrucción al operador.
 
 **Patrón canónico de delete defensive (ISSUE-076 verify-then-delete)**:
 
@@ -479,7 +479,8 @@ Todo agente que trabaje sobre una task del sistema debe gestionar su estado en e
 
 - **Tasks nuevas** usan `TASK-###`, nacen desde `docs/tasks/TASK_TEMPLATE.md` (plantilla copiable) y siguen el protocolo de `docs/tasks/TASK_PROCESS.md`.
 - **Tasks existentes** — tanto `CODEX_TASK_*` como `TASK-###` ya creadas en el backlog — siguen vigentes con su formato original hasta su cierre.
-- **Awareness de hook pre-ejecucion TASK-* para Codex**: cuando el operador menciona `TASK-###`, `[TASK-###]`, una ruta `docs/tasks/**/TASK-###-*.md` o alias slash-style de Codex como `/implement-task TASK-###`, `/implement-task ###`, `/task TASK-###` o `/task ###`, Codex debe ejecutar `pnpm codex:task-hook TASK-###` antes de implementar y aplicar el prompt que imprime. El hook Codex acepta ids numericos (`pnpm codex:task-hook 1033`). Si el operador dice `mantente en develop`, Codex usa `pnpm codex:task-hook TASK-### --develop`. Este hook es solo de Codex; no obliga automaticamente a Claude, Cursor u otros agentes. La excepcion de rama debe quedar documentada en Audit/Plan/Handoff. Codex no debe crear worktrees/folders clon por defecto; solo con pedido o aprobacion explicita del operador. Drift guard Codex: `pnpm codex:task-hook:check` valida prompt/hook/aliases/entrypoints.
+- **Workspace compartido obligatorio**: worktrees, checkouts aislados y clones están prohibidos; ante bloqueo, pedir decisión. Canon: `docs/architecture/agent-invariants/REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md`.
+- **Awareness de hook pre-ejecucion TASK-* para Codex**: cuando el operador menciona `TASK-###`, `[TASK-###]`, una ruta `docs/tasks/**/TASK-###-*.md` o alias slash-style de Codex como `/implement-task TASK-###`, `/implement-task ###`, `/task TASK-###` o `/task ###`, Codex debe ejecutar `pnpm codex:task-hook TASK-###` antes de implementar y aplicar el prompt que imprime. El hook Codex acepta ids numericos (`pnpm codex:task-hook 1033`). Si el operador dice `mantente en develop`, Codex usa `pnpm codex:task-hook TASK-### --develop`. Este hook es solo de Codex; no obliga automaticamente a Claude, Cursor u otros agentes. La excepción de rama debe quedar documentada en Audit/Plan/Handoff. Drift guard Codex: `pnpm codex:task-hook:check` valida prompt/hook/aliases/entrypoints.
 - **Delta Codex subagentes (2026-06-29):** si el operador pide subagentes/delegacion/trabajo paralelo, Codex usa `pnpm codex:task-hook TASK-### --subagents` (combinable con `--develop`) para registrar autorizacion explicita y activar el contrato `SUBAGENT TOOLING` del prompt.
 - **Delta Codex goal preflight (2026-06-29):** si el operador pide a Codex ejecutar/implementar/continuar una `TASK-###` sin `/goal` explicito, Codex primero propone un `/goal` recomendado y espera confirmacion; con `/goal` ya entregado, sigue al hook.
 

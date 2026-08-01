@@ -61,8 +61,9 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 - Producción: `main` y `https://greenhouse.efeoncepro.com`; promoción mediante el release control plane.
 - Staging/preview y producción tienen configuración separada. Flags, secrets y migraciones deben verificarse
   en cada runtime consumidor, no solo en Vercel.
-- Nunca cambiar la rama de un checkout compartido con trabajo ajeno. Coordinar o usar worktree solo con
-  autorización/justificación aplicable.
+- El checkout compartido actual es el único entorno de ejecución autorizado. Nunca crear, usar ni tocar
+  worktrees/checkouts aislados o carpetas clonadas; si el estado compartido bloquea, detenerse y pedir una
+  decisión al operador. Canon: [`REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md`](docs/architecture/agent-invariants/REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md).
 - Canon: [`LOCAL_FIRST_DEVELOPMENT_WORKFLOW_V1.md`](docs/operations/LOCAL_FIRST_DEVELOPMENT_WORKFLOW_V1.md),
   [`RELEASE_CHANNELS_OPERATING_MODEL_V1.md`](docs/operations/RELEASE_CHANNELS_OPERATING_MODEL_V1.md) y
   [`GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`](docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md).

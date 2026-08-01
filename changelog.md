@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-01 — Operación multiagente: checkout compartido único
+
+- Se retiraron dos worktrees temporales de MCP creados incorrectamente y se prohibieron los worktrees, checkouts
+  aislados y carpetas clonadas como workaround operativo. Ante WIP, conflictos o divergencias, los agentes deben
+  preservar el checkout compartido y pedir dirección al operador.
+- El contrato se canonizó en `REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md`, con routers, prompts, skills y la
+  memoria global de Claude alineados; el modelo histórico de worktrees quedó explícitamente superseded.
+
 ## 2026-08-01 — Efeonce MCP: Globe fleet reader end-to-end
 
 - Se habilitó únicamente `globe.producer.fleet.list`: el gateway llama el reader canónico `POST /v1/readers`,
@@ -701,9 +709,3 @@ Corrección de fuente de verdad: el cliente inicial es **SKY Agencia Creativa**,
 - FLUX 3 queda explícitamente como early access sin API pública general ni precio público al corte; no entra en
   compromisos de producción ni en unit economics aprobados.
 - Se sincronizaron las fuentes `.codex`/`.claude` correspondientes; no hubo cambios de runtime.
-
-## 2026-07-26 — Registro de postulaciones a partners de IA generativa
-
-- Se creó [`docs/audits/commercial/AI_PARTNER_PROGRAM_APPLICATIONS_2026-07-26.md`](docs/audits/commercial/AI_PARTNER_PROGRAM_APPLICATIONS_2026-07-26.md) con el mapa, evidencia, estados y próximos pasos de Anthropic/Claude, Lovable, OpenAI, Google Cloud, AWS, Salesforce, Runway, FLUX, BytePlus/ByteDance, ElevenLabs y HeyGen.
-- Se confirmaron envíos a FLUX, Runway Enterprise y ElevenLabs; BytePlus quedó bloqueado únicamente por reCAPTCHA.
-- Se incorporó a las skills de business model y customer model la clasificación de partners por función y los gates de oferta, ownership, economics, derechos, procurement, continuidad, fallback y evidencia de demanda; los companions de Claude quedaron sincronizados.

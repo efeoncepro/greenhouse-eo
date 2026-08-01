@@ -18,6 +18,17 @@
 # so all 1152 rule lines + 4190 content lines are reachable (0 orphans). New
 # entries appear only when content legitimately evolves away from the original.
 
+# 2026-08-01: el operador prohibió absolutamente worktrees, checkouts aislados y
+# carpetas clonadas. Las cinco líneas siguientes describían la política anterior
+# (incluido el workaround de abrir worktree) y fueron sustituidas por
+# REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md; conservarlas activas sería
+# contradictorio. Retiro deliberado y revisado.
+3. **Regla operativa documentada** (esta sección): aún con `.vercel/project.json` checked-in, cualquier comando ad-hoc desde un directory que NO sea la raíz del repo (e.g. agente en un worktree, script standalone) DEBE pasar `--scope efeonce-7670142f` explícito.
+- **SIEMPRE** que un agente nuevo emerja necesitando Vercel CLI access, asegurar que primero corre `cat .vercel/project.json` para confirmar canonical link. Si está en un fork/worktree donde `.vercel/project.json` no está clonado, hacer `vercel link --scope efeonce-7670142f --project greenhouse-eo --yes`.
+- `docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md` — incluye higiene de worktrees, `rebase --onto`, `force-push-with-lease`, CI como gate compartido, squash merge policy, background watcher pattern para auto-merge sin branch protection
+- Regla dura de convivencia: en un checkout compartido, el WIP `untracked`/unstaged de otro agente es estado vivo. No usar `git stash -u`, `git clean`, `git restore`, moves ni pathspecs amplios para apartarlo y pasar hooks. Si bloquea tu push, coordina con el owner, usa worktree propio o pide bypass explícito ya verificado.
+- **Awareness de hook pre-ejecucion TASK-* para Codex**: cuando el operador menciona `TASK-###`, `[TASK-###]`, una ruta `docs/tasks/**/TASK-###-*.md` o alias slash-style de Codex como `/implement-task TASK-###`, `/implement-task ###`, `/task TASK-###` o `/task ###`, Codex debe ejecutar `pnpm codex:task-hook TASK-###` antes de implementar y aplicar el prompt que imprime. El hook Codex acepta ids numericos (`pnpm codex:task-hook 1033`). Si el operador dice `mantente en develop`, Codex usa `pnpm codex:task-hook TASK-### --develop`. Este hook es solo de Codex; no obliga automaticamente a Claude, Cursor u otros agentes. La excepcion de rama debe quedar documentada en Audit/Plan/Handoff. Codex no debe crear worktrees/folders clon por defecto; solo con pedido o aprobacion explicita del operador. Drift guard Codex: `pnpm codex:task-hook:check` valida prompt/hook/aliases/entrypoints.
+
 # TASK-1154 formalized this pre-refactor hybrid-task guidance in
 # docs/tasks/TASK_PROCESS.md as "Hybrid Execution Profile Discipline"; the
 # legacy one-line pointer mentioned "formalizacion pendiente: TASK-1154", which

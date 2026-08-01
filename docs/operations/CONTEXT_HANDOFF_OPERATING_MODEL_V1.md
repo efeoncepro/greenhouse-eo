@@ -156,6 +156,9 @@ Debe revisar como minimo:
 
 - `AGENTS.md` debe declarar preflight, router, fallback historico y gates para Codex/agentes genericos.
 - `CLAUDE.md` debe declarar la misma regla para Claude Code.
+- Ambos entry points deben exigir el checkout compartido único; el detalle canónico vive en
+  `REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md` y el modelo de coordinación en
+  `MULTI_AGENT_SHARED_WORKSPACE_OPERATING_MODEL_V1.md`.
 - `docs/operations/CODEX_EXECUTION_PROMPT_V1.md` debe incluir este modelo en lectura obligatoria.
 - `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md` debe enlazar este modelo como especializacion de continuidad.
 - `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md` debe quedar enlazado desde los puntos de entrada cuando cambie el criterio transversal de no-parches.

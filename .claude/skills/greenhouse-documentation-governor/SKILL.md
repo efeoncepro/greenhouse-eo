@@ -137,6 +137,9 @@ Use this matrix to choose the smallest complete update set.
 
 ## Hard Rules
 
+- For Greenhouse execution, the current shared checkout is mandatory. Never create, use, prescribe or clean a
+  worktree, isolated checkout or cloned folder; if shared state blocks documentation work, preserve it and request
+  operator direction. Canon: `REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md`.
 - Never claim a task is complete if the docs/task lifecycle are not synced.
 - Never hide missing rollout behind "implemented in code".
 - Never create an ADR for every small change; do create or identify one for
