@@ -50,11 +50,10 @@
 - PR #176 (`626eda751`) integró OAuth PKCE, API Platform, provenance y confirmación agente en `origin/develop`;
   `d804c1169` sincronizó el checkout sin worktrees ni pérdida de WIP. El dueño vigente es TASK-1629 y
   las migraciones conservan sus nombres históricos `task-1616-*`.
-- TASK-1630 ordena: TASK-1482 truth/enforcement → TASK-1586 status/recovery → TASK-1629 one-command/readback →
-  TASK-1483 workbench Greenhouse → TASK-1628 self-view Producer.
-- En `greenhouse-org:efeonce`, una instrucción del CEO puede autorizar una operación acotada y el mismo agente
-  autenticado puede proponer/confirmar con `requireSecondConfirmer=OFF`. Workloads no confirman; las delegaciones
-  persistentes siguen limitadas y revocables.
+- Orden TASK-1630: 1482 truth/ensure-funded → 1468+1579 lifecycle/settlement → 1586 recovery → 1629
+  one-shot/adapters → 1483 workbench Greenhouse → 1628 self-view Producer.
+- La autoridad CEO one-shot está aprobada pero pendiente en TASK-1629. Live: delegación agente persistente,
+  límites vigentes, `requireSecondConfirmer=OFF`; workloads no confirman.
 - Estado honesto: formalización documental; no se hizo deploy, migración, fondeo, generación, push ni promoción
   a `main` durante este cierre.
 

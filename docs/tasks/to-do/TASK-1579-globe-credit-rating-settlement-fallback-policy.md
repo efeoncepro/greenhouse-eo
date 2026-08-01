@@ -18,7 +18,7 @@
 - Backend impact: `integration`
 - Epic: `EPIC-028`
 - Status real: `Contrato normativo pendiente; necesario antes de cerrar el engine de credits y el onboarding de modelos`
-- Rank: `TBD`
+- Rank: `next.2`
 - Domain: `finance|creative|platform|reliability`
 - Blocked by: `none`
 - Branch: `task/TASK-1579-globe-credit-rating-settlement-fallback-policy`
@@ -81,12 +81,46 @@ Entregar un contrato versionado, provider-neutral y auditable que permita respon
 
 This task no posee provider adapters, route catalog, UI, checkout, price book, invoice, tax, wallet ni GL.
 
+## Dependencies & Impact
+
+### Depends on
+
+- TASK-1468 para el kernel/ledger existente y los hechos reales de reservation/settlement.
+- TASK-1553 para identidad exacta de route, provider facts y output shapes; no para decidir la unidad económica.
+- El modelo vigente de Studio Credits y los constraints de Full API Parity.
+
+### Blocks / Impacts
+
+- TASK-1468 no cierra `actual|settlement` hasta implementar esta policy versionada.
+- TASK-1586 no publica lifecycle/receipts autoritativos hasta que los estados económicos tengan semántica única.
+- TASK-1578 consume la policy para emitir onboarding receipts por route/version.
+
+### Files owned
+
+- `docs/tasks/to-do/TASK-1579-globe-credit-rating-settlement-fallback-policy.md`
+- deltas normativos al modelo de Studio Credits aprobados durante Plan Mode;
+- fixtures/conformance de rating y settlement que Plan Mode ubique en Globe. El runtime
+  `packages/contracts/src/credits.ts`, `packages/domain/src/credit-ledger.ts` y stores/migrations sigue bajo
+  implementación coordinada con TASK-1468; esta task no edita esos archivos en paralelo.
+
+## Current Repo State
+
+### Already exists
+
+- Globe tiene rate catalog versionado, estimate, reservations, settlements y ledger append-only.
+- Existen rates por rutas reales y receipts que permiten comparar estimate/reserved/actual.
+
+### Gap
+
+- No existe una policy única que cierre factores, fallback/retry/batch, actual mayor a reserved, outputs parciales,
+  equivalencia entre providers, calibración y lifecycle de rates sin reescribir historia.
+
 ## Modular Placement Contract
 
 - Topology impact: `cross-runtime`
 - Current home: `Greenhouse governance/documentation; Globe runtime implementation`
 - Future candidate home: `remain-shared`
-- Canonical boundary: `credit policy and versioned rating/settlement contract`
+- Boundary: `credit policy and versioned rating/settlement contract; TASK-1468 implements the runtime`
 - Server/browser split: `policy, rates, settlement and provider facts server-only; client receives redacted estimates and outcomes`
 - Build impact: `TASK-1468, TASK-1578, Model Lab, provider adapters and conformance fixtures`
 - Extraction blocker: `ninguno; implementation remains in Globe and policy remains governed from Greenhouse`
@@ -248,6 +282,10 @@ Cada execution debe conservar:
 Signals mínimos: estimate/actual drift, rate mismatch, fallback rate, provider failure, retry rate, stuck hold,
 settlement delay, partial output, route availability drift, credits per successful candidate y margin-floor breach.
 
+<!-- ZONE 2 — PLAN MODE: se completa al tomar la task -->
+
+<!-- ZONE 3 — EXECUTION SPEC -->
+
 ## Scope
 
 ### Slice 1 — Rating unit and rate version contract
@@ -277,6 +315,12 @@ settlement delay, partial output, route availability drift, credits per successf
 - Convertir provider cost, tokens o dólares en credits visibles.
 - Promover una ruta o habilitar clientes externos.
 
+## Detailed Spec
+
+La policy se aprueba primero como contrato versionado y golden fixtures provider-neutral. TASK-1468 la implementa
+en el kernel y demuestra conformance estimate → reservation → actual → settlement. TASK-1578 sólo puede promover
+una route cuando su rate version y receipt apuntan a esa misma policy; ningún adapter introduce multiplicadores.
+
 ## Rollout Plan & Risk Matrix
 
 | Riesgo | Mitigation | Signal |
@@ -291,6 +335,8 @@ settlement delay, partial output, route availability drift, credits per successf
 - Default: policy `draft`/`gated`; no cambia runtime ni rates vivos hasta aprobación.
 - Rollback: retirar la policy futura, conservar rates/ledger históricos y detener nuevas reservations afectadas.
 - Runtime rollout: primero fixtures y shadow reconciliation, después canary interno, finalmente promotion separada.
+
+<!-- ZONE 4 — VERIFICATION & CLOSING -->
 
 ## Acceptance Criteria
 

@@ -239,7 +239,8 @@ schema/locking sin debilitar el posting único ni el enforcement transaccional.
 - [ ] Correcciones son compensatorias con reason/evidence/maker-checker.
 - [ ] Trusted context, tenant isolation, redaction y capability denies tienen evidencia.
 - [ ] API/SDK/MCP/CLI/worker/E2E están implemented, policy-blocked o not-applicable; nunca missing.
-- [ ] No se habilitan purchased grants, expiry, rollover, top-up ni clientes externos.
+- [ ] No se habilitan purchased grants, expiry/rollover **comercial**, top-up automático ni clientes externos;
+  el rollover operativo interno `current|next` permanece dentro del scope.
 - [ ] Mismo workspace/proyecto/instante/créditos produce la misma decisión en snapshot y reserve, salvo conflicto
   concurrente explícito.
 - [ ] `monthlySpent` filtra el período y `monthlyRemaining`/`projectRemaining` descuentan holds vigentes.

@@ -26,9 +26,10 @@ runbook que salieron de medirlo.
 - **Un fondeo útil casi siempre sube `monthlyCap`.** Si el tope vigente es lo que restringe (caso
   típico), un grant sin `monthlyCap` deja `policyAvailableAfter` igual o menor que antes. El plan lo
   dice antes de confirmar; léelo.
-- **Quién hace qué:** un usuario humano puede confirmar con sus entitlements; un usuario agente
-  puede hacerlo cuando el runtime reconoce una autoridad one-shot o una delegación expresa del workspace y el
-  acto cabe en sus límites. Un workload, API key o principal de servicio genérico nunca confirma.
+- **Quién hace qué hoy:** un usuario humano puede confirmar con sus entitlements; un usuario agente puede hacerlo
+  únicamente mediante la delegación persistente ya materializada para el workspace y dentro de sus límites. La
+  autoridad one-shot por instrucción del CEO está aprobada, pero todavía no está implementada. Un workload, API
+  key o principal de servicio genérico nunca confirma.
 - **Necesitas:** una sesión autenticada en Google Chrome para completar OAuth, los scopes
   `globe.credits.funding.propose` y `globe.credits.funding.confirm`, los entitlements de
   administración de créditos, el `poolId` vigente (ver
@@ -85,12 +86,18 @@ tope) y `allocationEntryId`. Todo ocurre en **una** transacción: grant + asient
 
 ### 4. Verificar
 
+El carril V1 todavía no tiene status/readback canónico de operador. Hasta que TASK-1586/TASK-1629 lo entreguen,
+las consultas directas siguientes son **diagnóstico privilegiado transitorio** para un operador autorizado, no el
+happy path, no una API de producto y no autorización para editar tablas:
+
 1. **Intents** (Greenhouse PG): `SELECT phase, actor_user_id FROM
    greenhouse_core.globe_credit_funding_intents ORDER BY created_at DESC LIMIT 2` → `proposed` +
    `confirmed` con el user id real y `actor_auth_mode` (`human` o `agent`).
 2. **Globe PG**: grant `posted`, política nueva `active` (la anterior `superseded`), asiento
    `allocation` con los créditos.
-3. **Generación**: el estimado del Producer debe mostrar `withinDayCap`/disponible acorde al plan.
+
+No uses el estimado/contador actual del Producer como verificación de capacidad: su self-status autoritativo es
+target de TASK-1586/TASK-1628 y todavía no está live.
 
 ## Qué significan los estados de una propuesta
 
@@ -100,7 +107,7 @@ tope) y `allocationEntryId`. Todo ocurre en **una** transacción: grant + asient
 | `expired` | Venció sin confirmar | Proponer de nuevo |
 | `completed` | Fondeo ejecutado; apunta a grant/política/asiento | Nada — es el estado final feliz |
 | `confirm_failed` | La confirmación falló DESPUÉS de transicionar; la transacción revirtió | Leer el estado antes de reintentar; es evidencia, no se borra |
-| `confirmed` (sin completar) | Anomalía: la mutación no terminó (era el síntoma del deadlock pre-fix) | NO reintentar a ciegas; ver `pg_locks`; se terminaliza vía TASK-1469 |
+| `confirmed` (sin completar) | Anomalía: la mutación no terminó (era el síntoma del deadlock pre-fix) | NO reintentar a ciegas; diagnóstico privilegiado hoy; lifecycle/terminalización canónicos pertenecen a TASK-1586 |
 
 ## Qué NO hacer
 
@@ -119,9 +126,9 @@ tope) y `allocationEntryId`. Todo ocurre en **una** transacción: grant + asient
 
 | Síntoma | Causa probable | Salida |
 |---|---|---|
-| `409 globe_funding_already_recorded` | Reusaste una clave, o esa propuesta ya tiene decisión registrada (el anti-replay del broker es **por propuesta**: ningún confirm repetido pasa, con cualquier clave) | Leer el estado de la propuesta; si `completed`, ya está |
+| `409 globe_funding_already_recorded` | Reusaste una clave, o esa propuesta ya tiene decisión registrada (el anti-replay del broker es **por propuesta**: ningún confirm repetido pasa, con cualquier clave) | No reintentar. Hoy: diagnóstico privilegiado del intent/receipt por un operador autorizado. Target TASK-1586/1629: `status/get` canónico; si `completed`, ya está |
 | `422 globe_funding_rejected` | Globe rechazó el payload (4xx real, no un problema de red) | Leer `code`; no reintentar igual |
-| `503 globe_unavailable` | El puente falló (red/WIF); si ocurrió durante confirm, el outcome puede ser desconocido | No repetir confirm a ciegas. Verificar health y reconciliar la propuesta/intent; TASK-1629 agrega el readback canónico |
+| `503 globe_unavailable` | El puente falló (red/WIF); si ocurrió durante confirm, el outcome puede ser desconocido | No repetir confirm a ciegas. Hoy: escalar a diagnóstico privilegiado. Target: TASK-1586 entrega lifecycle/readback/reconcile y TASK-1629 sus adapters CLI/API |
 | `401` | Sin sesión válida | Renovar sesión del portal |
 | `403 agent_confirmation_forbidden` | El usuario agente no tiene delegación activa para ese workspace | Habilitar la política gobernada; no usar una identidad humana como bypass |
 | `422 agent_funding_limit_exceeded` | El grant o el tope mensual excede la delegación del agente | Reducir el acto o elevar la política mediante el dueño del workspace |

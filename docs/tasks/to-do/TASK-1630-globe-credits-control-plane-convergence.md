@@ -155,6 +155,8 @@ la misma surface simultáneamente.
 - Build impact: `none`
 - Extraction blocker: la confirmación económica es transaccional en Postgres de Globe y la identidad/delegación vive en Greenhouse
 
+<!-- ZONE 2 — PLAN MODE -->
+
 ## Authority Contract
 
 ### Instrucción específica del CEO
@@ -182,14 +184,36 @@ operación, cap resultante, vigencia y número de ejecuciones. El agente no pued
 - La separación que permanece obligatoria es entre quien autoriza/firma y quien ejecuta la mutación a nivel de
   workloads de Globe; no exige dos personas.
 
+<!-- ZONE 3 — EXECUTION SPEC -->
+
+## Scope
+
+- Coordinar ownership, dependencias, orden y gates de salida de las child tasks de créditos de EPIC-028.
+- Mantener una frontera única: lifecycle económico en Globe; identidad, intents y surfaces en Greenhouse.
+- Exigir paridad semántica entre snapshot, reserve, adapters y UI sin implementar runtime desde la umbrella.
+- Registrar la autoridad CEO/agente aprobada y distinguirla del estado live hasta que TASK-1629 la materialice.
+
+## Detailed Spec
+
+Esta task es programática: no introduce endpoints, migrations, UI ni workers. Cada etapa sólo habilita la
+siguiente cuando su task dueña entrega conformance y evidencia runtime. Los cambios de alcance, source of truth,
+autoridad o secuencia se actualizan primero aquí y en ADR-015, y después en la child task afectada.
+
+## Backend/Data Contract
+
+- Backend impact: `none`; la umbrella coordina contratos y no posee tablas, readers, commands o deployables.
+- Globe conserva ledger, lifecycle, settlement y receipts. Greenhouse conserva identidad, entitlements e intents.
+- Migraciones, backfills, concurrencia, rollback y runtime evidence pertenecen a TASK-1468/1482/1579/1586/1629.
+- Ninguna child task puede crear una proyección económica autoritativa fuera de Globe ni un segundo ledger.
+
 ## Child Task Coordination
 
 | Orden | Task | Ownership exigible | Gate de salida |
 | --- | --- | --- | --- |
 | P0.1 | `TASK-1482` | período, funding, evaluator/snapshot y transacción de ciclo | snapshot y reserve coinciden; rollover sin pool manual |
 | P0.2 | `TASK-1468` + `TASK-1579` | holds, expiry, actual y settlement | cap incluye holds; `actual > reserved` se reautoriza |
-| P0.3 | `TASK-1629` | identidad, operation/status/readback y one-command CLI/API | agente completa end-to-end y timeout converge |
-| P0.4 | `TASK-1586` | status/preview/list/get/reconcile Greenhouse | diagnósticos tipados, sin math cliente |
+| P0.3 | `TASK-1586` | lifecycle canónico Globe, status/preview/list/get/reconcile y proyecciones Greenhouse | diagnósticos tipados y recovery readback-first, sin segunda máquina de estados |
+| P0.4 | `TASK-1629` | OAuth, autoridad one-shot y adapters one-command CLI/API sobre 1482/1586 | agente completa end-to-end y timeout converge |
 | P1.1 | `TASK-1483` | `/admin/globe/credits` | workbench Greenhouse con GVC/a11y |
 | P1.2 | `TASK-1628` | self-view read-only Producer | capacidad efectiva y razones sin admin writes |
 | P1.3 | `TASK-1578` | onboarding route→rate→estimate/actual | cada ruta promoted tiene receipt completo |
@@ -199,13 +223,16 @@ operación, cap resultante, vigencia y número de ejecuciones. El agente no pued
 
 ## Program Sequence
 
-1. **Truth:** corregir período, snapshot, enforcement, holds y settlement.
-2. **Operability:** `ensure-funded`, status/list/reconcile, expiry y one-command con agente.
-3. **Administration UI:** Greenhouse `/admin/globe/credits`.
-4. **Self-view:** Producer read-only.
-5. **Rating/onboarding:** TASK-1579 → TASK-1578.
-6. **Parity/hardening:** MCP, KMS e identidades disjuntas.
-7. **Commercial:** TASK-1484 sólo cuando su authority source sea un pago liquidado.
+1. **Truth:** TASK-1482 corrige período, snapshot, enforcement y `ensure-funded`.
+2. **Lifecycle:** TASK-1468 + TASK-1579 cierran holds, expiry, actual y settlement.
+3. **Recovery:** TASK-1586 entrega lifecycle/receipts autoritativos en Globe y proyecciones/adapters de lectura en
+   Greenhouse; Greenhouse nunca terminaliza una mutación económica por inferencia local.
+4. **One-command:** TASK-1629 agrega autoridad one-shot y adapters API Platform/CLI sobre TASK-1482/TASK-1586.
+5. **Administration UI:** Greenhouse `/admin/globe/credits`.
+6. **Self-view:** Producer read-only.
+7. **Onboarding:** TASK-1578 consume rating/settlement ya cerrados.
+8. **Parity/hardening:** MCP, KMS e identidades disjuntas.
+9. **Commercial:** TASK-1484 sólo cuando su authority source sea un pago liquidado.
 
 ## Out of Scope
 
@@ -230,6 +257,8 @@ autoritativo.
 | Agente excede autoridad | identity/finance | medium | instrucción/delegación server-side | `agent_funding_delegation_denied` |
 | UI presenta saldo histórico como spendable | UI | high | DTO semántico + cero math cliente | conformance UI/status |
 | Proposal/reservation queda retenida | reliability | high | sweeper + terminal states | `credit_operation_stale` |
+
+<!-- ZONE 4 — VERIFICATION & CLOSING -->
 
 ## Acceptance Criteria
 

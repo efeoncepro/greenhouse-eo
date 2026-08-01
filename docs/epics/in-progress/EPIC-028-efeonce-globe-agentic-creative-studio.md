@@ -483,8 +483,9 @@ mensual presupone un pool preparado. Por eso `TASK-1586`, `TASK-1483` y `TASK-16
 DTOs actuales.
 
 El orden normativo queda: `TASK-1482` corrige período, funding y decisión compartida; `TASK-1468` + `TASK-1579`
-cierran holds/expiry/settlement; `TASK-1629` completa operation status/readback y el one-command; `TASK-1586`
-publica el read/recovery plane; `TASK-1483` implementa `/admin/globe/credits` en Greenhouse; `TASK-1628` conserva
+cierran holds/expiry/settlement; `TASK-1586` entrega lifecycle/receipts autoritativos en Globe y proyecciones de
+status/recovery en Greenhouse; `TASK-1629` agrega autoridad one-shot y adapters one-command/readback;
+`TASK-1483` implementa `/admin/globe/credits` en Greenhouse; `TASK-1628` conserva
 Producer como self-view read-only; MCP llega después por `TASK-1473`/`TASK-1626`.
 
 La autoridad owner-operated queda explícita: una instrucción atribuida del CEO puede autorizar a un humano o

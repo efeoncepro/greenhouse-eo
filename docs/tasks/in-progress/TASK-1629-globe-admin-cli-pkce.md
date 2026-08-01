@@ -17,35 +17,36 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `PR #176 integrado; OAuth/API/CLI y agent-confirm recuperados, pero status/list/reconcile y one-command convergente siguen pendientes`
-- Rank: `TBD`
+- Status real: `PR #176 integrado; base OAuth/API/CLI viva; autoridad one-shot y adapters one-command/readback pendientes`
+- Rank: `next.4`
 - Domain: `platform|identity|finance|globe`
-- Blocked by: `none`
-- Branch: `codex/TASK-1614-credit-lane-integration`
+- Blocked by: `TASK-1482, TASK-1586`
+- Branch: `none — base integrada por PR #176; crear branch TASK-1629 sólo al retomar el delta pendiente`
 - Legacy ID: `TASK-1616` (etiqueta histórica de la rama; colisionó y fue reasignada a MiniMax H3)
 - GitHub Issue: `none`
 
 ## Summary
 
-Cierra la paridad programática que TASK-1566 declaró pero no entregó: un humano o agente autenticado por
-Greenhouse podrá ejecutar `propose → confirm` desde un CLI first-party mediante Authorization Code +
-PKCE, sin exportar cookies, compartir passwords ni asumir una identidad de workload. Una sesión agente
-es válida y conserva esa procedencia hasta la evidencia financiera.
+La base integrada cierra el acceso programático `propose → confirm` mediante OAuth PKCE, API Platform y CLI
+first-party. El delta pendiente agrega autoridad one-shot y adapters `status/readback/ensure/reconcile` que
+consumen TASK-1482/TASK-1586, sin duplicar el lifecycle económico ni asumir una identidad de workload.
 
 ## Why This Task Exists
 
-El command transaccional de fondeo está vivo y probado, pero su único adapter operativo exige una cookie
-NextAuth humana. El CLI no tiene autenticación humana delegada, el broker OAuth sólo admite clientes
-confidenciales y `agent-session` puede acuñar una sesión seleccionando un email. Esa combinación hizo que
-cada operación reaprendiera el acceso y tentara atajos incompatibles con la atribución financiera.
+El command transaccional de fondeo y el acceso OAuth/CLI ya están vivos, pero el operador todavía debe aportar
+pool/período y dos claves, y no dispone de recovery autoritativo ante timeout. Además, la instrucción textual del
+CEO todavía no se materializa como autoridad one-shot de runtime. Sin ese delta, la automatización sigue siendo
+plomería recuperada, no una operación end-to-end robusta.
 
 ## Goal
 
-- Reusar el broker OAuth existente para un cliente público instalado con PKCE y loopback seguro.
-- Publicar el fondeo en API Platform `app` como adapter del broker canónico, con entitlements e idempotencia.
-- Entregar un CLI tipado y auditable que autorice una sesión Greenhouse en Chrome y no maneje cookies.
-- Permitir confirmación agente sólo por delegación explícita del workspace y límites server-side.
-- Ejercer el flujo real en staging y conservar readback correlacionado.
+- Conservar la base ya integrada: OAuth public client PKCE, API Platform, CLI, provenance y agent-confirm.
+- Materializar una instrucción atribuida del CEO como autoridad one-shot exacta, expirable y no reutilizable.
+- Exponer en API Platform/CLI los readers/recovery de TASK-1586 y `ensure-funded` de TASK-1482, con una operation
+  key visible y readback-first.
+- Alinear el vocabulario Globe `HumanAttributionV1`/`assertHumanAttribution` con la frontera real: usuario
+  autenticado humano o agente delegado; service/workload principal rechazado.
+- Ejercer el flujo end-to-end en staging y conservar receipt correlacionado.
 
 <!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
 
@@ -88,6 +89,8 @@ Reglas obligatorias:
 - `src/lib/api-platform/core/app-auth.ts`
 - `greenhouse_core.sister_platform_oauth_clients`
 - `greenhouse_core.globe_credit_funding_intents`
+- `TASK-1482` para `ensure-funded` y `CreditDecisionSnapshot`.
+- `TASK-1586` para lifecycle/status/list/get/reconcile y receipts autoritativos.
 
 ### Blocks / Impacts
 
@@ -102,7 +105,15 @@ Reglas obligatorias:
 - `src/app/api/platform/app/globe/credit-funding/**`
 - `src/app/api/admin/globe/credit-funding/**`
 - `src/lib/globe/credit-administration-broker.ts`
+- `src/config/entitlements-catalog.ts`
+- `src/lib/entitlements/runtime.ts`
+- `src/lib/api/canonical-error-response.ts`
+- `src/lib/api-platform/resources/app-globe-credit-funding.ts`
+- `src/app/api/admin/globe/credit-funding/confirm/route.ts`
 - `scripts/globe-credit-funding.ts`
+- adapters y tipos de autoridad one-shot bajo paths definidos en Plan Mode;
+- en `efeonce-globe`, sólo el rename/evolución compatible de attribution que evita llamar “humano” al usuario
+  agente autenticado; TASK-1586 posee lifecycle/list/get/reconcile.
 - `migrations/*task-1616*`
 - `docs/manual-de-uso/creative-studio/fondear-creditos-globe.md`
 - `docs/architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md`
@@ -125,12 +136,18 @@ ownership operativo vigente de ese trabajo es `TASK-1629`.
 
 - El source of truth OAuth PKCE/API Platform/CLI fue integrado por PR `#176`; la rama histórica
   `codex/TASK-1616-globe-admin-cli-pkce` no se integra completa ni se renombran migraciones aplicadas.
-- Sólo existen adapters `propose`/`confirm`; faltan status/list/get/reconcile para resolver outcomes ambiguos y
-  operar las propuestas stale individualmente.
+- Sólo existen adapters `propose`/`confirm`; faltan adapters API Platform/CLI sobre el status/list/get/reconcile
+  que entregará TASK-1586 para resolver outcomes ambiguos y operar propuestas stale individualmente.
 - El CLI todavía expone plomería de pool/período y dos idempotency keys; falta la fachada `ensure-funded` con una
   operation key y resolución server-side del ciclo.
 - La delegación persistente acota grant/tope, pero aún falta modelar la instrucción one-shot del CEO con período,
   target, vigencia, fingerprint y receipt, coordinada por TASK-1630.
+- El contrato Globe todavía llama `HumanAttributionV1`/`assertHumanAttribution` a un guard que en realidad rechaza
+  service principals y acepta usuarios agentes ya autorizados por Greenhouse; el nombre/comentarios deben converger.
+- Greenhouse ya aplica en DB que `confirmante != proponente` depende de `requireSecondConfirmer`, pero comentarios y
+  copy de error en `entitlements-catalog.ts`, `entitlements/runtime.ts`, `credit-administration-broker.ts`, la route
+  admin, API Platform y `canonical-error-response.ts` todavía la presentan como invariante universal; TASK-1629
+  debe alinearlos sin borrar el error condicional que sigue siendo válido cuando la policy está activa.
 
 ## Modular Placement Contract
 
@@ -170,7 +187,8 @@ ownership operativo vigente de ese trabajo es `TASK-1629`.
   - confirmación agente exige `agent_confirmation_enabled`, límites y `actor_auth_mode=agent` durable;
   - `provider=agent` prevalece sobre el modo base de la cuenta; `unknown` y workloads fallan cerrados;
   - el fingerprint se compara contra la propuesta durable antes de registrar `confirm`;
-  - una respuesta ambigua se reanuda con la idempotency key original y termina en `completed|confirm_failed`;
+  - en la base V1, una respuesta ambigua puede reanudarse con la idempotency key original; tras TASK-1586 se lee
+    primero status/receipt y sólo se redispatcha si el estado autoritativo demuestra que no hubo efecto;
   - propuesta y confirmación usan idempotency keys distintas y correlacionadas.
 - Tenant/space boundary: usuario rehidratado por access token; entitlement fino; workspace validado por broker
 - Idempotency/concurrency: claves obligatorias; replay OAuth/command rechazado o estable por constraints existentes
@@ -239,6 +257,29 @@ ownership operativo vigente de ese trabajo es `TASK-1629`.
 - Autorización con la sesión autenticada disponible en Chrome, humana o agente.
 - Fondeo real, readback correlacionado y manual/skill actualizados.
 
+Las Slices 1–4 quedaron entregadas por PR `#176`; se preservan como evidencia y no se reimplementan.
+
+### Slice 5 — Attribution y autoridad one-shot
+
+- Evolucionar la nomenclatura `HumanAttributionV1`/`assertHumanAttribution` a usuario autenticado sin romper el
+  wire contract; Globe sigue rechazando principals `globe:service:*` y Greenhouse valida sesión/delegación.
+- Corregir comentarios y copy Greenhouse para explicar que maker-checker es policy opcional por workspace/umbral;
+  conservar `confirmer_is_proposer` únicamente como resultado condicional cuando `requireSecondConfirmer` está ON.
+- Persistir autoridad one-shot exacta con issuer CEO, workspace, período, target/cap, TTL, max executions,
+  fingerprint, revocación y evidence reference; el agente no puede emitirla ni ampliarla.
+
+### Slice 6 — Adapters one-command y recovery
+
+- Consumir `ensure-funded` de TASK-1482 y status/list/get/reconcile de TASK-1586 desde API Platform/CLI.
+- Exponer `preview|ensure|status|operations get|list|reconcile` con una operation key; cero DB/Globe directo.
+- Timeout ejecuta readback-first y sólo redispatcha si el receipt autoritativo prueba ausencia de efecto.
+
+### Slice 7 — Evidencia end-to-end
+
+- Ejercer instrucción CEO → autoridad one-shot → preview/propose/confirm → status/receipt en staging con la sesión
+  Chrome autenticada indicada por el operador.
+- Probar expiración, fingerprint mismatch, revocación, over-limit, service principal deny y timeout recuperado.
+
 ## Out of Scope
 
 - Crear otro ledger, command de crédito o sistema de sesiones.
@@ -302,18 +343,20 @@ Sin flag global: el cliente OAuth no existe hasta registrarlo y puede suspenders
 
 ## Acceptance Criteria
 
-- [ ] Public client PKCE funciona sin secret y confidential no cambia.
-- [ ] Sólo loopback registrado `127.0.0.1` (o su alias Vercel `localhost`) con path exacto admite puerto efímero.
-- [ ] API Platform expone propose/confirm sobre primitive existente con entitlement e idempotencia.
-- [ ] Una sesión agente confirma dentro de la delegación interna; workspace no delegado y monto sobre límite fallan.
-- [ ] CLI completa PKCE y fondeo sin cookies/passwords/secrets persistidos.
-- [ ] Fondeo real staging conserva identidad + auth mode y tiene readback correlacionado.
-- [ ] Tests, task gate, docs y verificación UI de Globe quedan verdes.
-- [ ] API Platform y el broker exponen `status/list/get/reconcile` sobre operaciones sin revelar errores crudos.
+- [x] Public client PKCE funciona sin secret y confidential no cambia (PR `#176`).
+- [x] Sólo loopback registrado `127.0.0.1` (o su alias Vercel `localhost`) con path exacto admite puerto efímero.
+- [x] API Platform expone propose/confirm sobre primitive existente con entitlement e idempotencia.
+- [x] Una sesión agente confirma dentro de la delegación interna; workspace no delegado y monto sobre límite fallan.
+- [x] CLI completa PKCE y fondeo sin cookies/passwords/secrets persistidos.
+- [x] Fondeo real staging conserva identidad + auth mode y tiene readback correlacionado.
+- [x] Tests y evidencia de la base integrada quedaron asociados a PR `#176`/TASK-1566.
+- [ ] API Platform y CLI adaptan `status/list/get/reconcile` de TASK-1586 sin duplicar lifecycle ni errores crudos.
 - [ ] El CLI ofrece `status`, `preview`, `ensure` y `operations reconcile` usando una sola operation key visible.
 - [ ] Una instrucción one-shot atribuida del CEO puede autorizar al mismo usuario agente para proponer y confirmar
   cuando `requireSecondConfirmer` está OFF; una policy que lo active sigue exigiendo actor distinto.
 - [ ] Los comentarios, errores y manuales dejan de presentar `confirmante ≠ proponente` como invariante universal.
+- [ ] El contrato y guard de Globe describen “usuario autenticado” y no “humano”; principals de servicio siguen
+  fallando cerrados y la evidencia conserva `actor_auth_mode`.
 
 ## Follow-ups
 

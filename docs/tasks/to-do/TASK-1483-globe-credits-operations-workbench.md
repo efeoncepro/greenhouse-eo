@@ -38,8 +38,8 @@ ADR-015 fija Greenhouse como superficie administrativa y Globe como autoridad. L
 
 ## Goal
 
-Dar a Credit Operators, budget owners, Finance Ops, leads y auditors una experiencia premium, auditable y
-recuperable sin representar Studio Credits como dinero/token ni calcular business logic en browser.
+Dar a operadores internos una experiencia premium, auditable y recuperable sin representar Studio Credits como
+dinero/token ni calcular business logic en browser. Las personas objetivo no conceden acceso por sí mismas.
 
 <!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
 
@@ -78,7 +78,8 @@ recuperable sin representar Studio Credits como dinero/token ni calcular busines
 - copy reutilizable bajo `src/lib/copy/**`
 - scenario GVC y reviews de `TASK-1483` en Greenhouse.
 
-Contracts/SDK permanecen bajo `TASK-1468`, `TASK-1482`, `TASK-1473` y `TASK-1481`.
+El snapshot de dominio pertenece a TASK-1482; lifecycle/receipts y DTOs browser-safe
+`CreditCapacityStatusV1|CreditFundingOperationV1` pertenecen a TASK-1586. TASK-1483 sólo consume esos contratos.
 
 ## Current Repo State
 
@@ -117,23 +118,31 @@ Contracts/SDK permanecen bajo `TASK-1468`, `TASK-1482`, `TASK-1473` y `TASK-1481
 - Copy/access: `copy centralizada; estados honestos por audience/capability; external client policy-blocked`.
 - Accessibility: `WCAG AA, keyboard, focus restore, text alternative del runway, reduced motion, 390 px sin overflow`.
 - Visual evidence: scenario `globe-credits-operations-workbench`, desktop 1440×1000 y mobile 390×844;
-  baseline `globe.credits-operations-workbench` sólo tras first-fold acceptance.
+  baseline `greenhouse.admin.globe-credits-operations-workbench` sólo tras first-fold acceptance.
 
 ## Backend/Data Contract
 
-No aplica: `TASK-1483` no crea schema, migrations, commands ni readers. Consume browser-safe DTOs ya owned por
-`TASK-1468`/`TASK-1482` a través del SDK/private HTTP certificado; cualquier brecha backend vuelve a la task
-owner y no se resuelve con endpoint o cálculo ad hoc en UI.
+No aplica: `TASK-1483` no crea schema, migrations, commands ni readers. Consume los DTOs browser-safe que debe
+entregar TASK-1586 sobre el snapshot de TASK-1482; hoy aún son una dependencia target, no un contrato live.
+Cualquier brecha backend vuelve a la task owner y no se resuelve con endpoint o cálculo ad hoc en UI.
 
-### Role contract
+### Access contract actual
 
-- Credit Operator: lectura, proposal y pause/resume dentro de policy; sin vendor cost/margin.
-- Budget owner/approver: runway/holds y confirmación de grants/limits; sin rates/adjustments contables.
+- El runtime vigente concede `propose|confirm` únicamente a `ROLE_CODES.EFEONCE_ADMIN`; TASK-1483 no amplía roles.
+- Cada control se renderiza desde capabilities/entitlements devueltos server-side. El browser no deriva autoridad
+  desde un role label, persona, operating mode ni `actor_auth_mode`.
+- Pause/resume, grants, limits, corrections o reconcile sólo aparecen cuando el command gobernado y el
+  entitlement específico existen; esta task frontend-only no los promete ni los crea.
+
+### Personas objetivo — no son access contracts
+
+- Credit Operator: lectura y propuesta cuando el backend concede la capability; sin vendor cost/margin.
+- Budget owner/approver: runway/holds y confirmación sólo cuando existe entitlement específico.
 - CEO owner-operated: una confirmación manual o instrucción a agente puede completar la operación sin segundo
   humano cuando `requireSecondConfirmer` está OFF.
 - Agente autenticado: preview/propose/confirm/readback sólo bajo instrucción/delegación server-side; no puede
   editar su propia autoridad.
-- Finance Ops: grants/correcciones/reconciliation y proyección interna restringida.
+- Finance Ops: proyección interna restringida y futuros commands explícitamente gateados.
 - Creative/project lead: usage/forecast/deep links read-only.
 - Auditor: ledger/audit/evidence read-only.
 - Client budget manager/viewer futuro: proyección redactada, `policy-blocked` hasta gate externo.
@@ -147,14 +156,16 @@ owner y no se resuelve con endpoint o cálculo ad hoc en UI.
 
 - Implementar header con workspace/período/freshness/audience y plano dominante
   effective available/monthly cap-spent-held/funding/ledger histórico.
-- Implementar empty, healthy, low/exhausted, paused, expiring, stale/partial, denied/redacted y error.
+- Implementar empty, healthy, low/exhausted, paused, expiring, stale/partial, denied/redacted,
+  `selection_required`, `second_actor_required` y error.
 
 ### Slice 2 — Pools, ledger and governed actions
 
 - Navegador de pools/sub-budgets, risk rail, ledger filtrable y detail sidecar.
 - Drawer `Asegurar capacidad del período` con status → preview → propose → confirm → readback; otras acciones sólo
   aparecen cuando su command y entitlement existen.
-- Bandeja de operaciones para pending/expired/confirm_failed/outcome_unknown/reconciled, con recovery seguro.
+- Bandeja de operaciones para pending/confirming/confirm_failed/completed/expired/outcome_unknown/reconciled,
+  fingerprint mismatch y timeout recovered/unknown, con recovery seguro.
 - Mostrar impact/preconditions/fingerprint server-side, refrescar readers y enlazar ledger/run/audit.
 
 ### Slice 3 — Reliability and visual acceptance
@@ -185,13 +196,15 @@ se valida first fold contra visual direction y fixtures; `UI ready` permanece `n
 
 - Feature flags: internal-only; client budget manager OFF.
 - Rollback: desactivar route/actions, preservar readers/audit.
-- Verification: first fold -> states -> mutations -> GVC/a11y -> internal canary.
+- Verification: first fold -> fixtures deterministas de estados/mutaciones -> GVC/a11y -> canary live con la
+  sesión Chrome autenticada indicada por el operador.
 
 <!-- ZONE 4 — VERIFICATION & CLOSING -->
 
 ## Acceptance Criteria
 
-- [ ] UI consume los mismos result/error/audit contracts que SDK/MCP y no contiene business logic de credits.
+- [ ] UI consume los mismos result/error/audit contracts que API/SDK y no contiene business logic de credits;
+  MCP/Nexa son adapters futuros no bloqueantes.
 - [ ] Runway, pools, ledger y forecast declaran freshness/coverage; null/partial nunca se convierte en cero.
 - [ ] Commands de alto riesgo usan proposal, confirmación explícita, reason/evidence y focus restore.
 - [ ] Roles/audiences reciben actions y redaction correctas; operating mode no concede capabilities.
@@ -202,6 +215,8 @@ se valida first fold contra visual direction y fixtures; `UI ready` permanece `n
 - [ ] El first fold distingue `effectiveAvailable`, funding vigente, cap/spent/held y ledger histórico.
 - [ ] El drawer permite confirmación humana o agente y sólo muestra éxito tras readback terminal.
 - [ ] `outcome_unknown` ofrece verificar/reconciliar y nunca retry ciego.
+- [ ] `selection_required`, `second_actor_required`, `confirming`, `confirm_failed`, `completed`, `reconciled`,
+  fingerprint mismatch y timeout recovered/unknown tienen estados y acciones explícitos.
 
 ## Verification
 

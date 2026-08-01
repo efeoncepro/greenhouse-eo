@@ -20,12 +20,12 @@
 - Se registró `TASK-1630` como umbrella P0 y se rebaselinaron TASK-1468/1482/1483/1586/1628/1629 contra el runtime
   observado: ledger histórico, funding vigente, caps/holds y operaciones de fondeo dejan de tratarse como una sola
   cifra implícita.
-- La secuencia queda fijada como truth de período/enforcement → status/recovery → one-command → workbench
-  Greenhouse → self-view Producer → paridad MCP/comercial. No se crea otro ledger ni se mueve administración al
-  Producer.
-- ADR-015 ahora explicita que una instrucción atribuida del CEO puede autorizar una operación acotada y que el
+- La secuencia queda fijada como truth/ensure-funded → holds/expiry/settlement → lifecycle/status/recovery →
+  autoridad one-shot + adapters one-command → workbench Greenhouse → self-view Producer → paridad
+  MCP/comercial. Globe conserva la máquina de estados económica; Greenhouse sólo proyecta/adapta.
+- ADR-015 ahora aprueba que una instrucción atribuida del CEO pueda autorizar una operación acotada y que el
   mismo agente autenticado puede proponer y confirmar end-to-end cuando la política del workspace no exige segundo
-  confirmante. Workloads siguen sin poder confirmar; delegaciones persistentes conservan límites y revocación.
+  confirmante. La autoridad one-shot sigue pendiente; live hoy sólo existe la delegación persistente acotada.
 - Este cambio fue sólo documental: no hubo fondeo, deploy, migración, push, release ni promoción a `main`.
 
 ## 2026-08-01 — Efeonce MCP: Globe fleet reader end-to-end

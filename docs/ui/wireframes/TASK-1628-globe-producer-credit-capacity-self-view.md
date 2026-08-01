@@ -47,7 +47,8 @@ histórico/contable.
 
 - El chip conserva estado + cifra corta; no fuerza scroll horizontal del header.
 - El popover se posiciona dentro del viewport y usa filas label/value apilables.
-- El deep link es el único CTA y sólo aparece para una sesión con entitlement administrativo.
+- El deep link es la única navegación administrativa del rollout interno. No transporta authority y Greenhouse
+  revalida sesión/entitlement; ocultarlo no es un control de seguridad.
 
 ## Required states
 
@@ -75,7 +76,8 @@ histórico/contable.
 - Viewports: 1440×1000 y 390×844, `qualityProfile: premium`.
 - Captures: todos los required states, popover abierto y teclado/focus.
 - Assertions: `scrollWidth === clientWidth`, cifra primaria effective, ledger secundario, sin raw errors/admin writes.
-- Browser: sesión Chrome autenticada anclada al perfil indicado por el operador.
+- Fixture scenario: auth/data deterministas, sin hardcodear ni leer perfiles Chrome.
+- Live canary: exclusivamente la sesión Chrome autenticada indicada por el operador.
 
 ## Design Decision Log
 

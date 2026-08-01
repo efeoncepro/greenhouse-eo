@@ -29,7 +29,9 @@ Canonical route: `/admin/globe/credits`. Globe Producer is a separate read-only 
 
 Loading por región; first allocation empty; healthy; low/exhausted; reservation-heavy; paused; expiring o
 expiry-disabled; stale/partial/insufficient forecast; anomaly/drift; proposal pending/expired; conflict;
-idempotent replay; denied; redacted; cross-workspace deny; sanitized error; success con ledger entry.
+`selection_required`; `second_actor_required`; confirming; confirm_failed; completed; reconciled; fingerprint
+mismatch; timeout recovered; timeout outcome unknown; idempotent replay; denied; redacted; cross-workspace deny;
+sanitized error; success con ledger entry.
 
 ## Command sidecar
 
@@ -49,10 +51,12 @@ readback -> ledger/audit link`. Un solo `operationKey`; no optimistic balance ni
 
 ## GVC Scenario Plan
 
-- Route: `/admin/globe/credits` con sesión admin autenticada.
+- Fixture scenario: route determinista `/admin/globe/credits` con auth/data fixture; no hardcodea ni lee perfiles.
+- Live canary: misma route usando exclusivamente la sesión Chrome autenticada indicada por el operador.
 - Viewports: 1440×1000 y 390×844; `qualityProfile: premium`.
 - Captures: healthy, ledger positivo/effective cero, pool vencido, monthly cap, project cap/paused,
-  stale/partial, proposal pending/expired, human confirm, agent confirm/deny/over-limit, outcome unknown y reconcile.
+  stale/partial, selection required, second actor required, proposal pending/expired, confirming, confirm failed,
+  completed, fingerprint mismatch, agent confirm/deny/over-limit, timeout recovered/unknown y reconciled.
 - Assertions: una CTA primaria, cero raw error/secret/cost/margin, focus restore, reduced motion y
   `scrollWidth === clientWidth`.
 
@@ -66,9 +70,3 @@ readback -> ledger/audit link`. Un solo `operationKey`; no optimistic balance ni
 
 H1 y sections; runway con alternativa textual/tabular exacta; 44px compact targets; named rows/actions;
 keyboard list-detail; polite live region sólo al completar cambio material; IDs y valores accesibles.
-
-## GVC
-
-Scenario: `scripts/frontend/scenarios/globe-credits-operations-workbench.scenario.ts`. Capturas 1440×1000 y
-390×844: healthy, low, paused, drift, filtered+sidecar, proposal/confirm, denied/redacted, empty, error,
-reduced motion y keyboard. Assert `scrollWidth <= clientWidth`, no raw errors/secrets/cost/margin no autorizado.

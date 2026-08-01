@@ -2,8 +2,9 @@
 
 ## Benchmark and intent
 
-Dirección repo-native basada en Orbital Threshold de Globe y en controles operativos enterprise: debe sentirse
-como capacidad creativa gobernada, no banca, crypto ni un dashboard genérico de cards.
+Dirección Greenhouse-native para una capacidad de Globe: conserva el concepto Runway Control Plane, pero se
+implementa con la shell y primitives del portal Greenhouse. Debe sentirse como capacidad creativa gobernada, no
+banca, crypto ni un dashboard genérico de cards.
 
 ## Alternatives
 
@@ -22,9 +23,9 @@ como capacidad creativa gobernada, no banca, crypto ni un dashboard genérico de
 
 ## Capacity Observatory application
 
-TASK-1485 posee el contrato normativo de Credit Unit, Credit Phase y Capacity Context. Este Workbench es su
-composición operacional completa: aquí los créditos dejan de ser metadata y se convierten en el plano de capacidad
-que conecta disponible, límite, reserva, consumo, proyección y evidencia.
+ADR-015 y TASK-1630 poseen el contrato de frontera y TASK-1586 los DTOs de operación. TASK-1485 sólo gobierna el
+payload cliente de Globe y no es dependencia normativa de esta superficie Greenhouse. Aquí los créditos se
+presentan como capacidad que conecta disponible, límite, reserva, consumo, proyección y evidencia.
 
 El runway debe responder, en una sola lectura, cuatro preguntas:
 
@@ -37,9 +38,9 @@ El Workbench usa `Runway Plane`, `Risk Rail`, `Allocation Navigator`, `Evidence 
 El `Credit Unit` nunca aparece sin fase; el `Credit Phase` nunca aparece sin ámbito; los valores `partial`, `stale`
 o `unknown` nunca se representan como cero.
 
-La firma visual **Horizon + Orbit** se traduce aquí en un horizonte de capacidad, segmentos orbitales para reservas y
-asignaciones, pulso breve durante consumo y bandas discontinuas para forecast. El Workbench no usa wallet, coin,
-token, ticker, precio ni lenguaje de checkout.
+La firma visual se traduce en un horizonte de capacidad dentro de `CompositionShell`, segmentos tokenizados para
+reservas/asignaciones y bandas discontinuas para forecast. El Workbench no usa wallet, coin, token, ticker, precio
+ni lenguaje de checkout.
 
 En esta superficie la densidad es operacional: los números usan tabular numerals, cada estado combina icono/label/texto
 y el runway tiene una alternativa textual o tabular exacta. English y Español cambian copy, no geometría, fases,
@@ -49,7 +50,8 @@ jerarquía ni significado.
 
 - Desktop: command-center + list-detail; rail in-flow.
 - Mobile 390: summary sticky, lista->detalle, sidecar temporal; nunca tabla aplastada ni page overflow.
-- Reusar color/typography/spacing de la shell Globe; status siempre icono+label+texto, no sólo color.
+- Reusar tokens AXIS proyectados por Greenhouse, typography/spacing MUI/Vuexy y primitives canónicas del portal;
+  status siempre icono+label+texto, no sólo color.
 - Créditos como enteros formateados con label accesible completo; IDs copyable/wrappable.
 
 ## Signature and anti-patterns
@@ -62,9 +64,10 @@ provider logos como price units y actions sin reason/precondition.
 
 ## Fidelity and first-fold gate
 
-- Implementar con patterns propios del stack Globe. `Runway Plane`, `Risk Rail`, `Pool Navigator`,
-  `Evidence Ledger` y `Governed Command Panel` entran al registry gobernado desde Greenhouse como `candidate`
-  y se promueven con evidencia; no heredan patterns Greenhouse.
-- Baseline: `globe.credits-operations-workbench`, después de aceptar first fold healthy + low balance.
+- Implementar con `CompositionShell` recipe `operationalWorkbench`, `WorkbenchHeader`, `SignalStrip`,
+  `OperationalSection`, `InventoryList`, `SelectionRow`, `AdaptiveSidecarLayout`, `ContextualSidecar`,
+  `ContextCommandBar` y `Dialog`. El runway es composición route-local hasta demostrar un segundo consumer; no
+  nace una primitive base por anticipación.
+- Baseline: `greenhouse.admin.globe-credits-operations-workbench`, después de aceptar first fold healthy + low.
 - Markers: `globe-credits-workbench`, `credits-runway`, `credits-risk-rail`, `credits-pools`,
   `credits-ledger`, `credits-detail`, `credits-command-preview`, `credits-state-*`.

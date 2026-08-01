@@ -174,17 +174,18 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
 
 ## Siguiente paso ejecutable
 
-1. `TASK-1630` ya quedó formalizada. Ejecutar primero `TASK-1482`: corregir la correspondencia entre readers,
-   período, funding, holds y enforcement, y entregar `ensure-funded` idempotente. No fondear, desplegar ni usar
-   SQL mientras el status autoritativo y el readback de operaciones sigan incompletos.
-2. Reconciliar las propuestas ambiguas de `TASK-1629` mediante primitives canónicas. Una instrucción explícita del
-   CEO puede autorizar `preview → propose → confirm → readback` por un agente autenticado; el segundo confirmador
-   permanece como política opcional, OFF para el workspace owner-operated.
-3. Con presupuesto admitido y evidencia terminal, completar el canary pendiente de `TASK-1614` exclusivamente con
+1. `TASK-1630` ya quedó formalizada. Ejecutar primero `TASK-1482` para período/funding/decisión y
+   `ensure-funded`; luego cerrar TASK-1468 + TASK-1579 para holds, expiry, actual y settlement. No fondear,
+   desplegar ni usar SQL como sustituto del status autoritativo.
+2. Ejecutar TASK-1586: Globe entrega lifecycle/list/get/reconcile/receipts; Greenhouse sólo une intents y publica
+   proyecciones. Después TASK-1629 agrega autoridad one-shot y adapters CLI/API one-command/readback.
+3. Sólo entonces reconciliar propuestas ambiguas por primitives canónicas. La instrucción explícita del CEO es
+   autoridad objetivo pendiente; el segundo confirmador permanece policy opcional, OFF para owner-operated.
+4. Con presupuesto admitido y evidencia terminal, completar el canary pendiente de `TASK-1614` exclusivamente con
    **Video → Movimiento/control cámara → Seedance 2.0**. Ante timeout, leer primero estado/run; nunca reintentar a
    ciegas ni tocar Omni, Seed Audio, Seedance Loop, Veo o Seedream.
-4. Ejecutar `TASK-1578` para las seis rutas de imagen y emitir por cada identidad exacta el onboarding receipt que
+5. Ejecutar `TASK-1578` para las seis rutas de imagen y emitir por cada identidad exacta el onboarding receipt que
    enlace route, rate version vigente de `TASK-1468`, evaluación, rights, binding, readiness, circuito y canary;
    reconciliar los receipts contra `globe.producer.fleet.list` antes de cerrar `TASK-1553`.
-5. Antes de ofrecer el reader por MCP a un cliente, implementar el entitlement B2B y ejecutar un canary real con
+6. Antes de ofrecer el reader por MCP a un cliente, implementar el entitlement B2B y ejecutar un canary real con
    identidad base-only; no inferir esa separación del cliente interno actual.

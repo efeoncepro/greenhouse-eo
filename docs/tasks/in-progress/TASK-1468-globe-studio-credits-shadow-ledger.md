@@ -20,7 +20,7 @@ Lab) ≠ `estimateCredits`/`getCreditEstimate` (credits) — son capabilities de
 ## Status
 
 - Lifecycle: `in-progress`
-- Priority: `P1`
+- Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
@@ -32,8 +32,8 @@ Lab) ≠ `estimateCredits`/`getCreditEstimate` (credits) — son capabilities de
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-028`
-- Status real: `Kernel y wiring local completos; migración y rollout comercial pendientes`
-- Rank: `TBD`
+- Status real: `Kernel y wiring existentes; cierre P0 de holds, expiry y settlement pendiente; rollout comercial separado`
+- Rank: `next.2`
 - Domain: `finance|creative|data`
 - Blocked by: `none`
 - Branch: `task/TASK-1468-globe-studio-credits-shadow-ledger`

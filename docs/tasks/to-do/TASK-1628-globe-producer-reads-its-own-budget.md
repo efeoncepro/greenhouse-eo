@@ -136,7 +136,8 @@ No posee contracts/readers de crédito, grants OAuth, commands de fondeo, pools,
 - Adaptive density / The Seam: `aplica` — compact header + popover rico en desktop/mobile.
 - Floating/Sidecar/Dialog decision: popover existente; sin drawer/modal administrativo.
 - Copy source: copy locale-keyed del payload Globe.
-- Access impact: self-status workspace-scoped; deep link sólo si la sesión proyecta entitlement administrativo.
+- Access impact: self-status workspace-scoped y sin authority Greenhouse. El deep link es navegación no
+  autorizante en el rollout interno; Greenhouse siempre revalida sesión/entitlements al entrar.
 
 ### State inventory
 
@@ -182,7 +183,8 @@ Contrato detallado:
 - Copy source: locale/copy del payload Globe.
 - Data reader / command: `CreditCapacitySelfStatusV1`; cero commands.
 - API parity: self-status deriva del mismo snapshot de TASK-1482/TASK-1586.
-- Access / capability: lectura propia; deep link admin condicionado por entitlement.
+- Access / capability: lectura propia; el deep link admin no concede ni transporta capability y Greenhouse
+  revalida acceso obligatoriamente.
 - States to implement: healthy, low, blocked, no-policy, partial/stale, daily fence, permission/error.
 
 ### GVC scenario plan
@@ -191,7 +193,7 @@ Contrato detallado:
 - Route: `/producer`
 - Viewports: `1440x1000|390x844`
 - Quality profile: `premium`
-- Required steps: abrir popover, navegar teclado, verificar deep link cuando corresponde.
+- Required steps: abrir popover, navegar teclado y verificar que el deep link no transporte authority.
 - Required captures: todos los estados del inventory.
 - Required `data-capture` markers: trigger, effective, period-cap, funding, ledger, fence, blocker/action.
 - Assertions: cifra primaria effective, zero-math, no admin actions, redaction.
@@ -224,8 +226,9 @@ Contrato detallado:
 ## Backend/Data Contract
 
 - Backend impact sigue siendo `none`: esta task no crea schema, migration, reader, command, OAuth scope ni
-  capability. `CreditCapacitySelfStatusV1` y su adapter BFF son entregables de TASK-1482/TASK-1586.
-- La implementación UI sólo consume el DTO browser-safe ya aceptado por esas tasks. Si el DTO no existe o no pasa
+  capability. TASK-1482 entrega el snapshot; `CreditCapacitySelfStatusV1` y su adapter BFF son entregables target
+  de TASK-1586 y todavía no están live.
+- La implementación UI sólo consume ese DTO browser-safe cuando TASK-1586 lo entregue. Si no existe o no pasa
   conformance reader↔reserve, TASK-1628 permanece bloqueada y no introduce un fallback local.
 - No se agregan write paths, secretos, cookies exportadas, queries directas ni derivaciones de autoridad en el
   cliente.
@@ -241,12 +244,12 @@ Contrato detallado:
    contexto histórico/contable secundario.
 3. Extender `CreditsPopover` dentro de `ProducerHeader.tsx` con filas separadas para período
    (`spent|held|cap|remaining`), funding vigente, ledger y daily fence.
-4. Resolver la acción recomendada desde el reason tipado. La única navegación administrativa es el deep link a
-   Greenhouse y sólo se renderiza cuando la sesión proyecta el entitlement correspondiente.
+4. La única navegación administrativa es un deep link no autorizante a Greenhouse para el rollout interno. No
+   transporta tokens/authority ni depende de un boolean inventado en Globe; Greenhouse revalida acceso al entrar.
 5. Reusar la transición CSS existente del popover con tokens del payload, apertura inmediata bajo reduced motion,
    foco restaurado y cero count-up/donut animado.
-6. Validar los estados definidos en wireframe/flow/motion con fixtures, GVC premium desktop/mobile y una lectura
-   real en Chrome autenticado antes de habilitar el cutover interno.
+6. Validar primero estados con fixtures deterministas y GVC premium desktop/mobile; después ejecutar un canary
+   live con la sesión Chrome autenticada indicada por el operador antes del cutover interno.
 
 ## Scope
 
@@ -259,7 +262,7 @@ Contrato detallado:
 
 - Cifra primaria effective available y estado semántico.
 - Descomposición ledger, cap/spent/held, funding y daily fence.
-- Reason + recommended action; deep link a `/admin/globe/credits` sólo con entitlement.
+- Reason tipado; deep link no autorizante a `/admin/globe/credits`, con revalidación en destino.
 
 ### Slice 3 — Visual/runtime evidence
 
@@ -287,7 +290,8 @@ Slice 1 → Slice 2 → Slice 3. Self-status debe pasar conformance antes de cam
 - Feature flags / cutover: usar gate/canary del payload Producer existente; no abrir admin writes.
 - Rollback: revert UI/adaptor y volver al estado neutro, nunca al saldo histórico como “disponible”.
 - Production verification: local → GVC → internal canary → release gobernado si corresponde.
-- Out-of-band coordination required: none; browser testing usa Chrome autenticado del perfil indicado por el operador.
+- Out-of-band coordination required: el scenario determinista no depende de perfil; el canary live usa
+  exclusivamente la sesión Chrome autenticada indicada por el operador.
 
 <!-- ZONE 4 — VERIFICATION & CLOSING -->
 
@@ -298,11 +302,12 @@ Slice 1 → Slice 2 → Slice 3. Self-status debe pasar conformance antes de cam
 - [ ] La cifra primaria es effective available; ledger histórico se muestra sólo como dimensión secundaria.
 - [ ] Cap/spent/held, funding y daily fence aparecen separados y con razones tipadas.
 - [ ] `partial|stale|unknown` nunca se convierte en cero ni en estado healthy.
-- [ ] No existe command/CTA de fondeo en Globe; deep link Greenhouse sólo aparece con entitlement.
+- [ ] No existe command/CTA de fondeo en Globe; el deep link no transporta authority y Greenhouse revalida acceso.
 - [ ] El browser no calcula cap, remaining, funding eligibility ni effective available.
 - [ ] Loading, healthy, low, blocked, no-policy, expired, partial/stale, permission y error están cubiertos.
 - [ ] Keyboard, focus restore, reduced motion y 390 px sin overflow pasan.
-- [ ] GVC desktop/mobile y canary real usan la sesión Chrome autenticada indicada por el operador.
+- [ ] GVC desktop/mobile usa fixtures deterministas sin perfil; el canary live usa exclusivamente la sesión
+  Chrome autenticada indicada por el operador.
 
 ## Verification
 

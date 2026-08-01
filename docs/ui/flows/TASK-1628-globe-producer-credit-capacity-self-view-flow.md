@@ -7,7 +7,8 @@
 3. El usuario abre el popover con mouse o teclado.
 4. El popover descompone período, spent/held/cap, funding, ledger y daily fence.
 5. Si existe blocker, muestra reason + recommended action tipadas.
-6. Si el actor tiene entitlement administrativo, el CTA navega a Greenhouse `/admin/globe/credits`.
+6. En el rollout interno, el CTA navega a Greenhouse `/admin/globe/credits` sin transportar authority;
+   Greenhouse revalida sesión/entitlement al entrar y muestra su estado de acceso canónico.
 7. Escape/click-away cierra y restaura foco al trigger.
 
 ## Degraded and recovery

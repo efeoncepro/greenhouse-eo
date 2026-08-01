@@ -2,7 +2,7 @@
 
 ## Meta
 
-- Status: `ready-for-implementation`.
+- Status: `motion-contract-ready; runtime-blocked`.
 - Owner task: `TASK-1628 — Globe Producer Credit Capacity Self-View`.
 - Related wireframe: `docs/ui/wireframes/TASK-1628-globe-producer-credit-capacity-self-view.md`.
 - Related flow: `docs/ui/flows/TASK-1628-globe-producer-credit-capacity-self-view-flow.md`.
@@ -29,7 +29,7 @@ paralelos: todos salen de los tokens vigentes del payload React/Tailwind.
 | Popover | open/close | transición anclada existente, opacity/transform | sí |
 | Skeleton → status | read settle | reemplazo estable sin animar el número desde cero | sí |
 | Cambio de reason | refresh con nuevo estado | actualización inline; `aria-live=polite` sólo al asentarse | sí |
-| CTA Greenhouse | hover/focus | feedback estándar del control existente | si hay entitlement |
+| CTA Greenhouse | hover/focus | feedback estándar del control existente | rollout interno; no autorizante |
 
 ## Transition Specs
 
@@ -66,4 +66,5 @@ paralelos: todos salen de los tokens vigentes del payload React/Tailwind.
 - Viewports: `1440x1000` y `390x844` con `qualityProfile: premium`.
 - Capturas: closed/open, keyboard focus, loading→healthy, effective-zero con ledger positivo, stale/partial y error.
 - Reduced-motion: verificar apertura inmediata, foco restaurado, texto/status íntegros y ausencia de count-up.
-- Browser: exclusivamente la sesión Chrome autenticada anclada al perfil indicado por el operador.
+- Fixture evidence: scenario determinista sin hardcodear/leer perfiles; live canary exclusivamente con la sesión
+  Chrome autenticada indicada por el operador.
