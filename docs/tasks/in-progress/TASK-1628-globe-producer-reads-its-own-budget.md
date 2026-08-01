@@ -17,7 +17,7 @@
 - Motion: `docs/ui/motion/TASK-1628-globe-producer-credit-capacity-self-view-motion.md`
 - Backend impact: `contract-extension`
 - Epic: `EPIC-028`
-- Status real: `Reader/proyección self-status code-complete en Globe main; implementación UI y rollout coordinado activos`
+- Status real: `Self-view desplegado en Globe main y verificado live; cierre GVC de estados todavía en curso`
 - Rank: `next.6`
 - Domain: `creative|ui|finance`
 - Blocked by: `none`
@@ -66,8 +66,8 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `docs/tasks/in-progress/TASK-1482-globe-credit-pools-grants-budget-administration.md`
-- `docs/tasks/in-progress/TASK-1586-globe-credit-denial-disambiguator-operator.md`
+- `docs/tasks/complete/TASK-1482-globe-credit-pools-grants-budget-administration.md`
+- `docs/tasks/complete/TASK-1586-globe-credit-denial-disambiguator-operator.md`
 - `docs/tasks/in-progress/TASK-1483-globe-credits-operations-workbench.md`
 - `docs/tasks/in-progress/TASK-1559-globe-client-feed-viewer-search-arrivals.md`
 

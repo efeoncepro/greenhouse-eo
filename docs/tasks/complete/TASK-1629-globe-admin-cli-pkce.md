@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `OAuth/API/CLI y carril browser one-shot code-complete local; migración/deploy/smoke real pendientes`
+- Status real: `Completa: browser one-shot y CLI OAuth PKCE verificados live`
 - Rank: `next.4`
 - Domain: `platform|identity|finance|globe`
 - Blocked by: `none`
@@ -369,9 +369,9 @@ Sin flag global: el cliente OAuth no existe hasta registrarlo y puede suspenders
 - [x] Los comentarios, errores y manuales dejan de presentar `confirmante ≠ proponente` como invariante universal.
 - [x] El contrato y guard de Globe describen “usuario autenticado” y no “humano”; principals de servicio siguen
   fallando cerrados y la evidencia conserva `actor_auth_mode`.
-- [ ] Migración, seed OAuth, deploy y smoke PKCE con Chrome autenticado prueban el carril en staging.
+- [x] Migración, seed OAuth, deploy y smoke PKCE con Chrome autenticado prueban el carril en staging.
 
-### Checkpoint 2026-08-01 — paridad browser sin OAuth ficticio
+### Checkpoint histórico supersedido 2026-08-01 — paridad browser sin OAuth ficticio
 
 - Se generalizaron authority/execution a `executor_channel = oauth|browser` sin crear otra tabla de autoridad ni
   otro lifecycle. El fingerprint y el trigger ligan canal, client, usuario, auth mode y evidencia.
@@ -389,15 +389,23 @@ Sin flag global: el cliente OAuth no existe hasta registrarlo y puede suspenders
 
 - Evaluar refresh token en Keychain sólo si la frecuencia operativa lo justifica.
 
-## Delta 2026-08-01 — PR integrado; cierre rebaselinado por TASK-1630
+## Delta 2026-08-01 — evidencia live final
+
+- Migraciones TASK-1586/TASK-1629 aplicadas y readback sin pendientes.
+- Cliente público `greenhouse-admin-cli` activo; seed repetido idempotentemente, sin imprimir secretos.
+- Browser one-shot completó la operación `23db5b0e-89dd-4661-9b8d-c12f9be4ad7a` con 800 efectivos.
+- CLI `status` completó Authorization Code + PKCE S256 por loopback usando Chrome autenticado y leyó
+  `ready`, `allowed=true`, efectivos 800, cap/remaining 1500 y cero blockers. No persistió token ni cookie.
+
+## Delta histórico supersedido 2026-08-01 — PR integrado; cierre rebaselinado por TASK-1630
 
 PR `#176` fue mergeada a `develop` en `626eda751`. Quedaron integrados OAuth public client + PKCE, API Platform,
 CLI tipado, provenance `actor_auth_mode`, policy de agent-confirm y terminalización local
 `completed|confirm_failed`. La etiqueta histórica `TASK-1616` permanece únicamente en nombres de migraciones ya
 aplicadas; el owner vigente es TASK-1629.
 
-La task no cierra todavía: el control plane necesita readers de operación, recuperación ante timeout, preview
-puro y la fachada `ensure-funded` coordinada por TASK-1630. El requisito del operador queda explícito: en el
+En ese checkpoint la task todavía no cerraba: el control plane necesitaba readers de operación, recuperación ante timeout, preview
+puro y la fachada `ensure-funded` coordinada por TASK-1630. El requisito del operador quedó explícito: en el
 workspace owner-operated, una instrucción atribuida del CEO permite que el mismo usuario agente autenticado
 complete `preview → propose → confirm → readback`; el segundo actor sólo se exige cuando una policy del
 workspace/umbral lo activa.
@@ -411,3 +419,12 @@ workspace/umbral lo activa.
 - Ejecutar `pnpm qa:gates --changed`, `pnpm docs:closure-check` y `pnpm docs:context-check:strict`.
 - Limpiar únicamente los snapshots temporales creados para esta recuperación después de preservar branch/commits.
 - No crear ni usar worktrees aislados para esta task.
+
+## Delta 2026-08-01 — cierre live dominante
+
+Los checkpoints que indicaban migración, deploy, readers o smoke pendientes quedan supersedidos. La migración y
+el seed OAuth están aplicados; el cliente público `greenhouse-admin-cli` está activo; el browser one-shot completó
+la operación `23db5b0e-89dd-4661-9b8d-c12f9be4ad7a`; y el CLI completó Authorization Code + PKCE S256 mediante
+loopback con Chrome autenticado para leer `ready`, `allowed=true`, 800 efectivos, cap/remaining 1500 y cero
+blockers. El posible uso futuro de Keychain es un follow-up no bloqueante. Evidencia:
+`docs/operations/creative-studio/evidence/2026-08-01/README.md`.

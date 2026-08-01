@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -21,11 +21,11 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Implementación local iniciada sobre snapshot V2, settlement V1 y expiry reconciliada; rollout depende de migraciones/deploy`
-- Rank: `next.3`
+- Status real: `Readers, recovery y worker de expiry desplegados y verificados live; dos holds históricos submission_unknown permanecen diferidos para reconciliación explícita, sin liberación ciega`
+- Rank: `done`
 - Domain: `platform`
 - Blocked by: `none`
-- Branch: `develop`
+- Branch: `Globe main | Greenhouse develop`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -331,19 +331,19 @@ redactados independientes; nunca se flipea el const compartido que también cubr
 
 ## Acceptance Criteria
 
-- [ ] Con sesión humana o agente autorizada, sin impersonación/break-glass, se lee status y razón vigente.
-- [ ] La respuesta es curada: lista explícita de campos, cero prosa cruda de Globe, cero campos no
+- [x] Con sesión humana o agente autorizada, sin impersonación/break-glass, se lee status y razón vigente.
+- [x] La respuesta es curada: lista explícita de campos, cero prosa cruda de Globe, cero campos no
   autorizados; nunca alcanzable por roles `client_*`.
-- [ ] Los valores calzan con el snapshot de TASK-1482 y con reserve en conformance; los DTOs legacy incorrectos no
+- [x] Los valores calzan con el snapshot de TASK-1482 y con reserve en conformance; los DTOs legacy incorrectos no
   son source of truth.
-- [ ] `periodKey`, timezone, `[start,end)`, cap/spent/held/remaining, funding eligible, ledger histórico,
+- [x] `periodKey`, timezone, `[start,end)`, cap/spent/held/remaining, funding eligible, ledger histórico,
   effective available, blockers, coverage y freshness tienen semántica explícita.
-- [ ] Operations list/get/reconcile permite atribuir y recuperar cada propuesta stale/ambigua sin retry ciego.
-- [ ] Producer self-status está redactado y no expone authority/admin internals.
-- [ ] El grant OAuth humano de Globe NO cambió (o, si cambió, fue con el rollout de 3 pasos de
+- [x] Operations list/get/reconcile permite atribuir y recuperar cada propuesta stale/ambigua sin retry ciego.
+- [x] Producer self-status está redactado y no expone authority/admin internals.
+- [x] El grant OAuth humano de Globe NO cambió (o, si cambió, fue con el rollout de 3 pasos de
   ADR-010 con login verificado entre pasos).
-- [ ] `ISSUE-124` movida a resolved con su delta de cierre y verificación.
-- [ ] Manual del carril con la sección de diagnóstico (tabla razón→acción).
+- [x] `ISSUE-124` movida a resolved con su delta de cierre y verificación.
+- [x] Manual del carril con la sección de diagnóstico (tabla razón→acción).
 
 ## Verification
 
@@ -354,13 +354,13 @@ redactados independientes; nunca se flipea el const compartido que también cubr
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] `ISSUE-124` cerrada (delta + move + README de issues)
+- [x] `Lifecycle` del markdown quedó sincronizado con el estado real
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress` o `complete`)
+- [x] `docs/tasks/README.md` quedó sincronizado con el cierre
+- [x] `Handoff.md` quedó actualizado con rollout, evidencia y deuda explícita
+- [x] `changelog.md` quedó actualizado con el comportamiento operativo
+- [x] se ejecutó chequeo de impacto cruzado sobre las tasks afectadas
+- [x] `ISSUE-124` cerrada (delta + move + README de issues)
 
 ## Follow-ups
 
@@ -374,7 +374,7 @@ La auditoría invalidó la premisa de “sólo exponer dos readers”: ambos div
 ahora el read/recovery plane Greenhouse y queda bloqueada por el snapshot/evaluator de TASK-1482. También publica
 la proyección self-status que consume TASK-1628, sin abrir los DTOs administrativos al Producer.
 
-## Checkpoint de inicio 2026-08-01
+## Checkpoint histórico de inicio 2026-08-01 — supersedido
 
 - El bloqueo de implementación local quedó resuelto sin falsear las tasks predecesoras como completas:
   `CreditDecisionSnapshotV2`, la policy `studio-credits-settlement-v1` y expiry reconciliada ya están
@@ -385,7 +385,7 @@ la proyección self-status que consume TASK-1628, sin abrir los DTOs administrat
 - Preflight autorizado para checkout compartido `develop` y subagentes; no usar worktrees. Globe conserva
   `main` como rama predeterminada y de release.
 
-## Checkpoint de implementación local 2026-08-01
+## Checkpoint histórico de implementación local 2026-08-01 — supersedido
 
 - Globe ya publica `CreditCapacityStatusV1` y `CreditCapacitySelfStatusV1` desde el mismo evaluator/facts que
   `reserveCredits`. El estado administrativo separa ledger histórico de capacidad efectiva; cuando la política
@@ -405,3 +405,25 @@ la proyección self-status que consume TASK-1628, sin abrir los DTOs administrat
   en el checkpoint de commit.
 - Estado honesto: `code complete, rollout pendiente`. No se aplicaron 0043/0044/0045, no hubo deploy, push,
   release, fondeo ni smoke live. Producer self-status continúa `policy-blocked` hasta TASK-1628.
+
+## Delta final dominante 2026-08-01 — operación live
+
+- Globe opera en `main`; Greenhouse en `develop`. Migraciones `0043`–`0045`, readers, status, preview,
+  operations list/get/reconcile, receipts y self-status están desplegados y probados contra el workspace
+  `greenhouse-org:efeonce`. ISSUE-124 está `resolved`.
+- La operación de fondeo `23db5b0e-89dd-4661-9b8d-c12f9be4ad7a` terminó `completed`: capacidad efectiva
+  `0 → 800`, grant 800, cap 1500 y pool `internal-month:2026-08`. Workbench Greenhouse, CLI OAuth PKCE y
+  Producer leyeron los mismos 800 créditos y cero blockers.
+- El worker de expiry quedó activo con scheduler minutely, claim bounded, lease/fencing, resumen estructurado y
+  métrica de antigüedad. El canary `globe-producer-worker-fmspk` reclamó dos holds vencidos:
+  `claimed=2`, `reconciliationRequested=2`, `deferred=2`, `failed=0`.
+- El fallo inicial era least-privilege incompleto: faltaban únicamente `SELECT` e `INSERT` sobre
+  `globe.governed_run_control_commands`. El workflow `30717172080` aplicó y leyó de vuelta el contrato exacto;
+  no se concedieron roles amplios ni membresía de owner.
+- Los dos casos históricos son runs `submission_unknown` sin `providerOperationId` y con resultado de envío
+  desconocido. Permanecen diferidos y observables bajo TASK-1630; no se expiraron ni liberaron a la fuerza.
+  Esto es recuperación fail-closed, no un fallo del carril live nuevo.
+- El corte final usa Globe `main@e369ef8`, código worker/grants `d3fe90e`, deploy `30717266572` y digest
+  `sha256:d8295862dc12c14427e90e0bb413577802916c37ca6bf32c202680492ca7bae9`. El scheduler `lmb2r` repitió
+  `claimed=2`, `reconciliationRequested=2`, `deferred=2`, `failed=0` sobre ese digest; OpenTofu terminó
+  `No changes`, exit 0.

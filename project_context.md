@@ -30,10 +30,14 @@ público + PKCE (`TASK-1629`; los archivos de migración conservan la etiqueta h
 contradicción de presupuesto, el primer acto es read-only: reconciliar propuesta, pool, grant, policy efectiva,
 availability/evaluate, balance, usage, ledger e intents append-only para el mismo workspace/período. `propose`
 también crea estado durable; no se ejecuta durante discovery ni se fondea cuando los readers prueban suficiencia.
-`TASK-1630` gobierna la convergencia del control plane y aprueba como target que una instrucción explícita y
-atribuida del CEO autorice una operación acotada para el mismo agente autenticado cuando la policy no exige
-segundo confirmante. Ese one-shot todavía no está live: hoy el agente confirma sólo bajo delegación persistente,
-con límites versionados, vigencia y revocación; workloads nunca confirman.
+`TASK-1630` gobierna la convergencia del control plane. Para el workspace interno, una instrucción explícita y
+atribuida del CEO ya autoriza una operación one-shot acotada para el mismo usuario/agente autenticado cuando la
+policy no exige segundo confirmante. UI browser y OAuth PKCE/CLI comparten la misma authority state machine;
+Globe deriva el ciclo UTC y crea o reutiliza el pool mensual determinístico dentro de la transacción económica.
+La operación live del 2026-08-01 dejó 800 efectivos sobre cap 1500. Workloads nunca confirman y clientes externos
+siguen gated. El worker minutely de expiry sólo libera reservations cuando existe evidencia terminal; un
+`submission_unknown` sin `providerOperationId` permanece diferido y observable. Nunca se fuerza su liberación
+para limpiar una métrica o fabricar capacidad.
 
 ### Lectura mínima obligatoria
 

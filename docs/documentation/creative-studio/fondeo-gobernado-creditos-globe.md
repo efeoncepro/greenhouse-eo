@@ -1,7 +1,7 @@
 # Fondeo gobernado de créditos de Globe — cómo se le pone presupuesto al mes
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-07-26 por Claude (TASK-1566)
 > **Ultima actualizacion:** 2026-08-01 por Codex (TASK-1630)
 > **Documentacion tecnica:** [ADR-015](../../architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md)
@@ -75,16 +75,26 @@ TASK-1630 distingue dos formas de autoridad agente:
 - **Delegación persistente:** sirve para operación rutinaria y queda versionada, revocable y limitada por
   workspace, período, monto por operación/acumulado, cap, vigencia y cantidad de ejecuciones.
 
-TASK-1629 ya deja code-complete la autoridad one-shot, los readers `status/list/get/reconcile`, la selección
+TASK-1629 desplegó y verificó live la autoridad one-shot, los readers `status/list/get/reconcile`, la selección
 automática del ciclo y la fachada `ensure`. Hay dos adaptadores sobre la misma state machine y el mismo ledger:
 
 - `browser`: la sesión humana de Greenhouse emite y ejecuta inmediatamente una operación exacta desde
   `/admin/globe/credits`, sin fabricar OAuth ni pedir un segundo operador;
 - `oauth`: API/CLI/agente ejecutan con un cliente OAuth activo y evidencia renovable del bearer.
 
-Ambos ligan usuario, workspace, client, modo de autenticación, fingerprint y límites. El código todavía requiere
-migración, configuración, deploy y smoke staging/live; hasta entonces una instrucción en texto no es por sí sola
-una credencial de runtime y la capacidad no se considera operativa.
+Ambos ligan usuario, workspace, client, modo de autenticación, fingerprint y límites. Desde el 2026-08-01 el
+carril está operativo para el workspace interno: las migraciones están aplicadas, el cliente OAuth está activo,
+Greenhouse `develop` y Globe `main` están desplegados, y UI + API/CLI + Producer pasaron smoke autenticado.
+
+El ciclo mensual ya no exige que el operador conozca un `poolId`. `ensure` deriva el mes UTC y, dentro de la
+misma transacción del grant, crea o reutiliza `internal-month:AAAA-MM`. Un pool determinístico pausado, cerrado o
+incompatible falla cerrado; no se fabrica un reemplazo para evadir el kill switch. Esta excepción es sólo del
+carril interno acotado y no debilita el maker-checker de la administración genérica de pools.
+
+La prueba live fijó objetivo 800, grant máximo 1000 y cap máximo 1500. La operación
+`23db5b0e-89dd-4661-9b8d-c12f9be4ad7a` terminó `completed`: capacidad efectiva `0 → 800`, pool
+`internal-month:2026-08`, un grant, una allocation y readback coincidente en Greenhouse, CLI PKCE y Producer.
+No habilita clientes externos ni fondeo comercial; ambos continúan gated.
 
 > Detalle técnico: comandos `globe.credits.month.fund.propose` / `.confirm` (surface
 > `sister-platform`), dominio en `efeonce-globe/packages/domain/src/credit-funding.ts`, rutas en

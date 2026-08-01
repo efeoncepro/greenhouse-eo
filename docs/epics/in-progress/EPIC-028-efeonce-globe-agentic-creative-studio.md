@@ -493,6 +493,14 @@ agente autenticado para completar `preview → propose → confirm → readback`
 `requireSecondConfirmer` es policy opcional por workspace/umbral y permanece OFF en
 `greenhouse-org:efeonce`; un workload genérico nunca confirma y un agente no puede ampliar su propia delegación.
 
+El corte live del 2026-08-01 retira el blocker operativo de fondeo interno: operación
+`23db5b0e-89dd-4661-9b8d-c12f9be4ad7a`, 800 efectivos, cap 1500, pool `internal-month:2026-08`, readback
+coincidente en Greenhouse, CLI OAuth PKCE y Producer. ISSUE-124 está resuelta. El epic permanece `in-progress`
+por su alcance comercial/modelos externo; TASK-1483/TASK-1628 conservan QA visual exhaustivo y
+TASK-1468/TASK-1579 receipts/calibración más amplia, sin volver a bloquear el carril interno.
+TASK-1586 cerró además el worker de expiry/recovery: el scheduler live reconcilia y difiere outcomes desconocidos
+sin liberar holds a ciegas; dos casos históricos sin `providerOperationId` permanecen visibles bajo TASK-1630.
+
 ## Delta 2026-07-19 — TASK-1458 complete (Golden Briefs & Evaluation Harness)
 
 `TASK-1458` quedó **complete** (fake canary), sumándose a `TASK-1481` (spine), `TASK-1457` (Model Lab) y

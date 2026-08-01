@@ -64,7 +64,8 @@ El mismo request con source/idempotency nuevos debe devolver `200` y producir ex
 
 ## Estado
 
-open — **causa de la ambigüedad identificada y con dueño (2026-07-26)**. La mitad de diagnóstico la cierra el Slice 1 de `TASK-1566`; la pregunta del guard de "un solo grant activo" sigue abierta y se vuelve contestable con ese slice.
+resolved — 2026-08-01. TASK-1586 expone status/preview/list/get/reconcile al operador; TASK-1482 unificó el
+snapshot con reserve y eliminó la dependencia circular del rollover; TASK-1629 entrega UI browser y OAuth PKCE.
 
 ## Relacionado
 
@@ -79,6 +80,16 @@ La fase de negación server-side existe y está desplegada (`CreditDenialPhaseV1
 ningún `conflict` del store sale sin fase declarada, y el carril de fondeo gobernado
 (`propose`/`confirm`) corrió end-to-end el 2026-07-26.
 
-**Lo que mantiene este issue abierto** es la mitad operativa: que el OPERADOR, con su sesión, pueda
-leer la razón vigente sin impersonar el workload caller. Eso es `TASK-1586` (ADR-015 Slice F: rutas
-broker para `budget.evaluate` + `budget.availability.get`). Este issue se cierra con esa task.
+**La mitad operativa quedó cerrada el 2026-08-01.** El operador puede leer la razón vigente sin impersonar el
+workload caller mediante TASK-1586; UI browser y CLI OAuth PKCE consumen los mismos readers.
+
+### Delta 2026-08-01 — cierre con evidencia live
+
+- La operación `23db5b0e-89dd-4661-9b8d-c12f9be4ad7a` terminó `completed` con source e idempotencia nuevas y
+  produjo exactamente un grant y una allocation.
+- Greenhouse mostró estado, operación y cero blockers sin SQL; CLI PKCE leyó `ready`, efectivos 800 y cap 1500;
+  Producer confirmó la misma capacidad redactada.
+- La primera ejecución del rollover, antes del fix, quedó durable como 409 sin efecto económico. Después de
+  `649eb08` el mismo objetivo mensual resolvió un pool determinístico y completó. Replay, fingerprint y
+  concurrencia mantienen 409 estable y cero duplicación en la suite.
+- Evidencia: `docs/operations/creative-studio/evidence/2026-08-01/README.md`.

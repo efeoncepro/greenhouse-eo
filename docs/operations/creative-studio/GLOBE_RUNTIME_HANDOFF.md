@@ -5,10 +5,10 @@
 > conserva sólo el estado mutable, los riesgos abiertos y el siguiente paso. La historia anterior
 > permanece auditable en el git log y en las tasks/ADRs enlazadas.
 >
-> **Corte verificado:** 2026-08-01 · Globe `main`
-> `001ce1b7da9cb896ecfbc32ea3b64a99f8e2fdfc` (incluye PR `#82` y el reader MCP de PR `#84`).
-> Migraciones hasta `0042` aplicadas; API interna `globe-api-internal-00179-qcz` al 100%, producer
-> worker y Asset Governance desplegados. Studio no se desplegó para TASK-1614.
+> **Corte verificado:** 2026-08-01 · Globe `main@e369ef8`. El fondeo mensual live fue verificado sobre
+> `649eb08`; migraciones hasta `0045`, API y Studio están aplicados. El worker de expiry/recovery usa código
+> `d3fe90e`, digest `sha256:d8295862dc12c14427e90e0bb413577802916c37ca6bf32c202680492ca7bae9`,
+> deploy `30717266572` y baseline IaC `e369ef8` sin drift.
 
 ## Estado activo
 
@@ -149,9 +149,10 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
 - Playwright verificó el candidato retenido (`readyState=4`, duración 5,06195 s, reproducción 0→1,738 s, sin
   error) y la selección exacta **Video → Movimiento/control cámara → Seedance 2.0**. La generación final nueva no se
   ejecutó porque el composer muestra presupuesto de agosto `0 / 0`.
-- Contradicción pendiente: balance live `available=500836`; usage agosto `allocated=0`, `spent=0`; fondeo
-  durable anterior `+500`, cap `800→1500`, disponible `836`. No ejecutar otro fondeo hasta reconciliar policy,
-  grants, budget y período por readers canónicos.
+- Contradicción resuelta por los readers canónicos de TASK-1482/TASK-1586 y el self-view de TASK-1628. El
+  `available` histórico es una dimensión del ledger y no la capacidad del período. El fondeo live de agosto dejó
+  `effectiveAvailable=800`, cap/remaining `1500`, spent/held `0`, una fuente vigente y pool
+  `internal-month:2026-08`.
 - Identidad Google/Chrome: `jreyes@efeonce.cl`. Identidad Greenhouse verificada:
   `jreyes@efeoncepro.com` / `user-efeonce-admin-julio-reyes`. Los intentos fallidos de OAuth y adapter no
   crearon propuesta, grant, run ni gasto.
@@ -164,15 +165,38 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
   `TASK-1578`.
 - Gemini Omni continúa sólo en Model Lab para su ruta gobernada; no extrapoles la promoción de
   Vertex imagen a Interactions video.
-- TASK-1614 permanece `in-progress` sólo por el canary de una pieza nueva. Antes de mutar presupuesto se debe
-  explicar la divergencia entre fondeo durable, balance, usage agosto y el `0 / 0` visible. No asumir saldo Fal,
-  ausencia de grant ni UI stale sin reader.
+- TASK-1614 permanece `in-progress` sólo por el canary de una pieza nueva. El blocker de créditos fue retirado:
+  Producer muestra 800 efectivos y su reader separa ledger, período, funding y daily fence.
 - La identidad temporal usada para consumo privado de AXIS debe sustituirse por una identidad de
   máquina antes del rollout externo; no recrees el secreto legacy de Globe.
 - El cliente Entra interno del gateway MCP recibe hoy ambos scopes aun cuando solicita el base. Antes de acceso
   B2B debe existir entitlement por tenant/capability y una identidad base-only que pruebe la denegación de Globe.
 
 ## Checkpoint de ejecución — Studio Credits enterprise (2026-08-01)
+
+> **Actualización dominante 19:34 UTC:** los párrafos históricos de este checkpoint que dicen “local”, “sin
+> migración”, “sin deploy” o describen Globe `develop` quedaron supersedidos por el corte siguiente. Se preservan
+> únicamente como trazabilidad del orden de ejecución.
+
+- Globe usa únicamente `main`; Greenhouse usa `develop`; ambos conservan un solo checkout y cero worktrees
+  aislados.
+- Migraciones Globe `0043`–`0045` y Greenhouse TASK-1586/TASK-1629 están aplicadas con readback limpio. El cliente
+  público `greenhouse-admin-cli` está activo y el CLI OAuth PKCE completó loopback desde Chrome autenticado.
+- Operación live `23db5b0e-89dd-4661-9b8d-c12f9be4ad7a`: target 800, grant 800, cap 1500, pool determinístico
+  `internal-month:2026-08`, estado `completed`, capacidad efectiva `0 → 800`, un grant y una allocation.
+- Greenhouse `/admin/globe/credits`, CLI `status` y Globe Producer leyeron 800 efectivos, funding 800, cap y
+  remaining 1500, spent/held 0 y cero blockers. Evidencia:
+  [`evidence/2026-08-01/README.md`](evidence/2026-08-01/README.md).
+- El rollover ya crea o reutiliza el pool mensual dentro de la misma transacción que grant, allocation y policy;
+  un pool pausado/cerrado/incompatible falla cerrado. Fix Globe `649eb08`, CI `30714494242`, deploy API
+  `30714686669`, deploy Studio `30714686697`.
+- TASK-1629 queda probado por ambos canales: browser one-shot y OAuth PKCE/API/CLI. TASK-1482 no conserva blocker
+  runtime propio. TASK-1468/TASK-1579 conservan únicamente sus gaps más amplios de lifecycle/calibración; el
+  rollout de expiry quedó activo. Scheduler `lmb2r` reportó `claimed=2`, `reconciliationRequested=2`,
+  `deferred=2`, `failed=0`; canary `j8nnw` terminó sobre el mismo digest.
+- Los dos holds antiguos son `submission_unknown` sin `providerOperationId`. Permanecen diferidos bajo
+  TASK-1630 y sostienen la métrica de edad; resolverlos exige evidencia autoritativa o decisión Finance, nunca
+  force-release. TASK-1586 está `complete` porque el recovery plane y worker operan correctamente.
 
 - Goal activo: completar TASK-1482 → TASK-1468+1579 → TASK-1586 → TASK-1629 → TASK-1483 → TASK-1628 con
   migraciones, runtime, observabilidad, runbooks y evidencia local/staging/live; no basta código ni documentación.
@@ -232,11 +256,13 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
 
 ## Siguiente paso ejecutable
 
-1. `TASK-1630` ya quedó formalizada. Ejecutar primero `TASK-1482` para período/funding/decisión y
-   `ensure-funded`; luego cerrar TASK-1468 + TASK-1579 para holds, expiry, actual y settlement. No fondear,
-   desplegar ni usar SQL como sustituto del status autoritativo.
-2. Ejecutar TASK-1586: Globe entrega lifecycle/list/get/reconcile/receipts; Greenhouse sólo une intents y publica
-   proyecciones. Después TASK-1629 agrega autoridad one-shot y adapters CLI/API one-command/readback.
+1. Cerrar la matriz GVC autenticada y estados exhaustivos de TASK-1483/TASK-1628 en desktop y 390 px, sin
+   reabrir el diseño económico ni duplicar math en el cliente.
+2. Reconciliar los dos outcomes históricos sólo con evidencia de provider/receipt o procedimiento Finance
+   explícito; mantenerlos diferidos mientras la autoridad siga incompleta.
+3. Completar receipts/calibración de TASK-1468/TASK-1579 y la decisión Finance sobre los 500.000 históricos.
+4. Mantener MCP write gated hasta contar con identidad agente propagada, scopes y conformance equivalentes.
+5. TASK-1614 ya no está bloqueada por créditos; ejecutar su canary nuevo desde Producer cuando corresponda.
 3. Sólo entonces reconciliar propuestas ambiguas por primitives canónicas. La instrucción explícita del CEO es
    autoridad objetivo pendiente; el segundo confirmador permanece policy opcional, OFF para owner-operated.
 4. Con presupuesto admitido y evidencia terminal, completar el canary pendiente de `TASK-1614` exclusivamente con

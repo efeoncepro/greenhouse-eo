@@ -582,3 +582,11 @@ Esto **cierra la mitad de diagnóstico de `ISSUE-124`** y evita que el carril nu
 > Slice E (identidades disjuntas por unidad de ejecución) y el Slice D (KMS) siguen pendientes como hardening.
 > Runbook operativo: `docs/manual-de-uso/creative-studio/fondear-creditos-globe.md`; explicación funcional:
 > `docs/documentation/creative-studio/fondeo-gobernado-creditos-globe.md`.
+
+> **Delta 2026-08-01 — rollover mensual sin dependencia circular, verificado live.** La fachada acotada
+> `ensure-funded` deriva el ciclo UTC y crea o reutiliza `internal-month:AAAA-MM` dentro de la misma transacción
+> que grant, allocation, policy y terminalización. No relaja el maker-checker de los comandos genéricos de pool.
+> Un pool determinístico pausado, cerrado o semánticamente incompatible falla cerrado; no se crea otro para
+> evadir la pausa. La operación live `23db5b0e-89dd-4661-9b8d-c12f9be4ad7a` dejó 800 efectivos sobre cap 1500 y
+> tuvo readback coincidente en Greenhouse, CLI OAuth PKCE y Globe Producer. Globe trabaja y despliega desde
+> `main`; Greenhouse integra este control plane en `develop`.

@@ -17,7 +17,7 @@
 - Motion: `docs/ui/motion/TASK-1483-globe-credits-operations-workbench-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `First fold aceptado y fondeo browser one-shot conectado localmente; recovery, GVC final y rollout pendientes`
+- Status real: `Happy path y recovery desplegados; fondeo live completado, QA visual final todavía en curso`
 - Rank: `next.5`
 - Domain: `finance|creative|ui|operations`
 - Blocked by: `none`

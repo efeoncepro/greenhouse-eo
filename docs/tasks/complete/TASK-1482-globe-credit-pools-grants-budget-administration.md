@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -17,11 +17,11 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-028`
-- Status real: `Kernel administrativo existe; readers/períodos/cap math no corresponden aún con reserve y bloquean consumers`
+- Status real: `Completa: ciclo mensual, funding, policy y decisión verificados live`
 - Rank: `next.1`
 - Domain: `finance|creative|data|reliability`
 - Blocked by: `none`
-- Branch: `task/TASK-1482-globe-credit-pools-grants-budget-administration`
+- Branch: `Globe main; Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -232,23 +232,23 @@ schema/locking sin debilitar el posting único ni el enforcement transaccional.
 
 ## Acceptance Criteria
 
-- [ ] Una emisión confirmada crea exactamente un grant y una allocation; replay/concurrencia no duplican.
-- [ ] Pools/budgets nunca mantienen un saldo divergente del ledger.
-- [ ] Paused/exhausted/project-capped rechaza reserve; hold existente puede settle/release.
-- [ ] Policy/funding quedan pinneados y versiones posteriores no reescriben historia.
-- [ ] Correcciones son compensatorias con reason/evidence/maker-checker.
-- [ ] Trusted context, tenant isolation, redaction y capability denies tienen evidencia.
-- [ ] API/SDK/MCP/CLI/worker/E2E están implemented, policy-blocked o not-applicable; nunca missing.
-- [ ] No se habilitan purchased grants, expiry/rollover **comercial**, top-up automático ni clientes externos;
+- [x] Una emisión confirmada crea exactamente un grant y una allocation; replay/concurrencia no duplican.
+- [x] Pools/budgets nunca mantienen un saldo divergente del ledger.
+- [x] Paused/exhausted/project-capped rechaza reserve; hold existente puede settle/release.
+- [x] Policy/funding quedan pinneados y versiones posteriores no reescriben historia.
+- [x] Correcciones son compensatorias con reason/evidence/maker-checker.
+- [x] Trusted context, tenant isolation, redaction y capability denies tienen evidencia.
+- [x] API/SDK/MCP/CLI/worker/E2E están implemented, policy-blocked o not-applicable; nunca missing.
+- [x] No se habilitan purchased grants, expiry/rollover **comercial**, top-up automático ni clientes externos;
   el rollover operativo interno `current|next` permanece dentro del scope.
-- [ ] Mismo workspace/proyecto/instante/créditos produce la misma decisión en snapshot y reserve, salvo conflicto
+- [x] Mismo workspace/proyecto/instante/créditos produce la misma decisión en snapshot y reserve, salvo conflicto
   concurrente explícito.
-- [ ] `monthlySpent` filtra el período y `monthlyRemaining`/`projectRemaining` descuentan holds vigentes.
-- [ ] Pool/grant fuera de período, priority no elegible o capability scope incompatible falla cerrado.
-- [ ] Un rollover `current|next` puede asegurar el ciclo sin `poolId` ni fechas calculadas por el caller.
-- [ ] Dos `ensure-funded` equivalentes producen un único delta y el readback confirma pool, grant, allocation,
+- [x] `monthlySpent` filtra el período y `monthlyRemaining`/`projectRemaining` descuentan holds vigentes.
+- [x] Pool/grant fuera de período, priority no elegible o capability scope incompatible falla cerrado.
+- [x] Un rollover `current|next` puede asegurar el ciclo sin `poolId` ni fechas calculadas por el caller.
+- [x] Dos `ensure-funded` equivalentes producen un único delta y el readback confirma pool, grant, allocation,
   policy y capacidad efectiva.
-- [ ] `actual > reserved` no puede superar funding/caps sin reautorización o policy de settlement explícita.
+- [x] `actual > reserved` no puede superar funding/caps sin reautorización o policy de settlement explícita.
 
 ## Verification
 
@@ -260,9 +260,9 @@ schema/locking sin debilitar el posting único ni el enforcement transaccional.
 
 ## Closing Protocol
 
-- [ ] Registry, README, EPIC-028, changelog y Handoff sincronizados.
-- [ ] QA release auditor y documentation governor ejecutados.
-- [ ] Estado runtime y rollout declarados honestamente.
+- [x] Registry, README, EPIC-028, changelog y Handoff sincronizados.
+- [x] QA release auditor y documentation governor ejecutados.
+- [x] Estado runtime y rollout declarados honestamente.
 
 ## Follow-ups
 
@@ -279,7 +279,7 @@ La task no absorbe settlement/rating de TASK-1579, UI de TASK-1483, identidad/re
 billing de TASK-1484. El command compuesto sigue siendo gobernado `propose → confirm`; la fachada one-command
 orquesta esas fases para una sesión autorizada, no las elimina.
 
-### Progreso verificable 2026-08-01
+### Checkpoint histórico supersedido — progreso verificable 2026-08-01
 
 - Implementado localmente `CreditDecisionSnapshotV2` y un evaluator puro compartido por preview y reserve.
 - Los facts autoritativos incorporan período, funding elegible, scopes, prioridad y spent+holds para caps mensual
@@ -290,3 +290,12 @@ orquesta esas fases para una sesión autorizada, no las elimina.
 - `pnpm check && pnpm build` pasó en Globe con exit 0. La migración no se ha aplicado y no hubo deploy, fondeo,
   generación ni release. `ensure-funded` y el canary de concurrencia/runtime siguen pendientes; la task permanece
   `in-progress`.
+
+## Delta 2026-08-01 — cierre live
+
+El checkpoint local anterior queda supersedido. Las migraciones `0043`–`0045` están aplicadas; Globe `main`
+desplegó el ciclo mensual transaccional en `649eb08`. La operación
+`23db5b0e-89dd-4661-9b8d-c12f9be4ad7a` aseguró `internal-month:2026-08`, emitió un solo grant y una sola
+allocation, fijó cap 1500 y llevó capacidad efectiva de 0 a 800. Greenhouse, CLI y Producer devolvieron el mismo
+readback. CI `30714494242`, deploy API `30714686669` y deploy Studio `30714686697` quedaron verdes. Evidencia:
+`docs/operations/creative-studio/evidence/2026-08-01/README.md`.

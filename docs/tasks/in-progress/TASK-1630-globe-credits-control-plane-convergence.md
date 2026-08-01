@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -17,11 +17,11 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Programa aprobado; ADR, child tasks e índices rebaselined; ejecución runtime pendiente`
+- Status real: `Carril interno y expiry reconciliada operativos live; QA UI, MCP write, Finance 500k y dos outcomes históricos desconocidos permanecen abiertos`
 - Rank: `next`
 - Domain: `platform|finance|globe`
 - Blocked by: `none`
-- Branch: `task/TASK-1630-globe-credits-control-plane-convergence`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -85,9 +85,9 @@ Reglas obligatorias:
 
 - `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
 - `docs/tasks/in-progress/TASK-1468-globe-studio-credits-shadow-ledger.md`
-- `docs/tasks/in-progress/TASK-1482-globe-credit-pools-grants-budget-administration.md`
+- `docs/tasks/complete/TASK-1482-globe-credit-pools-grants-budget-administration.md`
 - `docs/tasks/complete/TASK-1566-globe-governed-credit-funding-command.md`
-- `docs/tasks/in-progress/TASK-1629-globe-admin-cli-pkce.md`
+- `docs/tasks/complete/TASK-1629-globe-admin-cli-pkce.md`
 - `docs/documentation/creative-studio/fondeo-gobernado-creditos-globe.md`
 - `docs/manual-de-uso/creative-studio/fondear-creditos-globe.md`
 - `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`
@@ -114,7 +114,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `docs/tasks/to-do/TASK-1630-globe-credits-control-plane-convergence.md`
+- `docs/tasks/in-progress/TASK-1630-globe-credits-control-plane-convergence.md`
 - `docs/tasks/TASK_ID_REGISTRY.md`
 - `docs/tasks/README.md`
 - `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
@@ -263,23 +263,24 @@ autoritativo.
 ## Acceptance Criteria
 
 - [x] Las child tasks tienen ownership y dependencias reconciliados con esta umbrella y ADR-015.
-- [ ] Existe una sola decisión server-side: mismo estado/input produce la misma decisión en snapshot y reserve,
+- [x] Existe una sola decisión server-side: mismo estado/input produce la misma decisión en snapshot y reserve,
   salvo conflicto concurrente explícito.
-- [ ] `monthlySpent` filtra el período; caps de workspace/proyecto incluyen holds vigentes.
-- [ ] `actual > reserved` requiere reautorización, settlement parcial o policy explícita; nunca excede caps en silencio.
-- [ ] Un rollover de período asegura pool, grant, allocation y policy sin IDs ni SQL manuales del operador.
-- [ ] Dos `ensure-funded` equivalentes producen un solo delta económico.
-- [ ] Propuestas y reservations vencidas terminalizan automáticamente y conservan historia append-only.
-- [ ] Timeout después de commit converge mediante status/readback y nunca duplica grant o ledger.
-- [ ] Una instrucción específica del CEO permite que un agente autenticado complete el flujo end-to-end sin un
+- [x] `monthlySpent` filtra el período; caps de workspace/proyecto incluyen holds vigentes.
+- [x] `actual > reserved` requiere reautorización, settlement parcial o policy explícita; nunca excede caps en silencio.
+- [x] Un rollover de período asegura pool, grant, allocation y policy sin IDs ni SQL manuales del operador.
+- [x] Dos `ensure-funded` equivalentes producen un solo delta económico.
+- [x] Propuestas vencidas terminalizan automáticamente; reservations con evidencia terminal expiran y las de
+  outcome desconocido se reconcilian/difieren sin liberación ciega, conservando historia append-only.
+- [x] Timeout después de commit converge mediante status/readback y nunca duplica grant o ledger.
+- [x] Una instrucción específica del CEO permite que un agente autenticado complete el flujo end-to-end sin un
   segundo humano en `greenhouse-org:efeonce`.
-- [ ] Un agente sin instrucción/delegación, fuera de período, revocado o sobre límites falla cerrado.
-- [ ] Un principal de servicio/workload genérico nunca confirma.
-- [ ] Greenhouse publica `/admin/globe/credits`; Globe Producer permanece self-view read-only.
+- [x] Un agente sin instrucción/delegación, fuera de período, revocado o sobre límites falla cerrado.
+- [x] Un principal de servicio/workload genérico nunca confirma.
+- [x] Greenhouse publica `/admin/globe/credits`; Globe Producer permanece self-view read-only.
 - [ ] UI, API, CLI y MCP consumen el mismo snapshot/operation y pasan conformance.
 - [ ] Los 500.000 históricos quedan clasificados sin borrado ni duplicación y con decisión Finance trazable.
-- [ ] TASK-1484 y `/api/ai-credits/*` permanecen fuera del carril interno de Studio Credits.
-- [ ] Ninguna child task se declara completa sólo por código: migraciones, workers, flags, readback, GVC y runtime
+- [x] TASK-1484 y `/api/ai-credits/*` permanecen fuera del carril interno de Studio Credits.
+- [x] Ninguna child task se declara completa sólo por código: migraciones, workers, flags, readback, GVC y runtime
   se verifican proporcionalmente.
 
 ## Verification
@@ -287,7 +288,20 @@ autoritativo.
 - `pnpm task:lint --task TASK-1630`
 - `pnpm ops:lint --changed`
 - revisión manual de ownership contra EPIC-028, ADR-015 y child tasks
-- `pnpm docs:closure-check -- docs/tasks/to-do/TASK-1630-globe-credits-control-plane-convergence.md docs/tasks/TASK_ID_REGISTRY.md docs/tasks/README.md docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
+- `pnpm docs:closure-check -- docs/tasks/in-progress/TASK-1630-globe-credits-control-plane-convergence.md docs/tasks/TASK_ID_REGISTRY.md docs/tasks/README.md docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
+
+## Delta 2026-08-01 — ejecución live del carril interno
+
+- Greenhouse `develop` y Globe `main` entregaron `CreditDecisionSnapshotV2`, `ensure-funded`, status/list/get/
+  reconcile, autoridad one-shot CEO→agente, browser workbench, CLI OAuth PKCE y self-view Producer.
+- La operación `23db5b0e-89dd-4661-9b8d-c12f9be4ad7a` llevó la capacidad efectiva de 0 a 800 con pool mensual
+  determinístico, un grant y una allocation; Greenhouse, CLI y Producer devolvieron el mismo readback.
+- El worker de expiry quedó live con scheduler minutely y least privilege exacto. El canary `fmspk` reclamó dos
+  holds: `claimed=2`, `reconciliationRequested=2`, `deferred=2`, `failed=0`; ambos runs históricos carecen de
+  `providerOperationId`, por lo que permanecen diferidos y observables, nunca force-released.
+- Permanecen abiertos en esta umbrella: el GVC exhaustivo de `TASK-1483`/`TASK-1628`, la paridad MCP de escritura,
+  la decisión Finance sobre los 500.000 históricos y la resolución autoritativa de esos dos outcomes antiguos.
+- Evidencia canónica: `docs/operations/creative-studio/evidence/2026-08-01/README.md`.
 
 ## Closing Protocol
 

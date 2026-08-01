@@ -1,39 +1,28 @@
 # Handoff activo
 
-## Studio Credits — ramas y first fold Greenhouse (2026-08-01)
+## Studio Credits — fondeo live y readback convergente (2026-08-01)
 
-- Contrato de ramas corregido por el operador: `efeonce-globe` trabaja directamente en `main` (también default,
-  integración y release); `greenhouse-eo` trabaja en `develop`. No existe una rama `develop` de trabajo para
-  Globe en este flujo. En ambos repos están prohibidos los worktrees aislados.
-- Globe fue verificado en `main`, `origin/HEAD -> origin/main`, un único worktree y ocho commits locales sin push.
-- TASK-1483 quedó `in-progress` y su first fold ya existe en `/admin/globe/credits`: doble gate de view +
-  entitlement, status y operaciones leídos desde contratos canónicos de Globe, runway sin matemática de negocio
-  en browser, estados unknown/degraded honestos, navegación y detalle seleccionable.
-- El CTA `Asegurar capacidad` ya consume localmente un carril browser one-shot: exige sesión humana, ambos
-  entitlements y workspace binding; liga issuer=executor, `browser`, `greenhouse-portal` y attestation exacta.
-  El drawer conserva la misma operation key ante retry, y sólo declara éxito con `completed|no_effect`.
-  `outcome_unknown` permanece reconciliable y no dispara un fondeo ciego.
-- First fold aceptado tras evidencia Chrome autenticada desktop + 390 px. La primera captura mobile detectó el
-  drawer lateral persistido abierto; el scenario lo normaliza con `Escape`. Sin overflow después del cierre,
-  selección causal y detail drawer comprobados. El drawer de fondeo también fue validado a 390×844: tres límites
-  accesibles, confirmación bloqueada cuando `target > maxCap`, foco dentro del diálogo y cero errores de consola.
-  La operación `op-jul-recovery-001` dejó `aria-pressed=true` y expuso `Verificar y reconciliar` habilitado en el
-  detalle móvil; no se ejecutó fondeo ni reconcile real. Review:
-  `docs/ui/reviews/TASK-1483-globe-credits-operations-workbench-first-fold-review-2026-08-01.md`.
-- Pendiente inmediato: gates premium/automatizados, migración/deploy y smoke real. El path OAuth/API/CLI permanece
-  separado pero usa la misma authority state machine y ledger. Typecheck, ESLint focal y 38 tests dirigidos pasan.
-  No hubo push, deploy ni release.
-- TASK-1628 está en ejecución sobre Globe `main`: el self reader ya separa capacidad efectiva de ledger histórico,
-  agrega funding redactado, estado low resuelto server-side y un daily fence durable de solo lectura. El SDK usa una
-  query self sin `requestedCredits`; `/v1/session` entrega el deep link Greenhouse desde `GREENHOUSE_BASE_URL`.
-  Domain 419/419, database 143/143, SDK 18/18 y studio-web 286/286 pasan. Greenhouse ya prepara el movimiento OAuth
-  1/4 (`allowedScopes` solamente); coverage UI continúa `policy-blocked` hasta completar los cuatro movimientos.
-  Movimiento 1/4 aplicado y leído de vuelta live. Globe `main` fue publicado en `3105add`; CI remoto y build
-  pasaron sobre ese SHA. Las migrations `0043`–`0045` fueron aplicadas por el run keyless `30713283566` y el
-  readback quedó limpio: sin pendientes, inesperadas ni checksum mismatch. API `30713331682` y Studio
-  `30713332904` desplegaron el mismo SHA con 100% de tráfico; el smoke en Chrome autenticado abrió Producer como
-  Julio Reyes Rangel, sin redirección ni errores de consola. El movimiento 3/4 queda listo para promover el scope
-  a required + capability antes de habilitar la cobertura UI.
+- Rama correcta: Globe opera directamente en `main`; Greenhouse en `develop`; un solo checkout por repo, cero
+  worktrees aislados.
+- Operación live `23db5b0e-89dd-4661-9b8d-c12f9be4ad7a`: target/grant 800, cap 1500, pool
+  `internal-month:2026-08`, estado `completed`, capacidad efectiva `0 → 800`.
+- Greenhouse `/admin/globe/credits`, CLI OAuth PKCE `status` y Globe Producer coinciden en 800 efectivos,
+  funding 800, cap/remaining 1500, spent/held 0 y cero blockers. Capturas y IDs:
+  `docs/operations/creative-studio/evidence/2026-08-01/README.md`.
+- Globe `649eb08` elimina la dependencia circular del rollover. El worker final `d3fe90e`, digest
+  `sha256:d8295862…bae9`, quedó desplegado por `30717266572`; scheduler `lmb2r` reportó `claimed=2`,
+  `reconciliationRequested=2`, `deferred=2`, `failed=0`. `e369ef8` fija ese digest en IaC y OpenTofu devuelve
+  `No changes`.
+- ISSUE-124 está resolved. TASK-1482, TASK-1586 y TASK-1629 están `complete` con aceptación funcional/runtime.
+  TASK-1483/TASK-1628 conservan únicamente QA visual de estados; TASK-1468/TASK-1579
+  conservan receipts/calibración más amplia, sin volver a bloquear el fondeo interno.
+- Dos holds históricos `submission_unknown` sin `providerOperationId` permanecen diferidos y observables en
+  TASK-1630; no deben force-release ni contarse como capacidad disponible.
+
+El checkpoint local del first fold quedó supersedido por la operación live del bloque anterior. La evidencia
+responsive y de interacción se conserva en
+`docs/ui/reviews/TASK-1483-globe-credits-operations-workbench-first-fold-review-2026-08-01.md`; los detalles de
+rollout, migrations y Producer viven en `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`.
 
 ## Checkout compartido único — worktrees prohibidos (2026-08-01)
 
@@ -51,59 +40,9 @@
 
 ## Efeonce MCP — gateway público y canary Globe read-only verificados (2026-08-01)
 
-- Se creó el repo privado independiente `efeoncepro/efeonce-mcp`; Greenhouse y Globe no hospedan el gateway.
-  El PR `#2` fue fusionado a `main` en `d9c0c69` y su CI pasó.
-- Runtime: Cloud Run `efeonce-mcp-gateway` en `efeonce-group/southamerica-west1`, service account dedicada,
-  Artifact Registry inmutable, GitHub WIF sin keys y Global External ALB sobre `34.111.78.237`.
-- OAuth Entra pasó el canary real end-to-end de authorization code + PKCE por
-  `https://mcp.efeonce.org/mcp`: initialize, discovery y `globe.producer.fleet.list` respondieron `200` con
-  rutas redaccionadas. Los tests del gateway verifican que un scope Globe ausente se rechaza antes del dispatch.
-  El cliente interno actual de Entra recibe ambos scopes aun cuando solicita sólo el base, por lo que ese deny
-  todavía no tiene evidencia live con una identidad base-only. Entra v2 emite el App ID del recurso en `aud`, no
-  la URL pública.
-- `mcp.efeonce.org` ya resuelve a la IP global desde ambos NS de HostGator y resolvers públicos; HTTP responde
-  `301` a HTTPS. El certificado administrado está `ACTIVE` y TLS presentó un certificado válido para el hostname.
-- El servicio quedó detrás del load balancer; el acceso directo `run.app` devuelve `404`. `/mcp` permanece
-  OAuth-protegido y el único surface Globe comprobado es su manifest read-only.
-- Hardening posterior: Cloud Armor protege el backend con throttle aproximado de 600 requests/minuto por IP;
-  la revisión vigente `efeonce-mcp-gateway-00009-9c6` acepta sólo el hostname/origin canónico
-  `mcp.efeonce.org`.
-- La skill espejo `efeonce-mcp-platform` y las skills de arquitectura (`arch-architect` global de Claude y
-  `software-architect-2026` de Codex) componen ahora el router MCP con arquitectura, cloud/secret hygiene,
-  Globe, QA y documentación. `pnpm skills:mirrors` detecta drift entre los bundles MCP.
-- Health, metadata OAuth, rechazo anónimo, OAuth autenticado y la tool Globe de fleet pasaron por el hostname
-  público.
-  El primer callback local venció a los 180 segundos; el listener ahora usa una ventana configurable de 10
-  minutos. El override DNS del canary sólo sirvió para diagnóstico con SNI público y no modifica el runtime.
-- Globe quedó habilitado end-to-end: PR `efeonce-globe#84` (`001ce1b`) desplegado como
-  `globe-api-internal-00179-qcz`; gateway `ce593f2` desplegado como `efeonce-mcp-gateway-00009-9c6`. El canary
-  PKCE real invocó `globe.producer.fleet.list` y recibió rutas sin house, provider, costo de vendor ni margen.
-  Cloud Run conserva `concurrency=80` y `maxScale=5` efectivo inicialmente.
-- Estado honesto: operativo para el tenant Entra único y este único reader read-only. El principal downstream
-  tiene sólo `globe.producer.catalog.read` sobre `greenhouse-org:efeonce`; no hay runs, assets, delivery ni
-  writes. El cliente PKCE actual recibe ambos scopes aunque solicite el base: antes de clientes externos hay que
-  separar entitlement/emisión de scopes y repetir el deny real. Las demás tools conservan gates de
-  `TASK-1469`/`TASK-1472`.
-- `TASK-1631` sigue `to-do`: WorkOS staging sólo tiene discovery MCP, sin login público ni bindings. La primera
-  cohorte externa será por invitación de organizaciones cliente ya existentes y explícitamente allowlisted en
-  Account 360; un dominio o email nunca crea acceso. La UI propia de `auth.efeonce.org` queda separada del gateway
-  y requiere aceptar el ADR, el plan y el contrato de binding/revocación antes de implementación.
-
-## TASK-1614/TASK-1629/TASK-1630 — recuperación y convergencia del carril Globe (2026-08-01)
-
-- Goal activo confirmado por el operador: dejar Studio Credits operativo, funcional y enterprise end-to-end;
-  no se limita a documentación ni termina hasta verificar código, migraciones, runtime y superficies reales.
-- PR #176 (`626eda751`) integró OAuth PKCE, API Platform, provenance y confirmación agente en `origin/develop`;
-  `d804c1169` sincronizó el checkout sin worktrees ni pérdida de WIP. El dueño vigente es TASK-1629 y
-  las migraciones conservan sus nombres históricos `task-1616-*`.
-- Orden TASK-1630: 1482 truth/ensure-funded → 1468+1579 lifecycle/settlement → 1586 recovery → 1629
-  one-shot/adapters → 1483 workbench Greenhouse → 1628 self-view Producer.
-- La autoridad CEO one-shot está aprobada pero pendiente en TASK-1629. Live: delegación agente persistente,
-  límites vigentes, `requireSecondConfirmer=OFF`; workloads no confirman.
-- Ejecución activa: preflight TASK-1482 completado; auditoría confirma bloqueos P0 de verdad económica y un
-  `workspaceBinding` OAuth no aplicado. Estado de repos, hallazgos con detalle, acciones no realizadas y siguiente
-  comando seguro quedan en
-  [`GLOBE_RUNTIME_HANDOFF.md`](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md#checkpoint-de-ejecución--studio-credits-enterprise-2026-08-01).
+- Gateway independiente `efeoncepro/efeonce-mcp`, OAuth Entra PKCE y el reader Globe read-only están operativos
+  en `https://mcp.efeonce.org/mcp`; runs/assets/writes y clientes externos siguen gated. La continuidad completa,
+  riesgos de scopes y TASK-1631 viven en el repo del gateway y en el runtime handoff de Globe.
 
 ## AXIS — guía visual agent-facing publicada (2026-08-01)
 

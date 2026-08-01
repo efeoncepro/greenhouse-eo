@@ -1,7 +1,7 @@
 # Manual — Fondear los créditos de Globe por el carril gobernado
 
 > **Tipo de documento:** Manual de uso / runbook (orientado al operador)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-07-26 por Claude (TASK-1566)
 > **Ultima actualizacion:** 2026-08-01 por Codex (TASK-1630)
 > **Documentacion tecnica:** [ADR-015](../../architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md) · [TASK-1566](../../tasks/complete/TASK-1566-globe-governed-credit-funding-command.md)
@@ -18,9 +18,9 @@ Ejercido end-to-end por primera vez el 2026-07-26: `confirm` en 905 ms, grant +1
 atribuido al operador real. Este manual documenta ese camino verificado, con las dos correcciones de
 runbook que salieron de medirlo.
 
-> **Estado 2026-08-01:** `status`, `preview`, `list/get/reconcile` y el flujo one-shot `ensure` están
-> code-complete en los checkouts compartidos: Greenhouse en `develop` y Globe directamente en `main`, que también
-> es su rama predeterminada/release. Todavía requieren migración, seed OAuth y deploy antes de usarse en staging.
+> **Estado 2026-08-01:** operativo para el workspace interno. Greenhouse corre desde `develop`; Globe corre desde
+> su rama predeterminada, de integración y release `main`. Migraciones, seed OAuth y deploy están aplicados. La
+> UI, el CLI PKCE y Producer leyeron el mismo resultado live: 800 créditos efectivos, cap 1500 y cero blockers.
 
 ## Antes de empezar
 
@@ -36,8 +36,7 @@ runbook que salieron de medirlo.
   agente por parámetro. Un workload, API key o principal de servicio genérico nunca confirma.
 - **Necesitas:** una sesión autenticada en Google Chrome para completar OAuth, los scopes
   `globe.credits.funding.propose`, `confirm`, `read`, `reconcile` y `ensure`, los entitlements de
-  administración de créditos, el `poolId` vigente (ver
-  [`GLOBE_RUNTIME_HANDOFF.md`](../../operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md)), y que
+  administración de créditos y que
   `GLOBE_CREDIT_ADMIN_LANE_ENABLED=true` esté en la revisión activa de `globe-api-internal`.
 - **La propuesta vence en 15 minutos.** Se confirma sobre el estado que se vio; si venció, se
   propone de nuevo.
@@ -49,7 +48,7 @@ Globe lee su estado real, deriva el delta y devuelve `no_effect` si el sistema y
 
 ### Opción A — Greenhouse UI (persona autorizada)
 
-Una vez desplegado el slice:
+Camino verificado y recomendado para una persona autorizada:
 
 1. Abre `/admin/globe/credits` en Greenhouse con la sesión humana autorizada.
 2. Revisa la capacidad efectiva y pulsa `Asegurar capacidad`.
@@ -60,8 +59,8 @@ Una vez desplegado el slice:
    operación y usa `Verificar y reconciliar`; no abras un fondeo nuevo.
 
 La UI exige simultáneamente la view `administracion.globe_credits` y los entitlements de emisión/ejecución. La
-operation key se conserva ante timeout o reintento incierto. Este camino está validado localmente, pero no debe
-usarse en staging/live antes de la migración y deploy documentados en TASK-1629.
+operation key se conserva ante timeout o reintento incierto. Fue ejercido live el 2026-08-01 con la sesión Chrome
+de `jreyes@efeonce.cl`; la operación `23db5b0e-89dd-4661-9b8d-c12f9be4ad7a` terminó `completed`.
 
 ### Opción B — autoridad OAuth para CLI/agente
 
@@ -75,7 +74,7 @@ usarse en staging/live antes de la migración y deploy documentados en TASK-1629
   "periodStart": "2026-08-01T00:00:00.000Z",
   "periodEnd": "2026-09-01T00:00:00.000Z",
   "targetAvailableCredits": 800,
-  "maxGrantCredits": 500,
+  "maxGrantCredits": 1000,
   "maxResultingCapCredits": 1500,
   "executorClientId": "greenhouse-admin-cli",
   "evidenceRef": "instruction:TASK-1629"
@@ -116,7 +115,7 @@ a una persona o a un agente autenticado; la política de delegación se valida n
 GREENHOUSE_API_BASE_URL=https://dev-greenhouse.efeoncepro.com \
 GLOBE_ADMIN_OAUTH_CLIENT_ID=greenhouse-admin-cli \
 pnpm globe:credit-funding -- \
-  --input '{"globeWorkspaceId":"greenhouse-org:efeonce","poolId":"<pool-vigente>","grantCredits":500,"monthlyCap":1500,"periodStart":"<inicio-UTC>","periodEnd":"<fin-UTC>"}' \
+  --input '{"globeWorkspaceId":"greenhouse-org:efeonce","poolId":"<pool-activo>","grantCredits":500,"monthlyCap":1500,"periodStart":"<inicio-UTC>","periodEnd":"<fin-UTC>"}' \
   --propose-idempotency-key <clave-unica-propose> \
   --confirm-idempotency-key <clave-unica-confirm> \
   --yes true
@@ -126,8 +125,10 @@ Sin `--yes true`, el CLI muestra el plan y pide confirmación interactiva. `--ye
 un agente sólo cuando la autoridad/delegación ya existe en el runtime; la instrucción textual del operador no
 omite ninguna verificación server-side.
 
-Este comando sigue disponible para una persona autorizada y para diagnóstico controlado. Para agentes, usa
+Este comando legacy explícito sigue disponible para una persona autorizada y para diagnóstico controlado. Para agentes, usa
 `ensure --authority-id`: el gate one-shot impide que el carril crudo se convierta en delegación permanente.
+El camino recomendado `ensure` no recibe pool ni fechas: Globe deriva el mes UTC y crea o reutiliza el pool
+determinístico `internal-month:AAAA-MM` dentro de la misma transacción económica.
 
 ### 2. Revisar el plan — éste es el punto entero del carril
 
@@ -150,7 +151,7 @@ tope) y `allocationEntryId`. Todo ocurre en **una** transacción: grant + asient
 
 ### 4. Verificar
 
-Tras el deploy de TASK-1586/TASK-1629, usa los comandos canónicos:
+Usa los comandos canónicos desplegados:
 
 ```bash
 pnpm tsx scripts/globe-credit-funding.ts status --workspace-id greenhouse-org:efeonce --requested-credits 1
@@ -160,7 +161,8 @@ pnpm tsx scripts/globe-credit-funding.ts operations reconcile --workspace-id gre
   --operation-id <id> --idempotency-key <clave-estable>
 ```
 
-Antes del deploy, las consultas directas siguientes siguen siendo sólo **diagnóstico privilegiado transitorio**:
+Las consultas SQL siguientes quedan sólo como **diagnóstico privilegiado de último recurso**; no son el camino
+normal ni condición para operar:
 
 1. **Intents** (Greenhouse PG): `SELECT phase, actor_user_id FROM
    greenhouse_core.globe_credit_funding_intents ORDER BY created_at DESC LIMIT 2` → `proposed` +
@@ -169,8 +171,8 @@ Antes del deploy, las consultas directas siguientes siguen siendo sólo **diagn�
 2. **Globe PG**: grant `posted`, política nueva `active` (la anterior `superseded`), asiento
    `allocation` con los créditos.
 
-No uses el estimado/contador actual del Producer como verificación de capacidad: su self-status autoritativo es
-target de TASK-1586/TASK-1628 y todavía no está live.
+Producer ya consume el self-status autoritativo. Úsalo como verificación independiente de experiencia, pero
+conserva el `operationId` y el reader `status/get` como evidencia causal de la operación.
 
 ## Qué significan los estados de una propuesta
 
@@ -180,7 +182,7 @@ target de TASK-1586/TASK-1628 y todavía no está live.
 | `expired` | Venció sin confirmar | Proponer de nuevo |
 | `completed` | Fondeo ejecutado; apunta a grant/política/asiento | Nada — es el estado final feliz |
 | `confirm_failed` | La confirmación falló DESPUÉS de transicionar; la transacción revirtió | Leer el estado antes de reintentar; es evidencia, no se borra |
-| `confirmed` (sin completar) | Anomalía: la mutación no terminó (era el síntoma del deadlock pre-fix) | NO reintentar a ciegas; diagnóstico privilegiado hoy; lifecycle/terminalización canónicos pertenecen a TASK-1586 |
+| `confirmed` (sin completar) | La mutación puede estar en curso o con outcome desconocido | Consultar `operations get/status` con la misma operation key; si no converge, ejecutar `operations reconcile` antes de cualquier nuevo intento |
 
 ## Qué NO hacer
 
@@ -199,9 +201,9 @@ target de TASK-1586/TASK-1628 y todavía no está live.
 
 | Síntoma | Causa probable | Salida |
 |---|---|---|
-| `409 globe_funding_already_recorded` | Reusaste una clave, o esa propuesta ya tiene decisión registrada (el anti-replay del broker es **por propuesta**: ningún confirm repetido pasa, con cualquier clave) | No reintentar. Hoy: diagnóstico privilegiado del intent/receipt por un operador autorizado. Target TASK-1586/1629: `status/get` canónico; si `completed`, ya está |
+| `409 globe_funding_already_recorded` | Reusaste una clave, o esa propuesta ya tiene decisión registrada (el anti-replay del broker es **por propuesta**: ningún confirm repetido pasa, con cualquier clave) | No reintentar. Consultar `operations get/status`; si está `completed`, usar ese receipt y readback |
 | `422 globe_funding_rejected` | Globe rechazó el payload (4xx real, no un problema de red) | Leer `code`; no reintentar igual |
-| `503 globe_unavailable` | El puente falló (red/WIF); si ocurrió durante confirm, el outcome puede ser desconocido | No repetir confirm a ciegas. Hoy: escalar a diagnóstico privilegiado. Target: TASK-1586 entrega lifecycle/readback/reconcile y TASK-1629 sus adapters CLI/API |
+| `503 globe_unavailable` | El puente falló (red/WIF); si ocurrió durante confirm, el outcome puede ser desconocido | No repetir confirm a ciegas. Consultar `operations get/status` y luego `operations reconcile` con la misma operation key |
 | `401` | Sin sesión válida | Renovar sesión del portal |
 | `403 agent_confirmation_forbidden` | El usuario agente no tiene delegación persistente activa para ese workspace | Revisar la política gobernada; no usar una identidad humana como bypass |
 | `403 agent_one_shot_authority_required` | Falta una autoridad vigente, exacta o ligada al mismo agente/OAuth client | Emitir una autoridad nueva desde la sesión del CEO; no reutilizar otra |
@@ -212,7 +214,7 @@ target de TASK-1586/TASK-1628 y todavía no está live.
 ## Referencias técnicas
 
 - Decisión: [ADR-015 — Greenhouse administra Globe](../../architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md)
-- Programa de convergencia y autoridad CEO/agente: [TASK-1630](../../tasks/to-do/TASK-1630-globe-credits-control-plane-convergence.md)
+- Programa de convergencia y autoridad CEO/agente: [TASK-1630](../../tasks/in-progress/TASK-1630-globe-credits-control-plane-convergence.md)
 - Implementación + evidencia del primer fondeo real: [TASK-1566](../../tasks/complete/TASK-1566-globe-governed-credit-funding-command.md) (Deltas 4–6)
 - Estado vivo (revisiones, pool, flags): [`GLOBE_RUNTIME_HANDOFF.md`](../../operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md)
 - Explicación en simple: [documentación funcional](../../documentation/creative-studio/fondeo-gobernado-creditos-globe.md)

@@ -7,6 +7,20 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-01 — Studio Credits operativo por UI y OAuth PKCE
+
+- Greenhouse `develop` y Globe `main` quedaron desplegados con migraciones y OAuth activos. La operación live
+  `23db5b0e-89dd-4661-9b8d-c12f9be4ad7a` aseguró 800 créditos efectivos sobre cap 1500 mediante un único acto
+  atribuido, sin segundo confirmante obligatorio ni break-glass.
+- `ensure-funded` crea o reutiliza el pool mensual determinístico dentro de la misma transacción económica. La UI
+  Greenhouse, el CLI OAuth PKCE y Producer devolvieron 800 efectivos, funding 800, cap/remaining 1500 y cero
+  blockers. ISSUE-124 pasó a resolved.
+- Globe conserva `main` como rama predeterminada/integración/release; Greenhouse permanece en `develop`. No se
+  creó ningún worktree ni se ejecutó un release completo de Greenhouse.
+- El worker de expiry quedó promovido desde Globe `main` con scheduler minutely, flag y observabilidad activos.
+  El digest `sha256:d8295862…bae9` pasó deploy exacto, canary y OpenTofu sin drift. Dos holds históricos
+  `submission_unknown` se reconcilian/difieren con `failed=0`; no se liberan a ciegas.
+
 ## 2026-08-01 — Operación multiagente: checkout compartido único
 
 - Se retiraron dos worktrees temporales de MCP creados incorrectamente y se prohibieron los worktrees, checkouts
@@ -31,8 +45,8 @@
   MCP/comercial. Globe conserva la máquina de estados económica; Greenhouse sólo proyecta/adapta.
 - ADR-015 ahora aprueba que una instrucción atribuida del CEO pueda autorizar una operación acotada y que el
   mismo agente autenticado puede proponer y confirmar end-to-end cuando la política del workspace no exige segundo
-  confirmante. La autoridad one-shot y sus carriles `oauth|browser` están code-complete localmente; live hoy sólo
-  existe la delegación persistente acotada hasta aplicar migración, configuración y deploy.
+  confirmante. La autoridad one-shot y sus carriles `oauth|browser` están desplegados y verificados live para el
+  workspace interno; clientes externos y fondeo comercial siguen gated.
 - La primera corrección ejecutable ya cierra el aislamiento de workspace: API Platform conserva los bindings
   emitidos por OAuth y tanto el bearer como las rutas admin rechazan un `globeWorkspaceId` no vinculado antes de
   invocar el broker. No hubo fondeo, deploy, migración, release ni promoción a `main`.
@@ -704,13 +718,3 @@ Corrección de fuente de verdad: el cliente inicial es **SKY Agencia Creativa**,
   Search Visibility.
 - Globe conserva el rol de product brand habilitante; no se convierte en la línea creativa completa. No hubo cambios
   de runtime ni de pricing aprobado.
-
-## 2026-07-26 — Portfolio Efeonce: marca paraguas, líneas y product brands
-
-- Se canonizó la separación entre **Efeonce** como marca paraguas/relación comercial, líneas de negocio/prácticas,
-  product brands/platform brands, ofertas, delivery models y engagements en
-  [`EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md`](docs/architecture/EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md).
-- Se corrigió el lenguaje de contextos, business models, catálogo de servicios y skills: Creative Services no se
-  reduce a Globe; Digital Services & Engineering no se reduce a Wave; RevOps & CRM no es una quinta unidad; Reach,
-  Wave, Globe, Kortex y Verk nombran productos/sistemas cuando corresponde; Greenhouse es el control plane.
-- No hubo cambios de runtime, schema, catálogo productivo ni configuración externa.
