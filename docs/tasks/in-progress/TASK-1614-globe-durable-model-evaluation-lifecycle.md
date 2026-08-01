@@ -14,7 +14,7 @@
 - Status real: `Código sistémico y migración aplicados; rollout de Asset Governance bloqueado por IAM`
 - Domain: `Globe / Model Lab / evaluation / worker`
 - Owner: `Efeonce Globe runtime`
-- Runtime code: Globe `main` hasta PR `#76` (`37b6f7ddd99bbf348613c5cc9e68dae7a5393cd7`)
+- Runtime code: Globe `main` hasta PR `#77` (`9e6325ccf4747944119e0f3cb5e0d1f9a0d5899b`)
 - ADRs: [Evaluation Harness](../../architecture/creative-studio/EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md) y
   [Asset Governance Worker](../../architecture/creative-studio/EFEONCE_GLOBE_ASSET_GOVERNANCE_WORKER_DECISION_V1.md)
 
@@ -136,11 +136,20 @@ Do not alter already promoted Omni, Seed Audio or Seedance Loop; do not bypass t
   `cloudscheduler.jobs.pause` y `cloudscheduler.jobs.enable`; CI `30684915496` y Terraform Check `30684915503`
   terminaron `success`. El rol está mergeado en HCL pero **todavía no provisionado**; por tanto el Job de Asset
   Governance aún no ejecuta el fix de PR `#74` y la finalización/report/promoción permanecen cerradas.
+- El discovery de arquitectura/operaciones detectó una segunda brecha antes de provisionar: si el runner desaparecía
+  después de `pause`, el mismo job podía no alcanzar su cleanup. Globe PR `#77`
+  (`9e6325ccf4747944119e0f3cb5e0d1f9a0d5899b`) movió la captura de estado a un job `scheduler_preflight` que
+  termina antes de toda mutación, ejecuta build/baseline antes del fence y restaura desde un job independiente con
+  `needs + always`, reintentos acotados y readback convergente. La evidencia parte en failed y sólo declara éxito
+  al recuperar el estado inicial. `pnpm check` local, CI `30685780585` y Terraform Check `30685780571` terminaron
+  `success`; una revisión independiente dio `MERGE` sin hallazgos bloqueantes.
 
 ## Handoff ejecutable
 
-1. Provisionar por el carril IaC el rol custom de PR `#76`; leer el plan y exigir cero destroy/replace antes del
-   apply. Verificar por readback que `globe-deployer` puede pausar/reanudar sólo schedulers existentes.
+1. Completar la reautenticación MFA de `julio.reyes@efeonce.org` abierta por `gcloud --force --update-adc` y
+   provisionar por el carril IaC el rol custom de PR `#76`; leer el plan y exigir cero destroy/replace antes del
+   apply. Verificar por readback que `globe-deployer` puede pausar/reanudar sólo schedulers existentes. No entregar
+   autoridad IAM amplia al WIF actual.
 2. Reejecutar `Deploy Asset Governance Job (keyless)` sobre el SHA exacto de `main`, modo `deploy` +
    `managed_reconcile`. Exigir digest desplegado, scheduler restaurado a su estado inicial y ejecución one-shot
    exitosa; no pausar ni reanudar manualmente fuera del workflow.

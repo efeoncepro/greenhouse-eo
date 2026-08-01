@@ -25,9 +25,14 @@ el scheduler estaba activo. PR `#75` (`353aa3b`) agregó lifecycle keyless `mana
 deploy por digest, reconciliación one-shot y restauración del estado inicial—, pero el retry `30684770248` probó que
 `globe-deployer` carece de `cloudscheduler.jobs.pause`. PR `#76`
 (`37b6f7ddd99bbf348613c5cc9e68dae7a5393cd7`) añadió un rol custom mínimo con `pause` + `enable`; está mergeado y
-sus gates CI/Terraform pasaron, pero el HCL **aún no fue provisionado**.
+sus gates CI/Terraform pasaron, pero el HCL **aún no fue provisionado**. El discovery posterior encontró que una
+falla o timeout después del fence todavía podía dejar el scheduler pausado. PR `#77`
+(`9e6325ccf4747944119e0f3cb5e0d1f9a0d5899b`) corrigió esa brecha: un preflight termina y publica el estado antes
+de cualquier mutación, el build ocurre antes del fence y un job de recovery independiente restaura con reintentos
+acotados y readback convergente. `pnpm check`, CI `30685780585` y Terraform Check `30685780571` pasaron.
 
-Siguiente paso: aplicar IaC con cero destroy/replace, verificar el grant mínimo, reejecutar el workflow de Asset
+Siguiente paso: completar una sola reautenticación MFA de `julio.reyes@efeonce.org`, aplicar IaC con cero
+destroy/replace, verificar el grant mínimo y reejecutar el workflow de Asset
 Governance en `managed_reconcile` y recuperar el mismo run hasta report + asset retenido/elegible. Sólo entonces
 completar atestación/readiness/promoción para `ref/video/motion-v1 / fal / seedance-2.0-r2v / 2.0` y probar en Chrome
 autenticado de `jreyes@efeonce.cl` mediante **Video → control de movimiento/cámara → Seedance 2.0**. No tocar Omni,

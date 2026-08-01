@@ -20,8 +20,11 @@
 - PR `#75` convirtió el deploy de Asset Governance en un lifecycle keyless administrado que pausa, despliega,
   reconcilia una vez y restaura el scheduler. El rollout falló cerrado porque `globe-deployer` carece de
   `cloudscheduler.jobs.pause`; PR `#76` agregó un rol custom mínimo `pause` + `enable`, mergeado pero aún no
-  provisionado. Promoción y prueba UI siguen pendientes; no se repitió gasto ni se tocaron Omni, Seed Audio o
-  Seedance Loop.
+  provisionado.
+- PR `#77` endureció el lifecycle antes de provisionarlo: preflight durable previo a cualquier mutación, build antes
+  del fence y recovery en un job independiente con reintentos/readback convergente. `pnpm check`, CI y Terraform
+  Check quedaron verdes. Promoción y prueba UI siguen pendientes; no se repitió gasto ni se tocaron Omni, Seed
+  Audio o Seedance Loop.
 
 ## 2026-07-31 — TASK-1614: handoff de Seedance R2V y output rights de evaluación
 

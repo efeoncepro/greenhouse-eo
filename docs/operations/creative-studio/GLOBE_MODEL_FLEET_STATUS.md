@@ -93,8 +93,10 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
   (`30684456492`/`30684472892`).
 - El Job de Asset Governance aún no contiene ese fix. PR `#75` agregó lifecycle de deploy
   `managed_reconcile`; su primer uso falló con `cloudscheduler.jobs.pause` ausente. PR `#76` agregó en HCL el rol
-  custom mínimo `pause` + `enable`, con CI y Terraform Check verdes, pero todavía no se provisiona. No existe report
-  objetivo, atestación, readiness, binding/promoción, disponibilidad en el reader ni canary UI de Seedance R2V.
+  custom mínimo `pause` + `enable`, con CI y Terraform Check verdes, pero todavía no se provisiona. PR `#77`
+  agregó preflight durable previo a mutación, fence posterior al build y recovery independiente con convergencia;
+  `pnpm check`, CI `30685780585` y Terraform Check `30685780571` pasaron. No existe todavía report objetivo,
+  atestación, readiness, binding/promoción, disponibilidad en el reader ni canary UI de Seedance R2V.
 
 ## Evidencia de Nano Banana Pro — canary y promoción gobernada
 

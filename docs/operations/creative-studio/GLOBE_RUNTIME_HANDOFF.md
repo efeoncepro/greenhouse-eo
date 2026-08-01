@@ -6,7 +6,7 @@
 > permanece auditable en el git log y en las tasks/ADRs enlazadas.
 >
 > **Corte de código verificado:** 2026-08-01 · Globe `main`
-> `37b6f7ddd99bbf348613c5cc9e68dae7a5393cd7` (PR `#76`). El runtime está deliberadamente mixto mientras
+> `9e6325ccf4747944119e0f3cb5e0d1f9a0d5899b` (PR `#77`). El runtime está deliberadamente mixto mientras
 > termina TASK-1614: API interna y producer worker en `1a810df`; Asset Governance aún en su digest anterior.
 
 ## Estado activo
@@ -153,6 +153,11 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
   `cloudscheduler.jobs.pause` + `cloudscheduler.jobs.enable`; CI `30684915496` y Terraform Check `30684915503`
   pasaron. El rol está mergeado en HCL pero aún no provisionado. Hasta aplicar IaC, desplegar/reconciliar el Job y
   recuperar el run no existen report, atestación, readiness, promoción ni prueba UI válidos.
+- Antes del apply se cerró una brecha adicional de recovery. PR `#77` (`9e6325c`) separó un preflight durable que
+  termina antes de mutar, movió build/baseline antes del fence y agregó un job independiente que restaura el estado
+  inicial con `needs + always`, reintentos y readback convergente. `pnpm check`, CI `30685780585` y Terraform Check
+  `30685780571` pasaron; revisión independiente sin hallazgos bloqueantes. Esto no provisiona IAM ni despliega el
+  Job por sí solo.
 
 ## Riesgos abiertos
 
@@ -163,13 +168,15 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
 - Gemini Omni continúa sólo en Model Lab para su ruta gobernada; no extrapoles la promoción de
   Vertex imagen a Interactions video.
 - TASK-1614 permanece bloqueada operativamente en el rollout de Asset Governance: el deployer aún no tiene en vivo
-  el rol mínimo de scheduler que PR `#76` declara. No uses IAM amplio ni pausa manual como sustituto del apply.
+  el rol mínimo de scheduler que PR `#76` declara. La única ceremonia pendiente antes del plan es reautenticar por
+  MFA al Owner `julio.reyes@efeonce.org`; no uses IAM amplio ni pausa manual como sustituto del apply.
 - La identidad temporal usada para consumo privado de AXIS debe sustituirse por una identidad de
   máquina antes del rollout externo; no recrees el secreto legacy de Globe.
 
 ## Siguiente paso ejecutable
 
-1. Planear y aplicar el HCL de PR `#76`; aceptar sólo cero destroy/replace y verificar por readback que
+1. Completar la reautenticación MFA del Owner, planear y aplicar el HCL de PR `#76`; aceptar sólo cero
+   destroy/replace y verificar por readback que
    `globe-deployer` recibió el rol custom mínimo, sin permisos create/delete/update de Scheduler.
 2. Reejecutar `Deploy Asset Governance Job (keyless)` desde el SHA exacto de `main`, modo `deploy` +
    `managed_reconcile`. Exigir digest exacto, topología `parallelism=1/taskCount=1`, reconciliación exitosa y estado
