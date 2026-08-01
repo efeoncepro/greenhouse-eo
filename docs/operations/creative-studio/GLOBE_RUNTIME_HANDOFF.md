@@ -5,8 +5,9 @@
 > conserva sólo el estado mutable, los riesgos abiertos y el siguiente paso. La historia anterior
 > permanece auditable en el git log y en las tasks/ADRs enlazadas.
 >
-> **Corte verificado:** 2026-07-30 · Globe `main`
-> `84d6a8e2a1201a9e41cc2ede71acda31e52e43f9`.
+> **Corte de código verificado:** 2026-08-01 · Globe `main`
+> `37b6f7ddd99bbf348613c5cc9e68dae7a5393cd7` (PR `#76`). El runtime está deliberadamente mixto mientras
+> termina TASK-1614: API interna y producer worker en `1a810df`; Asset Governance aún en su digest anterior.
 
 ## Estado activo
 
@@ -130,9 +131,25 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
   `working-30d`; Asset Governance relee `clean / verified / active / eligibleForGeneration=true`.
 - Run `eval_16272c31b11f75be3e0369870f89746b`, attempt `9361550f-6ce3-456d-b710-d5cd3ded6217`: Fal completó;
   estado `completion_received/finalizing`. No repetir provider spend: recuperar por readback/outbox.
-- Bloqueo: `asset_rights_denied` durante `registerGeneratedAsset`. El diagnóstico allowlisted de Globe PR `#72`
-  debe probar si `generatedAssetParents` apunta al asset canónico y si la proyección consumida por el finalizer
-  conserva evidencia/verifiedAt. Hasta resolverlo no hay report, atestación, readiness ni promoción.
+- El diagnóstico allowlisted de PR `#72` confirmó que `generatedAssetParents` y la policy eran correctos. La causa
+  era una carrera de autoridad: una proyección terminal stale de Asset Governance podía escribir rights antiguos
+  después de una revisión más nueva. El reader compuesto mostraba el parent elegible, pero
+  `registerGeneratedAsset` consumía la proyección persistida degradada y rechazaba `asset_rights_denied`.
+- PR `#74` (`1a810df`) corrige la causa con `rights_revision` por asset/job, evidencia append-only y merge terminal
+  independiente de malware, C2PA y rights. Una revisión stale ya no degrada derechos nuevos ni cuarenteniza por un
+  fallo antiguo sólo de rights. `pnpm check`, `pnpm build`, CI PR `30684242455` y CI main `30684380636` pasaron.
+- Migración `0041_asset_governance_authority_revision.sql`: plan `30684391269` limpio y apply/readback
+  `30684420198` exitoso. API interna `30684456492` y producer worker `30684472892` se desplegaron desde `1a810df`;
+  Studio no se desplegó.
+- Asset Governance no se desplegó todavía. `30684456659` falló cerrado porque el scheduler estaba activo. PR `#75`
+  (`353aa3b`) agregó lifecycle keyless `managed_reconcile`: captura baseline, pausa un scheduler activo, despliega
+  el digest, ejecuta una reconciliación y restaura el estado inicial. CI `30684633070` pasó.
+- El retry `30684770248` falló antes de build/deploy con
+  `PERMISSION_DENIED cloudscheduler.jobs.pause`. PR `#76`
+  (`37b6f7ddd99bbf348613c5cc9e68dae7a5393cd7`) añadió un rol custom mínimo con sólo
+  `cloudscheduler.jobs.pause` + `cloudscheduler.jobs.enable`; CI `30684915496` y Terraform Check `30684915503`
+  pasaron. El rol está mergeado en HCL pero aún no provisionado. Hasta aplicar IaC, desplegar/reconciliar el Job y
+  recuperar el run no existen report, atestación, readiness, promoción ni prueba UI válidos.
 
 ## Riesgos abiertos
 
@@ -142,17 +159,23 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
   `TASK-1578`.
 - Gemini Omni continúa sólo en Model Lab para su ruta gobernada; no extrapoles la promoción de
   Vertex imagen a Interactions video.
+- TASK-1614 permanece bloqueada operativamente en el rollout de Asset Governance: el deployer aún no tiene en vivo
+  el rol mínimo de scheduler que PR `#76` declara. No uses IAM amplio ni pausa manual como sustituto del apply.
 - La identidad temporal usada para consumo privado de AXIS debe sustituirse por una identidad de
   máquina antes del rollout externo; no recrees el secreto legacy de Globe.
 
 ## Siguiente paso ejecutable
 
-1. Ejecuta `TASK-1578` para las seis rutas de imagen y emite por cada identidad exacta el onboarding
-   receipt que enlace route, rate version vigente de `TASK-1468`, evaluación, rights, binding,
-   readiness, circuito y canary.
-2. Reconcilia esos receipts contra `globe.producer.fleet.list`; cualquier divergencia se trata como
-   incidente documental/runtime y falla cerrado.
-3. Actualiza el criterio 7 de `TASK-1553`; ciérrala sólo cuando los seis receipts estén presentes y
-   los readers sigan `available`.
-4. Mantén toda prueba de gasto real por el Producer autenticado o por el canary canónico; ante un
-   timeout, lee primero `run-get`/diagnóstico y no reintentes a ciegas.
+1. Planear y aplicar el HCL de PR `#76`; aceptar sólo cero destroy/replace y verificar por readback que
+   `globe-deployer` recibió el rol custom mínimo, sin permisos create/delete/update de Scheduler.
+2. Reejecutar `Deploy Asset Governance Job (keyless)` desde el SHA exacto de `main`, modo `deploy` +
+   `managed_reconcile`. Exigir digest exacto, topología `parallelism=1/taskCount=1`, reconciliación exitosa y estado
+   final del scheduler igual al inicial.
+3. Leer y recuperar `eval_16272c31b11f75be3e0369870f89746b` hasta report
+   `objective_pass_pending_human` y output retenido/elegible. No volver a invocar Fal.
+4. Completar revisión/atestación, readiness, binding, promoción, reader live y generación UI sólo para
+   `ref/video/motion-v1 / fal / seedance-2.0-r2v / 2.0`. La prueba final es Chrome autenticado como
+   `jreyes@efeonce.cl` en **Video → control de movimiento/cámara → Seedance 2.0**, con pieza nueva, playback,
+   retención y governance. Omni, Seed Audio, Seedance Loop e Imagen/Seedream quedan fuera de la evidencia.
+5. Después de TASK-1614, retomar los receipts de `TASK-1578`/`TASK-1553`; no confundir ese backlog de imagen con el
+   bloqueo P0 actual.

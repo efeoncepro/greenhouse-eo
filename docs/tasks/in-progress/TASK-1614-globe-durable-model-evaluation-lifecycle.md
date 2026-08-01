@@ -11,11 +11,12 @@
 - UI impact: `verification-only`
 - Backend impact: `yes`
 - Epic: `EPIC-028`
-- Status real: `Rollout parcial; finalización durable bloqueada`
+- Status real: `Código sistémico y migración aplicados; rollout de Asset Governance bloqueado por IAM`
 - Domain: `Globe / Model Lab / evaluation / worker`
 - Owner: `Efeonce Globe runtime`
-- Branch: `codex/evaluation-rights-provenance` en el worktree aislado de Globe
-- ADR: [Async evaluation lifecycle](../../architecture/creative-studio/EFEONCE_GLOBE_ASYNC_EVALUATION_LIFECYCLE_DECISION_V1.md)
+- Runtime code: Globe `main` hasta PR `#76` (`37b6f7ddd99bbf348613c5cc9e68dae7a5393cd7`)
+- ADRs: [Evaluation Harness](../../architecture/creative-studio/EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md) y
+  [Asset Governance Worker](../../architecture/creative-studio/EFEONCE_GLOBE_ASSET_GOVERNANCE_WORKER_DECISION_V1.md)
 
 ## Objective
 
@@ -104,13 +105,43 @@ Do not alter already promoted Omni, Seed Audio or Seedance Loop; do not bypass t
   exclusivamente **Video → control de movimiento/cámara → Seedance 2.0** en la sesión autenticada de
   `jreyes@efeonce.cl`; no se toca Omni, Seed Audio ni Seedance Loop, y Seedream no cuenta como evidencia.
 
+## Root cause y rollout sistémico — 2026-08-01
+
+- El diagnóstico allowlisted confirmó que el bloqueo no estaba en Fal, saldo, webhook, policy ni parent lineage.
+  Un job terminal de Asset Governance podía proyectar una revisión antigua después de una escritura de rights más
+  nueva y sobrescribir esa dimensión con evidencia stale. El reader componía el estado más reciente y podía mostrar
+  el parent elegible mientras `registerGeneratedAsset` consumía la proyección persistida degradada.
+- Globe PR `#74` (`1a810dfbd189eeb7130ba30e01d90370734f1bd0`) corrige la autoridad por causa raíz. La migración
+  `0041_asset_governance_authority_revision.sql` agrega `rights_revision` a assets/jobs y evidencia append-only;
+  los jobs quedan pineados a su revisión y la proyección terminal fusiona malware, C2PA y rights como dimensiones
+  independientes. Una revisión stale ya no puede degradar rights nuevos ni cuarentenizar por un fallo antiguo sólo
+  de rights. Replay y reconciliación siguen idempotentes y revisionados.
+- Verificación de implementación: `pnpm check` y `pnpm build` completos en verde; CI PR `30684242455` y CI de
+  `main` `30684380636` terminaron `success`. El plan de migración `30684391269` mostró sólo `0041` pendiente y el
+  apply/readback `30684420198` terminó `success`, sin drift ni checksum inesperado.
+- API interna (`30684456492`) y producer worker (`30684472892`) se desplegaron desde `1a810df` y terminaron
+  `success`. Studio no se desplegó. La completion de Fal del run existente se conserva; no se creó otro provider run
+  ni se volvió a gastar.
+- El primer rollout de Asset Governance (`30684456659`) falló cerrado porque el scheduler estaba `ENABLED` y el
+  workflow exigía pausa previa. Globe PR `#75` (`353aa3b49e0f285901658c6ca71f1d9ae50048f1`) agregó el modo keyless
+  `managed_reconcile`: captura baseline, pausa si corresponde, despliega por digest, ejecuta una reconciliación y
+  restaura el estado inicial del scheduler. CI `30684633070` terminó `success`.
+- El retry `30684770248` ejercitó ese camino y falló antes de build/deploy con
+  `PERMISSION_DENIED cloudscheduler.jobs.pause`. Globe PR `#76`
+  (`37b6f7ddd99bbf348613c5cc9e68dae7a5393cd7`) agregó un rol custom mínimo para el deployer con sólo
+  `cloudscheduler.jobs.pause` y `cloudscheduler.jobs.enable`; CI `30684915496` y Terraform Check `30684915503`
+  terminaron `success`. El rol está mergeado en HCL pero **todavía no provisionado**; por tanto el Job de Asset
+  Governance aún no ejecuta el fix de PR `#74` y la finalización/report/promoción permanecen cerradas.
+
 ## Handoff ejecutable
 
-1. Leer el diagnóstico allowlisted del run `eval_16272c31b11f75be3e0369870f89746b` y reconciliar el parent asset
-   persistido con `asset_6e9c95d3-7b94-473d-b91a-00f8b35d9eec` y su evidencia durable de derechos.
-2. Corregir la causa sistémica de la divergencia de lifecycle/proyección, con regresiones de idempotencia y
-   reconciliación. Ejecutar `pnpm check && pnpm build`, integrar por PR/CI y desplegar sólo API + worker internos.
-3. Reanudar/finalizar el mismo run provider-completed; no invocar Fal nuevamente. Exigir report
+1. Provisionar por el carril IaC el rol custom de PR `#76`; leer el plan y exigir cero destroy/replace antes del
+   apply. Verificar por readback que `globe-deployer` puede pausar/reanudar sólo schedulers existentes.
+2. Reejecutar `Deploy Asset Governance Job (keyless)` sobre el SHA exacto de `main`, modo `deploy` +
+   `managed_reconcile`. Exigir digest desplegado, scheduler restaurado a su estado inicial y ejecución one-shot
+   exitosa; no pausar ni reanudar manualmente fuera del workflow.
+3. Reanudar/finalizar el mismo run provider-completed `eval_16272c31b11f75be3e0369870f89746b`; no invocar Fal
+   nuevamente. Exigir report
    `objective_pass_pending_human` y un activo retenido/elegible antes de attestation/promoción.
 4. Completar rights comerciales, revisión humana, readiness, binding y promoción sólo para la identidad exacta de
    Seedance R2V. No tocar Omni, Seed Audio ni Seedance Loop.

@@ -14,9 +14,14 @@
 - El video fuente quedó private-ingested, retenido y gobernado (`clean / verified / active / eligible`). Fal completó
   la evaluación nueva y el sistema preservó el resultado para finalización idempotente, sin confundir timeout,
   webhook o saldo con un fallo del proveedor.
-- La promoción continúa cerrada: `registerGeneratedAsset` rechaza con `asset_rights_denied` pese al readback elegible
-  del parent. El siguiente cambio debe reconciliar la autoridad durable/proyección y recuperar el mismo run; no
-  repetir gasto ni tocar Omni, Seed Audio o Seedance Loop.
+- La causa de `asset_rights_denied` fue una carrera de authority ordering: una proyección terminal stale podía
+  sobrescribir rights nuevos. PR `#74` la corrige con `rights_revision` y merge independiente por dimensión;
+  `pnpm check`, `pnpm build`, CI, migración `0041`, API y producer worker quedaron verdes.
+- PR `#75` convirtió el deploy de Asset Governance en un lifecycle keyless administrado que pausa, despliega,
+  reconcilia una vez y restaura el scheduler. El rollout falló cerrado porque `globe-deployer` carece de
+  `cloudscheduler.jobs.pause`; PR `#76` agregó un rol custom mínimo `pause` + `enable`, mergeado pero aún no
+  provisionado. Promoción y prueba UI siguen pendientes; no se repitió gasto ni se tocaron Omni, Seed Audio o
+  Seedance Loop.
 
 ## 2026-07-31 — TASK-1614: handoff de Seedance R2V y output rights de evaluación
 
