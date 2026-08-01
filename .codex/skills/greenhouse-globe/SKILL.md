@@ -426,6 +426,30 @@ Si el Model Lab muestra "capability con estado + provider", el **Evaluation Harn
 - **Separar lo objetivo de lo humano; el verdict nunca auto-aprueba craft.** `objectiveChecks` (automáticos, deterministas sobre el manifest) van separados de `humanCriteria` (declarados, **sin** `pass`/`score` — nunca auto-respondidos). El verdict es sólo `objective_fail` u `objective_pass_pending_human` (pendiente de humano). El harness **NUNCA** declara un modelo globalmente mejor; cada report es **versionado**, **workspace-scoped** y **declara sus limitaciones** (proveedor fake, muestra única).
 - **Coverage + capability idénticos al patrón.** `globe.lab.evaluation.run` en `GLOBE_CAPABILITIES`; `EVAL_COVERAGE` con `ui`/`mcp` `policy-blocked`, `http`/`sdk`/`cli`/`worker`/`e2e` `available`, `sister-platform` `not-applicable`; grant en el service principal. Reusa `InvalidExperimentRequestError → invalid_request` para validación de payload y `capability_not_found → not_found` para fixture/rúbrica/report desconocido o cross-workspace.
 
+### Evaluación durable con inputs reales (TASK-1614, regla vigente desde 2026-07-31)
+
+Una evaluación durable no puede confundir el dato hermético del fixture con el activo que el provider debe
+consumir. Los handles `sha256:*` con `rights=test-fixture` sólo sirven cuando el resolver conoce sus bytes; en
+runtime real se parte de un output retenido y autorizado, se convierte mediante
+`globe.producer.asset.copyAsReference` y se pasa el handle completo como `authorizedInputs` a
+`globe.lab.evaluation.evaluate`. El experimento y el reporte persisten esos inputs efectivos, conservan cantidad,
+modalidad y orden, y verifican `input_lineage_intact`. Ante un timeout, consulta experimento, run y reporte antes de
+considerar otro intento.
+
+Antes del gasto, el compiler debe resolver una política durable `purpose=evaluation` para la tupla exacta
+`workspace + route + provider + model + version + sourceKind + time`; una policy de producción no la sustituye y
+una policy `appliesTo=generated` no autoriza por sí sola un derivado. El policy id/version/digest/purpose forma
+parte del snapshot y del fingerprint. El `ProducerReferenceHandleV1` se resuelve además al `assetId` canónico,
+verificando workspace, hash, medio, retención, Asset Governance y derechos del output fuente; ese padre queda en
+`generatedAssetParents`. Los outputs de evaluación pueden verse internamente, pero no descargarse como attachment
+ni entrar a un share board.
+
+Si el provider produjo bytes pero falló la finalización, no reintentes el webhook ni edites el run inmutable:
+recupera provider attempt, output retenido, asset/rights proyectados y evaluation report por sus readers. Repara
+lineage/rights mediante el carril canónico y crea un run nuevo sólo después del rollout. El workflow keyless expone
+`copy-reference:caller`, `evaluate:caller`, `run-get:caller` y `run-cancel:caller`; son commands de la API Contract
+Spine, no SQL ni llamadas directas al provider.
+
 ## El tercer ejemplo trabajado — Provider adapters reales (TASK-1486/1487/1488): el provider seam con motores reales
 
 Los dos ejemplos anteriores corren sobre `FakeReferenceAdapter` (hermético, gasto cero). TASK-1486/1487/1488 enchufan **motores reales** sobre el mismo `CreativeProviderAdapter`, **sin tocar el dominio ni el command** — exactamente lo que promete el provider seam. Son el patrón a copiar cuando agregues un provider nuevo. Todos viven en `apps/creative-runner/src/*`.
@@ -773,6 +797,18 @@ cuando esa sea la sesión autorizada; no abras un perfil Playwright nuevo y lo p
 evidencia debe mostrar el modelo/ruta seleccionados, operación, créditos, estado terminal, `Guardada`/retenida,
 preview de los bytes reales y descarga habilitada. API, runner, CI y canary técnico son evidencia necesaria, pero
 no sustituyen esta prueba cuando el criterio es “funciona en Producer”.
+
+Reproducir un candidato retenido de evaluación sólo prueba retrieval/playback de ese activo; **no** prueba que la
+ruta promovida pueda crear hoy una pieza nueva desde el Producer. Si el criterio pide canary post-promoción, exige
+un run nuevo iniciado en la UI, conserva su identidad exacta hasta el attempt/output y verifica por separado
+playback, retención y governance. No reutilices el candidato de evaluación como sustituto de ese canary.
+
+**Cierre sistémico de un incidente de evaluación.** Mantén separados provider attempt, output retenido,
+asset/rights proyectados y evaluation report. Recupera cada estado por su reader y conserva la identidad lógica;
+un webhook no es un reintento genérico del provider. Evaluación, atestación, readiness, binding/circuito, promoción
+y canary son gates distintos: una ruta puede estar promovida y seleccionable sin que exista aún una pieza nueva
+verificada desde la UI. Los IDs y el estado mutable viven en `GLOBE_RUNTIME_HANDOFF.md` y
+`GLOBE_MODEL_FLEET_STATUS.md`, no en esta regla reusable.
 
 **Sesión operativa del operador — regla obligatoria.** Cuando el operador indique que su sesión autenticada de
 `jreyes@efeonce.cl` ya contiene los accesos necesarios, reclama u abre una pestaña dentro de **ese Chrome
@@ -1183,14 +1219,17 @@ Ocho reglas medidas contra el runtime, no razonadas. Las tres primeras cuestan u
    funciona. **NUNCA** lo conviertas en el camino normal, **NUNCA** le des
    `secretmanager.versions.access` a `greenhouse-portal@` (es la identidad de reconciliación de tenancy de
    **Greenhouse**: usarla para administrar crédito de **Globe** es admin implícito cross-plataforma), y **NUNCA**
-   dejes que un **agente o proceso** proponga y confirme: la confirmación es de un humano autenticado, siempre.
+   dejes que un **workload genérico o principal de servicio** proponga y confirme. Un agente autenticado sí puede
+   confirmar por el carril delegado de `TASK-1629`, pero sólo con OAuth público allowlisted, los dos entitlements,
+   política explícita por workspace, límites de grant/tope mensual e intención append-only.
 
    🔴 **Y NUNCA exijas DOS humanos por defecto.** La primera versión de ADR-015 lo hacía y costó **dos horas de
    fricción para sumar créditos**: el operador es CEO y product owner del presupuesto, así que no hay segundo actor
    que buscar. **Un control que nadie puede satisfacer no protege, desvía** — al break-glass, que otorga MÁS
    autoridad que el camino que reemplaza. El segundo confirmador es **política** (`requireSecondConfirmer` por
    workspace + techo por operación), **default OFF** en el workspace interno. Lo que se queda como invariante es lo
-   que cuesta cero: el agente nunca confirma, y aprobador ≠ ejecutor entre service accounts.
+   que cuesta cero: un principal de servicio nunca confirma; un agente sólo confirma dentro de su delegación
+   acotada; y aprobador ≠ ejecutor entre service accounts.
 
 6. 🔴 **La autoridad de crédito YA está concedida a la identidad que Greenhouse puede impersonar — el problema no es
    que falte, es que SOBRABA — y el 2026-07-26 SE RETIRÓ (ADR-015 §10, rev `00114-k4t`).** La cadena era:
@@ -1223,7 +1262,8 @@ superficie en Greenhouse, autoridad en Globe, lane `sister-platform` (hoy `avail
 identidades disjuntas** (broker de administración **distinto** del reconciliador de tenancy; aprobador que firma y no
 muta; ejecutor que muta y **no puede firmar**, separados como **unidad de ejecución propia** porque dentro de un
 proceso la disyunción es cosmética), **KMS asimétrico** en vez del HMAC, comando gobernado
-`credits.month.fund.propose` / `.confirm` con **UNA confirmación humana** (el agente propone, nunca confirma; el segundo confirmador es política por workspace + techo, default OFF en el interno) y la mutación (grant + asiento
+`credits.month.fund.propose` / `.confirm` con **UNA confirmación autenticada** (humana o agente delegado por
+política y límites; el segundo confirmador es política por workspace + techo, default OFF en el interno) y la mutación (grant + asiento
 de ledger + política) en **UNA transacción Postgres**, y el **retiro de la autoridad de crédito del caller
 genérico** al final. Break-glass con TTL/motivo/aprobación/revocación automática/readback **y su propio contador**.
 **Cargá ADR-015 antes de tocar administración de crédito o capabilities de usuarios de Globe.**
@@ -1362,19 +1402,20 @@ y dueño del presupuesto, no hay segundo actor, y **un control que nadie puede s
 desvía al break-glass, que otorga MÁS autoridad que el camino que reemplaza**. Se cometió ese error en
 esta sesión y bloqueó al operador hasta el forward-fix.
 
-**Lo que sí es invariante y no se toca:** el agente **nunca** confirma (trigger `actor_must_be_human`
-rechaza principals de servicio), toda confirmación registra contra quién confirma, y la evidencia es
-**append-only** (triggers anti-UPDATE/DELETE).
+**Lo que sí es invariante y no se toca:** un principal de servicio **nunca** confirma. Un usuario agente
+autenticado puede confirmar únicamente si `agent_confirmation_enabled` está activo para el workspace y el plan
+queda bajo `agent_max_grant_credits` y `agent_max_monthly_cap_credits`. Toda confirmación registra
+`actor_user_id` + `actor_auth_mode`, y la evidencia es **append-only** (triggers anti-UPDATE/DELETE).
 
 🔴 **`assertHumanAttribution` de Globe es SHAPE-ONLY** — rechaza `globe:service:` y exige entitlement
-no vacío, pero **no puede** verificar que la atribución venga de una sesión autenticada, porque Globe
+no vacío, pero **no puede** verificar la sesión humana/agente ni su delegación, porque Globe
 no tiene las sesiones. Ese amarre vive en Greenhouse (`globe_credit_funding_intents` + trigger). **No
 publiques el carril sin esa contraparte.**
 
-🔴 **El top-up de CLIENTE es otro acto económico, y el trigger actual lo bloquea.** El grant interno
-gasta presupuesto **de Efeonce** (por eso lo aprueba una persona de Efeonce); un top-up gasta plata
-**del cliente** y lo autoriza **el pago liquidado**. El trigger exige actor humano ⇒ **hay que
-discriminar por `source`** (`human_session` vs `settled_payment`), no relajarlo. Dueño: `TASK-1484`.
+🔴 **El top-up de CLIENTE es otro acto económico.** El grant interno gasta presupuesto **de Efeonce**
+y se autoriza por sesión humana o delegación agente acotada; un top-up gasta plata **del cliente** y lo autoriza
+**el pago liquidado**. Ese camino debe **discriminar por `source`** (`delegated_session` vs
+`settled_payment`), no relajarlo. Dueño: `TASK-1484`.
 Reglas no negociables: monto **del PSP nunca del cliente**, idempotencia por **id de pago** (los PSP
 reintentan webhooks), y un chargeback se corrige con **`grant.correct`**, jamás borrando el grant.
 
@@ -1388,12 +1429,42 @@ futuro debe saber:
 
 - **El confirm exige `x-idempotency-key` PROPIA** — reusar la del propose da
   `409 globe_funding_already_recorded` (el broker registra la intención por clave).
-- **El anti-replay del broker es POR PROPUESTA**, no por clave: registrada la decisión, ningún
-  confirm repetido pasa. El replay idempotente del dominio queda inalcanzable a través del broker;
-  el invariante (ningún segundo grant) vive en dos capas.
-- **La atribución es lo que era "del operador", no la mecánica**: un agente puede ejecutar los curls
-  con autorización explícita SI la sesión es la del humano real; confirmar con la persona agente
-  (`user-agent-e2e-001`) fabrica evidencia en una tabla append-only y sigue prohibido.
+- **El confirm es recuperable por propuesta:** si el dispatch queda ambiguo, el broker reutiliza la idempotency
+  key original y completa una fase append-only `completed|confirm_failed`; nunca crea un segundo grant.
+- **Regla vigente desde TASK-1629:** no fabriques una identidad humana. Usa `pnpm globe:credit-funding` por el
+  cliente público `greenhouse-admin-cli`; una sesión agente puede autorizar y confirmar porque la base registra
+  `actor_auth_mode=agent` y aplica la delegación del workspace. Fuera de esa política o por encima de sus límites,
+  el confirm falla cerrado.
+- **Un comando, dos fases server-side:** el CLI OAuth público + PKCE llama `propose`, conserva el `proposalId`
+  real y ejecuta `confirm` con otra idempotency key; imprime readback de grant, policy y ledger, nunca tokens ni
+  errores upstream crudos. La UI sólo participa en el consentimiento OAuth cuando la política lo exige.
+- **Loopback en Vercel:** se registra `http://127.0.0.1/oauth/callback`; el alias `localhost` observado se acepta
+  sólo contra ese registro y se canoniza inmediatamente. Protocolo, path, query, PKCE y state siguen exactos.
+- **Deployment Protection no es OAuth:** en staging el CLI usa el helper canónico de automation bypass sólo en
+  token/propose/confirm; nunca lo pone en el URL del navegador, lo imprime ni lo envía fuera del origen Greenhouse.
+- **La procedencia cruza el wrapper completo:** `runAppRoute` debe copiar `oauthSessionAuthMode` al contexto del
+  handler. Sin esa propagación, el broker recibe `unknown` y falla cerrado.
+- **Último fondeo real verificado (2026-07-31):** el carril OAuth/PKCE con sesión agente añadió 500 créditos al
+  workspace interno, elevó el tope 800→1500 y dejó evidencia append-only correlacionada. Es evidencia histórica,
+  **no autorización ni receta para otro período**.
+
+### Cambio de período y presupuesto divergente — discovery obligatorio antes de fondear
+
+Ledger, pool, grant, policy mensual, disponibilidad efectiva, usage y proyección visible son controles distintos.
+Un balance positivo no prueba que exista un grant vigente y una UI `0 / 0` no prueba que falten fondos. Nunca
+interpretes unidades raw como créditos visibles sin reconciliar el contrato de escala/formato.
+
+El primer turno es read-only: fija un mismo instante `at` y un período UTC end-exclusive; lee la propuesta conocida,
+pool `get/list`, grant `get/list`, `policy.effective.get`, budget `list`/`availability.get`/`evaluate` con la
+cotización exacta, balance, usage y ledger; luego reconcilia intents Greenhouse por proposal/correlation/idempotency.
+`propose` también crea estado durable, por lo que no pertenece al discovery. Si existe grant `posted` vigente,
+pool activo, policy correcta, `effectiveAvailable` suficiente y `budget.evaluate.allowed=true`, **no fondees**:
+investiga la proyección o UI por su dueño canónico. Sólo autoriza `propose` ante déficit demostrado y sin propuesta
+pendiente/ambigua equivalente; antes de `confirm`, relee y exige fingerprint, valores `Before`, período/cap e
+identidad Greenhouse vigentes. Si algo cambió, descarta el plan stale.
+
+La cuenta Google visible en Chrome puede diferir de la identidad Greenhouse. La autoridad económica sale de
+`actor_user_id + actor_auth_mode` de la sesión Greenhouse, no del correo mostrado por el perfil del navegador.
 
 ### Ocho lecciones de método, que valen más que los fixes
 

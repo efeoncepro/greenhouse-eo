@@ -75,7 +75,7 @@ export async function POST(request: Request) {
     }
 
     const clientId = basicAuth?.clientId || asString(payload.client_id)
-    const clientSecret = basicAuth?.clientSecret || asString(payload.client_secret)
+    const clientSecret = basicAuth ? basicAuth.clientSecret : asString(payload.client_secret)
 
     const consumed = await consumeSisterPlatformAuthorizationCode({
       clientId,

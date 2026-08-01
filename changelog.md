@@ -22,6 +22,15 @@
 - Se incorporó la skill espejo `efeonce-mcp-platform` para Codex y Claude: enruta gateway, OAuth, edge e
   integración de providers hacia las skills dueñas, y mantiene una verificación mecánica de paridad.
 
+## 2026-08-01 — Globe: recuperación del source of truth OAuth/PKCE y evaluación durable
+
+- Se reconstruyó sobre `develop` el código preservado del Admin CLI OAuth público + PKCE, las rutas API Platform,
+  la procedencia autenticada y la recuperación idempotente de fondeo, sin repetir ninguna mutación de runtime.
+- El trabajo administrativo que usó históricamente `TASK-1616` se renumeró a `TASK-1629` para no colisionar con
+  MiniMax H3. Las migraciones ya aplicadas conservan sus nombres históricos `task-1616-*`.
+- Se reconciliaron los checkpoints de TASK-1614 sobre evaluación durable, lineage/rights, recuperación sistémica
+  y el requisito de un canary nuevo desde Producer; el candidato retenido no sustituye esa prueba.
+
 ## 2026-08-01 — AXIS Lab: Astro 7 con foundation documental y testing
 
 - `axis-design-system/apps/lab` dejó Vite vanilla y ahora usa Astro `7.1.6` con salida estática para Vercel,
@@ -688,103 +697,3 @@ Corrección de fuente de verdad: el cliente inicial es **SKY Agencia Creativa**,
 - Se creó [`docs/audits/commercial/AI_PARTNER_PROGRAM_APPLICATIONS_2026-07-26.md`](docs/audits/commercial/AI_PARTNER_PROGRAM_APPLICATIONS_2026-07-26.md) con el mapa, evidencia, estados y próximos pasos de Anthropic/Claude, Lovable, OpenAI, Google Cloud, AWS, Salesforce, Runway, FLUX, BytePlus/ByteDance, ElevenLabs y HeyGen.
 - Se confirmaron envíos a FLUX, Runway Enterprise y ElevenLabs; BytePlus quedó bloqueado únicamente por reCAPTCHA.
 - Se incorporó a las skills de business model y customer model la clasificación de partners por función y los gates de oferta, ownership, economics, derechos, procurement, continuidad, fallback y evidencia de demanda; los companions de Claude quedaron sincronizados.
-
-## 2026-07-26 — ADR-015: Greenhouse administra Globe (créditos y capabilities de usuarios)
-
-- Se creó `docs/architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md` (**ADR-015**,
-  Proposed) y se registró en `creative-studio/DECISIONS_INDEX.md` + `README.md`. Greenhouse es la **superficie** de
-  administración; Globe la **autoridad**: la llave de aprobación nunca sale de su runtime y ningún actor obtiene
-  aprobación y ejecución a la vez.
-- Se creó **`TASK-1566`** (backend-data/command, backend-critical) como su implementación, con el registry y el
-  índice de tasks sincronizados. Siguiente ID libre: `TASK-1567`.
-- Se corrigieron dos afirmaciones de los deltas del 2026-07-26 de ADR-014, con evidencia de código: la autoridad de
-  crédito **ya está** concedida al principal genérico `globe:service:internal-caller` junto con el gasto (no falta
-  una capability, **sobra**), y el maker-checker de crédito es **vacuo** para cualquier caller de workload porque
-  compara contra un `principalId` que es constante por clase. De ahí que la disyunción de actores viva en Greenhouse
-  y no en Globe.
-- Se corrigió el diseño objetivo del Delta (4): grant + asiento de ledger + política van en **una** transacción
-  Postgres, no en una saga — los tres agregados viven en la misma base.
-- Se actualizó `ISSUE-124` con la causa localizada: `dispatch.ts` colapsa **tres** clases de error de crédito en
-  `conflict` (incluido `maker_checker_required`, indistinguible de `pool_paused`) y el desambiguador
-  `budget.evaluate` está `policy-blocked` en `ui`. Solución = Slice 1 de `TASK-1566`.
-- **Cambio de contrato para agentes:** la skill `greenhouse-globe` (`.claude/` y `.codex/`) pasa de 5 a 8 reglas en
-  `Gasto y crédito en Globe`, y nace `.claude/rules/globe-administration.md` (auto-load por `src/lib/globe/**` +
-  `src/lib/sister-platforms/**`). El pointer **no** se agregó a `CLAUDE.md`: el router estaba a 27 tokens del techo
-  y el routing ya existe vía la skill y el índice de `creative-studio`.
-
-## 2026-07-26 — Experience LaunchOps + Globe: producción creativa para experiencias launch-ready
-
-- Se creó `docs/architecture/EFEONCE_EXPERIENCE_LAUNCHOPS_GLOBE_CREATIVE_PRODUCTION_INTEGRATION_V1.md`.
-- La frontera queda explícita: Globe produce `CreativeAssetPack`, `AssetManifest` y `AssemblyManifest`; Wave conserva
-  `LaunchContract`, ensamblaje, Search/AEO, Measurement, governance, release y evidencia.
-- Se distinguen `asset-ready`, `experience-ready` y `launch-ready`, y se agregan los modos client-assets,
-  Globe-assisted, Globe-managed y full Efeonce.
-- Las skills gemelas `.codex/skills/greenhouse-globe/SKILL.md` y `.claude/skills/greenhouse-globe/SKILL.md` incorporan
-  el `Creative Production Contract`, la composición con Wave y la regla de no pasar secretos ni integrar ad hoc.
-
-## 2026-07-26 — Efeonce Product Service Operating Model transversal
-
-- Se creó `docs/business-models/EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md` para definir `Product Service` y
-  separar oferta, productización, delivery model, operating mode y engagement.
-- El contrato cubre scope, outputs, roles, plataformas, Workers, quality gates, pricing architecture, economics,
-  legal/IP, evidence, expansion y stop conditions.
-- Business Model y Pricing Operators de Codex/Claude ahora deben cargar este modelo antes de diseñar packaging o
-  pricing; Wave, Globe y Experience LaunchOps quedan referenciados a él.
-
-## 2026-07-26 — Directriz corporativa 2028: todos los servicios Productized y AI-native
-
-- Se creó `docs/strategy/EFEONCE_2028_PRODUCTIZED_AI_NATIVE_SERVICES_STRATEGIC_DIRECTION_V1.md`.
-- La directriz aplica a todo servicio client-facing y exige Product Service Contract, workflow repetible, IA
-  estructural, autoridad humana, plataforma/memoria, gates, economics, governance y evidencia.
-- ASaaS Manifesto, modelo ASaaS, contexto corporativo y skills de agencia, business model, pricing y customer model
-  quedaron alineados. AI-native no se interpreta como SaaS puro, self-service, autonomía total ni reducción de personas.
-
-## 2026-07-26 — Customer Model Operator para Codex y Claude
-
-- Se creó la skill transversal `efeonce-customer-model-operator` en `.codex/skills/` y `.claude/skills/`.
-- Se cubrieron ICP, segmentación, beachhead, JTBD, triggers, WTP, buyer personas, buying group, stakeholder map,
-  decision/paper process, procurement readiness, qualification, evidence, adopción, retención, expansión y gates.
-- Se añadió el `Customer Model Integrity Pack` reusable, con evidence ledger, confidence, owners, falsadores y handoffs.
-- Business model, GTM, commercial, research, pricing y agency quedaron conectados a la nueva capa; las ofertas concretas
-  siguen siendo responsables de aportar evidencia y mantener sus boundaries.
-
-## 2026-07-26 — Customer Model Integrity Pack para Search Visibility 360
-
-- Se creó `SEARCH_VISIBILITY_360_CUSTOMER_MODEL_INTEGRITY_PACK_V1.md` aplicado a la oferta SEO+AEO integrada de Wave.
-- El alcance comercial queda explícitamente en mid-market y enterprise; SMB queda fuera salvo decisión posterior.
-- El pack separa ICP estratégico/oportunidad/delivery y califica de forma independiente diagnostic, implementation,
-  managed operation, ecosystem/providers y renewal.
-- Se documentan jobs secuenciales, buying group por fase, decision/paper process, provider governance, transition gates,
-  evidence ledger y experimentos. Verdict: `model_incomplete` / `hypothesis_only`.
-
-## 2026-07-26 — EPIC-022 incorpora readiness de producto-servicio
-
-- Se añadió al epic la madurez actual de AEO, la diferencia entre arquitectura SEO y runtime SEO, y los gaps para cerrar
-  el loop diagnóstico → acción → implementación → verificación → renovación.
-- Se fijó mid-market y enterprise como alcance; SMB queda fuera salvo decisión explícita.
-- Se agregaron gates independientes para diagnostic, commercial qualification, implementation, managed operation,
-  renewal/expansion y enterprise readiness, además de la secuencia por olas AEO → SEO mínimo → 360 → authority/enterprise.
-
-## 2026-07-26 — Pricing transversal para Codex y Claude
-
-- Se creó la skill agnóstica `efeonce-pricing-operator` en `.codex/skills/` y `.claude/skills/`.
-- Se consolidaron patrones investigados de value-based/cost-floor pricing, productized services, capacity,
-  managed delivery, T&M/fixed/milestone/usage/outcome/hybrid, credits, AI cost controls, margin waterfall,
-  discount governance, versionado y validación.
-- Business model, GTM, commercial, Finance, Creative Practice y SEO/AEO Practice quedaron enrutados al companion;
-  sus reglas específicas siguen siendo dueñas de sus respectivas líneas.
-
-## 2026-07-26 — Primera aplicación de pricing a Wave
-
-- Se probó `efeonce-pricing-operator` sobre las cinco familias de Wave y sus seis delivery models.
-- Se creó `docs/business-models/wave/WAVE_PRICING_INTEGRITY_PACK_V1.md` con métricas candidatas, revenue
-  architecture, economics, experimentos y gates de aprobación.
-- El resultado es `hypothesis_only`: no se aprobaron tarifas, claims, márgenes ni venta general.
-
-## 2026-07-26 — Pricing específico para Search Visibility 360
-
-- Se creó `SEARCH_VISIBILITY_360_PRICING_INTEGRITY_PACK_V1.md` como aplicación específica de la skill general de
-  pricing a Search Visibility 360.
-- El pack separa diagnóstico, foundation, operación, transparencia/plataforma, capacidad de contenido y expansión;
-  evita usar artículos como unidad pública y trata SEO+AEO como producto integrado.
-- Verdict: `hypothesis_only`, pendiente de Finance, evidencia de willingness-to-pay, capacidad y aprobación comercial.

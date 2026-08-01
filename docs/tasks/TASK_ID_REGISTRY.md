@@ -145,6 +145,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 
 | `TASK-1614` | `in-progress` | **Globe durable model evaluation lifecycle.** EPIC-028; architecture/backend-data/integration; backend-critical; P0. Cambia la evaluación larga de polling síncrono a receipt durable → outbox/worker → manifest checkpoint → reporte idempotente; mantiene separado el carril de readiness/comercial de producción. Requiere evidencia objetiva terminal antes de atestación y prueba UI posterior. | `docs/tasks/in-progress/TASK-1614-globe-durable-model-evaluation-lifecycle.md` |
 | `TASK-1616` | `to-do` | **Integración completa de MiniMax H3 en la flota y el Producer de Globe.** EPIC-028; backend-data/integration + consumer UI; P1/Muy alto/Alto. Integra text-to-video, first-to-last y reference-to-video con imágenes, videos y audios; amplía contratos/validación/ingest/retrieval, Fal adapter, catálogo/bindings/rates, rights/evaluación/canary/promotion y Producer. Fal está live; Globe todavía no está integrado ni promovido. | `docs/tasks/to-do/TASK-1616-globe-minimax-h3-fleet-producer-integration.md` |
+| `TASK-1629` | `in-progress` | **Globe Admin CLI con OAuth PKCE y fondeo gobernado.** EPIC-028; backend-data/integration; P0/Muy alto/Alto. Recupera el source of truth del cliente público OAuth PKCE, API Platform, provenance y delegación agente ya ejercidos; la etiqueta histórica `TASK-1616` colisionó con MiniMax H3 y los nombres de migración ya aplicados no se reescriben. | `docs/tasks/in-progress/TASK-1629-globe-admin-cli-pkce.md` |
 
 ## Siguiente ID disponible
 
@@ -1714,12 +1715,14 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 
 ## Siguiente ID disponible
 
-`TASK-1627`
+`TASK-1630`
 
 > **Corrección 2026-07-30.** Este pie declaraba `TASK-1587`, pero la tabla de este mismo archivo ya
 > registraba hasta `TASK-1598` y esos archivos existen en disco: el pie estaba obsoleto respecto de su
 > propia tabla. Antes de reservar un ID, **verificar contra el sistema de archivos**
 > (`ls docs/tasks/*/TASK-*.md`), no sólo contra este pie. Reservados `TASK-1599`, `TASK-1600`, `TASK-1601` y
-> `TASK-1602`…`TASK-1611`; `TASK-1614` fue reservado para el ciclo durable de evaluación; `TASK-1616`…`TASK-1624` fueron reservadas para la flota challenger de Fal; `TASK-1625` fue reservado para payroll correctness; `TASK-1626` fue reservado para Efeonce MCP Platform; Runway queda fuera de esta expansión; `TASK-1627` sigue reservado y `TASK-1628` quedó tomado por el presupuesto legible del Producer; el siguiente ID libre es `TASK-1629`.
+> `TASK-1602`…`TASK-1611`; `TASK-1614` fue reservado para el ciclo durable de evaluación; `TASK-1616`…`TASK-1624` fueron reservadas para la flota challenger de Fal; `TASK-1625` fue reservado para payroll correctness; `TASK-1626` fue reservado para Efeonce MCP Platform; Runway queda fuera de esta expansión; `TASK-1627` sigue reservado, `TASK-1628` quedó tomado por el presupuesto legible del Producer y `TASK-1629` por la recuperación del Admin CLI; el siguiente ID libre es `TASK-1630`.
 
-> `TASK-1628` quedó tomado por «El Producer puede leer su propio presupuesto» (EPIC-028); `TASK-1626` y `TASK-1627` ya estaban reservados, así que el siguiente ID libre es `TASK-1629`.
+> `TASK-1628` quedó tomado por «El Producer puede leer su propio presupuesto» (EPIC-028); `TASK-1629` quedó
+> asignado a la recuperación del Admin CLI OAuth/PKCE cuyo branch histórico usó por error `TASK-1616`. El
+> siguiente ID libre es `TASK-1630`.

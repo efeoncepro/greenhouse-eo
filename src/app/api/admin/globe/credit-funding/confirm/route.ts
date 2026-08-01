@@ -2,10 +2,8 @@ import { canonicalErrorResponse } from '@/lib/api/canonical-error-response'
 import { getServerAuthSession } from '@/lib/auth'
 import { buildTenantEntitlementSubject } from '@/lib/commercial/party/route-entitlement-subject'
 import { can } from '@/lib/entitlements/runtime'
-import {
-  confirmGlobeCreditFunding,
-  GlobeCreditFundingBrokerError
-} from '@/lib/globe/credit-administration-broker'
+import { confirmGlobeCreditFunding, GlobeCreditFundingBrokerError } from '@/lib/globe/credit-administration-broker'
+import { parseConfirmBody } from '@/lib/globe/credit-funding-request'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 
@@ -14,7 +12,7 @@ import { GreenhouseGlobeConfigurationError } from '@/lib/globe/client'
 import {
   brokerErrorResponse,
   globeConfigurationErrorResponse,
-  parseConfirmBody,
+  resolveFundingActorAuthMode,
   requireIdempotencyKey
 } from '../shared'
 
@@ -25,7 +23,8 @@ import {
  * una autoridad distinta de proponer, y la disyunción confirmante ≠ proponente la impone un `CHECK`
  * en `globe_credit_funding_intents` — no esta ruta, y no una convención de payload.
  *
- * Un agente puede proponer; **confirmar es de una persona**, y esa persona es la de la sesión.
+ * Un agente autenticado puede confirmar sólo cuando la política delegada del workspace y sus límites
+ * lo permiten. La base aplica esa decisión usando la proveniencia firmada de la sesión.
  */
 export const dynamic = 'force-dynamic'
 
@@ -60,7 +59,14 @@ export const POST = async (request: Request) => {
       fingerprint: parsed.fingerprint,
       // Igual que en `propose`: la identidad sale de la sesión. Es lo único que hace que la
       // atribución humana signifique algo del otro lado.
-      actor: { userId: tenant.userId, entitlement: 'platform.globe_credit_funding.confirm' },
+      actor: {
+        userId: tenant.userId,
+        entitlement: 'platform.globe_credit_funding.confirm',
+        authMode: resolveFundingActorAuthMode({
+          provider: session.user.provider,
+          authMode: session.user.authMode || tenant.authMode
+        })
+      },
       idempotencyKey
     })
 
