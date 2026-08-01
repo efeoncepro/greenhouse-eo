@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -21,11 +21,11 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Rebaselinada por TASK-1630; bloqueada por truth y lifecycle antes de publicar recovery autoritativo`
+- Status real: `Implementación local iniciada sobre snapshot V2, settlement V1 y expiry reconciliada; rollout depende de migraciones/deploy`
 - Rank: `next.3`
 - Domain: `platform`
-- Blocked by: `TASK-1482, TASK-1468, TASK-1579`
-- Branch: `task/TASK-1586-globe-credit-denial-disambiguator-operator`
+- Blocked by: `none`
+- Branch: `develop`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -373,3 +373,14 @@ redactados independientes; nunca se flipea el const compartido que también cubr
 La auditoría invalidó la premisa de “sólo exponer dos readers”: ambos divergen del enforcement real. Esta task es
 ahora el read/recovery plane Greenhouse y queda bloqueada por el snapshot/evaluator de TASK-1482. También publica
 la proyección self-status que consume TASK-1628, sin abrir los DTOs administrativos al Producer.
+
+## Checkpoint de inicio 2026-08-01
+
+- El bloqueo de implementación local quedó resuelto sin falsear las tasks predecesoras como completas:
+  `CreditDecisionSnapshotV2`, la policy `studio-credits-settlement-v1` y expiry reconciliada ya están
+  code-complete y verificadas en Globe `develop` (`8e2c0cb`, `9acfa58`, `1009e41`).
+- TASK-1482/1468/1579 permanecen `in-progress` porque faltan aplicar migraciones, desplegar, activar flags y
+  verificar runtime. Esos pendientes bloquean el rollout de TASK-1586, no el desarrollo local de contratos,
+  readers y recovery.
+- Preflight autorizado para checkout compartido `develop` y subagentes; no usar worktrees. Globe conserva
+  `main` como rama predeterminada y de release.
