@@ -9,6 +9,7 @@ const failures = []
 
 const files = {
   packageJson: 'package.json',
+  preCommitHook: '.husky/pre-commit',
   prompt: 'docs/operations/CODEX_EXECUTION_PROMPT_V1.md',
   hook: 'scripts/codex-task-hook.mjs',
   skill: '.codex/skills/greenhouse-task-execution-hook/SKILL.md',
@@ -39,6 +40,7 @@ const sources = Object.fromEntries(
 
 requireIncludes('package.json', sources.packageJson, '"codex:task-hook"')
 requireIncludes('package.json', sources.packageJson, '"codex:task-hook:check"')
+requireIncludes('pre-commit hook', sources.preCommitHook, 'lint-staged --no-stash')
 requireIncludes('CODEX prompt', sources.prompt, '## Prompt canónico')
 requireIncludes('CODEX prompt', sources.prompt, '## Protocolo de actualización continua')
 requireIncludes('CODEX prompt', sources.prompt, '/implement-task ###')
@@ -87,6 +89,7 @@ rejectIncludes('CODEX prompt stale branch rule', sources.prompt, 'crea branch `t
 rejectIncludes('task process stale branch rule', sources.taskProcess, 'Crear branch: `task/TASK-###-short-slug`')
 rejectIncludes('task template stale branch rule', sources.taskTemplate, 'Branch: `task/TASK-###-short-slug`')
 rejectIncludes('package stale worktree command', sources.packageJson, '"worktrees:sync"')
+rejectIncludes('pre-commit hook unsafe lint-staged stash', sources.preCommitHook, 'pnpm exec lint-staged\n')
 rejectIncludes('worktree tombstone active git worktree call', sources.worktreeScript, 'git worktree')
 rejectIncludes('CODEX prompt stale skill', sources.prompt, 'vercel:nextjs')
 rejectIncludes('CODEX prompt stale skill', sources.prompt, 'modern-ui-architect')

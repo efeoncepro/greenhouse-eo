@@ -38,7 +38,8 @@ rollout, migrations y Producer viven en `docs/operations/creative-studio/GLOBE_R
 - Se retiró el drift que todavía inducía Globe `develop`: `efeonce-globe/AGENTS.md` ahora fija `main` como rama
   única de trabajo/integración/release, CI sólo acepta push a `main`, EPIC-028 declara el contrato por repositorio
   y el helper `worktree-sync` quedó retirado fail-closed. `pnpm codex:task-hook:check` bloquea la reintroducción
-  de ramas por task o comandos activos de worktree. Un commit no autoriza deploy automáticamente.
+  de ramas por task o comandos activos de worktree; el pre-commit ejecuta `lint-staged --no-stash` para no apartar
+  WIP ajeno. Un commit no autoriza deploy automáticamente.
 
 ## Globe — ADR-018: continuidad móvil native-first como dirección, no rollout (2026-08-01)
 
