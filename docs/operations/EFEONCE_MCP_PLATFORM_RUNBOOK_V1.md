@@ -265,3 +265,13 @@ Cada promoción registra:
   deploy. Rollback de Globe: revisión previa `globe-api-internal-00178-f5s`.
 - Límite conocido: el cliente interno Entra recibe ambos scopes; no habilites clientes hasta separar la emisión
   de scope/entitlement y repetir el deny real con una identidad base-only.
+
+### Identidad cliente externa — propuesta, no configuración activa
+
+Entra permanece como identidad del canary interno. No crees usuarios cliente en ese tenant ni expongas una
+capacidad Globe por haber pasado el canary. La propuesta de un issuer B2B en `auth.efeonce.org`, el binding con la
+organización de Account 360 y el rollout allow/base-only/revoke viven en
+[`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`](../architecture/EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md)
+y [`TASK-1631`](../tasks/to-do/TASK-1631-efeonce-customer-identity-mcp-federation.md). Hasta la aceptación
+explícita del ADR y el plan de proveedor, no hay DNS, tenant, secreto, client registration ni acceso cliente que
+configurar.

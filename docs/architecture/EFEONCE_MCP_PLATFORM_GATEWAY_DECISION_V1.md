@@ -158,6 +158,15 @@ corporativa neutral; `efeoncepro.com` queda como compatibilidad opcional.
 
 ## Consequences
 
+### Delta 2026-08-01 — identidad de clientes externos
+
+El authorization server Entra descrito en esta decisión se mantiene como canary interno. No es el modelo de
+onboarding de organizaciones cliente ni evidencia de autorización B2B, porque el cliente canary emite ambos scopes.
+La propuesta de identidad cliente, el vínculo con Account 360 y el gate de proveedor viven en
+[`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`](EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md)
+y [`TASK-1631`](../tasks/to-do/TASK-1631-efeonce-customer-identity-mcp-federation.md). Esta adición no acepta un
+proveedor ni altera el reader Globe interno habilitado.
+
 ### Benefits
 
 - releases y escalado independientes de Greenhouse y Globe;

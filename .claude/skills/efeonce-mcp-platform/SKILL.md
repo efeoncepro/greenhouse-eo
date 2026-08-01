@@ -34,8 +34,11 @@ If a source conflicts with remembered behavior, the verified runtime and its can
   scopes before MCP dispatch; never log tokens, auth codes, raw bodies or secrets.
 - Derive tenant/workspace from verified identity and provider policy. Never accept a free-form tenant boundary.
 - Before customer access, require B2B/multitenant entitlements that can issue and revoke access per tenant and
-  capability. The current internal Entra client receives both delegated MCP scopes, so it cannot prove base-only
-  persona denial; retain a dispatch-level deny test and add a real base-only client before that rollout.
+  capability. Entra is the internal canary only. Follow the proposed Account 360 binding and customer identity
+  gate in `EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md` / `TASK-1631`; do not provision its leading
+  vendor candidate without explicit approval. The current Entra client receives both delegated MCP scopes, so it
+  cannot prove base-only persona denial; retain a dispatch-level deny test and add a real base-only client before
+  that rollout.
 - Treat writes, approvals, spending, rights-sensitive creative work, webhooks and new public auth surfaces as new
   ADR/task work. Do not infer permission from a read-only MCP capability.
 - Do not call a product deployment successful because its MCP adapter compiled. Require provider allow/deny/fault

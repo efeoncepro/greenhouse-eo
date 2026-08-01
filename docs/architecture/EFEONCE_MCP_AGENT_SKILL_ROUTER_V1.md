@@ -20,8 +20,11 @@ The two versioned bundles are intentionally mirrored:
 `pnpm skills:mirrors` makes drift in the declared mirrors a failing local check.
 
 El gateway público ya opera el reader interno y read-only `globe.producer.fleet.list`. Eso no cambia la postura
-por defecto de una capacidad nueva ni autoriza acceso de clientes: el acceso B2B/multitenant sigue bloqueado hasta
-que Entra y el provider puedan aplicar entitlements por tenant y capability.
+por defecto de una capacidad nueva ni autoriza acceso de clientes: Entra es sólo el canary interno. El acceso
+B2B/multitenant sigue bloqueado hasta que la identidad cliente propuesta, el binding Account 360 y el provider
+puedan aplicar y revocar entitlements por tenant y capability según
+[`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`](EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md)
+y `TASK-1631`.
 
 ## Invocation boundary
 
