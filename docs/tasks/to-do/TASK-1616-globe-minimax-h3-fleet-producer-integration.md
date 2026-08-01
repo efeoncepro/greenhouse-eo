@@ -57,7 +57,7 @@ canary, settlement y evidencia por modalidad.
 - `docs/tasks/in-progress/TASK-1553-globe-extensible-multi-model-provider-catalog.md`
 - `docs/tasks/complete/TASK-1554-globe-producer-fleet-availability-projection.md`
 - `docs/tasks/to-do/TASK-1578-globe-model-onboarding-credit-rate-promotion.md`
-- `docs/tasks/to-do/TASK-1579-globe-credit-rating-settlement-fallback-policy.md`
+- `docs/tasks/in-progress/TASK-1579-globe-credit-rating-settlement-fallback-policy.md`
 
 Reglas: reutilizar el seam y los readers; no compartir secretos; no exponer slugs; usar rutas nuevas;
 mantener output content-addressed; no hacer fallback silencioso; promover por modelo/ruta.

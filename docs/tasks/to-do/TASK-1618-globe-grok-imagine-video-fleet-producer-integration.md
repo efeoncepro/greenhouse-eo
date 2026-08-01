@@ -36,7 +36,7 @@ Integrar Grok Imagine Video mediante las rutas Fal de texto, imagen, referencias
 - `docs/architecture/creative-studio/EFEONCE_GLOBE_ROUTE_BASED_MODEL_RESOLUTION_DECISION_V1.md`
 - `docs/architecture/GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md`
 - `docs/tasks/to-do/TASK-1573-globe-video-edit-capability-and-governed-continuation.md`
-- `docs/tasks/to-do/TASK-1579-globe-credit-rating-settlement-fallback-policy.md`
+- `docs/tasks/in-progress/TASK-1579-globe-credit-rating-settlement-fallback-policy.md`
 
 ## Modular Placement Contract
 

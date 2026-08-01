@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Medio-Alto`
@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Contrato normativo pendiente; necesario antes de cerrar el engine de credits y el onboarding de modelos`
+- Status real: `Policy V1 y conformance local en implementación; expiry/worker, calibración y rollout pendientes`
 - Rank: `next.2`
 - Domain: `finance|creative|platform|reliability`
 - Blocked by: `none`
@@ -97,7 +97,7 @@ This task no posee provider adapters, route catalog, UI, checkout, price book, i
 
 ### Files owned
 
-- `docs/tasks/to-do/TASK-1579-globe-credit-rating-settlement-fallback-policy.md`
+- `docs/tasks/in-progress/TASK-1579-globe-credit-rating-settlement-fallback-policy.md`
 - deltas normativos al modelo de Studio Credits aprobados durante Plan Mode;
 - fixtures/conformance de rating y settlement que Plan Mode ubique en Globe. El runtime
   `packages/contracts/src/credits.ts`, `packages/domain/src/credit-ledger.ts` y stores/migrations sigue bajo
@@ -363,6 +363,18 @@ una route cuando su rate version y receipt apuntan a esa misma policy; ningún a
 - `pnpm ops:lint --changed`
 - `pnpm qa:gates --changed`
 - `pnpm docs:closure-check`
+
+## Progreso verificable 2026-08-01
+
+- El hook canónico se ejecutó con `--develop --subagents`; se mantiene el checkout compartido y no se usa worktree.
+- Globe incorpora una policy pura `studio-credits-settlement-v1` consumida por ambos finalizadores, durable y
+  síncrono, con outcomes `settle | release | keep-held-for-reconciliation | requires-reauthorization`.
+- Un timeout aceptado, un output parcial o un fallback fuera del envelope conserva el hold; un fallo definitivo
+  libera y un candidato completo liquida la rate semántica pinneada, no unidades crudas del provider.
+- Verificación: typecheck de contracts/domain, 396 tests de domain y `pnpm check && pnpm build` monorepo verdes.
+  Commit local de Globe `develop`: `9acfa58 feat(credits): govern settlement fallback outcomes`.
+- Pendiente antes de cerrar: expiry con claim/lease/fencing y reconciliación previa, policy receipts/readers,
+  observabilidad, calibración/onboarding, migración/deploy y canary runtime.
 - Contract fixtures/conformance en `efeonce-globe` cuando la policy se implemente.
 
 ## Closing Protocol

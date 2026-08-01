@@ -208,6 +208,12 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
 - Próximo punto seguro de continuación: cerrar TASK-1468+1579 con outcomes explícitos de settlement y expiry
   reconciliada antes de liberar holds; luego implementar `ensure-funded` idempotente sobre `propose → confirm`.
   TASK-1482 sigue `in-progress`: código local no equivale a migración aplicada ni operación live.
+- TASK-1579 pasó a `in-progress`. La policy local `studio-credits-settlement-v1` ya converge ambos finalizadores en
+  cuatro outcomes: settle, release, keep-held-for-reconciliation y requires-reauthorization. Timeout aceptado,
+  parcial y fallback fuera del envelope no liberan ni cobran. `pnpm check && pnpm build` pasó completo; commit
+  local de Globe `develop`: `9acfa58`. El próximo slice
+  es expiry periódica en el `globe-producer-worker` existente, secuencial después del governed batch, con
+  claim/lease/fencing y reconciliación obligatoria; no se libera por TTL a ciegas.
 
 ## Siguiente paso ejecutable
 
