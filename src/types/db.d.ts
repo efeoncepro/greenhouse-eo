@@ -2628,10 +2628,93 @@ export interface GreenhouseCoreFirstPartyAppSessions {
   user_id: string;
 }
 
+export interface GreenhouseCoreGlobeCreditFundingAuthorityAuthAttestations {
+  attestation_id: string;
+  attested_at: Generated<Timestamp>;
+  auth_mode: string;
+  auth_provider: string;
+  correlation_id: string;
+  issuer_user_id: string;
+}
+
+export interface GreenhouseCoreGlobeCreditFundingAuthorityExecutionEvents {
+  auth_evidence_ref: string;
+  correlation_id: string;
+  event_fingerprint: string;
+  event_id: Generated<string>;
+  event_type: string;
+  evidence: Generated<Json>;
+  execution_id: string;
+  occurred_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCoreGlobeCreditFundingAuthorityExecutions {
+  actor_auth_mode: string;
+  authority_id: string;
+  claimed_at: Generated<Timestamp>;
+  completed_at: Timestamp | null;
+  confirm_idempotency_key: string;
+  correlation_id: string;
+  dispatch_lease_expires_at: Timestamp | null;
+  dispatch_lease_generation: Generated<number>;
+  dispatch_lease_owner: string | null;
+  execution_fingerprint: string;
+  execution_id: Generated<string>;
+  executor_channel: string;
+  executor_client_id: string;
+  executor_user_id: string;
+  first_auth_evidence_ref: string;
+  globe_operation_id: string | null;
+  globe_receipt_ref: string | null;
+  operation_key: string;
+  outcome: string | null;
+  plan_fingerprint: string | null;
+  proposal_id: string | null;
+  propose_idempotency_key: string;
+  receipt_digest: string | null;
+  reconcile_idempotency_key: string;
+  state: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCoreGlobeCreditFundingAuthorityIssuerRevocations {
+  correlation_id: string;
+  globe_workspace_id: string;
+  issuer_user_id: string;
+  reason_code: string;
+  revoked_at: Generated<Timestamp>;
+  revoked_by_user_id: string;
+}
+
+export interface GreenhouseCoreGlobeCreditFundingAuthorityIssuers {
+  active: Generated<boolean>;
+  configured_at: Generated<Timestamp>;
+  configured_by: string;
+  globe_workspace_id: string;
+  issuer_user_id: string;
+  max_grant_credits: number;
+  max_resulting_cap_credits: number;
+  max_target_available_credits: number;
+  max_ttl_seconds: Generated<number>;
+}
+
+export interface GreenhouseCoreGlobeCreditFundingAuthorityRevocations {
+  auth_evidence_ref: string;
+  authority_id: string;
+  correlation_id: string;
+  reason_code: string;
+  revocation_id: Generated<string>;
+  revoked_at: Generated<Timestamp>;
+  revoked_by_entitlement: string;
+  revoked_by_user_id: string;
+}
+
 export interface GreenhouseCoreGlobeCreditFundingIntents {
   actor_auth_mode: Generated<string>;
   actor_entitlement: string;
   actor_user_id: string;
+  authority_execution_id: string | null;
+  authority_id: string | null;
   correlation_id: string;
   created_at: Generated<Timestamp>;
   globe_workspace_id: string;
@@ -2644,10 +2727,39 @@ export interface GreenhouseCoreGlobeCreditFundingIntents {
   proposed_by_user_id: string | null;
 }
 
+export interface GreenhouseCoreGlobeCreditFundingOneShotAuthorities {
+  authority_id: Generated<string>;
+  evidence_ref: string;
+  executor_auth_mode: string;
+  executor_channel: string;
+  executor_client_id: string;
+  executor_user_id: string;
+  expires_at: Timestamp;
+  globe_workspace_id: string;
+  instruction_fingerprint: string;
+  issued_at: Generated<Timestamp>;
+  issuer_auth_evidence_ref: string;
+  issuer_auth_mode: string;
+  issuer_entitlement: string;
+  issuer_user_id: string;
+  max_executions: Generated<number>;
+  max_grant_credits: number;
+  max_resulting_cap_credits: number;
+  not_before: Timestamp;
+  operation_key: string;
+  operation_kind: Generated<string>;
+  period_end: Timestamp;
+  period_key: string;
+  period_start: Timestamp;
+  schema_version: Generated<string>;
+  target_available_credits: number;
+}
+
 export interface GreenhouseCoreGlobeCreditFundingPolicies {
   agent_confirmation_enabled: Generated<boolean>;
   agent_max_grant_credits: number | null;
   agent_max_monthly_cap_credits: number | null;
+  agent_one_shot_authority_required: Generated<boolean>;
   globe_workspace_id: string;
   requires_second_confirmer: Generated<boolean>;
   second_confirmer_above_credits: number | null;
@@ -11730,7 +11842,14 @@ export interface DB {
   "greenhouse_core.entitlement_governance_audit_log": GreenhouseCoreEntitlementGovernanceAuditLog;
   "greenhouse_core.entity_source_links": GreenhouseCoreEntitySourceLinks;
   "greenhouse_core.first_party_app_sessions": GreenhouseCoreFirstPartyAppSessions;
+  "greenhouse_core.globe_credit_funding_authority_auth_attestations": GreenhouseCoreGlobeCreditFundingAuthorityAuthAttestations;
+  "greenhouse_core.globe_credit_funding_authority_execution_events": GreenhouseCoreGlobeCreditFundingAuthorityExecutionEvents;
+  "greenhouse_core.globe_credit_funding_authority_executions": GreenhouseCoreGlobeCreditFundingAuthorityExecutions;
+  "greenhouse_core.globe_credit_funding_authority_issuer_revocations": GreenhouseCoreGlobeCreditFundingAuthorityIssuerRevocations;
+  "greenhouse_core.globe_credit_funding_authority_issuers": GreenhouseCoreGlobeCreditFundingAuthorityIssuers;
+  "greenhouse_core.globe_credit_funding_authority_revocations": GreenhouseCoreGlobeCreditFundingAuthorityRevocations;
   "greenhouse_core.globe_credit_funding_intents": GreenhouseCoreGlobeCreditFundingIntents;
+  "greenhouse_core.globe_credit_funding_one_shot_authorities": GreenhouseCoreGlobeCreditFundingOneShotAuthorities;
   "greenhouse_core.globe_credit_funding_policies": GreenhouseCoreGlobeCreditFundingPolicies;
   "greenhouse_core.identity_profile_source_links": GreenhouseCoreIdentityProfileSourceLinks;
   "greenhouse_core.identity_profiles": GreenhouseCoreIdentityProfiles;
