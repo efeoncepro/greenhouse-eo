@@ -16,6 +16,10 @@ const BROKER_ERROR_CODES = {
   proposal_not_found: 'globe_funding_proposal_not_found',
   confirmer_is_proposer: 'globe_funding_confirmer_is_proposer',
   already_recorded: 'globe_funding_already_recorded',
+  fingerprint_mismatch: 'globe_funding_invalid_request',
+  actor_auth_mode_not_allowed: 'forbidden',
+  agent_confirmation_forbidden: 'globe_funding_agent_confirmation_forbidden',
+  agent_funding_limit_exceeded: 'globe_funding_agent_limit_exceeded',
   globe_unavailable: 'globe_unavailable',
   rejected_by_globe: 'globe_funding_rejected'
 } as const satisfies Record<GlobeCreditFundingBrokerError['code'], string>
@@ -35,10 +39,7 @@ export const brokerErrorResponse = (error: GlobeCreditFundingBrokerError) =>
  * La línea de servidor va acá y no queda a criterio del caller (ISSUE-127): sin ella, el operador ve
  * un código honesto pero nadie puede decir QUÉ variable falta.
  */
-export const globeConfigurationErrorResponse = (
-  error: GreenhouseGlobeConfigurationError,
-  operation: string
-) => {
+export const globeConfigurationErrorResponse = (error: GreenhouseGlobeConfigurationError, operation: string) => {
   // `error.code` es un enum cerrado de configuración: no lleva secreto, host ni payload.
   console.error(
     JSON.stringify({
@@ -57,6 +58,19 @@ export const requireIdempotencyKey = (request: Request): string | undefined => {
   const value = request.headers.get('x-idempotency-key')?.trim()
 
   return value && value.length >= 8 ? value : undefined
+}
+
+export const resolveFundingActorAuthMode = ({
+  provider,
+  authMode
+}: {
+  provider?: string | null
+  authMode?: string | null
+}) => {
+  const normalizedProvider = provider?.trim().toLowerCase() || ''
+  const normalizedAuthMode = authMode?.trim().toLowerCase() || ''
+
+  return normalizedProvider === 'agent' || normalizedAuthMode === 'agent' ? 'agent' : normalizedAuthMode || 'unknown'
 }
 
 export type ParsedFundingBody = Readonly<{
