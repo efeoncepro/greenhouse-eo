@@ -123,10 +123,11 @@ fixtures visuales completos por contrato y la migración ordenada del catálogo 
   órbita única, variante ambiental y fallback `prefers-reduced-motion`. No se copian el SVG experimental ni GSAP
   desde Greenhouse.
 - El Lab genera 27 páginas estáticas y 21 contratos publicados. Build, typecheck, tests, lint y 16 E2E Chromium/
-  mobile pasan. `axis.efeonce.org` está asociado al proyecto Vercel; la resolución DNS de HostGator aún debe
-  propagarse antes de cerrar el smoke por dominio custom.
-- Commit AXIS: `4b661db` (`feat(lab): add leaderboard reference contract`), publicado en `main`. La slice
-  `brand-motion` queda pendiente de commit y despliegue en esta continuidad.
+  mobile pasan. `axis.efeonce.org` está asociado al proyecto Vercel, resuelve a `76.76.21.21` y el smoke HTTPS
+  de `/patterns/efeonce.brand-motion/` responde `200`.
+- Commits AXIS: `4b661db` (`feat(lab): add leaderboard reference contract`) y `708a515`
+  (`feat(lab): add brand motion reference contract`), publicados en `main`. Deployment público actualizado:
+  `axis-design-system-ijrh0xqh9-efeonce-7670142f.vercel.app`, alias `https://axis.efeonce.org`.
 
 ### Plan futuro para portar el Lab Greenhouse a AXIS
 
