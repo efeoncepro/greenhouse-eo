@@ -86,6 +86,13 @@ fixtures visuales completos por contrato y la migración ordenada del catálogo 
 - El Lab genera 18 páginas estáticas y 12 contratos publicados; los E2E Chromium/mobile pasan después de verificar
   las nuevas rutas. No se trasladaron Portal context, telemetry ni componentes MUI.
 
+### Delta 2026-08-01 (g) — catálogo pure-UI ampliado
+
+- AXIS publica `efeonce.charts`, `efeonce.roadmap-timeline`, `efeonce.team-avatar-group` y
+  `efeonce.surface-recipes` como contratos estáticos, sin motores de charts ni datos de producto.
+- El Lab genera 22 páginas estáticas y 16 contratos publicados; los E2E Chromium/mobile pasan. La paridad visual
+  con los canaries consumidores sigue pendiente antes de retirar cualquier ruta Greenhouse.
+
 ### Plan futuro para portar el Lab Greenhouse a AXIS
 
 1. Inventariar las rutas actuales de `/design-system` y clasificarlas como contrato puro, fixture visual,

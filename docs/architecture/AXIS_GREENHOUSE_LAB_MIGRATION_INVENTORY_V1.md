@@ -33,7 +33,7 @@ Cada candidato requiere auditoría transitive de imports antes de migrarse.
 | `card-density`, `composition-shell` | migrada | density/shell contracts; no Portal shell |
 | `motion`, `border-beam` | migrada | motion contract + reduced-motion evidence |
 | `microinteractions` | excluded first slice | composite product feedback; extract per primitive |
-| `team-avatar-group`, `surface-recipes`, `roadmap-timeline`, `charts` | pure-UI candidate | contract after transitive import audit |
+| `team-avatar-group`, `surface-recipes`, `roadmap-timeline`, `charts` | migrada | static contracts + framework-agnostic fixtures |
 | `brand-logos` | candidate after provenance | AXIS asset/provenance gate |
 | `axis-adapters` | excluded from reference | stays in consumers; compare by evidence |
 | `efeonce-brand`, `gamification`, `handoff` | excluded first slice | brand/workflow/product surface |
@@ -69,6 +69,10 @@ reduced-motion mode. Greenhouse's Nexa-specific beam palettes and GSAP runtime a
 `efeonce.composition-shell` and `efeonce.card-density` now expose layout-only fixtures. They preserve landmark
 order, responsive composition and content priority without copying Greenhouse Portal context, telemetry or MUI
 components.
+
+The catalog block now also publishes `efeonce.charts`, `efeonce.roadmap-timeline`, `efeonce.team-avatar-group`
+and `efeonce.surface-recipes`. These are reference fixtures for data shape, sequence, overflow and surface roles;
+they do not copy chart engines, product data, Portal state or consumer adapters.
 
 ## Gate for each next route
 

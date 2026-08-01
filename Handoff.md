@@ -31,6 +31,8 @@
   del traslado inicial porque mezcla múltiples primitivas y estados de producto.
 - `composition-shell` y `card-density` ya tienen fixtures estáticos en AXIS; el shell de Portal y su telemetría
   siguen excluidos del Lab público.
+- El catálogo pure-UI también cubre `charts`, `roadmap-timeline`, `team-avatar-group` y `surface-recipes`; aún
+  faltan las comparaciones visuales contra consumidores antes de retirar el fallback Greenhouse.
 
 ## Globe Producer — seis defectos de superficie, el pie de la app y la paginación del feed (2026-08-01)
 
