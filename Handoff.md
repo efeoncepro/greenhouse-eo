@@ -56,10 +56,12 @@
   token-backed en `/references/colors/`, `/references/typography/`, `/references/geometry/` y
   `/references/elevation/`; el inventario y el triage están en
   [`AXIS_GREENHOUSE_LAB_MIGRATION_INVENTORY_V1.md`](docs/architecture/AXIS_GREENHOUSE_LAB_MIGRATION_INVENTORY_V1.md).
-- El primer bloque pure-UI tiene contratos publicados, pero sólo `button` y `chip` están documentados como
-  `candidate parity`; `breadcrumbs`, `disclosure`, `loaders` y `floating-surface` siguen siendo skeletons. La
+- El primer bloque pure-UI tiene contratos publicados; `button`, `chip`, `breadcrumbs`, `floating-surface` y
+  `motion` están documentados como `candidate parity`; `disclosure` y `loaders` siguen siendo skeletons. La
   migración continúa y `/design-system` permanece como fallback hasta cerrar parity visual y de consumidores.
-- También quedaron publicados `motion` y `border-beam` como contratos portables; `microinteractions` sigue fuera
+- También quedaron publicados `motion` y `border-beam` como contratos portables; `motion` ya tiene una reconstrucción
+  de candidate parity en AXIS (`95bc3f2`): seis duraciones, cuatro easings, cuatro variantes, replay, estado
+  manual sin motion y E2E responsive/reduced-motion. `microinteractions` sigue fuera
   del traslado inicial porque mezcla múltiples primitivas y estados de producto.
 - `composition-shell` y `card-density` ya tienen fixtures estáticos en AXIS; el shell de Portal y su telemetría
   siguen excluidos del Lab público.
@@ -81,7 +83,7 @@
   focus return real contra el consumer Greenhouse.
 - `leaderboard` ya tiene contrato y fixture estática con datos sintéticos; `brand-motion` ya tiene contrato y
   referencia orbital HTML/CSS sin SVG privado ni GSAP. El Lab queda en 27 páginas y 21 contratos; build, lint,
-  typecheck, tests y 26 E2E pasan. `axis.efeonce.org` ya resuelve a `76.76.21.21` y el smoke HTTPS devuelve `200`.
+  typecheck, tests y 28 E2E pasan. `axis.efeonce.org` ya resuelve a `76.76.21.21` y el smoke HTTPS devuelve `200`.
   La siguiente continuidad debe continuar con `handoff`, `microinteractions` y las superficies con API.
 
 ## Globe Producer — seis defectos de superficie, el pie de la app y la paginación del feed (2026-08-01)
