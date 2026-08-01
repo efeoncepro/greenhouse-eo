@@ -9,6 +9,10 @@
   pedir dirección al operador. Canon:
   `docs/architecture/agent-invariants/REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md`.
 
+## Globe — ADR-018: continuidad móvil como dirección, no rollout (2026-08-01)
+
+- [ADR-018](docs/architecture/creative-studio/EFEONCE_GLOBE_MOBILE_CONTINUITY_APPLICATION_DECISION_V1.md) fija Globe como **continuity-first**: mobile web/PWA primero; no se creó una skill nueva, no hay app/runtime rollout y Phase 1 requiere evidencia, task, policy, owner y gates. Funcional/manual: [`mobile continuity`](docs/documentation/creative-studio/efeonce-globe-mobile-continuidad.md) · [`validación`](docs/manual-de-uso/creative-studio/operar-globe-continuidad-movil.md).
+
 ## Efeonce MCP — gateway público y canary Globe read-only verificados (2026-08-01)
 
 - Se creó el repo privado independiente `efeoncepro/efeonce-mcp`; Greenhouse y Globe no hospedan el gateway.

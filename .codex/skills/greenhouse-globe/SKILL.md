@@ -988,6 +988,56 @@ DESPACHA**.
   activa. No lo llames galería, no lo vuelvas a implementar en el payload legacy y no uses una nota histórica de
   port/cutover para ubicarlo.
 
+## ADR-018 — continuidad móvil y aplicación companion (dirección propuesta, 2026-08-01)
+
+Globe es **continuity-first**, no `desktop-first` con un breakpoint. La promesa del producto es devolverle al
+creativo tiempo y atención; la intención puede aparecer en cualquier lugar y un job puede terminar lejos del
+Producer. La estrategia móvil vigente es **mobile web/PWA para validar continuidad → companion acotado → app nativa
+sólo con evidencia**. No se crea una skill nueva para este dominio: esta sección es la guía operativa canónica de
+`greenhouse-globe` y el detalle contractual vive en [ADR-018](../../../docs/architecture/creative-studio/EFEONCE_GLOBE_MOBILE_CONTINUITY_APPLICATION_DECISION_V1.md).
+
+### Boundary operativo
+
+- **Móvil** captura intención/referencia/draft, recupera contexto, observa jobs, revisa una selección, comenta,
+  decide lo permitido y entrega el siguiente paso.
+- **Desktop** conserva composer profundo, comparación extensa, refine, storyboard, shape/route, operaciones y
+  delivery.
+- **Globe cloud** conserva identidad, entitlements, policy, estimates, credits, runs, assets, rights, provenance y
+  lineage. El cliente móvil es una superficie, nunca otra autoridad.
+
+### Invariantes obligatorias
+
+- **NUNCA** construyas una app nativa completa, app ID, OAuth client, push provider, store listing o native bundle
+  por esta dirección: primero baseline mobile web y una task con evidencia.
+- **NUNCA** crees backend, feed, viewer, library, notification ledger, credits ledger ni provider SDK paralelo.
+  Todo cliente usa los mismos commands/readers/policies del API Contract Spine; si requiere otra surface o SDK, abre
+  un ADR de contrato.
+- **NUNCA** expongas provider credentials, house, vendor cost, margin o rutas internas en el cliente.
+- **NUNCA** permitas offline estimate/hold/reserve/execute/approve/promote/publish/delivery/rights mutation. Offline
+  sólo captura drafts; al sincronizar usa operation key + status/readback idempotente.
+- **SIEMPRE** enlaza al `(workspace, project/session, asset/output, run)` exacto y deriva notificaciones de readers/
+  estados canónicos; abrir un deep link jamás dispara `execute`.
+- **SIEMPRE** falla cerrado ante workspace incorrecto, entitlement ausente, rol revocado, sesión expirada, lineage
+  no autorizado o asset sin rights; nunca uses fallback permisivo ni conviertas bytes locales en asset autorizado.
+- **SIEMPRE** valida la continuidad en 390 px y desktop, teclado/lector de pantalla, reduced motion, red intermitente,
+  handoff y scroll-width antes de proponer Phase 1.
+
+### Secuencia de inversión
+
+1. **Phase 0:** instrumenta responsive actual, capture/drafts, deep links, estados de job, handoff y baseline de
+   abandono/decisión.
+2. **Phase 1:** entrega companion para capture/inbox/review/comentarios/decisiones acotadas sólo con task, owner,
+   entitlements, policy y métricas.
+3. **Phase 2:** evalúa cámara, voz, reference packs, background upload, share sheet, push y secure storage; cada
+   frontera exige ADR de identity/media/privacy/notifications cuando aplique.
+4. **Phase 3:** considera full mobile studio sólo si los datos demuestran un trabajo móvil propio y un caso económico
+   y operativo; no conviertas el desktop comprimido en roadmap automático.
+
+El rollout actual sigue **internal-only/internal_smoke** y los externos permanecen gated por TASK-1480. Esta decisión
+no cambia flags, auth, billing, créditos, providers, runtime ni distribución. Ver también [documentación funcional de
+continuidad móvil](../../../docs/documentation/creative-studio/efeonce-globe-mobile-continuidad.md) y [manual de
+validación](../../../docs/manual-de-uso/creative-studio/operar-globe-continuidad-movil.md).
+
 ## 🔴 Antes de crear una TASK de este epic: barrer por DOMINIO, no por nombre (2026-07-25)
 
 EPIC-028 tiene **~50 tasks hijas**, y varias describen **la misma superficie desde ángulos distintos**:
