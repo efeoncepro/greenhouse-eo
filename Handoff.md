@@ -1,26 +1,29 @@
 # Handoff activo
 
-## Efeonce MCP — gateway core y TLS verificados; OAuth público y Globe pendientes de cierre (2026-08-01)
+## Efeonce MCP — gateway público y canary Globe read-only verificados (2026-08-01)
 
 - Se creó el repo privado independiente `efeoncepro/efeonce-mcp`; Greenhouse y Globe no hospedan el gateway.
   El PR `#2` fue fusionado a `main` en `d9c0c69` y su CI pasó.
 - Runtime: Cloud Run `efeonce-mcp-gateway` en `efeonce-group/southamerica-west1`, service account dedicada,
   Artifact Registry inmutable, GitHub WIF sin keys y Global External ALB sobre `34.111.78.237`.
-- OAuth Entra pasó un canary real de authorization code + PKCE con resource
+- OAuth Entra pasó el canary real end-to-end de authorization code + PKCE por
   `https://mcp.efeonce.org/mcp`: initialize `200`; una llamada Globe sin su scope fue rechazada `403` antes
-  del dispatch. Entra v2 emite el App ID del recurso en `aud`, no la URL pública.
+  del dispatch y el manifest Globe read-only respondió con el scope autorizado. Entra v2 emite el App ID del
+  recurso en `aud`, no la URL pública.
 - `mcp.efeonce.org` ya resuelve a la IP global desde ambos NS de HostGator y resolvers públicos; HTTP responde
   `301` a HTTPS. El certificado administrado está `ACTIVE` y TLS presentó un certificado válido para el hostname.
 - El servicio quedó detrás del load balancer; el acceso directo `run.app` devuelve `404`. `/mcp` permanece
-  OAuth-protegido y Globe está `GLOBE_PROVIDER_ENABLED=false`.
+  OAuth-protegido y el único surface Globe comprobado es su manifest read-only.
+- Hardening posterior: Cloud Armor protege el backend con throttle aproximado de 600 requests/minuto por IP;
+  la revisión `efeonce-mcp-gateway-00007-d79` acepta sólo el hostname/origin canónico `mcp.efeonce.org`.
 - Se agregó la skill espejo `efeonce-mcp-platform` para Codex/Claude, con router de sinergias hacia arquitectura,
   cloud/secret hygiene, Globe, QA y documentación. `pnpm skills:mirrors` detecta drift entre ambos bundles.
-- Health, discovery OAuth y rechazo anónimo del MCP pasaron por el hostname público. El resolver local conserva
-  una caché negativa, pero los autoritativos y resolvers públicos ya devuelven la IP correcta; el smoke usó SNI.
-- Estado honesto: falta repetir el canary OAuth autenticado por hostname antes de declarar el gateway operativo
-  públicamente. Un intento controlado no recibió el callback de Entra dentro de la ventana de autorización,
-  por lo que este último canary debe ejecutarse desde una sesión de Entra autorizada. La federación Globe real
-  continúa bajo `TASK-1473`; no habilitarla sin package/API/IAM y canary.
+- Health, discovery OAuth, rechazo anónimo, OAuth autenticado y manifest Globe pasaron por el hostname público.
+  El primer callback local venció a los 180 segundos; el listener ahora usa una ventana configurable de 10
+  minutos. El override DNS del canary sólo sirvió para diagnóstico con SNI público y no modifica el runtime.
+- Estado honesto: gateway operativo para el tenant Entra único y el manifest Globe read-only verificado. No hay
+  acceso externo general: exige una decisión B2B/multitenant y entitlements por tenant/capability. La federación
+  Globe completa, sus tools de dominio y cualquier write conservan los gates de `TASK-1473`.
 
 
 ## AXIS — guía visual agent-facing publicada (2026-08-01)

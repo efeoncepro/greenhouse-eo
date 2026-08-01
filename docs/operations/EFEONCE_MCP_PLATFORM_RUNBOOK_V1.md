@@ -56,8 +56,8 @@ pública.
 | Variable | Secret | Rule |
 | --- | --- | --- |
 | `MCP_PUBLIC_URL` | no | exactamente `https://mcp.efeonce.org/mcp` en producción |
-| `MCP_ALLOWED_HOSTS` | no | hostname canónico + hostname `run.app` sólo durante private canary |
-| `MCP_ALLOWED_ORIGINS` | no | allowlist equivalente; clientes sin `Origin` pasan |
+| `MCP_ALLOWED_HOSTS` | no | en producción sólo `mcp.efeonce.org`; `run.app` sólo durante un private canary y se retira antes del front door |
+| `MCP_ALLOWED_ORIGINS` | no | en producción sólo el hostname canónico; clientes sin `Origin` pasan |
 | `MCP_REQUIRED_SCOPES` | no | scope base mínimo, inicialmente `efeonce.mcp.read` |
 | `OAUTH_ISSUER` | no | issuer exacto descubierto y validado |
 | `OAUTH_JWKS_URI` | no | JWKS HTTPS del authorization server |
@@ -117,15 +117,33 @@ Canary Entra vigente:
 - cliente público PKCE de diagnóstico: `32617b87-e7ef-493a-838f-1ff3f0213b93`, sin secreto;
 - token v2: issuer del tenant Efeonce, `aud=c5363215-b9a6-4bf1-bb1c-e61963b37dac` y
   `scp=efeonce.mcp.read`;
-- initialize autenticado: `200`; llamada `globe.*` sin scope Globe: `403` antes del dispatch.
+- canary público end-to-end aprobado por `mcp.efeonce.org`: initialize autenticado `200`; llamada `globe.*`
+  sin scope Globe `403` antes del dispatch; el manifest Globe read-only con scope autorizado respondió por el
+  mismo hostname.
+
+### Incidente de callback local resuelto — 2026-08-01
+
+El primer canary no recibió el callback de authorization code porque su listener local vencía a los 180 segundos.
+El límite ahora es configurable y el valor operativo es 10 minutos. Esto sólo afecta la espera del cliente PKCE
+local; no modifica el timeout de Cloud Run, OAuth, ingress ni la política del gateway.
+
+Cuando la caché del resolver local no contiene el record recién publicado, el canary puede usar un override DNS
+de diagnóstico hacia la IP global **con SNI y `Host` públicos** para validar el front door. Ese override no es
+configuración runtime, no cambia DNS autoritativo ni permite omitir TLS/OAuth; los resultados de producción se
+atribuyen al hostname canónico `mcp.efeonce.org`.
 
 ## Globe canary
 
-- Verifica `globe.capabilities.list` con caller allowlisted y workspace/scope interno.
+- El canary end-to-end verificó el manifest de tools Globe por el hostname público con caller/scopes autorizados.
+- El manifiesto actual es exclusivamente read-only; no expone writes, datos directos de Globe, storage ni
+  proveedores creativos.
 - Retira temporalmente el invoker/allowlist en un entorno controlado y confirma deny.
 - Fuerza timeout o endpoint inválido y confirma `provider_unavailable` sanitizado.
 - Correlaciona request ID gateway → Globe sin registrar token ni body.
-- Mantén `GLOBE_PROVIDER_ENABLED=false` hasta completar todas las pruebas.
+
+El canary habilita una prueba interna acotada, no disponibilidad general. Clientes externos requieren una
+decisión explícita de B2B/multitenancy y entitlements por tenant/capability antes de recibir acceso. No conviertas
+el scope básico de un tenant único en una autorización comercial o multi-tenant implícita.
 
 ## Front door and DNS
 
@@ -150,14 +168,24 @@ Canary Entra vigente:
   IP global porque el resolver local conservaba una caché negativa, mientras los autoritativos y públicos ya
   devolvían el record correcto.
 
-Siguiente paso: ejecuta el canary OAuth autenticado contra el hostname público desde una sesión de Entra
-autorizada y registra el resultado. El intento controlado no recibió el callback de autorización dentro de su
-ventana; no lo interpretes como un fallo DNS/TLS ni debilites ingress o autenticación para sortearlo.
+El canary OAuth autenticado y el canary del manifest Globe aprobaron end-to-end por el hostname público. El
+incidente previo del callback local vencido está resuelto con una ventana configurable de 10 minutos; conserva
+el override DNS sólo como herramienta diagnóstica con SNI público, no como configuración de runtime.
 
 `mcp.efeoncepro.com` no recibe una segunda configuración OAuth. Si se usa, sólo redirige al hostname canónico.
 
 El backend service de un serverless NEG no acepta `timeout_sec`; Google Cloud rechaza esa combinación. El
 timeout de 3.600 segundos vive en Cloud Run y no se replica en el backend del load balancer.
+
+### Protección de disponibilidad en el edge — 2026-08-01
+
+El backend público usa la política Cloud Armor `efeonce-mcp-gateway-edge`: throttle aproximado de **600 requests
+por minuto por IP** y respuesta `429` al excederlo. Cloud Armor protege el serverless NEG antes de Cloud Run;
+no reemplaza OAuth, entitlements, cuotas por workspace ni límites de gasto. Es un control de abuso y continuidad,
+por lo que no debe usarse para cobrar, licenciar o decidir autorización de un cliente.
+
+Cloud Run mantiene `concurrency=80` y `maxScale=20`. Esa capacidad sirve al tráfico de transporte; cada provider
+debe declarar sus propios límites de concurrencia, cuotas y circuit breakers antes de exponer trabajo de dominio.
 
 ## Rollback
 
@@ -189,12 +217,24 @@ Cada promoción registra:
 - source/image: commit `38591b5`, digest
   `sha256:6c74d7ab8a6c638dcf13dd6fb9a231041cf89b020889c48edf9fe664158b5ea5`;
 - Cloud Run: revisión `efeonce-mcp-gateway-00005-bkw`, 100% de tráfico, service account dedicada;
-- OAuth: Entra PKCE real aprobado; initialize `200`; scope Globe ausente `403`;
+- OAuth: Entra PKCE real y público aprobado; initialize `200`; scope Globe ausente `403`; callback local con
+  ventana configurable de 10 minutos;
 - edge: IP `34.111.78.237`, HTTP `301` a HTTPS, ingress `internal-and-cloud-load-balancing`, invoker público
   protegido por OAuth en aplicación;
 - DNS: autoritativos, Google y Cloudflare resuelven `mcp.efeonce.org` a la IP global;
 - certificado: `ACTIVE`, con `CN=mcp.efeonce.org` emitido por Google Trust Services. Health y discovery OAuth
-  devolvieron `200`; un request MCP anónimo fue rechazado `401`. El canary OAuth autenticado por hostname sigue
-  pendiente;
-- provider Globe: `GLOBE_PROVIDER_ENABLED=false`, pendiente de `TASK-1473`; no se presenta como operativo;
+  devolvieron `200`; un request MCP anónimo fue rechazado `401`; el canary OAuth autenticado aprobó por el
+  hostname canónico. Un override DNS de diagnóstico conservó SNI público y no cambió el runtime;
+- provider Globe: manifest de tools read-only verificado end-to-end por el hostname público. La capacidad sigue
+  limitada a tenant único e identidad autorizada; clientes externos requieren decisión B2B/multitenant y
+  entitlements. La federación Globe completa conserva los gates de `TASK-1473`;
 - rollback: revisión previa `efeonce-mcp-gateway-00004-dwq` o provider OFF/fail-closed.
+
+### Hardening 2026-08-01
+
+- source: `637b2a5` (`feat(edge): protect public MCP gateway`), validado con `pnpm check`, `tofu validate` y
+  plan posterior sin drift;
+- edge: Cloud Armor `efeonce-mcp-gateway-edge` adjunto al backend del ALB, throttle `600/min` por IP y `429`;
+- runtime: revisión `efeonce-mcp-gateway-00007-d79`, 100% traffic, `MCP_ALLOWED_HOSTS` y
+  `MCP_ALLOWED_ORIGINS` restringidos a `mcp.efeonce.org`;
+- smoke posterior: health y metadata `200`; `POST /mcp` anónimo `401` con `resource_metadata` y scope base.

@@ -17,10 +17,10 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `none`
-- Status real: `gateway core en main y desplegado; DNS/TLS y smokes públicos anónimos verificados; canary OAuth público autenticado pendiente; Globe provider policy-blocked por TASK-1473`
+- Status real: `gateway público verificado end-to-end (DNS/TLS/OAuth); manifest Globe read-only verificado; acceso externo B2B/multitenant y tools Globe de dominio siguen gated`
 - Rank: `TBD`
 - Domain: `platform|agentic|integration|cloud|identity`
-- Blocked by: `canary OAuth público autenticado desde una sesión Entra autorizada; Globe provider depende de TASK-1473 y sus gates de dominio`
+- Blocked by: `acceso externo requiere decisión B2B/multitenant + entitlements; federación Globe de dominio depende de TASK-1473 y sus gates`
 - Branch: `task/TASK-1626-efeonce-mcp-platform-gateway`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -287,8 +287,8 @@ DNS en HostGator requieren acceso del operador. No se sustituyen con tokens est�
 ## Acceptance Criteria
 
 - [x] `efeoncepro/efeonce-mcp` existe como repo privado independiente con CI y container reproducibles.
-- [ ] `https://mcp.efeonce.org/mcp` sirve Streamable HTTP sobre TLS y discovery OAuth correcto.
-- [ ] Requests sin token, expirados, audience/scope incorrectos fallan antes de ejecutar tools.
+- [x] `https://mcp.efeonce.org/mcp` sirve Streamable HTTP sobre TLS y discovery OAuth correcto.
+- [x] Requests sin token, expirados, audience/scope incorrectos fallan antes de ejecutar tools.
 - [x] Runtime usa service account dedicada y WIF; no hay keys persistentes ni roles de datos de Globe.
 - [ ] Globe aporta al menos una capacidad read-only real mediante `TASK-1473`, con paridad y redaction certificadas.
 - [x] Gateway no importa DB/provider/storage de Globe y un fallo de Globe queda aislado.
@@ -300,8 +300,15 @@ DNS en HostGator requieren acceso del operador. No se sustituyen con tokens est�
 - DNS externo de `mcp.efeonce.org` está propagado a `34.111.78.237` sin `AAAA` ni `CNAME`.
 - El certificado `efeonce-mcp-gateway-cert` y su dominio están `ACTIVE`; el SNI presenta un certificado válido
   para `mcp.efeonce.org`.
-- Los smokes públicos anónimos aprobaron: health `200`, metadata OAuth `200` y `POST /mcp` sin token `401` con
-  challenge. Falta el canary OAuth autenticado por hostname antes de declarar el gateway operativo públicamente.
+- Los smokes públicos aprobaron: health `200`, metadata OAuth `200`, `POST /mcp` sin token `401` con challenge,
+  OAuth PKCE autenticado y manifest Globe read-only por el hostname canónico.
+- Hardening posterior: Cloud Armor quedó adjunto al backend con throttle aproximado de 600 requests/minuto por
+  IP; la revisión `efeonce-mcp-gateway-00007-d79` restringe host/origin a `mcp.efeonce.org`. No sustituye las
+  cuotas, entitlements ni límites de gasto de los products providers.
+- El primer callback localhost venció con un listener de 180 segundos; el canary ahora admite una ventana de 10
+  minutos configurable. Su override DNS se usa sólo para diagnóstico, conserva SNI público y no modifica runtime.
+- Límite actual: auth de tenant único y manifest Globe read-only. La exposición a clientes externos requiere
+  decisión B2B/multitenant y entitlements; las tools Globe de dominio siguen bajo `TASK-1473`.
 
 ## Verification
 
