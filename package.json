@@ -55,6 +55,7 @@
     "ui:quality": "node scripts/ci/ui-quality-gate.mjs",
     "ui:quality:test": "node scripts/ci/__tests__/ui-quality-gates.test.mjs",
     "skills:motion-guard": "node scripts/skills/motion-overlay-guard.mjs",
+    "skills:mirrors": "node scripts/skills/validate-mirrored-skills.mjs",
     "ui:wireframe-check": "node scripts/ci/task-lint.mjs",
     "docs:closure-check": "node scripts/check-documentation-closure.mjs && node scripts/ci/feature-flags-audit.mjs --strict --no-vercel",
     "docs:context-check": "node scripts/check-context-handoff.mjs",

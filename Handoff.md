@@ -1,5 +1,28 @@
 # Handoff activo
 
+## Efeonce MCP — gateway core y TLS verificados; OAuth público y Globe pendientes de cierre (2026-08-01)
+
+- Se creó el repo privado independiente `efeoncepro/efeonce-mcp`; Greenhouse y Globe no hospedan el gateway.
+  El PR `#2` fue fusionado a `main` en `d9c0c69` y su CI pasó.
+- Runtime: Cloud Run `efeonce-mcp-gateway` en `efeonce-group/southamerica-west1`, service account dedicada,
+  Artifact Registry inmutable, GitHub WIF sin keys y Global External ALB sobre `34.111.78.237`.
+- OAuth Entra pasó un canary real de authorization code + PKCE con resource
+  `https://mcp.efeonce.org/mcp`: initialize `200`; una llamada Globe sin su scope fue rechazada `403` antes
+  del dispatch. Entra v2 emite el App ID del recurso en `aud`, no la URL pública.
+- `mcp.efeonce.org` ya resuelve a la IP global desde ambos NS de HostGator y resolvers públicos; HTTP responde
+  `301` a HTTPS. El certificado administrado está `ACTIVE` y TLS presentó un certificado válido para el hostname.
+- El servicio quedó detrás del load balancer; el acceso directo `run.app` devuelve `404`. `/mcp` permanece
+  OAuth-protegido y Globe está `GLOBE_PROVIDER_ENABLED=false`.
+- Se agregó la skill espejo `efeonce-mcp-platform` para Codex/Claude, con router de sinergias hacia arquitectura,
+  cloud/secret hygiene, Globe, QA y documentación. `pnpm skills:mirrors` detecta drift entre ambos bundles.
+- Health, discovery OAuth y rechazo anónimo del MCP pasaron por el hostname público. El resolver local conserva
+  una caché negativa, pero los autoritativos y resolvers públicos ya devuelven la IP correcta; el smoke usó SNI.
+- Estado honesto: falta repetir el canary OAuth autenticado por hostname antes de declarar el gateway operativo
+  públicamente. Un intento controlado no recibió el callback de Entra dentro de la ventana de autorización,
+  por lo que este último canary debe ejecutarse desde una sesión de Entra autorizada. La federación Globe real
+  continúa bajo `TASK-1473`; no habilitarla sin package/API/IAM y canary.
+
+
 ## AXIS — guía visual agent-facing publicada (2026-08-01)
 
 - `efeoncepro/axis-design-system` publicó `DESIGN.md` en `main` mediante `0e3c4d6`.
