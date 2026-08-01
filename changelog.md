@@ -18,6 +18,8 @@
   retenido reproduce sin error. Omni, Seed Audio, Seedance Loop, Veo y Seedream no se tocaron.
 - Falta el canary con una pieza nueva. Agosto aparece con presupuesto `0 / 0` pese a balance y fondeo durables; la
   siguiente sesión debe reconciliar policy/grants/budget/usage en modo read-only antes de autorizar otro fondeo.
+- Las skills gemelas `greenhouse-globe` ahora convierten ese aprendizaje en protocolo reusable: incluso `propose`
+  queda fuera del discovery; primero se reconcilian período, grant, policy, disponibilidad, usage, ledger e intents.
 
 ## 2026-07-31 — TASK-1614: handoff de Seedance R2V y output rights de evaluación
 

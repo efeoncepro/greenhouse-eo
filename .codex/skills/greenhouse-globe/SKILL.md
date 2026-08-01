@@ -741,6 +741,11 @@ evidencia debe mostrar el modelo/ruta seleccionados, operación, créditos, esta
 preview de los bytes reales y descarga habilitada. API, runner, CI y canary técnico son evidencia necesaria, pero
 no sustituyen esta prueba cuando el criterio es “funciona en Producer”.
 
+Reproducir un candidato retenido de evaluación sólo prueba retrieval/playback de ese activo; **no** prueba que la
+ruta promovida pueda crear hoy una pieza nueva desde el Producer. Si el criterio pide canary post-promoción, exige
+un run nuevo iniciado en la UI, conserva su identidad exacta hasta el attempt/output y verifica por separado
+playback, retención y governance. No reutilices el candidato de evaluación como sustituto de ese canary.
+
 **Referencias ejercitadas del portafolio still/vector** (consulta el reader antes de actuar): Seedream 5 Pro
 `ref/still/rrss-v1`; Nano Banana Pro `ref/still/nanobanana-pro-v1`; Nano Banana 2
 `ref/still/nanobanana-2-v1`; GPT Image 2 `ref/still/openai-v2`; GPT Image 1.5
@@ -1383,6 +1388,33 @@ futuro debe saber:
   `eca7c50e-563e-4174-b508-be244e85783b`, ledger `24ecb9a7-e7fc-4338-a9b3-9c12a5441d45`, correlation
   `392e5076-2701-41d7-8b19-53db5126ce40`. El camino correcto fue API OAuth/PKCE + sesión agente permitida;
   Chrome no ejecutó el fondeo y no se usó break-glass.
+
+#### Cambio de período y presupuesto divergente — discovery obligatorio antes de fondear
+
+Ledger, pool, grant, policy mensual, disponibilidad efectiva, usage y proyección visible son controles distintos.
+Un balance durable positivo **no demuestra** que exista un grant vigente para el período consultado; un `0 / 0` en
+la UI tampoco demuestra por sí solo que falten fondos. Nunca interpretes unidades raw como créditos visibles sin
+reconciliar el contrato de escala/formato. Ante señales divergentes, el primer turno es read-only y sigue este orden:
+
+1. No ejecutes deploy, SQL, provider API, generación, `propose` ni `confirm`. `propose` no mueve dinero, pero sí
+   crea una propuesta durable y por eso tampoco es discovery.
+2. Fija un mismo instante `at` y un período UTC end-exclusive. Lee la propuesta conocida; pool `get/list`; grant
+   `get/list`; `policy.effective.get`; budget `list`, `availability.get` y `evaluate` con la cotización exacta del
+   run; balance, usage del período y ledger. En Greenhouse reconcilia además intents append-only por proposal y
+   correlation antes de crear otra propuesta.
+3. Clasifica con evidencia una causa: grant fuera del período, policy efectiva ausente/incorrecta, proyección o
+   reader divergente, o UI stale. No uses el saldo de Fal como explicación sin evidencia del provider.
+4. Si grant `posted` vigente, pool activo, policy correcta, `effectiveAvailable` suficiente y
+   `budget.evaluate.allowed=true`, **no fondees**: corrige/reconcilia la proyección o la UI por su dueño canónico.
+5. Sólo autoriza `propose` cuando los readers demuestren un déficit real y no exista una propuesta pendiente o
+   ambigua equivalente. Sólo autoriza `confirm` sobre una propuesta vigente cuyo fingerprint y valores `Before`
+   coincidan con los readers recién consultados, el período/cap sean deliberados, la identidad Greenhouse esté
+   autenticada y no haya cambio concurrente. Si algo cambió, relee; nunca confirmes un plan stale.
+
+La cuenta Google visible en Chrome y la identidad de Greenhouse pueden ser distintas. La autoridad económica sale
+del actor durable de la sesión Greenhouse y su `authMode`, no del correo mostrado por el perfil de Chrome. El
+checkpoint mutable, los IDs y el período exacto de una ejecución viven en `GLOBE_RUNTIME_HANDOFF.md` y en la task,
+no en esta regla reusable.
 
 ### Ocho lecciones de método, que valen más que los fixes
 

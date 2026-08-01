@@ -15,6 +15,8 @@ evidencia durable de un fondeo `+500`, cap `800→1500`, disponible `836`.
 La siguiente sesión comienza con discovery read-only: policy efectiva, grants, budget/availability, usage y período
 de agosto. No debe desplegar, ejecutar `propose/confirm`, generar, invocar Fal ni usar SQL hasta explicar la
 contradicción. Sólo si el plan canónico demuestra un déficit real se fondea; después se genera exactamente una pieza.
+Este protocolo quedó incorporado en las skills gemelas `greenhouse-globe`; no se debe redescubrir ni reiniciar el
+fondeo desde cero en la próxima sesión.
 
 Identidades verificadas: Google/Chrome `jreyes@efeonce.cl`; Greenhouse
 `jreyes@efeoncepro.com` (`user-efeonce-admin-julio-reyes`). Los intentos OAuth/adapter de esta sesión fallaron

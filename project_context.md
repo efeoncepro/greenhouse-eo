@@ -32,7 +32,10 @@ El fondeo administrativo de Globe es API-first mediante el cliente público OAut
 `greenhouse-admin-cli`; Chrome sólo aporta la sesión autenticada a la autorización, nunca cookies o tokens
 extraídos. Un usuario agente puede proponer y confirmar si el workspace lo delega con scopes, entitlements y
 límites de grant/tope mensual. La procedencia real de la sesión viaja hasta el intent append-only; workloads,
-service principals y modos desconocidos fallan cerrados. Canon: ADR-015, TASK-1616 y skill `greenhouse-globe`.
+service principals y modos desconocidos fallan cerrados. Ante un cambio de período o señales presupuestarias
+divergentes, primero se reconcilian ledger, pool, grant vigente, policy efectiva, budget, usage e intents por
+readers canónicos; ni el balance positivo ni un `0 / 0` visual autorizan por sí solos otro fondeo, y `propose`
+también queda fuera del discovery porque persiste estado. Canon: ADR-015, TASK-1616 y skill `greenhouse-globe`.
 
 ### Lectura mínima obligatoria
 
