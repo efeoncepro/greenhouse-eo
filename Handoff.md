@@ -27,6 +27,8 @@
 - El primer bloque pure-UI ya tiene contratos y fixtures estáticos para `button`, `chip`, `breadcrumbs`,
   `disclosure`, `loaders` y `floating-surface`; la migración sigue en curso y `/design-system` continúa como
   fallback hasta cerrar parity visual y de consumidores.
+- También quedaron publicados `motion` y `border-beam` como contratos portables; `microinteractions` sigue fuera
+  del traslado inicial porque mezcla múltiples primitivas y estados de producto.
 
 ## Globe Producer — seis defectos de superficie, el pie de la app y la paginación del feed (2026-08-01)
 

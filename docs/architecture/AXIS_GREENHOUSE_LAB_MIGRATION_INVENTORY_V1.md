@@ -31,7 +31,8 @@ Cada candidato requiere auditoría transitive de imports antes de migrarse.
 | `buttons`, `chips`, `breadcrumbs` | migrada | `DesignPatternContract` + static fixtures |
 | `disclosure`, `loaders`, `floating-surfaces` | migrada | headless/motion contracts + static fixtures |
 | `card-density`, `composition-shell` | pure-UI candidate | density/shell contracts; no Portal shell |
-| `motion`, `microinteractions`, `border-beam` | pure-UI candidate | motion contract + reduced-motion evidence |
+| `motion`, `border-beam` | migrada | motion contract + reduced-motion evidence |
+| `microinteractions` | excluded first slice | composite product feedback; extract per primitive |
 | `team-avatar-group`, `surface-recipes`, `roadmap-timeline`, `charts` | pure-UI candidate | contract after transitive import audit |
 | `brand-logos` | candidate after provenance | AXIS asset/provenance gate |
 | `axis-adapters` | excluded from reference | stays in consumers; compare by evidence |
@@ -60,6 +61,10 @@ The first pure-UI block now publishes `efeonce.button`, `efeonce.chip`, `efeonce
 `efeonce.disclosure`, `efeonce.loaders` and `efeonce.floating-surface` through the AXIS Content Loader. Their
 routes are framework-agnostic HTML/CSS fixtures and include keyboard, responsive and reduced-motion evidence;
 the Greenhouse primitives remain the fallback implementation until consumer parity is recorded.
+
+The motion block additionally publishes `efeonce.motion` and `efeonce.border-beam`. Motion values come from the
+dependency-free scale; the beam is represented as a framework-agnostic surface-boundary fixture with a static
+reduced-motion mode. Greenhouse's Nexa-specific beam palettes and GSAP runtime are not copied into AXIS.
 
 ## Gate for each next route
 

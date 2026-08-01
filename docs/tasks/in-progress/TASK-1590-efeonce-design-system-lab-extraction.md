@@ -72,6 +72,13 @@ fixtures visuales completos por contrato y la migración ordenada del catálogo 
 - La verificación actual pasa build, typecheck, tests, lint y 16 E2E en Chromium y mobile; `/design-system`
   sigue siendo fallback porque aún falta comparación visual/consumer parity ruta por ruta.
 
+### Delta 2026-08-01 (e) — motion y border beam
+
+- AXIS publica `efeonce.motion` y `efeonce.border-beam`; el primero conserva la escala de duración/easing y el
+  segundo una fixture de borde de superficie sin dependencias GSAP/Nexa.
+- El Lab genera 16 páginas estáticas, con 10 contratos publicados; pasan 19 tests de tokens y 16 E2E en Chromium
+  y mobile. La referencia Greenhouse permanece como fallback para comparar consumidores.
+
 ### Plan futuro para portar el Lab Greenhouse a AXIS
 
 1. Inventariar las rutas actuales de `/design-system` y clasificarlas como contrato puro, fixture visual,
