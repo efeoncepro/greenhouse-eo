@@ -31,7 +31,8 @@ Cada candidato requiere auditoría transitive de imports antes de migrarse.
 | `buttons` | candidate parity | dos boards, matrices y 152 controles en AXIS; falta canary visual/computed |
 | `chips` | candidate parity | boards light/dark, 72 especímenes, avatar/closable, feedback atoms y motion; faltan canary visual/computed y provenance del avatar |
 | `breadcrumbs` | candidate parity | cuatro ports, overflow, variantes/kinds, hit area cómoda y reduced-motion; falta canary visual/computed |
-| `disclosure`, `loaders` | skeleton reference | faltan flujos, focus management y estados completos |
+| `disclosure` | candidate parity | cuatro triggers, editor/menu anclados, Escape, outside press, focus return, dirty guard y quickPeek fuera de scope documentado; falta canary visual/computed |
+| `loaders` | skeleton reference | faltan flujos, anuncios, skeletons y motion real |
 | `floating-surfaces` | candidate parity | seis variantes, roles tooltip/menu/dialog, editor dirty-safe, motion y reduced-motion; falta canary visual/computed y focus return real |
 | `card-density`, `composition-shell` | skeleton reference | faltan drivers, morph y composición real |
 | `motion` | candidate parity | seis duraciones, cuatro easings, cuatro variantes, replay y estado manual sin motion; faltan canary visual/computed y compare del consumidor |

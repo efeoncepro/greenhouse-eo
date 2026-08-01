@@ -402,3 +402,15 @@ necesita que la `spec` exista.
   `charts-mobile-reduced-motion.png`.
 - Estado honesto: `candidate parity`; falta comparación visual/computed contra los cinco canaries Greenhouse y
   evidencia de consumidor antes de retirar `/design-system/charts`.
+
+### Delta 2026-08-01 (q) — reconstrucción fiel de disclosure
+
+- `efeonce.disclosure` se reconstruyó desde `DisclosureLabView` y sus controllers: cuatro triggers (`addToggle`,
+  `expand`, `reveal`, `nexaMark`), `contextualEditor` y `actionMenu` con semántica `aria-expanded`, Escape,
+  outside press, retorno de foco y dirty guard. `quickPeek` queda visible como fuera de alcance de esta referencia
+  pública hasta contar con evidencia de placement/focus del consumer.
+- La referencia conserva rotaciones 45°/90°/180°, morph de Nexa, companion, editor abierto por defecto y fallback
+  estático para reduced-motion. El contrato pasó a `0.1.1`; build, typecheck, lint, tests y 32 E2E desktop/mobile
+  pasan. La suite específica valida teclado, foco, outside press, cambios dirty y ausencia de overflow.
+- Estado honesto: `candidate parity`; falta comparación visual/computed contra Greenhouse y canary del consumer antes
+  de retirar `/design-system/disclosure`.
