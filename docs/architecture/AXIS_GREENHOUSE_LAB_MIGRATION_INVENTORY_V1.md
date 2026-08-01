@@ -1,6 +1,6 @@
 # AXIS / Greenhouse Lab migration inventory
 
-**Estado:** 21 contratos portables migrados · migración en curso 2026-08-01
+**Estado:** 21 reference skeletons publicados · parity pendiente · migración en curso 2026-08-01
 **Dueño:** AXIS Design System + Greenhouse UI Platform
 **Fuente:** `src/app/(dashboard)/design-system/**` en `greenhouse-eo`
 **Destino:** `axis-design-system/apps/lab` (Astro 7, static, público)
@@ -22,29 +22,29 @@ Cada candidato requiere auditoría transitive de imports antes de migrarse.
 
 | Ruta Greenhouse | Triage | Próximo destino |
 |---|---|---|
-| `colors` | primer slice | `/references/colors/` — migrada desde tokens AXIS |
-| `typography` | primer slice | `/references/typography/` — migrada desde la escala canónica |
-| `geometry` | migrada | `/references/geometry/` — `axisGeometry` |
-| `elevation` | migrada | `/references/elevation/` — `axisElevation` |
-| `gradients` | migrada | static gradient contract + reduced-motion fixture |
-| `utilities` | migrada | `efeonce.activity-timeline`; no operational data |
-| `buttons`, `chips`, `breadcrumbs` | migrada | `DesignPatternContract` + static fixtures |
-| `disclosure`, `loaders`, `floating-surfaces` | migrada | headless/motion contracts + static fixtures |
-| `card-density`, `composition-shell` | migrada | density/shell contracts; no Portal shell |
-| `motion`, `border-beam` | migrada | motion contract + reduced-motion evidence |
+| `colors` | skeleton reference | `/references/colors/`; parity visual/consumer pendiente |
+| `typography` | skeleton reference | `/references/typography/`; parity de specimens/copy pendiente |
+| `geometry` | skeleton reference | `/references/geometry/`; parity de layout/evidencia pendiente |
+| `elevation` | skeleton reference | `/references/elevation/`; parity de escenarios pendiente |
+| `gradients` | skeleton reference | contract + fixture mínima; faltan presets/controles/motion real |
+| `utilities` | skeleton reference | `efeonce.activity-timeline`; no equivale a toda la suite Utilities |
+| `buttons`, `chips`, `breadcrumbs` | skeleton reference | faltan matrices de estados, acciones y canaries |
+| `disclosure`, `loaders`, `floating-surfaces` | skeleton reference | faltan flujos, focus management y estados completos |
+| `card-density`, `composition-shell` | skeleton reference | faltan drivers, morph y composición real |
+| `motion`, `border-beam` | skeleton reference | faltan replay, escenas y medición de motion |
 | `microinteractions` | excluded first slice | composite product feedback; extract per primitive |
-| `team-avatar-group`, `surface-recipes`, `roadmap-timeline`, `charts` | migrada | static contracts + framework-agnostic fixtures |
-| `brand-logos` | gate migrado | `efeonce.brand-logos`; assets reales pendientes de provenance |
+| `team-avatar-group`, `surface-recipes`, `roadmap-timeline`, `charts` | skeleton reference | contracts + fixtures mínimas; parity pendiente |
+| `brand-logos` | gate parcial | `efeonce.brand-logos`; assets reales y compare pendientes |
 | `axis-adapters` | excluded from reference | stays in consumers; compare by evidence |
-| `efeonce-brand` | `efeonce.brand-motion` migrada | el asset experimental privado y GSAP siguen fuera; AXIS publica la referencia portable |
-| `gamification` | `efeonce.leaderboard` migrada | fixture estática; sin participantes ni datos operativos reales |
+| `efeonce-brand` | skeleton reference | `efeonce.brand-motion`; asset experimental, SVG nodes y GSAP siguen fuera |
+| `gamification` | skeleton reference | `efeonce.leaderboard`; faltan card, variants, current user y paginación |
 | `handoff` | excluded first slice | workflow/product surface; requiere parity de API/readers |
 | `growth-forms-renderer`, `native-meeting-scheduler`, `talent-profile` | excluded first slice | API/workforce/product surface |
 | `nexa-*` | excluded first slice | Nexa product/runtime surface |
 | `mockup/*` and `typography/mockup` | excluded first slice | proposal/mockup artifacts |
 | `figma-link/mockup` | excluded first slice | private Figma integration |
 
-## First slices moved
+## Reference skeletons publicados (no parity)
 
 `colors` renders at `https://axis-design-system-lab.vercel.app/references/colors/`.
 The page reads `axisRamp` from `@efeoncepro/axis-tokens`; it does not copy Greenhouse theme values or import
@@ -84,13 +84,18 @@ ordered events, people, timestamps and attachments, but no product data or audit
 source/provenance and approval status. The public fixture intentionally renders status-only specimens until each
 third-party asset has an approved source, license and versioned checksum.
 
-`efeonce.brand-motion` migrates the portable motion contract behind `efeonce-brand`: AXIS renders a static
+`efeonce.brand-motion` publishes the portable motion contract behind `efeonce-brand`: AXIS renders a static
 HTML/CSS orbital reference with idle, single-orbit, ambient and reduced-motion semantics. The Greenhouse SVG
 experiment, GSAP runtime and private asset copy remain consumer-side and are not imported by AXIS.
 
-`efeonce.leaderboard` migrates the portable gamification shape: period, run status, podium, ordered ranking and
+`efeonce.leaderboard` publishes the portable gamification shape: period, run status, podium, ordered ranking and
 score formatting. Its AXIS fixture uses synthetic names and values only; the Greenhouse leaderboard remains the
 fallback until consumer state, pagination and capture evidence are compared.
+
+La auditoría completa y la definición de “migrada” viven en
+[`AXIS_GREENHOUSE_LAB_PARITY_AUDIT_V1.md`](AXIS_GREENHOUSE_LAB_PARITY_AUDIT_V1.md). Hasta que una fila tenga
+evidencia verde en todas sus dimensiones, el destino se considera una reference skeleton y Greenhouse conserva
+la implementación canónica del Lab.
 
 ## Gate for each next route
 

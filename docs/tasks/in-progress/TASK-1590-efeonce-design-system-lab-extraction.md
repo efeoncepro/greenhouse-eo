@@ -16,6 +16,7 @@
 - Backend impact: `none`
 - Epic: `optional`
 - Status real: `EN EJECUCIÓN 2026-08-01`. El Lab ya existe en `../axis-design-system/apps/lab`, pero hoy es Vite + TypeScript vanilla. Esta ejecución migra ese contenedor a Astro 7, mantiene el despliegue público en el Vercel de AXIS y conserva la frontera: sólo tokens/registry publicados o workspace del repo AXIS; nunca imports desde Greenhouse/Globe. La referencia se renderiza en HTML/CSS; la interactividad se limita a islas o scripts mínimos. La contradicción con TASK-1382 queda resuelta para esta superficie: Labs no es build unit de Greenhouse.
+- Auditoría 2026-08-01: las 21 entradas AXIS actuales son `reference skeletons`, no parity del Lab Greenhouse. La matriz ruta por ruta, con gates de contrato, funcionalidad, estética, motion, accesibilidad y evidencia, vive en [`AXIS_GREENHOUSE_LAB_PARITY_AUDIT_V1.md`](../../architecture/AXIS_GREENHOUSE_LAB_PARITY_AUDIT_V1.md). No se autoriza retirar ni redirigir `/design-system`.
 - Rank: `TBD`
 - Domain: `ui-platform|cross-runtime`
 - Blocked by: `none`
