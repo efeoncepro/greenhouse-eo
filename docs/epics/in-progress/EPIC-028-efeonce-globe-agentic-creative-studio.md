@@ -495,9 +495,9 @@ agente autenticado para completar `preview → propose → confirm → readback`
 
 El corte live del 2026-08-01 retira el blocker operativo de fondeo interno: operación
 `23db5b0e-89dd-4661-9b8d-c12f9be4ad7a`, 800 efectivos, cap 1500, pool `internal-month:2026-08`, readback
-coincidente en Greenhouse, CLI OAuth PKCE y Producer. ISSUE-124 está resuelta. El epic permanece `in-progress`
-por su alcance comercial/modelos externo; TASK-1483/TASK-1628 conservan QA visual exhaustivo y
-TASK-1468/TASK-1579 receipts/calibración más amplia, sin volver a bloquear el carril interno.
+coincidente en Greenhouse, CLI OAuth PKCE y Producer. ISSUE-124 está resuelta. TASK-1483 y TASK-1628 cerraron
+GVC, rollout y smoke autenticado. El epic permanece `in-progress` por su alcance comercial/modelos externo,
+MCP write y TASK-1468/TASK-1579 receipts/calibración más amplia, sin volver a bloquear el carril interno.
 TASK-1586 cerró además el worker de expiry/recovery: el scheduler live reconcilia y difiere outcomes desconocidos
 sin liberar holds a ciegas; dos casos históricos sin `providerOperationId` permanecen visibles bajo TASK-1630.
 

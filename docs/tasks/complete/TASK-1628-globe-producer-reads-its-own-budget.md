@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -17,8 +17,8 @@
 - Motion: `docs/ui/motion/TASK-1628-globe-producer-credit-capacity-self-view-motion.md`
 - Backend impact: `contract-extension`
 - Epic: `EPIC-028`
-- Status real: `Contrato/UI endurecidos y GVC premium local aceptado; rollout puntual de esta ampliación pendiente`
-- Rank: `next.6`
+- Status real: `Completa: self-view desplegado en Globe main, GVC premium y smoke autenticado live aceptados`
+- Rank: `done`
 - Domain: `creative|ui|finance`
 - Blocked by: `none`
 - Branch: `Greenhouse develop; Globe main; sin worktrees`
@@ -68,7 +68,7 @@ Reglas obligatorias:
 
 - `docs/tasks/complete/TASK-1482-globe-credit-pools-grants-budget-administration.md`
 - `docs/tasks/complete/TASK-1586-globe-credit-denial-disambiguator-operator.md`
-- `docs/tasks/in-progress/TASK-1483-globe-credits-operations-workbench.md`
+- `docs/tasks/complete/TASK-1483-globe-credits-operations-workbench.md`
 - `docs/tasks/in-progress/TASK-1559-globe-client-feed-viewer-search-arrivals.md`
 
 ## Dependencies & Impact
@@ -240,7 +240,7 @@ Contrato detallado:
   incorpora agregados redactados de funding/ledger, clasificación server-side y una lectura no mutante del daily
   fence. Activa coverage `ui` sólo al final y coordina el scope humano read-only
   `globe.credits.capacity.self.read`. TASK-1482/TASK-1586 ya entregaron la autoridad económica y el wiring base en
-  Globe `main`; todavía no están live.
+  Globe `main`; están desplegados y verificados live.
 - La implementación UI consume exclusivamente ese DTO browser-safe. Si el rollout coordinado de scope o la
   conformance reader↔reserve falla, la surface permanece fail-closed y no introduce un fallback local.
 - No se agregan write paths, secretos, cookies exportadas, queries directas ni derivaciones de autoridad en el
@@ -339,10 +339,10 @@ El scope OAuth se promueve en cuatro movimientos sin downtime:
 
 ## Closing Protocol
 
-- [ ] `UI ready: yes` sólo después de mapping, GVC plan, decision log y checks verdes.
-- [ ] Lifecycle/carpeta, README, registry, EPIC-028, changelog y Handoff sincronizados.
-- [ ] QA release auditor y documentation governor ejecutados.
-- [ ] No se crea ni usa un worktree aislado.
+- [x] `UI ready: yes` sólo después de mapping, GVC plan, decision log y checks verdes.
+- [x] Lifecycle/carpeta, README, registry, EPIC-028, changelog y Handoff sincronizados.
+- [x] QA release auditor y documentation governor ejecutados.
+- [x] No se crea ni usa un worktree aislado.
 
 ## Follow-ups
 
@@ -365,5 +365,16 @@ self-status corregido, preserva Producer como read-only y reubica toda administr
   daily cap y freshness; no contiene comandos administrativos.
 - Tests de dominio/fecha/fixture y GVC premium desktop + 390 px pasaron. Evidencia local:
   `.captures/2026-08-01T21-45-11_globe-producer-credit-capacity-self-view`.
-- Veredicto: `PASS` local. La task permanece `in-progress` hasta desplegar esta ampliación desde Globe
-  `main` y repetir el smoke en la sesión Chrome autenticada.
+- Veredicto local: `PASS`.
+
+## Closure 2026-08-01 — rollout y smoke autenticado
+
+- Globe `main@e31518b430b8d23b53abc473068185496a01b713` quedó desplegado por los workflows
+  `30721563575` (API) y `30721563554` (Studio), ambos `success` con verificación de SHA, imagen, revisión,
+  tráfico y smoke inmutable.
+- Studio sirve `globe-studio-internal-00132-rdt` al 100 % y API `globe-api-internal-00183-cml` al 100 %.
+- La sesión Chrome anclada a `jreyes@efeonce.cl` verificó `https://globe.efeoncepro.com/producer`: cifra primaria
+  800, estado `Disponible`, período UTC, cap/restante 1500, gasto/reserva 0, fondeo 800, una fuente activa,
+  daily fence 500/120/380 y freshness 0 s.
+- La consola del navegador no reportó errores. Producer permaneció read-only y el enlace administrativo apuntó
+  a Greenhouse sin transportar autoridad.

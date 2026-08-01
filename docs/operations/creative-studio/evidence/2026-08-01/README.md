@@ -3,8 +3,9 @@
 ## Corte verificado
 
 - Workspace: `greenhouse-org:efeonce`.
-- Greenhouse: `develop`, superficie `https://dev-greenhouse.efeoncepro.com/admin/globe/credits`.
-- Globe: `main@e369ef8`, Producer
+- Greenhouse: `develop@f899d951b84aebd23bf8702042b4fffb1252bc1f`, Vercel staging
+  `dpl_F153TxebTXfkLVjg12SiJtqSBXsH`, superficie `https://dev-greenhouse.efeoncepro.com/admin/globe/credits`.
+- Globe: `main@e31518b430b8d23b53abc473068185496a01b713`, Producer
   `https://globe.efeoncepro.com/producer`.
 - Identidad Chrome: `jreyes@efeonce.cl`; identidad Greenhouse atribuida:
   `user-efeonce-admin-julio-reyes`.
@@ -23,6 +24,17 @@
 
 Las capturas son evidencia visual, no autoridad económica aislada. La causalidad se sostiene con el receipt de
 la operación, el reader CLI/API y el self-reader de Producer sobre el mismo runtime.
+
+## Rollout de las surfaces enriquecidas
+
+- API Globe: workflow `30721563575`, revisión `globe-api-internal-00183-cml`, imagen
+  `globe-api-internal@sha256:84918e8d5c1836731b85f1e20f5ac91b459b7db0bfee8eaa49546f18b852c15d`, Ready y 100 %.
+- Studio Globe: workflow `30721563554`, revisión `globe-studio-internal-00132-rdt`, imagen
+  `globe-studio-internal@sha256:5c4c5b171f9b700d73f64454aea24d864f44f30b9cd6836d8f6d86a4b8e90f7c`, Ready y 100 %.
+- Smoke Chrome autenticado: Greenhouse mostró runway, pools, grants, budgets, forecast, alertas, ledger y la
+  operación terminal; Producer mostró 800 efectivos, período UTC, cap/restante 1500, spent/held 0, funding 800,
+  una fuente y daily fence 500/120/380. Ambas consolas quedaron sin errores.
+- Este smoke fue read-only: no creó otra propuesta, grant, allocation, reserva, consumo ni fondeo.
 
 ## Worker de expiry y recovery
 

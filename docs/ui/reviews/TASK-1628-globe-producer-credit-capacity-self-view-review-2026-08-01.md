@@ -2,9 +2,8 @@
 
 ## Veredicto
 
-`PASS` local. Producer permanece read-only, presenta capacidad efectiva como cifra primaria y separa período,
-funding, ledger y daily fence sin convertir unknown/partial en cero. El rollout y smoke autenticado siguen
-pendientes, por lo que la task permanece `in-progress`.
+`PASS LIVE`. Producer permanece read-only, presenta capacidad efectiva como cifra primaria y separa período,
+funding, ledger y daily fence sin convertir unknown/partial en cero. Rollout y smoke autenticado completos.
 
 ## Evidencia
 
@@ -26,3 +25,10 @@ pendientes, por lo que la task permanece `in-progress`.
 | Resistencia a template | 4.6 | composición específica de capacidad, no dashboard genérico |
 
 Promedio: `4.7/5`; floor: `4.6/5`. UI review y enterprise review: `PASS`, sin `BLOCK`.
+
+## Evidencia live
+
+- Globe `main@e31518b430b8d23b53abc473068185496a01b713`; API `globe-api-internal-00183-cml` y Studio
+  `globe-studio-internal-00132-rdt`, ambos Ready y con 100 % del tráfico.
+- Chrome autenticado verificó 800 efectivos, cap/restante 1500, spent/held 0, funding 800, período UTC,
+  una fuente activa, daily fence 500/120/380, freshness 0 s y cero errores de consola.

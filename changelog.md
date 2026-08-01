@@ -36,15 +36,17 @@
   El digest `sha256:d8295862…bae9` pasó deploy exacto, canary y OpenTofu sin drift. Dos holds históricos
   `submission_unknown` se reconcilian/difieren con `failed=0`; no se liberan a ciegas.
 
-## 2026-08-01 — Studio Credits: workbench y self-view completados en local
+## 2026-08-01 — Studio Credits: workbench y self-view desplegados
 
 - TASK-1483 agrega proyecciones fail-closed de pools, grants, budgets, forecast, alertas y ledger, contexto de
   audience/período/freshness, preview antes del ensure y evidencia navegable sin duplicar lógica económica.
 - TASK-1628 endurece el self-status con coverage/freshness, aislamiento del daily fence, loading/retry/last-good
   stale, ARIA/foco/click-away y cifra efectiva visible en mobile.
 - Pasaron GVC premium desktop/mobile para el workbench, su drawer mobile y Producer (14 frames), además de
-  teclado, reduced motion, accesibilidad, overflow y runtime. Estado real: código/UI local completos; rollout
-  puntual y smoke autenticado pendientes. No se ejecutó release completo ni se usó worktree.
+  teclado, reduced motion, accesibilidad, overflow y runtime. Greenhouse `f899d951b` quedó Ready en staging y
+  Globe `e31518b430b8` desplegó API/Studio con SHA exacto y tráfico 100 %.
+- El smoke Chrome autenticado confirmó ambas superficies, readback 800/800/1500/0/0, daily fence 500/120/380 y
+  cero errores de consola. Fue sólo lectura: no hubo nuevo fondeo, release completo de Greenhouse ni worktree.
 
 ## 2026-08-01 — Operación multiagente: checkout compartido único
 
@@ -76,8 +78,8 @@
   emitidos por OAuth y tanto el bearer como las rutas admin rechazan un `globeWorkspaceId` no vinculado antes de
   invocar el broker. No hubo fondeo, deploy, migración, release ni promoción a `main`.
 - El workbench Greenhouse conecta `Asegurar capacidad` a la misma state machine one-shot y agrega recovery
-  readback-first para `outcome_unknown`; la validación autenticada desktop/390 px pasó sin overflow ni errores de
-  consola. Sigue pendiente el rollout y smoke real, por lo que no se declara capacidad operativa todavía.
+  readback-first para `outcome_unknown`; TASK-1483 y TASK-1628 ya cerraron rollout y smoke live. TASK-1630
+  permanece abierta únicamente por MCP write, Finance/500.000 y outcomes históricos inciertos.
 
 ## 2026-08-01 — Efeonce MCP: Globe fleet reader end-to-end
 

@@ -20,7 +20,9 @@ runbook que salieron de medirlo.
 
 > **Estado 2026-08-01:** operativo para el workspace interno. Greenhouse corre desde `develop`; Globe corre desde
 > su rama predeterminada, de integración y release `main`. Migraciones, seed OAuth y deploy están aplicados. La
-> UI, el CLI PKCE y Producer leyeron el mismo resultado live: 800 créditos efectivos, cap 1500 y cero blockers.
+> UI rica, el CLI PKCE y Producer leyeron el mismo resultado live: 800 créditos efectivos, cap 1500 y cero
+> blockers. Workbench y self-view pasaron GVC y smoke Chrome autenticado; el estado mutable del rollout vive en
+> `GLOBE_RUNTIME_HANDOFF.md`.
 
 ## Antes de empezar
 

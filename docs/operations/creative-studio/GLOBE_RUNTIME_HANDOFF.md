@@ -5,7 +5,8 @@
 > conserva sólo el estado mutable, los riesgos abiertos y el siguiente paso. La historia anterior
 > permanece auditable en el git log y en las tasks/ADRs enlazadas.
 >
-> **Corte verificado:** 2026-08-01 · Globe `main@e369ef8`. El fondeo mensual live fue verificado sobre
+> **Corte verificado:** 2026-08-01 · Globe `main@e31518b430b8d23b53abc473068185496a01b713`; Greenhouse
+> `develop@f899d951b84aebd23bf8702042b4fffb1252bc1f`. El fondeo mensual live fue verificado sobre
 > `649eb08`; migraciones hasta `0045`, API y Studio están aplicados. El worker de expiry/recovery usa código
 > `d3fe90e`, digest `sha256:d8295862dc12c14427e90e0bb413577802916c37ca6bf32c202680492ca7bae9`,
 > deploy `30717266572` y baseline IaC `e369ef8` sin drift.
@@ -27,6 +28,8 @@
 - `TASK-1553` permanece `in-progress` únicamente por el criterio transversal de rate-version
   receipts de `TASK-1468` y onboarding receipts de `TASK-1578`. Este pendiente no revierte la
   disponibilidad live de las seis rutas.
+- TASK-1483 y TASK-1628 están completas: Greenhouse staging y Globe internal sirven las vistas enriquecidas y
+  pasaron smoke Chrome autenticado sin errores. Esto no abre clientes externos ni amplía MCP write.
 
 ## Superficies operativas vigentes
 
@@ -254,22 +257,22 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
   contracts 44/44, domain 406/406, database 139/139, SDK 18/18 y studio-web 286/286; Greenhouse 9/9, migration
   marker gate y typecheck verdes. Sigue pendiente migrar, desplegar, activar el worker y verificar staging/live.
 
+## Rollout Studio Credits verificado el 2026-08-01
+
+- Greenhouse Vercel staging: deployment `dpl_F153TxebTXfkLVjg12SiJtqSBXsH`, `Ready`, alias
+  `https://dev-greenhouse.efeoncepro.com`; no hubo release completo ni promoción a producción.
+- Globe API: workflow `30721563575`, revisión `globe-api-internal-00183-cml`, digest
+  `sha256:84918e8d5c1836731b85f1e20f5ac91b459b7db0bfee8eaa49546f18b852c15d`, Ready y 100 % del tráfico.
+- Globe Studio: workflow `30721563554`, revisión `globe-studio-internal-00132-rdt`, digest
+  `sha256:5c4c5b171f9b700d73f64454aea24d864f44f30b9cd6836d8f6d86a4b8e90f7c`, Ready y 100 % del tráfico.
+- Chrome autenticado con `jreyes@efeonce.cl` verificó ambas surfaces, cifras 800/800/1500/0/0, daily fence
+  500/120/380 y cero errores de consola. El smoke fue read-only y no repitió la mutación económica.
+
 ## Siguiente paso ejecutable
 
-1. Cerrar la matriz GVC autenticada y estados exhaustivos de TASK-1483/TASK-1628 en desktop y 390 px, sin
-   reabrir el diseño económico ni duplicar math en el cliente.
-2. Reconciliar los dos outcomes históricos sólo con evidencia de provider/receipt o procedimiento Finance
-   explícito; mantenerlos diferidos mientras la autoridad siga incompleta.
-3. Completar receipts/calibración de TASK-1468/TASK-1579 y la decisión Finance sobre los 500.000 históricos.
-4. Mantener MCP write gated hasta contar con identidad agente propagada, scopes y conformance equivalentes.
-5. TASK-1614 ya no está bloqueada por créditos; ejecutar su canary nuevo desde Producer cuando corresponda.
-3. Sólo entonces reconciliar propuestas ambiguas por primitives canónicas. La instrucción explícita del CEO es
-   autoridad objetivo pendiente; el segundo confirmador permanece policy opcional, OFF para owner-operated.
-4. Con presupuesto admitido y evidencia terminal, completar el canary pendiente de `TASK-1614` exclusivamente con
-   **Video → Movimiento/control cámara → Seedance 2.0**. Ante timeout, leer primero estado/run; nunca reintentar a
-   ciegas ni tocar Omni, Seed Audio, Seedance Loop, Veo o Seedream.
-5. Ejecutar `TASK-1578` para las seis rutas de imagen y emitir por cada identidad exacta el onboarding receipt que
-   enlace route, rate version vigente de `TASK-1468`, evaluación, rights, binding, readiness, circuito y canary;
-   reconciliar los receipts contra `globe.producer.fleet.list` antes de cerrar `TASK-1553`.
-6. Antes de ofrecer el reader por MCP a un cliente, implementar el entitlement B2B y ejecutar un canary real con
-   identidad base-only; no inferir esa separación del cliente interno actual.
+1. Mantener MCP write gated hasta contar con identidad agente propagada, scopes y conformance equivalentes.
+2. Completar receipts/calibración de TASK-1468/TASK-1579 y la decisión Finance sobre los 500.000 históricos.
+3. Reconciliar los dos outcomes históricos sólo con evidencia de provider/receipt o procedimiento Finance
+   explícito; mientras tanto permanecen diferidos, observables y nunca force-released.
+4. TASK-1614 ya no está bloqueada por créditos; ejecutar su canary nuevo desde Producer cuando corresponda.
+5. Mantener rollout externo y acceso MCP B2B gated por TASK-1480/TASK-1631 y sus canaries de identidad.

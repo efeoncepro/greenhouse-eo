@@ -39,6 +39,11 @@ siguen gated. El worker minutely de expiry sólo libera reservations cuando exis
 `submission_unknown` sin `providerOperationId` permanece diferido y observable. Nunca se fuerza su liberación
 para limpiar una métrica o fabricar capacidad.
 
+Las superficies internas están operativas: Greenhouse `/admin/globe/credits` administra mediante DTOs redactados
+sin segundo ledger y Globe Producer muestra un self-view read-only de effective/funding/cap-spent-held/daily fence.
+Cobertura parcial o stale nunca se representa como cero. Los IDs mutables del rollout viven en `Handoff.md` y
+`GLOBE_RUNTIME_HANDOFF.md`, no en este contrato durable.
+
 ### Lectura mínima obligatoria
 
 1. [AGENTS.md](AGENTS.md): reglas transversales y router de dominios.

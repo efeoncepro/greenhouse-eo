@@ -75,12 +75,12 @@ una instrucción o delegación vigente y deja readback terminal.
 Para leer esta ADR sin mezclar tiempos:
 
 - **Live:** fase de negación tipada; command transaccional `propose → confirm`; intents Greenhouse; OAuth public
-  client + PKCE; API Platform/CLI `propose|confirm`; confirmación de usuario agente bajo la delegación persistente
-  y límites actuales; caller genérico sin las cuatro capabilities retiradas. La firma sigue siendo HMAC dentro del
-  runtime de Globe y el acceso actual de Greenhouse está concedido a `ROLE_CODES.EFEONCE_ADMIN`.
-- **Aprobado, no live:** autoridad one-shot derivada de una instrucción del CEO; `ensure-funded` con resolución de
+  client + PKCE; API Platform/CLI; autoridad one-shot CEO→usuario/agente; `ensure-funded` con resolución de
   período/pool; status/list/get/reconcile y receipts autoritativos; workbench `/admin/globe/credits`; self-view
-  Producer; adapters Nexa/MCP; KMS asimétrico, broker/aprobador/ejecutor físicamente disjuntos y retiro del HMAC.
+  Producer; caller genérico sin las cuatro capabilities retiradas. La firma sigue siendo HMAC dentro del runtime
+  de Globe y el acceso actual de Greenhouse está concedido a `ROLE_CODES.EFEONCE_ADMIN`.
+- **Aprobado, no live:** adapters de escritura Nexa/MCP; KMS asimétrico, broker/aprobador/ejecutor físicamente
+  disjuntos y retiro del HMAC.
 - **Baseline histórico:** el Contexto siguiente registra lo observado al inicio del 2026-07-26. Las frases
   “hoy”, “no existe” o “nunca fue ejercitado” dentro de ese baseline explican el diagnóstico de entonces y no
   reemplazan el estado live anterior ni los deltas fechados.
@@ -295,9 +295,9 @@ El maker-checker vive donde hay identidades reales:
 Esto arregla tres cosas a la vez: una intención = un comando; los agentes operan sin tocar `gcloud`, Secret
 Manager ni impersonación; y la autoridad queda expresada como actores autenticados + política, no strings.
 
-**Por Full API Parity la capability nace con contrato gobernado.** Live, API Platform y CLI consumen el mismo
-command `propose|confirm`. UI, Nexa y MCP son adapters objetivo todavía pendientes; cuando existan consumirán los
-mismos primitives y ninguna superficie obtendrá autoridad adicional.
+**Por Full API Parity la capability nace con contrato gobernado.** API Platform, CLI y la UI Greenhouse consumen
+los mismos commands/readers. Nexa y MCP write continúan pendientes; cuando existan consumirán los mismos
+primitives y ninguna superficie obtendrá autoridad adicional.
 
 ### 6. Atomicidad: UNA transacción Postgres para grant + asiento de ledger + política; el intent durable cubre lo que no puede estar en la transacción
 
@@ -590,9 +590,9 @@ alerts y ledger; los writes administrativos permanecen bloqueados. Greenhouse co
 fail-closed y nunca crea un ledger o cálculo económico alternativo. TASK-1628 amplía sólo el self-status
 browser-safe: coverage/freshness y daily fence no mutante. Producer continúa sin commands administrativos.
 
-Los tres escenarios GVC premium pasaron localmente; este delta registra evidencia de implementación y no declara
-rollout. La frontera aprobada de esta ADR permanece intacta: Globe es autoridad económica y Greenhouse es control
-plane de identidad, intents y superficie.
+Los tres escenarios GVC premium y el smoke autenticado pasaron sobre las surfaces desplegadas. La frontera
+aprobada permanece intacta: Globe es autoridad económica y Greenhouse es control plane de identidad, intents y
+superficie. Revisiones, digests y deployments mutables viven sólo en `GLOBE_RUNTIME_HANDOFF.md`.
 
 > **Delta 2026-08-01 — rollover mensual sin dependencia circular, verificado live.** La fachada acotada
 > `ensure-funded` deriva el ciclo UTC y crea o reutiliza `internal-month:AAAA-MM` dentro de la misma transacción

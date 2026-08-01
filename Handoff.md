@@ -17,16 +17,15 @@
   `sha256:d8295862…bae9`, quedó desplegado por `30717266572`; scheduler `lmb2r` reportó `claimed=2`,
   `reconciliationRequested=2`, `deferred=2`, `failed=0`. `e369ef8` fija ese digest en IaC y OpenTofu devuelve
   `No changes`.
-- ISSUE-124 está resolved. TASK-1482, TASK-1586 y TASK-1629 están `complete` con aceptación funcional/runtime.
-  TASK-1483/TASK-1628 siguen `in-progress`, pero su WIP local ya resolvió readers/proyección de
-  pools/ledger/forecast/coverage/audiences, preview, estados loading/partial/stale/error, freshness, ARIA,
-  interacción/foco y mobile. Los tres escenarios GVC premium pasaron; falta rollout puntual y smoke autenticado.
+- ISSUE-124 está resolved. TASK-1482, TASK-1483, TASK-1586, TASK-1628 y TASK-1629 están `complete` con aceptación
+  funcional/runtime. Greenhouse `develop@f899d951b` quedó Ready en staging `dpl_F153TxebTXfkLVjg12SiJtqSBXsH`;
+  Globe `main@e31518b430b8` sirve API `00183-cml` y Studio `00132-rdt` al 100 %. Los tres escenarios GVC premium
+  y el smoke Chrome autenticado pasaron sin errores; el smoke fue read-only y no repitió el fondeo.
   TASK-1468/TASK-1579 conservan receipts/calibración amplia sin bloquear el fondeo interno.
 - Dos holds históricos `submission_unknown` sin `providerOperationId` permanecen diferidos y observables en
   TASK-1630; no deben force-release ni contarse como capacidad disponible.
 
-El checkpoint local del first fold quedó supersedido por la operación live del bloque anterior. La evidencia
-responsive y de interacción se conserva en
+El first fold quedó supersedido por el rollout live. La evidencia responsive y de interacción se conserva en
 `docs/ui/reviews/TASK-1483-globe-credits-operations-workbench-first-fold-review-2026-08-01.md`; los detalles de
 rollout, migrations y Producer viven en `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`.
 

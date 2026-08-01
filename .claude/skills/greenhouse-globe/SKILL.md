@@ -810,6 +810,14 @@ y canary son gates distintos: una ruta puede estar promovida y seleccionable sin
 verificada desde la UI. Los IDs y el estado mutable viven en `GLOBE_RUNTIME_HANDOFF.md` y
 `GLOBE_MODEL_FLEET_STATUS.md`, no en esta regla reusable.
 
+**Sesión operativa del operador — regla obligatoria.** Cuando el operador indique que su sesión autenticada de
+`jreyes@efeonce.cl` ya contiene los accesos necesarios, reclama u abre una pestaña dentro de **ese Chrome
+autenticado** mediante el control de navegador y opera allí. No inicies el flujo en un perfil Playwright efímero,
+en el navegador interno vacío ni en una sesión de Vercel/GitHub distinta para luego pedir un login evitable. Antes
+de declarar un bloqueo de autenticación, verifica una navegación same-origin al portal desde ese Chrome. Esta regla
+aplica tanto a la evidencia UI del Producer como a los actos administrativos de Globe que exigen atribución humana;
+no inspecciones ni extraigas cookies, contraseñas o secretos para trasladar la sesión a otro cliente.
+
 **Referencias ejercitadas del portafolio still/vector** (consulta el reader antes de actuar): Seedream 5 Pro
 `ref/still/rrss-v1`; Nano Banana Pro `ref/still/nanobanana-pro-v1`; Nano Banana 2
 `ref/still/nanobanana-2-v1`; GPT Image 2 `ref/still/openai-v2`; GPT Image 1.5
@@ -1310,6 +1318,22 @@ Ocho reglas medidas contra el runtime, no razonadas. Las tres primeras cuestan u
    existe ninguna superficie que firme**: `.sign(` no aparece en `app.ts` — el verificador está cableado, el firmador
    no. **NUNCA** propongas "ampliar el radio del secreto" como salida: es la misma propiedad con otro dueño.
 
+### Operación vigente de Studio Credits
+
+- La vía humana canónica es Greenhouse `/admin/globe/credits`; la vía agente/CLI usa OAuth público + PKCE y los
+  mismos primitives `status → preview → propose → confirm → readback`. Ningún adapter implementa reglas propias.
+- Globe conserva pools, grants, allocation, ledger, reservations, policy, receipts y cálculo económico.
+  Greenhouse conserva identidad, entitlements, autoridad one-shot e intents, y sólo proyecta DTOs redactados.
+- En `greenhouse-org:efeonce`, `requireSecondConfirmer` permanece OFF para operación owner-operated: una
+  instrucción atribuida del CEO puede ser ejecutada end-to-end por el mismo humano o agente autenticado dentro de
+  sus límites. Un workload genérico nunca confirma.
+- Producer es self-view read-only. Debe separar capacidad efectiva, funding elegible, cap/spent/held, ledger
+  histórico y daily fence. `partial`, `stale` o `unknown` nunca se representa como cero ni como healthy.
+- `timeout` u `outcome_unknown` obliga a consultar la misma operation key y reconciliar; nunca abre un fondeo
+  nuevo ni repite la mutación económica. La UI considera éxito únicamente `completed|no_effect`.
+- Revisions, digests, deployment IDs, último fondeo y cifras del período son estado mutable: consúltalos en
+  `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`. No los conviertas en regla reusable de la skill.
+
 **Dirección decidida — ADR-015** (`EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md`, Partially
 implemented: carril de fondeo VIVO y ejercido + retiro de las 4 caps ejecutado el 2026-07-26; KMS e
 identidades disjuntas por unidad quedan como hardening; implementación = `TASK-1566`): la administración de créditos y capabilities de Globe **vive en Greenhouse** —
@@ -1499,9 +1523,8 @@ futuro debe saber:
   token/propose/confirm; nunca lo pone en el URL del navegador, lo imprime ni lo envía fuera del origen Greenhouse.
 - **La procedencia cruza el wrapper completo:** `runAppRoute` debe copiar `oauthSessionAuthMode` al contexto del
   handler. Sin esa propagación, el broker recibe `unknown` y falla cerrado.
-- **Último fondeo real verificado (2026-07-31):** el carril OAuth/PKCE con sesión agente añadió 500 créditos al
-  workspace interno, elevó el tope 800→1500 y dejó evidencia append-only correlacionada. Es evidencia histórica,
-  **no autorización ni receta para otro período**.
+- **No fijes “el último fondeo” en la skill.** Consulta el corte vigente en `GLOBE_RUNTIME_HANDOFF.md`; cualquier
+  operación anterior es evidencia histórica, **no autorización ni receta para otro período**.
 
 ### Cambio de período y presupuesto divergente — discovery obligatorio antes de fondear
 

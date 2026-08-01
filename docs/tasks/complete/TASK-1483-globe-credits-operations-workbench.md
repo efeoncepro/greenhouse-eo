@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -17,8 +17,8 @@
 - Motion: `docs/ui/motion/TASK-1483-globe-credits-operations-workbench-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Código/UI completos y GVC premium local aceptado; rollout puntual de esta ampliación todavía pendiente`
-- Rank: `next.5`
+- Status real: `Completa: workbench desplegado en staging, GVC premium y smoke autenticado live aceptados`
+- Rank: `done`
 - Domain: `finance|creative|ui|operations`
 - Blocked by: `none`
 - Branch: `Greenhouse develop; Globe main; sin worktrees`
@@ -136,7 +136,7 @@ El snapshot de dominio pertenece a TASK-1482; lifecycle/receipts y DTOs browser-
 - Scenario desktop y drawer mobile dedicados.
 - Viewports: desktop 1440×1000 y mobile 390×844.
 - Review dossier: `docs/ui/reviews/TASK-1483-globe-credits-operations-workbench-first-fold-review-2026-08-01.md`.
-- Baseline: diferida hasta rollout; evidencia local aceptada en los manifests de captura.
+- Baseline: evidencia local aceptada en los manifests de captura; rollout staging verificado sobre el mismo corte.
 - Scroll-width, teclado, reduced motion, accesibilidad y runtime son gates obligatorios.
 
 ### Design Decision Log
@@ -146,8 +146,8 @@ El snapshot de dominio pertenece a TASK-1482; lifecycle/receipts y DTOs browser-
 
 ## Backend/Data Contract
 
-No aplica: `TASK-1483` no crea schema, migrations, commands ni readers. Consume los DTOs browser-safe que debe
-entregar TASK-1586 sobre el snapshot de TASK-1482; hoy aún son una dependencia target, no un contrato live.
+No aplica: `TASK-1483` no crea schema, migrations, commands ni readers. Consume los DTOs browser-safe que
+entregan TASK-1586 y TASK-1482, desplegados y verificados live.
 Cualquier brecha backend vuelve a la task owner y no se resuelve con endpoint o cálculo ad hoc en UI.
 
 ### Access contract actual
@@ -318,9 +318,9 @@ se valida first fold contra visual direction y fixtures; `UI ready` permanece `n
 
 ## Closing Protocol
 
-- [ ] `UI ready: yes` sólo tras contrato, implementation mapping, GVC, a11y y scorecard aceptados.
-- [ ] Registry, README, EPIC-028, changelog y Handoff sincronizados.
-- [ ] QA release auditor y documentation governor ejecutados.
+- [x] `UI ready: yes` sólo tras contrato, implementation mapping, GVC, a11y y scorecard aceptados.
+- [x] Registry, README, EPIC-028, changelog y Handoff sincronizados.
+- [x] QA release auditor y documentation governor ejecutados.
 
 ## Follow-ups
 
@@ -332,3 +332,14 @@ Se preserva la dirección `Runway Control Plane`, pero se supersede su placement
 en Greenhouse `/admin/globe/credits` y reusa la plataforma UI Greenhouse; Globe Producer sólo conserva el
 self-view de TASK-1628. TASK-1485 deja de ser dependencia de esta surface porque gobierna el payload UI de Globe,
 no el portal Greenhouse.
+
+## Closure 2026-08-01 — rollout y smoke autenticado
+
+- Greenhouse `develop@f899d951b84aebd23bf8702042b4fffb1252bc1f` quedó desplegado en Vercel staging como
+  `dpl_F153TxebTXfkLVjg12SiJtqSBXsH`, `Ready`, con alias `https://dev-greenhouse.efeoncepro.com`.
+- La sesión Chrome anclada a `jreyes@efeonce.cl` abrió `/admin/globe/credits` autenticada y comprobó el workbench
+  completo: runway, pools, grants, budgets, forecast, alertas, ledger filtrable, preview y operaciones/recovery.
+- El readback live mostró 800 efectivos, funding 800, cap/remaining 1500, spent/held 0, cero blockers y la operación
+  `23db5b0e-89dd-4661-9b8d-c12f9be4ad7a` en estado `completed`. No se ejecutó una segunda mutación.
+- La consola del navegador no reportó errores. El rollout fue puntual a staging; no se promovió Greenhouse a
+  producción ni se ejecutó un release completo.

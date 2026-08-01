@@ -5,7 +5,7 @@
 `ACCEPT FIRST FOLD` después de una iteración correctiva. Este veredicto acepta composición, jerarquía,
 densidad, lenguaje visual y transformación responsive; no equivale a `UI ready`, launch readiness ni cierre de
 TASK-1483. El checkpoint posterior conectó el CTA a una ejecución one-shot con identidad, límites exactos y
-readback/recovery; todavía no equivale a rollout ni a verificación staging/live.
+readback/recovery. El rollout staging y la verificación live quedaron completados en el cierre de esta revisión.
 
 ## Evidencia
 
@@ -46,11 +46,10 @@ También se corrigieron:
 - La acción primaria sólo se habilita con proyección confiable y ambos entitlements. `completed|no_effect` son los
   únicos éxitos; un resultado incierto conserva la operation key y ofrece reconcile, sin success optimista.
 
-## Pendiente antes del gate premium final
+## Gate premium final
 
-- GVC canónico staging con la sesión humana indicada, una vez desplegada la surface.
-- Axe/keyboard/reduced-motion automatizados, dossier y scorecard final con `pnpm ui:quality --task TASK-1483`.
-- Revisión `greenhouse-ui-review` y `greenhouse-ui-enterprise-review` sin `BLOCK`.
+- GVC desktop/mobile, teclado, reduced motion, accesibilidad, overflow y runtime: `PASS`.
+- Revisión `greenhouse-ui-review` y `greenhouse-ui-enterprise-review`: `PASS`, sin `BLOCK`.
 
 ## Gate premium final — PASS local
 
@@ -61,4 +60,11 @@ También se corrigieron:
 - UI review: `PASS`; primitives canónicas, copy centralizada y cero lógica económica en browser.
 - Enterprise review: promedio `4.7/5`, floor `4.5/5`; hierarchy 4.8, surface economy 4.7, visual impact 4.6,
   fidelity 4.8 y template resistance 4.5.
-- Estado honesto: `UI ready: yes` en local; falta rollout puntual y smoke autenticado.
+- Estado honesto: `UI ready: yes`; rollout staging y smoke autenticado completos.
+
+## Evidencia live
+
+- Vercel staging `dpl_F153TxebTXfkLVjg12SiJtqSBXsH`, corte Greenhouse
+  `f899d951b84aebd23bf8702042b4fffb1252bc1f`, alias `https://dev-greenhouse.efeoncepro.com`.
+- Chrome autenticado verificó la surface completa, operación `23db5b0e-89dd-4661-9b8d-c12f9be4ad7a`, readback
+  800/800/1500/0/0 y cero errores de consola. No hubo mutación adicional ni release completo.
