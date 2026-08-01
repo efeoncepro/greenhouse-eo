@@ -354,3 +354,15 @@ necesita que la `spec` exista.
   completa de 22 pruebas pasan. Publicado en `028dba2` y desplegado en `https://axis.efeonce.org/patterns/efeonce.chip/`.
 - Estado honesto: `candidate parity`; falta comparación visual/computed contra Greenhouse y provenance del avatar
   sintético. `/design-system/chips` continúa como fallback.
+
+### Delta 2026-08-01 (n) — reconstrucción fiel de breadcrumbs
+
+- `efeonce.breadcrumbs` se reconstruyó en AXIS desde `BreadcrumbsLabView`: cuatro ports visibles (default,
+  chevrons con raíz icon-only, trail cómodo con motion y overflow), dos variantes (`default`/`compact`), cuatro
+  kinds semánticos y reglas de uso.
+- La referencia conserva el overflow como menú nativo con trigger nombrado, los enlaces ancestros, `aria-current`,
+  hit areas cómodas, scroll seguro en móvil y entrada sutil con fallback para `prefers-reduced-motion`.
+- El contrato pasó a `0.1.1`; la suite completa de AXIS pasa con 24 E2E desktop/mobile, además de build,
+  typecheck y tests. Publicado en `6979641` y desplegado en `https://axis.efeonce.org/patterns/efeonce.breadcrumbs/`.
+- Estado honesto: `candidate parity`; falta comparación visual/computed contra Greenhouse. `/design-system/breadcrumbs`
+  continúa como fallback.

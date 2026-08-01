@@ -47,7 +47,7 @@ del Lab Greenhouse. Las fixtures actuales son válidas como punto de partida té
 | `/motion` | escala, replay y diagnóstico de motion | `efeonce.motion` | 🟡 skeleton | falta reproducción real, medición y evidencia |
 | `/buttons` | variantes, estados y acciones | `efeonce.button` | 🟡 candidate parity | AXIS ya reproduce las dos boards y 152 controles; falta compare visual/computed contra canary MUI/Vuexy |
 | `/chips` | tonos, kinds, avatar y delete action | `efeonce.chip` | 🟡 candidate parity | AXIS reproduce boards light/dark, 72 especímenes, feedback atoms, chips animados y reduced-motion; faltan compare visual/computed y provenance del avatar |
-| `/breadcrumbs` | jerarquía, overflow y motion | `efeonce.breadcrumbs` | 🟡 skeleton | falta overflow real, hit areas, motion y keyboard evidence |
+| `/breadcrumbs` | jerarquía, overflow y motion | `efeonce.breadcrumbs` | 🟡 candidate parity | AXIS reproduce cuatro ports, overflow nativo, variantes, cuatro kinds, hit area cómoda y reduced-motion; falta compare visual/computed contra Greenhouse |
 | `/disclosure` | disclosure/modal con estado y guardrails | `efeonce.disclosure` | 🟡 skeleton | fixture nativa no cubre el flujo real ni motion |
 | `/loaders` | loading section con variantes y estados | `efeonce.loaders` | 🟡 skeleton | faltan escenas, anuncios, skeletons y motion real |
 | `/floating-surfaces` | tooltip/popover/menu y focus return | `efeonce.floating-surface` | 🟡 skeleton | falta positioning, escape, focus return y viewport safety |
