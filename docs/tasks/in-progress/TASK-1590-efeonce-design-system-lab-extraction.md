@@ -57,6 +57,13 @@ fixtures visuales completos por contrato y la migración ordenada del catálogo 
 - El inventario de rutas y la clasificación inicial están en
   [`AXIS_GREENHOUSE_LAB_MIGRATION_INVENTORY_V1.md`](../../architecture/AXIS_GREENHOUSE_LAB_MIGRATION_INVENTORY_V1.md).
 
+### Delta 2026-08-01 (c) — geometry y elevation
+
+- AXIS publica `/references/geometry/` y `/references/elevation/` como rutas estáticas token-backed.
+- `axisGeometry` conserva el spacing 1..16 + 25 y los radius `xs`..`display`/`round`; `axisElevation` conserva
+  los roles semánticos `none`, `raised`, `floating`, `overlay`, `modal` y `overflow` reservado.
+- El bloque pasó build, typecheck, tests unitarios, lint y 14 pruebas E2E en Chromium y mobile.
+
 ### Plan futuro para portar el Lab Greenhouse a AXIS
 
 1. Inventariar las rutas actuales de `/design-system` y clasificarlas como contrato puro, fixture visual,

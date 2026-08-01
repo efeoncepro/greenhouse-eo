@@ -20,8 +20,9 @@
   `https://axis-design-system-lab.vercel.app`, `READY`, Astro/output `apps/lab/dist`, Node 24. Se retiró la
   protección SSO del proyecto porque el Lab ya tenía decisión explícita de ser público; `/`, `/docs/`,
   `/references/colors/` y `/sitemap-index.xml` responden `200`.
-- Empezó la migración Greenhouse → AXIS: `colors` y `typography` son los primeros slices, con referencias
-  token-backed en `/references/colors/` y `/references/typography/`; el inventario y el triage están en
+- Empezó la migración Greenhouse → AXIS: `colors`, `typography`, `geometry` y `elevation` ya tienen referencias
+  token-backed en `/references/colors/`, `/references/typography/`, `/references/geometry/` y
+  `/references/elevation/`; el inventario y el triage están en
   [`AXIS_GREENHOUSE_LAB_MIGRATION_INVENTORY_V1.md`](docs/architecture/AXIS_GREENHOUSE_LAB_MIGRATION_INVENTORY_V1.md).
 
 ## Globe Producer — seis defectos de superficie, el pie de la app y la paginación del feed (2026-08-01)

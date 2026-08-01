@@ -1,6 +1,6 @@
 # AXIS / Greenhouse Lab migration inventory
 
-**Estado:** slice 0 completado · migración iniciada 2026-08-01
+**Estado:** 4 referencias portables migradas · migración en curso 2026-08-01
 **Dueño:** AXIS Design System + Greenhouse UI Platform
 **Fuente:** `src/app/(dashboard)/design-system/**` en `greenhouse-eo`
 **Destino:** `axis-design-system/apps/lab` (Astro 7, static, público)
@@ -24,8 +24,8 @@ Cada candidato requiere auditoría transitive de imports antes de migrarse.
 |---|---|---|
 | `colors` | primer slice | `/references/colors/` — migrada desde tokens AXIS |
 | `typography` | primer slice | `/references/typography/` — migrada desde la escala canónica |
-| `geometry` | token/reference candidate | contrato de geometry AXIS |
-| `elevation` | token/reference candidate | contrato de surface/elevation AXIS |
+| `geometry` | migrada | `/references/geometry/` — `axisGeometry` |
+| `elevation` | migrada | `/references/elevation/` — `axisElevation` |
 | `gradients` | token/reference candidate | referencia AXIS tras provenance |
 | `utilities` | token/reference candidate | primitives/recipes AXIS |
 | `buttons`, `chips`, `breadcrumbs` | pure-UI candidate | `DesignPatternContract` + fixtures |
@@ -51,6 +51,10 @@ E2E smoke verifies the public route and a published token value.
 `typography` now renders at `https://axis-design-system-lab.vercel.app/references/typography/`.
 Its semantic scale, families, weights and line-heights are published by `axisTypography`; the page does not
 import `CanonicalTypographyView` or Greenhouse typography runtime.
+
+`geometry` and `elevation` now render at `/references/geometry/` and `/references/elevation/`. Geometry publishes
+the 4px spacing scale and radius roles; elevation publishes semantic roles (`none` through `modal`, plus reserved
+`overflow`). Both are static and token-backed. The raw Greenhouse MUI theme remains outside AXIS.
 
 ## Gate for each next route
 
