@@ -44,7 +44,7 @@ Make long-running model evaluations durable and provider-neutral so an upstream 
 
 Do not alter already promoted Omni, Seed Audio or Seedance Loop; do not bypass the daily spend cap; do not add provider-specific timeout patches; do not write direct SQL or create a second ledger/catalog.
 
-## Checkpoint vigente — 2026-08-01
+## Checkpoint histórico — 2026-08-01 (supersedido por el cierre)
 
 - PRs Globe `#74…#82` quedaron integrados por PR/CI. Las migraciones `0040`, `0041` y `0042` están aplicadas;
   API interna, producer worker y Asset Governance se desplegaron y reconciliaron sin desplegar Studio. PR `#81`
@@ -124,9 +124,8 @@ Do not alter already promoted Omni, Seed Audio or Seedance Loop; do not bypass t
   `authorizedInputs`; the effective inputs are persisted and scored for lineage.
 - The exact identity remains `ref/video/motion-v1` / `fal` / `seedance-2.0-r2v` / `2.0`. Omni, Seed Audio and
   Seedance Loop remain outside this mutation scope.
-- Code and CI integrados están completos hasta Globe PR `#31`. Un cambio adicional no integrado vive en el
-  worktree aislado `/private/tmp/globe-evaluation-rights`, branch
-  `codex/evaluation-rights-provenance`, basado en Globe `949ce88` (PR `#32`). Añade `purpose` a las políticas de
+- Code and CI integrados estaban completos hasta Globe PR `#31`. El cambio adicional de PR `#32`, entonces aún no
+  integrado, añadió `purpose` a las políticas de
   output rights, resolución exacta antes del gasto, lineage durable de referencias, padre derivado en el finalizer
   y bloqueos de entrega/share para outputs de evaluación. Incluye migración `0040_generated_rights_policy_purpose.sql`.
 - Los 253 tests de `@efeonce-globe/creative-runner` pasan, incluidos los casos de policy faltante, purpose incorrecto,
@@ -212,19 +211,13 @@ Do not alter already promoted Omni, Seed Audio or Seedance Loop; do not bypass t
   al recuperar el estado inicial. `pnpm check` local, CI `30685780585` y Terraform Check `30685780571` terminaron
   `success`; una revisión independiente dio `MERGE` sin hallazgos bloqueantes.
 
-## Handoff ejecutable — discovery primero, cero mutaciones iniciales
+## Cierre y límites de continuidad
 
-1. Leer este checkpoint, `GLOBE_RUNTIME_HANDOFF.md`, TASK-1566, TASK-1629 y el manual de fondeo. No ejecutar
-   deploy, `propose/confirm`, generación, SQL ni provider API durante el discovery.
-2. Releer por commands/readers canónicos la policy efectiva, grants activos, budget/availability y usage del período
-   exacto `2026-08-01T00:00:00Z…2026-09-01T00:00:00Z`. Reconciliar esos resultados con proposal
-   `ef775b1b-ebe0-411f-95e6-eff1000cbf62`, grant `3ef983b4-e41e-4d83-8a53-c02ae00fccdc`, policy
-   `eca7c50e-563e-4174-b508-be244e85783b` y ledger `24ecb9a7-e7fc-4338-a9b3-9c12a5441d45`.
-3. Clasificar con evidencia una sola causa: período del grant, policy efectiva, proyección/reader o UI stale. Sólo si
-   el plan canónico demuestra un déficit real se autoriza un nuevo `propose → revisión del delta → confirm`;
-   recuperar primero cualquier intent ambiguo y usar claves distintas.
-4. Con presupuesto admitido, volver a la sesión Playwright existente: Greenhouse
-   `jreyes@efeoncepro.com`, Google/Chrome `jreyes@efeonce.cl`. Generar exactamente una pieza con
-   **Video → Movimiento/control cámara → Seedance 2.0** y el reference gobernado ya añadido.
-5. Verificar la pieza nueva por identidad exacta, playback real, retención, governance y canary de la saga. Sólo
-   entonces mover TASK-1614 a `complete`. No tocar Omni, Seed Audio, Seedance Loop, Veo ni Seedream.
+- TASK-1614 no conserva acciones de rollout ni un canary pendiente: run, attempt, output, playback, cobro único,
+  governance y `canary-confirm` están verificados en el checkpoint dominante del 2026-08-02.
+- TASK-1504 continúa la promoción de Gemini Omni sobre otra identidad y otra saga. Su circuito abierto y el rollout
+  pendiente posterior al fix de idempotencia de `auto-promote` no reabren TASK-1614 ni autorizan un segundo canary
+  de Seedance.
+- TASK-1632 es un handoff interno de Globe entre completion de provider, finalización de Producer y Asset
+  Governance. No forma parte de TASK-1614, Greenhouse no participa en ese runtime y cualquier proyección futura
+  entre productos permanece separada bajo TASK-1475.

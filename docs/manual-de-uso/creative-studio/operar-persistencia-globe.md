@@ -1,9 +1,9 @@
 # Manual — Operar la persistencia durable de Efeonce Globe
 
 > **Tipo de documento:** Manual de uso / runbook (orientado al operador)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-07-21 por Claude (TASK-1465)
-> **Ultima actualizacion:** 2026-07-21 por Claude
+> **Ultima actualizacion:** 2026-08-02 por Codex (estado vigente de Studio Credits)
 
 ## Para qué sirve
 
@@ -68,7 +68,9 @@ Si **falta** cualquiera, el servicio **arranca en memoria** (comportamiento prev
 - **NUNCA** compartas la base de datos (ni sesión, bucket, secreto o rol admin) **entre Globe y Greenhouse**. `globe-pg` es de Globe. Greenhouse la gobierna, no la conecta.
 - **NUNCA** dejes viva la contraseña del usuario `postgres` después del bootstrap: se revuelve al terminar. El modelo es sin contraseña de admin en pie.
 - **NUNCA** hagas `git commit --no-verify` / `git push --no-verify` sin autorización explícita del operador. Los hooks son el gate; bypassearlos deja errores para el próximo agente.
-- **NUNCA** trates el **spend fence** durable como el **ledger de créditos comerciales**: es un freno de seguridad, no el registro contable. El ledger comercial es capacidad aparte, pendiente.
+- **NUNCA** trates el **spend fence** durable como el ledger append-only de **Studio Credits**: es un freno de
+  seguridad separado. El ledger ya está operativo en Globe y es consumido por Greenhouse UI, API/CLI OAuth PKCE
+  y MCP; Studio Credits no son dinero, revenue ni tokens de proveedor.
 - **NUNCA** corras el `bootstrap.sql` en cada deploy: es setup de una sola vez.
 
 ## Problemas comunes

@@ -27,6 +27,35 @@ flags, rutas promovidas, canarios y bloqueos— vive en
 `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`; nunca se infiere desde un número histórico de esta
 skill.
 
+### Continuidad operativa de rutas y canarios
+
+- Trabaja en Globe únicamente sobre su checkout compartido y su rama canónica `main`. Nunca crees, uses, muevas
+  ni limpies worktrees, clones o checkouts aislados; si el WIP compartido bloquea, detente y pide una decisión.
+- Conserva la identidad ejecutable exacta de extremo a extremo:
+  `routeId + capability + provider + model + version/endpoint`. Un éxito de una ruta vecina, otro endpoint o una
+  versión parecida no constituye evidencia para la ruta bajo prueba.
+- Ante timeout o resultado ambiguo, aplica **readback-first** con la misma correlación e idempotencia antes de
+  mutar. Para cada canary lógico conserva una sola `idempotencyKey` del command facturable, un solo run y un solo
+  cobro; no abras otro intento mientras el reader no descarte que el anterior completó o sigue recuperable.
+- No confundas el candidato retenido de evaluación con un canary post-promoción. El primero puede probar
+  evaluación y playback; el segundo, cuando el criterio lo exige, es una generación nueva iniciada en Producer.
+- Cuando el operador exija su sesión existente, ejecuta el canary desde el Chrome autenticado que él indicó; no
+  sustituyas esa atribución con un perfil Playwright efímero ni traslades cookies o secretos.
+- Verifica simetría de rollout entre API y worker ejecutor: driver/adapter, imagen y configuración, Secret Manager,
+  accessor IAM y service account deben existir en cada consumidor que realmente los usa. Una API que resuelve la
+  ruta con un worker sin el mismo soporte, o un secret declarado sin accessor runtime, no es una integración
+  operativa.
+- Las atestaciones y policies de derechos son inmutables. Corregir términos, digest o grants crea una atestación
+  nueva y una policy derivada nueva; nunca reescribas la anterior. La idempotencia de `auto-promote` se ancla a la
+  atestación exacta, de modo que repetirla sea no-op y una atestación nueva produzca una promoción distinta sin
+  colisionar con la clave anterior.
+- Un circuito `open` con razón `canary_unattested` prueba que falta evidencia del canary; no prueba por sí solo que
+  el driver, provider o endpoint estén rotos. Lee readiness, binding, attempt, output y atestación antes de cambiar
+  código o generar otra pieza.
+- `TASK-1632` pertenece completamente a Globe: conecta completion del provider con finalización de Producer y
+  Asset Governance dentro del mismo producto. Cualquier proyección o evento futuro entre Globe y Greenhouse sigue
+  siendo responsabilidad separada de `TASK-1475`; no introduzcas Greenhouse en el hot path de `TASK-1632`.
+
 > **LEER PRIMERO antes de asumir que un modelo/proveedor "no está" o "hay que integrarlo":**
 > `docs/operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md` — el **ledger canónico de la flota de modelos**
 > (qué modelo/proveedor está integrado, en qué **carril** — Model Lab vs producción gobernada —, validado cuándo y

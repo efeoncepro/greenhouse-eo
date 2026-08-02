@@ -128,7 +128,7 @@ fail-closed antes de reservar crédito**:
 | **TASK-1501** ✅ | Modality-Discriminated Run Contract | `PreparePayload` como union por capability + output-shape validados pre-spend (**absorbe `1495`**). **Shipped 2026-07-20** (ver §Contratos reales del run contract) | backend-data |
 | **TASK-1502** ✅ | Previewable Estimate reader | el `✨N` antes de gastar (extrae el estimate de dentro de `execute`; slice adelantado de `1469`). **Shipped 2026-07-20** (ver §Contratos reales del estimate) | backend-data |
 | **TASK-1503** ✅ | Governed Output Retrieval + Asset Actions | hash→bytes servible + download/preview/favorite/copy sobre el store content-addressed de `1490`. **Shipped 2026-07-22** (ver §Contratos reales del retrieval) | backend-data |
-| **TASK-1504** 🟡 | Producer Capability Expansion | `in-progress`, slices Image/Video/Audio solo locales: video frames + motion-control; audio change-voice + translate; faltan multi-output tipado por output, voice-preset durable, canary y deploy | backend-data |
+| **TASK-1504** 🟡 | Producer Capability Expansion | `in-progress`; foundation cross-modal desplegada. Omni gobernado está integrado en `62337b483`, con evaluación/review/readiness/binding completos; el fix idempotente `fa286dbd` tiene CI verde, pero el circuito sigue abierto hasta deploy, policy/readback y un único canary confirmado. Las demás capacidades avanzadas conservan canarios propios pendientes | backend-data |
 | **TASK-1505** | Producer Surface (UI) | Superficie aprobada completa: composer Image/Video/Audio + biblioteca, viewer, collections/batch, budgets, provenance, collaboration/share y operator UX; integración por vertical slices, sin recortar el baseline | ui-ux |
 | **TASK-1519** | Producer Human Execution Bridge + Surface Enforcement | browser → same-origin BFF → IAM-private API; broker grants humanos, delegación actor/workspace y enforcement de surface | backend-critical |
 | **TASK-1520** | Producer Asset Library, Collections + Bulk Operations | projection/reader del feed real, collections, búsqueda y commands batch idempotentes/auditados | backend-data |
@@ -566,6 +566,32 @@ Este párrafo describe el checkpoint local del 2026-07-22 y queda superseded por
   runs están `completed`, por lo que `queueOldestAgeSeconds` mide trabajo no reclamable y genera ruido. La solución
   debe terminalizar/superseder esos eventos al completar y calcular edad sólo sobre trabajo reclamable, con backfill
   gobernado; nunca `UPDATE` manual.
+
+## Materialización 2026-08-02 — Gemini Omni en promoción gobernada, canary aún cerrado por policy
+
+- El driver gobernado para
+  `ref/motion/reference-v1 / vertex-omni / gemini-omni-flash-preview / preview` y la composición simétrica de API
+  y Producer worker están integrados en Globe `main@62337b483fd965cd3a518fa1b9d13c7b0ac6d3f4`.
+- La evidencia exacta ya está fijada: report `5f20a731-26e3-423b-b453-f5f0758e160f`, attempt
+  `d68605db-7d33-4ea6-b540-e6063668f3f7`, review
+  `review_e77b2999-0da9-4eea-9081-3a0068b8a580`, readiness `promoted` revisión 2 y route binding habilitado
+  revisión 5. No corresponde producir otra evaluación.
+- La atestación vigente es `mcra_8c59f455-8704-47b1-9489-26d468f8ff8d`, `sublicensable=false`, digest
+  `sha256:04e949c5a43564c336d5380362b8cd2515766ee6bc85a736abec94cec7e53d4b`. La evidencia anterior no se
+  reutiliza ni se reescribe.
+- La causa raíz de replay de `auto-promote` está corregida en Globe
+  `main@fa286dbda0a3c1ce02de7d5a2ab173ba1bf34966`: la identidad idempotente incorpora atestación/policy y la
+  regresión cubre una segunda atestación sin duplicar route revision. CI `30744034457` terminó verde
+  (`check` + `build`).
+- El circuito sigue `open` por `promotion_recovery_canary_unattested`. No es disponibilidad live: falta desplegar
+  API/worker, repetir `auto-promote` con la atestación vigente, verificar policy/readbacks y saga,
+  ejecutar un solo canary nuevo desde Producer y cerrar con playback, cobro único, retención, lineage, governance
+  y `canary-confirm`.
+- El cambio event-driven de provider completion → Asset Governance pertenece a `TASK-1632` y no se mezcla con
+  este rollout. El canary de Omni puede cerrar sobre el Scheduler/reconcile vigente; `TASK-1632` queda como unidad
+  Globe-internal posterior y Greenhouse no entra en su data path.
+- `TASK-1504` permanece `in-progress` aunque Omni cierre: los canarios de las otras capacidades avanzadas se
+  verifican por identidad/capability, nunca por transitividad.
 
 ### Decisión pendiente para entrega multimedia a escala
 

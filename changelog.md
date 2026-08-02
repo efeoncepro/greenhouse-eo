@@ -7,6 +7,24 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-02 — Gemini Omni: evidencia legal corregida y checkpoint durable
+
+- Globe `62337b483` quedó en `main` con driver gobernado y simetría de configuración/secret/IAM entre API y
+  Producer worker para `ref/motion/reference-v1 / vertex-omni / gemini-omni-flash-preview / preview`; CI
+  `30743786928` terminó verde.
+- Globe `fa286dbd` corrigió la idempotencia de `auto-promote` para incorporar la atestación/policy sin duplicar la
+  route revision; CI `30744034457` terminó verde. El despliegue de API/worker, la nueva policy y el canary siguen
+  pendientes para la sesión de continuidad.
+- Los readbacks canónicos probaron evaluation/readiness ya promovidos, binding habilitado y circuito abierto por
+  `promotion_recovery_canary_unattested`, no por un fallo probado del driver. El candidato de evaluación retenido
+  no se reutilizará como canary productivo.
+- La atestación anterior declaraba sublicencia y términos genéricos incorrectos. El Producer autenticado firmó
+  una nueva atestación inmutable con uso comercial/entrega permitidos, sublicencia denegada y digest exacto
+  `sha256:04e949c5…e53d4b`. La siguiente sesión debe desplegar API/worker, publicar la policy derivada corregida y
+  ejecutar exactamente un canary nuevo con cobro, playback, retención, lineage, governance y `canary-confirm`.
+- TASK-1632 permanece separada y `to-do`: formaliza dentro de Globe el wake event-driven desde completion del
+  proveedor hasta Asset Governance; no es un handoff Greenhouse ni reabre TASK-1614.
+
 ## 2026-08-02 — Cierres canónicos: TASK-1614 y Proposal Studio
 
 - Se agregó `proposal-studio.json` al workspace scaffoldeado y `pnpm tender:canonical-gate <slug>` como gate
@@ -94,6 +112,9 @@
 - TASK-1630 cerró live: MCP `globe.credits.funding.ensure` pasó OAuth/Entra + WIF + RFC 8693 + Greenhouse command;
   los dos outcomes antiguos liberaron 14+16 mediante decisions Finance gobernadas; los 500.000 se conservaron
   append-only y se retiraron de toda proyección operativa UI/API/CLI/MCP.
+- La documentación funcional y el manual quedaron reconciliados con el sistema live: UI recomendada, paridad
+  API/CLI/MCP sobre un solo ledger, autoridad CEO one-shot, `ensure` readback-first y saldo posterior a Seedance
+  `800 → 784` bajo cap 1500. Studio Credits no se presentan como dinero, revenue ni tokens de proveedor.
 
 ## 2026-08-01 — Efeonce MCP: Globe fleet reader end-to-end
 
@@ -714,12 +735,3 @@ Corrección de fuente de verdad: el cliente inicial es **SKY Agencia Creativa**,
 - Se separaron las capas vendibles: licencia/acceso, advisory, implementación, managed operations, Product Services e IP propia.
 - Se clasificaron HubSpot, OpenAI, Claude, Google Cloud, Microsoft AI Cloud, AWS, Salesforce, Adobe, Lovable y providers creativos sin confundir provider, partnership aprobado, product brand o business line.
 - Se sincronizaron arquitectura, business models, GTM, context pack y skills; el estado de programas permanece en la auditoría fechada y no habilita claims comerciales por sí solo.
-
-## 2026-07-26 — HubSpot: brochure histórico convertido en input gobernado
-
-- Se revisaron los brochures Efeonce x HubSpot de 2024/2025 y se documentó qué capacidades se absorben en RevOps & CRM.
-- El catálogo adopta el recorrido diagnóstico → arquitectura → implementación modular → enablement → operación,
-  con ofertas diferenciadas y HubSpot explícitamente como plataforma/provider.
-- Se sincronizaron `hubspot-as-a-service` y `hubspot-solutions-partner` en `.codex` y `.claude`; claims, precios,
-  bundles y disponibilidad del brochure quedan fuera del canon hasta verificación primaria fechada.
-- Auditoría: [`HUBSPOT_BROCHURE_REVIEW_2026-07-26.md`](docs/audits/commercial/HUBSPOT_BROCHURE_REVIEW_2026-07-26.md).

@@ -25,6 +25,21 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Checkpoint de secuencia 2026-08-02 — unidad posterior a Omni
+
+- La task permanece `to-do`: no existen todavía wake outbox/dispatcher, migración, IAM, flags, despliegue ni
+  canary event-driven que permitan marcar un slice como implementado.
+- El cierre en curso de Gemini Omni bajo `TASK-1504` no implementa esta task. El fix de `auto-promote` ya integrado,
+  su deploy de API/Producer worker y el único canary posterior conservan el trigger periódico vigente; no deben
+  mezclar un cambio polling-first → event-first en el mismo rollout.
+- Esta unidad comienza sólo después del cierre o checkpoint estable de Omni y mantiene su orden:
+  `ADR/audit → durable wake → dispatcher/IAM → failure tests → shadow → internal wake → canary → Scheduler safety-net`.
+- **Greenhouse queda fuera del data path y del runtime.** Sólo gobierna task, ADR, evidencia y handoff; no recibe
+  callbacks, wakes, payloads, estados intermedios ni jobs de Asset Governance. `TASK-1475` conserva cualquier
+  integración cross-product futura bajo un contrato separado.
+- El primer acto de la próxima sesión es auditar el commit transaccional real de `complete` y el enqueue durable
+  de governance; no se elige Cloud Tasks, Pub/Sub, Eventarc ni Jobs API antes de esa evidencia y el ADR.
+
 ## Summary
 
 Convertir el callback verificado de Fal en el disparador primario del lifecycle durable de Globe hasta Asset

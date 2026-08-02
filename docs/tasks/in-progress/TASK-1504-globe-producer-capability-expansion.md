@@ -55,13 +55,42 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-028`
-- Status real: `Desplegada internal-only; ruta base video canariada, capacidades avanzadas aún requieren canarios propios`
+- Status real: `Omni integrado y parcialmente promovido internal-only; circuito abierto hasta policy/canary; otras capacidades avanzadas conservan canarios propios pendientes`
 - Rank: `TBD`
 - Domain: `creative|ai|platform`
 - Blocked by: `none`
 - Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Checkpoint 2026-08-02 — Gemini Omni, handoff exacto de promoción internal-only
+
+- Identidad inmutable: `ref/motion/reference-v1 / vertex-omni / gemini-omni-flash-preview / preview`.
+  Globe `main@62337b483fd965cd3a518fa1b9d13c7b0ac6d3f4` ya contiene el driver gobernado, la simetría
+  API/Producer worker y el acceso condicional al secret Gemini. Este checkpoint no autoriza otro adapter,
+  routeId ni provider call directo.
+- La evaluación exacta ya existe y **no debe repetirse**: report
+  `5f20a731-26e3-423b-b453-f5f0758e160f`, attempt
+  `d68605db-7d33-4ea6-b540-e6063668f3f7` y review humana
+  `review_e77b2999-0da9-4eea-9081-3a0068b8a580`. Readiness está `promoted` revisión 2 y el binding de la
+  ruta está habilitado revisión 5.
+- El circuito permanece deliberadamente `open` con razón `promotion_recovery_canary_unattested`; por ello la
+  ruta todavía no es un canary gobernado cerrado ni debe presentarse como disponible por esta evidencia parcial.
+- La atestación aplicable es únicamente
+  `mcra_8c59f455-8704-47b1-9489-26d468f8ff8d`, con `sublicensable=false` y digest
+  `sha256:04e949c5a43564c336d5380362b8cd2515766ee6bc85a736abec94cec7e53d4b`. Sustituye la atestación
+  anterior jurídicamente inexacta; la historia inmutable no se reescribe.
+- La causa raíz de `auto-promote` ya quedó corregida y publicada en Globe
+  `main@fa286dbda0a3c1ce02de7d5a2ab173ba1bf34966`: la idempotency key incorpora la atestación/policy y el test
+  de regresión prueba una segunda atestación sin duplicar la route revision. CI `30744034457` terminó verde
+  (`check` + `build`); código integrado no equivale todavía a runtime desplegado.
+- Secuencia única pendiente: desplegar API y Producer worker desde `fa286dbd` → repetir
+  `auto-promote` con `mcra_8c59f455-8704-47b1-9489-26d468f8ff8d` → verificar policy/readbacks y saga →
+  cerrar/activar el circuito por el lane canónico →
+  ejecutar **un solo canary nuevo** desde Producer autenticado → verificar playback, cobro único, retención,
+  lineage y Asset Governance → ejecutar `canary-confirm` y reconciliar el reader live.
+- `TASK-1504` continúa `in-progress`: cerrar Omni no certifica por transitividad `video-frames`,
+  `audio-change-voice`, `audio-translate`, otros casos multi-output ni las voces curadas pendientes.
 
 ## Checkpoint 2026-07-23 — rollout parcial honesto
 
@@ -439,6 +468,12 @@ pedido. Autorizado por el operador para cerrarse acá. Modos mudados a las rutas
 regresión + `assertInputModeSatisfied` (cuenta referencias **por tipo de medio** pre-fence).
 
 ### Pendiente bloqueante — gate humano, no trabajo de código
+
+> **Delta dominante 2026-08-02:** para Gemini Omni el driver, evaluación, review, readiness y binding ya existen.
+> Su pendiente exacto es el checkpoint anterior: desplegar el fix ya integrado con CI verde, repetir auto-promote
+> con la atestación vigente, verificar policy/readbacks, producir un único canary nuevo y confirmarlo. La lista
+> histórica siguiente continúa aplicando sólo a las demás capacidades todavía no canariadas y no autoriza repetir
+> la evaluación de Omni.
 
 - [ ] **Canario facturable por capability** (`video-frames`, `video-motion-control`,
       `audio-change-voice`, `audio-translate`, omni multi-output): 1 run real bajo el fence con

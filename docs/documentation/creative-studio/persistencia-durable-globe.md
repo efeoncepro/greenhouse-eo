@@ -1,9 +1,9 @@
 # Efeonce Globe — Persistencia durable (deja de vivir en la memoria)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-07-21 por Claude (TASK-1465)
-> **Ultima actualizacion:** 2026-07-21 por Claude
+> **Ultima actualizacion:** 2026-08-02 por Codex (estado vigente de Studio Credits)
 > **Documentacion tecnica:** [`docs/architecture/creative-studio/EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md`](../../architecture/creative-studio/EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md)
 
 ## De qué se trata este documento
@@ -43,7 +43,10 @@ Lo importante es que **no es un plan teórico**: se desplegó y se verificó en 
 
 ## Qué NO hace
 
-- **No es el ledger de créditos comerciales.** El spend fence durable es un **freno de seguridad** (aborta antes de gastar de más), no el **registro contable** de créditos comerciales. Ese ledger comercial es una capacidad aparte, todavía pendiente. No confundir uno con el otro.
+- **No es el ledger de Studio Credits.** El spend fence durable es un **freno de seguridad** (aborta antes de
+  gastar de más), no el ledger append-only de Studio Credits. Ese ledger ya está operativo en Globe y converge con
+  Greenhouse UI, API/CLI OAuth PKCE y MCP; sigue siendo una unidad de consumo gobernado, no dinero ni contabilidad
+  legal. No confundas ambos controles.
 - **No trae el modelo rico de espacios de trabajo / miembros / permisos.** Un modelo detallado de workspace, members y grants queda **diferido** a una tarea posterior.
 - **No blindaba el escalado por sí sola.** Al cerrar esta capacidad, `deploy-internal.yml` hardcodeaba `--max-instances=1`. La `TASK-1508` (completa, 2026-07-21) lo cerró: el workflow pasa sólo `--image` y Terraform gobierna los dos topes (servicio y revisión, ambos en 3). No hay workaround que correr.
 

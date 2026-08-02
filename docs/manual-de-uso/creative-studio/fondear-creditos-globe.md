@@ -1,9 +1,9 @@
 # Manual — Fondear los créditos de Globe por el carril gobernado
 
 > **Tipo de documento:** Manual de uso / runbook (orientado al operador)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-07-26 por Claude (TASK-1566)
-> **Ultima actualizacion:** 2026-08-01 por Codex (TASK-1630)
+> **Ultima actualizacion:** 2026-08-02 por Codex (reconciliación documental TASK-1630)
 > **Documentacion tecnica:** [ADR-015](../../architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md) · [TASK-1566](../../tasks/complete/TASK-1566-globe-governed-credit-funding-command.md)
 
 ## Para qué sirve
@@ -21,12 +21,16 @@ runbook que salieron de medirlo.
 > **Estado 2026-08-01:** operativo para el workspace interno. Greenhouse corre desde `develop`; Globe corre desde
 > su rama predeterminada, de integración y release `main`. Migraciones, seed OAuth y deploy están aplicados. La
 > UI rica, el CLI PKCE y Producer leyeron el mismo resultado live: 800 créditos efectivos, cap 1500 y cero
-> blockers. Workbench y self-view pasaron GVC y smoke Chrome autenticado; el estado mutable del rollout vive en
+> blockers. El canary posterior de Seedance consumió 16 y dejó 784 efectivos bajo el mismo cap 1500. Workbench y
+> self-view pasaron GVC y smoke Chrome autenticado; el estado mutable del rollout vive en
 > `GLOBE_RUNTIME_HANDOFF.md`.
 
 ## Antes de empezar
 
-- **Las dos capas de crédito NO son lo mismo.** El **ledger** (`credits.allocate`) es la caja; la
+- **Studio Credit no es dinero.** Es una unidad de operación generativa gobernada; no representa revenue,
+  efectivo, gift card, token o factura de proveedor. El carril documentado es interno y no habilita top-ups,
+  checkout, precios ni clientes externos.
+- **Las dos capas de crédito NO son lo mismo.** El **ledger** (`credits.allocate`) es el registro append-only; la
   **política** (`monthlyCap` + grants de pools activos) es lo que el gasto consulta. Cargar el ledger
   sin subir la política no habilita nada — el plan del propose te muestra exactamente eso.
 - **Un fondeo útil casi siempre sube `monthlyCap`.** Si el tope vigente es lo que restringe (caso
@@ -42,13 +46,18 @@ runbook que salieron de medirlo.
   `GLOBE_CREDIT_ADMIN_LANE_ENABLED=true` esté en la revisión activa de `globe-api-internal`.
 - **La propuesta vence en 15 minutos.** Se confirma sobre el estado que se vio; si venció, se
   propone de nuevo.
+- **El bootstrap histórico de 500.000 no es capacidad.** Se conserva como auditoría append-only, pero está
+  excluido de status, UI, API, CLI, MCP y KPIs. No lo sumes, no lo borres y no lo compenses manualmente.
 
 ## Camino recomendado: instrucción CEO → ensure one-shot
 
 Este camino evita que el agente calcule `poolId`, grant o tope. El CEO emite una autoridad con objetivo y techos;
 Globe lee su estado real, deriva el delta y devuelve `no_effect` si el sistema ya tenía fondos suficientes.
+Con `requireSecondConfirmer=OFF` en el workspace interno, una instrucción one-shot atribuida del CEO permite que
+el mismo usuario agente autenticado ejecute el flujo end-to-end; no se requiere una segunda persona.
+UI, API/CLI OAuth PKCE y MCP son adapters de esta misma operación: no tienen reglas, saldos o ledgers propios.
 
-### Opción A — Greenhouse UI (persona autorizada)
+### Opción A — Greenhouse UI (recomendada)
 
 Camino verificado y recomendado para una persona autorizada:
 
@@ -162,6 +171,10 @@ determinístico `internal-month:AAAA-MM` dentro de la misma transacción económ
 El plan muestra el **delta**: `monthlyCapBefore/After`, `policyAvailableBefore/After`,
 `spentInPeriod` y, si hoy se niega, `currentDenialReason`. Reglas de lectura:
 
+- `propose` crea una intención durable con actor, idempotency key, fingerprint, preview y expiración. No es una
+  lectura pura, pero todavía no crea grant, allocation ni cambio de cap; esa mutación económica ocurre sólo al
+  confirmar.
+
 - Si `policyAvailableAfter` **no sube**, el fondeo no sirve como está — probablemente falta subir
   `monthlyCap`.
 - Un `monthlyCap` por debajo de lo ya gastado se rechaza en el propose (`invalid_request`).
@@ -188,15 +201,8 @@ pnpm tsx scripts/globe-credit-funding.ts operations reconcile --workspace-id gre
   --operation-id <id> --idempotency-key <clave-estable>
 ```
 
-Las consultas SQL siguientes quedan sólo como **diagnóstico privilegiado de último recurso**; no son el camino
-normal ni condición para operar:
-
-1. **Intents** (Greenhouse PG): `SELECT phase, actor_user_id FROM
-   greenhouse_core.globe_credit_funding_intents ORDER BY created_at DESC LIMIT 2` → `proposed` +
-   `confirmed` con el user id real y `actor_auth_mode` (`credentials`, `both`, `microsoft_sso`, `google_sso` o
-   `agent`).
-2. **Globe PG**: grant `posted`, política nueva `active` (la anterior `superseded`), asiento
-   `allocation` con los créditos.
+No uses SQL para confirmar outcomes, reconstruir saldo o reparar una operación. Los readers y receipts anteriores
+son la evidencia causal y permiten recuperar ambigüedad sin saltarse la máquina de estados.
 
 Producer ya consume el self-status autoritativo. Úsalo como verificación independiente de experiencia, pero
 conserva el `operationId` y el reader `status/get` como evidencia causal de la operación.
@@ -224,9 +230,11 @@ producción sin reescribir la capacidad económica ni habilitar un CTA de fondeo
   debe entrar como usuario autenticado y estar delegado por la política del workspace.
 - **NO** extraer cookies, tokens, `localStorage` ni contraseñas de Chrome. Chrome aporta únicamente
   la sesión autenticada para la autorización OAuth; el CLI recibe el código PKCE por loopback.
-- **NO** usar los scripts legacy de firma cliente (`raise-credit-monthly-cap.mjs`) ni el break-glass
-  para fondear: su premisa (firmar desde el cliente) contradice el diseño y están en retiro.
+- **NO** recrear ni usar scripts legacy de firma cliente (`raise-credit-monthly-cap.mjs`) o break-glass para
+  fondear: su premisa contradice el diseño y el camino cliente fue retirado.
 - **NO** tocar las tablas de crédito con SQL manual.
+- **NO** tratar los 500.000 históricos como saldo operativo ni presentarlos en una superficie; ya están excluidos.
+- **NO** usar este carril interno para clientes, top-ups, checkout o facturación. Esas capacidades siguen gated.
 
 ## Problemas comunes
 

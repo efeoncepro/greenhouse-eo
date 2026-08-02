@@ -41,7 +41,7 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 | `ref/still/openai-v2` | GPT Image · 2 | OpenAI (`gpt-image-2`) | image-generate | ✅ 07-24 | ✅ driver + promoción + canary real 07-30 | run UI `a81c8049-7772-4933-82f2-1e2e59e5121c`; 14 créditos |
 | `ref/still/openai-v1-5` | GPT Image · 1.5 | OpenAI (`gpt-image-1.5`) | image-generate | ✅ 07-24 | ✅ driver + promoción + canary real gobernado 07-30 | run UI `bf8cd62b-e2d7-4e83-981a-7631a14a5d3a`; 10 créditos |
 | `ref/motion/loop-v1` | Seedance · 2.0 | Fal | video-generate | ✅ 07-19 | ✅ driver Fal | — |
-| `ref/motion/reference-v1` | Gemini Omni Flash · Preview | Vertex (Omni, Interactions API) | video-generate | ✅ 07-20 (40cr) | ⏳ **solo Lab** — Omni NO está en el path gobernado | ver "Delta" abajo |
+| `ref/motion/reference-v1` | Gemini Omni Flash · Preview | Vertex (Omni, Interactions API) | video-generate | ✅ evaluación retenida (40cr) | ⏳ driver gobernado integrado; promoción incompleta | TASK-1504: readiness promovido, binding habilitado, circuito abierto; no `available` |
 | `ref/video/frames-v1` | Veo · 2.0 | Vertex (`veo-…:predictLongRunning`) | video-frames | ✅ 07-20 (MP4 real, 32cr) | ✅ driver Veo gobernado (`vertex-video`, `us-central1`) desde 07-22 | — |
 | `ref/video/motion-v1` | Seedance · 2.0 | Fal | video-motion-control | ✅ evaluación/report 08-01 | 🟢 canary real gobernado 08-02 | TASK-1614 cerrada: run `bbe6dfff…`, output MP4 retenido, 16 créditos, `canary_passed` |
 | `ref/audio/foley-v1` | Seed Audio | Fal | audio-generate | ✅ 07-19 | ✅ driver Fal | atestación comercial firmada |
@@ -75,6 +75,7 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 | 2026-07-30 | TASK-1553 | **Recraft v4.1 promovido**; contrato SVG, evaluación/revisión/derechos, binding/readiness/circuito y generación real desde Producer; fix fail-closed `84d6a8e` |
 | 2026-08-01 | TASK-1614 | Seedance R2V: evaluación/report, governance, atestación, readiness y policy productiva completos |
 | 2026-08-02 | TASK-1614 | Canary nuevo gobernado verde: run `bbe6dfff…`, attempt `7bb11342…`, output SHA `93adbf46…`, 16 créditos, governance elegible y `canary_passed` |
+| 2026-08-02 | TASK-1504 | Gemini Omni: driver gobernado integrado en `62337b483`; fix de idempotencia en `fa286db`; evaluación de 40 créditos retenida, binding habilitado y readiness promovido; circuito aún abierto y canary final pendiente |
 
 ## Evidencia Seedance R2V — canary gobernado verde (actualizado 2026-08-02)
 
@@ -106,6 +107,30 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 - Saga `promotion_557d4df1-994e-45ac-92f7-7ef885aa967e` pasó a `canary_passed` rev. 9 mediante workflow
   `30742268557`, conservando la identidad exacta y `governanceState=eligible`. No se repitió evaluación, provider
   call ni fondeo. El arreglo de lineage fue append-only; Omni, Seed Audio, Seedance Loop, Veo y Seedream no se tocaron.
+
+## Gemini Omni — checkpoint de promoción TASK-1504 (2026-08-02)
+
+- Identidad exacta: `ref/motion/reference-v1 / vertex-omni / gemini-omni-flash-preview / preview`. Globe
+  `main@62337b483fd965cd3a518fa1b9d13c7b0ac6d3f4` integra el driver gobernado y la simetría API/worker; CI
+  `30743786928` terminó verde. Los readbacks exactos quedaron verdes en rights `30743848333`,
+  readiness `30743849301`, route `30743850171` y circuit `30743851095`.
+- Ya existe un candidato retenido de 40 créditos: reporte `5f20a731-26e3-423b-b453-f5f0758e160f`, revisión
+  `review_e77b2999-0da9-4eea-9081-3a0068b8a580` y attempt `d68605db-7d33-4ea6-b540-e6063668f3f7`.
+  Binding está habilitado rev. 5 y readiness `promoted` rev. 2; el circuito sigue `open` por
+  `promotion_recovery_canary_unattested`, así que el reader no debe tratar la ruta como `available`.
+- La atestación vigente es `mcra_8c59f455-8704-47b1-9489-26d468f8ff8d`, con `commercialUse=true`,
+  `clientDelivery=true`, `sublicensable=false` y digest
+  `sha256:04e949c5a43564c336d5380362b8cd2515766ee6bc85a736abec94cec7e53d4b`. No reutilizar
+  `mcra_3f32e30a-b4ff-4c34-82b0-7f1a0be4a6e9`: contiene términos genéricos y `sublicensable=true`.
+- Globe `main@fa286dbda0a3c1ce02de7d5a2ab173ba1bf34966` ya corrige la clave de idempotencia de `auto-promote`
+  para incorporar la atestación; el test de corrección de términos quedó verde y CI `30744034457` terminó verde
+  (`check` + `build`). Antes del canary final faltan deploy de API/worker, nueva policy derivada con readback y continuidad
+  de la saga; después se ejecuta exactamente un asset desde Producer con playback, cobro único, retención, lineage,
+  Asset Governance y `canary-confirm`. La evaluación existente no se repite.
+
+> **Límite TASK-1632:** el wake desde completion de provider hacia finalización de Producer y Asset Governance es
+> un handoff interno de Globe, actualmente diseñado pero aún no implementado. No cambia este ledger de promoción,
+> Greenhouse no participa y TASK-1475 conserva cualquier proyección cross-product futura.
 
 ## Evidencia de Nano Banana Pro — canary y promoción gobernada
 
@@ -225,13 +250,15 @@ Manual: [operar la flota](../../manual-de-uso/creative-studio/operar-flota-model
 
 ## Estado vigente y límites fuera de TASK-1553
 
-- **Gemini Omni en producción gobernada:** hoy Omni está **solo en el Lab**; el path gobernado tiene Fal + Veo + (ahora) Vertex-imagen, **no Omni**. Si `ref/motion/reference-v1` se quiere entregar a cliente, falta su driver gobernado (Interactions API) — análogo a lo que se hizo para Vertex-imagen.
+- **Gemini Omni en producción gobernada:** el driver de Interactions API ya está integrado en Globe `main`, pero
+  TASK-1504 no está cerrada. Readiness promovido + binding habilitado no bastan: el circuito continúa abierto y
+  falta el canary final con la atestación corregida; la ruta no se declara `available`.
 - **OpenAI (GPT Image 2/1.5):** lane gobernado, promociones y canaries reales completados el 07-30.
 - **Nano Banana 2:** promovido y ejercitado desde el Producer el 07-30; el bloqueo de allowlist quedó retirado.
 - **Recraft v4.1:** promovido y ejercitado desde el Producer el 07-30; SVG retenido y descarga habilitada.
 - **Selector:** el consumer vigente es un desplegable compacto con isotipo real y disponibilidad del
   reader. La dirección de galería fue rechazada y no forma parte del estado ni del roadmap.
-- **Topaz, Omni, 3D y otras expansiones:** conservan sus propios drivers, contratos de modalidad,
+- **Topaz, Omni, 3D y otras expansiones:** conservan sus propios contratos de modalidad,
   promociones y canaries. No son trabajo residual de las seis rutas de imagen entregadas por TASK-1553.
 - **Único pendiente de TASK-1553:** receipts transversales que demuestren, por cada ruta promovible,
   una rate version vigente de TASK-1468 y el onboarding receipt de TASK-1578. Este pendiente no

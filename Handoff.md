@@ -2,6 +2,33 @@
 
 Historia anterior: [Handoff.archive.md](Handoff.archive.md).
 
+## TASK-1504 — Gemini Omni: checkpoint de promoción internal-only (2026-08-02)
+
+- Checkouts sin worktrees: Globe `main@fa286dbda0a3c1ce02de7d5a2ab173ba1bf34966`; Greenhouse tenía como base
+  `develop@4a609c3adbffd909a665b0a7776fb22ef3d19f01` antes de este cierre documental.
+- Globe `62337b483` ya contiene el driver gobernado y la simetría API/Producer worker para
+  `ref/motion/reference-v1 / vertex-omni / gemini-omni-flash-preview / preview`, incluido el acceso condicional
+  al secret Gemini. Push a `origin/main` completado; CI `30743786928` terminó verde (`check` + `build`).
+- Globe `fa286dbda0a3c1ce02de7d5a2ab173ba1bf34966` corrige la causa raíz del replay de `auto-promote`: la
+  identidad idempotente incorpora la atestación/policy y conserva una sola route revision. CI `30744034457`
+  terminó verde (`check` + `build`). El código aún no está desplegado en API/Producer worker.
+- Readbacks canónicos en el SHA exacto: rights `30743848333`, readiness `30743849301`, route `30743850171` y
+  circuit `30743851095`, todos verdes. La ruta está habilitada en revisión 5 y readiness `promoted` en revisión 2
+  con report `5f20a731-26e3-423b-b453-f5f0758e160f`, review
+  `review_e77b2999-0da9-4eea-9081-3a0068b8a580` y attempt
+  `d68605db-7d33-4ea6-b540-e6063668f3f7`; el circuito está `open` por
+  `promotion_recovery_canary_unattested`.
+- La atestación anterior `mcra_3f32e30a-b4ff-4c34-82b0-7f1a0be4a6e9` era jurídicamente inexacta:
+  `sublicensable=true` y términos genéricos. No debe reutilizarse. Desde el Producer autenticado se firmó la
+  atestación inmutable corregida `mcra_8c59f455-8704-47b1-9489-26d468f8ff8d`, con
+  `commercialUse=true`, `clientDelivery=true`, `sublicensable=false`, términos específicos de Gemini Omni y
+  digest `sha256:04e949c5a43564c336d5380362b8cd2515766ee6bc85a736abec94cec7e53d4b`.
+- La evaluación exacta ya existe y el candidato de 40 créditos está retenido. Se debe desplegar `fa286dbd` en
+  API/Producer worker, publicar y releer la política
+  derivada nueva con la atestación corregida, ejecutar una sola pieza nueva desde el Producer y cerrar la saga con
+  playback, cobro único, retención, lineage, Asset Governance y `canary-confirm` verificados. No reabrir TASK-1614
+  ni generar un segundo canary a ciegas.
+
 ## TASK-1632 — provider completion → Asset Governance dentro de Globe (2026-08-02)
 
 - Alcance corregido contra código real: Globe ya verifica/deduplica el callback Fal y encola `complete`; la
@@ -38,7 +65,15 @@ Historia anterior: [Handoff.archive.md](Handoff.archive.md).
 ## Studio Credits — fondeo enterprise UI/API/CLI/MCP y readback convergente (2026-08-01)
 
 - Greenhouse sigue en `develop`, Globe en `main`, y el checkout compartido único continúa siendo obligatorio.
-- El fondeo interno live quedó en 800 efectivos sobre cap 1500; UI, CLI OAuth PKCE, Producer y MCP convergen.
+- El fondeo interno live dejó 800 efectivos sobre cap 1500; el canary único de Seedance consumió 16 y el saldo
+  vigente quedó en 784. UI, CLI OAuth PKCE, Producer y MCP convergen sobre la misma state machine y el mismo ledger.
+- La UI `/admin/globe/credits` es la vía recomendada; API/CLI PKCE y
+  `https://mcp.efeonce.org/mcp` son adapters equivalentes. El write MCP acepta sólo `authorityId`, `ensure` deriva
+  período/pool/delta y un timeout se recupera por readers antes de reintentar. El bootstrap histórico de 500.000 no
+  forma parte de saldo, capacidad, KPIs ni proyecciones.
+- El contrato funcional y el runbook vigentes están en
+  `docs/documentation/creative-studio/fondeo-gobernado-creditos-globe.md` y
+  `docs/manual-de-uso/creative-studio/fondear-creditos-globe.md`.
 - ISSUE-124 y TASK-1482/1483/1586/1628/1629/1630 están cerradas; la evidencia y los detalles runtime viven en
   `docs/operations/creative-studio/evidence/2026-08-01/README.md` y `GLOBE_RUNTIME_HANDOFF.md`.
 - No hay rollout comercial externo; los holds históricos y el bootstrap no monetario conservan su tratamiento

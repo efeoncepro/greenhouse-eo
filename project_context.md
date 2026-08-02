@@ -24,6 +24,11 @@ La flota de modelos de Globe se resuelve y promueve por identidad exacta de ruta
 `globe.producer.fleet.list` y el mapa humano en `GLOBE_MODEL_FLEET_STATUS.md`; una promoción se cierra con
 evaluación/derechos/readbacks y una generación real desde la UI autenticada. Un MIME de transporte genérico nunca
 amplía la allowlist global: sólo puede aceptarse para una salida exacta esperada después de verificar sus bytes.
+Las atestaciones comerciales son inmutables por identidad de modelo + digest de términos: una corrección jurídica
+crea una atestación y policy derivada nuevas, nunca modifica la anterior. La idempotencia de `auto-promote` debe
+incluir esa autoridad legal; ruta/workspace/report por sí solos no distinguen una nueva versión de términos. Un
+circuito abierto por `promotion_recovery_canary_unattested` es un cierre fail-closed de la saga, no evidencia de que
+el driver del proveedor esté roto; primero se leen operación, ruta, circuito y run antes de generar otra pieza.
 
 La administración de créditos de Globe usa el carril gobernado `propose → confirm` de ADR-015 mediante OAuth
 público + PKCE (`TASK-1629`; los archivos de migración conservan la etiqueta histórica `task-1616`). Ante una
@@ -32,9 +37,10 @@ availability/evaluate, balance, usage, ledger e intents append-only para el mism
 también crea estado durable; no se ejecuta durante discovery ni se fondea cuando los readers prueban suficiencia.
 `TASK-1630` gobierna la convergencia del control plane. Para el workspace interno, una instrucción explícita y
 atribuida del CEO ya autoriza una operación one-shot acotada para el mismo usuario/agente autenticado cuando la
-policy no exige segundo confirmante. UI browser y OAuth PKCE/CLI comparten la misma authority state machine;
-Globe deriva el ciclo UTC y crea o reutiliza el pool mensual determinístico dentro de la transacción económica.
-La operación live del 2026-08-01 dejó 800 efectivos sobre cap 1500. Workloads nunca confirman y clientes externos
+policy no exige segundo confirmante. UI browser, OAuth PKCE/CLI y MCP comparten la misma authority state machine;
+el write MCP recibe sólo `authorityId` y Globe deriva el ciclo UTC, el pool mensual determinístico y el delta.
+La operación live del 2026-08-01 dejó 800 efectivos sobre cap 1500; el canary Seedance posterior consumió 16 y
+dejó 784. Workloads nunca confirman y clientes externos
 siguen gated. El worker minutely de expiry sólo libera reservations cuando existe evidencia terminal. Los dos
 casos históricos sin entregable se resolvieron mediante una decisión Finance exacta y una primitive gobernada,
 no por TTL o SQL. El bootstrap de 500.000 de julio se conserva sólo como auditoría append-only: no forma parte

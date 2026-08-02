@@ -5,9 +5,11 @@
 > conserva sólo el estado mutable, los riesgos abiertos y el siguiente paso. La historia anterior
 > permanece auditable en el git log y en las tasks/ADRs enlazadas.
 >
-> **Corte verificado:** 2026-08-02 · Globe `main@d79fda94ba97c7bd4b358c4eaf957ca1389ed9fc`; Greenhouse
-> `develop` con cierre documental de TASK-1614. El fondeo mensual live fue verificado sobre
-> `649eb08`; migraciones hasta `0047`, API y Studio están aplicados. El worker de expiry/recovery usa código
+> **Corte verificado:** 2026-08-02 · Globe `main@fa286dbda0a3c1ce02de7d5a2ab173ba1bf34966`; Greenhouse
+> tenía como base `develop@4a609c3adbffd909a665b0a7776fb22ef3d19f01` antes de este cierre documental. TASK-1614 conserva su cierre runtime en Globe
+> `d79fda94ba97c7bd4b358c4eaf957ca1389ed9fc`; el corte posterior corresponde a TASK-1504 y no implica que Omni
+> esté disponible. El fondeo mensual live fue verificado sobre
+> `649eb08`; migraciones hasta `0048`, API y Studio están aplicados. El worker de expiry/recovery usa código
 > `d3fe90e`, digest `sha256:d8295862dc12c14427e90e0bb413577802916c37ca6bf32c202680492ca7bae9`,
 > deploy `30717266572` y baseline IaC `e369ef8` sin drift.
 
@@ -156,14 +158,46 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
 - No se volvió a evaluar, no se invocó Fal directamente, no se fondeó, no se ejecutó SQL/break-glass y no se tocó
   Omni, Seed Audio, Seedance Loop, Veo o Seedream. Studio no requirió despliegue para este cierre.
 
+## TASK-1504 — Gemini Omni (promoción incompleta, checkpoint 2026-08-02)
+
+- Globe `main@62337b483fd965cd3a518fa1b9d13c7b0ac6d3f4` integra el driver gobernado con simetría API/worker
+  para `ref/motion/reference-v1 / vertex-omni / gemini-omni-flash-preview / preview`; CI `30743786928` terminó
+  verde. Los readbacks canónicos sobre ese SHA quedaron verdes: rights `30743848333`, readiness
+  `30743849301`, route `30743850171` y circuit `30743851095`.
+- La evaluación existente ya produjo un candidato retenido de 40 créditos: reporte
+  `5f20a731-26e3-423b-b453-f5f0758e160f`, revisión `review_e77b2999-0da9-4eea-9081-3a0068b8a580` y attempt
+  `d68605db-7d33-4ea6-b540-e6063668f3f7`. Route binding está habilitado rev. 5 y readiness `promoted` rev. 2,
+  pero el circuito permanece `open` por `promotion_recovery_canary_unattested`; por tanto Omni aún no está
+  `available` ni puede declararse cerrado.
+- La atestación correcta e inmutable es `mcra_8c59f455-8704-47b1-9489-26d468f8ff8d`, con uso comercial y entrega
+  a cliente permitidos, `sublicensable=false`, términos específicos de Gemini Omni y digest
+  `sha256:04e949c5a43564c336d5380362b8cd2515766ee6bc85a736abec94cec7e53d4b`. La atestación anterior
+  `mcra_3f32e30a-b4ff-4c34-82b0-7f1a0be4a6e9` es jurídicamente incorrecta y no debe reutilizarse.
+- Globe `main@fa286dbda0a3c1ce02de7d5a2ab173ba1bf34966` corrige la causa raíz: la clave de idempotencia de
+  `auto-promote` ya incorpora la atestación y el test de corrección de términos quedó verde. CI `30744034457`
+  terminó verde (`check` + `build`). Falta desplegar API/worker, publicar y releer la nueva policy derivada,
+  continuar la saga y ejecutar exactamente un asset nuevo desde Producer con playback, cobro único, retención,
+  lineage, Asset Governance y `canary-confirm`. No se debe abrir otro experimento ni repetir a ciegas el canary
+  existente.
+
+## TASK-1632 — handoff interno de completion (diseño corregido, implementación pendiente)
+
+- Globe ya verifica y deduplica el callback de Fal y encola `complete`. La brecha es despertar la finalización de
+  Producer y Asset Governance sin esperar al Scheduler, mediante wakes durables at-least-once; los schedulers
+  permanecen como mecanismo de recuperación.
+- Este flujo vive íntegramente dentro de Globe. Greenhouse no participa; TASK-1475 conserva por separado cualquier
+  evento o proyección futura entre productos. TASK-1632 no modifica el cierre de TASK-1614 ni el estado de promoción
+  de TASK-1504. Al corte existe diseño corregido, pero no migración, deploy ni evidencia runtime de TASK-1632.
+
 ## Riesgos abiertos
 
 - Rollout externo/comercial sigue gated por `TASK-1480`; `internal_smoke` describe el estadio, no
   la naturaleza del producto.
 - `TASK-1553` no puede cerrarse hasta registrar los receipts transversales de `TASK-1468` y
   `TASK-1578`.
-- Gemini Omni continúa sólo en Model Lab para su ruta gobernada; no extrapoles la promoción de
-  Vertex imagen a Interactions video.
+- Gemini Omni ya tiene driver gobernado integrado, pero la promoción de TASK-1504 sigue incompleta: el circuito
+  está abierto y falta completar el rollout posterior al fix de `auto-promote` y el canary final. No confundir
+  `promoted` en readiness con disponibilidad mientras el circuito permanezca abierto.
 - TASK-1614 está cerrada con evidencia live completa. El rollout externo/comercial continúa gated por `TASK-1480`;
   esta restricción no afecta el canary interno ni la naturaleza comercial de Globe.
 - La identidad temporal usada para consumo privado de AXIS debe sustituirse por una identidad de
@@ -269,6 +303,10 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
 
 ## Siguiente paso ejecutable
 
-1. Retomar TASK-1614 y ejecutar el canary nuevo de Seedance desde Producer; créditos ya no son blocker.
-2. Completar receipts/calibración amplia de TASK-1468/TASK-1579 sin reabrir TASK-1630 ni alterar los 800 efectivos.
-3. Mantener rollout externo y acceso MCP B2B gated por TASK-1480/TASK-1631 y sus canaries de identidad.
+1. Continuar TASK-1504 desde `fa286db`: desplegar API/worker, derivar y releer la policy
+   con la atestación correcta, continuar la saga y ejecutar un único canary nuevo de Gemini Omni desde Producer con
+   evidencia completa.
+2. Implementar TASK-1632 dentro de Globe sin introducir a Greenhouse en el path de finalización; conservar los
+   schedulers como recovery y demostrar deduplicación/idempotencia antes del rollout.
+3. Completar receipts/calibración amplia de TASK-1468/TASK-1579 sin reabrir TASK-1614/TASK-1630 ni alterar los
+   800 efectivos. Mantener rollout externo y acceso MCP B2B gated por TASK-1480/TASK-1631.
