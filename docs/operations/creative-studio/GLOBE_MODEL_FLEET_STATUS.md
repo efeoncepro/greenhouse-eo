@@ -41,7 +41,7 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 | `ref/still/openai-v2` | GPT Image · 2 | OpenAI (`gpt-image-2`) | image-generate | ✅ 07-24 | ✅ driver + promoción + canary real 07-30 | run UI `a81c8049-7772-4933-82f2-1e2e59e5121c`; 14 créditos |
 | `ref/still/openai-v1-5` | GPT Image · 1.5 | OpenAI (`gpt-image-1.5`) | image-generate | ✅ 07-24 | ✅ driver + promoción + canary real gobernado 07-30 | run UI `bf8cd62b-e2d7-4e83-981a-7631a14a5d3a`; 10 créditos |
 | `ref/motion/loop-v1` | Seedance · 2.0 | Fal | video-generate | ✅ 07-19 | ✅ driver Fal | — |
-| `ref/motion/reference-v1` | Gemini Omni Flash · Preview | Vertex (Omni, Interactions API) | video-generate | ✅ evaluación retenida (40cr) | ⏳ driver gobernado integrado; promoción incompleta | TASK-1504: readiness promovido, binding habilitado, circuito abierto; no `available` |
+| `ref/motion/reference-v1` | Gemini Omni Flash · Preview | Vertex (Omni, Interactions API) | video-generate | ✅ evaluación retenida (40cr) | ⏳ driver, policy y saga activados; canary pendiente | TASK-1504: Producer no habilita `Elementos`; no `available`, sin cobro ni output nuevo |
 | `ref/video/frames-v1` | Veo · 2.0 | Vertex (`veo-…:predictLongRunning`) | video-frames | ✅ 07-20 (MP4 real, 32cr) | ✅ driver Veo gobernado (`vertex-video`, `us-central1`) desde 07-22 | — |
 | `ref/video/motion-v1` | Seedance · 2.0 | Fal | video-motion-control | ✅ evaluación/report 08-01 | 🟢 canary real gobernado 08-02 | TASK-1614 cerrada: run `bbe6dfff…`, output MP4 retenido, 16 créditos, `canary_passed` |
 | `ref/audio/foley-v1` | Seed Audio | Fal | audio-generate | ✅ 07-19 | ✅ driver Fal | atestación comercial firmada |
@@ -76,6 +76,7 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 | 2026-08-01 | TASK-1614 | Seedance R2V: evaluación/report, governance, atestación, readiness y policy productiva completos |
 | 2026-08-02 | TASK-1614 | Canary nuevo gobernado verde: run `bbe6dfff…`, attempt `7bb11342…`, output SHA `93adbf46…`, 16 créditos, governance elegible y `canary_passed` |
 | 2026-08-02 | TASK-1504 | Gemini Omni: driver gobernado integrado en `62337b483`; fix de idempotencia en `fa286db`; evaluación de 40 créditos retenida, binding habilitado y readiness promovido; circuito aún abierto y canary final pendiente |
+| 2026-08-02 | TASK-1504 | API/worker desplegados desde `fa286db`; policy `arp_8090d31a…` releída con atestación corregida; saga `promotion_922157fa…` activada rev. 7; canary bloqueado por `Elementos` deshabilitado en Producer, sin gasto |
 
 ## Evidencia Seedance R2V — canary gobernado verde (actualizado 2026-08-02)
 
@@ -127,6 +128,19 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
   (`check` + `build`). Antes del canary final faltan deploy de API/worker, nueva policy derivada con readback y continuidad
   de la saga; después se ejecuta exactamente un asset desde Producer con playback, cobro único, retención, lineage,
   Asset Governance y `canary-confirm`. La evaluación existente no se repite.
+
+### Estado posterior al rollout
+
+- API `globe-api-internal-00187-9ht` y Producer worker quedaron desplegados desde
+  `fa286dbda0a3c1ce02de7d5a2ab173ba1bf34966`; OpenTofu registró `1 add, 2 change, 0 destroy`. La policy
+  `arp_8090d31ae570c016f84cad0f7aee09ba84578f1dbd3622074a38cfa03a839ff5` y los readbacks de rights/readiness/
+  route/circuit terminaron correctamente; la saga quedó `activated` rev. 7 y circuito `closed`.
+- El readback de créditos canónico mostró 784 disponibles y `budget.evaluate.allowed=true`. La sesión Producer
+  autenticada mostró `Gemini Omni Flash · Preview`, pero `Elementos` siguió deshabilitado en dos pestañas con
+  `Todavía no hay un modelo publicado para este modo`. No hay run/attempt/output/cobro/playback/governance ni
+  `canary-confirm`; la ruta permanece no disponible para el ledger hasta que exista el canary gobernado.
+- No se desplegó Studio, no se ejecutó bypass, no se reutilizó el candidato de evaluación y no se repitió la
+  evaluación. Estado: `code complete, rollout pendiente`.
 
 > **Límite TASK-1632:** el wake desde completion de provider hacia finalización de Producer y Asset Governance es
 > un handoff interno de Globe, actualmente diseñado pero aún no implementado. No cambia este ledger de promoción,
@@ -250,9 +264,9 @@ Manual: [operar la flota](../../manual-de-uso/creative-studio/operar-flota-model
 
 ## Estado vigente y límites fuera de TASK-1553
 
-- **Gemini Omni en producción gobernada:** el driver de Interactions API ya está integrado en Globe `main`, pero
-  TASK-1504 no está cerrada. Readiness promovido + binding habilitado no bastan: el circuito continúa abierto y
-  falta el canary final con la atestación corregida; la ruta no se declara `available`.
+- **Gemini Omni en producción gobernada:** el driver de Interactions API, la policy corregida y la saga ya están
+  activados, pero TASK-1504 no está cerrada. Falta el canary final: el Producer autenticado no habilita
+  `Elementos` aunque el route reader está activo; la ruta no se declara `available` y no se registra gasto.
 - **OpenAI (GPT Image 2/1.5):** lane gobernado, promociones y canaries reales completados el 07-30.
 - **Nano Banana 2:** promovido y ejercitado desde el Producer el 07-30; el bloqueo de allowlist quedó retirado.
 - **Recraft v4.1:** promovido y ejercitado desde el Producer el 07-30; SVG retenido y descarga habilitada.

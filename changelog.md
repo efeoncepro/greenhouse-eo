@@ -13,15 +13,19 @@
   Producer worker para `ref/motion/reference-v1 / vertex-omni / gemini-omni-flash-preview / preview`; CI
   `30743786928` terminó verde.
 - Globe `fa286dbd` corrigió la idempotencia de `auto-promote` para incorporar la atestación/policy sin duplicar la
-  route revision; CI `30744034457` terminó verde. El despliegue de API/worker, la nueva policy y el canary siguen
-  pendientes para la sesión de continuidad.
-- Los readbacks canónicos probaron evaluation/readiness ya promovidos, binding habilitado y circuito abierto por
-  `promotion_recovery_canary_unattested`, no por un fallo probado del driver. El candidato de evaluación retenido
-  no se reutilizará como canary productivo.
+  route revision; CI `30744034457` terminó verde. API `30744857697` y worker `30744857698` quedaron desplegados;
+  OpenTofu aplicó `1 add, 2 change, 0 destroy`, sin deploy de Studio.
+- `auto-promote` `30745031010`, policy reader `30745219391` y la saga
+  `promotion_922157fa-b708-45cc-8bbf-b08d761afb21` terminaron correctamente. La policy
+  `arp_8090d31ae570c016f84cad0f7aee09ba84578f1dbd3622074a38cfa03a839ff5` conserva la atestación corregida,
+  `no-sublicense` y el digest de términos exacto; los readbacks finales reconciliaron saga `activated` rev. 7,
+  readiness promovido, route rev. 7, binding habilitado y circuito cerrado.
+- El candidato de evaluación retenido no se reutilizó como canary productivo.
 - La atestación anterior declaraba sublicencia y términos genéricos incorrectos. El Producer autenticado firmó
   una nueva atestación inmutable con uso comercial/entrega permitidos, sublicencia denegada y digest exacto
-  `sha256:04e949c5…e53d4b`. La siguiente sesión debe desplegar API/worker, publicar la policy derivada corregida y
-  ejecutar exactamente un canary nuevo con cobro, playback, retención, lineage, governance y `canary-confirm`.
+  `sha256:04e949c5…e53d4b`. El Producer sigue mostrando 784 créditos y el modelo exacto, pero `Elementos` está
+  deshabilitado en dos pestañas con `Todavía no hay un modelo publicado para este modo`; no se ejecutó gasto,
+  run, output ni `canary-confirm`. Queda pendiente una única ejecución cuando la superficie gobernada lo exponga.
 - TASK-1632 permanece separada y `to-do`: formaliza dentro de Globe el wake event-driven desde completion del
   proveedor hasta Asset Governance; no es un handoff Greenhouse ni reabre TASK-1614.
 
@@ -133,6 +137,10 @@
   separar asignación/consentimiento de entitlements y repetir el deny con identidad base-only.
 - La skill espejo `efeonce-mcp-platform` y sus matrices de verificación ahora codifican esa excepción internal-only
   y exigen evidencia real de entitlement/revocación base-only antes de cualquier rollout B2B.
+- La decisión de identidad cliente y `TASK-1631` aclaran la relación con el login Greenhouse: los runtimes,
+  cookies, sesiones y audiencias permanecen separados, pero un cliente existente se enlaza al mismo
+  `identity_profile` y Account 360. La coexistencia inicial debe converger después al mismo plano externo de
+  autenticación; no se permite una segunda identidad o contraseña permanente.
 - Las skills de arquitectura globales y locales (`arch-architect` de Claude y `software-architect-2026` de Codex)
   ahora cargan el router MCP, el provider dueño y este mismo gate antes de proponer otra tool, OAuth surface o
   binding cross-runtime.

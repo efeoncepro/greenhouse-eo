@@ -55,7 +55,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-028`
-- Status real: `Omni integrado y parcialmente promovido internal-only; circuito abierto hasta policy/canary; otras capacidades avanzadas conservan canarios propios pendientes`
+- Status real: `Omni desplegado y saga activada internal-only; canary gobernado bloqueado por la superficie Producer; otras capacidades avanzadas conservan canarios propios pendientes`
 - Rank: `TBD`
 - Domain: `creative|ai|platform`
 - Blocked by: `none`
@@ -83,14 +83,41 @@
 - La causa raíz de `auto-promote` ya quedó corregida y publicada en Globe
   `main@fa286dbda0a3c1ce02de7d5a2ab173ba1bf34966`: la idempotency key incorpora la atestación/policy y el test
   de regresión prueba una segunda atestación sin duplicar la route revision. CI `30744034457` terminó verde
-  (`check` + `build`); código integrado no equivale todavía a runtime desplegado.
-- Secuencia única pendiente: desplegar API y Producer worker desde `fa286dbd` → repetir
-  `auto-promote` con `mcra_8c59f455-8704-47b1-9489-26d468f8ff8d` → verificar policy/readbacks y saga →
-  cerrar/activar el circuito por el lane canónico →
-  ejecutar **un solo canary nuevo** desde Producer autenticado → verificar playback, cobro único, retención,
-  lineage y Asset Governance → ejecutar `canary-confirm` y reconciliar el reader live.
+  (`check` + `build`); el runtime quedó desplegado y reconciliado en el estado de ejecución posterior.
+- Secuencia única restante: ejecutar **un solo canary nuevo** desde Producer autenticado cuando el modo
+  `Elementos` esté publicado → verificar playback, cobro único, retención, lineage y Asset Governance → ejecutar
+  `canary-confirm` y reconciliar el reader live. No repetir auto-promote, evaluación ni la saga ya activada.
 - `TASK-1504` continúa `in-progress`: cerrar Omni no certifica por transitividad `video-frames`,
   `audio-change-voice`, `audio-translate`, otros casos multi-output ni las voces curadas pendientes.
+
+## Estado de ejecución 2026-08-02 — despliegue y saga verificados; canary bloqueado en Producer
+
+- Globe `main@fa286dbda0a3c1ce02de7d5a2ab173ba1bf34966` quedó desplegado sin Studio: API workflow
+  `30744857697` → revisión `globe-api-internal-00187-9ht`, 100% de tráfico; Producer worker workflow
+  `30744857698` → imagen con digest `sha256:764acd30c1e4678c87042e1fe004b25c984529cb92df3e0c5e18bd59b5e8a36a`.
+  OpenTofu fue aplicado con `1 add, 2 change, 0 destroy`: gate Omni `true` en API/worker y acceso IAM al
+  secret `globe-gemini-api-key` para ambas service accounts.
+- `auto-promote` workflow `30745031010` terminó `success` con la atestación
+  `mcra_8c59f455-8704-47b1-9489-26d468f8ff8d`; la policy derivada se leyó como
+  `arp_8090d31ae570c016f84cad0f7aee09ba84578f1dbd3622074a38cfa03a839ff5`, versión de policy igual a la
+  atestación, `no-sublicense`, términos y digest
+  `sha256:04e949c5a43564c336d5380362b8cd2515766ee6bc85a736abec94cec7e53d4b` exactos. Reader de policy:
+  `30745219391`.
+- La saga continuó una sola vez: operación
+  `promotion_922157fa-b708-45cc-8bbf-b08d761afb21`; start `30745272975`, stage `30745297572`, promote
+  `30745319614`, activate `30745343659`. Readbacks posteriores `30745513017`, `30745514170`,
+  `30745515254`, `30745516291` y `30745517313` reconciliaron operación `activated` rev. 7, readiness
+  `promoted` rev. 2, route rev. 7, binding habilitado y circuito cerrado por `promotion_activated`.
+- Créditos: readback canónico en Producer autenticado mostró `784` disponibles bajo cap `1500` y
+  `budget.evaluate.allowed=true`; no se ejecutó fondeo, evaluación, provider directo ni gasto.
+- El Producer autenticado con actor `user-efeonce-admin-julio-reyes` conserva la identidad y el selector
+  `Video → Gemini Omni Flash · Preview`, pero `Elementos` permanece deshabilitado en dos pestañas autenticadas
+  con el mensaje `Todavía no hay un modelo publicado para este modo`. Por eso no existe run/attempt nuevo,
+  cobro, output, playback, retención, lineage, Asset Governance ni `canary-confirm` en este corte. No se forzó
+  el control ni se ejecutó un payload de `Crear` disfrazado de `Elementos`.
+- Estado honesto: `code complete, rollout pendiente`; resolver la discrepancia de la superficie Producer/BFF
+  requiere una reconciliación de Studio/runtime que queda fuera de este alcance porque esta sesión no autoriza
+  desplegar Globe Studio. No reabrir la evaluación ni reutilizar su candidato retenido.
 
 ## Checkpoint 2026-07-23 — rollout parcial honesto
 

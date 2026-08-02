@@ -2,32 +2,27 @@
 
 Historia anterior: [Handoff.archive.md](Handoff.archive.md).
 
-## TASK-1504 — Gemini Omni: checkpoint de promoción internal-only (2026-08-02)
+## TASK-1504 — Gemini Omni: despliegue y saga activada; canary pendiente (2026-08-02)
 
-- Checkouts sin worktrees: Globe `main@fa286dbda0a3c1ce02de7d5a2ab173ba1bf34966`; Greenhouse tenía como base
-  `develop@4a609c3adbffd909a665b0a7776fb22ef3d19f01` antes de este cierre documental.
-- Globe `62337b483` ya contiene el driver gobernado y la simetría API/Producer worker para
-  `ref/motion/reference-v1 / vertex-omni / gemini-omni-flash-preview / preview`, incluido el acceso condicional
-  al secret Gemini. Push a `origin/main` completado; CI `30743786928` terminó verde (`check` + `build`).
-- Globe `fa286dbda0a3c1ce02de7d5a2ab173ba1bf34966` corrige la causa raíz del replay de `auto-promote`: la
-  identidad idempotente incorpora la atestación/policy y conserva una sola route revision. CI `30744034457`
-  terminó verde (`check` + `build`). El código aún no está desplegado en API/Producer worker.
-- Readbacks canónicos en el SHA exacto: rights `30743848333`, readiness `30743849301`, route `30743850171` y
-  circuit `30743851095`, todos verdes. La ruta está habilitada en revisión 5 y readiness `promoted` en revisión 2
-  con report `5f20a731-26e3-423b-b453-f5f0758e160f`, review
-  `review_e77b2999-0da9-4eea-9081-3a0068b8a580` y attempt
-  `d68605db-7d33-4ea6-b540-e6063668f3f7`; el circuito está `open` por
-  `promotion_recovery_canary_unattested`.
-- La atestación anterior `mcra_3f32e30a-b4ff-4c34-82b0-7f1a0be4a6e9` era jurídicamente inexacta:
-  `sublicensable=true` y términos genéricos. No debe reutilizarse. Desde el Producer autenticado se firmó la
-  atestación inmutable corregida `mcra_8c59f455-8704-47b1-9489-26d468f8ff8d`, con
-  `commercialUse=true`, `clientDelivery=true`, `sublicensable=false`, términos específicos de Gemini Omni y
-  digest `sha256:04e949c5a43564c336d5380362b8cd2515766ee6bc85a736abec94cec7e53d4b`.
-- La evaluación exacta ya existe y el candidato de 40 créditos está retenido. Se debe desplegar `fa286dbd` en
-  API/Producer worker, publicar y releer la política
-  derivada nueva con la atestación corregida, ejecutar una sola pieza nueva desde el Producer y cerrar la saga con
-  playback, cobro único, retención, lineage, Asset Governance y `canary-confirm` verificados. No reabrir TASK-1614
-  ni generar un segundo canary a ciegas.
+- Checkouts sin worktrees: Globe `main@fa286dbda0a3c1ce02de7d5a2ab173ba1bf34966`; Greenhouse `develop`
+  `d98307fdb87beea4f58e13e41ddbde5b404373f9`, descendiente de `fb3c469dcdb85a4898e054a3422a647d9c1938eb`.
+- API deploy `30744857697` → `globe-api-internal-00187-9ht`; worker deploy `30744857698` → digest
+  `sha256:764acd30c1e4678c87042e1fe004b25c984529cb92df3e0c5e18bd59b5e8a36a`; OpenTofu `1 add, 2 change, 0 destroy`,
+  sin Studio ni destroy. CI del fix `30744034457` quedó verde.
+- `auto-promote` `30745031010`; policy `arp_8090d31ae570c016f84cad0f7aee09ba84578f1dbd3622074a38cfa03a839ff5`,
+  reader `30745219391`, atestación `mcra_8c59f455-8704-47b1-9489-26d468f8ff8d`, rights comerciales exactos,
+  `no-sublicense` y digest de términos `sha256:04e949c5a43564c336d5380362b8cd2515766ee6bc85a736abec94cec7e53d4b`.
+- Saga `promotion_922157fa-b708-45cc-8bbf-b08d761afb21`: start/stage/promote/activate
+  `30745272975`/`30745297572`/`30745319614`/`30745343659`; readbacks `30745513017`, `30745514170`,
+  `30745515254`, `30745516291`, `30745517313` → `activated` rev. 7, readiness promovido rev. 2, route rev. 7,
+  binding habilitado y circuito cerrado.
+- La evaluación y candidato retenido de 40 créditos no se tocaron. Producer autenticado: actor esperado, modelo
+  exacto, `784` créditos y `budget.evaluate.allowed=true`; `Elementos` sigue deshabilitado en dos pestañas con
+  `Todavía no hay un modelo publicado para este modo`. No hay run/attempt/output/cobro/playback/retención/
+  lineage/governance nuevo ni `canary-confirm`; no se forzó el control ni se reutilizó la atestación antigua.
+- Estado: `code complete, rollout pendiente`; TASK-1504 sigue `in-progress`. Detalle operativo y siguiente paso:
+  [`GLOBE_RUNTIME_HANDOFF.md`](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md) y
+  [`TASK-1504`](docs/tasks/in-progress/TASK-1504-globe-producer-capability-expansion.md).
 
 ## TASK-1632 — provider completion → Asset Governance dentro de Globe (2026-08-02)
 
@@ -100,9 +95,10 @@ Historia anterior: [Handoff.archive.md](Handoff.archive.md).
 
 ## Efeonce MCP — reader y write one-shot de Studio Credits verificados (2026-08-01)
 
-- `https://mcp.efeonce.org/mcp`, el reader Globe y el write interno one-shot de Studio Credits están operativos.
-  El write acepta sólo `authorityId`, intercambia Entra→Greenhouse con WIF y usa el command canónico; monto,
-  workspace, cap y período no cruzan como argumentos MCP. Clientes externos siguen gated por TASK-1631.
+- `mcp.efeonce.org`, el reader Globe y el write interno one-shot están operativos; clientes externos siguen gated
+  por TASK-1631.
+- TASK-1631 separa sesiones, no identidades: un `identity_profile` + Account 360; linking, revocación y convergencia
+  posterior del login Greenhouse preceden el rollout.
 
 ## AXIS — guía visual agent-facing publicada (2026-08-01)
 

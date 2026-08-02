@@ -158,7 +158,7 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
 - No se volvió a evaluar, no se invocó Fal directamente, no se fondeó, no se ejecutó SQL/break-glass y no se tocó
   Omni, Seed Audio, Seedance Loop, Veo o Seedream. Studio no requirió despliegue para este cierre.
 
-## TASK-1504 — Gemini Omni (promoción incompleta, checkpoint 2026-08-02)
+## TASK-1504 — Gemini Omni (despliegue y saga activada; canary pendiente, checkpoint 2026-08-02)
 
 - Globe `main@62337b483fd965cd3a518fa1b9d13c7b0ac6d3f4` integra el driver gobernado con simetría API/worker
   para `ref/motion/reference-v1 / vertex-omni / gemini-omni-flash-preview / preview`; CI `30743786928` terminó
@@ -175,10 +175,30 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
   `mcra_3f32e30a-b4ff-4c34-82b0-7f1a0be4a6e9` es jurídicamente incorrecta y no debe reutilizarse.
 - Globe `main@fa286dbda0a3c1ce02de7d5a2ab173ba1bf34966` corrige la causa raíz: la clave de idempotencia de
   `auto-promote` ya incorpora la atestación y el test de corrección de términos quedó verde. CI `30744034457`
-  terminó verde (`check` + `build`). Falta desplegar API/worker, publicar y releer la nueva policy derivada,
-  continuar la saga y ejecutar exactamente un asset nuevo desde Producer con playback, cobro único, retención,
-  lineage, Asset Governance y `canary-confirm`. No se debe abrir otro experimento ni repetir a ciegas el canary
-  existente.
+  terminó verde (`check` + `build`). API workflow `30744857697` quedó en revisión
+  `globe-api-internal-00187-9ht` con 100% de tráfico; worker workflow `30744857698` terminó con digest
+  `sha256:764acd30c1e4678c87042e1fe004b25c984529cb92df3e0c5e18bd59b5e8a36a`. OpenTofu confirmó
+  `1 to add, 2 to change, 0 to destroy`. API y worker tienen el gate Omni activo y acceso IAM al secret
+  `globe-gemini-api-key`.
+  La policy y la saga quedan verificadas en el delta posterior; sólo falta ejecutar exactamente un asset nuevo
+  desde Producer con playback, cobro único, retención, lineage, Asset Governance y `canary-confirm`. No se debe
+  abrir otro experimento ni repetir a ciegas el canary existente.
+
+### Delta posterior — policy y saga activadas, sin canary (2026-08-02)
+
+- `auto-promote` `30745031010` terminó `success` con `mcra_8c59f455-8704-47b1-9489-26d468f8ff8d`. La policy
+  derivada `arp_8090d31ae570c016f84cad0f7aee09ba84578f1dbd3622074a38cfa03a839ff5` se leyó en `30745219391`
+  con `no-sublicense`, `commercialUse=true`, `clientDelivery=true`, `sublicensable=false`, términos de
+  Gemini Omni y digest `sha256:04e949c5a43564c336d5380362b8cd2515766ee6bc85a736abec94cec7e53d4b`.
+- La operación `promotion_922157fa-b708-45cc-8bbf-b08d761afb21` recorrió start/stage/promote/activate en
+  `30745272975`, `30745297572`, `30745319614` y `30745343659`. Los readbacks `30745513017`, `30745514170`,
+  `30745515254`, `30745516291` y `30745517313` reconciliaron `activated` rev. 7, readiness `promoted` rev. 2,
+  route rev. 7, binding habilitado y circuito cerrado por `promotion_activated`.
+- El Producer autenticado mostró 784 créditos disponibles, pero después de seleccionar Video y
+  `Gemini Omni Flash · Preview` mantuvo `Elementos` deshabilitado con `Todavía no hay un modelo publicado para
+  este modo`, reproducido en dos pestañas. No se ejecutó generación, no hubo cobro ni run/attempt/output, y no
+  se ejecutó `canary-confirm`. No se desplegó Globe Studio ni se usó bypass; la discrepancia Producer/BFF queda
+  bloqueante y fuera del alcance autorizado de esta sesión.
 
 ## TASK-1632 — handoff interno de completion (diseño corregido, implementación pendiente)
 
@@ -195,9 +215,9 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
   la naturaleza del producto.
 - `TASK-1553` no puede cerrarse hasta registrar los receipts transversales de `TASK-1468` y
   `TASK-1578`.
-- Gemini Omni ya tiene driver gobernado integrado, pero la promoción de TASK-1504 sigue incompleta: el circuito
-  está abierto y falta completar el rollout posterior al fix de `auto-promote` y el canary final. No confundir
-  `promoted` en readiness con disponibilidad mientras el circuito permanezca abierto.
+- Gemini Omni ya tiene driver gobernado, policy corregida y saga activada, pero TASK-1504 sigue incompleta por el
+  canary final. El circuito está cerrado después de `activate`; no confundir `promoted` en readiness ni circuito
+  cerrado con disponibilidad hasta que exista el canary y `canary-confirm`.
 - TASK-1614 está cerrada con evidencia live completa. El rollout externo/comercial continúa gated por `TASK-1480`;
   esta restricción no afecta el canary interno ni la naturaleza comercial de Globe.
 - La identidad temporal usada para consumo privado de AXIS debe sustituirse por una identidad de
@@ -303,9 +323,10 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
 
 ## Siguiente paso ejecutable
 
-1. Continuar TASK-1504 desde `fa286db`: desplegar API/worker, derivar y releer la policy
-   con la atestación correcta, continuar la saga y ejecutar un único canary nuevo de Gemini Omni desde Producer con
-   evidencia completa.
+1. Resolver la discrepancia de publicación del modo `Elementos` en la superficie Producer/BFF mediante una
+   unidad autorizada que no fuerce el control ni despliegue Studio fuera de alcance; después ejecutar el único
+   canary Omni pendiente desde Producer y reconciliar playback, cobro, retención, lineage, governance y
+   `canary-confirm`.
 2. Implementar TASK-1632 dentro de Globe sin introducir a Greenhouse en el path de finalización; conservar los
    schedulers como recovery y demostrar deduplicación/idempotencia antes del rollout.
 3. Completar receipts/calibración amplia de TASK-1468/TASK-1579 sin reabrir TASK-1614/TASK-1630 ni alterar los
