@@ -2,6 +2,37 @@
 
 Historia anterior: [Handoff.archive.md](Handoff.archive.md).
 
+## TASK-1631 / MCP — canon de scopes, CIMD como registro primario y benchmark de proveedor (2026-08-02)
+
+- **Cambio de invariante en el ADR propuesto** `EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md` (sigue
+  `Proposed`, sin aceptar): **DCR quedó deprecado en la spec MCP vigente** y el orden normativo pasa a
+  pre-registro → **CIMD** → DCR → manual (`SHOULD` para CIMD contra `MAY` para DCR, verificado 2026-08-02). Un
+  proveedor con DCR y sin CIMD ya **no cumple** el requisito. Afecta el criterio de selección, no el runtime.
+- **Riesgo de `subject` pairwise descartado con medición:** los once candidatos SaaS emiten `public`. El único
+  `pairwise` es Entra —carril interno— y particiona por **App ID**, no por sector identifier del estándar, así que
+  desktop y web con la misma App Registration comparten `sub`; el identificador estable cross-app sigue siendo
+  `oid`+`tid`, que el write de fondeo ya usa. Se corrigió la advertencia previa sobre host de redirect.
+- **Canon de scopes sincronizado, drift cero verificado por grep** en 15 archivos (arquitectura, runbook, doc
+  funcional, manual de operador, `GLOBE_RUNTIME_HANDOFF`, TASK-1473/1626/1631, plan, ambos espejos de
+  `efeonce-mcp-platform` y el overlay Codex-only `software-architect-2026`). Lo verificado es co-emisión **base +
+  reader**; el write interno `efeonce.mcp.globe.credits.funding.ensure` es un tercer scope declarado, flag-gated,
+  con consentimiento propio y **no** verificado en esa co-emisión. `pnpm skills:mirrors` verde.
+- **Hallazgo de seguridad que TASK-1631 ahora gobierna:** el verificador del gateway es single-issuer, descarta el
+  `subject` (`clientId = azp ?? sub`) y fusiona `roles` dentro de `scopes`. Con un segundo issuer eso permitiría
+  que un scope string externo satisficiera una tool internal-only. La task exige autoridad calificada por issuer,
+  contexto con `issuer`/`subject`/`clientId`/`audience`/`delegatedScopes`/`roles` separados y binding por
+  `(issuer, subject)`. Nada de esto está implementado: es diseño gated.
+- **Benchmark de proveedor con precios oficiales:** WorkOS confirmado a **USD 99/mes planos** en 1/5, 5/25 y 20/100
+  (el costo lo fija el custom domain, no el volumen; organizaciones sin cargo ni tope). Runner-up Stytch (USD 0
+  base, precio de dominio no público). Logto y FusionAuth descartados por no soportar DCR. Curva a modelar:
+  SSO/SAML de WorkOS a **USD 125 por conexión/mes**.
+- **TASK-1631 quedó `template=1, errors=0, warnings=0`** tras reescritura completa (antes linteaba `legacy`) más
+  cuatro rondas de revisión cruzada. Sigue `to-do` y **bloqueada por tres gates**: aceptación del ADR, aprobación
+  de proveedor/plan con costo presentado, y **revisión de privacidad/subprocesador** — gate nuevo, porque es el
+  primer flujo que rutea PII de personas de organizaciones cliente a un procesador externo.
+- Sin cambios de runtime, secretos, DNS ni provisión externa. Commits: `746999fed`, `8533fd533`, `1c7dcce3a`,
+  `0155f1f77`, `6f57819ca`, `385cbf76b`.
+
 ## Finance Core + Cost Accounting + cotización agentic — planificación (2026-08-02)
 
 - [ADR-021](docs/architecture/GREENHOUSE_FINANCE_CORE_ACCOUNTING_FOUNDATION_DECISION_V1.md) aceptado; `EPIC-012`
