@@ -106,14 +106,24 @@ Reglas obligatorias:
   `globe.credits.funding.ensure` y cualquier write futuro— queda ligada explícitamente al issuer interno; un token
   del issuer externo que traiga ese string se deniega en dispatch, fail-closed, además de las defensas downstream
   (token-exchange Entra→Greenhouse por `(microsoft_tenant_id, microsoft_oid)`).
-- **Dynamic client registration REGISTRA e IDENTIFICA un cliente OAuth. No autentica a la persona, no establece
-  membresía y no concede capabilities.** Un cliente público con PKCE puede no tener client secret, así que su
-  `client_id` es un identificador auto-declarado, **nunca una credencial**. La política de emisión de scopes vive
-  en la configuración del plano de identidad y en los grants, no en el registro del client.
+- **Dynamic client registration entrega un identificador PÚBLICO del cliente OAuth. Identifica una aplicación
+  registrada; no autentica a la persona ni autoriza organización o capabilities.** En DCR (RFC 7591) el `client_id`
+  lo **emite el authorization server**, no lo elige el cliente — pero para un cliente público con PKCE **no hay
+  client secret ni prueba de posesión**, así que es un identificador observable y presentable por cualquiera, nunca
+  una credencial. La política de emisión de scopes vive en la configuración del plano de identidad y en los grants,
+  no en el registro del client. **No conflacionar DCR con Client ID Metadata Documents** (donde el `client_id` es
+  una URL que el propio cliente controla): son mecanismos distintos con semánticas de identificación distintas, y
+  el Slice 0 debe confirmar cuáles admite la versión de spec MCP vigente antes de razonar sobre ellos.
 - **El binding de persona se resuelve por `(issuer, subject)`, JAMÁS por `client_id`.** Es el corolario directo de
-  la regla anterior: atar autoridad a un identificador auto-declarado por el cliente sería confiar en el dato que
-  el atacante controla. El contexto de autorización debe conservar `issuer`, `subject`, `clientId`, `audience` y
-  `scopes` como campos **separados**; ninguno se deriva del otro por fallback.
+  la regla anterior: el `client_id` de un cliente público no prueba posesión de nada, así que atarle autoridad es
+  confiar en un dato que cualquiera puede presentar. El contexto de autorización debe conservar `issuer`,
+  `subject`, `clientId`, `audience`, `delegatedScopes` y `roles` como campos **separados**; ninguno se deriva del
+  otro por fallback.
+- **`delegatedScopes` y `roles` son CLASES DE AUTORIDAD distintas y no se fusionan.** Los scopes delegados
+  (`scp`/`scope`) representan consentimiento en contexto de usuario; los app roles (`roles`) representan asignación
+  administrativa. Hoy el verificador los une en un solo array, así que **un app role con el mismo string que un
+  scope satisface la comprobación sin que nadie haya consentido ese scope** — y eso es cierto **dentro de un mismo
+  issuer**, no sólo entre dos. Cada tool declara qué clase de autoridad acepta.
 - Entra sigue siendo exclusivamente el canary interno durante la transición. No se deshabilita
   `globe.producer.fleet.list` ni se usa ese cliente como evidencia de acceso cliente.
 - La configuración de WorkOS staging y discovery MCP no constituye acceso cliente. No crear producción, DNS,
@@ -239,8 +249,10 @@ Reglas obligatorias:
   - `Una organización de identidad externa sólo es usable a través de un binding explícito y auditado hacia una organización canónica.`
   - `El binding y el grant son provider-neutral: relacionan organización canónica ↔ capability namespaceada; no llevan columnas específicas de Globe ni de ningún provider.`
   - `Los scopes del gateway no reemplazan el enforcement de workspace/capability/credits/rights de cada provider.`
-  - `El binding de persona se resuelve por (issuer, subject). Nunca por client_id, que bajo PKCE público es auto-declarado y no es credencial.`
-  - `El contexto de autorización conserva issuer, subject, clientId, audience y scopes como campos separados; ningún campo se deriva de otro por fallback.`
+  - `El binding de persona se resuelve por (issuer, subject). Nunca por client_id: un cliente público con PKCE no tiene prueba de posesión, así que su identificador es observable y presentable por cualquiera.`
+  - `El contexto de autorización conserva issuer, subject, clientId, audience, delegatedScopes y roles como campos separados; ningún campo se deriva de otro por fallback.`
+  - `delegatedScopes (scp/scope) y roles son clases de autoridad distintas y nunca se fusionan en un array único; cada tool declara qué clase acepta.`
+  - `El subject usado como clave de binding debe ser estable para la misma persona a través de clientes y registros distintos; si el proveedor emite subjects pairwise, (issuer, subject) no es clave global hasta fijar sector o adoptar un identificador estable verificado del proveedor.`
   - `La autoridad de una tool se resuelve por (issuer, scope, binding, grant); un scope string del issuer externo jamás satisface una tool ligada al issuer interno.`
   - `La revocación falla cerrada tanto en el dispatch del gateway como en la policy del provider.`
 - Tenant/space boundary: `derivado server-side desde issuer/subject/client verificados y el binding explícito de Account 360; cada provider resuelve independientemente su workspace autorizado`
@@ -279,13 +291,19 @@ Reglas obligatorias:
 - [ ] La coexistencia del login cliente actual de Greenhouse y la delegación futura al plano de identidad externo
       aceptado quedan documentadas, con cookies/audiencias separadas y cutover gateado por separado.
 - [ ] Gateway y provider fallan cerrado de forma independiente ante binding o capability ausente/revocada.
-- [ ] El contexto de autorización expone `issuer`, `subject`, `clientId`, `audience` y `scopes` como campos
-      separados, y el binding de persona se resuelve por `(issuer, subject)`; ningún camino lo resuelve por
-      `client_id` ni deriva un campo de otro por fallback.
+- [ ] El contexto de autorización expone `issuer`, `subject`, `clientId`, `audience`, `delegatedScopes` y `roles`
+      como campos separados, y el binding de persona se resuelve por `(issuer, subject)`; ningún camino lo resuelve
+      por `client_id` ni deriva un campo de otro por fallback.
 - [ ] Un token del issuer externo que porte un scope string internal-only (p.ej. el write de fondeo) se deniega en
       dispatch sin llegar al provider.
-- [ ] Está medido y registrado contra un token live qué scopes co-emite realmente cada issuer (base, reader y, si
-      aplica, write), y el diseño de la calificación por issuer se apoya en esa medición, no en el supuesto.
+- [ ] Un token que porte `roles: ["efeonce.mcp.globe.credits.funding.ensure"]` **sin** el scope delegado
+      correspondiente se deniega en dispatch — verificado también dentro del issuer interno, no sólo entre issuers.
+- [ ] La matriz de tokens live está ejecutada y registrada redactada (`iss`, `aud`, `sub`, `azp`/`client_id`,
+      `scp`, `scope`, `roles`, claim organizacional, `exp`) para cada cliente objetivo, y el diseño de calificación
+      por issuer se apoya en esa medición, no en el supuesto.
+- [ ] La estabilidad del `subject` está resuelta: `subject_types_supported` del proveedor está leído y, si es
+      `pairwise`, la clave de binding tiene sector fijado o un identificador estable verificado del proveedor, con
+      prueba que no dependa de que todos los clientes compartan host de redirect.
 - [ ] Migración, audit, revocación y rollback quedan verificados antes de acceso de clientes.
 - [ ] Canaries OAuth reales de Claude, Codex y ChatGPT cubren allow, base-only deny y revocación.
 - [ ] Ningún token, code, secret o respuesta cruda de provider aparece en logs o respuestas de error.
@@ -315,9 +333,20 @@ Reglas obligatorias:
 - Especificar la calificación por issuer de la autoridad de tools en el gateway (tool ↔ issuers permitidos) y su
   test de regresión, antes de introducir el segundo issuer.
 - Especificar el contrato ampliado del contexto de autorización (`issuer`, `subject`, `clientId`, `audience`,
-  `scopes` separados) y que el binding de persona se resuelve por `(issuer, subject)`.
-- Medir contra un token live qué scopes co-emite hoy el cliente Entra interno (cerrando de paso la prueba
-  base-only pendiente de TASK-1626) y registrar el resultado como insumo del diseño de calificación por issuer.
+  `delegatedScopes` y `roles` separados) y que el binding de persona se resuelve por `(issuer, subject)`.
+- **Ejecutar la matriz de tokens live** y registrarla redactada: por cada cliente objetivo (Claude, Codex,
+  ChatGPT) capturar `iss`, `aud`, `sub`, `azp`/`client_id`, `scp`, `scope`, `roles`, claim organizacional y `exp`.
+  Cierra de paso la prueba base-only pendiente de TASK-1626 y es el insumo del diseño de calificación por issuer.
+- **Resolver la estabilidad del `subject` ANTES de fijarlo como clave de binding, y no sólo comparando clientes.**
+  Leer primero `subject_types_supported` en el discovery del proveedor (metadata OIDC obligatoria, responde sin
+  emitir un token): si incluye `pairwise`, el `sub` se calcula **por sector identifier** — `sector_identifier_uri`
+  si está declarado, o el **host del `redirect_uri`** si no. ⚠️ Comparar sólo Claude vs Codex puede dar un **falso
+  negativo**: ambos usan redirect `http://localhost:PORT/callback` (el canary vigente usa
+  `http://localhost:8765/callback`), o sea comparten sector `localhost` y mostrarían un `sub` estable — mientras el
+  primer cliente MCP hospedado, con su propio host de redirect, recibiría un `sub` distinto y el binding dejaría de
+  resolver en silencio. Si el proveedor es pairwise, la decisión es fijar un `sector_identifier_uri` común para
+  todos los clientes MCP de Efeonce o adoptar un identificador estable de persona verificado del proveedor;
+  documentar cuál, con su prueba.
 
 ### Slice 1 — External identity and Account 360 binding
 
@@ -335,8 +364,10 @@ Reglas obligatorias:
 
 - Agregar validación dual-issuer gateada al gateway sin cambiar el canary interno Entra: el verificador
   single-issuer actual (`src/auth/token-verifier.ts`) pasa a un resolver por issuer con JWKS y audience propios.
-- Ampliar el contexto de autorización a `issuer` + `subject` + `clientId` + `audience` + `scopes` separados,
-  eliminando el fallback `clientId = azp ?? sub`, y resolver el binding de persona por `(issuer, subject)`.
+- Ampliar el contexto de autorización a `issuer` + `subject` + `clientId` + `audience` + `delegatedScopes` +
+  `roles` separados, eliminando el fallback `clientId = azp ?? sub` y la fusión `scp ∪ scope ∪ roles`, y resolver
+  el binding de persona por `(issuer, subject)` con la clave estable que fijó el Slice 0.
+- Ligar cada tool a su clase de autoridad (`delegatedScopes` y/o `roles`) además de a sus issuers permitidos.
 - Ligar cada tool a sus issuers permitidos: las tools internal-only (write de fondeo incluido) rechazan tokens del
   issuer externo aunque porten el scope string; test de regresión de esa denegación.
 - Resolver el binding verificado server-side y exigir revalidación del provider (organización, workspace y
@@ -344,7 +375,10 @@ Reglas obligatorias:
 
 ### Slice 3 — Client canary and first customer rollout
 
-- Probar OAuth/PKCE, compatibilidad de registro y MCP initialize con Claude, Codex y ChatGPT.
+- Probar OAuth/PKCE, compatibilidad de registro y MCP initialize con Claude, Codex y ChatGPT, cubriendo **las dos
+  formas de redirect**: loopback (cliente nativo, puerto efímero, literal `127.0.0.1`) y HTTPS en dominio propio
+  (cliente hospedado). Confirmar que el authorization server admite cualquier puerto en loopback y que el `sub` de
+  la misma persona coincide entre ambas formas.
 - Allowlist de una capability Globe read-only para una organización; probar allow, base-only deny, expiración y
   revocación antes de habilitar cualquier acceso de cliente más amplio.
 - Requiere la superficie de login entregada por la task `ui-ux` dependiente.
@@ -381,7 +415,18 @@ Restricciones de forma verificadas contra el runtime que el diseño debe honrar:
   binding de una persona cliente — el peor momento para descubrirlo.
 - **`roles` se fusiona dentro de `scopes`.** El verificador arma los scopes como `scp ∪ scope ∪ roles`, así que un
   claim `roles` de cualquier issuer se vuelve un scope string. Es otra razón por la que la equivalencia por string
-  no puede ser la última capa de autoridad con dos issuers.
+  no puede ser la última capa de autoridad — y aplica **dentro** de un issuer: un app role de Entra con el mismo
+  string que un scope satisface la comprobación sin consentimiento delegado.
+- **Hay DOS formas de cliente MCP y hoy sólo se ejercita una.** Los clientes nativos/desktop (Claude Desktop,
+  Codex CLI) usan redirect **loopback**, que es el patrón correcto y estándar para apps nativas (RFC 8252) — no es
+  un atajo del canary. Los clientes hospedados/web usan un redirect **HTTPS en su propio dominio**. El plano de
+  identidad debe admitir ambas formas, y toda medición de claims debe cubrir las dos: es justamente el eje donde un
+  `sub` pairwise cambia de valor. Dos detalles del canary vigente que **no se propagan al producto**:
+  `scripts/oauth-canary.mjs` usa el hostname `localhost` en vez del literal `127.0.0.1` que RFC 8252 recomienda
+  (`localhost` se resuelve por DNS/hosts y es redirigible) — el CLI de Greenhouse ya registra la forma correcta,
+  así que hay inconsistencia entre repos —, y fija el puerto `8765`, aceptable para un canary de una máquina pero
+  inválido como contrato de producto: un cliente real toma puerto efímero y el authorization server debe admitir
+  cualquier puerto en loopback.
 - **Los scopes hoy son strings sin dueño.** `efeonce.mcp.read`, `efeonce.mcp.globe.read` y
   `efeonce.mcp.globe.credits.funding.ensure` se comprueban por `includes` sobre los scopes del token. Con un solo
   issuer eso es suficiente; con dos, la tupla de autoridad pasa a ser `(issuer, scope, binding, grant)` y la
@@ -428,6 +473,7 @@ Slice 3 MUST prove base-only denial and revocation before it allows a second org
 | External issuer disrupts current reader | gateway | low | dual issuer gated; retain Entra internal path and provider flag | internal canary regression |
 | OAuth client incompatibility | external MCP clients | medium | metadata/registration and PKCE canary for each target client | per-client auth compatibility result |
 | Existing Greenhouse customer receives a duplicate identity or credential | identity / customer experience | medium | deterministic `identity_profile` source-linking, conflict review and one-authentication target | duplicate profile, competing recovery path or unmatched subject |
+| Pairwise `sub` breaks the binding for a client shape never tested | identity / MCP clients | medium | read `subject_types_supported` first; pin `sector_identifier_uri` or use a provider-stable person id; test loopback AND hosted redirect shapes | same person resolves to different subjects across clients |
 
 ### Feature flags / cutover
 
