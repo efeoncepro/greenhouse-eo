@@ -28,7 +28,9 @@
 Habilitar una identidad B2B de Efeonce para que organizaciones cliente existentes se autentiquen en clientes MCP
 sin requerir una cuenta Entra de Efeonce. Account 360 conserva la organización comercial canónica; la identidad
 externa sólo se enlaza explícitamente y Globe conserva workspace, capacidades, créditos y policy. El primer corte
-es por invitación y allowlist de clientes existentes, nunca por signup público o dominio de correo.
+es por invitación y allowlist de clientes existentes, nunca por signup público o dominio de correo. La superficie
+de autenticación tiene despliegue, cookies y sesiones independientes de Greenhouse, pero converge en la misma
+persona, organización y membresía canónicas; no crea una identidad o contraseña cliente paralela permanente.
 
 ## Why This Task Exists
 
@@ -50,6 +52,9 @@ Account 360 en el gateway.
   membership, organización o acceso.
 - Entregar una UI de acceso propia en `auth.efeonce.org`, aislada del gateway y de Greenhouse; WorkOS/AuthKit
   opera autenticación mediante APIs server-side y WorkOS Connect sigue emitiendo OAuth para MCP.
+- Mantener sesiones y audiencias separadas por aplicación, enlazadas a un único `identity_profile`; definir en
+  esta task la transición para que el login externo de Greenhouse pueda delegar posteriormente en el mismo plano
+  de identidad aceptado, sin hacer que Greenhouse sea el issuer OAuth del MCP.
 
 ## Architecture Alignment
 
@@ -68,6 +73,12 @@ Reglas obligatorias:
 
 - Account 360 y `greenhouse_core.organizations` son el único ancla comercial/customer; un ID WorkOS u otro IDP es
   un binding externo, no un tenant paralelo.
+- `auth.efeonce.org` está aislado como runtime y sesión, no como identidad: una persona existente se enlaza al
+  mismo `greenhouse_core.identity_profiles` y membresía canónica. Greenhouse, auth y MCP no comparten cookies,
+  secretos de sesión ni tokens entre audiencias.
+- La coexistencia inicial entre el login cliente actual de Greenhouse y WorkOS/IDP para MCP es transitoria. Esta
+  task debe entregar el contrato de convergencia, account linking, recovery y revocación; el cutover del login de
+  Greenhouse requiere su propio gate de rollout.
 - La primera cohorte usa exclusivamente clientes existentes y allowlisted de Account 360. No hay signup público,
   import automático masivo ni admisión basada en el dominio de correo.
 - El gateway valida autenticación/transport y delega. Globe conserva workspace, creative policy, credits y
@@ -128,7 +139,7 @@ Reglas obligatorias:
 - Topology impact: `cross-runtime`
 - Current home: `Greenhouse para Account 360/identity binding; ../efeonce-mcp para OAuth validation y dispatch; ../efeonce-globe para provider policy`
 - Future candidate home: `remain-shared`
-- Boundary: `binding server-side Account 360 ↔ identity organization, entitlement resolver y provider policy revalidation`
+- Boundary: `binding server-side identity_profile/Account 360 ↔ external subject/organization, entitlement resolver y provider policy revalidation; runtimes and sessions stay independent`
 - Server/browser split: `auth browser UI is isolated at auth.efeonce.org; its server adapter alone accesses AuthKit APIs. Tokens, binding stores, identity-provider admin APIs, provider clients and secrets never reach browser code`
 - Build impact: `dedicated auth UI/session deployment is independent from the MCP gateway; identity-provider SDK/configuration remains behind its server adapter`
 - Extraction blocker: `authentication/session and Account 360 binding are cross-runtime contracts; implementation begins only after an approved topology, UI contract and identity plan`
@@ -155,6 +166,9 @@ Reglas obligatorias:
 - Entidades/tablas/views afectadas: `greenhouse_core.organizations plus the canonical identity/membership surface selected during discovery; no duplicate customer organization table`
 - Invariantes que no se pueden romper:
   - `Account 360 organization remains the commercial/customer source of truth.`
+  - `One existing customer person remains one canonical identity_profile; an external IDP subject is a source link, not a parallel person or credential authority inside Greenhouse.`
+  - `Greenhouse, auth.efeonce.org and MCP keep separate cookies, session secrets and audiences; identity convergence never means browser-session sharing.`
+  - `The target customer journey uses one external authentication relationship across MCP and customer-facing Greenhouse, with separate application sessions; initial coexistence must have a documented convergence and rollback path.`
   - `Only an existing Account 360 customer explicitly allowlisted by an audited operator command may receive an external identity binding or invitation.`
   - `An email address, email domain or WorkOS organization without that binding never creates customer membership, a capability grant or a Globe workspace right.`
   - `An external identity organization is usable only through an explicit audited binding to one canonical organization.`
@@ -190,6 +204,10 @@ Reglas obligatorias:
 ### Acceptance criteria additions
 
 - [ ] Account 360, binding and provider sources of truth are named and no second customer organization model exists.
+- [ ] Existing-person linking, collision/manual review, recovery, deactivation and revocation map an external
+      subject to one canonical `identity_profile`; email-only matching is rejected.
+- [ ] The current Greenhouse customer login coexistence and future delegation to the accepted external identity
+      plane are documented, with separate cookies/audiences and a separately gated cutover.
 - [ ] Gateway and Globe independently fail closed for absent/revoked binding or capability.
 - [ ] Migration, audit, revocation and rollback behavior are verified before customer access.
 - [ ] Real Claude, Codex and ChatGPT OAuth canaries cover allow, base-only deny and revocation.
@@ -202,9 +220,14 @@ Reglas obligatorias:
 - Obtain explicit acceptance of the ADR and selected identity-provider plan before external provisioning.
 - Inventory Account 360 organization, canonical person/membership and Globe workspace contracts; propose the minimal
   additive binding schema, command/reader/audit and invalidation contract.
+- Inventory the current Greenhouse NextAuth, `client_users`, `identity_profiles`, source-link and `session_360`
+  contracts. Define existing-account linking, conflicts/manual review, recovery, deactivation and revocation without
+  exporting or sharing the Greenhouse session secret/cookie.
 - Define the first existing-client eligibility read, operator allowlist command, designated-administrator input and
   invitation/revocation audit. Explicitly prohibit public signup, email-domain inference and automatic enrollment.
 - Produce the design/flow and deployment contract for the custom `auth.efeonce.org` surface before browser code.
+- Produce the target convergence contract by which customer-facing Greenhouse can later delegate authentication
+  to the same accepted external identity plane while retaining its own application session and audience.
 
 ### Slice 1 — External identity and Account 360 binding
 
@@ -213,6 +236,8 @@ Reglas obligatorias:
   the MCP gateway into a browser/session host.
 - Implement audited, idempotent organization/person/grant binding primitives with additive migration, no automatic
   customer backfill and invitation only after an explicit existing-client allowlist review.
+- When the invited person already exists, link the verified external subject to that `identity_profile`; do not
+  create a second person or a second Greenhouse password. Exercise conflict and recovery paths before customer access.
 
 ### Slice 2 — Gateway/provider enforcement
 
@@ -230,6 +255,8 @@ Reglas obligatorias:
 
 - Customer public signup, automatic enrollment by email domain, a customer administration UI, SCIM, broad SSO
   rollout or self-service entitlement management.
+- Migrating the customer-facing Greenhouse login runtime in the first MCP slice. This task defines and validates
+  the convergence contract; a later gated rollout performs that cutover.
 - Globe writes, credit/spend, approvals, rights-sensitive tooling or any capability not separately approved.
 - Replacing Account 360, moving Globe policy into the gateway, or disabling the Entra internal reader/canary.
 - Production provisioning of WorkOS or any other provider before ADR acceptance and commercial approval.
@@ -250,6 +277,7 @@ Slice 3 MUST prove base-only denial and revocation before it allows a second org
 | Revocation lags and leaks access | identity / MCP / Globe | medium | short-lived token, grant version/invalidation and revoke canary | revoked principal dispatch attempt |
 | External issuer disrupts current reader | gateway | low | dual issuer gated; retain Entra internal path and provider flag | internal canary regression |
 | OAuth client incompatibility | external MCP clients | medium | metadata/registration and PKCE canary for each target client | per-client auth compatibility result |
+| Existing Greenhouse customer receives a duplicate identity or credential | identity / customer experience | medium | deterministic `identity_profile` source-linking, conflict review and one-authentication target | duplicate profile, competing recovery path or unmatched subject |
 
 ### Feature flags / cutover
 
@@ -285,6 +313,10 @@ production secrets, client registrations and the first customer onboarding conse
 
 - [ ] The ADR is accepted and the selected provider/plan is explicitly approved before external provisioning.
 - [ ] An Account 360 organization is the sole customer anchor and has an audited external identity binding.
+- [ ] An existing customer authenticating through the external plane resolves to the same canonical
+      `identity_profile`; Greenhouse/auth/MCP sessions remain audience-separated.
+- [ ] The customer-facing Greenhouse login convergence contract is approved, even though its runtime cutover is a
+      later rollout gate.
 - [ ] Gateway and Globe both deny unknown, base-only, expired or revoked access.
 - [ ] The Entra internal canary and `globe.producer.fleet.list` remain available through the transition.
 - [ ] Claude, Codex and ChatGPT canaries pass OAuth/PKCE plus MCP initialize for the allowlisted organization.
@@ -308,9 +340,13 @@ production secrets, client registrations and the first customer onboarding conse
 ## Follow-ups
 
 - Customer self-service administration and SCIM/enterprise SSO require separate discovery and task/ADR scope.
+- Customer-facing Greenhouse login cutover follows the convergence contract from this task and requires a separate
+  implementation/rollout unit; it must not introduce a second customer identity store.
 - Each additional provider or write-capable Globe tool requires its own capability, entitlement and rollout gate.
 
 ## Open Questions
 
 - Confirm the selected external identity provider and commercial plan after explicit operator review.
 - Select the exact canonical Greenhouse membership primitive and additive binding schema during Slice 0 discovery.
+- Decide the cutover sequence for customer-facing Greenhouse authentication after the shared identity-link contract
+  is proven, without changing the internal Entra path.

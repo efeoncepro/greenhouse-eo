@@ -33,6 +33,11 @@ If a source conflicts with remembered behavior, the verified runtime and its can
 - Keep human OAuth separate from the gateway's downstream service identity. Validate issuer, audience, expiry and
   scopes before MCP dispatch; never log tokens, auth codes, raw bodies or secrets.
 - Derive tenant/workspace from verified identity and provider policy. Never accept a free-form tenant boundary.
+- Treat `auth.efeonce.org` as session/runtime-isolated, not identity-isolated. Greenhouse, auth and MCP keep separate
+  cookies, session secrets and token audiences, but an existing customer must resolve to one canonical
+  `identity_profile` and Account 360 membership through audited source links. Never share the Greenhouse cookie or
+  create a permanent second customer credential; preserve the gated customer-login convergence contract in
+  `EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md` / `TASK-1631`.
 - Before customer access, require B2B/multitenant entitlements that can issue and revoke access per tenant and
   capability. Entra is the internal canary only. Follow the proposed Account 360 binding and customer identity
   gate in `EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md` / `TASK-1631`; do not provision its leading

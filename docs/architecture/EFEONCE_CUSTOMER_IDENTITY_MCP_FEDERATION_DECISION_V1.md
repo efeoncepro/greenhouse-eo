@@ -6,7 +6,7 @@
 > **Scope:** customer identity, B2B federation, MCP OAuth, Account 360 organization binding and Globe access
 > **Reversibility:** `two-way-but-slow`
 > **Confidence:** `medium`
-> **Validated as of:** 2026-08-01 — gateway MCP, Entra canary and Account 360 contracts verified; WorkOS has a staging project with MCP discovery configuration only. There is no external customer binding, public login, production domain, production secret or customer access.
+> **Validated as of:** 2026-08-02 — gateway MCP, Entra canary, current Greenhouse NextAuth/session resolution and Account 360 contracts verified; WorkOS has a staging project with MCP discovery configuration only. There is no external customer binding, public login, production domain, production secret, Greenhouse customer-login convergence or customer access.
 > **Implementation:** [`TASK-1631`](../tasks/to-do/TASK-1631-efeonce-customer-identity-mcp-federation.md)
 
 ## Context
@@ -35,6 +35,40 @@ service at `auth.efeonce.org` will use AuthKit Authentication APIs server-side a
 the gateway remains a resource server, not a session/UI host. This is not WorkOS Standalone Connect in the first
 cut: Efeonce does not yet have an independent customer authentication stack to reuse. WorkOS continues to own
 credential and authentication mechanics; the browser never receives a WorkOS API key.
+
+### Relationship with the Greenhouse login
+
+`auth.efeonce.org` is operationally independent from the Greenhouse deployable, but it is not an independent
+person, organization or membership system. "Independent" means separate deployment, cookie namespace, session
+store, token audience, scaling and rollback. It does not authorize a second customer record, a parallel password
+store or a second identity for a person who already exists in Greenhouse.
+
+Greenhouse's current login continues to issue its own NextAuth session for the Greenhouse audience. Internal
+Efeonce operators continue through the existing Entra-backed path. The external identity plane authenticates
+customers and issues OAuth tokens for the MCP audience. Neither application accepts the other's browser cookie,
+and `mcp.efeonce.org` never treats a Greenhouse portal session as its OAuth authorization server.
+
+Both paths converge server-side on one canonical person and organization relationship:
+
+```text
+Internal operator ─ Greenhouse login / Entra ─┐
+                                              ├─ identity_profile + Account 360 membership
+External customer ─ auth.efeonce.org / IDP ──┘               │
+                                                              ├─ Greenhouse customer session (current/future)
+                                                              └─ MCP OAuth grant → gateway → Globe policy
+```
+
+The external subject and organization identifiers are source links/bindings to the canonical Greenhouse person
+and Account 360 organization. Linking must use verified provider identifiers plus an audited invitation or
+operator command; matching an email address alone is insufficient. A customer who already has Greenhouse access
+must be linked to the existing `identity_profile` rather than provisioned as a new person.
+
+The first MCP slice may coexist with the current Greenhouse customer login, but this is a transition state, not
+the target architecture. `TASK-1631` must define account linking, conflict handling, recovery and revocation, and
+must produce a migration path for customer-facing Greenhouse authentication to delegate to the same accepted
+external identity plane. That later convergence lets the customer use one authentication relationship while each
+application still issues an audience-bound session/token. Internal Greenhouse access may remain on Entra. The
+full Greenhouse customer-login cutover is separately gated and is not implied by enabling the first MCP cohort.
 
 The durable ownership model is:
 
@@ -74,6 +108,13 @@ membership or access.
   membership or Globe grant.
 - Invitations and revocations originate from audited canonical Account 360/identity commands. They must bind a
   person to the selected organization and never infer access from an unverified email domain or JWT field.
+- One person maps to one canonical `identity_profile`. A WorkOS or other IDP subject is an external source link;
+  it must not create a parallel customer identity or permanent second credential set for an existing person.
+- Greenhouse, `auth.efeonce.org` and MCP use separate cookies, sessions and token audiences. Sharing a Greenhouse
+  session secret/cookie with another deployable, or accepting a portal cookie as an MCP token, is prohibited.
+- Customer-facing Greenhouse authentication and MCP authentication must have an explicit convergence path through
+  the same accepted external identity plane. Coexistence is allowed during rollout; permanent identity divergence
+  is not.
 - Entra remains available only for the internal canary during the transition. It neither onboards external customers
   nor demonstrates their deny/revocation behavior.
 - External authorization uses OAuth 2.1 authorization code with PKCE. Remote MCP clients must have public
@@ -92,6 +133,12 @@ Its resulting binding must minimally relate an external identity organization to
 relate authenticated people to an organization-scoped membership/grant without storing commercial, Globe workspace
 or credit policy in the identity provider. The exact table and identifier choice remain intentionally undecided until
 that discovery confirms the current schema and avoids a parallel identity model.
+
+Discovery must also identify how the current `greenhouse_core.client_users`, `greenhouse_core.identity_profiles`,
+`greenhouse_core.identity_profile_source_links` and `greenhouse_serving.session_360` contracts participate. The
+resulting design must specify deterministic existing-person linking, collision/manual-review behavior, account
+recovery, provider-subject rotation, deactivation and revocation propagation. It must not reuse the Greenhouse
+NextAuth cookie or secret outside Greenhouse.
 
 The initial cohort flow must additionally record the Account 360 organization, designated customer administrator,
 operator authorizing the invitation, external identity subject/organization IDs, permitted capability, timestamps
@@ -131,6 +178,9 @@ secrets are an irreversible operational commitment and require explicit operator
 - Customer onboarding has a clear order: select/verify an existing Account 360 organization, allowlist it,
   establish the explicit identity binding, designate/invite its administrators, grant the provider capability,
   then run organization-scoped OAuth and provider canaries.
+- Existing Greenhouse customers keep one canonical person and organization membership while applications keep
+  separate audience-bound sessions. The first MCP rollout may coexist with the current portal login, but it must
+  leave an explicit, reversible path to a shared external authentication relationship.
 - The gateway needs dual-issuer transition support and a binding/entitlement resolver; providers need an
   organization-aware revalidation contract.
 - The initial login surface is a dedicated custom Efeonce UI, but customer self-service administration is not
@@ -140,7 +190,9 @@ secrets are an irreversible operational commitment and require explicit operator
 ## Rollout gates
 
 1. Accept this decision and approve the selected identity-provider commercial plan before production provisioning.
-2. Discover and implement the Account 360 binding with migration, audit and revocation semantics.
+2. Discover and implement the Account 360/person binding with migration, collision handling, recovery, audit and
+   revocation semantics; approve the future Greenhouse customer-login convergence contract without coupling the
+   first MCP rollout to that later cutover.
 3. Implement the isolated `auth.efeonce.org` custom UI/session service with server-only AuthKit API access, then
    configure the external issuer, OAuth metadata, PKCE and supported MCP client registration.
 4. Add the gateway's gated dual-issuer validation and provider entitlement revalidation; retain the Entra internal

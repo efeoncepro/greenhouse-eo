@@ -73,6 +73,10 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   OAuth PKCE real. El write acepta únicamente una autoridad ya sellada y llama el command Greenhouse canónico.
   Clientes externos continúan bloqueados hasta separar entitlements/emisión de scopes
   B2B y probar una identidad base-only. Greenhouse mantiene sólo ADRs, tasks y handoff de ecosistema.
+- Para identidad cliente, separar runtimes no significa separar personas: Greenhouse, `auth.efeonce.org` y MCP
+  mantienen cookies, sesiones y audiencias propias, pero resuelven un único `identity_profile` y la membresía de
+  Account 360 mediante bindings auditados. La coexistencia inicial con el login cliente actual requiere una ruta
+  de convergencia posterior al mismo plano de identidad externo; nunca una segunda identidad o contraseña permanente.
 - La operación o evolución MCP se enruta por las skills espejo `.codex/skills/efeonce-mcp-platform/` y
   `.claude/skills/efeonce-mcp-platform/`; estas componen la skill dueña de cada provider y no duplican su policy.
   Las skills de arquitectura `software-architect-2026` y `arch-architect` deben cargar ese router antes de
