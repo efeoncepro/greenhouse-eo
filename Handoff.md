@@ -22,8 +22,22 @@ Historia anterior: [Handoff.archive.md](Handoff.archive.md).
   exclusión mutua **ya corre en producción** (`producer-client.ts:1191`, `producer_prompt_contract_invalid`) y un
   campo de valores en el intent la eludiría por el costado, habilitando dos direcciones contradictorias sin error
   observable.
+- **ADR-022 Delta (c) aceptado — el prompt efectivo también se compila por ruta.** El mismo defecto que la task
+  corrige en inputs seguía intacto en el único eje que **todas** las rutas consumen: `compileStructuredBrief`
+  (`structured-briefs.ts:142`) es global y corre en `domain` antes del adapter, contra la regla del propio ADR de
+  que sólo los adapters traducen; el puerto lo delata en su firma (`compile(raw)`, `app.ts:1416`, sin ruta).
+  Decidido: compilación por ruta detrás del adapter con revisión propia en el fingerprint, el peso **ordena pero
+  no se imprime** (hoy se emite `[weight=0.820]` y el encoder lo lee como texto: no condiciona), el rol del slot
+  informa el texto compilado (hoy se valida y muere ahí), y `native-parameter` gana siempre que exista. **Cuál
+  dialecto es mejor no se decide, se mide** con el Evaluation Harness (`TASK-1458`).
+- **Dos mediciones que lo sostienen:** **13 de 17 rutas** heredan `PROMPT_CONTROLS` sin evidencia propia, y
+  **ningún adapter manda campo negativo nativo** (cero `negative_prompt` en `apps/creative-runner/src`) — así que
+  `negative-prompt: prompt-semantic` es una promesa heredada, y la negación en texto tiende a reforzar lo que
+  niega. El cambio es de **firma**, no de arquitectura: el puerto ya existe y la implementación por defecto
+  preserva el texto actual de todas las rutas.
 - **Hallazgo lateral para `TASK-1552`:** la capability de guardar/reutilizar recetas existe desde el 2026-07-22 y
-  tiene **cero uso porque nunca tuvo UI**. No es rechazo de usuarios, es superficie ausente.
+  tiene **cero uso porque nunca tuvo UI**; y el composer usa el brief de forma degradada — el prompt entero entra
+  como un solo ingrediente `subject` de peso 1, con la composición ponderada construida y sin ejercer.
 - Task actualizada con Slice 3.5, `valueShape`, criterio 7 desmarcado (su guard es de autoría del catálogo, no de
   ejecución) y dos criterios nuevos. Corregido el delta previo: el fingerprint **sí** incluye roles y ordinales.
 - Sin cambios de runtime, código Globe, deploy, migración ni gasto. `task:lint` y `ops:lint --changed` verdes.

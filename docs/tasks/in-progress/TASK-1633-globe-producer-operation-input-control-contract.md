@@ -298,6 +298,26 @@ Trabajo del slice:
   cambio estructural porque el brief ya viaja dentro del quote firmado.
 - Test que falla si un control declara un valor cuyo dueño es otro vocabulario.
 
+**ADR-022 Delta (c) — el prompt efectivo también se compila por ruta.** El mismo defecto que esta task corrige en
+el eje de inputs seguía intacto en el único eje que **todas** las rutas consumen: `compileStructuredBrief`
+(`structured-briefs.ts:142`) es global y corre en `domain`, **antes** del adapter, contra la regla del propio ADR
+de que sólo los adapters traducen. El puerto lo delata en su firma: `structuredPrompts.compile(raw)`
+(`app.ts:1416`) **no recibe la ruta**. Trabajo derivado, dentro de este mismo slice:
+
+- Mover la compilación al adapter y versionarla por ruta; el puerto pasa a `compile(raw, routeContract)` y la
+  implementación por defecto **preserva el texto actual**, de modo que ninguna ruta cambia su salida al migrar.
+- La revisión del compilador entra al fingerprint: dos textos distintos para el mismo brief son dos pedidos
+  distintos y no comparten approval.
+- **El peso ordena y estructura; nunca se imprime.** Hoy se emite `Style [weight=0.820]: …` y el encoder lo lee
+  como texto — no condiciona, gasta tokens y ensucia el prompt.
+- **El rol del slot informa el texto compilado.** Hoy se valida con rigor y muere ahí: el modelo recibe las
+  imágenes por otro canal y no sabe si son sujeto, estilo o storyboard salvo que el texto se lo diga.
+- **Declarar el mecanismo por control por ruta, con evidencia del contrato oficial.** Medido: **13 de 17 rutas**
+  heredan `PROMPT_CONTROLS` sin evidencia propia, y **ningún adapter manda campo negativo nativo** (cero
+  `negative_prompt` en `apps/creative-runner/src`), así que `negative-prompt: prompt-semantic` es hoy una promesa
+  heredada — y la negación en texto tiende a reforzar lo que niega.
+- Qué dialecto es mejor por ruta **no se decide acá: se mide** con el Evaluation Harness (`TASK-1458`).
+
 ### Slice 4 — Migración y conformance de rutas existentes
 
 - Migrar primero fixtures/rutas representativas de create, frames, reference, motion transfer, edit y upscale.
@@ -402,6 +422,8 @@ Ninguna para la foundation. Las promociones, atestaciones y canaries permanecen 
 - [ ] Un control/input requerido no soportado falla antes de reserva/provider submit con error canónico. **Desmarcado 2026-08-02:** el guard existe pero es de **autoría del catálogo** (`producer-catalog.ts:914`, corre al cargar), no de ejecución; como no hay canal para que un caller pida un control, la condición es hoy inalcanzable y el criterio se cumplía de forma vacía. El guard de autoría se conserva.
 - [ ] Cada rechazo de contrato tiene **razón nombrada del lado del servidor** y nace clasificado `terminal` en la política de fallos. Hoy `production-route-compiler.ts:504-524,551` colapsa nueve causas accionables distintas —contrato ausente · intent ausente · revisión · operación · slot inexistente · rol · media type · MIME · input no materializado— en un único `route_creative_contract_mismatch`, y ninguna está en `TERMINAL_CODES`.
 - [ ] Un solo vocabulario es dueño de cada valor de dirección creativa; ningún control declara un valor cuyo dueño es `StructuredBriefV1` o `RouteConstraintsV1` (Slice 3.5), con test que lo sostenga.
+- [ ] La compilación del prompt efectivo recibe el contrato de ruta, vive detrás del adapter y su revisión entra al fingerprint; la implementación por defecto preserva el texto actual de todas las rutas existentes (ADR-022 Delta (c)).
+- [ ] Ningún control declara su mecanismo por herencia del default: las 17 rutas lo declaran con evidencia del contrato oficial de su proveedor, en particular `negative-prompt`, que hoy ninguna ruta puede honrar de forma nativa.
 - [ ] Manifest/run evidence conserva schema revision, roles y controles aplicados/rechazados sin secretos.
 - [ ] Rutas legacy tienen dual-read/equivalence tests y rutas nuevas no pueden registrarse sin descriptor.
 - [ ] Fixtures Omni/Seedance/Veo demuestran una UI intent común con traducciones distintas dentro de adapters.

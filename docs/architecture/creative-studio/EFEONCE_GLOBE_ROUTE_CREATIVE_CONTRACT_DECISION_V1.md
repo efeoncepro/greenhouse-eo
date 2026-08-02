@@ -9,7 +9,8 @@
 - Scope: catálogo de rutas, contrato de ejecución, compiler server-side, adapters y consumidores del Producer
 - Reversibility: two-way-but-slow
 - Confidence: high
-- Validated as of: 2026-08-02 (incluye el Delta 2026-08-02 (b), que fija dónde viaja el valor de un control)
+- Validated as of: 2026-08-02 (incluye los Deltas (b) —dónde viaja el valor de un control— y (c) —el prompt
+  efectivo también se compila por ruta—)
 - Governing task: [`TASK-1633`](../../tasks/in-progress/TASK-1633-globe-producer-operation-input-control-contract.md)
 - Extends: [`EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md`](EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md) y [`EFEONCE_GLOBE_ROUTE_BASED_MODEL_RESOLUTION_DECISION_V1.md`](EFEONCE_GLOBE_ROUTE_BASED_MODEL_RESOLUTION_DECISION_V1.md)
 
@@ -180,3 +181,93 @@ combinationId, inputAssignments}`. Lo que gana el sistema es `valueShape` en el 
 el brief y validación del valor contra el descriptor en el compiler. El fingerprint canónico cubre el eje sin
 cambio estructural: el brief ya viaja dentro del quote que se firma. La UI de `TASK-1552` deriva del descriptor
 qué controles ofrecer y en qué forma, y los escribe donde ya escribe hoy.
+
+## Delta 2026-08-02 (c) — el prompt efectivo también se compila por ruta
+
+- Status del delta: Accepted
+- Validated as of: 2026-08-02, contra el runtime de Globe
+- Governing task: `TASK-1633` Slice 3.5
+
+### La contradicción
+
+Este ADR declara que *"los adapters son los únicos que traducen esa intención a payloads de proveedor"*. El eje de
+texto no cumple esa regla: `compileStructuredBrief` (`packages/domain/src/structured-briefs.ts:142`) es **una
+función global** que emite el mismo texto para Seedance, Omni y Veo, y corre en `domain`, **antes** del adapter. El
+puerto que la inyecta lo hace explícito en su firma: `structuredPrompts.compile(raw)` (`app.ts:1416`) **no recibe
+la ruta** — estructuralmente no puede conocerla.
+
+Es exactamente la falla que este ADR corrige en el eje de inputs, intacta en el único eje que **todas** las rutas
+consumen. La foundation separó operación, slots y roles por ruta y dejó el prompt compilado por un molde único.
+
+### Cómo entienden realmente estos modelos, y qué se rompe
+
+Un modelo de difusión o un transformer de video **no tiene jerarquía de instrucción**. No hay `system` sobre
+`user`: hay un encoder que convierte el texto en embeddings de condicionamiento que se cross-atienden en cada paso
+de denoising. Una sola secuencia plana, donde todo compite en el mismo espacio. De ahí, cuatro consecuencias
+verificables contra el runtime actual:
+
+1. **Los pesos impresos como texto no condicionan.** El compilador emite hoy `Style [weight=0.820]: …`; el encoder
+   lo lee **como texto**. El prompt weighting real opera en el espacio de embeddings del pipeline de inferencia
+   —`(palabra:1.2)`, `guidance_scale`—, no en el string, y una API cerrada no expone ese control. El número gasta
+   tokens, ensucia el condicionamiento y no cumple lo que promete. El peso debe **ordenar y estructurar** —lo
+   dominante en la oración principal, lo secundario subordinado— y no imprimirse.
+2. **La negación en texto tiende a reforzar lo que niega.** Los stacks que la manejan bien usan un **campo
+   separado** que entra a la guidance con signo invertido. Medido: **ningún adapter de Globe manda un campo
+   negativo nativo** (cero ocurrencias de `negative_prompt` en `apps/creative-runner/src`), y el catálogo declara
+   `negative-prompt: prompt-semantic` en el default que **13 de las 17 rutas heredan sin evidencia por ruta**. El
+   `Avoid: …` viaja siempre como texto. Donde no exista campo nativo, la salida honesta es reformular en positivo
+   —una transformación de oficio— o declararlo `unsupported`, no prometerlo por herencia.
+3. **El rol del slot muere en la validación.** Las referencias entran por el canal de condicionamiento de imagen;
+   el modelo recibe tres imágenes y **no sabe** si son sujeto, estilo o storyboard salvo que el texto se lo diga.
+   Globe valida el rol con rigor y después no lo pasa al prompt: información que el usuario dio, que el sistema
+   conoce, y que el modelo nunca ve.
+4. **El vocabulario de oficio funciona porque está en el corpus.** "Dolly in", "contrapicado", "hora dorada",
+   "35 mm" condicionan porque los datos de entrenamiento traen metadata de producción. Una taxonomía inventada no.
+   Los controles deben aterrizar en lenguaje del oficio, no en enums abstractos.
+
+Por modalidad: **audio** es donde `native-parameter` es genuino (voz, velocidad, pitch son parámetros reales);
+**video** es el más sensible al orden temporal y a describir el movimiento como lo describe un director; **imagen**
+es el más tolerante y el que más gana con composición ponderada bien expresada.
+
+### Decisión
+
+1. **El brief neutral sigue siendo el SSOT del pedido** — ingredientes, pesos y roles, sin dialecto de proveedor.
+   El Delta (b) no se toca.
+2. **La compilación a texto se muda al adapter y se versiona por ruta.** El puerto pasa a recibir el contrato de
+   ruta además del brief; la implementación por defecto conserva el comportamiento actual para no cambiar ninguna
+   ruta al migrar.
+3. **El compilador de prompt tiene revisión propia y entra al fingerprint**, igual que el contrato y el intent: dos
+   textos distintos para el mismo brief son dos pedidos distintos y no pueden compartir approval.
+4. **El peso ordena y estructura; nunca se imprime.**
+5. **El rol del slot informa el texto compilado.** Tres referencias con rol `style` producen texto distinto de tres
+   con rol `subject`, aunque el canal de imagen sea idéntico.
+6. **`native-parameter` gana siempre que exista**, y el mecanismo por control se declara **por ruta con evidencia**
+   del contrato oficial del proveedor, no por herencia del default. El prompt es el último recurso, no el primero.
+
+### Lo que este delta NO decide
+
+**Cuál dialecto de compilación es mejor para cada ruta.** Esa pregunta no se responde por diseño: se mide. Globe ya
+tiene el Evaluation Harness (`TASK-1458`) con golden briefs, rubrics y la separación entre `objectiveChecks`
+automáticos y `humanCriteria` declarados, más la regla de que el harness **nunca elige un ganador creativo solo**.
+Un compilador de prompt versionado es precisamente el objeto que ese harness existe para evaluar, y es lo que hace
+sostenible llegar al modelo número veinte sin que cada uno traiga su propia heurística sin medir.
+
+### Alternativas rechazadas
+
+1. **Dejar la compilación global y parchear por proveedor dentro de ella.** Rechazado: reintroduce el `switch` por
+   nombre de modelo que toda esta decisión existe para eliminar, y en el peor lugar — el único eje que todas las
+   rutas consumen.
+2. **Compilar en el cliente según el modelo elegido.** Rechazado por la regla vigente: el browser nunca concatena
+   instrucciones vendor-specific ni decide payloads. Además filtraría dialecto de proveedor a la proyección
+   browser-safe.
+3. **Un cockpit de controles en la UI, uno por cada control declarado.** Rechazado: los modelos no responden
+   linealmente a taxonomías, responden a lenguaje. El descriptor sirve para saber qué ofrecer, qué validar y qué
+   rechazar antes de gastar — no para convertir el composer en una cabina.
+
+### Consecuencias
+
+El puerto ya existe, así que el cambio es de **firma y de ubicación de la implementación**, no arquitectura nueva:
+`compile(raw)` pasa a `compile(raw, routeContract)` y la implementación por defecto preserva el texto actual, de
+modo que ninguna ruta cambia su salida al migrar. Lo que cambia después es por ruta, con su propia revisión, su
+evaluación y su rollout. El costo real está en el punto 6: revisar las 13 rutas que heredan mecanismos sin
+evidencia y declararlos contra el contrato oficial de cada proveedor.
