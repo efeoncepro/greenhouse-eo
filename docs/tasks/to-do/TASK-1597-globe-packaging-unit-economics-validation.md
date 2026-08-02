@@ -1,5 +1,11 @@
 # TASK-1597 — Globe Packaging and Unit Economics Validation
 
+## Delta 2026-08-02 — Cost-to-serve desde Cost Subledger
+
+Esta policy consume hechos técnicos de `TASK-1478` y el canonical cost reader para calcular cost-to-serve y margins
+por lane. No crea un ledger financiero en Globe ni trata Studio Credits como costo real. Pricing/packaging conserva
+su owner; Finance Core conserva cuentas, events y reconocimiento.
+
 ## Status
 
 - Lifecycle: `to-do`

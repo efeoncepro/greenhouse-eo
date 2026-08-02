@@ -1,3 +1,10 @@
+## Delta 2026-08-02 — Fuente laboral del Cost Subledger, no modelo universal
+
+Esta task produce costo laboral `actual` y policies `standard` consumibles por el Cost Subledger. Los porcentajes,
+beneficios y provisiones deben quedar versionados por jurisdicción, modalidad y vigencia; Chile no puede ser un
+default global silencioso. MLCM permanece como método de member loaded cost, mientras Finance Core aporta entidad,
+período, money/FX, dimensiones y event provenance.
+
 ## Delta 2026-04-28 — Subordinada al programa Member Loaded Cost Model
 
 Esta task ahora se mapea al programa canónico definido en `docs/architecture/GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1.md`. El output (provisiones laborales agregadas al fully-loaded cost) **alimenta el bucket `payroll_cost_clp` de `member_loaded_cost_per_period`** (Fact 3 del modelo dimensional, §2.3 de MLCM_V1). El scope técnico de esta task NO cambia. Sigue siendo **prerequisito hard del gate Reliable Actual Foundation** y, en el nuevo contexto, prerequisito de Fase 2 (Materializers) del roadmap MLCM_V1 §11.

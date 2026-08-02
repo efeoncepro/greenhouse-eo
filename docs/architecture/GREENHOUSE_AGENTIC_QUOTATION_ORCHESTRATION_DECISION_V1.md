@@ -9,7 +9,7 @@
 - **Reversibility:** two-way-but-slow
 - **Confidence:** medium
 - **Validated as of:** 2026-08-02
-- **Related:** [live cost basis and unobserved profiles](../audits/finance/GREENHOUSE_LIVE_COST_BASIS_AND_UNOBSERVED_PROFILE_PRICING_2026-08-02.md), [costing methods deep review](../audits/finance/GREENHOUSE_COSTING_METHODS_DEEP_REVIEW_2026-08-02.md), [Tender Proposal Studio](GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md)
+- **Related:** [Finance Core accounting foundation — ADR-021](GREENHOUSE_FINANCE_CORE_ACCOUNTING_FOUNDATION_DECISION_V1.md), [live cost basis and unobserved profiles](../audits/finance/GREENHOUSE_LIVE_COST_BASIS_AND_UNOBSERVED_PROFILE_PRICING_2026-08-02.md), [costing methods deep review](../audits/finance/GREENHOUSE_COSTING_METHODS_DEEP_REVIEW_2026-08-02.md), [Tender Proposal Studio](GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md)
 
 ## Context
 
@@ -52,6 +52,25 @@ Quote/API/MCP/Nexa consumers
 
 Esta decisión es una dirección arquitectónica propuesta. No autoriza todavía autonomía de emisión, cambios de schema, nuevas tools MCP, escritura directa del agente ni modificación del pricing engine.
 
+### Dependencia sobre Finance Core y Cost Subledger
+
+El orquestador no debe crear su propia base de costos. `ADR-021` gobierna el orden:
+
+```text
+Finance Core accounting-ready
+  → Live Cost Subledger
+  → Agentic quotation recommendation
+  → Proposal economic package / governed writes / Q2C
+```
+
+El primer slice de Finance Core debe ser deliberadamente delgado: plan de cuentas, entidad/ledger, períodos,
+money/FX, dimensiones, `EconomicEvent` y `JournalCandidate`, sin posting real. Sobre él nace el Cost Subledger con
+actual/standard/modeled/forecast, vigencias, invalidación y snapshots. Solo entonces el agente puede recomendar una
+cotización usando una base viva y reconciliable con la futura contabilidad general.
+
+Esto no obliga a terminar el libro mayor antes de cotizar. Obliga a que los hechos de costos nazcan con las claves,
+semántica y provenance necesarias para que General Accounting los consuma después sin una migración conceptual.
+
 ### Límite headless y madurez actual
 
 El cotizador objetivo es **headless**: la interpretación, el cálculo, las políticas, el versionado y la
@@ -70,12 +89,18 @@ La madurez verificada al 2026-08-02 es:
 | Kernel determinista `pricing-engine-v2` | Operativo | UI y consumers programáticos pueden reutilizar el mismo cálculo. |
 | Simulación y authoring first-party por API Platform/HTTP | Operativo | Greenhouse puede calcular y crear drafts/versiones mediante commands canónicos y sesión autorizada. |
 | Consumer de ecosistema | Operativo en lectura/simulación | No autoriza writes externos ni expone el cost stack completo. |
+| MCP local de Greenhouse | Operativo en `search_services` + `quote_price`, read-only | Sirve consumers autenticados del runtime Greenhouse; no equivale al gateway federado público. |
+| Gateway federado `mcp.efeonce.org` | Operativo sin provider de cotizaciones | Requiere un provider read/recommend delgado; acceso B2B externo además espera identidad/entitlements de `TASK-1631`. |
 | Interpretación agentic `QuoteIntent → ServicePlan → CostCard` | Propuesto | Todavía no existe el orquestador completo ni su golden set de promoción. |
 | Writes de agentes externos o tools MCP de cotización | No implementados ni autorizados | Requieren contracts, grants, evals y aprobación posteriores. |
 | Emisión o envío autónomo client-facing | No autorizado | Continúa bajo confirmación humana y policy comercial. |
 
 Por tanto, Greenhouse ya es **headless-capable y parcialmente headless-operativo**, pero todavía no es una
 plataforma de cotización agentic headless completa.
+
+El provider MCP federado futuro no puede vivir dentro del gateway como lógica de negocio. Debe adaptar API Platform
+y `TASK-609`, aplicar redaction/capabilities y devolver read/recommend. El gateway conserva transporte, OAuth y
+federación; Finance/Commercial conservan datos, policy y cálculo.
 
 ### Moneda de cotización y unidades indexadas
 
@@ -312,10 +337,11 @@ La regla de sincronización es:
 - cualquier ajuste posterior crea una nueva versión de cotización, paquete y artefactos derivados;
 - PDF, Excel, deck y cotización formal son N proyecciones del mismo paquete congelado.
 
-La contabilidad general, el plan de cuentas y el subledger financiero continúan como una línea fundacional
-necesaria para registrar lo realizado. No bloquean el primer slice read-only de costos, pero sí son
-necesarios para cerrar quote-to-cash, reconocer ingresos/gastos y comparar estándar versus real sin
-reconciliaciones manuales.
+La contabilidad general no necesita estar completa para iniciar costos, pero la foundation accounting-ready sí debe
+nacer antes o dentro del primer slice: entidad/ledger, plan de cuentas versionado, períodos, money/FX, dimensiones,
+eventos económicos y contratos de diario. Cost Accounting es la primera vertical sobre esa base; General Accounting
+la extiende después con posting, close y statements. De este modo se puede empezar a costear sin esperar el libro
+mayor y sin construir un subledger que luego haya que migrar.
 
 ## Runtime state machine
 
@@ -514,27 +540,32 @@ Esta propuesta no autoriza todavía:
 
 El orden reduce riesgo económico y entrega valor antes de abrir writes agentic:
 
-1. **Vertical read-only/recommendation.** Implementar `QuoteIntent`, resolución de perfiles —incluido
-   cualquier rol nunca contratado—, `ServicePlan`, llamada al kernel y `CostCard`; validarlo con el golden
-   set, sin escritura ni emisión client-facing.
-2. **Cost readiness vivo.** Hacer explícitos coverage, freshness, confidence, vigencias y eventos de
+1. **Finance Core reference foundation.** Definir y materializar entidad/ledger, conceptos y plan de cuentas,
+   períodos, money/FX/UF y dimensiones; sin posting real.
+2. **Economic Event + journal-ready shadow.** Separar documento, devengo, caja y posting; modelar idempotencia,
+   causation, supersede/reversal, eligibility y `JournalCandidate` balanceado, todavía sin asientos reales.
+3. **Cost Subledger vivo.** Hacer explícitos actual/standard/modeled/forecast, coverage, freshness, confidence,
+   vigencias y eventos de
    invalidación para sueldos, licencias, tools, providers, FX, overhead y perfiles modelados. Un cambio
    afecta drafts y forecasts; nunca reescribe snapshots emitidos.
-3. **Frontera Proposal ↔ Pricing.** Introducir `ProposalDeliverablePlan` y separar
+4. **Vertical read-only/recommendation.** Implementar `QuoteIntent`, resolución de perfiles —incluido
+   cualquier rol nunca contratado—, `ServicePlan`, llamada al kernel y `CostCard`; validarlo con el golden
+   set, sin escritura ni emisión client-facing.
+5. **Frontera Proposal ↔ Pricing.** Introducir `ProposalDeliverablePlan` y separar
    `BidEconomicAssessment` de `QuotationVersion`. Corregir la obligación universal de `quote_id` post-GO
    para que dependa de `commercial_commitment` y de los requisitos de la fase.
-4. **Paquete económico completo.** Congelar header, versión, líneas, impuestos, FX, términos,
+6. **Paquete económico completo.** Congelar header, versión, líneas, impuestos, FX, términos,
    requerimientos, aprobaciones y hash. El snapshot parcial de la cabecera no es cierre suficiente.
-5. **Un modelo, N salidas.** Derivar `PricingFull`, PDF, Excel y módulos embebidos desde
+7. **Un modelo, N salidas.** Derivar `PricingFull`, PDF, Excel y módulos embebidos desde
    `ProposalEconomicProjection`, con un verificador de paridad. SKY es el primer vertical dorado para el
    modo combinado.
-6. **Writes headless gobernados.** Solo después de evals y observabilidad, habilitar creación de drafts o
+8. **Writes headless gobernados.** Solo después de evals y observabilidad, habilitar creación de drafts o
    versiones a API/MCP/agents mediante el mismo command, con scopes, idempotencia y confirmación humana.
-7. **Cierre económico real.** Conectar won → quote-to-cash → billing/collections/accounting y alimentar
+9. **Cierre económico real.** Conectar won → quote-to-cash → billing/collections/accounting y alimentar
    actual-vs-standard para que el sistema de costos aprenda de nómina, gastos, proveedores y delivery real.
 
-La primera task debe cubrir únicamente los puntos 1 y la instrumentación mínima del 2. Los puntos 3–7
-son tasks dependientes; no deben mezclarse en una implementación monolítica.
+La primera task cubre únicamente el punto 1. Cost Subledger, recomendación agentic, Proposal, writes y Q2C son build
+units dependientes; no deben mezclarse en una implementación monolítica.
 
 ## Revisit when
 

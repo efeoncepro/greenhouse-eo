@@ -1,5 +1,11 @@
 # TASK-1478 — Globe Shadow Calibration and Unit Economics
 
+## Delta 2026-08-02 — Fuente técnica de costo para Greenhouse
+
+Globe conserva provider/model/run y costo técnico como autoridad. Esta task debe exponer un reader versionado por
+operación, ruta/provider/model, workspace, cliente/servicio y período para que el Cost Subledger lo consuma. Studio
+Credits son una unidad comercial/control, no costo contable ni asiento.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

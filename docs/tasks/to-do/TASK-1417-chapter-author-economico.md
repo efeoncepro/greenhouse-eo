@@ -1,5 +1,11 @@
 # TASK-1417 — Chapter-author económico: la lámina `pricing` desde el motor de pricing (nunca desde el LLM)
 
+## Delta 2026-08-02 — Consumer de ProposalEconomicProjection
+
+El author ya no debe leer una simulación suelta como contrato final. Consumirá una `ProposalEconomicProjection`
+derivada de `QuotationVersion + ProposalEconomicPackage` congelados. Mantiene el invariante de que el LLM no toca
+números, pero tampoco recalcula pricing ni recibe loaded cost/margin. SKY sigue siendo golden del modo combinado.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

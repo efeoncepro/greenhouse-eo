@@ -1,4 +1,4 @@
-# EPIC-012 — Finance Five-Capabilities Operating System
+# EPIC-012 — Finance Core + Five-Capabilities Operating System
 
 ## Status
 
@@ -15,7 +15,7 @@
 
 ## Summary
 
-Coordina la evolución de Finance hacia cinco capacidades canónicas: `Treasury & Payments`, `Accounting Semantics`, `Management Accounting`, `Close Governance` y `Planning & Control Tower`. El objetivo es que Finance deje de ser un conjunto de dashboards y readers parcialmente correctos, y pase a ser un sistema financiero-operativo auditable, explicable y apto para cerrar períodos con confianza. Donde exista ambigüedad contable o financiera, el sistema puede usar IA como copiloto de revisión y orquestación, pero nunca como source-of-truth operativo sin reglas, aprobación y audit trail.
+Coordina la evolución de Finance sobre un `Finance Core accounting-ready` compartido y cinco capacidades canónicas: `Treasury & Payments`, `Accounting Semantics`, `Management Accounting`, `Close Governance` y `Planning & Control Tower`. La contabilidad de costos es la primera vertical operativa; plan de cuentas, entidades, períodos, monedas/FX, dimensiones, eventos económicos y contratos de diario nacen desde el inicio para que la contabilidad general se agregue después por extensión, no mediante otro modelo o una migración semántica. Donde exista ambigüedad contable o financiera, el sistema puede usar IA como copiloto de revisión y orquestación, pero nunca como source-of-truth operativo sin reglas, aprobación y audit trail.
 
 ## Why This Epic Exists
 
@@ -28,6 +28,12 @@ La auditoría `FINANCE_DOMAIN_AUDIT_2026-05-03` confirmó una separación clara:
 
 Este epic existe para convertir esas piezas en un sistema coherente y ejecutable.
 
+La auditoría de costos y cotización del 2026-08-02 agregó una necesidad load-bearing: Efeonce no puede seguir
+cotizando sin una base de costos viva, pero tampoco debe construir esa base como un módulo aislado que luego haya
+que migrar al incorporar plan de cuentas y contabilidad general. `ADR-021` fija la secuencia: foundation contable
+mínima compartida, Cost Subledger vivo como primer vertical, cotización agentic read-only y extensión posterior
+hacia Q2C y General Accounting.
+
 ## Outcome
 
 - Finance opera con cinco capacidades explícitas y no con una bolsa de funcionalidades mezcladas.
@@ -36,6 +42,14 @@ Este epic existe para convertir esas piezas en un sistema coherente y ejecutable
 - La IA acelera análisis de ambigüedad, propuestas de reglas y priorización de revisión, pero las métricas finales dependen de resoluciones determinísticas/versionadas.
 - Cada métrica visible de Finance declara source reader, lente contable, freshness, close status y degradación.
 - Budget, variance y forecast se construyen solo sobre actuals confiables.
+- Finance Core conserva plan de cuentas versionado, entidad/ledger, períodos, money/FX, dimensiones, eventos
+  económicos y contratos de posting reutilizables por costos y contabilidad general.
+- Cost Accounting distingue `actual`, `standard`, `modeled` y `forecast`; una estimación o cotización nunca se
+  convierte en asiento por inferencia.
+- Un cambio de sueldo, licencia, provider, herramienta o FX actualiza drafts y forecasts futuros sin reescribir
+  snapshots ya emitidos.
+- Pricing, Proposal Studio, Q2C, Globe y agentes/API/MCP consumen los mismos readers/commands y no crean ledgers o
+  motores económicos paralelos.
 
 ## Architecture Alignment
 
@@ -46,9 +60,37 @@ Este epic existe para convertir esas piezas en un sistema coherente y ejecutable
 - `docs/architecture/GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1.md`
 - `docs/architecture/GREENHOUSE_PAYMENT_ORDERS_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_FINANCE_CORE_ACCOUNTING_FOUNDATION_DECISION_V1.md`
+- `docs/architecture/GREENHOUSE_AGENTIC_QUOTATION_ORCHESTRATION_DECISION_V1.md`
+- `docs/architecture/GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md`
 - `docs/audits/finance/FINANCE_DOMAIN_AUDIT_2026-05-03.md`
+- `docs/audits/finance/GREENHOUSE_FINANCE_COST_QUOTING_AUDIT_2026-08-02.md`
+- `docs/audits/finance/GREENHOUSE_MLCM_FIT_AND_COST_ACCOUNTING_START_2026-08-02.md`
+- `docs/audits/finance/GREENHOUSE_LIVE_COST_BASIS_AND_UNOBSERVED_PROFILE_PRICING_2026-08-02.md`
 
 ## Capability Model
+
+### Shared substrate — Finance Core accounting-ready
+
+No es una sexta capability visible ni un segundo módulo. Es el contrato común que evita que Treasury,
+Accounting Semantics, Management Accounting y una futura General Accounting modelen el mismo hecho de formas
+incompatibles.
+
+Owner of:
+
+- legal entity, ledger scope y accounting periods
+- account concepts, plan de cuentas versionado y mappings externos
+- money nativo, funcional, contractual, de liquidación y reporting; FX/UF versionados
+- dimensiones financieras separadas de las cuentas
+- envelope canónico de evento económico y documento fuente
+- `JournalCandidate`, posting eligibility, audit, supersede y reversal contracts
+
+Hard boundary:
+
+- Cost Subledger puede materializar `actual`, `standard`, `modeled` y `forecast`.
+- Solo hechos `actual` reconocidos pueden llegar a `eligible`, siempre mediante una posting rule y aprobación.
+- Standard, model, forecast, quote y proposal snapshots son `non_posting`.
+- Nubox/SII u otro sistema conserva el rol fiscal/legal hasta un cutover separado y demostrado.
 
 ### 1. Treasury & Payments
 
@@ -154,6 +196,28 @@ Primary tasks:
 
 ## Execution Waves
 
+### Foundation F0 — Accounting-ready, sin abrir todavía el GL legal
+
+- Mapear las primitives actuales antes de crear schema nuevo.
+- Definir entidad/ledger, conceptos y plan de cuentas versionado, períodos, money/FX, dimensiones, `EconomicEvent`
+  y `JournalCandidate`.
+- Crear únicamente migrations aditivas necesarias para que costos nazca sobre esos contracts.
+- Mantener posting, estados legales y sustitución de Nubox/SII fuera de este slice.
+
+### Foundation F1 — Cost Subledger vivo
+
+- Integrar labor, tools, providers, direct costs, overhead, pass-through, rights y Globe.
+- Distinguir actual/standard/modeled/forecast con vigencia, provenance, coverage, freshness y confidence.
+- Invalidar drafts y forecasts cuando cambia una fuente; preservar snapshots emitidos.
+- Reusar MLCM para member loaded cost sin convertirlo en el modelo universal de todos los costos.
+
+### Vertical F2 — Cost-to-quote y propuesta económica
+
+- Habilitar primero `QuoteIntent → ProfileResolution → ServicePlan → CostCard` en modo read-only/recommendation.
+- Congelar después `QuotationVersion` + `ProposalEconomicPackage`; derivar PDF, Excel, deck y cotización formal de
+  una misma proyección.
+- Mantener emisión, envío y excepciones de margen bajo aprobación humana.
+
 ### Wave 0 — Freeze Decision Quality
 
 - Keep April 2026 explicitly provisional / restatement-needed.
@@ -188,6 +252,47 @@ Primary tasks:
 
 ## Child Tasks
 
+### Planned build units — IDs pendientes de confirmación del operador
+
+- `TASK-1633` candidate — Finance Core Reference Foundation: account concepts/CoA, entity/ledger, periods,
+  dimensions y money/FX/UF, reutilizando `TASK-224` y auditando la foundation real de `TASK-725`.
+- `TASK-1634` candidate — Economic Event + Journal-Ready Shadow Contract: documento/devengo/caja/posting,
+  idempotencia, causation, supersede/reversal, eligibility y reconciliación shadow; sin posting real.
+- `TASK-1635` candidate — Live Cost Subledger + Canonical Cost Reader: actual/standard/modeled/forecast, labor,
+  tools, providers, overhead, pass-through, rights y Globe con vigencia, invalidation, coverage, freshness,
+  confidence y snapshots.
+- `TASK-1636` candidate — Universal Profile Resolution: member actual, role blended/modeled/proxy y
+  `manual_pending` para cualquier perfil nunca contratado, sin crear SKUs automáticamente.
+- `TASK-1637` candidate — CostCard + Quotation Cost Baseline: costo determinista por línea/work package,
+  contribution/fully-loaded, units, scenarios, FX, margins, provenance y baseline inmutable por versión.
+- `TASK-1638` candidate — Costing & Quotation Golden Set: replay y paridad Portal/Nexa/API/MCP para perfiles
+  conocidos/desconocidos, servicios, tools, Globe, USD/CLP/UF, stale data y margin floor.
+- `TASK-1639` candidate — Immutable Quotation Version + Economic Package: snapshot append-only de header, lines,
+  costs/prices, taxes, currencies, FX/UF, terms, approvals, provenance y hash.
+- `TASK-1642` candidate — Efeonce MCP Quotation Provider Read/Recommend: adapter federado sobre API Platform y
+  `TASK-609`, sin pricing propio ni writes; clientes externos esperan `TASK-1631`.
+- Agentic quotation vertical: ampliar `TASK-609` en vez de crear otro asistente; debe consumir `TASK-1635…1638`
+  en modo read-only/recommendation antes de cualquier write externo.
+
+La reserva de IDs y creación de archivos `TASK-###` se hace sólo después del checkpoint de task planning. El mapa
+final debe actualizar, no duplicar, `TASK-609`, `TASK-1206`, `TASK-1417`, `TASK-1607` y las tasks de FX/quote/tax.
+`TASK-1211` y `TASK-1212` ya poseen simulación y autoría/emisión canónicas; cualquier exposición futura a agentes
+externos debe adaptar esos commands, no crear otro motor o write path.
+`EPIC-029` registra como dependientes `TASK-1640/1641/1643` candidates para composición económica, finalización de
+artefactos y el vertical dorado SKY; no pertenecen al Cost Subledger.
+
+### Backlog corrections before execution
+
+- Reconciliar el duplicado físico de `TASK-174` entre `to-do` y `complete`; no ejecutar dos copias.
+- Auditar `TASK-725`: lifecycle `complete` y `Status real: Diseño` no permiten asumir sin evidencia qué parte de
+  legal entity está realmente materializada.
+- Corregir referencias MLCM stale/colisionadas a `TASK-705/708/709`; esos IDs no representan el programa de costos
+  descrito por la spec.
+- Reconciliar metadata/acceptance criteria de `TASK-481/482`; en `TASK-482`, el probe debe consumir
+  `service_attribution_facts`, no la tabla inexistente `service_attribution`.
+- Tratar `TASK-476…483` como foundation comercial implementada pero no como live cost basis operativamente cerrada;
+  la auditoría 2026-08-02 demostró cobertura y provenance parciales.
+
 - `TASK-777` — first execution task; fixes expense distribution lanes/shared pools and adds an AI-assisted review copilot for ambiguous cases
 - `TASK-713` — period closing workflow
 - `TASK-393` — restatements and reclassification governance
@@ -218,6 +323,12 @@ Primary tasks:
 - `src/lib/finance/reconciliation-intelligence/` — existing guardrailed Finance AI pattern
 - `src/lib/finance/ai/` — existing prompt/version/hash Finance AI utilities
 - `docs/audits/finance/FINANCE_DOMAIN_AUDIT_2026-05-03.md`
+- `TASK-609` — AI Quote Draft Assistant; debe convertirse en el owner de la vertical agentic de recomendación
+- `TASK-1206` — comando canónico de cierre Q2C; consumer posterior de events/posting eligibility
+- `TASK-1210` — rollout MXN/CLF del Finance Core
+- `TASK-1417` — author económico de Proposal Studio; consumer de una proyección económica congelada
+- `TASK-1607` — recruitability y factibilidad económica para perfiles nunca contratados
+- `EPIC-029` — Proposal Studio; owner del composition/render client-facing, no del cálculo económico
 
 ## Exit Criteria
 
@@ -230,10 +341,21 @@ Primary tasks:
 - [ ] Core Finance dashboards use document readers for accrual and normalized payment readers for cash.
 - [ ] Finance metrics declare source, accounting lens, freshness, close status and degradation.
 - [ ] Budget/variance/forecast are built on closed or explicitly provisional actuals.
+- [ ] Finance Core tiene un plan de cuentas versionado por entity/ledger y conceptos de grupo sin usar dimensiones
+  como cuentas.
+- [ ] Los subledgers comparten entidad, período, money/FX, dimensiones y `EconomicEvent`.
+- [ ] Existe contrato de `JournalCandidate` y posting eligibility, aunque posting permanezca apagado.
+- [ ] Cost Subledger separa actual/standard/modeled/forecast y conserva provenance, vigencia, coverage, freshness y
+  confidence por línea.
+- [ ] Un cambio de costo fuente invalida drafts/forecast afectados y nunca muta una cotización emitida.
+- [ ] Pricing, Proposal Studio, Q2C, Globe y consumers headless no poseen cálculos o ledgers paralelos.
+- [ ] La futura General Accounting puede agregar posting/close/statements sobre la misma foundation sin migrar ni
+  reinterpretar el Cost Subledger.
 
 ## Non-goals
 
-- Opening full legal double-entry accounting inside Greenhouse.
+- Implementar en el primer slice un libro mayor legal completo, posting, estados estatutarios o sustitución de ERP.
+- Tratar la foundation accounting-ready como si ya fuera contabilidad general operativa.
 - Replacing Nubox/SII fiscal systems as legal source of truth.
 - Rebuilding all Finance UI in one large redesign.
 - Implementing planning/forecast before actuals and close governance are trustworthy.
@@ -244,3 +366,10 @@ Primary tasks:
 Created after `FINANCE_DOMAIN_AUDIT_2026-05-03` and user decision to frame Finance around five capabilities instead of a single overloaded module.
 
 Updated same day to incorporate AI as an advisory Finance copilot for ambiguous accounting/distribution cases. Runtime authority remains deterministic, versioned and auditable.
+
+## Delta 2026-08-02
+
+El operador confirmó que Cost Accounting debe comenzar primero, pero nacer con las bases necesarias para que General
+Accounting sea una extensión. Se acepta `ADR-021`, se agrega `Finance Core accounting-ready` como sustrato debajo
+de las cinco capabilities y se conecta el programa con agentic quotation, Proposal Studio, Q2C, multimoneda y
+Globe. Este delta no declara runtime implementado ni autoriza posting.

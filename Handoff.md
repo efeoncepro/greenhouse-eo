@@ -2,10 +2,10 @@
 
 Historia anterior: [Handoff.archive.md](Handoff.archive.md).
 
-## Cotización headless y contabilidad de costos — decisión propuesta (2026-08-02)
+## Finance Core + Cost Accounting + cotización agentic — planificación (2026-08-02)
 
-- [ADR propuesto](docs/architecture/GREENHOUSE_AGENTIC_QUOTATION_ORCHESTRATION_DECISION_V1.md), sin runtime.
-  Siguiente paso: aceptarlo y abrir la task read-only `QuoteIntent → ServicePlan → CostCard` + golden set.
+- [ADR-021](docs/architecture/GREENHOUSE_FINANCE_CORE_ACCOUNTING_FOUNDATION_DECISION_V1.md) aceptado; `EPIC-012`
+  es owner. Candidatas `TASK-1633…1643` esperan confirmación; sin runtime ni tasks nuevas.
 
 ## TASK-1504 — Gemini Omni: despliegue y saga activada; canary pendiente (2026-08-02)
 

@@ -35,6 +35,8 @@ El Studio creció como un programa multi-task sin épica ancla: 8 tasks completa
 - `docs/architecture/GREENHOUSE_ARTIFACT_RENDER_PIPELINE_V1.md` — render gobernado (`artifact-worker`)
 - `docs/architecture/agent-invariants/COMMERCIAL_TENDERS_AGENT_INVARIANTS.md` — los 3 principios raíz + invariantes por sub-sistema
 - `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` — cada capability nace con contrato gobernado (UI/Nexa/MCP por construcción)
+- `docs/architecture/GREENHOUSE_FINANCE_CORE_ACCOUNTING_FOUNDATION_DECISION_V1.md` — la económica consume el Cost Subledger y Finance Core; no crea cuentas, costos ni journal propio
+- `docs/architecture/GREENHOUSE_AGENTIC_QUOTATION_ORCHESTRATION_DECISION_V1.md` — separa assessment interno, quotation version, package congelado y proyecciones
 - `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md` — el dominio es candidato a package bajo `EPIC-027`; trabajo nuevo nace extraction-ready
 
 ## Child Tasks
@@ -47,6 +49,24 @@ El Studio creció como un programa multi-task sin épica ancla: 8 tasks completa
 - `TASK-1421` — F1 canónica: análisis + admisibilidad del RFP (requisito-set + matriz de admisibilidad + fit score → gate humano)
 
 Los chapter-authors restantes (creativo, social media, web/CRM, HubSpot, contenido) se crean como tasks hijas nuevas **cuando su fuente de datos canónica exista** — un author sin fuente estructurada real sería un stub especulativo (regla de robustez del task-planner). El molde para crearlos: la costura "Un chapter-author nuevo" del companion `proposal-studio-runtime.md`.
+
+`TASK-1417` sigue siendo el owner del chapter client-facing, pero debe consumir una
+`ProposalEconomicProjection` derivada de una versión/paquete económico congelado. No debe leer loaded cost,
+recalcular precio ni transformarse en el owner del package. La foundation y el Cost Subledger pertenecen a
+`EPIC-012`; este epic posee composición, verificación y render de la salida económica.
+
+### Planned cross-epic build units — IDs pendientes de confirmación
+
+- `TASK-1640` candidate — Proposal Economic Composition & Gates: `ProposalDeliverablePlan`,
+  `BidEconomicAssessment`, `ProposalEconomicProjection` y requerimiento de quote según compromiso/fase, no de
+  forma universal post-GO. Depende del economic package de `EPIC-012`.
+- `TASK-1641` candidate — Proposal Artifact Review & Finalization: command idempotente y auditable
+  `draft → in_review → final`, capabilities, evidence y readback; puede avanzar sin esperar Finance Core.
+- `TASK-1643` candidate — SKY Golden Vertical & Canonical Closure: costo vivo, quote/package congelado,
+  composición técnica/económica, paridad deck/PDF/Excel, artifact final, gates humanos y handoff Q2C.
+
+La reserva de estos IDs y la creación de sus archivos requieren el checkpoint del task planner. No reemplazan
+`TASK-1416…1421`; cierran gaps de package/composición/finalización descubiertos contra el runtime actual.
 
 ## Existing Related Work
 

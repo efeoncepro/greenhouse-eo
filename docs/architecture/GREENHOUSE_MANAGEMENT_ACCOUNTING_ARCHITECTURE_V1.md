@@ -6,6 +6,28 @@
 
 ---
 
+## Delta 2026-08-02 — Finance Core accounting-ready y Cost Subledger primero
+
+`ADR-021` acepta una precisión que supersede únicamente el boundary negativo de esta spec: Greenhouse sí debe
+crear desde ahora la foundation de entidad/ledger, plan de cuentas versionado, períodos, money/FX, dimensiones,
+eventos económicos y contratos de diario. Eso **no** convierte a Management Accounting en owner del plan de
+cuentas ni declara un libro legal operativo.
+
+La separación vigente queda así:
+
+- `Finance Core` posee la foundation accounting-ready.
+- `Management Accounting / Cost Accounting` es la primera vertical y posee actual/standard/modeled/forecast,
+  atribución, snapshots y variance.
+- una futura `General Accounting` agrega posting rules, journals, close y statements sobre la misma foundation.
+- Nubox/SII conservan su rol fiscal/legal hasta un cutover separado.
+
+Por tanto, siguen siendo correctas las reglas posteriores que dicen que Management Accounting no debe poseer plan
+de cuentas ni ledger legal. Queda supersedida la lectura de que toda foundation contable debía diferirse: nace
+ahora para evitar migrar o reinterpretar Cost Accounting después. Canon:
+[GREENHOUSE_FINANCE_CORE_ACCOUNTING_FOUNDATION_DECISION_V1.md](GREENHOUSE_FINANCE_CORE_ACCOUNTING_FOUNDATION_DECISION_V1.md).
+
+---
+
 ## ⚠️ Delta 2026-04-28 — Spec parcialmente supersedida por MEMBER_LOADED_COST_MODEL_V1
 
 A partir del 2026-04-28, **`GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1.md` es la spec raíz del modelo económico Greenhouse**. Esta spec (Management Accounting V1) queda **parcialmente supersedida**: conserva su scope de gobernanza enterprise, pero las decisiones canónicas del modelo de costos pasan a MLCM_V1.

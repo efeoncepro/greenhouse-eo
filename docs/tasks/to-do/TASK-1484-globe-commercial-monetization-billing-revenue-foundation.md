@@ -1,5 +1,11 @@
 # TASK-1484 — Globe Commercial Monetization, Billing and Revenue Foundation
 
+## Delta 2026-08-02 — Billing/revenue sobre Finance Core
+
+La monetización de Globe debe producir documentos, settlement y economic events compatibles con Finance Core y
+Q2C. El credits ledger sigue siendo owner de credits; no se convierte en cuentas por cobrar, revenue ledger ni GL.
+Posting, recognition y mappings contables permanecen en Finance.
+
 ## Delta 2026-07-26 — el carril interno de fondeo ya existe, y su trigger BLOQUEA el top-up de cliente
 
 `TASK-1566` entregó el carril gobernado de fondeo **interno** (`kind: 'internal'`). Buena parte es

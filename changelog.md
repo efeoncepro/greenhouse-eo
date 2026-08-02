@@ -9,6 +9,9 @@
 
 ## 2026-08-02 — Cotización headless y composición opcional de Proposal Studio
 
+- ADR-021 quedó aceptado: Finance Core nace con plan de cuentas versionado, entidad/ledger, períodos, money/FX/UF,
+  dimensiones, eventos económicos y contratos de diario; Cost Subledger es la primera vertical y General
+  Accounting extiende después la misma foundation. No se autorizó posting, migraciones ni sustitución de Nubox/SII.
 - El ADR propuesto de cotización agentic define el límite headless: kernel determinista compartido,
   consumidores UI/Nexa/API/MCP/agentes y autonomía graduada sin bypass de identidad, approval ni auditoría.
 - Proposal Studio distingue evaluación económica interna, versión de cotización, paquete económico congelado
@@ -17,9 +20,11 @@
 - Se registraron como gaps —no como capacidad implementada— el `quote_id` universal post-GO, el snapshot
   parcial de cabecera, el cross-check económico y la proyección de render incompletos. La skill de licitaciones
   quedó alineada en Codex y Claude.
-- El orden propuesto comienza con recomendación read-only y cost readiness vivo; sigue con integración de
-  Proposal Studio, freeze completo, salidas N desde una proyección, writes headless gobernados y cierre
-  quote-to-cash/actual-vs-standard. No hubo cambios de schema ni runtime.
+- El orden se corrige a Finance Core reference → Economic Event/journal shadow → Live Cost Subledger → Profile
+  Resolution/CostCard/golden set → `TASK-609` read-only → economic package/Proposal → MCP/provider y writes
+  gobernados → Q2C/actual-vs-standard → General Accounting. No hubo cambios de schema ni runtime.
+- `EPIC-012` y `EPIC-029` registran candidatos `TASK-1633…1643`; los archivos/IDs no se crean hasta el checkpoint
+  de confirmación del task planner.
 
 ## 2026-08-02 — Gemini Omni: evidencia legal corregida y checkpoint durable
 

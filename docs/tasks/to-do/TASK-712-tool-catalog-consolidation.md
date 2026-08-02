@@ -1,5 +1,11 @@
 # TASK-712 — Tool Catalog Consolidation: provisioning, cost models, lifecycle
 
+## Delta 2026-08-02 — Owner de convergencia antes del consumo
+
+La auditoría confirmó dos catálogos live y solapamiento con `TASK-710`. Esta task se mantiene: debe decidir y
+ejecutar la convergencia reuse-first hacia el catálogo canónico vigente, resolver vendor/lifecycle/unit semantics y
+dejar mappings compatibles. No implementa consumption facts ni reparto; esos pertenecen a `TASK-710`.
+
 ## Status
 
 | Campo | Valor |
@@ -10,7 +16,7 @@
 | Effort | `Medio` |
 | Status real | `Diseño` |
 | Domain | AI Tooling / Cost Intelligence |
-| Sequence | Paralelo a TASK-710, prerequisito de TASK-711 (UI) |
+| Sequence | Antes de TASK-710 y TASK-711 |
 
 ## Summary
 

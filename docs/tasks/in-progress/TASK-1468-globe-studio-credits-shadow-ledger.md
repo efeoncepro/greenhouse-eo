@@ -1,5 +1,11 @@
 # TASK-1468 — Globe Studio Credits Shadow Ledger
 
+## Delta 2026-08-02 — Credits no son costo ni contabilidad general
+
+El ledger de Studio Credits conserva rates, allocations, reservations y settlements de la unidad comercial de
+Globe. Greenhouse puede consumir receipts y costo técnico reconciliado mediante `TASK-1478`, pero no debe mapear un
+credit como gasto, revenue o journal line sin un evento económico y una regla contable independiente.
+
 ## Delta 2026-07-20 — reconciliar el seam de estimate con TASK-1502 (complete)
 
 TASK-1502 (complete) shippeó un **estimate previewable de PROVEEDOR-COSTO** (`globe.lab.experiment.estimate` +

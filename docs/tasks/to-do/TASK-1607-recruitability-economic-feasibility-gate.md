@@ -1,5 +1,11 @@
 # TASK-1607 — Recruitability and Economic Feasibility Gate
 
+## Delta 2026-08-02 — Consumer de Profile Resolution y CostCard
+
+Para perfiles nunca contratados, esta task consume `ProfileResolution` y `CostCard` aprobables del programa
+Finance/Cost Accounting. Sigue siendo owner de recruitability y del gate `go/re-scope/re-price/borrow/no-go`, pero
+no estima salarios, no crea role costs ni decide pricing por su cuenta.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -40,6 +46,8 @@ La presión competitiva puede reducir el presupuesto hasta hacer inviable reclut
 
 - `docs/business-models/EFEONCE_TALENT_ASSURANCE_ECONOMIC_GUARDRAILS_V1.md`
 - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_FINANCE_CORE_ACCOUNTING_FOUNDATION_DECISION_V1.md`
+- `docs/architecture/GREENHOUSE_AGENTIC_QUOTATION_ORCHESTRATION_DECISION_V1.md`
 - `docs/architecture/GREENHOUSE_TEAM_CAPACITY_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_EFEONCE_TALENT_ASSURANCE_ARCHITECTURE_V1.md`
 
@@ -47,7 +55,8 @@ La presión competitiva puede reducir el presupuesto hasta hacer inviable reclut
 
 ### Depends on
 
-- `TASK-1602`; Finance/CPQ, Workforce/ICO, Team Capacity, TalentDemand.
+- `TASK-1602`; Universal Profile Resolution; CostCard/canonical cost reader; Workforce/ICO, Team Capacity,
+  TalentDemand.
 
 ### Blocks / Impacts
 

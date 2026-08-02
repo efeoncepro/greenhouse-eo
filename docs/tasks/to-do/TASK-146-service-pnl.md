@@ -1,3 +1,10 @@
+## Delta 2026-08-02 — Consumer del Cost Subledger y atribución real
+
+`TASK-452` ya cerró la foundation de atribución. El bloqueo forward-going es el canonical cost reader y la
+adopción correcta de `service_attribution_facts`; Service P&L no vuelve a derivar costos ni fuerza `service_id`
+dentro de todos los facts MLCM. Consume actual/standard y baseline de quote con dimensiones de servicio/work
+package para explicar variance.
+
 ## Delta 2026-04-28 — Subordinada al programa Member Loaded Cost Model
 
 Esta task **agrega la dimensión `service_id` al modelo dimensional** definido en `docs/architecture/GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1.md`. Para producir Service P&L, los facts `member_loaded_cost_per_period` y `client_full_cost_per_period` deben ganar una dimensión adicional `service_id`. Bloqueo previo: requiere FK `service_id` en `payroll_member_client_allocations` (input al Fact 2 de allocations) y un mapping `expense → service_id` para tools de cliente directo. Hasta que el modelo dimensional materialice (Fase 2 del roadmap MLCM_V1 §11), Service P&L no puede ser fully-loaded.

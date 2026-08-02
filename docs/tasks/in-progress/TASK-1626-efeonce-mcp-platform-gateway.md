@@ -1,5 +1,11 @@
 # TASK-1626 — Efeonce MCP Platform Gateway and Globe Federation
 
+## Delta 2026-08-02 — Provider de cotización separado
+
+El gateway permanece adapter-neutral. La futura capability de cotización entra como provider read/recommend
+separado que consume API Platform + `TASK-609`; no se implementa dentro del gateway ni duplica pricing, policy o
+datos. Clientes externos requieren además identidad y entitlements verificables de `TASK-1631`.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
