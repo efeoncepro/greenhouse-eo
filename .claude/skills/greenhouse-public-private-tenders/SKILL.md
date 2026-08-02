@@ -92,9 +92,11 @@ En una licitación de contenidos **todas las ofertas dicen lo mismo** ("optimiza
 
 ### Reglas generales aprendidas para la propuesta y el deck
 
-10. **Separa los artefactos técnicos y económicos.** Cuando una licitación use decks, produce un deck
-    técnico y un deck económico independientes, con narrativa, `deck-plan`, output, manifest y
-    capturas propios. Nunca reemplaces el deck de otra licitación ni mezcles sus assets.
+10. **Separa la fuente y gobernanza técnica/económica; no impongas separación física.** Según las bases y
+    la etapa, el paquete puede ser técnico solo, económico solo, separado, combinado o mixto. Todo monto
+    embebido deriva de la misma cotización aprobada; si existen artefactos independientes, cada uno conserva
+    narrativa, `deck-plan`, output, manifest y capturas propios. Nunca reemplaces el deck de otra licitación
+    ni mezcles sus assets.
 11. **Usa `PricingFull` para presentar la inversión.** La oferta económica debe mostrar la opción
     recomendada, el desglose cotizado y las condiciones comerciales desde una cotización aprobada;
     no autorices una tabla libre que omita la estructura del catálogo.

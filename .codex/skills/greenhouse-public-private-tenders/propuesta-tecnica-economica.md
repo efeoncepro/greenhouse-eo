@@ -68,12 +68,14 @@ Modela cada sección **hacia el criterio ponderado que la evalúa** (lee primero
 ## Oferta económica — el detalle que descalifica por forma
 
 > **El Excel brandeado se GENERA, no se mantiene a mano.** Hay clientes que exigen Excel (documento
-> integrante). Las cifras + condiciones viven en `economica.json` (fuente única) y el `.xlsx` profesional
-> se emite con `pnpm economica:build <caso>/economica.json` (builder reusable
+> integrante). Las cifras + condiciones derivan de la versión de cotización y del paquete económico
+> congelado de Greenhouse. `economica.json` es un input transitorio del renderer local —no el SSOT— y
+> requiere reconciliación contra esa fuente mientras no se genere desde `ProposalEconomicProjection`.
+> El `.xlsx` profesional se emite con `pnpm economica:build <caso>/economica.json` (builder reusable
 > `scripts/commercial/lib/economic-offer-xlsx.mjs`: banda navy + wordmark, paleta AXIS, zebra, bloque
 > Neto/IVA/Total, print A4). **Techo:** las fuentes no se embeben en `.xlsx`; brand pixel-perfect = PDF
 > del composer, con el Excel como planilla editable. 🔴 NUNCA precio unitario por artículo.
-> **Confirmá primero si las bases exigen SU planilla** — formato equivocado = inadmisible.
+> **Confirma primero si las bases exigen SU planilla** — formato equivocado = inadmisible.
 
 
 - Usa **exactamente el formato/planilla** que exigen (a veces un Excel específico). Un precio correcto en formato equivocado puede ser inadmisible.

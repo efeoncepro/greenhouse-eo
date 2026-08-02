@@ -9,7 +9,7 @@
 - **Reversibility:** two-way-but-slow
 - **Confidence:** medium
 - **Validated as of:** 2026-08-02
-- **Related:** [live cost basis and unobserved profiles](../audits/finance/GREENHOUSE_LIVE_COST_BASIS_AND_UNOBSERVED_PROFILE_PRICING_2026-08-02.md), [costing methods deep review](../audits/finance/GREENHOUSE_COSTING_METHODS_DEEP_REVIEW_2026-08-02.md)
+- **Related:** [live cost basis and unobserved profiles](../audits/finance/GREENHOUSE_LIVE_COST_BASIS_AND_UNOBSERVED_PROFILE_PRICING_2026-08-02.md), [costing methods deep review](../audits/finance/GREENHOUSE_COSTING_METHODS_DEEP_REVIEW_2026-08-02.md), [Tender Proposal Studio](GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md)
 
 ## Context
 
@@ -51,6 +51,31 @@ Quote/API/MCP/Nexa consumers
 ```
 
 Esta decisión es una dirección arquitectónica propuesta. No autoriza todavía autonomía de emisión, cambios de schema, nuevas tools MCP, escritura directa del agente ni modificación del pricing engine.
+
+### Límite headless y madurez actual
+
+El cotizador objetivo es **headless**: la interpretación, el cálculo, las políticas, el versionado y la
+persistencia viven detrás de contratos programáticos y no dependen de una pantalla específica. Portal,
+Proposal Studio, Nexa, Codex, Claude, Agentica y futuros adapters API/MCP son consumidores del mismo
+kernel; ninguno puede convertirse en una segunda fuente de cálculo.
+
+Headless **no** significa anónimo, sin estado ni autónomo. Cada consumidor sigue sujeto a identidad de
+usuario y workload, tenant, capabilities, idempotencia, aprobación, auditoría y separación entre draft,
+emisión y envío.
+
+La madurez verificada al 2026-08-02 es:
+
+| Plano | Estado real | Consecuencia |
+|---|---|---|
+| Kernel determinista `pricing-engine-v2` | Operativo | UI y consumers programáticos pueden reutilizar el mismo cálculo. |
+| Simulación y authoring first-party por API Platform/HTTP | Operativo | Greenhouse puede calcular y crear drafts/versiones mediante commands canónicos y sesión autorizada. |
+| Consumer de ecosistema | Operativo en lectura/simulación | No autoriza writes externos ni expone el cost stack completo. |
+| Interpretación agentic `QuoteIntent → ServicePlan → CostCard` | Propuesto | Todavía no existe el orquestador completo ni su golden set de promoción. |
+| Writes de agentes externos o tools MCP de cotización | No implementados ni autorizados | Requieren contracts, grants, evals y aprobación posteriores. |
+| Emisión o envío autónomo client-facing | No autorizado | Continúa bajo confirmación humana y policy comercial. |
+
+Por tanto, Greenhouse ya es **headless-capable y parcialmente headless-operativo**, pero todavía no es una
+plataforma de cotización agentic headless completa.
 
 ### Moneda de cotización y unidades indexadas
 
@@ -216,6 +241,81 @@ CostCard
 ```
 
 El agente solo puede pasar al kernel objetos que validen schema. El kernel devuelve una salida estructurada; la explicación visible se genera a partir de esa salida, no de cálculos paralelos en el modelo.
+
+## Proposal Studio: composición opcional y frontera económica
+
+Una `Proposal` no equivale a un paquete fijo “técnica + económica”. Es el contenedor gobernado de un
+proceso comercial y sus entregables. Debe separar dos dimensiones que hoy tienden a mezclarse:
+
+1. **Contenido lógico:** técnico, económico y administrativo.
+2. **Artefacto físico:** deck, PDF, Excel, cotización formal, anexo o superficie web.
+
+Separar el contenido técnico del económico en fuente, permisos y aprobación **no obliga** a publicarlos
+siempre en documentos distintos. La composición depende del requisito del comprador o de la etapa:
+
+| Modo | Salida client-facing | Condición económica interna |
+|---|---|---|
+| Técnica sola | Propuesta/deck técnico sin precio | Debe existir evaluación interna de viabilidad cuando la oportunidad consume capacidad; no exige una cotización client-facing si todavía no hay compromiso comercial. |
+| Económica sola | Cotización, planilla, PDF o deck económico | Requiere una `QuotationVersion` aprobable y sus condiciones comerciales. |
+| Técnica y económica separadas | Dos o más artefactos coordinados | Todos derivan de la misma versión económica congelada. |
+| Combinada | Un artefacto técnico con módulo económico embebido, como SKY | El módulo económico es una proyección sanitizada de la misma cotización; nunca una tabla recalculada o transcrita. |
+| Administrativa/técnica con precio posterior | Entregables no económicos en la fase actual | Conserva `commercial_commitment=none` hasta que una fase posterior requiera precio indicativo o vinculante. |
+
+El contrato objetivo distingue cuatro objetos:
+
+```text
+ProposalDeliverablePlan
+  proposal_id / phase
+  content_modules: technical[] | economic[] | administrative[]
+  artifacts: deck | pdf | spreadsheet | formal_quote | annex | web
+  commercial_commitment: none | indicative | binding
+  audience / requirement_refs
+  composition_policy: separate | combined | mixed
+```
+
+```text
+BidEconomicAssessment
+  proposal_id / assessed_at
+  service_plan_ref / cost_card_ref
+  coverage / freshness / confidence
+  contribution_margin / fully_loaded_margin
+  viability_decision / blockers / approval_state
+```
+
+```text
+ProposalEconomicPackage
+  proposal_id / quotation_id / quotation_version_id
+  quote_header_snapshot / line_items_snapshot
+  taxes / FX / payment_terms / validity / assumptions
+  requirement_cross_check / approval_evidence
+  source_hash / packaged_at
+```
+
+```text
+ProposalEconomicProjection
+  economic_package_id
+  audience / locale / presentation_currency
+  visible_lines / totals / fiscal_basis / conditions
+  excluded_internal_fields
+```
+
+`BidEconomicAssessment` responde “¿nos conviene participar y podemos entregar con este costo?”.
+`QuotationVersion` y `ProposalEconomicPackage` responden “¿qué precio y condiciones estamos ofreciendo?”.
+No son equivalentes y no deben volver a colapsarse en un único `quote_id` obligatorio para toda fase
+post-GO.
+
+La regla de sincronización es:
+
+- un draft puede recalcularse o quedar `stale` cuando cambia sueldo, licencia, provider, FX o política;
+- al aprobar/empaquetar, se congela el costo y la versión económica usados;
+- una propuesta enviada no cambia retroactivamente por una actualización de costos;
+- cualquier ajuste posterior crea una nueva versión de cotización, paquete y artefactos derivados;
+- PDF, Excel, deck y cotización formal son N proyecciones del mismo paquete congelado.
+
+La contabilidad general, el plan de cuentas y el subledger financiero continúan como una línea fundacional
+necesaria para registrar lo realizado. No bloquean el primer slice read-only de costos, pero sí son
+necesarios para cerrar quote-to-cash, reconocer ingresos/gastos y comparar estándar versus real sin
+reconciliaciones manuales.
 
 ## Runtime state machine
 
@@ -410,15 +510,31 @@ Esta propuesta no autoriza todavía:
 - cambiar la política de márgenes;
 - exponer costos internos a perfiles no autorizados.
 
-El primer trabajo autorizado después de aceptar el ADR debería ser un slice read-only/recommendation:
+### Secuencia recomendada después de aceptar el ADR
 
-1. `QuoteIntent` estructurado;
-2. resolución de perfil y evidencia;
-3. `ServicePlan`;
-4. llamada al kernel actual;
-5. `CostCard` con confidence y blockers;
-6. golden set y comparación contra casos deterministas;
-7. sin escritura ni emisión client-facing.
+El orden reduce riesgo económico y entrega valor antes de abrir writes agentic:
+
+1. **Vertical read-only/recommendation.** Implementar `QuoteIntent`, resolución de perfiles —incluido
+   cualquier rol nunca contratado—, `ServicePlan`, llamada al kernel y `CostCard`; validarlo con el golden
+   set, sin escritura ni emisión client-facing.
+2. **Cost readiness vivo.** Hacer explícitos coverage, freshness, confidence, vigencias y eventos de
+   invalidación para sueldos, licencias, tools, providers, FX, overhead y perfiles modelados. Un cambio
+   afecta drafts y forecasts; nunca reescribe snapshots emitidos.
+3. **Frontera Proposal ↔ Pricing.** Introducir `ProposalDeliverablePlan` y separar
+   `BidEconomicAssessment` de `QuotationVersion`. Corregir la obligación universal de `quote_id` post-GO
+   para que dependa de `commercial_commitment` y de los requisitos de la fase.
+4. **Paquete económico completo.** Congelar header, versión, líneas, impuestos, FX, términos,
+   requerimientos, aprobaciones y hash. El snapshot parcial de la cabecera no es cierre suficiente.
+5. **Un modelo, N salidas.** Derivar `PricingFull`, PDF, Excel y módulos embebidos desde
+   `ProposalEconomicProjection`, con un verificador de paridad. SKY es el primer vertical dorado para el
+   modo combinado.
+6. **Writes headless gobernados.** Solo después de evals y observabilidad, habilitar creación de drafts o
+   versiones a API/MCP/agents mediante el mismo command, con scopes, idempotencia y confirmación humana.
+7. **Cierre económico real.** Conectar won → quote-to-cash → billing/collections/accounting y alimentar
+   actual-vs-standard para que el sistema de costos aprenda de nómina, gastos, proveedores y delivery real.
+
+La primera task debe cubrir únicamente los puntos 1 y la instrumentación mínima del 2. Los puntos 3–7
+son tasks dependientes; no deben mezclarse en una implementación monolítica.
 
 ## Revisit when
 

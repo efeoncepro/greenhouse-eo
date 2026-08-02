@@ -2,6 +2,11 @@
 
 Historia anterior: [Handoff.archive.md](Handoff.archive.md).
 
+## Cotización headless y contabilidad de costos — decisión propuesta (2026-08-02)
+
+- [ADR propuesto](docs/architecture/GREENHOUSE_AGENTIC_QUOTATION_ORCHESTRATION_DECISION_V1.md), sin runtime.
+  Siguiente paso: aceptarlo y abrir la task read-only `QuoteIntent → ServicePlan → CostCard` + golden set.
+
 ## TASK-1504 — Gemini Omni: despliegue y saga activada; canary pendiente (2026-08-02)
 
 - Checkouts sin worktrees: Globe `main@fa286dbda0a3c1ce02de7d5a2ab173ba1bf34966`; Greenhouse `develop`

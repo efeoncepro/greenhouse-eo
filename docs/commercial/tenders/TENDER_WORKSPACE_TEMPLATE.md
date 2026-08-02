@@ -35,7 +35,7 @@ docs/commercial/tenders/<slug>/
   artifact-manifest.json           # 📄 artefactos VIVOS (Radiografía, Grader report) — por ENLACE, nunca archivo
   oferta-tecnica.md                # ➡️ client-facing (narrativa + ledger de evidencia) — FUENTE
   oferta-economica.md              # ➡️ client-facing (narrativa de la económica)
-  economica.json                   # 📄 FUENTE de datos del Excel (cifras, condiciones)
+  economica.json                   # 📄 input transitorio del renderer Excel; NO es el SSOT económico
   propuesta-economica.xlsx         # ➡️ entregable BRANDEADO (generado: `pnpm economica:build economica.json`)
   deck-plan.json                   # fuente de composición del deck (slots, SSOT del deck)
   anexos/                          # ➡️ administrativos: declaraciones, poderes, certificados
@@ -124,8 +124,11 @@ La salida del composer nunca sustituye la revisión humana.
 ## La oferta económica en Excel (brandeada, no a mano)
 
 Hay clientes que **exigen Excel** (documento integrante de las bases). El `.xlsx` **no se mantiene a
-mano** (se desincroniza): las cifras y condiciones viven en **`economica.json`** (la fuente) y el Excel
-brandeado se emite con:
+mano** (se desincroniza). El cálculo y las condiciones comerciales pertenecen a la versión de cotización y
+al paquete económico congelado en Greenhouse. `economica.json` es hoy un **input transitorio del renderer
+local**: mientras no se genere desde `ProposalEconomicProjection`, requiere reconciliación y aprobación
+contra la cotización canónica; no puede declarar el cierre económico por sí solo. El Excel brandeado se
+emite con:
 
 ```bash
 pnpm economica:build docs/commercial/tenders/<slug>/economica.json
@@ -145,8 +148,10 @@ inadmisible). 🔴 **NUNCA** un precio unitario por artículo (el schema no tien
 - **NUNCA** una cifra en oferta/deck que no esté en el ledger de evidencia (`oferta-tecnica.md` Zona 0)
   con fuente googleable + as-of.
 - **NUNCA** una pieza viva por captura: `render: "by_link"` en el manifiesto.
-- **SIEMPRE** el `.md`/`.json` es la FUENTE; el PDF y el registro en el aggregate se re-emiten desde acá.
-- **SIEMPRE** las fuentes son archivos git (no `proposal_assets`); el aggregate referencia por `proposal_id`.
+- **SIEMPRE** los `.md` y `deck-plan.json` son fuente de narrativa/composición; los montos y condiciones
+  económicas derivan de la cotización y del paquete congelado de Greenhouse.
+- **SIEMPRE** las fuentes de narrativa/composición son archivos git (no `proposal_assets`); el aggregate
+  referencia el workspace por `proposal_id` y conserva el vínculo a la fuente económica gobernada.
 - **SIEMPRE** un deal con deck conserva `proposal-studio.json`; `status=workshop_only` es el estado
   honesto hasta que exista Proposal, render job, asset versionado y verificación autenticada.
 - **NUNCA** marques `verified` por tener un PDF o PNG en `.captures/`; el gate exige IDs del registro

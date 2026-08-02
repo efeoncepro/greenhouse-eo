@@ -7,6 +7,20 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-02 — Cotización headless y composición opcional de Proposal Studio
+
+- El ADR propuesto de cotización agentic define el límite headless: kernel determinista compartido,
+  consumidores UI/Nexa/API/MCP/agentes y autonomía graduada sin bypass de identidad, approval ni auditoría.
+- Proposal Studio distingue evaluación económica interna, versión de cotización, paquete económico congelado
+  y proyección client-facing. Las propuestas pueden ser técnicas solas, económicas solas, separadas,
+  combinadas o mixtas; cualquier monto embebido deriva del mismo SSOT económico.
+- Se registraron como gaps —no como capacidad implementada— el `quote_id` universal post-GO, el snapshot
+  parcial de cabecera, el cross-check económico y la proyección de render incompletos. La skill de licitaciones
+  quedó alineada en Codex y Claude.
+- El orden propuesto comienza con recomendación read-only y cost readiness vivo; sigue con integración de
+  Proposal Studio, freeze completo, salidas N desde una proyección, writes headless gobernados y cierre
+  quote-to-cash/actual-vs-standard. No hubo cambios de schema ni runtime.
+
 ## 2026-08-02 — Gemini Omni: evidencia legal corregida y checkpoint durable
 
 - Globe `62337b483` quedó en `main` con driver gobernado y simetría de configuración/secret/IAM entre API y
@@ -736,10 +750,3 @@ Corrección de fuente de verdad: el cliente inicial es **SKY Agencia Creativa**,
 - Se priorizaron cuatro beachheads: AI Visibility & Search; RevOps & HubSpot; Performance & Commerce; y Creative Velocity & Production.
 - Se definieron ofertas de entrada, rutas de expansión, motions, proof system, campos de cross-sell y validación de 90 días.
 - La amplitud del catálogo queda para expansión; no se autoriza presentar todo el portfolio como paquete inicial ni convertir los umbrales de validación en KPI de runtime.
-
-## 2026-07-26 — Partner & Provider Layer transversal
-
-- Se formalizó el modelo transversal de partnerships y providers de Efeonce.
-- Se separaron las capas vendibles: licencia/acceso, advisory, implementación, managed operations, Product Services e IP propia.
-- Se clasificaron HubSpot, OpenAI, Claude, Google Cloud, Microsoft AI Cloud, AWS, Salesforce, Adobe, Lovable y providers creativos sin confundir provider, partnership aprobado, product brand o business line.
-- Se sincronizaron arquitectura, business models, GTM, context pack y skills; el estado de programas permanece en la auditoría fechada y no habilita claims comerciales por sí solo.
