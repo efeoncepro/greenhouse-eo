@@ -2,7 +2,7 @@
 
 **Fecha de corte:** 2026-08-02
 **Alcance:** costos de personas, catálogo de roles, cotizaciones y perfiles sin contratación previa
-**Ejemplo:** `Influencer Specialist`
+**Caso ilustrativo:** `Influencer Specialist`; el mecanismo aplica a cualquier rol o perfil no observado
 **Estado:** recomendación para ADR y extensión del modelo; no cambia código, schema ni datos live
 
 ## 1. Decisión
@@ -19,6 +19,8 @@ variance / reforecast    → qué cambió y qué decisión produce
 ```
 
 La misma regla aplica cuando el perfil solicitado no existe todavía en la nómina, en los hechos de costo o en el catálogo exacto de roles.
+
+`Influencer Specialist` es únicamente el ejemplo utilizado para hacer visible el problema. La capacidad que se necesita debe funcionar igual para un abogado, investigador, estratega, especialista técnico, perfil de datos, operador de una nueva capability o cualquier otra combinación de skills que Efeonce nunca haya contratado.
 
 > **Un perfil nuevo se puede cotizar sin haberlo contratado, pero nunca debe presentarse como costo real. Debe entrar como `role_modeled`, con fuente, fecha, supuestos, rango, confianza y aprobación.**
 
@@ -97,17 +99,17 @@ Un quinto estado, `manual_pending`, debe cubrir casos donde la incertidumbre es 
 
 ### 4.1 No crear una falsa exactitud
 
-Para un rol nuevo no debe hacerse esto:
+Para un perfil nuevo no debe hacerse esto:
 
 ```text
-Influencer Specialist = Influencer Manager = USD X
+perfil solicitado = rol más parecido = USD X
 ```
 
 Debe hacerse esto:
 
 ```text
-Influencer Specialist
-  ├─ proxy: Influencer Manager
+perfil solicitado
+  ├─ proxy: rol vecino, si existe
   ├─ diferencias de alcance y seniority
   ├─ hipótesis de contratación y geografía
   ├─ rango de costo
@@ -117,9 +119,22 @@ Influencer Specialist
   └─ aprobación requerida
 ```
 
-El proxy ayuda a empezar; no convierte el perfil nuevo en el perfil existente.
+El proxy ayuda a empezar; no convierte el perfil nuevo en el perfil existente. Si no existe ningún proxy razonable, el flujo debe continuar con evidencia de contratación, proveedores o benchmarks fechados, y puede terminar en `manual_pending`.
 
-## 5. Cómo calcular un rol no observado
+### 4.2 Perfil solicitado no es automáticamente un `sellable_role`
+
+El flujo debe distinguir cuatro objetos que hoy se pueden confundir:
+
+```text
+requested_profile   → lo que el cliente pidió
+profile_archetype   → normalización de skills, seniority y alcance
+sellable_role       → SKU comercial reusable y aprobado
+cost_basis          → costo actual, blended, modelado o proxy
+```
+
+Un pedido nuevo puede cotizarse usando un `profile_archetype` provisional sin crear inmediatamente un SKU permanente en `sellable_roles`. El SKU se crea cuando el perfil demuestra recurrencia, ownership, packaging y una economía suficientemente estable. Así se evita llenar el catálogo con cientos de roles únicos o usar un SKU definitivo para una necesidad puntual.
+
+## 5. Cómo calcular un perfil no observado
 
 ### 5.1 Primero definir el perfil económico
 
@@ -136,7 +151,7 @@ Antes de buscar una cifra, se debe fijar:
 - si el perfil es delivery directo, coordinación o capacidad compartida;
 - si el trabajo es proyecto, retainer, staff augmentation o managed service.
 
-“Influencer Specialist” no es una unidad económica suficiente hasta saber si hará estrategia, búsqueda de creadores, negociación, gestión de campañas, reporting, relación con clientes o producción.
+El nombre del perfil no es una unidad económica suficiente hasta saber qué hará, en qué contexto y con qué nivel de responsabilidad. La misma regla aplica a cualquier rol nuevo: el título es una etiqueta de búsqueda, no una base de costo.
 
 ### 5.2 Jerarquía de evidencia
 
@@ -188,13 +203,15 @@ Política recomendada:
 
 La elección de `base`, `p75` o `p90` no debe ser global por costumbre. Debe depender de si existe muestra, materialidad del riesgo, posibilidad de sustitución y compromiso contractual.
 
-## 6. Ejemplo: Influencer Specialist
+## 6. Caso ilustrativo: Influencer Specialist
 
 ### Estado actual verificado
 
 El catálogo tiene `ECG-023 Influencer Manager`, activo. No tiene un rol exacto denominado `Influencer Specialist`.
 
 No es seguro cotizar el nuevo perfil copiando automáticamente el costo de `ECG-023`. Primero debe compararse el alcance.
+
+Este caso no requiere una lógica especial para influencers. El mismo flujo se ejecuta para cualquier perfil no observado; lo único que cambia son las competencias, los costos directos, la modalidad de contratación y las fuentes de evidencia.
 
 ### Caso A — el servicio necesita un especialista interno
 
@@ -340,7 +357,7 @@ El primer slice debe ser un **Unobserved Profile Costing Flow** dentro del cotiz
 9. capturar costo real cuando el perfil se contrate;
 10. alimentar variance y futuras bases de roles.
 
-Esto resuelve tanto un `Influencer Specialist` como cualquier futuro perfil nuevo sin crear un cotizador paralelo ni depender de intuición silenciosa.
+Esto resuelve un `Influencer Specialist` y cualquier futuro perfil nuevo sin crear un cotizador paralelo ni depender de intuición silenciosa. El rol es un dato de entrada; el mecanismo de costeo es transversal.
 
 ## 11. Conclusión
 
@@ -353,7 +370,7 @@ no es garantía de contratación
 sí es una hipótesis versionada de costo
 ```
 
-La capacidad que necesitamos no es saber el costo exacto de todo perfil antes de contratarlo —eso no existe—, sino producir una estimación defendible, acotada y actualizable, y luego aprender de la contratación y ejecución reales.
+La capacidad que necesitamos no es saber el costo exacto de todo perfil antes de contratarlo —eso no existe—, sino producir una estimación defendible, acotada y actualizable para cualquier perfil, y luego aprender de la contratación y ejecución reales.
 
 **Boundary:** este documento no crea roles, no modifica costos, no consulta benchmarks externos para fijar precios, no activa `role_modeled`, no cambia el engine y no constituye una aprobación comercial o laboral.
 
