@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `webhook`
 - Epic: `EPIC-028`
-- Status real: `Diseño corregido contra runtime; implementación pendiente`
+- Status real: `Diseño y pre-auditoría read-only verificados contra runtime (2026-08-02); implementación pendiente`
 - Rank: `next.1`
 - Domain: `platform|integration|data`
 - Blocked by: `none`
@@ -39,6 +39,13 @@
   integración cross-product futura bajo un contrato separado.
 - El primer acto de la próxima sesión es auditar el commit transaccional real de `complete` y el enqueue durable
   de governance; no se elige Cloud Tasks, Pub/Sub, Eventarc ni Jobs API antes de esa evidencia y el ADR.
+- **Pre-auditoría read-only 2026-08-02 (verificada contra código, Slice 0 la incorpora al ADR):** el enqueue de
+  `complete` SÍ es same-transaction (`checkpointCompletion` dentro de `recordCompletionSignal`); el create del job
+  de governance NO — es una `tenantTx` propia, idempotente por `(workspace_id, idempotency_key)` con
+  fingerprint-conflict, y su fallo degrada al código durable `governance_queue_unavailable` que el retry del outbox
+  recupera. Los dos emisores de wake son asimétricos: el de Producer nace en el request path de la API (post-commit,
+  sin retrasar el `202`); el de governance nace dentro del Producer worker (ya async). El ADR debe evaluar el
+  trigger contra ambos emisores, no contra uno genérico.
 
 ## Summary
 
@@ -123,7 +130,8 @@ Reglas obligatorias:
 - `../efeonce-globe/apps/creative-runner/src/provider-webhooks.ts`
 - `../efeonce-globe/apps/creative-runner/src/governed-runtime-entry.ts`
 - `../efeonce-globe/apps/creative-runner/src/governed-run-worker.ts`
-- `../efeonce-globe/apps/studio-web/src/governed-runtime-app.ts`
+- `../efeonce-globe/apps/studio-web/src/app.ts` (ingress `/v1/provider-webhooks/*` + relay web→api; el archivo
+  `governed-runtime-app.ts` no existe — su test `governed-runtime-app.test.ts` ejercita `app.ts`)
 - `../efeonce-globe/packages/domain/src/governed-run-lifecycle.ts`
 - `../efeonce-globe/packages/database/src/stores/governed-run-store.ts`
 - `../efeonce-globe/packages/database/src/stores/asset-governance-job-store.ts`
@@ -135,17 +143,31 @@ Reglas obligatorias:
 
 ### Already exists
 
-- `verifyAndNormalizeFalWebhook` verifica el contrato Fal y produce `CompletionSignalV1` sanitizada.
-- `recordCompletionSignal` deduplica delivery/event, resuelve correlación incluso en lost-ack, checkpointa
-  `completion_received`, supersede reconcile pendiente y encola `complete` dentro de la transacción.
-- Producer worker reclama trabajos con lease/fencing, materializa el resultado una sola vez y retiene bytes.
-- Generated outputs entran al pipeline durable de Asset Governance antes de quedar elegibles.
-- Schedulers minutely/bounded y reconciliación recuperan trabajo aunque el webhook no llegue.
+- `verifyAndNormalizeFalWebhook` (`apps/creative-runner/src/provider-webhooks.ts`) verifica Ed25519/JWKS sobre el
+  digest del raw body + timestamp window y produce `CompletionSignalV1` sanitizada.
+- `recordCompletionSignal` (`packages/database/src/stores/governed-run-store.ts`) deduplica delivery/event con
+  `ON CONFLICT DO NOTHING`, resuelve correlación incluso en lost-ack vía `callback_correlation_id`, checkpointa
+  `completion_received`, supersede reconcile pendiente y encola `complete` (dedupe key
+  `complete:{workspace}:{attempt}`) — todo dentro de UNA transacción (`checkpointCompletion`).
+- El ingress `/v1/provider-webhooks/(fal|openai)/:correlation` vive en `apps/studio-web/src/app.ts`: en modo `web`
+  actúa como relay estrecho hacia la API; en modo `api` verifica el caller del proxy y delega en
+  `acceptFalWebhook`/`acceptOpenAiWebhook` del governed runtime.
+- Producer worker y Asset Governance reclaman con `FOR UPDATE SKIP LOCKED` + lease/fencing; el worker materializa
+  el resultado una sola vez y retiene bytes.
+- `DurableAssetGovernanceJobStore.create` es idempotente por `(workspace_id, idempotency_key)` con
+  fingerprint-conflict, en `tenantTx` propia; su indisponibilidad degrada al código durable
+  `governance_queue_unavailable` que el retry del outbox recupera.
+- Schedulers Cloud Scheduler → `run.googleapis.com …jobs/…:run` (`retry_config.retry_count=0`,
+  `attempt_deadline=320s`): Producer worker `* * * * *`, Asset Governance `*/5 * * * *`. Un `:run` SIEMPRE crea una
+  ejecución nueva — no hay dedupe server-side; el coalescing es responsabilidad nuestra.
+- Reconciliación recupera trabajo aunque el webhook no llegue.
 
 ### Gap
 
-- El commit del `complete` no despierta de forma durable/inmediata al Producer worker.
-- La creación del job de Asset Governance tampoco despierta de forma inmediata a su worker.
+- El commit del `complete` no despierta de forma durable/inmediata al Producer worker (latencia hasta ~60s por el
+  tick minutely).
+- La creación del job de Asset Governance tampoco despierta de forma inmediata a su worker (latencia hasta ~5 min
+  por su tick `*/5`).
 - Scheduler es todavía el trigger primario observable; falta wake deduplicado, retries/DLQ, IAM, métricas y prueba
   callback→terminal sin esperar el tick.
 
@@ -281,6 +303,17 @@ comparar Cloud Tasks/Pub/Sub/Eventarc/Jobs API contra el runtime real; no se pre
 El diseño debe conservar los dos commits de autoridad: provider completion vuelve reclamable `complete`, y el
 finalizer/ingest vuelve reclamable Asset Governance. Cada commit produce un wake recuperable, pero cada worker
 vuelve a leer y reclamar su trabajo desde PostgreSQL.
+
+Restricciones de forma verificadas contra el runtime que el ADR debe honrar:
+
+- **Emisores asimétricos.** El wake del Producer nace en el request path de la API (post-commit, sin retrasar el
+  `202` del webhook); el wake de governance nace dentro del Producer worker (contexto ya async). El trigger elegido
+  debe funcionar para ambos sin acoplar el request web a una llamada cloud síncrona bloqueante.
+- **Wake provider-neutral por construcción.** El ingress ya sirve `fal|openai`; el wake se ancla al commit del
+  outbox/job — nunca a la identidad del proveedor. Un provider nuevo hereda el wake sin trabajo adicional, y la
+  generalización del follow-up es automática, no per-provider.
+- **Coalescing propio.** El endpoint `jobs.run` no deduplica ejecuciones; el work key + ventana de supresión viven
+  en nuestro plano durable, no en el trigger cloud.
 
 ## Rollout Plan & Risk Matrix
 
