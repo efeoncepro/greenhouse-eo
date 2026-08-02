@@ -78,4 +78,7 @@ The current operational exception is only internal read-only `globe.producer.fle
 canonical fleet reader. Treat any new reader as disabled until its provider contract, least-privilege binding,
 allow/deny/fault/redaction evidence and public-gateway canary pass. Customer B2B/multitenant access is a separate
 decision: require tenant/capability entitlements with revocation plus a real base-only identity that proves Globe
-denial; the current internal Entra client receives both scopes and cannot establish that proof.
+denial; the current internal Entra client receives base + reader (`efeonce.mcp.read` and `efeonce.mcp.globe.read`)
+even when it requests only the base, so it cannot establish that proof. The gateway declares a third scope, the
+flag-gated internal write `efeonce.mcp.globe.credits.funding.ensure`; whether that same client also receives it is
+not verified and follows its own consent flow.
