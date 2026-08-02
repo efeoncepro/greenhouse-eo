@@ -238,7 +238,7 @@ Esta skill posee el **dominio growth pre-pipeline**. Delega sin dudar:
 
 | Tema | Skill dueña | Por qué no es de esta skill |
 |---|---|---|
-| Doctrina y arquitectura editorial de **Content Engineering** | **`content-marketing-studio`** (`references/content-engineering.md`) | Growth mide si la experiencia reduce fricción y mueve una decisión; no define la verdad, el formato ni su sistema editorial. |
+| Doctrina y arquitectura editorial de **Content Engineering** | **`content-marketing-studio`** (`../content-marketing-studio/references/content-engineering.md`) | Growth mide si la experiencia reduce fricción y mueve una decisión; no define la verdad, el formato ni su sistema editorial. |
 | SEO técnico, schema/JSON-LD, AEO/GEO por-motor, topical authority, backlinks, **ser citado por IA** | **`seo-aeo`** | Es un dominio propio y profundo; esta skill lo usa como *canal de adquisición* pero no reimplementa su táctica. |
 | Pricing, packaging, negociación, forecast, quota, comp plan, deal review, discovery de ventas, RevOps de pipeline | **`commercial-expert`** | Es post-conversión / pipeline calificado. Growth entrega leads; commercial los cierra. |
 | Doctrina ASaaS, posicionamiento de marca Efeonce, modelo de negocio | **`efeonce-agency`** | Es estrategia de negocio, no ejecución de growth. |
