@@ -9,7 +9,7 @@ customer payloads as evidence.
 | OAuth/resource metadata | root and path metadata, missing/expired/wrong issuer/audience token rejection, insufficient-scope rejection before downstream dispatch, authenticated initialize |
 | Provider adapter | disabled default, capability listing, allow, deny before dispatch, timeout/fault sanitization, correlation and provider isolation |
 | Globe/creative capability | all provider evidence plus workspace/rights/credit/approval gates from Globe; for the active fleet reader, verify no house/provider cost or margin leaks; never test with a real paid generation unless authorized |
-| Customer/B2B MCP access | all OAuth and provider evidence plus a real client that receives only its granted tenant/capability entitlements, revocation evidence and an external-access decision; an internal client that receives both scopes is insufficient |
+| Customer/B2B MCP access | all OAuth and provider evidence plus a real client that receives only its granted tenant/capability entitlements, revocation evidence and an external-access decision; an internal client that receives both the base (`efeonce.mcp.read`) and Globe reader (`efeonce.mcp.globe.read`) scopes is insufficient |
 | Cloud Run/edge | deployed revision/image, ingress, service identity, rollback revision, DNS from independent resolvers, TLS, public unauthorized `401` |
 | Managed TLS incident | A/AAAA/CNAME answers from authoritative and independent public resolvers, forwarding-rule IP/443, HTTPS-proxy certificate attachment, certificate-map absence/precedence, managed/domain status and retry timestamp |
 | New write or approval | all above plus ADR/task, preview/confirmation, idempotency, audit/redaction, entitlement revocation and reversible rollback |

@@ -63,8 +63,11 @@ database, storage or upstream-provider access, chooses domain policy, or substit
    ADR/task work.
 6. Before calling a public runtime operational, require DNS/TLS, discovery, unauthenticated denial and authenticated
    MCP client evidence. Para acceso externo, además prueba una identidad que reciba sólo los scopes/entitlements
-   concedidos; el cliente Entra interno actual recibe ambos scopes y no demuestra ese deny por persona. A compiled
-   adapter is not rollout evidence.
+   concedidos; el cliente Entra interno actual recibe base + reader (`efeonce.mcp.read` y `efeonce.mcp.globe.read`)
+   aunque solicite sólo el base, y no demuestra ese deny por persona. El gateway declara tres scopes —esos dos más
+   el write interno `efeonce.mcp.globe.credits.funding.ensure`, gateado por `globeCreditFunding.enabled`—; que el
+   mismo cliente reciba además el de write no está verificado y depende de su propio consentimiento/asignación.
+   A compiled adapter is not rollout evidence.
 
 ## Maintenance
 

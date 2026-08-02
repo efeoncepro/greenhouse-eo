@@ -12,9 +12,13 @@
 ## Context
 
 `https://mcp.efeonce.org/mcp` is operational with an internal Entra authorization-code + PKCE canary and the
-read-only Globe fleet reader. That identity is an internal validation path: it emits both delegated MCP scopes and
-cannot model a customer's organization, administrator, member, entitlement or revocation. It must not become a
-prerequisite for Efeonce customers.
+read-only Globe fleet reader. That identity is an internal validation path: it emits both the base
+(`efeonce.mcp.read`) and the Globe reader (`efeonce.mcp.globe.read`) delegated scopes even when it requests only the
+base, and cannot model a customer's organization, administrator, member, entitlement or revocation. It must not
+become a prerequisite for Efeonce customers. The gateway declares a third scope, the flag-gated internal write
+`efeonce.mcp.globe.credits.funding.ensure` (published in `scopes_supported` only when `globeCreditFunding.enabled`
+is ON); whether the same internal client also receives it is **not** verified and follows its own
+consent/assignment flow.
 
 Greenhouse already creates the commercial organization in `greenhouse_core.organizations`. Account Complete 360
 resolves that organization into its organization, spaces and client graph. A customer identity provider must not
@@ -118,7 +122,13 @@ membership or access.
 - Entra remains available only for the internal canary during the transition. It neither onboards external customers
   nor demonstrates their deny/revocation behavior.
 - External authorization uses OAuth 2.1 authorization code with PKCE. Remote MCP clients must have public
-  authorization-server metadata and a deliberate dynamic-registration or pre-registration compatibility path.
+  authorization-server metadata and a deliberate client-registration compatibility path, in the normative order of
+  the current MCP spec: pre-registration → **Client ID Metadata Documents (CIMD)** → Dynamic Client Registration →
+  manual entry. **CIMD is the primary requirement and DCR is backwards compatibility**: the spec states verbatim
+  that *"Dynamic Client Registration is deprecated. New implementations should use Client ID Metadata Documents
+  instead"*, and marks CIMD `SHOULD` against DCR `MAY` (verified 2026-08-02). A provider that supports DCR but not
+  CIMD does not satisfy this invariant. Target clients differ today — ChatGPT supports DCR and CIMD; Claude
+  supports DCR plus manual client id/secret — so the selected provider must cover both mechanisms.
 - Access is fail-closed. An unknown issuer, client, organization binding, membership, entitlement, revoked grant or
   provider policy result denies dispatch; no free-form organization/workspace supplied by the client is accepted.
 - Human OAuth identity and the gateway-to-provider service identity remain separate. Tokens, authorization codes,

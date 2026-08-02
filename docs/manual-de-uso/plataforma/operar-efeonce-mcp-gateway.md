@@ -40,5 +40,10 @@ cierres la sesión compartida del perfil.
 ## Antes de clientes externos
 
 No entregues este endpoint a clientes hasta que exista entitlement por tenant/capability y una prueba real de
-persona base-only denegada para Globe. El cliente interno actual recibe ambos scopes incluso si solicita sólo el
-base; por eso no prueba esa separación.
+persona base-only denegada para Globe. Al cliente interno actual se le entregan hoy el scope base y el de lectura
+de Globe incluso si solicita sólo el base; por eso no prueba esa separación.
+
+Cuando revises los scopes soportados en el paso 2 de la verificación, ten presente que el gateway declara tres, no
+dos: el base, el de lectura de Globe y el de escritura interna de fondeo de créditos, que aparece sólo cuando su
+flag está encendido. Ese tercero se autoriza por separado y no queda demostrado por la entrega conjunta de los dos
+primeros; no lo uses como evidencia de nada.

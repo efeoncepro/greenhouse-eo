@@ -41,9 +41,12 @@ If a source conflicts with remembered behavior, the verified runtime and its can
 - Before customer access, require B2B/multitenant entitlements that can issue and revoke access per tenant and
   capability. Entra is the internal canary only. Follow the proposed Account 360 binding and customer identity
   gate in `EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md` / `TASK-1631`; do not provision its leading
-  vendor candidate without explicit approval. The current Entra client receives both delegated MCP scopes, so it
-  cannot prove base-only persona denial; retain a dispatch-level deny test and add a real base-only client before
-  that rollout.
+  vendor candidate without explicit approval. The gateway declares three scopes, not two: base `efeonce.mcp.read`,
+  Globe reader `efeonce.mcp.globe.read` and the flag-gated internal write
+  `efeonce.mcp.globe.credits.funding.ensure`. The current Entra client receives base + reader even when it requests
+  only the base, so it cannot prove base-only persona denial; retain a dispatch-level deny test and add a real
+  base-only client before that rollout. Whether that same client also receives the write scope is not verified and
+  follows its own consent/assignment flow.
 - Treat writes, approvals, spending, rights-sensitive creative work, webhooks and new public auth surfaces as new
   ADR/task work. Do not infer permission from a read-only MCP capability.
 - The certified internal Studio Credits write is `globe.credits.funding.ensure`. It accepts only a Greenhouse-issued

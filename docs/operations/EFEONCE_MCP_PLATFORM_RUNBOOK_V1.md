@@ -279,8 +279,11 @@ Cada promoción registra:
   sigue `401`.
 - Capacidad: `concurrency=80`, `maxScale=5` efectivo. Rollback del gateway: `00008-fwj` o provider OFF y
   deploy. Rollback de Globe: revisión previa `globe-api-internal-00178-f5s`.
-- Límite conocido: el cliente interno Entra recibe ambos scopes; no habilites clientes hasta separar la emisión
-  de scope/entitlement y repetir el deny real con una identidad base-only.
+- Límite conocido: el cliente interno Entra recibe base + reader (`efeonce.mcp.read` y `efeonce.mcp.globe.read`)
+  aunque solicite sólo el base; no habilites clientes hasta separar la emisión de scope/entitlement y repetir el
+  deny real con una identidad base-only. El tercer scope declarado por el gateway, el write interno
+  `efeonce.mcp.globe.credits.funding.ensure` gateado por `globeCreditFunding.enabled`, tiene su propio
+  consentimiento/asignación y no forma parte de lo verificado en esta co-emisión.
 
 ### Identidad cliente externa — propuesta; sin acceso cliente activo
 

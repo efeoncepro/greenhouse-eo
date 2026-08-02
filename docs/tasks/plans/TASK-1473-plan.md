@@ -80,9 +80,12 @@
   efectivo.
 - [x] El canary authorization code + PKCE real completó initialize, discovery y la invocación autenticada de
   `globe.producer.fleet.list`, con rutas disponibles y sin house, provider slug, costo de vendor ni margen.
-- [~] Los tests cubren deny antes del downstream y fault sanitizado. Entra entrega ambos scopes al cliente
-  interno incluso ante una solicitud del scope base, por lo que la evidencia live de una persona base-only es un
-  requisito previo al acceso B2B/multitenant, no una condición fallida del corte internal-only.
+- [~] Los tests cubren deny antes del downstream y fault sanitizado. Entra entrega base + reader
+  (`efeonce.mcp.read` y `efeonce.mcp.globe.read`) al cliente interno incluso ante una solicitud del scope base,
+  por lo que la evidencia live de una persona base-only es un requisito previo al acceso B2B/multitenant, no una
+  condición fallida del corte internal-only. El tercer scope declarado por el gateway, el write interno
+  `efeonce.mcp.globe.credits.funding.ensure` gateado por `globeCreditFunding.enabled`, tiene consentimiento propio
+  y no está verificado en esa co-emisión.
 
 ## Files to create
 

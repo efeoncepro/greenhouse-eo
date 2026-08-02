@@ -262,7 +262,8 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
       La respuesta conserva correlation ID entre gateway y Globe.
 - [~] El scope Globe ausente se rechaza antes de llamar downstream; una caída/timeout upstream devuelve un
       error sanitizado y no degrada discovery del gateway. Los tests del gateway lo verifican; la demostración
-      live con persona base-only requiere corregir la emisión actual de ambos scopes por Entra.
+      live con persona base-only requiere corregir la emisión actual de base + reader (`efeonce.mcp.read` y
+      `efeonce.mcp.globe.read`) por Entra.
 - [x] El canary autenticado de un cliente MCP real invoca `globe.producer.fleet.list` y recibe rutas con
       disponibilidad derivada de readiness + binding, no un manifiesto estático.
 - [ ] MCP/SDK no importan ni llaman providers, DB o storage directamente.

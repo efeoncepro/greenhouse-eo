@@ -39,7 +39,10 @@ duplica lógica de negocio.
    audience, expiración y scopes, y responde con challenges estándar. Microsoft Entra ID del tenant Efeonce
    es el authorization server inicial. El resource parameter canónico es `https://mcp.efeonce.org/mcp`; Entra
    v2 representa ese recurso en el claim `aud` mediante el App ID exacto de la aplicación recurso. Si la
-   configuración falta o no pasa el canary, `/mcp` falla cerrado.
+   configuración falta o no pasa el canary, `/mcp` falla cerrado. El gateway declara **tres** scopes, no dos: el
+   base `efeonce.mcp.read`, el reader Globe `efeonce.mcp.globe.read` y el write interno
+   `efeonce.mcp.globe.credits.funding.ensure` del punto 12, que sólo aparece en `scopes_supported` cuando su flag
+   `globeCreditFunding.enabled` está en ON.
 8. La identidad humana OAuth y la identidad workload hacia providers son planos distintos. El gateway llama a
    Globe con su service account dedicada, ID token con audience exacta y allowlist del runtime de Globe.
 9. Globe es el primer provider, pero conserva ownership de sus tools/resources en `efeonce-globe` mediante
@@ -170,7 +173,8 @@ corporativa neutral; `efeoncepro.com` queda como compatibilidad opcional.
 ### Delta 2026-08-01 — identidad de clientes externos
 
 El authorization server Entra descrito en esta decisión se mantiene como canary interno. No es el modelo de
-onboarding de organizaciones cliente ni evidencia de autorización B2B, porque el cliente canary emite ambos scopes.
+onboarding de organizaciones cliente ni evidencia de autorización B2B, porque el cliente canary emite base + reader
+(`efeonce.mcp.read` y `efeonce.mcp.globe.read`) aunque solicite sólo el base.
 La propuesta de identidad cliente, el vínculo con Account 360 y el gate de proveedor viven en
 [`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`](EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md)
 y [`TASK-1631`](../tasks/to-do/TASK-1631-efeonce-customer-identity-mcp-federation.md). Esta adición no acepta un
@@ -191,8 +195,8 @@ proveedor ni altera el reader Globe interno habilitado.
 - la federación introduce versionado y health por provider;
 - el load balancer global tiene costo fijo mayor que exponer directamente la URL `run.app`;
 - La apertura a clientes externos requiere un modelo B2B/multitenant y entitlements que pueda emitir y revocar
-  acceso por tenant y capability; el cliente Entra interno actual no prueba esa separación porque recibe ambos
-  scopes delegados.
+  acceso por tenant y capability; el cliente Entra interno actual no prueba esa separación porque recibe base +
+  reader (`efeonce.mcp.read` y `efeonce.mcp.globe.read`) aunque solicite sólo el base.
 
 ## Rollout and rollback
 

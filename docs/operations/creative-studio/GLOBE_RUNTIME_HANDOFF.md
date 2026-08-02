@@ -226,8 +226,11 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
   esta restricción no afecta el canary interno ni la naturaleza comercial de Globe.
 - La identidad temporal usada para consumo privado de AXIS debe sustituirse por una identidad de
   máquina antes del rollout externo; no recrees el secreto legacy de Globe.
-- El cliente Entra interno del gateway MCP recibe hoy ambos scopes aun cuando solicita el base. Antes de acceso
-  B2B debe existir entitlement por tenant/capability y una identidad base-only que pruebe la denegación de Globe.
+- El cliente Entra interno del gateway MCP recibe hoy base + reader (`efeonce.mcp.read` y `efeonce.mcp.globe.read`)
+  aun cuando solicita el base. Antes de acceso B2B debe existir entitlement por tenant/capability y una identidad
+  base-only que pruebe la denegación de Globe. El tercer scope del gateway, el write interno
+  `efeonce.mcp.globe.credits.funding.ensure` gateado por `globeCreditFunding.enabled`, se autoriza aparte y no
+  está verificado en esa co-emisión.
 - Los 500.000 históricos permanecen sólo como auditoría append-only; ninguna proyección operativa los publica.
 
 ## Checkpoint de ejecución — Studio Credits enterprise (2026-08-01)

@@ -335,9 +335,12 @@ DNS en HostGator requieren acceso del operador. No se sustituyen con tokens est�
   y `maxScale=5` efectivo. No sustituye las cuotas, entitlements ni límites de gasto de los products providers.
 - El primer callback localhost venció con un listener de 180 segundos; el canary ahora admite una ventana de 10
   minutos configurable. Su override DNS se usa sólo para diagnóstico, conserva SNI público y no modifica runtime.
-- Límite actual: auth de tenant único y un reader Globe read-only. El cliente PKCE interno recibe ambos scopes
-  incluso cuando solicita sólo el base: la exposición a clientes exige separación B2B de entitlements/emisión de
-  scopes y una prueba real base-only. Las demás tools Globe siguen bajo `TASK-1473`.
+- Límite actual: auth de tenant único y un reader Globe read-only. El cliente PKCE interno recibe base + reader
+  (`efeonce.mcp.read` y `efeonce.mcp.globe.read`) incluso cuando solicita sólo el base: la exposición a clientes
+  exige separación B2B de entitlements/emisión de scopes y una prueba real base-only. El gateway declara un tercer
+  scope, el write interno `efeonce.mcp.globe.credits.funding.ensure` gateado por `globeCreditFunding.enabled`; que
+  este mismo cliente lo reciba además no está verificado y depende de su propio consentimiento/asignación. Las
+  demás tools Globe siguen bajo `TASK-1473`.
 
 ## Verification
 

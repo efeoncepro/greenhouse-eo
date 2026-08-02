@@ -106,14 +106,19 @@ Reglas obligatorias:
   `globe.credits.funding.ensure` y cualquier write futuro— queda ligada explícitamente al issuer interno; un token
   del issuer externo que traiga ese string se deniega en dispatch, fail-closed, además de las defensas downstream
   (token-exchange Entra→Greenhouse por `(microsoft_tenant_id, microsoft_oid)`).
-- **Dynamic client registration entrega un identificador PÚBLICO del cliente OAuth. Identifica una aplicación
-  registrada; no autentica a la persona ni autoriza organización o capabilities.** En DCR (RFC 7591) el `client_id`
-  lo **emite el authorization server**, no lo elige el cliente — pero para un cliente público con PKCE **no hay
-  client secret ni prueba de posesión**, así que es un identificador observable y presentable por cualquiera, nunca
-  una credencial. La política de emisión de scopes vive en la configuración del plano de identidad y en los grants,
-  no en el registro del client. **No conflacionar DCR con Client ID Metadata Documents** (donde el `client_id` es
-  una URL que el propio cliente controla): son mecanismos distintos con semánticas de identificación distintas, y
-  el Slice 0 debe confirmar cuáles admite la versión de spec MCP vigente antes de razonar sobre ellos.
+- **CIMD es el mecanismo primario de registro; DCR queda como compatibilidad hacia atrás.** Verificado contra la
+  spec MCP vigente (2026-08-02): *"Dynamic Client Registration is deprecated. New implementations should use Client
+  ID Metadata Documents instead"*, con orden normativo pre-registro → **CIMD** (`client_id_metadata_document_supported`)
+  → DCR (`registration_endpoint`) → entrada manual, y `SHOULD` para CIMD contra `MAY` para DCR. El proveedor
+  elegido debe soportar **ambos**: ChatGPT admite DCR y CIMD; Claude admite DCR y además permite configurar
+  client id/secret a mano. Un proveedor con excelente DCR y sin CIMD **no cumple** el requisito primario.
+- **Ni DCR ni CIMD autentican a la persona ni autorizan organización o capabilities; sólo identifican una
+  aplicación.** Son mecanismos distintos y no se conflacionan: en DCR (RFC 7591) el `client_id` lo **emite el
+  authorization server**; en CIMD el `client_id` es una **URL que el propio cliente controla** y desde la que se
+  resuelve su metadata. En los dos casos, para un cliente público con PKCE **no hay client secret ni prueba de
+  posesión**, así que el identificador es observable y presentable por cualquiera, nunca una credencial. La
+  política de emisión de scopes vive en la configuración del plano de identidad y en los grants, no en el registro
+  del client.
 - **El binding de persona se resuelve por `(issuer, subject)`, JAMÁS por `client_id`.** Es el corolario directo de
   la regla anterior: el `client_id` de un cliente público no prueba posesión de nada, así que atarle autoridad es
   confiar en un dato que cualquiera puede presentar. El contexto de autorización debe conservar `issuer`,
@@ -184,8 +189,8 @@ Reglas obligatorias:
   `scopes_supported` con el flag ON). El write ejecuta token-exchange Entra→Greenhouse mapeado por
   `(microsoft_tenant_id, microsoft_oid)` y llama el endpoint canónico Greenhouse; su canary interno real pasó el
   2026-08-01 con resultado terminal y sin segundo delta económico. **Lo verificado sobre la co-emisión de Entra es
-  únicamente base + reader** (TASK-1626 §Estado de rollout: "recibe ambos scopes incluso cuando solicita sólo el
-  base"); que el mismo cliente reciba además el scope de write **no está verificado** y su consentimiento/asignación
+  únicamente base + reader** (TASK-1626 §Estado de rollout: "recibe base + reader … incluso cuando solicita sólo
+  el base"); que el mismo cliente reciba además el scope de write **no está verificado** y su consentimiento/asignación
   es un flujo separado — medirlo contra un token live es entregable del Slice 0, no una cautela redaccional.
 - El verificador **descarta el `subject`**: `AuthInfo` sale como `{ token, clientId, scopes, expiresAt }` y
   `clientId = azp ?? sub` (`src/auth/token-verifier.ts:34`). Con `azp` presente el `sub` no llega al contexto de
@@ -267,7 +272,8 @@ Reglas obligatorias:
   - `El binding de persona se resuelve por (issuer, subject). Nunca por client_id: un cliente público con PKCE no tiene prueba de posesión, así que su identificador es observable y presentable por cualquiera.`
   - `El contexto de autorización conserva issuer, subject, clientId, audience, delegatedScopes y roles como campos separados; ningún campo se deriva de otro por fallback.`
   - `delegatedScopes (scp/scope) y roles son clases de autoridad distintas y nunca se fusionan en un array único; cada tool declara qué clase acepta.`
-  - `El subject usado como clave de binding debe ser estable para la misma persona a través de clientes y registros distintos; si el proveedor emite subjects pairwise, (issuer, subject) no es clave global hasta fijar sector o adoptar un identificador estable verificado del proveedor.`
+  - `El subject usado como clave de binding debe ser estable para la misma persona a través de clientes y registros distintos; se confirma leyendo subject_types_supported del proveedor aprobado antes de fijarlo como clave.`
+  - `El proveedor de identidad debe soportar CIMD como mecanismo primario de registro y DCR como compatibilidad; DCR-only no cumple la spec MCP vigente.`
   - `La autoridad de una tool se resuelve por (issuer, scope, binding, grant); un scope string del issuer externo jamás satisface una tool ligada al issuer interno.`
   - `La revocación falla cerrada tanto en el dispatch del gateway como en la policy del provider.`
 - Tenant/space boundary: `derivado server-side desde issuer/subject/client verificados y el binding explícito de Account 360; cada provider resuelve independientemente su workspace autorizado`
@@ -318,9 +324,11 @@ Reglas obligatorias:
 - [ ] La matriz de tokens live está ejecutada y registrada redactada (`iss`, `aud`, `sub`, `azp`/`client_id`,
       `scp`, `scope`, `roles`, claim organizacional, `exp`) para cada cliente objetivo, y el diseño de calificación
       por issuer se apoya en esa medición, no en el supuesto.
-- [ ] La estabilidad del `subject` está resuelta: `subject_types_supported` del proveedor está leído y, si es
-      `pairwise`, la clave de binding tiene sector fijado o un identificador estable verificado del proveedor, con
-      prueba que no dependa de que todos los clientes compartan host de redirect.
+- [ ] La estabilidad del `subject` está resuelta contra el proveedor aprobado: `subject_types_supported` leído y
+      registrado; si resultara `pairwise`, la clave de binding usa un identificador estable verificado del
+      proveedor en vez de `sub`.
+- [ ] El proveedor aprobado soporta **CIMD** (mecanismo primario de la spec MCP vigente) y DCR como
+      compatibilidad, verificado contra su discovery y su documentación.
 - [ ] Migración, audit, revocación y rollback quedan verificados antes de acceso de clientes.
 - [ ] Canaries OAuth reales de Claude, Codex y ChatGPT cubren allow, base-only deny y revocación.
 - [ ] Ningún token, code, secret o respuesta cruda de provider aparece en logs o respuestas de error.
@@ -340,10 +348,15 @@ Reglas obligatorias:
   supresión, y notificación a clientes si un contrato vigente lo exige (marco CL + CO/MX/PE según cartera). Sin
   esta revisión cerrada no se provisiona el tenant productivo, aunque el plan comercial ya esté aprobado — son
   dos gates distintos, no uno.
-- **Presentar el costo antes de pedir la aprobación del plan.** El bloqueo declara "aprobar proveedor y plan
-  comercial", así que el operador necesita el número: costo al tamaño de la primera cohorte y proyección a 12
-  meses con el crecimiento esperado de organizaciones y usuarios, más qué se rompe si se cancela (portabilidad del
-  binding y de las identidades). Aprobar un plan sin ver su costo no es una aprobación.
+- **Presentar el costo antes de pedir la aprobación del plan.** Benchmark ejecutado 2026-08-02 sobre once
+  proveedores con precios de páginas oficiales: **WorkOS queda confirmado como recomendación a USD 99/mes planos**
+  en los tres escenarios (1 org/5 usuarios, 5 orgs/25 usuarios, 20 orgs/100 usuarios), porque su costo lo determina
+  el **custom domain**, no el volumen — las organizaciones B2B no tienen línea de cobro ni tope. Runner-up:
+  **Stytch B2B** (USD 0 de base, orgs ilimitadas, pero precio de custom domain **no público**). Descartados por no
+  soportar DCR: **Logto** (en backlog) y **FusionAuth** (issue abierto desde 2021). El Slice 0 sólo debe cerrar
+  dos incógnitas antes de firmar: la **curva de SSO/SAML de WorkOS a USD 125 por conexión/mes**, que es el costo
+  que escala cuando los clientes pidan federación propia, y la portabilidad del binding si algún día se cambia de
+  proveedor.
 - Inventariar la organización Account 360, persona/membership canónica y contratos de workspace de Globe; proponer
   el schema aditivo mínimo de binding, command/reader/audit y contrato de invalidación — provider-neutral.
 - Inventariar los contratos actuales de Greenhouse NextAuth, `client_users`, `identity_profiles`,
@@ -365,16 +378,15 @@ Reglas obligatorias:
 - **Ejecutar la matriz de tokens live** y registrarla redactada: por cada cliente objetivo (Claude, Codex,
   ChatGPT) capturar `iss`, `aud`, `sub`, `azp`/`client_id`, `scp`, `scope`, `roles`, claim organizacional y `exp`.
   Cierra de paso la prueba base-only pendiente de TASK-1626 y es el insumo del diseño de calificación por issuer.
-- **Resolver la estabilidad del `subject` ANTES de fijarlo como clave de binding, y no sólo comparando clientes.**
-  Leer primero `subject_types_supported` en el discovery del proveedor (metadata OIDC obligatoria, responde sin
-  emitir un token): si incluye `pairwise`, el `sub` se calcula **por sector identifier** — `sector_identifier_uri`
-  si está declarado, o el **host del `redirect_uri`** si no. ⚠️ Comparar sólo Claude vs Codex puede dar un **falso
-  negativo**: ambos usan redirect `http://localhost:PORT/callback` (el canary vigente usa
-  `http://localhost:8765/callback`), o sea comparten sector `localhost` y mostrarían un `sub` estable — mientras el
-  primer cliente MCP hospedado, con su propio host de redirect, recibiría un `sub` distinto y el binding dejaría de
-  resolver en silencio. Si el proveedor es pairwise, la decisión es fijar un `sector_identifier_uri` común para
-  todos los clientes MCP de Efeonce o adoptar un identificador estable de persona verificado del proveedor;
-  documentar cuál, con su prueba.
+- **Confirmar la estabilidad del `subject` leyendo `subject_types_supported` del proveedor elegido** (metadata OIDC
+  obligatoria; responde sin emitir un token). **Medición 2026-08-02: todos los candidatos SaaS viables emiten
+  `public`** — WorkOS, Stytch, Clerk, Zitadel, Descope, Auth0, Scalekit y Ory —, así que con cualquiera de ellos
+  `(issuer, subject)` es clave estable y el riesgo no se materializa. El único `pairwise` del grupo es **Microsoft
+  Entra**, o sea el carril interno, y su mecanismo **no** es el sector identifier del estándar: Entra particiona el
+  `sub` **por App ID**, así que dos App Registrations distintas dan `sub` distintos aunque compartan redirect, y
+  una misma App Registration da el mismo `sub` desde desktop y desde web. El identificador estable cross-app de
+  Entra es `oid` + `tid` — que es exactamente lo que el write de fondeo ya usa. La verificación sigue siendo
+  obligatoria contra el proveedor que finalmente se apruebe: es una consulta y cierra la pregunta.
 
 ### Slice 1 — External identity and Account 360 binding
 

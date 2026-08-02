@@ -46,9 +46,14 @@ El servicio está operativo sólo para el tenant interno de Entra. La autorizaci
 una capability de lectura y un binding de workspace exacto. Esto evita que una conexión MCP sea un bypass de
 los permisos de Globe.
 
+El gateway maneja tres permisos, no dos: el permiso base de conexión, el permiso de lectura de Globe y un tercer
+permiso de escritura interna para el fondeo de créditos, que sólo se publica cuando su interruptor está encendido.
+
 Antes de entregar acceso a clientes, Efeonce debe implementar entitlements por tenant/capability y demostrar una
-identidad que reciba sólo el scope base cuando no tiene Globe. El cliente Entra interno actual recibe ambos scopes
-incluso si solicita sólo el base; por eso no representa aún una prueba válida de segmentación comercial.
+identidad que reciba sólo el permiso base cuando no tiene Globe. Al cliente Entra interno actual se le entregan
+hoy los dos primeros permisos —el base y el de lectura de Globe— incluso si pide sólo el base; por eso no
+representa aún una prueba válida de segmentación comercial. El permiso de escritura tiene su propia autorización
+aparte y no forma parte de lo comprobado en ese comportamiento.
 
 ## Relación con otros MCP
 
