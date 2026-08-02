@@ -6,8 +6,8 @@
 
 ## TASK-1614 — canary pendiente (2026-08-02)
 
-- Créditos admitidos y promoción reactivada; Studio live oculta la referencia. Fix `595f0cb…` sin deploy;
-  cero runs/cobros. Continuidad en TASK-1614 y `GLOBE_RUNTIME_HANDOFF.md`.
+- Reader `30733996145`: saga rev 7 activa hasta `2026-08-02T10:54:43.570Z`; Studio aún muestra 8 referencias.
+  Fix `595f0cb…` sin deploy, cero runs/cobros. Detalle: TASK-1614 y `GLOBE_RUNTIME_HANDOFF.md`.
 
 ## Studio Credits — fondeo enterprise UI/API/CLI/MCP y readback convergente (2026-08-01)
 

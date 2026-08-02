@@ -96,6 +96,10 @@ Do not alter already promoted Omni, Seed Audio or Seedance Loop; do not bypass t
   5 habilitado y circuito revision 5 cerrado. Reutilizó la atestación, revisión, readiness y policy ya firmadas.
 - Chrome autenticado confirmó 800 créditos y seleccionó explícitamente **Video → Movimiento/control cámara →
   Seedance 2.0**. No se generó ninguna pieza: cero run nuevo, cero attempt nuevo y cero cobro nuevo.
+- El readback canónico `30733996145`, ejecutado a las `2026-08-02T05:22:28Z` sobre Globe
+  `595f0cb5460e42d9cc958ced204dc6a336e6deae`, confirmó que la saga nueva sigue `activated` revision 7 y conserva
+  deadline `2026-08-02T10:54:43.570Z`. La verificación UI inmediatamente posterior confirmó el runtime anterior:
+  el menú presenta exactamente ocho referencias (diez botones contando sus dos controles), sin el asset fuente.
 - El único bloqueo real está en el Studio desplegado: `globe.producer.feed.live.list` entrega hasta 24 candidatos
   retenidos, pero el compositor recortaba el render a ocho. El asset fuente sí aparece en el feed como el output
   Veo retenido de 32 créditos, pero queda fuera de esos ocho; el botón visible `Usar como referencia` del feed

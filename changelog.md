@@ -132,7 +132,9 @@
   activada con binding/circuit revision 5.
 - El canary no se disparó: el Studio live oculta referencias posteriores a la octava. Globe `main` `595f0cb`
   elimina el recorte y prueba la décima referencia con rights/lineage e idempotencia; tests y CI
-  `30733665167` verdes, deploy manual no ejecutado. TASK-1614 sigue `in-progress`, rollout pendiente.
+  `30733665167` verdes, deploy manual no ejecutado. Reader `30733996145` confirmó saga rev 7 activa hasta
+  `2026-08-02T10:54:43.570Z` y Chrome volvió a medir ocho referencias live, sin generar. TASK-1614 sigue
+  `in-progress`, rollout pendiente.
 
 ## 2026-08-01 — AXIS Lab: Astro 7 con foundation documental y testing
 

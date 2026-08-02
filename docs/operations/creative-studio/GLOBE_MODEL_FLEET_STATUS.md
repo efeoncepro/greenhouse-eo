@@ -99,7 +99,9 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
   (`readyState=4`, 0→1,738 s, sin error), pero no sustituye el canary. El readback exacto para 16 créditos dio
   `allowed=true`, 800 efectivos y cero blockers. La pieza nueva no existe porque el Studio live recorta a ocho
   referencias; el asset exacto queda fuera y el CTA del feed es no-op. El fix `595f0cb` está en `main`, con test
-  que selecciona la décima referencia, pero no fue desplegado. Cero run, attempt, cobro u output nuevos.
+  que selecciona la décima referencia, pero no fue desplegado. El reader `30733996145` confirmó a las
+  `2026-08-02T05:22:28Z` que la saga sigue `activated` revision 7, deadline `2026-08-02T10:54:43.570Z`; Chrome
+  volvió a contar ocho opciones live. Cero run, attempt, cobro u output nuevos.
 
 ## Evidencia de Nano Banana Pro — canary y promoción gobernada
 

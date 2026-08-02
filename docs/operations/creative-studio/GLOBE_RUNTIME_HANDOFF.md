@@ -180,6 +180,8 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
   `595f0cb5460e42d9cc958ced204dc6a336e6deae` elimina el recorte y agrega regresión para elegir la décima;
   tests locales verdes y CI `30733665167` `success` (`pnpm check` + `pnpm build`). El deploy manual de Studio no se ejecutó por exclusión
   explícita; por ello siguen ausentes run/attempt/output/cobro/playback/governance y `canary-confirm` nuevos.
+  Readback `30733996145` (`2026-08-02T05:22:28Z`) mantiene la saga `activated` revision 7, deadline
+  `2026-08-02T10:54:43.570Z`; Chrome volvió a medir ocho opciones en el selector live, sin generar.
 - La identidad temporal usada para consumo privado de AXIS debe sustituirse por una identidad de
   máquina antes del rollout externo; no recrees el secreto legacy de Globe.
 - El cliente Entra interno del gateway MCP recibe hoy ambos scopes aun cuando solicita el base. Antes de acceso
