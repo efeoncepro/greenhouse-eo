@@ -52,8 +52,7 @@ flowchart LR
   C --> T["TASK-1471 deterministic templates"]
   X --> T
   T --> V["TASK-1472…1475 review, parity, UI and projections"]
-  D --> AG["TASK-1632 terminal Asset Governance event handoff"]
-  AG --> V
+  D --> AG["TASK-1632 provider completion → governance wake"]
   C --> O["TASK-1476/1477 market proof"]
   V --> K["TASK-1478/1479 calibration and pilots"]
   O --> K
@@ -83,9 +82,9 @@ lab-only means surfaces are policy-blocked, not that providers may be called fro
 `TASK-1464`–`TASK-1475` establish the durable system: tenancy, assets, responsibilities, Studio Credits,
 approval, transactional dispatch, qualified adapters, deterministic composition, review, UI/MCP parity and
 Greenhouse projections. Globe owns the creative record; Greenhouse remains the ecosystem identity and account
-control plane. `TASK-1632` extracts the terminal Asset Governance handoff so its outbox/WIF/inbox/replay
-foundation can advance before the wider release, parity and deep-link gates in `TASK-1475`; the latter consumes
-that foundation instead of duplicating it.
+control plane. `TASK-1632` is an independent Globe-internal reliability slice: it makes verified provider
+completion wake Producer finalization and Asset Governance event-first while periodic schedulers remain the
+recovery net. It neither publishes to Greenhouse nor blocks `TASK-1475`.
 
 ### Lane C — Commercial validation
 

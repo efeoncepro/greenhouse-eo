@@ -1,12 +1,14 @@
 # Handoff activo
 
-## TASK-1632 — handoff terminal Asset Governance → Greenhouse (2026-08-02)
+Historia anterior: [Handoff.archive.md](Handoff.archive.md).
 
-- Creada y registrada como unidad P0 independiente: terminal gobernado → outbox durable Globe → delivery WIF
-  at-least-once → inbox/proyección Greenhouse idempotente, con revisión monotónica, replay y DLQ.
-- No reabre TASK-1614 ni reenvía el webhook crudo de Fal. TASK-1475 conserva el portfolio amplio y los deep
-  links, y debe consumir esta foundation sin duplicar publisher/consumer.
-- Estado real: diseño confirmado, implementación pendiente; sin runtime, migraciones ni despliegues ejecutados.
+## TASK-1632 — provider completion → Asset Governance dentro de Globe (2026-08-02)
+
+- Alcance corregido contra código real: Globe ya verifica/deduplica el callback Fal y encola `complete`; la
+  brecha es despertar Producer finalization y Asset Governance sin esperar Scheduler. La task añade wakes
+  durables at-least-once y conserva los schedulers como recovery.
+- Greenhouse no participa. `TASK-1475` conserva por separado cualquier proyección/evento cross-product futuro.
+- Estado real: diseño corregido, implementación pendiente; sin runtime, migraciones ni despliegues ejecutados.
 - Siguiente unidad activa de esta sesión: cerrar el WIP de Omni bajo TASK-1504 en Globe `main`, sin worktrees.
 
 ## Gate canónico de licitaciones / Brightcell (2026-08-02)
@@ -508,7 +510,7 @@ La continuidad canónica y los índices ya enlazan el paquete completo: diferenc
 operación, medición Search + Social, pricing validation y customer model. No se modificaron modelos ni skills en esta
 actualización; sólo se sincronizaron índices y continuidad documental.
 
-## 2026-07-29 — Release completo: develop promovido y producción verificada
+## Sesión 2026-07-29 — Release completo: develop promovido y producción verificada
 
 Estado honesto: **complete**. PR #166 promovió todo `develop` a `main` mediante el merge
 `0b4bdd6acb401ef0b108e27f1a8f1d80c469a0ed`; no hubo cherry-picks ni release parcial de AXIS. CI, CI Deep,
@@ -537,48 +539,3 @@ La ubicación en `efeonce-globe` fue un acoplamiento legado deliberado y tempora
 activo vive en `efeonce-group`, el PAT legacy fue revocado y no se debe recrear el secreto en Globe por inercia.
 El PAT temporal de migración permanece activo hasta la sustitución por una identidad de máquina antes del
 rollout externo.
-
-## 2026-07-29 — PR #164: main promovido, release bloqueado por latencia Sentry (fix en develop)
-
-`develop` quedó en `2ecef6a5c4c8a79a738536fe04192b7343e358b0` y PR #164 promovió todo el contenido a `main` mediante
-el merge completo `e711fe2560e3a7c2e7e8639e07a8a394e9582cdb`. CI, CI Deep, context-governance, CLAUDE, task-contract,
-Design Contract, smoke afectado y Vercel pasaron. Vercel production quedó READY para ese SHA.
-
-Los orchestrators `30452322643`, `30452924614`, `30453278402` y `30453818726` se detuvieron en preflight, antes de
-crear manifest, aprobar Production o desplegar workers. El primer bloqueo fue `playwright_smoke` sin run para
-`main`; el smoke manual canónico `30452463889` pasó verde y publicó resultados en Postgres. Los siguientes intentos
-resolvieron smoke, CI y Vercel; `30452924614` encontró timeout de Sentry, `30453278402` encontró staging cancelado +
-Sentry timeout y `30453818726` encontró Sentry timeout persistente con staging READY. La medición aisló la causa:
-Secret Manager tardó ~1,1 s y la consulta Sentry con `limit=100` tardó ~8,5–9,1 s aunque devolvió cero issues. El
-fix en develop reduce el límite a 10 (el umbral de bloqueo), da al check un presupuesto de 20 s y conserva el API
-deadline interno de 15 s; también corrige la evidencia del runner para mostrar el timeout específico. Estado honesto:
-**fix code complete en develop; rollout pendiente / operativamente bloqueado**. Falta llevar este fix a `main` mediante
-el PR canónico, esperar sus gates y repetir el preflight sin bypass. No se usó bypass.
-
-Cambios propios: autenticación efímera de paquetes privados AXIS en workflows, `NPM_RC` cifrado en Vercel `staging`,
-Preview develop y Production, compactación documentada de contexto, corrección del presupuesto/auditoría de
-`CLAUDE.md` y manifest de reachability. La credencial Vercel actual es operator-owned y debe rotarse por una
-identidad read-only antes de rollout externo.
-
-Los cambios locales ajenos siguen fuera de commits: `.vercel/project.json` y los dos artefactos SKY Blog. No se
-implementó trabajo nuevo de AXIS/Globe.
-
-## AXIS/Globe — promoción live de Nano Banana Pro
-
-Globe sigue siendo producto comercial Efeonce; su estadio técnico permanece `internal-only`/`internal_smoke`, con
-externos gated por TASK-1480. En la sesión 2026-07-30 se completó la promoción independiente de
-`ref/still/nanobanana-pro-v1`: revisión humana firmada desde el Producer autenticado, readiness `promoted` en revisión 2,
-binding de routing creado y activado en revisión 2, y despliegue live `896a0620cc93cccfb93ab5576068ff5a87e85113`.
-El selector live muestra Nano Banana Pro como `Disponible`. No se forzaron rutas restantes: siguen bloqueadas por
-evidencia exacta ausente, driver gobernado ausente o dependencia externa según `GLOBE_MODEL_FLEET_STATUS.md`.
-Desde el Producer autenticado también quedaron firmadas el 2026-07-30 las atestaciones comerciales de
-`gpt-image-2` y `gpt-image-1.5`; eso no habilita promoción todavía porque Globe aún carece del verifier/callback
-gobernado de OpenAI y de un canary exacto por ruta.
-TASK-1485 sigue `to-do` y depende de TASK-1455/aceptación ADR-016; TASK-1552 mantiene Slice 3 abierto.
-
-Siguiente task recomendado: **TASK-1480**, cerrar primero el readiness dossier del lane managed SKY con sus gates de
-derechos, gasto, ruta, rollback, entrega segura, SOW y facturación; después coordinar TASK-1485/TASK-1552 según sus
-dependencias. Para promover otra ruta, primero completar su brief/evaluación exacta y repetir el flujo gobernado.
-
-La historia anterior y los índices archivados viven en [Handoff.archive.md](Handoff.archive.md) y
-`docs/operations/agent-context-history/`; no cargar esos shards completos al inicio.

@@ -1,4 +1,4 @@
-# TASK-1632 — Globe Asset Governance Terminal Event Handoff
+# TASK-1632 — Globe Provider Completion → Asset Governance Event-Driven Handoff
 
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
@@ -15,9 +15,9 @@
 - Wireframe: `none`
 - Flow: `none`
 - Motion: `none`
-- Backend impact: `sync`
+- Backend impact: `webhook`
 - Epic: `EPIC-028`
-- Status real: `Diseño confirmado; implementación pendiente`
+- Status real: `Diseño corregido contra runtime; implementación pendiente`
 - Rank: `next.1`
 - Domain: `platform|integration|data`
 - Blocked by: `none`
@@ -27,26 +27,30 @@
 
 ## Summary
 
-Materializar el handoff event-driven desde el estado terminal canónico de Asset Governance en Globe hacia una
-proyección explícita de Greenhouse. El contrato parte de la transacción gobernada de Globe, usa outbox durable,
-entrega keyless y consumo idempotente; nunca reenvía el webhook crudo de Fal ni comparte base de datos.
+Convertir el callback verificado de Fal en el disparador primario del lifecycle durable de Globe hasta Asset
+Governance. La señal del proveedor se valida y deduplica, adelanta el trabajo durable de finalización, el output se
+recupera y retiene, y el job de Asset Governance se despierta sin depender del siguiente tick periódico. Cloud
+Scheduler permanece como red de reconciliación; Greenhouse no participa de este handoff interno.
 
 ## Why This Task Exists
 
-El runtime ya recibe callbacks de proveedor y Asset Governance ya termina assets en estados durables, pero no
-existe un handoff cross-product formal después de ese terminal. Depender de polling/manual readback deja a
-Greenhouse sin una señal recuperable y verificable. `TASK-1475` posee la integración amplia de proyecciones,
-eventos y deep links, pero está bloqueada por `TASK-1472` y `TASK-1473`; ese bloqueo no debe impedir construir la
-foundation terminal que ya tiene un productor y un consumidor definidos.
+Globe ya recibe el webhook firmado de Fal, conserva raw bytes para verificarlo, normaliza la señal, la deduplica en
+`provider_completion_signals` y crea un `complete` durable en `governed_run_outbox`. Después, el Producer worker
+recupera y retiene el output y el lifecycle existente encola Asset Governance. Sin embargo, tanto Producer worker
+como Asset Governance despiertan principalmente por Scheduler periódico. La señal es durable y transaccional, pero
+el wake-up todavía es polling-first: añade latencia y hace que el callback no cierre por sí mismo la cadena.
+
+La solución no es enviar el body de Fal directamente a Asset Governance ni crear un bridge hacia Greenhouse. El
+webhook sólo informa que una operación de proveedor cambió; la autoridad sigue en los stores, finalizers y workers
+de Globe. La notificación event-driven es una pista recuperable para despertar esos consumidores durables.
 
 ## Goal
 
-- Publicar una sola versión canónica del evento terminal de Asset Governance desde una transacción local +
-  outbox durable en Globe.
-- Entregarlo a Greenhouse mediante WIF/ADC, con al menos una entrega, autenticación de workload y datos mínimos.
-- Mantener en Greenhouse una proyección idempotente, tenant-safe, observable y recuperable mediante replay.
-- Dejar a `TASK-1475` como consumidora de esta foundation para el portfolio amplio y los deep links, sin duplicar
-  publisher, consumer ni policy.
+- Mantener `provider_completion_signals` + `governed_run_outbox` como autoridad durable del callback aceptado.
+- Emitir o registrar atómicamente un wake intent idempotente al quedar disponible trabajo inmediato.
+- Despertar Producer worker para finalizar/retener el output y Asset Governance cuando exista su job durable.
+- Mantener Cloud Scheduler como reconciliación de baja frecuencia y recuperación, no como camino primario.
+- Demostrar callback duplicado, perdido, temprano, tardío y wake perdido sin doble run, doble cobro o doble terminal.
 
 <!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
 
@@ -54,28 +58,27 @@ foundation terminal que ya tiene un productor y un consumidor definidos.
 
 Revisar y respetar:
 
+- `docs/architecture/creative-studio/EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md`.
 - `docs/architecture/creative-studio/EFEONCE_GLOBE_ASSET_GOVERNANCE_WORKER_DECISION_V1.md` (ADR-007).
-- `docs/architecture/creative-studio/GREENHOUSE_CONNECTIVITY_V1.md` (ADR-001).
-- `docs/architecture/creative-studio/EFEONCE_GLOBE_PERSISTED_TENANCY_PROJECTION_DECISION_V1.md` (ADR-006).
-- `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`.
-- `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`.
+- `docs/architecture/creative-studio/EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md`.
+- `docs/architecture/creative-studio/EFEONCE_GLOBE_PRODUCER_HUMAN_EXECUTION_DECISION_V1.md`.
 - `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`.
-- `docs/tasks/to-do/TASK-1475-globe-greenhouse-projections-events-deep-links.md`.
 
 Reglas obligatorias:
 
-- Globe conserva autoridad sobre asset, rights, lineage, retention y governance; Greenhouse almacena sólo una
-  proyección explícita y reconstruible.
-- El evento nace sólo después de que la transacción de Globe persiste un terminal gobernado; el callback de Fal
-  es señal de finalización del proveedor, no un evento empresarial cross-product.
-- Publicación = transacción local + outbox durable. Consumo = inbox/dedupe + apply atómico. No dual write.
-- Entrega `at-least-once`; no se promete exactly-once. Duplicados, demora, reordenamiento, poison messages y
-  caída del consumidor forman parte del contrato.
-- Orden por `workspaceId + assetId` y revisión monotónica; una revisión anterior nunca sobrescribe una posterior.
-- Replays no invocan proveedores, no crean runs, no gastan créditos y no repiten efectos externos.
-- WIF/ADC keyless, audience exacta y binding workspace verificado; nunca secrets, cookies o DB compartidos.
-- Payload mínimo: sin bytes/URLs privadas, prompt, body del webhook, credenciales ni raw errors.
-- Esta task requiere un ADR/addendum aceptado para el contrato cross-runtime antes de modificar runtime.
+- El callback de Fal es provider ingress, no byte authority, rights authority ni evento cross-product.
+- La API verifica firma Ed25519/JWKS sobre raw bytes, timestamp, request ID, tamaño y correlación opaca antes de
+  persistir o activar cualquier wake.
+- La transacción durable manda: una notificación puede duplicarse o perderse; nunca contiene la única copia del
+  trabajo ni ejecuta el lifecycle en el request web.
+- Semántica `at-least-once` con dedupe estable. No se promete exactly-once.
+- El callback persiste señal + checkpoint/outbox antes de responder `202`; el wake ocurre después del commit.
+- Un callback temprano se enlaza al attempt precomprometido; uno tardío o duplicado converge sin revivir terminales.
+- Finalización, retrieval, private ingest, retention y Asset Governance conservan sus boundaries actuales.
+- El evento/wake interno contiene sólo IDs opacos y reason codes; nunca payload Fal, URLs, bytes, prompt, tokens,
+  secretos ni raw errors.
+- Poll/reconcile continúa disponible para proveedores sin webhook y para recuperar pérdida o caída del wake plane.
+- Esta task requiere ADR/addendum para el nuevo trigger cloud, su IAM y el cambio polling-first → event-first.
 
 ## Normative Docs
 
@@ -89,230 +92,237 @@ Reglas obligatorias:
 
 ### Depends on
 
-- ADR-007 y su runtime terminal de Asset Governance ya desplegado.
-- ADR-001 para federación keyless entre Greenhouse y Globe.
-- ADR-006 para resolver el workspace/binding sin aceptar tenancy desde el payload.
+- TASK-1469 durable run lifecycle y su outbox ya implementados.
+- ADR-007 y el job durable de Asset Governance ya implementados internal-only.
+- Relay público estrecho y verificación server-side del callback Fal ya desplegados.
 
 ### Blocks / Impacts
 
-- Desbloquea la foundation event-driven que `TASK-1475` consumirá para sus proyecciones amplias y deep links.
-- No desbloquea por sí sola release, delivery, clientes externos ni el resto de `TASK-1475`.
+- Reduce la latencia callback → output retenido → governance terminal y robustece toda ruta Fal promovida.
+- No bloquea ni implementa `TASK-1475`; una proyección futura hacia Greenhouse consume estados canónicos de Globe
+  bajo su propio contrato.
+- No habilita clientes externos, delivery comercial ni una ruta/modelo adicional.
 
 ### Files owned
 
-- `../efeonce-globe/packages/contracts/src/asset-governance.ts`
-- `../efeonce-globe/packages/domain/src/asset-governance-jobs.ts`
+- `../efeonce-globe/apps/creative-runner/src/provider-webhooks.ts`
+- `../efeonce-globe/apps/creative-runner/src/governed-runtime-entry.ts`
+- `../efeonce-globe/apps/creative-runner/src/governed-run-worker.ts`
+- `../efeonce-globe/apps/studio-web/src/governed-runtime-app.ts`
+- `../efeonce-globe/packages/domain/src/governed-run-lifecycle.ts`
+- `../efeonce-globe/packages/database/src/stores/governed-run-store.ts`
 - `../efeonce-globe/packages/database/src/stores/asset-governance-job-store.ts`
-- `../efeonce-globe/packages/database/migrations/`
-- `../efeonce-globe/apps/asset-governance/src/`
-- `src/lib/sister-platforms/`
-- `src/app/api/platform/ecosystem/`
+- `../efeonce-globe/infra/terraform/`
 - `docs/architecture/creative-studio/`
-- `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
+- `docs/operations/creative-studio/`
 
 ## Current Repo State
 
 ### Already exists
 
-- Globe persiste jobs, evidence y retention intents de Asset Governance y recupera la proyección terminal.
-- El worker aplica leases/fencing, estados `eligible|rejected|failed` y autoridad tenant-safe.
-- El creative runner recibe webhooks de proveedor y el output generado entra al lifecycle gobernado.
-- Greenhouse y Globe ya usan federación server-side WIF/ADC sin claves persistidas.
-- Greenhouse posee API platform versionada y patrones de consumo/proyección bajo `src/lib/sister-platforms/`.
+- `verifyAndNormalizeFalWebhook` verifica el contrato Fal y produce `CompletionSignalV1` sanitizada.
+- `recordCompletionSignal` deduplica delivery/event, resuelve correlación incluso en lost-ack, checkpointa
+  `completion_received`, supersede reconcile pendiente y encola `complete` dentro de la transacción.
+- Producer worker reclama trabajos con lease/fencing, materializa el resultado una sola vez y retiene bytes.
+- Generated outputs entran al pipeline durable de Asset Governance antes de quedar elegibles.
+- Schedulers minutely/bounded y reconciliación recuperan trabajo aunque el webhook no llegue.
 
 ### Gap
 
-- No hay evento empresarial versionado emitido atómicamente al terminal de governance.
-- No hay outbox de Asset Governance, delivery con lease/retry/DLQ ni inbox/proyección deduplicada en Greenhouse.
-- No existe readback/replay operativo que demuestre continuidad durante una caída del consumidor.
+- El commit del `complete` no despierta de forma durable/inmediata al Producer worker.
+- La creación del job de Asset Governance tampoco despierta de forma inmediata a su worker.
+- Scheduler es todavía el trigger primario observable; falta wake deduplicado, retries/DLQ, IAM, métricas y prueba
+  callback→terminal sin esperar el tick.
 
 ## Modular Placement Contract
 
-- Topology impact: `cross-runtime`
-- Current home: `Globe produce el terminal y Greenhouse consume una proyección explícita`
+- Topology impact: `worker`
+- Current home: `Globe API + Producer worker + Asset Governance worker`
 - Future candidate home: `remain-shared`
-- Boundary: `contrato versionado; Globe outbox/delivery; Greenhouse inbox/proyección/readback`
-- Server/browser split: `handoff completo server-only; browser no firma, entrega ni consume eventos internos`
-- Build impact: `migraciones y workers/adapters aditivos en ambos repos; ningún file: cross-repo`
-- Extraction blocker: `transacción terminal, auth WIF y binding tenant permanecen en sus runtimes dueños`
+- Boundary: `provider ingress normalizado → stores/outbox durables → wake dispatcher → workers existentes`
+- Server/browser split: `server-only; el browser no recibe ni emite provider callbacks o wakes`
+- Build impact: `migración/IaC/worker aditivos; ningún file: cross-repo`
+- Extraction blocker: `transacción PostgreSQL, Cloud Run Job IAM y lifecycle durable permanecen en Globe`
 
 ## Backend/Data Contract
 
 ### Backend/data brief
 
 - Backend rigor: `backend-critical`
-- Impacto principal: `sync`
-- Source of truth afectado: `Globe Asset Governance; Greenhouse sólo proyección reconstruible`
-- Consumidores afectados: `Greenhouse platform/integration operators y TASK-1475`
-- Runtime target: `sibling-service`
+- Impacto principal: `webhook|async`
+- Source of truth afectado: `ninguno nuevo; stores durables de Globe continúan como SSOT`
+- Consumidores afectados: `Producer worker y Asset Governance worker`
+- Runtime target: `Globe API + Cloud Run Jobs`
 
 ### Contract surface
 
-- Contrato existente a respetar: `ADR-007 terminal states + ADR-001 workload federation + ADR-006 binding`
-- Contrato nuevo o modificado: `AssetGovernanceTerminalEventV1 y receipt/readback de entrega/proyección`
-- Backward compatibility: `additive, schema-versioned, tolerant reader; retiro sólo con ventana declarada`
-- Full API parity: `el mismo contrato/readback queda utilizable por operación y agentes; no click handler`
+- Contrato existente a respetar: `CompletionSignalV1`, `GovernedRunStorePort`, `AssetGovernanceJobStorePort`.
+- Contrato nuevo o modificado: `WorkerWakeIntentV1` o primitive equivalente fijada por ADR, con target, work key,
+  causation/correlation, availableAt y schema version.
+- Backward compatibility: `aditivo; Scheduler/reconcile continúa como fallback durante rollout y rollback`.
+- Full API parity: `reader operativo de wake/lag/recovery; no endpoint creado como click handler`.
 
 ### Data model and invariants
 
-- Entidades/tablas/views afectadas: `outbox Globe append-only; inbox/proyección Greenhouse; nombres finales en ADR`
-- Invariantes que no se pueden romper: `un terminal/revisión produce una identidad de evento estable; monotonía
-  por asset; apply idempotente; terminal de Globe no depende de disponibilidad Greenhouse`
-- Tenant/space boundary: `workspace derivado/verificado en ambos extremos; subject no autoriza por sí mismo`
-- Idempotency/concurrency: `eventId persistido; unique constraint; leases fenced; inbox y proyección en una
-  transacción; revision compare-and-apply`
-- Audit/outbox/history: `correlationId, causationId, eventId, schemaVersion, occurredAt, attempt, receipt,
-  outcome y error sanitizado`
+- Entidades afectadas: `wake outbox/dispatch receipts` o extensión explícita de un outbox existente; nombres finales
+  sólo después del ADR y auditoría de las migraciones reales.
+- Invariantes: `trabajo durable antes de wake; wake no autoriza trabajo; un work key activo por consumer; terminal
+  no revive; retry no invoca submit; governance no corre antes de private ingest/retention`.
+- Tenant boundary: `workspace sólo desde el attempt/job persistido; nunca desde un campo confiado del webhook`.
+- Idempotency/concurrency: `unique work key, claim leased/fenced, coalescing de bursts, Cloud Run 409/429/5xx
+  clasificados, y no overlap no gobernado`.
+- Audit: `wakeId, target, causationId, deliveryAttempt, disposition, timestamps, lag y error code sanitizado`.
 
-### Event payload minimum
+### Event and wake payload minimum
 
-- Envelope: `eventId`, `eventType`, `schemaVersion`, `occurredAt`, `source`, `subject`, `correlationId`,
-  `causationId`.
-- Scope: `workspaceId`, `assetId`, `governanceJobId`, `governanceRevision` y, cuando existan, `runId` y
-  `attemptId`.
-- Governed projection: terminal `status`, `eligible`, output `sha256`/MIME, rights/policy digests, lineage parent,
-  retention/legal-hold posture y timestamps terminales.
-- Exclusiones: provider payload, provider URL, prompt, bytes, storage handle, secrets, tokens y raw errors.
+- `wakeId`, `schemaVersion`, `target`, `workKey`, `causationId`, `correlationId`, `availableAt`.
+- Opcionalmente `workspaceId`, `runId`, `attemptId` o `governanceJobId` sólo para trazabilidad tenant-safe.
+- Exclusiones: provider body/headers, response URL, storage handle, prompt, media, credentials y raw errors.
+- El consumidor siempre reclama desde PostgreSQL; nunca procesa trabajo basándose sólo en este payload.
 
 ### Delivery and failure semantics
 
-- Publicación: append outbox en la misma transacción que hace visible la revisión terminal.
-- Delivery: `at-least-once`, retries acotados con backoff+jitter, lease fenced, timeout, circuit breaker y DLQ.
-- Consumer: WIF/audience/issuer, envelope estricto, inbox dedupe y proyección atómica.
-- Reorder: una revisión menor/igual se reconoce como replay/stale y no muta la proyección.
-- Missing: reconciliation/readback compara watermark/outbox/receipt y permite replay sin side effects.
-- Poison: cuarentena con reason code sanitizado; nunca bloquea indefinidamente otros assets.
+- Publicación: wake intent en la misma transacción que vuelve reclamable el trabajo, o relay post-commit apoyado en
+  outbox durable; nunca dual write sin recovery.
+- Delivery: `at-least-once`, retries acotados con backoff+jitter, coalescing y poison/DLQ observable.
+- Wake perdido: Scheduler/reconciler encuentra el trabajo durable y cierra el lag.
+- Wake duplicado: el segundo trigger no duplica claim, terminal, retention, governance ni cobro.
+- Consumer ocupado: se conserva pending/retry; no se lanza una tormenta de ejecuciones Cloud Run.
+- Callback desconocido: se conserva la señal para el lost-ack window y reconciliation; no se inventa un run.
 
 ### Migration, backfill and rollout
 
 - Migration posture: `additive`
-- Default state: `internal-only; delivery OFF hasta completar shadow/readback`
-- Backfill plan: `snapshot/replay acotado desde terminales existentes sólo si el ADR lo acepta; sin provider calls`
-- Rollback path: `apagar delivery, conservar outbox, reparar consumer y replay; Globe continúa terminando assets`
-- External coordination: `GCP IAM/WIF y runtime owners; sin coordinación de Fal para este handoff`
+- Default state: `internal-only; event wake OFF y Scheduler actual intacto`
+- Backfill: `sólo wakes para trabajo durable reclamable; nunca replay de provider submit ni generación`
+- Rollout: `shadow receipts → event wake internal-only → bajar frecuencia del Scheduler → mantener safety net`
+- Rollback: `apagar dispatcher/wake, conservar outbox y restaurar Scheduler como trigger primario`
+- External coordination: `GCP IAM/API del trigger seleccionado; Fal no requiere cambio de contrato`
 
 ### Security and access
 
-- Auth/access gate: `workload identity allowlisted, audience exacta, capability interna y binding verificado`
-- Sensitive data posture: `allowlist de campos; sin media privada o URLs; logs redacted`
-- Error contract: `reason codes tipados; raw cloud/DB/provider errors no cruzan frontera`
-- Abuse/rate-limit posture: `batch/concurrency limits, retry budget, poison quarantine y alertas por lag`
+- Auth/access: `service accounts dedicadas y permisos mínimos para publicar/ejecutar sólo el target exacto`.
+- API/Job boundary: `API no recibe run.jobs.run amplio si un dispatcher dedicado puede reducir blast radius`.
+- Sensitive data: `payload allowlisted, logs redacted, ninguna firma/header/body persistido fuera de evidencia mínima`.
+- Abuse controls: `body cap, replay window, dedupe, coalescing, rate limit, retry budget y alertas de burst/lag`.
 
 ### Runtime evidence
 
-- Local checks: `contract, migration, duplicate, reorder, stale, poison, auth deny, outage y replay tests`
-- DB/runtime checks: `unique/fencing/readback tenant-scoped y transacción outbox-terminal demostrada`
-- Integration checks: `shadow interno; duplicate delivery; consumer outage; replay; revoke/rights revision`
-- Reliability signals/logs: `outbox lag, oldest pending, delivery attempts, DLQ, inbox duplicates, projection lag`
-- Production verification sequence: `ADR -> local -> migrations -> shadow -> failure/replay -> internal live`
+- Local: firma inválida, body grande, early/lost-ack, duplicate, late, wake lost/duplicate, outage y recovery.
+- DB: señal + complete + wake atómicos; unique/fencing y terminal monotónico.
+- Integration: callback firmado fixture → Producer wake → output retained → governance wake → terminal.
+- Reliability: `wake pending/oldest age`, dispatch failures, scheduler recoveries, callback-to-complete latency y
+  complete-to-governance latency.
+- Production: un canary interno controlado y replay de wake sin provider call ni crédito adicional.
 
 ### Acceptance criteria additions
 
-- [ ] Consumer caído no impide que Globe alcance y conserve el terminal gobernado.
-- [ ] Duplicado/reordenado/replay no muta dos veces ni produce un efecto externo.
-- [ ] La proyección Greenhouse se reconstruye sin leer la DB de Globe.
+- [ ] Callback aceptado despierta el camino durable sin esperar el siguiente tick periódico.
+- [ ] Perder el wake sólo aumenta latencia: Scheduler/reconciler recupera sin pérdida ni doble efecto.
+- [ ] Asset Governance nunca procesa body, URL o estado declarativo proveniente directamente de Fal.
 
 <!-- ZONE 2 — PLAN MODE: se completa al tomar la task -->
 <!-- ZONE 3 — EXECUTION SPEC -->
 
 ## Scope
 
-### Slice 0 — Decisión y contrato
+### Slice 0 — ADR y auditoría del lifecycle existente
 
-- Crear/aceptar el ADR o addendum que fija ownership, envelope, payload, versioning, ordering, auth, delivery,
-  replay, poison handling, retention y deprecation.
-- Registrar el evento en el catálogo y publicar fixtures/contract tests sin importar código interno entre repos.
+- Fijar el trigger cloud, ownership, IAM, coalescing, retries, DLQ, observabilidad y rollback.
+- Documentar qué ya resuelven `provider_completion_signals`, `governed_run_outbox` y governance jobs; no crear un
+  segundo queue/state machine.
 
-### Slice 1 — Productor durable en Globe
+### Slice 1 — Wake durable del Producer worker
 
-- Persistir outbox en la misma transacción del terminal/revisión de Asset Governance.
-- Implementar dispatcher con leases fenced, retry budget, backoff+jitter, DLQ, métricas y receipts.
-- Demostrar que callbacks Fal duplicados o tardíos convergen a una sola revisión aplicable.
+- Registrar/emitir el wake al quedar disponible `complete` y despacharlo después del commit.
+- Despertar el job con identidad mínima, coalescer bursts y conservar reconcile/Scheduler como safety net.
+- Cubrir callback temprano, lost-ack, duplicado, tardío y worker ocupado.
 
-### Slice 2 — Consumidor y proyección en Greenhouse
+### Slice 2 — Wake durable de Asset Governance
 
-- Autenticar la entrega keyless y resolver el binding/workspace desde autoridad verificada.
-- Persistir inbox/dedupe y proyección monotónica en una transacción.
-- Exponer readback/recovery operator- y agent-usable sin filtrar media ni ampliar permisos.
+- Despertar Asset Governance sólo después de que private ingest/retention encole su job durable.
+- Reclamar desde el store existente, mantener orden malware → C2PA → rights y terminal fenced.
+- Evitar que una notificación salte quarantine, rights, lineage o retention.
 
-### Slice 3 — Recovery y rollout internal-only
+### Slice 3 — Recovery, observabilidad y cutover internal-only
 
-- Ejecutar shadow, fallas inyectadas, duplicate/reorder/poison y caída temporal del consumidor.
-- Reconciliar watermark/outbox/receipts/proyección y ejecutar replay sin provider calls ni créditos.
-- Habilitar sólo el workspace interno después de que señales y runbook queden verdes.
+- Probar pérdida/duplicado/outage, DLQ, replay y recuperación por Scheduler sin provider calls.
+- Medir latencias callback→complete y complete→governance, bajar Scheduler a safety-net sólo con SLO verde.
+- Ejecutar un canary interno y verificar un run/cobro/output/governance, más replay sin gasto.
 
 ## Out of Scope
 
-- Reabrir o extender `TASK-1614`.
-- Reenviar el webhook crudo de Fal a Greenhouse o tratarlo como evento empresarial.
-- Portafolio amplio, deep links, release/delivery y UI de `TASK-1475`.
-- Habilitar clientes externos, compartir DB/storage/sesión/secretos o duplicar policy de Globe en Greenhouse.
-- Cambiar el lifecycle del proveedor, volver a generar assets o gastar créditos durante replay/backfill.
+- Greenhouse, `TASK-1475`, eventos cross-product, portfolio o deep links.
+- Reenviar raw webhook o permitir que Fal escriba directamente Asset Governance.
+- Cambiar términos, derechos, policy o elegibilidad del output.
+- Sustituir PostgreSQL/outbox/leases por una cola cloud como SSOT.
+- Habilitar clientes externos, modelos/rutas nuevas o release comercial.
+- Crear una pieza adicional sólo para probar replay/recovery.
 
 ## Detailed Spec
 
-La ejecución comienza con `pnpm codex:task-hook TASK-1632 --develop`. Los nombres físicos del schema se fijan en
-Slice 0 tras auditar stores/migraciones reales; esta task no autoriza una segunda fuente de verdad. Globe emite
-sólo después del terminal ADR-007. Greenhouse confirma recepción con receipt durable y deriva una proyección;
-cualquier workflow posterior requiere su task dueña, especialmente `TASK-1475`.
+La ejecución comienza con `pnpm codex:task-hook TASK-1632 --develop`. El ADR debe escoger el trigger después de
+comparar Cloud Tasks/Pub/Sub/Eventarc/Jobs API contra el runtime real; no se prescribe un servicio por intuición.
+El diseño debe conservar los dos commits de autoridad: provider completion vuelve reclamable `complete`, y el
+finalizer/ingest vuelve reclamable Asset Governance. Cada commit produce un wake recuperable, pero cada worker
+vuelve a leer y reclamar su trabajo desde PostgreSQL.
 
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
 
-`ADR/contract -> migrations -> duplicate/reorder tests -> shadow -> failure/replay -> internal live -> enable`.
-Ningún delivery live precede la atomicidad terminal+outbox ni la deduplicación del consumidor.
+`ADR/audit → durable wake → dispatcher/IAM → failure tests → shadow → internal wake → canary → Scheduler safety-net`.
+No se reduce Scheduler antes de probar pérdida de wake y reconciliación.
 
 ### Risk matrix
 
-| Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
+| Riesgo | Sistema | Probabilidad | Mitigación | Señal de alerta |
 |---|---|---:|---|---|
-| Evento perdido por dual write | Globe | medium | terminal + outbox en una transacción | terminal sin outbox/receipt |
-| Duplicado/reordenamiento regresa estado | Greenhouse | medium | inbox unique + revisión monotónica | revisión disminuye |
-| Consumer outage bloquea governance | ambos | low | entrega desacoplada y retries bounded | latencia terminal sube con outage |
-| Fuga de media/datos sensibles | contrato/logs | low | allowlist y negative tests | campo no permitido |
-| Poison detiene la cola | dispatcher | medium | quarantine/DLQ por asset | oldest pending crece sin aislamiento |
-| Replay produce gasto/side effect | ambos | low | consumer projection-only + tests | provider call/run/charge en replay |
+| Wake antes del commit | API/DB | medium | outbox transaccional + dispatcher post-commit | wake sin trabajo reclamable |
+| Tormenta de ejecuciones | cloud trigger | medium | coalescing/work key/rate limit | invocaciones ≫ trabajos |
+| Doble terminal/cobro | lifecycle | low | dedupe + lease/fencing + economic key | >1 terminal o charge |
+| Webhook salta governance | boundary | low | worker reclama store; no direct handoff | job sin ingest/retention |
+| Trigger perdido deja backlog | reliability | medium | Scheduler safety-net + lag alert | oldest pending sobre SLO |
+| IAM amplía blast radius | cloud | low | dispatcher/target exacto + deny tests | API puede ejecutar otros jobs |
 
 ### Feature flags / cutover
 
-- Publisher/outbox puede desplegarse primero con dispatcher OFF.
-- Dispatcher y consumer comienzan en shadow/internal-only con allowlist del workspace interno.
-- Externos permanecen OFF y dependen de `TASK-1480`/`TASK-1475` y gates comerciales aplicables.
+- Wakes se despliegan OFF; outbox/receipts pueden operar en shadow.
+- Internal-only permite event wake con Scheduler aún minutely.
+- Sólo tras failure tests se baja la frecuencia del Scheduler; nunca se elimina la reconciliación.
 
 ### Rollback plan per slice
 
 | Slice | Rollback | Tiempo | Reversible? |
 |---|---|---:|---|
-| ADR/contract | nueva revisión aditiva; no reescribir eventos emitidos | <30 min | sí |
-| Globe publisher | apagar dispatcher y conservar outbox | <15 min | sí |
-| Greenhouse consumer | apagar ingest, conservar inbox y reparar/replay | <15 min | sí |
-| Internal enable | retirar allowlist, reconciliar y replay tras corrección | <30 min | sí |
+| Wake publisher | apagar publicación; conservar trabajo durable | <15 min | sí |
+| Dispatcher/trigger | apagar dispatcher; reanudar Scheduler primario | <15 min | sí |
+| Governance wake | apagar wake; job durable queda reclamable | <15 min | sí |
+| Cutover | restaurar frecuencia anterior y reconciliar | <30 min | sí |
 
 ### Production verification sequence
 
-Local contract/migration tests; sandbox/shadow; WIF allow/deny; outage+duplicate+reorder+poison; replay; readback
-cross-runtime; internal-only live; observación de lag/receipts; promoción explícita.
+Contract/migration tests; IaC plan sin replace/destroy; shadow receipts; firma/duplicate/lost-wake tests; internal
+wake con Scheduler activo; canary único; replay del wake sin provider call/cobro; reducción controlada del polling.
 
 ### Out-of-band coordination required
 
-IAM/WIF y deploy owners de ambos runtimes. Fal no participa del contrato cross-product y no requiere cambios.
+GCP IAM y APIs del trigger seleccionado. No requiere cambio de Fal ni intervención de Greenhouse.
 
 <!-- ZONE 4 — VERIFICATION & CLOSING -->
 
 ## Acceptance Criteria
 
-- [ ] ADR/addendum aceptado fija source of truth, schema, auth, delivery, ordering, replay y deprecation.
-- [ ] Un terminal/revisión persiste una identidad de evento aplicable junto al cambio local; retries pueden
-      entregar más de una vez sin duplicar mutación.
-- [ ] Greenhouse rechaza issuer/audience/binding/schema inválidos antes de persistir la proyección.
-- [ ] Duplicado, demora, reordenamiento y replay conservan la revisión más nueva y un solo apply efectivo.
-- [ ] Caída del consumidor no bloquea terminalización en Globe; al volver, replay/reconciliation cierra el lag.
-- [ ] Poison messages quedan en cuarentena y no bloquean otros assets.
-- [ ] Payload, logs y receipts no contienen bytes, URLs privadas, prompts, storage handles, credentials ni raw
-      errors.
-- [ ] Replay/backfill no invoca Fal/Vertex, no crea runs y no gasta créditos.
-- [ ] `TASK-1475` consume esta foundation y no crea un segundo publisher/consumer.
+- [ ] ADR/addendum aceptado fija trigger, transacciones, IAM, delivery, coalescing, fallback y SLO.
+- [ ] Firma/body/timestamp/correlación inválidos no persisten señal ni producen wake.
+- [ ] Callback válido persiste/deduplica señal y vuelve reclamable `complete` antes de responder `202`.
+- [ ] Wake primario adelanta Producer worker sin esperar Scheduler y el worker reclama sólo desde el store.
+- [ ] Output queda recuperado, content-addressed, retenido y con lineage antes de encolar governance.
+- [ ] Governance wake ocurre sólo después de su job durable y conserva malware → C2PA → rights.
+- [ ] Duplicado, early/lost-ack, tardío y wake repetido producen un run, un cobro y un terminal.
+- [ ] Wake perdido o dispatcher caído se recupera mediante Scheduler/reconcile sin provider call adicional.
+- [ ] Payloads/logs/receipts no contienen raw webhook, provider URLs, bytes, prompts, secrets ni raw errors.
+- [ ] Métricas prueban SLO de latencia y distinguen event-driven completion de recovery por polling.
 - [ ] Rollout queda internal-only; clientes externos continúan fail-closed.
 
 ## Verification
@@ -324,16 +334,17 @@ IAM/WIF y deploy owners de ambos runtimes. Fal no participa del contrato cross-p
 - `pnpm docs:closure-check`
 - `pnpm docs:context-check:strict`
 - `cd ../efeonce-globe && pnpm check && pnpm build`
-- Contract/integration smoke cross-runtime con duplicate/reorder/outage/replay y readback de lag cero.
+- Integration smoke callback→complete→retention→governance con duplicate/lost-wake/replay y readback de cobro.
 
 ## Closing Protocol
 
-- [ ] Lifecycle/carpeta, registry, README, EPIC-028, execution plan, event catalog, changelog y Handoff sincronizados.
-- [ ] Migraciones y despliegues aplicados con readback o estado `rollout pendiente` honesto.
+- [ ] Lifecycle/carpeta, registry, README, EPIC-028, arquitectura, runbook, changelog y Handoff sincronizados.
+- [ ] Migraciones/IAM/flags/triggers/deploys aplicados o estado `rollout pendiente` honesto.
 - [ ] QA release auditor y documentation governor ejecutados.
-- [ ] Evidencia conserva event IDs, revisions, outbox/inbox receipts, timestamps y métricas sin datos sensibles.
+- [ ] Evidencia conserva delivery/wake/run/attempt/job IDs, hashes, timestamps, lag y charge sin datos sensibles.
 
 ## Follow-ups
 
-- `TASK-1475` construye el portfolio amplio y deep links reutilizando este handoff.
-- Cualquier evento adicional o automatización downstream requiere owner/task explícita.
+- `TASK-1475` puede consumir una proyección terminal de Globe en el futuro, pero no consume ni bloquea este wake
+  interno y debe diseñar su propio contrato cross-product.
+- Generalizar otros provider callbacks sólo si preservan la misma verificación y lifecycle durable.
