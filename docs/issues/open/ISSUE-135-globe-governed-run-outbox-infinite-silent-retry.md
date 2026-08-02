@@ -54,6 +54,51 @@ Dos agravantes que lo vuelven invisible:
 - Logs del worker: `gcloud logging read 'resource.labels.job_name="globe-producer-worker"'` — `exit(0)` por
   batch con el JSON de resultado; cero entradas `severity>=WARNING` en 2 h.
 
+## Delta 2026-08-02 — mitigado y parcialmente resuelto
+
+**El zombi está neutralizado.** `run-cancel` sobre `3c1fe091` por el carril de operador
+(run `30765996641`): llegó a **705 entregas** —diez más sólo durante el diagnóstico— y quedó
+`run_state: cancelled`, `outbox_state: done`. Deja de consumir lease cada minuto.
+
+**El tope existe.** Globe `packages/domain/src/governed-run-failure-policy.ts` + su cableado en
+`reschedule()` (`governed-run-lifecycle.ts`).
+
+Hallazgo que redujo el trabajo a una fracción: **el camino terminal del store ya estaba implementado
+completo** — `reschedule({terminal: true})` cierra el lease, marca el intento y el run como `failed`— y
+**nadie lo invocaba nunca**. El lifecycle pasaba `terminal: false` siempre. No hacía falta maquinaria
+nueva: hacía falta decidir cuándo pasar `true`.
+
+**Por qué no alcanzaba un tope único.** Un insumo que no resuelve nunca va a resolver; un 5xx del
+proveedor se recupera solo. Con un número único o matas corridas recuperables o dejas vivas las muertas.
+La decisión se toma por **clase de error**, y el tope queda como red de seguridad de lo no clasificado:
+
+| Clase | Tope | Ejemplo |
+|---|---:|---|
+| `terminal` | 1 | `provider_input_resolution_failed`, `generated_rights_policy_not_authorized` |
+| `unknown` | 3 | `run_finalization_failed` (el fallback genérico) |
+| `transient` | 25 | `fal_adapter_upstream_error`, `output_ingest_unreachable` |
+| `waiting` | 240 | `completion_checkpoint_missing` |
+
+La clase `waiting` es la guarda que evita convertir el fix en un apagón: `completion_checkpoint_missing`
+**no es un fallo**, es la espera normal de una corrida en vuelo contada por el mismo contador. Un tope bajo
+ahí cancelaría toda generación que tarde más que su backoff.
+
+Un cierre terminal ahora se reporta como `applied` y no como `rescheduled`, así la métrica del batch deja de
+contar como «reprogramado» algo que murió.
+
+7 tests nuevos; `packages/domain` 456 → 457.
+
+## Lo que queda abierto
+
+1. **Las señales.** `globe.run.outbox_dead_letter` y `globe.run.outbox_retry_storm` (umbral 10, ya expuesto
+   como `isRetryStorm`) todavía no existen como señal observable. Sin ellas el tope evita el daño pero nadie
+   se entera de que algo murió.
+2. **Preservar el motivo real.** `finalizationFailureCode` sigue cayendo a `run_finalization_failed` cuando
+   el error no está en su allowlist. Correcto para no filtrar, pero deja cero rastro accionable — y por eso
+   la clase `unknown` existe con tope 3.
+3. **Proyectar el estado terminal a la card** (`TASK-1559`): un run en terminal debe dejar de decir
+   «generando».
+
 ## Solución propuesta
 
 1. **Techo de entregas por `kind`** con estado terminal `dead_letter`, append-only, conservando el último
