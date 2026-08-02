@@ -3,18 +3,79 @@
   "schemaVersion": 1,
   "deal": "brightcell-lic-95",
   "workspacePath": "docs/commercial/tenders/brightcell-lic-95",
-  "status": "workshop_only",
-  "proposalId": null,
-  "registration": null,
+  "status": "proposal_registered",
+  "proposalId": "prop-d03087a4-3673-4091-9bf1-72e92407f879",
+  "registration": {
+    "surface": "authenticated_nexa_proposal_studio",
+    "registeredAt": "2026-08-02T09:06:47.889896Z",
+    "actorKind": "member",
+    "actorMemberId": "julio-reyes",
+    "proposalId": "prop-d03087a4-3673-4091-9bf1-72e92407f879",
+    "clientOrganizationId": "org-339e4498-38f3-4bcf-98d7-764861e1eda9"
+  },
   "composition": {
     "sourcePlans": [
       "deck-plan.json",
       "deck-plan-economic.json"
+    ],
+    "resolvedManifests": [
+      {
+        "sourcePlan": "deck-plan.json",
+        "artifactId": "BRIGHTCELL-LIC-95-TECHNICAL",
+        "manifestVersion": 1,
+        "slideCount": 23,
+        "manifestHash": "b266db17aad16afb127f74ffa1cef731ee6a44127c2f82554e51d400d86f0ccc",
+        "validators": "all_pass"
+      },
+      {
+        "sourcePlan": "deck-plan-economic.json",
+        "artifactId": "BRIGHTCELL-LIC-95-ECONOMIC",
+        "manifestVersion": 1,
+        "slideCount": 9,
+        "manifestHash": "4d6f359293fbb529fd929b5b534f6c56c82a08176e8c0f08d9e87f09f0748af4",
+        "validators": "all_pass"
+      }
     ]
   },
   "renderJobs": [],
   "deliverables": [],
   "verification": null,
+  "evidence": [
+    {
+      "evidenceId": "prev-58db453d-613a-475f-b702-44208af57285",
+      "source": "oferta-tecnica.md",
+      "audience": "client_facing",
+      "classification": "attested"
+    },
+    {
+      "evidenceId": "prev-616c1578-116c-425a-a5c6-aa1a172ffbda",
+      "source": "propuesta-economica.md",
+      "audience": "client_facing",
+      "classification": "attested"
+    }
+  ],
+  "renderAttempts": [
+    {
+      "attemptedAt": "2026-08-02T09:13:16Z",
+      "audience": "client_facing",
+      "outputTarget": "pdf-merged",
+      "artifactPurpose": "technical_deck",
+      "manifestHash": "b266db17aad16afb127f74ffa1cef731ee6a44127c2f82554e51d400d86f0ccc",
+      "state": "rejected",
+      "failureCode": "deadline_expired",
+      "detail": "El deadline de la propuesta ya venció: no se encola un render para un proceso cerrado."
+    },
+    {
+      "attemptedAt": "2026-08-02T09:13:16Z",
+      "audience": "client_facing",
+      "outputTarget": "pdf-merged",
+      "artifactPurpose": "economic_deck",
+      "manifestHash": "4d6f359293fbb529fd929b5b534f6c56c82a08176e8c0f08d9e87f09f0748af4",
+      "state": "rejected",
+      "failureCode": "deadline_expired",
+      "detail": "El deadline de la propuesta ya venció: no se encola un render para un proceso cerrado."
+    }
+  ],
   "workshopOutputs": [
     {
       "path": ".captures/brightcell-bid-v13",
@@ -28,8 +89,11 @@
     }
   ],
   "notes": [
-    "La composición local valida el taller visual, pero no registra una Proposal ni un asset versionado.",
-    "La sesión autenticada revisada el 2026-08-02 no mostró una Proposal Brightcell en el Portal de Propuestas.",
-    "Regularizar mediante createProposal/requestProposalRender/asset-worker y verificar el resultado antes de marcar verified."
+    "La Proposal se registró el 2026-08-02 desde la sesión autenticada de Nexa/Proposal Studio con actor member julio-reyes.",
+    "La organización canónica es Brightcell Logísticas Chile Limitada (EO-ORG-0344); proposalId=prop-d03087a4-3673-4091-9bf1-72e92407f879.",
+    "Se registraron dos evidencias client-facing: oferta técnica y propuesta económica; no se inventó un asset de RFP que no existe en el workspace.",
+    "Los dos manifests fueron producidos por resolvePlan y pasaron todos sus validadores; no equivalen todavía a assets versionados.",
+    "requestProposalRender rechazó ambos renders con deadline_expired; no se creó renderJob ni deliverable y el registro no debe marcarse verified.",
+    "No cambiar ni borrar el deadline histórico para forzar el cierre. Si se necesita un deck productivo posterior, requiere una decisión comercial explícita y un nuevo proceso gobernado con fecha vigente."
   ]
 }
