@@ -418,3 +418,35 @@ Ninguna para la foundation. Las promociones, atestaciones y canaries permanecen 
 - No hubo commit Globe, deploy, migración, rights/policy nueva, promoción, gasto, canary ni mutación runtime durante
   este slice. TASK-1633 y el goal permanecen activos; el siguiente agente debe continuar desde el diff existente,
   no reimplementarlo.
+
+## Delta 2026-08-02 — hallazgo de revisión externa (sesión de monitoreo)
+
+`47c0585` y `db8686e` verificados de forma independiente en copia aislada: `pnpm check` con exit code real
+`0` en ambos (1458 y 1481 tests, 0 fallos). Invariantes revisados contra el diff sin hallazgos: proyección
+browser-safe sin provider IDs/slugs/costos/secretos, `reference`/`source`/`first-frame`/`motion-source` con
+semánticas distintas, control `required` + `unsupported` inválido, sin Omni por Fal, contrato resuelto
+server-side desde el catálogo.
+
+**Un hallazgo abierto, latente — no rompe hoy.** En `apps/creative-runner/src/production-route-compiler.ts`
+(~línea 345), el snapshot inmutable de `authorizedInputs` hace spread del assignment **después** de los
+campos explícitos:
+
+```ts
+inputId, sha256, mediaType, rights,
+...(experiment.request.creativeIntent?.inputAssignments.find(…) ?? {}),
+```
+
+El spread gana por precedencia. Hoy no hay colisión: `RouteInputAssignmentV1` declara
+`inputRef | slotId | role | ordinal | referenceRole`. Pero `sha256`/`mediaType`/`rights` provienen del camino
+**verificado** (`#verifyRights` resuelve el asset y valida derechos) mientras el spread trae datos del
+**intent del caller**, y el objeto alimenta el snapshot inmutable que sostiene lineage. Si
+`RouteInputAssignmentV1` gana un `mediaType` —plausible: el slot ya declara `mediaTypes` y registrar el
+resuelto sería natural— un valor del caller sobrescribiría en silencio uno verificado dentro del registro que
+luego se usa como evidencia.
+
+Misma familia que las dos construcciones ya corregidas en `47c0585`: el `as never` silenciaba al checker donde
+debía atrapar el desajuste; la IIFE escondía un throw en un ternario; ésta esconde una precedencia. Arreglo de
+una línea — **spread primero, campos verificados después** — para que el orden exprese la regla: lo verificado
+gana sobre lo declarado.
+
+Sin cambios aplicados por la sesión de monitoreo: el archivo pertenece a esta task y su dueño decide.
