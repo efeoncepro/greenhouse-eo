@@ -28,8 +28,9 @@
 **Split UI (regla de perfil híbrido):** esta task es la foundation `backend-data`. La superficie visible de login
 en `auth.efeonce.org` (pantallas, estados, copy, accesibilidad) se entrega en una **task `ui-ux` dependiente**,
 creada al cierre del Slice 0 cuando exista el contrato de diseño/flujo que ese slice produce — con su wireframe y
-flow reales, nunca stubs. Esa task UI bloquea el Slice 3 (canaries de cliente); esta task no declara `UI impact`
-porque no implementa superficie visible por sí misma.
+flow reales, nunca stubs. Esa task UI **corre en paralelo** a los Slices 1-2 y sólo bloquea el Slice 3 (canaries de
+cliente) — ver el DAG en `Slice ordering hard rule`; esta task no declara `UI impact` porque no implementa
+superficie visible por sí misma.
 
 ## Summary
 
@@ -105,9 +106,14 @@ Reglas obligatorias:
   `globe.credits.funding.ensure` y cualquier write futuro— queda ligada explícitamente al issuer interno; un token
   del issuer externo que traiga ese string se deniega en dispatch, fail-closed, además de las defensas downstream
   (token-exchange Entra→Greenhouse por `(microsoft_tenant_id, microsoft_oid)`).
-- **Dynamic client registration autentica software, nunca autoriza.** Un cliente MCP registrado dinámicamente
-  contra el issuer externo no recibe nada sin binding persona+organización y grant explícito; la política de
-  emisión de scopes vive en la configuración del plano de identidad y en los grants, no en el registro del client.
+- **Dynamic client registration REGISTRA e IDENTIFICA un cliente OAuth. No autentica a la persona, no establece
+  membresía y no concede capabilities.** Un cliente público con PKCE puede no tener client secret, así que su
+  `client_id` es un identificador auto-declarado, **nunca una credencial**. La política de emisión de scopes vive
+  en la configuración del plano de identidad y en los grants, no en el registro del client.
+- **El binding de persona se resuelve por `(issuer, subject)`, JAMÁS por `client_id`.** Es el corolario directo de
+  la regla anterior: atar autoridad a un identificador auto-declarado por el cliente sería confiar en el dato que
+  el atacante controla. El contexto de autorización debe conservar `issuer`, `subject`, `clientId`, `audience` y
+  `scopes` como campos **separados**; ninguno se deriva del otro por fallback.
 - Entra sigue siendo exclusivamente el canary interno durante la transición. No se deshabilita
   `globe.producer.fleet.list` ni se usa ese cliente como evidencia de acceso cliente.
 - La configuración de WorkOS staging y discovery MCP no constituye acceso cliente. No crear producción, DNS,
@@ -160,11 +166,22 @@ Reglas obligatorias:
 - El verificador de tokens del gateway es **single-issuer**: `../efeonce-mcp/src/config.ts` construye un único
   `oauth.issuer` desde `OAUTH_ISSUER` y `src/auth/token-verifier.ts` valida issuer/audience/exp/sub contra ese
   único JWKS; `authorization_servers` publica exactamente un issuer.
-- Existen **tres scopes**, no dos: base `efeonce.mcp.read`, reader `efeonce.mcp.globe.read` y el write interno
-  `efeonce.mcp.globe.credits.funding.ensure` (gateado por `globeCreditFunding.enabled`, sólo aparece en
+- El gateway **declara tres scopes**, no dos: base `efeonce.mcp.read`, reader `efeonce.mcp.globe.read` y el write
+  interno `efeonce.mcp.globe.credits.funding.ensure` (gateado por `globeCreditFunding.enabled`, sólo aparece en
   `scopes_supported` con el flag ON). El write ejecuta token-exchange Entra→Greenhouse mapeado por
   `(microsoft_tenant_id, microsoft_oid)` y llama el endpoint canónico Greenhouse; su canary interno real pasó el
-  2026-08-01 con resultado terminal y sin segundo delta económico.
+  2026-08-01 con resultado terminal y sin segundo delta económico. **Lo verificado sobre la co-emisión de Entra es
+  únicamente base + reader** (TASK-1626 §Estado de rollout: "recibe ambos scopes incluso cuando solicita sólo el
+  base"); que el mismo cliente reciba además el scope de write **no está verificado** y su consentimiento/asignación
+  es un flujo separado — medirlo contra un token live es entregable del Slice 0, no una cautela redaccional.
+- El verificador **descarta el `subject`**: `AuthInfo` sale como `{ token, clientId, scopes, expiresAt }` y
+  `clientId = azp ?? sub` (`src/auth/token-verifier.ts:34`). Con `azp` presente el `sub` no llega al contexto de
+  autorización; sin `azp` el `clientId` **ES** el `sub`, o sea los dos ejes quedan conflacionados. Hoy el defecto es
+  invisible porque `clientId` no tiene ningún consumer en el gateway y el write de fondeo reenvía el **token crudo**
+  al exchange (Greenhouse hace el mapeo por su cuenta), así que nada lo ejercita.
+- El verificador además **fusiona `roles` dentro de `scopes`** (`scp` ∪ `scope` ∪ `roles`). Con un solo issuer es
+  una conveniencia para app roles de Entra; con dos issuers, cualquier claim `roles` del issuer externo se convierte
+  en un scope string y amplía la superficie del problema de equivalencia por string.
 - Globe ya hace policy downstream sobre su workspace y capability para el reader habilitado.
 
 ### Gap
@@ -175,8 +192,12 @@ Reglas obligatorias:
 - El gateway no soporta dual-issuer: agregar el issuer externo requiere validación gateada por issuer, con
   autoridad calificada por issuer para cada tool (hoy la comprobación de scopes es por string, suficiente con un
   solo issuer, insuficiente con dos).
-- El cliente Entra interno actual recibe los scopes delegados juntos y por ello no demuestra denial por persona ni
-  por cliente; la prueba base-only real sigue pendiente.
+- El contexto de autorización **no puede resolver un binding de persona hoy**: no propaga `issuer` ni `subject`
+  como campos propios. Es precondición dura de esta task, no un refactor cosmético — sin `(issuer, subject)` el
+  binding sólo podría apoyarse en `clientId`, que bajo PKCE público es auto-declarado.
+- El cliente Entra interno actual co-emite base + reader y por ello no demuestra denial por persona ni por
+  cliente; la prueba base-only real sigue pendiente desde TASK-1626. Esa medición es también el insumo que
+  determina cómo se diseña el test de calificación por issuer.
 
 ## Modular Placement Contract
 
@@ -218,6 +239,8 @@ Reglas obligatorias:
   - `Una organización de identidad externa sólo es usable a través de un binding explícito y auditado hacia una organización canónica.`
   - `El binding y el grant son provider-neutral: relacionan organización canónica ↔ capability namespaceada; no llevan columnas específicas de Globe ni de ningún provider.`
   - `Los scopes del gateway no reemplazan el enforcement de workspace/capability/credits/rights de cada provider.`
+  - `El binding de persona se resuelve por (issuer, subject). Nunca por client_id, que bajo PKCE público es auto-declarado y no es credencial.`
+  - `El contexto de autorización conserva issuer, subject, clientId, audience y scopes como campos separados; ningún campo se deriva de otro por fallback.`
   - `La autoridad de una tool se resuelve por (issuer, scope, binding, grant); un scope string del issuer externo jamás satisface una tool ligada al issuer interno.`
   - `La revocación falla cerrada tanto en el dispatch del gateway como en la policy del provider.`
 - Tenant/space boundary: `derivado server-side desde issuer/subject/client verificados y el binding explícito de Account 360; cada provider resuelve independientemente su workspace autorizado`
@@ -256,8 +279,13 @@ Reglas obligatorias:
 - [ ] La coexistencia del login cliente actual de Greenhouse y la delegación futura al plano de identidad externo
       aceptado quedan documentadas, con cookies/audiencias separadas y cutover gateado por separado.
 - [ ] Gateway y provider fallan cerrado de forma independiente ante binding o capability ausente/revocada.
+- [ ] El contexto de autorización expone `issuer`, `subject`, `clientId`, `audience` y `scopes` como campos
+      separados, y el binding de persona se resuelve por `(issuer, subject)`; ningún camino lo resuelve por
+      `client_id` ni deriva un campo de otro por fallback.
 - [ ] Un token del issuer externo que porte un scope string internal-only (p.ej. el write de fondeo) se deniega en
       dispatch sin llegar al provider.
+- [ ] Está medido y registrado contra un token live qué scopes co-emite realmente cada issuer (base, reader y, si
+      aplica, write), y el diseño de la calificación por issuer se apoya en esa medición, no en el supuesto.
 - [ ] Migración, audit, revocación y rollback quedan verificados antes de acceso de clientes.
 - [ ] Canaries OAuth reales de Claude, Codex y ChatGPT cubren allow, base-only deny y revocación.
 - [ ] Ningún token, code, secret o respuesta cruda de provider aparece en logs o respuestas de error.
@@ -286,6 +314,10 @@ Reglas obligatorias:
   autenticación al mismo plano de identidad externo aceptado, conservando su propia sesión y audiencia.
 - Especificar la calificación por issuer de la autoridad de tools en el gateway (tool ↔ issuers permitidos) y su
   test de regresión, antes de introducir el segundo issuer.
+- Especificar el contrato ampliado del contexto de autorización (`issuer`, `subject`, `clientId`, `audience`,
+  `scopes` separados) y que el binding de persona se resuelve por `(issuer, subject)`.
+- Medir contra un token live qué scopes co-emite hoy el cliente Entra interno (cerrando de paso la prueba
+  base-only pendiente de TASK-1626) y registrar el resultado como insumo del diseño de calificación por issuer.
 
 ### Slice 1 — External identity and Account 360 binding
 
@@ -303,6 +335,8 @@ Reglas obligatorias:
 
 - Agregar validación dual-issuer gateada al gateway sin cambiar el canary interno Entra: el verificador
   single-issuer actual (`src/auth/token-verifier.ts`) pasa a un resolver por issuer con JWKS y audience propios.
+- Ampliar el contexto de autorización a `issuer` + `subject` + `clientId` + `audience` + `scopes` separados,
+  eliminando el fallback `clientId = azp ?? sub`, y resolver el binding de persona por `(issuer, subject)`.
 - Ligar cada tool a sus issuers permitidos: las tools internal-only (write de fondeo incluido) rechazan tokens del
   issuer externo aunque porten el scope string; test de regresión de esa denegación.
 - Resolver el binding verificado server-side y exigir revalidación del provider (organización, workspace y
@@ -338,6 +372,16 @@ Restricciones de forma verificadas contra el runtime que el diseño debe honrar:
 - **El gateway es hoy single-issuer por construcción** (`OAUTH_ISSUER` único, un JWKS, un
   `authorization_servers`). El dual-issuer del Slice 2 es un cambio de verificador, no de configuración: requiere
   resolver issuer→JWKS/audience por token y propagar el issuer al contexto de autorización de cada tool.
+- **El contexto de autorización pierde el `subject` hoy y hay que ampliarlo antes de poder bindear a nadie.**
+  `AuthInfo` sale como `{ token, clientId, scopes, expiresAt }` con `clientId = azp ?? sub`: con `azp` presente el
+  `sub` se descarta, y sin `azp` los dos ejes se conflacionan en un solo campo. El contrato nuevo conserva
+  `issuer`, `subject`, `clientId`, `audience` y `scopes` por separado. Que hoy no rompa nada **no es evidencia de
+  que esté bien**: `clientId` no tiene consumers en el gateway y el write de fondeo reenvía el token crudo al
+  exchange, así que ningún camino ejercita el campo. La primera vez que se ejercite será justamente resolviendo el
+  binding de una persona cliente — el peor momento para descubrirlo.
+- **`roles` se fusiona dentro de `scopes`.** El verificador arma los scopes como `scp ∪ scope ∪ roles`, así que un
+  claim `roles` de cualquier issuer se vuelve un scope string. Es otra razón por la que la equivalencia por string
+  no puede ser la última capa de autoridad con dos issuers.
 - **Los scopes hoy son strings sin dueño.** `efeonce.mcp.read`, `efeonce.mcp.globe.read` y
   `efeonce.mcp.globe.credits.funding.ensure` se comprueban por `includes` sobre los scopes del token. Con un solo
   issuer eso es suficiente; con dos, la tupla de autoridad pasa a ser `(issuer, scope, binding, grant)` y la
@@ -359,9 +403,18 @@ Restricciones de forma verificadas contra el runtime que el diseño debe honrar:
 
 ### Slice ordering hard rule
 
-`Slice 0 -> task ui-ux dependiente -> Slice 1 -> Slice 2 -> Slice 3`. Slice 2 MUST preserve the Entra internal
-issuer and fleet reader; Slice 3 MUST prove base-only denial and revocation before it allows a second organization
-or capability.
+El orden es un **DAG, no una cadena** — serializar la task UI antes del Slice 1 bloquearía el backend sin motivo:
+
+```text
+Slice 0 (ADR aceptado + contrato de binding/diseño + task ui-ux creada)
+  ├─ Slice 1 (issuer + auth/session service + binding primitives) ─→ Slice 2 (dual-issuer + issuer-qualified tools) ─┐
+  └─ task ui-ux (diseño/autoría en paralelo desde el cierre del Slice 0;                                             ├─→ Slice 3
+     integra contra el session service que entrega el Slice 1) ───────────────────────────────────────────────────────┘
+```
+
+La task UI **nunca bloquea Slice 1 ni Slice 2**, pero debe estar terminada antes del Slice 3 (los canaries de
+cliente atraviesan la superficie real de login). Slice 2 MUST preserve the Entra internal issuer and fleet reader;
+Slice 3 MUST prove base-only denial and revocation before it allows a second organization or capability.
 
 ### Risk matrix
 
@@ -370,6 +423,7 @@ or capability.
 | External ID becomes a second tenant source of truth | identity / Account 360 | medium | explicit binding only; architecture review and migration tests | unbound or conflicting organization binding |
 | Valid token reaches wrong Globe workspace | MCP / Globe | medium | gateway binding plus provider revalidation, fail-closed deny test | tenant/workspace mismatch denial |
 | External-issuer token satisfies an internal-only tool | MCP / issuer authority | medium | tool↔issuer allowlist, regression test, downstream token-exchange defense | external token dispatch attempt on internal tool |
+| Person binding resolved from a self-asserted `client_id` | MCP / identity | medium | separate issuer/subject/clientId in auth context; bind by `(issuer, subject)`; remove `azp ?? sub` fallback | binding lookup keyed on clientId, or subject absent from context |
 | Revocation lags and leaks access | identity / MCP / Globe | medium | short-lived token, grant version/invalidation and revoke canary | revoked principal dispatch attempt |
 | External issuer disrupts current reader | gateway | low | dual issuer gated; retain Entra internal path and provider flag | internal canary regression |
 | OAuth client incompatibility | external MCP clients | medium | metadata/registration and PKCE canary for each target client | per-client auth compatibility result |
@@ -400,7 +454,7 @@ or capability.
 3. Complete OAuth/PKCE and MCP initialize from each target client.
 4. Prove permitted reader access, base-only denial, expired token denial and revoked-grant denial.
 5. Prove issuer-qualified denial: an external-issuer token carrying an internal-only scope string is denied at
-   dispatch.
+   dispatch, and confirm the person binding resolved from `(issuer, subject)` — never from `client_id`.
 6. Verify Globe workspace/capability revalidation and redacted telemetry.
 7. Observe signals before adding another organization or capability; stop and roll back on any mismatch.
 
