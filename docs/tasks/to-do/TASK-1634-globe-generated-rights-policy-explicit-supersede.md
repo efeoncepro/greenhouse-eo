@@ -153,6 +153,9 @@ Migración aditiva + VIEW + cambio de lectura. Sin borrar filas, sin UPDATE sobr
 
 - `commercial-promotion-lane` declara a quién supersede al publicar en un scope ocupado, en la misma
   transacción. Publicar sin declararlo falla.
+- **Reafirmación vs atestación nueva, decidido por digest** (ver Decisiones de gobernanza): si el
+  `providerTermsDigest` de la corrección coincide con el de la policy superseded, es reafirmación y procede
+  sin evidencia nueva; si difiere, exige evidencia. El criterio deja de depender de quien publica.
 
 ### Slice 4 — Señal
 
@@ -225,6 +228,8 @@ y exigir resultado idéntico en las 12 rutas con policy vigente.
 - [ ] Publicar en un scope ocupado exige declarar a quién supersede, en la misma transacción.
 - [ ] Ni un `UPDATE` ni un `DELETE` sobre historia de derechos: la supersesión es una fila nueva.
 - [ ] `resolveExact` viejo y nuevo devuelven lo mismo en las 12 rutas con policy vigente.
+- [ ] Una corrección con el mismo `providerTermsDigest` se publica sin evidencia nueva; una con digest
+      distinto la exige.
 - [ ] `rights-list` enumera atestaciones desde el carril gobernado.
 - [ ] `globe.rights.policy_ambiguity` existe, lee de la VIEW y está en 0.
 - [ ] `pnpm check` y `pnpm build` salen 0 en Globe.
@@ -248,6 +253,22 @@ y exigir resultado idéntico en las 12 rutas con policy vigente.
 
 ## Open Questions
 
-- **¿Una corrección de rights exige atestación nueva, o puede reafirmar la existente?** El 2026-08-02 se
-  hizo lo segundo para restaurar servicio, y fue defendible porque los términos del proveedor no cambiaron.
-  Como política permanente es una decisión de gobernanza, no técnica. **Bloqueante para Slice 3.**
+Ninguna. La única que había quedó resuelta — ver abajo.
+
+## Decisiones de gobernanza
+
+### Una corrección de rights PUEDE reafirmar la atestación existente
+
+**Decidido por el operador el 2026-08-02.** No hace falta una atestación nueva para corregir una policy:
+reafirmar la vigente es válido y es el camino esperado.
+
+Esto desbloquea Slice 3 y define su forma: el lane publica la corrección arrastrando el mismo
+`providerTermsRef` y el mismo `providerTermsDigest` de la policy que supersede, sin pedir evidencia nueva.
+Es exactamente lo que se hizo a mano para restaurar servicio ese día (`producer-rights-v2-dedupe`), ahora
+como contrato.
+
+**El límite es la definición misma de reafirmar:** sólo se puede reafirmar lo que sigue siendo cierto. Si
+los términos del proveedor cambiaron, el `providerTermsDigest` cambia con ellos y eso ya no es una
+corrección — es una atestación nueva, con su evidencia. El contrato lo hace verificable en vez de
+dejarlo al criterio de quien publica: **si el digest coincide con el de la policy superseded, es
+reafirmación y procede sin evidencia nueva; si difiere, exige evidencia.** Ese chequeo va en Slice 3.
