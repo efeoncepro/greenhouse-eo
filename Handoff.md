@@ -2,6 +2,32 @@
 
 Historia anterior: [Handoff.archive.md](Handoff.archive.md).
 
+## TASK-1633 / ADR-022 — auditoría arquitectónica y dónde viaja el valor de un control (2026-08-02)
+
+- **Auditoría con `arch-architect` contra `ISSUE-126`/`127`/`135`.** El eje de inputs está bien resuelto y no se
+  tocó. Tres hallazgos, por costo de revertir: (1) `creativeControls` no era un eje nuevo sino el **tercero** que
+  expresa lo mismo que `StructuredBriefV1` y `RouteConstraintsV1`; (2) los cinco códigos de error canónicos que la
+  task promete **tienen cero ocurrencias** — el compiler colapsa nueve causas accionables en
+  `route_creative_contract_mismatch`, décima aparición del bug class de `ISSUE-127`; (3) ese rechazo **no está en
+  `TERMINAL_CODES`** pese a ser determinista, así que cae a `unknown` con tope 3 — versión atenuada de las 705
+  entregas de `ISSUE-135`, y en el mismo camino de materialización de inputs.
+- **ADR-022 Delta (b) aceptado:** `creativeControls` **declara soporte y nunca transporta valores**. El valor de
+  dirección viaja por el canal que ya existe, `prompt XOR structuredBrief`, y los controles que el brief no tiene
+  (`camera`, `lens`, `motion`, `timing`, `audio-direction`, `negative-prompt`) entran como ingredientes nuevos.
+  `duration`/`aspect-ratio`/`resolution` salen de los controles: su dueño es `RouteConstraintsV1`/`OutputShapeV1`.
+  `RouteCreativeIntentV1` **no gana campo de controles**.
+- **Lo que desempató no fue lo que esperábamos.** La hipótesis era que el store de recetas de `TASK-1493` tenía
+  datos cuya migración decidía el asunto. Lectura pura contra producción: **0 recetas, 0 workspaces**; en cambio
+  `prompt_history` con **144 entradas** activas ese día. El argumento correcto resultó ser otro: la regla de
+  exclusión mutua **ya corre en producción** (`producer-client.ts:1191`, `producer_prompt_contract_invalid`) y un
+  campo de valores en el intent la eludiría por el costado, habilitando dos direcciones contradictorias sin error
+  observable.
+- **Hallazgo lateral para `TASK-1552`:** la capability de guardar/reutilizar recetas existe desde el 2026-07-22 y
+  tiene **cero uso porque nunca tuvo UI**. No es rechazo de usuarios, es superficie ausente.
+- Task actualizada con Slice 3.5, `valueShape`, criterio 7 desmarcado (su guard es de autoría del catálogo, no de
+  ejecución) y dos criterios nuevos. Corregido el delta previo: el fingerprint **sí** incluye roles y ordinales.
+- Sin cambios de runtime, código Globe, deploy, migración ni gasto. `task:lint` y `ops:lint --changed` verdes.
+
 ## TASK-1631 / MCP — canon de scopes, CIMD como registro primario y benchmark de proveedor (2026-08-02)
 
 - **Cambio de invariante en el ADR propuesto** `EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md` (sigue

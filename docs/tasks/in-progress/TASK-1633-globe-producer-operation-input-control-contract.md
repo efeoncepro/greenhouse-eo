@@ -275,19 +275,28 @@ duplicación pura. **El modo de fallo no es un conflicto detectable: es preceden
 compilan al prompt, ambos entran al fingerprint — y uno gana sin dejar rastro. Es la misma familia que el spread
 de lineage corregido en `b062d6f`, un nivel más arriba: el orden expresa una regla que nadie declaró.
 
+**Decidido en ADR-022 Delta (b) el 2026-08-02.** El desempate no fue el costo del legado —se verificó contra
+producción y hay **0 recetas guardadas**, así que no hay nada que migrar— sino que **Globe ya tiene la regla y su
+guardia**: `producer-client.ts:1191` rechaza `prompt` + `structuredBrief` juntos con
+`producer_prompt_contract_invalid`, y la UI vive de eso hoy (`ProducerComposer.tsx:752-758`). Un campo de valores
+en el intent eludiría esa guardia por el costado: el pedido pasaría a ser `(prompt XOR structuredBrief) + controls`
+y nada impediría dos direcciones contradictorias compilando al mismo prompt.
+
 Trabajo del slice:
 
+- **`creativeControls` declara soporte y NUNCA transporta valores.** Es el descriptor por ruta.
+- **El valor viaja por el canal existente `prompt XOR structuredBrief`**; los controles que el brief no tiene
+  —`camera`, `lens`, `motion`, `timing`, `audio-direction`, `negative-prompt`— entran como **ingredientes nuevos**
+  de `StructuredBriefV1`. Aditivo; hereda la exclusión mutua sin código nuevo y el peso por ingrediente gratis.
 - **Retirar `duration`, `aspect-ratio` y `resolution` de `ROUTE_CREATIVE_CONTROLS`.** Su dueño es `constraints` +
   `OutputShapeV1`, que ya los valida contra la ruta. Un control que ya tiene camino tipado no necesita un segundo.
-- **Decidir un único dueño del valor para la dirección semántica.** Dirección recomendada: `StructuredBriefV1` es
-  el **valor** (qué pides) y `creativeControls` el **descriptor de soporte por ruta** (si esta ruta lo honra y por
-  qué mecanismo). Así son complementarios en vez de competidores y no nace un tercer canal.
-- **Los controles genuinamente nuevos** —`camera`, `lens`, `motion`, `timing`, `audio-direction`,
-  `negative-prompt`, `seed`— entran como ingredientes del vocabulario elegido, nunca como canal paralelo.
 - **Agregar `valueShape` a `RouteCreativeControlSupportV1`** (ver Contract surface), sin lo cual el fail-closed
   pre-spend no alcanza al eje de controles.
-- El SSOT resultante queda declarado en el ADR y con un test que falla si un control declara un valor cuyo dueño
-  es otro vocabulario.
+- **El compiler valida el valor contra el descriptor**: un ingrediente cuyo control es `unsupported` en esa ruta se
+  rechaza o degrada explícitamente antes del estimate, con razón nombrada y clasificación `terminal`.
+- `RouteCreativeIntentV1` **no gana campo de controles**: conserva su forma actual. El fingerprint cubre el eje sin
+  cambio estructural porque el brief ya viaja dentro del quote firmado.
+- Test que falla si un control declara un valor cuyo dueño es otro vocabulario.
 
 ### Slice 4 — Migración y conformance de rutas existentes
 
@@ -428,13 +437,11 @@ Ninguna para la foundation. Las promociones, atestaciones y canaries permanecen 
 
 - **Resuelta para Slice 1.** ADR-022 resolvió que la operación vive dentro del descriptor versionado de cada ruta;
   el vocabulario compartido no es una referencia runtime mutable.
-- 🔴 **ABIERTA y bloqueante del eje de aplicación — ¿quién es dueño del valor de dirección creativa?**
-  `creativeControls` (esta task), `StructuredBriefV1` (`TASK-1493`) y `RouteConstraintsV1` declaran hoy conceptos
-  solapados: `style`↔`style`, `lighting`↔`light`, `composition`↔`framing`, y `duration`/`aspect-ratio`/`resolution`
-  duplicados enteros. Los tres son *"el caller expresa dirección → el server compila"*. La pregunta no es
-  estilística: define si el fingerprint firma una intención o dos, y si un pedido contradictorio es un error o una
-  precedencia silenciosa. **No cablear valores de control hasta resolverla** (Slice 3.5). Dirección recomendada,
-  no decidida: brief = valor, contrato de ruta = descriptor de soporte.
+- ✅ **RESUELTA 2026-08-02 — ¿quién es dueño del valor de dirección creativa?** `creativeControls` (esta task),
+  `StructuredBriefV1` (`TASK-1493`) y `RouteConstraintsV1` declaraban conceptos solapados: `style`↔`style`,
+  `lighting`↔`light`, `composition`↔`framing`, y `duration`/`aspect-ratio`/`resolution` duplicados enteros.
+  **ADR-022 Delta (b)**: el descriptor declara soporte, el valor viaja por `prompt XOR structuredBrief`, la forma
+  de salida se queda en `constraints`/`OutputShapeV1`. Ver Slice 3.5.
 - Abierta, menor: si `valueShape` debe admitir texto libre para los controles semánticos o restringirse a enums
   por ruta. Un enum es verificable pre-spend; el texto libre es lo que el oficio realmente usa. Probablemente
   ambos, discriminados — pero no está decidido y `ISSUE-127` (capa 8) advierte que un control demasiado estricto
