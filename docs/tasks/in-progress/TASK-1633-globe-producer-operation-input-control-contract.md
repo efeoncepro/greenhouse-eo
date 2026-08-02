@@ -110,10 +110,23 @@ Reglas obligatorias:
 - `../efeonce-globe/packages/contracts/src/index.ts`
 - `../efeonce-globe/packages/provider-contract/src/index.ts`
 - `../efeonce-globe/packages/domain/src/producer-catalog.ts`
+- `../efeonce-globe/packages/domain/src/governed-run-failure-policy.ts` — sólo para clasificar los códigos de
+  rechazo de contrato que esta task introduce; la política de reintentos en sí pertenece a `ISSUE-135`.
 - `../efeonce-globe/apps/studio-web/src/governed-production-composition.ts`
 - tests de contracts/domain/compiler correspondientes
 - `docs/architecture/creative-studio/`
 - `docs/operations/creative-studio/`
+
+**`vendor/efeonce-globe/` NO es owned por esta task, y es una decisión, no un olvido.** Greenhouse consume
+`@efeonce-globe/contracts` como tarball `file:` pinneado (`package.json:314`) y ese tarball **transporta
+`producer-catalog.js`**, o sea el archivo que esta task modifica. Verificado el 2026-08-02: hoy ningún módulo
+de Greenhouse importa `producer-catalog` ni `producer-fleet` (los imports vivos son `tenancy`, `credits` y
+`capabilities`), así que el drift no tiene consumidor y re-vendorizar sería ruido. **Esta task no crea el
+primer consumidor Greenhouse del catálogo.** El día que alguno nazca —el candidato obvio es la proyección de
+flota, que sí transporta `creativeContract` (`producer-catalog.ts:1075`) hacia el gateway MCP— hereda
+`ISSUE-126` completo, incluido que **pnpm resuelve un `file:` por NOMBRE DE ARCHIVO**: el re-vendorizado
+correcto es silenciosamente inefectivo en local y local diverge de CI. La regla de ordenamiento de ese issue
+—bumpear el vocabulario vendorizado ANTES de que exista quien lo lea— aplica a quien lo cree, no acá.
 
 Los adapters concretos y la UI consumidora permanecen en sus tasks dueñas. No ejecutar en paralelo cambios de
 `producer-catalog.ts` bajo TASK-1504/1553 mientras esta foundation esté modificando el mismo contrato.
@@ -165,6 +178,12 @@ Los adapters concretos y la UI consumidora permanecen en sus tasks dueñas. No e
 
 - Contrato existente a respetar: `ProducerRouteCatalogEntryV1`, `CreativeProviderRequestV1`, `ProductionRouteBindingV1`, `PrepareExperimentPayloadV1` y readers del catálogo/flota.
 - Contrato nuevo o modificado: `RouteCreativeContractV1` o nombre equivalente con `operation`, `inputSlots`, `creativeControls`, `outputContract` y `schemaVersion`.
+- **Asimetría a cerrar en `RouteCreativeControlSupportV1`:** hoy es `{ mechanism, required }` — declara **si** un
+  control se honra y **cómo**, pero no **qué se puede pedir**. `inputSlots` sí tiene su contraparte tipada en el
+  intent (`inputAssignments`, con cardinalidad, MIME y orden); `creativeControls` no tiene ninguna. Sin una
+  `valueShape` por control (enum cerrado · texto libre acotado · numérico con rango, según el caso), el
+  fail-closed pre-spend —que es el corazón de esta task— **no puede ejercerse sobre el eje de controles**, y el
+  primero que necesite un enum lo inventará al lado del contrato.
 - Backward compatibility: `gated`; lectura dual de `inputModes/referencePolicy` durante migración y rechazo ante contradicción.
 - Full API parity: el catálogo/reader proyecta el mismo descriptor a todas las surfaces; ningún consumidor mantiene una matriz paralela.
 
@@ -193,7 +212,8 @@ Los adapters concretos y la UI consumidora permanecen en sus tasks dueñas. No e
 
 - Auth/access gate: capabilities, workspace, route readiness/binding, rights y spend fence existentes.
 - Sensitive data posture: hashes/roles browser-safe según proyección; bytes, URLs firmadas, prompts efectivos internos, provider IDs y secretos server-only.
-- Error contract: `route_operation_unsupported`, `route_input_slot_invalid`, `route_input_combination_unsupported`, `route_control_unsupported`, `route_contract_revision_mismatch` o equivalentes canónicos.
+- Error contract: `route_operation_unsupported`, `route_input_slot_invalid`, `route_input_combination_unsupported`, `route_control_unsupported`, `route_contract_revision_mismatch` o equivalentes canónicos. **Ninguno existe todavía** (auditoría 2026-08-02): el compiler colapsa las nueve causas en un único `route_creative_contract_mismatch` — ver el criterio de razones nombradas y el Delta correspondiente.
+- **Clasificación de fallo obligatoria:** todo código de rechazo de contrato nace `terminal` en `governed-run-failure-policy.ts`. Un contrato desajustado es determinista por definición — la próxima entrega falla idéntica sin que nadie toque nada, que es el criterio de admisión literal de esa lista. Sin clasificar cae a `unknown` (tope 3) y gasta tres entregas en algo imposible, contadas como `rescheduled`.
 - Abuse/rate-limit posture: límites por slot/MIME/duración/bytes, hard budget, circuit breaker e idempotency antes del provider.
 
 ### Runtime evidence
@@ -238,6 +258,37 @@ Los adapters concretos y la UI consumidora permanecen en sus tasks dueñas. No e
 - Compilar el contrato neutral a `CreativeProviderRequestV1` y exigir que adapter/driver declare controles aplicados.
 - Incluir inputs/roles/controles/output en estimate validity, approval e idempotency fingerprints.
 
+### Slice 3.5 — Unificación del vocabulario de dirección creativa (BLOQUEA el cableado de controles)
+
+Este slice existe porque `creativeControls` **no es un eje nuevo: es el tercero que expresa lo mismo**, y
+cablear valores antes de resolverlo crea dos caminos hacia el mismo prompt. Los tres vocabularios vivos:
+
+| Vocabulario | Dónde | Qué expresa |
+|---|---|---|
+| `StructuredBriefV1` (`TASK-1493`) | `packages/contracts/src/structured-briefs.ts` | `subject·style·light·framing·mood·palette` **+ `weight`**, y su propio comentario lo declara *"structured alternative to `prompt`; the server compiles it deterministically"* |
+| `RouteConstraintsV1` | `packages/contracts/src/producer-catalog.ts` | `aspectRatio`, `resolution`, `durationSeconds` por ruta, ya validados fail-closed vía `OutputShapeV1` |
+| `ROUTE_CREATIVE_CONTROLS` (esta task) | idem | vuelve a declarar `style`, `lighting`, `composition`, `duration`, `aspect-ratio`, `resolution` |
+
+Solapamientos directos: `style`↔`style`, `lighting`↔`light`, `composition`↔`framing`, y los tres de output son
+duplicación pura. **El modo de fallo no es un conflicto detectable: es precedencia silenciosa.** Un pedido con
+`structuredBrief.light='golden hour'` y `controls.lighting='high key'` no es inválido por ninguna regla, ambos
+compilan al prompt, ambos entran al fingerprint — y uno gana sin dejar rastro. Es la misma familia que el spread
+de lineage corregido en `b062d6f`, un nivel más arriba: el orden expresa una regla que nadie declaró.
+
+Trabajo del slice:
+
+- **Retirar `duration`, `aspect-ratio` y `resolution` de `ROUTE_CREATIVE_CONTROLS`.** Su dueño es `constraints` +
+  `OutputShapeV1`, que ya los valida contra la ruta. Un control que ya tiene camino tipado no necesita un segundo.
+- **Decidir un único dueño del valor para la dirección semántica.** Dirección recomendada: `StructuredBriefV1` es
+  el **valor** (qué pides) y `creativeControls` el **descriptor de soporte por ruta** (si esta ruta lo honra y por
+  qué mecanismo). Así son complementarios en vez de competidores y no nace un tercer canal.
+- **Los controles genuinamente nuevos** —`camera`, `lens`, `motion`, `timing`, `audio-direction`,
+  `negative-prompt`, `seed`— entran como ingredientes del vocabulario elegido, nunca como canal paralelo.
+- **Agregar `valueShape` a `RouteCreativeControlSupportV1`** (ver Contract surface), sin lo cual el fail-closed
+  pre-spend no alcanza al eje de controles.
+- El SSOT resultante queda declarado en el ADR y con un test que falla si un control declara un valor cuyo dueño
+  es otro vocabulario.
+
 ### Slice 4 — Migración y conformance de rutas existentes
 
 - Migrar primero fixtures/rutas representativas de create, frames, reference, motion transfer, edit y upscale.
@@ -261,17 +312,31 @@ usar nombres de modelos. Los slots iniciales incluyen `source`, `reference`, `fi
 orden, límites y combinaciones. Los roles de referencia incluyen sujeto/personaje/producto/estilo/escena/storyboard,
 sin afirmar que todos los providers los distinguen nativamente.
 
-Los controles comunes incluyen cámara, movimiento, lente, estilo, iluminación, ritmo, temporalidad, audio,
-duración, ratio, resolución, seed y restricciones negativas. El descriptor no obliga a mostrar todos: declara
-soporte y mecanismo. La compilación prompt-semantic ocurre server-side desde un brief neutral y registra qué se
-aplicó; el browser sólo envía elecciones tipadas. `unsupported` requerido aborta antes del estimate/spend.
+Los controles comunes de **dirección creativa** incluyen cámara, movimiento, lente, encuadre, estilo,
+iluminación, ritmo, temporalidad, audio, seed y restricciones negativas. El descriptor no obliga a mostrar
+todos: declara soporte, mecanismo y —tras Slice 3.5— la forma del valor admitido. La compilación
+prompt-semantic ocurre server-side desde un brief neutral y registra qué se aplicó; el browser sólo envía
+elecciones tipadas. `unsupported` requerido aborta antes del estimate/spend.
+
+**Duración, ratio y resolución NO son controles creativos de este descriptor**: son forma de salida y su dueño
+es `RouteConstraintsV1` + `OutputShapeV1`, que ya los valida fail-closed contra la ruta. Declararlos también acá
+fue duplicación de SSOT y se retira en Slice 3.5.
+
+Cámara y movimiento se conservan como controles comunes con su mecanismo por ruta — es exactamente la capability
+compartida y adaptable que originó esta task. Lo que desaparece no es el control: es el **modo** «Elementos»
+(una composición de inputs disfrazada de operación) y el botón «Movimiento» específico de un modelo. El control
+`motion` (dirección creativa, compilada al prompt) y el slot `motion-source` (transferir movimiento desde un
+asset) son cosas distintas y ADR-022 las separa.
 
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
 
-`ADR → tipos/validators → compiler/fingerprint → fixtures legacy → gate nuevas rutas → consumers`. TASK-1504 no
-modifica el catálogo Omni y TASK-1552 no retira modos visuales antes de que Slice 3 proyecte el descriptor estable.
+`ADR → tipos/validators → compiler/fingerprint → unificación de vocabulario → fixtures legacy → gate nuevas rutas
+→ consumers`. TASK-1504 no modifica el catálogo Omni y TASK-1552 no retira modos visuales antes de que Slice 3
+proyecte el descriptor estable. **Slice 3.5 precede a cualquier cableado de valores de control**: mientras haya
+tres vocabularios, cablear el eje de aplicación fija la duplicación en el fingerprint y deja de ser reversible
+barato.
 
 ### Risk matrix
 
@@ -282,6 +347,8 @@ modifica el catálogo Omni y TASK-1552 no retira modos visuales antes de que Sli
 | Fingerprint no incluye referencia/control | ledger/idempotency | high | golden fingerprint tests y estimate invalidation | mismo approval para recipe distinta |
 | UI vuelve a crear matriz propia | UI/contracts | medium | reader único + conformance + TASK-1552 consumer | branches por model name |
 | Scope se convierte en integración Fal | provider governance | low | out-of-scope y no secret/slug changes | nuevo endpoint/provider binding |
+| **Un rechazo de contrato entra a la máquina de reintentos sin clasificar** (materializado) | outbox/worker | high | clasificar `terminal` en `governed-run-failure-policy.ts` en el MISMO PR que introduce el código | `delivery_attempt > 1` sobre un código de contrato; `rescheduled` repetido sobre el mismo job |
+| **Dos vocabularios compilan al mismo prompt y uno gana en silencio** | contracts/prompt seam | high | Slice 3.5 antes de cablear valores; test de dueño único por control | ninguna — es precisamente el riesgo: no hay error, hay precedencia |
 
 ### Feature flags / cutover
 
@@ -323,7 +390,9 @@ Ninguna para la foundation. Las promociones, atestaciones y canaries permanecen 
 - [x] Controles declaran `native-parameter | prompt-semantic | reference-conditioned | preprocessed | postprocessed | unsupported`.
 - [x] `reference`, `first-frame`, `edit-source` y `motion-source` conservan semánticas distintas hasta manifest/lineage.
 - [ ] Estimate/approval/idempotency invalidan ante cambios de ruta, inputs/roles, controles u output.
-- [x] Un control/input requerido no soportado falla antes de reserva/provider submit con error canónico.
+- [ ] Un control/input requerido no soportado falla antes de reserva/provider submit con error canónico. **Desmarcado 2026-08-02:** el guard existe pero es de **autoría del catálogo** (`producer-catalog.ts:914`, corre al cargar), no de ejecución; como no hay canal para que un caller pida un control, la condición es hoy inalcanzable y el criterio se cumplía de forma vacía. El guard de autoría se conserva.
+- [ ] Cada rechazo de contrato tiene **razón nombrada del lado del servidor** y nace clasificado `terminal` en la política de fallos. Hoy `production-route-compiler.ts:504-524,551` colapsa nueve causas accionables distintas —contrato ausente · intent ausente · revisión · operación · slot inexistente · rol · media type · MIME · input no materializado— en un único `route_creative_contract_mismatch`, y ninguna está en `TERMINAL_CODES`.
+- [ ] Un solo vocabulario es dueño de cada valor de dirección creativa; ningún control declara un valor cuyo dueño es `StructuredBriefV1` o `RouteConstraintsV1` (Slice 3.5), con test que lo sostenga.
 - [ ] Manifest/run evidence conserva schema revision, roles y controles aplicados/rechazados sin secretos.
 - [ ] Rutas legacy tienen dual-read/equivalence tests y rutas nuevas no pueden registrarse sin descriptor.
 - [ ] Fixtures Omni/Seedance/Veo demuestran una UI intent común con traducciones distintas dentro de adapters.
@@ -357,8 +426,19 @@ Ninguna para la foundation. Las promociones, atestaciones y canaries permanecen 
 
 ## Open Questions
 
-- Ninguna para Slice 1. ADR-022 resolvió que la operación vive dentro del descriptor versionado de cada ruta; el
-  vocabulario compartido no es una referencia runtime mutable.
+- **Resuelta para Slice 1.** ADR-022 resolvió que la operación vive dentro del descriptor versionado de cada ruta;
+  el vocabulario compartido no es una referencia runtime mutable.
+- 🔴 **ABIERTA y bloqueante del eje de aplicación — ¿quién es dueño del valor de dirección creativa?**
+  `creativeControls` (esta task), `StructuredBriefV1` (`TASK-1493`) y `RouteConstraintsV1` declaran hoy conceptos
+  solapados: `style`↔`style`, `lighting`↔`light`, `composition`↔`framing`, y `duration`/`aspect-ratio`/`resolution`
+  duplicados enteros. Los tres son *"el caller expresa dirección → el server compila"*. La pregunta no es
+  estilística: define si el fingerprint firma una intención o dos, y si un pedido contradictorio es un error o una
+  precedencia silenciosa. **No cablear valores de control hasta resolverla** (Slice 3.5). Dirección recomendada,
+  no decidida: brief = valor, contrato de ruta = descriptor de soporte.
+- Abierta, menor: si `valueShape` debe admitir texto libre para los controles semánticos o restringirse a enums
+  por ruta. Un enum es verificable pre-spend; el texto libre es lo que el oficio realmente usa. Probablemente
+  ambos, discriminados — pero no está decidido y `ISSUE-127` (capa 8) advierte que un control demasiado estricto
+  rechaza casos legítimos: `"Key visual"` fue leído como credencial y bloqueó el canary.
 
 ## Delta 2026-08-02 — intake de ejecución
 
@@ -531,9 +611,15 @@ El contrato declara **cómo se honraría** cada control. Nada lo honra todavía.
 2. **`RouteCreativeIntentV1` no lleva valores de control.** Su forma es
    `{schemaVersion, routeRevision, operation, combinationId, inputAssignments}` — no hay campo donde el
    caller ponga «dolly in, contrapicado». El eje entero está sin cablear del lado del pedido.
-3. **El fingerprint del approval no incluye controles ni roles.** `commercial-credit-lifecycle.ts:30` firma
+3. **El fingerprint del approval no incluye valores de control.** `commercial-credit-lifecycle.ts:30` firma
    `{quote, provider, route, model, modelVersion, rateId, catalog, credits}`. Cambiar la dirección de cámara
    **no invalidaría el approval**, que es exactamente lo que el criterio exige.
+   > **Corregido 2026-08-02 — la mitad de "ni roles" era falsa; no reimplementar el fingerprint.** `LabQuoteInputV1`
+   > (`contracts/src/index.ts:551-561`) transporta `creativeIntent` **y** `routeContract`, y `fingerprint()` hace
+   > `stable({q, …})` sobre el quote **entero**. Cambiar revisión, operación, combinación, rol u ordinal **sí**
+   > produce `approval_stale` hoy, y el `requestFingerprint` del compiler (`production-route-compiler.ts:295-303`)
+   > los incluye explícitamente. Lo único ausente son **valores de control** — porque no existe el campo. La
+   > conclusión del punto era correcta; su diagnóstico no.
 4. **Sin dual-read/equivalence de rutas legacy** (Slice 4). El único archivo con «equivalence» en el repo es
    de tokens y no tiene relación.
 5. **Sin fixtures Omni/Seedance/Veo** que demuestren una intención común con traducciones distintas.
@@ -554,3 +640,43 @@ desempate de las policies de rights fue un incidente cuyo arreglo de fondo es `T
 
 Cablear el eje de aplicación (1–3), Slice 4 (4–5) y el canary de Omni (6) — este último **bloqueado** hasta
 que TASK-1504 resuelva el transporte.
+
+## Delta 2026-08-02 — auditoría arquitectónica contra los incidentes del día (`arch-architect`)
+
+Revisión leyendo el código de Globe contra `ISSUE-126`, `ISSUE-127` e `ISSUE-135`. **El eje de inputs está bien
+resuelto y no se toca.** Lo que cambia son los criterios, un slice nuevo y dos filas de riesgo. Tres hallazgos,
+por orden de costo de revertir:
+
+**1 — `creativeControls` no es un eje nuevo: es el tercero que expresa lo mismo.** Ver Slice 3.5. Es el hallazgo
+caro porque cae exactamente sobre el trabajo que falta: cablear valores antes de unificar el vocabulario fija la
+duplicación dentro del fingerprint, y ahí deja de ser una puerta de dos vías. El modo de fallo no es un conflicto
+detectable sino **precedencia silenciosa** — misma familia que el spread de lineage corregido en `b062d6f`, un
+nivel más arriba.
+
+**2 — La décima aparición del bug class de `ISSUE-127`, y esta vez la task ya tenía escritos los nombres
+correctos.** La sección `Security and access` promete cinco códigos canónicos; **los cinco tienen cero
+ocurrencias en Globe**. El compiler colapsa nueve causas con acciones opuestas —re-estimar, cambiar operación,
+cambiar el asset, convertir el archivo— en un único `route_creative_contract_mismatch`. La regla que ese issue
+derivó de nueve apariciones es literal: *una sanitización sin contraparte de observabilidad no protege
+información, la destruye*; y su novena aparición fue código escrito el mismo día por quien documentaba las ocho.
+El patrón de salida ya está canonizado en el propio repo: las 24 razones nombradas de
+`ProductionRouteDependencyError`.
+
+**3 — El rechazo determinista de contrato entra a la máquina de reintentos sin clasificar.**
+`route_creative_contract_mismatch` no está en `TERMINAL_CODES` (`governed-run-failure-policy.ts:44-70`) pese a
+cumplir su criterio de admisión al pie de la letra: *"si dos entregas separadas por una hora dan el mismo
+resultado sin que nadie toque nada, va acá"*. Cae a `unknown`, tope 3. Es la versión atenuada de las 705 entregas
+de `ISSUE-135` — y no es coincidencia de dominio: el error que produjo aquel zombi,
+`provider_input_resolution_failed`, nace de un `catch {}` mudo (`governed-provider-runtime.ts:85`) en el **mismo
+camino de materialización de inputs** que esta task endureció.
+
+Menores, ya incorporados arriba: el criterio 7 se cumplía de forma vacua (guard de autoría, no de ejecución);
+`RouteCreativeControlSupportV1` no declara la forma del valor, así que el fail-closed no alcanza al eje de
+controles; y `vendor/efeonce-globe/` queda fuera de scope **por decisión declarada**, no por olvido.
+
+Corregido además el punto 3 del delta anterior: el fingerprint **sí** incluye roles y ordinales. Queda anotado
+in-place para que nadie reimplemente algo que ya funciona.
+
+Nada de esto cambia el veredicto de estado: la task sigue `in-progress`, con el eje de aplicación abierto y el
+canary de Omni bloqueado por el transporte de TASK-1504. Lo que cambia es que ese eje **ya no es plomería**:
+tiene una pregunta de dueño que resolver antes.
