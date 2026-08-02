@@ -74,12 +74,19 @@ una instrucción o delegación vigente y deja readback terminal.
 
 Para leer esta ADR sin mezclar tiempos:
 
+- **Corrección 2026-08-01 — adapter MCP interno live:** `globe.credits.funding.ensure` ya está desplegado y
+  ejercido por el gateway `https://mcp.efeonce.org/mcp`. Es un adapter delgado que recibe únicamente una
+  `authorityId` one-shot, exige el scope dedicado, intercambia identidad con Greenhouse y llama el command
+  canónico; no recibe monto, workspace, período, cap, actor ni autoridad financiera. El canary terminó
+  `completed/no_effect` sin crear un segundo delta económico. Esta corrección no habilita clientes externos,
+  writes Nexa ni fondeo recurrente.
 - **Live:** fase de negación tipada; command transaccional `propose → confirm`; intents Greenhouse; OAuth public
   client + PKCE; API Platform/CLI; autoridad one-shot CEO→usuario/agente; `ensure-funded` con resolución de
   período/pool; status/list/get/reconcile y receipts autoritativos; workbench `/admin/globe/credits`; self-view
-  Producer; caller genérico sin las cuatro capabilities retiradas. La firma sigue siendo HMAC dentro del runtime
-  de Globe y el acceso actual de Greenhouse está concedido a `ROLE_CODES.EFEONCE_ADMIN`.
-- **Aprobado, no live:** adapters de escritura Nexa/MCP; KMS asimétrico, broker/aprobador/ejecutor físicamente
+  Producer; adapter MCP interno one-shot; caller genérico sin las cuatro capabilities retiradas. La firma sigue
+  siendo HMAC dentro del runtime de Globe y el acceso actual de Greenhouse está concedido a
+  `ROLE_CODES.EFEONCE_ADMIN`.
+- **Aprobado, no live:** adapter de escritura Nexa; KMS asimétrico, broker/aprobador/ejecutor físicamente
   disjuntos y retiro del HMAC.
 - **Baseline histórico:** el Contexto siguiente registra lo observado al inicio del 2026-07-26. Las frases
   “hoy”, “no existe” o “nunca fue ejercitado” dentro de ese baseline explican el diagnóstico de entonces y no
