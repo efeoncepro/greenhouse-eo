@@ -38,6 +38,23 @@ Historia anterior: [Handoff.archive.md](Handoff.archive.md).
 - [ADR-021](docs/architecture/GREENHOUSE_FINANCE_CORE_ACCOUNTING_FOUNDATION_DECISION_V1.md) aceptado; `EPIC-012`
   es owner. Sus 11 candidatas no estaban reservadas y deben reenumerarse desde TASK-1634 al confirmarlas.
 
+## TASK-1633 — Fases 1-2 cerradas y desplegadas; canary bloqueado por IAM (2026-08-02)
+
+- Continuidad tomada desde el handoff de Codex. Estado: **`code complete, rollout pendiente`**.
+- Globe `main@b062d6f` con CI verde y **desplegado**: API `globe-api-internal-00192-nmh` (imagen `b062d6f2df11`)
+  y Producer worker desde el mismo SHA. Ambas service accounts tienen `roles/aiplatform.user`.
+- Cerrado: endurecimiento de `authority`/`ordered`/`audioPackaging` (los tres estaban declarados y sin validar);
+  las tres suites del plan (fingerprint en seis ejes, placeholder faltante, conformance Seedance/Omni/Veo);
+  `inputCombinations` cumpliendo ADR-022 (el ADR declara *conjuntos* y sólo uno era representable); **Omni por
+  Vertex ADC** con el endpoint aprobado atado al snapshot (falla cerrado antes de gastar si diverge); y la
+  precedencia de lineage que el operador detectó (lo verificado gana sobre la intención del caller).
+- `pnpm check` y `pnpm build` exit 0. contracts 48 · domain 450 · creative-runner 270 · studio-web 290.
+- 🔴 **Bloqueo abierto:** los canaries facturables de Seedance y Omni **no corrieron**. Acuñar el ID token del
+  canary exige impersonar `greenhouse-globe-caller@` y devuelve `IAM_PERMISSION_DENIED`; la identidad local es un
+  usuario y no existe binding de `serviceAccountTokenCreator`. No se auto-otorgó el rol. Preferencia de
+  desbloqueo: dos generaciones desde el Producer en el Chrome autenticado del operador (la skill declara que ésa
+  es la prueba de salida), o el operador corre el canary, o grant temporal con readback. Detalle en la task.
+
 ## TASK-1633 — contrato route-driven del Producer y orden de estabilización (2026-08-02)
 
 - ADR-022 aceptado. Globe tiene WIP **sin commit** sobre `main@a24910c`: contrato, assignments y fingerprints.

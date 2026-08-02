@@ -450,3 +450,59 @@ una línea — **spread primero, campos verificados después** — para que el o
 gana sobre lo declarado.
 
 Sin cambios aplicados por la sesión de monitoreo: el archivo pertenece a esta task y su dueño decide.
+
+## Delta 2026-08-02 — Fase 1 y Fase 2 cerradas; canary bloqueado por IAM
+
+Continuidad tomada desde el handoff de Codex (`docs/tasks/plans/TASK-1633-plan.md`). Estado real:
+**`code complete, rollout pendiente`** — código desplegado y verificado, falta la prueba facturable.
+
+### Cerrado con evidencia
+
+- **Fase 1** (`efeonce-globe@db8686e`). Tres campos declarados y sin validar en runtime, cada uno fallando
+  distinto: `authority` inválida se caía del filtro `callerSlots` en silencio (saltándose la paridad legacy);
+  `ordered` no tenía **ningún** consumidor; y `audioPackaging` sólo se comparaba contra `'none'`, así que un valor
+  desconocido pasaba en una ruta con audio (`('maybe'==='none') !== !true` es `false !== false`). Se agregó además
+  el invariante de que `ordered` sobre un slot de `max: 1` es error de autoría.
+- **Las tres suites del plan**: fingerprint invalidado en seis ejes por separado (revisión, operación, output
+  contract, mecanismo de control, requiredness y combinación elegida); rechazo de placeholder faltante más el caso
+  de intercambiar sólo el ordinal de dos referencias; y conformance tabular Seedance/Omni/Veo, que prueba que el
+  contrato es un **motor** y no la descripción de una ruta.
+- **`inputCombinations` cumple ADR-022** (`efeonce-globe@47c0585`). El ADR declara *conjuntos* en plural, pero el
+  generador derivaba exactamente uno y el validador exigía que todo slot con `min > 0` fuera requerido en TODA
+  combinación: `prompt-only` junto a `image-conditioned` era irrepresentable. Las combinaciones pasan a ser
+  autorables con la derivación como default, y `cardinality.min` se lee como *"si el slot participa, al menos
+  min"*. Se preservó la propiedad de seguridad con un invariante que no bloquea alternativas: todo slot declarado
+  debe participar en al menos una combinación.
+- **Fase 2 — transporte** (`efeonce-globe@55c3761`). El driver gobernado ejecuta por **Vertex ADC** en vez de
+  `createGeminiOmniTransport` con API key; el guard de arranque exige `vertexProject` en vez de la key; y el
+  transporte ejecuta el **endpoint aprobado del snapshot** en vez de reconstruir el suyo, fallando cerrado con
+  `globe_vertex_omni_endpoint_divergence` **antes** de llamar al proveedor. El edit stateful sigue exigiendo la
+  superficie Gemini y pertenece a `TASK-1573`.
+- **Precedencia de lineage** (`efeonce-globe@b062d6f`, reportado por el operador). El spread del assignment iba
+  después de `sha256`/`mediaType`/`rights` en el snapshot inmutable, así que ganaba por precedencia. Hoy no
+  colisionan, pero el día que `RouteInputAssignmentV1` gane un homónimo un valor del caller sobrescribiría uno
+  verificado dentro del registro de lineage. Spread primero, verificados después.
+- **Rollout**: `origin/main` en `b062d6f`, CI verde, API (`globe-api-internal-00192-nmh`, imagen `b062d6f2df11`) y
+  Producer worker desplegados desde ese SHA. **Ambas service accounts tienen `roles/aiplatform.user`**, que es la
+  simetría que el transporte ADC necesita.
+- **Gates**: `pnpm check` y `pnpm build` exit 0. contracts 48 · domain 450 · creative-runner 270 · studio-web 290.
+
+### Bloqueo abierto — canaries facturables
+
+Los canaries terminales de Seedance y Omni **no se ejecutaron**. `pnpm producer:canary` exige acuñar un ID token
+impersonando `greenhouse-globe-caller@`, y esa operación devuelve `IAM_PERMISSION_DENIED` sobre
+`iam.serviceAccounts.getAccessToken`. Verificado: la identidad operativa local es un **usuario**
+(`julio.reyes@efeonce.org`), la API sólo acepta callers que son service accounts, y la política IAM del proyecto
+no tiene ningún binding de `serviceAccountTokenCreator` que lo habilite. **No se auto-otorgó el rol**: es el
+break-glass que las prohibiciones del plan excluyen.
+
+Tres caminos, en orden de preferencia:
+
+1. **Dos generaciones desde el Producer en el Chrome autenticado del operador.** No es un rodeo: la skill de Globe
+   declara que la prueba de salida es una generación real desde la UI, y el script es el carril workload.
+2. El operador corre `pnpm producer:canary --execute --approve video:<créditos>` con
+   `GLOBE_CANARY_BASE_URL=https://globe-api-internal-a6odmgzpvq-tl.a.run.app`.
+3. Grant temporal de `serviceAccountTokenCreator` sobre `greenhouse-globe-caller@`, con revocación y readback.
+
+Hasta que exista esa evidencia —un run facturable, un attempt terminal y **un** cobro por generación leído del
+ledger, más output retenido, playback, lineage y governance— esta task **no** puede declararse `complete`.
