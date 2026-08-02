@@ -131,8 +131,8 @@
   de policy. La saga expirada se recuperó fail-closed y `promotion_557d4df1-994e-45ac-92f7-7ef885aa967e` quedó
   activada con binding/circuit revision 5.
 - El canary no se disparó: el Studio live oculta referencias posteriores a la octava. Globe `main` `595f0cb`
-  elimina el recorte y prueba la décima referencia con rights/lineage e idempotencia; tests verdes, CI
-  `30733665167` iniciado y deploy manual no ejecutado. TASK-1614 sigue `in-progress`, rollout pendiente.
+  elimina el recorte y prueba la décima referencia con rights/lineage e idempotencia; tests y CI
+  `30733665167` verdes, deploy manual no ejecutado. TASK-1614 sigue `in-progress`, rollout pendiente.
 
 ## 2026-08-01 — AXIS Lab: Astro 7 con foundation documental y testing
 

@@ -178,7 +178,7 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
   muestra 800 efectivos y `budget.evaluate` admite 16. El Studio desplegado sí bloquea la referencia exacta porque
   recorta a ocho el conjunto de 24 retenidos y el CTA del feed es no-op. Globe `main` commit
   `595f0cb5460e42d9cc958ced204dc6a336e6deae` elimina el recorte y agrega regresión para elegir la décima;
-  tests locales verdes y CI `30733665167` iniciado. El deploy manual de Studio no se ejecutó por exclusión
+  tests locales verdes y CI `30733665167` `success` (`pnpm check` + `pnpm build`). El deploy manual de Studio no se ejecutó por exclusión
   explícita; por ello siguen ausentes run/attempt/output/cobro/playback/governance y `canary-confirm` nuevos.
 - La identidad temporal usada para consumo privado de AXIS debe sustituirse por una identidad de
   máquina antes del rollout externo; no recrees el secreto legacy de Globe.

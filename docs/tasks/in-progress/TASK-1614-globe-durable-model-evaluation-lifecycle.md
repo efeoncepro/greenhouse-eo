@@ -105,7 +105,8 @@ Do not alter already promoted Omni, Seed Audio or Seedance Loop; do not bypass t
   `595f0cb5460e42d9cc958ced204dc6a336e6deae`: el selector presenta todo el conjunto retenido retornado por el
   reader. El canary local prueba 12 opciones, selecciona deliberadamente la décima y conserva el handle completo
   (`mediaType`, `rights`, `parentRights`); también verifica un solo prepare, un solo execute y una clave de
-  idempotencia compartida. `pnpm --filter @efeonce-globe/studio-client test` pasó; CI `30733665167` quedó iniciado.
+  idempotencia compartida. `pnpm --filter @efeonce-globe/studio-client test` pasó; CI `30733665167` terminó
+  `success` con `pnpm check` y `pnpm build`.
 - El push a `main` no despliega por sí solo: `Deploy Internal (keyless)` es manual. En cumplimiento de la exclusión
   explícita **no desplegar Studio**, el fix aún no está live. TASK-1614 permanece `in-progress`; no se puede afirmar
   playback, output SHA/MIME, retención, governance ni `canary-confirm` de una pieza que no existe.
