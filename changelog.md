@@ -7,6 +7,22 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-02 — Contrato route-driven del Producer y corrección planificada de Omni
+
+- Se registró TASK-1633 como foundation backend-critical: operación, slots/roles de entrada, controles creativos,
+  mecanismo `native-parameter|prompt-semantic|reference-conditioned|preprocessed|postprocessed|unsupported` y
+  output contract pasan a ser dato versionado de ruta consumido por UI/BFF/SDK/MCP/CLI/workers.
+- TASK-1504 quedó corregida documentalmente: Omni no demuestra `{video,audio}` separado, reference-to-video acepta
+  imágenes, duración/ratio deben llegar a Vertex y text/image/reference requieren rutas/promociones independientes;
+  edit/continuidad permanecen en TASK-1573.
+- TASK-1552 conserva ownership único del composer: prompt persistente, referencias transversales, cámara separada
+  de motion transfer y modelo estable. El rollout exige una generación UI nueva de Seedance y una Omni con cobro,
+  playback, retención, lineage y governance verificados, sin repetir evaluación/promoción/fondeo de Seedance.
+- TASK-1469 puede avanzar en paralelo con TASK-1633 y debe cerrar antes de TASK-1632; el wake event-driven queda
+  explícitamente post-Omni estable/canary-confirm. No hubo código, provider calls, gasto, deploy ni runtime.
+- La reserva provisional Finance `TASK-1633…1643` nunca se materializó; sus candidatas deben reenumerarse desde
+  TASK-1634 si se confirman.
+
 ## 2026-08-02 — Cotización headless y composición opcional de Proposal Studio
 
 - ADR-021 quedó aceptado: Finance Core nace con plan de cuentas versionado, entidad/ledger, períodos, money/FX/UF,
@@ -23,8 +39,8 @@
 - El orden se corrige a Finance Core reference → Economic Event/journal shadow → Live Cost Subledger → Profile
   Resolution/CostCard/golden set → `TASK-609` read-only → economic package/Proposal → MCP/provider y writes
   gobernados → Q2C/actual-vs-standard → General Accounting. No hubo cambios de schema ni runtime.
-- `EPIC-012` y `EPIC-029` registran candidatos `TASK-1633…1643`; los archivos/IDs no se crean hasta el checkpoint
-  de confirmación del task planner.
+- `EPIC-012` y `EPIC-029` registran 11 candidatos sin IDs reservados; tras asignar TASK-1633 a Globe deben
+  reenumerarse desde TASK-1634 si superan el checkpoint de confirmación del task planner.
 
 ## 2026-08-02 — Gemini Omni: evidencia legal corregida y checkpoint durable
 
@@ -748,10 +764,3 @@ Corrección de fuente de verdad: el cliente inicial es **SKY Agencia Creativa**,
 - Se documentaron Agentic Readiness y Experience LaunchOps como Product Services compuestos de Wave sobre las cinco familias base; Agentic Readiness incluye Snapshot público, Audit/Grader, workbench interno, superficie cliente y monitoreo.
 - Se explicitó el contrato de identidad: una sesión/SSO de Greenhouse para entrar a las plataformas habilitadas, con subject, tenant, capabilities y entitlements verificados localmente en cada runtime.
 - Se estableció Agent Native + Full API Parity como requisito de nacimiento para los nuevos productos; no se autorizó runtime, migración del Brand Visibility Grader actual, pricing ni rollout.
-
-## 2026-07-26 — Foco comercial: beachheads, entrada y expansión
-
-- Se creó `EFEONCE_COMMERCIAL_FOCUS_AND_BEACHHEADS_V1.md` para convertir el portfolio amplio en una máquina comercial secuenciada.
-- Se priorizaron cuatro beachheads: AI Visibility & Search; RevOps & HubSpot; Performance & Commerce; y Creative Velocity & Production.
-- Se definieron ofertas de entrada, rutas de expansión, motions, proof system, campos de cross-sell y validación de 90 días.
-- La amplitud del catálogo queda para expansión; no se autoriza presentar todo el portfolio como paquete inicial ni convertir los umbrales de validación en KPI de runtime.

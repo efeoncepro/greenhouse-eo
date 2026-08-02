@@ -1,5 +1,19 @@
 # TASK-1573 — Globe Video Edit Capability and Governed Continuation
 
+## Delta 2026-08-02 — ownership explícito de Omni edit y consumo de TASK-1633
+
+Esta task, no TASK-1504, posee `edit` y continuidad conversacional de Gemini Omni. Consume los slots/roles y
+creative-control support de TASK-1633; un video fuente es `edit-source`, no `reference-to-video`. Cada turno produce
+un run/output/cobro hijo, conserva parent lineage y requiere retención/chainability del interaction anterior.
+
+Restricciones verificadas que pasan a criterios exigibles:
+
+- [ ] Omni edit usa video fuente de hasta 10 s y referencias de imagen sólo cuando el contrato oficial las admite.
+- [ ] `previousInteractionId`/historial sólo se usa sobre la superficie Vertex exacta y un parent retenido/chainable.
+- [ ] Voice editing, audio reference, video extension e interpolación no se presentan como soportados.
+- [ ] Restricciones regionales y `store`/retención necesaria son gates pre-spend y quedan en evidencia.
+- [ ] Un segundo turno es un child run con idempotency, cobro, output y governance propios.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
@@ -20,7 +34,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `creative|video|ai`
-- Blocked by: `TASK-1490`, `TASK-1553`; external-video slice additionally `TASK-1539`
+- Blocked by: `TASK-1490`, `TASK-1553`, `TASK-1633`; external-video slice additionally `TASK-1539`
 - Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 

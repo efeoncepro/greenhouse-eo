@@ -1,5 +1,25 @@
 # TASK-1469 — Globe Governed Run Lifecycle, Submission Fence and Provider Completion
 
+## Delta 2026-08-02 — alcance restante reducido y orden frente a TASK-1632
+
+El lifecycle durable, submission fence, completion drivers, retención y settlement ya están vivos. Esta task no
+reconstruye ese sistema ni bloquea el diseño del contrato de capacidades de TASK-1633. Su cierre restante se limita a:
+
+- terminalizar o superseder reconciles de runs ya terminales;
+- medir `queueOldestAgeSeconds` sólo sobre trabajo reclamable;
+- recuperar por primitives canónicas propuestas históricas atrapadas en `confirmed|confirm_failed`, sin SQL;
+- demostrar que duplicate/late completion y retry convergen sin segundo cobro ni segundo terminal.
+
+Orden: TASK-1469 puede avanzar en paralelo con TASK-1633 y debe cerrar antes de TASK-1632. Es preferible cerrarla
+antes del canary final de Omni para que las señales sean honestas, pero no bloquea la corrección de catálogo/UI.
+
+Criterios exigibles adicionales:
+
+- [ ] No quedan reconciles reclamables asociados a runs terminales ni métricas infladas por trabajo no reclamable.
+- [ ] La recuperación de funding decisions históricas usa commands/readers existentes y deja audit; no usa SQL.
+- [ ] Un replay de completion/reconcile no crea attempt, provider submit, settlement ni cobro adicional.
+- [ ] TASK-1632 permanece bloqueada hasta que este cierre esté verificado en runtime.
+
 ## Delta 2026-07-26
 
 - **Caso nuevo para la terminalización del reconcile:** el carril de fondeo (TASK-1566, cerrada)
@@ -77,7 +97,7 @@ canary ya tiene owner: **ADR-004** (`TASK-1506`, complete) fijó el front door y
 - Motion: `none`
 - Backend impact: `webhook`
 - Epic: `EPIC-028`
-- Status real: `Worker durable ejecuta runs reales; 5 reconciles terminales stale mantienen queue age incorrecta`
+- Status real: `Lifecycle durable live; sólo faltan terminalización de reconciles stale, métricas reclamables y recovery gobernado de decisiones históricas`
 - Rank: `TBD`
 - Domain: `creative|platform|ops`
 - Blocked by: `none`
@@ -87,8 +107,8 @@ canary ya tiene owner: **ADR-004** (`TASK-1506`, complete) fijó el front door y
 
 ## Summary
 
-Implementar lifecycle transaccional estimate → reserve → approve → submit → complete/reconcile → candidate →
-review → settle/release con queue, approval token, submission fence y completion drivers por proveedor.
+Cerrar la deuda residual del lifecycle ya desplegado: terminalizar/superseder reconciles no reclamables, reconciliar
+decisiones históricas atrapadas y hacer que las métricas describan trabajo real, sin SQL ni reimplementar drivers.
 
 ## Checkpoint 2026-07-23 — ejecución real y deuda de reconciliación
 

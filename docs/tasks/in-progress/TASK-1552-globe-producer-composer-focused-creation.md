@@ -1,5 +1,33 @@
 # TASK-1552 — Globe Producer Composer Focused Creation
 
+## Delta 2026-08-02 — operaciones, referencias y controles derivados de ruta
+
+TASK-1552 continúa como única dueña del composer; no se crea otra task UI. Después de `TASK-1633`, la composición
+deja de usar `Elementos`, `Cuadros` o `Movimiento` como categorías que seleccionan/cambian modelos. La UI consume
+operación, slots/roles y controles del descriptor compartido.
+
+Dirección aprobada:
+
+- el prompt permanece visible en toda operación generativa;
+- navegación primaria: `Crear | Editar | Extender | Mejorar` sólo cuando exista contrato operativo;
+- `Fuentes y referencias` reutiliza uploader, menciones, assets gobernados y rights/lineage actuales;
+- cada asset recibe un rol compatible (`first-frame`, sujeto, estilo, motion-source, edit-source, etc.);
+- `Dirección` agrupa cámara, movimiento creativo, lente, estilo, ritmo, temporalidad y audio;
+- el modelo seleccionado no cambia silenciosamente al agregar/quitar una referencia o control;
+- el descriptor decide visible/disponible/no soportado y muestra razón; React no contiene branches por modelo;
+- transferencia de movimiento conserva su slot específico y no se representa como cámara/movimiento creativo.
+
+Criterios exigibles adicionales:
+
+- [ ] La caja de prompt está siempre presente para create/image/reference-to-video y conserva texto ante errores.
+- [ ] Agregar o quitar una referencia no cambia `routeId` salvo elección explícita del operador.
+- [ ] No existe botón/modo técnico `Elementos`; referencias son una bandeja transversal.
+- [ ] Límites, MIME, roles y combinaciones provienen del descriptor, no de caps hardcodeados por modo.
+- [ ] Cambiar referencia/rol/control invalida el estimate mediante el fingerprint canónico de TASK-1633.
+- [ ] GVC cubre 1440/390/320, teclado, foco, reduced motion, razones disabled y cero overflow.
+- [ ] El mismo Producer autenticado completa una generación Seedance y una Omni sin que el cambio route-driven
+      altere selección, prompt, referencias, estimate, idempotencia, playback o estados terminales de ninguna.
+
 > ## 🛑 LEE ESTO ANTES DE TOCAR NADA
 >
 > **El plan cambió el 2026-07-27.** Si vas a implementar, en este orden:
@@ -31,7 +59,7 @@
 - Status real: `SLICE 1 EN CURSO — LOS CINCO BLOQUES EXISTEN, LA CONVERSION A TAILWIND VA POR TRES REGIONES (2026-07-27, commits 5b7cb3f + 512dcbc + a37d105). Cada bloque declara su pregunta creativa con su icono; Modo subio al bloque 1; el cajon de sastre no existe y el canary ahora afirma su ausencia en vez de un KNOWN sobre un elemento borrado. Convertidas a Tailwind: cabecera, modality-pill y fila de Modo, verificadas por VALOR COMPUTADO en browser. El SSOT gano 5 tokens (--text-micro, --text-meta, --text-lg, --accent-ink-bright, --field/--white) por decision del operador de tokenizar en vez de normalizar. HALLAZGO: el peso 700 no tenia utilidad alcanzable (font-display lo tomaba la familia) con el build en verde — corregido en el generador + guardrail que lanza. Slice 1h: los 8 `capability-button` pasan a un COMPONENTE local (CapabilityButton.tsx) con API de tipo discriminado — `blocked` siempre trae razon. HALLAZGO: el orden dentro del className NO decide nada; con `rounded-sm` en base y `rounded-full` en la variante, el boton circular rindio 9,28px con build y typecheck verdes. Regla: una propiedad se declara en UNA sola capa. Slices 1i/1j: el BLOQUE 1 queda entero en Tailwind (campo de prompt con su glow tokenizado, acciones, sugerencias, negativo) y el canary gana el aserto del glow que el STYLE_REFERENCE §9 pedia y no existia. Slices 1k/1l: overlays, direccion y seed convertidos. HALLAZGO MAYOR: el gate de reduced-motion leia solo CSS, asi que una animacion escrita en Tailwind era INVISIBLE para el — mismo agujero que ADR-016 condicion 2 describe para los otros tres gates, que si se reescribieron. Cerrado antes de crear la animacion. Slice 1m: referencias convertidas. HALLAZGO: el fixture no podia producir una ficha, asi que esa region nunca se habia renderizado en el canary — al poblarlo aparecieron TRES defectos, dos de ellos cancelandose mutuamente. Y «Mencionar del feed» estaba bloqueado POR OMISION (falta en el mapa de gates), no por el gate. SLICE 1 CERRADO (1n + 1o): la superficie queda con CERO clases de la hoja legacy — se cumple la regla dura de ADR-016. Incluye la atenuacion del estimado, que el contrato llama el motion mas importante y no existia. HALLAZGO: una utilidad de Tailwind puede colisionar POR NOMBRE con una clase del legacy y las capas NO lo resuelven — `text-action` daba al marco del icono 30,8x44px en vez de 28x28, y estuvo asi en varias capturas revisadas sin notarse. Cerrado con guardrail. SLICE 2 CERRADO (a631f7c): tool dock con 4 herramientas, role=toolbar, 44px constante y razon visible en las bloqueadas. El negativo y el seed salen del flujo. FRONTERA DECLARADA: el dock 100% derivado del catalogo NO es alcanzable — /v1/capabilities publica disponibilidad y NADA sobre presentacion (sin icono ni etiqueta); gap escalado al API Contract Spine (TASK-1481). PENDIENTE: resto de Slice 3 (estados de ejecucion y evidencia premium). Historico: TAILWIND LISTO, SUPERFICIE NO MIGRADA (2026-07-27): el motor de ADR-016 quedo instalado, gateado y verificado en efeonce-globe (804b7d7 + 91432ed) — theme generado desde el SSOT, 4 gates que muerden en className, canary de motor sobre valores computados. NINGUNA superficie migrada: el composer sigue con producerStyles y cero utilidades Tailwind. Unico bloqueo restante: cerrar TASK-1555. Baseline de diff capturado a 1440/390/320 CON la hoja del legacy. Historico: ADR-016 CAMBIO EL PLAN (2026-07-27): Slice 0 RETIRADO — el payload cliente migra a Tailwind v4 y una superficie reescrita no depende de la hoja legacy. BLOQUEADA por el slice de Tailwind en TASK-1485 y por cerrar TASK-1555. Diseno COMPLETO y documentado en docs/ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md (leer PRIMERO). Rama efeonce-globe task/TASK-1552-slice0-internalizar-css commit 5edd2a3 = WIP congelado con partes a revertir, ver su mensaje`
 - Rank: `TBD`
 - Domain: `creative|ui|product`
-- Blocked by: `none`
+- Blocked by: `TASK-1633 para el slice route-driven de referencias/controles; el craft visual independiente puede avanzar`
 - Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

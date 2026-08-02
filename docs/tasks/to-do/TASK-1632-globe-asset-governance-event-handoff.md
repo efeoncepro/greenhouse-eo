@@ -1,5 +1,24 @@
 # TASK-1632 — Globe Provider Completion → Asset Governance Event-Driven Handoff
 
+## Delta 2026-08-02 — orden de ejecución: post-lifecycle y post-Omni estable
+
+Esta task no corrige el catálogo, adapter o UI de Gemini Omni y no debe comenzar para desbloquear su canary. El
+Scheduler/reconciler actual continúa siendo un camino válido y durable mientras se estabiliza Omni.
+
+Orden obligatorio:
+
+1. TASK-1469 terminaliza reconciles stale y deja métricas sobre trabajo reclamable.
+2. TASK-1633 + TASK-1504 + TASK-1552 corrigen contrato, ejecución y UI de Omni.
+3. Un canary Omni exacto termina con un cobro, output retenido, lineage, Asset Governance y `canary-confirm`.
+4. Sólo entonces TASK-1632 añade wake event-driven, conservando Scheduler como recovery.
+
+Criterios exigibles adicionales:
+
+- [ ] TASK-1469 está completa con runtime evidence antes del primer apply/cutover de wakes.
+- [ ] TASK-1504 registra un canary Omni terminal y Asset Governance terminal antes del primer apply/cutover de wakes.
+- [ ] El canary de TASK-1632 reutiliza/replayea trabajo durable y no crea una pieza provider adicional.
+- [ ] Ningún cambio de TASK-1632 modifica route contract, policy, rights, provider adapter o UI del composer.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
@@ -20,7 +39,7 @@
 - Status real: `Diseño y pre-auditoría read-only verificados contra runtime (2026-08-02); implementación pendiente`
 - Rank: `next.1`
 - Domain: `platform|integration|data`
-- Blocked by: `none`
+- Blocked by: `TASK-1469`, `TASK-1504 (Omni estable y canary-confirm)`
 - Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

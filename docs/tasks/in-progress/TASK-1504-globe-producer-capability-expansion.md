@@ -1,5 +1,38 @@
 # TASK-1504 — Producer Capability Expansion (video frames/motion · audio change-voice/translate · multi-output omni · voice-preset registry)
 
+## Delta 2026-08-02 — corrección del contrato Omni y dependencia de TASK-1633
+
+La evidencia oficial actual corrige dos supuestos históricos de esta task: Gemini Omni no demuestra un output
+`{video,audio}` separado — entrega un MP4 con audio nativo— y `reference_to_video` no soporta hoy referencias de
+video/audio confiables. El contrato multi-output genérico permanece válido para otros providers, pero deja de usar
+Omni como prueba o requisito de dos outputs.
+
+TASK-1504 consume primero el descriptor de `TASK-1633` y migra Omni con estas reglas:
+
+- la ruta promovida `ref/motion/reference-v1` conserva identidad/evaluación/review/atestación/policy existentes y
+  se restringe a prompt + referencias de imagen; no se repite evaluación ni se reutiliza su candidato;
+- `duration` (3–10 s) y `aspectRatio` (`16:9|9:16`) llegan realmente a Vertex; 720p/24 FPS y audio nativo se
+  registran como output contract; `silent` no se ofrece como parámetro estructurado no verificable;
+- texto a video, imagen como first frame y reference-to-video son operaciones/rutas distintas. Cada ruta nueva
+  necesita identidad, rate, evaluación, atestación/policy, binding, promoción y canary propios;
+- video fuente, edición y continuidad conversacional pertenecen a `TASK-1573`; audio/video reference-to-video,
+  híbridos arbitrarios, voice editing, extensión e interpolación no se declaran soportados;
+- C2PA y SynthID son evidencia esperada de Omni y Asset Governance debe verificarlos sin inventarlos.
+
+Criterios exigibles adicionales:
+
+- [ ] La ruta actual rechaza referencias video/audio antes del estimate/fence y acepta sólo imágenes gobernadas.
+- [ ] Prompt, duración y ratio efectivos quedan en request snapshot/manifest; no se fijan o descartan en el adapter.
+- [ ] El output Omni se modela como un `video/mp4` con audio embebido, no como audio asset separado.
+- [ ] `text_to_video`, `image_to_video` y `reference_to_video` nunca comparten promoción/canary por transitividad.
+- [ ] El canary existente pendiente usa únicamente la ruta promovida exacta y una imagen de referencia gobernada.
+- [ ] La documentación retira toda afirmación de audio/video reference o multi-output Omni sin evidencia.
+- [ ] El rollout termina con exactamente una generación UI nueva de regresión en Seedance y una en Omni, cada una
+      con idempotency key distinta y única, un run facturable, un cobro, attempt terminal, output nuevo, playback,
+      retención, lineage y Asset Governance terminales.
+- [ ] El canary Seedance no reabre TASK-1614, no repite evaluación/promoción, no fondea y usa su ruta ya promovida;
+      ante respuesta ambigua se consulta run/attempt por la misma correlación antes de cualquier reintento.
+
 ## Delta 2026-07-22
 
 - `TASK-1503` **complete** — el retrieval gobernado y las asset actions ya existen (siguen fuera del
@@ -58,7 +91,7 @@
 - Status real: `Omni desplegado y saga activada internal-only; canary gobernado bloqueado por la superficie Producer; otras capacidades avanzadas conservan canarios propios pendientes`
 - Rank: `TBD`
 - Domain: `creative|ai|platform`
-- Blocked by: `none`
+- Blocked by: `TASK-1633 para la corrección contractual Omni; los otros canarios de esta task conservan sus gates propios`
 - Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

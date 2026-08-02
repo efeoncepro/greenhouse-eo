@@ -5,22 +5,20 @@ Historia anterior: [Handoff.archive.md](Handoff.archive.md).
 ## Finance Core + Cost Accounting + cotización agentic — planificación (2026-08-02)
 
 - [ADR-021](docs/architecture/GREENHOUSE_FINANCE_CORE_ACCOUNTING_FOUNDATION_DECISION_V1.md) aceptado; `EPIC-012`
-  es owner. Candidatas `TASK-1633…1643` esperan confirmación; sin runtime ni tasks nuevas.
+  es owner. Sus 11 candidatas no estaban reservadas y deben reenumerarse desde TASK-1634 al confirmarlas.
+
+## TASK-1633 — contrato route-driven del Producer y orden de estabilización (2026-08-02)
+
+- Goal activo: separar operaciones, input slots/roles, controles creativos, mecanismo de aplicación y output
+  contract; corregir Omni directo por Vertex y mantener el Producer prompt-first sin integrar Omni mediante Fal.
+- TASK-1504 consume TASK-1633 para Omni image-reference, duración/ratio y MP4 con audio; TASK-1573 conserva edit y
+  TASK-1552 el composer. Gate final: una generación UI Seedance y una Omni, sin repetir evaluación/fondeo.
+- TASK-1469 y TASK-1633 pueden avanzar en paralelo; TASK-1632 espera ambas y `canary-confirm`. No hubo runtime.
 
 ## TASK-1504 — Gemini Omni: despliegue y saga activada; canary pendiente (2026-08-02)
 
-- Checkouts sin worktrees: Globe `main@fa286dbda0a3c1ce02de7d5a2ab173ba1bf34966`; Greenhouse `develop`
-  `d98307fdb87beea4f58e13e41ddbde5b404373f9`, descendiente de `fb3c469dcdb85a4898e054a3422a647d9c1938eb`.
-- API deploy `30744857697` → `globe-api-internal-00187-9ht`; worker deploy `30744857698` → digest
-  `sha256:764acd30c1e4678c87042e1fe004b25c984529cb92df3e0c5e18bd59b5e8a36a`; OpenTofu `1 add, 2 change, 0 destroy`,
-  sin Studio ni destroy. CI del fix `30744034457` quedó verde.
-- `auto-promote` `30745031010`; policy `arp_8090d31ae570c016f84cad0f7aee09ba84578f1dbd3622074a38cfa03a839ff5`,
-  reader `30745219391`, atestación `mcra_8c59f455-8704-47b1-9489-26d468f8ff8d`, rights comerciales exactos,
-  `no-sublicense` y digest de términos `sha256:04e949c5a43564c336d5380362b8cd2515766ee6bc85a736abec94cec7e53d4b`.
-- Saga `promotion_922157fa-b708-45cc-8bbf-b08d761afb21`: start/stage/promote/activate
-  `30745272975`/`30745297572`/`30745319614`/`30745343659`; readbacks `30745513017`, `30745514170`,
-  `30745515254`, `30745516291`, `30745517313` → `activated` rev. 7, readiness promovido rev. 2, route rev. 7,
-  binding habilitado y circuito cerrado.
+- API/worker y policy corregida están desplegados; saga `promotion_922157fa-b708-45cc-8bbf-b08d761afb21` quedó
+  `activated`, readiness promovido, binding habilitado y circuito cerrado. Sin deploy de Studio ni destroy.
 - La evaluación y candidato retenido de 40 créditos no se tocaron. Producer autenticado: actor esperado, modelo
   exacto, `784` créditos y `budget.evaluate.allowed=true`; `Elementos` sigue deshabilitado en dos pestañas con
   `Todavía no hay un modelo publicado para este modo`. No hay run/attempt/output/cobro/playback/retención/
@@ -28,15 +26,6 @@ Historia anterior: [Handoff.archive.md](Handoff.archive.md).
 - Estado: `code complete, rollout pendiente`; TASK-1504 sigue `in-progress`. Detalle operativo y siguiente paso:
   [`GLOBE_RUNTIME_HANDOFF.md`](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md) y
   [`TASK-1504`](docs/tasks/in-progress/TASK-1504-globe-producer-capability-expansion.md).
-
-## TASK-1632 — provider completion → Asset Governance dentro de Globe (2026-08-02)
-
-- Alcance corregido contra código real: Globe ya verifica/deduplica el callback Fal y encola `complete`; la
-  brecha es despertar Producer finalization y Asset Governance sin esperar Scheduler. La task añade wakes
-  durables at-least-once y conserva los schedulers como recovery.
-- Greenhouse no participa. `TASK-1475` conserva por separado cualquier proyección/evento cross-product futuro.
-- Estado real: diseño corregido, implementación pendiente; sin runtime, migraciones ni despliegues ejecutados.
-- Siguiente unidad activa de esta sesión: cerrar el WIP de Omni bajo TASK-1504 en Globe `main`, sin worktrees.
 
 ## Gate canónico de licitaciones / Brightcell (2026-08-02)
 
