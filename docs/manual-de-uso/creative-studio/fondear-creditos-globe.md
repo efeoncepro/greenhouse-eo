@@ -109,6 +109,27 @@ pnpm tsx scripts/globe-credit-funding.ts ensure --authority-id <authority-id>
    /api/admin/globe/credits/funding/authorities/<authorityId>/revoke`. Una vez reclamada, no se libera ni se
    reemplaza: se recupera con la misma ejecución e idempotency keys derivadas.
 
+### Opción C — agente mediante Efeonce MCP
+
+Usa esta opción cuando el agente ya está autenticado contra `https://mcp.efeonce.org/mcp`. La emisión de la
+autoridad sigue ocurriendo en Greenhouse desde la sesión del CEO, pero debe fijar `executorChannel: "mcp"`,
+`executorClientId: "efeonce-mcp-gateway"` y `executorAuthMode: "agent"`. Entrega al agente solamente el ID.
+
+El agente llama la tool `globe.credits.funding.ensure` con el input estricto:
+
+```json
+{ "authorityId": "<authority-id>" }
+```
+
+La tool requiere el scope separado `efeonce.mcp.globe.credits.funding.ensure`. El gateway valida Entra, obtiene
+su workload identity, intercambia el token por un token Greenhouse de cinco minutos y llama exclusivamente el
+command canónico. No acepta monto, workspace, período, cap, actor ni instrucciones libres. El éxito terminal es
+`completed` o `no_effect`; ante `outcome_unknown`, reintenta únicamente el mismo `authorityId` para reconciliar.
+
+Canary live del 2026-08-01: autoridad `df166eab-2c22-4009-a674-b83c8df307e4`, ejecución MCP terminal
+`completed/no_effect`, operación Globe `b69ecd23-6e41-4a5c-9bdf-c3f212e8bbeb`. `no_effect` fue correcto porque
+el workspace ya tenía los 800 créditos objetivo; no se creó un segundo delta económico.
+
 ## Camino manual compatible: propose → confirm
 
 ### 1. Ejecutar el cliente OAuth gobernado
@@ -224,7 +245,7 @@ producción sin reescribir la capacidad económica ni habilitar un CTA de fondeo
 ## Referencias técnicas
 
 - Decisión: [ADR-015 — Greenhouse administra Globe](../../architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md)
-- Programa de convergencia y autoridad CEO/agente: [TASK-1630](../../tasks/in-progress/TASK-1630-globe-credits-control-plane-convergence.md)
+- Programa de convergencia y autoridad CEO/agente: [TASK-1630](../../tasks/complete/TASK-1630-globe-credits-control-plane-convergence.md)
 - Implementación + evidencia del primer fondeo real: [TASK-1566](../../tasks/complete/TASK-1566-globe-governed-credit-funding-command.md) (Deltas 4–6)
 - Estado vivo (revisiones, pool, flags): [`GLOBE_RUNTIME_HANDOFF.md`](../../operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md)
 - Explicación en simple: [documentación funcional](../../documentation/creative-studio/fondeo-gobernado-creditos-globe.md)

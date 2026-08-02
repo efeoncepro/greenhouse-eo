@@ -2,11 +2,11 @@
 
 ## Verdict
 
-CONDITIONAL PASS
+PASS
 
-Closure state: el carril interno de fondeo, status, recovery, workbench y self-read está operativo live;
-TASK-1483/TASK-1628 pasaron GVC y smoke autenticado. TASK-1630 permanece `in-progress` por paridad MCP write,
-calibración/receipts transversales y dos holds históricos con resultado desconocido.
+Closure state: el carril interno de fondeo, status, recovery, workbench, self-read y MCP write está operativo live;
+TASK-1483/TASK-1628 pasaron GVC y smoke autenticado. Los dos holds históricos fueron adjudicados y liberados por
+la primitive gobernada, y los 500.000 históricos quedaron sólo en auditoría append-only.
 
 ## Scope and risk
 
@@ -38,23 +38,23 @@ calibración/receipts transversales y dos holds históricos con resultado descon
 | Idempotencia/recovery | PASS | list/get/status/reconcile y receipts autoritativos; outcome ambiguo exige readback y nunca repite la mutación económica. |
 | Expiry worker | PASS | Scheduler minutely, topología `1×1`, flag activo, grants exactos. Canary `fmspk`: `claimed=2`, `reconciliationRequested=2`, `deferred=2`, `failed=0`. |
 | Least privilege | PASS | El gap live se acotó a `SELECT`/`INSERT` en `governed_run_control_commands`; workflow `30717172080` aplicó y verificó el contrato exacto, sin owner ni grants amplios. |
-| Seguridad de incertidumbre | PASS | Dos runs históricos `submission_unknown` sin `providerOperationId` permanecen diferidos; no se cobra ni libera a ciegas. |
+| Seguridad de incertidumbre | PASS | Dos runs históricos sin `providerOperationId` y sin entregable fueron adjudicados por decisión Finance exacta; receipts gobernados liberaron 14+16 y terminalizaron ambos runs sin retry ni SQL. |
 | Evidencia visual focal | PASS | Capturas autenticadas desktop de Greenhouse y Producer en `docs/operations/creative-studio/evidence/2026-08-01/`. |
 | QA UI exhaustivo | PASS LIVE | TASK-1483 pasó desktop + drawer mobile y TASK-1628 desktop/mobile con 14 frames. El smoke Chrome autenticado confirmó ambas superficies desplegadas, sus cifras convergentes y cero errores de consola. |
-| MCP write parity | PENDING | El gateway MCP actual es read-only; el carril interno no depende de ampliar autoridad MCP. |
-| Finance 500k/calibración | PENDING | TASK-1468/TASK-1579 conservan receipts/calibración amplia y el ejercicio de volumen; no bloquean el fondeo interno live. |
+| MCP write parity | PASS | `globe.credits.funding.ensure` acepta sólo `authorityId`; OAuth/Entra, WIF, token exchange y command Greenhouse pasaron canary real con resultado terminal `completed/no_effect`. |
+| Finance 500k/calibración | PASS P0 | Los 500.000 se clasificaron `historical_internal_shadow_bootstrap`, nunca funding-eligible y se excluyeron de toda proyección operativa; TASK-1468/TASK-1579 conservan calibración amplia no bloqueante. |
 
 ## Risk disposition
 
 | Riesgo residual | Severidad | Disposición |
 | --- | --- | --- |
-| Dos holds históricos mantienen edad alta | Medium | Mantener diferidos y observables; resolver sólo con evidencia autoritativa o procedimiento financiero explícito. Nunca force-release. |
+| Aparición tardía de evidencia provider de los dos holds | Low | No cobrar al workspace en silencio; registrar costo interno de excepción y exigir nueva decisión Finance. |
 | Drift futuro entre UI y readers | Medium | Mantener DTO-only, coverage/freshness y smoke autenticado por corte; nunca recalcular saldos en browser. |
-| MCP no puede fondear | Low para carril interno | Mantener read-only hasta diseñar delegación/scopes/auditoría equivalentes; UI/API/CLI ya entregan operación end-to-end. |
+| Acceso MCP externo | High si se adelanta | El canary es interno y single-tenant; B2B/multitenant continúa gated por TASK-1631. |
 | Rollout externo | High si se adelanta | Sigue gated por TASK-1480 y controles comerciales/tenant. |
 
 ## Final call
 
-El sistema ya tiene una vía inmediata y recuperable por UI y CLI/API para fondear y leer créditos internos sin
-segundo humano obligatorio. El corte es apto para operación interna enterprise con las condiciones anteriores;
-no equivale a cerrar TASK-1630, monetización externa ni MCP write. TASK-1483 y TASK-1628 sí quedan completas.
+El sistema tiene vías inmediatas y recuperables por UI, API/CLI y MCP para fondear y leer créditos internos sin
+segundo humano obligatorio. El corte cierra TASK-1630 como operación interna enterprise. No habilita monetización
+externa, checkout ni identidad B2B/multitenant.

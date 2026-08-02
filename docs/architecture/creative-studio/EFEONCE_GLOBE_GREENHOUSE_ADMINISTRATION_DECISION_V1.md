@@ -295,9 +295,9 @@ El maker-checker vive donde hay identidades reales:
 Esto arregla tres cosas a la vez: una intención = un comando; los agentes operan sin tocar `gcloud`, Secret
 Manager ni impersonación; y la autoridad queda expresada como actores autenticados + política, no strings.
 
-**Por Full API Parity la capability nace con contrato gobernado.** API Platform, CLI y la UI Greenhouse consumen
-los mismos commands/readers. Nexa y MCP write continúan pendientes; cuando existan consumirán los mismos
-primitives y ninguna superficie obtendrá autoridad adicional.
+**Por Full API Parity la capability nace con contrato gobernado.** API Platform, CLI, UI Greenhouse y el write
+interno MCP consumen los mismos commands/readers. MCP acepta sólo una authority one-shot ya sellada; ninguna
+superficie obtiene autoridad adicional. Nexa permanece pendiente hasta adoptar este mismo primitive.
 
 ### 6. Atomicidad: UNA transacción Postgres para grant + asiento de ledger + política; el intent durable cubre lo que no puede estar en la transacción
 

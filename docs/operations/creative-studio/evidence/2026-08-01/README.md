@@ -30,7 +30,20 @@ la operación, el reader CLI/API y el self-reader de Producer sobre el mismo run
 [`STUDIO_CREDITS_FINANCE_DECISIONS.md`](STUDIO_CREDITS_FINANCE_DECISIONS.md) clasifica los 500.000 de julio como
 bootstrap histórico no monetario, período cerrado y nunca elegible para funding vigente. También acepta la
 adjudicación `historical_submission_unknown_no_deliverable` para los dos holds antiguos, condicionada a una
-primitive gobernada y readback append-only; no autoriza SQL manual ni liberación ciega.
+primitive gobernada y readback append-only; ambos casos ya fueron aplicados y verificados. Greenhouse excluye el
+agregado histórico completo de sus proyecciones operativas.
+
+## Canary MCP write
+
+- Gateway: `efeonce-mcp@3add7b2`, workflow `30723992263`, Cloud Run Ready.
+- Tool/scope: `globe.credits.funding.ensure` / `efeonce.mcp.globe.credits.funding.ensure`.
+- Autoridad: `df166eab-2c22-4009-a674-b83c8df307e4`, canal `mcp`, client `efeonce-mcp-gateway`.
+- Resultado: HTTP 200, ejecución `completed`, outcome `no_effect`, operación Globe
+  `b69ecd23-6e41-4a5c-9bdf-c3f212e8bbeb`; el sistema conservó 800 efectivos sin duplicar allocation.
+- OAuth real verificó audience, issuer, tenant y los tres scopes; WIF + RFC 8693 llegaron a Greenhouse mediante
+  el bypass de automatización administrado en GCP Secret Manager. Ningún secreto llegó a Globe.
+- Readback Chrome autenticado posterior: `effectiveAvailable=800`, `eligibleFunding=800`, cap/remaining 1500,
+  spent/held 0, blockers vacíos, `historicalLedger` ausente y ninguna aparición de 500.000.
 
 ## Rollout de las surfaces enriquecidas
 
@@ -58,6 +71,6 @@ primitive gobernada y readback append-only; no autoriza SQL manual ni liberació
   `claimed=4`, `rescheduled=4`, sin fallo del worker.
 - OpenTofu `fmt -check`, `validate` y plan live con `-detailed-exitcode`: `No changes`, exit 0.
 
-Los dos holds vencidos son runs históricos `submission_unknown`, sin `providerOperationId`, con resultado de
-envío desconocido. El worker los reconcilia y difiere; no los libera ni cobra a ciegas. Su edad continúa visible
-como señal operacional hasta una resolución autoritativa o financiera explícita.
+Los dos holds vencidos fueron inicialmente diferidos correctamente por el worker. Después, la decisión Finance
+exacta permitió adjudicarlos como históricos sin entregable mediante la primitive gobernada; se liberaron 14+16
+con receipts append-only y no existe ya un hold antiguo abierto por esos casos.

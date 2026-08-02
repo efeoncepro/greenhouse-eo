@@ -35,9 +35,10 @@ atribuida del CEO ya autoriza una operación one-shot acotada para el mismo usua
 policy no exige segundo confirmante. UI browser y OAuth PKCE/CLI comparten la misma authority state machine;
 Globe deriva el ciclo UTC y crea o reutiliza el pool mensual determinístico dentro de la transacción económica.
 La operación live del 2026-08-01 dejó 800 efectivos sobre cap 1500. Workloads nunca confirman y clientes externos
-siguen gated. El worker minutely de expiry sólo libera reservations cuando existe evidencia terminal; un
-`submission_unknown` sin `providerOperationId` permanece diferido y observable. Nunca se fuerza su liberación
-para limpiar una métrica o fabricar capacidad.
+siguen gated. El worker minutely de expiry sólo libera reservations cuando existe evidencia terminal. Los dos
+casos históricos sin entregable se resolvieron mediante una decisión Finance exacta y una primitive gobernada,
+no por TTL o SQL. El bootstrap de 500.000 de julio se conserva sólo como auditoría append-only: no forma parte
+de ninguna proyección operativa, capacidad, KPI, UI, CLI o MCP.
 
 Las superficies internas están operativas: Greenhouse `/admin/globe/credits` administra mediante DTOs redactados
 sin segundo ledger y Globe Producer muestra un self-view read-only de effective/funding/cap-spent-held/daily fence.
@@ -61,10 +62,10 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   source of truth ni producto activo.
 - Greenhouse es plataforma/subproducto de Efeonce; `EO` es abreviación del repo, no nomenclatura visible.
 - El gateway MCP federado vive en el repo hermano `efeonce-mcp`, no en Greenhouse ni Globe. Su recurso canónico
-  es `https://mcp.efeonce.org/mcp`, corre en Cloud Run dentro de `efeonce-group` y habilita sólo el reader
-  internal-only `globe.producer.fleet.list`, verificado por OAuth PKCE real; todo provider/capability adicional
-  conserva sus gates propios. Un futuro write de Studio Credits extiende este gateway; nunca crea otro MCP y
-  permanece bloqueado hasta probar identidad agente, scopes, límites, auditoría y conformance. Clientes externos continúan bloqueados hasta separar entitlements/emisión de scopes
+  es `https://mcp.efeonce.org/mcp`, corre en Cloud Run dentro de `efeonce-group` y habilita el reader internal-only
+  `globe.producer.fleet.list` y el write interno one-shot `globe.credits.funding.ensure`, ambos verificados por
+  OAuth PKCE real. El write acepta únicamente una autoridad ya sellada y llama el command Greenhouse canónico.
+  Clientes externos continúan bloqueados hasta separar entitlements/emisión de scopes
   B2B y probar una identidad base-only. Greenhouse mantiene sólo ADRs, tasks y handoff de ecosistema.
 - La operación o evolución MCP se enruta por las skills espejo `.codex/skills/efeonce-mcp-platform/` y
   `.claude/skills/efeonce-mcp-platform/`; estas componen la skill dueña de cada provider y no duplican su policy.

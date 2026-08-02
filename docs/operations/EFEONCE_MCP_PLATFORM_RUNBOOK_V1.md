@@ -69,6 +69,10 @@ habilita clientes externos ni multitenancy.
 | `GLOBE_PROVIDER_ENABLED` | no | default `false`; sólo `true` con canary/IAM verdes |
 | `GLOBE_API_URL` | no | URL IAM-private de la API Globe |
 | `GLOBE_API_AUDIENCE` | no | audience exacta para el ID token Google |
+| `GLOBE_CREDIT_FUNDING_WRITE_ENABLED` | no | default `false`; habilita sólo la tool one-shot certificada |
+| `GREENHOUSE_API_URL` | no | origin Greenhouse exacto para el command de funding |
+| `GREENHOUSE_TOKEN_EXCHANGE_URL` | no | endpoint RFC 8693 exacto y audience del ID token WIF |
+| `GREENHOUSE_VERCEL_BYPASS_SECRET` | sí | inyectado desde `greenhouse-vercel-automation-bypass` en GCP Secret Manager; nunca GitHub var/env file |
 
 Si falta configuración OAuth, `/health` responde pero `/mcp` devuelve `503 oauth_not_configured`. Esto es el
 comportamiento seguro esperado, no una razón para habilitar acceso anónimo.
@@ -153,6 +157,18 @@ atribuyen al hostname canónico `mcp.efeonce.org`.
 El canary habilita una prueba interna acotada, no disponibilidad general. Clientes externos requieren una
 decisión explícita de B2B/multitenancy y entitlements por tenant/capability antes de recibir acceso. No conviertas
 el scope básico de un tenant único en una autorización comercial o multi-tenant implícita.
+
+### Canary Studio Credits write
+
+- Solicita además `efeonce.mcp.globe.credits.funding.ensure` y entrega a la tool únicamente una `authorityId`
+  one-shot emitida por Greenhouse para canal `mcp`, client `efeonce-mcp-gateway` y auth mode `agent`.
+- Verifica `initialize`, reader Globe y `globe.credits.funding.ensure`; éxito terminal es `completed|no_effect`.
+- Confirma por readback que la authority execution queda terminal y que un replay no produce un segundo delta.
+- Si Greenhouse staging tiene Vercel Deployment Protection, el gateway recibe el bypass desde Secret Manager y
+  lo envía sólo al token exchange y command exactos. Nunca lo envíes a Globe, logs o respuestas MCP.
+- Canary certificado 2026-08-01: gateway `3add7b2`, workflow `30723992263`, authority
+  `df166eab-2c22-4009-a674-b83c8df307e4`, outcome `completed/no_effect`, operación Globe
+  `b69ecd23-6e41-4a5c-9bdf-c3f212e8bbeb` y capacidad efectiva sin cambio en 800.
 
 ## Front door and DNS
 

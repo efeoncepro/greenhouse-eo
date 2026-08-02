@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Readers, recovery y worker de expiry desplegados y verificados live; dos holds históricos submission_unknown permanecen diferidos para reconciliación explícita, sin liberación ciega`
+- Status real: `Readers, recovery y worker de expiry desplegados y verificados live; TASK-1630 adjudicó después los dos holds históricos mediante decisión Finance gobernada`
 - Rank: `done`
 - Domain: `platform`
 - Blocked by: `none`

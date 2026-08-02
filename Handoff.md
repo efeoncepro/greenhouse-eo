@@ -4,7 +4,7 @@
 
 - ADR-019 `Accepted`; ADR-020 `Proposed`. Brightcell: **no enviar** hasta Finance. Polpaico: `HOLD / NO-BID`, sin precio/deck emitible. Detalle en `changelog.md`.
 
-## Studio Credits — fondeo live y readback convergente (2026-08-01)
+## Studio Credits — fondeo enterprise UI/API/CLI/MCP y readback convergente (2026-08-01)
 
 - Rama correcta: Globe opera directamente en `main`; Greenhouse en `develop`; un solo checkout por repo, cero
   worktrees aislados.
@@ -13,17 +13,14 @@
 - Greenhouse `/admin/globe/credits`, CLI OAuth PKCE `status` y Globe Producer coinciden en 800 efectivos,
   funding 800, cap/remaining 1500, spent/held 0 y cero blockers. Capturas y IDs:
   `docs/operations/creative-studio/evidence/2026-08-01/README.md`.
-- Globe `649eb08` elimina la dependencia circular del rollover. El worker final `d3fe90e`, digest
-  `sha256:d8295862…bae9`, quedó desplegado por `30717266572`; scheduler `lmb2r` reportó `claimed=2`,
-  `reconciliationRequested=2`, `deferred=2`, `failed=0`. `e369ef8` fija ese digest en IaC y OpenTofu devuelve
-  `No changes`.
-- ISSUE-124 está resolved. TASK-1482, TASK-1483, TASK-1586, TASK-1628 y TASK-1629 están `complete` con aceptación
-  funcional/runtime. Greenhouse `develop@f899d951b` quedó Ready en staging `dpl_F153TxebTXfkLVjg12SiJtqSBXsH`;
-  Globe `main@e31518b430b8` sirve API `00183-cml` y Studio `00132-rdt` al 100 %. Los tres escenarios GVC premium
-  y el smoke Chrome autenticado pasaron sin errores; el smoke fue read-only y no repitió el fondeo.
-  TASK-1468/TASK-1579 conservan receipts/calibración amplia sin bloquear el fondeo interno.
-- Dos holds históricos `submission_unknown` sin `providerOperationId` permanecen diferidos y observables en
-  TASK-1630; no deben force-release ni contarse como capacidad disponible.
+- ISSUE-124 está resolved. TASK-1482, TASK-1483, TASK-1586, TASK-1628, TASK-1629 y TASK-1630 están `complete` con aceptación
+  funcional/runtime; GVC y smoke Chrome autenticado pasaron. TASK-1468/TASK-1579 conservan calibración amplia
+  sin bloquear el fondeo interno.
+- Los dos holds históricos sin entregable se adjudicaron por primitive gobernada y liberaron 14+16 créditos.
+- El bootstrap histórico de 500.000 permanece únicamente en historia append-only, clasificado no monetario,
+  período cerrado y nunca elegible. Greenhouse ya no lo expone en status, CLI, MCP ni UI operativa.
+- MCP write está operativo en el gateway único y su canary OAuth real terminó `completed/no_effect`; no duplicó
+  funding porque ya existían 800 efectivos. IDs y receipts viven en la evidencia canónica enlazada arriba.
 
 El first fold quedó supersedido por el rollout live. La evidencia responsive y de interacción se conserva en
 `docs/ui/reviews/TASK-1483-globe-credits-operations-workbench-first-fold-review-2026-08-01.md`; los detalles de
@@ -48,10 +45,11 @@ rollout, migrations y Producer viven en `docs/operations/creative-studio/GLOBE_R
 
 - [ADR-018](docs/architecture/creative-studio/EFEONCE_GLOBE_MOBILE_CONTINUITY_APPLICATION_DECISION_V1.md) fija Globe como **continuity-first y native-first para Android/iOS**: React Native + Expo development builds/CNG es la dirección tecnológica de la companion; web/PWA queda como fallback. No se creó una skill nueva, no hay app/runtime rollout y el vertical slice requiere PKCE, deep links, captura, upload interrumpible, push reconciliable, handoff, compatibilidad binary/API, task, policy, owner y gates. Funcional/manual: [`mobile continuity`](docs/documentation/creative-studio/efeonce-globe-mobile-continuidad.md) · [`validación`](docs/manual-de-uso/creative-studio/operar-globe-continuidad-movil.md).
 
-## Efeonce MCP — gateway público y canary Globe read-only verificados (2026-08-01)
+## Efeonce MCP — reader y write one-shot de Studio Credits verificados (2026-08-01)
 
-- `https://mcp.efeonce.org/mcp` y el reader Globe read-only están operativos; Studio Credits extenderá ese gateway,
-  nunca otro MCP. Writes/clientes externos siguen gated; detalle en el repo MCP y el runtime handoff de Globe.
+- `https://mcp.efeonce.org/mcp`, el reader Globe y el write interno one-shot de Studio Credits están operativos.
+  El write acepta sólo `authorityId`, intercambia Entra→Greenhouse con WIF y usa el command canónico; monto,
+  workspace, cap y período no cruzan como argumentos MCP. Clientes externos siguen gated por TASK-1631.
 
 ## AXIS — guía visual agent-facing publicada (2026-08-01)
 

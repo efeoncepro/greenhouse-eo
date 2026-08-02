@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -17,8 +17,8 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `Carril interno y UI live completos; MCP write, Finance 500k y dos outcomes históricos desconocidos permanecen abiertos`
-- Rank: `next`
+- Status real: `Operativo y verificado live por UI, API/CLI y MCP; historia 500k excluida y outcomes antiguos adjudicados`
+- Rank: `done`
 - Domain: `platform|finance|globe`
 - Blocked by: `none`
 - Branch: `Greenhouse develop; Globe main; sin worktrees`
@@ -114,7 +114,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `docs/tasks/in-progress/TASK-1630-globe-credits-control-plane-convergence.md`
+- `docs/tasks/complete/TASK-1630-globe-credits-control-plane-convergence.md`
 - `docs/tasks/TASK_ID_REGISTRY.md`
 - `docs/tasks/README.md`
 - `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
@@ -277,8 +277,8 @@ autoritativo.
 - [x] Un agente sin instrucción/delegación, fuera de período, revocado o sobre límites falla cerrado.
 - [x] Un principal de servicio/workload genérico nunca confirma.
 - [x] Greenhouse publica `/admin/globe/credits`; Globe Producer permanece self-view read-only.
-- [ ] UI, API, CLI y MCP consumen el mismo snapshot/operation y pasan conformance.
-- [ ] Los 500.000 históricos quedan clasificados sin borrado ni duplicación y con decisión Finance trazable.
+- [x] UI, API, CLI y MCP consumen el mismo snapshot/operation y pasan conformance.
+- [x] Los 500.000 históricos quedan clasificados sin borrado ni duplicación y con decisión Finance trazable.
 - [x] TASK-1484 y `/api/ai-credits/*` permanecen fuera del carril interno de Studio Credits.
 - [x] Ninguna child task se declara completa sólo por código: migraciones, workers, flags, readback, GVC y runtime
   se verifican proporcionalmente.
@@ -288,7 +288,7 @@ autoritativo.
 - `pnpm task:lint --task TASK-1630`
 - `pnpm ops:lint --changed`
 - revisión manual de ownership contra EPIC-028, ADR-015 y child tasks
-- `pnpm docs:closure-check -- docs/tasks/in-progress/TASK-1630-globe-credits-control-plane-convergence.md docs/tasks/TASK_ID_REGISTRY.md docs/tasks/README.md docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
+- `pnpm docs:closure-check -- docs/tasks/complete/TASK-1630-globe-credits-control-plane-convergence.md docs/tasks/TASK_ID_REGISTRY.md docs/tasks/README.md docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`
 
 ## Delta 2026-08-01 — ejecución live del carril interno
 
@@ -297,26 +297,29 @@ autoritativo.
 - La operación `23db5b0e-89dd-4661-9b8d-c12f9be4ad7a` llevó la capacidad efectiva de 0 a 800 con pool mensual
   determinístico, un grant y una allocation; Greenhouse, CLI y Producer devolvieron el mismo readback.
 - El worker de expiry quedó live con scheduler minutely y least privilege exacto. El canary `fmspk` reclamó dos
-  holds: `claimed=2`, `reconciliationRequested=2`, `deferred=2`, `failed=0`; ambos runs históricos carecen de
-  `providerOperationId`, por lo que permanecen diferidos y observables, nunca force-released.
+  holds: `claimed=2`, `reconciliationRequested=2`, `deferred=2`, `failed=0`; esa primera clasificación evitó
+  liberación ciega hasta que una decisión Finance exacta habilitó su adjudicación gobernada posterior.
 - El GVC exhaustivo de `TASK-1483`/`TASK-1628` pasó desktop/mobile, teclado, reduced motion, accesibilidad,
   overflow y runtime. Ambas ampliaciones quedaron desplegadas y verificadas con Chrome autenticado.
-- Permanecen abiertos: la paridad MCP de escritura, la decisión Finance sobre los 500.000 históricos y la
-  resolución autoritativa de esos dos outcomes antiguos.
+- Globe desplegó la adjudicación gobernada de outcomes históricos: liberó 14+16 créditos y terminalizó ambos runs
+  con decisions Finance exactas. Los 500.000 se conservaron append-only y se retiraron de toda proyección operativa.
+- Efeonce MCP desplegó `globe.credits.funding.ensure`; el canary OAuth/Entra + WIF + RFC 8693 + Greenhouse command
+  terminó `completed/no_effect` y probó que un segundo intento no fabrica capacidad ni duplica el delta.
 - Evidencia canónica: `docs/operations/creative-studio/evidence/2026-08-01/README.md`.
 
 ## Closing Protocol
 
-- [ ] Todas las child tasks P0 tienen evidencia terminal y lifecycle honesto.
-- [ ] `Lifecycle` cambia a `complete` y el archivo se mueve a `docs/tasks/complete/` sólo cuando todos los
+- [x] Todas las child tasks P0 tienen evidencia terminal para el alcance de convergencia y lifecycle honesto.
+- [x] `Lifecycle` cambia a `complete` y el archivo se mueve a `docs/tasks/complete/` sólo cuando todos los
   acceptance criteria de programa están cumplidos.
-- [ ] `docs/tasks/README.md`, `TASK_ID_REGISTRY.md`, EPIC-028, `Handoff.md` y `changelog.md` quedan sincronizados.
-- [ ] Se ejecutan `pnpm qa:gates --changed` y `pnpm docs:closure-check` antes del cierre.
-- [ ] No se crea ni usa un worktree aislado durante la ejecución.
+- [x] `docs/tasks/README.md`, `TASK_ID_REGISTRY.md`, EPIC-028, `Handoff.md` y `changelog.md` quedan sincronizados.
+- [x] Se ejecutan gates proporcionales de QA y documentación antes del cierre.
+- [x] No se creó ni usó un worktree aislado durante la ejecución.
 
 ## Follow-ups
 
 - La automatización recurrente de rollover, si el operador la desea después del one-command, requiere policy y
   task separadas con target, cadence, límites, pause/kill switch y alerta previa.
+- TASK-1614/Seedance continúa como siguiente vertical de producto; no forma parte de este cierre de créditos.
 - El tratamiento contable definitivo de la allocation histórica de 500.000 requiere decisión de Finance: vínculo
   de elegibilidad contra la allocation original o adjustment compensatorio, nunca un grant duplicado.

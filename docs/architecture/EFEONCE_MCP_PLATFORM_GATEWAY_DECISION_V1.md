@@ -44,10 +44,10 @@ duplica lógica de negocio.
    Globe con su service account dedicada, ID token con audience exacta y allowlist del runtime de Globe.
 9. Globe es el primer provider, pero conserva ownership de sus tools/resources en `efeonce-globe` mediante
    contracts/SDK/adapters delgados gobernados por `TASK-1473`. El gateway sólo descubre, monta, filtra y enruta
-   esas capacidades. El primer corte operativo habilita exclusivamente el reader `globe.producer.fleet.list`,
-   interno y read-only; no habilita generaciones, assets, review, delivery, créditos ni reveal-house.
-10. No se habilitan writes en el primer corte. Cada write futuro exige command canónico, autorización fina,
-    idempotencia, auditoría, cuotas y clasificación de impacto.
+   esas capacidades. El corte operativo habilita el reader `globe.producer.fleet.list` y la excepción interna
+   one-shot de créditos definida en el punto 12; no habilita generaciones, assets, review, delivery ni reveal-house.
+10. Los writes son deny-by-default. Cada write exige command canónico, autorización fina, idempotencia,
+    auditoría, cuotas, clasificación de impacto y canary real antes de habilitarse.
 11. Codex y Claude usan el router compartido `efeonce-mcp-platform` para componer las skills de arquitectura,
     cloud/secret hygiene, provider, QA y documentación. El router no sustituye esas skills ni sus fuentes de
     verdad; su contrato vive en `EFEONCE_MCP_AGENT_SKILL_ROUTER_V1.md`.
@@ -58,7 +58,8 @@ duplica lógica de negocio.
     Greenhouse `POST /api/platform/app/globe/credit-funding/ensure` con una `authorityId` one-shot ya sellada.
     El intercambio exige workload identity exacta del gateway, scope MCP de write separado, audience exacta,
     workspace binding y entitlement Greenhouse. No acepta workspace, monto, período, cap, actor ni instrucciones
-    libres en la tool. Default OFF y rollback por flag/provider; acceso B2B/multitenant continúa bloqueado.
+    libres en la tool. Default OFF y rollback por flag/provider; acceso B2B/multitenant continúa bloqueado. El
+    canary interno real pasó el 2026-08-01 con resultado terminal y sin segundo delta económico.
 
 ## Ownership Contract
 

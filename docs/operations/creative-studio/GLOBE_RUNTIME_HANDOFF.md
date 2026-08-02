@@ -5,9 +5,9 @@
 > conserva sólo el estado mutable, los riesgos abiertos y el siguiente paso. La historia anterior
 > permanece auditable en el git log y en las tasks/ADRs enlazadas.
 >
-> **Corte verificado:** 2026-08-01 · Globe `main@e31518b430b8d23b53abc473068185496a01b713`; Greenhouse
-> `develop@f899d951b84aebd23bf8702042b4fffb1252bc1f`. El fondeo mensual live fue verificado sobre
-> `649eb08`; migraciones hasta `0045`, API y Studio están aplicados. El worker de expiry/recovery usa código
+> **Corte verificado:** 2026-08-01 · Globe `main@b94d02a242a686b30969fa1854aefc754562779f`; Greenhouse
+> `develop@e593a2fbf492562e7435f06faf3d19e67fd45c69`. El fondeo mensual live fue verificado sobre
+> `649eb08`; migraciones hasta `0047`, API y Studio están aplicados. El worker de expiry/recovery usa código
 > `d3fe90e`, digest `sha256:d8295862dc12c14427e90e0bb413577802916c37ca6bf32c202680492ca7bae9`,
 > deploy `30717266572` y baseline IaC `e369ef8` sin drift.
 
@@ -19,17 +19,16 @@
   same-origin; no recibe credenciales de workload ni llama providers directamente.
 - El reader `globe.producer.fleet.list` es el SoT live. El ledger humano es
   [`GLOBE_MODEL_FLEET_STATUS.md`](GLOBE_MODEL_FLEET_STATUS.md).
-- El gateway federado `https://mcp.efeonce.org/mcp` consume ese mismo reader desde el 2026-08-01, pero sólo
-  expone lectura interna: principal `globe:service:mcp-provider`, capability
-  `globe.producer.catalog.read` y workspace `greenhouse-org:efeonce` exacto. No entrega selección de workspace,
-  ejecuciones, assets, revisiones, delivery, créditos ni datos de proveedor.
+- El gateway federado `https://mcp.efeonce.org/mcp` expone el reader y el write interno one-shot
+  `globe.credits.funding.ensure`. La tool acepta sólo `authorityId`; Greenhouse retiene identidad, límites y
+  command, y Globe conserva la autoridad económica. No habilita generaciones, assets, delivery ni datos provider.
 - Seis rutas de imagen están simultáneamente `available`: Seedream 5 Pro, Nano Banana Pro,
   Nano Banana 2, GPT Image 2, GPT Image 1.5 y Recraft v4.1.
 - `TASK-1553` permanece `in-progress` únicamente por el criterio transversal de rate-version
   receipts de `TASK-1468` y onboarding receipts de `TASK-1578`. Este pendiente no revierte la
   disponibilidad live de las seis rutas.
-- TASK-1483 y TASK-1628 están completas: Greenhouse staging y Globe internal sirven las vistas enriquecidas y
-  pasaron smoke Chrome autenticado sin errores. Esto no abre clientes externos ni amplía MCP write.
+- TASK-1483, TASK-1628 y TASK-1630 están completas: Greenhouse staging y Globe internal sirven las vistas
+  enriquecidas, MCP write pasó canary real y el corte no abre clientes externos.
 
 ## Superficies operativas vigentes
 
@@ -174,10 +173,11 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
   máquina antes del rollout externo; no recrees el secreto legacy de Globe.
 - El cliente Entra interno del gateway MCP recibe hoy ambos scopes aun cuando solicita el base. Antes de acceso
   B2B debe existir entitlement por tenant/capability y una identidad base-only que pruebe la denegación de Globe.
+- Los 500.000 históricos permanecen sólo como auditoría append-only; ninguna proyección operativa los publica.
 
 ## Checkpoint de ejecución — Studio Credits enterprise (2026-08-01)
 
-> **Actualización dominante 19:34 UTC:** los párrafos históricos de este checkpoint que dicen “local”, “sin
+> **Actualización dominante 23:55 UTC:** TASK-1630 está cerrada. Los párrafos históricos de este checkpoint que dicen “local”, “sin
 > migración”, “sin deploy” o describen Globe `develop` quedaron supersedidos por el corte siguiente. Se preservan
 > únicamente como trazabilidad del orden de ejecución.
 
@@ -197,9 +197,11 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
   runtime propio. TASK-1468/TASK-1579 conservan únicamente sus gaps más amplios de lifecycle/calibración; el
   rollout de expiry quedó activo. Scheduler `lmb2r` reportó `claimed=2`, `reconciliationRequested=2`,
   `deferred=2`, `failed=0`; canary `j8nnw` terminó sobre el mismo digest.
-- Los dos holds antiguos son `submission_unknown` sin `providerOperationId`. Permanecen diferidos bajo
-  TASK-1630 y sostienen la métrica de edad; resolverlos exige evidencia autoritativa o decisión Finance, nunca
-  force-release. TASK-1586 está `complete` porque el recovery plane y worker operan correctamente.
+- Los dos holds antiguos fueron adjudicados mediante la decisión Finance exacta
+  `historical_submission_unknown_no_deliverable`; se liberaron 14+16 con receipts gobernados y runs terminales.
+  El bootstrap de 500.000 quedó fuera de status/UI/API/CLI/MCP, sin borrar su historia append-only.
+- MCP `3add7b2`, deploy `30723992263`, pasó OAuth/Entra + WIF + RFC 8693 + command Greenhouse. La authority
+  `df166eab-2c22-4009-a674-b83c8df307e4` terminó `completed/no_effect` y no duplicó los 800 efectivos.
 
 - Goal activo: completar TASK-1482 → TASK-1468+1579 → TASK-1586 → TASK-1629 → TASK-1483 → TASK-1628 con
   migraciones, runtime, observabilidad, runbooks y evidencia local/staging/live; no basta código ni documentación.
@@ -270,10 +272,6 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
 
 ## Siguiente paso ejecutable
 
-1. Extender exclusivamente el gateway existente `https://mcp.efeonce.org/mcp` para MCP write cuando tenga
-   identidad agente propagada, scopes y conformance equivalentes; no crear otro servidor MCP.
-2. Completar receipts/calibración de TASK-1468/TASK-1579 y la decisión Finance sobre los 500.000 históricos.
-3. Reconciliar los dos outcomes históricos sólo con evidencia de provider/receipt o procedimiento Finance
-   explícito; mientras tanto permanecen diferidos, observables y nunca force-released.
-4. TASK-1614 ya no está bloqueada por créditos; ejecutar su canary nuevo desde Producer cuando corresponda.
-5. Mantener rollout externo y acceso MCP B2B gated por TASK-1480/TASK-1631 y sus canaries de identidad.
+1. Retomar TASK-1614 y ejecutar el canary nuevo de Seedance desde Producer; créditos ya no son blocker.
+2. Completar receipts/calibración amplia de TASK-1468/TASK-1579 sin reabrir TASK-1630 ni alterar los 800 efectivos.
+3. Mantener rollout externo y acceso MCP B2B gated por TASK-1480/TASK-1631 y sus canaries de identidad.

@@ -27,8 +27,8 @@ Clasificar el asiento como:
 
 Se conserva byte-for-byte la historia append-only. No se elimina, renombra, reposta ni compensa con un adjustment
 de `-500000`: ese ajuste no corregiría la capacidad vigente y agregaría una semántica económica inexistente. Los
-500.000 quedan excluidos de funding vigente, capacidad efectiva y KPI comercial. El funding efectivo de agosto
-proviene exclusivamente del pool/grant mensual gobernado.
+500.000 quedan excluidos de funding vigente, capacidad efectiva, KPI comercial y de toda proyección operativa
+servida a UI, API/CLI o MCP. El funding efectivo de agosto proviene exclusivamente del pool/grant mensual gobernado.
 
 ### Evidencia de no interferencia
 
@@ -67,7 +67,9 @@ nueva decisión para alterar el tratamiento económico.
 
 ### Estado de ejecución
 
-`decision accepted; aplicación runtime pendiente`. La decisión no se considera ejecutada hasta que los dos runs
-queden terminales, ambas reservations dejen `held`, existan los ledger entries canónicos y la señal de hold antiguo
-baje por resolución real.
+`applied and verified`. Globe `main@b94d02a` desplegó la primitive y ambos actos terminaron live:
 
+- 14 créditos: decision `4c15ec76-dd7c-44ca-ab28-c523bc97a8c5`, run `9a5a041c-8f68-4657-8638-234f87432059`.
+- 16 créditos: decision `e037344a-c808-4d6e-b34b-1a0efe88c955`, run `856f7796-a7fb-4a54-9cd3-692fb12f88f9`.
+
+Las dos reservations dejaron `held`, los runs quedaron terminales y el readback efectivo permaneció en 800.

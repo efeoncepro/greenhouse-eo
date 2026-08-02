@@ -78,16 +78,18 @@
   emitidos por OAuth y tanto el bearer como las rutas admin rechazan un `globeWorkspaceId` no vinculado antes de
   invocar el broker. No hubo fondeo, deploy, migración, release ni promoción a `main`.
 - El workbench Greenhouse conecta `Asegurar capacidad` a la misma state machine one-shot y agrega recovery
-  readback-first para `outcome_unknown`; TASK-1483 y TASK-1628 ya cerraron rollout y smoke live. TASK-1630
-  permanece abierta únicamente por MCP write, Finance/500.000 y outcomes históricos inciertos.
+  readback-first para `outcome_unknown`; TASK-1483 y TASK-1628 cerraron rollout y smoke live.
+- TASK-1630 cerró live: MCP `globe.credits.funding.ensure` pasó OAuth/Entra + WIF + RFC 8693 + Greenhouse command;
+  los dos outcomes antiguos liberaron 14+16 mediante decisions Finance gobernadas; los 500.000 se conservaron
+  append-only y se retiraron de toda proyección operativa UI/API/CLI/MCP.
 
 ## 2026-08-01 — Efeonce MCP: Globe fleet reader end-to-end
 
 - Se habilitó únicamente `globe.producer.fleet.list`: el gateway llama el reader canónico `POST /v1/readers`,
   sin importar base de datos, storage ni SDKs de proveedor. La respuesta conserva rutas de disponibilidad pero no
   house, provider slug, costo de vendor ni margen.
-- Studio Credits reutilizará este mismo gateway para su futuro write; no se creará otro MCP. Ese adapter sigue
-  gated por identidad agente, scopes, límites, auditoría y conformance de los primitives existentes.
+- Studio Credits reutiliza este mismo gateway mediante el write interno one-shot `globe.credits.funding.ensure`;
+  no se creó otro MCP. El acceso de clientes externos continúa gated por identidad B2B/multitenant.
 - Globe `#84` (`001ce1b`) quedó desplegado como `globe-api-internal-00179-qcz`; el gateway `ce593f2` como
   `efeonce-mcp-gateway-00009-9c6`, ambos con tráfico 100%. El canary Entra PKCE real pasó initialize, discovery
   y la tool de fleet por `https://mcp.efeonce.org/mcp`.

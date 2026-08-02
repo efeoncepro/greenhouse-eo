@@ -41,6 +41,11 @@ If a source conflicts with remembered behavior, the verified runtime and its can
   that rollout.
 - Treat writes, approvals, spending, rights-sensitive creative work, webhooks and new public auth surfaces as new
   ADR/task work. Do not infer permission from a read-only MCP capability.
+- The certified internal Studio Credits write is `globe.credits.funding.ensure`. It accepts only a Greenhouse-issued
+  one-shot `authorityId`, requires its dedicated Entra scope, exchanges identity through RFC 8693, and calls the
+  canonical Greenhouse command. Never add workspace, amount, period, cap, actor or free-form instruction inputs.
+  For Vercel-protected Greenhouse environments, inject the system-managed automation bypass from Secret Manager
+  and send it only to the exact token-exchange and command URLs; never store it in GitHub variables or forward it.
 - Do not call a product deployment successful because its MCP adapter compiled. Require provider allow/deny/fault
   evidence and a public gateway smoke.
 - Keep the Codex and Claude bundles byte-identical. Update both in the same change and verify the diff.
