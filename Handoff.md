@@ -40,31 +40,16 @@ Historia anterior: [Handoff.archive.md](Handoff.archive.md).
 
 ## TASK-1633 — contrato route-driven del Producer y orden de estabilización (2026-08-02)
 
-- Intake ejecutado con `pnpm codex:task-hook TASK-1633 --develop --subagents`; task movida a `in-progress` y
-  lint focal verde. ADR-022 aceptado e indexado: el descriptor vive dentro de cada revisión de ruta; operación,
-  slots/roles, combinaciones, controles/mecanismos y output son ejes separados. `inputModes`/`referencePolicy`
-  quedan dual-read durante la migración. Tres subagentes auditan contracts, compiler/adapters y UI en paralelo.
-- Checkpoint actual: Greenhouse `develop@15584bbc8`; Globe limpio `main@a24910c`. Cambios MCP concurrentes en
-  Greenhouse son ajenos y se preservan fuera de staging. Siguiente paso: cerrar auditoría, implementar tipos y
-  validadores aditivos en Globe, luego compiler/fingerprint y consumidores.
-
-- Goal activo y task tomada (`in-progress`, hook `--develop --subagents`): separar operaciones, input slots/roles, controles creativos, mecanismo de aplicación y output
-  contract; corregir Omni directo por Vertex y mantener el Producer prompt-first sin integrar Omni mediante Fal.
-- TASK-1504 consume TASK-1633 para Omni image-reference, duración/ratio y MP4 con audio; TASK-1573 conserva edit y
-  TASK-1552 el composer. Gate final: una generación UI Seedance y una Omni, sin repetir evaluación/fondeo.
-- TASK-1469 y TASK-1633 pueden avanzar en paralelo; TASK-1632 espera ambas y `canary-confirm`. No hubo runtime.
-
-## TASK-1504 — Gemini Omni: despliegue y saga activada; canary pendiente (2026-08-02)
-
-- API/worker y policy corregida están desplegados; saga `promotion_922157fa-b708-45cc-8bbf-b08d761afb21` quedó
-  `activated`, readiness promovido, binding habilitado y circuito cerrado. Sin deploy de Studio ni destroy.
-- La evaluación y candidato retenido de 40 créditos no se tocaron. Producer autenticado: actor esperado, modelo
-  exacto, `784` créditos y `budget.evaluate.allowed=true`; `Elementos` sigue deshabilitado en dos pestañas con
-  `Todavía no hay un modelo publicado para este modo`. No hay run/attempt/output/cobro/playback/retención/
-  lineage/governance nuevo ni `canary-confirm`; no se forzó el control ni se reutilizó la atestación antigua.
-- Estado: `code complete, rollout pendiente`; TASK-1504 sigue `in-progress`. Detalle operativo y siguiente paso:
-  [`GLOBE_RUNTIME_HANDOFF.md`](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md) y
-  [`TASK-1504`](docs/tasks/in-progress/TASK-1504-globe-producer-capability-expansion.md).
+- ADR-022 aceptado. Globe tiene WIP **sin commit** sobre `main@a24910c`: contrato, assignments y fingerprints.
+  Falta el gate raíz.
+- P0: Vertex ADC simétrico API/worker, identidades Omni separadas y UI sin mezcla operación/modelo/inputs.
+  Runtime previo: saga/readiness/binding/circuito reconciliados, 784 créditos; sin canary Omni ni `canary-confirm`.
+  No repetir evaluación, candidato retenido ni fondeo.
+- Continuidad Claude: cerrar foundation; luego Vertex/UI/deploy y canaries Seedance + Omni. Greenhouse
+  `develop@23fcdf54a` contiene tres commits MCP locales: staging por path. Estado completo:
+  [`plan`](docs/tasks/plans/TASK-1633-plan.md) ·
+  [`task`](docs/tasks/in-progress/TASK-1633-globe-producer-operation-input-control-contract.md) ·
+  [`runtime`](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md).
 
 ## Gate canónico de licitaciones / Brightcell (2026-08-02)
 
@@ -82,30 +67,14 @@ Historia anterior: [Handoff.archive.md](Handoff.archive.md).
 
 ## TASK-1614 — canary cerrado (2026-08-02)
 
-- Canary único en Producer autenticado, identidad exacta `ref/video/motion-v1 / fal / seedance-2.0-r2v / 2.0`:
-  run `bbe6dfff-41df-4569-95ef-07c51d555b97`, attempt `7bb11342-f0cd-4265-8c15-0c429617e1ae`, output MP4
-  `sha256:93adbf46c85efecd1ad51e7ebbc577cec21c23055ad3e250c876638a70400a5f`, 16 créditos, playback y governance
-  verificados.
-- Saga `promotion_557d4df1-994e-45ac-92f7-7ef885aa967e` → `canary_passed` rev. 9 (`30742268557`); lineage
-  append-only y lanes operator corregidos en Globe `main`. TASK-1614 `complete`; sin mutar créditos ni rutas fuera
-  de scope.
+- TASK-1614 está completa: Seedance motion terminó `canary_passed` con 16 créditos, playback/governance y lineage.
+  No reabrir su evaluación/promoción/fondeo; el próximo Seedance es sólo la regresión UI exigida por TASK-1633.
 
 ## Studio Credits — fondeo enterprise UI/API/CLI/MCP y readback convergente (2026-08-01)
 
-- Greenhouse sigue en `develop`, Globe en `main`, y el checkout compartido único continúa siendo obligatorio.
-- El fondeo interno live dejó 800 efectivos sobre cap 1500; el canary único de Seedance consumió 16 y el saldo
-  vigente quedó en 784. UI, CLI OAuth PKCE, Producer y MCP convergen sobre la misma state machine y el mismo ledger.
-- La UI `/admin/globe/credits` es la vía recomendada; API/CLI PKCE y
-  `https://mcp.efeonce.org/mcp` son adapters equivalentes. El write MCP acepta sólo `authorityId`, `ensure` deriva
-  período/pool/delta y un timeout se recupera por readers antes de reintentar. El bootstrap histórico de 500.000 no
-  forma parte de saldo, capacidad, KPIs ni proyecciones.
-- El contrato funcional y el runbook vigentes están en
-  `docs/documentation/creative-studio/fondeo-gobernado-creditos-globe.md` y
-  `docs/manual-de-uso/creative-studio/fondear-creditos-globe.md`.
-- ISSUE-124 y TASK-1482/1483/1586/1628/1629/1630 están cerradas; la evidencia y los detalles runtime viven en
-  `docs/operations/creative-studio/evidence/2026-08-01/README.md` y `GLOBE_RUNTIME_HANDOFF.md`.
-- No hay rollout comercial externo; los holds históricos y el bootstrap no monetario conservan su tratamiento
-  append-only gobernado.
+- Saldo vigente esperado: 784 de cap 1500; no fondear. UI/CLI/MCP comparten ledger y todo transporte ambiguo exige
+  readers antes de reintentar. Contrato/runbook: [`fondeo`](docs/manual-de-uso/creative-studio/fondear-creditos-globe.md)
+  y [`evidencia`](docs/operations/creative-studio/evidence/2026-08-01/README.md). Sin rollout externo.
 
 ## Checkout compartido único — worktrees prohibidos (2026-08-01)
 

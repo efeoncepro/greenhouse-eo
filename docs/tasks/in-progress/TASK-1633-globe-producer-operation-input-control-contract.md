@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Ejecución iniciada en Greenhouse develop + Globe main; Discovery/ADR y contrato compartido en curso`
+- Status real: `Foundation local sin commit en Globe; handoff ejecutable documentado, rollout/UI/canaries pendientes`
 - Rank: `next.1`
 - Domain: `creative|platform`
 - Blocked by: `none`
@@ -377,3 +377,44 @@ Ninguna para la foundation. Las promociones, atestaciones y canaries permanecen 
   dentro del scroll del composer y puede salir completamente del viewport; ambos comportamientos violan ADR-022.
 - No se modificó runtime ni Globe todavía. Tres subagentes continúan auditorías read-only de contracts,
   compiler/adapters y UI antes del primer patch.
+
+## Delta 2026-08-02 — checkpoint de contratos y catálogo
+
+- Globe incorpora de forma local `RouteCreativeContractV1` browser-safe con operación, slots/roles, roles de
+  referencia, combinaciones, controles exhaustivos, mecanismo de soporte y output MIME/audio packaging.
+- El catálogo sube localmente de `1.5.0` a `1.6.0`; las 17 rutas publicadas tienen descriptor explícito y guards
+  de carga para revisión, modalidad/output, MIME, cardinalidad, slots únicos, combinaciones, controles y paridad
+  con `referencePolicy` durante dual-read.
+- Omni queda corregido en dato local a `create + referencias de imagen 1…4 + MP4 con audio embebido opcional`;
+  ya no declara video como referencia generativa. Seedance text-to-video conserva `create` sin inputs y no cambia
+  su identidad, binding ni readiness.
+- Verificación local verde: contracts typecheck + 48 tests; domain typecheck + 437 tests. Todavía no hay commit,
+  deploy ni mutación runtime. Próximo paso: intent/fingerprint y compiler/adapters antes de consumo UI.
+
+## Delta 2026-08-02 — handoff de implementación a Claude
+
+- Plan ejecutable completo: [`TASK-1633-plan.md`](../plans/TASK-1633-plan.md). Coordina sin mezclar ownership:
+  TASK-1633 foundation, TASK-1504 Omni directo por Vertex y TASK-1552 compositor UI.
+- Coordenadas del checkout al entregar:
+  - Greenhouse `develop@23fcdf54a8f9ec5538e2cc02d923da3157884a32`; `origin/develop@34a016800`; los tres
+    commits intermedios son MCP concurrente y no deben mezclarse en un push Globe.
+  - Globe `main@a24910c7639129f3e5955e9b3e0e2daf9e2d611f`, igual a `origin/main`; WIP TASK-1633
+    **sin commit**, 10 archivos modificados + un test nuevo, 763 inserciones/18 eliminaciones.
+- El WIP ya enhebra `RouteCreativeContractV1` y `RouteCreativeIntentV1` por contracts/domain/provider seam,
+  congela contrato + assignments en experiment/snapshots y los incorpora a fingerprints de producción/evaluación.
+  El compiler valida revisión, operación, slot, media/MIME y exige materializar cada input autorizado antes del
+  spend.
+- Evidencia adicional verde: provider-contract typecheck, creative-runner typecheck y suite completa del runner
+  **255/255**; `git diff --check` verde. No se ejecutó aún `pnpm check && pnpm build` raíz sobre este WIP.
+- Antes del primer commit deben cerrarse cuatro deudas explícitas: validar runtime `authority`/`ordered`/
+  `audioPackaging`; modelar combinaciones alternativas reales; reemplazar la IIFE de error y el cast `as never`;
+  agregar pruebas de intent, approval stale, fingerprint y materialización tabular Seedance/Omni/Veo.
+- P0 no implementado: la identidad aprobada dice Vertex, pero API/worker todavía cablean el transporte Gemini API
+  por API key y el driver no ata el endpoint ejecutado al snapshot. Debe reemplazarse por Vertex ADC con simetría
+  API/worker antes de cualquier promoción/canary.
+- UI no modificada: el prompt sigue en React pero puede quedar fuera del viewport por scroll; operación/modelo/
+  inputs continúan mezclados en `MODE_REQUIREMENTS`, el picker oculta imágenes válidas para rutas de video y una
+  selección de modo puede cambiar ruta/modelo o recortar referencias en silencio.
+- No hubo commit Globe, deploy, migración, rights/policy nueva, promoción, gasto, canary ni mutación runtime durante
+  este slice. TASK-1633 y el goal permanecen activos; el siguiente agente debe continuar desde el diff existente,
+  no reimplementarlo.

@@ -1,9 +1,9 @@
 # Efeonce Globe — Catálogo gobernado de rutas del Creative Producer
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-07-20 por Claude (TASK-1500)
-> **Ultima actualizacion:** 2026-07-30 (TASK-1553 — seis rutas de imagen ejercitadas)
+> **Ultima actualizacion:** 2026-08-02 (TASK-1633 — contrato creativo route-driven en implementación)
 > **Documentacion tecnica:** [EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md](../../architecture/creative-studio/EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md)
 
 ## Qué es y para qué sirve
@@ -30,6 +30,30 @@ Sin catálogo, la superficie del Producer tendría que adivinar qué opciones of
 - **Los mismos datos alimentan a los consumidores internos** (validación pre-gasto y estimador) por funciones directas en el proceso — nadie reconstruye los límites por su cuenta.
 - **Las superficies nacen fail-closed.** La UI del Producer fue promovida al cerrar `TASK-1505`; MCP conserva su
   gate independiente. HTTP/SDK/CLI/worker/E2E siguen sus estados declarados en el capability registry.
+
+## Operación, inputs y controles son ejes distintos
+
+ADR-022 y TASK-1633 extienden cada revisión de ruta con un contrato creativo autocontenido. El objetivo es que
+Producer, BFF, SDK, MCP, CLI, compiler y workers lean la misma semántica, sin matrices paralelas por modelo:
+
+- `operation` dice qué intención ejecuta la ruta (`create`, `edit`, `extend`, `upscale`, etc.).
+- `inputSlots` dice qué significa cada asset y conserva rol, media, cardinalidad y orden. Una referencia visual,
+  first frame, edit source y motion source no son intercambiables aunque compartan MIME.
+- `inputCombinations` declara conjuntos válidos, incluidos caminos prompt-only o condicionados por asset.
+- `creativeControls` declara si cámara, estilo, movimiento, timing, audio u otro control se aplica como parámetro
+  nativo, semántica de prompt, referencia, pre/postproceso o si no está soportado.
+- `outputContract` declara modalidad, MIME y packaging real; un MP4 con audio embebido no se representa como dos
+  outputs ficticios.
+
+El adapter server-side sigue siendo el único lugar que conoce campos, endpoint o slug del proveedor. El browser
+no concatena instrucciones vendor-specific ni infiere tareas por cantidad/tipo de archivos. Durante la migración,
+`inputModes` y `referencePolicy` siguen disponibles para compatibilidad, pero una ruta nueva debe declarar el
+contrato creativo y fallar antes del gasto ante contradicciones.
+
+Estado honesto al 2026-08-02: el contrato y su threading están en WIP local sin commit/deploy. La UI route-driven,
+el transporte Omni Vertex ADC y los canaries todavía no están operativos. Continuidad:
+[`TASK-1633`](../../tasks/in-progress/TASK-1633-globe-producer-operation-input-control-contract.md) y
+[`plan`](../../tasks/plans/TASK-1633-plan.md).
 
 > Detalle técnico: tipos en `efeonce-globe/packages/contracts/src/producer-catalog.ts`; dato + guards + helpers + lectores en `efeonce-globe/packages/domain/src/producer-catalog.ts`; métodos SDK `listProducerRoutes` / `getProducerRoute`.
 
