@@ -129,7 +129,7 @@ Las capturas son evidencia de la UI autenticada, no autoridad de estado por sí 
 una ruta disponible deben concordar: reader live, identidad de ruta, rate vigente, evaluación,
 revisión/rights, readiness, binding, circuito, run terminal, output retenido y readback/diagnóstico.
 
-## TASK-1614 — Seedance R2V durable evaluation (2026-08-01)
+## TASK-1614 — Seedance R2V durable evaluation (actualizado 2026-08-02)
 
 - PRs `#74…#82` están mergeados. El lifecycle keyless del scheduler quedó provisionado y ejercido; migraciones
   `0040`, `0041` y `0042`, API interna, producer worker y Asset Governance están aplicados. PR `#81` cerró
@@ -145,9 +145,13 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
 - Atestación `mcra_abf61584-46b2-4aa1-adb5-1374d46a6966`, revisión
   `review_8561c3a9-67ed-4a51-a777-5d7d98746d9f` y readiness
   `readiness:3fec1f4037aad02f6eb07f471bc7c949` están firmados.
-- Policy productiva `arp_77a9a0efe8b3f6d3d66a635bfcb05fba2e5268e07baa637ad1bfbe829a301dc4` y saga
-  `promotion_4bda2e0f-6264-4633-a370-4aecf5deaa1a` están activadas: binding revision 2 habilitado y circuito
-  revision 2 cerrado.
+- Policy productiva `arp_77a9a0efe8b3f6d3d66a635bfcb05fba2e5268e07baa637ad1bfbe829a301dc4` permanece vigente. La saga
+  `promotion_4bda2e0f-6264-4633-a370-4aecf5deaa1a` expiró y terminó `rolled_back` revision 9 por
+  `promotion_recovery_deadline`; el recovery deshabilitó el binding revision 3, como exige el fail-closed.
+- La promoción se reanudó sin reevaluar mediante `promotion_557d4df1-994e-45ac-92f7-7ef885aa967e`:
+  workflows start `30733163802`, stage `30733188021`, promote `30733212704` y activate `30733239029`, todos
+  `success`. Readback al activar: saga `activated` revision 7, binding revision 5 enabled y circuito revision 5
+  closed.
 - Playwright verificó el candidato retenido (`readyState=4`, duración 5,06195 s, reproducción 0→1,738 s, sin
   error) y la selección exacta **Video → Movimiento/control cámara → Seedance 2.0**. La generación final nueva no se
   ejecutó porque el composer muestra presupuesto de agosto `0 / 0`.
@@ -155,6 +159,9 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
   `available` histórico es una dimensión del ledger y no la capacidad del período. El fondeo live de agosto dejó
   `effectiveAvailable=800`, cap/remaining `1500`, spent/held `0`, una fuente vigente y pool
   `internal-month:2026-08`.
+- Readback OAuth PKCE de sólo lectura a `2026-08-02T05:12:14.855Z`, solicitado por 16 créditos:
+  `allowed=true`, `effectiveAvailable=800`, `eligibleFunding=800`, remaining 1500, candidateCount 1 y cero
+  blockers. No hubo fondeo ni mutación de policy.
 - Identidad Google/Chrome: `jreyes@efeonce.cl`. Identidad Greenhouse verificada:
   `jreyes@efeoncepro.com` / `user-efeonce-admin-julio-reyes`. Los intentos fallidos de OAuth y adapter no
   crearon propuesta, grant, run ni gasto.
@@ -167,8 +174,12 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
   `TASK-1578`.
 - Gemini Omni continúa sólo en Model Lab para su ruta gobernada; no extrapoles la promoción de
   Vertex imagen a Interactions video.
-- TASK-1614 permanece `in-progress` sólo por el canary de una pieza nueva. El blocker de créditos fue retirado:
-  Producer muestra 800 efectivos y su reader separa ledger, período, funding y daily fence.
+- TASK-1614 permanece `in-progress` sólo por el canary de una pieza nueva. Los créditos no bloquean: Producer
+  muestra 800 efectivos y `budget.evaluate` admite 16. El Studio desplegado sí bloquea la referencia exacta porque
+  recorta a ocho el conjunto de 24 retenidos y el CTA del feed es no-op. Globe `main` commit
+  `595f0cb5460e42d9cc958ced204dc6a336e6deae` elimina el recorte y agrega regresión para elegir la décima;
+  tests locales verdes y CI `30733665167` iniciado. El deploy manual de Studio no se ejecutó por exclusión
+  explícita; por ello siguen ausentes run/attempt/output/cobro/playback/governance y `canary-confirm` nuevos.
 - La identidad temporal usada para consumo privado de AXIS debe sustituirse por una identidad de
   máquina antes del rollout externo; no recrees el secreto legacy de Globe.
 - El cliente Entra interno del gateway MCP recibe hoy ambos scopes aun cuando solicita el base. Antes de acceso

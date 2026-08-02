@@ -127,6 +127,12 @@
   MiniMax H3. Las migraciones ya aplicadas conservan sus nombres históricos `task-1616-*`.
 - Se reconciliaron los checkpoints de TASK-1614 sobre evaluación durable, lineage/rights, recuperación sistémica
   y el requisito de un canary nuevo desde Producer; el candidato retenido no sustituye esa prueba.
+- Actualización 2026-08-02: 16 créditos dieron `allowed=true`, 800 efectivos y cero blockers, sin fondeo ni cambio
+  de policy. La saga expirada se recuperó fail-closed y `promotion_557d4df1-994e-45ac-92f7-7ef885aa967e` quedó
+  activada con binding/circuit revision 5.
+- El canary no se disparó: el Studio live oculta referencias posteriores a la octava. Globe `main` `595f0cb`
+  elimina el recorte y prueba la décima referencia con rights/lineage e idempotencia; tests verdes, CI
+  `30733665167` iniciado y deploy manual no ejecutado. TASK-1614 sigue `in-progress`, rollout pendiente.
 
 ## 2026-08-01 — AXIS Lab: Astro 7 con foundation documental y testing
 

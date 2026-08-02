@@ -43,7 +43,7 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 | `ref/motion/loop-v1` | Seedance · 2.0 | Fal | video-generate | ✅ 07-19 | ✅ driver Fal | — |
 | `ref/motion/reference-v1` | Gemini Omni Flash · Preview | Vertex (Omni, Interactions API) | video-generate | ✅ 07-20 (40cr) | ⏳ **solo Lab** — Omni NO está en el path gobernado | ver "Delta" abajo |
 | `ref/video/frames-v1` | Veo · 2.0 | Vertex (`veo-…:predictLongRunning`) | video-frames | ✅ 07-20 (MP4 real, 32cr) | ✅ driver Veo gobernado (`vertex-video`, `us-central1`) desde 07-22 | — |
-| `ref/video/motion-v1` | Seedance · 2.0 | Fal | video-motion-control | ✅ evaluación/report 08-01 | ✅ driver + readiness + binding/promoción 08-01 | TASK-1614: selector live disponible; pieza nueva/playback/governance final pendiente por presupuesto agosto |
+| `ref/video/motion-v1` | Seedance · 2.0 | Fal | video-motion-control | ✅ evaluación/report 08-01 | ✅ driver + readiness + binding reactivado 08-02 | TASK-1614: 16 créditos admitidos; canary nuevo bloqueado por selector Studio live (fix `595f0cb`, deploy pendiente) |
 | `ref/audio/foley-v1` | Seed Audio | Fal | audio-generate | ✅ 07-19 | ✅ driver Fal | atestación comercial firmada |
 | `ref/voice/tts-v1` | ElevenLabs · Multilingual v2 | ElevenLabs | speech-synthesize | ✅ 07-19 | ✅ driver Fal | — |
 | `ref/voice/change-v1` | ElevenLabs · Voice Changer | ElevenLabs | audio-change-voice | ✅ 07-20 | ✅ | — |
@@ -74,8 +74,9 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 | 2026-07-30 | TASK-1553 | **Nano Banana 2 promovido** tras despejar el allowlist; generación UI real y recuperación idempotente del mismo run después del fix `1fb5728` |
 | 2026-07-30 | TASK-1553 | **Recraft v4.1 promovido**; contrato SVG, evaluación/revisión/derechos, binding/readiness/circuito y generación real desde Producer; fix fail-closed `84d6a8e` |
 | 2026-08-01 | TASK-1614 | Seedance R2V: evaluación/report, governance, atestación, readiness y saga de promoción completos; selector live disponible. Canary de pieza nueva pendiente por reconciliar presupuesto agosto `0 / 0` contra fondeo y balance durables |
+| 2026-08-02 | TASK-1614 | Readback de 16 créditos `allowed=true`; saga anterior recuperada fail-closed y nueva saga `promotion_557d…` activada. El Studio live oculta la referencia exacta después de la octava; fix `595f0cb` integrado y sin deploy por exclusión explícita |
 
-## Evidencia Seedance R2V — promoción completa, canary final pendiente (2026-08-01)
+## Evidencia Seedance R2V — promoción reactivada, canary final pendiente (actualizado 2026-08-02)
 
 - Identidad exacta: `ref/video/motion-v1 / fal / seedance-2.0-r2v / 2.0`. Policy
   `seedance-r2v-evaluation` v2, `purpose=evaluation`, `appliesTo=derived`.
@@ -90,12 +91,15 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 - Atestación `mcra_abf61584-46b2-4aa1-adb5-1374d46a6966`, revisión
   `review_8561c3a9-67ed-4a51-a777-5d7d98746d9f`, readiness
   `readiness:3fec1f4037aad02f6eb07f471bc7c949`, policy productiva
-  `arp_77a9a0efe8b3f6d3d66a635bfcb05fba2e5268e07baa637ad1bfbe829a301dc4` y saga
-  `promotion_4bda2e0f-6264-4633-a370-4aecf5deaa1a` están completos. Binding revision 2 habilitado; circuito
-  revision 2 cerrado.
+  `arp_77a9a0efe8b3f6d3d66a635bfcb05fba2e5268e07baa637ad1bfbe829a301dc4` siguen vigentes. La saga antigua
+  `promotion_4bda2e0f-6264-4633-a370-4aecf5deaa1a` expiró y se recuperó fail-closed. La nueva
+  `promotion_557d4df1-994e-45ac-92f7-7ef885aa967e` quedó `activated` revision 7; binding revision 5 habilitado y
+  circuito revision 5 cerrado (`30733163802`, `30733188021`, `30733212704`, `30733239029`).
 - El Producer muestra **Video → Movimiento/control cámara → Seedance 2.0**. El candidato reproduce
-  (`readyState=4`, 0→1,738 s, sin error). Falta una pieza nueva porque agosto aparece `0 / 0`, pese a balance
-  `available=500836` y fondeo durable previo. Discovery debe reconciliar policy/grants/budget antes de mutar.
+  (`readyState=4`, 0→1,738 s, sin error), pero no sustituye el canary. El readback exacto para 16 créditos dio
+  `allowed=true`, 800 efectivos y cero blockers. La pieza nueva no existe porque el Studio live recorta a ocho
+  referencias; el asset exacto queda fuera y el CTA del feed es no-op. El fix `595f0cb` está en `main`, con test
+  que selecciona la décima referencia, pero no fue desplegado. Cero run, attempt, cobro u output nuevos.
 
 ## Evidencia de Nano Banana Pro — canary y promoción gobernada
 

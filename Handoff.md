@@ -4,6 +4,11 @@
 
 - ADR-019 `Accepted`; ADR-020 `Proposed`. Brightcell: **no enviar** hasta Finance. Polpaico: `HOLD / NO-BID`, sin precio/deck emitible. Detalle en `changelog.md`.
 
+## TASK-1614 — canary pendiente (2026-08-02)
+
+- Créditos admitidos y promoción reactivada; Studio live oculta la referencia. Fix `595f0cb…` sin deploy;
+  cero runs/cobros. Continuidad en TASK-1614 y `GLOBE_RUNTIME_HANDOFF.md`.
+
 ## Studio Credits — fondeo enterprise UI/API/CLI/MCP y readback convergente (2026-08-01)
 
 - Rama correcta: Globe opera directamente en `main`; Greenhouse en `develop`; un solo checkout por repo, cero

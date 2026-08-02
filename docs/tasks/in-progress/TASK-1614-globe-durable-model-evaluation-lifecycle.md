@@ -11,11 +11,11 @@
 - UI impact: `verification-only`
 - Backend impact: `yes`
 - Epic: `EPIC-028`
-- Status real: `Evaluación, governance y promoción completas; canary final pendiente por reconciliación de presupuesto de agosto`
+- Status real: `Code complete, rollout pendiente: evaluación/governance completas; canary nuevo bloqueado por selector de referencias del Studio desplegado`
 - Domain: `Globe / Model Lab / evaluation / worker`
 - Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Owner: `Efeonce Globe runtime`
-- Runtime code: Globe `main` hasta PR `#82` (merge `90d0d48861d03e17ef95e2b7cbabdb14b7c1af47`)
+- Runtime code: Globe `main` `595f0cb5460e42d9cc958ced204dc6a336e6deae`; el fix del selector todavía no está desplegado en Studio
 - ADRs: [Evaluation Harness](../../architecture/creative-studio/EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md) y
   [Asset Governance Worker](../../architecture/creative-studio/EFEONCE_GLOBE_ASSET_GOVERNANCE_WORKER_DECISION_V1.md)
 
@@ -79,6 +79,36 @@ Do not alter already promoted Omni, Seed Audio or Seedance Loop; do not bypass t
   `user-efeonce-admin-julio-reyes`. Los intentos de esta sesión no crearon propuesta, fondeo, provider run ni
   gasto: staging OAuth fue bloqueado por `ERR_BLOCKED_BY_CLIENT`/Vercel Protection y el adapter de producción
   respondió `globe_not_configured` antes de mutar.
+
+## Checkpoint dominante — 2026-08-02
+
+- El readback canónico previo al gasto pasó a las `2026-08-02T05:12:14.855Z`: requested 16,
+  `allowed=true`, `effectiveAvailable=800`, `eligibleFunding=800`, cap/remaining 1500, spent/held 0,
+  `candidateCount=1`, freshness 0 y cero blockers. Fue un `status` OAuth PKCE de sólo lectura; no se ejecutó
+  funding, `preview`, `ensure`, `propose`, `confirm`, SQL ni break-glass.
+- La saga anterior `promotion_4bda2e0f-6264-4633-a370-4aecf5deaa1a` no seguía activada: el reader live la
+  devolvió `rolled_back` revision 9 por `promotion_recovery_deadline`, y el binding estaba deshabilitado revision
+  3 por el recovery fail-closed. Los readbacks fueron workflows `30733116372` (readiness), `30733117416`
+  (route) y `30733118461` (saga).
+- Se abrió una saga nueva sin repetir evaluación ni tocar policy:
+  `promotion_557d4df1-994e-45ac-92f7-7ef885aa967e`. Start `30733163802`, stage `30733188021`, promote
+  `30733212704` y activate `30733239029` terminaron `success`; estado `activated` revision 7, binding revision
+  5 habilitado y circuito revision 5 cerrado. Reutilizó la atestación, revisión, readiness y policy ya firmadas.
+- Chrome autenticado confirmó 800 créditos y seleccionó explícitamente **Video → Movimiento/control cámara →
+  Seedance 2.0**. No se generó ninguna pieza: cero run nuevo, cero attempt nuevo y cero cobro nuevo.
+- El único bloqueo real está en el Studio desplegado: `globe.producer.feed.live.list` entrega hasta 24 candidatos
+  retenidos, pero el compositor recortaba el render a ocho. El asset fuente sí aparece en el feed como el output
+  Veo retenido de 32 créditos, pero queda fuera de esos ocho; el botón visible `Usar como referencia` del feed
+  está cableado a un no-op y no modifica el compositor. No se eligió un candidato incorrecto ni se reintentó a
+  ciegas.
+- La causa raíz quedó corregida en Globe `main` commit
+  `595f0cb5460e42d9cc958ced204dc6a336e6deae`: el selector presenta todo el conjunto retenido retornado por el
+  reader. El canary local prueba 12 opciones, selecciona deliberadamente la décima y conserva el handle completo
+  (`mediaType`, `rights`, `parentRights`); también verifica un solo prepare, un solo execute y una clave de
+  idempotencia compartida. `pnpm --filter @efeonce-globe/studio-client test` pasó; CI `30733665167` quedó iniciado.
+- El push a `main` no despliega por sí solo: `Deploy Internal (keyless)` es manual. En cumplimiento de la exclusión
+  explícita **no desplegar Studio**, el fix aún no está live. TASK-1614 permanece `in-progress`; no se puede afirmar
+  playback, output SHA/MIME, retención, governance ni `canary-confirm` de una pieza que no existe.
 
 ## Live progress histórico — 2026-07-31
 
