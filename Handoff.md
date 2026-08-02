@@ -9,7 +9,15 @@ Historia anterior: [Handoff.archive.md](Handoff.archive.md).
 
 ## TASK-1633 — contrato route-driven del Producer y orden de estabilización (2026-08-02)
 
-- Goal activo: separar operaciones, input slots/roles, controles creativos, mecanismo de aplicación y output
+- Intake ejecutado con `pnpm codex:task-hook TASK-1633 --develop --subagents`; task movida a `in-progress` y
+  lint focal verde. ADR-022 aceptado e indexado: el descriptor vive dentro de cada revisión de ruta; operación,
+  slots/roles, combinaciones, controles/mecanismos y output son ejes separados. `inputModes`/`referencePolicy`
+  quedan dual-read durante la migración. Tres subagentes auditan contracts, compiler/adapters y UI en paralelo.
+- Checkpoint actual: Greenhouse `develop@15584bbc8`; Globe limpio `main@a24910c`. Cambios MCP concurrentes en
+  Greenhouse son ajenos y se preservan fuera de staging. Siguiente paso: cerrar auditoría, implementar tipos y
+  validadores aditivos en Globe, luego compiler/fingerprint y consumidores.
+
+- Goal activo y task tomada (`in-progress`, hook `--develop --subagents`): separar operaciones, input slots/roles, controles creativos, mecanismo de aplicación y output
   contract; corregir Omni directo por Vertex y mantener el Producer prompt-first sin integrar Omni mediante Fal.
 - TASK-1504 consume TASK-1633 para Omni image-reference, duración/ratio y MP4 con audio; TASK-1573 conserva edit y
   TASK-1552 el composer. Gate final: una generación UI Seedance y una Omni, sin repetir evaluación/fondeo.

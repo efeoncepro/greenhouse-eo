@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Diseño aprobado por el operador; contrato compartido y ADR pendientes`
+- Status real: `Ejecución iniciada en Greenhouse develop + Globe main; Discovery/ADR y contrato compartido en curso`
 - Rank: `next.1`
 - Domain: `creative|platform`
 - Blocked by: `none`
@@ -317,7 +317,7 @@ Ninguna para la foundation. Las promociones, atestaciones y canaries permanecen 
 
 ## Acceptance Criteria
 
-- [ ] ADR aceptado e indexado define operación, slots/roles, controles, mecanismo de soporte y output contract.
+- [x] ADR aceptado e indexado define operación, slots/roles, controles, mecanismo de soporte y output contract.
 - [ ] El catálogo expone un descriptor versionado browser-safe sin provider IDs/slugs/costos/secrets.
 - [ ] Slots declaran media/MIME, cardinalidad, roles, orden, límites y combinaciones válidas.
 - [ ] Controles declaran `native-parameter | prompt-semantic | reference-conditioned | preprocessed | postprocessed | unsupported`.
@@ -357,5 +357,23 @@ Ninguna para la foundation. Las promociones, atestaciones y canaries permanecen 
 
 ## Open Questions
 
-- Resolver en ADR si `operation` se versiona dentro de cada ruta o como catálogo compartido referenciado; no cambia
-  la separación obligatoria entre operación, inputs y controles.
+- Ninguna para Slice 1. ADR-022 resolvió que la operación vive dentro del descriptor versionado de cada ruta; el
+  vocabulario compartido no es una referencia runtime mutable.
+
+## Delta 2026-08-02 — intake de ejecución
+
+- Goal explícito activo; excepción `--develop` y subagentes autorizados registradas por el hook canónico.
+- TASK-1633 se tomó en los checkouts compartidos Greenhouse `develop` y Globe `main`, sin worktrees ni cambio de rama.
+- El ADR resolverá `operation` dentro del descriptor versionado de cada ruta para que el snapshot sea autocontenido;
+  cualquier catálogo compartido será vocabulario reusable, no una referencia runtime mutable.
+
+## Delta 2026-08-02 — checkpoint de arquitectura
+
+- ADR-022 aceptado e indexado en los índices de Creative Studio y Greenhouse.
+- Manual del catálogo actualizado a v1.4 con la lectura de operación, slots, combinaciones, controles y output.
+- Auditoría preliminar confirmó la causa de UI: `MODE_REQUIREMENTS` trata `Elementos` como modo separado y filtra
+  sólo rutas `available`; el click escoge `routesForMode[0]`, por lo que una Omni con circuito abierto deja el botón
+  inerte y una ruta compatible puede sustituir silenciosamente el modelo. El prompt sí existe en React, pero vive
+  dentro del scroll del composer y puede salir completamente del viewport; ambos comportamientos violan ADR-022.
+- No se modificó runtime ni Globe todavía. Tres subagentes continúan auditorías read-only de contracts,
+  compiler/adapters y UI antes del primer patch.

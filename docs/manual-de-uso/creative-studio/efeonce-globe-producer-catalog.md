@@ -1,13 +1,33 @@
 # Manual — Leer y ampliar el catálogo de rutas del Creative Producer
 
 > **Tipo de documento:** Manual de uso / runbook (orientado al operador)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-07-20 por Claude (TASK-1500)
-> **Ultima actualizacion:** 2026-07-30 (TASK-1553 — receta ejercitada en seis rutas de imagen)
+> **Ultima actualizacion:** 2026-08-02 (TASK-1633 — contrato creativo por ruta en implementación)
 
 ## Para qué sirve
 
 El catálogo gobernado de rutas (`TASK-1500`) es la SSOT de qué admite cada ruta creativa de Globe: constraints de forma de salida por modalidad, specialty, modos de entrada, el **modelo** público (nombre + versión) y la **casa** interna de clasificación. Este manual cubre las dos operaciones del día a día: **leerlo** (SDK/HTTP) y **ampliarlo** (agregar o ajustar una ruta como dato).
+
+Desde `TASK-1633`, una revisión de ruta también declara un contrato creativo autocontenido: operación, slots/roles
+de entrada, combinaciones válidas, controles y output. `inputModes`/`referencePolicy` siguen visibles durante la
+migración dual-read, pero no son la forma canónica para una ruta nueva. Estado de implementación y rollout:
+[`TASK-1633`](../../tasks/in-progress/TASK-1633-globe-producer-operation-input-control-contract.md).
+
+## Cómo leer el contrato creativo
+
+- `operation` responde qué hará la ruta: crear, editar, extender o escalar.
+- `inputSlots` responde qué significa cada asset. Una referencia no equivale a first frame, edit source o motion
+  source aunque dos de ellos sean imágenes o videos.
+- `inputCombinations` enumera conjuntos válidos; la UI no inventa cardinalidades.
+- `creativeControls` declara si una perilla es nativa, semántica de prompt, condicionada por referencia,
+  pre/postprocesada o no soportada.
+- `outputContract` declara el resultado real. Para video, el audio embebido se expresa como parte del MP4 y no
+  como un segundo archivo ficticio.
+
+El prompt es primario en el Producer: agregar referencias o cambiar de operación no lo oculta ni cambia el modelo
+seleccionado. Si una operación no existe para la ruta activa, la UI debe explicar la incompatibilidad y pedir una
+selección explícita; no elige el primer modelo compatible por su cuenta.
 
 ## Antes de empezar
 
