@@ -575,3 +575,46 @@ para un glifo de 15. **De 219 botones era el único afectado**; el umbral es 29 
 
 La píldora **«N nuevas»**: hoy las novedades entran por `changes` y empujan el contenido. `state-design` pide
 acumularlas y que el operador las traiga. Es el siguiente slice de esta superficie.
+
+## Delta 2026-08-02 — card optimista y proyección de estado terminal
+
+Globe `7a7235f`. `pnpm check` exit 0 con **1.491 tests** (1.482 antes); `studio-client` 163 → 172.
+
+**El hueco que cierra.** Al apretar Generar no aparecía nada hasta recargar la app. El composer prometía
+*«el feed se actualizará cuando la pieza esté lista»* y no lo cumplía: el feed proyecta **runs**, y entre el
+envío y el primer delta no hay run que proyectar. Peor — un experimento que el compiler **niega antes de
+crear el run** nunca llega a ser run, así que ese fallo era invisible para siempre.
+
+**Caso fuente.** Un empate de `valid_from` entre dos versiones de la misma policy de rights negaba toda
+generación antes de reservar créditos. El gate hacía lo correcto (cero cobro, `attempts: []`), pero hicieron
+falta horas de lectura de readers para descubrir que el sistema estaba **negando** en vez de estar lento. El
+operador sólo veía «Solicitud enviada» y silencio. Un gate que protege bien y comunica mal se percibe como
+un producto roto. Detalle del incidente: `ISSUE-135` y `HANDOFF-GLOBE-RIGHTS-INCIDENT.md`.
+
+**Cómo respeta la decisión de `ProducerWorkspace`.** Composer y feed siguen siendo hermanos y el feed sigue
+descubriendo el trabajo por su marca de agua. Lo que viaja por el callback nuevo es una **promesa con
+`experimentId`**, no una pieza: nunca entra a `items`, se descarta sola en cuanto el ingreso autoritativo
+trae ese id, y no sobrevive a un reload. El estado vive en el workspace porque es justamente lo que ninguno
+de los dos hermanos puede saber solo — el composer sabe que envió pero no qué muestra el feed; el feed sabe
+qué muestra pero no que hubo un envío.
+
+**Decisiones que no se deducen del diff:**
+
+- La card se anuncia **entre `prepare` y `execute`**, no después. `execute` es la llamada que puede tardar;
+  esperarla dejaría al operador otra vez frente a un botón que no hizo nada visible. En ese punto el
+  `experimentId` ya es un hecho del servidor, así que la promesa no es una invención del cliente.
+- Un fallo **no se descarta solo**: se queda con su motivo traducido y el código canónico visible para el
+  reporte, hasta que el operador lo cierre. Un fallo que desaparece es indistinguible de uno que nunca
+  ocurrió.
+- **No ofrece «Reintentar»** cuando reintentar no resuelve — `generated_rights_policy_not_authorized` es una
+  autoridad ausente, y ofrecer el botón haría repetir un gesto inútil mientras el problema real sigue sin dueño.
+- Reusa `GlobeGeneratingMark`, el mismo globo que ya marca una pieza generándose. Un spinner propio sería un
+  segundo vocabulario para el mismo estado.
+- La reconciliación es por `experimentId`, nunca por posición ni por título: dos envíos con el mismo prompt
+  son piezas distintas y el orden del feed no es el orden de envío.
+
+**Archivos.** `data/producer-pending-submissions.ts` (+ 9 tests) · `copy/index.ts` · `ProducerWorkspace.tsx`
+· `composer/ProducerComposer.tsx` · `feed/ProducerFeed.tsx` · `feed/ProducerFeedRoute.tsx`.
+
+**Abierto.** Falta el estado terminal para un job que agotó reintentos (`ISSUE-135`): hoy un run zombi sigue
+mostrándose como «generando» porque nadie declara que murió. Y falta GVC de la card en desktop + 390 px.
