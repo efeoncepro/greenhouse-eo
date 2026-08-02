@@ -20,7 +20,7 @@
 - Status real: `arquitectura propuesta; runtime pre-auditado 2026-08-02; pendiente aceptación del proveedor de identidad y su plan comercial antes de provisionar`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|agentic`
-- Blocked by: `aceptación explícita de EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md y aprobación del proveedor/plan de identidad externo`
+- Blocked by: `aceptación explícita de EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md; aprobación del proveedor/plan de identidad externo con su costo presentado; y revisión de privacidad/subprocesador cerrada`
 - Branch: `Greenhouse develop; MCP main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -158,7 +158,10 @@ Reglas obligatorias:
 - `docs/architecture/EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`
 - `docs/tasks/to-do/TASK-1631-efeonce-customer-identity-mcp-federation.md`
 - `../efeonce-mcp/**`
-- migraciones y primitives canónicos de identidad/Account 360 identificados durante el plan aprobado
+- `src/lib/sister-platforms/**` (broker/allowlist de redirect URIs y su primitive canónica; ya existente)
+- `src/lib/identity/**` + `src/lib/reliability/queries/**` + `migrations/**` — paths exactos de los primitives de
+  binding, sus capabilities y sus signals se fijan en el Slice 0; se declaran acá para detectar colisión con otras
+  tasks antes de escribir código, no para reservarlos a ciegas
 - contratos/provider policy de `../efeonce-globe/**` sólo para revalidación, sin mover ownership de Globe
 
 ## Current Repo State
@@ -239,6 +242,18 @@ Reglas obligatorias:
 ### Data model and invariants
 
 - Entidades/tablas/views afectadas: `greenhouse_core.organizations más la superficie canónica de identidad/membership seleccionada en discovery (identity_profiles, client_users, identity_profile_source_links, session_360 verificadas como existentes); ninguna tabla duplicada de organización cliente`
+- Capabilities: cada command de operador nace con **capability dedicada y granular** (nunca `identity.admin` como
+  cajón de sastre) — mínimo binding de organización, emisión de invitación y revocación como capabilities
+  separadas, porque revocar y otorgar no son la misma autoridad. Los nombres exactos se fijan en el Slice 0. Regla
+  dura del repo: toda capability nueva se seedea en `capabilities_registry` **y** en el catálogo TS **y** se
+  granteea a ≥1 rol real de `src/config/role-codes.ts` **en el mismo PR** — el guard
+  `capability-grant-coverage.test.ts` rompe el build si falta el grant.
+- Reliability signals (nombres canónicos, `steady = 0`, registrados en `src/lib/reliability/queries/` y visibles en
+  `/admin/operations`): `identity.external_binding.unbound_dispatch_attempt` (token válido sin binding intentando
+  dispatch), `identity.external_binding.revoked_still_dispatching` (revocación que no propagó),
+  `identity.external_binding.subject_collision` (un subject externo resolviendo a más de un `identity_profile`, o
+  una persona con subjects divergentes entre clientes — es la señal que detecta en vivo el problema de `sub`
+  pairwise) y `identity.external_binding.orphan_grant` (grant activo sobre un binding inexistente o desactivado).
 - Invariantes que no se pueden romper:
   - `La organización de Account 360 permanece como source of truth comercial/customer.`
   - `Una persona cliente existente permanece como un único identity_profile canónico; un subject de IDP externo es un source link, no una persona paralela ni una autoridad de credenciales dentro de Greenhouse.`
@@ -279,7 +294,9 @@ Reglas obligatorias:
 - Local checks: `tests de contrato/auth-negative del gateway, tests del primitive de binding, tests de policy del provider y gates de task/docs`
 - DB/runtime checks: `dry-run de migración, readback auditado de binding/grant/revoke y aserción no-unbound-dispatch`
 - Integration checks: `metadata OAuth/PKCE y flujo de registro con Claude, Codex y ChatGPT; canaries allow/base-only/revoke; canary de denial issuer-calificado (token externo con scope string interno)`
-- Reliability signals/logs: `mismatch redactado de issuer/client/binding, denial de entitlement, propagación de revocación y señales de dispatch por provider`
+- Reliability signals/logs: las cuatro signals canónicas declaradas arriba (`unbound_dispatch_attempt`,
+  `revoked_still_dispatching`, `subject_collision`, `orphan_grant`) más mismatch redactado de issuer/client/binding,
+  denial de entitlement y señales de dispatch por provider
 - Production verification sequence: `una organización allowlisted, un reader Globe read-only, después base-only deny y revoke con rollback documentado antes de ampliar onboarding`
 
 ### Acceptance criteria additions
@@ -316,6 +333,17 @@ Reglas obligatorias:
 ### Slice 0 — Decision, cohort policy and schema discovery
 
 - Obtener aceptación explícita del ADR y del plan del proveedor de identidad antes de provisionar nada externo.
+- **Revisión de privacidad y subprocesador antes de cualquier provisión.** Este es el primer flujo que rutea datos
+  personales de personas de organizaciones **cliente** a un procesador externo nuevo. Invocar
+  `legal-privacy-ip-operator` y resolver: qué datos personales se envían y cuáles no, DPA/acuerdo de
+  encargado firmado, lista de subprocesadores, región de almacenamiento y tratamiento, retención, derechos ARCO/
+  supresión, y notificación a clientes si un contrato vigente lo exige (marco CL + CO/MX/PE según cartera). Sin
+  esta revisión cerrada no se provisiona el tenant productivo, aunque el plan comercial ya esté aprobado — son
+  dos gates distintos, no uno.
+- **Presentar el costo antes de pedir la aprobación del plan.** El bloqueo declara "aprobar proveedor y plan
+  comercial", así que el operador necesita el número: costo al tamaño de la primera cohorte y proyección a 12
+  meses con el crecimiento esperado de organizaciones y usuarios, más qué se rompe si se cancela (portabilidad del
+  binding y de las identidades). Aprobar un plan sin ver su costo no es una aprobación.
 - Inventariar la organización Account 360, persona/membership canónica y contratos de workspace de Globe; proponer
   el schema aditivo mínimo de binding, command/reader/audit y contrato de invalidación — provider-neutral.
 - Inventariar los contratos actuales de Greenhouse NextAuth, `client_users`, `identity_profiles`,
@@ -513,7 +541,18 @@ production secrets, client registrations and the first customer onboarding conse
 
 ## Acceptance Criteria
 
-- [ ] The ADR is accepted and the selected provider/plan is explicitly approved before external provisioning.
+- [ ] The ADR is accepted and the selected provider/plan is explicitly approved before external provisioning, with
+      its cost presented for the initial cohort and a 12-month projection.
+- [ ] La revisión de privacidad/subprocesador está cerrada (DPA, subprocesadores, región, retención, derechos de
+      titular y notificación contractual cuando aplique) antes de provisionar el tenant productivo.
+- [ ] Cada command de operador tiene capability dedicada y granular, seedeada en registry + catálogo TS y
+      granteada a ≥1 rol real en el mismo PR; `capability-grant-coverage.test.ts` pasa.
+- [ ] Las cuatro reliability signals están registradas, visibles en `/admin/operations` y en `steady = 0`.
+- [ ] La baja de una persona en la organización cliente revoca su acceso MCP end-to-end, verificado en vivo: el
+      binding queda desactivado, el grant deja de resolver y un token vigente emitido antes de la baja se deniega
+      en dispatch sin esperar a su expiración.
+- [ ] El camino de soporte está documentado en el runbook MCP: qué ve un cliente que no puede entrar, qué
+      diagnostica el operador y con qué evidencia redactada, sin exponer tokens ni claims de terceros.
 - [ ] An Account 360 organization is the sole customer anchor and has an audited external identity binding.
 - [ ] An existing customer authenticating through the external plane resolves to the same canonical
       `identity_profile`; Greenhouse/auth/MCP sessions remain audience-separated.
