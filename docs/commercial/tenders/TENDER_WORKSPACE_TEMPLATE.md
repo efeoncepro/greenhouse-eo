@@ -29,6 +29,7 @@ si algún día se quieren las fuentes en la DB, es una migración aditiva.
 ```
 docs/commercial/tenders/<slug>/
   README.md                        # índice del deal: proposal_id · estado · deadline · qué falta
+  proposal-studio.json             # estado durable del registro gobernado + evidencia de cierre
   bases/                           # 📁 fuente normativa: RFP, bases admin/técnica/económica, aclaraciones del foro
   research/                        # 🔒 taller INTERNO: diagnóstico, benchmark, VoC, fuentes crudas
   artifact-manifest.json           # 📄 artefactos VIVOS (Radiografía, Grader report) — por ENLACE, nunca archivo
@@ -73,8 +74,12 @@ oferta-tecnica.md  (ledger de evidencia + narrativa)  ←→  artifact-manifest.
 deck-plan.json  →  pnpm deck:compose  →  PDF
         │
         ▼
-registrar como Proposal en el Studio  →  adjuntar salidas (versionadas)  →  portal /admin/commercial/proposals
+registrar como Proposal en el Studio  →  render job gobernado  →  salidas versionadas  →
+proposal-studio.json (verified)  →  portal /admin/commercial/proposals
 ```
+
+`pnpm deck:compose` es una herramienta de taller. El PDF que produce en `.captures/` no es un
+entregable canónico ni permite cerrar el deal. El cierre debe pasar `pnpm tender:canonical-gate <slug>`.
 
 ## Flujo de construcción con Artifact Composer
 
@@ -142,3 +147,7 @@ inadmisible). 🔴 **NUNCA** un precio unitario por artículo (el schema no tien
 - **NUNCA** una pieza viva por captura: `render: "by_link"` en el manifiesto.
 - **SIEMPRE** el `.md`/`.json` es la FUENTE; el PDF y el registro en el aggregate se re-emiten desde acá.
 - **SIEMPRE** las fuentes son archivos git (no `proposal_assets`); el aggregate referencia por `proposal_id`.
+- **SIEMPRE** un deal con deck conserva `proposal-studio.json`; `status=workshop_only` es el estado
+  honesto hasta que exista Proposal, render job, asset versionado y verificación autenticada.
+- **NUNCA** marques `verified` por tener un PDF o PNG en `.captures/`; el gate exige IDs del registro
+  gobernado y del asset store canónico.

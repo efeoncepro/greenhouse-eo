@@ -247,6 +247,18 @@ estado. **Decisión (2026-07-15): las fuentes se quedan como archivos git, NO se
 Es también el **F0 del Digital Sales Room** (workspace interno primero; la sala del comprador es una
 proyección posterior — `GREENHOUSE_DIGITAL_SALES_ROOM_*_V1.md`).
 
+### Gate operativo de cierre
+
+La carpeta y el aggregate no se pueden tratar como sinónimos. `pnpm deck:compose` solo compone una salida
+de taller en `.captures/`; no crea la Proposal, no encola `requestProposalRender` y no adjunta una versión
+al asset store. Cada workspace con deck mantiene `proposal-studio.json` y el gate
+`pnpm tender:canonical-gate <slug>` solo pasa cuando el registro está en `verified`.
+
+El registro debe enlazar la Proposal, el `renderJob` que consumió el `ResolvedCompositionManifest`, el
+PDF/previews producidos por `artifact-worker`, el `proposalAssetId`/versión `final` y la verificación
+autenticada en `/admin/commercial/proposals` o en la API equivalente. El contrato durable está en
+`docs/commercial/tenders/PROPOSAL_STUDIO_CLOSURE_SCHEMA.md`.
+
 ## Delta 2026-07-15 — la versión se DERIVA y la descarga es gobernada (TASK-1412/1413)
 
 **Cambio de contrato en `attachProposalAsset`:** el input **ya NO acepta `version`** — se deriva

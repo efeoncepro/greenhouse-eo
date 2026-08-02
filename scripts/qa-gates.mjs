@@ -4,6 +4,8 @@ import { spawnSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 
+import { evaluateTenderWorkspace } from './commercial/lib/tender-closure-gate.mjs'
+
 const DOMAIN_DEFS = [
   {
     id: 'ui',
@@ -147,6 +149,35 @@ const DOMAIN_DEFS = [
     commands: ['pnpm exec vitest run <integration-tests>', 'pnpm docs:closure-check'],
     blockers: ['External integration needs real provisioning/env/webhook/health evidence or explicit rollout pending.'],
     notes: ['Claude has no vercel-operations skill in this repo; Vercel-specific closure should route through Codex or explicit Vercel runbooks.'],
+  },
+  {
+    id: 'commercial-tender',
+    label: 'Commercial tender / Proposal Studio closure',
+    flags: ['tender', 'proposal', 'composer'],
+    patterns: [
+      /^docs\/commercial\/tenders\/[^/]+\//,
+      /^scripts\/commercial\/(canonical-tender-gate|compose-tender-deck|new-tender)\.(mjs|ts)$/,
+    ],
+    codexSkills: [
+      'greenhouse-public-private-tenders',
+      'deck-studio',
+      'greenhouse-documentation-governor',
+      'greenhouse-qa-release-auditor',
+    ],
+    claudeSkills: [
+      'greenhouse-public-private-tenders',
+      'deck-studio',
+      'greenhouse-documentation-governor',
+      'greenhouse-qa-release-auditor',
+    ],
+    commands: [
+      'pnpm tender:canonical-gate <slug>',
+      'pnpm tender:canonical-gate:test',
+      'pnpm docs:closure-check',
+    ],
+    blockers: [
+      'Una composición local o un PDF en .captures no cierra una Proposal; el gate canónico debe pasar con evidencia de Proposal Studio.',
+    ],
   },
   {
     id: 'worker-cron',
@@ -474,6 +505,29 @@ function missingSkills(skills, availableSkills) {
   return skills.filter(skill => !available.has(skill))
 }
 
+function commercialTenderSlugs(files) {
+  return [...new Set(files
+    .map(filePath => filePath.match(/^docs\/commercial\/tenders\/([^/]+)\//)?.[1])
+    .filter(Boolean))].sort()
+}
+
+function runCommercialTenderGate(files) {
+  const slugs = commercialTenderSlugs(files)
+
+  if (slugs.length === 0) {
+    return { applicable: false, passed: true, slugs: [], results: [] }
+  }
+
+  const results = slugs.map(slug => evaluateTenderWorkspace({ repoRoot: process.cwd(), slug }))
+
+  return {
+    applicable: true,
+    passed: results.every(result => result.passed),
+    slugs,
+    results,
+  }
+}
+
 function buildReport(options, files, domains, skillInventory) {
   const codexSkills = unique(domains.flatMap(domain => domain.codexSkills))
   const claudeSkills = unique(domains.flatMap(domain => domain.claudeSkills))
@@ -486,7 +540,14 @@ function buildReport(options, files, domains, skillInventory) {
     ...domains.flatMap(domain => domain.commands),
   ])
 
-  const blockers = unique(domains.flatMap(domain => domain.blockers))
+  const commercialTenderGate = runCommercialTenderGate(files)
+
+  const blockers = unique([
+    ...domains.flatMap(domain => domain.blockers),
+    ...commercialTenderGate.results
+      .filter(result => !result.passed)
+      .map(result => `Commercial tender gate BLOCK (${result.slug}): ${result.issues.map(issue => issue.message).join(' ')}`),
+  ])
 
   if (files.length > 0 && domains.length === 0) {
     commands.push('pnpm lint')
@@ -510,8 +571,9 @@ function buildReport(options, files, domains, skillInventory) {
     skillRoutingNotes: skillNotes,
     suggestedCommands: unique(commands),
     potentialBlockers: blockers,
+    commercialTenderGate,
     closureReminder:
-      'The CLI is advisory. Use greenhouse-qa-release-auditor for PASS / CONDITIONAL PASS / BLOCK.',
+      'The general QA CLI is advisory; for commercial tenders, `pnpm tender:canonical-gate <slug>` is fail-closed. Use greenhouse-qa-release-auditor for PASS / CONDITIONAL PASS / BLOCK.',
   }
 }
 
@@ -641,6 +703,10 @@ try {
     console.log(JSON.stringify(report, null, 2))
   } else {
     printText(report)
+  }
+
+  if (report.commercialTenderGate.applicable && !report.commercialTenderGate.passed) {
+    process.exitCode = 1
   }
 
   if (options.strict && report.potentialBlockers.length > 0) {

@@ -77,6 +77,7 @@ esta carpeta por \`proposal_id\`. Contrato de la carpeta: \`../TENDER_WORKSPACE_
 - [ ] Investigación en \`research/\`; cifras al ledger de \`oferta-tecnica.md\`.
 - [ ] Registrar artefactos vivos en \`artifact-manifest.json\`.
 - [ ] Autorar \`deck-plan.json\` DESDE la oferta técnica; \`pnpm deck:compose\`.
+- [ ] Mantener \`proposal-studio.json\` actualizado; \`deck:compose\` solo produce una salida de taller.
 - [ ] Registrar el deal como \`Proposal\` en el Studio y adjuntar las salidas.
 `
 
@@ -95,6 +96,26 @@ const artifactManifest = {
       used_in: [],
       note: 'BORRAR este ejemplo. render:by_link SIEMPRE — la pieza viva se enlaza, nunca se captura.'
     }
+  ]
+}
+
+const proposalStudio = {
+  $schema: '../PROPOSAL_STUDIO_CLOSURE_SCHEMA.md',
+  schemaVersion: 1,
+  deal: slug,
+  workspacePath: `docs/commercial/tenders/${slug}`,
+  status: 'workshop_only',
+  proposalId: null,
+  registration: null,
+  composition: {
+    sourcePlans: ['deck-plan.json']
+  },
+  renderJobs: [],
+  deliverables: [],
+  verification: null,
+  notes: [
+    'La salida de pnpm deck:compose es local/exploratoria y no cuenta como Proposal ni como asset versionado.',
+    'Actualizar este registro solo con evidencia del camino canónico Proposal → render job → asset versionado → verificación autenticada.'
   ]
 }
 
@@ -133,6 +154,7 @@ const economicaStub = {
 
 writeFileSync(join(dealDir, 'README.md'), readme)
 writeFileSync(join(dealDir, 'artifact-manifest.json'), `${JSON.stringify(artifactManifest, null, 2)}\n`)
+writeFileSync(join(dealDir, 'proposal-studio.json'), `${JSON.stringify(proposalStudio, null, 2)}\n`)
 writeFileSync(join(dealDir, 'economica.json'), `${JSON.stringify(economicaStub, null, 2)}\n`)
 
 if (existsSync(TECHNICAL_OFFER_TEMPLATE)) {
@@ -142,5 +164,5 @@ if (existsSync(TECHNICAL_OFFER_TEMPLATE)) {
 }
 
 console.log(`✓ Workspace creado: docs/commercial/tenders/${slug}/`)
-console.log('  bases/  research/  anexos/  README.md  oferta-tecnica.md  artifact-manifest.json')
+console.log('  bases/  research/  anexos/  README.md  oferta-tecnica.md  artifact-manifest.json  proposal-studio.json')
 console.log('\nSiguiente: cargá el RFP en bases/, corré admisibilidad + bid/no-bid, y llená el ledger de evidencia.')

@@ -19,11 +19,27 @@
 | Plan deck económico | `deck-plan-economic.json` | Fuente de composición | Deck client-facing separado, con precios netos sin IVA |
 | Plan del deck | `deck-plan.json` | Fuente de composición | Slots y orden narrativo del PDF |
 | Artefactos vivos | `artifact-manifest.json`, cuando existan enlaces | Mixta, con gate | Procedencia y uso de piezas externas/interactivas |
-| PDF compuesto | `.captures/brightcell-bid-v*` | Entregable | Salida versionada de Artifact Composer; no es la fuente |
+| Registro Proposal Studio | `proposal-studio.json` | Interno, auditable | `workshop_only`; no existe aún `proposalId` ni salida versionada en el Studio |
+| PDF compuesto | `.captures/brightcell-bid-v*` | Salida de taller | Salida de Artifact Composer; no es una Proposal ni un asset canónico |
 
 El discriminador de audiencia manda: los archivos `research/` y `*-INTERNO` nunca se entregan al cliente.
 El deck puede mostrar mockups conceptuales, pero deben estar rotulados como tales y nunca simular resultados
 reales de Brightcell.
+
+## Estado de cierre gobernado — 2 de agosto de 2026
+
+Brightcell queda registrado honestamente como `workshop_only` en `proposal-studio.json`. En la revisión de
+la sesión autenticada del Portal de Propuestas no apareció una Proposal Brightcell ni un `proposalId`
+asociable a este workspace; por eso los PDFs bajo `.captures/` no se consideran entregables productivos.
+
+El gate esperado es:
+
+```bash
+pnpm tender:canonical-gate brightcell-lic-95
+```
+
+Debe permanecer en `BLOCK` hasta regularizar la Proposal, el render gobernado y el asset versionado. No
+se debe cambiar a `verified` por copiar un PDF local o por registrar un ID sin comprobarlo en el Studio.
 
 ## Aprendizajes comerciales consolidados — 31 de julio de 2026
 
@@ -179,6 +195,7 @@ la lámina de equipo y reemplazó una imagen tipo collage por un asset integrado
 5. Verificar que la oferta técnica, el deck y la económica no se contradicen.
 6. Confirmar que investigación, costos, benchmark y supuestos permanecen internos.
 7. Registrar la versión del PDF y el siguiente paso humano.
+8. Ejecutar `pnpm tender:canonical-gate brightcell-lic-95`; si falta Proposal Studio, conservar `workshop_only`.
 
 ## Lecciones específicas de Grader, X-Ray y Greenhouse
 

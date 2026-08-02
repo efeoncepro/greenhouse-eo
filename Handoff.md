@@ -1,5 +1,15 @@
 # Handoff activo
 
+## Gate canónico de licitaciones / Brightcell (2026-08-02)
+
+- Se agregó `pnpm tender:canonical-gate <slug>` y el registro durable `proposal-studio.json`. Una salida de
+  `pnpm deck:compose` bajo `.captures/` queda explícitamente en `workshop_only`; no es Proposal ni asset productivo.
+- El gate solo pasa con `status=verified`, `proposalId`, render job `client_facing` completado, PDF/previews
+  versionados en `proposal_assets` y verificación autenticada del Portal/API. `pnpm qa:gates --changed` lo ejecuta
+  y reporta `BLOCK` si falta la cadena.
+- Brightcell quedó documentada en `workshop_only`; regularización pendiente en Proposal Studio. No se ejecutó
+  creación de Proposal, render productivo, gcloud ni ADC durante esta implementación.
+
 ## WIP saneado — Globe, Brightcell y Polpaico (2026-08-01)
 
 - ADR-019 `Accepted`; ADR-020 `Proposed`. Brightcell: **no enviar** hasta Finance. Polpaico: `HOLD / NO-BID`, sin precio/deck emitible. Detalle en `changelog.md`.
@@ -11,25 +21,12 @@
 
 ## Studio Credits — fondeo enterprise UI/API/CLI/MCP y readback convergente (2026-08-01)
 
-- Rama correcta: Globe opera directamente en `main`; Greenhouse en `develop`; un solo checkout por repo, cero
-  worktrees aislados.
-- Operación live `23db5b0e-89dd-4661-9b8d-c12f9be4ad7a`: target/grant 800, cap 1500, pool
-  `internal-month:2026-08`, estado `completed`, capacidad efectiva `0 → 800`.
-- Greenhouse `/admin/globe/credits`, CLI OAuth PKCE `status` y Globe Producer coinciden en 800 efectivos,
-  funding 800, cap/remaining 1500, spent/held 0 y cero blockers. Capturas y IDs:
-  `docs/operations/creative-studio/evidence/2026-08-01/README.md`.
-- ISSUE-124 está resolved. TASK-1482, TASK-1483, TASK-1586, TASK-1628, TASK-1629 y TASK-1630 están `complete` con aceptación
-  funcional/runtime; GVC y smoke Chrome autenticado pasaron. TASK-1468/TASK-1579 conservan calibración amplia
-  sin bloquear el fondeo interno.
-- Los dos holds históricos sin entregable se adjudicaron por primitive gobernada y liberaron 14+16 créditos.
-- El bootstrap histórico de 500.000 permanece únicamente en historia append-only, clasificado no monetario,
-  período cerrado y nunca elegible. Greenhouse ya no lo expone en status, CLI, MCP ni UI operativa.
-- MCP write está operativo en el gateway único y su canary OAuth real terminó `completed/no_effect`; no duplicó
-  funding porque ya existían 800 efectivos. IDs y receipts viven en la evidencia canónica enlazada arriba.
-
-El first fold quedó supersedido por el rollout live. La evidencia responsive y de interacción se conserva en
-`docs/ui/reviews/TASK-1483-globe-credits-operations-workbench-first-fold-review-2026-08-01.md`; los detalles de
-rollout, migrations y Producer viven en `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`.
+- Greenhouse sigue en `develop`, Globe en `main`, y el checkout compartido único continúa siendo obligatorio.
+- El fondeo interno live quedó en 800 efectivos sobre cap 1500; UI, CLI OAuth PKCE, Producer y MCP convergen.
+- ISSUE-124 y TASK-1482/1483/1586/1628/1629/1630 están cerradas; la evidencia y los detalles runtime viven en
+  `docs/operations/creative-studio/evidence/2026-08-01/README.md` y `GLOBE_RUNTIME_HANDOFF.md`.
+- No hay rollout comercial externo; los holds históricos y el bootstrap no monetario conservan su tratamiento
+  append-only gobernado.
 
 ## Checkout compartido único — worktrees prohibidos (2026-08-01)
 

@@ -237,6 +237,8 @@
     "ai:image": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/generate-image.ts",
     "ai:image:rmbg": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/remove-bg.ts",
     "tender:new": "node scripts/commercial/new-tender.mjs",
+    "tender:canonical-gate": "node scripts/commercial/canonical-tender-gate.mjs",
+    "tender:canonical-gate:test": "node --test scripts/commercial/__tests__/tender-closure-gate.test.mjs",
     "economica:build": "node scripts/commercial/build-economic-offer-xlsx.mjs",
     "deck:compose": "tsx scripts/commercial/compose-tender-deck.ts",
     "composer:visual-gate": "tsx scripts/artifact-composer/visual-gate.ts",

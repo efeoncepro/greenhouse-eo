@@ -1,0 +1,35 @@
+{
+  "$schema": "../PROPOSAL_STUDIO_CLOSURE_SCHEMA.md",
+  "schemaVersion": 1,
+  "deal": "brightcell-lic-95",
+  "workspacePath": "docs/commercial/tenders/brightcell-lic-95",
+  "status": "workshop_only",
+  "proposalId": null,
+  "registration": null,
+  "composition": {
+    "sourcePlans": [
+      "deck-plan.json",
+      "deck-plan-economic.json"
+    ]
+  },
+  "renderJobs": [],
+  "deliverables": [],
+  "verification": null,
+  "workshopOutputs": [
+    {
+      "path": ".captures/brightcell-bid-v13",
+      "purpose": "technical_deck",
+      "canonical": false
+    },
+    {
+      "path": ".captures/brightcell-bid-economic-v2",
+      "purpose": "economic_deck",
+      "canonical": false
+    }
+  ],
+  "notes": [
+    "La composición local valida el taller visual, pero no registra una Proposal ni un asset versionado.",
+    "La sesión autenticada revisada el 2026-08-02 no mostró una Proposal Brightcell en el Portal de Propuestas.",
+    "Regularizar mediante createProposal/requestProposalRender/asset-worker y verificar el resultado antes de marcar verified."
+  ]
+}

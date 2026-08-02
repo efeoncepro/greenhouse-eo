@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-02 — Gate canónico de Proposal Studio para licitaciones
+
+- Se agregó `proposal-studio.json` al workspace scaffoldeado y `pnpm tender:canonical-gate <slug>` como gate
+  fail-closed: `deck:compose`/`.captures` se reconocen como taller, no como cierre productivo.
+- El gate exige Proposal registrada con actor humano, `ResolvedCompositionManifest` usado por un render job,
+  PDF/previews versionados en el asset store, vínculo `proposal_assets` y verificación autenticada en Portal/API.
+- `pnpm qa:gates --changed` detecta el workspace modificado y reporta `BLOCK` si la cadena no está completa.
+  Brightcell quedó registrada honestamente como `workshop_only`; no se mutó runtime ni se creó una Proposal.
+
 ## 2026-08-01 — Cierre de WIP documental y comercial
 
 - Se registraron ADR-019 (evaluación asíncrona durable de Globe, Accepted e implementada) y ADR-020 (export a
@@ -711,23 +720,3 @@ Corrección de fuente de verdad: el cliente inicial es **SKY Agencia Creativa**,
 - Se sincronizaron `hubspot-as-a-service` y `hubspot-solutions-partner` en `.codex` y `.claude`; claims, precios,
   bundles y disponibilidad del brochure quedan fuera del canon hasta verificación primaria fechada.
 - Auditoría: [`HUBSPOT_BROCHURE_REVIEW_2026-07-26.md`](docs/audits/commercial/HUBSPOT_BROCHURE_REVIEW_2026-07-26.md).
-
-## 2026-07-26 — TASK-1566 COMPLETE: fondeo gobernado de créditos de Globe vivo, ejercido y con la autoridad vieja retirada
-
-- **Primer fondeo real de Globe punta a punta sin break-glass**: `propose` (plan legible con el delta
-  completo) → `confirm` en 905 ms con atribución humana real; grant +100 `posted`, tope 400→800 y
-  asiento de ledger en **una** transacción; `pg_locks` 0/0/0 después. En el camino se cerraron los
-  7 defectos en cadena de la sesión (incluida la federación WIF Vercel→Globe que **nunca** había
-  funcionado y el self-deadlock del store transaccional — regla nueva: dentro de la transacción,
-  ningún port abre conexión propia).
-- **Retiro ejecutado (ADR-015 §10)**: el caller genérico (y el broker de tenancy) perdió las 4
-  capabilities de credit-admin; señal anti-regreso en dos capas (evento
-  `globe.credit_admin.caller_authority_drift` + test de disyunción); scripts de firma cliente
-  eliminados.
-- **Triple documentación**: manual `docs/manual-de-uso/creative-studio/fondear-creditos-globe.md`
-  (con las dos correcciones de runbook medidas: clave de idempotencia propia para el confirm;
-  anti-replay del broker por propuesta), funcional
-  `docs/documentation/creative-studio/fondeo-gobernado-creditos-globe.md`, ADR-015 delta + skill.
-- **Hardening restante como tasks nuevas**: `TASK-1584` (KMS + identidades disjuntas),
-  `TASK-1585` (break-glass gobernado + retiro del HMAC), `TASK-1586` (desambiguador de negación al
-  operador — cierra ISSUE-124).
