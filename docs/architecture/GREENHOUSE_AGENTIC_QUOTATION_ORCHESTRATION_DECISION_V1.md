@@ -52,6 +52,31 @@ Quote/API/MCP/Nexa consumers
 
 Esta decisión es una dirección arquitectónica propuesta. No autoriza todavía autonomía de emisión, cambios de schema, nuevas tools MCP, escritura directa del agente ni modificación del pricing engine.
 
+### Moneda de cotización y unidades indexadas
+
+La moneda no se puede inferir únicamente desde el país del cliente ni tratarse como un atributo global de la cotización. El contrato debe conservar, como mínimo, estos planos:
+
+| Plano | Significado | Regla para cotizar |
+|---|---|---|
+| `native` / `contract` | Moneda en la que se expresa el contrato, la solicitud comercial o el costo fuente | Se preserva siempre junto con el monto original. |
+| `cost_basis` | Moneda de cada sueldo, proveedor, herramienta, licencia o pass-through | Puede diferir de la moneda de salida; se conserva por línea. |
+| `output` / `presentation` | Moneda que verá el cliente en la cotización | USD es la presentación comercial predeterminada cuando no existe una exigencia local o contractual explícita. |
+| `functional` | Moneda operativa/contable de Efeonce | La arquitectura financiera vigente define CLP como plano funcional chileno. |
+| `settlement` | Moneda que efectivamente se cobra o paga y cuenta bancaria utilizada | Debe registrar el movimiento real; no se deduce silenciosamente desde la moneda de presentación. |
+| `reporting` | Moneda de consolidación y análisis | El objetivo financiero define CLP y USD, pero el runtime actual de reporting/analytics todavía está normalizado a CLP. |
+
+Reglas vinculantes:
+
+- Si el cliente o contrato exige moneda local y esa moneda está soportada y lista, el agente debe cotizar en ella.
+- Si no existe exigencia local, el agente debe proponer USD como salida comercial por defecto, sin borrar la moneda nativa de costos o contrato.
+- En Chile, la salida puede ser `CLP` o `CLF`/UF. `CLF`/UF es una unidad indexada, no dinero de liquidación: una cotización en UF debe declarar su equivalente y liquidar en CLP según la política aprobada.
+- En otros países, la moneda local solo puede ofrecerse si está declarada en la matriz de dominio, tiene cobertura y tiene un FX listo. Greenhouse no admite hoy “cualquier moneda local” por inferencia geográfica.
+- Una moneda declarada pero manual-only o temporalmente unavailable no se convierte silenciosamente a otra. El resultado debe quedar `blocked`/`manual_pending` o presentar USD como alternativa explícita y aprobable.
+- Toda conversión debe conservar `fx_snapshot_id`, fecha, fuente, política y composición. Una cotización enviada no se recalcula retroactivamente porque cambió el FX.
+- El agente debe explicar por qué eligió la moneda de salida y distinguir moneda contractual, moneda de presentación y moneda de liquidación.
+
+Esto significa que la intención “principalmente USD, pero CLP/UF en Chile y USD o moneda local en otros mercados” está contemplada como política, pero no implica que todas las monedas locales estén operativamente habilitadas hoy.
+
 ## Responsibilities
 
 ### Agentic Quote Orchestrator
@@ -112,7 +137,8 @@ QuoteIntent
   requested_profiles
   requested_outcomes
   scope / deliverables / cadence
-  geography / currency / dates
+  geography / currency_preferences / contract_currency
+  settlement_preferences / dates
   known_constraints
   missing_information
 ```
@@ -151,7 +177,15 @@ ServicePlan
 ```text
 PricingRequest
   quote_date
-  output_currency
+  native_currency / contract_currency
+  output_currency / presentation_currency
+  cost_basis_currency_by_line
+  functional_currency
+  settlement_currency
+  reporting_currency
+  indexed_unit nullable: CLF | UF
+  currency_selection_reason
+  fx_policy / fx_snapshot_requirements
   cost_views: contribution | fully_loaded | both
   measurement: standard | actual | forecast
   lines
@@ -169,9 +203,13 @@ CostCard
   margin_floor / margin_target
   recommended_price
   scenario_range
-  FX_snapshot
+  FX_snapshot_by_conversion
+  native_amounts_preserved
+  functional_equivalent
+  reporting_equivalent
+  settlement_plan
   source_refs / snapshot_dates
-  coverage / freshness / confidence
+  currency_readiness / coverage / freshness / confidence
   assumptions / exclusions
   warnings / blockers
   override_and_approval_state
@@ -254,6 +292,10 @@ El runtime debe fallar cerrado cuando:
 - la cotización mezcla standard con actual sin declararlo;
 - una tool total se intenta usar como costo unitario;
 - falta FX válido para la moneda de salida;
+- la moneda local solicitada no está declarada, lista o promovida para el dominio de cotización;
+- se intenta usar `CLF`/UF como moneda de caja, cuenta, orden de pago o liquidación sin CLP settlement;
+- se pierde el monto nativo al convertir a USD, CLP u otra moneda de presentación;
+- la moneda de salida se eligió por geografía sin una razón contractual/comercial explícita;
 - el actor no tiene capacidad de aprobación;
 - el quote o periodo está cerrado;
 - se detecta un intento de duplicar un efecto.
@@ -271,6 +313,13 @@ Antes de habilitar cualquier escritura o autonomía, debe existir un golden set 
 - perfil no observado sin proxy;
 - direct cost, rights, pass-through y provider usage;
 - cambios de sueldo, licencia, FX y vigencia;
+- cotización chilena en CLP;
+- cotización chilena en UF/CLF con liquidación en CLP;
+- costo en USD y cotización en CLP, conservando el costo nativo y el FX snapshot;
+- costo en CLP y cotización/liquidación en USD;
+- solicitud de COP, MXN o PEN sin rate listo y con bloqueo manual explícito;
+- solicitud de una moneda local que Greenhouse todavía no reconoce;
+- cambio de FX después del envío de la cotización sin mutar su snapshot original;
 - cotización bajo floor;
 - datos stale o faltantes;
 - solicitud ambigua o fuera de catálogo;
@@ -326,6 +375,27 @@ Es la alternativa elegida. Reutiliza el pricing module existente, permite cotiza
 - herramientas externas y benchmarks introducen stale data y costo;
 - una explicación convincente puede ocultar una baja confianza si la UI no la muestra;
 - observabilidad y revisión humana tienen costo operativo.
+
+### Estado real de cobertura monetaria al validar este ADR
+
+La siguiente tabla refleja el runtime actual, no solo el diseño objetivo:
+
+| Moneda/unidad | Cotización | Cobertura actual | Límite comprobado |
+|---|---|---|---|
+| `USD` | Sí | `auto_synced` | Moneda comercial predeterminada; no reemplaza el monto nativo. |
+| `CLP` | Sí | `auto_synced` | Moneda funcional chilena y moneda de liquidación de la UF. |
+| `CLF`/UF | Sí, como unidad indexada | `auto_synced` | Está habilitada para `pricing_output`, pero no es efectivo ni una moneda de cuenta. |
+| `COP` | Declarada | `manual_only` | Solo `pricing_output`; requiere rate manual listo antes de snapshot client-facing. |
+| `MXN` | Declarada | `manual_only` | La matriz declara promoción a `finance_core`, pero los writes siguen gated y el registry vigente todavía la declara para `pricing_output`; no está end-to-end cerrada. |
+| `PEN` | Declarada | `manual_only` | Solo `pricing_output`; requiere rate manual listo. |
+| Otras monedas locales | No | No reconocidas por la matriz actual | No deben aparecer por inferencia; requieren una promoción explícita de moneda y proveedor. |
+
+También hay dos diferencias que deben permanecer visibles para no sobredeclarar capacidad:
+
+1. El ADR financiero aceptado define como objetivo reporting en CLP y USD, pero `currency-domain.ts` mantiene hoy reporting/analytics solo en CLP.
+2. La matriz de `finance_core` incluye MXN con writes gated, mientras el registry de MXN y los contratos históricos todavía no representan soporte financiero end-to-end.
+
+Por tanto, el primer slice agentic puede recomendar una cotización USD/CLP/UF con evidencia consistente. Las salidas COP/MXN/PEN deben respetar readiness y bloqueo manual; una nueva moneda local no puede habilitarse solo porque el usuario la mencione.
 
 ## Implementation boundary
 
