@@ -7,7 +7,7 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
-## 2026-08-02 — Gate canónico de Proposal Studio para licitaciones
+## 2026-08-02 — Cierres canónicos: TASK-1614 y Proposal Studio
 
 - Se agregó `proposal-studio.json` al workspace scaffoldeado y `pnpm tender:canonical-gate <slug>` como gate
   fail-closed: `deck:compose`/`.captures` se reconocen como taller, no como cierre productivo.
@@ -15,6 +15,9 @@
   PDF/previews versionados en el asset store, vínculo `proposal_assets` y verificación autenticada en Portal/API.
 - `pnpm qa:gates --changed` detecta el workspace modificado y reporta `BLOCK` si la cadena no está completa.
   Brightcell quedó registrada honestamente como `workshop_only`; no se mutó runtime ni se creó una Proposal.
+- TASK-1614 quedó `complete` tras un canary único de Seedance R2V: run `bbe6dfff…`, output MP4
+  `sha256:93adbf46…`, 16 créditos, playback/governance verificados y saga `promotion_557d…` en `canary_passed` rev. 9
+  (`30742268557`).
 
 ## 2026-08-01 — Cierre de WIP documental y comercial
 

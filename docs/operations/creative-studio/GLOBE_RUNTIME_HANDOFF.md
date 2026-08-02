@@ -5,8 +5,8 @@
 > conserva sólo el estado mutable, los riesgos abiertos y el siguiente paso. La historia anterior
 > permanece auditable en el git log y en las tasks/ADRs enlazadas.
 >
-> **Corte verificado:** 2026-08-01 · Globe `main@b94d02a242a686b30969fa1854aefc754562779f`; Greenhouse
-> `develop@e593a2fbf492562e7435f06faf3d19e67fd45c69`. El fondeo mensual live fue verificado sobre
+> **Corte verificado:** 2026-08-02 · Globe `main@d79fda94ba97c7bd4b358c4eaf957ca1389ed9fc`; Greenhouse
+> `develop` con cierre documental de TASK-1614. El fondeo mensual live fue verificado sobre
 > `649eb08`; migraciones hasta `0047`, API y Studio están aplicados. El worker de expiry/recovery usa código
 > `d3fe90e`, digest `sha256:d8295862dc12c14427e90e0bb413577802916c37ca6bf32c202680492ca7bae9`,
 > deploy `30717266572` y baseline IaC `e369ef8` sin drift.
@@ -129,42 +129,32 @@ Las capturas son evidencia de la UI autenticada, no autoridad de estado por sí 
 una ruta disponible deben concordar: reader live, identidad de ruta, rate vigente, evaluación,
 revisión/rights, readiness, binding, circuito, run terminal, output retenido y readback/diagnóstico.
 
-## TASK-1614 — Seedance R2V durable evaluation (actualizado 2026-08-02)
+## TASK-1614 — Seedance R2V durable evaluation (cerrada 2026-08-02)
 
-- PRs `#74…#82` están mergeados. El lifecycle keyless del scheduler quedó provisionado y ejercido; migraciones
-  `0040`, `0041` y `0042`, API interna, producer worker y Asset Governance están aplicados. PR `#81` cerró
-  replay de derived rights y PR `#82` el grant mínimo de persistencia del reporte.
-- Policy de evaluación `seedance-r2v-evaluation` v2 permanece publicada para
-  `ref/video/motion-v1 / fal / seedance-2.0-r2v / 2.0`, `purpose=evaluation`, `appliesTo=derived`.
-- Fuente canónica private-ingested: `asset_6e9c95d3-7b94-473d-b91a-00f8b35d9eec`, SHA-256
-  `69cbc966999963ed2959c9adedf409560097dce06700d4fe5c9719292a392509`, retención hasta
-  `2026-08-30T23:27:57.776Z`. Output exacto retenido:
-  `sha256:58cc144e0092dbbcd585bdaff44046c7df83df6071ba32bcfc3e05191b28be41`, retención hasta 2026-08-31.
-- Evaluación `eval_16272c31b11f75be3e0369870f89746b`, attempt
-  `9361550f-6ce3-456d-b710-d5cd3ded6217`, terminó con reporte `candidate_ready`. Fal no se volvió a invocar.
-- Atestación `mcra_abf61584-46b2-4aa1-adb5-1374d46a6966`, revisión
-  `review_8561c3a9-67ed-4a51-a777-5d7d98746d9f` y readiness
-  `readiness:3fec1f4037aad02f6eb07f471bc7c949` están firmados.
-- Policy productiva `arp_77a9a0efe8b3f6d3d66a635bfcb05fba2e5268e07baa637ad1bfbe829a301dc4` permanece vigente. La saga
-  `promotion_4bda2e0f-6264-4633-a370-4aecf5deaa1a` expiró y terminó `rolled_back` revision 9 por
-  `promotion_recovery_deadline`; el recovery deshabilitó el binding revision 3, como exige el fail-closed.
-- La promoción se reanudó sin reevaluar mediante `promotion_557d4df1-994e-45ac-92f7-7ef885aa967e`:
-  workflows start `30733163802`, stage `30733188021`, promote `30733212704` y activate `30733239029`, todos
-  `success`. Readback al activar: saga `activated` revision 7, binding revision 5 enabled y circuito revision 5
-  closed.
-- Playwright verificó el candidato retenido (`readyState=4`, duración 5,06195 s, reproducción 0→1,738 s, sin
-  error) y la selección exacta **Video → Movimiento/control cámara → Seedance 2.0**. La generación final nueva no se
-  ejecutó porque el composer muestra presupuesto de agosto `0 / 0`.
-- Contradicción resuelta por los readers canónicos de TASK-1482/TASK-1586 y el self-view de TASK-1628. El
-  `available` histórico es una dimensión del ledger y no la capacidad del período. El fondeo live de agosto dejó
-  `effectiveAvailable=800`, cap/remaining `1500`, spent/held `0`, una fuente vigente y pool
-  `internal-month:2026-08`.
-- Readback OAuth PKCE de sólo lectura a `2026-08-02T05:12:14.855Z`, solicitado por 16 créditos:
-  `allowed=true`, `effectiveAvailable=800`, `eligibleFunding=800`, remaining 1500, candidateCount 1 y cero
-  blockers. No hubo fondeo ni mutación de policy.
-- Identidad Google/Chrome: `jreyes@efeonce.cl`. Identidad Greenhouse verificada:
-  `jreyes@efeoncepro.com` / `user-efeonce-admin-julio-reyes`. Los intentos fallidos de OAuth y adapter no
-  crearon propuesta, grant, run ni gasto.
+- La identidad exacta `ref/video/motion-v1 / fal / seedance-2.0-r2v / 2.0` quedó activada y confirmada. La saga
+  `promotion_557d4df1-994e-45ac-92f7-7ef885aa967e` pasó de `activated` rev. 7 a `canary_passed` rev. 9 mediante
+  `canary-confirm` workflow `30742268557`; binding habilitado, circuito `closed`, completion driver
+  `webhook-and-poll`.
+- Producer autenticado con Google/Chrome `jreyes@efeonce.cl` y Greenhouse `jreyes@efeoncepro.com` generó exactamente
+  una pieza nueva seleccionando **Video → Movimiento/control cámara → Seedance 2.0** y usando el parent gobernado
+  `asset_6e9c95d3-7b94-473d-b91a-00f8b35d9eec` (SHA
+  `sha256:69cbc966999963ed2959c9adedf409560097dce06700d4fe5c9719292a392509`).
+- Run `bbe6dfff-41df-4569-95ef-07c51d555b97` y attempt
+  `7bb11342-f0cd-4265-8c15-0c429617e1ae` son los únicos nuevos y terminaron `completed`; `run-get` workflow
+  `30742234399` confirmó `providerAccepted=true`, `currentAttempt=1`, sin segundo run ni segundo cobro.
+- El cobro único fue de 16 créditos (`800 → 784`). El output retenido es `video/mp4`, 788624 bytes,
+  SHA `sha256:93adbf46c85efecd1ad51e7ebbc577cec21c23055ad3e250c876638a70400a5f`. Playback Chrome: `readyState=4`,
+  duración `4.041667s`, `currentTime` `0 → ~1.699s`, `paused true → false`, `ended=false`, error `null`.
+- Asset Governance final: `sourceKind=derived`, parent/ancestor correctos, `rights.verdict=verified`,
+  `rightsClass=derived-internal`, `parentRights=internal-owned`, `scan=clean`, lifecycle `active`,
+  `eligibleForGeneration=true`, governance `eligible/terminal=true` y retención `working-30d` hasta
+  `2026-09-01T07:51:14.141Z`.
+- La causa raíz de lineage se corrigió sin mutar autoridad histórica: migración `0048`, grants mínimos de parent
+  rights y secuencia de auditoría, reparación `globe-asset-governance-ms9np` y progresión normal del worker hasta
+  `promoted=1`. Los commits Globe `2e3b6a8`, `9036bbf`, `118f692`, `94a315a`, `f0d0bfdd0781dbe81df49a97f9a9689c323d5c37`
+  y `d79fda94ba97c7bd4b358c4eaf957ca1389ed9fc` están en `main`.
+- No se volvió a evaluar, no se invocó Fal directamente, no se fondeó, no se ejecutó SQL/break-glass y no se tocó
+  Omni, Seed Audio, Seedance Loop, Veo o Seedream. Studio no requirió despliegue para este cierre.
 
 ## Riesgos abiertos
 
@@ -174,14 +164,8 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
   `TASK-1578`.
 - Gemini Omni continúa sólo en Model Lab para su ruta gobernada; no extrapoles la promoción de
   Vertex imagen a Interactions video.
-- TASK-1614 permanece `in-progress` sólo por el canary de una pieza nueva. Los créditos no bloquean: Producer
-  muestra 800 efectivos y `budget.evaluate` admite 16. El Studio desplegado sí bloquea la referencia exacta porque
-  recorta a ocho el conjunto de 24 retenidos y el CTA del feed es no-op. Globe `main` commit
-  `595f0cb5460e42d9cc958ced204dc6a336e6deae` elimina el recorte y agrega regresión para elegir la décima;
-  tests locales verdes y CI `30733665167` `success` (`pnpm check` + `pnpm build`). El deploy manual de Studio no se ejecutó por exclusión
-  explícita; por ello siguen ausentes run/attempt/output/cobro/playback/governance y `canary-confirm` nuevos.
-  Readback `30733996145` (`2026-08-02T05:22:28Z`) mantiene la saga `activated` revision 7, deadline
-  `2026-08-02T10:54:43.570Z`; Chrome volvió a medir ocho opciones en el selector live, sin generar.
+- TASK-1614 está cerrada con evidencia live completa. El rollout externo/comercial continúa gated por `TASK-1480`;
+  esta restricción no afecta el canary interno ni la naturaleza comercial de Globe.
 - La identidad temporal usada para consumo privado de AXIS debe sustituirse por una identidad de
   máquina antes del rollout externo; no recrees el secreto legacy de Globe.
 - El cliente Entra interno del gateway MCP recibe hoy ambos scopes aun cuando solicita el base. Antes de acceso

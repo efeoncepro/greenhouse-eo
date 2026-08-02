@@ -14,10 +14,15 @@
 
 - ADR-019 `Accepted`; ADR-020 `Proposed`. Brightcell: **no enviar** hasta Finance. Polpaico: `HOLD / NO-BID`, sin precio/deck emitible. Detalle en `changelog.md`.
 
-## TASK-1614 — canary pendiente (2026-08-02)
+## TASK-1614 — canary cerrado (2026-08-02)
 
-- Reader `30733996145`: saga rev 7 activa hasta `2026-08-02T10:54:43.570Z`; Studio aún muestra 8 referencias.
-  Fix `595f0cb…` sin deploy, cero runs/cobros. Detalle: TASK-1614 y `GLOBE_RUNTIME_HANDOFF.md`.
+- Canary único en Producer autenticado, identidad exacta `ref/video/motion-v1 / fal / seedance-2.0-r2v / 2.0`:
+  run `bbe6dfff-41df-4569-95ef-07c51d555b97`, attempt `7bb11342-f0cd-4265-8c15-0c429617e1ae`, output MP4
+  `sha256:93adbf46c85efecd1ad51e7ebbc577cec21c23055ad3e250c876638a70400a5f`, 16 créditos, playback y governance
+  verificados.
+- Saga `promotion_557d4df1-994e-45ac-92f7-7ef885aa967e` → `canary_passed` rev. 9 (`30742268557`); lineage
+  append-only y lanes operator corregidos en Globe `main`. TASK-1614 `complete`; sin mutar créditos ni rutas fuera
+  de scope.
 
 ## Studio Credits — fondeo enterprise UI/API/CLI/MCP y readback convergente (2026-08-01)
 

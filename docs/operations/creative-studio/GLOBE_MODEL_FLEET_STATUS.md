@@ -7,7 +7,7 @@
 > sustenta en `globe.production-routing` + `globe.model-readiness.*`. Este documento es el mapa
 > legible que reconcilia ambas autoridades.
 >
-> **Creado:** 2026-07-24 (TASK-1553). **Última actualización:** 2026-08-01.
+> **Creado:** 2026-07-24 (TASK-1553). **Última actualización:** 2026-08-02.
 > **Contrato técnico:** `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md`,
 > `EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md`, `EFEONCE_GLOBE_ROUTE_BASED_MODEL_RESOLUTION_DECISION_V1.md` (ADR-013).
 
@@ -43,7 +43,7 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 | `ref/motion/loop-v1` | Seedance · 2.0 | Fal | video-generate | ✅ 07-19 | ✅ driver Fal | — |
 | `ref/motion/reference-v1` | Gemini Omni Flash · Preview | Vertex (Omni, Interactions API) | video-generate | ✅ 07-20 (40cr) | ⏳ **solo Lab** — Omni NO está en el path gobernado | ver "Delta" abajo |
 | `ref/video/frames-v1` | Veo · 2.0 | Vertex (`veo-…:predictLongRunning`) | video-frames | ✅ 07-20 (MP4 real, 32cr) | ✅ driver Veo gobernado (`vertex-video`, `us-central1`) desde 07-22 | — |
-| `ref/video/motion-v1` | Seedance · 2.0 | Fal | video-motion-control | ✅ evaluación/report 08-01 | ✅ driver + readiness + binding reactivado 08-02 | TASK-1614: 16 créditos admitidos; canary nuevo bloqueado por selector Studio live (fix `595f0cb`, deploy pendiente) |
+| `ref/video/motion-v1` | Seedance · 2.0 | Fal | video-motion-control | ✅ evaluación/report 08-01 | 🟢 canary real gobernado 08-02 | TASK-1614 cerrada: run `bbe6dfff…`, output MP4 retenido, 16 créditos, `canary_passed` |
 | `ref/audio/foley-v1` | Seed Audio | Fal | audio-generate | ✅ 07-19 | ✅ driver Fal | atestación comercial firmada |
 | `ref/voice/tts-v1` | ElevenLabs · Multilingual v2 | ElevenLabs | speech-synthesize | ✅ 07-19 | ✅ driver Fal | — |
 | `ref/voice/change-v1` | ElevenLabs · Voice Changer | ElevenLabs | audio-change-voice | ✅ 07-20 | ✅ | — |
@@ -73,10 +73,10 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 | 2026-07-30 | TASK-1553 | **GPT Image 2 + 1.5 promovidos** mediante el driver oficial OpenAI Images; generaciones reales desde Producer |
 | 2026-07-30 | TASK-1553 | **Nano Banana 2 promovido** tras despejar el allowlist; generación UI real y recuperación idempotente del mismo run después del fix `1fb5728` |
 | 2026-07-30 | TASK-1553 | **Recraft v4.1 promovido**; contrato SVG, evaluación/revisión/derechos, binding/readiness/circuito y generación real desde Producer; fix fail-closed `84d6a8e` |
-| 2026-08-01 | TASK-1614 | Seedance R2V: evaluación/report, governance, atestación, readiness y saga de promoción completos; selector live disponible. Canary de pieza nueva pendiente por reconciliar presupuesto agosto `0 / 0` contra fondeo y balance durables |
-| 2026-08-02 | TASK-1614 | Readback de 16 créditos `allowed=true`; saga anterior recuperada fail-closed y nueva saga `promotion_557d…` activada. El Studio live oculta la referencia exacta después de la octava; fix `595f0cb` integrado y sin deploy por exclusión explícita |
+| 2026-08-01 | TASK-1614 | Seedance R2V: evaluación/report, governance, atestación, readiness y policy productiva completos |
+| 2026-08-02 | TASK-1614 | Canary nuevo gobernado verde: run `bbe6dfff…`, attempt `7bb11342…`, output SHA `93adbf46…`, 16 créditos, governance elegible y `canary_passed` |
 
-## Evidencia Seedance R2V — promoción reactivada, canary final pendiente (actualizado 2026-08-02)
+## Evidencia Seedance R2V — canary gobernado verde (actualizado 2026-08-02)
 
 - Identidad exacta: `ref/video/motion-v1 / fal / seedance-2.0-r2v / 2.0`. Policy
   `seedance-r2v-evaluation` v2, `purpose=evaluation`, `appliesTo=derived`.
@@ -95,13 +95,17 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
   `promotion_4bda2e0f-6264-4633-a370-4aecf5deaa1a` expiró y se recuperó fail-closed. La nueva
   `promotion_557d4df1-994e-45ac-92f7-7ef885aa967e` quedó `activated` revision 7; binding revision 5 habilitado y
   circuito revision 5 cerrado (`30733163802`, `30733188021`, `30733212704`, `30733239029`).
-- El Producer muestra **Video → Movimiento/control cámara → Seedance 2.0**. El candidato reproduce
-  (`readyState=4`, 0→1,738 s, sin error), pero no sustituye el canary. El readback exacto para 16 créditos dio
-  `allowed=true`, 800 efectivos y cero blockers. La pieza nueva no existe porque el Studio live recorta a ocho
-  referencias; el asset exacto queda fuera y el CTA del feed es no-op. El fix `595f0cb` está en `main`, con test
-  que selecciona la décima referencia, pero no fue desplegado. El reader `30733996145` confirmó a las
-  `2026-08-02T05:22:28Z` que la saga sigue `activated` revision 7, deadline `2026-08-02T10:54:43.570Z`; Chrome
-  volvió a contar ocho opciones live. Cero run, attempt, cobro u output nuevos.
+- El Producer autenticado seleccionó **Video → Movimiento/control cámara → Seedance 2.0** y generó exactamente una
+  pieza nueva. Run `bbe6dfff-41df-4569-95ef-07c51d555b97`, attempt `7bb11342-f0cd-4265-8c15-0c429617e1ae`, ambos
+  `completed`, `providerAccepted=true`, un solo cobro de 16 créditos. Output `video/mp4`, 788624 bytes, SHA
+  `sha256:93adbf46c85efecd1ad51e7ebbc577cec21c23055ad3e250c876638a70400a5f`; playback `readyState=4`, duración
+  `4.041667s`, `currentTime 0→~1.699s`, `paused true→false`, `ended=false`, error `null`.
+- Asset Governance readback final: `sourceKind=derived`, parent y ancestor `asset_6e9c95d3-7b94-473d-b91a-00f8b35d9eec`,
+  derechos `verified/derived-internal/parentRights=internal-owned`, scan clean, lifecycle active, elegible true,
+  governance `eligible/terminal=true`, retención `working-30d` hasta `2026-09-01T07:51:14.141Z`.
+- Saga `promotion_557d4df1-994e-45ac-92f7-7ef885aa967e` pasó a `canary_passed` rev. 9 mediante workflow
+  `30742268557`, conservando la identidad exacta y `governanceState=eligible`. No se repitió evaluación, provider
+  call ni fondeo. El arreglo de lineage fue append-only; Omni, Seed Audio, Seedance Loop, Veo y Seedream no se tocaron.
 
 ## Evidencia de Nano Banana Pro — canary y promoción gobernada
 

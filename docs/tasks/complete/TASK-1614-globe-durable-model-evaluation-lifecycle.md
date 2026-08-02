@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -11,11 +11,11 @@
 - UI impact: `verification-only`
 - Backend impact: `yes`
 - Epic: `EPIC-028`
-- Status real: `Code complete, rollout pendiente: evaluación/governance completas; canary nuevo bloqueado por selector de referencias del Studio desplegado`
+- Status real: `Cerrada 2026-08-02: canary nuevo ejecutado y confirmado end-to-end; output retenido, playback y governance verificados`
 - Domain: `Globe / Model Lab / evaluation / worker`
 - Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Owner: `Efeonce Globe runtime`
-- Runtime code: Globe `main` `595f0cb5460e42d9cc958ced204dc6a336e6deae`; el fix del selector todavía no está desplegado en Studio
+- Runtime code: Globe `main` `d79fda94ba97c7bd4b358c4eaf957ca1389ed9fc`; canary y lane operator verificados en runtime
 - ADRs: [Evaluation Harness](../../architecture/creative-studio/EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md) y
   [Asset Governance Worker](../../architecture/creative-studio/EFEONCE_GLOBE_ASSET_GOVERNANCE_WORKER_DECISION_V1.md)
 
@@ -80,40 +80,36 @@ Do not alter already promoted Omni, Seed Audio or Seedance Loop; do not bypass t
   gasto: staging OAuth fue bloqueado por `ERR_BLOCKED_BY_CLIENT`/Vercel Protection y el adapter de producción
   respondió `globe_not_configured` antes de mutar.
 
-## Checkpoint dominante — 2026-08-02
+## Checkpoint dominante — 2026-08-02 (cerrado)
 
-- El readback canónico previo al gasto pasó a las `2026-08-02T05:12:14.855Z`: requested 16,
-  `allowed=true`, `effectiveAvailable=800`, `eligibleFunding=800`, cap/remaining 1500, spent/held 0,
-  `candidateCount=1`, freshness 0 y cero blockers. Fue un `status` OAuth PKCE de sólo lectura; no se ejecutó
-  funding, `preview`, `ensure`, `propose`, `confirm`, SQL ni break-glass.
-- La saga anterior `promotion_4bda2e0f-6264-4633-a370-4aecf5deaa1a` no seguía activada: el reader live la
-  devolvió `rolled_back` revision 9 por `promotion_recovery_deadline`, y el binding estaba deshabilitado revision
-  3 por el recovery fail-closed. Los readbacks fueron workflows `30733116372` (readiness), `30733117416`
-  (route) y `30733118461` (saga).
-- Se abrió una saga nueva sin repetir evaluación ni tocar policy:
-  `promotion_557d4df1-994e-45ac-92f7-7ef885aa967e`. Start `30733163802`, stage `30733188021`, promote
-  `30733212704` y activate `30733239029` terminaron `success`; estado `activated` revision 7, binding revision
-  5 habilitado y circuito revision 5 cerrado. Reutilizó la atestación, revisión, readiness y policy ya firmadas.
-- Chrome autenticado confirmó 800 créditos y seleccionó explícitamente **Video → Movimiento/control cámara →
-  Seedance 2.0**. No se generó ninguna pieza: cero run nuevo, cero attempt nuevo y cero cobro nuevo.
-- El readback canónico `30733996145`, ejecutado a las `2026-08-02T05:22:28Z` sobre Globe
-  `595f0cb5460e42d9cc958ced204dc6a336e6deae`, confirmó que la saga nueva sigue `activated` revision 7 y conserva
-  deadline `2026-08-02T10:54:43.570Z`. La verificación UI inmediatamente posterior confirmó el runtime anterior:
-  el menú presenta exactamente ocho referencias (diez botones contando sus dos controles), sin el asset fuente.
-- El único bloqueo real está en el Studio desplegado: `globe.producer.feed.live.list` entrega hasta 24 candidatos
-  retenidos, pero el compositor recortaba el render a ocho. El asset fuente sí aparece en el feed como el output
-  Veo retenido de 32 créditos, pero queda fuera de esos ocho; el botón visible `Usar como referencia` del feed
-  está cableado a un no-op y no modifica el compositor. No se eligió un candidato incorrecto ni se reintentó a
-  ciegas.
-- La causa raíz quedó corregida en Globe `main` commit
-  `595f0cb5460e42d9cc958ced204dc6a336e6deae`: el selector presenta todo el conjunto retenido retornado por el
-  reader. El canary local prueba 12 opciones, selecciona deliberadamente la décima y conserva el handle completo
-  (`mediaType`, `rights`, `parentRights`); también verifica un solo prepare, un solo execute y una clave de
-  idempotencia compartida. `pnpm --filter @efeonce-globe/studio-client test` pasó; CI `30733665167` terminó
-  `success` con `pnpm check` y `pnpm build`.
-- El push a `main` no despliega por sí solo: `Deploy Internal (keyless)` es manual. En cumplimiento de la exclusión
-  explícita **no desplegar Studio**, el fix aún no está live. TASK-1614 permanece `in-progress`; no se puede afirmar
-  playback, output SHA/MIME, retención, governance ni `canary-confirm` de una pieza que no existe.
+- Readback previo de sólo lectura para 16 créditos: `budget.evaluate.allowed=true`, `effectiveAvailable=800`,
+  `eligibleFunding=800`, cap/remaining `1500`, spent/held `0`, sin fondeo, SQL, break-glass ni cambio de policy.
+- El Producer autenticado (`jreyes@efeonce.cl`; Greenhouse `jreyes@efeoncepro.com`) ejecutó exactamente una pieza
+  nueva seleccionando **Video → Movimiento/control cámara → Seedance 2.0**, usando el asset gobernado
+  `asset_6e9c95d3-7b94-473d-b91a-00f8b35d9eec` (SHA
+  `sha256:69cbc966999963ed2959c9adedf409560097dce06700d4fe5c9719292a392509`).
+- Run único `bbe6dfff-41df-4569-95ef-07c51d555b97`, attempt único
+  `7bb11342-f0cd-4265-8c15-0c429617e1ae`, estado `completed`, `providerAccepted=true`, una sola reserva/cobro de
+  16 créditos (`800 → 784`). La identidad se conservó exactamente:
+  `ref/video/motion-v1 / fal / seedance-2.0-r2v / 2.0`.
+- Output nuevo retenido: `video/mp4`, 788624 bytes, SHA
+  `sha256:93adbf46c85efecd1ad51e7ebbc577cec21c23055ad3e250c876638a70400a5f`. Playback Chrome: `readyState=4`,
+  duración `4.041667s`, `currentTime` `0 → ~1.699s`, `paused true → false`, `ended=false`, error `null`.
+- Asset Governance final: `sourceKind=derived`, parent y ancestor exactos, `rights.verdict=verified`,
+  `rightsClass=derived-internal`, `parentRights=internal-owned`, `scan=clean`, lifecycle `active`,
+  `eligibleForGeneration=true`, governance `eligible/terminal=true`, retención explícita `working-30d` hasta
+  `2026-09-01T07:51:14.141Z`.
+- El defecto de lineage se resolvió por autoridad append-only y el worker desplegado: migración `0048`, grants de
+  `generated_asset_parent_rights` y `asset_provenance_audit_audit_id_seq`, ejecución final de reparación
+  `globe-asset-governance-ms9np` y progresión durable de las etapas hasta `promoted=1`. No se mutó la autoridad
+  original ni se gastaron créditos adicionales.
+- Saga `promotion_557d4df1-994e-45ac-92f7-7ef885aa967e`: readback activado rev. 7; `canary-confirm` workflow
+  `30742268557` terminó `200/completed`, outcome `canary_passed`, rev. 9, con el mismo run/attempt/output y
+  `governanceState=eligible`. La ruta conserva `webhook-and-poll`, circuito `closed` y binding habilitado.
+- El lane operator requería preservar payload para `get` y `canary-confirm`; los commits Globe
+  `f0d0bfdd0781dbe81df49a97f9a9689c323d5c37` y `d79fda94ba97c7bd4b358c4eaf957ca1389ed9fc` lo corrigieron en
+  `main` y los workflows read-only/confirmación quedaron verdes. No se desplegó Studio ni se tocó Omni, Seed Audio,
+  Seedance Loop, Veo o Seedream.
 
 ## Live progress histórico — 2026-07-31
 
