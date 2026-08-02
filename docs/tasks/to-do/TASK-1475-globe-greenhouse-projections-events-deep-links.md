@@ -1,5 +1,13 @@
 # TASK-1475 — Globe Greenhouse Projections, Events and Deep Links
 
+## Delta 2026-08-02 — foundation terminal extraída a TASK-1632
+
+`TASK-1632` posee el handoff mínimo desde el terminal canónico de Asset Governance: contrato versionado,
+outbox Globe, delivery WIF, inbox/proyección Greenhouse, replay y recovery. Esta extracción permite construir la
+foundation sin depender de release/delivery ni de la paridad amplia que bloquean esta task. `TASK-1475`
+permanece dueña del portfolio general de proyecciones, eventos y deep links; debe consumir `TASK-1632` y no
+crear un segundo publisher, consumer o policy de Asset Governance.
+
 ## Delta 2026-07-21 — TASK-1507 complete: gate del custom domain levantado
 
 El custom domain ya está publicado: los deep links se construyen sobre `https://globe.efeoncepro.com`. El `*.run.app`
@@ -35,7 +43,7 @@ decisión diferida (ADR-004) — no asumir dominio comercial acá.
 - Status real: `Diseño gobernado; implementación pendiente`
 - Rank: `TBD`
 - Domain: `platform|integration|greenhouse`
-- Blocked by: `TASK-1472, TASK-1473`
+- Blocked by: `TASK-1472, TASK-1473, TASK-1632`
 - Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -74,7 +82,7 @@ Hacer Globe alcanzable y observable desde Greenhouse conservando fronteras de pr
 
 ### Depends on
 
-- `TASK-1472`, `TASK-1473`.
+- `TASK-1472`, `TASK-1473` y la foundation terminal de `TASK-1632`.
 
 ### Blocks / Impacts
 
@@ -173,7 +181,7 @@ Hacer Globe alcanzable y observable desde Greenhouse conservando fronteras de pr
 
 ### Slice 2
 
-- Implementar publisher/consumer idempotente con WIF.
+- Consumir y extender el publisher/consumer idempotente WIF de `TASK-1632`; no duplicarlo.
 
 ### Slice 3
 

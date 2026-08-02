@@ -1715,10 +1715,11 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-1628` | `complete` | **Globe Producer Credit Capacity Self-View.** Self-view read-only, GVC premium, rollout Globe `main` y smoke autenticado completos. EPIC-028. | `docs/tasks/complete/TASK-1628-globe-producer-reads-its-own-budget.md` |
 | `TASK-1626` | `in-progress` | **Efeonce MCP Platform Gateway and Globe Federation.** Repo neutral `efeonce-mcp`, OAuth protected resource, Streamable HTTP, Cloud Run, front door `mcp.efeonce.org` y primer reader Globe internal-only verificado por PKCE: `globe.producer.fleet.list`. Clientes externos siguen gateados por entitlements B2B/base-only. | `docs/tasks/in-progress/TASK-1626-efeonce-mcp-platform-gateway.md` |
 | `TASK-1631` | `to-do` | **Efeonce Customer Identity and MCP Federation Foundation.** Account 360 conserva `greenhouse_core.organizations` como ancla comercial; identidad cliente externa, binding auditado, validación gateway y policy Globe habilitan B2B MCP sin requerir Entra de Efeonce. Proveedor/plan pendiente de aprobación explícita. | `docs/tasks/to-do/TASK-1631-efeonce-customer-identity-mcp-federation.md` |
+| `TASK-1632` | `to-do` | **Globe Asset Governance Terminal Event Handoff.** EPIC-028; backend-data/sync; backend-critical; P0/Muy alto/Medio. Terminal gobernado → outbox Globe → delivery WIF at-least-once → inbox/proyección Greenhouse idempotente, con revision ordering, replay y DLQ; no reenvía webhooks Fal ni comparte DB. | `docs/tasks/to-do/TASK-1632-globe-asset-governance-event-handoff.md` |
 
 ## Siguiente ID disponible
 
-`TASK-1632`
+`TASK-1633`
 
 > **Corrección 2026-07-30.** Este pie declaraba `TASK-1587`, pero la tabla de este mismo archivo ya
 > registraba hasta `TASK-1598` y esos archivos existen en disco: el pie estaba obsoleto respecto de su
@@ -1729,4 +1730,5 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 > `TASK-1628` quedó tomado por «El Producer puede leer su propio presupuesto» (EPIC-028); `TASK-1629` quedó
 > asignado a la recuperación del Admin CLI OAuth/PKCE cuyo branch histórico usó por error `TASK-1616`. El
 > `TASK-1630` quedó asignado a «Globe Credits Control Plane Convergence» (EPIC-028) y `TASK-1631` a «Efeonce
-> Customer Identity and MCP Federation Foundation»; el siguiente ID libre es `TASK-1632`.
+> Customer Identity and MCP Federation Foundation», y `TASK-1632` a «Globe Asset Governance Terminal Event
+> Handoff»; el siguiente ID libre es `TASK-1633`.

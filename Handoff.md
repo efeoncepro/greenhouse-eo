@@ -1,5 +1,14 @@
 # Handoff activo
 
+## TASK-1632 — handoff terminal Asset Governance → Greenhouse (2026-08-02)
+
+- Creada y registrada como unidad P0 independiente: terminal gobernado → outbox durable Globe → delivery WIF
+  at-least-once → inbox/proyección Greenhouse idempotente, con revisión monotónica, replay y DLQ.
+- No reabre TASK-1614 ni reenvía el webhook crudo de Fal. TASK-1475 conserva el portfolio amplio y los deep
+  links, y debe consumir esta foundation sin duplicar publisher/consumer.
+- Estado real: diseño confirmado, implementación pendiente; sin runtime, migraciones ni despliegues ejecutados.
+- Siguiente unidad activa de esta sesión: cerrar el WIP de Omni bajo TASK-1504 en Globe `main`, sin worktrees.
+
 ## Gate canónico de licitaciones / Brightcell (2026-08-02)
 
 - Se agregó `pnpm tender:canonical-gate <slug>` y el registro durable `proposal-studio.json`. Una salida de

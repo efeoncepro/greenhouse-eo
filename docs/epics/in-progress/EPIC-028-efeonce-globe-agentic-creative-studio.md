@@ -501,6 +501,14 @@ GVC, rollout y smoke autenticado. TASK-1630 cerró además MCP write interno, la
 comercial/modelos externo y TASK-1468/TASK-1579 receipts/calibración más amplia, sin volver a bloquear el carril
 interno ni TASK-1614.
 
+## Delta 2026-08-02 — handoff terminal de Asset Governance extraído a TASK-1632
+
+`TASK-1632` construye la foundation event-driven no bloqueada entre productos: el terminal canónico de Asset
+Governance persiste un outbox en Globe, se entrega con WIF y semántica at-least-once, y Greenhouse aplica una
+proyección idempotente con revisión monotónica, replay y DLQ. El callback de Fal sigue siendo sólo ingress del
+proveedor y nunca cruza como evento empresarial. `TASK-1475` conserva el portfolio amplio de proyecciones,
+eventos y deep links, consume esta foundation y no duplica sus componentes.
+
 ## Delta 2026-07-19 — TASK-1458 complete (Golden Briefs & Evaluation Harness)
 
 `TASK-1458` quedó **complete** (fake canary), sumándose a `TASK-1481` (spine), `TASK-1457` (Model Lab) y
