@@ -31,6 +31,21 @@ Comunicación: español neutro latinoamericano (sin voseo/modismos argentinos). 
 
 `Agent` tool (`Explore`, `general-purpose`, `Plan`) para paralelizar trabajo independiente — discovery cross-módulos, slices sin dependencias, verificación cruzada. Múltiples subagentes en **un solo mensaje**. Contexto autocontenido + qué skills invocar si van a escribir. No dupliques en el hilo lo que delegaste.
 
+## Objetivo de sesión (`/goal`)
+
+`/goal` es un **slash command built-in de Claude Code** (no vive en `.claude/commands/`; no crees `goal.md`). Sintaxis: `/goal [condition|clear]`. Sin argumento muestra el objetivo vigente o el último alcanzado; `clear`/`stop`/`off`/`reset`/`none`/`cancel` lo retira.
+
+**Implicación de autonomía — leer antes de fijar uno:** `/goal` NO es una nota de acuerdo. Dispara **continuación autónoma turno tras turno** hasta cumplir la condición. Si la condición incluye acciones que gastan o mutan runtime (canaries facturables de Globe, fondeo, deploys, promociones), el agente avanza solo a través de ese gasto **sin checkpoint humano intermedio**. Por eso el alcance del goal es una decisión de riesgo, no de estilo.
+
+Reglas al escribirlo:
+
+- Si la condición cruza gasto real, deploy, promoción o mutación de runtime, **decláralo explícitamente** en el texto; si no se autoriza, acota la condición para detenerse antes de esa frontera.
+- La condición debe ser **evaluable** (alguien externo puede responder sí/no), no prosa aspiracional.
+- Debe declarar: objetivo de cierre · evidencia obligatoria · límites de alcance (qué NO se toca) · estado correcto si falta rollout (`code complete, rollout pendiente` u `operativamente bloqueado`) · si conviene `mantente en develop` y si se autorizan subagentes.
+- Ante transporte ambiguo (no se sabe si el efecto ocurrió): **leer readers/estado antes de reintentar**, nunca un segundo submit a ciegas.
+
+Contenido canónico compartido con Codex (mismo contrato, distinto mecanismo): `docs/operations/CODEX_EXECUTION_PROMPT_V1.md` §GOAL PREFLIGHT y §UI/UX GOAL GUARD.
+
 ## Skills (invocar una vez por dominio, antes de escribir)
 
 Elige según dominio (lista canónica y mandatos en `CLAUDE.md`): `greenhouse-backend` · `greenhouse-dev` · `greenhouse-ux-writing` (TODO copy visible) · `greenhouse-postgres` · `gcp-bigquery` · `hubspot-greenhouse-bridge` · `greenhouse-cron-sync-ops`. **Mandatorias por gate**: `greenhouse-finance-accounting-operator` (cualquier finanzas/costos/fiscal/tesorería/P&L o trigger léxico contable), `greenhouse-payroll-auditor` (payroll/finiquito/KPI ICO), `greenhouse-documentation-governor` (cierre), `greenhouse-qa-release-auditor` (cierre no trivial). **UI** → fija `/goal TASK-### UI enterprise-ready` y usa `greenhouse-ai-design-studio` como orquestador canónico antes de JSX/copy visible; carga sus lanes reales de arquitectura, implementación, Vuexy, UX/content, tipografía, motion y review. Fija dirección visual versionada, recipe/Composition Shell, jerarquía de acciones, estados, responsive y un momento visual dominante; aplica presupuesto de chrome (máximo tres superficies `contained` en el first fold normal) y bloquea card-on-card sin frontera semántica. Ejecuta los contratos wireframe/flow/motion/readiness y los cuatro gates independientes: `pnpm design-contract:lint --task TASK-###`, `pnpm ui:code-lint --changed`, `pnpm ui:visual-gate --task TASK-###`, `pnpm ui:quality --task TASK-###`. GVC premium desktop+390px debe quedar mirado, sin overflow ni findings; score medio ≥4.5, piso ≥4 y jerarquía/economía de superficies/impacto visual/fidelidad/resistencia genérica ≥4.5. Nunca freehand ni "listo" por tokens correctos solamente.
