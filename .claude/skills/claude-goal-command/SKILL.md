@@ -129,6 +129,34 @@ para chequeos determinísticos.
 **Auto mode** por sí solo aprueba tool calls dentro de un turno pero no arranca uno nuevo. Son
 complementarios: auto mode quita los prompts por herramienta, `/goal` quita los prompts por turno.
 
+### No se combina con `/loop` en un comando
+
+`/loop <intervalo> /goal <condición>` **no fija ningún goal**: `/goal` es un *built-in command* y los
+built-in llegan como **texto plano** desde un disparo programado (v2.1.196+).
+
+Y tenerlos **ambos activos en la misma sesión es contraproducente**: el evaluador juzga *la
+conversación completa*, así que el prompt y la salida del loop **entran a la evidencia que evalúa** —
+un loop que reporte "todo verde" puede empujarlo a dar por cumplida la condición. Además un goal
+activo casi nunca deja la sesión idle, y las tareas programadas solo disparan con Claude idle y sin
+catch-up.
+
+**Separa por sesión**: `/goal` en la que ejecuta, `/loop` en la que vigila.
+
+### Esperar dentro de un goal
+
+`/goal` **no sabe esperar** — arranca el turno siguiente apenas termina el anterior. Un goal que deba
+aguardar estado externo (un run de proveedor, un canary, una revisión de Cloud Run) **giraría en
+vacío** quemando turnos y tokens.
+
+La forma correcta no es un loop: **Monitor** o un background task **dentro del mismo turno**. Bloquea
+hasta el estado terminal y el harness re-invoca al terminar. Declara la regla en la condición:
+
+> *"Para esperar un run del proveedor usa Monitor o un background task dentro del turno; nunca
+> reintentes el submit para ver si ya."*
+
+En dominios con cobro por generación, esa línea es la diferencia entre un cargo y dos: un goal
+reintenta solo, y un submit ambiguo re-enviado cobra dos veces.
+
 ## Uso en Greenhouse
 
 ### Reglas duras

@@ -195,11 +195,35 @@ Si el loop dejó trabajo hecho, aplican los gates del repo igual que en cualquie
 `pnpm local:check`, y para cerrar una task `pnpm test` completo + `pnpm build` de producción.
 Un loop no exime del Runtime Rollout Completion Gate: `code complete ≠ operationally complete`.
 
+## Combinar con `/goal`
+
+**En un solo comando: no se puede.** `/loop <intervalo> /goal <condición>` **no fija ningún goal**.
+`/goal` es un *built-in command* y los built-in llegan como **texto plano** desde un disparo
+programado (misma regla que tumba `/loop 30m /code-review`).
+
+**Los dos activos en la misma sesión: evítalo.** Son mecanismos independientes y conviven
+mecánicamente, pero:
+
+- **El evaluador del goal lee la conversación completa.** El prompt y la salida del loop entran al
+  transcript que el evaluador juzga. Un loop que reporte "todo verde" puede empujarlo a dar por
+  cumplida una condición que nadie pretendía.
+- **Contención de turnos.** Las tareas programadas solo disparan con Claude **idle** y no hay
+  catch-up. Un goal activo casi nunca deja la sesión idle, así que el loop dispara irregular o nunca.
+
+**La combinación correcta es en sesiones distintas**: `/goal` en la que ejecuta, `/loop` en la que
+vigila. Así el transcript del vigía no contamina al evaluador.
+
+**Para esperar dentro de un goal, no uses loop.** `/goal` no sabe esperar — arranca el turno
+siguiente de inmediato. Usa **Monitor** o un background task en ese mismo turno: bloquea hasta el
+estado terminal y el harness re-invoca al terminar. Cero turnos en vacío y cero reintentos a ciegas
+(que en un dominio con cobro por generación es la diferencia entre un cargo y dos).
+
 ## Errores frecuentes
 
 | Síntoma | Causa | Arreglo |
 |---|---|---|
 | El loop "no hace nada" | Pasaste `/code-review` o `/verify` como prompt | Escríbelo en prosa |
+| `/loop … /goal …` no fija goal | `/goal` es built-in → llega como texto | Fíjalo aparte, idealmente en otra sesión |
 | Dispara tarde | Jitter (hasta 30 min en recurrentes) | Es esperado; elige minuto ≠ `:00`/`:30` |
 | Dejó de disparar solo | Expiración de 7 días, o conversación nueva | Recrear, o migrar a Routines/Desktop |
 | Se perdió al reanudar | Background bash/monitor nunca se restauran | Re-lanzarlos tras `--resume` |
