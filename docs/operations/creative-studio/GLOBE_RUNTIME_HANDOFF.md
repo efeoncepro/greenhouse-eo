@@ -199,6 +199,10 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
   este modo`, reproducido en dos pestañas. No se ejecutó generación, no hubo cobro ni run/attempt/output, y no
   se ejecutó `canary-confirm`. No se desplegó Globe Studio ni se usó bypass; la discrepancia Producer/BFF queda
   bloqueante y fuera del alcance autorizado de esta sesión.
+- Diagnóstico live preciso: `/_client-seam` devuelve hidratación `ok` en la revisión Studio
+  `globe-studio-internal-00133-b9k` (`595f0cb5460e`), pero el bundle publicado declara
+  `MODE_CAPABILITIES.video[3] = undefined`; el filtro de modos convierte `Elementos` en cero rutas y lo deshabilita.
+  Resolverlo exige una corrección y despliegue de Studio, prohibidos en este alcance.
 
 ## TASK-1632 — handoff interno de completion (diseño corregido, implementación pendiente)
 

@@ -141,6 +141,9 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
   `canary-confirm`; la ruta permanece no disponible para el ledger hasta que exista el canary gobernado.
 - No se desplegó Studio, no se ejecutó bypass, no se reutilizó el candidato de evaluación y no se repitió la
   evaluación. Estado: `code complete, rollout pendiente`.
+- El bloqueo no proviene del reader ni del driver: el bundle Studio live (`globe-studio-internal-00133-b9k`,
+  `595f0cb5460e`) deja `MODE_CAPABILITIES.video[3]` en `undefined`, por lo que el filtro del Composer deshabilita
+  `Elementos` aunque Omni figure `Disponible`. Corregir/desplegar Studio queda fuera del alcance autorizado.
 
 > **Límite TASK-1632:** el wake desde completion de provider hacia finalización de Producer y Asset Governance es
 > un handoff interno de Globe, actualmente diseñado pero aún no implementado. No cambia este ledger de promoción,

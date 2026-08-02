@@ -118,6 +118,11 @@
 - Estado honesto: `code complete, rollout pendiente`; resolver la discrepancia de la superficie Producer/BFF
   requiere una reconciliación de Studio/runtime que queda fuera de este alcance porque esta sesión no autoriza
   desplegar Globe Studio. No reabrir la evaluación ni reutilizar su candidato retenido.
+- Diagnóstico live preciso: la revisión Studio `globe-studio-internal-00133-b9k` (`595f0cb5460e`) hidrata el client
+  bundle (`/_client-seam` → `Estado: 0`), pero su `MODE_CAPABILITIES.video` deja la posición de `Elementos`
+  como `undefined`; el Composer filtra por capability y por eso renderiza el chip deshabilitado aunque Omni sea
+  `Disponible`. Corregir y desplegar ese cliente queda fuera de alcance por la prohibición explícita de desplegar
+  Studio; no se debe simular el modo desde `Crear` ni forzar el control.
 
 ## Checkpoint 2026-07-23 — rollout parcial honesto
 
