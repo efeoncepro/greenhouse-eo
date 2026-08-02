@@ -209,6 +209,31 @@ Fíjate en tres cosas: exige las **salidas** (no la conclusión), **cierra la pu
 declara que `rollout pendiente` **cuenta como cumplido** — sin eso el evaluador puede empujar a
 Claude a cruzar la frontera para "terminar".
 
+### Componer con `/implement-task`
+
+No compiten: `/implement-task` es el **harness** (proceso + checklist de gates), `/goal` es el
+**motor**. Pero el orden importa y es donde se falla solo.
+
+**El goal se fija en FASE 4, no en FASE 0.** El harness tiene checkpoints humanos en FASE 2, FASE 3
+y FASE 4 (`si P0/P1 o blast alto → STOP checkpoint humano`). Un goal puesto antes de arrancar
+**pasa de largo por los tres**. Secuencia canónica:
+
+```
+1. /implement-task <###>       → corre FASES 1-4 e imprime el plan
+2. el operador mira el plan    → aquí decide de verdad
+3. /goal <condición del plan>  → empuja FASES 5-6 solo
+```
+
+Así la condición cita **slices reales** en vez de una aspiración. En P0/P1 o blast alto ese orden es
+obligatorio.
+
+**La condición hereda los gates del harness**, porque un goal amplio optimiza hacia su condición y
+se come el ritmo por slice:
+
+> *"Por cada slice: `pnpm local:check` + tests focales y commit
+> `feat(<domain>): TASK-### Slice N — <título>`, con `git status --short` antes de commitear para no
+> acoplar WIP ajeno. Al cerrar: `pnpm test` completo + `pnpm build` de producción."*
+
 ### Preflight — el paso que no se salta
 
 Si el operador pide ejecutar/implementar/continuar una `TASK-###` **sin `/goal` explícito**:

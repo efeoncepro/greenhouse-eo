@@ -28,6 +28,7 @@ Fuente oficial: [Run prompts on a schedule](https://code.claude.com/docs/en/sche
 | El trabajo debe seguir hasta cumplir una condición, no cada X minutos | **`/goal`** → `claude-goal-command` |
 | Debe correr sin tu máquina encendida / sin sesión abierta | **Routines** (cloud) o **Desktop scheduled tasks** o **GitHub Actions** |
 | Evento externo puede empujarse a la sesión (CI que avisa) | **Channels** |
+| Implementar una `TASK-###` | **`/implement-task` + `/goal`**. NUNCA `/loop` sobre ese command: es un pipeline lineal con fases y cada disparo lo reinicia desde Discovery — su propio Budget guardrail declara que re-hacer Discovery una segunda vez es scope creep y hay que detenerse. |
 | Chequeo único a una hora | No uses `/loop`. Di en lenguaje natural: `recuérdame a las 3pm empujar la rama` → tarea de disparo único que se autoborra. |
 
 Queda `/loop` cuando: hay estado externo que el harness **no** puede notificarte (una corrida de CI,

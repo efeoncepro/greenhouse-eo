@@ -44,6 +44,14 @@ Reglas al escribirlo:
 - Debe declarar: objetivo de cierre · evidencia obligatoria · límites de alcance (qué NO se toca) · estado correcto si falta rollout (`code complete, rollout pendiente` u `operativamente bloqueado`) · si conviene `mantente en develop` y si se autorizan subagentes.
 - Ante transporte ambiguo (no se sabe si el efecto ocurrió): **leer readers/estado antes de reintentar**, nunca un segundo submit a ciegas.
 
+**Cuándo fijarlo — en FASE 4, no en FASE 0.** Este harness tiene checkpoints humanos en FASE 2, FASE 3 y FASE 4 (`si P0/P1 o blast alto → STOP checkpoint humano`). Un `/goal` fijado antes de arrancar **pasa de largo por los tres**: el goal no conoce los checkpoints del command. Secuencia canónica: `/implement-task <###>` corre FASES 1–4 e imprime el plan → el operador mira el plan → recién ahí se fija el `/goal` para empujar FASES 5–6. Así la condición cita los slices reales en vez de una aspiración. En P0/P1 o blast alto ese orden es obligatorio, no preferencia.
+
+**La condición hereda los gates de este harness.** Un goal amplio optimiza hacia su condición y se come el ritmo por slice. Incluye siempre: *"por cada slice `pnpm local:check` + tests focales y commit `feat(<domain>): TASK-### Slice N — <título>`, con `git status --short` antes de commitear para no acoplar WIP ajeno; al cerrar `pnpm test` completo + `pnpm build` de producción"*.
+
+**Mal motor para UI y para runtime.** El evaluador del goal juzga texto, no ve imágenes ni runtime: puede cerrar con "los cuatro gates pasaron" mientras la pantalla se ve genérica, o dar por buena una afirmación de que algo funciona en producción. En UI el goal sirve para llegar hasta los gates, no para declarar calidad visual; y `code complete ≠ operationally complete`.
+
+**Nunca `/loop` sobre este command.** Es un pipeline lineal con fases: cada disparo lo reiniciaría desde Discovery, y el Budget guardrail de más arriba declara que re-hacer Discovery una segunda vez es señal de scope creep y hay que detenerse. `/loop` es para relojes ajenos (canary, proveedor async, deploy, CI, otra sesión), no para trabajo propio. Detalle de ambos mecanismos: skills `claude-goal-command` y `claude-loop-command`.
+
 Contenido canónico compartido con Codex (mismo contrato, distinto mecanismo): `docs/operations/CODEX_EXECUTION_PROMPT_V1.md` §GOAL PREFLIGHT y §UI/UX GOAL GUARD.
 
 ## Skills (invocar una vez por dominio, antes de escribir)
