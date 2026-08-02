@@ -318,18 +318,18 @@ Ninguna para la foundation. Las promociones, atestaciones y canaries permanecen 
 ## Acceptance Criteria
 
 - [x] ADR aceptado e indexado define operación, slots/roles, controles, mecanismo de soporte y output contract.
-- [ ] El catálogo expone un descriptor versionado browser-safe sin provider IDs/slugs/costos/secrets.
-- [ ] Slots declaran media/MIME, cardinalidad, roles, orden, límites y combinaciones válidas.
-- [ ] Controles declaran `native-parameter | prompt-semantic | reference-conditioned | preprocessed | postprocessed | unsupported`.
-- [ ] `reference`, `first-frame`, `edit-source` y `motion-source` conservan semánticas distintas hasta manifest/lineage.
+- [x] El catálogo expone un descriptor versionado browser-safe sin provider IDs/slugs/costos/secrets.
+- [x] Slots declaran media/MIME, cardinalidad, roles, orden, límites y combinaciones válidas.
+- [x] Controles declaran `native-parameter | prompt-semantic | reference-conditioned | preprocessed | postprocessed | unsupported`.
+- [x] `reference`, `first-frame`, `edit-source` y `motion-source` conservan semánticas distintas hasta manifest/lineage.
 - [ ] Estimate/approval/idempotency invalidan ante cambios de ruta, inputs/roles, controles u output.
-- [ ] Un control/input requerido no soportado falla antes de reserva/provider submit con error canónico.
+- [x] Un control/input requerido no soportado falla antes de reserva/provider submit con error canónico.
 - [ ] Manifest/run evidence conserva schema revision, roles y controles aplicados/rechazados sin secretos.
 - [ ] Rutas legacy tienen dual-read/equivalence tests y rutas nuevas no pueden registrarse sin descriptor.
 - [ ] Fixtures Omni/Seedance/Veo demuestran una UI intent común con traducciones distintas dentro de adapters.
 - [ ] UI/SDK/MCP/CLI consumen la misma proyección o permanecen explícitamente policy-blocked/unsupported.
 - [ ] La task consumidora registra canaries UI terminales de Seedance y Omni con un cobro/output por generación.
-- [ ] `pnpm check && pnpm build` en Globe y gates documentales Greenhouse quedan verdes.
+- [x] `pnpm check && pnpm build` en Globe y gates documentales Greenhouse quedan verdes.
 
 ## Verification
 
@@ -506,3 +506,51 @@ Tres caminos, en orden de preferencia:
 
 Hasta que exista esa evidencia —un run facturable, un attempt terminal y **un** cobro por generación leído del
 ledger, más output retenido, playback, lineage y governance— esta task **no** puede declararse `complete`.
+
+## Delta 2026-08-02 — estado verificado contra el código, no contra el plan
+
+Auditoría independiente de los 13 criterios leyendo el código, no los commits. **7 cerrados, 6 abiertos.**
+La task sigue `in-progress`.
+
+**Por qué esto no contradice el "code complete" del handoff anterior:** ese estado se refería a las fases
+1–2 del plan de continuidad, que es un marco distinto de estos criterios. Dos varas, ninguna deshonesta.
+
+### Cerrados y verificados
+
+Descriptor browser-safe sin provider IDs/slugs/costos/secretos · slots con media/MIME, cardinalidad, roles,
+orden y combinaciones · controles declarando su mecanismo · `reference`/`first-frame`/`edit-source`/
+`motion-source` con semánticas distintas hasta el snapshot de lineage · requerido + no soportado falla antes
+de reservar · `pnpm check` y `pnpm build` verdes (1.506 tests).
+
+### Abiertos — el eje de APLICACIÓN
+
+El contrato declara **cómo se honraría** cada control. Nada lo honra todavía. Concretamente:
+
+1. **Nadie consume `creativeControls`.** Fuera del catálogo, su validador y los tests: cero consumidores.
+   No existe traducción de `prompt-semantic` al prompt ni de `native-parameter` al payload.
+2. **`RouteCreativeIntentV1` no lleva valores de control.** Su forma es
+   `{schemaVersion, routeRevision, operation, combinationId, inputAssignments}` — no hay campo donde el
+   caller ponga «dolly in, contrapicado». El eje entero está sin cablear del lado del pedido.
+3. **El fingerprint del approval no incluye controles ni roles.** `commercial-credit-lifecycle.ts:30` firma
+   `{quote, provider, route, model, modelVersion, rateId, catalog, credits}`. Cambiar la dirección de cámara
+   **no invalidaría el approval**, que es exactamente lo que el criterio exige.
+4. **Sin dual-read/equivalence de rutas legacy** (Slice 4). El único archivo con «equivalence» en el repo es
+   de tokens y no tiene relación.
+5. **Sin fixtures Omni/Seedance/Veo** que demuestren una intención común con traducciones distintas.
+6. **Canary de Omni pendiente.** Seedance **sí** quedó registrado el 2026-08-02: `ref/motion/loop-v1`,
+   `candidate_ready`, 16 cr, 1 output, cobro único verificado en el ledger. Omni no: su ruta
+   (`ref/motion/reference-v1`, «Elementos») sigue sin promover, y además arrastra un bloqueo propio — el
+   binding declara `provider=vertex-omni` sobre `aiplatform.googleapis.com` mientras `app.ts:4173,4175`
+   inyectan `createGeminiOmniTransport` por Generative Language. Su canary cobraría por una identidad
+   distinta de la aprobada.
+
+### Trabajo del mismo día que NO pertenece a esta task
+
+Para que nadie lo cuente como avance de 1633: la card optimista y el filtro de estado del feed son
+`TASK-1559`; el tope de reintentos, las señales de outbox y el motivo diagnosticable son `ISSUE-135`; el
+desempate de las policies de rights fue un incidente cuyo arreglo de fondo es `TASK-1634`.
+
+### Alcance restante
+
+Cablear el eje de aplicación (1–3), Slice 4 (4–5) y el canary de Omni (6) — este último **bloqueado** hasta
+que TASK-1504 resuelva el transporte.
