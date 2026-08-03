@@ -2,6 +2,25 @@
 
 Historia anterior: [Handoff.archive.md](Handoff.archive.md).
 
+## TASK-1635 — entorno de desarrollo de Globe: código listo, apply pendiente (2026-08-03)
+
+**Estado: `code complete, rollout pendiente`.** Globe tiene UN solo entorno —lo desplegado—, así que probar
+cualquier cambio cuesta un despliegue. Detalle, invariantes y evidencia en
+[`TASK-1635`](docs/tasks/in-progress/TASK-1635-globe-local-development-multimodal-harness.md).
+
+Commiteado en Globe `main`, local, **sin push**: `864ce68` (entorno + dos guardarraíles mecánicos, ambos
+probados en rojo) y `f1b8e6e` (migraciones alcanzan la base dev). `tofu plan` con el flag OFF da `No changes`;
+ON da **43 to add, 0 change, 0 destroy**, sin tocar la instancia.
+
+**Bloqueado, requiere al operador:** `tofu apply`, valores de los 11 secretos de firma out-of-band, y correr
+`bootstrap-development.sql` + `verify-development-isolation.sql` por el proxy. Su **orden es load-bearing**: el
+CONNECT productivo se hace explícito antes de revocar `PUBLIC`, o producción pierde su propia base (en las 49
+migraciones no hay un solo `GRANT CONNECT`). Recién después: migrar dev, `globe:dev` y generación real.
+
+**Decisión abierta:** credenciales de proveedor compartidas con producción (aislamiento por workspace + tope
+diario) vs. cuentas propias. El despliegue por lote se movió a
+[`TASK-1636`](docs/tasks/to-do/TASK-1636-globe-deployable-promotion-bundle.md), bloqueada por ésta.
+
 ## SKY Blog — propuesta técnica V2 y arquitectura económica (2026-08-03)
 
 - V2 técnica append-only en [`docs/commercial/tenders/sky-blog-2026/`](docs/commercial/tenders/sky-blog-2026/): fuente,
