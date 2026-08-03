@@ -20,6 +20,15 @@ payload Tailwind. El renderer vanilla y `producerStyles` permanecen sólo como f
 
 La dirección de producto móvil de Globe es continuity-first y native-first según [ADR-018](docs/architecture/creative-studio/EFEONCE_GLOBE_MOBILE_CONTINUITY_APPLICATION_DECISION_V1.md): React Native + Expo development builds/CNG es la dirección tecnológica de una companion Android/iOS; web/PWA queda como fallback. El vertical slice debe validar PKCE, deep links, captura, upload interrumpible, push reconciliable, handoff y compatibilidad binary/API; no cambia todavía el runtime ni el rollout internal-only.
 
+Las decisiones de arquitectura de Globe se enrutan por el overlay `.claude/skills/arch-architect/globe-overlay.md`
+(pinned decisions G1–G10, los dos bug class canonizados y cómo condiciona un modelo generativo). Decide la FORMA;
+la skill espejo `greenhouse-globe` (`.claude/` + `.codex/`, paridad verificada por `pnpm skills:mirrors`) llena la
+implementación. Cada ruta ejecutable publica un contrato creativo versionado y autocontenido —operación, slots con
+rol, combinaciones, controles con mecanismo y forma de valor, contrato de salida— según
+[ADR-022](docs/architecture/creative-studio/EFEONCE_GLOBE_ROUTE_CREATIVE_CONTRACT_DECISION_V1.md): el contrato
+declara qué honra la ruta y el brief lleva el valor pedido, nunca al revés, y la forma de salida (duración, ratio,
+resolución) pertenece a `RouteConstraintsV1`/`OutputShapeV1`. La compilación del prompt efectivo es por ruta.
+
 La flota de modelos de Globe se resuelve y promueve por identidad exacta de ruta. El estado live se consulta en
 `globe.producer.fleet.list` y el mapa humano en `GLOBE_MODEL_FLEET_STATUS.md`; una promoción se cierra con
 evaluación/derechos/readbacks y una generación real desde la UI autenticada. Un MIME de transporte genérico nunca

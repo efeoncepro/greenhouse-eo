@@ -10,7 +10,13 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
 
 const repo = resolve(new URL('../..', import.meta.url).pathname)
-const mirroredSkills = ['efeonce-mcp-platform']
+/*
+ * `greenhouse-globe` entra el 2026-08-03: los dos bundles ya se venían manteniendo a mano y byte a
+ * byte, sin nada que lo verificara. Un espejo que nadie valida diverge en silencio — es la misma
+ * clase de drift invisible de ISSUE-126, donde una dependencia cambió de contenido sin que ninguna
+ * versión lo delatara y la reconciliación falló dos días con su scheduler en verde.
+ */
+const mirroredSkills = ['efeonce-mcp-platform', 'greenhouse-globe']
 
 const filesIn = root => {
   if (!existsSync(root)) return null

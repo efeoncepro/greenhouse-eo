@@ -252,6 +252,35 @@ histórico era inalcanzable. **No faltaba paginación: estaba a medio cablear.**
   `gcloud run services describe … --format='value(status.latestReadyRevisionName)'` y comparar el commit de la
   imagen contra `origin/main`.
 
+#### La secuencia que SÍ despliega — ejecutada y verificada cuatro veces el 2026-08-02/03
+
+Los cinco commits de `TASK-1633` salieron a producción con esta secuencia, sin variantes. No es una lista de
+opciones: cada paso es precondición del siguiente.
+
+1. **`push`/merge a `main`** — no despliega nada (trampa de arriba).
+2. **CI verde sobre el SHA EXACTO**, no «el último run del workflow». `deploy-internal.yml` valida el SHA contra
+   `refs/heads/main` en `Verify exact remote main SHA` y rechaza cualquier otro; el SHA sale de `git rev-parse`,
+   nunca de memoria.
+3. **API:** `gh workflow run deploy-internal.yml -f service=globe-api-internal -f target_sha=<SHA40>`. El input
+   `service` es obligatorio y acotado (`globe-studio-internal` | `globe-api-internal`): desplegar el web **no**
+   despliega la API, y el dispatch de commands ocurre en la API.
+4. **Worker:** `gh workflow run deploy-producer-worker.yml -f target_sha=<SHA40> -f mode=build` y **después** el
+   mismo comando con `mode=deploy`. Son **dos corridas**: `build` publica el digest bootstrap, `deploy` actualiza
+   el Job ya gobernado por Terraform. Correr sólo una deja el Job con la imagen anterior, en silencio.
+5. **Verificar la REVISIÓN ACTIVA y el digest etiquetado, nunca el workflow en verde.**
+   `gcloud run services describe globe-api-internal --format='value(status.latestReadyRevisionName)'` + el tag de
+   la imagen en Artifact Registry contra el SHA. Un workflow `success` prueba que el pipeline corrió, no que el
+   tráfico está en esa revisión ni que el Job tomó ese digest.
+6. **Blast radius medido, no supuesto**, cuando el cambio altera cuándo muere un job: el payload estructurado del
+   worker expone `outboxDeadLetter`/`outboxRetryStorm` desde `ISSUE-135`, y da la **serie temporal** — que es lo
+   que prueba que un dead letter es preexistente y no tuyo. En estos cuatro deploys sirvió **mejor** que la
+   consulta directa a Postgres, que ni siquiera estaba disponible (ADC vencida, `invalid_rapt`): el valor solo no
+   distingue «venía así» de «lo rompí».
+
+Snapshot histórico (no consultar acá el estado vigente, que vive en `GLOBE_RUNTIME_HANDOFF.md`): las cuatro
+corridas pasaron por revisión de API + digest de worker etiquetados con el SHA, con `outboxDeadLetter` estable en
+el preexistente y `retryStorm` en 0.
+
 ## Boundary: Globe es plataforma hermana, no un módulo de Greenhouse
 
 Esta es la regla que gobierna todo lo demás. Interiorízala antes de tocar código.
@@ -565,6 +594,12 @@ Los tres ejemplos anteriores son capabilities con provider detrás. El **Produce
 
 **La distinción que muerde (colisión de término `model`).** El **nombre** del modelo (`"Seedance"`) es público y **≠** el **slug** de wire (`"bytedance/seedance-2.0/text-to-video"`, prohibido). Ojo: el campo `model` del **manifest de adapter** (provider seam, "el slug va en el campo `model`") carga el **slug**; el campo `route.model` del **catálogo** carga el **nombre público**. Son dos campos `model` en dos capas distintas — no los conflaciones.
 
+> **Extendido por ADR-022 / `TASK-1633`:** cada revisión ejecutable de ruta publica además un
+> `RouteCreativeContractV1` con cinco ejes (`operation`, `inputSlots`, `inputCombinations`, `creativeControls`,
+> `outputContract`). `inputModes` y `referencePolicy` quedan **temporalmente** como proyección legacy y, si ambas
+> formas están presentes, **deben ser equivalentes**; **una ruta nueva no puede nacer sólo con el contrato legacy**.
+> Ver *El noveno ejemplo* más abajo antes de agregar o tocar una ruta.
+
 ## El output side del Creative Producer (TASK-1503) — la capability de gasto CERO cuya autoridad no puede venir del store
 
 Los ejemplos anteriores **producen** piezas. TASK-1503 es el **output side**: hace **usable** una pieza ya generada — recuperarla, listarla, marcarla, reusarla como referencia. Vive en `packages/{contracts,domain}/src/producer-assets.ts`, con el seam de lectura en `apps/creative-runner/src/output-retrieval.ts`, el grant en `apps/studio-web/src/retrieval-grant.ts`, la ruta de serving en `apps/studio-web/src/app.ts` y la persistencia en `packages/database/src/stores/producer-asset-store.ts`. Es el patrón a copiar cuando una capability **no gasta** pero **expone bytes**.
@@ -858,6 +893,195 @@ históricos “OpenAI pendiente” ni “Nano Banana 2 en 404”: revalida dispo
 Aunque el payload de Fal declare `image/svg+xml`, el CDN puede responder `application/octet-stream`; aplica la
 excepción estrecha de MIME + validación de bytes descrita arriba y sirve con CSP `sandbox`. Una aceptación genérica
 por proveedor, extensión o URL sería fail-open.
+
+## El noveno ejemplo — El contrato creativo por ruta (ADR-022 / TASK-1633): cinco ejes, dos guards y un dueño por valor
+
+El Producer Route Catalog (TASK-1500) publicó **dato gobernado**. `ADR-022` publica **el contrato de ejecución de
+ese dato**: cada revisión ejecutable de ruta lleva un `RouteCreativeContractV1` browser-safe y autocontenido que
+separa cinco ejes que antes venían mezclados en `capability` + `inputModes` + una policy plana de referencias.
+Canon: [`EFEONCE_GLOBE_ROUTE_CREATIVE_CONTRACT_DECISION_V1.md`](../../../docs/architecture/creative-studio/EFEONCE_GLOBE_ROUTE_CREATIVE_CONTRACT_DECISION_V1.md)
+(ADR-022 `Accepted` 2026-08-02, con sus Deltas **(b)** —dónde viaja el valor de un control— y **(c)** —el prompt
+efectivo también se compila por ruta—). Dueña: `TASK-1633`, **`in-progress` con 10 de 17 criterios cerrados**.
+
+**Por qué existe.** Gemini Omni lo hizo visible: su ruta se publicó como un modo `elements` aunque conserva prompt
+y admite referencias de imagen, así que al quedar no disponible **el botón entero** dejó de ser accionable. La UI
+convertía composiciones de entrada en botones de modo, cambiaba de modelo al cambiar de modo y duplicaba topes; los
+adapters inferían intención por tipo o cantidad de archivos. No es un problema de Omni: referencias, cámara,
+movimiento, estilo, temporalidad y audio son conceptos comunes cuya implementación cambia **por ruta**.
+
+**Los cinco ejes, y el estado REAL de cada uno** (verificado contra el código, no contra el plan):
+
+| Eje | Qué declara | Estado |
+|---|---|---|
+| `operation` | intención de producto (`create`, `edit`, `extend`, `upscale`) | **cableado**; `route_operation_unsupported` la rechaza pre-spend |
+| `inputSlots` | rol semántico, autoridad, medios, MIME, cardinalidad, orden | **cableado y completo** — es el eje mejor resuelto; el fingerprint **sí** incluye roles y ordinales |
+| `inputCombinations` | conjuntos válidos de slots + cuál es el default | **cableado** |
+| `creativeControls` | qué controles honra la ruta, por qué mecanismo y **con qué `valueShape`** | **descriptor cableado**; **el cableado de VALORES desde una superficie sigue abierto** (`TASK-1552`) |
+| `outputContract` | modalidad, MIME reales y presencia de audio embebido | **cableado**; la **forma de salida** (duración/ratio/resolución) es de este eje + `RouteConstraintsV1`/`OutputShapeV1`, **no** un control |
+
+**Dónde vive.** Tipos públicos en `packages/contracts/src/producer-catalog.ts` (+ el vocabulario del brief en
+`packages/contracts/src/structured-briefs.ts`); catálogo, guards de carga y compilación del brief en
+`packages/domain/src/{producer-catalog,structured-briefs,model-lab}.ts`; el compiler de ruta de producción y sus
+razones nombradas en `apps/creative-runner/src/production-route-compiler.ts`; la clasificación de fallos en
+`packages/domain/src/governed-run-failure-policy.ts`. Catálogo en **`PRODUCER_CATALOG_VERSION = '1.7.0'`**.
+
+### Una causa, un código — y la familia entera clasificada (`@8986b45` + `@ac1999f`)
+
+**`route_creative_contract_mismatch` colapsaba NUEVE causas con remedios opuestos** —re-estimar contra la revisión
+vigente, elegir otra operación, elegir otro slot, cambiar el asset, convertir el archivo—. El operador sabía que
+algo del contrato no calzó, jamás cuál. Fue la **décima** aparición del bug class de `ISSUE-127`, y la única con
+agravante propio: **los nombres correctos ya estaban escritos en la spec de la task y la implementación los
+colapsó igual**. Conocer la regla no la aplica sola; escribirla en la spec tampoco.
+
+Hoy son **ocho códigos, uno por causa**: `route_creative_contract_incomplete` (el pedido llegó a medias — se
+resuelve **re-preparando**, no cambiando el contrato, por eso no comparte código con los desajustes),
+`route_contract_revision_mismatch`, `route_operation_unsupported`, `route_input_slot_unknown`,
+`route_input_role_mismatch`, `route_input_media_type_invalid`, `route_input_mime_type_invalid`,
+`route_input_assignment_unresolved`. **Media type y MIME quedan SEPARADOS a propósito**: uno pide **otro asset**,
+el otro pide **convertir el que ya tienes**. Sin migración: estas razones se registran como
+`route_dependency_unavailable`, así que el vocabulario cerrado de `production_router_decisions` no cambia.
+
+Ambos vocabularios (`PRODUCTION_ROUTE_DEPENDENCY_REASONS`, `PRODUCTION_ROUTE_DENIAL_CODES`) pasaron de **union type
+a array `as const`**: un union **no sobrevive al compilado**, y el paso siguiente necesita **enumerarlos** para
+afirmar cobertura en un test. Es la forma canónica cuando un vocabulario tiene que ser auditable, no sólo tipado.
+
+**El hallazgo que amplió el trabajo: de las 35 razones que el compiler sabía nombrar, sólo DOS estaban
+clasificadas** en `governed-run-failure-policy.ts` (las de derechos). Las otras 33 caían a `unknown`, tope 3,
+gastando tres entregas cada una en algo determinista — un allowlist vacío, un MIME que el slot no acepta, un body
+que el sanitizador rechaza. **Y estaba invisible porque el tope de `ISSUE-135` hizo su trabajo**: tres reintentos
+no llaman la atención de nadie. Es exactamente la forma en que una red de seguridad **esconde** el problema que
+estaba conteniendo — la versión atenuada de las 705 entregas, en el mismo camino de materialización de inputs.
+
+Reparto vigente: **38 `terminal`** (identidad y estado de ruta —piden un humano que promueva o habilite—,
+presupuesto —el fence ya liberó la reserva—, configuración de endpoints y regiones, forma del request compilado,
+las ocho del contrato creativo y las once del body snapshot), **3 `transient`** (`provider_unavailable`,
+`decision_persistence_failed`, `decision_record_failed` — las únicas del compiler que **no** son deterministas: el
+circuito se cierra solo cuando el proveedor se recupera, y las dos de decisión son fallas de **persistencia**, no
+del pedido) y **2 `unknown` DECLARADOS** (`route_compilation_failed`, `route_dependency_unavailable`: son catch-all
+que nombran «algo falló y no sé qué»; asumir determinismo mataría corridas recuperables, asumir transitoriedad
+reviviría muertas, y el tope 3 es la respuesta prudente a **no saber**).
+
+**Lo que hace que no recaiga:** `apps/creative-runner/src/production-route-failure-classification.test.ts` **rompe
+el build** si una razón nueva nace sin clasificar, y verifica los catch-all **en la dirección contraria** (si dejan
+de serlo, su entrada queda mintiendo). Probado en rojo en ambos sentidos, y la tabla de causas también —colapsando
+dos a propósito, el test las atrapa—. **Diez apariciones de `ISSUE-127` probaron que acordarse no funciona; lo que
+funciona es que el build no deje.**
+
+### Un dueño por valor, y la forma declarada (`@e300c4e`, ADR-022 Delta (b))
+
+**`duration`, `aspect-ratio` y `resolution` SALIERON de `ROUTE_CREATIVE_CONTROLS`.** Son **forma de salida**, no
+dirección creativa: su dueño es `RouteConstraintsV1` + `OutputShapeV1`, que ya los valida fail-closed contra la
+ruta y ya los transporta al proveedor. Declararlos también como controles era duplicación de SSOT **dentro del
+mismo contrato**. El dato que lo confirmó al retirarlos: las **únicas** rutas que declaraban `resolution` como
+control eran **las dos de upscale** — precisamente las que no tienen dirección creativa. El control estaba
+supliendo la ausencia de un vocabulario de salida que ya existía en otro lado; hoy declaran `creativeControls({})`,
+que describe exactamente lo que un upscale es. Verificado que no deja consumidores huérfanos.
+
+**`valueShape` cierra la asimetría del descriptor.** Declaraba **cómo** se honraría un control y si era
+obligatorio, pero nada sobre **qué se puede pedir** — así que el fail-closed pre-spend, que es el corazón de este
+contrato, **no alcanzaba a este eje**: no había contra qué validar. Los `inputSlots` sí tenían contraparte tipada
+(cardinalidad, media, MIME, orden). Formas: **`text`** para la dirección creativa —estos modelos responden a
+lenguaje de oficio («dolly in», «hora dorada») porque está en su corpus, no a taxonomías inventadas, y el límite se
+alinea al de un ingrediente del brief, que es donde estos valores van a vivir—, **`enum`** para el conjunto cerrado
+**real** de un proveedor y **`number`** para el paramétrico. El guard de carga lo exige **en SUS DOS DIRECCIONES**:
+un control honrado **sin** forma promete algo que nadie puede validar; un `unsupported` **con** forma promete una
+afordancia que la ruta no honra.
+
+### Un solo vocabulario de dirección creativa (`@1b580f8`, cierra el Delta (b))
+
+**El brief PIDE y el contrato de ruta declara SI SE HONRA: son dos caras del mismo vocabulario**, y divergían en
+las **tres** formas posibles a la vez. Hoy `BRIEF_INGREDIENT_KINDS` y `ROUTE_CREATIVE_CONTROLS` están alineados
+**1:1**:
+
+- **`light` → `lighting`** y **`framing` → `composition`**: un nombre por concepto.
+- **Al brief** entran `camera`, `lens`, `motion`, `timing`, `audio-direction` — eran controles que **ninguna
+  superficie podía pedir**.
+- **A los controles** entran `subject`, `mood`, `palette` — eran ingredientes pedibles **sin que ninguna ruta
+  declarara si los honra**.
+- **Tres controles quedan sin ingrediente, DECLARADOS y verificados**: `prompt` (es el brief entero),
+  `negative-prompt` (viaja en `notes`) y `seed` (determinismo, no dirección).
+
+Las tres divergencias eran **silenciosas** —un ingrediente sin control es una promesa que nadie validó; un control
+sin ingrediente es soporte que ningún caller puede ejercer; dos nombres para un concepto son ambas cosas a la vez—
+**por eso hace falta un test y no una convención**: `packages/domain/src/structured-brief-vocabulary.test.ts` cubre
+las dos direcciones **más la honestidad de las excepciones** (si `negative-prompt` deja de ser caso especial, su
+entrada queda mintiendo y el test lo dice). Probado en rojo.
+
+**Renombrar fue seguro sobre lo persistido, y no por suerte** — el dato salió de **leer el camino**, no de un
+`SELECT`: `experiment-store.get` devuelve el JSON **sin revalidar**, `normalizeStructuredBrief` se llama en **un
+solo lugar** (camino de ENTRADA), y lo que alimenta al proveedor es el `effectivePrompt` ya compilado y **congelado
+en el snapshot**. Ninguna de las tres capas re-lee el vocabulario; el caso residual —un cliente viejo mandando
+`light`— falla **fail-closed**, no en silencio.
+
+De paso, los fixtures de **controles** pasan a **derivarse** del vocabulario. Estaba copiado literal en **cuatro**
+lugares y cada copia rompió por separado **y en una capa distinta** —guard del catálogo, error de **tipo** en el
+runner, aserción en contracts, integración en studio-web—: eso no es el sistema fallando cuatro veces, es el mismo
+dato avisando cuatro veces, y ese ruido **escondería una regresión real**. Los fixtures de **ingredientes** siguen
+literales a propósito: son casos de uso concretos, no la lista.
+
+### El brief se compila POR RUTA (`@91d1f71`, ADR-022 Delta (c), primera mitad)
+
+`compileStructuredBrief` era **una función global** que emitía el mismo texto para Seedance, Omni y Veo, corriendo
+en `domain` **antes** del adapter — exactamente la falla que este ADR corrige en el eje de inputs, intacta en el
+**único eje que TODAS las rutas consumen**. El puerto lo hacía explícito en su firma: `compile(raw)` **no recibía
+la ruta**, así que estructuralmente no podía informarla. Tres cambios:
+
+1. **El contrato de ruta llega al compilador**, y se resuelve **ANTES** de compilar el prompt (antes se resolvía
+   después). Leer el `referenceRoute` del payload todavía sin validar es seguro: una ruta inexistente da
+   `undefined`, el compilador cae al comportamiento legacy y `validatePreparePayload` la rechaza **dos líneas más
+   abajo**.
+2. **Un ingrediente cuyo control la ruta declara `unsupported` se RECHAZA**, con `UnsupportedBriefControlError` y
+   el control nombrado del lado del servidor. Degradarlo en silencio es exactamente lo que este contrato existe
+   para evitar: el caller pide dirección de cámara, **paga**, y recibe una pieza donde nadie la aplicó.
+3. **El peso ORDENA y ya no se imprime.** `[weight=0.820]` viajaba al proveedor **como texto**: un encoder de
+   difusión **no tiene jerarquía de instrucción** —convierte todo en embeddings de condicionamiento que compiten en
+   una sola secuencia plana—, así que gastaba tokens y no condicionaba. El prompt weighting real opera en el
+   espacio de embeddings del pipeline de inferencia (`(palabra:1.2)`, `guidance_scale`) y una API cerrada no lo
+   expone. **El orden sí condiciona**, porque la atención sigue la estructura del lenguaje.
+
+**El `catch` volvió a colapsar la razón, en código escrito para cerrar ese bug class.** El bloque que envolvía la
+compilación mapeaba todo a `badRequest`, incluida la razón nueva. «La ruta no honra ese control» **no** es «el
+brief está mal formado», y la acción del operador es distinta —elegir otra ruta o quitar esa dirección, no corregir
+el JSON—: se **re-lanza tal cual**. Undécima aparición del patrón de `ISSUE-127`, y la primera atrapada **antes**
+de mergear.
+
+**🔴 Límite declarado, autorizado por el operador — no lo leas como verificado.** Quitar el peso **cambia el texto
+que llega al proveedor en TODAS las rutas**, y **no se pudo verificar con un canary**: siguen bloqueados por el
+transporte de `TASK-1504`. Es una **mejora razonada** sobre cómo condicionan estos modelos, **no una mejora
+verificada**. Si aparece una regresión de calidad creativa, éste es el **primer sospechoso**.
+
+**🔴 Cambio de comportamiento visible, elegido a conciencia.** Un usuario en **upscale con preset de estilo activo**
+recibía antes una generación que **ignoraba el estilo y le cobraba**; ahora recibe **error sin gasto**. Se eligió el
+error explícito sobre el cobro silencioso. La UI que evita que el caso llegue siquiera es `TASK-1552`.
+
+### Los DOS guards conviven — autoría y ejecución no son el mismo control
+
+Esta distinción cerró un criterio que se cumplía **de forma vacía**, y hay que conservarla al extender el contrato:
+
+- **Guard de AUTORÍA del catálogo** (corre **al cargar**, en `packages/domain/src/producer-catalog.ts`): impide
+  **declarar lo imposible** — un control honrado sin `valueShape`, un `unsupported` con forma, un slot inconsistente.
+- **Guard de EJECUCIÓN** (`UnsupportedBriefControlError` desde `compileStructuredBrief`, dentro de
+  `prepareExperiment` y por tanto **antes del estimate y de la reserva**): impide **pedir lo que no se honra**.
+
+Mientras no hubo canal para pedir un control, el guard de autoría **solo** hacía la condición inalcanzable: se
+cumplía por vacío. Un guard de autoría nunca sustituye a uno de ejecución, ni al revés.
+
+### Lo que sigue ABIERTO (7 de 17 criterios) — no lo declares cerrado
+
+- **`promptCompilerRevision` NO existe en ningún fingerprint** (verificado por grep: cero ocurrencias), y la
+  compilación **sigue siendo una función global de `domain`**, no vive detrás del adapter. Dos textos distintos
+  para el mismo brief son dos pedidos distintos y **hoy pueden compartir approval**.
+- **13 de las 17 rutas heredan el mecanismo de sus controles del default, sin evidencia por ruta.** El caso duro es
+  `negative-prompt`, declarado `prompt-semantic` por herencia cuando **ningún adapter de Globe manda un campo
+  negativo nativo** (cero ocurrencias de `negative_prompt` en `apps/creative-runner/src`): el `Avoid: …` viaja
+  siempre como texto, y la negación en texto **tiende a reforzar lo que niega**. Donde no exista campo nativo, la
+  salida honesta es reformular en positivo o declararlo `unsupported`, **nunca prometerlo por herencia**.
+- Estimate/approval/idempotencia **no invalidan** todavía ante cambio de ruta/inputs/roles/controles/output.
+- Manifest y run evidence **no conservan** controles aplicados/rechazados.
+- Rutas legacy **sin** dual-read/equivalence; una ruta nueva todavía puede registrarse sin descriptor.
+- Los fixtures Omni/Seedance/Veo prueban **media** cosa: `producer-catalog.test.ts` verifica que las tres resuelven
+  por el **mismo helper sin branch por ruta** —o sea que el contrato es un motor, no la descripción de la ruta #1—,
+  pero **las traducciones distintas dentro de adapters no existen** porque la compilación aún no vive ahí.
 
 ## Provider boundary
 
@@ -1231,6 +1455,13 @@ shippeó con **4 de 11** animaciones del diseño aprobado. El task-lint sólo ve
 - **SIEMPRE** calibra un smoke contra el origen **viejo** antes de un cutover: si falla después, tiene que acusar al cutover y no al instrumento. Un smoke sin calibrar no es evidencia.
 - **NUNCA** expongas por ninguna surface el **slug de wire**, el **costo vendor** ni el **margen** de una ruta del Producer Catalog: lo público es `model = { name, version? }` (el nombre real "Seedance · 2.0" es ancla de posicionamiento), y la taxonomía `house` es OPERATOR-ONLY detrás de `globe.producer.route.reveal_house` (default audiencia `client`, que omite `house`). El **nombre** del modelo ≠ el **slug** (el campo `model` del catálogo es el nombre; el campo `model` del manifest de adapter es el slug).
 - **NUNCA** reimplementes la resolución de rutas del Producer Catalog: reusá los helpers in-process SSOT (`resolveRouteConstraints`/`getProducerRoute`/`listProducerRoutes`) sin re-dispatch por el registry desde dentro de un handler (mismo patrón que el Evaluation Harness); ampliar/tunear una ruta es editar el array de dato + `PRODUCER_CATALOG_VERSION`, nunca el motor del reader.
+- 🔴 **NUNCA una razón nueva del compiler de ruta sin su código propio Y sin clasificarla en el MISMO commit** (ADR-022 / `TASK-1633`). **Una causa, un código**: `route_creative_contract_mismatch` colapsaba nueve causas con remedios **opuestos** y hoy son ocho códigos —`route_creative_contract_incomplete`, `route_contract_revision_mismatch`, `route_operation_unsupported`, `route_input_slot_unknown`, `route_input_role_mismatch`, `route_input_media_type_invalid`, `route_input_mime_type_invalid`, `route_input_assignment_unresolved`—, con **media type y MIME SEPARADOS** porque uno pide **otro asset** y el otro pide **convertir el que ya tienes**. Y la clasificación en `governed-run-failure-policy.ts` va en el mismo commit: `production-route-failure-classification.test.ts` **rompe el build** si falta, y verifica los catch-all en la dirección contraria. Un `unknown` **por olvido** es indistinguible de uno **declarado**, y cuesta tres entregas por corrida en algo determinista — invisible, además, porque el tope de `ISSUE-135` lo absorbe.
+- **NUNCA declares un vocabulario auditable como `union type`**: los que un test tiene que **enumerar** para afirmar cobertura van como array `as const` (`PRODUCTION_ROUTE_DEPENDENCY_REASONS`, `PRODUCTION_ROUTE_DENIAL_CODES`, `ROUTE_CREATIVE_CONTROLS`, `BRIEF_INGREDIENT_KINDS`). Un union no sobrevive al compilado, así que ningún gate puede recorrerlo.
+- 🔴 **NUNCA dos vocabularios para el mismo valor de dirección creativa** (ADR-022 Delta (b)). **El brief PIDE y el contrato de ruta declara SI SE HONRA**: `BRIEF_INGREDIENT_KINDS` ↔ `ROUTE_CREATIVE_CONTROLS` están alineados **1:1**, con **tres excepciones DECLARADAS y verificadas** (`prompt` = el brief entero, `negative-prompt` = viaja en `notes`, `seed` = determinismo). Un ingrediente sin control es una promesa que nadie validó; un control sin ingrediente es soporte que ningún caller puede ejercer; dos nombres para un concepto son ambas cosas — las tres son **silenciosas**, por eso el guard es `structured-brief-vocabulary.test.ts` y no una convención. Y **NUNCA** declares como control creativo un valor de **forma de salida**: `duration`/`aspect-ratio`/`resolution` son de `RouteConstraintsV1` + `OutputShapeV1`, que ya los validan fail-closed contra la ruta.
+- **NUNCA un `RouteCreativeControlSupportV1` honrado sin `valueShape`, ni un `unsupported` CON `valueShape`.** El guard de carga lo exige en **las dos direcciones**: sin forma, el fail-closed pre-spend **no alcanza a este eje** (no hay contra qué validar); con forma sobre un `unsupported`, la ruta promete una afordancia que no honra. `text` para dirección creativa (estos modelos responden a **lenguaje de oficio**, que está en su corpus, no a taxonomías inventadas), `enum` sólo para un conjunto cerrado **real** del proveedor, `number` para el paramétrico.
+- 🔴 **NUNCA degrades en silencio un ingrediente que la ruta declara `unsupported`: se RECHAZA antes del gasto.** El guard de ejecución es `UnsupportedBriefControlError` desde `compileStructuredBrief`, dentro de `prepareExperiment` y por tanto **antes del estimate y de la reserva**, con el control **nombrado server-side**. Degradarlo es exactamente lo que este contrato existe para evitar: el caller pide dirección de cámara, **paga**, y recibe una pieza donde nadie la aplicó. **Los DOS guards conviven y no se sustituyen**: el de **autoría** (al cargar el catálogo) impide **declarar** lo imposible; el de **ejecución** impide **pedirlo**. Un criterio que sólo tiene el primero se cumple **de forma vacía**. Corolario ya cobrado: **NUNCA envuelvas la compilación en un `catch` que colapse esta razón en `badRequest`** — «la ruta no honra ese control» pide otra ruta o quitar esa dirección, no corregir el JSON.
+- **NUNCA imprimas el peso de un ingrediente en el prompt: ORDENA y estructura, no se imprime.** Un encoder de difusión **no tiene jerarquía de instrucción** —convierte el texto en embeddings de condicionamiento que compiten en una sola secuencia plana—, así que `[weight=0.820]` se leía **como texto**: gastaba tokens y no condicionaba. El prompt weighting real vive en el espacio de embeddings del pipeline de inferencia y una API cerrada no lo expone. ⚠️ **Límite declarado:** el retiro del peso **no se verificó con canary** (bloqueados por el transporte de `TASK-1504`) — es mejora **razonada**, no verificada, y es el **primer sospechoso** ante una regresión de calidad creativa.
+- **NUNCA declares cerrado el eje de compilación por ruta:** hoy la compilación **sigue siendo una función global de `domain`** (no vive detrás del adapter) y **`promptCompilerRevision` no existe en ningún fingerprint** (grep: cero ocurrencias), así que dos textos distintos para el mismo brief **pueden compartir approval**. Y **NUNCA** dejes que una ruta herede el mecanismo de un control **por default sin evidencia del contrato oficial de su proveedor**: 13 de las 17 lo hacen, y el caso duro es `negative-prompt` —declarado `prompt-semantic` cuando **ningún adapter de Globe manda campo negativo nativo**—; donde no exista campo nativo, la salida honesta es reformular en positivo o declararlo `unsupported`.
 - **NUNCA** autorices retrieval de un output **contra el store**: el store de Globe es **content-addressed y TENANT-BLIND** (el nombre del objeto ES el hash, un bucket para todos los workspaces) y guarda **los outputs Y los bytes de las referencias private-ingest de entrada** — no sabe de quién es nada. La autoridad la resuelve el **dominio** (`authorizeOwnedOutput`) contra `store.get(workspaceId, experimentId)` — el **MISMO `ExperimentStorePort` del Lab, nunca un índice paralelo** — y sólo sobre `outputHashes` de un attempt `candidate_ready` con `outputsRetained === true`. **NUNCA** consultes `authorizedInputHashes` en un path de retrieval: eso convierte el endpoint de outputs en un lector de los inputs de cualquiera.
 - **NUNCA** devuelvas de un rechazo de **propiedad** en retrieval algo más fino que **`not_found`**: cross-workspace, id desconocido, hash que sólo fue input y candidato no retenido tienen que ser **indistinguibles desde afuera** (un grant forjado/expirado sí es `access_denied`: es fallo de prueba de autorización, no una señal sobre existencia). Un `access_denied` que confirme existencia —o un código que confirme el hash— es un **oráculo para sondear por content hash un bucket compartido**.
 - **NUNCA** dupliques la política de autorización en la ruta de serving: `GET /v1/outputs/:sha256` reusa el **mismo helper del reader** y el **mismo `handlerErrorToApiCode`** (un primitivo, dos transportes) y **RE-EJECUTA** `authorizeOwnedOutput` después de autenticar y de verificar el grant — un candidato que dejó de ser recuperable deja de ser servible aunque el grant siga vivo. El grant (HMAC-SHA256, server-minted, **firmado no cifrado**, bound a `(workspaceId, experimentId, sha256, disposition)`, TTL 300s —rango 30-900—, verify stateless en tiempo constante) **NO es un bearer autosuficiente**; viaja en query porque la UI necesita `src` directo, y **NUNCA** se loggea ni entra a un audit event.

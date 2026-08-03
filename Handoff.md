@@ -2,121 +2,46 @@
 
 Historia anterior: [Handoff.archive.md](Handoff.archive.md).
 
-## TASK-1633 / ADR-022 — auditoría arquitectónica y dónde viaja el valor de un control (2026-08-02)
+## TASK-1633 — contrato creativo de ruta: 5 slices desplegados (2026-08-02/03)
 
-- **Auditoría con `arch-architect` contra `ISSUE-126`/`127`/`135`.** El eje de inputs está bien resuelto y no se
-  tocó. Tres hallazgos, por costo de revertir: (1) `creativeControls` no era un eje nuevo sino el **tercero** que
-  expresa lo mismo que `StructuredBriefV1` y `RouteConstraintsV1`; (2) los cinco códigos de error canónicos que la
-  task promete **tienen cero ocurrencias** — el compiler colapsa nueve causas accionables en
-  `route_creative_contract_mismatch`, décima aparición del bug class de `ISSUE-127`; (3) ese rechazo **no está en
-  `TERMINAL_CODES`** pese a ser determinista, así que cae a `unknown` con tope 3 — versión atenuada de las 705
-  entregas de `ISSUE-135`, y en el mismo camino de materialización de inputs.
-- **ADR-022 Delta (b) aceptado:** `creativeControls` **declara soporte y nunca transporta valores**. El valor de
-  dirección viaja por el canal que ya existe, `prompt XOR structuredBrief`, y los controles que el brief no tiene
-  (`camera`, `lens`, `motion`, `timing`, `audio-direction`, `negative-prompt`) entran como ingredientes nuevos.
-  `duration`/`aspect-ratio`/`resolution` salen de los controles: su dueño es `RouteConstraintsV1`/`OutputShapeV1`.
-  `RouteCreativeIntentV1` **no gana campo de controles**.
-- **Lo que desempató no fue lo que esperábamos.** La hipótesis era que el store de recetas de `TASK-1493` tenía
-  datos cuya migración decidía el asunto. Lectura pura contra producción: **0 recetas, 0 workspaces**; en cambio
-  `prompt_history` con **144 entradas** activas ese día. El argumento correcto resultó ser otro: la regla de
-  exclusión mutua **ya corre en producción** (`producer-client.ts:1191`, `producer_prompt_contract_invalid`) y un
-  campo de valores en el intent la eludiría por el costado, habilitando dos direcciones contradictorias sin error
-  observable.
-- **ADR-022 Delta (c) aceptado — el prompt efectivo también se compila por ruta.** El mismo defecto que la task
-  corrige en inputs seguía intacto en el único eje que **todas** las rutas consumen: `compileStructuredBrief`
-  (`structured-briefs.ts:142`) es global y corre en `domain` antes del adapter, contra la regla del propio ADR de
-  que sólo los adapters traducen; el puerto lo delata en su firma (`compile(raw)`, `app.ts:1416`, sin ruta).
-  Decidido: compilación por ruta detrás del adapter con revisión propia en el fingerprint, el peso **ordena pero
-  no se imprime** (hoy se emite `[weight=0.820]` y el encoder lo lee como texto: no condiciona), el rol del slot
-  informa el texto compilado (hoy se valida y muere ahí), y `native-parameter` gana siempre que exista. **Cuál
-  dialecto es mejor no se decide, se mide** con el Evaluation Harness (`TASK-1458`).
-- **Dos mediciones que lo sostienen:** **13 de 17 rutas** heredan `PROMPT_CONTROLS` sin evidencia propia, y
-  **ningún adapter manda campo negativo nativo** (cero `negative_prompt` en `apps/creative-runner/src`) — así que
-  `negative-prompt: prompt-semantic` es una promesa heredada, y la negación en texto tiende a reforzar lo que
-  niega. El cambio es de **firma**, no de arquitectura: el puerto ya existe y la implementación por defecto
-  preserva el texto actual de todas las rutas.
-- **Hallazgo lateral para `TASK-1552`:** la capability de guardar/reutilizar recetas existe desde el 2026-07-22 y
-  tiene **cero uso porque nunca tuvo UI**; y el composer usa el brief de forma degradada — el prompt entero entra
-  como un solo ingrediente `subject` de peso 1, con la composición ponderada construida y sin ejercer.
-- Task actualizada con Slice 3.5, `valueShape`, criterio 7 desmarcado (su guard es de autoría del catálogo, no de
-  ejecución) y dos criterios nuevos. Corregido el delta previo: el fingerprint **sí** incluye roles y ordinales.
-- **Reparto de alcance para que 1633 tenga un cierre alcanzable.** Una foundation no puede quedar abierta
-  esperando trabajo que no controla:
-  - **`TASK-1504` (Delta b)** recibe el **canary de Omni** y la simetría API/worker del transporte. El bloqueo es
-    suyo y es P0: la identidad declara `vertex-omni` mientras `app.ts:4173,4175` inyectan Generative Language, así
-    que hoy cobraría por una identidad distinta de la aprobada. Sus rutas nuevas declaran mecanismos con evidencia
-    en vez de heredar el default.
-  - **`TASK-1552` (Delta b)** recibe la medición del composer —**el descriptor ya le llega al navegador y la UI lo
-    ignora**, `mode` es índice numérico, `references` es lista plana sin rol, 3.064 líneas— y tres capacidades
-    pagadas sin superficie: recetas guardadas en **0** desde el 2026-07-22, composición ponderada ejercida al
-    mínimo, y el campo de exclusión ofrecido sin mecanismo nativo en ninguna ruta.
-  - **`ISSUE-127`** registra su **décima** aparición, con el agravante de que los cinco nombres correctos ya
-    estaban escritos en la spec de 1633 y la implementación los colapsó igual.
-  - **`ISSUE-135`** registra que la clasificación necesita una **regla de nacimiento**, no otra fila: el tope
-    funcionó y por eso el defecto queda invisible. Abrir razones y clasificarlas es un solo trabajo.
-- 1633 conserva: eje de aplicación, Slice 4, razones nombradas y mecanismos por ruta. Suelta el canary.
-- **Ejecutado el mismo día — Slices 1 y 2 en Globe, `code complete, rollout pendiente`:**
-  - `efeonce-globe@8986b45` — ocho códigos, uno por causa. Media type y MIME separados porque el remedio difiere
-    (otro asset vs convertir el que tienes); `route_creative_contract_incomplete` con código propio porque «llegó a
-    medias» se resuelve re-preparando, no es un desajuste. Tabla de causas **probada en rojo** + aserción de
-    unicidad contra la recaída. Cierra `ISSUE-127` en Globe.
-  - `efeonce-globe@ac1999f` — el hallazgo que amplió el slice: de **35 razones del compiler, sólo 2 estaban
-    clasificadas**. 38 pasan a `terminal`, 3 a `transient`, 2 quedan `unknown` **con su razón declarada**. Test que
-    rompe el build si una razón nueva nace sin clasificar, probado en rojo en ambas direcciones. Cierra el punto de
-    clasificación de `ISSUE-135`; sus dos señales siguen abiertas.
-  - **Por qué estaba invisible:** el tope de ISSUE-135 hizo su trabajo. Tres reintentos no llaman la atención de
-    nadie — así es como una red de seguridad esconde el problema que contiene.
-  - Sin migración (se registran como `route_dependency_unavailable`). `pnpm check` + `pnpm build` exit 0;
-    `creative-runner` 270 → 282.
-- **ROLLOUT EJECUTADO Y VERIFICADO EN RUNTIME (2026-08-02).** `ac1999f` en `origin/main`, CI verde sobre ese SHA;
-  `globe-api-internal` en revisión **`00194-l4s`** con imagen `…:ac1999f2ea16` y 100 % del tráfico (responde 403,
-  vivo y protegido); `globe-producer-worker` con digest `sha256:c3c48db2…` etiquetado al mismo SHA.
-  **Blast radius medido, no supuesto:** el cambio altera cuándo muere un job, así que se verificó contra la outbox
-  viva — `outboxDeadLetter` estaba en **1 desde 2,5 h ANTES** del deploy y venía bajando (5 → 3 → 1) por la limpieza
-  de ISSUE-135; post-deploy sigue en 1, `outboxRetryStorm` en 0, worker con `claimed=0`. **El rollout no mató
-  ninguna corrida.**
-  Método a recordar: la lectura directa a PG no estaba disponible (**ADC vencida, `invalid_rapt`** — el gcloud CLI
-  seguía vivo, sólo el ADC caducó), así que la evidencia salió del payload estructurado del worker. Salió mejor: da
-  la **serie temporal**, y era la serie —no el valor— la que probaba que el dead letter no era nuestro.
-- **Slice 3.5a ejecutado y desplegado** (`efeonce-globe@e300c4e`, catálogo 1.6.0 → **1.7.0**): `duration`,
-  `aspect-ratio` y `resolution` salieron de los controles creativos —las únicas rutas que declaraban `resolution`
-  eran las de upscale, o sea las que NO tienen dirección creativa; el control suplía un vocabulario de salida que
-  ya existía— y `valueShape` cierra la asimetría del descriptor, exigida por el guard en las dos direcciones.
-  Runtimes en `e300c4eafa5e`: API revisión **`00195-qj6`**, worker digest `sha256:3324787d…`; dead letter sigue en
-  1 (preexistente), retry storm 0, API 403.
-- **Slice 3.5b — un solo vocabulario de dirección creativa** (`efeonce-globe@1b580f8`). Cierra ADR-022 Delta (b):
-  el brief PIDE, el contrato de ruta declara SI SE HONRA. Divergían en las tres formas posibles a la vez —
-  `light`/`lighting` y `framing`/`composition` eran el mismo concepto con dos nombres; `mood`/`palette` se podían
-  pedir sin que ninguna ruta declarara si los honra; `camera`/`lens`/`motion`/`timing`/`audio-direction` los
-  declaraba el contrato sin que existiera dónde pedirlos. Tres controles quedan sin ingrediente, **declarados y
-  verificados**: `prompt` (es el brief entero), `negative-prompt` (viaja en `notes`), `seed` (determinismo).
-  - **La decisión renombrar-vs-mapear se resolvió leyendo el camino, no con un `SELECT`.** Renombrar es seguro
-    porque ninguna de las tres capas re-lee el vocabulario: `experiment-store.get()` devuelve el JSON sin
-    revalidar, `normalizeStructuredBrief` se llama en **un solo lugar** (camino de ENTRADA), y lo que alimenta al
-    proveedor es el `effectivePrompt` ya compilado y congelado en el snapshot. El caso residual —un cliente viejo
-    mandando `light`— falla fail-closed. Tercera vez en el día que **leer el camino encuentra lo que perseguir por
-    datos no encuentra** (`ISSUE-127` capa 5).
-  - **El vocabulario estaba copiado literal en CUATRO lugares** y cada copia rompió por separado y en una capa
-    distinta: guard de catálogo, error de **tipo** (el cast perdió overlap), aserción de vocabulario y test de
-    integración. Los dos fixtures de CONTROLES pasan a derivarse; los de INGREDIENTES siguen literales a propósito
-    (son casos de uso concretos, no la lista).
-  - `structured-brief-vocabulary.test.ts` cubre las dos direcciones + la honestidad de las excepciones, **probado
-    en rojo**. `pnpm check` + `pnpm build` exit 0; domain 458 → 462.
-  - Nota operativa: el ADC **sí responde** (`print-access-token` OK); lo que se cuelga es el handshake del Cloud
-    SQL **Connector** contra la Admin API. Son tres carriles distintos —gcloud CLI, ADC, Connector— y conviene no
-    confundirlos al diagnosticar.
-- **Slice 3.5c desplegado** (`efeonce-globe@91d1f71`, API **`00197-f9z`**, worker `sha256:76d31673…`): la
-  compilación del prompt deja de ser un molde único. El contrato de ruta llega al compilador (antes se resolvía
-  DESPUÉS, así que estructuralmente no podía informarlo); un ingrediente que la ruta no honra se **rechaza** con el
-  control nombrado; y el peso **ordena pero ya no se imprime**. Cero errores del API post-deploy.
-  - **El `catch` volvió a colapsar la razón, en código escrito para cerrar ese bug class** — undécima aparición del
-    patrón de `ISSUE-127`, y la primera atrapada **antes** de mergear.
-  - 🔶 **Dos límites declarados y autorizados por el operador:** (1) quitar el peso cambia el texto que recibe el
-    modelo en TODAS las rutas y **no se pudo verificar con un canary** — mejora razonada, no verificada; si
-    aparece una regresión de calidad, es el primer sospechoso. (2) un usuario en upscale con preset de estilo
-    activo ahora recibe **error sin gasto** en vez de una generación que ignoraba el estilo y le cobraba; la UI
-    que evita el caso es `TASK-1552`.
-- Greenhouse: `ops:lint --changed` verde sobre las 3 tasks.
+**Estado: 10 de 17 criterios, `in-progress`.** El detalle completo —cada slice, su evidencia y sus límites— vive en
+[`TASK-1633`](docs/tasks/in-progress/TASK-1633-globe-producer-operation-input-control-contract.md) y en
+[ADR-022](docs/architecture/creative-studio/EFEONCE_GLOBE_ROUTE_CREATIVE_CONTRACT_DECISION_V1.md) (Deltas b y c).
+Acá sólo la continuidad activa.
+
+**Desplegado y verificado en runtime** (Globe `main`, cada uno con CI verde de su SHA y revisión activa confirmada,
+no sólo workflow en verde): `8986b45` razones nombradas · `ac1999f` clasificación de fallos mecánica ·
+`e300c4e` un dueño por valor + `valueShape` · `1b580f8` vocabulario único · `91d1f71` compilación por ruta.
+Runtime final: API `00197-f9z`, worker `sha256:76d31673…`, ambos en `91d1f71689c0`. `outboxDeadLetter` estable en
+**1 y preexistente** en los cuatro rollouts (probado por la serie temporal del log del worker, no por el valor);
+`retryStorm` 0; cero errores del API post-deploy.
+
+### 🔶 Riesgos vivos que alguien debe conocer
+
+1. **Si aparece una regresión de calidad en las generaciones, el primer sospechoso es el peso.** `91d1f71` dejó de
+   imprimir `[weight=…]` en el prompt de TODAS las rutas. El razonamiento es sólido (un encoder lo lee como texto,
+   no condiciona) pero **no se pudo verificar con canary** — siguen bloqueados por el transporte de `TASK-1504`.
+   Mejora razonada, no verificada.
+2. **Puede reportarse que «upscale con estilo dejó de funcionar».** Es esperado: ahora da error **sin cobrar** en
+   vez de generar ignorando el estilo y cobrar igual. La UI que evita el caso es `TASK-1552`.
+3. **El canary de Omni sigue bloqueado y no es de esta task**: la identidad declara `vertex-omni` mientras el
+   runtime inyecta Generative Language, así que cobraría por una identidad distinta de la aprobada. Dueño:
+   `TASK-1504`.
+
+### Próximo paso
+
+Segunda mitad de ADR-022 Delta (c): la compilación detrás del adapter con su revisión en el fingerprint
+(`promptCompilerRevision` **no existe** — verificado por grep) y el rol del slot informando el texto. Después, los
+mecanismos por ruta con evidencia (13/17 heredan el default, `negative-prompt` a la cabeza: **ningún adapter tiene
+campo negativo nativo**) y Slice 4.
+
+### Nota operativa
+
+Tres carriles de credenciales distintos —`gcloud` CLI, ADC y el Cloud SQL **Connector**— y el CLI puede estar vivo
+mientras el Connector se cuelga (`invalid_rapt` es reauth). Para medir blast radius sin base, el payload
+`globe_worker_completed` del worker ya trae `outboxDeadLetter`/`outboxRetryStorm` por batch. Ambas cosas, con sus
+comandos, en
+[el manual](docs/manual-de-uso/creative-studio/operar-contrato-creativo-ruta-globe.md).
 
 ## TASK-1631 / MCP — canon de scopes, CIMD como registro primario y benchmark de proveedor (2026-08-02)
 
@@ -154,35 +79,13 @@ Historia anterior: [Handoff.archive.md](Handoff.archive.md).
 - [ADR-021](docs/architecture/GREENHOUSE_FINANCE_CORE_ACCOUNTING_FOUNDATION_DECISION_V1.md) aceptado; `EPIC-012`
   es owner. Sus 11 candidatas no estaban reservadas y deben reenumerarse desde TASK-1634 al confirmarlas.
 
-## TASK-1633 — Fases 1-2 cerradas y desplegadas; canary bloqueado por IAM (2026-08-02)
+## TASK-1633 — sesiones previas del 2026-08-02 (consolidadas)
 
-- Continuidad tomada desde el handoff de Codex. Estado: **`code complete, rollout pendiente`**.
-- Globe `main@b062d6f` con CI verde y **desplegado**: API `globe-api-internal-00192-nmh` (imagen `b062d6f2df11`)
-  y Producer worker desde el mismo SHA. Ambas service accounts tienen `roles/aiplatform.user`.
-- Cerrado: endurecimiento de `authority`/`ordered`/`audioPackaging` (los tres estaban declarados y sin validar);
-  las tres suites del plan (fingerprint en seis ejes, placeholder faltante, conformance Seedance/Omni/Veo);
-  `inputCombinations` cumpliendo ADR-022 (el ADR declara *conjuntos* y sólo uno era representable); **Omni por
-  Vertex ADC** con el endpoint aprobado atado al snapshot (falla cerrado antes de gastar si diverge); y la
-  precedencia de lineage que el operador detectó (lo verificado gana sobre la intención del caller).
-- `pnpm check` y `pnpm build` exit 0. contracts 48 · domain 450 · creative-runner 270 · studio-web 290.
-- 🔴 **Bloqueo abierto:** los canaries facturables de Seedance y Omni **no corrieron**. Acuñar el ID token del
-  canary exige impersonar `greenhouse-globe-caller@` y devuelve `IAM_PERMISSION_DENIED`; la identidad local es un
-  usuario y no existe binding de `serviceAccountTokenCreator`. No se auto-otorgó el rol. Preferencia de
-  desbloqueo: dos generaciones desde el Producer en el Chrome autenticado del operador (la skill declara que ésa
-  es la prueba de salida), o el operador corre el canary, o grant temporal con readback. Detalle en la task.
-
-## TASK-1633 — contrato route-driven del Producer y orden de estabilización (2026-08-02)
-
-- ADR-022 aceptado. Globe tiene WIP **sin commit** sobre `main@a24910c`: contrato, assignments y fingerprints.
-  Falta el gate raíz.
-- P0: Vertex ADC simétrico API/worker, identidades Omni separadas y UI sin mezcla operación/modelo/inputs.
-  Runtime previo: saga/readiness/binding/circuito reconciliados, 784 créditos; sin canary Omni ni `canary-confirm`.
-  No repetir evaluación, candidato retenido ni fondeo.
-- Continuidad Claude: cerrar foundation; luego Vertex/UI/deploy y canaries Seedance + Omni. Greenhouse
-  `develop@23fcdf54a` contiene tres commits MCP locales: staging por path. Estado completo:
-  [`plan`](docs/tasks/plans/TASK-1633-plan.md) ·
-  [`task`](docs/tasks/in-progress/TASK-1633-globe-producer-operation-input-control-contract.md) ·
-  [`runtime`](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md).
+Las dos entradas anteriores de esta task —fases 1-2 desplegadas en `b062d6f` y el planteo del contrato
+route-driven— se consolidaron acá: su detalle completo vive en
+[`TASK-1633`](docs/tasks/in-progress/TASK-1633-globe-producer-operation-input-control-contract.md), y su único
+pendiente vivo (el canary bloqueado por identidad de transporte) está arriba en «Riesgos vivos», ahora bajo
+`TASK-1504`.
 
 ## Gate canónico de licitaciones / Brightcell (2026-08-02)
 

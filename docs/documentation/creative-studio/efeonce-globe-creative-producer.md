@@ -1,9 +1,9 @@
 # Efeonce Globe Creative Producer
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-07-23 por Claude
-> **Ultima actualizacion:** 2026-07-29 por Claude (legibilidad y jerarquia de la consola)
+> **Ultima actualizacion:** 2026-08-03 por Claude (delta: contrato creativo por ruta; conteo real de rutas)
 > **Documentacion tecnica:** [Creative Producer V1](../../architecture/creative-studio/EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md) · [ADR-014 — Client Application](../../architecture/creative-studio/EFEONCE_GLOBE_CLIENT_APPLICATION_DECISION_V1.md)
 
 Creative Producer es la consola prompt-first de Globe para crear y continuar activos de imagen, video y audio.
@@ -36,6 +36,23 @@ derivados heredan restricciones de sus padres.
 
 Los modos que necesitan referencias o provenance no se habilitan por apariencia: el Producer consulta la
 autoridad del workspace y los mantiene cerrados si la capability está apagada, denegada o degradada.
+
+## Qué puede pedirle cada ruta: su contrato creativo
+
+Desde `TASK-1633`, cada ruta publica una **ficha versionada** que declara qué operación hace, qué
+archivos acepta y en qué rol (una imagen puede ser el producto, el estilo, el primer cuadro o la
+fuente del movimiento — y son cosas distintas), qué controles creativos honra y por qué mecanismo, y
+qué produce. El servidor la valida **antes** de cotizar y de reservar crédito: pedir un control que
+esa ruta no honra ahora falla con la razón nombrada, en vez de cobrarse y entregar una pieza donde
+nunca se aplicó.
+
+Eso reemplaza —en el contrato, todavía no en la pantalla— la fila de botones por modelo del composer.
+La ficha ya se publica para las 17 rutas; la migración de la UI es `TASK-1552` y aún no ocurrió, así
+que los modos **Crear · Editar · Movimiento · Elementos · Escalar · Cuadros** siguen visibles.
+
+> Detalle técnico: [el contrato creativo de cada ruta](./efeonce-globe-contrato-creativo-ruta.md)
+> (funcional, con los cinco ejes y el estado real) ·
+> [ADR-022](../../architecture/creative-studio/EFEONCE_GLOBE_ROUTE_CREATIVE_CONTRACT_DECISION_V1.md).
 
 ## Cómo se lee la pantalla
 
@@ -123,8 +140,11 @@ Tres límites visibles, para que no se confundan con fallas:
 
 El Producer está **operativo internal-only** para personas autorizadas. Desde la UI se generaron y recuperaron
 Image, Video y Audio reales; el feed hidrató nueve outputs y el viewer sirvió los tres medios. El catálogo expone
-10 rutas, pero hoy sólo tres rutas/modelos tienen promoción durable, binding, circuito y canario: que una ruta
-aparezca en catálogo no significa que esté habilitada.
+hoy 17 rutas —cada una con su contrato creativo—, pero sólo una parte tiene promoción durable, binding, circuito
+y canario: que una ruta aparezca en catálogo no significa que esté habilitada. El estado real por ruta/modelo, con
+su evidencia, vive en el
+[ledger de la flota](../../operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md); la verdad live de
+disponibilidad para quien consume es la propia flota del Producer.
 
 Los originales se alojan en GCS privado por hash; el bucket no autoriza acceso. Globe valida workspace, ownership,
 estado e integridad antes de servirlos mediante un grant corto same-origin. Una sesión válida con CSRF rotado se

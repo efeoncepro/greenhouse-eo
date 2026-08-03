@@ -7,6 +7,40 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-03 — Globe Producer: el contrato creativo de ruta empieza a aplicarse
+
+- Cinco commits de Globe desplegados a producción y verificados contra la revisión activa (`8986b45`, `ac1999f`,
+  `e300c4e`, `1b580f8`, `91d1f71`; API `00194-l4s` → `00197-f9z` y el worker con el digest de cada SHA).
+  `pnpm check` + `pnpm build` en exit 0 en todos; `outboxDeadLetter` se mantuvo en 1 —el preexistente— y
+  `retryStorm` en 0 después de cada despliegue, así que ningún rollout mató una corrida viva.
+- **Cuando algo se rechaza, ahora dice qué lo rechazó** (`8986b45`). Un solo código del contrato de ruta colapsaba
+  nueve causas con remedios opuestos —re-preparar, cambiar la operación, cambiar el asset, convertir el archivo— y
+  se abre en ocho códigos propios. Media type y MIME quedan separados porque uno pide otro asset y el otro pide
+  convertir el que ya tienes. La tabla de causas está probada en rojo y una aserción de unicidad impide la recaída.
+  Es la décima aparición del bug class de `ISSUE-127`, cerrada.
+- **Una corrida con un fallo determinista muere al primer intento** (`ac1999f`). De las 35 razones que el compiler
+  sabe nombrar, sólo dos estaban clasificadas en la política de reintentos: las otras 33 gastaban tres entregas
+  cada una en algo que jamás iba a cambiar. Quedan 38 `terminal`, 3 `transient` y 2 `unknown` con su razón
+  declarada, y un test rompe el build si una razón nueva nace sin clasificar. El tope de `ISSUE-135` había estado
+  escondiendo el defecto: tres reintentos no llaman la atención de nadie.
+- **Duración, relación de aspecto y resolución dejan de ser controles creativos** (`e300c4e`, catálogo
+  1.6.0 → 1.7.0, ADR-022 Delta (b)). Son forma de salida y su dueño ya era `RouteConstraintsV1`/`OutputShapeV1`;
+  declararlas dos veces era duplicar el SSOT dentro del mismo contrato. Nace `valueShape` en el descriptor, que es
+  lo que permite validar un control antes del gasto.
+- **Un solo vocabulario de dirección creativa** (`1b580f8`). El brief pide y el contrato de ruta declara si se
+  honra: los dos lados quedan alineados 1:1 (`light` → `lighting`, `framing` → `composition`, más los controles e
+  ingredientes que sólo existían de un lado), con un test que impide que vuelvan a divergir.
+- **Un pedido que la ruta no honra da error sin cobrar** (`91d1f71`, ADR-022 Delta (c), primera mitad). La
+  compilación del prompt deja de ser un molde único: recibe el contrato de la ruta y rechaza antes del estimate y
+  de la reserva. Pedir estilo en una operación de upscale antes generaba ignorando lo pedido y cobraba igual.
+  Además el peso ordena la oración y ya no viaja al modelo como texto (`[weight=0.820]`), que un encoder de
+  difusión lee como palabras y no condiciona.
+- Estado honesto: **TASK-1633 sigue `in-progress`, con 10 de 17 criterios cerrados**. Falta el eje de aplicación
+  por ruta —la compilación todavía no vive detrás del adapter y no existe `promptCompilerRevision` en ningún
+  fingerprint—, el Slice 4 de rutas legacy y los mecanismos declarados con evidencia por proveedor. Los canaries de
+  Omni siguen bloqueados por el transporte, que pertenece a `TASK-1504`; por eso el peso reordenado es una mejora
+  razonada, no verificada.
+
 ## 2026-08-02 — Contrato route-driven del Producer y corrección planificada de Omni
 
 - Se registró TASK-1633 como foundation backend-critical: operación, slots/roles de entrada, controles creativos,
@@ -757,10 +791,3 @@ Corrección de fuente de verdad: el cliente inicial es **SKY Agencia Creativa**,
 - Se fijó que ESLint, `pnpm`, typecheck, tests, build, deploy y smoke se declaran por repo mediante verification profiles; Greenhouse agrega sus resultados y aplica policy sin imponer una toolchain común.
 - Se aclaró que el contrato debe gobernar tanto `pnpm codex:task-hook` como `/implement-task` de Claude; los gates actuales del command de Claude pasan a ser un perfil Greenhouse-specific, no requisitos universales del ecosistema.
 - No se autorizó todavía schema, transporte, adapter concreto, ejecución remota, deploy ni segundo task registry.
-
-## 2026-07-27 — Wave Product House, Greenhouse Admin y Agent Native
-
-- Se formalizó `EPIC-037` y el ADR propuesto para que Wave sea la casa de producto de sus Product Services, con Greenhouse como admin/control plane transversal de todas las plataformas Efeonce.
-- Se documentaron Agentic Readiness y Experience LaunchOps como Product Services compuestos de Wave sobre las cinco familias base; Agentic Readiness incluye Snapshot público, Audit/Grader, workbench interno, superficie cliente y monitoreo.
-- Se explicitó el contrato de identidad: una sesión/SSO de Greenhouse para entrar a las plataformas habilitadas, con subject, tenant, capabilities y entitlements verificados localmente en cada runtime.
-- Se estableció Agent Native + Full API Parity como requisito de nacimiento para los nuevos productos; no se autorizó runtime, migración del Brand Visibility Grader actual, pricing ni rollout.
