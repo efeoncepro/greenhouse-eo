@@ -1,6 +1,6 @@
 ---
 name: arch-architect-globe-overlay
-description: Efeonce Globe-specific pinned architecture decisions that extend the Greenhouse arch-architect overlay. Load whenever an architecture decision touches Globe (repo `efeonce-globe`, EPIC-028) — API Contract Spine, route creative contract (ADR-022), provider adapters, spend fence / governed run lifecycle, eval harness, prompt compilation, or the Globe↔Greenhouse boundary.
+description: Efeonce Globe-specific pinned architecture decisions that extend the Greenhouse arch-architect overlay. Load whenever an architecture decision touches Globe (repo `efeonce-globe`, EPIC-028) — API Contract Spine, route creative contract (ADR-022), provider adapters, spend fence / governed run lifecycle, eval harness, prompt compilation, the human-vs-workload lanes, a local/development environment or its isolation, Globe's IaC, or the Globe↔Greenhouse boundary.
 type: overlay
 extends: arch-architect-greenhouse-overlay
 user-invocable: false
@@ -32,7 +32,8 @@ The Greenhouse overlay pins Postgres+BigQuery, outbox→ops-worker, the canonica
 - `EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md` (SPEC-007), `EFEONCE_GLOBE_ASSET_GOVERNANCE_WORKER_DECISION_V1.md` (ADR-007), `EFEONCE_GLOBE_PERSISTED_TENANCY_PROJECTION_DECISION_V1.md` (ADR-006), `EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md` (ADR-015).
 - Client payload (UI) — `EFEONCE_GLOBE_CLIENT_APPLICATION_DECISION_V1.md` (ADR-014), `..._STYLING_ENGINE_...` (ADR-016), `..._COLOR_SCHEME_...` (ADR-017), `..._TYPOGRAPHY_CONTRACT_...`, `GLOBE_CLIENT_MOTION_CONTRACT_V1.md`. This overlay does **not** re-derive them; it defers to those + `greenhouse-ux`/`modern-ui`.
 - Bug classes: `docs/issues/open/ISSUE-127-*.md`, `docs/issues/open/ISSUE-135-*.md`.
-- Governing task in flight: `docs/tasks/in-progress/TASK-1633-*.md`.
+- Governing tasks in flight: `docs/tasks/in-progress/TASK-1633-*.md`, `docs/tasks/in-progress/TASK-1635-*.md` (the latter's Deltas record a **discarded** path in full — read them before re-proposing a Globe development environment).
+- Human-lane authentication precedent: `docs/tasks/complete/TASK-1629-globe-admin-cli-pkce.md` (public OAuth client + PKCE + loopback redirect).
 
 ---
 
@@ -133,6 +134,34 @@ A `CreativeProviderAdapter` is minted **per vendor** behind `creative-runner`: `
 - **ADR-010**: human judgment sits on the two facts carrying liability — a **Model Commercial Rights Attestation** recorded **once per model**, anchored to durable license evidence — and an automated promotion lane **derives** the rights posture from that attestation (never fabricates it). Two safety valves: **promotion ≠ delivery** (a promoted route is *available*, not auto-approved; every client artifact still passes candidate → human approval), and **the attestation is SSOT, every promotion a derivation**. A per-workspace promotion ceiling is fail-closed by workspace `kind`: an internal-eval-only route can **never** be promoted to a `client` workspace.
 - The recommendation matrix (cost/latency/objective) **informs a human; it never promotes a route**.
 
+### G11. Isolation is dimensioned by the CLASS of change — and Globe already isolates by `workspace_id`
+
+Before building any isolation, ask **what class of change is going to be tested**. Globe **already separates data by `workspace_id`, and the spend cap is per workspace too** (G9's double cap). Working inside a test workspace already separates the work, through a mechanism the platform has had since day one. A separate database only earns its cost when the change touches the **schema**; for the composer, the feed, the viewer, the adapters or the prompts — the majority of the work — it adds nothing and costs infrastructure.
+
+Measured 2026-08-03 (TASK-1635): a whole development environment was built — separate Cloud SQL database, four buckets, service accounts, IAM, permission-based isolation with its bootstrap SQL and its verifier — so the operator could "test locally". Mid-execution the operator asked: *"why do you need a separate database to develop Globe, if what I want is to evolve Globe?"* The correct answer was: it wasn't needed. The pain declared in the task's own `Why This Task Exists` was the **feedback cycle**, and the feedback cycle never needed a database. **One question from the operator dismantled in two minutes what took hours to build.**
+
+> **Generalizable rule: isolation is a response to a blast radius, and a blast radius cannot be estimated without naming the class of change. "Isolate everything" is not a conservative default — it is an unpriced decision.**
+
+What survived the discard is the tell: a local Postgres pinned to production's **exact major** (16; the machine's Homebrew build is 18, and two majors of drift move errors toward production) so the data layer can be exercised without the cloud, plus the dev-shell isolation gate. They survived because they serve the feedback cycle, which was the real problem all along.
+
+### G12. Permission isolation inside a governed instance collides with zero standing credentials
+
+Choosing — for cost — a separate database **inside** the `globe-pg` instance instead of its own instance has a non-obvious consequence: isolation stops being **physical** and becomes **permission-based**, which demands `CREATE ROLE`, `REVOKE CONNECT ... FROM PUBLIC` and `ALTER ROLE ... CONNECTION LIMIT` — that is, standing administrative authority over the instance. **Globe's persistence design (SPEC-007: keyless connector + IAM database authentication) deliberately eliminates every permanent superuser credential**, so that option is not implementable without a break-glass. The avoided cost did not buy convenience; it bought **coherence with the security model**, and that is the axis on which the tradeoff must be argued.
+
+🔴 **Load-bearing datum for anyone who attempts it anyway.** In Globe's **49 migrations there is not a single `GRANT CONNECT`**: production runtimes connect through PostgreSQL's default, since `PUBLIC` holds CONNECT on every database — their access to production is **implicit**. **Running `REVOKE CONNECT ON DATABASE globe FROM PUBLIC` without first granting CONNECT explicitly to `api_runtime`, `web_runtime` and `deployer` leaves production without access to its own database.** The order is not negotiable, and it belongs written **inside the file that performs the revoke**, not only in the head of whoever wrote it.
+
+Second-order consequence of IAM database authentication, same family: **the impersonated service account *is* the Postgres user.** Declaring a migrator user while impersonating a different identity simply does not connect — and it is not fixed by granting the deployer access to the development database, because the bootstrap revokes it on purpose.
+
+### G13. Human lane ≠ workload lane; and never proxy by intercepting someone else's session
+
+Globe has **two lanes that are not interchangeable**: **human** (browser → BFF → API, authority derived from the person's session) and **workload** (client → API with an ID token, authority of a service account). Serving a **human** surface with a **service-account** token is not equivalent even when it "works": readers answer 200, but `globe.media.derivative.*` comes back `policy-blocked` and `*.self.*` returns 403 — so thumbnails are missing and self-capacity is unavailable. Measured: `globe.credits.capacity.self.get` → 403 while `balance.get` → 200, because `*.self.*` asks for a "me" that a service account does not have. The honest response is to let the UI degrade (the header credit counter reads `—`); **filling the hole by deriving the number from `balance.get` would make the screen lie about which lane serves it.** The BFF does not impersonate a human with a workload token — it takes the human's session and derives authority from it.
+
+🔴 **The fix attempt that must NOT be retried:** proxying the BFF login by rewriting the cookies (stripping `Secure`/`Domain` so they survive on loopback) and the `redirect_uri` of the 303. It would work, and it is the mechanics of a **session hijack**; an environment control blocked it while it was being written. **The shape of the code is the shape of the attack, and a legitimate intention does not change it.** The correct form is a **public OAuth client of its own, with PKCE and a loopback redirect** — the pattern already canonized in `TASK-1629` for the administration CLI: it opens its own session with consent instead of intercepting anyone's.
+
+**`roles/owner` does NOT include impersonating service accounts** — verified against the role definitions, not assumed. Owner carries `iam.serviceAccounts.actAs` but **neither `getAccessToken` nor `getOpenIdToken`**; those live only in `roles/iam.serviceAccountTokenCreator`. Google separated them on purpose: if Owner included impersonation, every project owner would silently inherit the permissions of **every** service account. `actAs` lets you attach an SA to a resource; asking for its token is a different thing. Practical consequence: the project-owner operator **cannot mint the caller's ID token** without an explicit binding, and granting it is a decision — `greenhouse-globe-caller` carries `globe.lab.experiment.run`, i.e. **spend authority**.
+
+**And when a proxy replaces a layer, it inherits that layer's ENTIRE contract**, not just the stretch you remembered. The dev shell acted as the BFF and proxied readers and commands, but did not serve `GET /v1/session` — which **does not exist in the private API (404)**: it lives in the BFF. The symptom surfaced as *"Tu sesión expiró"*, accusing the session when what happened is that the API was asked for something that was never its own. **A symptom that names the wrong subsystem is the normal signature of an incomplete substitution** — when it appears, audit the contract of the layer you replaced before debugging the one it accuses.
+
 ---
 
 ## The two canonized Globe bug classes
@@ -201,6 +230,16 @@ So: control fixtures **derive** from the vocabulary. Ingredient fixtures stay li
 
 ---
 
+## IaC: the graph does not see every dependency, and the plan is the evidence
+
+`local.*_sa_emails` builds the service-account email by **string interpolation** (`"${name}@${project}.iam.gserviceaccount.com"`), so a `google_secret_manager_secret_iam_member` or a `google_storage_bucket_iam_member` that consumes it **has no edge back to the `google_service_account` that creates it**. Terraform plans them in parallel and the binding can run before the identity exists. Measured 2026-08-03: **7 of 9 bindings failed with `Service account ... does not exist`** in the same apply that was creating them. Same class as the front door's `SERVICE_DISABLED` race, and it is fixed the same way: **explicit `depends_on` in the HCL, never by retrying blindly.** *A derived string is not a reference* — if the graph has to see the dependency, it has to be declared.
+
+**Corollary: a flag that governs a `count`/`for_each` must govern EVERY derived resource.** One version looked only at `provider_secrets_shared` (default `true`) rather than at the environment flag, so with the environment **off** the plan proposed `4 to add`: IAM bindings over **production** provider credentials for a service account that did not exist — an orphan binding that would hand over the keys the day someone created that SA. It is the bug class this overlay already pins in another guise (a declared flag that does not govern what it claims to govern), and what caught it was **reading the plan**, not reviewing the code.
+
+> **The plan is the artifact you review; the HCL is only its source.** With the feature off, `No changes` is the assertion — anything else is a resource escaping its flag.
+
+---
+
 ## How a generative model actually understands (load-bearing for any prompt/control decision)
 
 Do not design a prompt, a control or a "cockpit" without this. It is the technical basis of ADR-022 Delta (c) and it constrains architecture, not just copy.
@@ -233,6 +272,12 @@ Every Globe architecture decision still lands as an **ADR in `docs/architecture/
 
 - **NUNCA** tratar a Globe como módulo de Greenhouse, lab interno o piloto — es producto comercial (ADR-010); su estadio de rollout no cambia su naturaleza ni autoriza bajar el estándar de infra/UX/calidad.
 - **NUNCA** compartir base de datos, sesión, bucket, secreto de proveedor ni rol admin entre Globe y Greenhouse. Keyless para Google-native; secreto propio para el resto.
+- **NUNCA** construir aislamiento antes de nombrar la **clase de cambio** que se va a probar: Globe ya separa por `workspace_id` y el tope de gasto también es por workspace, así que una base aparte sólo se justifica cuando el cambio toca el **schema**.
+- **NUNCA** elegir aislamiento por permisos dentro de una instancia gobernada: exige `CREATE ROLE`/`REVOKE`/`ALTER ROLE`, o sea autoridad administrativa permanente, y SPEC-007 elimina a propósito toda credencial de superusuario (keyless + IAM DB auth).
+- **NUNCA** ejecutar `REVOKE CONNECT ... FROM PUBLIC` sobre una base de Globe sin conceder antes CONNECT explícito a `api_runtime`, `web_runtime` y `deployer`: en las 49 migraciones no existe un solo `GRANT CONNECT` y su acceso a producción es **implícito**.
+- **NUNCA** servir una superficie **humana** con token de service account y darla por equivalente: `*.self.*` da 403 y los derivados salen `policy-blocked`; se degrada honesto y **jamás** se rellena el hueco con un valor derivado de otro reader.
+- **NUNCA** proxear un login reescribiendo cookies (`Secure`/`Domain`) o el `redirect_uri` ajeno: ésa es la mecánica de un secuestro de sesión. La forma correcta es cliente OAuth público propio con PKCE + redirect loopback (patrón `TASK-1629`).
+- **NUNCA** asumir que `roles/owner` puede impersonar un service account: incluye `actAs`, **no** `getAccessToken`/`getOpenIdToken` — viven sólo en `roles/iam.serviceAccountTokenCreator`, y otorgarlo sobre `greenhouse-globe-caller` es conceder autoridad de gasto.
 - **NUNCA** aceptar actor, capability o workspace de autoridad desde el body/headers, ni construir un `TrustedCommandContextV1` fuera de `deriveTrustedContext`.
 - **NUNCA** declarar un `CapabilityDescriptorV1` con una superficie omitida ni representar `missing`; una superficie deshabilitada es `policy-blocked`.
 - **NUNCA** confundir `policy_blocked` con `access_denied` o `not_found`; la política precede a la capability y un `available` sin handler falla cerrado.
@@ -252,9 +297,12 @@ Every Globe architecture decision still lands as an **ADR in `docs/architecture/
 - **NUNCA** introducir un código de rechazo determinista sin clasificarlo en la política de reintentos en el MISMO commit.
 - **NUNCA** declarar un vocabulario que otro subsistema debe cubrir como union type de TS; array `as const` + test de cobertura en ambas direcciones + aserción de unicidad.
 - **NUNCA** copiar literal un vocabulario en fixtures que representan LA LISTA: se derivan.
+- **NUNCA** confiar en que Terraform vea una dependencia construida por interpolación de strings: `depends_on` explícito, y jamás reintentar a ciegas un apply que dice `does not exist`.
 - **NUNCA** crear documentación gobernante de Globe en `efeonce-globe/docs/**`.
 - **SIEMPRE** leer `GLOBE_MODEL_FLEET_STATUS.md` antes de afirmar que un modelo/proveedor no está integrado.
 - **SIEMPRE** separar por **remedio** al abrir razones: dos causas con la misma acción pueden compartir código; dos con acciones opuestas, nunca.
 - **SIEMPRE** que un fix destape una capa nueva, dejar de desplegar y leer el camino completo.
+- **SIEMPRE** que un flag gobierne un `count`/`for_each`, verificar que gobierne **todos** los recursos derivados, y **leer el plan** con el flag apagado: `No changes` es la aserción, cualquier otra cosa es un recurso escapando de su flag.
+- **SIEMPRE** que un proxy reemplace una capa, heredar su **contrato completo** (`/v1/session` vive en el BFF, no en la API); un síntoma que acusa al subsistema equivocado es la firma de una sustitución incompleta.
 - **SIEMPRE** verificar el **efecto** de una clave de idempotencia, no su presencia: que exista no prueba que el handler la honre.
 - **SIEMPRE** declarar qué se decide y qué se **mide** (dialecto de prompt, ruta preferida) — el harness responde lo segundo.

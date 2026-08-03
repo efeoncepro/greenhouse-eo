@@ -32,7 +32,13 @@ porque un agente estuvo a punto de montar una capa paralela sin saberlo (2026-08
 | **Canary del composer** | `apps/studio-client/scripts/producer-composer-canary.test.ts` | Levanta un **servidor stub** (`producer-composer-canary.mjs`, puerto 4324) que sirve el **bundle React de producción** y el shell real, y abre **Chrome real** con `playwright-core` (`channel: 'chrome'`, sin descargar browsers) |
 | Asertos de browser | `producer-composer-browser-canary.mjs` | First fold, disclosure, reduced motion, no-overflow a 1440/390/320, flujo integrado con idempotencia — **y desde 2026-08-03 escucha la consola y escribe tecla por tecla** |
 | Otros canaries del cliente | `scripts/tailwind-engine-canary.test.mjs`, `legacy-fallback-canary.mjs`, `light-contrast-audit.test.mjs`, `axis-pilot-canary.test.mjs` | Motor Tailwind, fallback legacy, contraste, piloto AXIS |
+| **Loop local del payload** (no es un test) | `scripts/globe-dev.mjs` → **`pnpm globe:dev`** | Levanta **Vite con HMR** y sirve **el MISMO shell que producción** (`renderShell` importado de `dist/`, igual que `seam-smoke-server.mjs`) con un bundle apuntado al dev server; los datos salen del fixture `producer-gvc-fixture.mjs`, levantado **dentro del mismo proceso** |
 | Runner | `node --test` nativo, registrado **explícitamente** en el script `test` de cada package | Agregar un `.test.ts` **no basta**: si no está en la lista de `package.json`, no corre |
+
+El loop vive en `scripts/globe-dev.mjs`, **fuera de `apps/studio-web/src/**` a propósito**: es herramienta de
+desarrollo, no superficie servida. Sirve para iterar el payload cliente con el shell real; lo que **NO** da es el
+carril humano —sesión, workspace, capabilities `*.self.*`—, y ése es el error que sigue (§El Producer es una
+superficie HUMANA).
 
 **Los asertos apuntan a `data-capture`, NUNCA a clases** — una clase es implementación del estilo y ya rompió
 asertos dos veces sin que el comportamiento cambiara.
@@ -192,6 +198,44 @@ skill.
   política explícita de visibilidad mientras governance está pendiente y reconciliación/GC de objetos huérfanos.
   Se diseñan como arquitectura versionada; no se resuelven cargando originales completos ni con excepciones UI.
 
+### 🔴 El Producer es una superficie HUMANA: un service account NO es un sustituto del carril
+
+Medido el 2026-08-03 montando `pnpm globe:dev`. **El error es fácil de cometer porque "funciona"**: con un token
+de service account los readers responden 200 y la pantalla carga. Lo que no carga es justo lo que define al carril.
+
+- **`GET /v1/session` contra la API IAM-privada responde `404`, y está bien: ese endpoint vive en el BFF**
+  (`studio-web` en modo web), no en la API. El cliente React lo consulta al arrancar para saber **quién es** y **en
+  qué workspace está**; con un proxy apuntado directo a la API privada ese llamado da 404 y la UI muestra **"Tu
+  sesión expiró"** — un síntoma que acusa a la sesión cuando el problema es que se le pidió a la API algo que
+  **nunca fue suyo**.
+- **Las capabilities `*.self.*` piden un "yo" que un service account no tiene.** Con principal de workload,
+  `globe.media.derivative.{get,ticket,request}` salen `policy-blocked` y `globe.credits.capacity.self.get` da
+  **403** — mientras `balance.get` da **200**, que es lo que hace parecer un permiso puntual y no un carril
+  equivocado.
+- **El síntoma visible invita al diagnóstico equivocado.** En local: tarjetas del feed **sin miniatura** (y el
+  placeholder se ve **igual** que una imagen fallida) y el contador de créditos en `—`, mientras
+  `globe.efeoncepro.com` se ve perfecto. De ahí a "es CORS" o "es el bucket" hay un paso.
+- **No es configuración apagada.** `GLOBE_MEDIA_DERIVATIVES_ENABLED` y `GLOBE_MEDIA_RANGE_GATEWAY_ENABLED` están en
+  **`true`** en el runtime: es un **grant que el carril workload no tiene**, no un flag por prender.
+- 🔴 **Antes de culpar al transporte, pide el objeto con su grant y mira los BYTES.** Medido: el logo responde 200,
+  y `GET /v1/outputs/:sha256` con `x-globe-retrieval-grant` devuelve el **PNG real completo** (7,4 MB, 2048×2048),
+  idéntico por API directa y por el proxy. **Un 200 con cuerpo JSON de error es indistinguible de un 200 con imagen
+  hasta que se mira el `content-type`.**
+
+### 🔴 El anti-patrón que no hay que reintentar: proxear el login del BFF desplegado
+
+Para llevar el carril humano a local, el primer intento fue **proxear el login del BFF ya desplegado** reescribiendo
+dos cosas: quitarle `Secure`/`Domain` a sus cookies para que sobrevivan en `127.0.0.1`, y reapuntar el
+`redirect_uri` del `303` de `/auth/start` al origen local. **Funcionaría — y es exactamente la mecánica de un
+secuestro de sesión.** Un control del entorno lo bloqueó mientras se escribía, con razón: **la forma del código es
+la del ataque, y que la intención sea legítima no la cambia.**
+
+La forma **correcta** es la que el repo ya canonizó en **`TASK-1629`** para el CLI de administración: el dev shell
+como **cliente OAuth PÚBLICO propio**, con **PKCE** y redirect loopback `http://127.0.0.1:<puerto>/auth/callback`.
+No intercepta la sesión de nadie: **abre la suya**, con consentimiento y sus propios scopes. El broker ya soporta
+esa forma (`oauth-broker.ts`: loopback exacto, puerto libre para clientes públicos). Prerequisito: **registrar ese
+cliente en el broker de Greenhouse**, que es configuración de autenticación compartida y la mueve un humano.
+
 ### 🔴 Trampas de verificación del payload cliente — medidas, no teóricas
 
 Los siete defectos de la auditoría inicial pasaron con **build verde, cuatro gates de diseño verdes y canary de browser verde** (la lista de abajo ya creció con lo medido después, mismo patrón).
@@ -314,6 +358,25 @@ histórico era inalcanzable. **No faltaba paginación: estaba a medio cablear.**
   generándose y reordenándose en vivo, mueve el contenido bajo el cursor. **Ni páginas numeradas:** con items
   entrando por arriba, la página 2 cambia de contenido sola — offset es incorrecto por construcción, y por eso
   el backend eligió cursor.
+
+#### Cuando el shell real sirve el bundle de Vite: dos defectos que sólo se ven MIRANDO (2026-08-03)
+
+Aparecieron montando `pnpm globe:dev` y valen para cualquier documento que no sea el `index.html` de Vite.
+
+- 🔴 **Pantalla negra con la consola del navegador LIMPIA.** React monta —aparece el mensaje de React DevTools—, el
+  punto de montaje queda **vacío** y hay **cero errores en el navegador**. La causa sale por la salida del **DEV
+  SERVER**: `@vitejs/plugin-react can't detect preamble`. El plugin transforma cada componente **asumiendo que el
+  documento ya instaló el runtime de Fast Refresh** — un script que Vite inyecta en **SU** `index.html`. Si el
+  documento lo sirve otro (el shell real de Globe), hay que **inyectar el preamble a mano antes del entry**. Lo que
+  hace cara la búsqueda es dónde sale el error: **por donde nadie mira cuando lo que falla es la pantalla**.
+- 🔴 **Contenido correcto y CERO estilos.** En CSP, **declarar un nonce hace que el navegador IGNORE
+  `'unsafe-inline'`** para esa directiva — es precisamente la regla que vuelve seguros a los nonces. Vite inyecta el
+  CSS **por JavaScript** en desarrollo, así que con nonce presente esos estilos **se bloquean en silencio**. En
+  producción no aplica: ahí el CSS viaja como `<link nonce>` del bundle compilado, y el nonce es lo que hay que
+  **conservar**.
+- **Dato operativo:** el entry de Vite en dev vive **bajo el `base` del proyecto** — `/assets/app/src/main.tsx` y
+  `/assets/app/@vite/client`, **no** en la raíz. Un `curl /` da **302** y `/src/main.tsx` da **404**, lo que hace
+  parecer que el dev server no arrancó.
 
 #### Trampas operativas de la sesión (cuestan tiempo, no código)
 
@@ -1444,6 +1507,14 @@ shippeó con **4 de 11** animaciones del diseño aprobado. El task-lint sólo ve
 - **NUNCA** mandes el ID token en `X-Serverless-Authorization` (Cloud Run lo **consume**, no lo reenvía al contenedor): va en **`Authorization`** (Cloud Run lo reenvía, y es lo único que la re-verificación en-app puede leer). Con X-Serverless el perímetro pasa y la app da **401** al caller legítimo. El SDK usa `Authorization` (`applyAuthMaterial`).
 - **NUNCA** permitas que el browser opere el Lab directamente: TASK-1519 habilita UI sólo por BFF same-origin,
   grants acotados y trusted surface server-derived; la ejecución/autoridad sigue en API mode.
+- 🔴 **NUNCA sustituyas el carril HUMANO por un token de service account para "ver" el Producer**: `GET /v1/session`
+  es del **BFF**, no de la API (404 contra la API privada ⇒ la UI dice *"Tu sesión expiró"* y acusa a la sesión), y
+  las capabilities `*.self.*` (`globe.credits.capacity.self.get` → 403, `globe.media.derivative.*` →
+  `policy-blocked`) piden un "yo" que un workload no tiene, con los flags de media en `true`. Engaña porque los
+  readers responden 200. Para llevar el carril humano a local el camino es **cliente OAuth público + PKCE con
+  redirect loopback** (la forma de `TASK-1629`), y **NUNCA** proxear el login del BFF desplegado reescribiendo sus
+  cookies (`Secure`/`Domain`) o el `redirect_uri` del `303`: **esa es la mecánica de un secuestro de sesión, y una
+  intención legítima no cambia la forma del código.**
 - **NUNCA** dejes `invokerIamDisabled: True` en un servicio **`api` mode** (perímetro OFF): es correcto sólo para el servicio **web** con SSO (browser sin ID token; auth por sesión). Desde **TASK-1508** los dos servicios Cloud Run están en Terraform, así que el flag **sí está gobernado por IaC** — **NUNCA** lo muevas con `gcloud` fuera de un incidente documentado: eso reintroduce drift contra el state.
 - **NUNCA** trates una mutación `gcloud` sobre los servicios Cloud Run de Globe como si fuera permanente: desde **TASK-1508** el `ingress`, las env vars, el scaling y la service account viven en `cloud_run_services.tf`, y el `ignore_changes` cubre **sólo** imagen + `client` + `client_version` ⇒ **todo lo demás que muevas con `gcloud` es out-of-band contra el state y muere en el próximo `tofu apply`, en silencio**. Está permitido por velocidad dentro de un incidente documentado, y en ese caso el mismo movimiento tiene que reflejarse en HCL **antes** del siguiente apply.
 - **NUNCA** llames a un SDK de provider directo desde UI/MCP/CLI/scripts/tests; **NUNCA** expongas `endpoint + arbitrary JSON`; **NUNCA** metas model identifiers vendor en policy de dominio.
@@ -1658,6 +1729,20 @@ Ocho reglas medidas contra el runtime, no razonadas. Las tres primeras cuestan u
    `createHmacCreditAdminApproval` no admite un firmador de cliente sin repartir poder de forja, y por eso **no
    existe ninguna superficie que firme**: `.sign(` no aparece en `app.ts` — el verificador está cableado, el firmador
    no. **NUNCA** propongas "ampliar el radio del secreto" como salida: es la misma propiedad con otro dueño.
+
+### Runs colgados: `running` sin intentos y con la reserva retenida (`ISSUE-137`, medido 2026-08-03)
+
+Hallazgo de sesión, **no causado por el trabajo que lo encontró**. Hay experimentos que quedan en `state: running`
+con **`attempts: []` vacío**, `reservedCredits` puesto y `spentCredits: 0`, con `updatedAt` a **0,3 s** del
+`createdAt` y sin tocarse **por horas**, mientras `globe-producer-worker` corre **cada minuto** y cierra limpio
+(`globe_worker_completed`, exit 0) **sin tomar el trabajo**. Se midieron **dos** el mismo día (11:16 y 19:58); de
+los 24 experimentos del workspace interno: 11 `candidate_ready`, 10 `failed`, **2 `running` colgados**, 1
+`estimated`.
+
+Es la familia de **`ISSUE-135` con otro disfraz**: en la UI se ve **"generando" para siempre**. No hay pérdida
+económica —la reserva queda **retenida** y nunca se convierte en gasto— pero **el crédito queda inmovilizado y
+ningún readback lo distingue de una corrida legítima en curso**. 🔴 **NUNCA lo "destrabes" reintentando**:
+readback-first, porque un segundo submit a ciegas crea un **segundo cobro**.
 
 ### Operación vigente de Studio Credits
 
