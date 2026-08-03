@@ -1076,3 +1076,41 @@ plausible haría que la pantalla mienta sobre qué carril la sirve.
 
 Hasta que exista esa generación verificada, el estado honesto de la generación end-to-end es
 `code complete, rollout pendiente` — el camino está cableado y leído, no ejercido.
+
+## Delta 2026-08-03 — generación real ejecutada: el envío funciona, la ejecución NO (defecto preexistente)
+
+Con autorización explícita de gasto se generó desde el Producer local. **El loop de envío quedó
+verificado de punta a punta; la ejecución destapó un defecto que NO es del loop.**
+
+### Lo que SÍ funcionó (verificado en pantalla y por readers)
+
+Se escribió el prompt en el campo real con teclado, el composer calculó el **costo estimado real
+(10 cr)** y habilitó el botón, y al enviar el feed pasó de 20 a 21 piezas con la pieza propia
+**destacada**, con su prompt, su ruta (`ref/still/rrss-v1`), su modelo (Seedream 5 Pro, `v5-pro`,
+provider `fal`) y su reserva de 10 créditos. El envío desde el carril local es correcto.
+
+### Lo que NO ocurrió, y por qué no es de esta task
+
+`experimentId 96c0ddcd-07bc-4bcc-8de5-d39b74ddbc97` quedó en `state: running` con **`attempts: []`
+vacío**, `reservedCredits: 10`, `spentCredits: 0`, y un `updatedAt` **0,3 segundos posterior** al
+`createdAt`: no se volvió a tocar en más de seis minutos. El `globe-producer-worker` corre **cada
+minuto** y cierra limpio (`globe_worker_completed`, `exit(0)`) sin tomar ese trabajo.
+
+**El dato que descarta al loop como causa:** hay **otro run en el mismo estado desde las 11:16 de
+hoy** —nueve horas, cero intentos, mismo patrón— creado antes de que existiera `globe:dev`. Sobre
+24 experimentos del workspace: 11 `candidate_ready`, 10 `failed`, **2 `running` colgados**, 1
+`estimated`.
+
+Es la familia de `ISSUE-135` con otro disfraz: en la UI se ve «generando» para siempre. La reserva
+queda retenida y **no** se convierte en gasto, así que no hay pérdida económica, pero el crédito
+permanece inmovilizado y ningún readback lo distingue de un run en curso legítimo.
+
+**No se reintentó**, por la regla de readback-first: un segundo submit a ciegas sobre un run que
+puede estar recuperable crea un segundo cobro. Amerita ISSUE propio.
+
+### Estado honesto de la task
+
+`globe:dev` está **completo y verificado** para lo que gobierna: levantar, servir, HMR, datos
+reales y **enviar** una generación con su costo. La **ejecución** end-to-end queda
+`operativamente bloqueada` por un defecto de la cola de governed runs que es anterior y ajeno a
+este trabajo.
