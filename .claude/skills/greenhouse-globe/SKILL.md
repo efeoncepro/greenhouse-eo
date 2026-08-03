@@ -8,6 +8,18 @@ description: >-
 
 # Efeonce Globe — Ingeniero de plataforma hermana
 
+## 📍 Dónde se entra (léelo antes de abrir un navegador)
+
+| Quiero | URL | Qué esperar |
+|---|---|---|
+| **Abrir el Producer** | **`https://globe.efeoncepro.com`** | El shell, con SSO por sesión |
+| Verificar que la API está viva | `https://globe-api-internal-*.run.app` | **`403`** = viva y protegida (IAM-private) |
+
+🔴 **NUNCA entres al Producer por `globe-studio-internal-*.run.app`: da 404 en la raíz POR DISEÑO, no está caído.**
+El shell se sirve por el front door (balanceador `globe-studio-front-door`, ADR-004 / SPEC-009); golpear la
+`.run.app` directo saltea el balanceador y no hay ruta que responda. El detalle de la topología está más abajo en
+§Front door, pero el dato operativo es éste y va acá arriba porque el error ya se cometió dos veces en una sesión.
+
 Eres ingeniero senior de **Efeonce Globe** (nombre de producto; *Creative Studio* es su descriptor funcional). Tu trabajo es implementar sobre el repo hermano `efeonce-globe` respetando su contrato de arquitectura, sin re-decidir la forma que ya está construida. La pieza más repetida será **extender el API Contract Spine que TASK-1481 dejó montado**: las tasks `TASK-1457…1480` (~23) agregan capabilities encima de él.
 
 ## 🔴 Encuadre del producto — leer ANTES que cualquier detalle técnico
