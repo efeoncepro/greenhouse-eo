@@ -730,6 +730,50 @@ que el dead letter no era nuestro.
 **Estado: operativamente completo para estos dos slices.** La task sigue `in-progress` por su alcance restante
 (eje de aplicación, mecanismos por ruta, Slice 4).
 
+## Delta 2026-08-02 — Slice 3.5a: un solo dueño por valor, y forma declarada (ejecutado y desplegado)
+
+`efeonce-globe@e300c4e`. ADR-022 Delta (b) en código; catálogo **1.6.0 → 1.7.0**.
+
+**`duration`, `aspect-ratio` y `resolution` salieron de `ROUTE_CREATIVE_CONTROLS`.** El dato que lo confirmó al
+retirarlos: las **únicas** rutas que declaraban `resolution` como control eran las dos de upscale — precisamente
+las que no tienen dirección creativa. El control estaba supliendo la ausencia de un vocabulario de salida que ya
+existía en otro lado. Ahora declaran `creativeControls({})`, que describe exactamente lo que un upscale es.
+Verificado que no deja consumidores huérfanos: los dos usos de `resolution` en `producer-controller.ts` leen
+`constraints.resolution`, o sea el vocabulario correcto.
+
+**`valueShape` cierra la asimetría del descriptor.** Declaraba cómo se honraría un control y si era obligatorio,
+pero nada sobre qué se puede pedir; los `inputSlots` sí tenían contraparte tipada y `creativeControls` no tenía
+ninguna. `text` para la dirección creativa —alineado al límite de un ingrediente del brief, que es donde estos
+valores van a vivir—, `enum` para el conjunto cerrado real de un proveedor, `number` para el paramétrico. El guard
+lo exige **en las dos direcciones**: un control honrado sin forma promete algo que nadie puede validar; un
+`unsupported` con forma promete una afordancia que la ruta no honra.
+
+Rollout verificado: `globe-api-internal` en revisión **`00195-qj6`** y el worker con digest
+`sha256:3324787d…`, ambos etiquetados `e300c4eafa5e`. `outboxDeadLetter` sigue en 1 (el preexistente),
+`retryStorm` 0, worker con `claimed=0`, API responde 403. `pnpm check` + `pnpm build` exit 0.
+
+### 🔴 Punto de decisión abierto antes de Slice 3.5b
+
+Al preparar los ingredientes nuevos del brief apareció que **los dos vocabularios no coinciden**, ni en nombres ni
+en cobertura:
+
+| | Vocabulario |
+|---|---|
+| `BRIEF_INGREDIENT_KINDS` | `subject` · `style` · **`light`** · **`framing`** · `mood` · `palette` |
+| Controles de dirección | `negative-prompt` · `camera` · `lens` · `composition` · `style` · **`lighting`** · `motion` · `timing` · `audio-direction` |
+
+Dos conceptos con **nombres distintos** (`light`↔`lighting`, `framing`↔`composition`), dos ingredientes que ningún
+control declara (`mood`, `palette` — nadie puede saber si una ruta los honra) y seis controles que ningún
+ingrediente puede pedir (`camera`, `lens`, `motion`, `timing`, `audio-direction`, `negative-prompt`).
+
+Para que el Delta (b) funcione —el brief es el valor, el contrato dice si se honra— **los dos deben alinearse 1:1**,
+con un test que impida que vuelvan a divergir. La decisión abierta es cómo: renombrar para tener un solo nombre por
+concepto (más limpio) o mantener nombres y un mapa explícito (más conservador).
+
+**Riesgo que no se pudo verificar:** los experimentos históricos persisten `request.structuredBrief`. Renombrar un
+`kind` rompería su lectura. La consulta directa a PG no estaba disponible (ADC vencida), así que **el volumen de
+briefs persistidos es un dato pendiente** y es el que debe decidir entre las dos opciones.
+
 ## Delta 2026-08-02 — auditoría arquitectónica contra los incidentes del día (`arch-architect`)
 
 Revisión leyendo el código de Globe contra `ISSUE-126`, `ISSUE-127` e `ISSUE-135`. **El eje de inputs está bien

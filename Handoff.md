@@ -78,6 +78,18 @@ Historia anterior: [Handoff.archive.md](Handoff.archive.md).
   Método a recordar: la lectura directa a PG no estaba disponible (**ADC vencida, `invalid_rapt`** — el gcloud CLI
   seguía vivo, sólo el ADC caducó), así que la evidencia salió del payload estructurado del worker. Salió mejor: da
   la **serie temporal**, y era la serie —no el valor— la que probaba que el dead letter no era nuestro.
+- **Slice 3.5a ejecutado y desplegado** (`efeonce-globe@e300c4e`, catálogo 1.6.0 → **1.7.0**): `duration`,
+  `aspect-ratio` y `resolution` salieron de los controles creativos —las únicas rutas que declaraban `resolution`
+  eran las de upscale, o sea las que NO tienen dirección creativa; el control suplía un vocabulario de salida que
+  ya existía— y `valueShape` cierra la asimetría del descriptor, exigida por el guard en las dos direcciones.
+  Runtimes en `e300c4eafa5e`: API revisión **`00195-qj6`**, worker digest `sha256:3324787d…`; dead letter sigue en
+  1 (preexistente), retry storm 0, API 403.
+- 🔴 **DECISIÓN ABIERTA antes de seguir (Slice 3.5b):** los dos vocabularios de dirección creativa **no coinciden**.
+  `light`↔`lighting` y `framing`↔`composition` son el mismo concepto con nombre distinto; `mood`/`palette` existen
+  sólo en el brief (nadie puede saber si una ruta los honra) y `camera`/`lens`/`motion`/`timing`/`audio-direction`
+  sólo en los controles (nadie puede pedirlos). Deben alinearse 1:1 con un test que impida divergir: **renombrar**
+  (un nombre por concepto, más limpio) o **mapear** (más conservador). El dato que decide —cuántos briefs hay
+  persistidos en experimentos históricos, que un renombre rompería— **quedó pendiente por la ADC vencida**.
 - Greenhouse: `ops:lint --changed` verde sobre las 3 tasks.
 
 ## TASK-1631 / MCP — canon de scopes, CIMD como registro primario y benchmark de proveedor (2026-08-02)
