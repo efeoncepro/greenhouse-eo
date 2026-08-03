@@ -28,15 +28,22 @@
 
 ## Summary
 
-Globe necesita un flujo local-first que permita desarrollar el Producer completo —composer, selección de ruta,
-feed, viewer, playback, BFF y workers de ejecución/governance— y sus capacidades multimodales sin recompilar y
-desplegar a Cloud Run después de cada cambio. La task crea un harness local integrado para `studio-client`,
-`studio-web`, contratos, fixtures y estados de imagen/audio/video, y un camino explícito para validar providers
-reales y promover el lote completo a los runtimes que correspondan.
+Globe hoy tiene **un solo entorno**: lo desplegado. Una sola Cloud SQL (`globe-pg`), un solo set de buckets,
+una sola cola. No existe un lugar donde desarrollar y probar que no sea la app productiva, así que el ciclo de
+feedback de cualquier cambio es un despliegue.
 
-El resultado no es un simulador que sustituye producción: separa evidencia local, smoke real de provider y
-verificación internal-only, manteniendo créditos, governance, IAM, Cloud SQL, GCS, workers, flags, secretos,
-migraciones, canarios y rollback dentro del cierre de despliegue cuando apliquen.
+Esta task **crea el entorno de desarrollo de Globe**: su propia base, sus propios buckets, sus propias
+identidades y su propio presupuesto — desechable y recreable desde cero. Sobre él, los tres procesos
+(`studio-client` con HMR, `studio-web` y el worker de ejecución) corren desde el checkout, y **una generación
+es real**: proveedor real, asset real, governance real. Lo único que no se replica es el proveedor, porque el
+modelo vive en su nube.
+
+La app sigue siendo la desplegada. El entorno de desarrollo **no la toca**: distinta base, distintos buckets,
+distinta cola, distinto presupuesto. Cuando el cambio está probado ahí, recién entonces se despliega el lote
+completo con sus gates de SHA, imagen, revisión, tráfico y rollback intactos.
+
+Los fixtures quedan como **modo secundario**, para reproducir estados difíciles de provocar y para trabajar
+sin red. Un fixture verde nunca es evidencia de que una ruta genere.
 
 ## Why This Task Exists
 
@@ -49,17 +56,25 @@ prueba con fixtures, qué se prueba contra un provider real y qué exige Cloud R
 (`check`, `gvc:fixture`, `globe:runtime-drift`, `smoke-private-api`, `production-promotion-cli`, 10 canarios)
 pero sin composición ni carriles nombrados.
 
+Y el dolor no es sólo visual. **La generación real la ejecuta el worker**, no `studio-web`. Hoy, cambiar un
+adapter de proveedor, la compilación del prompt o la resolución de ruta obliga a construir imagen y desplegar
+el job **sólo para saber si sigue generando**. Levantar únicamente la UI no lo resuelve: quien responde sigue
+siendo el worker desplegado con la imagen vieja. Por eso el modo local tiene que incluir **los tres procesos**,
+no dos.
+
 El despliegue actual exige SHA exacto en `main`, Cloud Build, Artifact Registry y Cloud Run. Ese control debe
 seguir protegiendo el runtime, pero debe ocurrir después de una verificación local y por lote, no como mecanismo
 de feedback para cada modificación.
 
 ## Goal
 
-- Permitir desarrollar y revisar localmente las superficies de Globe con HMR y un shell/BFF ejecutable.
-- Probar de forma reproducible las capabilities existentes de imagen, audio y video con fixtures completos,
-  incluyendo estados terminales, errores, governance, feed, viewer y playback.
-- Permitir smoke tests reales y acotados de providers sin bypass de Producer, créditos, idempotencia,
-  provenance, rights ni Asset Governance.
+- **Provisionar el entorno de desarrollo de Globe**: base, buckets, identidades, secretos y presupuesto
+  propios, aislados de lo desplegado y recreables desde cero.
+- Correr los **tres procesos** de Globe desde el checkout —cliente con HMR, `studio-web` y worker de
+  ejecución— contra ese entorno.
+- Permitir **generar un asset real** (imagen, audio o video) apretando el botón en el navegador local, sin
+  bypass de Producer, créditos, idempotencia, provenance, rights ni Asset Governance.
+- Conservar los fixtures como modo secundario para estados difíciles de provocar y para trabajar sin red.
 - Promover un slice listo mediante el despliegue de todos sus consumidores runtime: Studio/API, worker,
   derivados/governance, migraciones, flags, configuración, secretos y canarios cuando corresponda.
 - Dejar evidencia honesta y comandos repetibles para distinguir `local`, `provider smoke`, `internal-only`
@@ -235,6 +250,20 @@ declaraba antes; lo que sobra se resuelve **componiendo**, no construyendo.
   `globe:runtime-drift` detecta la asimetría **después**; falta el derivador **antes**.
 - **Genuinamente ausente:** no hay frontera documentada que impida confundir fixture verde con provider
   disponible o rollout live.
+- 🔴 **El gap raíz: Globe no tiene entorno de desarrollo.** La IaC declara **una sola** instancia
+  (`google_sql_database_instance.globe` = `globe-pg`, `infra/terraform/cloud_sql.tf:20`) y un solo set de
+  buckets (`private_assets`, `lab_evidence`, `library_exports`, `media_derivatives`). Los tres runtimes
+  apuntan a esa misma instancia. No existe un lugar donde probar que no sea lo desplegado — de ahí que el
+  ciclo de feedback sea un despliegue. **Éste es el prerequisito de todo lo demás** (Slice 0).
+- ⚠️ **Consecuencia si se intenta el atajo:** apuntar un worker local a la base desplegada **no** es una
+  opción. El claim de `governed_run_outbox`
+  (`packages/database/src/stores/governed-run-store.ts:210-218`) toma trabajo con
+  `FOR UPDATE OF o SKIP LOCKED` ordenando por `kind`, `priority` y `available_at`, **sin filtro de
+  `workspace_id`**: el worker local tomaría trabajo de producción y el desplegado el del desarrollador, en
+  ambas direcciones, por diseño de la consulta y no por una carrera. Con base propia el problema no existe
+  —la cola es otra tabla en otra base—, así que el alcance por workspace queda como **follow-up de higiene**,
+  no como bloqueante. Mismo patrón sin filtro en `asset-governance-job-store`, `media-derivative-store`,
+  `asset-library-store`, `credit-reservation-expiry-store` y `production-promotion-operation-store`.
 
 ## Modular Placement Contract
 
@@ -250,9 +279,10 @@ declaraba antes; lo que sobra se resuelve **componiendo**, no construyendo.
   provider SDKs, créditos, governance y deploy helpers permanecen server-side o en scripts de operación.
 - Build impact: agrega entrypoints de scripts y, si es estrictamente necesario, un seam de desarrollo; no
   agrega dependencia pesada sin justificarla ni cambia el bundle productivo por defecto.
-- Extraction blocker: el smoke end-to-end depende de la transacción y autoridad compartidas de Globe
-  (identity, credits, Cloud SQL, GCS, workers y provider bindings); el modo local de UI debe poder funcionar
-  sin esos servicios, pero no puede declarar evidencia live sin ellos.
+- Extraction blocker: la generación end-to-end depende de la transacción y autoridad completas de Globe
+  (identity, credits, Cloud SQL, GCS, workers y provider bindings). Por eso el entorno de desarrollo es un
+  **duplicado aislado de esa topología**, no un subconjunto: replicarla a medias produce evidencia falsa.
+  El modo fixtures sigue funcionando sin esos servicios, pero nunca declara evidencia live.
 
 ## Backend/Data Contract
 
@@ -287,26 +317,33 @@ declaraba antes; lo que sobra se resuelve **componiendo**, no construyendo.
   - retry/readback nunca crea segundo attempt, submit, reservation, settlement ni cobro;
   - output válido se verifica por bytes/MIME/hash y no por extensión o fixture metadata;
   - cualquier config/flag/secreto usado por un consumidor runtime se verifica en ese consumidor, no sólo localmente.
-- Tenant/space boundary: local usa un workspace sintético explícito y no puede aparentar identidad cliente;
-  provider smoke/internal usa el workspace interno y la identidad/capability que ya gobierna Globe.
-- Idempotency/concurrency: provider smoke conserva una clave por canary lógico, serializa la prueba por ruta y
-  reconcilia por reader antes de reintentar; los comandos locales no crean reservas reales.
-- Audit/outbox/history: fixtures y verify local dejan reporte local; provider smoke/internal usa audit, outbox,
-  run/attempt y señales canónicas del runtime real.
+- Tenant/space boundary: el entorno de desarrollo tiene su **propio workspace**, clasificado con un `kind` sin
+  privilegio para que la promoción quede denegada por construcción (ADR-010). No puede aparentar identidad
+  cliente ni compartir workspace con lo desplegado.
+- Idempotency/concurrency: una clave por generación lógica, con verificación del **efecto** y no de la
+  presencia; readback por reader antes de reintentar. En el entorno de desarrollo las reservas **sí son
+  reales** —hay gasto real— y por eso el tope diario del workspace es parte del provisioning, no un extra.
+- Audit/outbox/history: la generación en el entorno de desarrollo usa audit, outbox, run/attempt y señales
+  canónicas **de ese entorno**; el modo fixtures deja reporte local. Ningún rastro de desarrollo entra a las
+  tablas ni a los buckets desplegados.
 
 ### Migration, backfill and rollout
 
-- Migration posture: `none` para el harness; migrations existentes sólo se ejecutan mediante el procedimiento
-  del runtime consumidor y nunca desde `globe:dev`.
-- Default state: fixtures/local habilitados; provider smoke explícito y con budget; flags de producción sin
-  cambios; cualquier nuevo seam de desarrollo default-OFF fuera de local.
+- Migration posture: `infra` — la task **provisiona un entorno nuevo** (instancia Cloud SQL, buckets, SAs,
+  IAM). No modifica el schema de Globe: corre las **mismas** migraciones existentes contra la base de
+  desarrollo. Un schema de desarrollo que diverja del productivo invalida la evidencia, así que la única vía
+  de creación es el runner de migraciones vigente.
+- Default state: el entorno de desarrollo no existe hasta que alguien lo provisiona explícitamente; `globe:dev`
+  falla al arrancar si apunta a la instancia o buckets productivos; flags de producción sin cambios.
 - Backfill plan: `N/A — no backfill`; si una capability requiere backfill, queda fuera del smoke local y se
   incorpora como prerequisito de la task dueña.
 - Rollback path: detener el proceso local; revertir el seam o apagar el flag de desarrollo; para rollout,
   usar rollback de revisión del workflow y revertir flags/configuración según el runbook, nunca limpiar SQL a mano.
-- External coordination: provider budget/terms, Secret Manager accessors, OAuth redirect local si se necesita,
-  Cloud Build, Cloud Run services/jobs, Cloud SQL migrations, GCS buckets y canarios requieren coordinación y
-  evidencia explícita antes del rollout.
+- External coordination: el provisioning del entorno de desarrollo exige aprobación de **costo recurrente**
+  (instancia Cloud SQL + buckets + gasto de proveedor con tope diario), `tofu/terraform apply` sobre el
+  proyecto de Globe, IAM y Secret Manager accessors propios. Todo eso es out-of-band y precede a Slice 1.
+  Para el rollout: provider budget/terms, Cloud Build, Cloud Run services/jobs, migraciones productivas y
+  canarios conservan su coordinación y evidencia explícita.
 
 ### Security and access
 
@@ -356,12 +393,39 @@ declaraba antes; lo que sobra se resuelve **componiendo**, no construyendo.
 
 ## Scope
 
-### Slice 1 — Local integrated Producer runtime
+### Slice 0 — Provisionar el entorno de desarrollo de Globe (BLOQUEA todo lo demás)
 
-- Implementar `globe:dev` para levantar `studio-client` con HMR, el Producer completo y `studio-web` local en
-  un perfil explícito.
-- Permitir iterar localmente sobre composer, selector/routing, feed, viewer, playback, estados de generación,
-  recuperación visual y bridges BFF sin desplegar cada cambio.
+Un entorno propio, aislado de lo desplegado, y **desechable**: si se ensucia, se bota y se levanta de nuevo
+corriendo migraciones. Ése es el criterio de calidad del slice.
+
+- **Instancia Cloud SQL propia** (`globe-pg-dev`), no una base extra dentro de `globe-pg`. Compartir instancia
+  deja producción expuesta a una migración pesada o a un `DROP` mal apuntado, y mezcla backups, PITR y
+  deletion protection. La instancia de desarrollo va sin PITR ni deletion protection — es desechable a
+  propósito — y con el tamaño mínimo que aguante el trabajo.
+- **Buckets propios** para los cuatro usos (`private_assets`, `lab_evidence`, `library_exports`,
+  `media_derivatives`), con `public_access_prevention = enforced` igual que los productivos: el entorno de
+  desarrollo es más barato y más chico, **nunca más laxo**.
+- **Service accounts e IAM propios**, espejo de los productivos. El modo local corre **por impersonación**
+  (patrón ya usado por `smoke-private-api.mjs`), nunca con el ADC crudo del operador: probar con permisos de
+  más hace creer que algo funciona cuando en producción falla por IAM.
+- **Workspace de desarrollo con su propio `dailyCapCredits`.** El fence de doble tope ya existe por workspace;
+  sólo hay que apuntarlo. Clasificarlo por el mapa deploy-governed que ya existe
+  (`GLOBE_WORKSPACE_KIND_CLASSIFICATIONS`) con un `kind` sin privilegio, de modo que el techo de derechos de
+  ADR-010 **deniegue su promoción por construcción**, sin código nuevo.
+- **Credenciales de proveedor separadas** cuando el proveedor lo permita; cuando no, el aislamiento es por
+  presupuesto y workspace, y eso se declara explícito en vez de suponerse.
+- Terraform + runbook para **crear y destruir** el entorno completo, y comando de migraciones contra él.
+- ⚠️ Al tocar la clasificación: `WorkspaceKindV1` es hoy un **union type**
+  (`packages/domain/src/commercial-promotion-lane.ts:40`) con una copia literal en
+  `ConfigWorkspaceKindResolver`. Convertirlo a array `as const` + test de cobertura en ambas direcciones
+  (regla R1) y derivar la copia (regla R2).
+
+### Slice 1 — Los tres procesos corriendo contra el entorno de desarrollo
+
+- Implementar `globe:dev` levantando los **tres procesos**: `studio-client` con HMR, `studio-web` local
+  (shell + BFF + dispatch) y el **worker de ejecución** local, todos desde el checkout.
+- Apuntar los tres al entorno de Slice 0 —nunca a `globe-pg` ni a los buckets desplegados— con un guardarraíl
+  que **falla al arrancar** si la configuración apunta a la instancia o los buckets productivos.
 - El shell de desarrollo vive **fuera** de la entrada productiva (invariante 1 del Detailed Spec) y reusa el
   renderer real igual que `seam-smoke-server.mjs`; el bundle manifestado de producción queda intacto.
 - Agregar el gate mecánico que rompe el build si `apps/studio-web/src/main.ts` o `src/app.ts` alcanza el
@@ -370,32 +434,43 @@ declaraba antes; lo que sobra se resuelve **componiendo**, no construyendo.
   y la diferencia con `seam:smoke` (bundle compilado bajo CSP real) — los dos coexisten y prueban cosas
   distintas.
 
-### Slice 2 — Producer multimodal fixture and capability harness
+### Slice 2 — Generación real end-to-end en el entorno de desarrollo
+
+Es el corazón de la task: apretar generar en el navegador local y obtener un asset real, con el código local
+ejecutando las tres capas y todo el rastro cayendo en el entorno de desarrollo.
+
+- Cerrar el circuito completo: composer → estimate → reserva en el fence → submit → ejecución por el
+  **worker local** → provider real → ingest al bucket de desarrollo → governance/provenance → feed → viewer
+  → playback, sin ningún bypass.
+- Cubrir imagen, audio y video. La matriz de rutas elegibles se **deriva de `globe.producer.fleet.list`**
+  (invariante 4), nunca de una lista literal: una ruta recién promovida entra a cobertura sin editar scripts.
+- Validar el resultado por bytes, MIME, hash, output shape, governance, rights, feed/viewer y **cobro único**;
+  readback-first, prohibido el `execute` ciego después de un timeout.
+- Verificar el **efecto** de la clave de idempotencia, no su presencia: que exista no prueba que el handler la
+  honre.
+- Exponer `globe:provider-smoke` como la versión no interactiva del mismo circuito —**cliente delgado del
+  spine**, mismo patrón que `smoke-private-api.mjs` / `globe-operator-lane.mjs` /
+  `production-promotion-cli.mjs`— para correrlo en lote o desde CI sin abrir el navegador.
+
+### Slice 3 — Fixtures como modo secundario
+
+Los fixtures dejan de ser el propósito y pasan a cubrir lo que la generación real no da barato: estados
+difíciles de provocar y trabajo sin red.
 
 - **Extender `apps/studio-web/scripts/producer-gvc-fixture.mjs`** (no crear un segundo fixture) a audio y
   video, con outputs gobernados, estados pending/completed/failed, governance, rights, feed, viewer, poster,
   waveform, Range y retrieval. La proyección de flota y las rutas se **derivan** de `PRODUCER_ROUTE_CATALOG`
   y de los contratos publicados (invariante 4); el `FLEET_AVAILABILITY` literal actual se convierte en
   derivación con overrides explícitos por caso.
-- Montar esos fixtures en los puntos reales del Producer para comprobar que composer → submit → pending →
-  completion/failure → feed → viewer/playback conserva el contrato, sin implementar un flujo paralelo.
+- Montar esos fixtures en los puntos reales del Producer, sin implementar un flujo paralelo.
 - Añadir canarios locales para desktop/390px cuando la superficie sea visible, reduced motion, ausencia de
   scroll horizontal, MIME/hash y reconciliación de resultados.
 - Exponer `globe:verify` como gate local reproducible, sin gasto ni mutación de runtime real. **`globe:verify`
   invoca `pnpm check` y los canarios existentes**; no re-deriva typecheck, tests ni gates de fuente. Si
   `globe:verify` y `check` pueden divergir, el diseño está mal: hay un solo gate local y `globe:verify` es su
   nombre compuesto.
-
-### Slice 3 — Real provider smoke lane
-
-- Implementar `globe:provider-smoke` **como cliente delgado del spine** (mismo patrón que
-  `smoke-private-api.mjs` / `globe-operator-lane.mjs` / `production-promotion-cli.mjs`), con selección
-  explícita de modalidad/ruta, workspace, budget, idempotency key y modo readback-first.
-- Cubrir al menos una ruta real de imagen, una de audio y una de video sólo cuando cada una esté available,
-  atestada, configurada y soportada por su worker/driver simétrico. La matriz de rutas elegibles se **deriva
-  de `globe.producer.fleet.list`** (invariante 4), nunca de una lista literal: si una ruta se promueve o se
-  bloquea, la cobertura del smoke lo refleja sin editar el script.
-- Validar resultado real por bytes, MIME, hash, output shape, governance, rights, feed/viewer y cobro único.
+- Regla de honestidad: un fixture verde **nunca** es evidencia de que una ruta genere. Esa evidencia es
+  Slice 2.
 
 ### Slice 4 — Deployable promotion bundle
 
@@ -490,17 +565,23 @@ de rollback. Los reportes locales no deben contener secretos, bytes privados inn
 
 ### Slice ordering hard rule
 
-- Slice 1 MUST precede Slice 2: los fixtures necesitan el shell local integrado.
-- Slice 2 MUST precede Slice 3: primero se prueba el flujo multimodal sin gasto y se valida la forma de salida.
-- Slice 3 MUST precede Slice 4 para cada ruta real: provider, binding, policy, worker y canary deben estar listos.
+- **Slice 0 MUST precede todo.** Sin entorno propio, cualquier proceso local apuntado a la base desplegada
+  toma trabajo de producción: el claim de la cola no filtra por workspace. No hay atajo aceptable.
+- Slice 1 MUST precede Slice 2: la generación real necesita los tres procesos corriendo contra el entorno.
+- Slice 2 MUST precede Slice 4 para cada ruta: sólo se despliega lo que ya generó de verdad en desarrollo.
+- Slice 3 puede ir en paralelo a Slice 2; los fixtures no son prerequisito de la generación real, y tratarlos
+  como tal reintroduce la confusión que esta task existe para eliminar.
 - Slice 4 MUST verify every runtime consumer before any flag flip or migration apply.
-- Slice 5 puede documentarse en paralelo, pero el cierre final exige evidencia de Slices 1–4 y handoff actualizado.
+- Slice 5 puede documentarse en paralelo, pero el cierre final exige evidencia de Slices 0–4 y handoff
+  actualizado.
 
 ### Risk matrix
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---:|---|---|
-| El modo local dispara provider real o gasto por configuración heredada | provider/credits | medium | perfiles explícitos, default fixtures, allowlist y budget fail-closed | provider submit inesperado / reservation local |
+| 🔴 Un proceso local apunta a la base/buckets desplegados y toma trabajo de producción | Cloud SQL/worker | **high** si no se hace Slice 0 | entorno propio (Slice 0) + guardarraíl que falla al arrancar si la config apunta a `globe-pg` o a los buckets productivos | run de producción ejecutado por un worker sin revisión desplegada |
+| El schema de desarrollo diverge del productivo y la evidencia se vuelve falsa | Cloud SQL | medium | única vía de creación es el runner de migraciones vigente; verificación de paridad de schema | migración aplicada en un entorno y no en el otro |
+| El gasto del entorno de desarrollo se dispara sin techo | provider/credits | medium | `dailyCapCredits` propio del workspace de desarrollo, fail-closed | tope diario alcanzado / reservas sostenidas |
 | HMR diverge del bundle que Cloud Run sirve | UI/build | high | canary de seam, build manifestado obligatorio y `globe:verify` | hash servido distinto al artefacto |
 | Smoke real se repite después de timeout y cobra dos veces | lifecycle/credits | medium | readback-first, idempotency única y bloqueo de retry ciego | attempts o settlements duplicados |
 | API despliega sin worker/secret/config compatible | Cloud Run/worker | medium | matriz de consumidores y simetría de deploy | route binding/driver/secret accessor mismatch |
@@ -579,6 +660,14 @@ de rollback. Los reportes locales no deben contener secretos, bytes privados inn
   comercial/external readiness.
 - [ ] No se imprimen ni almacenan tokens, secretos, service-account JSON, URLs firmadas, cuerpos upstream,
   stacks ni raw errors en fixtures, reportes o logs.
+- [ ] Existe un entorno de desarrollo de Globe con instancia, buckets, service accounts, IAM y workspace
+  propios, creable y destruible desde Terraform, con su schema creado por el runner de migraciones vigente.
+- [ ] `globe:dev` **falla al arrancar** si la configuración apunta a `globe-pg` o a cualquier bucket
+  productivo; se prueba rojo.
+- [ ] Una generación real de imagen, audio y video sale desde el navegador local, ejecutada por el worker
+  local, y todo su rastro (run, attempt, asset, provenance, ledger) queda en el entorno de desarrollo y en
+  **ninguna** tabla o bucket desplegado; se verifica leyendo ambos lados.
+- [ ] El workspace de desarrollo tiene tope diario propio y su promoción está denegada por clasificación.
 - [ ] Existe un test que **rompe el build** si la entrada productiva (`apps/studio-web/src/main.ts`,
   `src/app.ts`) alcanza el módulo del shell de desarrollo; se prueba rojo en ambas direcciones.
 - [ ] Ningún comando del harness reimplementa arte previo: `globe:verify` invoca `pnpm check`,
@@ -740,3 +829,44 @@ reportan por separado, que es precisamente lo que impide que un fixture verde se
 lo hace lineal: 10 rutas hoy y 25 mañana no cambian el script. Costo a 10x: lineal en el carril de smoke
 (gasto real por ruta), sub-lineal en los carriles locales. El punto de contención real es humano — el canario
 autenticado por modalidad —, no computacional.
+
+## Delta 2026-08-03 — corrección de tesis: la app es la desplegada; falta el ENTORNO de desarrollo
+
+Dirección del operador, en sus palabras: *«no quiero que la app sea mi entorno de desarrollo local, la app es
+la que está desplegada en el servicio; lo que necesito es tener un entorno de desarrollo habilitado con todo
+para poder desarrollar más rápido y probar lo desarrollado»*.
+
+La versión previa de esta task —y el primer borrador de mi propia auditoría— apuntaba el runtime local a la
+Cloud SQL, los buckets y la cola **desplegados**. Eso no es un entorno de desarrollo: es operar la app
+productiva desde una máquina de escritorio. Corregido.
+
+### Lo que cambió
+
+| Antes | Ahora |
+|---|---|
+| Fixtures como propósito; generación real como fase ceremonial aparte | Generación real como loop diario; fixtures como modo secundario |
+| Runtime local contra los servicios desplegados | Runtime local contra un **entorno de desarrollo propio** |
+| Slice 0 = filtrar la cola por workspace (bloqueante) | Slice 0 = **provisionar el entorno**; el filtro pasa a follow-up de higiene |
+| Sólo UI + BFF en local | **Los tres procesos**, incluido el worker: la generación la ejecuta él |
+
+### Por qué el entorno propio resuelve más de lo que cuesta
+
+El bloqueante que había encontrado —el claim de `governed_run_outbox` no filtra por `workspace_id`, así que un
+worker local robaría trabajo de producción y viceversa— **se disuelve solo**: con base propia, la cola es otra
+tabla en otra base. Lo que era un cambio en el corazón del runtime gobernado pasa a ser higiene diferible. El
+aislamiento por infraestructura resultó más barato y más seguro que el aislamiento por filtro.
+
+### Lo que sí cuesta
+
+Una instancia Cloud SQL adicional, cuatro buckets, service accounts propios y el gasto de proveedor del
+entorno. Es costo recurrente y requiere aprobación explícita. La alternativa —una base extra dentro de
+`globe-pg`— ahorra ese costo pero deja producción expuesta a una migración pesada o a un `DROP` mal apuntado,
+y mezcla backups, PITR y deletion protection. **El aislamiento vale más que el ahorro**, y por eso la task
+pide instancia separada, sin PITR ni deletion protection, del tamaño mínimo que aguante.
+
+### Lo que NO cambió
+
+La app desplegada sigue siendo la app. El entorno de desarrollo no la toca: distinta base, distintos buckets,
+distinta cola, distinto presupuesto, promoción denegada por clasificación. El despliegue conserva íntegros sus
+gates de SHA, imagen, revisión, tráfico y rollback. Y el schema del entorno de desarrollo se crea **con las
+mismas migraciones**: un schema que diverge convierte toda la evidencia local en ficción.
