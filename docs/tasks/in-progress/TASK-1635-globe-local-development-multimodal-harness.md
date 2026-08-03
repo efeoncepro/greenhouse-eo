@@ -931,3 +931,42 @@ los tres procesos) y Slice 2 (generación real).
 
 Credenciales de proveedor: el HCL hoy las comparte con producción (`development_provider_secrets_shared = true`,
 aislamiento por workspace + tope diario). Separarlas exige cuentas de proveedor propias.
+
+## Delta 2026-08-03 — cero claves nuevas: los secretos se juzgan por autoridad
+
+Instrucción del operador: *no crear más claves, usar las existentes de Globe*. Globe `9d44091`.
+
+**Medido antes de cablearlo, y el resultado convierte la restricción en una mejora.**
+`readSecret` (`apps/studio-web/src/app.ts:1146`) devuelve `undefined` cuando un secreto falta —no
+lanza— y cada firmante se construye como `secreto ? crearFirmante(secreto) : undefined`. Un
+secreto ausente **no rompe el arranque: deja su capability sin autoridad de firma**, que ya es
+fail-closed y está implementado.
+
+Así que los 11 contenedores de secreto que el HCL creaba eran innecesarios. El runtime de
+desarrollo lee un subconjunto **enumerado** de los productivos —los de **acceso**— y los tres que
+confieren **autoridad** quedan fuera de su alcance:
+
+| Secreto | Qué firmaría | Estado en desarrollo |
+|---|---|---|
+| `globe-credit-approval-secret` | aprobaciones de crédito | **denegado** — podría aprobar gasto productivo |
+| `globe-model-rights-attestation-secret` | derechos comerciales | **denegado** — sostiene responsabilidad legal |
+| `globe-model-readiness-attestation-secret` | readiness de modelo | **denegado** |
+| `globe-producer-grant-secret` · `globe-media-ticket-secret` | acceso al output propio | legible: el gateway re-autoriza cada request |
+| `globe-ui-delegation-secret` · `globe-ui-csrf-secret` · `globe-private-ingest-handle-secret` | sesión y referencias del BFF | legible |
+| `globe-fal-api-key` · `globe-gemini-api-key` · `globe-openai-api-key` · `globe-fal-voice-map` | proveedores | legible: aislamiento por workspace + tope diario |
+
+Es un control **más fuerte** que el diseño anterior, donde desarrollo tenía claves propias para
+todo. Y cierra la decisión que estaba abierta sobre credenciales de proveedor: se comparten, y el
+guardarraíl declara por qué es aceptable — ninguno de los legibles es bearer autosuficiente.
+
+**El guardarraíl pasa a juzgar por autoridad, no por nombre**, con dos capas que conviven a
+propósito: el denylist da el mensaje preciso cuando alguien intenta justo lo peligroso; el
+allowlist es lo que hace que la **próxima** clave de autoridad —la que todavía no existe— también
+se rechace. Un test nuevo exige que las dos listas sean **disjuntas**: el guardarraíl no puede
+confiar en sus propias listas más de lo que confía en el entorno. Probado en rojo.
+
+**Plan: de 43 a 26 `to add`, 0 change, 0 destroy. Cero contenedores de secreto nuevos** — los 9
+recursos de Secret Manager son accessors sobre secretos existentes.
+
+**Verificación:** `pnpm check` **exit=0** (1539 tests, 0 fail) · guardarraíl 9/9 · plan OFF sigue
+en `No changes`.

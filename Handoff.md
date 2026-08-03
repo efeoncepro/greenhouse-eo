@@ -12,13 +12,17 @@ Commiteado en Globe `main`, local, **sin push**: `864ce68` (entorno + dos guarda
 probados en rojo) y `f1b8e6e` (migraciones alcanzan la base dev). `tofu plan` con el flag OFF da `No changes`;
 ON da **43 to add, 0 change, 0 destroy**, sin tocar la instancia.
 
-**Bloqueado, requiere al operador:** `tofu apply`, valores de los 11 secretos de firma out-of-band, y correr
-`bootstrap-development.sql` + `verify-development-isolation.sql` por el proxy. Su **orden es load-bearing**: el
+**Cero claves nuevas** (`9d44091`): medido contra el runtime, un secreto ausente no rompe el arranque —deja su
+capability sin firmante—, así que desarrollo lee un subconjunto de los productivos y los **tres de autoridad**
+(aprobación de crédito + las dos atestaciones) le quedan **denegados**. Control más fuerte que darle claves
+propias. Plan bajó a **26 to add**, cero contenedores de secreto nuevos.
+
+**Bloqueado, requiere al operador:** `tofu apply` y correr `bootstrap-development.sql` +
+`verify-development-isolation.sql` por el proxy. Su **orden es load-bearing**: el
 CONNECT productivo se hace explícito antes de revocar `PUBLIC`, o producción pierde su propia base (en las 49
 migraciones no hay un solo `GRANT CONNECT`). Recién después: migrar dev, `globe:dev` y generación real.
 
-**Decisión abierta:** credenciales de proveedor compartidas con producción (aislamiento por workspace + tope
-diario) vs. cuentas propias. El despliegue por lote se movió a
+El despliegue por lote se movió a
 [`TASK-1636`](docs/tasks/to-do/TASK-1636-globe-deployable-promotion-bundle.md), bloqueada por ésta.
 
 ## SKY Blog — propuesta técnica V2 y arquitectura económica (2026-08-03)
