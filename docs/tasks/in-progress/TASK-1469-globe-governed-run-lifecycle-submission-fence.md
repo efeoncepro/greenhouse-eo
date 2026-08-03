@@ -1,5 +1,77 @@
 # TASK-1469 — Globe Governed Run Lifecycle, Submission Fence and Provider Completion
 
+## Delta 2026-08-03 (c) — el barrido está hecho y el alcance restante era otro del que la task decía
+
+**Todo lo de abajo se midió contra `globe-pg` con la identidad IAM del operador, sólo lecturas.** El barrido
+que los deltas anteriores pedían como primer paso ya no es una propuesta: es el dato con el que se ejecutó.
+
+### El barrido, con veredicto por agregado
+
+| Agregado | Divergencia medida | Veredicto |
+|---|---|---|
+| outbox `reconcile` ↔ `governed_runs` | **0** | **CONVERGE.** `supersedeNonReclaimableReconciles` ya lo cierra pre-batch. La deuda que esta task declaraba como su alcance principal **ya no existe** |
+| `experiments` ↔ `governed_runs` | **4** (`running` con run terminal; el más viejo del 2026-07-30) | DIVERGE hacia atrás: `abandon` sólo actúa hacia adelante |
+| `credit_reservations` ↔ `governed_runs` | 1 `held` con TTL vigente | **OBSERVABLE.** Lo cierra el expiry y su latencia ya tiene alerta (`creditExpiryOldestAgeSeconds`) |
+| `asset_governance_jobs` | **0** no terminales de 4.448 | CONVERGE por su propio lease/`max_attempts` |
+
+El conteo real de huérfanos es **4**, no 6: la diferencia entre las dos anotaciones previas era convergencia
+posterior, no un error de conteo.
+
+### 🔴 Hallazgo: `outboxDeadLetter` no tenía mal el nombre — **medía mal**
+
+Su SQL contaba **filas de outbox**, y un attempt tiene una fila por fase (`submit`/`reconcile`/`complete`).
+Medido sobre la corrida perdida del incidente: **`dead_letter = 3` para UN solo attempt**. Cablear esa señal
+tal cual habría producido una alerta cuyo número no corresponde a ninguna cantidad real de trabajo — la forma
+lenta de enseñarle al equipo a desconfiar del dato.
+
+Y el nombre desviaba de verdad: **`governed_run_outbox.state='dead'` SÍ existe** (CHECK de la migración
+`0014`) y tiene 4 filas, escritas por **otro camino** (`credit-ledger-store.ts`, recuperación histórica de
+crédito); el cierre terminal de un job escribe `done`. Quien buscara «la tabla de dead letters» detrás de esa
+métrica encontraría filas sin relación con ella. Corrige la nota del Handoff que decía que el estado no
+existía.
+
+### Lo implementado (Globe `main`, local, sin push)
+
+| Commit | Qué |
+|---|---|
+| `f5c321d` | El invariante declarado y **enumerable**: `RUN_DEPENDENT_AGGREGATES` (array `as const`) + test de cobertura en ambas direcciones — un agregado sin postura rompe el build, y un `observable` sin señal se rechaza |
+| `54f41f9` | Barrido de convergencia hacia atrás, reusando el **mismo `abandon`** del camino terminal; puerto estrecho aparte de `GovernedRunStorePort` |
+| `8704fc0` | La señal cuenta **attempts distintos**; `outboxDeadLetter` → `outboxTerminalAttempts`, con el contrato documentando quién escribe `dead` |
+| `196846d` | 3 `logging_metric` + 3 `alert_policy`. `tofu plan`: **6 to add, 0 to change, 0 to destroy** |
+
+Dos decisiones que conviene no revertir por descuido:
+
+- **El barrido sólo toma terminales recuperables** (`failed|cancelled|timed_out`). Marcar `failed` un run
+  `completed` cuyo experimento quedara atrás sería mentir sobre una corrida que sí entregó: ese caso **se
+  cuenta y no converge**, y la diferencia queda en `divergentAggregates`.
+- **Propaga el `last_error_code` real** del último intento. Un genérico dejaría el experimento diciendo
+  «falló» sin decir por qué, justo en la fila que un humano va a leer — ISSUE-127 en la superficie visible.
+
+### ⚠️ Trampa encontrada al planificar el apply (NO es de esta task, y muerde)
+
+`tofu plan` desde un checkout limpio da **`6 to add, 0 to change, 20 to destroy`**. Los 20 destroys son
+**todo el entorno de desarrollo de `TASK-1635`**: `development_environment_enabled` tiene default `false` en
+git y el entorno vivo existe porque alguien aplicó con un `terraform.tfvars` **gitignoreado**. Un apply desde
+una máquina sin ese archivo **destruye el entorno de desarrollo entero**, en silencio y con plan verde.
+
+El plan honesto de esta task se obtiene pasando las variables:
+
+```bash
+tofu plan -var development_environment_enabled=true \
+  -var 'development_operator_principal=user:julio.reyes@efeonce.org'
+```
+
+Dueño del arreglo de fondo: `TASK-1635` (el estado real de un flag no puede vivir en un archivo sin trackear
+— es el mismo problema que `producer_assets_enabled`, mejor disfrazado).
+
+### Rollout pendiente (esto es `code complete`, NO operativamente completo)
+
+1. `tofu apply` con las variables de arriba → crea las 3 métricas + 3 alertas.
+2. Desplegar el worker desde el SHA de estos commits → el barrido recupera los 4 huérfanos en su primer batch.
+3. Re-medir el conteo de huérfanos después del primer batch (debe quedar en 0) y confirmar
+   `divergentAggregates = 0` en `globe_worker_completed`.
+
+
 ## Delta 2026-08-02 — alcance restante reducido y orden frente a TASK-1632
 
 El lifecycle durable, submission fence, completion drivers, retención y settlement ya están vivos. Esta task no
@@ -97,7 +169,7 @@ canary ya tiene owner: **ADR-004** (`TASK-1506`, complete) fijó el front door y
 - Motion: `none`
 - Backend impact: `webhook`
 - Epic: `EPIC-028`
-- Status real: `Lifecycle durable live; los 5 arreglos de la espera de governance desplegados (efeonce-globe@d58bc6f). Restante: convergencia terminal de los agregados del run (barrido primero), cableado de las 2 señales de outbox y recovery de experimentos huérfanos — ver Delta 2026-08-03`
+- Status real: `code complete, rollout pendiente. Barrido hecho y medido; invariante de convergencia + barrido hacia atrás + señales honestas + cableado Terraform commiteados en Globe main (f5c321d, 54f41f9, 8704fc0, 196846d), sin push. Falta tofu apply + deploy del worker + re-medición de los 4 huérfanos — ver Delta 2026-08-03 (c)`
 - Rank: `TBD`
 - Domain: `creative|platform|ops`
 - Blocked by: `none`
@@ -642,15 +714,21 @@ Candidatos a tercera pareja, **no verificados**:
 
 ### Criterios exigibles que agrega este delta
 
-- [ ] El invariante de convergencia terminal está declarado y probado como propiedad del lifecycle, no como
+- [x] El invariante de convergencia terminal está declarado y probado como propiedad del lifecycle, no como
       arreglo de una pareja: un run terminal deja **todo** agregado dependiente convergido u observable.
-- [ ] El barrido de agregados dependientes está hecho y su resultado escrito (al menos: outbox `reconcile`,
+      → `packages/domain/src/run-aggregate-convergence.ts` + su test de cobertura en ambas direcciones.
+- [x] El barrido de agregados dependientes está hecho y su resultado escrito (al menos: outbox `reconcile`,
       `experiments`, reservas de crédito, assets en governance), con veredicto por cada uno.
-- [ ] `globe.run.outbox_dead_letter` y `globe.run.outbox_retry_storm` tienen `logging_metric` + `alert_policy`
-      en `infra/terraform/`, con steady-state declarado (`0`/`0`).
-- [ ] El nombre de la señal de dead letter describe lo que cuenta, o su contrato lo documenta explícitamente.
-- [ ] Los experimentos huérfanos previos al fix quedan recuperados por primitive canónica con audit; el conteo
-      se re-mide antes y después.
+      → tabla del Delta 2026-08-03 (c), medida contra el runtime.
+- [~] `globe.run.outbox_dead_letter` y `globe.run.outbox_retry_storm` tienen `logging_metric` + `alert_policy`
+      en `infra/terraform/`, con steady-state declarado (`0`/`0`). → HCL commiteado y plan verificado
+      (`6 to add, 0 to destroy`); **falta el `tofu apply`**.
+- [x] El nombre de la señal de dead letter describe lo que cuenta, o su contrato lo documenta explícitamente.
+      → renombrada a `outboxTerminalAttempts` **y** documentado quién escribe `state='dead'`; además se
+      corrigió que **medía filas en vez de attempts** (3 por 1).
+- [~] Los experimentos huérfanos previos al fix quedan recuperados por primitive canónica con audit; el conteo
+      se re-mide antes y después. → medición previa hecha (**4**) y barrido implementado con `abandon` +
+      audit; **falta el deploy del worker y la re-medición posterior**.
 
 ## Follow-ups
 

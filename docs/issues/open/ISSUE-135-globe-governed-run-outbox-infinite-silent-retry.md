@@ -90,10 +90,9 @@ contar como «reprogramado» algo que murió.
 
 ## Lo que queda abierto
 
-1. 🔴 **Las señales.** `globe.run.outbox_dead_letter` y `globe.run.outbox_retry_storm` (umbral 10, ya expuesto
-   como `isRetryStorm`) todavía no existen como señal observable. Sin ellas el tope evita el daño pero nadie
-   se entera de que algo murió. **Sigue abierto al 2026-08-03** — ahora se calculan por batch, pero nada las
-   lee; ver el delta de ese día.
+1. ✅ **Las señales.** Cableadas el 2026-08-03 por `TASK-1469` (`efeonce-globe@8704fc0` + `@196846d`): tres
+   `logging_metric` + tres `alert_policy` en `infra/terraform/producer_worker_observability.tf`. **Rollout
+   pendiente del `tofu apply`** — ver el delta de abajo.
 2. 🔴 **Preservar el motivo real.** `finalizationFailureCode` sigue cayendo a `run_finalization_failed` cuando
    el error no está en su allowlist. Correcto para no filtrar, pero deja cero rastro accionable — y por eso
    la clase `unknown` existe con tope 3. **Sigue abierto**; el 2026-08-03 se cerró un caso concreto
@@ -217,6 +216,30 @@ trabajo cerró el caso concreto de la espera de governance agregándola a la all
 siendo una allowlist**: el próximo código que no esté en ella se vuelve a borrar, y la clase `unknown` con tope 3
 seguirá tomando decisiones sobre un hueco. La regla de nacimiento de la clasificación ya es mecánica
 (`production-route-failure-classification.test.ts`); la de preservación del nombre todavía no.
+
+## Delta 2026-08-03 (b) — las señales quedaron cableadas, y medían mal
+
+`TASK-1469` cerró el punto 1. Lo que hay que saber antes de leer el número:
+
+🔴 **La señal no tenía sólo mal el nombre: contaba filas de outbox en vez de attempts distintos.** Un attempt
+tiene una fila por fase (`submit`/`reconcile`/`complete`), así que multiplicaba cada muerte por tres — medido
+contra el runtime sobre la corrida perdida de este issue: **`dead_letter = 3` para UN solo attempt**. Cablearla
+tal cual habría producido una alerta cuyo valor no corresponde a ninguna cantidad real de trabajo, que es la
+forma lenta de enseñarle al equipo a desconfiar del dato. Es la propia clase de defecto de este issue aplicada
+a su instrumento: el número existía, y no decía lo que parecía decir.
+
+Y **`governed_run_outbox.state='dead'` SÍ existe** (CHECK de la migración `0014`) con 4 filas, escritas por un
+camino distinto (`credit-ledger-store.ts`, recuperación histórica de crédito); el cierre terminal de un job
+escribe `done`. Por eso la señal pasa a llamarse `outboxTerminalAttempts` — por lo que mide — y su contrato
+documenta quién escribe el estado que el nombre viejo prometía. Corrige la nota previa que decía que el estado
+no existía todavía.
+
+Cableado: 3 `logging_metric` + 3 `alert_policy` (`outbox_terminal_attempts` ERROR sin espera,
+`outbox_retry_storm` WARNING con ventana, `run_aggregate_divergence` ERROR). La tercera es de `TASK-1469` y
+detecta una divergencia entre agregados que el barrido no pudo cerrar. `tofu plan`: `6 to add, 0 to destroy`;
+**el apply queda pendiente**.
+
+Sigue abierto el punto 2 — preservar el motivo real cuando `finalizationFailureCode` cae al genérico.
 
 ## Solución propuesta
 

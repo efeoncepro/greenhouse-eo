@@ -2,6 +2,40 @@
 
 Historia anterior: [Handoff.archive.md](Handoff.archive.md).
 
+## TASK-1469 — convergencia terminal de los agregados del run (2026-08-03)
+
+**Estado: `code complete, rollout pendiente`.** Detalle en
+[`TASK-1469`](docs/tasks/in-progress/TASK-1469-globe-governed-run-lifecycle-submission-fence.md) →
+**Delta 2026-08-03 (c)**, que es el estado vigente.
+
+Commiteado en Globe `main`, local, **sin push**: `f5c321d` · `54f41f9` · `8704fc0` · `196846d`.
+`pnpm check` en verde (11 paquetes, 0 fallos).
+
+- **El barrido cambió el alcance de la propia task:** la pareja que declaraba como deuda principal (outbox
+  `reconcile` ↔ runs terminales) **ya convergía** — 0 divergencias. La que dolía era `experiments` ↔ runs, con
+  **4** huérfanos (no 6). El invariante quedó declarado y **enumerable**, y el barrido hacia atrás reusa el
+  **mismo `abandon`** del camino terminal. Veredicto por agregado y decisiones de diseño: en el Delta.
+- 🔴 **`outboxDeadLetter` no tenía sólo mal el nombre: MEDÍA MAL.** Contaba filas de outbox y un attempt tiene
+  una por fase → decía **3 para UN solo attempt**. Y **`state='dead'` SÍ existe** (CHECK de la `0014`, escrito
+  por la recuperación histórica de crédito). Corrige la nota previa de este Handoff. Hoy es
+  `outboxTerminalAttempts` y cuenta attempts distintos. **ISSUE-135 punto 1 cerrado en código.**
+
+### Rollout pendiente — dos acciones, en este orden
+
+1. `tofu apply` **con las variables del entorno de desarrollo** (ver la trampa de abajo).
+2. Deploy del worker desde el SHA de estos commits → el barrido recupera los 4 huérfanos en su primer batch.
+   Después: re-medir el conteo (debe quedar en 0) y confirmar `divergentAggregates = 0`.
+
+### 🔴 Trampa de infra encontrada al planificar el apply (dueño: `TASK-1635`, no 1469)
+
+`tofu plan` desde un checkout limpio da **`6 to add, 0 to change, 20 to destroy`**, y los 20 destroys son
+**todo el entorno de desarrollo de TASK-1635**: `development_environment_enabled` tiene default `false` en git
+y el entorno vivo existe porque alguien aplicó con un `terraform.tfvars` **gitignoreado**. Un apply desde una
+máquina sin ese archivo lo destruye entero, en silencio y con plan verde. El plan honesto se obtiene con
+`-var development_environment_enabled=true -var 'development_operator_principal=user:julio.reyes@efeonce.org'`
+→ **`6 to add, 0 to change, 0 to destroy`**. El arreglo de fondo (el estado real de un flag no puede vivir en
+un archivo sin trackear) es de `TASK-1635`.
+
 ## TASK-1635 — `pnpm globe:dev`: el loop rápido de Globe, funcionando (2026-08-03)
 
 Ver un cambio de UI de Globe costaba construir imagen y desplegar tres runtimes. Ahora cuesta guardar el
@@ -91,8 +125,9 @@ consumers es de 1552.
 
 ### Próximo paso, en este orden
 
-1. **Las dos señales de [`ISSUE-135`](docs/issues/open/ISSUE-135-globe-governed-run-outbox-infinite-silent-retry.md)**
-   (`outbox_dead_letter`, `outbox_retry_storm`) — protegen todo lo demás.
+1. **El rollout de `TASK-1469`** (`tofu apply` + deploy del worker) — cierra el punto 1 de
+   [`ISSUE-135`](docs/issues/open/ISSUE-135-globe-governed-run-outbox-infinite-silent-retry.md) en runtime y
+   protege todo lo demás. El código ya está; ver la sección de 1469 arriba.
 2. El bloque del adapter de 1633 (grupo **a**).
 3. El composer de 1552 leyendo el descriptor.
 
@@ -106,15 +141,14 @@ consumers es de 1552.
    que recibe el modelo en TODAS las rutas y **no se verificó con canary** (bloqueados por lo anterior).
 3. **«Upscale con estilo dejó de funcionar» es esperado**, no un defecto: ahora da error **sin gasto** en vez de
    generar ignorando el estilo y cobrar igual. La UI que evita el caso es `TASK-1552`.
-4. **Experimentos huérfanos en `running` con su run ya terminal**, anteriores al fix; `abandon` sólo actúa hacia
-   adelante. `TASK-1469` declara **6** en su Follow-up y una nota de sesión dice 4: **contar contra runtime antes
-   de recuperar, y nunca por SQL**.
-5. **Las dos señales de `ISSUE-135` se calculan pero no están cableadas.** El worker las emite por batch en
-   `globe_worker_completed` (`apps/studio-web/src/worker-main.ts:267`); no hay dashboard ni alerta que las lea, así
-   que hoy sólo se ven mirando el log.
-6. **El nombre `outboxDeadLetter` engaña.** No cuenta filas en estado `dead_letter` de la outbox —ese estado no
-   existe todavía—: cuenta attempts `state='failed'` con `terminal_at` no nulo en una ventana de 24 h
-   (`packages/database/src/stores/governed-run-store.ts:320`). Leerlo literal produce conclusiones falsas.
+4. ~~Experimentos huérfanos~~ — **contados (4) y con barrido implementado**; queda el deploy para que se
+   recuperen. Ver la sección de `TASK-1469` arriba.
+5. ~~Las dos señales de `ISSUE-135` no están cableadas~~ — **cableadas en código** (3 métricas + 3 alertas);
+   queda el `tofu apply`.
+6. ~~El nombre `outboxDeadLetter` engaña~~ — **corregido, y el diagnóstico previo era incompleto**: no sólo
+   desviaba el nombre, **medía filas de outbox en vez de attempts** (decía 3 para 1). Además `state='dead'`
+   **sí existe** en la outbox y lo escribe la recuperación histórica de crédito. Hoy es
+   `outboxTerminalAttempts`.
 
 ### Nota operativa
 
