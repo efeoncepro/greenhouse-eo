@@ -1036,3 +1036,43 @@ BFF, el mismo de `smoke-private-api.mjs`. **Bloqueado por IAM**: el usuario oper
 `roles/iam.serviceAccountTokenCreator` sobre `greenhouse-globe-caller`, así que no puede mintear
 el token. Otorgarlo es una decisión: ese principal carga `globe.lab.experiment.run`, o sea
 autoridad de gasto.
+
+## Delta 2026-08-03 (cierre de sesión) — modo live cerrado; qué falta para `complete`
+
+Con el binding de IAM aplicado (Globe `786ee19`, por sesión Codex), el modo de datos reales quedó
+funcionando y **verificado en pantalla**: el Producer local muestra las 19 piezas reales del
+workspace interno con prompt, modelo, créditos y estado.
+
+```bash
+GLOBE_DEV_API=https://globe-api-internal-a6odmgzpvq-tl.a.run.app pnpm globe:dev
+```
+
+### El defecto que faltaba, y es arquitectónico
+
+`GET /v1/session` contra la API privada responde **404**: ese endpoint vive en el BFF, no en la
+API. Globe tiene dos carriles que no son intercambiables — humano (browser → BFF → API) y workload
+(cliente → API con ID token) — y el cliente React consulta `/v1/session` al arrancar para saber
+quién es. Con el proxy apuntando directo a la API, ese llamado daba 404 y la UI reportaba «Tu
+sesión expiró»: **un síntoma que acusa a la sesión cuando lo que pasó es que se le pidió a la API
+algo que nunca fue suyo.** Como el dev shell actúa de BFF, ahora provee lo que el BFF provee.
+
+Regla general: **cuando un proxy reemplaza una capa, hereda su contrato completo**, no sólo el
+tramo que uno recordaba.
+
+### Diferencia declarada del carril workload
+
+`globe.credits.capacity.self.get` → **403** (`balance.get` → 200). Las capabilities `*.self.*`
+piden un «yo» que un service account no tiene. El síntoma es el contador de créditos del header en
+`—`, y la UI **degrada bien**. Deliberadamente no se rellena derivándolo de `balance.get`: un dato
+plausible haría que la pantalla mienta sobre qué carril la sirve.
+
+### Qué falta para mover a `complete`
+
+- **Una generación real desde el Producer local.** Es el criterio de Slice 2 y **no se ejecutó**:
+  gasta créditos reales (~10 para una imagen) y eso exige decisión explícita del operador, no una
+  autorización general de sesión.
+- **Fixtures multimodales de audio y video** (Slice 3). Su valor bajó mucho ahora que el modo live
+  funciona: el fixture quedó como el camino sin credenciales, no como la fuente principal.
+
+Hasta que exista esa generación verificada, el estado honesto de la generación end-to-end es
+`code complete, rollout pendiente` — el camino está cableado y leído, no ejercido.
