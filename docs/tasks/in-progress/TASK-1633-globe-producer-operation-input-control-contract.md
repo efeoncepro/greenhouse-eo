@@ -752,6 +752,24 @@ Rollout verificado: `globe-api-internal` en revisión **`00195-qj6`** y el worke
 `sha256:3324787d…`, ambos etiquetados `e300c4eafa5e`. `outboxDeadLetter` sigue en 1 (el preexistente),
 `retryStorm` 0, worker con `claimed=0`, API responde 403. `pnpm check` + `pnpm build` exit 0.
 
+## Delta 2026-08-03 — el contrato verificado con una generación real
+
+**Una pieza salió por el Producer con el catálogo `1.7.0` y el contrato nuevo.** Prompt escrito en la UI
+autenticada, estimate vigente, `prepare → execute → provider → settle` completo, `run: completed`,
+`experiment: candidate_ready`, pieza visible en el feed y **un solo cobro** (738 → 728 créditos).
+
+Eso cierra la evidencia que faltaba del lado de esta task: el descriptor por ruta no rompió el camino de
+generación, y el estimate/approval siguen operando sobre el contrato resuelto server-side.
+
+**Los defectos que aparecieron en el camino NO son de esta task.** Verificar el contrato exigió generar, y generar
+destapó una espera de Asset Governance modelada como error que costó una pieza pagada. Su dominio es el lifecycle
+de governed runs: está documentado y arreglado en
+[`TASK-1469`](TASK-1469-globe-governed-run-lifecycle-submission-fence.md) (Delta 2026-08-03). **1633 destapó, 1469
+arregla** — y 1633 no espera a 1469 para cerrar.
+
+Queda igualmente registrado acá porque afecta la lectura de cualquier canary futuro de esta task: una generación
+que se quede en «generando» puede ser el lifecycle y no el contrato.
+
 ### 🔴 Punto de decisión abierto antes de Slice 3.5b
 
 Al preparar los ingredientes nuevos del brief apareció que **los dos vocabularios no coinciden**, ni en nombres ni

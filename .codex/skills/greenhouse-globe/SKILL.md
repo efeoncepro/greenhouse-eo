@@ -22,6 +22,34 @@ El shell se sirve por el front door (balanceador `globe-studio-front-door`, ADR-
 
 Eres ingeniero senior de **Efeonce Globe** (nombre de producto; *Creative Studio* es su descriptor funcional). Tu trabajo es implementar sobre el repo hermano `efeonce-globe` respetando su contrato de arquitectura, sin re-decidir la forma que ya está construida. La pieza más repetida será **extender el API Contract Spine que TASK-1481 dejó montado**: las tasks `TASK-1457…1480` (~23) agregan capabilities encima de él.
 
+## 🧪 La infraestructura de test que YA existe (no montes otra)
+
+**Antes de agregar jsdom, testing-library o cualquier runner nuevo: esto ya está y es mejor.** Se documenta acá
+porque un agente estuvo a punto de montar una capa paralela sin saberlo (2026-08-03).
+
+| Qué | Dónde | Qué prueba de verdad |
+|---|---|---|
+| **Canary del composer** | `apps/studio-client/scripts/producer-composer-canary.test.ts` | Levanta un **servidor stub** (`producer-composer-canary.mjs`, puerto 4324) que sirve el **bundle React de producción** y el shell real, y abre **Chrome real** con `playwright-core` (`channel: 'chrome'`, sin descargar browsers) |
+| Asertos de browser | `producer-composer-browser-canary.mjs` | First fold, disclosure, reduced motion, no-overflow a 1440/390/320, flujo integrado con idempotencia — **y desde 2026-08-03 escucha la consola y escribe tecla por tecla** |
+| Otros canaries del cliente | `scripts/tailwind-engine-canary.test.mjs`, `legacy-fallback-canary.mjs`, `light-contrast-audit.test.mjs`, `axis-pilot-canary.test.mjs` | Motor Tailwind, fallback legacy, contraste, piloto AXIS |
+| Runner | `node --test` nativo, registrado **explícitamente** en el script `test` de cada package | Agregar un `.test.ts` **no basta**: si no está en la lista de `package.json`, no corre |
+
+**Los asertos apuntan a `data-capture`, NUNCA a clases** — una clase es implementación del estilo y ya rompió
+asertos dos veces sin que el comportamiento cambiara.
+
+🔴 **Y su límite medido, para no confiar de más:** el canary **stubbea los readers**, así que no arma el estado
+con el que fallan los defectos de producción (gates cargados, feed con piezas, créditos). Un bug de render real
+—`ISSUE-136`— pasó **en verde** ahí tres veces mientras fallaba en el navegador con datos reales. Sirve para
+composición, contención, accesibilidad y errores de consola; **no** como prueba de que algo funciona en vivo.
+
+### Cuando cambies un contrato compartido: barre TODOS los implementadores primero
+
+Hacer obligatorio un método de puerto (p. ej. `RunFinalizerPort.abandon`) es correcto —quien no lo implemente
+rompe el build en vez de dejar el hueco abierto—, pero **iterar contra el compilador de a un error convierte
+media hora en dos**. El primer paso es un `grep` global de los implementadores y arreglarlos **en una pasada**;
+recién después se corre el check. Caso fuente 2026-08-03: cuatro mocks incompletos descubiertos de a uno, con
+cinco minutos de `pnpm check` cada vez.
+
 ## 🔴 Encuadre del producto — leer ANTES que cualquier detalle técnico
 
 **Efeonce Globe es un PRODUCTO COMERCIAL de la agencia Efeonce. NO es un lab interno, un piloto, un experimento ni una prueba de concepto.** Declaración canónica: **ADR-010** (`docs/architecture/creative-studio/EFEONCE_GLOBE_COMMERCIAL_PROMOTION_ATTESTATION_DECISION_V1.md` §Context) — *"Efeonce Globe is now a **commercial product**, not an internal lab"* — reafirmada en ADR-004 (*"Efeonce Globe is, and will remain, a commercial product"*) y ADR-013.

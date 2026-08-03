@@ -502,6 +502,73 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 - [ ] QA release auditor y documentation governor ejecutados.
 - [ ] Evidencia faltante queda declarada como `code complete, rollout pendiente` o bloqueo operativo.
 
+## Delta 2026-08-03 — una espera modelada como error costó una pieza pagada
+
+Encontrado verificando el contrato de ruta de `TASK-1633` con una generación real. **El defecto es de esta task**,
+no de aquélla: 1633 lo destapó, 1469 lo arregla.
+
+### Qué pasó
+
+Una imagen fue aceptada por el proveedor, cobrada (10 créditos), y **nunca apareció**. El run terminó `failed` y
+el experimento quedó en `running` para siempre; la UI mostró «generando» indefinidamente sobre trabajo ya pagado.
+
+### La causa, que son cuatro capas componiéndose
+
+El error real es **`generated_asset_governance_pending`** — el finalizador esperando a que Asset Governance
+termine con el output (C2PA, scan, elegibilidad). **No es un fallo: es una espera.** Y cada capa lo empeoró:
+
+| Capa | Qué hizo |
+|---|---|
+| `finalizationFailureCode` | El nombre no estaba en su allowlist → lo colapsó en `run_finalization_failed` (defecto de `ISSUE-127`) |
+| Política de reintentos | El genérico cae a `unknown`, tope 3 → mató la espera en el tercer intento (`ISSUE-135`) |
+| `backoffMs` | Exponencial con techo de 5 min, **igual para errores que para esperas** → la pieza quedaba lista y sin publicar todo ese rato |
+| `reschedule` terminal | Marcaba el run `failed` y **nadie tocaba el experimento** |
+
+Ninguna es incorrecta por separado. **Compuestas** produjeron la pérdida. Y la evidencia de que el tope era una
+apuesta: el día anterior la MISMA espera tardó **12 entregas** y completó bien.
+
+### Arreglado (`efeonce-globe@bbbc9c1` + el commit siguiente)
+
+1. `generated_asset_governance_pending` entra a `SAFE_FINALIZATION_CODES`: su nombre sobrevive.
+2. Se clasifica **`waiting`**, simétrico a `completion_checkpoint_missing` — una espera al proveedor, la otra a
+   governance.
+3. **La fase entra en `shouldFailTerminally`**: post-gasto (`reconcile`/`complete`) abandonar significa que el
+   cliente pagó y no recibió, así que lo no clasificado tiene el margen de lo recuperable. Pre-gasto (`submit`)
+   conserva los topes cortos. Lo genuinamente determinista muere igual en su primera entrega.
+4. **El ritmo depende de la clase**: una espera vuelve a mirar pronto (cadencia fija) en vez de heredar el backoff
+   de un error. El backoff existe para no martillar un sistema **caído**; governance está trabajando.
+5. **Un run terminal cierra su experimento** vía el puerto nuevo `RunFinalizerPort.abandon` — obligatorio, no
+   opcional, para que quien no lo implemente rompa el build. **No toca créditos** a propósito: el settlement es
+   autoridad de otro dueño y ya decidió.
+
+**Verificado en producción:** generación completa, `run: completed`, `experiment: candidate_ready`, pieza visible
+y **un solo cobro** (738 → 728).
+
+### 🔴 El hallazgo que amplía el alcance de esta task
+
+Su alcance restante dice *«terminalizar o superseder reconciles de runs ya terminales»* — o sea **la misma
+enfermedad, en otra pareja**:
+
+| Pareja | Síntoma | Estado |
+|---|---|---|
+| outbox `reconcile` ↔ `governed_runs` | reconciles pendientes de runs terminales, métricas infladas | declarado acá |
+| `experiments` ↔ `governed_runs` | experimento `running` eterno, pieza fantasma | **no estaba declarado; arreglado hoy** |
+
+**Si hay dos parejas, el arreglo no es por pareja.** El invariante correcto es: *cuando un run llega a terminal,
+todo agregado que dependa de su estado converge o queda observable*. Arreglar caso por caso garantiza descubrir el
+tercero en producción, como pasó con éste.
+
+Candidatos a barrer, **no verificados**: reservas de crédito colgadas (¿el expiry las cubre siempre?) y assets en
+governance de un run que murió. Ampliar el alcance a ese barrido es decisión del operador.
+
+### Pendiente que este delta NO cierra
+
+Las señales `globe.run.outbox_dead_letter` y `globe.run.outbox_retry_storm` **siguen sin existir** (punto abierto
+de `ISSUE-135`). Sin ellas, la próxima espera larga tampoco avisa — y los **6 experimentos huérfanos** anteriores
+al arreglo siguen en `running`, porque `abandon` sólo actúa sobre runs que mueran de ahora en adelante.
+
 ## Follow-ups
 
 - Las dependencias sucesoras se leen desde EPIC-028 y `docs/tasks/README.md`.
+- Recuperar los 6 experimentos huérfanos en `running` cuyos runs ya son terminales (anteriores al fix del
+  2026-08-03), por primitive canónica y nunca por SQL.
