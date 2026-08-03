@@ -705,8 +705,30 @@ esconde el problema que estaba conteniendo.
 
 Sin migración: estas razones se registran como `route_dependency_unavailable`, así que el vocabulario cerrado de
 `production_router_decisions` no cambia. `pnpm check` y `pnpm build` en exit 0; `creative-runner` 270 → 282.
-Sin deploy, sin runtime tocado, sin gasto. **Estado: `code complete, rollout pendiente`** — el código está en
-`main` local de Globe, sin push.
+
+### Rollout ejecutado y verificado en runtime — 2026-08-02
+
+`efeonce-globe@ac1999f` en `origin/main`, CI verde sobre ese SHA exacto (run `30778011653`). Los dos runtimes que
+consumen el compiler y la política de fallos quedaron desplegados desde él:
+
+| Runtime | Evidencia |
+|---|---|
+| `globe-api-internal` | revisión `00194-l4s`, imagen `…:ac1999f2ea16`, **100 % del tráfico**; responde `403` (vivo y protegido, no 5xx) |
+| `globe-producer-worker` | digest `sha256:c3c48db2…`, etiquetado `ac1999f2ea16` en Artifact Registry |
+
+**Blast radius medido, no supuesto.** El cambio altera cuándo muere un job, así que se verificó contra la outbox
+viva: `outboxDeadLetter` estaba en **1 desde las 23:41 UTC**, ~2,5 h **antes** del deploy, y venía bajando (5 → 3 →
+1) por la limpieza de `ISSUE-135`. Post-deploy sigue en 1 y `outboxRetryStorm` en 0. **El rollout no mató ninguna
+corrida**: el único dead letter es preexistente. El worker corre cada minuto con `claimed=0` — sin trabajo
+represado.
+
+Nota de método: la lectura directa a Postgres no estaba disponible (ADC vencida con `invalid_rapt`), así que la
+evidencia salió del payload estructurado del worker, que ya expone `outboxDeadLetter`/`outboxRetryStorm` desde
+`ISSUE-135`. Sirvió mejor que la consulta: da la **serie temporal**, y era la serie —no el valor— la que probaba
+que el dead letter no era nuestro.
+
+**Estado: operativamente completo para estos dos slices.** La task sigue `in-progress` por su alcance restante
+(eje de aplicación, mecanismos por ruta, Slice 4).
 
 ## Delta 2026-08-02 — auditoría arquitectónica contra los incidentes del día (`arch-architect`)
 

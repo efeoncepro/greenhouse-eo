@@ -67,7 +67,17 @@ Historia anterior: [Handoff.archive.md](Handoff.archive.md).
   - **Por qué estaba invisible:** el tope de ISSUE-135 hizo su trabajo. Tres reintentos no llaman la atención de
     nadie — así es como una red de seguridad esconde el problema que contiene.
   - Sin migración (se registran como `route_dependency_unavailable`). `pnpm check` + `pnpm build` exit 0;
-    `creative-runner` 270 → 282. **Sin push, sin deploy, sin gasto.**
+    `creative-runner` 270 → 282.
+- **ROLLOUT EJECUTADO Y VERIFICADO EN RUNTIME (2026-08-02).** `ac1999f` en `origin/main`, CI verde sobre ese SHA;
+  `globe-api-internal` en revisión **`00194-l4s`** con imagen `…:ac1999f2ea16` y 100 % del tráfico (responde 403,
+  vivo y protegido); `globe-producer-worker` con digest `sha256:c3c48db2…` etiquetado al mismo SHA.
+  **Blast radius medido, no supuesto:** el cambio altera cuándo muere un job, así que se verificó contra la outbox
+  viva — `outboxDeadLetter` estaba en **1 desde 2,5 h ANTES** del deploy y venía bajando (5 → 3 → 1) por la limpieza
+  de ISSUE-135; post-deploy sigue en 1, `outboxRetryStorm` en 0, worker con `claimed=0`. **El rollout no mató
+  ninguna corrida.**
+  Método a recordar: la lectura directa a PG no estaba disponible (**ADC vencida, `invalid_rapt`** — el gcloud CLI
+  seguía vivo, sólo el ADC caducó), así que la evidencia salió del payload estructurado del worker. Salió mejor: da
+  la **serie temporal**, y era la serie —no el valor— la que probaba que el dead letter no era nuestro.
 - Greenhouse: `ops:lint --changed` verde sobre las 3 tasks.
 
 ## TASK-1631 / MCP — canon de scopes, CIMD como registro primario y benchmark de proveedor (2026-08-02)
