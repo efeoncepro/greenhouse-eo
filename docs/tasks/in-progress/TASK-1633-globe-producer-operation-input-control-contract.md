@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Foundation local sin commit en Globe; handoff ejecutable documentado, rollout/UI/canaries pendientes`
+- Status real: `10 de 17 criterios cerrados y desplegados (efeonce-globe@91d1f71, API 00197-f9z). Sin dependencias bloqueantes: el canary migró a TASK-1504 y el criterio de consumers es de TASK-1552. Restante agrupado en 4 bloques — ver Delta 2026-08-03 «estado de cierre»`
 - Rank: `next.1`
 - Domain: `creative|platform`
 - Blocked by: `none`
@@ -413,6 +413,11 @@ Ninguna para la foundation. Las promociones, atestaciones y canaries permanecen 
 
 ## Acceptance Criteria
 
+> **10 de 17 cerrados.** Los 7 abiertos están agrupados por naturaleza —un bloque acoplado, dos lecturas, una
+> higiene y uno que pertenece a `TASK-1552`— en el **Delta 2026-08-03 «estado de cierre»**. Leer ese delta
+> antes de tomar cualquiera de los pendientes: tres de ellos son un solo trabajo secuencial y uno no es de
+> esta task.
+
 - [x] ADR aceptado e indexado define operación, slots/roles, controles, mecanismo de soporte y output contract.
 - [x] El catálogo expone un descriptor versionado browser-safe sin provider IDs/slugs/costos/secrets.
 - [x] Slots declaran media/MIME, cardinalidad, roles, orden, límites y combinaciones válidas.
@@ -429,7 +434,9 @@ Ninguna para la foundation. Las promociones, atestaciones y canaries permanecen 
 - [ ] Fixtures Omni/Seedance/Veo demuestran una UI intent común con traducciones distintas dentro de adapters. **Mitad hecha, verificada 2026-08-03:** `producer-catalog.test.ts:656` prueba que las tres rutas resuelven por el **mismo helper sin branch por ruta** — o sea que el contrato es un motor, no la descripción de la ruta #1. Lo que falta es la otra mitad: **traducciones distintas dentro de adapters**, que no existe todavía porque la compilación aún no vive detrás del adapter (criterio anterior).
 - [ ] La proyección expone el descriptor a todas las surfaces por el reader canónico. **Verificado 2026-08-02:** ya
       viaja (`ProducerCatalogViewV1.creativeContract` → proyección de flota); que un consumer lo lea o permanezca
-      `policy-blocked`/`unsupported` es criterio de ese consumer, no de la foundation.
+      `policy-blocked`/`unsupported` es criterio de ese consumer, no de la foundation. **Propuesto 2026-08-03
+      (Delta «estado de cierre», bloque D): moverlo a `TASK-1552` o marcarlo dependencia externa de rollout** —
+      el composer ignora el descriptor (cero ocurrencias en `apps/studio-client/src`) y esa es su task dueña.
 - [x] ~~La task consumidora registra canaries UI terminales de Seedance y Omni.~~ **Migrado a `TASK-1504`
       (Delta b) el 2026-08-02.** Una foundation no puede quedar abierta esperando un canary que no controla, y el
       de Omni está bloqueado por el transporte, que es de 1504: la identidad declara `vertex-omni` mientras el
@@ -913,3 +920,99 @@ in-place para que nadie reimplemente algo que ya funciona.
 Nada de esto cambia el veredicto de estado: la task sigue `in-progress`, con el eje de aplicación abierto y el
 canary de Omni bloqueado por el transporte de TASK-1504. Lo que cambia es que ese eje **ya no es plomería**:
 tiene una pregunta de dueño que resolver antes.
+
+## Delta 2026-08-03 — estado de cierre: 10 de 17, agrupados por naturaleza
+
+**Este delta existe para que quien retome no dimensione mal el trabajo restante.** Los 7 criterios abiertos
+**no son siete trabajos**: son un bloque acoplado, dos lecturas, una higiene y uno que no pertenece a esta
+task. Todo lo de abajo está verificado leyendo el código de `../efeonce-globe`, no los commits.
+
+### 🔒 Esta task ya no depende de ninguna otra para cerrar
+
+Declararlo explícito porque los deltas anteriores dejaron dos bloqueos que **ya no aplican**:
+
+- **El canary de Omni migró a `TASK-1504`** (Delta b, 2026-08-02). Una foundation no puede quedar abierta
+  esperando un canary que no controla, y ése está bloqueado por el transporte, que es de 1504. Aquí es
+  dependencia de rollout, no criterio propio.
+- **El criterio de consumers es de `TASK-1552`** (ver más abajo).
+
+O sea: **el alcance restante de 1633 es ejecutable de punta a punta sin esperar a nadie.**
+
+### Bloque A — un solo trabajo, no tres (segunda mitad de ADR-022 Delta c)
+
+Los tres criterios de abajo **dependen del primero**; intentarlos por separado significa hacer el primero
+tres veces.
+
+1. **La compilación del prompt efectivo detrás del adapter, con su revisión en el fingerprint.**
+   Estado real: la primera mitad está hecha (`@91d1f71` — el compilador **recibe** el contrato de ruta y
+   rechaza lo que la ruta no honra). Faltan las otras dos: `compileStructuredBrief` sigue siendo una
+   **función global de `domain`** (`packages/domain/src/structured-briefs.ts:180`), invocada desde
+   `apps/studio-web/src/app.ts:1416-1418`; y **no existe `promptCompilerRevision` en ningún fingerprint** —
+   verificado por grep, **cero ocurrencias en todo el repo**. Sin esa revisión, dos textos distintos para el
+   mismo brief comparten approval, que es exactamente lo que el criterio prohíbe.
+2. **Los fixtures que demuestran traducciones distintas por adapter.** Mitad hecha: `producer-catalog.test.ts:656`
+   ya prueba que Seedance/Omni/Veo resuelven por el **mismo helper sin branch por ruta** — o sea que el
+   contrato es un motor, no la descripción de la ruta #1. La otra mitad —*traducciones distintas dentro de
+   adapters*— **no puede escribirse todavía**, porque no hay adapter donde vivan: depende literalmente de (1).
+3. **La invalidación del estimate ante cambio de controles.** El fingerprint del quote ya cubre revisión,
+   operación, combinación, rol y ordinal (`LabQuoteInputV1` transporta `creativeIntent` **y** `routeContract`,
+   y `fingerprint()` hace `stable()` sobre el quote entero). Lo que falta entra por (1): el valor de control
+   viaja dentro del brief, y la **revisión del compilador** es lo que hace que dos compilaciones distintas del
+   mismo brief no compartan approval.
+
+**Orden obligatorio: 1 → 2 → 3.** No hay atajo.
+
+### Bloque B — dos criterios de lectura, no de código
+
+Ninguno de estos dos pide construir nada nuevo. Piden **ir a leer** y escribir lo que se encontró.
+
+4. **Los mecanismos declarados por ruta, con evidencia oficial del proveedor.** Medido hoy: el catálogo tiene
+   **17 rutas con `creativeContract`** y sólo **4 declaran `controls:` propios**
+   (`packages/domain/src/producer-catalog.ts:370, 566, 597, 631`) — las otras **13 heredan `PROMPT_CONTROLS`**
+   por el default de `producer-catalog.ts:146`. Y el dato que lo vuelve urgente: **ningún adapter manda campo
+   negativo nativo** — cero ocurrencias de `negative_prompt`/`negativePrompt` en `apps/creative-runner/src`.
+   O sea que **`negative-prompt: prompt-semantic` es hoy una promesa heredada**, en 13 rutas que nadie
+   verificó, sobre un mecanismo que además tiende a reforzar lo que niega. El trabajo es leer el contrato
+   oficial de cada proveedor y declarar el mecanismo real por ruta.
+5. **La evidencia de controles aplicados/rechazados en el manifest.** El manifest/run snapshot debe conservar
+   schema revision, roles y **qué controles se aplicaron, degradaron o se rechazaron**, sin secretos. Hoy el
+   rechazo existe y tiene nombre del lado del servidor, pero no queda escrito en la evidencia del run.
+
+### Bloque C — un criterio de higiene
+
+6. **Slice 4: dual-read, equivalence de rutas legacy y gate de rutas nuevas.** Que una ruta nueva no pueda
+   registrarse sin descriptor, y que las legacy tengan equivalence tests. Independiente de A y B; se puede
+   hacer en paralelo.
+
+### Bloque D — un criterio que NO es de esta task
+
+7. **«La proyección expone el descriptor a todas las surfaces por el reader canónico»** — *que un consumer lo
+   lea*. El descriptor **ya viaja al navegador**: `ProducerCatalogViewV1.creativeContract`
+   (`packages/contracts/src/producer-catalog.ts:335,364`) llega dentro de la proyección de flota. Y el
+   composer **lo ignora**: verificado hoy, **cero ocurrencias de `creativeContract`, `creativeControls` o
+   `inputSlots` en `apps/studio-client/src`**.
+
+   Eso es **`TASK-1552`**, la única dueña del composer, y su registry ya lo declara. **Propuesta: moverlo a
+   1552 o marcarlo como dependencia externa de rollout**, igual que se hizo con el canary de Omni. Una
+   foundation que expone correctamente su proyección no puede quedar abierta porque su consumidor todavía no
+   la lea.
+
+### Dos límites vivos, autorizados por el operador — no son deuda oculta
+
+- **Quitar el peso del prompt no se verificó con canary.** `[weight=0.820]` viajaba al proveedor como texto y
+  se retiró por razonamiento sobre cómo condicionan estos modelos (un encoder de difusión no tiene jerarquía
+  de instrucción; el orden sí condiciona, la etiqueta no). Es una mejora **razonada, no verificada**: si
+  aparece una regresión de calidad de salida, **éste es el primer sospechoso**.
+- **El rechazo en upscale con preset de estilo activo es intencional.** Antes el usuario recibía una
+  generación que ignoraba el estilo y le cobraba igual; ahora recibe error sin gasto. Se eligió el error
+  explícito sobre el cobro silencioso. **La UI que evita llegar a ese caso es `TASK-1552`** — no es un bug de
+  esta task ni se "arregla" relajando el rechazo.
+
+### Resumen ejecutable
+
+| Bloque | Criterios | Naturaleza | ¿Paralelizable? |
+|---|---|---|---|
+| A | compilación tras adapter + revisión en fingerprint · fixtures por adapter · invalidación del estimate | **un solo trabajo, secuencial** | no — 1 → 2 → 3 |
+| B | mecanismos por ruta con evidencia · evidencia de controles en manifest | lectura + declaración | sí |
+| C | Slice 4 (dual-read + gate) | higiene | sí |
+| D | consumer lee la proyección | **no es de 1633** → `TASK-1552` | n/a |

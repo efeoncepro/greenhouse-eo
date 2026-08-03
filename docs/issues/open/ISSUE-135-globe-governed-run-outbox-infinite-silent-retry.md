@@ -90,14 +90,17 @@ contar como «reprogramado» algo que murió.
 
 ## Lo que queda abierto
 
-1. **Las señales.** `globe.run.outbox_dead_letter` y `globe.run.outbox_retry_storm` (umbral 10, ya expuesto
+1. 🔴 **Las señales.** `globe.run.outbox_dead_letter` y `globe.run.outbox_retry_storm` (umbral 10, ya expuesto
    como `isRetryStorm`) todavía no existen como señal observable. Sin ellas el tope evita el daño pero nadie
-   se entera de que algo murió.
-2. **Preservar el motivo real.** `finalizationFailureCode` sigue cayendo a `run_finalization_failed` cuando
+   se entera de que algo murió. **Sigue abierto al 2026-08-03** — ahora se calculan por batch, pero nada las
+   lee; ver el delta de ese día.
+2. 🔴 **Preservar el motivo real.** `finalizationFailureCode` sigue cayendo a `run_finalization_failed` cuando
    el error no está en su allowlist. Correcto para no filtrar, pero deja cero rastro accionable — y por eso
-   la clase `unknown` existe con tope 3.
-3. **Proyectar el estado terminal a la card** (`TASK-1559`): un run en terminal debe dejar de decir
-   «generando».
+   la clase `unknown` existe con tope 3. **Sigue abierto**; el 2026-08-03 se cerró un caso concreto
+   (`generated_asset_governance_pending`), no el mecanismo.
+3. ✅ **Proyectar el estado terminal a la card** (`TASK-1559`): un run en terminal debe dejar de decir
+   «generando». **Cerrado 2026-08-03** (`efeonce-globe@bbbc9c1`): un run terminal cierra su experimento con el
+   motivo real.
 
 ## Delta 2026-08-02 (b) — la clasificación necesita una regla de nacimiento, no sólo una lista
 
@@ -138,6 +141,82 @@ funciona; lo que funciona es que el build no deje.
 Lo que sigue abierto de este issue no cambia: las dos señales (`outbox_dead_letter`, `outbox_retry_storm`) y
 preservar el motivo real cuando `finalizationFailureCode` cae al genérico. Este trabajo las vuelve útiles —ahora un
 terminal es un terminal de verdad— pero no las crea.
+
+## Delta 2026-08-03 — una pieza pagada y perdida: la intersección con `ISSUE-127` era el defecto
+
+**El caso.** Una imagen fue aceptada por el proveedor a las 11:17 y **cobrada** (748 → 738 créditos). Su
+finalización falló con el código genérico `run_finalization_failed`; la política lo clasificó `unknown` —tope 3—
+y la corrida murió al tercer intento **con el gasto ya hecho**. El experimento quedó diciendo «generando» para
+siempre. El día anterior el **MISMO** error, en el **MISMO** paso, se había recuperado solo tras **doce
+entregas** y terminado `completed`.
+
+Ése es el punto entero: **el tope de 3 no protegía de nada; cortaba trabajo sano a mitad de camino.**
+
+> **La lección, y es la que hay que llevarse de este issue: un tope de reintentos aplicado sobre un código que
+> perdió su nombre no es una política, es una apuesta.** `ISSUE-135` puso el tope confiando en una clasificación
+> que `ISSUE-127` había hecho imposible — `run_finalization_failed` no es una causa, es el hueco donde nueve
+> causas distintas se colapsan. Los dos issues estaban abiertos por separado, cada uno correcto en su propio
+> marco, y **su intersección era el defecto**. Un issue de observabilidad y uno de resiliencia que se tocan no
+> son dos issues: son uno.
+
+### Los cuatro arreglos, en producción (los tres runtimes en `d58bc6f`)
+
+`bbbc9c1` + `deffbd4`, ambos ancestros del SHA desplegado. Verificado en producción: generación completa, run
+`completed`, experimento `candidate_ready`, pieza visible y **un solo cobro** (738 → 728).
+
+1. **El nombre de la espera sobrevive al sanitizador.** El error real era
+   `generated_asset_governance_pending` — el finalizador esperando a que Asset Governance termine con el output
+   (C2PA, scan, elegibilidad). Estaba **fuera** de `SAFE_FINALIZATION_CODES`, así que se colapsaba en el
+   genérico y la causa se perdía. Es el defecto de `ISSUE-127`, cometido sobre una espera.
+2. **Se clasifica `waiting`**, simétrico a `completion_checkpoint_missing`. Las dos esperas del ciclo son la del
+   proveedor y la de governance; con el nombre ya preservado, la política puede reconocerla. **Sin el paso 1
+   este paso era imposible**: no se puede clasificar lo que no tiene nombre.
+3. **La fase entra en la política.** La asimetría que un tope por-código no veía: **antes** del gasto abandonar
+   devuelve el crédito y no pierde nada; **después** del gasto significa que el cliente pagó y no recibió. Dos
+   errores con costo tan distinto no pueden compartir tope. Ahora `submit` mantiene los topes cortos y
+   `reconcile`/`complete` le dan a lo no clasificado el margen de lo recuperable — lo genuinamente determinista
+   (una autoridad de derechos ausente) sigue muriendo en su primera entrega también post-gasto.
+4. **El ritmo depende de la clase.** El backoff exponencial existe para no martillar un sistema **caído**;
+   governance no está roto, está trabajando. Aplicarle backoff sólo agrega latencia **después** de que el
+   trabajo terminó: en la entrega 10 el techo de 5 minutos dejaba la pieza lista y sin publicar todo ese rato.
+   Una espera vuelve a mirar a los **10 segundos**, con cadencia fija (`WAITING_POLL_MS`); un error conserva el
+   backoff creciente, que es donde sirve. El worker corre por scheduler cada minuto, así que ése es el piso real
+   de latencia — lo que la cadencia garantiza es que el job esté elegible en el **próximo tick** en vez de
+   dormido cinco minutos.
+
+**Y el ítem 3 de «lo que queda abierto» quedó cerrado de paso:** `governed_runs` y `experiments` son agregados
+distintos y sus estados divergían — el store marcaba el run `failed` y **nadie** tocaba el experimento, que es lo
+que la UI lee. Ahora un run terminal cierra su experimento con el motivo real (el puerto `abandon` es
+obligatorio, para que quien no lo implemente rompa el build). No toca créditos a propósito: el settlement es
+autoridad de otro dueño y ya decidió.
+
+### Lo que sigue ABIERTO, y es el próximo paso recomendado
+
+**Las dos señales no existen como señal.** `outboxDeadLetter` y `outboxRetryStorm` **se calculan en cada batch
+del worker** (`readOutboxHealth` en `packages/database/src/stores/governed-run-store.ts:313-337`, emitidas en
+`globe_worker_completed` desde `apps/studio-web/src/worker-main.ts:263-268`) y **no están cableadas a nada**: no
+hay `google_logging_metric` ni `monitoring_alert_policy` para ellas en `infra/terraform/` —sí existen para
+`queueOldestAgeSeconds`, `creditExpiryOldestAgeSeconds` y `globe_worker_failed`, que es exactamente el patrón que
+falta replicar—. Hoy el número está en el JSON de un log que nadie consulta salvo un humano que va a buscarlo.
+
+**Ésa es la brecha de fondo, y esta sesión la demostró completa.** Todo lo que se encontró —una pieza pagada y
+perdida, cuatro experimentos huérfanos, producción cuatro commits atrás, un bug de React vivo en el composer
+(`ISSUE-136`)— **lo encontró un humano preguntando, no el sistema avisando.** El tope evita el daño; la señal es
+lo que convierte el daño evitado en algo que alguien sabe. Sin ella el patrón se repite: el arreglo funciona y
+el próximo defecto vuelve a esperar a que alguien pregunte.
+
+⚠️ **Y el nombre engaña, que es una trampa para el que venga a cablearlas.** `outboxDeadLetter` **no** cuenta
+filas de la outbox en estado `dead_letter` — ese estado **no existe** en el vocabulario de
+`governed_run_outbox`. Cuenta **attempts** en `state='failed'` con `terminal_at IS NOT NULL` dentro de una
+ventana de 24 h sobre `updated_at`. Consultar la tabla buscando ese estado devuelve vacío y hace concluir que la
+señal está rota cuando está bien. La ventana es deliberada: sin ella un dead-letter de hace un mes mantendría la
+alerta encendida para siempre y el equipo aprendería a ignorarla.
+
+Lo demás abierto no cambia: **preservar el motivo real** cuando `finalizationFailureCode` cae al genérico. Este
+trabajo cerró el caso concreto de la espera de governance agregándola a la allowlist, pero **el mecanismo sigue
+siendo una allowlist**: el próximo código que no esté en ella se vuelve a borrar, y la clase `unknown` con tope 3
+seguirá tomando decisiones sobre un hueco. La regla de nacimiento de la clasificación ya es mecánica
+(`production-route-failure-classification.test.ts`); la de preservación del nombre todavía no.
 
 ## Solución propuesta
 

@@ -148,6 +148,30 @@ unicidad, que es la defensa contra la recaída — si alguien vuelve a colapsar,
 Sin migración: estas razones se registran como `route_dependency_unavailable`, así que el vocabulario cerrado de
 `production_router_decisions` no cambia.
 
+## Delta 2026-08-03 — UNDÉCIMA aparición, y la primera atrapada ANTES de mergear
+
+Al cablear la compilación del prompt por ruta (`91d1f71`, TASK-1633 Slice 3.5c), el `catch` que envolvía la
+llamada a `prompts.compile` colapsaba la razón **nueva** —`UnsupportedBriefControlError`, que nombra «la ruta no
+honra ese control»— en un `badRequest` genérico. En código escrito **precisamente para cerrar este bug class**,
+en la misma task que abrió los ocho códigos del contrato creativo.
+
+El colapso importaba porque las dos causas piden acciones **opuestas**: «el brief está mal formado» pide corregir
+el JSON; «la ruta no honra ese control» pide elegir otra ruta o quitar esa dirección — el pedido es válido. Hoy
+el catch re-lanza (`packages/domain/src/model-lab.ts:1106`) con el comentario que explica por qué.
+
+**Lo que la distingue de las diez anteriores: se atrapó antes de mergear.** Las diez costaron un canary o un
+deploy cada una; ésta costó cero. Y conviene ser honesto sobre por qué, porque la razón **no fue disciplina**: no
+hubo un checklist ni un gate que la detuviera. Fue que el trabajo de esa misma mañana —clasificar la espera de
+governance, que exigió rastrear cómo un nombre se perdía camino a la política— dejó al agente **mirando esos
+`catch` con otra pregunta**: no «¿sanitiza bien?» sino «¿qué nombre se está borrando acá?».
+
+> Eso matiza —no contradice— la conclusión de la novena aparición. Sigue siendo cierto que conocer la regla no la
+> aplica sola. Lo que se agrega es que **el contexto reciente sí cambia lo que uno ve**: haber perseguido un
+> nombre perdido durante horas vuelve visibles los lugares donde otro se pierde. Es un efecto real y también es
+> **frágil** — se evapora con la sesión, no escala a otro agente y no sobrevive a un cambio de tema. Por eso no
+> reemplaza al mecanismo; la defensa duradera sigue siendo la del cierre de la décima: un test que rompe el build
+> cuando una razón nace sin nombre o sin clasificar.
+
 ## Delta 2026-07-26 (b) — capa 8: el control que rechazaba, encontrado leyendo (commit `4eee1cc`)
 
 Se hizo esa lectura y **apareció la causa, sin desplegar nada**. El método funcionó por segunda vez.
@@ -196,6 +220,13 @@ El asset quedó `lifecycle: quarantined` con `governance.state: c2pa_verify` (`t
 ## Estado
 
 open — cuatro de los códigos cerrados (`409` de crédito, `runner_error`, `ProductionRouteDependencyError` con 24 razones, el catch que las destruía); `authentication_required` pendiente; y **la causa del bloqueo del canary encontrada y cerrada en código** (capa 8: el falso positivo de `credential_like` sobre `"Key visual"`, `4eee1cc`), pendiente de deploy + canary con gasto real. Antes decía: bloqueo acotado al sanitizador del body, sin causa identificada. La verificación runtime necesita desplegar `324be6b` + `4eee1cc`.
+
+**Once apariciones al 2026-08-03.** La décima cerrada en `8986b45` (ocho códigos del contrato creativo de ruta);
+la undécima atrapada antes de mergear (`91d1f71`, el `catch` que colapsaba `UnsupportedBriefControlError`). El
+issue sigue abierto como **referencia del bug class**, no sólo por `authentication_required`: cada vez que un
+código canónico colapsa más de una causa accionable, este documento es el precedente. Y el 2026-08-03 quedó
+probado que el costo no es sólo diagnóstico — un código sin nombre alimentó una política de reintentos que mató
+una pieza ya cobrada (`ISSUE-135`).
 
 ## Relacionado
 

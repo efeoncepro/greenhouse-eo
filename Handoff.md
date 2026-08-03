@@ -46,45 +46,80 @@ El despliegue por lote sigue en [`TASK-1636`](docs/tasks/to-do/TASK-1636-globe-d
 - La técnica y la económica siguen en `.captures/` como `workshop_only`; falta validar capacidad, cost-to-serve,
   margen y frontera de contenidos nuevos antes de registrarlas como oferta productiva.
 
-## TASK-1633 — contrato creativo de ruta: 5 slices desplegados (2026-08-02/03)
+## TASK-1633 — el contrato creativo declara; falta que APLIQUE (2026-08-03)
 
-**Estado: 10 de 17 criterios, `in-progress`.** El detalle completo —cada slice, su evidencia y sus límites— vive en
-[`TASK-1633`](docs/tasks/in-progress/TASK-1633-globe-producer-operation-input-control-contract.md) y en
+**Estado: 10 de 17 criterios, `in-progress`.** El eje de **declaración** está cerrado; el de **aplicación** no
+empezó. Criterio por criterio en
+[`TASK-1633`](docs/tasks/in-progress/TASK-1633-globe-producer-operation-input-control-contract.md)
+(`## Acceptance Criteria`) y en
 [ADR-022](docs/architecture/creative-studio/EFEONCE_GLOBE_ROUTE_CREATIVE_CONTRACT_DECISION_V1.md) (Deltas b y c).
-Acá sólo la continuidad activa.
 
-**Desplegado y verificado en runtime** (Globe `main`, cada uno con CI verde de su SHA y revisión activa confirmada,
-no sólo workflow en verde): `8986b45` razones nombradas · `ac1999f` clasificación de fallos mecánica ·
-`e300c4e` un dueño por valor + `valueShape` · `1b580f8` vocabulario único · `91d1f71` compilación por ruta.
-Runtime final: API `00197-f9z`, worker `sha256:76d31673…`, ambos en `91d1f71689c0`. `outboxDeadLetter` estable en
-**1 y preexistente** en los cuatro rollouts (probado por la serie temporal del log del worker, no por el valor);
-`retryStorm` 0; cero errores del API post-deploy.
+**Runtime de Globe verificado hoy contra Cloud Run/Artifact Registry: los tres en `d58bc6f`** — API
+`globe-api-internal-00202-74w`, Studio `globe-studio-internal-00145-q2w`, worker digest `sha256:3c510416…`
+(= tag `d58bc6f4d300`). `main` local en `949a58c`, sólo docs por delante.
 
-### 🔶 Riesgos vivos que alguien debe conocer
+### Lo que ya corre en producción
 
-1. **Si aparece una regresión de calidad en las generaciones, el primer sospechoso es el peso.** `91d1f71` dejó de
-   imprimir `[weight=…]` en el prompt de TODAS las rutas. El razonamiento es sólido (un encoder lo lee como texto,
-   no condiciona) pero **no se pudo verificar con canary** — siguen bloqueados por el transporte de `TASK-1504`.
-   Mejora razonada, no verificada.
-2. **Puede reportarse que «upscale con estilo dejó de funcionar».** Es esperado: ahora da error **sin cobrar** en
-   vez de generar ignorando el estilo y cobrar igual. La UI que evita el caso es `TASK-1552`.
-3. **El canary de Omni sigue bloqueado y no es de esta task**: la identidad declara `vertex-omni` mientras el
-   runtime inyecta Generative Language, así que cobraría por una identidad distinta de la aprobada. Dueño:
-   `TASK-1504`.
+- **Contrato creativo por ruta:** 8 códigos de rechazo nombrados donde había uno que colapsaba nueve causas;
+  38 razones del compiler clasificadas `terminal`, 3 `transient`, 2 `unknown` declaradas; catálogo `1.7.0`;
+  `valueShape`; vocabulario único brief↔contrato; compilación del prompt por ruta (el peso ordena y ya no se imprime).
+- **Lifecycle de runs — es de [`TASK-1469`](docs/tasks/in-progress/TASK-1469-globe-governed-run-lifecycle-submission-fence.md), no de 1633:**
+  la fase entra en la política de reintentos (post-gasto abandonar cuesta distinto que pre-gasto); un run terminal
+  cierra su experimento vía el puerto `RunFinalizerPort.abandon`; `generated_asset_governance_pending` entra a la
+  allowlist y se clasifica `waiting`; una espera deja de heredar el backoff exponencial de error (10 s fijos en vez
+  de hasta 5 min).
+- [`ISSUE-136`](docs/issues/resolved/ISSUE-136-globe-composer-command-palette-rebuilds-per-keystroke.md) cerrado
+  (`011d0eb`): el composer reconstruía la paleta de comandos en cada tecla y React cortaba con el error #185.
+- `scripts/globe-runtime-drift.mjs` (Globe): compara los tres runtimes entre sí **y** contra `origin/main`.
 
-### Próximo paso
+### Los 7 criterios abiertos, agrupados por trabajo real
 
-Segunda mitad de ADR-022 Delta (c): la compilación detrás del adapter con su revisión en el fingerprint
-(`promptCompilerRevision` **no existe** — verificado por grep) y el rol del slot informando el texto. Después, los
-mecanismos por ruta con evidencia (13/17 heredan el default, `negative-prompt` a la cabeza: **ningún adapter tiene
-campo negativo nativo**) y Slice 4.
+- **(a) Un solo trabajo — el adapter.** La compilación detrás del adapter con su revisión en el fingerprint
+  (`promptCompilerRevision` **no existe**: cero ocurrencias por grep), los fixtures de traducción por adapter
+  (la mitad «un motor sin branch por ruta» ya está probada) y la invalidación del estimate ante cambio de
+  controles. Los tres se cierran juntos cuando la compilación deja de ser una función global de `domain`.
+- **(b) Dos de lectura, no de código.** Declarar el mecanismo por ruta con evidencia del contrato oficial del
+  proveedor —**13 de 17 rutas heredan el default**, `negative-prompt` incluido, y **ningún adapter tiene campo
+  negativo nativo**— y la evidencia de controles aplicados/rechazados en el manifest.
+- **(c) Dos de higiene.** Slice 4 (dual-read/equivalence de rutas legacy) y uno que **NO es de 1633**: que un
+  consumer lea la proyección es criterio de [`TASK-1552`](docs/tasks/in-progress/TASK-1552-globe-producer-composer-focused-creation.md)
+  — el descriptor ya viaja al navegador (`ProducerCatalogViewV1.creativeContract`) y el composer lo ignora
+  (cero ocurrencias en `apps/studio-client/src`).
+
+**1633 ya no depende de nadie para cerrar:** se le sacó el canary de Omni (migró a `TASK-1504`) y el criterio de
+consumers es de 1552.
+
+### Próximo paso, en este orden
+
+1. **Las dos señales de [`ISSUE-135`](docs/issues/open/ISSUE-135-globe-governed-run-outbox-infinite-silent-retry.md)**
+   (`outbox_dead_letter`, `outbox_retry_storm`) — protegen todo lo demás.
+2. El bloque del adapter de 1633 (grupo **a**).
+3. El composer de 1552 leyendo el descriptor.
+
+### 🔶 Riesgos vivos
+
+1. **El canary de Omni sigue bloqueado por el TRANSPORTE (`TASK-1504`), no por IAM.** El bloqueo de IAM sí se
+   levantó (`TASK-1635`, Globe `786ee19`). **Son dos cosas distintas y confundirlas lleva a correr un canary
+   inválido:** el binding declara `provider=vertex-omni` mientras el runtime inyecta Generative Language, así que
+   cobraría por una identidad distinta de la aprobada.
+2. **Si aparece una regresión de calidad, el primer sospechoso es el peso.** Quitarlo del prompt cambió el texto
+   que recibe el modelo en TODAS las rutas y **no se verificó con canary** (bloqueados por lo anterior).
+3. **«Upscale con estilo dejó de funcionar» es esperado**, no un defecto: ahora da error **sin gasto** en vez de
+   generar ignorando el estilo y cobrar igual. La UI que evita el caso es `TASK-1552`.
+4. **Experimentos huérfanos en `running` con su run ya terminal**, anteriores al fix; `abandon` sólo actúa hacia
+   adelante. `TASK-1469` declara **6** en su Follow-up y una nota de sesión dice 4: **contar contra runtime antes
+   de recuperar, y nunca por SQL**.
+5. **Las dos señales de `ISSUE-135` se calculan pero no están cableadas.** El worker las emite por batch en
+   `globe_worker_completed` (`apps/studio-web/src/worker-main.ts:267`); no hay dashboard ni alerta que las lea, así
+   que hoy sólo se ven mirando el log.
+6. **El nombre `outboxDeadLetter` engaña.** No cuenta filas en estado `dead_letter` de la outbox —ese estado no
+   existe todavía—: cuenta attempts `state='failed'` con `terminal_at` no nulo en una ventana de 24 h
+   (`packages/database/src/stores/governed-run-store.ts:320`). Leerlo literal produce conclusiones falsas.
 
 ### Nota operativa
 
 Tres carriles de credenciales distintos —`gcloud` CLI, ADC y el Cloud SQL **Connector**— y el CLI puede estar vivo
-mientras el Connector se cuelga (`invalid_rapt` es reauth). Para medir blast radius sin base, el payload
-`globe_worker_completed` del worker ya trae `outboxDeadLetter`/`outboxRetryStorm` por batch. Ambas cosas, con sus
-comandos, en
+mientras el Connector se cuelga (`invalid_rapt` es reauth). Comandos en
 [el manual](docs/manual-de-uso/creative-studio/operar-contrato-creativo-ruta-globe.md).
 
 ## TASK-1631 / MCP — canon de scopes, CIMD como registro primario y benchmark de proveedor (2026-08-02)
@@ -128,14 +163,6 @@ comandos, en
 
 - [ADR-021](docs/architecture/GREENHOUSE_FINANCE_CORE_ACCOUNTING_FOUNDATION_DECISION_V1.md) aceptado; `EPIC-012`
   es owner. Sus 11 candidatas no estaban reservadas y deben reenumerarse desde TASK-1634 al confirmarlas.
-
-## TASK-1633 — sesiones previas del 2026-08-02 (consolidadas)
-
-Las dos entradas anteriores de esta task —fases 1-2 desplegadas en `b062d6f` y el planteo del contrato
-route-driven— se consolidaron acá: su detalle completo vive en
-[`TASK-1633`](docs/tasks/in-progress/TASK-1633-globe-producer-operation-input-control-contract.md), y su único
-pendiente vivo (el canary bloqueado por identidad de transporte) está arriba en «Riesgos vivos», ahora bajo
-`TASK-1504`.
 
 ## Gate canónico de licitaciones / Brightcell (2026-08-02)
 

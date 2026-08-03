@@ -97,7 +97,7 @@ canary ya tiene owner: **ADR-004** (`TASK-1506`, complete) fijó el front door y
 - Motion: `none`
 - Backend impact: `webhook`
 - Epic: `EPIC-028`
-- Status real: `Lifecycle durable live; sólo faltan terminalización de reconciles stale, métricas reclamables y recovery gobernado de decisiones históricas`
+- Status real: `Lifecycle durable live; los 5 arreglos de la espera de governance desplegados (efeonce-globe@d58bc6f). Restante: convergencia terminal de los agregados del run (barrido primero), cableado de las 2 señales de outbox y recovery de experimentos huérfanos — ver Delta 2026-08-03`
 - Rank: `TBD`
 - Domain: `creative|platform|ops`
 - Blocked by: `none`
@@ -567,8 +567,94 @@ Las señales `globe.run.outbox_dead_letter` y `globe.run.outbox_retry_storm` **s
 de `ISSUE-135`). Sin ellas, la próxima espera larga tampoco avisa — y los **6 experimentos huérfanos** anteriores
 al arreglo siguen en `running`, porque `abandon` sólo actúa sobre runs que mueran de ahora en adelante.
 
+## Delta 2026-08-03 — los cinco arreglos están en producción; el hallazgo redefine el alcance restante
+
+Continuación del delta anterior, ya con rollout. **Lo que sigue está verificado leyendo el código de
+`../efeonce-globe`, no el commit message.**
+
+### Los cinco arreglos, y dónde vive cada uno
+
+Commits `efeonce-globe@bbbc9c1` (fase + `abandon`) y `@deffbd4` (allowlist + clase + ritmo). Ambos son
+ancestros de `d58bc6f`, que es el SHA desde el que están desplegados **los tres runtimes** de Globe.
+
+| # | Arreglo | Dónde verificarlo |
+|---|---|---|
+| 1 | `generated_asset_governance_pending` entra a la allowlist del sanitizador: **el nombre de la espera sobrevive** en vez de colapsar en `run_finalization_failed` | `packages/domain/src/governed-run-lifecycle.ts:623` |
+| 2 | Se clasifica **`waiting`**, simétrico a `completion_checkpoint_missing` — una espera al proveedor, la otra a governance | `governed-run-failure-policy.ts:166` (`WAITING_CODES`) |
+| 3 | **La fase entra en la política de reintentos.** `shouldFailTerminally(code, attempt, kind)`: `submit` conserva topes cortos; `reconcile`/`complete` le dan a lo no clasificado el margen de lo recuperable | `governed-run-failure-policy.ts` (`POST_SPEND_KINDS`, `POST_SPEND_UNKNOWN_CAP`) |
+| 4 | **El ritmo depende de la clase.** Una espera vuelve a mirar a los 10 s fijos en vez de heredar el backoff exponencial de error | `governed-run-lifecycle.ts` (cálculo de `backoffMs`) |
+| 5 | **Un run terminal cierra su experimento** vía `RunFinalizerPort.abandon` | `governed-run-lifecycle.ts` + `governed-run-lifecycle.test.ts:364-396` |
+
+Dos decisiones de diseño que no son detalle y conviene no revertir por descuido:
+
+- **La asimetría que justifica el #3**: antes del gasto, abandonar devuelve el crédito y no pierde nada;
+  después del gasto, abandonar significa que **el cliente pagó y no recibió**. Los dos errores no cuestan lo
+  mismo, así que no pueden compartir tope. Lo genuinamente `terminal` sigue muriendo en su primera entrega
+  incluso post-gasto.
+- **`abandon` es obligatorio en el puerto, no opcional** — para que quien no lo implemente rompa el build — y
+  **no toca créditos a propósito**: el settlement es autoridad de otro dueño y ya decidió. Un `abandon` que
+  liberara reserva estaría reabriendo una decisión ajena.
+
+### 🔴 El hallazgo que debe gobernar el cierre de esta task
+
+**Es el mismo bug class en DOS parejas distintas de agregados**, y sólo una estaba declarada:
+
+| Pareja | Síntoma | Estado antes de hoy |
+|---|---|---|
+| outbox `reconcile` ↔ `governed_runs` | reconciles pendientes de runs terminales, `queueOldestAgeSeconds` inflado | **declarado** en el alcance restante de esta task |
+| `experiments` ↔ `governed_runs` | experimento `running` eterno, pieza pagada y fantasma | **no lo declaraba nadie**; arreglado el 2026-08-03 |
+
+Si hay dos, **el arreglo no es por pareja**. El invariante correcto es:
+
+> **Cuando un run llega a terminal, todo agregado que dependa de su estado converge o queda observable.**
+
+Arreglar caso por caso garantiza descubrir el tercero en producción, que es exactamente como apareció éste.
+
+**Propuesta de alcance para quien retome** (requiere decisión del operador antes de ejecutar): ampliar el
+alcance restante de *«terminalizar reconciles de runs ya terminales»* a **«convergencia terminal de los
+agregados del run»**, con **el barrido como primer paso** — enumerar qué agregados dependen del estado de un
+run antes de escribir el siguiente arreglo puntual.
+
+Candidatos a tercera pareja, **no verificados**:
+
+- **reservas de crédito** de un run que murió — ¿el expiry las cubre siempre, o sólo las que nadie tocó?
+- **assets en Asset Governance** de un run que murió — quedan en vuelo sin dueño que los reclame.
+
+### Pendientes que este delta NO cierra
+
+1. **Las dos señales existen pero no están cableadas.** `readOutboxHealth` (`packages/database/src/stores/
+   governed-run-store.ts:294`) calcula `deadLetter` y `retryStorm` en **cada batch** del worker, y
+   `worker-main.ts:267-268` los emite dentro de `globe_worker_completed`. **Ahí se acaban.** Verificado en
+   `infra/terraform/`: hay `logging_metric` + `alert_policy` para `queueOldestAgeSeconds` y
+   `creditExpiryOldestAgeSeconds`, y **cero ocurrencias de `outbox`** en todo el Terraform. O sea que el
+   número se calcula, se imprime y nadie lo mira. Sin ese cableado, la próxima espera larga tampoco avisa —
+   que es el punto abierto de `ISSUE-135`.
+2. **El nombre `outboxDeadLetter` engaña y es parte de este cierre.** Su SQL es
+   `COUNT(*) FILTER (WHERE a.state='failed' AND a.terminal_at IS NOT NULL)` sobre una ventana de 24 h: cuenta
+   **attempts que murieron en terminal**, no filas en un estado `dead_letter`. Es una señal correcta con un
+   nombre que promete otra cosa; hay que **renombrarla o documentarla en el propio contrato**, porque el día
+   que alguien busque la tabla de dead letters no la va a encontrar.
+3. **Experimentos huérfanos anteriores al fix.** La última medición da **4** en `running` con run terminal;
+   el delta anterior había anotado 6, así que **hay que re-medir antes de barrer** — la diferencia es
+   probablemente convergencia posterior, no un error de conteo. `abandon` no los alcanza porque **sólo actúa
+   hacia adelante**: cierra runs que mueran de ahora en adelante, no los que ya murieron. Recuperación por
+   primitive canónica con audit, **nunca por SQL**.
+
+### Criterios exigibles que agrega este delta
+
+- [ ] El invariante de convergencia terminal está declarado y probado como propiedad del lifecycle, no como
+      arreglo de una pareja: un run terminal deja **todo** agregado dependiente convergido u observable.
+- [ ] El barrido de agregados dependientes está hecho y su resultado escrito (al menos: outbox `reconcile`,
+      `experiments`, reservas de crédito, assets en governance), con veredicto por cada uno.
+- [ ] `globe.run.outbox_dead_letter` y `globe.run.outbox_retry_storm` tienen `logging_metric` + `alert_policy`
+      en `infra/terraform/`, con steady-state declarado (`0`/`0`).
+- [ ] El nombre de la señal de dead letter describe lo que cuenta, o su contrato lo documenta explícitamente.
+- [ ] Los experimentos huérfanos previos al fix quedan recuperados por primitive canónica con audit; el conteo
+      se re-mide antes y después.
+
 ## Follow-ups
 
 - Las dependencias sucesoras se leen desde EPIC-028 y `docs/tasks/README.md`.
-- Recuperar los 6 experimentos huérfanos en `running` cuyos runs ya son terminales (anteriores al fix del
-  2026-08-03), por primitive canónica y nunca por SQL.
+- Recuperar los experimentos huérfanos en `running` cuyos runs ya son terminales (anteriores al fix del
+  2026-08-03; última medición **4**, medición previa 6 — re-medir), por primitive canónica y nunca por SQL.
+- Cablear las dos señales de outbox a métrica + alerta, y resolver el nombre de `outboxDeadLetter`.

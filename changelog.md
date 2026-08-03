@@ -7,6 +7,37 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-03 — Globe Producer: una corrida deja de morir esperando, y la pieza deja de quedar «generando»
+
+- **Una corrida que espera a Asset Governance ya no se confunde con un fallo** (`deffbd4`, `bbbc9c1`; los tres
+  runtimes en `d58bc6f`). El paso donde se verifica el output —C2PA, scan, elegibilidad— es una espera, no un
+  error, y tres capas lo trataban como error hasta matarlo: el nombre real se borraba camino al genérico, el
+  genérico caía en la clase «no clasificado» con tope 3, y al tercer intento la corrida moría **con el gasto ya
+  hecho**. El caso medido: una imagen aceptada y cobrada (748 → 738 créditos) murió esperando algo que el día
+  anterior había tardado doce entregas y terminado bien. Ahora la espera conserva su nombre, se reconoce como
+  espera, y **abandonar después de cobrar exige más margen que abandonar antes** — que es una diferencia de
+  plata, no de código.
+- **Y vuelve a mirar en segundos en vez de minutos.** El backoff creciente existe para no martillar un sistema
+  caído; governance no está caído, está trabajando. Aplicárselo sólo agregaba latencia **después** de que la
+  pieza ya estaba lista: en la décima entrega el techo de 5 minutos la dejaba terminada y sin publicar todo ese
+  rato. Una espera vuelve a mirar a los 10 segundos; un error conserva el backoff, que es donde sirve.
+- **Una pieza cuya corrida muere ya no queda «generando» para siempre** (`bbbc9c1`). La corrida y el experimento
+  son registros distintos y sus estados divergían: el sistema marcaba la corrida como fallida y nadie tocaba el
+  experimento, que es lo que la pantalla lee. Ahora un cierre terminal cierra su experimento con el motivo real.
+  No toca créditos a propósito: la liquidación ya decidió y meter dinero ahí arriesgaría un segundo movimiento.
+- **El composer ya no reconstruye su paleta de comandos en cada tecla** (`011d0eb`, `ISSUE-136` resuelto).
+  Escribir en el prompt encadenaba decenas de actualizaciones y React cortaba con su error #185 una vez por
+  sesión. La pantalla respondía igual, así que ninguna verificación visual lo habría visto — **lo encontró el
+  operador preguntando si alguien había abierto la UI**, tras cuatro despliegues declarados «verificados en
+  runtime». El canary del composer ahora escucha la consola y escribe tecla por tecla; antes hacía las dos cosas
+  mal y por eso no lo vio.
+- Estado honesto: **las dos señales de salud de la outbox (`outboxDeadLetter`, `outboxRetryStorm`) se calculan en
+  cada vuelta del worker y no las lee nada** — no hay métrica ni alerta que las consuma. Todo lo que se encontró
+  hoy lo encontró un humano preguntando, no el sistema avisando. Es el próximo paso recomendado de `ISSUE-135`,
+  que sigue abierto por eso.
+- Los códigos de rechazo del contrato creativo de ruta y el rechazo sin cobro de un control no honrado quedaron
+  registrados en la entrada siguiente de este mismo día; acá sólo se registra lo que ocurrió después.
+
 ## 2026-08-03 — Globe Producer: el contrato creativo de ruta empieza a aplicarse
 
 - Cinco commits de Globe desplegados a producción y verificados contra la revisión activa (`8986b45`, `ac1999f`,
@@ -797,11 +828,3 @@ Corrección de fuente de verdad: el cliente inicial es **SKY Agencia Creativa**,
 - Se verificó que `https://think.efeoncepro.com/brand-visibility` está publicado y sirve el form gobernado del grader.
 - Se actualizaron TASK-1246/TASK-1327, el índice de tasks, el ledger de flags, la documentación funcional de Think y el handoff para retirar el estado histórico “superficie inexistente”.
 - El loop base queda documentado como submit → run → status → reporte tokenizado; resta consolidar evidencia E2E fechada y sincronizar el lifecycle de TASK-1335/TASK-1336.
-
-## 2026-07-27 — Ecosystem Work Registry y Federated Execution Harness
-
-- Se formalizó el ADR propuesto que extiende el harness Greenhouse-local hacia una arquitectura de ecosistema: Greenhouse conserva registro, visibilidad y coordinación global; cada repo conserva ejecución y evidencia primaria.
-- Se definieron work contracts, Repo Capability Manifests, adapters federados, estados de freshness y una transición read-only antes de habilitar mutaciones cross-repo.
-- Se fijó que ESLint, `pnpm`, typecheck, tests, build, deploy y smoke se declaran por repo mediante verification profiles; Greenhouse agrega sus resultados y aplica policy sin imponer una toolchain común.
-- Se aclaró que el contrato debe gobernar tanto `pnpm codex:task-hook` como `/implement-task` de Claude; los gates actuales del command de Claude pasan a ser un perfil Greenhouse-specific, no requisitos universales del ecosistema.
-- No se autorizó todavía schema, transporte, adapter concreto, ejecución remota, deploy ni segundo task registry.
