@@ -84,12 +84,27 @@ Historia anterior: [Handoff.archive.md](Handoff.archive.md).
   ya existía— y `valueShape` cierra la asimetría del descriptor, exigida por el guard en las dos direcciones.
   Runtimes en `e300c4eafa5e`: API revisión **`00195-qj6`**, worker digest `sha256:3324787d…`; dead letter sigue en
   1 (preexistente), retry storm 0, API 403.
-- 🔴 **DECISIÓN ABIERTA antes de seguir (Slice 3.5b):** los dos vocabularios de dirección creativa **no coinciden**.
-  `light`↔`lighting` y `framing`↔`composition` son el mismo concepto con nombre distinto; `mood`/`palette` existen
-  sólo en el brief (nadie puede saber si una ruta los honra) y `camera`/`lens`/`motion`/`timing`/`audio-direction`
-  sólo en los controles (nadie puede pedirlos). Deben alinearse 1:1 con un test que impida divergir: **renombrar**
-  (un nombre por concepto, más limpio) o **mapear** (más conservador). El dato que decide —cuántos briefs hay
-  persistidos en experimentos históricos, que un renombre rompería— **quedó pendiente por la ADC vencida**.
+- **Slice 3.5b — un solo vocabulario de dirección creativa** (`efeonce-globe@1b580f8`). Cierra ADR-022 Delta (b):
+  el brief PIDE, el contrato de ruta declara SI SE HONRA. Divergían en las tres formas posibles a la vez —
+  `light`/`lighting` y `framing`/`composition` eran el mismo concepto con dos nombres; `mood`/`palette` se podían
+  pedir sin que ninguna ruta declarara si los honra; `camera`/`lens`/`motion`/`timing`/`audio-direction` los
+  declaraba el contrato sin que existiera dónde pedirlos. Tres controles quedan sin ingrediente, **declarados y
+  verificados**: `prompt` (es el brief entero), `negative-prompt` (viaja en `notes`), `seed` (determinismo).
+  - **La decisión renombrar-vs-mapear se resolvió leyendo el camino, no con un `SELECT`.** Renombrar es seguro
+    porque ninguna de las tres capas re-lee el vocabulario: `experiment-store.get()` devuelve el JSON sin
+    revalidar, `normalizeStructuredBrief` se llama en **un solo lugar** (camino de ENTRADA), y lo que alimenta al
+    proveedor es el `effectivePrompt` ya compilado y congelado en el snapshot. El caso residual —un cliente viejo
+    mandando `light`— falla fail-closed. Tercera vez en el día que **leer el camino encuentra lo que perseguir por
+    datos no encuentra** (`ISSUE-127` capa 5).
+  - **El vocabulario estaba copiado literal en CUATRO lugares** y cada copia rompió por separado y en una capa
+    distinta: guard de catálogo, error de **tipo** (el cast perdió overlap), aserción de vocabulario y test de
+    integración. Los dos fixtures de CONTROLES pasan a derivarse; los de INGREDIENTES siguen literales a propósito
+    (son casos de uso concretos, no la lista).
+  - `structured-brief-vocabulary.test.ts` cubre las dos direcciones + la honestidad de las excepciones, **probado
+    en rojo**. `pnpm check` + `pnpm build` exit 0; domain 458 → 462.
+  - Nota operativa: el ADC **sí responde** (`print-access-token` OK); lo que se cuelga es el handshake del Cloud
+    SQL **Connector** contra la Admin API. Son tres carriles distintos —gcloud CLI, ADC, Connector— y conviene no
+    confundirlos al diagnosticar.
 - Greenhouse: `ops:lint --changed` verde sobre las 3 tasks.
 
 ## TASK-1631 / MCP — canon de scopes, CIMD como registro primario y benchmark de proveedor (2026-08-02)

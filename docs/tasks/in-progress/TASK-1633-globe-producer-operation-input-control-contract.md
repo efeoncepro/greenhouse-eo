@@ -774,6 +774,50 @@ concepto (más limpio) o mantener nombres y un mapa explícito (más conservador
 `kind` rompería su lectura. La consulta directa a PG no estaba disponible (ADC vencida), así que **el volumen de
 briefs persistidos es un dato pendiente** y es el que debe decidir entre las dos opciones.
 
+### Resuelto leyendo el camino, no la base
+
+El dato que decidía no vino de un `SELECT` — vino de leer las tres capas:
+
+1. **`experiment-store.get()` devuelve el JSON tal cual.** Un brief persistido **nunca se revalida** al leerse.
+2. **`normalizeStructuredBrief` se llama en un solo lugar** (`app.ts:1417`), en el camino de **entrada**, sobre
+   briefs nuevos.
+3. **Lo que alimenta al proveedor es el `effectivePrompt` ya compilado**, congelado en el snapshot del run — no el
+   brief.
+
+Renombrar es seguro, y no por suerte: ninguna de las tres capas re-lee el vocabulario. El único caso residual —un
+cliente viejo mandando `light` después del renombre— falla **fail-closed** con error de validación, no en silencio,
+y el cliente es nuestro propio composer, que se despliega junto. Es la lección de `ISSUE-127` capa 5 otra vez:
+leer el camino completo encuentra lo que perseguir por datos no encuentra.
+
+## Delta 2026-08-02 — Slice 3.5b: un solo vocabulario de dirección creativa
+
+Los dos lados quedan alineados 1:1 y con un test que impide que vuelvan a divergir.
+
+- **`light` → `lighting`** y **`framing` → `composition`**: un nombre por concepto.
+- **Al brief** entran `camera`, `lens`, `motion`, `timing`, `audio-direction` — antes eran controles que ninguna
+  superficie podía pedir.
+- **A los controles** entran `subject`, `mood`, `palette` — antes eran ingredientes que se podían pedir sin que
+  ninguna ruta declarara si los honra.
+- **Tres controles quedan sin ingrediente, declarados y verificados**: `prompt` (es el brief entero),
+  `negative-prompt` (viaja en `notes`) y `seed` (determinismo, no dirección).
+
+**Las tres formas de divergencia eran silenciosas** —un ingrediente sin control produce una promesa que nadie
+validó; un control sin ingrediente, soporte que ningún caller puede ejercer; y dos nombres para un concepto, ambas
+cosas a la vez— por eso hace falta un test y no una convención. `structured-brief-vocabulary.test.ts` cubre las dos
+direcciones más la honestidad de las excepciones: si `negative-prompt` deja de ser un caso especial, su entrada
+queda mintiendo y el test lo dice.
+
+De paso, los fixtures de controles pasan a **derivarse** del vocabulario en vez de copiarlo. El dato que lo
+justifica: el vocabulario estaba copiado literal en **cuatro** lugares, y cada copia rompió por separado y **en
+una capa distinta** — guard del catálogo (4 tests rojos), error de **tipo** en el runner (el cast dejó de tener
+overlap), aserción del vocabulario en contracts, y test de integración del compilador en studio-web. Ninguno es el
+sistema fallando: es el mismo dato avisando cuatro veces, y ese ruido escondería una regresión real cuando
+aparezca. Los fixtures de **ingredientes** siguen literales a propósito: son casos de uso concretos, no la lista.
+
+Rollout verificado: `efeonce-globe@1b580f8`, API en revisión **`00196-27t`** y worker con digest
+`sha256:31d84697…`, ambos etiquetados `1b580f8a5fa0`. `outboxDeadLetter` sigue en 1 (el preexistente),
+`retryStorm` 0, worker con `claimed=0`, API responde 403. `pnpm check` + `pnpm build` exit 0; domain 458 → 462.
+
 ## Delta 2026-08-02 — auditoría arquitectónica contra los incidentes del día (`arch-architect`)
 
 Revisión leyendo el código de Globe contra `ISSUE-126`, `ISSUE-127` e `ISSUE-135`. **El eje de inputs está bien
