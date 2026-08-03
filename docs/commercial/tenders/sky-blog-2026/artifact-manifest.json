@@ -1,0 +1,25 @@
+{
+  "deal": "sky-blog-2026",
+  "artifacts": [
+    {
+      "id": "radiografia-sky-carretera-austral",
+      "type": "aeo_xray",
+      "url": "https://think.efeoncepro.com/muestras/sky-carretera-austral-861c18cc0e37/",
+      "as_of": "2026-07",
+      "audience": "client_facing",
+      "render": "by_link",
+      "used_in": ["deck:muestra", "oferta-tecnica-v2-evolucion §7"]
+    },
+    {
+      "id": "ai-visibility-sky-july-2026",
+      "type": "ai_visibility_report",
+      "url": "https://think.efeoncepro.com/brand-visibility/r/grt-9892e5684c394557a63f8171926871c26d3278216daf42a2a8100951ccb5537f",
+      "run_id": "EO-GRUN-00046",
+      "as_of": "2026-07",
+      "audience": "client_facing",
+      "render": "by_link",
+      "backs_evidence": ["E3"],
+      "used_in": ["oferta-tecnica-v2-evolucion §0", "oferta-tecnica-v2-evolucion §7", "oferta-tecnica-v2-evolucion §10"]
+    }
+  ]
+}

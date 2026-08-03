@@ -2,6 +2,20 @@
 
 Historia anterior: [Handoff.archive.md](Handoff.archive.md).
 
+## SKY Blog — propuesta técnica V2 y arquitectura económica (2026-08-03)
+
+- V2 técnica append-only en [`docs/commercial/tenders/sky-blog-2026/`](docs/commercial/tenders/sky-blog-2026/): fuente,
+  deck enriquecido de 29 láminas y manifiesto de evidencia; Notion/Content Hub es el hub editorial propuesto y
+  WordPress queda como superficie de publicación. El borrador comprimido de 17 láminas y la V1 se conservan.
+- La composición pasó slots y revisión visual; `.captures/` es `workshop_only`, sin render productivo ni `verified`.
+- La económica V2 ya tiene fuente, deck separado de 9 láminas y Excel generado: **CLP 3.000.000 netos/mes sin
+  IVA**, IVA 19% **CLP 570.000**, total mensual con IVA **CLP 3.570.000**; Notion/Content Hub incluido como
+  hub de la operación, newsletter incluida y Addons separados.
+- La sesión quedó trazada en HubSpot como nota `114121518673` sobre el deal `62535094842`; no se modificaron
+  monto ni etapa. La nota registra contexto, guardrails internos y siguientes pasos.
+- La técnica y la económica siguen en `.captures/` como `workshop_only`; falta validar capacidad, cost-to-serve,
+  margen y frontera de contenidos nuevos antes de registrarlas como oferta productiva.
+
 ## TASK-1633 — contrato creativo de ruta: 5 slices desplegados (2026-08-02/03)
 
 **Estado: 10 de 17 criterios, `in-progress`.** El detalle completo —cada slice, su evidencia y sus límites— vive en

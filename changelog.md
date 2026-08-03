@@ -75,6 +75,17 @@
   gobernados → Q2C/actual-vs-standard → General Accounting. No hubo cambios de schema ni runtime.
 - `EPIC-012` y `EPIC-029` registran 11 candidatos sin IDs reservados; tras asignar TASK-1633 a Globe deben
   reenumerarse desde TASK-1634 si superan el checkpoint de confirmación del task planner.
+- En SKY se agregó una V2 técnica append-only enriquecida de 29 láminas con evidencia viva por enlace y estado local
+  `workshop_only`; se recuperaron Stack Operativo, diagnóstico, escalera IA, informe, Content Hub, portal y prueba social.
+  El primer borrador comprimido de 17 láminas se conserva como histórico; se construyó también la económica V2 separada: Core de **CLP 3.000.000 netos/mes sin IVA**,
+  IVA 19% de **CLP 570.000** y total mensual con IVA de **CLP 3.570.000**, con newsletter incluida, Addons
+  separados, deck `PricingFull` de 9 láminas y Excel generado. La validación de capacidad y margen sigue
+  pendiente antes del registro productivo.
+- Actualización 2026-08-03: Word queda únicamente como contexto del flujo actual en documentación interna;
+  la técnica, la económica, ambos decks, el Excel y el correo proponen Notion/Content Hub para grilla, briefs,
+  fuentes, comentarios, estados, QA, aprobaciones y ciclo de vida. Se recompusieron los decks, se regeneró el
+  Excel desde su JSON fuente y la síntesis quedó en HubSpot como nota `114121518673` sobre el deal `62535094842`;
+  no se alteraron la etapa ni el monto del deal. El cierre sigue `workshop_only`.
 
 ## 2026-08-02 — Gemini Omni: evidencia legal corregida y checkpoint durable
 

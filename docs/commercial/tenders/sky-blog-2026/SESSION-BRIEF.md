@@ -7,7 +7,61 @@
 
 ---
 
-## DELTA 2026-07-15 (estado vigente — LEE ESTO PRIMERO, supersede §3/§4/§6)
+## DELTA 2026-08-03 — V2 técnica y económica alineadas con Notion; cierre canónico pendiente
+
+Se creó una nueva versión técnica sin reemplazar la anterior:
+
+- fuente narrativa: [`oferta-tecnica-v2-evolucion.md`](oferta-tecnica-v2-evolucion.md);
+- plan de composición: [`deck-plan-v2-evolucion.json`](deck-plan-v2-evolucion.json);
+- evidencia viva por enlace: [`artifact-manifest.json`](artifact-manifest.json);
+- fuente económica: [`oferta-economica-v2-evolucion.md`](oferta-economica-v2-evolucion.md);
+- input del Excel: [`economica-v2-evolucion.json`](economica-v2-evolucion.json);
+- deck económico: [`deck-plan-economic-v2-evolucion.json`](deck-plan-economic-v2-evolucion.json);
+- Excel económico: [`propuesta-economica-sky-visibility-core-v2.xlsx`](propuesta-economica-sky-visibility-core-v2.xlsx);
+- correo de entrega: [`correo-entrega-propuesta-v2.md`](correo-entrega-propuesta-v2.md), con Notion/Content Hub como hub editorial;
+- registro local de cierre: [`proposal-studio.json`](proposal-studio.json), en `workshop_only`, con ambos planes;
+- salida técnica enriquecida de taller: `.captures/sky-bid-v2-evolucion-enriched/` — 29 láminas, composición validada,
+  revisión visual completa y enlaces externos verificados.
+- histórico preservado: `.captures/sky-bid-v2-evolucion/` — primer borrador comprimido de 17 láminas; no usar para entrega.
+- salida económica de taller: `.captures/sky-bid-economic-v2-evolucion/` — 9 láminas, composición validada,
+  revisión visual del deck y render de control del Excel.
+
+Durante la revisión final se corrigió una desalineación importante: Word corresponde al flujo actual de SKY y
+no forma parte de la solución propuesta. La técnica, la económica, ambos decks, el Excel y el correo de entrega
+quedaron alineados con **Notion/Content Hub como hub editorial operativo** para grilla, briefs, fuentes,
+responsables, comentarios, estados, QA, aprobaciones y ciclo de vida; WordPress permanece como superficie de
+publicación.
+
+Se recompusieron los dos decks y se regeneró el Excel después del ajuste: técnica de 29 láminas, económica de
+9 láminas y workbook V2 actualizado. JSON, composición, PDF y presencia de Notion/Content Hub en el workbook
+fueron verificados localmente. El gate canónico continúa en `workshop_only`; no se registró una Proposal
+productiva ni se subió la oferta a Wherex.
+
+La síntesis de esta sesión quedó registrada como nota interna en el deal de HubSpot **SKY Airline — Licitación
+Blog SEO/AEO (Wherex)** (`dealId 62535094842`), nota `114121518673`, con el contexto, el ajuste de Notion/Content
+Hub, la configuración económica, los guardrails internos y los siguientes pasos. No se modificaron la etapa ni
+el monto del deal.
+
+La tesis nueva es que SKY ya tiene un blog con tracción y necesita una nueva etapa: proteger lo que funciona,
+evolucionar la cartera y amplificar el valor de cada contenido en blog, newsletter y superficies de búsqueda y
+respuesta. La técnica propone Notion/Content Hub como centro de la grilla, comentarios, aprobaciones y ciclo
+de vida editorial; WordPress queda como superficie de publicación y el reporte mensual conserva su lugar. No
+incluye precios ni costos internos.
+
+El estado de cierre canónico sigue siendo de taller hasta contar con una Proposal y un render client-facing
+versionado en Proposal Studio. No se debe inferir `verified` desde el PDF local.
+
+La económica V2 queda configurada en **CLP 3.000.000 mensuales netos, sin IVA**. El IVA 19% equivale a
+**CLP 570.000** y el total mensual facturado con IVA es **CLP 3.570.000**. La newsletter mensual de hasta 10
+contenidos está incluida; los Addons se cotizan separadamente. La propuesta usa capacidad gobernada para una
+cartera de hasta 45–50 oportunidades y no precio unitario por artículo.
+
+La composición sigue en taller: antes de convertirla en oferta definitiva se debe cerrar internamente el
+envelope de capacidad para la mezcla 45–50, el tratamiento de contenidos nuevos versus `refreshes`, los límites
+de multimedia/WordPress, los Addons, el cost-to-serve y el margen. La arquitectura permanece separada de la
+técnica y el documento interno de costeo/margen nunca se empaqueta.
+
+## DELTA 2026-07-15 (histórico — supersedido por la V2 del 2026-08-03)
 
 El deck quedó en **26 láminas · PDF 12.2 MB**. Se integraron tres patrones reutilizables del catálogo:
 
