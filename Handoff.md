@@ -2,28 +2,35 @@
 
 Historia anterior: [Handoff.archive.md](Handoff.archive.md).
 
-## TASK-1635 — entorno de desarrollo de Globe: código listo, apply pendiente (2026-08-03)
+## TASK-1635 — `pnpm globe:dev`: el loop rápido de Globe, funcionando (2026-08-03)
 
-**Estado: `code complete, rollout pendiente`.** Globe tiene UN solo entorno —lo desplegado—, así que probar
-cualquier cambio cuesta un despliegue. Detalle, invariantes y evidencia en
-[`TASK-1635`](docs/tasks/in-progress/TASK-1635-globe-local-development-multimodal-harness.md).
+Ver un cambio de UI de Globe costaba construir imagen y desplegar tres runtimes. Ahora cuesta guardar el
+archivo. Detalle y las dos correcciones de tesis en
+[`TASK-1635`](docs/tasks/in-progress/TASK-1635-globe-local-development-multimodal-harness.md) — leer su
+**último Delta**, que es el estado vigente.
 
-Commiteado en Globe `main`, local, **sin push**: `864ce68` (entorno + dos guardarraíles mecánicos, ambos
-probados en rojo) y `f1b8e6e` (migraciones alcanzan la base dev). `tofu plan` con el flag OFF da `No changes`;
-ON da **43 to add, 0 change, 0 destroy**, sin tocar la instancia.
+Commiteado en Globe `main`, local, **sin push**: `864ce68` · `f1b8e6e` · `8c91fa9` · `9d44091` · `68c4b99` ·
+`c8767d0` · `ee8872f`. `pnpm check` en verde.
 
-**Cero claves nuevas** (`9d44091`): medido contra el runtime, un secreto ausente no rompe el arranque —deja su
-capability sin firmante—, así que desarrollo lee un subconjunto de los productivos y los **tres de autoridad**
-(aprobación de crédito + las dos atestaciones) le quedan **denegados**. Control más fuerte que darle claves
-propias. Plan bajó a **26 to add**, cero contenedores de secreto nuevos.
+- `pnpm globe:dev` sirve el **mismo shell que producción** con un bundle que apunta a Vite. **HMR verificado de
+  punta a punta en navegador real**: se editó copy, entró sin recarga, se restauró y volvió.
+- Dos defectos que **sólo se veían mirando la pantalla**: el preamble de Fast Refresh que falta cuando el
+  documento no lo sirve Vite (pantalla negra, consola limpia), y que **un nonce en `style-src` anula
+  `'unsafe-inline'`** (contenido correcto, cero estilos). Ninguno aparece en un test ni en un código HTTP.
+- **La premisa inicial era falsa** y la desarmó una pregunta del operador: Globe ya separa por `workspace_id`
+  y el tope de gasto también, así que una base de datos aparte sólo aporta cuando el cambio toca el **schema**.
+  Se construyó infraestructura antes de preguntar qué clase de cambios se iban a hacer.
+- Lo que quedó del desvío y sirve igual: `packages/database` ahora **se puede ejercitar sin nube** (antes el
+  connector estaba cableado a la fuerza) y un Postgres local en la versión exacta de producción, listo para el
+  día que un cambio toque el schema. La base creada en Cloud SQL fue destruida; instancia y base productiva
+  intactas.
 
-**Bloqueado, requiere al operador:** `tofu apply` y correr `bootstrap-development.sql` +
-`verify-development-isolation.sql` por el proxy. Su **orden es load-bearing**: el
-CONNECT productivo se hace explícito antes de revocar `PUBLIC`, o producción pierde su propia base (en las 49
-migraciones no hay un solo `GRANT CONNECT`). Recién después: migrar dev, `globe:dev` y generación real.
+**Pendiente con bloqueo nombrado:** datos reales en el loop. El cableado está hecho (el dev shell actúa como el
+BFF y mintea el token server-side), pero el usuario operador **no tiene `serviceAccountTokenCreator` sobre
+`greenhouse-globe-caller`**. Otorgarlo es decisión: ese principal carga `globe.lab.experiment.run`, o sea
+autoridad de gasto.
 
-El despliegue por lote se movió a
-[`TASK-1636`](docs/tasks/to-do/TASK-1636-globe-deployable-promotion-bundle.md), bloqueada por ésta.
+El despliegue por lote sigue en [`TASK-1636`](docs/tasks/to-do/TASK-1636-globe-deployable-promotion-bundle.md).
 
 ## SKY Blog — propuesta técnica V2 y arquitectura económica (2026-08-03)
 

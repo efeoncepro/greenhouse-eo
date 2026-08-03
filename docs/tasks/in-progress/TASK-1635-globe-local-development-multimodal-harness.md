@@ -1,4 +1,4 @@
-# TASK-1635 — Globe Development Environment and Real-Generation Local Loop
+# TASK-1635 — Globe Local Development Loop
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -28,22 +28,16 @@
 
 ## Summary
 
-Globe hoy tiene **un solo entorno**: lo desplegado. Una sola Cloud SQL (`globe-pg`), un solo set de buckets,
-una sola cola. No existe un lugar donde desarrollar y probar que no sea la app productiva, así que el ciclo de
-feedback de cualquier cambio es un despliegue.
+> ⚠️ **La tesis de esta task cambió DOS veces durante su ejecución.** Lo que vale es el
+> `## Delta 2026-08-03 — la premisa era falsa` al final del archivo; el cuerpo de abajo conserva
+> el razonamiento intermedio porque explica por qué se descartó, no porque siga vigente.
 
-Esta task **crea el entorno de desarrollo de Globe**: su propia base, sus propios buckets, sus propias
-identidades y su propio presupuesto — desechable y recreable desde cero. Sobre él, los tres procesos
-(`studio-client` con HMR, `studio-web` y el worker de ejecución) corren desde el checkout, y **una generación
-es real**: proveedor real, asset real, governance real. Lo único que no se replica es el proveedor, porque el
-modelo vive en su nube.
+Ver un cambio de UI de Globe costaba construir una imagen y desplegar tres runtimes. Esta task
+entrega `pnpm globe:dev`: un comando que levanta el Producer con HMR sobre el árbol React real,
+sirviendo el **mismo shell que producción** con un bundle que apunta al dev server de Vite.
 
-La app sigue siendo la desplegada. El entorno de desarrollo **no la toca**: distinta base, distintos buckets,
-distinta cola, distinto presupuesto. Cuando el cambio está probado ahí, recién entonces se despliega el lote
-completo con sus gates de SHA, imagen, revisión, tráfico y rollback intactos.
-
-Los fixtures quedan como **modo secundario**, para reproducir estados difíciles de provocar y para trabajar
-sin red. Un fixture verde nunca es evidencia de que una ruta genere.
+Los datos salen del fixture del Producer que ya existía en el repo, y opcionalmente de la API
+privada real —donde el dev shell actúa como el BFF, sosteniendo la identidad server-side.
 
 ## Why This Task Exists
 
@@ -970,3 +964,75 @@ recursos de Secret Manager son accessors sobre secretos existentes.
 
 **Verificación:** `pnpm check` **exit=0** (1539 tests, 0 fail) · guardarraíl 9/9 · plan OFF sigue
 en `No changes`.
+
+## Delta 2026-08-03 — la premisa era falsa: no hacía falta un entorno de base de datos
+
+**Éste es el estado vigente de la task.** Todo lo anterior sobre "el entorno de desarrollo de
+Globe" describe un camino que se recorrió y se descartó; se conserva porque explica el descarte.
+
+### La pregunta que lo desarmó
+
+El operador preguntó, a mitad de ejecución: *«¿para qué necesitas una base de datos aparte para
+desarrollar Globe, si lo que quiero es evolucionar Globe?»*
+
+No hacía falta. **Globe ya separa los datos por `workspace_id`**, y el tope de gasto también es
+por workspace. Desarrollar dentro de un workspace de pruebas ya deja el trabajo separado, con un
+mecanismo que la plataforma tiene desde siempre. Una base aparte sólo aporta cuando el cambio
+modifica el **schema** — y para el composer, el feed, el viewer, los adapters o los prompts, que
+es la mayoría del trabajo, no aporta nada y cuesta infraestructura.
+
+La lección de método, que vale más que el código: **se construyó infraestructura antes de
+preguntar qué clase de cambios se iban a hacer.** El dolor declarado en `## Why This Task Exists`
+era el ciclo de feedback, y el ciclo de feedback no necesitaba una base.
+
+### Lo que sí se entregó
+
+`pnpm globe:dev` (`scripts/globe-dev.mjs`, Globe `68c4b99` · `c8767d0` · `ee8872f`): levanta Vite
+con HMR y sirve el **mismo shell que producción** (`renderShell` importado de `dist/`, igual que
+`seam-smoke-server.mjs`) con un bundle que apunta al dev server. Los datos salen del fixture que
+ya existía (`gvc:fixture`), levantado **dentro del mismo proceso** en vez de coordinar otro.
+
+Verificado en navegador real, no por código de respuesta: el Producer renderiza completo y con
+estilos —composer, modalidades, créditos, sugerencias, costo estimado— y **el HMR se probó de
+punta a punta**: se editó un string de copy, el texto nuevo apareció y el viejo desapareció **sin
+recarga**; restaurado el archivo, volvió el original.
+
+### Dos defectos que sólo se veían MIRANDO LA PANTALLA
+
+Ninguno de los dos aparece en un test, un lint o un código de respuesta HTTP.
+
+1. **Pantalla negra con la consola del navegador limpia.** React montaba, el punto de montaje
+   quedaba vacío, cero errores. La causa salía por la salida del dev server:
+   `@vitejs/plugin-react can't detect preamble` — el plugin transforma cada componente asumiendo
+   que el documento instaló el runtime de Fast Refresh, un script que Vite inyecta en SU
+   `index.html`, y acá el documento lo sirve el shell real de Globe.
+2. **Contenido correcto, cero estilos.** En CSP, **declarar un nonce hace que el navegador ignore
+   `'unsafe-inline'`** para esa directiva — es la regla que vuelve seguros los nonces. Vite
+   inyecta el CSS por JavaScript en desarrollo, así que quedaban bloqueados en silencio. En
+   producción no aplica: ahí el CSS viaja como `<link nonce>` del bundle compilado.
+
+### Lo que quedó del camino descartado, porque sirve igual
+
+- **`packages/database` acepta un Postgres local** además del connector de Cloud SQL. Antes la
+  capa de datos **no se podía ejercitar sin nube**: el connector estaba instanciado
+  incondicionalmente. El guard rechaza todo host que no sea loopback, para que el modo no se use
+  como atajo a la instancia gobernada. 7 tests.
+- **`scripts/globe-dev-database.mjs`** levanta ese Postgres en la versión **exacta** de producción
+  (16; el de Homebrew de la máquina es 18, y dos majors de diferencia mueven los errores hacia
+  producción). Queda listo para el día que un cambio toque el schema.
+- Los 4 buckets de desarrollo, los dos guardarraíles y el gate de aislamiento del dev shell.
+
+### Lo que se revirtió
+
+La base `globe_dev` creada en Cloud SQL fue **destruida** (estaba vacía); la instancia y la base
+productiva nunca se tocaron. El input `target` del workflow de migraciones volvió a su forma
+original. Del HCL se podaron la base, los usuarios SQL y el service account migrador.
+
+### Pendiente, con su bloqueo nombrado
+
+**Datos reales en el loop.** El cableado está hecho: con `GLOBE_DEV_API` apuntando a la API
+privada, el dev shell mintea un ID token por impersonación y lo inyecta server-side —el patrón del
+BFF, el mismo de `smoke-private-api.mjs`. **Bloqueado por IAM**: el usuario operador no tiene
+`roles/iam.serviceAccountTokenCreator` sobre `greenhouse-globe-caller`, así que no puede mintear
+el token. Otorgarlo es una decisión: ese principal carga `globe.lab.experiment.run`, o sea
+autoridad de gasto.
