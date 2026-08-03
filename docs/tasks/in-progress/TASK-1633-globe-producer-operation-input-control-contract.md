@@ -818,6 +818,39 @@ Rollout verificado: `efeonce-globe@1b580f8`, API en revisión **`00196-27t`** y 
 `sha256:31d84697…`, ambos etiquetados `1b580f8a5fa0`. `outboxDeadLetter` sigue en 1 (el preexistente),
 `retryStorm` 0, worker con `claimed=0`, API responde 403. `pnpm check` + `pnpm build` exit 0; domain 458 → 462.
 
+## Delta 2026-08-03 — Slice 3.5c: la compilación del prompt deja de ser un molde único
+
+`efeonce-globe@91d1f71`. ADR-022 Delta (c), primera mitad. Tres cambios:
+
+1. **El contrato de ruta llega al compilador.** Antes se resolvía **después** de compilar el prompt, así que
+   estructuralmente no podía informarlo. Leer el `referenceRoute` sin validar es seguro: una ruta inexistente da
+   `undefined`, el compilador cae al comportamiento legacy y `validatePreparePayload` la rechaza dos líneas abajo.
+2. **Un ingrediente que la ruta no honra se RECHAZA**, con el control nombrado del lado del servidor. Degradarlo
+   en silencio es lo que este contrato existe para evitar: el caller pide dirección de cámara, paga, y recibe una
+   pieza donde nadie la aplicó.
+3. **El peso ordena y ya no se imprime.** `[weight=0.820]` viajaba al proveedor como texto — un encoder de difusión
+   no tiene jerarquía de instrucción, convierte todo en embeddings que compiten en una secuencia plana. Gastaba
+   tokens y no condicionaba. El orden sí, porque la atención sigue la estructura del lenguaje.
+
+**El `catch` volvió a colapsar la razón, en código escrito para cerrar ese bug class.** El bloque que envolvía la
+compilación mapeaba todo a `badRequest`, incluida la razón nueva. «La ruta no honra ese control» no es «el brief
+está mal formado» y la acción del operador es distinta —elegir otra ruta o quitar esa dirección, no corregir el
+JSON—. Se re-lanza tal cual. Undécima aparición del patrón de `ISSUE-127`, y la primera que se atrapa **antes** de
+mergear.
+
+### Dos límites declarados, autorizados por el operador
+
+- **El peso no se pudo verificar con un canary** (bloqueados por el transporte de `TASK-1504`). Es una mejora
+  razonada sobre cómo condicionan estos modelos, **no una mejora verificada**. Si una regresión de calidad
+  apareciera, éste es el primer sospechoso.
+- **El rechazo rompe un flujo que hoy "funciona":** un usuario en upscale con preset de estilo activo recibía una
+  generación que ignoraba el estilo y le cobraba; ahora recibe error sin gasto. La UI que evita el caso es
+  `TASK-1552`. Se eligió el error explícito sobre el cobro silencioso.
+
+Rollout verificado: API en revisión **`00197-f9z`** y worker con digest `sha256:76d31673…`, ambos etiquetados
+`91d1f71689c0`. `outboxDeadLetter` en 1, `retryStorm` 0, **cero errores del API** en la ventana post-deploy.
+`pnpm check` exit 0; domain 462 → 463.
+
 ## Delta 2026-08-02 — auditoría arquitectónica contra los incidentes del día (`arch-architect`)
 
 Revisión leyendo el código de Globe contra `ISSUE-126`, `ISSUE-127` e `ISSUE-135`. **El eje de inputs está bien

@@ -105,6 +105,17 @@ Historia anterior: [Handoff.archive.md](Handoff.archive.md).
   - Nota operativa: el ADC **sí responde** (`print-access-token` OK); lo que se cuelga es el handshake del Cloud
     SQL **Connector** contra la Admin API. Son tres carriles distintos —gcloud CLI, ADC, Connector— y conviene no
     confundirlos al diagnosticar.
+- **Slice 3.5c desplegado** (`efeonce-globe@91d1f71`, API **`00197-f9z`**, worker `sha256:76d31673…`): la
+  compilación del prompt deja de ser un molde único. El contrato de ruta llega al compilador (antes se resolvía
+  DESPUÉS, así que estructuralmente no podía informarlo); un ingrediente que la ruta no honra se **rechaza** con el
+  control nombrado; y el peso **ordena pero ya no se imprime**. Cero errores del API post-deploy.
+  - **El `catch` volvió a colapsar la razón, en código escrito para cerrar ese bug class** — undécima aparición del
+    patrón de `ISSUE-127`, y la primera atrapada **antes** de mergear.
+  - 🔶 **Dos límites declarados y autorizados por el operador:** (1) quitar el peso cambia el texto que recibe el
+    modelo en TODAS las rutas y **no se pudo verificar con un canary** — mejora razonada, no verificada; si
+    aparece una regresión de calidad, es el primer sospechoso. (2) un usuario en upscale con preset de estilo
+    activo ahora recibe **error sin gasto** en vez de una generación que ignoraba el estilo y le cobraba; la UI
+    que evita el caso es `TASK-1552`.
 - Greenhouse: `ops:lint --changed` verde sobre las 3 tasks.
 
 ## TASK-1631 / MCP — canon de scopes, CIMD como registro primario y benchmark de proveedor (2026-08-02)
