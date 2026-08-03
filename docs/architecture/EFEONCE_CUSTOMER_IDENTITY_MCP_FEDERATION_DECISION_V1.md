@@ -35,10 +35,44 @@ discovery settings enabled; it is not customer access or a production commitment
 DNS, production secrets, an external binding and customer authorization remain separately gated.
 
 The selected experience direction is an **Efeonce-owned custom login UI**. A dedicated browser-facing identity
-service at `auth.efeonce.org` will use AuthKit Authentication APIs server-side and WorkOS Connect for MCP OAuth;
-the gateway remains a resource server, not a session/UI host. This is not WorkOS Standalone Connect in the first
-cut: Efeonce does not yet have an independent customer authentication stack to reuse. WorkOS continues to own
-credential and authentication mechanics; the browser never receives a WorkOS API key.
+service at `auth.efeonce.org` will use the selected authentication adapter server-side and expose MCP OAuth;
+the gateway remains a resource server, not a session/UI host. WorkOS AuthKit + Connect is one candidate, not an
+approved commitment: the provider decision remains gated by the Slice 0 build-vs-buy comparison below.
+
+### Native Greenhouse broker alternative
+
+Greenhouse already contains a reusable authentication foundation that must be evaluated before adopting a second
+identity stack. `src/lib/auth.ts` provides the current NextAuth browser session and `src/lib/auth/magic-link.ts`
+provides the existing single-use recovery path. The sister-platform OAuth broker in
+`src/lib/sister-platforms/oauth-broker.ts`, together with its authorization, token and userinfo routes, already
+implements authorization-code + PKCE, exact redirect allowlists, public/confidential client policy, hashed opaque
+access tokens, expiry/revocation and audit events while resolving the existing Greenhouse tenant/person context.
+
+That broker is a **foundation, not yet a public MCP authorization server**. It is currently coupled to the
+Greenhouse deployable and browser session, accepts loopback redirects for public clients, and does not yet expose
+the complete protected-resource/authorization-server metadata, CIMD/DCR compatibility, hosted HTTPS callback
+policy, MCP token-verification adapter and customer consent/grant surface required by Claude, Codex and ChatGPT.
+Its opaque tokens also need an explicit gateway verification contract (introspection/userinfo or short-lived signed
+tokens with revocation/version checks); the gateway must not assume that the existing Entra JWT verifier can consume
+them.
+
+If the native route wins Slice 0, extract/operate the broker as an independent runtime at `auth.efeonce.org` while
+reusing Greenhouse identity and Account 360 commands/readers server-side. It must have its own deployment, cookie
+namespace, session store, audience, secrets, scaling and rollback. It must never share `NEXTAUTH_SECRET`, accept a
+Greenhouse browser cookie as an MCP token or make the Greenhouse release the operational boundary for customer
+OAuth. WorkOS may still be used upstream for enterprise SAML/SCIM federation without becoming the customer or
+Account 360 source of truth.
+
+The provider decision is therefore explicitly three-way:
+
+| Option | Reuses Greenhouse identity | Main benefit | Main cost/risk |
+| --- | --- | --- | --- |
+| WorkOS AuthKit + Connect | Through an audited binding | Managed OAuth/federation and lower security-operations burden | Vendor dependency, plan/custom-domain cost and subprocessor review |
+| Native Greenhouse broker extracted to `auth.efeonce.org` | Yes, directly | One canonical identity stack and existing broker primitives | We own metadata, client compatibility, MFA/recovery, hardening and 24/7 operations |
+| Hybrid: native broker + WorkOS for enterprise federation | Yes, with WorkOS upstream only where needed | Preserves ecosystem continuity while buying enterprise federation | Two adapters and two operational failure modes |
+
+No option is approved by this ADR yet. Slice 0 must measure compatibility, security/operations, cost, privacy,
+migration and exit before production provisioning.
 
 ### Relationship with the Greenhouse login
 
@@ -112,7 +146,7 @@ membership or access.
   membership or Globe grant.
 - Invitations and revocations originate from audited canonical Account 360/identity commands. They must bind a
   person to the selected organization and never infer access from an unverified email domain or JWT field.
-- One person maps to one canonical `identity_profile`. A WorkOS or other IDP subject is an external source link;
+- One person maps to one canonical `identity_profile`. A WorkOS, native-broker or other IDP subject is an external source link;
   it must not create a parallel customer identity or permanent second credential set for an existing person.
 - Greenhouse, `auth.efeonce.org` and MCP use separate cookies, sessions and token audiences. Sharing a Greenhouse
   session secret/cookie with another deployable, or accepting a portal cookie as an MCP token, is prohibited.
@@ -199,12 +233,16 @@ secrets are an irreversible operational commitment and require explicit operator
 
 ## Rollout gates
 
-1. Accept this decision and approve the selected identity-provider commercial plan before production provisioning.
+1. Accept this decision and approve the selected identity-provider/composition and any commercial plan before
+   production provisioning. The selection must include the measured native Greenhouse broker vs WorkOS vs hybrid
+   comparison; a WorkOS benchmark alone is not an approval.
 2. Discover and implement the Account 360/person binding with migration, collision handling, recovery, audit and
    revocation semantics; approve the future Greenhouse customer-login convergence contract without coupling the
    first MCP rollout to that later cutover.
-3. Implement the isolated `auth.efeonce.org` custom UI/session service with server-only AuthKit API access, then
-   configure the external issuer, OAuth metadata, PKCE and supported MCP client registration.
+3. Implement the isolated `auth.efeonce.org` custom UI/session service with the selected server-side adapter (native
+   Greenhouse broker, WorkOS or hybrid), then configure the external issuer, OAuth metadata, PKCE and supported MCP
+   client registration. If the native route is selected, the broker must be extracted and operated independently;
+   the Greenhouse deployable remains an identity/data dependency, not the OAuth runtime.
 4. Add the gateway's gated dual-issuer validation and provider entitlement revalidation; retain the Entra internal
    canary unchanged.
 5. Run Claude, Codex and ChatGPT compatibility canaries with one allowlisted customer organization, one
@@ -214,7 +252,8 @@ secrets are an irreversible operational commitment and require explicit operator
 
 ## Revisit when
 
-- WorkOS cannot meet the verified metadata/registration, B2B federation, data-residency or commercial requirements.
+- The selected provider/composition cannot meet the verified metadata/registration, B2B federation, data-residency
+  or commercial requirements, or the native broker proves too costly to operate safely.
 - A second MCP provider requires a materially different organization or entitlement model.
 - Customer self-service administration, public signup, SCIM, enterprise SSO or contractual audit requirements
   expand the binding.

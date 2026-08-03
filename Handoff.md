@@ -81,6 +81,12 @@ comandos, en
   (el costo lo fija el custom domain, no el volumen; organizaciones sin cargo ni tope). Runner-up Stytch (USD 0
   base, precio de dominio no público). Logto y FusionAuth descartados por no soportar DCR. Curva a modelar:
   SSO/SAML de WorkOS a **USD 125 por conexión/mes**.
+- **Nueva alternativa documentada:** Greenhouse ya tiene NextAuth y un broker OAuth sister-platform con PKCE,
+  allowlists, tokens opacos hasheados, revocación, audit y userinfo. Es una foundation reutilizable, no un
+  authorization server MCP público: requiere extracción independiente a `auth.efeonce.org`, metadata/CIMD-DCR,
+  callbacks HTTPS hospedados, consent/grants y contrato de verificación compatible con el gateway. TASK-1631 ahora
+  compara WorkOS vs native extraído vs hybrid; ninguna opción está aprobada y Greenhouse cookies/`NEXTAUTH_SECRET`
+  nunca se comparten.
 - **TASK-1631 quedó `template=1, errors=0, warnings=0`** tras reescritura completa (antes linteaba `legacy`) más
   cuatro rondas de revisión cruzada. Sigue `to-do` y **bloqueada por tres gates**: aceptación del ADR, aprobación
   de proveedor/plan con costo presentado, y **revisión de privacidad/subprocesador** — gate nuevo, porque es el

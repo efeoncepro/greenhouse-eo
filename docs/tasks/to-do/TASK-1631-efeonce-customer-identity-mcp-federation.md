@@ -17,10 +17,10 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `none`
-- Status real: `arquitectura propuesta; runtime pre-auditado 2026-08-02; pendiente aceptación del proveedor de identidad y su plan comercial antes de provisionar`
+- Status real: `arquitectura propuesta; runtime pre-auditado 2026-08-02; pendiente decidir WorkOS vs broker Greenhouse extraído vs híbrido antes de provisionar`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|agentic`
-- Blocked by: `aceptación explícita de EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md; aprobación del proveedor/plan de identidad externo con su costo presentado; y revisión de privacidad/subprocesador cerrada`
+- Blocked by: `aceptación explícita de EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md; comparación y aprobación de WorkOS vs broker Greenhouse extraído vs híbrido con costo/operación presentados; y revisión de privacidad/subprocesador cerrada`
 - Branch: `Greenhouse develop; MCP main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -62,9 +62,10 @@ token externo con el mismo string de scope pareciera equivalente a uno interno.
 - Iniciar la cohorte externa sólo desde organizaciones cliente ya existentes en Account 360: selección explícita,
   administrador designado, invitación auditable y grant read-only antes de OAuth. Ningún email o dominio crea
   membership, organización o acceso.
-- Entregar el servicio de autenticación propio en `auth.efeonce.org`, aislado del gateway y de Greenhouse;
-  WorkOS/AuthKit opera autenticación mediante APIs server-side y WorkOS Connect sigue emitiendo OAuth para MCP. La
-  superficie visible de login se entrega en la task `ui-ux` dependiente declarada arriba.
+- Entregar el servicio de autenticación propio en `auth.efeonce.org`, aislado del gateway y del deployable de
+  Greenhouse. Slice 0 debe comparar tres composiciones: WorkOS/AuthKit + Connect, el broker OAuth de Greenhouse
+  extraído/operado como runtime independiente reutilizando identidad/Account 360, o el híbrido native + WorkOS para
+  federación enterprise. La superficie visible de login se entrega en la task `ui-ux` dependiente declarada arriba.
 - Mantener sesiones y audiencias separadas por aplicación, enlazadas a un único `identity_profile`; definir en
   esta task la transición para que el login externo de Greenhouse pueda delegar posteriormente en el mismo plano
   de identidad aceptado, sin hacer que Greenhouse sea el issuer OAuth del MCP.
@@ -133,6 +134,11 @@ Reglas obligatorias:
   `globe.producer.fleet.list` ni se usa ese cliente como evidencia de acceso cliente.
 - La configuración de WorkOS staging y discovery MCP no constituye acceso cliente. No crear producción, DNS,
   secretos, bindings ni desplegar la ruta pública de login mientras el ADR propuesto no tenga aceptación explícita.
+- El broker existente de `src/lib/sister-platforms/oauth-broker.ts` es una base reutilizable, no evidencia de que
+  exista ya un authorization server MCP público. Antes de elegir la ruta native se deben cerrar metadata de OAuth,
+  CIMD/DCR, callbacks HTTPS para clientes hospedados, consentimiento/grants y el contrato de verificación de sus
+  tokens opacos. Nunca compartir cookie o `NEXTAUTH_SECRET` ni hacer que un release de Greenhouse sea el rollback del
+  OAuth externo.
 
 ## Normative Docs
 
@@ -207,6 +213,11 @@ Reglas obligatorias:
 - Existe una configuración WorkOS de staging para discovery MCP; no existe un issuer B2B activo para clientes,
   binding canónico de organización externa a Account 360, servicio propio de login ni una prueba real
   base-only/allow/revoke por capacidad.
+- Greenhouse ya tiene NextAuth y un broker OAuth sister-platform con PKCE, allowlists de redirect, clientes
+  públicos/confidenciales, tokens opacos hasheados, expiración/revocación, audit y userinfo. Sigue acoplado al
+  deployable Greenhouse y le faltan metadata MCP pública, CIMD/DCR, callbacks HTTPS hospedados, consentimiento/grants
+  de cliente y un contrato de verificación compatible con el gateway; por eso se registra como foundation, no como
+  autorización MCP externa lista.
 - El gateway no soporta dual-issuer: agregar el issuer externo requiere validación gateada por issuer, con
   autoridad calificada por issuer para cada tool (hoy la comprobación de scopes es por string, suficiente con un
   solo issuer, insuficiente con dos).
@@ -223,7 +234,7 @@ Reglas obligatorias:
 - Current home: `Greenhouse para Account 360/identity binding; ../efeonce-mcp para OAuth validation y dispatch; ../efeonce-globe para provider policy`
 - Future candidate home: `remain-shared`
 - Boundary: `binding server-side identity_profile/Account 360 ↔ external subject/organization, entitlement resolver provider-neutral y provider policy revalidation; runtimes y sesiones permanecen independientes`
-- Server/browser split: `la UI browser de auth está aislada en auth.efeonce.org y se entrega en la task ui-ux dependiente; sólo su adapter server accede a AuthKit APIs. Tokens, binding stores, admin APIs del IDP, provider clients y secretos nunca llegan a código browser`
+- Server/browser split: `la UI browser de auth está aislada en auth.efeonce.org y se entrega en la task ui-ux dependiente; sólo su adapter server accede a las APIs del proveedor/composición seleccionada. Tokens, binding stores, admin APIs del IDP, provider clients y secretos nunca llegan a código browser`
 - Build impact: `deployment de auth UI/session independiente del gateway MCP; SDK/configuración del IDP queda detrás de su adapter server`
 - Extraction blocker: `authentication/session y el binding Account 360 son contratos cross-runtime; la implementación comienza sólo después de topología aprobada, contrato UI y plan de identidad aceptado`
 
@@ -340,7 +351,7 @@ Reglas obligatorias:
 
 ### Slice 0 — Decision, cohort policy and schema discovery
 
-- Obtener aceptación explícita del ADR y del plan del proveedor de identidad antes de provisionar nada externo.
+- Obtener aceptación explícita del ADR y de la composición seleccionada antes de provisionar nada externo.
 - **Revisión de privacidad y subprocesador antes de cualquier provisión.** Este es el primer flujo que rutea datos
   personales de personas de organizaciones **cliente** a un procesador externo nuevo. Invocar
   `legal-privacy-ip-operator` y resolver: qué datos personales se envían y cuáles no, DPA/acuerdo de
@@ -348,21 +359,28 @@ Reglas obligatorias:
   supresión, y notificación a clientes si un contrato vigente lo exige (marco CL + CO/MX/PE según cartera). Sin
   esta revisión cerrada no se provisiona el tenant productivo, aunque el plan comercial ya esté aprobado — son
   dos gates distintos, no uno.
-- **Presentar el costo antes de pedir la aprobación del plan.** Benchmark ejecutado 2026-08-02 sobre once
-  proveedores con precios de páginas oficiales: **WorkOS queda confirmado como recomendación a USD 99/mes planos**
+- **Comparar y presentar costo/operación antes de pedir aprobación.** El benchmark ejecutado 2026-08-02 sobre once
+  proveedores con precios de páginas oficiales dejó **WorkOS como candidato técnico a USD 99/mes planos**
   en los tres escenarios (1 org/5 usuarios, 5 orgs/25 usuarios, 20 orgs/100 usuarios), porque su costo lo determina
   el **custom domain**, no el volumen — las organizaciones B2B no tienen línea de cobro ni tope. Runner-up:
   **Stytch B2B** (USD 0 de base, orgs ilimitadas, pero precio de custom domain **no público**). Descartados por no
   soportar DCR: **Logto** (en backlog) y **FusionAuth** (issue abierto desde 2021). El Slice 0 sólo debe cerrar
   dos incógnitas antes de firmar: la **curva de SSO/SAML de WorkOS a USD 125 por conexión/mes**, que es el costo
   que escala cuando los clientes pidan federación propia, y la portabilidad del binding si algún día se cambia de
-  proveedor.
+  proveedor. Ese benchmark no mide el costo operativo del broker Greenhouse extraído: Slice 0 debe estimar
+  hardening, MFA/recovery, metadata/CIMD/DCR, callbacks HTTPS, verificación de tokens, observabilidad, soporte y
+  operación independiente. Debe comparar WorkOS, native y hybrid en costo total, seguridad, compatibilidad, privacidad,
+  migración y salida; no aprobar WorkOS sólo por su precio publicado.
 - Inventariar la organización Account 360, persona/membership canónica y contratos de workspace de Globe; proponer
   el schema aditivo mínimo de binding, command/reader/audit y contrato de invalidación — provider-neutral.
 - Inventariar los contratos actuales de Greenhouse NextAuth, `client_users`, `identity_profiles`,
   `identity_profile_source_links` y `session_360` (verificados como existentes 2026-08-02). Definir account
   linking de cuentas existentes, conflictos/revisión manual, recovery, desactivación y revocación sin exportar ni
   compartir el secret/cookie de sesión de Greenhouse.
+- Evaluar el broker existente de sister-platforms contra el contrato de authorization server MCP: metadata pública,
+  CIMD/DCR, callbacks loopback y HTTPS hospedados, consentimiento/grants, refresh/revocation y verificación de
+  tokens opacos. Si native o hybrid gana, definir su extracción a `auth.efeonce.org` con despliegue, secretos,
+  cookies, audiencia, escalado y rollback independientes de Greenhouse.
 - Definir el primer read de elegibilidad de clientes existentes, el command allowlist de operador, el input de
   administrador designado y el audit de invitación/revocación. Prohibir explícitamente signup público, inferencia
   por dominio de correo y enrolamiento automático.
@@ -392,8 +410,13 @@ Reglas obligatorias:
 
 - Provisionar el issuer de identidad cliente aceptado y su custom domain con configuración/secretos fuera del
   source.
-- Implementar el servicio aislado de auth/sesión de Efeonce (server adapter de AuthKit); no convierte el gateway
-  MCP en host de browser/sesión. La superficie visible se implementa en la task `ui-ux` dependiente.
+- Si Slice 0 selecciona native o hybrid, extraer el broker sister-platform a un runtime independiente en
+  `auth.efeonce.org`: NextAuth/Greenhouse queda como upstream de identidad y sesión del portal, no como issuer MCP;
+  el adapter conserva Account 360 como source of truth y añade metadata/CIMD/DCR, callbacks públicos compatibles,
+  consentimiento/grants y verificación de token acordada con el gateway.
+- Implementar el servicio aislado de auth/sesión de Efeonce (server adapter del proveedor/composición seleccionada);
+  no convierte el gateway MCP en host de browser/sesión. La superficie visible se implementa en la task `ui-ux`
+  dependiente.
 - Implementar primitives auditados e idempotentes de binding organización/persona/grant con migración aditiva, sin
   backfill automático de clientes, e invitación sólo después de revisión allowlist explícita de cliente existente.
 - Cuando la persona invitada ya existe, enlazar el subject externo verificado a ese `identity_profile`; no crear
@@ -554,7 +577,9 @@ production secrets, client registrations and the first customer onboarding conse
 ## Acceptance Criteria
 
 - [ ] The ADR is accepted and the selected provider/plan is explicitly approved before external provisioning, with
-      its cost presented for the initial cohort and a 12-month projection.
+      its cost presented for the initial cohort and a 12-month projection. The decision record includes the measured
+      WorkOS vs native Greenhouse broker vs hybrid comparison; the existing broker is not treated as MCP-ready
+      without closing its metadata, client-compatibility and verification gaps.
 - [ ] La revisión de privacidad/subprocesador está cerrada (DPA, subprocesadores, región, retención, derechos de
       titular y notificación contractual cuando aplique) antes de provisionar el tenant productivo.
 - [ ] Cada command de operador tiene capability dedicada y granular, seedeada en registry + catálogo TS y
@@ -570,6 +595,9 @@ production secrets, client registrations and the first customer onboarding conse
       `identity_profile`; Greenhouse/auth/MCP sessions remain audience-separated.
 - [ ] The customer-facing Greenhouse login convergence contract is approved, even though its runtime cutover is a
       later rollout gate.
+- [ ] If native or hybrid is selected, the extracted broker runs at `auth.efeonce.org` with independent deployment,
+      cookie/session secrets, audience, scaling and rollback, while resolving the same canonical identity and Account
+      360 membership. A Greenhouse release or browser cookie is never required to validate an MCP token.
 - [ ] Gateway and Globe both deny unknown, base-only, expired or revoked access.
 - [ ] Tool authority is issuer-qualified: an external-issuer token never satisfies an internal-only tool,
       regardless of scope strings.
@@ -606,7 +634,9 @@ production secrets, client registrations and the first customer onboarding conse
 
 ## Open Questions
 
-- Confirm the selected external identity provider and commercial plan after explicit operator review.
+- Confirm the selected composition (WorkOS, native Greenhouse broker extracted to `auth.efeonce.org`, or hybrid)
+  and any commercial plan after explicit operator review; the native broker's operating cost and security ownership
+  must be estimated alongside SaaS pricing.
 - Select the exact canonical Greenhouse membership primitive and additive binding schema during Slice 0 discovery.
 - Decide the cutover sequence for customer-facing Greenhouse authentication after the shared identity-link contract
   is proven, without changing the internal Entra path.

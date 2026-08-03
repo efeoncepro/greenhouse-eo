@@ -220,7 +220,10 @@
 - La decisión de identidad cliente y `TASK-1631` aclaran la relación con el login Greenhouse: los runtimes,
   cookies, sesiones y audiencias permanecen separados, pero un cliente existente se enlaza al mismo
   `identity_profile` y Account 360. La coexistencia inicial debe converger después al mismo plano externo de
-  autenticación; no se permite una segunda identidad o contraseña permanente.
+  autenticación; no se permite una segunda identidad o contraseña permanente. La revisión ahora documenta que
+  Greenhouse ya tiene NextAuth + broker OAuth sister-platform reutilizable, pero todavía no un authorization server
+  MCP público: TASK-1631 compara WorkOS, broker extraído independientemente a `auth.efeonce.org` y hybrid, sin
+  compartir cookie/`NEXTAUTH_SECRET` ni hacer que un release Greenhouse sea el rollback de OAuth externo.
 - Las skills de arquitectura globales y locales (`arch-architect` de Claude y `software-architect-2026` de Codex)
   ahora cargan el router MCP, el provider dueño y este mismo gate antes de proponer otra tool, OAuth surface o
   binding cross-runtime.

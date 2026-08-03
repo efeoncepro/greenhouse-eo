@@ -38,6 +38,11 @@ If a source conflicts with remembered behavior, the verified runtime and its can
   `identity_profile` and Account 360 membership through audited source links. Never share the Greenhouse cookie or
   create a permanent second customer credential; preserve the gated customer-login convergence contract in
   `EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md` / `TASK-1631`.
+- Greenhouse's existing NextAuth + sister-platform OAuth broker is a reusable identity foundation, not automatically
+  a public MCP authorization server. Before customer access, `TASK-1631` must compare WorkOS, an independently
+  extracted broker at `auth.efeonce.org`, and the hybrid; native extraction must close OAuth metadata, CIMD/DCR,
+  hosted callbacks, consent/grants and token-verification gaps. Never make the gateway own browser login or share a
+  Greenhouse cookie/`NEXTAUTH_SECRET`, and never make a Greenhouse release the rollback boundary for external OAuth.
 - Before customer access, require B2B/multitenant entitlements that can issue and revoke access per tenant and
   capability. Entra is the internal canary only. Follow the proposed Account 360 binding and customer identity
   gate in `EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md` / `TASK-1631`; do not provision its leading
