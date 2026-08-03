@@ -552,6 +552,43 @@ regresión + `assertInputModeSatisfied` (cuenta referencias **por tipo de medio*
 
 Estado correcto mientras esto siga abierto: **`code complete, rollout pendiente`**, no `complete`.
 
+## Delta 2026-08-02 (b) — TASK-1504 recibe el canary de Omni y la declaración de mecanismos por ruta
+
+Reparto de alcance acordado con el operador: `TASK-1633` es foundation y **no puede quedar abierta esperando un
+canary que no controla**. Lo que sigue pasa a ser criterio de esta task, que ya es dueña de las identidades, el
+transporte, la promoción y el canary de Omni.
+
+### El bloqueo es de esta task, y es P0
+
+La identidad aprobada declara `provider=vertex-omni` sobre `aiplatform.googleapis.com`, pero API y worker todavía
+inyectan `createGeminiOmniTransport` por Generative Language (`apps/studio-web/src/app.ts:4173,4175`). **Un canary
+en ese estado cobraría por una identidad distinta de la aprobada.** El driver gobernado ya ejecuta por Vertex ADC
+y falla cerrado ante divergencia de endpoint (`efeonce-globe@55c3761`); lo que falta es la simetría API/worker.
+Mientras eso siga así, el canary de Omni no puede ejecutarse aunque la foundation esté completa.
+
+### Criterios que migran desde TASK-1633
+
+- [ ] Canary UI terminal de Omni: un run facturable, un attempt terminal y **un** cobro leído del ledger, con
+      output retenido, playback real, lineage, rights y governance terminales.
+- [ ] API y worker inyectan el **mismo** transporte Vertex ADC, verificado sobre la revisión activa, antes de
+      cualquier promoción o canary.
+
+El canary de Seedance ya quedó registrado el 2026-08-02 (`ref/motion/loop-v1`, `candidate_ready`, 16 cr, cobro
+único verificado) y no se repite.
+
+### Lo que ADR-022 Delta (c) le exige a cada ruta nueva de esta task
+
+`text_to_video`, `image_to_video` y `reference_to_video` **no pueden heredar el default `PROMPT_CONTROLS`**: cada
+una declara el mecanismo de sus controles contra el contrato oficial de Vertex. Dos consecuencias medidas el
+2026-08-02:
+
+- **Ningún adapter de Globe manda campo negativo nativo** (cero `negative_prompt` en `apps/creative-runner/src`),
+  y 13 de las 17 rutas heredan `negative-prompt: prompt-semantic` del default. Para Omni eso es una promesa sin
+  respaldo: la negación viaja como texto dentro del prompt, donde tiende a reforzar lo que niega. Declararlo
+  `unsupported` es más honesto que heredarlo, salvo evidencia oficial de un campo nativo.
+- Cámara, estilo, movimiento y temporalidad son `prompt-semantic` para Omni **salvo evidencia oficial de un
+  parámetro nativo exacto** — ya declarado en el plan y ahora exigible por ruta.
+
 ## Closing Protocol
 
 - [ ] `Lifecycle` del markdown sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)

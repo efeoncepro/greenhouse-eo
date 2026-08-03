@@ -104,6 +104,34 @@ porque `propose` y `confirm` fallan por razones distintas y exigen acciones dist
 mode **sigue abierta** — sus tres causas (clase de credencial equivocada, `--include-email` ausente,
 audiencia incorrecta) siguen colapsadas en el mismo 401/403. Es el único trabajo pendiente del issue.
 
+## Delta 2026-08-02 — DÉCIMA aparición, y esta vez los nombres correctos ya estaban escritos
+
+`route_creative_contract_mismatch` (`apps/creative-runner/src/production-route-compiler.ts:504-524,551`) colapsa
+**nueve causas accionables distintas** con acciones opuestas: contrato ausente · intent ausente · revisión
+desajustada · operación desajustada · slot inexistente · rol desajustado · media type inválido · MIME inválido ·
+input no materializado. Re-estimar, cambiar la operación, cambiar el asset o convertir el archivo son remedios
+distintos bajo el mismo código.
+
+**El agravante que la distingue de las nueve anteriores:** `TASK-1633` **ya tenía escritos los cinco nombres
+correctos** en su sección `Security and access` —`route_operation_unsupported`, `route_input_slot_invalid`,
+`route_input_combination_unsupported`, `route_control_unsupported`, `route_contract_revision_mismatch`— y los cinco
+tienen **cero ocurrencias** en Globe. No fue desconocimiento de la regla ni ausencia de diseño: el diseño nombró
+las causas y la implementación las colapsó igual. Y el criterio quedó marcado como cerrado porque, leído literal
+—"falla antes de reserva con error canónico"—, se cumple.
+
+Esto refuerza la conclusión de la novena aparición y la endurece: **conocer la regla no la aplica sola, y
+escribirla en la spec tampoco.** Lo único que funciona es mecánico — abrir las razones en el mismo commit que
+introduce el rechazo, con el patrón que este issue ya canonizó (las 24 razones de
+`ProductionRouteDependencyError`).
+
+**Agravante propio, que no tenían las anteriores:** ninguno de esos códigos está en `TERMINAL_CODES`
+(`packages/domain/src/governed-run-failure-policy.ts`), pese a cumplir su criterio de admisión al pie de la letra.
+Un desajuste de contrato es determinista: la próxima entrega falla idéntica. Hoy cae a `unknown` con tope 3 — la
+versión atenuada de las 705 entregas de `ISSUE-135`, y en el mismo camino de materialización de inputs. Un código
+sin razón nombrada **también queda sin clasificar**, porque no hay nada que clasificar.
+
+Dueño: `TASK-1633`, primer trabajo pendiente de su alcance restante.
+
 ## Delta 2026-07-26 (b) — capa 8: el control que rechazaba, encontrado leyendo (commit `4eee1cc`)
 
 Se hizo esa lectura y **apareció la causa, sin desplegar nada**. El método funcionó por segunda vez.

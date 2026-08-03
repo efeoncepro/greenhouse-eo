@@ -40,7 +40,22 @@ Historia anterior: [Handoff.archive.md](Handoff.archive.md).
   como un solo ingrediente `subject` de peso 1, con la composición ponderada construida y sin ejercer.
 - Task actualizada con Slice 3.5, `valueShape`, criterio 7 desmarcado (su guard es de autoría del catálogo, no de
   ejecución) y dos criterios nuevos. Corregido el delta previo: el fingerprint **sí** incluye roles y ordinales.
-- Sin cambios de runtime, código Globe, deploy, migración ni gasto. `task:lint` y `ops:lint --changed` verdes.
+- **Reparto de alcance para que 1633 tenga un cierre alcanzable.** Una foundation no puede quedar abierta
+  esperando trabajo que no controla:
+  - **`TASK-1504` (Delta b)** recibe el **canary de Omni** y la simetría API/worker del transporte. El bloqueo es
+    suyo y es P0: la identidad declara `vertex-omni` mientras `app.ts:4173,4175` inyectan Generative Language, así
+    que hoy cobraría por una identidad distinta de la aprobada. Sus rutas nuevas declaran mecanismos con evidencia
+    en vez de heredar el default.
+  - **`TASK-1552` (Delta b)** recibe la medición del composer —**el descriptor ya le llega al navegador y la UI lo
+    ignora**, `mode` es índice numérico, `references` es lista plana sin rol, 3.064 líneas— y tres capacidades
+    pagadas sin superficie: recetas guardadas en **0** desde el 2026-07-22, composición ponderada ejercida al
+    mínimo, y el campo de exclusión ofrecido sin mecanismo nativo en ninguna ruta.
+  - **`ISSUE-127`** registra su **décima** aparición, con el agravante de que los cinco nombres correctos ya
+    estaban escritos en la spec de 1633 y la implementación los colapsó igual.
+  - **`ISSUE-135`** registra que la clasificación necesita una **regla de nacimiento**, no otra fila: el tope
+    funcionó y por eso el defecto queda invisible. Abrir razones y clasificarlas es un solo trabajo.
+- 1633 conserva: eje de aplicación, Slice 4, razones nombradas y mecanismos por ruta. Suelta el canary.
+- Sin cambios de runtime, código Globe, deploy, migración ni gasto. `ops:lint --changed` verde sobre las 3 tasks.
 
 ## TASK-1631 / MCP — canon de scopes, CIMD como registro primario y benchmark de proveedor (2026-08-02)
 

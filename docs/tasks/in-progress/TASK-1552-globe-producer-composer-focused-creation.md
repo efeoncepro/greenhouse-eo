@@ -1854,3 +1854,57 @@ emite, así que `b, strong { font-weight: bolder }` del navegador pide el corte 
 que ninguna clase lo diga** — estructuralmente invisible al gate. Apareció tres veces el mismo día y **no
 tiene dueño**. Si al cerrar Slice 3 aparece un trazo más pesado de lo pedido sin clase que lo explique,
 ésta es la causa.
+
+## Delta 2026-08-02 (b) — medición del composer contra el contrato, y tres capacidades pagadas sin superficie
+
+Auditoría del cliente real (no del plan) al cerrar la foundation de `TASK-1633`. **El backend está bastante más
+listo de lo que parece y la UI no lo está usando.**
+
+### El contrato YA le llega al navegador; el composer lo ignora
+
+`ProducerCatalogViewV1` incluye `creativeContract` y la proyección de flota lo transporta
+(`producer-catalog.ts:1075`), o sea que **el descriptor viaja hoy dentro de lo que el selector ya descarga**.
+Búsqueda en todo `apps/studio-client/src`: **cero ocurrencias** de `creativeContract`, `inputSlots`,
+`creativeControls` y `combinationId`. No falta backend para empezar a leerlo.
+
+Tres hechos del estado actual que definen el tamaño real del trabajo:
+
+- **`mode` es un índice numérico** (`useState(0)`): una posición dentro de `MODE_REQUIREMENTS`, no una operación
+  semántica. Cambiar el orden de los chips cambia el significado.
+- **`references` es una lista plana** sin slot, sin rol y sin ordinal. La UI no distingue producto de estilo ni de
+  primer cuadro — y ese es exactamente el dato que el modelo necesita y que hoy se pierde antes de llegar.
+- **`MODE_REQUIREMENTS` sigue derivando de `inputModes` legacy** (`elements`, `frames`, `motion-source`,
+  `edit-target`), intacto.
+
+`ProducerComposer.tsx` son **3.064 líneas**: esto es reescritura del composer, no un parche. Se mantiene la
+secuencia acordada — no tocarlo hasta que el eje de aplicación de `TASK-1633` esté firme, para no hacerlo dos
+veces.
+
+### Tres capacidades construidas que nadie puede alcanzar
+
+Medido contra la base de producción de Globe el 2026-08-02. Ninguna es un defecto de esta task; las tres son
+superficie que sólo esta task puede dar:
+
+1. **Recetas guardadas: 0 versiones, 0 workspaces.** La capability existe desde el 2026-07-22 (`TASK-1493`,
+   migración `0008`) y nunca tuvo UI para guardar ni reutilizar. No es rechazo de usuarios: es superficie ausente.
+2. **La composición ponderada existe y no se ejerce.** `briefFor` (`ProducerComposer.tsx:752`) manda el prompt
+   entero como **un solo ingrediente `subject` con peso 1** y el preset como `style` 0,82. El compilador ordena
+   por peso, desempata por orden semántico y admite múltiples ingredientes por tipo — maquinaria completa,
+   ejercida al mínimo.
+3. **`prompt_history` con 144 entradas** activas ese mismo día: el carril libre sí se usa. La superficie que falta
+   es la estructurada, no la básica.
+
+### Lo que ADR-022 Delta (c) le exige a esta UI
+
+- **Nunca ofrecer un control cuyo mecanismo no esté declarado con evidencia por esa ruta.** Caso vivo: el campo
+  «Excluir del resultado» llega hoy al modelo como texto `Avoid: …` dentro del prompt, porque **ningún adapter
+  tiene campo negativo nativo** y 13 de 17 rutas heredan `negative-prompt: prompt-semantic` del default. Ofrecerlo
+  como si funcionara igual en todas las rutas es prometer lo que el modelo no honra — la UI debe reflejar el
+  mecanismo real, incluido `unsupported`.
+- **El rol del asset debe viajar, no sólo validarse.** Hoy se valida con rigor server-side y muere ahí; el modelo
+  recibe las imágenes por el canal de condicionamiento y no sabe qué es cada una.
+- **Ningún control se traduce en el cliente.** La UI recoge elecciones tipadas; la compilación a texto vive detrás
+  del adapter, por ruta.
+- **No convertir el composer en cabina.** Un control por cada entrada del descriptor se ve profesional y rinde
+  peor: estos modelos responden a lenguaje de oficio, no a taxonomías. El descriptor decide qué ofrecer y qué
+  rechazar, no cuántas perillas dibujar.

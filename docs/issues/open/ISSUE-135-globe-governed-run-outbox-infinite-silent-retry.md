@@ -99,6 +99,24 @@ contar como «reprogramado» algo que murió.
 3. **Proyectar el estado terminal a la card** (`TASK-1559`): un run en terminal debe dejar de decir
    «generando».
 
+## Delta 2026-08-02 (b) — la clasificación necesita una regla de nacimiento, no sólo una lista
+
+Auditoría de `TASK-1633`: los rechazos del contrato creativo de ruta **no están en `TERMINAL_CODES`** pese a
+cumplir el criterio de admisión textual de esa lista —*"si dos entregas separadas por una hora dan el mismo
+resultado sin que nadie toque nada, va acá"*—. Un contrato desajustado es determinista por definición. Hoy caen a
+`unknown`, tope 3: tres entregas gastadas en algo imposible, contadas como `rescheduled`.
+
+El tope funcionó —no hay 705 entregas— y ése es el punto: **la red de seguridad hizo su trabajo y por eso el
+defecto de clasificación queda invisible.** Tres reintentos no llaman la atención de nadie.
+
+Y hay un acoplamiento con `ISSUE-127` que conviene nombrar: **un código sin razón nombrada tampoco se puede
+clasificar**, porque las nueve causas que hoy colapsan en `route_creative_contract_mismatch` comparten un único
+token. Abrir las razones y clasificarlas es un solo trabajo, no dos.
+
+La regla que falta no es otra fila en la lista: es de **nacimiento**. Todo código de rechazo determinista se
+clasifica en el mismo commit que lo introduce, igual que `ISSUE-127` exige su razón de servidor en el mismo commit
+que escribe el `catch`. Declarado como invariante en `TASK-1633` (`### Security and access`) y en su Files owned.
+
 ## Solución propuesta
 
 1. **Techo de entregas por `kind`** con estado terminal `dead_letter`, append-only, conservando el último

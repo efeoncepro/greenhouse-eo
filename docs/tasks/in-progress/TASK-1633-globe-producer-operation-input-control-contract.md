@@ -427,8 +427,15 @@ Ninguna para la foundation. Las promociones, atestaciones y canaries permanecen 
 - [ ] Manifest/run evidence conserva schema revision, roles y controles aplicados/rechazados sin secretos.
 - [ ] Rutas legacy tienen dual-read/equivalence tests y rutas nuevas no pueden registrarse sin descriptor.
 - [ ] Fixtures Omni/Seedance/Veo demuestran una UI intent común con traducciones distintas dentro de adapters.
-- [ ] UI/SDK/MCP/CLI consumen la misma proyección o permanecen explícitamente policy-blocked/unsupported.
-- [ ] La task consumidora registra canaries UI terminales de Seedance y Omni con un cobro/output por generación.
+- [ ] La proyección expone el descriptor a todas las surfaces por el reader canónico. **Verificado 2026-08-02:** ya
+      viaja (`ProducerCatalogViewV1.creativeContract` → proyección de flota); que un consumer lo lea o permanezca
+      `policy-blocked`/`unsupported` es criterio de ese consumer, no de la foundation.
+- [x] ~~La task consumidora registra canaries UI terminales de Seedance y Omni.~~ **Migrado a `TASK-1504`
+      (Delta b) el 2026-08-02.** Una foundation no puede quedar abierta esperando un canary que no controla, y el
+      de Omni está bloqueado por el transporte, que es de 1504: la identidad declara `vertex-omni` mientras el
+      runtime inyecta Generative Language, así que cobraría por una identidad distinta de la aprobada. El de
+      Seedance ya está registrado (16 cr, `candidate_ready`, cobro único verificado). Aquí queda como dependencia
+      de rollout, no como criterio propio.
 - [x] `pnpm check && pnpm build` en Globe y gates documentales Greenhouse quedan verdes.
 
 ## Verification
