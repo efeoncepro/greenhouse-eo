@@ -42,6 +42,23 @@ con el que fallan los defectos de producción (gates cargados, feed con piezas, 
 —`ISSUE-136`— pasó **en verde** ahí tres veces mientras fallaba en el navegador con datos reales. Sirve para
 composición, contención, accesibilidad y errores de consola; **no** como prueba de que algo funciona en vivo.
 
+⚠️ **Y CIERRA EL BROWSER SIEMPRE: el canary lanza el Chrome REAL del operador.** `chromium.launch({ channel:
+'chrome' })` usa `/Applications/Google Chrome.app`, no un binario aislado — esa decisión es correcta (evita
+descargar browsers y `ISSUE-128`), pero tiene una consecuencia que muerde. Si el proceso Node muere sin cerrar
+el browser —timeout, `Ctrl-C`, fin de sesión—, **el Chrome queda vivo indefinidamente**. Y como macOS trata
+Chrome como una sola app por bundle, al operador le deja de abrir su navegador: el clic en el icono activa la
+instancia huérfana, que no tiene ventanas, en vez de su perfil.
+
+Medido el 2026-08-03: dos instancias del **día anterior** (05:44 y 05:46, perfil temporal
+`playwright_chromiumdev_profile-*`) bloqueaban el navegador del operador. Una ignoró `SIGTERM` y necesitó
+`kill -9`. Diagnóstico y limpieza, sin tocar el Chrome legítimo:
+
+```bash
+ps aux | grep "[G]oogle Chrome.app/Contents/MacOS/Google Chrome" | awk '{print $2}' | while read pid; do
+  ps -o command= -p "$pid" | grep -q playwright_chromiumdev_profile && echo "huérfano: $pid"
+done
+```
+
 ### Cuando cambies un contrato compartido: barre TODOS los implementadores primero
 
 Hacer obligatorio un método de puerto (p. ej. `RunFinalizerPort.abandon`) es correcto —quien no lo implemente
