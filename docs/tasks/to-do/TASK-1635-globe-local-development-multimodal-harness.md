@@ -1,4 +1,4 @@
-# TASK-1635 — Globe Local Development, Multimodal Harness and Deployable Promotion Flow
+# TASK-1635 — Globe Development Environment and Real-Generation Local Loop
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -339,9 +339,10 @@ declaraba antes; lo que sobra se resuelve **componiendo**, no construyendo.
   incorpora como prerequisito de la task dueña.
 - Rollback path: detener el proceso local; revertir el seam o apagar el flag de desarrollo; para rollout,
   usar rollback de revisión del workflow y revertir flags/configuración según el runbook, nunca limpiar SQL a mano.
-- External coordination: el provisioning del entorno de desarrollo exige aprobación de **costo recurrente**
-  (instancia Cloud SQL + buckets + gasto de proveedor con tope diario), `tofu/terraform apply` sobre el
-  proyecto de Globe, IAM y Secret Manager accessors propios. Todo eso es out-of-band y precede a Slice 1.
+- External coordination: el provisioning exige `tofu/terraform apply` sobre el proyecto de Globe, IAM,
+  usuarios IAM de base de datos y Secret Manager accessors propios. **Costo recurrente acotado** por decisión
+  del operador: sin instancia nueva; queda el almacenamiento de los buckets y el gasto de proveedor con tope
+  diario. Todo eso es out-of-band y precede a Slice 1.
   Para el rollout: provider budget/terms, Cloud Build, Cloud Run services/jobs, migraciones productivas y
   canarios conservan su coordinación y evidencia explícita.
 
@@ -398,13 +399,22 @@ declaraba antes; lo que sobra se resuelve **componiendo**, no construyendo.
 Un entorno propio, aislado de lo desplegado, y **desechable**: si se ensucia, se bota y se levanta de nuevo
 corriendo migraciones. Ése es el criterio de calidad del slice.
 
-- **Instancia Cloud SQL propia** (`globe-pg-dev`), no una base extra dentro de `globe-pg`. Compartir instancia
-  deja producción expuesta a una migración pesada o a un `DROP` mal apuntado, y mezcla backups, PITR y
-  deletion protection. La instancia de desarrollo va sin PITR ni deletion protection — es desechable a
-  propósito — y con el tamaño mínimo que aguante el trabajo.
+- **Base de datos propia dentro de la instancia existente `globe-pg`** (decisión del operador 2026-08-03:
+  se evita el costo de una instancia adicional). Como el aislamiento deja de ser físico, **tiene que ser real
+  por permisos**, no por convención:
+  - IAM database user de desarrollo con `GRANT` **sólo** sobre la base de desarrollo y `REVOKE CONNECT` sobre
+    la base productiva. El punto no es que no deba tocarla: es que **no puede**.
+  - Simétrico: los usuarios de runtime productivo sin acceso a la base de desarrollo.
+  - `CONNECTION LIMIT` por rol y `statement_timeout` en el rol de desarrollo, para que una consulta o una
+    migración pesada no ahogue una instancia que es `db-g1-small` y ahora sirve a dos inquilinos.
+  - **Nunca se restaura la instancia por un problema de desarrollo.** El PITR y los backups son de instancia,
+    así que restaurar arrastraría producción. La base de desarrollo se **recrea** (drop → create → migrate),
+    que además es el criterio de calidad del slice.
 - **Buckets propios** para los cuatro usos (`private_assets`, `lab_evidence`, `library_exports`,
-  `media_derivatives`), con `public_access_prevention = enforced` igual que los productivos: el entorno de
-  desarrollo es más barato y más chico, **nunca más laxo**.
+  `media_derivatives`), con `public_access_prevention = enforced` igual que los productivos. Éstos **sí** van
+  separados aunque se comparta la instancia: un bucket vacío no cuesta —se paga el almacenamiento, no la
+  existencia—, así que compartirlos no ahorra nada y mezclaría assets de desarrollo con evidencia real. El
+  entorno de desarrollo es más barato y más chico, **nunca más laxo**.
 - **Service accounts e IAM propios**, espejo de los productivos. El modo local corre **por impersonación**
   (patrón ya usado por `smoke-private-api.mjs`), nunca con el ADC crudo del operador: probar con permisos de
   más hace creer que algo funciona cuando en producción falla por IAM.
@@ -414,7 +424,11 @@ corriendo migraciones. Ése es el criterio de calidad del slice.
   ADR-010 **deniegue su promoción por construcción**, sin código nuevo.
 - **Credenciales de proveedor separadas** cuando el proveedor lo permita; cuando no, el aislamiento es por
   presupuesto y workspace, y eso se declara explícito en vez de suponerse.
-- Terraform + runbook para **crear y destruir** el entorno completo, y comando de migraciones contra él.
+- Terraform + runbook para **crear y destruir** la base de desarrollo, sus buckets, SAs e IAM —nunca la
+  instancia, que es compartida— y comando de migraciones contra esa base.
+- **Condición de retiro documentada:** si la contención sobre `globe-pg` se vuelve observable (latencia,
+  conexiones agotadas, CPU), la salida es promover el entorno a instancia propia. Se registra como decisión
+  con dueño y condición, no como estado permanente asumido.
 - ⚠️ Al tocar la clasificación: `WorkspaceKindV1` es hoy un **union type**
   (`packages/domain/src/commercial-promotion-lane.ts:40`) con una copia literal en
   `ConfigWorkspaceKindResolver`. Convertirlo a array `as const` + test de cobertura en ambas direcciones
@@ -472,25 +486,18 @@ difíciles de provocar y trabajo sin red.
 - Regla de honestidad: un fixture verde **nunca** es evidencia de que una ruta genere. Esa evidencia es
   Slice 2.
 
-### Slice 4 — Deployable promotion bundle
+### Slice 4 — Documentación operativa del entorno y handoff
 
-- Implementar `globe:internal-verify` y un reporte de promoción que derive los consumidores del slice:
-  Studio/API, producer worker, creative runner, asset governance, media derivatives, jobs, migrations,
-  flags, env/secrets, IAM/configuración, observabilidad y canarios.
-- Verificar que el workflow keyless despliegue la imagen correcta desde `main`, con SHA/digest/revisión/tráfico
-  exactos y baseline de rollback, **invocando `scripts/globe-runtime-drift.mjs --expect <sha>`** en vez de
-  reimplementar la comparación de revisión activa.
-- El reporte de promoción es un **lector** sobre la saga de ADR-009 (`production-promotion-cli.mjs` y sus
-  readers), nunca una segunda noción de promoción ni una fuente de evidencia propia (invariante 5).
-- Ejecutar un lote real internal-only y documentar qué quedó `complete`, `code complete, rollout pendiente`
-  u `operativamente bloqueado`.
+- Runbook del entorno de desarrollo: crear, destruir, migrar, conectar los tres procesos, presupuesto, límites,
+  secretos, auth por impersonación, recuperación y troubleshooting.
+- Registrar la decisión de instancia compartida con su dueño y su condición de retiro.
+- Actualizar Greenhouse `Handoff.md` y `GLOBE_RUNTIME_HANDOFF.md` con el entorno y sus fronteras, sin declarar
+  disponibles rutas que sólo tienen fixtures.
 
-### Slice 5 — Operating documentation and handoff
-
-- Actualizar runbook técnico de Globe con el flujo local-first → provider smoke → internal verify → promotion.
-- Registrar límites, costos, secretos, auth, recovery, rollback, evidencia y troubleshooting.
-- Actualizar Greenhouse Handoff y la matriz de capabilities sin declarar disponibles las rutas que sólo tienen
-  fixtures.
+> **La promoción desplegable se movió a `TASK-1636`** (partición 2026-08-03). Esta task entrega el entorno de
+> desarrollo y el loop de generación real; el despliegue por lote del slice verificado —`globe:internal-verify`,
+> reporte de consumidores, simetría de runtimes y canario humano— es su continuación natural pero tiene otro
+> blast radius y otra coordinación.
 
 ## Out of Scope
 
@@ -500,6 +507,10 @@ difíciles de provocar y trabajo sin red.
 - Emular completamente providers, governance, workers o almacenamiento y tratar esa emulación como evidencia live.
 - Migrar Globe a Vercel/Next.js o cambiar la decisión vigente de hosting.
 - Resolver capabilities de Producer que pertenecen a `TASK-1504`, `TASK-1552`, `TASK-1633` u otra task dueña.
+- **El despliegue por lote y su verificación** (`globe:internal-verify`, reporte de consumidores runtime,
+  simetría de imagen/revisión, canario humano internal-only, rollback baseline) — se movió a `TASK-1636`.
+- Crear una instancia Cloud SQL adicional: por decisión del operador (2026-08-03) el entorno de desarrollo
+  vive como base separada dentro de `globe-pg`, con aislamiento por permisos.
 
 ## Detailed Spec
 
@@ -581,6 +592,8 @@ de rollback. Los reportes locales no deben contener secretos, bytes privados inn
 |---|---|---:|---|---|
 | 🔴 Un proceso local apunta a la base/buckets desplegados y toma trabajo de producción | Cloud SQL/worker | **high** si no se hace Slice 0 | entorno propio (Slice 0) + guardarraíl que falla al arrancar si la config apunta a `globe-pg` o a los buckets productivos | run de producción ejecutado por un worker sin revisión desplegada |
 | El schema de desarrollo diverge del productivo y la evidencia se vuelve falsa | Cloud SQL | medium | única vía de creación es el runner de migraciones vigente; verificación de paridad de schema | migración aplicada en un entorno y no en el otro |
+| 🔴 Trabajo de desarrollo degrada la instancia compartida `globe-pg` (`db-g1-small`, ahora con dos inquilinos) | Cloud SQL | medium | `CONNECTION LIMIT` por rol + `statement_timeout` en el rol de desarrollo; condición de retiro hacia instancia propia | latencia o conexiones agotadas en el runtime productivo |
+| Una migración o un `DROP` de desarrollo apunta a la base productiva | Cloud SQL | medium | el usuario de desarrollo **no puede conectarse** a la base productiva (`REVOKE CONNECT`), probado rojo | conexión denegada esperada que deja de fallar |
 | El gasto del entorno de desarrollo se dispara sin techo | provider/credits | medium | `dailyCapCredits` propio del workspace de desarrollo, fail-closed | tope diario alcanzado / reservas sostenidas |
 | HMR diverge del bundle que Cloud Run sirve | UI/build | high | canary de seam, build manifestado obligatorio y `globe:verify` | hash servido distinto al artefacto |
 | Smoke real se repite después de timeout y cobra dos veces | lifecycle/credits | medium | readback-first, idempotency única y bloqueo de retry ciego | attempts o settlements duplicados |
@@ -601,24 +614,25 @@ de rollback. Los reportes locales no deben contener secretos, bytes privados inn
 
 | Slice | Rollback | Tiempo | Reversible? |
 |---|---|---:|---|
-| 1 | detener `globe:dev` y revertir el seam local; producción continúa usando bundle compilado | <5 min | sí |
-| 2 | deshabilitar fixtures/canarios nuevos o revertir scripts; no toca runtime live | <5 min | sí |
-| 3 | detener lane, reconciliar por readers y cerrar budget/circuit; nunca repetir execute a ciegas | <30 min | sí, con recuperación gobernada |
-| 4 | usar baseline de rollback del workflow, revertir flags/config y restaurar revisión; migrations sólo con rollback aprobado por su task dueña | <30 min inicial | parcial, según consumidor |
-| 5 | corregir runbook/Handoff y repetir evidencia; no se declara cierre hasta consistencia documental | <1 día | sí |
+| 0 | `terraform destroy` de la base de desarrollo, sus buckets, SAs e IAM. **Nunca restaurar la instancia** — el PITR es compartido y arrastraría producción; la base se recrea | <30 min | sí |
+| 1 | detener `globe:dev` y revertir el módulo de desarrollo; producción continúa usando bundle compilado | <5 min | sí |
+| 2 | detener el loop, reconciliar por readers y cerrar budget/circuit; nunca repetir execute a ciegas. El rastro queda en el entorno de desarrollo, que es desechable | <30 min | sí, con recuperación gobernada |
+| 3 | deshabilitar fixtures/canarios nuevos o revertir scripts; no toca runtime live | <5 min | sí |
+| 4 | corregir runbook/Handoff y repetir evidencia; no se declara cierre hasta consistencia documental | <1 día | sí |
 
 ### Production verification sequence
 
-1. Ejecutar `globe:verify` local con fixtures image/audio/video y verificar cero gasto/mutación real.
-2. Ejecutar build-order, typecheck, lint, tests y canarios del cliente/Studio.
-3. Preparar la lista de consumidores del slice y verificar image/digest/config/secret/IAM/worker/migration.
-4. Ejecutar provider smoke real sólo en internal-only, con ruta available, budget e idempotency explícitos.
-5. Leer run/attempt/output/credits/governance/feed y comprobar cobro único, bytes/MIME/hash y recovery.
-6. Construir y desplegar desde `main` los servicios/workers/jobs que correspondan mediante workflows keyless.
-7. Verificar SHA, digest, revisión Ready, tráfico, flags, migrations, secrets, accessors y señales.
-8. Ejecutar canario humano desde Producer autenticado para cada modalidad/ruta exigida.
-9. Ejecutar readback/recovery y confirmar que no hay segundo submit, attempt, settlement ni cobro.
-10. Documentar evidencia, rollback disponible y estado honesto; detenerse ante cualquier mismatch.
+> El despliegue por lote y su verificación viven en `TASK-1636`. Esta secuencia termina cuando el cambio está
+> probado en el entorno de desarrollo.
+
+1. Provisionar (o recrear) el entorno de desarrollo y aplicar migraciones con el runner vigente.
+2. Verificar las dos denegaciones cruzadas de conexión y el guardarraíl de arranque de `globe:dev`.
+3. Ejecutar `globe:verify` con fixtures image/audio/video: cero gasto, cero mutación.
+4. Ejecutar build-order, typecheck, lint, tests y canarios del cliente/Studio.
+5. Levantar los tres procesos y generar de verdad una ruta por modalidad, dentro del tope diario.
+6. Leer run/attempt/output/credits/governance/feed y comprobar cobro único, bytes/MIME/hash y recovery.
+7. Confirmar que **ninguna** tabla ni bucket productivo recibió rastro del trabajo de desarrollo.
+8. Documentar evidencia y estado honesto; detenerse ante cualquier mismatch.
 
 ### Out-of-band coordination required
 
@@ -637,44 +651,38 @@ de rollback. Los reportes locales no deben contener secretos, bytes privados inn
 
 ## Acceptance Criteria
 
-- [ ] `TASK-1635` tiene comandos documentados y ejecutables para `globe:dev`, `globe:verify`,
-  `globe:provider-smoke` y `globe:internal-verify`.
-- [ ] `globe:dev` levanta `studio-client` con HMR y `studio-web` local sin desplegar ni recompilar manualmente
-  después de cada cambio visual.
-- [ ] El shell productivo continúa cargando el bundle manifestado compilado y el seam de desarrollo falla
-  cerrado fuera del perfil local.
-- [ ] Fixtures cubren imagen, audio y video, incluyendo output, pending, failed, governance, rights, feed,
-  viewer, poster, waveform, playback y retrieval donde la capability exista.
-- [ ] `globe:verify` demuestra cero gasto, cero mutation de Cloud SQL/GCS/ledger y cero provider submit.
-- [ ] Existe al menos un provider smoke real de imagen, audio y video cuando cada ruta cumpla sus gates; si una
-  modalidad continúa gated, el reporte lo declara con razón canónica y no usa fixture como sustituto.
-- [ ] Cada provider smoke conserva una sola idempotency key, usa readback-first y demuestra ausencia de doble
-  attempt, submit, settlement o cobro.
-- [ ] El smoke real valida bytes, MIME, hash, output shape, governance, rights, feed/viewer y playback según
-  modalidad, sin confiar sólo en extensión o metadata declarada.
-- [ ] El reporte de promoción lista todos los consumidores runtime afectados y evidencia API/Studio, workers,
-  jobs, derivatives/governance, migrations, flags, env/secrets, IAM, observability, canary y rollback.
-- [ ] El deploy real usa el SHA exacto de `main`, imagen/digest/revisión/tráfico verificados y baseline de rollback;
-  no introduce bypass de GitHub, Cloud Build o Cloud Run.
-- [ ] El lote desplegado queda verificado internal-only con canarios autenticados y readbacks; no se declara
-  comercial/external readiness.
-- [ ] No se imprimen ni almacenan tokens, secretos, service-account JSON, URLs firmadas, cuerpos upstream,
-  stacks ni raw errors en fixtures, reportes o logs.
-- [ ] Existe un entorno de desarrollo de Globe con instancia, buckets, service accounts, IAM y workspace
-  propios, creable y destruible desde Terraform, con su schema creado por el runner de migraciones vigente.
-- [ ] `globe:dev` **falla al arrancar** si la configuración apunta a `globe-pg` o a cualquier bucket
-  productivo; se prueba rojo.
+- [ ] Existe un entorno de desarrollo de Globe con base propia dentro de `globe-pg`, buckets, service
+  accounts, IAM y workspace propios, creable y destruible desde Terraform, con su schema creado por el runner
+  de migraciones vigente.
+- [ ] **El usuario de desarrollo no puede conectarse a la base productiva** y el runtime productivo no puede
+  conectarse a la de desarrollo; ambas denegaciones se prueban en rojo. Éste es el control que reemplaza al
+  aislamiento físico: sin él, la instancia compartida es sólo una convención.
+- [ ] El rol de desarrollo tiene `CONNECTION LIMIT` y `statement_timeout`, y la condición de retiro hacia
+  instancia propia queda registrada con dueño.
+- [ ] `globe:dev` levanta los **tres procesos** (cliente con HMR, `studio-web`, worker) y **falla al arrancar**
+  si la configuración apunta a la base productiva o a cualquier bucket productivo; se prueba rojo.
+- [ ] Un cambio en el composer, en el BFF o en un adapter de proveedor se prueba sin construir imagen ni
+  desplegar.
 - [ ] Una generación real de imagen, audio y video sale desde el navegador local, ejecutada por el worker
   local, y todo su rastro (run, attempt, asset, provenance, ledger) queda en el entorno de desarrollo y en
   **ninguna** tabla o bucket desplegado; se verifica leyendo ambos lados.
+- [ ] Cada generación conserva una sola idempotency key —verificada por su **efecto**, no por su presencia—,
+  usa readback-first y demuestra ausencia de doble attempt, submit, settlement o cobro.
+- [ ] El resultado real se valida por bytes, MIME, hash, output shape, governance, rights, feed/viewer y
+  playback según modalidad, sin confiar en extensión ni metadata declarada.
 - [ ] El workspace de desarrollo tiene tope diario propio y su promoción está denegada por clasificación.
+- [ ] Si una modalidad continúa gated, se declara con razón canónica y **no** se usa un fixture como sustituto.
+- [ ] Fixtures cubren imagen, audio y video (output, pending, failed, governance, rights, feed, viewer, poster,
+  waveform, playback, retrieval) donde la capability exista, y `globe:verify` demuestra cero gasto y cero
+  mutación.
 - [ ] Existe un test que **rompe el build** si la entrada productiva (`apps/studio-web/src/main.ts`,
   `src/app.ts`) alcanza el módulo del shell de desarrollo; se prueba rojo en ambas direcciones.
-- [ ] Ningún comando del harness reimplementa arte previo: `globe:verify` invoca `pnpm check`,
-  `globe:internal-verify` invoca `globe-runtime-drift`, el smoke usa el SDK y el reporte de promoción lee la
-  saga de ADR-009. Un grep demuestra que no hay import de handlers de `packages/domain` desde `scripts/**`.
-- [ ] Las rutas del smoke y la proyección de flota de los fixtures se **derivan** del lector/catálogo; un
-  cambio de contrato rompe la compilación del fixture en vez de dejarlo verde.
+- [ ] Ningún comando del harness reimplementa arte previo: `globe:verify` invoca `pnpm check` y el loop usa el
+  SDK. Un grep demuestra que no hay import de handlers de `packages/domain` desde `scripts/**`.
+- [ ] Las rutas y la proyección de flota se **derivan** del lector/catálogo; un cambio de contrato rompe la
+  compilación del fixture en vez de dejarlo verde.
+- [ ] No se imprimen ni almacenan tokens, secretos, service-account JSON, URLs firmadas, cuerpos upstream,
+  stacks ni raw errors en fixtures, reportes o logs.
 - [ ] `pnpm task:lint --task TASK-1635`, `pnpm ops:lint --changed` y los gates proporcionales de Globe pasan.
 - [ ] Greenhouse `Handoff.md`, `GLOBE_RUNTIME_HANDOFF.md`, README de tasks y evidencia técnica quedan sincronizados.
 
@@ -684,10 +692,10 @@ de rollback. Los reportes locales no deben contener secretos, bytes privados inn
 - `pnpm ops:lint --changed`
 - En Globe: `pnpm check`, `pnpm build`, suites focales de `studio-client` y `studio-web`.
 - En Globe: `pnpm globe:verify` con fixtures image/audio/video.
-- Provider smoke real image/audio/video con budget y workspace autorizados.
-- `globe:internal-verify` y workflows keyless de cada consumidor runtime aplicable.
-- Canario humano Producer + readback de run/attempt/output/credits/governance/feed/viewer.
-- Verificación de rollback/revisión baseline proporcional al lote desplegado.
+- Generación real image/audio/video en el entorno de desarrollo, dentro del tope diario.
+- Denegación cruzada de conexión (dev↛prod y prod↛dev) probada en rojo.
+- Readback de run/attempt/output/credits/governance/feed/viewer en el entorno de desarrollo.
+- Confirmación de que ninguna tabla ni bucket productivo recibió rastro.
 
 ## Closing Protocol
 
