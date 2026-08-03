@@ -169,6 +169,18 @@ And the coupling with B1: **a code with no named reason cannot be classified eit
 
 What made it stop recurring is **mechanical, not disciplinary**: `production-route-failure-classification.test.ts` breaks the build if a new reason is born unclassified, and checks the catch-alls in the opposite direction (if they stop being catch-alls, their entry is now lying). Proved red in both directions. Ten appearances of B1 proved that remembering does not work; what works is that the build won't let you.
 
+🔴 **And the step the mechanical guard does NOT cover — measured 2026-08-03.** A rejection code born inside the
+finalizer needs a third step between naming and classifying: registering it in `SAFE_FINALIZATION_CODES`
+(`governed-run-lifecycle.ts:609`). That sanitizer **only lets through names on its allowlist** and replaces
+everything else with the generic code. Skip it and the name is destroyed *before* the policy ever sees it, so the
+classification never applies — no matter how correctly you declared it `terminal`.
+
+**It does not fail; it degrades.** The build stays green and the coverage test passes — the code *is* classified —
+and the damage only shows up in production, on a real run, as the wrong ceiling. This is B1 operating on top of
+B2's fix: the sanitizer destroys the very information the policy needed to decide. It is also the limit of the
+mechanical guard: a test can prove a name was classified, but not that the name survives the pipe to the place
+where the classification is read. **When a rule spans two subsystems, verify the value's whole path, not each end.**
+
 ---
 
 ## Two mechanical rules that fall out of B1/B2

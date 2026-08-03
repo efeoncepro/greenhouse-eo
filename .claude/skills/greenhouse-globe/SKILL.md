@@ -59,6 +59,30 @@ ps aux | grep "[G]oogle Chrome.app/Contents/MacOS/Google Chrome" | awk '{print $
 done
 ```
 
+### Agregar un código de rechazo son TRES pasos, y el olvidado es el del medio
+
+Medido el 2026-08-03. Un código nuevo que sólo cumple dos de los tres muere en silencio:
+
+1. **Nombrarlo** — al array `as const` de su vocabulario (`PRODUCTION_ROUTE_DEPENDENCY_REASONS`,
+   `PRODUCTION_ROUTE_DENIAL_CODES`), nunca a un union type: un union no sobrevive al compilado y el test de
+   cobertura no puede enumerarlo.
+2. 🔴 **Registrarlo en `SAFE_FINALIZATION_CODES`** (`packages/domain/src/governed-run-lifecycle.ts:609`) si nace
+   dentro del finalizador. Ese sanitizador **sólo deja pasar los nombres de su allowlist**; lo demás se
+   reemplaza por el genérico. Si te lo saltas, el nombre se borra **antes** de que la política lo vea, así que
+   la clasificación del paso 3 nunca se aplica y el código cae a `unknown` (tope 3) por más `terminal` que lo
+   hayas declarado.
+3. **Clasificarlo** en `governed-run-failure-policy.ts`, en el mismo commit. El test
+   `production-route-failure-classification.test.ts` rompe el build si falta.
+
+**Por qué el paso 2 es fácil de perder: no falla, degrada.** El build queda verde, el test de cobertura pasa
+—porque el código *sí* está clasificado— y la degradación sólo aparece en runtime, sobre una corrida real, como
+un tope equivocado. Es exactamente `ISSUE-127` operando sobre el arreglo de `ISSUE-135`: el sanitizador destruye
+la información que la política necesitaba para decidir.
+
+Caso fuente: `generated_asset_governance_pending` estaba fuera de la allowlist, salía como
+`run_finalization_failed`, caía a `unknown` con tope 3 — y mató una corrida ya cobrada mientras Asset Governance
+todavía trabajaba. El día anterior el mismo error se había recuperado solo tras **doce** entregas.
+
 ### Cuando cambies un contrato compartido: barre TODOS los implementadores primero
 
 Hacer obligatorio un método de puerto (p. ej. `RunFinalizerPort.abandon`) es correcto —quien no lo implemente
