@@ -117,6 +117,28 @@ La regla que falta no es otra fila en la lista: es de **nacimiento**. Todo códi
 clasifica en el mismo commit que lo introduce, igual que `ISSUE-127` exige su razón de servidor en el mismo commit
 que escribe el `catch`. Declarado como invariante en `TASK-1633` (`### Security and access`) y en su Files owned.
 
+### Cerrada — `efeonce-globe@ac1999f`
+
+**38 códigos** a `terminal`: identidad y estado de ruta (piden un humano que promueva o habilite, no un reintento),
+presupuesto (el fence ya liberó la reserva; insistir contra un cap agotado no lo desbloquea), configuración de
+endpoints y regiones, forma del request compilado, las ocho del contrato creativo y las once del body snapshot.
+
+**3 a `transient`**, separadas a mano por ser las únicas del compiler que no son deterministas: el circuito abierto
+se cierra solo cuando el proveedor se recupera, y las dos de decisión son fallas de persistencia, no del pedido.
+
+**2 se quedan en `unknown` a propósito, y ahora está declarado por qué.** `route_compilation_failed` y
+`route_dependency_unavailable` nombran «algo falló y no sé qué»: asumir determinismo mataría corridas recuperables,
+asumir transitoriedad reviviría muertas. El tope 3 de `unknown` es la respuesta prudente a no saber, no un olvido.
+
+**La regla quedó mecánica, no escrita.** `production-route-failure-classification.test.ts` rompe el build si una
+razón nueva nace sin clasificar, y verifica los catch-all en la dirección contraria: si dejan de serlo, su entrada
+queda mintiendo. Probado en rojo en ambas direcciones. Las diez apariciones de `ISSUE-127` probaron que acordarse no
+funciona; lo que funciona es que el build no deje.
+
+Lo que sigue abierto de este issue no cambia: las dos señales (`outbox_dead_letter`, `outbox_retry_storm`) y
+preservar el motivo real cuando `finalizationFailureCode` cae al genérico. Este trabajo las vuelve útiles —ahora un
+terminal es un terminal de verdad— pero no las crea.
+
 ## Solución propuesta
 
 1. **Techo de entregas por `kind`** con estado terminal `dead_letter`, append-only, conservando el último

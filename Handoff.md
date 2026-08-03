@@ -55,7 +55,20 @@ Historia anterior: [Handoff.archive.md](Handoff.archive.md).
   - **`ISSUE-135`** registra que la clasificación necesita una **regla de nacimiento**, no otra fila: el tope
     funcionó y por eso el defecto queda invisible. Abrir razones y clasificarlas es un solo trabajo.
 - 1633 conserva: eje de aplicación, Slice 4, razones nombradas y mecanismos por ruta. Suelta el canary.
-- Sin cambios de runtime, código Globe, deploy, migración ni gasto. `ops:lint --changed` verde sobre las 3 tasks.
+- **Ejecutado el mismo día — Slices 1 y 2 en Globe, `code complete, rollout pendiente`:**
+  - `efeonce-globe@8986b45` — ocho códigos, uno por causa. Media type y MIME separados porque el remedio difiere
+    (otro asset vs convertir el que tienes); `route_creative_contract_incomplete` con código propio porque «llegó a
+    medias» se resuelve re-preparando, no es un desajuste. Tabla de causas **probada en rojo** + aserción de
+    unicidad contra la recaída. Cierra `ISSUE-127` en Globe.
+  - `efeonce-globe@ac1999f` — el hallazgo que amplió el slice: de **35 razones del compiler, sólo 2 estaban
+    clasificadas**. 38 pasan a `terminal`, 3 a `transient`, 2 quedan `unknown` **con su razón declarada**. Test que
+    rompe el build si una razón nueva nace sin clasificar, probado en rojo en ambas direcciones. Cierra el punto de
+    clasificación de `ISSUE-135`; sus dos señales siguen abiertas.
+  - **Por qué estaba invisible:** el tope de ISSUE-135 hizo su trabajo. Tres reintentos no llaman la atención de
+    nadie — así es como una red de seguridad esconde el problema que contiene.
+  - Sin migración (se registran como `route_dependency_unavailable`). `pnpm check` + `pnpm build` exit 0;
+    `creative-runner` 270 → 282. **Sin push, sin deploy, sin gasto.**
+- Greenhouse: `ops:lint --changed` verde sobre las 3 tasks.
 
 ## TASK-1631 / MCP — canon de scopes, CIMD como registro primario y benchmark de proveedor (2026-08-02)
 

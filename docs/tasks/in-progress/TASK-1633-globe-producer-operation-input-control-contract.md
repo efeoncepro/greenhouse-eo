@@ -420,7 +420,7 @@ Ninguna para la foundation. Las promociones, atestaciones y canaries permanecen 
 - [x] `reference`, `first-frame`, `edit-source` y `motion-source` conservan semánticas distintas hasta manifest/lineage.
 - [ ] Estimate/approval/idempotency invalidan ante cambios de ruta, inputs/roles, controles u output.
 - [ ] Un control/input requerido no soportado falla antes de reserva/provider submit con error canónico. **Desmarcado 2026-08-02:** el guard existe pero es de **autoría del catálogo** (`producer-catalog.ts:914`, corre al cargar), no de ejecución; como no hay canal para que un caller pida un control, la condición es hoy inalcanzable y el criterio se cumplía de forma vacía. El guard de autoría se conserva.
-- [ ] Cada rechazo de contrato tiene **razón nombrada del lado del servidor** y nace clasificado `terminal` en la política de fallos. Hoy `production-route-compiler.ts:504-524,551` colapsa nueve causas accionables distintas —contrato ausente · intent ausente · revisión · operación · slot inexistente · rol · media type · MIME · input no materializado— en un único `route_creative_contract_mismatch`, y ninguna está en `TERMINAL_CODES`.
+- [x] Cada rechazo de contrato tiene **razón nombrada del lado del servidor** y nace clasificado `terminal` en la política de fallos. **Cerrado 2026-08-02** (`efeonce-globe@8986b45` + `@ac1999f`): ocho códigos, uno por causa, con tabla probada en rojo y aserción de unicidad contra la recaída; y la familia completa del compiler clasificada —38 `terminal`, 3 `transient`, 2 `unknown` declarados— con un test que rompe el build si una razón nueva nace sin clasificar.
 - [ ] Un solo vocabulario es dueño de cada valor de dirección creativa; ningún control declara un valor cuyo dueño es `StructuredBriefV1` o `RouteConstraintsV1` (Slice 3.5), con test que lo sostenga.
 - [ ] La compilación del prompt efectivo recibe el contrato de ruta, vive detrás del adapter y su revisión entra al fingerprint; la implementación por defecto preserva el texto actual de todas las rutas existentes (ADR-022 Delta (c)).
 - [ ] Ningún control declara su mecanismo por herencia del default: las 17 rutas lo declaran con evidencia del contrato oficial de su proveedor, en particular `negative-prompt`, que hoy ninguna ruta puede honrar de forma nativa.
@@ -676,6 +676,37 @@ desempate de las policies de rights fue un incidente cuyo arreglo de fondo es `T
 
 Cablear el eje de aplicación (1–3), Slice 4 (4–5) y el canary de Omni (6) — este último **bloqueado** hasta
 que TASK-1504 resuelva el transporte.
+
+## Delta 2026-08-02 — razones nombradas y clasificación de fallos (ejecutado)
+
+Dos slices en Globe. **8 de 16 criterios cerrados.** La task sigue `in-progress`.
+
+**Slice 1 — una causa, un código** (`efeonce-globe@8986b45`). `route_creative_contract_mismatch` colapsaba nueve
+causas con remedios opuestos. Ocho códigos nuevos, uno por causa. Media type y MIME quedaron separados porque el
+remedio difiere: uno pide otro asset, el otro pide convertir el que ya tienes. `route_creative_contract_incomplete`
+tiene código propio porque «el pedido llegó a medias» se resuelve re-preparando, no cambiando el contrato — no es
+un desajuste. Ambos vocabularios pasaron de union type a array `as const`: un union no sobrevive al compilado y el
+Slice 2 necesita enumerarlos.
+
+**Slice 2 — la familia completa, y la regla mecánica** (`efeonce-globe@ac1999f`). El hallazgo que amplió el slice:
+de las 35 razones que el compiler sabía nombrar, **sólo dos estaban clasificadas**. Las otras 33 caían a `unknown`,
+tope 3, gastando tres entregas cada una en algo determinista. 38 pasan a `terminal`, 3 a `transient` —las únicas
+del compiler que se recuperan solas— y 2 se quedan en `unknown` **con su razón declarada**, porque nombran «algo
+falló y no sé qué» y ahí el tope 3 es la respuesta prudente, no un olvido.
+
+**Lo que hace que esto no recaiga:** `production-route-failure-classification.test.ts` rompe el build si una razón
+nueva nace sin clasificar, y verifica los catch-all en la dirección contraria. Probado en rojo en ambos sentidos, y
+la tabla de causas también —colapsando dos a propósito, el test las atrapa—. Diez apariciones de `ISSUE-127`
+probaron que acordarse no funciona; lo que funciona es que el build no deje.
+
+**Por qué el defecto de clasificación estaba invisible:** el tope de `ISSUE-135` hizo su trabajo. No hubo 705
+entregas. Tres reintentos no llaman la atención de nadie, y esa es exactamente la forma en que una red de seguridad
+esconde el problema que estaba conteniendo.
+
+Sin migración: estas razones se registran como `route_dependency_unavailable`, así que el vocabulario cerrado de
+`production_router_decisions` no cambia. `pnpm check` y `pnpm build` en exit 0; `creative-runner` 270 → 282.
+Sin deploy, sin runtime tocado, sin gasto. **Estado: `code complete, rollout pendiente`** — el código está en
+`main` local de Globe, sin push.
 
 ## Delta 2026-08-02 — auditoría arquitectónica contra los incidentes del día (`arch-architect`)
 

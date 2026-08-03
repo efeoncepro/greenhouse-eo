@@ -132,6 +132,22 @@ sin razón nombrada **también queda sin clasificar**, porque no hay nada que cl
 
 Dueño: `TASK-1633`, primer trabajo pendiente de su alcance restante.
 
+### Cerrada — `efeonce-globe@8986b45`
+
+Ocho códigos, uno por causa: `route_creative_contract_incomplete` (el pedido llegó a medias — su remedio es
+re-preparar, no cambiar el contrato, y por eso no comparte con los desajustes), `route_contract_revision_mismatch`,
+`route_operation_unsupported`, `route_input_slot_unknown`, `route_input_role_mismatch`,
+`route_input_media_type_invalid`, `route_input_mime_type_invalid`, `route_input_assignment_unresolved`.
+
+Media type y MIME quedaron separados porque **el remedio difiere**: uno pide otro asset, el otro pide convertir el
+que ya tienes. Es el mismo criterio que separó las doce de `snapshot_body_*` de las de endpoint.
+
+**La tabla de causas está probada en rojo:** colapsando dos a propósito, el test las atrapa. Y trae una aserción de
+unicidad, que es la defensa contra la recaída — si alguien vuelve a colapsar, dos filas esperan el mismo código.
+
+Sin migración: estas razones se registran como `route_dependency_unavailable`, así que el vocabulario cerrado de
+`production_router_decisions` no cambia.
+
 ## Delta 2026-07-26 (b) — capa 8: el control que rechazaba, encontrado leyendo (commit `4eee1cc`)
 
 Se hizo esa lectura y **apareció la causa, sin desplegar nada**. El método funcionó por segunda vez.
