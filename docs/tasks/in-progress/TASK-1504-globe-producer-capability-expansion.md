@@ -558,6 +558,18 @@ Reparto de alcance acordado con el operador: `TASK-1633` es foundation y **no pu
 canary que no controla**. Lo que sigue pasa a ser criterio de esta task, que ya es dueña de las identidades, el
 transporte, la promoción y el canary de Omni.
 
+### Delta 2026-08-03 — el bloqueo de IAM se levantó; el de transporte NO
+
+`TASK-1635` aplicó por Terraform el binding que faltaba (`efeonce-globe@786ee19`, plan `1 to add`), y la
+impersonación de `greenhouse-globe-caller@` quedó verificada con `token-returned`. El
+`IAM_PERMISSION_DENIED` sobre `iam.serviceAccounts.getAccessToken` que impedía correr `pnpm producer:canary`
+**ya no aplica**.
+
+⚠️ **Eso NO desbloquea el canary de Omni.** Eran dos bloqueos independientes y sólo cayó uno: el de
+herramienta. El de identidad sigue intacto —el binding declara `provider=vertex-omni` mientras el runtime
+inyecta el transporte de Generative Language— y es el que hace que un canary cobre por una identidad distinta
+de la aprobada. Confundirlos llevaría a ejecutar un canary inválido creyéndolo habilitado.
+
 ### El bloqueo es de esta task, y es P0
 
 La identidad aprobada declara `provider=vertex-omni` sobre `aiplatform.googleapis.com`, pero API y worker todavía

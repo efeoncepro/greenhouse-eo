@@ -620,6 +620,11 @@ Tres caminos, en orden de preferencia:
    `GLOBE_CANARY_BASE_URL=https://globe-api-internal-a6odmgzpvq-tl.a.run.app`.
 3. Grant temporal de `serviceAccountTokenCreator` sobre `greenhouse-globe-caller@`, con revocación y readback.
 
+> **Resuelto 2026-08-03 por `TASK-1635`** (`efeonce-globe@786ee19`): el binding se aplicó por Terraform —plan
+> `1 to add`— y la impersonación devuelve `token-returned`. El camino 3 dejó de ser un break-glass y pasó a ser
+> infraestructura declarada. **El canary de Omni sigue bloqueado igual**, por el transporte, que es de
+> `TASK-1504`: eran dos bloqueos independientes y sólo cayó el de herramienta.
+
 Hasta que exista esa evidencia —un run facturable, un attempt terminal y **un** cobro por generación leído del
 ledger, más output retenido, playback, lineage y governance— esta task **no** puede declararse `complete`.
 
