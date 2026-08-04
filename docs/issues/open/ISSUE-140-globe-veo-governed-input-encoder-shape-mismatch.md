@@ -6,6 +6,50 @@
 > **Repo afectado:** `efeoncepro/efeonce-globe` · **Gobierna:** Greenhouse (EPIC-028)
 > **Bloquea:** `ISSUE-138` D12 (el fix de `storageUri` no es ejercitable)
 
+## Delta 2026-08-04 (noche) — fix desplegado y verificado; destapa un segundo defecto aguas abajo
+
+**Corregido en `efeonce-globe@cd8bad1`, desplegado y verificado en runtime** (API `globe-api-internal-00209-lzw`
+con imagen `cd8bad1c6893`; Job `globe-producer-worker` con el digest `sha256:378b53e8…` etiquetado al mismo SHA).
+
+El fix **no fue** pasarle su encoder a Veo, sino que **ningún driver pueda heredar la forma de otro**: el parámetro
+`encoder` pasa a ser **requerido** y las formas se declaran en `PROVIDER_INPUT_ENCODERS`
+(`geminiInlineData` · `vertexPredictInline` · `rawBase64`). Un driver nuevo elige su forma o no compila.
+
+El barrido de implementadores —hecho en una sola pasada, no iterando contra el compilador— encontró **5
+constructores en producción, 2 de ellos heredando el default en silencio**: Veo (roto) y el driver de imagen de
+Vertex (que funcionaba **sólo porque el default ERA su forma**). Ambos declaran ahora la suya.
+
+Test `provider-input-encoders.test.ts`, registrado en el script `test` del package y **probado en rojo**: atrapa la
+regresión en tres asertos, incluido *"dos formas idénticas significan que un proveedor está heredando la de otro"*.
+`pnpm check` (308 + 301) y `pnpm build` verdes.
+
+### Verificación en runtime: el submit ya pasa
+
+Canary sobre el runtime corregido (run `61d75e38-c309-43c9-9d79-479cff6e00c2`, 32 cr):
+
+| | Antes del fix | Después |
+|---|---|---|
+| Código | `veo_submit_invalid` | `veo_operation_evidence_invalid` |
+| Progresión | `submitting` → terminal en 1 vuelta | **`submitting` durante 6 vueltas** |
+| Operación en Vertex | nunca creada | el request **fue aceptado** |
+
+**El rechazo del submit está cerrado.** Vertex ya no rechaza el body.
+
+### 🔴 Lo que queda abierto — dos defectos nuevos, distintos de éste
+
+1. **`veo_operation_evidence_invalid`**: el poll pide `attempt.providerOperation.providerOperationId` y el attempt
+   lo tiene **vacío** — la evidencia de la operación no quedó persistida pese a que el submit fue aceptado. Es la
+   familia del **lost-ack de `ISSUE-138` D1**, ahora en el carril de Veo: si Vertex creó la operación, hay un video
+   potencialmente generado y facturado que no podemos recuperar.
+2. **La reserva de crédito NO convergió.** El run quedó terminal (el código está clasificado `terminal`, no
+   `unknown`) y los 32 créditos siguen **retenidos sin `release`**, verificado dos ciclos del worker después. El run
+   anterior, que murió con `provider_failed`, **sí liberó** — así que el camino de liberación depende de *por dónde*
+   murió el run y no del hecho de que murió. Es el invariante de convergencia terminal de ADR-021/`TASK-1469`
+   incumplido sobre el agregado de crédito.
+
+Ambos son **aguas abajo** de este issue y no lo reabren: este issue cerró el rechazo del submit. Se registran acá
+porque los destapó su verificación, y necesitan dueño propio.
+
 ## Síntoma
 
 Toda generación por `ref/video/frames-v1` (`vertex-video` / `veo-3.1-generate-001`) termina en
