@@ -840,10 +840,3 @@ Corrección de fuente de verdad: el cliente inicial es **SKY Agencia Creativa**,
 - **Dos hallazgos de runtime:** el canary servía el composer **sin la hoja del legacy** y daba todo verde; y
   `.advanced-controls > summary` tiene `display:none`, así que ese `<details open>` **no tiene control para
   cerrarse** — la progressive disclosure no existe, el markup es decorativo.
-
-## 2026-07-27 — Reconciliación de costo del AI Visibility Grader
-
-- Se documentó que `grader_runs.estimated_cost_usd` es un guard parcial, no costo all-in ni base suficiente para pricing.
-- La auditoría de un run público real recalculó ~US$0,3067 en providers principales antes de extracción LLM; el valor persistido US$0,2767 omitía request fees de Perplexity.
-- Se documentaron los 18 intentos de extracción LLM sin tokens/costo persistidos y la imposibilidad de asignar directamente el costo del `ops-worker` compartido.
-- Se sincronizaron la documentación funcional, el runbook de smoke y las skills Codex/Claude; la instrumentación completa queda pendiente.

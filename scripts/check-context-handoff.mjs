@@ -71,7 +71,15 @@ const changelogIndex = read('docs/changelog/internal/README.md')
 read('docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md')
 
 const handoffLines = lines(handoff)
-const sessionCount = (handoff.match(/^## Sesi[oó]n/gim) ?? []).length
+/*
+ * Una sesión es un heading `##` CON FECHA, no uno que empiece con la palabra «Sesión».
+ *
+ * El patrón anterior contaba **0 sobre 20 secciones reales**, así que el guardrail de la línea ~112
+ * —«Handoff.md has N sessions; active limit is …»— **no podía dispararse nunca**. Debe quedar idéntico
+ * al de `scripts/maintenance/rotate-handoff-context.mjs`: si el chequeo y la rotación no cuentan lo
+ * mismo, el gate pide rotar algo que la rotación no ve, que es exactamente el estado del que salimos.
+ */
+const sessionCount = (handoff.match(/^## [^\n]*\d{4}-\d{2}-\d{2}[^\n]*$/gm) ?? []).length
 const historicalDeltas = (projectContext.match(/^## Delta /gim) ?? []).length
 const changelogHeadings = [...changelog.matchAll(/^## ([^\n]+)$/gm)]
 const canonicalChangelogEntries = changelogHeadings.filter(match => /^\d{4}-\d{2}-\d{2} — \S/.test(match[1]))

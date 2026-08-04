@@ -54,7 +54,22 @@ function hash(contents) {
 function planHandoffRotation() {
   const filePath = path.join(root, 'Handoff.md')
   const originalContents = readFileSync(filePath, 'utf8')
-  const matches = [...originalContents.matchAll(/^## Sesi[oó]n[^\n]*$/gim)]
+  /*
+   * Una sesión del Handoff es un heading `##` que lleva su FECHA, no uno que empiece con la palabra
+   * «Sesión».
+   *
+   * El patrón anterior (`^## Sesi[oó]n…`) matcheaba **1 de 40** secciones reales: la convención del
+   * archivo derivó hacia headings temáticos —`## ISSUE-137 — … (2026-08-04)`, `## TASK-1469 — …`,
+   * `## 2026-07-30 — Globe: …`— y la herramienta nunca la alcanzó. El efecto era peor que no rotar:
+   * `docs:context-check:strict` avisaba «994 líneas, budget 600» y **recomendaba correr esta misma
+   * rotación**, que respondía «1/20 sesiones activas; nada que archivar». Un gate que manda a ejecutar
+   * un comando incapaz de resolverlo enseña a ignorar el gate.
+   *
+   * La fecha es el ancla correcta porque el ranking de abajo ya ordena por ella; un heading sin fecha
+   * caería a `0000-00-00` y se archivaría primero, así que se exige explícitamente en el patrón en vez
+   * de aceptarlo y degradar en silencio.
+   */
+  const matches = [...originalContents.matchAll(/^## [^\n]*\d{4}-\d{2}-\d{2}[^\n]*$/gm)]
 
   if (matches.length <= maxSessions) {
     return {
