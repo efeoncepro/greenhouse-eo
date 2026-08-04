@@ -197,9 +197,11 @@ generación queda el valor medido y se configura.
 Que la observación sea **posterior** a la verificación no es un detalle de orden: si fuera antes, cualquiera
 podría dictar desde afuera el valor que el operador va a terminar configurando.
 
-### Lo que sigue pendiente de rollout
+### Rollout ejecutado
 
-Los once arreglos están en `main` pero **no desplegados**: el worker y la API siguen corriendo `c28ab9f`.
+Los **tres runtimes** en `0b5f875a19cb`, verificado con el drift guard contra revisión activa y digest —no
+contra el workflow en verde—: API `00203-77k`, Studio `00146-hdx`, worker `sha256:4060447a5095`. Salud
+post-deploy limpia.
 
 ## Solución propuesta
 

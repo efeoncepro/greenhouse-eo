@@ -583,9 +583,12 @@ replay para cubrir un riesgo hipotético.
 las entregas legítimas — peor que el riesgo que cierra. El sistema lo **observa** sobre una entrega ya
 verificada y emite `globe.provider_webhook.account_identity_observed` mientras siga sin configurar.
 
-### Rollout pendiente
+### Rollout EJECUTADO (2026-08-04)
 
-Los once arreglos están en `main` y **no desplegados**: worker y API siguen en `c28ab9f`.
+Los **tres runtimes** verificados en `0b5f875a19cb` por el drift guard, no por el workflow en verde:
+API `globe-api-internal-00203-77k` · Studio `globe-studio-internal-00146-hdx` · worker digest
+`sha256:4060447a5095`. Salud post-deploy: `divergentAggregates=0`, `supersededReconciles=0`,
+`retryStorm=0`, `queueOldestAgeSeconds=0`.
 
 ## Delta 2026-08-04 (c) — auditoría de los tres proveedores: la captura funciona, y tiene tres agujeros que pierden un asset ya pagado
 

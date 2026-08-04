@@ -65,15 +65,18 @@ Lo que más vale recordar de la sesión:
   del proveedor sin verificar, y "arreglarlos" por las dudas —ampliar la ventana— debilitaría una protección
   real para cubrir un riesgo hipotético.
 
-**⚠️ Pendiente de rollout:** los once arreglos están en `main` y **no desplegados** — worker y API siguen en
-`c28ab9f`.
+**Rollout ejecutado:** los tres runtimes en `0b5f875a19cb` (drift guard verde: API `00203-77k`, Studio
+`00146-hdx`, worker `sha256:4060447a5095`), con salud post-deploy limpia.
 
 **⚠️ `GLOBE_FAL_USER_ID` cableado y sin configurar, a propósito.** El panel de Fal no expone ese identificador
 como valor; ponerlo mal rechazaría TODAS las entregas legítimas. El sistema lo **observa** sobre una entrega ya
 verificada (`globe.provider_webhook.account_identity_observed`) mientras siga sin configurar: con la próxima
 generación queda el valor medido.
 
-**`TASK-1632` sigue bloqueada** hasta desplegar y verificar.
+**`TASK-1632` sigue bloqueada** por los tres que quedan abiertos a decisión: **D1** (la forma de recuperar un
+lost-ack de Fal), **D7** (medible sobre una entrega reintentada, ahora que el ingress devuelve 503) y **D12**
+(se cierra pasando `storageUri`, que además elimina el costo de memoria de D2 — la rama GCS del resolver ya
+existe y ya está gobernada por allowlist).
 
 ### 🔴 Trampa de infra viva (dueño: `TASK-1635`, NO 1469)
 
