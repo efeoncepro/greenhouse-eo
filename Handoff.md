@@ -1,5 +1,25 @@
 # Handoff activo
 
+## TASK-1641 — Globe: el sello del canary y los motores de video (2026-08-04)
+
+**Estado:** `in-progress`. Diagnóstico cerrado, migración escrita y committeada (`efeonce-globe@7994f0d`),
+**NO aplicada**. Próximo paso concreto: `migrate:up` → arreglar el checkpoint → deploy API → re-sellar.
+
+**Lo que quedó funcionando:** Veo y Omni **generan** por el carril gobernado, probados en vivo hoy (MP4 de
+7,99 MB y 1,95 MB, `retained`, liquidación exacta). `ISSUE-140` resuelto en dos capas y **D12 de `ISSUE-138`
+cerrado** con el objeto en `governed-veo/`.
+
+**Lo que bloquea:** el `canary-confirm` devuelve `internal_error` 500 porque
+`generated_asset_rights_authority_effective` proyecta 3 columnas y su consumidor usa 14 — la consulta nunca
+pudo parsear. Sin sello, toda promoción se revierte al vencer su ventana (medido: 10 de 12 históricas).
+
+**Trampa a no repetir:** `confirmProductionPromotionCanary` marca `verifying_canary` antes de leer la
+evidencia y no tiene try/catch; de ese estado sólo se sale por rollback, así que **cada reintento quema una
+promoción**. Arreglar la vista sin reordenar el checkpoint deja la trampa viva.
+
+**Ventanas vivas al cierre:** Veo apagada (se revirtió con `canary_unattested`); Omni activa con ~2h40 desde
+las 21:00 UTC — se apagará sola si no se sella.
+
 Historia anterior: [Handoff.archive.md](Handoff.archive.md).
 
 ## EPIC-039 — Next.js 16.3 + TypeScript 7 Toolchain Adoption (2026-08-04)
