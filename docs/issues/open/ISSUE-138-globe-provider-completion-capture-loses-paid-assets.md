@@ -1,6 +1,6 @@
 # ISSUE-138 — Globe: la captura de completitud pierde assets ya cobrados en los tres proveedores
 
-> **Estado:** Open
+> **Estado:** Open — **11 de 13 arreglados y en `main`; 2 declarados por depender del proveedor**
 > **Detectado:** 2026-08-04 · **Ambiente:** Globe producción (`globe-producer-worker`, `globe-api-internal`)
 > **Severidad:** Alta — tres caminos distintos terminan en un asset generado, facturado e irrecuperable
 > **Repo afectado:** `efeoncepro/efeonce-globe` · **Gobierna:** Greenhouse (EPIC-028, `TASK-1469`)
@@ -139,6 +139,67 @@ provienen de su documentación oficial en vivo.
 
 Los tres hallazgos graves (D1, D2, D3) más D4 y D5 se **verificaron de forma independiente** leyendo el código,
 con `archivo:línea`.
+
+## Delta 2026-08-04 — resuelto end-to-end salvo dos que dependen del proveedor
+
+Nueve commits en `efeonce-globe@main`, `pnpm check` y `pnpm build` verdes en cada uno.
+
+| | Qué se hizo | Commit |
+|---|---|---|
+| **D2** | El techo del poll se **DERIVA** del presupuesto de salida a través de su expansión base64, y el submit conserva el suyo. Eran dos números que tenían que estar de acuerdo declarados por separado; ahora el test afirma la relación, así que subir uno sin el otro rompe el build. **Probado en rojo revirtiendo el fix** | `0e9d696` |
+| **D5** | `reconciliationFailureCode` lee `.code` además de `.errorCode`, y conserva la clase del error como sufijo. **21 códigos a `terminal`, 7 a `transient`, `veo_result_not_ready` a `waiting`** — la tercera espera del ciclo, que caía a `unknown`. `safeStatus` separa `rejected` en `invalid` (4xx) y `unavailable` (5xx) | `b88cfdb` |
+| **D3** | Lease de 60 s → 10 min. Una lease larga sólo hace más lento un takeover; una corta pierde una pieza pagada | `b0a85cb` |
+| **D4** | Timeout acotado en el submit de OpenAI, espejo del de Fal (30 s default, techo 120 s) | `b0a85cb` |
+| **D8** | El ingress devuelve **503** ante un fallo nuestro y **400** sólo ante un rechazo definitivo. El test existente atrapó que mi primera clasificación era demasiado gruesa: un cuerpo sobredimensionado también es definitivo | `b0a85cb` |
+| **D10** | Un `pending` usa la cadencia de espera (10 s fijos) en vez del backoff exponencial de error | `b0a85cb` |
+| **D6** | **Se respeta `X-Fal-Retryable`**, la propia señal del proveedor, en vez de inferir del status. El 400 pasa a leerse como «todavía no completada». El 404 se conserva pendiente **a propósito**: darlo por terminal con evidencia de segunda mano mataría corridas vivas | `3e9a599` |
+| **D9** | El `x-fal-webhook-user-id` se compara contra el nuestro cuando está configurado. Cableado de punta a punta (`GLOBE_FAL_USER_ID`) pero **sin configurar**, porque el valor no se adivina — ver abajo | `3e9a599` + `1febd9e` |
+| **D1** | El rescate parcial queda **nombrado y auditado** (`lost_ack_recovered_without_follow_up`). No se arregla adivinando la URL — ver abajo | `44c6da9` |
+| **D11** | `x-app-fal-disable-fallbacks` en cada submit: un reruteo silencioso cobraría por un modelo que nadie aprobó y dejaría el `route_snapshot` mintiendo | `a5ebb13` |
+| **D13** | El segmento de correlación pasa a ser **opcional sólo para OpenAI**, que configura su webhook por proyecto con URL estática. Su evento trae el `response_id` y el store ya sabe correlacionar por él. En Fal sigue obligatorio | `a5ebb13` |
+| **D7, D12** | **Declarados donde vive el riesgo**, no en un doc aparte | `0b5f875` |
+
+### Guards nuevos, todos derivados y en ambas direcciones
+
+- `production-result-failure-classification.test.ts` — **deriva el vocabulario del archivo fuente** en vez de copiarlo, y **encontró cuatro códigos que se me habían pasado**. Cubre también la dirección contraria: una excepción que deja de ser excepción queda mintiendo.
+- El test del presupuesto inline afirma que el techo puede transportar la salida declarada, con su margen de envoltorio.
+
+### Lo verificado en el panel de Fal, que confirma el diagnóstico desde el proveedor
+
+- Su sección «Webhooks» es un **registro** (*"View your webhook requests"*), **no una configuración**: no hay nada que habilitar. **34 entregas, todas `202`**, todas a `globe.efeoncepro.com/v1/provider-webhooks/fal/<handle>` — el handle va por request, confirmando la asimetría con OpenAI que motiva D13.
+- La API key del panel coincide con la nuestra.
+
+### 🔴 Los dos que NO se cierran, y por qué
+
+**D1 — el rescate del lost-ack sigue sin recuperar el asset.** La salida obvia (armar
+`{queue}/requests/{request_id}`) **está prohibida por contrato y no es derivable**: un modelo con sub-path deja
+de coincidir, así que adivinarla mandaría a leer el resultado de otra cosa. Tres formas candidatas, todas
+pendientes de decisión:
+
+1. **Base de seguimiento declarada por endpoint** en el allowlist — convierte una derivación imposible en dato
+   curado y verificado por un humano. Es la más alineada con el repo (*"si el motor sólo soporta N valores,
+   que el schema los ENUMERE"*), y necesita la doc en vivo de Fal.
+2. **El payload del webhook como portador de último recurso** — hoy nunca se persiste, y por buenas razones.
+   Cambia una postura de seguridad y es decisión del operador.
+3. **Command gobernado para adjuntar evidencia** — un humano que lee el request en el panel de Fal recupera la
+   corrida. La más cara, la que no depende de nadie más.
+
+Mientras tanto la corrida muere con un código nombrado y el rescate parcial queda auditado, así que estos casos
+son **enumerables**: sin eso ni siquiera se podía medir cuántos assets pagados se pierden por este camino.
+
+**D9 — el guard está cableado y deliberadamente sin configurar.** El panel de Fal **no expone ese identificador
+como valor**, sólo el username. Configurarlo con una suposición sería peor que dejarlo apagado: si el valor está
+mal, el guard rechaza **todas** las entregas legítimas y tumba el carril de webhooks — un fallo mayor que el que
+cierra. Así que el sistema lo **observa**: sobre una entrega real y ya verificada emite
+`globe.provider_webhook.account_identity_observed`, y sólo mientras el guard siga sin configurar. Con la próxima
+generación queda el valor medido y se configura.
+
+Que la observación sea **posterior** a la verificación no es un detalle de orden: si fuera antes, cualquiera
+podría dictar desde afuera el valor que el operador va a terminar configurando.
+
+### Lo que sigue pendiente de rollout
+
+Los once arreglos están en `main` pero **no desplegados**: el worker y la API siguen corriendo `c28ab9f`.
 
 ## Solución propuesta
 

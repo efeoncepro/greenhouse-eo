@@ -553,6 +553,40 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 
 <!-- ZONE 4 — VERIFICATION & CLOSING -->
 
+## Delta 2026-08-04 (d) — los 13 huecos resueltos; 11 en código, 2 declarados
+
+Detalle completo, commit por commit, en
+[`ISSUE-138`](../../issues/open/ISSUE-138-globe-provider-completion-capture-loses-paid-assets.md).
+Nueve commits en `efeonce-globe@main` (`0e9d696` → `0b5f875`), `pnpm check` y `pnpm build` verdes en cada uno.
+
+**Los tres que perdían un asset pagado:** el techo del poll de Veo ahora se **deriva** del presupuesto de
+salida (probado en rojo); la lease pasa de 60 s a 10 min para que una generación de minutos no muera a mitad;
+y el rescate parcial del lost-ack de Fal queda **nombrado y auditado** —no se arregla adivinando una URL que no
+es derivable—.
+
+**Los que dejaban ciego al resto:** `reconciliationFailureCode` lee `.code`, con 21 códigos a `terminal`, 7 a
+`transient` y `veo_result_not_ready` a `waiting`. El guard nuevo **deriva el vocabulario del archivo fuente** y
+encontró cuatro códigos que se me habían pasado.
+
+**Los de contrato con el proveedor:** se respeta `X-Fal-Retryable` en vez de inferir del status; el ingress
+devuelve 503 ante un fallo nuestro y 400 sólo ante un rechazo definitivo; se desactivan los fallbacks de Fal
+para que la identidad de ruta ejecutada sea la aprobada; y el segmento de correlación pasa a ser opcional sólo
+para OpenAI, cuya lane era literalmente irregistrable.
+
+**Dos quedan declarados y no cerrados**, porque dependen de hechos del proveedor sin verificar: la ventana de
+replay de Fal frente a su política de reintentos (D7) y la retención de una Operation de Vertex con resultado
+inline (D12). Ninguno se "arregla" por las dudas: ampliar la ventana debilitaría la protección real contra
+replay para cubrir un riesgo hipotético.
+
+**Y uno queda cableado y deliberadamente sin configurar:** el guard de propiedad de entregas de Fal
+(`GLOBE_FAL_USER_ID`). El panel de Fal no expone ese identificador como valor, y ponerlo mal rechazaría TODAS
+las entregas legítimas — peor que el riesgo que cierra. El sistema lo **observa** sobre una entrega ya
+verificada y emite `globe.provider_webhook.account_identity_observed` mientras siga sin configurar.
+
+### Rollout pendiente
+
+Los once arreglos están en `main` y **no desplegados**: worker y API siguen en `c28ab9f`.
+
 ## Delta 2026-08-04 (c) — auditoría de los tres proveedores: la captura funciona, y tiene tres agujeros que pierden un asset ya pagado
 
 Tres auditorías en paralelo (Fal · OpenAI · Vertex), cada una contrastando la documentación oficial del

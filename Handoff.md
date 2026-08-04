@@ -48,7 +48,32 @@ Más: el submit de imágenes de OpenAI **no tiene timeout** (el de Fal sí) y su
 `.code`, así que **todos** los códigos del poll colapsan en uno — `ISSUE-127` en el único camino donde no se
 había arreglado, y es lo que vuelve invisible al agujero de Veo.
 
-**`TASK-1632` sigue bloqueada.** Estos huecos son de captura de completitud, o sea del corazón de 1469.
+### ✅ Resueltos (2026-08-04) — 11 en código, 2 declarados
+
+Nueve commits en Globe `main` (`0e9d696` → `0b5f875`), `pnpm check` + `pnpm build` verdes en cada uno. Detalle
+en [`ISSUE-138`](docs/issues/open/ISSUE-138-globe-provider-completion-capture-loses-paid-assets.md).
+
+Lo que más vale recordar de la sesión:
+
+- **El guard nuevo derivó el vocabulario del archivo fuente y encontró CUATRO códigos que se me habían
+  pasado.** Copiar la lista a mano habría dado verde con el defecto adentro.
+- **Un test existente atrapó que mi clasificación de D8 era demasiado gruesa** (un cuerpo sobredimensionado
+  también es definitivo, no infraestructura). Separar por remedio, otra vez.
+- **En D6 la salida no era inferir del status: Fal publica `X-Fal-Retryable` y la estábamos ignorando.**
+  Respetar la señal del proveedor vale más que cualquier heurística nuestra.
+- **Dos NO se cerraron a propósito** (D7 ventana de replay, D12 retención de la Operation): dependen de hechos
+  del proveedor sin verificar, y "arreglarlos" por las dudas —ampliar la ventana— debilitaría una protección
+  real para cubrir un riesgo hipotético.
+
+**⚠️ Pendiente de rollout:** los once arreglos están en `main` y **no desplegados** — worker y API siguen en
+`c28ab9f`.
+
+**⚠️ `GLOBE_FAL_USER_ID` cableado y sin configurar, a propósito.** El panel de Fal no expone ese identificador
+como valor; ponerlo mal rechazaría TODAS las entregas legítimas. El sistema lo **observa** sobre una entrega ya
+verificada (`globe.provider_webhook.account_identity_observed`) mientras siga sin configurar: con la próxima
+generación queda el valor medido.
+
+**`TASK-1632` sigue bloqueada** hasta desplegar y verificar.
 
 ### 🔴 Trampa de infra viva (dueño: `TASK-1635`, NO 1469)
 
