@@ -1,6 +1,8 @@
 # ISSUE-138 — Globe: la captura de completitud pierde assets ya cobrados en los tres proveedores
 
-> **Estado:** Open — **12 de 13 cerrados y verificados con una generación real; queda D12, acotado**
+> **Estado:** ✅ Resolved 2026-08-04 — **los 13 hallazgos cerrados y verificados en runtime**; D12 cerró con
+> `ISSUE-140` desplegado (`efeonce-globe@cd8bad1` + `@015b9d7`), y su verificación se re-confirmó el 2026-08-04
+> contra GCS sobre el attempt del canary sellado de Veo (`68a75b70-…`), no sólo sobre la corrida que lo cerró.
 > **Detectado:** 2026-08-04 · **Ambiente:** Globe producción (`globe-producer-worker`, `globe-api-internal`)
 > **Severidad:** Alta — tres caminos distintos terminan en un asset generado, facturado e irrecuperable
 > **Repo afectado:** `efeoncepro/efeonce-globe` · **Gobierna:** Greenhouse (EPIC-028, `TASK-1469`)
@@ -19,6 +21,19 @@ Run `f0e8b876-fb0d-4949-9a22-a306fcaa454e` · attempt `d752100d-…` · `candida
 
 **Con esto los 13 hallazgos de ISSUE-138 quedan cerrados.** Para ejercitarlo hubo que resolver antes `ISSUE-140`
 (dos defectos que impedían que la ruta llegara siquiera a generar).
+
+**Re-verificación de cierre (2026-08-04, noche).** D12 se re-confirmó sobre un attempt distinto del que lo cerró:
+el del **canary sellado** de la promoción de Veo, `68a75b70-91dc-4a7e-bd65-0d63dd0942f5`, que tiene su
+`sample_0.mp4` bajo `gs://efeonce-globe-lab-evidence/governed-veo/68a75b70-…/`. Que aterrice también por el carril
+del canary —y no sólo en la corrida que sirvió para cerrar el hallazgo— es lo que vuelve al arreglo un
+comportamiento del driver y no una coincidencia de una corrida. El lifecycle de este issue quedó abierto por
+descuido: el archivo siguió en `open/` con el header viejo ("queda D12") **tres deltas después** de que su propio
+cierre y `ISSUE-140` lo declararan cerrado.
+
+🔴 **Residuo declarado, sin dueño todavía.** El prefijo `ba0feca7-ca89-44db-879e-7e71c052d465/` sigue conteniendo su
+`sample_0.mp4`: es el video **generado y facturado** que el dominio perdió antes del arreglo. Existe en nuestro
+bucket y es inalcanzable desde el dominio —ningún agregado lo referencia—, así que no se recupera solo. Cerrar
+este issue **no** lo reconcilia; queda como el costo ya incurrido que el arreglo evita hacia adelante.
 
 🔴 **Y aparece la prueba de por qué D12 importaba, en la forma más cruda posible.** El prefijo del attempt
 `ba0feca7-…` —el del intento que murió con `veo_operation_evidence_invalid`— **contiene su propio `sample_0.mp4`**:

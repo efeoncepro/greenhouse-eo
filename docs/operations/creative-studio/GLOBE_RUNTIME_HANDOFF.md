@@ -59,6 +59,13 @@ exacta: **32 créditos reservados = 32 gastados**. Forma de salida usada: 720p, 
 `authorizedInputs` con `rights: internal-owned`. El sello lo ejecutó `globe-operator-lane.yml`
 `mode=canary-confirm` `lane=checker`, run `30958027741`.
 
+**Re-verificado en runtime a las 23:09Z** con el reader canónico (`globe-operator-lane.yml` `mode=get`
+`lane=routing`, run `30959001009`): `canary_passed` rev. 9, binding `enabled` rev. 11, circuito `closed` rev. 11,
+governance `eligible`. El `deadlineAt` de `2026-08-05T01:03:02Z` **queda en el agregado pero no se puede cobrar**:
+los barridos de expiración excluyen `canary_passed` y `rolled_back`. Y D12 de `ISSUE-138` se re-confirmó sobre el
+attempt del propio canary —`gs://efeonce-globe-lab-evidence/governed-veo/68a75b70-…/sample_0.mp4`—, así que ese
+issue pasó a `resolved/` con sus 13 hallazgos cerrados.
+
 ⚠️ **Matiz de honestidad: el canary NO se produjo desde la UI del Producer.** Se produjo por el **carril
 gobernado**, con los commands canónicos del spine (`globe.lab.experiment.estimate` → `prepare` → `execute`)
 sobre el transporte de `scripts/producer-ui-canary-lib.mjs`. La UI **sigue sin poder producirlo**: el botón

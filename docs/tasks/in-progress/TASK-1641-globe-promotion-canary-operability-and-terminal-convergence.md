@@ -131,6 +131,14 @@ transporte de `scripts/producer-ui-canary-lib.mjs`—, con forma 720p / 8 s / 16
 `inputMode {kind:'frames', hasEndFrame:false}` y, como primer cuadro, el output ya gobernado
 `output:8a5e24ec-0a92-4d9d-b9c8-5d52a37e5e5b:0` declarado en `authorizedInputs`.
 
+**Re-leído en runtime (2026-08-04, 23:09Z) por el reader canónico**, no por el doc: `globe-operator-lane.yml`
+`mode=get` `lane=routing` run `30959001009` devuelve `state=canary_passed`, revisión 9, `bindingEnabled=true`
+revisión 11, `circuitState=closed` revisión 11, `governanceState=eligible` (revisión 17864), con el mismo run,
+attempt y `sha256` del sello. **El `deadlineAt` de `2026-08-05T01:03:02Z` sigue en el agregado y es inerte**: los
+cinco barridos de expiración de `production-promotion-operation-store.ts` filtran
+`state NOT IN ('canary_passed','rolled_back')`, así que el plazo no puede cobrarse sobre una promoción sellada.
+Se verifica porque «terminal» leído en un doc y «terminal» aplicado por el barrido son afirmaciones distintas.
+
 🔴 **Lo que este sello NO prueba, y hay que decirlo:** el canary **no salió de la UI del Producer**, y la UI
 sigue sin poder producirlo. Por lo tanto **el Scope 1 de esta task sigue abierto** —no existe todavía un canary
 de ruta arbitraria canónico, committeado y testeado— y la generación desde el Producer para rutas con entrada
@@ -138,9 +146,12 @@ obligatoria sigue cerrada.
 
 ### 🔴 Los dos defectos de entrada de referencia, ajenos a esta task
 
-`promotion_ddd0977c-c6e7-4fa6-bd31-61737c108d31` está **`activated`** (ventana hasta `2026-08-05T01:03:02Z`), con
-binding y circuito correctos. Falta su canary, y hace falta uno **nuevo**: `resolveCanary` exige
-`created_at >= activatedAt`, así que la corrida `f0e8b876` de las 20:20 no sirve.
+⏱️ **Leer con su fecha: esto describe el estado de las 22:03Z, ANTES del sello de las 22:53Z.** Cuando se escribió,
+`promotion_ddd0977c-c6e7-4fa6-bd31-61737c108d31` estaba **`activated`** (ventana hasta `2026-08-05T01:03:02Z`) sin
+canary, y hacía falta uno **nuevo** porque `resolveCanary` exige `created_at >= activatedAt` —la corrida `f0e8b876`
+de las 20:20 no servía—. Esa promoción **ya está `canary_passed`** (ver arriba): el canary se produjo por el carril
+gobernado, sin pasar por la UI. **Lo que sigue vigente de esta sección son los dos defectos de entrada**, que son
+los que mantienen cerrada la generación desde el Producer.
 
 La ruta pide 1-2 referencias de imagen y **los dos caminos de entrada están rotos hoy**:
 
