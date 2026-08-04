@@ -5,6 +5,28 @@
 > **Severidad:** Alta — tres caminos distintos terminan en un asset generado, facturado e irrecuperable
 > **Repo afectado:** `efeoncepro/efeonce-globe` · **Gobierna:** Greenhouse (EPIC-028, `TASK-1469`)
 
+## Delta 2026-08-04 (noche) — la ruta Veo SE PROMOVIÓ y D12 sigue sin ejercitarse: el submit muere antes
+
+Se promovió `ref/video/frames-v1` end-to-end por el carril gobernado (`promotion_3902259f-c56b-4c7e-8589-5e31f9a077a3`:
+`planned → controls_staged → readiness_promoted → activated`, binding `enabled`, circuito `closed`) y se corrió una
+generación real. **El canary falló, y el fallo NO es de D12.**
+
+🔴 **D12 queda EXONERADO por medición.** Un probe de gasto cero contra `veo-3.1-generate-001` confirma que
+`storageUri` **es aceptado** por el endpoint (el 400 llega por otro campo). El arreglo de D12 está bien; lo que pasa
+es que **nunca se ejecuta**, porque el submit se rechaza antes de crear la operación en Vertex.
+
+La causa real es **`ISSUE-140`**: el materializer de inputs gobernados se construye para Veo sin encoder propio y
+hereda el default `{data, mimeType}` —la forma de `inlineData` de Gemini— cuando `:predictLongRunning` exige
+`{bytesBase64Encoded, mimeType}`. Vertex responde `image mime type is empty` → `veo_submit_invalid`.
+
+Evidencia: run `f1c0184f-c404-47cb-8f36-cfde131ace26`, attempt `bdcecae2-8047-4610-8702-e7b2002619d0`,
+`waiting → submitting → finalizing → terminal`, sin `provider_operation_id`. **Cero pérdida económica**: reserva 32 →
+release −32, `spent_delta = 0`. El prefijo `gs://efeonce-globe-lab-evidence/governed-veo/` sigue vacío, y ahora se
+sabe exactamente por qué.
+
+**Estado de D12: code complete, exonerado como causa, bloqueado por `ISSUE-140` para su verificación de runtime.**
+Cuando ese fix esté desplegado, re-promover cuesta 4 dispatches (~3 min) y la prueba de salida no cambia.
+
 ## Delta 2026-08-04 (tarde) — D12 implementado y desplegado; **no ejercitable hoy**
 
 El arreglo de **D12** está implementado, desplegado y probado en rojo (`efeonce-globe@c1f17f4`): el driver

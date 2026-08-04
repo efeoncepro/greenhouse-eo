@@ -1724,9 +1724,11 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-1638` | `to-do` | **Next.js 16.3 Framework Alignment.** EPIC-039; standard; P1/Alto/Medio. Alinea `next` y `eslint-config-next` en `16.3.0`, valida lockfile, Webpack/Turbopack, clean/warm build, preview Vercel y rollback sin cambios de producto. | `docs/tasks/to-do/TASK-1638-nextjs-16-3-framework-alignment.md` |
 | `TASK-1639` | `to-do` | **TypeScript 7 Dual Compiler Adoption.** EPIC-039; standard; P1/Alto/Medio. Bloqueada por TASK-1638. Usa TS7 para `tsc` y TS6 para la API compatible de `typescript-eslint`, elimina opciones retiradas, añade lanes CI y mide recursos. | `docs/tasks/to-do/TASK-1639-typescript-7-dual-compiler-adoption.md` |
 
+| `TASK-1641` | `to-do` | **Globe: canary post-promoción operable y convergencia terminal de la saga.** EPIC-028; backend-data/api; P1/Alto/Medio. Medido 2026-08-04: **10 de 12 promociones terminaron `rolled_back`**, y 4 murieron segundos después de su deadline ya estando `activated`. El diseño es correcto y NO se relaja —`activated` no es terminal y el código prohíbe inferir el canary—: falta el **paso operativo**. Tres huecos: no hay camino canónico para producir el canary de una ruta arbitraria (el canary estándar tiene sus 3 modalidades fijas), el reader `stalled` no tiene consumidor ni alerta, y un rollback deja `readiness=promoted` con binding apagado — divergencia de agregados, el invariante de `TASK-1469` en otra saga. | `docs/tasks/to-do/TASK-1641-globe-promotion-canary-operability-and-terminal-convergence.md` |
+
 ## Siguiente ID disponible
 
-`TASK-1640`
+`TASK-1642`
 
 > **Corrección 2026-07-30.** Este pie declaraba `TASK-1587`, pero la tabla de este mismo archivo ya
 > registraba hasta `TASK-1598` y esos archivos existen en disco: el pie estaba obsoleto respecto de su
