@@ -5,7 +5,7 @@
 
 ## Concepto y craft
 
-- ❌ **Empezar por la herramienta, no por el concepto.** "Generá una imagen" sin brief ni idea.
+- ❌ **Empezar por la herramienta, no por el concepto.** "Genera una imagen" sin brief ni idea.
   ✅ Concepto → dirección → recién ahí la herramienta. Los fundamentos mandan sobre el modelo.
 - ❌ **Imagen impecable con mala jerarquía.** Una render IA 4K sin foco ni orden es mal diseño.
   ✅ Composición, jerarquía y contraste primero; el acabado después.

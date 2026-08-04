@@ -75,7 +75,7 @@ Si **falta** cualquiera, el servicio **arranca en memoria** (comportamiento prev
 
 ## Problemas comunes
 
-- **El servicio arrancó en memoria (perdí estado tras un reinicio):** le falta alguna de las tres `GLOBE_POSTGRES_*` (`INSTANCE_CONNECTION_NAME`, `DATABASE`, `USER`). Declaralas en el servicio de Cloud Run (con su usuario IAM de runtime) y redespliega. Recuerda: correr en memoria sólo está permitido en `internal_smoke`.
+- **El servicio arrancó en memoria (perdí estado tras un reinicio):** le falta alguna de las tres `GLOBE_POSTGRES_*` (`INSTANCE_CONNECTION_NAME`, `DATABASE`, `USER`). Decláralas en el servicio de Cloud Run (con su usuario IAM de runtime) y redespliega. Recuerda: correr en memoria sólo está permitido en `internal_smoke`.
 - **El techo de réplicas ya no baja tras un deploy:** `TASK-1508` cerró ese drift-trap. `deploy-internal.yml` dejó de pasar `--max-instances` y Terraform gobierna los **dos** ceilings (servicio y revisión), hoy en 3/3. Cuidado con el workaround viejo `gcloud run services update <servicio> --max-instances=3`: escribía el ceiling de **revisión**, no el de **servicio**, y Cloud Run aplica el menor — dejaba el techo efectivo en 1 aparentando restaurarlo.
 - **La migración no aplica / no ve la instancia:** confirma `GLOBE_POSTGRES_INSTANCE_CONNECTION_NAME=efeonce-globe:southamerica-west1:globe-pg` y que `GLOBE_MIGRATOR_USER` sea un usuario IAM miembro de `globe_owner`. El runner aplica como `globe_owner`; un usuario sin ese rol no tiene los privilegios de DDL.
 - **No valida Globe con `pnpm local:check` de Greenhouse:** correcto, son toolchains distintos. Valida Globe con `pnpm check` / `pnpm build` dentro de `efeonce-globe`.

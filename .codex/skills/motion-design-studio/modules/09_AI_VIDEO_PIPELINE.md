@@ -49,7 +49,7 @@ No hay "el mejor modelo" — hay **el mejor modelo para ESTA toma**. Elige por l
 
 ## 2. Framework de prompt cinematográfico
 
-**Dirigí la IA como a un director de cine: describí una escena FILMÁNDOSE, no una imagen.** El prompt
+**Dirige la IA como a un director de cine: describe una escena FILMÁNDOSE, no una imagen.** El prompt
 canónico tiene cuatro partes:
 
 **`[dirección de cámara] + [ritmo de escena] + [acción/movimiento] + [detalles atmosféricos]`**
@@ -68,11 +68,11 @@ DoF, 4s, smooth movement."*
 **Reglas de prompt:**
 - Usa **verbos de movimiento**, no adjetivos estáticos (una imagen "hermosa" no dirige; algo que
   *glides* sí).
-- Especificá **focal length** y **DoF** cuando importe la óptica (Cinema Studio lo respeta).
+- Especifica **focal length** y **DoF** cuando importe la óptica (Cinema Studio lo respeta).
 - **Un movimiento dominante por toma.** Apilar dolly + orbit + zoom + tilt en 4s = caos. Una toma, una
   intención de cámara.
 - **Duración explícita** (ver §5: tomas cortas, montar después).
-- Iterá el prompt como un director da notas: cambiá **una** variable por vez para aislar qué mejora.
+- Itera el prompt como un director da notas: cambia **una** variable por vez para aislar qué mejora.
 
 ---
 
@@ -81,12 +81,12 @@ DoF, 4s, smooth movement."*
 **Doctrina (SKILL §6.7): para tomas con inicio/fin claros, genera keyframes precisos y usalos como
 referencia — mucho más control que text-to-video puro.**
 
-1. **Diseñá el/los keyframe(s)** como stills exactos (encuadre, personaje, luz, look). Generación de
+1. **Diseña el/los keyframe(s)** como stills exactos (encuadre, personaje, luz, look). Generación de
    stills → **`greenhouse-ai-image-generator` / `design-studio`** (boundary). El still lleva ya la
    composición y el look que quieres.
 2. **i2v desde el keyframe:** el modelo anima *desde* esa imagen, respetando composición y estilo.
    Reduce la deriva enormemente vs text-to-video.
-3. **Start + end frame (cuando el modelo lo soporta):** dando el frame inicial **y** final, controlás
+3. **Start + end frame (cuando el modelo lo soporta):** dando el frame inicial **y** final, controlas
    el arco del movimiento (útil para transiciones y reveals precisos).
 4. **Keyframes como red de seguridad de consistencia:** el mismo keyframe base reusado alimenta tomas
    coherentes entre sí.
@@ -101,16 +101,16 @@ referencia — mucho más control que text-to-video puro.**
 **Sin consistencia, el personaje "deriva": cambia de cara, ropa, edad o voz entre tomas y se rompe la
 ilusión.** Es el error #1 que separa el video IA amateur del pro. Herramientas `(as-of 2026-07)`:
 
-- **Soul ID (Higgsfield):** subís 3–5 fotos, entrena ~5–10 min, y reusás **el mismo rostro** en todas
+- **Soul ID (Higgsfield):** subes 3–5 fotos, entrena ~5–10 min, y reúsas **el mismo rostro** en todas
   las tools (i2v, Cinema Studio, LipSync). El modo canónico para un personaje recurrente (incl. mascota).
-- **Refs multi-imagen (Seedance 12–50 refs):** cargás muchas referencias del personaje/producto para
+- **Refs multi-imagen (Seedance 12–50 refs):** cargas muchas referencias del personaje/producto para
   fijarlo. Fuerte para producto (packaging, logo) que debe verse idéntico entre tomas.
 - **Voice Binding (Kling):** fija la **voz** consistente en múltiples cortes/idiomas — la contraparte
   sonora de Soul ID (ver `modules/07 §8`).
 - **Reference Image (Magnific)** en finishing: mantiene textura/estilo al upscalear.
 
 **Disciplina:**
-- Fijá **identidad visual (rostro/producto) + voz** *antes* de generar volumen. Entrenar el Soul ID /
+- Fija **identidad visual (rostro/producto) + voz** *antes* de generar volumen. Entrenar el Soul ID /
   cargar refs una vez, reusar en todas las tomas.
 - Chequea deriva mirando las tomas **seguidas** (no una por una): rostro, ropa, color, escala, edad.
 - Parte de la consistencia se refuerza en el **grade** (`modules/08 §4`), pero el grade corrige color,
@@ -126,7 +126,7 @@ ilusión.** Es el error #1 que separa el video IA amateur del pro. Herramientas 
   tracking. Repetibles = puedes aplicar el **mismo** movimiento a varias tomas para coherencia de
   lenguaje de cámara en toda la pieza.
 - **Focal length:** elegir la lente cambia el look — gran angular (dramatiza perspectiva, distorsiona
-  bordes) vs teleobjetivo (comprime, aísla, aplasta fondo). Dirigí la óptica, no solo el encuadre
+  bordes) vs teleobjetivo (comprime, aísla, aplasta fondo). Dirige la óptica, no solo el encuadre
   (`modules/03`).
 - **Física óptica:** DoF, flares, distorsión coherentes con la lente elegida. Un shallow DoF real vende
   cine; un fondo plano delata IA barata.
@@ -147,10 +147,10 @@ ilusión.** Es el error #1 que separa el video IA amateur del pro. Herramientas 
 
 | Modo de fallo | Síntoma | Workaround canónico |
 |---|---|---|
-| **Handheld / shaky** | Movimiento de cámara "a mano" sale tembloroso, con warping o grano raro | Genera **estático/suave** y agregá el *shake* en post (AE/Resolve), o suma grano en post. No pidas handheld al modelo |
-| **Tomas > ~10s** | Deriva, morphing, pérdida de coherencia en clips largos | Genera en **chunks de 5–8s** y **montá** (`modules/06`). El master largo se arma editando, no generando de una |
+| **Handheld / shaky** | Movimiento de cámara "a mano" sale tembloroso, con warping o grano raro | Genera **estático/suave** y agrega el *shake* en post (AE/Resolve), o suma grano en post. No pidas handheld al modelo |
+| **Tomas > ~10s** | Deriva, morphing, pérdida de coherencia en clips largos | Genera en **chunks de 5–8s** y **monta** (`modules/06`). El master largo se arma editando, no generando de una |
 | **Through-object moves** | Cámara que atraviesa un objeto (a través de una ventana, un anillo) se rompe | **Plates estáticos** + el *move* en post (compositing/3D camera en AE). No lo resuelve el modelo hoy |
-| **Manos / texto / detalle fino** | Manos deformes, texto ilegible, logos derretidos | Evitá primeros planos de manos/texto generado; pon el **texto real en post** (mograph, `modules/05`); logo compositeado, no generado |
+| **Manos / texto / detalle fino** | Manos deformes, texto ilegible, logos derretidos | Evita primeros planos de manos/texto generado; pon el **texto real en post** (mograph, `modules/05`); logo compositeado, no generado |
 | **Edit `completed` con deriva temporal** | La edición cambia artefactos, cámara o anatomía fuera de la zona pedida | `completed` = candidato. Revisar 1×/0.5× + contact sheet; si sólo faltan timing/orden/repetición y las poses existen, retimar el mismo master en post (`workflows/omni-in-place-edit-and-deterministic-finish.md`) |
 | **Deriva de identidad** | Personaje cambia entre tomas | Soul ID / refs / Voice Binding (§4) |
 | **Deriva de color** | Cada toma con distinta temperatura/contraste | Grade de match unificador (`modules/08 §4`) |
@@ -188,7 +188,7 @@ dirigir (shot list + prompt sheet)
 
 **Producir/renderizar/upscalear con IA cuesta créditos.** Antes de correr sobre toda la pieza:
 
-- **Dimensioná primero:** estimá segundos totales × costo/s del modelo elegido (§1) + upscales. Una
+- **Dimensiona primero:** estima segundos totales × costo/s del modelo elegido (§1) + upscales. Una
   pieza de 30s a ~$0.10/s con 4 variantes por toma escala rápido.
 - **Prueba en una toma**, valida calidad/consistencia, **recién ahí** genera el volumen.
 - **Chunks, no clips largos** (§7) — también controla el gasto de re-tiradas.

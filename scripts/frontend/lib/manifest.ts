@@ -42,7 +42,7 @@ export interface FrameRecord {
   /**
    * Observación máquina-legible: ruta al snapshot del árbol de accesibilidad
    * (`<NN>-<label>.aria.txt`) de la región capturada en este frame. Convierte
-   * "mirá el PNG y adiviná el selector" en "leé el a11y tree y escribí el
+   * "mira el PNG y adiviná el selector" en "lee el a11y tree y escribí el
    * `getByRole(...)` correcto". Técnica de `microsoft/webwright`
    * (`local_browser.py`: `page.locator('body').aria_snapshot()`). Best-effort:
    * ausente si la captura del snapshot falló (graceful degrade, nunca rompe el mark).

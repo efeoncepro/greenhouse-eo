@@ -34,7 +34,7 @@ For **event naming / taxonomy / the gh_ house style** → `docs/reference/measur
 | Clientes de código | `src/lib/growth/gtm/api-client.ts` (`GtmApiClient`) · `src/lib/growth/ga4/api-client.ts` |
 | Verificar en vivo | `scripts/ga4/realtime-events.ts 486264460` · `scripts/gtm/verify-connection.ts` |
 
-> **⚠️ Verificar SIEMPRE el Measurement ID destino.** El sitio tiene DOS ids GA4-ish (`G-KYPPY57M14` en el GTM, `GT-KV5CNNKQ` de Site Kit). Antes de crear un GA4 Event tag, confirmar **qué measurement ID pertenece a la propiedad `486264460`** por la Admin API (`properties/486264460/dataStreams`) — si mandás al id equivocado, el evento no aparece en la propiedad que medimos. Ver `docs/reference/measurement-gtm-ga4/07-ga4-admin-api-ops.md`.
+> **⚠️ Verificar SIEMPRE el Measurement ID destino.** El sitio tiene DOS ids GA4-ish (`G-KYPPY57M14` en el GTM, `GT-KV5CNNKQ` de Site Kit). Antes de crear un GA4 Event tag, confirmar **qué measurement ID pertenece a la propiedad `486264460`** por la Admin API (`properties/486264460/dataStreams`) — si mandas al id equivocado, el evento no aparece en la propiedad que medimos. Ver `docs/reference/measurement-gtm-ga4/07-ga4-admin-api-ops.md`.
 
 ## Metodología — cómo decidir el camino (árbol de decisión)
 

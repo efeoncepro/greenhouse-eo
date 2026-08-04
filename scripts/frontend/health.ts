@@ -43,7 +43,7 @@ const main = (): void => {
   console.log('')
 
   if (signal.totalRuns === 0) {
-    console.log('  No hay runs registrados. Ejecutá `pnpm fe:capture <scenario>` para empezar.')
+    console.log('  No hay runs registrados. Ejecuta `pnpm fe:capture <scenario>` para empezar.')
 
     return
   }

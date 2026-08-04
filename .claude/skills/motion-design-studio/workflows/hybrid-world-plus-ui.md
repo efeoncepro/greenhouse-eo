@@ -35,8 +35,8 @@ las citas y el logo sean reales".
 ## Pasos (encadenados)
 
 1. Storyboard por beats + reparto de la tabla.
-2. Producí cada beat con su mano (Omni / mograph).
-3. Ensamblá (edición, ritmo al beat) + costura (pull-back/match-cut).
+2. Produce cada beat con su mano (Omni / mograph).
+3. Ensambla (edición, ritmo al beat) + costura (pull-back/match-cut).
 4. **Sonido** → `audio-studio` (thinking beat, clicks, whoosh, música, sting en el gauge).
 5. **Grade + finish + upscale** → `modules/08` + Magnific. Entrega 16:9 + 9:16/1:1 (`social-media-studio`).
 

@@ -22,7 +22,7 @@
 | Orden | **Primero** | **Después** |
 
 **Regla dura:** no metas el *look* sobre tomas que aún no están balanceadas entre sí. Primero
-neutralizá y emparejá (§4); recién ahí aplica el grade creativo encima. Grade sobre base sucia =
+neutraliza y empareja (§4); recién ahí aplica el grade creativo encima. Grade sobre base sucia =
 inconsistencia que ningún look tapa.
 
 ---
@@ -40,7 +40,7 @@ inconsistencia que ningún look tapa.
 6. **Finishing** (§5) — grano, viñeta, glow/bloom, halation, ajustes de textura.
 7. **Trim / entrega** — chequeo en scopes, render por destino (§6/§7).
 
-> Trabajá siempre con **scopes** (waveform, parade RGB, vectorscope), no solo a ojo. El monitor
+> Trabaja siempre con **scopes** (waveform, parade RGB, vectorscope), no solo a ojo. El monitor
 > miente; los scopes no. Waveform para exposición/contraste, parade para balance, vectorscope para
 > saturación y tono de piel (la "skin line").
 
@@ -62,7 +62,7 @@ inconsistencia que ningún look tapa.
   saturación, aire), duotono/monocromo de marca, verde-magenta (thriller), cálido-cálido (dorado
   sobre ámbar, sin frío). Elige el look desde la marca y la emoción, no desde la moda.
 - **Coherencia con la identidad:** el look debe convivir con la paleta de marca. Si el color de marca
-  es un verde específico, el grade no puede virarlo. Fijá el look contra los tokens de marca
+  es un verde específico, el grade no puede virarlo. Fija el look contra los tokens de marca
   (overlay Efeonce: `efeonce/EFEONCE_OVERLAY.md`).
 
 ---
@@ -73,11 +73,11 @@ inconsistencia que ningún look tapa.
 de piel, aunque el prompt sea el mismo. Sin match, la secuencia se ve rota. Disciplina de match:
 
 - **Toma de referencia (hero shot):** elige la mejor toma como referencia y lleva todas las demás
-  hacia ella. No emparejes contra el vacío — emparejá contra una referencia fija.
-- **Método de match:** igualá en este orden — (1) negros/blancos (waveform), (2) balance/temperatura
+  hacia ella. No emparejes contra el vacío — empareja contra una referencia fija.
+- **Método de match:** iguala en este orden — (1) negros/blancos (waveform), (2) balance/temperatura
   (parade), (3) contraste medio, (4) saturación (vectorscope), (5) tono de piel (skin line del
   vectorscope). El ojo salta si la piel o el punto negro no matchean.
-- **Split-screen / stills de referencia:** compará toma-vs-referencia lado a lado. Resolve tiene
+- **Split-screen / stills de referencia:** compara toma-vs-referencia lado a lado. Resolve tiene
   memorias de stills (gallery) — guarda el grade de la hero y aplicalo como punto de partida.
 - **Grade unificador por encima:** un nodo/ajuste de look común sobre toda la timeline (después del
   match individual) sella la cohesión. Es el equivalente visual del ambience unificador de sonido
@@ -125,11 +125,11 @@ de piel, aunque el prompt sea el mismo. Sin match, la secuencia se ve rota. Disc
 - **Bitrate:** más alto = más calidad, más peso. Guía web `(as-of 2026-07 — reverificar recomendación
   de plataforma)`: 1080p ~8-12 Mbps, 4K ~35-45 Mbps (H.264); H.265 rinde parecido a ~la mitad del
   bitrate. Para gráficos con degradados/motion limpio, sube el bitrate: la compresión banding-ea los
-  degradados. Considerá 2-pass para entregas finales.
+  degradados. Considera 2-pass para entregas finales.
 - **Color space de salida:** **Rec.709** para web/broadcast SDR (default); **P3 / Rec.2020 + HDR
   (PQ/HLG)** solo si el destino soporta HDR y el pipeline entero es HDR. **No entregues P3 a un canal
-  Rec.709** — se ve desaturado/mal. Etiquetá el color space en el archivo.
-- **Frame rate y resolución:** conservá el frame rate de la pieza (no convertir sin retiming); entrega
+  Rec.709** — se ve desaturado/mal. Etiqueta el color space en el archivo.
+- **Frame rate y resolución:** conserva el frame rate de la pieza (no convertir sin retiming); entrega
   a la resolución del destino. Detalle de spec por red en `social-media-studio`.
 - **Chroma subsampling:** 4:2:0 para entrega estándar; 4:2:2/4:4:4 para masters, HDR o croma/keying.
 
@@ -142,7 +142,7 @@ de piel, aunque el prompt sea el mismo. Sin match, la secuencia se ve rota. Disc
 - **HDR (P3/Rec.2020, PQ/HLG)** exige monitor HDR calibrado, pipeline HDR de punta a punta y spec del
   canal. No "actives HDR" sin eso — produce un master roto en pantallas SDR.
 - **Metadata correcta:** un master mal etiquetado (P3 marcado como 709 o viceversa) se ve virado en el
-  reproductor. Verificá tag de color en el archivo final.
+  reproductor. Verifica tag de color en el archivo final.
 - **QC final:** mira el master en al menos dos pantallas (una de referencia, una "de consumo" tipo
   celular/laptop). Chequea banding en degradados, clipping en altas, negros aplastados, y que el look
   aguante fuera del monitor de grade.
@@ -164,12 +164,12 @@ upscale bicúbico: es **generativo** — "sueña" detalle plausible, no interpol
 
 - **Regla de uso:** para **video**, usa **Video Sequence Enhancement** (frame-consistent) — un upscale
   imagen-por-imagen genera *flicker/boiling* porque cada frame inventa detalle distinto. Para
-  **frames sueltos/stills/keyframes** (que luego animás), el upscaler de imagen. Para nitidez fiel sin
+  **frames sueltos/stills/keyframes** (que luego animas), el upscaler de imagen. Para nitidez fiel sin
   reinvención (texto de marca, rostros reconocibles), **Precision API** con Resemblance alto.
 - **Dónde cae en el pipeline:** el upscale es paso de **finish**, casi al final — después del grade y
-  el finishing, o sobre el master antes de la entrega en alta. Si upscaleás antes de graduar, graduás
+  el finishing, o sobre el master antes de la entrega en alta. Si upscaleas antes de graduar, gradúas
   detalle inventado.
-- **Gasto gobernado:** upscalear (sobre todo secuencias y 8K) **cuesta** (créditos/API). Dimensioná
+- **Gasto gobernado:** upscalear (sobre todo secuencias y 8K) **cuesta** (créditos/API). Dimensiona
   antes de correr sobre toda la pieza — prueba en una toma, valida el resultado, recién ahí volumen
   (ver regla dura de `modules/09` y `modules/10`). Disponibilidad: plugin Photoshop, API Python/Node.
 - **Boundary:** Magnific **finaliza/upscalea**; **no** reemplaza el grade ni el sonido. Un frame 8K con

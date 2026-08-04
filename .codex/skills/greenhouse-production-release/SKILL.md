@@ -146,10 +146,10 @@ gh workflow run production-release.yml \
 ```
 
 6. Approve the `production` environment gate — **OJO: el entorno `production` se pide
-   DOS veces en el mismo run** (ver gotcha #6). Aprobá AMBAS: la primera (jobs del
+   DOS veces en el mismo run** (ver gotcha #6). Aprueba AMBAS: la primera (jobs del
    orquestador) y la segunda (jobs Azure gated, que aparece después de que arrancan los
-   deploys). Si dejás la segunda sin aprobar, el run queda `waiting` indefinidamente y el
-   manifest NUNCA transiciona a `released`. **Poleá `pending_deployments` REPETIDAMENTE
+   deploys). Si dejas la segunda sin aprobar, el run queda `waiting` indefinidamente y el
+   manifest NUNCA transiciona a `released`. **Polea `pending_deployments` REPETIDAMENTE
    durante todo el run, no solo el `.status` del run** (el status queda `waiting` pero no
    dice que hay un gate esperando). No aprobar runs de workers stale ajenos.
 
@@ -202,11 +202,11 @@ GITHUB_RELEASE_OBSERVER_TOKEN="$(gh auth token)" pnpm release:watchdog --json
 
 ## Gotchas conocidos del release (verificados 2026-07-03 #139; fix de raíz = ISSUE-114)
 
-El flujo de **squash-merge** produce condiciones recurrentes que NO son fallas reales. No las persigas como bugs; aplicá la mitigación:
+El flujo de **squash-merge** produce condiciones recurrentes que NO son fallas reales. No las persigas como bugs; aplica la mitigación:
 
-1. **El PR `develop→main` conflicta ("merge commit cannot be cleanly created").** `main` (squashes de releases previos) no es ancestro de `develop` → conflictos (docs Handoff/changelog/README/registry y a veces código). **Resolución robusta:** en `develop`, `git merge origin/main -X ours --no-edit` (`develop` es autoritativo — contiene todo `main` por construcción: los squash de `main` son DE commits de `develop`). Verificá: `git log origin/main --not develop` vacío **y** `git diff HEAD@{1} HEAD -- src/ scripts/` sin cambios de código. Push `develop` → el PR queda MERGEABLE. Bonus: **avanza la merge-base** y reduce la divergencia del próximo release. **NUNCA** cherry-pick a `main` (duplica SHAs).
+1. **El PR `develop→main` conflicta ("merge commit cannot be cleanly created").** `main` (squashes de releases previos) no es ancestro de `develop` → conflictos (docs Handoff/changelog/README/registry y a veces código). **Resolución robusta:** en `develop`, `git merge origin/main -X ours --no-edit` (`develop` es autoritativo — contiene todo `main` por construcción: los squash de `main` son DE commits de `develop`). Verifica: `git log origin/main --not develop` vacío **y** `git diff HEAD@{1} HEAD -- src/ scripts/` sin cambios de código. Push `develop` → el PR queda MERGEABLE. Bonus: **avanza la merge-base** y reduce la divergencia del próximo release. **NUNCA** cherry-pick a `main` (duplica SHAs).
 
-2. **Preflight `release_batch_policy=requires_break_glass` falso positivo.** El classifier usa diff *three-dot* (`origin/main...target`, merge-base) → resucita archivos ya desplegados en un release previo (ej. `services/ops-worker/deploy.sh`) como `cloud_release` irreversible. Confirmá el fantasma: `git diff origin/main..target -- <archivo>` = 0 líneas. Post-merge (target = HEAD de `main`) el batch-policy del orchestrator ve diff vacío y pasa. Fix de raíz pendiente = **ISSUE-114** (three-dot → two-dot).
+2. **Preflight `release_batch_policy=requires_break_glass` falso positivo.** El classifier usa diff *three-dot* (`origin/main...target`, merge-base) → resucita archivos ya desplegados en un release previo (ej. `services/ops-worker/deploy.sh`) como `cloud_release` irreversible. Confirma el fantasma: `git diff origin/main..target -- <archivo>` = 0 líneas. Post-merge (target = HEAD de `main`) el batch-policy del orchestrator ve diff vacío y pasa. Fix de raíz pendiente = **ISSUE-114** (three-dot → two-dot).
 
 3. **`playwright_smoke` (0 runs) + evidencia aún corriendo en el squash commit fresco de `main`.** El smoke corre en `develop` (ya verde); el commit de `main` no tiene su propio smoke. Antes del primer dispatch, esperar `CI`, `CI Deep Verification` y Vercel Production `READY` para el SHA exacto. Con esos prerequisitos verdes, un `bypass_preflight_reason` forense (≥20 chars) puede cubrir sólo la ausencia inevitable del smoke en el squash; nunca cubrir checks pendientes o fallidos.
 
@@ -229,8 +229,8 @@ El flujo de **squash-merge** produce condiciones recurrentes que NO son fallas r
    completo queda `waiting`, y el job `Transition release_manifests → released` **no
    corre** (el manifest queda en estado `preflight`, nunca `released`). **Síntoma:**
    `gh run view` muestra `run=waiting/` indefinido pese a que workers + Vercel + health
-   ya están verdes; el `.status` NO revela que hay un gate esperando. **Fix:** poleá
-   `pending_deployments` en loop (no solo `run.status`) y aprobá el 2do gate. Una vez
+   ya están verdes; el `.status` NO revela que hay un gate esperando. **Fix:** polea
+   `pending_deployments` en loop (no solo `run.status`) y aprueba el 2do gate. Una vez
    aprobado, los jobs Azure corren `Validate Bicep` + `Detect Bicep diff vs origin/main`
    → **`Skip Bicep deploy (no diff)` + `Deploy … stack` = `skipped`** (no-op esperado
    cuando no hay diff de infra ni federated creds — coincide con "Azure `no_infra_diff`

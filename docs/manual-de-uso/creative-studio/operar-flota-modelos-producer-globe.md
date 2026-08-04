@@ -156,7 +156,7 @@ por workspace, recomendado honesto, y que **el identificador del proveedor nunca
   del modelo sí va.
 - **NUNCA** preseleccionar un modelo recomendado que no esté disponible. Una recomendación que no se
   puede ejecutar es peor que ninguna.
-- **NUNCA** ocultar un modelo no disponible. Mostralo con su estado: invisible y bloqueado se sienten
+- **NUNCA** ocultar un modelo no disponible. Muéstralo con su estado: invisible y bloqueado se sienten
   igual de mal, pero invisible además impide preguntar.
 
 ## Problemas comunes

@@ -27,7 +27,7 @@ const main = async () => {
   console.log(`  batches: ${result.batches} · tokens estimados: ~${result.tokensEstimated}`)
 
   if (!result.apply) {
-    console.log('\n  (dry-run — nada escrito; usá --apply para persistir)')
+    console.log('\n  (dry-run — nada escrito; usa --apply para persistir)')
   }
 
   process.exit(0)

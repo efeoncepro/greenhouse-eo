@@ -46,7 +46,7 @@ Greenhouse detecta tu regimen automaticamente (Chile dependiente, honorarios Chi
 | **Internacional** (USD) | Pais del banco · Banco · SWIFT/BIC · IBAN o numero de cuenta · Nombre legal del titular · Comentario opcional |
 | **Sin determinar** | (No hay formulario; CTA "Contactar finance" para que completen tu identidad primero) |
 
-El nombre del titular y el documento legal se pre-rellenan desde tus Datos legales (TASK-784) si los completaste antes. Si no, podes editarlo ahi mismo.
+El nombre del titular y el documento legal se pre-rellenan desde tus Datos legales (TASK-784) si los completaste antes. Si no, puedes editarlo ahi mismo.
 
 ## Estados de tu cuenta
 
@@ -88,7 +88,7 @@ El sistema garantiza que si tanto el drenaje inline como el cron procesan el mis
 ## Reglas duras
 
 1. **Nunca puedes aprobar tu propio cambio.** El endpoint de aprobacion (admin) tiene un guard: `actorUserId !== profile.createdBy`. Un trigger en la base de datos lo enforce a nivel DB tambien.
-2. **Las solicitudes propias solo las podes cancelar VOS** (no otro colaborador).
+2. **Las solicitudes propias solo las puedes cancelar TÚ** (no otro colaborador).
 3. **Solo se cancelan solicitudes en estado pending o draft.** Una cuenta activa la cambia o desactiva finance, no el colaborador.
 4. **Los datos sensibles** (numero completo de cuenta, RUT) se enmascaran en lectura. Solo finance con capability `finance.payment_profiles.reveal_sensitive` puede ver el dato completo (con auditoria + razon obligatoria).
 5. **Tu RUT debe coincidir con tu identidad legal** (TASK-784). Si difiere, finance lo va a marcar como discrepancia y no aprobara hasta resolverlo.

@@ -50,7 +50,7 @@ const main = async () => {
 
   if (accounts.length === 0) {
     console.log('⚠️  Impersonación OK (token minteado), pero el SA NO ve ninguna cuenta GA4.')
-    console.log(`    → Agregá ${TARGET_SERVICE_ACCOUNT} en GA4 (Admin → Account/Property Access Management, rol Viewer).`)
+    console.log(`    → Agrega ${TARGET_SERVICE_ACCOUNT} en GA4 (Admin → Account/Property Access Management, rol Viewer).`)
 
     return
   }
@@ -69,13 +69,13 @@ const main = async () => {
     }
   }
 
-  console.log('\n👉 Copiá el propertyId de la propiedad de efeoncepro.com para verificar eventos vía Data API.')
+  console.log('\n👉 Copia el propertyId de la propiedad de efeoncepro.com para verificar eventos vía Data API.')
 }
 
 main().catch((err: unknown) => {
   if (err instanceof Ga4ApiError && err.status === 403) {
     console.error('❌ 403 PERMISSION_DENIED — el SA no tiene acceso a la propiedad GA4.')
-    console.error(`   → Agregá ${TARGET_SERVICE_ACCOUNT} en GA4 (Admin → Property Access Management) con rol Viewer.`)
+    console.error(`   → Agrega ${TARGET_SERVICE_ACCOUNT} en GA4 (Admin → Property Access Management) con rol Viewer.`)
     process.exit(1)
   }
 

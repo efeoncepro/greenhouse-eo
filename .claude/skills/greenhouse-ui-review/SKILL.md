@@ -8,15 +8,15 @@ type: gate
 
 ## Recipe: capture-driven review (V1.1 — desde 2026-05-12)
 
-Para auditar surfaces vivas (no solo código local), usá el helper canónico de captura + el dossier auto-generado:
+Para auditar surfaces vivas (no solo código local), usa el helper canónico de captura + el dossier auto-generado:
 
 ```bash
 # 1. Genera captura + dossier markdown
 pnpm fe:capture:review <scenario-name> --env=staging
 
 # 2. El comando arma .captures/<run>/review-dossier.md con los frames + prompt estructurado
-# 3. Abrí Claude Code con este skill cargado, adjuntá los frames, y pegá el dossier como prompt
-# 4. Aplicá la 13-row checklist contra cada frame relevante
+# 3. Abre Claude Code con este skill cargado, adjunta los frames, y pega el dossier como prompt
+# 4. Aplica la 13-row checklist contra cada frame relevante
 ```
 
 V1.2 (futuro): el comando invocará Anthropic SDK directamente con el dossier + frames adjuntos → reporte auto en stdout. Por ahora es scaffolding manual.
@@ -212,7 +212,7 @@ Al implementar cualquier diseño (especialmente desde Figma), **Figma es intenci
 
 GVC (`pnpm fe:capture`) ya no es solo evidencia: es **contrato verificable** del paso mockup aprobado → runtime. Todos los gates son **opt-in por scenario + warning-first** (`error` solo si el scenario lo declara). Codes SSOT: `scripts/frontend/lib/failure-taxonomy.ts`.
 
-- **Baseline visual diff**: el scenario declara `baseline.surfaceId` + `maxDiffRatio` (+ `maskSelectors` para datos dinámicos + `requiredFrameLabels`/`requiredRegions`). Promové el mockup aprobado con `pnpm fe:capture:diff --promote <capture-dir>` → home durable committeable `scripts/frontend/baselines/<surfaceId>/`. El runtime con el mismo `surfaceId` corre el diff solo: `match` / `exceeded` (con PNG diff) / `baseline_stale` (degrada honesto si falta el baseline). GVC aplica determinismo (animaciones off, caret oculto, reduced-motion, fonts settled) automáticamente cuando hay `baseline.surfaceId`.
+- **Baseline visual diff**: el scenario declara `baseline.surfaceId` + `maxDiffRatio` (+ `maskSelectors` para datos dinámicos + `requiredFrameLabels`/`requiredRegions`). Promueve el mockup aprobado con `pnpm fe:capture:diff --promote <capture-dir>` → home durable committeable `scripts/frontend/baselines/<surfaceId>/`. El runtime con el mismo `surfaceId` corre el diff solo: `match` / `exceeded` (con PNG diff) / `baseline_stale` (degrada honesto si falta el baseline). GVC aplica determinismo (animaciones off, caret oculto, reduced-motion, fonts settled) automáticamente cuando hay `baseline.surfaceId`.
 - **`quality.layout`** (overflow / target <24px / texto cortado / scroll sin label / cards anidadas), **`quality.runtime`** (console.error / pageerror / hydration / 4xx-5xx), **`quality.keyboard`** (foco esperado + focus ring + estado + reduced-motion), **`quality.performance`** (DOM nodes / requests / transfer / FCP), **`quality.enterpriseRubric`** (placeholders / exceso de —·0 / >1 botón primario por header / saturación cromática).
 - `trace.zip` se guarda automático en cada captura fallida (`pnpm exec playwright show-trace <dir>/trace.zip`). El `index.html` y el `review-dossier.md` traen un **resumen ejecutivo**: `Apto para implementar` / `Revisar` / `Requiere iteración` + verdict del rubric.
 - Regresión: scenarios `gvc-contract-gates` + `gvc-keyboard-focus`. Detalle: `docs/architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md` Delta V1.5; workflow de adopción en `scripts/frontend/scenarios/_README.md`.

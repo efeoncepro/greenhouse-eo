@@ -73,7 +73,7 @@ export const PRESERVED_FORM_VERSION_COLUMNS = [
 
 /**
  * Mapea la versión publicada vigente a los campos preservables de `authorDraftForm`. Spread esto
- * PRIMERO y agregá tus overrides después (fieldSchema, copyRefs modificado, uiPolicy con captcha…).
+ * PRIMERO y agrega tus overrides después (fieldSchema, copyRefs modificado, uiPolicy con captcha…).
  */
 export const preserveFormVersionFields = (
   current: PreservableFormVersionRow,

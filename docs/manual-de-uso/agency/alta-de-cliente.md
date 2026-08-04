@@ -60,13 +60,13 @@ En la ficha del cliente (Account 360) veras el timeline del caso con su checklis
 Cuando un deal de HubSpot pasa a cerrado-ganado, Greenhouse abre un caso de onboarding en **borrador** automaticamente. Para verlo no necesitas tipear ninguna URL:
 
 1. Anda a **Agencia → Operaciones → "Alta de cliente"** (el cockpit de onboarding).
-2. Vas a ver el inbox de los casos en vuelo. Los **borradores** (los que nacieron de un deal y esperan activacion) estan destacados. Podes filtrar por estado u origen, o buscar por cliente / codigo / deal.
+2. Vas a ver el inbox de los casos en vuelo. Los **borradores** (los que nacieron de un deal y esperan activacion) estan destacados. Puedes filtrar por estado u origen, o buscar por cliente / codigo / deal.
 3. Selecciona el caso: al centro ves su checklist real y a la derecha la siguiente accion.
 4. Presiona **"Abrir timeline"** para ir a la ficha del caso. Si esta en borrador, **"Activar caso"** te lleva al mismo lugar, donde lo activas (`borrador → en curso`) y empezas a completar el checklist.
 
-Tambien podes llegar al onboarding de una organizacion desde donde ya estabas: la **lista de Organizaciones** muestra una columna "Onboarding" y la **ficha del cliente** muestra un banner "Onboarding en curso · Abrir timeline" cuando hay un caso activo.
+Tambien puedes llegar al onboarding de una organizacion desde donde ya estabas: la **lista de Organizaciones** muestra una columna "Onboarding" y la **ficha del cliente** muestra un banner "Onboarding en curso · Abrir timeline" cuando hay un caso activo.
 
-> El cockpit **no reemplaza el wizard**: para dar de alta un cliente nuevo segui usando "Nuevo cliente" (que va al wizard). El cockpit solo hace visibles y activables los casos que ya estan en vuelo.
+> El cockpit **no reemplaza el wizard**: para dar de alta un cliente nuevo sigue usando "Nuevo cliente" (que va al wizard). El cockpit solo hace visibles y activables los casos que ya estan en vuelo.
 
 ### Como vincular el teamspace de Notion
 
@@ -97,8 +97,8 @@ En la ficha del cliente, abre el item **"Accesos del portal"** (`provision_clien
 | Aviso "Notion quedo pendiente" (pantalla de exito) | El cliente se creo, pero Notion no se pudo vincular | Resuelvelo desde el item de Notion en el checklist |
 | Banner "Onboarding en curso — N de 10 completados" | El caso esta abierto con tareas pendientes | Sigue completando el checklist |
 | "Con acceso" (verde) en una persona | Ya tiene usuario de portal con rol | No hace falta re-invitar |
-| Chip "Detectado" (verde) bajo un paso pendiente | El sistema ve que la pieza ya esta lista | Podes marcar el paso (o se marca solo si el auto-completado esta activo) |
-| Chip "No verificable" (ambar) bajo un paso | No se pudo verificar ahora (fuente caida) | Volve a presionar "Verificar evidencia" en unos segundos |
+| Chip "Detectado" (verde) bajo un paso pendiente | El sistema ve que la pieza ya esta lista | Puedes marcar el paso (o se marca solo si el auto-completado esta activo) |
+| Chip "No verificable" (ambar) bajo un paso | No se pudo verificar ahora (fuente caida) | Vuelve a presionar "Verificar evidencia" en unos segundos |
 
 ## Que no hacer
 
@@ -134,10 +134,10 @@ En la ficha del cliente, el panel del checklist tiene un boton **"Verificar evid
 - **Sin detectar** (gris) — todavia no esta hecho.
 - **No verificable** (ambar) — no se pudo verificar ahora (la fuente esta caida). No es un "pendiente" falso; vuelve a intentar.
 
-La evidencia aparece **solo en los pasos que aun no marcaste**. Si ves **"Detectado"** junto a un paso que sigue pendiente, es justo lo que buscas: la pieza ya esta lista, podes marcarla.
+La evidencia aparece **solo en los pasos que aun no marcaste**. Si ves **"Detectado"** junto a un paso que sigue pendiente, es justo lo que buscas: la pieza ya esta lista, puedes marcarla.
 
 - **Auto-completado:** si tu entorno tiene el auto-completado activo, los pasos detectados que no necesitan un documento adjunto se marcan solos. **Nunca** se marca algo sin detectar, **nunca** se pisa lo que ya marcaste a mano, y los pasos que piden un documento (como provisionar Notion) muestran la evidencia pero los completas tú.
-- **Que NO hacer:** suponer que "Sin detectar" es un error. Significa que la pieza todavia no esta — hazla y volve a verificar.
+- **Que NO hacer:** suponer que "Sin detectar" es un error. Significa que la pieza todavia no esta — hazla y vuelve a verificar.
 
 ## Referencias tecnicas
 

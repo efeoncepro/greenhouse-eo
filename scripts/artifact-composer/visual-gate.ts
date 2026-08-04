@@ -389,7 +389,7 @@ const freeze = async (): Promise<number> => {
       console.error(
         '✗ Rebaseline NO declarado. Estos frames cambian y no aparecen en BASELINE_DELTAS.md:\n' +
           undeclared.map(frame => `  - ${frame}`).join('\n') +
-          '\n\nDeclará cada lámina (qué cambió, por qué, quién lo aprobó) y volvé a correr --freeze.\n'
+          '\n\nDeclará cada lámina (qué cambió, por qué, quién lo aprobó) y vuelve a correr --freeze.\n'
       )
 
       return 1
@@ -452,7 +452,7 @@ const gate = async (): Promise<number> => {
 
   if (!manifest) {
     console.error(
-      '✗ No existe baseline congelado. Corré primero:\n' +
+      '✗ No existe baseline congelado. Corre primero:\n' +
         '    pnpm composer:visual-gate --selftest   (probar determinismo)\n' +
         '    pnpm composer:visual-gate --freeze     (congelar el baseline)\n'
     )
@@ -525,7 +525,7 @@ const gate = async (): Promise<number> => {
   if (!clean) {
     console.error(
       '\n✗ REGRESIÓN VISUAL: el render actual difiere del baseline congelado.\n' +
-        '  Si el cambio es intencional: declaralo lámina por lámina en BASELINE_DELTAS.md y corré --freeze.\n' +
+        '  Si el cambio es intencional: declaralo lámina por lámina en BASELINE_DELTAS.md y corre --freeze.\n' +
         '  Si no lo es: acabás de atrapar la regresión que este gate existe para atrapar.\n'
     )
 

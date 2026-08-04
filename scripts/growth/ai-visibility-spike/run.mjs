@@ -202,7 +202,7 @@ async function main() {
 
   if (enabled.length === 0) {
     console.log(`\n[spike] DRY-RUN — no hay keys de provider en env (${Object.values(PROVIDERS).map(c => c.env).join(' / ')}).`)
-    console.log('[spike] Para correr real: agregá al menos una key a .env.local y reejecutá.')
+    console.log('[spike] Para correr real: agrega al menos una key a .env.local y reejecutá.')
     console.log('[spike] Ejemplos de runs:')
     for (const r of runs.slice(0, 4)) console.log(`   - ${r.promptId}${r.brandId ? ` · ${r.brandId}` : ''}: ${r.text}`)
     console.log('[spike] Exit 0 (skip limpio).')

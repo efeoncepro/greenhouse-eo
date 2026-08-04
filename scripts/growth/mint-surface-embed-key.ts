@@ -6,7 +6,7 @@
  * El secreto se muestra UNA sola vez: guardalo server-side en el plugin WordPress
  * (NUNCA en el browser ni en el repo). Rotarlo invalida el anterior de inmediato.
  *
- * Requiere conexión a Postgres (corré `pnpm pg:connect` antes, o tené el proxy/ADC listos).
+ * Requiere conexión a Postgres (corre `pnpm pg:connect` antes, o ten el proxy/ADC listos).
  *
  * Uso:
  *   pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/mint-surface-embed-key.ts --list
@@ -91,7 +91,7 @@ const main = async () => {
   console.log(`  surfaceId   = ${surfaceId}`)
   console.log(`  embedKeyId  = ${result.embedKeyId}`)
   console.log(`  SECRET      = ${result.secret}`)
-  console.log('\n⚠️  Guardá el SECRET server-side en el plugin WordPress. NO vuelve a mostrarse.\n')
+  console.log('\n⚠️  Guarda el SECRET server-side en el plugin WordPress. NO vuelve a mostrarse.\n')
 }
 
 main()

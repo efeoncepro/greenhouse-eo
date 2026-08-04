@@ -203,7 +203,7 @@ logo** — resalta como la única celda oscura entre las claras, más limpio que
 el destaque es **DATO del plan, nunca un literal en el CSS** (es el acoplamiento al primer cliente que
 mata el test del segundo consumidor de `arch-architect`).
 
-**⚠️ Los 3 gotchas de SVG de logos** — queman horas si no los conocés, los tres vistos en vivo:
+**⚠️ Los 3 gotchas de SVG de logos** — queman horas si no los conoces, los tres vistos en vivo:
 
 1. **Máscara de luminancia vacía = logo invisible.** Un export con `<mask style="mask-type:luminance">`
    SIN contenido enmascara **todo** el grupo a negro → el logo entero desaparece. Fix: quitar la

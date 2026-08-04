@@ -210,7 +210,7 @@ En el inspector (columna derecha, al seleccionar un engagement) ahora tienes:
 
 ### Ver el detalle completo
 
-"Ver detalle completo" abre un panel con todos los terminos: economicos (modelo de pago, tarifa, cadencia, monedas, bono), tributario (responsable, tasa de retencion, invoice/aprobacion), proveedor (contrato/worker/FX), fechas, maquina de estados y los factores de clasificacion. Desde ahi podes "Editar terminos".
+"Ver detalle completo" abre un panel con todos los terminos: economicos (modelo de pago, tarifa, cadencia, monedas, bono), tributario (responsable, tasa de retencion, invoice/aprobacion), proveedor (contrato/worker/FX), fechas, maquina de estados y los factores de clasificacion. Desde ahi puedes "Editar terminos".
 
 ### Mover el ciclo de vida
 

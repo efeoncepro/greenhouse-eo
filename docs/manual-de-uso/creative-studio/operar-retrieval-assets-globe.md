@@ -77,10 +77,10 @@ referencias son durables).
 
 6. **Prender**: `producer_assets_enabled = true` en `variables.tf` — **en git**, no en un
    `terraform.tfvars` gitignoreado. Un flag cuyo estado real vive en un archivo sin trackear es el
-   mismo problema de estado efímero que moverlo con `gcloud`, mejor disfrazado. Comprobalo planeando
+   mismo problema de estado efímero que moverlo con `gcloud`, mejor disfrazado. Compruébalo planeando
    sin `terraform.tfvars`: debe dar `No changes`.
 
-7. **Canario** (abajo). Requiere impersonar la caller SA; si es un grant temporal, revocalo al
+7. **Canario** (abajo). Requiere impersonar la caller SA; si es un grant temporal, revócalo al
    terminar y verifica el corte.
 
 ## Verificación (canary)

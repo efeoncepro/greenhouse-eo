@@ -343,7 +343,7 @@ Los cuatro renumerados se verificaron **byte-idénticos** (`shasum -a 256`) cont
 > solo conserva el `manifest-digest` — es decir, **la promoción destruye la declaración que ella misma
 > exigió**, que es exactamente el "rebaseline silencioso" que este archivo existe para impedir. Esta
 > sección se restauró a mano después del `--freeze` (el digest sella el *manifest*, no la prosa, así
-> que reponerla es seguro). **Hasta que se arregle: después de todo `--freeze`, verificá que tu
+> que reponerla es seguro). **Hasta que se arregle: después de todo `--freeze`, verifica que tu
 > declaración siga acá.**
 
 **Follow-up abierto:** falta una plantilla de *artifact showcase* (captura a sangre + copy). La

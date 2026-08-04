@@ -1043,7 +1043,7 @@ advisory es **reentrante**, así que componen. Backward compatible: sin inyecci�
 como antes.
 
 El seam del dominio es **`atomically`**: `confirm` arma su mutación como función de los ports y pide
-"corré esto atómicamente". Opcional a propósito — sin él degrada a secuencial resumible, y los tests
+"corre esto atómicamente". Opcional a propósito — sin él degrada a secuencial resumible, y los tests
 con dobles no simulan transacciones.
 
 **Separación que hubo que rehacer a mitad de camino:** la primera versión duplicaba el adapter de

@@ -5,7 +5,7 @@ description: Consultar la guidance oficial de Chrome (GoogleChrome/modern-web-gu
 
 # Modern Web Guidance (Chrome) — consulta canónica
 
-CLI oficial de Chrome que inyecta patrones de plataforma web **verificados por expertos** vía retrieval semántico **offline** (TensorFlow.js — sin red, sin API keys, sin telemetría si la apagás). Benchmark interno de Google: +37 pts de adherencia a best-practices web cuando un agente la consume. **Es conocimiento de referencia, NO un runtime del producto.**
+CLI oficial de Chrome que inyecta patrones de plataforma web **verificados por expertos** vía retrieval semántico **offline** (TensorFlow.js — sin red, sin API keys, sin telemetría si la apagas). Benchmark interno de Google: +37 pts de adherencia a best-practices web cuando un agente la consume. **Es conocimiento de referencia, NO un runtime del producto.**
 
 ## Cuándo consultarla
 

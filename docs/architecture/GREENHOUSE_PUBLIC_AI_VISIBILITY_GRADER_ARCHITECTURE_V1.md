@@ -1628,7 +1628,7 @@ Operador (Growth/AM)      → requestGraderRunAsOperator    → ilimitado, costo
 - **NUNCA** confirmar una entidad solo por nombre de marca: desambiguar por dominio (KG `result.url`, Wikidata sitio oficial P856, Reddit `domainLinkedMentions`) y flaggear el riesgo de homónimo en la evidencia/razón cuando no hay confirmación por dominio.
 - **NUNCA** hardcodear la KG api key: resolverla server-side con `resolveSecret({GOOGLE_KNOWLEDGE_GRAPH_API_KEY})` en el command; el probe la recibe vía `ctx.entity.knowledgeGraphApiKey` (null → degrada `not_configured`).
 - **NUNCA** loggear/exponer la api key ni contenido crudo de terceros más allá de conteos/tipos/snippets acotados public-safe; sin PII del lead (solo marca/dominio).
-- **SIEMPRE** que agregues una fuente de entidad nueva: nuevo `ProbeKind` + dimensión en `readiness-config.ts` (peso que mantenga la suma del eje `entity` en 100), registrala en `probes/entity/index.ts`, y añadí su host a `ENTITY_API_ALLOWED_HOSTS` si consulta una API nueva.
+- **SIEMPRE** que agregues una fuente de entidad nueva: nuevo `ProbeKind` + dimensión en `readiness-config.ts` (peso que mantenga la suma del eje `entity` en 100), regístrala en `probes/entity/index.ts`, y añade su host a `ENTITY_API_ALLOWED_HOSTS` si consulta una API nueva.
 
 ## Delta 2026-06-29 — TASK-1271 Prose Extraction Router (cost-efficient, evidencia-first) · EPIC-020
 

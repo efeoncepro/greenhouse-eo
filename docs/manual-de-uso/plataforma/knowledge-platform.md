@@ -119,7 +119,7 @@ El reporte muestra por documento: `PUBLISHED` (n chunks · v#), `SKIPPED_UNCHANG
 
 - **Idempotente:** re-correr `--apply` no duplica. Solo publica una versión nueva si el checksum del contenido cambió.
 - **Embeddings reactivos:** desde TASK-1155, cada versión publicada dispara el embedding de sus chunks después del commit. El comando de ingesta no debería dejar chunks nuevos pendientes; valídalo con `scripts/knowledge/embed-corpus.ts` en dry-run.
-- **Cuarentena:** un documento flagged NO se chunkea ni se vuelve recuperable; queda `quarantined` con la razón en el run. Remedia la fuente (saca el secreto) y re-ingerí.
+- **Cuarentena:** un documento flagged NO se chunkea ni se vuelve recuperable; queda `quarantined` con la razón en el run. Remedia la fuente (saca el secreto) y re-ingiere.
 - **Solo el source piloto:** `knowledge_sources.sync_enabled` está en `FALSE` por default; producción se mantiene deshabilitada hasta aprobación humana.
 - **No** ingerir contenido con secretos/tokens reales — el sanitizer los pone en cuarentena, pero el principio es no meterlos.
 

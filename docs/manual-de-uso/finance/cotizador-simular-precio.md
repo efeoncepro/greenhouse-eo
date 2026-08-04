@@ -18,7 +18,7 @@ Permite obtener un **estimado de precio** de un servicio del catálogo preguntan
 
 ### Desde Nexa (asistente)
 
-Preguntale directo: *"¿Cuánto cuesta un servicio de diseño digital?"* (opcionalmente "…en CLP").
+Pregúntale directo: *"¿Cuánto cuesta un servicio de diseño digital?"* (opcionalmente "…en CLP").
 
 - Si hay un solo servicio que coincide → responde el estimado + moneda.
 - Si hay varios → te pregunta a cuál te refieres (eliges y repreguntas).

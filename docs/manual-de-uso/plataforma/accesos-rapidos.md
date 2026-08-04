@@ -9,7 +9,7 @@
 
 ## Para que sirve
 
-Llegar en un click a las pantallas que mas usas, sin pasar por el menu lateral. Si haces nomina todos los meses, podes pinear "Permisos" y "Por pagar" y tenerlos siempre arriba a mano. Si entras a un modulo distinto cada semana, los recomendados ya te los pone Greenhouse segun tu rol.
+Llegar en un click a las pantallas que mas usas, sin pasar por el menu lateral. Si haces nomina todos los meses, puedes pinear "Permisos" y "Por pagar" y tenerlos siempre arriba a mano. Si entras a un modulo distinto cada semana, los recomendados ya te los pone Greenhouse segun tu rol.
 
 ---
 
@@ -32,7 +32,7 @@ Llegar en un click a las pantallas que mas usas, sin pasar por el menu lateral. 
 ### Agregar un acceso
 
 1. Con el panel abierto, click en el `+` arriba a la derecha del popover.
-2. Aparece la lista de "Disponibles" — todos los accesos que podes pinear.
+2. Aparece la lista de "Disponibles" — todos los accesos que puedes pinear.
 3. Click en el que quieres. El acceso se agrega a tus pineados y vuelves a la vista principal.
 
 ### Quitar un acceso
@@ -58,7 +58,7 @@ Hoy se reordenan en el orden en que los pineaste. Para cambiar el orden:
 |---------|----------------|
 | Spinner + "Cargando accesos..." | Greenhouse esta consultando tus permisos al servidor. Espera 1-2 segundos. |
 | 4 atajos con tile gris debajo de cada uno | Recomendados — todavia no pineaste nada propio. |
-| Atajos con `×` al pasar el cursor | Pineados — esos son tus atajos guardados. Podes quitarlos. |
+| Atajos con `×` al pasar el cursor | Pineados — esos son tus atajos guardados. Puedes quitarlos. |
 | `+` deshabilitado | Ya pineaste todo lo que tu cuenta puede pinear. No hay mas accesos disponibles. |
 | "Agrega accesos con +" | Tu lista de pineados quedo vacia. El recomendado funciona como respaldo. |
 | "No pudimos cargar tus accesos" | El portal no pudo conectarse al backend. Click "Intentar de nuevo". |

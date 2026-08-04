@@ -3,7 +3,7 @@
 > Léxico técnico canónico de la categoría de visibilidad de marca en motores de
 > respuesta + SEO clásico. Sirve para diagnóstico, copy, FAQ, schema y para hablar
 > la categoría con precisión. El vocabulario de este espacio colisiona y muta
-> rápido; reverificá lo volátil (ver `SOURCES.md`). Sello: as-of 2026-07.
+> rápido; reverifica lo volátil (ver `SOURCES.md`). Sello: as-of 2026-07.
 > Cross-refs a módulos (`modules/*.md`) donde aplica.
 
 ## 1. Nombres de la categoría (las siglas que compiten)
@@ -34,7 +34,7 @@
   recuperadas (término del paper de 2024).
 - **SGE** — *Search Generative Experience*. Nombre **viejo** (2023–24) del experimento
   de Google; sustituido por "AI Overviews" + "AI Mode". Si alguien dice SGE, se refiere
-  a esto; usá la nomenclatura actual.
+  a esto; usa la nomenclatura actual.
 - **AI Overviews (AIO)** — la respuesta generada de Google **arriba** de los resultados
   orgánicos; la superficie GEO más grande por volumen. Impulsada por Gemini; usa
   Googlebot + índice de Google; cita un panel de fuentes. ~48–50% de queries (2026).

@@ -165,4 +165,4 @@ if (existsSync(TECHNICAL_OFFER_TEMPLATE)) {
 
 console.log(`✓ Workspace creado: docs/commercial/tenders/${slug}/`)
 console.log('  bases/  research/  anexos/  README.md  oferta-tecnica.md  artifact-manifest.json  proposal-studio.json')
-console.log('\nSiguiente: cargá el RFP en bases/, corré admisibilidad + bid/no-bid, y llená el ledger de evidencia.')
+console.log('\nSiguiente: cargá el RFP en bases/, corre admisibilidad + bid/no-bid, y llená el ledger de evidencia.')

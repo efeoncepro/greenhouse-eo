@@ -14,12 +14,12 @@ type: reference
 
 ---
 
-## Regla #1 — Observá ANTES de autorar (aria snapshot). No adivines selectores.
+## Regla #1 — Observa ANTES de autorar (aria snapshot). No adivines selectores.
 
 GVC (Capa 1, TASK-1097) escribe en **cada `mark`** un snapshot del **árbol de accesibilidad** de la región capturada:
 - `manifest.frames[].ariaSnapshotPath` → `frames/<NN>-<label>.aria.txt`
 
-Ese archivo es **lo que tenés que leer** en vez de mirar el PNG y adivinar. Ejemplo real (`/coming-soon`):
+Ese archivo es **lo que tienes que leer** en vez de mirar el PNG y adivinar. Ejemplo real (`/coming-soon`):
 
 ```
 - main:
@@ -30,29 +30,29 @@ Ese archivo es **lo que tenés que leer** en vez de mirar el PNG y adivinar. Eje
   - img "Efeonce"
 ```
 
-Con eso escribís `getByRole('button', { name: 'Notifícame' })` **contra lo que existe de verdad**, no `[class*="MuiButton"]:nth-child(3)` adivinado.
+Con eso escribes `getByRole('button', { name: 'Notifícame' })` **contra lo que existe de verdad**, no `[class*="MuiButton"]:nth-child(3)` adivinado.
 
 **Loop canónico de autoría:**
 1. **Throwaway capture primero** si nunca viste la ruta: `pnpm fe:capture --route=/finance/cash-out --env=staging --hold=2000`.
-2. **Leé el `.aria.txt`** del run (`.captures/<ISO>/01-desktop/frames/*.aria.txt`) → ahí están los roles + nombres reales.
-3. **Escribí el scenario** con `getByRole`/`getByText` + `readiness` (abajo).
-4. `pnpm fe:capture <scenario>` → leé el dossier (`fe:capture:review`) → iterá.
+2. **Lee el `.aria.txt`** del run (`.captures/<ISO>/01-desktop/frames/*.aria.txt`) → ahí están los roles + nombres reales.
+3. **Escribe el scenario** con `getByRole`/`getByText` + `readiness` (abajo).
+4. `pnpm fe:capture <scenario>` → lee el dossier (`fe:capture:review`) → itera.
 
 ---
 
 ## Locators — user-facing > CSS (Webwright + Playwright moderno)
 
-| Preferí | Evitá |
+| Prefiere | Evita |
 |---|---|
 | `getByRole('tab', { name: 'Conciliados' })` | `[role="tab"]:nth-child(2)` |
 | `getByRole('button', { name: 'Registrar pago' })` | `[class*="MuiButton-contained"]` |
 | `getByText('Sin resultados')` | `.empty-state > p` |
 | `[data-capture="timeline"]` (marker estable explícito) | offsets de scroll frágiles |
 
-- `nth-child`/clases MUI cambian con el render → frágiles. Roles + nombres accesibles son estables (y los leés del `.aria.txt`).
+- `nth-child`/clases MUI cambian con el render → frágiles. Roles + nombres accesibles son estables (y los lees del `.aria.txt`).
 - Para **regiones de captura**, los markers `data-capture="<seccion>"` son explícitos y estables — preferilos sobre offsets de scroll.
 
-En el DSL de GVC los `step.selector` aceptan cualquier locator CSS/role; usá selectores de rol (`[role="..."][aria-label="..."]`) o data-markers. Para ad-hoc Playwright, usá `page.getByRole(...)` directo.
+En el DSL de GVC los `step.selector` aceptan cualquier locator CSS/role; usa selectores de rol (`[role="..."][aria-label="..."]`) o data-markers. Para ad-hoc Playwright, usa `page.getByRole(...)` directo.
 
 ---
 
@@ -75,38 +75,38 @@ En el DSL de GVC los `step.selector` aceptan cualquier locator CSS/role; usá se
     { kind: 'noErrorBoundary', reason: 'la evidencia no debe ser un error de app' }
   ]
   ```
-- **Timeouts en capas** (modelo de Webwright — separá nav / operación / observación): navegación ~30s, espera de selector ~5-10s, observación ~5s. No uses un timeout único gigante: enmascara el fallo real.
+- **Timeouts en capas** (modelo de Webwright — separa nav / operación / observación): navegación ~30s, espera de selector ~5-10s, observación ~5s. No uses un timeout único gigante: enmascara el fallo real.
 
 ---
 
 ## Graceful degrade (Webwright) — una observación opcional NUNCA rompe la captura
 
-Webwright envuelve cada componente de observación (url/title/aria/screenshot) en su propio try/except. GVC ya lo hace (`failure-taxonomy.ts`, y el aria snapshot es best-effort). **Para ad-hoc Playwright: hacé lo mismo** — envolvé inspecciones opcionales en try/catch; nunca dejes que un `aria`/screenshot tumbe el flujo principal.
+Webwright envuelve cada componente de observación (url/title/aria/screenshot) en su propio try/except. GVC ya lo hace (`failure-taxonomy.ts`, y el aria snapshot es best-effort). **Para ad-hoc Playwright: haz lo mismo** — envuelve inspecciones opcionales en try/catch; nunca dejes que un `aria`/screenshot tumbe el flujo principal.
 
 ---
 
 ## Gotchas de GVC que repetidamente nos pegan
 
-- **`fullPage` + sidebar `position:fixed` → ilegible** (el sidebar se repite/encima). Para detalle, **scrolleá al selector y capturá con `clipSelector`** sobre un `data-capture`:
+- **`fullPage` + sidebar `position:fixed` → ilegible** (el sidebar se repite/encima). Para detalle, **scrollea al selector y captura con `clipSelector`** sobre un `data-capture`:
   ```ts
   { kind: 'scroll', selector: '[data-capture="timeline"]', scrollBlock: 'center' },
   { kind: 'mark', label: 'timeline', clipSelector: '[data-capture="timeline"]' }
   ```
 - **Capturó skeleton/login en vez de contenido** → faltó `readiness.absentSelectors` (MuiSkeleton-root, login-card, data-loading).
-- **Turbopack `Compiling…`** → readiness DSL, no `networkidle`. Si `localhost` queda compilando, seguí la secuencia Turbopack canónica de CLAUDE.md antes de `pnpm clean`.
-- **Auth**: no re-fumbles el setup. GVC resuelve agent-auth en `scripts/frontend/lib/auth.ts`; para ad-hoc, `node scripts/playwright-auth-setup.mjs` genera `.auth/storageState.json` (personas: superadmin / collaborator / client — usá la de menor privilegio que represente el caso).
+- **Turbopack `Compiling…`** → readiness DSL, no `networkidle`. Si `localhost` queda compilando, sigue la secuencia Turbopack canónica de CLAUDE.md antes de `pnpm clean`.
+- **Auth**: no re-fumbles el setup. GVC resuelve agent-auth en `scripts/frontend/lib/auth.ts`; para ad-hoc, `node scripts/playwright-auth-setup.mjs` genera `.auth/storageState.json` (personas: superadmin / collaborator / client — usa la de menor privilegio que represente el caso).
 - **Staging tras SSO**: `pnpm fe:capture ... --env=staging` ya inyecta el bypass; ad-hoc curl/Playwright a `.vercel.app` requiere header `x-vercel-protection-bypass`.
 - **Steps mutating** (`fill`/`press`/`click` que dispara Server Action): requieren `mutating: true` + `safeForCapture: true`. **⚠️ Crean entidades reales en staging.** Read-only por default.
-- **Labels de `mark`**: `kebab-case`, únicos por scenario (la validación rompe build si duplicás), empezar con `initial-*`.
+- **Labels de `mark`**: `kebab-case`, únicos por scenario (la validación rompe build si duplicas), empezar con `initial-*`.
 
 ---
 
 ## Cuándo caer a ad-hoc Playwright (y cómo)
 
-El DSL de GVC cubre captura/scroll/interacción/baseline. Caé a Playwright ad-hoc **solo** cuando necesitás console/network/API payloads o una interacción que el DSL no soporta. Reglas:
-- Guardá artifacts bajo `.captures/` y **documentá por qué no bastó GVC**.
+El DSL de GVC cubre captura/scroll/interacción/baseline. Cae a Playwright ad-hoc **solo** cuando necesitas console/network/API payloads o una interacción que el DSL no soporta. Reglas:
+- Guarda artifacts bajo `.captures/` y **documenta por qué no bastó GVC**.
 - Si el flujo es repetible, **promovelo a scenario** (`scripts/frontend/scenarios/`) — el artefacto durable es el DSL determinístico, no un `.mjs` huérfano.
-- Reusá `lib/auth.ts` + `lib/browser.ts` (auth + lifecycle ya resueltos); no reinventes el setup.
+- Reúsa `lib/auth.ts` + `lib/browser.ts` (auth + lifecycle ya resueltos); no reinventes el setup.
 
 ## Public WordPress / Elementor landing mode
 
@@ -114,9 +114,9 @@ Cuando el target es `efeoncepro.com` u otra landing pública WordPress/Elementor
 
 Reglas:
 
-- **Observá antes de tocar:** primero inspeccioná DOM/render real con Playwright (`domcontentloaded`, no `networkidle` como única verdad), roles/texto/selector estable, screenshots y computed styles. No hagas cambios Elementor basados solo en memoria o en un PNG del operador.
+- **Observa antes de tocar:** primero inspecciona DOM/render real con Playwright (`domcontentloaded`, no `networkidle` como única verdad), roles/texto/selector estable, screenshots y computed styles. No hagas cambios Elementor basados solo en memoria o en un PNG del operador.
 - **Computed style es el contrato:** para typography/layout bugs, lee `getComputedStyle()` en desktop y mobile 390. La cascada Ohio/Elementor puede hacer que el CSS correcto exista en el HTML pero no gane en runtime.
-- **Promové probes repetibles a comando durable:** si un bug puede volver, no lo dejes como `tmp/*.mjs`; crea un script repo-level o scenario que falle. Ejemplo vigente: `pnpm public-website:verify-aeo-form-typography`.
+- **Promueve probes repetibles a comando durable:** si un bug puede volver, no lo dejes como `tmp/*.mjs`; crea un script repo-level o scenario que falle. Ejemplo vigente: `pnpm public-website:verify-aeo-form-typography`.
 - **Webwright cuando aporte:** si la landing requiere exploración multi-step, estados interactivos, o una auditoría de varias secciones, puedes arrancar con `@webwright`/skill Webwright para producir un script y screenshots de observación. Luego cristaliza el contrato en GVC, Playwright repo-level o un comando `public-website:*` antes de cerrar.
 - **No adoptes code-as-action de Webwright:** el agente no debe ejecutar código libre como superficie runtime de producto. Se importan las técnicas de observación, locators, layered timeouts y graceful degrade; las mutaciones siguen por el carril gobernado (`Document::save()`, backups, cache purge, Playwright verification).
 - **Scope público:** para landings WordPress, captura evidencia desktop + mobile 390, overflow (`scrollWidth - clientWidth`), y los estados relevantes (forms, accordions, reduced-motion) antes de cerrar.
@@ -129,22 +129,22 @@ Webwright **ejecuta Python que el modelo escribe libremente** contra el browser.
 
 **Explore mode (TASK-1098, ya shipped):** el loop de Regla #1 ahora tiene comandos dedicados:
 - `pnpm fe:capture:explore --route=/x --env=staging [--ready=<sel>] [--probe='role=button[name="X"]']` — observa la página viva (read-only) y persiste `.captures/_explore/<slug>/{session.json,aria.txt,snapshot.png}`: candidatos con `getByRole(...)` sugerido + **uniqueness validada** (¿resuelve a 1 nodo?) + markers `data-capture`/`data-gvc-ready` + probes. Es el `spawn→inspect→discard` de Webwright aplicado a la autoría.
-- `pnpm fe:capture:promote --route=/x --name=<scenario> [--mark='<sel>']` — cristaliza la sesión en un `.scenario.ts` válido (readiness auto desde marker/heading único + marks). Revisás y `pnpm fe:capture <scenario>`.
+- `pnpm fe:capture:promote --route=/x --name=<scenario> [--mark='<sel>']` — cristaliza la sesión en un `.scenario.ts` válido (readiness auto desde marker/heading único + marks). Revisas y `pnpm fe:capture <scenario>`.
 
-⚠️ **Readiness auto puede ser flaky:** si la ruta no tiene markers `data-gvc-ready`/`data-capture`, promote ancla la readiness a un heading único — y si ese heading tiene copy dinámico (rota/cambia), la readiness falla al capturar. **Revisá la readiness del scenario generado** y preferí un marker estable.
+⚠️ **Readiness auto puede ser flaky:** si la ruta no tiene markers `data-gvc-ready`/`data-capture`, promote ancla la readiness a un heading único — y si ese heading tiene copy dinámico (rota/cambia), la readiness falla al capturar. **Revisa la readiness del scenario generado** y prefiere un marker estable.
 
 **Coreografía / microinteracciones (TASK-1099):** explore/promote SÍ cubren motion:
 - `pnpm fe:capture:explore --route=/x --interaction 'hover:<selector>'` (repetible; `hover`|`focus`|`click` — read-only, NUNCA fill/press) — performa la acción y **mide los timings reales** del feedback por pixel-diff (TASK-1100): muestrea el clip del target y deriva `feedback`/`settled` (cualquier motion: CSS/framer-motion/GSAP). `--interaction-window=<ms>` (default 1000) para animaciones largas. Si no hay cambio visible → reporta honesto (`measuredTimings:false`).
-- `promote` auto-emite un step **`interaction` (V2)** por cada interacción observada con los `atMs` **medidos** (frames + keyboardEquivalent + `reducedMotion: 'capture'`); ajustás `intent`.
-- También podés autorar el step `interaction` a mano o usar `pnpm fe:capture:micro`.
+- `promote` auto-emite un step **`interaction` (V2)** por cada interacción observada con los `atMs` **medidos** (frames + keyboardEquivalent + `reducedMotion: 'capture'`); ajustas `intent`.
+- También puedes autorar el step `interaction` a mano o usar `pnpm fe:capture:micro`.
 
 ---
 
 ## Comandos canónicos
 
 ```bash
-pnpm fe:capture:explore --route=/x --env=staging   # observá la página viva ANTES de autorar (TASK-1098)
-pnpm fe:capture:explore --route=/x --interaction 'hover:[role="tab"]'   # observá una microinteracción (TASK-1099)
+pnpm fe:capture:explore --route=/x --env=staging   # observa la página viva ANTES de autorar (TASK-1098)
+pnpm fe:capture:explore --route=/x --interaction 'hover:[role="tab"]'   # observa una microinteracción (TASK-1099)
 pnpm fe:capture:promote --route=/x --name=<scenario>  # cristaliza la sesión en un .scenario.ts válido (+ interaction steps)
 pnpm fe:capture <scenario> --env=staging        # captura (lee el .aria.txt del run)
 pnpm fe:capture --route=/x --env=staging --hold=2000   # throwaway para observar antes de autorar

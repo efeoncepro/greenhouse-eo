@@ -56,7 +56,7 @@ Avoid:
 - "Hacemos brand + performance + content" (feature dump)
 
 Use:
-> "Efeonce opera con un modelo distinto al que probablemente conocés: en lugar de agency tradicional, operamos como Agency-as-a-Service. Concretamente: las capacidades de servicio están productizadas con scope, output y economía unitaria explícitos; el delivery corre sobre software propio que te da telemetría operativa real, no Excel + buena fe; y la economía es SaaS-grade — predecible y auditable. ¿Cuál es el dolor más concreto que tenés hoy con tus vendors actuales? Te voy a decir si nuestro modelo encaja con lo que necesitás."
+> "Efeonce opera con un modelo distinto al que probablemente conoces: en lugar de agency tradicional, operamos como Agency-as-a-Service. Concretamente: las capacidades de servicio están productizadas con scope, output y economía unitaria explícitos; el delivery corre sobre software propio que te da telemetría operativa real, no Excel + buena fe; y la economía es SaaS-grade — predecible y auditable. ¿Cuál es el dolor más concreto que tienes hoy con tus vendors actuales? Te voy a decir si nuestro modelo encaja con lo que necesitas."
 
 Notice:
 - Reframe categoría inmediato (Challenger teach)
@@ -66,13 +66,13 @@ Notice:
 
 ### Para Director-level (champion potential)
 
-> "Mi tesis es que el dolor más concreto que tienen los Directors hoy es: te están midiendo por outcomes, pero los vendors te dan deliverables. Y cuando el CMO pregunta '¿cómo va Sky/Codelco/Aguas?' no podés responder con confianza. ¿Cómo lo manejás hoy?"
+> "Mi tesis es que el dolor más concreto que tienen los Directors hoy es: te están midiendo por outcomes, pero los vendors te dan deliverables. Y cuando el CMO pregunta '¿cómo va Sky/Codelco/Aguas?' no puedes responder con confianza. ¿Cómo lo manejas hoy?"
 
 JTBD anchor: el dolor del Director es ser preguntado y no tener answer crisp.
 
 ### Para Procurement / Operations
 
-> "Nuestro modelo es distinto al agency tradicional. Operamos con productización + telemetría + auditable economics. Concretamente: scope canónico documentado, telemetría de delivery en software propio, economía unitaria transparente. Si querés, te muestro un ejemplo concreto de cómo se ve un MSA + SOWs Active Account our way vs. cómo lo manejaba el vendor anterior."
+> "Nuestro modelo es distinto al agency tradicional. Operamos con productización + telemetría + auditable economics. Concretamente: scope canónico documentado, telemetría de delivery en software propio, economía unitaria transparente. Si quieres, te muestro un ejemplo concreto de cómo se ve un MSA + SOWs Active Account our way vs. cómo lo manejaba el vendor anterior."
 
 Procurement anchor: explicit transparency + auditable + accountable.
 
@@ -80,7 +80,7 @@ Procurement anchor: explicit transparency + auditable + accountable.
 
 ## Cómo no pitch los 4 productos a la vez
 
-Anti-pattern: "Tenemos servicios + Kortex + Verk + Greenhouse. Mirá, te muestro el demo de los 4."
+Anti-pattern: "Tenemos servicios + Kortex + Verk + Greenhouse. Mira, te muestro el demo de los 4."
 
 Resultado: choice overload + confusion + nothing memorable.
 
@@ -115,11 +115,11 @@ Response: "Justa observation. La diferencia concreta es economía unitaria y tel
 
 ### "¿Pero cómo es distinto a una agencia con un dashboard?"
 
-Response: "Dashboard + transparency + economic accountability + product roadmap es distinto a 'tenemos un dashboard'. Por ejemplo: cuando un Active Account tiene un MSA + SOWs activos, podés ver en tiempo real qué miembros están allocated a tu cuenta con qué FTE %, qué outputs están producing, qué dolores ICO emergieron en último QBR. Eso no es 'dashboard'; es operational system de record con vos como stakeholder. Y la diferencia es que ese system es lo mismo que usamos internamente — no un dashboard cosmético."
+Response: "Dashboard + transparency + economic accountability + product roadmap es distinto a 'tenemos un dashboard'. Por ejemplo: cuando un Active Account tiene un MSA + SOWs activos, puedes ver en tiempo real qué miembros están allocated a tu cuenta con qué FTE %, qué outputs están producing, qué dolores ICO emergieron en último QBR. Eso no es 'dashboard'; es operational system de record contigo como stakeholder. Y la diferencia es que ese system es lo mismo que usamos internamente — no un dashboard cosmético."
 
 ### "¿Por qué no contratamos servicios + buy SaaS separately?"
 
-Response: "Podés. Es legítimo. Pero la fricción está en el handoff: agency con sus tools + SaaS con sus integrations + tu team in-house mediating. ASaaS Efeonce vende el integrated motion: las 4 piezas componen un único modelo operativo. Si contratás servicios separately, perdés el effect compound. Si querés validate con piloto: te ofrezco un Project con scope limitado donde experimentás el modelo antes de Active commitment."
+Response: "Puedes. Es legítimo. Pero la fricción está en el handoff: agency con sus tools + SaaS con sus integrations + tu team in-house mediating. ASaaS Efeonce vende el integrated motion: las 4 piezas componen un único modelo operativo. Si contratas servicios separately, pierdes el effect compound. Si quieres validate con piloto: te ofrezco un Project con scope limitado donde experimentas el modelo antes de Active commitment."
 
 ### "Procurement va a pedir cost breakdown"
 

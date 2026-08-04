@@ -148,7 +148,7 @@ export const serializeScenario = (scenario: CaptureScenario): string => {
   return `import type { CaptureScenario } from '../lib/scenario'
 
 // Generado por \`pnpm fe:capture:promote\` desde una sesión de explore (TASK-1098).
-// Revisá selectores/readiness/marks y ajustá antes de commitear. Preferí
+// Revisa selectores/readiness/marks y ajustá antes de commitear. Preferí
 // user-facing locators (getByRole/data-markers) sobre CSS frágil.
 export const scenario: CaptureScenario = ${body}
 `

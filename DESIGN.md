@@ -688,7 +688,7 @@ Regla cross-agente (Claude + Codex): cualquier ilustración de personaje bajo `c
 
 **AXIS es el logo del Design System de Efeonce — NO es marca de producto.** Identidad del sistema de diseño (tokens, paleta, componentes), distinta del logo **Greenhouse** (app/portal) y del logo **Efeonce** (institucional/PDFs).
 
-**Regla dura — scope cerrado:** el logo AXIS se usa **ÚNICAMENTE** en superficies del propio design system — referencias de paleta/tokens, documentación del DS, theme previews internos. **NUNCA** en UI de producto, dashboards, navegación, login, emails, PDFs, comprobantes, finiquitos, portal cliente, ni ningún contexto de cara al usuario u operador. Si dudás, NO uses AXIS: usá **Greenhouse** (app) o **Efeonce** (institucional).
+**Regla dura — scope cerrado:** el logo AXIS se usa **ÚNICAMENTE** en superficies del propio design system — referencias de paleta/tokens, documentación del DS, theme previews internos. **NUNCA** en UI de producto, dashboards, navegación, login, emails, PDFs, comprobantes, finiquitos, portal cliente, ni ningún contexto de cara al usuario u operador. Si dudas, NO uses AXIS: usa **Greenhouse** (app) o **Efeonce** (institucional).
 
 **Componente canónico:** `src/components/greenhouse/brand/AxisWordmark.tsx` (`variant`: `full` | `isotype` | `negative`). NUNCA pegar el `<svg>` inline ni referenciar el archivo a mano.
 

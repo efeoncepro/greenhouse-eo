@@ -17,7 +17,7 @@ legible), **NO uses video IA** (deforma texto/logos). Construye un **mockup HTML
 
 ## Pasos (encadenados)
 
-1. **Escribí el mockup** `aeo_ui.html`: layout answer-engine (o el producto), timeline JS
+1. **Escribe el mockup** `aeo_ui.html`: layout answer-engine (o el producto), timeline JS
    (`async/await` + `setTimeout`) para orquestar typing → cursor → burbujas → citas → ventana → boleto →
    end-card. Embebe el **logo real** (`<img src>` a un asset de `public/branding/*` copiado al lado).
 2. **Script de captura** `capture.mjs` (Playwright): `newContext({ recordVideo:{dir,size:{1280,720}},

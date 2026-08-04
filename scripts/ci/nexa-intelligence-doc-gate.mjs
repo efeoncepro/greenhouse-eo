@@ -199,7 +199,7 @@ const checkPromptGovernance = () => {
   const cur = parsePromptGovernance(readFileSync(join(REPO_ROOT, PROMPT_SRC), 'utf8'))
 
   if (!cur?.activeVersion) {
-    fail.push(`No pude parsear NEXA_PROMPT_GOVERNANCE en ${PROMPT_SRC} (activeVersion/changelog). Mantené la shape canónica (consts string + changelog).`)
+    fail.push(`No pude parsear NEXA_PROMPT_GOVERNANCE en ${PROMPT_SRC} (activeVersion/changelog). Mantén la shape canónica (consts string + changelog).`)
 
     return
   }
@@ -207,7 +207,7 @@ const checkPromptGovernance = () => {
   // (A) el changelog debe tener una entrada para la versión activa
   if (!cur.changelogVersions.includes(cur.activeVersion)) {
     fail.push(
-      `NEXA_PROMPT_GOVERNANCE.changelog no tiene una entrada para activeVersion "${cur.activeVersion}" — agregá la entrada (más reciente primero).`
+      `NEXA_PROMPT_GOVERNANCE.changelog no tiene una entrada para activeVersion "${cur.activeVersion}" — agrega la entrada (más reciente primero).`
     )
   }
 
@@ -222,7 +222,7 @@ const checkPromptGovernance = () => {
 
     if (!bumped && !grew) {
       fail.push(
-        `Cambió ${PROMPT_SRC} pero NO se bumpeó la versión (sigue "${cur.activeVersion}") ni creció el changelog de NEXA_PROMPT_GOVERNANCE. Elegí la clase de cambio + bumpeá versión + agregá la entrada de changelog (ver ${docsRoot}/system-prompt/versioning.md).`
+        `Cambió ${PROMPT_SRC} pero NO se bumpeó la versión (sigue "${cur.activeVersion}") ni creció el changelog de NEXA_PROMPT_GOVERNANCE. Elegí la clase de cambio + bumpeá versión + agrega la entrada de changelog (ver ${docsRoot}/system-prompt/versioning.md).`
       )
     }
   }
@@ -255,7 +255,7 @@ const runChanged = () => {
   // prompt governance: si cambió el system prompt, exigir bump de versión + entrada de changelog
   if (PROMPT_SRC && changed.has(PROMPT_SRC)) checkPromptGovernance()
 
-  if (changed.size === 0) warn.push('No detecté archivos cambiados (¿base inalcanzable?). Corré --audit para el chequeo estructural.')
+  if (changed.size === 0) warn.push('No detecté archivos cambiados (¿base inalcanzable?). Corre --audit para el chequeo estructural.')
 }
 
 // ── Run ──────────────────────────────────────────────────────────────────────

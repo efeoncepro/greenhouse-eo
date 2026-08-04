@@ -22,7 +22,7 @@ Es un **overlay de dominio**: compone con `greenhouse-product-ui-architect` (P+V
 
 ## La inteligencia (backend) — SSOT = Nexa Intelligence
 
-Toda la inteligencia está documentada por capas en **`docs/architecture/nexa-intelligence/`** (carpetas que crecen por dominio). **Es la fuente de verdad agent-facing del backend** — leé la capa que vas a tocar ANTES de codear:
+Toda la inteligencia está documentada por capas en **`docs/architecture/nexa-intelligence/`** (carpetas que crecen por dominio). **Es la fuente de verdad agent-facing del backend** — lee la capa que vas a tocar ANTES de codear:
 
 - `system-prompt/` — el prompt versionado (V1 rollback / V2 modular) + qué tiene hoy. Código: `src/lib/nexa/nexa-system-prompt.ts`.
 - `behavior/` — comportamiento por turno + ruteo de tools + ruteo de provider (auto-router). Código: `nexa-service.ts`, `nexa-model-router.ts`, `nexa-provider.ts`, `providers/`.
@@ -32,7 +32,7 @@ Toda la inteligencia está documentada por capas en **`docs/architecture/nexa-in
 - `governance/` — do's & don'ts consolidados.
 - `technical/` — modelos LLM (Gemini/Claude), pipeline RAG end-to-end, técnicas, contratos de datos.
 
-**Doc gate `pnpm nexa:doc-gate`** (en `ci.yml`): si tocás código de un dominio Nexa y NO actualizás su doc de capa → falla; archivo Nexa nuevo sin registrar en `manifest.json` → falla. **Al tocar el backend del chat, actualizá la(s) capa(s) en el mismo cambio.**
+**Doc gate `pnpm nexa:doc-gate`** (en `ci.yml`): si tocas código de un dominio Nexa y NO actualizas su doc de capa → falla; archivo Nexa nuevo sin registrar en `manifest.json` → falla. **Al tocar el backend del chat, actualiza la(s) capa(s) en el mismo cambio.**
 
 ## El endpoint + el modelo + la persistencia (hechos)
 
@@ -101,7 +101,7 @@ tiene su **flag propio default-OFF** además del master `NEXA_ACTION_RUNTIME_ENA
 3. **`buildPreview`** = cruza la puerta del dominio **y ejercita los gates del command** · **`execute`**
    = re-cruza la puerta y delega en el command **sin** `idempotencyKey` (la pone el confirm).
 4. Registrar en `NEXA_ACTION_REGISTRY` **y en la descripción del tool `propose_action`** (la lista de
-   acciones está **hardcodeada** en ese string: si no la actualizás, el LLM no sabe que la acción existe).
+   acciones está **hardcodeada** en ese string: si no la actualizas, el LLM no sabe que la acción existe).
 5. Flag → fila en `FEATURE_FLAG_STATE_LEDGER.md` + doc de capa (`behavior/behavior-and-routing.md`).
 
 ### Hard rules de acciones (aplican a TODA acción, no sólo a las existentes)
@@ -116,7 +116,7 @@ tiene su **flag propio default-OFF** además del master `NEXA_ACTION_RUNTIME_ENA
   acción (no permisos — estado real), `buildPreview` lanza **`NexaActionBlockedError`** → gap
   `unavailable`: **se explica, no se propone**. Sólo ese error se traduce a gap; cualquier otra excepción
   es un bug y sigue ruidosa.
-- **NUNCA** un preview **reimplementa** los gates del command: los **ejercita** (extraé un assert
+- **NUNCA** un preview **reimplementa** los gates del command: los **ejercita** (extrae un assert
   read-only compartido, como `assertProposalRenderAdmissible`). Una copia miente el día que se agrega un gate.
 - **NUNCA** re-tipes con Zod un payload que debe viajar **verbatim** sin `.passthrough()`: Zod **borra las
   claves que no declara** (bug real: el manifest del composer perdía su procedencia → otro hash → el mismo
@@ -127,10 +127,10 @@ tiene su **flag propio default-OFF** además del master `NEXA_ACTION_RUNTIME_ENA
 
 ## Receta: agregar un dominio/surface conversacional (lente)
 
-**Seguí el PLAYBOOK** (`docs/architecture/ui-platform/CONVERSATIONAL_EXPERIENCE_DOMAIN_PLAYBOOK.md`) — Knowledge (TASK-1101) es el ejemplo trabajado. El dominio entra por **datos**, no por chrome:
+**Sigue el PLAYBOOK** (`docs/architecture/ui-platform/CONVERSATIONAL_EXPERIENCE_DOMAIN_PLAYBOOK.md`) — Knowledge (TASK-1101) es el ejemplo trabajado. El dominio entra por **datos**, no por chrome:
 
 1. **Domain adapter** `packet → NexaAnswersRenderPlan` (puro, `src/lib/<dominio>/nexa/`): reusa el citation mapper + evidence converter canónicos; gap honesto sin datos; emite solo tus `allowedRenderers`.
-2. **`surfaceContext`** declarativo. Si hay kind de dominio, resolvé a un variant EXISTENTE — NUNCA uno nuevo.
+2. **`surfaceContext`** declarativo. Si hay kind de dominio, resuelve a un variant EXISTENTE — NUNCA uno nuevo.
 3. **Lens host self-contained** (`src/views/greenhouse/<dominio>/`): posee draft/estado/packet, conduce la coreografía, abort en `onStopGeneration`, `degraded`/`error` honestos.
 4. **Flag de PRESENTACIÓN** default OFF, ortogonal al de retrieval; la page (server) hace el swap.
 5. **GVC** con el flag ON (corpus real → staging).
@@ -161,7 +161,7 @@ Vive en `src/components/greenhouse/primitives/nexa-<x>/` + barrel + resolver `ki
 - **NUNCA** hardcodear HEX/px/fontFamily/ms — tokens AXIS + SoT + motion tokens.
 
 **Inteligencia (backend)**
-- **NUNCA** editar el prompt inline en `nexa-service.ts` — vive en `nexa-system-prompt.ts` (versionado). Al cambiarlo: bumpeá `version` + entrada de `changelog` + actualizá el **golden snapshot** (`nexa-system-prompt.test.ts -u`); el doc-gate (`pnpm nexa:doc-gate --changed`) lo exige. Cómo: `nexa-intelligence/system-prompt/versioning.md`.
+- **NUNCA** editar el prompt inline en `nexa-service.ts` — vive en `nexa-system-prompt.ts` (versionado). Al cambiarlo: bumpea `version` + entrada de `changelog` + actualiza el **golden snapshot** (`nexa-system-prompt.test.ts -u`); el doc-gate (`pnpm nexa:doc-gate --changed`) lo exige. Cómo: `nexa-intelligence/system-prompt/versioning.md`.
 - **NUNCA** exponer la selección de modelo al usuario; el modelo Anthropic es router-internal.
 - **NUNCA** instanciar un SDK LLM dentro de un dominio — Gemini/Claude vía `src/lib/ai/*` (los providers ya lo hacen).
 - **NUNCA** responder un dato operativo en vivo desde Knowledge (rutear al tool operativo).
@@ -189,7 +189,7 @@ Vive en `src/components/greenhouse/primitives/nexa-<x>/` + barrel + resolver `ki
 
 ## Required reads (en orden)
 
-1. **`docs/architecture/nexa-intelligence/README.md`** — el índice de capas del backend (SSOT de la inteligencia). Leé la capa que vas a tocar.
+1. **`docs/architecture/nexa-intelligence/README.md`** — el índice de capas del backend (SSOT de la inteligencia). Lee la capa que vas a tocar.
    - Para identidad/voz: `voice/nexa-identity-canon.md` + `voice/nexa-voice-system-v1.md` + `voice/voice-tone-style-personality.md`.
 2. `docs/architecture/ui-platform/CONVERSATIONAL_EXPERIENCE.md` — el contrato de la experiencia (shell + coreografía + contratos SSOT). + `..._DOMAIN_PLAYBOOK.md` para agregar un dominio.
 3. `docs/architecture/ui-platform/PRIMITIVES.md` — fila "Nexa chat atoms / answer surfaces".

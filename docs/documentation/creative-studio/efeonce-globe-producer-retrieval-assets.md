@@ -27,7 +27,7 @@ digital de su contenido, y hay **un solo depósito para todos los clientes**. Es
 distintas mezcladas: las **piezas producidas** y los **bytes de las referencias que alguien subió como
 insumo**.
 
-Eso significa que un "servime cualquier archivo del depósito" filtraría dos cosas a la vez: la pieza de otro
+Eso significa que un "sírveme cualquier archivo del depósito" filtraría dos cosas a la vez: la pieza de otro
 cliente y el material de referencia que alguien declaró de forma privada. Y el depósito **no puede** cerrar
 esa puerta, porque no sabe qué archivo es de quién.
 

@@ -157,7 +157,7 @@ Segun el proceso de tesoreria:
 
 1. Si quieres registrar una fecha de ejecucion, usa **Programar**.
 2. Cuando el pago se suba al banco/processor, usa **Marcar enviada**.
-3. Si tienes referencia externa del banco, registrala en ese paso.
+3. Si tienes referencia externa del banco, regístrala en ese paso.
 
 **Marcar enviada** significa que la operacion fue instruida. Todavia no es confirmacion bancaria.
 

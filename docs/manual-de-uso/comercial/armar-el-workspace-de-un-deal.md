@@ -35,7 +35,7 @@ manda sobre todo lo demás. Si hay aclaraciones del foro, van también acá.
 
 ### 3. Admisibilidad + bid/no-bid
 
-Antes de escribir la oferta: corre el checklist de admisibilidad y la decisión bid/no-bid (pedíselo a un
+Antes de escribir la oferta: corre el checklist de admisibilidad y la decisión bid/no-bid (pídeselo a un
 agente con la skill `greenhouse-public-private-tenders`). **Nunca un GO sin margen sobre loaded cost.**
 
 ### 4. Investigación

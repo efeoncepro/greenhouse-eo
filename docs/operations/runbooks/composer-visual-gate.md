@@ -34,7 +34,7 @@ sus cambios se mezclan en el render y cualquier `--freeze` co-mingla el trabajo 
 
 ```
 1. Editas el deck-plan / la plantilla / el catálogo.
-2. Recompones y MIRÁS el frame:   pnpm deck:compose <plan>   → Read del PNG (nunca "listo" sin mirar)
+2. Recompones y MIRAS el frame:   pnpm deck:compose <plan>   → Read del PNG (nunca "listo" sin mirar)
 3. Corres la suite:               pnpm vitest run src/lib/artifact-composer   (boundary/composability/…)
 4. Corres el gate:                pnpm composer:visual-gate    → va a fallar en las láminas que cambiaste
 5. ¿El cambio es INTENCIONAL?

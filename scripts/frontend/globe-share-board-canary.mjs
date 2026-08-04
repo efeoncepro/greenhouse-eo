@@ -192,7 +192,7 @@ for (const scenario of SCENARIOS) {
     // 5 — every link is a document or an absolute external URL. None may answer JSON.
     for (const href of observed.links) {
       if (href.startsWith('https://') || href.startsWith('http://')) continue;
-      record(scenario.name, viewport.name, `link relativo "${href}": verificá que responde HTML y no JSON`);
+      record(scenario.name, viewport.name, `link relativo "${href}": verifica que responde HTML y no JSON`);
     }
 
     // A single h1, and it is never empty.
