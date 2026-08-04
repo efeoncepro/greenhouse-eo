@@ -107,3 +107,41 @@ new claims and scheduler invocation while preserving quarantined assets, durable
   `globe-asset-governance-kn549` completed with `claimed=3`, `applied=3`, `promoted=1`, `failed=0`.
 - This proves generated-output governance internal-only. It does not open private ingest or clients externos, and
   it does not settle the feed-visibility policy for assets still pending/rejected.
+
+## Presupuesto de latencia — la consecuencia estructural de «claims bounded work, processes it and exits»
+
+Registrado el 2026-08-04 tras `ISSUE-137`. **Este ADR describía la forma del worker pero nunca su latencia, y
+esa omisión costó un incidente mal diagnosticado.**
+
+🔴 **La latencia de este pipeline es `nº de etapas × la cadencia del Scheduler`, no el trabajo que hace.**
+`runGovernanceBatch` hace `claimDue` **una vez por ejecución** y procesa cada lease una vez; `advance()` deja
+el job con `next_attempt_at = now` —o sea reclamable de inmediato— pero **ya no queda ninguna ejecución que lo
+reclame**, así que cada etapa espera al tick siguiente. Con cuatro etapas obligatorias
+(`inspection → malware → c2pa → rights`) eso son **cuatro ticks**, mientras cada ejecución del Job dura ~15 s.
+
+Es **cadence-bound, no size-bound**, y eso está medido, no razonado: una imagen PNG de 7,57 MB y un video MP4
+dieron **el mismo** tiempo de governance (183 s y 183,8 s) y el mismo end-to-end (471,8 s y 474,0 s). Si fuera
+función del tamaño, no coincidirían.
+
+| `asset_governance_schedule` | governance | end-to-end de una generación |
+|---|---|---|
+| `*/5` (hasta 2026-08-04) | ~1085 s (~18 min) | ~22 min |
+| **`*/1` (vigente)** | **~183 s** | **~7,9 min** |
+
+Consecuencias que un agente debe conservar:
+
+- **El orden obligatorio de este ADR NO depende de la cadencia.** Lo imponen los CHECK de la base y la state
+  machine del dominio (`Database constraints and the domain state machine both prohibit C2PA/rights stages
+  before a clean malware result`). Bajar el cron acorta la espera; **no** relaja la secuencia.
+- **Una espera dentro del presupuesto NO es un cuelgue.** Mientras el pipeline corre, el experimento se lee
+  `running` y su consumidor no distingue un run sano de uno atascado — ese defecto tiene dueño en `TASK-1469`.
+  Antes de declarar un cuelgue, comparar contra este presupuesto: un readback es un instante, no un veredicto.
+- **Cualquier instrumento que vigile este camino necesita una paciencia mayor que este presupuesto.** El canary
+  de generación abortaba a los 20 min sobre un sistema perfectamente sano justamente por esto.
+- **Drenar el batch** (seguir procesando el mismo job en la misma ejecución tras `advance`) bajaría governance a
+  ~1 min y fue **evaluado y diferido**: su riesgo no es el lease —los fencing tokens ya lo cubren— sino la
+  **equidad entre workspaces**, porque hoy cada workspace recibe un `claimDue` de `batchSize` por ejecución y
+  eso es round-robin justo. Si se hace, va con cota configurable y default que reproduce la conducta actual.
+
+Evidencia: [`ISSUE-137`](../../issues/resolved/ISSUE-137-globe-experiment-running-forever-zero-attempts.md),
+cambio de cron en `efeonce-globe@d78ce01`.

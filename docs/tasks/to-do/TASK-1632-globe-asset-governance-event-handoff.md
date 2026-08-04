@@ -1,5 +1,30 @@
 # TASK-1632 — Globe Provider Completion → Asset Governance Event-Driven Handoff
 
+## Delta 2026-08-04 — la brecha que esta task declara se encogió 5×, y eso toca su prioridad
+
+`ISSUE-137` bajó el cron de Asset Governance de `*/5` a `*/1` (`efeonce-globe@d78ce01`, Scheduler live
+`*/1 * * * * ENABLED`). Dos afirmaciones de este archivo quedaron obsoletas:
+
+- **Contexto:** «Asset Governance `*/5 * * * *`» → hoy **`*/1 * * * *`**.
+- **Gap:** «latencia hasta ~5 min por su tick `*/5`» → hoy **hasta ~1 min**.
+
+Medido post-arreglo: governance **183 s** y generación end-to-end **7,9 min** (antes ~1085 s y ~22 min), con
+imagen y video coincidiendo — o sea la latencia era **cadence-bound, no size-bound**.
+
+🔴 **Esto NO invalida la task, pero sí su dimensionamiento.** El wake event-driven sigue siendo correcto por
+razones que no son la latencia: elimina la dependencia del Scheduler como trigger primario observable, y trae
+wake deduplicado, retries/DLQ, IAM y métricas. Lo que cambió es el **beneficio marginal**: ya no ahorra ~5 min
+por asset sino ~1. La task está declarada **P0/Muy alto** apoyándose en parte en esa latencia; **revisar esa
+prioridad antes de tomarla** — puede seguir siendo P0 por las otras razones, pero la justificación tiene que
+decir cuáles, no la que ya se resolvió por otro camino.
+
+También sube el costo del carril actual en el otro eje: `*/1` son 1440 ejecuciones/día en vez de 288, lo que
+hace **más** atractivo el wake por evento a mediano plazo. Es un argumento distinto del original y conviene
+escribirlo como tal.
+
+Fuente: [`ISSUE-137`](../../issues/resolved/ISSUE-137-globe-experiment-running-forever-zero-attempts.md) y
+[ADR-007 § Presupuesto de latencia](../../architecture/creative-studio/EFEONCE_GLOBE_ASSET_GOVERNANCE_WORKER_DECISION_V1.md).
+
 ## Delta 2026-08-02 — orden de ejecución: post-lifecycle y post-Omni estable
 
 Esta task no corrige el catálogo, adapter o UI de Gemini Omni y no debe comenzar para desbloquear su canary. El

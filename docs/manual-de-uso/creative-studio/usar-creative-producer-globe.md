@@ -1,9 +1,9 @@
 # Usar Efeonce Globe Creative Producer
 
 > **Tipo de documento:** Manual de uso / runbook (orientado al operador)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-07-23 por Claude
-> **Ultima actualizacion:** 2026-07-29 por Claude (panel de créditos y lectura del composer)
+> **Ultima actualizacion:** 2026-08-04 por Claude (presupuesto de espera de una generación sana)
 > **Doc funcional:** [efeonce-globe-creative-producer.md](../../documentation/creative-studio/efeonce-globe-creative-producer.md)
 > **Doc tecnica:** [Creative Producer V1](../../architecture/creative-studio/EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md)
 
@@ -115,10 +115,32 @@ expirable y revocable; el token no aparece en query strings ni logs. No entregue
 - Modo deshabilitado: el workspace no tiene autoridad de assets/provenance confirmada; no intentes eludirlo con
   otra ruta o un identificador externo.
 - `dependency_unavailable`: una dependencia real no respondió; reintentar puede ser válido.
-- `quarantined` / governance pendiente: los bytes existen, pero todavía no son elegibles.
+- `quarantined` / governance pendiente: los bytes existen, pero todavía no son elegibles. **Ver abajo cuánto
+  esperar antes de tratarlo como un problema.**
 - `candidate_ready`: la generación terminó y el output fue retenido; no implica aprobación humana ni derechos
   irrestrictos.
 - `degraded`: una proyección secundaria falló; consulta el detalle antes de operar.
+
+## Cuánto tarda una pieza sana (y cuándo sí preocuparse)
+
+**Una generación sana tarda ~8 minutos de punta a punta.** Medido el 2026-08-04 sobre generaciones reales:
+imagen 471,8 s y video 474,0 s. Los tiempos son prácticamente iguales para imagen y para video, así que **no
+esperes que una pieza «liviana» salga antes**: lo que manda no es el peso del archivo.
+
+De esos ~8 minutos, el proveedor tarda unos 2; el resto es Asset Governance, que revisa la pieza en cuatro
+etapas (inspección → malware → C2PA → derechos) y avanza una por minuto. Hasta que termina, la pieza se ve
+«generando» y **eso es normal**.
+
+- **Menos de ~10 minutos:** está trabajando. No reintentes.
+- **Más de ~15 minutos:** ahí sí conviene mirar. Sigue el
+  [runbook del ciclo de vida de corridas](operar-ciclo-de-vida-corridas-globe.md).
+
+🔴 **Nunca vuelvas a enviar la misma generación porque «se demoró».** El envío ya reservó tus créditos; un
+segundo envío a ciegas crea **un segundo cobro**. Primero se lee el estado, después se decide.
+
+> Detalle técnico: el presupuesto y su razón estructural están en
+> [ADR-007 § Presupuesto de latencia](../../architecture/creative-studio/EFEONCE_GLOBE_ASSET_GOVERNANCE_WORKER_DECISION_V1.md);
+> el incidente que lo midió, en [`ISSUE-137`](../../issues/resolved/ISSUE-137-globe-experiment-running-forever-zero-attempts.md).
 
 Ante un error, conserva el correlation ID y no repitas un command de gasto si la respuesta fue ambigua: consulta
 primero el reader del experimento.

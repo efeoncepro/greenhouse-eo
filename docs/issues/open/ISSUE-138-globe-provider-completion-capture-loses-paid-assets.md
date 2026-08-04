@@ -221,13 +221,19 @@ aplicado y verificado en la revisión viva (`globe-api-internal-00205-kx5`), con
 #### 🔴 Hallazgo nuevo: el canary abortaba sobre un sistema sano
 
 El canary devolvió `producer_canary_worker_timeout` a los 20 minutos **mientras la corrida estaba perfecta** —
-completó sola en la entrega 21. El cuello **no es el proveedor**: Fal respondió en segundos. Es que el
-scheduler de **Asset Governance corre cada 5 minutos** y avanza un estado por tick, así que el camino en frío
-tarda ~20-25 min. La paciencia del canary estaba **estructuralmente por debajo de la latencia real del sistema
-que vigila**.
+completó sola en la entrega 21. El cuello **no era el proveedor**: Fal respondió en segundos. Es que el
+scheduler de **Asset Governance corría cada 5 minutos** y avanza un estado por tick, así que el camino en frío
+tardaba ~20-25 min. La paciencia del canary estaba **estructuralmente por debajo de la latencia real del
+sistema que vigila**.
 
 Un canary que aborta sobre un sistema sano es peor que no tenerlo: **enseña a leer «timeout» como normal**, que
 es exactamente cómo un cuelgue real pasa desapercibido. Subido a 45 min.
+
+> **Delta 2026-08-04 — el cuello se cerró por otro camino.** `ISSUE-137` bajó el cron a `*/1`
+> (`efeonce-globe@d78ce01`): governance mide **183 s** y el end-to-end **7,9 min**, con imagen y video
+> coincidiendo. Los 45 min de paciencia siguen siendo el número correcto, pero ahora quedan **~5× sobre la
+> latencia real** (eran ~2×). Y el hallazgo de este párrafo se confirmó por un segundo camino independiente
+> el mismo día: el readback de `ISSUE-137` llegó a la misma causa sin pasar por el canary.
 
 Y de paso confirma en vivo dos arreglos de esta sesión: la clase `waiting` sostuvo 21 entregas sin matar la
 corrida (con el tope viejo de `unknown` habría muerto en la tercera, con la pieza ya cobrada), y el reconcile

@@ -245,9 +245,11 @@ Lo que más vale recordar de la sesión:
   es un identificador estilo Auth0 (`github|…`) que **no se parece en nada** al username de su panel.
   Suponerlo habría rechazado todas las entregas. Aplicado y verificado en la revisión viva.
 - 🔴 **El canary abortaba sobre un sistema sano.** Daba timeout a los 20 min mientras la corrida completó sola
-  en la entrega 21: el cuello no es el proveedor sino que **Asset Governance corre cada 5 minutos** y avanza un
-  estado por tick (~20-25 min en frío). Su paciencia estaba por debajo de la latencia real del sistema que
+  en la entrega 21: el cuello no era el proveedor sino que **Asset Governance corría cada 5 minutos** y avanzaba
+  un estado por tick (~20-25 min en frío). Su paciencia estaba por debajo de la latencia real del sistema que
   vigila. Subido a 45 min — un canary que aborta sobre algo sano enseña a leer «timeout» como normal.
+  **Delta 2026-08-04: el cron bajó a `*/1` (`ISSUE-137`) y la latencia real es ~7,9 min**, así que los 45 min
+  quedaron ~5× por encima (eran ~2×). El presupuesto sigue siendo correcto; el número viejo ya no.
 - **Queda sólo D12**, acotado: la retención de la Operation de Vertex sigue sin documentarse, pero D2 ya cerró
   su modo de fallo — resta una ventana de latencia, no una pérdida. Su arreglo (`storageUri`) tiene dueño y no
   se implementó detrás de un flag involtable, que sería el código muerto que D13 vino a limpiar.

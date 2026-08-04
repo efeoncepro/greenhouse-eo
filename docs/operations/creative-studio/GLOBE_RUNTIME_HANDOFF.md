@@ -13,6 +13,30 @@
 > `d3fe90e`, digest `sha256:d8295862dc12c14427e90e0bb413577802916c37ca6bf32c202680492ca7bae9`,
 > deploy `30717266572` y baseline IaC `e369ef8` sin drift.
 
+## Corte 2026-08-04 — cadencia de Asset Governance (`ISSUE-137`)
+
+`asset_governance_schedule` pasó de `*/5 * * * *` a **`*/1 * * * *`** en Globe **`d78ce01`**. `tofu plan`
+con `0 to destroy` y el único cambio en el `google_cloud_scheduler_job.asset_governance`; Scheduler live
+verificado en **`*/1 * * * * ENABLED`**, región **`southamerica-east1`** (Cloud Scheduler no soporta
+`southamerica-west1`, que es donde vive el Job).
+
+**Efecto medido** con dos generaciones reales por el carril workload, leído contra `globe-pg`:
+
+| | governance | end-to-end | créditos | output |
+|---|---|---|---|---|
+| imagen (Seedream 5 Pro) | 183 s | 471,8 s | 10 = 10 | PNG 7,57 MB `retained` |
+| video (Seedance) | 183,8 s | 474,0 s | 16 = 16 | MP4 `retained` |
+
+Antes: ~1085 s de governance y ~22 min end-to-end. Que **imagen y video coincidan** siendo otro medio y otro
+peso es la prueba de que la latencia era **cadence-bound, no size-bound** — y por tanto que el arreglo
+generaliza. Presupuesto canónico y su razón estructural: [ADR-007 § Presupuesto de
+latencia](../../architecture/creative-studio/EFEONCE_GLOBE_ASSET_GOVERNANCE_WORKER_DECISION_V1.md).
+
+Consecuencias para lo que ya estaba escrito acá: la brecha que declara `TASK-1632` (despertar governance sin
+esperar al Scheduler) **se encogió de ~5 min a ~1 min** — sigue válida por sus otras razones, pero su
+dimensionamiento cambió (ver su Delta 2026-08-04). En el otro eje, `*/1` son **1440 ejecuciones/día** en vez
+de 288.
+
 ## Estado activo
 
 - Globe sigue siendo un producto comercial de Efeonce. El rollout continúa `internal-only`, con
