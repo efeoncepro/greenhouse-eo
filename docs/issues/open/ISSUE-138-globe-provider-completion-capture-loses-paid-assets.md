@@ -1,6 +1,6 @@
 # ISSUE-138 — Globe: la captura de completitud pierde assets ya cobrados en los tres proveedores
 
-> **Estado:** Open — **11 de 13 arreglados y en `main`; 2 declarados por depender del proveedor**
+> **Estado:** Open — **12 de 13 cerrados; queda D12, acotado y con arreglo con dueño**
 > **Detectado:** 2026-08-04 · **Ambiente:** Globe producción (`globe-producer-worker`, `globe-api-internal`)
 > **Severidad:** Alta — tres caminos distintos terminan en un asset generado, facturado e irrecuperable
 > **Repo afectado:** `efeoncepro/efeonce-globe` · **Gobierna:** Greenhouse (EPIC-028, `TASK-1469`)
@@ -169,7 +169,45 @@ Nueve commits en `efeonce-globe@main`, `pnpm check` y `pnpm build` verdes en cad
 - Su sección «Webhooks» es un **registro** (*"View your webhook requests"*), **no una configuración**: no hay nada que habilitar. **34 entregas, todas `202`**, todas a `globe.efeoncepro.com/v1/provider-webhooks/fal/<handle>` — el handle va por request, confirmando la asimetría con OpenAI que motiva D13.
 - La API key del panel coincide con la nuestra.
 
-### 🔴 Los dos que NO se cierran, y por qué
+### Delta 2026-08-04 (b) — la doc de Fal en vivo cerró D1 y D7
+
+`docs.fal.ai` devolvía 429 a todo fetch programático, pero **es alcanzable desde el navegador real**. Eso
+convirtió dos "no verificados" en hechos.
+
+**D1 — CERRADO.** La doc en vivo más nuestros propios datos confirmaron que **la regla dura era correcta**: la
+base de la queue **no es derivable**. Medido contra `provider_response_url` real de esta cuenta:
+
+| endpoint de submit | base de seguimiento real |
+|---|---|
+| `bytedance/seedream/v5/pro/text-to-image` | `bytedance/seedream` (descarta **3** segmentos) |
+| `bytedance/seedance-2.0/text-to-video` | `bytedance/seedance-2.0` (descarta 1) |
+| `fal-ai/elevenlabs/tts/multilingual-v2` | `fal-ai/elevenlabs` (descarta 2) |
+
+Y la propia doc muestra `fal-ai/flux/schnell` **conservando los tres**. No hay regla de segmentos: hay un
+límite de «app id» que sólo Fal conoce. Derivarlo habría apuntado a leer el resultado de otro modelo.
+
+Entonces **se declara en vez de derivar**: `FAL_FOLLOW_UP_BASES`, una entrada por endpoint verificada contra
+las URLs que Fal devolvió en submits reales, usada **sólo** para reponer la evidencia cuando el ack se perdió.
+El camino normal sigue usando exclusivamente lo que Fal devuelve. Un endpoint sin entrada **no se recupera y
+falla nombrado** —correcto: mucho mejor que leer el resultado de otro modelo— y una base malformada se rechaza
+al construir el driver, no en medio de una recuperación.
+
+**D7 — CERRADO, sin cambiar nada.** La doc prescribe **exactamente ±300 s**, que es lo que ya hacíamos. La duda
+la resuelve la **consistencia interna de su propia página**: prescribe enforcar 300 s *y* describe reintentos
+durante 2 horas. Un proveedor no publica una guía de verificación que descarte el 90 % de sus propios
+reintentos, así que cada entrega se firma fresca. La ventana **no se amplía**: hacerlo debilitaría la
+protección sin ganar nada, y el control real contra replay es el dedupe durable por `(provider, delivery_id)`.
+
+**Y cae una sospecha que venía del espejo, no del código:** el host del JWKS que usamos (`rest.fal.ai`) es el
+**documentado**. El espejo decía `rest.alpha.fal.ai`.
+
+**D12 — acotado, no cerrado.** La retención de una Operation de Vertex con resultado inline **sigue sin estar
+documentada** (buscada en su página oficial de long-running operations). Pero su alcance cambió: **D2 ya cerró
+el modo de fallo seguro**, así que lo que queda es una **ventana de latencia**, no una pérdida garantizada. El
+arreglo estructural es `storageUri`; no se implementa detrás de un flag que nadie puede voltear sin canary,
+porque eso sería agregar exactamente el código muerto que D13 vino a limpiar.
+
+### 🔴 Lo que NO se cierra, y por qué (superado en parte por el Delta (b))
 
 **D1 — el rescate del lost-ack sigue sin recuperar el asset.** La salida obvia (armar
 `{queue}/requests/{request_id}`) **está prohibida por contrato y no es derivable**: un modelo con sub-path deja

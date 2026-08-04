@@ -106,9 +106,14 @@ Lo que más vale recordar de la sesión:
   también es definitivo, no infraestructura). Separar por remedio, otra vez.
 - **En D6 la salida no era inferir del status: Fal publica `X-Fal-Retryable` y la estábamos ignorando.**
   Respetar la señal del proveedor vale más que cualquier heurística nuestra.
-- **Dos NO se cerraron a propósito** (D7 ventana de replay, D12 retención de la Operation): dependen de hechos
-  del proveedor sin verificar, y "arreglarlos" por las dudas —ampliar la ventana— debilitaría una protección
-  real para cubrir un riesgo hipotético.
+- **La doc de Fal en vivo cerró D1 y D7.** Devolvía 429 a todo fetch programático **pero es alcanzable desde
+  el navegador real** — vale recordarlo la próxima vez que una doc parezca inaccesible. Confirmó que la base de
+  la queue **no es derivable**: medido contra nuestros propios datos, un endpoint descarta 3 segmentos y otro 1,
+  y su doc muestra uno que conserva 3. La regla dura era correcta, así que la base se **declara por endpoint**
+  desde evidencia real.
+- **Queda sólo D12**, acotado: la retención de la Operation de Vertex sigue sin documentarse, pero D2 ya cerró
+  su modo de fallo — resta una ventana de latencia, no una pérdida. Su arreglo (`storageUri`) tiene dueño y no
+  se implementó detrás de un flag involtable, que sería el código muerto que D13 vino a limpiar.
 
 **Rollout ejecutado:** los tres runtimes en `0b5f875a19cb` (drift guard verde: API `00203-77k`, Studio
 `00146-hdx`, worker `sha256:4060447a5095`), con salud post-deploy limpia.

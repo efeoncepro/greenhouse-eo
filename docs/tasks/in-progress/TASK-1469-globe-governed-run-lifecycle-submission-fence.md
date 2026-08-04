@@ -573,10 +573,16 @@ devuelve 503 ante un fallo nuestro y 400 sólo ante un rechazo definitivo; se de
 para que la identidad de ruta ejecutada sea la aprobada; y el segmento de correlación pasa a ser opcional sólo
 para OpenAI, cuya lane era literalmente irregistrable.
 
-**Dos quedan declarados y no cerrados**, porque dependen de hechos del proveedor sin verificar: la ventana de
-replay de Fal frente a su política de reintentos (D7) y la retención de una Operation de Vertex con resultado
-inline (D12). Ninguno se "arregla" por las dudas: ampliar la ventana debilitaría la protección real contra
-replay para cubrir un riesgo hipotético.
+**D1 y D7 quedaron cerrados con la doc de Fal en vivo** —429 a todo fetch programático, alcanzable desde el
+navegador real—. Confirmó que la base de la queue **no es derivable** (medido: un endpoint descarta 3 segmentos,
+otro 1, y su doc muestra uno que conserva 3), así que se **declara por endpoint** desde evidencia real en vez de
+adivinarse; y que la ventana de ±300 s es exactamente la que Fal prescribe, consistente con sus reintentos de
+2 h. La regla dura de no reconstruir desde el slug era correcta.
+
+**Queda D12, acotado:** la retención de una Operation de Vertex con resultado inline sigue sin documentarse,
+pero D2 ya cerró su modo de fallo, así que resta una ventana de latencia y no una pérdida garantizada. Su
+arreglo estructural (`storageUri`) queda con dueño y sin implementar detrás de un flag que nadie puede voltear
+sin canary.
 
 **Y uno queda cableado y deliberadamente sin configurar:** el guard de propiedad de entregas de Fal
 (`GLOBE_FAL_USER_ID`). El panel de Fal no expone ese identificador como valor, y ponerlo mal rechazaría TODAS
