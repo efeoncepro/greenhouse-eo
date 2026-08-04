@@ -2,6 +2,15 @@
 
 Historia anterior: [Handoff.archive.md](Handoff.archive.md).
 
+## EPIC-039 — Next.js 16.3 + TypeScript 7 Toolchain Adoption (2026-08-04)
+
+Estado: **to-do / diseño**. Se registraron el epic y sus dos tasks hijas:
+[`EPIC-039`](docs/epics/to-do/EPIC-039-nextjs-typescript-toolchain-adoption.md),
+[`TASK-1638`](docs/tasks/to-do/TASK-1638-nextjs-16-3-framework-alignment.md) para el alineamiento del framework y
+[`TASK-1639`](docs/tasks/to-do/TASK-1639-typescript-7-dual-compiler-adoption.md) para el lane dual TS7/TS6.
+Los linters de tasks/epic/ops y el cierre documental pasan. No hubo cambios de código, dependencias, runtime,
+deploy ni producción. Siguiente paso: tomar `TASK-1638`; `TASK-1639` permanece bloqueada hasta su cierre.
+
 ## ISSUE-137 — Asset Governance: resolución verificada con cron de un minuto (2026-08-04)
 
 Estado: **resolved**. Detalle y evidencia post-arreglo en
