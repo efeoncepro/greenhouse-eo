@@ -3,7 +3,7 @@
 ## Estado
 
 - Estado: propuesta documental para tasks de integración.
-- Fecha de snapshot autenticado: 2026-07-31.
+- Fecha de snapshot autenticado: 2026-07-31 para los challengers iniciales; FLUX 3 se añadió con discovery oficial del 2026-08-04.
 - Fuente de disponibilidad: Fal Model Search API autenticada; cada schema y precio debe revalidarse al ejecutar.
 - Naturaleza: Globe sigue siendo un producto comercial; las rutas nuevas permanecen `gated` hasta completar evaluación, derechos, rate, binding, canary y promoción.
 
@@ -21,8 +21,9 @@ La separación es necesaria porque cada familia tiene contratos de salida, preci
 | Grok Imagine Video | `xai/grok-imagine-video/{text-to-video,image-to-video,reference-to-video,edit-video,extend-video}`, además `v1.5/image-to-video` | Texto/imagen/referencias, edición, extensión, audio nativo, diálogo/lip-sync según modalidad | No integrado |
 | Wan 2.7 | `fal-ai/wan/v2.7/{text-to-video,image-to-video,reference-to-video,edit-video}`, además `edit` y rutas de imagen | Texto/imagen/referencias, first/end frame, continuación, audio conductor, multi-shot, edición y generación/edición de imagen | No integrado |
 | FLUX.2 Max | `fal-ai/flux-2-max`, `fal-ai/flux-2-max/edit` | Generación y edición de imagen, referencias múltiples en Edit, seed, safety checker, JPEG/PNG y tamaños preset/custom según schema | No integrado |
+| FLUX 3 Video | `blackforestlabs/flux-3/{text-to-video,image-to-video,first-last-frame-to-video,keyframes-to-video,extend-video}` + cinco drafts + `draft-enhance` | Video con audio nativo, first/last, keyframes posicionados, continuación y preview → enhance según OpenAPI live | No integrado; propuesta dedicada en [`EFEONCE_GLOBE_FLUX3_VIDEO_INTEGRATION_PROPOSAL_V1.md`](EFEONCE_GLOBE_FLUX3_VIDEO_INTEGRATION_PROPOSAL_V1.md) |
 
-No existe coincidencia exacta `Flux 3` en el catálogo autenticado. No se debe nombrar ni registrar Flux 3 hasta que Fal publique un endpoint identificable y su OpenAPI.
+El snapshot del 2026-07-31 no tenía coincidencia exacta `Flux 3`; el catálogo oficial consultado el 2026-08-04 ya devuelve once endpoints activos. La identidad presenta una discrepancia load-bearing entre `blackforestlabs/...` (catálogo) y `fal-ai/...` (OpenAPI/queue), por lo que FLUX 3 no debe fijarse en producción hasta resolverla con discovery autenticado y un submit controlado. La propuesta específica define el contrato y los gates.
 
 ## Qué se reutiliza y qué se extiende
 
@@ -55,6 +56,7 @@ No se requiere una capability nueva para FLUX.2: extiende `image-generate`/`imag
 | Grok Imagine Video | video-generate, video-frames, referencias, video-edit | edit-video/extend-video, audio/lip-sync, 1–10s, 480/720 y cargos por violación | no prometer audio ni extensión si la ruta no lo entrega |
 | Wan 2.7 | video-generate, video-frames, referencias e image-generate | video-edit, continuidad y límites propios de edición/referencia; `pro` como ruta independiente | no presentar `edit-video` como image-to-video |
 | FLUX.2 Max/Edit | image-generate, image-edit, referencia/lineage, aspect ratio y estimate | múltiples referencias, controls de edición, typography/consistencia según OpenAPI | no crear capability `flux-3` ni un adapter separado |
+| FLUX 3 Video | video-generate, video-frames y continuation solo donde el contrato encaje | keyframes con posición, draft cache y audio nativo con evidencia; ver propuesta dedicada | no mapear drafts a una resolución común, no crear adapter BFL paralelo |
 
 ## Producer requerido
 
@@ -63,6 +65,8 @@ El selector debe seguir siendo data-driven. Las tasks deben añadir rutas, const
 Para video: tray de imagen/video/audio con roles, orden estable y citación; start/end frame; referencias de sujeto/estilo/movimiento; edición con rango temporal y preservación; audio nativo como opción explícita; validación antes de estimate y nuevamente en `prepare`; preview/poster/playback/retrieval y recovery.
 
 Para FLUX.2: prompt, image-to-image/edit, múltiples referencias, seed, safety y tamaños solo si el schema live los soporta, preview, compare y lineage. FLUX.2 Edit no debe sustituir el flujo regional Fill/Erase porque su schema no declara máscara ni regiones. No agregar controles especulativos.
+
+Para FLUX 3: revisar [`EFEONCE_GLOBE_FLUX3_VIDEO_INTEGRATION_PROPOSAL_V1.md`](EFEONCE_GLOBE_FLUX3_VIDEO_INTEGRATION_PROPOSAL_V1.md) y `TASK-1642`. No presentar como GA el Early Access de BFL, no asumir codec/FPS/MIME desde el anuncio y no promover drafts hasta resolver la retención y el lineage de `draft_cache`.
 
 ## Gates antes de implementación
 
@@ -80,4 +84,6 @@ Para FLUX.2: prompt, image-to-image/edit, múltiples referencias, seed, safety y
 - [Grok Imagine Video](https://fal.ai/grok-imagine)
 - [Grok Imagine Video API](https://fal.ai/docs/model-api-reference/video-generation-api/xai-grok-imagine-video)
 - [Wan 2.7 image-to-video](https://fal.ai/models/fal-ai/wan/v2.7/image-to-video)
+- [Fal FLUX 3](https://fal.ai/flux-3)
+- [BFL FLUX 3](https://bfl.ai/models/flux-3)
 - [Fal model API reference](https://fal.ai/docs/model-api-reference)

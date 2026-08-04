@@ -21,6 +21,10 @@
   decía 3 para uno.
 - **Cierre documental**: ADR-021 + doc funcional + manual + dos runbooks + las dos skills espejadas y el overlay
   de arquitectura, donde se corrigieron **cuatro contradicciones activas**.
+- **FLUX 3 queda documentado y gated:** Fal expone once endpoints activos (cinco estándar, cinco drafts y
+  `draft-enhance`), mientras BFL mantiene el producto/API directo en Early Access. `TASK-1642` y su propuesta
+  registran la discrepancia de namespace, keyframes, `duration: auto`, audio evidence, `draft_cache`, rates,
+  rights, evaluación, canary y rollback; el runtime de Globe no fue modificado.
 
 ## 2026-08-04 — Globe Asset Governance: la latencia deja de multiplicarse por el cron
 

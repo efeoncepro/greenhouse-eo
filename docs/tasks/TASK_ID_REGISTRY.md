@@ -1706,7 +1706,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-1617` | `to-do` | Globe Kling 3/O3 video fleet y Producer: text/image/reference/edit/motion, audio y multi-shot según OpenAPI; rutas, catálogo, rights, rates, evaluación, canary y promoción. | `docs/tasks/to-do/TASK-1617-globe-kling-3-o3-video-fleet-producer-integration.md` |
 | `TASK-1618` | `to-do` | Globe Grok Imagine Video fleet y Producer: text/image/reference/edit/extend, audio/lip-sync según evidencia, policy de billing y promoción por ruta. | `docs/tasks/to-do/TASK-1618-globe-grok-imagine-video-fleet-producer-integration.md` |
 | `TASK-1619` | `to-do` | Globe Wan 2.7 fleet y Producer: rutas Pro/standard de video e imagen, referencias y edición; constraints y evidencia independientes. | `docs/tasks/to-do/TASK-1619-globe-wan-2-7-fleet-producer-integration.md` |
-| `TASK-1620` | `to-do` | Globe FLUX.2 Max/Edit fleet y Producer: extensión de image-generate/image-edit, references y controls soportados; no Flux 3 inexistente. | `docs/tasks/to-do/TASK-1620-globe-flux-2-max-image-fleet-producer-integration.md` |
+| `TASK-1620` | `to-do` | Globe FLUX.2 Max/Edit fleet y Producer: extensión de image-generate/image-edit, references y controls soportados; FLUX 3 Video queda separado por ser una familia de video con contrato y gates propios. | `docs/tasks/to-do/TASK-1620-globe-flux-2-max-image-fleet-producer-integration.md` |
 | `TASK-1621` | `to-do` | Globe Ideogram v4 Generate/Edit: typography, posters, logos, prompt expansion, image-to-image, evaluación y promoción por ruta. | `docs/tasks/to-do/TASK-1621-globe-ideogram-v4-image-fleet-producer-integration.md` |
 | `TASK-1622` | `to-do` | Globe Recraft v4.1 Raster: extensión de Recraft vector a raster/Pro con MIME, rates, rights, evaluación y canary separados. | `docs/tasks/to-do/TASK-1622-globe-recraft-v4-1-raster-image-fleet.md` |
 | `TASK-1623` | `to-do` | Globe Qwen Image 2/Pro: generate/edit challenger con seed, negative prompt, outputs múltiples, formatos y benchmark cancelable. | `docs/tasks/to-do/TASK-1623-globe-qwen-image-2-fleet-producer-integration.md` |
@@ -1725,21 +1725,24 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-1639` | `to-do` | **TypeScript 7 Dual Compiler Adoption.** EPIC-039; standard; P1/Alto/Medio. Bloqueada por TASK-1638. Usa TS7 para `tsc` y TS6 para la API compatible de `typescript-eslint`, elimina opciones retiradas, añade lanes CI y mide recursos. | `docs/tasks/to-do/TASK-1639-typescript-7-dual-compiler-adoption.md` |
 
 | `TASK-1641` | `to-do` | **Globe: canary post-promoción operable y convergencia terminal de la saga.** EPIC-028; backend-data/api; P1/Alto/Medio. Medido 2026-08-04: **10 de 12 promociones terminaron `rolled_back`**, y 4 murieron segundos después de su deadline ya estando `activated`. El diseño es correcto y NO se relaja —`activated` no es terminal y el código prohíbe inferir el canary—: falta el **paso operativo**. Tres huecos: no hay camino canónico para producir el canary de una ruta arbitraria (el canary estándar tiene sus 3 modalidades fijas), el reader `stalled` no tiene consumidor ni alerta, y un rollback deja `readiness=promoted` con binding apagado — divergencia de agregados, el invariante de `TASK-1469` en otra saga. | `docs/tasks/to-do/TASK-1641-globe-promotion-canary-operability-and-terminal-convergence.md` |
+| `TASK-1642` | `to-do` | **Globe FLUX 3 Video en la flota y el Producer.** EPIC-028; backend-data/integration; backend-critical; P1/Muy alto/Alto. Cinco rutas estándar vía Fal, keyframes/first-last/extend/audio, decisión de drafts y `draft_cache`, namespace catalog/OpenAPI, rates, rights, evaluación, canary, settlement y promoción por ruta. BFL mantiene Early Access; Globe parte `gated`. | `docs/tasks/to-do/TASK-1642-globe-flux3-video-fleet-producer-integration.md` |
 
 ## Siguiente ID disponible
 
-`TASK-1642`
+`TASK-1643`
 
 > **Corrección 2026-07-30.** Este pie declaraba `TASK-1587`, pero la tabla de este mismo archivo ya
 > registraba hasta `TASK-1598` y esos archivos existen en disco: el pie estaba obsoleto respecto de su
 > propia tabla. Antes de reservar un ID, **verificar contra el sistema de archivos**
 > (`ls docs/tasks/*/TASK-*.md`), no sólo contra este pie. Reservados `TASK-1599`, `TASK-1600`, `TASK-1601` y
-> `TASK-1602`…`TASK-1611`; `TASK-1614` fue reservado para el ciclo durable de evaluación; `TASK-1616`…`TASK-1624` fueron reservadas para la flota challenger de Fal; `TASK-1625` fue reservado para payroll correctness; `TASK-1626` fue reservado para Efeonce MCP Platform; Runway queda fuera de esta expansión; `TASK-1627` sigue reservado, `TASK-1628` quedó tomado por el presupuesto legible del Producer, `TASK-1629` por la recuperación del Admin CLI, `TASK-1630` por la convergencia del control plane de créditos, `TASK-1631` por la foundation de identidad cliente MCP, `TASK-1632` por el handoff event-driven, `TASK-1633` por el contrato de operaciones/inputs/controles del Producer, `TASK-1634` por la supersesión explícita de generated rights policy `TASK-1635` por el entorno de desarrollo de Globe y `TASK-1636` por el bundle de promoción desplegable (partición 2026-08-03); `TASK-1637` por los deadlines por etapa y el conformance del spine; el siguiente ID libre es `TASK-1638`.
+> `TASK-1602`…`TASK-1611`; `TASK-1614` fue reservado para el ciclo durable de evaluación; `TASK-1616`…`TASK-1624` fueron reservadas para la flota challenger de Fal; `TASK-1625` fue reservado para payroll correctness; `TASK-1626` fue reservado para Efeonce MCP Platform; Runway queda fuera de esta expansión; `TASK-1627` sigue reservado, `TASK-1628` quedó tomado por el presupuesto legible del Producer, `TASK-1629` por la recuperación del Admin CLI, `TASK-1630` por la convergencia del control plane de créditos, `TASK-1631` por la foundation de identidad cliente MCP, `TASK-1632` por el handoff event-driven, `TASK-1633` por el contrato de operaciones/inputs/controles del Producer, `TASK-1634` por la supersesión explícita de generated rights policy, `TASK-1635` por el entorno de desarrollo de Globe y `TASK-1636` por el bundle de promoción desplegable (partición 2026-08-03); `TASK-1637` por los deadlines por etapa y el conformance del spine; al cierre de esa corrección el siguiente ID libre era `TASK-1638`.
 
 > `TASK-1628` quedó tomado por «El Producer puede leer su propio presupuesto» (EPIC-028); `TASK-1629` quedó
 > asignado a la recuperación del Admin CLI OAuth/PKCE cuyo branch histórico usó por error `TASK-1616`. El
 > `TASK-1630` quedó asignado a «Globe Credits Control Plane Convergence» (EPIC-028) y `TASK-1631` a «Efeonce
 > Customer Identity and MCP Federation Foundation», y `TASK-1632` a «Globe Provider Completion → Asset
 > Governance Event-Driven Handoff», `TASK-1633` a «Globe Producer Creative Operation, Input Roles and Control
-> Support Contract» `TASK-1635` al entorno de desarrollo de Globe y `TASK-1636` al bundle de promoción desplegable; el
-> siguiente ID libre es `TASK-1637`.
+> Support Contract» `TASK-1635` al entorno de desarrollo de Globe y `TASK-1636` al bundle de promoción desplegable; al
+> cierre de esa nota el siguiente ID libre era `TASK-1637`.
+
+> **Reserva 2026-08-04.** `TASK-1642` quedó asignada a la integración de FLUX 3 Video en la flota y el Producer de Globe; el siguiente ID libre es `TASK-1643`.
