@@ -18,6 +18,13 @@ Un operador —humano o agente— que intenta generar no puede saber **qué cont
 | `runner_error` | **todo** fallo del runner que no traiga un `reason` de nuestro vocabulario | ✅ **cerrado** (revisión `00098-45x`) |
 | `ProductionRouteDependencyError` | **28 sitios de throw sin argumento**: allowlist vacío, endpointId duplicado, endpoint ausente, provider que no calza, URL malformada, origin no permitido, regiones inválidas, persistencia de la decisión, forma del request compilado, placeholder de input no autorizado | ✅ **cerrado** (`17329f6`, 12 razones) |
 | `authentication_required` (API mode) | clase de credencial equivocada vs `--include-email` ausente vs audiencia incorrecta | 🔴 **abierto** |
+| `dependency_unavailable` (Asset Governance) | **quinta aparición, 2026-08-04.** `asset-governance-jobs.ts:82` colapsa todo error que no sea `AssetGovernanceDependencyError`, y su `SAFE_DEPENDENCY_CODES` sólo tiene los **cuatro códigos de C2PA**: los seis nombres de ClamAV/inspección que `apps/asset-governance/src/engines.ts` **ya emite bien** se destruyen en la frontera | 🔴 **abierto** — dueño `ISSUE-141` |
+
+> **Lo que enseña la quinta.** Las cuatro primeras se cerraron nombrando causas *hacia adelante*. Ésta invierte el
+> orden: el sistema **ya tenía los nombres** y los tiró en el borde. Por eso el arreglo no es agregar los seis
+> códigos al set —eso repite el defecto en la séptima causa— sino que la frontera **preserve el código nombrado** y
+> reserve el colapso para lo que genuinamente no lo tiene. Un allowlist que hay que ampliar cada vez es el mismo
+> bug con más filas.
 
 ## Causa raíz
 

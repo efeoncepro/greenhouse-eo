@@ -181,7 +181,13 @@ de los bytes a GCS, lo que explicaría un `describe` en 404 dentro de `inspectin
 defecto de plataforma hay que reproducirlo con una subida real por el selector de archivos**. Lo que **sí** queda
 verificado con independencia de eso es el enmascaramiento de la causa.
 
-Ambos defectos son ajenos a esta task —no son la saga de promoción ni el canary— y quedaron con su propio chip.
+Ambos defectos son ajenos a esta task —no son la saga de promoción ni el canary— y **ya tienen dueño escrito**
+(2026-08-04): el de la subida es **`ISSUE-141`**, y el de los botones es el **Slice 5 de `TASK-1559`**, que es la
+dueña del feed. Ninguno abrió task nueva: el enmascaramiento entró como quinta fila de `ISSUE-127`, y los botones
+como slice de la superficie que ya existe. **Corrección al diagnóstico de arriba:** el ClamAV sospechoso **no es el
+de `TASK-1378`** —esa es el adapter `clamav-http` de *Greenhouse*, apagado por diseño y con pregunta económica—;
+éste vive embebido en Globe (`apps/asset-governance/src/engines.ts`). Son dos sistemas con el mismo nombre, y
+confundirlos manda el diagnóstico a la task equivocada.
 
 Y refuerza el Scope 1 de esta task: mientras `ref/video/frames-v1` siga `executionReady: false` con
 `pending: governed_source_and_route_specific_controls`, no existe camino canónico para producir el canary de una

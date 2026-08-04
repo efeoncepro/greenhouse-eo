@@ -333,6 +333,29 @@ Before/after del feed y del viewer, desktop y 390px.
 
 - Canary con escenarios de concurrencia; flip tras verde.
 
+### Slice 5 — Las acciones de la tarjeta despachan (agregado 2026-08-04, TASK-1641)
+
+`ProducerFeedRoute.tsx:316-317` pasa `onReference: () => undefined` y `onRecreate: () => undefined`. **Un handler
+vacío es peor que ausente:** `ProducerFeed.tsx:718-720` ya deshabilita la acción cuando el handler es `undefined`,
+así que al pasarle una función que no hace nada **el botón se ve habilitado y miente**. Medido en vivo: cero
+`POST /v1/commands`, cero consola, contador de referencias en `0 / 2`. No es el overlay ni `pointer-events`
+—«Añadir a favoritos», en la misma tarjeta, sí registra— y toda la cadena de padres computa `pointer-events: auto`.
+
+- `onReference` despacha `globe.producer.asset.copyAsReference` y la referencia aterriza en el composer.
+- `onRecreate` carga la receta del ítem en el composer.
+- Mientras una acción no tenga camino, **se deshabilita con su motivo**; no se cablea a una función vacía.
+
+**Esta es la tercera aparición de la misma familia, y por eso el arreglo no puede ser sólo cablear dos handlers.**
+`TASK-1552` cerró el mismo defecto en el composer: «Mencionar del feed» estaba bloqueado **por omisión del mapa de
+gates** —`copyAsReference` no era una de las tres capabilities consultadas— y `gateOf` traducía ese `undefined` a
+*«todavía no tiene contrato gobernado»*, o sea una **negación falsa**: le decía al operador que la plataforma no lo
+soportaba cuando lo único que pasaba es que esa pantalla nunca preguntó. El contrato existe y
+`producer-client.ts:132-145` ya lo consume. Cerrar el slice exige que **no se pueda volver a renderizar una acción
+sin camino como si lo tuviera**.
+
+Bloquea la entrada de referencias del Producer junto con `ISSUE-141` (el otro camino, la subida). Con los dos
+rotos, ninguna ruta con entrada obligatoria se puede generar desde la UI.
+
 ## Out of Scope
 
 - Rediseño visual del feed o del viewer.

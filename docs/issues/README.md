@@ -64,12 +64,13 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-140`
+`ISSUE-142`
 
 ## Open
 
 | ID          | Título                                                                                                                       | Ambiente             | Detectado  | Estado |
 | ----------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------- | ---------- | ------ |
+| `ISSUE-141` | [Globe: la subida de un asset muere en `inspecting` y la causa llega enmascarada](open/ISSUE-141-globe-asset-ingest-dies-in-inspecting-with-masked-cause.md) | Globe producción (`globe-asset-governance`) | 2026-08-04 | open — dos ingests consecutivos muertos en `inspecting` con `dependency_unavailable` tras 5 intentos (`asset_f861b971…`, `asset_86670e74…`); no es transitorio. **La causa está enmascarada, quinta aparición de `ISSUE-127`:** `asset-governance-jobs.ts:82` colapsa todo error que no sea `AssetGovernanceDependencyError` y su `SAFE_DEPENDENCY_CODES` sólo tiene los cuatro códigos de C2PA, así que los seis nombres de ClamAV/inspección que `engines.ts` **ya emite bien** se destruyen en la frontera. ⚠️ **Primer paso obligatorio: reproducir con una subida REAL por el selector** — el hallazgo se hizo con un `File` sintético y ese camino pudo omitir el PUT de los bytes a GCS, lo que dejaría a ClamAV fuera de la historia. Y el ClamAV sospechoso **no es el de `TASK-1378`** (ese es el adapter de Greenhouse, OFF por diseño): éste vive embebido en Globe. Junto con el Slice 5 de `TASK-1559` deja cerrada la entrada de referencias del Producer, y con ella la generación desde la UI de toda ruta con entrada obligatoria |
 | `ISSUE-122` | [Visual gate del composer: nondeterminismo de fotos + sin protocolo de concurrencia + docs dispersas](open/ISSUE-122-composer-visual-gate-photo-nondeterminism-concurrency-docs.md) | local (composer visual gate) | 2026-07-15 | open (runbook cerrado; fix determinismo + regla concurrencia coordinados con la sesión del composer) |
 | `ISSUE-123` | [Alias env-staging de Vercel fijado a un deployment viejo por `vercel alias set` manual](open/ISSUE-123-vercel-env-staging-alias-pinned-manual-alias-set.md) | Vercel staging (agent tooling) | 2026-07-18 | open (tooling resiliente shipped + des-pin ejecutado + **re-atado automático verificado ciclo 1** — cierra con 1 deploy más moviéndose solo) |
 | `ISSUE-124` | [Globe: grant adicional de créditos devuelve 409 sin causa de fase](resolved/ISSUE-124-globe-credit-grant-canonical-409-root-cause-hidden.md) | production (Globe API internal) | 2026-07-24 | resolved 2026-08-01 — status/recovery live, fondeo 800 completado y readback coincidente en Greenhouse, CLI PKCE y Producer |
