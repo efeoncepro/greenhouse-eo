@@ -122,6 +122,25 @@ Ante un `execute` o un canary que expira: **leer el estado antes de decidir**. V
 2026-08-04 — una corrida dio timeout de cliente a los 20 minutos y **completó sola en la entrega 21**.
 Reintentar habría gastado de nuevo.
 
+
+### I11 · La fila de la cola se sella con el reloj de PARED, no con el instante del dominio
+
+`completed_at`/`available_at` de `governed_run_outbox` describen **la cola**, no el negocio. Cuando cada call
+site de `finishLease` pasaba su instante de dominio —aceptación del proveedor, próxima acción, terminal—, **tres
+de los siete pasaban instantes del FUTURO** y la fila quedaba diciendo que terminó antes de estar disponible.
+
+Medido en producción: **23 de 131 filas `done`** con `completed_at < available_at`, peor caso **−34.965 s = 9,7
+horas**. Con eso, cualquier señal de latencia de cola **miente sin fallar**: una edad negativa no «se ve rara»,
+desaparece del conteo y con ella el trabajo que representaba.
+
+`finishLease` recibe hoy el reloj **inyectado** —no `new Date()` disperso, para que un test pueda afirmar qué
+reloj se usó— y es el único que sella. El instante de dominio no se pierde: tiene columna propia en los siete
+caminos (`provider_accepted_at`, `next_action_at`, `terminal_at`, `cancellation_confirmed_at`, el JSON de
+`completion`), y eso es lo que hizo el cambio barato.
+
+**Reglas duras.** **NUNCA** le pases a `finishLease` un instante de negocio. **NUNCA** guardes un instante de
+dominio en una columna de la cola: si hace falta, se agrega su propia columna. ⚠️ **Toda edad o latencia
+calculada sobre filas anteriores al sello es sospechosa** y no sirve para cerrar un incidente.
 ## Convergencia terminal de los agregados del run
 
 La captura de completitud tiene un corolario que se descubrió por el camino difícil: **cuando un run llega a

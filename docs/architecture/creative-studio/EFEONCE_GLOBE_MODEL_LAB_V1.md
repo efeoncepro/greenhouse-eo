@@ -61,11 +61,24 @@ export type LabExperimentV1 = Readonly<{
   reservedCredits: number;
   spentCredits: number;
   attempts: readonly ExperimentAttemptManifestV1[];
+  /** La corrida gobernada DETRÁS del experimento. Eje distinto de `state`, no su duplicado. */
+  runProgress?: ExperimentRunProgressV1;  // { runId, state, coarseProgress, attempt, providerAccepted, since }
   failureReason?: string;
   createdAt: string;
   updatedAt: string;
 }>;
 ```
+
+> **`attempts[]` sólo se puebla al FINALIZAR.** Durante toda la ventana de una generación el experimento se leía
+> `running` con `attempts: []`, aunque el attempt existía desde el segundo 15 y el proveedor ya lo había
+> aceptado: **una corrida sana en curso era indistinguible de una atascada**, y por eso `ISSUE-137` se
+> diagnosticó mal —nació proponiendo una señal que, sobre ese dato, habría alertado sobre corridas sanas—.
+>
+> `runProgress` cierra el hueco desde un **puerto de lectura estrecho** (`ExperimentRunProgressPort`), separado
+> del scheduler (que sólo agenda) y del store de escritura del worker: un reader no debe poder reclamar leases ni
+> mover la state machine. Su ausencia deja el experimento **mudo, no roto**, y la indisponibilidad se **observa**
+> (`RunProgressUnavailablePort`) en vez de degradar en silencio. Se publica **también cuando la corrida es
+> terminal**: un run terminal bajo un experimento `running` es justamente la divergencia que hay que poder ver.
 
 La `capability` **no es un nombre de modelo de vendor** sino un verbo creativo semántico del vocabulario cerrado `CREATIVE_CAPABILITIES` (`packages/contracts/src/index.ts`): `image-generate`, `image-edit`, `image-vectorize`, `video-generate`, `video-extend`, `audio-generate`, `speech-synthesize`. El dominio **enruta por contrato de fidelidad, no por nombre de vendor** (invariante 3): el identificador de modelo del proveedor jamás aparece en el contrato de entrada.
 

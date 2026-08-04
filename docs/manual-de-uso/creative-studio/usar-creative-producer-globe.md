@@ -147,6 +147,12 @@ primero el reader del experimento.
 
 ## Lo que se ve raro y no es un error
 
+- **Un audio que bajaste antes del 2026-08-04 puede tener la extensión equivocada.** La ficha de la pieza
+  anunciaba el formato **adivinado por su tipo de medio**, así que un MP3 se descargaba nombrado `.wav`. **Los
+  bytes siempre estuvieron intactos**: el archivo está bien, el nombre no. Renómbralo a `.mp3` o vuelve a
+  descargarlo — **no regeneres la pieza**, eso sí cuesta créditos. Desde el arreglo la ficha declara el formato
+  real (`ISSUE-139`).
+
 - **Los rótulos del composer son chicos y densos, y así se quedan.** Esos tamaños se midieron y se
   aprobaron para una consola interna que un operador usa el día entero; no es un descuido pendiente de
   agrandar. Lo que sí se corrigió el 2026-07-29 son los textos que se **leen** —ayudas, estados vacíos,

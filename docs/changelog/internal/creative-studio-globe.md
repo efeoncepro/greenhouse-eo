@@ -6,6 +6,45 @@
 
 # Changelog
 
+## 2026-08-04 (b) — El run deja de mentir sobre su propio reloj, y el experimento deja de ser mudo
+
+- **La fila de la cola se sellaba con el reloj equivocado, y era mucho peor de lo medido en el incidente.**
+  `finishLease` escribe `completed_at`/`updated_at` —hechos sobre *cuándo terminó la fila de la cola*— pero
+  recibía el instante como parámetro, y **los siete call sites le pasaban un instante de DOMINIO**: cuatro del
+  pasado y **tres del futuro** (`retryAt`, `nextCheckAt`), o sea filas que podían declararse completas **antes de
+  existir**. Medido sobre producción: **23 de 131** filas `done` son contradictorias, con un peor caso de
+  **−34.965 s = 9,7 horas** en un job `complete` de 144 entregas. Hoy sella con un **reloj de pared inyectado**
+  —inyectado y no `new Date()` disperso, para que un test pueda afirmar *qué reloj se usó*—. Verificado en vivo:
+  cero contradictorias en los tres tipos de job.
+- **El arreglo resultó más barato de lo que la task temía, y por dato medido.** `completed_at` del outbox **no
+  tiene lectores** y `finishLease` **no toca `available_at`**, así que la ventana de reintento que se advertía
+  no se mueve; y el instante de dominio **ya tenía su propia columna** en los siete caminos.
+- **Una sola definición de la fase gruesa, no tres.** `coarseProgress` estaba transcrito en una función TS, en un
+  `CASE` del SQL del live feed y en un `Set` de valores del mismo archivo. **Coincidían — por eso el riesgo era
+  invisible**: divergir no rompe nada, sólo hace que la tarjeta del feed y el detalle digan cosas distintas del
+  MISMO run, en verde. Hoy es dato único y el SQL se genera de él. Se retiró el `ELSE 'terminal'`, que presentaba
+  un estado desconocido como corrida **terminada**.
+- **El experimento ya no es mudo mientras trabaja.** Se leía `running` con `attempts: []` durante toda la ventana,
+  así que **una corrida sana era indistinguible de una atascada** — la razón por la que `ISSUE-137` se diagnosticó
+  mal. No faltaba la proyección: **faltaba el link**. `coarseProgress` ya existía y era browser-safe, pero su
+  reader pide `runId` y `LabExperimentV1` no lo llevaba. Tercera aparición del patrón *«la capability existe y la
+  UI no la consume»*. Se publica también la corrida **terminal**, porque un run terminal bajo un experimento
+  `running` es justo la divergencia que hay que poder ver.
+- **El canary estaba roto y `pnpm check` seguía verde.** Un comentario de bloque escribió una expresión de cron
+  literal; su `*/` **cierra el comentario**. La suite importaba la *lib* del canary y nunca el *script*, así que
+  el instrumento de salida de todo rollout no corría y nadie lo notaba. Guard nuevo: **parsea todos los
+  entrypoints**.
+- **`ISSUE-139` — un default que acierta casi siempre es peor que ninguno.** El descriptor de output anunciaba un
+  MIME **adivinado por modalidad**: un MP3 servido correctamente como `audio/mpeg` se anunciaba `audio/wav`.
+  Imagen y video pasaban porque su default **coincidía por casualidad**, y por eso sobrevivió tres semanas. El
+  dato correcto estaba a la vista y se descartaba. Lo destapó el canary de generación real; diagnosticarlo exigió
+  reproducir el chequeo a mano porque **colapsaba ocho condiciones con remedios opuestos** en un código opaco —
+  `ISSUE-127` dentro del instrumento que existe para detectar problemas, también cerrado.
+- **Rollout verificado contra la revisión activa**, no contra el workflow verde: `globe-api-internal-00207-28r`,
+  `globe-studio-internal-00149-w9c` y el Job del worker, las tres con el digest etiquetado `e7a732c9b62e`. Canary
+  de generación real: las tres modalidades generadas, retenidas y servidas, con liquidación económica exacta;
+  imagen end-to-end en **7 min 48 s**.
+
 ## 2026-08-04 — Captura de completitud y convergencia terminal: 13 huecos, 12 cerrados
 
 - **ADR-021 nace porque el contrato no existía.** Ningún documento de arquitectura mencionaba siquiera la

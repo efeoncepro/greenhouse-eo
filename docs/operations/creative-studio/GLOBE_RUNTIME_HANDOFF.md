@@ -13,6 +13,36 @@
 > `d3fe90e`, digest `sha256:d8295862dc12c14427e90e0bb413577802916c37ca6bf32c202680492ca7bae9`,
 > deploy `30717266572` y baseline IaC `e369ef8` sin drift.
 
+## Corte 2026-08-04 (tarde) — sello del reloj, canary reparado e ISSUE-139
+
+**Revisiones activas:** `globe-api-internal-00207-28r`, `globe-studio-internal-00149-w9c` y el Job
+`globe-producer-worker`, las tres sobre el mismo digest etiquetado **`e7a732c9b62e`**. Verificadas contra la
+revisión activa y el tag del digest, no contra el workflow verde.
+
+Commits en Globe `main`: `a69cb1f` (sello del reloj de la cola), `753042c` (una sola definición de
+`coarseProgress`), `f06eae7` (el reader del experimento proyecta el attempt en vuelo), `e3088b2` (el entrypoint
+del canary vuelve a parsear + guard), `e7a732c` (`ISSUE-139`).
+
+🔴 **El sello del reloj, verificado sobre `governed_run_outbox`:** de **131 filas `done`**, **23 son
+históricamente contradictorias** (`completed_at < available_at`), peor caso **−9,7 horas**. De las selladas por el
+código nuevo: **0 contradictorias**, en los tres tipos de job. ⚠️ **Toda edad o latencia calculada sobre filas
+anteriores al sello es sospechosa** — no cierres un incidente sobre ellas.
+
+🔴 **El canary de generación estuvo ROTO desde el 2026-08-03.** Un comentario de bloque contenía una expresión de
+cron literal cuya barra-asterisco **cierra el comentario**: el script dejó de parsear. `pnpm check` seguía
+**verde** porque la suite importa la librería, no el script. `e3088b2` lo repara y agrega un guard que **parsea
+todos los `scripts/*.mjs`** — un gate que no ejercita el entrypoint no lo cubre.
+
+**`ISSUE-139` (resuelta):** el descriptor de output anunciaba un MIME **adivinado por modalidad** — un MP3 se
+anunciaba `audio/wav`. Los bytes servidos SIEMPRE fueron correctos; mentía el descriptor, así que un consumidor
+que lo use para nombrar la descarga produce la extensión equivocada. **La detectó el propio canary**, no un
+usuario.
+
+**Latencia end-to-end medida de una imagen: 7 min 48 s**, dentro del presupuesto de ~7,9 min.
+
+**Sigue abierto:** `D12` de `ISSUE-138` (`storageUri` de Veo) — necesita un canary con gasto real, decisión del
+operador.
+
 ## Corte 2026-08-04 — cadencia de Asset Governance (`ISSUE-137`)
 
 `asset_governance_schedule` pasó de `*/5 * * * *` a **`*/1 * * * *`** en Globe **`d78ce01`**. `tofu plan`

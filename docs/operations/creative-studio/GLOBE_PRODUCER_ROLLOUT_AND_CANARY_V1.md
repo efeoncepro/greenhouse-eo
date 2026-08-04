@@ -48,7 +48,31 @@ código, workflows e imágenes viven en `efeonce-globe`.
 9. Provisionar los Jobs y sus schedulers explícitamente pausados (`enable_*_scheduler=true`,
    `*_scheduler_paused=true`), activar primero un workspace canario y disparar ejecuciones one-shot manuales.
    Despausar cada Scheduler sólo después del smoke, métricas y notification channels verdes.
-10. Ejecutar `pnpm producer:canary` en dry-run.
+10. Ejecutar `pnpm producer:canary` en dry-run. 🟢 **El dry-run es de COSTO CERO** y ya valida readiness, route,
+    circuito, derechos y estimate de **las tres** modalidades: es el primer diagnóstico ante cualquier duda de
+    disponibilidad, no el último recurso.
+
+    ```bash
+    export GLOBE_CANARY_BASE_URL=<url del api>
+    export GLOBE_CANARY_WORKSPACE_ID=greenhouse-org:efeonce
+    export GLOBE_CANARY_RUN_LABEL=<etiqueta de la corrida>
+    export GLOBE_CANARY_ID_TOKEN=$(gcloud auth print-identity-token \
+      --impersonate-service-account=greenhouse-globe-caller@efeonce-globe.iam.gserviceaccount.com \
+      --audiences=$GLOBE_CANARY_BASE_URL --include-email)
+
+    pnpm producer:canary                                               # dry-run, 0 créditos
+    pnpm producer:canary --execute --approve=image:N,video:N,audio:N   # ~32 créditos
+    ```
+
+    ⚠️ `--execute` **exige las tres modalidades**: menos de tres aborta con
+    `producer_canary_three_approvals_required`, así que no existe un canary barato de una sola. Y
+    `GLOBE_CANARY_RUN_LABEL` se valida **sólo** en la rama `--execute` — un dry-run verde no prueba que el
+    execute vaya a arrancar.
+
+    🔴 **Nunca escribas una expresión de cron literal dentro de un comentario de bloque de un script.** Su
+    barra-asterisco cierra el comentario y el entrypoint deja de parsear: el canary estuvo roto un día entero
+    con `pnpm check` VERDE, porque la suite importa la librería y no el script. El guard que parsea todos los
+    `scripts/*.mjs` existe por eso.
 
     ⚠️ **Presupuesto y paciencia.** El CLI exige las **tres** aprobaciones y corre las tres modalidades
     (~32 créditos); no se puede acotar a una sin editar la librería. Su paciencia es de **45 min**, deliberadamente

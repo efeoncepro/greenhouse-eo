@@ -187,6 +187,15 @@ skill.
   cuando corresponda), pero nunca imprime mensajes upstream, stacks, cuerpos, tokens, cookies, URLs firmadas ni
   secretos. Verifica cada salto por su reader, audit y manifest; una respuesta sanitizada sin señal operable no
   basta para diagnosticar.
+- 🔴 **Un default POR MODALIDAD no puede describir los BYTES (`ISSUE-139`).** `advertisedMimeType`
+  (`packages/domain/src/producer-assets.ts`) caía a un mapa por modalidad, así que un **MP3 servido correctamente
+  como `audio/mpeg` se anunciaba `audio/wav`** en el descriptor. Imagen y video pasaban **porque su default
+  coincidía por CASUALIDAD** — esa coincidencia accidental es lo que lo mantuvo invisible tres semanas, y es la
+  lección: **un default que acierta casi siempre es peor que ninguno**. Una modalidad admite varios formatos y el
+  motor elige: el MIME sale de lo que el intento DECLARÓ para esos bytes, y el mapa por modalidad es último
+  recurso, sólo para manifiestos anteriores a los descriptores por output. Los bytes nunca estuvieron mal; mentía
+  el rótulo, y un rótulo falso nombra mal la descarga y puede hacer fallar un reproductor **sobre un archivo
+  perfecto**.
 - **SVG servido por Fal:** Fal puede declarar `image/svg+xml` en el resultado y entregar el objeto CDN como
   `application/octet-stream`. Acepta ese MIME genérico **sólo** cuando la salida esperada por la ruta es SVG,
   valida los bytes como SVG antes del ingest y rechaza cualquier otra combinación. Sirve el SVG retenido con CSP
@@ -342,8 +351,9 @@ como catálogo porque **cada una es una CLASE, no un caso**.
 
 #### El feed: el backend paginaba y el cliente usaba medio contrato (2026-08-01)
 
-Segunda vez en el mismo día que aparece el patrón «la capability existe y la UI no la consume» (la primera
-fue el compare de las cards). `globe.producer.feed.live.*` pagina por **cursor keyset** (`updatedAt` +
+**Tercera** aparición del patrón «la capability existe y la UI no la consume» (compare de las cards ·
+paginación del feed · `runProgress` del experimento, 2026-08-04). Tres veces en pocos días **no es olvido: es
+que nada verifica el CONSUMO** — un contrato con cero lectores pasa todos los gates. `globe.producer.feed.live.*` pagina por **cursor keyset** (`updatedAt` +
 `stableKey`) con `nextCursor` desde TASK-1525; `nextFeedRead` sólo resolvía el eje del FUTURO (marca →
 `changes`) y **el `nextCursor` para retroceder se ignoraba**. El feed crecía sin techo por arriba y el
 histórico era inalcanzable. **No faltaba paginación: estaba a medio cablear.**
@@ -499,6 +509,43 @@ hacerse cargo.
   sí entregó. Ese caso **se cuenta y no converge**, y la diferencia queda en `divergentAggregates`.
 - **NUNCA** midas una señal en la unidad equivocada. `outboxDeadLetter` contaba **filas de outbox** y un attempt
   tiene una por fase: decía **3 para UN solo attempt**. Hoy es `outboxTerminalAttempts` y cuenta attempts.
+
+### 🔴 El reloj de la COLA no es el reloj del DOMINIO
+
+`finishLease` cierra la fila de `governed_run_outbox` escribiendo `completed_at`/`updated_at` — hechos sobre
+**cuándo terminó la fila de la cola**. Recibía el instante como parámetro y **los siete call sites le pasaban un
+instante de NEGOCIO**: cuatro del pasado (`acceptedAt`, `observedAt`) y **tres del futuro** (`retryAt`,
+`nextCheckAt`), o sea filas que podían declararse completas **antes de existir**.
+
+Medido en producción: **23 de 131 filas `done`** con `completed_at < available_at`, peor caso **−34.965 s = 9,7
+horas** en un job `complete` de 144 entregas. Hoy sella con el reloj de pared **inyectado** (`this.#now()`), y un
+guard estructural **pinea que son siete** — un octavo exige una decisión explícita en vez de heredarla.
+
+**Y el diagnóstico correcto necesitó dos datos que la métrica sola no da:** `completed_at` del outbox **no tiene
+lectores** y `finishLease` **no toca `available_at`**. O sea el daño era de **observabilidad**, no de scheduling,
+y el arreglo no movía ninguna ventana de reintento. **Antes de escalar un dato torcido, mide quién lo lee.**
+
+- **NUNCA** le pases a `finishLease` —ni a ningún campo de reloj de la cola— un instante de dominio.
+- **NUNCA** guardes un instante de negocio en una columna de la cola: si hace falta, se agrega su propia columna.
+  Los siete caminos ya tenían la suya (`provider_accepted_at`, `next_action_at`, `terminal_at`,
+  `cancellation_confirmed_at`, el JSON de `completion`), que es lo que hizo el cambio barato.
+- ⚠️ **Toda edad, latencia o serie calculada sobre filas anteriores al sello es sospechosa.** No concluyas un
+  incidente sobre ellas.
+
+### Una regla transcrita tres veces son TRES reglas
+
+`coarseProgress` vivía como función TS en el run store, como `CASE` en el SQL del live feed y como `Set` de
+valores en ese mismo archivo. **Las tres coincidían — por eso el riesgo era invisible**: divergir no rompe nada,
+sólo hace que la tarjeta del feed y el detalle del run digan cosas distintas del **mismo** run, con el build y
+los tests en verde.
+
+Hoy es **dato único** `GOVERNED_RUN_COARSE_PROGRESS` (`packages/contracts/src/governed-runs.ts`, `Record`
+exhaustivo sobre `GovernedRunStateV1`) y el SQL se **genera** con `governedRunCoarseProgressSql()`.
+
+🔴 **Se retiró el `ELSE 'terminal'`, y esa parte importa más que la deduplicación:** un catch-all que presenta un
+estado **desconocido** como **corrida terminada** miente en la dirección más cara — el operador deja de esperar
+algo que sigue vivo. Sin `ELSE`, un estado no declarado rinde NULL y el consumidor **lanza**. Un default sobre un
+vocabulario cerrado no es robustez: es una respuesta inventada.
 
 ### Alertas: el aligner es función del TIPO de métrica
 
@@ -1169,7 +1216,7 @@ razones nombradas en `apps/creative-runner/src/production-route-compiler.ts`; la
 
 **`route_creative_contract_mismatch` colapsaba NUEVE causas con remedios opuestos** —re-estimar contra la revisión
 vigente, elegir otra operación, elegir otro slot, cambiar el asset, convertir el archivo—. El operador sabía que
-algo del contrato no calzó, jamás cuál. Fue la **décima** aparición del bug class de `ISSUE-127` (van **doce** al 2026-08-04), y la única con
+algo del contrato no calzó, jamás cuál. Fue la **décima** aparición del bug class de `ISSUE-127` (van **trece** al 2026-08-04), y la única con
 agravante propio: **los nombres correctos ya estaban escritos en la spec de la task y la implementación los
 colapsó igual**. Conocer la regla no la aplica sola; escribirla en la spec tampoco.
 
@@ -1213,7 +1260,9 @@ funciona es que el build no deje.** ⚠️ Con un límite MEDIDO: la 11.ª viví
 —`reconciliationFailureCode` leyendo `.errorCode` mientras el error expone `.code`— ocurrió **con el guard
 vigente**, porque un test de cobertura ve que un código esté clasificado, no que LLEGUE a la política leyendo el
 campo correcto. **Cuando una regla cruza dos subsistemas, verifica el camino completo del valor, no cada
-extremo.**
+extremo.** Y la **13.ª** ocurrió **dentro del canary**: colapsaba **OCHO condiciones de integridad con remedios
+opuestos** en un código opaco, así que el instrumento que existe para nombrar causas fue el que dejó de
+nombrarlas — diagnosticarlo exigió reproducir el chequeo a mano. Ya corregido para decir cuál falló.
 
 ### Un dueño por valor, y la forma declarada (`@e300c4e`, ADR-022 Delta (b))
 
@@ -1845,8 +1894,23 @@ los 24 experimentos del workspace interno: 11 `candidate_ready`, 10 `failed`, **
 
 Es la familia de **`ISSUE-135` con otro disfraz**: en la UI se ve **"generando" para siempre**. No hay pérdida
 económica —la reserva queda **retenida** y nunca se convierte en gasto— pero **el crédito queda inmovilizado y
-ningún readback lo distingue de una corrida legítima en curso**. 🔴 **NUNCA lo "destrabes" reintentando**:
+ningún readback lo distinguía de una corrida legítima en curso**. 🔴 **NUNCA lo "destrabes" reintentando**:
 readback-first, porque un segundo submit a ciegas crea un **segundo cobro**.
+
+🔴 **Delta 2026-08-04 — el readback SÍ existía; faltaba el CABLE.** `GovernedRunViewV1.coarseProgress` (reader
+`globe.run.get`) ya distinguía el avance y ya era browser-safe, pero pide `runId` y `LabExperimentV1` **no lo
+llevaba**: no faltaba proyección, faltaba el **link** entre dos agregados. Hoy `LabExperimentV1.runProgress`
+—`{runId, state, coarseProgress, attempt, providerAccepted, since}`— lo publica vía un **puerto de LECTURA
+estrecho** (`ExperimentRunProgressPort`), deliberadamente separado del scheduler (que sólo agenda) y del
+`GovernedRunStorePort` completo (superficie de ESCRITURA del worker): un reader no debe poder reclamar leases ni
+mover la state machine. Se publica **también cuando la corrida es terminal**, porque un run terminal bajo un
+experimento `running` es justo la divergencia que hay que poder ver — silenciarla la vuelve a esconder. Y degrada
+**observando** (`RunProgressUnavailablePort`): un `catch` mudo haría indistinguibles «no hay corrida» y «no pude
+leerla», que es la misma ambigüedad una capa más arriba.
+
+**Antes de declarar «no hay readback», busca si la proyección existe y nadie la consume.** Verificado en vivo
+sobre una corrida EN CURSO: se leía `running` con `attempts: 0` y el reader respondió
+`provider-running/queued, providerAccepted=true`.
 
 ### Operación vigente de Studio Credits
 
@@ -2108,9 +2172,25 @@ La cuenta Google visible en Chrome puede diferir de la identidad Greenhouse. La 
 🔴 **ANTES de escribir una secuencia de canary a mano: YA EXISTE COMO SCRIPT (2026-07-26).**
 `pnpm producer:canary` (`scripts/producer-ui-canary.mjs` + `-lib.mjs`) hace el recorrido **completo** de gasto real
 —`producer.catalog.list` → `lab.experiment.estimate` → `prepare` → `execute` → `experiment.get` →
-`producer.output.get`— y **valida `retained === true`** sobre el output de la modalidad pedida. Su test
-(`producer-ui-canary.test.mjs`) está registrado en el `test` de la raíz. Necesita **una sola** variable:
-`GLOBE_CANARY_ID_TOKEN`.
+`producer.output.get`— y **valida `retained === true`** sobre el output de la modalidad pedida.
+
+🟢 **El dry-run es de COSTO CERO y es el primer diagnóstico, no el último recurso:** `pnpm producer:canary`
+**sin `--execute`** valida readiness, route, circuito, derechos y estimate de las tres modalidades sin gastar un
+crédito. No pidas permiso para gastar antes de saber si hay algo que ver.
+
+**Gastar exige `--execute` MÁS `--approve=image:N,video:N,audio:N` con las TRES modalidades**: menos de tres
+aborta con `producer_canary_three_approvals_required`, así que **no existe un canary barato de una sola
+modalidad**. Y necesita **cuatro** variables, no una: `GLOBE_CANARY_BASE_URL`,
+`GLOBE_CANARY_WORKSPACE_ID=greenhouse-org:efeonce`, `GLOBE_CANARY_RUN_LABEL` y `GLOBE_CANARY_ID_TOKEN`
+(`RUN_LABEL` se valida **sólo** en la rama `--execute`: un dry-run verde no prueba que el execute vaya a arrancar).
+
+⚠️ **Su test NO cubre el entrypoint.** `producer-ui-canary.test.mjs` importa la **lib**; a
+`producer-ui-canary.mjs` **no lo importa nadie**. El 2026-08-04 el script estuvo **roto un día entero con
+`pnpm check` VERDE**: un comentario de bloque contenía una expresión de cron literal y su barra-asterisco
+**cerró el comentario**, dejando el resto como código. 🔴 **Un archivo que ninguna suite importa no está
+testeado por estar en el repo** — hay un guard que **parsea todos los `scripts/*.mjs`**; si la lógica vive en la
+lib y el entrypoint es «sólo pegamento», el pegamento es exactamente lo único sin cobertura. Y **nunca escribas
+una expresión de cron literal dentro de un comentario de bloque**.
 
 Los otros dos smokes canónicos, para no confundirlos: **`smoke-private-api.mjs`** cubre el carril **workload**
 (SA + ID token) y **`smoke-human-federation.mjs`** el carril **humano** (las tres piernas del login SSO).

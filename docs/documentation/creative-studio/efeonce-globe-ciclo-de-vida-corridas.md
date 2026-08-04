@@ -255,3 +255,16 @@ pasa desapercibido.
   un único hueco abierto: la retención de la operación de larga duración de Vertex (`ISSUE-138` D12).
 </content>
 </invoke>
+
+## El reloj de la cola
+
+Una cola se diagnostica por **edades**: cuánto lleva esperando algo. Eso convierte al timestamp en un dato de
+autoridad — y no lo era. Al medirlo en producción, **23 de 131 filas terminadas eran contradictorias**: la peor
+decía haber terminado **9,7 horas antes** de estar disponible.
+
+No es cosmético. Una edad negativa no «se ve rara»: **desaparece del conteo**, y con ella el trabajo atascado que
+representaba. La señal seguía en verde justamente porque el dato estaba torcido.
+
+Hoy la fila se sella con el reloj real al escribirla, y las selladas por el código nuevo dan **cero**
+contradicciones. Lo que no se puede reparar hacia atrás: **toda lectura sobre filas anteriores al sello sigue
+siendo sospechosa**, y esa distinción hay que hacerla explícita antes de concluir un incidente.

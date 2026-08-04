@@ -126,6 +126,9 @@ Con una pieza real ya generada (un golden brief que haya retenido su salida):
 
 ## Problemas comunes
 
+| El archivo descargado tiene la extensión equivocada (un MP3 llamado `.wav`) | El descriptor anunciaba un MIME **adivinado por modalidad**, no el declarado por el intento (`ISSUE-139`) | Los bytes son correctos: renombrar o volver a descargar. **Nunca regenerar.** Al verificar, compara el `mimeType` del descriptor contra el del cable — si divergen, el que miente es el descriptor |
+
+
 | Síntoma | Causa probable | Diagnóstico |
 |---|---|---|
 | Todo responde `policy_blocked` | Interruptor apagado en la revisión activa | `gcloud run services describe globe-api-internal --region southamerica-west1` y mirar la revisión **activa**, no el último deploy |

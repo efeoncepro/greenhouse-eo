@@ -261,9 +261,13 @@ dejó `TASK-1490` (write half) y agrega su **espejo servible** gobernado.
   bucket compartido.
 - **Reader `globe.producer.output.get` → `ProducerOutputHandleV1`:** descriptor (`experimentId`, `attemptId`,
   `sha256`, `mediaType`, `mimeType`, `disposition`) + **grant efímero**. **Cero bytes en el JSON**, cero URL
-  firmada, cero bucket, cero identidad de proveedor. `mediaType` se deriva de la capability semántica del run
-  (única evidencia del manifest); el `Content-Type` servido sale del objeto real, así un run multi-output no
-  miente en el cable (tipado por-output = `TASK-1467`).
+  firmada, cero bucket, cero identidad de proveedor. `mediaType` sale de lo que el intento **declaró** para ese
+  output (con la capability semántica como respaldo); el `Content-Type` servido sale del objeto real, así un run
+  multi-output no miente en el cable. **El `mimeType` ANUNCIADO también sale del intento** (`advertisedMimeType`,
+  `packages/domain/src/producer-assets.ts`): el mapa por modalidad (`FALLBACK_MIME`) es **último recurso**, no la
+  respuesta por defecto — una modalidad admite varios formatos y el motor elige. Medido el 2026-08-04, un MP3 real
+  (`audio/mpeg`, 109.968 bytes) se anunciaba `audio/wav`, y el consumidor que confía en el descriptor nombra el
+  archivo `.wav` (`ISSUE-139`).
 - **El grant** (`RetrievalGrantSignerPort`, impl HMAC-SHA256 en `apps/studio-web/src/retrieval-grant.ts`):
   opaco, server-minted, **firmado no cifrado** (sus claims son cosas que el caller ya sabe), bound a
   `(workspaceId, experimentId, sha256, disposition)` con TTL corto (default 300 s), verificación
@@ -414,8 +418,16 @@ browser
   al provider y settlement/release; reintentos no nacen del browser.
 - Cancel, retry, priority, timeout recovery y reconciliation son transiciones explícitas. Un timeout cliente
   primero lee estado; jamás re-ejecuta a ciegas un command con gasto.
-- Progress granular existe solo con evidencia del provider. Si no existe, la UI muestra estados coarse honestos
-  (`queued`, `running`, `finalizing`) y timestamps; no fabrica porcentajes desde un timer.
+- Progress granular existe solo con evidencia del provider. Si no existe, la UI muestra la **fase gruesa
+  canónica** `GOVERNED_RUN_COARSE_PROGRESS` (`packages/contracts/src/governed-runs.ts`):
+  `waiting · submitting · provider-running · finalizing · cancelling · terminal`. Es un `Record` **exhaustivo**
+  sobre `GovernedRunStateV1` —**sin `ELSE`**, porque un catch-all presenta un estado desconocido como corrida
+  **terminada** y el operador deja de esperar algo que sigue vivo— y el SQL del live feed se **genera** desde ese
+  mismo `Record` con `governedRunCoarseProgressSql()`. Estuvo transcrito tres veces: una derivación escrita a mano
+  es una segunda definición. No se fabrican porcentajes desde un timer.
+- El experimento publica además `runProgress` (la corrida gobernada detrás de él) como **eje distinto** de su
+  `state` y de `attempts[]`, que sólo se puebla al finalizar: sin él, una corrida sana en curso es
+  indistinguible de una atascada por readback.
 
 ### Data products del target
 
@@ -562,10 +574,15 @@ Este párrafo describe el checkpoint local del 2026-07-22 y queda superseded por
   `unverified/c2pa_manifest_absent`; no se reporta como outage. El worker también reconcilia una revisión terminal
   no proyectada antes de fabricar otra y recupera derechos desde autoridad durable. La ejecución
   `globe-asset-governance-kn549` aplicó 3 trabajos, promovió 1 y falló 0.
-- La observabilidad del Producer Worker aún tiene deuda: cinco eventos `reconcile` quedaron `pending` aunque sus
-  runs están `completed`, por lo que `queueOldestAgeSeconds` mide trabajo no reclamable y genera ruido. La solución
-  debe terminalizar/superseder esos eventos al completar y calcular edad sólo sobre trabajo reclamable, con backfill
-  gobernado; nunca `UPDATE` manual.
+- **Cerrado** (ADR-021): `governed_run_outbox` converge por `supersedeNonReclaimableReconciles` pre-batch y
+  `queueOldestAgeSeconds` mide edad **sólo sobre trabajo reclamable**, sin `UPDATE` manual.
+- ⚠️ **Delta 2026-08-04 — el reloj de las filas viejas miente.** `finishLease` sella la fila con el **reloj de
+  pared inyectado**, no con el instante de dominio que traía cada call site (tres de los siete pasaban instantes
+  del **futuro**). Medido: **23 de 131** filas `done` históricas con `completed_at < available_at`, peor caso
+  **−9,7 h**. Las selladas por el código nuevo dan **cero**. Consecuencia operativa: **toda latencia calculada
+  sobre filas anteriores al arreglo es sospechosa**. El instante de negocio no se perdió — vive en su propia
+  columna por camino (`provider_accepted_at`, `next_action_at`, `terminal_at`, `cancellation_confirmed_at`, el
+  JSON de `completion`).
 
 ## Materialización 2026-08-02 — Gemini Omni en promoción gobernada, canary aún cerrado por policy
 

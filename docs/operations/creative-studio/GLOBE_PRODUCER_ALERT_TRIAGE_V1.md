@@ -40,6 +40,20 @@ DELTA/INT64 (métrica que cuenta entradas de log); una que **extrae un valor** e
 
 Y un **404 de la métrica recién creada no es defecto**: es propagación de Cloud Monitoring, hasta 10 minutos.
 
+
+⚠️ **Antes de concluir por una edad: las filas viejas de la cola tienen el reloj sucio.** De 131 filas terminadas
+medidas en producción, **23 eran contradictorias** (la peor decía haber terminado 9,7 horas antes de estar
+disponible). Desde el 2026-08-04 se sellan con el reloj real y las nuevas dan **0**. Una latencia calculada sobre
+filas anteriores a ese arreglo **no es evidencia**.
+
+**Conexión a la base de Globe** (para correlacionar por readback):
+
+```bash
+cloud-sql-proxy "efeonce-globe:southamerica-west1:globe-pg" --port 15433 --auto-iam-authn
+psql "host=127.0.0.1 port=15433 dbname=globe user=<tu email> sslmode=disable"
+-- y después, obligatorio:  set search_path to globe;
+```
+
 ## Primeros cinco minutos
 
 1. Confirmar proyecto `efeonce-globe`, región `southamerica-west1`, policy/condition y hora exacta del incidente.

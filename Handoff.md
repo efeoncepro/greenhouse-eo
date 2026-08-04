@@ -178,7 +178,38 @@ a runtimes que no seteen la variable), pero exageré su impacto. Queda escrito e
 ## TASK-1469 — convergencia terminal cerrada; task REABIERTA por cierre prematuro (2026-08-04)
 
 Verificado en runtime desde `efeonce-globe@c28ab9f`; detalle en
-[`TASK-1469`](docs/tasks/complete/TASK-1469-globe-governed-run-lifecycle-submission-fence.md).
+[`TASK-1469`](docs/tasks/in-progress/TASK-1469-globe-governed-run-lifecycle-submission-fence.md).
+
+### Delta 2026-08-04 (d) — los dos defectos de ISSUE-137 cerrados y DESPLEGADOS
+
+Rollout verificado contra la **revisión activa**, no contra el workflow verde: `globe-api-internal-00207-28r`,
+`globe-studio-internal-00149-w9c` y el Job del worker, las tres con el digest etiquetado `e7a732c9b62e`.
+
+- 🔴 **El sello del reloj era MUCHO peor que los 19 minutos del incidente.** `finishLease` recibía el instante
+  como parámetro y sus **siete** call sites pasaban uno de DOMINIO — tres del **futuro**, o sea filas que podían
+  declararse completas antes de existir. Medido: **23 de 131** filas `done` contradictorias, peor caso
+  **−34.965 s = 9,7 horas**. Hoy sella con reloj de pared **inyectado**; verificado en vivo con **0
+  contradictorias** en los tres tipos de job. Y el cambio salió barato por dato, no por suerte: `completed_at`
+  del outbox **no tiene lectores**, `finishLease` **no toca `available_at`**, y el instante de dominio **ya
+  tenía su columna** en los siete caminos.
+- **El attempt en vuelo no necesitaba proyección nueva: necesitaba un LINK.** `coarseProgress` ya existía y era
+  browser-safe, pero su reader pide `runId` y `LabExperimentV1` no lo llevaba. Tercera aparición de «la
+  capability existe y la UI no la consume». Verificado con una corrida EN CURSO: se leía `running` con
+  `attempts: 0` y el reader nuevo respondió `provider-running/queued, providerAccepted=true`.
+- **Hallazgo colateral:** `coarseProgress` estaba transcrito **tres** veces y coincidían — por eso el riesgo era
+  invisible. Hoy es dato único con el SQL generado; el `ELSE 'terminal'` se retiró porque presentaba un estado
+  desconocido como corrida terminada.
+- 🔴 **El canary estaba ROTO desde ayer y `pnpm check` seguía verde**: un comentario de bloque escribió una
+  expresión de cron literal cuyo `*/` cierra el comentario, y la suite importa la *lib* del canary y nunca el
+  *script*. El instrumento de salida de todo rollout no corría. Guard nuevo parsea todos los entrypoints.
+- **[`ISSUE-139`](docs/issues/resolved/ISSUE-139-globe-output-descriptor-advertises-per-modality-mime-guess.md)
+  (ajena, resuelta):** el descriptor de output anunciaba un MIME adivinado **por modalidad** — un MP3 servido
+  como `audio/mpeg` se anunciaba `audio/wav`. Imagen y video pasaban porque su default **coincidía por
+  casualidad**. Lo destapó el canary de generación real; re-verificado sobre los mismos assets con **cero gasto
+  adicional**.
+
+**Sigue abierto:** los 3 criterios NO VERIFICADOS de abajo, el webhook de OpenAI sin evidencia de runtime, y
+**D12 de `ISSUE-138`** (`storageUri` de Veo), que necesita un canary con gasto y es decisión del operador.
 
 - **Huérfanos 4 → 0** en un solo batch, con el motivo real propagado (tres códigos distintos, ningún
   genérico) y el batch siguiente en `convergedExperiments=0` — el barrido es idempotente.

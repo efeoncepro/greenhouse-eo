@@ -216,11 +216,17 @@ Every collapsed code existed for a legitimate reason (don't leak balances, polic
 
 > **Rule: every canonical code that collapses more than one actionable cause is born with its server-side reason, in the SAME commit.** The reason's payload carries the **name of the control** — never `message`, never `stack`, never the upstream body, never anything derived from the payload (the ban on leaking internal detail applies to logs exactly as it applies to the client).
 
-**Twelve appearances (2026-08-04).** Two facts make this the rule and not a war story:
+**Thirteen appearances (2026-08-04).** Two facts make this the rule and not a war story:
 
 - The **ninth** was written the same day, by the same agent, in the same session that documented the previous eight.
 - The **tenth** happened where `TASK-1633` had **already written the five correct names in its spec** — all five with zero occurrences in Globe. Design named the causes and the implementation collapsed them anyway. **Writing it in the spec does not apply it either.**
 - The **eleventh** was inside the fix for the bug class itself (a `catch` mapping the new named reason back to `badRequest`) — and was the first caught *before* merging.
+- The **thirteenth** happened **inside the canary itself**: eight integrity conditions with opposite remedies collapsed into one opaque code, so the instrument that exists to name causes was the one that stopped naming them — diagnosing it required reproducing the check by hand. **A diagnostic tool that only says "it failed" turns every run into an investigation from scratch.**
+
+> **Signal naming note.** The worker's blast-radius signal is `outboxTerminalAttempts` / `outboxRetryStorm`.
+> It used to be `outboxDeadLetter`, which **counted outbox ROWS** while an attempt has one row per phase — it
+> read **3 for a single attempt**. Never cite the old name, and never measure a signal in a unit that
+> corresponds to no real quantity of work: a dashboard in the wrong unit teaches the team to distrust it.
 
 Corollaries earned in production:
 - **A default bucket covering 17 sites is not a named reason — it is an invented one.** A wrong label misdirects, which is worse than no label (`endpoint_url_not_permitted` sent the author to read the wrong config; the twelve real causes were body-snapshot checks).

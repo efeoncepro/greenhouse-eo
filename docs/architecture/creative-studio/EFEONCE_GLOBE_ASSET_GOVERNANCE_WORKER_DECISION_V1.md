@@ -133,9 +133,12 @@ Consecuencias que un agente debe conservar:
 - **El orden obligatorio de este ADR NO depende de la cadencia.** Lo imponen los CHECK de la base y la state
   machine del dominio (`Database constraints and the domain state machine both prohibit C2PA/rights stages
   before a clean malware result`). Bajar el cron acorta la espera; **no** relaja la secuencia.
-- **Una espera dentro del presupuesto NO es un cuelgue.** Mientras el pipeline corre, el experimento se lee
-  `running` y su consumidor no distingue un run sano de uno atascado — ese defecto tiene dueño en `TASK-1469`.
-  Antes de declarar un cuelgue, comparar contra este presupuesto: un readback es un instante, no un veredicto.
+- **Una espera dentro del presupuesto NO es un cuelgue, y desde el 2026-08-04 se puede DISTINGUIR.** Mientras el
+  pipeline corre, el experimento publica `runProgress` (`coarseProgress`, `attempt`, `providerAccepted`, `since`):
+  un run sano **avanza de fase**, uno atascado se queda quieto en la misma con un `since` viejo. Antes se leía
+  `running` con `attempts: []` y había que comparar contra este presupuesto a mano — que es exactamente lo que
+  hizo fallar el diagnóstico de `ISSUE-137`. Sigue valiendo la cautela: un readback es un instante, no un
+  veredicto.
 - **Cualquier instrumento que vigile este camino necesita una paciencia mayor que este presupuesto.** El canary
   de generación abortaba a los 20 min sobre un sistema perfectamente sano justamente por esto.
 - **Drenar el batch** (seguir procesando el mismo job en la misma ejecución tras `advance`) bajaría governance a
