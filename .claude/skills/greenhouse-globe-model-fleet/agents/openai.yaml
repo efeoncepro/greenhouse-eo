@@ -1,0 +1,7 @@
+interface:
+  display_name: "Globe Model Fleet"
+  short_description: "Govern model and provider route cards for Globe."
+  default_prompt: "Use $greenhouse-globe-model-fleet to investigate, wire, verify, or promote a model route in Efeonce Globe."
+
+policy:
+  allow_implicit_invocation: true

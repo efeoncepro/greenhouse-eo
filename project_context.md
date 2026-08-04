@@ -42,6 +42,10 @@ La flota de modelos de Globe se resuelve y promueve por identidad exacta de ruta
 `globe.producer.fleet.list` y el mapa humano en `GLOBE_MODEL_FLEET_STATUS.md`; una promoción se cierra con
 evaluación/derechos/readbacks y una generación real desde la UI autenticada. Un MIME de transporte genérico nunca
 amplía la allowlist global: sólo puede aceptarse para una salida exacta esperada después de verificar sus bytes.
+El método transversal para añadir o auditar proveedores es `greenhouse-globe-model-fleet`, espejado para Codex y
+Claude; sus route cards machine-readable viven en `docs/architecture/creative-studio/model-fleet/routes/` y nunca
+sustituyen la autoridad live del reader. ADR-023 y el primer card de FLUX 3 fijan la separación entre evidencia del
+proveedor, cables de integración y disponibilidad de Globe.
 Las atestaciones comerciales son inmutables por identidad de modelo + digest de términos: una corrección jurídica
 crea una atestación y policy derivada nuevas, nunca modifica la anterior. La idempotencia de `auto-promote` debe
 incluir esa autoridad legal; ruta/workspace/report por sí solos no distinguen una nueva versión de términos. Un

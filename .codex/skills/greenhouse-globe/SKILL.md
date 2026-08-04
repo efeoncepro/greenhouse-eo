@@ -436,6 +436,52 @@ Snapshot histórico (no consultar acá el estado vigente, que vive en `GLOBE_RUN
 corridas pasaron por revisión de API + digest de worker etiquetados con el SHA, con la señal terminal estable en
 el preexistente y `retryStorm` en 0.
 
+## 🔴 "Vertex" NO es un proveedor: son TRES superficies de invocación (medido 2026-08-04)
+
+El error de modelado más caro de esta plataforma. Bajo el mismo `vertex*` conviven tres formas de invocar que
+**no comparten nada operativo**, y el código las trató como variantes con defaults compartidos:
+
+| Carril | Superficie | Forma del input | Identificador | Completitud |
+|---|---|---|---|---|
+| `vertex` (imagen) | `generateContent` | `{data, mimeType}` (inlineData) | ninguno | síncrona |
+| `vertex-video` (Veo) | `predictLongRunning` | **`{bytesBase64Encoded, mimeType}`** | operation name | poll |
+| `vertex-omni` (Omni) | Interactions API | **base64 desnudo** | interaction id | unary |
+
+**El default de cada cosa era el del primer carril implementado (imagen).** Por eso imagen nunca falló —el
+default *era* su forma— y Veo falló en los dos puntos donde se desvía. Ambos defectos se descubrieron por
+separado, gastando, y ambos eran invisibles con el build verde.
+
+- **NUNCA** dejes que un driver herede la forma de encoding de otro: el encoder es **requerido** y se declara
+  en `PROVIDER_INPUT_ENCODERS` (`governed-provider-runtime.ts`). Un carril nuevo elige o no compila.
+- **NUNCA** valides la **FORMA** de un identificador que fabrica el proveedor. Es opaco: su forma es de Google
+  y cambia sin avisar. Veo devuelve `projects/<p>/locations/<r>/publishers/google/models/<model>/operations/<id>`
+  —**verificado en vivo**— y una regex adivinada lo rechazaba, descartando el nombre **sin persistirlo** con el
+  video ya generándose. Para un driver `poll` puro eso es **pérdida irreversible con gasto incurrido**: Fal
+  sobrevive porque su webhook repone la evidencia; Veo no tiene segundo escritor. Valida **propiedad**
+  (proyecto+región+modelo de la ruta), que es lo único que protege un invariante real.
+- **NUNCA** confíes en que un carril funciona porque "el modelo está integrado": el adapter del **Lab** y el
+  **driver gobernado** son código distinto. Omni estaba integrado desde julio y tenía **cero runs** por
+  producción; Veo tenía dos bugs que sólo aparecieron al ejercitarlo. **Cada motor genera al menos una pieza
+  por el carril real antes de darse por integrado.**
+- ⚠️ Cuando un test de un carril de proveedor use un identificador de ejemplo, **cópialo de una respuesta
+  REAL**. Los fixtures de Veo inventaban la forma corta mientras los endpoints de esos mismos tests ya llevaban
+  `/publishers/google/models/…`: la suite verificaba una ficción durante semanas.
+
+### Una vista que reemplaza a una tabla debe proyectar la MISMA superficie
+
+`generated_asset_rights_authority_effective` (migración `0048`) proyecta 3 columnas; el consumidor que se
+cambió a ella en el mismo commit usa 14. **La consulta nunca pudo parsear** —`42703` en planificación, sin
+importar los datos— y como un `DatabaseError` de `pg` no está en el allowlist de `handlerErrorToApiCode`, sale
+como **`internal_error` 500**. Efecto: `canary-confirm` reventaba con toda la evidencia correcta.
+
+- **NUNCA** sustituyas una tabla por una vista sin verificar que proyecta **todo** lo que sus consumidores leen;
+  un swap de una línea convierte cada consumidor existente en un error de parseo diferido, que sólo aparece
+  ejercitando el camino.
+- **NUNCA** dejes que un checkpoint de saga consuma el único estado desde el que se puede reintentar.
+  `confirmProductionPromotionCanary` marca `verifying_canary` **antes** de leer la evidencia y no tiene
+  try/catch, así que **cada reintento quema una promoción** (de `verifying_canary` sólo se sale por rollback).
+- Dueño de ambos: **`TASK-1641`**.
+
 ## Captura de completitud: cada proveedor avisa distinto (ADR-021, `ISSUE-138`)
 
 **La pregunta operativa es «¿cómo se entera Globe de que el asset está listo?», y la respuesta NO es la misma

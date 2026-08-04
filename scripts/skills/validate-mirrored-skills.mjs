@@ -16,7 +16,27 @@ const repo = resolve(new URL('../..', import.meta.url).pathname)
  * clase de drift invisible de ISSUE-126, donde una dependencia cambió de contenido sin que ninguna
  * versión lo delatara y la reconciliación falló dos días con su scheduler en verde.
  */
-const mirroredSkills = ['efeonce-mcp-platform', 'greenhouse-globe']
+
+const mirroredSkills = [
+  {
+    id: 'efeonce-mcp-platform',
+    mode: 'byte-identical',
+    codex: '.codex/skills/efeonce-mcp-platform',
+    claude: '.claude/skills/efeonce-mcp-platform',
+  },
+  {
+    id: 'greenhouse-globe',
+    mode: 'byte-identical',
+    codex: '.codex/skills/greenhouse-globe',
+    claude: '.claude/skills/greenhouse-globe',
+  },
+  {
+    id: 'greenhouse-globe-model-fleet',
+    mode: 'byte-identical',
+    codex: '.codex/skills/greenhouse-globe-model-fleet',
+    claude: '.claude/skills/greenhouse-globe-model-fleet',
+  },
+]
 
 const filesIn = root => {
   if (!existsSync(root)) return null
@@ -26,8 +46,8 @@ const filesIn = root => {
       const path = join(directory, entry.name)
 
       if (entry.isDirectory()) return visit(path)
-      
-return entry.isFile() ? [relative(root, path)] : []
+
+      return entry.isFile() ? [relative(root, path)] : []
     })
 
   return visit(root).sort()
@@ -36,14 +56,21 @@ return entry.isFile() ? [relative(root, path)] : []
 const digest = path => createHash('sha256').update(readFileSync(path)).digest('hex')
 const failures = []
 
-for (const skill of mirroredSkills) {
-  const codexRoot = join(repo, '.codex', 'skills', skill)
-  const claudeRoot = join(repo, '.claude', 'skills', skill)
+for (const manifest of mirroredSkills) {
+  const { id, mode, codex, claude } = manifest
+
+  if (mode !== 'byte-identical') {
+    failures.push(`${id}: unsupported mirror mode '${mode}'`)
+    continue
+  }
+
+  const codexRoot = join(repo, codex)
+  const claudeRoot = join(repo, claude)
   const codexFiles = filesIn(codexRoot)
   const claudeFiles = filesIn(claudeRoot)
 
   if (!codexFiles || !claudeFiles) {
-    failures.push(`${skill}: mirror directory missing`)
+    failures.push(`${id}: mirror directory missing`)
     continue
   }
 
@@ -51,12 +78,12 @@ for (const skill of mirroredSkills) {
 
   for (const path of paths) {
     if (!codexFiles.includes(path) || !claudeFiles.includes(path)) {
-      failures.push(`${skill}: ${path} exists in only one mirror`)
+      failures.push(`${id}: ${path} exists in only one mirror`)
       continue
     }
 
     if (digest(join(codexRoot, path)) !== digest(join(claudeRoot, path))) {
-      failures.push(`${skill}: ${path} content differs`)
+      failures.push(`${id}: ${path} content differs`)
     }
   }
 }
@@ -67,4 +94,4 @@ if (failures.length) {
   process.exit(1)
 }
 
-console.log(`✓ Mirrored skills are identical: ${mirroredSkills.join(', ')}`)
+console.log(`✓ Mirrored skills are identical: ${mirroredSkills.map(({ id }) => id).join(', ')}`)

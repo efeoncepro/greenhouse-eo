@@ -103,6 +103,8 @@ Reglas obligatorias:
 - [`TASK-1578-globe-model-onboarding-credit-rate-promotion.md`](TASK-1578-globe-model-onboarding-credit-rate-promotion.md)
 - [`TASK-1579-globe-credit-rating-settlement-fallback-policy.md`](../in-progress/TASK-1579-globe-credit-rating-settlement-fallback-policy.md)
 - [`TASK-1535-globe-commercial-promotion-attestation-lane.md`](../complete/TASK-1535-globe-commercial-promotion-attestation-lane.md)
+- [`EFEONCE_GLOBE_MODEL_ROUTE_CARDS_DECISION_V1.md`](../../architecture/creative-studio/EFEONCE_GLOBE_MODEL_ROUTE_CARDS_DECISION_V1.md) (ADR-023)
+- [`FLUX_3_VIDEO_ROUTE_CARD_V1.json`](../../architecture/creative-studio/model-fleet/routes/FLUX_3_VIDEO_ROUTE_CARD_V1.json) — snapshot de evidencia gated; no es catálogo runtime.
 
 Fuentes primarias externas que se deben revalidar al ejecutar:
 
@@ -161,6 +163,8 @@ capacidades son gates de ejecución/promotion y deben coordinarse antes de activ
 - Catálogo de Producer versionado, route contract, input slots, fleet reader, readiness/binding y `globe.producer.fleet.list`.
 - Captura de completion Fal por webhook/poll, recuperación de ack perdido y descarga durable.
 - Onboarding de modelos, rates, credits, rights, evaluation durable y promoción por ruta como foundations separadas.
+- Route card de FLUX 3 en Greenhouse con once superficies Fal y una superficie BFL Early Access; todas permanecen
+  gated y la ficha no altera el reader ni declara disponibilidad.
 
 ### Gap
 

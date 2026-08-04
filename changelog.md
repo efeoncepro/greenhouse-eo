@@ -7,6 +7,13 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-04 — Globe: skill compartida para integrar modelos por ruta
+
+- **ADR-023 implementa `greenhouse-globe-model-fleet`** como skill espejada para Codex y Claude, con contrato de
+  route cards, schema, validador determinista y gate de paridad. La primera ficha machine-readable es FLUX 3 Video.
+- La ficha separa evidencia del proveedor, cables de integración y disponibilidad live; no crea catálogo, adapter,
+  rate ledger ni promoción paralelos. FLUX 3 permanece gated y el runtime de Globe no fue modificado.
+
 ## 2026-08-04 — Globe: la captura de completitud tenía trece huecos y ningún contrato escrito
 
 - **ADR-021 nace porque el contrato no existía.** Ningún doc de arquitectura mencionaba «webhook»: la captura de
@@ -824,23 +831,3 @@ Corrección de fuente de verdad: el cliente inicial es **SKY Agencia Creativa**,
   Product Services y Greenhouse como un sistema de aprendizaje y autoridad.
 - Se definió el `Learn Moment Contract` para convertir contenido en aprendizaje contextual, acción, evidencia y
   memoria dentro de los productos.
-
-## 2026-07-27 — Globe: motor de estilos en Tailwind v4 y cierre de `TASK-1555`
-
-- **ADR-016 implementado (pasos 1-4).** `apps/studio-client` adopta Tailwind v4 con el SSOT de tokens como
-  theme. **Ninguna superficie migrada todavía**: el composer sigue con `producerStyles` y cero utilidades.
-- **El theme se GENERA desde el SSOT, no se aliasea.** El idiom de la documentación de Tailwind
-  (`@theme inline { --text-xs: var(--text-xs) }`) es una referencia circular cuando el nombre coincide a ambos
-  lados —y en Globe casi todos coinciden—. Medido en browser: `text-xs` a 16px, `rounded-sm` a 0px,
-  `font-display` en Times, **con el build verde**.
-- **Cuatro gates de diseño**, no tres: cada uno cubre ahora la forma CSS y la forma `className`, con una regla
-  común (el único valor arbitrario permitido es una referencia a token) y uno nuevo para espaciado y medidas.
-  Verificados mordiendo. La escala ajena (`text-red-500`, `text-lg`) se cierra vaciando los namespaces.
-- **Regla nueva:** en Tailwind, documentar un anti-patrón dentro del árbol escaneado **lo materializa** como
-  clase real — el gate de literales los estaba emitiendo a la hoja servida.
-- **`TASK-1555` (selector de modelo) cerrada.** Su ficha declaraba `Diseño` con el código vivo, un bloqueo ya
-  resuelto y criterios que describían la galería rechazada. Reescritos contra el runtime; el canary pasó de 1
-  ruta a una flota de 4 y ganó 11 asertos de browser. **Desbloquea el Slice 1 de `TASK-1552`.**
-- **Dos hallazgos de runtime:** el canary servía el composer **sin la hoja del legacy** y daba todo verde; y
-  `.advanced-controls > summary` tiene `display:none`, así que ese `<details open>` **no tiene control para
-  cerrarse** — la progressive disclosure no existe, el markup es decorativo.

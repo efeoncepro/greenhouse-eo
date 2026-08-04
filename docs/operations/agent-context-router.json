@@ -113,6 +113,21 @@
       "sources": ["docs/architecture/agent-invariants/KNOWLEDGE_NEXA_AGENT_INVARIANTS.md"]
     },
     {
+      "id": "efeonce-globe-model-fleet",
+      "triggers": ["Efeonce Globe", "Creative Studio", "model fleet", "route card", "model route", "provider adapter", "FLUX 3", "Flux 3", "Fal", "Black Forest Labs", "BFL", "globe.producer.fleet.list"],
+      "skills": ["greenhouse-globe-model-fleet", "greenhouse-globe", "software-architect-2026"],
+      "sources": [
+        "docs/architecture/creative-studio/README.md",
+        "docs/architecture/creative-studio/DECISIONS_INDEX.md",
+        "docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_ROUTE_CARDS_DECISION_V1.md",
+        "docs/architecture/creative-studio/EFEONCE_GLOBE_ROUTE_BASED_MODEL_RESOLUTION_DECISION_V1.md",
+        "docs/architecture/creative-studio/EFEONCE_GLOBE_PROVIDER_COMPLETION_CAPTURE_DECISION_V1.md",
+        "docs/architecture/creative-studio/EFEONCE_GLOBE_ROUTE_CREATIVE_CONTRACT_DECISION_V1.md",
+        "docs/tasks/to-do/TASK-1642-globe-flux3-video-fleet-producer-integration.md",
+        "docs/operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md"
+      ]
+    },
+    {
       "id": "efeonce-mcp-platform",
       "triggers": ["MCP", "mcp.efeonce.org", "Streamable HTTP", "OAuth protected resource", "provider federation", "MCP tool", "MCP resource", "MCP prompt", "MCP Cloud Run", "MCP TLS", "MCP DNS", "Globe MCP provider", "MCP B2B entitlements"],
       "skills": ["efeonce-mcp-platform", "software-architect-2026", "greenhouse-secret-hygiene"],

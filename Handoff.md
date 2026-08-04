@@ -22,6 +22,18 @@ las 21:00 UTC — se apagará sola si no se sella.
 
 Historia anterior: [Handoff.archive.md](Handoff.archive.md).
 
+## ADR-023 — Model Route Cards y skill compartida (2026-08-04)
+
+**Estado:** implementado como contrato documental y de tooling; no cambia el runtime de Globe. La skill
+`greenhouse-globe-model-fleet` existe en `.codex/skills/` y `.claude/skills/`, con paridad byte a byte, schema y
+validador local. La primera ficha es
+[`FLUX_3_VIDEO_ROUTE_CARD_V1.json`](docs/architecture/creative-studio/model-fleet/routes/FLUX_3_VIDEO_ROUTE_CARD_V1.json).
+
+**Estado honesto:** FLUX 3 sigue `gated` y no está declarado en `globe.producer.fleet.list`. Fal es la vía candidata;
+BFL directo permanece Early Access y fuera de alcance. Próximo paso operativo: revalidar namespace/OpenAPI/pricing
+con credenciales en Globe y ejecutar el Slice 0 de `TASK-1642`; no hacer submit billable ni promoción desde esta
+skill.
+
 ## EPIC-039 — Next.js 16.3 + TypeScript 7 Toolchain Adoption (2026-08-04)
 
 Estado: **to-do / diseño**. Se registraron el epic y sus dos tasks hijas:
@@ -529,24 +541,3 @@ las trampas operativas) y el `Delta 2026-08-01` de
 período, funding, caps y holds. La decisión ya no está abierta: TASK-1482 corrige la verdad, TASK-1586 publica el
 self-status y TASK-1628 lo consume sin matemática local;
 (3) el `main` local del operador sigue divergente con 2 duplicados de trabajo ya mergeado.
-
-## MiniMax H3 — documentación y task de integración Globe (2026-07-31)
-
-- Fal live confirmó tres endpoints comerciales activos: `minimax/h3/text-to-video`,
-  `minimax/h3/image-to-video` y `minimax/h3/reference-to-video`, con snapshot de precio de
-  `USD 0,26/s`. La consulta y los probes fueron de catálogo/validación; no hubo generación.
-- Se documentó la propuesta en [`EFEONCE_GLOBE_MINIMAX_H3_INTEGRATION_PROPOSAL_V1.md`](docs/architecture/creative-studio/EFEONCE_GLOBE_MINIMAX_H3_INTEGRATION_PROPOSAL_V1.md).
-- Se creó [`TASK-1616`](docs/tasks/to-do/TASK-1616-globe-minimax-h3-fleet-producer-integration.md),
-  todavía `to-do`: integra las tres rutas, referencias image/video/audio, contratos, Producer,
-  ingest/retrieval, rates, rights, evaluación, canary y promoción. No se ejecutó código de Globe.
-- Siguiente paso: tomar `TASK-1616` con su goal/preflight, revisar ADR y ejecutar el plan en
-  `efeonce-globe`; no marcar H3 `available` antes de los gates de onboarding y promoción.
-
-## Fal challenger models — documentación y tasks Globe (2026-07-31)
-
-- La consulta autenticada de Fal del 2026-07-31 confirmó rutas activas para Kling 3/O3, Grok Imagine Video, Wan 2.7 y FLUX.2 Max/Edit; el discovery oficial del 2026-08-04 añadió once endpoints activos de FLUX 3 Video, documentados por separado en `TASK-1642`.
-- Se documentó la matriz de capacidades y reutilización/extensión en [`EFEONCE_GLOBE_FAL_CHALLENGER_MODELS_PRODUCER_INTEGRATION_PROPOSAL_V1.md`](docs/architecture/creative-studio/EFEONCE_GLOBE_FAL_CHALLENGER_MODELS_PRODUCER_INTEGRATION_PROPOSAL_V1.md).
-- Se crearon `TASK-1617` Kling, `TASK-1618` Grok, `TASK-1619` Wan y `TASK-1620` FLUX.2. Son tasks separadas porque sus schemas, derechos, rates, outputs y canarios no son intercambiables; comparten el seam Fal y las extensiones de Producer de `TASK-1616`/`TASK-1573`.
-- No se ejecutó código ni generación. Antes de implementar cada task se debe revalidar OpenAPI y pricing autenticados; todas las rutas parten `gated`.
-- **Delta 2026-08-04 — FLUX 3:** Fal devuelve once endpoints activos (cinco estándar, cinco draft y `draft-enhance`) y BFL mantiene el producto/API directo en Early Access. Se creó [`TASK-1642`](docs/tasks/to-do/TASK-1642-globe-flux3-video-fleet-producer-integration.md) y la propuesta [`EFEONCE_GLOBE_FLUX3_VIDEO_INTEGRATION_PROPOSAL_V1.md`](docs/architecture/creative-studio/EFEONCE_GLOBE_FLUX3_VIDEO_INTEGRATION_PROPOSAL_V1.md). La discrepancia `blackforestlabs/...` vs `fal-ai/...` exige discovery autenticado y submit controlado; no hay código ni promoción en `../efeonce-globe`.
-- La task cubre keyframes posicionados, first/last, extend, audio evidence, `duration: auto`, `draft_cache`, rates, rights, evaluación, canary y rollback. Siguiente paso: tomarla con su goal/preflight; todas las rutas parten `gated`.
