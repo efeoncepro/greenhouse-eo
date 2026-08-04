@@ -73,6 +73,67 @@ llega a terminal, todo agregado que dependa de su estado converge o queda observ
 saga. Se declara como invariante y no como arreglo de un caso porque el mismo defecto ya apareció en
 dos familias distintas.
 
+## Delta 2026-08-04 (cierre de sesión) — el sello FUNCIONA; Omni sellada, Veo a un paso
+
+`efeonce-globe@38c528d`, desplegado y verificado por revisión y digest: API `globe-api-internal-00211-8sp`
+(imagen tag `38c528d27b9a`) y Job `globe-producer-worker` (`sha256:14b80d2f…`, mismo tag). Migración `0050`
+aplicada por el workflow keyless (run `30953709590`).
+
+**Prueba de salida parcial:** `ref/motion/reference-v1` (Omni) → **`canary_passed`**, binding `enabled=true`,
+circuito `closed`, canary `74ea0dec-27c5-4d11-94d6-e0d459cfd61e` con output retenido y governance `eligible`.
+Es el mismo command que devolvía `internal_error` 500 con la evidencia perfecta.
+
+### La migración committeada no arreglaba nada, y no se veía leyéndola
+
+Medido contra PG real dentro de una transacción con ROLLBACK, **antes** de aplicar. Dos defectos, ambos fatales:
+
+1. **`CREATE OR REPLACE VIEW` no puede reordenar ni renombrar columnas** — sólo agregar al final conservando
+   nombre, tipo y posición. La vista vieja es `(workspace_id, asset_id, authority)` y la nueva pone `source_kind`
+   tercero, así que PostgreSQL aborta con **`42P16`**. Va `DROP` + `CREATE`, sin `CASCADE` a propósito (si mañana
+   alguien construye encima, el DROP debe fallar en vez de arrastrarla). Verificado: la vista no tiene
+   dependientes; el DROP pierde los GRANT, así que se re-otorgan explícitos y el bloque `DO` verifica columnas
+   **y** accesos.
+2. **El runner de Globe no parsea markers**: `migrate.ts` hace `tx.query(sql)` con el archivo completo, así que la
+   sección `-- Down Migration` se ejecutaba y **re-creaba la vista rota tres líneas después de arreglarla**,
+   quedando registrada como aplicada y con el canary fallando igual. Esa convención es de `node-pg-migrate`
+   (Greenhouse); en Globe el rollback de un forward-fix es otra migración forward. `0050` era el **único**
+   archivo del repo con esa sección.
+
+La vista proyecta hoy **16 columnas**, incluida `rights_policy_purpose` de `0049`: dejar afuera la más nueva de
+la tabla reintroduce el mismo defecto una columna después.
+
+### Lo demás que entró
+
+- **Checkpoint reordenado.** `resolveCanary` es una lectura pura; el checkpoint delante no protegía nada y
+  consumía el único estado desde el que se puede reintentar. Ahora se lee primero, y la ventana sin retorno es un
+  único write. Test en ambos modos de fallo (excepción y evidencia ausente), probado en rojo con el orden viejo.
+- **`DatabaseError` deja de ser un 500 opaco.** Infraestructura (`08/40/53/55/57`) → `dependency_unavailable`; las
+  deterministas (`42703`, `23505`, …) siguen en `internal_error`, que es la verdad — prometer reintento sobre un
+  defecto de código manda a reintentar para siempre. Detección por forma (`severity` + SQLSTATE), sin acoplar el
+  transporte al driver, y última para no ganarle nunca a un código nombrado. Todo error de Postgres deja su
+  SQLSTATE en `globe.dispatch.database_error`: mapear no puede costar la observación.
+- **Cobertura del path**, en dos eslabones: `consumidor ⊆ contrato declarado` (sin base, en cada `pnpm check`) y
+  `contrato ⊆ vista real` (bloque `DO`, en cada apply), más un test en vivo opt-in que ejecuta la query real —
+  falló con `42703` antes de migrar y pasa después. Barre **todo** el árbol de fuentes y exige que cada consumidor
+  **aliase** la vista: sin alias una referencia no es atribuible. El propio ejercicio en rojo destapó que el
+  detector aceptaba `WHERE` como alias, o sea cubría cero.
+
+### 🔴 Veo: bloqueado por un defecto de UI que NO es de esta task
+
+`promotion_ddd0977c-c6e7-4fa6-bd31-61737c108d31` está **`activated`** (ventana hasta `2026-08-05T01:03:02Z`), con
+binding y circuito correctos. Falta su canary, y hace falta uno **nuevo**: `resolveCanary` exige
+`created_at >= activatedAt`, así que la corrida `f0e8b876` de las 20:20 no sirve.
+
+En el Producer, modo **Cuadros** (`ref/video/frames-v1`, que pide 1-2 referencias de imagen), **«Usar como
+referencia» y «Recrear» no disparan ningún command**: cero `POST /v1/commands`, cero mensajes de consola, el
+contador queda en `0 / 2` y sin referencia el estimado nunca se calcula. Los botones existen, están habilitados y
+son enfocables. Es la familia ya documentada de «la capability existe y la UI no la consume»; el único otro camino
+de entrada es subir un archivo. **Merece su propia task**: no es la saga de promoción ni el canary.
+
+Y refuerza el Scope 1 de esta task: mientras `ref/video/frames-v1` siga `executionReady: false` con
+`pending: governed_source_and_route_specific_controls`, no existe camino canónico para producir el canary de una
+ruta arbitraria, y el procedimiento depende de que la UI coopere.
+
 ## Delta 2026-08-04 — causa raíz del sello ENCONTRADA y migración escrita (no aplicada)
 
 El punto 4 del scope dejó de ser diagnóstico: **el `canary-confirm` falla por una consulta que nunca pudo

@@ -1,24 +1,41 @@
 # Handoff activo
 
-## TASK-1641 — Globe: el sello del canary y los motores de video (2026-08-04)
+## TASK-1641 — Globe: el sello del canary FUNCIONA; Omni sellada (2026-08-04)
 
-**Estado:** `in-progress`. Diagnóstico cerrado, migración escrita y committeada (`efeonce-globe@7994f0d`),
-**NO aplicada**. Próximo paso concreto: `migrate:up` → arreglar el checkpoint → deploy API → re-sellar.
+**Estado:** `in-progress`. **La causa raíz está cerrada y verificada en runtime.** `canary-confirm` volvió a
+sellar: `ref/motion/reference-v1` (Omni) quedó en **`canary_passed`** con binding `enabled=true` y circuito
+`closed` — el mismo command que devolvía `internal_error` 500 con toda la evidencia correcta.
 
-**Lo que quedó funcionando:** Veo y Omni **generan** por el carril gobernado, probados en vivo hoy (MP4 de
-7,99 MB y 1,95 MB, `retained`, liquidación exacta). `ISSUE-140` resuelto en dos capas y **D12 de `ISSUE-138`
-cerrado** con el objeto en `governed-veo/`.
+**Desplegado:** `efeonce-globe@38c528d`. API `globe-api-internal-00211-8sp` (imagen tag `38c528d27b9a`) y Job
+`globe-producer-worker` (digest `sha256:14b80d2f…`, tag `38c528d27b9a`). Migración `0050` aplicada por el
+workflow keyless (run `30953709590`); la vista proyecta **16 columnas** y conserva SELECT para los cuatro
+runtimes.
 
-**Lo que bloquea:** el `canary-confirm` devuelve `internal_error` 500 porque
-`generated_asset_rights_authority_effective` proyecta 3 columnas y su consumidor usa 14 — la consulta nunca
-pudo parsear. Sin sello, toda promoción se revierte al vencer su ventana (medido: 10 de 12 históricas).
+**Los dos defectos que la migración committeada TENÍA y no se veían leyéndola** (medidos contra PG real, en una
+transacción con ROLLBACK, antes de aplicar):
 
-**Trampa a no repetir:** `confirmProductionPromotionCanary` marca `verifying_canary` antes de leer la
-evidencia y no tiene try/catch; de ese estado sólo se sale por rollback, así que **cada reintento quema una
-promoción**. Arreglar la vista sin reordenar el checkpoint deja la trampa viva.
+1. `CREATE OR REPLACE VIEW` **no puede** reordenar ni renombrar columnas — sólo agregar al final. Poner
+   `source_kind` en la tercera posición aborta con **`42P16`**. Va `DROP` + `CREATE`, sin `CASCADE`.
+2. El runner de Globe hace `tx.query(sql)` con el **archivo completo**: no parsea markers. La sección
+   `-- Down Migration` se ejecutaba y **re-creaba la vista rota tres líneas después de arreglarla**, quedando
+   registrada como aplicada. Esa convención es de `node-pg-migrate` (Greenhouse), no de Globe.
 
-**Ventanas vivas al cierre:** Veo apagada (se revirtió con `canary_unattested`); Omni activa con ~2h40 desde
-las 21:00 UTC — se apagará sola si no se sella.
+**Lo demás que entró:** el checkpoint `activated → verifying_canary` ahora ocurre **después** de leer la
+evidencia (era una lectura pura delante de un estado sin retorno: cada intento fallido quemaba una promoción);
+un `DatabaseError` de pg deja de ser `internal_error` opaco —clases de infraestructura `08/40/53/55/57` →
+`dependency_unavailable`, las deterministas siguen siendo `internal_error`, que es la verdad— y todo error de
+Postgres emite su SQLSTATE en `globe.dispatch.database_error`; y el path tiene test real (estructural sin base
++ en vivo opt-in), registrado en el script `test` del package y probado en rojo y en verde.
+
+**Veo quedó a un paso, y el paso lo bloquea un defecto de UI ajeno a esta task.** La promoción
+`promotion_ddd0977c-c6e7-4fa6-bd31-61737c108d31` está **`activated`** con ventana hasta **2026-08-05T01:03 UTC**.
+Falta su canary: `resolveCanary` exige `created_at >= activatedAt`, así que la corrida de las 20:20 no sirve y
+hace falta una generación nueva. En el Producer, en modo **Cuadros**, **«Usar como referencia» y «Recrear» no
+disparan ningún command** —cero `POST /v1/commands`, cero consola— y sin referencia el estimado nunca se
+calcula. Es la familia «la capability existe y la UI no la consume»; el único otro camino es subir un archivo.
+
+**Ventanas vivas al cierre:** Omni **sellada** (terminal, ya no expira). Veo `activated` hasta 01:03 UTC — si
+nadie genera dentro, se revierte sola y el binding vuelve a `false`, que es donde ya estaba.
 
 Historia anterior: [Handoff.archive.md](Handoff.archive.md).
 
