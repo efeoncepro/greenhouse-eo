@@ -205,6 +205,14 @@ trazabilidad, no como criterios de cierre de esta issue:
   en qué va, y un run sano deja de ser indistinguible de uno atascado.
 - Ninguna fila de outbox `done` puede tener `completed_at` anterior a su propio `available_at`.
 
+🔴 **Esos dos últimos NO se cerraron con esta issue y tienen dueño declarado: `TASK-1469`** (Globe
+Governed Run Lifecycle, Submission Fence and **Provider Completion**), que ya declara en su Scope
+*«Model progress as honest lifecycle phase/attempt/provider evidence… When no granular evidence exists,
+expose a coarse state»*. Están registrados con su evidencia en su
+[Delta 2026-08-04](../../tasks/in-progress/TASK-1469-globe-governed-run-lifecycle-submission-fence.md).
+Se anota acá porque **un criterio vigente dentro de una issue resuelta es un huérfano**: nadie relee una
+issue cerrada, y así es como una deuda medida se pierde.
+
 Criterios originales, conservados por trazabilidad:
 
 - Los dos runs colgados (`96c0ddcd-07bc-4bcc-8de5-d39b74ddbc97` y el de las 11:16) transitan a un

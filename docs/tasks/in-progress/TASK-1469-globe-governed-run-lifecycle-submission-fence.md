@@ -1,5 +1,83 @@
 # TASK-1469 — Globe Governed Run Lifecycle, Submission Fence and Provider Completion
 
+## Delta 2026-08-04 — dos defectos que ISSUE-137 destapó y que son de ESTA task, no de aquella
+
+`ISSUE-137` cerró como **latencia** (Asset Governance era cadence-bound: `*/5` × 4 etapas ≈ 20 min; bajó a
+`*/1` y la generación end-to-end pasó de 22,3 a **7,9 min**, verificado con imagen y video). Pero al
+diagnosticarla se midieron **dos defectos que no son de latencia y que esta task ya declara en su Scope**.
+Se traen acá porque su único registro estaba dentro de una issue **ya resuelta**, y nadie lee una issue
+cerrada.
+
+### 1. La vista del experimento no proyecta el attempt en vuelo
+
+El Scope de esta task dice: *«Model progress as honest lifecycle phase/attempt/provider evidence… When no
+granular evidence exists, expose a coarse state.»* Hoy **no se cumple**.
+
+Medido sobre `96c0ddcd-07bc-4bcc-8de5-d39b74ddbc97`: el experimento se lee `state: running` con
+**`attempts: []`** durante TODA la ventana, aunque el attempt ya existía (`run_approved` 19:58:58), ya
+había sido aceptado por el proveedor a los **15 segundos** (19:59:13) y ya había completado (20:01:30). El
+array del experimento sólo se puebla al finalizar.
+
+🔴 **La consecuencia es que un run sano en curso es indistinguible de uno atascado**, y eso no es teórico:
+**es la causa de que este incidente se diagnosticara mal**. `ISSUE-137` nació afirmando «colgados para
+siempre con cero intentos» y proponiendo una señal de «reservado sin attempt tras N minutos» — una señal
+que, sobre este dato, **habría alertado sobre corridas perfectamente sanas**. No falta una señal: falta que
+el agregado proyecte la fase/attempt que ya tiene.
+
+La latencia bajó a 7,9 min, así que el síntoma duele menos. **El defecto sigue entero**, y con él la
+imposibilidad de distinguir sano de atascado por readback.
+
+### 2. El cierre del job `complete` se sella con el reloj equivocado
+
+La fila de `governed_run_outbox` quedó internamente contradictoria:
+
+```
+state=done   completed_at=2026-08-03 20:01:29.739   available_at=2026-08-03 20:20:25.843   delivery_attempt=20
+```
+
+Una fila no puede completarse **19 minutos antes** de su propia última reprogramación. El evento
+`run_finalized` lleva el mismo sello (20:01:29.739) mientras el experimento se finalizó a las **20:21:16**
+(hora real, de `experiments.updated_at`).
+
+**Rastreado en código, y NO es exclusivo del camino `complete`: es una conflación sistémica.**
+`finishLease` (`packages/database/src/stores/governed-run-store.ts:1157`) escribe
+`completed_at`/`updated_at` — hechos sobre **cuándo terminó la fila de la cola** — pero recibe el instante
+como parámetro, y **los siete call sites le pasan un timestamp del DOMINIO**:
+
+| línea | reloj que pasa | naturaleza |
+|---|---|---|
+| 493 | `evidence.acceptedAt` | pasado — cuándo aceptó el proveedor |
+| 545 | `nextCheckAt` | 🔴 **futuro** |
+| 578 | `retryAt` | 🔴 **futuro** |
+| 690 | `completion.observedAt` | pasado — **el caso medido** |
+| 702 | `completion?.observedAt ?? new Date()` | mixto — **el único con fallback al reloj real** |
+| 737 | `retryAt` | 🔴 **futuro** |
+| 759 | `outcome.observedAt` | pasado |
+
+O sea la fila puede declararse completada **19 minutos antes** (nuestro caso) o **en el futuro** (los tres
+`retryAt`/`nextCheckAt`). Ninguno de los dos es «cuándo terminó este lease». La línea 702 es la
+delatora: alguien ya sintió la falta y puso el reloj real como fallback, en un solo sitio.
+
+El efecto es que **el rastro de auditoría afirma que el run finalizó 20 minutos antes de que ocurriera**,
+que es exactamente lo que vuelve imposible reconstruir esta clase de latencia leyendo el run — y es la
+razón por la que hizo falta cruzar tres tablas para explicar 20 minutos.
+
+**Forma del arreglo (NO ejecutado a propósito):** `finishLease` sella con el reloj real —inyectado, no
+`new Date()` disperso— y el instante del dominio, si se necesita conservar, va en su propia columna con su
+propio nombre. Son 7 call sites en el camino del dinero, así que pide su slice con tests, no un parche
+nocturno: cambiar el sello sin mirar quién lo lee puede mover una ventana de reintento.
+
+### Criterios que estos dos agregan
+
+- Durante la espera, el reader del experimento expone el attempt en vuelo y su fase; «generando» dice en
+  qué va, y un run sano deja de ser indistinguible de uno atascado por readback.
+- Ninguna fila de `governed_run_outbox` en `done` puede tener `completed_at` anterior a su propio
+  `available_at`; el sello del cierre es el reloj de la finalización.
+
+Evidencia completa y cronología en
+[`ISSUE-137`](../../issues/resolved/ISSUE-137-globe-experiment-running-forever-zero-attempts.md) → Delta
+2026-08-04.
+
 ## Delta 2026-08-03 (c) — el barrido está hecho y el alcance restante era otro del que la task decía
 
 **Todo lo de abajo se midió contra `globe-pg` con la identidad IAM del operador, sólo lecturas.** El barrido

@@ -114,6 +114,31 @@ habría verificado nada nuevo: la línea base ya está medida dos veces (22,3 y 
 **Al aplicar el cron, la verificación correcta es una generación con el MISMO instrumento** y comparar
 contra esos dos números: gobierno esperado ~4 min, total ~6,5.
 
+### ✅ Aplicado y verificado (2026-08-04) — y los dos defectos restantes quedaron con dueño
+
+El cron quedó en `*/1` (`efeonce-globe@d78ce01`, Scheduler live `*/1 * * * * ENABLED`). **Verificado con
+dos generaciones reales**, medidas de forma independiente contra `globe-pg`:
+
+| | end-to-end | governance | créditos | retenido |
+|---|---|---|---|---|
+| imagen | 471,8 s | 183 s | 10 = 10 | PNG |
+| video | 474,0 s | 183,8 s | 16 = 16 | MP4 |
+
+Que imagen y video den el mismo tiempo **siendo otro medio y otro peso** es la prueba de que la latencia era
+de cadencia y no de tamaño — o sea que el arreglo generaliza. `ISSUE-137` → `resolved/`.
+
+🔴 **Los dos defectos que NO eran de latencia se movieron a su dueño real, `TASK-1469`** (Delta 2026-08-04),
+porque su único registro estaba dentro de una issue **ya resuelta** y nadie relee una issue cerrada: (1) la
+vista del experimento **no proyecta el attempt en vuelo** —lo que hace un run sano indistinguible de uno
+atascado, y es *la causa de que este incidente se diagnosticara mal*—; (2) el cierre del outbox se sella con
+el reloj equivocado. Este último resultó **sistémico, no del camino `complete`**: `finishLease` recibe el
+instante por parámetro y sus **siete** call sites le pasan timestamps del dominio, **tres de ellos del
+futuro** (`retryAt`/`nextCheckAt`). No se parchó: son 7 sitios en el camino del dinero y piden su slice.
+
+También en Globe (`7013648`): **el timeout del canary ahora acusa lo que observó** (`state=running:attempts=0`,
+o `asset=found:governance=c2pa_verify`) en vez de un código pelado. Complementa la subida de paciencia a 45 min
+de `b108d73`: uno evita que aborte sobre un sistema sano, el otro hace que cuando expire diga por qué.
+
 ### Resolución y readback post-arreglo
 
 - Globe `main`, commit [`d78ce01`](https://github.com/efeoncepro/efeonce-globe/commit/d78ce015ee2f96690b7431bd7e0f9094d52f6456): `asset_governance_schedule` pasó de `*/5` a `*/1`.
