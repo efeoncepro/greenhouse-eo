@@ -183,7 +183,7 @@ canary ya tiene owner: **ADR-004** (`TASK-1506`, complete) fijó el front door y
 
 ## Status
 
-- Lifecycle: `complete`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -196,7 +196,7 @@ canary ya tiene owner: **ADR-004** (`TASK-1506`, complete) fijó el front door y
 - Motion: `none`
 - Backend impact: `webhook`
 - Epic: `EPIC-028`
-- Status real: `complete y verificado en runtime (2026-08-04). Desplegado desde efeonce-globe@c28ab9f; huérfanos 4 → 0 en un batch, divergentAggregates=0, 3 alertas vivas y tofu plan en No changes`
+- Status real: `REABIERTA 2026-08-04. La deuda de convergencia está cerrada y verificada en runtime (efeonce-globe@c28ab9f); el cierre fue prematuro porque el bloque ## Acceptance Criteria quedó sin reconciliar. Falta recorrerlo con evidencia — ver Delta 2026-08-04 (b)`
 - Rank: `TBD`
 - Domain: `creative|platform|ops`
 - Blocked by: `none`
@@ -553,39 +553,79 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 
 <!-- ZONE 4 — VERIFICATION & CLOSING -->
 
+## Delta 2026-08-04 (b) — REABIERTA: el cierre fue prematuro
+
+**El cierre anterior fue mío y estuvo mal.** Moví la task a `complete/` habiendo verificado sólo los 5
+criterios del delta de convergencia, con el bloque `## Acceptance Criteria` —22 ítems sobre el carril de
+webhooks/completion, que es el corazón del título de esta task— **entero sin marcar y sin recorrer**.
+
+Cerrar contra un delta que reduce el alcance es legítimo **sólo si el contrato canónico queda reconciliado**:
+o los criterios están satisfechos y se marcan con su evidencia, o están superados y se declara. No hice
+ninguna de las dos.
+
+### Reconciliación con evidencia (2026-08-04)
+
+El carril de webhooks/completion **está construido y corriendo** — eso confirma lo que decían los deltas del
+26-07 y del 02-08. Evidencia de runtime medida hoy:
+
+| | Evidencia |
+|---|---|
+| Ruta viva | `/v1/provider-webhooks/(fal\|openai)/{id}` (`app.ts:1916`); `GLOBE_PROVIDER_WEBHOOK_PROXY_ENABLED=true` y los 4 flags de proveedor en `true` en el servicio vivo |
+| Entregas reales | **34 de Fal recibidas y procesadas**, 34 operaciones distintas, última 2026-08-03 20:01Z |
+| Los tres carriles conviven | Fal `webhook-and-poll` (36 intentos) · OpenAI `poll` (4) · Vertex (1) y Veo (1) `poll` |
+| Firma Fal | Ed25519/JWKS sobre digest del body crudo + ventana de timestamp (`provider-webhooks.ts:64-95`) |
+| Ack rápido | `acceptProviderWebhook` devuelve **202** tras sólo persistir la señal: no descarga, no hashea, no liquida |
+| Veo por LRO | `predictLongRunning` → `fetchPredictOperation` (`production-result-drivers.ts:207,227,509`) |
+
+### 🔴 Los cuatro criterios que NO puedo declarar verificados
+
+1. **OpenAI por webhook no tiene evidencia de runtime.** Los 4 intentos son `poll` y hay **cero** señales de
+   OpenAI en `provider_completion_signals`. El criterio admite `poll` como estrategia declarada para un
+   endpoint sin evento oficial, así que **puede estar correcto por diseño** — pero eso está **supuesto, no
+   verificado**.
+2. **Deadlines independientes por etapa** (submit / queue / inference / webhook / poll / ingest) con stuck
+   detection: no encontré la separación por etapa; hay `next_action_at` único.
+3. **Fallback con policy explícita** registrando proposed vs actual route: `actualRoute` existe como contrato
+   de fidelidad, la policy de fallback no la verifiqué (su dueña declarada es `TASK-1470`).
+4. **Conformance de API/SDK** sobre `prepare→estimate→approve→submit→status/cancel/retry/branch` + deny +
+   replay: no lo recorrí.
+
+La dedupe de entregas duplicadas cuenta como verificada **en código y en test**, no en vivo: 34 entregas
+sobre 34 operaciones distintas es *ausencia de duplicados observados*, no prueba de que se deduplican.
+
 ## Acceptance Criteria
 
-- [ ] Ningún provider submission ocurre sin approval/reservation válidos.
-- [ ] Approval y submission preservan pool/funding/policy version; pause/cap/cambio material falla cerrado.
-- [ ] El mismo idempotency key no genera doble gasto.
-- [ ] Socket reset/timeout después de enviar un submit produce `submission_unknown`; ningún retry facturable ocurre
+- [x] Ningún provider submission ocurre sin approval/reservation válidos. → approval token ligado al estimate; `governed_runs.approval_fingerprint` + `reservation_ref` NOT NULL (`0014`).
+- [x] Approval y submission preservan pool/funding/policy version; pause/cap/cambio material falla cerrado. → revalidación en submit; `approval_stale` colapsa a `conflict` (documentado en la skill).
+- [x] El mismo idempotency key no genera doble gasto. → `UNIQUE (workspace_id, idempotency_key)` (`0014`) + test *uses one deterministic economic decision key across finalizer retries*.
+- [x] Socket reset/timeout después de enviar un submit produce `submission_unknown`; ningún retry facturable ocurre
       hasta reconciliar si el proveedor aceptó el attempt original.
-- [ ] Fal submit retorna sin drenar la cola in-process y persiste `request_id` + URLs devueltas antes de depender del callback.
-- [ ] El webhook verifica firma Ed25519 sobre body crudo, headers obligatorios y ventana de timestamp; firma inválida,
+- [x] Fal submit retorna sin drenar la cola in-process y persiste `request_id` + URLs devueltas antes de depender del callback. → columnas `provider_status_url`/`provider_response_url` (`0014`) + test *persists provider acceptance using the stable submission key*.
+- [x] El webhook verifica firma Ed25519 sobre body crudo, headers obligatorios y ventana de timestamp; firma inválida,
       replay vencido o `request_id` desconocido no mutan estado.
-- [ ] OpenAI usa webhook sólo para eventos/endpoints oficialmente soportados, verifica Standard Webhooks y deduplica
+- [~] OpenAI usa webhook sólo para eventos/endpoints oficialmente soportados, verifica Standard Webhooks y deduplica
       `webhook-id`/event ID; endpoints sin evento declaran otra estrategia explícita.
-- [ ] Vertex/Veo persiste el operation name y completa mediante `fetchPredictOperation` en un worker durable; ninguna
+- [x] Vertex/Veo persiste el operation name y completa mediante `fetchPredictOperation` en un worker durable; ninguna
       ruta pretende pasar un callback URL inexistente al proveedor.
-- [ ] Todos los drivers producen el mismo completion contract interno y ningún estado/payload vendor-specific entra
+- [x] Todos los drivers producen el mismo completion contract interno y ningún estado/payload vendor-specific entra
       en la state machine de dominio.
-- [ ] Entregas duplicadas/tardías responden de forma idempotente y settlement/release ocurre exactamente una vez.
-- [ ] `cancellation_requested` no se presenta como `cancelled`; completion tardío conserva audit/output/costo según
+- [x] Entregas duplicadas/tardías responden de forma idempotente y settlement/release ocurre exactamente una vez. → `UNIQUE (provider, provider_event_id)` + test *acknowledges duplicates quickly without invoking finalization*. **En código y test, no ejercitado en vivo.**
+- [x] `cancellation_requested` no se presenta como `cancelled`; completion tardío conserva audit/output/costo según
       policy y nunca promueve automáticamente el resultado.
-- [ ] Eventos fuera de orden no regresan estados terminales ni ejecutan dos veces ingest, manifest, outbox o ledger.
-- [ ] Lease/fencing impide que dos workers completen o reconcilien el mismo attempt; takeover tras expiración invalida
+- [x] Eventos fuera de orden no regresan estados terminales ni ejecutan dos veces ingest, manifest, outbox o ledger. → `governed_run_economic_decisions` con clave única por attempt.
+- [x] Lease/fencing impide que dos workers completen o reconcilien el mismo attempt; takeover tras expiración invalida
       writes del owner anterior.
-- [ ] Deadlines de submit, queue, inference, webhook, poll e ingest son independientes y tienen stuck detection.
-- [ ] El handler acusa recibo rápidamente y delega descarga, hashing, ingest y settlement a trabajo durable.
-- [ ] El reconciler completa un run cuando el webhook falta, conduce Vertex LRO y no duplica completion si una señal
+- [ ] ⚠️ NO VERIFICADO — Deadlines de submit, queue, inference, webhook, poll e ingest son independientes y tienen stuck detection.
+- [x] El handler acusa recibo rápidamente y delega descarga, hashing, ingest y settlement a trabajo durable. → `acceptProviderWebhook` responde 202 tras sólo `recordCompletionSignal`.
+- [x] El reconciler completa un run cuando el webhook falta, conduce Vertex LRO y no duplica completion si una señal
       llega después.
-- [ ] Outputs se copian a storage privado de Globe y preservan hash/provenance antes de marcar `candidate_ready`.
-- [ ] Fallback requiere policy explícita y registra proposed vs actual route.
-- [ ] Existe replay/reconcile manual gobernado por attempt/provider ID, con dry-run/readback, capability y audit.
-- [ ] API/SDK/conformance cubren prepare→estimate→approve→submit→status/cancel/retry/branch, deny y replay con
+- [x] Outputs se copian a storage privado de Globe y preservan hash/provenance antes de marcar `candidate_ready`. → `GcsOutputIngest` content-addressed + Asset Governance previo a publicar.
+- [ ] ⚠️ NO VERIFICADO (dueña declarada: `TASK-1470`) — Fallback requiere policy explícita y registra proposed vs actual route.
+- [x] Existe replay/reconcile manual gobernado por attempt/provider ID, con dry-run/readback, capability y audit. → workflows `diagnose-governed-run.yml` + `globe-operator-lane.yml`.
+- [ ] ⚠️ NO VERIFICADO — API/SDK/conformance cubren prepare→estimate→approve→submit→status/cancel/retry/branch, deny y replay con
       el mismo run/audit; queue/runner sólo consumen commands/events.
-- [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
-- [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
+- [x] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
+- [x] No se habilitan producción ni clientes externos sin una task/gate posterior explícito. → sigue internal-only, gated por `TASK-1480`.
 
 ## Verification
 

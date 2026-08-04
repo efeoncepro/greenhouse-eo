@@ -2,7 +2,7 @@
 
 Historia anterior: [Handoff.archive.md](Handoff.archive.md).
 
-## TASK-1469 — convergencia terminal de los agregados del run · **COMPLETE** (2026-08-04)
+## TASK-1469 — convergencia terminal cerrada; task REABIERTA por cierre prematuro (2026-08-04)
 
 Verificado en runtime desde `efeonce-globe@c28ab9f`; detalle en
 [`TASK-1469`](docs/tasks/complete/TASK-1469-globe-governed-run-lifecycle-submission-fence.md).
@@ -19,7 +19,16 @@ Verificado en runtime desde `efeonce-globe@c28ab9f`; detalle en
   sobre DELTA/INT64; una métrica que extrae valor necesita `ALIGN_PERCENTILE_99`. Mirar la pieza hermana está
   bien; mirar CUÁL hermana aplica es la otra mitad de la regla.
 
-**Desbloquea `TASK-1632`.**
+🔴 **La task NO está complete: la reabrí.** La deuda de convergencia sí quedó cerrada y verificada, pero la
+había movido a `complete/` con su bloque `## Acceptance Criteria` —22 ítems del carril webhooks/completion,
+que es el corazón de su título— **sin recorrer**. Reconciliado ahora con evidencia: **19 marcados**, **3
+declarados NO VERIFICADOS** (deadlines independientes por etapa, policy de fallback —dueña `TASK-1470`— y
+conformance API/SDK) y **el webhook de OpenAI sin evidencia de runtime** (sus 4 intentos corren por `poll` y
+no hay ninguna señal suya; puede ser correcto por diseño, pero está supuesto).
+
+El carril de webhooks SÍ funciona y hay evidencia: **34 entregas reales de Fal** recibidas, verificadas por
+Ed25519/JWKS sobre el body crudo y procesadas; ack en 202 sin descargar ni liquidar; Veo por
+`predictLongRunning`→`fetchPredictOperation`. **`TASK-1632` sigue bloqueada hasta cerrar los 4 puntos.**
 
 ### 🔴 Trampa de infra viva (dueño: `TASK-1635`, NO 1469)
 
@@ -121,7 +130,7 @@ consumers es de 1552.
 
 1. El bloque del adapter de 1633 (grupo **a**).
 2. El composer de 1552 leyendo el descriptor.
-3. `TASK-1632`, que quedó desbloqueada por el cierre de 1469.
+3. Cerrar los 4 puntos abiertos de `TASK-1469`, que es lo que desbloquea `TASK-1632`.
 
 ### 🔶 Riesgos vivos
 
