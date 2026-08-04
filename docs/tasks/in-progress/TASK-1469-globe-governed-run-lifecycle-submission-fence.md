@@ -553,6 +553,113 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 
 <!-- ZONE 4 — VERIFICATION & CLOSING -->
 
+## Delta 2026-08-04 (c) — auditoría de los tres proveedores: la captura funciona, y tiene tres agujeros que pierden un asset ya pagado
+
+Tres auditorías en paralelo (Fal · OpenAI · Vertex), cada una contrastando la documentación oficial del
+proveedor contra nuestro código. Los tres hallazgos de riesgo alto **los verifiqué yo aparte** leyendo el
+código; los cito con `archivo:línea`.
+
+⚠️ **Nota de método sobre las fuentes de Fal:** `docs.fal.ai` devolvió 429 en todos los intentos, así que su
+contrato se leyó de dos espejos verbatim independientes que coinciden entre sí, más probes en vivo del JWKS y
+de `api.fal.ai/v1/meta`. No es documentación de primera mano; tratarlo como fuerte pero no definitivo.
+
+### Veredicto por proveedor
+
+| Proveedor | Mecanismo | Veredicto |
+|---|---|---|
+| **Fal** | webhook firmado + poll de respaldo | **CORRECTO CON HUECOS.** Firma, ventana de replay y dedupe replican el contrato al pie de la letra; los huecos están en recuperación y clasificación |
+| **OpenAI** | `poll` (síncrono) | **CORRECTO POR DISEÑO.** No perdemos ningún webhook: **OpenAI no emite eventos de imagen**. Sus 16 eventos son `response.*`, `batch.*`, `fine_tuning.job.*`, `eval.run.*`, `realtime/live.call.incoming` |
+| **Vertex — Veo** | LRO `predictLongRunning`→`fetchPredictOperation` | **CORRECTO CON HUECOS.** Vertex no ofrece callback por request; el poll es la respuesta correcta |
+| **Vertex — Omni / imagen** | unary síncrono | **CORRECTO** (imagen) / **CON HUECOS** (Omni) |
+
+### 🔴 Los tres que pierden un asset YA COBRADO
+
+**G1 · Fal — el rescate del lost-ack recupera el id pero NO las URLs.** Cuando el POST de submit llega a Fal y
+nuestra respuesta se pierde, el attempt queda `submission_unknown` sin URLs. Después llega el webhook firmado
+y el camino de rescate —cuyo propio comentario se llama *"the lost-ack recovery path"*— escribe **sólo**
+`provider_operation_id` y `provider_accepted_at` (`governed-run-store.ts:625-631`). El único escritor de
+`provider_response_url` es `markSubmissionAccepted` (`:497-505`), que ya no se ejecuta. Y las dos salidas
+exigen esa URL: `resolve` falla con `fal_response_evidence_missing`
+(`production-result-drivers.ts:77-78`) y `reconcile` con `fal_provider_operation_evidence_missing`
+(`governed-provider-runtime.ts:191-193`). **Tenemos el `request_id` en la mano y no armamos la ruta
+documentada `GET queue.fal.run/{model}/requests/{request_id}`.** Fal ejecutó y facturó; el run queda trabado
+y la reserva colgada.
+
+**G2 · Vertex/Veo — el techo de 2 MB revienta justo en el poll del éxito.** El transporte acota el JSON a
+`DEFAULT_MAX_JSON_BYTES = 2 MB` (`production-result-drivers.ts:19`, usado en `:311`) mientras el driver
+declara un presupuesto de salida de **64 MB** (`:18`). Como no pasamos `storageUri`, el MP4 vuelve **inline en
+base64** (+33 % sobre el binario). Los polls `pending` pasan —son chicos— y **sólo revienta el que trae el
+video**. El repo ya resolvió este mismo problema para OpenAI con una constante dedicada de 24 MB (`:20`) y no
+lo replicó acá. No está medido en vivo, pero no depende de medición: 64 MB a través de un caño de 2 MB es
+inalcanzable por construcción.
+
+**G3 · Omni — generación de minutos dentro de una lease de 60 s.** Google documenta que la generación *"can
+take over a minute"*; `GLOBE_GOVERNED_LEASE_MS` por defecto es **60 000 ms**
+(`governed-runtime-config.ts:32`). Si la lease vence con la llamada síncrona en vuelo, el sistema hace lo
+correcto y **no re-submite**, pero `reconcile` exige un `providerOperationId` **que nunca se escribió**
+(`vertex-omni-governed-driver.ts:111-112`), porque la evidencia sólo nace al final del submit. Peor: los
+bytes **sí se ingirieron a GCS** (`:97`) y su hash se perdió. El asset existe, está pagado y es irrecuperable.
+
+### Riesgo alto, sin pérdida de asset
+
+**G4 · OpenAI — el submit síncrono no tiene timeout.** `createOpenAiImagesGovernedTransport` hace `fetch`
+**sin `AbortSignal.timeout`** (`openai-images-governed-driver.ts:167`), mientras el transporte de Fal sí lo
+acota entre 1 s y 120 s (`governed-provider-runtime.ts:286-293`). Con lease de 60 s, una generación colgada
+puede hacer que otro worker reclame el job y **vuelva a llamar a OpenAI**. La única defensa es el header
+`idempotency-key` (`:172`), y **NO ESTÁ VERIFICADO que OpenAI lo honre en `/v1/images/generations`** — no
+aparece en su referencia de Images. La protección anti-doble-cobro de esta lane es hoy una suposición.
+
+**G5 · El código de error del reconcile se borra.** `ProductionProviderResultError` guarda `.code`
+(`production-result-drivers.ts:24-30`) pero `reconciliationFailureCode` lee `.errorCode`
+(`governed-run-lifecycle.ts:665-672`) → `provider_response_too_large`, `veo_poll_quota_exhausted` y
+`veo_poll_access_denied` colapsan **al mismo string**. Es `ISSUE-127` otra vez, en el único camino donde no se
+arregló: el de finalización sí lee `.code` (`:581`). **Y hace invisible al G2.**
+
+**G6 · Fal no reporta `FAILED` por el status endpoint.** Su queue documenta sólo `IN_QUEUE | IN_PROGRESS |
+COMPLETED`; el fallo del modelo llega como **código HTTP del response endpoint**. Nosotros mapeamos `404 ⇒
+pendiente` cuando la doc dice "request cannot be found", y cualquier 5xx a `fal_result_unavailable` →
+reschedule (`governed-provider-runtime.ts:335-343`). Si el webhook se pierde y el run falló en el modelo,
+**el poll no sabe cerrarlo**: reintenta indefinidamente con la reserva retenida. Es el modo de fallo que el
+poll existe para cubrir, y no lo cubre.
+
+### Medio y bajo
+
+- **G7 · Fal — ventana de replay de 300 s contra reintentos de 2 h.** Si Fal **re-firma** cada reintento, todo
+  bien; si reutiliza el timestamp original, todo reintento posterior a 5 min se rechaza. **NO VERIFICADO** en
+  la doc. Se compone con G6.
+- **G8 · Fal — `catch` ciego que convierte cualquier error interno en 400** (`app.ts:1951-1953`): un blip de
+  Postgres durante la entrega descarta la señal. Un 503 para infraestructura y 400 sólo para firma inválida
+  cambiaría el resultado.
+- **G9 · Fal — sin verificación de `x-fal-webhook-user-id` ni allowlist de IP.** El JWKS de Fal es **global**:
+  cualquier cliente de Fal puede provocar una entrega genuinamente firmada hacia nuestra URL. No permite robar
+  un asset (`assertCompleted` ata el `resultRef` al id persistido) pero **sí matar runs ajenos** con un
+  `status:"ERROR"` firmado. Fal publica `webhook_ip_ranges` en `api.fal.ai/v1/meta` y no lo usamos.
+- **G10 · Veo — la espera `pending` usa backoff de ERROR, no la cadencia de espera.** `reconcileOnce` llama
+  `backoffMs` sin `failureClass` (`governed-run-lifecycle.ts:422`), así que escala hasta 5 min pese a que el
+  módulo ya define `WAITING_POLL_MS = 10_000` para exactamente esto (`:556`). Hasta ~5 min de latencia
+  **después** de que la pieza ya existe. Es la misma corrección que esta task ya aplicó en la finalización, sin
+  aplicar en el reconcile.
+- **G11 · Fal — fallbacks de modelo activos por defecto.** Fal puede reenrutar a otro endpoint tras 5
+  reintentos; se desactiva con `x-app-fal-disable-fallbacks`, que no enviamos. El modelo que ejecutó puede no
+  ser el del `route_snapshot` aprobado y tarifado. Gobernanza económica, no captura.
+- **G12 · Veo — `resolve()` re-consulta la operación mucho después del `done`**, y la retención de una
+  Operation de Vertex con resultado inline es **NO VERIFICADO**. Pasar `storageUri` elimina G2 y G12 de una vez.
+- **G13 · el verificador de webhook de OpenAI es código muerto**, y además su ruta es irregistrable: OpenAI
+  configura **una URL estática por proyecto** y la nuestra exige el correlation id en el path
+  (`app.ts:1916`); al edge público, un POST de OpenAI da 404 (`:1929`). No cuesta nada hoy —nada usa esa
+  lane—, pero invita a leer "sí capturamos webhooks de OpenAI".
+
+### ¿Hay push disponible que no usemos?
+
+- **Vertex/Veo: NO.** La doc de LRO dice literalmente que se consulta por polling. **Sí existe** Eventarc sobre
+  el bucket de salida si pasáramos `storageUri`, pero **no reemplaza el poll**: sólo dispara en éxito, así que
+  una operación que termina en `error` o filtrada por RAI no produciría objeto y quedaría colgada para siempre.
+- **Omni: existe `webhook_config`** en la Interactions API con entrega at-least-once, pero documentado **sólo**
+  sobre `generativelanguage.googleapis.com`, y nuestro binding aprobado está pinneado a `aiplatform`. Su valor
+  real no sería el push sino sacar una generación de minutos de dentro de una lease de 60 s (G3).
+- **OpenAI: no para imágenes.** Su lane de webhook es `/v1/responses` con `background:true`, que hoy ninguna
+  ruta de producción usa.
+
 ## Delta 2026-08-04 (b) — REABIERTA: el cierre fue prematuro
 
 **El cierre anterior fue mío y estuvo mal.** Moví la task a `complete/` habiendo verificado sólo los 5

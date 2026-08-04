@@ -28,7 +28,27 @@ no hay ninguna señal suya; puede ser correcto por diseño, pero está supuesto)
 
 El carril de webhooks SÍ funciona y hay evidencia: **34 entregas reales de Fal** recibidas, verificadas por
 Ed25519/JWKS sobre el body crudo y procesadas; ack en 202 sin descargar ni liquidar; Veo por
-`predictLongRunning`→`fetchPredictOperation`. **`TASK-1632` sigue bloqueada hasta cerrar los 4 puntos.**
+`predictLongRunning`→`fetchPredictOperation`.
+
+### 🔴 Auditoría de los tres proveedores (Delta 2026-08-04 (c)) — tres agujeros que pierden un asset pagado
+
+La captura es **correcta en su forma** en los tres, y `poll` para OpenAI es correcto **por diseño** (OpenAI no
+emite eventos de imagen). Pero la auditoría contra la doc oficial destapó 13 huecos; los tres graves los
+verifiqué yo leyendo el código:
+
+- **Fal:** el rescate del lost-ack recupera el `request_id` pero **no las URLs** de status/response, y ambas
+  salidas las exigen → run trabado con el asset ya facturado, teniendo el id en la mano.
+- **Veo:** techo de **2 MB** en el poll contra un video que vuelve **inline en base64** (el driver declara 64 MB)
+  → revienta exactamente en el poll del éxito. El repo ya resolvió esto para OpenAI con 24 MB y no lo replicó.
+- **Omni:** generación de minutos dentro de una lease de **60 s**; si vence, `reconcile` exige un id que nunca
+  se escribió — y los bytes ya se ingirieron a GCS con su hash perdido.
+
+Más: el submit de imágenes de OpenAI **no tiene timeout** (el de Fal sí) y su anti-doble-cobro depende de un
+`idempotency-key` **no verificado**; y `reconciliationFailureCode` lee `.errorCode` mientras el error expone
+`.code`, así que **todos** los códigos del poll colapsan en uno — `ISSUE-127` en el único camino donde no se
+había arreglado, y es lo que vuelve invisible al agujero de Veo.
+
+**`TASK-1632` sigue bloqueada.** Estos huecos son de captura de completitud, o sea del corazón de 1469.
 
 ### 🔴 Trampa de infra viva (dueño: `TASK-1635`, NO 1469)
 
