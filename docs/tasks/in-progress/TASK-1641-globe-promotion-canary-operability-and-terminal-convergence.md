@@ -73,6 +73,53 @@ llega a terminal, todo agregado que dependa de su estado converge o queda observ
 saga. Se declara como invariante y no como arreglo de un caso porque el mismo defecto ya apareció en
 dos familias distintas.
 
+## Delta 2026-08-04 (b) — Scope 1 CERRADO: el canary produce la ruta arbitraria
+
+`efeonce-globe@1767138`. `pnpm producer:canary --route=<routeId>` resuelve la ruta del catálogo,
+**deriva** su `outputShape` desde `constraints` y resuelve sus entradas desde el feed retenido,
+certificándolas con `copyAsReference`. Sin `--execute` estima **sin gastar**; el gasto va por
+`--approve-route`, **excluyente** de `--approve` (una aprobación escrita para un canary no puede
+autorizar el gasto del otro).
+
+El camino de verificación **no se duplicó**: se extrajo `runCanaryTarget`, que ahora comparten las
+tres modalidades base y la ruta arbitraria. Dos implementaciones del mismo camino divergen, y
+entonces «pasó el canary» dejaría de significar lo mismo según qué ruta se probó.
+
+**La prueba de que cierra el scope:** sobre `ref/video/frames-v1` el plan derivado reproduce
+**exactamente** lo que anoche se armó a mano — 720p / 8 s / 16:9 / `silent` / `frames` sin cuadro
+final, la misma referencia `sha256:b2762b73…` y los mismos **32 créditos**. Verificado también en
+`ref/still/rrss-v1` (10 cr), `ref/motion/reference-v1` (12 cr) y `ref/voice/tts-v1` (6 cr): el motor
+es del catálogo, no de la ruta #1.
+
+### 🔴 Los dos defectos que sólo aparecieron contra el runtime
+
+Los dos pasaron la suite en verde. Un doble acepta cualquier forma.
+
+1. **`referenceHashes` NO es una lista de hashes, pese al nombre.** El contrato lo declara
+   `readonly LabDeclaredInputV1[]` y `validateAuthorizedInputs` exige `inputId`, `sha256`,
+   `mediaType` y `rights`; mandar los strings devuelve **`invalid_request` 400**. Estaba invisible
+   porque **las tres modalidades base estiman con la lista VACÍA** — el canary de ruta arbitraria es
+   el primer consumidor real del campo.
+2. **Elegir el `inputMode` por orden del array es fail-open.** `ref/motion/reference-v1` declara
+   `['prompt','elements']` **y** exige 1 referencia: tomar el primero daba `create` —prompt-driven—
+   con la referencia en la mano, y el motor la habría descartado **después de reservar crédito**,
+   devolviendo un video que se ve bien y responde otra pregunta. Es el mismo fail-open que
+   `TASK-1633` cerró en `ref/motion/loop-v1`, reintroducido desde el otro lado. Hoy el modo se elige
+   por **si van a viajar referencias de verdad**, y `hasEndFrame` sigue la misma regla.
+
+### Lo que este cierre NO prueba
+
+El camino de **gasto** (`--execute`) está implementado y cubierto por tests, pero **no se ejercitó
+con gasto real**: lo verificado en runtime es el dry-run de cuatro rutas. La primera promoción que
+lo use es su prueba de salida.
+
+Y una decisión que se tomó y se revirtió, porque la premisa era falsa: el dry-run **sí certifica**
+sus referencias. Se intentó dejarlo read-only puro y el estimate de una ruta con entrada obligatoria
+**no es computable** sin referencias válidas — `assertReferencePolicySatisfied` corre antes de
+cotizar y `derived-internal` es una postura que un caller no puede declarar. `copyAsReference` es
+gasto cero e idempotente: lo que deja es una anotación, no un cobro. El output lo declara
+(`referencesCertified`) en vez de que el nombre lo esconda.
+
 ## Delta 2026-08-04 (cierre de sesión) — el sello FUNCIONA; Omni sellada, Veo a un paso
 
 `efeonce-globe@38c528d`, desplegado y verificado por revisión y digest: API `globe-api-internal-00211-8sp`
@@ -370,8 +417,10 @@ sigue siendo el recovery.
 
 ## Acceptance Criteria
 
-- [ ] El canary canónico puede ejercitar una ruta arbitraria por su identidad exacta, incluidas las que
-      exigen referencias, sin escribir la secuencia a mano.
+- [x] El canary canónico puede ejercitar una ruta arbitraria por su identidad exacta, incluidas las que
+      exigen referencias, sin escribir la secuencia a mano. — `efeonce-globe@1767138`, verificado en
+      dry-run contra el runtime sobre 4 rutas; el camino de gasto queda cubierto por tests y **sin
+      ejercitar con gasto real** (ver Delta 2026-08-04 (b)).
 - [ ] Una promoción `activated` próxima a expirar emite señal observable, con alerta.
 - [ ] Los agregados dependientes de la saga están declarados en un array enumerable, con test en ambas
       direcciones; un `observable` sin señal se rechaza.

@@ -13,6 +13,20 @@
 > `d3fe90e`, digest `sha256:d8295862dc12c14427e90e0bb413577802916c37ca6bf32c202680492ca7bae9`,
 > deploy `30717266572` y baseline IaC `e369ef8` sin drift.
 
+## Corte 2026-08-04 (b) — el canary ya produce una ruta arbitraria (TASK-1641 Scope 1)
+
+`efeonce-globe@1767138`, **sin desplegar** (es un script del repo, no runtime). `pnpm producer:canary
+--route=<routeId>` deriva el `outputShape` desde el catálogo y resuelve sus entradas desde el feed
+retenido. Dry-run verificado contra la API en vivo sobre cuatro rutas: `ref/video/frames-v1` (32 cr,
+1 referencia), `ref/motion/reference-v1` (12 cr, 1), `ref/still/rrss-v1` (10 cr, 0) y
+`ref/voice/tts-v1` (6 cr, 0). Sobre Veo reproduce **exactamente** la forma, la referencia y el costo
+del sello artesanal de anoche.
+
+⚠️ **El camino de gasto (`--execute`) no se ejercitó todavía**: la próxima promoción es su prueba de
+salida. Y el dry-run **certifica** sus referencias (gasto cero, idempotente) porque el estimate de
+una ruta con entrada obligatoria no es computable sin ellas — el output lo declara en
+`referencesCertified`.
+
 ## Corte 2026-08-04 (noche) — TASK-1641: Omni y Veo sellados, migración `0050`
 
 **Despliegue.** Globe `main@38c528d` (SHA completo `38c528d27b9ae67d4432055535cbd9e7975410cc`), con CI verde
