@@ -115,18 +115,17 @@ Lo que más vale recordar de la sesión:
   su modo de fallo — resta una ventana de latencia, no una pérdida. Su arreglo (`storageUri`) tiene dueño y no
   se implementó detrás de un flag involtable, que sería el código muerto que D13 vino a limpiar.
 
-**Rollout ejecutado:** los tres runtimes en `0b5f875a19cb` (drift guard verde: API `00203-77k`, Studio
-`00146-hdx`, worker `sha256:4060447a5095`), con salud post-deploy limpia.
+**Rollout ejecutado:** los tres runtimes en **`07baef97af9a`** (drift guard verde: API `00204-ttm`, Studio
+`00147-gq4`, worker `sha256:26fc3ded0c30`), con salud post-deploy limpia.
 
 **⚠️ `GLOBE_FAL_USER_ID` cableado y sin configurar, a propósito.** El panel de Fal no expone ese identificador
 como valor; ponerlo mal rechazaría TODAS las entregas legítimas. El sistema lo **observa** sobre una entrega ya
 verificada (`globe.provider_webhook.account_identity_observed`) mientras siga sin configurar: con la próxima
 generación queda el valor medido.
 
-**`TASK-1632` sigue bloqueada** por los tres que quedan abiertos a decisión: **D1** (la forma de recuperar un
-lost-ack de Fal), **D7** (medible sobre una entrega reintentada, ahora que el ingress devuelve 503) y **D12**
-(se cierra pasando `storageUri`, que además elimina el costo de memoria de D2 — la rama GCS del resolver ya
-existe y ya está gobernada por allowlist).
+**`TASK-1632` queda bloqueada sólo por D12**, que es una ventana de latencia y no una pérdida: se cierra
+pasando `storageUri` —lo que además elimina el costo de memoria del presupuesto derivado— y exige un canary
+con gasto real, o sea decisión tuya.
 
 ### 🔴 Trampa de infra viva (dueño: `TASK-1635`, NO 1469)
 
