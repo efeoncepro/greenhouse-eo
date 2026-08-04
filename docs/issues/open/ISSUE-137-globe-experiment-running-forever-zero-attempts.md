@@ -178,6 +178,13 @@ el arreglo entró entre ambos y se ve en producción.
   vez de esperar al tick. Sólo debe avanzar de inmediato lo que **aplicó**; una etapa que
   `rescheduled` con backoff conserva su espera, o se convierte un backoff en un bucle caliente.
   Bajaría ~20 min a <1 min. Toca semántica de lease y fencing: pide decisión explícita.
+
+  **Verificado que el espaciado NO es deliberado del dominio**, que era el supuesto capaz de invalidar
+  este arreglo: `processAssetGovernanceLease` resuelve **una** etapa por llamada (`activeStage(state)`)
+  y en éxito llama `store.advance`; el único retraso que introduce es el backoff de `retry()`, y sólo
+  en los caminos de fallo. Los 5 minutos salen de que `runGovernanceBatch` hace `claimDue` **una vez**
+  antes del loop, así que el job ya avanzado no se vuelve a tomar en esa ejecución. Es artefacto de la
+  estructura del batch, no una decisión de aislamiento entre etapas.
 - **Proyectar el attempt en vuelo** en la vista del experimento, para que «generando» diga en qué va.
 - **Sellar el cierre con el reloj de la finalización**, no con el de la completitud del proveedor.
 
