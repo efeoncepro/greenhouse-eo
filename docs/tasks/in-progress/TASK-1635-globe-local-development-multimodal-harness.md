@@ -1114,3 +1114,36 @@ puede estar recuperable crea un segundo cobro. Amerita ISSUE propio.
 reales y **enviar** una generación con su costo. La **ejecución** end-to-end queda
 `operativamente bloqueada` por un defecto de la cola de governed runs que es anterior y ajeno a
 este trabajo.
+
+## ✅ Delta 2026-08-04 — la generación NO estaba bloqueada: completó. El bloqueo era la ventana de observación
+
+Readback contra `globe-pg` (identidad IAM del operador, sólo lecturas). El
+`experimentId 96c0ddcd-07bc-4bcc-8de5-d39b74ddbc97` que se declaró colgado **terminó bien**:
+
+```
+state            : candidate_ready        outcome : candidate_ready
+model            : seedream-5-pro         attempts: 1
+reservedCredits  : 10   ·   spentCredits : 10      ← liquidado, no retenido
+output           : sha256:7c1e2816…  image/png  7.340.208 bytes  retained: true
+```
+
+Cronología real: `run_approved` 19:58:58 → `provider_submission_accepted` **19:59:13 (15 s)** →
+proveedor listo 20:01:30 → experimento finalizado **20:21:16**. El worker sí tomó el trabajo, y rápido.
+Los 20 minutos intermedios son Asset Governance avanzando **una etapa por tick de 5 min**
+(`inspection` 20:05 · `malware` 20:10 · `c2pa` 20:15 · `rights` 20:20), con el job `complete` esperando
+correctamente. Diagnóstico completo y evidencia por etapa en
+[`ISSUE-137`](../../issues/open/ISSUE-137-globe-experiment-running-forever-zero-attempts.md) → Delta
+2026-08-04.
+
+**Consecuencia para esta task: el criterio de salida de Slice 2 —«una generación real desde el Producer
+local»— está CUMPLIDO**, con output retenido y liquidación correcta. El envío y la ejecución end-to-end
+quedan verificados; no hay defecto ajeno bloqueando a `globe:dev`.
+
+🔴 **La lección es de método, y es la que hay que conservar:** se declaró un bloqueo por un defecto ajeno
+observando **seis minutos** un camino cuya latencia real era **veintidós**. La regla de readback-first se
+aplicó bien (no se reintentó, y eso evitó un segundo cobro); lo que faltó fue **volver a leer más tarde**.
+Un readback es un instante, no un veredicto: declarar «no avanza» exige conocer la latencia esperada del
+camino, y ninguna de las cuatro observaciones (20:01→20:04) alcanzaba el primer tick de governance.
+
+Pendiente real de la task, sin cambios: los **fixtures multimodales de audio y video** (Slice 3), cuyo
+valor sigue bajo ahora que el modo live funciona.

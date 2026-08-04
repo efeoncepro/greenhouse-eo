@@ -2,6 +2,51 @@
 
 Historia anterior: [Handoff.archive.md](Handoff.archive.md).
 
+## ISSUE-137 — los runs NUNCA estuvieron colgados; la causa es Asset Governance (2026-08-04, nocturno)
+
+Trabajo de diagnóstico, **sin cambios de código y sin deploy**. Readback contra `globe-pg` con la
+identidad IAM del operador, sólo lecturas. Detalle y evidencia por etapa en
+[`ISSUE-137`](docs/issues/open/ISSUE-137-globe-experiment-running-forever-zero-attempts.md) → Delta
+2026-08-04.
+
+🔴 **Las dos hipótesis de la issue quedaron refutadas, y con ellas su plan de trabajo.** No era «reserva
+sin encolado» (`create()` inserta run + attempt + `enqueue` en UNA transacción) ni «el claim los filtra»
+(el `submit` se tomó en **15 s** y **22 s**). **Ningún experimento quedó `running`**: los tres del
+2026-08-03 son terminales. La ventana de observación del incidente —seis minutos— fue más corta que la
+latencia real, que era de veintidós.
+
+**La causa real:** Asset Governance avanza **una etapa por ejecución programada**, y su cron es `*/5`:
+`inspection` 20:05 · `malware` 20:10 · `c2pa` 20:15 · `rights` 20:20. Cada ejecución del Job dura ~15 s.
+Cuatro etapas × 5 min = **~20 minutos de reloj por ~60 segundos de trabajo**, consistente en las tres
+mediciones del día (906 s, 1083 s, 1085 s). El job `complete` de la outbox **espera bien**: su último
+reintento cae 6 segundos después de que governance llega a terminal. El mecanismo es correcto; lo que
+está mal es la espera.
+
+**El hallazgo más valioso es por qué el diagnóstico salió mal:** el experimento se lee `running` con
+`attempts: []` durante toda la ventana, aunque el attempt ya existe, ya fue aceptado a los 15 s y ya
+completó. La vista **no proyecta el attempt en vuelo**. Por eso un run sano es indistinguible de uno
+colgado — y por eso la conclusión «falta una señal de reservado-sin-attempt» apuntaba al dato
+equivocado: esa señal habría alertado sobre corridas perfectamente sanas.
+
+**Defecto secundario:** la fila `complete` de la outbox dice `state=done` con
+`completed_at=20:01:29` y `available_at=20:20:25` — se cierra 19 minutos **antes** de su propia última
+reprogramación, porque el cierre se sella con el instante de completitud del proveedor y no con el de
+finalización. Eso vuelve imposible reconstruir la latencia leyendo el run.
+
+✅ **Desbloquea `TASK-1635`.** Su criterio de Slice 2 —una generación real desde el Producer local—
+**está cumplido**: `candidate_ready`, Seedream 5 Pro, PNG de 7,34 MB con `retained: true`, y 10 créditos
+reservados = 10 gastados. No había defecto ajeno bloqueando a `globe:dev`. Corrige lo que decía este
+Handoff.
+
+**Nada ejecutado sobre producción.** Los tres arreglos candidatos quedan declarados y sin hacer, porque
+cambian el comportamiento de un pipeline de governance y piden decisión: drenar el batch (sólo lo que
+**aplicó**, nunca lo que hizo `reschedule` con backoff, o se convierte un backoff en bucle caliente),
+proyectar el attempt en vuelo en la vista, y sellar el cierre con el reloj de la finalización.
+
+**Confirmación colateral:** el run de las 12:52 murió con el genérico `run_finalization_failed` y el de
+las 20:01 con `generated_asset_governance_pending` nombrado — el arreglo de allowlist de `ISSUE-138`
+entró entre ambos y se ve operando en producción.
+
 ## TASK-1469 — convergencia terminal cerrada; task REABIERTA por cierre prematuro (2026-08-04)
 
 Verificado en runtime desde `efeonce-globe@c28ab9f`; detalle en
