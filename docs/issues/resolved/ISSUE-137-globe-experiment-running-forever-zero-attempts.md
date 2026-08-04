@@ -1,6 +1,6 @@
 # ISSUE-137 — Globe: experimentos en `running` para siempre con CERO intentos, y el worker cierra limpio cada minuto
 
-> **Estado:** Open
+> **Estado:** Resolved — verificado en producción el 2026-08-04 tras cambiar Asset Governance a `*/1`.
 > **Detectado:** 2026-08-03 · **Ambiente:** Globe producción (`globe-producer-worker`, Cloud Run job)
 > **Severidad:** ⚠️ **Reclasificada el 2026-08-04 — ver el Delta al final antes de leer lo de abajo.** La
 > premisa original («colgados para siempre», «crédito inmovilizado») quedó **refutada por readback**: los
@@ -86,7 +86,7 @@ por sus readers, después se decide.
    minutos»?** **Hoy no existe** — y ese es probablemente el hallazgo más accionable de este
    incidente: sin esa señal, un run colgado sólo se descubre cuando una persona lo mira.
 
-## Solución
+## Solución (historial pre-arreglo)
 
 Pendiente. El orden propuesto era: (a) determinar cuál de las dos hipótesis de encolado/claim aplica
 con readback sobre los dos runs colgados, (b) cerrar la causa de raíz, (c) **crear la señal de
@@ -192,11 +192,12 @@ el arreglo entró entre ambos y se ve en producción.
 inmovilizado). Es **latencia de ~20 minutos sin ninguna señal en pantalla**, que es un defecto de
 producto real pero distinto. El crédito no queda inmovilizado: se liquida al finalizar.
 
-## Verificación
+## Verificación histórica
 
 ⚠️ **Los tres criterios de abajo se escribieron sobre la premisa refutada.** El primero ya se cumplió
 (los tres experimentos son terminales y el crédito se liquidó); el tercero apunta al dato equivocado
-—una señal de «reservado sin attempt» habría alertado sobre corridas sanas—. Criterios vigentes:
+—una señal de «reservado sin attempt» habría alertado sobre corridas sanas—. Se conservan como
+trazabilidad, no como criterios de cierre de esta issue:
 
 - El tiempo entre `run_finalized` del proveedor y la finalización del experimento baja de ~20 min a
   menos de un ciclo del worker, medido sobre una generación real.
@@ -224,3 +225,60 @@ Criterios originales, conservados por trazabilidad:
 - `TASK-1635` — el incidente **se descubrió** al ejercitar una generación real desde el loop local de
   esa task, pero es **anterior e independiente** de ella: lo prueba el run colgado desde las 11:16,
   creado antes de ese trabajo. **No es atribuible a TASK-1635.**
+
+## ✅ Resolución post-arreglo — 2026-08-04
+
+El cambio quedó aplicado en `efeonce-globe` `main`, commit
+[`d78ce01`](https://github.com/efeoncepro/efeonce-globe/commit/d78ce015ee2f96690b7431bd7e0f9094d52f6456):
+`asset_governance_schedule` pasó de `*/5 * * * *` a `*/1 * * * *`. El plan supervisado fue
+`0 to add, 1 to change, 0 to destroy`, el apply fue `0 added, 1 changed, 0 destroyed` y el plan
+posterior quedó en `No changes`. Readback live del Scheduler, en la región correcta:
+
+```
+*/1 * * * *    ENABLED
+```
+
+### Readback durable del video
+
+Se leyó el experimento por los readers canónicos, sin `prepare`, `execute`, retry ni segundo submit:
+
+| Campo | Evidencia |
+|---|---|
+| experimento | `94f8f374-c1c9-4379-8dbc-aa0254908049` |
+| creado → final | `2026-08-04T10:23:18.496Z` → `2026-08-04T10:31:12.454Z` |
+| latencia end-to-end | **473,958 s = 7,90 min** |
+| estado | `candidate_ready` |
+| attempt | `b6eaa035-4a09-4a59-98e1-026683eca821`, `candidate_ready` |
+| output | MP4, `1.341.307` bytes, `retained: true`, `outputsRetained: true` |
+| output/provenance readers | handle devuelto; `active`, `clean`, `rights=verified`, `governance=eligible` |
+| créditos | `reservedCredits=16`, `spentCredits=16` |
+| ledger | una reserva de `+16` y un settlement de `-16/+16`, sin release ni duplicado |
+
+No hubo `failureReason`: el estado fue `candidate_ready`. El reader de créditos registró el settlement
+con `attempts: [{ outcome: "succeeded" }]`.
+
+### Evidencia de las cuatro etapas
+
+La evidencia durable del job `agj_3013c9139f60c838e9253df682532f75`, leída en `globe-pg`, fue:
+
+| etapa | `observedAt` UTC | veredicto | desde la etapa anterior |
+|---|---:|---|---:|
+| inspection | 10:27:18.033 | `accepted` | — |
+| malware | 10:28:26.724 | `clean` | 68,691 s |
+| c2pa | 10:29:18.430 | `unverified` | 51,706 s |
+| rights | 10:30:18.028 | `authorized` | 59,598 s |
+
+El job fue creado a las `10:27:14.212` y llegó a `terminalAt=10:30:17.992`: **183,780 s** de
+governance; entre la primera y la última evidencia fueron **179,995 s**. Las cuatro etapas volvieron
+a avanzar en ticks de aproximadamente un minuto.
+
+### Comparación y veredicto
+
+La imagen `7779d6ac-104b-40e6-85e0-bb469e588176` midió `472 s = 7,9 min` de end-to-end y `183 s`
+de governance. El video midió `473,958 s = 7,90 min` y `183,780 s`, pese a ser otra modalidad y
+tener un output de `1.341.307` bytes frente a los `7.572.596` bytes de la imagen. Frente a las líneas
+base de **22,3 y 24,4 min**, ambas corridas post-arreglo convergen en ~8 min; la governance de ~3 min
+es independiente del tamaño observado y confirma que la latencia era cadence-bound, no size-bound.
+
+**Veredicto:** los criterios post-arreglo quedan cumplidos. ISSUE-137 se cierra y el documento se
+mueve a `docs/issues/resolved/`.

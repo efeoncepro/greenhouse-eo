@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-04 — Globe Asset Governance: la latencia deja de multiplicarse por el cron
+
+- **ISSUE-137 resuelto en runtime** con `efeonce-globe@d78ce01`: Terraform cambió
+  `asset_governance_schedule` de `*/5` a `*/1`; plan/apply supervisados quedaron en `0 to destroy` y
+  el Scheduler live en `southamerica-east1` lee `*/1 * * * * ENABLED`.
+- Verificación post-arreglo sin gasto nuevo: el video durable terminó en `candidate_ready` en
+  `473,958 s / 7,90 min`, governance en `183,780 s`, output retenido y settlement exacto de 16
+  créditos. La imagen post-arreglo midió `472 s / 183 s`; la coincidencia entre modalidades confirma
+  que el cuello era cadence-bound, no size-bound. El drain loop no se tocó.
+
 ## 2026-08-03 — Globe Producer: una corrida deja de morir esperando, y la pieza deja de quedar «generando»
 
 - **Una corrida que espera a Asset Governance ya no se confunde con un fallo** (`deffbd4`, `bbbc9c1`; los tres
@@ -822,9 +832,3 @@ Corrección de fuente de verdad: el cliente inicial es **SKY Agencia Creativa**,
 - La auditoría de un run público real recalculó ~US$0,3067 en providers principales antes de extracción LLM; el valor persistido US$0,2767 omitía request fees de Perplexity.
 - Se documentaron los 18 intentos de extracción LLM sin tokens/costo persistidos y la imposibilidad de asignar directamente el costo del `ops-worker` compartido.
 - Se sincronizaron la documentación funcional, el runbook de smoke y las skills Codex/Claude; la instrumentación completa queda pendiente.
-
-## 2026-07-27 — Brand Visibility Grader: Think live reconciliado
-
-- Se verificó que `https://think.efeoncepro.com/brand-visibility` está publicado y sirve el form gobernado del grader.
-- Se actualizaron TASK-1246/TASK-1327, el índice de tasks, el ledger de flags, la documentación funcional de Think y el handoff para retirar el estado histórico “superficie inexistente”.
-- El loop base queda documentado como submit → run → status → reporte tokenizado; resta consolidar evidencia E2E fechada y sincronizar el lifecycle de TASK-1335/TASK-1336.

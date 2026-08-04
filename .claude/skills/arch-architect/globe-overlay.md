@@ -119,6 +119,39 @@ A `CreativeProviderAdapter` is minted **per vendor** behind `creative-runner`: `
 - **Secrets follow the sibling-platform line:** keyless for Google-native (Globe's own ADC/WIF), keyed-with-its-own-secret for everything else. **Never a secret shared between Globe and Greenhouse.**
 - The public catalog stays slug-free (G4); provider IDs, effective prompts and payloads never cross into the browser-safe projection.
 
+### G8b. Completion capture is the PROVIDER's shape, not ours (ADR-021)
+
+How Globe learns that an asset is ready is **a property of each provider**, and forcing a common abstraction is
+the design error this pin prevents. Fal signs a **per-request** webhook (`?fal_webhook=`) plus a poll safety
+net; OpenAI's image API is **synchronous and emits no webhook events at all**, so `poll` is correct **by
+design**; Vertex/Veo offers **no callback**, only the LRO. `completion_driver='poll'` with zero completion
+signals is the right behaviour, not debt.
+
+Load-bearing consequences, all measured:
+
+- **A valid signature does not prove ownership.** Fal's JWKS is **global**: any of its customers can point a
+  `fal_webhook` at our URL and produce a genuinely signed delivery. It cannot steal an asset, but it **can kill
+  someone else's run** with a signed `ERROR`. The account id must be compared — and **never guessed**: measured,
+  it is an Auth0-style handle unrelated to the dashboard username, so a wrong value rejects *every* legitimate
+  delivery.
+- **The status code we return governs whether the provider retries.** 503 for our own failures, 400 only for a
+  definitive rejection. Answering 400 to a transient blip discards the signal permanently.
+- **Retryability is declared by the provider** (`X-Fal-Retryable`); inferring it from the HTTP status is a
+  heuristic that loses to the vendor's own answer.
+- **Follow-up URLs are NOT derivable and must be declared per endpoint from measured evidence.** Fal's queue
+  base drops a provider-specific number of path segments (3 for one of ours, 1 for another, 0 in the vendor's
+  own doc example). There is no segment rule — only an "app id" boundary Fal alone knows.
+- **A provider-side model fallback breaks route identity.** Fal reroutes by default; for a governed platform
+  that means charging for a model nobody approved while the route snapshot lies, with no signal.
+
+### G8c. Expected latency is part of the contract
+
+⚠️ A healthy cold path took **~20-25 minutes** because Asset Governance advanced **one stage per cron tick**.
+Two independent paths hit it the same day: a readback investigation and a generation canary that **aborted on a
+perfectly healthy system**. **A canary whose patience sits below the real latency is worse than none — it
+teaches the team to read "timeout" as normal, which is exactly how a real hang goes unnoticed.** Publish the
+latency budget of any path a canary watches.
+
 ### G9. Governed run lifecycle + spend fence — nothing fails **after** the money
 
 - **Double cap:** each run cannot exceed its `hardCapCredits`; a workspace cannot exceed `dailyCapCredits` across runs in a UTC day. `estimate > hardCap` is checked **before** `fence.reserve` — a second defensive barrier even if the fence is misconfigured.
@@ -141,6 +174,15 @@ Before building any isolation, ask **what class of change is going to be tested*
 Measured 2026-08-03 (TASK-1635): a whole development environment was built — separate Cloud SQL database, four buckets, service accounts, IAM, permission-based isolation with its bootstrap SQL and its verifier — so the operator could "test locally". Mid-execution the operator asked: *"why do you need a separate database to develop Globe, if what I want is to evolve Globe?"* The correct answer was: it wasn't needed. The pain declared in the task's own `Why This Task Exists` was the **feedback cycle**, and the feedback cycle never needed a database. **One question from the operator dismantled in two minutes what took hours to build.**
 
 > **Generalizable rule: isolation is a response to a blast radius, and a blast radius cannot be estimated without naming the class of change. "Isolate everything" is not a conservative default — it is an unpriced decision.**
+
+🔴 **But «discarded» describes the DECISION, not the infrastructure — and confusing the two is dangerous.**
+Those resources still exist in the Terraform state behind `development_environment_enabled`, whose default is
+`false` **in git** while the live environment depends on a **gitignored `terraform.tfvars`**. Measured
+2026-08-04: `tofu plan` from a clean checkout reports **`20 to destroy`**, entirely green, and applying it
+would delete the whole development environment. The honest plan requires
+`-var development_environment_enabled=true -var 'development_operator_principal=user:…'`, and **`0 to destroy`
+is the assertion before any apply** — the existing "with the feature off, `No changes`" claim holds only where
+the tfvars is present. The root fix (a flag whose real state lives in an untracked file) belongs to `TASK-1635`.
 
 What survived the discard is the tell: a local Postgres pinned to production's **exact major** (16; the machine's Homebrew build is 18, and two majors of drift move errors toward production) so the data layer can be exercised without the cloud, plus the dev-shell isolation gate. They survived because they serve the feedback cycle, which was the real problem all along.
 
@@ -174,7 +216,7 @@ Every collapsed code existed for a legitimate reason (don't leak balances, polic
 
 > **Rule: every canonical code that collapses more than one actionable cause is born with its server-side reason, in the SAME commit.** The reason's payload carries the **name of the control** — never `message`, never `stack`, never the upstream body, never anything derived from the payload (the ban on leaking internal detail applies to logs exactly as it applies to the client).
 
-**11 appearances.** Two facts make this the rule and not a war story:
+**Twelve appearances (2026-08-04).** Two facts make this the rule and not a war story:
 
 - The **ninth** was written the same day, by the same agent, in the same session that documented the previous eight.
 - The **tenth** happened where `TASK-1633` had **already written the five correct names in its spec** — all five with zero occurrences in Globe. Design named the causes and the implementation collapsed them anyway. **Writing it in the spec does not apply it either.**
@@ -196,7 +238,12 @@ A run sat **695 deliveries** (705 by the time it was cancelled) retrying the sam
 
 And the coupling with B1: **a code with no named reason cannot be classified either**, because nine causes share one token. Opening the reasons and classifying them is **one job, not two**.
 
-What made it stop recurring is **mechanical, not disciplinary**: `production-route-failure-classification.test.ts` breaks the build if a new reason is born unclassified, and checks the catch-alls in the opposite direction (if they stop being catch-alls, their entry is now lying). Proved red in both directions. Ten appearances of B1 proved that remembering does not work; what works is that the build won't let you.
+🔴 **And the mechanical guard has a MEASURED limit.** The 12th appearance —`reconciliationFailureCode`
+reading `.errorCode` while the error exposes `.code`, collapsing every poll code into one— happened **with the
+guard in place**. A coverage test proves a code is *classified*; it cannot prove the code *reaches* the policy
+through the right field. **When a rule spans two subsystems, verify the value's whole path, not each end.**
+
+What made it stop recurring is **mechanical, not disciplinary**: `production-route-failure-classification.test.ts` breaks the build if a new reason is born unclassified, and checks the catch-alls in the opposite direction (if they stop being catch-alls, their entry is now lying). Proved red in both directions. Twelve appearances of B1 proved that remembering does not work; what works is that the build won't let you — within the limit above.
 
 🔴 **And the step the mechanical guard does NOT cover — measured 2026-08-03.** A rejection code born inside the
 finalizer needs a third step between naming and classifying: registering it in `SAFE_FINALIZATION_CODES`
@@ -298,6 +345,21 @@ Every Globe architecture decision still lands as an **ADR in `docs/architecture/
 - **NUNCA** declarar un vocabulario que otro subsistema debe cubrir como union type de TS; array `as const` + test de cobertura en ambas direcciones + aserción de unicidad.
 - **NUNCA** copiar literal un vocabulario en fixtures que representan LA LISTA: se derivan.
 - **NUNCA** confiar en que Terraform vea una dependencia construida por interpolación de strings: `depends_on` explícito, y jamás reintentar a ciegas un apply que dice `does not exist`.
+- **NUNCA** tratar una firma de proveedor como prueba de PROPIEDAD cuando su JWKS es global; comparar la
+  identidad de cuenta, y **nunca adivinarla** — un valor errado rechaza todas las entregas legítimas.
+- **NUNCA** responder al webhook de un proveedor con un código que le diga «no reintentes» ante un fallo
+  NUESTRO: el status que devolvemos gobierna su política de reintentos.
+- **NUNCA** derivar una URL de seguimiento del proveedor desde el slug; se declara por endpoint desde evidencia
+  medida, o el lost-ack no se recupera y falla nombrado.
+- **NUNCA** dejar activo un fallback de modelo del proveedor en una plataforma con promoción y atestación por
+  ruta: ejecutar otro modelo es un fallo de gobernanza, no de fidelidad.
+- **NUNCA** leer el abort de un canary como defecto del sistema sin comparar su paciencia contra el
+  presupuesto de latencia real del camino que vigila.
+- **NUNCA** aplicar Terraform de Globe desde un checkout limpio sin verificar `0 to destroy`: el entorno de
+  desarrollo vive detrás de un flag cuyo estado real está en un `terraform.tfvars` gitignoreado.
+- **SIEMPRE** declarar la convergencia de cada agregado que dependa del estado de un run (`converge` u
+  `observable`, y un `observable` sin señal se rechaza); el barrido de recuperación reusa el MISMO primitive
+  del camino hacia adelante.
 - **NUNCA** crear documentación gobernante de Globe en `efeonce-globe/docs/**`.
 - **SIEMPRE** leer `GLOBE_MODEL_FLEET_STATUS.md` antes de afirmar que un modelo/proveedor no está integrado.
 - **SIEMPRE** separar por **remedio** al abrir razones: dos causas con la misma acción pueden compartir código; dos con acciones opuestas, nunca.

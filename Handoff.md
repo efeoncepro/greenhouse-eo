@@ -2,12 +2,15 @@
 
 Historia anterior: [Handoff.archive.md](Handoff.archive.md).
 
-## ISSUE-137 — los runs NUNCA estuvieron colgados; la causa es Asset Governance (2026-08-04, nocturno)
+## ISSUE-137 — Asset Governance: resolución verificada con cron de un minuto (2026-08-04)
 
-Trabajo de diagnóstico, **sin cambios de código y sin deploy**. Readback contra `globe-pg` con la
-identidad IAM del operador, sólo lecturas. Detalle y evidencia por etapa en
-[`ISSUE-137`](docs/issues/open/ISSUE-137-globe-experiment-running-forever-zero-attempts.md) → Delta
-2026-08-04.
+Estado: **resolved**. Detalle y evidencia post-arreglo en
+[`ISSUE-137`](docs/issues/resolved/ISSUE-137-globe-experiment-running-forever-zero-attempts.md).
+
+El diagnóstico inicial fue sólo lectura contra `globe-pg`; la resolución sí incluyó el cambio de
+Terraform y su apply supervisado. El bloque siguiente conserva el diagnóstico histórico.
+
+### Diagnóstico histórico
 
 🔴 **Las dos hipótesis de la issue quedaron refutadas, y con ellas su plan de trabajo.** No era «reserva
 sin encolado» (`create()` inserta run + attempt + `enqueue` en UNA transacción) ni «el claim los filtra»
@@ -79,7 +82,7 @@ backlog mate de hambre a los siguientes. No vale rediseñar eso para ganar 3 min
 la forma correcta es cota configurable con **default que reproduce la conducta de hoy**, para que
 desplegar sea no-op y el cambio de conducta sea un flip aparte.
 
-### 🔴 El cambio NO se aplicó: la edición del `.tf` quedó bloqueada por el clasificador del entorno
+### 🗃️ Estado previo al rollout (supersedido)
 
 Dos intentos sobre `infra/terraform/asset_governance_job.tf`; el segundo, bloqueo firme. **No lo rodeé
 moviendo el scheduler con `gcloud`**, porque eso crea drift out-of-band contra el state que el próximo
@@ -95,7 +98,7 @@ default = "*/1 * * * *"
 o el plan destruye los 20 recursos del entorno de desarrollo (trampa viva, dueño `TASK-1635`). Leer el
 plan y exigir **`0 to destroy`** antes de aplicar.
 
-### Verificación: salud confirmada sin gastar créditos
+### 🗃️ Verificación previa al rollout (supersedida)
 
 `pnpm producer:canary` en dry-run (gasto cero) contra `globe-api-internal-00204-ttm`: **`ready: true`,
 `blockers: []`**, con readiness/route/circuit/rights/estimate en verde para las tres modalidades
@@ -110,6 +113,18 @@ habría verificado nada nuevo: la línea base ya está medida dos veces (22,3 y 
 
 **Al aplicar el cron, la verificación correcta es una generación con el MISMO instrumento** y comparar
 contra esos dos números: gobierno esperado ~4 min, total ~6,5.
+
+### Resolución y readback post-arreglo
+
+- Globe `main`, commit [`d78ce01`](https://github.com/efeoncepro/efeonce-globe/commit/d78ce015ee2f96690b7431bd7e0f9094d52f6456): `asset_governance_schedule` pasó de `*/5` a `*/1`.
+- Plan/apply supervisados: `0 to destroy`; sólo cambió el schedule; el plan posterior quedó en `No changes`.
+- Scheduler live en `southamerica-east1`: `*/1 * * * * ENABLED`.
+- Video `94f8f374-c1c9-4379-8dbc-aa0254908049`, leído sin retry ni segundo submit: `candidate_ready`, `reservedCredits=16`, `spentCredits=16`, MP4 de `1.341.307` bytes con `retained=true`; provenance `eligible`, `clean`, `rights=verified`.
+- End-to-end: `10:23:18.496` → `10:31:12.454` = **473,958 s / 7,90 min**. Governance job `agj_3013c9139f60c838e9253df682532f75`: **183,780 s**, con `inspection 10:27:18.033`, `malware 10:28:26.724`, `c2pa 10:29:18.430`, `rights 10:30:18.028`.
+- Comparación: imagen `7779d6ac-104b-40e6-85e0-bb469e588176` = `472 s / 7,9 min` y `183 s` de governance. La coincidencia entre modalidades y tamaños distintos confirma la latencia cadence-bound, no size-bound.
+
+ISSUE-137 queda cerrada. El drain loop no se tocó; su riesgo de equidad entre workspaces queda fuera
+de esta issue y no hay otro paso requerido para su resolución.
 
 ## TASK-1469 — convergencia terminal cerrada; task REABIERTA por cierre prematuro (2026-08-04)
 

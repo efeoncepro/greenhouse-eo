@@ -416,14 +416,108 @@ opciones: cada paso es precondición del siguiente.
    la imagen en Artifact Registry contra el SHA. Un workflow `success` prueba que el pipeline corrió, no que el
    tráfico está en esa revisión ni que el Job tomó ese digest.
 6. **Blast radius medido, no supuesto**, cuando el cambio altera cuándo muere un job: el payload estructurado del
-   worker expone `outboxDeadLetter`/`outboxRetryStorm` desde `ISSUE-135`, y da la **serie temporal** — que es lo
+   worker expone `outboxTerminalAttempts`/`outboxRetryStorm` (así se llaman desde `ISSUE-138`; antes
+   `outboxDeadLetter`) y da la **serie temporal** — que es lo
    que prueba que un dead letter es preexistente y no tuyo. En estos cuatro deploys sirvió **mejor** que la
    consulta directa a Postgres, que ni siquiera estaba disponible (ADC vencida, `invalid_rapt`): el valor solo no
    distingue «venía así» de «lo rompí».
 
 Snapshot histórico (no consultar acá el estado vigente, que vive en `GLOBE_RUNTIME_HANDOFF.md`): las cuatro
-corridas pasaron por revisión de API + digest de worker etiquetados con el SHA, con `outboxDeadLetter` estable en
+corridas pasaron por revisión de API + digest de worker etiquetados con el SHA, con la señal terminal estable en
 el preexistente y `retryStorm` en 0.
+
+## Captura de completitud: cada proveedor avisa distinto (ADR-021, `ISSUE-138`)
+
+**La pregunta operativa es «¿cómo se entera Globe de que el asset está listo?», y la respuesta NO es la misma
+para los tres.** Forzar una abstracción común es el error de diseño que este bloque previene.
+
+| Proveedor | Mecanismo | Dato duro |
+|---|---|---|
+| **Fal** | Webhook firmado **POR REQUEST** (`?fal_webhook=`) + poll de respaldo | Su sección «Webhooks» del panel es un **REGISTRO**, no una configuración: no hay nada que habilitar |
+| **OpenAI** | **`poll`**, y es CORRECTO por diseño | `/v1/images/generations` es **síncrono** y OpenAI **no emite eventos de webhook para imágenes**. Su lane de webhook es `/v1/responses` con `background:true`, que ninguna ruta de producción usa. Configura **por proyecto, URL estática** |
+| **Vertex/Veo** | LRO `predictLongRunning` → `fetchPredictOperation` | **No ofrece callback por request**; su doc de LRO describe polling |
+
+🔴 **`completion_driver='poll'` con cero filas en `provider_completion_signals` es el comportamiento CORRECTO
+para OpenAI y Vertex, no un síntoma.** Un agente que lo lea como deuda va a "arreglar" algo que está bien.
+
+**Reglas duras del carril (todas medidas, no razonadas):**
+
+- **NUNCA** hagas trabajo real dentro del handler del webhook: verificar → persistir → **202**. Fal da **15 s**
+  a la primera entrega.
+- **NUNCA** uses el payload del webhook como resultado: sale del `response_url` persistido. Es la remediación
+  que la propia doc de Fal prescribe para su `payload_error`.
+- **NUNCA** metas un `JSON.parse`/`stringify` entre el cuerpo recibido y el digest: la firma es sobre bytes
+  crudos.
+- 🔴 **NUNCA** trates una firma válida como prueba de propiedad: **el JWKS de Fal es GLOBAL**. Cualquier cliente
+  suyo puede apuntar su `fal_webhook` a nuestra URL y producir una entrega genuinamente firmada. No permite
+  robar un asset, **sí matar runs ajenos** con un `ERROR` firmado. Por eso `GLOBE_FAL_USER_ID` compara el
+  `x-fal-webhook-user-id`. **Su valor NO se adivina** — medido, es un identificador estilo Auth0 (`github|…`)
+  que no se parece al username del panel; ponerlo mal rechaza TODAS las entregas legítimas.
+- **NUNCA** infieras la reintentabilidad del status HTTP cuando el proveedor la declara: **Fal publica
+  `X-Fal-Retryable`**. Y su **400** en el endpoint de resultado significa «todavía no completada», no error.
+- **NUNCA** respondas 400 a un fallo NUESTRO: el código que devolvemos gobierna si el proveedor reintenta. 503
+  para infraestructura, 400 sólo para rechazo definitivo (firma inválida, cuerpo sobredimensionado).
+- 🔴 **NUNCA** reconstruyas una URL de seguimiento de Fal desde el slug — y ahora está MEDIDO por qué:
+  `bytedance/seedream/v5/pro/text-to-image` sigue por `bytedance/seedream` (**descarta 3 segmentos**),
+  `bytedance/seedance-2.0/text-to-video` descarta 1, y la doc de Fal muestra `fal-ai/flux/schnell`
+  **conservando los 3**. No hay regla de segmentos: hay un «app id» que sólo Fal conoce. La base se **declara
+  por endpoint** (`FAL_FOLLOW_UP_BASES`) desde el `provider_response_url` de un submit REAL, nunca por
+  analogía. Un guard derivado exige que cada endpoint declare su base o declare que no la tiene.
+- **NUNCA** dejes los fallbacks de modelo de Fal activos: están **por default** y pueden ejecutar un modelo
+  distinto del aprobado y tarifado, dejando el `route_snapshot` mintiendo sin ninguna señal. Se apagan con
+  `x-app-fal-disable-fallbacks`.
+- **`docs.fal.ai` devuelve 429 a todo fetch programático pero es alcanzable desde el navegador real.** Una doc
+  que parece caída puede no estarlo — y en esta sesión eso convirtió dos «no verificados» en hechos.
+
+### ⚠️ Latencia esperada: ~20-25 min en frío NO es un cuelgue
+
+Asset Governance avanzaba **una etapa por tick de su cron** (`*/5` hasta el 2026-08-04, luego `*/1`): cuatro
+etapas × 5 min ≈ **20 minutos de reloj para ~60 s de trabajo**. Lo encontraron **dos caminos independientes el
+mismo día**: el readback de `ISSUE-137` y el canary de generación, que **abortaba a los 20 min sobre un sistema
+perfectamente sano** (la corrida completó sola en la entrega 21).
+
+🔴 **Un canary cuya paciencia esté por debajo de la latencia real es peor que no tenerlo: enseña a leer
+«timeout» como normal, que es exactamente cómo un cuelgue real pasa desapercibido.** Antes de tocar código
+porque «el canary falló», mide el estado real.
+
+## Convergencia terminal de los agregados del run (`TASK-1469`)
+
+**Cuando un run llega a terminal, todo agregado que dependa de su estado converge o queda observable.** Se
+declara como invariante y no como arreglo de un caso porque el mismo defecto apareció en **dos parejas** y sólo
+una estaba declarada — arreglar por pareja garantiza descubrir la tercera en producción.
+
+`RUN_DEPENDENT_AGGREGATES` es un array enumerable con test **en ambas direcciones**: un agregado sin postura
+rompe el build, y un `observable` **sin señal** se rechaza, porque declararlo así es la forma elegante de no
+hacerse cargo.
+
+- **NUNCA** escribas una lógica de cierre propia para el barrido de recuperación: reusa **el mismo primitive**
+  del camino hacia adelante (`RunFinalizerPort.abandon`). Dos definiciones de «converger» pueden divergir entre
+  sí — el bug class original, una capa más arriba.
+- **NUNCA** marques `failed` un run `completed` cuyo agregado quedó atrás: sería mentir sobre una corrida que
+  sí entregó. Ese caso **se cuenta y no converge**, y la diferencia queda en `divergentAggregates`.
+- **NUNCA** midas una señal en la unidad equivocada. `outboxDeadLetter` contaba **filas de outbox** y un attempt
+  tiene una por fase: decía **3 para UN solo attempt**. Hoy es `outboxTerminalAttempts` y cuenta attempts.
+
+### Alertas: el aligner es función del TIPO de métrica
+
+`ALIGN_COUNT` **sólo** vale sobre DELTA/INT64 (una métrica que cuenta entradas de log). Una métrica que
+**extrae un valor** es DELTA/DISTRIBUTION y necesita `ALIGN_PERCENTILE_99`. Copiarlo de la alerta hermana
+equivocada **falla en el apply con 400**, no antes. Y un **404 de la métrica recién creada es propagación** de
+Cloud Monitoring (hasta 10 min), no un defecto: se reintenta.
+
+### 🔴 `tofu apply` desde un checkout limpio DESTRUYE el entorno de desarrollo
+
+`development_environment_enabled` tiene default `false` en git y el entorno **vivo** depende de un
+`terraform.tfvars` **gitignoreado**. Un plan desde una máquina sin ese archivo da **`20 to destroy`** con todo
+en verde. El plan honesto exige:
+
+```bash
+tofu plan -var development_environment_enabled=true \
+  -var 'development_operator_principal=user:julio.reyes@efeonce.org'
+```
+
+**SIEMPRE** exige `0 to destroy` antes de aplicar. El arreglo de fondo —que el estado real de un flag no puede
+vivir en un archivo sin trackear— es de `TASK-1635`.
 
 ## Boundary: Globe es plataforma hermana, no un módulo de Greenhouse
 
@@ -1073,7 +1167,7 @@ razones nombradas en `apps/creative-runner/src/production-route-compiler.ts`; la
 
 **`route_creative_contract_mismatch` colapsaba NUEVE causas con remedios opuestos** —re-estimar contra la revisión
 vigente, elegir otra operación, elegir otro slot, cambiar el asset, convertir el archivo—. El operador sabía que
-algo del contrato no calzó, jamás cuál. Fue la **décima** aparición del bug class de `ISSUE-127`, y la única con
+algo del contrato no calzó, jamás cuál. Fue la **décima** aparición del bug class de `ISSUE-127` (van **doce** al 2026-08-04), y la única con
 agravante propio: **los nombres correctos ya estaban escritos en la spec de la task y la implementación los
 colapsó igual**. Conocer la regla no la aplica sola; escribirla en la spec tampoco.
 
@@ -1108,8 +1202,16 @@ reviviría muertas, y el tope 3 es la respuesta prudente a **no saber**).
 **Lo que hace que no recaiga:** `apps/creative-runner/src/production-route-failure-classification.test.ts` **rompe
 el build** si una razón nueva nace sin clasificar, y verifica los catch-all **en la dirección contraria** (si dejan
 de serlo, su entrada queda mintiendo). Probado en rojo en ambos sentidos, y la tabla de causas también —colapsando
-dos a propósito, el test las atrapa—. **Diez apariciones de `ISSUE-127` probaron que acordarse no funciona; lo que
-funciona es que el build no deje.**
+dos a propósito, el test las atrapa—. ⚠️ **Ese número de dead letters estaba INFLADO**: la señal contaba **filas de outbox** y un attempt tiene una
+por fase, así que decía **3 para UN solo attempt**. Corregido el 2026-08-04 (`ISSUE-138`). Una señal cuya
+unidad no corresponde a ninguna cantidad real de trabajo enseña a desconfiar del tablero.
+
+**Doce apariciones de `ISSUE-127` probaron que acordarse no funciona; lo que
+funciona es que el build no deje.** ⚠️ Con un límite MEDIDO: la 11.ª vivía dentro de un `catch` y la **12.ª**
+—`reconciliationFailureCode` leyendo `.errorCode` mientras el error expone `.code`— ocurrió **con el guard
+vigente**, porque un test de cobertura ve que un código esté clasificado, no que LLEGUE a la política leyendo el
+campo correcto. **Cuando una regla cruza dos subsistemas, verifica el camino completo del valor, no cada
+extremo.**
 
 ### Un dueño por valor, y la forma declarada (`@e300c4e`, ADR-022 Delta (b))
 
