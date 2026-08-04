@@ -47,6 +47,70 @@ proyectar el attempt en vuelo en la vista, y sellar el cierre con el reloj de la
 las 20:01 con `generated_asset_governance_pending` nombrado — el arreglo de allowlist de `ISSUE-138`
 entró entre ambos y se ve operando en producción.
 
+### Veredicto de arquitectura: el arreglo es el CRON, no el drain loop
+
+Red-team con `arch-architect` + overlay de Globe + **ADR-007**. La conclusión invirtió la propuesta
+inicial: casi escribimos código donde alcanza **una variable**.
+
+`asset_governance_schedule` es una variable de Terraform (`infra/terraform/asset_governance_job.tf`,
+default `*/5 * * * *`). Como `advance()` deja `next_attempt_at = now`, la latencia es literalmente
+**`nº de etapas × el cron`**:
+
+| | hoy | cron `*/1` | drain loop |
+|---|---|---|---|
+| governance | ~20 min | **~4 min** | ~1 min |
+| total con proveedor | ~22 min | **~6,5 min** | ~3,5 min |
+| cambio | — | una variable | código en el pipeline |
+
+Hay efecto compuesto: el job `complete` llegaba al intento 20 con backoff largo **porque** governance
+tardaba; si termina al minuto 4 engancha en un intento temprano.
+
+**Por qué el cron es seguro** — el orden obligatorio del ADR-007 (malware limpio antes de C2PA/rights)
+lo imponen los CHECK de la base y la state machine, **no la cadencia**; `claimDue` ya usa
+`FOR UPDATE SKIP LOCKED` + fencing tokens y «concurrent workers never create two terminal outcomes» es
+una fitness function **ya probada** del ADR; el backoff no se toca (`reschedule` deja
+`next_attempt_at` en el futuro); y **no cambia la memoria por ejecución**, que es la restricción real
+del ADR. Costo: 288 → 1440 ejecuciones/día de ~15 s (unos pocos USD/mes, estimación no-billing).
+
+**Por qué el drain loop queda para después, no descartado:** su riesgo real no es el lease —los
+fencing tokens ya lo cubren— sino la **equidad entre workspaces**: hoy cada workspace recibe un
+`claimDue` de `batchSize` por ejecución (round-robin justo) y un drain por workspace deja que uno con
+backlog mate de hambre a los siguientes. No vale rediseñar eso para ganar 3 min sobre 6,5. Si se hace,
+la forma correcta es cota configurable con **default que reproduce la conducta de hoy**, para que
+desplegar sea no-op y el cambio de conducta sea un flip aparte.
+
+### 🔴 El cambio NO se aplicó: la edición del `.tf` quedó bloqueada por el clasificador del entorno
+
+Dos intentos sobre `infra/terraform/asset_governance_job.tf`; el segundo, bloqueo firme. **No lo rodeé
+moviendo el scheduler con `gcloud`**, porque eso crea drift out-of-band contra el state que el próximo
+`tofu apply` revierte en silencio — exactamente lo que la skill prohíbe. Queda para el operador; es
+una línea:
+
+```
+default = "*/1 * * * *"
+```
+
+⚠️ **Y el apply NO se corre limpio**: no existe `terraform.tfvars` local, así que hay que pasar
+`-var development_environment_enabled=true -var 'development_operator_principal=user:julio.reyes@efeonce.org'`
+o el plan destruye los 20 recursos del entorno de desarrollo (trampa viva, dueño `TASK-1635`). Leer el
+plan y exigir **`0 to destroy`** antes de aplicar.
+
+### Verificación: salud confirmada sin gastar créditos
+
+`pnpm producer:canary` en dry-run (gasto cero) contra `globe-api-internal-00204-ttm`: **`ready: true`,
+`blockers: []`**, con readiness/route/circuit/rights/estimate en verde para las tres modalidades
+(imagen 10 cr, video 16, audio 6).
+
+**No se ejecutó la generación real, a propósito.** El CLI **exige las tres aprobaciones** y corre las
+tres modalidades (**32 créditos**), por encima de la generación única autorizada; la librería itera
+todos los targets y lanza si falta una, así que no se puede acotar sin editarla. Acotarla a mano
+habría significado escribir una secuencia de gasto artesanal de noche y sin supervisión, que la skill
+desaconseja explícitamente. Y como el cambio de cron **no llegó a aplicarse**, una generación ahora no
+habría verificado nada nuevo: la línea base ya está medida dos veces (22,3 y 24,4 min).
+
+**Al aplicar el cron, la verificación correcta es una generación con el MISMO instrumento** y comparar
+contra esos dos números: gobierno esperado ~4 min, total ~6,5.
+
 ## TASK-1469 — convergencia terminal cerrada; task REABIERTA por cierre prematuro (2026-08-04)
 
 Verificado en runtime desde `efeonce-globe@c28ab9f`; detalle en
