@@ -164,7 +164,23 @@ agregados convergidos o su divergencia declarada.
    enumerable con test en **ambas direcciones** (un agregado sin postura rompe el build; un
    `observable` sin señal se rechaza), espejando `RUN_DEPENDENT_AGGREGATES` de `TASK-1469`. Reusar el
    primitive del camino hacia adelante para revertir readiness: **nunca** una lógica de cierre propia.
-4. **Runbook.** Procedimiento completo de promoción, con el canary como paso explícito y no como
+4. **`canary-confirm` no puede responder `internal_error` 500.** Medido 2026-08-04 sobre una promoción con TODA
+   la evidencia en su lugar —run `completed`, asset `active` + `eligible`, output `retained`—: el command devolvió
+   un 500 opaco y dejó la saga en `verifying_canary`, un estado del que **no hay reintento** (el command exige
+   `activated`). El sello de una promoción legítima quedó inalcanzable por una excepción no manejada. Es
+   `ISSUE-127` otra vez: cada causa por la que `resolveCanary` puede no resolver necesita su razón nombrada
+   server-side, y el checkpoint no debe consumir el único estado desde el que se puede reintentar.
+
+5. **Convergencia de la reserva pre-gasto.** La liberación económica está acoplada a `finalize()`, que sólo se
+   alcanza con `completion` persistida; todo terminal que muere por `reschedule()` → `abandon()` sale sin
+   movimiento de crédito, y `RUN_DEPENDENT_AGGREGATES` declara `credit_reservations` como `observable` delegando
+   en el expiry TTL de **24 h**. Esa postura es correcta **post-gasto** —el settlement ya decidió y tocar dinero
+   arriesgaría doble movimiento— pero **falsa pre-gasto**: un run que murió sin `providerOperation` no cobró nada,
+   así que retener 24 h protege un escenario que no aplica. La distinción ya existe y está bien nombrada en la
+   política de fases (`POST_SPEND_KINDS`) y **no se propaga a `abandon()`**. Propagarla es el trabajo; no
+   relajar la postura `observable` donde sí corresponde.
+
+6. **Runbook.** Procedimiento completo de promoción, con el canary como paso explícito y no como
    sobreentendido.
 
 ## Out of Scope
@@ -203,6 +219,10 @@ sigue siendo el recovery.
 - [ ] Los agregados dependientes de la saga están declarados en un array enumerable, con test en ambas
       direcciones; un `observable` sin señal se rechaza.
 - [ ] Un rollback deja readiness convergido o su divergencia contada y observable.
+- [ ] `canary-confirm` nunca responde `internal_error`: cada causa de no-resolución tiene razón nombrada, y un
+      fallo deja la saga en un estado desde el que se puede reintentar.
+- [ ] Una reserva de un run muerto **antes del gasto** converge por el camino terminal, sin esperar el TTL de 24 h;
+      la postura `observable` se conserva para el caso post-gasto.
 - [ ] Runbook publicado con el canary como paso explícito.
 - [ ] Una promoción completa end-to-end llega a `canary_passed` sin intervención artesanal.
 

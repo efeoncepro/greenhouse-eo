@@ -1,10 +1,62 @@
 # ISSUE-140 — Globe: el encoder de inputs gobernados emite la forma de Gemini y Veo rechaza todo submit
 
-> **Estado:** Open — causa raíz localizada y reproducida con probe de gasto cero; fix no aplicado
+> **Estado:** ✅ **Resolved 2026-08-04** (`efeonce-globe@cd8bad1` + `@015b9d7`) — dos defectos de la misma familia,
+> corregidos, desplegados y verificados con una generación real. La ruta Veo produce.
 > **Detectado:** 2026-08-04 · **Ambiente:** Globe producción (`globe-api-internal`, `globe-producer-worker`)
-> **Severidad:** Alta — la ruta Veo no puede generar ni una sola pieza por el camino gobernado
+> **Severidad:** Alta — la ruta Veo no podía generar ni una sola pieza por el camino gobernado
 > **Repo afectado:** `efeoncepro/efeonce-globe` · **Gobierna:** Greenhouse (EPIC-028)
-> **Bloquea:** `ISSUE-138` D12 (el fix de `storageUri` no es ejercitable)
+> **Desbloqueó:** `ISSUE-138` D12, hoy **cerrado con evidencia de runtime**
+
+## Delta 2026-08-04 (cierre) — ✅ RESUELTO en dos capas; la ruta Veo GENERA
+
+Segundo defecto, encontrado al verificar el primero y **de la misma familia**: el driver validaba la **FORMA** de
+un identificador que fabrica el proveedor.
+
+```
+VEO_OPERATION = /^projects\/[a-z0-9-]+\/(?:locations\/[a-z0-9-]+\/)?operations\/[A-Za-z0-9._~-]+$/
+```
+
+Vertex, para un publisher model, devuelve
+`projects/efeonce-globe/locations/us-central1/publishers/google/models/veo-3.1-generate-001/operations/<id>`
+— **verificado en el runtime real**. La regex no tenía lugar para `publishers/google/models/<model>/`, así que el
+submit era aceptado, el nombre real llegaba, la validación lo rechazaba y **el nombre se descartaba sin persistirse
+jamás**. Para un driver `poll` puro eso es pérdida irreversible con gasto incurrido: Fal sobrevive porque su webhook
+repone la evidencia; Veo no tiene segundo escritor.
+
+**Invisible porque los fixtures inventaban la forma corta** mientras los endpoints de esos mismos tests ya llevaban
+`/publishers/google/models/…`: la suite verificaba una ficción. Corregidos los 4 fixtures al formato real.
+
+**El fix no fue ampliar la regex.** Un operation name es un identificador **opaco**: su forma es del proveedor y
+puede cambiar sin aviso — Fal y OpenAI sólo exigen string no vacío, y el adapter del Lab (único camino Veo que había
+generado video real) nunca validó forma. Lo que sí protege un invariante es que la operación sea **NUESTRA**:
+`assertVeoOperationOwnership` la contrasta contra proyecto, región y modelo que la ruta gobernada ya declaró — la
+misma autoridad que `assertVeoEndpoint` aplica al endpoint, sin fijar el orden de los segmentos.
+
+**Los dos fixes comparten diagnóstico:** el driver se acoplaba a detalles del proveedor que no controla (la forma
+del encoding, la forma del id) en vez de a lo que sí gobierna (qué superficie consume, de quién es la operación).
+
+### Evidencia de cierre
+
+`efeonce-globe@cd8bad1` (encoder) + `@015b9d7` (id opaco), desplegados y verificados: API
+`globe-api-internal-00210-pr5` imagen `015b9d72eaa0`, Job del worker con el digest etiquetado al mismo SHA.
+
+Run `f0e8b876-…` → **`candidate_ready`**, MP4 de 7.988.662 bytes, `retained: true`, con liquidación exacta. El video
+aterrizó en `gs://efeonce-globe-lab-evidence/governed-veo/d752100d-…/sample_0.mp4` → **cierra D12 de `ISSUE-138`**.
+
+309 tests verdes, `pnpm check` y `pnpm build` verdes, test de propiedad probado en rojo.
+
+### 🔴 Lo que queda abierto (no bloquea la generación)
+
+1. **`canary-confirm` responde `internal_error` 500.** El asset estaba `active` + `eligible` y el run `completed`,
+   así que la evidencia existía; la saga quedó en `verifying_canary` y no hay reintento posible desde ese estado
+   (el command exige `activated`). El sello de la promoción es hoy inalcanzable por una excepción no manejada. Es
+   `ISSUE-127` otra vez: un 500 opaco donde debería haber una razón nombrada. **Dueño: `TASK-1641`.**
+2. **La reserva no converge cuando el run muere por `reschedule()` → `abandon()`.** Diagnóstico completo: la
+   liberación está acoplada a `finalize()`, que exige `completion` persistida, y `RUN_DEPENDENT_AGGREGATES` declara
+   `credit_reservations` como `observable` delegando en el expiry TTL de **24 h**. Eso es correcto **post-gasto**
+   (el settlement ya decidió) pero no **pre-gasto**, donde nadie cobró y no hay riesgo de doble movimiento. La
+   distinción ya existe en la política de fases (`POST_SPEND_KINDS`) y **no se propaga a `abandon()`**.
+   **Dueño: `TASK-1641`.**
 
 ## Delta 2026-08-04 (noche) — fix desplegado y verificado; destapa un segundo defecto aguas abajo
 

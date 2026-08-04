@@ -5,6 +5,29 @@
 > **Severidad:** Alta — tres caminos distintos terminan en un asset generado, facturado e irrecuperable
 > **Repo afectado:** `efeoncepro/efeonce-globe` · **Gobierna:** Greenhouse (EPIC-028, `TASK-1469`)
 
+## Delta 2026-08-04 (cierre) — ✅ **D12 VERIFICADO EN RUNTIME Y CERRADO**
+
+La ruta Veo generó por el camino gobernado y **el video aterrizó en nuestro bucket**, que es exactamente lo que D12
+implementaba:
+
+```
+gs://efeonce-globe-lab-evidence/governed-veo/d752100d-8933-4ad1-a4b6-3136c005b146/…/sample_0.mp4
+```
+
+Run `f0e8b876-fb0d-4949-9a22-a306fcaa454e` · attempt `d752100d-…` · `candidate_ready` · MP4 **7.988.662 bytes** ·
+`retained: true` · liquidación exacta (`reservation +32` → `settlement −32 reservado / +32 gastado`, sin doble cobro).
+
+**Con esto los 13 hallazgos de ISSUE-138 quedan cerrados.** Para ejercitarlo hubo que resolver antes `ISSUE-140`
+(dos defectos que impedían que la ruta llegara siquiera a generar).
+
+🔴 **Y aparece la prueba de por qué D12 importaba, en la forma más cruda posible.** El prefijo del attempt
+`ba0feca7-…` —el del intento que murió con `veo_operation_evidence_invalid`— **contiene su propio `sample_0.mp4`**:
+Vertex generó y facturó ese video, y el sistema lo perdió porque no había persistido el nombre de la operación.
+Es el escenario que este issue describe —*"un asset generado, facturado e irrecuperable"*— capturado en vivo. Que
+el archivo esté ahí y sea inalcanzable por el dominio es, a la vez, la confirmación del riesgo y la evidencia de
+que `storageUri` es la mitigación correcta: sin él, ese MP4 sólo habría existido dentro de una Operation con
+retención no documentada.
+
 ## Delta 2026-08-04 (noche) — la ruta Veo SE PROMOVIÓ y D12 sigue sin ejercitarse: el submit muere antes
 
 Se promovió `ref/video/frames-v1` end-to-end por el carril gobernado (`promotion_3902259f-c56b-4c7e-8589-5e31f9a077a3`:
