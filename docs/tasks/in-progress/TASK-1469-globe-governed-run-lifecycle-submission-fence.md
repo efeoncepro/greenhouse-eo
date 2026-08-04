@@ -69,10 +69,48 @@ nocturno: cambiar el sello sin mirar quién lo lee puede mover una ventana de re
 
 ### Criterios que estos dos agregan
 
-- Durante la espera, el reader del experimento expone el attempt en vuelo y su fase; «generando» dice en
+- [x] Durante la espera, el reader del experimento expone el attempt en vuelo y su fase; «generando» dice en
   qué va, y un run sano deja de ser indistinguible de uno atascado por readback.
-- Ninguna fila de `governed_run_outbox` en `done` puede tener `completed_at` anterior a su propio
+- [x] Ninguna fila de `governed_run_outbox` en `done` puede tener `completed_at` anterior a su propio
   `available_at`; el sello del cierre es el reloj de la finalización.
+
+### Delta 2026-08-04 (b) — los dos cerrados, y lo que se encontró al cerrarlos
+
+**Estado: code complete, rollout pendiente.** Los dos defectos están implementados con guards probados
+en rojo y `pnpm check` / `pnpm build` verdes; **falta desplegar** (`deploy-internal.yml` para API/web,
+`deploy-producer-worker.yml` en sus dos modos) y verificar contra la revisión activa.
+
+| Commit | Qué cierra |
+|---|---|
+| `efeonce-globe@a69cb1f` | El sello de la fila de la cola (defecto 2) |
+| `efeonce-globe@753042c` | Una sola definición de la fase gruesa (hallazgo colateral) |
+| `efeonce-globe@f06eae7` | El attempt en vuelo proyectado (defecto 1) |
+
+**El sello (defecto 2) resultó más barato de lo que la task temía, y por una razón medida.** La task
+advertía —con razón, como precaución— que cambiarlo podía mover una ventana de reintento. No la mueve:
+`finishLease` **no toca `available_at`**, y `completed_at` del outbox **no tiene lectores** (el único
+`completed_at` leído en el repo es un alias distinto sobre `governed_run_attempts`). Además el instante
+de dominio **ya tenía su propia columna en los siete caminos**, así que el cambio no pierde nada. El
+reloj va inyectado, no `new Date()` disperso, para que un test pueda afirmar **qué reloj se usó**.
+
+**El attempt en vuelo (defecto 1) no necesitaba una proyección nueva: necesitaba un LINK.**
+`GovernedRunViewV1.coarseProgress` ya existe, está computado y es browser-safe, y el reader
+`globe.run.get` está registrado — pero pide `runId`, y `LabExperimentV1` no lo lleva. Es la tercera
+aparición del patrón «la capability existe y la UI no la consume». Se resolvió con un puerto de
+**lectura** separado del scheduler y del store de escritura del worker, publicando `runProgress` como
+**eje distinto** de `state` y `attempts` — y publicando también la corrida **terminal**, porque un run
+terminal bajo un experimento `running` es justo la divergencia que hay que poder ver por readback.
+
+**Hallazgo colateral, no buscado:** `coarseProgress` estaba transcrito **tres veces** (función TS,
+`CASE` en el SQL del live feed, `Set` de valores en ese mismo archivo). Coincidían — por eso el riesgo
+era invisible: divergir no rompe nada, sólo hace que la tarjeta del feed y el detalle del run digan
+cosas distintas del **mismo** run, con todo en verde. Ahora es dato único y el SQL se genera de él; el
+`ELSE 'terminal'` se retiró porque presentaba un estado desconocido como corrida terminada — un run en
+vuelo mostrado como finalizado, el mismo defecto que esta task cierra.
+
+⚠️ **Aparición 13 de `ISSUE-127`, atrapada antes de mergear:** el enriquecimiento se escribió primero
+con `.catch(() => undefined)`. Eso habría hecho indistinguibles «no hay corrida» y «no pude leerla» —
+exactamente la ambigüedad que esta task elimina una capa más arriba. Degrada observando.
 
 Evidencia completa y cronología en
 [`ISSUE-137`](../../issues/resolved/ISSUE-137-globe-experiment-running-forever-zero-attempts.md) → Delta
