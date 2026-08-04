@@ -175,6 +175,15 @@ Lo que más vale recordar de la sesión:
   la queue **no es derivable**: medido contra nuestros propios datos, un endpoint descarta 3 segmentos y otro 1,
   y su doc muestra uno que conserva 3. La regla dura era correcta, así que la base se **declara por endpoint**
   desde evidencia real.
+- **Verificado con una generación real** sobre el runtime desplegado: run `completed`, experimento
+  `candidate_ready`, governance `eligible`. **La captura funciona de punta a punta.**
+- **D9 cerrado con el valor MEDIDO**, y el resultado justifica haberme negado a adivinarlo: el user id de Fal
+  es un identificador estilo Auth0 (`github|…`) que **no se parece en nada** al username de su panel.
+  Suponerlo habría rechazado todas las entregas. Aplicado y verificado en la revisión viva.
+- 🔴 **El canary abortaba sobre un sistema sano.** Daba timeout a los 20 min mientras la corrida completó sola
+  en la entrega 21: el cuello no es el proveedor sino que **Asset Governance corre cada 5 minutos** y avanza un
+  estado por tick (~20-25 min en frío). Su paciencia estaba por debajo de la latencia real del sistema que
+  vigila. Subido a 45 min — un canary que aborta sobre algo sano enseña a leer «timeout» como normal.
 - **Queda sólo D12**, acotado: la retención de la Operation de Vertex sigue sin documentarse, pero D2 ya cerró
   su modo de fallo — resta una ventana de latencia, no una pérdida. Su arreglo (`storageUri`) tiene dueño y no
   se implementó detrás de un flag involtable, que sería el código muerto que D13 vino a limpiar.

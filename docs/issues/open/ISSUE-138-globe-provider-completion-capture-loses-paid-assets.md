@@ -1,6 +1,6 @@
 # ISSUE-138 — Globe: la captura de completitud pierde assets ya cobrados en los tres proveedores
 
-> **Estado:** Open — **12 de 13 cerrados; queda D12, acotado y con arreglo con dueño**
+> **Estado:** Open — **12 de 13 cerrados y verificados con una generación real; queda D12, acotado**
 > **Detectado:** 2026-08-04 · **Ambiente:** Globe producción (`globe-producer-worker`, `globe-api-internal`)
 > **Severidad:** Alta — tres caminos distintos terminan en un asset generado, facturado e irrecuperable
 > **Repo afectado:** `efeoncepro/efeonce-globe` · **Gobierna:** Greenhouse (EPIC-028, `TASK-1469`)
@@ -206,6 +206,32 @@ documentada** (buscada en su página oficial de long-running operations). Pero s
 el modo de fallo seguro**, así que lo que queda es una **ventana de latencia**, no una pérdida garantizada. El
 arreglo estructural es `storageUri`; no se implementa detrás de un flag que nadie puede voltear sin canary,
 porque eso sería agregar exactamente el código muerto que D13 vino a limpiar.
+
+### Delta 2026-08-04 (c) — verificado con una generación real
+
+Canary de generación sobre el runtime desplegado. **La captura funciona de punta a punta:** run `completed`,
+experimento `candidate_ready`, Asset Governance `eligible`, pieza publicada. 10 créditos.
+
+**D9 cerrado con el valor MEDIDO, y el resultado justifica haberme negado a adivinarlo.** El observador emitió
+el user id sobre una entrega real y verificada: es un identificador estilo Auth0 (`github|…`) que **no se
+parece en nada** al username que muestra el panel de Fal. Configurarlo con la suposición natural habría
+rechazado **todas** las entregas legítimas y tumbado el carril de webhooks. Queda declarado en Terraform,
+aplicado y verificado en la revisión viva (`globe-api-internal-00205-kx5`), con `tofu plan` en `No changes`.
+
+#### 🔴 Hallazgo nuevo: el canary abortaba sobre un sistema sano
+
+El canary devolvió `producer_canary_worker_timeout` a los 20 minutos **mientras la corrida estaba perfecta** —
+completó sola en la entrega 21. El cuello **no es el proveedor**: Fal respondió en segundos. Es que el
+scheduler de **Asset Governance corre cada 5 minutos** y avanza un estado por tick, así que el camino en frío
+tarda ~20-25 min. La paciencia del canary estaba **estructuralmente por debajo de la latencia real del sistema
+que vigila**.
+
+Un canary que aborta sobre un sistema sano es peor que no tenerlo: **enseña a leer «timeout» como normal**, que
+es exactamente cómo un cuelgue real pasa desapercibido. Subido a 45 min.
+
+Y de paso confirma en vivo dos arreglos de esta sesión: la clase `waiting` sostuvo 21 entregas sin matar la
+corrida (con el tope viejo de `unknown` habría muerto en la tercera, con la pieza ya cobrada), y el reconcile
+quedó `superseded_by_terminal_state` como corresponde.
 
 ### 🔴 Lo que NO se cierra, y por qué (superado en parte por el Delta (b))
 
