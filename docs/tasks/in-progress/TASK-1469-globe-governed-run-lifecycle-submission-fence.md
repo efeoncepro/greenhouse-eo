@@ -76,9 +76,56 @@ nocturno: cambiar el sello sin mirar quién lo lee puede mover una ventana de re
 
 ### Delta 2026-08-04 (b) — los dos cerrados, y lo que se encontró al cerrarlos
 
-**Estado: code complete, rollout pendiente.** Los dos defectos están implementados con guards probados
-en rojo y `pnpm check` / `pnpm build` verdes; **falta desplegar** (`deploy-internal.yml` para API/web,
-`deploy-producer-worker.yml` en sus dos modos) y verificar contra la revisión activa.
+**Estado: desplegado y verificado en runtime (2026-08-04).** Los dos defectos están implementados con
+guards probados en rojo, y el rollout quedó verificado contra la **revisión activa**, no contra un
+workflow verde.
+
+| Superficie | Revisión / digest activo | Etiqueta |
+|---|---|---|
+| `globe-api-internal` | `00206-4vp` | `f06eae7e6c3d` |
+| `globe-studio-internal` | `00148-qcs` | `f06eae7e6c3d` |
+| `globe-producer-worker` | `sha256:98d948da…` (ejecutando) | `f06eae7e6c3d` |
+
+**El sello del reloj, medido sobre filas reales.** De 131 filas `done` en `governed_run_outbox`,
+**23 son históricamente contradictorias** (`completed_at < available_at`), con un peor caso de
+**−34.965 s = 9,7 horas** en un job `complete` de 144 entregas — o sea el defecto era **mucho peor que
+los 19 minutos** del incidente. De las selladas por el código nuevo: **0 contradictorias**, en los
+**tres tipos de job**, incluido `complete`, que es el que falló en el incidente.
+
+| job | filas nuevas | correctas | contradictorias | delta mínimo |
+|---|---|---|---|---|
+| `complete` | 1 | 1 | **0** | +52 s |
+| `reconcile` | 1 | 1 | **0** | +4 s |
+| `submit` | 2 | 2 | **0** | +43 s |
+
+**La proyección del attempt, medida en vuelo.** Sobre el despliegue vivo, **8/8 experimentos** proyectan
+`runProgress`. La prueba decisiva se capturó con una corrida **en curso**: `199a8476` se leía
+`state: running` con `attempts: 0` —la firma exacta del defecto— y el reader nuevo respondía
+`provider-running/queued, attempt=1, providerAccepted=true`. Y en los experimentos `failed` con
+`attempts: 0`, ahora se distingue lo que antes era una sola cosa: dos fallaron **antes** de que el
+proveedor los aceptara (`providerAccepted=false`) y dos **después**.
+
+**Un dato que confirma el diagnóstico de `ISSUE-137` desde el otro lado:** durante toda la generación,
+la fila del experimento mantuvo `updated_at` a **un segundo** de su `created_at` — el patrón que aquella
+issue leyó como «colgado». La corrida estaba sana y completó en **7 min 48 s** (presupuesto documentado
+~7,9 min). Sin esta proyección, ese estado sigue siendo indistinguible de un cuelgue real.
+
+**Salud del worker post-rollout:** `outboxTerminalAttempts=0`, `outboxRetryStorm=0`,
+`queueOldestAgeSeconds=0`, cero logs `ERROR`.
+
+**Canary de generación real (32 créditos aprobados: imagen 10 · video 16 · audio 6).** Las tres
+modalidades generaron, retuvieron y sirvieron correctamente: PNG 6,9 MB, MP4 1,35 MB, MP3 110 KB, cada
+una `candidate_ready` con el crédito exacto aprobado. La imagen cerró en **7 min 48 s**, clavada en el
+presupuesto de latencia documentado (~7,9 min).
+
+El canary **falló** después de generar, y destapó un defecto **preexistente y ajeno a esta task**:
+[`ISSUE-139`](../../issues/resolved/ISSUE-139-globe-output-descriptor-advertises-per-modality-mime-guess.md)
+— el descriptor de output anunciaba un MIME adivinado por modalidad (`audio/wav` para un MP3). Arreglado
+en `efeonce-globe@e7a732c` y **re-verificado sobre los mismos assets, con cero gasto adicional**:
+integridad, liquidación económica exacta y Asset Governance coherentes en las tres modalidades.
+
+Superficies finales, verificadas contra la revisión activa: `globe-api-internal-00207-28r`,
+`globe-studio-internal-00149-w9c` y el Job del worker, las tres con el digest etiquetado `e7a732c9b62e`.
 
 | Commit | Qué cierra |
 |---|---|
