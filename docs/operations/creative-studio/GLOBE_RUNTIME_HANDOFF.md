@@ -13,6 +13,81 @@
 > `d3fe90e`, digest `sha256:d8295862dc12c14427e90e0bb413577802916c37ca6bf32c202680492ca7bae9`,
 > deploy `30717266572` y baseline IaC `e369ef8` sin drift.
 
+## Corte 2026-08-04 (noche) — TASK-1641: Omni y Veo sellados, migración `0050`
+
+**Despliegue.** Globe `main@38c528d` (SHA completo `38c528d27b9ae67d4432055535cbd9e7975410cc`), con CI verde
+sobre ese SHA exacto (run `30953279839`).
+
+- API: servicio `globe-api-internal`, revisión activa **`globe-api-internal-00211-8sp`**, imagen
+  `southamerica-west1-docker.pkg.dev/efeonce-globe/globe-runtime/globe-api-internal:38c528d27b9a`.
+- Worker: Job `globe-producer-worker`, imagen por digest
+  `sha256:14b80d2f150b29d25b61862a7bba265da4fbd4bb25c7aa2bd0ae66cb573202d6`, que en Artifact Registry lleva el
+  tag `38c528d27b9a`.
+- Workflows: `deploy-internal.yml` con `service=globe-api-internal`, y `deploy-producer-worker.yml` en **dos
+  corridas** (`mode=build` y después `mode=deploy`), como exige el contrato de ese Job.
+- **No se desplegaron** `globe-asset-governance` ni `globe-studio-internal`.
+
+**Migración `0050_generated_asset_rights_authority_effective_lineage.sql`**, aplicada por el workflow keyless
+`migrate-internal.yml` `mode=apply`, run `30953709590`, exit 0. La vista
+`generated_asset_rights_authority_effective` pasa a proyectar **16 columnas**: `workspace_id`, `asset_id`,
+`source_kind`, `run_id`, `attempt_id`, `output_index`, `route_id`, `provider_id`, `model_id`, `model_version`,
+`readiness_rights_policy_version`, `route_snapshot_digest`, `parent_rights_digest`, `authority`, `recorded_at`,
+`rights_policy_purpose`. Conserva `SELECT` para `globe-api-runtime@`, `globe-web-runtime@`,
+`globe-producer-worker@` y `globe-asset-governance@` (los cuatro con sufijo `.iam`).
+
+**`ref/motion/reference-v1` — Gemini Omni: canary sellado.** Identidad exacta
+`gemini-omni-flash-preview / preview`, endpoint `vertex.omni.reference-to-video`, región `global`,
+`completionDriver=poll`. La promoción **`promotion_1a5d117e-0a0c-4f63-92e7-817a808e0ff3`** quedó en
+**`canary_passed`** (revisión 9, estado terminal); binding `enabled=true` revisión 10; circuito `closed`
+revisión 9. El canary es run `74ea0dec-27c5-4d11-94d6-e0d459cfd61e`, attempt
+`4f4ba0b4-0f4a-49f9-9909-764aeeec940c`, output
+`sha256:2c3370a9b3c9c804ff505e98dd288c2588628085a2f2f3bb1a86f5271562695d`, governance `eligible`, generado
+`2026-08-04T20:50:57Z` — **posterior** a la activación de `20:49:43Z`, que es lo que lo vuelve elegible como
+canary.
+
+**`ref/video/frames-v1` — Veo: canary sellado.** Identidad exacta
+`veo-3.1-generate-001 / 3.1`, endpoint `vertex.veo.frames`, región `us-central1`, `completionDriver=poll`. La
+promoción **`promotion_ddd0977c-c6e7-4fa6-bd31-61737c108d31`** quedó en **`canary_passed`** (revisión 9, estado
+terminal: ya no expira); binding `enabled=true` revisión 11; circuito `closed` revisión 11. El canary es el
+run/experimento `d2788195-3b13-4e33-b4fd-46e91638adc6`, attempt `68a75b70-91dc-4a7e-bd65-0d63dd0942f5`, output
+`sha256:3a49d5ba1fdfdcc94973ecaf85d8e61d8cea710540e9a694e769e62e3ef17f4b`, governance `eligible`, run creado
+`2026-08-04T22:45:11Z` — **posterior** a la activación de `22:03:02Z`, como exige `resolveCanary`. Economía
+exacta: **32 créditos reservados = 32 gastados**. Forma de salida usada: 720p, 8 segundos, 16:9, `silent`,
+`inputMode {kind:'frames', hasEndFrame:false}`. La referencia de primer cuadro fue el output ya gobernado
+`output:8a5e24ec-0a92-4d9d-b9c8-5d52a37e5e5b:0`
+(`sha256:b2762b738f45d6dd512cef9dfa0202046a2da9028e9af04d567411e9852093df`, `image/png`), declarado como
+`authorizedInputs` con `rights: internal-owned`. El sello lo ejecutó `globe-operator-lane.yml`
+`mode=canary-confirm` `lane=checker`, run `30958027741`.
+
+⚠️ **Matiz de honestidad: el canary NO se produjo desde la UI del Producer.** Se produjo por el **carril
+gobernado**, con los commands canónicos del spine (`globe.lab.experiment.estimate` → `prepare` → `execute`)
+sobre el transporte de `scripts/producer-ui-canary-lib.mjs`. La UI **sigue sin poder producirlo**: el botón
+«Usar como referencia» del feed no despacha ningún command —`ProducerFeedRoute.tsx` cablea `onReference`,
+`onRecreate`, `onFavorite` y `onDownload` a `() => undefined`—, y sin referencia el estimado no se calcula. O
+sea: la promoción está sellada y la ruta habilitada, pero el **Scope 1 de TASK-1641 —un canary de ruta
+arbitraria canónico y committeado— sigue pendiente**, y la generación desde el Producer para rutas con entrada
+obligatoria sigue bloqueada.
+
+**Bloqueo vigente de la entrada de referencias en el Producer.** La ruta exige 1-2 referencias de imagen y sus
+**dos** caminos de entrada siguen rotos hoy:
+
+1. **«Usar como referencia» y «Recrear» en el feed del Producer no despachan ningún command**: cero
+   `POST /v1/commands`, cero consola. **«Añadir a favoritos» en la misma tarjeta sí registra**, así que el
+   defecto no está en el overlay.
+2. **La subida ingesta, pero Asset Governance falla en la etapa `inspecting` con `dependency_unavailable`**
+   tras 5 intentos. Assets afectados: `asset_f861b971-4a6b-44eb-afc0-95623718131b` y
+   `asset_86670e74-c71f-498a-9727-92d2f9a60461`.
+
+⚠️ **Límite declarado del segundo hallazgo:** el ingest se disparó con un `File` sintético desde el browser.
+**Antes de llamarlo defecto de plataforma hay que reproducirlo con una subida real por el selector de archivos.**
+
+Evidencia gobernada de la promoción, por si hiciera falta reconstruir el linaje:
+
+- `rightsEvidenceId` `arp_0bbbb5b5e8c880dd760a32879b505e32fbbe10278c009b0b1412b6dab4f13869:mcra_4da3c2f3-3be4-453d-84fd-b31764537951`
+  (expira 2027-07-31).
+- `reviewId` `review_48829ea4-53c6-42b6-bdec-800714d4ba12`.
+- `proposalId` `readiness:dcc03360bb39d9b132f68d1a7b0c4d84`.
+
 ## Corte 2026-08-04 (tarde) — sello del reloj, canary reparado e ISSUE-139
 
 **Revisiones activas:** `globe-api-internal-00207-28r`, `globe-studio-internal-00149-w9c` y el Job
@@ -80,6 +155,12 @@ de 288.
   command, y Globe conserva la autoridad económica. No habilita generaciones, assets, delivery ni datos provider.
 - Seis rutas de imagen están simultáneamente `available`: Seedream 5 Pro, Nano Banana Pro,
   Nano Banana 2, GPT Image 2, GPT Image 1.5 y Recraft v4.1.
+- Las **dos** rutas de video quedaron promovidas, selladas y habilitadas el 2026-08-04:
+  `ref/motion/reference-v1` (Gemini Omni) y `ref/video/frames-v1` (Veo 3.1) tienen su promoción en
+  `canary_passed` terminal, binding habilitado y circuito cerrado.
+- El canary de Veo se produjo por el **carril gobernado**, no desde la UI del Producer: la entrada de
+  referencias del Producer sigue rota, así que el Scope 1 de `TASK-1641` (canary de ruta arbitraria canónico y
+  committeado) sigue pendiente.
 - `TASK-1553` permanece `in-progress` únicamente por el criterio transversal de rate-version
   receipts de `TASK-1468` y onboarding receipts de `TASK-1578`. Este pendiente no revierte la
   disponibilidad live de las seis rutas.
@@ -214,6 +295,11 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
 
 ## TASK-1504 — Gemini Omni (despliegue y saga activada; canary pendiente, checkpoint 2026-08-02)
 
+> **Superado el 2026-08-04 (noche):** el canary de `ref/motion/reference-v1` quedó **sellado** bajo la promoción
+> `promotion_1a5d117e-0a0c-4f63-92e7-817a808e0ff3` (`canary_passed`, revisión 9, terminal). Lo que sigue en esta
+> sección se conserva como trazabilidad del checkpoint del 2026-08-02 — la promoción `promotion_922157fa…` y el
+> bloqueo del modo `Elementos` **no describen el estado vigente**. El corte válido es el de arriba.
+
 - Globe `main@62337b483fd965cd3a518fa1b9d13c7b0ac6d3f4` integra el driver gobernado con simetría API/worker
   para `ref/motion/reference-v1 / vertex-omni / gemini-omni-flash-preview / preview`; CI `30743786928` terminó
   verde. Los readbacks canónicos sobre ese SHA quedaron verdes: rights `30743848333`, readiness
@@ -273,9 +359,16 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
   la naturaleza del producto.
 - `TASK-1553` no puede cerrarse hasta registrar los receipts transversales de `TASK-1468` y
   `TASK-1578`.
-- Gemini Omni ya tiene driver gobernado, policy corregida y saga activada, pero TASK-1504 sigue incompleta por el
-  canary final. El circuito está cerrado después de `activate`; no confundir `promoted` en readiness ni circuito
-  cerrado con disponibilidad hasta que exista el canary y `canary-confirm`.
+- Gemini Omni (`promotion_1a5d117e…`) y Veo 3.1 (`promotion_ddd0977c…`) ya tienen su canary sellado, ambos
+  `canary_passed` revisión 9. La regla general se mantiene: **no confundir `promoted` en readiness ni un
+  circuito cerrado con disponibilidad** hasta que exista el canary y su `canary-confirm`.
+- 🔴 La **generación desde el Producer para rutas con entrada de referencia obligatoria sigue bloqueada**: los
+  dos caminos de entrada (feed y subida) siguen rotos, descritos en el corte del 2026-08-04 (noche). El canary
+  de Veo se selló por el carril gobernado, así que el bloqueo no revierte la promoción, pero **el Scope 1 de
+  `TASK-1641` —un canary de ruta arbitraria canónico y committeado— sigue pendiente**.
+- El fallo de Asset Governance en `inspecting` (`dependency_unavailable`, 5 intentos) se observó con un `File`
+  sintético desde el browser. **No está probado como defecto de plataforma** hasta reproducirlo con una subida
+  real por el selector de archivos.
 - TASK-1614 está cerrada con evidencia live completa. El rollout externo/comercial continúa gated por `TASK-1480`;
   esta restricción no afecta el canary interno ni la naturaleza comercial de Globe.
 - La identidad temporal usada para consumo privado de AXIS debe sustituirse por una identidad de
@@ -384,11 +477,18 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
 
 ## Siguiente paso ejecutable
 
-1. Resolver la discrepancia de publicación del modo `Elementos` en la superficie Producer/BFF mediante una
-   unidad autorizada que no fuerce el control ni despliegue Studio fuera de alcance; después ejecutar el único
-   canary Omni pendiente desde Producer y reconciliar playback, cobro, retención, lineage, governance y
-   `canary-confirm`.
-2. Implementar TASK-1632 dentro de Globe sin introducir a Greenhouse en el path de finalización; conservar los
+1. Desbloquear **uno** de los dos caminos de entrada de referencia del Producer. Ya no hay ventana que corra
+   —la promoción de Veo está sellada—, pero sin esto la generación desde la UI para rutas con entrada
+   obligatoria sigue muerta. El camino 1 («Usar como referencia» / «Recrear» no despachan command) está aislado
+   a esos dos controles, porque «Añadir a favoritos» sí registra desde la misma tarjeta; el handler vive en
+   `ProducerFeedRoute.tsx`, que cablea `onReference`, `onRecreate`, `onFavorite` y `onDownload` a
+   `() => undefined`. Para el camino 2, **primero reproducir la subida con el selector real** antes de tratar el
+   `dependency_unavailable` de `inspecting` como defecto de plataforma.
+2. Cerrar el **Scope 1 de `TASK-1641`**: dejar committeado un canary de ruta arbitraria canónico. El sello de
+   Veo se hizo con los commands del spine (`globe.lab.experiment.estimate` → `prepare` → `execute`) sobre el
+   transporte de `scripts/producer-ui-canary-lib.mjs`, pero esa forma todavía no está consolidada como
+   herramienta reutilizable.
+3. Implementar TASK-1632 dentro de Globe sin introducir a Greenhouse en el path de finalización; conservar los
    schedulers como recovery y demostrar deduplicación/idempotencia antes del rollout.
-3. Completar receipts/calibración amplia de TASK-1468/TASK-1579 sin reabrir TASK-1614/TASK-1630 ni alterar los
+4. Completar receipts/calibración amplia de TASK-1468/TASK-1579 sin reabrir TASK-1614/TASK-1630 ni alterar los
    800 efectivos. Mantener rollout externo y acceso MCP B2B gated por TASK-1480/TASK-1631.

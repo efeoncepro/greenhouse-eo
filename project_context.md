@@ -38,6 +38,15 @@ Fal **no son derivables** y se declaran por endpoint desde evidencia medida; el 
 gobierna si el proveedor reintenta. Y cuando un run llega a terminal, **todo agregado dependiente converge o
 queda observable**, declarado como lista enumerable cuyo incumplimiento rompe el build.
 
+Una **vista que reemplaza a una tabla debe proyectar la MISMA superficie**: un swap de una línea convierte a cada
+consumidor existente en un error de parseo diferido que sólo aparece ejercitando el camino (`TASK-1641`, medido el
+2026-08-04 — `42703` en planificación saliendo como `internal_error` 500). Dos trampas del carril de migraciones de
+Globe que no se ven leyendo el archivo: `CREATE OR REPLACE VIEW` **no puede** reordenar ni renombrar columnas
+(`42P16`, va `DROP`+`CREATE`), y su runner ejecuta el **archivo completo sin parsear markers**, así que una sección
+`-- Down Migration` —convención de `node-pg-migrate`, ajena a ese repo— se ejecuta y deshace el arreglo. Y **un
+checkpoint de saga nunca va delante de una lectura pura**: no protege nada y consume el único estado desde el que
+se puede reintentar.
+
 La flota de modelos de Globe se resuelve y promueve por identidad exacta de ruta. El estado live se consulta en
 `globe.producer.fleet.list` y el mapa humano en `GLOBE_MODEL_FLEET_STATUS.md`; una promoción se cierra con
 evaluación/derechos/readbacks y una generación real desde la UI autenticada. Un MIME de transporte genérico nunca

@@ -118,7 +118,25 @@ la tabla reintroduce el mismo defecto una columna después.
   **aliase** la vista: sin alias una referencia no es atribuible. El propio ejercicio en rojo destapó que el
   detector aceptaba `WHERE` como alias, o sea cubría cero.
 
-### 🔴 Veo: bloqueado por un defecto de UI que NO es de esta task
+### Veo: SELLADA — canary producido por el carril gobernado
+
+`promotion_ddd0977c-c6e7-4fa6-bd31-61737c108d31` quedó en **`canary_passed`** (revisión 9), binding `enabled`
+revisión 11 y circuito `closed` revisión 11. Canary: run `d2788195-3b13-4e33-b4fd-46e91638adc6`, attempt
+`68a75b70-91dc-4a7e-bd65-0d63dd0942f5`, output `sha256:3a49d5ba1fdfdcc94973ecaf85d8e61d8cea710540e9a694e769e62e3ef17f4b`,
+governance `eligible`; run creado 22:45:11Z, posterior a la activación de 22:03:02Z como exige `resolveCanary`.
+Economía exacta: 32 créditos reservados = 32 gastados. Sello por `globe-operator-lane.yml` run `30958027741`.
+
+Se produjo por el **carril gobernado** —`globe.lab.experiment.estimate` → `prepare` → `execute` sobre el
+transporte de `scripts/producer-ui-canary-lib.mjs`—, con forma 720p / 8 s / 16:9 / `silent` /
+`inputMode {kind:'frames', hasEndFrame:false}` y, como primer cuadro, el output ya gobernado
+`output:8a5e24ec-0a92-4d9d-b9c8-5d52a37e5e5b:0` declarado en `authorizedInputs`.
+
+🔴 **Lo que este sello NO prueba, y hay que decirlo:** el canary **no salió de la UI del Producer**, y la UI
+sigue sin poder producirlo. Por lo tanto **el Scope 1 de esta task sigue abierto** —no existe todavía un canary
+de ruta arbitraria canónico, committeado y testeado— y la generación desde el Producer para rutas con entrada
+obligatoria sigue cerrada.
+
+### 🔴 Los dos defectos de entrada de referencia, ajenos a esta task
 
 `promotion_ddd0977c-c6e7-4fa6-bd31-61737c108d31` está **`activated`** (ventana hasta `2026-08-05T01:03:02Z`), con
 binding y circuito correctos. Falta su canary, y hace falta uno **nuevo**: `resolveCanary` exige

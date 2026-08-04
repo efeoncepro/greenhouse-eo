@@ -1,9 +1,9 @@
 # Flota de modelos del Producer — disponibilidad por workspace
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-07-25 por Claude (TASK-1554)
-> **Ultima actualizacion:** 2026-07-30 por Codex
+> **Ultima actualizacion:** 2026-08-04 por Claude (TASK-1641)
 > **Documentacion tecnica:** [`GLOBE_MODEL_FLEET_STATUS.md`](../../operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md) · [`EFEONCE_GLOBE_CREATIVE_STUDIO_ARCHITECTURE_V1.md`](../../architecture/EFEONCE_GLOBE_CREATIVE_STUDIO_ARCHITECTURE_V1.md)
 
 ## Qué resuelve
@@ -104,6 +104,37 @@ restricción: siempre puedes elegir otro.
 Y es **honesto**: si el recomendado no está disponible para tu workspace, se muestra su estado real
 en vez de preseleccionarlo. Preseleccionar algo que no se puede ejecutar convierte la recomendación
 en una trampa.
+
+## Una promoción no está terminada hasta que se sella (y si no, se deshace sola)
+
+Promover una ruta a un workspace tiene un último paso que es fácil de subestimar: **una generación real
+con esa ruta exacta, verificada del lado del servidor**. Se llama *canary*, y hasta que existe, la
+promoción está **activada pero no sellada** — con una ventana de tiempo. Si la ventana vence sin sello,
+la promoción **se revierte sola**: el modelo vuelve a "Próximamente" sin que nadie haya hecho nada mal.
+
+Eso es deliberado y **no se relaja**: una ruta que nadie probó produciendo de verdad no debe quedar
+disponible para el equipo ni para un cliente. Nadie puede "declarar" que el canary pasó; el sistema
+resuelve la evidencia por su cuenta (la corrida, el intento, la pieza retenida y su decisión de
+governance) y sólo entonces sella.
+
+**El 2026-08-04 se descubrió que ese último paso llevaba tiempo sin poder ejecutarse.** El sello fallaba
+con un error genérico **aunque la evidencia estuviera perfecta**, por un defecto interno de la consulta
+que la verifica. La consecuencia medida: **10 de 12 promociones históricas terminaron revirtiéndose**,
+varias de ellas segundos después de vencer su ventana. Ya está corregido, y ese mismo día **las dos rutas
+de video quedaron promovidas, selladas y habilitadas**: `ref/motion/reference-v1` (Gemini Omni Flash) y
+`ref/video/frames-v1` (Veo 3.1).
+
+Con un matiz que conviene decir en voz alta: **el canary de Veo no se produjo desde el Producer**, sino
+por el carril gobernado, con los comandos internos de la plataforma. La ruta exige referencias de imagen
+y los dos caminos para aportarlas desde el Producer siguen rotos hoy — dos defectos ajenos a la promoción,
+registrados por separado. Es decir: la ruta está sellada y habilitada, pero **generar desde el Producer un
+modelo que exige referencias todavía no funciona**.
+
+La lectura práctica para quien opera: **si una ruta que ya habías visto disponible deja de estarlo, la
+causa más probable no es un fallo del modelo, sino una promoción que venció sin su canary.**
+
+> Detalle técnico: la saga de promoción y el Delta de esta corrección están en el
+> [ADR-009](../../architecture/creative-studio/EFEONCE_GLOBE_ROUTE_PROMOTION_OPERATION_DECISION_V1.md).
 
 ## Qué nunca vas a ver
 

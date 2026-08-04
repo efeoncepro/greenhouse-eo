@@ -7,7 +7,7 @@
 > sustenta en `globe.production-routing` + `globe.model-readiness.*`. Este documento es el mapa
 > legible que reconcilia ambas autoridades.
 >
-> **Creado:** 2026-07-24 (TASK-1553). **Última actualización:** 2026-08-02.
+> **Creado:** 2026-07-24 (TASK-1553). **Última actualización:** 2026-08-04.
 > **Contrato técnico:** `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md`,
 > `EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md`, `EFEONCE_GLOBE_ROUTE_BASED_MODEL_RESOLUTION_DECISION_V1.md` (ADR-013).
 
@@ -41,8 +41,8 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 | `ref/still/openai-v2` | GPT Image · 2 | OpenAI (`gpt-image-2`) | image-generate | ✅ 07-24 | ✅ driver + promoción + canary real 07-30 | run UI `a81c8049-7772-4933-82f2-1e2e59e5121c`; 14 créditos |
 | `ref/still/openai-v1-5` | GPT Image · 1.5 | OpenAI (`gpt-image-1.5`) | image-generate | ✅ 07-24 | ✅ driver + promoción + canary real gobernado 07-30 | run UI `bf8cd62b-e2d7-4e83-981a-7631a14a5d3a`; 10 créditos |
 | `ref/motion/loop-v1` | Seedance · 2.0 | Fal | video-generate | ✅ 07-19 | ✅ driver Fal | — |
-| `ref/motion/reference-v1` | Gemini Omni Flash · Preview | Vertex (Omni, Interactions API) | video-generate | ✅ evaluación retenida (40cr) | ⏳ driver, policy y saga activados; canary pendiente | TASK-1504: Producer no habilita `Elementos`; no `available`, sin cobro ni output nuevo |
-| `ref/video/frames-v1` | Veo · 2.0 | Vertex (`veo-…:predictLongRunning`) | video-frames | ✅ 07-20 (MP4 real, 32cr) | ✅ driver Veo gobernado (`vertex-video`, `us-central1`) desde 07-22 | — |
+| `ref/motion/reference-v1` | Gemini Omni Flash · Preview | Vertex (Omni, `vertex.omni.reference-to-video`, `global`) | video-generate | ✅ evaluación retenida (40cr) | 🟢 canary sellado 08-04 | `promotion_1a5d117e…` `canary_passed` rev. 9; run `74ea0dec…`, governance `eligible` |
+| `ref/video/frames-v1` | Veo · 3.1 | Vertex (`veo-3.1-generate-001`, `vertex.veo.frames`, `us-central1`) | video-frames | ✅ 07-20 (MP4 real, 32cr) | 🟢 canary sellado 08-04 | `promotion_ddd0977c…` `canary_passed` rev. 9 (terminal); run `d2788195…`, 32cr = 32cr, governance `eligible`; **canary por carril gobernado, no desde la UI** |
 | `ref/video/motion-v1` | Seedance · 2.0 | Fal | video-motion-control | ✅ evaluación/report 08-01 | 🟢 canary real gobernado 08-02 | TASK-1614 cerrada: run `bbe6dfff…`, output MP4 retenido, 16 créditos, `canary_passed` |
 | `ref/audio/foley-v1` | Seed Audio | Fal | audio-generate | ✅ 07-19 | ✅ driver Fal | atestación comercial firmada |
 | `ref/voice/tts-v1` | ElevenLabs · Multilingual v2 | ElevenLabs | speech-synthesize | ✅ 07-19 | ✅ driver Fal | — |
@@ -77,6 +77,9 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 | 2026-08-02 | TASK-1614 | Canary nuevo gobernado verde: run `bbe6dfff…`, attempt `7bb11342…`, output SHA `93adbf46…`, 16 créditos, governance elegible y `canary_passed` |
 | 2026-08-02 | TASK-1504 | Gemini Omni: driver gobernado integrado en `62337b483`; fix de idempotencia en `fa286db`; evaluación de 40 créditos retenida, binding habilitado y readiness promovido; circuito aún abierto y canary final pendiente |
 | 2026-08-02 | TASK-1504 | API/worker desplegados desde `fa286db`; policy `arp_8090d31a…` releída con atestación corregida; saga `promotion_922157fa…` activada rev. 7; canary bloqueado por `Elementos` deshabilitado en Producer, sin gasto |
+| 2026-08-04 | TASK-1641 | Despliegue `38c528d` (API rev. `globe-api-internal-00211-8sp`, worker digest `sha256:14b80d2f…` tag `38c528d27b9a`) + migración `0050`: la vista `generated_asset_rights_authority_effective` pasa a 16 columnas |
+| 2026-08-04 | TASK-1641 | **Gemini Omni sellado:** `promotion_1a5d117e…` `canary_passed` rev. 9; run `74ea0dec…`, attempt `4f4ba0b4…`, output `sha256:2c3370a9…`, governance `eligible` |
+| 2026-08-04 | TASK-1641 | **Veo 3.1 sellado:** `promotion_ddd0977c…` `canary_passed` rev. 9 (terminal); run `d2788195…`, attempt `68a75b70…`, output `sha256:3a49d5ba…`, governance `eligible`, 32cr = 32cr. El canary se produjo por el **carril gobernado** (`globe.lab.experiment.estimate` → `prepare` → `execute`), no desde la UI: los dos caminos de entrada de referencia del Producer siguen rotos |
 
 ## Evidencia Seedance R2V — canary gobernado verde (actualizado 2026-08-02)
 
@@ -111,6 +114,11 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 
 ## Gemini Omni — checkpoint de promoción TASK-1504 (2026-08-02)
 
+> **Superado el 2026-08-04 (TASK-1641):** el canary quedó sellado bajo la promoción
+> `promotion_1a5d117e-0a0c-4f63-92e7-817a808e0ff3` (`canary_passed`, revisión 9, terminal). Ver *Cierre del
+> canary* al final de esta sección; el bloqueo del modo `Elementos` y la saga `promotion_922157fa…` **ya no
+> describen el estado vigente** y se conservan sólo como trazabilidad.
+
 - Identidad exacta: `ref/motion/reference-v1 / vertex-omni / gemini-omni-flash-preview / preview`. Globe
   `main@62337b483fd965cd3a518fa1b9d13c7b0ac6d3f4` integra el driver gobernado y la simetría API/worker; CI
   `30743786928` terminó verde. Los readbacks exactos quedaron verdes en rights `30743848333`,
@@ -144,6 +152,60 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 - El bloqueo no proviene del reader ni del driver: el bundle Studio live (`globe-studio-internal-00133-b9k`,
   `595f0cb5460e`) deja `MODE_CAPABILITIES.video[3]` en `undefined`, por lo que el filtro del Composer deshabilita
   `Elementos` aunque Omni figure `Disponible`. Corregir/desplegar Studio queda fuera del alcance autorizado.
+
+### Cierre del canary (2026-08-04, TASK-1641)
+
+- Identidad exacta vigente: `ref/motion/reference-v1 / gemini-omni-flash-preview / preview`, endpoint
+  `vertex.omni.reference-to-video`, región `global`, `completionDriver=poll`.
+- Promoción **`promotion_1a5d117e-0a0c-4f63-92e7-817a808e0ff3`** en **`canary_passed`** revisión 9 (terminal);
+  binding `enabled=true` revisión 10; circuito `closed` revisión 9.
+- Canary: run `74ea0dec-27c5-4d11-94d6-e0d459cfd61e`, attempt `4f4ba0b4-0f4a-49f9-9909-764aeeec940c`, output
+  `sha256:2c3370a9b3c9c804ff505e98dd288c2588628085a2f2f3bb1a86f5271562695d`, governance `eligible`, generado
+  `2026-08-04T20:50:57Z` — **posterior** a la activación de `20:49:43Z`, que es la condición que lo vuelve
+  elegible como canary.
+- Runtime del sello: Globe `main@38c528d`, API rev. `globe-api-internal-00211-8sp`, worker digest
+  `sha256:14b80d2f150b29d25b61862a7bba265da4fbd4bb25c7aa2bd0ae66cb573202d6`, migración `0050` aplicada.
+
+## Veo 3.1 — frames: promoción sellada (2026-08-04, TASK-1641)
+
+- Identidad exacta: `ref/video/frames-v1 / veo-3.1-generate-001 / 3.1`, endpoint `vertex.veo.frames`, región
+  `us-central1`, `completionDriver=poll`.
+- Promoción **`promotion_ddd0977c-c6e7-4fa6-bd31-61737c108d31`** en **`canary_passed`** revisión 9 (terminal: ya
+  no expira); binding `enabled=true` revisión 11; circuito `closed` revisión 11.
+- Canary: run/experimento `d2788195-3b13-4e33-b4fd-46e91638adc6`, attempt
+  `68a75b70-91dc-4a7e-bd65-0d63dd0942f5`, output
+  `sha256:3a49d5ba1fdfdcc94973ecaf85d8e61d8cea710540e9a694e769e62e3ef17f4b`, governance `eligible`, run creado
+  `2026-08-04T22:45:11Z` — **posterior** a la activación de `22:03:02Z`, como exige `resolveCanary`.
+- Economía exacta: **32 créditos reservados = 32 gastados**, liquidación sin diferencia.
+- Forma de salida usada: 720p, 8 segundos, 16:9, `silent`, `inputMode {kind:'frames', hasEndFrame:false}`. La
+  referencia de primer cuadro fue el output ya gobernado `output:8a5e24ec-0a92-4d9d-b9c8-5d52a37e5e5b:0`
+  (`sha256:b2762b738f45d6dd512cef9dfa0202046a2da9028e9af04d567411e9852093df`, `image/png`), declarado como
+  `authorizedInputs` con `rights: internal-owned`.
+- Sello ejecutado por `globe-operator-lane.yml` `mode=canary-confirm` `lane=checker`, run `30958027741`.
+- Evidencia gobernada del linaje: `rightsEvidenceId`
+  `arp_0bbbb5b5e8c880dd760a32879b505e32fbbe10278c009b0b1412b6dab4f13869:mcra_4da3c2f3-3be4-453d-84fd-b31764537951`
+  (expira 2027-07-31), `reviewId` `review_48829ea4-53c6-42b6-bdec-800714d4ba12`, `proposalId`
+  `readiness:dcc03360bb39d9b132f68d1a7b0c4d84`.
+
+⚠️ **El canary NO se produjo desde la UI del Producer.** Se produjo por el **carril gobernado**, con los commands
+canónicos del spine (`globe.lab.experiment.estimate` → `prepare` → `execute`) sobre el transporte de
+`scripts/producer-ui-canary-lib.mjs`. La promoción está sellada y la ruta habilitada, pero **el Scope 1 de
+TASK-1641 —un canary de ruta arbitraria canónico y committeado— sigue pendiente**.
+
+**Por qué la UI todavía no puede producirlo.** La ruta exige 1-2 referencias de imagen y sus **dos** caminos de
+entrada siguen rotos hoy — el botón «Usar como referencia» del feed no despacha ningún command
+(`ProducerFeedRoute.tsx` cablea `onReference`, `onRecreate`, `onFavorite` y `onDownload` a `() => undefined`), y
+sin referencia el estimado no se calcula:
+
+1. **«Usar como referencia» y «Recrear» en el feed del Producer no despachan ningún command** — cero
+   `POST /v1/commands`, cero consola. **«Añadir a favoritos» en la misma tarjeta sí registra**, así que el
+   defecto está acotado a esos dos controles y no al overlay.
+2. **La subida ingesta, pero Asset Governance falla en `inspecting` con `dependency_unavailable`** tras 5
+   intentos. Assets: `asset_f861b971-4a6b-44eb-afc0-95623718131b`, `asset_86670e74-c71f-498a-9727-92d2f9a60461`.
+
+⚠️ **Límite declarado del segundo hallazgo:** el ingest se disparó con un `File` sintético desde el browser.
+**Antes de tratarlo como defecto de plataforma hay que reproducirlo con una subida real por el selector de
+archivos.**
 
 > **Límite TASK-1632:** el wake desde completion de provider hacia finalización de Producer y Asset Governance es
 > un handoff interno de Globe, actualmente diseñado pero aún no implementado. No cambia este ledger de promoción,
@@ -267,9 +329,13 @@ Manual: [operar la flota](../../manual-de-uso/creative-studio/operar-flota-model
 
 ## Estado vigente y límites fuera de TASK-1553
 
-- **Gemini Omni en producción gobernada:** el driver de Interactions API, la policy corregida y la saga ya están
-  activados, pero TASK-1504 no está cerrada. Falta el canary final: el Producer autenticado no habilita
-  `Elementos` aunque el route reader está activo; la ruta no se declara `available` y no se registra gasto.
+- **Gemini Omni en producción gobernada:** driver de Interactions API, policy corregida, saga y **canary sellado**
+  (`promotion_1a5d117e…`, `canary_passed` rev. 9, 2026-08-04). El bloqueo de `Elementos` del 08-02 ya no aplica.
+- **Veo 3.1 (`ref/video/frames-v1`):** promoción **sellada** (`promotion_ddd0977c…`, `canary_passed` rev. 9
+  terminal, 2026-08-04), binding habilitado y circuito cerrado. Con esto **las dos rutas de video quedaron
+  promovidas, selladas y habilitadas**. El canary se produjo por el **carril gobernado**, no desde la UI: los dos
+  caminos de entrada de referencia del Producer siguen rotos, así que la generación desde el Producer para rutas
+  con entrada obligatoria continúa bloqueada.
 - **OpenAI (GPT Image 2/1.5):** lane gobernado, promociones y canaries reales completados el 07-30.
 - **Nano Banana 2:** promovido y ejercitado desde el Producer el 07-30; el bloqueo de allowlist quedó retirado.
 - **Recraft v4.1:** promovido y ejercitado desde el Producer el 07-30; SVG retenido y descarga habilitada.

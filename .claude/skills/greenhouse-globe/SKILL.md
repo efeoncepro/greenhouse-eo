@@ -369,6 +369,29 @@ histórico era inalcanzable. **No faltaba paginación: estaba a medio cablear.**
   entrando por arriba, la página 2 cambia de contenido sola — offset es incorrecto por construcción, y por eso
   el backend eligió cursor.
 
+#### Hallazgos operativos del Producer (2026-08-04) — medidos, pendientes de dueño
+
+- 🔴 **«Usar como referencia» y «Recrear» en las tarjetas del feed NO despachan ningún command.** Cero
+  `POST /v1/commands`, cero consola, y el contador de referencias se queda en **`0 / 2`**. Probado por las tres
+  vías: **coordenada con hover previo**, **`ref` del árbol de accesibilidad** y **`.click()` en la página**. **No
+  es el overlay ni `pointer-events`** — «Añadir a favoritos», **en la misma tarjeta y el mismo overlay**, SÍ
+  registra, y toda la cadena de padres computa `pointer-events: auto`. Es la familia ya documentada de **«la
+  capability existe y la UI no la consume»** (§El feed): un contrato con cero lectores pasa todos los gates.
+- **Sin referencia, el estimado nunca se calcula**, así que las rutas que **exigen entrada** (p. ej.
+  `ref/video/frames-v1`) **no se pueden ejecutar desde la UI**. El defecto de arriba no es cosmético: cierra un
+  carril entero de generación.
+- 🔴 **Asset Governance enmascara la causa (`ISSUE-127`, tercera aparición del día).**
+  `packages/domain/src/asset-governance-jobs.ts` colapsa **todo error que no sea `AssetGovernanceDependencyError`**
+  en `dependency_unavailable`, y su **`SAFE_DEPENDENCY_CODES` contiene SÓLO los cuatro códigos de C2PA**. Los
+  nombres de ClamAV y de inspección que `apps/asset-governance/src/engines.ts` **YA emite correctamente**
+  —`clamav_signature_update_failed`, `clamav_signature_stale`, `clamav_unavailable`, `clamav_scan_failed`,
+  `clamav_scan_invalid`, `clamav_signature_missing`, `clamav_version_invalid`— **se destruyen en la frontera**.
+  Dos ingests privados consecutivos murieron en `inspecting` con el código genérico, **sin una sola línea que
+  dijera por qué**.
+  ⚠️ **Límite declarado:** esos dos ingests se dispararon con un `File` **sintético** desde el browser, así que
+  antes de llamarlo defecto de plataforma hay que **reproducirlo con una subida real por el selector**. El
+  **enmascaramiento sí está verificado**, con independencia de eso.
+
 #### Cuando el shell real sirve el bundle de Vite: dos defectos que sólo se ven MIRANDO (2026-08-03)
 
 Aparecieron montando `pnpm globe:dev` y valen para cualquier documento que no sea el `index.html` de Vite.
@@ -467,7 +490,7 @@ separado, gastando, y ambos eran invisibles con el build verde.
   REAL**. Los fixtures de Veo inventaban la forma corta mientras los endpoints de esos mismos tests ya llevaban
   `/publishers/google/models/…`: la suite verificaba una ficción durante semanas.
 
-### Una vista que reemplaza a una tabla debe proyectar la MISMA superficie
+## Una vista que reemplaza a una tabla debe proyectar la MISMA superficie (`TASK-1641`, medido 2026-08-04)
 
 `generated_asset_rights_authority_effective` (migración `0048`) proyecta 3 columnas; el consumidor que se
 cambió a ella en el mismo commit usa 14. **La consulta nunca pudo parsear** —`42703` en planificación, sin
@@ -477,10 +500,95 @@ como **`internal_error` 500**. Efecto: `canary-confirm` reventaba con toda la ev
 - **NUNCA** sustituyas una tabla por una vista sin verificar que proyecta **todo** lo que sus consumidores leen;
   un swap de una línea convierte cada consumidor existente en un error de parseo diferido, que sólo aparece
   ejercitando el camino.
-- **NUNCA** dejes que un checkpoint de saga consuma el único estado desde el que se puede reintentar.
-  `confirmProductionPromotionCanary` marca `verifying_canary` **antes** de leer la evidencia y no tiene
-  try/catch, así que **cada reintento quema una promoción** (de `verifying_canary` sólo se sale por rollback).
-- Dueño de ambos: **`TASK-1641`**.
+
+Lo que sigue son las lecciones de **arreglarlo**, todas medidas: cada una apareció ejecutando, no razonando, y
+ninguna se ve leyendo el archivo que la contiene.
+
+### `CREATE OR REPLACE VIEW` no puede reordenar ni renombrar columnas
+
+Sólo permite **agregar al final**, conservando nombre, tipo y posición de lo que ya estaba. Cambiar la tercera
+columna de `authority` a `source_kind` **aborta** con **`42P16 cannot change name of view column`** — la migración
+no aplica, no es una advertencia.
+
+- **SIEMPRE** que cambie la **forma** de una vista: **`DROP VIEW` + `CREATE VIEW`**, y **sin `CASCADE` a
+  propósito**. Si alguien construyó encima, el DROP **debe FALLAR** en vez de arrastrarlo: el fallo es el aviso.
+  `CASCADE` destruye en silencio lo que no sabías que existía.
+- **SIEMPRE** verifica dependientes por **`pg_depend`/`pg_rewrite` ANTES** del DROP, no después de romper algo.
+- 🔴 **El DROP PIERDE los GRANT.** Se re-otorgan **explícitos** en la misma migración y se **verifican**; **NUNCA**
+  lo delegues en `ALTER DEFAULT PRIVILEGES` — un permiso que aparece por herencia es exactamente el que se rompe
+  en silencio cuando el objeto se recrea, y nadie lo nota hasta que un runtime distinto lo lee.
+
+### 🔴 El runner de migraciones de Globe NO parsea markers: `-- Down Migration` es SQL que SE EJECUTA
+
+`packages/database/src/migrate.ts` hace **`tx.query(sql)` con el ARCHIVO COMPLETO**, dentro de una transacción por
+archivo. **No busca `-- Up Migration` ni `-- Down Migration`: son comentarios.** Una sección "Down" no es un
+contrato de rollback — es SQL que corre **a continuación** del resto, en la misma transacción.
+
+Caso medido: la primera versión de la migración `0050` **re-creaba la vista rota tres líneas después de
+arreglarla**. Habría quedado **registrada como aplicada**, con el canary fallando exactamente igual.
+
+- **Esa convención es de `node-pg-migrate` (Greenhouse), NO de este repo.** Traerla acá por memoria muscular es
+  el error, y el build no dice nada.
+- **En Globe el rollback de un forward-fix es OTRA migración forward.** No hay otro camino.
+- Era el **ÚNICO** archivo del repo con esa sección: la regla es que **ninguno** la tenga.
+
+### Una migración que cambia una vista compartida se prueba contra PG real ANTES de aplicar
+
+En una transacción con **ROLLBACK**: se ejecuta **el archivo completo, tal como lo haría el runner**, se leen las
+columnas resultantes de `information_schema`, se **verifican los GRANT** y se **ejercita la query REAL de cada
+consumidor**.
+
+Los dos defectos de arriba —el `42P16` y el Down que re-rompía— salieron **así**, y ninguno de los dos es visible
+leyendo el archivo por más atención que se le ponga.
+
+### 🔴 NUNCA pongas un checkpoint de saga delante de una LECTURA PURA
+
+`confirmProductionPromotionCanary` marcaba `activated → verifying_canary` **antes** de leer la evidencia del
+canary — una lectura que **no escribe nada durable**. Y de `verifying_canary` **no se vuelve** (el command exige
+`activated`), así que **cada fallo de esa lectura QUEMABA una promoción**: vista rota, canary inexistente,
+identidad que no calza… y **reintentar quemaba otra**.
+
+Hoy se **lee primero** y el checkpoint cubre **sólo el sello**. La regla general, que vale para cualquier saga:
+**un checkpoint protege efectos durables**; delante de una lectura no protege nada y sí **consume el único estado
+desde el que se puede reintentar**.
+
+### Un `DatabaseError` de pg no puede salir como `internal_error` opaco
+
+La clasificación es por **clase de SQLSTATE**, y separa infraestructura de defecto:
+
+| SQLSTATE | Qué es | Código API |
+|---|---|---|
+| `08` connection · `40` transaction rollback · `53` insufficient resources · `55` object not in prerequisite state · `57` operator intervention | **infraestructura** | **`dependency_unavailable`** (reintentable) |
+| `42703` undefined_column · `23505` unique_violation · `22P02` invalid_text_representation… | **determinista** | **`internal_error`**, que es la verdad |
+
+🔴 **Prometer que reintentar ayuda cuando el fallo es determinista manda a reintentar para siempre contra un
+defecto que sólo se arregla con código.** Un `42703` no mejora esperando, y una promesa de reintento sobre él es
+peor que un 500 honesto.
+
+- La detección es **por FORMA** (`severity` + SQLSTATE de **cinco caracteres**), sin acoplar el transporte al
+  driver, y va **ÚLTIMA** en el mapeo para no ganarle **nunca** a un código nombrado.
+- **Mapear no puede costar la observación:** todo error de Postgres emite su SQLSTATE en el evento
+  **`globe.dispatch.database_error`**. Es la misma regla de `ISSUE-127` — una sanitización sin contraparte de
+  observabilidad no protege información, la destruye.
+
+### Contrato de superficie vista↔consumidor: dos eslabones, y ninguno alcanza solo
+
+- **`consumidor ⊆ contrato declarado`** — se verifica **sin base de datos**, en cada `pnpm check`.
+- **`contrato declarado ⊆ vista real`** — lo verifica el **bloque `DO`** de la migración, en cada apply.
+- Encadenados dan **`consumidor ⊆ vista real`**. El test estructural **no sabe qué hay en PG**; el bloque `DO`
+  **no sabe qué leen los consumidores**. Quedarse con uno es creer que se cubrió la propiedad entera.
+
+El guard barre **TODO el árbol de fuentes** —no el archivo que rompió— y **exige que cada consumidor ALIASE la
+vista**: sin alias, una referencia a columna **no es atribuible** y el guard no puede afirmar nada sobre ella.
+
+🔴 **Lección de método: un guard que no se prueba EN ROJO puede estar midiendo nada.** El detector de alias
+aceptaba **`WHERE` como alias** —o sea cubría **cero**— y eso sólo se vio **provocando el fallo a propósito**.
+
+### El único test del camino stubeaba el store, y un doble no falla por una columna inexistente
+
+Cuando el defecto vive en el **SQL**, el test tiene que ejercitar el **SQL**. Se agregó un **test en vivo opt-in**
+que corre la query real contra el **schema desplegado** y **se salta, visiblemente**, cuando no hay credenciales:
+falló con **`42703` antes de migrar**. Un doble prueba el TypeScript alrededor de la consulta, nunca la consulta.
 
 ## Captura de completitud: cada proveedor avisa distinto (ADR-021, `ISSUE-138`)
 
@@ -1693,6 +1801,7 @@ shippeó con **4 de 11** animaciones del diseño aprobado. El task-lint sólo ve
 
 - El enum `GlobeApiErrorCode` distingue causas: **`policy_blocked` es distinto de `access_denied` y de `not_found`.** El mapeo lo hace `dispatchErrorToApiCode`: `surface_policy_blocked → policy_blocked`; `capability_denied → access_denied`; `capability_not_found` / `surface_not_applicable → not_found`. Un `TrustedContextError` (workspace no bindeado) siempre es `access_denied`, nunca una pista de qué workspaces existen.
 - **NUNCA** filtres detalle interno (secretos, ID tokens, cookies, auth codes, body crudo del upstream, stack) al cliente ni a logs. El SDK jamás devuelve el body crudo del upstream.
+- **Un `DatabaseError` de `pg` se clasifica por CLASE de SQLSTATE, nunca cae a `internal_error` opaco:** infraestructura (`08` connection, `40` transaction rollback, `53` insufficient resources, `55` object not in prerequisite state, `57` operator intervention) → **`dependency_unavailable`** (reintentable); determinista (`42703`, `23505`, `22P02`…) → **`internal_error`**, que es la verdad. La detección es **por forma** (`severity` + SQLSTATE de cinco caracteres) y va **última**, para no ganarle a un código nombrado; el SQLSTATE **siempre** sale en `globe.dispatch.database_error`. Detalle y caso fuente: §Una vista que reemplaza a una tabla (`TASK-1641`).
 - **Un `correlationId` atraviesa todo:** request → trusted context → result → audit. La cadena causal mínima es `greenhouse auth audit id → Globe session id → correlation id → command id → run id → artifact manifest`.
 
 ## Reglas duras (NUNCA / SIEMPRE)
@@ -1787,6 +1896,13 @@ shippeó con **4 de 11** animaciones del diseño aprobado. El task-lint sólo ve
 - **NUNCA** modeles infraestructura como un command/MCP del spine ni dupliques en runtime lo que la IaC provisiona: el runtime consume los outputs versionados de IaC. Cambiar infra es Terraform/`gcloud`, no una capability.
 - **NUNCA** deployees con SA keys ni verifiques readiness por proxy: el deploy es keyless (OIDC→WIF→deployer) y la readiness se lee con `run services describe`.
 - **NUNCA** crees un `pg.Pool` (`new pg.Pool()`) fuera de `packages/database`: el único punto de conexión es **`createGlobePool(config)`** (Cloud SQL connector + pool `pg` + `transaction()`); resolvé el config de runtime con `resolveRuntimePoolConfigFromEnv()`. (Mismo espíritu que el `no-direct-pg-pool` de Greenhouse, pero en Globe.)
+- 🔴 **NUNCA cambies la FORMA de una vista con `CREATE OR REPLACE VIEW`**: sólo permite **agregar columnas al final** conservando nombre, tipo y posición (renombrar la tercera columna aborta con **`42P16 cannot change name of view column`**). La forma se cambia con **`DROP VIEW` + `CREATE VIEW`**, **sin `CASCADE` a propósito** —si alguien construyó encima, el DROP **debe FALLAR** en vez de arrastrarlo—, verificando dependientes por **`pg_depend`/`pg_rewrite` ANTES**, y **re-otorgando los GRANT explícitos** después: el DROP **los pierde**, y **NUNCA** los delegues en `ALTER DEFAULT PRIVILEGES` — un permiso que aparece por herencia es justo el que se rompe en silencio al recrear el objeto.
+- 🔴 **NUNCA escribas una sección `-- Down Migration` en una migración de Globe**: `packages/database/src/migrate.ts` hace **`tx.query(sql)` con el ARCHIVO COMPLETO** dentro de una transacción por archivo y **no parsea markers** ⇒ ese SQL **se EJECUTA a continuación**, no es un contrato de rollback. Es convención de `node-pg-migrate` (**Greenhouse**), no de este repo; acá el rollback de un forward-fix es **otra migración forward**. Caso fuente: la primera versión de `0050` **re-creaba la vista rota tres líneas después de arreglarla** y habría quedado registrada como aplicada, con el canary fallando igual. Era el **único** archivo del repo con esa sección: **ninguno** debe tenerla.
+- **SIEMPRE** prueba **contra PG real, en una transacción con ROLLBACK**, una migración que cambie una **vista compartida**: ejecutar el archivo completo **tal como lo haría el runner**, leer las columnas resultantes de `information_schema`, verificar los **GRANT** y **ejercitar la query REAL de cada consumidor**. Los dos defectos de arriba salieron así y **ninguno se ve leyendo el archivo**.
+- 🔴 **NUNCA pongas un checkpoint de saga delante de una LECTURA PURA:** consume el único estado desde el que se puede reintentar. `confirmProductionPromotionCanary` marcaba `activated → verifying_canary` **antes** de leer la evidencia del canary —que **no escribe nada durable**— y de `verifying_canary` no se vuelve, así que **cada fallo de esa lectura quemaba una promoción** (vista rota, canary inexistente, identidad que no calza) **y reintentar quemaba otra**. Hoy se **lee primero** y el checkpoint cubre **sólo el sello**: un checkpoint protege **efectos durables**.
+- **NUNCA dejes salir un `DatabaseError` de `pg` como `internal_error` opaco, ni lo declares reintentable por defecto**: las clases de SQLSTATE de **infraestructura** (`08`, `40`, `53`, `55`, `57`) mapean a **`dependency_unavailable`**; las **deterministas** (`42703` undefined_column, `23505` unique_violation, `22P02` invalid_text_representation…) siguen siendo **`internal_error`**, que es la verdad — prometer que reintentar ayuda manda a **reintentar para siempre** contra un defecto que sólo se arregla con código. La detección es **por FORMA** (`severity` + SQLSTATE de cinco caracteres), sin acoplar el transporte al driver, y va **ÚLTIMA** para no ganarle nunca a un código nombrado. Y **mapear no puede costar la observación**: todo error de Postgres emite su SQLSTATE en **`globe.dispatch.database_error`**.
+- **NUNCA verifiques la superficie vista↔consumidor con un solo eslabón:** `consumidor ⊆ contrato declarado` lo prueba un test **sin base de datos** en cada `pnpm check`, y `contrato declarado ⊆ vista real` lo prueba el **bloque `DO`** de la migración en cada apply — **encadenados** dan `consumidor ⊆ vista real`, y **ninguno solo alcanza** (el test estructural no sabe qué hay en PG; el bloque `DO` no sabe qué leen los consumidores). El guard barre **TODO el árbol de fuentes**, no el archivo que rompió, y **exige que cada consumidor ALIASE la vista** (sin alias, una referencia a columna **no es atribuible**). 🔴 Y **SIEMPRE pruébalo EN ROJO**: el detector de alias aceptaba **`WHERE` como alias** —cubría cero— y sólo se vio provocando el fallo a propósito. **Un guard que no se probó en rojo puede estar midiendo nada.**
+- **NUNCA pruebes con un doble un defecto que vive en el SQL**: un stub **no puede fallar por una columna inexistente**, así que prueba el TypeScript alrededor de la consulta y nunca la consulta. Va un **test en vivo opt-in** contra el schema desplegado, que **se salta visiblemente** cuando no hay credenciales (el de `TASK-1641` falló con **`42703` antes de migrar**).
 - **NUNCA** uses **password** en el path de **runtime**: el runtime es **keyless IAM database auth** (sin password); el modo PASSWORD existe **SOLO** para el bootstrap one-time del superuser (que después scramblea su propio password ⇒ cero credencial standing).
 - **NUNCA** dejes un servicio **durable** sin sus `GLOBE_POSTGRES_*` (`GLOBE_POSTGRES_INSTANCE_CONNECTION_NAME` + `GLOBE_POSTGRES_DATABASE`) **y** su usuario IAM correcto **por servicio** (`GLOBE_POSTGRES_USER` = `web_runtime` para web / `api_runtime` para api): sin ellos `main.ts` no construye los stores durables y el guard cae a in-memory (permitido solo en `internal_smoke`).
 - **NUNCA** agregues una dep de package nueva a `studio-web` sin **COPY + build** de ese package (`@efeonce-globe/database` incluido) en el `apps/studio-web/Dockerfile`: el bundle `pnpm deploy` debe traer `pg` + el connector, o el servicio bootea sin cliente de DB (lección viva de TASK-1465).
@@ -1807,6 +1923,7 @@ shippeó con **4 de 11** animaciones del diseño aprobado. El task-lint sólo ve
 - **NUNCA** expongas por ninguna surface el **slug de wire**, el **costo vendor** ni el **margen** de una ruta del Producer Catalog: lo público es `model = { name, version? }` (el nombre real "Seedance · 2.0" es ancla de posicionamiento), y la taxonomía `house` es OPERATOR-ONLY detrás de `globe.producer.route.reveal_house` (default audiencia `client`, que omite `house`). El **nombre** del modelo ≠ el **slug** (el campo `model` del catálogo es el nombre; el campo `model` del manifest de adapter es el slug).
 - **NUNCA** reimplementes la resolución de rutas del Producer Catalog: reusá los helpers in-process SSOT (`resolveRouteConstraints`/`getProducerRoute`/`listProducerRoutes`) sin re-dispatch por el registry desde dentro de un handler (mismo patrón que el Evaluation Harness); ampliar/tunear una ruta es editar el array de dato + `PRODUCER_CATALOG_VERSION`, nunca el motor del reader.
 - 🔴 **NUNCA una razón nueva del compiler de ruta sin su código propio Y sin clasificarla en el MISMO commit** (ADR-022 / `TASK-1633`). **Una causa, un código**: `route_creative_contract_mismatch` colapsaba nueve causas con remedios **opuestos** y hoy son ocho códigos —`route_creative_contract_incomplete`, `route_contract_revision_mismatch`, `route_operation_unsupported`, `route_input_slot_unknown`, `route_input_role_mismatch`, `route_input_media_type_invalid`, `route_input_mime_type_invalid`, `route_input_assignment_unresolved`—, con **media type y MIME SEPARADOS** porque uno pide **otro asset** y el otro pide **convertir el que ya tienes**. Y la clasificación en `governed-run-failure-policy.ts` va en el mismo commit: `production-route-failure-classification.test.ts` **rompe el build** si falta, y verifica los catch-all en la dirección contraria. Un `unknown` **por olvido** es indistinguible de uno **declarado**, y cuesta tres entregas por corrida en algo determinista — invisible, además, porque el tope de `ISSUE-135` lo absorbe.
+- 🔴 **NUNCA colapses en `dependency_unavailable` todo error que no sea el de tu propio motor, con un allowlist que cubre uno solo.** `packages/domain/src/asset-governance-jobs.ts` colapsa todo lo que no sea `AssetGovernanceDependencyError`, y su **`SAFE_DEPENDENCY_CODES` contiene SÓLO los cuatro códigos de C2PA** ⇒ los nombres de ClamAV e inspección que `apps/asset-governance/src/engines.ts` **ya emite correctamente** (`clamav_signature_update_failed`, `clamav_signature_stale`, `clamav_unavailable`, `clamav_scan_failed`, `clamav_scan_invalid`, `clamav_signature_missing`, `clamav_version_invalid`) **se destruyen en la frontera**: dos ingests privados murieron en `inspecting` con el código genérico y **sin una línea que dijera por qué**. Misma familia que `SAFE_FINALIZATION_CODES` (§Agregar un código de rechazo son TRES pasos): **el sanitizador borra el nombre ANTES de que nadie pueda clasificarlo**. Un allowlist de códigos seguros crece **con cada motor que emite códigos**, o el motor nuevo es mudo por construcción.
 - **NUNCA declares un vocabulario auditable como `union type`**: los que un test tiene que **enumerar** para afirmar cobertura van como array `as const` (`PRODUCTION_ROUTE_DEPENDENCY_REASONS`, `PRODUCTION_ROUTE_DENIAL_CODES`, `ROUTE_CREATIVE_CONTROLS`, `BRIEF_INGREDIENT_KINDS`). Un union no sobrevive al compilado, así que ningún gate puede recorrerlo.
 - 🔴 **NUNCA dos vocabularios para el mismo valor de dirección creativa** (ADR-022 Delta (b)). **El brief PIDE y el contrato de ruta declara SI SE HONRA**: `BRIEF_INGREDIENT_KINDS` ↔ `ROUTE_CREATIVE_CONTROLS` están alineados **1:1**, con **tres excepciones DECLARADAS y verificadas** (`prompt` = el brief entero, `negative-prompt` = viaja en `notes`, `seed` = determinismo). Un ingrediente sin control es una promesa que nadie validó; un control sin ingrediente es soporte que ningún caller puede ejercer; dos nombres para un concepto son ambas cosas — las tres son **silenciosas**, por eso el guard es `structured-brief-vocabulary.test.ts` y no una convención. Y **NUNCA** declares como control creativo un valor de **forma de salida**: `duration`/`aspect-ratio`/`resolution` son de `RouteConstraintsV1` + `OutputShapeV1`, que ya los validan fail-closed contra la ruta.
 - **NUNCA un `RouteCreativeControlSupportV1` honrado sin `valueShape`, ni un `unsupported` CON `valueShape`.** El guard de carga lo exige en **las dos direcciones**: sin forma, el fail-closed pre-spend **no alcanza a este eje** (no hay contra qué validar); con forma sobre un `unsupported`, la ruta promete una afordancia que no honra. `text` para dirección creativa (estos modelos responden a **lenguaje de oficio**, que está en su corpus, no a taxonomías inventadas), `enum` sólo para un conjunto cerrado **real** del proveedor, `number` para el paramétrico.

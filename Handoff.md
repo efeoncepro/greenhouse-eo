@@ -1,15 +1,19 @@
 # Handoff activo
 
-## TASK-1641 — Globe: el sello del canary FUNCIONA; Omni sellada (2026-08-04)
+## TASK-1641 — Globe: el sello del canary funciona; Omni y Veo SELLADAS (2026-08-04)
 
-**Estado:** `in-progress`. **La causa raíz está cerrada y verificada en runtime.** `canary-confirm` volvió a
-sellar: `ref/motion/reference-v1` (Omni) quedó en **`canary_passed`** con binding `enabled=true` y circuito
-`closed` — el mismo command que devolvía `internal_error` 500 con toda la evidencia correcta.
+**Estado:** `in-progress`. **Causa raíz cerrada y las dos rutas de video promovidas, selladas y habilitadas.**
 
-**Desplegado:** `efeonce-globe@38c528d`. API `globe-api-internal-00211-8sp` (imagen tag `38c528d27b9a`) y Job
-`globe-producer-worker` (digest `sha256:14b80d2f…`, tag `38c528d27b9a`). Migración `0050` aplicada por el
-workflow keyless (run `30953709590`); la vista proyecta **16 columnas** y conserva SELECT para los cuatro
-runtimes.
+| Ruta | Promoción | Binding | Circuito | Canary |
+|---|---|---|---|---|
+| `ref/motion/reference-v1` (Omni) | **`canary_passed`** rev 9 | `enabled` rev 10 | `closed` rev 9 | run `74ea0dec…`, output `sha256:2c3370a9…`, `eligible` |
+| `ref/video/frames-v1` (Veo 3.1) | **`canary_passed`** rev 9 | `enabled` rev 11 | `closed` rev 11 | run `d2788195…`, attempt `68a75b70…`, output `sha256:3a49d5ba…`, `eligible`, 32 cr reservados = 32 gastados |
+
+Las dos son terminales: ya no expiran.
+
+**Desplegado:** `efeonce-globe@38c528d`. API `globe-api-internal-00211-8sp` (tag `38c528d27b9a`) y Job
+`globe-producer-worker` (digest `sha256:14b80d2f…`, mismo tag). Migración `0050` aplicada por el workflow keyless
+(run `30953709590`); la vista proyecta **16 columnas** y conserva SELECT para los cuatro runtimes.
 
 **Los dos defectos que la migración committeada TENÍA y no se veían leyéndola** (medidos contra PG real, en una
 transacción con ROLLBACK, antes de aplicar):
@@ -22,34 +26,35 @@ transacción con ROLLBACK, antes de aplicar):
 
 **Lo demás que entró:** el checkpoint `activated → verifying_canary` ahora ocurre **después** de leer la
 evidencia (era una lectura pura delante de un estado sin retorno: cada intento fallido quemaba una promoción);
-un `DatabaseError` de pg deja de ser `internal_error` opaco —clases de infraestructura `08/40/53/55/57` →
-`dependency_unavailable`, las deterministas siguen siendo `internal_error`, que es la verdad— y todo error de
-Postgres emite su SQLSTATE en `globe.dispatch.database_error`; y el path tiene test real (estructural sin base
-+ en vivo opt-in), registrado en el script `test` del package y probado en rojo y en verde.
+un `DatabaseError` de pg deja de ser `internal_error` opaco —infraestructura `08/40/53/55/57` →
+`dependency_unavailable`, las deterministas siguen `internal_error`, que es la verdad— y todo error de Postgres
+emite su SQLSTATE en `globe.dispatch.database_error`; y el path tiene test real (estructural sin base + en vivo
+opt-in), registrado en el script `test` del package y probado en rojo y en verde.
 
-**Veo quedó a un paso, y el paso lo bloquean DOS defectos ajenos a esta task.** La promoción
-`promotion_ddd0977c-c6e7-4fa6-bd31-61737c108d31` está **`activated`** con ventana hasta **2026-08-05T01:03 UTC**,
-con binding y circuito correctos. Falta su canary, y tiene que ser **nuevo**: `resolveCanary` exige
-`created_at >= activatedAt`, así que la corrida de las 20:20 no sirve. La ruta `ref/video/frames-v1` pide 1-2
-referencias de imagen, y **ninguno de los dos caminos de entrada funciona hoy**:
+### 🔴 Cómo se produjo el canary de Veo, y qué NO prueba
 
-1. **«Usar como referencia» no despacha nada.** Cero `POST /v1/commands`, cero consola, contador clavado en
-   `0 / 2`. Probado por coordenada con hover, por `ref` del árbol de accesibilidad y por `.click()` en la propia
-   página. **No es el overlay**: «Añadir a favoritos», en la misma tarjeta, **sí** registra. «Recrear» tampoco
-   carga la receta. Es la familia «la capability existe y la UI no la consume».
-2. **La subida ingesta pero Asset Governance falla.** Dos ingests seguidos murieron en la etapa `inspecting` con
-   `dependency_unavailable` tras 5 intentos. La causa está **enmascarada**: `SAFE_DEPENDENCY_CODES`
-   (`asset-governance-jobs.ts`) sólo deja pasar los cuatro códigos de C2PA, así que los nombres de ClamAV y de
-   inspección —que `engines.ts` **ya emite correctamente**— se destruyen en la frontera. Tercera aparición de
-   ISSUE-127 en el día. ⚠️ El ingest se disparó con un `File` sintético desde el browser, así que **antes de
-   declarar defecto de plataforma hay que reproducirlo con una subida real por el selector**; el enmascaramiento
-   sí está verificado con independencia de eso.
+Por el **carril gobernado**, con los commands canónicos del spine (`estimate` → `prepare` → `execute`) sobre el
+transporte de `scripts/producer-ui-canary-lib.mjs`. Forma: 720p, 8 s, 16:9, `silent`,
+`inputMode {kind:'frames', hasEndFrame:false}`; primer cuadro = el output ya gobernado
+`output:8a5e24ec-…:0` declarado como `authorizedInputs`.
 
-Ambos tienen chip propio. Si dentro de la ventana alguien sube un archivo real por el selector y genera, el sello
-es un solo dispatch de `canary-confirm:checker` con `expectedRevision: 7`.
+**NO se produjo desde la UI del Producer, y la UI sigue sin poder producirlo.** `ProducerFeedRoute.tsx` cablea
+`onReference`, `onRecreate`, `onFavorite` y `onDownload` a **`() => undefined`** — no-ops explícitos —, así que
+«Usar como referencia» no despacha ningún command y sin referencia el estimado no se calcula. El comentario del
+propio archivo ya razonó que un no-op deja el botón mintiendo, pero sólo lo aplicaron a `onSelect`.
 
-**Ventanas vivas al cierre:** Omni **sellada** (terminal, ya no expira). Veo `activated` hasta 01:03 UTC — si
-nadie genera dentro, se revierte sola y el binding vuelve a `false`, que es donde ya estaba.
+Consecuencias, sin adornos: **el Scope 1 de la task —un canary de ruta arbitraria canónico y committeado— sigue
+pendiente**, y **la generación desde el Producer para rutas con entrada obligatoria sigue bloqueada**. Ambos
+defectos tienen chip propio.
+
+**Y un hallazgo sobre el ingest privado, con su límite declarado.** Dos subidas de referencia murieron en la
+etapa `inspecting` con `dependency_unavailable` tras 5 intentos, mientras el asset **generado** de este mismo
+canary pasó `inspecting` y `malware_scan` sin problema — o sea el worker está sano y lo que falla es el camino
+private-ingest. ⚠️ Esas subidas se dispararon con un `File` **sintético** desde el browser, así que antes de
+llamarlo defecto de plataforma hay que reproducirlo con el selector real. Lo que **sí** queda verificado es el
+**enmascaramiento**: `SAFE_DEPENDENCY_CODES` sólo deja pasar los cuatro códigos de C2PA, así que los nombres de
+ClamAV y de inspección que `engines.ts` ya emite se destruyen en la frontera. Tercera aparición de ISSUE-127 en
+el día.
 
 Historia anterior: [Handoff.archive.md](Handoff.archive.md).
 

@@ -7,6 +7,51 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-04 — Globe: la promoción de una ruta vuelve a poder sellarse (y el sello deja de quemar promociones)
+
+- **Una promoción se moría con la evidencia perfecta** (`efeonce-globe@38c528d`). El último paso de la saga de
+  ADR-009 —el canary que sella la promoción— devolvía `internal_error` 500 aunque la corrida, el intento, el output
+  retenido y la decisión de governance estuvieran todos donde debían. Como `activated` no es terminal y la ventana
+  vence, **cada promoción quedaba condenada a revertirse sola: 10 de 12 históricas terminaron `rolled_back`**,
+  varias segundos después de su vencimiento. El diseño no se relajó; lo que faltaba era que su último paso pudiera
+  ejecutarse.
+- **La causa era de forma, no de datos.** El resolver del canary hace JOIN por linaje contra la vista
+  `generated_asset_rights_authority_effective`, que proyectaba **3 columnas** mientras el consumidor usa **14**:
+  PostgreSQL fallaba en **planificación** con `42703`, así que ningún dato podía salvarlo. La migración `0050` la
+  lleva a **16 columnas** —todo el linaje más `rights_policy_purpose`— y la razón es de dominio: **una corrección
+  corrige los DERECHOS, no el origen.** La tabla de correcciones no tiene columnas de linaje y tiene FK a la base,
+  así que el linaje es invariante por construcción; el `UNION ALL` anterior lo perdía por accidente.
+- **La migración committeada no arreglaba nada, y no se veía leyéndola.** Dos defectos fatales, hallados
+  ejercitándola contra PG real dentro de una transacción con `ROLLBACK`: `CREATE OR REPLACE VIEW` **no puede
+  reordenar ni renombrar** columnas (aborta con `42P16`, así que va `DROP` + `CREATE` sin `CASCADE`, re-otorgando
+  los GRANT), y el runner de migraciones de Globe **ejecuta el archivo completo sin parsear markers**, de modo que
+  la sección `-- Down Migration` re-creaba la vista rota tres líneas después de arreglarla — y habría quedado
+  registrada como aplicada.
+- **Reintentar el sello ya no quema una promoción.** El checkpoint `activated → verifying_canary` se escribía
+  **antes** de leer la evidencia, que es una lectura pura; y de `verifying_canary` no se vuelve. Ahora se lee
+  primero y el checkpoint cubre sólo el sello.
+- **Un `DatabaseError` deja de ser un 500 opaco:** las clases de infraestructura (`08`, `40`, `53`, `55`, `57`) →
+  `dependency_unavailable`; las deterministas (`42703`, `23505`, …) siguen en `internal_error`, **que es la
+  verdad** — prometer reintento sobre un defecto de código manda a reintentar para siempre. Todo error de Postgres
+  emite además su SQLSTATE en `globe.dispatch.database_error`.
+- **La frontera consumidor↔schema queda cubierta por los dos lados**, probada en rojo y en verde: `consumidor ⊆
+  contrato declarado` (test sin base, en cada `pnpm check`) y `contrato ⊆ vista real` (bloque `DO`, en cada apply),
+  más un test en vivo opt-in que ejecuta la query real. El defecto vivía exactamente entre los dos gates.
+- **Runtime: las dos rutas de video quedaron promovidas, selladas y habilitadas.**
+  `ref/motion/reference-v1` (Gemini Omni Flash) quedó **`canary_passed`** — promoción sellada, binding habilitado,
+  circuito cerrado. `ref/video/frames-v1` (Veo 3.1) también quedó **`canary_passed`** (revisión 9, terminal:
+  ya no expira): canary con run `d2788195…`, attempt `68a75b70…`, output `sha256:3a49d5ba…`, governance
+  `eligible` y **32 créditos reservados = 32 gastados**; salida 720p / 8 s / 16:9 / `silent` con `inputMode
+  {kind:'frames', hasEndFrame:false}` y primer cuadro tomado de un output ya gobernado, declarado como
+  `authorizedInputs` con `rights: internal-owned`.
+- **El canary de Veo no se produjo desde la UI del Producer**, sino por el **carril gobernado**, con los commands
+  canónicos del spine (`estimate` → `prepare` → `execute`). La UI sigue sin poder producirlo: el botón «Usar como
+  referencia» del feed no despacha ningún command y sin referencia el estimado no se calcula; la subida ingesta
+  pero Asset Governance falla en `inspecting` con la causa enmascarada. **Ambos bloqueos son ajenos a TASK-1641**
+  y quedaron registrados aparte; ya no ponen en riesgo la promoción, pero **el Scope 1 de TASK-1641 —un canary de
+  ruta arbitraria canónico y committeado— sigue pendiente**, y la generación desde el Producer para rutas con
+  entrada obligatoria sigue bloqueada.
+
 ## 2026-08-04 — Globe: skill compartida para integrar modelos por ruta
 
 - **ADR-023 implementa `greenhouse-globe-model-fleet`** como skill espejada para Codex y Claude, con contrato de

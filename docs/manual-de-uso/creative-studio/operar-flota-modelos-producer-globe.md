@@ -1,9 +1,9 @@
 # Operar la flota de modelos del Producer
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-07-25 por Claude (TASK-1554)
-> **Ultima actualizacion:** 2026-07-30 por Codex
+> **Ultima actualizacion:** 2026-08-04 por Claude (TASK-1641)
 > **Documentacion funcional:** [Flota de modelos del Producer](../../documentation/creative-studio/efeonce-globe-producer-flota-modelos.md)
 
 ## Para qué sirve
@@ -75,6 +75,22 @@ La distinción no es cosmética: un modelo ofrecido como ejecutable donde no pue
 No se edita ninguna pantalla. Si alguien pide "cablear el modelo en la UI", algo se desvió del
 diseño. El procedimiento transversal completo y sus receipts pertenecen a `TASK-1578`; este manual
 no crea un segundo ledger ni una segunda promoción.
+
+> ⚠️ **El paso 6 no es una verificación opcional: es el sello de la promoción, y tiene ventana.** La
+> generación real de la ruta exacta (*canary*) es lo que cierra la saga de ADR-009. Mientras no exista,
+> la promoción está **activada pero no sellada** y **se revierte sola al vencer la ventana** — el modelo
+> vuelve a "Próximamente" sin ningún error visible. Nadie puede declarar que el canary pasó: el servidor
+> resuelve la evidencia (corrida, intento, output retenido y decisión de governance) por su cuenta.
+> Medido el 2026-08-04: **10 de 12 promociones históricas terminaron revertidas**, varias segundos
+> después de su vencimiento, porque el sello fallaba con un error genérico aun con la evidencia
+> correcta. Ya está corregido (ver el Delta 2026-08-04 del
+> [ADR-009](../../architecture/creative-studio/EFEONCE_GLOBE_ROUTE_PROMOTION_OPERATION_DECISION_V1.md)),
+> pero la regla operativa queda: **planifica el canary dentro de la ventana, no “para después”**. Si la
+> ruta exige referencias de imagen, verifica **antes** que puedes aportarlas desde el Producer: hoy los
+> dos caminos para aportarlas están rotos, así que el canary de `ref/video/frames-v1` (Veo 3.1) —sellado
+> el 2026-08-04— tuvo que producirse por el **carril gobernado**, no desde el Producer. La promoción quedó
+> sellada y la ruta habilitada, pero generar desde el Producer un modelo que exige referencias todavía no
+> funciona.
 
 ### Canary Recraft v4.1 de referencia
 
@@ -150,6 +166,7 @@ por workspace, recomendado honesto, y que **el identificador del proveedor nunca
 | El modelo no aparece en ninguna modalidad | No tiene ruta en el catálogo | Declarar la ruta (paso 1 de "Agregar") |
 | Aparece en un workspace y no en otro | Comportamiento correcto: promoción por workspace | Promover donde haga falta |
 | Dice "Próximamente" y sabes que funciona | Verificado en el Model Lab, **no promovido** a producción | Revisar el ledger; promover si corresponde |
+| **Estaba disponible y dejó de estarlo**, sin error ni cambio de modelo | La promoción venció **sin su canary** y se revirtió sola (binding deshabilitado, circuito abierto) | Volver a promover y **sellar el canary dentro de la ventana**; si el sello falla con un error genérico, es defecto de plataforma, no falta de evidencia |
 | Nexa y la pantalla muestran distinto | **Un consumer se armó su propia lista** | Bug: buscar el cálculo paralelo y borrarlo |
 | Falla después de reservar crédito | Se ofreció ejecutable donde no puede correr | Bug: reportar con la ruta y el modo |
 | Un run pagado queda sin finalizar tras un fix | El proveedor terminó, pero falló la reconciliación local | Leer el run/attempt y recuperar idempotentemente; no generar otra vez |
