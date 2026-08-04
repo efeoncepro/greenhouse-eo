@@ -27,12 +27,26 @@ un `DatabaseError` de pg deja de ser `internal_error` opaco —clases de infraes
 Postgres emite su SQLSTATE en `globe.dispatch.database_error`; y el path tiene test real (estructural sin base
 + en vivo opt-in), registrado en el script `test` del package y probado en rojo y en verde.
 
-**Veo quedó a un paso, y el paso lo bloquea un defecto de UI ajeno a esta task.** La promoción
-`promotion_ddd0977c-c6e7-4fa6-bd31-61737c108d31` está **`activated`** con ventana hasta **2026-08-05T01:03 UTC**.
-Falta su canary: `resolveCanary` exige `created_at >= activatedAt`, así que la corrida de las 20:20 no sirve y
-hace falta una generación nueva. En el Producer, en modo **Cuadros**, **«Usar como referencia» y «Recrear» no
-disparan ningún command** —cero `POST /v1/commands`, cero consola— y sin referencia el estimado nunca se
-calcula. Es la familia «la capability existe y la UI no la consume»; el único otro camino es subir un archivo.
+**Veo quedó a un paso, y el paso lo bloquean DOS defectos ajenos a esta task.** La promoción
+`promotion_ddd0977c-c6e7-4fa6-bd31-61737c108d31` está **`activated`** con ventana hasta **2026-08-05T01:03 UTC**,
+con binding y circuito correctos. Falta su canary, y tiene que ser **nuevo**: `resolveCanary` exige
+`created_at >= activatedAt`, así que la corrida de las 20:20 no sirve. La ruta `ref/video/frames-v1` pide 1-2
+referencias de imagen, y **ninguno de los dos caminos de entrada funciona hoy**:
+
+1. **«Usar como referencia» no despacha nada.** Cero `POST /v1/commands`, cero consola, contador clavado en
+   `0 / 2`. Probado por coordenada con hover, por `ref` del árbol de accesibilidad y por `.click()` en la propia
+   página. **No es el overlay**: «Añadir a favoritos», en la misma tarjeta, **sí** registra. «Recrear» tampoco
+   carga la receta. Es la familia «la capability existe y la UI no la consume».
+2. **La subida ingesta pero Asset Governance falla.** Dos ingests seguidos murieron en la etapa `inspecting` con
+   `dependency_unavailable` tras 5 intentos. La causa está **enmascarada**: `SAFE_DEPENDENCY_CODES`
+   (`asset-governance-jobs.ts`) sólo deja pasar los cuatro códigos de C2PA, así que los nombres de ClamAV y de
+   inspección —que `engines.ts` **ya emite correctamente**— se destruyen en la frontera. Tercera aparición de
+   ISSUE-127 en el día. ⚠️ El ingest se disparó con un `File` sintético desde el browser, así que **antes de
+   declarar defecto de plataforma hay que reproducirlo con una subida real por el selector**; el enmascaramiento
+   sí está verificado con independencia de eso.
+
+Ambos tienen chip propio. Si dentro de la ventana alguien sube un archivo real por el selector y genera, el sello
+es un solo dispatch de `canary-confirm:checker` con `expectedRevision: 7`.
 
 **Ventanas vivas al cierre:** Omni **sellada** (terminal, ya no expira). Veo `activated` hasta 01:03 UTC — si
 nadie genera dentro, se revierte sola y el binding vuelve a `false`, que es donde ya estaba.

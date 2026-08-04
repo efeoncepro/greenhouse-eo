@@ -124,11 +124,35 @@ la tabla reintroduce el mismo defecto una columna después.
 binding y circuito correctos. Falta su canary, y hace falta uno **nuevo**: `resolveCanary` exige
 `created_at >= activatedAt`, así que la corrida `f0e8b876` de las 20:20 no sirve.
 
-En el Producer, modo **Cuadros** (`ref/video/frames-v1`, que pide 1-2 referencias de imagen), **«Usar como
-referencia» y «Recrear» no disparan ningún command**: cero `POST /v1/commands`, cero mensajes de consola, el
-contador queda en `0 / 2` y sin referencia el estimado nunca se calcula. Los botones existen, están habilitados y
-son enfocables. Es la familia ya documentada de «la capability existe y la UI no la consume»; el único otro camino
-de entrada es subir un archivo. **Merece su propia task**: no es la saga de promoción ni el canary.
+La ruta pide 1-2 referencias de imagen y **los dos caminos de entrada están rotos hoy**:
+
+1. **«Usar como referencia» no despacha nada.** Cero `POST /v1/commands`, cero consola, contador en `0 / 2`.
+   Probado por coordenada con hover previo, por `ref` del árbol de accesibilidad y por `.click()` en la propia
+   página. **No es el overlay ni pointer-events**: «Añadir a favoritos», en la misma tarjeta y el mismo overlay,
+   **sí** registra, y toda la cadena de padres computa `pointer-events: auto`. «Recrear» tampoco carga la receta
+   en el composer. Es la familia ya documentada de «la capability existe y la UI no la consume».
+2. **La subida ingesta, pero Asset Governance falla.** Dos ingests consecutivos murieron en la etapa
+   **`inspecting`** —la primera— con `dependency_unavailable` tras 5 intentos
+   (`asset_f861b971-4a6b-44eb-afc0-95623718131b`, `asset_86670e74-c71f-498a-9727-92d2f9a60461`). No es
+   transitorio. Un private-ingest anterior (2026-07-31) sí llegó a `eligible`, así que algo cambió.
+
+   **Y la causa está enmascarada, tercera aparición de ISSUE-127 en el día.**
+   `packages/domain/src/asset-governance-jobs.ts` colapsa todo error que no sea `AssetGovernanceDependencyError`
+   en `dependency_unavailable`, y su `SAFE_DEPENDENCY_CODES` contiene **sólo los cuatro códigos de C2PA**. Los
+   nombres de ClamAV y de inspección que `engines.ts` **ya emite correctamente** —`clamav_signature_update_failed`,
+   `clamav_signature_stale`, `clamav_unavailable`, `clamav_scan_failed`, `clamav_scan_invalid`,
+   `clamav_signature_missing`— se destruyen en la frontera. Sospechoso concreto en los logs del Job, en cada
+   corrida: `ERROR: NotifyClamd: Can't find or parse configuration file /etc/clamav/clamd.conf` (freshclam puede
+   salir con código distinto de 0 por eso, y `engines.ts:47` sólo perdona la salida que matchea `/up[- ]to[- ]date/i`).
+
+⚠️ **Límite de honestidad declarado:** el ingest se disparó desde el browser con un `File` **sintético**
+(canvas → `DataTransfer` → `input.files` → evento `change`), porque el tool de subida rechaza rutas fuera de la
+sesión. **No está descartado que ese camino haya omitido un paso real del flujo de subida** —por ejemplo el PUT
+de los bytes a GCS, lo que explicaría un `describe` en 404 dentro de `inspecting`—, así que **antes de declarar
+defecto de plataforma hay que reproducirlo con una subida real por el selector de archivos**. Lo que **sí** queda
+verificado con independencia de eso es el enmascaramiento de la causa.
+
+Ambos defectos son ajenos a esta task —no son la saga de promoción ni el canary— y quedaron con su propio chip.
 
 Y refuerza el Scope 1 de esta task: mientras `ref/video/frames-v1` siga `executionReady: false` con
 `pending: governed_source_and_route_specific_controls`, no existe camino canónico para producir el canary de una
