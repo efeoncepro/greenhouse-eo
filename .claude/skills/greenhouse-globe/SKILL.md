@@ -471,8 +471,10 @@ para OpenAI y Vertex, no un síntoma.** Un agente que lo lea como deuda va a "ar
 
 ### ⚠️ Latencia esperada: ~20-25 min en frío NO es un cuelgue
 
-Asset Governance avanzaba **una etapa por tick de su cron** (`*/5` hasta el 2026-08-04, luego `*/1`): cuatro
-etapas × 5 min ≈ **20 minutos de reloj para ~60 s de trabajo**. Lo encontraron **dos caminos independientes el
+Asset Governance avanza **una etapa por tick de su cron**, así que su latencia es **cadence-bound, no
+size-bound**: el trabajo real son ~60 s y el reloj lo pone el scheduler. Con `*/5` eso daban **~20-25 min en
+frío**; `ISSUE-137` lo bajó a `*/1` y la medición post-arreglo da **7,9 min totales con governance en 3** —
+que imagen y video coincidan es la prueba de que el cuello era la cadencia. Lo encontraron **dos caminos independientes el
 mismo día**: el readback de `ISSUE-137` y el canary de generación, que **abortaba a los 20 min sobre un sistema
 perfectamente sano** (la corrida completó sola en la entrega 21).
 

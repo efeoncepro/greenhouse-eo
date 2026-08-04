@@ -29,6 +29,15 @@ rol, combinaciones, controles con mecanismo y forma de valor, contrato de salida
 declara qué honra la ruta y el brief lleva el valor pedido, nunca al revés, y la forma de salida (duración, ratio,
 resolución) pertenece a `RouteConstraintsV1`/`OutputShapeV1`. La compilación del prompt efectivo es por ruta.
 
+La captura de completitud de un proveedor es **propiedad del proveedor, no una elección nuestra**, según
+[ADR-021](docs/architecture/creative-studio/EFEONCE_GLOBE_PROVIDER_COMPLETION_CAPTURE_DECISION_V1.md): Fal avisa
+por webhook firmado **por request**, OpenAI **no emite eventos de imagen** —así que su `poll` es correcto por
+diseño, no una deuda— y Vertex sólo ofrece la operación de larga duración. El aviso acelera y nunca es la única
+vía. Una firma válida **no prueba propiedad** cuando el JWKS del proveedor es global; las URLs de seguimiento de
+Fal **no son derivables** y se declaran por endpoint desde evidencia medida; el código HTTP que devolvemos
+gobierna si el proveedor reintenta. Y cuando un run llega a terminal, **todo agregado dependiente converge o
+queda observable**, declarado como lista enumerable cuyo incumplimiento rompe el build.
+
 La flota de modelos de Globe se resuelve y promueve por identidad exacta de ruta. El estado live se consulta en
 `globe.producer.fleet.list` y el mapa humano en `GLOBE_MODEL_FLEET_STATUS.md`; una promoción se cierra con
 evaluación/derechos/readbacks y una generación real desde la UI autenticada. Un MIME de transporte genérico nunca

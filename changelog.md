@@ -7,6 +7,21 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-04 — Globe: la captura de completitud tenía trece huecos y ningún contrato escrito
+
+- **ADR-021 nace porque el contrato no existía.** Ningún doc de arquitectura mencionaba «webhook»: la captura de
+  completitud vivía sólo en el código, y esa ausencia dejó acumular **13 defectos** sin que nadie los viera —
+  tres terminaban en un asset **generado, facturado e irrecuperable**, y ninguno producía error visible.
+- **Cada proveedor avisa distinto, y eso es la decisión**: Fal por webhook **por request**, OpenAI **no emite
+  eventos de imagen** (su `poll` es correcto por diseño), Vertex sólo por operación de larga duración.
+- **12 de 13 cerrados y desplegados**, verificados con una generación real (run `completed`, experimento
+  `candidate_ready`, governance `eligible`). Queda D12, que ya no es pérdida sino ventana de latencia.
+- **Convergencia terminal como invariante enumerable** (`TASK-1469`): 4 experimentos huérfanos → 0, y tres
+  señales de outbox pasaron de imprimirse a mirarse. `outboxDeadLetter` **medía filas en vez de intentos** —
+  decía 3 para uno.
+- **Cierre documental**: ADR-021 + doc funcional + manual + dos runbooks + las dos skills espejadas y el overlay
+  de arquitectura, donde se corrigieron **cuatro contradicciones activas**.
+
 ## 2026-08-04 — Globe Asset Governance: la latencia deja de multiplicarse por el cron
 
 - **ISSUE-137 resuelto en runtime** con `efeonce-globe@d78ce01`: Terraform cambió

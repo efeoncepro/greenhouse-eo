@@ -4,9 +4,41 @@
 
 ## Alcance
 
-Este runbook cubre alertas `globe_producer_worker_failures`, edad de cola del Producer y fallas del Job de Asset
-Governance. Una alerta confirma una señal, no la causa: primero correlacionar ejecución, run/outbox y logs antes de
-reintentar o modificar estado.
+Este runbook cubre alertas `globe_producer_worker_failures`, edad de cola del Producer, fallas del Job de Asset
+Governance y las **tres alertas de salud del ciclo de corridas** vivas desde el 2026-08-04. Una alerta confirma
+una señal, no la causa: primero correlacionar ejecución, run/outbox y logs antes de reintentar o modificar estado.
+
+## ⚠️ Antes de triagear: ~8 minutos NO son una cola stale
+
+La latencia del camino en frío es **cadence-bound, no size-bound**: Asset Governance avanza **una etapa por tick
+de su cron**, así que el reloj lo pone el scheduler y no el peso del archivo. Con el cron cada minuto una corrida
+sana tarda **~7,9 min** (con `*/5` tardaba ~20-25). Que imagen y video midan casi lo mismo es la prueba.
+
+🔴 **Un canary que aborta por debajo de ese presupuesto reporta su propia impaciencia, no un defecto.** Ocurrió:
+una prueba automática abortó sobre una corrida perfecta que completó sola. Antes de tocar nada, mide el estado.
+
+## Las tres señales del ciclo de corridas
+
+| Alerta | Severidad | Qué significa | Primera acción |
+|---|---|---|---|
+| `outbox terminal attempts` | ERROR, sin espera | Intentos que **ya murieron**: trabajo pedido que no va a llegar | Mirar la **serie**, no el valor: distingue preexistente de recién causado |
+| `outbox retry storm` | WARNING, con ventana | Intentos que **insisten** por encima del umbral, sin cerrar | Alerta temprana; un `waiting` alto puede ser sano por contrato |
+| `run aggregate divergence` | ERROR | Un agregado que depende de una corrida terminal **no convergió** | Se mide **después** del barrido: >0 significa que el barrido no pudo cerrarlo |
+
+🔴 **La señal terminal cuenta INTENTOS DISTINTOS, no filas de outbox.** Se llamaba `outboxDeadLetter` y contaba
+filas —una por fase—, así que decía **3 para UN solo intento**. Toda lectura previa al 2026-08-04 que cite ese
+número está inflada.
+
+⚠️ **La cola stale de reconciles ya no es residuo esperado**: un barrido previo a cada tanda la cierra, y la
+divergencia medida fue **0**. Si aparece, es defecto nuevo.
+
+## Al crear o editar una alerta
+
+**El aligner es función del TIPO de métrica, no del gusto de la alerta.** `ALIGN_COUNT` sólo vale sobre
+DELTA/INT64 (métrica que cuenta entradas de log); una que **extrae un valor** es DELTA/DISTRIBUTION y necesita
+`ALIGN_PERCENTILE_99`. Copiarlo de la alerta hermana equivocada **falla en el apply con 400**, no antes.
+
+Y un **404 de la métrica recién creada no es defecto**: es propagación de Cloud Monitoring, hasta 10 minutos.
 
 ## Primeros cinco minutos
 

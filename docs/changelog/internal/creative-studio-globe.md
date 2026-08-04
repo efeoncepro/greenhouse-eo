@@ -6,6 +6,45 @@
 
 # Changelog
 
+## 2026-08-04 — Captura de completitud y convergencia terminal: 13 huecos, 12 cerrados
+
+- **ADR-021 nace porque el contrato no existía.** Ningún documento de arquitectura mencionaba siquiera la
+  palabra «webhook»: la captura de completitud vivía sólo en el código. Una auditoría de Fal, OpenAI y Vertex
+  contra su documentación oficial encontró **13 huecos**, tres de los cuales terminaban en un asset
+  **generado, facturado e irrecuperable**, y **ninguno producía error visible** — dos fallaban *exactamente en
+  el momento del éxito*.
+- **Cada proveedor avisa distinto y eso es la decisión, no un accidente.** Fal por webhook firmado **por
+  request**; OpenAI **no emite eventos de imagen**, así que su `poll` es correcto por diseño; Vertex **no
+  ofrece callback**, sólo LRO. `completion_driver='poll'` con cero señales es el comportamiento correcto.
+- **Los tres que perdían un asset pagado:** el techo del poll de Veo ahora se **deriva** del presupuesto de
+  salida (2 MB contra un video inline en base64); la lease sube de 60 s a 10 min; y el rescate del lost-ack de
+  Fal repone la evidencia desde una base **declarada por endpoint y medida**, porque la base de su queue **no
+  es derivable** — un endpoint descarta 3 segmentos del path, otro 1, y su propia doc muestra uno que conserva
+  los 3.
+- **`reconciliationFailureCode` leía el campo equivocado** (`.errorCode` mientras el error expone `.code`), así
+  que todos los códigos del poll colapsaban en uno. 12.ª aparición de `ISSUE-127`, y la primera **con el guard
+  mecánico ya vigente**: un test de cobertura ve que un código esté clasificado, no que llegue a la política
+  por el campo correcto.
+- **Se respeta `X-Fal-Retryable`** en vez de inferir del status HTTP; el ingress devuelve **503** ante un fallo
+  nuestro y 400 sólo ante rechazo definitivo; se desactivan los **fallbacks de modelo de Fal**, que podían
+  ejecutar un modelo distinto del aprobado dejando el snapshot mintiendo.
+- **El JWKS de Fal es GLOBAL**, así que una firma válida no prueba que la entrega sea nuestra. El guard de
+  propiedad quedó cableado y **su valor se midió en vez de adivinarse**: es un identificador estilo Auth0 que
+  no se parece al username del panel — suponerlo habría rechazado todas las entregas legítimas.
+- **Convergencia terminal declarada como invariante enumerable** (`TASK-1469`): cuando un run llega a terminal,
+  todo agregado dependiente converge o queda observable. Un agregado sin postura rompe el build y un
+  `observable` sin señal se rechaza. Barrido hacia atrás con el mismo `abandon` del camino normal: **4
+  experimentos huérfanos → 0**.
+- **Las señales de outbox dejaron de imprimirse y pasaron a mirarse**: 3 `logging_metric` + 3 `alert_policy`.
+  Y `outboxDeadLetter` **no tenía sólo mal el nombre: medía filas de outbox en vez de intentos** — decía 3 para
+  uno. Hoy es `outboxTerminalAttempts`.
+- **Verificado con una generación real:** run `completed`, experimento `candidate_ready`, governance
+  `eligible`. La clase `waiting` sostuvo **21 entregas** sin matar la corrida; con el tope anterior habría
+  muerto en la tercera, ya cobrada.
+- **Abierto:** `ISSUE-138` D12 — la retención de la Operation de Vertex sigue sin documentarse. Ya no es una
+  pérdida garantizada sino una ventana de latencia; su arreglo (`storageUri`) exige canary con gasto real.
+
+
 ## 2026-07-21 — TASK-1508: Cloud Run bajo IaC + ownership por campo
 
 - **Los dos servicios Cloud Run entraron a Terraform por import brownfield:** `2 imported / 2 changed / 0 destroyed`.

@@ -80,33 +80,41 @@ gcloud logging read \
   --project efeonce-globe
 ```
 
-Cada tanda del worker trae `outboxDeadLetter` y `outboxRetryStorm`. En estado normal, **los dos en 0**.
+Cada tanda del worker trae `outboxTerminalAttempts`, `outboxRetryStorm` y `divergentAggregates`. En estado
+normal, **los tres en 0** — y desde el 2026-08-04 los tres tienen alerta viva en Cloud Monitoring.
 
 ⚠️ **Lo que prueba que un dead letter no es tuyo es la SERIE TEMPORAL, no el valor puntual.** Mira
 **cuándo apareció**, no cuánto vale. Un `1` sin su historia no distingue "venía de antes" de "lo acabo
 de causar". En los rollouts del 2026-08-02 el valor fue `1` en todos y era preexistente desde ~2,5 h
 antes del primer deploy, además con tendencia a la baja (5 → 3 → 1).
 
-⚠️ **El nombre `outboxDeadLetter` engaña, y te va a hacer perder tiempo.** No cuenta filas en estado
-`dead_letter` de la outbox. Cuenta **intentos en estado `failed` con `terminal_at` puesto, en las
-últimas 24 horas**. De hecho la tabla `governed_run_outbox` ni siquiera tiene un estado
-`dead_letter`: sus estados son `pending`, `leased`, `done` y `dead`, y el camino terminal la deja en
-`done`. Consultar la tabla buscando ese estado devuelve **vacío** y confunde. La consulta real vive en
-`readOutboxHealth` (`packages/database/src/stores/governed-run-store.ts`).
+⚠️ **La señal se llamaba `outboxDeadLetter` y no era sólo un mal nombre: MEDÍA MAL.** Contaba **filas de la
+outbox**, y como una corrida tiene una fila por fase, decía **3 para UN solo intento muerto**. Cualquier
+lectura anterior al 2026-08-04 que cite ese número está inflada. Hoy cuenta intentos distintos.
+
+Y ojo con el otro malentendido, que sigue vigente: el estado `dead` **sí existe** en la outbox y **sí tiene
+filas** — las escribe la recuperación histórica de crédito, no el cierre terminal de una corrida. Buscar ahí
+la explicación de esta señal te manda a otro lado.
 
 El payload del worker, además, sirve **mejor** que consultar la base directamente: da la serie
 temporal, y sigue disponible aunque el ADC esté vencido.
 
 ### 3. Diagnosticar una pieza que dice "generando" para siempre
 
-Ese síntoma tiene una causa estructural conocida: **`governed_runs` y `experiments` son dos agregados
-distintos**, y la pantalla lee el experimento. Si la corrida murió y el experimento no se cerró, la
+🔴 **Paso 0, antes de cualquier otra cosa: ¿pasaron menos de ~8 minutos?** Entonces probablemente no pasa
+nada. La revisión del asset avanza **una etapa por pasada programada**, así que la latencia la manda el reloj
+del scheduler y no el tamaño del archivo: con el cron cada minuto, una corrida sana tarda **~7,9 min**
+(cuando corría cada 5, tardaba ~20-25). Una prueba automática abortó sobre un sistema perfectamente sano por
+saltarse este paso. **Sin él, este runbook te manda a diagnosticar corridas que están bien.**
+
+Pasado ese umbral, el síntoma tiene una causa estructural conocida: **`governed_runs` y `experiments` son dos
+agregados distintos**, y la pantalla lee el experimento. Si la corrida murió y el experimento no se cerró, la
 pieza miente indefinidamente.
 
 Recorrido:
 
 1. **¿La corrida está terminal?** Si el intento quedó en `failed` con `terminal_at`, entra en el
-   conteo de `outboxDeadLetter`. Ahí ya sabes que hubo trabajo que agotó sus intentos.
+   conteo de `outboxTerminalAttempts`. Ahí ya sabes que hubo trabajo que agotó sus intentos.
 2. **¿Cuál fue el código de error?** Es la pregunta que decide todo lo demás. Si es
    `run_finalization_failed` **a secas**, la causa se perdió en el limpiador: es el defecto de
    `ISSUE-127`. Si trae sufijo (`run_finalization_failed:typeerror`), el nombre de la clase del error
@@ -121,7 +129,7 @@ Recorrido:
 
 | Señal | Dónde se lee | Qué significa |
 |---|---|---|
-| `outboxDeadLetter` > 0 | payload `globe_worker_completed` | Hay trabajo que agotó sus intentos. Mira la **serie**: si el valor ya existía antes de tu deploy, no es tuyo |
+| `outboxTerminalAttempts` > 0 | payload `globe_worker_completed` | Hay trabajo que agotó sus intentos. Mira la **serie**: si el valor ya existía antes de tu deploy, no es tuyo |
 | `outboxRetryStorm` > 0 | idem | Hay jobs insistiendo por encima de 10 intentos y **todavía sin cerrar**. Es alerta temprana, no daño consumado |
 | Clase `terminal` | `governed-run-failure-policy.ts` | No se reintenta ni una vez. Determinista por contrato |
 | Clase `unknown` | idem | Tope 3 antes del gasto; tope 25 después. Sólo legítimo para los catch-all declarados |
@@ -139,8 +147,8 @@ Recorrido:
 - **NUNCA** agregues un código de rechazo sin clasificarlo en el mismo commit. La disciplina ya se
   probó y no funciona: `ISSUE-127` lleva diez apariciones del mismo defecto, la novena cometida por
   quien acababa de documentar las ocho anteriores. Por eso el test existe.
-- **NUNCA** asumas que `outboxDeadLetter` cuenta filas de la outbox en estado `dead_letter`. No
-  existe ese estado. Cuenta intentos `failed` con `terminal_at` de las últimas 24 h.
+- **NUNCA** confíes en el valor de una señal sin saber en qué **unidad** cuenta. El defecto más caro de esta
+  familia no fue una señal ausente: fue una presente que contaba filas donde debía contar intentos.
 - **NUNCA** declares un dead letter como propio (ni ajeno) por su valor puntual. Sin serie temporal
   no hay conclusión.
 - **NUNCA** metas movimientos de crédito en el camino de abandono. La liquidación es autoridad de otro

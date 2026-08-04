@@ -1132,7 +1132,7 @@ proveedor listo 20:01:30 → experimento finalizado **20:21:16**. El worker sí 
 Los 20 minutos intermedios son Asset Governance avanzando **una etapa por tick de 5 min**
 (`inspection` 20:05 · `malware` 20:10 · `c2pa` 20:15 · `rights` 20:20), con el job `complete` esperando
 correctamente. Diagnóstico completo y evidencia por etapa en
-[`ISSUE-137`](../../issues/open/ISSUE-137-globe-experiment-running-forever-zero-attempts.md) → Delta
+[`ISSUE-137`](../../issues/resolved/ISSUE-137-globe-experiment-running-forever-zero-attempts.md) → Delta
 2026-08-04.
 
 **Consecuencia para esta task: el criterio de salida de Slice 2 —«una generación real desde el Producer
