@@ -2,39 +2,33 @@
 
 Historia anterior: [Handoff.archive.md](Handoff.archive.md).
 
-## TASK-1469 — convergencia terminal de los agregados del run (2026-08-03)
+## TASK-1469 — convergencia terminal de los agregados del run · **COMPLETE** (2026-08-04)
 
-**Estado: `code complete, rollout pendiente`.** Detalle en
-[`TASK-1469`](docs/tasks/in-progress/TASK-1469-globe-governed-run-lifecycle-submission-fence.md) →
-**Delta 2026-08-03 (c)**, que es el estado vigente.
+Verificado en runtime desde `efeonce-globe@c28ab9f`; detalle en
+[`TASK-1469`](docs/tasks/complete/TASK-1469-globe-governed-run-lifecycle-submission-fence.md).
 
-Commiteado en Globe `main`, local, **sin push**: `f5c321d` · `54f41f9` · `8704fc0` · `196846d`.
-`pnpm check` en verde (11 paquetes, 0 fallos).
+- **Huérfanos 4 → 0** en un solo batch, con el motivo real propagado (tres códigos distintos, ningún
+  genérico) y el batch siguiente en `convergedExperiments=0` — el barrido es idempotente.
+- **El invariante quedó enumerable, no como arreglo de una pareja:** un agregado nuevo sin postura rompe el
+  build y un `observable` sin señal se rechaza. La señal `run_aggregate_divergence` existe para que una
+  TERCERA pareja se vea en el tablero en vez de descubrirse en producción, que es como apareció la segunda.
+- 🔴 **`outboxDeadLetter` no tenía sólo mal el nombre: MEDÍA MAL** — contaba filas de outbox y decía **3 para
+  UN solo attempt**. Ya en producción marca `1`. Y `state='dead'` **sí existe**, escrito por la recuperación
+  histórica de crédito. Corrige lo que decía este Handoff. **ISSUE-135 punto 1 cerrado.**
+- Al aplicar salió un defecto propio: **el aligner es función del TIPO de métrica** — `ALIGN_COUNT` sólo vale
+  sobre DELTA/INT64; una métrica que extrae valor necesita `ALIGN_PERCENTILE_99`. Mirar la pieza hermana está
+  bien; mirar CUÁL hermana aplica es la otra mitad de la regla.
 
-- **El barrido cambió el alcance de la propia task:** la pareja que declaraba como deuda principal (outbox
-  `reconcile` ↔ runs terminales) **ya convergía** — 0 divergencias. La que dolía era `experiments` ↔ runs, con
-  **4** huérfanos (no 6). El invariante quedó declarado y **enumerable**, y el barrido hacia atrás reusa el
-  **mismo `abandon`** del camino terminal. Veredicto por agregado y decisiones de diseño: en el Delta.
-- 🔴 **`outboxDeadLetter` no tenía sólo mal el nombre: MEDÍA MAL.** Contaba filas de outbox y un attempt tiene
-  una por fase → decía **3 para UN solo attempt**. Y **`state='dead'` SÍ existe** (CHECK de la `0014`, escrito
-  por la recuperación histórica de crédito). Corrige la nota previa de este Handoff. Hoy es
-  `outboxTerminalAttempts` y cuenta attempts distintos. **ISSUE-135 punto 1 cerrado en código.**
+**Desbloquea `TASK-1632`.**
 
-### Rollout pendiente — dos acciones, en este orden
+### 🔴 Trampa de infra viva (dueño: `TASK-1635`, NO 1469)
 
-1. `tofu apply` **con las variables del entorno de desarrollo** (ver la trampa de abajo).
-2. Deploy del worker desde el SHA de estos commits → el barrido recupera los 4 huérfanos en su primer batch.
-   Después: re-medir el conteo (debe quedar en 0) y confirmar `divergentAggregates = 0`.
-
-### 🔴 Trampa de infra encontrada al planificar el apply (dueño: `TASK-1635`, no 1469)
-
-`tofu plan` desde un checkout limpio da **`6 to add, 0 to change, 20 to destroy`**, y los 20 destroys son
-**todo el entorno de desarrollo de TASK-1635**: `development_environment_enabled` tiene default `false` en git
-y el entorno vivo existe porque alguien aplicó con un `terraform.tfvars` **gitignoreado**. Un apply desde una
-máquina sin ese archivo lo destruye entero, en silencio y con plan verde. El plan honesto se obtiene con
+`tofu apply` desde un checkout limpio **destruye los 20 recursos del entorno de desarrollo**:
+`development_environment_enabled` tiene default `false` en git y el entorno vivo depende de un
+`terraform.tfvars` **gitignoreado**. El apply de hoy se hizo con
 `-var development_environment_enabled=true -var 'development_operator_principal=user:julio.reyes@efeonce.org'`
-→ **`6 to add, 0 to change, 0 to destroy`**. El arreglo de fondo (el estado real de un flag no puede vivir en
-un archivo sin trackear) es de `TASK-1635`.
+→ `0 to destroy`. El arreglo de fondo —el estado real de un flag no puede vivir en un archivo sin trackear—
+sigue abierto.
 
 ## TASK-1635 — `pnpm globe:dev`: el loop rápido de Globe, funcionando (2026-08-03)
 
@@ -125,11 +119,9 @@ consumers es de 1552.
 
 ### Próximo paso, en este orden
 
-1. **El rollout de `TASK-1469`** (`tofu apply` + deploy del worker) — cierra el punto 1 de
-   [`ISSUE-135`](docs/issues/open/ISSUE-135-globe-governed-run-outbox-infinite-silent-retry.md) en runtime y
-   protege todo lo demás. El código ya está; ver la sección de 1469 arriba.
-2. El bloque del adapter de 1633 (grupo **a**).
-3. El composer de 1552 leyendo el descriptor.
+1. El bloque del adapter de 1633 (grupo **a**).
+2. El composer de 1552 leyendo el descriptor.
+3. `TASK-1632`, que quedó desbloqueada por el cierre de 1469.
 
 ### 🔶 Riesgos vivos
 
@@ -141,14 +133,9 @@ consumers es de 1552.
    que recibe el modelo en TODAS las rutas y **no se verificó con canary** (bloqueados por lo anterior).
 3. **«Upscale con estilo dejó de funcionar» es esperado**, no un defecto: ahora da error **sin gasto** en vez de
    generar ignorando el estilo y cobrar igual. La UI que evita el caso es `TASK-1552`.
-4. ~~Experimentos huérfanos~~ — **contados (4) y con barrido implementado**; queda el deploy para que se
-   recuperen. Ver la sección de `TASK-1469` arriba.
-5. ~~Las dos señales de `ISSUE-135` no están cableadas~~ — **cableadas en código** (3 métricas + 3 alertas);
-   queda el `tofu apply`.
-6. ~~El nombre `outboxDeadLetter` engaña~~ — **corregido, y el diagnóstico previo era incompleto**: no sólo
-   desviaba el nombre, **medía filas de outbox en vez de attempts** (decía 3 para 1). Además `state='dead'`
-   **sí existe** en la outbox y lo escribe la recuperación histórica de crédito. Hoy es
-   `outboxTerminalAttempts`.
+4. ~~Experimentos huérfanos, señales sin cablear y el nombre `outboxDeadLetter`~~ — **los tres cerrados y
+   verificados en runtime** por `TASK-1469` (ver arriba). Lo único que queda vivo de ese frente es la trampa
+   del `terraform.tfvars` gitignoreado, que es de `TASK-1635`.
 
 ### Nota operativa
 

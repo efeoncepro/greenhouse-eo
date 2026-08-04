@@ -64,12 +64,39 @@ tofu plan -var development_environment_enabled=true \
 Dueño del arreglo de fondo: `TASK-1635` (el estado real de un flag no puede vivir en un archivo sin trackear
 — es el mismo problema que `producer_assets_enabled`, mejor disfrazado).
 
-### Rollout pendiente (esto es `code complete`, NO operativamente completo)
+### Rollout EJECUTADO y verificado en runtime (2026-08-04)
 
-1. `tofu apply` con las variables de arriba → crea las 3 métricas + 3 alertas.
-2. Desplegar el worker desde el SHA de estos commits → el barrido recupera los 4 huérfanos en su primer batch.
-3. Re-medir el conteo de huérfanos después del primer batch (debe quedar en 0) y confirmar
-   `divergentAggregates = 0` en `globe_worker_completed`.
+SHA desplegado: **`c28ab9f23debd84fc533848caf60a8cf1590c1e7`** (CI verde sobre ese SHA exacto). El Job
+`globe-producer-worker` corre el digest `sha256:f2dffffc…`, **etiquetado `c28ab9f23deb`** — verificado contra
+la revisión activa y Artifact Registry, no contra el workflow en verde.
+
+| Verificación | Resultado |
+|---|---|
+| `tofu apply` | 3 métricas + 3 alertas creadas; `tofu plan` posterior: **`No changes`** |
+| Alertas vivas | `outbox terminal attempts` · `outbox retry storm` · `run aggregate divergence` |
+| Experimentos huérfanos | **4 → 0** en un solo batch (`00:50:21Z`) |
+| Idempotencia del barrido | batch siguiente: `convergedExperiments=0` — no vuelve a tocar lo ya cerrado |
+| Divergencia residual | `divergentAggregates=0` |
+| Motivo real propagado | **tres motivos distintos**, cada `failureReason` idéntico al `last_error_code` de su intento: `historical_submission_unknown_no_deliverable` ×2, `asset_provenance_invalid_request`, `run_finalization_failed`. Ningún genérico |
+| Corrección de medición, visible en vivo | `outboxTerminalAttempts = 1` donde el contador viejo decía **3** para el mismo attempt |
+
+Payload real de `globe_worker_completed`, los dos batches consecutivos:
+
+```
+convergedExperiments=4; divergentAggregates=0; supersededReconciles=0 | terminal=1 | storm=0 | queueAge=0
+convergedExperiments=0; divergentAggregates=0; supersededReconciles=0 | terminal=1 | storm=0 | queueAge=0
+```
+
+### 🔴 Defecto encontrado durante el apply (mío, corregido en `c28ab9f`)
+
+El primer `tofu apply` falló con **400: `ALIGN_COUNT` no aplica a métricas DELTA/DISTRIBUTION**. Había copiado
+el aligner de la alerta hermana `failure`, que corre sobre una métrica **DELTA/INT64** — cuenta entradas de
+log, no extrae un valor. Las tres nuevas extraen valor, así que van con `ALIGN_PERCENTILE_99`, igual que
+`queue_age` y `credit_expiry_held_age`. **Mirar la pieza hermana antes de inventar una solución es correcto;
+mirar CUÁL de las hermanas aplica es la otra mitad de la regla.**
+
+El segundo error del mismo apply (404 de la métrica recién creada) **no era un defecto**: es la propagación de
+Cloud Monitoring, hasta 10 minutos. Se reintentó y quedó limpio.
 
 
 ## Delta 2026-08-02 — alcance restante reducido y orden frente a TASK-1632
@@ -156,7 +183,7 @@ canary ya tiene owner: **ADR-004** (`TASK-1506`, complete) fijó el front door y
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -169,7 +196,7 @@ canary ya tiene owner: **ADR-004** (`TASK-1506`, complete) fijó el front door y
 - Motion: `none`
 - Backend impact: `webhook`
 - Epic: `EPIC-028`
-- Status real: `code complete, rollout pendiente. Barrido hecho y medido; invariante de convergencia + barrido hacia atrás + señales honestas + cableado Terraform commiteados en Globe main (f5c321d, 54f41f9, 8704fc0, 196846d), sin push. Falta tofu apply + deploy del worker + re-medición de los 4 huérfanos — ver Delta 2026-08-03 (c)`
+- Status real: `complete y verificado en runtime (2026-08-04). Desplegado desde efeonce-globe@c28ab9f; huérfanos 4 → 0 en un batch, divergentAggregates=0, 3 alertas vivas y tofu plan en No changes`
 - Rank: `TBD`
 - Domain: `creative|platform|ops`
 - Blocked by: `none`
@@ -720,15 +747,15 @@ Candidatos a tercera pareja, **no verificados**:
 - [x] El barrido de agregados dependientes está hecho y su resultado escrito (al menos: outbox `reconcile`,
       `experiments`, reservas de crédito, assets en governance), con veredicto por cada uno.
       → tabla del Delta 2026-08-03 (c), medida contra el runtime.
-- [~] `globe.run.outbox_dead_letter` y `globe.run.outbox_retry_storm` tienen `logging_metric` + `alert_policy`
-      en `infra/terraform/`, con steady-state declarado (`0`/`0`). → HCL commiteado y plan verificado
-      (`6 to add, 0 to destroy`); **falta el `tofu apply`**.
+- [x] `globe.run.outbox_dead_letter` y `globe.run.outbox_retry_storm` tienen `logging_metric` + `alert_policy`
+      en `infra/terraform/`, con steady-state declarado (`0`/`0`). → **aplicado**; `tofu plan` posterior en
+      `No changes` y las tres alertas vivas en Cloud Monitoring.
 - [x] El nombre de la señal de dead letter describe lo que cuenta, o su contrato lo documenta explícitamente.
       → renombrada a `outboxTerminalAttempts` **y** documentado quién escribe `state='dead'`; además se
       corrigió que **medía filas en vez de attempts** (3 por 1).
-- [~] Los experimentos huérfanos previos al fix quedan recuperados por primitive canónica con audit; el conteo
-      se re-mide antes y después. → medición previa hecha (**4**) y barrido implementado con `abandon` +
-      audit; **falta el deploy del worker y la re-medición posterior**.
+- [x] Los experimentos huérfanos previos al fix quedan recuperados por primitive canónica con audit; el conteo
+      se re-mide antes y después. → **4 antes, 0 después**, en un solo batch, con el motivo real propagado
+      (tres códigos distintos, ningún genérico) y el batch siguiente en `convergedExperiments=0`.
 
 ## Follow-ups
 

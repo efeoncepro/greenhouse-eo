@@ -90,9 +90,10 @@ contar como «reprogramado» algo que murió.
 
 ## Lo que queda abierto
 
-1. ✅ **Las señales.** Cableadas el 2026-08-03 por `TASK-1469` (`efeonce-globe@8704fc0` + `@196846d`): tres
-   `logging_metric` + tres `alert_policy` en `infra/terraform/producer_worker_observability.tf`. **Rollout
-   pendiente del `tofu apply`** — ver el delta de abajo.
+1. ✅ **Las señales.** **Cerrado y verificado en runtime el 2026-08-04** por `TASK-1469`
+   (`efeonce-globe@c28ab9f`): tres `logging_metric` + tres `alert_policy` aplicadas y vivas en Cloud
+   Monitoring, con `tofu plan` en `No changes`. En producción: `outboxTerminalAttempts=1` donde el contador
+   viejo decía **3** para el mismo attempt. Ver el delta de abajo.
 2. 🔴 **Preservar el motivo real.** `finalizationFailureCode` sigue cayendo a `run_finalization_failed` cuando
    el error no está en su allowlist. Correcto para no filtrar, pero deja cero rastro accionable — y por eso
    la clase `unknown` existe con tope 3. **Sigue abierto**; el 2026-08-03 se cerró un caso concreto
@@ -236,8 +237,13 @@ no existía todavía.
 
 Cableado: 3 `logging_metric` + 3 `alert_policy` (`outbox_terminal_attempts` ERROR sin espera,
 `outbox_retry_storm` WARNING con ventana, `run_aggregate_divergence` ERROR). La tercera es de `TASK-1469` y
-detecta una divergencia entre agregados que el barrido no pudo cerrar. `tofu plan`: `6 to add, 0 to destroy`;
-**el apply queda pendiente**.
+detecta una divergencia entre agregados que el barrido no pudo cerrar. **Aplicado y verificado el 2026-08-04**,
+con `tofu plan` posterior en `No changes`.
+
+⚠️ Un detalle del apply que vale para la próxima alerta: **el aligner es función del TIPO de métrica**.
+`ALIGN_COUNT` sólo vale sobre DELTA/INT64 (como `failure`, que cuenta entradas de log); una métrica que
+extrae un valor es DELTA/DISTRIBUTION y necesita `ALIGN_PERCENTILE_99`. Copiarlo de la alerta hermana
+equivocada falla con un 400 en el apply, no antes.
 
 Sigue abierto el punto 2 — preservar el motivo real cuando `finalizationFailureCode` cae al genérico.
 
