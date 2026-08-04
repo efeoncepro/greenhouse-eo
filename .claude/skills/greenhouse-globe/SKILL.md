@@ -469,7 +469,7 @@ para OpenAI y Vertex, no un síntoma.** Un agente que lo lea como deuda va a "ar
 - **`docs.fal.ai` devuelve 429 a todo fetch programático pero es alcanzable desde el navegador real.** Una doc
   que parece caída puede no estarlo — y en esta sesión eso convirtió dos «no verificados» en hechos.
 
-### ⚠️ Latencia esperada: ~20-25 min en frío NO es un cuelgue
+### ⚠️ Latencia esperada: ~8 min en frío NO es un cuelgue (eran ~20-25 con `*/5`)
 
 Asset Governance avanza **una etapa por tick de su cron**, así que su latencia es **cadence-bound, no
 size-bound**: el trabajo real son ~60 s y el reloj lo pone el scheduler. Con `*/5` eso daban **~20-25 min en
