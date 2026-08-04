@@ -5,6 +5,31 @@
 > **Severidad:** Alta — tres caminos distintos terminan en un asset generado, facturado e irrecuperable
 > **Repo afectado:** `efeoncepro/efeonce-globe` · **Gobierna:** Greenhouse (EPIC-028, `TASK-1469`)
 
+## Delta 2026-08-04 (tarde) — D12 implementado y desplegado; **no ejercitable hoy**
+
+El arreglo de **D12** está implementado, desplegado y probado en rojo (`efeonce-globe@c1f17f4`): el driver
+gobernado de Veo pasa `storageUri` para que el video aterrice en **nuestro** bucket en vez de volver inline
+dentro de la Operation, cuya retención no está documentada.
+
+**El riesgo que lo había frenado quedó MEDIDO, no supuesto.** Quien escribe en `storageUri` no es nuestra SA
+sino el agente de servicio de Vertex (`service-818083690953@gcp-sa-aiplatform`); si no tuviera escritura fallaría
+**toda** generación de video. Verificado: el agente existe, tiene `roles/aiplatform.serviceAgent` a nivel de
+proyecto, y ese rol incluye `storage.objects.create` sobre un bucket del mismo proyecto.
+
+🔴 **Pero no se pudo VERIFICAR en runtime, y la razón importa: la única ruta Veo está apagada.**
+`ref/video/frames-v1` (`vertex-video` / `veo-3.1-generate-001`) tiene `enabled = false` en
+`production_route_binding_revisions`. El canary de generación autorizado corrió las tres modalidades y su video
+fue por **Fal Seedance** (`ref/motion/loop-v1`), así que **el camino de Veo nunca se ejecutó** — el prefijo
+`gs://efeonce-globe-lab-evidence/governed-veo/` está vacío, como corresponde.
+
+**Ejercitar D12 exige promover la ruta Veo**, que es un gate gobernado propio (readiness, atestación de derechos,
+revisión humana, binding y circuito) y no un flip. Hasta entonces el estado honesto es **code complete, sin
+evidencia de runtime** — y la exposición real es **cero**, porque una ruta apagada no genera.
+
+Lo que el canary sí probó: las tres modalidades generan, retienen y sirven correctamente sobre el código nuevo,
+con liquidación económica exacta (`noDoubleDebit: true`), y su aserción de integridad —la que falló antes de
+`ISSUE-139`— ahora **pasa**.
+
 ## Cómo apareció
 
 No lo reportó un usuario ni una alerta: **lo destapó una pregunta del operador** — *"¿1469 no trataba de los
