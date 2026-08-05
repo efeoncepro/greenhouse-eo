@@ -1,5 +1,12 @@
 # TASK-1335 — Growth Forms Public CORS + Surface Allowlist Governance
 
+## Delta 2026-08-05
+
+- `TASK-1327` cerrada `complete`: la landing `think.efeoncepro.com/brand-visibility` está **live y verificada en
+  runtime** (HTTP 200 + `<greenhouse-form>` gobernado embebido + definición del form 200 en producción con
+  Turnstile `required`). Esta task **ya no bloquea una landing pendiente** — el consumer existe y sirve tráfico.
+  Lo que queda acá es su propio endurecimiento y su smoke, no habilitar la superficie.
+
 ## Delta 2026-07-27 — Think consume el form en producción
 
 La surface `fhsf-ai-visibility-grader` ya está siendo consumida por la landing productiva de Think en

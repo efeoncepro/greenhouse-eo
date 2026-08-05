@@ -7,6 +7,25 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-05 — TASK-1327 `complete`: la landing pública del lead magnet está live y verificada en runtime
+
+- `TASK-1327` (landing `think.efeoncepro.com/brand-visibility` + embed del form gobernado) cerrada con
+  **verificación en runtime, no lectura de docs**: HTTP 200 con el `<greenhouse-form>` real
+  (`formKey 69cd5269…`, `surface=fhsf-ai-visibility-grader`), y `GET /api/public/growth/forms/<formKey>` contra
+  **producción** devolviendo 200 con los campos del intake, **Turnstile `required`** con site key real y
+  `consentPolicyVersion = ai-visibility-grader-consent-v1`. EPIC-020 queda en **49 childs: 33 `complete`,
+  16 abiertas**.
+- **Lo que NO se cerró con ella:** el smoke E2E productivo del loop completo sigue siendo de `TASK-1246` (gate de
+  readiness), y `TASK-1335`/`1336` siguen `in-progress` por mérito propio — se les agregó delta de impacto cruzado:
+  ya no bloquean una landing pendiente, sino su propio endurecimiento.
+- ⚠️ **Hallazgo para el sign-off legal:** la definición publicada del form trae `consent.checkboxes` **vacío** —
+  hay versión de política pero ningún checkbox renderizado. Puede ser por diseño o ser un hueco de cumplimiento;
+  queda anotado como input obligatorio de `TASK-1246`, sin asumir cuál de las dos.
+- **Corrección de una recomendación previa:** se había sugerido cerrar también `TASK-1321` por "superseded".
+  Es falso: `/aeo-2/` submit → grader → email con PDF + dedupe de HubSpot es una **capacidad propia** (segunda
+  superficie self-serve), con 8 criterios de aceptación sin cumplir y dos flags apagados
+  (`GROWTH_AEO_FORM_GRADER_INTAKE_ENABLED`, `GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE_ENABLED`). Sigue `in-progress`.
+
 ## 2026-08-05 — Registro de epics reconciliado: EPIC-040 nace, gate `epic-child-parity`, 193 childs huérfanas al descubierto
 
 - **El bug class:** el campo `Epic:` de una task y el `## Child Tasks` de su epic son dos escrituras que nada
@@ -935,15 +954,3 @@ y [`docs/changelog/internal/2026-07.md`](docs/changelog/internal/2026-07.md).
   la evidencia pública no permite llamar partnership formal a la mayoría de esas relaciones ni validar claims de escala.
 - El patrón transferible para Globe queda definido como `builder experto → workflow → runner → pod/workspace`, con
   derechos, provenance, QA, aprobación, costos y accountability; no se copian créditos, unlimited ni logos.
-
-## 2026-07-29 — Higgsfield: Go-to-Market, partnerships, advertising y expansión vertical documentadas
-
-- Se añadió una auditoría comercial que analiza el GTM completo: PLG/self-serve, content-led education, agency-led
-  adoption, enterprise sales y ecosystem distribution; además separa partnerships formales, proveedores,
-  integraciones, workshops, creator programs y case studies.
-- Se documentó Advertising como beachhead de alta frecuencia: URL-to-Ad, variantes, workflows de campaña y expansión
-  hacia Team/Enterprise, con agencias como multiplicadores y enablement como acelerador de adopción.
-- La implicancia para Globe queda en validación: wedge estrecho, partnership taxonomy explícita, memoria de workflow,
-  derechos/provenance y accountability Efeonce; Higgsfield puede ser capability provider, no dueño del resultado.
-- Las skills de GTM, business model y research incorporan el patrón transferible `cuña → activación → workflow →
-  agencia/pod → enterprise → expansión`, con traducción `adoptar | adaptar | descartar` y anti-copia explícita.

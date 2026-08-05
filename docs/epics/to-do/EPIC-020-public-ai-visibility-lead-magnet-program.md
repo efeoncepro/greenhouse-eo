@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Cara pública LIVE en think.efeoncepro.com (verificado runtime 2026-08-05); registro reconciliado: 49 childs reales — 32 complete, 17 abiertas (paridad Epic:↔child list verificada por `pnpm epic:lint`). Falta el smoke E2E del loop`
+- Status real: `Cara pública LIVE en think.efeoncepro.com (verificado runtime 2026-08-05); registro reconciliado: 49 childs reales — 33 complete, 16 abiertas (paridad Epic:↔child list verificada por `pnpm epic:lint`). Falta el smoke E2E del loop`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `unassigned`
@@ -39,9 +39,9 @@ El motor del grader está completo y verificado (TASK-1226/1227/1234/1235/1236/1
 
 ## Child Tasks
 
-> **Estado real (reconciliado 2026-08-05):** **49 childs — 32 `complete`, 17 abiertas** (conteo canónico: tasks cuyo campo `Epic:` dice EPIC-020; paridad verificada por el gate `epic-child-parity`). La lista A–M de abajo son los 13 hijos originales del diseño del epic; debajo de ella está el **bloque reconciliado** con las **22 tasks que declaran `Epic: EPIC-020` en su propia cabecera y nunca fueron registradas acá**. (Fueron 25: tres salieron el 2026-08-05 hacia su dueño correcto — `TASK-1335`/`1359` a [`EPIC-040`](EPIC-040-growth-public-forms-engine.md), `TASK-1326` a EPIC-019.)
+> **Estado real (reconciliado 2026-08-05):** **49 childs — 33 `complete`, 16 abiertas** (conteo canónico: tasks cuyo campo `Epic:` dice EPIC-020; paridad verificada por el gate `epic-child-parity`). La lista A–M de abajo son los 13 hijos originales del diseño del epic; debajo de ella está el **bloque reconciliado** con las **22 tasks que declaran `Epic: EPIC-020` en su propia cabecera y nunca fueron registradas acá**. (Fueron 25: tres salieron el 2026-08-05 hacia su dueño correcto — `TASK-1335`/`1359` a [`EPIC-040`](EPIC-040-growth-public-forms-engine.md), `TASK-1326` a EPIC-019.)
 >
-> El conteo previo ("12/13 `complete`, sólo `TASK-1246` abierta") era una **ficción contable**: contaba únicamente el denominador original. El epic no está a una task de cerrar, está a **diecisiete**. Método de la reconciliación y falsos positivos descartados: [`../AEO_PROGRAM_STATUS.md`](../AEO_PROGRAM_STATUS.md) § Delta 2026-08-05 (b).
+> El conteo previo ("12/13 `complete`, sólo `TASK-1246` abierta") era una **ficción contable**: contaba únicamente el denominador original. El epic no está a una task de cerrar, está a **dieciséis**. Método de la reconciliación y falsos positivos descartados: [`../AEO_PROGRAM_STATUS.md`](../AEO_PROGRAM_STATUS.md) § Delta 2026-08-05 (b).
 
 - `TASK-1239` ✅ **complete (dev)** — **(A) Public Grader Report Snapshot + Token Reader** — `grader_reports` inmutable (run_id + score_version + report_version + recommendation_pack_version + as_of + DTO público congelado + token NO enumerable 256-bit + expires_at) + `readPublicGraderReport(reportToken)` + `publishGraderReportSnapshot` (idempotente, no publica gateados) + capability `report.publish` + endpoints admin/público. Foundation de parity pública. **P1.**
 - `TASK-1240` ✅ **code complete (dev); rollout pendiente** — **(B) Public Grader Run Intake + abuse/cost controls** — `createPublicGraderRun` (§9.2 input + consent + work email, **email nunca a providers**) → captcha (Turnstile) + rate-limit (per-IP 10/email 3) + presupuesto global diario (circuit breaker) + modo `light` → enqueue al worker async (TASK-1234). Lead dedicado `grader_leads` + `grader_intake_events`. Flag `GROWTH_AI_VISIBILITY_PUBLIC_INTAKE_ENABLED` default OFF. **P1. Pendiente:** sign-off legal consent + secret captcha + flag ON staging.
@@ -136,7 +136,7 @@ El motor del grader está completo y verificado (TASK-1226/1227/1234/1235/1236/1
 
 ## Estado actual y qué sigue (2026-08-05)
 
-**La cara pública ya está encendida; lo que falta es evidencia y las 17 childs abiertas.** Verificado en runtime el 2026-08-05:
+**La cara pública ya está encendida; lo que falta es evidencia y las 16 childs abiertas.** Verificado en runtime el 2026-08-05:
 
 - `https://think.efeoncepro.com/brand-visibility` → **HTTP 200**, sirviendo el `<greenhouse-form>` gobernado (`surface=fhsf-ai-visibility-grader`, `base-url=greenhouse.efeoncepro.com`).
 - `GET /api/public/growth/forms/<formKey>` en **producción** → **200**, con campos (`brandName`, `websiteUrl`…), **Turnstile `required`** con site key real y `consentPolicyVersion: ai-visibility-grader-consent-v1`.
@@ -147,7 +147,7 @@ Por tanto la hipótesis histórica del epic —"no existe puerta pública self-s
 
 1. **Smoke E2E real** `submit → run async → status → token → informe público → email → props `ai_visibility_*` en HubSpot`. Que el form renderice no prueba que el loop cierre; nadie registró ese smoke. Es el único residuo duro de `TASK-1246`.
 2. **Gobernanza del path público:** sign-off legal del consent (ojo: la definición publicada trae `consent.checkboxes` **vacío** — hay versión de política pero ningún checkbox renderizado; confirmar si es por diseño o es hueco), follow-ups de retención/PII, y revisar signals de costo/abuso con tráfico real (el path público es gasto LLM expuesto).
-3. **Las 16 childs abiertas restantes** (ver § Childs reconciliadas, ambas pasadas): `TASK-1336` (contrato submit→token) · `TASK-1424`/`1425` (SoV per-motor) · `TASK-1332`/`1338` (hub Think) · `TASK-1269` (Fix-It Artifacts) · `TASK-1270` (re-grade recurrente) · `TASK-1330` (short links) · `TASK-1281` (headless probe) · `TASK-1341` (DataForSEO AIO) · `TASK-1251` (convergencia Forms) · `TASK-1282`/`1283` (Search Console) · `TASK-1321`/`1327` (candidatas históricas de la cara pública, hoy superseded por Think) · `TASK-1293` (residuo de ops).
+3. **Las 16 childs abiertas restantes** (ver § Childs reconciliadas, ambas pasadas): `TASK-1336` (contrato submit→token) · `TASK-1424`/`1425` (SoV per-motor) · `TASK-1332`/`1338` (hub Think) · `TASK-1269` (Fix-It Artifacts) · `TASK-1270` (re-grade recurrente) · `TASK-1330` (short links) · `TASK-1281` (headless probe) · `TASK-1341` (DataForSEO AIO) · `TASK-1251` (convergencia Forms) · `TASK-1282`/`1283` (Search Console) · `TASK-1321` (self-serve de `/aeo-2/`: submit → grader → email con PDF + dedupe HubSpot; capacidad propia, NO duplicado de la landing de Think) · `TASK-1293` (residuo de ops).
 4. `TASK-1341` — DataForSEO AIO: confirmar con un run real que el secret resuelve (las creds ya están en la revisión activa del `ops-worker`; el `missing_secret` que citaba la versión previa de esta sección era stale).
 5. Poblar `grader_profiles.organization_id` para el consumer cliente (J).
 

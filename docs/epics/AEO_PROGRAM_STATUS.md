@@ -15,7 +15,7 @@ Este documento existe para no volver a perder visibilidad de un programa que est
 
 **El motor está terminado y en producción. La cara pública también está encendida y el cockpit del operador ya está construido. Lo que falta es evidencia de que el loop cierra, y 10 childs abiertas que el registro del epic nunca contó.**
 
-> ⚠️ **Leer el Delta 2026-08-05 (b) al final ANTES de actuar sobre las §2, §4 y §5.** Ese delta corrige tres cosas que las secciones de abajo declaran mal: (1) `TASK-1276` está `complete`, no `to-do` — el "gap #1" ya no existe; (2) la entrada pública self-serve **está live** en `think.efeoncepro.com/brand-visibility`, verificada en runtime; (3) el conteo "12/13 childs" de EPIC-020 era una ficción contable — el alcance real declarado son **49 childs, 17 abiertas**. Las §2–§5 describen el snapshot del 2026-07-16 y se conservan como historia, no como estado.
+> ⚠️ **Leer el Delta 2026-08-05 (b) al final ANTES de actuar sobre las §2, §4 y §5.** Ese delta corrige tres cosas que las secciones de abajo declaran mal: (1) `TASK-1276` está `complete`, no `to-do` — el "gap #1" ya no existe; (2) la entrada pública self-serve **está live** en `think.efeoncepro.com/brand-visibility`, verificada en runtime; (3) el conteo "12/13 childs" de EPIC-020 era una ficción contable — el alcance real declarado son **49 childs, 16 abiertas**. Las §2–§5 describen el snapshot del 2026-07-16 y se conservan como historia, no como estado.
 
 ---
 
@@ -74,7 +74,7 @@ Este documento existe para no volver a perder visibilidad de un programa que est
 
 | EPIC | Título | Lifecycle | Lectura |
 |---|---|---|---|
-| **EPIC-020** | Public AI Visibility Lead Magnet Program | `to-do` (spec) · ~~12/13~~ → **49 childs reales: 32 `complete`, 17 abiertas** (reconciliado 2026-08-05) | El "12/13" contaba sólo el denominador original. Cara pública **live**; falta el smoke E2E + 17 childs abiertas. Ver Delta (b). |
+| **EPIC-020** | Public AI Visibility Lead Magnet Program | `to-do` (spec) · ~~12/13~~ → **49 childs reales: 33 `complete`, 16 abiertas** (reconciliado 2026-08-05) | El "12/13" contaba sólo el denominador original. Cara pública **live**; falta el smoke E2E + 16 childs abiertas. Ver Delta (b). |
 | **EPIC-021** | AEO Brand-Aware Prompt Generation Engine | ✅ `complete` (2026-06-30) | Motor brand-aware live. Follow-up: UI de review del operador (no bloquea). |
 | **EPIC-022** | Growth SEO Module (Search Visibility 360) | 🚧 en ejecución (2026-08-05) · **2/21 childs `complete`** | Arrancó: `TASK-1299` (schema) + `TASK-1301` (capabilities + entitlement per-org + chokepoint) `complete`, migraciones aplicadas. Prioridad **MCP-first** (operar por MCP antes que UI); `TASK-1645` nueva (parity/MCP, P1); destino Wave declarado. Ver Delta 2026-08-05 al final. |
 | **EPIC-023** | Growth CTA & Popup CRO Engine | `to-do` | Adyacente. Vertical-slice ancla = follow-up CTA del reporte AI Visibility en Think. No arrancado. |
@@ -92,7 +92,7 @@ Este documento existe para no volver a perder visibilidad de un programa que est
 |---|---|---|---|
 | `TASK-1246` | (H) Public Launch Readiness + Rollout | Venta pública | **Único freno formal de EPIC-020.** Legal consent + Turnstile + flags + smoke + release. |
 | `TASK-1321` | `/aeo-2/` submit auto-runs grader + emails report | Venta pública | Candidato #1 para cerrar la entrada self-serve. El grader aún no está desplegado en esa ruta. |
-| `TASK-1327` | Public lead magnet landing form embed (Think) | Venta pública | Candidato #2 (landing `brand-visibility`). Sin deploy. |
+| ~~`TASK-1327`~~ | Public lead magnet landing form embed (Think) | Venta pública | ✅ **`complete` 2026-08-05** — la landing está live y verificada en runtime. Su fila en §5 queda como historia. |
 | `TASK-1251` | Growth Forms ↔ Grader convergence | Venta pública | Converge el intake sobre el motor Growth Forms (wiring del self-serve). |
 | `TASK-1270` | Recurring SoV + scheduled re-grade | Operativa cliente | Cadencia recurrente. Staging aplicado; E2E cliente pendiente. |
 | `TASK-1269` | Fix-It Artifacts (JSON-LD / llms.txt / briefs) | Operativa cliente | Entregables accionables del diagnóstico. |
@@ -167,7 +167,7 @@ No es que les falte dueño: **se declaran hijas de un epic que no las lista.** E
 | EPIC-021 | 1 — `TASK-1390` (fix `ISSUE-120` del pipeline) | ✅ reconciliada |
 | EPIC-022 | 1 — `TASK-1426` (GSC multi-property) | ✅ reconciliada |
 
-**Consecuencia:** el "12/13 childs `complete`" de EPIC-020 era una **ficción contable** — contaba el denominador original (13) e ignoraba las 25 que se declaraban suyas. El alcance real es **49 childs: 32 `complete`, 17 abiertas** (conteo canónico por campo `Epic:`, con paridad verificada). El epic no estaba a una task de cerrar; está a diecisiete.
+**Consecuencia:** el "12/13 childs `complete`" de EPIC-020 era una **ficción contable** — contaba el denominador original (13) e ignoraba las 25 que se declaraban suyas. El alcance real es **49 childs: 33 `complete`, 16 abiertas** (conteo canónico por campo `Epic:`, con paridad verificada). El epic no estaba a una task de cerrar; está a diecisiete.
 
 **Las 6 abiertas reconciliadas de EPIC-020:** `TASK-1336` (contrato submit→`reportToken`) · `TASK-1424`/`1425` (Share of Voice per-motor: foundation + panel) · `TASK-1332`/`1338` (hub Think: icon library + extracción del view-model) · `TASK-1293` (post-flag-rollout hardening, residuo de ops).
 

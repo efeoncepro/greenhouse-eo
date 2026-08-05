@@ -1,5 +1,28 @@
 # TASK-1327 — Public lead-magnet landing + embed del form gobernado (think.efeoncepro.com/brand-visibility)
 
+## Cierre 2026-08-05 — `complete` (evidencia productiva verificada)
+
+Se cierra con verificación en runtime del mismo día, no por lectura de docs:
+
+- `curl -L https://think.efeoncepro.com/brand-visibility` → **HTTP 200**, 64.553 bytes. El HTML productivo
+  contiene el `<greenhouse-form>` real con `form-key="69cd5269-5f97-4d32-99c4-0b23f41aa2f5"`,
+  `surface="fhsf-ai-visibility-grader"`, `locale="es-CL"` y `base-url="https://greenhouse.efeoncepro.com"`.
+- `GET /api/public/growth/forms/<formKey>` contra **producción** → **200**, con el slug `ai-visibility-grader`,
+  los campos del intake (`brandName`, `websiteUrl`, …), `security.captcha` **Turnstile `required`** con site key
+  pública real y `consent.consentPolicyVersion = ai-visibility-grader-consent-v1`.
+
+El alcance de esta task —construir la landing y embeber el form gobernado— está cumplido y sirviendo tráfico.
+
+**Lo que NO se cierra acá y queda con su dueño** (esta task no es su gate):
+
+- **Smoke E2E productivo fechado** del loop completo (`submit → run → status → token → informe → email → HubSpot`):
+  pertenece a `TASK-1246`, que es el gate de readiness del lanzamiento.
+- `TASK-1336` (contrato submit→`reportToken`) y `TASK-1335` (CORS/surface allowlist, hoy en `EPIC-040`) siguen
+  `in-progress` por mérito propio; su reconciliación de lifecycle depende de sus propios smokes, no de éste.
+- ⚠️ **Hallazgo para el sign-off legal de `TASK-1246`:** la definición publicada del form trae
+  `consent.checkboxes` **vacío**. Hay versión de política pero ningún checkbox renderizado. Puede ser por diseño
+  (aviso implícito en el copy) o ser un hueco de cumplimiento — **no asumirlo, confirmarlo.**
+
 ## Delta 2026-07-27 — superficie y loop base confirmados en producción
 
 La landing ya no está en estado “code complete local” ni “rollout pendiente”.
@@ -52,7 +75,7 @@ Estado de cierre actualizado: **live en producción; cierre formal pendiente por
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
