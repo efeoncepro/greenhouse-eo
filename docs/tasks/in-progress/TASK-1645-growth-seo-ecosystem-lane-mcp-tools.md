@@ -16,7 +16,14 @@ cero residuo. Full suite 10168/0 + build prod verdes.
 2. `GROWTH_SEO_ENABLED` es multi-runtime: el lane lo lee en **Vercel** y hoy está ON solo en el ops-worker
    (materializer). El flip en Vercel es parte del cutover del módulo (ledger).
 3. Federación `mcp.efeonce.org` → **TASK-1647 creada y registrada** (cumple el criterio "con dueño":
-   adapter delgado + canaries antes de discovery).
+   adapter delgado + canaries antes de discovery). **Actualización (misma fecha, noche): el punto 3 quedó
+   CODE COMPLETE vía TASK-1647** — provider `greenhouse-seo` + 3 tools en `efeonce-mcp` (main,
+   `a53b77f`+`4870e90`), consumer `EO-SPK-0004` + binding `EO-SPB-0004` provisionados, y **canary e2e
+   verificado por HTTPS real** (gateway → lane staging → readers → PG: Berel `riesgo`/50 keywords/AEO 44.5,
+   entitlement Efeonce 8/$50 + `no_seo_data` honesto, deny anti-oracle 404). Además el punto 2 avanzó:
+   `GROWTH_SEO_ENABLED=true` ya está en Vercel **staging** (redeploy aplicado); falta Production. El smoke
+   por `mcp.efeonce.org` queda **unificado con el cutover** (release develop→main → flag prod → env del
+   provider en el gateway + deploy dispatch → smoke), secuencia documentada en TASK-1647.
 
 
 ## Delta 2026-08-05

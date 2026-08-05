@@ -7,6 +7,20 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-05 — Provider Greenhouse-SEO federado en el gateway MCP (TASK-1647, code complete)
+
+- **Provider `greenhouse-seo` + 3 tools federados en el repo `efeonce-mcp`** (main, commits `a53b77f`+`4870e90`):
+  adapter delgado fail-closed default OFF, scope base `efeonce.mcp.read`, 6 tests + canary e2e committeado.
+  Consumer sister-platform `EO-SPK-0004` + binding `EO-SPB-0004` provisionados en greenhouse
+  (`scripts/api-platform/provision-mcp-gateway-seo-consumer.ts`; token en Secret Manager
+  `efeonce-mcp-gateway-greenhouse-token`). `GROWTH_SEO_ENABLED=true` aplicado en Vercel staging + redeploy.
+- **Canary e2e verificado por HTTPS real** (provider del gateway → lane staging → readers → PG): Berel con su
+  quadrant real `domainQuadrant=riesgo` + 50 keywords + AEO 44.5 · entitlement Efeonce `contracted` 8/$50 +
+  `no_seo_data` honesto · deny anti-oracle 404 por la cadena completa.
+- **Enable en `mcp.efeonce.org` gated por el release prod:** greenhouse PROD aún no tiene el lane; la secuencia
+  de cierre (release develop→main → flag Vercel prod → env del provider en el gateway Cloud Run + deploy
+  dispatch → smoke por `mcp.efeonce.org`) queda documentada en TASK-1647.
+
 ## 2026-08-05 — Efeonce provisionada como org own-brand del 360 (dogfooding)
 
 - **Decisión de modelado:** la agencia se trackea como su propio cliente sobre la org canónica `EO-ORG-0007`
@@ -934,25 +948,3 @@ y [`docs/changelog/internal/2026-07.md`](docs/changelog/internal/2026-07.md).
   adquisición y aprendizaje inicial.
 - Se documentaron loops de artifact/template/creator/referral/content/integration/agency, límites entre software,
   Product Service, managed/co-operated y canal, revenue architecture, cost-to-serve y pilotos de 90 días.
-
-## 2026-07-29 — Globe Producer: craft, densidad y tres bugs que sólo vio el despliegue
-
-- Composer del Producer desplegado a `globe-studio-internal` (`00095`→`00097`): glow con reposo propio y
-  rampa de fondo **invertida** (`--field` es más oscuro que el panel, así que la rampa heredada oscurecía
-  al interactuar), pozo único sin el borde de fábrica del navegador en el `<textarea>`, ritmo interno
-  16/20/32, y bloque de modelo+formato de **471 a 302 px** con jerarquía por consecuencia.
-- Miniaturas de Dirección: ocho stills con globo generados con `pnpm ai:image`, mismo sujeto y ocho
-  tratamientos, `aspect-video`. Pendiente regenerarlas por el Still Model Lab para procedencia gobernada.
-- Proporción pasa a **taxonomía por forma, no por plataforma** (corrección del operador: Globe no produce
-  sólo para social). Calidad deja de mostrar el enum crudo `standard`/`high`.
-- Header a una fila en la banda 768–1024: **121 → 67 px**. Riel `sticky` funcionando bajo `lg`
-  (`overflow-hidden` lo anulaba). Anillo de créditos devuelto al trigger, que el port había perdido.
-- Bloque de referencias: el menú ordena por disponibilidad, el copy deja de prometer influencia y anclaje
-  —ninguna de las dos existe— y cada ficha muestra su miniatura real.
-- **Gate nuevo**: `tailwind-theme.test.ts` falla si una utilidad consume un namespace que el theme vació y
-  el SSOT no repobló. Verificado en ambos sentidos. Nació de seis `backdrop-blur-*` computando `none`.
-- ⚠️ Tres defectos aparecieron **sólo al desplegar**, con gates verdes: el `.npmrc` que no llegaba al
-  `pnpm deploy --prod`, las miniaturas dando 404 por no estar en `assets.ts`, y el feed montando un MP4 en
-  un `<img>`. Registrados con su patrón en
-  [`GLOBE_PRODUCER_VERIFICATION_BLIND_SPOTS_2026-07-29.md`](docs/audits/globe/GLOBE_PRODUCER_VERIFICATION_BLIND_SPOTS_2026-07-29.md).
-- **TASK-1552 Slice 3 sigue abierta**; nada de esto la cierra.

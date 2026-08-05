@@ -229,3 +229,10 @@ tenía), assignment `seo_v1` `contracted`/`own_brand`, target `efeoncepro.com`; 
 **Para operar falta el cutover:** `GROWTH_SEO_ENABLED` en Vercel + smoke e2e HTTP con binding real (cierre de
 1645) · `TASK-1647` (federación del provider en `mcp.efeonce.org`, adapter delgado con canaries antes de
 discovery) · conexión GSC per-org de `efeoncepro.com` al destrabar `TASK-1282`/`1283`.
+
+**Cierre nocturno (misma fecha):** `TASK-1647` quedó **code-complete** — provider `greenhouse-seo` + 3 tools
+en `efeonce-mcp` (main, `a53b77f`+`4870e90`, fail-closed default OFF) con canary e2e **verificado por HTTPS
+real** (gateway → lane staging → readers → PG: Berel `riesgo`/50 keywords/AEO 44.5, entitlement Efeonce 8/$50 +
+`no_seo_data` honesto, deny anti-oracle 404). `GROWTH_SEO_ENABLED=true` aplicado en Vercel **staging** +
+redeploy; Berel provisionada Fase 0 (`cpma-berel-seo-contracted` + `seot-berel-fase0`). Único bloqueo:
+greenhouse PROD sin el lane (release develop→main); secuencia de cierre en `TASK-1647`.
