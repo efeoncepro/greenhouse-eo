@@ -164,7 +164,11 @@ Reglas obligatorias:
 
 ## Capability Definition of Done — Full API Parity gate
 
-`N/A — no capability`. Esta task es schema puro (DDL + tipos). No introduce ni modifica una capability; los primitives gobernados (commands/readers) que consumen este schema nacen en `TASK-1301` (capabilities), `TASK-1303`/`TASK-1304` (commands/readers). Deuda declarada: el schema no es consumible por ningún consumer hasta que esas tasks aterricen; se secuencian a continuación en EPIC-022.
+`N/A — no capability`. Esta task es schema puro (DDL + tipos). No introduce ni modifica una capability; los primitives gobernados (commands/readers) que consumen este schema nacen en `TASK-1301` (capabilities), `TASK-1303`/`TASK-1304` (commands/readers).
+
+**Camino de parity declarado (mandato del operador 2026-08-05, ya con dueño):** el módulo completo nace Full API Parity + MCP — capabilities consumer-agnósticas (`TASK-1301`, DoD reforzado), readers canónicos (`TASK-1302/1303/1305`) y exposición lane ecosystem + MCP tools (`TASK-1645`, espejo TASK-1086). Exit criterion nuevo en EPIC-022: el epic no cierra UI-only. La deuda "schema sin consumer" es secuencia, no hueco.
+
+**Modular Placement (N/A razonado):** esta task no crea módulos `src/**` ni deployables — es DDL + `db.d.ts` regenerado; el placement de los primitives lo declaran las tasks que los crean (1301+).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE

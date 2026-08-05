@@ -1,5 +1,15 @@
 # TASK-1301 — Growth SEO: Capabilities + Per-Org Entitlement
 
+## Delta 2026-08-05 — DoD parity+MCP (mandato del operador)
+
+Directiva de sesión 2026-08-05: el módulo SEO nace **Full API Parity y usable por MCP**. Implicación dura
+para esta task: el chokepoint de entitlement (`enforceSeoRunEntitlement` + gate de lectura) debe nacer
+**consumer-agnóstico** — el MISMO gate sirve UI, Nexa, lane `app` y lane `ecosystem` (machine-authed);
+NUNCA un gate paralelo por consumer. `TASK-1645` (lane ecosystem + MCP tools, espejo TASK-1086) es el
+consumer que lo verifica: al diseñar las capabilities acá, dejar el resolver de subject listo para
+principals machine-authed (binding ecosystem), no solo sesión. Exit criterion nuevo del epic:
+parity+MCP verificados como consumers reales.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

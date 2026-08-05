@@ -61,6 +61,7 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1315` — [planificada, backend-data] E-E-A-T signal extraction (entity + author + trust) — capa de autor + probes de trust, reusando entity probes (KG/Wikidata/Reddit) + json-ld.
 - `TASK-1316` — [planificada, backend-data] E-E-A-T rater (rúbrica 4 pilares, YMYL-aware) — assessment LLM reusando brand-intelligence + evals/accuracy, con confianza calibrada (anti falso-0).
 - `TASK-1317` — [planificada, backend-data] E-E-A-T scorecard reader + integración (`readEeatScorecard`; alimenta topical authority 1314 + el 360; medido vs evaluado).
+- `TASK-1645` — [planificada, backend-data] **Ecosystem lane + MCP tools** (`/api/platform/ecosystem/growth/seo/*` vía `runEcosystemReadRoute` + 3 tools read-only en `src/mcp/greenhouse/**`, espejo TASK-1086). Materializa el mandato parity+MCP (delta 2026-08-05). Blocked by 1301/1302/1303.
 
 ## Existing Related Work
 
@@ -76,6 +77,7 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - [ ] La pantalla estrella (evolución de URLs/keywords en el tiempo) entrega valor con datos reales de Berel, con honestidad medido (GSC) vs estimado (DataForSEO).
 - [ ] Gate de costo DataForSEO per-org operativo (quota cap + signal `seo.provider.cost_over_budget`).
 - [ ] Documentación triple (técnica/funcional/manual) del módulo + flag `GROWTH_SEO_ENABLED` en el Feature Flag Ledger.
+- [ ] **Full API Parity + MCP verificados como consumers reales (mandato del operador 2026-08-05):** los readers canónicos sirven UI + Nexa + lane ecosystem (`api/platform/ecosystem/growth/seo/*`) + MCP tools (`TASK-1645`) sin lógica duplicada; el epic NO cierra con el módulo UI-only aunque todos los demás criterios pasen. Writes de agente declarados vía governed action loop (follow-up explícito, no deuda oculta).
 
 ## Non-goals
 
@@ -176,3 +178,8 @@ revenue, ni publicar pricing. Mantiene las reglas del modelo canónico y del [Cu
 La definición de cierre del epic debe incluir evidencia técnica **y** evidencia de cliente, delivery, economics,
 adopción y renovación. La fuente transversal para esa evaluación es `efeonce-customer-model-operator`; GTM,
 Commercial, Pricing, Finance, Legal y Operations conservan sus decisiones propias.
+
+## Delta 2026-08-05 — Arranque de ejecución + mandato Full API Parity / MCP
+
+- **`TASK-1299` (schema fundacional) en ejecución:** migración `20260805134439202_task-1299-growth-seo-schema.sql` aplicada en `greenhouse-pg-dev` — 8 tablas `seo_*` (config + serie temporal append-only), UNIQUEs de idempotencia, triggers `block_seo_row_mutation`, GRANTs least-privilege, `db.d.ts` regenerado, smoke live anti-mutation verificado. El bloqueador fundacional dejó de serlo.
+- **Mandato del operador (directiva de sesión 2026-08-05):** todo lo que el módulo SEO construya **nace Full API Parity y usable por MCP**. Materialización: exit criterion nuevo (parity+MCP verificados como consumers reales), child task `TASK-1645` (lane ecosystem + MCP tools, espejo `TASK-1086` de Knowledge) y DoD reforzado en `TASK-1301` (capability ⇒ el chokepoint sirve a TODOS los lanes, nunca un gate paralelo por consumer). Los writes de agente se declaran vía governed action loop como follow-up explícito.
