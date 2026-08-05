@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.1
 > **Creado:** 2026-08-05 por Claude (TASK-1299 + TASK-1301)
-> **Ultima actualizacion:** 2026-08-05 por Claude (TASK-1302)
+> **Ultima actualizacion:** 2026-08-05 por Claude (TASK-1305 + TASK-1645: cruce SEO↔AEO + operable por MCP)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
 
 # Modulo SEO — Search Visibility 360 (Growth)
@@ -90,13 +90,12 @@ TASK-1302 convierte esa consulta en vivo en una **serie propia de Greenhouse**: 
 
 ## Que NO existe todavia
 
-Nada de lo siguiente está construido; esas tablas están vacías hasta que lleguen sus tasks (la única serie que ya se está llenando es la de Search Console):
+Lo siguiente aún no está construido (la serie que ya se llena es la de Search Console). **Sí existen ya** — además del schema y el modelo de acceso — el cruce SEO ↔ AEO (`readSeoAeoGap` + matriz quadrant 360, TASK-1305) y la **operación por MCP** (TASK-1645: lane ecosystem + 3 tools read-only — `get_seo_entitlement`, `get_seo_keyword_opportunities`, `get_seo_visibility_360`; ver el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md) §8). Pendiente:
 
 | Falta | Task que lo trae |
 |---|---|
 | Captura diaria de rankings (Cloud Scheduler + ops-worker + mirror BigQuery) | TASK-1303 |
 | Site audit (queue + poll OnPage async) y snapshot semanal de backlinks | TASK-1304 |
-| Derived read SEO ↔ AEO (`readSeoAeoGap`) | TASK-1305 |
 | UI operador `/admin/growth/seo` (overview) | TASK-1306 |
 | Pantalla ancla: Rank & URL performance over time | TASK-1307 |
 | Keyword opportunities (UI) | TASK-1308 |

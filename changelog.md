@@ -75,6 +75,15 @@
   `seo-aeo` tiene su copia Claude fuera del repo (sin versionar): le faltaban 2 referencias, incluida la de la API
   de GSC; el gate `skills:mirrors` no puede ver ese drift porque la skill no está en su manifiesto.
 
+## 2026-08-05 — SEO operable por MCP (TASK-1645, code complete)
+
+- Lane ecosystem machine-authed + 3 MCP tools read-only (`get_seo_keyword_opportunities`,
+  `get_seo_visibility_360`, `get_seo_entitlement`) sobre los primitives gobernados del módulo SEO;
+  entitlement per-org con 404 anti-oracle y degradaciones honestas passthrough.
+- Smoke live del lane con quadrant real; rollout pendiente: smoke e2e HTTP con binding, flag en Vercel y
+  federación al gateway `mcp.efeonce.org` (TASK-1647 creada). Todo reader SEO futuro nace con su tool
+  (criterio en 7 tasks).
+
 ## 2026-08-05 — Search Visibility 360: el cruce SEO↔AEO existe (TASK-1305)
 
 - `readSeoAeoGap` + matriz quadrant 360 (dominante/riesgo/oportunidad/invisible): posición orgánica medida
@@ -911,12 +920,3 @@ y [`docs/changelog/internal/2026-07.md`](docs/changelog/internal/2026-07.md).
 - Greenhouse fija los tres paquetes privados y expone adapters MUI/Vuexy; Globe fija los mismos paquetes y expone adapters Tailwind/token classes.
 - Se añadieron fixtures opt-in en `/design-system/axis-adapters` y `/_axis-pilot`, con evidencia desktop/mobile, teclado, reduced motion y sin overflow.
 - El rollout productivo permanece separado; el PAT operator-owned vence el 2026-08-27 y debe rotarse antes de uso externo durable.
-
-## 2026-07-29 — Creator Influence & Content: modelo operativo documentado
-
-- Se documentó el submodelo de Influencers, Creators & UGC dentro de Media & Distribution, con cinco ofertas:
-  Creator Intelligence, Influencer Activation, Creator Content & UGC, Creator Partnership Program y Amplification & Whitelisting.
-- Se añadieron ficha de servicio, arquitectura operativa no-runtime, documentación funcional y manual de operación,
-  separando audiencia, assets, derechos, pass-through, paid usage, RACI, gates y medición.
-- La skill social de Creator/UGC quedó enlazada al modelo canónico; el estado permanece `Approved for validation` y
-  no habilita pricing público ni venta general.

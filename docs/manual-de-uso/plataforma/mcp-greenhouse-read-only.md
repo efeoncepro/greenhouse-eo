@@ -1,9 +1,9 @@
 # MCP Greenhouse Read-Only
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-04-30 por Codex
-> **Ultima actualizacion:** 2026-05-01 por Codex
+> **Ultima actualizacion:** 2026-08-05 por Claude (TASK-1645: tools SEO / Search Visibility 360)
 > **Modulo:** plataforma / MCP
 > **Ruta en portal:** `N/A` (server MCP local `stdio` o remoto HTTP)
 > **Documentacion relacionada:** [API Platform Ecosystem](../../documentation/plataforma/api-platform-ecosystem.md), [Platform Health API](../../documentation/plataforma/platform-health-api.md), [GREENHOUSE_MCP_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md)
@@ -183,6 +183,26 @@ Reglas que el agente debe respetar:
 - **Solo bindings de scope `internal`** ven el corpus (es interno-only en esta versión). Un binding tenant-scoped (organización/cliente/space) recibe `403 scope_not_allowed`. No es un error tuyo: ese binding no tiene grant al corpus interno.
 - Un documento marcado como "no usado por agentes", borrador, deprecado o no-interno **no aparece** (responde `404` por id, o simplemente no entra en la búsqueda). Lo que queda fuera por política se **cuenta** sin mostrar su contenido.
 - Es **read-only**: estas tools nunca crean, editan ni publican conocimiento.
+
+### 8. SEO / Search Visibility 360 (TASK-1645)
+
+- `get_seo_entitlement`
+- `get_seo_keyword_opportunities`
+- `get_seo_visibility_360`
+
+Qué entregan:
+
+- `get_seo_entitlement` dice si una organización tiene el módulo SEO (`seo_v1`) asignado, su tier (`contracted`/`trial`/`pilot`), cuántos site-audits le quedan en el mes y cuánto presupuesto de proveedor (USD) le queda. **Úsala PRIMERO**, antes de proponer cualquier operación SEO.
+- `get_seo_keyword_opportunities` lista las oportunidades striking-distance **medidas** (Google Search Console): posición ponderada, impresiones, clics incrementales estimados, quick wins y canibalización.
+- `get_seo_visibility_360` cruza los dos internets de búsqueda: posición orgánica medida (GSC) × citabilidad IA (score del AEO grader). Devuelve la **matriz quadrant** por keyword y del dominio: `dominante` (rankea y la IA lo cita), `riesgo` (rankea pero la IA NO lo cita — autoridad sin citabilidad, la señal de venta cruzada al AEO), `oportunidad` (citado sin rankear) e `invisible`.
+
+Reglas que el agente debe respetar:
+
+- **La organización se resuelve por el binding.** Un binding ligado a una organización solo ve la suya (pedir otra da `404`). Un binding `internal` debe pasar `organizationId`.
+- **Sin módulo `seo_v1` asignado, el recurso "no existe"** (`404`). No se puede inferir nada más de la organización desde ese 404.
+- **Una lente faltante es un estado, no un cero.** `no_seo_data` / `no_aeo_data` / `target_not_configured` / `disabled` se reportan tal cual; NUNCA inventes un quadrant ni rellenes con ceros.
+- **Los dos ejes del 360 nunca se promedian**: rankeo y citabilidad son verdades ortogonales de motores distintos.
+- Es **read-only**: ninguna de estas tools dispara capturas ni gasta presupuesto de proveedor.
 
 ## Que no puede hacer
 

@@ -1,5 +1,24 @@
 # TASK-1645 — Growth SEO: Ecosystem Lane + MCP Tools (Full API Parity)
 
+## Delta 2026-08-05 (c) — code complete, rollout pendiente
+
+**Entregado:** lane ecosystem (3 rutas + resource builder con org-por-binding, entitlement per-org 404
+anti-oracle, `target_not_configured` honesto, passthrough) + **3 MCP tools** (`get_seo_keyword_opportunities`,
+`get_seo_visibility_360`, `get_seo_entitlement` — la tercera respondiendo a la pregunta del operador de
+exponer TODO lo que tiene reader vivo). 17 tests focales (builder 10 + tools 7) + route-contract + smoke live
+del lane contra PG real (`scripts/growth/_sanity-seo-ecosystem-lane.ts`): anti-oracle ✓, target_not_configured ✓,
+**visibility-360 con quadrant real `riesgo` y 50 keywords** ✓, opportunities ✓, entitlement ✓, cross-org deny ✓,
+cero residuo. Full suite 10168/0 + build prod verdes.
+
+**Rollout pendiente (por qué NO complete):**
+1. El acceptance exige 1 invocación MCP e2e por HTTP con binding ecosystem real en staging — no hay binding
+   disponible en esta sesión (mismo pendiente que dejó TASK-1086 post-deploy).
+2. `GROWTH_SEO_ENABLED` es multi-runtime: el lane lo lee en **Vercel** y hoy está ON solo en el ops-worker
+   (materializer). El flip en Vercel es parte del cutover del módulo (ledger).
+3. Federación `mcp.efeonce.org` → **TASK-1647 creada y registrada** (cumple el criterio "con dueño":
+   adapter delgado + canaries antes de discovery).
+
+
 ## Delta 2026-08-05
 
 - **TASK-1302 complete:** el reader `readKeywordOpportunities` ya nace consumer-agnóstico (server-side, sin acoplamiento a UI) con shape `{ ok } | { ok: false, errorCode, status }`, tal como exige el mandato parity+MCP. Se puede exponer al lane ecosystem y como MCP tool sin adaptador ni lógica duplicada.
@@ -27,7 +46,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-022`
-- Status real: `Diseno`
+- Status real: `CODE COMPLETE 2026-08-05, rollout pendiente — lane+3 tools implementados y live-verificados a nivel función; falta smoke e2e HTTP con binding real + GROWTH_SEO_ENABLED en Vercel (multi-runtime) + federación gateway (TASK-1647)`
 - Rank: `TBD`
 - Domain: `growth|mcp|platform|api`
 - Blocked by: `TASK-1301, TASK-1302`

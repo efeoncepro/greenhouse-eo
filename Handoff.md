@@ -1,5 +1,28 @@
 # Handoff activo
 
+### TASK-1645 — SEO operable por MCP: CODE COMPLETE, rollout pendiente (2026-08-05)
+
+La milla final del camino MCP-first quedó implementada y verificada a nivel función. **Lane ecosystem**
+(`/api/platform/ecosystem/growth/seo/{keyword-opportunities,visibility-360,entitlement}` vía
+`runEcosystemReadRoute`; builder `ecosystem-growth-seo.ts`: org-por-binding — org-scoped manda con mismatch
+404 anti-oracle, internal exige `organizationId` —, entitlement per-org `seo_v1` → 404 anti-oracle,
+`target_not_configured` honesto, payloads passthrough) + **3 MCP tools read-only** en `src/mcp/greenhouse/**`
+(`get_seo_keyword_opportunities`, `get_seo_visibility_360` — nace con el cruce AEO real —, `get_seo_entitlement`
+— el chokepoint como lectura, decisión del operador de exponer todo reader vivo). Evidencia: 17 tests focales +
+route-contract + smoke live del lane contra PG real (quadrant `riesgo` con 50 keywords, cross-org deny, cero
+residuo); full suite **10168/0** + build prod verdes.
+
+**Por qué NO complete (Runtime Rollout Completion Gate):** (1) falta la invocación MCP e2e por HTTP con un
+binding ecosystem real en staging (no disponible en la sesión; mismo pendiente que TASK-1086 dejó post-deploy);
+(2) `GROWTH_SEO_ENABLED` es multi-runtime — el lane lo lee en **Vercel** y hoy está ON solo en el ops-worker;
+el flip es parte del cutover del módulo; (3) la federación al gateway `mcp.efeonce.org` quedó con dueño:
+**TASK-1647 creada** (adapter delgado, canaries antes de discovery — cumple el acceptance "con dueño").
+Mandato amarrado además en 1303/1304/1311/1312/1313/1314/1317: todo reader futuro expone su MCP tool en el
+mismo PR. Docs: arch SEO §7, API Platform delta, manual MCP §8, doc funcional. Sin push.
+
+**Próximo paso:** TASK-1647 (federación gateway) o el cutover del módulo (flag Vercel + assignment Berel +
+smoke e2e con binding) — decisión del operador.
+
 ### TASK-1305 — Cruce SEO↔AEO (quadrant 360) COMPLETE (2026-08-05)
 
 La sinergia directa con AEO que exigió el operador quedó implementada el mismo día: `readSeoAeoGap`
@@ -565,20 +588,6 @@ esa ausencia es lo que dejó acumular trece defectos sin que nadie los viera.
 con 60 s. **No era cierto** — `producer_worker_job.tf` la fija en 15 min desde antes de la sesión, así que el
 modo de fallo que describí no pudo ocurrir en producción. El cambio de default sigue siendo correcto (protege
 a runtimes que no seteen la variable), pero exageré su impacto. Queda escrito en el código.
-
-## SKY Blog — propuesta técnica V2 y arquitectura económica (2026-08-03)
-
-- V2 técnica append-only en [`docs/commercial/tenders/sky-blog-2026/`](docs/commercial/tenders/sky-blog-2026/): fuente,
-  deck enriquecido de 29 láminas y manifiesto de evidencia; Notion/Content Hub es el hub editorial propuesto y
-  WordPress queda como superficie de publicación. El borrador comprimido de 17 láminas y la V1 se conservan.
-- La composición pasó slots y revisión visual; `.captures/` es `workshop_only`, sin render productivo ni `verified`.
-- La económica V2 ya tiene fuente, deck separado de 9 láminas y Excel generado: **CLP 3.000.000 netos/mes sin
-  IVA**, IVA 19% **CLP 570.000**, total mensual con IVA **CLP 3.570.000**; Notion/Content Hub incluido como
-  hub de la operación, newsletter incluida y Addons separados.
-- La sesión quedó trazada en HubSpot como nota `114121518673` sobre el deal `62535094842`; no se modificaron
-  monto ni etapa. La nota registra contexto, guardrails internos y siguientes pasos.
-- La técnica y la económica siguen en `.captures/` como `workshop_only`; falta validar capacidad, cost-to-serve,
-  margen y frontera de contenidos nuevos antes de registrarlas como oferta productiva.
 
 ## WIP saneado — Globe, Brightcell y Polpaico (2026-08-01)
 

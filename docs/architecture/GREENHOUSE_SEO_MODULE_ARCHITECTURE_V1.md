@@ -140,6 +140,18 @@ domain    /v3/domain_analytics/  domain metrics
 
 Cada capacidad = primitive gobernado `src/lib/growth/seo/**`, reusable por UI + Nexa + MCP. Reads directos; writes vía `propose → confirm → execute`.
 
+**Exposición MCP/ecosystem — IMPLEMENTADA (TASK-1645, 2026-08-05).** Lane machine-authed
+`/api/platform/ecosystem/growth/seo/{keyword-opportunities,visibility-360,entitlement}` (vía
+`runEcosystemReadRoute`; resource builder `src/lib/api-platform/resources/ecosystem-growth-seo.ts`:
+org por binding — org-scoped manda con mismatch 404 anti-oracle, internal exige `organizationId` —,
+entitlement per-org `seo_v1` → 404 anti-oracle, `target_not_configured` honesto, payloads passthrough
+de los readers) + **3 MCP tools read-only** en `src/mcp/greenhouse/**`: `get_seo_keyword_opportunities`,
+`get_seo_visibility_360` (nace con el cruce AEO real de TASK-1305) y `get_seo_entitlement` (el
+chokepoint como lectura, SIN anti-oracle por diseño — visibilidad operativa). Regla vigente
+(mandato del operador): **todo reader SEO/E-E-A-T futuro expone su MCP tool en el MISMO PR**
+(criterio de aceptación en TASK-1303/1304/1311/1312/1313/1314/1317). La federación al gateway
+`mcp.efeonce.org` es `TASK-1647` (adapter delgado del provider; canaries antes de discovery).
+
 **Commands (write, capability-gated, audited, outbox):**
 - `configureSeoTarget(orgId, { rootDomain, market }, actor)`
 - `trackKeywords(keywordSetId, keywords[], actor)`
