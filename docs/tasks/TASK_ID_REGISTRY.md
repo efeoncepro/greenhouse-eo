@@ -1727,10 +1727,11 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-1641` | `complete` | **Globe: canary post-promoción operable y convergencia terminal de la saga.** EPIC-028; backend-data/api; P1/Alto/Medio. Medido 2026-08-04: **10 de 12 promociones terminaron `rolled_back`**, y 4 murieron segundos después de su deadline ya estando `activated`. El diseño es correcto y NO se relaja —`activated` no es terminal y el código prohíbe inferir el canary—: falta el **paso operativo**. Los tres huecos quedaron cerrados en código (2026-08-04): `pnpm producer:canary --route=` produce cualquier ruta por su identidad exacta, el worker consume la saga en un solo pase y emite `globe_promotion_window_closing` (complemento estricto de `stalled`, que sólo mira ventanas ya vencidas) + `globe_promotion_readiness_divergent`, y la reserva pre-gasto converge en vez de esperar 24 h. **`code complete, rollout pendiente`**: nada desplegado ni aplicado. | `docs/tasks/complete/TASK-1641-globe-promotion-canary-operability-and-terminal-convergence.md` |
 | `TASK-1642` | `to-do` | **Globe FLUX 3 Video en la flota y el Producer.** EPIC-028; backend-data/integration; backend-critical; P1/Muy alto/Alto. Cinco rutas estándar vía Fal, keyframes/first-last/extend/audio, decisión de drafts y `draft_cache`, namespace catalog/OpenAPI, rates, rights, evaluación, canary, settlement y promoción por ruta. BFL mantiene Early Access; Globe parte `gated`. | `docs/tasks/to-do/TASK-1642-globe-flux3-video-fleet-producer-integration.md` |
 | `TASK-1643` | `to-do` | **Globe Producer Feed-to-Composer Action Continuity.** EPIC-028; ui-ux/interaction; ui-standard; P0/Alto/Medio. Consumer estrecho sobre TASK-1503: Reference, Recreate, Favorite y Download reales o disabled con razón, handoff zero-spend al composer TASK-1552, shell/feed TASK-1559 y GVC premium desktop/390 px. No crea API, schema, capability, viewer, library ni promotion. | `docs/tasks/to-do/TASK-1643-globe-producer-feed-to-composer-action-continuity.md` |
+| `TASK-1644` | `to-do` | **Artifact Composer Visual Profiles for Proposal Studio.** EPIC-029; backend-data/command; P1/Alto/Alto. Define `VisualProfile` versionado —Skin de producto— compatible con catálogos, lo resuelve y sella en el manifest, conserva `axis` como default y conecta la selección gobernada de Proposal Studio sin UI ni CRUD multi-tenant en esta task. | `docs/tasks/to-do/TASK-1644-artifact-composer-visual-profiles-proposal-studio.md` |
 
 ## Siguiente ID disponible
 
-`TASK-1644`
+`TASK-1645`
 
 > **Corrección 2026-07-30.** Este pie declaraba `TASK-1587`, pero la tabla de este mismo archivo ya
 > registraba hasta `TASK-1598` y esos archivos existen en disco: el pie estaba obsoleto respecto de su
@@ -1746,4 +1747,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 > Support Contract» `TASK-1635` al entorno de desarrollo de Globe y `TASK-1636` al bundle de promoción desplegable; al
 > cierre de esa nota el siguiente ID libre era `TASK-1637`.
 
-> **Reserva 2026-08-05.** `TASK-1643` quedó asignada a la continuidad de acciones del Producer feed → composer; el siguiente ID libre es `TASK-1644`.
+> **Reserva 2026-08-05.** `TASK-1643` quedó asignada a la continuidad de acciones del Producer feed → composer y `TASK-1644` al contrato de perfiles visuales del Artifact Composer/Proposal Studio; el siguiente ID libre es `TASK-1645`.

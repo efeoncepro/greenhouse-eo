@@ -47,6 +47,7 @@ El Studio creció como un programa multi-task sin épica ancla: 8 tasks completa
 - `TASK-1419` — Orquestador del deck (§5-ter nodo 1: outline de capítulos + fan-out determinista sobre los authors)
 - `TASK-1420` — Verifier del deck (§5-ter nodo 3: veredicto estructurado de integridad/registro/coherencia + gate humano)
 - `TASK-1421` — F1 canónica: análisis + admisibilidad del RFP (requisito-set + matriz de admisibilidad + fit score → gate humano)
+- `TASK-1644` — Visual Profiles del Artifact Composer para Proposal Studio: perfiles versionados compatibles con catálogo, resolución/sellado en manifest y selección gobernada sin UI ni CRUD multi-tenant inicial.
 
 Los chapter-authors restantes (creativo, social media, web/CRM, HubSpot, contenido) se crean como tasks hijas nuevas **cuando su fuente de datos canónica exista** — un author sin fuente estructurada real sería un stub especulativo (regla de robustez del task-planner). El molde para crearlos: la costura "Un chapter-author nuevo" del companion `proposal-studio-runtime.md`.
 
@@ -62,8 +63,9 @@ recalcular precio ni transformarse en el owner del package. La foundation y el C
   forma universal post-GO. Depende del economic package de `EPIC-012`.
 - `TASK-1641` candidate — Proposal Artifact Review & Finalization: command idempotente y auditable
   `draft → in_review → final`, capabilities, evidence y readback; puede avanzar sin esperar Finance Core.
-- `TASK-1643` candidate — SKY Golden Vertical & Canonical Closure: costo vivo, quote/package congelado,
+- `ID pendiente` — SKY Golden Vertical & Canonical Closure: costo vivo, quote/package congelado,
   composición técnica/económica, paridad deck/PDF/Excel, artifact final, gates humanos y handoff Q2C.
+  La referencia histórica `TASK-1643` ya pertenece a Globe y no se reutiliza.
 
 La reserva de estos IDs y la creación de sus archivos requieren el checkpoint del task planner. No reemplazan
 `TASK-1416…1421`; cierran gaps de package/composición/finalización descubiertos contra el runtime actual.
