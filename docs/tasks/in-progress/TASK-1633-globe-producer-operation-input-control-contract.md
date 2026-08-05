@@ -444,6 +444,9 @@ Ninguna para la foundation. Las promociones, atestaciones y canaries permanecen 
       Seedance ya está registrado (16 cr, `candidate_ready`, cobro único verificado). Aquí queda como dependencia
       de rollout, no como criterio propio.
 - [x] `pnpm check && pnpm build` en Globe y gates documentales Greenhouse quedan verdes.
+- [ ] La matriz browser-safe cubre explícitamente Imagen, Video y Audio: cada ruta declara operación, slots/roles, controles y output sin branches por provider/model slug.
+- [ ] El descriptor permite que `TASK-1552` muestre controles adaptados por modalidad y ruta, con `available | policy-blocked | unsupported` y razón recuperable; ninguna afordancia queda como no-op.
+- [ ] La salida de este contrato conserva la frontera de un solo Producer shell con tres estudios de modalidad; no introduce rutas/apps independientes ni reasigna ownership a `TASK-1641`.
 
 ## Verification
 
@@ -1016,3 +1019,11 @@ Ninguno de estos dos pide construir nada nuevo. Piden **ir a leer** y escribir l
 | B | mecanismos por ruta con evidencia · evidencia de controles en manifest | lectura + declaración | sí |
 | C | Slice 4 (dual-read + gate) | higiene | sí |
 | D | consumer lee la proyección | **no es de 1633** → `TASK-1552` | n/a |
+
+## Delta 2026-08-05 — contrato de tres estudios, no composer genérico
+
+El benchmark de Higgsfield y Magnific confirma que la brecha del Producer está en cómo se presenta el contrato,
+no en crear otra capa de providers. Esta task conserva el contrato neutral como autoridad: Imagen, Video y Audio
+comparten operación, slots, controles, output y estimate donde corresponde, pero cada modalidad debe poder declarar
+su propia forma de trabajo y revisión. La UI consumidora `TASK-1552` queda responsable de materializar esa diferencia
+sin inferirla desde la cantidad de referencias, el provider o el slug del modelo.

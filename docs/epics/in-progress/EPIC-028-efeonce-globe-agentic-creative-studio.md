@@ -155,9 +155,36 @@ producto, sin copiar marcas, assets ni claims.
 | Biblioteca y home | Projects, Sessions, Entry Hub, contexto, library, review y reuse sin duplicar feed | `TASK-1520`, `TASK-1580` → `TASK-1583` | Reusa feed/viewer/media owners y review foundation `TASK-1522` |
 | Promoción de rutas | Canary, ventana, rollback, readiness y convergencia de la saga | `TASK-1641` | Backend/API; `UI impact: none`; queda fuera de la experience lane |
 
-Orden de implementación de experiencia: `TASK-1633 → TASK-1552 → TASK-1643 → TASK-1571/1570/1568 →
-TASK-1580 → TASK-1581 → TASK-1582 → TASK-1583`. Las ramas de media conservan sus foundations: video
-`1569 → 1570`, audio `1567 → 1568`; edición de video y audio sigue después de sus contratos.
+Orden de implementación de experiencia, con dependencias explícitas: `TASK-1633 → TASK-1552 → TASK-1643 →
+revisión de media → TASK-1580 → TASK-1581 → TASK-1582 → TASK-1583`.
+
+| Fase | Entrada | Entregable | Dependencias estrictas |
+|---|---|---|---|
+| Contrato transversal | `TASK-1523` | Creative Loop, dirección visual, IA, flow/motion y ownership | policy; no runtime paralelo |
+| Composer foundation | `TASK-1633` | contrato browser-safe de operación, slots, controles y output | API Contract Spine / catálogo |
+| Composer multimodal | `TASK-1552` | un shell Producer con estudios adaptativos de Imagen, Video y Audio | `TASK-1633` |
+| Continuidad | `TASK-1643` + `TASK-1559` | muro/feed accionable, handoff zero-spend y viewer único | `TASK-1552`; `TASK-1559` conserva shell/render |
+| Imagen | `TASK-1571` | Focus Canvas, compare y revisión visual | `TASK-1559`; edición regional después en `TASK-1572` |
+| Video | `TASK-1569 → TASK-1570` | projection, poster, playback, timeline, timecode y MediaDock | `TASK-1559`; edición después en `TASK-1573 → TASK-1574` |
+| Audio | `TASK-1567 → TASK-1568` | waveform, playback único, playhead y AudioDock | `TASK-1559`; edición layer-aware después en `TASK-1575 → TASK-1577` |
+| Contexto y reuse | `TASK-1580 → TASK-1583` | Project/Session/Element, Entry Hub, Asset Workspace y Review-to-Element | revisión de media + `TASK-1520`/`TASK-1522` |
+
+La revisión de media puede ejecutarse en tres ramas después del contrato común: imagen (`1571`), video
+(`1569 → 1570`) y audio (`1567 → 1568`). El orden de aceptación del Producer sigue siendo el de la tabla,
+aunque las foundations backend de video/audio puedan prepararse en paralelo sin convertirlas en bloqueos
+artificiales del feed.
+
+Esta recomposición se registra como un plan de owners existentes, no como `Producer V3`: no se reserva un ID
+nuevo ni se crea una task paraguas. Un solo shell alberga tres estudios de modalidad; no se crean tres aplicaciones,
+un segundo feed/viewer ni un composer genérico que ignore `RouteCreativeContractV1`.
+
+Contratos de diseño y ejecución asociados:
+
+- [Dirección visual Producer V3](../../ui/visual-directions/EPIC-028-producer-v3-unified-studios.md)
+- [Wireframe Producer V3](../../ui/wireframes/EPIC-028-producer-v3-unified-studios.md)
+- [Flow Producer V3](../../ui/flows/EPIC-028-producer-v3-unified-studios-flow.md)
+- [Motion Producer V3](../../ui/motion/EPIC-028-producer-v3-unified-studios-motion.md)
+- [Plan operativo Producer V3](../../operations/creative-studio/EPIC_028_PRODUCER_V3_EXECUTION_PLAN_V1.md)
 
 Criterios de salida comunes para esta lane:
 

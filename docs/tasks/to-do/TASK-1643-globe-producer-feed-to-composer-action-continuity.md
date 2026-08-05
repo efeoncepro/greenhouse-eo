@@ -370,6 +370,8 @@ después del readback de `TASK-1503`. No cambiar flags comerciales ni autorizar 
       desktop y 390 px.
 - [ ] GVC premium, scorecard y tests focales pasan; `UI ready` permanece `no` hasta que los gates lo confirmen.
 - [ ] No se agrega API, schema, capability, provider, viewer, gallery o action registry paralelo.
+- [ ] La action rail es agnóstica al media stage: entrega handles/contexto a los estudios de Imagen, Video y Audio sin reimplementar sus viewers ni convertir el feed en un editor.
+- [ ] El handoff sigue siendo una unidad bounded y no abre una task paraguas `Producer V3`; `TASK-1559` conserva shell/render y `TASK-1641` permanece fuera de la lane UI.
 
 ## Verification
 
@@ -404,3 +406,10 @@ después del readback de `TASK-1503`. No cambiar flags comerciales ni autorizar 
 - Qué subset exacto de recipe puede proyectar el feed antes de que `TASK-1552` cierre su consumer; resolverlo leyendo
   el contrato, no agregando campos ad hoc al card item.
 - Qué acciones deben permanecer disabled por rights/projection en assets históricos; usar el reader de `TASK-1503`.
+
+## Delta 2026-08-05 — continuidad común para los tres estudios
+
+El benchmark muestra que la diferencia competitiva se percibe cuando una pieza puede continuar inmediatamente hacia
+referencia, recreación, edición, organización o descarga. Esta task cierra sólo el primer tramo transversal: feed
+→ acción → composer. Los stages especializados de Imagen/Video/Audio y el Asset Workspace reciben el contexto, pero
+no se incorporan aquí. La acción debe conservar modality, role, lineage, rights y estimate stale sin iniciar gasto.

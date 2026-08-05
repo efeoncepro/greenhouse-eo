@@ -372,6 +372,9 @@ Product/Creative valida dirección; owners de `TASK-1505`, `1474` y `1485` acept
 - [ ] Cada acción mapea a contract existente o task backend separada.
 - [ ] Deltas de consumers y EPIC-028 quedan sincronizados.
 - [ ] Evidencia distingue Producer runtime de Workbench futuro.
+- [ ] La dirección de experiencia fija un solo Producer shell con tres estudios adaptativos —Imagen, Video y Audio— y rechaza tanto tres aplicaciones aisladas como un composer genérico.
+- [ ] La matriz de responsabilidades distingue primitives compartidas, controles por modalidad, viewer especializado, feed, workspace, review y reuse; ningún consumer crea un segundo feed/viewer/library.
+- [ ] El grafo ejecutable queda documentado como `TASK-1633 → TASK-1552 → TASK-1643 → revisión de media → TASK-1580 → TASK-1581 → TASK-1582 → TASK-1583`, con `TASK-1641` fuera de la lane UI.
 
 ### Criterios del MOTION del payload cliente — migrados de TASK-1565 (retirada)
 
@@ -427,3 +430,25 @@ Los contratos maestros del programa son:
 - `docs/ui/motion/EPIC-028-globe-creative-studio-master-motion.md`
 
 El delivery se deriva a `TASK-1580` (Project/Session/Element contract), `TASK-1581` (Entry Hub + Session Feed), `TASK-1582` (Asset Workspace) y `TASK-1583` (Review-to-Element). Los consumers deben declarar esos contratos y no redefinir estados, focus, reduced motion o ownership de media.
+
+## Delta 2026-08-05 — Producer unificado con tres estudios de modalidad
+
+El benchmark autenticado de Higgsfield y Magnific confirma que la ventaja competitiva está en la continuidad
+`crear → revisar → modificar → reutilizar`, no en separar el producto en tres aplicaciones. `TASK-1523` conserva
+la autoridad de la decisión: Producer mantiene un shell y un muro/feed común, mientras Imagen, Video y Audio
+reciben compositores, stages, estados y acciones de revisión especializados.
+
+La decisión es una recomposición de experiencia sobre contracts/readers/commands existentes. No crea `Producer V3`
+como task paraguas, no agrega un segundo runtime y no cambia la autoridad de `TASK-1633`, `TASK-1552`, `TASK-1559`,
+las tasks de media o `TASK-1580`–`TASK-1583`.
+
+El handoff de diseño del corte está consolidado en:
+
+- [Dirección visual Producer V3](../../ui/visual-directions/EPIC-028-producer-v3-unified-studios.md)
+- [Wireframe Producer V3](../../ui/wireframes/EPIC-028-producer-v3-unified-studios.md)
+- [Flow Producer V3](../../ui/flows/EPIC-028-producer-v3-unified-studios-flow.md)
+- [Motion Producer V3](../../ui/motion/EPIC-028-producer-v3-unified-studios-motion.md)
+- [Plan operativo Producer V3](../../operations/creative-studio/EPIC_028_PRODUCER_V3_EXECUTION_PLAN_V1.md)
+
+Estos documentos son un contrato program-level de handoff; no sustituyen los wireframes/flows/motion declarados
+por cada task consumer ni permiten pasar `UI ready` sin sus gates propios.

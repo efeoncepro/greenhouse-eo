@@ -24,6 +24,7 @@ es auditable en el git log del repo hermano):
 - [LOCAL_AUTHENTICATION.md](LOCAL_AUTHENTICATION.md) — autenticación local contra Globe (web/api mode).
 - [TASK_1454_INTERNAL_SMOKE_RUNBOOK.md](TASK_1454_INTERNAL_SMOKE_RUNBOOK.md) — smoke internal-only.
 - [EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md](EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md) — plan de ejecución paralela del EPIC-028.
+- [EPIC_028_PRODUCER_V3_EXECUTION_PLAN_V1.md](EPIC_028_PRODUCER_V3_EXECUTION_PLAN_V1.md) — plan operativo del shell Producer unificado y sus tres estudios de modalidad.
 - [EPIC_028_FRESH_SESSION_PROMPT.md](EPIC_028_FRESH_SESSION_PROMPT.md) — prompt de arranque de sesión para trabajo sobre EPIC-028.
 - [TASK_1641_SESSION_HANDOFF_2026-08-04.md](TASK_1641_SESSION_HANDOFF_2026-08-04.md) — arranque de sesión para **retomar `TASK-1641`**: scopes cerrados con su evidencia, orden recomendado (Scope 2 y el cierre del 3 son el mismo trabajo) y las trampas ya pagadas (`referenceHashes`, elección de `inputMode`, el alcance real de la alerta `stalled`).
 - [GLOBE_PRODUCER_ROLLOUT_AND_CANARY_V1.md](GLOBE_PRODUCER_ROLLOUT_AND_CANARY_V1.md) — rollout interno serializado, políticas exactas y canarios image/video/audio por los commands/readers de la UI.

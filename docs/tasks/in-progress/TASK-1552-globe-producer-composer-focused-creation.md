@@ -1687,6 +1687,9 @@ N/A — repo-only task/documentation plus UI changes in the Globe runtime owned 
 - [ ] Una receta modificada se identifica como personalizada y permite restaurar la receta base; los locks
       de cámara/look/sujeto se muestran con estado honesto y no se simulan si el contrato no está disponible.
 - [ ] Imagen, Video y Audio muestran sólo los controles relevantes para su modalidad y no presentan capacidades gated como activas.
+- [ ] El composer conserva un único Producer shell y materializa tres estudios adaptativos —Imagen, Video y Audio— sin crear rutas `/producer/image`, `/producer/video` o `/producer/audio` independientes.
+- [ ] El primer fold, controls dock, output shape, estados y copy cambian por `RouteCreativeContractV1` y modalidad; no se implementa un formulario genérico ni branches por provider/model slug.
+- [ ] Las transiciones image→video y audio→video preservan referencia, rol, lineage, rights y estimate stale; ninguna transición inicia gasto implícito ni pierde el contexto del asset.
 - [ ] El CTA reutiliza `TASK-1532`: no hay botón manual `Calcular costo`, no se duplica la línea de costo y el estimate vigente aparece dentro del CTA.
 - [ ] El prompt, disclosures, CTA y estados son operables por teclado, tienen focus visible, targets táctiles de 44 px y equivalencia reduced-motion.
 - [ ] GVC premium captura 1440×1000 y 390×844, con first fold, estados clave y evidencia revisada en dossier.
@@ -1908,3 +1911,14 @@ superficie que sólo esta task puede dar:
 - **No convertir el composer en cabina.** Un control por cada entrada del descriptor se ve profesional y rinde
   peor: estos modelos responden a lenguaje de oficio, no a taxonomías. El descriptor decide qué ofrecer y qué
   rechazar, no cuántas perillas dibujar.
+
+## Delta 2026-08-05 — composer V3 como shell compartido y estudios adaptativos
+
+La decisión de producto derivada del benchmark es recomponer el composer dentro de la superficie existente: un
+shell compartido para sesión, estimate, créditos, referencias y continuidad, con tres estudios internos que cambian
+su jerarquía y controles según la modalidad. Imagen prioriza referencias/variantes y comparación; Video prioriza
+frames, motion, duración, audio y revisión temporal; Audio prioriza script/voz/idioma y waveform/playback.
+
+Esto no amplía el ownership de la task: `TASK-1633` sigue siendo la autoridad del contrato, `TASK-1643` posee
+feed→composer, `TASK-1559` conserva feed/viewer y las tasks de media poseen sus stages. `TASK-1641` no es dependencia
+de UI.
