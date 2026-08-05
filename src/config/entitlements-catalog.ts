@@ -2182,6 +2182,22 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   // nunca conecta directo). Grant set operador (internal ∪ EFEONCE_ADMIN ∪ EFEONCE_ACCOUNT
   // ∪ EFEONCE_OPERATIONS ∪ AI_TOOLING_ADMIN) en runtime.ts mismo PR.
   { key: 'growth.search_console.connect', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
+  // TASK-1301 — Growth SEO (dominio growth.seo, EPIC-022 "Search Visibility 360"). 5 capabilities
+  // gobernadas (Full API Parity + MCP-first: mismas caps para UI/Nexa/lane app/lane ecosystem —
+  // NUNCA un gate paralelo por consumer). El ACCESO efectivo es per-org vía module_assignments
+  // (module_key `seo_v1`, lección TASK-1248); el rol es solo el plano fino. El gate de costo
+  // DataForSEO vive en el chokepoint único `enforceSeoRunEntitlement` (src/lib/growth/seo/
+  // entitlement.ts). Grants en runtime.ts mismo PR:
+  //  - target.configure / audit.run: set operador (internal ∪ EFEONCE_ADMIN ∪ EFEONCE_ACCOUNT ∪
+  //    EFEONCE_OPERATIONS ∪ AI_TOOLING_ADMIN).
+  //  - observation.read: set interno base (internal ∪ EFEONCE_ADMIN ∪ AI_TOOLING_ADMIN).
+  //  - entitlement.manage: SOLO EFEONCE_ADMIN ∪ EFEONCE_ACCOUNT (espejo AEO TASK-1286).
+  //  - report.read_client: client_* scope 'own' (+ réplica superset interno para coverage).
+  { key: 'growth.seo.target.configure', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
+  { key: 'growth.seo.audit.run', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
+  { key: 'growth.seo.observation.read', module: 'growth', actions: ['read'] as const, defaultScope: 'tenant' },
+  { key: 'growth.seo.report.read_client', module: 'growth', actions: ['read'] as const, defaultScope: 'own' },
+  { key: 'growth.seo.entitlement.manage', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
   // TASK-353 — Hiring / ATS domain foundation. 8 capabilities V1 del dominio de
   // fulfillment de talento. `publish` y `decide` se modelan como verbo `execute`
   // (gobernanza: publicar un opening / decidir una postulación son commands, no CRUD).

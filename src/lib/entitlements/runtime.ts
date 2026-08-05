@@ -269,6 +269,30 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       scope: 'own',
       source
     })
+
+    // TASK-1301 — growth.seo.observation.read: leer rank/backlink/audit del módulo SEO
+    // (mismo set interno base que observation.read del AEO — quien opera el motor lee
+    // su evidencia). El acceso a una org concreta lo gobierna el chokepoint per-org
+    // (`enforceSeoRunEntitlement`, module_assignments `seo_v1`); esta capability es el
+    // plano fino.
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.seo.observation.read',
+      action: 'read',
+      scope: 'tenant',
+      source
+    })
+
+    // TASK-1301 — growth.seo.report.read_client: el cliente la usa con scope 'own' (grant
+    // real en el bloque tenantType='client' de abajo). Réplica al set interno SOLO para el
+    // guard de cobertura (patrón report.read_client del AEO, inocuo por el mismo motivo).
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.seo.report.read_client',
+      action: 'read',
+      scope: 'own',
+      source
+    })
   }
 
   // TASK-1277 — run.operator: Growth/AM corre el motor AEO sobre cualquier cliente o prospecto
@@ -386,6 +410,43 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       scope: 'tenant',
       source: operatorSource
     })
+
+    // TASK-1301 — Growth SEO (EPIC-022): target.configure (autor de targets/keywords/
+    // competitors) + audit.run (disparar site audit). Mismo set operador que run.operator:
+    // quien opera el motor de venta/servicio configura y dispara. El GASTO real lo gatea
+    // el chokepoint único `enforceSeoRunEntitlement` (per-org via module_assignments
+    // `seo_v1` + allowance + budget); ningún consumer lo salta.
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.seo.target.configure',
+      action: 'execute',
+      scope: 'tenant',
+      source: operatorSource
+    })
+
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.seo.audit.run',
+      action: 'execute',
+      scope: 'tenant',
+      source: operatorSource
+    })
+
+    // TASK-1301 — growth.seo.entitlement.manage: espejo exacto de TASK-1286 (AEO) — el
+    // set operador completo NO recibe esta mutación; sólo AM (`efeonce_account`) y admin
+    // asignan/cambian/revocan el módulo `seo_v1` per-org.
+    if (
+      hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+      hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT)
+    ) {
+      addEntitlement(entries, {
+        module: 'growth',
+        capability: 'growth.seo.entitlement.manage',
+        action: 'execute',
+        scope: 'tenant',
+        source: 'role'
+      })
+    }
   }
 
   // TASK-1229 — Growth Forms engine. Operación interna del motor de formularios
@@ -2692,6 +2753,17 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       module: 'growth',
       capability: 'growth.ai_visibility.run.portal',
       action: 'execute',
+      scope: 'own',
+      source: 'role'
+    })
+
+    // TASK-1301 — growth.seo.report.read_client: el cliente ve el report SEO de SU
+    // organización (scope 'own', org derivada server-side — espejo del report.read_client
+    // del AEO). El acceso efectivo lo gobierna el assignment per-org `seo_v1`.
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.seo.report.read_client',
+      action: 'read',
       scope: 'own',
       source: 'role'
     })
