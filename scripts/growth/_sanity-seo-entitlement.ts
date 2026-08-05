@@ -47,21 +47,28 @@ const main = async () => {
      VALUES ($1, $2, 'seo_v1', 'active', $3, CURRENT_DATE, '{"seo_tier":"contracted"}'::jsonb)`,
     [id, org, source]
   )
-  e = await resolveSeoEntitlement(org)
-  const gate = await enforceSeoRunEntitlement(org, { estimatedCostUsd: 1.5 })
 
-  console.log(
-    '2. con assignment → tier', e.tier, '| audits', `${e.allowanceUsed}/${e.allowanceCap}`,
-    '| budget usado $' + e.budgetUsedUsd, '| gate.allowed =', gate.allowed, '(esperado true)'
-  )
-  if (!gate.allowed || e.tier !== 'contracted') process.exitCode = 1
+  try {
+    e = await resolveSeoEntitlement(org)
+    const gate = await enforceSeoRunEntitlement(org, { estimatedCostUsd: 1.5 })
 
-  const gateBig = await enforceSeoRunEntitlement(org, { estimatedCostUsd: 9999 })
+    console.log(
+      '2. con assignment → tier', e.tier, '| audits', `${e.allowanceUsed}/${e.allowanceCap}`,
+      '| budget usado $' + e.budgetUsedUsd, '| gate.allowed =', gate.allowed, '(esperado true)'
+    )
+    if (!gate.allowed || e.tier !== 'contracted') process.exitCode = 1
 
-  console.log('3. costo estimado 9999 → allowed =', gateBig.allowed, '| reason =', gateBig.blockedReason, '(esperado budget_exhausted)')
-  if (gateBig.allowed || gateBig.blockedReason !== 'budget_exhausted') process.exitCode = 1
+    const gateBig = await enforceSeoRunEntitlement(org, { estimatedCostUsd: 9999 })
 
-  await runGreenhousePostgresQuery(`DELETE FROM greenhouse_client_portal.module_assignments WHERE assignment_id = $1`, [id])
+    console.log('3. costo estimado 9999 → allowed =', gateBig.allowed, '| reason =', gateBig.blockedReason, '(esperado budget_exhausted)')
+    if (gateBig.allowed || gateBig.blockedReason !== 'budget_exhausted') process.exitCode = 1
+  } finally {
+    // Hallazgo TASK-1300 (2026-08-05): BEGIN/ROLLBACK a través del pool NO es seguro
+    // (una conexión por llamada). Patrón canónico de sanity: writes commiteados +
+    // cleanup en finally para no dejar residuo aunque un assert reviente.
+    await runGreenhousePostgresQuery(`DELETE FROM greenhouse_client_portal.module_assignments WHERE assignment_id = $1`, [id])
+  }
+
   e = await resolveSeoEntitlement(org)
   console.log('4. revocado →', e.blockedReason, '(esperado no_entitlement)')
   if (e.blockedReason !== 'no_entitlement') process.exitCode = 1
