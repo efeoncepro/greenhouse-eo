@@ -179,7 +179,7 @@ Evidencia: [biblioteca y selección](./evidence/2026-08-04/magnific-image-genera
 
 | Prioridad | Entrega | Resultado verificable |
 |---|---|---|
-| P0 | Reparar las acciones del feed `Reference`, `Recreate`, `Favorite` y `Download`, y exponer el input obligatorio para rutas que lo requieren | Cada control visible tiene handler real, estado de éxito/error y evidencia browser; no hay no-op. Relacionado con TASK-1641. |
+| P0 | Reparar las acciones del feed `Reference`, `Recreate`, `Favorite` y `Download`, y exponer el input obligatorio para rutas que lo requieren | Cada control visible tiene handler real, estado de éxito/error y evidencia browser; no hay no-op. Relacionado con TASK-1643; los contratos siguen en TASK-1503 y el composer en TASK-1552. |
 | P0 | Cablear `creativeContract` en el composer y declarar controles por ruta/modelo | La UI no ofrece campos o defaults que el adapter ignora; negative prompt y controles de evidencia tienen dueño explícito. Relacionado con TASK-1633. |
 | P1 | Entregar `MediaStage` para imagen, vídeo y audio | Info/Tools/Comments, metadata, prompt, inputs, lineage, reproducción/timecode y acciones condicionadas por capability. |
 | P1 | Implementar referencias y recreación zero-spend | `Reference`/`Recreate` prellenan el composer, conservan `sourceAssetId` y no crean un job hasta que el usuario confirma. |

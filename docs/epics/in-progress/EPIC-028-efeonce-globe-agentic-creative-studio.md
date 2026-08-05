@@ -136,6 +136,41 @@ mismo camino. Reescribir los tres gates de diseño es **precondición**, no foll
 La referencia de valores para migrar sin reinterpretar vive en
 [`GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md`](../../ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md).
 
+### Delta 2026-08-05 — Benchmark competitivo Higgsfield/Magnific: owner map y slices de experiencia
+
+La auditoría autenticada de [Higgsfield y Magnific](../../audits/competitive-ui/GLOBE_COMPETITIVE_BENCHMARK_HIGGSFIELD_MAGNIFIC_2026-08-05.md)
+confirma una brecha de UI en la continuidad `crear → revisar → modificar → reutilizar`, no una ausencia general
+de contratos server-side. La UI de los líderes es más fuerte en jerarquía, composer por modalidad, muro accionable,
+viewer profundo, video temporal, audio nativo y home/workspace. EPIC-028 adopta esos aprendizajes como criterios de
+producto, sin copiar marcas, assets ni claims.
+
+| Superficie | Aprendizaje que se incorpora | Owner | Dependencias / frontera |
+|---|---|---|---|
+| Contrato de experiencia | Creative Loop, IA, agentic `propose → approve → execute → judge`, flow/motion y gates humanos | `TASK-1523` | Política transversal; no backend ni runtime paralelo |
+| Composer multimodal | El composer se adapta a operación, slots, roles, controles y output de la ruta; no a un formulario genérico | `TASK-1633` → `TASK-1552` | `TASK-1504`, `TASK-1553`, `TASK-1555`; el adapter conserva su traducción |
+| Feed → composer | Reference, Recreate, Favorite y Download deben ejecutar o explicar su bloqueo; Reference/Recreate son zero-spend | **`TASK-1643`**; shell/render `TASK-1559`; actions backend `TASK-1503` | Slice nuevo y estrecho; reemplaza la atribución errónea a `TASK-1641` |
+| Viewer de imagen | Focus Canvas, zoom/pan/fit/1:1, navegación y compare sólo con lineage real | `TASK-1559` → `TASK-1571` | Edición regional queda en `TASK-1572` |
+| Viewer de video | Poster, timeline, timecode, playback único, MediaDock y estados de buffering | `TASK-1569` → `TASK-1570` | Edición/continuidad separada en `TASK-1573` → `TASK-1574` |
+| Viewer de audio | Waveform, playhead, duración, preview, AudioDock y estados degradados | `TASK-1567` → `TASK-1568` | Edición layer-aware en `TASK-1575` → `TASK-1577` |
+| Biblioteca y home | Projects, Sessions, Entry Hub, contexto, library, review y reuse sin duplicar feed | `TASK-1520`, `TASK-1580` → `TASK-1583` | Reusa feed/viewer/media owners y review foundation `TASK-1522` |
+| Promoción de rutas | Canary, ventana, rollback, readiness y convergencia de la saga | `TASK-1641` | Backend/API; `UI impact: none`; queda fuera de la experience lane |
+
+Orden de implementación de experiencia: `TASK-1633 → TASK-1552 → TASK-1643 → TASK-1571/1570/1568 →
+TASK-1580 → TASK-1581 → TASK-1582 → TASK-1583`. Las ramas de media conservan sus foundations: video
+`1569 → 1570`, audio `1567 → 1568`; edición de video y audio sigue después de sus contratos.
+
+Criterios de salida comunes para esta lane:
+
+- ningún control visible es no-op;
+- toda acción ejecuta, rechaza antes de gastar o aparece disabled con una razón comprensible;
+- Reference/Recreate conserva asset, role, recipe, lineage y estimate stale sin iniciar un job;
+- imagen, video y audio comparten identidad de asset, rights y acciones gobernadas;
+- desktop, 390 px, teclado, reduced motion y `scrollWidth === clientWidth` tienen evidencia GVC proporcional.
+
+`TASK-1641` queda explícitamente fuera de la UI. La nueva `TASK-1643` existe sólo porque el benchmark había
+mezclado acciones del Producer con la saga de promoción y porque `TASK-1526`/`TASK-1559` tienen una frontera
+histórica de port versus dominio; no es una task paraguas ni crea un segundo owner de feed, composer o library.
+
 ## Child Tasks
 
 > Greenhouse es el único control plane operativo: registra `TASK-###`, dependencias, lifecycle, hooks, lint,
@@ -207,6 +242,7 @@ La referencia de valores para migrar sin reinterpretar vive en
  - `TASK-1581` — **Globe Producer Creative Entry Hub and Session Feed.** Consumer UI que cambia el ingreso por modalidad a ingreso por intención, muestra contexto reciente y agrupa actividad por sesión sin crear otro feed.
  - `TASK-1582` — **Globe Producer Asset Workspace and Contextual Reuse.** Consumer UI que conecta el viewer/media canvases con proyecto, colección, sesión, lineage y acciones de continuidad.
  - `TASK-1583` — **Globe Producer Review-to-Element and Governed Reuse Experience.** Consumer UI que conecta review/changes-requested/approval con child sessions, creación explícita de Elements y reutilización gobernada.
+ - `TASK-1643` — **Globe Producer Feed-to-Composer Action Continuity.** Consumer UI estrecho para wiring gobernado de Reference, Recreate, Favorite y Download y su handoff zero-spend al composer. No posee contratos de asset, feed transport, composer route logic, media canvas, review, workspace ni promotion.
 
 ### Commercial architecture and market validation — 2026-07-29
 

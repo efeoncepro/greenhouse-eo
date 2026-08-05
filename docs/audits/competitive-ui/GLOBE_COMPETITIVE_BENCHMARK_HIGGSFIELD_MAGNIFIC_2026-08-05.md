@@ -34,7 +34,8 @@ El gap más crítico está en la interfaz activa de React, no en la ausencia de 
 4. Audio está declarado en el catálogo con rutas de voz, traducción, cambio de voz, foley y TTS, pero el
    ShapeControls activo muestra Voice como «—» y no expone el contrato específico de la ruta.
 
-**Recomendación:** tratar TASK-1641 y TASK-1552 como la primera entrega de paridad de workflow. Después,
+**Recomendación:** tratar TASK-1643 y TASK-1552 como la primera entrega de paridad de workflow; TASK-1641
+permanece en paralelo como lane backend de promoción. Después,
 completar MediaStage/Viewer y las operaciones zero-spend de lineage. El catálogo de modelos se puede ampliar
 cuando el selector explique compatibilidad, capacidad, latencia orientativa, resolución y coste sin divulgar
 slugs de proveedor ni datos internos.
@@ -394,7 +395,7 @@ ProducerViewer.tsx:116-181; acciones y readers ya inventariados en legacy-parity
 
 **Confianza:** Alta.
 
-**Implicación:** cerrar TASK-1641 antes de ampliar el catálogo. Una UI que anuncia Reference o Download y no
+**Implicación:** cerrar TASK-1643 antes de ampliar el catálogo. Una UI que anuncia Reference o Download y no
 hace nada erosiona confianza más rápido que una capability ausente y explicada.
 
 ### H3 — El contrato creativo de ruta es el puente entre flota y UX
@@ -489,7 +490,7 @@ con la misma identidad de asset, permisos, lineage y estado.
 
 | Prioridad | Entrega | Task/carril | Evidencia de cierre |
 |---|---|---|---|
-| P0 | Conectar Reference, Recreate, Favorite y Download del feed; explicar input obligatorio en rutas bloqueadas | TASK-1641 / scopes Producer | captura browser de cada acción, command/reader real, error visible y prueba de no duplicación |
+| P0 | Conectar Reference, Recreate, Favorite y Download del feed; explicar input obligatorio en rutas bloqueadas | TASK-1643; contracts `TASK-1503`, `TASK-1552`, shell `TASK-1559` | captura browser de cada acción, command/reader real, error visible y prueba de no duplicación |
 | P0 | Hacer que el composer consuma creativeContract, slots y controls de la ruta | TASK-1552, alineado con TASK-1633 | ruta con first-frame, ruta con motion-source y ruta de audio; cada control aplicado o rechazado antes de estimate/prepare |
 | P1 | Completar MediaStage/ProducerViewer con Info, Tools, Comments, prompt, inputs, lineage y acciones | viewer / review | desktop y 390 px; teclado; reduced motion; herramientas condicionadas por capability |
 | P1 | Implementar Reference/Recreate zero-spend con sourceAssetId y recipe gobernada | feed + composer + assets | no aparece job ni reserva hasta confirmar; lineage visible; rights heredados |
@@ -500,7 +501,7 @@ con la misma identidad de asset, permisos, lineage y estado.
 
 ### Orden de ejecución recomendado
 
-1. TASK-1641: eliminar affordances mentirosas del feed y desbloquear la ruta de inputs obligatorios.
+1. TASK-1643: eliminar affordances mentirosas del feed y cerrar el handoff zero-spend a Composer.
 2. TASK-1552: consumir creativeContract para que la forma visible sea la forma ejecutable.
 3. Viewer/review: convertir el asset retenido en una superficie de trabajo.
 4. Reference/Recreate: cerrar el ciclo de lineage sin gasto accidental.

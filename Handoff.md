@@ -50,7 +50,8 @@ del canary. Detalle:
 Globe main@21d6ee3 están documentadas en
 [GLOBE_COMPETITIVE_BENCHMARK_HIGGSFIELD_MAGNIFIC_2026-08-05](docs/audits/competitive-ui/GLOBE_COMPETITIVE_BENCHMARK_HIGGSFIELD_MAGNIFIC_2026-08-05.md).
 El hallazgo load-bearing coincide con este handoff: la UI React todavía deja Reference, Recreate, Favorite y
-Download sin handlers reales; no declarar cerrado el loop de Producer hasta TASK-1641/TASK-1552.
+Download sin handlers reales; no declarar cerrado el loop de Producer hasta TASK-1643/TASK-1552. TASK-1641 queda
+limitada al lane backend/API de promoción y conserva como único criterio abierto el canary end-to-end.
 
 ## TASK-1641 — Globe: el sello del canary funciona; Omni y Veo SELLADAS (2026-08-04)
 

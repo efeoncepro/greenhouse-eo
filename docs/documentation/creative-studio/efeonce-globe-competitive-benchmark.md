@@ -67,10 +67,10 @@ y el [contrato creativo por ruta](./efeonce-globe-contrato-creativo-ruta.md).
 
 ## Prioridades
 
-- **P0:** TASK-1641 — acciones del feed e inputs obligatorios.
+- **P0:** TASK-1643 — acciones del feed e inputs obligatorios, con contratos `TASK-1503` y composer `TASK-1552`.
 - **P0:** TASK-1552, alineada con TASK-1633 — consumo de creativeContract.
 - **P1:** MediaStage/ProducerViewer con review, tools y lineage.
-- **P1:** Reference/Recreate zero-spend.
+- **P1:** Reference/Recreate zero-spend, continuidad extendida por `TASK-1643` y luego `TASK-1582`.
 - **P1:** model picker y biblioteca.
 - **P2:** audio route-native, waveform, help y recovery.
 

@@ -158,7 +158,7 @@ El benchmark del 2026-08-05 revalidó una diferencia importante entre contrato y
 deja Reference, Recreate, Favorite y Download sin handlers reales, y ProducerComposer todavía no consume
 creativeContract de forma completa. Por eso las listas de capacidades anteriores describen el producto aprobado
 y sus contratos, no una afirmación de que cada acción esté operativa en la UI React actual. El estado de esas
-brechas vive en TASK-1641, TASK-1552 y Handoff.
+brechas vive en TASK-1643, TASK-1552 y Handoff. TASK-1641 conserva únicamente el lane backend/API de promoción.
 
 Continúan abiertos la limpieza semántica de reconciliaciones obsoletas que inflan la edad de cola, la promoción
 independiente de las otras siete rutas y la arquitectura de derivados/streaming para previews grandes. Clientes
