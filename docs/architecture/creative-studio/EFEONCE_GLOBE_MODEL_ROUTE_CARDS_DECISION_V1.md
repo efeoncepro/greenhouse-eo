@@ -110,10 +110,26 @@ initial audited baseline now also includes:
   `veo-3.1-generate-001` frames route, while keeping the adapter's Fast variant separate;
 - [`SEEDANCE_2_VIDEO_ROUTE_CARD_V1.json`](model-fleet/routes/SEEDANCE_2_VIDEO_ROUTE_CARD_V1.json) for full Seedance
   2.0, Seedance 2.0 R2V and the deferred Mini/I2V adapter surface.
+- [`GPT_IMAGE_2_IMAGE_ROUTE_CARD_V1.json`](model-fleet/routes/GPT_IMAGE_2_IMAGE_ROUTE_CARD_V1.json) for the exact
+  OpenAI `gpt-image-2` generation route. The user-facing label “Imagen 2 de ChatGPT” is normalized to GPT Image 2;
+  Google `imagen-2` has no Globe route, adapter or binding and is not an integration candidate.
+- [`SEEDREAM_5_PRO_IMAGE_ROUTE_CARD_V1.json`](model-fleet/routes/SEEDREAM_5_PRO_IMAGE_ROUTE_CARD_V1.json) for
+  Seedream 5 Pro text-to-image and the separate Seedream 5 Pro Edit identity. The text route is available; the latest
+  live reader readback leaves edit gated because its binding is disabled, even though Fal and the adapter support it.
+- [`NANO_BANANA_2_IMAGE_ROUTE_CARD_V1.json`](model-fleet/routes/NANO_BANANA_2_IMAGE_ROUTE_CARD_V1.json) for the
+  Vertex `gemini-3.1-flash-image` route in `global`.
+- [`NANO_BANANA_PRO_IMAGE_ROUTE_CARD_V1.json`](model-fleet/routes/NANO_BANANA_PRO_IMAGE_ROUTE_CARD_V1.json) for
+  the Vertex `gemini-3-pro-image` `preview` route in `global`; the reader reports it available, while a missing circuit
+  readback remains an explicit operational blocker.
 
 The cards preserve the distinction between sealed governed evidence and live availability. FLUX 3 and the deferred
 variants remain gated; Omni and Veo have sealed canaries but still require live-reader and Producer-input checks before
 consumer-facing claims. Seedance's public routes are full 2.0 and R2V; Mini is not a public Producer route.
+
+The image cards also preserve provider/runtime boundaries: OpenAI image editing is deferred until a multipart transport
+exists; Nano Banana editing and video-to-image remain non-public surfaces; Seedream Lite is a Fal candidate, not a
+connected “Mini” model. Availability claims always come from `globe.producer.fleet.list`, not from a card or provider
+announcement.
 
 ### 5. Provider and Globe capability are separate claims
 
@@ -187,6 +203,10 @@ promotion. It creates these Greenhouse-owned artifacts:
 - `docs/architecture/creative-studio/model-fleet/routes/GEMINI_OMNI_VIDEO_ROUTE_CARD_V1.json`;
 - `docs/architecture/creative-studio/model-fleet/routes/VEO_3_1_VIDEO_ROUTE_CARD_V1.json`;
 - `docs/architecture/creative-studio/model-fleet/routes/SEEDANCE_2_VIDEO_ROUTE_CARD_V1.json`;
+- `docs/architecture/creative-studio/model-fleet/routes/GPT_IMAGE_2_IMAGE_ROUTE_CARD_V1.json`;
+- `docs/architecture/creative-studio/model-fleet/routes/SEEDREAM_5_PRO_IMAGE_ROUTE_CARD_V1.json`;
+- `docs/architecture/creative-studio/model-fleet/routes/NANO_BANANA_2_IMAGE_ROUTE_CARD_V1.json`;
+- `docs/architecture/creative-studio/model-fleet/routes/NANO_BANANA_PRO_IMAGE_ROUTE_CARD_V1.json`;
 - `pnpm model-fleet:validate` and the mirrored-skill manifest entry;
 - router pointers in `AGENTS.md`, `CLAUDE.md` and `agent-context-router.json`.
 

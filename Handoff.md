@@ -62,11 +62,16 @@ Historia anterior: [Handoff.archive.md](Handoff.archive.md).
 
 **Estado:** implementado como contrato documental y de tooling; no cambia el runtime de Globe. La skill
 `greenhouse-globe-model-fleet` existe en `.codex/skills/` y `.claude/skills/`, con paridad byte a byte, schema y
-validador local. El baseline de fichas incluye FLUX 3, Gemini Omni, Veo 3.1 y Seedance 2.0/R2V:
+validador local. El baseline de fichas incluye FLUX 3, Gemini Omni, Veo 3.1, Seedance 2.0/R2V, GPT Image 2,
+Seedream 5 Pro y Nano Banana 2/Pro:
 [`FLUX_3_VIDEO_ROUTE_CARD_V1.json`](docs/architecture/creative-studio/model-fleet/routes/FLUX_3_VIDEO_ROUTE_CARD_V1.json),
 [`GEMINI_OMNI_VIDEO_ROUTE_CARD_V1.json`](docs/architecture/creative-studio/model-fleet/routes/GEMINI_OMNI_VIDEO_ROUTE_CARD_V1.json),
 [`VEO_3_1_VIDEO_ROUTE_CARD_V1.json`](docs/architecture/creative-studio/model-fleet/routes/VEO_3_1_VIDEO_ROUTE_CARD_V1.json) y
-[`SEEDANCE_2_VIDEO_ROUTE_CARD_V1.json`](docs/architecture/creative-studio/model-fleet/routes/SEEDANCE_2_VIDEO_ROUTE_CARD_V1.json).
+[`SEEDANCE_2_VIDEO_ROUTE_CARD_V1.json`](docs/architecture/creative-studio/model-fleet/routes/SEEDANCE_2_VIDEO_ROUTE_CARD_V1.json),
+[`GPT_IMAGE_2_IMAGE_ROUTE_CARD_V1.json`](docs/architecture/creative-studio/model-fleet/routes/GPT_IMAGE_2_IMAGE_ROUTE_CARD_V1.json),
+[`SEEDREAM_5_PRO_IMAGE_ROUTE_CARD_V1.json`](docs/architecture/creative-studio/model-fleet/routes/SEEDREAM_5_PRO_IMAGE_ROUTE_CARD_V1.json),
+[`NANO_BANANA_2_IMAGE_ROUTE_CARD_V1.json`](docs/architecture/creative-studio/model-fleet/routes/NANO_BANANA_2_IMAGE_ROUTE_CARD_V1.json) y
+[`NANO_BANANA_PRO_IMAGE_ROUTE_CARD_V1.json`](docs/architecture/creative-studio/model-fleet/routes/NANO_BANANA_PRO_IMAGE_ROUTE_CARD_V1.json).
 
 La auditoría confirmó que las rutas públicas de Seedance usan `seedance-2.0` (text-to-video) y `seedance-2.0-r2v`
 (R2V). `seedance-2.0-i2v`, bajo `bytedance/seedance-2.0/mini/image-to-video`, existe solo en el adapter Fal para
@@ -77,6 +82,13 @@ contiene `veo-3.1-fast-generate-001`, pero el binding sellado de `ref/video/fram
 BFL directo permanece Early Access y fuera de alcance. Próximo paso operativo: revalidar namespace/OpenAPI/pricing
 con credenciales en Globe y ejecutar el Slice 0 de `TASK-1642`; no hacer submit billable ni promoción desde esta
 skill.
+
+La auditoría de imagen resolvió “Imagen 2 de ChatGPT” como GPT Image 2 (`gpt-image-2`); Google `imagen-2` no tiene
+routeId, adapter ni binding en Globe. El reader live confirma disponibles GPT Image 2, Nano Banana 2 y Nano Banana Pro,
+y Seedream 5 Pro para generación. Seedream Edit conserva provider/adapter cableados, pero su binding está deshabilitado
+y el reader la devuelve `gated`; no debe promocionarse por herencia de Seedream T2I. Las cards mantienen además como
+superficies diferidas la edición de OpenAI/Nano Banana y Seedream 5 Lite. Nano Banana Pro requiere reconciliar un lookup
+de circuito `not_found` antes de nuevo gasto. No hubo cambios de runtime, secrets, bindings, rates ni deploy.
 
 ## EPIC-039 — Next.js 16.3 + TypeScript 7 Toolchain Adoption (2026-08-04)
 

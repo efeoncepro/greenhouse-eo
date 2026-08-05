@@ -54,9 +54,12 @@ amplía la allowlist global: sólo puede aceptarse para una salida exacta espera
 El método transversal para añadir o auditar proveedores es `greenhouse-globe-model-fleet`, espejado para Codex y
 Claude; sus route cards machine-readable viven en `docs/architecture/creative-studio/model-fleet/routes/` y nunca
 sustituyen la autoridad live del reader. ADR-023 y el card inicial de FLUX 3 fijan la separación entre evidencia del
-proveedor, cables de integración y disponibilidad de Globe; el baseline auditado también cubre Gemini Omni, Veo 3.1
-y Seedance 2.0/R2V. Seedance Mini/I2V y Veo Fast quedan documentados como superficies no públicas hasta tener ruta,
-binding, canary y readback propios.
+proveedor, cables de integración y disponibilidad de Globe; el baseline auditado también cubre Gemini Omni, Veo 3.1,
+Seedance 2.0/R2V, GPT Image 2, Seedream 5 Pro y Nano Banana 2/Pro. “Imagen 2 de ChatGPT” se normaliza a
+`gpt-image-2`; Google `imagen-2` no tiene ruta en Globe. Seedream T2I, GPT Image 2 y Nano Banana 2/Pro están disponibles
+según el reader live; Seedream Edit queda `gated` por binding deshabilitado. Seedream Lite, edición de OpenAI/Nano
+Banana y video-to-image de Nano Banana permanecen como superficies no públicas hasta tener ruta, binding, canary y
+readback propios. Un lookup de circuito `not_found` para Nano Banana Pro es blocker operativo explícito.
 Las atestaciones comerciales son inmutables por identidad de modelo + digest de términos: una corrección jurídica
 crea una atestación y policy derivada nuevas, nunca modifica la anterior. La idempotencia de `auto-promote` debe
 incluir esa autoridad legal; ruta/workspace/report por sí solos no distinguen una nueva versión de términos. Un

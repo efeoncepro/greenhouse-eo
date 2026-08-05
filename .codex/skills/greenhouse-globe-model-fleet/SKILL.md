@@ -160,6 +160,36 @@ de `ref/video/frames-v1` usa exactamente `veo-3.1-generate-001`. Omni tiene una 
 las capacidades de video-reference o edición stateful del proveedor quedan como superficies diferidas hasta tener
 routeId, contrato, evidencia, canary y readback propios.
 
+## Inventario inicial auditado: imagen, Seedream y Nano Banana
+
+La auditoría del 2026-08-04 añadió cuatro fichas de imagen sin mover la autoridad live del reader:
+
+- [`GPT_IMAGE_2_IMAGE_ROUTE_CARD_V1.json`](../../../docs/architecture/creative-studio/model-fleet/routes/GPT_IMAGE_2_IMAGE_ROUTE_CARD_V1.json)
+  — “Imagen 2 de ChatGPT” se normaliza a **GPT Image 2** (`gpt-image-2`), ruta `ref/still/openai-v2`,
+  snapshot `2026-04-21`, endpoint `openai.gpt-image-2`, región `us-central1`, completion `poll` y salida PNG.
+  Google `imagen-2` es otra familia, deprecated y **no existe como routeId, adapter ni binding en Globe**. OpenAI
+  soporta edición en sus superficies de proveedor, pero Globe mantiene esa operación `deferred` porque `/v1/images/edits`
+  requiere un transporte multipart y una ruta gobernada propios.
+- [`SEEDREAM_5_PRO_IMAGE_ROUTE_CARD_V1.json`](../../../docs/architecture/creative-studio/model-fleet/routes/SEEDREAM_5_PRO_IMAGE_ROUTE_CARD_V1.json)
+  — `ref/still/rrss-v1` usa Fal `seedream-5-pro` / `v5-pro` con el slug bare
+  `bytedance/seedream/v5/pro/text-to-image`, y `ref/still/reference-v1` usa `seedream-5-pro-edit` / `v5-pro`
+  con `bytedance/seedream/v5/pro/edit`. La primera ruta está `available`; la edición conserva cables de proveedor y
+  adapter, pero el último reader readback la deja `gated` por binding deshabilitado. Seedream 5 Lite queda como
+  superficie `candidate`, no como “Mini” ni como variante conectada.
+- [`NANO_BANANA_2_IMAGE_ROUTE_CARD_V1.json`](../../../docs/architecture/creative-studio/model-fleet/routes/NANO_BANANA_2_IMAGE_ROUTE_CARD_V1.json)
+  — `ref/still/nanobanana-2-v1`, Vertex `gemini-3.1-flash-image` `preview`, endpoint `vertex.gemini.image.flash`,
+  región `global`, `generateContent` y binding `poll`; está `available`. Edición, multi-turn y video-to-image del
+  proveedor siguen como superficies diferidas sin routeId público.
+- [`NANO_BANANA_PRO_IMAGE_ROUTE_CARD_V1.json`](../../../docs/architecture/creative-studio/model-fleet/routes/NANO_BANANA_PRO_IMAGE_ROUTE_CARD_V1.json)
+  — `ref/still/nanobanana-pro-v1`, Vertex `gemini-3-pro-image` `preview`, endpoint `vertex.gemini.image`, región
+  `global`, `generateContent` y binding `poll`; está `available`. El último circuito consultado devolvió `not_found`,
+  así que la ficha conserva esa reconciliación como blocker aunque el reader siga proyectando `available`.
+
+La identidad de runtime siempre se lee como `routeId + capability + provider + model + version/endpoint + region + completionDriver`.
+No sustituyas los IDs de Vertex por un nombre comercial, no cambies `global` por analogía y no conviertas una capacidad
+de edición del proveedor en una ruta pública. Para las cuatro familias, el selector puede mostrar sólo lo que devuelva el
+reader; `externalRollout` permanece gated mientras el rollout multitenant no tenga entitlement y readback propios.
+
 Estas fichas reflejan evidencia observada, no disponibilidad final. Antes de afirmar `available`, lee siempre
 `globe.producer.fleet.list` y reconcilia el resultado con el ledger y el handoff de Globe.
 

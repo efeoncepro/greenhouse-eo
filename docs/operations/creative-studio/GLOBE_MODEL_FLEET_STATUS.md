@@ -27,7 +27,8 @@ solo el Lab. La foundation de selección multi-modelo es ADR-013 (resolución po
 
 ## Fleet — estado por ruta/modelo
 
-Backbone = `PRODUCER_ROUTE_CATALOG` (`packages/domain/src/producer-catalog.ts`, `v1.3.0`). El nombre público
+Backbone = `PRODUCER_ROUTE_CATALOG` (`packages/domain/src/producer-catalog.ts`, runtime observado `v1.7.0`; este
+ledger conserva referencias históricas `v1.3.0`). El nombre público
 del modelo es señal de calidad (ADR-003); el slug de wire vive solo en el adapter/binding.
 
 Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (dependencia externa) · ⏳ pendiente.
@@ -35,7 +36,7 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 | Ruta (routeId) | Modelo público | Proveedor (slug wire) | Capacidad | Lab | Prod. gobernada | Gate / nota |
 |---|---|---|---|---|---|---|
 | `ref/still/rrss-v1` | Seedream · 5 Pro | Fal (`bytedance/seedream/v5/pro/text-to-image`) | image-generate | ✅ 07-19 | ✅ driver Fal | default vivo de imagen |
-| `ref/still/reference-v1` | Seedream · 5 Pro Edit | Fal (`…/v5/pro/edit`) | image-edit | ✅ 07-19 | ✅ driver Fal | — |
+| `ref/still/reference-v1` | Seedream · 5 Pro Edit | Fal (`…/v5/pro/edit`) | image-edit | ✅ 07-19 | 🔒 binding deshabilitado; reader `gated` | Fal y adapter cableados; requiere reconciliar binding/circuit antes de volver a afirmar disponibilidad |
 | `ref/still/nanobanana-pro-v1` | Nano Banana · Pro | Vertex (`gemini-3-pro-image`) | image-generate | ✅ 07-24 | ✅ driver + promoción gobernada 07-30 | región `global`; selector live `Disponible`; revisión `896a0620` |
 | `ref/still/nanobanana-2-v1` | Nano Banana · 2 | Vertex (`gemini-3.1-flash-image`) | image-generate | ✅ 07-30 | ✅ driver + promoción + generación UI real 07-30 | run UI `ce06f8b4-ebe9-43b6-9d47-8e4cc901f49a`; 10 créditos |
 | `ref/still/openai-v2` | GPT Image · 2 | OpenAI (`gpt-image-2`) | image-generate | ✅ 07-24 | ✅ driver + promoción + canary real 07-30 | run UI `a81c8049-7772-4933-82f2-1e2e59e5121c`; 14 créditos |
@@ -51,6 +52,36 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 | `ref/still/vector-v1` | Recraft · v4.1 | Fal (`fal-ai/recraft/v4.1/text-to-vector`) | image-vectorize | ✅ 07-19 | ✅ driver + promoción + generación UI real 07-30 | run UI `b5631c86-707a-41d9-8ecc-ef61caa8200c`; SVG retenido; 4 créditos |
 | `ref/still/upscale-v1` | Topaz · Upscale | Fal (`fal-ai/topaz/upscale/image`) | image-upscale | ✅ 07-19 | ⏳ sin lane | ruta creada 07-25; exige 1 imagen de origen |
 | `ref/video/upscale-v1` | Topaz · Upscale | Fal (`fal-ai/topaz/upscale/video`) | video-upscale | ✅ 07-19 | ⏳ sin lane | ruta creada 07-25; exige 1 video de origen |
+
+## Identidades exactas de imagen auditadas (2026-08-04)
+
+Las fichas machine-readable enlazadas por la skill compartida son [`GPT Image 2`](../../architecture/creative-studio/model-fleet/routes/GPT_IMAGE_2_IMAGE_ROUTE_CARD_V1.json),
+[`Seedream 5 Pro`](../../architecture/creative-studio/model-fleet/routes/SEEDREAM_5_PRO_IMAGE_ROUTE_CARD_V1.json),
+[`Nano Banana 2`](../../architecture/creative-studio/model-fleet/routes/NANO_BANANA_2_IMAGE_ROUTE_CARD_V1.json) y
+[`Nano Banana Pro`](../../architecture/creative-studio/model-fleet/routes/NANO_BANANA_PRO_IMAGE_ROUTE_CARD_V1.json). La identidad de implementación completa
+es `routeId + capability + provider + model + version/endpoint + region + completionDriver`; el nombre comercial no sustituye el tuple.
+
+- “Imagen 2 de ChatGPT” corresponde a **GPT Image 2**: `ref/still/openai-v2` / OpenAI / `gpt-image-2` / `2026-04-21` /
+  `openai.gpt-image-2` / `us-central1` / `poll`. Globe expone generación prompt-only con PNG; `/v1/images/edits` queda fuera
+  hasta implementar un transporte multipart y una ruta gobernada propia.
+- Seedream generación: `ref/still/rrss-v1` / Fal / `seedream-5-pro` / `v5-pro` / `fal.seedream.text-to-image` /
+  `us-central1` / `webhook-and-poll`, **available**. Seedream edición: `ref/still/reference-v1` / Fal /
+  `seedream-5-pro-edit` / `v5-pro` / `fal.seedream.edit` / `us-central1` / `webhook-and-poll`; la superficie del
+  proveedor y el adapter existen, pero el último readback del reader la deja **gated** con binding deshabilitado.
+- Nano Banana Pro: `ref/still/nanobanana-pro-v1` / Vertex / `gemini-3-pro-image` / `preview` /
+  `vertex.gemini.image` / `global` / `poll`, **available**. El lookup más reciente del circuito devolvió `not_found`;
+  no se debe gastar ni reintentar a ciegas hasta reconciliarlo.
+- Nano Banana 2: `ref/still/nanobanana-2-v1` / Vertex / `gemini-3.1-flash-image` / `preview` /
+  `vertex.gemini.image.flash` / `global` / `poll`, **available**. El endpoint global y el canary UI real son parte de la
+  evidencia; no debe reemplazarse por `gemini-2.5-flash-image` ni por el modelo Pro.
+- Google `imagen-2` no aparece como routeId, modelo, endpoint o adapter de Globe. No crear una ficha de integración para
+  esa familia; si el pedido usa ese nombre, confirmar primero si se refiere a GPT Image 2.
+- Seedream 5 Lite, edición Nano Banana y video-to-image de Nano Banana existen como superficies de proveedor o seams
+  genéricos, pero no tienen ruta pública, binding, canary y readback propios. No son variantes conectadas del Producer.
+
+**Delta operativo del reader:** la disponibilidad anterior del edit de Seedream que decía “✅ driver Fal” queda supersedida
+por el readback live más reciente (`binding enabled=false`, `gated`). El reader manda sobre este ledger; actualiza esta fila
+cuando exista un nuevo binding/circuit readback, no por una edición del catálogo o una afirmación del proveedor.
 
 ## Identidades exactas de video auditadas (2026-08-04)
 
