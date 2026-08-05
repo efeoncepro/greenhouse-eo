@@ -1,5 +1,20 @@
 # Handoff activo
 
+### TASK-1647 — Provider Greenhouse-SEO federado: CODE COMPLETE, enable pendiente del release (2026-08-05)
+
+El segundo salto MCP quedó construido y verificado e2e. Gateway (`efeonce-mcp` main `a53b77f`+`4870e90`):
+provider `greenhouse-seo` fail-closed + 3 tools (scope base) + canaries + canary e2e. Greenhouse: consumer
+`EO-SPK-0004`/binding `EO-SPB-0004` activos (script `provision-mcp-gateway-seo-consumer.ts`; token en Secret
+Manager `efeonce-mcp-gateway-greenhouse-token`). Flag `GROWTH_SEO_ENABLED=true` en Vercel **staging** +
+redeploy (autorizado). Berel provisionada Fase 0 (`cpma-berel-seo-contracted` + `seot-berel-fase0`).
+
+**Evidencia e2e (provider real → lane staging HTTPS):** Berel **`domainQuadrant=riesgo`, 50 keywords,
+AEO 44.5** · Efeonce entitlement ok + `no_seo_data` honesto · deny anti-oracle 404. La cadena completa
+del MCP-first funciona; lo ÚNICO entre esto y `mcp.efeonce.org` es que greenhouse PROD aún no tiene el
+lane. **El cutover restante = release develop→main de greenhouse** (control plane, skill
+`greenhouse-production-release`) → flag en Vercel prod → enable del provider en Cloud Run + deploy
+dispatch → smoke por el front door. GSC de efeoncepro.com sigue gated por 1282/1283.
+
 ### Efeonce provisionada como org del 360 (own-brand, dogfooding) — 2026-08-05
 
 Decisión de modelado del operador ejecutada: **Efeonce se modela como su propio cliente** sobre la org

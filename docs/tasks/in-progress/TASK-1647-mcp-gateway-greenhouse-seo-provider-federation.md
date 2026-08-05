@@ -1,12 +1,34 @@
 # TASK-1647 — MCP Gateway: Federación del Provider Greenhouse-SEO (`mcp.efeonce.org`)
 
+## Delta 2026-08-05 — code complete; enable pendiente del release prod
+
+**Entregado (repo `efeonce-mcp`, commits `a53b77f`+`4870e90` en main):** provider `greenhouse-seo`
+(adapter delgado, fail-closed `policy-blocked`, gated por `GREENHOUSE_SEO_PROVIDER_ENABLED` default OFF) +
+3 tools bajo scope base `efeonce.mcp.read` + 6 tests canary + canary e2e committeado. **Greenhouse:** consumer
+`EO-SPK-0004` + binding internal `EO-SPB-0004` (activos) provisionados con
+`scripts/api-platform/provision-mcp-gateway-seo-consumer.ts`; token en Secret Manager
+(`efeonce-mcp-gateway-greenhouse-token`, jamás impreso). `GROWTH_SEO_ENABLED=true` en Vercel **staging**
+(redeploy aplicado — autorizado por el operador).
+
+**Canary e2e verificado (2026-08-05, provider real → lane staging por HTTPS):** Efeonce entitlement
+`contracted 8/$50` ✓ + `no_seo_data` honesto ✓ · **Berel `domainQuadrant=riesgo`, 50 keywords, AEO 44.5** ✓
+(Berel provisionada Fase 0: `cpma-berel-seo-contracted` + `seot-berel-fase0`) · deny anti-oracle 404 ✓.
+
+**Por qué NO complete:** los tools aún no son alcanzables por `mcp.efeonce.org` — habilitar el provider en el
+gateway público requiere que greenhouse PROD tenga el lane (release develop→main pendiente). Secuencia de
+cierre: (1) release prod de greenhouse (control plane), (2) `GROWTH_SEO_ENABLED=true` en Vercel prod,
+(3) env del gateway en Cloud Run (`GREENHOUSE_SEO_PROVIDER_ENABLED=true` + `GREENHOUSE_ECOSYSTEM_API_URL=
+https://greenhouse.efeoncepro.com` + secret ref del token) + deploy dispatch, (4) smoke final por
+`https://mcp.efeonce.org/mcp`.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -19,7 +41,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Diseno`
+- Status real: `CODE COMPLETE 2026-08-05 — provider + tools + canary e2e verificados; enable en el gateway público pendiente del release prod de greenhouse (cutover)`
 - Rank: `TBD`
 - Domain: `mcp|platform|growth`
 - Blocked by: `none` (TASK-1645 code-complete entrega los tools; gateway público verificado en TASK-1626)
