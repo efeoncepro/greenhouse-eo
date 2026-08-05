@@ -16,11 +16,21 @@ Con aprobación del operador se ejecutaron **S0.2 y S0.3** del Slice 0:
   retención/ARCO/notificación contractual (CL 21.719 plena el 1-dic-2026 + CO/MX/PE). **El gate sigue abierto**:
   falta DPA firmado + validación con abogado habilitado.
 
-**Bloqueo restante para Slices 1-3:** aceptación del ADR (sigue `Proposed`) + aprobación de composición/plan +
-cierre legal del gate de privacidad. Checklist pre-firma bloqueante: CIMD en discovery live de WorkOS,
-`subject_types_supported: public` del tenant real, DPA + subprocesadores vigentes. Pendientes del Slice 0:
-S0.1 (matriz de tokens live + base-only de TASK-1626), S0.4-S0.6 (schema binding, contratos gateway, contrato
-de diseño `auth.efeonce.org` + task ui-ux). Nada externo se provisionó.
+**Delta mismo día — composición APROBADA con staging de gasto cero.** El operador no quiere pagar WorkOS ahora;
+la recomendación se ajustó y aprobó: (1) hoy USD 0, nada provisionado, solo diseño; (2) primer cliente
+interesado → WorkOS **free tier sin dominio propio** (AuthKit hosteado, dominio default); (3) USD 99/mes por
+`auth.efeonce.org` sólo con clientes pagando. Requisito duro derivado: el binding se llavea por
+`(environment, subject)` vía registry `external_identity_environments`, NUNCA por el issuer string crudo — el
+cutover de dominio futuro es un UPDATE auditado + re-login, no re-onboarding. **S0.4 y S0.5 entregados** en el
+ADR: binding de persona reutiliza `identity_profile_source_links` (sin tabla de identidad nueva); tablas nuevas
+sólo para organización/grants/invitaciones; `AuthContext` de 6 campos sin fallback + tools con
+`allowedIssuers` + clase de autoridad + 3 tests de regresión obligatorios. La task `ui-ux` dependiente se
+reduce a branding config y su creación se difiere (AuthKit hosteado elimina el login custom del primer corte).
+
+**Restante para Slices 1-3:** cierre legal (DPA + abogado), checklist pre-provisión (CIMD live,
+`subject_types_supported`, términos free tier) y aceptación formal del ADR completo. Pendiente del Slice 0:
+S0.1 (matriz de tokens live + base-only de TASK-1626 — **requiere sesión interactiva del operador** para los
+logins OAuth) y el contrato de convergencia del login Greenhouse. Nada externo se provisionó.
 
 ### Registro de partnerships — fuente operativa creada (2026-08-05)
 
@@ -524,75 +534,6 @@ El despliegue por lote sigue en [`TASK-1636`](docs/tasks/to-do/TASK-1636-globe-d
   monto ni etapa. La nota registra contexto, guardrails internos y siguientes pasos.
 - La técnica y la económica siguen en `.captures/` como `workshop_only`; falta validar capacidad, cost-to-serve,
   margen y frontera de contenidos nuevos antes de registrarlas como oferta productiva.
-
-## TASK-1633 — el contrato creativo declara; falta que APLIQUE (2026-08-03)
-
-**Estado: 10 de 17 criterios, `in-progress`.** El eje de **declaración** está cerrado; el de **aplicación** no
-empezó. Criterio por criterio en
-[`TASK-1633`](docs/tasks/in-progress/TASK-1633-globe-producer-operation-input-control-contract.md)
-(`## Acceptance Criteria`) y en
-[ADR-022](docs/architecture/creative-studio/EFEONCE_GLOBE_ROUTE_CREATIVE_CONTRACT_DECISION_V1.md) (Deltas b y c).
-
-**Runtime de Globe verificado hoy contra Cloud Run/Artifact Registry: los tres en `d58bc6f`** — API
-`globe-api-internal-00202-74w`, Studio `globe-studio-internal-00145-q2w`, worker digest `sha256:3c510416…`
-(= tag `d58bc6f4d300`). `main` local en `949a58c`, sólo docs por delante.
-
-### Lo que ya corre en producción
-
-- **Contrato creativo por ruta:** 8 códigos de rechazo nombrados donde había uno que colapsaba nueve causas;
-  38 razones del compiler clasificadas `terminal`, 3 `transient`, 2 `unknown` declaradas; catálogo `1.7.0`;
-  `valueShape`; vocabulario único brief↔contrato; compilación del prompt por ruta (el peso ordena y ya no se imprime).
-- **Lifecycle de runs — es de [`TASK-1469`](docs/tasks/in-progress/TASK-1469-globe-governed-run-lifecycle-submission-fence.md), no de 1633:**
-  la fase entra en la política de reintentos (post-gasto abandonar cuesta distinto que pre-gasto); un run terminal
-  cierra su experimento vía el puerto `RunFinalizerPort.abandon`; `generated_asset_governance_pending` entra a la
-  allowlist y se clasifica `waiting`; una espera deja de heredar el backoff exponencial de error (10 s fijos en vez
-  de hasta 5 min).
-- [`ISSUE-136`](docs/issues/resolved/ISSUE-136-globe-composer-command-palette-rebuilds-per-keystroke.md) cerrado
-  (`011d0eb`): el composer reconstruía la paleta de comandos en cada tecla y React cortaba con el error #185.
-- `scripts/globe-runtime-drift.mjs` (Globe): compara los tres runtimes entre sí **y** contra `origin/main`.
-
-### Los 7 criterios abiertos, agrupados por trabajo real
-
-- **(a) Un solo trabajo — el adapter.** La compilación detrás del adapter con su revisión en el fingerprint
-  (`promptCompilerRevision` **no existe**: cero ocurrencias por grep), los fixtures de traducción por adapter
-  (la mitad «un motor sin branch por ruta» ya está probada) y la invalidación del estimate ante cambio de
-  controles. Los tres se cierran juntos cuando la compilación deja de ser una función global de `domain`.
-- **(b) Dos de lectura, no de código.** Declarar el mecanismo por ruta con evidencia del contrato oficial del
-  proveedor —**13 de 17 rutas heredan el default**, `negative-prompt` incluido, y **ningún adapter tiene campo
-  negativo nativo**— y la evidencia de controles aplicados/rechazados en el manifest.
-- **(c) Dos de higiene.** Slice 4 (dual-read/equivalence de rutas legacy) y uno que **NO es de 1633**: que un
-  consumer lea la proyección es criterio de [`TASK-1552`](docs/tasks/in-progress/TASK-1552-globe-producer-composer-focused-creation.md)
-  — el descriptor ya viaja al navegador (`ProducerCatalogViewV1.creativeContract`) y el composer lo ignora
-  (cero ocurrencias en `apps/studio-client/src`).
-
-**1633 ya no depende de nadie para cerrar:** se le sacó el canary de Omni (migró a `TASK-1504`) y el criterio de
-consumers es de 1552.
-
-### Próximo paso, en este orden
-
-1. El bloque del adapter de 1633 (grupo **a**).
-2. El composer de 1552 leyendo el descriptor.
-3. Cerrar los 4 puntos abiertos de `TASK-1469`, que es lo que desbloquea `TASK-1632`.
-
-### 🔶 Riesgos vivos
-
-1. **El canary de Omni sigue bloqueado por el TRANSPORTE (`TASK-1504`), no por IAM.** El bloqueo de IAM sí se
-   levantó (`TASK-1635`, Globe `786ee19`). **Son dos cosas distintas y confundirlas lleva a correr un canary
-   inválido:** el binding declara `provider=vertex-omni` mientras el runtime inyecta Generative Language, así que
-   cobraría por una identidad distinta de la aprobada.
-2. **Si aparece una regresión de calidad, el primer sospechoso es el peso.** Quitarlo del prompt cambió el texto
-   que recibe el modelo en TODAS las rutas y **no se verificó con canary** (bloqueados por lo anterior).
-3. **«Upscale con estilo dejó de funcionar» es esperado**, no un defecto: ahora da error **sin gasto** en vez de
-   generar ignorando el estilo y cobrar igual. La UI que evita el caso es `TASK-1552`.
-4. ~~Experimentos huérfanos, señales sin cablear y el nombre `outboxDeadLetter`~~ — **los tres cerrados y
-   verificados en runtime** por `TASK-1469` (ver arriba). Lo único que queda vivo de ese frente es la trampa
-   del `terraform.tfvars` gitignoreado, que es de `TASK-1635`.
-
-### Nota operativa
-
-Tres carriles de credenciales distintos —`gcloud` CLI, ADC y el Cloud SQL **Connector**— y el CLI puede estar vivo
-mientras el Connector se cuelga (`invalid_rapt` es reauth). Comandos en
-[el manual](docs/manual-de-uso/creative-studio/operar-contrato-creativo-ruta-globe.md).
 
 ## WIP saneado — Globe, Brightcell y Polpaico (2026-08-01)
 

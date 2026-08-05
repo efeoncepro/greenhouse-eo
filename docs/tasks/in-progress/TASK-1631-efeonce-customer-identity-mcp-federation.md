@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `none`
-- Status real: `arquitectura propuesta; runtime pre-auditado 2026-08-02; pendiente decidir WorkOS vs broker Greenhouse extraído vs híbrido antes de provisionar`
+- Status real: `Slice 0 en curso; composición aprobada 2026-08-05 (WorkOS staging de gasto cero: free tier sin dominio propio, provisión diferida a demanda real); S0.2-S0.5 entregados en el ADR; restan S0.1 (matriz de tokens, requiere sesión interactiva), contrato de convergencia (S0.6) y cierre legal/checklist pre-provisión (S0.7)`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|agentic`
 - Blocked by: `aceptación explícita de EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md; comparación y aprobación de WorkOS vs broker Greenhouse extraído vs híbrido con costo/operación presentados; y revisión de privacidad/subprocesador cerrada`
@@ -377,23 +377,45 @@ Reglas obligatorias:
    (subjects = source links re-enlazables, sin migración de credenciales). Recomendación del Slice 0: WorkOS
    con binding provider-neutral + contrato de salida — **pendiente de aprobación del operador**. Checklist
    pre-firma bloqueante: CIMD en discovery live de WorkOS, `subject_types_supported: public` en el tenant
-   real, DPA + lista de subprocesadores vigente.
+   real, DPA + lista de subprocesadores vigente, **y términos del free tier (límites MAU, branding, CIMD/DCR
+   igual que el plan pago)**.
+
+   **Delta 2026-08-05 — recomendación ajustada y APROBADA por el operador (staging de gasto cero):** WorkOS
+   **sin dominio propio y sin plan pago**, por etapas de demanda: (1) hoy USD 0 y nada provisionado — solo
+   diseño; (2) primer cliente interesado → free tier con dominio default de WorkOS + AuthKit hosteado (logo/
+   colores Efeonce, "Powered by WorkOS" aceptado para cohorte invitada); (3) USD 99/mes por `auth.efeonce.org`
+   sólo cuando clientes pagando lo justifiquen, idealmente trasladado a contrato. Requisito duro derivado: el
+   binding NUNCA se llavea por el issuer string crudo — referencia un registry de environment estable, así el
+   cutover de dominio es un UPDATE auditado + re-login forzado, no un re-onboarding. Registrado en el ADR
+   §`Slice 0 measurement`. El trigger de revisita native/hybrid (≥5 conexiones SSO enterprise) se mantiene.
 3. **S0.3 — Revisión de privacidad/subprocesador** — **HECHO 2026-08-05** (memo, no cierre legal). Entregable:
    `docs/operations/EFEONCE_CUSTOMER_IDENTITY_PRIVACY_REVIEW_V1.md` (roles controller/processor, datos
    enviados vs retenidos con minimización, checklist DPA/subprocesadores/región/retención/ARCO/notificación
    contractual por país, comparación de riesgo por ruta). La firma del DPA y la validación con abogado
-   habilitado quedan con el operador; el gate sigue ABIERTO hasta ese cierre.
-4. **S0.4 — Schema aditivo de binding provider-neutral** (propuesta, sin migración aplicada): organización
-   canónica ↔ binding IDP externo ↔ membership/grant por capability namespaceada; commands
-   allowlist/invitación/revocación con capabilities dedicadas; contrato de account linking, colisión, recovery
-   y revocación sobre `identity_profiles`/`identity_profile_source_links`/`client_users`/`session_360`.
-5. **S0.5 — Contratos de gateway**: especificación del contexto de autorización ampliado (`issuer`, `subject`,
-   `clientId`, `audience`, `delegatedScopes`, `roles` separados), calificación por issuer de la autoridad de
-   tools (tool ↔ issuers permitidos + clase de autoridad) y su plan de tests de regresión.
-6. **S0.6 — Contrato de diseño/flujo/deployment de `auth.efeonce.org`** + creación de la task `ui-ux`
-   dependiente (wireframe + flow reales) + contrato de convergencia del login customer-facing de Greenhouse.
-7. **S0.7 — Presentar el paquete de decisión al operador**: aceptación del ADR + composición + plan + privacidad.
-   Sin ese triple gate no se provisiona tenant, DNS, secretos ni binding alguno.
+   habilitado quedan con el operador; el gate sigue ABIERTO hasta ese cierre — pero al diferir la provisión
+   (staging de gasto cero) este gate sólo bloquea la etapa (2), no el diseño.
+4. **S0.4 — Schema aditivo de binding provider-neutral** — **HECHO 2026-08-05** (propuesta, sin migración
+   aplicada). Registrado en ADR §`Slice 0 binding design proposal`. Hallazgo: el binding de PERSONA no
+   necesita tabla nueva — `identity_profile_source_links` ya modela la relación; la llave durable es
+   `(environment, subject)` vía registry `external_identity_environments` (absorbe rotación de issuer). Nuevas
+   tablas propuestas: `external_organization_bindings`, `external_capability_grants`,
+   `external_member_invitations`; commands `bindExternalOrganization`/`issueExternalInvitation`/
+   `revokeExternalAccess` con capability dedicada cada uno y `grants_version` para invalidación fail-closed.
+5. **S0.5 — Contratos de gateway** — **HECHO 2026-08-05** (spec, sin código). Registrado en ADR §`Slice 0
+   gateway authorization-context contract`: `AuthContext` con los 6 campos separados sin fallback, resolver
+   por issuer (JWKS/audience/policy propios), tools con `allowedIssuers` + clase de autoridad, y los 3 tests
+   de regresión obligatorios antes del segundo issuer (denial por issuer, denial roles-sin-scope intra-issuer,
+   denial por `grants_version` con token vigente).
+6. **S0.6 — Contrato de diseño/flujo/deployment de `auth.efeonce.org`** + task `ui-ux` dependiente + contrato
+   de convergencia del login Greenhouse. **Delta 2026-08-05:** con AuthKit hosteado (etapa 2 del staging), la
+   superficie custom de login desaparece del primer corte — la task `ui-ux` dependiente se reduce a branding
+   config + superficie de invitación, y su creación formal se difiere al momento en que la etapa (2) se
+   desbloquee (crearla hoy produciría wireframes stub, prohibido). El contrato de convergencia del login
+   customer-facing de Greenhouse sigue pendiente como entregable documental.
+7. **S0.7 — Paquete de decisión**: la composición y el staging de gasto cero quedaron aprobados por el
+   operador el 2026-08-05 (registrado en el ADR). Para abrir la etapa (2)/(3) y los Slices 1-3 restan: cierre
+   del gate legal (DPA + abogado), checklist pre-provisión (CIMD/subject/free-tier) y aceptación formal del
+   ADR completo con el binding design.
 
 ### Checkpoint humano (P0)
 

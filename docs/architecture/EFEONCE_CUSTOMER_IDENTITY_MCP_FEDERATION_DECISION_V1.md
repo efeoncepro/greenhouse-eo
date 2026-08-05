@@ -115,17 +115,32 @@ re-invitation at worst), with Account 360, memberships, grants and audit untouch
 from WorkOS is not assumed; the exit plan is re-invitation, not credential migration. Contractual condition
 before signing: no term may claim ownership of the organization/member directory.
 
-**Pre-signature verification checklist (blocking):** confirm against live WorkOS discovery that it publishes
+**Pre-provisioning verification checklist (blocking):** confirm against live WorkOS discovery that it publishes
 `client_id_metadata_document_supported` (CIMD is the primary MCP registration mechanism; DCR alone fails the
-invariant), confirm `subject_types_supported: public` on the actual tenant, and obtain the current DPA +
-subprocessor list for the privacy review below.
+invariant), confirm `subject_types_supported: public` on the actual tenant, confirm the current **free-tier
+terms** (MAU limits, configurable branding, and that the free tier exposes the same CIMD/DCR surface as paid),
+and obtain the current DPA + subprocessor list for the privacy review below.
 
-**Slice 0 recommendation (pending operator approval, not self-executing):** adopt **WorkOS** for the first
-external cohort with the provider-neutral binding and the exit contract above, and **defer native/hybrid** to the
-explicit revisit trigger (≥5 enterprise SSO connections or a WorkOS pricing/term change). Rationale: the cohort
-is small and allowlisted, speed matters for the B2B MCP program, the marginal money cost is trivial against
-7–10.5 build weeks plus permanent security operations, and the binding design keeps the exit reversible. The
-privacy/subprocessor gate remains independent: see
+**Slice 0 recommendation — approved by the operator 2026-08-05 (zero-spend staging):** adopt **WorkOS without a
+custom domain and without any paid plan**, staged strictly by demand:
+
+1. **Now — USD 0, nothing provisioned.** Complete all design work (binding schema, gateway authorization-context
+   and issuer-qualification contracts, token matrix). No tenant, DNS, secret or client registration is created;
+   the internal Entra canary remains the only active path.
+2. **First interested customer — USD 0.** Run the first external cohort on the WorkOS free tier under WorkOS's
+   default domain with hosted AuthKit UI (Efeonce logo/colors; "Powered by WorkOS" accepted for an invited
+   cohort). The MCP protocol is domain-indifferent: the gateway's protected-resource metadata simply points at
+   whatever issuer URL the authorization server has.
+3. **Paying customers justify polish — USD 99/month.** Purchase the custom domain (`auth.efeonce.org`) only when
+   revenue-attached clients warrant the branded experience, ideally priced into their contracts. The SSO/SAML
+   revisit trigger (≥5 enterprise connections → re-evaluate native/hybrid) is unchanged.
+
+**Issuer-rotation resilience (hard design requirement born from this staging):** moving from the default domain
+to a custom domain later **changes the issuer URL**. The binding must therefore never key durable rows on the raw
+issuer string: bindings reference a **provider environment registry row** (stable environment ID → current
+issuer/JWKS), so a domain cutover is one audited registry UPDATE plus a forced re-authentication — a controlled
+migration, not a re-onboarding. The binding design below implements this. The privacy/subprocessor gate remains
+independent and open: see
 [`EFEONCE_CUSTOMER_IDENTITY_PRIVACY_REVIEW_V1.md`](../operations/EFEONCE_CUSTOMER_IDENTITY_PRIVACY_REVIEW_V1.md).
 
 ### Relationship with the Greenhouse login
@@ -241,6 +256,61 @@ NextAuth cookie or secret outside Greenhouse.
 The initial cohort flow must additionally record the Account 360 organization, designated customer administrator,
 operator authorizing the invitation, external identity subject/organization IDs, permitted capability, timestamps
 and revocation state. It is an explicit, idempotent enrollment command; it is not a bulk import of existing clients.
+
+### Slice 0 binding design proposal (2026-08-05)
+
+Discovery result: **person-level binding needs no new identity table.**
+`greenhouse_core.identity_profile_source_links` already models exactly this relation (`source_system` +
+`source_object_type` + `source_object_id` → `profile_id`, with `active`, `is_login_identity` and primacy flags).
+An external IDP subject is registered as a source link — honoring the canonical rule that external systems extend
+360 objects via links, never via parallel identities. What does not exist yet is the organization/grant layer.
+Proposed additive schema (all in `greenhouse_core`, migration NOT applied until the ADR provisioning gate opens):
+
+| Table (new) | Purpose | Key shape |
+| --- | --- | --- |
+| `external_identity_environments` | Provider environment registry — the issuer-rotation absorber | `environment_id` PK; `provider` (`workos`/…); `provider_environment_ref`; `issuer_url`; `jwks_uri`; `status`; audited updates |
+| `external_organization_bindings` | External IDP organization ↔ canonical organization | `binding_id` PK; `organization_id` FK → `organizations`; `environment_id` FK; `external_organization_ref`; `status` (`active`/`revoked`); `grants_version` |
+| `external_capability_grants` | Provider-neutral capability grant per binding | `grant_id` PK; `binding_id` FK; `capability` (namespaced string — no Globe-specific columns); `status`; granted/revoked by+at |
+| `external_member_invitations` | Audited invitation lifecycle | `invitation_id` PK; `binding_id` FK; `profile_id` nullable until linked; `email`; `designated_admin`; state machine `issued → accepted → linked` / `revoked` / `expired` |
+
+Person links produced by an accepted invitation are stored in `identity_profile_source_links` with
+`source_system = 'external_idp:<environment_id>'` and `source_object_id = <subject>` — i.e. the durable person
+key is `(environment, subject)`, which resolves to `(issuer, subject)` through the registry at verification time.
+A domain/issuer cutover is one audited `issuer_url` UPDATE on the environment row; no binding row changes.
+
+Operator commands (canonical server-side primitives, each with its **own dedicated capability** per the task's
+granularity rule, all idempotent and audit-appending): `bindExternalOrganization`, `issueExternalInvitation`,
+`revokeExternalAccess` (binding- or grant-scoped; bumps `grants_version` so gateway-side caches fail closed).
+Reads: eligibility reader over existing Account 360 client organizations; binding/grant resolvers for the
+gateway. The four reliability signals declared in `TASK-1631` (`unbound_dispatch_attempt`,
+`revoked_still_dispatching`, `subject_collision`, `orphan_grant`) observe this schema, steady = 0.
+
+### Slice 0 gateway authorization-context contract (2026-08-05)
+
+The gateway's `AuthInfo` contract is replaced (current shape verified 2026-08-05: `{ token, clientId, scopes,
+expiresAt }` with `clientId = azp ?? sub` and `scopes = scp ∪ scope ∪ roles`):
+
+```text
+AuthContext {
+  issuer            // verbatim from the validated token; selects the verifier that ran
+  subject           // sub — never dropped, never merged into clientId
+  clientId          // azp/client_id if present; NO fallback to sub — absent means absent
+  audience          // aud actually validated
+  delegatedScopes   // scp ∪ scope ONLY (user-consented delegated authority)
+  roles             // roles claim ONLY (administrative assignment) — never merged into scopes
+  expiresAt
+}
+```
+
+Verification becomes a **per-issuer resolver**: each configured issuer carries its own JWKS, audience and
+authority policy; an unknown issuer is denied before JWKS fetch. Every tool declares `allowedIssuers` and the
+**authority class** it accepts (`delegatedScopes` and/or `roles`); internal-only tools — the credit-funding write
+included — declare the internal Entra issuer exclusively, so an external-issuer token carrying the same scope
+string is denied at dispatch with a redacted signal. Person binding resolves exclusively by `(issuer, subject)`
+through the environment registry; `clientId` is never a binding key. Regression tests required before the second
+issuer ships: (a) external token + internal-only scope string → dispatch denial; (b) token with
+`roles: [<write scope string>]` and no delegated scope → denial, proven inside the internal issuer as well;
+(c) revoked grant with still-valid token → denial via `grants_version` recheck.
 
 ## Alternatives considered
 
