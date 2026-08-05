@@ -16,11 +16,13 @@ export const dynamic = 'force-dynamic'
 
 const VALID_DENSITY = new Set(['cozy', 'comfortable', 'compact'])
 
-// TASK-1079 — Nexa interaction mode (dock A / expandible B / lane C). Self-preference
-// per usuario; mismo pattern de columna que ui_density. Validación mirror del CHECK en DB.
-const VALID_NEXA_INTERACTION_MODE = new Set(['dock', 'expandible', 'lane'])
+// TASK-1079 — Nexa interaction mode (expandible / lane). Self-preference per usuario;
+// mismo pattern de columna que ui_density. Validación mirror del CHECK en DB. El modo
+// legacy `dock` se retiró (2026-08-05) y ya no se acepta como escritura; las filas que
+// lo tuvieran se normalizaron en migración y el reader lo coacciona a `expandible`.
+const VALID_NEXA_INTERACTION_MODE = new Set(['expandible', 'lane'])
 
-export type NexaInteractionMode = 'dock' | 'expandible' | 'lane'
+export type NexaInteractionMode = 'expandible' | 'lane'
 
 interface PreferencesPayload {
   uiDensity?: 'cozy' | 'comfortable' | 'compact' | null

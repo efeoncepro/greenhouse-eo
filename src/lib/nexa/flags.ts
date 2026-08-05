@@ -1,17 +1,14 @@
-// TASK-1078 — Nexa floating chat expandable shell cutover flag. Default OFF: the
-// new expandable + persisted panel ships behind this flag; with it OFF the floating
-// behaves exactly as before (ephemeral mini panel). Read client-side by
-// `NexaFloatingButton` (a client component), so it must be a NEXT_PUBLIC mirror.
-// Accepts either the server var or the client-readable mirror; setting JUST
-// `NEXT_PUBLIC_NEXA_FLOATING_EXPANDABLE_ENABLED=true` flips both consistently.
-export const isNexaFloatingExpandableEnabled = (): boolean =>
-  process.env.NEXA_FLOATING_EXPANDABLE_ENABLED === 'true' ||
-  process.env.NEXT_PUBLIC_NEXA_FLOATING_EXPANDABLE_ENABLED === 'true'
+// TASK-1078 — el cutover del panel ampliable + persistido COMPLETÓ su rollout (ON en
+// Production, staging y Preview) y su flag (`NEXA_FLOATING_EXPANDABLE_ENABLED` + su
+// NEXT_PUBLIC mirror) se retiró el 2026-08-05: el panel ampliable es ahora el
+// comportamiento base incondicional del flotante. Con él salió el modo `dock`
+// ("Compacto"), que era el panel efímero previo — el único fallback que ese flag
+// gateaba. Las env vars quedan huérfanas; borrarlas de Vercel es el paso de limpieza.
 
 // TASK-1079 — Nexa interaction-mode lane (concepto C) availability gate. Default OFF:
 // el lane reflowea el contenido del dashboard (split full-height), cambio de hot-path;
 // con OFF, el modo `lane` no se ofrece en el selector y cualquier preferencia `lane`
-// degrada al default (panel B / dock) → comportamiento idéntico al previo. NEXT_PUBLIC
+// degrada al default (panel ampliable) → comportamiento idéntico al previo. NEXT_PUBLIC
 // mirror para que el provider client (selector + host) puedan gatear consistentemente.
 export const isNexaInteractionLaneEnabled = (): boolean =>
   process.env.NEXA_INTERACTION_LANE_ENABLED === 'true' ||

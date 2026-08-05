@@ -1,5 +1,34 @@
 # Handoff activo
 
+### Nexa — retiro del modo "Compacto" + diagnóstico del lane que se abría solo (2026-08-05)
+
+**Origen.** El operador reportó que al iniciar sesión el chat de Nexa aparecía abierto a la derecha. Causa
+verificada en runtime (no deducida): su fila en `greenhouse_core.client_users` tenía
+`nexa_interaction_mode='lane'`, y el provider abre el sidecar en cada carga fresca
+(`useState(initialMode === 'lane')` en `nexa-interaction-mode-context.tsx`), sin persistir el colapso. Se
+reprodujo con su propia sesión vía agent-auth y se contrastó con otra persona en modo `expandible` (no monta
+el lane). **Preferencia revertida a NULL**; no hubo cambio de código para eso.
+
+**Cambio ejecutado.** Se retiró el modo `dock` ("Compacto"): era el panel efímero pre-TASK-1078 (runtime
+local, sin historial) que sobrevivió como opción del selector tras el cutover al panel ampliable. Salieron
+con él su código muerto en `NexaFloatingButton` y el flag `NEXA_FLOATING_EXPANDABLE_ENABLED` + mirror
+`NEXT_PUBLIC_*` (su único fallback era ese modo). Modos vigentes: `expandible` (piso incondicional) y `lane`.
+
+**Estado:** code complete + migración aplicada; **rollout pendiente en un punto**: borrar de Vercel las 4
+env vars huérfanas del flag retirado (Production/staging/Preview) — el código ya no las lee, así que no
+bloquean, pero quedan como basura de configuración. Requiere decisión del operador.
+
+**Verificación:** `pnpm local:check`, `pnpm test` (10.064 pass), `pnpm build`, `pnpm flags:audit --strict`
+verdes. Menú verificado con Playwright contra localhost: solo Panel/Lateral, switch a Lateral y vuelta con
+`PATCH /api/home/preferences` 200, cero errores de consola. CHECK de DB leído post-migración:
+`('expandible','lane')`, 0 filas en `dock`.
+
+**Deuda descubierta (no tocada):** el `focusRef` + pregunta semilla de TASK-1182 estaba implementado **solo**
+en el panel legacy, nunca en `NexaFloatingPanel`. Como el default en producción era `expandible`, el CTA
+"Pregúntale a Nexa" ya no anclaba el insight ni auto-enviaba la semilla **antes** de este cambio. Los CTAs
+siguen abriendo el chat; portar el ancla a `useNexaPersistentRuntime` (que no acepta `focusRef`) es trabajo
+propio pendiente de task.
+
 ### EPIC-028 — Producer V3: contratos de diseño y plan de ejecución (2026-08-05)
 
 **Estado:** contratos de diseño `design-ready`; no se modificó runtime ni se creó una task paraguas. La

@@ -1,10 +1,10 @@
 > **Tipo de documento:** Manual de uso (operador del portal)
-> **Version:** 1.1
+> **Version:** 2.0
 > **Creado:** 2026-06-18 por Claude (TASK-1079)
-> **Ultima actualizacion:** 2026-06-21 por Claude (v1.1 — TASK-1212: cómo confirmar una acción de Nexa)
+> **Ultima actualizacion:** 2026-08-05 por Claude (v2.0 — retiro del modo "Compacto": quedan Panel y Lateral)
 > **Documentacion tecnica:** [docs/architecture/nexa-intelligence/experience/conversational-experience.md](../../architecture/nexa-intelligence/experience/conversational-experience.md)
 
-# Nexa — modo de interacción (Compacto / Panel / Lateral)
+# Nexa — modo de interacción (Panel / Lateral)
 
 ## Para qué sirve
 
@@ -16,19 +16,23 @@ cuenta y te sigue entre dispositivos.
 - Nexa está disponible en todo el portal (la burbuja flotante abajo a la derecha).
 - No necesitas permisos especiales: es una preferencia tuya.
 
-## Los tres modos
+## Los dos modos
 
 | Modo | Cuándo te sirve | Cómo se ve |
 | --- | --- | --- |
-| **Compacto** | Preguntas rápidas y puntuales | Burbuja flotante chica. |
-| **Panel** | Conversaciones más largas, revisar historial | Panel que se amplía, con rail de historial. |
+| **Panel** | Uso general: preguntas rápidas y conversaciones largas con historial | Panel que se amplía, con rail de historial. Es el modo por defecto. |
 | **Lateral** | Trabajar **con el dashboard a la vista** | Columna fija a la derecha; la pantalla se acomoda al lado (no se tapa). |
+
+> **Delta 2026-08-05:** el modo **Compacto** se retiró. Era el chat anterior de Nexa (sin historial
+> guardado) que quedó como opción por error después de que Panel pasó a ser el modo base. Si lo tenías
+> elegido, tu cuenta quedó en Panel automáticamente; no perdiste ninguna conversación, porque el
+> historial vive en tu cuenta y no en el form-factor.
 
 ## Paso a paso — cambiar el modo
 
 1. Abre Nexa (clic en la burbuja flotante).
 2. En la cabecera del chat, abre el **botón de modo** (ícono de distribución/columnas).
-3. Elige **Compacto**, **Panel** o **Lateral**. El cambio aplica de inmediato y se guarda.
+3. Elige **Panel** o **Lateral**. El cambio aplica de inmediato y se guarda.
 
 ## En modo Lateral
 
@@ -40,12 +44,15 @@ cuenta y te sigue entre dispositivos.
 ## Qué no hacer
 
 - No esperes que "Lateral" esté siempre disponible: llega de forma gradual. Si no aparece en el menú,
-  aún no está habilitado para tu entorno; usa Compacto o Panel.
+  aún no está habilitado para tu entorno; usa Panel.
 
 ## Problemas comunes
 
-- **No veo el botón de modo:** aparece solo cuando hay más de un modo disponible. Si solo está
-  Compacto habilitado, no hay nada que elegir.
+- **No veo el botón de modo:** aparece solo cuando hay más de un modo disponible. Si "Lateral" no
+  está habilitado en tu entorno, queda solo Panel y no hay nada que elegir.
+- **Nexa se abre sola al entrar al portal:** tienes el modo **Lateral** elegido. En ese modo la columna
+  nace abierta en cada carga de página (incluido el login) y contraerla no se recuerda entre recargas.
+  Si prefieres que no aparezca sola, cambia a **Panel**.
 - **Cambié de computador y se mantuvo mi modo:** es lo esperado — la preferencia se guarda en tu cuenta.
 
 ## Confirmar una acción de Nexa

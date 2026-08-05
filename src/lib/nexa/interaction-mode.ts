@@ -1,10 +1,17 @@
 /**
  * TASK-1079 — Nexa interaction mode (SSOT puro, client-safe).
  *
- * El usuario elige cómo conversar con Nexa: `dock` (compacto A), `expandible`
- * (panel B) o `lane` (sidecar full-height C). Las 3 modalidades comparten runtime
+ * El usuario elige cómo conversar con Nexa: `expandible` (panel ampliable con
+ * historial) o `lane` (sidecar full-height). Ambas modalidades comparten runtime
  * (`useNexaPersistentRuntime`), persistencia e historial (`nexa_threads`) y selector
  * de modelo — cero lógica de chat duplicada.
+ *
+ * Delta 2026-08-05 — el modo `dock` ("Compacto") se retiró: era el panel efímero
+ * anterior a TASK-1078 (runtime local, sin historial persistido) que sobrevivió como
+ * opción del selector después de que el panel ampliable pasó a ser el comportamiento
+ * base. Ya no existe como modo; una preferencia `dock` persistida se coacciona a
+ * `expandible` (ver `coerceNexaInteractionMode`), así que no hay perfil que quede
+ * apuntando a un modo inexistente.
  *
  * La preferencia persiste en `greenhouse_core.client_users.nexa_interaction_mode`
  * (self-preference per usuario; NO env var ni home_rollout_flags operator-facing).
@@ -13,59 +20,53 @@
  * `nexa-interaction-mode-context.tsx`.
  */
 
-export type NexaInteractionMode = 'dock' | 'expandible' | 'lane'
+export type NexaInteractionMode = 'expandible' | 'lane'
 
-export const NEXA_INTERACTION_MODES: readonly NexaInteractionMode[] = ['dock', 'expandible', 'lane'] as const
+export const NEXA_INTERACTION_MODES: readonly NexaInteractionMode[] = ['expandible', 'lane'] as const
 
 export const isNexaInteractionMode = (value: unknown): value is NexaInteractionMode =>
-  value === 'dock' || value === 'expandible' || value === 'lane'
+  value === 'expandible' || value === 'lane'
 
 /**
- * Disponibilidad de cada modo según flags de plataforma:
- * - `expandableEnabled`: el panel B + el lane reusan el runtime persistente que ese
- *   flag habilita (`NEXA_FLOATING_EXPANDABLE_ENABLED`, TASK-1078).
- * - `laneEnabled`: el lane C (reflow del contenido) está detrás de su propio flag
- *   default-OFF (`NEXA_INTERACTION_LANE_ENABLED`, TASK-1079).
+ * Disponibilidad de cada modo según flags de plataforma. `expandible` es el piso
+ * incondicional (no se gatea: es el comportamiento base del flotante desde que
+ * TASK-1078 completó su rollout). Solo el lane C (reflow del contenido) sigue detrás
+ * de su flag (`NEXA_INTERACTION_LANE_ENABLED`, TASK-1079).
  */
 export interface NexaInteractionModeAvailability {
-  expandableEnabled: boolean
   laneEnabled: boolean
 }
 
 /**
- * Default cuando el usuario NO tiene preferencia (NULL). Preserva EXACTAMENTE el
- * comportamiento actual del flotante: con el flag expandible ON → panel B; con OFF →
- * dock compacto. Nunca devuelve `lane` por default (es opt-in explícito).
+ * Default cuando el usuario NO tiene preferencia (NULL): el panel ampliable. Nunca
+ * devuelve `lane` por default (es opt-in explícito).
  */
-export const defaultNexaInteractionMode = (availability: NexaInteractionModeAvailability): NexaInteractionMode =>
-  availability.expandableEnabled ? 'expandible' : 'dock'
+export const defaultNexaInteractionMode = (): NexaInteractionMode => 'expandible'
 
 /**
- * Resuelve la preferencia cruda a un modo efectivo, gateado por disponibilidad
- * (default-safe): un modo no disponible degrada al fallback, nunca rompe.
+ * Resuelve la preferencia cruda a un modo efectivo, gateada por disponibilidad
+ * (default-safe): un modo no disponible degrada al fallback, nunca rompe. El valor
+ * legacy `dock` (modo retirado) cae acá y degrada a `expandible`.
  */
 export const coerceNexaInteractionMode = (
   raw: string | null | undefined,
   availability: NexaInteractionModeAvailability
 ): NexaInteractionMode => {
-  if (raw === 'lane') return availability.laneEnabled ? 'lane' : defaultNexaInteractionMode(availability)
-  if (raw === 'expandible') return availability.expandableEnabled ? 'expandible' : 'dock'
-  if (raw === 'dock') return 'dock'
+  if (raw === 'lane') return availability.laneEnabled ? 'lane' : defaultNexaInteractionMode()
 
-  // NULL / valor inválido → default que preserva el comportamiento vigente.
-  return defaultNexaInteractionMode(availability)
+  // `expandible`, `dock` legacy, NULL o valor inválido → el piso incondicional.
+  return defaultNexaInteractionMode()
 }
 
 /**
- * Modos ofrecibles en el selector (un modo no disponible no se ofrece). `dock`
+ * Modos ofrecibles en el selector (un modo no disponible no se ofrece). `expandible`
  * siempre disponible (es el fallback universal).
  */
 export const availableNexaInteractionModes = (
   availability: NexaInteractionModeAvailability
 ): NexaInteractionMode[] => {
-  const modes: NexaInteractionMode[] = ['dock']
+  const modes: NexaInteractionMode[] = ['expandible']
 
-  if (availability.expandableEnabled) modes.push('expandible')
   if (availability.laneEnabled) modes.push('lane')
 
   return modes
