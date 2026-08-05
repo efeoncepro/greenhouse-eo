@@ -7434,6 +7434,98 @@ export interface GreenhouseGrowthSearchConsoleOauthStates {
   state_id: Generated<string>;
 }
 
+export interface GreenhouseGrowthSeoBacklinkSnapshots {
+  backlink_snapshot_id: Generated<string>;
+  backlinks_total: Int8 | null;
+  capture_date: Timestamp;
+  captured_at: Generated<Timestamp>;
+  domain_rank: Numeric | null;
+  new_lost_delta: Generated<Json>;
+  provider_cost: Generated<Numeric>;
+  referring_domains: number | null;
+  seo_target_id: string;
+  toxic_share: Numeric | null;
+}
+
+export interface GreenhouseGrowthSeoCompetitors {
+  competitor_domain: string;
+  created_at: Generated<Timestamp>;
+  effective_from: Generated<Timestamp>;
+  effective_to: Timestamp | null;
+  seo_competitor_id: Generated<string>;
+  seo_target_id: string;
+}
+
+export interface GreenhouseGrowthSeoKeywordSetMembers {
+  created_at: Generated<Timestamp>;
+  effective_from: Generated<Timestamp>;
+  effective_to: Timestamp | null;
+  keyword: string;
+  keyword_set_id: string;
+  keyword_set_member_id: Generated<string>;
+  tags: Generated<string[]>;
+}
+
+export interface GreenhouseGrowthSeoKeywordSets {
+  created_at: Generated<Timestamp>;
+  keyword_set_id: Generated<string>;
+  name: string;
+  seo_target_id: string;
+}
+
+export interface GreenhouseGrowthSeoRankSnapshots {
+  capture_date: Timestamp;
+  captured_at: Generated<Timestamp>;
+  device: string;
+  engine: string;
+  estimated_traffic: Numeric | null;
+  keyword: string;
+  position: number | null;
+  provider_cost: Generated<Numeric>;
+  rank_snapshot_id: Generated<string>;
+  seo_target_id: string;
+  serp_features: Generated<Json>;
+  source_run_id: string | null;
+  url: string | null;
+}
+
+export interface GreenhouseGrowthSeoSiteAuditFindings {
+  audit_finding_id: Generated<string>;
+  audit_run_id: string;
+  created_at: Generated<Timestamp>;
+  detail: Generated<Json>;
+  issue_type: string;
+  severity: string;
+  url: string;
+}
+
+export interface GreenhouseGrowthSeoSiteAuditRuns {
+  audit_run_id: Generated<string>;
+  capture_date: Timestamp;
+  crawled_pages: number | null;
+  created_at: Generated<Timestamp>;
+  finished_at: Timestamp | null;
+  health_score: Numeric | null;
+  provider_cost: Generated<Numeric>;
+  provider_task_id: string | null;
+  seo_target_id: string;
+  started_at: Timestamp | null;
+  status: Generated<string>;
+}
+
+export interface GreenhouseGrowthSeoTargets {
+  created_at: Generated<Timestamp>;
+  created_by: string | null;
+  language_code: string;
+  location_code: string;
+  market: string | null;
+  organization_id: string;
+  root_domain: string;
+  seo_target_id: Generated<string>;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseHiringAssessmentFairness {
   advanced_count: number | null;
   category_key: string | null;
@@ -12062,6 +12154,14 @@ export interface DB {
   "greenhouse_growth.provider_observations": GreenhouseGrowthProviderObservations;
   "greenhouse_growth.search_console_connections": GreenhouseGrowthSearchConsoleConnections;
   "greenhouse_growth.search_console_oauth_states": GreenhouseGrowthSearchConsoleOauthStates;
+  "greenhouse_growth.seo_backlink_snapshots": GreenhouseGrowthSeoBacklinkSnapshots;
+  "greenhouse_growth.seo_competitors": GreenhouseGrowthSeoCompetitors;
+  "greenhouse_growth.seo_keyword_set_members": GreenhouseGrowthSeoKeywordSetMembers;
+  "greenhouse_growth.seo_keyword_sets": GreenhouseGrowthSeoKeywordSets;
+  "greenhouse_growth.seo_rank_snapshots": GreenhouseGrowthSeoRankSnapshots;
+  "greenhouse_growth.seo_site_audit_findings": GreenhouseGrowthSeoSiteAuditFindings;
+  "greenhouse_growth.seo_site_audit_runs": GreenhouseGrowthSeoSiteAuditRuns;
+  "greenhouse_growth.seo_targets": GreenhouseGrowthSeoTargets;
   "greenhouse_hiring.assessment_fairness": GreenhouseHiringAssessmentFairness;
   "greenhouse_hiring.candidate_facet": GreenhouseHiringCandidateFacet;
   "greenhouse_hiring.hiring_application": GreenhouseHiringHiringApplication;
