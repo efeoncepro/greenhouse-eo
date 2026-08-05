@@ -18,6 +18,70 @@
 - ⚠️ **Pero pausar una readiness sigue sin camino ejecutable** (ver `TASK-1463`, Delta 2026-08-05): si esta
   task necesita retirar una ruta, la única salida hoy es volver a promoverla.
 
+## Delta 2026-08-05 (b) — dos supuestos de esta task NO se sostienen contra el código
+
+Auditado el runtime antes de implementar. Tres correcciones, y las dos primeras cambian el alcance.
+
+### 🔴 1. «Recrear zero-spend» contradice el único contrato que existe
+
+`AC:377` pide que Recrear «carga recipe/route/shape preservados… sin iniciar estimate → prepare → execute», y
+`:86` lo declara zero-spend. Pero el contrato existente es **`globe.lab.experiment.relaunch`**
+(`packages/contracts/src/generation-recipes.ts:25-37`), que **GASTA**: deriva la recipe server-side y abre una
+operación con fingerprint e idempotencyKey (`packages/domain/src/generation-recipes.ts:48-56`). El payload
+legacy lo usaba así (`producer-controller.ts:4232-4240`).
+
+Son **dos semánticas distintas con un nombre**, y la task no dice cuál quiere:
+
+- **(a) Relanzar** = volver a correr. Existe, gasta, es un clic.
+- **(b) Hidratar el composer** = precargar recipe/route/shape y dejar que el usuario confirme. Es lo que el AC
+  describe, y **no tiene contrato**: `globe.lab.recipe.get` está **excluido de paridad** y nunca despachado
+  (`legacy-parity.ts:166-168`), así que la única fuente sería `globe.lab.experiment.get` — reader declarado en
+  paridad (`:69`) pero **nunca consumido por `studio-client`**.
+
+⚠️ Y aunque se eligiera (a), **no es componible desde el feed**: `UnifiedProducerFeedItemV1`
+(`producer-live-feed.ts:32-76`) trae `spentCredits` pero **NO `hardCapCredits` ni `estimatedCredits`**, que es
+justo lo que `RelaunchExperimentPayloadV1` exige.
+
+**Consecuencia dura: `Backend impact: none` (`:34`) es incorrecto para la opción (b)** — consumir un reader que
+ningún cliente consumía, o proyectar `hardCapCredits` en el item del feed, es trabajo de contrato. Elegir la
+semántica es una decisión de producto (¿el botón gasta o precarga?) y **no se puede resolver implementando**.
+
+### 🔴 2. Reference y Recreate necesitan un archivo que esta task NO posee
+
+`Files owned` (`:120-132`) no incluye **`ProducerComposer.tsx`**, y ambas acciones lo exigen: el composer **no
+expone ninguna prop entrante** —sus props son `{ modality, onCommands?, onSubmission? }`, todas salientes— y sus
+`references`/`routeId`/`shape`/`prompt` son `useState` privados. El único puente hoy viaja en la dirección
+**contraria** (composer → workspace → feed, vía `onSubmission`).
+
+Ese archivo es de **`TASK-1552`**. La continuidad feed → composer exige un contrato nuevo entre
+`ProducerWorkspace` y `ProducerComposer`, así que **esta task no se puede completar sin coordinar con 1552** — o
+1552 expone el canal de entrada y 1643 lo consume, o las dos se ejecutan juntas.
+
+### ✅ 3. Lo que sí quedó hecho, y lo que habilita
+
+`efeonce-globe@2cdd4d8` agrega **`apps/studio-client/src/data/producer-item-actions.ts`**: el despachador
+canónico como **tabla declarativa**, con 11 tests. Cubre el AC de `:373` («cero funciones vacías; toda acción
+visible ejecuta un primitive gobernado o queda disabled con razón») **por construcción**, no por disciplina.
+
+- **Favorite / Download** quedan resueltos: efecto, gateo por capability y clave de idempotencia salen de la
+  declaración. Falta sólo traducirlos a props en `ProducerFeedRoute` + el helper de descarga.
+- **Reference / Recreate** quedan declarados como `not-implemented` **con dueño** (`TASK-1552` y esta task
+  respectivamente) y su razón. `pendingProducerItemActions()` las expone y un test exige dueño + razón.
+- El gateo por capability **no existía en ninguna card** del feed, aunque el legacy gatea las cuatro. Ahora sale
+  de la tabla vía `producerItemActionCapabilities()`, derivado y no copiado.
+
+Cuando esta task cablee las props, **tiene que borrar las entries correspondientes de
+`KNOWN_DEAD_AFFORDANCES`** (`apps/studio-client/src/gates/dead-affordance.test.ts`) o el gate falla: es
+bidireccional a propósito.
+
+### Hallazgos sueltos que esta task puede cerrar barato
+
+- **`favoriteKeys` está clavado en `[]`** (`ProducerFeedRoute.tsx:336`) aunque el dato **ya viene en el feed**
+  (`output.favorite`). El filtro «favoritos» de `applyPresentation` está **muerto hoy** por eso. Es derivable
+  del snapshot, sin reader extra.
+- **No hay copy para estados de acción** (pending/success/denied/failed): el namespace `producerFeed` sólo tiene
+  labels y un `actionUnavailable` genérico.
+
 ## Status
 
 - Lifecycle: `to-do`
