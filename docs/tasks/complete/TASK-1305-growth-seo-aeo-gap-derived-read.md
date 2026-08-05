@@ -22,7 +22,7 @@ real medida por query, verdad de primera parte; (2) `grader_scores` está en pro
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -35,7 +35,7 @@ real medida por query, verdad de primera parte; (2) `grader_scores` está en pro
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-022`
-- Status real: `Diseno`
+- Status real: `Complete 2026-08-05 — reader live-verificado contra PG (Berel: quadrant riesgo real); prod via release control plane`
 - Rank: `TBD`
 - Domain: `growth|ai|data`
 - Blocked by: `none` (V1 sobre seo_gsc_daily live + grader_scores en prod; TASK-1303 solo ENRIQUECE)
