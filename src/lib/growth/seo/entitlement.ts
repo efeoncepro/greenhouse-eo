@@ -20,9 +20,9 @@ import 'server-only'
  * - Assignment/tier: `module_assignments` (`metadata_json.seo_tier`; override de cupo
  *   pilot vía `metadata_json.seo_audit_runs_per_month`).
  * - Allowance usada: COUNT de `seo_site_audit_runs` del mes (JOIN `seo_targets` por org).
- * - Budget usado: SUM(`provider_cost`) del mes de las 3 tablas snapshot (TASK-1299).
- *   HOOK TASK-1300: cuando exista el contador dedicado `seo_provider_spend_daily`, este
- *   resolver cambia de fuente a ese ledger (misma interfaz; solo cambia el SQL).
+ * - Budget usado: SUM(`provider_cost_usd`) del mes de `seo_provider_spend_daily` (TASK-1300).
+ *   El hook declarado acá se ejecutó al aterrizar ese ledger: la fuente dejó de ser la suma
+ *   de las 3 tablas snapshot. Sumar ambas contaría el mismo gasto dos veces.
  */
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
@@ -175,7 +175,15 @@ export const resolveSeoEntitlement = async (
   const config = resolveSeoAllowanceConfig(env)
 
   // Uso del período (allowance + spend) siempre disponible, incluso sin entitlement.
-  // El spend suma provider_cost de las 3 tablas snapshot de TASK-1299 (JOIN por target→org).
+  //
+  // ⚠️ FUENTE ÚNICA DE GASTO: `seo_provider_spend_daily` (TASK-1300). Este resolver ya NO suma
+  // el `provider_cost` de las tablas snapshot — hacer ambas cosas contaría el mismo gasto DOS
+  // VECES (el transporte registra la llamada Y el caller persiste el costo en su fila) y los
+  // presupuestos se agotarían a la mitad, en silencio. El `provider_cost` de los snapshots
+  // queda como procedencia por fila, no como fuente de presupuesto.
+  //
+  // El ledger es además más completo: lo escribe el transporte en CADA llamada cobrada, así
+  // que cubre las que no dejan fila (tarea `on_page` async, consulta con cero resultados).
   const usageRows = await runGreenhousePostgresQuery<UsageRow>(
     `SELECT
        (SELECT COUNT(*)
@@ -183,21 +191,10 @@ export const resolveSeoEntitlement = async (
           JOIN greenhouse_growth.seo_targets t ON t.seo_target_id = r.seo_target_id
          WHERE t.organization_id = $1
            AND r.created_at >= date_trunc('month', CURRENT_DATE))::int AS audit_runs_used,
-       (COALESCE((SELECT SUM(s.provider_cost)
-          FROM greenhouse_growth.seo_rank_snapshots s
-          JOIN greenhouse_growth.seo_targets t ON t.seo_target_id = s.seo_target_id
-         WHERE t.organization_id = $1
-           AND s.captured_at >= date_trunc('month', CURRENT_DATE)), 0)
-        + COALESCE((SELECT SUM(r.provider_cost)
-          FROM greenhouse_growth.seo_site_audit_runs r
-          JOIN greenhouse_growth.seo_targets t ON t.seo_target_id = r.seo_target_id
-         WHERE t.organization_id = $1
-           AND r.created_at >= date_trunc('month', CURRENT_DATE)), 0)
-        + COALESCE((SELECT SUM(b.provider_cost)
-          FROM greenhouse_growth.seo_backlink_snapshots b
-          JOIN greenhouse_growth.seo_targets t ON t.seo_target_id = b.seo_target_id
-         WHERE t.organization_id = $1
-           AND b.captured_at >= date_trunc('month', CURRENT_DATE)), 0))::float8 AS spend_used_usd,
+       COALESCE((SELECT SUM(sp.provider_cost_usd)
+          FROM greenhouse_growth.seo_provider_spend_daily sp
+         WHERE sp.organization_id = $1
+           AND sp.spend_date >= date_trunc('month', CURRENT_DATE)::date), 0)::float8 AS spend_used_usd,
        (date_trunc('month', CURRENT_DATE) + INTERVAL '1 month')::timestamptz AS period_reset_at`,
     [organizationId]
   )

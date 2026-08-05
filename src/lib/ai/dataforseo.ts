@@ -138,6 +138,21 @@ export const postDataForSeoTask = async (input: DataForSeoTaskInput): Promise<Da
     throw new Error(`La familia DataForSEO "${family}" exige organizationId para atribuir su gasto.`)
   }
 
+  // ⚠️ Falla FUERTE si el runtime no registró el contador de gasto.
+  //
+  // Es deliberado y es la lección de TASK-1302: un runtime nuevo que consume un cliente
+  // externo sin llevarse su configuración degrada EN SILENCIO y nadie se entera hasta que
+  // alguien audita. Acá el modo de falla equivalente sería peor — se gastaría dinero real
+  // sin quedar contabilizado, y el gate de presupuesto leería cero para siempre.
+  // Un throw en la primera llamada del entorno nuevo se descubre en desarrollo; un
+  // contador en cero se descubre en la factura.
+  if (definition?.requiresOrganization && !spendRecorder) {
+    throw new Error(
+      `La familia DataForSEO "${family}" gasta presupuesto y este runtime no registró el contador. ` +
+        'Importa `@/lib/growth/seo/register-provider-spend` en el punto de entrada antes de llamar.'
+    )
+  }
+
   // El endpoint se valida ANTES de resolver credenciales: un mismatch es error de programación
   // y no tiene sentido tocar Secret Manager para descubrirlo.
   const endpoint = normalizeEndpoint(input.endpoint, family)
