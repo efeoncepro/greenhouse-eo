@@ -1,5 +1,22 @@
 # TASK-1246 — Growth AI Visibility: Public Launch Readiness + Rollout
 
+## Delta 2026-08-05 — el sign-off de consent tiene un hueco concreto: `ISSUE-142`
+
+El residuo "sign-off legal de consent" de esta task dejó de ser genérico. Verificado contra producción:
+**los dos formularios públicos del AEO no muestran aviso ni casilla de consentimiento, pero registran
+consentimiento afirmativo a una versión de política nombrada.**
+
+- `ai-visibility-grader` (landing de Think) y `efeonce-aeo-diagnostic` (`/aeo-2/`): `consent.checkboxes = []`
+  **y sin `noticeText`** → `renderConsent()` no pinta nada, y el renderer manda `consent: true` igual porque
+  `(checkboxes ?? []).length === 0` cuenta como otorgado. El gate server-side es correcto; recibe un `true`
+  fabricado por el cliente.
+- No es falla del motor: **3 de los 5 forms publicados tienen su bloque de consent bien**.
+- Detalle, evidencia y opciones de fix: [`ISSUE-142`](../../issues/open/ISSUE-142-aeo-public-forms-record-consent-never-shown.md).
+
+**Esta task no puede declarar el sign-off legal cumplido mientras `ISSUE-142` esté `open`.** La decisión de
+contención (¿siguen capturando mientras se corrige?) y el destino de los leads ya registrados con ese consent
+son del operador + legal, no de un agente.
+
 ## Delta 2026-07-27 — Think ya es la superficie pública operativa
 
 La hipótesis histórica de esta task —“no existe ninguna superficie pública del grader”— queda **superseded**.

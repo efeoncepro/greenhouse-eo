@@ -32,6 +32,25 @@
 - **Pendientes:** conectar la propiedad de Google Search Console (segunda lente del 360) y el merge/dedupe del
   registro en HubSpot.
 
+## 2026-08-05 — ISSUE-142: los dos formularios públicos del AEO registran consentimiento a una política que nunca se mostró
+
+- Al cerrar `TASK-1327` quedó anotado "confirmar, no asumir" sobre un `consent.checkboxes` vacío. Confirmado
+  contra producción: **es un hueco de cumplimiento (Ley 21.719)**, no una decisión de diseño.
+- **La cadena:** las definiciones publicadas de `ai-visibility-grader` (landing de Think) y
+  `efeonce-aeo-diagnostic` (`/aeo-2/`) traen `checkboxes: []` **y sin `noticeText`** → `renderConsent()` retorna
+  `null` y no pinta nada en pantalla; pero el renderer envía `consent: true` igual, porque
+  `(checkboxes ?? []).length === 0` cuenta como otorgado. El gate server-side existe y es correcto
+  (`commands.ts:404-406`) — recibe un `true` fabricado por el cliente. La submission queda con
+  `consentPolicyVersion` afirmativo. **El registro es peor que un vacío: documenta algo que no ocurrió.**
+- **No es falla del motor Growth Forms:** auditados los 5 formularios públicos, **3 tienen su bloque de consent
+  correcto** (`efeonce-lead-gen-web`, `efeonce-seo-diagnostic`, `efeonce-web-agentica-ebook`). Los dos afectados
+  son justo los del AEO: se publicaron sin él y el fallback del renderer lo volvió silencioso en vez de ruidoso.
+- **Nada se aplicó.** Publicar texto legal en un formulario público live es decisión de operador + legal. El issue
+  documenta la contención, el fix de las dos definiciones, el fix del bug class (que publicar un form sin bloque
+  de consent **falle**, en vez de registrar consentimiento inventado) y el destino de los leads ya capturados.
+- `TASK-1246` no puede declarar su sign-off legal cumplido mientras `ISSUE-142` siga `open`; queda cruzado en
+  ambas direcciones. Bug class al motor: `EPIC-040` / `TASK-1255`.
+
 ## 2026-08-05 — TASK-1327 `complete`: la landing pública del lead magnet está live y verificada en runtime
 
 - `TASK-1327` (landing `think.efeoncepro.com/brand-visibility` + embed del form gobernado) cerrada con
@@ -938,13 +957,3 @@ y [`docs/changelog/internal/2026-07.md`](docs/changelog/internal/2026-07.md).
   verticalización y exit criteria de negocio todavía están incompletos.
 - Se recomendó añadir dentro del mismo epic workstreams de enterprise design partners, Agency Workflow Sprint,
   Campaign Variant Workflow, activation/distribution y packaging/economics, sin duplicar owners técnicos.
-
-## 2026-07-29 — Globe: estrategia de mercado, distribución y monetización V1
-
-- Se integraron los benchmarks de Higgsfield y Magnific en una estrategia de segmentos, oportunidades, distribución
-  masiva, ventas B2B/enterprise, canales, packaging y validación.
-- Se fijó enterprise marketing organizations como ICP estratégico; mid-market o una unidad enterprise como beachhead
-  operativo; agencias/productoras como canal multiplicador; e-commerce/DTC como vertical wedge; creators y SMB como
-  adquisición y aprendizaje inicial.
-- Se documentaron loops de artifact/template/creator/referral/content/integration/agency, límites entre software,
-  Product Service, managed/co-operated y canal, revenue architecture, cost-to-serve y pilotos de 90 días.
