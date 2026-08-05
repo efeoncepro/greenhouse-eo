@@ -219,7 +219,7 @@ export const readSeoAeoGap = async (
       domainQuadrant: classifyQuadrant(bestPosition, overallScore, thresholds)
     }
   } catch (error) {
-    captureWithDomain(error, 'growth', { context: 'read-seo-aeo-gap', seoTargetId })
+    captureWithDomain(error, 'growth', { extra: { context: 'read-seo-aeo-gap', seoTargetId } })
 
     return { ok: false, errorCode: 'query_failed', status: null }
   }

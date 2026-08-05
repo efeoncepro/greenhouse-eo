@@ -40,7 +40,7 @@ const resolveOrganizationId = (context: ApiPlatformRequestContext, request: Requ
     if (requested && requested !== bindingOrg) {
       throw new ApiPlatformError('SEO resource not found for the resolved scope.', {
         statusCode: 404,
-        errorCode: 'resource_not_found'
+        errorCode: 'not_found'
       })
     }
 
@@ -88,7 +88,7 @@ const resolveSeoLaneSubject = async (
     // Anti-oracle: sin módulo `seo_v1` vigente, el recurso "no existe" para este binding.
     throw new ApiPlatformError('SEO resource not found for the resolved scope.', {
       statusCode: 404,
-      errorCode: 'resource_not_found'
+      errorCode: 'not_found'
     })
   }
 

@@ -120,7 +120,7 @@ describe('gates del lane', () => {
 
     await expect(
       getEcosystemSeoVisibility360Payload({ context: orgCtx, request: req() })
-    ).rejects.toMatchObject({ statusCode: 404, errorCode: 'resource_not_found' })
+    ).rejects.toMatchObject({ statusCode: 404, errorCode: 'not_found' })
   })
 
   it('entitled sin target configurado → target_not_configured honesto', async () => {
