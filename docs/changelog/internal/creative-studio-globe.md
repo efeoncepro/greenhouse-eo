@@ -6,6 +6,23 @@
 
 # Changelog
 
+## 2026-08-05 (b) — promoción end-to-end por el runbook; la ruta que murió +2 s tarde vuelve a estar viva
+
+- **`ref/still/reference-v1` promovida de punta a punta** (`promotion_4265dd26…`): `start → stage →
+  promote → activate → canary → canary-confirm`, **sin una sola secuencia escrita a mano**. `canary_passed`
+  rev 9, binding `enabled` rev 5, canary run `b811d5fc…` con PNG 8.359.849 B governance `eligible`,
+  **10 = 10 créditos**, `noDoubleDebit`. Es la ruta que el 2026-07-31 murió **+2 s** después de su deadline
+  por falta de canary: el caso que fundó la task, cerrado con la herramienta que faltaba.
+- **La divergencia se cerró sola:** `promotionReadinessDivergent` pasó de 1 a 0. Encender el binding volvió
+  coherente la readiness `promoted` — no hizo falta la capability de pause.
+- 🔴 **Hallazgo: pausar una readiness NO tiene camino ejecutable.** `transitionModelRoute` hace
+  `requireHuman(c)` para todo destino distinto de `promoted`, así que un lane de service account falla
+  cerrado por diseño; y `globe.model-readiness.pause` no está en `PRODUCER_HUMAN_CAPABILITY_SCOPES`, así
+  que un humano por el BFF tampoco. **No se construyó el modo en el operator lane** porque habría sido un
+  camino muerto; cerrarlo exige el rollout de 3 pasos del broker. Queda como follow-up.
+- ⚠️ El canary **se negó a ejecutar sin `--route-prompt`**: no inventa dirección creativa para un gasto
+  real. Guardrail funcionando, no defecto.
+
 ## 2026-08-05 — TASK-1641 desplegado, y el primer ciclo real destapó un falso positivo
 
 - **Desplegado y aplicado.** Globe `main@b958a11`; API `globe-api-internal-00213-5z9` (tráfico 100%), Job

@@ -77,6 +77,35 @@ dos familias distintas.
 > [`docs/operations/creative-studio/TASK_1641_SESSION_HANDOFF_2026-08-04.md`](../../operations/creative-studio/TASK_1641_SESSION_HANDOFF_2026-08-04.md)
 > — qué está cerrado con su evidencia, por dónde seguir y las trampas ya pagadas.
 
+## Delta 2026-08-05 (h) — promoción end-to-end ejecutada; la divergencia se cerró sola
+
+`ref/still/reference-v1` promovida de punta a punta con el runbook nuevo:
+`promotion_4265dd26-7eda-4918-bd7d-10318dd6cd5f` → **`canary_passed` rev 9**, binding `enabled` rev 5,
+readiness `promoted` rev 2. Canary run `b811d5fc-9d80-4e9f-a0ab-736dac528ecd`, attempt
+`c0bbc8f1-8c23-4d11-96b3-e6efd61361c9`, output
+`sha256:3dae8ef188c8506781daa0b6f21e6e4840bf17bcbabf40c5dd16d12e04b22606` (PNG 8.359.849 B), governance
+`eligible`, **10 créditos = 10 gastados**, una reserva y una liquidación, `noDoubleDebit`.
+
+Se eligió esa ruta y no Omni por tres razones: Omni **ya estaba sellada** (repromoverla no prueba nada),
+`reference-v1` es **la que murió +2 s tarde** por falta de canary —o sea el caso que fundó la task—, y
+promoverla **cierra la divergencia sin la capability de pause**, porque encender el binding vuelve
+coherente la readiness. **Medido: `promotionReadinessDivergent` pasó de 1 a 0.**
+
+### 🔴 El remedio que la señal recomienda NO tiene camino ejecutable, y eso es un hallazgo propio
+
+Antes de promover se intentó lo obvio —agregar un modo `readiness-pause` al operator lane— y se descartó
+al leer el código: `transitionModelRoute` hace `requireHuman(c)` para cualquier destino distinto de
+`promoted` (`model-readiness.ts:106`), así que **un lane de service account falla cerrado por diseño**; y
+`globe.model-readiness.pause` **no está** en `PRODUCER_HUMAN_CAPABILITY_SCOPES`, así que un humano por el
+BFF tampoco puede. **Hoy nadie puede pausar una readiness.**
+
+No se construyó el modo: habría sido un camino muerto. Cerrar el hueco exige el rollout de 3 pasos del
+broker —el mismo que tumbó el login entero de Globe una vez— más una superficie que lo despache. Queda
+como follow-up, y la promoción end-to-end demostró que **para este caso** el remedio correcto era otro.
+
+⚠️ El canary **se negó a ejecutar sin `--route-prompt`** (`producer_canary_route_prompt_required`): no
+inventa dirección creativa para un gasto real. Es el guardrail funcionando, no un defecto.
+
 ## Delta 2026-08-05 (g) — DESPLEGADO, y el primer ciclo real destapó un falso positivo
 
 Globe `main@b958a11`. API `globe-api-internal-00213-5z9` (tag `b958a116a23a`, tráfico 100%), Job worker por
@@ -621,9 +650,11 @@ sigue siendo el recovery.
       degradación (`globe_run_abandon_release_degraded`) está aplicada y en 0.
 - [x] Runbook publicado con el canary como paso explícito. —
       `docs/operations/creative-studio/GLOBE_ROUTE_PROMOTION_RUNBOOK_V1.md`.
-- [ ] Una promoción completa end-to-end llega a `canary_passed` sin intervención artesanal. — **el único
-      abierto.** La plataforma ya está desplegada y las señales vivas; falta ejercitar una promoción real,
-      que implica elegir una ruta y autorizar el gasto del canary.
+- [x] Una promoción completa end-to-end llega a `canary_passed` sin intervención artesanal. —
+      `ref/still/reference-v1` (`promotion_4265dd26…`), 2026-08-05: `start → stage → promote → activate →
+      canary → canary-confirm` sin una sola secuencia escrita a mano. **`canary_passed` rev 9**, binding
+      `enabled` rev 5, run `b811d5fc…`, PNG 8.359.849 B governance `eligible`, **10 = 10 créditos**,
+      `noDoubleDebit`. Se eligió esa ruta porque es **la que murió +2 s tarde** por falta de canary.
 
 ## Verification
 

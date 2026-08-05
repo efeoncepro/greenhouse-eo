@@ -13,6 +13,36 @@
 > `d3fe90e`, digest `sha256:d8295862dc12c14427e90e0bb413577802916c37ca6bf32c202680492ca7bae9`,
 > deploy `30717266572` y baseline IaC `e369ef8` sin drift.
 
+## Corte 2026-08-05 (b) — promoción end-to-end ejecutada; `ref/still/reference-v1` vuelve a estar viva
+
+`promotion_4265dd26-7eda-4918-bd7d-10318dd6cd5f` recorrió `start → stage → promote → activate → canary →
+canary-confirm` **sin una sola secuencia escrita a mano**, con el runbook nuevo:
+
+- **`canary_passed` rev 9** (terminal), binding `enabled` rev 5, readiness `promoted` rev 2.
+- Identidad exacta: `ref/still/reference-v1` / `fal` / `seedream-5-pro-edit` / `v5-pro`, endpoint
+  `fal.seedream.edit`, región `us-central1`, `completionDriver=webhook-and-poll`, capability `image-edit`,
+  contrato `preserve-set`.
+- Canary: run `b811d5fc-9d80-4e9f-a0ab-736dac528ecd`, attempt `c0bbc8f1-8c23-4d11-96b3-e6efd61361c9`,
+  output `sha256:3dae8ef188c8506781daa0b6f21e6e4840bf17bcbabf40c5dd16d12e04b22606` (PNG 8.359.849 B),
+  governance `eligible` (revisión 17872). Generado 09:27:11Z, posterior a la activación de 09:24:13Z.
+- Economía exacta: **10 aprobados = 10 estimados = 10 gastados**, reserva
+  `86f1f6fc-4524-4d42-92fe-bc432d667b84`, una liquidación, `noDoubleDebit`.
+- Evidencia reusada de la promoción anterior (sigue vigente): rights
+  `arp_f2e93add…:mcra_2ad04617-c83a-4210-8c3c-651f9c71a010` (expira 2027-07-31), review
+  `review_850163b7-bc10-481f-9942-1e6b28cd5cbc`, proposal `readiness:5ab78a7fb381a9d1ac19fe58e3292fdc`.
+
+**La divergencia se cerró sola: `promotionReadinessDivergent` pasó de 1 a 0.** Encender el binding volvió
+coherente la readiness `promoted`, sin necesitar la capability de pause.
+
+### 🔴 Pausar una readiness NO tiene camino ejecutable hoy
+
+`transitionModelRoute` hace `requireHuman(c)` para todo destino distinto de `promoted`
+(`model-readiness.ts:106`) ⇒ un lane de service account **falla cerrado por diseño**; y
+`globe.model-readiness.pause` **no está** en `PRODUCER_HUMAN_CAPABILITY_SCOPES` ⇒ un humano por el BFF
+tampoco. **Nadie puede pausar una readiness.** Cerrarlo exige el rollout de 3 pasos del broker (el que
+tumbó el login de Globe una vez) más una superficie que lo despache. Queda como follow-up; no se construyó
+el modo en el operator lane porque habría sido un camino muerto.
+
 ## Corte 2026-08-05 — TASK-1641 DESPLEGADO, y el primer ciclo real destapó un falso positivo
 
 **Runtime vigente:** Globe `main@b958a116a23a146b0523d04196e447ae11eb0d58`.

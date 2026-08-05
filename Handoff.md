@@ -1,6 +1,6 @@
 # Handoff activo
 
-## TASK-1641 — Globe: DESPLEGADO; el primer ciclo real destapó un falso positivo (2026-08-05)
+## TASK-1641 — Globe: DESPLEGADO + promoción end-to-end ejecutada (2026-08-05)
 
 **Estado:** `in-progress`, **desplegado y aplicado**. Globe `main@b958a11`; API
 `globe-api-internal-00213-5z9` (tag `b958a116a23a`, tráfico 100%), Job worker por digest
@@ -41,9 +41,14 @@ exacta, la señal habría acusado de divergencia justo a las dos rutas que conve
 pre-gasto (32 créditos) y hay **cero** post-gasto. El discriminador es `attempt.providerOperation`, no
 `lease.kind`. Un fallo al liberar degrada al TTL y se observa, nunca se propaga.
 
-**Único criterio abierto:** una promoción completa end-to-end hasta `canary_passed` sin intervención
-artesanal. La plataforma ya está desplegada y las señales vivas; falta elegir una ruta y autorizar el gasto
-del canary. Detalle:
+**Los 8 criterios de aceptación están cerrados.** `ref/still/reference-v1` se promovió de punta a punta
+(`promotion_4265dd26…` → `canary_passed` rev 9, binding `enabled` rev 5, 10 = 10 créditos) con el runbook
+nuevo y sin una sola secuencia a mano — y esa promoción **cerró la divergencia**: la señal pasó de 1 a 0.
+
+🔴 **Follow-up abierto: pausar una readiness no tiene camino ejecutable.** `requireHuman` rechaza a los
+lanes de service account y `globe.model-readiness.pause` no está en los scopes humanos, así que hoy nadie
+puede. No se construyó el modo en el operator lane porque habría sido un camino muerto; cerrarlo exige el
+rollout de 3 pasos del broker. Detalle:
 [`TASK_1641_SESSION_HANDOFF_2026-08-04.md`](docs/operations/creative-studio/TASK_1641_SESSION_HANDOFF_2026-08-04.md).
 
 **Benchmark de producto (2026-08-05):** la comparación autenticada de Higgsfield/Magnific y la verificación de
