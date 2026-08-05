@@ -1,5 +1,27 @@
 # Handoff activo
 
+### Efeonce provisionada como org del 360 (own-brand, dogfooding) — 2026-08-05
+
+Decisión de modelado del operador ejecutada: **Efeonce se modela como su propio cliente** sobre la org
+canónica **EO-ORG-0007** (`Efeonce`, Efeonce Group SpA, RUT 77.357.182-1, `is_operating_entity=true` —
+canónica verificada contra la base; las otras dos orgs "efeonce" son auto-companies de HubSpot
+sincronizadas como ruido). Aplicado con `scripts/growth/provision-efeonce-own-brand-seo.ts` (idempotente):
+
+- 4 perfiles del grader ligados (`EO-GAVP-0002/0017/0018/0020`) → **lente AEO disponible** (cierra §2.A
+  del programa AEO para la marca propia).
+- Assignment `cpma-efeonce-seo-own-brand` (`seo_v1`, contracted, `metadata.note=own_brand`) → chokepoint
+  responde `hasModule=true`, 8 audits, $50 budget.
+- Target `seot-efeonce-own-brand` (efeoncepro.com, CL/es).
+- Verificado vía payloads del lane (TASK-1645): entitlement ✓ · keyword-opportunities `ok:true` (vacío,
+  sin GSC aún) · visibility-360 → **`no_seo_data` honesto** (lente SEO llega al conectar la GSC de
+  efeoncepro.com — OAuth de TASK-1282/1283, rollout pendiente — o con TASK-1303/DataForSEO).
+
+**Pendientes operativos:** (1) merge en HubSpot de las auto-companies `efeonce.org` (56011409567) y
+`efeonce` (57099835819) hacia la company canónica — el sync propaga; NUNCA borrarlas por SQL. (2)
+`website_url` de EO-ORG-0007 está vacío (`efeoncepro.com`) — completar por la puerta canónica
+(`upsertCanonicalOrganization`), no SQL directo. (3) Conectar GSC de efeoncepro.com cuando 1282/1283
+destraben su rollout. SKY ya tiene lente AEO ligada; su SEO sigue igual de pendiente que Efeonce.
+
 ### TASK-1645 — SEO operable por MCP: CODE COMPLETE, rollout pendiente (2026-08-05)
 
 La milla final del camino MCP-first quedó implementada y verificada a nivel función. **Lane ecosystem**
