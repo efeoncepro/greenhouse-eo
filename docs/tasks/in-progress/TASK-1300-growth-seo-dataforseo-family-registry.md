@@ -13,7 +13,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -26,11 +26,11 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Diseno`
+- Status real: `en ejecución` — Slice 1-2; la verificación live por familia queda condicionada al saldo de la cuenta DataForSEO (USD 0,90 medido 2026-08-05)
 - Rank: `TBD`
 - Domain: `growth|integrations|ai`
 - Blocked by: `none`
-- Branch: `task/TASK-1300-growth-seo-dataforseo-family-registry`
+- Branch: `develop` (contrato del repo: una task NO crea rama propia; local-first, sin push automático)
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
