@@ -27,6 +27,8 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
+import { SEO_PROVIDER_SPEND_MONTHLY_SUM_SQL } from './provider-spend'
+
 export const SEO_MODULE_KEY = 'seo_v1' as const
 
 export type SeoTier = 'contracted' | 'trial' | 'pilot'
@@ -191,10 +193,7 @@ export const resolveSeoEntitlement = async (
           JOIN greenhouse_growth.seo_targets t ON t.seo_target_id = r.seo_target_id
          WHERE t.organization_id = $1
            AND r.created_at >= date_trunc('month', CURRENT_DATE))::int AS audit_runs_used,
-       COALESCE((SELECT SUM(sp.provider_cost_usd)
-          FROM greenhouse_growth.seo_provider_spend_daily sp
-         WHERE sp.organization_id = $1
-           AND sp.spend_date >= date_trunc('month', CURRENT_DATE)::date), 0)::float8 AS spend_used_usd,
+       ${SEO_PROVIDER_SPEND_MONTHLY_SUM_SQL}::float8 AS spend_used_usd,
        (date_trunc('month', CURRENT_DATE) + INTERVAL '1 month')::timestamptz AS period_reset_at`,
     [organizationId]
   )

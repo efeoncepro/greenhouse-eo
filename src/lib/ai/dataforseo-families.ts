@@ -22,8 +22,16 @@ export interface DataForSeoFamilyDefinition {
    *
    * Las 4 familias SEO son trabajo per-cliente y su gasto DEBE quedar atribuido, así que el
    * tipo obliga a pasar `organizationId` — el gasto no rastreado se vuelve imposible por
-   * construcción, no por disciplina del caller. `serp` es la excepción deliberada: el AEO
-   * grader corre sobre prospectos que todavía no son una organización en Greenhouse.
+   * construcción, no por disciplina del caller.
+   *
+   * ⚠️ `serp` queda en `false` por una limitación ACTUAL, no porque su gasto no sea
+   * atribuible. `grader_profiles.organization_id` existe y es NULLABLE (TASK-1243): un perfil
+   * del grader puede ser público/prospecto (sin org) o estar ligado a una organización
+   * cliente. Pero `ProviderAdapterContext` no transporta la organización hoy, así que el
+   * adapter AEO no tiene con qué atribuir ni siquiera cuando el perfil sí tiene org.
+   * Consecuencia viva: **el gasto AEO de perfiles ligados a un cliente no entra en el
+   * presupuesto de ese cliente.** Cerrarlo exige llevar la organización al contexto del
+   * adapter — trabajo del dominio AEO, registrado como follow-up en TASK-1300.
    */
   requiresOrganization: boolean
   /** Para qué se usa; sirve de documentación en el propio registry. */

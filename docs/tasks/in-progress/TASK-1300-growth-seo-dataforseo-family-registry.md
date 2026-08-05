@@ -294,6 +294,17 @@ Ver el contrato canónico en `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTU
 
 ## Follow-ups
 
+- 🔴 **El gasto AEO de perfiles ligados a un cliente NO entra en su presupuesto** (detectado
+  por el operador 2026-08-05 al revisar esta task). `grader_profiles.organization_id` existe y
+  es nullable desde TASK-1243: un perfil del grader puede ser público/prospecto o pertenecer a
+  una organización cliente. Pero `ProviderAdapterContext` no transporta la organización, así
+  que el adapter `google-ai-overview` no puede atribuir su gasto ni cuando el perfil sí la
+  tiene. Por eso la familia `serp` quedó con `organizationId` opcional — es una limitación
+  del contexto, NO que el AEO sea sólo para prospectos (afirmación errónea que se corrigió en
+  los comentarios del registry). Cerrarlo requiere llevar la organización al contexto del
+  adapter y pasarla en la llamada; el transporte ya lo contabiliza sin cambios adicionales.
+  Dueño natural: dominio AEO (EPIC-020), no esta task.
+
 - `TASK-1301` — `enforceSeoRunEntitlement` con quota cap por-org que lee `seo_provider_spend_daily`.
 - `TASK-1303` — rank capture command usa `postDataForSeoTask` (familia `serp`/`labs`) + materializa el signal `seo.provider.cost_over_budget`.
 - `TASK-1304` — site audit (familia `onpage`, task-based async en ops-worker) + backlinks (familia `backlinks`).

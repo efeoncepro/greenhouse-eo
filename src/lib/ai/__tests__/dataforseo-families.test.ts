@@ -22,7 +22,9 @@ describe('DATAFORSEO_FAMILIES — allowlist cerrado', () => {
   })
 
   it('sólo `serp` puede correr sin organización', () => {
-    // El AEO grader corre sobre prospectos que aún no son organización en Greenhouse.
+    // NO porque el AEO sea sólo para prospectos —un perfil del grader puede estar ligado a
+    // una organización cliente (TASK-1243)—, sino porque el contexto del adapter AEO todavía
+    // no transporta la organización. Ver la nota en `dataforseo-families.ts`.
     expect(DATAFORSEO_FAMILIES.serp.requiresOrganization).toBe(false)
 
     // Las 4 familias SEO son trabajo per-cliente: su gasto SIEMPRE se atribuye.

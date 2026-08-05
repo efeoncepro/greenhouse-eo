@@ -109,6 +109,11 @@ export const setDataForSeoSpendRecorder = (recorder: DataForSeoSpendRecorder | n
  * una preferencia de estilo: el gasto de una familia SEO sin organización sería gasto no
  * atribuible, y "el caller se acuerda de pasarlo" es justo la disciplina que falla en
  * silencio. El tipo lo vuelve imposible; el runtime lo revalida por si el caller es JS.
+ *
+ * ⚠️ Que `serp` lo tenga opcional NO significa que su gasto sea inatribuible por naturaleza
+ * — un perfil del grader puede estar ligado a una organización cliente (TASK-1243). Es una
+ * limitación actual del contexto del adapter AEO; ver la nota en `dataforseo-families.ts`.
+ * Cuando `serp` reciba `organizationId`, se contabiliza igual que las demás sin más cambios.
  */
 export type DataForSeoTaskInput =
   | {
