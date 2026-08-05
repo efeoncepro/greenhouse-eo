@@ -77,6 +77,92 @@ dos familias distintas.
 > [`docs/operations/creative-studio/TASK_1641_SESSION_HANDOFF_2026-08-04.md`](../../operations/creative-studio/TASK_1641_SESSION_HANDOFF_2026-08-04.md)
 > — qué está cerrado con su evidencia, por dónde seguir y las trampas ya pagadas.
 
+## Delta 2026-08-04 (f) — Scope 6: runbook publicado
+
+`docs/operations/creative-studio/GLOBE_ROUTE_PROMOTION_RUNBOOK_V1.md`, indexado en el README del
+directorio. Lleva el canary como **paso explícito** (`pnpm producer:canary --route=`, con el dry-run de
+gasto cero como primer diagnóstico) y publica el **presupuesto real de la ventana**: ~1-2 min de
+generación + ~8 min de Asset Governance + `canary-confirm` ≈ **10 min por intento** sobre 3 h, que es lo
+que vuelve accionable el aviso de 30 min. Las tres alertas nuevas quedaron en
+`GLOBE_PRODUCER_ALERT_TRIAGE_V1.md` con su remedio, incluido el aviso de no confundir
+`window_closing` con `stalled`.
+
+## Delta 2026-08-04 (e) — Scope 5: la reserva pre-gasto converge
+
+`efeonce-globe@21d6ee3`.
+
+**Medido contra `globe-pg` antes de tocar código, porque es el camino del dinero:** la **ÚNICA** reserva
+`held` de toda la base es **pre-gasto** —32 créditos, run terminal sin `provider_operation_id`, TTL hasta
+el 2026-08-05 18:44Z— y hay **CERO** post-gasto. O sea el **100 %** del crédito inmovilizado hoy pertenece
+a la rama en la que la postura `observable` era falsa. Universo pre-gasto: 6 runs terminales (4 `failed` +
+2 `cancelled`) sin `provider_operation_id`.
+
+### El discriminador es el hecho durable, no el nombre de la fase
+
+`POST_SPEND_KINDS` nombra bien la asimetría pero clasifica **topes de reintento**, y una entrega de
+`submit` puede haber aceptado con la respuesta perdida — ése es justamente el caso ambiguo que no se debe
+liberar a ciegas. El que decide es **`attempt.providerOperation`**, y viaja íntegro por los dos call sites
+de `abandon` (verificado: `listDivergentTerminalRuns` proyecta `provider_operation_id`).
+
+Sin él se libera por los **mismos primitives** del camino hacia adelante (`SpendFencePort.release` +
+`CommercialCreditLifecyclePort.release`); con él no se toca nada y la reserva sigue siendo del expiry.
+
+### 🔴 El orden lo decide el peor caso, no la elegancia
+
+Liberar va **primero** —marcar terminal antes haría que un segundo intento saliera por la guarda de
+idempotencia sin liberar nunca— pero un fallo al liberar **no se propaga**: `abandon` corre después de que
+la outbox cerró la entrega, así que un throw dejaría el experimento `running` para siempre, peor que la
+reserva colgada que este cambio evita. Degrada al TTL —el dueño declarado de ese caso— y lo **observa**
+(`globe_run_abandon_release_degraded`, WARNING): sin esa línea, «se liberó rápido» y «se cayó al TTL de
+24 h» son indistinguibles desde afuera.
+
+### El contrato gana `condition`, y no son dos filas
+
+`aggregate` es el **nombre físico de la tabla**, verificable contra el runtime sin traducir; partirlo en
+`credit_reservations (pre-spend)` rompería justo la propiedad que lo sostiene. El test exige dueño y señal
+en **ambas** ramas —una condición es la forma honesta de declarar un matiz y también la más cómoda de
+esconder la mitad que falta— y rechaza dos ramas con la misma postura.
+
+Discriminador y orden **probados en rojo**.
+
+## Delta 2026-08-04 (d) — Scopes 2 y 3 cerrados por un solo consumidor
+
+`efeonce-globe@17c3fef`. Van juntos porque son **el mismo lector**: ambas señales parten de
+`production_promotion_operations` leída cross-workspace después del batch de recuperación, por la política
+de scan que **ya existía** (`app.promotion_recovery_scan`, migración `0028`) — **sin migración nueva**.
+
+- **Scope 2** — `promotionWindowClosing` es el **complemento estricto** de `stalled`, no un umbral mejor:
+  mira `deadline_at > now` y **nunca** cuenta una ventana vencida, porque contarla dos veces borraría la
+  frontera y ninguna de las dos señales significaría una sola cosa.
+- **Scope 3** — el consumidor que faltaba. La divergencia se computa sobre el estado **leído ahora** por el
+  reader canónico de readiness, nunca sobre la evidencia que la saga guardó al revertir.
+
+### 🔴 El predicado de supersede, sin el cual la señal era FALSA en su primer disparo
+
+De las 10 promociones revertidas, **dos pertenecen a identidades que después se volvieron a promover y
+quedaron selladas** (`ref/motion/reference-v1` y `ref/video/frames-v1`, ese mismo día). Su readiness dice
+`promoted` **por la promoción posterior, que es legítima**. Sin
+`NOT EXISTS (promoción posterior de la misma identidad)`, la señal habría acusado de divergencia justo a
+las dos rutas que **sí** convergieron — y su remedio, pausar esa readiness, **habría retirado dos rutas
+vivas**. Una identidad produce como máximo una fila; si la posterior también terminó revertida, ella es la
+que reporta.
+
+### Las métricas son de CONTEO, y la razón de fondo no es el aligner
+
+El aligner es función del tipo, sí. Pero «segundos restantes» **se alinea al revés**: pediría
+`COMPARISON_LT` y no existe `ALIGN_MIN` para DISTRIBUTION, así que un p99 sería la promoción **menos**
+urgente. El hecho accionable es «hay N por expirar»; los segundos viven en la línea que un humano lee.
+
+**Antelación: 30 min**, medida y no redondeada — ~8 min de Asset Governance (ADR-007 tras `ISSUE-137`) +
+generación + `canary-confirm`, sobre una ventana de 3 h. Deja margen para un segundo intento sin volverse
+ruido.
+
+Guards de estado terminal y de ventana vencida **probados en rojo**. Test en vivo opt-in que ejercita las
+dos consultas contra el schema desplegado y **se salta visiblemente** sin credenciales.
+
+**`tofu plan` honesto: `6 to add, 1 to change, 0 to destroy`** — las 3 métricas, las 3 alertas y el env var
+del worker. Nada más. **Sin aplicar ni desplegar.**
+
 ## Delta 2026-08-04 (c) — Scope 3: el contrato de convergencia de la saga
 
 `efeonce-globe@4a0a18b`. `PROMOTION_DEPENDENT_AGGREGATES` declara los **tres** agregados que la saga
@@ -484,17 +570,29 @@ sigue siendo el recovery.
       exigen referencias, sin escribir la secuencia a mano. — `efeonce-globe@1767138`, verificado en
       dry-run contra el runtime sobre 4 rutas **y con GASTO REAL** sobre `ref/motion/reference-v1`
       (run `6a6112f4…`, MP4 661.995 B, 12 = 12 créditos). Ver Delta 2026-08-04 (b).
-- [ ] Una promoción `activated` próxima a expirar emite señal observable, con alerta.
+- [x] Una promoción `activated` próxima a expirar emite señal observable, con alerta. —
+      `efeonce-globe@17c3fef`: `globe_promotion_window_closing` (WARNING) a 30 min del deadline, complemento
+      estricto de `stalled`. **Código y IaC listos; la alerta NO está aplicada** (`tofu plan`
+      `6 to add / 0 to destroy`, sin aplicar).
 - [x] Los agregados dependientes de la saga están declarados en un array enumerable, con test en ambas
       direcciones; un `observable` sin señal se rechaza. — `efeonce-globe@4a0a18b`, probado en rojo.
-- [ ] Un rollback deja readiness convergido o su divergencia contada y observable. — **contable, aún
-      no observada**: falta el consumidor que emita la señal (comparte dueño con el Scope 2).
-- [ ] `canary-confirm` nunca responde `internal_error`: cada causa de no-resolución tiene razón nombrada, y un
-      fallo deja la saga en un estado desde el que se puede reintentar.
-- [ ] Una reserva de un run muerto **antes del gasto** converge por el camino terminal, sin esperar el TTL de 24 h;
-      la postura `observable` se conserva para el caso post-gasto.
-- [ ] Runbook publicado con el canary como paso explícito.
-- [ ] Una promoción completa end-to-end llega a `canary_passed` sin intervención artesanal.
+- [x] Un rollback deja readiness convergido o su divergencia contada y observable. —
+      `efeonce-globe@17c3fef`: `globe_promotion_readiness_divergent` (ERROR), computada sobre el estado leído
+      ahora y con supersede por identidad exacta. **Pendiente de apply** para pasar de «computable» a
+      «observada» en el runtime.
+- [x] `canary-confirm` nunca responde `internal_error`: cada causa de no-resolución tiene razón nombrada, y un
+      fallo deja la saga en un estado desde el que se puede reintentar. — `efeonce-globe@38c528d`, sellado en
+      vivo por Omni y Veo.
+- [x] Una reserva de un run muerto **antes del gasto** converge por el camino terminal, sin esperar el TTL de 24 h;
+      la postura `observable` se conserva para el caso post-gasto. — `efeonce-globe@21d6ee3`, con la medición
+      contra `globe-pg` que muestra que el 100 % del crédito hoy inmovilizado es de esa rama. **Code complete,
+      rollout pendiente.**
+- [x] Runbook publicado con el canary como paso explícito. —
+      `docs/operations/creative-studio/GLOBE_ROUTE_PROMOTION_RUNBOOK_V1.md`.
+- [ ] Una promoción completa end-to-end llega a `canary_passed` sin intervención artesanal. — **requiere
+      rollout**: desplegar API + worker desde el SHA exacto (dos corridas del worker: `build` y después
+      `deploy`), aplicar `tofu` y ejercitar una promoción real. Es el único criterio que no se puede cerrar sin
+      autorización del operador.
 
 ## Verification
 

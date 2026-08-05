@@ -675,9 +675,41 @@ ADR, no editar una palabra — y el test lo pinea.
 la evidencia dice qué pasó entonces y la pregunta es si alguien ya lo cerró. Una señal que no baja enseña a
 ignorarla, y eso es peor que no tenerla.
 
-⚠️ **Pendiente declarado:** falta el **consumidor** que lea las promociones `rolled_back` con su readiness y
-emita la señal — el mismo lugar donde vivirá la de ventana-por-expirar (Scope 2). Hasta entonces la
-divergencia es **computable, no observada**.
+✅ **El consumidor existe desde `efeonce-globe@17c3fef`** (`observePromotionConvergence` + el pase del worker
+en `apps/studio-web/src/promotion-observation.ts`), junto con la señal de ventana-por-expirar: son el **mismo
+lector** cross-workspace y separarlos duplicaría el escaneo. Usa la política de scan que ya existía
+(`app.promotion_recovery_scan`, migración `0028`) — **sin migración nueva**.
+
+### 🔴 Una señal sobre historia append-only necesita su predicado de VIGENCIA, o su primer disparo es falso
+
+La versión ingenua del consumidor —leer las `rolled_back` y reportar las que tienen readiness `promoted`—
+**habría acusado de divergencia justo a las dos rutas que sí convergieron**. Medido: de las 10 promociones
+revertidas, `ref/motion/reference-v1` y `ref/video/frames-v1` pertenecen a identidades que **después se
+volvieron a promover y quedaron selladas**; su readiness dice `promoted` **por esa promoción posterior, que es
+legítima**. Y el remedio que la señal sugiere —pausar esa readiness— **habría retirado dos rutas vivas**.
+
+Por eso el lector aplica supersede por identidad exacta (`NOT EXISTS` de una promoción posterior sobre el
+mismo `routeId + modelVersion`, con comparación de tupla para desempatar): **una identidad produce como máximo
+una fila**, y si la posterior también terminó revertida, ella es la que reporta. **NUNCA** derives una señal
+de un agregado append-only sin preguntarte qué fila la supersede.
+
+### La métrica de conteo no se elige sólo por el aligner
+
+El aligner es función del tipo —`ALIGN_SUM`/`ALIGN_COUNT` sobre DELTA/INT64, `ALIGN_PERCENTILE_99` sobre
+DELTA/DISTRIBUTION— y copiarlo de la hermana equivocada falla en el apply con un 400. Pero la razón de fondo
+para que `globe_promotion_window_closing` sea de **conteo** es otra: **«segundos restantes» se alinea al
+revés**. Pediría `COMPARISON_LT`, y **no existe `ALIGN_MIN` para DISTRIBUTION**, así que un p99 sería la
+promoción **menos** urgente — exactamente el extremo equivocado. **SIEMPRE** que una magnitud sea "cuánto
+falta" en vez de "cuánto lleva", emite el **evento discreto** y deja el número en la línea que un humano lee.
+
+### Las dos señales de la ventana son los dos lados del mismo instante
+
+`stalled` / `promotion_queue_oldest_age_seconds` miden `deadline_at <= now`;
+`globe_promotion_window_closing` mira `deadline_at > now`, con 30 min de antelación
+(`GLOBE_PROMOTION_WINDOW_WARNING_SECONDS`, medidos: ~8 min de Asset Governance + generación +
+`canary-confirm`, sobre una ventana de 3 h). **NUNCA** las unifiques ni dejes que una cuente lo de la otra:
+contar una ventana vencida en las dos borra la frontera y ninguna significa una sola cosa. Runbook:
+`docs/operations/creative-studio/GLOBE_ROUTE_PROMOTION_RUNBOOK_V1.md`.
 
 ## Convergencia terminal de los agregados del run (`TASK-1469`)
 
@@ -692,6 +724,26 @@ hacerse cargo.
 - **NUNCA** escribas una lógica de cierre propia para el barrido de recuperación: reusa **el mismo primitive**
   del camino hacia adelante (`RunFinalizerPort.abandon`). Dos definiciones de «converger» pueden divergir entre
   sí — el bug class original, una capa más arriba.
+- 🔴 **La postura de un agregado puede depender del CASO, y una fila que promedia dos casos esconde el que
+  está mal.** `credit_reservations` era `observable` entera, delegando en el TTL de 24 h. Post-gasto eso es
+  correcto —el settlement ya decidió y tocar dinero arriesga doble movimiento—, pero **pre-gasto era falso**:
+  un run que murió sin que el proveedor aceptara no cobró nada. Medido el 2026-08-04 contra `globe-pg`: la
+  **única** reserva `held` de toda la base era pre-gasto (32 créditos) y había **cero** post-gasto, o sea el
+  100 % del crédito inmovilizado estaba amparado por un razonamiento que no le correspondía. Hoy la entrada
+  lleva `condition` con dueño y señal en **ambas** ramas, y el test rechaza dos ramas con la misma postura.
+  **NUNCA** partas la fila en dos: `aggregate` es el **nombre físico de la tabla** y `credit_reservations
+  (pre-spend)` rompería justo la propiedad que la hace verificable contra el runtime.
+- 🔴 **El discriminador de gasto es `attempt.providerOperation`, NO `lease.kind`.** `POST_SPEND_KINDS` nombra
+  bien la asimetría pero clasifica **topes de reintento**: una entrega de `submit` puede haber aceptado con la
+  respuesta perdida, y ése es justamente el caso ambiguo que no se debe liberar a ciegas. El hecho durable
+  decide; el nombre de la fase no.
+- 🔴 **En `abandon`, el orden lo decide el peor caso y el fallo NO se propaga.** Liberar va **primero** —marcar
+  terminal antes haría que un segundo intento saliera por la guarda de idempotencia sin liberar nunca— pero un
+  throw dejaría el experimento `running` para siempre, porque `abandon` corre **después** de que la outbox
+  cerró la entrega: peor que la reserva colgada que el cambio evita. Degrada al TTL, que es el dueño declarado
+  de ese caso, y **se observa** (`globe_run_abandon_release_degraded`): sin esa línea, «se liberó rápido» y
+  «se cayó al TTL de 24 h» son indistinguibles desde afuera. Es la regla de `ISSUE-127` aplicada a un
+  `catch` legítimo.
 - **NUNCA** marques `failed` un run `completed` cuyo agregado quedó atrás: sería mentir sobre una corrida que
   sí entregó. Ese caso **se cuenta y no converge**, y la diferencia queda en `divergentAggregates`.
 - **NUNCA** midas una señal en la unidad equivocada. `outboxDeadLetter` contaba **filas de outbox** y un attempt

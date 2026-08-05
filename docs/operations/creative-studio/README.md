@@ -27,6 +27,7 @@ es auditable en el git log del repo hermano):
 - [EPIC_028_FRESH_SESSION_PROMPT.md](EPIC_028_FRESH_SESSION_PROMPT.md) — prompt de arranque de sesión para trabajo sobre EPIC-028.
 - [TASK_1641_SESSION_HANDOFF_2026-08-04.md](TASK_1641_SESSION_HANDOFF_2026-08-04.md) — arranque de sesión para **retomar `TASK-1641`**: scopes cerrados con su evidencia, orden recomendado (Scope 2 y el cierre del 3 son el mismo trabajo) y las trampas ya pagadas (`referenceHashes`, elección de `inputMode`, el alcance real de la alerta `stalled`).
 - [GLOBE_PRODUCER_ROLLOUT_AND_CANARY_V1.md](GLOBE_PRODUCER_ROLLOUT_AND_CANARY_V1.md) — rollout interno serializado, políticas exactas y canarios image/video/audio por los commands/readers de la UI.
+- [GLOBE_ROUTE_PROMOTION_RUNBOOK_V1.md](GLOBE_ROUTE_PROMOTION_RUNBOOK_V1.md) — promoción de una ruta de punta a punta (ADR-009 + ADR-010), con el **canary como paso explícito** (`pnpm producer:canary --route=`) y el presupuesto real de la ventana de 3 h. Existe porque el procedimiento incompleto costó 10 de 12 promociones.
 - [GLOBE_PRODUCER_ALERT_TRIAGE_V1.md](GLOBE_PRODUCER_ALERT_TRIAGE_V1.md) — diagnóstico de failures, cola stale, Asset Governance/C2PA y recuperación sin mutación SQL ad hoc.
 - [GLOBE_CLIENT_UI_GATES_RUNBOOK_V1.md](GLOBE_CLIENT_UI_GATES_RUNBOOK_V1.md) — cómo correr y **verificar que muerden** los 6 gates de UI del payload cliente (`apps/studio-client`, ADR-014), el smoke de browser cross-repo (`seam:smoke` en Globe + el driver Playwright en Greenhouse) y el ledger `LEGACY_TOKEN_DRIFT`.
 

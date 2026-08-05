@@ -13,6 +13,46 @@
 > `d3fe90e`, digest `sha256:d8295862dc12c14427e90e0bb413577802916c37ca6bf32c202680492ca7bae9`,
 > deploy `30717266572` y baseline IaC `e369ef8` sin drift.
 
+## Corte 2026-08-04 (d) — TASK-1641: Scopes 2, 3, 5 y 6 cerrados en código; **rollout PENDIENTE**
+
+`efeonce-globe@17c3fef` (Scopes 2 y 3) + `@21d6ee3` (Scope 5). `pnpm check` (1.680 tests) y `pnpm build` en
+verde. 🔴 **Nada de esto está desplegado ni aplicado**: no hay deploy de API/worker ni `tofu apply`, así que
+las tres alertas nuevas **no existen todavía en el proyecto** y la liberación pre-gasto no corre en runtime.
+
+**Un solo consumidor para las dos señales de la saga**, porque son el mismo lector cross-workspace y
+separarlos duplicaría el escaneo. Usa la política de scan que ya existía (`app.promotion_recovery_scan`,
+migración `0028`): **sin migración nueva**.
+
+- `globe_promotion_window_closing` (WARNING, 30 min de antelación) es el **complemento estricto** de
+  `stalled`, que mide `deadline_at <= now` y por tanto avisa cuando la ventana ya venció — las cuatro
+  promociones que murieron lo hicieron a +2 s, +18 s, +26 s y +40 s del deadline.
+- `globe_promotion_readiness_divergent` (ERROR) es la señal que le faltaba al contrato para que
+  `observable` significara algo. Se computa sobre el estado **leído ahora**.
+
+🔴 **El predicado de supersede evitó que la señal naciera falsa.** Dos de las diez promociones revertidas
+pertenecen a identidades que **después se volvieron a promover y quedaron selladas**
+(`ref/motion/reference-v1`, `ref/video/frames-v1`): su readiness dice `promoted` por esa promoción
+posterior, que es legítima. Sin el `NOT EXISTS` por identidad exacta, la señal habría acusado de divergencia
+justo a las dos rutas que convergieron, y su remedio habría **retirado dos rutas vivas**.
+
+**Scope 5 — medido contra `globe-pg` antes de tocar código:** la **única** reserva `held` de toda la base es
+**pre-gasto** (32 créditos, run terminal sin `provider_operation_id`, TTL hasta el 2026-08-05 18:44Z) y hay
+**cero** post-gasto. El 100 % del crédito inmovilizado hoy pertenece a la rama en la que la postura
+`observable` era falsa. `abandon` la libera por los mismos primitives del camino hacia adelante; un fallo al
+liberar degrada al TTL y se observa (`globe_run_abandon_release_degraded`), nunca se propaga — un throw
+dejaría el experimento `running` para siempre.
+
+**`tofu plan` honesto: `6 to add, 1 to change, 0 to destroy`** — tres métricas, tres alertas y el env var
+`GLOBE_PROMOTION_WINDOW_WARNING_SECONDS` del worker. Nada más entra en el diff.
+
+**Runbook publicado:** [`GLOBE_ROUTE_PROMOTION_RUNBOOK_V1.md`](GLOBE_ROUTE_PROMOTION_RUNBOOK_V1.md), con el
+canary como paso explícito y el presupuesto real de la ventana (~10 min por intento sobre 3 h). Las tres
+alertas con su remedio en [`GLOBE_PRODUCER_ALERT_TRIAGE_V1.md`](GLOBE_PRODUCER_ALERT_TRIAGE_V1.md).
+
+**Siguiente paso**: deploy de `globe-api-internal` + `globe-producer-worker` (dos corridas: `mode=build` y
+después `mode=deploy`) desde el SHA exacto con CI verde, `tofu apply` con `0 to destroy`, y verificación
+contra la **revisión activa** y el digest etiquetado — nunca contra el workflow en verde.
+
 ## Corte 2026-08-04 (c) — TASK-1641: Scope 3 declarado; arranque de sesión nueva
 
 `efeonce-globe@4a0a18b`. `PROMOTION_DEPENDENT_AGGREGATES` declara los tres agregados de la saga con
@@ -525,10 +565,11 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
    `ProducerFeedRoute.tsx`, que cablea `onReference`, `onRecreate`, `onFavorite` y `onDownload` a
    `() => undefined`. Para el camino 2, **primero reproducir la subida con el selector real** antes de tratar el
    `dependency_unavailable` de `inspecting` como defecto de plataforma.
-2. Cerrar el **Scope 1 de `TASK-1641`**: dejar committeado un canary de ruta arbitraria canónico. El sello de
-   Veo se hizo con los commands del spine (`globe.lab.experiment.estimate` → `prepare` → `execute`) sobre el
-   transporte de `scripts/producer-ui-canary-lib.mjs`, pero esa forma todavía no está consolidada como
-   herramienta reutilizable.
+2. **Desplegar `TASK-1641`** (todos sus scopes están code-complete y ninguno está en runtime): API + worker
+   desde el SHA exacto con CI verde —el worker en **dos** corridas, `mode=build` y después `mode=deploy`— y
+   `tofu apply` con el plan honesto, que verificado da `6 to add, 1 to change, 0 to destroy`. Verificar contra
+   la revisión activa y el digest etiquetado, nunca contra el workflow en verde. Hasta entonces las tres
+   alertas nuevas no existen en el proyecto y la liberación pre-gasto no corre.
 3. Implementar TASK-1632 dentro de Globe sin introducir a Greenhouse en el path de finalización; conservar los
    schedulers como recovery y demostrar deduplicación/idempotencia antes del rollout.
 4. Completar receipts/calibración amplia de TASK-1468/TASK-1579 sin reabrir TASK-1614/TASK-1630 ni alterar los

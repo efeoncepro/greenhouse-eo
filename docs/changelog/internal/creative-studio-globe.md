@@ -6,6 +6,45 @@
 
 # Changelog
 
+## 2026-08-04 (c) — La saga de promoción se observa, y la reserva pre-gasto deja de esperar 24 h
+
+> `code complete, rollout pendiente`: nada de esto está desplegado ni aplicado. Las tres alertas no existen
+> todavía en el proyecto. Plan honesto verificado: `6 to add, 1 to change, 0 to destroy`.
+
+- **`TASK-1641` Scopes 2 y 3, cerrados por un solo consumidor** (`efeonce-globe@17c3fef`). Las dos señales
+  parten del mismo lector cross-workspace después del batch de recuperación, por la política de scan que ya
+  existía (`app.promotion_recovery_scan`, migración `0028`): **sin migración nueva**.
+  - `globe_promotion_window_closing` (WARNING, 30 min de antelación) es el **complemento estricto** de
+    `stalled`, que mide `deadline_at <= now` y por tanto avisa **cuando la ventana ya venció**. Las cuatro
+    promociones que murieron el 2026-08-04 lo hicieron a +2 s, +18 s, +26 s y +40 s del deadline: para todas
+    ellas esa alerta llegaba tarde **por diseño**, no por umbral mal puesto.
+  - `globe_promotion_readiness_divergent` (ERROR) es la señal que le faltaba al contrato para que la palabra
+    `observable` significara algo. Se computa sobre el estado **leído ahora**, así que baja sola cuando un
+    operador cierra la divergencia.
+- 🔴 **El predicado de supersede evitó que la señal naciera falsa.** Dos de las diez promociones revertidas
+  pertenecen a identidades que **después se volvieron a promover y quedaron selladas**: su readiness dice
+  `promoted` por esa promoción posterior, que es legítima. Sin `NOT EXISTS` por identidad exacta, la señal
+  habría acusado de divergencia justo a las dos rutas que **sí** convergieron, y su remedio —pausar esa
+  readiness— **habría retirado dos rutas vivas**. Una señal sobre historia append-only necesita su predicado
+  de vigencia, o su primer disparo es falso.
+- **Las métricas son de conteo, y no sólo por el aligner.** «Segundos restantes» se alinea al revés: pediría
+  `COMPARISON_LT` y no existe `ALIGN_MIN` para DISTRIBUTION, así que un p99 sería la promoción **menos**
+  urgente. El hecho accionable es «hay N por expirar»; los segundos viven en la línea que un humano lee.
+- **`TASK-1641` Scope 5 — la reserva de un run muerto ANTES del gasto converge** (`efeonce-globe@21d6ee3`).
+  Medido contra `globe-pg` antes de tocar código: la **única** reserva `held` de toda la base es pre-gasto
+  (32 créditos, run terminal sin `provider_operation_id`) y hay **cero** post-gasto — el 100 % del crédito
+  inmovilizado estaba amparado por un razonamiento que no le correspondía.
+  - El discriminador es **`attempt.providerOperation`**, el hecho durable, no `lease.kind`: una entrega de
+    `submit` puede haber aceptado con la respuesta perdida.
+  - Se libera por los **mismos primitives** del camino hacia adelante. Un fallo al liberar **no se propaga**
+    —`abandon` corre después de que la outbox cerró la entrega, y un throw dejaría el experimento `running`
+    para siempre— sino que degrada al TTL y **se observa** (`globe_run_abandon_release_degraded`).
+  - `RunDependentAggregateV1` gana `condition`, con test que exige dueño y señal en **ambas** ramas y rechaza
+    dos ramas con la misma postura. No son dos filas: `aggregate` es el nombre físico de la tabla.
+- **Runbook de promoción publicado** (`GLOBE_ROUTE_PROMOTION_RUNBOOK_V1.md`), con el canary como paso
+  explícito y el presupuesto real de la ventana (~10 min por intento sobre 3 h). Las tres alertas nuevas con
+  su remedio en `GLOBE_PRODUCER_ALERT_TRIAGE_V1.md`.
+
 ## 2026-08-04 (b) — El run deja de mentir sobre su propio reloj, y el experimento deja de ser mudo
 
 - **La fila de la cola se sellaba con el reloj equivocado, y era mucho peor de lo medido en el incidente.**

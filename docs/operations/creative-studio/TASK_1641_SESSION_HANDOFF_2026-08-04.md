@@ -18,46 +18,58 @@
 | Scope | Estado | Evidencia |
 |---|---|---|
 | **1** — canary de ruta arbitraria | ✅ cerrado y **ejercitado con gasto real** | `efeonce-globe@1767138` + `@a6ff46f`; run `6a6112f4…` en `ref/motion/reference-v1`, MP4 661.995 B retenido y `eligible`, 12 = 12 créditos |
-| **3** — contrato de convergencia | ✅ contrato declarado, ⚠️ señal sin consumidor | `efeonce-globe@4a0a18b`, `PROMOTION_DEPENDENT_AGGREGATES` + test bidireccional probado en rojo |
+| **2** — señal de ventana por expirar | ✅ código + IaC, ⚠️ **sin aplicar** | `efeonce-globe@17c3fef`; `globe_promotion_window_closing` WARNING a 30 min |
+| **3** — contrato de convergencia + su consumidor | ✅ cerrado | `@4a0a18b` (contrato) + `@17c3fef` (consumidor); `globe_promotion_readiness_divergent` ERROR |
 | **4** — `canary-confirm` sin 500 opaco | ✅ cerrado | `efeonce-globe@38c528d`; lo probó el sello de Veo que pasó |
+| **5** — reserva pre-gasto | ✅ código, ⚠️ **sin desplegar** | `efeonce-globe@21d6ee3`, con medición contra `globe-pg` |
+| **6** — runbook | ✅ publicado | `GLOBE_ROUTE_PROMOTION_RUNBOOK_V1.md` + 3 alertas en el triage |
 
 Promociones **selladas** (terminal, no expiran): Omni `promotion_1a5d117e…` y Veo
 `promotion_ddd0977c…`, ambas `canary_passed` con binding `enabled` y circuito `closed`.
 
-## Lo que falta, en el orden que conviene
+## Lo único que falta: el ROLLOUT
 
-### 1.º — Scope 2 **junto con** el cierre del Scope 3 (son el mismo trabajo)
+🔴 **Todo lo de arriba es `code complete, rollout pendiente`.** No hay deploy ni `tofu apply`, así que las
+tres alertas **no existen en el proyecto** y la liberación pre-gasto **no corre**. El último criterio de
+aceptación —una promoción end-to-end sin intervención artesanal— sólo se puede cerrar después.
 
-Al Scope 3 le falta el **consumidor** que lea las promociones `rolled_back` con su readiness y emita
-la señal; ese consumidor es **exactamente** donde vive la señal de ventana-por-expirar del Scope 2.
-Hacerlos separados duplica el lector.
+Secuencia (la del repo, sin variantes):
 
-- El reader `globe.production-promotion.operation.stalled` **ya existe** y **no tiene consumidor**.
-- 🔴 **La observabilidad existente NO cubre el Scope 2, aunque lo parezca.**
-  `infra/terraform/promotion_observability.tf` tiene tres alertas (`promotion_partial` ERROR,
-  `promotion_rollback_failed` CRITICAL, `stalled` WARNING), pero la de `stalled` mide **queue age de
-  operaciones ya reclamables**: avisa **cuando ya venció**. Las cuatro promociones que murieron lo
-  hicieron a **+2 s, +18 s, +26 s y +40 s** del deadline — para todas ellas esa alerta llega tarde
-  **por diseño**. Falta la señal sobre `activated` **acercándose** a su `deadline_at`.
-- Dónde vive el consumidor: `apps/studio-web/src/worker-main.ts` (ahí corre el batch de recuperación
-  de promociones, y ya mide edad después del batch).
-- ⚠️ Al crear la métrica: el aligner es función del **tipo**. `ALIGN_COUNT` sólo vale sobre
-  DELTA/INT64; una métrica que **extrae un valor** es DELTA/DISTRIBUTION y necesita
-  `ALIGN_PERCENTILE_99`. Copiarlo de la alerta hermana equivocada **falla en el apply con 400**, no
-  antes. Y un 404 de la métrica recién creada es **propagación** (hasta 10 min), no un defecto.
+1. Push a `main` **no despliega nada**.
+2. CI verde sobre el **SHA exacto** (sale de `git rev-parse`, nunca de memoria).
+3. `gh workflow run deploy-internal.yml -f service=globe-api-internal -f target_sha=<SHA40>`.
+4. Worker: `deploy-producer-worker.yml` con `mode=build` y **después** `mode=deploy`. **Son dos corridas**;
+   correr sólo una deja el Job con la imagen anterior, en silencio.
+5. `tofu apply` con el plan honesto — **`0 to destroy` es la condición**, y el plan verificado da
+   `6 to add, 1 to change, 0 to destroy`:
 
-### 2.º — Scope 5 (reserva pre-gasto)
+   ```bash
+   tofu plan -var development_environment_enabled=true \
+     -var 'development_operator_principal=user:julio.reyes@efeonce.org'
+   ```
 
-`POST_SPEND_KINDS` vive en `packages/domain/src/governed-run-failure-policy.ts:250` y **no se propaga
-a `abandon()`**: un run que murió **sin `providerOperation` no cobró nada**, así que retener 24 h
-protege un escenario que no aplica. **Propagar la distinción es el trabajo; no relajar la postura
-`observable` donde sí corresponde** (post-gasto el settlement ya decidió y tocar dinero arriesga doble
-movimiento). Es el camino del dinero: va con más cuidado que los otros dos.
+6. Verificar la **revisión activa** y el digest etiquetado, nunca el workflow en verde.
+7. Un 404 de una métrica recién creada es **propagación** (hasta 10 min), no un defecto.
 
-### 3.º — Scope 6 (runbook)
+## Lo que se aprendió en esta sesión y no estaba escrito
 
-Al cierre y con lo aprendido, no antes. Debe llevar el canary como **paso explícito**, incluido
-`--route` para la ruta recién promovida.
+- 🔴 **El predicado de supersede.** Sin `NOT EXISTS (promoción posterior de la misma identidad)`, la señal
+  de readiness divergente habría acusado a `ref/motion/reference-v1` y `ref/video/frames-v1` —las dos que
+  **sí** convergieron ese día— porque su readiness dice `promoted` por su promoción **posterior**, que es
+  legítima. Y su remedio habría retirado dos rutas vivas. **Una señal sobre historia append-only necesita
+  su predicado de vigencia, o su primer disparo es falso.**
+- **La métrica de conteo no es sólo por el aligner.** «Segundos restantes» se alinea al revés: pediría
+  `COMPARISON_LT` y no existe `ALIGN_MIN` para DISTRIBUTION, así que un p99 sería la promoción **menos**
+  urgente. El aligner es la trampa visible; la dirección es la de fondo.
+- **El discriminador de gasto es `attempt.providerOperation`, no `lease.kind`.** `POST_SPEND_KINDS` nombra
+  bien la asimetría pero clasifica **topes de reintento**: una entrega de `submit` puede haber aceptado con
+  la respuesta perdida, y ése es el caso ambiguo que no se debe liberar a ciegas.
+- **En `abandon`, el orden lo decide el peor caso.** Liberar va primero (si no, la guarda de idempotencia
+  impide liberar en el segundo intento) pero el fallo **no se propaga**: corre después de que la outbox
+  cerró la entrega, así que un throw dejaría el experimento `running` para siempre — peor que la reserva
+  colgada que el cambio evita.
+- **La medición cambió el peso del Scope 5.** La única reserva `held` de toda la base es pre-gasto: el
+  100 % del crédito inmovilizado hoy estaba en la rama donde `observable` era falsa.
 
 ## Trampas ya pagadas — no las vuelvas a pagar
 

@@ -108,3 +108,45 @@ cierra cuando la causa dejó de producir señal; silenciarla o subir umbral no c
 sostenida, riesgo de gasto repetido, cruce de tenant, corrupción/pérdida de evidencia o incapacidad de rollback.
 Asset Governance failure o firmas stale persistentes son `CRITICAL`. El payload de fallo sólo puede incluir
 referencia saneada a ejecución/correlación, nunca raw error ni secreto.
+
+## Delta 2026-08-04 — tres alertas nuevas de `TASK-1641`
+
+### `globe_promotion_window_closing` — WARNING
+
+Una promoción `activated` entra en los últimos **30 minutos** de su ventana de 3 h. Se emite una línea por
+promoción y por tick del worker (`*/1`), con `routeId`, `modelVersion` y `secondsRemaining`.
+
+**Qué hacer:** producir el canary de esa identidad exacta, ahora. El ciclo completo son ~10 min
+(generación ~1-2 min + Asset Governance ~8 min + `canary-confirm`), así que **todavía alcanza**, y ése es
+exactamente el punto de esta alerta. Procedimiento:
+[`GLOBE_ROUTE_PROMOTION_RUNBOOK_V1.md`](GLOBE_ROUTE_PROMOTION_RUNBOOK_V1.md) § El canary.
+
+🔴 **No la confundas con `stalled`** (`promotion_queue_oldest_age_seconds`), que mide edad de cola de
+operaciones **ya reclamables** (`deadline_at <= now`) y por tanto avisa **cuando la ventana venció**. Las
+cuatro promociones que murieron el 2026-08-04 lo hicieron a **+2 s, +18 s, +26 s y +40 s** del deadline: para
+todas ellas `stalled` llegaba tarde **por diseño**. Son los dos lados del mismo instante y ninguna sustituye a
+la otra. Si `window_closing` se apagó y `stalled` se encendió sobre la misma operación, la ventana ya se
+perdió: el remedio deja de ser el canary y pasa a ser el bloque siguiente.
+
+### `globe_promotion_readiness_divergent` — ERROR
+
+Una promoción revertida cuya `model_readiness_revisions` sigue en `promoted`. Es la señal que permite declarar
+ese agregado `observable` y que la palabra signifique algo: un `observable` sin señal es «no lo miramos».
+
+**Qué hacer:** pausar esa readiness por su **identidad exacta** (`globe.model-readiness.route.pause`,
+`promoted → paused`, append-only). Es un acto **humano y explícito** a propósito: la saga no porta
+`globe.model-readiness.pause`, y dársela dejaría que un rollback automático retire una promoción que un humano
+firmó. La señal se computa sobre el estado **leído ahora**, así que baja sola cuando alguien la cierra.
+
+⚠️ **Sólo reporta la ÚLTIMA promoción de cada identidad.** Si la ruta se volvió a promover y quedó sellada, su
+readiness dice `promoted` por esa promoción posterior, que es legítima — pausarla retiraría una ruta viva.
+Verifica la identidad antes de actuar.
+
+### `globe_run_abandon_release_degraded` — WARNING
+
+La liberación rápida de una reserva **pre-gasto** falló y el sistema degradó al expiry (TTL 24 h). **No hay
+pérdida** —el crédito se recupera igual— pero el steady esperado es 0 y cualquier valor dice que la vía rápida
+se rompió.
+
+**Qué hacer:** el payload lleva `workspaceId`, `experimentId`, `attemptId` y `reservedCredits`. Revisa el
+dueño económico (fence / ledger). No hace falta acción manual sobre la reserva: el expiry la recoge.

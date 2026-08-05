@@ -1,5 +1,39 @@
 # Handoff activo
 
+## TASK-1641 — Globe: los seis scopes están en código; falta el ROLLOUT (2026-08-04, corte más reciente)
+
+**Estado:** `in-progress`, **`code complete, rollout pendiente`**. Globe `main@21d6ee3`; `pnpm check` (1.680
+tests) y `pnpm build` en verde. 🔴 **Nada desplegado, nada aplicado**: las tres alertas nuevas no existen en el
+proyecto y la liberación pre-gasto no corre en runtime.
+
+| Scope | Estado | Evidencia |
+|---|---|---|
+| 1 canary de ruta arbitraria | ✅ ejercitado con gasto real | `@1767138` + `@a6ff46f` |
+| 2 señal de ventana por expirar | ✅ código + IaC, sin aplicar | `@17c3fef` |
+| 3 convergencia + su consumidor | ✅ cerrado | `@4a0a18b` + `@17c3fef` |
+| 4 `canary-confirm` sin 500 opaco | ✅ cerrado | `@38c528d` |
+| 5 reserva pre-gasto | ✅ código, sin desplegar | `@21d6ee3` |
+| 6 runbook | ✅ publicado | `GLOBE_ROUTE_PROMOTION_RUNBOOK_V1.md` |
+
+**Scopes 2 y 3 son un solo consumidor** porque son el mismo lector cross-workspace; usan la política de scan
+que ya existía (`app.promotion_recovery_scan`, migración `0028`) — **sin migración nueva**. La señal de
+ventana es el **complemento estricto** de `stalled`, que mide `deadline_at <= now` y avisa cuando ya venció.
+
+🔴 **El hallazgo que evitó una señal falsa:** dos de las diez promociones revertidas pertenecen a identidades
+que **después se volvieron a promover y quedaron selladas**. Sin el predicado de supersede por identidad
+exacta, la señal habría acusado de divergencia justo a las dos rutas que convergieron, y su remedio habría
+**retirado dos rutas vivas**.
+
+**Scope 5, medido contra `globe-pg` antes de tocar código:** la **única** reserva `held` de toda la base es
+pre-gasto (32 créditos) y hay **cero** post-gasto. El discriminador es `attempt.providerOperation`, no
+`lease.kind`. Un fallo al liberar degrada al TTL y se observa, nunca se propaga.
+
+**Siguiente paso (necesita autorización):** deploy de API + worker desde el SHA exacto —el worker en **dos**
+corridas, `mode=build` y después `mode=deploy`— y `tofu apply`; plan honesto verificado:
+**`6 to add, 1 to change, 0 to destroy`**. Verificar contra la revisión activa y el digest etiquetado, nunca
+contra el workflow en verde. Detalle:
+[`TASK_1641_SESSION_HANDOFF_2026-08-04.md`](docs/operations/creative-studio/TASK_1641_SESSION_HANDOFF_2026-08-04.md).
+
 ## TASK-1641 — Globe: el sello del canary funciona; Omni y Veo SELLADAS (2026-08-04)
 
 **Estado:** `in-progress`. **Causa raíz cerrada y las dos rutas de video promovidas, selladas y habilitadas.**
