@@ -8,6 +8,7 @@ const root = process.cwd()
 const apply = process.argv.includes('--apply')
 const bootstrapChangelog = process.argv.includes('--bootstrap-changelog')
 const maxSessions = positiveIntegerArg('--max-sessions=', 20)
+const maxHandoffLines = positiveIntegerArg('--max-handoff-lines=', 600)
 const maxChangelogEntries = positiveIntegerArg('--max-changelog-entries=', 60)
 const maxChangelogLines = positiveIntegerArg('--max-changelog-lines=', 2_000)
 
@@ -71,11 +72,11 @@ function planHandoffRotation() {
    */
   const matches = [...originalContents.matchAll(/^## [^\n]*\d{4}-\d{2}-\d{2}[^\n]*$/gm)]
 
-  if (matches.length <= maxSessions) {
+  if (matches.length <= maxSessions && lineCount(originalContents) <= maxHandoffLines) {
     return {
       kind: 'Handoff',
       required: false,
-      summary: `${matches.length}/${maxSessions} active sessions; nothing to archive.`
+      summary: `${matches.length}/${maxSessions} active sessions and ${lineCount(originalContents)}/${maxHandoffLines} lines; nothing to archive.`
     }
   }
 
@@ -95,13 +96,25 @@ function planHandoffRotation() {
     return byDate || left.originalIndex - right.originalIndex
   })
 
-  const active = ranked.slice(0, maxSessions)
-  const archived = ranked.slice(maxSessions)
+  const active = []
+  const archived = []
+
+  for (const block of ranked) {
+    const candidate = `${preamble}\n\n${[...active, block].map(value => value.contents).join('\n\n')}\n`
+    const fitsSessionBudget = active.length < maxSessions
+    const fitsLineBudget = lineCount(candidate) <= maxHandoffLines
+
+    if (fitsSessionBudget && (fitsLineBudget || active.length === 0)) active.push(block)
+    else archived.push(block)
+  }
 
   return {
     kind: 'Handoff',
-    required: true,
-    summary: `keep ${active.length}; archive ${archived.length}.`,
+    required: archived.length > 0,
+    summary:
+      archived.length > 0
+        ? `keep ${active.length}; archive ${archived.length}.`
+        : `${active.length}/${maxSessions} active sessions still exceed ${maxHandoffLines} lines; manual compaction required.`,
     filePath,
     originalContents,
     preamble,

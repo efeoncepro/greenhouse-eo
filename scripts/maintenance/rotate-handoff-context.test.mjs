@@ -140,6 +140,56 @@ Historia anterior: [Handoff.archive.md](Handoff.archive.md).
   }
 })
 
+test('rotates handoff by line budget even when the session count is within budget', () => {
+  const fixture = createFixture()
+
+  try {
+    writeFileSync(
+      path.join(fixture, 'changelog.md'),
+      '# changelog.md\n\n## 2026-08-05 — Solo para que la rotación de changelog tenga entrada válida\n\n- x\n'
+    )
+
+    writeFileSync(
+      path.join(fixture, 'Handoff.md'),
+      `# Handoff activo
+
+Historia anterior: [Handoff.archive.md](Handoff.archive.md).
+
+## Sesión 2026-08-05 — reciente
+
+- línea 1
+- línea 2
+- línea 3
+
+## Sesión 2026-08-04 — intermedia
+
+- línea 1
+- línea 2
+- línea 3
+
+## Sesión 2026-08-03 — antigua
+
+- línea 1
+- línea 2
+- línea 3
+`
+    )
+
+    runRotation(fixture, '--apply', '--max-sessions=3', '--max-handoff-lines=14')
+
+    const active = readFileSync(path.join(fixture, 'Handoff.md'), 'utf8')
+    const archived = readFileSync(path.join(fixture, 'docs/operations/agent-context-history/handoff/2026-08.md'), 'utf8')
+
+    assert.match(active, /Sesión 2026-08-05/)
+    assert.doesNotMatch(active, /Sesión 2026-08-04/)
+    assert.doesNotMatch(active, /Sesión 2026-08-03/)
+    assert.match(archived, /Sesión 2026-08-04/)
+    assert.match(archived, /Sesión 2026-08-03/)
+  } finally {
+    rmSync(fixture, { recursive: true, force: true })
+  }
+})
+
 function createFixture() {
   const fixture = mkdtempSync(path.join(os.tmpdir(), 'greenhouse-changelog-rotation-'))
 

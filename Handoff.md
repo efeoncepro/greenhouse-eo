@@ -572,43 +572,6 @@ Tres carriles de credenciales distintos —`gcloud` CLI, ADC y el Cloud SQL **Co
 mientras el Connector se cuelga (`invalid_rapt` es reauth). Comandos en
 [el manual](docs/manual-de-uso/creative-studio/operar-contrato-creativo-ruta-globe.md).
 
-## TASK-1631 / MCP — canon de scopes, CIMD como registro primario y benchmark de proveedor (2026-08-02)
-
-- **Cambio de invariante en el ADR propuesto** `EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md` (sigue
-  `Proposed`, sin aceptar): **DCR quedó deprecado en la spec MCP vigente** y el orden normativo pasa a
-  pre-registro → **CIMD** → DCR → manual (`SHOULD` para CIMD contra `MAY` para DCR, verificado 2026-08-02). Un
-  proveedor con DCR y sin CIMD ya **no cumple** el requisito. Afecta el criterio de selección, no el runtime.
-- **Riesgo de `subject` pairwise descartado con medición:** los once candidatos SaaS emiten `public`. El único
-  `pairwise` es Entra —carril interno— y particiona por **App ID**, no por sector identifier del estándar, así que
-  desktop y web con la misma App Registration comparten `sub`; el identificador estable cross-app sigue siendo
-  `oid`+`tid`, que el write de fondeo ya usa. Se corrigió la advertencia previa sobre host de redirect.
-- **Canon de scopes sincronizado, drift cero verificado por grep** en 15 archivos (arquitectura, runbook, doc
-  funcional, manual de operador, `GLOBE_RUNTIME_HANDOFF`, TASK-1473/1626/1631, plan, ambos espejos de
-  `efeonce-mcp-platform` y el overlay Codex-only `software-architect-2026`). Lo verificado es co-emisión **base +
-  reader**; el write interno `efeonce.mcp.globe.credits.funding.ensure` es un tercer scope declarado, flag-gated,
-  con consentimiento propio y **no** verificado en esa co-emisión. `pnpm skills:mirrors` verde.
-- **Hallazgo de seguridad que TASK-1631 ahora gobierna:** el verificador del gateway es single-issuer, descarta el
-  `subject` (`clientId = azp ?? sub`) y fusiona `roles` dentro de `scopes`. Con un segundo issuer eso permitiría
-  que un scope string externo satisficiera una tool internal-only. La task exige autoridad calificada por issuer,
-  contexto con `issuer`/`subject`/`clientId`/`audience`/`delegatedScopes`/`roles` separados y binding por
-  `(issuer, subject)`. Nada de esto está implementado: es diseño gated.
-- **Benchmark de proveedor con precios oficiales:** WorkOS confirmado a **USD 99/mes planos** en 1/5, 5/25 y 20/100
-  (el costo lo fija el custom domain, no el volumen; organizaciones sin cargo ni tope). Runner-up Stytch (USD 0
-  base, precio de dominio no público). Logto y FusionAuth descartados por no soportar DCR. Curva a modelar:
-  SSO/SAML de WorkOS a **USD 125 por conexión/mes**.
-- **Nueva alternativa documentada:** Greenhouse ya tiene NextAuth y un broker OAuth sister-platform con PKCE,
-  allowlists, tokens opacos hasheados, revocación, audit y userinfo. Es una foundation reutilizable, no un
-  authorization server MCP público: requiere extracción independiente a `auth.efeonce.org`, metadata/CIMD-DCR,
-  callbacks HTTPS hospedados, consent/grants y contrato de verificación compatible con el gateway. TASK-1631 ahora
-  compara WorkOS vs native extraído vs hybrid; ninguna opción está aprobada y Greenhouse cookies/`NEXTAUTH_SECRET`
-  nunca se comparten.
-- **TASK-1631 quedó `template=1, errors=0, warnings=0`** tras reescritura completa (antes linteaba `legacy`) más
-  cuatro rondas de revisión cruzada. Sigue `to-do` y **bloqueada por tres gates**: aceptación del ADR, aprobación
-  de proveedor/plan con costo presentado, y **revisión de privacidad/subprocesador** — gate nuevo, porque es el
-  primer flujo que rutea PII de personas de organizaciones cliente a un procesador externo.
-- Sin cambios de runtime, secretos, DNS ni provisión externa. Commits: `746999fed`, `8533fd533`, `1c7dcce3a`,
-  `0155f1f77`, `6f57819ca`, `385cbf76b`.
-
 ## Finance Core + Cost Accounting + cotización agentic — planificación (2026-08-02)
 
 - [ADR-021](docs/architecture/GREENHOUSE_FINANCE_CORE_ACCOUNTING_FOUNDATION_DECISION_V1.md) aceptado; `EPIC-012`
@@ -632,35 +595,3 @@ mientras el Connector se cuelga (`invalid_rapt` es reauth). Comandos en
 ## WIP saneado — Globe, Brightcell y Polpaico (2026-08-01)
 
 - ADR-019 `Accepted`; ADR-020 `Proposed`. Brightcell: **no enviar** hasta Finance. Polpaico: `HOLD / NO-BID`, sin precio/deck emitible. Detalle en `changelog.md`.
-
-## Studio Credits — fondeo enterprise UI/API/CLI/MCP y readback convergente (2026-08-01)
-
-- Saldo vigente esperado: 784 de cap 1500; no fondear. UI/CLI/MCP comparten ledger y todo transporte ambiguo exige
-  readers antes de reintentar. Contrato/runbook: [`fondeo`](docs/manual-de-uso/creative-studio/fondear-creditos-globe.md)
-  y [`evidencia`](docs/operations/creative-studio/evidence/2026-08-01/README.md). Sin rollout externo.
-
-## Checkout compartido único — worktrees prohibidos (2026-08-01)
-
-- Se eliminaron los dos worktrees temporales creados erróneamente bajo `/private/tmp/greenhouse-mcp-push.*` y el
-  worktree de rescate `/Users/jreye/.codex/worktrees/ecd5/greenhouse-eo`, que estaba limpio, 777 commits detrás y
-  0 por delante de `develop`. Greenhouse conserva un único checkout en `develop`; Globe uno en `main`.
-- Todo agente debe operar sólo en el checkout compartido actual. No puede crear, usar, integrar, limpiar ni
-  eliminar worktrees, checkouts aislados o carpetas clonadas; si el estado compartido bloquea, debe detenerse y
-  pedir dirección al operador. Canon:
-  `docs/architecture/agent-invariants/REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md`.
-- Se retiró el drift que todavía inducía Globe `develop`: `efeonce-globe/AGENTS.md` ahora fija `main` como rama
-  única de trabajo/integración/release, CI sólo acepta push a `main`, EPIC-028 declara el contrato por repositorio
-  y el helper `worktree-sync` quedó retirado fail-closed. `pnpm codex:task-hook:check` bloquea la reintroducción
-  de ramas por task o comandos activos de worktree; el pre-commit ejecuta `lint-staged --no-stash` para no apartar
-  WIP ajeno. Un commit no autoriza deploy automáticamente.
-
-## Globe — ADR-018: continuidad móvil native-first como dirección, no rollout (2026-08-01)
-
-- [ADR-018](docs/architecture/creative-studio/EFEONCE_GLOBE_MOBILE_CONTINUITY_APPLICATION_DECISION_V1.md) fija Globe como **continuity-first y native-first para Android/iOS**: React Native + Expo development builds/CNG es la dirección tecnológica de la companion; web/PWA queda como fallback. No se creó una skill nueva, no hay app/runtime rollout y el vertical slice requiere PKCE, deep links, captura, upload interrumpible, push reconciliable, handoff, compatibilidad binary/API, task, policy, owner y gates. Funcional/manual: [`mobile continuity`](docs/documentation/creative-studio/efeonce-globe-mobile-continuidad.md) · [`validación`](docs/manual-de-uso/creative-studio/operar-globe-continuidad-movil.md).
-
-## Efeonce MCP — reader y write one-shot de Studio Credits verificados (2026-08-01)
-
-- `mcp.efeonce.org`, el reader Globe y el write interno one-shot están operativos; clientes externos siguen gated
-  por TASK-1631.
-- TASK-1631 separa sesiones, no identidades: un `identity_profile` + Account 360; linking, revocación y convergencia
-  posterior del login Greenhouse preceden el rollout.
