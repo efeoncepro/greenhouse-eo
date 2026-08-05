@@ -580,13 +580,42 @@ GROWTH_FORMS_DISPATCH_ENABLED="${GROWTH_FORMS_DISPATCH_ENABLED:-${DEFAULT_FORMS_
 GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED="${GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED:-${DEFAULT_FORMS_HUBSPOT_ENABLED}}"
 ENV_VARS="${ENV_VARS},GROWTH_FORMS_DISPATCH_ENABLED=${GROWTH_FORMS_DISPATCH_ENABLED}"
 ENV_VARS="${ENV_VARS},GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED=${GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED}"
-# TASK-1302 — Módulo SEO (materialización diaria GSC). Default OFF en AMBOS entornos:
-# el módulo nace code-complete y el flip es acción de operador staging-first, después de
-# aplicar la migración y despausar `ops-seo-gsc-snapshot`. Declarativo acá porque
-# `--set-env-vars` es destructivo y borraría el flag puesto out-of-band en el próximo deploy.
-# ⚠️ Este flag lo lee el ops-worker, NO Vercel: prenderlo sólo en Vercel deja el
-# materializer muerto (CLAUDE.md §Feature Flag State Ledger — prender un flag es multi-runtime).
-GROWTH_SEO_ENABLED="${GROWTH_SEO_ENABLED:-false}"
+# TASK-1302 — Search Console DENTRO del ops-worker.
+#
+# El materializer GSC es el PRIMER consumer del reader de Search Console en este runtime:
+# hasta TASK-1302 ese reader sólo corría en rutas Vercel, así que el worker nunca tuvo ni el
+# flag ni la config OAuth. Sin esto, `readSearchConsoleAnalytics` resuelve `disabled` y el
+# batch degrada TODAS las orgs **en silencio** — exactamente la bug class de ISSUE-113
+# (flag ON + secret ref nunca cableado ⇒ provider saltado sin ruido).
+#
+# El flag va a `true` porque acá gatea la LECTURA de una conexión ya existente y verificada;
+# quien decide si el módulo corre es `GROWTH_SEO_ENABLED` (abajo). El client id es un
+# identificador OAuth público que el CI inyecta como GH secret (mismo patrón que
+# DATAFORSEO_API_LOGIN) y sólo se appendea si viene poblado, para que un `--set-env-vars`
+# destructivo no deje la var vacía. El client SECRET nunca viaja acá: sale de Secret Manager.
+GROWTH_SEARCH_CONSOLE_ENABLED="${GROWTH_SEARCH_CONSOLE_ENABLED:-true}"
+GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID="${GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID:-}"
+GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_SECRET_SECRET_REF="${GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_SECRET_SECRET_REF:-greenhouse-search-console-oauth-client-secret}"
+ENV_VARS="${ENV_VARS},GROWTH_SEARCH_CONSOLE_ENABLED=${GROWTH_SEARCH_CONSOLE_ENABLED}"
+ENV_VARS="${ENV_VARS},GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_SECRET_SECRET_REF=${GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_SECRET_SECRET_REF}"
+if [ -n "${GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID}" ]; then
+  ENV_VARS="${ENV_VARS},GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID=${GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID}"
+fi
+ensure_secret_accessor_binding "${GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_SECRET_SECRET_REF}:latest"
+
+# TASK-1302 — Módulo SEO (materialización diaria GSC).
+#
+# **ON desde el rollout 2026-08-05** (autorizado por el operador). Declarativo acá y no sólo
+# vía `gcloud run services update`, porque `--set-env-vars` es destructivo: aplicarlo sólo en
+# vivo lo borraría en el próximo deploy, en silencio.
+# ⚠️ Lo lee el ops-worker, NO Vercel: prenderlo sólo en Vercel deja el materializer muerto
+# (CLAUDE.md §Feature Flag State Ledger — prender un flag es multi-runtime).
+#
+# Alcance real de tenerlo ON: el batch itera SÓLO las orgs con conexión GSC `active`, lee
+# datos gratuitos de Google (cero costo de proveedor) y escribe en `seo_gsc_daily`, tabla que
+# hoy no consume ningún cliente (TASK-1306/1308 aún no existen). Degrada honesto por org.
+# Rollback (<5 min): `GROWTH_SEO_ENABLED=false` acá + redeploy, o pausar el scheduler.
+GROWTH_SEO_ENABLED="${GROWTH_SEO_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},GROWTH_SEO_ENABLED=${GROWTH_SEO_ENABLED}"
 ENV_VARS="${ENV_VARS},OPENAI_API_KEY_SECRET_REF=${OPENAI_API_KEY_SECRET_REF}"
 ENV_VARS="${ENV_VARS},ANTHROPIC_API_KEY_SECRET_REF=${ANTHROPIC_API_KEY_SECRET_REF}"
@@ -1044,17 +1073,21 @@ echo "  -> ops-growth-forms-dispatch: */2 * * * * (Growth Forms delivery, TASK-1
 # propia que sobrevive la ventana de 16 meses de Google, y es idempotente por
 # `capture_date`: el re-run corrige el consolidado tardío (~48h) sin duplicar.
 #
-# ⚠️ Nace PAUSADO (quinto argumento `true`). No despausar hasta que se cumplan las tres
-# condiciones: migración aplicada en el target, ops-worker redeployado con el handler y
-# GROWTH_SEO_ENABLED=true en ESTE servicio (el flag lo lee el worker, NO Vercel).
-# Aun despausado con el flag OFF el handler hace no-op, así que el orden es seguro.
+# ACTIVO desde el rollout 2026-08-05. Nació pausado por diseño; se despausa acá y no a mano
+# porque `upsert_scheduler_job` re-aplica el estado en CADA deploy: dejarlo con `true` y
+# despausarlo out-of-band lo volvería a pausar en el siguiente deploy, en silencio (misma
+# trampa que un env var aplicado sólo en vivo).
+# Precondiciones ya cumplidas: migración aplicada, handler desplegado, GROWTH_SEO_ENABLED=true
+# y config OAuth de Search Console cableada en ESTE servicio (arriba).
+# Rollback (<5 min): `gcloud scheduler jobs pause ops-seo-gsc-snapshot` + poner el 5º arg en
+# "true" acá para que el pause sobreviva al próximo deploy.
 upsert_scheduler_job \
   "ops-seo-gsc-snapshot" \
   "0 9 * * *" \
   "/seo/gsc/snapshot-batch" \
   '{}' \
-  "true"
-echo "  -> ops-seo-gsc-snapshot: 0 9 * * * PAUSADO (materialización GSC diaria, TASK-1302)"
+  "false"
+echo "  -> ops-seo-gsc-snapshot: 0 9 * * * ACTIVO (materialización GSC diaria, TASK-1302)"
 
 # Email deliverability monitor — TASK-775 Slice 2.
 #
