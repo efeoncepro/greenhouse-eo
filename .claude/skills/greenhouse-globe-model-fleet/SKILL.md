@@ -213,6 +213,14 @@ Estas fichas reflejan evidencia observada, no disponibilidad final. Antes de afi
    En Claude, usa el path espejo `.claude/skills/greenhouse-globe-model-fleet/`. La ficha concreta sigue siendo la
    ruta canónica de Greenhouse; no crees una copia bajo `references/routes/`.
 2. Añade evidencia y fecha antes de cambiar un edge a `verified`.
+🔴 **Edita una ficha con reemplazo de TEXTO, nunca reserializando el JSON.** Medido el 2026-08-05: cambiar dos
+campos con `json.dumps(indent=2)` expandió todos los objetos compactos del archivo y produjo un diff de **404
+líneas para un cambio de 4**. El contenido queda correcto y el validador pasa, pero el cambio real se vuelve
+irrevisable y el archivo deja de parecerse a sus hermanos. Las fichas usan objetos de una línea para entradas
+cortas (`{ "name": …, "owner": …, "valueShape": …, "mechanism": … }`) a propósito: son tablas, y una tabla se
+lee de un vistazo. Si necesitas validar la estructura después de editar, parsea para **comprobar**, no para
+**reescribir**.
+
 3. Cambia un edge a `unknown` o `stale` cuando la evidencia no permita afirmar soporte; no lo omitas.
 4. No pongas secretos, tokens, cookies, cuerpos raw, URLs firmadas, `status_url` vivos ni `response_url` vivos en la
    ficha. Registra el tipo de evidencia y el requisito de revalidación, no la credencial ni el artefacto efímero.

@@ -506,14 +506,14 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
 
 ## Riesgos abiertos
 
-- 🔴 **El gate de fichas de ruta está ROJO por evidencia de proveedor vencida, y es preexistente.**
-  `SEEDANCE_2_VIDEO_ROUTE_CARD_V1.json` declara `seedance-text-api` (`authority: provider_primary`,
-  observada 2026-07-22, `ttlDays: 14`), que **venció el 2026-08-05**; su edge `provider_supported` depende de
-  ella, así que `validate-route-cards.mjs` falla incluso sin `--strict-freshness`. **No lo causó el trabajo de
-  `TASK-1641`** (verificado corriendo el validador con `--as-of 2026-08-04`). Cerrarlo honestamente exige
-  revalidar el endpoint contra Fal —probe de gasto cero, `POST {}` a `https://fal.run/<slug>`: 404 = no existe,
-  422 = existe— y subir `observedAt`; **no** editar la fecha sin volver a mirar. Marcar el edge `stale` es la
-  alternativa aceptable si nadie va a revalidar ahora.
+- ✅ **Gate de fichas de ruta: cerrado el 2026-08-05.** Estuvo rojo por evidencia de proveedor vencida
+  (`seedance-text-api`, `provider_primary`, observada 2026-07-22 con `ttlDays: 14`) de la que dependía el edge
+  `provider_supported` de `ref/motion/loop-v1`. **Era preexistente** —verificado corriendo el validador con
+  `--as-of 2026-08-04`—: venció por calendario. Se **revalidó**, no se editó la fecha: probe de existencia de
+  gasto cero contra el endpoint de runtime (`POST {}` a `https://fal.run/bytedance/seedance-2.0/text-to-video`
+  con la key propia de Globe) → **HTTP 422**, o sea el endpoint resuelve y rechazó el payload vacío en
+  validación, no en ruteo (404 habría significado que el slug dejó de existir). `observedAt` a 2026-08-05 con
+  nota que declara **qué** se verificó. Las 8 fichas pasan `--strict-freshness`.
 
 
 - Rollout externo/comercial sigue gated por `TASK-1480`; `internal_smoke` describe el estadio, no

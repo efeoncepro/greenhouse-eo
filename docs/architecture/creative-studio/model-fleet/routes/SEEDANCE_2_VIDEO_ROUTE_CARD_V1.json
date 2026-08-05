@@ -2,7 +2,7 @@
   "schemaVersion": "model-route-card.v1",
   "cardId": "route-card/seedance-2-video",
   "snapshot": {
-    "observedAt": "2026-08-04",
+    "observedAt": "2026-08-05",
     "maxAgeDays": 14,
     "revalidateBeforeUse": true
   },
@@ -93,10 +93,11 @@
       "id": "seedance-text-api",
       "authority": "provider_primary",
       "kind": "endpoint-api",
-      "observedAt": "2026-07-22",
+      "observedAt": "2026-08-05",
       "reference": "https://fal.ai/models/bytedance/seedance-2.0/text-to-video/api",
       "revalidateBeforeUse": true,
-      "ttlDays": 14
+      "ttlDays": 14,
+      "note": "Revalidated 2026-08-05 by a zero-spend existence probe against the runtime endpoint (POST {} to https://fal.run/bytedance/seedance-2.0/text-to-video with Globe's own Fal key): HTTP 422, i.e. the endpoint resolves and rejected the empty payload at validation, not at routing. 404 would have meant the slug no longer exists. The probe verifies the executable endpoint, which is what `provider_supported` asserts; the reference URL is the vendor doc page for the same slug."
     },
     {
       "id": "seedance-r2v-api",
