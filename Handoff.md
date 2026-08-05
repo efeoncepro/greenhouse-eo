@@ -1,5 +1,29 @@
 # Handoff activo
 
+### TASK-1305 — Cruce SEO↔AEO (quadrant 360) COMPLETE (2026-08-05)
+
+La sinergia directa con AEO que exigió el operador quedó implementada el mismo día: `readSeoAeoGap`
+(`src/lib/growth/seo/gap/read-seo-aeo-gap.ts`) cruza `seo_gsc_daily` (posición medida, ponderada por
+impresiones) × `grader_scores` (último run reportable del org) EN MEMORIA por `organization_id` — cero
+JOIN/VIEW/FK cross-motor (boundary §1.1, verificado por test dedicado que inspecciona las queries
+emitidas). Clasificador puro `classifyQuadrant` (página 1 × score ≥ 50, overridables, jamás promediados)
++ contrato `SeoAeoGapResult` con `aeoAxisGranularity='domain'` (TASK-1311 refina a URL sin romperlo).
+
+**Primera señal 360 real (smoke live):** Berel rankea #1.75 orgánico para su marca con citabilidad AEO
+44.5 → quadrant **`riesgo`** = autoridad orgánica sin citabilidad = el CTA cruzado al AEO, funcionando.
+
+Evidencia: 12 tests (incl. boundary + tenant binding) + smoke live con cero residuo
+(`scripts/growth/_sanity-seo-aeo-gap.ts`, patrón commit+try/finally post hallazgo TASK-1300 — el
+BEGIN/ROLLBACK cross-pool NO es seguro; `_sanity-seo-entitlement.ts` endurecido igual). Full suite
+**10142/0** + build prod verdes. Commits `6ff948e2d`+`3bac9df0a` (Slice 1) + `ed88f7d16` (Slice 2).
+Nota de proceso: el primer commit de Slice 1 capturó solo el rename (git add abortó por ruta
+inexistente — gotcha conocido); `3bac9df0a` es el fixup con el código.
+
+**Rollout:** reader detrás de `GROWTH_SEO_ENABLED` (hoy ON solo en el ops-worker para el materializer;
+el reader lo consumirán TASK-1645/1310 — cada consumer valida el flag en su runtime). **Próximo paso
+del camino MCP-first: `TASK-1645`** (lane ecosystem + MCP tools — get_seo_visibility_360 nace con este
+cruce). Sin push aún.
+
 ### TASK-1300 — Registry de familias DataForSEO + ledger de gasto (2026-08-05)
 
 **`code complete, rollout pendiente`.** El cliente DataForSEO pasa de candado hard-code a `/v3/serp/` a un

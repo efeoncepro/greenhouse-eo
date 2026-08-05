@@ -75,6 +75,13 @@
   `seo-aeo` tiene su copia Claude fuera del repo (sin versionar): le faltaban 2 referencias, incluida la de la API
   de GSC; el gate `skills:mirrors` no puede ver ese drift porque la skill no está en su manifiesto.
 
+## 2026-08-05 — Search Visibility 360: el cruce SEO↔AEO existe (TASK-1305)
+
+- `readSeoAeoGap` + matriz quadrant 360 (dominante/riesgo/oportunidad/invisible): posición orgánica medida
+  (GSC) × citabilidad IA (grader), cruce en memoria por org con boundary duro verificado por test.
+- Primera señal real en el smoke live: Berel #1.75 orgánico × AEO 44.5 → `riesgo` (autoridad sin
+  citabilidad → CTA cruzado al AEO). Consumers siguientes: tool MCP (TASK-1645) y UI (TASK-1310).
+
 ## 2026-08-05 — Growth SEO (EPIC-022): capabilities + entitlement per-org + chokepoint de costo (TASK-1301)
 
 - 5 capabilities `growth.seo.*` seedeadas (catálogo + registry + grants; coverage verde) y módulo `seo_v1`
@@ -913,10 +920,3 @@ y [`docs/changelog/internal/2026-07.md`](docs/changelog/internal/2026-07.md).
   separando audiencia, assets, derechos, pass-through, paid usage, RACI, gates y medición.
 - La skill social de Creator/UGC quedó enlazada al modelo canónico; el estado permanece `Approved for validation` y
   no habilita pricing público ni venta general.
-
-## 2026-07-29 — Creator Influence & Content: arquitectura de fees y comisiones
-
-- Se añadió el `Pricing Integrity Pack V1` con bandas internas de validación, fee fijo, pass-through transparente,
-  coordinación de terceros, performance fee condicionado, mínimos y condiciones de pago.
-- Se fijó como hipótesis el modelo `fee base + pass-through`; las comisiones no pueden ser ocultas ni sustituir el
-  delivery fee. Finance, Legal y Commercial deben validar cost-to-serve, derechos, atribución y willingness-to-pay.
