@@ -13,6 +13,19 @@
 > `d3fe90e`, digest `sha256:d8295862dc12c14427e90e0bb413577802916c37ca6bf32c202680492ca7bae9`,
 > deploy `30717266572` y baseline IaC `e369ef8` sin drift.
 
+## Corte 2026-08-04 (c) — TASK-1641: Scope 3 declarado; arranque de sesión nueva
+
+`efeonce-globe@4a0a18b`. `PROMOTION_DEPENDENT_AGGREGATES` declara los tres agregados de la saga con
+test bidireccional: circuito y binding `converges`, **readiness `observable`** — su primitive de
+reversa existe (`route.pause`) pero exige una capability que la saga no porta, y dársela dejaría que
+un rollback automático retire una promoción que un humano firmó. ⚠️ Falta el **consumidor** que emita
+la señal; la divergencia hoy es computable, no observada.
+
+🧭 **Para retomar `TASK-1641`:**
+[`TASK_1641_SESSION_HANDOFF_2026-08-04.md`](TASK_1641_SESSION_HANDOFF_2026-08-04.md) — scopes cerrados
+con evidencia, orden recomendado (el Scope 2 y el cierre del 3 son **el mismo trabajo**) y las trampas
+ya pagadas.
+
 ## Corte 2026-08-04 (b) — el canary ya produce una ruta arbitraria (TASK-1641 Scope 1)
 
 `efeonce-globe@1767138`, **sin desplegar** (es un script del repo, no runtime). `pnpm producer:canary

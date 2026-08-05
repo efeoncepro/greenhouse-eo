@@ -73,6 +73,10 @@ llega a terminal, todo agregado que dependa de su estado converge o queda observ
 saga. Se declara como invariante y no como arreglo de un caso porque el mismo defecto ya apareció en
 dos familias distintas.
 
+> 🧭 **Para retomar esto en sesión nueva:**
+> [`docs/operations/creative-studio/TASK_1641_SESSION_HANDOFF_2026-08-04.md`](../../operations/creative-studio/TASK_1641_SESSION_HANDOFF_2026-08-04.md)
+> — qué está cerrado con su evidencia, por dónde seguir y las trampas ya pagadas.
+
 ## Delta 2026-08-04 (c) — Scope 3: el contrato de convergencia de la saga
 
 `efeonce-globe@4a0a18b`. `PROMOTION_DEPENDENT_AGGREGATES` declara los **tres** agregados que la saga

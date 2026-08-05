@@ -646,6 +646,39 @@ perfectamente sano** (la corrida completó sola en la entrega 21).
 «timeout» como normal, que es exactamente cómo un cuelgue real pasa desapercibido.** Antes de tocar código
 porque «el canary falló», mide el estado real.
 
+## Convergencia terminal de la saga de PROMOCIÓN (`TASK-1641`, 2026-08-04)
+
+El mismo invariante de abajo, en otra saga — y por eso se declaró como contrato y no como arreglo de un
+caso: **el defecto ya apareció en dos familias distintas**. Medido al revertir `ref/video/frames-v1`: el
+binding quedó `enabled=false` y el circuito `open` —los dos que la saga sí cierra— pero
+**`model_readiness_revisions` se quedó en `promoted`**. Tres agregados, dos posturas, nada que lo declarara.
+
+`PROMOTION_DEPENDENT_AGGREGATES` (`packages/domain/src/promotion-aggregate-convergence.ts`) los enumera con
+test **bidireccional**: una postura sin señal rompe el build.
+
+| Agregado | Postura | Lo cierra |
+|---|---|---|
+| `production_routing_circuits` | `converges` | la saga (`setCircuit`, **antes** que el binding: fail-closed) |
+| `production_route_bindings` | `converges` | la saga (`setBinding enabled=false`) |
+| `model_readiness_revisions` | **`observable`** | `globe.model-readiness.route.pause` — **otro dueño** |
+
+🔴 **NUNCA muevas readiness a `converges` ni le hagas pausar su propia readiness a la saga.** El primitive
+de reversa **ya existe** y es el del camino hacia adelante (`route.pause`: `promoted → paused`, append-only,
+sin borrar evidencia); lo que no existe es la **autoridad**: `pause` exige `globe.model-readiness.pause` y la
+saga sólo porta `globe.production-promotion.*`. Son **disjuntas a propósito** — es la separación
+maker/checker que hace vendible el régimen humano. Dársela le daría, **en el camino de recuperación**, una
+autoridad que el diseño le negó **en el camino normal**: un rollback automático podría retirar una promoción
+que un humano firmó. Por eso la divergencia **se cuenta y se hace visible**. Cambiar esa fila es reabrir el
+ADR, no editar una palabra — y el test lo pinea.
+
+**La señal se computa sobre el estado LEÍDO AHORA**, nunca sobre la evidencia que la saga guardó al revertir:
+la evidencia dice qué pasó entonces y la pregunta es si alguien ya lo cerró. Una señal que no baja enseña a
+ignorarla, y eso es peor que no tenerla.
+
+⚠️ **Pendiente declarado:** falta el **consumidor** que lea las promociones `rolled_back` con su readiness y
+emita la señal — el mismo lugar donde vivirá la de ventana-por-expirar (Scope 2). Hasta entonces la
+divergencia es **computable, no observada**.
+
 ## Convergencia terminal de los agregados del run (`TASK-1469`)
 
 **Cuando un run llega a terminal, todo agregado que dependa de su estado converge o queda observable.** Se
@@ -2341,9 +2374,49 @@ La cuenta Google visible en Chrome puede diferir de la identidad Greenhouse. La 
 **sin `--execute`** valida readiness, route, circuito, derechos y estimate de las tres modalidades sin gastar un
 crédito. No pidas permiso para gastar antes de saber si hay algo que ver.
 
-**Gastar exige `--execute` MÁS `--approve=image:N,video:N,audio:N` con las TRES modalidades**: menos de tres
-aborta con `producer_canary_three_approvals_required`, así que **no existe un canary barato de una sola
-modalidad**. Y necesita **cuatro** variables, no una: `GLOBE_CANARY_BASE_URL`,
+### 🟢 Para una ruta RECIÉN PROMOVIDA existe `--route=<routeId>` (TASK-1641 Scope 1, 2026-08-04)
+
+**No escribas la secuencia a mano ni agregues una cuarta modalidad a `PRODUCER_CANARY_TARGETS`.**
+`pnpm producer:canary --route=ref/video/frames-v1` resuelve la ruta del catálogo, **DERIVA** su
+`outputShape` desde `constraints` —primer valor de cada enum, mínimo de cada rango— y resuelve sus
+entradas desde el **feed retenido** (`globe.producer.feed.live.list` mode `retained`), certificándolas
+con `copyAsReference`. Sin `--execute` estima sin gastar. El gasto va por **`--approve-route=N`**,
+**excluyente** de `--approve` (una aprobación escrita para un canary no puede autorizar el gasto del
+otro). Flags: `--route-capability=` (obligatoria si un `routeId` sirve a varias: se **niega** a elegir),
+`--route-references=`, `--route-target-lang=`, `--route-prompt=`.
+
+Verificado en vivo: sobre `ref/video/frames-v1` el plan derivado reproduce **exactamente** lo que un
+humano armó a mano —720p / 8 s / 16:9 / `silent` / `frames` sin cuadro final, la misma referencia y los
+mismos 32 créditos—, y `ref/motion/reference-v1` **generó con gasto real** (MP4 661.995 B, 12 = 12 cr).
+
+**Reglas que salieron de ejercitarlo, y las dos primeras SÓLO aparecieron contra el runtime:**
+
+- 🔴 **`referenceHashes` NO es una lista de hashes, pese al nombre.** El contrato lo declara
+  `readonly LabDeclaredInputV1[]` y `validateAuthorizedInputs` exige `inputId`, `sha256`, `mediaType` y
+  `rights`; mandar los strings devuelve **`invalid_request` 400**. Estuvo invisible desde siempre porque
+  **las tres modalidades base estiman con la lista VACÍA**. Un doble de test acepta cualquier forma.
+- 🔴 **NUNCA elijas el `inputMode` por el orden del array de la ruta.** `ref/motion/reference-v1` declara
+  `['prompt','elements']` **y** exige 1 referencia: tomar el primero da `create` —prompt-driven— con la
+  referencia en la mano, y el motor **la descarta después de reservar crédito**, devolviendo un video que
+  se ve bien y responde otra pregunta. Se elige por **si van a viajar referencias de verdad**; `hasEndFrame`
+  sigue la misma regla. Es el fail-open que `TASK-1633` cerró en `ref/motion/loop-v1`, por el otro lado.
+- **El dry-run de una ruta SÍ certifica sus referencias, y lo declara** (`referencesCertified`). Se intentó
+  dejarlo read-only puro y **no se puede**: el estimate de una ruta con entrada obligatoria no es computable
+  sin referencias válidas —`assertReferencePolicySatisfied` corre antes de cotizar y `derived-internal` es
+  una postura que un caller **no** puede declarar—. `copyAsReference` es gasto cero e idempotente: deja una
+  anotación, no un cobro.
+- **El camino de verificación es UNO** (`runCanaryTarget`), compartido por las tres modalidades base y por la
+  ruta arbitraria. Dos implementaciones del mismo camino divergen, y entonces «pasó el canary» dejaría de
+  significar lo mismo según qué ruta se probó.
+- 🔴 **La evidencia publica el veredicto de governance que el canary verificó** (`describeCanaryArtifacts`).
+  Durante un tiempo lo comprobaba y **no lo contaba**: la salida se quedaba en `{sha256, mimeType, byteSize,
+  file}`. El dato estaba y se tiraba en la frontera de salida — `ISSUE-127` dentro del instrumento que existe
+  para dar evidencia. Un chequeo correcto no vuelve accionable una evidencia que lo omite.
+
+**Gastar por el canary de las TRES modalidades base exige `--execute` MÁS `--approve=image:N,video:N,audio:N`
+con las TRES**: menos de tres aborta con `producer_canary_three_approvals_required`, así que **no existe un
+canary barato de una sola modalidad** por esa vía (para una ruta suelta, `--route` + `--approve-route`). Y
+necesita **cuatro** variables, no una: `GLOBE_CANARY_BASE_URL`,
 `GLOBE_CANARY_WORKSPACE_ID=greenhouse-org:efeonce`, `GLOBE_CANARY_RUN_LABEL` y `GLOBE_CANARY_ID_TOKEN`
 (`RUN_LABEL` se valida **sólo** en la rama `--execute`: un dry-run verde no prueba que el execute vaya a arrancar).
 
