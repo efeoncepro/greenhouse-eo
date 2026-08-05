@@ -63,7 +63,7 @@
 - **Deploy canónico via GitHub Actions** (`.github/workflows/ops-worker-deploy.yml`): trigger automático en `push` a `develop` o `main` que toque el runtime surface del worker; trigger manual: `gh workflow run ops-worker-deploy.yml --ref <branch>` o desde la UI de Actions. El workflow autentica con WIF, corre `bash services/ops-worker/deploy.sh` (mismo script idempotente que upsertea Cloud Scheduler jobs), verifica `/health` y registra el commit. Desde 2026-06-18, `workflow_dispatch` sin `expected_sha` resuelve el último SHA que tocó paths runtime del worker, no necesariamente el HEAD documental; antes de construir Docker compara la revisión Cloud Run actual por `GIT_SHA` y por diff de paths runtime para saltar build/deploy cuando el worker servido es runtime-equivalente. Confirmar deploy con `gh run list --workflow=ops-worker-deploy.yml --limit 1` o `gh run watch <run-id>`. **Manual local (`bash services/ops-worker/deploy.sh`) solo para hotfix puntual** con `gcloud` autenticado contra `efeonce-group`; el path canónico para que el deploy quede trazable es el workflow.
 - Las rutas API Vercel (`/api/cron/outbox-react`, etc.) son fallback manual, no scheduladas.
 - Run tracking: `source_sync_runs` con `source_system='reactive_worker'`, visible en Admin > Ops Health.
-- Fuente canónica: `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` §4.9 y §5.
+- Fuente canónica: `docs/architecture/cloud-infrastructure/CLOUD_RUN.md` + `docs/architecture/cloud-infrastructure/SCHEDULING.md` (ex `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` §4.9 y §5; reestructurado por TASK-1646).
 
 ### Vercel cron classification + migration platform (TASK-775)
 

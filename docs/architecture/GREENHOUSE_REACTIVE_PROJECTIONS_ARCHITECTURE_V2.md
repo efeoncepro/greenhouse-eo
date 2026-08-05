@@ -253,6 +253,6 @@ El Ops Health metric (post PR #50) ya los filtra del backlog visible restando la
 - Playbook operativo: [GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V2.md](./GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V2.md)
 - TASK-379: [reactive-projections-enterprise-hardening](../tasks/in-progress/TASK-379-reactive-projections-enterprise-hardening.md)
 - ISSUE-046: [silent-skip-backlog](../issues/open/ISSUE-046-reactive-pipeline-silent-skip-backlog.md)
-- Cloud infrastructure: [GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md](./GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md) §4.9, §5
+- Cloud infrastructure: [cloud-infrastructure/CLOUD_RUN.md](./cloud-infrastructure/CLOUD_RUN.md) + [cloud-infrastructure/SCHEDULING.md](./cloud-infrastructure/SCHEDULING.md)
 - Event catalog: [GREENHOUSE_EVENT_CATALOG_V1.md](./GREENHOUSE_EVENT_CATALOG_V1.md)
 - Database tooling: [GREENHOUSE_DATABASE_TOOLING_V1.md](./GREENHOUSE_DATABASE_TOOLING_V1.md)

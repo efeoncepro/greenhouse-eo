@@ -7,6 +7,22 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-05 — Cloud Infrastructure doc reestructurado: temáticos + HISTORIAL + router stub (TASK-1646)
+
+- `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` (1340 líneas, 24 `## Delta` apilados) se particionó siguiendo el
+  precedente ui-platform: **`docs/architecture/cloud-infrastructure/`** con 11 docs temáticos de SÓLO estado
+  vigente (README/TOPOLOGY/CLOUD_SQL/BIGQUERY/STORAGE_BUCKETS/CLOUD_RUN/SCHEDULING/VERCEL/SECRETS/CICD_WIF/
+  SECURITY) + `HISTORIAL.md` con los 25 deltas verbatim y anotaciones de supersede. El path original quedó como
+  router stub (33 líneas) — ningún referrer se rompe. ADR nuevo:
+  `GREENHOUSE_CLOUD_INFRASTRUCTURE_RESTRUCTURE_DECISION_V1.md` (indexado en `DECISIONS_INDEX`).
+- Contradicciones resueltas contra runtime al separar: la topología compartida staging/prod es **canónica** (no
+  "por ahora"); los inventarios estaban congelados en la auditoría 2026-04-23 — hoy son **46 scheduler jobs** del
+  ops-worker (no 16), **8 crons Vercel** (no 13; el event bus ya no depende de Vercel) y **7 workflows de deploy**
+  (no 3). Los inventarios nuevos declaran as-of + source of truth (`deploy.sh`, `vercel.json`, workflows) para que
+  el drift futuro sea detectable; la re-auditoría live completa sigue en TASK-127.
+- `pnpm docs:closure-check` ya no emite `architecture_doc_monolith` para ese path; referrers vivos con anclas
+  `§4.9`/`§5` actualizados a los temáticos.
+
 ## 2026-08-05 — Growth SEO (EPIC-022): serie GSC propia + striking-distance (TASK-1302)
 
 - Google Search Console deja de ser read-through: `greenhouse_growth.seo_gsc_daily` materializa query×page por
@@ -896,12 +912,3 @@ y [`docs/changelog/internal/2026-07.md`](docs/changelog/internal/2026-07.md).
   performance-only, comisión oculta y porcentaje de media spend.
 - El modelo propio queda orientado a capacidad gobernada por lane, no a volumen de publicaciones, y permanece en
   `Approved for validation`.
-
-## 2026-07-29 — Creator Influence & Content: bandas y porcentajes de validación
-
-- El Pricing Integrity Pack pasó a V1.1 con bandas por lane: Creator Fit Brief USD 500–1.000, Intelligence USD
-  1.500–4.000, Activations USD 3.000–12.000, Content Engine USD 4.000–8.000/mes y Partnership USD 6.000–15.000/mes.
-- Se fijaron como hipótesis operativas 10–15% para coordinación de pass-through, 15% para management medio,
-  5–15% para creator affiliate, 2–5% para Efeonce success fee, 15–35% por 30 días de paid usage y 15–30% por exclusividad.
-- Las skills Codex/Claude de Creator/UGC ahora incluyen las bandas, porcentajes, regla de no doble cobro y prohibición
-  de presentar estos números como pricing público.

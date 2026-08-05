@@ -4,7 +4,7 @@
 > **Version:** 1.3
 > **Creado:** 2026-06-17 por agente (TASK-254)
 > **Ultima actualizacion:** 2026-04-21 por Codex (TASK-533)
-> **Documentacion tecnica:** [GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md](../../architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md) (§4.9, §5)
+> **Documentacion tecnica:** [cloud-infrastructure/CLOUD_RUN.md](../../architecture/cloud-infrastructure/CLOUD_RUN.md) + [cloud-infrastructure/SCHEDULING.md](../../architecture/cloud-infrastructure/SCHEDULING.md) (ex `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` §4.9/§5)
 
 ---
 
@@ -148,4 +148,4 @@ El ops-worker reutiliza codigo de `src/lib/` del portal. Parte de ese codigo imp
 
 Este patron debe replicarse en cualquier servicio Cloud Run futuro que reutilice `src/lib/` sin necesitar NextAuth.
 
-> Detalle tecnico: [GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md](../../architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md) §4.9 — ESM/CJS shim pattern
+> Detalle tecnico: [cloud-infrastructure/CLOUD_RUN.md](../../architecture/cloud-infrastructure/CLOUD_RUN.md) — ESM/CJS shim pattern (ex §4.9 del monolito)

@@ -365,7 +365,7 @@ La regla de oro: **si el operador esperaba que algo cambie y no cambió, throw**
 - **Arquitectura tecnica:** [GREENHOUSE_REACTIVE_PROJECTIONS_ARCHITECTURE_V2.md](./GREENHOUSE_REACTIVE_PROJECTIONS_ARCHITECTURE_V2.md)
 - **Playbook V1 archivado:** [GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md](./GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md)
 - **Event catalog:** [GREENHOUSE_EVENT_CATALOG_V1.md](./GREENHOUSE_EVENT_CATALOG_V1.md)
-- **Cloud infrastructure:** [GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md](./GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md) §4.9 y §5
+- **Cloud infrastructure:** [cloud-infrastructure/CLOUD_RUN.md](./cloud-infrastructure/CLOUD_RUN.md) + [cloud-infrastructure/SCHEDULING.md](./cloud-infrastructure/SCHEDULING.md)
 - **Database tooling:** [GREENHOUSE_DATABASE_TOOLING_V1.md](./GREENHOUSE_DATABASE_TOOLING_V1.md)
 - **Codigo:**
   - Consumer V2: `src/lib/sync/reactive-consumer.ts`

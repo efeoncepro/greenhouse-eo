@@ -1,5 +1,24 @@
 # Handoff activo
 
+### TASK-1646 — Cloud Infrastructure doc particionado: temáticos + HISTORIAL + stub (2026-08-05)
+
+**Complete.** El monolito `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` (1340 líneas / 24 deltas, finding
+`architecture_doc_monolith`) quedó dividido según el precedente ui-platform:
+`docs/architecture/cloud-infrastructure/` (11 temáticos de estado vigente + `HISTORIAL.md` con los
+25 deltas verbatim) + router stub en el path original + ADR
+`GREENHOUSE_CLOUD_INFRASTRUCTURE_RESTRUCTURE_DECISION_V1.md`.
+
+**Para el próximo agente que toque infra cloud:**
+
+- Entrada canónica: `docs/architecture/cloud-infrastructure/README.md` (mapa "dónde vive X").
+  Cambio vigente → doc temático; cronología → HISTORIAL. No agregar contenido al stub.
+- Al separar se resolvieron contradicciones contra runtime: los inventarios del monolito eran de la
+  auditoría 2026-04-23. Vigente verificado 2026-08-05: **46 scheduler jobs** del ops-worker (SoT
+  `services/ops-worker/deploy.sh`), **8 crons Vercel** (SoT `vercel.json`), **7 workflows de deploy**.
+  El detalle de qué se descartó y por qué está en el ADR + anotaciones `⚠️ Superseded` del HISTORIAL.
+- Gates verdes: `docs:closure-check` sin `architecture_doc_monolith`, `docs:context-check:strict`
+  0/0, `task:lint` template=1/0/0. Re-auditoría live GCP sigue siendo TASK-127.
+
 ### TASK-1302 — Serie GSC propia LIVE: 26.192 filas reales materializadas (2026-08-05)
 
 Tercer eslabón de EPIC-022. **Rollout EJECUTADO — operativamente completo.** Revisión

@@ -1,5 +1,15 @@
 # TASK-127 - Cloud Architecture Posture Consolidation
 
+## Delta 2026-08-05
+
+- El doc de referencia `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` fue reestructurado por TASK-1646:
+  ahora es un router stub y el estado vigente vive en `docs/architecture/cloud-infrastructure/`
+  (temáticos con as-of + SoT declarados) + `HISTORIAL.md`. Cuando esta task ejecute la re-auditoría
+  live GCP, el rebaseline se escribe en los docs temáticos (no en el stub), actualizando los as-of.
+  Los inventarios repo-verificables ya fueron re-verificados el 2026-08-05 (46 scheduler jobs
+  ops-worker, 8 crons Vercel, 7 workflows de deploy); lo que sigue pendiente de esta task es el
+  contraste contra GCP live (`gcloud`/`bq`).
+
 ## Status
 
 - Lifecycle: `to-do`

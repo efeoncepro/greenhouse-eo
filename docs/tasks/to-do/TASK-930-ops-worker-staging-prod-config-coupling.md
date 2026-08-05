@@ -1,5 +1,13 @@
 # TASK-930 — ops-worker comparte servicio entre staging/prod: config staging sobre el worker reactivo productivo
 
+## Delta 2026-08-05
+
+- La topología compartida quedó declarada **canónica** (no transitoria) por TASK-1302 y el contrato
+  vigente ahora vive en `docs/architecture/cloud-infrastructure/TOPOLOGY.md` §1 (reestructura
+  TASK-1646): `ENV` sólo selecciona secret refs, no hay flip sólo-staging, y una capacidad
+  worker-only queda live al mergear a `develop`. Cualquier propuesta de esta task de separar
+  config/infra por ambiente debe partir de ese contrato y actualizar TOPOLOGY.md si lo cambia.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

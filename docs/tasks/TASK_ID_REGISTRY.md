@@ -1730,9 +1730,15 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-1644` | `to-do` | **Artifact Composer Visual Profiles for Proposal Studio.** EPIC-029; backend-data/command; P1/Alto/Alto. Define `VisualProfile` versionado —Skin de producto— compatible con catálogos, lo resuelve y sella en el manifest, conserva `axis` como default y conecta la selección gobernada de Proposal Studio sin UI ni CRUD multi-tenant en esta task. | `docs/tasks/to-do/TASK-1644-artifact-composer-visual-profiles-proposal-studio.md` |
 | `TASK-1645` | `to-do` | **Growth SEO: Ecosystem Lane + MCP Tools (Full API Parity).** EPIC-022; backend-data/api; backend-standard; P2/Alto/Medio. Expone los readers SEO al lane ecosystem (`/api/platform/ecosystem/growth/seo/*`, `runEcosystemReadRoute`, default-DENY + entitlement per-org) y como 3 MCP tools read-only en `src/mcp/greenhouse/**` (espejo TASK-1086). Materializa la directiva del operador 2026-08-05: el módulo SEO nace Full API Parity y usable por MCP. Writes vía governed action loop = follow-up. Blocked by TASK-1301/1302/1303. | `docs/tasks/to-do/TASK-1645-growth-seo-ecosystem-lane-mcp-tools.md` |
 
+| `TASK-1646` | `complete` | **Cloud Infrastructure Doc Restructure (temáticos + HISTORIAL + router stub).** policy/standard; P1/Medio/Medio. Cerrada 2026-08-05. `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` (1340 líneas, 24 deltas) mezclaba estado vigente con cronología y sus inventarios quedaron congelados en la auditoría 2026-04-23 (16 scheduler jobs vs 46 reales; 13 crons Vercel vs 8 reales). Replicó el precedente ui-platform: `docs/architecture/cloud-infrastructure/` (11 temáticos + HISTORIAL con 25 deltas verbatim) + router stub + ADR indexado en DECISIONS_INDEX. Cierra el finding `architecture_doc_monolith`. | `docs/tasks/complete/TASK-1646-cloud-infrastructure-doc-restructure.md` |
+
 ## Siguiente ID disponible
 
-`TASK-1645`
+`TASK-1647`
+
+> **Reserva 2026-08-05 (2).** `TASK-1646` quedó asignada a la reestructuración del doc de Cloud
+> Infrastructure (temáticos + HISTORIAL + router stub, precedente ui-platform); el siguiente ID
+> libre es `TASK-1647`.
 
 > **Corrección 2026-07-30.** Este pie declaraba `TASK-1587`, pero la tabla de este mismo archivo ya
 > registraba hasta `TASK-1598` y esos archivos existen en disco: el pie estaba obsoleto respecto de su
