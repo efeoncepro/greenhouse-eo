@@ -102,3 +102,73 @@ export type KeywordOpportunitiesResult =
       opportunities: KeywordOpportunity[]
     }
   | { ok: false; errorCode: SeoDegradationCode | 'target_not_found'; status: SearchConsoleConnectionStatus | null }
+
+/**
+ * ═══ TASK-1305 — Cruce SEO↔AEO (quadrant 360) ═══
+ *
+ * Derived read cross-módulo: la lente SEO (posición medida, `seo_gsc_daily`) y la lente
+ * AEO (citabilidad IA, `grader_scores`) se mantienen como DOS EJES ORTOGONALES — el
+ * boundary §1.1 del doc maestro prohíbe promediarlas, mergearlas por SQL o
+ * reconciliarlas. "Rankeas #1 y la IA no te cita" es una celda de la matriz (riesgo),
+ * no un bug.
+ */
+
+/** Celda de la matriz 2×2: rankeo (X) × citabilidad IA (Y). */
+export type SeoAeoQuadrant = 'dominante' | 'riesgo' | 'oportunidad' | 'invisible'
+
+/**
+ * Granularidad del eje AEO. En V1 es `domain`: `grader_scores` es por-run (dominio
+ * completo), así que todas las keywords comparten la citabilidad del dominio. TASK-1311
+ * (citation attribution URL-level) lo refina a `url` SIN romper este contrato.
+ */
+export type SeoAeoAxisGranularity = 'domain'
+
+export interface SeoAeoKeywordStanding {
+  keyword: string
+  /** Página mejor posicionada para la keyword en la ventana. */
+  page: string
+  /** Posición media ponderada por impresiones (mismo método que KeywordOpportunity). */
+  position: number
+  impressions: number
+  clicks: number
+}
+
+export interface SeoAeoQuadrantEntry {
+  keyword: string
+  rankPosition: number
+  /** Score AEO del eje Y. En granularidad `domain` es el overall del dominio. */
+  aeoScore: number
+  quadrant: SeoAeoQuadrant
+}
+
+export interface SeoAeoGapLenses {
+  seoLens: {
+    windowDays: number
+    /** Keywords medidas (GSC) ordenadas por impresiones desc. */
+    keywords: SeoAeoKeywordStanding[]
+  }
+  aeoLens: {
+    latestRunId: string
+    latestRunAt: string | null
+    /** `grader_scores.overall_score` (0–100) del último run reportable. */
+    overallScore: number
+    /** `overallScore >= umbral de citabilidad` (documentado en el clasificador). */
+    cited: boolean
+  }
+}
+
+export type SeoAeoGapResult =
+  | ({
+      ok: true
+      organizationId: string
+      seoTargetId: string
+      aeoAxisGranularity: SeoAeoAxisGranularity
+      quadrants: SeoAeoQuadrantEntry[]
+      /** Clasificación agregada del dominio (mejor posición SEO × citabilidad). */
+      domainQuadrant: SeoAeoQuadrant
+    } & SeoAeoGapLenses)
+  | {
+      ok: false
+      errorCode: 'disabled' | 'target_not_found' | 'no_seo_data' | 'no_aeo_data' | 'query_failed'
+      status: null
+    }
