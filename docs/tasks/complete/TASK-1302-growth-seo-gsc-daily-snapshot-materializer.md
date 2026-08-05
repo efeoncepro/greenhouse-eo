@@ -25,7 +25,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-022`
-- Status real: `code complete, rollout pendiente` — implementado y verificado local + contra PG real; falta el flip operativo (flag ON + despausar scheduler) y el redeploy del ops-worker
+- Status real: `operativamente completo` — rollout ejecutado y verificado en vivo el 2026-08-05: revisión `ops-worker-00524-5wg`, scheduler `ops-seo-gsc-snapshot` ACTIVO (`0 9 * * *` CLT) y **26.192 filas reales materializadas** para `sc-domain:berel.com`
 - Rank: `TBD`
 - Domain: `growth|data`
 - Blocked by: `TASK-1299`
@@ -361,10 +361,35 @@ Ver `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §4.2 (`seo_gsc_daily`: materiali
 - `scripts/growth/_sanity-seo-keyword-opportunities.ts` (gate TASK-893): **9/9 checks verdes** contra PG real con rollback y cero residuo. Destapó un bug que ningún mock habría atrapado — la SQL seleccionaba `pq.query` mientras el TS leía `row.keyword`, así que todas las keywords salían vacías.
 - 38 tests focales del dominio + **suite completa 10102 passed / 0 failed** + **`pnpm build` de producción** verdes. `worker:build-contract-gate` y `worker:runtime-deps-gate` verdes, sin imports `@core`. `flags:audit --strict` verde.
 
-### Rollout pendiente (por qué NO es `operationally complete`)
+### Rollout EJECUTADO — 2026-08-05
 
-1. Aplicar la migración en el target productivo vía release control plane.
-2. Redeployar el ops-worker (el handler `POST /seo/gsc/snapshot-batch` no existe en la revisión activa).
-3. `GROWTH_SEO_ENABLED=true` **en el ops-worker** (no en Vercel) — staging primero.
-4. **Despausar** `ops-seo-gsc-snapshot`. Los pasos 3 y 4 son ambos necesarios: con el flag ON y el job pausado no corre nada; con el job activo y el flag OFF el handler no-opea.
-5. Verificar el primer run real contra la org con GSC activo y confirmar filas en `seo_gsc_daily`.
+Estado final: **operativamente completo**. Revisión activa `ops-worker-00524-5wg`, scheduler `ops-seo-gsc-snapshot` `ENABLED` (`0 9 * * *` CLT), **26.192 filas reales** en `seo_gsc_daily` para `sc-domain:berel.com`.
+
+**Simplificación descubierta al ejecutarlo.** Los pasos "migración en prod" y "promoción vía release control plane" **no aplicaban**: hay una sola instancia Cloud SQL (`greenhouse-pg-dev`, ya migrada) y el ops-worker es un **servicio Cloud Run único compartido staging+prod** que se despliega desde `develop`. La capacidad quedó viva sin promoción a `main` — nada en Vercel la consume todavía. Corolario operativo: para este dominio **no existe un flip "sólo staging"**.
+
+#### Dos defectos que sólo el rollout real podía revelar
+
+1. **El ops-worker no tenía NINGUNA variable de Search Console.** TASK-1302 introdujo el primer consumer del reader GSC en ese runtime — hasta ahora sólo corría en rutas Vercel — y su entorno nunca se provisionó. Sin `GROWTH_SEARCH_CONSOLE_ENABLED` + `GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID`, `readSearchConsoleAnalytics` habría resuelto `disabled` y el batch habría degradado **todas** las orgs en silencio. Es la misma bug class que ISSUE-113 (flag ON con secret ref nunca cableado ⇒ provider saltado sin ruido), que el propio `deploy.sh` ya documentaba. Cableado con el patrón canónico `DATAFORSEO_API_LOGIN` (GH secret → workflow → `deploy.sh`), client secret por secret ref. Verificado además que el SA `greenhouse-portal@` tiene `secretAccessor` **a nivel proyecto**, así que el token per-org es legible — sin eso el reader habría marcado la conexión de Berel como `revoked`, rompiendo un GSC que funcionaba.
+2. **GSC no publica D-1.** El primer run devolvió `materialized=1, degraded=0, rows=0`. Medido contra la API con la conexión viva: D-1 responde `ok` con **cero filas** y recién D-2 trae datos. El materializer apuntaba a "ayer" (como pedía la spec), así que habría escrito un día vacío en cada corrida y **nunca habría vuelto por él** cuando el dato llegara — serie permanentemente vacía con el batch reportando éxito. Ningún test lo atrapaba porque el mock decide qué devuelve GSC. **Arreglo de causa raíz:** ventana móvil de 5 días en vez de un solo día. El mismo mecanismo absorbe el lag de publicación (que Google no garantiza) y corrige el consolidado tardío (~48h); es seguro por construcción porque el UPSERT ya era idempotente — esa idempotencia deja de ser sólo defensa contra re-runs y pasa a ser **el mecanismo de convergencia de la serie**.
+
+#### Evidencia live
+
+```text
+[ops-worker] /seo/gsc/snapshot-batch done — dates=2026-08-04,2026-08-03,2026-08-02,2026-08-01,2026-07-31
+             orgs=1 materialized=5 degraded=0 failed=0 rows=26192 truncatedOrgs=0
+```
+
+| capture_date | filas | impresiones | clicks |
+|---|---|---|---|
+| 2026-08-03 | 7.003 | 30.390 | 666 |
+| 2026-08-02 | 5.528 | 20.967 | 325 |
+| 2026-08-01 | 6.582 | 25.424 | 450 |
+| 2026-07-31 | 7.079 | 28.596 | 565 |
+
+`2026-08-04` no aparece **a propósito**: GSC respondió sin filas y el materializer no fabricó un día vacío — la degradación honesta funcionando.
+
+`readKeywordOpportunities` ejercitado contra esa serie real (target de prueba en transacción con `ROLLBACK`, sin dejar config creada): **375 keywords en striking-distance**, umbral P75 resuelto en 10 impresiones, ventana 28d, `market: 'unavailable'`. Las 8 primeras salieron todas `quickWin` (posición 8–10) y varias marcadas `cannibalized` — señal real de consolidación pendiente para ese dominio.
+
+#### Rollback (<5 min)
+
+`GROWTH_SEO_ENABLED=false` en `deploy.sh` + redeploy, o `gcloud scheduler jobs pause ops-seo-gsc-snapshot` **y** poner el 5º argumento de `upsert_scheduler_job` en `"true"` para que el pause sobreviva al próximo deploy. La serie acumulada es append-only y no se borra.

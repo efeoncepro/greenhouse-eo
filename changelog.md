@@ -21,6 +21,13 @@
   `GROWTH_SEO_ENABLED` default OFF: `code complete, rollout pendiente`.
 - Sanity live 9/9 contra PG real destapó un bug de alias SQL↔TS que ningún mock atrapaba. Suite 10102/0 + build
   prod verdes.
+- **Rollout ejecutado el mismo día: LIVE.** 26.192 filas reales de `sc-domain:berel.com`, scheduler activo, 375
+  keywords en striking-distance. El rollout destapó dos defectos que ningún test podía ver: (a) el ops-worker no
+  tenía NINGUNA variable de Search Console —TASK-1302 fue su primer consumer del reader GSC— y prender el flag
+  habría degradado todas las orgs en silencio (bug class ISSUE-113); (b) **GSC no publica D-1**, así que apuntar a
+  "ayer" habría escrito días vacíos para siempre sin volver por ellos → ventana móvil de 5 días, que de paso
+  corrige el consolidado tardío de Google. Una sola instancia Cloud SQL y un solo ops-worker compartido
+  staging+prod ⇒ la capacidad quedó viva sin promoción a `main`.
 
 ## 2026-08-05 — Growth SEO (EPIC-022): capabilities + entitlement per-org + chokepoint de costo (TASK-1301)
 

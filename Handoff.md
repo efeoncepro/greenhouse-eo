@@ -1,13 +1,37 @@
 # Handoff activo
 
-### TASK-1302 — Serie GSC propia + striking-distance COMPLETE, rollout pendiente (2026-08-05)
+### TASK-1302 — Serie GSC propia LIVE: 26.192 filas reales materializadas (2026-08-05)
 
-Tercer eslabón de EPIC-022 (quick win del camino min-costo). **`code complete, rollout pendiente`.**
+Tercer eslabón de EPIC-022. **Rollout EJECUTADO — operativamente completo.** Revisión
+`ops-worker-00524-5wg`, scheduler `ops-seo-gsc-snapshot` ACTIVO (`0 9 * * *` CLT), serie real de
+`sc-domain:berel.com` acumulando (26.192 filas / 4 días; el 5.º día devolvió 0 filas y NO se
+fabricó — degradación honesta funcionando). `readKeywordOpportunities` ejercitado contra esa serie:
+**375 keywords en striking-distance**.
+
+**Dos defectos que sólo el rollout real podía revelar — leer antes de tocar este dominio:**
+
+1. **El ops-worker no tenía NINGUNA variable de Search Console.** TASK-1302 introdujo el primer
+   consumer del reader GSC en ese runtime (antes sólo corría en Vercel) y su entorno nunca se
+   provisionó. Prender el flag sin eso habría degradado TODAS las orgs en silencio — misma bug
+   class que ISSUE-113. Ya cableado en `deploy.sh` + GH secret.
+2. **GSC no publica D-1.** El primer run dio `materialized=1, rows=0`. Medido contra la API: D-1
+   responde `ok` con cero filas, D-2 sí trae datos. El materializer apuntaba a "ayer" (como pedía
+   la spec) ⇒ habría escrito días vacíos para siempre sin volver por ellos. **Arreglado con ventana
+   móvil de 5 días**, que además corrige el consolidado tardío de Google.
+
+**Simplificación operativa confirmada:** una sola instancia Cloud SQL y **un solo ops-worker
+compartido staging+prod** desplegado desde `develop` ⇒ la capacidad quedó viva **sin promoción a
+`main`**, y **no existe un flip "sólo staging"** para este dominio.
+
+**Rollback (<5 min):** `GROWTH_SEO_ENABLED=false` en `deploy.sh` + redeploy, o pausar el scheduler
+**y** poner su 5º arg en `"true"` (si no, el próximo deploy lo despausa solo).
+
+Lo que sigue abajo es el detalle de la implementación previa al rollout.
 
 **Lo entregado.** Tabla `greenhouse_growth.seo_gsc_daily` (migración `20260805171834316`, aplicada en
 `greenhouse-pg-dev`) + `materializeGscDailySnapshot` + batch per-org en ops-worker
-(`POST /seo/gsc/snapshot-batch`) + Cloud Scheduler `ops-seo-gsc-snapshot` (`0 9 * * *`, nace **PAUSADO**) +
-`readKeywordOpportunities`. Commits `88bc...`→Slice 4 (ver `git log --grep TASK-1302`). Sin push aún.
+(`POST /seo/gsc/snapshot-batch`) + Cloud Scheduler `ops-seo-gsc-snapshot` + `readKeywordOpportunities`.
+7 commits pusheados a `develop` (`git log --grep TASK-1302`).
 
 **Tres decisiones que conviene no re-litigar:**
 
@@ -29,10 +53,8 @@ todas las keywords salían vacías. Los mocks ejercitan el TS, nunca el SQL (gat
 cero residuo; smoke de la migración (idempotencia, DELETE rechazado, tipos DATE/TIMESTAMPTZ); 38 tests focales;
 suite completa **10102/0**; `pnpm build` prod; gates de worker; `flags:audit --strict`.
 
-**Rollout pendiente (4 pasos, ninguno hecho):** (1) migración en prod vía release control plane; (2) redeploy del
-ops-worker (el handler no existe en la revisión activa); (3) `GROWTH_SEO_ENABLED=true` **en el ops-worker, NO en
-Vercel**; (4) **despausar** `ops-seo-gsc-snapshot`. Los pasos 3 y 4 son ambos necesarios: flag ON + job pausado no
-corre nada; job activo + flag OFF hace no-op. **Próximo paso del epic:** TASK-1300 (paralela) o TASK-1303.
+**Próximo paso del epic:** TASK-1300 (paralela) o TASK-1303. Nota para quien tome TASK-1306/1308: la serie ya
+tiene datos reales, así que esas UIs se pueden construir contra datos vivos, no contra fixtures.
 
 ### TASK-1301 — Capabilities + entitlement per-org SEO COMPLETE (2026-08-05)
 
@@ -446,137 +468,6 @@ esa ausencia es lo que dejó acumular trece defectos sin que nadie los viera.
 con 60 s. **No era cierto** — `producer_worker_job.tf` la fija en 15 min desde antes de la sesión, así que el
 modo de fallo que describí no pudo ocurrir en producción. El cambio de default sigue siendo correcto (protege
 a runtimes que no seteen la variable), pero exageré su impacto. Queda escrito en el código.
-
-## TASK-1469 — convergencia terminal cerrada; task REABIERTA por cierre prematuro (2026-08-04)
-
-Verificado en runtime desde `efeonce-globe@c28ab9f`; detalle en
-[`TASK-1469`](docs/tasks/in-progress/TASK-1469-globe-governed-run-lifecycle-submission-fence.md).
-
-### Delta 2026-08-04 (d) — los dos defectos de ISSUE-137 cerrados y DESPLEGADOS
-
-Rollout verificado contra la **revisión activa**, no contra el workflow verde: `globe-api-internal-00207-28r`,
-`globe-studio-internal-00149-w9c` y el Job del worker, las tres con el digest etiquetado `e7a732c9b62e`.
-
-- 🔴 **El sello del reloj era MUCHO peor que los 19 minutos del incidente.** `finishLease` recibía el instante
-  como parámetro y sus **siete** call sites pasaban uno de DOMINIO — tres del **futuro**, o sea filas que podían
-  declararse completas antes de existir. Medido: **23 de 131** filas `done` contradictorias, peor caso
-  **−34.965 s = 9,7 horas**. Hoy sella con reloj de pared **inyectado**; verificado en vivo con **0
-  contradictorias** en los tres tipos de job. Y el cambio salió barato por dato, no por suerte: `completed_at`
-  del outbox **no tiene lectores**, `finishLease` **no toca `available_at`**, y el instante de dominio **ya
-  tenía su columna** en los siete caminos.
-- **El attempt en vuelo no necesitaba proyección nueva: necesitaba un LINK.** `coarseProgress` ya existía y era
-  browser-safe, pero su reader pide `runId` y `LabExperimentV1` no lo llevaba. Tercera aparición de «la
-  capability existe y la UI no la consume». Verificado con una corrida EN CURSO: se leía `running` con
-  `attempts: 0` y el reader nuevo respondió `provider-running/queued, providerAccepted=true`.
-- **Hallazgo colateral:** `coarseProgress` estaba transcrito **tres** veces y coincidían — por eso el riesgo era
-  invisible. Hoy es dato único con el SQL generado; el `ELSE 'terminal'` se retiró porque presentaba un estado
-  desconocido como corrida terminada.
-- 🔴 **El canary estaba ROTO desde ayer y `pnpm check` seguía verde**: un comentario de bloque escribió una
-  expresión de cron literal cuyo `*/` cierra el comentario, y la suite importa la *lib* del canary y nunca el
-  *script*. El instrumento de salida de todo rollout no corría. Guard nuevo parsea todos los entrypoints.
-- **[`ISSUE-139`](docs/issues/resolved/ISSUE-139-globe-output-descriptor-advertises-per-modality-mime-guess.md)
-  (ajena, resuelta):** el descriptor de output anunciaba un MIME adivinado **por modalidad** — un MP3 servido
-  como `audio/mpeg` se anunciaba `audio/wav`. Imagen y video pasaban porque su default **coincidía por
-  casualidad**. Lo destapó el canary de generación real; re-verificado sobre los mismos assets con **cero gasto
-  adicional**.
-
-**Sigue abierto:** los 3 criterios NO VERIFICADOS de abajo, el webhook de OpenAI sin evidencia de runtime, y
-**D12 de `ISSUE-138`** (`storageUri` de Veo), que necesita un canary con gasto y es decisión del operador.
-
-- **Huérfanos 4 → 0** en un solo batch, con el motivo real propagado (tres códigos distintos, ningún
-  genérico) y el batch siguiente en `convergedExperiments=0` — el barrido es idempotente.
-- **El invariante quedó enumerable, no como arreglo de una pareja:** un agregado nuevo sin postura rompe el
-  build y un `observable` sin señal se rechaza. La señal `run_aggregate_divergence` existe para que una
-  TERCERA pareja se vea en el tablero en vez de descubrirse en producción, que es como apareció la segunda.
-- 🔴 **`outboxDeadLetter` no tenía sólo mal el nombre: MEDÍA MAL** — contaba filas de outbox y decía **3 para
-  UN solo attempt**. Ya en producción marca `1`. Y `state='dead'` **sí existe**, escrito por la recuperación
-  histórica de crédito. Corrige lo que decía este Handoff. **ISSUE-135 punto 1 cerrado.**
-- Al aplicar salió un defecto propio: **el aligner es función del TIPO de métrica** — `ALIGN_COUNT` sólo vale
-  sobre DELTA/INT64; una métrica que extrae valor necesita `ALIGN_PERCENTILE_99`. Mirar la pieza hermana está
-  bien; mirar CUÁL hermana aplica es la otra mitad de la regla.
-
-🔴 **La task NO está complete: la reabrí.** La deuda de convergencia sí quedó cerrada y verificada, pero la
-había movido a `complete/` con su bloque `## Acceptance Criteria` —22 ítems del carril webhooks/completion,
-que es el corazón de su título— **sin recorrer**. Reconciliado ahora con evidencia: **19 marcados**, **3
-declarados NO VERIFICADOS** (deadlines independientes por etapa, policy de fallback —dueña `TASK-1470`— y
-conformance API/SDK) y **el webhook de OpenAI sin evidencia de runtime** (sus 4 intentos corren por `poll` y
-no hay ninguna señal suya; puede ser correcto por diseño, pero está supuesto).
-
-El carril de webhooks SÍ funciona y hay evidencia: **34 entregas reales de Fal** recibidas, verificadas por
-Ed25519/JWKS sobre el body crudo y procesadas; ack en 202 sin descargar ni liquidar; Veo por
-`predictLongRunning`→`fetchPredictOperation`.
-
-### 🔴 Auditoría de los tres proveedores (Delta 2026-08-04 (c)) — tres agujeros que pierden un asset pagado
-
-La captura es **correcta en su forma** en los tres, y `poll` para OpenAI es correcto **por diseño** (OpenAI no
-emite eventos de imagen). Pero la auditoría contra la doc oficial destapó 13 huecos; los tres graves los
-verifiqué yo leyendo el código:
-
-- **Fal:** el rescate del lost-ack recupera el `request_id` pero **no las URLs** de status/response, y ambas
-  salidas las exigen → run trabado con el asset ya facturado, teniendo el id en la mano.
-- **Veo:** techo de **2 MB** en el poll contra un video que vuelve **inline en base64** (el driver declara 64 MB)
-  → revienta exactamente en el poll del éxito. El repo ya resolvió esto para OpenAI con 24 MB y no lo replicó.
-- **Omni:** generación de minutos dentro de una lease de **60 s**; si vence, `reconcile` exige un id que nunca
-  se escribió — y los bytes ya se ingirieron a GCS con su hash perdido.
-
-Más: el submit de imágenes de OpenAI **no tiene timeout** (el de Fal sí) y su anti-doble-cobro depende de un
-`idempotency-key` **no verificado**; y `reconciliationFailureCode` lee `.errorCode` mientras el error expone
-`.code`, así que **todos** los códigos del poll colapsan en uno — `ISSUE-127` en el único camino donde no se
-había arreglado, y es lo que vuelve invisible al agujero de Veo.
-
-### ✅ Resueltos (2026-08-04) — 11 en código, 2 declarados
-
-Nueve commits en Globe `main` (`0e9d696` → `0b5f875`), `pnpm check` + `pnpm build` verdes en cada uno. Detalle
-en [`ISSUE-138`](docs/issues/open/ISSUE-138-globe-provider-completion-capture-loses-paid-assets.md).
-
-Lo que más vale recordar de la sesión:
-
-- **El guard nuevo derivó el vocabulario del archivo fuente y encontró CUATRO códigos que se me habían
-  pasado.** Copiar la lista a mano habría dado verde con el defecto adentro.
-- **Un test existente atrapó que mi clasificación de D8 era demasiado gruesa** (un cuerpo sobredimensionado
-  también es definitivo, no infraestructura). Separar por remedio, otra vez.
-- **En D6 la salida no era inferir del status: Fal publica `X-Fal-Retryable` y la estábamos ignorando.**
-  Respetar la señal del proveedor vale más que cualquier heurística nuestra.
-- **La doc de Fal en vivo cerró D1 y D7.** Devolvía 429 a todo fetch programático **pero es alcanzable desde
-  el navegador real** — vale recordarlo la próxima vez que una doc parezca inaccesible. Confirmó que la base de
-  la queue **no es derivable**: medido contra nuestros propios datos, un endpoint descarta 3 segmentos y otro 1,
-  y su doc muestra uno que conserva 3. La regla dura era correcta, así que la base se **declara por endpoint**
-  desde evidencia real.
-- **Verificado con una generación real** sobre el runtime desplegado: run `completed`, experimento
-  `candidate_ready`, governance `eligible`. **La captura funciona de punta a punta.**
-- **D9 cerrado con el valor MEDIDO**, y el resultado justifica haberme negado a adivinarlo: el user id de Fal
-  es un identificador estilo Auth0 (`github|…`) que **no se parece en nada** al username de su panel.
-  Suponerlo habría rechazado todas las entregas. Aplicado y verificado en la revisión viva.
-- 🔴 **El canary abortaba sobre un sistema sano.** Daba timeout a los 20 min mientras la corrida completó sola
-  en la entrega 21: el cuello no era el proveedor sino que **Asset Governance corría cada 5 minutos** y avanzaba
-  un estado por tick (~20-25 min en frío). Su paciencia estaba por debajo de la latencia real del sistema que
-  vigila. Subido a 45 min — un canary que aborta sobre algo sano enseña a leer «timeout» como normal.
-  **Delta 2026-08-04: el cron bajó a `*/1` (`ISSUE-137`) y la latencia real es ~7,9 min**, así que los 45 min
-  quedaron ~5× por encima (eran ~2×). El presupuesto sigue siendo correcto; el número viejo ya no.
-- **Queda sólo D12**, acotado: la retención de la Operation de Vertex sigue sin documentarse, pero D2 ya cerró
-  su modo de fallo — resta una ventana de latencia, no una pérdida. Su arreglo (`storageUri`) tiene dueño y no
-  se implementó detrás de un flag involtable, que sería el código muerto que D13 vino a limpiar.
-
-**Rollout ejecutado:** los tres runtimes en **`07baef97af9a`** (drift guard verde: API `00204-ttm`, Studio
-`00147-gq4`, worker `sha256:26fc3ded0c30`), con salud post-deploy limpia.
-
-**⚠️ `GLOBE_FAL_USER_ID` cableado y sin configurar, a propósito.** El panel de Fal no expone ese identificador
-como valor; ponerlo mal rechazaría TODAS las entregas legítimas. El sistema lo **observa** sobre una entrega ya
-verificada (`globe.provider_webhook.account_identity_observed`) mientras siga sin configurar: con la próxima
-generación queda el valor medido.
-
-**`TASK-1632` queda bloqueada sólo por D12**, que es una ventana de latencia y no una pérdida: se cierra
-pasando `storageUri` —lo que además elimina el costo de memoria del presupuesto derivado— y exige un canary
-con gasto real, o sea decisión tuya.
-
-### 🔴 Trampa de infra viva (dueño: `TASK-1635`, NO 1469)
-
-`tofu apply` desde un checkout limpio **destruye los 20 recursos del entorno de desarrollo**:
-`development_environment_enabled` tiene default `false` en git y el entorno vivo depende de un
-`terraform.tfvars` **gitignoreado**. El apply de hoy se hizo con
-`-var development_environment_enabled=true -var 'development_operator_principal=user:julio.reyes@efeonce.org'`
-→ `0 to destroy`. El arreglo de fondo —el estado real de un flag no puede vivir en un archivo sin trackear—
-sigue abierto.
 
 ## SKY Blog — propuesta técnica V2 y arquitectura económica (2026-08-03)
 
