@@ -257,6 +257,19 @@ The initial cohort flow must additionally record the Account 360 organization, d
 operator authorizing the invitation, external identity subject/organization IDs, permitted capability, timestamps
 and revocation state. It is an explicit, idempotent enrollment command; it is not a bulk import of existing clients.
 
+### Slice 0 convergence contract — Greenhouse customer login (2026-08-05)
+
+Target mechanism for the later, separately-gated cutover: Greenhouse adds the accepted external identity plane as
+an **additional NextAuth OIDC provider** for customer-facing login. On sign-in, Greenhouse resolves the person
+through the **same** `(environment, subject)` source link in `identity_profile_source_links` that MCP uses — one
+authentication relationship, two audience-bound sessions. Greenhouse keeps issuing its own NextAuth session and
+cookie for the Greenhouse audience; nothing about the MCP token flow changes; no cookie, session secret or token
+crosses applications. Rollback of the cutover is removing the provider option — bindings and profiles are
+untouched. Preconditions before that cutover gets its own rollout gate: the external plane is live for the MCP
+cohort, recovery/conflict paths are exercised, and every affected customer person has a verified source link.
+Until then, current Greenhouse customer credentials continue unchanged; coexistence is transitional by design and
+never produces a second permanent credential set for the same person.
+
 ### Slice 0 binding design proposal (2026-08-05)
 
 Discovery result: **person-level binding needs no new identity table.**

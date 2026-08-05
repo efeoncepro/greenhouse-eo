@@ -411,7 +411,10 @@ Reglas obligatorias:
    superficie custom de login desaparece del primer corte — la task `ui-ux` dependiente se reduce a branding
    config + superficie de invitación, y su creación formal se difiere al momento en que la etapa (2) se
    desbloquee (crearla hoy produciría wireframes stub, prohibido). El contrato de convergencia del login
-   customer-facing de Greenhouse sigue pendiente como entregable documental.
+   customer-facing de Greenhouse quedó **HECHO 2026-08-05** en ADR §`Slice 0 convergence contract`: el plano
+   externo entra como provider OIDC adicional de NextAuth, resuelve el MISMO source link `(environment,
+   subject)`, cada app conserva su sesión/audiencia, y el rollback del cutover es retirar el provider sin
+   tocar bindings.
 7. **S0.7 — Paquete de decisión**: la composición y el staging de gasto cero quedaron aprobados por el
    operador el 2026-08-05 (registrado en el ADR). Para abrir la etapa (2)/(3) y los Slices 1-3 restan: cierre
    del gate legal (DPA + abogado), checklist pre-provisión (CIMD/subject/free-tier) y aceptación formal del
