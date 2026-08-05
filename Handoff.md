@@ -1,5 +1,17 @@
 # Handoff activo
 
+### TASK-1631 — intake + plan Slice 0; checkpoint P0 pendiente (2026-08-05)
+
+TASK-1631 (Efeonce Customer Identity + MCP Federation) pasó a `in-progress` en `develop`. Se re-verificó contra
+runtime que el gateway sigue single-issuer con `clientId = azp ?? sub`, `sub` descartado y fusión
+`scp ∪ scope ∪ roles` (`../efeonce-mcp/src/auth/token-verifier.ts`, `src/config.ts`) — la spec no tiene drift.
+El plan de ejecución del Slice 0 quedó registrado en la ZONE 2 de la task (S0.1 matriz de tokens live +
+base-only de TASK-1626 → S0.7 paquete de decisión). **Bloqueo vigente:** el ADR
+`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md` sigue `Proposed`; composición
+(WorkOS/native/hybrid), plan comercial y revisión de privacidad sin aprobar. Slices 1-3 bloqueados; nada
+externo se provisiona. **Próximo paso:** el operador aprueba el plan del Slice 0 (checkpoint P0 del harness)
+y luego el paquete de decisión S0.7 habilita los Slices 1-3.
+
 ### Registro de partnerships — fuente operativa creada (2026-08-05)
 
 Se creó [`EFEONCE_PARTNERSHIP_REGISTRY_V1.md`](docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md) como registro
@@ -576,16 +588,6 @@ mientras el Connector se cuelga (`invalid_rapt` es reauth). Comandos en
 
 - [ADR-021](docs/architecture/GREENHOUSE_FINANCE_CORE_ACCOUNTING_FOUNDATION_DECISION_V1.md) aceptado; `EPIC-012`
   es owner. Sus 11 candidatas no estaban reservadas y deben reenumerarse desde TASK-1634 al confirmarlas.
-
-## Gate canónico de licitaciones / Brightcell (2026-08-02)
-
-- Se agregó `pnpm tender:canonical-gate <slug>` y el registro durable `proposal-studio.json`. Una salida de
-  `pnpm deck:compose` bajo `.captures/` queda explícitamente en `workshop_only`; no es Proposal ni asset productivo.
-- El gate solo pasa con `status=verified`, `proposalId`, render job `client_facing` completado, PDF/previews
-  versionados en `proposal_assets` y verificación autenticada del Portal/API. `pnpm qa:gates --changed` lo ejecuta
-  y reporta `BLOCK` si falta la cadena.
-- Brightcell quedó documentada en `workshop_only`; regularización pendiente en Proposal Studio. No se ejecutó
-  creación de Proposal, render productivo, gcloud ni ADC durante esta implementación.
 
 ## TASK-1614 — canary cerrado (2026-08-02)
 

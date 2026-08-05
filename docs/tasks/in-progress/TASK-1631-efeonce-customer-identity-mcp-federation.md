@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -345,6 +345,54 @@ Reglas obligatorias:
 - [ ] Ningún token, code, secret o respuesta cruda de provider aparece en logs o respuestas de error.
 
 <!-- ZONE 2 — PLAN MODE: se completa al tomar la task -->
+
+## Execution Plan (intake 2026-08-05)
+
+### Auditoría de supuestos (re-verificados contra runtime 2026-08-05)
+
+- **Verificado exacto:** `../efeonce-mcp/src/auth/token-verifier.ts` sigue single-issuer con
+  `clientId = azp ?? sub` (línea 34), `AuthInfo = { token, clientId, scopes, expiresAt }` (el `sub` se descarta)
+  y fusión `scp ∪ scope ∪ roles` en `scopes` (líneas 11-18). `src/config.ts` construye un único `oauth.issuer`
+  desde `OAUTH_ISSUER` y declara los tres scopes (base, reader, write de fondeo gateado por
+  `globeCreditFunding.enabled`). La spec no tiene drift respecto del runtime.
+- **Verificado:** el broker sister-platform existe con la superficie declarada
+  (`src/lib/sister-platforms/oauth-broker.ts` + policy, redirect allowlists, TTLs, workspace bindings, token
+  exchange y sus tests).
+- **Bloqueo vigente:** el ADR `EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md` sigue en `Proposed`;
+  no hay aceptación de composición, plan comercial ni revisión de privacidad cerrada. La prueba base-only de
+  TASK-1626 sigue pendiente (su §Estado de rollout 2026-08-01 lo declara).
+- **Consecuencia:** los Slices 1-3 permanecen bloqueados. El único trabajo ejecutable ahora es el Slice 0
+  (material de decisión + contratos + mediciones), que por definición no provisiona nada externo.
+
+### Plan de ejecución del Slice 0 (orden interno)
+
+1. **S0.1 — Matriz de tokens live + prueba base-only** (cierra el pendiente de TASK-1626): capturar redactado
+   `iss`, `aud`, `sub`, `azp`/`client_id`, `scp`, `scope`, `roles`, claim organizacional y `exp` por cliente
+   objetivo, cubriendo redirect loopback y HTTPS hospedado donde el cliente lo permita.
+2. **S0.2 — Estimación de costo operativo del broker native/hybrid** (hardening, MFA/recovery,
+   metadata/CIMD/DCR, callbacks HTTPS, verificación de tokens, observabilidad, soporte, operación 24/7) +
+   cierre de las dos incógnitas WorkOS (curva SSO/SAML USD 125/conexión/mes y portabilidad del binding) →
+   tabla comparativa WorkOS vs native vs hybrid en costo total/seguridad/compatibilidad/privacidad/migración/salida.
+3. **S0.3 — Revisión de privacidad/subprocesador** (`legal-privacy-ip-operator`): datos personales enviados,
+   DPA, subprocesadores, región, retención, derechos ARCO, notificación contractual (CL + CO/MX/PE).
+   Entregable: memo de revisión; la firma del DPA queda con el operador.
+4. **S0.4 — Schema aditivo de binding provider-neutral** (propuesta, sin migración aplicada): organización
+   canónica ↔ binding IDP externo ↔ membership/grant por capability namespaceada; commands
+   allowlist/invitación/revocación con capabilities dedicadas; contrato de account linking, colisión, recovery
+   y revocación sobre `identity_profiles`/`identity_profile_source_links`/`client_users`/`session_360`.
+5. **S0.5 — Contratos de gateway**: especificación del contexto de autorización ampliado (`issuer`, `subject`,
+   `clientId`, `audience`, `delegatedScopes`, `roles` separados), calificación por issuer de la autoridad de
+   tools (tool ↔ issuers permitidos + clase de autoridad) y su plan de tests de regresión.
+6. **S0.6 — Contrato de diseño/flujo/deployment de `auth.efeonce.org`** + creación de la task `ui-ux`
+   dependiente (wireframe + flow reales) + contrato de convergencia del login customer-facing de Greenhouse.
+7. **S0.7 — Presentar el paquete de decisión al operador**: aceptación del ADR + composición + plan + privacidad.
+   Sin ese triple gate no se provisiona tenant, DNS, secretos ni binding alguno.
+
+### Checkpoint humano (P0)
+
+El intake, la auditoría y este plan se registran antes de ejecutar S0.1-S0.7. La aprobación del operador sobre
+este plan habilita el Slice 0; la aprobación del paquete de decisión (S0.7) habilita los Slices 1-3.
+
 <!-- ZONE 3 — EXECUTION SPEC -->
 
 ## Scope
