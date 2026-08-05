@@ -62,7 +62,7 @@
     "model-fleet:validate": "node .codex/skills/greenhouse-globe-model-fleet/scripts/validate-route-cards.mjs",
     "model-fleet:test": "node --test .codex/skills/greenhouse-globe-model-fleet/scripts/__tests__/model-fleet-route-card-gate.test.mjs",
     "ui:wireframe-check": "node scripts/ci/task-lint.mjs",
-    "docs:closure-check": "node scripts/check-documentation-closure.mjs && node scripts/ci/feature-flags-audit.mjs --strict --no-vercel",
+    "docs:closure-check": "node scripts/check-documentation-closure.mjs && node scripts/ci/feature-flags-audit.mjs --strict --no-vercel && node scripts/ci/creative-studio-doc-index-gate.mjs",
     "docs:context-check": "node scripts/check-context-handoff.mjs",
     "flags:audit": "node scripts/ci/feature-flags-audit.mjs",
     "docs:context-check:strict": "node scripts/check-context-handoff.mjs --strict",
