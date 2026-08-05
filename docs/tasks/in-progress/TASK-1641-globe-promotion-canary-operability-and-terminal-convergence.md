@@ -107,11 +107,36 @@ Los dos pasaron la suite en verde. Un doble acepta cualquier forma.
    `TASK-1633` cerró en `ref/motion/loop-v1`, reintroducido desde el otro lado. Hoy el modo se elige
    por **si van a viajar referencias de verdad**, y `hasEndFrame` sigue la misma regla.
 
+### Ejercitado con GASTO REAL — prueba de salida cumplida (2026-08-04, 19:56Z)
+
+`ref/motion/reference-v1` (Gemini Omni) generó por el canary de ruta, con autorización explícita del
+operador. Run/experimento `6a6112f4-15f2-4fec-a8b5-aab2b5759e6b` → **`candidate_ready`**, output
+`sha256:2338c9ef9488a8cb780b974ae96201c1bde247075edbb28faa32a379967459a4`, **MP4 real de 661.995
+bytes** retenido y con governance `eligible`. Entrada: la referencia certificada
+`sha256:b2762b73…` con `rights: derived-internal`, resuelta **sola** desde el feed retenido.
+
+Economía exacta: **12 aprobados = 12 estimados = 12 gastados**, una reserva
+(`743fbcf8-c949-4641-af93-bcc0d714a07b`) y **una** liquidación, `noDoubleDebit: true`. Se eligió Omni
+sobre Veo a propósito: ejercita el mismo caso duro —entrada obligatoria, certificación de referencia,
+modo derivado distinto de `create`— por 12 créditos en vez de 32.
+
+Verificación independiente de los bytes: el `sha256` del archivo en disco coincide con el que el
+dominio certificó, así que lo que se escribió es lo que se generó.
+
+### 🔴 Lo que destapó leer esa evidencia
+
+**El canary verificaba el veredicto de governance y no lo contaba.** Falla si el asset no queda
+`eligible` con derechos verificados, pero la evidencia emitida se quedaba en
+`{sha256, mimeType, byteSize, file}`: el dato estaba y se tiraba en la frontera de salida — la misma
+familia de `ISSUE-127`, dentro del instrumento que existe para dar evidencia. Corregido en
+`efeonce-globe@a6ff46f`, con el mapeo movido del entrypoint a la lib (`describeCanaryArtifacts`)
+porque el pegamento del entrypoint es justo lo único que ninguna suite importa, y quitar un campo no
+rompe nada.
+
 ### Lo que este cierre NO prueba
 
-El camino de **gasto** (`--execute`) está implementado y cubierto por tests, pero **no se ejercitó
-con gasto real**: lo verificado en runtime es el dry-run de cuatro rutas. La primera promoción que
-lo use es su prueba de salida.
+El camino de gasto quedó ejercitado sobre **una** ruta con referencias. Una ruta de otra modalidad
+—audio con `source-audio`, o `frames` con dos cuadros— usa el mismo motor pero no está corrida.
 
 Y una decisión que se tomó y se revirtió, porque la premisa era falsa: el dry-run **sí certifica**
 sus referencias. Se intentó dejarlo read-only puro y el estimate de una ruta con entrada obligatoria
@@ -419,8 +444,8 @@ sigue siendo el recovery.
 
 - [x] El canary canónico puede ejercitar una ruta arbitraria por su identidad exacta, incluidas las que
       exigen referencias, sin escribir la secuencia a mano. — `efeonce-globe@1767138`, verificado en
-      dry-run contra el runtime sobre 4 rutas; el camino de gasto queda cubierto por tests y **sin
-      ejercitar con gasto real** (ver Delta 2026-08-04 (b)).
+      dry-run contra el runtime sobre 4 rutas **y con GASTO REAL** sobre `ref/motion/reference-v1`
+      (run `6a6112f4…`, MP4 661.995 B, 12 = 12 créditos). Ver Delta 2026-08-04 (b).
 - [ ] Una promoción `activated` próxima a expirar emite señal observable, con alerta.
 - [ ] Los agregados dependientes de la saga están declarados en un array enumerable, con test en ambas
       direcciones; un `observable` sin señal se rechaza.

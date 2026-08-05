@@ -22,10 +22,17 @@ retenido. Dry-run verificado contra la API en vivo sobre cuatro rutas: `ref/vide
 `ref/voice/tts-v1` (6 cr, 0). Sobre Veo reproduce **exactamente** la forma, la referencia y el costo
 del sello artesanal de anoche.
 
-⚠️ **El camino de gasto (`--execute`) no se ejercitó todavía**: la próxima promoción es su prueba de
-salida. Y el dry-run **certifica** sus referencias (gasto cero, idempotente) porque el estimate de
-una ruta con entrada obligatoria no es computable sin ellas — el output lo declara en
-`referencesCertified`.
+**Ejercitado con gasto real (19:56Z):** `ref/motion/reference-v1` → `candidate_ready`, run
+`6a6112f4-15f2-4fec-a8b5-aab2b5759e6b`, output
+`sha256:2338c9ef9488a8cb780b974ae96201c1bde247075edbb28faa32a379967459a4`, MP4 **661.995 bytes**
+retenido, governance `eligible`; **12 aprobados = 12 gastados**, una reserva y una liquidación,
+`noDoubleDebit`. La referencia de entrada la resolvió solo desde el feed retenido.
+
+Leer esa evidencia destapó que el canary **verificaba** el veredicto de governance y **no lo
+reportaba** — corregido en `efeonce-globe@a6ff46f`.
+
+El dry-run **certifica** sus referencias (gasto cero, idempotente) porque el estimate de una ruta con
+entrada obligatoria no es computable sin ellas — el output lo declara en `referencesCertified`.
 
 ## Corte 2026-08-04 (noche) — TASK-1641: Omni y Veo sellados, migración `0050`
 
