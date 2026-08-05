@@ -179,6 +179,9 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   | 'getKnowledgeDocument'
   | 'searchServices'
   | 'simulateQuote'
+  | 'getSeoKeywordOpportunities'
+  | 'getSeoVisibility360'
+  | 'getSeoEntitlement'
 >) => ({
   async getContext() {
     return callReadTool(
@@ -368,6 +371,69 @@ export const createGreenhouseMcpHandlers = (client: Pick<
         )} — referencial, no vinculante (${result.requestId}).`
       },
       () => client.simulateQuote(input)
+    )
+  },
+  // TASK-1645 — Growth SEO (read-only, MCP-first). Los tres tools delegan en el lane
+  // ecosystem (entitlement per-org seo_v1 + anti-oracle server-side); cero lógica de
+  // dominio acá. Las degradaciones honestas del reader (disabled / target_not_configured /
+  // no_seo_data / no_aeo_data) llegan en data.ok=false — el agente NO debe inventar datos.
+  async getSeoKeywordOpportunities(input: { organizationId?: string; limit?: number }) {
+    return callReadTool(
+      result => {
+        const data = result.data as { ok?: boolean; opportunities?: unknown[]; errorCode?: string }
+
+        if (data.ok === false) {
+          return `SEO keyword opportunities unavailable (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        const count = Array.isArray(data.opportunities) ? data.opportunities.length : 0
+
+        return `Loaded ${count} SEO keyword opportunities (measured GSC striking-distance) (${result.requestId}).`
+      },
+      () => client.getSeoKeywordOpportunities(input)
+    )
+  },
+  async getSeoVisibility360(input: { organizationId?: string }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          domainQuadrant?: string
+          quadrants?: unknown[]
+          aeoLens?: { overallScore?: number }
+        }
+
+        if (data.ok === false) {
+          return `Search Visibility 360 unavailable (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        const count = Array.isArray(data.quadrants) ? data.quadrants.length : 0
+
+        return `Search Visibility 360: domainQuadrant=${String(data.domainQuadrant ?? 'unknown')} aeoScore=${String(
+          data.aeoLens?.overallScore ?? 'unknown'
+        )} across ${count} keywords (${result.requestId}).`
+      },
+      () => client.getSeoVisibility360(input)
+    )
+  },
+  async getSeoEntitlement(input: { organizationId?: string }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          hasModule?: boolean
+          tier?: string | null
+          allowanceRemaining?: number
+          budgetRemainingUsd?: number
+        }
+
+        return `SEO entitlement: hasModule=${String(Boolean(data.hasModule))} tier=${String(
+          data.tier ?? 'none'
+        )} auditsRemaining=${String(data.allowanceRemaining ?? 0)} budgetRemainingUsd=${String(
+          data.budgetRemainingUsd ?? 0
+        )} (${result.requestId}).`
+      },
+      () => client.getSeoEntitlement(input)
     )
   }
 })
