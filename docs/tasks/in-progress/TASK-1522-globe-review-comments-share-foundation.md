@@ -19,7 +19,7 @@
 - Rank: `wip`
 - Domain: `creative|review|collaboration|security`
 - Blocked by: `none`
-- Branch: `task/TASK-1522-globe-review-comments-share-foundation`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

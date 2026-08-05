@@ -1,8 +1,9 @@
 # 02 · Contenido y Topical Authority
 
 > Carga este módulo para: search intent, topical authority, pillar/cluster,
-> contenido programático, content decay, canibalización y operación editorial.
-> Sello: as-of 2026-06.
+> contenido programático, content decay, canibalización, priorización por
+> striking distance y operación editorial.
+> Sello: as-of 2026-06; método de striking distance **medido** as-of 2026-08-05.
 
 ## Principio raíz: intención > keyword
 
@@ -89,12 +90,72 @@ con data propietaria y valor incremental. Ver `ANTIPATTERNS.md`.
   nuevo). La frescura es factor IA explícito.
 - **Canibalización** — dos URLs compitiendo por la misma intención se diluyen.
   Diagnóstico: GSC → misma query rankeando con URLs que rotan. Fix: consolidar
-  (301 + merge), diferenciar intención, o canonical.
+  (301 + merge), diferenciar intención, o canonical. **Es una acción distinta de
+  "empujar una keyword"** — ver *Striking distance* abajo.
 - **Pruning** — contenido thin/obsoleto sin tráfico ni enlaces puede *bajar* la
   calidad percibida del dominio. Opciones: mejorar, consolidar, o `noindex`/
   eliminar (con 301 si tenía valor). Hazlo con datos, no por corazonada.
 - **Cadencia de refresh** — define un ciclo (p.ej. revisar top-20 páginas dinero
   cada trimestre). El contenido es un activo que se mantiene.
+
+## Striking distance: priorizar con datos propios (sin volumen ni dificultad de terceros)
+
+> **Método medido** (as-of 2026-08-05) contra la **API real** de Search Console
+> sobre una propiedad `sc-domain:` conectada (levantada trabajando TASK-1302 de
+> Greenhouse). Es método verificado sobre datos reales, no una receta de blog.
+
+No necesitas Semrush ni Ahrefs para priorizar contenido: **con el GSC del propio
+sitio alcanza**. Y el resultado es **más defendible** frente al cliente — son sus
+datos medidos, no la estimación de un tercero para un mercado promedio.
+
+### Los parámetros del filtro
+
+| Parámetro | Valor | Por qué |
+|---|---|---|
+| **Rango de posición** | **8–20** | Ya rankeas: existe página y existe relevancia, falta empujar. **8–10 es el mejor ratio esfuerzo/retorno** — ya estás en página 1 |
+| **Umbral de "alta impresión"** | **percentil de la propia distribución del sitio (P75 por defecto)** + un **piso mínimo absoluto** de impresiones | No es un número absoluto: un sitio de 100 impresiones/día y uno de 1M **no pueden compartir umbral**. El piso existe aparte, para que la posición media sea **estadísticamente interpretable** — con 3 impresiones, "posición 9,0" no significa nada |
+| **Ventana** | **28 días** | Cubre **4 ciclos semanales completos**. Las queries B2B tienen estacionalidad de día hábil; 30 días corta la serie a mitad de semana |
+| **Score** | **clics incrementales estimados** | Ver abajo |
+
+### El score: clics incrementales, no un índice inventado
+
+```
+score = impresiones × max(0, CTR_esperado_en_posición_objetivo − CTR_actual)
+```
+
+- Las **impresiones de GSC ya son demanda medida** — y de **tu propia SERP**, con
+  tu país, tu dispositivo y tu mezcla real de queries.
+- El resultado sale en **clics**, no en puntos de un índice: es la unidad que el
+  cliente entiende y que después se puede verificar contra el mismo GSC.
+
+### La curva de CTR se deriva del propio sitio
+
+**No uses una tabla de CTR por posición de la industria.** Calcula la curva con
+los datos del sitio (CTR observado por posición sobre la misma ventana).
+
+🎯 **Ventaja concreta:** una curva propia **absorbe automáticamente cuánto están
+deprimiendo el CTR los AI Overviews EN ESE sitio y ESE vertical**, sin tener que
+estimarlo ni discutirlo. Si hoy la posición 3 de ese sitio rinde la mitad que en
+una tabla vieja, el score ya lo refleja.
+
+### Canibalización: no se descarta, se separa
+
+Una query que rankea con **más de una página** no es una oportunidad de
+optimización: es una oportunidad de **CONSOLIDACIÓN** (unificar, 301, canonical o
+diferenciar intención — ver *Content operations* arriba). **Es otra acción, no
+una variante de la misma.** Sácala del backlog de "empujar" y ponla en el de
+"consolidar", con su propio dueño y su propio criterio de éxito.
+
+### Evidencia de que el método produce señal
+
+Sobre **26.192 filas** de una propiedad real: **375 keywords** en striking
+distance. Las de mayor score salieron **todas en posición 8–10**, y **varias
+marcadas como canibalizadas**. Es decir: el filtro no devolvió ruido — devolvió
+el borde donde el trabajo rinde, y apartó el trabajo que es de otro tipo.
+
+⚠️ **Al agregar varios días, la posición se pondera por impresiones**
+(`SUM(position × impressions) / SUM(impressions)`, nunca `AVG(position)`) y la
+cola de días recientes **todavía se está consolidando** → `07_MEASUREMENT.md`.
 
 ## Keyword research que sigue sirviendo en 2026
 
@@ -112,7 +173,10 @@ con data propietaria y valor incremental. Ver `ANTIPATTERNS.md`.
 - No actualizar nunca (decay garantizado).
 - Generar a escala con IA sin valor incremental (riesgo de penalización + cero
   citas).
-- Ignorar canibalización (auto-competencia silenciosa).
+- Ignorar canibalización (auto-competencia silenciosa) — o peor, tratarla como
+  una keyword más que "hay que empujar" cuando la acción es consolidar.
+- Priorizar por volumen estimado de un tercero teniendo el GSC propio, donde la
+  demanda ya está **medida** (striking distance, arriba).
 
 > **Cross-refs:** estructura para ser citado → `04_AEO_GEO.md`. Autoría/E-E-A-T
 > → `03_EEAT_ENTITY.md`. Medir decay/posiciones → `07_MEASUREMENT.md`. Calidad

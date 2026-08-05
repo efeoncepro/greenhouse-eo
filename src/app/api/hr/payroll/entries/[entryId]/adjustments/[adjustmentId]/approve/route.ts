@@ -1,11 +1,16 @@
 import { NextResponse } from 'next/server'
 
 import { getServerAuthSession } from '@/lib/auth'
+import { query } from '@/lib/db'
 import {
   PayrollAdjustmentValidationError,
-  approveAdjustment
+  approveAdjustment,
+  revertAdjustment
 } from '@/lib/payroll/adjustments/apply-adjustment'
-import { recalculatePayrollEntry } from '@/lib/payroll/recalculate-entry'
+import {
+  assertAdjustmentPeriodWritable,
+  recalculateAfterAdjustment
+} from '@/lib/payroll/adjustments/recalculate-adjustment'
 import { requireHrTenantContext } from '@/lib/tenant/authorization'
 import { ROLE_CODES } from '@/config/role-codes'
 
@@ -23,16 +28,25 @@ export async function POST(
   const canApprove = tenant.roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN)
 
   if (!canApprove) {
-    return NextResponse.json(
-      { error: 'No autorizado para aprobar ajustes de nomina.' },
-      { status: 403 }
-    )
+    return NextResponse.json({ error: 'No autorizado para aprobar ajustes de nomina.' }, { status: 403 })
   }
 
   try {
     const { entryId, adjustmentId } = await params
     const session = await getServerAuthSession()
     const userId = session?.user?.id ?? tenant.userId
+
+    const entryRows = await query<{ period_id: string }>(
+      'SELECT period_id FROM greenhouse_payroll.payroll_entries WHERE entry_id = $1 LIMIT 1',
+      [entryId]
+    )
+
+    const periodId = entryRows[0]?.period_id
+
+    if (!periodId) throw new PayrollAdjustmentValidationError('Payroll entry no encontrada.', 404)
+
+    await assertAdjustmentPeriodWritable(periodId)
+
     const adjustment = await approveAdjustment({ adjustmentId, approverUserId: userId })
 
     // TASK-745c — auto-recalc tras aprobacion: el adjustment pasa de
@@ -40,16 +54,34 @@ export async function POST(
     let recalculated = false
 
     try {
-      await recalculatePayrollEntry({
+      await recalculateAfterAdjustment({
         entryId,
-        input: {},
+        periodId: adjustment.periodId,
         actorIdentifier: userId
       })
       recalculated = true
     } catch (recalcError) {
+      await revertAdjustment({
+        adjustmentId,
+        revertedByUserId: userId,
+        revertedReason: 'Aprobacion sin materializacion; requiere reintento controlado.'
+      }).catch(revertError => {
+        console.error(`[adjustments approve] failed to compensate ${adjustmentId}`, revertError)
+      })
+
       console.warn(
         `[adjustments approve] auto-recalc failed for entry ${entryId}:`,
         recalcError instanceof Error ? recalcError.message : recalcError
+      )
+
+      if (recalcError instanceof PayrollAdjustmentValidationError) throw recalcError
+
+      return NextResponse.json(
+        {
+          error: 'El ajuste fue aprobado pero no pudo materializarse; quedó revertido. Corrige el bloqueo y reintenta.',
+          code: 'payroll_adjustment_recalculation_failed'
+        },
+        { status: 409 }
       )
     }
 

@@ -8,7 +8,7 @@ description: Dirige arte y diseño gráfico enterprise con IA y humanos. Use for
 > **Qué es esto.** Una skill de **dos manos**: **(1) conocimiento experto** de diseño
 > gráfico y dirección de arte al estado del arte 2026 — los fundamentos que no caducan
 > _y_ las tendencias del año — y **(2) un estudio de ejecución** que audita, dirige,
-> produce y hace handoff. No es un banco de imágenes ni un botón de "generá una imagen":
+> produce y hace handoff. No es un banco de imágenes ni un botón de "genera una imagen":
 > es el **director de arte** que decide el concepto, el sistema visual y qué mano lo hace.
 
 > **La distinción de una frase.** **`greenhouse-ai-image-generator` GENERA el pixel (la
@@ -130,6 +130,21 @@ validada contra overlays y recortes reales de cada plataforma. Ver la auditoría
 - **Handoff humano**: cuando el craft final lo hace una persona (retoque, ilustración
   propietaria, print), entrega spec + referencias en vez de forzar IA.
 
+### Assets extraíbles dentro de una slide
+
+Cuando el visual se usará dentro de una propuesta, decide explícitamente entre
+**asset extraíble** y **full-bleed** antes de producirlo. Para un asset extraíble,
+dirige una sola tesis visual —no una escena que intente ser la slide completa—, deja
+zonas de respiración para el copy y entrega una pieza que pueda moverse, recortarse y
+reutilizarse en el template. La slide y sus textos, métricas, logos exactos y mockups
+finales se componen de forma determinística.
+
+Evita el “AI slop”: personajes genéricos rodeados de iconos, collages de tarjetas o
+dashboards ilegibles sin una función narrativa. En una propuesta SEO/AEO, cada mockup
+debe avanzar la historia: **AEO Grader diagnostica**, **X-Ray demuestra recuperabilidad**
+y **Greenhouse muestra la operación mensual**. Si una imagen no cumple una función en
+esa secuencia, no se incorpora por decoración.
+
 > **Regla dura (director, no dictador).** design-studio **decide el arte y elige la mano**,
 > pero **no reinventa la producción**: para assets de UI delega en `greenhouse-ai-image-generator`;
 > para logos reales, en `greenhouse-digital-brand-asset-designer`. Un primitive/mano por tarea,
@@ -147,6 +162,8 @@ validada contra overlays y recortes reales de cada plataforma. Ver la auditoría
 - **NUNCA** uses IA que confunda con foto real sin criterio de disclosure cuando aplique, ni
   ilustraciones propietarias de Efeonce como si fueran stock. Ver `efeonce/EFEONCE_OVERLAY.md`.
 - **NUNCA** transcribas mal la marca: Efeonce ≠ Greenhouse; `AxisWordmark` solo interno.
+- **NUNCA** apruebes un asset con alpha sucio, halo de matting o pérdida de detalles
+  blancos en iconos/logos; revísalo a tamaño original y sobre el fondo real de la slide.
 
 ## 6. Doctrina 2026 (lo que hay que creer este año)
 

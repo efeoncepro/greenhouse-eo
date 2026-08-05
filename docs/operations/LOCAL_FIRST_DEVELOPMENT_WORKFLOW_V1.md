@@ -150,7 +150,7 @@ Usar GitHub Actions / Vercel / staging cuando:
 |---|---|
 | Menos pushes ocultan errores locales | `local:check*`, tests focales y hooks pre-push mantienen feedback |
 | Agente dice "listo" sin UI review | Para UI debe entregar localhost o declarar bloqueo |
-| Worktree local se aleja de develop | Pull/rebase antes de push; usar worktrees para trabajo paralelo |
+| Checkout compartido diverge o contiene WIP ajeno | No crear un árbol alternativo; detenerse, preservar el WIP y pedir decisión al operador antes de integrar o publicar |
 | CI remoto deja de verse como fuente de verdad | CI sigue siendo gate de integracion/release; local-first solo mueve iteracion barata al entorno local |
 
 ## Relationship With TASK-931

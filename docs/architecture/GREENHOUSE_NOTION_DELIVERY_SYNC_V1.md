@@ -227,7 +227,7 @@ table-level locks — safe to interleave with reactive event handlers.
 
 - TASK-588 — NULLABLE titles + anti-sentinel CHECK constraints (PG side).
 - `GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md` — broader playbook for outbox + projection recovery.
-- `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` — ops-worker Cloud Run topology (§4.9, §5).
+- `cloud-infrastructure/CLOUD_RUN.md` + `cloud-infrastructure/SCHEDULING.md` — ops-worker Cloud Run topology (ex `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` §4.9/§5).
 - `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md` — strategic decoupling of Notion/HubSpot sources.
 
 ## Change history

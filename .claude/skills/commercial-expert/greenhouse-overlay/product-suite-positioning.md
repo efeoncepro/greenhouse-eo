@@ -41,7 +41,7 @@ Decision tree para posicionar los 4 productos Efeonce (servicio agencia / Kortex
 
 ## Decision tree de pitch focus (cold pitch)
 
-Cuando entrás a discovery con un Globe Account:
+Cuando entras a discovery con un Globe Account:
 
 ```
 Step 1: ¿Cuál es el dolor primario del cliente?
@@ -68,7 +68,7 @@ Step 4: Avoid los 4 productos a la vez
 
 ---
 
-## Storytelling per producto (cómo lo presentás)
+## Storytelling per producto (cómo lo presentas)
 
 ### Servicio agencia (eje en Active Accounts)
 
@@ -105,7 +105,7 @@ Step 4: Avoid los 4 productos a la vez
 
 ### Greenhouse portal (siempre foregrounded como soporte)
 
-> **Pitch core**: "Greenhouse es el portal operacional que da transparency real entre nosotros y vos. Sprints, tasks, ICO metrics, audit trail, evidence upload — todo visible. La opacidad operativa que tenés con vendors actuales se elimina. Cuando tu CFO pregunta '¿qué hizo Efeonce este mes?', vos tenés la answer."
+> **Pitch core**: "Greenhouse es el portal operacional que da transparency real entre nosotros y tú. Sprints, tasks, ICO metrics, audit trail, evidence upload — todo visible. La opacidad operativa que tienes con vendors actuales se elimina. Cuando tu CFO pregunta '¿qué hizo Efeonce este mes?', tú tienes la answer."
 
 **Proof points**:
 - Live walkthrough portal con cliente test
@@ -141,7 +141,7 @@ Always-on. No hay Active Account o Project sin Greenhouse portal foregrounded.
 
 ## Anti-pattern: el pitch "tenemos de todo"
 
-> "Tenemos servicios + Kortex + Verk + Greenhouse. ¿Qué necesitás?"
+> "Tenemos servicios + Kortex + Verk + Greenhouse. ¿Qué necesitas?"
 
 Por qué falla:
 - Choice overload buyer (anti-pattern catalog #8 demo early)

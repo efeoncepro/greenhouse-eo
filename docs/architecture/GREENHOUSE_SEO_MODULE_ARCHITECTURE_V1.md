@@ -93,7 +93,7 @@ Se envuelven en una sola narrativa de producto: **Search Visibility 360** = los 
 - `seo_site_audit_runs` — 1 fila por crawl (semanal): `status` CHECK(`running|succeeded|degraded|failed`), `health_score`, `crawled_pages`, `provider_task_id`.
 - `seo_site_audit_findings` — issues por crawl (append-only): `url`, `issue_type`, `severity` CHECK(`critical|warning|notice`), `detail` JSONB.
 - `seo_backlink_snapshots` — snapshot de perfil (semanal): `referring_domains`, `backlinks_total`, `domain_rank`, `toxic_share`, `new_lost_delta` JSONB. UNIQUE(target, capture_date). Anti-mutation trigger.
-- `seo_gsc_daily` — materialización diaria de GSC (query×page) append-only por `capture_date` (TASK-1302; convierte el read-through en serie propia > 16 meses).
+- `seo_gsc_daily` — materialización diaria de GSC (query×page) por `capture_date` (TASK-1302; convierte el read-through en serie propia > 16 meses). UNIQUE(organization_id, capture_date, query, page). **Anclada a `organization_id`, NO a `seo_target_id`** — es la única tabla de la serie que se ancla a la org, y es deliberado: (a) GSC entrega por *propiedad verificada*, que vive en `search_console_connections` con `organization_id` UNIQUE, mientras `seo_targets` tiene grano **más fino** (`location_code` + `language_code`, dimensiones que GSC no particiona) — FKear al target obligaría a asignar cada fila arbitrariamente a uno de varios targets posibles; (b) separa medición permanente e irreemplazable de configuración mutable y archivable. Trigger **no-delete** (no anti-UPDATE, a diferencia de las demás): GSC consolida con ~48h de retraso, así que el re-run del mismo día debe poder corregir el valor.
 
 **Decisión temporal:** snapshots = event rows append-only keyed por `capture_date` (mediciones, no supersede). Config = membership append-only con `effective_from/to` (términos). Reads temporales: `ORDER BY capture_date DESC` sobre la ventana caliente; índice compuesto `(seo_target_id, keyword, capture_date DESC)`.
 
@@ -115,7 +115,7 @@ Se envuelven en una sola narrativa de producto: **Search Visibility 360** = los 
 
 ## 6. DataForSEO governance
 
-`normalizeEndpoint()` hoy hard-codea `/v3/serp/`. Se parametriza a un **registry declarativo de familias** (allowlist cerrado):
+**Implementado por TASK-1300** (`src/lib/ai/dataforseo-families.ts` + `dataforseo-breaker.ts` + `src/lib/growth/seo/provider-spend.ts`). `normalizeEndpoint(endpoint, family)` es table-driven contra un **registry declarativo de familias** (allowlist cerrado):
 
 ```
 serp      /v3/serp/              (AEO usa esto hoy — no romper)
@@ -125,9 +125,10 @@ onpage    /v3/on_page/           site audit (task-based async → ops-worker, no
 domain    /v3/domain_analytics/  domain metrics
 ```
 
-- **Un cliente, familias como config** (no un cliente por familia): transporte compartido + gate de familia + instrumentación por familia.
-- **Cost tracking:** cada call persiste `provider_cost` en el snapshot + incrementa un contador `seo_provider_spend_daily` per-org (event-sourced) para el quota enforcement.
-- **Circuit breaker por familia:** un Backlinks roto no hunde el cron de rank tracking; aísla SERP-AI (AEO) de Labs/OnPage/Backlinks (SEO) aunque compartan credenciales.
+- **Un cliente, familias como config** (no un cliente por familia): transporte compartido `postDataForSeoTask({ family, endpoint, tasks, organizationId })` + gate de familia + instrumentación por familia. `postDataForSeoSerpLiveAdvanced` delega en él con `family: 'serp'` sin cambiar su contrato — el AEO no se toca.
+- **Cost tracking — `seo_provider_spend_daily` es la FUENTE ÚNICA de presupuesto.** El contador lo escribe el **transporte** en cada llamada cobrada (UPSERT atómico por `organization_id × family × spend_date`), así que una captura nueva no puede gastar sin quedar contabilizada por haber olvidado el registro; cubre además las llamadas que no dejan fila (tarea `on_page` async, consulta con cero resultados). `enforceSeoRunEntitlement` lee **sólo** este ledger: sumarlo además con el `provider_cost` de las tablas snapshot contaría el mismo gasto dos veces y agotaría los presupuestos a la mitad, en silencio. Ese `provider_cost` queda como procedencia por fila.
+- **Atribución obligatoria por tipo.** Las 4 familias SEO exigen `organizationId` (el tipo lo impone y el runtime lo revalida) y el transporte **lanza** si el runtime no registró el contador — gastar sin contabilizar se descubre en la factura; un throw se descubre en desarrollo. ⚠️ `serp` lo deja opcional por una limitación actual, NO porque su gasto sea inatribuible: `grader_profiles.organization_id` existe y es nullable (TASK-1243), pero `ProviderAdapterContext` no transporta la organización, así que **el gasto AEO de perfiles ligados a un cliente no entra en su presupuesto** (follow-up con dueño en EPIC-020).
+- **Circuit breaker por familia:** un Backlinks roto no hunde el cron de rank tracking; aísla SERP-AI (AEO) de Labs/OnPage/Backlinks (SEO) aunque compartan credenciales. `breakerOpen` en el resultado distingue "no se intentó" de "se intentó y falló".
 - **Honest degradation:** un audit que crawlea y devuelve 0 findings (`succeeded`) ≠ uno que falló el crawl (`failed`). Nunca fabricar snapshot.
 - **OnPage es task-based (async):** POST crea task, se poll-ea → ops-worker (queue+poll), no Vercel route handler.
 
@@ -138,6 +139,18 @@ domain    /v3/domain_analytics/  domain metrics
 ## 7. Primitives canónicos (Full API Parity)
 
 Cada capacidad = primitive gobernado `src/lib/growth/seo/**`, reusable por UI + Nexa + MCP. Reads directos; writes vía `propose → confirm → execute`.
+
+**Exposición MCP/ecosystem — IMPLEMENTADA (TASK-1645, 2026-08-05).** Lane machine-authed
+`/api/platform/ecosystem/growth/seo/{keyword-opportunities,visibility-360,entitlement}` (vía
+`runEcosystemReadRoute`; resource builder `src/lib/api-platform/resources/ecosystem-growth-seo.ts`:
+org por binding — org-scoped manda con mismatch 404 anti-oracle, internal exige `organizationId` —,
+entitlement per-org `seo_v1` → 404 anti-oracle, `target_not_configured` honesto, payloads passthrough
+de los readers) + **3 MCP tools read-only** en `src/mcp/greenhouse/**`: `get_seo_keyword_opportunities`,
+`get_seo_visibility_360` (nace con el cruce AEO real de TASK-1305) y `get_seo_entitlement` (el
+chokepoint como lectura, SIN anti-oracle por diseño — visibilidad operativa). Regla vigente
+(mandato del operador): **todo reader SEO/E-E-A-T futuro expone su MCP tool en el MISMO PR**
+(criterio de aceptación en TASK-1303/1304/1311/1312/1313/1314/1317). La federación al gateway
+`mcp.efeonce.org` es `TASK-1647` (adapter delgado del provider; canaries antes de discovery).
 
 **Commands (write, capability-gated, audited, outbox):**
 - `configureSeoTarget(orgId, { rootDomain, market }, actor)`
@@ -150,8 +163,13 @@ Cada capacidad = primitive gobernado `src/lib/growth/seo/**`, reusable por UI + 
 - `readRankSnapshotLatest(targetId)` → standings + WoW delta.
 - `readSiteAuditReport(targetId, auditRunId?)` → health + findings por severidad.
 - `readBacklinkProfile(targetId, { range })`.
-- `readKeywordOpportunities(targetId)` → **join SEO↔GSC** (striking-distance pos 8–20 alta impresión × volumen/dificultad DataForSEO).
-- `readSeoAeoGap(targetId)` → **derived read cross-módulo** (`seo_rank_snapshots` × `grader_scores` por keyword/domain).
+- `readKeywordOpportunities(targetId)` → **striking-distance** sobre la serie GSC (TASK-1302, implementado). Método fijado con la skill `seo-aeo`:
+  - **Posición 8–20** ponderada por impresiones: `SUM(position × impressions) / SUM(impressions)` sobre una ventana de **28 días** (4 ciclos semanales completos). `AVG(position)` entre días es incorrecto — GSC ya entrega su `position` ponderada dentro del período, así que promediar días planos daría el mismo peso a un día de 2 impresiones que a uno de 500.
+  - **"Alta impresión" es un percentil de la propia organización** (default P75), no un número absoluto: un sitio de 100 impresiones/día y uno de 1M no comparten umbral. Con piso estadístico (bajo ~10 impresiones la posición media no es interpretable).
+  - **Score = clics incrementales estimados**: `impresiones × max(0, CTR_objetivo − CTR_actual)`. Las impresiones de GSC **ya son demanda medida** — y de la propia SERP, mejor que un volumen estimado por un tercero. La curva de CTR por posición se **deriva de los datos de la propia org**, de modo que absorbe sola el efecto de los AI Overviews en ese sitio; hay una curva pública de fallback sólo para posiciones sin datos propios.
+  - **Canibalización se marca, no se descarta** (`cannibalized` + `competingPages`): una query con >1 página es una oportunidad de **consolidación**, no de optimización.
+  - Volumen/dificultad de DataForSEO Labs (TASK-1300) es **enriquecimiento**, no el corazón: mientras no aterrice, el reader responde `market: 'unavailable'` con el striking-distance completo.
+- `readSeoAeoGap(targetId)` → **derived read cross-módulo — IMPLEMENTADO (TASK-1305, 2026-08-05)** en `src/lib/growth/seo/gap/read-seo-aeo-gap.ts`. V1: lente SEO = `seo_gsc_daily` (posición medida ponderada por impresiones, ventana 28d) × lente AEO = `grader_scores` del último run reportable del org (granularidad `domain`; TASK-1311 la refina a URL). Cruce EN MEMORIA por `organization_id` (boundary §1.1: cero JOIN/VIEW/FK cross-motor, verificado por test dedicado); clasificador puro `classifyQuadrant` (página 1 × score ≥ 50, umbrales overridables, jamás promediados); degradación honesta `no_seo_data`/`no_aeo_data`. Cuando TASK-1303 aterrice, `seo_rank_snapshots` se suma como lente de mercado sin cambiar el contrato. Primer resultado live: Berel #1.75 orgánico × AEO 44.5 → `riesgo` (autoridad sin citabilidad — el CTA cruzado al AEO funcionando).
 
 Todo reader retorna `{ ok: true, ... } | { ok: false, errorCode, status }` (espejo `SearchConsoleAnalyticsResult`).
 
@@ -164,7 +182,13 @@ Cloud Scheduler + ops-worker (async-critical), nunca Vercel cron.
 - **Rank diario:** `seo-rank-capture` (~05:00 CLT) → `POST /seo/rank/capture-batch` → por target×keyword call DataForSEO, UPSERT `seo_rank_snapshots` (idempotente por capture_date), outbox → reactive BQ mirror.
 - **Site audit semanal (2 fases, OnPage async):** `seo-audit-enqueue` (semanal, encola) + `seo-audit-collect` (cada 30min, poll idempotente por `provider_task_id`).
 - **Backlinks semanal:** `seo-backlink-capture`.
-- **GSC snapshot diario:** `seo-gsc-snapshot` → `readSearchConsoleAnalytics(orgId, {ayer, ['query','page']})` → `seo_gsc_daily` (arregla el read-through + sobrevive los 16 meses de GSC).
+- **GSC snapshot diario (TASK-1302, LIVE desde 2026-08-05):** Cloud Scheduler `ops-seo-gsc-snapshot` (`0 9 * * *` CLT, **ACTIVO**) → `POST /seo/gsc/snapshot-batch` en ops-worker → `materializeGscDailySnapshot` por org → `seo_gsc_daily`. Reusa `readSearchConsoleAnalytics` de TASK-1282: cero cliente GSC nuevo.
+  - 🔴 **Materializa una VENTANA MÓVIL (5 días), no "ayer".** Medido en vivo: **GSC no publica D-1** — responde `ok` con cero filas y recién D-2 trae datos. Un job que apunte sólo a ayer escribe un día vacío en cada corrida y **nunca vuelve por él**: serie permanentemente vacía con el batch reportando éxito. La ventana absorbe el lag de publicación (que Google no garantiza y varía) y de paso corrige el consolidado tardío (~48h). Es seguro por construcción: el UPSERT es idempotente por `(org, capture_date, query, page)`, así que esa idempotencia **es el mecanismo de convergencia de la serie**, no sólo una defensa contra re-runs. `captureDate` explícito fuerza un día puntual.
+  - ⚠️ **El ops-worker es un servicio Cloud Run ÚNICO compartido staging+prod**, desplegado desde `develop`. No existe un flip "sólo staging" para este dominio, y la capacidad queda viva sin promoción a `main`. Su entorno necesita **su propia** config de Search Console (`GROWTH_SEARCH_CONSOLE_ENABLED` + `GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID` + secret ref del client secret, declarativos en `deploy.sh`): tenerlas en Vercel no sirve de nada acá.
+  - **Paginación real:** el primitive compartido ganó `startRow` opcional (aditivo). Sin él, `querySearchAnalytics` cortaba en 100 filas **sin señal** — sobre una serie histórica eso es pérdida permanente. Si se alcanza el techo de páginas se reporta `truncated` y el handler emite un warning; nunca se trunca en silencio.
+  - **Honest degradation:** si el reader degrada, **no se escribe ninguna fila** — un día sin conexión jamás puede parecerse a un día con cero tráfico. Un día en que GSC respondió sin filas es `ok` con `rowsWritten: 0`, que es un hecho distinto de un fallo.
+  - **Resiliencia per-org:** una org que falla se registra y el batch continúa; un token revocado de un cliente no puede impedir capturar la serie de los demás.
+  - Gate: `GROWTH_SEO_ENABLED` (default OFF, lo lee el **ops-worker**, no Vercel). El flip son **dos pasos**: prender el flag *y* despausar el scheduler.
 
 **Reliability signals** (`/admin/operations`, subsistema Growth Health): `seo.rank.capture_lag` (steady=0), `seo.audit.stuck_tasks`, `seo.provider.cost_over_budget`.
 
@@ -172,17 +196,19 @@ Cloud Scheduler + ops-worker (async-critical), nunca Vercel cron.
 
 ## 9. Entitlements (`growth.seo.*`, per-org)
 
-Capabilities (grain espejo de `growth.ai_visibility.*`), seedeadas en la misma migración que `entitlements-catalog.ts` (capability-grant coverage rule):
+**Implementado (TASK-1301, 2026-08-05).** Capabilities (grain espejo de `growth.ai_visibility.*`), seedeadas en `capabilities_registry` en el mismo PR que `entitlements-catalog.ts` + grants en `runtime.ts` (capability-grant coverage verde):
 
 ```
-growth.seo.target.configure     (execute, tenant)  autor de targets/keywords/competitors
-growth.seo.audit.run            (execute, tenant)  disparar site audit
-growth.seo.observation.read     (read, tenant)     rank/backlink/audit reads (contratado/operador)
-growth.seo.report.read_client   (read, tenant)     gate del report cliente
-growth.seo.entitlement.manage   (execute, tenant)  operador grantea acceso per-org
+growth.seo.target.configure     (execute, tenant)  autor de targets/keywords/competitors — set operador
+growth.seo.audit.run            (execute, tenant)  disparar site audit — set operador
+growth.seo.observation.read     (read, tenant)     rank/backlink/audit reads — set interno base
+growth.seo.report.read_client   (read, own)        gate del report cliente (client_* scope own)
+growth.seo.entitlement.manage   (execute, tenant)  SOLO EFEONCE_ADMIN + EFEONCE_ACCOUNT (espejo AEO)
 ```
 
-**Acceso per-org vía `module_assignments`** (no por rol — lección TASK-1248). Las **4 puertas**: operador (`entitlement.manage`, interno, todas las orgs), contratado (assignment activo → observación + report), trial/PLG (assignment con quota cap + expiry), público (quick-check rate-limited de 1 dominio, sin persistencia más allá de lead capture — reusa el patrón `public-submission` + `grader_leads`). Chokepoint único `enforceSeoRunEntitlement` con **quota cap por-org** (gate de costo DataForSEO).
+**Acceso per-org vía `module_assignments`** (no por rol — lección TASK-1248), con `module_key='seo_v1'` seedeado en `greenhouse_client_portal.modules` (la FK del catálogo lo exige; tier=addon, `data_sources=['growth.seo']` con parity al union `ClientPortalDataSource`; `view_codes=[]` hasta TASK-1310). El tier vive en `metadata_json.seo_tier` (`contracted|trial|pilot`; override de cupo pilot vía `metadata_json.seo_audit_runs_per_month`). Las **4 puertas**: operador (`entitlement.manage`, interno, todas las orgs), contratado (assignment activo → observación + report), trial/PLG (assignment con quota cap + expiry), público (quick-check rate-limited de 1 dominio, diferida — reusa el patrón `public-submission` + `grader_leads`).
+
+**Chokepoint único `enforceSeoRunEntitlement`** (`src/lib/growth/seo/entitlement.ts`) con **quota cap por-org** (gate de costo DataForSEO): entitlement → expiración (`expired` explícito) → allowance (site-audits/mes por tier) → budget (USD/mes por tier; gasto = `SUM(provider_cost)` mensual de los snapshots TASK-1299 — **hook TASK-1300**: al existir `seo_provider_spend_daily`, el resolver cambia de fuente). Acepta `estimatedCostUsd` y no deja pasar un run que exceda el budget restante. Consumer-agnóstico por diseño (mandato parity+MCP 2026-08-05): el plano fino de capability (`can()`) vive en el consumer; el MISMO gate sirve UI, Nexa, lane `app` y lane `ecosystem`/MCP. Knobs por env con default: `GROWTH_SEO_{CONTRACTED|TRIAL|PILOT}_{AUDIT_RUNS_PER_MONTH|MONTHLY_BUDGET_USD}`. Sanity live: `scripts/growth/_sanity-seo-entitlement.ts`.
 
 ---
 
@@ -307,3 +333,47 @@ E-E-A-T (Experience · Expertise · Authoritativeness · Trustworthiness) es el 
 - Entitlements: `GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
 - Full API Parity: `GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`
 - Funcional + manual: pendientes (exit criteria EPIC-022 — documentación triple).
+
+## 17. Placement y camino de extracción a Wave (`wave.efeonce.org`) — vigente 2026-08-05
+
+**Decisión del operador (2026-08-05):** Search Visibility 360 **nace en greenhouse-eo** (la plataforma que existe
+hoy) y **eventualmente se habilita como producto en `wave.efeonce.org`** — consistente con `EPIC-037`, que declara
+a Wave como casa de la capa de producto de Search Visibility 360 y a Greenhouse como administrador (orgs, acceso,
+entitlements administrativos, handoffs comerciales, proyecciones), NUNCA como runtime ni source of truth del
+producto a largo plazo. Mientras `EPIC-027` esté activo, ninguna task de EPIC-022 crea deployables ni paquetes por
+anticipado: el módulo nace **extraction-ready dentro del monolito** y la extracción física es un programa posterior
+(Wave, con sus propias tasks).
+
+### 17.1 Inventario del seam de extracción (qué se levanta como unidad)
+
+| Pieza | Home actual | Destino en extracción |
+|---|---|---|
+| Datos | `greenhouse_growth.seo_*` (8 tablas TASK-1299 + `seo_gsc_daily` TASK-1302) | DB de Wave; el schema es una unidad autocontenida (IDs TEXT prefijados, cero FK a otros dominios) |
+| Dominio | `src/lib/growth/seo/**` (readers/commands/chokepoint) | `domain-package` → runtime Wave |
+| Lanes | `app` (UI/Nexa) + `ecosystem` (`/api/platform/ecosystem/growth/seo/*`, TASK-1645) | El lane ecosystem ES el contrato sister-platform: Greenhouse lo consume desde Wave tras el cutover |
+| Entitlements | `module_assignments` per-org + capabilities `growth.seo.*` | Enforcement local de Wave + administración federada desde Greenhouse (modelo EPIC-037) |
+| Historia | BQ mirror (TASK-1303) | Viaja con el producto; dataset separado del resto de Greenhouse |
+
+### 17.2 El único acople deliberado: la FK a la org canónica
+
+`seo_targets.organization_id` → `greenhouse_core.organizations` (FK dura, ON DELETE RESTRICT). **Se mantiene**
+mientras el módulo viva en el monolito (integridad hoy > pureza especulativa; regla canónica 360: extender objetos
+canónicos, nunca identidades paralelas). En la extracción, la FK se reemplaza por integridad app-level + identidad
+federada (los `organization_id` son TEXT opacos y viajan tal cual). Este intercambio es el paso 1 conocido del
+runbook de extracción, no deuda oculta.
+
+### 17.3 Reglas duras para TODO el trabajo de EPIC-022 (nacer extraction-ready)
+
+- **NUNCA** agregar una FK nueva desde `seo_*` hacia ningún schema de Greenhouse distinto del ancla org ya
+  declarada (ni `grader_*`, ni core adicional, ni delivery/finance/payroll). Cruces = por `organization_id` en
+  derived reads.
+- **NUNCA** importar desde `src/lib/growth/seo/**` módulos de otros dominios de Greenhouse, salvo primitives
+  transversales canónicas (postgres client, entitlements runtime, copy, observabilidad). El grafo de imports del
+  dominio debe poder cortarse con el seam.
+- **SIEMPRE** que un consumer nuevo necesite datos SEO (UI, Nexa, MCP, sister platform), entrar por los readers
+  canónicos o el lane ecosystem — nunca SQL directo cross-dominio. El lane ecosystem es el contrato que sobrevive
+  la extracción.
+- **SIEMPRE** declarar en el `Modular Placement Contract` de cada child task: `Future candidate home:
+  domain-package` + nota Wave. La extracción física NO se autoriza desde una task de feature.
+
+Fuente: directiva del operador 2026-08-05 + `EPIC-037` + `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`.

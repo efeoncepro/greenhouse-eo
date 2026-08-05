@@ -19,11 +19,11 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Diseno`
+- Status real: `CODE + ROLLOUT DE LAS SEIS RUTAS DE IMAGEN COMPLETOS — Seedream 5 Pro, Nano Banana Pro, Nano Banana 2, GPT Image 2, GPT Image 1.5 y Recraft v4.1 están simultáneamente available en Producer y ejercitados desde la UI autenticada. TASK-1553 permanece in-progress únicamente porque falta adjuntar, por ruta promovible, la rate version vigente de TASK-1468 y el onboarding receipt de TASK-1578. No queda código, promoción ni canary pendiente para estas seis rutas`
 - Rank: `TBD`
 - Domain: `platform`
-- Blocked by: `none`
-- Branch: `task/TASK-1553-globe-extensible-multi-model-provider-catalog`
+- Blocked by: `TASK-1468, TASK-1578` (sólo receipts de cierre; no bloquean el runtime live)
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 
 ## Summary
@@ -46,9 +46,9 @@ que uno sustituya a otro**. El runtime actual no lo permite: `OPENAI_ROUTING[cap
 Nano Banana Pro **y** 2) exigen **resolución de modelo por-ruta** en los adapters. Sin esta task, "sumar modelos" es
 editar código destructivamente cada vez y sustituir, exactamente lo contrario de la mentalidad aditiva del negocio.
 
-Contexto verificado en vivo (TASK-1535, 2026-07-24): Nano Banana Pro (`gemini-3-pro-image`) **genera imágenes reales**
-en el proyecto Globe vía endpoint `global`; Nano Banana 2 (`gemini-3.1-flash-image`) da 404 (falta allowlist del
-proyecto, ask a Google); OpenAI está registrado en el composite del Lab pero sin lane de producción.
+Contexto actualizado en vivo (2026-07-30): Nano Banana Pro (`gemini-3-pro-image`) y Nano Banana 2
+(`gemini-3.1-flash-image`) generan imágenes reales mediante Vertex `global`. El 404 histórico de Nano Banana 2
+quedó retirado tras un probe HTTP 200 y una generación gobernada. GPT Image 2 y 1.5 también están promovidos.
 
 ## Goal
 
@@ -59,8 +59,8 @@ proyecto, ask a Google); OpenAI está registrado en el composite del Lab pero si
   capacidad.
 - Semántica explícita **update (reemplaza versión en la misma ruta) vs add (ruta nueva que coexiste)**, aplicada
   uniforme a todos los proveedores (Gemini, OpenAI, Fal, y futuros).
-- Seedream + Nano Banana Pro + GPT Image 2 + GPT Image 1.5 elegibles simultáneamente como imagen; Nano Banana 2 listo
-  para sumarse apenas Google habilite el allowlist, con un paso chico.
+- Seedream + Nano Banana Pro + Nano Banana 2 + GPT Image 2 + GPT Image 1.5 + Recraft v4.1 elegibles
+  simultáneamente como imagen.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -130,13 +130,17 @@ Reglas obligatorias:
 - Binding gobernado `ProductionRouteBindingV1` (`routeId, providerId, modelId, modelVersion, endpointId, region`) +
   compiler que exige `binding.modelId == estimate.model == readiness.route.modelId`.
 
-### Gap
+### Estado entregado
 
-- Los adapters resuelven modelo **por capacidad** (`OPENAI_ROUTING[capability]`, `VERTEX_ROUTING[capability]`) → un solo
-  modelo por proveedor por capacidad; imposible dos del mismo proveedor.
-- El composite rutea imagen a **un** proveedor por capacidad (`DEFAULT_COMPOSITE_POLICY['image-generate']='fal'`).
-- No hay noción de "ruta = modelo/tier" ni operación explícita update-vs-add en el catálogo.
-- OpenAI sin lane de producción (`governed-production-composition.ts:71`).
+- OpenAI y Vertex resuelven la identidad ejecutable por `routeId`; dos modelos del mismo proveedor
+  coexisten sin fallback silencioso.
+- El composite resuelve proveedor por ruta y conserva Seedream como default sólo cuando no existe
+  selección explícita.
+- El catálogo modela `ruta = modelo/tier` y distingue update de add.
+- OpenAI tiene driver gobernado oficial; Vertex image usa `global`; Fal/Recraft tiene driver,
+  output contract SVG y serving sandboxed.
+- El único gap de esta task es el receipt cross-task TASK-1468/TASK-1578. Las expansiones futuras
+  de video/audio/3D son nuevas unidades, no trabajo residual oculto de estas seis rutas.
 
 ## Modular Placement Contract
 
@@ -219,25 +223,25 @@ catálogo público).
 
 ## Scope
 
-### Slice 1 — ADR + diseño de resolución por-ruta (arch-architect)
+### Slice 1 — ADR + diseño de resolución por-ruta (completo)
 
 - ADR en `docs/architecture/creative-studio/` que fije: ruta=modelo/tier, resolución de modelo por-ruta en adapters,
   semántica update-vs-add, y la receta "agregar un modelo" (dato + binding). Indexar en `DECISIONS_INDEX`.
 
-### Slice 2 — Resolución de modelo por-ruta en los adapters
+### Slice 2 — Resolución de modelo por-ruta en los adapters (completo)
 
 - `openai-adapter.ts` + `vertex-adapter.ts`: `estimate()`/`submit()` resuelven `model/modelVersion` desde
   `request.route` vía una tabla route→model interna (o derivada del binding), en vez de `*_ROUTING[capability]`.
   Mantener un default seguro por capacidad como fallback del Lab sin ruta.
 
-### Slice 3 — Catálogo multi-ruta por capacidad + política composite por-ruta
+### Slice 3 — Catálogo multi-ruta por capacidad + política composite por-ruta (completo)
 
 - `producer-catalog.ts`: rutas nuevas para Seedream (existente), Nano Banana Pro, GPT Image 2, GPT Image 1.5
-  (Nano Banana 2 declarada pero gateada por allowlist). Público sin slug.
+  y Nano Banana 2. Público sin slug.
 - `composite-adapter.ts`: política de imagen como **resolver por-ruta** (`ref/still/openai-*`→openai,
   `ref/still/nanobanana-*`→vertex, `ref/still/seedream-*`→fal), coexistiendo.
 
-### Slice 4 — Bindings + endpoint allowlist + promoción por modelo
+### Slice 4 — Bindings + endpoint allowlist + promoción por modelo (completo para seis rutas)
 
 - Binding (`globe.production-routing.route.append`) por (workspace, ruta, modelo). Entradas de endpoint allowlist por
   modelo en `governed-production-composition.ts` (región `global` para Vertex image). Promoción por ruta (ADR-009/010).
@@ -245,7 +249,7 @@ catálogo público).
   reconciliados, evidencia de canary y coverage declarada por cada surface. Binding `enabled` sin ese recibo es
   inválido y debe fallar cerrado.
 
-### Slice 5 — Evidencia + canary por modelo + docs
+### Slice 5 — Evidencia + canary por modelo + docs (completo para seis rutas)
 
 - Canary por el Lab de cada ruta nueva; evidencia `scripts/evidence/*`; doc funcional + manual del catálogo
   multi-modelo y de la receta "agregar un modelo".
@@ -255,8 +259,8 @@ catálogo público).
 ## Out of Scope
 
 - El **selector de UI** de modelo (vive en `TASK-1552`, consumer). Esta task expone el catálogo, no la pantalla.
-- La **lane de producción de OpenAI** (verifier faltante, `governed-production-composition.ts:71`) si excede el
-  alcance — declarar follow-up si se difiere; el Lab de OpenAI ya funciona.
+- La lane de producción de OpenAI dejó de estar fuera de alcance: GPT Image 2 y 1.5 se promovieron y
+  verificaron desde Producer el 2026-07-30.
 - Video/audio multi-modelo: el diseño debe ser extensible a ellos, pero el shipping se acota a **imagen** primero.
 - Cambiar el default vivo de imagen sin selección explícita (no romper el comportamiento actual de Seedream sin decisión).
 
@@ -283,7 +287,7 @@ resolución (ya es por-ruta).
 | Regresión del modelo default vivo (Seedream) al cambiar la política composite | Producer/Lab imagen | medium | mantener Seedream como ruta + no cambiar el default sin selección explícita; canary por ruta | output MIME/hash inesperado; quejas de output |
 | Mismatch binding.modelId vs estimate.model tras resolución por-ruta | routing/compiler | medium | test de identidad por ruta; signal steady=0 | `route_identity_mismatch`/`route_binding_missing` en logs |
 | Slug de proveedor filtrado al catálogo público | seguridad/marca | low | drift guard `assertNoSlugLeak` (ya existe) rompe la carga | build/load falla |
-| Modelo preview sin allowlist (Nano Banana 2) promovido y falla en runtime | Vertex | medium | gate por evidencia de acceso antes de promover; ruta declarada pero no promovida | `model_unavailable` en el canary |
+| Modelo preview sin acceso promovido y falla en runtime | Vertex | medium | gate por probe/evaluación exacta antes de promover; aplicado a Nano Banana 2 | `model_unavailable` en el canary |
 
 ### Feature flags / cutover
 
@@ -300,16 +304,20 @@ resolución (ya es por-ruta).
 | Slice 4 | despromover ruta (pause/retire) — data append-only, no se borra | por ruta | parcial |
 | Slice 5 | revert PR docs/evidencia | <5 min | sí |
 
-### Production verification sequence
+### Production verification ejecutada
 
-1. Slice 2 en staging/internal: canary del modelo default por ruta = mismo output que hoy (no regresión).
-2. Slice 3/4: promover 1 ruta nueva (Nano Banana Pro), canary por el Lab, verificar output real + identidad de ruta.
-3. Repetir por modelo (GPT Image 2, GPT Image 1.5). Nano Banana 2 solo tras allowlist de Google.
-4. Verificar que Seedream sigue elegible y sin cambios.
+1. Seedream conservó el default y siguió elegible sin regresión.
+2. Nano Banana Pro completó canary, revisión humana, readiness, binding y readback `Disponible`.
+3. GPT Image 2 y 1.5 completaron driver oficial, rights, promoción y generaciones desde Producer.
+4. Nano Banana 2 completó evaluación 5/5, promoción y generación UI; el mismo run fue recuperado
+   idempotentemente después de corregir `1fb5728`.
+5. Recraft v4.1 completó evaluación/revisión/derechos/promoción y generación SVG; `84d6a8e`
+   verificó los bytes ante el MIME genérico del CDN y añadió CSP sandbox.
+6. `globe.producer.fleet.list` confirmó las seis rutas simultáneamente `available`.
 
 ### Out-of-band coordination required
 
-- **Google**: allowlist de preview del proyecto Globe para `gemini-3.1-flash-image` (Nano Banana 2) antes de promoverlo.
+- **Google**: coordinación cerrada de hecho el 2026-07-30; el endpoint respondió HTTP 200 y Nano Banana 2 fue promovido.
 - **CEO**: atestación humana por modelo (ADR-010) antes de entrega a cliente con cada modelo.
 - **Permiso de edición de código en Globe** para el agente implementador (el classifier del entorno bloqueó ediciones
   en la sesión de diseño 2026-07-24).
@@ -320,7 +328,41 @@ resolución (ya es por-ruta).
 
 ## Acceptance Criteria
 
-### Rollout evidence — 2026-07-24 (latest)
+### Rollout evidence — 2026-07-30 (estado vigente)
+
+- Nano Banana Pro quedó promovido con revisión humana desde Producer, readiness `promoted`, binding
+  `enabled` y selector live `Disponible`. Su canary base fue
+  `a258dda8-ea6e-4a34-94f0-4cd9ca301d17`, 10 créditos, `image/png`, región `global`,
+  SHA-256 `9e9edaf59cb927610d043e3af3cac9b90c321ed48e55eb34ec0300c72dc429cf`.
+- GPT Image 2 y GPT Image 1.5 quedaron promovidos y produjeron desde la UI autenticada los runs
+  `a81c8049-7772-4933-82f2-1e2e59e5121c` y `bf8cd62b-e2d7-4e83-981a-7631a14a5d3a`.
+- Nano Banana 2 dejó de estar bloqueado por allowlist: el endpoint oficial respondió HTTP 200 y la
+  ruta gobernada quedó implementada en `f143936`, con migración `0034`, evaluación exacta, revisión
+  humana, derechos comerciales, readiness, binding y circuito promovidos.
+- Evaluación Nano Banana 2: reporte `51818214-863d-4542-8e9b-eb50c1cb5be9`, experimento
+  `82e3f630-63e8-4c59-a629-8ea670c79dd7`, 5/5 checks, 10 créditos, output
+  `sha256:aa3268e81afbd1ef3cd7794426500881abb6abd63b92569d0050107af5551b5e`.
+- Prueba real desde Producer: run `ce06f8b4-ebe9-43b6-9d47-8e4cc901f49a`, ruta
+  `ref/still/nanobanana-2-v1`, 10 créditos. La prueba detectó el off-by-one de hash
+  `vertex-output:`; `1fb57285` lo corrigió con test de regresión. CI `30565123529` y worker
+  `30565166238` terminaron `success`; el mismo run quedó `completed/retained`, `image/png`,
+  `sha256:b8a0eb45289558a2cb99e9989fa401aa794035c709505b10c58fba34e0768c1e`.
+- CI/runtimes relevantes: `30561907019`, `30562256644`, `30562323309`, `30562758591`,
+  `30562845688`, `30562911378`, `30563293626`, `30563648994`, `30564118519`.
+- Los workflows de control plane de Nano Banana 2 finalizaron `success`:
+  `30564131652`, `30564134009`, `30564136579`, `30564202157`.
+- Recraft v4.1 quedó promovido con evaluación
+  `19504a56-3e70-43f5-a86a-bbc425312cd0`, revisión
+  `review_f38176d1-22b0-4639-884b-a1d61c00f5f4`, atestación
+  `mcra_e7d74373-edbc-4de6-abd7-1c0888baa162` y generación Producer
+  `b5631c86-707a-41d9-8ecc-ef61caa8200c`, 4 créditos, `completed/retained`.
+- El mismatch `image/svg+xml` declarado vs `application/octet-stream` transportado por Fal quedó
+  corregido fail-closed en `84d6a8e`; CI `30573503498`, worker `30573508938`, servicios internos
+  `30573523066`/`30573523128` y diagnóstico `30574036402` terminaron `success`.
+- Estado honesto: las seis rutas de imagen están disponibles y ejercitadas; TASK-1553 sigue
+  `in-progress` únicamente por el criterio 7 de receipts TASK-1468/TASK-1578.
+
+### Rollout evidence — 2026-07-24 (historical baseline)
 
 - Worker deploy `deploy-producer-worker.yml` run `30121176824` completed `success` for `5482a60a6c79b740a698a2cce9eb357b9c2f6080`.
 - Governed Vertex-image driver + `global` endpoint allowlist landed in Globe `main` at `9b62b193016ffe13c42c679be50fb28d19fc0f24`; API deploy run `30125681964` and worker build run `30125679964` completed `success`, followed by worker deploy run `30125918755`.
@@ -329,19 +371,19 @@ resolución (ya es por-ruta).
 - Break-glass impersonation of `greenhouse-globe-caller` was granted at SA scope to the operator, used with `--include-email`, and revoked; the final IAM readback confirms the operator grant is absent.
 - Migration `0031_add_nanobanana_pro_credit_rates.sql` was applied through the canonical database migrator (`1 applied`, `30 already applied`), adding the governed standard/HD rates for the supported Nano Banana Pro shapes. The live estimate then resolved the route at 10 credits.
 - A requested additional 5000-credit grant was attempted through the canonical maker/checker command with unique idempotency/source IDs and valid break-glass identity, but live API returned `409 conflict`; no unverified ledger mutation was made. The existing governed 10-credit grant was used instead.
-- The governed path reached the compiler but correctly failed before provider execution because ADR-009 route binding/readiness is not yet promoted. A separate Lab canary with production scheduler temporarily disabled exercised Vertex directly: experiment `a258dda8-ea6e-4a34-94f0-4cd9ca301d17`, `candidate_ready`, `spentCredits=10`, `provider=vertex`, `model=gemini-3-pro-image`, route `ref/still/nanobanana-pro-v1`, region `global`.
+- At that date, the governed path reached the compiler and correctly failed before provider execution because ADR-009 route binding/readiness was not yet promoted. A separate Lab canary with production scheduler temporarily disabled exercised Vertex directly: experiment `a258dda8-ea6e-4a34-94f0-4cd9ca301d17`, `candidate_ready`, `spentCredits=10`, `provider=vertex`, `model=gemini-3-pro-image`, route `ref/still/nanobanana-pro-v1`, region `global`.
 - Runtime evidence: output `image/png`, `1,111,472` bytes, SHA-256 `sha256:9e9edaf59cb927610d043e3af3cac9b90c321ed48e55eb34ec0300c72dc429cf`; retrieval returned HTTP 200 and independently verified the same hash. API revision was restored to governed/composite defaults and worker env to composite after the canary.
-- API/worker were redeployed at Globe `main` `c3b6bf4a89ff40c1713cc07255d22b91e9ff97e9` (API run `30129902342`, worker run `30129904260`, both `success`) so the new `globe.producer.fleet.list` reader is live. Its workspace readback is honest: Seedream/Seedance loop/ElevenLabs TTS are `available`; Nano Banana Pro and the remaining candidate routes are `gated` with `not_promoted`; OpenAI routes are `blocked` with `provider_verifier_pending`.
-- The ADR-009 saga was not advanced: the exact route/binding/readiness records are absent and the required separate promotion identities could not be impersonated from this environment (`iam.serviceAccounts.getAccessToken` denied). No binding, readiness, or circuit bypass was performed. The 5000-credit canonical grant remains a live `409 conflict`; the one-active-grant hypothesis is not present in `credit-administration-store.ts`, so ISSUE-124 tracks phase-level conflict observability/root-cause closure.
-- Current state: **code complete, canary verde, rollout parcial/bloqueado**. Nano Banana Pro is not promoted: ADR-009 binding/readiness saga, exact identity readback, and fleet `available` readback remain outstanding.
+- API/worker were redeployed at Globe `main` `c3b6bf4a89ff40c1713cc07255d22b91e9ff97e9` (API run `30129902342`, worker run `30129904260`, both `success`) so the new `globe.producer.fleet.list` reader became live. Its readback at that date reported Seedream/Seedance loop/ElevenLabs TTS `available`, Nano Banana Pro `gated/not_promoted` and OpenAI `blocked/provider_verifier_pending`; the 2026-07-30 evidence above supersedes those mutable states.
+- No binding, readiness or circuit bypass was performed during that baseline. The later promotions used the governed identities and exact readbacks.
 
 - [x] Source of truth nombrado: catálogo público (rutas) + binding runtime (providerModelId) + resolución por-ruta en adapters. **DONE (ADR-013 + código Slice 2-3).**
-- [x] Dos modelos del mismo proveedor coexisten y se seleccionan por ruta (GPT Image 1.5 + 2 y/o Nano Banana Pro + 2) sin `route_binding_missing`. **DONE a nivel resolución/Lab** (test del segundo consumidor: `openai-v2`→`gpt-image-2`, `openai-v1-5`→`gpt-image-1.5`, dos modelos mismo proveedor). La ausencia de `route_binding_missing` en **producción** se valida al promover (rollout-pending).
-- [x] Seedream + Nano Banana Pro + GPT Image 2 + GPT Image 1.5 elegibles simultáneamente como imagen; Seedream sin regresión. **DONE** (catálogo v1.3.0 + composite por-ruta; 236/236 tests creative-runner verdes; Seedream sigue default vivo).
+- [x] Dos modelos del mismo proveedor coexisten y se seleccionan por ruta (GPT Image 1.5 + 2 y Nano Banana Pro + 2) sin `route_binding_missing`. **DONE en resolución, Lab y producción**; las cuatro rutas están promovidas y ejercitadas.
+- [x] Seedream + Nano Banana Pro + Nano Banana 2 + GPT Image 2 + GPT Image 1.5 + Recraft v4.1 elegibles simultáneamente como imagen; Seedream sin regresión. **DONE en runtime live**: selector `Disponible`, promociones exactas y generaciones UI reales.
 - [x] Semántica update (bump de versión en la ruta) vs add (ruta nueva) explícita y documentada; el catálogo público sin slugs (drift guard verde). **DONE** (ADR-013 + doc funcional/manual; `assertNoSlugLeak` verde con las rutas nuevas).
-- [~] Invariante de consistencia `binding.modelId == estimate.model == readiness.route.modelId` se mantiene con resolución por-ruta. **Diseño garantizado por construcción (ADR-013); no ejercitado en runtime** (sin promoción) — rollout-pending.
-- [x] Evidencia runtime por modelo (canary por el Lab) listada; región `global` para Vertex image. **DONE for canary**: experiment `a258dda8-ea6e-4a34-94f0-4cd9ca301d17`, 10 credits, `image/png`, 1,111,472 bytes, SHA-256 `9e9edaf59cb927610d043e3af3cac9b90c321ed48e55eb34ec0300c72dc429cf`; promotion remains pending.
-- [~] Promoción ADR-009 + reader `globe.producer.fleet.list`: API/worker deployados y reader verificado live, pero Nano Banana Pro sigue `gated/not_promoted`; no se declara promoción ni disponibilidad.
+- [x] Invariante de consistencia `binding.modelId == estimate.model == readiness.route.modelId` ejercitada en runtime para las rutas promovidas; el operador exacto falla cerrado ante mismatch.
+- [x] Evidencia runtime por modelo listada; región `global` para Vertex image. Nano Banana Pro,
+  Nano Banana 2, GPT Image 2, GPT Image 1.5 y Recraft tienen evidencia real; promoción completada.
+- [x] Promoción ADR-009 + reader `globe.producer.fleet.list`: seis rutas de imagen devuelven `available` y el Producer las ofrece como `Disponible`.
 - [x] ADR de resolución por-ruta indexado en `DECISIONS_INDEX`. **DONE (Slice 1, 2026-07-24):** ADR-013 = `docs/architecture/creative-studio/EFEONCE_GLOBE_ROUTE_BASED_MODEL_RESOLUTION_DECISION_V1.md`, indexado en `DECISIONS_INDEX.md` + `creative-studio/README.md`.
 - [ ] Cada ruta promovible referencia un rate version vigente de `TASK-1468` y un receipt de onboarding de `TASK-1578`.
 
@@ -353,20 +395,20 @@ resolución (ya es por-ruta).
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado con el estado real
-- [ ] el archivo vive en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [x] `GLOBE_RUNTIME_HANDOFF.md` actualizado con deploys, flags, IAM cleanup y bloqueo del governed Vertex-image worker path
-- [ ] `changelog.md` actualizado si cambió comportamiento visible
-- [ ] chequeo de impacto cruzado (TASK-1552 selector; TASK-1535 atestación por modelo)
-- [ ] ADR + doc funcional + manual del catálogo multi-modelo creados/actualizados
+- [x] `Lifecycle` sincronizado con el estado real: `in-progress` sólo por receipts cross-task
+- [x] el archivo vive en la carpeta correcta
+- [x] lifecycle y ubicación conservan `in-progress`; el registry canónico mantiene el mismo estado
+- [x] `GLOBE_RUNTIME_HANDOFF.md` registra las promociones finales, canaries UI y fixes de Nano Banana 2/Recraft
+- [x] `changelog.md` ya registra el comportamiento visible del 2026-07-30
+- [x] chequeo de impacto cruzado (TASK-1552 selector; TASK-1535 atestación por modelo)
+- [x] ADR + doc funcional + manual del catálogo multi-modelo creados/actualizados
 
 ## Follow-ups
 
-- Selector de modelo en UI (TASK-1552).
-- Lane de producción de OpenAI (verifier) si se difiere de esta task.
-- Multi-modelo para video y audio (misma resolución por-ruta, extensible).
-- Nano Banana 2 (`gemini-3.1-flash-image`) tras allowlist de Google.
+- Completar los receipts transversales de TASK-1468/TASK-1578 para cerrar el criterio 7 y mover
+  TASK-1553 a `complete`.
+- Las expansiones multi-modelo de video, audio y 3D siguen el mismo contrato por-ruta, pero se
+  ejecutan en sus tasks dueñas; no bloquean este rollout de imagen.
 
 ## Open Questions
 

@@ -113,6 +113,34 @@
       "sources": ["docs/architecture/agent-invariants/KNOWLEDGE_NEXA_AGENT_INVARIANTS.md"]
     },
     {
+      "id": "efeonce-globe-model-fleet",
+      "triggers": ["Efeonce Globe", "Creative Studio", "model fleet", "route card", "model route", "provider adapter", "FLUX 3", "Flux 3", "Fal", "Black Forest Labs", "BFL", "globe.producer.fleet.list"],
+      "skills": ["greenhouse-globe-model-fleet", "greenhouse-globe", "software-architect-2026"],
+      "sources": [
+        "docs/architecture/creative-studio/README.md",
+        "docs/architecture/creative-studio/DECISIONS_INDEX.md",
+        "docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_ROUTE_CARDS_DECISION_V1.md",
+        "docs/architecture/creative-studio/EFEONCE_GLOBE_ROUTE_BASED_MODEL_RESOLUTION_DECISION_V1.md",
+        "docs/architecture/creative-studio/EFEONCE_GLOBE_PROVIDER_COMPLETION_CAPTURE_DECISION_V1.md",
+        "docs/architecture/creative-studio/EFEONCE_GLOBE_ROUTE_CREATIVE_CONTRACT_DECISION_V1.md",
+        "docs/tasks/to-do/TASK-1642-globe-flux3-video-fleet-producer-integration.md",
+        "docs/operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md"
+      ]
+    },
+    {
+      "id": "efeonce-mcp-platform",
+      "triggers": ["MCP", "mcp.efeonce.org", "Streamable HTTP", "OAuth protected resource", "provider federation", "MCP tool", "MCP resource", "MCP prompt", "MCP Cloud Run", "MCP TLS", "MCP DNS", "Globe MCP provider", "MCP B2B entitlements"],
+      "skills": ["efeonce-mcp-platform", "software-architect-2026", "greenhouse-secret-hygiene"],
+      "sources": [
+        "docs/architecture/EFEONCE_MCP_AGENT_SKILL_ROUTER_V1.md",
+        "docs/architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md",
+        "docs/operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md",
+        "docs/tasks/in-progress/TASK-1626-efeonce-mcp-platform-gateway.md",
+        "docs/tasks/in-progress/TASK-1473-globe-contract-packaging-parity-certification.md",
+        "docs/architecture/agent-invariants/INTEGRATIONS_INFRA_AGENT_INVARIANTS.md"
+      ]
+    },
+    {
       "id": "notion",
       "triggers": ["Notion", "work management", "source sync", "teamspace"],
       "skills": ["notion-platform"],
@@ -135,6 +163,18 @@
         "docs/business-models/README.md",
         "docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md",
         "docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md"
+      ]
+    },
+    {
+      "id": "ai-creative-rights-governance",
+      "triggers": ["AI creative", "AI Creative Operations", "GenAI", "generative AI", "synthetic media", "voice clone", "likeness", "provenance", "rights", "rights pack", "AI rider", "AI contract", "AI consent"],
+      "skills": ["greenhouse-ai-creative-rights-governance", "legal-privacy-ip-operator"],
+      "sources": [
+        "docs/architecture/GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md",
+        "docs/services/creative-services/EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_V2.md",
+        "docs/services/creative-services/EFEONCE_CREATIVE_SERVICES_OPERATING_MODEL_V1.md",
+        "docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md",
+        "docs/architecture/creative-studio/README.md"
       ]
     },
     {

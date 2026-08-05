@@ -1,5 +1,11 @@
 # TASK-1468 — Globe Studio Credits Shadow Ledger
 
+## Delta 2026-08-02 — Credits no son costo ni contabilidad general
+
+El ledger de Studio Credits conserva rates, allocations, reservations y settlements de la unidad comercial de
+Globe. Greenhouse puede consumir receipts y costo técnico reconciliado mediante `TASK-1478`, pero no debe mapear un
+credit como gasto, revenue o journal line sin un evento económico y una regla contable independiente.
+
 ## Delta 2026-07-20 — reconciliar el seam de estimate con TASK-1502 (complete)
 
 TASK-1502 (complete) shippeó un **estimate previewable de PROVEEDOR-COSTO** (`globe.lab.experiment.estimate` +
@@ -20,7 +26,7 @@ Lab) ≠ `estimateCredits`/`getCreditEstimate` (credits) — son capabilities de
 ## Status
 
 - Lifecycle: `in-progress`
-- Priority: `P1`
+- Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
@@ -32,11 +38,11 @@ Lab) ≠ `estimateCredits`/`getCreditEstimate` (credits) — son capabilities de
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-028`
-- Status real: `Kernel y wiring local completos; migración y rollout comercial pendientes`
-- Rank: `TBD`
+- Status real: `Kernel y wiring existentes; cierre P0 de holds, expiry y settlement pendiente; rollout comercial separado`
+- Rank: `next.2`
 - Domain: `finance|creative|data`
 - Blocked by: `none`
-- Branch: `task/TASK-1468-globe-studio-credits-shadow-ledger`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -320,6 +326,12 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 - [ ] Costos vendor y margen sólo aparecen en readers de audiencia autorizada; client-facing recibe credits,
       modelo/ruta transparente y razones legibles sin secretos ni economía confidencial.
 - [ ] Reliability detecta holds vencidos/stuck, duplicados, projection drift, saldo bajo y desviación estimate/actual.
+- [ ] Existe un caller periódico gobernado para `expire`; una reservation vencida no puede retener saldo
+      indefinidamente y su liberación deja ledger/audit idempotente.
+- [ ] La proyección distingue saldo ledger histórico, funding elegible y capacidad efectiva; ninguno se presenta
+      como sinónimo de los otros.
+- [ ] Settlement con `actual > reserved` exige reautorización, settlement parcial o policy explícita de TASK-1579;
+      nunca excede caps/funding silenciosamente.
 - [ ] Greenhouse conserva lifecycle, audit, plan, QA, changelog y handoff; Globe conserva runtime/evidencia técnica.
 - [ ] No se habilitan producción ni clientes externos sin una task/gate posterior explícito.
 
@@ -340,3 +352,24 @@ Provider/GCP/Legal/Finance/Security sólo cuando el slice los afecte. Ninguna au
 ## Follow-ups
 
 - Las dependencias sucesoras se leen desde EPIC-028 y `docs/tasks/README.md`.
+
+## Delta 2026-08-01 — invariantes de cierre exigidos por TASK-1630
+
+La auditoría encontró que el command `globe.credits.expire` no tiene scheduler/caller operativo y que settlement
+puede aceptar `actual > reserved` mirando el saldo agregado sin reautorizar funding/caps. TASK-1468 sigue abierta
+hasta cerrar expiry/reconciliation y probar el enlace con la policy normativa de TASK-1579. Los 500.000 créditos
+históricos permanecen append-only: se clasifican en proyección, no se borran ni se duplican.
+
+## Checkpoint 2026-08-01 — expiry reconciliada code-complete local
+
+- Globe incorpora un caller periódico en el `globe-producer-worker` existente; no se creó otro scheduler.
+- El worker ejecuta primero finalización/recovery de governed runs y después expiry, nunca en paralelo.
+- Las reservas vencidas se reclaman con lease, fencing y `FOR UPDATE SKIP LOCKED`. Sólo un run/experimento
+  terminal `failed|cancelled` puede liberar mediante `globe.credits.expire`; `completed`, `timed_out`, estados
+  activos o ausencia de evidencia conservan el hold y entran a conciliación/defer.
+- `0044_credit_reservation_expiry_claims.sql` agrega metadatos operativos reconstruibles y no otra autoridad
+  económica. El flag de rollout permanece apagado por defecto.
+- Existe métrica de edad del hold vencido más antiguo y alerta WARNING a 900 segundos. Verificación focal:
+  399 tests domain, 132 database y 285 studio-web verdes; el gate completo de Globe se registra en TASK-1579.
+- Estado honesto: `code complete, rollout pendiente`; faltan aplicar `0043/0044`, deploy, activar el flag y
+  verificar el comportamiento live antes de marcar los criterios operativos como completos.

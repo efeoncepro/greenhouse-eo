@@ -26,6 +26,17 @@ los estados parciales que permanecen más abajo como registro histórico:
 Para el estado operativo vigente, prevalecen el runbook y este bloque de cierre sobre las tablas históricas
 de este mapa.
 
+## Actualización — 2026-08-01: guía visual agent-facing de AXIS
+
+El repo `efeoncepro/axis-design-system` publicó `DESIGN.md` en `main` mediante el commit `0e3c4d6`.
+El archivo sigue el formato alpha de Google, pero no se convierte en un segundo SSOT: su frontmatter
+estándar se genera desde `packages/tokens`, el repo expone `pnpm design:generate` y `pnpm design:check`,
+y CI valida que el documento no derive. Las extensiones que Google aún no modela —multi-brand, modos y
+resolución de roles— permanecen en los packages y contratos de AXIS.
+
+La distinción operativa queda así: el `DESIGN.md` raíz de Greenhouse describe el producto MUI/Vuexy; el
+`DESIGN.md` del repo AXIS describe la especificación visual portable compartida. Ninguno reemplaza al otro.
+
 ---
 
 ## 0. Los cuatro actores, y por qué confundirlos es caro

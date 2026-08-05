@@ -60,7 +60,7 @@ idear → storyboard → animatic → producir → editar → finalizar → entr
 
 - **El animatic es el punto de control barato.** Corregir timing y estructura en un animatic manual o
   determinístico consume `0 credits` (pero sí capacidad); corregirlo después de producir tomas IA puede
-  exigir nuevas operaciones/branches. **Aprobá el animatic antes de producir.**
+  exigir nuevas operaciones/branches. **Aprueba el animatic antes de producir.**
 - **No saltees fases hacia adelante.** Producir sin storyboard/animatic aprobado = generar tomas que
   el edit va a descartar (gasto de créditos tirado).
 
@@ -90,7 +90,7 @@ idear → storyboard → animatic → producir → editar → finalizar → entr
   (`modules/09 §7`). El texto de marca va real, en post.
 - **Escena/personaje/ambiente → IA** por velocidad y volumen; la IA colapsa timelines de meses a
   minutos.
-- **Cuando dudás, híbrido:** plate IA + capa humana encima es el default más robusto para marca.
+- **Cuando dudas, híbrido:** plate IA + capa humana encima es el default más robusto para marca.
 - El **finish (edición/sonido/grade)** es **humano** siempre — es donde vive el juicio y la cohesión.
 
 ---
@@ -115,7 +115,7 @@ idear → storyboard → animatic → producir → editar → finalizar → entr
 **Sólo la operación generativa gobernada cuesta credits; render/composición/edición determinísticos no.
 Entregar/publicar pasa SIEMPRE por confirmación humana.** No es negociable:
 
-1. **Dimensioná antes del volumen.** Descompone por capability, segundos, tier, controls, attempts y
+1. **Dimensiona antes del volumen.** Descompone por capability, segundos, tier, controls, attempts y
    upscales generativos; presenta rango de credits con rate version. Costo vendor es input interno, no
    equivalencia comercial (`modules/13`).
 2. **Prueba → validación → volumen.** Genera una toma o pocas variantes, que un humano valide

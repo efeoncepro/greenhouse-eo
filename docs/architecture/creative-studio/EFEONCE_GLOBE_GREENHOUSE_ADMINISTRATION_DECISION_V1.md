@@ -1,7 +1,7 @@
 # Efeonce Globe — Administración desde Greenhouse (créditos y capabilities) Decision V1
 
 - **Decision:** ADR-015
-- **Status:** **Partially implemented — carril de fondeo VIVO y ejercido end-to-end** (2026-07-26). **Slice A entregado** (fase de negación; cierra la mitad de diagnóstico de `ISSUE-124`). **Slice B entregado y VERIFICADO CON UN CASO REAL**: fondeo mensual `propose` → `confirm` punta a punta SIN break-glass, confirmado por el operador con su sesión real (grant +100 `posted`, tope 400→800, asiento de ledger, en UNA transacción; `confirm` en 905 ms tras cerrar el defecto 7 de TASK-1566 — el self-deadlock del store transaccional). **El retiro del §10 quedó EJECUTADO el mismo día** (rev `00114-k4t`): el caller genérico (y el broker, que cae en esa clase) perdió `grant.issue`/`grant.correct`/`policy.manage`/`budget.manage`, con la señal `globe.credit_admin.caller_authority_drift` en dos capas (runtime + test de disyunción) y verificada en cero; **Slice C ejecutado** (scripts de firma cliente eliminados). D (KMS), E completo (identidades disjuntas por unidad), F-H pendientes como hardening. Ver Delta 2026-07-26 (3) y TASK-1566 Delta (7).
+- **Status:** **Partially implemented — carril de fondeo VIVO y ejercido end-to-end** (2026-07-26). **Slice A entregado** (fase de negación; cierra la mitad de diagnóstico de `ISSUE-124`). **Slice B entregado y VERIFICADO CON UN CASO REAL**: fondeo mensual `propose` → `confirm` punta a punta SIN break-glass, confirmado por el operador con su sesión real (grant +100 `posted`, tope 400→800, asiento de ledger, en UNA transacción; `confirm` en 905 ms tras cerrar el defecto 7 de TASK-1566 — el self-deadlock del store transaccional). **El retiro parcial del §10 quedó EJECUTADO el mismo día** (rev `00114-k4t`): el caller genérico (y el broker, que cae en esa clase) perdió `grant.issue`/`grant.correct`/`policy.manage`/`budget.manage`, con la señal `globe.credit_admin.caller_authority_drift` en dos capas (runtime + test de disyunción) y verificada en cero; **Slice C ejecutado** (scripts de firma cliente eliminados). D (KMS), el resto de E (identidades disjuntas por unidad) y F-H permanecen pendientes. Ver Delta 2026-07-26 (3) y TASK-1566 Delta (7).
 - **Date:** 2026-07-26
 - **Owner:** Greenhouse control plane (superficie, identidad, desired access, entitlements) + Efeonce Globe (autoridad, firma, ejecución, evidencia)
 - **Scope:** La **administración de Globe desde Greenhouse** en sus dos mitades: **(a) créditos** — fondear el mes, emitir grants, publicar/superseder política de presupuesto, presupuestos de proyecto; y **(b) capabilities por usuario** — qué puede hacer cada persona dentro de cada workspace de Globe. Cubre la topología de identidades de las dos plataformas, el carril de transporte, el modelo de aprobación y firma, la atomicidad de la mutación, la observabilidad de la negación y la superficie de administración en el portal. **NO** cubre el ledger comercial en sí (TASK-1468), el spend fence de seguridad del Lab, la promoción de rutas (ADR-009/ADR-010), el payload de browser (ADR-014) ni el rollout comercial externo (TASK-1480).
@@ -11,7 +11,88 @@
 
 ---
 
-## Contexto (baseline verificado 2026-07-26 contra el código de los dos repos, no contra la doc)
+## Delta 2026-07-31 — Cliente administrativo instalado: OAuth public client + PKCE
+
+TASK-1566 dejó vivo el carril financiero, pero no cerró el acceso programático: las rutas Greenhouse
+requieren una cookie NextAuth y el broker OAuth sólo admite clientes confidenciales. Copiar cookies o embutir
+un `client_secret` en un CLI convertiría la atribución en impersonación o en un secreto redistribuible.
+
+**Decisión.** TASK-1629 extiende el broker canónico con `client_type = confidential|public`. Los clientes
+confidenciales conservan su secreto y redirect exacto. Un cliente público instalado:
+
+- usa Authorization Code + PKCE S256 y nunca posee/acepta `client_secret`;
+- autoriza en Greenhouse con una sesión NextAuth autenticada, humana o agente según la política del cliente;
+- recibe el code en un listener loopback efímero y conserva el token sólo en memoria;
+- consume API Platform `app`, que rehidrata entitlements y delega al mismo broker de fondeo;
+- conserva `actor_auth_mode` en la evidencia append-only y aplica la política delegada en la base.
+
+**Corrección explícita del 2026-07-31.** Efeonce opera el desarrollo con agentes; prohibir toda confirmación
+agente contradice ese modelo y empuja de nuevo a cookies humanas o break-glass. La frontera correcta es entre
+**principal de servicio genérico** y **usuario agente autenticado**, no entre humano y agente. Un agente puede
+proponer y confirmar únicamente cuando coinciden cinco controles: cliente OAuth público allowlisted, scopes
+`globe.credits.funding.propose|confirm`, entitlements Greenhouse, `agent_confirmation_enabled` por workspace y
+límites `agent_max_grant_credits`/`agent_max_monthly_cap_credits`. El default para cualquier workspace sigue
+siendo OFF; `greenhouse-org:efeonce` delega hasta 1000 créditos por grant y tope mensual máximo 2000. La base
+aplica y audita esos límites; no dependen de la disciplina del CLI.
+
+Para clientes públicos instalados se adopta la semántica loopback de RFC 8252: un redirect registrado
+`http://127.0.0.1/<path>` acepta un puerto efímero elegido por el sistema operativo, pero protocolo, hostname
+literal y path deben coincidir. Esto **no es wildcard**: `localhost`, IPv6, otro host, HTTPS, otro path,
+userinfo, fragmentos o la misma URI en un cliente confidencial siguen rechazados.
+
+La autoridad no cambia: Greenhouse autentica/atribuye; Globe verifica, firma y muta. API Platform y CLI son
+adapters, no un segundo command. El cliente puede suspenderse sin tocar los commands ni clientes OAuth vivos.
+
+**Alternativas rechazadas:** exportar cookies; tratar una identidad agente como humana; permitir al caller de
+workload fondear; password en CLI; API key administrativa global; secret embebido en cliente instalado.
+
+**Evidencia exigida:** tests negativos de client type/secret/redirect/replay, migración aditiva con default
+confidential, OAuth real usando una sesión autenticada, smoke DB de allow/deny/límites, fondeo real con readback
+correlacionado y verificación UI.
+
+## Delta 2026-08-01 — una instrucción del CEO autoriza ejecución agente end-to-end
+
+El workspace interno es owner-operated y el CEO es la autoridad presupuestaria. Exigir otra persona para cada
+fondeo no agrega una autoridad independiente disponible: bloquea la operación y vuelve a empujarla al
+break-glass. La decisión vigente se vuelve explícita:
+
+- una instrucción atribuida del CEO puede crear una autorización one-shot para workspace, período, target de
+  funding y cap exactos;
+- el mismo usuario agente autenticado puede ejecutar `preview → propose → confirm → readback` cuando
+  `requireSecondConfirmer` está OFF;
+- la evidencia conserva quién instruyó, qué agente ejecutó, vigencia, operation key, fingerprint y receipt;
+- cambiar el plan invalida la autorización one-shot y exige un nuevo preview/fingerprint o instrucción;
+- una delegación persistente sigue siendo versionada, revocable y acotada; el agente nunca puede ampliarla;
+- el segundo humano sólo aplica si una policy futura del workspace/umbral lo activa. En
+  `greenhouse-org:efeonce` permanece OFF.
+
+La separación obligatoria sigue siendo técnica: un workload genérico nunca confirma; el aprobador/firma de
+Globe no muta y el ejecutor no firma. Esta decisión no autoriza autofunding recurrente: cada operación nace de
+una instrucción o delegación vigente y deja readback terminal.
+
+## Estado operativo vigente vs estado objetivo
+
+Para leer esta ADR sin mezclar tiempos:
+
+- **Corrección 2026-08-01 — adapter MCP interno live:** `globe.credits.funding.ensure` ya está desplegado y
+  ejercido por el gateway `https://mcp.efeonce.org/mcp`. Es un adapter delgado que recibe únicamente una
+  `authorityId` one-shot, exige el scope dedicado, intercambia identidad con Greenhouse y llama el command
+  canónico; no recibe monto, workspace, período, cap, actor ni autoridad financiera. El canary terminó
+  `completed/no_effect` sin crear un segundo delta económico. Esta corrección no habilita clientes externos,
+  writes Nexa ni fondeo recurrente.
+- **Live:** fase de negación tipada; command transaccional `propose → confirm`; intents Greenhouse; OAuth public
+  client + PKCE; API Platform/CLI; autoridad one-shot CEO→usuario/agente; `ensure-funded` con resolución de
+  período/pool; status/list/get/reconcile y receipts autoritativos; workbench `/admin/globe/credits`; self-view
+  Producer; adapter MCP interno one-shot; caller genérico sin las cuatro capabilities retiradas. La firma sigue
+  siendo HMAC dentro del runtime de Globe y el acceso actual de Greenhouse está concedido a
+  `ROLE_CODES.EFEONCE_ADMIN`.
+- **Aprobado, no live:** adapter de escritura Nexa; KMS asimétrico, broker/aprobador/ejecutor físicamente
+  disjuntos y retiro del HMAC.
+- **Baseline histórico:** el Contexto siguiente registra lo observado al inicio del 2026-07-26. Las frases
+  “hoy”, “no existe” o “nunca fue ejercitado” dentro de ese baseline explican el diagnóstico de entonces y no
+  reemplazan el estado live anterior ni los deltas fechados.
+
+## Contexto histórico (baseline verificado 2026-07-26 contra el código de los dos repos, no contra la doc)
 
 ### 1. La dirección del operador
 
@@ -117,9 +198,11 @@ Es **deliberado** (no filtrar saldos ni política por un transporte compartido) 
 
 ### 1. Greenhouse es la SUPERFICIE de administración; Globe es la AUTORIDAD
 
-El operador administra donde ya vive — con sus entitlements, su sesión humana real y su auditoría. La decisión la **verifica, firma y ejecuta** el runtime de Globe. Greenhouse manda una **intención autorizada y atribuida** (quién, con qué entitlement, sobre qué workspace, con qué correlación); nunca una aprobación ya firmada.
+El operador o su agente delegado administra donde ya vive — con entitlements, sesión autenticada y auditoría. La decisión la **verifica, firma y ejecuta** el runtime de Globe. Greenhouse manda una **intención autorizada y atribuida** (quién, auth mode, entitlement, workspace y correlación); nunca una aprobación ya firmada.
 
-**Invariante duro, no negociable:** la llave de aprobación **nunca sale del runtime de Globe**, y **ningún actor obtiene aprobación y ejecución a la vez**.
+**Invariante duro, no negociable:** la llave de aprobación **nunca sale del runtime de Globe**, y ningún
+principal técnico/workload puede firmar/aprobar y ejecutar la mutación a la vez. Esto no prohíbe que el mismo
+usuario humano o agente autenticado proponga y confirme cuando `requireSecondConfirmer` está OFF.
 
 ### 2. El carril es `sister-platform`, no impersonación del caller genérico — y el caller genérico PIERDE la autoridad de crédito
 
@@ -127,7 +210,7 @@ El operador administra donde ya vive — con sus entitlements, su sesión humana
 - **Y la contraparte, que es la mitad que de verdad cierra el hueco:** el principal genérico `globe:service:internal-caller` **deja de cargar** `globe.credits.grant.issue`, `globe.credits.grant.correct`, `globe.credits.policy.manage` y `globe.credits.budget.manage` (`app.ts:3554-3562`). Esas capabilities se mueven a la clase de workload del ejecutor. Publicar el carril nuevo sin retirar el viejo deja **dos** caminos a la misma autoridad, y el viejo es el que no tiene gates.
 - `globe.credits.pool.manage` **se queda** donde ya está y como está: el `tenancy-operator` es hoy el checker independiente de activar/pausar un pool (`app.ts:3487-3497`), y esa disyunción ya funciona. No se toca lo que ya está bien.
 
-### 3. Topología de identidades: una identidad por propósito, ninguna con dos mitades
+### 3. Topología objetivo pendiente: una identidad por propósito, ninguna con dos mitades
 
 Cuatro identidades nuevas. La regla que las ordena: **la que reconcilia tenancy no es la que mueve plata, la que firma no es la que muta, y la que muta no puede firmar.**
 
@@ -135,7 +218,7 @@ Cuatro identidades nuevas. La regla que las ordena: **la que reconcilia tenancy 
 |---|---|---|---|---|
 | `greenhouse-globe-admin@efeonce-group` | Greenhouse | Broker de administración. **Distinta de `greenhouse-portal@`** (el reconciliador de tenancy) | `serviceAccountTokenCreator` **sólo** sobre `globe-admin-broker` | No reconcilia tenancy, no invoca Cloud Run directo, no lee ningún secreto de Globe |
 | `globe-admin-broker@efeonce-globe` | Globe (ingress) | Clase de workload que recibe las intenciones de Greenhouse. Principal `globe:service:admin-broker` | Readers de crédito + `globe.credits.funding.propose` + `globe.tenancy.grant.propose`. **Read-only y propose-only** | **No confirma, no muta, no firma, no corre el Producer, no gasta** |
-| `globe-credit-approver@efeonce-globe` | Globe (firma) | Mintea la evidencia de aprobación con KMS, y sólo si hay una confirmación humana atribuida (más el segundo confirmador cuando la política del workspace lo exija) | `roles/cloudkms.signerVerifier` sobre la clave de aprobación + `SELECT` sobre la tabla de propuestas | **Ninguna capability de crédito. Cero DML sobre agregados de crédito o ledger** |
+| `globe-credit-approver@efeonce-globe` | Globe (firma) | Mintea la evidencia de aprobación con KMS sólo tras una confirmación autenticada y autorizada por Greenhouse (más el segundo confirmador cuando la política lo exija) | `roles/cloudkms.signerVerifier` sobre la clave de aprobación + `SELECT` sobre la tabla de propuestas | **Ninguna capability de crédito. Cero DML sobre agregados de crédito o ledger** |
 | `globe-credit-executor@efeonce-globe` | Globe (mutación) | Ejecuta el confirm | `globe.credits.funding.confirm`, `grant.issue`, `grant.correct`, `policy.manage`, `budget.manage` + DML | **No puede firmar** (sólo `publicKeyViewer`: verifica, no produce) |
 
 **La disyunción se realiza como separación física, no como convención.** El aprobador corre en **su propia unidad de ejecución** (`apps/credit-approver`, Cloud Run service IAM-private, una sola superficie estrecha: *"dada esta propuesta verificada, firma su aprobación"*). Si aprobador y ejecutor viven en el mismo proceso corriendo como `api_runtime`, la disyunción es **cosmética** — `api_runtime` tendría las dos mitades y volveríamos al punto de partida con más YAML.
@@ -157,7 +240,7 @@ Por qué es la propiedad correcta, dicha sin adorno: **con un HMAC, quien puede 
 
 Transición, y es el punto one-way de esta ADR: durante el corte el verificador acepta **ambos** formatos (HMAC legacy + firma KMS), con un contador de uso del legacy y una **fecha de retiro declarada**. Cuando el contador quede en cero por N días, el HMAC se retira y `api_runtime` **pierde** `secretmanager.versions.access` sobre `globe-credit-approval-secret`. Un verificador dual sin fecha de retiro es un verificador simétrico con pasos extra.
 
-### 5. El comando gobernado `propose → confirm`: UN humano confirma, el agente nunca — y el segundo humano es POLÍTICA, no invariante
+### 5. El comando gobernado `propose → confirm`: sesión autenticada + delegación acotada; el segundo actor es POLÍTICA
 
 > **Delta 2026-07-26, dirección del operador — y corrige la primera versión de este punto, que exigía dos
 > humanos distintos.** El operador es hoy CEO y product owner del presupuesto de Globe, y exigir un segundo
@@ -169,25 +252,25 @@ El maker-checker estaba **fusionando dos amenazas distintas**, y sólo una justi
 
 | Amenaza | Qué la detiene | Costo para el operador |
 |---|---|---|
-| **T1 — un agente o proceso comprometido funde sin intención humana** | el LLM **propone**, jamás confirma; la mutación exige una confirmación humana atribuida | **un clic** |
+| **T1 — un workload o agente fuera de política intenta fondear** | scopes + entitlements + política por workspace + límites en Postgres; service principals rechazados | **cero** |
 | **T2 — el aprobador fabrica la evidencia o el ejecutor la falsifica** | aprobador ≠ ejecutor, **entre service accounts**, en unidades separadas | **cero** (es IAM) |
 | **T3 — un humano con autoridad funde sin testigo** | un segundo humano | **dos horas, y hoy es insatisfacible** |
 
-**T1 y T2 se quedan como invariantes duros** — no cuestan nada y son los que de verdad impiden que algo se
-autofinancie. **T3 pasa a ser política**: `requireSecondConfirmer`, declarada **por workspace y por umbral de
+**T1 y T2 se quedan como invariantes duros**. **T3 pasa a ser política**: `requireSecondConfirmer`, declarada **por workspace y por umbral de
 créditos**, con default **OFF** en el workspace interno owner-operated. Se prende donde un segundo actor
 **existe y significa algo**: workspaces de cliente, o por encima de un techo declarado.
 
 Lo que queda, entonces:
 
-1. **Un agente (o el operador) propone.** `propose` es read-only, devuelve el plan legible y expira.
-2. **El operador confirma.** Una sesión humana real de Greenhouse, con su entitlement y su audit. **Un actor
-   humano + una máquina** — que es exactamente el loop de acción gobernada que la plataforma ya usa para Nexa,
-   no una excepción inventada para esto.
-3. **Globe verifica, firma internamente (KMS) y ejecuta.** El aprobador no muta; el ejecutor no firma.
+1. **Un agente o humano autenticado propone.** `propose` es read-only, devuelve el plan legible y expira.
+2. **Una sesión autenticada confirma.** Para `auth_mode=agent`, la base exige delegación explícita del workspace
+   y límites de grant/tope mensual; para cualquier identidad siguen aplicando entitlement, audit y segundo actor
+   cuando la política o el umbral lo exigen.
+3. **Globe verifica, firma internamente y ejecuta.** Live usa el HMAC custodiado dentro de Globe; el target
+   pendiente migra a KMS con aprobador y ejecutor físicamente disjuntos.
 
 **Y esto es lo que elimina el break-glass como operación normal**, que era el objetivo real de esta ADR. Hoy el
-operador necesita break-glass porque **no puede firmar**; con un confirmador humano el camino normal funciona y el
+operador necesita break-glass porque **no puede firmar**; con un confirmador autenticado el camino normal funciona y el
 break-glass vuelve a ser lo que su nombre dice.
 
 **Lo que reemplaza la prevención con detección** (el trade correcto cuando el aprobador es el dueño): audit
@@ -195,24 +278,33 @@ append-only atribuido en los dos lados, la señal de reliability, y un **techo p
 segundo actor cuando el monto lo amerita. Así funciona cualquier tesorería real — umbral de aprobación, no dual
 control universal.
 
-**El invariante que NO se relaja, y hay que decirlo fuerte:** el LLM **nunca** cruza el gate de confirmación.
-Bajar de dos humanos a uno **no** habilita que un agente confirme solo: sigue habiendo exactamente una
-confirmación humana, y sin ella no hay mutación.
+**El invariante que no se relaja:** un workload genérico nunca cruza el confirm, y un agente no puede ampliar su
+propia delegación ni superar sus límites. La política vive en Postgres y la evidencia conserva `actor_auth_mode`;
+no depende de que el CLI se comporte bien.
 
 Dos comandos, un solo punto de mutación:
 
-- **`globe.credits.month.fund.propose`** — capability `globe.credits.funding.propose`, coverage `sister-platform: available` + `ui: available`. **Read-only.** Evalúa contra la política, el pool y el ledger vivos y devuelve un **plan legible**: grant propuesto, tope resultante, disponible resultante, y el `reason` actual de `budget.evaluate`. Persiste una **propuesta durable** con `proposalId`, fingerprint del payload y `expiresAt`. **No firma y no muta.**
-- **`globe.credits.month.fund.confirm`** — capability `globe.credits.funding.confirm`. **El ÚNICO punto de mutación.** Verifica que la propuesta exista, no esté vencida y su fingerprint calce; que las dos atribuciones humanas sean **distintas** y ambas autorizadas; pide la firma al aprobador; **verifica la firma**; aplica la mutación (punto 6); hace readback; devuelve el estado resultante.
+- **`globe.credits.month.fund.propose`** — capability `globe.credits.funding.propose`, coverage live
+  `sister-platform: available`. El consumo por UI ocurre a través del broker Greenhouse cuando TASK-1586/1483 lo
+  entreguen; no se declara `ui: available` directo mientras siga pendiente. **Read-only.** Evalúa contra la
+  política, el pool y el ledger vivos y devuelve un **plan legible**: grant propuesto, tope resultante,
+  disponible resultante y el `reason` actual de `budget.evaluate`. Persiste una **propuesta durable** con
+  `proposalId`, fingerprint del payload y `expiresAt`. **No firma y no muta.**
+- **`globe.credits.month.fund.confirm`** — capability `globe.credits.funding.confirm`. **El ÚNICO punto de mutación.** Verifica propuesta/fingerprint, política del actor y segundo confirmador cuando aplique; pide y verifica la firma; muta y hace readback.
 
 El maker-checker vive donde hay identidades reales:
 
-1. **Quien propone** —el operador o un agente con su autorización— compone la intención. Greenhouse valida el entitlement, la registra append-only y llama `propose` por el carril `sister-platform`. Si el proponente es un agente, **queda atribuido como tal**: proponer no es confirmar.
-2. **El operador confirma** en el portal, con sesión humana real. **Cuando `requireSecondConfirmer` está ON** para ese workspace o el monto pasa el techo declarado, el confirmador debe ser distinto del proponente humano — y esa disyunción se enforcea con constraint en Postgres **y** se re-verifica en Globe. Con la política OFF (default en el workspace interno owner-operated) **basta una confirmación humana**, y lo que se enforcea es que el confirmador **sea humano**, no que sea otro.
+1. **Quien propone** compone la intención; Greenhouse valida entitlement y registra identidad + auth mode append-only.
+2. **Quien confirma** usa sesión autenticada. Un agente requiere `agent_confirmation_enabled` y límites; cuando
+   `requireSecondConfirmer` o el umbral aplican, el confirmador debe ser distinto del proponente.
 3. **Globe (executor)** verifica, obtiene la firma del aprobador, ejecuta y hace readback.
 
-Esto arregla tres cosas a la vez: una intención = un comando (hoy son tres actos y dos firmas); cualquier agente puede **proponer** con la autorización del operador sin tocar `gcloud`, Secret Manager ni impersonación; y el maker-checker se vuelve **más fuerte**, porque desaparece el secreto en manos de clientes y aparece la comparación entre **dos actores autenticados** en vez de entre dos strings.
+Esto arregla tres cosas a la vez: una intención = un comando; los agentes operan sin tocar `gcloud`, Secret
+Manager ni impersonación; y la autoridad queda expresada como actores autenticados + política, no strings.
 
-**Y por Full API Parity la capability nace con contrato gobernado**, así que la UI del portal, Nexa y MCP la operan por construcción — Nexa con el loop `propose → confirmación humana → execute`, donde el LLM **nunca** cruza el gate de confirmación.
+**Por Full API Parity la capability nace con contrato gobernado.** API Platform, CLI, UI Greenhouse y el write
+interno MCP consumen los mismos commands/readers. MCP acepta sólo una authority one-shot ya sellada; ninguna
+superficie obtiene autoridad adicional. Nexa permanece pendiente hasta adoptar este mismo primitive.
 
 ### 6. Atomicidad: UNA transacción Postgres para grant + asiento de ledger + política; el intent durable cubre lo que no puede estar en la transacción
 
@@ -242,7 +334,9 @@ Y lleva **su propio contador y su propia señal**: `globe.credit_admin.break_gla
 Prerrequisito, no extra (Contexto §8). Tres movimientos, en orden de valor:
 
 1. **Una razón de fase estable y sanitizada** acompaña al `conflict` de los comandos de administración de crédito: distingue `approval_stale` / `approval_invalid` / `maker_checker_required` / `pool_paused` / `pool_exhausted` / `month_cap_exceeded` / `project_cap_exceeded` / `policy_unavailable` / `replay_fingerprint_mismatch`. **Es un enum cerrado**, no prosa: sin SQL, sin saldos, sin payload. El 409 sigue siendo 409 — lo que cambia es que el operador sabe **qué fase** lo produjo.
-2. **`globe.credits.budget.evaluate` y `budget.availability.get` pasan a `ui: available`** para principals de administración. Son readers, devuelven un `reason` tipado y `policyAvailable` vs `ledgerAvailable` — y **son exactamente lo que hoy obliga a sondear por el lane privado**. Que el desambiguador viva fuera del alcance de quien tiene que diagnosticar es el bug, no una protección.
+2. **TASK-1586 publica el diagnóstico al operador por el broker Greenhouse** y decide, con evidencia, si necesita
+   un reader `ui` redactado separado para Producer. El flip directo de `budget.evaluate`/`availability.get` no está
+   live ni es requisito del workbench; cualquier cambio de coverage/scopes conserva el rollout ADR-010.
 3. **El plan del `propose` incluye la evaluación**, así que el operador ve *por qué* está bloqueado **antes** de proponer, no después de un 409.
 
 Esto **cierra la mitad de diagnóstico de `ISSUE-124`** y evita que el carril nuevo herede la misma ceguera.
@@ -263,9 +357,9 @@ Esto **cierra la mitad de diagnóstico de `ISSUE-124`** y evita que el carril nu
 | **Ampliar el radio del secreto HMAC a una SA dedicada de credit-admin** | **Rechazada.** Es la versión mejor peinada de la anterior. Mantiene la propiedad de raíz — **leer implica forjar** — y sólo cambia quién tiene ese poder. La salida no es ampliar el radio: es mover la firma adentro y volverla asimétrica. |
 | **Reusar `globe-promotion-promoter@` / `globe-promotion-checker@` por tener forma de maker-checker** | **Rechazada.** Pertenecen al saga de promoción de **modelos** (ADR-009 / TASK-1527, `locals.tf:9-14`). Reusarlas sería tomar prestada una separación de deberes ajena para autorizar **gasto**, y su disyunción está diseñada contra otro riesgo. ADR-010 ya estableció que una clase de workload nueva merece su identidad propia y disjunta. |
 | **Aprobador y ejecutor como dos identidades dentro del mismo servicio, impersonadas por `api_runtime`** | **Rechazada por ser disyunción cosmética.** Si `api_runtime` necesita `tokenCreator` sobre las dos, tiene las dos mitades y el control no existe — sólo hay más YAML. La disyunción se paga con una unidad de ejecución separada o no se paga. |
-| **Un solo comando `credits.month.fund` sin `propose`** | **Rechazada, y el motivo sobrevive al cambio a un solo confirmador.** Sin propuesta durable el humano confirmaría **un payload, no un plan evaluado** — no vería el tope resultante, el disponible resultante ni la razón actual de `budget.evaluate`, que es justamente lo que evita proponer a ciegas y comerse un 409. Y desaparece la ventana de expiración, que es lo que impide confirmar sobre un estado que ya cambió. La propuesta no existe para darle trabajo a un segundo actor: existe para que la confirmación sea informada. |
+| **Un solo comando `credits.month.fund` sin `propose` durable** | **Rechazada, y el motivo sobrevive al cambio a un solo confirmador.** Sin propuesta durable la sesión confirmaría **un payload, no un plan evaluado** — no vería el tope resultante, el disponible resultante ni la razón actual de `budget.evaluate`. La fachada one-command puede orquestar las fases para un agente autorizado, pero no eliminar el plan, fingerprint, expiración y evidence receipt internos. |
 | **Una saga distribuida para grant + política** (el diseño objetivo del Delta (4)) | **Rechazada tras verificar el sustrato — y esto corrige el diseño objetivo.** El delta pedía *"comandos independientes con readback y reconciliación explícita del estado parcial"*, razonable si los agregados vivieran en stores distintos. **Viven los tres en el mismo Postgres de Globe**, así que la atomicidad real es alcanzable y una saga sería aceptar un estado parcial que no hace falta aceptar. Los comandos independientes **se conservan** para las intenciones simples; lo que se corrige es que la intención compuesta **no** necesita saga. |
-| **Administrar créditos desde un CLI mejorado en vez de una superficie en el portal** | **Rechazada.** Un CLI no tiene identidad humana verificable, ni entitlement, ni auditoría, ni un segundo actor — es precisamente el conjunto de propiedades que el maker-checker necesita. Y viola Full API Parity al revés: la capability existiría sin superficie gobernada. Los dos scripts de la sesión anterior se **retiran** cuando exista el comando; su premisa (firmar desde el cliente) contradice el diseño. |
+| **Administrar créditos desde un CLI que firma o usa credenciales técnicas propias** | **Rechazada.** Ese CLI no tendría identidad de usuario verificable, entitlement ni auditoría. El cliente OAuth `greenhouse-admin-cli` sí es una superficie gobernada: Authorization Code + PKCE autentica al usuario humano o agente, la API aplica scopes/entitlements y la base de datos aplica la delegación por workspace. Los scripts legacy se retiran porque firman desde el cliente, no por ser CLI. |
 | **Diferenciar capabilities por usuario en el token OAuth** | **Rechazada por un hecho técnico duro.** El broker acopla `capabilityScopes ⊆ requiredScopes`: un scope otorgable-pero-opcional no es representable, y agregarlo lo vuelve **requerido para todos**. Es exactamente el mecanismo que tumbó todo el login de Globe en ADR-010. La diferenciación por usuario vive en la proyección; el token es el techo. |
 | **Modelar las capabilities de Globe en el `capabilities_registry` de Greenhouse** | **Rechazada.** Volvería a Greenhouse autoridad del **vocabulario** de Globe, y como `parseGlobeCapabilities` descarta lo desconocido, un drift no daría error: daría desaparición silenciosa. Greenhouse es dueño del **desired state**; Globe del vocabulario. Compartir el registry es una decisión de frontera con su propia ADR. |
 | **Esperar a que el mes reinicie y no construir nada** | **Rechazada como estrategia, aceptada como mitigación de hoy.** El reinicio del mes libera el tope y desbloquea imagen/video sin tocar nada, y por eso no hay urgencia de break-glass. Pero deja intacta la causa: una identidad con las dos mitades y una llave como único freno. |
@@ -277,24 +371,38 @@ Esto **cierra la mitad de diagnóstico de `ISSUE-124`** y evita que el carril nu
 ### Safety
 
 - **Qué puede salir mal:** que un actor —humano o proceso— se **autofinancie**. Es el riesgo central y el único que justifica todo el aparato: quien puede fondear y gastar con la misma identidad puede convertir presupuesto en gasto sin testigo.
-- **Gates:** (1) capabilities dedicadas y **disjuntas** por propósito, nunca un rol admin amplio; (2) `propose` read-only vs `confirm` como único punto de mutación; (3) una **confirmación humana autenticada** de Greenhouse —el LLM nunca la cruza— más un **segundo confirmador distinto** cuando `requireSecondConfirmer` o el techo por operación lo exijan, enforceado con constraint en Postgres **y** re-verificado en Globe; (4) firma **asimétrica** en KMS accesible sólo por el aprobador, que no puede mutar; (5) ejecutor que no puede firmar; (6) el broker de administración es una identidad **distinta** del reconciliador de tenancy; (7) el caller genérico **pierde** la autoridad de crédito; (8) break-glass con TTL, motivo, aprobación, revocación automática y readback del corte.
-- **Blast radius si sale mal:** hoy — **plataforma completa**: una sola identidad impersonable con fondeo + gasto, frenada por la custodia de un archivo. Después — acotado a **un workspace por intención**, con una confirmación humana atribuida, una firma no forjable, y audit append-only que hace el fondeo reconstruible aunque el aprobador sea el dueño del presupuesto.
-- **Tres casos de abuso y la capa que los detiene:** *(a)* un agente intenta fondear con la sesión del operador → el `propose` **no muta** y el `confirm` exige una confirmación **humana** que el agente no puede emitir (y con `requireSecondConfirmer` ON, además un segundo actor); *(b)* alguien lee la clave para forjar una aprobación → con KMS asimétrico leer la pública sólo permite **verificar**; *(c)* un proceso comprometido intenta ser maker y checker → el aprobador (que no puede mutar) verifica la disyunción antes de firmar, y el ejecutor no puede fabricar la firma.
+- **Gates live:** `propose` read-only vs `confirm` único punto de mutación; sesión Greenhouse autenticada;
+  delegación/techo agente por workspace; segundo confirmador por policy; caller genérico sin las capabilities
+  retiradas. **Gates target pendientes:** firma KMS, aprobador/ejecutor disjuntos, broker dedicado y break-glass
+  gobernado.
+- **Blast radius si sale mal:** acotado a **un workspace por intención** y, para agentes, a límites explícitos por operación/tope mensual, con firma no forjable y audit append-only.
+- **Tres casos de abuso y la capa que los detiene:** *(a)* un agente intenta ampliar su autoridad → OAuth lo
+  identifica como agente y Postgres rechaza falta de delegación/exceso; *(b)* alguien lee la clave HMAC live →
+  riesgo residual que TASK-1584 elimina con KMS asimétrico; *(c)* un workload intenta confirmar → los principals
+  de servicio fallan cerrados; la disyunción física de firma/ejecución sigue siendo target TASK-1584.
 - **Verificado por:** el guard de disyunción de callers (`app.ts:1222`, ya existente para tenancy operator vs broker) extendido a las clases nuevas; test de cobertura capability↔grant; señal `globe.credit_admin.caller_authority_drift` (steady = 0) que detecta si el caller genérico volvió a cargar autoridad de crédito.
 - **Residual risk, nombrado:** el compromiso **simultáneo** del aprobador y del ejecutor sigue permitiendo el acto — ninguna separación de deberes sobrevive a eso, y no se está mitigando. Segundo residual, más probable: el break-glass sigue existiendo, y su expiración automática mitiga el olvido pero no el mal uso deliberado dentro de la ventana. Tercero: el `propose` filtra **agregados de presupuesto** (tope, disponible, razón) al plano de Greenhouse — es la señal que el operador necesita y es una ampliación consciente de lo que hoy sale por el transporte.
 
 ### Robustness
 
-- **Idempotencia:** sí. Clave derivada del `proposalId` (`fund:<proposalId>`), a una operación por propuesta. Un `confirm` repetido devuelve el estado resultante, no un segundo grant. Se reusa el patrón `grant:<grantId>` que `issueCreditGrant` ya aplica al asiento de ledger.
-- **Atomicidad:** **una** transacción Postgres para grant + asiento + política. Exige enhebrar el `TransactionPort` de `packages/database` por `CreditAdministrationStorePort` y `CreditAdministrationLedgerPort`, que hoy no pueden compartirla (punto 6).
+- **Idempotencia live:** el broker registra una sola decisión por propuesta y rechaza replays; el dominio evita un
+  segundo efecto económico. Tras timeout, el target TASK-1586/TASK-1629 exige readback-first y no retry ciego.
+- **Atomicidad live:** grant + asiento + política ya se ejecutaron en **una** transacción Postgres después de
+  corregir el self-deadlock documentado en el Delta 2026-07-26 (3).
 - **Protección de carrera:** concurrencia optimista existente (`expectedPolicyId` + `expectedVersion`, `expectedVersion` de pool y budget) resuelta **dentro** de la transacción; `SELECT ... FOR UPDATE` sobre la política vigente del workspace; la idempotencia vive en SQL (`ON CONFLICT DO NOTHING` + re-lectura), **nunca** read-then-write — entre réplicas eso es una carrera cuyo síntoma visible sería un grant duplicado, y los servicios corren a `maxScale=3`.
-- **Cobertura de constraints:** `CHECK` de que confirmante ≠ proponente en la tabla de propuestas de Greenhouse; `CHECK` de `expiresAt > proposedAt`; `UNIQUE` sobre `(workspaceId, proposalId)`; índice parcial `UNIQUE` sobre la política activa por workspace; `CHECK` de estado de la propuesta contra su máquina de estados; FK del desired state per-member contra `client_users.user_id` y contra el workspace bindeado.
+- **Cobertura de constraints:** trigger de confirmante distinto del proponente **sólo** cuando
+  `requireSecondConfirmer`/umbral lo exigen; `CHECK` de `expiresAt > proposedAt`; `UNIQUE` sobre
+  `(workspaceId, proposalId)`; índice parcial `UNIQUE` sobre la política activa por workspace; `CHECK` de estado de
+  la propuesta contra su máquina de estados; FK del desired state per-member contra `client_users.user_id` y el
+  workspace bindeado. Con policy OFF, el mismo humano o agente autenticado puede proponer y confirmar.
 - **Verificado por:** test de concurrencia con dos `confirm` simultáneos sobre la misma propuesta (uno gana limpio); test de que una propuesta vencida se rechaza con la fase correcta; test de que el fingerprint alterado se rechaza; test de la transacción parcial (fallo del publish de política deja **cero** grant). Todos registrados en el script `test` de su package — en Globe los scripts **enumeran los archivos a mano**, y un test no registrado no corre y deja la suite verde por no haberlo mirado.
 
 ### Resilience
 
 - **Política de reintento:** el `confirm` **no se reintenta a ciegas**. Ante timeout del cliente se **lee el estado primero** (la lección ya canonizada: un `execute` síncrono puede exceder el timeout del cliente y completar bien en el servidor; reintentar ahí gasta de nuevo). La firma de KMS sí se reintenta, acotada con backoff, porque es previa a la transacción y no tiene efecto.
-- **Dead letter:** una propuesta que expira sin confirmarse queda en estado terminal `expired` — **append-only**, nunca borrada — y visible en la superficie. Un `confirm` que falla después de firmar deja la propuesta en `confirm_failed` con la razón de fase, resumible por idempotencia.
+- **Dead letter target (TASK-1586):** una propuesta que expira sin confirmarse queda en estado terminal `expired`
+  — **append-only**, nunca borrada — y visible en la superficie. Un `confirm` que falla después de firmar deja la
+  propuesta en `confirm_failed` con la razón de fase, resumible por idempotencia.
 - **Señales de reliability** (steady = 0 las cuatro primeras): `globe.credit_admin.break_glass_active`; `globe.credit_admin.caller_authority_drift` (el caller genérico volvió a cargar crédito); `globe.credit_admin.partial_funding_state` (grant posteado sin su política — debería ser imposible por la transacción, y por eso mismo su aparición es la señal de que la transacción se rompió); `globe.credit_admin.legacy_hmac_approval_used` (mide el retiro del HMAC y **es lo que le da fecha real** al punto 4); y `globe.credit_admin.capability_desired_drift` (desired per-member vs proyectado), que en `shadow` es el reporte de divergencia del punto 7.
 - **Audit trail:** append-only en **los dos lados**. Greenhouse registra la propuesta, la confirmación y el entitlement ejercido; Globe registra la mutación con `correlationId`, `idempotencyKey`, fingerprint y la **firma** como evidencia verificable. La cadena causal mínima se conserva: `greenhouse auth audit id → intención atribuida → correlation id → command id → grant/policy id`.
 - **Procedimiento de recuperación:** runbook en `docs/operations/creative-studio/`, con el orden explícito (leer estado → decidir → reusar la clave de idempotencia) y la prohibición de SQL manual sobre agregados de crédito.
@@ -303,13 +411,18 @@ Esto **cierra la mitad de diagnóstico de `ISSUE-124`** y evita que el carril nu
 
 - **Big-O del hot path:** la administración de crédito **no es un hot path** — son unidades de intenciones por mes, no por segundo. El `propose` es O(1) sobre índices existentes (política vigente por workspace + candidatos de funding por pool). El único punto de contención real es la **política activa por workspace**, serializada a propósito por el `FOR UPDATE`: es exactamente lo que debe ser serial.
 - **Cobertura de índices:** los existentes de `credit_pools` / `credit_grants` / `credit_budget_policies` por `(workspace_id, status)`; nuevo índice de la tabla de propuestas por `(workspace_id, state, expires_at)` para el barrido de expiración.
-- **Caminos async:** el barrido de expiración de propuestas y la revocación automática del break-glass son **cron**, no request path. Del lado de Greenhouse van por **Cloud Scheduler + ops-worker**, no por Vercel cron: son async-críticos y Vercel no corre crons en staging.
+- **Caminos async target:** el barrido de expiración de propuestas pertenece a Globe y transiciona su lifecycle
+  mediante worker/command canónico; Greenhouse sólo puede disparar el command o consumir su readback, nunca
+  terminalizar por edad local. La revocación automática de break-glass pertenece a TASK-1585. Ambos usan
+  Cloud Scheduler + worker del runtime dueño, no Vercel cron.
 - **Costo a 10x:** lineal y despreciable. La única pieza con costo marginal nuevo es **KMS** (por operación de firma, unidades por mes) y **una unidad Cloud Run más** con `minScale=0` — o sea costo ~cero en reposo. El escalamiento que sí importa es **de personas**: la mitad de capabilities crece O(miembros × capabilities) en el desired state, y la proyección de Globe ya está dimensionada para eso (grants revisionados con historia acotada, ADR-006).
 - **Paginación:** los readers de propuestas, grants y desired state per-member nacen paginados por cursor con orden estable, no `OFFSET`.
 
 ### Cuando los pilares chocan (nombrado, no resuelto en silencio)
 
-- **Safety vs Resilience — y acá está la lección más cara de esta ADR.** La primera versión exigía **dos humanos distintos**, y en una organización donde el aprobador ES el dueño del presupuesto eso no frenó un abuso: frenó **el trabajo**, y desvió la operación al break-glass tres veces. **Un control que nadie puede satisfacer no protege, desvía** — y el desvío es peor que la ausencia, porque el break-glass otorga MÁS autoridad que el camino que reemplaza y depende de que alguien se acuerde de revocarlo. Resolución: el segundo humano baja de invariante a **política por workspace y por umbral**, default OFF donde no hay segundo actor; T1 (el agente nunca confirma) y T2 (aprobador ≠ ejecutor entre service accounts) se quedan porque **cuestan cero al operador**; y la prevención que se retira se reemplaza con **detección** (audit atribuido + señal + techo). El break-glass se conserva sólo como válvula, con TTL y contador — y el objetivo declarado es que su contador quede en cero, porque ahora el camino normal funciona.
+- **Safety vs Resilience.** El segundo actor baja de invariante a política por workspace/umbral. Para agentes, la
+  prevención correcta es una delegación fail-closed con límites y audit, no prohibir el modelo operativo entero.
+  Aprobador ≠ ejecutor entre service accounts se conserva; el break-glass sigue siendo sólo una válvula.
 - **Safety vs Scalability de proceso.** Una unidad de ejecución más y una clave de KMS son complejidad operativa real, agregada para un flujo de baja frecuencia. Se acepta porque el activo protegido no es la frecuencia sino el **poder de fondeo**, y porque la alternativa medida —una sola identidad con las dos mitades— ya está en producción hoy.
 
 ---
@@ -334,11 +447,13 @@ Esto **cierra la mitad de diagnóstico de `ISSUE-124`** y evita que el carril nu
 
 ## Reglas duras
 
-- **NUNCA** dejar que una identidad cargue a la vez autoridad de **fondeo** y de **gasto**. Hoy `globe:service:internal-caller` las tiene las dos (`app.ts:3515` + `3554-3562`); retirárselas es parte de esta decisión, no un follow-up.
+- **NUNCA** dejar que una identidad cargue a la vez autoridad de **fondeo** y de **gasto**. El baseline mostró esa
+  combinación; las cuatro capabilities de crédito ya se retiraron del caller genérico y la señal de drift debe
+  permanecer en cero.
 - **NUNCA** darle `secretmanager.versions.access` sobre un secreto de aprobación de Globe a `greenhouse-portal@` ni a ninguna identidad de Greenhouse. La llave de aprobación **nunca sale del runtime de Globe**.
 - **NUNCA** usar el reconciliador de tenancy (`greenhouse-portal@`) para administrar crédito ni capabilities de Globe: una identidad por propósito, y la que reconcilia tenancy no es la que mueve plata.
 - **NUNCA** reusar las identidades del saga de promoción de modelos (`globe-promotion-*`) para autorizar gasto: su separación de deberes está diseñada contra otro riesgo.
-- **NUNCA** dejar que un **agente o proceso** proponga y confirme: la confirmación es de un humano autenticado, siempre, y el LLM no la cruza. El **segundo humano** es política (`requireSecondConfirmer` por workspace + techo por operación), **no invariante** — exigirlo donde no hay segundo actor no protege, desvía al break-glass (Delta 2026-07-26). Y **NUNCA** apoyar ninguna de las dos disyunciones sólo en `approval.proposedBy !== context.actor.principalId`: para un caller de workload ese chequeo es **vacuo**, porque el principalId es una constante por clase (Contexto §3).
+- **NUNCA** dejar que un **principal de servicio o workload genérico** proponga y confirme. Un usuario agente autenticado sólo cruza el confirm si la delegación del workspace está activa y el plan queda dentro de ambos límites. El segundo confirmador sigue siendo política (`requireSecondConfirmer` por workspace + techo), no invariante. Y **NUNCA** apoyar ninguna disyunción sólo en `approval.proposedBy !== context.actor.principalId`: para un caller de workload ese chequeo es **vacuo**, porque el principalId es una constante por clase (Contexto §3).
 - **NUNCA** volver a un esquema de aprobación **simétrico**: con HMAC, quien verifica puede forjar. La firma es asimétrica y `asymmetricSign` es exclusivo del aprobador.
 - **NUNCA** dejar un verificador dual (HMAC + KMS) sin **fecha de retiro declarada** y sin la señal que mide el uso del legacy: un dual sin retiro es un esquema simétrico con pasos extra.
 - **NUNCA** emitir el grant y mover la política en dos transacciones dentro de la intención compuesta: los tres writes viven en la misma base y van en **una** transacción.
@@ -353,7 +468,9 @@ Esto **cierra la mitad de diagnóstico de `ISSUE-124`** y evita que el carril nu
 - **NUNCA** declarar el carril "prendido" sin verificar las dos cosas de siempre: que el flag esté **cableado** (`grep` en `infra/terraform/` devuelve más que su declaración) y que la **imagen desplegada** contenga el código que lo lee.
 - **SIEMPRE** retirar la autoridad vieja **después** de que la nueva esté verde con un caso real, y **nunca** antes: al revés se corta el único camino operable.
 - **SIEMPRE** registrar cada test nuevo en el script `test` de su package en Globe: los scripts enumeran los archivos a mano, y un test no registrado deja la suite verde por no haberlo mirado.
-- **SIEMPRE** que esta capability nazca, nace con contrato gobernado por Full API Parity: la UI del portal, Nexa y MCP la operan por construcción, y Nexa **nunca** cruza el gate de confirmación.
+- **SIEMPRE** que esta capability nazca, nace con contrato gobernado por Full API Parity. Nexa u otro agente sólo
+  cruza el gate con identidad agente autenticada y la misma política/límites server-side; nunca por un token de
+  workload ni atribución fabricada.
 
 ---
 
@@ -409,7 +526,7 @@ Esto **cierra la mitad de diagnóstico de `ISSUE-124`** y evita que el carril nu
   Los dos comandos, la propuesta durable con su máquina de estados, la firma **dentro del runtime** (el api ya
   tiene el secreto), grant + asiento de ledger + política publish/supersede en **UNA transacción Postgres**, los
   ports transaction-scoped, idempotencia en SQL por `proposalId`, readback y tests de concurrencia. Coverage
-  `sister-platform: available`. **Criterio de salida: el fondeo del mes ejecutado con UNA confirmación humana y
+  `sister-platform: available`. **Criterio de salida: el fondeo del mes ejecutado con UNA confirmación autenticada y
   CERO break-glass.**
 - **Slice C — la superficie de confirmación en Greenhouse.** ⚠️ **Regla de ordenamiento que `ISSUE-126` hizo
   explícita, y que este slice DEBE respetar:** las capabilities nuevas (`globe.credits.funding.propose`/`.confirm`)
@@ -472,3 +589,22 @@ Esto **cierra la mitad de diagnóstico de `ISSUE-124`** y evita que el carril nu
 > Slice E (identidades disjuntas por unidad de ejecución) y el Slice D (KMS) siguen pendientes como hardening.
 > Runbook operativo: `docs/manual-de-uso/creative-studio/fondear-creditos-globe.md`; explicación funcional:
 > `docs/documentation/creative-studio/fondeo-gobernado-creditos-globe.md`.
+
+### Delta de evidencia 2026-08-01 — proyecciones UI sin nueva autoridad
+
+TASK-1483 habilita para `sister-platform` únicamente readers redactados de pools, grants, budgets, forecast,
+alerts y ledger; los writes administrativos permanecen bloqueados. Greenhouse combina esas lecturas por secciones
+fail-closed y nunca crea un ledger o cálculo económico alternativo. TASK-1628 amplía sólo el self-status
+browser-safe: coverage/freshness y daily fence no mutante. Producer continúa sin commands administrativos.
+
+Los tres escenarios GVC premium y el smoke autenticado pasaron sobre las surfaces desplegadas. La frontera
+aprobada permanece intacta: Globe es autoridad económica y Greenhouse es control plane de identidad, intents y
+superficie. Revisiones, digests y deployments mutables viven sólo en `GLOBE_RUNTIME_HANDOFF.md`.
+
+> **Delta 2026-08-01 — rollover mensual sin dependencia circular, verificado live.** La fachada acotada
+> `ensure-funded` deriva el ciclo UTC y crea o reutiliza `internal-month:AAAA-MM` dentro de la misma transacción
+> que grant, allocation, policy y terminalización. No relaja el maker-checker de los comandos genéricos de pool.
+> Un pool determinístico pausado, cerrado o semánticamente incompatible falla cerrado; no se crea otro para
+> evadir la pausa. La operación live `23db5b0e-89dd-4661-9b8d-c12f9be4ad7a` dejó 800 efectivos sobre cap 1500 y
+> tuvo readback coincidente en Greenhouse, CLI OAuth PKCE y Globe Producer. Globe trabaja y despliega desde
+> `main`; Greenhouse integra este control plane en `develop`.

@@ -1,5 +1,13 @@
 # TASK-1306 — Growth SEO: Overview Cockpit UI
 
+## Delta 2026-08-05
+
+- **Desbloqueada parcialmente por TASK-1302 (complete).** La serie GSC existe: `greenhouse_growth.seo_gsc_daily` (query×page por `capture_date`, anclada a `organization_id`, NO a `seo_target_id`). Los KPIs GSC del cockpit (clicks/impresiones/CTR/posición) se leen de esa tabla, no del read-through en vivo.
+- ⚠️ Al agregar posición media: **ponderar por impresiones** (`SUM(position*impressions)/SUM(impressions)`). `AVG(position)` es incorrecto — GSC ya entrega su posición ponderada dentro del período.
+- La serie sólo se llena con `GROWTH_SEO_ENABLED=true` **y** el scheduler `ops-seo-gsc-snapshot` despausado (hoy ambos OFF/pausado). Hasta el flip la tabla está vacía: el cockpit debe mostrar el estado connect/empty honesto, nunca ceros.
+- El badge medido(GSC)/estimado(DataForSEO) sigue vigente: TASK-1300 no aterrizó, así que hoy TODO lo de esta serie es medido.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

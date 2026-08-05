@@ -43,7 +43,8 @@ axis-design-system package repository
   ├─ @efeoncepro/axis-ui-primitives
   ├─ @efeoncepro/axis-ui-greenhouse
   ├─ @efeoncepro/axis-ui-globe
-  └─ @efeoncepro/axis-design-system-lab
+  ├─ @efeoncepro/axis-design-system-lab
+  └─ DESIGN.md (agent-facing visual guide, generated from tokens)
 
 Consumers
   ├─ Greenhouse: MUI/Vuexy adapter
@@ -62,6 +63,13 @@ persistencia o jobs.
 - Los paquetes privados publicados en GitHub Packages son `@efeoncepro/axis-tokens`,
   `@efeoncepro/axis-ui-contracts` y `@efeoncepro/axis-ui-registry`; AXIS tokens está en `0.2.1`
   (compatibilidad funcional de `0.2.0` más aliases de tipos públicos).
+- El repositorio AXIS tiene un [`DESIGN.md`](https://github.com/efeoncepro/axis-design-system/blob/main/DESIGN.md)
+  agent-facing, publicado en `main` mediante `0e3c4d6`. Su frontmatter estándar se genera desde
+  `packages/tokens`; la semántica multi-brand, modos y mappings propios de AXIS siguen viviendo en los
+  packages y contratos. El workflow `design:check` lo verifica en CI.
+- El Lab del repo AXIS ya está migrado a Astro `7.1.6` con `output: 'static'`; Vercel publica
+  `apps/lab/dist` como referencia HTML/CSS pública. La búsqueda es un script vanilla mínimo y el Lab no
+  importa adapters de Greenhouse ni Globe.
 - Los repositorios `efeoncepro/greenhouse-eo` y `efeoncepro/efeonce-globe` tienen acceso
   `Read` configurado en GitHub Actions para los tres paquetes.
 - El proyecto Vercel independiente `axis-design-system-lab` ya no tiene `NPM_RC`: el Lab

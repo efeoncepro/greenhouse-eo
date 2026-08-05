@@ -90,7 +90,9 @@ El primer precedente real de esta categoría es el **Efeonce Wrapper SKY primer 
 
 Lectura de producto: valida la dirección de **"Tu año con Efeonce"** como artefacto de memoria/renovación, pero no significa que Greenhouse ya lo genere automáticamente. Para productizarlo hay que extraer un contrato reusable de contenido, assets, permisos, métricas, hosting y autorización de caso.
 
-Regla comercial: SKY no queda autorizado como caso público, testimonio o prueba comercial sólo por existir el wrapper. Usarlo públicamente exige autorización escrita y métricas/claims verificables.
+Regla comercial: el operador declara autorización para nombrar a SKY como caso de éxito. Usarlo públicamente sigue
+exigiendo respetar el alcance autorizado y conservar métricas/claims verificables; el wrapper por sí solo no autoriza
+datos, screenshots, nombres de personas, URLs, assets, pricing ni métricas adicionales.
 
 ---
 

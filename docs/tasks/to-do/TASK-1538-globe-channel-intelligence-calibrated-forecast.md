@@ -19,7 +19,7 @@
 - Rank: `TBD`
 - Domain: `data`
 - Blocked by: `TASK-1536`
-- Branch: `task/TASK-1538-globe-channel-intelligence-calibrated-forecast`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 
 ## Summary

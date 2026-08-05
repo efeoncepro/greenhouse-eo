@@ -113,7 +113,7 @@ az ad app federated-credential create --id "$APP_ID" --parameters @- <<EOF
 EOF
 
 # Cloud Run (ops-worker)
-# ver: docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md §federated
+# ver: docs/architecture/cloud-infrastructure/CICD_WIF.md (federated identity / WIF)
 ```
 
 > Nota: el code path de runtime aún consume el client_secret blob; reemplazar el blob por el resultado del federated assertion exchange es follow-up de TASK-671.

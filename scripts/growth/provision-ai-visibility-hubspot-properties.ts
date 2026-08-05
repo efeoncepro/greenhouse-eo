@@ -26,7 +26,7 @@ const DRY_RUN = process.argv.includes('--dry-run')
 const token = process.env.HUBSPOT_ACCESS_TOKEN?.trim()
 
 if (!token) {
-  console.error('FALTA HUBSPOT_ACCESS_TOKEN. Corré con: HUBSPOT_ACCESS_TOKEN="$(gcloud secrets versions access latest --secret=hubspot-access-token --project=efeonce-group)" pnpm tsx ...')
+  console.error('FALTA HUBSPOT_ACCESS_TOKEN. Corre con: HUBSPOT_ACCESS_TOKEN="$(gcloud secrets versions access latest --secret=hubspot-access-token --project=efeonce-group)" pnpm tsx ...')
   process.exit(1)
 }
 

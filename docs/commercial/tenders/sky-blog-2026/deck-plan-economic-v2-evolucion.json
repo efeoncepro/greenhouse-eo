@@ -1,0 +1,173 @@
+{
+  "_readme": [
+    "Deck económico V2 client-facing de la licitación SKY — SKY Visibility Core.",
+    "Es un artefacto separado del deck técnico V2 y conserva el deck económico anterior sin reemplazarlo.",
+    "El precio principal se presenta explícitamente como CLP 3.000.000 mensuales netos, sin IVA.",
+    "El IVA 19% se muestra por separado: CLP 570.000; total mensual facturado: CLP 3.570.000.",
+    "Notion/Content Hub concentra la grilla, los comentarios, los estados y las aprobaciones; WordPress recibe las piezas aprobadas.",
+    "Los Addons extienden el servicio y se cotizan aparte; no existe precio unitario por artículo.",
+    "El plan declara contentType + slots; el catálogo selecciona las plantillas de forma determinista.",
+    "Componer: pnpm deck:compose docs/commercial/tenders/sky-blog-2026/deck-plan-economic-v2-evolucion.json --out .captures/sky-bid-economic-v2-evolucion"
+  ],
+  "tenderId": "SKY-BLOG-2026-ECONOMIC-V2",
+  "slides": [
+    {
+      "slideId": "portada-economica",
+      "contentType": "cover",
+      "slots": {
+        "clientLogo": { "src": "assets/clients/sky-on-dark.svg" },
+        "proposalKind": "economic"
+      }
+    },
+    {
+      "slideId": "agenda-economica",
+      "contentType": "agenda",
+      "slots": {
+        "sectionLabel": "LO QUE VAMOS A REVISAR",
+        "title": "Inversión",
+        "deckMeta": "<b>5</b> decisiones para contratar",
+        "chapters": [
+          { "number": "01", "title": "El Core", "description": "La operación mensual de visibilidad", "targetSlideId": "propuesta-core" },
+          { "number": "02", "title": "El valor", "description": "Neto, IVA y total mensual", "targetSlideId": "valor-mensual" },
+          { "number": "03", "title": "La capacidad", "description": "Cómo se gobierna la cartera", "targetSlideId": "lectura-transparente" },
+          { "number": "04", "title": "La newsletter", "description": "Una extensión incluida del trabajo editorial", "targetSlideId": "newsletter" },
+          { "number": "05", "title": "Los Addons", "description": "Cómo ampliar la operación", "targetSlideId": "addons" }
+        ],
+        "footerLabel": "Propuesta económica · SKY Visibility Core"
+      }
+    },
+    {
+      "slideId": "propuesta-core",
+      "contentType": "narrative",
+      "slots": {
+        "sectionLabel": "LA CONFIGURACIÓN",
+        "title": "El Core concentra la inversión en una <em>operación mensual gobernada</em>",
+        "body": [
+          "<b>SKY no contrata una suma de artículos aislados.</b> Contrata una operación que organiza la cartera en Notion/Content Hub, decide la mezcla de nuevos y refreshes, produce, publica, mide y aprende en ciclos.",
+          "<b>La capacidad se organiza por profundidad.</b> La grilla puede incluir hasta 45–50 oportunidades, pero cada intervención se prioriza según intención, vigencia, complejidad y valor para el viajero."
+        ],
+        "closing": "Una inversión que convierte el contenido en <span class='ac'>un sistema de visibilidad.</span>",
+        "conceptLabel": "LA PROPUESTA",
+        "conceptTitle": "Capacidad + criterio",
+        "conceptLegend": [
+          { "layer": "Decidir", "definition": "Cartera, intención y prioridad", "tone": "outer" },
+          { "layer": "Producir", "definition": "Nuevo, refresh y publicación", "tone": "middle" },
+          { "layer": "Aprender", "definition": "Medición y siguiente ciclo", "tone": "core" }
+        ]
+      }
+    },
+    {
+      "slideId": "valor-mensual",
+      "contentType": "pricing",
+      "slots": {
+        "sectionLabel": "VALOR MENSUAL",
+        "title": "El Core concentra el valor en la operación editorial",
+        "summary": {
+          "amount": "$3.000.000",
+          "period": "mensual · configuración recomendada",
+          "taxNote": "CLP, neto sin IVA · con IVA: $3.570.000"
+        },
+        "pricingOptions": [
+          {
+            "label": "SKY Visibility Core",
+            "status": "PROPUESTA",
+            "scope": "45–50 · Notion/Content Hub · refresh + nuevo · SEO/AEO · publicación · newsletter",
+            "amount": "$3.000.000",
+            "isProposed": true
+          },
+          {
+            "label": "Core + Addons",
+            "status": "EXPANSIÓN",
+            "scope": "Mayor capacidad, profundidad, multimedia o mercados según alcance aprobado",
+            "amount": "Cotización separada",
+            "isProposed": false
+          }
+        ],
+        "commercialTerms": [
+          { "label": "Impuestos", "value": "IVA 19%: $570.000 · total mensual: $3.570.000" },
+          { "label": "Contrato", "value": "24 meses · precio fijo en CLP · sin reajuste" },
+          { "label": "Pago", "value": "Mensual · 30 días desde aceptación de factura" }
+        ]
+      }
+    },
+    {
+      "slideId": "lectura-transparente",
+      "contentType": "requirements-table",
+      "slots": {
+        "sectionLabel": "LECTURA TRANSPARENTE",
+        "title": "La cifra queda explícita: <em>neto, IVA y total</em>",
+        "summary": {
+          "value": "$3.000.000",
+          "label": "Valor mensual neto sin IVA",
+          "detail": "Con IVA 19%: $3.570.000 mensuales"
+        },
+        "requirements": [
+          { "kind": "excluyente", "requirement": "Valor mensual del servicio", "evidence": "CLP 3.000.000 netos, sin IVA.", "status": "cubierto" },
+          { "kind": "excluyente", "requirement": "IVA aplicable", "evidence": "19% equivalente a CLP 570.000 mensuales.", "status": "cubierto" },
+          { "kind": "excluyente", "requirement": "Total mensual facturado", "evidence": "CLP 3.570.000 con IVA incluido.", "status": "cubierto" },
+          { "kind": "puntúa", "requirement": "Proyección del contrato", "evidence": "CLP 72.000.000 netos en 24 meses; Addons por separado.", "status": "cubierto" }
+        ]
+      }
+    },
+    {
+      "slideId": "newsletter",
+      "contentType": "dual-list",
+      "slots": {
+        "leftEyebrow": "DENTRO DEL CORE",
+        "leftTitle": "La operación que sostiene cada ciclo",
+        "leftItems": [
+          { "lead": "Cartera priorizada", "body": "Hasta 45–50 oportunidades ordenadas en la grilla de Notion." },
+          { "lead": "Refresh + nuevo", "body": "Actualizaciones y piezas nuevas según la grilla aprobada." },
+          { "lead": "SEO/AEO + WordPress", "body": "Estructura, publicación, fuentes y control de calidad." },
+          { "lead": "Medición y aprendizaje", "body": "Reporte mensual y decisiones para el siguiente ciclo." }
+        ],
+        "rightEyebrow": "NEWSLETTER INCLUIDA",
+        "rightTitle": "El blog extiende su vida útil",
+        "rightItems": [
+          { "lead": "Curaduría", "body": "Selección editorial de hasta 10 contenidos por edición." },
+          { "lead": "Preparación", "body": "Títulos, bajadas, llamados y enlaces listos para cargar." },
+          { "lead": "Una ronda", "body": "Ajustes con SKY dentro del flujo mensual acordado." },
+          { "lead": "Envío en SKY", "body": "La plataforma, segmentación y envío permanecen en SKY." }
+        ]
+      }
+    },
+    {
+      "slideId": "addons",
+      "contentType": "capabilities-grid",
+      "slots": {
+        "eyebrow": "ADDONS",
+        "headline": "Los Addons amplían la capacidad cuando el ciclo lo requiere",
+        "intro": "Cada Addon extiende un componente del Core con alcance, plazo y valor aprobados.",
+        "highlight": "Se cotizan aparte y nunca convierten el servicio en un precio por artículo.",
+        "panelQuestion": "¿Qué puede ampliarse?",
+        "capabilities": [
+          { "kind": "authoring", "title": "New Content", "description": "Más capacidad para contenidos nuevos estratégicos." },
+          { "kind": "search", "title": "Deep Refresh", "description": "Más profundidad en piezas prioritarias del portfolio." },
+          { "kind": "governance", "title": "Technical SEO", "description": "Implementaciones que exceden la lane editorial." },
+          { "kind": "conversation", "title": "Newsletter", "description": "Mayor volumen, diseño o automatización." },
+          { "kind": "data", "title": "Multimedia", "description": "Video, visuales y adaptaciones adicionales." },
+          { "kind": "measurement", "title": "Market Expansion", "description": "Nuevos mercados, idiomas o versiones regionales." }
+        ]
+      }
+    },
+    {
+      "slideId": "condiciones-economicas",
+      "contentType": "comparison",
+      "slots": {
+        "leftTitle": "Incluido en el valor Core",
+        "rightTitle": "Se cotiza como Addon o permanece a cargo de SKY",
+        "rows": [
+          { "left": { "lead": "Cartera mensual", "body": "Priorización de hasta 45–50 oportunidades en la grilla de Notion." }, "right": { "lead": "Mayor capacidad", "body": "Más contenidos nuevos o refreshes profundos mediante New Content o Deep Refresh." } },
+          { "left": { "lead": "Newsletter preparada", "body": "Curaduría y preparación de hasta 10 contenidos por edición." }, "right": { "lead": "Envío y plataforma", "body": "Herramienta de email, base, segmentación, automatización y envío a cargo de SKY." } },
+          { "left": { "lead": "SEO/AEO editorial", "body": "Intención, estructura, metadata, enlazado, entidades y QA sobre el Content Hub." }, "right": { "lead": "Desarrollo técnico", "body": "Templates, arquitectura, rastreo o implementaciones de mayor complejidad." } },
+          { "left": { "lead": "Publicación y reporte", "body": "WordPress, control de calidad, medición y reportería mensual." }, "right": { "lead": "Expansiones", "body": "Multimedia, nuevos mercados, idiomas y adaptaciones regionales." } }
+        ]
+      }
+    },
+    {
+      "slideId": "cierre-economico",
+      "contentType": "back-cover",
+      "slots": {}
+    }
+  ]
+}

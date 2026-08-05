@@ -9,6 +9,10 @@
 > pruebas negocio) es **watch time/completion, saves, shares/sends y dwell**. Medir la vanidad
 > es medir el ruido.
 
+> **Modelo federado.** Una pieza social puede ser un cluster node buscable y medible. Su reporte
+> debe separar external search, búsqueda/recomendación in-platform y progreso downstream. Son
+> sistemas diferentes: sus impresiones no se suman.
+
 ---
 
 ## 1. Métricas por objetivo (elige el objetivo primero)
@@ -113,9 +117,28 @@ trimestral es para **decidir el rumbo**. No mezcles profundidad interna con lect
 - Proxies honestos de dark social: picos de "directo" tras un post, sends elevados, menciones no
   linkeadas, "¿de dónde me conociste?" en formularios (→ `greenhouse-growth-forms`).
 
-## 9. Borde con skills hermanas + cierre
+## 9. Medición de un platform-native cluster node
+
+| Plano | Fuente | Qué mide | Dueño |
+|---|---|---|---|
+| **External search** | Search Console Platform Property | clics, impresiones, CTR y posición en Google; Discover/News cuando aplique | `seo-aeo` |
+| **Platform search/recommendation** | analytics nativo de la red | Search/Browse/Suggested/For You, queries disponibles, reach, saves, watch time | `social-media-studio` |
+| **Downstream progress** | analytics web/CRM/producto | visita, suscripción, tool, diagnóstico, decisión, handoff | `growth-marketing-cro` |
+
+Search Console Platform Properties soporta Instagram, TikTok, X y YouTube con rollout gradual;
+confirma disponibilidad antes de diseñar el reporte. TikTok Creator Search Insights, YouTube
+Analytics, Pinterest Trends/Analytics y LinkedIn Page/post analytics tienen coberturas distintas:
+declara `measurement_source`, `surface`, ventana y limitaciones por métrica.
+
+Para un nodo del cluster reporta además `cluster_node_id`, `primary_job`, `search_intent`,
+`progress_event` y `next_best_node`. Evalúa si produjo el progreso esperado, no sólo si acumuló
+engagement. **Nunca sumes impresiones externas y nativas:** no representan la misma exposición.
+
+## 10. Borde con skills hermanas + cierre
 
 - **`growth-marketing-cro`** → atribución/funnel duro, dark social medido, CRO, experimentos.
+- **`seo-aeo`** → rendimiento de URLs sociales en Google y Search Console Platform Properties.
+- **`content-marketing-studio`** → pertenencia del nodo al territorio/Pillar/Cluster Experience.
 - **`digital-marketing`** → medición de campaña integrada multi-canal, media mix ROI.
 - **`dataviz-design`** → si el reporte necesita gráficos/dashboard visual serio.
 - **Cierra siempre** con `templates/social-report.md` (no con prosa suelta ni un dump).
@@ -124,5 +147,6 @@ trimestral es para **decidir el rumbo**. No mezcles profundidad interna con lect
 > calcules engagement rate sobre followers (usa alcance). **NUNCA** prometas viralidad ni cifras
 > de alcance/venta. **NUNCA** entregues un volcado crudo a un cliente (sintetiza). **NUNCA**
 > inventes atribución social precisa — el dark social es invisible y el funnel duro es
-> `growth-marketing-cro`. **SIEMPRE** declara el objetivo antes de elegir la métrica y reporta
+> `growth-marketing-cro`. **NUNCA** sumes impresiones de superficies incompatibles. **SIEMPRE**
+> declara el objetivo antes de elegir la métrica y reporta
 > tendencia contra el propio baseline.

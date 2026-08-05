@@ -16,7 +16,9 @@ Sin content-market fit, un calendario es solo un cronograma de publicar por publ
 
 El modelo canónico para construir autoridad temática sin dispersarte:
 
-- **Pillar** — pieza ancla, amplia y profunda, sobre un tema núcleo del negocio (long-form, evergreen, la "sede" del tema). Es el activo que se **atomiza** (`04`) y se **distribuye por siempre** (`05`).
+- **Pillar** — hogar canónico, durable y evergreen de un territorio. Permite aprender el mapa, explorar satélites
+  y, cuando corresponde, decidir; puede empezar como Document Pillar y no depende de un post type. Es el activo
+  que se **atomiza** (`04`) y se **distribuye por siempre** (`05`).
 - **Cluster** — piezas satélite que cubren subtemas/preguntas específicas y enlazan al pillar. Densifican el tema y capturan intención específica.
 - **Internal linking + intención de búsqueda + schema** = **táctica de `seo-aeo`**, no de este módulo. Aquí decides *qué pillars y qué clusters*; seo-aeo decide *cómo se estructura técnicamente para descubribilidad*.
 
@@ -27,17 +29,23 @@ Regla: **elige pocos pillars y ve profundo**, no muchos temas superficiales. 3�
 1. Cruce de **lo que el negocio vende** × **lo que la audiencia busca/pregunta** × **donde tienes autoridad real** (evita temas sin credibilidad).
 2. Valida **demanda** (volumen/intención — con `seo-aeo`/Semrush) y **diferenciación** (¿ya está saturado? ¿tienes ángulo?).
 3. Prioriza por **contribución al funnel** + **capacidad de producción sostenible**.
+4. Define la función antes del renderer: `post`, `page`, Gutenberg, Elementor o Astro no determinan si una pieza
+   es Pillar. Para Efeonce, aplica PDR-018 al separar Think producto de `think.efeoncepro.com` host.
 
-## Mapa pillar→cluster (artefacto)
+## Mapa Pillar Experience → Cluster Experience (artefacto)
 
-Cada pillar se documenta con sus clusters, etapa de funnel, formato, y su plan de atomización desde el día 1:
+Cada Pillar se documenta con nodos que resuelven trabajos de aprender, aplicar, evaluar, verificar o decidir. El
+cluster federado puede incluir artículos, casos, templates, research, tools y piezas platform-native; cada nodo
+declara superficie, roles, etapa, progreso, relación, medición y siguiente paso. No agrupes assets sólo por keyword
+ni eleves toda pieza social al cluster.
 
 ```
 PILLAR: "AEO: cómo te encuentra la IA"  [autoridad + demanda | evergreen]
 ├─ cluster: "¿Qué es AEO vs SEO?"            [awareness]
 ├─ cluster: "Cómo medir citabilidad en LLMs" [consideración]
 ├─ cluster: "Checklist de contenido citable" [consideración | lead magnet → 03]
-└─ atomización planificada → newsletter (Glitch), 6 posts social, 1 webinar clip
+├─ nodo platform-native: video "AEO vs SEO en 90s" [search + comprensión]
+└─ activation assets → newsletter (Glitch), 5 posts social, 1 webinar clip
 ```
 
 Plantilla: `templates/pillar-cluster-map.md`.
@@ -60,7 +68,8 @@ Un calendario editorial operable declara, por pieza:
 - **Pillar profundo:** mensual o quincenal.
 - **Cluster / posts de apoyo:** semanal.
 - **Newsletter:** cadencia fija (semanal/quincenal) — el compromiso de fecha es sagrado (`03`).
-- **Átomos social:** derivados de lo anterior (no producción paralela — `04`).
+- **Social:** mezcla gobernada de platform-native cluster nodes y activation assets derivados (`04`); el formato
+  no decide el rol.
 
 ## Balance de portafolio de contenido
 

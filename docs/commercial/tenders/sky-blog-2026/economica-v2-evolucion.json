@@ -1,0 +1,134 @@
+{
+  "$comment": "SKY Visibility Core V2. El precio principal es CLP 3.000.000 mensuales netos sin IVA; el builder muestra IVA 19% y total mensual con IVA. Los contenidos son capacidad priorizada, nunca precio unitario. No reemplaza economica.json, economica-core.json ni sus Excel anteriores.",
+  "output": "propuesta-economica-sky-visibility-core-v2.xlsx",
+  "sheetName": "SKY Visibility Core V2",
+  "title": "PROPUESTA ECONÓMICA",
+  "subtitle": "SKY Visibility Core — Operación de optimización editorial y visibilidad SEO/AEO",
+  "currency": "CLP",
+  "ivaRate": 0.19,
+  "meta": {
+    "Oferente": "Efeonce Group SpA",
+    "Licitación": "Servicio de Producción de Contenido Blog SKY (plataforma Wherex)",
+    "Configuración": "SKY Visibility Core",
+    "Fecha": "agosto 2026",
+    "Validez de la oferta": "120 días desde su recepción por parte de SKY"
+  },
+  "sections": [
+    {
+      "type": "value-table",
+      "title": "1. Valor de la operación mensual",
+      "columns": ["Configuración", "Alcance de la operación mensual", "Valor mensual (neto, sin IVA)"],
+      "rows": [
+        {
+          "cells": [
+            "SKY Visibility Core",
+            "Operación mensual de la cartera editorial: grilla y ciclo de vida en Notion/Content Hub · priorización de hasta 45–50 oportunidades · refresh ligeros y profundos · contenidos nuevos estratégicos dentro de la capacidad acordada · SEO/AEO editorial · publicación WordPress · QA · medición · reportería · newsletter mensual de hasta 10 contenidos",
+            3000000
+          ],
+          "strong": true
+        },
+        {
+          "cells": [
+            "Newsletter mensual",
+            "Incluida en el Core: curaduría, adaptación y preparación de hasta 10 contenidos, con títulos, bajadas, llamados, enlaces y una ronda de ajustes. SKY conserva la plataforma, segmentación y envío.",
+            "Incluida"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "totals",
+      "title": "Detalle visible del valor mensual",
+      "basis": 3000000,
+      "label": "Valor mensual neto sin IVA"
+    },
+    {
+      "type": "value-table",
+      "title": "Proyección del contrato",
+      "columns": ["Horizonte", "Valor neto sin IVA", "Total con IVA (19%)"],
+      "rows": [
+        { "cells": ["Mensual", "CLP 3.000.000", 3570000] },
+        { "cells": ["Anual — 12 meses", "CLP 36.000.000", 42840000] },
+        { "cells": ["Contrato — 24 meses", "CLP 72.000.000", 85680000], "strong": true }
+      ]
+    },
+    {
+      "type": "value-table",
+      "title": "2. Addons de capacidad",
+      "columns": ["Addon", "Alcance", "Precio"],
+      "rows": [
+        {
+          "cells": [
+            "New Content Capacity",
+            "Bloque adicional para contenidos nuevos estratégicos, incluyendo investigación, redacción, edición, QA y publicación; no es precio por artículo.",
+            "Cotización separada"
+          ]
+        },
+        {
+          "cells": [
+            "Deep Refresh",
+            "Bloques adicionales de investigación, reorganización, reescritura y optimización de piezas prioritarias.",
+            "Cotización separada"
+          ]
+        },
+        {
+          "cells": [
+            "Technical SEO Expansion",
+            "Implementaciones en WordPress, templates, arquitectura, rastreo o datos estructurados que excedan la lane editorial del Core.",
+            "Cotización separada"
+          ]
+        },
+        {
+          "cells": [
+            "Multimedia Content",
+            "Video simple, piezas visuales adicionales o adaptaciones sociales, según alcance, derechos y complejidad.",
+            "Cotización separada"
+          ]
+        },
+        {
+          "cells": [
+            "Newsletter Expansion",
+            "Mayor volumen, diseño, carga, segmentación o automatización más allá de la preparación mensual incluida.",
+            "Cotización separada"
+          ]
+        },
+        {
+          "cells": [
+            "Market Expansion",
+            "Adaptación de la operación a nuevos mercados, idiomas o versiones regionales.",
+            "Cotización separada"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "keyvalue",
+      "title": "3. Condiciones comerciales",
+      "rows": [
+        { "cells": ["Precio", "CLP 3.000.000 mensuales, valor neto sin IVA. IVA 19%: CLP 570.000. Total mensual facturado con IVA: CLP 3.570.000"] },
+        { "cells": ["Moneda", "Pesos chilenos (CLP)"] },
+        { "cells": ["Reajustes", "Sin reajuste durante la vigencia del contrato"] },
+        { "cells": ["Condiciones de pago", "30 días desde la correcta recepción y aceptación conforme de la factura por parte de SKY"] },
+        { "cells": ["Facturación", "Mensual"] },
+        { "cells": ["Modalidad de pago", "Transferencia electrónica a la cuenta bancaria de Efeonce Group SpA"] },
+        { "cells": ["Duración", "Dos (2) años a contar del inicio del servicio"] },
+        { "cells": ["Condiciones de término", "Renovable por igual período previo acuerdo de ambas partes, con notificación 60 días antes del término del período en curso"] },
+        { "cells": ["Desembolsos", "No aplican dentro del alcance descrito; la operación Core incluye planificación, contenido, SEO/AEO editorial, publicación, newsletter, medición y coordinación"] },
+        { "cells": ["Comisiones de plataforma", "Las comisiones de Wherex aplicables al adjudicado son asumidas por Efeonce y están consideradas en esta oferta"] },
+        { "cells": ["Validez", "120 días desde su recepción por parte de SKY"] }
+      ]
+    },
+    {
+      "type": "keyvalue",
+      "title": "4. Capacidad y responsabilidades",
+      "rows": [
+        { "cells": ["Cartera editorial", "Hasta 45–50 oportunidades mensuales, priorizadas mediante una grilla en Notion/Content Hub con mezcla variable de contenido nuevo, refresh ligero, refresh profundo y ad-hoc"] },
+        { "cells": ["Hub editorial", "Notion/Content Hub concentra briefs, fuentes, responsables, comentarios, estados, QA y aprobaciones; WordPress recibe las piezas aprobadas"] },
+        { "cells": ["Frontera de capacidad", "La ejecución se define por mezcla y profundidad; los excedentes se reprograman o pasan a un Addon previamente aprobado"] },
+        { "cells": ["Newsletter", "Incluye preparación de hasta 10 contenidos y una ronda de ajustes; SKY conserva plataforma, segmentación, automatización y envío"] },
+        { "cells": ["Responsabilidad de SKY", "SKY proporciona accesos, fuentes oficiales, responsables de aprobación y observaciones dentro de los plazos acordados"] }
+      ]
+    }
+  ],
+  "footerNote": "SKY Visibility Core: CLP 3.000.000 mensuales netos sin IVA. IVA 19%: CLP 570.000. Total mensual con IVA: CLP 3.570.000. Los contenidos expresan capacidad priorizada y no una unidad de precio; los Addons se cotizan separadamente según alcance."
+}

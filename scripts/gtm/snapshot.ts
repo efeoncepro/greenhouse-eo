@@ -72,7 +72,7 @@ const main = async () => {
   const liveJson = JSON.stringify(liveNorm, null, 2) + '\n'
 
   if (check) {
-    if (!existsSync(SNAPSHOT_PATH)) { console.error(`❌ no existe ${SNAPSHOT_PATH} — corré 'pnpm gtm:snapshot' primero`); process.exit(1) }
+    if (!existsSync(SNAPSHOT_PATH)) { console.error(`❌ no existe ${SNAPSHOT_PATH} — corre 'pnpm gtm:snapshot' primero`); process.exit(1) }
     const committed = readFileSync(SNAPSHOT_PATH, 'utf8')
 
     if (committed.trim() === liveJson.trim()) {
@@ -83,7 +83,7 @@ return
 
     console.error('❌ DRIFT — el container live difiere del snapshot commiteado.')
     console.error('   Tags live:', liveNorm.tags.map((t: any) => t.name).join(', '))
-    console.error("   Corré 'pnpm gtm:snapshot' para actualizar el snapshot (tras revisar que el cambio es intencional).")
+    console.error("   Corre 'pnpm gtm:snapshot' para actualizar el snapshot (tras revisar que el cambio es intencional).")
     process.exit(1)
   }
 

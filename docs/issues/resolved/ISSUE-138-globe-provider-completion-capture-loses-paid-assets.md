@@ -1,0 +1,390 @@
+# ISSUE-138 — Globe: la captura de completitud pierde assets ya cobrados en los tres proveedores
+
+> **Estado:** ✅ Resolved 2026-08-04 — **los 13 hallazgos cerrados y verificados en runtime**; D12 cerró con
+> `ISSUE-140` desplegado (`efeonce-globe@cd8bad1` + `@015b9d7`), y su verificación se re-confirmó el 2026-08-04
+> contra GCS sobre el attempt del canary sellado de Veo (`68a75b70-…`), no sólo sobre la corrida que lo cerró.
+> **Detectado:** 2026-08-04 · **Ambiente:** Globe producción (`globe-producer-worker`, `globe-api-internal`)
+> **Severidad:** Alta — tres caminos distintos terminan en un asset generado, facturado e irrecuperable
+> **Repo afectado:** `efeoncepro/efeonce-globe` · **Gobierna:** Greenhouse (EPIC-028, `TASK-1469`)
+
+## Delta 2026-08-04 (cierre) — ✅ **D12 VERIFICADO EN RUNTIME Y CERRADO**
+
+La ruta Veo generó por el camino gobernado y **el video aterrizó en nuestro bucket**, que es exactamente lo que D12
+implementaba:
+
+```
+gs://efeonce-globe-lab-evidence/governed-veo/d752100d-8933-4ad1-a4b6-3136c005b146/…/sample_0.mp4
+```
+
+Run `f0e8b876-fb0d-4949-9a22-a306fcaa454e` · attempt `d752100d-…` · `candidate_ready` · MP4 **7.988.662 bytes** ·
+`retained: true` · liquidación exacta (`reservation +32` → `settlement −32 reservado / +32 gastado`, sin doble cobro).
+
+**Con esto los 13 hallazgos de ISSUE-138 quedan cerrados.** Para ejercitarlo hubo que resolver antes `ISSUE-140`
+(dos defectos que impedían que la ruta llegara siquiera a generar).
+
+**Re-verificación de cierre (2026-08-04, noche).** D12 se re-confirmó sobre un attempt distinto del que lo cerró:
+el del **canary sellado** de la promoción de Veo, `68a75b70-91dc-4a7e-bd65-0d63dd0942f5`, que tiene su
+`sample_0.mp4` bajo `gs://efeonce-globe-lab-evidence/governed-veo/68a75b70-…/`. Que aterrice también por el carril
+del canary —y no sólo en la corrida que sirvió para cerrar el hallazgo— es lo que vuelve al arreglo un
+comportamiento del driver y no una coincidencia de una corrida. El lifecycle de este issue quedó abierto por
+descuido: el archivo siguió en `open/` con el header viejo ("queda D12") **tres deltas después** de que su propio
+cierre y `ISSUE-140` lo declararan cerrado.
+
+🔴 **Residuo declarado, sin dueño todavía.** El prefijo `ba0feca7-ca89-44db-879e-7e71c052d465/` sigue conteniendo su
+`sample_0.mp4`: es el video **generado y facturado** que el dominio perdió antes del arreglo. Existe en nuestro
+bucket y es inalcanzable desde el dominio —ningún agregado lo referencia—, así que no se recupera solo. Cerrar
+este issue **no** lo reconcilia; queda como el costo ya incurrido que el arreglo evita hacia adelante.
+
+🔴 **Y aparece la prueba de por qué D12 importaba, en la forma más cruda posible.** El prefijo del attempt
+`ba0feca7-…` —el del intento que murió con `veo_operation_evidence_invalid`— **contiene su propio `sample_0.mp4`**:
+Vertex generó y facturó ese video, y el sistema lo perdió porque no había persistido el nombre de la operación.
+Es el escenario que este issue describe —*"un asset generado, facturado e irrecuperable"*— capturado en vivo. Que
+el archivo esté ahí y sea inalcanzable por el dominio es, a la vez, la confirmación del riesgo y la evidencia de
+que `storageUri` es la mitigación correcta: sin él, ese MP4 sólo habría existido dentro de una Operation con
+retención no documentada.
+
+## Delta 2026-08-04 (noche) — la ruta Veo SE PROMOVIÓ y D12 sigue sin ejercitarse: el submit muere antes
+
+Se promovió `ref/video/frames-v1` end-to-end por el carril gobernado (`promotion_3902259f-c56b-4c7e-8589-5e31f9a077a3`:
+`planned → controls_staged → readiness_promoted → activated`, binding `enabled`, circuito `closed`) y se corrió una
+generación real. **El canary falló, y el fallo NO es de D12.**
+
+🔴 **D12 queda EXONERADO por medición.** Un probe de gasto cero contra `veo-3.1-generate-001` confirma que
+`storageUri` **es aceptado** por el endpoint (el 400 llega por otro campo). El arreglo de D12 está bien; lo que pasa
+es que **nunca se ejecuta**, porque el submit se rechaza antes de crear la operación en Vertex.
+
+La causa real es **`ISSUE-140`**: el materializer de inputs gobernados se construye para Veo sin encoder propio y
+hereda el default `{data, mimeType}` —la forma de `inlineData` de Gemini— cuando `:predictLongRunning` exige
+`{bytesBase64Encoded, mimeType}`. Vertex responde `image mime type is empty` → `veo_submit_invalid`.
+
+Evidencia: run `f1c0184f-c404-47cb-8f36-cfde131ace26`, attempt `bdcecae2-8047-4610-8702-e7b2002619d0`,
+`waiting → submitting → finalizing → terminal`, sin `provider_operation_id`. **Cero pérdida económica**: reserva 32 →
+release −32, `spent_delta = 0`. El prefijo `gs://efeonce-globe-lab-evidence/governed-veo/` sigue vacío, y ahora se
+sabe exactamente por qué.
+
+**Estado de D12: code complete, exonerado como causa, bloqueado por `ISSUE-140` para su verificación de runtime.**
+Cuando ese fix esté desplegado, re-promover cuesta 4 dispatches (~3 min) y la prueba de salida no cambia.
+
+## Delta 2026-08-04 (tarde) — D12 implementado y desplegado; **no ejercitable hoy**
+
+El arreglo de **D12** está implementado, desplegado y probado en rojo (`efeonce-globe@c1f17f4`): el driver
+gobernado de Veo pasa `storageUri` para que el video aterrice en **nuestro** bucket en vez de volver inline
+dentro de la Operation, cuya retención no está documentada.
+
+**El riesgo que lo había frenado quedó MEDIDO, no supuesto.** Quien escribe en `storageUri` no es nuestra SA
+sino el agente de servicio de Vertex (`service-818083690953@gcp-sa-aiplatform`); si no tuviera escritura fallaría
+**toda** generación de video. Verificado: el agente existe, tiene `roles/aiplatform.serviceAgent` a nivel de
+proyecto, y ese rol incluye `storage.objects.create` sobre un bucket del mismo proyecto.
+
+🔴 **Pero no se pudo VERIFICAR en runtime, y la razón importa: la única ruta Veo está apagada.**
+`ref/video/frames-v1` (`vertex-video` / `veo-3.1-generate-001`) tiene `enabled = false` en
+`production_route_binding_revisions`. El canary de generación autorizado corrió las tres modalidades y su video
+fue por **Fal Seedance** (`ref/motion/loop-v1`), así que **el camino de Veo nunca se ejecutó** — el prefijo
+`gs://efeonce-globe-lab-evidence/governed-veo/` está vacío, como corresponde.
+
+**Ejercitar D12 exige promover la ruta Veo**, que es un gate gobernado propio (readiness, atestación de derechos,
+revisión humana, binding y circuito) y no un flip. Hasta entonces el estado honesto es **code complete, sin
+evidencia de runtime** — y la exposición real es **cero**, porque una ruta apagada no genera.
+
+Lo que el canary sí probó: las tres modalidades generan, retienen y sirven correctamente sobre el código nuevo,
+con liquidación económica exacta (`noDoubleDebit: true`), y su aserción de integridad —la que falló antes de
+`ISSUE-139`— ahora **pasa**.
+
+## Cómo apareció
+
+No lo reportó un usuario ni una alerta: **lo destapó una pregunta del operador** — *"¿1469 no trataba de los
+webhooks y de saber cuándo un modelo avisa que el asset está listo?"*. Esa pregunta expuso que yo había cerrado
+`TASK-1469` verificando sólo la deuda de convergencia, con su bloque `## Acceptance Criteria` —22 ítems sobre
+justamente ese carril— sin recorrer. La auditoría que siguió, contrastando la documentación oficial de cada
+proveedor contra el código, encontró 13 huecos.
+
+**El sistema estaba en verde durante todo eso.** Los tres agujeros graves no producen error visible: dos de
+ellos fallan *exactamente en el momento del éxito*, que es la peor forma de fallar.
+
+## Los tres que pierden un asset ya cobrado
+
+### D1 · Fal — el rescate del lost-ack recupera el id y no las URLs
+
+Cuando el POST de submit llega a Fal pero nuestra respuesta HTTP se pierde, el attempt queda
+`submission_unknown` sin evidencia de operación. Después llega el webhook firmado, y el camino de rescate
+—cuyo propio comentario en el código se llama *"the lost-ack recovery path"*— escribe **sólo**
+`provider_operation_id` y `provider_accepted_at` (`packages/database/src/stores/governed-run-store.ts:625-631`).
+
+El único escritor de `provider_status_url` / `provider_response_url` es `markSubmissionAccepted`
+(`:497-505`), que ya no se va a ejecutar. Y las dos salidas exigen esas URLs:
+
+- `FalProductionResultDriver.resolve` → `fal_response_evidence_missing` (`production-result-drivers.ts:77-78`)
+- `FalGovernedRunDriver.reconcile` → `fal_provider_operation_evidence_missing` (`governed-provider-runtime.ts:191-193`)
+
+**Consecuencia:** Fal ejecutó y facturó; tenemos el `request_id` en la mano; el run queda trabado y la reserva
+de crédito colgada. Se ve sólo como un `retryStorm`.
+
+⚠️ **La salida obvia está prohibida por una regla dura vigente:** *nunca reconstruir las URLs de la queue de
+Fal desde el slug*. Cualquier arreglo tiene que respetarla o cambiarla con argumento, no rodearla.
+
+### D2 · Vertex/Veo — un techo de 2 MB delante de un video que vuelve en base64
+
+`DEFAULT_MAX_JSON_BYTES = 2 MB` (`production-result-drivers.ts:19`) acota el body del poll
+(`:311` → `:343` → `boundedResponseBytes`), mientras el mismo archivo declara un presupuesto de salida de
+**64 MB** (`:18`). Como **no pasamos `storageUri`**, el MP4 vuelve **inline en `bytesBase64Encoded`**, con el
+~33 % de sobrecosto de base64.
+
+Los polls `pending` pasan sin problema —son chicos— y **revienta exactamente el que trae el video**.
+
+**No depende de medición:** 64 MB a través de un caño de 2 MB es inalcanzable por construcción. Y el repo ya
+había resuelto este mismo problema para OpenAI con una constante dedicada de **24 MB** (`:20`) sin replicarlo
+en Veo.
+
+### D3 · Omni — una generación de minutos dentro de una lease de 60 segundos
+
+Google documenta que la generación de Omni *"can take over a minute"*; `GLOBE_GOVERNED_LEASE_MS` tiene default
+**60 000 ms** (`apps/creative-runner/src/governed-runtime-config.ts:32`).
+
+Si la lease vence con la llamada síncrona en vuelo, el sistema hace **lo correcto** y no re-submite: pasa a
+`submission_unknown` y encola reconcile. Pero `VertexOmniGovernedRunDriver.reconcile` exige un
+`providerOperationId` **que nunca se escribió** (`vertex-omni-governed-driver.ts:111-112`), porque la evidencia
+sólo nace al final del submit.
+
+**Peor:** los bytes **sí se ingirieron a GCS** (`:97`) y su hash se perdió. El asset existe, está pagado, y no
+hay forma de alcanzarlo.
+
+## Riesgo alto sin pérdida de asset
+
+### D4 · OpenAI — el submit síncrono no tiene timeout, y su anti-doble-cobro no está verificado
+
+`createOpenAiImagesGovernedTransport` hace `fetch` **sin `AbortSignal.timeout`**
+(`openai-images-governed-driver.ts:167`), mientras el transporte de Fal lo acota entre 1 s y 120 s
+(`governed-provider-runtime.ts:286-293`). Con lease de 60 s, una generación colgada permite que otro worker
+reclame el job y **vuelva a llamar a OpenAI**.
+
+La única defensa es el header `idempotency-key` (`:172`), y **NO ESTÁ VERIFICADO que OpenAI lo honre en
+`/v1/images/generations`**: no aparece en su referencia de Images.
+
+### D5 · El código de error del reconcile se borra — y es lo que vuelve invisible a D2
+
+`ProductionProviderResultError` guarda su causa en `.code` (`production-result-drivers.ts:24-30`), pero
+`reconciliationFailureCode` lee `.errorCode` (`packages/domain/src/governed-run-lifecycle.ts:665-672`).
+Resultado: `provider_response_too_large`, `veo_poll_quota_exhausted` y `veo_poll_access_denied` colapsan **en
+el mismo string**.
+
+Es **`ISSUE-127` en el único camino donde no se había arreglado**: `finalizationFailureCode` sí lee `.code`
+(`:581`). Y al borrarse el nombre, tampoco se puede clasificar → todo cae a `unknown`.
+
+### D6 · Fal no reporta `FAILED` por el status endpoint, así que el poll no sabe cerrar un fallo
+
+La queue de Fal documenta sólo `IN_QUEUE | IN_PROGRESS | COMPLETED`; el fallo del modelo llega como **código
+HTTP del response endpoint**. Nosotros mapeamos `404 ⇒ pendiente` cuando su doc dice *"the request cannot be
+found"*, y cualquier 5xx a `fal_result_unavailable` → reschedule
+(`governed-provider-runtime.ts:335-343`). Las ramas `FAILED`/`CANCELLED` del reconcile (`:204-209`) no
+corresponden a ningún valor documentado.
+
+**Si el webhook se pierde y el run falló en el modelo, el poll no lo cierra nunca** — reintenta con la reserva
+retenida. Es justo el modo de fallo que el poll existe para cubrir.
+
+## Medio y bajo
+
+| | Hueco | Riesgo |
+|---|---|---|
+| D7 | Fal: ventana de replay de 300 s contra una política de reintentos de 2 h. Si Fal reutiliza el timestamp original, todo reintento posterior a 5 min se rechaza. **NO VERIFICADO** en su doc | medio, se compone con D6 |
+| D8 | Fal: `catch` ciego que convierte cualquier error interno en 400 (`app.ts:1951-1953`) — un blip de Postgres descarta la señal | medio |
+| D9 | Fal: sin verificar `x-fal-webhook-user-id` ni la allowlist de IP que Fal publica en `api.fal.ai/v1/meta`. Su JWKS es **global**: un tercero puede provocar una entrega genuinamente firmada. No permite robar un asset, **sí matar runs ajenos** | medio |
+| D10 | Veo: la espera `pending` usa backoff de **error** en vez de la cadencia de espera que el módulo ya define (`WAITING_POLL_MS`). Hasta ~5 min de latencia después de que la pieza existe | medio |
+| D11 | Fal: fallbacks de modelo activos por defecto; el modelo que ejecutó puede no ser el del `route_snapshot` aprobado y tarifado | gobernanza económica |
+| D12 | Veo: `resolve()` re-consulta la operación mucho después del `done`; la retención de una Operation con resultado inline es **NO VERIFICADO** | medio |
+| D13 | OpenAI: el verificador de webhook es código muerto y su ruta es **irregistrable** (OpenAI usa una URL estática por proyecto; la nuestra exige el correlation id en el path) | bajo, pero engaña |
+
+## Lo que está BIEN y no hay que tocar
+
+- **`poll` para OpenAI es correcto POR DISEÑO**, no una omisión: OpenAI **no emite eventos de webhook para
+  imágenes**. Sus 16 eventos son `response.*`, `batch.*`, `fine_tuning.job.*`, `eval.run.*` y
+  `realtime/live.call.incoming`.
+- **Vertex no ofrece callback por request**; su propia doc de LRO describe polling. El worker durable es la
+  respuesta correcta, y los 2 intentos en `poll` con cero señales son **coherentes con el proveedor**.
+- **El esquema de firma de Fal coincide carácter por carácter** con su contrato: SHA-256 hex del cuerpo crudo,
+  cuatro partes unidas por `\n` en orden request-id → user-id → timestamp → digest.
+- **El digest se calcula sobre `rawBody`, nunca sobre JSON re-serializado.** Cualquier refactor que meta un
+  `JSON.parse`/`stringify` en el camino rompe la verificación.
+- **El payload del webhook nunca se persiste ni se usa como resultado**: siempre se lee del `response_url`.
+  Es literalmente la remediación que Fal prescribe para `payload_error`, y ya la teníamos.
+- **La dedupe** (`PK (provider, delivery_id)` + `UNIQUE (provider, provider_event_id)`) implementa exactamente
+  la recomendación de entrega at-least-once.
+- **La carrera webhook-antes-del-ack ya está resuelta**: `markSubmissionAccepted` adopta señales huérfanas en
+  la misma transacción.
+- **Un solo efecto económico por attempt** (`dedupeKey` + `UNIQUE (economic_decision_key)`).
+- **Una lease de `submit` vencida nunca vuelve a ser elegible.** En proveedores sin idempotency key, ésta es
+  la propiedad que impide pagar dos veces.
+- **Omni y la lane de imagen ingieren los bytes ANTES de acusar aceptación.** Es el orden correcto.
+
+## Nota de método sobre las fuentes
+
+`docs.fal.ai` devolvió **HTTP 429** en todos los intentos de lectura en vivo. Su contrato se leyó de **dos
+espejos verbatim independientes que coinciden entre sí**, más probes en vivo del JWKS (dos hosts) y de
+`api.fal.ai/v1/meta`. Es evidencia fuerte, **no de primera mano**. Las afirmaciones sobre OpenAI y Google sí
+provienen de su documentación oficial en vivo.
+
+Los tres hallazgos graves (D1, D2, D3) más D4 y D5 se **verificaron de forma independiente** leyendo el código,
+con `archivo:línea`.
+
+## Delta 2026-08-04 — resuelto end-to-end salvo dos que dependen del proveedor
+
+Nueve commits en `efeonce-globe@main`, `pnpm check` y `pnpm build` verdes en cada uno.
+
+| | Qué se hizo | Commit |
+|---|---|---|
+| **D2** | El techo del poll se **DERIVA** del presupuesto de salida a través de su expansión base64, y el submit conserva el suyo. Eran dos números que tenían que estar de acuerdo declarados por separado; ahora el test afirma la relación, así que subir uno sin el otro rompe el build. **Probado en rojo revirtiendo el fix** | `0e9d696` |
+| **D5** | `reconciliationFailureCode` lee `.code` además de `.errorCode`, y conserva la clase del error como sufijo. **21 códigos a `terminal`, 7 a `transient`, `veo_result_not_ready` a `waiting`** — la tercera espera del ciclo, que caía a `unknown`. `safeStatus` separa `rejected` en `invalid` (4xx) y `unavailable` (5xx) | `b88cfdb` |
+| **D3** | Lease de 60 s → 10 min. Una lease larga sólo hace más lento un takeover; una corta pierde una pieza pagada | `b0a85cb` |
+| **D4** | Timeout acotado en el submit de OpenAI, espejo del de Fal (30 s default, techo 120 s) | `b0a85cb` |
+| **D8** | El ingress devuelve **503** ante un fallo nuestro y **400** sólo ante un rechazo definitivo. El test existente atrapó que mi primera clasificación era demasiado gruesa: un cuerpo sobredimensionado también es definitivo | `b0a85cb` |
+| **D10** | Un `pending` usa la cadencia de espera (10 s fijos) en vez del backoff exponencial de error | `b0a85cb` |
+| **D6** | **Se respeta `X-Fal-Retryable`**, la propia señal del proveedor, en vez de inferir del status. El 400 pasa a leerse como «todavía no completada». El 404 se conserva pendiente **a propósito**: darlo por terminal con evidencia de segunda mano mataría corridas vivas | `3e9a599` |
+| **D9** | El `x-fal-webhook-user-id` se compara contra el nuestro cuando está configurado. Cableado de punta a punta (`GLOBE_FAL_USER_ID`) pero **sin configurar**, porque el valor no se adivina — ver abajo | `3e9a599` + `1febd9e` |
+| **D1** | El rescate parcial queda **nombrado y auditado** (`lost_ack_recovered_without_follow_up`). No se arregla adivinando la URL — ver abajo | `44c6da9` |
+| **D11** | `x-app-fal-disable-fallbacks` en cada submit: un reruteo silencioso cobraría por un modelo que nadie aprobó y dejaría el `route_snapshot` mintiendo | `a5ebb13` |
+| **D13** | El segmento de correlación pasa a ser **opcional sólo para OpenAI**, que configura su webhook por proyecto con URL estática. Su evento trae el `response_id` y el store ya sabe correlacionar por él. En Fal sigue obligatorio | `a5ebb13` |
+| **D7, D12** | **Declarados donde vive el riesgo**, no en un doc aparte | `0b5f875` |
+
+### Guards nuevos, todos derivados y en ambas direcciones
+
+- `production-result-failure-classification.test.ts` — **deriva el vocabulario del archivo fuente** en vez de copiarlo, y **encontró cuatro códigos que se me habían pasado**. Cubre también la dirección contraria: una excepción que deja de ser excepción queda mintiendo.
+- El test del presupuesto inline afirma que el techo puede transportar la salida declarada, con su margen de envoltorio.
+
+### Lo verificado en el panel de Fal, que confirma el diagnóstico desde el proveedor
+
+- Su sección «Webhooks» es un **registro** (*"View your webhook requests"*), **no una configuración**: no hay nada que habilitar. **34 entregas, todas `202`**, todas a `globe.efeoncepro.com/v1/provider-webhooks/fal/<handle>` — el handle va por request, confirmando la asimetría con OpenAI que motiva D13.
+- La API key del panel coincide con la nuestra.
+
+### Delta 2026-08-04 (b) — la doc de Fal en vivo cerró D1 y D7
+
+`docs.fal.ai` devolvía 429 a todo fetch programático, pero **es alcanzable desde el navegador real**. Eso
+convirtió dos "no verificados" en hechos.
+
+**D1 — CERRADO.** La doc en vivo más nuestros propios datos confirmaron que **la regla dura era correcta**: la
+base de la queue **no es derivable**. Medido contra `provider_response_url` real de esta cuenta:
+
+| endpoint de submit | base de seguimiento real |
+|---|---|
+| `bytedance/seedream/v5/pro/text-to-image` | `bytedance/seedream` (descarta **3** segmentos) |
+| `bytedance/seedance-2.0/text-to-video` | `bytedance/seedance-2.0` (descarta 1) |
+| `fal-ai/elevenlabs/tts/multilingual-v2` | `fal-ai/elevenlabs` (descarta 2) |
+
+Y la propia doc muestra `fal-ai/flux/schnell` **conservando los tres**. No hay regla de segmentos: hay un
+límite de «app id» que sólo Fal conoce. Derivarlo habría apuntado a leer el resultado de otro modelo.
+
+Entonces **se declara en vez de derivar**: `FAL_FOLLOW_UP_BASES`, una entrada por endpoint verificada contra
+las URLs que Fal devolvió en submits reales, usada **sólo** para reponer la evidencia cuando el ack se perdió.
+El camino normal sigue usando exclusivamente lo que Fal devuelve. Un endpoint sin entrada **no se recupera y
+falla nombrado** —correcto: mucho mejor que leer el resultado de otro modelo— y una base malformada se rechaza
+al construir el driver, no en medio de una recuperación.
+
+**D7 — CERRADO, sin cambiar nada.** La doc prescribe **exactamente ±300 s**, que es lo que ya hacíamos. La duda
+la resuelve la **consistencia interna de su propia página**: prescribe enforcar 300 s *y* describe reintentos
+durante 2 horas. Un proveedor no publica una guía de verificación que descarte el 90 % de sus propios
+reintentos, así que cada entrega se firma fresca. La ventana **no se amplía**: hacerlo debilitaría la
+protección sin ganar nada, y el control real contra replay es el dedupe durable por `(provider, delivery_id)`.
+
+**Y cae una sospecha que venía del espejo, no del código:** el host del JWKS que usamos (`rest.fal.ai`) es el
+**documentado**. El espejo decía `rest.alpha.fal.ai`.
+
+**D12 — acotado, no cerrado.** La retención de una Operation de Vertex con resultado inline **sigue sin estar
+documentada** (buscada en su página oficial de long-running operations). Pero su alcance cambió: **D2 ya cerró
+el modo de fallo seguro**, así que lo que queda es una **ventana de latencia**, no una pérdida garantizada. El
+arreglo estructural es `storageUri`; no se implementa detrás de un flag que nadie puede voltear sin canary,
+porque eso sería agregar exactamente el código muerto que D13 vino a limpiar.
+
+### Delta 2026-08-04 (c) — verificado con una generación real
+
+Canary de generación sobre el runtime desplegado. **La captura funciona de punta a punta:** run `completed`,
+experimento `candidate_ready`, Asset Governance `eligible`, pieza publicada. 10 créditos.
+
+**D9 cerrado con el valor MEDIDO, y el resultado justifica haberme negado a adivinarlo.** El observador emitió
+el user id sobre una entrega real y verificada: es un identificador estilo Auth0 (`github|…`) que **no se
+parece en nada** al username que muestra el panel de Fal. Configurarlo con la suposición natural habría
+rechazado **todas** las entregas legítimas y tumbado el carril de webhooks. Queda declarado en Terraform,
+aplicado y verificado en la revisión viva (`globe-api-internal-00205-kx5`), con `tofu plan` en `No changes`.
+
+#### 🔴 Hallazgo nuevo: el canary abortaba sobre un sistema sano
+
+El canary devolvió `producer_canary_worker_timeout` a los 20 minutos **mientras la corrida estaba perfecta** —
+completó sola en la entrega 21. El cuello **no era el proveedor**: Fal respondió en segundos. Es que el
+scheduler de **Asset Governance corría cada 5 minutos** y avanza un estado por tick, así que el camino en frío
+tardaba ~20-25 min. La paciencia del canary estaba **estructuralmente por debajo de la latencia real del
+sistema que vigila**.
+
+Un canary que aborta sobre un sistema sano es peor que no tenerlo: **enseña a leer «timeout» como normal**, que
+es exactamente cómo un cuelgue real pasa desapercibido. Subido a 45 min.
+
+> **Delta 2026-08-04 — el cuello se cerró por otro camino.** `ISSUE-137` bajó el cron a `*/1`
+> (`efeonce-globe@d78ce01`): governance mide **183 s** y el end-to-end **7,9 min**, con imagen y video
+> coincidiendo. Los 45 min de paciencia siguen siendo el número correcto, pero ahora quedan **~5× sobre la
+> latencia real** (eran ~2×). Y el hallazgo de este párrafo se confirmó por un segundo camino independiente
+> el mismo día: el readback de `ISSUE-137` llegó a la misma causa sin pasar por el canary.
+
+Y de paso confirma en vivo dos arreglos de esta sesión: la clase `waiting` sostuvo 21 entregas sin matar la
+corrida (con el tope viejo de `unknown` habría muerto en la tercera, con la pieza ya cobrada), y el reconcile
+quedó `superseded_by_terminal_state` como corresponde.
+
+### 🔴 Lo que NO se cierra, y por qué (superado en parte por el Delta (b))
+
+**D1 — el rescate del lost-ack sigue sin recuperar el asset.** La salida obvia (armar
+`{queue}/requests/{request_id}`) **está prohibida por contrato y no es derivable**: un modelo con sub-path deja
+de coincidir, así que adivinarla mandaría a leer el resultado de otra cosa. Tres formas candidatas, todas
+pendientes de decisión:
+
+1. **Base de seguimiento declarada por endpoint** en el allowlist — convierte una derivación imposible en dato
+   curado y verificado por un humano. Es la más alineada con el repo (*"si el motor sólo soporta N valores,
+   que el schema los ENUMERE"*), y necesita la doc en vivo de Fal.
+2. **El payload del webhook como portador de último recurso** — hoy nunca se persiste, y por buenas razones.
+   Cambia una postura de seguridad y es decisión del operador.
+3. **Command gobernado para adjuntar evidencia** — un humano que lee el request en el panel de Fal recupera la
+   corrida. La más cara, la que no depende de nadie más.
+
+Mientras tanto la corrida muere con un código nombrado y el rescate parcial queda auditado, así que estos casos
+son **enumerables**: sin eso ni siquiera se podía medir cuántos assets pagados se pierden por este camino.
+
+**D9 — el guard está cableado y deliberadamente sin configurar.** El panel de Fal **no expone ese identificador
+como valor**, sólo el username. Configurarlo con una suposición sería peor que dejarlo apagado: si el valor está
+mal, el guard rechaza **todas** las entregas legítimas y tumba el carril de webhooks — un fallo mayor que el que
+cierra. Así que el sistema lo **observa**: sobre una entrega real y ya verificada emite
+`globe.provider_webhook.account_identity_observed`, y sólo mientras el guard siga sin configurar. Con la próxima
+generación queda el valor medido y se configura.
+
+Que la observación sea **posterior** a la verificación no es un detalle de orden: si fuera antes, cualquiera
+podría dictar desde afuera el valor que el operador va a terminar configurando.
+
+### Rollout ejecutado
+
+Los **tres runtimes** en `0b5f875a19cb`, verificado con el drift guard contra revisión activa y digest —no
+contra el workflow en verde—: API `00203-77k`, Studio `00146-hdx`, worker `sha256:4060447a5095`. Salud
+post-deploy limpia.
+
+## Solución propuesta
+
+Orden por dependencia, no por severidad: **D5 primero porque es barato y destapa a los demás.**
+
+1. **D5** — `reconciliationFailureCode` lee `.code` además de `.errorCode`, espejo de `finalizationFailureCode`;
+   y los códigos del poll se clasifican en la política de reintentos **en el mismo commit** (regla de
+   nacimiento de `ISSUE-135`).
+2. **D2** — presupuesto de JSON propio para el poll de Veo, dimensionado contra el presupuesto de salida.
+3. **D1** — el rescate del lost-ack persiste la evidencia de seguimiento, **sin violar la regla de no
+   reconstruir URLs desde el slug**.
+4. **D3** — que una generación de minutos no muera por una lease de 60 s.
+5. **D4** — timeout acotado en el transporte de OpenAI, espejo del de Fal.
+6. **D6, D8, D9, D10** — clasificación honesta del 404/5xx de Fal, `catch` que distingue infraestructura de
+   firma inválida, verificación del `user-id`, y cadencia de espera en el reconcile.
+7. **D7, D11, D12, D13** — declarar lo no verificado y retirar o cablear el código muerto.
+
+## Lo que NO es
+
+- **No es** una falla del diseño de captura. Los tres mecanismos son los correctos para cada proveedor.
+- **No es** que a OpenAI le falte webhook: no existe para imágenes.
+- **No es** que Vertex debiera tener callback: no lo ofrece.
+
+## Relacionado
+
+- `TASK-1469` — dueña del carril de completitud; lleva el arreglo.
+- `ISSUE-127` — sanitización sin contraparte de observabilidad. **D5 es su aparición número 12**, y la primera
+  en el camino de reconciliación.
+- `ISSUE-135` — tope de reintentos sin señal. D5 le impide clasificar; D2 muere por su tope.
+- `ISSUE-137` — experimentos en `running` con cero intentos: familia adyacente, alcance propio.
+- `TASK-1470` — routing/fallback/circuit-breaker policy: dueña declarada de D11.

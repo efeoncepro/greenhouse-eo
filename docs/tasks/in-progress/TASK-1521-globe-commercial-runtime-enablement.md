@@ -17,11 +17,11 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Producer interno multimodal con sesión/viewer, outbox/queue age y severidades cerrados; runtime comercial externo bloqueado por 7 rutas, gate 0B y build units ADR-008`
+- Status real: `Producer interno multimodal con sesión/viewer, outbox/queue age y severidades cerrados; runtime comercial externo bloqueado por 7 rutas, gate 0B y build units ADR-008 ACTUALIZACION 2026-07-30 (barrido EPIC-028): el bloqueo de '7 rutas sin promocion' YA NO APLICA en esa magnitud — hoy hay 10 rutas OPERATIVAS en produccion gobernada (Nano Banana Pro promovido el 07-30, revision live 896a0620). Quedan 3 bloqueadas por TERCEROS (verifier de OpenAI x2, allowlist de Google x1) y 1 solo-Lab (Omni). Ninguna depende de trabajo interno. Ver EPIC-028_WIP_SWEEP_2026-07-30.md`
 - Rank: `TBD`
 - Domain: `creative|platform|identity|finance|ops`
 - Blocked by: `none`
-- Branch: `task/TASK-1521-globe-commercial-runtime-enablement`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -97,6 +97,24 @@ Reglas obligatorias:
   pending, pero no sirve bytes hasta eligibility; shared/client requiere además su policy de review/share.
 - Originales, derivados, Range gateway, feed projector y GC conservan boundaries separados según ADR-008.
 - Ningún estado `ready` se declara sin evidencia live de config, migration, IAM, secrets, data recovery y rollback.
+
+### Reactivated product baseline — UI/UX preservation invariant
+
+El baseline de producto para esta task es el **estado actualmente reactivado de Globe**, no el payload legacy ni
+una reconstrucción histórica. Separar GCP, PostgreSQL, storage, identidades o perfiles de runtime no autoriza a
+degradar, duplicar ni rediseñar la experiencia vigente.
+
+- El payload React reactivado, sus tokens, primitives, superficies, capabilities, copy, motion, responsive,
+  teclado, reduced motion y estados de error se conservan como baseline verificable.
+- Una separación de infraestructura debe ser transparente para la UI/UX salvo por capabilities, entitlements,
+  límites o estados de política que el runtime exponga explícitamente.
+- Los ambientes no crean forks visuales: comparten contrato de UI y diseño; la configuración server-side y los
+  grants determinan qué puede hacer cada actor.
+- La evidencia de migración o cutover compara contra el runtime reactivado actual (código, build servido,
+  capturas y browser behavior). El legacy puede servir sólo como referencia histórica ante una duda y nunca como
+  source of truth para recuperar o eliminar una superficie vigente.
+- Una regresión visual o funcional detectada durante el cambio de runtime bloquea el cierre de esta task aunque
+  config, deploy, DB, IAM y canary estén verdes.
 
 ## Normative Docs
 
@@ -343,11 +361,16 @@ Decisión de hosting/front door, GCP/IAM/DNS, OAuth, provider credentials/accoun
 - [ ] `globe_worker_failed` tiene severidad/condición accionable y payload/runbook verificados.
 - [ ] IAM/secrets/data/storage/providers están aislados y verificados sin exponer valores.
 - [ ] Canary, recovery/restore y rollback tienen evidencia live; `TASK-1480` consume el pack antes del readiness final.
+- [ ] El cambio de runtime conserva el baseline UI/UX reactivado actual: payload React, tokens, primitives,
+      capabilities, motion, responsive, teclado, reduced motion y estados de error; la evidencia compara contra
+      el runtime reactivado y no contra el legacy.
 
 ## Verification
 
 - `pnpm task:lint --task TASK-1521`
 - `pnpm check` y config/IaC validation en `../efeonce-globe`.
+- Capturas/browser checks del runtime reactivado antes y después del cambio, en desktop y 390 px, incluyendo
+  capabilities visibles, estados bloqueados, motion/reduced-motion, teclado y ausencia de `scrollWidth` overflow.
 - E2E staging/commercial canary, Range/load/GC, negative gates, backup/restore y rollback rehearsal.
 
 ### Evidencia internal-only — 2026-07-23

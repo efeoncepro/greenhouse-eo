@@ -316,21 +316,12 @@ Why this matters:
 - the migration history is shared operational state
 - careless catch-up can cross lanes and muddy branch ownership
 
-### 7. Worktree-local build tooling matters
+### 7. Historical note: isolated-checkout build tooling
 
-The worktree implementation exposed a concrete Next.js/Turbopack caveat:
-
-- Turbopack rejected a `node_modules` symlink that pointed outside the worktree root
-
-Practical rule for agents:
-
-- when validating builds from an isolated worktree, use a real local `node_modules` directory
-- do not assume a symlinked dependency tree is always acceptable to the frontend toolchain
-
-Why this matters:
-
-- a build failure caused by worktree plumbing can be mistaken for an application regression
-- this is especially relevant in multi-agent execution where isolated worktrees are now the expected pattern
+An earlier implementation observed that Turbopack rejected a `node_modules` symlink outside an isolated checkout.
+This is historical evidence only. Agents must not recreate that topology to validate it: the shared checkout is now
+the sole authorized execution environment. See
+[`REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md`](agent-invariants/REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md).
 
 ## Critical Considerations For Future Adoption
 

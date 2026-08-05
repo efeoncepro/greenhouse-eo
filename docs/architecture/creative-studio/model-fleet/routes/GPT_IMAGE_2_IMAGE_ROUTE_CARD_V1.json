@@ -1,0 +1,274 @@
+{
+  "schemaVersion": "model-route-card.v1",
+  "cardId": "route-card/gpt-image-2-image",
+  "snapshot": {
+    "observedAt": "2026-08-04",
+    "maxAgeDays": 14,
+    "revalidateBeforeUse": true
+  },
+  "authority": {
+    "availabilityReader": "efeonce-globe:globe.producer.fleet.list",
+    "humanLedger": "docs/operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md",
+    "providerEvidence": "OpenAI GPT Image 2 model documentation, Images API documentation and Efeonce commercial evidence"
+  },
+  "modelFamily": {
+    "publicName": "GPT Image 2",
+    "familyKey": "gpt-image-2-image",
+    "modality": "image",
+    "globeStatus": "available",
+    "summary": "The request label ‘Imagen 2 de ChatGPT’ is normalized to OpenAI GPT Image 2 (`gpt-image-2`). Globe has one available prompt-to-image route. Google Imagen 2 is a different, deprecated family and has no route or adapter in this runtime.",
+    "integrationDecision": "Keep the exact OpenAI Images generations route and its poll completion driver. Do not infer OpenAI editing support from the provider docs: Globe exposes generation only until a dedicated multipart edit transport, route identity and governed evidence exist. Keep GPT Image 1.5 as its own sibling route, not as an alias of this card."
+  },
+  "evidence": [
+    {
+      "id": "fleet-ledger",
+      "authority": "runtime_primary",
+      "kind": "human-model-ledger",
+      "observedAt": "2026-08-04",
+      "reference": "docs/operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md",
+      "revalidateBeforeUse": true
+    },
+    {
+      "id": "reader-live",
+      "authority": "runtime_primary",
+      "kind": "live-fleet-reader",
+      "observedAt": "2026-08-04",
+      "reference": "efeonce-globe:globe.producer.fleet.list",
+      "revalidateBeforeUse": true,
+      "note": "The reader is the availability authority for the internal workspace; availability is not inferred from catalog presence."
+    },
+    {
+      "id": "route-catalog",
+      "authority": "repo_primary",
+      "kind": "producer-route-catalog",
+      "observedAt": "2026-08-04",
+      "reference": "efeonce-globe:packages/domain/src/producer-catalog.ts",
+      "revalidateBeforeUse": false
+    },
+    {
+      "id": "openai-adapter",
+      "authority": "repo_primary",
+      "kind": "openai-images-adapter",
+      "observedAt": "2026-08-04",
+      "reference": "efeonce-globe:apps/creative-runner/src/openai-adapter.ts",
+      "revalidateBeforeUse": false
+    },
+    {
+      "id": "governed-composition",
+      "authority": "repo_primary",
+      "kind": "governed-openai-endpoint-allowlist",
+      "observedAt": "2026-08-04",
+      "reference": "efeonce-globe:apps/studio-web/src/governed-production-composition.ts",
+      "revalidateBeforeUse": false
+    },
+    {
+      "id": "composite-policy",
+      "authority": "repo_primary",
+      "kind": "route-to-provider-composite-policy",
+      "observedAt": "2026-08-04",
+      "reference": "efeonce-globe:apps/creative-runner/src/composite-adapter.ts",
+      "revalidateBeforeUse": false
+    },
+    {
+      "id": "openai-docs",
+      "authority": "provider_primary",
+      "kind": "gpt-image-2-model-and-images-api",
+      "observedAt": "2026-08-04",
+      "reference": "https://developers.openai.com/api/docs/models/gpt-image-2",
+      "revalidateBeforeUse": true,
+      "ttlDays": 14,
+      "note": "The provider identifies `gpt-image-2` as the image generation model and documents image generation/editing surfaces; the Globe route is narrower."
+    },
+    {
+      "id": "openai-image-guide",
+      "authority": "provider_primary",
+      "kind": "images-and-vision-guide",
+      "observedAt": "2026-08-04",
+      "reference": "https://developers.openai.com/api/docs/guides/images-vision",
+      "revalidateBeforeUse": true,
+      "ttlDays": 14
+    },
+    {
+      "id": "openai-chatgpt-images",
+      "authority": "provider_primary",
+      "kind": "chatgpt-images-2-announcement",
+      "observedAt": "2026-08-04",
+      "reference": "https://openai.com/index/introducing-chatgpt-images-2-0/",
+      "revalidateBeforeUse": true,
+      "ttlDays": 14,
+      "note": "Primary source for the ChatGPT-facing name; the API/runtime identity remains `gpt-image-2`."
+    },
+    {
+      "id": "google-imagen-2-deprecation",
+      "authority": "provider_primary",
+      "kind": "google-imagen-2-deprecation",
+      "observedAt": "2026-08-04",
+      "reference": "https://cloud.google.com/vertex-ai/generative-ai/docs/image/subject-customization",
+      "revalidateBeforeUse": true,
+      "ttlDays": 30,
+      "note": "Google Imagen 1/2 is a separate deprecated family; it is not the OpenAI GPT Image 2 route requested here."
+    },
+    {
+      "id": "openai-terms",
+      "authority": "runtime_primary",
+      "kind": "model-exact-commercial-terms",
+      "observedAt": "2026-07-30",
+      "reference": "efeonce-globe:scripts/evidence/openai-gpt-image-commercial-terms.json",
+      "revalidateBeforeUse": true,
+      "ttlDays": 30
+    },
+    {
+      "id": "openai-canary",
+      "authority": "runtime_primary",
+      "kind": "producer-canary-evidence",
+      "observedAt": "2026-07-30",
+      "reference": "efeonce-globe:run/a81c8049-7772-4933-82f2-1e2e59e5121c",
+      "revalidateBeforeUse": true,
+      "note": "The governed Producer run generated image/png, settled 14 Globe credits and reached Listo under the exact route identity."
+    },
+    {
+      "id": "adr-023",
+      "authority": "repo_primary",
+      "kind": "route-card-decision",
+      "observedAt": "2026-08-04",
+      "reference": "docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_ROUTE_CARDS_DECISION_V1.md",
+      "revalidateBeforeUse": false
+    }
+  ],
+  "routes": [
+    {
+      "routeId": "ref/still/openai-v2",
+      "kind": "standard",
+      "capability": "image-generate",
+      "operation": "create",
+      "provider": "openai",
+      "model": "gpt-image-2",
+      "version": "2026-04-21",
+      "identityState": "resolved",
+      "endpointId": "openai.gpt-image-2",
+      "region": "us-central1",
+      "completionDriver": "poll",
+      "lifecycle": "available",
+      "exposure": {
+        "governed": "promoted",
+        "reader": "available",
+        "producerUi": "selectable",
+        "externalRollout": "gated"
+      },
+      "inputs": [
+        {
+          "slot": "prompt",
+          "role": "direction",
+          "mediaType": "text",
+          "required": true,
+          "valueShape": "text"
+        },
+        {
+          "slot": "references",
+          "role": "reference",
+          "mediaType": "image",
+          "required": false,
+          "cardinality": { "min": 0, "max": 0 },
+          "mechanism": "not accepted by the public Globe route"
+        }
+      ],
+      "controls": [
+        { "name": "quality", "owner": "providerRequest", "valueShape": "enum(low|medium|high)", "mechanism": "OpenAI Images API quality" },
+        { "name": "aspect-ratio", "owner": "outputShape", "valueShape": "enum(1:1|16:9|9:16|4:3|3:4)", "mechanism": "Globe-to-OpenAI discrete size mapping" },
+        { "name": "count", "owner": "outputShape", "valueShape": "integer(1)", "mechanism": "Globe route contract pins one output" }
+      ],
+      "output": {
+        "mediaType": "image",
+        "mimeTypes": ["image/png"],
+        "cardinality": { "min": 1, "max": 1 },
+        "encoding": "inline base64 decoded and retained content-addressed",
+        "durableAuthority": "Globe private asset and governance readback"
+      },
+      "transport": {
+        "kind": "OpenAI Images API",
+        "auth": "server-side Globe-owned OpenAI credential injected into the adapter",
+        "requestMode": "synchronous JSON POST",
+        "endpointSource": "governed endpoint allowlist",
+        "providerOutput": "inline base64 image data",
+        "browserAccess": "forbidden"
+      },
+      "completion": {
+        "driver": "poll",
+        "providerOperation": "synchronous image generation POST",
+        "resultAuthority": "adapter cache followed by Globe durable ingest",
+        "recovery": "read the existing attempt and retained output before any retry; never duplicate a billable submit"
+      },
+      "cables": {
+        "provider_supported": { "state": "verified", "evidenceRefs": ["openai-docs", "openai-terms"] },
+        "contract_declared": { "state": "verified", "evidenceRefs": ["route-catalog", "governed-composition", "adr-023"] },
+        "adapter_wired": { "state": "wired", "evidenceRefs": ["openai-adapter", "composite-policy"] },
+        "transport_verified": { "state": "verified", "evidenceRefs": ["openai-canary", "governed-composition"] },
+        "output_verified": { "state": "verified", "evidenceRefs": ["openai-canary", "fleet-ledger"] },
+        "billing_verified": { "state": "verified", "evidenceRefs": ["openai-canary", "openai-terms"], "note": "The 14-credit Globe settlement is evidenced; vendor pricing must be re-read before changing quality/size policy." },
+        "rights_verified": { "state": "verified", "evidenceRefs": ["openai-terms", "fleet-ledger"] },
+        "evaluated": { "state": "verified", "evidenceRefs": ["fleet-ledger", "openai-canary"] },
+        "canary_passed": { "state": "verified", "evidenceRefs": ["openai-canary", "fleet-ledger"] },
+        "promoted": { "state": "verified", "evidenceRefs": ["fleet-ledger", "openai-canary"] },
+        "available": { "state": "available", "evidenceRefs": ["reader-live", "fleet-ledger"], "note": "The live reader is the availability authority; external rollout remains gated by Globe policy." }
+      },
+      "evidenceRefs": ["route-catalog", "openai-adapter", "governed-composition", "openai-docs", "openai-canary", "reader-live"],
+      "blockers": [
+        "Keep the public Globe route prompt-only until a separate multipart edit route is implemented and governed.",
+        "Revalidate OpenAI snapshot, pricing, output limits and rights terms before changing the route contract.",
+        "Read the live reader and workspace entitlement before making any external availability claim."
+      ]
+    }
+  ],
+  "providerSurfaces": [
+    {
+      "surfaceId": "openai-gpt-image-2-edits",
+      "provider": "openai",
+      "endpointId": "openai.images.edits",
+      "status": "deferred",
+      "modes": ["image-edit", "mask-edit"],
+      "cables": {
+        "provider_supported": { "state": "verified", "evidenceRefs": ["openai-image-guide", "openai-docs"] },
+        "contract_declared": { "state": "proposed", "evidenceRefs": ["openai-docs", "openai-adapter"], "note": "The provider surface exists, but it is not the public Globe route contract." },
+        "adapter_wired": { "state": "not_started", "evidenceRefs": ["openai-adapter"], "note": "The adapter deliberately fails closed because the edits endpoint requires multipart transport." },
+        "transport_verified": { "state": "unknown", "evidenceRefs": ["openai-docs"] },
+        "output_verified": { "state": "unknown", "evidenceRefs": ["openai-docs"] },
+        "billing_verified": { "state": "unknown", "evidenceRefs": ["openai-terms"] },
+        "rights_verified": { "state": "verified", "evidenceRefs": ["openai-terms"] },
+        "evaluated": { "state": "not_started", "evidenceRefs": ["openai-adapter"] },
+        "canary_passed": { "state": "not_started", "evidenceRefs": ["openai-adapter"] },
+        "promoted": { "state": "not_promoted", "evidenceRefs": ["reader-live"] },
+        "available": { "state": "gated", "evidenceRefs": ["reader-live"], "note": "No separate public routeId, binding or canary exists for OpenAI editing." }
+      },
+      "evidenceRefs": ["openai-image-guide", "openai-adapter", "reader-live"],
+      "note": "Do not turn provider support into Globe capability by analogy. The next implementation needs a route identity, multipart transport, result schema, rates, rights evidence and a separate canary."
+    }
+  ],
+  "implementationChecklist": [
+    {
+      "id": "gpt-image-2-route-identity",
+      "status": "verified",
+      "ownerBoundary": "Globe catalog, OpenAI adapter, composite policy and governed endpoint compiler",
+      "evidenceRefs": ["route-catalog", "openai-adapter", "composite-policy", "governed-composition"]
+    },
+    {
+      "id": "gpt-image-2-generation-canary",
+      "status": "verified",
+      "ownerBoundary": "Globe readiness, binding, OpenAI result driver and Producer canary",
+      "evidenceRefs": ["openai-canary", "fleet-ledger", "reader-live"]
+    },
+    {
+      "id": "gpt-image-2-edit-transport",
+      "status": "open",
+      "ownerBoundary": "Globe OpenAI adapter and governed route compiler",
+      "evidenceRefs": ["openai-docs", "openai-adapter"],
+      "note": "Multipart image editing is provider-supported but intentionally not connected. It requires a new route identity and independent evidence."
+    },
+    {
+      "id": "gpt-image-2-external-rollout",
+      "status": "deferred",
+      "ownerBoundary": "Globe entitlement and external rollout control plane",
+      "evidenceRefs": ["reader-live", "fleet-ledger"],
+      "note": "Internal availability does not authorize external tenant rollout."
+    }
+  ]
+}

@@ -22,6 +22,22 @@ render is owned by Ohio parent templates plus `global_blog_*` options. When a
 new or refreshed article is meant to support the content hub, review category,
 tags, featured image, excerpt and search/archive impact before publishing.
 
+Runtime note 2026-07-15: the live WordPress runtime for `efeoncepro.com` registers
+both `core/details` and `core/accordion` alongside `yoast/faq-block`. For compact
+editorial FAQs inside a long article, prefer `core/details` first: it saves native
+`<details><summary>` HTML, keeps the complete answer in the document, needs no
+custom JavaScript and lets the global TOC point to the parent FAQ H2 instead of
+inflating the outline with every question. Use `core/accordion` only when the
+interaction specifically needs a grouped accordion pattern, keyboard roving or
+exclusive/open-state behavior that native independent disclosures do not cover.
+
+Runtime note 2026-07-16: when the disclosure is a true FAQ that should emit
+structured data, author it as semantic `kind: "faq"` in the `GutenbergArticleSpec`.
+Content Factory renders the visible `core/details` blocks and a governed
+`FAQPage` JSON-LD block from the same `items[]`. Do not duplicate questions in a
+manual schema block. `core/html` is allowed only for generated JSON-LD that the
+validator can parse and match back to visible summaries.
+
 | Example post                       | Observed structure                                                                                                                                                                               |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `249766` Glitch #02                | 81 parsed blocks, H2 intro, H3 numbered sections, 8 images, separators, many legacy `core/freeform` fragments.                                                                                   |
@@ -86,6 +102,12 @@ Recommended enrichment:
   or temporary POV fallback when no custom block is available.
 - `core/pullquote` for a short, high-signal editorial callout when the source
   post already uses highlighted claims or stats.
+- `core/details` for compact FAQ/disclosure moments inside a section when the
+  summary must remain visible and the full answer should stay in HTML without a
+  custom block.
+- `kind: "faq"` in the article spec when those disclosures are true FAQs and
+  should also emit `FAQPage` JSON-LD; this is the scalable path because visible
+  content and schema share one source of truth.
 - `core/separator` to separate CTA/final reflection from the body.
 - `core/image`, `core/gallery` or `core/embed` only after resolving real
   WordPress media or a valid embed source from the brief/source material.
@@ -187,6 +209,60 @@ Use lists for TL;DR, checklists, steps, tradeoffs and evidence.
   <li>Conservar evidencia de cada decisión editorial.</li>
 </ul>
 <!-- /wp:list -->
+```
+
+### Details / FAQ disclosures
+
+Use native `core/details` for compact question/answer or optional-detail moments
+inside a section. The block is not a replacement for major article structure:
+keep the section H2 as the navigable TOC destination, then put each question in
+the `<summary>`. Do not place hidden heading blocks inside the disclosure unless
+a reviewed outline/TOC decision owns that change.
+
+If the section is a real FAQ and should emit schema, do not author four
+standalone `details` plus a separate JSON-LD block. Use semantic `kind: "faq"`:
+the same `items[]` renders the visible disclosures and the `FAQPage` graph. This
+is the only generated use of `core/html`; arbitrary HTML remains blocked.
+
+```html
+<!-- wp:details {"summary":"¿Qué decide una persona?"} -->
+<details class="wp-block-details">
+  <summary>¿Qué decide una persona?</summary>
+  <!-- wp:paragraph -->
+  <p>La persona conserva intención, criterio, excepciones y aprobación final.</p>
+  <!-- /wp:paragraph -->
+</details>
+<!-- /wp:details -->
+```
+
+`core/details` differs from `core/accordion`: the former is native disclosure
+HTML with independent open/close behavior; the latter is a grouped interactive
+block powered by WordPress' Interactivity API. Prefer the lighter primitive
+unless the editorial job requires the grouped behavior.
+
+Minimal semantic FAQ shape:
+
+```json
+{
+  "kind": "faq",
+  "schema": {
+    "enabled": true,
+    "name": "Preguntas frecuentes sobre el tema",
+    "canonicalUrl": "https://efeoncepro.com/categoria/post/",
+    "inLanguage": "es-CL"
+  },
+  "items": [
+    {
+      "question": "¿Qué decide una persona?",
+      "answer": [
+        {
+          "kind": "paragraph",
+          "text": "La persona conserva intención, criterio, excepciones y aprobación final."
+        }
+      ]
+    }
+  ]
+}
 ```
 
 ### Quotes

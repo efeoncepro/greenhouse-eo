@@ -236,7 +236,7 @@ export const runBaselineDiffContract = (input: BaselineContractInput): BaselineC
           message:
             `Frame "${frame.label}" difiere del baseline aprobado: ${(result.diffRatio * 100).toFixed(2)}% ` +
             `(${result.changedPixels}/${result.totalPixels} px) > ${(((result.effectiveMaxDiffRatio ?? 0) * 100)).toFixed(2)}%` +
-            `${result.explicitThreshold ? '' : ' [threshold default — declará baseline.maxDiffRatio para fail-hard]'}. ` +
+            `${result.explicitThreshold ? '' : ' [threshold default — declara baseline.maxDiffRatio para fail-hard]'}. ` +
             `Diff: ${diffArtifactRel}`,
           frameLabel: frame.label
         })

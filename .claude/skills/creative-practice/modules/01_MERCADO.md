@@ -1,5 +1,16 @@
 # 01 · El mercado — la agencia del medio se está muriendo
 
+## Addendum 2026-07-30 — Creative Velocity
+
+El mercado ya vende capacidad recurrente, equipos dedicados, content supply chain, modular content, IA y
+performance creative. Referentes: Superside, Publicis PX, WPP Production, VML, Monks, DEPT, Dentsu y Accenture Song.
+En Chile/LatAm predominan paquetes de contenido mensual, jornadas y equipos dedicados.
+
+La oportunidad de Efeonce no es reclamar exclusividad sobre esas capacidades, sino empaquetarlas con Creative
+Operations, memoria, rights/provenance, telemetría y producto de soporte para equipos in-house que no quieren una
+transformación enterprise pesada. La evidencia y confidence están en el benchmark y en el [`Creative Velocity —
+Modular Production Addendum V1`](../../../docs/services/creative-services/EFEONCE_CREATIVE_VELOCITY_MODULAR_PRODUCTION_ADDENDUM_V1.md).
+
 > **La tesis que ordena todo el módulo:**
 > ## El mercado de servicios creativos se partió en tres. Arriba quedó el holding, caro y lento. Abajo quedó la suscripción productizada, barata y tonta. Y en el medio se abrió una grieta donde ya no vive casi nadie.
 >

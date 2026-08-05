@@ -161,6 +161,28 @@ export class GreenhouseApiPlatformClient {
     return this.request(`/api/platform/ecosystem/knowledge/documents/${encodedId}`)
   }
 
+  // TASK-1645 — Growth SEO (read-only, mandato MCP-first del operador 2026-08-05).
+  // El lane resuelve la org por binding: para bindings internos `organizationId` es
+  // requerido; para bindings org-scoped se omite (o debe coincidir con el binding).
+  async getSeoKeywordOpportunities(input: { organizationId?: string; limit?: number }) {
+    return this.request('/api/platform/ecosystem/growth/seo/keyword-opportunities', {
+      organizationId: input.organizationId,
+      limit: input.limit
+    })
+  }
+
+  async getSeoVisibility360(input: { organizationId?: string }) {
+    return this.request('/api/platform/ecosystem/growth/seo/visibility-360', {
+      organizationId: input.organizationId
+    })
+  }
+
+  async getSeoEntitlement(input: { organizationId?: string }) {
+    return this.request('/api/platform/ecosystem/growth/seo/entitlement', {
+      organizationId: input.organizationId
+    })
+  }
+
   // TASK-1211 — Cotizador (read-only). Resolver de servicios + simulación de precio
   // (estimado referencial NO vinculante). Lane ecosystem; scope por binding.
   async searchServices(input: { query?: string; limit?: number }) {

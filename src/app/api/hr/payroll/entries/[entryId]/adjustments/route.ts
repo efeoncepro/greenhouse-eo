@@ -6,13 +6,14 @@ import {
   PayrollAdjustmentValidationError,
   checkChileDependentCompliance,
   createAdjustment,
-  getAdjustmentsByEntry
+  getAdjustmentsByEntry,
+  revertAdjustment
 } from '@/lib/payroll/adjustments/apply-adjustment'
+import { ADJUSTMENT_REASON_CODES, isAdjustmentReasonCode } from '@/lib/payroll/adjustments/reason-codes'
 import {
-  ADJUSTMENT_REASON_CODES,
-  isAdjustmentReasonCode
-} from '@/lib/payroll/adjustments/reason-codes'
-import { recalculatePayrollEntry } from '@/lib/payroll/recalculate-entry'
+  assertAdjustmentPeriodWritable,
+  recalculateAfterAdjustment
+} from '@/lib/payroll/adjustments/recalculate-adjustment'
 import { requireHrTenantContext } from '@/lib/tenant/authorization'
 import type { AdjustmentKind } from '@/types/payroll-adjustments'
 
@@ -46,10 +47,7 @@ const fetchEntrySnapshot = async (entryId: string): Promise<EntrySnapshotRow | n
   return rows[0] ?? null
 }
 
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ entryId: string }> }
-) {
+export async function GET(_request: Request, { params }: { params: Promise<{ entryId: string }> }) {
   const { tenant, errorResponse } = await requireHrTenantContext()
 
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -67,10 +65,7 @@ export async function GET(
   }
 }
 
-export async function POST(
-  request: Request,
-  { params }: { params: Promise<{ entryId: string }> }
-) {
+export async function POST(request: Request, { params }: { params: Promise<{ entryId: string }> }) {
   const { tenant, errorResponse } = await requireHrTenantContext()
 
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -102,22 +97,18 @@ export async function POST(
     const reasonNote = String(body.reasonNote ?? '').trim()
 
     if (reasonNote.length < 5) {
-      return NextResponse.json(
-        { error: 'reasonNote requiere al menos 5 caracteres explicativos.' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'reasonNote requiere al menos 5 caracteres explicativos.' }, { status: 400 })
     }
 
-    const rawPayload = (body.payload && typeof body.payload === 'object' ? body.payload : {}) as Record<
-      string,
-      unknown
-    >
+    const rawPayload = (body.payload && typeof body.payload === 'object' ? body.payload : {}) as Record<string, unknown>
 
     const entrySnap = await fetchEntrySnapshot(entryId)
 
     if (!entrySnap) {
       return NextResponse.json({ error: 'Entry no encontrada' }, { status: 404 })
     }
+
+    await assertAdjustmentPeriodWritable(entrySnap.period_id)
 
     // Inyectar currency desde entry para kinds con monto absoluto. Si el client
     // no mando currency, asumimos la del entry (defensive). Si mando una
@@ -161,26 +152,48 @@ export async function POST(
     // nacio active, el recalc lo aplica; si nacio pending_approval, el
     // entry no cambia hasta que approveAdjustment dispare otro recalc.
     let recalculated = false
+    let recalculationScope: 'entry' | 'period' | 'pending_approval' = 'pending_approval'
 
     if (adjustment.status === 'active') {
       try {
-        await recalculatePayrollEntry({
+        const result = await recalculateAfterAdjustment({
           entryId,
-          input: {},
+          periodId: entrySnap.period_id,
           actorIdentifier: userId
         })
+
         recalculated = true
+        recalculationScope = result.scope
       } catch (recalcError) {
-        // No fallamos la creacion: el adjustment ya quedo persistido y el
-        // operador puede recalcular manual desde el header del periodo.
+        // Fail closed: no dejamos un ajuste activo que el entry no materializó.
+        // La reversión conserva el intento y su evidencia en el audit trail.
+        await revertAdjustment({
+          adjustmentId: adjustment.adjustmentId,
+          revertedByUserId: userId,
+          revertedReason: 'Aplicacion automatica fallida; requiere reintento controlado.'
+        }).catch(revertError => {
+          console.error(`[adjustments POST] failed to compensate ${adjustment.adjustmentId}`, revertError)
+        })
+
         console.warn(
           `[adjustments POST] auto-recalc failed for entry ${entryId}:`,
           recalcError instanceof Error ? recalcError.message : recalcError
         )
+
+        if (recalcError instanceof PayrollAdjustmentValidationError) throw recalcError
+
+        return NextResponse.json(
+          {
+            error:
+              'El ajuste no se aplicó porque la nómina no pudo recalcularse. El intento quedó revertido; corrige el bloqueo y reintenta.',
+            code: 'payroll_adjustment_recalculation_failed'
+          },
+          { status: 409 }
+        )
       }
     }
 
-    return NextResponse.json({ adjustment, eventId, created: true, recalculated }, { status: 201 })
+    return NextResponse.json({ adjustment, eventId, created: true, recalculated, recalculationScope }, { status: 201 })
   } catch (error) {
     if (error instanceof PayrollAdjustmentValidationError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode })

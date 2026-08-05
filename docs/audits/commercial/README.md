@@ -4,6 +4,10 @@ Auditorias tecnicas y operativas del dominio Commercial de Greenhouse.
 
 ## Auditorias
 
+- [Creative Services Market Benchmark 2026-07-30](CREATIVE_SERVICES_MARKET_BENCHMARK_2026-07-30.md) — benchmark global, digital/productized, Chile/LatAm y fuentes de compradores; base de la nueva arquitectura Creative Operations.
+- [Creative Velocity Buying Simulation — Banco BICE V1](EFEONCE_CREATIVE_VELOCITY_BUYING_SIMULATION_BANCO_BICE_V1.md) — simulación sintética de buying group, artefactos, demo, objeciones, respuestas y criterios de validación.
+- [Embedded Creative Pod Operating Model V1](../../services/creative-services/EFEONCE_EMBEDDED_CREATIVE_POD_OPERATING_MODEL_V1.md) — capability de integración cultural, operación compartida y frontera con Staff Augmentation.
+- [Creative Services Market Benchmark 2026-07-26](CREATIVE_SERVICES_MARKET_BENCHMARK_2026-07-26.md) — benchmark anterior; conservar como evidencia histórica y contrastar con el addendum vigente.
 - [Commercial Quote-to-Cash Deep Audit 2026-06-20](COMMERCIAL_QUOTE_TO_CASH_DEEP_AUDIT_2026-06-20.md)
 - [Creator Influence & Content Market Research 2026-07-29](CREATOR_INFLUENCE_CONTENT_MARKET_RESEARCH_2026-07-29.md) — benchmark de agencias y plataformas, best practices, pricing signals y modelo escalable de Efeonce.
 - [Creator Influence & Content — Perfume masculino con deportistas chilenos — simulación 2026-07-29](CREATOR_INFLUENCE_PERFUME_ATHLETES_CHILE_SIMULATION_2026-07-29.md) — caso sintético end-to-end de intake, casting, vetting, contacto, negociación, delivery, derechos, pricing y medición.

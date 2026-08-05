@@ -21,7 +21,7 @@
 - Rank: `TBD`
 - Domain: `creative|design|platform`
 - Blocked by: `TASK-1462, TASK-1467, TASK-1470`
-- Branch: `task/TASK-1471-globe-layout-compiler-deterministic-finishing`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

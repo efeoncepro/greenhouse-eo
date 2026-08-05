@@ -56,6 +56,8 @@ El sprint cubre:
 - `TASK-1535`: rights attestation, binding, canary y rollback route-specific.
 - `TASK-1482`: presupuesto, reservation/settlement, hard cap y bloqueo antes de gasto no autorizado.
 - Legal/Rights: inputs, outputs, proveedores, uso, portfolio/training y restricciones documentados en SOW.
+- Data Protection: provider/model/endpoint/plan exactos, no-training/no-improvement, retención, región,
+  subprocesadores, aislamiento, eliminación y AI Data Protection Pack cuando el material sea confidencial o restringido.
 - Finance: precio aprobado, coste esperado, reserva de retry/refund, impuestos aplicables y margen bruto objetivo ≥45%.
 - Delivery: brief, reviewer, aprobación, soporte y criterio de cierre nombrados.
 
@@ -74,6 +76,7 @@ coste, calidad o recuperación detiene el sprint y activa el runbook de rollback
 
 - Assets finales en el formato acordado.
 - Manifest con lineage, modelo/proveedor, versión, derechos y estado de aprobación.
+- AI Data Protection Pack o referencia a la excepción documentada cuando la clasificación de datos lo requiera.
 - Resumen de coste, retries, tiempos, incidencias y rework.
 - Confirmación de entrega y archivo de evidencia.
 - Aprobación humana del cliente o rechazo documentado.

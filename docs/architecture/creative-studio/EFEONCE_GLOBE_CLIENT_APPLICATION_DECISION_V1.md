@@ -934,9 +934,14 @@ Cierre del delta anterior con **generación real verificada** y el bloqueo de im
   prompt enviado.
 - Bytes por el carril gobernado (descriptor + `x-globe-retrieval-grant`): HTTP **200**, `audio/mpeg`,
   **114.983 bytes**.
-- Observación sin defecto: el descriptor anuncia `mimeType: audio/wav` y los bytes salen `audio/mpeg`. El contrato
-  dice que el tipo autoritativo se resuelve del objeto **al servir**, y el player usa el de la respuesta
-  (`response.blob()`), no el del descriptor — la reproducción es correcta.
+- 🔴 **Era un DEFECTO, no una observación** — corregido el 2026-08-04
+  ([`ISSUE-139`](../../issues/resolved/ISSUE-139-globe-output-descriptor-advertises-per-modality-mime-guess.md)).
+  El descriptor anunciaba `mimeType: audio/wav` sobre bytes `audio/mpeg` porque el MIME salía de un default **por
+  modalidad**. El razonamiento de entonces era correcto en lo que miraba y **se detuvo en el consumidor
+  equivocado**: el player efectivamente usa el tipo de la respuesta (`response.blob()`) y por eso reproduce bien,
+  pero cualquier consumidor que confíe en el descriptor **sí** se rompe — el mapa de extensiones de descarga
+  nombra `.wav` a un MP3. Hoy `advertisedMimeType` prefiere el MIME que el intento DECLARÓ y el mapa por
+  modalidad quedó como último recurso. **Lección: «un consumidor no se rompe» no es «no hay defecto».**
 
 Lo que lo desbloqueó fue un defecto propio: la forma por defecto ponía `mode: { kind: 'foley' }` para **toda** ruta
 de audio, y la ruta de locución (`speech-synthesize`) no lo admite → el estimado devolvía `invalid_request` y el

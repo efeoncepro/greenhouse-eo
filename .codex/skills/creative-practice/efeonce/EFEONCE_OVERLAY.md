@@ -27,6 +27,11 @@ un commodity con 10.000 competidores y un ranking de recall en el que no salimos
 
 ## 2. Qué vendemos realmente — el catálogo creativo
 
+> **Canon vigente 2026-07-30:** arquitectura híbrida. El catálogo plano es el índice de servicios reconocibles; las rutas `Creative Velocity`, `Brand & Campaign Systems`, `Content Production System` y `AI Creative Operations` orientan la venta; paquetes y modalidades scopean la compra. La escalera es `diagnóstico/proyecto exploratorio → sprint pagado → Managed Creative Capacity → sistema/lane especializado → Studio/Globe + composiciones`. Detalle: [`Creative Services Offer Architecture V2`](../../../docs/services/creative-services/EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_V2.md).
+
+El contrato profundo de operación —outcomes, ICP/JTBD, buying group, delivery models, RACI, capacity, pricing,
+rights, proof y expansión— vive en [`Creative Services Operating Model V1`](../../../docs/services/creative-services/EFEONCE_CREATIVE_SERVICES_OPERATING_MODEL_V1.md).
+
 *(De `docs/context/15`, la lane creativa del full-service.)*
 
 | Servicio comercial | Qué compra el cliente | Studio/capability que lo ejecuta |
@@ -39,6 +44,14 @@ un commodity con 10.000 competidores y un ranking de recall en el que no salimos
 | **Managed Creative Capacity** | Squad recurrente con prioridades, RACI y accountability | `greenhouse-talent-people-operator` + studios |
 | **AI Creative Operations / Studio Access** | Workflow, memoria, provenance y governance creativo | Globe / Creative Studio + studios |
 | **Creative Diagnostic** | Baseline y roadmap para elegir la siguiente fase | `modules/06_CUNA.md` |
+
+`Creative Operations` es la capa transversal que conecta intake, brief ownership, priorización, aprobación,
+rights/provenance, queue, quality gates, delivery, evidence y learning. No se presenta como un SKU independiente por
+defecto.
+
+La presentación comercial tiene tres capas: **catálogo reconocible** para que el mercado identifique los servicios,
+**rutas por problema** para orientar la conversación y **paquetes/modalidades** para convertirla en una compra. No
+obligues al comprador a comprender la arquitectura interna antes de reconocer qué hace Efeonce.
 
 `Performance Creative Lab`, Experience/Product/CX y Editorial Content & SEO son composiciones con Media & Distribution
 (Reach puede habilitarla),
@@ -200,10 +213,10 @@ validación es **2026-03-10**, anterior a **RpA v2 (TASK-916)**.
 
 1. 🩸 **Documentar la economía del engagement creativo de SKY** *(→ `greenhouse-finance-accounting-operator`)*.
    **Es el bug real de esta práctica** *(`ANTIPATTERNS.md` I)*.
-2. 🎯 **Formalizar a SKY como el primer caso creativo citable** — un año de relación, squad nombrado, **y
-   telemetría real que ya existe.** Falta la **autorización escrita** *(cláusula de portafolio)* y armar el
-   caso. El wrapper `experiencia.efeoncepro.com` ayuda a contar la memoria del año, pero no reemplaza ese
-   permiso. → `templates/caso-estudio.md`.
+2. 🎯 **Formalizar a SKY como el primer caso creativo citable** — un año de relación, squad nombrado, **telemetría
+   real** y autorización declarada para nombrarlo como caso de éxito. Falta armar el paquete de caso con alcance de
+   claims, métricas, assets, screenshots, nombres, URLs y pricing. El wrapper `experiencia.efeoncepro.com` ayuda a
+   contar la memoria del año, pero no sustituye los gates de evidencia específicos. → `templates/caso-estudio.md`.
 3. 🎯 **Empezar a usar el RpA en la venta.** Está medido, es bueno, y nadie más lo tiene.
 
 ---
@@ -235,3 +248,14 @@ switching cost — **y en la renovación te compara por precio como si fueras cu
 
 > ## El onboarding al portal no es un extra post-venta. Es parte del cierre.
 > **Un cliente que no entra al login compró una agencia cualquiera — aunque le hayamos vendido un sistema.**
+
+## Creative Velocity y Modular Production
+
+Creative Velocity vende capacidad creativa recurrente y gobernada para equipos in-house. Sus lanes son Social,
+Campaign, Performance Creative y Content Operations Velocity. `Dedicated Creative Pod` es la traducción comercial
+de un Managed Squad gobernado por Efeonce.
+
+SKY demuestra una capability modular de configuración de assets con Adobe Express, SharePoint y herramientas
+complementarias. Puede empaquetarse como `Modular Production Sprint/Lane`, pero sigue siendo delivery probado y no
+producto self-service generalizado. Separar servicio, IP/sistema y producto futuro; mantener rights, portabilidad,
+QA, economics y runtime como gates.

@@ -5,7 +5,9 @@ import type { TenantAccessRecord } from '@/lib/tenant/access'
 vi.mock('server-only', () => ({}))
 vi.mock('@/lib/db', () => ({ query: vi.fn() }))
 
-const { resolveGlobeOAuthWorkspaceBindings } = await import('./oauth-workspace-bindings')
+const { hasGlobeOAuthWorkspaceBinding, resolveGlobeOAuthWorkspaceBindings } = await import(
+  './oauth-workspace-bindings'
+)
 
 const tenant = {
   userId: 'user-1',
@@ -119,5 +121,15 @@ describe('Globe OAuth workspace bindings projection', () => {
       { workspaceId: 'globe-workspace:safe', displayName: 'Cliente seguro', kind: 'internal', isPrimary: false }
     ])
     expect(JSON.stringify(result)).not.toMatch(/bindingId|role|user-1|org-efeonce|space-efeonce/)
+  })
+
+  it('matches only an exact normalized workspace binding', () => {
+    const bindings = [
+      { workspaceId: 'greenhouse-org:efeonce', displayName: 'Efeonce', kind: 'internal' as const, isPrimary: true }
+    ]
+
+    expect(hasGlobeOAuthWorkspaceBinding(bindings, ' greenhouse-org:efeonce ')).toBe(true)
+    expect(hasGlobeOAuthWorkspaceBinding(bindings, 'globe-workspace:other')).toBe(false)
+    expect(hasGlobeOAuthWorkspaceBinding(bindings, 'bad workspace')).toBe(false)
   })
 })

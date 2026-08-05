@@ -6,6 +6,175 @@
 
 # Changelog
 
+## 2026-08-05 (b) — promoción end-to-end por el runbook; la ruta que murió +2 s tarde vuelve a estar viva
+
+- **`ref/still/reference-v1` promovida de punta a punta** (`promotion_4265dd26…`): `start → stage →
+  promote → activate → canary → canary-confirm`, **sin una sola secuencia escrita a mano**. `canary_passed`
+  rev 9, binding `enabled` rev 5, canary run `b811d5fc…` con PNG 8.359.849 B governance `eligible`,
+  **10 = 10 créditos**, `noDoubleDebit`. Es la ruta que el 2026-07-31 murió **+2 s** después de su deadline
+  por falta de canary: el caso que fundó la task, cerrado con la herramienta que faltaba.
+- **La divergencia se cerró sola:** `promotionReadinessDivergent` pasó de 1 a 0. Encender el binding volvió
+  coherente la readiness `promoted` — no hizo falta la capability de pause.
+- 🔴 **Hallazgo: pausar una readiness NO tiene camino ejecutable.** `transitionModelRoute` hace
+  `requireHuman(c)` para todo destino distinto de `promoted`, así que un lane de service account falla
+  cerrado por diseño; y `globe.model-readiness.pause` no está en `PRODUCER_HUMAN_CAPABILITY_SCOPES`, así
+  que un humano por el BFF tampoco. **No se construyó el modo en el operator lane** porque habría sido un
+  camino muerto; cerrarlo exige el rollout de 3 pasos del broker. Queda como follow-up.
+- ⚠️ El canary **se negó a ejecutar sin `--route-prompt`**: no inventa dirección creativa para un gasto
+  real. Guardrail funcionando, no defecto.
+- **Barrido documental del cierre** (4 auditorías en paralelo). Lo que destapó, por orden de gravedad:
+  - 🔴 **Dos reglas `NUNCA` que el runtime desplegado ya violaba.** El doc funcional y el manual del ciclo de
+    corridas decían que `abandon` «no toca créditos, a propósito» — un operador que las leyera habría tratado
+    la liberación pre-gasto como un bug. Corregidas con la regla fina: no se toca la liquidación **post**-gasto,
+    y un fallo al liberar degrada al TTL y se observa.
+  - 🔴 **Dos runbooks prescribían un remedio imposible.** El triage de alertas y el runbook de promoción
+    mandaban «pausar esa readiness», que hoy no puede ejecutar nadie. Ahora declaran el hueco y la mitigación
+    verificada (volver a promover).
+  - 🔴 **ADR-010 declaraba «exactamente dos chokepoints humanos» en readiness. Son tres**: `transitionModelRoute`
+    exige humano para todo destino distinto de `promoted`, así que `pause`/`retire` son el tercero — y el que
+    no tiene despachador.
+  - **ADR-021 tenía una fila factualmente incorrecta**: `credit_reservations | observable`, justo la postura
+    que era falsa pre-gasto.
+  - **Gate rojo preexistente**: la ficha de Seedance depende de evidencia de proveedor que venció el
+    2026-08-05. Registrado en riesgos abiertos, **no parcheado en silencio**.
+
+## 2026-08-05 — TASK-1641 desplegado, y el primer ciclo real destapó un falso positivo
+
+- **Desplegado y aplicado.** Globe `main@b958a11`; API `globe-api-internal-00213-5z9` (tráfico 100%), Job
+  worker por digest `sha256:82a4f2d3e0a6…` con sus dos corridas de contrato, y `tofu apply` sobre plan
+  guardado (`6 to add, 1 to change, 0 to destroy`) con `No changes` posterior. Las 3 métricas, sus 3 alertas
+  y `GLOBE_PROMOTION_WINDOW_WARNING_SECONDS=1800` verificados contra el runtime.
+- 🔴 **La señal de readiness divergente reportó 3 casos y DOS eran rutas VIVAS.** `ref/still/rrss-v1` y
+  `ref/still/openai-v2` tienen su última promoción de la saga en `rolled_back` **y su binding `enabled`**,
+  porque las habilitó el lane automatizado de ADR-010, que no enruta por la saga y por tanto no deja
+  operación posterior que las supersede. El remedio que la señal sugiere —pausar esa readiness— las habría
+  retirado.
+- **La lección generalizable:** «última promoción revertida» era un **proxy** de «el rollback sigue en pie»,
+  y un proxy falla exactamente donde otra autoridad puede deshacerlo. Cuando **dos mecanismos** pueden mover
+  el mismo estado, derivar de la historia de uno solo es incorrecto por construcción: el predicado se cierra
+  sobre el **estado actual del efecto**, no sobre el registro del acto. Arreglado en `@b958a11` exigiendo el
+  binding vigente apagado; **medido en runtime: la señal bajó de 3 a 1**.
+- ⚠️ **Ningún test atrapó esos dos falsos positivos.** Aparecieron leyendo las primeras emisiones reales
+  contra datos de producción. Una señal nueva no está verificada hasta comprobar sus primeras líneas una por
+  una contra el estado real.
+- **La divergencia que queda es genuina:** `ref/still/reference-v1` `v5-pro`, binding `enabled=false` y
+  readiness `promoted`. Su remedio (`globe.model-readiness.route.pause`) es un acto de operador, por la
+  frontera de autoridad que el contrato declara.
+
+## 2026-08-04 (c) — La saga de promoción se observa, y la reserva pre-gasto deja de esperar 24 h
+
+- **`TASK-1641` Scopes 2 y 3, cerrados por un solo consumidor** (`efeonce-globe@17c3fef`). Las dos señales
+  parten del mismo lector cross-workspace después del batch de recuperación, por la política de scan que ya
+  existía (`app.promotion_recovery_scan`, migración `0028`): **sin migración nueva**.
+  - `globe_promotion_window_closing` (WARNING, 30 min de antelación) es el **complemento estricto** de
+    `stalled`, que mide `deadline_at <= now` y por tanto avisa **cuando la ventana ya venció**. Las cuatro
+    promociones que murieron el 2026-08-04 lo hicieron a +2 s, +18 s, +26 s y +40 s del deadline: para todas
+    ellas esa alerta llegaba tarde **por diseño**, no por umbral mal puesto.
+  - `globe_promotion_readiness_divergent` (ERROR) es la señal que le faltaba al contrato para que la palabra
+    `observable` significara algo. Se computa sobre el estado **leído ahora**, así que baja sola cuando un
+    operador cierra la divergencia.
+- 🔴 **El predicado de supersede evitó que la señal naciera falsa.** Dos de las diez promociones revertidas
+  pertenecen a identidades que **después se volvieron a promover y quedaron selladas**: su readiness dice
+  `promoted` por esa promoción posterior, que es legítima. Sin `NOT EXISTS` por identidad exacta, la señal
+  habría acusado de divergencia justo a las dos rutas que **sí** convergieron, y su remedio —pausar esa
+  readiness— **habría retirado dos rutas vivas**. Una señal sobre historia append-only necesita su predicado
+  de vigencia, o su primer disparo es falso.
+- **Las métricas son de conteo, y no sólo por el aligner.** «Segundos restantes» se alinea al revés: pediría
+  `COMPARISON_LT` y no existe `ALIGN_MIN` para DISTRIBUTION, así que un p99 sería la promoción **menos**
+  urgente. El hecho accionable es «hay N por expirar»; los segundos viven en la línea que un humano lee.
+- **`TASK-1641` Scope 5 — la reserva de un run muerto ANTES del gasto converge** (`efeonce-globe@21d6ee3`).
+  Medido contra `globe-pg` antes de tocar código: la **única** reserva `held` de toda la base es pre-gasto
+  (32 créditos, run terminal sin `provider_operation_id`) y hay **cero** post-gasto — el 100 % del crédito
+  inmovilizado estaba amparado por un razonamiento que no le correspondía.
+  - El discriminador es **`attempt.providerOperation`**, el hecho durable, no `lease.kind`: una entrega de
+    `submit` puede haber aceptado con la respuesta perdida.
+  - Se libera por los **mismos primitives** del camino hacia adelante. Un fallo al liberar **no se propaga**
+    —`abandon` corre después de que la outbox cerró la entrega, y un throw dejaría el experimento `running`
+    para siempre— sino que degrada al TTL y **se observa** (`globe_run_abandon_release_degraded`).
+  - `RunDependentAggregateV1` gana `condition`, con test que exige dueño y señal en **ambas** ramas y rechaza
+    dos ramas con la misma postura. No son dos filas: `aggregate` es el nombre físico de la tabla.
+- **Runbook de promoción publicado** (`GLOBE_ROUTE_PROMOTION_RUNBOOK_V1.md`), con el canary como paso
+  explícito y el presupuesto real de la ventana (~10 min por intento sobre 3 h). Las tres alertas nuevas con
+  su remedio en `GLOBE_PRODUCER_ALERT_TRIAGE_V1.md`.
+
+## 2026-08-04 (b) — El run deja de mentir sobre su propio reloj, y el experimento deja de ser mudo
+
+- **La fila de la cola se sellaba con el reloj equivocado, y era mucho peor de lo medido en el incidente.**
+  `finishLease` escribe `completed_at`/`updated_at` —hechos sobre *cuándo terminó la fila de la cola*— pero
+  recibía el instante como parámetro, y **los siete call sites le pasaban un instante de DOMINIO**: cuatro del
+  pasado y **tres del futuro** (`retryAt`, `nextCheckAt`), o sea filas que podían declararse completas **antes de
+  existir**. Medido sobre producción: **23 de 131** filas `done` son contradictorias, con un peor caso de
+  **−34.965 s = 9,7 horas** en un job `complete` de 144 entregas. Hoy sella con un **reloj de pared inyectado**
+  —inyectado y no `new Date()` disperso, para que un test pueda afirmar *qué reloj se usó*—. Verificado en vivo:
+  cero contradictorias en los tres tipos de job.
+- **El arreglo resultó más barato de lo que la task temía, y por dato medido.** `completed_at` del outbox **no
+  tiene lectores** y `finishLease` **no toca `available_at`**, así que la ventana de reintento que se advertía
+  no se mueve; y el instante de dominio **ya tenía su propia columna** en los siete caminos.
+- **Una sola definición de la fase gruesa, no tres.** `coarseProgress` estaba transcrito en una función TS, en un
+  `CASE` del SQL del live feed y en un `Set` de valores del mismo archivo. **Coincidían — por eso el riesgo era
+  invisible**: divergir no rompe nada, sólo hace que la tarjeta del feed y el detalle digan cosas distintas del
+  MISMO run, en verde. Hoy es dato único y el SQL se genera de él. Se retiró el `ELSE 'terminal'`, que presentaba
+  un estado desconocido como corrida **terminada**.
+- **El experimento ya no es mudo mientras trabaja.** Se leía `running` con `attempts: []` durante toda la ventana,
+  así que **una corrida sana era indistinguible de una atascada** — la razón por la que `ISSUE-137` se diagnosticó
+  mal. No faltaba la proyección: **faltaba el link**. `coarseProgress` ya existía y era browser-safe, pero su
+  reader pide `runId` y `LabExperimentV1` no lo llevaba. Tercera aparición del patrón *«la capability existe y la
+  UI no la consume»*. Se publica también la corrida **terminal**, porque un run terminal bajo un experimento
+  `running` es justo la divergencia que hay que poder ver.
+- **El canary estaba roto y `pnpm check` seguía verde.** Un comentario de bloque escribió una expresión de cron
+  literal; su `*/` **cierra el comentario**. La suite importaba la *lib* del canary y nunca el *script*, así que
+  el instrumento de salida de todo rollout no corría y nadie lo notaba. Guard nuevo: **parsea todos los
+  entrypoints**.
+- **`ISSUE-139` — un default que acierta casi siempre es peor que ninguno.** El descriptor de output anunciaba un
+  MIME **adivinado por modalidad**: un MP3 servido correctamente como `audio/mpeg` se anunciaba `audio/wav`.
+  Imagen y video pasaban porque su default **coincidía por casualidad**, y por eso sobrevivió tres semanas. El
+  dato correcto estaba a la vista y se descartaba. Lo destapó el canary de generación real; diagnosticarlo exigió
+  reproducir el chequeo a mano porque **colapsaba ocho condiciones con remedios opuestos** en un código opaco —
+  `ISSUE-127` dentro del instrumento que existe para detectar problemas, también cerrado.
+- **Rollout verificado contra la revisión activa**, no contra el workflow verde: `globe-api-internal-00207-28r`,
+  `globe-studio-internal-00149-w9c` y el Job del worker, las tres con el digest etiquetado `e7a732c9b62e`. Canary
+  de generación real: las tres modalidades generadas, retenidas y servidas, con liquidación económica exacta;
+  imagen end-to-end en **7 min 48 s**.
+
+## 2026-08-04 — Captura de completitud y convergencia terminal: 13 huecos, 12 cerrados
+
+- **ADR-021 nace porque el contrato no existía.** Ningún documento de arquitectura mencionaba siquiera la
+  palabra «webhook»: la captura de completitud vivía sólo en el código. Una auditoría de Fal, OpenAI y Vertex
+  contra su documentación oficial encontró **13 huecos**, tres de los cuales terminaban en un asset
+  **generado, facturado e irrecuperable**, y **ninguno producía error visible** — dos fallaban *exactamente en
+  el momento del éxito*.
+- **Cada proveedor avisa distinto y eso es la decisión, no un accidente.** Fal por webhook firmado **por
+  request**; OpenAI **no emite eventos de imagen**, así que su `poll` es correcto por diseño; Vertex **no
+  ofrece callback**, sólo LRO. `completion_driver='poll'` con cero señales es el comportamiento correcto.
+- **Los tres que perdían un asset pagado:** el techo del poll de Veo ahora se **deriva** del presupuesto de
+  salida (2 MB contra un video inline en base64); la lease sube de 60 s a 10 min; y el rescate del lost-ack de
+  Fal repone la evidencia desde una base **declarada por endpoint y medida**, porque la base de su queue **no
+  es derivable** — un endpoint descarta 3 segmentos del path, otro 1, y su propia doc muestra uno que conserva
+  los 3.
+- **`reconciliationFailureCode` leía el campo equivocado** (`.errorCode` mientras el error expone `.code`), así
+  que todos los códigos del poll colapsaban en uno. 12.ª aparición de `ISSUE-127`, y la primera **con el guard
+  mecánico ya vigente**: un test de cobertura ve que un código esté clasificado, no que llegue a la política
+  por el campo correcto.
+- **Se respeta `X-Fal-Retryable`** en vez de inferir del status HTTP; el ingress devuelve **503** ante un fallo
+  nuestro y 400 sólo ante rechazo definitivo; se desactivan los **fallbacks de modelo de Fal**, que podían
+  ejecutar un modelo distinto del aprobado dejando el snapshot mintiendo.
+- **El JWKS de Fal es GLOBAL**, así que una firma válida no prueba que la entrega sea nuestra. El guard de
+  propiedad quedó cableado y **su valor se midió en vez de adivinarse**: es un identificador estilo Auth0 que
+  no se parece al username del panel — suponerlo habría rechazado todas las entregas legítimas.
+- **Convergencia terminal declarada como invariante enumerable** (`TASK-1469`): cuando un run llega a terminal,
+  todo agregado dependiente converge o queda observable. Un agregado sin postura rompe el build y un
+  `observable` sin señal se rechaza. Barrido hacia atrás con el mismo `abandon` del camino normal: **4
+  experimentos huérfanos → 0**.
+- **Las señales de outbox dejaron de imprimirse y pasaron a mirarse**: 3 `logging_metric` + 3 `alert_policy`.
+  Y `outboxDeadLetter` **no tenía sólo mal el nombre: medía filas de outbox en vez de intentos** — decía 3 para
+  uno. Hoy es `outboxTerminalAttempts`.
+- **Verificado con una generación real:** run `completed`, experimento `candidate_ready`, governance
+  `eligible`. La clase `waiting` sostuvo **21 entregas** sin matar la corrida; con el tope anterior habría
+  muerto en la tercera, ya cobrada.
+- **Abierto:** `ISSUE-138` D12 — la retención de la Operation de Vertex sigue sin documentarse. Ya no es una
+  pérdida garantizada sino una ventana de latencia; su arreglo (`storageUri`) exige canary con gasto real.
+
+
 ## 2026-07-21 — TASK-1508: Cloud Run bajo IaC + ownership por campo
 
 - **Los dos servicios Cloud Run entraron a Terraform por import brownfield:** `2 imported / 2 changed / 0 destroyed`.

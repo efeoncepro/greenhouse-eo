@@ -6,11 +6,24 @@
 > **Estado del catálogo:** Approved for validation; no habilita precios públicos ni venta self-serve
 > **Owner:** Efeonce Creative Practice + Strategy
 
+> **Arquitectura comercial vigente:** [`Efeonce Creative Services — Offer Architecture V2`](EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_V2.md)
+> · **Decisión:** [`Creative Services Offer Architecture Decision V1`](../../architecture/EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_DECISION_V1.md)
+> · **Benchmark:** [`Creative Services Market Benchmark 2026-07-30`](../../audits/commercial/CREATIVE_SERVICES_MARKET_BENCHMARK_2026-07-30.md)
+> · **Modelo operativo:** [`Creative Services Operating Model V1`](EFEONCE_CREATIVE_SERVICES_OPERATING_MODEL_V1.md)
+> · **Creative Velocity modular:** [`Modular Production Addendum V1`](EFEONCE_CREATIVE_VELOCITY_MODULAR_PRODUCTION_ADDENDUM_V1.md)
+> · **Embedded Pod:** [`Embedded Creative Pod Operating Model V1`](EFEONCE_EMBEDDED_CREATIVE_POD_OPERATING_MODEL_V1.md)
+
 ## Qué es esta línea
 
 Creative Services es la línea de negocio de Efeonce que entrega capacidad creativa gobernada para equipos de
 marketing, marca y comunicación. El cliente no compra piezas aisladas ni horas: compra un sistema de trabajo con
 dirección, craft, producción, memoria, control de alcance y responsabilidad de entrega.
+
+La presentación comercial es híbrida: el catálogo plano funciona como índice de reconocimiento rápido y las cuatro
+rutas —**Creative Velocity**, **Brand & Campaign Systems**, **Content Production System** y **AI Creative Operations**—
+orientan la conversación hacia el problema. Después, los paquetes y modalidades convierten la ruta en una compra
+scopeable. La relación completa entre catálogo, rutas, diagnóstico, sprint, capacidad recurrente y expansión vive en
+la arquitectura V2.
 
 Globe / Creative Studio es una product brand y plataforma de producción creativa. Puede habilitar estos servicios
 con workspace, memoria, provenance, operaciones generativas, métricas y governance; no reemplaza a la línea de
@@ -41,6 +54,20 @@ La ficha operativa del primer carril comercial está en [`Managed Creative Produ
 `Performance Creative Lab` es una composición con Media & Distribution (Reach puede habilitarla) y Measurement; experimenta variantes,
 hipótesis y aprendizaje creativo conectado con medios. No asume el ownership de media buying ni de atribución por sí
 solo.
+
+Creative Velocity se valida en cuatro lanes: Social Velocity, Campaign Velocity, Performance Creative Velocity y
+Content Operations Velocity. La capacidad modular observada en SKY —configuración de assets con Adobe Express,
+SharePoint y herramientas complementarias— es capability de delivery probada; la productización como experiencia
+independiente permanece en roadmap y no está habilitada por este README.
+
+`Embedded Creative Capacity` es una configuración de Creative Velocity: un pod externalizado que trabaja integrado
+al equipo interno, pero mantiene gobierno, staffing y accountability de Efeonce. No es Staff Augmentation. El fit
+cultural, la inmersión de marca, los rituales, la continuidad y la adopción del workflow forman parte del delivery.
+
+Cuando Efeonce absorbe equipo, infraestructura, licencias, costos laborales, provisionales, reemplazos y soporte, la
+modalidad se presenta como **Fully Managed Creative Capacity**: un fee mensual único por una capacidad definida. Está
+disponible como modelo global en todos los países donde Efeonce opera, sujeto a parametrización legal, laboral, fiscal,
+monetaria y de procurement local.
 
 ## Run & Gun Production
 
@@ -102,9 +129,10 @@ Antes de convertir un servicio en `Commercially approved`, su ficha debe declara
 5. especialistas, plataforma, providers y sistemas de registro;
 6. rondas, aceptación, quality gates, SLA/expectations y fallback;
 7. derechos de uso, IP, provenance, privacidad y offboarding;
-8. métricas de valor y delivery: OTD, FTR, RpA, cycle time y adopción cuando aplique;
-9. revenue architecture, unidad de valor, cost-to-serve, margen y pass-through;
-10. evidencia, renovación, expansión, stop conditions y owner de revisión.
+8. postura de data protection GenAI: no-training, retención, acceso humano, subprocesadores, región, eliminación y disclosure;
+9. métricas de valor y delivery: OTD, FTR, RpA, cycle time y adopción cuando aplique;
+10. revenue architecture, unidad de valor, cost-to-serve, margen y pass-through;
+11. evidencia, renovación, expansión, stop conditions y owner de revisión.
 
 ## Boundaries con otras líneas y marcas
 

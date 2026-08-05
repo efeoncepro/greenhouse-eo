@@ -1,5 +1,16 @@
 # 12 · Retención y expansión — el 70% de la venta ocurre DESPUÉS de firmar
 
+## Addendum Creative Velocity
+
+La expansión debe activarse por evidencia: Sprint → Managed Capacity → Dedicated Creative Pod → Performance Creative
+Lane o Modular Production Lane → Creative Studio/Production System. Los triggers son uso saludable de capacidad,
+memoria reutilizada, menor rework, adopción del workflow, siguiente necesidad identificada y margen dentro del piso.
+No expandir sólo por ofrecer más piezas.
+
+En Embedded Creative Capacity, las señales de renovación incluyen confianza del equipo interno, continuidad del pod,
+adopción del workflow, menor fricción cultural, memoria acumulada y autonomía progresiva. La expansión puede pasar de
+Managed Pod a Embedded Managed Pod o sumar lanes; no debe confundirse con aumentar personas bajo dirección del cliente.
+
 > ## El motor comercial de Efeonce es **70% expansión / 30% new business**.
 > *(`docs/context/08_estrategia-comercial.md` — doctrina interna.)*
 > ⚠️ [VERIFICAR: el split 70/30 expansión vs. new business no está en `SOURCES.md`. Confirmar contra

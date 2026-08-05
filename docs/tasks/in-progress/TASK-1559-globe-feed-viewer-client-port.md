@@ -29,11 +29,11 @@
 - Motion: `docs/ui/motion/TASK-1559-globe-feed-viewer-client-port-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-028`
-- Status real: `code complete PARCIAL — estructura/estados/concurrencia cerrados y verificados; MOTION no implementado (4 de 11 animaciones) y declarado en TASK-1565; falta push a main + deploy`
+- Status real: `CODE-COMPLETE EN MAIN — el Status decia 'falta push a main + deploy' y era falso (barrido 2026-07-30): esta en main de efeonce-globe (494caa0, c9ceabc) y el MOTION que declaraba faltante tambien (TASK-1565 Slices 1-6, 1c0684e). NO ES CERRABLE TODAVIA (verificado 2026-07-30): su criterio 7 exige before/after desktop y 390px, y NO existe ninguna captura suya en apps/studio-client/.captures/ (solo axis-pilot, tailwind-engine y las tres de TASK-1552). Los invariantes de concurrencia SI tienen tests verdes (watermark: 'la marca solo avanza'; epoch: 'DESCARTA un delta con revision menor o igual') y el cliente NO mintea URLs firmadas. Lo que falta es EVIDENCIA VISUAL, no codigo`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none` (TASK-1558 LIVE 2026-07-25; las primitives existen)
-- Branch: `task/TASK-1559-globe-feed-viewer-client-port`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - GitHub Issue: `TBD`
 
 ## Corrección de contrato 2026-07-25 — `Motion: none` era falso
@@ -333,6 +333,17 @@ Before/after del feed y del viewer, desktop y 390px.
 
 - Canary con escenarios de concurrencia; flip tras verde.
 
+### Slice 5 — Movido a TASK-1643: continuidad de acciones (2026-08-05)
+
+El hallazgo y su evidencia permanecen en esta task porque nacieron al auditar el port del feed, pero la implementación
+de los handlers y del handoff sale de aquí. `TASK-1559` conserva transporte, render, reconciliación, estados del feed
+y viewer; `TASK-1643` posee `ProducerFeedRoute`/action rail y la continuidad `feed → composer`.
+
+La evidencia que motivó la separación sigue siendo load-bearing: `ProducerFeedRoute.tsx` pasaba callbacks no-op,
+el control se veía habilitado, `POST /v1/commands` quedaba en cero y Reference/Recreate no llegaban al composer.
+`TASK-1643` debe cerrar también Favorite/Download y los estados honestos; no se debe reintroducir la misma familia
+como un scope oculto de esta task.
+
 ## Out of Scope
 
 - Rediseño visual del feed o del viewer.
@@ -411,6 +422,7 @@ invariantes temporales sin red justo mientras se los mueve.
 ## Follow-ups
 
 - `TASK-1560` — retiro del payload legacy.
+- `TASK-1643` — wiring de acciones y continuidad feed → composer.
 
 ## Open Questions
 
@@ -511,3 +523,110 @@ contrato no trae** y haría saltar el hero de pieza mientras las miniaturas resu
 1. `TASK-1569` (póster) primero: con arte real en la caja se sabe cuánto espacio sobra **de verdad**.
 2. El título como **decisión de contrato** con ADR corto — no es trabajo de maqueta, y la pregunta real no es
    en cuántos caracteres cortar sino **si el título de una corrida debería ser su prompt**.
+
+## Delta 2026-08-01 — el feed puede volver hacia atrás, y dos defectos de encabezado
+
+Entregado y verificado en producción (`globe-studio-internal`, main `8989074`). PRs
+[#69](https://github.com/efeoncepro/efeonce-globe/pull/69) y
+[#73](https://github.com/efeoncepro/efeonce-globe/pull/73). Reportado por el operador mirando la pantalla; los
+tres defectos tenían causa distinta de la aparente.
+
+### Paginación — el backend ya paginaba y el cliente usaba medio contrato
+
+`globe.producer.feed.live.*` pagina por **cursor keyset** (`updatedAt` + `stableKey`) con `nextCursor` desde
+`TASK-1525`. `nextFeedRead` resolvía sólo el eje del FUTURO (marca → `changes`) y **el `nextCursor` para
+retroceder se ignoraba**: el feed crecía sin techo por arriba y el histórico era inalcanzable. No faltaba
+paginación — estaba a medio cablear, el mismo patrón que el control de compare de las cards, que apareció el
+mismo día.
+
+Se agrega el eje del pasado (`olderCursor` + `historyDone` + `olderFeedRead`) y el pie de lista `FeedTail`
+con sus tres estados en una región: traer anteriores, fin del historial y fallo de una tanda.
+
+🔴 **La regla que no se ve desde el cliente:** una página hacia atrás **NO puede mover el `watermark`**. El
+backend lo calcula desde el ÚLTIMO item de la página, y en dirección `older` el último es el MÁS VIEJO —
+adoptarlo hace retroceder la marca y el próximo ciclo re-trae todo lo ya visto, con la pantalla viéndose
+perfecta. Los dos ejes viven en el mismo objeto y avanzan en direcciones opuestas, así que el modo
+(`sync` | `changes` | `older`) viaja explícito y nunca se infiere. Simétrico: un delta de novedades no toca el
+cursor del pasado, e invalidar la marca **conserva** el cursor del pasado.
+
+Descartado scroll infinito (vuelve inalcanzable el pie de la aplicación y mueve el contenido bajo el cursor
+con piezas generándose en vivo) y páginas numeradas (con items entrando por arriba, la página 2 cambia sola —
+offset es incorrecto por construcción, y por eso el backend eligió cursor).
+
+Verificado en vivo: **25 → 50 piezas** con un click, contador 26 → 51, y el pie sigue ofreciendo historial.
+Seis tests nuevos en `producer-feed-reconciler.test.ts`, registrados y corriendo (143 → 149).
+
+### La barra del encabezado — dos defectos, y una regresión propia entre medio
+
+1. **`margin-inline-start: auto` + `flex-wrap`.** El empuje a la derecha es correcto mientras la barra quepa
+   junto al título; al envolver **se lleva el empuje** y quedaba pegada a la derecha con 239 px de hueco
+   muerto debajo. Reemplazado por `justify-content: space-between` en `.pf__head`.
+2. **Tres alturas en la misma fila** (36 / 28 / 30): los bordes quedaban desalineados y la fila se leía
+   irregular. Unificadas a 36.
+3. 🔴 **La corrección de (1) creó una regresión:** `space-between` reparte HIJOS, y el encabezado tenía
+   **cuatro** sueltos, así que también separó el contador de su título — medido, el título terminaba en 196 px
+   y «26 piezas» arrancaba en 463. Se agrupan título + contador + píldora en `.pf__head-lead` para que el
+   contenedor tenga los dos hijos que el reparto supone.
+
+Medido en el runtime desplegado: alturas `36/36/36/36/36`, `margin-inline-start: 0px`, barra en x=0 (mismo
+borde que el título) y contador a 208 px.
+
+### El control de selección de las cards
+
+`onSelect` se pasaba como no-op, así que el guard `disabled={onSelect === undefined}` nunca disparaba: **24
+controles por pantalla** habilitados, sin su `title` y con `aria-pressed` fijo, que no hacían nada. El destino
+existe sólo en el payload legacy (`#producer-compare-dialog`): al portar el feed viajó el control y no el
+diálogo. Se omite la prop para que queden honestamente apagados. Dueña del compare cuando se porte:
+`TASK-1520`.
+
+Estaban además descentrados 1,5 px, y la causa no era ninguna regla propia: el `padding: 1px 6px` que el
+navegador da a todo `<button>` — el payload corre sin preflight. Con 26 px de caja quedan 12 px de contenido
+para un glifo de 15. **De 219 botones era el único afectado**; el umbral es 29 px para un glifo de 15.
+
+### Follow-up abierto
+
+La píldora **«N nuevas»**: hoy las novedades entran por `changes` y empujan el contenido. `state-design` pide
+acumularlas y que el operador las traiga. Es el siguiente slice de esta superficie.
+
+## Delta 2026-08-02 — card optimista y proyección de estado terminal
+
+Globe `7a7235f`. `pnpm check` exit 0 con **1.491 tests** (1.482 antes); `studio-client` 163 → 172.
+
+**El hueco que cierra.** Al apretar Generar no aparecía nada hasta recargar la app. El composer prometía
+*«el feed se actualizará cuando la pieza esté lista»* y no lo cumplía: el feed proyecta **runs**, y entre el
+envío y el primer delta no hay run que proyectar. Peor — un experimento que el compiler **niega antes de
+crear el run** nunca llega a ser run, así que ese fallo era invisible para siempre.
+
+**Caso fuente.** Un empate de `valid_from` entre dos versiones de la misma policy de rights negaba toda
+generación antes de reservar créditos. El gate hacía lo correcto (cero cobro, `attempts: []`), pero hicieron
+falta horas de lectura de readers para descubrir que el sistema estaba **negando** en vez de estar lento. El
+operador sólo veía «Solicitud enviada» y silencio. Un gate que protege bien y comunica mal se percibe como
+un producto roto. Detalle del incidente: `ISSUE-135` y `HANDOFF-GLOBE-RIGHTS-INCIDENT.md`.
+
+**Cómo respeta la decisión de `ProducerWorkspace`.** Composer y feed siguen siendo hermanos y el feed sigue
+descubriendo el trabajo por su marca de agua. Lo que viaja por el callback nuevo es una **promesa con
+`experimentId`**, no una pieza: nunca entra a `items`, se descarta sola en cuanto el ingreso autoritativo
+trae ese id, y no sobrevive a un reload. El estado vive en el workspace porque es justamente lo que ninguno
+de los dos hermanos puede saber solo — el composer sabe que envió pero no qué muestra el feed; el feed sabe
+qué muestra pero no que hubo un envío.
+
+**Decisiones que no se deducen del diff:**
+
+- La card se anuncia **entre `prepare` y `execute`**, no después. `execute` es la llamada que puede tardar;
+  esperarla dejaría al operador otra vez frente a un botón que no hizo nada visible. En ese punto el
+  `experimentId` ya es un hecho del servidor, así que la promesa no es una invención del cliente.
+- Un fallo **no se descarta solo**: se queda con su motivo traducido y el código canónico visible para el
+  reporte, hasta que el operador lo cierre. Un fallo que desaparece es indistinguible de uno que nunca
+  ocurrió.
+- **No ofrece «Reintentar»** cuando reintentar no resuelve — `generated_rights_policy_not_authorized` es una
+  autoridad ausente, y ofrecer el botón haría repetir un gesto inútil mientras el problema real sigue sin dueño.
+- Reusa `GlobeGeneratingMark`, el mismo globo que ya marca una pieza generándose. Un spinner propio sería un
+  segundo vocabulario para el mismo estado.
+- La reconciliación es por `experimentId`, nunca por posición ni por título: dos envíos con el mismo prompt
+  son piezas distintas y el orden del feed no es el orden de envío.
+
+**Archivos.** `data/producer-pending-submissions.ts` (+ 9 tests) · `copy/index.ts` · `ProducerWorkspace.tsx`
+· `composer/ProducerComposer.tsx` · `feed/ProducerFeed.tsx` · `feed/ProducerFeedRoute.tsx`.
+
+**Abierto.** Falta el estado terminal para un job que agotó reintentos (`ISSUE-135`): hoy un run zombi sigue
+mostrándose como «generando» porque nadie declara que murió. Y falta GVC de la card en desktop + 390 px.

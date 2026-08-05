@@ -56,7 +56,20 @@ No recortes canales de "branding/comunidad" porque el last-click no los ve. Capt
 - **Scheduling/analytics:** si el entorno expone el MCP de **Metricool**, úsalo para programar y
   medir; no hay integración social en el repo (ver `efeonce/CHANNELS_AND_MARTECH_GAPS.md`).
 
-## 7. Medición honesta
+## 7. Social dentro de una Cluster Experience federada
+
+Social no es sólo el canal que promociona un activo web. Una pieza nativa puede ser nodo de
+primera clase del territorio si resuelve un JTBD propio, entrega valor autónomo, mantiene relación
+con la Pillar/cluster, tiene URL o ID estable, owner y medición. Un teaser o recorte sin trabajo
+autónomo sigue siendo activación. `content-marketing-studio` decide la pertenencia; el craft,
+búsqueda/recomendación y analítica in-platform son de `social-media-studio`.
+
+Separa tres planos: **external search** de URLs sociales en Google/Search Console (`seo-aeo`),
+**platform search/recommendation** y analytics nativo (`social-media-studio`), y **downstream
+progress**/atribución (`growth-marketing-cro`). Search Console Platform Properties soporta
+Instagram, TikTok, X y YouTube mediante rollout gradual. No sumar impresiones entre planos.
+
+## 8. Medición honesta
 
 - **Leading:** engagement de calidad (comentarios/shares/saves > likes), crecimiento de
   comunidad, DMs/conversaciones, menciones. **No** vanity followers.
@@ -70,11 +83,15 @@ No recortes canales de "branding/comunidad" porque el last-click no los ve. Capt
 - [ ] Community management proactivo; espacios propios donde aplique.
 - [ ] Creator/influencer por fit y audiencia real, con disclosure.
 - [ ] Dark social capturado (self-reported); métricas de engagement de calidad, no vanidad.
+- [ ] Nodos sociales del cluster justificados por JTBD/valor/gobernanza; teasers marcados activación.
+- [ ] External search, descubrimiento nativo y progreso downstream reportados por separado.
 
 ## Cross-links
 
 - Mensaje/marca → `01`; contenido que alimenta el social → `02`; creatividad/video → `05`
 - Amplificar con paid social → `03`; campaña integrada/influencer → `07`
 - Viral/content loop como motor + atribución → `growth-marketing-cro`
+- Pertenencia a Pillar/Cluster Experience → `content-marketing-studio`; craft/search nativo → `social-media-studio`
+- URLs sociales en Google/Search Console → `seo-aeo`
 - Gaps de social/Metricool en el repo → `efeonce/CHANNELS_AND_MARTECH_GAPS.md`
 - Artefacto → `templates/social-content-plan.md`

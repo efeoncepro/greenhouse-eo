@@ -21,8 +21,8 @@
 
 ## ⭐ Workflow A — "Reference-Video → Omni Enhance" (VALIDADO 2026-07-05, spot AEO Grader)
 
-**La receta estrella.** **Construís tú un video/frame de referencia crisp** (mograph HTML+Playwright,
-o un keyframe diseñado) **y se lo pasás a Gemini Omni como referencia** → el resultado **eleva el look
+**La receta estrella.** **Construyes tú un video/frame de referencia crisp** (mograph HTML+Playwright,
+o un keyframe diseñado) **y se lo pasas a Gemini Omni como referencia** → el resultado **eleva el look
 dramáticamente** (profundidad, glass, cámara, materiales, atmósfera premium que un mockup plano no tiene).
 
 **Por qué funciona:** a Omni le das **composición, layout, marca y "qué mostrar" exactos**; Omni sólo
@@ -30,16 +30,16 @@ tiene que aportar el *tratamiento cinematográfico*. Es text-to-video dirigido p
 no un prompt a ciegas.
 
 **Pasos:**
-1. **Construí la referencia crisp** — con **logos y assets REALES** (ver Regla de logos abajo). Elementos
+1. **Construye la referencia crisp** — con **logos y assets REALES** (ver Regla de logos abajo). Elementos
    focales **grandes y claros**, fondo oscuro con "aire" para que Omni meta profundidad/reflejos.
-2. **Exportá:** UI → mockup HTML + captura Playwright (Workflow C); escena → keyframe (`design-studio` /
+2. **Exporta:** UI → mockup HTML + captura Playwright (Workflow C); escena → keyframe (`design-studio` /
    `greenhouse-ai-image-generator`).
-3. **Pasá a Omni** — `inlineData` (image/png **o** video/mp4) + el prompt template de abajo.
+3. **Pasa a Omni** — `inlineData` (image/png **o** video/mp4) + el prompt template de abajo.
    Endpoint/contrato: `efeonce/STUDIO_TOOLING.md` (global · `responseModalities:[TEXT,VIDEO]`).
-4. **Evaluá el output:** look ✅ — pero **micro-texto/logos se deforman** (no-determinista: en el test
+4. **Evalúa el output:** look ✅ — pero **micro-texto/logos se deforman** (no-determinista: en el test
    "ChatGPT→ChatOFT", "Perplexity→Pespically", precio 890→850, logo fantasmeado). **Nunca confíes la
    exactitud al output IA.**
-5. **Componé la UI/logos reales crisp ENCIMA** del plate Omni (o mezclá beats): **el plate da el look,
+5. **Compón la UI/logos reales crisp ENCIMA** del plate Omni (o mezcla beats): **el plate da el look,
    el overlay da la exactitud.** Este es el cierre canónico.
 
 **Regla de logos (señalada por el operador 2026-07-05):** la **referencia DEBE llevar los logos/assets
@@ -131,5 +131,5 @@ Antes de gastar, declara si la referencia es una **ancla visual flexible** o una
 
 > **Regla de aceptación:** `completed`, `succeeded` o un MP4 reproducible son estados técnicos. La aceptación creativa sólo ocurre después de revisar la actuación, continuidad, texto exacto y el corte con sonido.
 
-**Generaliza:** el patrón "construí una referencia real → deja que la IA le suba el tratamiento → componé
+**Generaliza:** el patrón "construye una referencia real → deja que la IA le suba el tratamiento → compón
 lo exacto encima" también aplica en `design-studio` (imagen) y `audio-studio` (voz de referencia → estilo).

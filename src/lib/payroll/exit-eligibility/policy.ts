@@ -1,5 +1,7 @@
 import 'server-only'
 
+import type { ContractType } from '@/types/hr-contracts'
+
 import type {
   ExitEligibilityWarning,
   ExitLane,
@@ -52,6 +54,7 @@ export type ExitCaseFacts = {
   exitCasePublicId: string | null
   exitLane: ExitLane | null
   exitStatus: ExitStatus | null
+  contractTypeSnapshot: ContractType | null
   lastWorkingDay: string | null
   effectiveDate: string | null
 }
@@ -251,9 +254,14 @@ export const derivePolicy = (
   }
 
   // Cutoff inside period → apply per-lane threshold
-  if (LANES_EXIT_FROM_APPROVED.has(facts.exitLane)) {
-    // external_payroll | non_payroll: Greenhouse doesn't pay internal
-    // → exclude from cutoff (informationally: cutoff is in this period)
+  const exitsFromApproved =
+    LANES_EXIT_FROM_APPROVED.has(facts.exitLane) ||
+    (facts.exitLane === 'internal_payroll' && facts.contractTypeSnapshot === 'international_internal')
+
+  if (exitsFromApproved) {
+    // external/non-payroll lanes do not use Greenhouse internal payroll;
+    // international_internal has no Chile settlement aggregate. Both close
+    // eligibility from the approved decision at the cutoff.
     return {
       ...base,
       eligibleFrom: null,

@@ -24,7 +24,7 @@
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none`
-- Branch: `task/TASK-1558-globe-share-board`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - GitHub Issue: `TBD`
 
 ## Summary

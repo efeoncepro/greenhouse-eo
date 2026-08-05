@@ -20,7 +20,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `api`
-- Epic: `optional`
+- Epic: `EPIC-040`
 - Status real: `Complete local; migración AEO live queda como follow-up separado`
 - Rank: `TBD`
 - Domain: `growth|public-site`

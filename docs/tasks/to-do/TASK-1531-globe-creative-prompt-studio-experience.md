@@ -21,7 +21,7 @@
 - Rank: `TBD`
 - Domain: `creative|ui|ai`
 - Blocked by: `TASK-1530`
-- Branch: `task/TASK-1531-globe-creative-prompt-studio-experience`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

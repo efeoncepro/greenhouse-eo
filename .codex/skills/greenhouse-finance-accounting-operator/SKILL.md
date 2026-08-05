@@ -145,6 +145,12 @@ Use this section only when the request concerns Studio Credits or the Creative S
 6. The ledger is append-only across `allocate → estimate → reserve → approve → execute → settle/release/refund`. Technical/provider/Efeonce failures release or refund the reservation; a valid output followed by a new creative direction is new scope and a new estimate.
 7. Do not publish a CLP/USD equivalence, top-up price, expiration, rollover, breakage policy, or public checkout until Finance and Commercial approve it from observed data. Unused credits are not automatically free margin; revenue-recognition treatment depends on the enforceable contract and must be assessed under IFRS 15 with the accountant/auditor.
 8. Rights, likeness/voice releases, stock, music, talent, media, and other pass-throughs always stay outside the credit wallet. An approved SOW may sell them alongside credits, but only as a separate economic line.
+9. A historical internal bootstrap without cash, revenue, customer liability, active period, pool or funding grant
+   remains append-only audit history. Classify it explicitly, exclude it from every operational capacity/KPI/UI/API/
+   CLI/MCP projection, and never fabricate current capacity with deletion, reposting or an offsetting adjustment.
+10. A historical `submission_unknown` may release only through a governed adjudication with exact Finance authority
+    and transactional proof of no provider operation, output, asset, delivery or settlement. Preserve the decision
+    and ledger receipts; TTL, missing logs or dashboard cleanup are never sufficient evidence.
 
 Recommended internal analysis fields: `delivery_model`, `engagement_form`, `operating_mode`, `capability`, `template_version`, `estimated_credits`, `reserved_credits`, `settled_credits`, `provider_cost`, `human_exception_cost`, `rights_cost`, `failure_class`, and `refund_reason`.
 

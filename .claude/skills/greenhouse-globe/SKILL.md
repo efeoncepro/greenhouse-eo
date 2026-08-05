@@ -4,13 +4,98 @@ description: >-
   Implementa, audita y opera Efeonce Globe, plataforma hermana gobernada por Greenhouse. Úsala para Producer
   UI/BFF, API Contract Spine, trusted context, provider adapters, Model Lab y readiness, generación y retrieval,
   GCS privado, Asset Governance/C2PA/rights, workers Cloud Run, Cloud SQL, IaC keyless y rollout comercial.
-user-invocable: true
-argument-hint: "[describe la capability, command/reader, provider adapter, o cambio del spine que vas a construir en efeonce-globe]"
 ---
 
 # Efeonce Globe — Ingeniero de plataforma hermana
 
+## 📍 Dónde se entra (léelo antes de abrir un navegador)
+
+| Quiero | URL | Qué esperar |
+|---|---|---|
+| **Abrir el Producer** | **`https://globe.efeoncepro.com`** | El shell, con SSO por sesión |
+| Verificar que la API está viva | `https://globe-api-internal-*.run.app` | **`403`** = viva y protegida (IAM-private) |
+
+🔴 **NUNCA entres al Producer por `globe-studio-internal-*.run.app`: da 404 en la raíz POR DISEÑO, no está caído.**
+El shell se sirve por el front door (balanceador `globe-studio-front-door`, ADR-004 / SPEC-009); golpear la
+`.run.app` directo saltea el balanceador y no hay ruta que responda. El detalle de la topología está más abajo en
+§Front door, pero el dato operativo es éste y va acá arriba porque el error ya se cometió dos veces en una sesión.
+
 Eres ingeniero senior de **Efeonce Globe** (nombre de producto; *Creative Studio* es su descriptor funcional). Tu trabajo es implementar sobre el repo hermano `efeonce-globe` respetando su contrato de arquitectura, sin re-decidir la forma que ya está construida. La pieza más repetida será **extender el API Contract Spine que TASK-1481 dejó montado**: las tasks `TASK-1457…1480` (~23) agregan capabilities encima de él.
+
+## 🧪 La infraestructura de test que YA existe (no montes otra)
+
+**Antes de agregar jsdom, testing-library o cualquier runner nuevo: esto ya está y es mejor.** Se documenta acá
+porque un agente estuvo a punto de montar una capa paralela sin saberlo (2026-08-03).
+
+| Qué | Dónde | Qué prueba de verdad |
+|---|---|---|
+| **Canary del composer** | `apps/studio-client/scripts/producer-composer-canary.test.ts` | Levanta un **servidor stub** (`producer-composer-canary.mjs`, puerto 4324) que sirve el **bundle React de producción** y el shell real, y abre **Chrome real** con `playwright-core` (`channel: 'chrome'`, sin descargar browsers) |
+| Asertos de browser | `producer-composer-browser-canary.mjs` | First fold, disclosure, reduced motion, no-overflow a 1440/390/320, flujo integrado con idempotencia — **y desde 2026-08-03 escucha la consola y escribe tecla por tecla** |
+| Otros canaries del cliente | `scripts/tailwind-engine-canary.test.mjs`, `legacy-fallback-canary.mjs`, `light-contrast-audit.test.mjs`, `axis-pilot-canary.test.mjs` | Motor Tailwind, fallback legacy, contraste, piloto AXIS |
+| **Loop local del payload** (no es un test) | `scripts/globe-dev.mjs` → **`pnpm globe:dev`** | Levanta **Vite con HMR** y sirve **el MISMO shell que producción** (`renderShell` importado de `dist/`, igual que `seam-smoke-server.mjs`) con un bundle apuntado al dev server; los datos salen del fixture `producer-gvc-fixture.mjs`, levantado **dentro del mismo proceso** |
+| Runner | `node --test` nativo, registrado **explícitamente** en el script `test` de cada package | Agregar un `.test.ts` **no basta**: si no está en la lista de `package.json`, no corre |
+
+El loop vive en `scripts/globe-dev.mjs`, **fuera de `apps/studio-web/src/**` a propósito**: es herramienta de
+desarrollo, no superficie servida. Sirve para iterar el payload cliente con el shell real; lo que **NO** da es el
+carril humano —sesión, workspace, capabilities `*.self.*`—, y ése es el error que sigue (§El Producer es una
+superficie HUMANA).
+
+**Los asertos apuntan a `data-capture`, NUNCA a clases** — una clase es implementación del estilo y ya rompió
+asertos dos veces sin que el comportamiento cambiara.
+
+🔴 **Y su límite medido, para no confiar de más:** el canary **stubbea los readers**, así que no arma el estado
+con el que fallan los defectos de producción (gates cargados, feed con piezas, créditos). Un bug de render real
+—`ISSUE-136`— pasó **en verde** ahí tres veces mientras fallaba en el navegador con datos reales. Sirve para
+composición, contención, accesibilidad y errores de consola; **no** como prueba de que algo funciona en vivo.
+
+⚠️ **Y CIERRA EL BROWSER SIEMPRE: el canary lanza el Chrome REAL del operador.** `chromium.launch({ channel:
+'chrome' })` usa `/Applications/Google Chrome.app`, no un binario aislado — esa decisión es correcta (evita
+descargar browsers y `ISSUE-128`), pero tiene una consecuencia que muerde. Si el proceso Node muere sin cerrar
+el browser —timeout, `Ctrl-C`, fin de sesión—, **el Chrome queda vivo indefinidamente**. Y como macOS trata
+Chrome como una sola app por bundle, al operador le deja de abrir su navegador: el clic en el icono activa la
+instancia huérfana, que no tiene ventanas, en vez de su perfil.
+
+Medido el 2026-08-03: dos instancias del **día anterior** (05:44 y 05:46, perfil temporal
+`playwright_chromiumdev_profile-*`) bloqueaban el navegador del operador. Una ignoró `SIGTERM` y necesitó
+`kill -9`. Diagnóstico y limpieza, sin tocar el Chrome legítimo:
+
+```bash
+ps aux | grep "[G]oogle Chrome.app/Contents/MacOS/Google Chrome" | awk '{print $2}' | while read pid; do
+  ps -o command= -p "$pid" | grep -q playwright_chromiumdev_profile && echo "huérfano: $pid"
+done
+```
+
+### Agregar un código de rechazo son TRES pasos, y el olvidado es el del medio
+
+Medido el 2026-08-03. Un código nuevo que sólo cumple dos de los tres muere en silencio:
+
+1. **Nombrarlo** — al array `as const` de su vocabulario (`PRODUCTION_ROUTE_DEPENDENCY_REASONS`,
+   `PRODUCTION_ROUTE_DENIAL_CODES`), nunca a un union type: un union no sobrevive al compilado y el test de
+   cobertura no puede enumerarlo.
+2. 🔴 **Registrarlo en `SAFE_FINALIZATION_CODES`** (`packages/domain/src/governed-run-lifecycle.ts:609`) si nace
+   dentro del finalizador. Ese sanitizador **sólo deja pasar los nombres de su allowlist**; lo demás se
+   reemplaza por el genérico. Si te lo saltas, el nombre se borra **antes** de que la política lo vea, así que
+   la clasificación del paso 3 nunca se aplica y el código cae a `unknown` (tope 3) por más `terminal` que lo
+   hayas declarado.
+3. **Clasificarlo** en `governed-run-failure-policy.ts`, en el mismo commit. El test
+   `production-route-failure-classification.test.ts` rompe el build si falta.
+
+**Por qué el paso 2 es fácil de perder: no falla, degrada.** El build queda verde, el test de cobertura pasa
+—porque el código *sí* está clasificado— y la degradación sólo aparece en runtime, sobre una corrida real, como
+un tope equivocado. Es exactamente `ISSUE-127` operando sobre el arreglo de `ISSUE-135`: el sanitizador destruye
+la información que la política necesitaba para decidir.
+
+Caso fuente: `generated_asset_governance_pending` estaba fuera de la allowlist, salía como
+`run_finalization_failed`, caía a `unknown` con tope 3 — y mató una corrida ya cobrada mientras Asset Governance
+todavía trabajaba. El día anterior el mismo error se había recuperado solo tras **doce** entregas.
+
+### Cuando cambies un contrato compartido: barre TODOS los implementadores primero
+
+Hacer obligatorio un método de puerto (p. ej. `RunFinalizerPort.abandon`) es correcto —quien no lo implemente
+rompe el build en vez de dejar el hueco abierto—, pero **iterar contra el compilador de a un error convierte
+media hora en dos**. El primer paso es un `grep` global de los implementadores y arreglarlos **en una pasada**;
+recién después se corre el check. Caso fuente 2026-08-03: cuatro mocks incompletos descubiertos de a uno, con
+cinco minutos de `pnpm check` cada vez.
 
 ## 🔴 Encuadre del producto — leer ANTES que cualquier detalle técnico
 
@@ -20,21 +105,50 @@ Lo que sí es acotado es el **estadio de rollout**: hoy el runtime corre `intern
 
 Consecuencias operativas, no retóricas:
 
-- Al escribir doc, tasks, ADRs o **copy visible**, describí el estado con precisión (*"desplegado internal-only"*, *"runtime en `internal_smoke`"*, *"gated por TASK-1480"*) y **NUNCA** con encuadre de piloto/lab/experimento/no-productivo. El copy visible no dice `piloto`, `internal` ni `foundation` (TASK-1523/1524).
+- Al escribir doc, tasks, ADRs o **copy visible**, describe el estado con precisión (*"desplegado internal-only"*, *"runtime en `internal_smoke`"*, *"gated por TASK-1480"*) y **NUNCA** con encuadre de piloto/lab/experimento/no-productivo. El copy visible no dice `piloto`, `internal` ni `foundation` (TASK-1523/1524).
 - **NUNCA** dimensiones infraestructura, UX, seguridad ni calidad "porque es interno". Se dimensiona para el producto comercial que es; si hay brecha, se declara como **deuda con dueño** (`TASK-1521` runtime comercial, `TASK-1480` readiness comercial), no como diseño correcto.
 - El modelo de negocio es real y está escrito: `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md` (cinco líneas de ingreso, tres modalidades de delivery, tres modos operativos) + `..._CREDIT_MODEL_V1.md`.
 
-Baseline verificado contra código y runtime real hasta 2026-07-25. El estado mutable —revisiones, digests,
+Los contratos de esta skill están contrastados con código y runtime real. El estado mutable —revisiones, digests,
 flags, rutas promovidas, canarios y bloqueos— vive en
 `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`; nunca se infiere desde un número histórico de esta
 skill.
+
+### Continuidad operativa de rutas y canarios
+
+- Trabaja en Globe únicamente sobre su checkout compartido y su rama canónica `main`. Nunca crees, uses, muevas
+  ni limpies worktrees, clones o checkouts aislados; si el WIP compartido bloquea, detente y pide una decisión.
+- Conserva la identidad ejecutable exacta de extremo a extremo:
+  `routeId + capability + provider + model + version/endpoint`. Un éxito de una ruta vecina, otro endpoint o una
+  versión parecida no constituye evidencia para la ruta bajo prueba.
+- Ante timeout o resultado ambiguo, aplica **readback-first** con la misma correlación e idempotencia antes de
+  mutar. Para cada canary lógico conserva una sola `idempotencyKey` del command facturable, un solo run y un solo
+  cobro; no abras otro intento mientras el reader no descarte que el anterior completó o sigue recuperable.
+- No confundas el candidato retenido de evaluación con un canary post-promoción. El primero puede probar
+  evaluación y playback; el segundo, cuando el criterio lo exige, es una generación nueva iniciada en Producer.
+- Cuando el operador exija su sesión existente, ejecuta el canary desde el Chrome autenticado que él indicó; no
+  sustituyas esa atribución con un perfil Playwright efímero ni traslades cookies o secretos.
+- Verifica simetría de rollout entre API y worker ejecutor: driver/adapter, imagen y configuración, Secret Manager,
+  accessor IAM y service account deben existir en cada consumidor que realmente los usa. Una API que resuelve la
+  ruta con un worker sin el mismo soporte, o un secret declarado sin accessor runtime, no es una integración
+  operativa.
+- Las atestaciones y policies de derechos son inmutables. Corregir términos, digest o grants crea una atestación
+  nueva y una policy derivada nueva; nunca reescribas la anterior. La idempotencia de `auto-promote` se ancla a la
+  atestación exacta, de modo que repetirla sea no-op y una atestación nueva produzca una promoción distinta sin
+  colisionar con la clave anterior.
+- Un circuito `open` con razón `canary_unattested` prueba que falta evidencia del canary; no prueba por sí solo que
+  el driver, provider o endpoint estén rotos. Lee readiness, binding, attempt, output y atestación antes de cambiar
+  código o generar otra pieza.
+- `TASK-1632` pertenece completamente a Globe: conecta completion del provider con finalización de Producer y
+  Asset Governance dentro del mismo producto. Cualquier proyección o evento futuro entre Globe y Greenhouse sigue
+  siendo responsabilidad separada de `TASK-1475`; no introduzcas Greenhouse en el hot path de `TASK-1632`.
 
 > **LEER PRIMERO antes de asumir que un modelo/proveedor "no está" o "hay que integrarlo":**
 > `docs/operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md` — el **ledger canónico de la flota de modelos**
 > (qué modelo/proveedor está integrado, en qué **carril** — Model Lab vs producción gobernada —, validado cuándo y
 > con qué evidencia, y qué falta para llevarlo al Producer). Los proveedores del Lab (Vertex imagen/Veo/Omni, Fal
 > Seedream/Seedance, ElevenLabs, etc.) están integrados y validados en vivo desde 2026-07-19/20 — **no re-integrar**;
-> lo que suele faltar es el **driver gobernado + promoción ADR-009** por ruta. Actualizá ese ledger al integrar,
+> lo que suele faltar es el **driver gobernado + promoción ADR-009** por ruta. Actualiza ese ledger al integrar,
 > validar o promover cualquier modelo.
 >
 > **Desde `TASK-1554` (COMPLETE) el ledger ya no es la única autoridad:** el **SoT LIVE** de disponibilidad de
@@ -60,14 +174,76 @@ skill.
 - Asset Governance procesa `inspection → malware → C2PA → rights` en un Job keyless, durable y fenced. En
   `c2patool` 0.26.60, un MP4/MP3 válido sin manifest devuelve nonzero `No claim found`: se normaliza como
   `unverified/c2pa_manifest_absent`, no como outage ni `unsupported`. Sólo `Trusted` habilita badge C2PA.
+- La protección de datos enterprise es una dimensión separada de C2PA/rights: provider/model/endpoint/plan exactos,
+  no-training/no-improvement, retención, zero-retention, acceso humano, región, subprocesadores, aislamiento y
+  eliminación se verifican por ruta. Canon: `docs/architecture/GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md`.
 - Antes de crear otra revisión, el worker reconcilia proyecciones terminales no aplicadas y recupera autoridad de
   rights desde evidencia durable; requeue/replay son revisionados e idempotentes, nunca SQL manual.
+- **Recuperación después de timeout o fallo:** preserva `idempotencyKey` y `correlationId`; consulta primero el
+  reader de estado y la evidencia del attempt. Si el servidor completó, continúa desde ese estado. Si quedó
+  terminal sin finalizar, usa el command gobernado de reconciliación/requeue con la misma identidad lógica. Nunca
+  repitas `execute`, reserves créditos otra vez ni alteres filas a mano para “destrabar” una corrida.
+- **Diagnóstico seguro:** conserva códigos y razones curadas server-side (`errorName`, control y `reasonShape`
+  cuando corresponda), pero nunca imprime mensajes upstream, stacks, cuerpos, tokens, cookies, URLs firmadas ni
+  secretos. Verifica cada salto por su reader, audit y manifest; una respuesta sanitizada sin señal operable no
+  basta para diagnosticar.
+- 🔴 **Un default POR MODALIDAD no puede describir los BYTES (`ISSUE-139`).** `advertisedMimeType`
+  (`packages/domain/src/producer-assets.ts`) caía a un mapa por modalidad, así que un **MP3 servido correctamente
+  como `audio/mpeg` se anunciaba `audio/wav`** en el descriptor. Imagen y video pasaban **porque su default
+  coincidía por CASUALIDAD** — esa coincidencia accidental es lo que lo mantuvo invisible tres semanas, y es la
+  lección: **un default que acierta casi siempre es peor que ninguno**. Una modalidad admite varios formatos y el
+  motor elige: el MIME sale de lo que el intento DECLARÓ para esos bytes, y el mapa por modalidad es último
+  recurso, sólo para manifiestos anteriores a los descriptores por output. Los bytes nunca estuvieron mal; mentía
+  el rótulo, y un rótulo falso nombra mal la descarga y puede hacer fallar un reproductor **sobre un archivo
+  perfecto**.
+- **SVG servido por Fal:** Fal puede declarar `image/svg+xml` en el resultado y entregar el objeto CDN como
+  `application/octet-stream`. Acepta ese MIME genérico **sólo** cuando la salida esperada por la ruta es SVG,
+  valida los bytes como SVG antes del ingest y rechaza cualquier otra combinación. Sirve el SVG retenido con CSP
+  `sandbox`; no generalices esta excepción a otros tipos ni confíes sólo en extensión, URL o header.
 - El cierre proporcional exige `pnpm check && pnpm build`, test nuevo registrado en el script del package,
-  imagen/digest/policy verificados y canario UI de Image/Video/Audio con feed, viewer/playback, MIME/hash,
+  imagen/digest/policy verificados y canario UI de Image/Video/Audio/vector con feed, viewer/playback, MIME/hash,
   governance y `tofu plan` sin drift.
 - Gaps de escala vigentes: derivados de preview (thumbnail/poster/transcode/waveform), Range/streaming real,
   política explícita de visibilidad mientras governance está pendiente y reconciliación/GC de objetos huérfanos.
   Se diseñan como arquitectura versionada; no se resuelven cargando originales completos ni con excepciones UI.
+
+### 🔴 El Producer es una superficie HUMANA: un service account NO es un sustituto del carril
+
+Medido el 2026-08-03 montando `pnpm globe:dev`. **El error es fácil de cometer porque "funciona"**: con un token
+de service account los readers responden 200 y la pantalla carga. Lo que no carga es justo lo que define al carril.
+
+- **`GET /v1/session` contra la API IAM-privada responde `404`, y está bien: ese endpoint vive en el BFF**
+  (`studio-web` en modo web), no en la API. El cliente React lo consulta al arrancar para saber **quién es** y **en
+  qué workspace está**; con un proxy apuntado directo a la API privada ese llamado da 404 y la UI muestra **"Tu
+  sesión expiró"** — un síntoma que acusa a la sesión cuando el problema es que se le pidió a la API algo que
+  **nunca fue suyo**.
+- **Las capabilities `*.self.*` piden un "yo" que un service account no tiene.** Con principal de workload,
+  `globe.media.derivative.{get,ticket,request}` salen `policy-blocked` y `globe.credits.capacity.self.get` da
+  **403** — mientras `balance.get` da **200**, que es lo que hace parecer un permiso puntual y no un carril
+  equivocado.
+- **El síntoma visible invita al diagnóstico equivocado.** En local: tarjetas del feed **sin miniatura** (y el
+  placeholder se ve **igual** que una imagen fallida) y el contador de créditos en `—`, mientras
+  `globe.efeoncepro.com` se ve perfecto. De ahí a "es CORS" o "es el bucket" hay un paso.
+- **No es configuración apagada.** `GLOBE_MEDIA_DERIVATIVES_ENABLED` y `GLOBE_MEDIA_RANGE_GATEWAY_ENABLED` están en
+  **`true`** en el runtime: es un **grant que el carril workload no tiene**, no un flag por prender.
+- 🔴 **Antes de culpar al transporte, pide el objeto con su grant y mira los BYTES.** Medido: el logo responde 200,
+  y `GET /v1/outputs/:sha256` con `x-globe-retrieval-grant` devuelve el **PNG real completo** (7,4 MB, 2048×2048),
+  idéntico por API directa y por el proxy. **Un 200 con cuerpo JSON de error es indistinguible de un 200 con imagen
+  hasta que se mira el `content-type`.**
+
+### 🔴 El anti-patrón que no hay que reintentar: proxear el login del BFF desplegado
+
+Para llevar el carril humano a local, el primer intento fue **proxear el login del BFF ya desplegado** reescribiendo
+dos cosas: quitarle `Secure`/`Domain` a sus cookies para que sobrevivan en `127.0.0.1`, y reapuntar el
+`redirect_uri` del `303` de `/auth/start` al origen local. **Funcionaría — y es exactamente la mecánica de un
+secuestro de sesión.** Un control del entorno lo bloqueó mientras se escribía, con razón: **la forma del código es
+la del ataque, y que la intención sea legítima no la cambia.**
+
+La forma **correcta** es la que el repo ya canonizó en **`TASK-1629`** para el CLI de administración: el dev shell
+como **cliente OAuth PÚBLICO propio**, con **PKCE** y redirect loopback `http://127.0.0.1:<puerto>/auth/callback`.
+No intercepta la sesión de nadie: **abre la suya**, con consentimiento y sus propios scopes. El broker ya soporta
+esa forma (`oauth-broker.ts`: loopback exacto, puerto libre para clientes públicos). Prerequisito: **registrar ese
+cliente en el broker de Greenhouse**, que es configuración de autenticación compartida y la mueve un humano.
 
 ### 🔴 Trampas de verificación del payload cliente — medidas, no teóricas
 
@@ -133,6 +309,544 @@ letra en pantalla. Mirar el frame renderizado no es la cortesía del cierre: par
   --prod` re-resuelve dependencias y necesita su propio `.npmrc`. Publicar e instalar en local no prueba nada.
 - **Ningún aserto compara la proporción de un control contra sus hermanos.** Un stepper midió 768 px donde
   sus pares miden 68, con todo verde.
+
+#### Seis defectos de superficie medidos el 2026-08-01, y ninguno lo veía un gate
+
+El operador señaló cuatro cosas mirando la pantalla; las cuatro tenían causa distinta de la aparente. Sirven
+como catálogo porque **cada una es una CLASE, no un caso**.
+
+- 🔴 **Sin preflight, el `padding: 1px 6px` que el navegador le da a todo `<button>` sigue vivo y ninguna
+  clase lo declara.** Rompe **sólo** cuando la caja es tan chica que el glifo no entra: con 26 px de botón y
+  borde de 1 px quedan **12 px** de contenido para un glifo de **15**, y el control queda 1,5 px corrido. De
+  **219 botones** de la superficie era el ÚNICO afectado — los de 30 px absorben el mismo padding. **El
+  umbral es 29 px para un glifo de 15**; cualquier control de ícono nuevo por debajo hereda el defecto. Misma
+  familia que `b, strong { font-weight: bolder }`: el defecto lo inyecta el UA y los gates escanean
+  `className`, así que le son **estructuralmente invisibles**.
+- 🔴 **`margin-inline-start: auto` + `flex-wrap` deja un hueco muerto al envolver.** El empuje a la derecha es
+  correcto mientras el elemento quepa en la línea; cuando baja a la suya **se lleva el empuje** y queda pegado
+  a la derecha (medido: 239 px de hueco bajo el título). Se resuelve con `justify-content: space-between` en
+  el contenedor, que separa a los extremos cuando comparten línea y alinea al inicio cuando cada uno queda
+  solo — sin una media query que adivine el punto de quiebre.
+- 🔴 **…pero `space-between` reparte HIJOS.** Aplicarlo a un contenedor con **cuatro** hijos sueltos separó
+  también el contador de su título (196 px → 463 px, con 267 px entre un dato y la palabra que lo explica).
+  **Arreglar la alineación creó una regresión de agrupamiento.** Lo correcto es envolver lo que es un grupo
+  para que el contenedor tenga los dos hijos que el reparto supone.
+- 🔴 **Un velo por alfa NO es un hueco.** El centro del anillo de créditos usaba `bg-surface-soft`
+  (`rgba(255,255,255,.03)`): funciona sobre el canvas oscuro y sobre un `conic-gradient` saturado **deja pasar
+  el color entero**. Con el glifo en `text-action` —el MISMO naranja— el resultado era un disco liso. **El
+  popover del mismo componente ya lo había resuelto con `surface-solid`, y el trigger no heredó su token**:
+  antes de inventar una solución, mirar si la pieza hermana ya la tiene.
+- 🔴 **Una forma puede estar bien elegida para el dato equivocado.** Ese anillo además era correcto: con
+  500.836 disponibles de 501.110, el arco de «no disponible» mide **0,197° de 360** — 0,05 px de trazo. Para
+  mover UN grado hay que gastar 1.392 créditos. **Un donut responde «¿qué fracción queda?» y con un stock
+  grande esa respuesta es 99,9 % durante meses.** Se cambió el eje: mide el CICLO (consumo del período), que
+  arranca en cero. Y cuando el período no tiene tope, **no se sustituye el denominador por el consumo
+  observado** —«gastado / gastado» daría 100 % y diría «agotado» cuando no se sabe nada—: aro neutro.
+- ⚠️ **Un ícono no es decoración cuando nombra qué se mide.** `sparkles` es con lo que TODO producto anuncia
+  «esto tiene IA»: no dice nada del dato. Se eligió `flame` —el quemador que mantiene el globo en el aire—
+  por metáfora del producto y no de la categoría, sin reusar el isotipo, que ya significa Globe y «generando».
+  Descartados con su motivo: `gauge` (círculo con aguja dentro de un anillo = ruido), `coins` (dinero literal,
+  y Globe no revende tokens), `battery` (lenguaje de dispositivo). **Los ocho candidatos se renderizaron a
+  tamaño real en el runtime antes de decidir** — a 16 px varias hipótesis mueren solas.
+
+#### El feed: el backend paginaba y el cliente usaba medio contrato (2026-08-01)
+
+**Tercera** aparición del patrón «la capability existe y la UI no la consume» (compare de las cards ·
+paginación del feed · `runProgress` del experimento, 2026-08-04). Tres veces en pocos días **no es olvido: es
+que nada verifica el CONSUMO** — un contrato con cero lectores pasa todos los gates. `globe.producer.feed.live.*` pagina por **cursor keyset** (`updatedAt` +
+`stableKey`) con `nextCursor` desde TASK-1525; `nextFeedRead` sólo resolvía el eje del FUTURO (marca →
+`changes`) y **el `nextCursor` para retroceder se ignoraba**. El feed crecía sin techo por arriba y el
+histórico era inalcanzable. **No faltaba paginación: estaba a medio cablear.**
+
+- 🔴 **Una página hacia atrás NO puede mover el `watermark`.** El backend lo calcula desde el **último** item
+  de la página, y en dirección `older` el último es el **MÁS VIEJO**: adoptarlo hace retroceder la marca y el
+  próximo ciclo re-trae todo lo ya visto, con la pantalla viéndose perfecta. Los dos ejes viven en el mismo
+  objeto y avanzan en direcciones **opuestas**, así que el modo (`sync` | `changes` | `older`) viaja
+  explícito y nunca se infiere. Simétrico: un delta de novedades no toca el cursor del pasado. E invalidar la
+  marca **conserva** el cursor del pasado — son fallos de ejes distintos.
+- **NUNCA scroll infinito en el Producer:** vuelve inalcanzable el pie de la aplicación y, con piezas
+  generándose y reordenándose en vivo, mueve el contenido bajo el cursor. **Ni páginas numeradas:** con items
+  entrando por arriba, la página 2 cambia de contenido sola — offset es incorrecto por construcción, y por eso
+  el backend eligió cursor.
+
+#### Hallazgos operativos del Producer (2026-08-04) — medidos, pendientes de dueño
+
+- 🔴 **«Usar como referencia» y «Recrear» en las tarjetas del feed NO despachan ningún command.** Cero
+  `POST /v1/commands`, cero consola, y el contador de referencias se queda en **`0 / 2`**. Probado por las tres
+  vías: **coordenada con hover previo**, **`ref` del árbol de accesibilidad** y **`.click()` en la página**. **No
+  es el overlay ni `pointer-events`** — «Añadir a favoritos», **en la misma tarjeta y el mismo overlay**, SÍ
+  registra, y toda la cadena de padres computa `pointer-events: auto`. Es la familia ya documentada de **«la
+  capability existe y la UI no la consume»** (§El feed): un contrato con cero lectores pasa todos los gates.
+- **Sin referencia, el estimado nunca se calcula**, así que las rutas que **exigen entrada** (p. ej.
+  `ref/video/frames-v1`) **no se pueden ejecutar desde la UI**. El defecto de arriba no es cosmético: cierra un
+  carril entero de generación.
+- 🔴 **Asset Governance enmascara la causa (`ISSUE-127`, tercera aparición del día).**
+  `packages/domain/src/asset-governance-jobs.ts` colapsa **todo error que no sea `AssetGovernanceDependencyError`**
+  en `dependency_unavailable`, y su **`SAFE_DEPENDENCY_CODES` contiene SÓLO los cuatro códigos de C2PA**. Los
+  nombres de ClamAV y de inspección que `apps/asset-governance/src/engines.ts` **YA emite correctamente**
+  —`clamav_signature_update_failed`, `clamav_signature_stale`, `clamav_unavailable`, `clamav_scan_failed`,
+  `clamav_scan_invalid`, `clamav_signature_missing`, `clamav_version_invalid`— **se destruyen en la frontera**.
+  Dos ingests privados consecutivos murieron en `inspecting` con el código genérico, **sin una sola línea que
+  dijera por qué**.
+  ⚠️ **Límite declarado:** esos dos ingests se dispararon con un `File` **sintético** desde el browser, así que
+  antes de llamarlo defecto de plataforma hay que **reproducirlo con una subida real por el selector**. El
+  **enmascaramiento sí está verificado**, con independencia de eso.
+
+#### Cuando el shell real sirve el bundle de Vite: dos defectos que sólo se ven MIRANDO (2026-08-03)
+
+Aparecieron montando `pnpm globe:dev` y valen para cualquier documento que no sea el `index.html` de Vite.
+
+- 🔴 **Pantalla negra con la consola del navegador LIMPIA.** React monta —aparece el mensaje de React DevTools—, el
+  punto de montaje queda **vacío** y hay **cero errores en el navegador**. La causa sale por la salida del **DEV
+  SERVER**: `@vitejs/plugin-react can't detect preamble`. El plugin transforma cada componente **asumiendo que el
+  documento ya instaló el runtime de Fast Refresh** — un script que Vite inyecta en **SU** `index.html`. Si el
+  documento lo sirve otro (el shell real de Globe), hay que **inyectar el preamble a mano antes del entry**. Lo que
+  hace cara la búsqueda es dónde sale el error: **por donde nadie mira cuando lo que falla es la pantalla**.
+- 🔴 **Contenido correcto y CERO estilos.** En CSP, **declarar un nonce hace que el navegador IGNORE
+  `'unsafe-inline'`** para esa directiva — es precisamente la regla que vuelve seguros a los nonces. Vite inyecta el
+  CSS **por JavaScript** en desarrollo, así que con nonce presente esos estilos **se bloquean en silencio**. En
+  producción no aplica: ahí el CSS viaja como `<link nonce>` del bundle compilado, y el nonce es lo que hay que
+  **conservar**.
+- **Dato operativo:** el entry de Vite en dev vive **bajo el `base` del proyecto** — `/assets/app/src/main.tsx` y
+  `/assets/app/@vite/client`, **no** en la raíz. Un `curl /` da **302** y `/src/main.tsx` da **404**, lo que hace
+  parecer que el dev server no arrancó.
+
+#### Trampas operativas de la sesión (cuestan tiempo, no código)
+
+- 🔴 **`gh pr merge --delete-branch` te deja en `main` LOCAL**, que en este repo suele estar viejo y
+  divergente. Se siguió editando sobre esa base sin notarlo, y los cambios quedaron sobre archivos que no
+  tenían los fixes previos. Después de cualquier merge: **`git rev-parse --abbrev-ref HEAD`** antes de seguir
+  editando. La salida es `git diff > patch` → rama nueva desde `origin/main` → `git apply --3way`.
+- 🔴 **El CSP del payload bloquea el atributo `style` de HTML parseado, pero NO el CSSOM.** Un
+  `innerHTML` con `style="…"` se ignora en silencio (los estilos no aplican y nada falla); `el.style.setProperty(…)`
+  sí funciona. Vale para cualquier verificación visual inyectada desde el browser.
+- ⚠️ **Los estilos inline no sobreviven al feed vivo.** Con `GLOBE_PRODUCER_LIVE_FEED_ENABLED=true` React
+  re-renderiza solo cada 4 s y borra lo inyectado; para mirar un fix antes de desplegarlo hay que inyectar una
+  **hoja `<style>`**, que sí sobrevive.
+- 🔴 **Merge a `main` NO despliega.** `deploy-internal.yml` es `workflow_dispatch` manual y toma el servicio
+  como input. Un operador que mira la pantalla después de un merge ve la revisión ANTERIOR — y eso es
+  indistinguible de «el cambio no funcionó». Confirmar siempre con
+  `gcloud run services describe … --format='value(status.latestReadyRevisionName)'` y comparar el commit de la
+  imagen contra `origin/main`.
+
+#### La secuencia que SÍ despliega — ejecutada y verificada cuatro veces el 2026-08-02/03
+
+Los cinco commits de `TASK-1633` salieron a producción con esta secuencia, sin variantes. No es una lista de
+opciones: cada paso es precondición del siguiente.
+
+1. **`push`/merge a `main`** — no despliega nada (trampa de arriba).
+2. **CI verde sobre el SHA EXACTO**, no «el último run del workflow». `deploy-internal.yml` valida el SHA contra
+   `refs/heads/main` en `Verify exact remote main SHA` y rechaza cualquier otro; el SHA sale de `git rev-parse`,
+   nunca de memoria.
+3. **API:** `gh workflow run deploy-internal.yml -f service=globe-api-internal -f target_sha=<SHA40>`. El input
+   `service` es obligatorio y acotado (`globe-studio-internal` | `globe-api-internal`): desplegar el web **no**
+   despliega la API, y el dispatch de commands ocurre en la API.
+4. **Worker:** `gh workflow run deploy-producer-worker.yml -f target_sha=<SHA40> -f mode=build` y **después** el
+   mismo comando con `mode=deploy`. Son **dos corridas**: `build` publica el digest bootstrap, `deploy` actualiza
+   el Job ya gobernado por Terraform. Correr sólo una deja el Job con la imagen anterior, en silencio.
+5. **Verificar la REVISIÓN ACTIVA y el digest etiquetado, nunca el workflow en verde.**
+   `gcloud run services describe globe-api-internal --format='value(status.latestReadyRevisionName)'` + el tag de
+   la imagen en Artifact Registry contra el SHA. Un workflow `success` prueba que el pipeline corrió, no que el
+   tráfico está en esa revisión ni que el Job tomó ese digest.
+6. **Blast radius medido, no supuesto**, cuando el cambio altera cuándo muere un job: el payload estructurado del
+   worker expone `outboxTerminalAttempts`/`outboxRetryStorm` (así se llaman desde `ISSUE-138`; antes
+   `outboxDeadLetter`) y da la **serie temporal** — que es lo
+   que prueba que un dead letter es preexistente y no tuyo. En estos cuatro deploys sirvió **mejor** que la
+   consulta directa a Postgres, que ni siquiera estaba disponible (ADC vencida, `invalid_rapt`): el valor solo no
+   distingue «venía así» de «lo rompí».
+
+Snapshot histórico (no consultar acá el estado vigente, que vive en `GLOBE_RUNTIME_HANDOFF.md`): las cuatro
+corridas pasaron por revisión de API + digest de worker etiquetados con el SHA, con la señal terminal estable en
+el preexistente y `retryStorm` en 0.
+
+## 🔴 "Vertex" NO es un proveedor: son TRES superficies de invocación (medido 2026-08-04)
+
+El error de modelado más caro de esta plataforma. Bajo el mismo `vertex*` conviven tres formas de invocar que
+**no comparten nada operativo**, y el código las trató como variantes con defaults compartidos:
+
+| Carril | Superficie | Forma del input | Identificador | Completitud |
+|---|---|---|---|---|
+| `vertex` (imagen) | `generateContent` | `{data, mimeType}` (inlineData) | ninguno | síncrona |
+| `vertex-video` (Veo) | `predictLongRunning` | **`{bytesBase64Encoded, mimeType}`** | operation name | poll |
+| `vertex-omni` (Omni) | Interactions API | **base64 desnudo** | interaction id | unary |
+
+**El default de cada cosa era el del primer carril implementado (imagen).** Por eso imagen nunca falló —el
+default *era* su forma— y Veo falló en los dos puntos donde se desvía. Ambos defectos se descubrieron por
+separado, gastando, y ambos eran invisibles con el build verde.
+
+- **NUNCA** dejes que un driver herede la forma de encoding de otro: el encoder es **requerido** y se declara
+  en `PROVIDER_INPUT_ENCODERS` (`governed-provider-runtime.ts`). Un carril nuevo elige o no compila.
+- **NUNCA** valides la **FORMA** de un identificador que fabrica el proveedor. Es opaco: su forma es de Google
+  y cambia sin avisar. Veo devuelve `projects/<p>/locations/<r>/publishers/google/models/<model>/operations/<id>`
+  —**verificado en vivo**— y una regex adivinada lo rechazaba, descartando el nombre **sin persistirlo** con el
+  video ya generándose. Para un driver `poll` puro eso es **pérdida irreversible con gasto incurrido**: Fal
+  sobrevive porque su webhook repone la evidencia; Veo no tiene segundo escritor. Valida **propiedad**
+  (proyecto+región+modelo de la ruta), que es lo único que protege un invariante real.
+- **NUNCA** confíes en que un carril funciona porque "el modelo está integrado": el adapter del **Lab** y el
+  **driver gobernado** son código distinto. Omni estaba integrado desde julio y tenía **cero runs** por
+  producción; Veo tenía dos bugs que sólo aparecieron al ejercitarlo. **Cada motor genera al menos una pieza
+  por el carril real antes de darse por integrado.**
+- ⚠️ Cuando un test de un carril de proveedor use un identificador de ejemplo, **cópialo de una respuesta
+  REAL**. Los fixtures de Veo inventaban la forma corta mientras los endpoints de esos mismos tests ya llevaban
+  `/publishers/google/models/…`: la suite verificaba una ficción durante semanas.
+
+## Una vista que reemplaza a una tabla debe proyectar la MISMA superficie (`TASK-1641`, medido 2026-08-04)
+
+`generated_asset_rights_authority_effective` (migración `0048`) proyecta 3 columnas; el consumidor que se
+cambió a ella en el mismo commit usa 14. **La consulta nunca pudo parsear** —`42703` en planificación, sin
+importar los datos— y como un `DatabaseError` de `pg` no está en el allowlist de `handlerErrorToApiCode`, sale
+como **`internal_error` 500**. Efecto: `canary-confirm` reventaba con toda la evidencia correcta.
+
+- **NUNCA** sustituyas una tabla por una vista sin verificar que proyecta **todo** lo que sus consumidores leen;
+  un swap de una línea convierte cada consumidor existente en un error de parseo diferido, que sólo aparece
+  ejercitando el camino.
+
+Lo que sigue son las lecciones de **arreglarlo**, todas medidas: cada una apareció ejecutando, no razonando, y
+ninguna se ve leyendo el archivo que la contiene.
+
+### `CREATE OR REPLACE VIEW` no puede reordenar ni renombrar columnas
+
+Sólo permite **agregar al final**, conservando nombre, tipo y posición de lo que ya estaba. Cambiar la tercera
+columna de `authority` a `source_kind` **aborta** con **`42P16 cannot change name of view column`** — la migración
+no aplica, no es una advertencia.
+
+- **SIEMPRE** que cambie la **forma** de una vista: **`DROP VIEW` + `CREATE VIEW`**, y **sin `CASCADE` a
+  propósito**. Si alguien construyó encima, el DROP **debe FALLAR** en vez de arrastrarlo: el fallo es el aviso.
+  `CASCADE` destruye en silencio lo que no sabías que existía.
+- **SIEMPRE** verifica dependientes por **`pg_depend`/`pg_rewrite` ANTES** del DROP, no después de romper algo.
+- 🔴 **El DROP PIERDE los GRANT.** Se re-otorgan **explícitos** en la misma migración y se **verifican**; **NUNCA**
+  lo delegues en `ALTER DEFAULT PRIVILEGES` — un permiso que aparece por herencia es exactamente el que se rompe
+  en silencio cuando el objeto se recrea, y nadie lo nota hasta que un runtime distinto lo lee.
+
+### 🔴 El runner de migraciones de Globe NO parsea markers: `-- Down Migration` es SQL que SE EJECUTA
+
+`packages/database/src/migrate.ts` hace **`tx.query(sql)` con el ARCHIVO COMPLETO**, dentro de una transacción por
+archivo. **No busca `-- Up Migration` ni `-- Down Migration`: son comentarios.** Una sección "Down" no es un
+contrato de rollback — es SQL que corre **a continuación** del resto, en la misma transacción.
+
+Caso medido: la primera versión de la migración `0050` **re-creaba la vista rota tres líneas después de
+arreglarla**. Habría quedado **registrada como aplicada**, con el canary fallando exactamente igual.
+
+- **Esa convención es de `node-pg-migrate` (Greenhouse), NO de este repo.** Traerla acá por memoria muscular es
+  el error, y el build no dice nada.
+- **En Globe el rollback de un forward-fix es OTRA migración forward.** No hay otro camino.
+- Era el **ÚNICO** archivo del repo con esa sección: la regla es que **ninguno** la tenga.
+
+### Una migración que cambia una vista compartida se prueba contra PG real ANTES de aplicar
+
+En una transacción con **ROLLBACK**: se ejecuta **el archivo completo, tal como lo haría el runner**, se leen las
+columnas resultantes de `information_schema`, se **verifican los GRANT** y se **ejercita la query REAL de cada
+consumidor**.
+
+Los dos defectos de arriba —el `42P16` y el Down que re-rompía— salieron **así**, y ninguno de los dos es visible
+leyendo el archivo por más atención que se le ponga.
+
+### 🔴 NUNCA pongas un checkpoint de saga delante de una LECTURA PURA
+
+`confirmProductionPromotionCanary` marcaba `activated → verifying_canary` **antes** de leer la evidencia del
+canary — una lectura que **no escribe nada durable**. Y de `verifying_canary` **no se vuelve** (el command exige
+`activated`), así que **cada fallo de esa lectura QUEMABA una promoción**: vista rota, canary inexistente,
+identidad que no calza… y **reintentar quemaba otra**.
+
+Hoy se **lee primero** y el checkpoint cubre **sólo el sello**. La regla general, que vale para cualquier saga:
+**un checkpoint protege efectos durables**; delante de una lectura no protege nada y sí **consume el único estado
+desde el que se puede reintentar**.
+
+### Un `DatabaseError` de pg no puede salir como `internal_error` opaco
+
+La clasificación es por **clase de SQLSTATE**, y separa infraestructura de defecto:
+
+| SQLSTATE | Qué es | Código API |
+|---|---|---|
+| `08` connection · `40` transaction rollback · `53` insufficient resources · `55` object not in prerequisite state · `57` operator intervention | **infraestructura** | **`dependency_unavailable`** (reintentable) |
+| `42703` undefined_column · `23505` unique_violation · `22P02` invalid_text_representation… | **determinista** | **`internal_error`**, que es la verdad |
+
+🔴 **Prometer que reintentar ayuda cuando el fallo es determinista manda a reintentar para siempre contra un
+defecto que sólo se arregla con código.** Un `42703` no mejora esperando, y una promesa de reintento sobre él es
+peor que un 500 honesto.
+
+- La detección es **por FORMA** (`severity` + SQLSTATE de **cinco caracteres**), sin acoplar el transporte al
+  driver, y va **ÚLTIMA** en el mapeo para no ganarle **nunca** a un código nombrado.
+- **Mapear no puede costar la observación:** todo error de Postgres emite su SQLSTATE en el evento
+  **`globe.dispatch.database_error`**. Es la misma regla de `ISSUE-127` — una sanitización sin contraparte de
+  observabilidad no protege información, la destruye.
+
+### Contrato de superficie vista↔consumidor: dos eslabones, y ninguno alcanza solo
+
+- **`consumidor ⊆ contrato declarado`** — se verifica **sin base de datos**, en cada `pnpm check`.
+- **`contrato declarado ⊆ vista real`** — lo verifica el **bloque `DO`** de la migración, en cada apply.
+- Encadenados dan **`consumidor ⊆ vista real`**. El test estructural **no sabe qué hay en PG**; el bloque `DO`
+  **no sabe qué leen los consumidores**. Quedarse con uno es creer que se cubrió la propiedad entera.
+
+El guard barre **TODO el árbol de fuentes** —no el archivo que rompió— y **exige que cada consumidor ALIASE la
+vista**: sin alias, una referencia a columna **no es atribuible** y el guard no puede afirmar nada sobre ella.
+
+🔴 **Lección de método: un guard que no se prueba EN ROJO puede estar midiendo nada.** El detector de alias
+aceptaba **`WHERE` como alias** —o sea cubría **cero**— y eso sólo se vio **provocando el fallo a propósito**.
+
+### El único test del camino stubeaba el store, y un doble no falla por una columna inexistente
+
+Cuando el defecto vive en el **SQL**, el test tiene que ejercitar el **SQL**. Se agregó un **test en vivo opt-in**
+que corre la query real contra el **schema desplegado** y **se salta, visiblemente**, cuando no hay credenciales:
+falló con **`42703` antes de migrar**. Un doble prueba el TypeScript alrededor de la consulta, nunca la consulta.
+
+## Captura de completitud: cada proveedor avisa distinto (ADR-021, `ISSUE-138`)
+
+**La pregunta operativa es «¿cómo se entera Globe de que el asset está listo?», y la respuesta NO es la misma
+para los tres.** Forzar una abstracción común es el error de diseño que este bloque previene.
+
+| Proveedor | Mecanismo | Dato duro |
+|---|---|---|
+| **Fal** | Webhook firmado **POR REQUEST** (`?fal_webhook=`) + poll de respaldo | Su sección «Webhooks» del panel es un **REGISTRO**, no una configuración: no hay nada que habilitar |
+| **OpenAI** | **`poll`**, y es CORRECTO por diseño | `/v1/images/generations` es **síncrono** y OpenAI **no emite eventos de webhook para imágenes**. Su lane de webhook es `/v1/responses` con `background:true`, que ninguna ruta de producción usa. Configura **por proyecto, URL estática** |
+| **Vertex/Veo** | LRO `predictLongRunning` → `fetchPredictOperation` | **No ofrece callback por request**; su doc de LRO describe polling |
+
+🔴 **`completion_driver='poll'` con cero filas en `provider_completion_signals` es el comportamiento CORRECTO
+para OpenAI y Vertex, no un síntoma.** Un agente que lo lea como deuda va a "arreglar" algo que está bien.
+
+**Reglas duras del carril (todas medidas, no razonadas):**
+
+- **NUNCA** hagas trabajo real dentro del handler del webhook: verificar → persistir → **202**. Fal da **15 s**
+  a la primera entrega.
+- **NUNCA** uses el payload del webhook como resultado: sale del `response_url` persistido. Es la remediación
+  que la propia doc de Fal prescribe para su `payload_error`.
+- **NUNCA** metas un `JSON.parse`/`stringify` entre el cuerpo recibido y el digest: la firma es sobre bytes
+  crudos.
+- 🔴 **NUNCA** trates una firma válida como prueba de propiedad: **el JWKS de Fal es GLOBAL**. Cualquier cliente
+  suyo puede apuntar su `fal_webhook` a nuestra URL y producir una entrega genuinamente firmada. No permite
+  robar un asset, **sí matar runs ajenos** con un `ERROR` firmado. Por eso `GLOBE_FAL_USER_ID` compara el
+  `x-fal-webhook-user-id`. **Su valor NO se adivina** — medido, es un identificador estilo Auth0 (`github|…`)
+  que no se parece al username del panel; ponerlo mal rechaza TODAS las entregas legítimas.
+- **NUNCA** infieras la reintentabilidad del status HTTP cuando el proveedor la declara: **Fal publica
+  `X-Fal-Retryable`**. Y su **400** en el endpoint de resultado significa «todavía no completada», no error.
+- **NUNCA** respondas 400 a un fallo NUESTRO: el código que devolvemos gobierna si el proveedor reintenta. 503
+  para infraestructura, 400 sólo para rechazo definitivo (firma inválida, cuerpo sobredimensionado).
+- 🔴 **NUNCA** reconstruyas una URL de seguimiento de Fal desde el slug — y ahora está MEDIDO por qué:
+  `bytedance/seedream/v5/pro/text-to-image` sigue por `bytedance/seedream` (**descarta 3 segmentos**),
+  `bytedance/seedance-2.0/text-to-video` descarta 1, y la doc de Fal muestra `fal-ai/flux/schnell`
+  **conservando los 3**. No hay regla de segmentos: hay un «app id» que sólo Fal conoce. La base se **declara
+  por endpoint** (`FAL_FOLLOW_UP_BASES`) desde el `provider_response_url` de un submit REAL, nunca por
+  analogía. Un guard derivado exige que cada endpoint declare su base o declare que no la tiene.
+- **NUNCA** dejes los fallbacks de modelo de Fal activos: están **por default** y pueden ejecutar un modelo
+  distinto del aprobado y tarifado, dejando el `route_snapshot` mintiendo sin ninguna señal. Se apagan con
+  `x-app-fal-disable-fallbacks`.
+- **`docs.fal.ai` devuelve 429 a todo fetch programático pero es alcanzable desde el navegador real.** Una doc
+  que parece caída puede no estarlo — y en esta sesión eso convirtió dos «no verificados» en hechos.
+
+### ⚠️ Latencia esperada: ~8 min en frío NO es un cuelgue (eran ~20-25 con `*/5`)
+
+Asset Governance avanza **una etapa por tick de su cron**, así que su latencia es **cadence-bound, no
+size-bound**: el trabajo real son ~60 s y el reloj lo pone el scheduler. Con `*/5` eso daban **~20-25 min en
+frío**; `ISSUE-137` lo bajó a `*/1` y la medición post-arreglo da **7,9 min totales con governance en 3** —
+que imagen y video coincidan es la prueba de que el cuello era la cadencia. Lo encontraron **dos caminos independientes el
+mismo día**: el readback de `ISSUE-137` y el canary de generación, que **abortaba a los 20 min sobre un sistema
+perfectamente sano** (la corrida completó sola en la entrega 21).
+
+🔴 **Un canary cuya paciencia esté por debajo de la latencia real es peor que no tenerlo: enseña a leer
+«timeout» como normal, que es exactamente cómo un cuelgue real pasa desapercibido.** Antes de tocar código
+porque «el canary falló», mide el estado real.
+
+## Convergencia terminal de la saga de PROMOCIÓN (`TASK-1641`, 2026-08-04)
+
+El mismo invariante de abajo, en otra saga — y por eso se declaró como contrato y no como arreglo de un
+caso: **el defecto ya apareció en dos familias distintas**. Medido al revertir `ref/video/frames-v1`: el
+binding quedó `enabled=false` y el circuito `open` —los dos que la saga sí cierra— pero
+**`model_readiness_revisions` se quedó en `promoted`**. Tres agregados, dos posturas, nada que lo declarara.
+
+`PROMOTION_DEPENDENT_AGGREGATES` (`packages/domain/src/promotion-aggregate-convergence.ts`) los enumera con
+test **bidireccional**: una postura sin señal rompe el build.
+
+| Agregado | Postura | Lo cierra |
+|---|---|---|
+| `production_routing_circuits` | `converges` | la saga (`setCircuit`, **antes** que el binding: fail-closed) |
+| `production_route_bindings` | `converges` | la saga (`setBinding enabled=false`) |
+| `model_readiness_revisions` | **`observable`** | `globe.model-readiness.route.pause` — **otro dueño** |
+
+🔴 **NUNCA muevas readiness a `converges` ni le hagas pausar su propia readiness a la saga.** El primitive
+de reversa **ya existe** y es el del camino hacia adelante (`route.pause`: `promoted → paused`, append-only,
+sin borrar evidencia); lo que no existe es la **autoridad**: `pause` exige `globe.model-readiness.pause` y la
+saga sólo porta `globe.production-promotion.*`. Son **disjuntas a propósito** — es la separación
+maker/checker que hace vendible el régimen humano. Dársela le daría, **en el camino de recuperación**, una
+autoridad que el diseño le negó **en el camino normal**: un rollback automático podría retirar una promoción
+que un humano firmó. Por eso la divergencia **se cuenta y se hace visible**. Cambiar esa fila es reabrir el
+ADR, no editar una palabra — y el test lo pinea.
+
+🔴 **Y hoy `route.pause` NO tiene camino ejecutable por NINGÚN carril — verificado leyendo el código el
+2026-08-05.** `transitionModelRoute` hace `requireHuman(c)` para todo destino distinto de `promoted`
+(`packages/domain/src/model-readiness.ts:106`), así que el operator lane de service account **falla cerrado por
+diseño** aunque su principal declare la capability; y `globe.model-readiness.pause` **no está** en
+`PRODUCER_HUMAN_CAPABILITY_SCOPES`, así que un humano por el BFF tampoco. Se estuvo a punto de construir un modo
+`readiness-pause` en el operator lane y **se descartó LEYENDO el código** — habría sido un camino muerto que
+compila, despliega y falla en runtime. **NUNCA construyas un modo sobre una capability sin leer antes su handler
+y su lista de scopes: una capability concedida no es una capability ejecutable.** Dueño: `TASK-1463` (Delta
+2026-08-05). ✅ **Mitigación verificada:** volver a promover la ruta también cierra la divergencia —enciende el
+binding y vuelve coherente la readiness—, ejercitado el 2026-08-05 con la señal bajando de 1 a 0. El `pause`
+sólo hace falta cuando la decisión es **retirar** la ruta, no restaurarla.
+
+🔴 **Y el corolario de ORDEN, medido el 2026-08-05 al intentar cerrarlo:** conceder el scope **no es el primer
+paso**, es el último. El instinto —extender el CLI OAuth público de `TASK-1629`, que ya tiene PKCE y despacho
+por comando— **no cierra el problema**: el tramo Greenhouse → Globe viaja con **ID token de service account**,
+Globe lo resuelve como `principalType: 'service'` y `requireHuman` lo rechaza. Y el truco del fondeo —gate
+humano del lado Greenhouse— **no aplica**, porque ahí quien exige humano es Greenhouse y acá es **Globe, en su
+propio dominio**. La única superficie que produce `human` es la sesión de Globe vía su BFF.
+
+Así que correr el rollout de 3 pasos del broker sin superficie **entrega CERO capacidad** y arriesga el SSO de
+todos: un humano con un scope que no tiene dónde usar. **SIEMPRE superficie primero, grant después.** Detalle
+del procedimiento, sus riesgos y su rollback: `TASK-1463`, Delta 2026-08-05 (b).
+
+
+**La señal se computa sobre el estado LEÍDO AHORA**, nunca sobre la evidencia que la saga guardó al revertir:
+la evidencia dice qué pasó entonces y la pregunta es si alguien ya lo cerró. Una señal que no baja enseña a
+ignorarla, y eso es peor que no tenerla.
+
+✅ **El consumidor existe desde `efeonce-globe@17c3fef`** (`observePromotionConvergence` + el pase del worker
+en `apps/studio-web/src/promotion-observation.ts`), junto con la señal de ventana-por-expirar: son el **mismo
+lector** cross-workspace y separarlos duplicaría el escaneo. Usa la política de scan que ya existía
+(`app.promotion_recovery_scan`, migración `0028`) — **sin migración nueva**.
+
+### 🔴 Una señal sobre historia append-only necesita su predicado de VIGENCIA — y hacen falta DOS
+
+El predicado tuvo que aprenderse **dos veces**, y la segunda ya con la señal desplegada. Es el mismo error
+entrando por dos puertas: **preguntarle a la HISTORIA algo que sólo el ESTADO ACTUAL puede responder.**
+
+1. **Supersede por promoción posterior** (razonado antes de shipear). La versión ingenua —leer las
+   `rolled_back` y reportar las que tienen readiness `promoted`— habría acusado a `ref/motion/reference-v1` y
+   `ref/video/frames-v1`, que se **re-promovieron y quedaron selladas**: su readiness dice `promoted` por esa
+   promoción posterior, que es legítima. `NOT EXISTS` de una promoción posterior sobre el mismo
+   `routeId + modelVersion`, con comparación de tupla para desempatar.
+2. 🔴 **Binding vigente apagado** (descubierto **en producción, 2026-08-05, con la señal ya viva**). En su
+   primer ciclo reportó **3 divergencias y 2 eran rutas VIVAS**: `ref/still/rrss-v1` y `ref/still/openai-v2`
+   tienen su última promoción de la saga en `rolled_back` **y su binding `enabled`**, porque las habilitó el
+   **lane automatizado de ADR-010, que NO enruta por la saga** y por tanto no deja ninguna operación posterior
+   que las supersede. El remedio que la señal sugiere las **habría retirado**.
+
+**La lección generalizable:** la divergencia que fundó el contrato nunca fue *«hubo un rollback»* — fue *«el
+binding quedó apagado y la readiness se quedó en `promoted`»*. «Última promoción revertida» era un **PROXY**
+de «el rollback sigue en pie», y **un proxy falla exactamente donde otra autoridad puede deshacerlo**. Cuando
+un sistema tiene **más de un mecanismo** que puede mover el mismo estado (acá: saga ADR-009 y lane ADR-010),
+derivar de la historia de UNO de ellos es incorrecto por construcción. **SIEMPRE** cierra el predicado sobre
+el **estado actual del efecto**, no sobre el registro del acto.
+
+Tras el arreglo (`efeonce-globe@b958a11`) la señal bajó de **3 a 1** en el ciclo siguiente, y la que queda
+—`ref/still/reference-v1` v5-pro, binding `enabled=false`, readiness `promoted`— es genuina.
+
+⚠️ Y el corolario de método: **los dos falsos positivos no los atrapó ningún test.** Aparecieron mirando el
+primer ciclo real de la señal contra datos de producción. Una señal nueva no está verificada hasta que se
+**leen sus primeras emisiones y se comprueba una por una contra el estado real**.
+
+### La métrica de conteo no se elige sólo por el aligner
+
+El aligner es función del tipo —`ALIGN_SUM`/`ALIGN_COUNT` sobre DELTA/INT64, `ALIGN_PERCENTILE_99` sobre
+DELTA/DISTRIBUTION— y copiarlo de la hermana equivocada falla en el apply con un 400. Pero la razón de fondo
+para que `globe_promotion_window_closing` sea de **conteo** es otra: **«segundos restantes» se alinea al
+revés**. Pediría `COMPARISON_LT`, y **no existe `ALIGN_MIN` para DISTRIBUTION**, así que un p99 sería la
+promoción **menos** urgente — exactamente el extremo equivocado. **SIEMPRE** que una magnitud sea "cuánto
+falta" en vez de "cuánto lleva", emite el **evento discreto** y deja el número en la línea que un humano lee.
+
+### Las dos señales de la ventana son los dos lados del mismo instante
+
+`stalled` / `promotion_queue_oldest_age_seconds` miden `deadline_at <= now`;
+`globe_promotion_window_closing` mira `deadline_at > now`, con 30 min de antelación
+(`GLOBE_PROMOTION_WINDOW_WARNING_SECONDS`, medidos: ~8 min de Asset Governance + generación +
+`canary-confirm`, sobre una ventana de 3 h). **NUNCA** las unifiques ni dejes que una cuente lo de la otra:
+contar una ventana vencida en las dos borra la frontera y ninguna significa una sola cosa. Runbook:
+`docs/operations/creative-studio/GLOBE_ROUTE_PROMOTION_RUNBOOK_V1.md`.
+
+## Convergencia terminal de los agregados del run (`TASK-1469`)
+
+**Cuando un run llega a terminal, todo agregado que dependa de su estado converge o queda observable.** Se
+declara como invariante y no como arreglo de un caso porque el mismo defecto apareció en **dos parejas** y sólo
+una estaba declarada — arreglar por pareja garantiza descubrir la tercera en producción.
+
+`RUN_DEPENDENT_AGGREGATES` es un array enumerable con test **en ambas direcciones**: un agregado sin postura
+rompe el build, y un `observable` **sin señal** se rechaza, porque declararlo así es la forma elegante de no
+hacerse cargo.
+
+- **NUNCA** escribas una lógica de cierre propia para el barrido de recuperación: reusa **el mismo primitive**
+  del camino hacia adelante (`RunFinalizerPort.abandon`). Dos definiciones de «converger» pueden divergir entre
+  sí — el bug class original, una capa más arriba.
+- 🔴 **La postura de un agregado puede depender del CASO, y una fila que promedia dos casos esconde el que
+  está mal.** `credit_reservations` era `observable` entera, delegando en el TTL de 24 h. Post-gasto eso es
+  correcto —el settlement ya decidió y tocar dinero arriesga doble movimiento—, pero **pre-gasto era falso**:
+  un run que murió sin que el proveedor aceptara no cobró nada. Medido el 2026-08-04 contra `globe-pg`: la
+  **única** reserva `held` de toda la base era pre-gasto (32 créditos) y había **cero** post-gasto, o sea el
+  100 % del crédito inmovilizado estaba amparado por un razonamiento que no le correspondía. Hoy la entrada
+  lleva `condition` con dueño y señal en **ambas** ramas, y el test rechaza dos ramas con la misma postura.
+  **NUNCA** partas la fila en dos: `aggregate` es el **nombre físico de la tabla** y `credit_reservations
+  (pre-spend)` rompería justo la propiedad que la hace verificable contra el runtime.
+- 🔴 **El discriminador de gasto es `attempt.providerOperation`, NO `lease.kind`.** `POST_SPEND_KINDS` nombra
+  bien la asimetría pero clasifica **topes de reintento**: una entrega de `submit` puede haber aceptado con la
+  respuesta perdida, y ése es justamente el caso ambiguo que no se debe liberar a ciegas. El hecho durable
+  decide; el nombre de la fase no.
+- 🔴 **En `abandon`, el orden lo decide el peor caso y el fallo NO se propaga.** Liberar va **primero** —marcar
+  terminal antes haría que un segundo intento saliera por la guarda de idempotencia sin liberar nunca— pero un
+  throw dejaría el experimento `running` para siempre, porque `abandon` corre **después** de que la outbox
+  cerró la entrega: peor que la reserva colgada que el cambio evita. Degrada al TTL, que es el dueño declarado
+  de ese caso, y **se observa** (`globe_run_abandon_release_degraded`): sin esa línea, «se liberó rápido» y
+  «se cayó al TTL de 24 h» son indistinguibles desde afuera. Es la regla de `ISSUE-127` aplicada a un
+  `catch` legítimo.
+- **NUNCA** marques `failed` un run `completed` cuyo agregado quedó atrás: sería mentir sobre una corrida que
+  sí entregó. Ese caso **se cuenta y no converge**, y la diferencia queda en `divergentAggregates`.
+- **NUNCA** midas una señal en la unidad equivocada. `outboxDeadLetter` contaba **filas de outbox** y un attempt
+  tiene una por fase: decía **3 para UN solo attempt**. Hoy es `outboxTerminalAttempts` y cuenta attempts.
+
+### 🔴 El reloj de la COLA no es el reloj del DOMINIO
+
+`finishLease` cierra la fila de `governed_run_outbox` escribiendo `completed_at`/`updated_at` — hechos sobre
+**cuándo terminó la fila de la cola**. Recibía el instante como parámetro y **los siete call sites le pasaban un
+instante de NEGOCIO**: cuatro del pasado (`acceptedAt`, `observedAt`) y **tres del futuro** (`retryAt`,
+`nextCheckAt`), o sea filas que podían declararse completas **antes de existir**.
+
+Medido en producción: **23 de 131 filas `done`** con `completed_at < available_at`, peor caso **−34.965 s = 9,7
+horas** en un job `complete` de 144 entregas. Hoy sella con el reloj de pared **inyectado** (`this.#now()`), y un
+guard estructural **pinea que son siete** — un octavo exige una decisión explícita en vez de heredarla.
+
+**Y el diagnóstico correcto necesitó dos datos que la métrica sola no da:** `completed_at` del outbox **no tiene
+lectores** y `finishLease` **no toca `available_at`**. O sea el daño era de **observabilidad**, no de scheduling,
+y el arreglo no movía ninguna ventana de reintento. **Antes de escalar un dato torcido, mide quién lo lee.**
+
+- **NUNCA** le pases a `finishLease` —ni a ningún campo de reloj de la cola— un instante de dominio.
+- **NUNCA** guardes un instante de negocio en una columna de la cola: si hace falta, se agrega su propia columna.
+  Los siete caminos ya tenían la suya (`provider_accepted_at`, `next_action_at`, `terminal_at`,
+  `cancellation_confirmed_at`, el JSON de `completion`), que es lo que hizo el cambio barato.
+- ⚠️ **Toda edad, latencia o serie calculada sobre filas anteriores al sello es sospechosa.** No concluyas un
+  incidente sobre ellas.
+
+### Una regla transcrita tres veces son TRES reglas
+
+`coarseProgress` vivía como función TS en el run store, como `CASE` en el SQL del live feed y como `Set` de
+valores en ese mismo archivo. **Las tres coincidían — por eso el riesgo era invisible**: divergir no rompe nada,
+sólo hace que la tarjeta del feed y el detalle del run digan cosas distintas del **mismo** run, con el build y
+los tests en verde.
+
+Hoy es **dato único** `GOVERNED_RUN_COARSE_PROGRESS` (`packages/contracts/src/governed-runs.ts`, `Record`
+exhaustivo sobre `GovernedRunStateV1`) y el SQL se **genera** con `governedRunCoarseProgressSql()`.
+
+🔴 **Se retiró el `ELSE 'terminal'`, y esa parte importa más que la deduplicación:** un catch-all que presenta un
+estado **desconocido** como **corrida terminada** miente en la dirección más cara — el operador deja de esperar
+algo que sigue vivo. Sin `ELSE`, un estado no declarado rinde NULL y el consumidor **lanza**. Un default sobre un
+vocabulario cerrado no es robustez: es una respuesta inventada.
+
+### Alertas: el aligner es función del TIPO de métrica
+
+`ALIGN_COUNT` **sólo** vale sobre DELTA/INT64 (una métrica que cuenta entradas de log). Una métrica que
+**extrae un valor** es DELTA/DISTRIBUTION y necesita `ALIGN_PERCENTILE_99`. Copiarlo de la alerta hermana
+equivocada **falla en el apply con 400**, no antes. Y un **404 de la métrica recién creada es propagación** de
+Cloud Monitoring (hasta 10 min), no un defecto: se reintenta.
+
+### 🔴 `tofu apply` desde un checkout limpio DESTRUYE el entorno de desarrollo
+
+`development_environment_enabled` tiene default `false` en git y el entorno **vivo** depende de un
+`terraform.tfvars` **gitignoreado**. Un plan desde una máquina sin ese archivo da **`20 to destroy`** con todo
+en verde. El plan honesto exige:
+
+```bash
+tofu plan -var development_environment_enabled=true \
+  -var 'development_operator_principal=user:julio.reyes@efeonce.org'
+```
+
+**SIEMPRE** exige `0 to destroy` antes de aplicar. El arreglo de fondo —que el estado real de un flag no puede
+vivir en un archivo sin trackear— es de `TASK-1635`.
 
 ## Boundary: Globe es plataforma hermana, no un módulo de Greenhouse
 
@@ -224,7 +938,7 @@ AXIS es la foundation portable gobernada desde Greenhouse, no un runtime compart
 - El acceso de Cloud Build usa el secreto `projects/efeonce-globe/secrets/axis-packages-read-token` y el service account de build autorizado a ese secreto. Materializa `.npmrc` solo durante la instalación en el workspace efímero; nunca pases el token como Docker build argument ni lo copies a la imagen.
 - `TASK-1591` tiene el piloto de adapters opt-in verificado en Globe con paquetes `0.1.4`: `AxisStatus` y `AxisProgress`, evidencia desktop/390 px/teclado/reduced-motion/accesibilidad y rollback por versión. No confundas este piloto con promoción de producto.
 
-**Toolchain (verificado en `tsconfig.base.json`):** `module`/`moduleResolution` NodeNext, `strict`, más `verbatimModuleSyntax`, `exactOptionalPropertyTypes`, `noUncheckedIndexedAccess`, `noImplicitOverride`, `useUnknownInCatchVariables`. Escribe código que satisfaga estos flags (p.ej. con `exactOptionalPropertyTypes` no pasas `undefined` a una prop opcional — usá spread condicional `...(x !== undefined ? { x } : {})`, patrón usado en todo el spine).
+**Toolchain (verificado en `tsconfig.base.json`):** `module`/`moduleResolution` NodeNext, `strict`, más `verbatimModuleSyntax`, `exactOptionalPropertyTypes`, `noUncheckedIndexedAccess`, `noImplicitOverride`, `useUnknownInCatchVariables`. Escribe código que satisfaga estos flags (p.ej. con `exactOptionalPropertyTypes` no pasas `undefined` a una prop opcional — usa spread condicional `...(x !== undefined ? { x } : {})`, patrón usado en todo el spine).
 
 **Tests: `node --test`, NO Vitest.** Los tests son `*.test.ts` ejecutados directo por Node (p.ej. `node --test src/index.test.ts`). No introduzcas Vitest, Jest ni otro runner. **Trampa de la suite (lección de método, cuesta un verde falso):** los scripts `test` de cada package **ENUMERAN los archivos a mano** — no hay glob ni descubrimiento. Un `*.test.ts` nuevo que no se agrega a ese script **NUNCA corre**, y la suite queda **verde por no haberlo mirado**, que es el peor de los verdes. Al agregar un test, agrégalo también al script `test` del package y confirma que aparece en la salida del run.
 
@@ -244,7 +958,7 @@ pnpm check   # = pnpm typecheck && pnpm test  (tsc NodeNext strict + node --test
 pnpm build   # = pnpm -r build
 ```
 
-Al **agregar una dependencia de workspace** (`workspace:*`), corré `pnpm install` para relinkear. Globe **no consume el build de `greenhouse-eo`**; son toolchains independientes — no corras aquí los comandos de Greenhouse (`pnpm local:check`, etc.) esperando validar Globe.
+Al **agregar una dependencia de workspace** (`workspace:*`), corre `pnpm install` para relinkear. Globe **no consume el build de `greenhouse-eo`**; son toolchains independientes — no corras aquí los comandos de Greenhouse (`pnpm local:check`, etc.) esperando validar Globe.
 
 ## El API Contract Spine (TASK-1481) — el corazón
 
@@ -299,12 +1013,12 @@ El **transporte HTTP es una sola surface del servidor**: SDK, MCP y CLI son clie
 
 Este es el camino exacto. Seguilo; no inventes uno paralelo.
 
-1. **Schemas en `packages/contracts`.** Definí los tipos versionados de payload/outcome (command) o query/data (reader). Reusá `CommandResultV1` / `ReaderResultV1` como sobre. Extendé el vocabulario (`GLOBE_CAPABILITIES`, error codes, etc.) acá si hace falta — este package es el source of truth de tipos.
-2. **Registrá el command/reader en `packages/domain`** vía `registry.registerCommand({ descriptor, requiredCapability, handler })` o `registry.registerReader(...)`. El patrón canónico es cómo `createGlobeSpineRegistry()` puebla el registry: un `CapabilityDescriptorV1` (con `capability`, `kind`, `summary`, `coverage`), la `requiredCapability` (una `GlobeCapability`), y el `handler(context, payload) => outcome`. El handler recibe el `TrustedCommandContextV1` ya derivado y autorizado.
-3. **Volteá el coverage** del descriptor de `policy-blocked` → `available` en las surfaces que realmente shippeás (y `not-applicable` donde de verdad no aplica). Nunca dejes una surface sin declarar. Una capability reservada pero no implementada se queda `policy-blocked` en sus surfaces ejecutables (así nace el fixture `globe.run.prepare` en el spine).
+1. **Schemas en `packages/contracts`.** Define los tipos versionados de payload/outcome (command) o query/data (reader). Reúsa `CommandResultV1` / `ReaderResultV1` como sobre. Extiende el vocabulario (`GLOBE_CAPABILITIES`, error codes, etc.) acá si hace falta — este package es el source of truth de tipos.
+2. **Registra el command/reader en `packages/domain`** vía `registry.registerCommand({ descriptor, requiredCapability, handler })` o `registry.registerReader(...)`. El patrón canónico es cómo `createGlobeSpineRegistry()` puebla el registry: un `CapabilityDescriptorV1` (con `capability`, `kind`, `summary`, `coverage`), la `requiredCapability` (una `GlobeCapability`), y el `handler(context, payload) => outcome`. El handler recibe el `TrustedCommandContextV1` ya derivado y autorizado.
+3. **Voltea el coverage** del descriptor de `policy-blocked` → `available` en las surfaces que realmente shippeas (y `not-applicable` donde de verdad no aplica). Nunca dejes una surface sin declarar. Una capability reservada pero no implementada se queda `policy-blocked` en sus surfaces ejecutables (así nace el fixture `globe.run.prepare` en el spine).
 4. **El handler llama a `packages/provider-contract` → `apps/creative-runner`** para cualquier trabajo de provider. **NUNCA** instancies un SDK de provider directo desde el handler, la UI, MCP, CLI, scripts ni tests.
-5. **Método SDK tipado** en `packages/sdk` (o reusá `dispatchCommand` / `dispatchReader` del `GlobeClient`). Los commands exigen `idempotencyKey`.
-6. **Granteá la `requiredCapability`** para que aparezca en `AuthenticatedPrincipalV1.capabilities` del broker grant. La autorización final la hace `#authorize` del registry: chequea coverage de la surface → `trustedContextHasCapability` → falla cerrado si el handler falta bajo un estado `available`.
+5. **Método SDK tipado** en `packages/sdk` (o reúsa `dispatchCommand` / `dispatchReader` del `GlobeClient`). Los commands exigen `idempotencyKey`.
+6. **Grantea la `requiredCapability`** para que aparezca en `AuthenticatedPrincipalV1.capabilities` del broker grant. La autorización final la hace `#authorize` del registry: chequea coverage de la surface → `trustedContextHasCapability` → falla cerrado si el handler falta bajo un estado `available`.
 7. **El harness manifest-driven de conformance la ejercita sola** — no escribas un backdoor de test que llame al provider o al handler saltándose el spine.
 
 ## El ejemplo trabajado — Model Lab (TASK-1457): la primera capability real sobre el spine
@@ -332,10 +1046,34 @@ El flujo de arriba es abstracto. El **Model Lab** es su primera instancia real y
 
 Si el Model Lab muestra "capability con estado + provider", el **Evaluation Harness** (SPEC-003, `EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md`) muestra el patrón **"capability sobre capability"**: `globe.lab.evaluation.run` no reimplementa la ejecución de experimentos — la **reusa**. Vive en `packages/domain/src/evaluation.ts`; el wiring en `app.ts` le pasa **las mismas** `ModelLabDependencies` que al Lab más un `EvaluationReportStorePort`.
 
-- **Reuso vía helper programático, no vía dispatch.** El Lab exporta `runModelLabExperiment({ context, request, deps })` (reusa `prepareExperiment` + `executeExperiment`). El comando `evaluate` lo llama para correr un golden brief por el camino real del Lab (con todos sus guardrails: kill switch, spend fence, private-ingest, provider seam) y obtener un `ExperimentAttemptManifestV1` fresco que puntúa. Cuando una capability nueva deba orquestar otra, **exportá un helper de dominio y reusalo** — nunca re-dispatchés por el registry desde dentro de un handler ni dupliques la lógica.
+- **Reuso vía helper programático, no vía dispatch.** El Lab exporta `runModelLabExperiment({ context, request, deps })` (reusa `prepareExperiment` + `executeExperiment`). El comando `evaluate` lo llama para correr un golden brief por el camino real del Lab (con todos sus guardrails: kill switch, spend fence, private-ingest, provider seam) y obtener un `ExperimentAttemptManifestV1` fresco que puntúa. Cuando una capability nueva deba orquestar otra, **exporta un helper de dominio y reúsalo** — nunca re-dispatches por el registry desde dentro de un handler ni dupliques la lógica.
 - **Dato vs motor (el test del segundo consumidor, ya aplicado).** Los **fixtures** (golden briefs still/motion/audio, con `license`/`consent`/`permittedUse` declarados) y las **rúbricas** son **dato versionado**; el motor de checks no tiene un `switch` por fixture. Dos contratos de fidelidad distintos (image `flexible-style` y audio `audio-foley`) fluyen por el **mismo** motor — eso es la evidencia de reutilización, no una promesa.
 - **Separar lo objetivo de lo humano; el verdict nunca auto-aprueba craft.** `objectiveChecks` (automáticos, deterministas sobre el manifest) van separados de `humanCriteria` (declarados, **sin** `pass`/`score` — nunca auto-respondidos). El verdict es sólo `objective_fail` u `objective_pass_pending_human` (pendiente de humano). El harness **NUNCA** declara un modelo globalmente mejor; cada report es **versionado**, **workspace-scoped** y **declara sus limitaciones** (proveedor fake, muestra única).
 - **Coverage + capability idénticos al patrón.** `globe.lab.evaluation.run` en `GLOBE_CAPABILITIES`; `EVAL_COVERAGE` con `ui`/`mcp` `policy-blocked`, `http`/`sdk`/`cli`/`worker`/`e2e` `available`, `sister-platform` `not-applicable`; grant en el service principal. Reusa `InvalidExperimentRequestError → invalid_request` para validación de payload y `capability_not_found → not_found` para fixture/rúbrica/report desconocido o cross-workspace.
+
+### Evaluación durable con inputs reales (TASK-1614, regla vigente desde 2026-07-31)
+
+Una evaluación durable no puede confundir el dato hermético del fixture con el activo que el provider debe
+consumir. Los handles `sha256:*` con `rights=test-fixture` sólo sirven cuando el resolver conoce sus bytes; en
+runtime real se parte de un output retenido y autorizado, se convierte mediante
+`globe.producer.asset.copyAsReference` y se pasa el handle completo como `authorizedInputs` a
+`globe.lab.evaluation.evaluate`. El experimento y el reporte persisten esos inputs efectivos, conservan cantidad,
+modalidad y orden, y verifican `input_lineage_intact`. Ante un timeout, consulta experimento, run y reporte antes de
+considerar otro intento.
+
+Antes del gasto, el compiler debe resolver una política durable `purpose=evaluation` para la tupla exacta
+`workspace + route + provider + model + version + sourceKind + time`; una policy de producción no la sustituye y
+una policy `appliesTo=generated` no autoriza por sí sola un derivado. El policy id/version/digest/purpose forma
+parte del snapshot y del fingerprint. El `ProducerReferenceHandleV1` se resuelve además al `assetId` canónico,
+verificando workspace, hash, medio, retención, Asset Governance y derechos del output fuente; ese padre queda en
+`generatedAssetParents`. Los outputs de evaluación pueden verse internamente, pero no descargarse como attachment
+ni entrar a un share board.
+
+Si el provider produjo bytes pero falló la finalización, no reintentes el webhook ni edites el run inmutable:
+recupera provider attempt, output retenido, asset/rights proyectados y evaluation report por sus readers. Repara
+lineage/rights mediante el carril canónico y crea un run nuevo sólo después del rollout. El workflow keyless expone
+`copy-reference:caller`, `evaluate:caller`, `run-get:caller` y `run-cancel:caller`; son commands de la API Contract
+Spine, no SQL ni llamadas directas al provider.
 
 ## El tercer ejemplo trabajado — Provider adapters reales (TASK-1486/1487/1488): el provider seam con motores reales
 
@@ -403,9 +1141,9 @@ El edit dejó de ser específico de Omni. Hay **una sola semántica** y el mecan
 - **NUNCA** blanquees un derivado como `internal-owned`: es `derived-internal` (postura que un caller no puede declarar) + los derechos heredados del padre, para que un input `licensed` siga restringiendo a sus descendientes.
 - **NUNCA** hilvanes un handle de sesión hacia un proveedor que no lo emitió, ni confíes en un `providerRunRef` sin `providerRunChainable`.
 - **NUNCA** trunques un set de referencias para que entre: truncar devuelve trabajo que parece correcto y no lo es.
-- **SIEMPRE** rechazá un edit imposible en `prepare` (padre desconocido/cross-workspace → `not_found` sin revelar existencia; sin candidato; **sin ninguna afordancia**; media no editable; profundidad excedida), antes de que el fence reserve.
+- **SIEMPRE** rechaza un edit imposible en `prepare` (padre desconocido/cross-workspace → `not_found` sin revelar existencia; sin candidato; **sin ninguna afordancia**; media no editable; profundidad excedida), antes de que el fence reserve.
 
-**Lección de método (vale más que el código).** Dos defectos sobrevivieron una suite unitaria en verde y sólo aparecieron gastando plata real: `providerRunChainable` se calculaba en el adapter y el runner no lo copiaba (todo edit stateful degradaba en silencio), y todo fallo del runner colapsaba a `runner_error` (el fallo más común de un edit era indistinguible de cualquier otro). Cuando un campo de evidencia nace, **verificá que haga el viaje completo hasta el manifest** — un test de adapter que lo afirma no prueba que llegue.
+**Lección de método (vale más que el código).** Dos defectos sobrevivieron una suite unitaria en verde y sólo aparecieron gastando plata real: `providerRunChainable` se calculaba en el adapter y el runner no lo copiaba (todo edit stateful degradaba en silencio), y todo fallo del runner colapsaba a `runner_error` (el fallo más común de un edit era indistinguible de cualquier otro). Cuando un campo de evidencia nace, **verifica que haga el viaje completo hasta el manifest** — un test de adapter que lo afirma no prueba que llegue.
 
 **Primer deploy keyless de la app.** `studio-web` quedó desplegado en Cloud Run `globe-studio-internal` rev `00007-jrr` (Ready), **privado**; `GLOBE_LAB_PROVIDER` sigue en `fake` en el servicio desplegado (los engines están desplegados pero **OFF** — prenderlos es un flip de flag gobernado). Deploy vía `.github/workflows/deploy-internal.yml` (keyless WIF → Cloud Build → Cloud Run).
 
@@ -422,6 +1160,12 @@ Los tres ejemplos anteriores son capabilities con provider detrás. El **Produce
 - El **slug de wire del proveedor** (`bytedance/seedance-2.0/text-to-video`), el **costo vendor** y el **margen** **NUNCA** salen — por ninguna surface. Un drift guard aborta la carga del catálogo si un slug se filtra en `routeId`/`model`/`house`.
 
 **La distinción que muerde (colisión de término `model`).** El **nombre** del modelo (`"Seedance"`) es público y **≠** el **slug** de wire (`"bytedance/seedance-2.0/text-to-video"`, prohibido). Ojo: el campo `model` del **manifest de adapter** (provider seam, "el slug va en el campo `model`") carga el **slug**; el campo `route.model` del **catálogo** carga el **nombre público**. Son dos campos `model` en dos capas distintas — no los conflaciones.
+
+> **Extendido por ADR-022 / `TASK-1633`:** cada revisión ejecutable de ruta publica además un
+> `RouteCreativeContractV1` con cinco ejes (`operation`, `inputSlots`, `inputCombinations`, `creativeControls`,
+> `outputContract`). `inputModes` y `referencePolicy` quedan **temporalmente** como proyección legacy y, si ambas
+> formas están presentes, **deben ser equivalentes**; **una ruta nueva no puede nacer sólo con el contrato legacy**.
+> Ver *El noveno ejemplo* más abajo antes de agregar o tocar una ruta.
 
 ## El output side del Creative Producer (TASK-1503) — la capability de gasto CERO cuya autoridad no puede venir del store
 
@@ -631,7 +1375,7 @@ Habilitar `globe.model-rights.attest` para el humano **causó una caída de TODO
 una regla del broker que un agente futuro DEBE conocer:
 
 - **El broker impone `capabilityScopes ⊆ requiredScopes`** (`src/lib/sister-platforms/oauth-policy.ts`): un scope no
-  puede ser "otorgable pero opcional" — si lo otorgás, es REQUERIDO. Y **ambos repos hardcodean su lista de scopes**:
+  puede ser "otorgable pero opcional" — si lo otorgas, es REQUERIDO. Y **ambos repos hardcodean su lista de scopes**:
   Greenhouse `GLOBE_PRODUCER_CAPABILITY_SCOPES` (`globe-oauth-grants.ts`) ↔ Globe `PRODUCER_HUMAN_CAPABILITY_SCOPES`
   (`apps/studio-web/src/app.ts`). Agregar attest SÓLO en el broker lo volvió required; el cliente desplegado no lo
   pedía → el broker **denegó todo login** ("Acceso no disponible / tu sesión no cumple la política de acceso").
@@ -642,72 +1386,284 @@ una regla del broker que un agente futuro DEBE conocer:
   lo pide) y el token ahora carga la capability. Cada paso mantiene `requiredScopes ⊆ lo-que-pide-el-cliente ⊆
   allowedScopes` por construcción.
 - **NUNCA** agregues un capability scope al grant del broker de Globe en un solo movimiento. **NUNCA** lo agregues al
-  broker antes de que el cliente Globe desplegado lo pida (ni al cliente antes de que el broker lo permita). Verificá
-  el `/auth/start` real (`curl` el redirect, mirá el `scope=`) antes del paso 3, y el broker `authorize` (303-accept
+  broker antes de que el cliente Globe desplegado lo pida (ni al cliente antes de que el broker lo permita). Verifica
+  el `/auth/start` real (`curl` el redirect, mira el `scope=`) antes del paso 3, y el broker `authorize` (303-accept
   vs 400 invalid_scope). El script del grant es `scripts/update-globe-producer-oauth-grants.ts` (dry-run sin `--apply`;
   corre contra greenhouse-pg vía **proxy** con `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME=` vacío para deshabilitar
   el connector que cuelga).
 
-### El canary (verificado en vivo) + fleet
+### Flota multi-modelo — resolución y promoción por ruta
 
-Canary honesto cero-spend-nuevo: reusar un eval existente (`foley-v1` / `fal`/`seed-audio`/`v1`, report
-`objective_pass` en `greenhouse-org:efeonce`). El auto-lane SA (impersonado con tokenCreator temporal + `--include-email`
-en el ID token, break-glass revocado con corte verificado) creó el binding disabled (rev1) y el `auto-lane.promote` lo
-habilitó (rev2) + publicó `appliedRestrictions` = la postura derivada de la attestation — **postura aplicada =
-atestada**. Fleet: el **OpenAI adapter** (`apps/creative-runner/src/openai-adapter.ts`, `gpt-image-2` snapshot
-`2026-04-21`, key Globe-owned `globe-openai-api-key` NUNCA la de Greenhouse, `image-generate` only fail-closed) enchufa
-en el mismo seam. Evidencia de términos en `scripts/evidence/*-commercial-terms.json` (Vertex, OpenAI, Fal Seed Audio) —
-**as-of, `reviewerMustVerify`, la stale se supersede con nuevo digest**. Estado vivo (attestations, rutas promovidas,
-flags, canarios): SIEMPRE `GLOBE_RUNTIME_HANDOFF.md`, nunca esta skill.
+**Principio de producto:** Globe mantiene modelos frontier que coexisten. **Update** cambia la versión dentro de un
+lineaje cuando el contrato decide reemplazarla; **add** crea otra ruta/tier seleccionable. La UI y la recommendation
+matrix eligen una ruta explícita; nunca existe un “mejor modelo global”.
 
-### Flota de modelos — catálogo multi-modelo extensible (update-vs-add) + el seam route→model (2026-07-24)
+**La identidad ejecutable es por ruta, no sólo por capability ni proveedor.** La resolución conserva como tupla
+exacta `routeId + capability + provider + model + version/endpoint`. Estimate, binding, readiness, circuito,
+attempt y manifest deben concordar con esa identidad. Un segundo modelo del mismo proveedor no se habilita
+añadiendo otra etiqueta al catálogo: exige resolución route→model en el adapter/driver y falla cerrado ante
+`route_binding_missing` o `route_identity_mismatch`. `globe.producer.fleet.list` es el SoT live; el ledger humano
+explica evidencia y pendientes, pero no sobreescribe el reader.
 
-**Principio de producto (EPIC-028 Delta 2026-07-24):** Globe corre los **mejores modelos del mercado, coexistiendo y
-creciendo — sin que uno sustituya a otro.** Dos operaciones distintas: **update** = bump de versión dentro del mismo
-lineaje/ruta (**reemplaza**: Gemini 2.5→3, gpt-image-1→2); **add** = modelo/tier distinto = **ruta nueva que coexiste**
-(Seedream ≠ Nano Banana; GPT Image 1.5 **y** 2; Nano Banana Pro **y** 2). Compatible con el non-goal "no mejor global":
-el catálogo **ofrece**; la selección es **explícita** (selector UI, TASK-1552) o por **contrato de fidelidad**
-(recommendation matrix), nunca un "mejor global".
+**Carriles separados; no los colapses:**
 
-**Roster frontier vigente (imagen)** — IDs reales SÓLO en adapter/binding, NUNCA en el catálogo público (`assertNoSlugLeak`):
+1. **Descubrimiento/evaluación:** probes de existencia o forma, Lab y evaluation harness producen candidatos y
+   reportes. Un 200/422, una generación directa o un `objective_pass` no publica la ruta.
+2. **Readiness/promoción operator-only:** registra rate vigente, driver gobernado, términos/derechos, attestation,
+   evaluación exacta, revisión humana cuando aplica, binding, readiness y circuito para la identidad exacta. La
+   promoción hace la ruta `available`; no aprueba piezas para cliente.
+3. **Ejecución humana:** el operador selecciona la ruta en Producer desde su sesión autenticada; el browser usa BFF
+   same-origin y nunca credenciales de workload. El run conserva la ruta elegida hasta provider, attempt y output.
+4. **Entrega/retrieval:** sólo un output exacto, retenido, íntegro y autorizado puede previsualizarse o descargarse.
+   Candidate→approval humana sigue siendo un gate distinto de la promoción del modelo.
 
-| Modelo | Proveedor | providerModelId | Estado (2026-07-24) |
-|---|---|---|---|
-| Seedream 5 Pro | fal | `bytedance/seedream/v5/pro/...` | vivo (default de imagen del composite) |
-| Nano Banana Pro | vertex | `gemini-3-pro-image` | **allowlist despejado, genera imágenes reales** vía `global` |
-| GPT Image 2 | openai | `gpt-image-2` (`2026-04-21`) | adapter default OpenAI; canary facturable pendiente |
-| GPT Image 1.5 | openai | `gpt-image-1.5` | 2.º tier a sumar (route-based) |
-| Nano Banana 2 | vertex | `gemini-3.1-flash-image` | **404 — proyecto sin allowlist** (ask a Google) |
+**Paquete mínimo de evidencia exacta para declarar una ruta operativa:** identidad de ruta/modelo/endpoint,
+rate-version, rights attestation y digest de términos, evaluation experiment/report exactos, review/proposal si
+aplica, binding/readiness/circuit readback, run + attempt, descriptor de output con MIME/hash/`retained`, y prueba
+desde la UI real. Registra identificadores y enlaces en el runtime handoff/ledger; no copies snapshots mutables a
+esta skill.
 
-Excluidos a propósito: `gpt-image-1`, `gemini-2.5-flash-image`, `gemini-3.1-flash-lite-image` (NB2 **Lite**).
+**La prueba de salida es una generación real desde la UI.** Usa la pestaña ya autenticada del operador en su Chrome
+cuando esa sea la sesión autorizada; no abras un perfil Playwright nuevo y lo presentes como equivalente. La
+evidencia debe mostrar el modelo/ruta seleccionados, operación, créditos, estado terminal, `Guardada`/retenida,
+preview de los bytes reales y descarga habilitada. API, runner, CI y canary técnico son evidencia necesaria, pero
+no sustituyen esta prueba cuando el criterio es “funciona en Producer”.
 
-**El seam route→model (hallazgo load-bearing).** Exponer **dos modelos del mismo proveedor** (2 OpenAI / 2 Vertex) NO
-es data — es CÓDIGO. Hoy los adapters resuelven el modelo **por capacidad** (`OPENAI_ROUTING[capability]`,
-`VERTEX_ROUTING[capability]`); el composite rutea imagen a **un** proveedor por capacidad
-(`DEFAULT_COMPOSITE_POLICY['image-generate']='fal'` → Seedream; Vertex sólo para video reference). El compiler ancla a
-`estimate.model` (`production-route-compiler.ts:154-171`): un binding a un 2.º modelo del mismo proveedor da
-`route_binding_missing`/`route_identity_mismatch` → **denegado**. Se necesita **resolución de modelo por-ruta** en los
-adapters. Vehículo: **`TASK-1553`** (backend-data foundation); selector UI = **`TASK-1552`**. OpenAI además no tiene lane
-de producción (`governed-production-composition.ts:71` lanza `globe_governed_openai_official_verifier_missing`; sólo Lab).
+Reproducir un candidato retenido de evaluación sólo prueba retrieval/playback de ese activo; **no** prueba que la
+ruta promovida pueda crear hoy una pieza nueva desde el Producer. Si el criterio pide canary post-promoción, exige
+un run nuevo iniciado en la UI, conserva su identidad exacta hasta el attempt/output y verifica por separado
+playback, retención y governance. No reutilices el candidato de evaluación como sustituto de ese canary.
 
-**Gotchas de runtime del canary facturable (verificados en vivo, TASK-1535 §"Canary path"):**
-- **Región Vertex image = `global`** (us-central1 da 404). El adapter usa `region:'global'`. ✓
-- **`composite` incluye openai** en el Lab (`app.ts:3488`) pero rutea imagen→Fal por política; para correr un modelo
-  Vertex/OpenAI de imagen hay que **flipear `GLOBE_LAB_PROVIDER`** (worker **`globe-producer-worker`** + api, SoT
-  Terraform) → afecta TODOS los lab runs → flip, canary, **revert a `composite`**.
-- **Auth para disparar un lab run real:** el api es IAM-private; un token de usuario NO pasa el SA-allowlist
-  (`GLOBE_API_CALLER_SERVICE_ACCOUNTS`). Hace falta **break-glass** impersonando una SA con `globe.lab.experiment.run`
-  (`greenhouse-globe-caller`) + `tokenCreator` temporal + `--include-email`.
-- **Para probar SÓLO el allowlist de un modelo Vertex** (sin el flujo gobernado): probe directo `generateContent` al
-  proyecto con ADC de operador — así se verificó Nano Banana Pro (200, imagen real) vs Nano Banana 2 (404).
-- **`gcloud` auth expira a mitad de sesión** → `gcloud auth login` + `application-default login` (interactivos).
-- **El classifier del entorno bloquea** IAM policy-bindings y a veces ediciones de código impactantes en Globe →
-  necesita permiso/aprobación del operador.
+**Cierre sistémico de un incidente de evaluación.** Mantén separados provider attempt, output retenido,
+asset/rights proyectados y evaluation report. Recupera cada estado por su reader y conserva la identidad lógica;
+un webhook no es un reintento genérico del provider. Evaluación, atestación, readiness, binding/circuito, promoción
+y canary son gates distintos: una ruta puede estar promovida y seleccionable sin que exista aún una pieza nueva
+verificada desde la UI. Los IDs y el estado mutable viven en `GLOBE_RUNTIME_HANDOFF.md` y
+`GLOBE_MODEL_FLEET_STATUS.md`, no en esta regla reusable.
+
+**Sesión operativa del operador — regla obligatoria.** Cuando el operador indique que su sesión autenticada de
+`jreyes@efeonce.cl` ya contiene los accesos necesarios, reclama u abre una pestaña dentro de **ese Chrome
+autenticado** mediante el control de navegador y opera allí. No inicies el flujo en un perfil Playwright efímero,
+en el navegador interno vacío ni en una sesión de Vercel/GitHub distinta para luego pedir un login evitable. Antes
+de declarar un bloqueo de autenticación, verifica una navegación same-origin al portal desde ese Chrome. Esta regla
+aplica tanto a la evidencia UI del Producer como a los actos administrativos de Globe que exigen atribución humana;
+no inspecciones ni extraigas cookies, contraseñas o secretos para trasladar la sesión a otro cliente.
+
+**Referencias ejercitadas del portafolio still/vector** (consulta el reader antes de actuar): Seedream 5 Pro
+`ref/still/rrss-v1`; Nano Banana Pro `ref/still/nanobanana-pro-v1`; Nano Banana 2
+`ref/still/nanobanana-2-v1`; GPT Image 2 `ref/still/openai-v2`; GPT Image 1.5
+`ref/still/openai-v1-5`; y Recraft v4.1 `ref/still/vector-v1`. OpenAI es directo con secreto propio de Globe;
+Google-native va por Vertex/GCP (`global` para estas rutas de imagen); Recraft va por Fal. No revivas los estados
+históricos “OpenAI pendiente” ni “Nano Banana 2 en 404”: revalida disponibilidad con el reader y el runtime handoff.
+
+**Caso Recraft/SVG generalizable:** `ref/still/vector-v1` usa el endpoint Fal de text-to-vector y espera SVG.
+Aunque el payload de Fal declare `image/svg+xml`, el CDN puede responder `application/octet-stream`; aplica la
+excepción estrecha de MIME + validación de bytes descrita arriba y sirve con CSP `sandbox`. Una aceptación genérica
+por proveedor, extensión o URL sería fail-open.
+
+## El noveno ejemplo — El contrato creativo por ruta (ADR-022 / TASK-1633): cinco ejes, dos guards y un dueño por valor
+
+El Producer Route Catalog (TASK-1500) publicó **dato gobernado**. `ADR-022` publica **el contrato de ejecución de
+ese dato**: cada revisión ejecutable de ruta lleva un `RouteCreativeContractV1` browser-safe y autocontenido que
+separa cinco ejes que antes venían mezclados en `capability` + `inputModes` + una policy plana de referencias.
+Canon: [`EFEONCE_GLOBE_ROUTE_CREATIVE_CONTRACT_DECISION_V1.md`](../../../docs/architecture/creative-studio/EFEONCE_GLOBE_ROUTE_CREATIVE_CONTRACT_DECISION_V1.md)
+(ADR-022 `Accepted` 2026-08-02, con sus Deltas **(b)** —dónde viaja el valor de un control— y **(c)** —el prompt
+efectivo también se compila por ruta—). Dueña: `TASK-1633`, **`in-progress` con 10 de 17 criterios cerrados**.
+
+**Por qué existe.** Gemini Omni lo hizo visible: su ruta se publicó como un modo `elements` aunque conserva prompt
+y admite referencias de imagen, así que al quedar no disponible **el botón entero** dejó de ser accionable. La UI
+convertía composiciones de entrada en botones de modo, cambiaba de modelo al cambiar de modo y duplicaba topes; los
+adapters inferían intención por tipo o cantidad de archivos. No es un problema de Omni: referencias, cámara,
+movimiento, estilo, temporalidad y audio son conceptos comunes cuya implementación cambia **por ruta**.
+
+**Los cinco ejes, y el estado REAL de cada uno** (verificado contra el código, no contra el plan):
+
+| Eje | Qué declara | Estado |
+|---|---|---|
+| `operation` | intención de producto (`create`, `edit`, `extend`, `upscale`) | **cableado**; `route_operation_unsupported` la rechaza pre-spend |
+| `inputSlots` | rol semántico, autoridad, medios, MIME, cardinalidad, orden | **cableado y completo** — es el eje mejor resuelto; el fingerprint **sí** incluye roles y ordinales |
+| `inputCombinations` | conjuntos válidos de slots + cuál es el default | **cableado** |
+| `creativeControls` | qué controles honra la ruta, por qué mecanismo y **con qué `valueShape`** | **descriptor cableado**; **el cableado de VALORES desde una superficie sigue abierto** (`TASK-1552`) |
+| `outputContract` | modalidad, MIME reales y presencia de audio embebido | **cableado**; la **forma de salida** (duración/ratio/resolución) es de este eje + `RouteConstraintsV1`/`OutputShapeV1`, **no** un control |
+
+**Dónde vive.** Tipos públicos en `packages/contracts/src/producer-catalog.ts` (+ el vocabulario del brief en
+`packages/contracts/src/structured-briefs.ts`); catálogo, guards de carga y compilación del brief en
+`packages/domain/src/{producer-catalog,structured-briefs,model-lab}.ts`; el compiler de ruta de producción y sus
+razones nombradas en `apps/creative-runner/src/production-route-compiler.ts`; la clasificación de fallos en
+`packages/domain/src/governed-run-failure-policy.ts`. Catálogo en **`PRODUCER_CATALOG_VERSION = '1.7.0'`**.
+
+### Una causa, un código — y la familia entera clasificada (`@8986b45` + `@ac1999f`)
+
+**`route_creative_contract_mismatch` colapsaba NUEVE causas con remedios opuestos** —re-estimar contra la revisión
+vigente, elegir otra operación, elegir otro slot, cambiar el asset, convertir el archivo—. El operador sabía que
+algo del contrato no calzó, jamás cuál. Fue la **décima** aparición del bug class de `ISSUE-127` (van **trece** al 2026-08-04), y la única con
+agravante propio: **los nombres correctos ya estaban escritos en la spec de la task y la implementación los
+colapsó igual**. Conocer la regla no la aplica sola; escribirla en la spec tampoco.
+
+Hoy son **ocho códigos, uno por causa**: `route_creative_contract_incomplete` (el pedido llegó a medias — se
+resuelve **re-preparando**, no cambiando el contrato, por eso no comparte código con los desajustes),
+`route_contract_revision_mismatch`, `route_operation_unsupported`, `route_input_slot_unknown`,
+`route_input_role_mismatch`, `route_input_media_type_invalid`, `route_input_mime_type_invalid`,
+`route_input_assignment_unresolved`. **Media type y MIME quedan SEPARADOS a propósito**: uno pide **otro asset**,
+el otro pide **convertir el que ya tienes**. Sin migración: estas razones se registran como
+`route_dependency_unavailable`, así que el vocabulario cerrado de `production_router_decisions` no cambia.
+
+Ambos vocabularios (`PRODUCTION_ROUTE_DEPENDENCY_REASONS`, `PRODUCTION_ROUTE_DENIAL_CODES`) pasaron de **union type
+a array `as const`**: un union **no sobrevive al compilado**, y el paso siguiente necesita **enumerarlos** para
+afirmar cobertura en un test. Es la forma canónica cuando un vocabulario tiene que ser auditable, no sólo tipado.
+
+**El hallazgo que amplió el trabajo: de las 35 razones que el compiler sabía nombrar, sólo DOS estaban
+clasificadas** en `governed-run-failure-policy.ts` (las de derechos). Las otras 33 caían a `unknown`, tope 3,
+gastando tres entregas cada una en algo determinista — un allowlist vacío, un MIME que el slot no acepta, un body
+que el sanitizador rechaza. **Y estaba invisible porque el tope de `ISSUE-135` hizo su trabajo**: tres reintentos
+no llaman la atención de nadie. Es exactamente la forma en que una red de seguridad **esconde** el problema que
+estaba conteniendo — la versión atenuada de las 705 entregas, en el mismo camino de materialización de inputs.
+
+Reparto vigente: **38 `terminal`** (identidad y estado de ruta —piden un humano que promueva o habilite—,
+presupuesto —el fence ya liberó la reserva—, configuración de endpoints y regiones, forma del request compilado,
+las ocho del contrato creativo y las once del body snapshot), **3 `transient`** (`provider_unavailable`,
+`decision_persistence_failed`, `decision_record_failed` — las únicas del compiler que **no** son deterministas: el
+circuito se cierra solo cuando el proveedor se recupera, y las dos de decisión son fallas de **persistencia**, no
+del pedido) y **2 `unknown` DECLARADOS** (`route_compilation_failed`, `route_dependency_unavailable`: son catch-all
+que nombran «algo falló y no sé qué»; asumir determinismo mataría corridas recuperables, asumir transitoriedad
+reviviría muertas, y el tope 3 es la respuesta prudente a **no saber**).
+
+**Lo que hace que no recaiga:** `apps/creative-runner/src/production-route-failure-classification.test.ts` **rompe
+el build** si una razón nueva nace sin clasificar, y verifica los catch-all **en la dirección contraria** (si dejan
+de serlo, su entrada queda mintiendo). Probado en rojo en ambos sentidos, y la tabla de causas también —colapsando
+dos a propósito, el test las atrapa—. ⚠️ **Ese número de dead letters estaba INFLADO**: la señal contaba **filas de outbox** y un attempt tiene una
+por fase, así que decía **3 para UN solo attempt**. Corregido el 2026-08-04 (`ISSUE-138`). Una señal cuya
+unidad no corresponde a ninguna cantidad real de trabajo enseña a desconfiar del tablero.
+
+**Doce apariciones de `ISSUE-127` probaron que acordarse no funciona; lo que
+funciona es que el build no deje.** ⚠️ Con un límite MEDIDO: la 11.ª vivía dentro de un `catch` y la **12.ª**
+—`reconciliationFailureCode` leyendo `.errorCode` mientras el error expone `.code`— ocurrió **con el guard
+vigente**, porque un test de cobertura ve que un código esté clasificado, no que LLEGUE a la política leyendo el
+campo correcto. **Cuando una regla cruza dos subsistemas, verifica el camino completo del valor, no cada
+extremo.** Y la **13.ª** ocurrió **dentro del canary**: colapsaba **OCHO condiciones de integridad con remedios
+opuestos** en un código opaco, así que el instrumento que existe para nombrar causas fue el que dejó de
+nombrarlas — diagnosticarlo exigió reproducir el chequeo a mano. Ya corregido para decir cuál falló.
+
+### Un dueño por valor, y la forma declarada (`@e300c4e`, ADR-022 Delta (b))
+
+**`duration`, `aspect-ratio` y `resolution` SALIERON de `ROUTE_CREATIVE_CONTROLS`.** Son **forma de salida**, no
+dirección creativa: su dueño es `RouteConstraintsV1` + `OutputShapeV1`, que ya los valida fail-closed contra la
+ruta y ya los transporta al proveedor. Declararlos también como controles era duplicación de SSOT **dentro del
+mismo contrato**. El dato que lo confirmó al retirarlos: las **únicas** rutas que declaraban `resolution` como
+control eran **las dos de upscale** — precisamente las que no tienen dirección creativa. El control estaba
+supliendo la ausencia de un vocabulario de salida que ya existía en otro lado; hoy declaran `creativeControls({})`,
+que describe exactamente lo que un upscale es. Verificado que no deja consumidores huérfanos.
+
+**`valueShape` cierra la asimetría del descriptor.** Declaraba **cómo** se honraría un control y si era
+obligatorio, pero nada sobre **qué se puede pedir** — así que el fail-closed pre-spend, que es el corazón de este
+contrato, **no alcanzaba a este eje**: no había contra qué validar. Los `inputSlots` sí tenían contraparte tipada
+(cardinalidad, media, MIME, orden). Formas: **`text`** para la dirección creativa —estos modelos responden a
+lenguaje de oficio («dolly in», «hora dorada») porque está en su corpus, no a taxonomías inventadas, y el límite se
+alinea al de un ingrediente del brief, que es donde estos valores van a vivir—, **`enum`** para el conjunto cerrado
+**real** de un proveedor y **`number`** para el paramétrico. El guard de carga lo exige **en SUS DOS DIRECCIONES**:
+un control honrado **sin** forma promete algo que nadie puede validar; un `unsupported` **con** forma promete una
+afordancia que la ruta no honra.
+
+### Un solo vocabulario de dirección creativa (`@1b580f8`, cierra el Delta (b))
+
+**El brief PIDE y el contrato de ruta declara SI SE HONRA: son dos caras del mismo vocabulario**, y divergían en
+las **tres** formas posibles a la vez. Hoy `BRIEF_INGREDIENT_KINDS` y `ROUTE_CREATIVE_CONTROLS` están alineados
+**1:1**:
+
+- **`light` → `lighting`** y **`framing` → `composition`**: un nombre por concepto.
+- **Al brief** entran `camera`, `lens`, `motion`, `timing`, `audio-direction` — eran controles que **ninguna
+  superficie podía pedir**.
+- **A los controles** entran `subject`, `mood`, `palette` — eran ingredientes pedibles **sin que ninguna ruta
+  declarara si los honra**.
+- **Tres controles quedan sin ingrediente, DECLARADOS y verificados**: `prompt` (es el brief entero),
+  `negative-prompt` (viaja en `notes`) y `seed` (determinismo, no dirección).
+
+Las tres divergencias eran **silenciosas** —un ingrediente sin control es una promesa que nadie validó; un control
+sin ingrediente es soporte que ningún caller puede ejercer; dos nombres para un concepto son ambas cosas a la vez—
+**por eso hace falta un test y no una convención**: `packages/domain/src/structured-brief-vocabulary.test.ts` cubre
+las dos direcciones **más la honestidad de las excepciones** (si `negative-prompt` deja de ser caso especial, su
+entrada queda mintiendo y el test lo dice). Probado en rojo.
+
+**Renombrar fue seguro sobre lo persistido, y no por suerte** — el dato salió de **leer el camino**, no de un
+`SELECT`: `experiment-store.get` devuelve el JSON **sin revalidar**, `normalizeStructuredBrief` se llama en **un
+solo lugar** (camino de ENTRADA), y lo que alimenta al proveedor es el `effectivePrompt` ya compilado y **congelado
+en el snapshot**. Ninguna de las tres capas re-lee el vocabulario; el caso residual —un cliente viejo mandando
+`light`— falla **fail-closed**, no en silencio.
+
+De paso, los fixtures de **controles** pasan a **derivarse** del vocabulario. Estaba copiado literal en **cuatro**
+lugares y cada copia rompió por separado **y en una capa distinta** —guard del catálogo, error de **tipo** en el
+runner, aserción en contracts, integración en studio-web—: eso no es el sistema fallando cuatro veces, es el mismo
+dato avisando cuatro veces, y ese ruido **escondería una regresión real**. Los fixtures de **ingredientes** siguen
+literales a propósito: son casos de uso concretos, no la lista.
+
+### El brief se compila POR RUTA (`@91d1f71`, ADR-022 Delta (c), primera mitad)
+
+`compileStructuredBrief` era **una función global** que emitía el mismo texto para Seedance, Omni y Veo, corriendo
+en `domain` **antes** del adapter — exactamente la falla que este ADR corrige en el eje de inputs, intacta en el
+**único eje que TODAS las rutas consumen**. El puerto lo hacía explícito en su firma: `compile(raw)` **no recibía
+la ruta**, así que estructuralmente no podía informarla. Tres cambios:
+
+1. **El contrato de ruta llega al compilador**, y se resuelve **ANTES** de compilar el prompt (antes se resolvía
+   después). Leer el `referenceRoute` del payload todavía sin validar es seguro: una ruta inexistente da
+   `undefined`, el compilador cae al comportamiento legacy y `validatePreparePayload` la rechaza **dos líneas más
+   abajo**.
+2. **Un ingrediente cuyo control la ruta declara `unsupported` se RECHAZA**, con `UnsupportedBriefControlError` y
+   el control nombrado del lado del servidor. Degradarlo en silencio es exactamente lo que este contrato existe
+   para evitar: el caller pide dirección de cámara, **paga**, y recibe una pieza donde nadie la aplicó.
+3. **El peso ORDENA y ya no se imprime.** `[weight=0.820]` viajaba al proveedor **como texto**: un encoder de
+   difusión **no tiene jerarquía de instrucción** —convierte todo en embeddings de condicionamiento que compiten en
+   una sola secuencia plana—, así que gastaba tokens y no condicionaba. El prompt weighting real opera en el
+   espacio de embeddings del pipeline de inferencia (`(palabra:1.2)`, `guidance_scale`) y una API cerrada no lo
+   expone. **El orden sí condiciona**, porque la atención sigue la estructura del lenguaje.
+
+**El `catch` volvió a colapsar la razón, en código escrito para cerrar ese bug class.** El bloque que envolvía la
+compilación mapeaba todo a `badRequest`, incluida la razón nueva. «La ruta no honra ese control» **no** es «el
+brief está mal formado», y la acción del operador es distinta —elegir otra ruta o quitar esa dirección, no corregir
+el JSON—: se **re-lanza tal cual**. Undécima aparición del patrón de `ISSUE-127`, y la primera atrapada **antes**
+de mergear.
+
+**🔴 Límite declarado, autorizado por el operador — no lo leas como verificado.** Quitar el peso **cambia el texto
+que llega al proveedor en TODAS las rutas**, y **no se pudo verificar con un canary**: siguen bloqueados por el
+transporte de `TASK-1504`. Es una **mejora razonada** sobre cómo condicionan estos modelos, **no una mejora
+verificada**. Si aparece una regresión de calidad creativa, éste es el **primer sospechoso**.
+
+**🔴 Cambio de comportamiento visible, elegido a conciencia.** Un usuario en **upscale con preset de estilo activo**
+recibía antes una generación que **ignoraba el estilo y le cobraba**; ahora recibe **error sin gasto**. Se eligió el
+error explícito sobre el cobro silencioso. La UI que evita que el caso llegue siquiera es `TASK-1552`.
+
+### Los DOS guards conviven — autoría y ejecución no son el mismo control
+
+Esta distinción cerró un criterio que se cumplía **de forma vacía**, y hay que conservarla al extender el contrato:
+
+- **Guard de AUTORÍA del catálogo** (corre **al cargar**, en `packages/domain/src/producer-catalog.ts`): impide
+  **declarar lo imposible** — un control honrado sin `valueShape`, un `unsupported` con forma, un slot inconsistente.
+- **Guard de EJECUCIÓN** (`UnsupportedBriefControlError` desde `compileStructuredBrief`, dentro de
+  `prepareExperiment` y por tanto **antes del estimate y de la reserva**): impide **pedir lo que no se honra**.
+
+Mientras no hubo canal para pedir un control, el guard de autoría **solo** hacía la condición inalcanzable: se
+cumplía por vacío. Un guard de autoría nunca sustituye a uno de ejecución, ni al revés.
+
+### Lo que sigue ABIERTO (7 de 17 criterios) — no lo declares cerrado
+
+- **`promptCompilerRevision` NO existe en ningún fingerprint** (verificado por grep: cero ocurrencias), y la
+  compilación **sigue siendo una función global de `domain`**, no vive detrás del adapter. Dos textos distintos
+  para el mismo brief son dos pedidos distintos y **hoy pueden compartir approval**.
+- **13 de las 17 rutas heredan el mecanismo de sus controles del default, sin evidencia por ruta.** El caso duro es
+  `negative-prompt`, declarado `prompt-semantic` por herencia cuando **ningún adapter de Globe manda un campo
+  negativo nativo** (cero ocurrencias de `negative_prompt` en `apps/creative-runner/src`): el `Avoid: …` viaja
+  siempre como texto, y la negación en texto **tiende a reforzar lo que niega**. Donde no exista campo nativo, la
+  salida honesta es reformular en positivo o declararlo `unsupported`, **nunca prometerlo por herencia**.
+- Estimate/approval/idempotencia **no invalidan** todavía ante cambio de ruta/inputs/roles/controles/output.
+- Manifest y run evidence **no conservan** controles aplicados/rechazados.
+- Rutas legacy **sin** dual-read/equivalence; una ruta nueva todavía puede registrarse sin descriptor.
+- Los fixtures Omni/Seedance/Veo prueban **media** cosa: `producer-catalog.test.ts` verifica que las tres resuelven
+  por el **mismo helper sin branch por ruta** —o sea que el contrato es un motor, no la descripción de la ruta #1—,
+  pero **las traducciones distintas dentro de adapters no existen** porque la compilación aún no vive ahí.
 
 ## Provider boundary
 
 - **El primer provider call *billable* entra por el mismo seam que las surfaces posteriores:** API/SDK o conformance harness → command/reader canónico → provider adapter (`packages/provider-contract`) → runner (`apps/creative-runner`). **NUNCA** un provider SDK directo desde UI/MCP/CLI/scripts/tests.
-- **Los model identifiers del provider NO entran a policy de dominio.** El dominio depende de `CreativeCapability` semánticas (`image-generate`, `video-generate`, `audio-generate`, `speech-synthesize`, …), no de nombres de modelo vendor. Ruteá por contrato de fidelidad a través de `CreativeProviderAdapter` (`providerId`, `supports`, `estimate`, `submit`, `poll`).
+- **Los model identifiers del provider NO entran a policy de dominio.** El dominio depende de `CreativeCapability` semánticas (`image-generate`, `video-generate`, `audio-generate`, `speech-synthesize`, …), no de nombres de modelo vendor. Rutea por contrato de fidelidad a través de `CreativeProviderAdapter` (`providerId`, `supports`, `estimate`, `submit`, `poll`).
 - **Ruteo de providers:** modelos Google-native solo directo por **Google Cloud / Vertex** (proyecto `efeonce-globe`); **Fal** solo para modelos **no-Google allowlisted**; **OpenAI** directo. Las impls reales de este ruteo son `VertexCreativeAdapter` (keyless) / `FalCreativeAdapter` (key propia) / `CompositeProviderAdapter` (overlap por política) — ver *Provider adapters reales* arriba.
 - **NUNCA** expongas una tool genérica `endpoint + arbitrary JSON` (`run_endpoint(endpoint, ...)`). Las capabilities son **semánticas** y gobernadas.
 - Cada run registra model/version, inputs, operación semántica, costo de provider, tiempo, hashes de output y rights/classification. `policy-blocked` en una surface significa apagada, **no** que se puedan llamar providers desde scripts ad-hoc.
@@ -856,28 +1812,74 @@ con grant, y no llama a nada. **No son riqueza: son promesas muertas**, declarad
 `LEGACY_PARITY_EXCLUSIONS`. Cuando alguien diga *"el legacy tiene X y el nuevo no"*, la pregunta es **si X
 DESPACHA**.
 
-- **`TASK-1555` (selector de modelo del Producer) — in-progress.** La **galería de láminas** se implementó y **el
-  operador la rechazó al verla**; se reemplazó por un **desplegable compacto con isotipo real** de cada modelo
-  (`a45954f`), que lista **toda la flota de la modalidad activa** (`0258534`). **No la llames "galería": está
-  muerta.** Ojo con dónde vive: el selector está todavía en el **payload legacy**
-  (`apps/studio-web/src/producer-ui.ts` + `producer-controller.ts`), así que porta bajo `TASK-1560`.
+- **Selector de modelo del Producer:** la dirección de “galería de láminas” fue descartada. El contrato vigente es
+  un **desplegable compacto con isotipo real**, dentro del composer React
+  (`apps/studio-client/src/surfaces/producer/composer/ProducerComposer.tsx`), que lista la flota de la modalidad
+  activa. No lo llames galería, no lo vuelvas a implementar en el payload legacy y no uses una nota histórica de
+  port/cutover para ubicarlo.
 
-### 🔴 El flag `client_app_enabled` NO está cableado — ninguna superficie sirve sobre el payload nuevo
+## ADR-018 — continuidad móvil y aplicación companion (dirección propuesta, 2026-08-01)
 
-Esta es la parte que hay que interiorizar antes de prometer un cutover. Verificado el 2026-07-25 contra `main`
-(`6e8ef5a`):
+Globe es **continuity-first**, no `desktop-first` con un breakpoint. La promesa del producto es devolverle al
+creativo tiempo y atención; la intención puede aparecer en cualquier lugar y un job puede terminar lejos del
+Producer. Android e iOS son canales de producto de primera clase: la estrategia es **native-first con una companion
+cross-platform → web/PWA como fallback → full mobile studio sólo con evidencia**. No se crea una skill nueva para
+este dominio: esta sección es la guía operativa canónica de `greenhouse-globe` y el detalle contractual vive en
+[ADR-018](../../../docs/architecture/creative-studio/EFEONCE_GLOBE_MOBILE_CONTINUITY_APPLICATION_DECISION_V1.md).
 
-- `grep -rn client_app_enabled infra/terraform/` devuelve **UNA sola línea**: su propia declaración en
-  `variables.tf:188`. `GLOBE_CLIENT_APP_ENABLED` **no aparece en ningún `.tf`**, ni en el spec del Cloud Run service.
-- La **imagen desplegada** de `globe-studio-internal` es `45235ccb62ca`, **anterior** al commit de `TASK-1556`
-  (`4bf631e`): `git merge-base --is-ancestor 4bf631e 45235cc` → **falso**.
-- **Consecuencia: cambiar el default a `true` y correr `tofu apply` da un PLAN VACÍO.** El contenedor vivo no tiene
-  bundle, no tiene `renderShell` y no lee esa variable. **Ninguna superficie sirve sobre el payload nuevo todavía:**
-  el cliente ve `public-share-ui.ts`, el template viejo.
+### Boundary operativo
 
-**La cadena real del cutover, en este orden:** (1) **cablear** la variable en el `.tf` del servicio → (2)
-`TASK-1562` → (3) desplegar `origin/main` vía `deploy-internal.yml` → (4) flip + `tofu apply` → (5) verificar con
-**grant real** → (6) retirar el legacy (`TASK-1560`).
+- **Móvil** captura intención/referencia/draft, recupera contexto, observa jobs, revisa una selección, comenta,
+  decide lo permitido y entrega el siguiente paso.
+- **Desktop** conserva composer profundo, comparación extensa, refine, storyboard, shape/route, operaciones y
+  delivery.
+- **Globe cloud** conserva identidad, entitlements, policy, estimates, credits, runs, assets, rights, provenance y
+  lineage. El cliente móvil es una superficie, nunca otra autoridad.
+
+### Invariantes obligatorias
+
+- **NUNCA** implementes una app, app ID, OAuth client, push provider, store listing o native bundle sin una task y
+  ADR/contrato de identity/media/notifications aprobados. La dirección es native-first, pero ADR-018 sigue Proposed
+  y no autoriza runtime.
+- **SIEMPRE** usa React Native + Expo development builds/CNG como dirección de la companion inicial; no trates Expo Go
+  ni un WebView/Capacitor como arquitectura de producción. Comparar Flutter o KMP + UI nativa si el full mobile
+  studio exige canvas, timeline, 3D, AR o integración OS que cambie el balance.
+- **SIEMPRE** comparte contracts, SDK neutral, operation keys, reconciliadores, tokens y copy gobernado; no importes
+  componentes DOM ni crees una UI o backend paralelo para móvil.
+- **NUNCA** crees backend, feed, viewer, library, notification ledger, credits ledger ni provider SDK paralelo.
+  Todo cliente usa los mismos commands/readers/policies del API Contract Spine; si requiere otra surface o SDK, abre
+  un ADR de contrato.
+- **NUNCA** expongas provider credentials, house, vendor cost, margin o rutas internas en el cliente.
+- **NUNCA** permitas offline estimate/hold/reserve/execute/approve/promote/publish/delivery/rights mutation. Offline
+  sólo captura drafts; al sincronizar usa operation key + status/readback idempotente.
+- **SIEMPRE** enlaza al `(workspace, project/session, asset/output, run)` exacto y deriva notificaciones de readers/
+  estados canónicos; abrir un deep link jamás dispara `execute`.
+- **SIEMPRE** falla cerrado ante workspace incorrecto, entitlement ausente, rol revocado, sesión expirada, lineage
+  no autorizado o asset sin rights; nunca uses fallback permisivo ni conviertas bytes locales en asset autorizado.
+- **SIEMPRE** valida la continuidad en 390 px y desktop, teclado/lector de pantalla, reduced motion, red intermitente,
+  handoff y scroll-width antes de proponer Phase 1.
+- **SIEMPRE** trata el BFF browser same-origin/cookie/CSRF como una frontera distinta: una app nativa requiere ADR de
+  OAuth/OIDC + PKCE, sesión móvil, revocación y front door; nunca llama directamente a `globe-api-internal`.
+- **SIEMPRE** asume que background work y push son best-effort del OS. Uploads críticos necesitan protocolo resumible,
+  idempotencia y, si corresponde, un módulo nativo; una notificación sólo despierta/reconcilia readers.
+- **SIEMPRE** gobierna binary/API skew con runtime versions, canales, compatibilidad N-1 y kill switch; OTA no sustituye
+  un nuevo build cuando cambia la capa nativa.
+
+### Secuencia de inversión
+
+1. **Phase 0:** instrumenta responsive como fallback y construye un vertical slice Android/iOS con PKCE, deep link,
+   inbox/job status, captura, upload interrumpible, push reconciliable y handoff.
+2. **Phase 1:** entrega companion para capture/inbox/review/comentarios/decisiones acotadas sólo con task, owner,
+   entitlements, policy, compatibilidad binary/API y métricas.
+3. **Phase 2:** evalúa cámara, voz, reference packs, background upload, share sheet, push, secure storage y MDM/DLP;
+   cada frontera exige ADR de identity/media/privacy/notifications cuando aplique.
+4. **Phase 3:** considera full mobile studio sólo si los datos demuestran un trabajo móvil propio y un caso económico
+   y operativo; no conviertas el desktop comprimido en roadmap automático.
+
+El rollout actual sigue **internal-only/internal_smoke** y los externos permanecen gated por TASK-1480. Esta decisión
+no cambia flags, auth, billing, créditos, providers, runtime ni distribución. Ver también [documentación funcional de
+continuidad móvil](../../../docs/documentation/creative-studio/efeonce-globe-mobile-continuidad.md) y [manual de
+validación](../../../docs/manual-de-uso/creative-studio/operar-globe-continuidad-movil.md).
 
 ## 🔴 Antes de crear una TASK de este epic: barrer por DOMINIO, no por nombre (2026-07-25)
 
@@ -897,7 +1899,7 @@ no cruce duplicados, y en una sola sesión se crearon **cinco tasks duplicadas**
 nombres.** La pregunta correcta no es *"¿existe una task con este nombre?"* sino **"¿quién es dueño de esta
 superficie?"**.
 
-**Mapa de dueños por superficie del Producer** (verificado 2026-07-25) — usalo antes de crear cualquier task:
+**Mapa de dueños por superficie del Producer** (verificado 2026-07-25) — úsalo antes de crear cualquier task:
 
 | Superficie | Dueña |
 |---|---|
@@ -925,6 +1927,7 @@ shippeó con **4 de 11** animaciones del diseño aprobado. El task-lint sólo ve
 
 - El enum `GlobeApiErrorCode` distingue causas: **`policy_blocked` es distinto de `access_denied` y de `not_found`.** El mapeo lo hace `dispatchErrorToApiCode`: `surface_policy_blocked → policy_blocked`; `capability_denied → access_denied`; `capability_not_found` / `surface_not_applicable → not_found`. Un `TrustedContextError` (workspace no bindeado) siempre es `access_denied`, nunca una pista de qué workspaces existen.
 - **NUNCA** filtres detalle interno (secretos, ID tokens, cookies, auth codes, body crudo del upstream, stack) al cliente ni a logs. El SDK jamás devuelve el body crudo del upstream.
+- **Un `DatabaseError` de `pg` se clasifica por CLASE de SQLSTATE, nunca cae a `internal_error` opaco:** infraestructura (`08` connection, `40` transaction rollback, `53` insufficient resources, `55` object not in prerequisite state, `57` operator intervention) → **`dependency_unavailable`** (reintentable); determinista (`42703`, `23505`, `22P02`…) → **`internal_error`**, que es la verdad. La detección es **por forma** (`severity` + SQLSTATE de cinco caracteres) y va **última**, para no ganarle a un código nombrado; el SQLSTATE **siempre** sale en `globe.dispatch.database_error`. Detalle y caso fuente: §Una vista que reemplaza a una tabla (`TASK-1641`).
 - **Un `correlationId` atraviesa todo:** request → trusted context → result → audit. La cadena causal mínima es `greenhouse auth audit id → Globe session id → correlation id → command id → run id → artifact manifest`.
 
 ## Reglas duras (NUNCA / SIEMPRE)
@@ -938,6 +1941,14 @@ shippeó con **4 de 11** animaciones del diseño aprobado. El task-lint sólo ve
 - **NUNCA** mandes el ID token en `X-Serverless-Authorization` (Cloud Run lo **consume**, no lo reenvía al contenedor): va en **`Authorization`** (Cloud Run lo reenvía, y es lo único que la re-verificación en-app puede leer). Con X-Serverless el perímetro pasa y la app da **401** al caller legítimo. El SDK usa `Authorization` (`applyAuthMaterial`).
 - **NUNCA** permitas que el browser opere el Lab directamente: TASK-1519 habilita UI sólo por BFF same-origin,
   grants acotados y trusted surface server-derived; la ejecución/autoridad sigue en API mode.
+- 🔴 **NUNCA sustituyas el carril HUMANO por un token de service account para "ver" el Producer**: `GET /v1/session`
+  es del **BFF**, no de la API (404 contra la API privada ⇒ la UI dice *"Tu sesión expiró"* y acusa a la sesión), y
+  las capabilities `*.self.*` (`globe.credits.capacity.self.get` → 403, `globe.media.derivative.*` →
+  `policy-blocked`) piden un "yo" que un workload no tiene, con los flags de media en `true`. Engaña porque los
+  readers responden 200. Para llevar el carril humano a local el camino es **cliente OAuth público + PKCE con
+  redirect loopback** (la forma de `TASK-1629`), y **NUNCA** proxear el login del BFF desplegado reescribiendo sus
+  cookies (`Secure`/`Domain`) o el `redirect_uri` del `303`: **esa es la mecánica de un secuestro de sesión, y una
+  intención legítima no cambia la forma del código.**
 - **NUNCA** dejes `invokerIamDisabled: True` en un servicio **`api` mode** (perímetro OFF): es correcto sólo para el servicio **web** con SSO (browser sin ID token; auth por sesión). Desde **TASK-1508** los dos servicios Cloud Run están en Terraform, así que el flag **sí está gobernado por IaC** — **NUNCA** lo muevas con `gcloud` fuera de un incidente documentado: eso reintroduce drift contra el state.
 - **NUNCA** trates una mutación `gcloud` sobre los servicios Cloud Run de Globe como si fuera permanente: desde **TASK-1508** el `ingress`, las env vars, el scaling y la service account viven en `cloud_run_services.tf`, y el `ignore_changes` cubre **sólo** imagen + `client` + `client_version` ⇒ **todo lo demás que muevas con `gcloud` es out-of-band contra el state y muere en el próximo `tofu apply`, en silencio**. Está permitido por velocidad dentro de un incidente documentado, y en ese caso el mismo movimiento tiene que reflejarse en HCL **antes** del siguiente apply.
 - **NUNCA** llames a un SDK de provider directo desde UI/MCP/CLI/scripts/tests; **NUNCA** expongas `endpoint + arbitrary JSON`; **NUNCA** metas model identifiers vendor en policy de dominio.
@@ -956,7 +1967,9 @@ shippeó con **4 de 11** animaciones del diseño aprobado. El task-lint sólo ve
 - 🔴 **NUNCA** uses un peso tipográfico que no tenga su `@font-face`: el browser lo **sintetiza**, deformando las letras, **sin fallar nada**. En Globe eso es concreto — `GLOBE_FONT_FACES` carga **tres cortes** (Poppins 700, Geist 400, Geist 600), así que **`font-bold` SÓLO acompañado de `font-display`**; el énfasis en Geist es **`font-semibold`**. Y `font-normal`/`font-medium` son **clases MUERTAS**: el theme hace `--font-weight-*: initial` y el build emite exactamente cuatro utilidades (`font-bold`/`font-semibold`/`font-regular`/`font-display`) ⇒ el 400 explícito se escribe **`font-regular`**. La síntesis sólo va hacia **más pesado**, por eso `font-display` sin peso se ve bien **por accidente** — se declara igual, porque la intención se escribe. Caso fuente 2026-07-29: **trece sitios** pedían Geist@700 (los tres KPI de crédito del header y **cinco reglas `.pf__*` en `styles/tailwind.css`** — la mayoría en la hoja, no en JSX) con el aserto de pesos sintetizados **verde**, porque era ciego a la familia. Hoy lo cierran dos gates: **`never asks a family for a cut it does not load`** (aparea familia×peso **en el sitio de uso**, deriva de `GLOBE_FONT_FACES` agrupado por familia y mapea con `themeKeyFor` —la misma función del generador— para honrar el alias `--weight-display → font-bold`) y **`never writes a font utility the theme cannot generate`**. El gate cubre además `font-family`/`font-size`/`font-weight`/`line-height`/`letter-spacing` (+ el shorthand `font:`) y camina `.ts`/`.tsx`/`.css`. Detalle tipográfico completo: overlay `typography-design/GLOBE_OVERLAY.md`.
 - ⚠️ **NUNCA** pidas más de 600 en un `<strong>`/`<b>` sobre Geist, y **NUNCA** introduzcas un elemento HTML nuevo sin verificar qué peso le inyecta el UA. Contexto: el proyecto **no emite el preflight de Tailwind**, así que `b, strong { font-weight: bolder }` computaba **900** dentro de un contenedor a 600 (y 700 dentro de uno a 400) y pedía un corte de Geist que no existe — **faux bold que ninguna clase declaraba**, invisible al gate porque el peso entraba por el **nombre del elemento** y el gate escanea `className`. **Cerrado el 2026-07-29 (`403d346`)**: la base declara `b, strong { font-weight: var(--weight-semibold) }` y ya no hace falta repetir el peso en cada sitio (medido en el runtime vivo: 24 Geist@600, 1 Poppins@700, **cero sintetizados**). Lo que **sí** hay que saber es el techo: el énfasis sobre Geist **topa en 600** — un `<strong>` dentro de un contenedor que ya está en 600 se ve **igual que su padre**, porque no hay archivo. Si de verdad hace falta más peso, el camino es **`font-display` (Poppins 700)**, no pedirle a Geist un corte que no carga. Y la **categoría** sigue abierta: `b`/`strong` están neutralizados, cualquier otro elemento con default del UA vuelve a caer fuera de todo escaneo de clases.
 - **NUNCA** decidas la disponibilidad de un modelo desde el ledger `GLOBE_MODEL_FLEET_STATUS.md`: el **SoT LIVE** es el reader **`globe.producer.fleet.list`** (`TASK-1554`); el ledger es el SoT **humano**. Si divergen, **manda el reader**.
-- **NUNCA** te refieras al selector de modelo del Producer (`TASK-1555`) como **"galería"**: esa dirección se implementó, **el operador la rechazó al verla** y hoy es un **desplegable compacto con isotipo real** que lista toda la flota de la modalidad activa. **Ya está portado** al payload cliente: vive dentro de `apps/studio-client/src/surfaces/producer/composer/ProducerComposer.tsx` (marcadores `producer-model-*`), en `/producer`. **Corregido 2026-07-25:** `TASK-1564` quedó **retirada** y el dueño del composer —port y rediseño de jerarquía— es **`TASK-1552`**; las dos tasks editan el MISMO archivo, así que hay que coordinar orden. La región `producer-route` es composición, no feed. `TASK-1560` sólo **borra** el legacy después, no lo porta.
+- **NUNCA** te refieras al selector de modelo del Producer como **“galería”** ni lo reimplementes en el legacy:
+  es un desplegable compacto con isotipo real dentro del composer React, lista la flota de la modalidad activa y
+  la región `producer-route` pertenece a composición, no al feed.
 - 🔴 **NUNCA inventes un nombre de cabecera al portar.** El transporte del payload cliente enviaba
   `x-globe-idempotency-key` y **ese nombre no lo lee NADIE**: toda la plataforma usa **`x-idempotency-key`**
   (`producer-client.ts` lo manda, `app.ts:2982` lo lee, `app.ts:3164` lo **EXIGE** igual a
@@ -971,7 +1984,7 @@ shippeó con **4 de 11** animaciones del diseño aprobado. El task-lint sólo ve
 - 🔴 **`deploy-internal.yml` toma el servicio como INPUT: desplegar `globe-studio-internal` NO despliega
   `globe-api-internal`.** La API estuvo corriendo una imagen varios commits vieja mientras el web iba
   adelante, y **el dispatch de commands ocurre en la API**: toda instrumentación agregada al web era
-  invisible para el fallo. **SIEMPRE** confirmá qué imagen corre CADA servicio antes de concluir que una
+  invisible para el fallo. **SIEMPRE** confirma qué imagen corre CADA servicio antes de concluir que una
   instrumentación no funciona.
 - 🔴 **NUNCA completes un SHA de memoria.** Despaché un deploy "rellenando" los 40 caracteres y el workflow lo
   rechazó en **`Verify exact remote main SHA`** antes de construir nada. El guardrail existe y es la única razón
@@ -982,7 +1995,7 @@ shippeó con **4 de 11** animaciones del diseño aprobado. El task-lint sólo ve
 - 🔴 **Un servicio sin `roles/logging.logWriter` corre MUDO y no lo dice.** Cloud Run sigue emitiendo sus
   *request logs* — así que en la consola parece que hay logs — pero cada línea del contenedor se descarta en
   silencio. Y sin una **línea de arranque** que siempre aparezca, ese silencio es indistinguible de una app
-  que no loggea. Globe emite `globe.studio_web.listening`; si no está, sospechá del rol antes que del código.
+  que no loggea. Globe emite `globe.studio_web.listening`; si no está, sospecha del rol antes que del código.
 - 🔴 **La hoja legacy estiliza por ATRIBUTO, no sólo por clase.** Al convertir 1:1 hay que cargar los
   atributos o el control se ve distinto **sin que ninguna regla propia esté mal**: `[data-producer-asset]`
   (span 4 / `:first-child` span 8 sobre 12 columnas), `capability-button` + `<i class="capability-dot">`,
@@ -1008,12 +2021,19 @@ shippeó con **4 de 11** animaciones del diseño aprobado. El task-lint sólo ve
 - **NUNCA** committees state ni planes (`*.tfstate`/`.terraform/`/`tfplan`/`terraform.tfvars` real; el state vive en `gs://efeonce-globe-tfstate`); el `.terraform.lock.hcl` SÍ se committea.
 - **NUNCA** modeles infraestructura como un command/MCP del spine ni dupliques en runtime lo que la IaC provisiona: el runtime consume los outputs versionados de IaC. Cambiar infra es Terraform/`gcloud`, no una capability.
 - **NUNCA** deployees con SA keys ni verifiques readiness por proxy: el deploy es keyless (OIDC→WIF→deployer) y la readiness se lee con `run services describe`.
-- **NUNCA** crees un `pg.Pool` (`new pg.Pool()`) fuera de `packages/database`: el único punto de conexión es **`createGlobePool(config)`** (Cloud SQL connector + pool `pg` + `transaction()`); resolvé el config de runtime con `resolveRuntimePoolConfigFromEnv()`. (Mismo espíritu que el `no-direct-pg-pool` de Greenhouse, pero en Globe.)
+- **NUNCA** crees un `pg.Pool` (`new pg.Pool()`) fuera de `packages/database`: el único punto de conexión es **`createGlobePool(config)`** (Cloud SQL connector + pool `pg` + `transaction()`); resuelve el config de runtime con `resolveRuntimePoolConfigFromEnv()`. (Mismo espíritu que el `no-direct-pg-pool` de Greenhouse, pero en Globe.)
+- 🔴 **NUNCA cambies la FORMA de una vista con `CREATE OR REPLACE VIEW`**: sólo permite **agregar columnas al final** conservando nombre, tipo y posición (renombrar la tercera columna aborta con **`42P16 cannot change name of view column`**). La forma se cambia con **`DROP VIEW` + `CREATE VIEW`**, **sin `CASCADE` a propósito** —si alguien construyó encima, el DROP **debe FALLAR** en vez de arrastrarlo—, verificando dependientes por **`pg_depend`/`pg_rewrite` ANTES**, y **re-otorgando los GRANT explícitos** después: el DROP **los pierde**, y **NUNCA** los delegues en `ALTER DEFAULT PRIVILEGES` — un permiso que aparece por herencia es justo el que se rompe en silencio al recrear el objeto.
+- 🔴 **NUNCA escribas una sección `-- Down Migration` en una migración de Globe**: `packages/database/src/migrate.ts` hace **`tx.query(sql)` con el ARCHIVO COMPLETO** dentro de una transacción por archivo y **no parsea markers** ⇒ ese SQL **se EJECUTA a continuación**, no es un contrato de rollback. Es convención de `node-pg-migrate` (**Greenhouse**), no de este repo; acá el rollback de un forward-fix es **otra migración forward**. Caso fuente: la primera versión de `0050` **re-creaba la vista rota tres líneas después de arreglarla** y habría quedado registrada como aplicada, con el canary fallando igual. Era el **único** archivo del repo con esa sección: **ninguno** debe tenerla.
+- **SIEMPRE** prueba **contra PG real, en una transacción con ROLLBACK**, una migración que cambie una **vista compartida**: ejecutar el archivo completo **tal como lo haría el runner**, leer las columnas resultantes de `information_schema`, verificar los **GRANT** y **ejercitar la query REAL de cada consumidor**. Los dos defectos de arriba salieron así y **ninguno se ve leyendo el archivo**.
+- 🔴 **NUNCA pongas un checkpoint de saga delante de una LECTURA PURA:** consume el único estado desde el que se puede reintentar. `confirmProductionPromotionCanary` marcaba `activated → verifying_canary` **antes** de leer la evidencia del canary —que **no escribe nada durable**— y de `verifying_canary` no se vuelve, así que **cada fallo de esa lectura quemaba una promoción** (vista rota, canary inexistente, identidad que no calza) **y reintentar quemaba otra**. Hoy se **lee primero** y el checkpoint cubre **sólo el sello**: un checkpoint protege **efectos durables**.
+- **NUNCA dejes salir un `DatabaseError` de `pg` como `internal_error` opaco, ni lo declares reintentable por defecto**: las clases de SQLSTATE de **infraestructura** (`08`, `40`, `53`, `55`, `57`) mapean a **`dependency_unavailable`**; las **deterministas** (`42703` undefined_column, `23505` unique_violation, `22P02` invalid_text_representation…) siguen siendo **`internal_error`**, que es la verdad — prometer que reintentar ayuda manda a **reintentar para siempre** contra un defecto que sólo se arregla con código. La detección es **por FORMA** (`severity` + SQLSTATE de cinco caracteres), sin acoplar el transporte al driver, y va **ÚLTIMA** para no ganarle nunca a un código nombrado. Y **mapear no puede costar la observación**: todo error de Postgres emite su SQLSTATE en **`globe.dispatch.database_error`**.
+- **NUNCA verifiques la superficie vista↔consumidor con un solo eslabón:** `consumidor ⊆ contrato declarado` lo prueba un test **sin base de datos** en cada `pnpm check`, y `contrato declarado ⊆ vista real` lo prueba el **bloque `DO`** de la migración en cada apply — **encadenados** dan `consumidor ⊆ vista real`, y **ninguno solo alcanza** (el test estructural no sabe qué hay en PG; el bloque `DO` no sabe qué leen los consumidores). El guard barre **TODO el árbol de fuentes**, no el archivo que rompió, y **exige que cada consumidor ALIASE la vista** (sin alias, una referencia a columna **no es atribuible**). 🔴 Y **SIEMPRE pruébalo EN ROJO**: el detector de alias aceptaba **`WHERE` como alias** —cubría cero— y sólo se vio provocando el fallo a propósito. **Un guard que no se probó en rojo puede estar midiendo nada.**
+- **NUNCA pruebes con un doble un defecto que vive en el SQL**: un stub **no puede fallar por una columna inexistente**, así que prueba el TypeScript alrededor de la consulta y nunca la consulta. Va un **test en vivo opt-in** contra el schema desplegado, que **se salta visiblemente** cuando no hay credenciales (el de `TASK-1641` falló con **`42703` antes de migrar**).
 - **NUNCA** uses **password** en el path de **runtime**: el runtime es **keyless IAM database auth** (sin password); el modo PASSWORD existe **SOLO** para el bootstrap one-time del superuser (que después scramblea su propio password ⇒ cero credencial standing).
 - **NUNCA** dejes un servicio **durable** sin sus `GLOBE_POSTGRES_*` (`GLOBE_POSTGRES_INSTANCE_CONNECTION_NAME` + `GLOBE_POSTGRES_DATABASE`) **y** su usuario IAM correcto **por servicio** (`GLOBE_POSTGRES_USER` = `web_runtime` para web / `api_runtime` para api): sin ellos `main.ts` no construye los stores durables y el guard cae a in-memory (permitido solo en `internal_smoke`).
 - **NUNCA** agregues una dep de package nueva a `studio-web` sin **COPY + build** de ese package (`@efeonce-globe/database` incluido) en el `apps/studio-web/Dockerfile`: el bundle `pnpm deploy` debe traer `pg` + el connector, o el servicio bootea sin cliente de DB (lección viva de TASK-1465).
-- **SIEMPRE** que hagas durable un store, ponelo **detrás del port EXISTENTE** (no reshapees callsites): `DurableExperimentStore`/`DurableEvaluationReportStore`/`DurableSpendFence`/`DurableSessionStore`/`DurableAuditLog` implementan los mismos ports que sus dobles in-memory, inyectados por DI (`StudioAppDependencies`). El `DurableSpendFence` hace reserve/settle/release **atómico bajo row locks** (el cap cross-replica que in-memory no da a `maxScale>1`), y sigue siendo el fence de **seguridad**, **NO** el ledger comercial (TASK-1468).
-- **SIEMPRE** recordá que **`globe_owner` (NOLOGIN) es dueño de TODO objeto** de la app: migrators son members (`SET ROLE globe_owner`), runtime SAs reciben DML por `ALTER DEFAULT PRIVILEGES`. Ojo con el superuser **restringido** de Cloud SQL (PG16): no puede `CREATE SCHEMA AUTHORIZATION` para un rol al que no puede `SET ROLE` ⇒ el bootstrap hace a `postgres` member de `globe_owner` primero.
+- **SIEMPRE** que hagas durable un store, ponlo **detrás del port EXISTENTE** (no reshapees callsites): `DurableExperimentStore`/`DurableEvaluationReportStore`/`DurableSpendFence`/`DurableSessionStore`/`DurableAuditLog` implementan los mismos ports que sus dobles in-memory, inyectados por DI (`StudioAppDependencies`). El `DurableSpendFence` hace reserve/settle/release **atómico bajo row locks** (el cap cross-replica que in-memory no da a `maxScale>1`), y sigue siendo el fence de **seguridad**, **NO** el ledger comercial (TASK-1468).
+- **SIEMPRE** recuerda que **`globe_owner` (NOLOGIN) es dueño de TODO objeto** de la app: migrators son members (`SET ROLE globe_owner`), runtime SAs reciben DML por `ALTER DEFAULT PRIVILEGES`. Ojo con el superuser **restringido** de Cloud SQL (PG16): no puede `CREATE SCHEMA AUTHORIZATION` para un rol al que no puede `SET ROLE` ⇒ el bootstrap hace a `postgres` member de `globe_owner` primero.
 - **NUNCA** uses un **seed de piloto** (`seed-globe-internal-pilot.ts`, `seed-kortex-sister-platform-pilot.ts`) para agregar o quitar un redirect URI de un cliente vivo: **REEMPLAZA** el array completo (borra el `run.app`) y **ROTA** el client secret (rompe el SSO en curso). El único camino es la primitive `updateSisterPlatformOAuthRedirectUris` vía `pnpm sister-platform:redirect --client <id> --add|--remove <uri> [--apply]` (aditiva/sustractiva, una transacción con `SELECT ... FOR UPDATE`, toca sólo `redirect_uris`; sin `--apply` es dry-run). Quitar un URI ausente **falla fuerte** a propósito — no lo "arregles" convirtiéndolo en no-op.
 - **NUNCA** flipees `GLOBE_PUBLIC_BASE_URL` (ni ningún origen SSO) **antes** de que su `/auth/callback` esté en el allowlist del broker: agregar el redirect es inerte hasta que algo lo use, pero mover la env var primero deja `/auth/start` anunciando un callback no permitido ⇒ SSO roto. El orden canónico es allowlist aditivo → verificar contra el broker (`GET /api/auth/sister-platforms/authorize`: `400 invalid_redirect_uri` vs `303`) → cutover de env var → smoke → endurecer ingress → re-smoke. **NUNCA** quites el origen anterior del allowlist en el mismo movimiento: es el camino de rollback.
 - **NUNCA** le des custom domain, domain mapping ni entrada al serverless NEG a **`globe-api-internal`**: es IAM-private (anónimo → 403), su `GLOBE_API_EXPECTED_AUDIENCE` lleva **los dos formatos de URL `run.app`** y **JAMÁS** el dominio browser, y su `GLOBE_PUBLIC_BASE_URL` es el placeholder `https://globe-api-internal.invalid`. El dominio `globe.efeoncepro.com` sirve **sólo** `globe-studio-internal` (domain mappings en el proyecto: **0**).
@@ -1027,7 +2047,15 @@ shippeó con **4 de 11** animaciones del diseño aprobado. El task-lint sólo ve
 - **NUNCA** conviertas el string literal del serverless NEG en una referencia al `google_cloud_run_v2_service` sin pasar el protocolo de import (`plan` con cero `destroy`/`replace`): el NEG lo nombra por literal desde TASK-1507, cuando adoptar el servicio todavía era scope de **TASK-1508** (ya ejecutada; los servicios están en Terraform). **NUNCA** prendas `enable_cdn` en el backend del shell SSO (cachear una superficie autenticada por sesión es un bug de correctitud), y **NUNCA** saques `create_before_destroy` del managed cert (no se edita in place). Si un recurso del front door no tiene arista implícita hacia `compute.googleapis.com`, dale `depends_on` explícito — **arregla la carrera en el HCL, no reintentando a ciegas**.
 - **SIEMPRE** calibra un smoke contra el origen **viejo** antes de un cutover: si falla después, tiene que acusar al cutover y no al instrumento. Un smoke sin calibrar no es evidencia.
 - **NUNCA** expongas por ninguna surface el **slug de wire**, el **costo vendor** ni el **margen** de una ruta del Producer Catalog: lo público es `model = { name, version? }` (el nombre real "Seedance · 2.0" es ancla de posicionamiento), y la taxonomía `house` es OPERATOR-ONLY detrás de `globe.producer.route.reveal_house` (default audiencia `client`, que omite `house`). El **nombre** del modelo ≠ el **slug** (el campo `model` del catálogo es el nombre; el campo `model` del manifest de adapter es el slug).
-- **NUNCA** reimplementes la resolución de rutas del Producer Catalog: reusá los helpers in-process SSOT (`resolveRouteConstraints`/`getProducerRoute`/`listProducerRoutes`) sin re-dispatch por el registry desde dentro de un handler (mismo patrón que el Evaluation Harness); ampliar/tunear una ruta es editar el array de dato + `PRODUCER_CATALOG_VERSION`, nunca el motor del reader.
+- **NUNCA** reimplementes la resolución de rutas del Producer Catalog: reúsa los helpers in-process SSOT (`resolveRouteConstraints`/`getProducerRoute`/`listProducerRoutes`) sin re-dispatch por el registry desde dentro de un handler (mismo patrón que el Evaluation Harness); ampliar/tunear una ruta es editar el array de dato + `PRODUCER_CATALOG_VERSION`, nunca el motor del reader.
+- 🔴 **NUNCA una razón nueva del compiler de ruta sin su código propio Y sin clasificarla en el MISMO commit** (ADR-022 / `TASK-1633`). **Una causa, un código**: `route_creative_contract_mismatch` colapsaba nueve causas con remedios **opuestos** y hoy son ocho códigos —`route_creative_contract_incomplete`, `route_contract_revision_mismatch`, `route_operation_unsupported`, `route_input_slot_unknown`, `route_input_role_mismatch`, `route_input_media_type_invalid`, `route_input_mime_type_invalid`, `route_input_assignment_unresolved`—, con **media type y MIME SEPARADOS** porque uno pide **otro asset** y el otro pide **convertir el que ya tienes**. Y la clasificación en `governed-run-failure-policy.ts` va en el mismo commit: `production-route-failure-classification.test.ts` **rompe el build** si falta, y verifica los catch-all en la dirección contraria. Un `unknown` **por olvido** es indistinguible de uno **declarado**, y cuesta tres entregas por corrida en algo determinista — invisible, además, porque el tope de `ISSUE-135` lo absorbe.
+- 🔴 **NUNCA colapses en `dependency_unavailable` todo error que no sea el de tu propio motor, con un allowlist que cubre uno solo.** `packages/domain/src/asset-governance-jobs.ts` colapsa todo lo que no sea `AssetGovernanceDependencyError`, y su **`SAFE_DEPENDENCY_CODES` contiene SÓLO los cuatro códigos de C2PA** ⇒ los nombres de ClamAV e inspección que `apps/asset-governance/src/engines.ts` **ya emite correctamente** (`clamav_signature_update_failed`, `clamav_signature_stale`, `clamav_unavailable`, `clamav_scan_failed`, `clamav_scan_invalid`, `clamav_signature_missing`, `clamav_version_invalid`) **se destruyen en la frontera**: dos ingests privados murieron en `inspecting` con el código genérico y **sin una línea que dijera por qué**. Misma familia que `SAFE_FINALIZATION_CODES` (§Agregar un código de rechazo son TRES pasos): **el sanitizador borra el nombre ANTES de que nadie pueda clasificarlo**. Un allowlist de códigos seguros crece **con cada motor que emite códigos**, o el motor nuevo es mudo por construcción.
+- **NUNCA declares un vocabulario auditable como `union type`**: los que un test tiene que **enumerar** para afirmar cobertura van como array `as const` (`PRODUCTION_ROUTE_DEPENDENCY_REASONS`, `PRODUCTION_ROUTE_DENIAL_CODES`, `ROUTE_CREATIVE_CONTROLS`, `BRIEF_INGREDIENT_KINDS`). Un union no sobrevive al compilado, así que ningún gate puede recorrerlo.
+- 🔴 **NUNCA dos vocabularios para el mismo valor de dirección creativa** (ADR-022 Delta (b)). **El brief PIDE y el contrato de ruta declara SI SE HONRA**: `BRIEF_INGREDIENT_KINDS` ↔ `ROUTE_CREATIVE_CONTROLS` están alineados **1:1**, con **tres excepciones DECLARADAS y verificadas** (`prompt` = el brief entero, `negative-prompt` = viaja en `notes`, `seed` = determinismo). Un ingrediente sin control es una promesa que nadie validó; un control sin ingrediente es soporte que ningún caller puede ejercer; dos nombres para un concepto son ambas cosas — las tres son **silenciosas**, por eso el guard es `structured-brief-vocabulary.test.ts` y no una convención. Y **NUNCA** declares como control creativo un valor de **forma de salida**: `duration`/`aspect-ratio`/`resolution` son de `RouteConstraintsV1` + `OutputShapeV1`, que ya los validan fail-closed contra la ruta.
+- **NUNCA un `RouteCreativeControlSupportV1` honrado sin `valueShape`, ni un `unsupported` CON `valueShape`.** El guard de carga lo exige en **las dos direcciones**: sin forma, el fail-closed pre-spend **no alcanza a este eje** (no hay contra qué validar); con forma sobre un `unsupported`, la ruta promete una afordancia que no honra. `text` para dirección creativa (estos modelos responden a **lenguaje de oficio**, que está en su corpus, no a taxonomías inventadas), `enum` sólo para un conjunto cerrado **real** del proveedor, `number` para el paramétrico.
+- 🔴 **NUNCA degrades en silencio un ingrediente que la ruta declara `unsupported`: se RECHAZA antes del gasto.** El guard de ejecución es `UnsupportedBriefControlError` desde `compileStructuredBrief`, dentro de `prepareExperiment` y por tanto **antes del estimate y de la reserva**, con el control **nombrado server-side**. Degradarlo es exactamente lo que este contrato existe para evitar: el caller pide dirección de cámara, **paga**, y recibe una pieza donde nadie la aplicó. **Los DOS guards conviven y no se sustituyen**: el de **autoría** (al cargar el catálogo) impide **declarar** lo imposible; el de **ejecución** impide **pedirlo**. Un criterio que sólo tiene el primero se cumple **de forma vacía**. Corolario ya cobrado: **NUNCA envuelvas la compilación en un `catch` que colapse esta razón en `badRequest`** — «la ruta no honra ese control» pide otra ruta o quitar esa dirección, no corregir el JSON.
+- **NUNCA imprimas el peso de un ingrediente en el prompt: ORDENA y estructura, no se imprime.** Un encoder de difusión **no tiene jerarquía de instrucción** —convierte el texto en embeddings de condicionamiento que compiten en una sola secuencia plana—, así que `[weight=0.820]` se leía **como texto**: gastaba tokens y no condicionaba. El prompt weighting real vive en el espacio de embeddings del pipeline de inferencia y una API cerrada no lo expone. ⚠️ **Límite declarado:** el retiro del peso **no se verificó con canary** (bloqueados por el transporte de `TASK-1504`) — es mejora **razonada**, no verificada, y es el **primer sospechoso** ante una regresión de calidad creativa.
+- **NUNCA declares cerrado el eje de compilación por ruta:** hoy la compilación **sigue siendo una función global de `domain`** (no vive detrás del adapter) y **`promptCompilerRevision` no existe en ningún fingerprint** (grep: cero ocurrencias), así que dos textos distintos para el mismo brief **pueden compartir approval**. Y **NUNCA** dejes que una ruta herede el mecanismo de un control **por default sin evidencia del contrato oficial de su proveedor**: 13 de las 17 lo hacen, y el caso duro es `negative-prompt` —declarado `prompt-semantic` cuando **ningún adapter de Globe manda campo negativo nativo**—; donde no exista campo nativo, la salida honesta es reformular en positivo o declararlo `unsupported`.
 - **NUNCA** autorices retrieval de un output **contra el store**: el store de Globe es **content-addressed y TENANT-BLIND** (el nombre del objeto ES el hash, un bucket para todos los workspaces) y guarda **los outputs Y los bytes de las referencias private-ingest de entrada** — no sabe de quién es nada. La autoridad la resuelve el **dominio** (`authorizeOwnedOutput`) contra `store.get(workspaceId, experimentId)` — el **MISMO `ExperimentStorePort` del Lab, nunca un índice paralelo** — y sólo sobre `outputHashes` de un attempt `candidate_ready` con `outputsRetained === true`. **NUNCA** consultes `authorizedInputHashes` en un path de retrieval: eso convierte el endpoint de outputs en un lector de los inputs de cualquiera.
 - **NUNCA** devuelvas de un rechazo de **propiedad** en retrieval algo más fino que **`not_found`**: cross-workspace, id desconocido, hash que sólo fue input y candidato no retenido tienen que ser **indistinguibles desde afuera** (un grant forjado/expirado sí es `access_denied`: es fallo de prueba de autorización, no una señal sobre existencia). Un `access_denied` que confirme existencia —o un código que confirme el hash— es un **oráculo para sondear por content hash un bucket compartido**.
 - **NUNCA** dupliques la política de autorización en la ruta de serving: `GET /v1/outputs/:sha256` reusa el **mismo helper del reader** y el **mismo `handlerErrorToApiCode`** (un primitivo, dos transportes) y **RE-EJECUTA** `authorizeOwnedOutput` después de autenticar y de verificar el grant — un candidato que dejó de ser recuperable deja de ser servible aunque el grant siga vivo. El grant (HMAC-SHA256, server-minted, **firmado no cifrado**, bound a `(workspaceId, experimentId, sha256, disposition)`, TTL 300s —rango 30-900—, verify stateless en tiempo constante) **NO es un bearer autosuficiente**; viaja en query porque la UI necesita `src` directo, y **NUNCA** se loggea ni entra a un audit event.
@@ -1041,12 +2069,12 @@ shippeó con **4 de 11** animaciones del diseño aprobado. El task-lint sólo ve
 - **NUNCA** filtres vendor en el filename servido (es neutro: `globe-<hash12>.<ext>`) ni sirvas un output sin `Cache-Control: private, no-store`; y **NUNCA** conflaciones `ProducerOutputMediaType` (`image|video|audio|model-3d`) con `LabInputMediaType` (`image|video|audio|text`): el `mediaType` se deriva de la capability semántica del run, pero el **`Content-Type` servido sale del objeto real**, para que un run multi-output no mienta en el cable.
 - **NUNCA** cablees un slug/modelo "que se sabe que existe" sin probarlo primero con un probe de **gasto cero**: en Fal, `POST {}` a `https://fal.run/<slug>` (**404 = no existe**, **422 = existe**); en Vertex, un probe que **siempre falla la validación** (bytes base64 inválidos) para discriminar *"el modelo no soporta el campo"* de *"el campo se aceptó"*. Verificado en vivo: **`fal-ai/elevenlabs/speech-to-speech` NO EXISTE** (404) — el app real de `audio-change-voice` es **`fal-ai/elevenlabs/voice-changer`** (`audio_url` obligatorio, `voice`, `output_format`); `audio-translate` es `fal-ai/elevenlabs/dubbing` (único obligatorio: `target_lang`); `video-motion-control` es `bytedance/seedance-2.0/reference-to-video`, con **`video_urls[]` e `image_urls[]` SEPARADOS**, `duration` como **STRING** y `generate_audio`. Cablear de memoria shippea una ruta que **sólo falla cuando alguien gasta**.
 - **NUNCA** uses un Veo 3.x para `video-frames`: **sólo `veo-2.0-generate-001` acepta y valida `lastFrame`** (`veo-3.0-fast-generate-001` / `veo-3.0-generate-001` → `FAILED_PRECONDITION` *"The request is not supported by this model"*; los ids `veo-3.1-*-preview` **no existen**, `NOT_FOUND`). Y **NUNCA** elijas `fal-ai/vidu/q1/start-end-to-video` para esa capability: existe (422), pero **exige AMBOS keyframes**, así que no puede servir `hasEndFrame: false` — un estado que el contrato de run declara. Es ruta futura de alta fidelidad, no la elegida.
-- **NUNCA** conviertas `FAL_ROUTING` en un record parcial ni resuelvas `supports()` por presencia de clave: es `Record<CreativeCapability, FalModelRoute | null>` **exhaustivo** (una capability nueva **rompe el build** hasta que alguien decida **en código** si Fal la sirve), `null` significa **"deliberadamente no servida acá"** y `supports()` chequea **`!== null`**. Una clave ausente sería un olvido indistinguible de una decisión. **SIEMPRE** dejá `supportsLastFrame` y equivalentes como **DATO de la ruta**: mover la interpolación a otro motor tiene que ser cambiar un id en la tabla, no editar una rama.
+- **NUNCA** conviertas `FAL_ROUTING` en un record parcial ni resuelvas `supports()` por presencia de clave: es `Record<CreativeCapability, FalModelRoute | null>` **exhaustivo** (una capability nueva **rompe el build** hasta que alguien decida **en código** si Fal la sirve), `null` significa **"deliberadamente no servida acá"** y `supports()` chequea **`!== null`**. Una clave ausente sería un olvido indistinguible de una decisión. **SIEMPRE** deja `supportsLastFrame` y equivalentes como **DATO de la ruta**: mover la interpolación a otro motor tiene que ser cambiar un id en la tabla, no editar una rama.
 - **NUNCA** metas referencias de distinto medio en un mismo campo del request del proveedor: se reparten **POR TIPO DE MEDIO** (`inputUrlKeyByMedia`), porque un slot compartido mete el video de movimiento en el slot de imágenes y el motor **lo acepta, lo cobra y condiciona sobre lo equivocado** — devuelve algo que **se ve bien**. Una referencia cuyo medio la ruta no puede cargar **FALLA CERRADA**: nunca se sube y se omite.
 - **NUNCA** chequees el tope de referencias antes que la afordancia: el chequeo *"este motor no interpola"* va **PRIMERO**, o el tope **enmascara la causa** y manda al operador a recortar el request cuando esa ruta **no interpola nunca**. Un error acusa la causa, no la consecuencia.
 - **NUNCA** dupliques el mapeo de los campos de forma (resolución, duración, `audioMode`, sample rate, formato, `targetLang`, `voicePreset`) entre la ruta de **run** y la de **estimate**: van por **UN** helper compartido, o el que deriva **cotiza distinto de como corre** y el estimate deja de ser una promesa sobre el gasto.
 - **NUNCA** infieras el modo de input de video desde la cantidad de referencias: se **HILA** al seam. Dos imágenes son **"inicio y fin"** bajo `frames` con fin y **"dos referencias"** bajo `elements`; adivinar devuelve un video que **se ve bien y responde otra pregunta**.
-- **NUNCA** declares en una ruta un modo de input que su adapter no adjunta: es **fail-open** y sólo se ve **gastando** (`ref/motion/loop-v1` declaraba `frames`/`motion-source` sobre un motor text-to-video sin campo de referencia y **descartaba los keyframes en silencio, después de reservar crédito**). **SIEMPRE** validá con `assertInputModeSatisfied`, que cuenta referencias **por tipo de medio ANTES del fence**: la validación de shape sólo prueba que la ruta **declara** el modo, nunca que el caller aportó **lo que ese modo consume**.
+- **NUNCA** declares en una ruta un modo de input que su adapter no adjunta: es **fail-open** y sólo se ve **gastando** (`ref/motion/loop-v1` declaraba `frames`/`motion-source` sobre un motor text-to-video sin campo de referencia y **descartaba los keyframes en silencio, después de reservar crédito**). **SIEMPRE** valida con `assertInputModeSatisfied`, que cuenta referencias **por tipo de medio ANTES del fence**: la validación de shape sólo prueba que la ruta **declara** el modo, nunca que el caller aportó **lo que ese modo consume**.
 - **NUNCA** describas la retención de un attempt multi-output con un solo booleano: es **POR OUTPUT** (`ExperimentAttemptManifestV1.outputs?: LabOutputDescriptorV1[]` = `{sha256, mediaType, mimeType, retained}`, aditivo) — antes un solo `throw` abandonaba el loop y el manifest **desconocía las piezas que sí se guardaron**; `outputsRetained` queda por compat y es `true` **sólo si TODAS** se retuvieron. Y **NUNCA** resuelvas la base de un edit con `outputHashes[0]`: `resolveEditSource` elige **POR MODALIDAD**, tomada de la capability **HIJA** (sólo el hijo sabe qué medio consume), o refinar "el video" de un `{video, audio}` entrega **la pista de audio**.
 - **NUNCA** metas el registro de voces bajo la capability de **gasto** ni dejes salir el vendor voice id: `globe.voice.preset.manage` es **propia y de gasto CERO** (registrar una voz no debe implicar autoridad para facturarle a un proveedor — mismo razonamiento que el output side), y hay **cuatro identidades separadas**: `presetId` (workspace-scoped, del caller), `displayName` (cliente), `catalogVoice` (clave curada de Efeonce, **lo ÚNICO que viaja al seam**) y el **vendor voice id, que vive SÓLO en el `FAL_VOICE_MAP` del adapter**. Cross-workspace y desconocido son el **MISMO `not_found`** (si no, el registry es un **oráculo para sondear otro tenant id por id**); un clon **sin `rights`** se rechaza; un clon **sin voz curada** resuelve a nada y el run **falla cerrado** en vez de usar la voz por defecto — entregar otra voz es peor que no entregar nada. La **idempotencia va EN EL STORE**, nunca read-then-write: entre réplicas es una carrera cuyo síntoma son **dos preset ids para una voz**, y un preset id ya usado por corridas pasadas **es parte de su evidencia**.
 - **NUNCA** declares lista una capability de modalidad nueva porque una ruta vecina o los probes pasaron: cada
@@ -1056,17 +2084,17 @@ shippeó con **4 de 11** animaciones del diseño aprobado. El task-lint sólo ve
 - **SIEMPRE** una capability nace con schema versionado + command/reader transport-neutral + trusted context + path HTTP/SDK + coverage + conformance (Full API Parity by birth).
 - **SIEMPRE** el primer provider call entra por API/SDK/harness → command → adapter → runner.
 - **SIEMPRE** commands mutantes llevan actor (derivado), workspace, `idempotencyKey`, `correlationId` y audit; todo run caro se estima y aprueba antes de reservar créditos; los outputs son *candidates* hasta review humano.
-- **SIEMPRE** corré `pnpm check && pnpm build` en `efeonce-globe` antes de cerrar, y `pnpm install` al agregar una dep de workspace.
+- **SIEMPRE** corre `pnpm check && pnpm build` en `efeonce-globe` antes de cerrar, y `pnpm install` al agregar una dep de workspace.
 - **SIEMPRE** que una capability nueva toque estado externo o un provider, sigue el patrón del Model Lab: ports en el dominio + impls inyectadas desde transporte/runner + dobles en tests + state machine + error de dominio mapeado a su API code (p.ej. `InvalidExperimentRequestError → invalid_request`).
 - **SIEMPRE** que enchufes un motor real, hazlo reemplazando el `CreativeProviderAdapter` detrás del runner — sin tocar el dominio ni el command — siguiendo los adapters reales: Vertex keyless (ADC/WIF), Fal con key propia de Globe (`GLOBE_FAL_API_KEY`, `status_url`/`response_url` de la queue), Composite por `supports()` + política para el overlap; el default de `GLOBE_LAB_PROVIDER` sigue siendo `fake` (hermético) hasta prender un motor por env, y el `actualRoute` reportado es el route del contrato de fidelidad, nunca el slug.
-- **SIEMPRE** usá la superficie **keyless** (ADC/WIF, runtime SA) para **GENERATE** de video — Veo (`:predictLongRunning`) y Omni generate (Interactions keyless en `aiplatform`); reservá la API key `globe-gemini-api-key` **solo** para el **edit stateful** de Omni (`generativelanguage`). El ancla `GLOBE_LAB_VIDEO_ANCHOR` (`fal`|`vertex-video`|`vertex-omni`, default `fal`) es **fidelity-aware**: `preserve-set` → Seedance; `anchor`/`flexible` → el motor ancla elegido; el harness nunca auto-gana un motor (todo verdict `objective_pass_pending_human`).
+- **SIEMPRE** usa la superficie **keyless** (ADC/WIF, runtime SA) para **GENERATE** de video — Veo (`:predictLongRunning`) y Omni generate (Interactions keyless en `aiplatform`); reserva la API key `globe-gemini-api-key` **solo** para el **edit stateful** de Omni (`generativelanguage`). El ancla `GLOBE_LAB_VIDEO_ANCHOR` (`fal`|`vertex-video`|`vertex-omni`, default `fal`) es **fidelity-aware**: `preserve-set` → Seedance; `anchor`/`flexible` → el motor ancla elegido; el harness nunca auto-gana un motor (todo verdict `objective_pass_pending_human`).
 
 - **NUNCA** transformes media fuera del Job `apps/media-derivatives` (TASK-1528/ADR-008): el web/BFF y el gateway JAMÁS transforman; **NUNCA** sirvas bytes bufferizando el objeto completo (arrayBuffer/Blob/base64) — el gateway `GET /v1/media/:sha256` pasa UN Range a GCS y pipea con backpressure (200/206/416; multipart 400); **NUNCA** guardes un derivado junto al original (bucket separado content-addressed, worker con get/create SIN delete, gateway read-only); **NUNCA** sobrescribas un derivado (same-key 412 = readback idempotente o integrity conflict) ni cambies un valor de perfil sin bumpear `profileVersion`, ni el pin de ffmpeg del Dockerfile sin bumpear `MEDIA_TRANSFORMER_VERSION`; **NUNCA** trates el media ticket (`globe-media-ticket-secret`, TTL 120s, principal-bound) como bearer — el gateway re-autentica + re-corre `authorizeOwnedOutput` por request. Detalle: `EFEONCE_GLOBE_MEDIA_DERIVATIVES_V1.md` (SPEC-010).
 
 ## Sinergias y gobierno
 
 - **`arch-architect`** (overlay greenhouse-pinned): para forma, decisiones de dominio/schema/frontera y red-team antes de implementar.
-- **`greenhouse-task-planner`**: para autorar/actualizar la `TASK-###` que gobierna el trabajo (recordá: el registry es de Greenhouse).
+- **`greenhouse-task-planner`**: para autorar/actualizar la `TASK-###` que gobierna el trabajo (recuerda: el registry es de Greenhouse).
 - **`greenhouse-documentation-governor`**: para el cierre documental proporcional (arquitectura de Globe + handoff + lifecycle de la task en Greenhouse).
 - Globe está gobernado por **EPIC-028** (parallel-first: Model Lab, plataforma gobernada y validación comercial avanzan en carriles con gates distintos). Ejecutar un experimento de modelo y promover una ruta a UI/MCP son **gates separados**: parity contractual nace temprano; habilitar una surface es aparte.
 
@@ -1108,14 +2136,17 @@ Ocho reglas medidas contra el runtime, no razonadas. Las tres primeras cuestan u
    funciona. **NUNCA** lo conviertas en el camino normal, **NUNCA** le des
    `secretmanager.versions.access` a `greenhouse-portal@` (es la identidad de reconciliación de tenancy de
    **Greenhouse**: usarla para administrar crédito de **Globe** es admin implícito cross-plataforma), y **NUNCA**
-   dejes que un **agente o proceso** proponga y confirme: la confirmación es de un humano autenticado, siempre.
+   dejes que un **workload genérico o principal de servicio** proponga y confirme. Un agente autenticado sí puede
+   confirmar por el carril delegado de `TASK-1629`, pero sólo con OAuth público allowlisted, los dos entitlements,
+   política explícita por workspace, límites de grant/tope mensual e intención append-only.
 
    🔴 **Y NUNCA exijas DOS humanos por defecto.** La primera versión de ADR-015 lo hacía y costó **dos horas de
    fricción para sumar créditos**: el operador es CEO y product owner del presupuesto, así que no hay segundo actor
    que buscar. **Un control que nadie puede satisfacer no protege, desvía** — al break-glass, que otorga MÁS
    autoridad que el camino que reemplaza. El segundo confirmador es **política** (`requireSecondConfirmer` por
    workspace + techo por operación), **default OFF** en el workspace interno. Lo que se queda como invariante es lo
-   que cuesta cero: el agente nunca confirma, y aprobador ≠ ejecutor entre service accounts.
+   que cuesta cero: un principal de servicio nunca confirma; un agente sólo confirma dentro de su delegación
+   acotada; y aprobador ≠ ejecutor entre service accounts.
 
 6. 🔴 **La autoridad de crédito YA está concedida a la identidad que Greenhouse puede impersonar — el problema no es
    que falte, es que SOBRABA — y el 2026-07-26 SE RETIRÓ (ADR-015 §10, rev `00114-k4t`).** La cadena era:
@@ -1141,6 +2172,53 @@ Ocho reglas medidas contra el runtime, no razonadas. Las tres primeras cuestan u
    existe ninguna superficie que firme**: `.sign(` no aparece en `app.ts` — el verificador está cableado, el firmador
    no. **NUNCA** propongas "ampliar el radio del secreto" como salida: es la misma propiedad con otro dueño.
 
+### Runs colgados: `running` sin intentos y con la reserva retenida (`ISSUE-137`, medido 2026-08-03)
+
+Hallazgo de sesión, **no causado por el trabajo que lo encontró**. Hay experimentos que quedan en `state: running`
+con **`attempts: []` vacío**, `reservedCredits` puesto y `spentCredits: 0`, con `updatedAt` a **0,3 s** del
+`createdAt` y sin tocarse **por horas**, mientras `globe-producer-worker` corre **cada minuto** y cierra limpio
+(`globe_worker_completed`, exit 0) **sin tomar el trabajo**. Se midieron **dos** el mismo día (11:16 y 19:58); de
+los 24 experimentos del workspace interno: 11 `candidate_ready`, 10 `failed`, **2 `running` colgados**, 1
+`estimated`.
+
+Es la familia de **`ISSUE-135` con otro disfraz**: en la UI se ve **"generando" para siempre**. No hay pérdida
+económica —la reserva queda **retenida** y nunca se convierte en gasto— pero **el crédito queda inmovilizado y
+ningún readback lo distinguía de una corrida legítima en curso**. 🔴 **NUNCA lo "destrabes" reintentando**:
+readback-first, porque un segundo submit a ciegas crea un **segundo cobro**.
+
+🔴 **Delta 2026-08-04 — el readback SÍ existía; faltaba el CABLE.** `GovernedRunViewV1.coarseProgress` (reader
+`globe.run.get`) ya distinguía el avance y ya era browser-safe, pero pide `runId` y `LabExperimentV1` **no lo
+llevaba**: no faltaba proyección, faltaba el **link** entre dos agregados. Hoy `LabExperimentV1.runProgress`
+—`{runId, state, coarseProgress, attempt, providerAccepted, since}`— lo publica vía un **puerto de LECTURA
+estrecho** (`ExperimentRunProgressPort`), deliberadamente separado del scheduler (que sólo agenda) y del
+`GovernedRunStorePort` completo (superficie de ESCRITURA del worker): un reader no debe poder reclamar leases ni
+mover la state machine. Se publica **también cuando la corrida es terminal**, porque un run terminal bajo un
+experimento `running` es justo la divergencia que hay que poder ver — silenciarla la vuelve a esconder. Y degrada
+**observando** (`RunProgressUnavailablePort`): un `catch` mudo haría indistinguibles «no hay corrida» y «no pude
+leerla», que es la misma ambigüedad una capa más arriba.
+
+**Antes de declarar «no hay readback», busca si la proyección existe y nadie la consume.** Verificado en vivo
+sobre una corrida EN CURSO: se leía `running` con `attempts: 0` y el reader respondió
+`provider-running/queued, providerAccepted=true`.
+
+### Operación vigente de Studio Credits
+
+- La vía humana canónica es Greenhouse `/admin/globe/credits`; la vía agente/CLI usa OAuth público + PKCE y los
+  mismos primitives `status → preview → propose → confirm → readback`. Ningún adapter implementa reglas propias.
+- Globe conserva pools, grants, allocation, ledger, reservations, policy, receipts y cálculo económico.
+  Greenhouse conserva identidad, entitlements, autoridad one-shot e intents, y sólo proyecta DTOs redactados.
+- En `greenhouse-org:efeonce`, `requireSecondConfirmer` permanece OFF para operación owner-operated: una
+  instrucción atribuida del CEO puede ser ejecutada end-to-end por el mismo humano o agente autenticado dentro de
+  sus límites. Un workload genérico nunca confirma.
+- Producer es self-view read-only. Debe separar capacidad efectiva, funding elegible, cap/spent/held, ledger
+  histórico y daily fence. `partial`, `stale` o `unknown` nunca se representa como cero ni como healthy.
+- `timeout` u `outcome_unknown` obliga a consultar la misma operation key y reconciliar; nunca abre un fondeo
+  nuevo ni repite la mutación económica. La UI considera éxito únicamente `completed|no_effect`.
+- La paridad MCP se implementa extendiendo `https://mcp.efeonce.org/mcp`, no creando otro gateway. Mientras el
+  adapter write no tenga identidad agente, scopes, límites, auditoría y conformance, permanece read-only.
+- Revisions, digests, deployment IDs, último fondeo y cifras del período son estado mutable: consúltalos en
+  `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`. No los conviertas en regla reusable de la skill.
+
 **Dirección decidida — ADR-015** (`EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md`, Partially
 implemented: carril de fondeo VIVO y ejercido + retiro de las 4 caps ejecutado el 2026-07-26; KMS e
 identidades disjuntas por unidad quedan como hardening; implementación = `TASK-1566`): la administración de créditos y capabilities de Globe **vive en Greenhouse** —
@@ -1148,10 +2226,11 @@ superficie en Greenhouse, autoridad en Globe, lane `sister-platform` (hoy `avail
 identidades disjuntas** (broker de administración **distinto** del reconciliador de tenancy; aprobador que firma y no
 muta; ejecutor que muta y **no puede firmar**, separados como **unidad de ejecución propia** porque dentro de un
 proceso la disyunción es cosmética), **KMS asimétrico** en vez del HMAC, comando gobernado
-`credits.month.fund.propose` / `.confirm` con **UNA confirmación humana** (el agente propone, nunca confirma; el segundo confirmador es política por workspace + techo, default OFF en el interno) y la mutación (grant + asiento
+`credits.month.fund.propose` / `.confirm` con **UNA confirmación autenticada** (humana o agente delegado por
+política y límites; el segundo confirmador es política por workspace + techo, default OFF en el interno) y la mutación (grant + asiento
 de ledger + política) en **UNA transacción Postgres**, y el **retiro de la autoridad de crédito del caller
 genérico** al final. Break-glass con TTL/motivo/aprobación/revocación automática/readback **y su propio contador**.
-**Cargá ADR-015 antes de tocar administración de crédito o capabilities de usuarios de Globe.**
+**Carga ADR-015 antes de tocar administración de crédito o capabilities de usuarios de Globe.**
 
 **Capabilities por usuario: hoy NO EXISTE la dimensión.** `src/lib/globe/tenancy-reconciler.ts:216` asigna
 `desiredCapabilities: policy.capabilities` — **el mismo set a todo miembro de todo workspace bindeado**, tomado del
@@ -1234,19 +2313,13 @@ correcta distingue el dato del formato: una credencial serializada es **un token
 🔴 **Un fallo de proveedor puede ser TRANSITORIO, y una hipótesis con un solo dato no está confirmada.**
 Un video falló con `provider_failed`; la hipótesis "es el audio" pareció confirmarse porque `silent`
 pasó. **La corrida de confirmación la refutó: `with-audio` también pasó.** Marcador real: 2 de 3.
-Antes de shippear un fix sobre una correlación, **corré el caso que la refutaría**.
+Antes de shippear un fix sobre una correlación, **corre el caso que la refutaría**.
 
-### Producer React — el flag que lo tenía invisible
+### Producer React — verificar wiring e imagen, no historia
 
-`GLOBE_CLIENT_PRODUCER_ENABLED` estaba en `false`, y `app.ts:2061` caía al **fallback legacy**. El
-código React estaba **desplegado desde antes** (la imagen ya contenía `ProducerComposer.tsx`): no
-faltaba deploy, faltaba el flag. El gate que la propia variable citaba (`legacy-parity.test.ts`) estaba
-**verde 7/7**, así que la condición para prenderlo estaba cumplida y sin medir.
-
-⚠️ **Notas de esta skill que resultaron STALE y ya no aplican:** `client_app_enabled` "no está
-cableado" (sí lo está, y en `true` desde 2026-07-25) y "ninguna superficie sirve sobre el payload
-nuevo" (el Producer sirve React desde 2026-07-26, rev `00092-9pr`). **Verificá contra el runtime antes
-de citar una nota de estado de este archivo.**
+Producer sirve el payload React. Antes de diagnosticar un fallback, verifica en el runtime el flag efectivo, que
+la variable esté cableada en IaC, que la imagen desplegada contenga el código que la lee y que la ruta bajo prueba
+use ese payload. Un plan vacío, un commit o una nota histórica no prueban el estado de la superficie.
 
 🔴 **`MediaStage` es primitive COMPARTIDA (share board + viewer): su `padding` y su
 `max-height: calc(100svh - 8.5rem)` son correctos en el share board y ROMPEN el viewer**, donde la
@@ -1293,19 +2366,20 @@ y dueño del presupuesto, no hay segundo actor, y **un control que nadie puede s
 desvía al break-glass, que otorga MÁS autoridad que el camino que reemplaza**. Se cometió ese error en
 esta sesión y bloqueó al operador hasta el forward-fix.
 
-**Lo que sí es invariante y no se toca:** el agente **nunca** confirma (trigger `actor_must_be_human`
-rechaza principals de servicio), toda confirmación registra contra quién confirma, y la evidencia es
-**append-only** (triggers anti-UPDATE/DELETE).
+**Lo que sí es invariante y no se toca:** un principal de servicio **nunca** confirma. Un usuario agente
+autenticado puede confirmar únicamente si `agent_confirmation_enabled` está activo para el workspace y el plan
+queda bajo `agent_max_grant_credits` y `agent_max_monthly_cap_credits`. Toda confirmación registra
+`actor_user_id` + `actor_auth_mode`, y la evidencia es **append-only** (triggers anti-UPDATE/DELETE).
 
 🔴 **`assertHumanAttribution` de Globe es SHAPE-ONLY** — rechaza `globe:service:` y exige entitlement
-no vacío, pero **no puede** verificar que la atribución venga de una sesión autenticada, porque Globe
+no vacío, pero **no puede** verificar la sesión humana/agente ni su delegación, porque Globe
 no tiene las sesiones. Ese amarre vive en Greenhouse (`globe_credit_funding_intents` + trigger). **No
 publiques el carril sin esa contraparte.**
 
-🔴 **El top-up de CLIENTE es otro acto económico, y el trigger actual lo bloquea.** El grant interno
-gasta presupuesto **de Efeonce** (por eso lo aprueba una persona de Efeonce); un top-up gasta plata
-**del cliente** y lo autoriza **el pago liquidado**. El trigger exige actor humano ⇒ **hay que
-discriminar por `source`** (`human_session` vs `settled_payment`), no relajarlo. Dueño: `TASK-1484`.
+🔴 **El top-up de CLIENTE es otro acto económico.** El grant interno gasta presupuesto **de Efeonce**
+y se autoriza por sesión humana o delegación agente acotada; un top-up gasta plata **del cliente** y lo autoriza
+**el pago liquidado**. Ese camino debe **discriminar por `source`** (`delegated_session` vs
+`settled_payment`), no relajarlo. Dueño: `TASK-1484`.
 Reglas no negociables: monto **del PSP nunca del cliente**, idempotencia por **id de pago** (los PSP
 reintentan webhooks), y un chargeback se corrige con **`grant.correct`**, jamás borrando el grant.
 
@@ -1319,12 +2393,41 @@ futuro debe saber:
 
 - **El confirm exige `x-idempotency-key` PROPIA** — reusar la del propose da
   `409 globe_funding_already_recorded` (el broker registra la intención por clave).
-- **El anti-replay del broker es POR PROPUESTA**, no por clave: registrada la decisión, ningún
-  confirm repetido pasa. El replay idempotente del dominio queda inalcanzable a través del broker;
-  el invariante (ningún segundo grant) vive en dos capas.
-- **La atribución es lo que era "del operador", no la mecánica**: un agente puede ejecutar los curls
-  con autorización explícita SI la sesión es la del humano real; confirmar con la persona agente
-  (`user-agent-e2e-001`) fabrica evidencia en una tabla append-only y sigue prohibido.
+- **El confirm es recuperable por propuesta:** si el dispatch queda ambiguo, el broker reutiliza la idempotency
+  key original y completa una fase append-only `completed|confirm_failed`; nunca crea un segundo grant.
+- **Regla vigente desde TASK-1629:** no fabriques una identidad humana. Usa `pnpm globe:credit-funding` por el
+  cliente público `greenhouse-admin-cli`; una sesión agente puede autorizar y confirmar porque la base registra
+  `actor_auth_mode=agent` y aplica la delegación del workspace. Fuera de esa política o por encima de sus límites,
+  el confirm falla cerrado.
+- **Un comando, dos fases server-side:** el CLI OAuth público + PKCE llama `propose`, conserva el `proposalId`
+  real y ejecuta `confirm` con otra idempotency key; imprime readback de grant, policy y ledger, nunca tokens ni
+  errores upstream crudos. La UI sólo participa en el consentimiento OAuth cuando la política lo exige.
+- **Loopback en Vercel:** se registra `http://127.0.0.1/oauth/callback`; el alias `localhost` observado se acepta
+  sólo contra ese registro y se canoniza inmediatamente. Protocolo, path, query, PKCE y state siguen exactos.
+- **Deployment Protection no es OAuth:** en staging el CLI usa el helper canónico de automation bypass sólo en
+  token/propose/confirm; nunca lo pone en el URL del navegador, lo imprime ni lo envía fuera del origen Greenhouse.
+- **La procedencia cruza el wrapper completo:** `runAppRoute` debe copiar `oauthSessionAuthMode` al contexto del
+  handler. Sin esa propagación, el broker recibe `unknown` y falla cerrado.
+- **No fijes “el último fondeo” en la skill.** Consulta el corte vigente en `GLOBE_RUNTIME_HANDOFF.md`; cualquier
+  operación anterior es evidencia histórica, **no autorización ni receta para otro período**.
+
+### Cambio de período y presupuesto divergente — discovery obligatorio antes de fondear
+
+Ledger, pool, grant, policy mensual, disponibilidad efectiva, usage y proyección visible son controles distintos.
+Un balance positivo no prueba que exista un grant vigente y una UI `0 / 0` no prueba que falten fondos. Nunca
+interpretes unidades raw como créditos visibles sin reconciliar el contrato de escala/formato.
+
+El primer turno es read-only: fija un mismo instante `at` y un período UTC end-exclusive; lee la propuesta conocida,
+pool `get/list`, grant `get/list`, `policy.effective.get`, budget `list`/`availability.get`/`evaluate` con la
+cotización exacta, balance, usage y ledger; luego reconcilia intents Greenhouse por proposal/correlation/idempotency.
+`propose` también crea estado durable, por lo que no pertenece al discovery. Si existe grant `posted` vigente,
+pool activo, policy correcta, `effectiveAvailable` suficiente y `budget.evaluate.allowed=true`, **no fondees**:
+investiga la proyección o UI por su dueño canónico. Sólo autoriza `propose` ante déficit demostrado y sin propuesta
+pendiente/ambigua equivalente; antes de `confirm`, relee y exige fingerprint, valores `Before`, período/cap e
+identidad Greenhouse vigentes. Si algo cambió, descarta el plan stale.
+
+La cuenta Google visible en Chrome puede diferir de la identidad Greenhouse. La autoridad económica sale de
+`actor_user_id + actor_auth_mode` de la sesión Greenhouse, no del correo mostrado por el perfil del navegador.
 
 ### Ocho lecciones de método, que valen más que los fixes
 
@@ -1335,10 +2438,10 @@ futuro debe saber:
 3. **Una sanitización sin contraparte de observabilidad no protege información: la DESTRUYE.** Ocurrió
    **ocho veces** en el mismo día, la última en código escrito mientras se arreglaban las siete
    anteriores. **Conocer la regla no la aplica sola.**
-4. **Que exista una clave de idempotencia no prueba que el handler la honre.** Verificá el efecto, no
+4. **Que exista una clave de idempotencia no prueba que el handler la honre.** Verifica el efecto, no
    la presencia del argumento.
-5. **Un timeout del CLIENTE no es un fallo del servidor.** Leé el estado con el reader antes de
-   reintentar, o gastás de nuevo.
+5. **Un timeout del CLIENTE no es un fallo del servidor.** Lee el estado con el reader antes de
+   reintentar, o gastas de nuevo.
 6. **Código presente no es capacidad disponible.** `registerCreditFundingCapabilities` existía con 12
    tests verdes y **no lo llamaba nadie**. Los tests de dominio no pueden ver un hueco de cableado:
    la aserción tiene que ir contra `/v1/capabilities`, que es lo que un caller ve.
@@ -1358,9 +2461,72 @@ futuro debe saber:
 🔴 **ANTES de escribir una secuencia de canary a mano: YA EXISTE COMO SCRIPT (2026-07-26).**
 `pnpm producer:canary` (`scripts/producer-ui-canary.mjs` + `-lib.mjs`) hace el recorrido **completo** de gasto real
 —`producer.catalog.list` → `lab.experiment.estimate` → `prepare` → `execute` → `experiment.get` →
-`producer.output.get`— y **valida `retained === true`** sobre el output de la modalidad pedida. Su test
-(`producer-ui-canary.test.mjs`) está registrado en el `test` de la raíz. Necesita **una sola** variable:
-`GLOBE_CANARY_ID_TOKEN`.
+`producer.output.get`— y **valida `retained === true`** sobre el output de la modalidad pedida.
+
+🟢 **El dry-run es de COSTO CERO y es el primer diagnóstico, no el último recurso:** `pnpm producer:canary`
+**sin `--execute`** valida readiness, route, circuito, derechos y estimate de las tres modalidades sin gastar un
+crédito. No pidas permiso para gastar antes de saber si hay algo que ver.
+
+### 🟢 Para una ruta RECIÉN PROMOVIDA existe `--route=<routeId>` (TASK-1641 Scope 1, 2026-08-04)
+
+**No escribas la secuencia a mano ni agregues una cuarta modalidad a `PRODUCER_CANARY_TARGETS`.**
+`pnpm producer:canary --route=ref/video/frames-v1` resuelve la ruta del catálogo, **DERIVA** su
+`outputShape` desde `constraints` —primer valor de cada enum, mínimo de cada rango— y resuelve sus
+entradas desde el **feed retenido** (`globe.producer.feed.live.list` mode `retained`), certificándolas
+con `copyAsReference`. Sin `--execute` estima sin gastar. El gasto va por **`--approve-route=N`**,
+**excluyente** de `--approve` (una aprobación escrita para un canary no puede autorizar el gasto del
+otro). Flags: `--route-capability=` (obligatoria si un `routeId` sirve a varias: se **niega** a elegir),
+`--route-references=`, `--route-target-lang=`, `--route-prompt=`.
+
+🔴 **`--route-prompt` es OBLIGATORIA con `--execute`**: sin ella aborta con
+`producer_canary_route_prompt_required`. El canary **no inventa dirección creativa para un gasto real**, y el
+dry-run **sí** corre sin prompt — así que la ausencia se descubre justo en la corrida que iba a costar. Si no
+sabes qué debe producir la ruta, la ruta no está lista para gastarse. Ejercitado el 2026-08-05 promoviendo
+`ref/still/reference-v1` (Seedream 5 Pro Edit / Fal), **única ruta del catálogo con `operation: 'edit'`**, por
+el runbook completo y con 10 créditos.
+
+Verificado en vivo: sobre `ref/video/frames-v1` el plan derivado reproduce **exactamente** lo que un
+humano armó a mano —720p / 8 s / 16:9 / `silent` / `frames` sin cuadro final, la misma referencia y los
+mismos 32 créditos—, y `ref/motion/reference-v1` **generó con gasto real** (MP4 661.995 B, 12 = 12 cr).
+
+**Reglas que salieron de ejercitarlo, y las dos primeras SÓLO aparecieron contra el runtime:**
+
+- 🔴 **`referenceHashes` NO es una lista de hashes, pese al nombre.** El contrato lo declara
+  `readonly LabDeclaredInputV1[]` y `validateAuthorizedInputs` exige `inputId`, `sha256`, `mediaType` y
+  `rights`; mandar los strings devuelve **`invalid_request` 400**. Estuvo invisible desde siempre porque
+  **las tres modalidades base estiman con la lista VACÍA**. Un doble de test acepta cualquier forma.
+- 🔴 **NUNCA elijas el `inputMode` por el orden del array de la ruta.** `ref/motion/reference-v1` declara
+  `['prompt','elements']` **y** exige 1 referencia: tomar el primero da `create` —prompt-driven— con la
+  referencia en la mano, y el motor **la descarta después de reservar crédito**, devolviendo un video que
+  se ve bien y responde otra pregunta. Se elige por **si van a viajar referencias de verdad**; `hasEndFrame`
+  sigue la misma regla. Es el fail-open que `TASK-1633` cerró en `ref/motion/loop-v1`, por el otro lado.
+- **El dry-run de una ruta SÍ certifica sus referencias, y lo declara** (`referencesCertified`). Se intentó
+  dejarlo read-only puro y **no se puede**: el estimate de una ruta con entrada obligatoria no es computable
+  sin referencias válidas —`assertReferencePolicySatisfied` corre antes de cotizar y `derived-internal` es
+  una postura que un caller **no** puede declarar—. `copyAsReference` es gasto cero e idempotente: deja una
+  anotación, no un cobro.
+- **El camino de verificación es UNO** (`runCanaryTarget`), compartido por las tres modalidades base y por la
+  ruta arbitraria. Dos implementaciones del mismo camino divergen, y entonces «pasó el canary» dejaría de
+  significar lo mismo según qué ruta se probó.
+- 🔴 **La evidencia publica el veredicto de governance que el canary verificó** (`describeCanaryArtifacts`).
+  Durante un tiempo lo comprobaba y **no lo contaba**: la salida se quedaba en `{sha256, mimeType, byteSize,
+  file}`. El dato estaba y se tiraba en la frontera de salida — `ISSUE-127` dentro del instrumento que existe
+  para dar evidencia. Un chequeo correcto no vuelve accionable una evidencia que lo omite.
+
+**Gastar por el canary de las TRES modalidades base exige `--execute` MÁS `--approve=image:N,video:N,audio:N`
+con las TRES**: menos de tres aborta con `producer_canary_three_approvals_required`, así que **no existe un
+canary barato de una sola modalidad** por esa vía (para una ruta suelta, `--route` + `--approve-route`). Y
+necesita **cuatro** variables, no una: `GLOBE_CANARY_BASE_URL`,
+`GLOBE_CANARY_WORKSPACE_ID=greenhouse-org:efeonce`, `GLOBE_CANARY_RUN_LABEL` y `GLOBE_CANARY_ID_TOKEN`
+(`RUN_LABEL` se valida **sólo** en la rama `--execute`: un dry-run verde no prueba que el execute vaya a arrancar).
+
+⚠️ **Su test NO cubre el entrypoint.** `producer-ui-canary.test.mjs` importa la **lib**; a
+`producer-ui-canary.mjs` **no lo importa nadie**. El 2026-08-04 el script estuvo **roto un día entero con
+`pnpm check` VERDE**: un comentario de bloque contenía una expresión de cron literal y su barra-asterisco
+**cerró el comentario**, dejando el resto como código. 🔴 **Un archivo que ninguna suite importa no está
+testeado por estar en el repo** — hay un guard que **parsea todos los `scripts/*.mjs`**; si la lógica vive en la
+lib y el entrypoint es «sólo pegamento», el pegamento es exactamente lo único sin cobertura. Y **nunca escribas
+una expresión de cron literal dentro de un comentario de bloque**.
 
 Los otros dos smokes canónicos, para no confundirlos: **`smoke-private-api.mjs`** cubre el carril **workload**
 (SA + ID token) y **`smoke-human-federation.mjs`** el carril **humano** (las tres piernas del login SSO).
@@ -1374,7 +2540,7 @@ GLOBE_CANARY_ID_TOKEN="$(gcloud auth print-identity-token   --impersonate-servic
 
 **Caso fuente, y es una lección de método, no una nota:** el 2026-07-26 dos agentes distintos estuvieron a punto de
 re-derivar esa secuencia a mano —uno escribió dos prompts manuales completos— antes de descubrir que el script
-existía, estaba commiteado y estaba testeado. **Buscá el script antes de escribir la secuencia.** Un canary
+existía, estaba commiteado y estaba testeado. **Busca el script antes de escribir la secuencia.** Un canary
 artesanal no sólo cuesta tiempo: se comporta distinto para cada agente y para CI, y esa divergencia es
 indiagnosticable después.
 
@@ -1389,3 +2555,36 @@ un secreto, el primitive es el **exit code**, nunca una máscara sobre la salida
 
 **Método:** `gcloud` CLI y ADC son credenciales **distintas** — el token del CLI puede estar vencido y ADC seguir
 viva (o al revés). No des por bloqueado un diagnóstico de infra sin probar las dos.
+
+### Runbook reusable — atestación y promoción con evidencia UI
+
+Para una promoción de modelo, sigue siempre esta secuencia y conserva los identificadores; no la reconstruyas de
+memoria ni repitas una etapa que ya tiene readback terminal:
+
+1. **Inventario exacto:** consulta `globe.producer.fleet.list` y el runtime handoff; fija una tabla con
+   `routeId/capability/provider/model/version`, estado actual, reporte, attempt, rate-version y attestation. Si una
+   ruta ya está promovida, sólo verifica su reader y su asset UI: no la repromuevas.
+2. **Cobertura comercial:** para cada shape que la UI puede enviar, resuelve el rate exacto
+   `modality/resolution/duration/aspect/audio`. La cobertura se prueba contra el catálogo real (incluidos límites
+   mínimo/máximo y pasos); un rate faltante es un defecto de datos que se corrige con migración forward-only,
+   `ON CONFLICT DO NOTHING` y test registrado, nunca relajando validación ni agregando un fallback de precio.
+3. **Derechos y revisión:** persiste evidencia durable para el endpoint/modelo exactos, attestation append-only,
+   evaluation report y revisión humana. La promoción operator-only encadena propuesta, readiness, binding y
+   circuito; cada etapa se verifica por reader. Un reporte objetivo no equivale a aprobación humana ni a derechos
+   comerciales.
+4. **Deploy/migración:** despliega desde el SHA exacto de `main`; aplica migraciones sólo mediante el workflow
+   keyless con verificación de SHA remoto y readback limpio. No uses SQL manual ni reintentos ciegos después de un
+   409; primero lee el estado durable.
+5. **Prueba UI real:** en la sesión autenticada existente, selecciona ruta, configura un shape válido, adjunta una
+   referencia autorizada, confirma estimate y créditos, genera una pieza y verifica estado terminal, `retained`,
+   preview/playback, MIME/hash y descarga. La evidencia mínima es `experimentId + attemptId + sha256`; API/CI no
+   sustituyen este paso.
+6. **Cierre y limpieza:** actualiza el handoff/ledger humano, registra bloqueos externos con la razón exacta y
+   elimina sólo archivos temporales y procesos creados por esta sesión. Nunca crees, uses ni elimines worktrees;
+   no borres recursos de Claude ni del operador y detén únicamente proxies que tú hayas iniciado.
+
+**Uso de subagentes:** divide únicamente trabajo independiente y de lectura: (a) identidad/readiness/rates, (b)
+derechos/evidencia legal, (c) UI/Playwright y asset. Cada subagente recibe una ruta explícita, no escribe sobre el
+árbol de otro agente y devuelve IDs/evidencia o un bloqueo verificable. El agente principal conserva el ownership
+de mutaciones, migraciones, promoción, decisión de no repromover y cierre; antes de ejecutar una mutación reconcilia
+los hallazgos para evitar dos sagas sobre la misma identidad.

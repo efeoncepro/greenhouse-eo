@@ -15,7 +15,7 @@
  * que la deuda vuelva a crecer en silencio cuando se agreguen routes nuevas.
  *
  * Cómo lee el resultado un dev cuando falla:
- *   "Tu route nueva muta estado sin capability-check. Agregá `can(subject, '<cap>', …)`
+ *   "Tu route nueva muta estado sin capability-check. Agrega `can(subject, '<cap>', …)`
  *    en el route o (mejor) en su command de `src/lib/**` — patrón canónico enable-sync.
  *    Si es una operación self-service sobre datos PROPIOS del miembro (ownership-scoped,
  *    no admin-coarse), agregala al ALLOWLIST con su razón."

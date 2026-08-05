@@ -1,19 +1,21 @@
 # 05 — Social Listening + Trends + Social Search
 
-> **Tesis dura 2026.** Las redes son **buscadores** y **radares**, no solo feeds. `~1 de
-> cada 3 consumidores salta Google` y `>50% de la Gen Z parte su búsqueda en TikTok/IG/YT`
-> `(as-of 2026-07 — semestral, reverificar)`. A la vez, la conversación pública es una
+> **Tesis operativa 2026.** Las redes también son superficies de **búsqueda**,
+> **recomendación** y **descubrimiento**, con comportamiento distinto por plataforma, mercado y
+> audiencia. A la vez, la conversación pública es una
 > fuente de inteligencia en tiempo real. Este módulo cubre **escuchar** (listening + SoV +
-> sentiment), **aparecer en la búsqueda dentro de las redes** (AEO-social) y **surfear
-> tendencias sin quemar la marca** (trend-jacking responsable).
+> sentiment), **aparecer en búsqueda/recomendación dentro de las redes** (AEO-social),
+> entender cuándo esas URLs aparecen también en Google y **surfear tendencias sin quemar
+> la marca** (trend-jacking responsable).
 
-> **Nota de borde.** El **AEO por-motor LLM** (ChatGPT / Perplexity / AI Overviews / Gemini —
-> aparecer *citado* en respuestas de IA, schema, llms.txt) es de **`seo-aeo`**. Acá cubrimos
-> **social search**: aparecer cuando alguien busca *dentro de* TikTok/Instagram/YouTube.
-> No confundir ni duplicar.
+> **Nota de borde actualizada.** Esta skill gobierna búsqueda y recomendación *dentro* de la
+> plataforma. `seo-aeo` gobierna la aparición de URLs sociales en Google/Search Console y la
+> coherencia de entidad, además del AEO por-motor LLM. `content-marketing-studio` decide si la
+> pieza pertenece a una Pillar/Cluster Experience. No hay una separación absoluta entre SEO y
+> social: una misma URL social puede ser descubrible en ambos sistemas.
 
 Cárgalo cuando trabajes escucha social, share of voice, sentiment, optimización para
-búsqueda dentro de las redes, trend-jacking o audio/sonido trending.
+búsqueda dentro de las redes, aparición externa de una URL social, trend-jacking o audio trending.
 
 ---
 
@@ -65,7 +67,7 @@ definidos. Mide cuánta conversación de la categoría es tuya.
 - Úsalo para detectar cuándo un competidor gana narrativa o cuándo un tema del nicho se
   calienta y puedes entrar.
 
-## 3. Social search → AEO-SOCIAL (aparecer en la búsqueda dentro de las redes)
+## 3. Social search y recomendación dentro de la plataforma
 
 La gente **busca dentro de la red**: "mejores audífonos", "receta X", "agencia de marketing
 en Chile". El algoritmo de búsqueda de cada red indexa **texto, audio y visual**. Optimiza
@@ -89,7 +91,45 @@ cada pieza para ser encontrada:
 Regla dura: escribe **para que un humano la encuentre buscando**, no para engañar al motor.
 El keyword-stuffing y el hashtag-confeti bajan la calidad percibida y no rankean.
 
-## 4. Trend-jacking RESPONSABLE
+### Evidencia nativa por plataforma
+
+- **TikTok Creator Search Insights** permite explorar temas buscados, content gaps y rendimiento
+  de publicaciones en búsqueda, según disponibilidad de la cuenta/región.
+- **YouTube Search** prioriza relevancia, engagement y calidad; YouTube Analytics separa fuentes
+  como Search, Browse, Suggested y Shorts feed para videos, Shorts y lives.
+- **Pinterest Trends** muestra tendencias de búsqueda, guardado y shopping; un Pin puede revivir
+  horas, meses o años después y Pin Analytics mide saves, clicks y conversiones disponibles.
+- **LinkedIn** reporta Search Appearances/keywords de Page y analytics por post para texto,
+  imagen, video, artículo, newsletter y otros formatos. No afirmar que Search Appearances mide
+  queries por post: su fuente oficial describe la visibilidad de la Page.
+
+## 4. Aparición de piezas sociales en Google
+
+Las piezas sociales también pueden aparecer fuera de su plataforma. Search Console ofrece
+**Platform Properties** para Instagram, TikTok, X y YouTube, con despliegue gradual. Reporta
+clics, impresiones, CTR y posición de esas cuentas en Google Search y, cuando hay datos,
+Discover y News. Esto **no** mide vistas dentro de Instagram/TikTok/X/YouTube.
+
+- Verifica primero si la propiedad está disponible y si la cuenta puede acreditar ownership.
+- En Instagram, posts y Reels elegibles de cuentas profesionales públicas pueden aparecer en
+  motores externos según las condiciones vigentes de Meta; reverifica elegibilidad antes de
+  prometer indexación.
+- La aparición en Google no convierte automáticamente una pieza en cluster node. Sigue
+  necesitando JTBD propio, valor autónomo, relación con la Pillar, URL/ID estable, owner y medición.
+- La URL social puede ser el nodo gobernado; no fabriques una copia web sólo para declarar canon.
+
+## 5. Tres planos que no se deben mezclar
+
+1. **External search:** Google Search/Discover/News, medido con Search Console cuando exista
+   Platform Property; ownership `seo-aeo`.
+2. **Platform search/recommendation:** consultas, Search/Browse/For You/Suggested, retención,
+   saves y descubrimiento nativo; ownership `social-media-studio`.
+3. **Downstream progress:** visita, suscripción, uso de tool, diagnóstico, decisión o handoff;
+   ownership `growth-marketing-cro` para tracking/atribución.
+
+No sumes impresiones de estos planos: tienen superficies, denominadores y metodologías distintas.
+
+## 6. Trend-jacking RESPONSABLE
 
 Sumarse a una tendencia (audio, formato, meme, conversación) puede multiplicar alcance —
 o quemar la marca si calza mal o llegas tarde. Evalúa **antes** de saltar:
@@ -111,7 +151,7 @@ requieren sign-off. Documéntalo para no perder la ventana pidiendo permiso.
 El artefacto operativo es `templates/trend-jack-checklist.md` — úsalo para decidir go/no-go
 en minutos y registrar la razón. **Cierra con ese artefacto.**
 
-## 5. Sonido / audio trending
+## 7. Sonido / audio trending
 
 - **El audio es señal de distribución** en TikTok/Reels: usar un sonido en ascenso puede
   darte una ola de alcance mientras dura.
@@ -122,7 +162,7 @@ en minutos y registrar la razón. **Cierra con ese artefacto.**
 - **Derechos**: usa el catálogo nativo de la red (licenciado); audio comercial ajeno puede
   ser silenciado o bajado, sobre todo en cuentas de marca. `(reverificar política por red)`
 
-## 6. Trend efímero vs shift estructural (no confundir)
+## 8. Trend efímero vs shift estructural (no confundir)
 
 | | **Trend efímero** | **Shift estructural** |
 |---|---|---|
@@ -136,7 +176,7 @@ estructural como moda pasajera.** El listening sirve para distinguirlos: un efí
 baja; un shift sube y se sostiene por trimestres. Confirma la categoría antes de mover
 presupuesto o pilares.
 
-## 7. Métricas de listening
+## 9. Métricas de listening
 
 - **Volumen de menciones** (serie temporal; el pico importa más que el absoluto).
 - **Sentiment** (% pos/neu/neg y su tendencia).
@@ -145,9 +185,11 @@ presupuesto o pilares.
 - **Reach/impresiones de la conversación** (cuánta gente ve lo que se dice de ti).
 - **Time-to-detect** de una crisis (cuánto tardas en verla — objetivo: minutos, no días).
 
-## 8. NUNCA (anti-patrones)
+## 10. NUNCA (anti-patrones)
 
-- **NUNCA** trates AEO-social como AEO de motores LLM — eso es `seo-aeo` (nota de borde).
+- **NUNCA** reduzcas social search a "sólo in-platform": una URL social puede aparecer en Google.
+- **NUNCA** mezcles Search Console externo, analytics nativo y progreso downstream en una sola
+  cifra de impresiones o "alcance total".
 - **NUNCA** hagas keyword-stuffing ni hashtag-confeti: baja calidad y no rankea.
 - **NUNCA** saltes a un trend sin pasar el filtro de 5 preguntas — el riesgo de marca es real.
 - **NUNCA** reestructures la estrategia por un trend efímero.

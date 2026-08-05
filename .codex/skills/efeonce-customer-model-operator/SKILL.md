@@ -148,6 +148,26 @@ Diseñar entrevistas, observation, win/loss, smoke test, paid diagnostic, pilot 
 decisión. Definir hipótesis falsable, muestra, métrica primaria, threshold, stop condition, owner, fecha y qué
 evidencia cambia la decisión. No usar entusiasmo verbal como prueba de compra.
 
+### Creative Velocity: buyer y primer valor
+
+El JTBD central es: “Cuando la demanda creativa supera la capacidad estable de mi equipo, quiero ampliar producción
+sin perder criterio, control ni memoria, para cumplir lanzamientos y mantener la marca consistente”. Calificar
+operator, problem owner, champion, economic buyer, procurement/Finance y Legal/IP/IT.
+
+El primer valor debe ser observable: backlog priorizado, calendario, primer lote, biblioteca modular, primera captura
+o dashboard de delivery. Para un Dedicated Creative Pod, validar autoridad, capacidad reservada, tiempos de
+aprobación, ownership por etapa y willingness-to-pay. Para Modular Production, validar quién mantiene templates,
+quién posee la IP, qué debe exportarse y cómo se mide reutilización.
+
+Para `Embedded Creative Capacity` validar fit bidireccional: comprensión de cultura y marca por el pod, y capacidad
+del cliente para colaborar con owner Efeonce, rituales, límites, feedback y aprobaciones. Añadir al customer model
+continuidad de personas, adopción del workflow, confianza del equipo interno, autonomía progresiva y riesgo de que el
+cliente convierta el pod en Staff Augmentation.
+
+Registrar también si el cliente valora que Efeonce absorba infraestructura, licencias, contratación, payroll,
+provisionales, reemplazos y soporte bajo un fee mensual. El JTBD no es sólo “producir más”: puede ser “despreocuparme
+de administrar la capacidad creativa sin perder control de marca”. Validar esa disposición por país y buying group.
+
 ### 9. Validar procurement, riesgo y contrato
 
 Registrar vendor onboarding, requisitos de seguridad, DPA, subprocesadores, certificaciones/seguros, procurement

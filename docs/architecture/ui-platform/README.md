@@ -16,7 +16,8 @@ Esta carpeta describe la **plataforma de ingeniería UI**. El **lenguaje visual 
 
 | Capa | Autoridad |
 |---|---|
-| **Contrato agente (visual)** | `DESIGN.md` (raíz, lint-gated TASK-764) |
+| **Contrato agente (visual de Greenhouse)** | [`DESIGN.md`](../../../DESIGN.md) (raíz, lint-gated TASK-764) |
+| **Guía visual agente de AXIS** | [`axis-design-system/DESIGN.md`](https://github.com/efeoncepro/axis-design-system/blob/main/DESIGN.md), proyección generada desde `packages/tokens` |
 | **Tokens visuales (extendido)** | [GREENHOUSE_DESIGN_TOKENS_V1.md](../GREENHOUSE_DESIGN_TOKENS_V1.md) · [GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md](../GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md) |
 | **Catálogo vivo del Design System** | `/admin/design-system` (interno) — home navegable de tokens, primitives, patrones y labs |
 | **Color AXIS + Greenhouse overrides** | `/admin/design-system/colors` (interno) · ramps/opacidades/neutrales desde `src/@core/theme/axis-tokens.ts` · Tidal Teal secondary governed by [GREENHOUSE_SECONDARY_TEAL_COLOR_DECISION_V1](../GREENHOUSE_SECONDARY_TEAL_COLOR_DECISION_V1.md) |
@@ -29,11 +30,11 @@ Regla: cuando un doc temático difiera del runtime, **gana el runtime** y el doc
 
 ### AXIS cross-runtime boundary
 
-AXIS gobierna tokens, contratos y registry compartidos; cada producto conserva su adapter y
+AXIS gobierna tokens, contratos, registry y la especificación visual portable compartida; cada producto conserva su adapter y
 runtime nativo. Para consumir AXIS desde Greenhouse, Globe o un producto futuro, usa la decisión
 [EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1](../EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md),
 el [runbook de paquetes privados](../../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md)
-y la evidencia de [TASK-1591](../../tasks/complete/TASK-1591-efeonce-ui-adapters-pilot.md). No copies
+y la [guía visual AXIS](https://github.com/efeoncepro/axis-design-system/blob/main/DESIGN.md), además de la evidencia de [TASK-1591](../../tasks/complete/TASK-1591-efeonce-ui-adapters-pilot.md). No copies
 componentes MUI/Vuexy a Globe ni conviertas el Lab en una dependencia de runtime de producto.
 
 ## Mapa "¿dónde vive X?"

@@ -270,10 +270,12 @@ export const GH_FINIQUITO = {
       },
       lane: {
         finalSettlement: 'Finiquito laboral',
+        internationalPayroll: 'Cierre de nómina internacional',
         contractualClose: 'Cierre contractual',
         externalProvider: 'Proveedor externo',
         needsClassification: 'Por clasificar',
         finalSettlementHelp: 'Trabajador dependiente en nómina interna; requiere cálculo, documento y ratificación.',
+        internationalPayrollHelp: 'Relación interna pagada por Greenhouse fuera de Chile; requiere cierre de nómina, sin finiquito chileno.',
         contractualCloseHelp: 'Honorarios o relación no laboral; se cierra como relación contractual sin finiquito laboral.',
         externalProviderHelp: 'El cierre vive en el proveedor laboral o payroll externo.',
         needsClassificationHelp: 'La combinación contractual requiere clasificación antes de habilitar documentos o pagos.'

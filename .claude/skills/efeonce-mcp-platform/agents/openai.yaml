@@ -1,0 +1,7 @@
+interface:
+  display_name: "Efeonce MCP Platform"
+  short_description: "Securely route Efeonce MCP capability work."
+  default_prompt: "Use $efeonce-mcp-platform to design, expose, secure, deploy, or verify an Efeonce MCP capability."
+
+policy:
+  allow_implicit_invocation: true

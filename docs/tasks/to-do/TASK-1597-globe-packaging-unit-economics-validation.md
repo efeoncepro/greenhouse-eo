@@ -1,5 +1,11 @@
 # TASK-1597 — Globe Packaging and Unit Economics Validation
 
+## Delta 2026-08-02 — Cost-to-serve desde Cost Subledger
+
+Esta policy consume hechos técnicos de `TASK-1478` y el canonical cost reader para calcular cost-to-serve y margins
+por lane. No crea un ledger financiero en Globe ni trata Studio Credits como costo real. Pricing/packaging conserva
+su owner; Finance Core conserva cuentas, events y reconocimiento.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -19,7 +25,7 @@
 - Rank: `TBD`
 - Domain: `finance|delivery|agency|commercial`
 - Blocked by: `TASK-1478, TASK-1479, TASK-1480, TASK-1482`
-- Branch: `task/TASK-1597-packaging-unit-economics-validation`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

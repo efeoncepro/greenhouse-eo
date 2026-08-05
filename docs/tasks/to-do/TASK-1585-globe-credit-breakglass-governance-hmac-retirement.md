@@ -25,7 +25,7 @@
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `TASK-1584`
-- Branch: `task/TASK-1585-globe-credit-breakglass-governance-hmac-retirement`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

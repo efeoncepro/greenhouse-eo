@@ -1,0 +1,22 @@
+{
+  "$schema": "../PROPOSAL_STUDIO_CLOSURE_SCHEMA.md",
+  "schemaVersion": 1,
+  "deal": "sky-blog-2026",
+  "workspacePath": "docs/commercial/tenders/sky-blog-2026",
+  "status": "workshop_only",
+  "proposalId": null,
+  "registration": null,
+  "composition": {
+    "sourcePlans": ["deck-plan-v2-evolucion.json", "deck-plan-economic-v2-evolucion.json"]
+  },
+  "renderJobs": [],
+  "deliverables": [],
+  "verification": null,
+  "notes": [
+    "La V2 técnica enriquecida compone localmente en .captures/sky-bid-v2-evolucion-enriched con 29 láminas; la salida es de taller y no es un asset productivo.",
+    "El primer borrador comprimido de 17 láminas permanece en .captures/sky-bid-v2-evolucion como histórico de taller; no se promueve como versión de entrega.",
+    "El brief histórico referencia un deck v6 previo en Proposal Studio, pero este workspace no tiene evidencia autenticada suficiente para reconstruir su proposalId o marcar la V2 como registrada.",
+    "La económica V2 compone localmente en .captures/sky-bid-economic-v2-evolucion y su Excel se genera desde economica-v2-evolucion.json; el Core es CLP 3.000.000 netos/mes sin IVA, IVA 19% CLP 570.000 y total mensual con IVA CLP 3.570.000.",
+    "La capacidad, cost-to-serve y margen aún requieren validación comercial/Finance; no se crea un render productivo ni se marca verified por inferencia."
+  ]
+}

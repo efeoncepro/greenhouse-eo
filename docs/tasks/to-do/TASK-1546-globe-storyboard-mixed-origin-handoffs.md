@@ -21,7 +21,7 @@
 - Rank: `TBD`
 - Domain: `creative-studio`
 - Blocked by: `TASK-1543`
-- Branch: `task/TASK-1546-globe-storyboard-mixed-origin-handoffs`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 
 ## Summary

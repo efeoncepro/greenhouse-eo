@@ -24,7 +24,7 @@ Necesitas:
 
 ## Operación 1 — Activar para ti primero (dogfood)
 
-1. Conseguir tu `userId` desde la session: abre `/admin/users` y buscate; el `userId` aparece en la URL del detalle del usuario.
+1. Conseguir tu `userId` desde la session: abre `/admin/users` y búscate; el `userId` aparece en la URL del detalle del usuario.
 2. Hacer un `POST` al endpoint de flags:
 
    ```bash

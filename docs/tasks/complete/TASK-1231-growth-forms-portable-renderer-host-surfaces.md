@@ -16,7 +16,7 @@
 - Execution profile: `ui-ux`
 - UI impact: `primitive`
 - Backend impact: `none`
-- Epic: `none`
+- Epic: `EPIC-040`
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|public-site|ui|wordpress|astro`

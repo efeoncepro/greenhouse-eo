@@ -1,5 +1,11 @@
 # TASK-1303 — Growth SEO: Rank Capture + Evolution Reader
 
+## Delta 2026-08-05
+
+- El schema fundacional ya existe: TASK-1299 aplicó `20260805134439202_task-1299-growth-seo-schema.sql` en `greenhouse-pg-dev` (8 tablas `seo_*`, UNIQUEs de idempotencia, triggers `block_seo_row_mutation`, `db.d.ts` regenerado). Actualizar el supuesto "schema no existe" en Discovery: verificar columnas reales contra `db.d.ts`/`information_schema`, no re-crear DDL.
+- Mandato parity+MCP del operador (2026-08-05, reforzado MCP-first): los readers/commands de esta task nacen consumer-agnósticos. TASK-1645 (lane + tools base) ya NO espera a esta task: al aterrizar ésta, DEBE registrar `get_seo_rank_evolution` en el server MCP + ruta del lane **en el mismo PR** (patrón TASK-1645, adapter delgado, cero lógica). Shape `{ ok } | { ok: false, errorCode, status }` obligatorio.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -307,6 +313,8 @@ Ver `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §5 (rank tracking: DataForSEO SE
      ═══════════════════════════════════════════════════════════ -->
 
 ## Acceptance Criteria
+
+- [ ] **MCP tool en el mismo PR (mandato del operador 2026-08-05, patrón TASK-1645):** cada reader/lectura canónica que esta task cree queda expuesto como MCP tool read-only (handler en `src/mcp/greenhouse/tools.ts` + registro en `server.ts` + método en `http-client.ts` + ruta del lane ecosystem si aplica) EN EL MISMO PR. La task NO se cierra con el reader UI-only.
 
 - [ ] Source of truth nombrado: `seo_rank_snapshots` (PG hot window) + `greenhouse_growth_analytics.seo_rank_history` (BQ historia larga) + `seo_provider_spend_daily` (cost counter).
 - [ ] `captureRankSnapshot(targetId, actor)` es command gobernado: llama `enforceSeoRunEntitlement` ANTES de pegar DataForSEO; UPSERT idempotente por `capture_date`; persiste `provider_cost` + incrementa `seo_provider_spend_daily`.

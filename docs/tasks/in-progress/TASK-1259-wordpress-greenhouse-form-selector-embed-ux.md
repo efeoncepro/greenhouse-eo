@@ -23,7 +23,7 @@
 - Execution profile: `ui-ux`
 - UI impact: `flow`
 - Backend impact: `none`
-- Epic: `none`
+- Epic: `EPIC-040`
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|public-site|wordpress|ui`

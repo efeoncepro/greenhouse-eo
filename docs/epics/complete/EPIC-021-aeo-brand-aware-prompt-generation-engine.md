@@ -49,6 +49,13 @@ Decisión de arquitectura (arch + seo + product, 2026-06-29): NO un artefacto mo
 - `TASK-1291` — **Gate de validación pre-run del operador + reabilitación del cross-sell** (chokepoint: bloquea run/envío si categoría `unknown` o arquetipo no confirmado; review/approval del operador para prospectos). Reabre TASK-1279 con seguridad.
 - `TASK-1292` — **Eval golden-set por arquetipo + drift signals** (regresión multi-arquetipo: aerolínea consumo, SaaS B2B, retail).
 
+### Childs reconciliadas (2026-08-05)
+
+> Declaraban `Epic: EPIC-021` (o fueron corregidas a él) y nunca fueron registradas acá. Detectadas en el barrido de registro del programa AEO + el gate `epic-child-parity` — ver [`../AEO_PROGRAM_STATUS.md`](../AEO_PROGRAM_STATUS.md) § Delta 2026-08-05 (b).
+
+- `TASK-1390` ✅ `complete` — **Fix `ISSUE-120` del pipeline de normalización/scoring**: clasificador determinista de `sourceType` para citaciones, domain matching, `fallback reason` visible y retry con backoff del scoring. Trabajo post-cierre del epic sobre el mismo motor.
+- `TASK-1286` ✅ `complete` — **Command gobernado `assignAeoTier`** (asignación de tiers AEO on-demand). Declaraba `Epic: EPIC-020`; corregido a EPIC-021, que es donde vive su bloque de trabajo.
+
 ## Existing Related Work
 
 - **ISSUE-110** — el falso-0 (causa raíz documentada): bypass de taxonomía + prompt pack ICP-Efeonce.

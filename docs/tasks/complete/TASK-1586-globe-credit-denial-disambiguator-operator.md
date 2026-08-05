@@ -1,0 +1,429 @@
+# TASK-1586 — Globe Credit Decision Status and Operator Recovery Plane
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 0 — IDENTITY & TRIAGE
+     "Que task es y puedo tomarla?"
+     Un agente lee esto primero. Si Lifecycle = complete, STOP.
+     ═══════════════════════════════════════════════════════════ -->
+
+## Status
+
+- Lifecycle: `complete`
+- Priority: `P0`
+- Impact: `Muy alto`
+- Effort: `Alto`
+- Type: `implementation`
+- Execution profile: `backend-data`
+- UI impact: `none`
+- UI ready: `n/a`
+- Wireframe: `none`
+- Flow: `none`
+- Motion: `none`
+- Backend impact: `integration`
+- Epic: `EPIC-028`
+- Status real: `Readers, recovery y worker de expiry desplegados y verificados live; TASK-1630 adjudicó después los dos holds históricos mediante decisión Finance gobernada`
+- Rank: `done`
+- Domain: `platform`
+- Blocked by: `none`
+- Branch: `Globe main | Greenhouse develop`
+- Legacy ID: `none`
+- GitHub Issue: `none`
+
+## Summary
+
+Entrega el read/recovery plane canónico de Studio Credits sin crear una segunda máquina de estados: Globe posee
+el lifecycle económico, expiry, list/get/reconcile y receipts; Greenhouse une esos resultados con sus intents y
+publica status/preview y proyecciones distintas para administración y self-view de Producer.
+
+## Why This Task Exists
+
+El colapso del `409` hacia callers no autorizados sigue siendo correcto, pero el reader actual tampoco es una
+verdad operativa: `spentInPeriod` agrega toda la historia y `evaluateCreditBudget` no aplica monthly/project caps
+como `reserveCredits`. Exponerlo cerraría ISSUE-124 con una explicación falsa. Además, Greenhouse sólo registra
+un contador de propuestas stale y no permite listar, inspeccionar o reconciliar cada operación.
+
+## Goal
+
+- Una sesión humana o agente autorizada puede leer `CreditCapacityStatusV1`, preview y razón vigente sin SQL,
+  break-glass ni math local.
+- Globe puede listar/leer/reconciliar operaciones por `operationId|proposalId`, incluyendo expiradas,
+  `confirm_failed` y outcome ambiguo; Greenhouse sólo adapta el readback autoritativo y sus intents locales.
+- Producer consume `CreditCapacitySelfStatusV1` redactado; nunca recibe IDs internos, actores, vendor cost o
+  margen. El DTO no transporta autoridad Greenhouse ni intenta proyectar sus entitlements en la sesión Globe.
+- ISSUE-124 se cierra sólo cuando reader y reserve pasan conformance sobre una negación real.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 1 — CONTEXT & CONSTRAINTS
+     ═══════════════════════════════════════════════════════════ -->
+
+## Architecture Alignment
+
+Revisar y respetar:
+
+- `docs/architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md` —
+  **ADR-015** Slice F y §Contexto (el colapso del 409 es diseño, no bug).
+- `docs/architecture/creative-studio/EFEONCE_GLOBE_COMMERCIAL_PROMOTION_ATTESTATION_DECISION_V1.md`
+  — ADR-010: el rollout de 3 pasos zero-downtime si se decide ampliar scopes del grant humano
+  (`capabilityScopes ⊆ requiredScopes`; agregar en un movimiento tumba el login).
+- `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` — la capability nace con contrato
+  gobernado; la futura UI del portal es un consumer más de estos readers.
+- `docs/architecture/creative-studio/EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md` — coverage de 3
+  estados; `policy-blocked` es declarado, no un gap.
+
+Reglas obligatorias:
+
+- **NUNCA** exponer saldos/política cruda al CLIENTE final: el desambiguador es para el operador
+  interno (el `propose` del fondeo ya filtra agregados al plano de Greenhouse — riesgo residual
+  nombrado en ADR-015; esta task no lo amplía hacia afuera).
+- **NUNCA** ampliar `capabilityScopes` del grant OAuth de Globe en un solo movimiento (ADR-010,
+  rollout de 3 pasos, verificando login entre pasos).
+- **NUNCA** publicar `getAvailability`/`evaluateCreditBudget` actuales como si fueran autoritativos. Consumir el
+  `CreditDecisionSnapshot` corregido por TASK-1482 y mantener el reserve como recheck transaccional.
+- **NUNCA** calcular cap, remaining o effective available en Greenhouse/Producer; el browser sólo formatea.
+
+## Normative Docs
+
+- `docs/issues/open/ISSUE-124-globe-credit-grant-canonical-409-root-cause-hidden.md` — la mitad
+  operativa que esta task cierra. [verificar path/estado exacto en Discovery]
+- `docs/manual-de-uso/creative-studio/fondear-creditos-globe.md` — el runbook del carril cuyo
+  patrón de rutas broker esta task replica.
+- `.claude/skills/greenhouse-globe/SKILL.md` § «Gasto y crédito en Globe» regla 2.
+
+## Dependencies & Impact
+
+### Depends on
+
+- `TASK-1482`: publica período explícito, evaluator compartido y snapshots admin/self con conformance contra
+  `reserveCredits`. Es un bloqueante duro.
+- `TASK-1468` + `TASK-1579`: fijan holds, expiry de reservations, actual y settlement antes de exponer un estado
+  operacional que pueda contradecir el lifecycle económico.
+- Carril `sister-platform` de fondeo vivo (TASK-1566, entregado): las rutas broker
+  `src/app/api/admin/globe/credit-funding/*` son el patrón a replicar (WIF + caller + envelope +
+  error mapping).
+- Los readers ya existen y son `available` en `http`/`sdk` para el workload
+  (`READ.evaluate`/`READ.availability` en `efeonce-globe/packages/domain/src/credit-administration.ts`,
+  capability `globe.credits.budget.read` — ya en el caller genérico post-retiro).
+
+### Blocks / Impacts
+
+- `TASK-1483`: consume status/preview/operations para `/admin/globe/credits`.
+- `TASK-1628`: consume exclusivamente la proyección self-status redactada.
+- `TASK-1629`: reusa list/get/reconcile para recovery y one-command API/CLI.
+- **`ISSUE-124`**: cerrable al completar esta task (delta + move a resolved).
+
+### Files owned
+
+En `greenhouse-eo`:
+
+- `src/app/api/admin/globe/credits/status/**`
+- `src/app/api/admin/globe/credits/funding/preview/**`
+- `src/app/api/admin/globe/credits/funding/operations/**`
+- `src/lib/globe/credit-capacity-status*.ts` y `src/lib/globe/credit-funding-operation*.ts` [crear según Plan Mode]
+- `src/lib/globe/**` — reuso del cliente broker existente para readers.
+- `docs/**` — cierre documental (manual del carril gana la sección «diagnosticar una negación»).
+
+En `efeonce-globe`:
+
+- contracts/domain/store de funding para lifecycle, expiry, list/get/reconcile y receipt económico canónicos;
+- worker/sweeper de expiración cuando corresponda;
+- API/readers `sister-platform` que exponen esos primitives sin abrir el contrato administrativo al browser.
+
+Si Plan Mode decide flip de `ui` coverage para el self-status, se crea un reader redactado independiente; nunca
+se reutiliza el const compartido que también cubre writes ni se amplían scopes en un solo movimiento.
+
+## Current Repo State
+
+### Already exists
+
+- Readers `evaluateCreditBudget`/`getAvailability` y la capability `globe.credits.budget.read`, pero sus shapes y
+  algoritmos no representan todavía la decisión completa.
+- El puente broker completo (WIF, envelope, `x-idempotency-key`, mapping de errores 4xx→422 no
+  actionable / 5xx→503 actionable) probado end-to-end por el fondeo.
+- La fase de negación server-side (TASK-1566 Slice 1) — mitad ya cerrada de ISSUE-124.
+- TASK-1629 registra intents con provenance/fases terminales y API Platform propose/confirm.
+
+### Gap
+
+- Ninguna ruta de Greenhouse expone un status correcto y estable a una sesión humana/agente.
+- No existen primitives Globe list/reconcile/sweeper ni receipt económico completo; `proposal.get` y la
+  reliability actual no bastan para recuperar operaciones ambiguas.
+- `ui`/`mcp` coverage de esos readers sigue `policy-blocked` (declarado; cambiarlo exigiría el
+  rollout de scopes — por eso la vía broker es la recomendada).
+- El manual del carril no tiene sección de diagnóstico de negaciones.
+
+## Modular Placement Contract
+
+- Topology impact: `cross-runtime`
+- Current home: lifecycle y receipts en `efeonce-globe`; adapters/proyecciones en `greenhouse-eo`
+- Future candidate home: `remain-shared`
+- Boundary: Globe decide/transiciona; Greenhouse sólo persiste la intención propia, une/readapta el readback y
+  expone endpoints browser-safe; la UI futura y Nexa consumen esos endpoints, nunca el lane workload directo
+- Server/browser split: el token WIF y el caller viven server-side; el browser sólo ve la
+  respuesta curada (razón + agregados permitidos al operador)
+- Build impact: `none`
+- Extraction blocker: `none`
+
+## Backend/Data Contract
+
+### Backend/data brief
+
+- Backend rigor: `backend-critical`
+- Impacto principal: `integration`
+- Source of truth afectado: lifecycle/receipts de funding en Globe; intents atribuidos en Greenhouse permanecen
+  evidencia local y nunca reemplazan el estado económico
+- Consumidores afectados: `Greenhouse Admin UI|API Platform|CLI|Nexa|MCP|Globe Producer self-view`
+- Runtime target: `staging|production` en Globe para lifecycle/receipts y Vercel para adapters/proyecciones
+
+### Contract surface
+
+- Contrato existente a respetar: `ReaderRequestEnvelopeV1`, ADR-015, intents de TASK-1629 y el
+  `CreditDecisionSnapshot` de TASK-1482.
+- Contrato nuevo o modificado: `CreditCapacityStatusV1`, `CreditFundingOperationV1` y
+  `CreditCapacitySelfStatusV1`; rutas status/preview/operations list|get|reconcile. El self-status no incluye
+  `canOpenAdmin`, entitlement ni authority cross-runtime.
+- Backward compatibility: `not applicable` (rutas nuevas).
+- Full API parity target: UI/API Platform/CLI consumen estos primitives en el P0/P1; Nexa/MCP son adapters futuros
+  y no bloquean TASK-1483. Producer consume sólo self-status.
+
+### Data model and invariants
+
+- Entidades/tablas/views afectadas: propuestas/lifecycle/receipts de Globe e intents existentes de Greenhouse;
+  cualquier proyección adicional es aditiva y no duplica ni sobreescribe la máquina de estados de Globe.
+- Invariantes que no se pueden romper:
+  - La disponibilidad/caps/reasons se leen del snapshot corregido, nunca se recomputan en Greenhouse.
+  - `partial|stale|unknown` nunca se convierte a cero.
+  - `outcome_unknown` no ofrece retry; consulta primero Globe y sólo reconcilia el intent Greenhouse después de
+    recibir un estado/receipt autoritativo.
+  - self-status no contiene IDs internos, actores, source confidencial, vendor cost ni margen.
+  - El colapso del 409 hacia el caller de gasto NO se relaja: el desambiguador es una superficie
+    aparte, gateada a operador.
+  - Cero saldos/política en logs (ISSUE-127: sanitización CON contraparte de observabilidad —
+    loggear código/fase, jamás montos).
+- Tenant/space boundary: workspace fijo al binding del broker (`greenhouse-org:efeonce` hoy);
+  el operador no elige workspaces arbitrarios.
+- Idempotency/concurrency: status/preview/list/get son puros; reconcile es idempotente por operation key y no repite
+  la mutación económica.
+- Audit/outbox/history: acceso auditado; reconcile agrega evidencia append-only, nunca reescribe intents.
+
+### Migration, backfill and rollout
+
+- Migration posture: `additive` sólo si Globe necesita índices/estado/receipts o Greenhouse una proyección; se
+  decide en Plan Mode con backfill explícito y sin reescribir historia.
+- Default state: gate por entitlement de operador en la ruta (mismo patrón que
+  `credit-funding/*`); sin flag nuevo salvo que el Plan Mode encuentre razón.
+- Backfill plan: `n/a`.
+- Rollback path: retirar adapters/readers nuevos y redeploy; preservar propuestas, intents y receipts append-only.
+- External coordination: cambios coordinados Greenhouse + Globe; contrato primero, consumer después.
+
+### Security and access
+
+- Auth/access gate: sesión de Greenhouse + entitlement de administración de crédito (el mismo
+  plano que confirma fondeos); NUNCA expuesto a `client_*`.
+- Sensitive data posture: agregados de presupuesto visibles SOLO al operador interno; respuesta
+  curada, campos permitidos listados explícitamente.
+- Error contract: `canonicalErrorResponse` en las rutas de Greenhouse; mapping del broker ya
+  existente (4xx real ≠ `globe_unavailable`).
+- Abuse/rate-limit posture: readers de bajo costo tras auth de operador; sin límite adicional
+  (razón: superficie interna, volumen humano).
+
+### Runtime evidence
+
+- Local checks: `pnpm local:check` + tests focales de las rutas (mock del broker).
+- DB/runtime checks: migración/índices si aplican, sweeper, transiciones concurrentes y readback cross-runtime.
+- Integration checks: smoke staging de status + preview + operations + reconcile; decisión comparada contra reserve.
+- Reliability signals/logs: `credit_decision_enforcement_drift`, `credit_operation_stale`,
+  `credit_operation_outcome_unknown`, `credit_period_uncovered`.
+- Production verification sequence: ver Rollout Plan.
+
+### Acceptance criteria additions
+
+- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
+- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
+- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 2 — PLAN MODE (no llenar al crear la task)
+     ═══════════════════════════════════════════════════════════ -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 3 — EXECUTION SPEC
+     ═══════════════════════════════════════════════════════════ -->
+
+## Scope
+
+### Slice 1 — Capacity status y preview puro
+
+- Publicar `CreditCapacityStatusV1` y `CreditCapacitySelfStatusV1` desde el snapshot de TASK-1482.
+- Exponer status y preview a sesión humana/agente con entitlement, coverage/freshness y reasons tipados.
+- Probar redacción por audiencia y cero math cliente.
+
+### Slice 2 — Lifecycle y recovery autoritativos
+
+- Publicar en Globe list/get por cursor, expiry/sweeper y reconcile idempotente; sólo Globe terminaliza el efecto
+  económico y emite el receipt.
+- Unir en Greenhouse la propuesta/receipt autoritativos con su intent, operation key, fingerprint y correlación;
+  `expired|confirm_failed|outcome_unknown|reconciled` nunca se infieren sólo por edad o timeout local.
+
+### Slice 3 — Evidencia y cierre de ISSUE-124
+
+- Smoke staging contra negaciones reales conocidas y conformance snapshot↔reserve.
+- Manual de status/diagnóstico/recovery con tabla reason→acción y prohibición de retry ciego.
+- Delta final en ISSUE-124 sólo si las razones observadas corresponden al enforcement real.
+
+## Out of Scope
+
+- Flip de coverage `ui`/`mcp` de los readers en Globe y ampliación del grant OAuth humano (sólo si
+  el Plan Mode lo justifica; la vía broker es la recomendada y no lo necesita).
+- La superficie ui-ux del portal (`TASK-1483`) y el widget Producer (`TASK-1628`).
+- Crear/arreglar la semántica económica de los readers; pertenece a TASK-1482/TASK-1468/TASK-1579.
+- Confirmar o fondear desde MCP; esta task publica contrato/read/recovery, no amplía autoridad.
+- Cualquier relajación del colapso del 409 hacia el caller de gasto.
+- El guard «un solo grant activo» que ISSUE-124 descarta explícitamente.
+
+## Detailed Spec
+
+Vía recomendada: **broker lane** para Greenhouse y self-status separado para Producer. El contrato administrativo
+no se abre al browser de Globe. Si el self-status requiere coverage `ui`, se publica una capability/reader
+redactados independientes; nunca se flipea el const compartido que también cubre writes de administración.
+
+## Rollout Plan & Risk Matrix
+
+### Slice ordering hard rule
+
+- TASK-1482 → TASK-1468+1579 → Slice 1 → Slice 2 → Slice 3. ISSUE-124 exige smoke real, no sólo routes.
+
+### Risk matrix
+
+| Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
+|---|---|---|---|---|
+| Filtrar agregados de presupuesto a un plano no autorizado | credit admin | low | respuesta curada con lista explícita de campos + gate de entitlement + nunca `client_*` | review + test de shape |
+| Divergencia entre status y reserve | credit admin | high | snapshot/evaluator compartido + conformance | `credit_decision_enforcement_drift` |
+| Retry duplica fondeo | finance | medium | outcome unknown → status/reconcile | `credit_funding_duplicate_delta` |
+
+### Feature flags / cutover
+
+- Sin flag — rutas admin aditivas gateadas por entitlement; revert = revert PR (<10 min).
+
+### Rollback plan per slice
+
+| Slice | Rollback | Tiempo | Reversible? |
+|---|---|---|---|
+| Slice 1 | revert PR + redeploy | <10 min | sí |
+| Slice 2 | retirar rutas/worker nuevos y redeploy; preservar proposals/intents/receipts | <30 min | sí |
+
+### Production verification sequence
+
+1. Staging: sesión humana y agente autorizados leen status/preview; partial/stale no aparece como cero.
+2. Staging: negaciones por funding, monthly cap y project cap corresponden con reserve.
+3. Staging: operación completada y outcome ambiguo convergen por list/get/reconcile sin segunda mutación.
+4. Producción: repetir reads/recovery tras release gobernado, sin ejecutar fondeo real no autorizado.
+
+### Out-of-band coordination required
+
+- Coordinación Greenhouse + Globe obligatoria: contract/lifecycle de Globe antes de adapters Greenhouse. No exige
+  IAM nuevo salvo que Plan Mode pruebe lo contrario; cualquier cambio de coverage/scopes sigue ADR-010.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 4 — VERIFICATION & CLOSING
+     ═══════════════════════════════════════════════════════════ -->
+
+## Acceptance Criteria
+
+- [x] Con sesión humana o agente autorizada, sin impersonación/break-glass, se lee status y razón vigente.
+- [x] La respuesta es curada: lista explícita de campos, cero prosa cruda de Globe, cero campos no
+  autorizados; nunca alcanzable por roles `client_*`.
+- [x] Los valores calzan con el snapshot de TASK-1482 y con reserve en conformance; los DTOs legacy incorrectos no
+  son source of truth.
+- [x] `periodKey`, timezone, `[start,end)`, cap/spent/held/remaining, funding eligible, ledger histórico,
+  effective available, blockers, coverage y freshness tienen semántica explícita.
+- [x] Operations list/get/reconcile permite atribuir y recuperar cada propuesta stale/ambigua sin retry ciego.
+- [x] Producer self-status está redactado y no expone authority/admin internals.
+- [x] El grant OAuth humano de Globe NO cambió (o, si cambió, fue con el rollout de 3 pasos de
+  ADR-010 con login verificado entre pasos).
+- [x] `ISSUE-124` movida a resolved con su delta de cierre y verificación.
+- [x] Manual del carril con la sección de diagnóstico (tabla razón→acción).
+
+## Verification
+
+- `pnpm local:check`
+- `pnpm test` (focales de las rutas nuevas)
+- Smoke staging por el puente real (sesión de operador)
+- `pnpm ops:lint --changed` al cierre
+
+## Closing Protocol
+
+- [x] `Lifecycle` del markdown quedó sincronizado con el estado real
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress` o `complete`)
+- [x] `docs/tasks/README.md` quedó sincronizado con el cierre
+- [x] `Handoff.md` quedó actualizado con rollout, evidencia y deuda explícita
+- [x] `changelog.md` quedó actualizado con el comportamiento operativo
+- [x] se ejecutó chequeo de impacto cruzado sobre las tasks afectadas
+- [x] `ISSUE-124` cerrada (delta + move + README de issues)
+
+## Follow-ups
+
+- `TASK-1483` implementa la superficie Greenhouse; `TASK-1628` implementa el self-view Producer.
+- Exponer los mismos readers a Nexa (contrato ya gobernado; consumer adicional cuando el dominio
+  Globe entre al scope de Nexa).
+
+## Delta 2026-08-01 — re-scope por TASK-1630
+
+La auditoría invalidó la premisa de “sólo exponer dos readers”: ambos divergen del enforcement real. Esta task es
+ahora el read/recovery plane Greenhouse y queda bloqueada por el snapshot/evaluator de TASK-1482. También publica
+la proyección self-status que consume TASK-1628, sin abrir los DTOs administrativos al Producer.
+
+## Checkpoint histórico de inicio 2026-08-01 — supersedido
+
+- El bloqueo de implementación local quedó resuelto sin falsear las tasks predecesoras como completas:
+  `CreditDecisionSnapshotV2`, la policy `studio-credits-settlement-v1` y expiry reconciliada ya están
+  code-complete y verificadas en Globe `develop` (`8e2c0cb`, `9acfa58`, `1009e41`).
+- TASK-1482/1468/1579 permanecen `in-progress` porque faltan aplicar migraciones, desplegar, activar flags y
+  verificar runtime. Esos pendientes bloquean el rollout de TASK-1586, no el desarrollo local de contratos,
+  readers y recovery.
+- Preflight autorizado para checkout compartido `develop` y subagentes; no usar worktrees. Globe conserva
+  `main` como rama predeterminada y de release.
+
+## Checkpoint histórico de implementación local 2026-08-01 — supersedido
+
+- Globe ya publica `CreditCapacityStatusV1` y `CreditCapacitySelfStatusV1` desde el mismo evaluator/facts que
+  `reserveCredits`. El estado administrativo separa ledger histórico de capacidad efectiva; cuando la política
+  no está disponible, los montos de decisión se omiten y el estado es `unknown`, nunca cero inventado.
+- El lifecycle de fondeo usa `proposalId` como `operationId`; ofrece list/get con cursor opaco tenant-bound,
+  expiración bounded con `FOR UPDATE SKIP LOCKED` y receipts append-only. Reconcile es readback-first: nunca
+  reejecuta grant, ledger o policy; evidencia parcial termina `outcome_unknown` y exige recuperación manual.
+- La migración aditiva Globe es `0045_credit_funding_operation_recovery.sql`. El worker ejecuta expiración de
+  propuestas antes de evaluar holds de reservations, bajo el flag de expiry existente; no se creó otro ledger,
+  otra máquina de estados ni otro flag.
+- El SDK tipado ya cubre capacity admin/self y funding operation get/list/reconcile. Greenhouse ya tiene adapters
+  allowlist, entitlements internos y rutas status, preview, operations list/get/reconcile con sesión, binding OAuth
+  exacto e idempotency obligatoria para reconcile. La migración Greenhouse
+  `20260801130000000_task-1586-globe-credit-recovery-entitlements.sql` registra read/reconcile en el catálogo DB.
+- Evidencia local hasta este checkpoint: contracts Globe 44/44, domain 406/406, database 139/139, SDK 18/18,
+  studio-web 286/286; Greenhouse adapters/status 9/9, migration marker gate y typecheck verdes. El gate completo Globe continúa registrado
+  en el checkpoint de commit.
+- Estado honesto: `code complete, rollout pendiente`. No se aplicaron 0043/0044/0045, no hubo deploy, push,
+  release, fondeo ni smoke live. Producer self-status continúa `policy-blocked` hasta TASK-1628.
+
+## Delta final dominante 2026-08-01 — operación live
+
+- Globe opera en `main`; Greenhouse en `develop`. Migraciones `0043`–`0045`, readers, status, preview,
+  operations list/get/reconcile, receipts y self-status están desplegados y probados contra el workspace
+  `greenhouse-org:efeonce`. ISSUE-124 está `resolved`.
+- La operación de fondeo `23db5b0e-89dd-4661-9b8d-c12f9be4ad7a` terminó `completed`: capacidad efectiva
+  `0 → 800`, grant 800, cap 1500 y pool `internal-month:2026-08`. Workbench Greenhouse, CLI OAuth PKCE y
+  Producer leyeron los mismos 800 créditos y cero blockers.
+- El worker de expiry quedó activo con scheduler minutely, claim bounded, lease/fencing, resumen estructurado y
+  métrica de antigüedad. El canary `globe-producer-worker-fmspk` reclamó dos holds vencidos:
+  `claimed=2`, `reconciliationRequested=2`, `deferred=2`, `failed=0`.
+- El fallo inicial era least-privilege incompleto: faltaban únicamente `SELECT` e `INSERT` sobre
+  `globe.governed_run_control_commands`. El workflow `30717172080` aplicó y leyó de vuelta el contrato exacto;
+  no se concedieron roles amplios ni membresía de owner.
+- Los dos casos históricos son runs `submission_unknown` sin `providerOperationId` y con resultado de envío
+  desconocido. Permanecen diferidos y observables bajo TASK-1630; no se expiraron ni liberaron a la fuerza.
+  Esto es recuperación fail-closed, no un fallo del carril live nuevo.
+- El corte final usa Globe `main@e369ef8`, código worker/grants `d3fe90e`, deploy `30717266572` y digest
+  `sha256:d8295862dc12c14427e90e0bb413577802916c37ca6bf32c202680492ca7bae9`. El scheduler `lmb2r` repitió
+  `claimed=2`, `reconciliationRequested=2`, `deferred=2`, `failed=0` sobre ese digest; OpenTofu terminó
+  `No changes`, exit 0.

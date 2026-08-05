@@ -1,5 +1,12 @@
 # TASK-713 — Period Closing Workflow: snapshots inmutables y restatement controlado
 
+## Delta 2026-08-02 — Un período compartido, no otro calendario MLCM
+
+La migración propuesta `accounting_periods(year, month)` no puede crear una segunda verdad frente a
+`greenhouse_cost_intelligence.period_closures` y la foundation de ADR-021. Discovery debe resolver un contrato
+compartido `legal_entity + ledger + period`, con compatibilidad hacia el cierre operativo existente. Esta task es
+owner del close y snapshots del Cost Subledger; `TASK-393` extiende después reopen/restatement/reclassification.
+
 ## Status
 
 | Campo | Valor |

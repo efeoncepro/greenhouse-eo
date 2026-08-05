@@ -155,6 +155,9 @@ Compose with specialized skills after deciding the architectural shape. In parti
 
 - hand Astro/static-site implementation to `astro` after boundaries and contracts are decided;
 - hand Efeonce Globe implementation to `greenhouse-globe` while preserving the sister-platform boundary;
+- hand federated Efeonce MCP architecture to `efeonce-mcp-platform` plus the provider owner. Read the MCP
+  gateway decision/router/runbook and active tasks before proposing a new tool, resource, OAuth surface or
+  provider binding; the gateway remains a neutral adapter over canonical readers/commands;
 - hand UI, finance, payroll, legal, identity, cloud, data, growth, or release details to the routed specialist.
 
 ### AXIS shared UI platform

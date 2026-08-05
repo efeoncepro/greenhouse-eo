@@ -105,10 +105,12 @@ export type GutenbergBlockPatternCatalogEntry = {
   role:
     | 'structure'
     | 'body'
+    | 'disclosure'
     | 'navigation'
     | 'media'
     | 'conversion'
     | 'layout'
+    | 'structured_data'
     | 'legacy'
     | 'third_party'
   generationPolicy: 'allowed' | 'recommended' | 'requires_source_asset' | 'inspect_only'
@@ -135,6 +137,7 @@ export type GutenbergBlockSemanticKind =
   | 'editorial_body'
   | 'editorial_heading'
   | 'editorial_list'
+  | 'editorial_disclosure'
   | 'editorial_quote'
   | 'editorial_pullquote'
   | 'navigation_toc'
@@ -143,6 +146,7 @@ export type GutenbergBlockSemanticKind =
   | 'layout_group'
   | 'layout_columns'
   | 'conversion_cta'
+  | 'structured_data'
   | 'section_break'
   | 'legacy_html'
   | 'third_party_module'
@@ -152,6 +156,7 @@ export type GutenbergBlockSemanticOperation =
   | 'rewrite_heading'
   | 'adjust_heading_level'
   | 'refresh_list_items'
+  | 'refresh_disclosure'
   | 'refresh_editorial_quote'
   | 'refresh_editorial_pullquote'
   | 'preserve_or_regenerate_toc'
@@ -159,6 +164,7 @@ export type GutenbergBlockSemanticOperation =
   | 'review_embed_source'
   | 'adjust_layout_settings'
   | 'refresh_cta'
+  | 'preserve_or_regenerate_schema'
   | 'preserve_legacy_html'
   | 'preserve_third_party_module'
 
@@ -178,6 +184,7 @@ export type GutenbergBlockCapabilityEntry = {
     | 'media_reconciliation'
     | 'link_destination_review'
     | 'cta_target'
+    | 'structured_data_validation'
     | 'plugin_serialization_policy'
   >
   applyPolicy: {

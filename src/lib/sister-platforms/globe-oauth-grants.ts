@@ -36,6 +36,7 @@ export const GLOBE_PRODUCER_CAPABILITY_SCOPES = [
   'globe.lab.recipe.author',
   'globe.credits.read',
   'globe.credits.estimate',
+  'globe.credits.capacity.self.read',
   // Internal creative operators may review evidence and propose an exact model
   // version. Promotion remains outside the Producer grant and is completed by
   // Globe's independent control-plane checker.

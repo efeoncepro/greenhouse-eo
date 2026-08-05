@@ -1,9 +1,9 @@
 # Operar la flota de modelos del Producer
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-07-25 por Claude (TASK-1554)
-> **Ultima actualizacion:** 2026-07-25 por Claude
+> **Ultima actualizacion:** 2026-08-04 por Claude (TASK-1641)
 > **Documentacion funcional:** [Flota de modelos del Producer](../../documentation/creative-studio/efeonce-globe-producer-flota-modelos.md)
 
 ## Para qué sirve
@@ -61,11 +61,86 @@ La distinción no es cosmética: un modelo ofrecido como ejecutable donde no pue
 
 1. Declarar la ruta en el catálogo del Producer (`PRODUCER_ROUTE_CATALOG`), **contra lo que el
    adapter realmente transporta**, no contra lo que uno supone que soporta.
-2. Promoverlo para el workspace (ADR-009).
-3. Verificar que aparece.
+2. Registrar una versión de rate vigente y el binding exacto de provider/modelo/endpoint.
+3. Ejecutar la evaluación exacta y cerrar los criterios humanos; publicar la evidencia de derechos
+   comerciales aplicable a la ruta.
+4. Promover readiness y binding mediante las identidades separadas de ADR-009/010; cerrar el circuito
+   sólo después de verificar el endpoint.
+5. Verificar el reader `globe.producer.fleet.list`.
+6. Ejecutar una generación real desde Producer y comprobar estado terminal, gasto, MIME, retención,
+   vista previa y descarga.
+7. Adjuntar el receipt transversal de TASK-1578, incluida la rate version vigente cuyo dueño es
+   TASK-1468. Sin ese receipt, la ruta puede estar operativa, pero la task de onboarding no es cerrable.
 
-No hay paso 4. **No se edita ninguna pantalla.** Si alguien te pide "cablear el modelo en la UI",
-algo se desvió del diseño.
+No se edita ninguna pantalla. Si alguien pide "cablear el modelo en la UI", algo se desvió del
+diseño. El procedimiento transversal completo y sus receipts pertenecen a `TASK-1578`; este manual
+no crea un segundo ledger ni una segunda promoción.
+
+> ⚠️ **El paso 6 no es una verificación opcional: es el sello de la promoción, y tiene ventana.** La
+> generación real de la ruta exacta (*canary*) es lo que cierra la saga de ADR-009. Mientras no exista,
+> la promoción está **activada pero no sellada** y **se revierte sola al vencer la ventana** — el modelo
+> vuelve a "Próximamente" sin ningún error visible. Nadie puede declarar que el canary pasó: el servidor
+> resuelve la evidencia (corrida, intento, output retenido y decisión de governance) por su cuenta.
+> Medido el 2026-08-04: **10 de 12 promociones históricas terminaron revertidas**, varias segundos
+> después de su vencimiento, porque el sello fallaba con un error genérico aun con la evidencia
+> correcta. Ya está corregido (ver el Delta 2026-08-04 del
+> [ADR-009](../../architecture/creative-studio/EFEONCE_GLOBE_ROUTE_PROMOTION_OPERATION_DECISION_V1.md)),
+> pero la regla operativa queda: **planifica el canary dentro de la ventana, no “para después”**. Si la
+> ruta exige referencias de imagen, verifica **antes** que puedes aportarlas desde el Producer: hoy los
+> dos caminos para aportarlas están rotos, así que el canary de `ref/video/frames-v1` (Veo 3.1) —sellado
+> el 2026-08-04— tuvo que producirse por el **carril gobernado**, no desde el Producer. La promoción quedó
+> sellada y la ruta habilitada, pero generar desde el Producer un modelo que exige referencias todavía no
+> funciona.
+>
+> ✅ **Y el canary ya no se escribe a mano** (2026-08-05): `pnpm producer:canary --route=<routeId>` ejecuta la
+> secuencia completa por los commands canónicos, deriva la forma de salida desde el catálogo y resuelve las
+> referencias desde el feed retenido. **Sin `--execute` no gasta un crédito**, así que es el primer diagnóstico
+> —no el último recurso— y conviene correrlo **antes de pedir autorización de gasto**. Con `--execute` exige
+> `--route-prompt`: el instrumento no inventa dirección creativa para un gasto real. Procedimiento completo:
+> [`GLOBE_ROUTE_PROMOTION_RUNBOOK_V1.md`](../../operations/creative-studio/GLOBE_ROUTE_PROMOTION_RUNBOOK_V1.md).
+>
+> 🔔 **Y ahora avisa antes de perder la ventana:** `globe_promotion_window_closing` (WARNING) se dispara a
+> **30 minutos** del vencimiento de cada promoción `activated`. No lo confundas con `stalled`, que mide
+> operaciones **ya vencidas** — son los dos lados del mismo instante.
+
+### Canary Recraft v4.1 de referencia
+
+- Ruta: `ref/still/vector-v1`.
+- Resultado esperado: `image/svg+xml`, 4 créditos, `completed/retained`.
+- Evidencia UI: modelo Recraft v4.1, capacidad `Imagen · vectorizar`, estado `Guardada`, vista previa
+  SVG y descarga habilitada.
+- Gotcha verificado: Fal declara el archivo como SVG, pero su CDN puede transportarlo como
+  `application/octet-stream`. No relajes MIME globalmente; la ruta admite ese transporte sólo tras
+  verificar que los bytes realmente forman un SVG.
+
+### Canary Nano Banana 2 de referencia
+
+- Ruta: `ref/still/nanobanana-2-v1`.
+- Resultado esperado: `image/png`, 10 créditos, `completed/retained`.
+- Evidencia UI: run `ce06f8b4-ebe9-43b6-9d47-8e4cc901f49a`, modelo Nano Banana 2 y estado `Listo`.
+- Gotcha verificado: el prefijo durable `vertex-output:` tiene 14 caracteres. Globe `1fb5728`
+  deriva el corte desde la longitud del prefijo y recuperó el mismo run idempotentemente. No
+  reejecutes un run pagado para corregir su finalización.
+
+### Canaries OpenAI de referencia
+
+- GPT Image 2: `ref/still/openai-v2`, run
+  `a81c8049-7772-4933-82f2-1e2e59e5121c`, 14 créditos.
+- GPT Image 1.5: `ref/still/openai-v1-5`, run
+  `bf8cd62b-e2d7-4e83-981a-7631a14a5d3a`, 10 créditos.
+- Ambos usan el driver gobernado oficial de OpenAI Images. Verifica que el asset herede la versión
+  efectiva de derechos fijada antes del gasto; no uses una policy expirada ni una lookup posterior
+  no anclada al snapshot del run.
+
+### Promoción Nano Banana Pro de referencia
+
+- Ruta: `ref/still/nanobanana-pro-v1`; modelo `gemini-3-pro-image`; región `global`.
+- Canary base: experimento `a258dda8-ea6e-4a34-94f0-4cd9ca301d17`, 10 créditos,
+  `image/png`, SHA-256
+  `9e9edaf59cb927610d043e3af3cac9b90c321ed48e55eb34ec0300c72dc429cf`.
+- El 2026-07-30 la revisión humana, readiness y binding quedaron promovidos y el selector live pasó
+  a `Disponible`. No vuelvas a seguir el baseline histórico que lo describe como
+  `gated/not_promoted`.
 
 ## Verificar
 
@@ -92,7 +167,7 @@ por workspace, recomendado honesto, y que **el identificador del proveedor nunca
   del modelo sí va.
 - **NUNCA** preseleccionar un modelo recomendado que no esté disponible. Una recomendación que no se
   puede ejecutar es peor que ninguna.
-- **NUNCA** ocultar un modelo no disponible. Mostralo con su estado: invisible y bloqueado se sienten
+- **NUNCA** ocultar un modelo no disponible. Muéstralo con su estado: invisible y bloqueado se sienten
   igual de mal, pero invisible además impide preguntar.
 
 ## Problemas comunes
@@ -102,8 +177,20 @@ por workspace, recomendado honesto, y que **el identificador del proveedor nunca
 | El modelo no aparece en ninguna modalidad | No tiene ruta en el catálogo | Declarar la ruta (paso 1 de "Agregar") |
 | Aparece en un workspace y no en otro | Comportamiento correcto: promoción por workspace | Promover donde haga falta |
 | Dice "Próximamente" y sabes que funciona | Verificado en el Model Lab, **no promovido** a producción | Revisar el ledger; promover si corresponde |
+| **Estaba disponible y dejó de estarlo**, sin error ni cambio de modelo | La promoción venció **sin su canary** y se revirtió sola (binding deshabilitado, circuito abierto) | Volver a promover y **sellar el canary dentro de la ventana**; si el sello falla con un error genérico, es defecto de plataforma, no falta de evidencia. Desde el 2026-08-05 `globe_promotion_window_closing` avisa **30 min antes** de que la ventana venza |
 | Nexa y la pantalla muestran distinto | **Un consumer se armó su propia lista** | Bug: buscar el cálculo paralelo y borrarlo |
 | Falla después de reservar crédito | Se ofreció ejecutable donde no puede correr | Bug: reportar con la ruta y el modo |
+| Un run pagado queda sin finalizar tras un fix | El proveedor terminó, pero falló la reconciliación local | Leer el run/attempt y recuperar idempotentemente; no generar otra vez |
+| SVG llega como `application/octet-stream` | Transporte genérico del CDN de Fal | Aceptar sólo si la ruta espera SVG y los bytes verifican como SVG; nunca relajar MIME globalmente |
+
+## Estado operativo de la flota de imagen
+
+Al 2026-07-30 están disponibles y ejercitadas desde la UI las siete rutas de imagen: Seedream 5 Pro,
+Nano Banana Pro, Nano Banana 2, GPT Image 2, GPT Image 1.5 y Recraft v4.1. El selector vigente es un
+desplegable compacto; la antigua dirección de galería no se usa.
+
+El único pendiente de TASK-1553 es documental/gobernante: receipts de rate-version TASK-1468 y
+onboarding TASK-1578. No uses ese pendiente para diagnosticar estas rutas como no promovidas.
 
 ## Referencias técnicas
 

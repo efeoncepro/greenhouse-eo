@@ -1,10 +1,16 @@
 # Measurement Dashboard (contenido → pipeline)
 
-> Artefacto de `06`. Leading + lagging; decide con lagging. Mide por TEMA (linaje de átomos).
+> Artefacto de `06`. Leading + lagging; decide con lagging. Mide por TERRITORIO usando registry y linaje.
 
 ## Por pieza / tema
 | Pieza/Tema | Objetivo | Métrica primaria | Leading | Lagging (influenced pipeline) | Aprendizaje / acción |
 |---|---|---|---|---|---|
+
+## Descubrimiento y progreso federado
+| Nodo | Surface / platform | External search | Platform search / recommendation | Downstream progress | Fuente / ventana / definición |
+|---|---|---|---|---|---|
+
+> No calcular una impresión total sumando buscadores, feeds, búsquedas internas, alcance y views.
 
 ## Leading (señales)
 - Tráfico / usuarios nuevos: _ | Engagement (tiempo, scroll, shares): _ | Suscriptores / opens newsletter: _

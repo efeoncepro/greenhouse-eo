@@ -1,5 +1,12 @@
 # TASK-1336 — Growth Forms Tokenized Report Success Contract
 
+## Delta 2026-08-05
+
+- `TASK-1327` cerrada `complete`: la landing `think.efeoncepro.com/brand-visibility` está **live y verificada en
+  runtime** (HTTP 200 + `<greenhouse-form>` gobernado embebido + definición del form 200 en producción con
+  Turnstile `required`). Esta task **ya no bloquea una landing pendiente** — el consumer existe y sirve tráfico.
+  Lo que queda acá es su propio endurecimiento y su smoke, no habilitar la superficie.
+
 ## Delta 2026-07-27 — handoff observado en la superficie live
 
 El contrato `tokenized_report` ya está integrado en Think: la landing productiva escucha

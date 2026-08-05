@@ -7,7 +7,7 @@
  * con la pantalla de consentimiento que bloquea el OAuth client compartido de gcloud.
  *
  * Si la API responde 403 / lista 0 cuentas: el SA no está agregado como usuario DENTRO
- * de GTM (Admin → User Management). Recordá: GTM ≠ IAM de GCP.
+ * de GTM (Admin → User Management). Recuerda: GTM ≠ IAM de GCP.
  *
  * Uso:
  *   gcloud auth application-default login    # ADC con scopes por defecto (cloud-platform)
@@ -51,7 +51,7 @@ const main = async () => {
 
   if (accounts.length === 0) {
     console.log('⚠️  Impersonación OK (token minteado), pero el SA NO ve ninguna cuenta GTM.')
-    console.log(`    → Agregá ${TARGET_SERVICE_ACCOUNT} como usuario dentro de GTM (Admin → User Management, permiso Publish).`)
+    console.log(`    → Agrega ${TARGET_SERVICE_ACCOUNT} como usuario dentro de GTM (Admin → User Management, permiso Publish).`)
 
     return
   }
@@ -74,13 +74,13 @@ const main = async () => {
     }
   }
 
-  console.log('\n👉 Copiá el accountId + containerId del contenedor de Efeonce para operar write+publish.')
+  console.log('\n👉 Copia el accountId + containerId del contenedor de Efeonce para operar write+publish.')
 }
 
 main().catch((err: unknown) => {
   if (err instanceof GtmApiError && err.status === 403) {
     console.error('❌ 403 PERMISSION_DENIED — el SA no tiene acceso al contenedor DENTRO de GTM.')
-    console.error(`   → Agregá ${TARGET_SERVICE_ACCOUNT} en GTM (Admin → User Management) con permiso Publish.`)
+    console.error(`   → Agrega ${TARGET_SERVICE_ACCOUNT} en GTM (Admin → User Management) con permiso Publish.`)
     process.exit(1)
   }
 

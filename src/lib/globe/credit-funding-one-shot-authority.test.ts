@@ -1,0 +1,574 @@
+import { describe, expect, it } from 'vitest'
+
+import type { GlobeCreditFundingAuthorityError } from './credit-funding-one-shot-authority'
+import { GlobeCreditFundingOneShotAuthorityStore } from './credit-funding-one-shot-authority'
+
+const NOW = new Date('2026-08-01T12:00:00.000Z')
+
+function harness() {
+  let clock = NOW
+  let authority: Record<string, unknown> | undefined
+  let execution: Record<string, unknown> | undefined
+  let oauthClientChecks = 0
+
+  const query = async (sql: string, params: unknown[] = []) => {
+    if (sql.includes('FROM greenhouse_core.globe_credit_funding_authority_issuers')) {
+      return {
+        rows: [
+          {
+            active: true,
+            max_target_available_credits: 2000,
+            max_grant_credits: 1000,
+            max_resulting_cap_credits: 4000,
+            max_ttl_seconds: 900
+          }
+        ]
+      }
+    }
+
+    if (sql.includes('FROM greenhouse_core.sister_platform_oauth_clients')) {
+      oauthClientChecks += 1
+
+      return { rows: [{ allowed: true }] }
+    }
+
+    if (sql.includes('INSERT INTO greenhouse_core.globe_credit_funding_authority_auth_attestations')) {
+      return { rows: [] }
+    }
+
+    if (sql.includes('INSERT INTO greenhouse_core.globe_credit_funding_one_shot_authorities')) {
+      if (authority) return { rows: [] }
+      authority = {
+        authority_id: params[0],
+        schema_version: '1',
+        globe_workspace_id: params[1],
+        operation_kind: 'ensure_funded',
+        period_key: params[2],
+        period_start: params[3],
+        period_end: params[4],
+        target_available_credits: params[5],
+        max_grant_credits: params[6],
+        max_resulting_cap_credits: params[7],
+        issuer_user_id: params[8],
+        issuer_auth_evidence_ref: params[11],
+        executor_user_id: params[12],
+        executor_channel: params[13],
+        executor_client_id: params[14],
+        executor_auth_mode: params[15],
+        not_before: params[16],
+        expires_at: params[17],
+        max_executions: 1,
+        operation_key: params[18],
+        instruction_fingerprint: params[19],
+        evidence_ref: params[20],
+        issued_at: params[21]
+      }
+
+      return { rows: [authority] }
+    }
+
+    if (sql.includes('SELECT * FROM greenhouse_core.globe_credit_funding_one_shot_authorities')) {
+      return { rows: authority ? [authority] : [] }
+    }
+
+    if (sql.includes('AS revoked')) return { rows: authority ? [{ ...authority, revoked: false }] : [] }
+
+    if (sql.includes('SELECT * FROM greenhouse_core.globe_credit_funding_authority_executions')) {
+      return { rows: execution ? [execution] : [] }
+    }
+
+    if (sql.includes('INSERT INTO greenhouse_core.globe_credit_funding_authority_executions')) {
+      execution = {
+        execution_id: params[0],
+        authority_id: params[1],
+        executor_user_id: params[2],
+        executor_channel: params[3],
+        executor_client_id: params[4],
+        actor_auth_mode: params[6],
+        execution_fingerprint: params[7],
+        operation_key: params[8],
+        state: 'claimed',
+        propose_idempotency_key: params[10],
+        confirm_idempotency_key: params[11],
+        reconcile_idempotency_key: params[12],
+        proposal_id: null,
+        plan_fingerprint: null,
+        globe_operation_id: null,
+        outcome: null,
+        claimed_at: params[13],
+        updated_at: params[13],
+        completed_at: null,
+        dispatch_lease_owner: null,
+        dispatch_lease_expires_at: null,
+        dispatch_lease_generation: 0
+      }
+
+      return { rows: [execution] }
+    }
+
+    if (sql.includes('INSERT INTO greenhouse_core.globe_credit_funding_authority_execution_events')) {
+      return { rows: [] }
+    }
+
+    if (sql.includes('dispatch_lease_generation=dispatch_lease_generation+1')) {
+      const activeOtherLease =
+        execution?.dispatch_lease_owner &&
+        execution.dispatch_lease_owner !== params[1] &&
+        Date.parse(String(execution.dispatch_lease_expires_at)) > Date.parse(String(params[3]))
+
+      if (!execution || activeOtherLease) {
+        return { rows: [] }
+      }
+
+      execution = {
+        ...execution,
+        dispatch_lease_owner: params[1],
+        dispatch_lease_expires_at: params[2],
+        dispatch_lease_generation: Number(execution.dispatch_lease_generation) + 1,
+        updated_at: params[3]
+      }
+
+      return { rows: [execution] }
+    }
+
+    if (sql.includes('UPDATE greenhouse_core.globe_credit_funding_authority_executions')) {
+      if (!execution || execution.state !== params[1]) return { rows: [] }
+      if (params[9] && execution.dispatch_lease_owner !== params[9]) return { rows: [] }
+      if (params[10] && execution.dispatch_lease_generation !== params[10]) return { rows: [] }
+
+      if (params[9] && Date.parse(String(execution.dispatch_lease_expires_at)) <= Date.parse(String(params[8]))) {
+        return { rows: [] }
+      }
+
+      execution = {
+        ...execution,
+        state: params[2],
+        proposal_id: params[3] ?? execution.proposal_id,
+        plan_fingerprint: params[4] ?? execution.plan_fingerprint,
+        globe_operation_id: params[5] ?? execution.globe_operation_id,
+        outcome: params[6] ?? execution.outcome,
+        updated_at: params[8],
+        completed_at: ['completed', 'failed_definitive', 'reconciled'].includes(String(params[2])) ? params[8] : null
+      }
+
+      return { rows: [execution] }
+    }
+
+    throw new Error(`unexpected_sql:${sql}`)
+  }
+
+  let id = 0
+
+  const store = new GlobeCreditFundingOneShotAuthorityStore({
+    now: () => clock,
+    newId: () => `00000000-0000-4000-8000-00000000000${++id}`,
+    transaction: async callback => callback({ query } as never)
+  })
+
+  return {
+    store,
+    setNow: (value: Date) => {
+      clock = value
+    },
+    getOauthClientChecks: () => oauthClientChecks
+  }
+}
+
+const issueInput = {
+  globeWorkspaceId: 'greenhouse-org:efeonce',
+  periodKey: '2026-08',
+  periodStart: '2026-08-01T00:00:00Z',
+  periodEnd: '2026-09-01T00:00:00Z',
+  targetAvailableCredits: 800,
+  maxGrantCredits: 500,
+  maxResultingCapCredits: 1500,
+  issuerUserId: 'user-efeonce-admin-julio-reyes',
+  issuerEntitlement: 'platform.globe_credit_funding.authority.issue',
+  issuerAuthMode: 'microsoft_sso',
+  issuerAuthProvider: 'microsoft-entra-id',
+  issuerAuthCorrelationId: 'correlation:issuer-1',
+  executorUserId: 'user-agent-e2e-001',
+  executorChannel: 'oauth',
+  executorClientId: 'greenhouse-admin-cli',
+  executorAuthMode: 'agent',
+  operationKey: 'fund-2026-08-evaluation',
+  evidenceRef: 'codex-goal:TASK-1629'
+} as const
+
+const browserIssueInput = {
+  ...issueInput,
+  executorUserId: issueInput.issuerUserId,
+  executorChannel: 'browser',
+  executorClientId: 'greenhouse-portal',
+  executorAuthMode: 'microsoft_sso'
+} as const
+
+const mcpIssueInput = {
+  ...issueInput,
+  executorChannel: 'mcp',
+  executorClientId: 'efeonce-mcp-gateway',
+  executorAuthMode: 'agent'
+} as const
+
+describe('Globe credit funding one-shot authority', () => {
+  it('replays issuance by operation key even when the HTTP retry arrives later', async () => {
+    const { store, setNow } = harness()
+    const first = await store.issue(issueInput)
+
+    setNow(new Date('2026-08-01T12:05:00.000Z'))
+    const replay = await store.issue(issueInput)
+
+    expect(replay.authorityId).toBe(first.authorityId)
+    expect(replay.expiresAt).toBe(first.expiresAt)
+  })
+
+  it('issues, claims once and resumes the same execution with deterministic keys', async () => {
+    const { store } = harness()
+    const authority = await store.issue(issueInput)
+
+    const first = await store.claim({
+      authorityId: authority.authorityId,
+      executorUserId: issueInput.executorUserId,
+      executorChannel: issueInput.executorChannel,
+      executorClientId: issueInput.executorClientId,
+      authEvidenceRef: 'token:first',
+      actorAuthMode: 'agent',
+      correlationId: 'correlation:first',
+      allowedGlobeWorkspaceIds: [issueInput.globeWorkspaceId]
+    })
+
+    const resumed = await store.claim({
+      authorityId: authority.authorityId,
+      executorUserId: issueInput.executorUserId,
+      executorChannel: issueInput.executorChannel,
+      executorClientId: issueInput.executorClientId,
+      authEvidenceRef: 'token:renewed',
+      actorAuthMode: 'agent',
+      correlationId: 'correlation:resume',
+      allowedGlobeWorkspaceIds: [issueInput.globeWorkspaceId]
+    })
+
+    expect(resumed.execution.executionId).toBe(first.execution.executionId)
+    expect(first.execution.proposeIdempotencyKey).not.toBe(first.execution.confirmIdempotencyKey)
+    expect(first.execution.operationKey).toBe(issueInput.operationKey)
+  })
+
+  it('binds a Chrome-authenticated executor without relabeling it as an agent', async () => {
+    const { store, getOauthClientChecks } = harness()
+    const authority = await store.issue(browserIssueInput)
+
+    const claimed = await store.claim({
+      authorityId: authority.authorityId,
+      executorUserId: browserIssueInput.executorUserId,
+      executorChannel: browserIssueInput.executorChannel,
+      executorClientId: browserIssueInput.executorClientId,
+      authEvidenceRef: authority.issuerAuthEvidenceRef,
+      actorAuthMode: 'microsoft_sso',
+      correlationId: 'correlation:human',
+      allowedGlobeWorkspaceIds: [browserIssueInput.globeWorkspaceId]
+    })
+
+    expect(getOauthClientChecks()).toBe(0)
+    expect(claimed.authority.executorChannel).toBe('browser')
+    expect(claimed.authority.executorAuthMode).toBe('microsoft_sso')
+    expect(claimed.execution.actorAuthMode).toBe('microsoft_sso')
+  })
+
+  it('rejects browser delegation to another user and browser agent impersonation', async () => {
+    const { store } = harness()
+
+    await expect(
+      store.issue({ ...browserIssueInput, executorUserId: 'user-other-human' })
+    ).rejects.toMatchObject({ code: 'authority_binding_mismatch' })
+
+    await expect(store.issue({ ...browserIssueInput, executorAuthMode: 'agent' })).rejects.toMatchObject({
+      code: 'authority_binding_mismatch'
+    })
+  })
+
+  it('issues and replays an MCP authority only for the exact gateway client and bound agent actor', async () => {
+    const { store, getOauthClientChecks } = harness()
+    const authority = await store.issue(mcpIssueInput)
+
+    const first = await store.claim({
+      authorityId: authority.authorityId,
+      executorUserId: mcpIssueInput.executorUserId,
+      executorChannel: 'mcp',
+      executorClientId: 'efeonce-mcp-gateway',
+      authEvidenceRef: 'spoauth-token-mcp-1',
+      actorAuthMode: 'agent',
+      correlationId: 'correlation:mcp-1',
+      allowedGlobeWorkspaceIds: [mcpIssueInput.globeWorkspaceId]
+    })
+
+    const replay = await store.claim({
+      authorityId: authority.authorityId,
+      executorUserId: mcpIssueInput.executorUserId,
+      executorChannel: 'mcp',
+      executorClientId: 'efeonce-mcp-gateway',
+      authEvidenceRef: 'spoauth-token-mcp-2',
+      actorAuthMode: 'agent',
+      correlationId: 'correlation:mcp-replay',
+      allowedGlobeWorkspaceIds: [mcpIssueInput.globeWorkspaceId]
+    })
+
+    expect(getOauthClientChecks()).toBe(1)
+    expect(authority.executorChannel).toBe('mcp')
+    expect(replay.execution.executionId).toBe(first.execution.executionId)
+  })
+
+  it('rejects MCP channel aliases, wrong clients, human auth mode and actor A using actor B authority', async () => {
+    const { store } = harness()
+
+    await expect(store.issue({ ...mcpIssueInput, executorClientId: 'greenhouse-admin-cli' })).rejects.toMatchObject({
+      code: 'authority_binding_mismatch'
+    })
+    await expect(store.issue({ ...mcpIssueInput, executorAuthMode: 'microsoft_sso' })).rejects.toMatchObject({
+      code: 'authority_binding_mismatch'
+    })
+
+    const authority = await store.issue(mcpIssueInput)
+
+    await expect(
+      store.claim({
+        authorityId: authority.authorityId,
+        executorUserId: 'actor-a-cannot-use-actor-b-authority',
+        executorChannel: 'mcp',
+        executorClientId: 'efeonce-mcp-gateway',
+        authEvidenceRef: 'spoauth-token-mcp-other',
+        actorAuthMode: 'agent',
+        correlationId: 'correlation:mcp-other',
+        allowedGlobeWorkspaceIds: [mcpIssueInput.globeWorkspaceId]
+      })
+    ).rejects.toMatchObject({ code: 'authority_binding_mismatch' })
+  })
+
+  it('requires the exact issuer attestation when the browser claims the authority', async () => {
+    const { store } = harness()
+    const authority = await store.issue(browserIssueInput)
+
+    await expect(
+      store.claim({
+        authorityId: authority.authorityId,
+        executorUserId: browserIssueInput.executorUserId,
+        executorChannel: browserIssueInput.executorChannel,
+        executorClientId: browserIssueInput.executorClientId,
+        authEvidenceRef: 'gh-credit-auth:wrong-attestation',
+        actorAuthMode: browserIssueInput.executorAuthMode,
+        correlationId: 'correlation:wrong-browser-evidence',
+        allowedGlobeWorkspaceIds: [browserIssueInput.globeWorkspaceId]
+      })
+    ).rejects.toMatchObject({ code: 'authority_binding_mismatch' })
+  })
+
+  it('rejects agent issuance and wrong executor binding', async () => {
+    const { store } = harness()
+
+    await expect(store.issue({ ...issueInput, issuerAuthMode: 'agent' })).rejects.toMatchObject({
+      code: 'issuer_not_allowed'
+    } satisfies Partial<GlobeCreditFundingAuthorityError>)
+    const authority = await store.issue(issueInput)
+
+    await expect(
+      store.claim({
+        authorityId: authority.authorityId,
+        executorUserId: 'another-agent',
+        executorChannel: issueInput.executorChannel,
+        executorClientId: issueInput.executorClientId,
+        authEvidenceRef: 'token:first',
+        actorAuthMode: 'agent',
+        correlationId: 'correlation:first',
+        allowedGlobeWorkspaceIds: [issueInput.globeWorkspaceId]
+      })
+    ).rejects.toMatchObject({ code: 'authority_binding_mismatch' })
+  })
+
+  it('rejects a token that is not bound to the authority workspace', async () => {
+    const { store } = harness()
+    const authority = await store.issue(issueInput)
+
+    await expect(
+      store.claim({
+        authorityId: authority.authorityId,
+        executorUserId: issueInput.executorUserId,
+        executorChannel: issueInput.executorChannel,
+        executorClientId: issueInput.executorClientId,
+        authEvidenceRef: 'token:first',
+        actorAuthMode: 'agent',
+        correlationId: 'correlation:first',
+        allowedGlobeWorkspaceIds: ['globe-workspace:other']
+      })
+    ).rejects.toMatchObject({ code: 'authority_binding_mismatch' })
+  })
+
+  it('resumes a consumed execution after the issuance TTL expires', async () => {
+    const { store, setNow } = harness()
+    const authority = await store.issue(issueInput)
+
+    const claim = {
+      authorityId: authority.authorityId,
+      executorUserId: issueInput.executorUserId,
+      executorChannel: issueInput.executorChannel,
+      executorClientId: issueInput.executorClientId,
+      authEvidenceRef: 'token:first',
+      actorAuthMode: 'agent',
+      correlationId: 'correlation:first',
+      allowedGlobeWorkspaceIds: [issueInput.globeWorkspaceId]
+    } as const
+
+    const first = await store.claim(claim)
+
+    setNow(new Date('2026-08-01T13:00:00.000Z'))
+    const resumed = await store.claim({ ...claim, authEvidenceRef: 'token:renewed' })
+
+    expect(resumed.execution.executionId).toBe(first.execution.executionId)
+  })
+
+  it('allows only one active dispatch lease', async () => {
+    const { store } = harness()
+    const authority = await store.issue(issueInput)
+
+    const { execution } = await store.claim({
+      authorityId: authority.authorityId,
+      executorUserId: issueInput.executorUserId,
+      executorChannel: issueInput.executorChannel,
+      executorClientId: issueInput.executorClientId,
+      authEvidenceRef: 'token:first',
+      actorAuthMode: 'agent',
+      correlationId: 'correlation:first',
+      allowedGlobeWorkspaceIds: [issueInput.globeWorkspaceId]
+    })
+
+    await store.advance({
+      executionId: execution.executionId,
+      expectedState: 'claimed',
+      state: 'proposed',
+      proposalId: 'proposal-1',
+      planFingerprint: 'plan-1',
+      authEvidenceRef: 'token:first',
+      correlationId: 'correlation:proposed'
+    })
+    await store.advance({
+      executionId: execution.executionId,
+      expectedState: 'proposed',
+      state: 'confirming',
+      authEvidenceRef: 'token:first',
+      correlationId: 'correlation:confirming'
+    })
+    await store.acquireDispatchLease({
+      executionId: execution.executionId,
+      leaseOwnerId: 'lease:first',
+      authEvidenceRef: 'token:first',
+      correlationId: 'correlation:lease'
+    })
+
+    await expect(
+      store.acquireDispatchLease({
+        executionId: execution.executionId,
+        leaseOwnerId: 'lease:other',
+        authEvidenceRef: 'token:other',
+        correlationId: 'correlation:other'
+      })
+    ).rejects.toMatchObject({ code: 'execution_busy' })
+  })
+
+  it('fences an expired lease owner after a newer generation is acquired', async () => {
+    const { store, setNow } = harness()
+    const authority = await store.issue(issueInput)
+
+    const claimed = await store.claim({
+      authorityId: authority.authorityId,
+      executorUserId: issueInput.executorUserId,
+      executorChannel: issueInput.executorChannel,
+      executorClientId: issueInput.executorClientId,
+      authEvidenceRef: 'token:first',
+      actorAuthMode: 'agent',
+      correlationId: 'correlation:first',
+      allowedGlobeWorkspaceIds: [issueInput.globeWorkspaceId]
+    })
+
+    await store.advance({
+      executionId: claimed.execution.executionId,
+      expectedState: 'claimed',
+      state: 'proposed',
+      proposalId: 'proposal-1',
+      planFingerprint: 'plan-1',
+      authEvidenceRef: 'token:first',
+      correlationId: 'correlation:proposed'
+    })
+    await store.advance({
+      executionId: claimed.execution.executionId,
+      expectedState: 'proposed',
+      state: 'confirming',
+      authEvidenceRef: 'token:first',
+      correlationId: 'correlation:confirming'
+    })
+
+    const staleLease = await store.acquireDispatchLease({
+      executionId: claimed.execution.executionId,
+      leaseOwnerId: 'lease:stale',
+      authEvidenceRef: 'token:first',
+      correlationId: 'correlation:stale',
+      leaseSeconds: 30
+    })
+
+    setNow(new Date('2026-08-01T12:01:00.000Z'))
+    await store.acquireDispatchLease({
+      executionId: claimed.execution.executionId,
+      leaseOwnerId: 'lease:new',
+      authEvidenceRef: 'token:new',
+      correlationId: 'correlation:new'
+    })
+
+    await expect(
+      store.advance({
+        executionId: claimed.execution.executionId,
+        expectedState: 'confirming',
+        state: 'completed',
+        authEvidenceRef: 'token:first',
+        correlationId: 'correlation:stale-settle',
+        leaseOwnerId: 'lease:stale',
+        leaseGeneration: staleLease.dispatchLeaseGeneration
+      })
+    ).rejects.toMatchObject({ code: 'invalid_transition' })
+  })
+
+  it('allows only explicit compare-and-set transitions', async () => {
+    const { store } = harness()
+    const authority = await store.issue(issueInput)
+
+    const { execution } = await store.claim({
+      authorityId: authority.authorityId,
+      executorUserId: issueInput.executorUserId,
+      executorChannel: issueInput.executorChannel,
+      executorClientId: issueInput.executorClientId,
+      authEvidenceRef: 'token:first',
+      actorAuthMode: 'agent',
+      correlationId: 'correlation:first',
+      allowedGlobeWorkspaceIds: [issueInput.globeWorkspaceId]
+    })
+
+    await expect(
+      store.advance({
+        executionId: execution.executionId,
+        expectedState: 'claimed',
+        state: 'confirming',
+        authEvidenceRef: 'token:first',
+        correlationId: 'correlation:bad'
+      })
+    ).rejects.toMatchObject({ code: 'invalid_transition' })
+
+    const proposed = await store.advance({
+      executionId: execution.executionId,
+      expectedState: 'claimed',
+      state: 'proposed',
+      proposalId: 'proposal-1',
+      planFingerprint: 'plan-1',
+      authEvidenceRef: 'token:first',
+      correlationId: 'correlation:proposed'
+    })
+
+    expect(proposed.state).toBe('proposed')
+    expect(proposed.proposalId).toBe('proposal-1')
+  })
+})

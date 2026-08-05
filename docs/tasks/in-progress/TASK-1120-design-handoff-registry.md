@@ -421,8 +421,14 @@ Lifecycle canónico: `proposed → in_implementation → implemented`; `* → ar
 ## Acceptance Criteria
 
 - [ ] Un `designer` puede registrar un nodo Figma de un archivo de **producto aprobado** y ver su
-      preview renderizada en el carril "Por implementar". **Pendiente runtime**: falta aprobar/seedear
-      un `file_key` producto y aplicar la migración.
+      preview renderizada en el carril "Por implementar". **Bloqueado por una decisión de gobernanza,
+      no por ingeniería** (verificado 2026-07-31): las migraciones del dominio están TODAS aplicadas
+      (`pnpm pg:connect:status` → "No migrations to run"), así que la mitad "aplicar la migración" de
+      este criterio ya no aplica. Lo que falta es que alguien con autoridad decida **qué archivo Figma
+      de producto se aprueba** y lo apruebe por el path gobernado (`POST /api/design-system/handoff/allowlist`).
+      Estado real del allowlist: **un solo archivo, y es un fixture de pruebas** (`Task1180GvcFile01`,
+      "TASK-1180 GVC fixture file", agregado el 2026-06-20). Cero archivos de producto. El registro
+      tiene 2 entradas.
 - [x] Registrar un nodo de un archivo **no aprobado** es rechazado fail-closed con error es-CL.
 - [x] El linking AXIS de primitivas (`design_system_figma_nodes`, TASK-1072) sigue intacto y AXIS-only.
 - [x] La entrada transiciona `proposed → in_implementation → implemented`, y `implemented` exige
@@ -466,3 +472,12 @@ Lifecycle canónico: `proposed → in_implementation → implemented`; `* → ar
    `design_system.handoff.stale_entries`.
 4. **IA:** ¿carril dentro de `DesignSystemCatalogView` o child route `/admin/design-system/handoff`?
    **Resuelto:** child route `/design-system/handoff`, entrada en catálogo.
+5. **Hueco de Full API Parity en el allowlist (detectado 2026-07-31, cosecha de tasks casi-cerradas):**
+   `src/app/api/design-system/handoff/allowlist/route.ts` exporta **solo `POST`**. Se puede aprobar un
+   `file_key`, pero **no existe reader** para listar qué archivos están aprobados — un `GET` a esa ruta
+   responde `405`, y no hay reader canónico equivalente en `src/lib/design-system/`. Para saber el estado
+   del allowlist hoy hay que consultar `greenhouse_core.design_handoff_allowed_files` por SQL, que es
+   exactamente lo que el principio de Full API Parity existe para evitar: la capacidad "administrar el
+   allowlist" quedó a medias, con el write gobernado y el read sin contrato. Consecuencia práctica: ni la
+   UI, ni Nexa, ni MCP pueden responder "¿qué archivos de producto están aprobados?". Cerrar con un `GET`
+   que reuse el mismo guard de capability que el `POST`.

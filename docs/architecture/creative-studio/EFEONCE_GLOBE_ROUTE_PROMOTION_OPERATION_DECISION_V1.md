@@ -1,10 +1,11 @@
 # Efeonce Globe — Route Promotion Operation Decision V1
 
 - Decision: ADR-009
-- Status: Accepted; implementation and rollout gated
+- Status: Accepted; implementation and rollout gated. **El sello del canary (`canary-confirm`) fallaba en runtime y
+  quedó corregido el 2026-08-04 — ver [§ Delta 2026-08-04](#delta-2026-08-04--canary-confirm-fallaba-con-la-evidencia-correcta-task-1641).**
 - Date: 2026-07-23
 - Owners: Efeonce Globe platform, creative operations and security
-- Implements through: `TASK-1527`
+- Implements through: `TASK-1527`; corrección del sello del canary en `TASK-1641`
 - Related: `TASK-1521`, `EFEONCE_GLOBE_API_CONTRACT_SPINE_V1.md`,
   `EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md`,
   `EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md`
@@ -169,3 +170,146 @@ operation/authority history. Schema changes remain additive until the compatibil
 - Worker tests proving it cannot promote, activate or attest.
 - Internal stage→rollback and full canary rehearsals with distinct identities.
 - Cloud SQL readback, alert/signal verification, `pnpm check`, `pnpm build` and IaC plan without destructive drift.
+
+## Delta 2026-08-04 — `canary-confirm` fallaba con la evidencia correcta (TASK-1641)
+
+`efeonce-globe@38c528d`. La fase `canary-confirm` devolvía `internal_error` 500 **con toda la evidencia
+correcta**: corrida gobernada, intento, output retenido, decisión de governance y tupla de ruta estaban donde
+debían. Como `activated` no es terminal y la ventana vence, cada promoción quedaba condenada a revertirse sola —
+**10 de 12 promociones históricas terminaron `rolled_back`**. El diseño de esta ADR no se relajó; lo que faltaba
+era que su último paso pudiera ejecutarse.
+
+### La causa: un consumidor que pide 14 columnas contra una vista que proyectaba 3
+
+El resolver del canary hace JOIN contra la vista `generated_asset_rights_authority_effective` por linaje
+(`run_id`, `attempt_id`, `route_id`, `provider_id`, `model_id`, `model_version`). Esa vista proyectaba
+`workspace_id`, `asset_id` y `authority`, así que PostgreSQL fallaba en **planificación** con `42703`: los datos
+nunca entraban en la ecuación. La migración `0050` la lleva a **16 columnas** —todo el linaje más
+`rights_policy_purpose`— y fue aplicada por el workflow keyless.
+
+La razón es de dominio, no de compilación: **una corrección corrige los DERECHOS, no el origen.** La tabla de
+correcciones no tiene columnas de linaje y tiene FK a la base, así que el linaje es **invariante por
+construcción**; el `UNION ALL` anterior lo perdía por accidente en la rama corregida. El `LEFT JOIN` sobre la PK
+compartida proyecta la base completa y sobreescribe sólo `authority`.
+
+### La migración committeada tenía dos defectos fatales invisibles al leerla
+
+Ambos aparecieron al ejercitarla contra PG real dentro de una transacción con `ROLLBACK`, **antes** de aplicarla:
+
+1. **`CREATE OR REPLACE VIEW` no puede reordenar ni renombrar columnas** — sólo agregar al final conservando
+   nombre, tipo y posición. Reordenar aborta con **`42P16`**. Va `DROP` + `CREATE`, **sin `CASCADE`** a propósito
+   (si mañana alguien construye encima, el DROP debe fallar en vez de arrastrarla), re-otorgando los GRANT
+   explícitos que el DROP se lleva.
+2. **El runner de migraciones de Globe ejecuta el archivo completo sin parsear markers.** La sección
+   `-- Down Migration` —convención de `node-pg-migrate`, que es de Greenhouse, no de Globe— se ejecutaba y
+   **re-creaba la vista rota tres líneas después de arreglarla**, quedando registrada como aplicada. En Globe el
+   rollback de un forward-fix es **otra migración forward**, nunca una sección en el mismo archivo.
+
+### El checkpoint irreversible ocurría antes de la lectura que podía fallar
+
+`activated → verifying_canary` se escribía **antes** de resolver la evidencia, que es una lectura pura. De
+`verifying_canary` no se vuelve: cada intento fallido quemaba una promoción y reintentar quemaba otra. Ahora se
+lee primero y el checkpoint cubre **sólo el sello**. La ventana sin retorno queda reducida a un único write.
+
+### Un `DatabaseError` deja de ser un 500 opaco
+
+Las clases de infraestructura (`08`, `40`, `53`, `55`, `57`) se mapean a `dependency_unavailable`; las
+deterministas (`42703`, `23505`, …) siguen en `internal_error`, **que es la verdad** — prometer reintento sobre un
+defecto de código manda a reintentar para siempre. Todo error de Postgres emite además su SQLSTATE en el evento
+`globe.dispatch.database_error`: mapear no puede costar la observación.
+
+### Cobertura en los dos eslabones de la frontera
+
+El path tenía cobertura cero: el único test stubeaba el resolver. Ahora hay dos gates, probados en rojo y en verde:
+
+- **`consumidor ⊆ contrato declarado`** — test sin base, en cada `pnpm check`.
+- **`contrato ⊆ vista real`** — bloque `DO` de la migración, en cada apply.
+
+Más un test en vivo opt-in que ejecuta la query real. Ningún gate solo alcanza: el defecto vivía exactamente entre
+los dos.
+
+### Estado en runtime al cierre
+
+- **`ref/motion/reference-v1` (Gemini Omni Flash) → `canary_passed`**: promoción sellada, binding habilitado,
+  circuito cerrado. Es el mismo command que devolvía 500.
+- **`ref/video/frames-v1` (Veo 3.1) → `canary_passed`**: promoción sellada (revisión 9, terminal), binding
+  habilitado, circuito cerrado, 32 créditos reservados = 32 gastados. Con esto **las dos rutas de video quedaron
+  promovidas, selladas y habilitadas**. ⚠️ El canary **no se produjo desde la UI del Producer** sino por el
+  **carril gobernado**, con los commands canónicos del spine (`estimate` → `prepare` → `execute`): la ruta exige
+  referencias de imagen y sus dos caminos de entrada en el Producer siguen rotos hoy (el botón «Usar como
+  referencia» no despacha ningún command; la subida ingesta pero Asset Governance falla en `inspecting` con la
+  causa enmascarada). **Ambos bloqueos son ajenos a esta ADR** y quedaron registrados aparte; ya no ponen en
+  riesgo la promoción, pero sí mantienen bloqueada la generación desde el Producer para rutas con entrada
+  obligatoria.
+
+Evidencia viva (revisiones desplegadas, promociones, bindings y canarios) en
+[`GLOBE_RUNTIME_HANDOFF.md`](../../operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md).
+
+### Invariantes que deja este Delta
+
+- **NUNCA** escribir el checkpoint `activated → verifying_canary` antes de resolver la evidencia. El checkpoint
+  irreversible cubre el sello, no la lectura que puede fallar; adelantarlo convierte cada reintento en una
+  promoción quemada.
+- **NUNCA** cambiar la tabla por una vista (ni al revés) sin verificar que la proyección cubre **todas** las
+  columnas que el consumidor referencia. La falla es de planificación (`42703`) y ocurre con datos perfectos.
+- **NUNCA** reordenar ni renombrar columnas con `CREATE OR REPLACE VIEW` (`42P16`): va `DROP` + `CREATE` sin
+  `CASCADE`, re-otorgando GRANT explícitos y verificando columnas **y** accesos en el bloque `DO`.
+- **NUNCA** escribir una sección `-- Down Migration` en una migración de Globe: su runner ejecuta el archivo
+  entero y deshace el fix en la misma transacción, en silencio.
+- **NUNCA** mapear un error determinista de Postgres a `dependency_unavailable`. Reintentar no arregla un defecto
+  de código, y la promesa de reintento esconde el defecto.
+- **SIEMPRE** ejercitar una migración contra PG real dentro de una transacción con `ROLLBACK` antes de aplicarla.
+  Los dos defectos fatales de `0050` eran invisibles leyéndola.
+- **SIEMPRE** cubrir la frontera consumidor↔schema por los dos lados (test sin base + verificación en el apply).
+  Un gate solo deja pasar exactamente el hueco que ya se coló.
+
+## Delta 2026-08-05 — la saga declara su convergencia, y su ventana se observa ANTES de vencer
+
+### El contrato de convergencia de la saga
+
+`PROMOTION_DEPENDENT_AGGREGATES` (`packages/domain/src/promotion-aggregate-convergence.ts`) declara los tres
+agregados que la saga mueve, con test bidireccional — una postura sin señal rompe el build:
+
+| Agregado | Postura | Lo cierra |
+|---|---|---|
+| `production_routing_circuits` | `converges` | la saga (`setCircuit`, **antes** que el binding: fail-closed) |
+| `production_route_bindings` | `converges` | la saga (`setBinding enabled=false`) |
+| `model_readiness_revisions` | **`observable`** | `globe.model-readiness.route.pause` — **autoridad disjunta** |
+
+🔴 **Readiness es `observable` por una frontera de AUTORIDAD.** `pause` exige `globe.model-readiness.pause` y la
+saga sólo porta `globe.production-promotion.*`; son disjuntas a propósito — es la separación maker/checker que
+hace vendible el régimen humano. Dársela dejaría que un **rollback automático retire una promoción que un humano
+firmó**. Por eso la fase `rollback` (§ arriba) deja `model_readiness_revisions` en `promoted` **deliberadamente**,
+y la divergencia se **cuenta y se hace visible** en vez de cerrarse sola.
+
+⚠️ Y hoy ese remedio **no tiene camino ejecutable por ningún carril** (ver ADR-010 § chokepoints corregidos);
+dueño del follow-up: `TASK-1463`.
+
+### Dos señales nuevas, y una de ellas es el complemento estricto de `stalled`
+
+- **`globe_promotion_window_closing`** (WARNING, 30 min de antelación): promociones `activated` con
+  `deadline_at > now` dentro del umbral. 🔴 **No sustituye a `stalled`, lo complementa por el otro lado del mismo
+  instante**: `stalled` / `promotion_queue_oldest_age_seconds` miden `deadline_at <= now`, o sea avisan **cuando
+  la ventana ya venció**. Las cuatro promociones que murieron el 2026-08-04 lo hicieron a +2 s, +18 s, +26 s y
+  +40 s del deadline: para todas ellas esa alerta llegaba tarde **por diseño**. Una ventana vencida **no** entra
+  en la señal nueva — contarla dos veces borraría la frontera.
+- **`globe_promotion_readiness_divergent`** (ERROR): rollbacks cuya readiness sigue `promoted`. Es la señal que
+  permite declarar ese agregado `observable` y que la palabra signifique algo.
+
+Ambas las emite un **solo consumidor** en el worker, porque son el mismo lector cross-workspace; usa la política
+de scan que ya existía (`app.promotion_recovery_scan`, migración `0028`) mediante
+`PromotionConvergenceObservationStorePort` + `PromotionReadinessStateReaderPort` — **sin migración nueva**.
+
+### 🔴 El invariante de predicado que esta sesión ganó
+
+Un predicado derivado de historia append-only necesita su **cláusula de vigencia**, y hicieron falta **dos**:
+supersede por promoción posterior **y** binding vigente apagado. El segundo se descubrió con la señal ya
+desplegada, porque el **lane automatizado de ADR-010 habilita rutas sin pasar por la saga** y no deja operación
+posterior que las supersede. **Cuando dos mecanismos pueden mover el mismo estado, derivar de la historia de uno
+solo es incorrecto por construcción**: el predicado se cierra sobre el **estado actual del efecto**.
+
+### Métrica: la forma la decide la dirección de la magnitud
+
+«Segundos restantes» se alinea al revés — pediría `COMPARISON_LT`, y **no existe `ALIGN_MIN` para DISTRIBUTION**,
+así que un `ALIGN_PERCENTILE_99` alertaría sobre la promoción **menos** urgente. Se emite el **evento discreto
+contable** (DELTA/INT64 + `ALIGN_SUM`) y el número vive en la línea de log que un humano lee.

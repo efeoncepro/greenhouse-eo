@@ -90,6 +90,28 @@ const document: OffboardingWorkQueueDocumentSummary = {
 }
 
 describe('OffboardingWorkQueue derivation', () => {
+  it('routes international_internal cases to the international payroll lane instead of classification', () => {
+    const item = buildOffboardingWorkQueueItem({
+      item: {
+        ...baseCase,
+        status: 'draft',
+        contractTypeSnapshot: 'international_internal',
+        payRegimeSnapshot: 'international',
+        countryCode: 'MX',
+        separationType: 'contract_end',
+        requiresLeaveReconciliation: false
+      },
+      collaborator,
+      settlement: null,
+      document: null
+    })
+
+    expect(item.closureLane.code).toBe('international_payroll')
+    expect(item.nextStep.code).toBe('review_payment')
+    expect(item.primaryAction?.code).toBe('review_payment')
+    expect(item.secondaryActions.map(action => action.code)).toContain('transition_approve')
+  })
+
   it('blocks resignation final settlement until carta and pension declaration are present', () => {
     const item = buildOffboardingWorkQueueItem({
       item: baseCase,

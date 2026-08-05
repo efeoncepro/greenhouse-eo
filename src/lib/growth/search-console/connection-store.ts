@@ -51,6 +51,29 @@ export const getSearchConsoleConnection = async (
   return row ? mapRow(row) : null
 }
 
+/**
+ * Lista las organizaciones materializables (TASK-1302).
+ *
+ * Único reader cross-org del store. Filtra por las tres condiciones que hacen que
+ * `readSearchConsoleAnalytics` pueda responder `ok:true`: conexión `active`, propiedad
+ * elegida y token presente. Así el batch diario no gasta una llamada por org para
+ * descubrir que iba a degradar.
+ */
+export const listActiveSearchConsoleOrganizations = async (): Promise<
+  Array<{ organizationId: string; siteUrl: string }>
+> => {
+  const rows = await runGreenhousePostgresQuery<{ organization_id: string; site_url: string }>(
+    `SELECT organization_id, site_url
+       FROM greenhouse_growth.search_console_connections
+      WHERE status = 'active'
+        AND site_url IS NOT NULL
+        AND token_secret_ref IS NOT NULL
+      ORDER BY organization_id`
+  )
+
+  return rows.map(row => ({ organizationId: String(row.organization_id), siteUrl: String(row.site_url) }))
+}
+
 export interface UpsertSearchConsoleConnectionInput {
   organizationId: string
   siteUrl: string

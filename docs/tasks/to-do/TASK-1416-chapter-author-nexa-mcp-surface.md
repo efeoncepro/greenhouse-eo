@@ -1,5 +1,11 @@
 # TASK-1416 — Chapter-author operable desde Nexa + MCP (la 3ª y 4ª pata de parity del motor)
 
+## Delta 2026-08-02 — MCP local de Proposal, no provider federado de cotización
+
+La surface MCP de esta task pertenece al runtime Greenhouse/Proposal y opera chapter authors. No implementa el
+provider federado de cotizaciones de `mcp.efeonce.org`, no expone Cost Subledger y no adquiere authority de pricing.
+El author económico consume `ProposalEconomicProjection` a través de `TASK-1417`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

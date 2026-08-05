@@ -19,14 +19,14 @@ Comunicación: español neutro latinoamericano (sin voseo/modismos argentinos).
 
 **NUNCA** ejecutes `git push`, `gh workflow run`, approval gate, Cloud Run deploy, promoción Vercel, rollback, `vercel env add`, ni transición de estado del manifest **sin mi aprobación explícita para ESA mutación concreta**. Aprobar un paso ≠ aprobar el siguiente. Tu trabajo por defecto es **leer, diagnosticar y proponer el comando exacto**; yo lo autorizo. Lo único que corres libre es lo read-only (preflight exploratorio, `git status`, `gh run list`, `release:watchdog --json`, lecturas SQL).
 
-## 0. Reads canónicos (leé solo lo que el modo necesita, en este orden)
+## 0. Reads canónicos (lee solo lo que el modo necesita, en este orden)
 
 - `AGENTS.md` · `CLAUDE.md` · `project_context.md` · `Handoff.md`
 - **`docs/operations/FEATURE_FLAG_STATE_LEDGER.md` → `§ Pendientes de acción` — OBLIGATORIO en TODO paso a producción.** Hay features `code-complete` cuyo flag `*_ENABLED` (default OFF) debe **prenderse en prod junto a este release** (a veces + migración/ops-worker). El deploy del código NO los activa; qué prender se lee de acá, no de la memoria.
 - `docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md` → §"Invariantes operativos para agentes"
 - `docs/operations/runbooks/production-release.md` (decision tree, batch policy, post-deploy checklist, rollback, signals)
 - `.github/workflows/production-release.yml` · `src/lib/release/workflow-allowlist.ts`
-- **Si el orquestador falló:** `docs/operations/PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md` (OBLIGATORIO — leé el JSON de salida como diagnóstico, no chasees el gate).
+- **Si el orquestador falló:** `docs/operations/PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md` (OBLIGATORIO — lee el JSON de salida como diagnóstico, no chasees el gate).
 - **Si rollback / watchdog / Azure / Vercel / HubSpot:** runbook + manual del watchdog + los workflows de workers/Azure (lista en la skill).
 
 ## Hard rules (resumen — la versión vinculante vive en la skill)
@@ -41,32 +41,32 @@ Comunicación: español neutro latinoamericano (sin voseo/modismos argentinos).
 
 ## Modo A — Release normal (camino canónico)
 
-1. **Estado**: confirmá rama, remotes, worktree limpio. Confirmá que `develop` está verde (CI + Playwright smoke) y que ningún cambio local no relacionado entra. Fijá el `target_sha` (HEAD de `develop`) y confirmámelo.
-2. **Batch policy**: validá contra la matriz del runbook (§2.2) que el release es **un bloque funcional coherente, reversible, con rollback explicable en una frase**. Si se describe con "también incluye…", o mezcla dominios sensibles (payroll/finance/auth/infra/migration) sin dependencia declarada → STOP, reportá y partilo.
+1. **Estado**: confirma rama, remotes, worktree limpio. Confirma que `develop` está verde (CI + Playwright smoke) y que ningún cambio local no relacionado entra. Fija el `target_sha` (HEAD de `develop`) y confírmamelo.
+2. **Batch policy**: valida contra la matriz del runbook (§2.2) que el release es **un bloque funcional coherente, reversible, con rollback explicable en una frase**. Si se describe con "también incluye…", o mezcla dominios sensibles (payroll/finance/auth/infra/migration) sin dependencia declarada → STOP, reporta y pártelo.
 3. **Preflight** (read-only primero):
    - exploratorio: `pnpm release:preflight --target-sha=<sha> --target-branch=main`
    - gate: `pnpm release:preflight --json --fail-on-error --output-file=<path> --target-sha=<sha> --target-branch=main`
    - cualquier `readyToDeploy=false` (degraded/unknown) **bloquea**. NO promuevas.
-4. **Promoción a `main`** (mutación → pedí aprobación): PR/merge aprobado del SHA exacto. El orquestador espera que `target_sha` ya exista en `main`. Vercel auto-deploya production en el push; el orquestador espera ese deployment READY.
-5. **Dispatch del orquestador** (mutación → pedí aprobación; respetá el ≥8 min post-push):
+4. **Promoción a `main`** (mutación → pide aprobación): PR/merge aprobado del SHA exacto. El orquestador espera que `target_sha` ya exista en `main`. Vercel auto-deploya production en el push; el orquestador espera ese deployment READY.
+5. **Dispatch del orquestador** (mutación → pide aprobación; respeta el ≥8 min post-push):
    ```bash
    gh workflow run production-release.yml --ref main \
      -f target_sha=<40-char-sha> -f force_infra_deploy=false
    ```
-6. **Approval gate** (mutación → pedí aprobación): aprobá el gate del environment `Production` del **`Production Release Orchestrator`**, NO runs de workers sueltos ni runs stale (>24h → cancelá primero con `gh run cancel <id>`).
-7. **Observá el orquestador completo**: preflight → record-started → approval-gate → 4 workers (`workflow_call`) → Azure gated → Vercel READY → `/api/auth/health` → transición de manifest a `released` | `degraded`.
-8. **Watchdog** (read-only por ahora; el workflow está manual-only hasta TASK-920): `pnpm release:watchdog --json` → esperá `drift_count=0` y `4/4 workers synced`.
-9. **Verificá Cloud Run `GIT_SHA`** de los servicios mapeados cuando aplique: `ops-worker`, `commercial-cost-worker`, `ico-batch-worker` (us-east4), `hubspot-greenhouse-integration` (us-central1).
+6. **Approval gate** (mutación → pide aprobación): aprobá el gate del environment `Production` del **`Production Release Orchestrator`**, NO runs de workers sueltos ni runs stale (>24h → cancelá primero con `gh run cancel <id>`).
+7. **Observa el orquestador completo**: preflight → record-started → approval-gate → 4 workers (`workflow_call`) → Azure gated → Vercel READY → `/api/auth/health` → transición de manifest a `released` | `degraded`.
+8. **Watchdog** (read-only por ahora; el workflow está manual-only hasta TASK-920): `pnpm release:watchdog --json` → espera `drift_count=0` y `4/4 workers synced`.
+9. **Verifica Cloud Run `GIT_SHA`** de los servicios mapeados cuando aplique: `ops-worker`, `commercial-cost-worker`, `ico-batch-worker` (us-east4), `hubspot-greenhouse-integration` (us-central1).
 10. **Post-deploy checklist** (runbook §4): Vercel production Ready · workers Ready · Sentry sin errors nuevos `release:<sha>` · smoke real (login, `/finance/cash-out`, `/agency/operations`, `/admin/operations`) · signals `Platform Release` OK.
-11. **Flags pendientes de este release** (mutación → pedí aprobación por flag): releé `FEATURE_FLAG_STATE_LEDGER.md` → `§ Pendientes de acción`. Por cada flag gated a este release: `vercel env add <FLAG>=true Production` (+ `gcloud run services update ops-worker --update-env-vars …` si corre en el worker) + redeploy + smoke del flujo en prod + actualizá la fila del ledger (snapshot por environment). Si un flag requería su migración en prod, confirmá que entró por este release antes de prenderlo. **El deploy del código no prende nada.**
+11. **Flags pendientes de este release** (mutación → pide aprobación por flag): relee `FEATURE_FLAG_STATE_LEDGER.md` → `§ Pendientes de acción`. Por cada flag gated a este release: `vercel env add <FLAG>=true Production` (+ `gcloud run services update ops-worker --update-env-vars …` si corre en el worker) + redeploy + smoke del flujo en prod + actualiza la fila del ledger (snapshot por environment). Si un flag requería su migración en prod, confirma que entró por este release antes de prenderlo. **El deploy del código no prende nada.**
 
 ## Modo B — Rollback
 
-Solo si post-deploy falla. Capability `platform.release.rollback` (EFEONCE_ADMIN). Decision tree del runbook §7 (CRÍTICO=rollback inmediato · DEGRADED=forward-fix <2h · MENOR=forward-fix próximo ciclo). Identificá el `release_id` + `previous_*` del manifest, **dry-run primero** con `pnpm release:rollback … --dry-run`, revisá el plan, y solo con mi aprobación corré el apply. Azure NO tiene rollback automático: `az deployment group what-if` obligatorio antes de cualquier reapply de Bicep. Anotá en `Handoff.md` con razón + trigger de post-mortem.
+Solo si post-deploy falla. Capability `platform.release.rollback` (EFEONCE_ADMIN). Decision tree del runbook §7 (CRÍTICO=rollback inmediato · DEGRADED=forward-fix <2h · MENOR=forward-fix próximo ciclo). Identifica el `release_id` + `previous_*` del manifest, **dry-run primero** con `pnpm release:rollback … --dry-run`, revisa el plan, y solo con mi aprobación corre el apply. Azure NO tiene rollback automático: `az deployment group what-if` obligatorio antes de cualquier reapply de Bicep. Anota en `Handoff.md` con razón + trigger de post-mortem.
 
 ## Modo C — Watchdog / Drift recovery
 
-`pnpm release:watchdog --json`. Si reporta `platform.release.worker_revision_drift`, **no adivines**: leé el último manifest (SQL de lectura), compará `GIT_SHA` de cada servicio mapeado, clasificá la causa (orquestador incompleto / deploy directo / push parcial / manifest stale / fallo Cloud Run) y **preferí un re-intento fresco del orquestador** para el SHA verificado. Worker dispatch individual solo como break-glass aprobado. NO edites el manifest por SQL. Re-corré watchdog y documentá en `Handoff.md`.
+`pnpm release:watchdog --json`. Si reporta `platform.release.worker_revision_drift`, **no adivines**: lee el último manifest (SQL de lectura), compara `GIT_SHA` de cada servicio mapeado, clasifica la causa (orquestador incompleto / deploy directo / push parcial / manifest stale / fallo Cloud Run) y **prefiere un re-intento fresco del orquestador** para el SHA verificado. Worker dispatch individual solo como break-glass aprobado. NO edites el manifest por SQL. Re-corre watchdog y documenta en `Handoff.md`.
 
 ## Modo D — Break-glass
 
@@ -76,9 +76,9 @@ Solo con incidente productivo activo y orquestación normal bloqueada. Requiere:
 
 ## Cierre y reporte
 
-Reportá siempre (contrato de la skill): target SHA · estado de rama/remote · si se corrió el orquestador · workflow run id(s) · `release_id` + estado final del manifest · URL/dominio del deployment Vercel production · `GIT_SHA` de los servicios Cloud Run mapeados · resultado del watchdog · **qué NO se validó** · flags prendidos + fila del ledger actualizada · cualquier doc/skill actualizada.
+Reporta siempre (contrato de la skill): target SHA · estado de rama/remote · si se corrió el orquestador · workflow run id(s) · `release_id` + estado final del manifest · URL/dominio del deployment Vercel production · `GIT_SHA` de los servicios Cloud Run mapeados · resultado del watchdog · **qué NO se validó** · flags prendidos + fila del ledger actualizada · cualquier doc/skill actualizada.
 
-**Documentación** (governor): si el flujo crítico cambió (workflow YAML, contrato `workflow_call`, state machine, mapeo Vercel/Cloud Run, semántica del watchdog, gating Azure/WIF), actualizá en el mismo change set todas las fuentes del **Skill Maintenance Contract** (ambas skills Codex+Claude, control plane spec, runbook, manuales, `workflow-allowlist.ts`, `AGENTS.md`, `CLAUDE.md`, `project_context.md`, `Handoff.md`, `changelog.md`).
+**Documentación** (governor): si el flujo crítico cambió (workflow YAML, contrato `workflow_call`, state machine, mapeo Vercel/Cloud Run, semántica del watchdog, gating Azure/WIF), actualiza en el mismo change set todas las fuentes del **Skill Maintenance Contract** (ambas skills Codex+Claude, control plane spec, runbook, manuales, `workflow-allowlist.ts`, `AGENTS.md`, `CLAUDE.md`, `project_context.md`, `Handoff.md`, `changelog.md`).
 
 ---
 

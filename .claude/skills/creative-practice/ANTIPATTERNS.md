@@ -116,7 +116,8 @@ Rescatar un caso un año después es pedir un favor; documentarlo desde el día 
 
 **Fix:** **todo engagement creativo arranca su `templates/caso-estudio.md` el día 1**, y **la autorización de
 portafolio se pide EN EL CONTRATO** *(cláusula, no favor)*. → `modules/05_SCOPE_SOW.md` §4.
-🎯 **SKY es el candidato natural al primer caso — en cuanto G esté resuelto.**
+🎯 **SKY es el primer caso creativo autorizado para nombrar**, sujeto al alcance de claims, métricas, assets y
+evidencia de cada uso.
 
 ---
 

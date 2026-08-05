@@ -12,6 +12,7 @@ type ExitEligibilityRow = {
   public_id: string | null
   rule_lane: string | null
   status: string | null
+  contract_type_snapshot: string | null
   last_working_day: string | null
   effective_date: string | null
 }
@@ -87,6 +88,7 @@ const FETCH_EXIT_CASE_FACTS_SQL = `
       oc.public_id,
       oc.rule_lane,
       oc.status,
+      oc.contract_type_snapshot,
       oc.last_working_day,
       oc.effective_date
     FROM greenhouse_hr.work_relationship_offboarding_cases AS oc
@@ -133,6 +135,15 @@ export const fetchExitCaseFactsForMembers = async (
       exitCasePublicId: row.public_id,
       exitLane: normalizeLane(row.rule_lane),
       exitStatus: normalizeStatus(row.status),
+      contractTypeSnapshot:
+        row.contract_type_snapshot === 'indefinido' ||
+        row.contract_type_snapshot === 'plazo_fijo' ||
+        row.contract_type_snapshot === 'honorarios' ||
+        row.contract_type_snapshot === 'contractor' ||
+        row.contract_type_snapshot === 'eor' ||
+        row.contract_type_snapshot === 'international_internal'
+          ? row.contract_type_snapshot
+          : null,
       lastWorkingDay: normalizeDate(row.last_working_day),
       effectiveDate: normalizeDate(row.effective_date)
     })

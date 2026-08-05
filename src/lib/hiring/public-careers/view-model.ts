@@ -192,6 +192,34 @@ const extractResponsibilityItems = (value: string | null | undefined): string[] 
   return splitList(value).slice(0, 4)
 }
 
+const extractDescriptionBody = (value: string | null | undefined): string | null => {
+  if (!value?.trim()) return null
+
+  const lines = value.split(/\r?\n/g)
+  const normalizedLines = lines.map(line => normalizeText(cleanText(line)))
+  const responsibilityHeadingIndex = normalizedLines.findIndex(line => line.startsWith('responsabilidades'))
+  const firstBulletIndex = lines.findIndex(line => RESPONSIBILITY_ITEM_PREFIX.test(line.trim()))
+
+  const boundaryIndex = responsibilityHeadingIndex >= 0
+    ? responsibilityHeadingIndex
+    : firstBulletIndex >= 0
+      ? firstBulletIndex
+      : -1
+
+  const bodyLines = boundaryIndex >= 0 ? lines.slice(0, boundaryIndex) : lines
+  const body = bodyLines.join('\n').trim()
+  const bodyLinesWithoutHeading = body.split(/\r?\n/g)
+  const firstLine = normalizeText(cleanText(bodyLinesWithoutHeading[0] ?? ''))
+
+  if (firstLine === 'sobre el rol' || firstLine === 'descripcion' || firstLine === 'description') {
+    bodyLinesWithoutHeading.shift()
+  }
+
+  const normalizedBody = bodyLinesWithoutHeading.join('\n').trim()
+
+  return normalizedBody || null
+}
+
 const weightedSourceText = (opening: PublicOpeningPayload): Array<{ text: string; weight: number }> => [
   { text: opening.title, weight: 8 },
   { text: opening.summary ?? '', weight: 6 },
@@ -404,7 +432,12 @@ export const buildCareersOpeningViewModel = (
 ): CareersOpeningViewModel => {
   const modality = resolveModality(opening, copy.fallbacks.modality)
   const location = resolveLocation(opening, modality, copy.fallbacks.location)
-  const descriptionParagraphs = splitParagraphs(opening.description, opening.summary ?? copy.fallbacks.summary)
+
+  const descriptionParagraphs = splitParagraphs(
+    extractDescriptionBody(opening.description),
+    opening.summary ?? copy.fallbacks.summary,
+  )
+
   const responsibilityItems = extractResponsibilityItems(opening.description)
   const requirementItems = splitList(opening.requirements)
 

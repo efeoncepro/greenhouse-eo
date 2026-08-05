@@ -557,6 +557,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'admin'
   },
   {
+    viewCode: 'administracion.globe_credits',
+    section: 'administracion',
+    label: 'Créditos Globe',
+    description: 'Capacidad efectiva, operaciones de fondeo y recuperación de Globe.',
+    routePath: '/admin/globe/credits',
+    routeGroup: 'admin'
+  },
+  {
     viewCode: 'administracion.growth_forms',
     section: 'administracion',
     label: 'Growth Forms',

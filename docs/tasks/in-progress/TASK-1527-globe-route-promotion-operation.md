@@ -21,7 +21,7 @@
 - Rank: `TBD`
 - Domain: `creative|ops|security`
 - Blocked by: `none`
-- Branch: `task/TASK-1527-globe-route-promotion-operation`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

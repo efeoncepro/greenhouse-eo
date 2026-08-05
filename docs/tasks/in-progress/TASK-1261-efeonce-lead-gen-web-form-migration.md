@@ -18,7 +18,7 @@ Cutover de **prueba** (operador-dirigido), aislado del CRM productivo: override 
 - Execution profile: `backend-data`
 - UI impact: `none`
 - Backend impact: `migration`
-- Epic: `none`
+- Epic: `EPIC-040`
 - Status real: `En ejecución`
 - Rank: `TBD`
 - Domain: `growth|public-site|hubspot`

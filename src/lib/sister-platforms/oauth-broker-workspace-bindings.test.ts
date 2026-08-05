@@ -92,6 +92,34 @@ describe('Globe OAuth workspace identity projection', () => {
     expect(resolveGlobeOAuthWorkspaceBindings).toHaveBeenCalledTimes(2)
   })
 
+  it('projects Globe bindings for the admin CLI through explicit resource metadata', async () => {
+    resolveGlobeOAuthWorkspaceBindings.mockResolvedValueOnce([
+      {
+        workspaceId: 'greenhouse-org:efeonce',
+        displayName: 'Efeonce',
+        kind: 'internal',
+        isPrimary: true
+      }
+    ])
+
+    const identity = await buildBrokerSisterPlatformOAuthIdentityPayload({
+      tenant,
+      client: {
+        sisterPlatformKey: 'greenhouse-admin-cli',
+        metadata: { resourceFamily: 'globe', workspaceBindingProvider: 'globe' },
+        policy: {
+          claims: { includeGreenhouseRoles: false },
+          capabilityScopes: ['globe.credits.funding.read']
+        }
+      } as never,
+      requestedScopes: ['openid', 'globe.credits.funding.read'],
+      expiresAt
+    })
+
+    expect(identity.workspaceBindings?.map(binding => binding.workspaceId)).toEqual(['greenhouse-org:efeonce'])
+    expect(resolveGlobeOAuthWorkspaceBindings).toHaveBeenCalledOnce()
+  })
+
   it('does not query or expose workspace bindings for another sister platform', async () => {
     const identity = await buildBrokerSisterPlatformOAuthIdentityPayload({
       tenant,

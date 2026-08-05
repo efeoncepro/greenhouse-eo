@@ -18,7 +18,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `integration`
-- Epic: `none`
+- Epic: `EPIC-040`
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|platform`

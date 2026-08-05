@@ -136,6 +136,68 @@ mismo camino. Reescribir los tres gates de diseño es **precondición**, no foll
 La referencia de valores para migrar sin reinterpretar vive en
 [`GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md`](../../ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md).
 
+### Delta 2026-08-05 — Benchmark competitivo Higgsfield/Magnific: owner map y slices de experiencia
+
+La auditoría autenticada de [Higgsfield y Magnific](../../audits/competitive-ui/GLOBE_COMPETITIVE_BENCHMARK_HIGGSFIELD_MAGNIFIC_2026-08-05.md)
+confirma una brecha de UI en la continuidad `crear → revisar → modificar → reutilizar`, no una ausencia general
+de contratos server-side. La UI de los líderes es más fuerte en jerarquía, composer por modalidad, muro accionable,
+viewer profundo, video temporal, audio nativo y home/workspace. EPIC-028 adopta esos aprendizajes como criterios de
+producto, sin copiar marcas, assets ni claims.
+
+| Superficie | Aprendizaje que se incorpora | Owner | Dependencias / frontera |
+|---|---|---|---|
+| Contrato de experiencia | Creative Loop, IA, agentic `propose → approve → execute → judge`, flow/motion y gates humanos | `TASK-1523` | Política transversal; no backend ni runtime paralelo |
+| Composer multimodal | El composer se adapta a operación, slots, roles, controles y output de la ruta; no a un formulario genérico | `TASK-1633` → `TASK-1552` | `TASK-1504`, `TASK-1553`, `TASK-1555`; el adapter conserva su traducción |
+| Feed → composer | Reference, Recreate, Favorite y Download deben ejecutar o explicar su bloqueo; Reference/Recreate son zero-spend | **`TASK-1643`**; shell/render `TASK-1559`; actions backend `TASK-1503` | Slice nuevo y estrecho; reemplaza la atribución errónea a `TASK-1641` |
+| Viewer de imagen | Focus Canvas, zoom/pan/fit/1:1, navegación y compare sólo con lineage real | `TASK-1559` → `TASK-1571` | Edición regional queda en `TASK-1572` |
+| Viewer de video | Poster, timeline, timecode, playback único, MediaDock y estados de buffering | `TASK-1569` → `TASK-1570` | Edición/continuidad separada en `TASK-1573` → `TASK-1574` |
+| Viewer de audio | Waveform, playhead, duración, preview, AudioDock y estados degradados | `TASK-1567` → `TASK-1568` | Edición layer-aware en `TASK-1575` → `TASK-1577` |
+| Biblioteca y home | Projects, Sessions, Entry Hub, contexto, library, review y reuse sin duplicar feed | `TASK-1520`, `TASK-1580` → `TASK-1583` | Reusa feed/viewer/media owners y review foundation `TASK-1522` |
+| Promoción de rutas | Canary, ventana, rollback, readiness y convergencia de la saga | `TASK-1641` | Backend/API; `UI impact: none`; queda fuera de la experience lane |
+
+Orden de implementación de experiencia, con dependencias explícitas: `TASK-1633 → TASK-1552 → TASK-1643 →
+revisión de media → TASK-1580 → TASK-1581 → TASK-1582 → TASK-1583`.
+
+| Fase | Entrada | Entregable | Dependencias estrictas |
+|---|---|---|---|
+| Contrato transversal | `TASK-1523` | Creative Loop, dirección visual, IA, flow/motion y ownership | policy; no runtime paralelo |
+| Composer foundation | `TASK-1633` | contrato browser-safe de operación, slots, controles y output | API Contract Spine / catálogo |
+| Composer multimodal | `TASK-1552` | un shell Producer con estudios adaptativos de Imagen, Video y Audio | `TASK-1633` |
+| Continuidad | `TASK-1643` + `TASK-1559` | muro/feed accionable, handoff zero-spend y viewer único | `TASK-1552`; `TASK-1559` conserva shell/render |
+| Imagen | `TASK-1571` | Focus Canvas, compare y revisión visual | `TASK-1559`; edición regional después en `TASK-1572` |
+| Video | `TASK-1569 → TASK-1570` | projection, poster, playback, timeline, timecode y MediaDock | `TASK-1559`; edición después en `TASK-1573 → TASK-1574` |
+| Audio | `TASK-1567 → TASK-1568` | waveform, playback único, playhead y AudioDock | `TASK-1559`; edición layer-aware después en `TASK-1575 → TASK-1577` |
+| Contexto y reuse | `TASK-1580 → TASK-1583` | Project/Session/Element, Entry Hub, Asset Workspace y Review-to-Element | revisión de media + `TASK-1520`/`TASK-1522` |
+
+La revisión de media puede ejecutarse en tres ramas después del contrato común: imagen (`1571`), video
+(`1569 → 1570`) y audio (`1567 → 1568`). El orden de aceptación del Producer sigue siendo el de la tabla,
+aunque las foundations backend de video/audio puedan prepararse en paralelo sin convertirlas en bloqueos
+artificiales del feed.
+
+Esta recomposición se registra como un plan de owners existentes, no como `Producer V3`: no se reserva un ID
+nuevo ni se crea una task paraguas. Un solo shell alberga tres estudios de modalidad; no se crean tres aplicaciones,
+un segundo feed/viewer ni un composer genérico que ignore `RouteCreativeContractV1`.
+
+Contratos de diseño y ejecución asociados:
+
+- [Dirección visual Producer V3](../../ui/visual-directions/EPIC-028-producer-v3-unified-studios.md)
+- [Wireframe Producer V3](../../ui/wireframes/EPIC-028-producer-v3-unified-studios.md)
+- [Flow Producer V3](../../ui/flows/EPIC-028-producer-v3-unified-studios-flow.md)
+- [Motion Producer V3](../../ui/motion/EPIC-028-producer-v3-unified-studios-motion.md)
+- [Plan operativo Producer V3](../../operations/creative-studio/EPIC_028_PRODUCER_V3_EXECUTION_PLAN_V1.md)
+
+Criterios de salida comunes para esta lane:
+
+- ningún control visible es no-op;
+- toda acción ejecuta, rechaza antes de gastar o aparece disabled con una razón comprensible;
+- Reference/Recreate conserva asset, role, recipe, lineage y estimate stale sin iniciar un job;
+- imagen, video y audio comparten identidad de asset, rights y acciones gobernadas;
+- desktop, 390 px, teclado, reduced motion y `scrollWidth === clientWidth` tienen evidencia GVC proporcional.
+
+`TASK-1641` queda explícitamente fuera de la UI. La nueva `TASK-1643` existe sólo porque el benchmark había
+mezclado acciones del Producer con la saga de promoción y porque `TASK-1526`/`TASK-1559` tienen una frontera
+histórica de port versus dominio; no es una task paraguas ni crea un segundo owner de feed, composer o library.
+
 ## Child Tasks
 
 > Greenhouse es el único control plane operativo: registra `TASK-###`, dependencias, lifecycle, hooks, lint,
@@ -207,6 +269,7 @@ La referencia de valores para migrar sin reinterpretar vive en
  - `TASK-1581` — **Globe Producer Creative Entry Hub and Session Feed.** Consumer UI que cambia el ingreso por modalidad a ingreso por intención, muestra contexto reciente y agrupa actividad por sesión sin crear otro feed.
  - `TASK-1582` — **Globe Producer Asset Workspace and Contextual Reuse.** Consumer UI que conecta el viewer/media canvases con proyecto, colección, sesión, lineage y acciones de continuidad.
  - `TASK-1583` — **Globe Producer Review-to-Element and Governed Reuse Experience.** Consumer UI que conecta review/changes-requested/approval con child sessions, creación explícita de Elements y reutilización gobernada.
+ - `TASK-1643` — **Globe Producer Feed-to-Composer Action Continuity.** Consumer UI estrecho para wiring gobernado de Reference, Recreate, Favorite y Download y su handoff zero-spend al composer. No posee contratos de asset, feed transport, composer route logic, media canvas, review, workspace ni promotion.
 
 ### Commercial architecture and market validation — 2026-07-29
 
@@ -473,6 +536,40 @@ define la fórmula, settlement, fallback y lifecycle de rates; `TASK-1468` imple
 catálogo, bindings y resolución por ruta; `TASK-1578` certifica route → rate → binding → estimate/actual → canary
 → promotion y declara coverage API/SDK/MCP/UI. Ningún modelo nuevo se considera disponible sólo por existir en el
 catálogo.
+
+## Delta 2026-08-01 — TASK-1630 converge el control plane de créditos
+
+`TASK-1630` coordina las tasks existentes sin crear un tercer ledger ni absorber sus archivos. La auditoría del
+runtime comprobó que availability/evaluate no aplican aún la misma semántica que reservation: gasto histórico se
+publica como `spentInPeriod`, los caps no incluyen holds vigentes, el período del pool no se exige y el rollover
+mensual presupone un pool preparado. Por eso `TASK-1586`, `TASK-1483` y `TASK-1628` no pueden ejecutarse sobre los
+DTOs actuales.
+
+El orden normativo queda: `TASK-1482` corrige período, funding y decisión compartida; `TASK-1468` + `TASK-1579`
+cierran holds/expiry/settlement; `TASK-1586` entrega lifecycle/receipts autoritativos en Globe y proyecciones de
+status/recovery en Greenhouse; `TASK-1629` agrega autoridad one-shot y adapters one-command/readback;
+`TASK-1483` implementa `/admin/globe/credits` en Greenhouse; `TASK-1628` conserva
+Producer como self-view read-only; MCP llega después por `TASK-1473`/`TASK-1626`.
+
+La autoridad owner-operated queda explícita: una instrucción atribuida del CEO puede autorizar a un humano o
+agente autenticado para completar `preview → propose → confirm → readback` sin un segundo humano.
+`requireSecondConfirmer` es policy opcional por workspace/umbral y permanece OFF en
+`greenhouse-org:efeonce`; un workload genérico nunca confirma y un agente no puede ampliar su propia delegación.
+
+El corte live del 2026-08-01 retira el blocker operativo de fondeo interno: operación
+`23db5b0e-89dd-4661-9b8d-c12f9be4ad7a`, 800 efectivos, cap 1500, pool `internal-month:2026-08`, readback
+coincidente en Greenhouse, CLI OAuth PKCE y Producer. ISSUE-124 está resuelta. TASK-1483 y TASK-1628 cerraron
+GVC, rollout y smoke autenticado. TASK-1630 cerró además MCP write interno, la clasificación Finance de los
+500.000 y la adjudicación gobernada de los dos outcomes antiguos. El epic permanece `in-progress` por su alcance
+comercial/modelos externo y TASK-1468/TASK-1579 receipts/calibración más amplia, sin volver a bloquear el carril
+interno ni TASK-1614.
+
+## Aclaración 2026-08-02 — TASK-1632 es un handoff interno de Globe
+
+`TASK-1632` formaliza provider completion → finalización durable → output retenido → Asset Governance. Globe ya
+verifica y deduplica el callback de Fal y encola `complete`; la task agrega wakes durables para que los workers
+reaccionen sin esperar el siguiente tick, con Scheduler como recovery. No existe delivery WIF ni proyección
+Greenhouse en este alcance. `TASK-1475` mantiene por separado su portfolio cross-product.
 
 ## Delta 2026-07-19 — TASK-1458 complete (Golden Briefs & Evaluation Harness)
 
@@ -777,16 +874,15 @@ sustituya a otro.** Se agrega como principio del epic:
   la **selección** es explícita del operador (selector, TASK-1552) o por contrato de fidelidad / recommendation matrix
   (TASK-1459) — nunca un "mejor global".
 
-**Gap de implementación (real, no cubierto por ninguna child task):** hoy los adapters resuelven el modelo **por
-capacidad** (`OPENAI_ROUTING[capability]`, `VERTEX_ROUTING[capability]`) y el composite rutea imagen a **un** proveedor
-por capacidad, así que **dos modelos del mismo proveedor no pueden coexistir** — el compiler ancla a `estimate.model` y
-un binding al segundo modelo da `route_binding_missing`. Se requiere **resolución de modelo por-ruta** en los adapters.
-Vehículo: **`TASK-1553` — Globe Extensible Multi-Model Provider Catalog + Route-Based Model Resolution** (backend-data
-foundation; el selector de UI es su consumer TASK-1552).
+**Gap de implementación al abrir el delta:** los adapters resolvían el modelo por capacidad y dos modelos del mismo
+proveedor no podían coexistir. **Resuelto por TASK-1553:** la identidad ejecutable se resuelve por ruta, una ruta
+declarada sin entry falla cerrada y el selector consume disponibilidad live. La historia de esta brecha se conserva
+porque explica ADR-013; no representa el runtime actual.
 
-**Evidencia viva (TASK-1535, 2026-07-24):** Nano Banana Pro (`gemini-3-pro-image`) **genera imágenes reales** en el
-proyecto Globe vía endpoint `global`; Nano Banana 2 (`gemini-3.1-flash-image`) pendiente de allowlist del proyecto
-(ask a Google). Los defaults de adapter ya se actualizaron a los frontier (updates legítimos), sin borrar Seedream.
+**Actualización 2026-07-30:** Seedream 5 Pro, Nano Banana Pro, Nano Banana 2, GPT Image 2, GPT Image 1.5 y Recraft
+v4.1 Vector coexisten como rutas disponibles y fueron ejercitados desde el Producer autenticado. El 404 histórico
+de Nano Banana 2 y el bloqueo del verifier OpenAI quedaron superados. Cada futura identidad conserva evaluación,
+revisión, derechos, binding/readiness/circuito y canary UI propios.
 
 ### Outcome (adición)
 
@@ -825,7 +921,7 @@ principio sobre cómo se construyen**. ADR-014 lo hace explícito y su foundatio
   bundle real corre en Chromium real bajo la CSP estricta real sin un solo error. El fallback a
   `vite@7.3.x` se retira.
 - **Cluster ADR-013/ADR-014 en el programa:** `TASK-1553` (resolución de modelo por-ruta) · `TASK-1554`
-  (reader de availability, desplegado) · `TASK-1555` (selector compacto del Producer, in-progress — la galería se rechazó) · `TASK-1556`
+  (reader de availability, desplegado) · `TASK-1555` (selector compacto del Producer, **complete** — la galería se rechazó) · `TASK-1556`
   (esta foundation, **complete**) · `TASK-1557` (CDN de assets, **complete y verificado en vivo**).
 
 ### El programa de ADR-014, completo (creado 2026-07-25)
@@ -886,6 +982,24 @@ Tres decisiones que quedaron fijadas al crear estas tasks:
   *"the same shape of failure that produced 63 unrepeatable colours, one step behind"*. Y la tipografía
   es peor que el color: un peso sin archivo cargado **lo sintetiza el browser** deformando las letras,
   sin fallar ningún gate.
+
+## Delta 2026-08-01 — primer reader Globe federado por MCP, internal-only
+
+`TASK-1473` y `TASK-1626` habilitaron el primer corte real de MCP sin mover el dominio creativo: el gateway
+independiente `efeonce-mcp` publica únicamente `globe.producer.fleet.list` y lo delega al reader canónico de
+Globe. El principal downstream queda limitado a `globe.producer.catalog.read` y al workspace
+`greenhouse-org:efeonce`; no obtiene grants de runs, assets, review, delivery, créditos ni reveal-house.
+
+La evidencia operativa es Globe `001ce1b` / `globe-api-internal-00179-qcz`, gateway `ce593f2` /
+`efeonce-mcp-gateway-00009-9c6` y canary OAuth authorization-code + PKCE por
+`https://mcp.efeonce.org/mcp`: initialize, discovery y la tool respondieron sin provider slug, house, costo de
+vendor ni margen. El gateway es un adapter: no importa DB, storage ni SDKs de proveedores y Cloud Run conserva
+`concurrency=80` con `maxScale=5` efectivo.
+
+Esto **no habilita clientes externos ni completa la paridad MCP de Globe**. El cliente interno Entra recibe ambos
+scopes incluso cuando solicita el base; antes de B2B/multitenant debe separarse la emisión/asignación de
+entitlements y repetirse el deny con una identidad base-only. La paridad de lifecycle, assets, review, delivery y
+writes conserva sus tasks y gates propios.
 
 ## Delta 2026-07-25 — ADR-014 avanza cuatro superficies, y un fallo de gobernanza que vale más que el código
 

@@ -10,7 +10,8 @@ Layering canónico del ecosistema digital (SSOT: `docs/public-site/decisions/PDR
 
 | Superficie | Rol en el funnel | Qué contenido |
 |---|---|---|
-| **Think** (`think.efeoncepro.com`) — hub Astro | demand-gen + nurturing top-of-funnel | El hogar del contenido editorial; render "tonto" de un modelo headless. Repo/Vercel dedicado (NO greenhouse-eo). Marca = tokens AXIS copiados. Ver skill `astro`/efeonce-think |
+| **Think** — producto/hub editorial multi-runtime | demand-gen + nurturing top-of-funnel | Agrupa Marketing con Manzanitas, Glitch, tools y lead magnets. No equivale al host `think.efeoncepro.com`; placement de Pillars por PDR-018 |
+| **`think.efeoncepro.com`** — runtime Astro especializado | tools, reportes y experiencias enfocadas | Repo/Vercel `efeonce-think`; no es el destino automático de artículos o Pillars |
 | **Marketing con Manzanitas** — blog | thought leadership / autoridad / demanda | El blog de contenido; pillars y clusters viven aquí |
 | **Glitch** — newsletter semanal (IA / Marketing / Negocios) | audiencia propia / nurturing | Canal owned de mayor ROI; consume átomos del pillar y genera piezas |
 | **Tools / lead magnets** (AI Visibility Grader, ebooks, webinars) | demand-capture / captura | Contenido gated que convierte audiencia en lead |
@@ -46,7 +47,7 @@ Cadena típica de un pillar de **Marketing con Manzanitas**:
 ```
 Pillar (blog, vía Content Factory) 
   → Glitch (edición dedicada al insight)        [greenhouse-email]
-  → LinkedIn/IG/X (átomos nativos)              [social-media-studio + Metricool]
+  → LinkedIn/IG/X (nodos o activation assets)   [social-media-studio + Metricool]
   → Reel/clip (si aplica)                       [motion-design-studio]
   → Lead magnet gated (si el tema lo amerita)   [03 + growth-forms]
   → Slides sales enablement                     [commercial-expert]
@@ -55,6 +56,8 @@ Pillar (blog, vía Content Factory)
 
 - **Metricool** está conectado (MCP, 10 marcas) y **sí programa posts** (`createScheduledPost`; gotcha `dayOfWeek 1=lun..7=dom`). La ejecución social es de `social-media-studio`.
 - **Redes sociales de Efeonce** y su calendario → `social-media-studio` + landing de redes (TASK-1351).
+- **Cluster federado:** una pieza social sólo entra al registry como nodo cuando resuelve un JTBD autónomo y
+  declara roles, relación y progreso; de lo contrario conserva su rol honesto de activation asset.
 
 ## Voz y contexto (delegado, citado)
 
@@ -76,6 +79,9 @@ El baseline competitivo de la agencia vive en `docs/context/15_panorama-competit
 - **NUNCA** confundir `/aeo-2/` (servicio) con el grader (lead magnet).
 - **NUNCA** publicar output IA crudo (gate de REVIEW + barra de insight/voz).
 - El contenido de Think vive en su **repo dedicado** (efeonce-think, Astro), no en greenhouse-eo.
+- Pertenecer al **producto Think** no fija el host: authoring/render puede vivir en WordPress/apex o Astro, y
+  sólo las rutas especializadas del subdominio viven en `efeonce-think`. Nunca asumir host desde la marca; lo
+  resuelve PDR-018.
 - Las infografías editoriales usan `EFEONCE_EDITORIAL_INFOGRAPHIC_SYSTEM.md`: shell estable, arquetipo elegido por
   relación, sello canónico `efeoncepro.com` y SVG directo cuando gana por seguridad, fidelidad y peso.
 

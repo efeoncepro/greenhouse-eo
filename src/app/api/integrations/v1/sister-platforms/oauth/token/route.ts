@@ -6,6 +6,12 @@ import {
   recordSisterPlatformOAuthAuditEvent,
   SisterPlatformOAuthError
 } from '@/lib/sister-platforms/oauth-broker'
+import {
+  exchangeMcpGatewayToken,
+  McpTokenExchangeError,
+  RFC8693_ACCESS_TOKEN_TYPE,
+  RFC8693_TOKEN_EXCHANGE_GRANT
+} from '@/lib/sister-platforms/mcp-token-exchange'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -49,6 +55,12 @@ const parseTokenPayload = async (request: Request) => {
 
 const asString = (value: unknown) => (typeof value === 'string' ? value.trim() : '')
 
+const parseBearerAuth = (request: Request) => {
+  const authorization = request.headers.get('authorization')?.trim() ?? ''
+
+  return authorization.toLowerCase().startsWith('bearer ') ? authorization.slice('bearer '.length).trim() : ''
+}
+
 const buildOAuthError = (error: SisterPlatformOAuthError) =>
   NextResponse.json(
     {
@@ -57,6 +69,24 @@ const buildOAuthError = (error: SisterPlatformOAuthError) =>
     },
     { status: error.statusCode }
   )
+
+const normalizeTokenExchangeError = (error: McpTokenExchangeError) => {
+  const errorCode =
+    error.code === 'scope_not_allowed'
+      ? 'invalid_scope'
+      : ['identity_not_bound', 'user_not_eligible'].includes(error.code)
+        ? 'invalid_grant'
+        : error.code === 'exchange_disabled'
+          ? 'unauthorized_client'
+          : error.code === 'configuration_missing'
+            ? 'temporarily_unavailable'
+            : error.code
+
+  return new SisterPlatformOAuthError('MCP token exchange rejected.', {
+    statusCode: error.statusCode,
+    errorCode
+  })
+}
 
 export async function POST(request: Request) {
   const startedAt = Date.now()
@@ -67,6 +97,45 @@ export async function POST(request: Request) {
     const basicAuth = parseBasicAuth(request)
     const grantType = asString(payload.grant_type)
 
+    if (grantType === RFC8693_TOKEN_EXCHANGE_GRANT) {
+      if (!request.headers.get('content-type')?.toLowerCase().includes('application/x-www-form-urlencoded')) {
+        throw new McpTokenExchangeError('invalid_request')
+      }
+
+      const exchanged = await exchangeMcpGatewayToken({
+        requestUrl: request.url,
+        workloadToken: parseBearerAuth(request),
+        grantType,
+        clientId: asString(payload.client_id),
+        subjectToken: asString(payload.subject_token),
+        subjectTokenType: asString(payload.subject_token_type),
+        ...(asString(payload.requested_token_type)
+          ? { requestedTokenType: asString(payload.requested_token_type) }
+          : {}),
+        requestedScope: asString(payload.scope),
+        auditMetadata
+      })
+
+      return NextResponse.json(
+        {
+          token_type: 'Bearer',
+          issued_token_type: RFC8693_ACCESS_TOKEN_TYPE,
+          access_token: exchanged.accessToken,
+          expires_in: exchanged.expiresIn,
+          scope: exchanged.scope,
+          correlation_id: exchanged.correlationId
+        },
+        {
+          status: 200,
+          headers: {
+            'cache-control': 'no-store',
+            pragma: 'no-cache',
+            'x-correlation-id': exchanged.correlationId
+          }
+        }
+      )
+    }
+
     if (grantType !== 'authorization_code') {
       throw new SisterPlatformOAuthError('Unsupported grant_type.', {
         statusCode: 400,
@@ -75,7 +144,7 @@ export async function POST(request: Request) {
     }
 
     const clientId = basicAuth?.clientId || asString(payload.client_id)
-    const clientSecret = basicAuth?.clientSecret || asString(payload.client_secret)
+    const clientSecret = basicAuth ? basicAuth.clientSecret : asString(payload.client_secret)
 
     const consumed = await consumeSisterPlatformAuthorizationCode({
       clientId,
@@ -105,7 +174,9 @@ export async function POST(request: Request) {
     )
   } catch (error) {
     const normalized =
-      error instanceof SisterPlatformOAuthError
+      error instanceof McpTokenExchangeError
+        ? normalizeTokenExchangeError(error)
+        : error instanceof SisterPlatformOAuthError
         ? error
         : new SisterPlatformOAuthError('Unexpected token broker failure.', {
             statusCode: 500,

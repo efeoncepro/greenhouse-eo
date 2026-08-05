@@ -1,0 +1,442 @@
+# TASK-1632 — Globe Provider Completion → Asset Governance Event-Driven Handoff
+
+## Delta 2026-08-04 — la brecha que esta task declara se encogió 5×, y eso toca su prioridad
+
+`ISSUE-137` bajó el cron de Asset Governance de `*/5` a `*/1` (`efeonce-globe@d78ce01`, Scheduler live
+`*/1 * * * * ENABLED`). Dos afirmaciones de este archivo quedaron obsoletas:
+
+- **Contexto:** «Asset Governance `*/5 * * * *`» → hoy **`*/1 * * * *`**.
+- **Gap:** «latencia hasta ~5 min por su tick `*/5`» → hoy **hasta ~1 min**.
+
+Medido post-arreglo: governance **183 s** y generación end-to-end **7,9 min** (antes ~1085 s y ~22 min), con
+imagen y video coincidiendo — o sea la latencia era **cadence-bound, no size-bound**.
+
+🔴 **Esto NO invalida la task, pero sí su dimensionamiento.** El wake event-driven sigue siendo correcto por
+razones que no son la latencia: elimina la dependencia del Scheduler como trigger primario observable, y trae
+wake deduplicado, retries/DLQ, IAM y métricas. Lo que cambió es el **beneficio marginal**: ya no ahorra ~5 min
+por asset sino ~1. La task está declarada **P0/Muy alto** apoyándose en parte en esa latencia; **revisar esa
+prioridad antes de tomarla** — puede seguir siendo P0 por las otras razones, pero la justificación tiene que
+decir cuáles, no la que ya se resolvió por otro camino.
+
+También sube el costo del carril actual en el otro eje: `*/1` son 1440 ejecuciones/día en vez de 288, lo que
+hace **más** atractivo el wake por evento a mediano plazo. Es un argumento distinto del original y conviene
+escribirlo como tal.
+
+Fuente: [`ISSUE-137`](../../issues/resolved/ISSUE-137-globe-experiment-running-forever-zero-attempts.md) y
+[ADR-007 § Presupuesto de latencia](../../architecture/creative-studio/EFEONCE_GLOBE_ASSET_GOVERNANCE_WORKER_DECISION_V1.md).
+
+## Delta 2026-08-02 — orden de ejecución: post-lifecycle y post-Omni estable
+
+Esta task no corrige el catálogo, adapter o UI de Gemini Omni y no debe comenzar para desbloquear su canary. El
+Scheduler/reconciler actual continúa siendo un camino válido y durable mientras se estabiliza Omni.
+
+Orden obligatorio:
+
+1. TASK-1469 terminaliza reconciles stale y deja métricas sobre trabajo reclamable.
+2. TASK-1633 + TASK-1504 + TASK-1552 corrigen contrato, ejecución y UI de Omni.
+3. Un canary Omni exacto termina con un cobro, output retenido, lineage, Asset Governance y `canary-confirm`.
+4. Sólo entonces TASK-1632 añade wake event-driven, conservando Scheduler como recovery.
+
+Criterios exigibles adicionales:
+
+- [ ] TASK-1469 está completa con runtime evidence antes del primer apply/cutover de wakes.
+- [ ] TASK-1504 registra un canary Omni terminal y Asset Governance terminal antes del primer apply/cutover de wakes.
+- [ ] El canary de TASK-1632 reutiliza/replayea trabajo durable y no crea una pieza provider adicional.
+- [ ] Ningún cambio de TASK-1632 modifica route contract, policy, rights, provider adapter o UI del composer.
+
+<!-- ZONE 0 — IDENTITY & TRIAGE -->
+
+## Status
+
+- Lifecycle: `to-do`
+- Priority: `P0`
+- Impact: `Muy alto`
+- Effort: `Medio`
+- Type: `implementation`
+- Execution profile: `backend-data`
+- UI impact: `none`
+- UI ready: `n/a`
+- Wireframe: `none`
+- Flow: `none`
+- Motion: `none`
+- Backend impact: `webhook`
+- Epic: `EPIC-028`
+- Status real: `Diseño y pre-auditoría read-only verificados contra runtime (2026-08-02); implementación pendiente`
+- Rank: `next.1`
+- Domain: `platform|integration|data`
+- Blocked by: `TASK-1469`, `TASK-1504 (Omni estable y canary-confirm)`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
+- Legacy ID: `none`
+- GitHub Issue: `none`
+
+## Checkpoint de secuencia 2026-08-02 — unidad posterior a Omni
+
+- La task permanece `to-do`: no existen todavía wake outbox/dispatcher, migración, IAM, flags, despliegue ni
+  canary event-driven que permitan marcar un slice como implementado.
+- El cierre en curso de Gemini Omni bajo `TASK-1504` no implementa esta task. El fix de `auto-promote` ya integrado,
+  su deploy de API/Producer worker y el único canary posterior conservan el trigger periódico vigente; no deben
+  mezclar un cambio polling-first → event-first en el mismo rollout.
+- Esta unidad comienza sólo después del cierre o checkpoint estable de Omni y mantiene su orden:
+  `ADR/audit → durable wake → dispatcher/IAM → failure tests → shadow → internal wake → canary → Scheduler safety-net`.
+- **Greenhouse queda fuera del data path y del runtime.** Sólo gobierna task, ADR, evidencia y handoff; no recibe
+  callbacks, wakes, payloads, estados intermedios ni jobs de Asset Governance. `TASK-1475` conserva cualquier
+  integración cross-product futura bajo un contrato separado.
+- El primer acto de la próxima sesión es auditar el commit transaccional real de `complete` y el enqueue durable
+  de governance; no se elige Cloud Tasks, Pub/Sub, Eventarc ni Jobs API antes de esa evidencia y el ADR.
+- **Pre-auditoría read-only 2026-08-02 (verificada contra código, Slice 0 la incorpora al ADR):** el enqueue de
+  `complete` SÍ es same-transaction (`checkpointCompletion` dentro de `recordCompletionSignal`); el create del job
+  de governance NO — es una `tenantTx` propia, idempotente por `(workspace_id, idempotency_key)` con
+  fingerprint-conflict, y su fallo degrada al código durable `governance_queue_unavailable` que el retry del outbox
+  recupera. Los dos emisores de wake son asimétricos: el de Producer nace en el request path de la API (post-commit,
+  sin retrasar el `202`); el de governance nace dentro del Producer worker (ya async). El ADR debe evaluar el
+  trigger contra ambos emisores, no contra uno genérico.
+
+## Summary
+
+Convertir el callback verificado de Fal en el disparador primario del lifecycle durable de Globe hasta Asset
+Governance. La señal del proveedor se valida y deduplica, adelanta el trabajo durable de finalización, el output se
+recupera y retiene, y el job de Asset Governance se despierta sin depender del siguiente tick periódico. Cloud
+Scheduler permanece como red de reconciliación; Greenhouse no participa de este handoff interno.
+
+## Why This Task Exists
+
+Globe ya recibe el webhook firmado de Fal, conserva raw bytes para verificarlo, normaliza la señal, la deduplica en
+`provider_completion_signals` y crea un `complete` durable en `governed_run_outbox`. Después, el Producer worker
+recupera y retiene el output y el lifecycle existente encola Asset Governance. Sin embargo, tanto Producer worker
+como Asset Governance despiertan principalmente por Scheduler periódico. La señal es durable y transaccional, pero
+el wake-up todavía es polling-first: añade latencia y hace que el callback no cierre por sí mismo la cadena.
+
+La solución no es enviar el body de Fal directamente a Asset Governance ni crear un bridge hacia Greenhouse. El
+webhook sólo informa que una operación de proveedor cambió; la autoridad sigue en los stores, finalizers y workers
+de Globe. La notificación event-driven es una pista recuperable para despertar esos consumidores durables.
+
+## Goal
+
+- Mantener `provider_completion_signals` + `governed_run_outbox` como autoridad durable del callback aceptado.
+- Emitir o registrar atómicamente un wake intent idempotente al quedar disponible trabajo inmediato.
+- Despertar Producer worker para finalizar/retener el output y Asset Governance cuando exista su job durable.
+- Mantener Cloud Scheduler como reconciliación de baja frecuencia y recuperación, no como camino primario.
+- Demostrar callback duplicado, perdido, temprano, tardío y wake perdido sin doble run, doble cobro o doble terminal.
+
+<!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
+
+## Architecture Alignment
+
+Revisar y respetar:
+
+- `docs/architecture/creative-studio/EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md`.
+- `docs/architecture/creative-studio/EFEONCE_GLOBE_ASSET_GOVERNANCE_WORKER_DECISION_V1.md` (ADR-007).
+- `docs/architecture/creative-studio/EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md`.
+- `docs/architecture/creative-studio/EFEONCE_GLOBE_PRODUCER_HUMAN_EXECUTION_DECISION_V1.md`.
+- `docs/epics/in-progress/EPIC-028-efeonce-globe-agentic-creative-studio.md`.
+
+Reglas obligatorias:
+
+- El callback de Fal es provider ingress, no byte authority, rights authority ni evento cross-product.
+- La API verifica firma Ed25519/JWKS sobre raw bytes, timestamp, request ID, tamaño y correlación opaca antes de
+  persistir o activar cualquier wake.
+- La transacción durable manda: una notificación puede duplicarse o perderse; nunca contiene la única copia del
+  trabajo ni ejecuta el lifecycle en el request web.
+- Semántica `at-least-once` con dedupe estable. No se promete exactly-once.
+- El callback persiste señal + checkpoint/outbox antes de responder `202`; el wake ocurre después del commit.
+- Un callback temprano se enlaza al attempt precomprometido; uno tardío o duplicado converge sin revivir terminales.
+- Finalización, retrieval, private ingest, retention y Asset Governance conservan sus boundaries actuales.
+- El evento/wake interno contiene sólo IDs opacos y reason codes; nunca payload Fal, URLs, bytes, prompt, tokens,
+  secretos ni raw errors.
+- Poll/reconcile continúa disponible para proveedores sin webhook y para recuperar pérdida o caída del wake plane.
+- Esta task requiere ADR/addendum para el nuevo trigger cloud, su IAM y el cambio polling-first → event-first.
+
+## Normative Docs
+
+- `docs/tasks/TASK_PROCESS.md`
+- `docs/tasks/TASK_BACKEND_DATA_ADDENDUM.md`
+- `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`
+- `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md`
+- `docs/operations/creative-studio/EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md`
+
+## Dependencies & Impact
+
+### Depends on
+
+- TASK-1469 durable run lifecycle y su outbox ya implementados.
+- ADR-007 y el job durable de Asset Governance ya implementados internal-only.
+- Relay público estrecho y verificación server-side del callback Fal ya desplegados.
+
+### Blocks / Impacts
+
+- Reduce la latencia callback → output retenido → governance terminal y robustece toda ruta Fal promovida.
+- No bloquea ni implementa `TASK-1475`; una proyección futura hacia Greenhouse consume estados canónicos de Globe
+  bajo su propio contrato.
+- No habilita clientes externos, delivery comercial ni una ruta/modelo adicional.
+
+### Files owned
+
+- `../efeonce-globe/apps/creative-runner/src/provider-webhooks.ts`
+- `../efeonce-globe/apps/creative-runner/src/governed-runtime-entry.ts`
+- `../efeonce-globe/apps/creative-runner/src/governed-run-worker.ts`
+- `../efeonce-globe/apps/studio-web/src/app.ts` (ingress `/v1/provider-webhooks/*` + relay web→api; el archivo
+  `governed-runtime-app.ts` no existe — su test `governed-runtime-app.test.ts` ejercita `app.ts`)
+- `../efeonce-globe/packages/domain/src/governed-run-lifecycle.ts`
+- `../efeonce-globe/packages/database/src/stores/governed-run-store.ts`
+- `../efeonce-globe/packages/database/src/stores/asset-governance-job-store.ts`
+- `../efeonce-globe/infra/terraform/`
+- `docs/architecture/creative-studio/`
+- `docs/operations/creative-studio/`
+
+## Current Repo State
+
+### Already exists
+
+- `verifyAndNormalizeFalWebhook` (`apps/creative-runner/src/provider-webhooks.ts`) verifica Ed25519/JWKS sobre el
+  digest del raw body + timestamp window y produce `CompletionSignalV1` sanitizada.
+- `recordCompletionSignal` (`packages/database/src/stores/governed-run-store.ts`) deduplica delivery/event con
+  `ON CONFLICT DO NOTHING`, resuelve correlación incluso en lost-ack vía `callback_correlation_id`, checkpointa
+  `completion_received`, supersede reconcile pendiente y encola `complete` (dedupe key
+  `complete:{workspace}:{attempt}`) — todo dentro de UNA transacción (`checkpointCompletion`).
+- El ingress `/v1/provider-webhooks/(fal|openai)/:correlation` vive en `apps/studio-web/src/app.ts`: en modo `web`
+  actúa como relay estrecho hacia la API; en modo `api` verifica el caller del proxy y delega en
+  `acceptFalWebhook`/`acceptOpenAiWebhook` del governed runtime.
+- Producer worker y Asset Governance reclaman con `FOR UPDATE SKIP LOCKED` + lease/fencing; el worker materializa
+  el resultado una sola vez y retiene bytes.
+- `DurableAssetGovernanceJobStore.create` es idempotente por `(workspace_id, idempotency_key)` con
+  fingerprint-conflict, en `tenantTx` propia; su indisponibilidad degrada al código durable
+  `governance_queue_unavailable` que el retry del outbox recupera.
+- Schedulers Cloud Scheduler → `run.googleapis.com …jobs/…:run` (`retry_config.retry_count=0`,
+  `attempt_deadline=320s`): Producer worker `* * * * *`, Asset Governance `*/5 * * * *`. Un `:run` SIEMPRE crea una
+  ejecución nueva — no hay dedupe server-side; el coalescing es responsabilidad nuestra.
+- Reconciliación recupera trabajo aunque el webhook no llegue.
+
+### Gap
+
+- El commit del `complete` no despierta de forma durable/inmediata al Producer worker (latencia hasta ~60s por el
+  tick minutely).
+- La creación del job de Asset Governance tampoco despierta de forma inmediata a su worker (latencia hasta ~5 min
+  por su tick `*/5`).
+- Scheduler es todavía el trigger primario observable; falta wake deduplicado, retries/DLQ, IAM, métricas y prueba
+  callback→terminal sin esperar el tick.
+
+## Modular Placement Contract
+
+- Topology impact: `worker`
+- Current home: `Globe API + Producer worker + Asset Governance worker`
+- Future candidate home: `remain-shared`
+- Boundary: `provider ingress normalizado → stores/outbox durables → wake dispatcher → workers existentes`
+- Server/browser split: `server-only; el browser no recibe ni emite provider callbacks o wakes`
+- Build impact: `migración/IaC/worker aditivos; ningún file: cross-repo`
+- Extraction blocker: `transacción PostgreSQL, Cloud Run Job IAM y lifecycle durable permanecen en Globe`
+
+## Backend/Data Contract
+
+### Backend/data brief
+
+- Backend rigor: `backend-critical`
+- Impacto principal: `webhook|async`
+- Source of truth afectado: `ninguno nuevo; stores durables de Globe continúan como SSOT`
+- Consumidores afectados: `Producer worker y Asset Governance worker`
+- Runtime target: `Globe API + Cloud Run Jobs`
+
+### Contract surface
+
+- Contrato existente a respetar: `CompletionSignalV1`, `GovernedRunStorePort`, `AssetGovernanceJobStorePort`.
+- Contrato nuevo o modificado: `WorkerWakeIntentV1` o primitive equivalente fijada por ADR, con target, work key,
+  causation/correlation, availableAt y schema version.
+- Backward compatibility: `aditivo; Scheduler/reconcile continúa como fallback durante rollout y rollback`.
+- Full API parity: `reader operativo de wake/lag/recovery; no endpoint creado como click handler`.
+
+### Data model and invariants
+
+- Entidades afectadas: `wake outbox/dispatch receipts` o extensión explícita de un outbox existente; nombres finales
+  sólo después del ADR y auditoría de las migraciones reales.
+- Invariantes: `trabajo durable antes de wake; wake no autoriza trabajo; un work key activo por consumer; terminal
+  no revive; retry no invoca submit; governance no corre antes de private ingest/retention`.
+- Tenant boundary: `workspace sólo desde el attempt/job persistido; nunca desde un campo confiado del webhook`.
+- Idempotency/concurrency: `unique work key, claim leased/fenced, coalescing de bursts, Cloud Run 409/429/5xx
+  clasificados, y no overlap no gobernado`.
+- Audit: `wakeId, target, causationId, deliveryAttempt, disposition, timestamps, lag y error code sanitizado`.
+
+### Event and wake payload minimum
+
+- `wakeId`, `schemaVersion`, `target`, `workKey`, `causationId`, `correlationId`, `availableAt`.
+- Opcionalmente `workspaceId`, `runId`, `attemptId` o `governanceJobId` sólo para trazabilidad tenant-safe.
+- Exclusiones: provider body/headers, response URL, storage handle, prompt, media, credentials y raw errors.
+- El consumidor siempre reclama desde PostgreSQL; nunca procesa trabajo basándose sólo en este payload.
+
+### Delivery and failure semantics
+
+- Publicación: wake intent en la misma transacción que vuelve reclamable el trabajo, o relay post-commit apoyado en
+  outbox durable; nunca dual write sin recovery.
+- Delivery: `at-least-once`, retries acotados con backoff+jitter, coalescing y poison/DLQ observable.
+- Wake perdido: Scheduler/reconciler encuentra el trabajo durable y cierra el lag.
+- Wake duplicado: el segundo trigger no duplica claim, terminal, retention, governance ni cobro.
+- Consumer ocupado: se conserva pending/retry; no se lanza una tormenta de ejecuciones Cloud Run.
+- Callback desconocido: se conserva la señal para el lost-ack window y reconciliation; no se inventa un run.
+
+### Migration, backfill and rollout
+
+- Migration posture: `additive`
+- Default state: `internal-only; event wake OFF y Scheduler actual intacto`
+- Backfill: `sólo wakes para trabajo durable reclamable; nunca replay de provider submit ni generación`
+- Rollout: `shadow receipts → event wake internal-only → bajar frecuencia del Scheduler → mantener safety net`
+- Rollback: `apagar dispatcher/wake, conservar outbox y restaurar Scheduler como trigger primario`
+- External coordination: `GCP IAM/API del trigger seleccionado; Fal no requiere cambio de contrato`
+
+### Security and access
+
+- Auth/access: `service accounts dedicadas y permisos mínimos para publicar/ejecutar sólo el target exacto`.
+- API/Job boundary: `API no recibe run.jobs.run amplio si un dispatcher dedicado puede reducir blast radius`.
+- Sensitive data: `payload allowlisted, logs redacted, ninguna firma/header/body persistido fuera de evidencia mínima`.
+- Abuse controls: `body cap, replay window, dedupe, coalescing, rate limit, retry budget y alertas de burst/lag`.
+
+### Runtime evidence
+
+- Local: firma inválida, body grande, early/lost-ack, duplicate, late, wake lost/duplicate, outage y recovery.
+- DB: señal + complete + wake atómicos; unique/fencing y terminal monotónico.
+- Integration: callback firmado fixture → Producer wake → output retained → governance wake → terminal.
+- Reliability: `wake pending/oldest age`, dispatch failures, scheduler recoveries, callback-to-complete latency y
+  complete-to-governance latency.
+- Production: un canary interno controlado y replay de wake sin provider call ni crédito adicional.
+
+### Acceptance criteria additions
+
+- [ ] Callback aceptado despierta el camino durable sin esperar el siguiente tick periódico.
+- [ ] Perder el wake sólo aumenta latencia: Scheduler/reconciler recupera sin pérdida ni doble efecto.
+- [ ] Asset Governance nunca procesa body, URL o estado declarativo proveniente directamente de Fal.
+
+<!-- ZONE 2 — PLAN MODE: se completa al tomar la task -->
+<!-- ZONE 3 — EXECUTION SPEC -->
+
+## Scope
+
+### Slice 0 — ADR y auditoría del lifecycle existente
+
+- Fijar el trigger cloud, ownership, IAM, coalescing, retries, DLQ, observabilidad y rollback.
+- Documentar qué ya resuelven `provider_completion_signals`, `governed_run_outbox` y governance jobs; no crear un
+  segundo queue/state machine.
+
+### Slice 1 — Wake durable del Producer worker
+
+- Registrar/emitir el wake al quedar disponible `complete` y despacharlo después del commit.
+- Despertar el job con identidad mínima, coalescer bursts y conservar reconcile/Scheduler como safety net.
+- Cubrir callback temprano, lost-ack, duplicado, tardío y worker ocupado.
+
+### Slice 2 — Wake durable de Asset Governance
+
+- Despertar Asset Governance sólo después de que private ingest/retention encole su job durable.
+- Reclamar desde el store existente, mantener orden malware → C2PA → rights y terminal fenced.
+- Evitar que una notificación salte quarantine, rights, lineage o retention.
+
+### Slice 3 — Recovery, observabilidad y cutover internal-only
+
+- Probar pérdida/duplicado/outage, DLQ, replay y recuperación por Scheduler sin provider calls.
+- Medir latencias callback→complete y complete→governance, bajar Scheduler a safety-net sólo con SLO verde.
+- Ejecutar un canary interno y verificar un run/cobro/output/governance, más replay sin gasto.
+
+## Out of Scope
+
+- Greenhouse, `TASK-1475`, eventos cross-product, portfolio o deep links.
+- Reenviar raw webhook o permitir que Fal escriba directamente Asset Governance.
+- Cambiar términos, derechos, policy o elegibilidad del output.
+- Sustituir PostgreSQL/outbox/leases por una cola cloud como SSOT.
+- Habilitar clientes externos, modelos/rutas nuevas o release comercial.
+- Crear una pieza adicional sólo para probar replay/recovery.
+
+## Detailed Spec
+
+La ejecución comienza con `pnpm codex:task-hook TASK-1632 --develop`. El ADR debe escoger el trigger después de
+comparar Cloud Tasks/Pub/Sub/Eventarc/Jobs API contra el runtime real; no se prescribe un servicio por intuición.
+El diseño debe conservar los dos commits de autoridad: provider completion vuelve reclamable `complete`, y el
+finalizer/ingest vuelve reclamable Asset Governance. Cada commit produce un wake recuperable, pero cada worker
+vuelve a leer y reclamar su trabajo desde PostgreSQL.
+
+Restricciones de forma verificadas contra el runtime que el ADR debe honrar:
+
+- **Emisores asimétricos.** El wake del Producer nace en el request path de la API (post-commit, sin retrasar el
+  `202` del webhook); el wake de governance nace dentro del Producer worker (contexto ya async). El trigger elegido
+  debe funcionar para ambos sin acoplar el request web a una llamada cloud síncrona bloqueante.
+- **Wake provider-neutral por construcción.** El ingress ya sirve `fal|openai`; el wake se ancla al commit del
+  outbox/job — nunca a la identidad del proveedor. Un provider nuevo hereda el wake sin trabajo adicional, y la
+  generalización del follow-up es automática, no per-provider.
+- **Coalescing propio.** El endpoint `jobs.run` no deduplica ejecuciones; el work key + ventana de supresión viven
+  en nuestro plano durable, no en el trigger cloud.
+
+## Rollout Plan & Risk Matrix
+
+### Slice ordering hard rule
+
+`ADR/audit → durable wake → dispatcher/IAM → failure tests → shadow → internal wake → canary → Scheduler safety-net`.
+No se reduce Scheduler antes de probar pérdida de wake y reconciliación.
+
+### Risk matrix
+
+| Riesgo | Sistema | Probabilidad | Mitigación | Señal de alerta |
+|---|---|---:|---|---|
+| Wake antes del commit | API/DB | medium | outbox transaccional + dispatcher post-commit | wake sin trabajo reclamable |
+| Tormenta de ejecuciones | cloud trigger | medium | coalescing/work key/rate limit | invocaciones ≫ trabajos |
+| Doble terminal/cobro | lifecycle | low | dedupe + lease/fencing + economic key | >1 terminal o charge |
+| Webhook salta governance | boundary | low | worker reclama store; no direct handoff | job sin ingest/retention |
+| Trigger perdido deja backlog | reliability | medium | Scheduler safety-net + lag alert | oldest pending sobre SLO |
+| IAM amplía blast radius | cloud | low | dispatcher/target exacto + deny tests | API puede ejecutar otros jobs |
+
+### Feature flags / cutover
+
+- Wakes se despliegan OFF; outbox/receipts pueden operar en shadow.
+- Internal-only permite event wake con Scheduler aún minutely.
+- Sólo tras failure tests se baja la frecuencia del Scheduler; nunca se elimina la reconciliación.
+
+### Rollback plan per slice
+
+| Slice | Rollback | Tiempo | Reversible? |
+|---|---|---:|---|
+| Wake publisher | apagar publicación; conservar trabajo durable | <15 min | sí |
+| Dispatcher/trigger | apagar dispatcher; reanudar Scheduler primario | <15 min | sí |
+| Governance wake | apagar wake; job durable queda reclamable | <15 min | sí |
+| Cutover | restaurar frecuencia anterior y reconciliar | <30 min | sí |
+
+### Production verification sequence
+
+Contract/migration tests; IaC plan sin replace/destroy; shadow receipts; firma/duplicate/lost-wake tests; internal
+wake con Scheduler activo; canary único; replay del wake sin provider call/cobro; reducción controlada del polling.
+
+### Out-of-band coordination required
+
+GCP IAM y APIs del trigger seleccionado. No requiere cambio de Fal ni intervención de Greenhouse.
+
+<!-- ZONE 4 — VERIFICATION & CLOSING -->
+
+## Acceptance Criteria
+
+- [ ] ADR/addendum aceptado fija trigger, transacciones, IAM, delivery, coalescing, fallback y SLO.
+- [ ] Firma/body/timestamp/correlación inválidos no persisten señal ni producen wake.
+- [ ] Callback válido persiste/deduplica señal y vuelve reclamable `complete` antes de responder `202`.
+- [ ] Wake primario adelanta Producer worker sin esperar Scheduler y el worker reclama sólo desde el store.
+- [ ] Output queda recuperado, content-addressed, retenido y con lineage antes de encolar governance.
+- [ ] Governance wake ocurre sólo después de su job durable y conserva malware → C2PA → rights.
+- [ ] Duplicado, early/lost-ack, tardío y wake repetido producen un run, un cobro y un terminal.
+- [ ] Wake perdido o dispatcher caído se recupera mediante Scheduler/reconcile sin provider call adicional.
+- [ ] Payloads/logs/receipts no contienen raw webhook, provider URLs, bytes, prompts, secrets ni raw errors.
+- [ ] Métricas prueban SLO de latencia y distinguen event-driven completion de recovery por polling.
+- [ ] Rollout queda internal-only; clientes externos continúan fail-closed.
+
+## Verification
+
+- `pnpm codex:task-hook TASK-1632 --develop`
+- `pnpm task:lint --task TASK-1632`
+- `pnpm ops:lint --changed`
+- `pnpm qa:gates --changed`
+- `pnpm docs:closure-check`
+- `pnpm docs:context-check:strict`
+- `cd ../efeonce-globe && pnpm check && pnpm build`
+- Integration smoke callback→complete→retention→governance con duplicate/lost-wake/replay y readback de cobro.
+
+## Closing Protocol
+
+- [ ] Lifecycle/carpeta, registry, README, EPIC-028, arquitectura, runbook, changelog y Handoff sincronizados.
+- [ ] Migraciones/IAM/flags/triggers/deploys aplicados o estado `rollout pendiente` honesto.
+- [ ] QA release auditor y documentation governor ejecutados.
+- [ ] Evidencia conserva delivery/wake/run/attempt/job IDs, hashes, timestamps, lag y charge sin datos sensibles.
+
+## Follow-ups
+
+- `TASK-1475` puede consumir una proyección terminal de Globe en el futuro, pero no consume ni bloquea este wake
+  interno y debe diseñar su propio contrato cross-product.
+- Generalizar otros provider callbacks sólo si preservan la misma verificación y lifecycle durable.

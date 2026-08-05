@@ -32,6 +32,7 @@ interface Props {
   entryId: string | null
   memberName: string | null
   canApprove: boolean
+  onAdjustmentChanged?: () => void
 }
 
 const STATUS_CHIP: Record<
@@ -87,7 +88,8 @@ const PayrollAdjustmentHistoryDrawer = ({
   onClose,
   entryId,
   memberName,
-  canApprove
+  canApprove,
+  onAdjustmentChanged
 }: Props) => {
   const [adjustments, setAdjustments] = useState<PayrollAdjustment[]>([])
   const [loading, setLoading] = useState(false)
@@ -149,6 +151,7 @@ const PayrollAdjustmentHistoryDrawer = ({
       }
 
       await load()
+      onAdjustmentChanged?.()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No fue posible revertir.')
     } finally {
@@ -173,6 +176,7 @@ const PayrollAdjustmentHistoryDrawer = ({
       }
 
       await load()
+      onAdjustmentChanged?.()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No fue posible aprobar.')
     } finally {

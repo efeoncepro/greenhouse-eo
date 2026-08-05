@@ -1,5 +1,15 @@
 # TASK-1308 — Growth SEO: Keyword Opportunities UI
 
+## Delta 2026-08-05
+
+- **Desbloqueada por TASK-1302 (complete):** `readKeywordOpportunities(seoTargetId, options?)` ya existe en `src/lib/growth/seo/keyword-opportunities-reader.ts` y retorna el contrato `{ ok } | { ok: false, errorCode, status }`. El wireframe la marcaba como "aún no existe en `src/lib/growth/seo/`" — ese supuesto quedó cerrado.
+- **La UI sólo renderiza.** El join, el score y los umbrales viven en el primitive. No recomputar nada en el componente.
+- Campos disponibles por oportunidad: `keyword`, `page`, `position` (ponderada por impresiones), `impressions`, `clicks`, `ctr`, `estimatedClickGain`, `quickWin`, `cannibalized`, `competingPages`, `searchVolume`/`difficulty` (hoy `null`).
+- ⚠️ **`cannibalized` NO es una variante visual de "oportunidad": es otra acción.** Una query con >1 página se resuelve consolidando (301/merge/canonical/diferenciar intención), no optimizando. Necesita su propio tratamiento en la UI, no un chip decorativo.
+- El score se expresa en **clics incrementales estimados**, no en un índice abstracto: la UI puede rotularlo como tal ("+N clics/mes est.").
+- `market: 'unavailable'` mientras TASK-1300 no aterrice → las columnas de volumen/dificultad deben mostrar estado honesto, no `0` ni `—` ambiguo.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

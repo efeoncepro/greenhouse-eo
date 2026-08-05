@@ -19,7 +19,7 @@
 - Rank: `TBD`
 - Domain: `commercial|agency|content|growth`
 - Blocked by: `TASK-1476, TASK-1477, TASK-1523, TASK-1580, TASK-1581, TASK-1582, TASK-1583`
-- Branch: `task/TASK-1596-distribution-activation-layer`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

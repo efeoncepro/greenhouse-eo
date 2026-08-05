@@ -44,7 +44,7 @@ Cuando un agente o persona verifique UI visible de Greenhouse, la evidencia visu
 | Lupa de motion / frames por selector | `pnpm fe:capture:micro --route=/path --selector='[data-capture="x"]'` |
 | Limpieza de artifacts | `pnpm fe:capture:gc [--apply] [--max-gb=N]` |
 
-Playwright ad-hoc solo debe usarse como complemento cuando haga falta inspeccionar consola, network, payloads de API o un gesto que el DSL todavía no soporte. En ese caso, guarda artifacts bajo `.captures/`, explica por qué no alcanzó el helper canónico y convertí el flujo en scenario si se va a repetir.
+Playwright ad-hoc solo debe usarse como complemento cuando haga falta inspeccionar consola, network, payloads de API o un gesto que el DSL todavía no soporte. En ese caso, guarda artifacts bajo `.captures/`, explica por qué no alcanzó el helper canónico y convierte el flujo en scenario si se va a repetir.
 
 Si la captura staging falla por configuración local, por ejemplo `VERCEL_AUTOMATION_BYPASS_SECRET ausente`, documenta ese bloqueo exacto y prueba `--env=local` si la ruta puede validarse contra `pnpm dev`.
 
@@ -387,7 +387,7 @@ export GREENHOUSE_CAPTURE_ACTOR_CAPABILITY=platform.frontend.capture_prod
 pnpm fe:capture <scenario> --env=production --prod
 ```
 
-Solo declaralos si **sabes** que posees la capability vigente. El audit log registra al actor para forensic post-hoc.
+Solo decláralos si **sabes** que posees la capability vigente. El audit log registra al actor para forensic post-hoc.
 
 ## Que significan los estados / señales
 
@@ -403,7 +403,7 @@ Solo declaralos si **sabes** que posees la capability vigente. El audit log regi
 ## Que no hacer
 
 - **NUNCA** ejecutar contra production sin Triple Gate: `GREENHOUSE_CAPTURE_ALLOW_PROD=true` env + `--prod` flag + capability (futuro). Para visualizar production usa production directamente con un browser real.
-- **NUNCA** committear `.captures/` — ya está en `.gitignore`. Si necesitas compartir un artifact, pégalo en un Notion/Drive o adjuntalo a un comentario en PR/GitHub directamente.
+- **NUNCA** committear `.captures/` — ya está en `.gitignore`. Si necesitas compartir un artifact, pégalo en un Notion/Drive o adjúntalo a un comentario en PR/GitHub directamente.
 - **NUNCA** crear scenarios con `mutating: true` que toquen surfaces irreversibles (Pagos, Finiquitos, Releases) sin coordinar primero. Esos scenarios crean entidades reales en staging.
 - **NUNCA** invocar `tsx scripts/frontend/capture.ts` directo — usa siempre `pnpm fe:capture` para que el script entrypoint del package corra el resolve correcto.
 - **NUNCA** reinventar la generación del cookie de agent — el helper delega a `scripts/playwright-auth-setup.mjs` canónico.

@@ -21,7 +21,7 @@
 - Rank: `TBD`
 - Domain: `creative-studio`
 - Blocked by: `TASK-1543`
-- Branch: `task/TASK-1548-globe-storyboard-exports-interoperability`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 
 ## Summary

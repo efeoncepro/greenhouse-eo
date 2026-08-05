@@ -306,10 +306,10 @@ de Chromium. El **`DeckPlan` es el artefacto auditable**: mismos slots → mismo
 **Lo que el composer RECHAZA (y por qué está bien que lo haga):**
 
 - **Copy que no cabe** → `overflow: reject`. **No trunca.** Truncar el texto de una oferta en
-  silencio es peor que fallar: el evaluador lee una frase mutilada y nadie se entera. Reescribí más
+  silencio es peor que fallar: el evaluador lee una frase mutilada y nadie se entera. Reescribe más
   corto.
 - **Una cifra sin `evidenceRef`** → no se compone. Es el principio anti-humo del método, hecho gate.
-- **Un content-type que no calza** → revienta. Significa **falta una plantilla**, no "improvisá".
+- **Un content-type que no calza** → revienta. Significa **falta una plantilla**, no "improvisa".
 - **Cualquier slot que el filler no sepa llenar** → aborta el deck. Ver abajo.
 
 ### ⚠️ La bug class del composer: el FALLO SILENCIOSO
@@ -320,7 +320,7 @@ de ejemplo del prototipo y nadie se entera** — un deck llegando al comité con
 marcados como "el propuesto").
 
 Está cerrado de raíz: **cualquier tipo o campo que el filler no sepa llenar aborta el deck.** Si
-tocás el renderer, **NUNCA** agregues un `default:` silencioso ni un `continue` que deje pasar un
+tocas el renderer, **NUNCA** agregues un `default:` silencioso ni un `continue` que deje pasar un
 slot sin escribir.
 
 ### ⚠️ La otra regla dura: una lámina NO PUEDE MENTIR

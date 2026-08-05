@@ -238,6 +238,13 @@ render job → Cloud Run Job `artifact-worker` → PDF en el asset store, con ga
 accesibilidad/peso y QA visual mecánica) el manual es
 `greenhouse-public-private-tenders/proposal-studio-runtime.md` — shipped 2026-07-12.
 
+**Cierre productivo — regla fail-closed.** Componer y revisar el PDF no equivale a registrar una Proposal.
+En una licitación, `pnpm deck:compose` es el taller local; el camino productivo es `Proposal →
+ResolvedCompositionManifest → render job → artifact-worker → asset versionado`. Antes de declarar el
+deck listo, ejecuta `pnpm tender:canonical-gate <slug>` y exige `status=verified` en
+`docs/commercial/tenders/<slug>/proposal-studio.json`. Un PDF o PNG bajo `.captures/` nunca satisface
+este cierre. Ver `docs/commercial/tenders/PROPOSAL_STUDIO_CLOSURE_SCHEMA.md`.
+
 **De dónde viene el `deck-plan`: es una PROYECCIÓN de la oferta técnica, no se auto-genera.** En una
 licitación el deck-plan vive en el **workspace del deal** (`docs/commercial/tenders/<slug>/`, scaffoldeado
 con `pnpm tender:new`) junto a la `oferta-tecnica.md`. El autor/agente arma el plan **desde** esa oferta
@@ -260,6 +267,79 @@ lámina incorpora un hero, imagen, clip o voz generados, sólo esas operaciones 
 estiman/reservan/liquidan en Creative Studio. Reutilizar un anchor aprobado o derivar el PDF no crea consumo.
 Derechos de stock, talento, música, likeness y licencias se cotizan aparte. Canon:
 `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md`.
+
+### Patrón reusable: segunda licitación con Artifact Composer — Brightcell
+
+Brightcell dejó un patrón de producción reusable para una segunda licitación armada con el
+Artifact Composer y el catálogo de plantillas. No es una secuencia de herramientas agregadas por
+decoración: cada lámina debe avanzar el argumento y mostrar cómo la capacidad se convierte en
+resultado para el cliente.
+
+#### Método paso a paso
+
+1. **Fijar el arquetipo y la tesis.** Confirmar que la propuesta se leerá sin narrador, escribir la
+   única frase gobernante y ordenar la historia según la decisión del comité. La lámina debe poder
+   defenderse sola.
+2. **Traducir la oferta a una cadena de evidencia.** Para capacidades de crecimiento, usar la
+   secuencia `diagnóstico → intervención → operación`: primero se mide la visibilidad y la brecha,
+   luego se muestra qué se corrige en una página o activo, y finalmente cómo se gobierna el trabajo
+   mes a mes.
+3. **Asignar una plantilla por función argumental.** Elegir desde el catálogo cerrado. No introducir
+   una herramienta, un mockup o una lámina de equipo si no responde a una pregunta de la licitación.
+4. **Hacer visibles las capacidades sin convertirlas en inventario.** `ToolStackFull` responde con
+   qué stack se ejecuta la propuesta y `TeamGalleryFull` responde quién la ejecuta y con qué rol.
+   Ambos deben aparecer después de explicar el método y antes del cierre operativo, cuando reducen
+   riesgo de ejecución. No deben funcionar como páginas aisladas de credenciales.
+5. **Usar mockups conceptuales con honestidad.** Un AEO Grader, X-Ray, dashboard de operación o
+   pipeline se presenta como `vista conceptual`, `ejemplo de lectura` o caption equivalente mientras
+   no existan datos reales del cliente. El mockup debe demostrar el flujo de decisión, no inventar
+   scores, resultados, métricas ni testimonios.
+6. **Conectar cada evidencia con la conversión.** El diagnóstico debe llevar a la intervención; la
+   intervención debe llevar a una operación medible; y la operación debe conectar con el CTA del
+   cliente (cotización, agendamiento, formulario o conversación comercial).
+7. **Componer y auditar visualmente.** Ejecutar el Composer, inspeccionar todos los frames y revisar
+   especialmente titulares, recortes, captions, legibilidad de mockups, jerarquía y consistencia de
+   assets. Los tests son piso técnico, no aprobación visual.
+8. **Proteger trabajos previos.** Componer Brightcell en un output y workspace propios, no editar el
+   plan, assets, PDFs ni capturas de SKY para reutilizarlos. Antes del cierre, revisar `git diff` y
+   confirmar que el deck anterior conserva sus archivos y que los nuevos assets están referenciados
+   sólo por el plan del nuevo deal.
+
+#### Secuencia narrativa recomendada
+
+Para una propuesta que combina SEO/AEO, contenido y social media:
+
+`problema del cliente → sistema propuesto → stack y equipo → diagnóstico → intervención →
+operación mensual → conversión y medición → cierre seguro`.
+
+En particular, las láminas de AEO Grader, X-Ray y dashboard no deben aparecer como demos de producto
+sueltas. Deben leerse como tres momentos de una misma promesa: **entender cómo el cliente es
+encontrado, corregir cómo es comprendido y operar cómo convierte**.
+
+Este patrón fue validado por la segunda licitación de referencia, Brightcell, después del primer
+deck producido con el Composer para SKY. La referencia sirve para repetir el método, no para copiar
+datos, branding, screenshots, equipo, métricas ni assets entre propuestas.
+
+### Reglas generales para decks de licitación
+
+- **Separa el deck técnico del económico.** El técnico desarrolla el desafío, la solución, la
+  metodología, el equipo y la evidencia; el económico permite comparar alcance, inversión y
+  condiciones sin esconder el precio dentro de la narrativa técnica.
+- **Usa `PricingFull` para la oferta económica.** La lámina debe mostrar la opción recomendada, el
+  desglose cotizado y las condiciones comerciales desde el snapshot aprobado de la cotización; no
+  se reemplaza por una tabla improvisada ni por texto de otra plantilla.
+- **Haz visibles los valores fiscales.** Cada monto client-facing debe declarar explícitamente si es
+  neto y si el IVA está excluido o incluido. La condición no puede quedar solo en una nota escondida.
+- **Conserva outputs y planes separados.** Cada licitación y cada deck tiene su propio `deck-plan`,
+  output, manifest y carpeta de captura; nunca se reutilizan ni se sobrescriben artefactos de otra
+  licitación.
+- **Revisa visualmente todos los frames antes del cierre.** Inspecciona cada lámina exportada:
+  recortes, jerarquía, legibilidad, captions, assets, firmas y consistencia. Los tests del Composer
+  son necesarios, pero no sustituyen mirar todos los frames.
+- **Pasa el gate de Proposal Studio.** La revisión visual es necesaria, pero el cierre también debe
+  registrar la Proposal, el render job completado, el asset `deck` versionado y la comprobación
+  autenticada del portal. Si falta, el estado es `code complete, rollout pendiente` o bloqueado; no
+  `complete`.
 
 ---
 

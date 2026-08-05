@@ -234,6 +234,6 @@ else
   echo " ⛔ VEREDICTO: NO SEGURO. ${OFFENDER_N} digest(s) sirviendo AHORA caerían en el borrado:"
   printf '%s\n' "${OFFENDERS}" | sed 's/^/    /'
   echo ""
-  echo " Acción: subí KEEP_RECENT o KEEP_DAYS y re-corré. NO pasar a enforced."
+  echo " Acción: subí KEEP_RECENT o KEEP_DAYS y re-corre. NO pasar a enforced."
   exit 1
 fi

@@ -1,15 +1,19 @@
 # Efeonce Globe Creative Producer
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.3
 > **Creado:** 2026-07-23 por Claude
-> **Ultima actualizacion:** 2026-07-29 por Claude (legibilidad y jerarquia de la consola)
+> **Ultima actualizacion:** 2026-08-05 por Codex (benchmark competitivo y estado React revalidado)
 > **Documentacion tecnica:** [Creative Producer V1](../../architecture/creative-studio/EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md) · [ADR-014 — Client Application](../../architecture/creative-studio/EFEONCE_GLOBE_CLIENT_APPLICATION_DECISION_V1.md)
 
 Creative Producer es la consola prompt-first de Globe para crear y continuar activos de imagen, video y audio.
 El diseño aprobado es el producto completo: composer multimodal, referencias privadas, estimación pre-spend,
 biblioteca editorial, viewer/refinamiento, organización, revisión y sharing. Las capacidades no se eliminan cuando
 un backend está apagado; la UI muestra su estado real y el dueño que debe habilitarlo.
+
+El [benchmark comparativo frente a Higgsfield y Magnific](./efeonce-globe-competitive-benchmark.md) documenta
+qué partes de ese workflow ya están entregadas y qué partes siguen pendientes en la superficie React activa.
+La comparación es una referencia de producto fechada, no un cambio al contrato runtime.
 
 ## Qué puede hacer
 
@@ -36,6 +40,23 @@ derivados heredan restricciones de sus padres.
 
 Los modos que necesitan referencias o provenance no se habilitan por apariencia: el Producer consulta la
 autoridad del workspace y los mantiene cerrados si la capability está apagada, denegada o degradada.
+
+## Qué puede pedirle cada ruta: su contrato creativo
+
+Desde `TASK-1633`, cada ruta publica una **ficha versionada** que declara qué operación hace, qué
+archivos acepta y en qué rol (una imagen puede ser el producto, el estilo, el primer cuadro o la
+fuente del movimiento — y son cosas distintas), qué controles creativos honra y por qué mecanismo, y
+qué produce. El servidor la valida **antes** de cotizar y de reservar crédito: pedir un control que
+esa ruta no honra ahora falla con la razón nombrada, en vez de cobrarse y entregar una pieza donde
+nunca se aplicó.
+
+Eso reemplaza —en el contrato, todavía no en la pantalla— la fila de botones por modelo del composer.
+La ficha ya se publica para las 17 rutas; la migración de la UI es `TASK-1552` y aún no ocurrió, así
+que los modos **Crear · Editar · Movimiento · Elementos · Escalar · Cuadros** siguen visibles.
+
+> Detalle técnico: [el contrato creativo de cada ruta](./efeonce-globe-contrato-creativo-ruta.md)
+> (funcional, con los cinco ejes y el estado real) ·
+> [ADR-022](../../architecture/creative-studio/EFEONCE_GLOBE_ROUTE_CREATIVE_CONTRACT_DECISION_V1.md).
 
 ## Cómo se lee la pantalla
 
@@ -123,12 +144,21 @@ Tres límites visibles, para que no se confundan con fallas:
 
 El Producer está **operativo internal-only** para personas autorizadas. Desde la UI se generaron y recuperaron
 Image, Video y Audio reales; el feed hidrató nueve outputs y el viewer sirvió los tres medios. El catálogo expone
-10 rutas, pero hoy sólo tres rutas/modelos tienen promoción durable, binding, circuito y canario: que una ruta
-aparezca en catálogo no significa que esté habilitada.
+hoy 17 rutas —cada una con su contrato creativo—, pero sólo una parte tiene promoción durable, binding, circuito
+y canario: que una ruta aparezca en catálogo no significa que esté habilitada. El estado real por ruta/modelo, con
+su evidencia, vive en el
+[ledger de la flota](../../operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md); la verdad live de
+disponibilidad para quien consume es la propia flota del Producer.
 
 Los originales se alojan en GCS privado por hash; el bucket no autoriza acceso. Globe valida workspace, ownership,
 estado e integridad antes de servirlos mediante un grant corto same-origin. Una sesión válida con CSRF rotado se
 recupera automáticamente; una sesión realmente expirada todavía necesita un CTA de reautenticación más claro.
+
+El benchmark del 2026-08-05 revalidó una diferencia importante entre contrato y consumer: ProducerFeedRoute todavía
+deja Reference, Recreate, Favorite y Download sin handlers reales, y ProducerComposer todavía no consume
+creativeContract de forma completa. Por eso las listas de capacidades anteriores describen el producto aprobado
+y sus contratos, no una afirmación de que cada acción esté operativa en la UI React actual. El estado de esas
+brechas vive en TASK-1643, TASK-1552 y Handoff. TASK-1641 conserva únicamente el lane backend/API de promoción.
 
 Continúan abiertos la limpieza semántica de reconciliaciones obsoletas que inflan la edad de cola, la promoción
 independiente de las otras siete rutas y la arquitectura de derivados/streaming para previews grandes. Clientes

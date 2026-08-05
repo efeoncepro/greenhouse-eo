@@ -160,6 +160,7 @@ Indice maestro de la documentacion no operativa del repo.
 
 - [Audits Index](audits/README.md)
 - Regla de uso: las auditorias deben consumirse frecuentemente cuando el trabajo toque esa zona, pero siempre revalidando si sus hallazgos siguen vigentes o si hace falta una auditoria nueva/refresh.
+- [Globe UI competitive benchmark — Higgsfield y Magnific — 2026-08-05](audits/competitive-ui/GLOBE_COMPETITIVE_BENCHMARK_HIGGSFIELD_MAGNIFIC_2026-08-05.md)
 - [ICO Audits](audits/ico/README.md)
 - [ICO_ENGINE_AUDIT_2026-04-30.md](audits/ico/ICO_ENGINE_AUDIT_2026-04-30.md)
 - [Notion Audits](audits/notion/README.md)
@@ -169,12 +170,14 @@ Indice maestro de la documentacion no operativa del repo.
 ### Operations
 
 - [Issue Tracker](issues/README.md)
+- [Efeonce Partnership Registry V1](operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md)
 - [AXIS Private Package Consumption Runbook](operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md)
 - [Agent Context History](operations/agent-context-history/README.md)
 - [Agent Context Router Decision](architecture/GREENHOUSE_AGENT_CONTEXT_ROUTER_DECISION_V1.md)
 - [SOLUTION_QUALITY_OPERATING_MODEL_V1.md](operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md)
 - [ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md](operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md)
-- [MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md](operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md)
+- [Multi-Agent Shared Workspace Operating Model](operations/MULTI_AGENT_SHARED_WORKSPACE_OPERATING_MODEL_V1.md)
+- [Repository Shared Workspace Agent Invariants](architecture/agent-invariants/REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md)
 - [Mini Task Operating Model](operations/MINI_TASK_OPERATING_MODEL_V1.md)
 - [DOCUMENTATION_OPERATING_MODEL_V1.md](operations/DOCUMENTATION_OPERATING_MODEL_V1.md)
 - [CONTEXT_HANDOFF_OPERATING_MODEL_V1.md](operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md)

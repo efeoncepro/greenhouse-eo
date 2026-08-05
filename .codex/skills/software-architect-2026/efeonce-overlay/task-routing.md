@@ -21,4 +21,6 @@ Give the work planner:
 - implementation slices, dependencies, rollout, rollback, recovery, and decommissioning;
 - runtime completeness requirements and risks requiring human authority.
 
-Use canonical repository paths. Do not prescribe branch, worktree, commit, push, PR, merge, deploy, or release behavior from this overlay; the active repository/operator contract owns those actions.
+Use canonical repository paths. Do not prescribe branch, commit, push, PR, merge, deploy, or release behavior from
+this overlay; the active repository/operator contract owns those actions. In Greenhouse, that contract requires the
+current shared checkout and prohibits worktrees, isolated checkouts and cloned folders.

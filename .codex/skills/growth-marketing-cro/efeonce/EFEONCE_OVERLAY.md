@@ -52,6 +52,12 @@ NO invade:
 - `docs/architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_TRACKING_ENGINE_ARCHITECTURE_V1.md` (Proposed)
-- `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` (Search Visibility 360, EPIC-022)
+- `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` (Search Visibility 360, EPIC-022 — motor real al
+  2026-08-05 fin de día: COMPLETE TASK-1299 schema `greenhouse_growth.seo_*` + TASK-1301 entitlement per-org
+  `seo_v1` con chokepoint `enforceSeoRunEntitlement` en `src/lib/growth/seo/entitlement.ts` + TASK-1300 registry
+  DataForSEO/ledger + TASK-1302 materializer GSC LIVE (`readKeywordOpportunities`) + TASK-1305
+  `readSeoAeoGap`/quadrant SEO×AEO (primer quadrant real: Berel → `riesgo`); TASK-1645 lane ecosystem + 3 MCP
+  tools code-complete (federación gateway = TASK-1647); regla: todo reader SEO/E-E-A-T futuro expone su MCP tool
+  en el mismo PR; destino Wave `wave.efeonce.org` §17/EPIC-037; aún sin superficie cliente)
 - `docs/architecture/GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md` (funnel comercial)
 - Código: `src/lib/growth/**`

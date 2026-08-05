@@ -1,0 +1,371 @@
+- generic [ref=f13e1] [box=0,0,1200,12047]:
+  - generic [ref=f13e2] [box=0,0,1200,12047]:
+    - region "Notifications (F8)" [box=0,0,1200,0]:
+      - list [box=0,0,1200,0]
+    - link "Freepik is now Magnific" [ref=f13e4] [cursor=pointer] [box=512,12,176,22]:
+      - /url: /freepik#from_element=topbar_banner
+    - generic [ref=f13e7] [box=0,47,1200,12000]:
+      - banner [ref=f13e8] [box=0,47,1200,72]:
+        - generic [ref=f13e9] [box=0,47,1200,72]:
+          - generic [ref=f13e10] [box=32,59,553,48]:
+            - link "Magnific" [ref=f13e11] [cursor=pointer] [box=32,61,144,44]:
+              - /url: https://www.magnific.com
+            - navigation [ref=f13e15] [box=216,59,369,48]:
+              - button "Creative Suite" [expanded] [active] [ref=f13e16] [cursor=pointer] [box=216,59,103,48]
+              - dialog "Creative Suite" [ref=f13e1049] [box=196,107,910,548]:
+                - generic [ref=f13e1051] [box=228,155,846,460]
+              - button "Stock" [ref=f13e18] [cursor=pointer] [box=351,59,43,48]
+              - generic [box=351,107,0,8]:
+                - dialog "Stock" [box=351,107,0,8]
+              - button "Resources" [ref=f13e20] [cursor=pointer] [box=426,59,77,48]
+              - generic [box=426,107,0,8]:
+                - dialog "Resources" [box=426,107,0,8]
+              - generic [box=0,0,0,8]:
+                - dialog "Enterprise" [box=0,0,0,8]
+              - link "Pricing" [ref=f13e22] [cursor=pointer] [box=535,59,51,48]:
+                - /url: /pricing?origin=magnific_web#from_element=mainmenu
+          - generic [ref=f13e23] [box=815,63,353,40]:
+            - button "Search or create" [ref=f13e24] [box=815,63,168,40]
+            - generic [ref=f13e28] [box=999,63,169,40]:
+              - link "Log in" [ref=f13e29] [cursor=pointer] [box=999,63,72,40]:
+                - /url: https://www.magnific.com/log-in?client_id=magnific&lang=en
+              - link "Sign up" [ref=f13e30] [cursor=pointer] [box=1086,63,82,40]:
+                - /url: https://www.magnific.com/sign-up?client_id=magnific&lang=en#from_element=home_topbar
+      - main [ref=f13e31] [box=0,47,1200,12000]:
+        - generic [ref=f13e33] [box=0,47,1200,830]:
+          - generic [ref=f13e34] [box=80,143,1040,580]:
+            - generic [ref=f13e35] [box=80,266,646,335]:
+              - 'link "Ranked #1 AI creative platform Read a16z report" [ref=f13e36] [cursor=pointer] [box=80,266,336,37]':
+                - /url: https://a16z.com/100-gen-ai-apps-6/
+                - generic [ref=f13e37] [box=97,275,167,19]: "Ranked #1 AI creative platform"
+                - generic [ref=f13e38] [box=276,275,93,19]: Read a16z report
+              - heading "The creative platform to direct your best work" [level=1] [ref=f13e41] [box=80,327,646,132]
+              - paragraph [ref=f13e42] [box=80,483,646,54]: Every AI model for video, image, and audio. Intelligent workflows for professional control and collaboration. On-brand production at any scale.
+              - generic [ref=f13e43] [box=80,561,646,40]:
+                - link "Start creating" [ref=f13e44] [cursor=pointer] [box=80,561,140,40]:
+                  - /url: https://www.magnific.com/sign-up?client_id=magnific&lang=en#from_element=home_hero
+                - button "Why Magnific?" [ref=f13e45] [cursor=pointer] [box=236,561,171,40]
+            - generic [ref=f13e54] [box=818,-1037,302,3000]:
+              - generic [ref=f13e55] [box=818,-1037,302,60]: Build workflows
+              - generic [ref=f13e57] [box=818,-977,302,60]: Video upscaling
+              - generic [ref=f13e59] [box=818,-917,302,60]: Direct photoshoots
+              - generic [ref=f13e61] [box=818,-857,302,60]: Cast characters
+              - generic [ref=f13e63] [box=818,-797,302,60]: Stay on brand
+              - generic [ref=f13e65] [box=818,-737,302,60]: Upscale to 4K
+              - generic [ref=f13e67] [box=818,-677,302,60]: Draft storyboards
+              - generic [ref=f13e69] [box=818,-617,302,60]: Scale campaigns
+              - generic [ref=f13e71] [box=818,-557,302,60]: Generate images
+              - generic [ref=f13e73] [box=818,-497,302,60]: Shoot cinematic videos
+              - generic [ref=f13e75] [box=818,-437,302,60]: Build workflows
+              - generic [ref=f13e77] [box=818,-377,302,60]: Video upscaling
+              - generic [ref=f13e79] [box=818,-317,302,60]: Direct photoshoots
+              - generic [ref=f13e81] [box=818,-257,302,60]: Cast characters
+              - generic [ref=f13e83] [box=818,-197,302,60]: Stay on brand
+              - generic [ref=f13e85] [box=818,-137,302,60]: Upscale to 4K
+              - generic [ref=f13e87] [box=818,-77,302,60]: Draft storyboards
+              - generic [ref=f13e89] [box=818,-17,302,60]: Scale campaigns
+              - generic [ref=f13e91] [box=818,43,302,60]: Generate images
+              - generic [ref=f13e93] [box=818,103,302,60]: Shoot cinematic videos
+              - generic [ref=f13e95] [box=818,163,302,60]: Build workflows
+              - generic [ref=f13e97] [box=818,223,302,60]: Video upscaling
+              - generic [ref=f13e99] [box=818,283,302,60]: Direct photoshoots
+              - generic [ref=f13e101] [box=818,343,302,60]: Cast characters
+              - generic [ref=f13e103] [box=818,403,302,60]: Stay on brand
+              - generic [ref=f13e105] [box=818,463,302,60]: Upscale to 4K
+              - generic [ref=f13e107] [box=818,523,302,60]: Draft storyboards
+              - generic [ref=f13e109] [box=818,583,302,60]: Scale campaigns
+              - generic [ref=f13e111] [box=818,643,302,60]: Generate images
+              - generic [ref=f13e113] [box=818,703,302,60]: Shoot cinematic videos
+              - generic [ref=f13e115] [box=818,763,302,60]: Build workflows
+              - generic [ref=f13e117] [box=818,823,302,60]: Video upscaling
+              - generic [ref=f13e119] [box=818,883,302,60]: Direct photoshoots
+              - generic [ref=f13e121] [box=818,943,302,60]: Cast characters
+              - generic [ref=f13e123] [box=818,1003,302,60]: Stay on brand
+              - generic [ref=f13e125] [box=818,1063,302,60]: Upscale to 4K
+              - generic [ref=f13e127] [box=818,1123,302,60]: Draft storyboards
+              - generic [ref=f13e129] [box=818,1183,302,60]: Scale campaigns
+              - generic [ref=f13e131] [box=818,1243,302,60]: Generate images
+              - generic [ref=f13e133] [box=818,1303,302,60]: Shoot cinematic videos
+              - generic [ref=f13e135] [box=818,1363,302,60]: Build workflows
+              - generic [ref=f13e137] [box=818,1423,302,60]: Video upscaling
+              - generic [ref=f13e139] [box=818,1483,302,60]: Direct photoshoots
+              - generic [ref=f13e141] [box=818,1543,302,60]: Cast characters
+              - generic [ref=f13e143] [box=818,1603,302,60]: Stay on brand
+              - generic [ref=f13e145] [box=818,1663,302,60]: Upscale to 4K
+              - generic [ref=f13e147] [box=818,1723,302,60]: Draft storyboards
+              - generic [ref=f13e149] [box=818,1783,302,60]: Scale campaigns
+              - generic [ref=f13e151] [box=818,1843,302,60]: Generate images
+              - generic [ref=f13e153] [box=818,1903,302,60]: Shoot cinematic videos
+          - generic [ref=f13e156] [box=80,771,1040,74]:
+            - paragraph [ref=f13e157] [box=368,771,465,22]: Trusted by 1M+ subscribers—creatives, enterprises, agencies and studios
+            - generic [ref=f13e158] [box=240,818,720,28]:
+              - img "coca-cola" [ref=f13e159] [box=240,818,100,28]
+              - img "ogilvy" [ref=f13e160] [box=372,818,80,28]
+              - img "rga" [ref=f13e161] [box=484,822,60,20]
+              - img "wonder" [ref=f13e162] [box=576,822,110,20]
+              - img "guess" [ref=f13e163] [box=718,822,100,20]
+              - img "deliveryhero" [ref=f13e164] [box=850,820,110,24]
+        - generic [ref=f13e165] [box=0,878,1200,11169]:
+          - generic [ref=f13e166] [box=0,878,1200,1087]:
+            - generic [ref=f13e167] [box=0,986,1200,197]:
+              - generic [ref=f13e170] [box=32,986,1136,86]:
+                - heading "One place to create anything" [level=2] [ref=f13e171] [box=264,986,672,43]
+                - paragraph [ref=f13e172] [box=264,1045,672,27]: Pick your starting point. Every tool, every model, every format.
+              - tablist [ref=f13e174] [box=267,1128,666,54]:
+                - tab "Creative Suite" [selected] [ref=f13e176] [cursor=pointer] [box=273,1134,138,42]
+                - tab "MCP & API New" [ref=f13e177] [cursor=pointer] [box=411,1134,158,42]
+                - tab "Agents New" [ref=f13e179] [cursor=pointer] [box=569,1134,135,42]
+                - tab "Plugins New" [ref=f13e181] [cursor=pointer] [box=704,1134,137,42]
+                - tab "Stock" [ref=f13e183] [cursor=pointer] [box=841,1134,86,42]
+            - tabpanel "Creative Suite" [ref=f13e186] [box=32,1206,1136,650]:
+              - generic [ref=f13e189] [box=64,1731,1072,94]:
+                - heading "Pro-level production, end to end" [level=2] [ref=f13e190] [box=64,1731,1072,25]
+                - paragraph [ref=f13e191] [box=64,1764,1072,22]: Start with an idea. Direct the shots. Add sound. Explore variations. Explore workflows. Connect in Spaces. Your team, creating together.
+                - button "Take a tour" [ref=f13e193] [cursor=pointer] [box=64,1802,95,22]
+          - generic [ref=f13e197] [box=0,1964,1200,633]:
+            - generic [ref=f13e201] [box=32,2060,1136,113]:
+              - heading "With all the latest models" [level=2] [ref=f13e202] [box=264,2060,672,43]
+              - paragraph [ref=f13e203] [box=264,2120,672,54]: Get access to the world's leading AI companies so you never have to choose between the best models and the easiest workflow.
+            - generic [ref=f13e205] [box=0,2222,1200,280]:
+              - link "GPT 2" [ref=f13e206] [cursor=pointer] [box=0,2222,220,280]:
+                - /url: https://www.magnific.com/gpt-image-2#from_element=home_anon_ai_models
+              - link "Nano Banana 2" [ref=f13e215] [cursor=pointer] [box=228,2222,220,280]:
+                - /url: https://www.magnific.com/nano-banana-2#from_element=home_anon_ai_models
+              - link "Grok Imagine" [ref=f13e224] [cursor=pointer] [box=456,2222,220,280]:
+                - /url: https://www.magnific.com/grok-imagine#from_element=home_anon_ai_models
+              - link "Happyhorse 1" [ref=f13e233] [cursor=pointer] [box=684,2222,220,280]:
+                - /url: https://www.magnific.com/happyhorse-1#from_element=home_anon_ai_models
+              - link "Krea 2" [ref=f13e242] [cursor=pointer] [box=912,2222,220,280]:
+                - /url: https://www.magnific.com/krea-2#from_element=home_anon_ai_models
+              - link "Veo 3" [ref=f13e251] [cursor=pointer] [box=1140,2222,220,280]:
+                - /url: https://www.magnific.com/google-veo-3-1#from_element=home_anon_ai_models
+              - link "Seedream 5" [ref=f13e260] [cursor=pointer] [box=1368,2222,220,280]:
+                - /url: https://www.magnific.com/seedream-5#from_element=home_anon_ai_models
+              - link "Seedance 2" [ref=f13e269] [cursor=pointer] [box=1596,2222,220,280]:
+                - /url: https://www.magnific.com/seedance-2#from_element=home_anon_ai_models
+              - link "Kling 3" [ref=f13e278] [cursor=pointer] [box=1824,2222,220,280]:
+                - /url: https://www.magnific.com/kling-3-0#from_element=home_anon_ai_models
+              - link "Flux 2" [ref=f13e287] [cursor=pointer] [box=2052,2222,220,280]:
+                - /url: https://www.magnific.com/flux-2-pro#from_element=home_anon_ai_models
+              - link "ElevenLabs" [ref=f13e296] [cursor=pointer] [box=2280,2222,220,280]:
+                - /url: https://www.magnific.com/elevenlabs#from_element=home_anon_ai_models
+              - link "Runway Gen 4.5" [ref=f13e305] [cursor=pointer] [box=2508,2222,220,280]:
+                - /url: https://www.magnific.com/runway-gen-4-5#from_element=home_anon_ai_models
+              - link "Wan" [ref=f13e314] [cursor=pointer] [box=2736,2222,220,280]:
+                - /url: https://www.magnific.com/wan-2-6#from_element=home_anon_ai_models
+              - link "Minimax" [ref=f13e323] [cursor=pointer] [box=2964,2222,220,280]:
+                - /url: https://www.magnific.com/minimax-hailuo-2-3#from_element=home_anon_ai_models
+              - link "GPT 2" [ref=f13e332] [cursor=pointer] [box=3192,2222,220,280]:
+                - /url: https://www.magnific.com/gpt-image-2#from_element=home_anon_ai_models
+              - link "Nano Banana 2" [ref=f13e341] [cursor=pointer] [box=3420,2222,220,280]:
+                - /url: https://www.magnific.com/nano-banana-2#from_element=home_anon_ai_models
+              - link "Grok Imagine" [ref=f13e350] [cursor=pointer] [box=3648,2222,220,280]:
+                - /url: https://www.magnific.com/grok-imagine#from_element=home_anon_ai_models
+              - link "Happyhorse 1" [ref=f13e359] [cursor=pointer] [box=3876,2222,220,280]:
+                - /url: https://www.magnific.com/happyhorse-1#from_element=home_anon_ai_models
+              - link "Krea 2" [ref=f13e368] [cursor=pointer] [box=4104,2222,220,280]:
+                - /url: https://www.magnific.com/krea-2#from_element=home_anon_ai_models
+              - link "Veo 3" [ref=f13e377] [cursor=pointer] [box=4332,2222,220,280]:
+                - /url: https://www.magnific.com/google-veo-3-1#from_element=home_anon_ai_models
+              - link "Seedream 5" [ref=f13e386] [cursor=pointer] [box=4560,2222,220,280]:
+                - /url: https://www.magnific.com/seedream-5#from_element=home_anon_ai_models
+              - link "Seedance 2" [ref=f13e395] [cursor=pointer] [box=4788,2222,220,280]:
+                - /url: https://www.magnific.com/seedance-2#from_element=home_anon_ai_models
+              - link "Kling 3" [ref=f13e404] [cursor=pointer] [box=5016,2222,220,280]:
+                - /url: https://www.magnific.com/kling-3-0#from_element=home_anon_ai_models
+              - link "Flux 2" [ref=f13e413] [cursor=pointer] [box=5244,2222,220,280]:
+                - /url: https://www.magnific.com/flux-2-pro#from_element=home_anon_ai_models
+              - link "ElevenLabs" [ref=f13e422] [cursor=pointer] [box=5472,2222,220,280]:
+                - /url: https://www.magnific.com/elevenlabs#from_element=home_anon_ai_models
+              - link "Runway Gen 4.5" [ref=f13e431] [cursor=pointer] [box=5700,2222,220,280]:
+                - /url: https://www.magnific.com/runway-gen-4-5#from_element=home_anon_ai_models
+              - link "Wan" [ref=f13e440] [cursor=pointer] [box=5928,2222,220,280]:
+                - /url: https://www.magnific.com/wan-2-6#from_element=home_anon_ai_models
+              - link "Minimax" [ref=f13e449] [cursor=pointer] [box=6156,2222,220,280]:
+                - /url: https://www.magnific.com/minimax-hailuo-2-3#from_element=home_anon_ai_models
+              - link "GPT 2" [ref=f13e458] [cursor=pointer] [box=6384,2222,220,280]:
+                - /url: https://www.magnific.com/gpt-image-2#from_element=home_anon_ai_models
+              - link "Nano Banana 2" [ref=f13e467] [cursor=pointer] [box=6612,2222,220,280]:
+                - /url: https://www.magnific.com/nano-banana-2#from_element=home_anon_ai_models
+              - link "Grok Imagine" [ref=f13e476] [cursor=pointer] [box=6840,2222,220,280]:
+                - /url: https://www.magnific.com/grok-imagine#from_element=home_anon_ai_models
+              - link "Happyhorse 1" [ref=f13e485] [cursor=pointer] [box=7068,2222,220,280]:
+                - /url: https://www.magnific.com/happyhorse-1#from_element=home_anon_ai_models
+              - link "Krea 2" [ref=f13e494] [cursor=pointer] [box=7296,2222,220,280]:
+                - /url: https://www.magnific.com/krea-2#from_element=home_anon_ai_models
+              - link "Veo 3" [ref=f13e503] [cursor=pointer] [box=7524,2222,220,280]:
+                - /url: https://www.magnific.com/google-veo-3-1#from_element=home_anon_ai_models
+              - link "Seedream 5" [ref=f13e512] [cursor=pointer] [box=7752,2222,220,280]:
+                - /url: https://www.magnific.com/seedream-5#from_element=home_anon_ai_models
+              - link "Seedance 2" [ref=f13e521] [cursor=pointer] [box=7980,2222,220,280]:
+                - /url: https://www.magnific.com/seedance-2#from_element=home_anon_ai_models
+              - link "Kling 3" [ref=f13e530] [cursor=pointer] [box=8208,2222,220,280]:
+                - /url: https://www.magnific.com/kling-3-0#from_element=home_anon_ai_models
+              - link "Flux 2" [ref=f13e539] [cursor=pointer] [box=8436,2222,220,280]:
+                - /url: https://www.magnific.com/flux-2-pro#from_element=home_anon_ai_models
+              - link "ElevenLabs" [ref=f13e548] [cursor=pointer] [box=8664,2222,220,280]:
+                - /url: https://www.magnific.com/elevenlabs#from_element=home_anon_ai_models
+              - link "Runway Gen 4.5" [ref=f13e557] [cursor=pointer] [box=8892,2222,220,280]:
+                - /url: https://www.magnific.com/runway-gen-4-5#from_element=home_anon_ai_models
+              - link "Wan" [ref=f13e566] [cursor=pointer] [box=9120,2222,220,280]:
+                - /url: https://www.magnific.com/wan-2-6#from_element=home_anon_ai_models
+              - link "Minimax" [ref=f13e575] [cursor=pointer] [box=9348,2222,220,280]:
+                - /url: https://www.magnific.com/minimax-hailuo-2-3#from_element=home_anon_ai_models
+          - generic [ref=f13e585] [box=0,2706,1200,1211]:
+            - generic [ref=f13e587] [box=32,2706,1136,129]:
+              - generic [ref=f13e588] [box=32,2706,930,129]:
+                - heading "Start simple. Scale when you're ready" [level=2] [ref=f13e589] [box=32,2706,672,86]: Start simple.Scale when you're ready
+                - paragraph [ref=f13e590] [box=32,2808,672,27]: From a single tool to a complete workflow, at your own pace.
+              - link "Start creating" [ref=f13e592] [cursor=pointer] [box=994,2785,174,50]:
+                - /url: https://www.magnific.com/sign-up?client_id=magnific&lang=en#from_element=home_start_simple
+            - generic [ref=f13e595] [box=32,2891,1136,1026]:
+              - article [ref=f13e596] [box=32,2891,560,560]:
+                - generic [ref=f13e597] [box=32,2891,560,183]
+              - article [ref=f13e600] [box=608,2891,560,560]:
+                - generic [ref=f13e601] [box=608,2891,560,245]
+              - article [ref=f13e604] [box=32,3467,560,450]:
+                - generic [ref=f13e605] [box=32,3467,560,183]
+              - article [ref=f13e608] [box=608,3467,560,450]:
+                - generic [ref=f13e609] [box=608,3467,560,183]
+          - generic [ref=f13e612] [box=0,4025,1200,586]:
+            - generic [ref=f13e613] [box=0,4121,1200,177]:
+              - generic [ref=f13e614] [box=32,4121,1136,85]:
+                - heading "Pick a tool, start creating" [level=2] [ref=f13e615] [box=32,4121,576,43]
+                - paragraph [ref=f13e616] [box=32,4180,672,26]: Generate, upscale, edit—your creative workflow starts here.
+              - generic [ref=f13e617] [box=32,4246,1136,52]:
+                - group "Pick a tool, start creating" [ref=f13e618] [box=32,4246,366,52]
+                - generic [ref=f13e625] [box=1080,4252,88,40]
+            - list [ref=f13e633] [box=0,4330,1776,177]:
+              - listitem [ref=f13e634] [box=32,4330,200,177]:
+                - link "AI Image Generator Create top-quality images with the best AI models" [ref=f13e635] [cursor=pointer] [box=32,4330,200,177]:
+                  - /url: https://www.magnific.com/ai/image-generator#from_element=home_featured_ai_tools
+              - listitem [ref=f13e644] [box=248,4330,200,177]:
+                - link "Video Generator Create videos from text, image, or both" [ref=f13e645] [cursor=pointer] [box=248,4330,200,177]:
+                  - /url: https://www.magnific.com/ai/video-generator#from_element=home_featured_ai_tools
+              - listitem [ref=f13e652] [box=464,4330,200,177]:
+                - link "Image Upscaler Upscale images up to 10K with real detail" [ref=f13e653] [cursor=pointer] [box=464,4330,200,177]:
+                  - /url: https://www.magnific.com/ai/image-upscaler#from_element=home_featured_ai_tools
+              - listitem [ref=f13e660] [box=680,4330,200,177]:
+                - link "Image Editor Retouch, adjust, and refine photos in seconds" [ref=f13e661] [cursor=pointer] [box=680,4330,200,177]:
+                  - /url: https://www.magnific.com/ai/photo-editor#from_element=home_featured_ai_tools
+              - listitem [ref=f13e668] [box=896,4330,200,177]:
+                - link "Background Remover Remove any background in one click" [ref=f13e669] [cursor=pointer] [box=896,4330,200,177]:
+                  - /url: https://www.magnific.com/ai/background-remover#from_element=home_featured_ai_tools
+              - listitem [ref=f13e676] [box=1112,4330,200,177]:
+                - link "Text to Speech Turn your text into natural speech, in any voice" [ref=f13e677] [cursor=pointer] [box=1112,4330,200,177]:
+                  - /url: https://www.magnific.com/ai/voice-generator#from_element=home_featured_ai_tools
+              - listitem [ref=f13e686] [box=1328,4330,200,177]:
+                - link "Change camera angle Reframe any shot from a new angle" [ref=f13e687] [cursor=pointer] [box=1328,4330,200,177]:
+                  - /url: https://www.magnific.com/ai/change-camera#from_element=home_featured_ai_tools
+              - listitem [ref=f13e694] [box=1544,4330,200,177]:
+                - link "All tools" [ref=f13e695] [cursor=pointer] [box=1544,4330,200,177]:
+                  - /url: https://www.magnific.com/ai#from_element=home_featured_ai_tools
+          - generic [ref=f13e701] [box=0,4611,1200,1271]:
+            - generic [ref=f13e703] [box=32,4719,1136,113]:
+              - generic [ref=f13e704] [box=32,4719,930,113]:
+                - heading "From product shot to viral phenomenon" [level=2] [ref=f13e705] [box=32,4719,672,43]
+                - paragraph [ref=f13e706] [box=32,4778,672,54]: Global on-brand campaigns, product shots, and top-tier filmmaking. Everything a brand needs to show up at the highest level, in every format, every time.
+              - link "Start creating" [ref=f13e708] [cursor=pointer] [box=994,4782,174,50]:
+                - /url: https://www.magnific.com/sign-up?client_id=magnific&lang=en#from_element=home_use_cases
+            - generic [ref=f13e711] [box=32,4888,1136,491]:
+              - generic [ref=f13e712] [box=32,4888,368,491]:
+                - img "Advertising" [ref=f13e713] [box=32,4888,368,491]
+                - generic [ref=f13e714] [box=56,5259,320,95]
+              - generic [ref=f13e717] [box=416,4888,368,491]:
+                - img "Product shots" [ref=f13e718] [box=416,4888,368,491]
+                - generic [ref=f13e719] [box=440,5259,320,95]
+              - generic [ref=f13e722] [box=800,4888,368,491]:
+                - img "Brand campaigns" [ref=f13e723] [box=800,4888,368,491]
+                - generic [ref=f13e724] [box=824,5259,320,95]
+            - generic [ref=f13e729] [box=56,5654,1088,95]:
+              - heading "Filmmaking" [level=3] [ref=f13e730] [box=56,5654,1088,36]
+              - paragraph [ref=f13e731] [box=56,5698,512,51]: Characters, storyboards, and concepts to explore. Cinematic tools made for the final frame.
+          - generic [ref=f13e732] [box=0,5881,1200,870]:
+            - generic [ref=f13e735] [box=32,5977,1136,86]:
+              - generic [ref=f13e736] [box=32,5977,904,86]:
+                - heading "Made with Magnific" [level=2] [ref=f13e737] [box=32,5977,672,43]
+                - paragraph [ref=f13e738] [box=32,6036,672,27]: Original productions made by talented creatives around the world.
+              - link "Explore Originals" [ref=f13e740] [cursor=pointer] [box=968,6014,200,50]:
+                - /url: /originals
+            - generic [ref=f13e743] [box=0,6111,1200,518]:
+              - generic [ref=f13e746] [cursor=pointer] [box=-723,6150,782,440]:
+                - generic [box=-723,6150,782,440]
+              - generic [ref=f13e754] [cursor=pointer] [box=140,6111,920,518]:
+                - link "Watch the video" [ref=f13e756] [box=140,6111,920,518]:
+                  - /url: /originals/chronicles-of-bone
+                - generic [box=140,6111,920,518]
+              - generic [ref=f13e763] [cursor=pointer] [box=1141,6150,782,440]:
+                - generic [box=1141,6150,782,440]
+            - generic [ref=f13e769] [box=0,6645,1200,10]:
+              - button "Go to slide 1" [ref=f13e770] [cursor=pointer] [box=562,6645,10,10]
+              - button "Go to slide 2" [ref=f13e771] [cursor=pointer] [box=584,6645,32,10]
+              - button "Go to slide 3" [ref=f13e772] [cursor=pointer] [box=628,6645,10,10]
+          - generic [ref=f13e775] [box=32,6951,1136,2293]:
+            - generic [ref=f13e776] [box=32,6951,1136,457]:
+              - heading "Team plans built for creative work at scale" [level=3] [ref=f13e777] [box=32,6951,672,134]
+              - generic [ref=f13e778] [box=32,7149,1136,227]:
+                - generic [ref=f13e779] [box=32,7149,552,227]
+                - generic [ref=f13e784] [box=616,7149,552,227]
+            - generic [ref=f13e789] [box=32,7472,1136,485]:
+              - generic [ref=f13e790] [box=32,7472,556,485]:
+                - generic [ref=f13e791] [box=32,7472,556,200]
+                - img "All the AI tools in a single place" [ref=f13e796] [box=80,7671,508,286]
+              - generic [ref=f13e797] [box=612,7472,556,485]:
+                - generic [ref=f13e798] [box=612,7472,556,200]
+                - img "Unlimited users, flexible credits" [ref=f13e803] [box=660,7671,508,286]
+            - generic [ref=f13e804] [box=32,8021,1136,477]:
+              - generic [ref=f13e805] [box=80,8069,1040,77]:
+                - heading "Enterprise features built for scale" [level=4] [ref=f13e806] [box=80,8069,1040,34]
+                - paragraph [ref=f13e807] [box=80,8119,1040,27]: Security, compliance, and admin control for teams of any size.
+              - generic [ref=f13e808] [box=80,8194,1040,256]:
+                - generic [ref=f13e809] [box=80,8194,1040,112]
+                - generic [ref=f13e831] [box=80,8338,1040,112]
+            - generic [ref=f13e853] [box=32,8562,1136,682]:
+              - generic [ref=f13e854] [box=32,8562,1136,209]:
+                - img "RGA" [ref=f13e855] [box=64,8594,88,20]
+                - paragraph [ref=f13e856] [box=64,8630,1072,48]: “Best-in-class models and workflow tools through a single unified interface. Magnific has been a key unlock as we've woven AI into our workflows, end to end.”
+                - generic [ref=f13e857] [box=64,8694,1072,45]
+              - generic [ref=f13e860] [box=32,8795,1136,213]:
+                - img "Delivery Hero" [ref=f13e861] [box=64,8827,150,24]
+                - paragraph [ref=f13e862] [box=64,8867,1072,48]: “At Delivery Hero, we are highly satisfied with Magnific. It consistently delivers high-quality, reliable results while streamlining workflows and enhancing efficiency.”
+                - generic [ref=f13e863] [box=64,8931,1072,45]
+              - generic [ref=f13e866] [box=32,9031,1136,213]:
+                - img "Job & Talent" [ref=f13e867] [box=64,9063,80,24]
+                - paragraph [ref=f13e868] [box=64,9103,1072,48]: “Magnific is a key part of our marketing stack. It helps us create high-quality content at scale as we expand our AI-native workforce platform powering our global staffing marketplace.”
+                - generic [ref=f13e869] [box=64,9167,1072,45]
+          - generic [ref=f13e876] [box=32,10356,1136,360]:
+            - generic [ref=f13e877] [box=32,10356,300,360]:
+              - heading "Answers to your top questions" [level=2] [ref=f13e878] [box=32,10356,300,88]
+              - link "Contact support" [ref=f13e879] [cursor=pointer] [box=32,10468,149,44]:
+                - /url: https://www.magnific.com/ai/support?form=true#from_element=home_faqs
+            - list [ref=f13e880] [box=412,10356,756,360]:
+              - listitem [ref=f13e881] [box=412,10356,756,66]:
+                - button "Is Magnific the same as Freepik?" [ref=f13e883] [cursor=pointer] [box=412,10356,756,66]
+              - listitem [ref=f13e888] [box=412,10430,756,66]:
+                - button "I have a magnific.ai subscription—what happens now?" [ref=f13e890] [cursor=pointer] [box=412,10430,756,66]
+              - listitem [ref=f13e895] [box=412,10503,756,66]:
+                - button "Will stock content still be available, or is everything now AI-based?" [ref=f13e897] [cursor=pointer] [box=412,10503,756,66]
+              - listitem [ref=f13e902] [box=412,10577,756,66]:
+                - button "I already have a Magnific paid plan. What happens to it?" [ref=f13e904] [cursor=pointer] [box=412,10577,756,66]
+              - listitem [ref=f13e909] [box=412,10651,756,66]:
+                - button "Who owns the content I create?" [ref=f13e911] [cursor=pointer] [box=412,10651,756,66]
+          - generic [ref=f13e917] [box=0,10812,1200,499]:
+            - heading "Be Magnific" [level=2] [ref=f13e918] [box=446,10992,308,67]
+            - link "Start creating" [ref=f13e919] [cursor=pointer] [box=518,11091,164,40]:
+              - /url: https://www.magnific.com/sign-up?client_id=magnific&lang=en#from_element=home_bottom_cta
+          - generic [ref=f13e924] [box=20,11311,1160,736]:
+            - generic [ref=f13e925] [box=116,11391,968,517]:
+              - generic [ref=f13e926] [box=300,11391,600,173]:
+                - link "Magnific" [ref=f13e927] [cursor=pointer] [box=516,11391,168,32]:
+                  - /url: https://www.magnific.com
+                - paragraph [ref=f13e930] [box=300,11455,600,45]: The creative platform to direct your best work. More than 1 million subscribers across creatives, enterprises, agencies, and studios.
+                - button "English" [ref=f13e931] [box=540,11532,119,32]
+              - generic [ref=f13e937] [box=116,11604,968,304]:
+                - generic [ref=f13e938] [box=116,11604,218,304]
+                - generic [ref=f13e965] [box=366,11604,218,304]
+                - generic [ref=f13e991] [box=616,11604,218,304]
+                - generic [ref=f13e1016] [box=866,11604,218,304]
+            - paragraph [ref=f13e1035] [box=116,11948,968,19]: Copyright © 2010-2026 Freepik Company S.L.U. All rights reserved.
+    - region "Notifications (F8)" [box=0,12047,1200,0]:
+      - list [box=0,12047,1200,0]
+  - alert [ref=f13e1036] [box=-1,-1,1,1]

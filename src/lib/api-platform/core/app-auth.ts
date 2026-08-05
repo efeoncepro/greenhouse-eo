@@ -3,21 +3,20 @@ import 'server-only'
 import { randomUUID } from 'node:crypto'
 
 import { getTenantContext, type TenantContext } from '@/lib/tenant/get-tenant-context'
-import type { TenantAccessRecord } from '@/lib/tenant/access'
+import { getTenantAccessRecordByUserId, type TenantAccessRecord } from '@/lib/tenant/access'
+import {
+  getOAuthRequestAuditMetadata,
+  resolveSisterPlatformOAuthUserinfo,
+  SisterPlatformOAuthError
+} from '@/lib/sister-platforms/oauth-broker'
+import type { GlobeOAuthWorkspaceBindingV1 } from '@/lib/sister-platforms/oauth-workspace-bindings'
 
 import { ApiPlatformError, normalizeApiPlatformError } from './errors'
+import { executeApiPlatformCommand } from './commands'
 import { buildApiPlatformErrorResponse, buildApiPlatformSuccessResponse } from './responses'
 import { DEFAULT_API_PLATFORM_VERSION, resolveApiPlatformVersion } from './versioning'
-import {
-  decodeAppAccessToken,
-  resolveAppSessionTenant,
-  revokeFirstPartyAppSession
-} from './app-sessions'
-import {
-  getApiPlatformIpHash,
-  getApiPlatformUserAgentHash,
-  recordApiPlatformRequestLog
-} from './request-logging'
+import { decodeAppAccessToken, resolveAppSessionTenant, revokeFirstPartyAppSession } from './app-sessions'
+import { getApiPlatformIpHash, getApiPlatformUserAgentHash, recordApiPlatformRequestLog } from './request-logging'
 import { query } from '@/lib/db'
 import type { ApiPlatformRateLimit } from './context'
 
@@ -30,6 +29,16 @@ export type AppPlatformRequestContext = {
   version: string
   tenant: TenantContext
   appSessionId: string | null
+  authSource: 'cookie_session' | 'first_party_app' | 'sister_platform_oauth'
+  oauthCapabilities: readonly string[]
+  oauthWorkspaceBindings: readonly GlobeOAuthWorkspaceBindingV1[]
+  oauthSessionAuthMode?: string | null
+  /** OAuth client that minted the bearer; null outside the sister-platform OAuth lane. */
+  oauthClientId?: string | null
+  /** Durable bearer identity for provenance/revocation evidence; never the raw token. */
+  oauthAccessTokenId?: string | null
+  /** Correlation preserved from token issuance/userinfo for downstream evidence. */
+  oauthCorrelationId?: string | null
   rateLimit: ApiPlatformRateLimit
 }
 
@@ -37,6 +46,7 @@ type AppRouteHandler<T> = (context: AppPlatformRequestContext) => Promise<{
   data: T
   meta?: Record<string, unknown>
   status?: number
+  headers?: Record<string, string>
 }>
 
 type AppAuditState = {
@@ -100,16 +110,67 @@ const resolveAppTenantContext = async (request: Request) => {
   const token = extractBearerToken(request)
 
   if (token) {
-    const payload = await decodeAppAccessToken(token)
+    try {
+      const payload = await decodeAppAccessToken(token)
 
-    const tenant = await resolveAppSessionTenant({
-      sessionId: payload.sid,
-      userId: payload.sub
-    })
+      const tenant = await resolveAppSessionTenant({
+        sessionId: payload.sid,
+        userId: payload.sub
+      })
 
-    return {
-      tenant: tenantAccessRecordToContext(tenant),
-      appSessionId: payload.sid
+      return {
+        tenant: tenantAccessRecordToContext(tenant),
+        appSessionId: payload.sid,
+        authSource: 'first_party_app' as const,
+        oauthCapabilities: [] as readonly string[],
+        oauthWorkspaceBindings: [] as readonly GlobeOAuthWorkspaceBindingV1[],
+        oauthClientId: null,
+        oauthAccessTokenId: null,
+        oauthCorrelationId: null
+      }
+    } catch (appTokenError) {
+      try {
+        const oauth = await resolveSisterPlatformOAuthUserinfo({
+          accessToken: token,
+          auditMetadata: getOAuthRequestAuditMetadata(request)
+        })
+
+        const userId = oauth.identity.sub.startsWith('greenhouse:user:')
+          ? oauth.identity.sub.slice('greenhouse:user:'.length)
+          : ''
+
+        if (!userId) throw new Error('oauth_identity_subject_invalid')
+
+        const tenant = await getTenantAccessRecordByUserId(userId)
+
+        if (!tenant) throw new Error('oauth_identity_tenant_missing')
+
+        return {
+          tenant: tenantAccessRecordToContext(tenant),
+          appSessionId: null,
+          authSource: 'sister_platform_oauth' as const,
+          oauthCapabilities: oauth.identity.capabilities,
+          oauthWorkspaceBindings: oauth.identity.workspaceBindings ?? [],
+          oauthSessionAuthMode: oauth.identity.authMode,
+          oauthClientId: oauth.client.clientId,
+          oauthAccessTokenId: oauth.accessTokenId,
+          oauthCorrelationId: oauth.correlationId
+        }
+      } catch (oauthError) {
+        if (oauthError instanceof SisterPlatformOAuthError) {
+          throw new ApiPlatformError('Invalid app bearer token.', {
+            statusCode: oauthError.statusCode === 403 ? 403 : 401,
+            errorCode: oauthError.statusCode === 403 ? 'forbidden' : 'invalid_token'
+          })
+        }
+
+        if (appTokenError instanceof ApiPlatformError) throw appTokenError
+
+        throw new ApiPlatformError('Invalid app bearer token.', {
+          statusCode: 401,
+          errorCode: 'invalid_token'
+        })
+      }
     }
   }
 
@@ -124,7 +185,13 @@ const resolveAppTenantContext = async (request: Request) => {
 
   return {
     tenant,
-    appSessionId: null
+    appSessionId: null,
+    authSource: 'cookie_session' as const,
+    oauthCapabilities: [] as readonly string[],
+    oauthWorkspaceBindings: [] as readonly GlobeOAuthWorkspaceBindingV1[],
+    oauthClientId: null,
+    oauthAccessTokenId: null,
+    oauthCorrelationId: null
   }
 }
 
@@ -142,10 +209,12 @@ const getRateWindowCounts = async ({ userId, appSessionId }: { userId: string; a
     [userId, appSessionId]
   )
 
-  return rows[0] ?? {
-    requests_last_minute: 0,
-    requests_last_hour: 0
-  }
+  return (
+    rows[0] ?? {
+      requests_last_minute: 0,
+      requests_last_hour: 0
+    }
+  )
 }
 
 const buildRateLimit = (counts: RateWindowCounts): ApiPlatformRateLimit => ({
@@ -259,6 +328,13 @@ export const runAppRoute = async <T>({
       version,
       tenant: appContext.tenant,
       appSessionId: appContext.appSessionId,
+      authSource: appContext.authSource,
+      oauthCapabilities: appContext.oauthCapabilities,
+      oauthWorkspaceBindings: appContext.oauthWorkspaceBindings,
+      oauthSessionAuthMode: appContext.oauthSessionAuthMode,
+      oauthClientId: appContext.oauthClientId,
+      oauthAccessTokenId: appContext.oauthAccessTokenId,
+      oauthCorrelationId: appContext.oauthCorrelationId,
       rateLimit
     })
 
@@ -277,6 +353,7 @@ export const runAppRoute = async <T>({
         lane: 'app'
       },
       status: result.status,
+      headers: result.headers,
       rateLimit
     })
   } catch (error) {
@@ -296,6 +373,50 @@ export const runAppRoute = async <T>({
     })
   }
 }
+
+/**
+ * App-lane command wrapper. It keeps bearer/session resolution, rate limits and request logging in
+ * `runAppRoute`, while adding the shared command audit/idempotency foundation around the mutation.
+ */
+export const runAppCommandRoute = async <T>({
+  request,
+  routeKey,
+  body,
+  handler
+}: {
+  request: Request
+  routeKey: string
+  body: unknown
+  handler: (context: AppPlatformRequestContext) => Promise<{
+    data: T
+    meta?: Record<string, unknown>
+    status?: number
+  }>
+}) =>
+  runAppRoute({
+    request,
+    routeKey,
+    handler: context =>
+      executeApiPlatformCommand({
+        principal: {
+          lane: 'app',
+          principalKind: 'app_user',
+          principalId: context.tenant.userId,
+          appSessionId: context.appSessionId,
+          userId: context.tenant.userId
+        },
+        scope: {
+          greenhouseScopeType: context.tenant.tenantType === 'client' ? 'client' : 'internal',
+          clientId: context.tenant.clientId,
+          organizationId: context.tenant.organizationId,
+          spaceId: context.tenant.spaceId
+        },
+        routeKey,
+        request,
+        body,
+        run: () => handler(context)
+      })
+  })
 
 export const revokeCurrentAppSession = async (context: AppPlatformRequestContext) => {
   if (!context.appSessionId) {

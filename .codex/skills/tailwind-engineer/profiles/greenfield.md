@@ -58,7 +58,7 @@ Declaralo explícito y **antes del primer `@import`**:
 @layer theme, base, components, utilities;
 ```
 
-Si hay CSS heredado conviviendo, dale su propia capa y ponela **después de `base` y antes de
+Si hay CSS heredado conviviendo, dale su propia capa y ponla **después de `base` y antes de
 `components`**. Ponerla primera hace que las utilidades le ganen a estilos de componente que sí
 querías conservar (medido en Globe: `.capability-button` cayó de 11,52px/600 a 16px/400).
 

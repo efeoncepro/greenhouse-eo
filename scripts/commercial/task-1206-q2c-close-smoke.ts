@@ -193,7 +193,7 @@ const main = async () => {
   }
 
   if (!process.argv.includes('--confirm')) {
-    log('DRY: pasá --confirm para ejecutar el smoke (escribe AR real en dev sobre un fixture).')
+    log('DRY: pasa --confirm para ejecutar el smoke (escribe AR real en dev sobre un fixture).')
     process.exit(0)
   }
 

@@ -50,7 +50,7 @@ Antes solo habia 3 skills product-design (`modern-ui`, `microinteractions-audito
 
 - Las skills se **invocan automaticamente** cuando un agente reconoce un trigger (palabra clave o contexto). No requieren comando explicito.
 - Si trabajas dentro de `greenhouse-eo`, el overlay Greenhouse se carga **siempre** despues del global y gana en conflicto.
-- Cada skill declara con que otras se compone. No tenes que orquestar — el agente lo hace.
+- Cada skill declara con que otras se compone. No tienes que orquestar — el agente lo hace.
 
 ## Paso a paso — pedir trabajo asistido
 
@@ -109,7 +109,7 @@ Las skills tienen 3 modos de interaccion:
 | **Defer to** | Una skill delega a otra. Ej: `motion-design` delega el contrato `prefers-reduced-motion` a `a11y-architect`. |
 | **Override** | El overlay Greenhouse sobreescribe defaults del global. Ej: global pide OKLCH, Greenhouse pina sRGB + MUI palette. |
 
-No tenes que orquestarlo a mano. Cada skill declara su grafo de relaciones al inicio del cuerpo.
+No tienes que orquestarlo a mano. Cada skill declara su grafo de relaciones al inicio del cuerpo.
 
 ## Que no hacer
 

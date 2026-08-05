@@ -20,7 +20,7 @@
 - Rank: `TBD`
 - Domain: `ui|creative|product`
 - Blocked by: `TASK-1559`
-- Branch: `task/TASK-1571-globe-image-focus-compare-canvas`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 
 ## Summary
 

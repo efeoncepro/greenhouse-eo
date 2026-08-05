@@ -109,12 +109,17 @@ explicito. `docs/changelog/CLIENT_CHANGELOG.md` es otro producto documental y no
 - Techo V1: 20 sesiones, 600 lineas y ~12.000 tokens estimados.
 - Mantener en `changelog.md` solo la ventana cronologica reciente.
 - Techo V1 de changelog: 60 entradas, 2.000 lineas y ~60.000 tokens estimados.
+- Cada techo es independiente y vinculante: si `Handoff.md` cumple sesiones pero excede lineas/tokens, o
+  `changelog.md` cumple lineas pero excede entradas, igual se debe rotar. La rotacion no puede decidir solo por
+  conteo de sesiones/entradas.
 - Excepcion: mantener mas contexto activo si hay incidente abierto, release en curso o task P0/P1 aun viva.
 - Una excepcion debe ser temporal y no puede cerrar con el gate estricto en verde hasta recompactar.
 - Todo lo archivado debe quedar enlazado desde `Handoff.archive.md`, no eliminado.
 - Si un incidente se resolvio, debe existir `ISSUE-###` resuelto o task complete cuando el impacto fue material.
 - Rotacion canonica conjunta: `pnpm docs:context-rotate --apply`; dry-run sin `--apply`. Rota de forma
-  independiente Handoff y changelog, por lo que uno puede no requerir cambios mientras el otro si.
+  independiente Handoff y changelog, por lo que uno puede no requerir cambios mientras el otro si. Si el gate
+  estricto recomienda rotar y el dry-run dice que no hay nada que archivar, eso es bug del rotador o una excepcion
+  documentada; no se cierra el trabajo hasta corregir la causa y volver a correr `pnpm docs:context-check:strict`.
 
 ## Protocolo De Auditoria
 
@@ -142,8 +147,8 @@ El check es no destructivo por defecto: reporta warnings y recomendaciones. El m
 Debe revisar como minimo:
 
 - tamano de `Handoff.md`;
-- cantidad de sesiones activas;
-- cantidad, orden y formato de entradas activas de `changelog.md`;
+- cantidad de sesiones activas y presupuesto de lineas/tokens de `Handoff.md`;
+- cantidad, orden, formato y presupuesto de lineas/tokens de entradas activas de `changelog.md`;
 - budgets de tokens de `AGENTS.md`, `project_context.md`, `Handoff.md`, `changelog.md` y los indices de archive;
 - ausencia de `## Delta` en `project_context.md`;
 - existencia de targets minimos del router;
@@ -156,6 +161,9 @@ Debe revisar como minimo:
 
 - `AGENTS.md` debe declarar preflight, router, fallback historico y gates para Codex/agentes genericos.
 - `CLAUDE.md` debe declarar la misma regla para Claude Code.
+- Ambos entry points deben exigir el checkout compartido único; el detalle canónico vive en
+  `REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md` y el modelo de coordinación en
+  `MULTI_AGENT_SHARED_WORKSPACE_OPERATING_MODEL_V1.md`.
 - `docs/operations/CODEX_EXECUTION_PROMPT_V1.md` debe incluir este modelo en lectura obligatoria.
 - `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md` debe enlazar este modelo como especializacion de continuidad.
 - `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md` debe quedar enlazado desde los puntos de entrada cuando cambie el criterio transversal de no-parches.

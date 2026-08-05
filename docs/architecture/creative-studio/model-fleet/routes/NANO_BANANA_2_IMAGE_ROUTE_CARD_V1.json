@@ -1,0 +1,253 @@
+{
+  "schemaVersion": "model-route-card.v1",
+  "cardId": "route-card/nano-banana-2-image",
+  "snapshot": {
+    "observedAt": "2026-08-04",
+    "maxAgeDays": 14,
+    "revalidateBeforeUse": true
+  },
+  "authority": {
+    "availabilityReader": "efeonce-globe:globe.producer.fleet.list",
+    "humanLedger": "docs/operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md",
+    "providerEvidence": "Google Vertex AI Gemini 3.1 Flash Image documentation and Efeonce Vertex commercial evidence"
+  },
+  "modelFamily": {
+    "publicName": "Nano Banana 2",
+    "familyKey": "nano-banana-2-image",
+    "modality": "image",
+    "globeStatus": "available",
+    "summary": "The public Globe route uses Google Vertex `gemini-3.1-flash-image` in `global`. It is promoted, bound and available; the public catalog exposes prompt generation only, while provider editing/reference capabilities remain a separate surface.",
+    "integrationDecision": "Use the exact Vertex generateContent endpoint, ADC/WIF boundary and poll/reconcile completion binding. Do not replace it with the retired Gemini 2.5 image family, Gemini API direct credentials or Nano Banana Pro by capability fallback."
+  },
+  "evidence": [
+    {
+      "id": "fleet-ledger",
+      "authority": "runtime_primary",
+      "kind": "human-model-ledger",
+      "observedAt": "2026-08-04",
+      "reference": "docs/operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md",
+      "revalidateBeforeUse": true
+    },
+    {
+      "id": "reader-live",
+      "authority": "runtime_primary",
+      "kind": "live-fleet-reader-and-route-readback",
+      "observedAt": "2026-08-04",
+      "reference": "efeonce-globe:globe.producer.fleet.list",
+      "revalidateBeforeUse": true
+    },
+    {
+      "id": "route-catalog",
+      "authority": "repo_primary",
+      "kind": "producer-route-catalog",
+      "observedAt": "2026-08-04",
+      "reference": "efeonce-globe:packages/domain/src/producer-catalog.ts",
+      "revalidateBeforeUse": false
+    },
+    {
+      "id": "vertex-adapter",
+      "authority": "repo_primary",
+      "kind": "vertex-image-adapter",
+      "observedAt": "2026-08-04",
+      "reference": "efeonce-globe:apps/creative-runner/src/vertex-adapter.ts",
+      "revalidateBeforeUse": false
+    },
+    {
+      "id": "governed-composition",
+      "authority": "repo_primary",
+      "kind": "governed-vertex-endpoint-allowlist",
+      "observedAt": "2026-08-04",
+      "reference": "efeonce-globe:apps/studio-web/src/governed-production-composition.ts",
+      "revalidateBeforeUse": false
+    },
+    {
+      "id": "composite-policy",
+      "authority": "repo_primary",
+      "kind": "route-to-provider-composite-policy",
+      "observedAt": "2026-08-04",
+      "reference": "efeonce-globe:apps/creative-runner/src/composite-adapter.ts",
+      "revalidateBeforeUse": false
+    },
+    {
+      "id": "nano-2-docs",
+      "authority": "provider_primary",
+      "kind": "gemini-3-1-flash-image-model-documentation",
+      "observedAt": "2026-08-04",
+      "reference": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/3-1-flash-image",
+      "revalidateBeforeUse": true,
+      "ttlDays": 14,
+      "note": "Provider documentation uses the stable model ID; Globe runtime keeps its exact binding version as `preview`."
+    },
+    {
+      "id": "nano-image-guide",
+      "authority": "provider_primary",
+      "kind": "vertex-gemini-image-generation-guide",
+      "observedAt": "2026-08-04",
+      "reference": "https://docs.cloud.google.com/vertex-ai/generative-ai/docs/multimodal/image-generation",
+      "revalidateBeforeUse": true,
+      "ttlDays": 14
+    },
+    {
+      "id": "vertex-terms",
+      "authority": "runtime_primary",
+      "kind": "model-exact-commercial-terms",
+      "observedAt": "2026-07-30",
+      "reference": "efeonce-globe:scripts/evidence/vertex-generative-commercial-terms.json",
+      "revalidateBeforeUse": true,
+      "ttlDays": 30
+    },
+    {
+      "id": "nano-2-canary",
+      "authority": "runtime_primary",
+      "kind": "producer-canary-evidence",
+      "observedAt": "2026-07-30",
+      "reference": "efeonce-globe:run/ce06f8b4-ebe9-43b6-9d47-8e4cc901f49a",
+      "revalidateBeforeUse": true,
+      "note": "The exact route generated image/png, settled 10 Globe credits and recovered idempotently after the durable hash fix without a second generation."
+    },
+    {
+      "id": "adr-023",
+      "authority": "repo_primary",
+      "kind": "route-card-decision",
+      "observedAt": "2026-08-04",
+      "reference": "docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_ROUTE_CARDS_DECISION_V1.md",
+      "revalidateBeforeUse": false
+    }
+  ],
+  "routes": [
+    {
+      "routeId": "ref/still/nanobanana-2-v1",
+      "kind": "standard",
+      "capability": "image-generate",
+      "operation": "create",
+      "provider": "vertex",
+      "model": "gemini-3.1-flash-image",
+      "version": "preview",
+      "identityState": "resolved",
+      "endpointId": "vertex.gemini.image.flash",
+      "region": "global",
+      "completionDriver": "poll",
+      "lifecycle": "available",
+      "exposure": {
+        "governed": "promoted",
+        "reader": "available",
+        "producerUi": "selectable",
+        "externalRollout": "gated"
+      },
+      "inputs": [
+        {
+          "slot": "prompt",
+          "role": "direction",
+          "mediaType": "text",
+          "required": true,
+          "valueShape": "text"
+        },
+        {
+          "slot": "references",
+          "role": "reference",
+          "mediaType": "image",
+          "required": false,
+          "cardinality": { "min": 0, "max": 0 },
+          "mechanism": "not accepted by the public Globe route"
+        }
+      ],
+      "controls": [
+        { "name": "quality", "owner": "outputShape", "valueShape": "enum(standard|hd)", "mechanism": "Globe route contract" },
+        { "name": "aspect-ratio", "owner": "outputShape", "valueShape": "enum(1:1|16:9|9:16|4:3|3:4)", "mechanism": "Vertex generationConfig.imageConfig.aspectRatio" },
+        { "name": "count", "owner": "outputShape", "valueShape": "integer(1)", "mechanism": "Vertex route declares one candidate" }
+      ],
+      "output": {
+        "mediaType": "image",
+        "mimeTypes": ["image/png"],
+        "cardinality": { "min": 1, "max": 1 },
+        "encoding": "Vertex inlineData decoded and retained content-addressed",
+        "durableAuthority": "Globe private asset and governance readback",
+        "providerResponse": "TEXT and IMAGE modalities requested; Globe retains the image output"
+      },
+      "transport": {
+        "kind": "Vertex AI generateContent",
+        "auth": "server-side ADC/WIF with Vertex IAM",
+        "requestMode": "synchronous unary request",
+        "endpointSource": "governed endpoint allowlist",
+        "regionRule": "global is required for this model; do not substitute us-central1",
+        "browserAccess": "forbidden"
+      },
+      "completion": {
+        "driver": "poll",
+        "providerOperation": "synchronous generateContent response",
+        "resultAuthority": "Vertex driver cache followed by Globe durable ingest/reconcile",
+        "recovery": "read existing attempt and durable output before retry; never submit a second billable generation blindly"
+      },
+      "cables": {
+        "provider_supported": { "state": "verified", "evidenceRefs": ["nano-2-docs", "nano-image-guide", "vertex-terms"] },
+        "contract_declared": { "state": "verified", "evidenceRefs": ["route-catalog", "governed-composition", "adr-023"] },
+        "adapter_wired": { "state": "wired", "evidenceRefs": ["vertex-adapter", "composite-policy"] },
+        "transport_verified": { "state": "verified", "evidenceRefs": ["nano-2-canary", "governed-composition"] },
+        "output_verified": { "state": "verified", "evidenceRefs": ["nano-2-canary", "fleet-ledger"] },
+        "billing_verified": { "state": "verified", "evidenceRefs": ["nano-2-canary", "vertex-terms"], "note": "The 10-credit Globe settlement is evidenced; Vertex commercial pricing remains a separate revalidation concern." },
+        "rights_verified": { "state": "verified", "evidenceRefs": ["vertex-terms", "fleet-ledger"] },
+        "evaluated": { "state": "verified", "evidenceRefs": ["fleet-ledger", "nano-2-canary"] },
+        "canary_passed": { "state": "verified", "evidenceRefs": ["nano-2-canary", "fleet-ledger"] },
+        "promoted": { "state": "verified", "evidenceRefs": ["fleet-ledger", "reader-live"] },
+        "available": { "state": "available", "evidenceRefs": ["reader-live", "fleet-ledger"] }
+      },
+      "evidenceRefs": ["route-catalog", "vertex-adapter", "governed-composition", "nano-2-docs", "nano-2-canary", "reader-live"],
+      "blockers": [
+        "Revalidate the provider model ID/version, global region, IAM, quotas and commercial terms before changing the binding.",
+        "Keep image editing and video-to-image as separate route candidates; do not widen this prompt-only route by inference.",
+        "External rollout remains gated by Globe tenant entitlements."
+      ]
+    }
+  ],
+  "providerSurfaces": [
+    {
+      "surfaceId": "vertex-nano-banana-2-edit-and-video-to-image",
+      "provider": "vertex",
+      "endpointId": "vertex.gemini.image.flash.non-public",
+      "status": "deferred",
+      "modes": ["image-edit", "multi-turn-edit", "video-to-image"],
+      "cables": {
+        "provider_supported": { "state": "verified", "evidenceRefs": ["nano-2-docs", "nano-image-guide"] },
+        "contract_declared": { "state": "proposed", "evidenceRefs": ["nano-2-docs", "route-catalog"], "note": "Provider capability is broader than the public Globe route." },
+        "adapter_wired": { "state": "wired", "evidenceRefs": ["vertex-adapter"], "note": "A generic Vertex image-edit seam exists, but no public Nano Banana 2 routeId binds it." },
+        "transport_verified": { "state": "unknown", "evidenceRefs": ["nano-2-docs", "vertex-adapter"] },
+        "output_verified": { "state": "unknown", "evidenceRefs": ["nano-2-docs"] },
+        "billing_verified": { "state": "unknown", "evidenceRefs": ["vertex-terms"] },
+        "rights_verified": { "state": "unknown", "evidenceRefs": ["vertex-terms"] },
+        "evaluated": { "state": "not_started", "evidenceRefs": ["vertex-adapter"] },
+        "canary_passed": { "state": "not_started", "evidenceRefs": ["vertex-adapter"] },
+        "promoted": { "state": "not_promoted", "evidenceRefs": ["reader-live"] },
+        "available": { "state": "gated", "evidenceRefs": ["reader-live"], "note": "No separate public route, binding or canary exists for these modes." }
+      },
+      "evidenceRefs": ["nano-2-docs", "vertex-adapter", "reader-live"],
+      "note": "The current composite policy sends public image-edit to Seedream/Fal. Add a Nano Banana route only with its own input contract, result parsing, rates, rights, evaluation and canary."
+    }
+  ],
+  "implementationChecklist": [
+    {
+      "id": "nano-banana-2-route-identity",
+      "status": "verified",
+      "ownerBoundary": "Globe catalog, Vertex adapter, composite policy and governed endpoint compiler",
+      "evidenceRefs": ["route-catalog", "vertex-adapter", "composite-policy", "governed-composition"]
+    },
+    {
+      "id": "nano-banana-2-canary-and-promotion",
+      "status": "verified",
+      "ownerBoundary": "Globe Vertex driver, readiness, binding, circuit, canary and live reader",
+      "evidenceRefs": ["nano-2-canary", "fleet-ledger", "reader-live"]
+    },
+    {
+      "id": "nano-banana-2-nonpublic-modes",
+      "status": "deferred",
+      "ownerBoundary": "Globe route contract and Vertex provider adapter",
+      "evidenceRefs": ["nano-2-docs", "vertex-adapter", "reader-live"],
+      "note": "Provider editing/video-to-image support is not a public Globe capability until a distinct route is governed."
+    },
+    {
+      "id": "nano-banana-2-external-rollout",
+      "status": "deferred",
+      "ownerBoundary": "Globe entitlement and external rollout control plane",
+      "evidenceRefs": ["reader-live", "fleet-ledger"]
+    }
+  ]
+}

@@ -2,19 +2,21 @@ import { canonicalErrorResponse } from '@/lib/api/canonical-error-response'
 import { getServerAuthSession } from '@/lib/auth'
 import { buildTenantEntitlementSubject } from '@/lib/commercial/party/route-entitlement-subject'
 import { can } from '@/lib/entitlements/runtime'
-import {
-  confirmGlobeCreditFunding,
-  GlobeCreditFundingBrokerError
-} from '@/lib/globe/credit-administration-broker'
+import { confirmGlobeCreditFunding, GlobeCreditFundingBrokerError } from '@/lib/globe/credit-administration-broker'
+import { parseConfirmBody } from '@/lib/globe/credit-funding-request'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
+import {
+  hasGlobeOAuthWorkspaceBinding,
+  resolveGlobeOAuthWorkspaceBindings
+} from '@/lib/sister-platforms/oauth-workspace-bindings'
 
 import { GreenhouseGlobeConfigurationError } from '@/lib/globe/client'
 
 import {
   brokerErrorResponse,
   globeConfigurationErrorResponse,
-  parseConfirmBody,
+  resolveFundingActorAuthMode,
   requireIdempotencyKey
 } from '../shared'
 
@@ -22,10 +24,11 @@ import {
  * TASK-1566 Slice 5 — `POST /api/admin/globe/credit-funding/confirm`.
  *
  * **Único punto que dispara la mutación en Globe.** Lleva su propia capability porque confirmar es
- * una autoridad distinta de proponer, y la disyunción confirmante ≠ proponente la impone un `CHECK`
- * en `globe_credit_funding_intents` — no esta ruta, y no una convención de payload.
+ * una autoridad distinta de proponer. La separación entre proponente y confirmante es una política
+ * por workspace/techo, no un requisito universal.
  *
- * Un agente puede proponer; **confirmar es de una persona**, y esa persona es la de la sesión.
+ * Un agente autenticado puede confirmar sólo cuando la política delegada del workspace y sus límites
+ * lo permiten. La base aplica esa decisión usando la proveniencia firmada de la sesión.
  */
 export const dynamic = 'force-dynamic'
 
@@ -54,13 +57,26 @@ export const POST = async (request: Request) => {
 
     if (!parsed) return canonicalErrorResponse('globe_funding_invalid_request')
 
+    const workspaceBindings = await resolveGlobeOAuthWorkspaceBindings(tenant)
+
+    if (!hasGlobeOAuthWorkspaceBinding(workspaceBindings, parsed.globeWorkspaceId)) {
+      return canonicalErrorResponse('forbidden')
+    }
+
     const outcome = await confirmGlobeCreditFunding({
       globeWorkspaceId: parsed.globeWorkspaceId,
       proposalId: parsed.proposalId,
       fingerprint: parsed.fingerprint,
       // Igual que en `propose`: la identidad sale de la sesión. Es lo único que hace que la
-      // atribución humana signifique algo del otro lado.
-      actor: { userId: tenant.userId, entitlement: 'platform.globe_credit_funding.confirm' },
+      // atribución del usuario autenticado signifique algo del otro lado.
+      actor: {
+        userId: tenant.userId,
+        entitlement: 'platform.globe_credit_funding.confirm',
+        authMode: resolveFundingActorAuthMode({
+          provider: session.user.provider,
+          authMode: session.user.authMode || tenant.authMode
+        })
+      },
       idempotencyKey
     })
 

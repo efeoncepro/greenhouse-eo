@@ -1,0 +1,652 @@
+{
+  "schemaVersion": "model-route-card.v1",
+  "cardId": "route-card/seedream-5-pro-image",
+  "snapshot": {
+    "observedAt": "2026-08-05",
+    "maxAgeDays": 14,
+    "revalidateBeforeUse": true
+  },
+  "authority": {
+    "availabilityReader": "efeonce-globe:globe.producer.fleet.list",
+    "humanLedger": "docs/operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md",
+    "providerEvidence": "Fal Seedream 5.0 Pro API documentation and Efeonce Fal commercial evidence"
+  },
+  "modelFamily": {
+    "publicName": "Seedream 5 Pro",
+    "familyKey": "seedream-5-pro-image",
+    "modality": "image",
+    "globeStatus": "available",
+    "summary": "Globe contains two separate Fal identities, and since 2026-08-05 BOTH are available: Seedream 5 Pro text-to-image and Seedream 5 Pro Edit, whose promotion was sealed end-to-end (canary_passed) and confirmed by the live fleet reader.",
+    "integrationDecision": "Keep Fal as the non-Google provider boundary, preserve the bare ByteDance slugs exactly, and never promote the edit route from the existence of the text-to-image route. Seedream 5.0 Lite is a separate candidate surface and is not the connected model."
+  },
+  "evidence": [
+    {
+      "id": "fleet-ledger",
+      "authority": "runtime_primary",
+      "kind": "human-model-ledger",
+      "observedAt": "2026-08-05",
+      "reference": "docs/operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md",
+      "revalidateBeforeUse": true
+    },
+    {
+      "id": "reader-live",
+      "authority": "runtime_primary",
+      "kind": "live-fleet-reader-and-route-readback",
+      "observedAt": "2026-08-05",
+      "reference": "efeonce-globe:globe.producer.fleet.list",
+      "revalidateBeforeUse": true,
+      "note": "Readback 2026-08-05: the reader reports BOTH `ref/still/rrss-v1` and `ref/still/reference-v1` as `available`; seven still routes are available in total. The reader wins over any older human row."
+    },
+    {
+      "id": "route-catalog",
+      "authority": "repo_primary",
+      "kind": "producer-route-catalog",
+      "observedAt": "2026-08-04",
+      "reference": "efeonce-globe:packages/domain/src/producer-catalog.ts",
+      "revalidateBeforeUse": false
+    },
+    {
+      "id": "fal-adapter",
+      "authority": "repo_primary",
+      "kind": "fal-seedream-adapter",
+      "observedAt": "2026-08-04",
+      "reference": "efeonce-globe:apps/creative-runner/src/fal-adapter.ts",
+      "revalidateBeforeUse": false
+    },
+    {
+      "id": "governed-composition",
+      "authority": "repo_primary",
+      "kind": "governed-fal-endpoint-allowlist",
+      "observedAt": "2026-08-04",
+      "reference": "efeonce-globe:apps/studio-web/src/governed-production-composition.ts",
+      "revalidateBeforeUse": false
+    },
+    {
+      "id": "composite-policy",
+      "authority": "repo_primary",
+      "kind": "route-to-provider-composite-policy",
+      "observedAt": "2026-08-04",
+      "reference": "efeonce-globe:apps/creative-runner/src/composite-adapter.ts",
+      "revalidateBeforeUse": false
+    },
+    {
+      "id": "seedream-text-docs",
+      "authority": "provider_primary",
+      "kind": "seedream-5-pro-text-to-image-api",
+      "observedAt": "2026-08-04",
+      "reference": "https://fal.ai/models/bytedance/seedream/v5/pro/text-to-image/api",
+      "revalidateBeforeUse": true,
+      "ttlDays": 14
+    },
+    {
+      "id": "seedream-edit-docs",
+      "authority": "provider_primary",
+      "kind": "seedream-5-pro-edit-api",
+      "observedAt": "2026-08-04",
+      "reference": "https://fal.ai/models/bytedance/seedream/v5/pro/edit/api",
+      "revalidateBeforeUse": true,
+      "ttlDays": 14
+    },
+    {
+      "id": "seedream-lite-docs",
+      "authority": "provider_primary",
+      "kind": "seedream-5-lite-provider-surface",
+      "observedAt": "2026-08-04",
+      "reference": "https://fal.ai/models/bytedance/seedream/v5/lite/text-to-image/api",
+      "revalidateBeforeUse": true,
+      "ttlDays": 14,
+      "note": "Lite is documented as a separate Fal tier and is not a Globe route."
+    },
+    {
+      "id": "fal-terms",
+      "authority": "provider_primary",
+      "kind": "fal-api-services-terms",
+      "observedAt": "2026-08-04",
+      "reference": "https://fal.ai/legal/api-services",
+      "revalidateBeforeUse": true,
+      "ttlDays": 30
+    },
+    {
+      "id": "seedream-terms",
+      "authority": "runtime_primary",
+      "kind": "model-exact-commercial-terms",
+      "observedAt": "2026-07-19",
+      "reference": "efeonce-globe:scripts/evidence/producer-canary-seedream-5-pro-terms.json",
+      "revalidateBeforeUse": true,
+      "ttlDays": 30
+    },
+    {
+      "id": "seedream-canary",
+      "authority": "runtime_primary",
+      "kind": "fal-seedream-lab-evidence",
+      "observedAt": "2026-07-19",
+      "reference": "efeonce-globe:producer-canary/seedream-5-pro",
+      "revalidateBeforeUse": true,
+      "ttlDays": 30,
+      "note": "The adapter and Fal output path were exercised in the internal lane; route-specific governed availability remains reader-controlled."
+    },
+    {
+      "id": "adr-023",
+      "authority": "repo_primary",
+      "kind": "route-card-decision",
+      "observedAt": "2026-08-04",
+      "reference": "docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_ROUTE_CARDS_DECISION_V1.md",
+      "revalidateBeforeUse": false
+    },
+    {
+      "id": "seedream-edit-canary",
+      "authority": "runtime_primary",
+      "kind": "governed-promotion-and-canary",
+      "observedAt": "2026-08-05",
+      "reference": "efeonce-globe:promotion_4265dd26-7eda-4918-bd7d-10318dd6cd5f",
+      "revalidateBeforeUse": false,
+      "note": "start->stage->promote->activate->canary->canary-confirm with no hand-written sequence. canary_passed rev 9 (terminal), binding enabled rev 5, readiness promoted rev 2. Canary run b811d5fc-9d80-4e9f-a0ab-736dac528ecd, attempt c0bbc8f1-8c23-4d11-96b3-e6efd61361c9, output sha256:3dae8ef188c8506781daa0b6f21e6e4840bf17bcbabf40c5dd16d12e04b22606 (image/png, 8359849 bytes), governance eligible. Economics exact: 10 reserved = 10 spent, one reservation, one settlement, noDoubleDebit."
+    },
+    {
+      "id": "runtime-handoff",
+      "authority": "runtime_primary",
+      "kind": "runtime-handoff",
+      "observedAt": "2026-08-05",
+      "reference": "docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md",
+      "revalidateBeforeUse": true
+    }
+  ],
+  "routes": [
+    {
+      "routeId": "ref/still/rrss-v1",
+      "kind": "standard",
+      "capability": "image-generate",
+      "operation": "create",
+      "provider": "fal",
+      "model": "seedream-5-pro",
+      "version": "v5-pro",
+      "identityState": "resolved",
+      "endpointId": "fal.seedream.text-to-image",
+      "region": "us-central1",
+      "completionDriver": "webhook-and-poll",
+      "lifecycle": "available",
+      "exposure": {
+        "governed": "promoted",
+        "reader": "available",
+        "producerUi": "selectable",
+        "externalRollout": "gated"
+      },
+      "inputs": [
+        {
+          "slot": "prompt",
+          "role": "direction",
+          "mediaType": "text",
+          "required": true,
+          "valueShape": "text"
+        }
+      ],
+      "controls": [
+        {
+          "name": "quality",
+          "owner": "outputShape",
+          "valueShape": "enum(standard|hd)",
+          "mechanism": "Globe route contract"
+        },
+        {
+          "name": "aspect-ratio",
+          "owner": "outputShape",
+          "valueShape": "enum(1:1|16:9|9:16|4:3|3:4)",
+          "mechanism": "mapped to Fal image_size preset"
+        },
+        {
+          "name": "count",
+          "owner": "outputShape",
+          "valueShape": "integer(1..4)",
+          "mechanism": "Fal num_images"
+        },
+        {
+          "name": "output-format",
+          "owner": "providerRequest",
+          "valueShape": "enum(png)",
+          "mechanism": "Globe pins PNG for retained MIME parity"
+        }
+      ],
+      "output": {
+        "mediaType": "image",
+        "mimeTypes": [
+          "image/png"
+        ],
+        "cardinality": {
+          "min": 1,
+          "max": 4
+        },
+        "encoding": "Fal result URL downloaded and retained content-addressed",
+        "durableAuthority": "Globe private asset and governance readback"
+      },
+      "transport": {
+        "kind": "Fal queue API",
+        "auth": "server-side Globe-owned Fal credential",
+        "requestMode": "queue submit with provider-returned follow-up references",
+        "endpointSource": "governed endpoint allowlist",
+        "followUpReferences": "opaque URLs returned by Fal; never derive or persist them in a route card",
+        "browserAccess": "forbidden"
+      },
+      "completion": {
+        "driver": "webhook-and-poll",
+        "providerOperation": "Fal queue status and result",
+        "resultAuthority": "Fal result resolver followed by Globe durable ingest",
+        "recovery": "signed webhook accelerates; poll/readback remains authoritative before retry"
+      },
+      "cables": {
+        "provider_supported": {
+          "state": "verified",
+          "evidenceRefs": [
+            "seedream-text-docs",
+            "seedream-terms"
+          ]
+        },
+        "contract_declared": {
+          "state": "verified",
+          "evidenceRefs": [
+            "route-catalog",
+            "governed-composition",
+            "adr-023"
+          ]
+        },
+        "adapter_wired": {
+          "state": "wired",
+          "evidenceRefs": [
+            "fal-adapter",
+            "composite-policy"
+          ]
+        },
+        "transport_verified": {
+          "state": "verified",
+          "evidenceRefs": [
+            "seedream-canary",
+            "governed-composition"
+          ]
+        },
+        "output_verified": {
+          "state": "verified",
+          "evidenceRefs": [
+            "seedream-canary",
+            "fleet-ledger"
+          ]
+        },
+        "billing_verified": {
+          "state": "verified",
+          "evidenceRefs": [
+            "seedream-terms",
+            "fal-terms"
+          ],
+          "note": "Globe credits and Fal settlement are different ledgers; re-read endpoint pricing before changing output shape."
+        },
+        "rights_verified": {
+          "state": "verified",
+          "evidenceRefs": [
+            "seedream-terms",
+            "fal-terms"
+          ]
+        },
+        "evaluated": {
+          "state": "verified",
+          "evidenceRefs": [
+            "fleet-ledger",
+            "seedream-canary"
+          ]
+        },
+        "canary_passed": {
+          "state": "verified",
+          "evidenceRefs": [
+            "seedream-canary",
+            "fleet-ledger"
+          ]
+        },
+        "promoted": {
+          "state": "verified",
+          "evidenceRefs": [
+            "fleet-ledger"
+          ]
+        },
+        "available": {
+          "state": "available",
+          "evidenceRefs": [
+            "reader-live",
+            "fleet-ledger"
+          ]
+        }
+      },
+      "evidenceRefs": [
+        "route-catalog",
+        "fal-adapter",
+        "governed-composition",
+        "seedream-text-docs",
+        "seedream-canary",
+        "reader-live"
+      ],
+      "blockers": [
+        "Re-read Fal pricing, terms and output schema before changing resolution, count or format policy.",
+        "Keep the bare ByteDance slug and provider-returned follow-up references exact; never prefix or reconstruct them by analogy.",
+        "External rollout remains gated even though the internal reader reports available."
+      ]
+    },
+    {
+      "routeId": "ref/still/reference-v1",
+      "kind": "standard",
+      "capability": "image-edit",
+      "operation": "edit",
+      "provider": "fal",
+      "model": "seedream-5-pro-edit",
+      "version": "v5-pro",
+      "identityState": "resolved",
+      "endpointId": "fal.seedream.edit",
+      "region": "us-central1",
+      "completionDriver": "webhook-and-poll",
+      "lifecycle": "available",
+      "exposure": {
+        "governed": "promoted",
+        "reader": "available",
+        "producerUi": "selectable",
+        "externalRollout": "gated"
+      },
+      "inputs": [
+        {
+          "slot": "prompt",
+          "role": "direction",
+          "mediaType": "text",
+          "required": true,
+          "valueShape": "text"
+        },
+        {
+          "slot": "references",
+          "role": "reference",
+          "mediaType": "image",
+          "required": true,
+          "cardinality": {
+            "min": 1,
+            "max": 10
+          },
+          "ordered": true,
+          "mechanism": "Fal image_urls[]; edit base first"
+        }
+      ],
+      "controls": [
+        {
+          "name": "quality",
+          "owner": "outputShape",
+          "valueShape": "enum(standard|hd)",
+          "mechanism": "Globe route contract"
+        },
+        {
+          "name": "aspect-ratio",
+          "owner": "outputShape",
+          "valueShape": "enum(1:1|16:9|9:16|4:3|3:4)",
+          "mechanism": "route shape and Fal edit defaults"
+        },
+        {
+          "name": "count",
+          "owner": "outputShape",
+          "valueShape": "integer(1..4)",
+          "mechanism": "governed Fal compiler num_images"
+        },
+        {
+          "name": "output-format",
+          "owner": "providerRequest",
+          "valueShape": "enum(png)",
+          "mechanism": "Globe pins PNG for retained MIME parity"
+        }
+      ],
+      "output": {
+        "mediaType": "image",
+        "mimeTypes": [
+          "image/png"
+        ],
+        "cardinality": {
+          "min": 1,
+          "max": 4
+        },
+        "encoding": "Fal result URL downloaded and retained content-addressed",
+        "durableAuthority": "Globe private asset and governance readback"
+      },
+      "transport": {
+        "kind": "Fal queue API",
+        "auth": "server-side Globe-owned Fal credential",
+        "requestMode": "queue submit with uploaded reference URLs",
+        "endpointSource": "governed endpoint allowlist",
+        "followUpReferences": "opaque URLs returned by Fal; never derive or persist them in a route card",
+        "browserAccess": "forbidden"
+      },
+      "completion": {
+        "driver": "webhook-and-poll",
+        "providerOperation": "Fal queue status and result",
+        "resultAuthority": "Fal result resolver followed by Globe durable ingest",
+        "recovery": "read binding/circuit state and existing attempt before retry; no duplicate submit"
+      },
+      "cables": {
+        "provider_supported": {
+          "state": "verified",
+          "evidenceRefs": [
+            "seedream-edit-docs",
+            "seedream-terms"
+          ]
+        },
+        "contract_declared": {
+          "state": "verified",
+          "evidenceRefs": [
+            "route-catalog",
+            "governed-composition",
+            "adr-023"
+          ]
+        },
+        "adapter_wired": {
+          "state": "wired",
+          "evidenceRefs": [
+            "fal-adapter",
+            "composite-policy"
+          ]
+        },
+        "transport_verified": {
+          "state": "verified",
+          "evidenceRefs": [
+            "seedream-canary",
+            "fal-adapter",
+            "seedream-edit-canary"
+          ]
+        },
+        "output_verified": {
+          "state": "verified",
+          "evidenceRefs": [
+            "seedream-canary",
+            "seedream-edit-docs",
+            "seedream-edit-canary"
+          ]
+        },
+        "billing_verified": {
+          "state": "verified",
+          "evidenceRefs": [
+            "seedream-edit-canary"
+          ],
+          "note": "Governed settlement readback on the sealed canary: 10 credits reserved = 10 spent, one reservation, one settlement, noDoubleDebit."
+        },
+        "rights_verified": {
+          "state": "verified",
+          "evidenceRefs": [
+            "seedream-terms",
+            "fal-terms",
+            "seedream-edit-canary"
+          ]
+        },
+        "evaluated": {
+          "state": "verified",
+          "evidenceRefs": [
+            "seedream-canary",
+            "fleet-ledger",
+            "seedream-edit-canary"
+          ]
+        },
+        "canary_passed": {
+          "state": "verified",
+          "evidenceRefs": [
+            "seedream-edit-canary"
+          ],
+          "note": "Governed post-promotion canary produced through the canonical spine commands, not a Lab run."
+        },
+        "promoted": {
+          "state": "verified",
+          "evidenceRefs": [
+            "seedream-edit-canary"
+          ],
+          "note": "promotion_4265dd26-7eda-4918-bd7d-10318dd6cd5f reached canary_passed rev 9 (terminal); binding enabled rev 5."
+        },
+        "available": {
+          "state": "available",
+          "evidenceRefs": [
+            "reader-live",
+            "seedream-edit-canary"
+          ],
+          "note": "Live fleet reader readback 2026-08-05 reports this route available. External rollout stays gated by TASK-1480."
+        }
+      },
+      "evidenceRefs": [
+        "route-catalog",
+        "fal-adapter",
+        "governed-composition",
+        "seedream-edit-docs",
+        "reader-live",
+        "seedream-edit-canary",
+        "runtime-handoff"
+      ],
+      "blockers": []
+    }
+  ],
+  "providerSurfaces": [
+    {
+      "surfaceId": "fal-seedream-5-lite",
+      "provider": "fal",
+      "endpointId": "bytedance/seedream/v5/lite",
+      "status": "candidate",
+      "modes": [
+        "text-to-image",
+        "image-edit"
+      ],
+      "cables": {
+        "provider_supported": {
+          "state": "verified",
+          "evidenceRefs": [
+            "seedream-lite-docs",
+            "fal-terms"
+          ]
+        },
+        "contract_declared": {
+          "state": "proposed",
+          "evidenceRefs": [
+            "seedream-lite-docs",
+            "route-catalog"
+          ]
+        },
+        "adapter_wired": {
+          "state": "not_started",
+          "evidenceRefs": [
+            "fal-adapter"
+          ],
+          "note": "The current Fal routing table serves Pro only."
+        },
+        "transport_verified": {
+          "state": "unknown",
+          "evidenceRefs": [
+            "seedream-lite-docs"
+          ]
+        },
+        "output_verified": {
+          "state": "unknown",
+          "evidenceRefs": [
+            "seedream-lite-docs"
+          ]
+        },
+        "billing_verified": {
+          "state": "unknown",
+          "evidenceRefs": [
+            "fal-terms"
+          ]
+        },
+        "rights_verified": {
+          "state": "unknown",
+          "evidenceRefs": [
+            "fal-terms"
+          ]
+        },
+        "evaluated": {
+          "state": "not_started",
+          "evidenceRefs": [
+            "seedream-lite-docs"
+          ]
+        },
+        "canary_passed": {
+          "state": "not_started",
+          "evidenceRefs": [
+            "seedream-lite-docs"
+          ]
+        },
+        "promoted": {
+          "state": "not_promoted",
+          "evidenceRefs": [
+            "reader-live"
+          ]
+        },
+        "available": {
+          "state": "gated",
+          "evidenceRefs": [
+            "reader-live"
+          ],
+          "note": "Lite has no Globe routeId or binding; it is not Seedream Mini."
+        }
+      },
+      "evidenceRefs": [
+        "seedream-lite-docs",
+        "fal-adapter",
+        "reader-live"
+      ],
+      "note": "Keep Lite separate from Pro. Adding it requires a route identity, adapter entry, rates, rights, evaluation, canary and reader readback."
+    }
+  ],
+  "implementationChecklist": [
+    {
+      "id": "seedream-pro-identities",
+      "status": "verified",
+      "ownerBoundary": "Globe catalog, Fal adapter, composite policy and endpoint compiler",
+      "evidenceRefs": [
+        "route-catalog",
+        "fal-adapter",
+        "composite-policy",
+        "governed-composition"
+      ]
+    },
+    {
+      "id": "seedream-t2i-availability",
+      "status": "verified",
+      "ownerBoundary": "Globe readiness, Fal binding, circuit and live fleet reader",
+      "evidenceRefs": [
+        "reader-live",
+        "fleet-ledger",
+        "seedream-canary"
+      ]
+    },
+    {
+      "id": "seedream-edit-binding-reconciliation",
+      "status": "verified",
+      "ownerBoundary": "Globe production routing control and Fal governed driver",
+      "evidenceRefs": [
+        "reader-live",
+        "fleet-ledger",
+        "fal-adapter"
+      ],
+      "note": "Closed 2026-08-05 by TASK-1641: the route was re-promoted end-to-end and its binding is enabled rev 5. Re-promoting was also what closed the readiness divergence, since no executable path exists today to pause a readiness (see TASK-1463 Delta 2026-08-05)."
+    },
+    {
+      "id": "seedream-lite-expansion",
+      "status": "deferred",
+      "ownerBoundary": "Globe model fleet expansion",
+      "evidenceRefs": [
+        "seedream-lite-docs",
+        "fal-adapter",
+        "reader-live"
+      ]
+    }
+  ]
+}

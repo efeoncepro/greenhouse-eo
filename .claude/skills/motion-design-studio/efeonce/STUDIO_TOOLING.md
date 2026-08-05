@@ -68,12 +68,12 @@ Gemini Omni + Veo corren en **Vertex del proyecto `efeonce-group`**. Receta **pr
 - **Referencias / image-to-video VERIFICADO (2026-07-05):** Omni **acepta imagen de referencia** en
   `contents[].parts[].inlineData` (`mimeType image/png` + el `text`). Probado pasando el frame de una toma
   previa → devolvió una toma **casi idéntica** (mismo mundo/luz/composición). **Esta es la cura de la
-  "desconexión":** encadená las tomas → cada toma usa el **último frame de la anterior como referencia** +
+  "desconexión":** encadena las tomas → cada toma usa el **último frame de la anterior como referencia** +
   el prompt del beat siguiente. Sin eso, tomas text-to-video independientes se ven como escenas sueltas.
 
 > **Fortaleza vs límite:** Omni entrega tomas cinematográficas de 10s; la **consistencia entre tomas** se
 > logra con **reference-chaining** (frame anterior como `inlineData`), no sólo con prompt. El **logo/UI/texto
-> NUNCA se generan con IA** (los deforma) → van en post como **overlay de asset real** (mograph). Diseñá el
+> NUNCA se generan con IA** (los deforma) → van en post como **overlay de asset real** (mograph). Diseña el
 > corte para no necesitar composite in-frame: beats de UI a **pantalla completa**, mundo/humano en **cortes
 > separados**, hilados por transición (pull-back/match-cut).
 
@@ -82,10 +82,10 @@ Gemini Omni + Veo corren en **Vertex del proyecto `efeonce-group`**. Receta **pr
 Cuando el motion es **UI/producto** (prompt box, chat, citas, cursor, gauge, dashboards, tipografía legible),
 NO uses video IA (deforma texto/logos). Producible por el agente, legible y on-brand:
 
-1. **Construí un mockup HTML/CSS/JS animado** (timeline con `setTimeout`/CSS): typing, cursor que se mueve y
-   "clickea", burbujas, citas, unfold de ventana, etc. Embebé el **logo real** (`<img src>` a `public/branding/*`).
-2. **Capturá con Playwright** (`recordVideo`, viewport 1280×720): correr el `.mjs` **desde la raíz del repo**
-   (el scratchpad NO resuelve `node_modules` → `ERR_MODULE_NOT_FOUND`; copiá el script a la raíz, corré, borralo).
+1. **Construye un mockup HTML/CSS/JS animado** (timeline con `setTimeout`/CSS): typing, cursor que se mueve y
+   "clickea", burbujas, citas, unfold de ventana, etc. Embebe el **logo real** (`<img src>` a `public/branding/*`).
+2. **Captura con Playwright** (`recordVideo`, viewport 1280×720): correr el `.mjs` **desde la raíz del repo**
+   (el scratchpad NO resuelve `node_modules` → `ERR_MODULE_NOT_FOUND`; copia el script a la raíz, corre, bórralo).
 3. **Empaquetado web** con `pnpm media:web-video` cuando el resultado vaya a
    un sitio/landing: genera WebM + MP4 fallback + poster. Runbook:
    `docs/operations/web-media-delivery-tooling.md`.
@@ -101,9 +101,9 @@ es no-determinista: **deforma el micro-texto y el logo** — en el test los moto
 Perplexity→Pespically, Gemini→Cantnl", "Fechas→Faches", precio 890→850, logo Efeonce fantasmeado. **NUNCA
 confiar la exactitud** (citas/nombres de motores/logo/precio) al output IA.
 
-**Workflow canónico (lo mejor de ambos):** usá el output Omni como **plate cinematográfico de fondo**
-(atmósfera/cámara/profundidad) y **componé encima la UI real crisp** (o los elementos que deben ser exactos:
-pregunta, citas con logos reales, gauge, logo). O mezclá beats: **Omni-enhanced** donde solo importa el texto
+**Workflow canónico (lo mejor de ambos):** usa el output Omni como **plate cinematográfico de fondo**
+(atmósfera/cámara/profundidad) y **compón encima la UI real crisp** (o los elementos que deben ser exactos:
+pregunta, citas con logos reales, gauge, logo). O mezcla beats: **Omni-enhanced** donde solo importa el texto
 grande (pregunta, thinking, ambiente) + **mograph crisp** donde el micro-texto es el mensaje (citas, gauge, end-card).
 
 ## Router de producción (elige la mano correcta)

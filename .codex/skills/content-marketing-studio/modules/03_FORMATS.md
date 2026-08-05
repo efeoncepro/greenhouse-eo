@@ -17,10 +17,16 @@ Cada formato es una herramienta distinta con una anatomía y un trabajo propio. 
 
 ## Blog / Pillar
 
-- **Trabajo:** ser la sede de un tema y el activo que se atomiza y distribuye por siempre.
-- **Anatomía:** título answer-first · promesa/hook · tesis con POV · desarrollo con datos/ejemplos/originalidad · takeaways accionables · CTA a la siguiente etapa.
+- **Trabajo:** ser la sede durable de un territorio: aprender, explorar y, cuando corresponda, decidir; además se
+  atomiza y distribuye por siempre.
+- **Anatomía:** entrada answer-first · orientación/rutas · núcleo canónico con POV y evidencia · mapa de cluster
+  desde registry · profundidad contextual · siguiente paso útil. No cada función necesita una card o interacción.
 - **2026:** escríbelo para ser **citable por IA** (respuestas autocontenidas, datos, fuentes, estructura escaneable). La *táctica técnica* (schema, chunking, entidad) es de `seo-aeo`.
-- **Regla:** un pillar sin plan de atomización (`04`) está a medio construir.
+- **Regla:** un pillar sin plan de cluster, atomización (`04`) y mantenimiento está a medio construir. El renderer
+  no define el formato; aplica `references/content-engineering.md` y PDR-018 en Efeonce.
+- **Cluster Experience federada:** los nodos no se limitan al sitio. Artículos, casos, templates, datasets,
+  diagnósticos, tools y piezas platform-native pertenecen sólo si completan un JTBD del territorio, entregan valor
+  autónomo y componen una progresión medible. La Pillar conserva el hogar canónico y el registry las relaciones.
 
 ## Ebook / Whitepaper / Lead magnet
 
@@ -52,6 +58,8 @@ Cada formato es una herramienta distinta con una anatomía y un trabajo propio. 
 
 - **Corto** (awareness/alcance social) vs **largo** (autoridad/profundidad). Video-first domina feeds.
 - El asset lo produce `motion-design-studio` / `audio-studio` / studios de asset via brief creativo; la distribución social es de `social-media-studio`. Aquí decides el *rol y guion editorial*.
+- Un video, Short o Reel puede ser `platform-native cluster node` si resuelve un JTBD de forma autónoma, tiene
+  URL/ID estable, relación gobernada y medición. Si sólo anuncia otra pieza, es `activation asset`.
 
 ## Podcast
 
@@ -65,7 +73,9 @@ Cada formato es una herramienta distinta con una anatomía y un trabajo propio. 
 
 ## Regla de oro del módulo
 
-**Piensa en sistemas de formato, no en piezas sueltas:** un pillar + su ebook gated + su webinar + su newsletter + sus átomos social son **un solo tema** expresado en formatos. Diseña el sistema, no la pieza aislada (→ `04`).
+**Piensa en sistemas de formato, no en piezas sueltas:** un pillar + su ebook gated + su webinar + su newsletter +
+sus nodos platform-native y activation assets son **un solo territorio** expresado en superficies y roles. Diseña
+el sistema, no la pieza aislada (→ `04`).
 
 ## Cross-links
 

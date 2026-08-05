@@ -30,6 +30,32 @@
 > `~/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Sky Airlines/7. Blog/`
 > Se lee y escribe **por filesystem** — no hace falta el conector de SharePoint.
 
+## V2 — Evolución y visibilidad del blog (agosto 2026)
+
+La nueva versión técnica se construyó como una línea append-only: la propuesta original y su deck vigente
+se conservan sin cambios.
+
+| Artefacto | Estado | Función |
+|---|---|---|
+| [`oferta-tecnica-v2-evolucion.md`](oferta-tecnica-v2-evolucion.md) | ✅ fuente | Reencuadra el servicio desde el blog con tracción hacia una nueva etapa editorial, con Notion/Content Hub como hub operativo, WordPress como superficie de publicación, el Centro de Ayuda como fuente y la newsletter de SKY. |
+| [`deck-plan-v2-evolucion.json`](deck-plan-v2-evolucion.json) | ✅ fuente de composición | Deck técnico enriquecido de 29 láminas, sin precios ni costos internos; recupera diagnóstico, Stack Operativo, SEO/AEO, Content Hub, portal y prueba social. |
+| [`artifact-manifest.json`](artifact-manifest.json) | ✅ evidencia viva | Registra por enlace la Radiografía y el informe de visibilidad en IA, con fecha y procedencia. |
+| [`oferta-economica-v2-evolucion.md`](oferta-economica-v2-evolucion.md) | ✅ fuente client-facing de taller | Core de CLP 3.000.000 mensuales netos, sin IVA; muestra IVA de CLP 570.000 y total mensual con IVA de CLP 3.570.000. Notion/Content Hub como hub editorial; newsletter incluida; Addons separados. |
+| [`economica-v2-evolucion.json`](economica-v2-evolucion.json) | ✅ input del Excel | SSOT transitorio del renderer económico; contiene la misma cifra neta, IVA y total que la fuente legible. |
+| [`propuesta-economica-sky-visibility-core-v2.xlsx`](propuesta-economica-sky-visibility-core-v2.xlsx) | ✅ generado | Excel económico V2 con desglose mensual, proyección a 12/24 meses, Addons y condiciones. |
+| [`correo-entrega-propuesta-v2.md`](correo-entrega-propuesta-v2.md) | ✅ borrador client-facing | Correo para Natalia y Erika, con Nashira en copia; resume el ajuste técnico, Notion/Content Hub y la económica neta/IVA. |
+| [`deck-plan-economic-v2-evolucion.json`](deck-plan-economic-v2-evolucion.json) | ✅ fuente de composición | Deck económico separado con `PricingFull`, Notion/Content Hub, neto/IVA/total explícitos y Addons coherentes con el Core. |
+| [`proposal-studio.json`](proposal-studio.json) | 🟡 `workshop_only` | Registro local honesto; incluye los planes técnico y económico, sin `proposalId`, render productivo ni verificación autenticada. |
+| [Deal SKY en HubSpot](https://app.hubspot.com/contacts/48713323/deal/62535094842?engagement=114121518673&utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=manage_crm_objects) | ✅ nota `114121518673` | Registro interno de la sesión: ajuste a Notion/Content Hub, contexto, económica, guardrails y siguientes pasos; no cambia etapa ni monto. |
+| `.captures/sky-bid-v2-evolucion-enriched/` | 🟡 taller | PDF local de 29 láminas, previews y contacto visual; no equivale a un asset verificado en Proposal Studio. |
+| `.captures/sky-bid-v2-evolucion/` | 🟡 histórico | Primer borrador comprimido de 17 láminas; se conserva para trazabilidad, no es la versión técnica recomendada. |
+| `.captures/sky-bid-economic-v2-evolucion/` | 🟡 taller | PDF económico local de 9 láminas, previews y render de control del Excel; no equivale a un asset verificado en Proposal Studio. |
+
+La económica V2 se mantiene separada de la técnica: fuente económica, deck `PricingFull`, Excel generado y,
+por separado, una arquitectura interna de capacidad/margen. La salida está compuesta en taller; antes de
+enviarla o registrarla como versión productiva se debe reconciliar el envelope de capacidad con el mix real,
+el cost-to-serve y el margen aprobado.
+
 ---
 
 ## 🚀 ¿Sesión nueva? Empieza acá
@@ -56,7 +82,7 @@ enlaces no clickeables, el discurso de la §3) y **lo que ya aprendimos y no hay
 
 | # | Entregable | Estado |
 |---|---|---|
-| 1 | **Deck de la propuesta** — la propuesta **se presenta en un deck** | ✅ **26 láminas, PDF 12.2 MB** (2026-07-15: suma stack operativo, día a día y anatomía del Content Hub; conserva los showcases vivos, agenda derivada, equipo real y 11 enlaces: 6 internos + 5 externos). La portada canónica amplía Efeonce, usa el logo SKY on-dark derivado del SVG oficial y conserva la URL Bubble. Registrado como **deck v6 · client-facing · draft** en Proposal Studio; v1-v5 se conservan. |
+| 1 | **Deck de la propuesta** — la propuesta **se presenta en un deck** | ✅ **29 láminas, PDF 12.7 MB** (2026-08-03: recupera diagnóstico, Stack Operativo, SEO/AEO, Content Hub, portal y prueba social, e instala Notion como hub editorial para grilla, comentarios, estados, QA y aprobación; conserva la evidencia viva y la agenda de la versión anterior). Registrado como **deck V2 enriquecido · client-facing · draft** en Proposal Studio; la versión comprimida de 17 láminas y las versiones anteriores se conservan. |
 | 2 | Subir a Wherex | ⏳ **Operador** (regla dura: el agente prepara; el humano sube y firma) |
 | — | Oferta técnica (PDF) | ✅ 2026-07-11 |
 | — | Oferta económica (PDF) | ✅ 2026-07-11 |
@@ -105,6 +131,7 @@ enlaces no clickeables, el discurso de la §3) y **lo que ya aprendimos y no hay
 | [`matriz-admisibilidad-INTERNO.md`](matriz-admisibilidad-INTERNO.md) | Checklist de control + **loaded cost y piso de negociación**. Entregarlo sería darle a la contraparte tu estructura de costos. |
 | [`squad-blueprint-INTERNO.md`](squad-blueprint-INTERNO.md) | **Loaded cost** del squad. |
 | [`diagnostico-INTERNO.md`](diagnostico-INTERNO.md) · [`benchmark-competencia-INTERNO.md`](benchmark-competencia-INTERNO.md) | Material de trabajo; lo publicable ya está destilado en la oferta técnica. |
+| [`propuesta-economica-arquitectura-v2-INTERNA.md`](propuesta-economica-arquitectura-v2-INTERNA.md) | Gate de capacidad, costeo, límites y artefactos de la económica V2; **no se entrega**. |
 
 > **Regla dura (`audience`):** todo artefacto del bid es **`internal`** o **`client_facing`**. **Sólo lo
 > `client_facing` se empaqueta.** El squad blueprint y el diagnóstico interno llevan **loaded cost** — no

@@ -82,6 +82,7 @@ const parseArgs = argv => {
     strict: false,
     changed: false,
     active: false,
+    strictChildParity: false,
     item: null
   }
 
@@ -111,6 +112,11 @@ const parseArgs = argv => {
 
     if (arg.startsWith('--format=')) {
       options.format = arg.slice('--format='.length)
+      continue
+    }
+
+    if (arg === '--strict-child-parity') {
+      options.strictChildParity = true
       continue
     }
 
@@ -569,6 +575,112 @@ const lintNextId = (config, context) => {
   return findings
 }
 
+const TASK_LIFECYCLE_DIRS = ['to-do', 'in-progress', 'complete']
+const MAX_REPORTED_MISSING_CHILDREN = 8
+
+export const parseDeclaredEpic = source => {
+  const match = source
+    .replace(/\r\n/g, '\n')
+    .match(/^-\s*Epic:\s*(.+)$/m)
+
+  if (!match) return null
+
+  return match[1].match(/EPIC-\d{3,}/)?.[0] ?? null
+}
+
+/**
+ * Epic ↔ child parity.
+ *
+ * El campo `Epic:` de una task y el `## Child Tasks` de su epic son dos escrituras
+ * independientes que nada reconcilia, así que divergen en silencio: el epic reporta
+ * un avance que no es el suyo. Caso fuente (2026-08-05): EPIC-020 declaraba "12/13
+ * childs complete" mientras 25 tasks se declaraban suyas sin estar listadas — el
+ * denominador estaba mal y el epic se leía como "casi cerrado".
+ *
+ * Esta regla barre TODAS las tasks del corpus, lee el epic que cada una declara y
+ * verifica que el id aparezca en el `## Child Tasks` de ese epic.
+ */
+const lintEpicChildParity = ({ repoRoot, config, context, options }) => {
+  if (options.kind !== 'epic') return []
+
+  const findings = []
+  const epicFiles = new Map()
+
+  for (const filePath of listAllFiles(repoRoot, config)) {
+    const id = normalizePath(relative(repoRoot, filePath)).match(/EPIC-\d{3,}/)?.[0]
+
+    if (id) epicFiles.set(id, filePath)
+  }
+
+  const tasksRoot = join(repoRoot, 'docs', 'tasks')
+  const taskFiles = TASK_LIFECYCLE_DIRS.flatMap(dir => listMarkdownFiles(join(tasksRoot, dir)))
+  const missingByEpic = new Map()
+  const unknownEpics = []
+
+  for (const taskFile of taskFiles) {
+    const relativeTaskPath = normalizePath(relative(repoRoot, taskFile))
+    const taskId = relativeTaskPath.match(/TASK-\d{3,}(?:\.\d+)?/)?.[0]
+
+    if (!taskId) continue
+
+    const declaredEpic = parseDeclaredEpic(readFileSync(taskFile, 'utf8'))
+
+    if (!declaredEpic) continue
+    if (options.item && declaredEpic !== options.item) continue
+
+    const epicFile = epicFiles.get(declaredEpic)
+
+    if (!epicFile) {
+      unknownEpics.push({ taskId, declaredEpic, relativeTaskPath })
+      continue
+    }
+
+    const childSection = parseSections(readFileSync(epicFile, 'utf8')).get('child tasks')
+
+    if (!childSection) continue
+
+    if (!childSection.content.includes(taskId)) {
+      const entry = missingByEpic.get(declaredEpic) ?? {
+        file: normalizePath(relative(repoRoot, epicFile)),
+        line: childSection.line,
+        tasks: []
+      }
+
+      if (!entry.tasks.includes(taskId)) entry.tasks.push(taskId)
+      missingByEpic.set(declaredEpic, entry)
+    }
+  }
+
+  for (const [epicId, entry] of Array.from(missingByEpic.entries()).sort()) {
+    const sorted = entry.tasks.sort()
+    const shown = sorted.slice(0, MAX_REPORTED_MISSING_CHILDREN).join(', ')
+    const overflow = sorted.length > MAX_REPORTED_MISSING_CHILDREN ? ` (+${sorted.length - MAX_REPORTED_MISSING_CHILDREN} más)` : ''
+
+    findings.push(
+      finding({
+        artifact: { file: entry.file },
+        rule: 'epic-child-parity',
+        severity: context.enforceEpicChildParity ? 'error' : 'warning',
+        line: entry.line,
+        message: `${epicId} no lista ${sorted.length} task(s) que se declaran suyas en su campo "Epic:": ${shown}${overflow}. Agrégalas a "## Child Tasks" o corrige el campo "Epic:" de la task — un denominador incompleto hace que el epic reporte un avance que no es el suyo.`
+      })
+    )
+  }
+
+  for (const item of Array.from(unknownEpics).sort((a, b) => a.taskId.localeCompare(b.taskId))) {
+    findings.push(
+      finding({
+        artifact: { file: item.relativeTaskPath },
+        rule: 'epic-child-parity',
+        severity: context.enforceEpicChildParity ? 'error' : 'warning',
+        message: `${item.taskId} declara "Epic: ${item.declaredEpic}" pero no existe ningún archivo de ese epic bajo docs/epics/.`
+      })
+    )
+  }
+
+  return findings
+}
+
 export const lintOperationalArtifacts = ({ repoRoot, options }) => {
   const config = CONFIG[options.kind]
   const context = loadContext(repoRoot, config)
@@ -616,6 +728,15 @@ export const lintOperationalArtifacts = ({ repoRoot, options }) => {
   }
 
   if (!options.item) findings.push(...lintNextId(config, context))
+
+  findings.push(
+    ...lintEpicChildParity({
+      repoRoot,
+      config,
+      context: { ...context, enforceEpicChildParity: options.strictChildParity },
+      options
+    })
+  )
 
   const errors = findings.filter(item => item.severity === 'error')
   const warnings = findings.filter(item => item.severity === 'warning')

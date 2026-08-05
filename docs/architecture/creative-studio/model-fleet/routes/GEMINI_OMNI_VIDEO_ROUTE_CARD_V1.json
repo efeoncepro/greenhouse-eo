@@ -1,0 +1,245 @@
+{
+  "schemaVersion": "model-route-card.v1",
+  "cardId": "route-card/gemini-omni-video",
+  "snapshot": {
+    "observedAt": "2026-08-04",
+    "maxAgeDays": 14,
+    "revalidateBeforeUse": true
+  },
+  "authority": {
+    "availabilityReader": "efeonce-globe:globe.producer.fleet.list",
+    "humanLedger": "docs/operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md",
+    "providerEvidence": "Google Cloud Gemini Omni model documentation and service terms"
+  },
+  "modelFamily": {
+    "publicName": "Gemini Omni Flash",
+    "familyKey": "gemini-omni-video",
+    "modality": "video",
+    "globeStatus": "gated",
+    "summary": "Reference-conditioned video route on Vertex Interactions API. The sealed canary proves the governed route, but the card does not replace the live reader or unblock the Producer input path.",
+    "integrationDecision": "Reuse the governed Vertex Omni driver and the exact reference-to-video binding; do not infer text-to-video, stateful edit or video-reference support from this route."
+  },
+  "evidence": [
+    {
+      "id": "fleet-ledger",
+      "authority": "runtime_primary",
+      "kind": "human-model-ledger",
+      "observedAt": "2026-08-04",
+      "reference": "docs/operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md",
+      "revalidateBeforeUse": true
+    },
+    {
+      "id": "runtime-handoff",
+      "authority": "runtime_primary",
+      "kind": "governed-canary-handoff",
+      "observedAt": "2026-08-04",
+      "reference": "docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md",
+      "revalidateBeforeUse": true
+    },
+    {
+      "id": "route-catalog",
+      "authority": "repo_primary",
+      "kind": "producer-route-catalog",
+      "observedAt": "2026-08-04",
+      "reference": "efeonce-globe:packages/domain/src/producer-catalog.ts",
+      "revalidateBeforeUse": false
+    },
+    {
+      "id": "governed-composition",
+      "authority": "repo_primary",
+      "kind": "governed-endpoint-composition",
+      "observedAt": "2026-08-04",
+      "reference": "efeonce-globe:apps/studio-web/src/governed-production-composition.ts",
+      "revalidateBeforeUse": false
+    },
+    {
+      "id": "omni-adapter",
+      "authority": "repo_primary",
+      "kind": "vertex-interactions-adapter",
+      "observedAt": "2026-08-04",
+      "reference": "efeonce-globe:apps/creative-runner/src/vertex-omni-adapter.ts",
+      "revalidateBeforeUse": false
+    },
+    {
+      "id": "omni-rights",
+      "authority": "runtime_primary",
+      "kind": "model-exact-rights-evidence",
+      "observedAt": "2026-08-02",
+      "reference": "efeonce-globe:scripts/evidence/vertex-omni-commercial-terms.json",
+      "revalidateBeforeUse": true,
+      "ttlDays": 30
+    },
+    {
+      "id": "omni-docs",
+      "authority": "provider_primary",
+      "kind": "model-documentation",
+      "observedAt": "2026-08-02",
+      "reference": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/omni-flash-preview",
+      "revalidateBeforeUse": true,
+      "ttlDays": 14,
+      "note": "Primary source for the preview model identity, global availability and reference-to-video capability."
+    },
+    {
+      "id": "omni-terms",
+      "authority": "provider_primary",
+      "kind": "service-and-preview-terms",
+      "observedAt": "2026-08-02",
+      "reference": "https://cloud.google.com/terms/genai-preview-products",
+      "revalidateBeforeUse": true,
+      "ttlDays": 30,
+      "note": "Commercial delivery remains subject to the exact model documentation, Cloud agreement and use policy."
+    },
+    {
+      "id": "adr-023",
+      "authority": "repo_primary",
+      "kind": "route-card-decision",
+      "observedAt": "2026-08-04",
+      "reference": "docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_ROUTE_CARDS_DECISION_V1.md",
+      "revalidateBeforeUse": false
+    },
+    {
+      "id": "omni-canary",
+      "authority": "runtime_primary",
+      "kind": "terminal-canary-evidence",
+      "observedAt": "2026-08-04",
+      "reference": "efeonce-globe:promotion_1a5d117e-0a0c-4f63-92e7-817a808e0ff3",
+      "revalidateBeforeUse": true,
+      "note": "Canary passed under the exact route identity; the retained output and governance readback are recorded in the runtime handoff."
+    }
+  ],
+  "routes": [
+    {
+      "routeId": "ref/motion/reference-v1",
+      "kind": "standard",
+      "capability": "video-generate",
+      "operation": "create",
+      "provider": "vertex-omni",
+      "model": "gemini-omni-flash-preview",
+      "version": "preview",
+      "identityState": "resolved",
+      "endpointId": "vertex.omni.reference-to-video",
+      "region": "global",
+      "completionDriver": "poll",
+      "lifecycle": "gated",
+      "exposure": {
+        "governed": "sealed",
+        "reader": "unknown",
+        "producerUi": "blocked",
+        "externalRollout": "gated"
+      },
+      "inputs": [
+        {
+          "slot": "references",
+          "role": "reference",
+          "mediaType": "image",
+          "mimeTypes": ["image/jpeg", "image/png", "image/webp"],
+          "cardinality": { "min": 1, "max": 4 },
+          "ordered": true,
+          "mechanism": "reference-conditioned"
+        },
+        {
+          "slot": "prompt",
+          "role": "direction",
+          "mediaType": "text",
+          "required": true,
+          "valueShape": "text"
+        }
+      ],
+      "controls": [
+        { "name": "duration", "owner": "outputShape", "valueShape": "integer(3..10 seconds)", "mechanism": "Globe route contract" },
+        { "name": "aspect-ratio", "owner": "outputShape", "valueShape": "enum(16:9|9:16)", "mechanism": "response_format.aspect_ratio" },
+        { "name": "audio-mode", "owner": "outputShape", "valueShape": "enum(with-audio|silent)", "mechanism": "catalog declaration; inspect output before external delivery" }
+      ],
+      "output": {
+        "mediaType": "video",
+        "mimeTypes": ["video/mp4"],
+        "audio": "catalog declares audio capability; byte-level output inspection remains required per canary",
+        "durableAuthority": "Globe private content-addressed asset and governance readback"
+      },
+      "transport": {
+        "kind": "Vertex Interactions API",
+        "auth": "server-side ADC/WIF",
+        "requestMode": "synchronous unary interaction",
+        "endpointSource": "governed allowlist",
+        "followUpReferences": "none; do not reconstruct a provider queue URL",
+        "browserAccess": "forbidden"
+      },
+      "completion": {
+        "driver": "poll",
+        "providerOperation": "interaction completion read",
+        "resultAuthority": "Globe result driver after provider response",
+        "recovery": "readback before retry; no provider fallback"
+      },
+      "cables": {
+        "provider_supported": { "state": "verified", "evidenceRefs": ["omni-docs", "omni-rights"] },
+        "contract_declared": { "state": "verified", "evidenceRefs": ["route-catalog", "governed-composition", "adr-023"] },
+        "adapter_wired": { "state": "wired", "evidenceRefs": ["omni-adapter", "governed-composition"] },
+        "transport_verified": { "state": "verified", "evidenceRefs": ["omni-canary", "runtime-handoff"] },
+        "output_verified": { "state": "verified", "evidenceRefs": ["omni-canary", "runtime-handoff"], "note": "Retained canary output and governance are evidenced; recheck MIME/audio when changing the route contract." },
+        "billing_verified": { "state": "unknown", "evidenceRefs": ["fleet-ledger", "runtime-handoff"], "note": "The card does not infer final settlement details from the canary hash." },
+        "rights_verified": { "state": "verified", "evidenceRefs": ["omni-rights", "omni-terms"] },
+        "evaluated": { "state": "verified", "evidenceRefs": ["fleet-ledger", "omni-canary"] },
+        "canary_passed": { "state": "verified", "evidenceRefs": ["omni-canary", "runtime-handoff"] },
+        "promoted": { "state": "verified", "evidenceRefs": ["omni-canary", "runtime-handoff"] },
+        "available": { "state": "gated", "evidenceRefs": ["fleet-ledger", "runtime-handoff"], "note": "The card never overrides globe.producer.fleet.list; external rollout and the Producer reference-input path remain gated." }
+      },
+      "evidenceRefs": ["route-catalog", "governed-composition", "omni-adapter", "omni-docs", "omni-canary", "runtime-handoff"],
+      "blockers": [
+        "Re-read the live fleet reader before any consumer-facing availability claim.",
+        "Keep the Producer reference-input and private-ingest blockers explicit until a real UI canary passes.",
+        "Revalidate preview terms, output MIME/audio and settlement before external rollout."
+      ]
+    }
+  ],
+  "providerSurfaces": [
+    {
+      "surfaceId": "vertex-omni-non-public-video-surfaces",
+      "provider": "vertex-omni",
+      "endpointId": "vertex.omni.reference-to-video",
+      "status": "deferred",
+      "modes": ["image-to-video", "reference-to-video", "stateful-edit"],
+      "cables": {
+        "provider_supported": { "state": "verified", "evidenceRefs": ["omni-docs", "omni-rights"] },
+        "contract_declared": { "state": "proposed", "evidenceRefs": ["omni-docs", "omni-adapter"], "note": "Provider capability is broader than Globe's public route contract; video references and stateful edit need their own route identity and governance." },
+        "adapter_wired": { "state": "wired", "evidenceRefs": ["omni-adapter"], "note": "The adapter contains generic image-to-video/stateful-edit seams, but this card does not treat them as public Producer routes." },
+        "transport_verified": { "state": "unknown", "evidenceRefs": ["omni-adapter"], "note": "No separate governed route canary is claimed for these modes." },
+        "output_verified": { "state": "unknown", "evidenceRefs": ["omni-docs"] },
+        "billing_verified": { "state": "unknown", "evidenceRefs": ["omni-docs"] },
+        "rights_verified": { "state": "unknown", "evidenceRefs": ["omni-rights"], "note": "The exact governed reference route is attested; a new mode still requires route-scoped review." },
+        "evaluated": { "state": "not_started", "evidenceRefs": ["omni-adapter"] },
+        "canary_passed": { "state": "not_started", "evidenceRefs": ["omni-adapter"] },
+        "promoted": { "state": "not_promoted", "evidenceRefs": ["fleet-ledger"] },
+        "available": { "state": "gated", "evidenceRefs": ["fleet-ledger"], "note": "No public Producer route or governed binding is claimed for these modes." }
+      },
+      "evidenceRefs": ["omni-docs", "omni-adapter", "fleet-ledger"],
+      "note": "The provider supports a wider modality set than Globe currently exposes. Add a distinct route card/routeId before exposing video references or stateful editing."
+    }
+  ],
+  "implementationChecklist": [
+    {
+      "id": "omni-route-identity",
+      "status": "verified",
+      "ownerBoundary": "efeonce-globe route catalog, governed composition and Vertex Omni adapter",
+      "evidenceRefs": ["route-catalog", "governed-composition", "omni-adapter"]
+    },
+    {
+      "id": "omni-canary-and-governance",
+      "status": "verified",
+      "ownerBoundary": "Globe readiness, routing, canary and Asset Governance",
+      "evidenceRefs": ["omni-canary", "runtime-handoff"]
+    },
+    {
+      "id": "omni-producer-reference-input",
+      "status": "blocked",
+      "ownerBoundary": "Globe Producer UI and private ingest",
+      "evidenceRefs": ["fleet-ledger", "runtime-handoff"],
+      "note": "The governed canary does not prove that the authenticated Producer can create the mandatory-input route from its UI."
+    },
+    {
+      "id": "omni-external-rollout",
+      "status": "deferred",
+      "ownerBoundary": "Globe entitlements, rollout and commercial governance",
+      "evidenceRefs": ["fleet-ledger", "omni-rights", "omni-terms"]
+    }
+  ]
+}

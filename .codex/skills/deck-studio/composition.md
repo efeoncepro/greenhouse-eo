@@ -61,6 +61,65 @@ operaciones determinísticas con **0 Studio Credits**. El costo humano/plataform
 asset generativo incluido en un slot conserva su propio run y ledger; el Composer no lo recobra por slide ni
 convierte costo de provider en créditos. Reemitir el mismo plan o derivar otro target tampoco crea inferencia.
 
+### Patrón de licitación reusable: evidencia que progresa
+
+La segunda licitación producida con el Artifact Composer, Brightcell, consolidó un patrón que debe
+reutilizarse cuando una propuesta combina diagnóstico, servicios recurrentes y herramientas
+operativas. El plan no agrupa láminas por disponibilidad de templates: las encadena por la decisión
+que el lector necesita tomar.
+
+```text
+Diagnóstico  →  Intervención  →  Operación  →  Conversión
+qué ocurre       qué cambia       cómo se sostiene  qué acción habilita
+```
+
+#### Aplicación práctica
+
+1. **Diagnóstico:** mostrar la brecha con evidencia trazable. En SEO/AEO puede ser un AEO Grader o
+   una línea base de visibilidad. Si el dato todavía no fue medido, mostrar el método y rotular la
+   pieza como conceptual; nunca convertir un ejemplo en resultado.
+2. **Intervención:** mostrar una página, contenido o journey mediante un mockup X-Ray. Anotar qué se
+   corrige: intención, arquitectura, entidad, schema, preguntas, prueba y CTA. El mockup demuestra
+   cómo se trabaja, no que el trabajo ya fue ejecutado.
+3. **Operación:** mostrar el ritmo mensual con un dashboard tipo Greenhouse: acciones, publicaciones,
+   visibilidad, citabilidad, conversiones y siguientes decisiones. El caption debe explicar qué
+   pregunta responde el tablero.
+4. **Conversión:** hacer explícito el siguiente paso: cotización, agendamiento, formulario o contacto
+   comercial. Una lámina de medición que no cambia una decisión es un reporte decorativo.
+
+#### Templates que reducen riesgo de compra
+
+- `ToolStackFull` aparece cuando el lector ya entiende el método y necesita comprobar con qué se
+  ejecutará. Organiza el stack por función, no como una lista de logos sin relación con la oferta.
+- `TeamGalleryFull` aparece cuando el lector necesita comprobar ownership y capacidad de delivery.
+  Cada persona lleva un rol real y verificable; no se generan rostros para representar al equipo.
+- Los mockups de Grader, X-Ray, dashboard o pipeline llevan captions del tipo `vista conceptual`,
+  `ejemplo de lectura` o `flujo propuesto` mientras no haya evidencia viva del cliente. La caption
+  debe aclarar el propósito del artefacto y evitar que el comité lo interprete como una métrica
+  histórica.
+
+La regla de selección es: **si la lámina no cambia la comprensión del método, la confianza en la
+ejecución o la acción siguiente, se elimina**. La continuidad visual del catálogo importa, pero la
+continuidad argumental importa más.
+
+#### QA específico y protección de decks previos
+
+Después de componer:
+
+- mirar todos los frames, no sólo la lámina nueva;
+- comprobar que cada mockup conserva su caption y no muestra datos ficticios como hechos;
+- revisar que `ToolStackFull` y `TeamGalleryFull` no repitan información ya explicada ni rompan la
+  densidad del arco;
+- verificar que los titulares se leen como una cadena de afirmaciones;
+- confirmar que el output, el plan, los assets y las capturas pertenecen al deal actual;
+- ejecutar `git status --short` y `git diff --stat` para comprobar que un deck anterior (por ejemplo,
+  SKY) no fue sustituido ni reescrito.
+
+Brightcell es la segunda implementación de este método con Artifact Composer; SKY es la primera
+referencia. La protección es parte del método: cada licitación conserva su propio plan, evidencia,
+assets y output. Reusar una plantilla o una capacidad no autoriza reusar datos, screenshots,
+branding, equipo, métricas o artefactos internos de otro cliente.
+
 **El entregable es UN PDF de N páginas**, no un puñado de PNGs. El merge y el **gate de peso** son
 parte del contrato: **los portales rechazan adjuntos sobre su límite** — el peso es **admisibilidad**,
 no cosmética. *(Y el límite lo fijan **las bases**, no el portal. Ver [`evidence-integrity.md`](evidence-integrity.md).)*

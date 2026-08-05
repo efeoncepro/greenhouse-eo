@@ -119,6 +119,28 @@ aparece citado subió {X}%."* **Eso se mide en la cuenta de él, y nadie más lo
 🎯 **Cambiar *"mira mi pasado"* por *"mira tu presente"* no es un parche: es un upgrade de conversación.**
 El caso ajeno **siempre** admite la duda *("sí, pero ese no es mi negocio")*. **Su propio diagnóstico, no.**
 
+### 🎯 El segundo diagnóstico gratis: su propio Search Console
+
+El Grader mira los motores de respuesta. **Hay un segundo diagnóstico, del mismo costo (cero), que mira su
+SERP clásica: *striking distance* sobre SU GSC.** Método completo → skill `seo-aeo`,
+`modules/02_SEO_CONTENT.md` *(**medido** as-of 2026-08-05)*.
+
+Por qué vende:
+
+- ✅ **No depende de licencias de terceros.** No hay volumen de Semrush ni dificultad estimada que discutir:
+  **son sus impresiones, medidas por Google.**
+- ✅ **Sale en clics, no en puntos de un índice.** El score es *clics incrementales estimados* — unidad que el
+  CFO entiende y que después **se verifica en la casa del cliente**, no en nuestro dashboard *(regla 7)*.
+- 🎯 **Separa dos trabajos que el mercado vende revueltos:** empujar una query que está en posición 8–10 **no
+  es** consolidar una query canibalizada. Mostrar esa distinción **prueba método sin prometer nada.**
+
+🔴 **Sigue sin ser un caso.** Es un diagnóstico sobre datos del propio prospecto: no lo presentes como
+resultado nuestro ni le cuelgues encima una promesa de tráfico. **Las reglas del §7 quedan intactas.**
+
+⚠️ **Cuidado al leerlo en reunión:** GSC **no publica el día de ayer** *(responde vacío, sin error)* y
+consolida con ~48h de retraso. **Nunca muestres "ayer"** — es un cero que no existe. → `seo-aeo`,
+`modules/07_MEASUREMENT.md`.
+
 ---
 
 ## 7. Reglas duras

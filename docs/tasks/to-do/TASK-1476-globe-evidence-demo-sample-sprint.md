@@ -21,7 +21,7 @@
 - Rank: `TBD`
 - Domain: `creative|commercial|sales`
 - Blocked by: `TASK-1462, TASK-1467, TASK-1472, TASK-1473`
-- Branch: `task/TASK-1476-globe-evidence-demo-sample-sprint`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

@@ -93,14 +93,11 @@ If the no-regression surface is too broad for an issue-only fix, escalate to
 
 ## Filesystem / Worktree Rule
 
-Do not create `git worktree` folders or cloned repo folders by default when this
-hook runs.
-
-Use a worktree only if the operator explicitly asks for it or approves it in the
-current session. If the checkout is dirty, report the relevant dirty state and
-work around it in the current checkout, or ask for confirmation if the dirty
-state blocks the issue. If an approved worktree is created, remove it and delete
-its temporary branch before closing unless the operator asks to keep it.
+Work only in the current shared checkout. Never create, use, or move issue work to
+`git worktree` folders, isolated checkouts or cloned repo folders. Never touch an
+existing worktree unless the operator explicitly names its path and the exact
+action. If dirty state blocks the issue, report it and stop for operator direction;
+do not create an alternate tree as a workaround.
 
 ## Notes
 

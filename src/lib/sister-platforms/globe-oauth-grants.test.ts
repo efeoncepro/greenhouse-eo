@@ -108,6 +108,7 @@ describe('Globe OAuth grant contract', () => {
       'globe.lab.recipe.author',
       'globe.credits.read',
       'globe.credits.estimate',
+      'globe.credits.capacity.self.read',
       'globe.model-readiness.review',
       'globe.model-readiness.propose',
       'globe.model-rights.attest',
@@ -141,6 +142,10 @@ describe('Globe OAuth grant contract', () => {
       expect(PRODUCER_CONTRACT.policy.capabilityScopes).toContain(attestScope)
       expect(PRODUCER_CONTRACT.allowedScopes).toContain(attestScope)
     }
+
+    expect(PRODUCER_CONTRACT.policy.requiredScopes).toContain('globe.credits.capacity.self.read')
+    expect(PRODUCER_CONTRACT.policy.capabilityScopes).toContain('globe.credits.capacity.self.read')
+    expect(PRODUCER_CONTRACT.allowedScopes).toContain('globe.credits.capacity.self.read')
   })
 
   it('promotes only allowed_scopes and policy_json, preserving every other client field', async () => {

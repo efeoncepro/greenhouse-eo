@@ -357,6 +357,27 @@ El contrato canónico y el mapa de composición viven en
 vive en `docs/audits/commercial/AI_PARTNER_PROGRAM_APPLICATIONS_2026-07-26.md`. Una postulación enviada, una cuenta
 creada o una capability disponible no equivale a partnership aprobado, reseller rights o co-selling habilitado.
 
+### Creative Velocity y productización modular
+
+Cuando una oferta combina capacidad humana, Creative Operations y una experiencia modular, separar tres capas:
+
+1. Servicio operado: capacity envelope, pod/lane, SOW y delivery.
+2. IP/sistema: templates, reglas, taxonomía, brand profile, memoria y método.
+3. Producto: experiencia configurable, provenance, exportación, integraciones, entitlements y billing.
+
+La evidencia de SKY con Adobe Express, SharePoint y assets reutilizables prueba capability de delivery; no prueba
+self-service, API pública, precio por asset ni producto generalizado. El estado debe permanecer
+`approved_for_validation` hasta cerrar economics, rights, portabilidad, runtime y soporte.
+
+`Embedded Managed Pod` es una configuración de delivery, no Staff Augmentation: integra culturalmente un pod externo
+al cliente, pero Efeonce conserva staffing, gobierno y accountability. El fit cultural es un driver económico y de
+renovación; costear immersion, rituales, coordinación, memoria, continuidad, backup y soporte.
+
+Si Efeonce absorbe equipos, infraestructura, licencias, contratación, payroll, provisionales, reemplazos y soporte,
+clasificar la oferta como `Fully Managed Creative Capacity`: fee mensual integral por capacity envelope. El modelo es
+global en los países donde Efeonce opera, pero requiere economics, compliance, impuestos, FX, derechos laborales,
+privacidad, proveedores y procurement parametrizados por jurisdicción.
+
 ### Regla de economics para providers de IA
 
 Para cada capability separar `prototype`, `production-scale` y `fallback`. Fal puede funcionar como gateway de

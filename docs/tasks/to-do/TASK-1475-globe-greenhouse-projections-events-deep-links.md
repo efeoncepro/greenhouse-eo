@@ -1,5 +1,12 @@
 # TASK-1475 — Globe Greenhouse Projections, Events and Deep Links
 
+## Aclaración 2026-08-02 — TASK-1632 no es una dependencia cross-product
+
+`TASK-1632` pertenece íntegramente al runtime Globe: convierte los callbacks verificados de proveedor en el
+disparador primario del lifecycle durable hasta Asset Governance. No publica a Greenhouse y no es foundation ni
+blocker de esta task. `TASK-1475` conserva de forma independiente el contrato futuro de proyecciones, eventos y
+deep links entre productos.
+
 ## Delta 2026-07-21 — TASK-1507 complete: gate del custom domain levantado
 
 El custom domain ya está publicado: los deep links se construyen sobre `https://globe.efeoncepro.com`. El `*.run.app`
@@ -36,7 +43,7 @@ decisión diferida (ADR-004) — no asumir dominio comercial acá.
 - Rank: `TBD`
 - Domain: `platform|integration|greenhouse`
 - Blocked by: `TASK-1472, TASK-1473`
-- Branch: `task/TASK-1475-globe-greenhouse-projections-events-deep-links`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -74,7 +81,7 @@ Hacer Globe alcanzable y observable desde Greenhouse conservando fronteras de pr
 
 ### Depends on
 
-- `TASK-1472`, `TASK-1473`.
+- `TASK-1472` y `TASK-1473`.
 
 ### Blocks / Impacts
 
@@ -173,7 +180,8 @@ Hacer Globe alcanzable y observable desde Greenhouse conservando fronteras de pr
 
 ### Slice 2
 
-- Implementar publisher/consumer idempotente con WIF.
+- Implementar el publisher Globe y consumer Greenhouse idempotentes bajo el contrato cross-product propio de
+  esta task; no reutilizar los wakes internos de `TASK-1632` como eventos empresariales.
 
 ### Slice 3
 

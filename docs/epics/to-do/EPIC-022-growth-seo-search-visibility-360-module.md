@@ -61,6 +61,8 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1315` — [planificada, backend-data] E-E-A-T signal extraction (entity + author + trust) — capa de autor + probes de trust, reusando entity probes (KG/Wikidata/Reddit) + json-ld.
 - `TASK-1316` — [planificada, backend-data] E-E-A-T rater (rúbrica 4 pilares, YMYL-aware) — assessment LLM reusando brand-intelligence + evals/accuracy, con confianza calibrada (anti falso-0).
 - `TASK-1317` — [planificada, backend-data] E-E-A-T scorecard reader + integración (`readEeatScorecard`; alimenta topical authority 1314 + el 360; medido vs evaluado).
+- `TASK-1645` — [planificada, backend-data] **Ecosystem lane + MCP tools** (`/api/platform/ecosystem/growth/seo/*` vía `runEcosystemReadRoute` + 3 tools read-only en `src/mcp/greenhouse/**`, espejo TASK-1086). Materializa el mandato parity+MCP (delta 2026-08-05). Blocked by 1301/1302/1303.
+- `TASK-1426` — [reconciliada 2026-08-05, backend-data] **Search Console multi-property + URL Inspection + post-publish discovery.** Declaraba `Epic: EPIC-022` en su cabecera pero no estaba en esta lista (su única traza era la mención en la Ola D). Extiende la conexión GSC de una propiedad única por organización a un contrato multi-property canónico.
 
 ## Existing Related Work
 
@@ -76,6 +78,7 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - [ ] La pantalla estrella (evolución de URLs/keywords en el tiempo) entrega valor con datos reales de Berel, con honestidad medido (GSC) vs estimado (DataForSEO).
 - [ ] Gate de costo DataForSEO per-org operativo (quota cap + signal `seo.provider.cost_over_budget`).
 - [ ] Documentación triple (técnica/funcional/manual) del módulo + flag `GROWTH_SEO_ENABLED` en el Feature Flag Ledger.
+- [ ] **Full API Parity + MCP verificados como consumers reales (mandato del operador 2026-08-05):** los readers canónicos sirven UI + Nexa + lane ecosystem (`api/platform/ecosystem/growth/seo/*`) + MCP tools (`TASK-1645`) sin lógica duplicada; el epic NO cierra con el módulo UI-only aunque todos los demás criterios pasen. La superficie MCP incluye disponibilidad vía el gateway `mcp.efeonce.org` (provider federado en TASK-1626) o task dedicada de federación creada con dueño. Writes de agente declarados vía governed action loop (follow-up explícito, no deuda oculta).
 
 ## Non-goals
 
@@ -176,3 +179,60 @@ revenue, ni publicar pricing. Mantiene las reglas del modelo canónico y del [Cu
 La definición de cierre del epic debe incluir evidencia técnica **y** evidencia de cliente, delivery, economics,
 adopción y renovación. La fuente transversal para esa evaluación es `efeonce-customer-model-operator`; GTM,
 Commercial, Pricing, Finance, Legal y Operations conservan sus decisiones propias.
+
+## Delta 2026-08-05 — Arranque de ejecución + mandato Full API Parity / MCP
+
+- **`TASK-1299` (schema fundacional) en ejecución:** migración `20260805134439202_task-1299-growth-seo-schema.sql` aplicada en `greenhouse-pg-dev` — 8 tablas `seo_*` (config + serie temporal append-only), UNIQUEs de idempotencia, triggers `block_seo_row_mutation`, GRANTs least-privilege, `db.d.ts` regenerado, smoke live anti-mutation verificado. El bloqueador fundacional dejó de serlo.
+- **Mandato del operador (directiva de sesión 2026-08-05):** todo lo que el módulo SEO construya **nace Full API Parity y usable por MCP**. Materialización: exit criterion nuevo (parity+MCP verificados como consumers reales), child task `TASK-1645` (lane ecosystem + MCP tools, espejo `TASK-1086` de Knowledge) y DoD reforzado en `TASK-1301` (capability ⇒ el chokepoint sirve a TODOS los lanes, nunca un gate paralelo por consumer). Los writes de agente se declaran vía governed action loop como follow-up explícito.
+
+## Delta 2026-08-05 (b) — Destino Wave declarado: nace en Greenhouse, se habilita en `wave.efeonce.org`
+
+Directiva del operador: Search Visibility 360 nace en greenhouse-eo (la plataforma vigente) y eventualmente se
+habilita como producto en `wave.efeonce.org` (consistente con `EPIC-037`: Wave = casa del producto; Greenhouse =
+administrador, no runtime de largo plazo). Implicación para TODAS las child tasks: nacer **extraction-ready** según
+`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §17 (inventario del seam, FK org como único acople deliberado, reglas
+duras de imports/FKs/consumers). La extracción física NO se autoriza desde este epic mientras `EPIC-027` esté
+activo; es programa posterior de Wave.
+
+## Delta 2026-08-05 (c) — Prioridad MCP-first (directiva del operador)
+
+Operar las herramientas SEO **por MCP es la prioridad más alta del módulo**; la UI es necesaria pero va después.
+Re-priorización: `TASK-1301`, `TASK-1302` y `TASK-1645` suben a **P1**; `TASK-1645` se desbloquea de 1303 y sale
+con el primer reader (GSC). Los readers posteriores (1303/1305) registran su MCP tool **en su propio PR**
+(parity-at-birth incremental). Ola B re-ordenada: `1301 → 1302 → 1645 (lane+tools V1) → 1300 → 1303 (+tool rank)
+→ UI 1306/1307`. La UI no bloquea ninguna entrega MCP.
+
+## Delta 2026-08-05 (d) — Sinergia SEO↔AEO adelantada al camino crítico (directiva del operador)
+
+El operador exige que las sinergias directas con el AEO **ocurran** — no son un nice-to-have de Ola C.
+Con `seo_gsc_daily` materializándose en vivo (TASK-1302 rollout 2026-08-05) y `grader_scores` en producción,
+el cruce ya es computable HOY. `TASK-1305` (`readSeoAeoGap` + matriz quadrant 360) sube P3→P1, se desbloquea
+de TASK-1303 (V1 = GSC medido × grader; rank snapshots enriquecen después) y entra a la Ola B:
+**1301 → 1302 → 1305 → 1645**, para que el tool MCP `get_seo_visibility_360` nazca con el cruce real.
+Las sinergias posteriores (1311 citation attribution URL, 1313 unified read, 1314 topical authority,
+1315-17 E-E-A-T sobre probes del grader) siguen su secuencia, pero el quadrant 360 no espera.
+
+## Delta 2026-08-05 (e) — Cierre del día
+
+El día cerró con **seis tasks ejecutadas**: `TASK-1299` (schema) · `TASK-1301` (capabilities + entitlement
+per-org `seo_v1` + chokepoint `enforceSeoRunEntitlement`) · `TASK-1300` (DataForSEO family registry + ledger de
+gasto como fuente única) · `TASK-1302` (GSC daily materializer + `readKeywordOpportunities`, **rollout live**) ·
+`TASK-1305` (`readSeoAeoGap` + quadrant 360; primer cruce real: Berel #1.75 orgánico × AEO 44.5 → `riesgo`),
+todas `complete`, más `TASK-1645` **code-complete** (lane ecosystem
+`/api/platform/ecosystem/growth/seo/{keyword-opportunities,visibility-360,entitlement}` + 3 MCP tools
+`get_seo_keyword_opportunities` / `get_seo_visibility_360` / `get_seo_entitlement`). Los mandatos quedaron
+amarrados: MCP-first, todo reader futuro expone su MCP tool en el mismo PR (criterio de aceptación en
+`TASK-1303`/`1304`/`1311`/`1312`/`1313`/`1314`/`1317`) y destino Wave en la arquitectura §17. Efeonce quedó
+provisionada **own-brand** (dogfooding) sobre `EO-ORG-0007`: 4 perfiles grader con lente AEO ligada (SKY ya la
+tenía), assignment `seo_v1` `contracted`/`own_brand`, target `efeoncepro.com`; `visibility-360` responde
+`no_seo_data` honesto hasta conectar GSC (script: `scripts/growth/provision-efeonce-own-brand-seo.ts`).
+**Para operar falta el cutover:** `GROWTH_SEO_ENABLED` en Vercel + smoke e2e HTTP con binding real (cierre de
+1645) · `TASK-1647` (federación del provider en `mcp.efeonce.org`, adapter delgado con canaries antes de
+discovery) · conexión GSC per-org de `efeoncepro.com` al destrabar `TASK-1282`/`1283`.
+
+**Cierre nocturno (misma fecha):** `TASK-1647` quedó **code-complete** — provider `greenhouse-seo` + 3 tools
+en `efeonce-mcp` (main, `a53b77f`+`4870e90`, fail-closed default OFF) con canary e2e **verificado por HTTPS
+real** (gateway → lane staging → readers → PG: Berel `riesgo`/50 keywords/AEO 44.5, entitlement Efeonce 8/$50 +
+`no_seo_data` honesto, deny anti-oracle 404). `GROWTH_SEO_ENABLED=true` aplicado en Vercel **staging** +
+redeploy; Berel provisionada Fase 0 (`cpma-berel-seo-contracted` + `seot-berel-fase0`). Único bloqueo:
+greenhouse PROD sin el lane (release develop→main); secuencia de cierre en `TASK-1647`.

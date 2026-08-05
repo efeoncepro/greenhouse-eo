@@ -9,6 +9,8 @@
 > [RESEARCH-009](../../research/RESEARCH-009-creative-operations-agentic-workflows.md) (doctrina Creative Workflow).
 > **Brief de ejecución:** [Creative Workflows Pillar + Cluster Brief V1](../CREATIVE_WORKFLOWS_PILLAR_CLUSTER_BRIEF_V1.md).
 > **Evolución del territorio:** [Creative Workflows Knowledge-to-Product Ladder V1](../CREATIVE_WORKFLOWS_KNOWLEDGE_TO_PRODUCT_LADDER_V1.md).
+> **Evolución de formato:** [PDR-018](PDR-018-pillar-experience-arquitectura-editorial-y-runtime.md) define cómo
+> una Document Pillar progresa a Pillar Experience sin duplicar canonical ni confundir Think con un host.
 > **Estado de evidencia:** la tesis, el panorama competitivo, la intención SERP y el claim ledger tienen research
 > vigente. La URL canónica y la taxonomía están resueltas; la investigación de demanda regional continúa sin
 > atribuir volúmenes no verificados.
@@ -129,6 +131,16 @@ El dueño editorial es **Marketing con Manzanitas**, según PDR-003. La Pillar s
 canonical `https://efeoncepro.com/creative/creative-workflows/`; Think no mantiene una copia pública equivalente.
 Las piezas satélite podrán usar el runtime que corresponda, pero cada una conservará una sola canonical.
 
+Según PDR-018, el post type `post` no invalida su función. El estado vigente es **Document Pillar** sólida: puede
+evolucionar en la misma URL hacia una Pillar Experience con rutas editoriales y mapa dinámico del cluster cuando
+existan satélites publicados. No se crea una Page Elementor paralela ni se migra al subdominio Think por razones
+de diseño.
+
+Los doce satélites siguen siendo el plan editorial vigente, pero no agotan la arquitectura futura. PDR-018 permite
+que casos, templates, research, tools o piezas platform-native se incorporen como nodos de una Cluster Experience
+sólo si resuelven un JTBD propio, entregan valor autónomo, declaran relación y medición y pasan sus gates; no nacen
+por extensión automática de este PDR.
+
 ## 5. Los satélites
 
 Los satélites se abren por intención real y aporte propietario, no por cada variación de keyword.
@@ -152,20 +164,40 @@ Los satélites se abren por intención real y aporte propietario, no por cada va
 
 Una idea merece satélite si reúne las cuatro condiciones: responde una intención independiente, tiene una
 respuesta útil sin leer la Pillar completa, permite evidencia o pensamiento original y puede enlazar de vuelta
-sin competir por la definición canónica. Si no las cumple, es una sección, FAQ o átomo de distribución.
+sin competir por la definición canónica. Si no las cumple, es una sección, FAQ o activación, pero no un nodo
+canónico por defecto.
+
+### Red federada y piezas platform-native
+
+El cluster futuro no se limita a estos doce artículos ni al dominio propio. Reels, posts, carruseles, pins, videos,
+Shorts o newsletters pueden ser nodos platform-native de primera clase cuando:
+
+1. completan un JTBD de Creative Workflows con valor autónomo;
+2. poseen URL o identificador estable, owner, estado y durabilidad declarados;
+3. mantienen relación explícita con la Pillar u otro nodo;
+4. declaran intención de búsqueda/descubrimiento, progreso esperado y fuente de medición;
+5. no duplican la definición canónica que pertenece a la Pillar.
+
+`cluster node` y `activation` son roles multidimensionales, no clases excluyentes. Un carrusel que explica de forma
+autónoma la frontera humano/sistema puede ser nodo y activación; un post que sólo anuncia CW-03 es activación. El
+registry debe distinguir `surface`, `platform`, `ownership`, `node_role`, `search_intent`, `query_set`,
+`indexing_eligibility`, `discovery_surfaces`, `measurement_sources`, `derived_from`, `canonical_parent`,
+`durability`, `progress_event` y `next_best_node`.
 
 ## 6. Arquitectura de enlaces y canonical
 
 - La Pillar es la única URL que posee la definición amplia de **Creative Workflow**.
 - Cada satélite incluye una definición breve, enlaza la definición completa y profundiza una sola pregunta.
-- La Pillar enlaza satélites desde la sección donde resuelven el siguiente nivel de detalle, no desde una lista
-  ornamental al final.
+- La Pillar enlaza satélites desde la sección donde resuelven el siguiente nivel de detalle y, cuando exista masa
+  crítica, desde un mapa gobernado por registry; no desde una lista ornamental o cards manuales.
 - Los enlaces horizontales se reservan para relaciones útiles: CW-01↔CW-03, CW-05↔CW-10, CW-06↔CW-07 y
   CW-08↔CW-09.
 - La Pillar enlaza contextualmente la landing de Agencia Creativa; la landing puede enlazar la Pillar como
   evidencia educativa. Ninguna reemplaza el CTA de la otra.
 - WordPress y Think nunca publican copias indexables. Cada pieza tiene una URL canónica y una sola fuente
   pública, incluso si el authoring o render usan más de un runtime.
+- La Pillar conserva el hogar canónico, pero puede enlazar nodos platform-native publicados cuando aportan el
+  siguiente trabajo útil; `canonical_parent` expresa pertenencia editorial, no una canonical SEO cruzada.
 
 ## 7. Faseo
 
@@ -213,9 +245,9 @@ El territorio no se evalúa solo por tráfico:
 
 - **Descubrimiento:** cobertura de consultas, impresiones, posiciones y entradas no-brand.
 - **Autoridad/AEO:** presencia y citación en un panel estable de preguntas sobre Creative Workflows.
-- **Consumo:** profundidad de lectura, navegación Pillar↔satélite, retorno y suscripción.
+- **Consumo/progreso:** profundidad de lectura, navegación Pillar↔nodo, retorno y siguiente paso útil.
 - **Negocio:** conversaciones y oportunidades influenciadas, con atribución en HubSpot cuando exista el CTA.
-- **Sistema editorial:** satélites publicados, integridad de enlaces, freshness de claims y reutilización en
+- **Sistema editorial:** nodos publicados por tipo, integridad de enlaces, freshness de claims y reutilización en
   Glitch, social, ventas y formación.
 - **Madurez del activo:** preguntas que justifican síntesis en ebook, uso real de ejercicios y, solo después,
   señales de utilidad para un diagnóstico personalizado.

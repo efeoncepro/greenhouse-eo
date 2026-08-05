@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.2
 > **Creado:** 2026-07-19 por Claude (TASK-1457)
-> **Ultima actualizacion:** 2026-07-20 por Claude (TASK-1492 — repatriación canónica)
+> **Ultima actualizacion:** 2026-08-02 por Codex (estado vigente de Studio Credits)
 > **Documentacion tecnica:** [EFEONCE_GLOBE_MODEL_LAB_V1.md](../../architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md)
 
 ## De qué se trata este documento
@@ -112,7 +112,7 @@ El Model Lab tiene **tres frenos** independientes, y conviene verlos juntos:
 - **Tope diario por espacio de trabajo.** Aunque cada corrida quepa en su tope, un espacio no puede exceder un total diario. Este freno protege contra "muchas corridas chicas que suman demasiado".
 - **Interruptor de apagado (kill switch), apagado por defecto.** El Model Lab nace **apagado**. Mientras esté apagado, **cualquier** comando de experimento responde "bloqueado por política" — ni siquiera arranca. Se enciende a propósito, para el piloto interno, y se puede apagar en cualquier momento.
 
-Un matiz honesto sobre el presupuesto: en modo de desarrollo/ensayo los topes viven en memoria del proceso y se reinician si el servicio se reinicia. **En producción ya no pasa**: desde `TASK-1465` los topes se guardan en una base de datos durable (Cloud SQL), así que sobreviven reinicios del servicio y varias copias corriendo a la vez. Aun así, ese freno **sigue siendo un freno de seguridad**, no el registro contable de créditos comerciales (ese registro, durable y a prueba de pérdidas, es una capacidad aparte y llega en una tarea posterior). El freno de seguridad y el registro contable son dos cosas distintas a propósito.
+Un matiz honesto sobre el presupuesto: en modo de desarrollo/ensayo los topes viven en memoria del proceso y se reinician si el servicio se reinicia. **En producción ya no pasa**: desde `TASK-1465` los topes se guardan en una base de datos durable (Cloud SQL), así que sobreviven reinicios del servicio y varias copias corriendo a la vez. Aun así, ese freno **sigue siendo un freno de seguridad**, no el ledger append-only de Studio Credits. El ledger ya está operativo en Globe y es la autoridad que consumen Greenhouse UI, API/CLI OAuth PKCE y MCP; ambos controles siguen separados a propósito.
 
 ### 8. Cada quién ve solo lo suyo
 
@@ -171,7 +171,9 @@ Para ser exactos sobre el estado real de hoy:
 - Las 4 capacidades que necesitan un archivo de entrada (editar imagen, upscalear imagen/video, extender video) tienen su ruta verificada, pero su corrida de punta a punta espera la resolución de huella→bytes desde el bucket privado.
 - Está **apagado por defecto**; se enciende solo para el piloto interno.
 - **No hay clientes ni producción.** Es uso interno, gobernado por Greenhouse (programa EPIC-028).
-- El registro contable de créditos comerciales (durable, a prueba de pérdidas) es una capacidad aparte, aún pendiente — el spend fence de hoy es un **freno de seguridad**, no ese registro. Desde `TASK-1465` ese freno ya corre durable en producción (sus topes se guardan en Cloud SQL y sobreviven reinicios y réplicas), pero sigue siendo un freno de seguridad, no el registro contable comercial.
+- El ledger append-only de Studio Credits ya está operativo y reconciliado; el spend fence sigue siendo un
+  **freno de seguridad** separado. Studio Credits miden consumo gobernado y no son dinero, revenue ni tokens de
+  proveedor.
 
 Lo que **sí** existe y quedó probado es **todo el mecanismo del experimento**: preparar con tope, ingesta privada por huella, estimar, frenar antes de gastar, reservar (con tope diario), correr, saldar y dejar evidencia por intento — todo sobre el mismo contrato central.
 

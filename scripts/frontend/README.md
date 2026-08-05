@@ -65,7 +65,7 @@ Para evidencia confiable en rutas importantes, preferí además:
 - `viewports` para desktop/tablet/mobile en un solo scenario.
 - `baseline` para comparar mockup aprobado contra runtime final con `fe:capture:diff`.
 
-Las capturas inline usan navegación `domcontentloaded` y no `networkidle`; esto evita falsos bloqueos en Next/Turbopack, HMR o requests persistentes. Para una ruta puntual, pasá `--ready='[data-capture="..."]'` y dejá que GVC espere una señal visual estable antes del primer frame.
+Las capturas inline usan navegación `domcontentloaded` y no `networkidle`; esto evita falsos bloqueos en Next/Turbopack, HMR o requests persistentes. Para una ruta puntual, pasa `--ready='[data-capture="..."]'` y deja que GVC espere una señal visual estable antes del primer frame.
 
 Playwright ad-hoc queda como complemento para consola/red/API payloads o pasos que el DSL no soporte. Si se usa, guardar artifacts bajo `.captures/` y documentar por qué no bastó `fe:capture`. Si el flujo se repetirá, agregar o actualizar un scenario en `scripts/frontend/scenarios/`.
 

@@ -238,6 +238,13 @@ render job → Cloud Run Job `artifact-worker` → PDF en el asset store, con ga
 accesibilidad/peso y QA visual mecánica) el manual es
 `greenhouse-public-private-tenders/proposal-studio-runtime.md` — shipped 2026-07-12.
 
+**Cierre productivo — regla fail-closed.** Componer y revisar el PDF no equivale a registrar una Proposal.
+En una licitación, `pnpm deck:compose` es el taller local; el camino productivo es `Proposal →
+ResolvedCompositionManifest → render job → artifact-worker → asset versionado`. Antes de declarar el
+deck listo, ejecuta `pnpm tender:canonical-gate <slug>` y exige `status=verified` en
+`docs/commercial/tenders/<slug>/proposal-studio.json`. Un PDF o PNG bajo `.captures/` nunca satisface
+este cierre. Ver `docs/commercial/tenders/PROPOSAL_STUDIO_CLOSURE_SCHEMA.md`.
+
 **De dónde viene el `deck-plan`: es una PROYECCIÓN de la oferta técnica, no se auto-genera.** En una
 licitación el deck-plan vive en el **workspace del deal** (`docs/commercial/tenders/<slug>/`, scaffoldeado
 con `pnpm tender:new`) junto a la `oferta-tecnica.md`. El autor/agente arma el plan **desde** esa oferta
@@ -299,6 +306,27 @@ otra cosa. Cablearla acá es un error.
 
 **⚠️ Frontera de herramienta:** deck del catálogo → **el Composer**. Una pieza visual suelta que no
 está en el catálogo → lane de Adobe / `design-studio`. **No se mezclan.**
+
+### Reglas generales para decks de licitación
+
+- **Separa el deck técnico del económico.** El técnico desarrolla el desafío, la solución, la
+  metodología, el equipo y la evidencia; el económico permite comparar alcance, inversión y
+  condiciones sin esconder el precio dentro de la narrativa técnica.
+- **Usa `PricingFull` para la oferta económica.** La lámina debe mostrar la opción recomendada, el
+  desglose cotizado y las condiciones comerciales desde el snapshot aprobado de la cotización; no
+  se reemplaza por una tabla improvisada ni por texto de otra plantilla.
+- **Haz visibles los valores fiscales.** Cada monto client-facing debe declarar explícitamente si es
+  neto y si el IVA está excluido o incluido. La condición no puede quedar solo en una nota escondida.
+- **Conserva outputs y planes separados.** Cada licitación y cada deck tiene su propio `deck-plan`,
+  output, manifest y carpeta de captura; nunca se reutilizan ni se sobrescriben artefactos de otra
+  licitación.
+- **Revisa visualmente todos los frames antes del cierre.** Inspecciona cada lámina exportada:
+  recortes, jerarquía, legibilidad, captions, assets, firmas y consistencia. Los tests del Composer
+  son necesarios, pero no sustituyen mirar todos los frames.
+- **Pasa el gate de Proposal Studio.** La revisión visual es necesaria, pero el cierre también debe
+  registrar la Proposal, el render job completado, el asset `deck` versionado y la comprobación
+  autenticada del portal. Si falta, el estado es `code complete, rollout pendiente` o bloqueado; no
+  `complete`.
 
 ---
 

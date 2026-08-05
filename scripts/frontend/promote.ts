@@ -82,7 +82,7 @@ const main = async (): Promise<void> => {
   }
 
   if (!values.route && !values.session) {
-    throw new Error('Pasá --route=<path> o --session=<dir> para resolver la sesión de explore.')
+    throw new Error('Pasa --route=<path> o --session=<dir> para resolver la sesión de explore.')
   }
 
   const sessionDir = values.session
@@ -104,7 +104,7 @@ const main = async (): Promise<void> => {
     : resolve(SCENARIOS_DIR, `${name}.scenario.ts`)
 
   if (existsSync(outPath) && values.force !== true) {
-    throw new Error(`${outPath.replace(REPO_ROOT, '<repo>')} ya existe. Usá --force para sobrescribir.`)
+    throw new Error(`${outPath.replace(REPO_ROOT, '<repo>')} ya existe. Usa --force para sobrescribir.`)
   }
 
   writeFileSync(outPath, serializeScenario(scenario), 'utf8')
@@ -113,7 +113,7 @@ const main = async (): Promise<void> => {
   PRINT(`  readiness: ${scenario.readiness?.selector ?? '(solo absentSelectors + fonts)'}`)
   PRINT(`  steps: ${scenario.steps.map(s => `${s.kind}${s.label ? `:${s.label}` : ''}`).join(' · ')}`)
   PRINT('')
-  PRINT(`Siguiente: revisá selectores/marks y capturá →`)
+  PRINT(`Siguiente: revisa selectores/marks y capturá →`)
   PRINT(`  pnpm fe:capture ${name} --env=${session.env}`)
 }
 

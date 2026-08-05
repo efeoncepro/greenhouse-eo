@@ -21,7 +21,7 @@
 - Rank: `TBD`
 - Domain: `creative|ops|delivery`
 - Blocked by: `TASK-1469, TASK-1470, TASK-1471, TASK-1522`
-- Branch: `task/TASK-1472-globe-creative-review-release-delivery`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

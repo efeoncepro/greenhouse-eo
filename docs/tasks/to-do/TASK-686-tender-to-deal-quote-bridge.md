@@ -1,5 +1,11 @@
 # TASK-686 — Tender To Deal / Quote Bridge
 
+## Delta 2026-08-02 — Bridge de origen, no package económico
+
+Esta task conserva el alcance opportunity/tender → deal/quote. No es owner de `QuotationVersion`,
+`ProposalEconomicPackage`, `ProposalEconomicProjection` ni CostCard. Debe enlazar los IDs canónicos cuando esas
+build units existan y dejar composición/gates al Proposal Studio.
+
 ## Status
 
 - Lifecycle: `to-do`

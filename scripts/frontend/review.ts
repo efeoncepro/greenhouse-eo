@@ -246,7 +246,7 @@ ${interactions}
 
 ## Petición canónica
 
-Invocá la skill \`greenhouse-ui-review\` y evaluá la evidencia contra el estándar premium vigente. No asignes calidad estética desde heurísticas: mirá cada frame desktop/móvil y cada transición.
+Invocá la skill \`greenhouse-ui-review\` y evaluá la evidencia contra el estándar premium vigente. No asignes calidad estética desde heurísticas: mira cada frame desktop/móvil y cada transición.
 
 1. **Dirección y fidelidad** — la visual direction versionada se reconoce; no se transcribió Figma/Claude literalmente ni se degradó a defaults del framework.
 2. **Jerarquía y acción** — propósito, dato dominante, ownership y CTA primario se entienden en cinco segundos; secundarios y destructivos no compiten.
@@ -364,7 +364,7 @@ const main = (): void => {
   console.log('')
   console.log('Siguiente paso:')
   console.log('  1. Abrí Claude Code con el skill greenhouse-ui-review cargado')
-  console.log('  2. Adjuntá los frames listados (o pasá el manifest.json)')
+  console.log('  2. Adjuntá los frames listados (o pasa el manifest.json)')
   console.log(`  3. Pegá el contenido de ${dossierPath} como prompt`)
   console.log('')
   console.log('  V1.2: este step será automático vía Anthropic SDK orchestration.')

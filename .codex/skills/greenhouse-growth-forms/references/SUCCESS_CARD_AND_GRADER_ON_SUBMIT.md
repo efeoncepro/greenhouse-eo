@@ -1,9 +1,9 @@
 # Growth Forms — Success Card (thank-you card) + AEO grader-on-submit
 
 > Companion de `greenhouse-growth-forms/SKILL.md`. Dos capacidades nuevas del motor
-> (2026-07, TASK-1319/1320/1321) que la skill enruta acá para no saturarse. Si tocás el
+> (2026-07, TASK-1319/1320/1321) que la skill enruta acá para no saturarse. Si tocas el
 > estado success de un form, el `success_behavior_json`, el renderer del success card, o el
-> auto-run del grader desde `/aeo-2/` — **leé esto primero**.
+> auto-run del grader desde `/aeo-2/` — **lee esto primero**.
 
 ---
 
@@ -141,9 +141,9 @@ preservando TODO lo demás. El script de referencia (`activate-aeo-success-card-
 
 > **Bug class que esto evita (2026-07-02/03):** un activation script previo (brandName) NO preservó
 > el `success_behavior_json` bien y dejó la card con copy viejo ("En 24–48h"). El fix es
-> `preserveFormVersionFields` + cambiar sólo el campo objetivo. Si publicás una versión y "se pierde"
+> `preserveFormVersionFields` + cambiar sólo el campo objetivo. Si publicas una versión y "se pierde"
 > un campo (estilo, card, destino), es que NO preservaste ese campo — nunca edites en vivo, siempre
-> preservá explícito.
+> preserva explícito.
 
 ---
 
@@ -251,10 +251,10 @@ El grader-on-submit sólo funciona de punta a punta si además están ON (ops-wo
 - **NUNCA** pasar el email (PII) a `enqueueGraderDiagnostic`/run engine — sólo al lead con consent.
 - **NUNCA** dejar que un submit sin categoría resuelta genere run/informe (skip → lead comercial).
 - **NUNCA** editar el `success_behavior_json` de una versión publicada in-place — clone → publish →
-  deprecate, **preservando** las 12 columnas con `preserveFormVersionFields` (o perdés estilo/card/
+  deprecate, **preservando** las 12 columnas con `preserveFormVersionFields` (o pierdes estilo/card/
   destinos).
 - **NUNCA** publicar `presentation='success_card'` sin que el renderer esté en el runtime prod (el
-  guard del script lo bloquea; respetá "renderer a main primero, activation script después").
+  guard del script lo bloquea; respeta "renderer a main primero, activation script después").
 - **NUNCA** meter href no-allowlisted, HTML o PII en la Success Card — cruza al browser tal cual; el
   schema (largos + `successCardHrefSchema`) es el leak boundary.
 

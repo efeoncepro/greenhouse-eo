@@ -2,7 +2,8 @@
 
 > Carga para: medir resultados. GSC/GA4/BigQuery para SEO clásico, **Share of
 > Voice en LLMs** + tráfico IA + monitoreo de exactitud/alucinación para AEO.
-> Regla de oro: **mide o no existió**. Sello: as-of 2026-06.
+> Regla de oro: **mide o no existió**. Sello: as-of 2026-06; frescura y
+> agregación de GSC **medidas** as-of 2026-08-05.
 
 ## PARTE A — Medición SEO clásica
 
@@ -13,14 +14,56 @@
 - **Pages (Indexing):** estado de indexación real (ver `01_SEO_TECHNICAL.md`).
 - **Core Web Vitals + Page Experience:** datos de campo (CrUX).
 - **Links:** perfil de enlaces que Google reconoce.
-- **Limitaciones:** muestreo, 16 meses de retención, "(other)" en queries. Para
-  histórico largo y joins → exportar a BigQuery.
+- **Limitaciones:** muestreo, **16 meses de retención por el extremo viejo de la
+  serie** y **~2 días de latencia por el extremo nuevo** (ver frescura abajo),
+  "(other)" en queries. Para histórico largo y joins → exportar a BigQuery.
+
+### Frescura y agregación de GSC — **medido** (as-of 2026-08-05)
+
+> **Procedencia:** medición día por día contra la **API real** de Search Console
+> sobre una propiedad `sc-domain:` conectada (levantada trabajando TASK-1302 de
+> Greenhouse). Es **dato medido**, no estimado ni tomado de un blog. Reverifica
+> si Google cambia su pipeline.
+
+**1) GSC no publica D-1.** Consultando día por día con dimensiones `query × page`:
+
+| Día consultado | Respuesta de la API | Filas |
+|---|---|---|
+| **D-1** (ayer) | `ok` | 🔴 **cero** |
+| **D-2 en adelante** | `ok` | datos completos |
+
+🔴 **El endpoint no falla: responde `ok` y vacío.** Un pipeline que capture
+"ayer" captura vacío **sin error**, y un reporte que lea eso muestra una caída a
+cero que nunca ocurrió. Además Google **consolida sus métricas con retraso
+(~48h)**: un día capturado temprano tiene valores que después cambian.
+
+🎯 **Consecuencia de método:** captura y **recaptura una ventana móvil de días
+recientes** — nunca un solo día — y haz la escritura **idempotente**, para que la
+recaptura **converja** en vez de duplicar. Aplica igual a un cron, a un export a
+BigQuery o a un reporte armado a mano: **el borde derecho de la serie todavía se
+está moviendo.**
+
+**2) La posición media se pondera por impresiones — nunca se promedia plana.**
+GSC ya entrega su `position` **ponderada por impresiones dentro del período que
+le pidas**. Por eso, al agregar varios días:
+
+```
+🔴 MAL    AVG(position)                                ← un día de 2 impresiones pesa igual que uno de 500
+✅ BIEN   SUM(position × impressions) / SUM(impressions)
+```
+
+Es un error **silencioso**: no rompe nada, no lanza excepción — sólo devuelve un
+número que **no es la posición del sitio**. Y sesga hacia los días de cola larga,
+que suelen ser los de peor posición: el promedio plano te muestra **peor de lo
+que estás**.
 
 ### GSC → BigQuery (export masivo, caso Greenhouse)
 - El **bulk data export** de GSC a BigQuery elimina el muestreo y guarda
   histórico ilimitado. Greenhouse ya usa BigQuery (`efeonce-group`) → encaja.
 - Permite joins con GA4, datos de negocio (HubSpot leads) y dashboards propios.
 - Patrón: tabla de GSC export + GA4 export + modelar en marts → dashboard.
+- ⚠️ **El export no te salva de la latencia**: los días recientes siguen siendo
+  una ventana móvil (arriba). Modela la carga como idempotente por día.
 
 ### GA4 (comportamiento y conversión)
 - Tráfico orgánico, engagement, conversiones por landing. Configura eventos de
@@ -113,5 +156,6 @@ No basta *aparecer*; importa que la IA diga cosas **correctas** de la marca.
 - Siempre con **tendencia** (vs. período anterior) y **vs. competidores**.
 
 > **Cross-refs:** prompts/panel → `04_AEO_GEO.md`. Indexación/CWV →
-> `01_SEO_TECHNICAL.md`. Conversión/atribución a leads (HubSpot) →
+> `01_SEO_TECHNICAL.md`. Priorizar oportunidades con esa misma data de GSC
+> (striking distance, curva de CTR propia, canibalización) → `02_SEO_CONTENT.md`. Conversión/atribución a leads (HubSpot) →
 > `efeonce/EFEONCE_OVERLAY.md`. Qué reverificar y cada cuánto → `SOURCES.md`.

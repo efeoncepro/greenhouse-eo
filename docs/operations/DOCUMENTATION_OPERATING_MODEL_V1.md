@@ -141,7 +141,9 @@ No mezclar las capas:
 - El historial interno vive bajo `docs/changelog/internal/`: el primer corte conserva un snapshot byte-for-byte
   con manifest SHA-256 y las rotaciones posteriores crean shards mensuales con hash por entrada.
 - La rotacion canonica es `pnpm docs:context-rotate --apply`; el dry-run omite `--apply`. El proceso debe ser
-  idempotente, mantener entradas completas y abortar la reescritura si detecta una edicion concurrente.
+  idempotente, mantener entradas completas y abortar la reescritura si detecta una edicion concurrente. La
+  rotacion de contexto debe satisfacer todos los techos activos, no solo el conteo principal: `Handoff.md` rota por
+  sesiones, lineas y tokens; `changelog.md` rota por entradas, lineas y tokens.
 - Buscar historia por keyword en el indice/snapshots; una entrada antigua es evidencia secundaria y no reemplaza
   task, issue, ADR, arquitectura ni runtime vigente.
 
@@ -345,3 +347,10 @@ requerido, intencionalmente no requerido, o si el cierre debe quedar como
 - Regla de compresión:
   - la explicación canónica de estructura y ubicación vive aquí
   - `Handoff.md`, `changelog.md` y `project_context.md` solo registran la nueva skill, su propósito y el impacto contractual
+
+## Checkout compartido obligatorio
+
+La documentación se edita sólo en el checkout compartido actual. Nunca crear, usar, limpiar ni mover trabajo a
+worktrees, checkouts aislados o carpetas clonadas. Si WIP ajeno, una divergencia o un conflicto bloquea el cierre,
+preservarlo y pedir decisión al operador. Canon:
+[`REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md`](../architecture/agent-invariants/REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md).

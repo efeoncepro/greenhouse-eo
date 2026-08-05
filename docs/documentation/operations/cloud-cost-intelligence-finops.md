@@ -116,7 +116,11 @@ La senal reliability canonical es `cloud.billing.github`. Puede quedar:
 - `not_configured`: faltan token/org.
 - `awaiting_data`: la API respondio sin usage items para el periodo observado.
 
-Budgets GitHub siguen siendo un guardrail externo complementario. La org `efeoncepro` ya tiene un budget de Actions a nivel organización con `prevent_further_usage=true`, `budget_amount=0` y alertas activas para `cesargrowth11` (verificado 2026-05-24 via GitHub Budgets API, budget id `7f36dec2-18a4-4575-9f49-c5b0470ff929`). Greenhouse observa y reporta; no debe cambiar ese budget sin confirmación humana porque puede bloquear uso pagado.
+Budgets GitHub siguen siendo un guardrail externo complementario. El presupuesto de Actions a nivel organización de `efeoncepro` fue actualizado el **2026-07-31**, con confirmación humana, desde `budget_amount=0` a **USD 20 mensuales** (`prevent_further_usage=true` se mantiene). El presupuesto conserva alertas activas para `cesargrowth11` y el método de pago de la organización quedó verificado en GitHub; no se registran datos de tarjeta en el repositorio.
+
+La evidencia de cierre fue la pantalla de Budgets and alerts de GitHub: `Actions`, `$0 spent`, `$20.00 budget` y `Stop usage: Yes`. La alerta inicial reportaba 1.803 de 2.000 minutos incluidos y un reset el 2026-08-01. El monto de USD 20 es un tope de gasto adicional, no una ampliación de minutos incluidos; GitHub continuará aplicando la cuota incluida antes de facturar consumo metered.
+
+Para el procedimiento paso a paso, consultar [Aumentar el presupuesto de GitHub Actions](../../manual-de-uso/operations/github-actions-budget.md). Greenhouse observa y reporta este guardrail, pero no debe modificarlo sin confirmación humana explícita.
 
 ### Atribucion por workflow/job
 

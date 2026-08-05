@@ -19,7 +19,7 @@
 - Rank: `TBD`
 - Domain: `ui|creative`
 - Blocked by: `TASK-1580`, `TASK-1503`, `TASK-1498`, `TASK-1568`, `TASK-1570`, `TASK-1571`
-- Branch: `task/TASK-1582-globe-producer-asset-workspace-contextual-reuse`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 
 ## Summary
 

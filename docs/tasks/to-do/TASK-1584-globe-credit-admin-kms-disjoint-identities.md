@@ -25,7 +25,7 @@
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
-- Branch: `task/TASK-1584-globe-credit-admin-kms-disjoint-identities`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -196,7 +196,8 @@ En `greenhouse-eo`: `src/lib/globe/**` sólo si el broker de administración cam
 - Invariantes que no se pueden romper:
   - El payload firmado incluye su propia `approval` sin digest (trampa documentada en `signFor`).
   - Quien verifica NO puede forjar (propiedad que define el éxito de esta task).
-  - El agente nunca confirma; la confirmación es humana (no cambia acá).
+  - Un principal de servicio nunca confirma; un usuario agente sólo confirma bajo la delegación
+    acotada por workspace introducida en TASK-1629 (esta task no la amplía).
 - Tenant/space boundary: la aprobación sigue tenant-bound (el verificador ve workspace).
 - Idempotency/concurrency: sin cambios — la idempotencia del confirm ya vive en el broker + stores.
 - Audit/outbox/history: señal nueva `globe.credit_admin.legacy_hmac_approval_used` (contador de

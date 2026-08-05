@@ -1,0 +1,556 @@
+{
+  "schemaVersion": "model-route-card.v1",
+  "cardId": "route-card/kling-3-video",
+  "snapshot": {
+    "observedAt": "2026-08-05",
+    "maxAgeDays": 14,
+    "revalidateBeforeUse": true
+  },
+  "authority": {
+    "availabilityReader": "efeonce-globe:globe.producer.fleet.list",
+    "humanLedger": "docs/operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md",
+    "providerEvidence": "Fal Kling V3 endpoint/OpenAPI pages, queue/webhook/pricing/terms evidence"
+  },
+  "modelFamily": {
+    "publicName": "Kling 3.0",
+    "familyKey": "kling-3-video",
+    "modality": "video",
+    "globeStatus": "gated",
+    "summary": "Fal exposes separate Kling V3 Pro, Standard and Native 4K text-to-video/image-to-video surfaces with native audio, multi-shot prompts, start/end frames and grouped elements. Globe currently has no Kling route in its Producer catalog, adapter or governed bindings.",
+    "integrationDecision": "Reuse Globe's existing Fal seam in TASK-1617; create route identities per tier and operation, keep provider slugs server-side, resolve the OpenAPI namespace and region through a controlled non-billable discovery/submit workflow, and keep Kling O3 as a separate family rather than aliasing it to Kling 3.0."
+  },
+  "evidence": [
+    {
+      "id": "task-1617",
+      "authority": "repo_primary",
+      "kind": "implementation-task",
+      "observedAt": "2026-08-05",
+      "reference": "docs/tasks/to-do/TASK-1617-globe-kling-3-o3-video-fleet-producer-integration.md",
+      "revalidateBeforeUse": true,
+      "note": "The governing task is still to-do and explicitly records Fal active but Globe not integrated."
+    },
+    {
+      "id": "challenger-proposal",
+      "authority": "repo_primary",
+      "kind": "provider-integration-proposal",
+      "observedAt": "2026-07-31",
+      "reference": "docs/architecture/creative-studio/EFEONCE_GLOBE_FAL_CHALLENGER_MODELS_PRODUCER_INTEGRATION_PROPOSAL_V1.md",
+      "revalidateBeforeUse": true,
+      "note": "The proposal is a planning source, not proof of a Globe route or availability."
+    },
+    {
+      "id": "adr-013",
+      "authority": "repo_primary",
+      "kind": "route-identity-decision",
+      "observedAt": "2026-07-30",
+      "reference": "docs/architecture/creative-studio/EFEONCE_GLOBE_ROUTE_BASED_MODEL_RESOLUTION_DECISION_V1.md",
+      "revalidateBeforeUse": false
+    },
+    {
+      "id": "adr-022",
+      "authority": "repo_primary",
+      "kind": "route-creative-contract-decision",
+      "observedAt": "2026-08-02",
+      "reference": "docs/architecture/creative-studio/EFEONCE_GLOBE_ROUTE_CREATIVE_CONTRACT_DECISION_V1.md",
+      "revalidateBeforeUse": false
+    },
+    {
+      "id": "adr-023",
+      "authority": "repo_primary",
+      "kind": "route-card-decision",
+      "observedAt": "2026-08-04",
+      "reference": "docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_ROUTE_CARDS_DECISION_V1.md",
+      "revalidateBeforeUse": false
+    },
+    {
+      "id": "globe-catalog",
+      "authority": "runtime_primary",
+      "kind": "producer-route-catalog-and-adapter-audit",
+      "observedAt": "2026-08-05",
+      "reference": "efeonce-globe:packages/domain/src/producer-catalog.ts; apps/creative-runner/src/fal-adapter.ts; apps/studio-web/src/governed-production-composition.ts",
+      "revalidateBeforeUse": true,
+      "note": "The current checkout has no Kling route, Fal model mapping, production binding or Kling-specific runtime implementation."
+    },
+    {
+      "id": "globe-reader",
+      "authority": "runtime_primary",
+      "kind": "live-fleet-reader",
+      "observedAt": "2026-08-05",
+      "reference": "efeonce-globe:globe.producer.fleet.list",
+      "revalidateBeforeUse": true,
+      "note": "Kling is not a declared Globe route in this card; the live reader must be queried again before any availability claim."
+    },
+    {
+      "id": "fal-pro-text-api",
+      "authority": "provider_primary",
+      "kind": "endpoint-openapi",
+      "observedAt": "2026-08-05",
+      "reference": "https://fal.ai/models/fal-ai/kling-video/v3/pro/text-to-video/api",
+      "revalidateBeforeUse": true,
+      "ttlDays": 14,
+      "note": "Pro text-to-video: prompt or multi_prompt, 3–15 seconds, native audio, shot_type and 16:9/9:16/1:1."
+    },
+    {
+      "id": "fal-pro-image-api",
+      "authority": "provider_primary",
+      "kind": "endpoint-openapi",
+      "observedAt": "2026-08-05",
+      "reference": "https://fal.ai/models/fal-ai/kling-video/v3/pro/image-to-video/api",
+      "revalidateBeforeUse": true,
+      "ttlDays": 14,
+      "note": "Pro image-to-video: start_image_url, optional end_image_url/elements, 3–15 seconds, native audio and voice_ids."
+    },
+    {
+      "id": "fal-standard-text-api",
+      "authority": "provider_primary",
+      "kind": "endpoint-openapi",
+      "observedAt": "2026-08-05",
+      "reference": "https://fal.ai/models/fal-ai/kling-video/v3/standard/text-to-video/api",
+      "revalidateBeforeUse": true,
+      "ttlDays": 14,
+      "note": "Standard is a separate endpoint and route identity; do not inherit Pro pricing, rights or canary evidence."
+    },
+    {
+      "id": "fal-standard-image-api",
+      "authority": "provider_primary",
+      "kind": "endpoint-openapi",
+      "observedAt": "2026-08-05",
+      "reference": "https://fal.ai/models/fal-ai/kling-video/v3/standard/image-to-video/api",
+      "revalidateBeforeUse": true,
+      "ttlDays": 14,
+      "note": "Standard image-to-video is a separate endpoint; its start/end/elements schema must be re-read before implementation."
+    },
+    {
+      "id": "fal-4k-text-api",
+      "authority": "provider_primary",
+      "kind": "endpoint-openapi",
+      "observedAt": "2026-08-05",
+      "reference": "https://fal.ai/models/fal-ai/kling-video/v3/4k/text-to-video/api",
+      "revalidateBeforeUse": true,
+      "ttlDays": 14,
+      "note": "Native 4K text-to-video; Fal documents Singapore-only execution for this mode."
+    },
+    {
+      "id": "fal-4k-image-api",
+      "authority": "provider_primary",
+      "kind": "endpoint-openapi",
+      "observedAt": "2026-08-05",
+      "reference": "https://fal.ai/models/fal-ai/kling-video/v3/4k/image-to-video/api",
+      "revalidateBeforeUse": true,
+      "ttlDays": 14,
+      "note": "Native 4K image-to-video with start/end/elements and native audio; Fal documents Singapore-only execution for this mode."
+    },
+    {
+      "id": "fal-queue",
+      "authority": "provider_primary",
+      "kind": "queue-contract",
+      "observedAt": "2026-08-05",
+      "reference": "https://fal.ai/docs/documentation/model-apis/inference/queue",
+      "revalidateBeforeUse": true,
+      "ttlDays": 30,
+      "note": "Submit returns request-scoped follow-up references; status/result URLs must never be derived from a slug."
+    },
+    {
+      "id": "fal-webhooks",
+      "authority": "provider_primary",
+      "kind": "webhook-contract",
+      "observedAt": "2026-08-05",
+      "reference": "https://fal.ai/docs/documentation/model-apis/inference/webhooks",
+      "revalidateBeforeUse": true,
+      "ttlDays": 30
+    },
+    {
+      "id": "fal-pricing",
+      "authority": "provider_primary",
+      "kind": "pricing-api",
+      "observedAt": "2026-08-05",
+      "reference": "https://fal.ai/docs/platform-apis/v1/models/pricing",
+      "revalidateBeforeUse": true,
+      "ttlDays": 7,
+      "note": "Numeric rates and rate versions are intentionally not frozen here; resolve them per endpoint before estimate/promotion."
+    },
+    {
+      "id": "fal-terms",
+      "authority": "provider_primary",
+      "kind": "provider-terms",
+      "observedAt": "2026-08-05",
+      "reference": "https://fal.ai/legal/terms-of-service",
+      "revalidateBeforeUse": true,
+      "ttlDays": 14,
+      "digest": null,
+      "note": "A current terms digest and Globe model rights attestation are required before promotion."
+    },
+    {
+      "id": "kling-native-api",
+      "authority": "provider_primary",
+      "kind": "native-api-reference",
+      "observedAt": "2026-08-05",
+      "reference": "https://kling.ai/document-api/3-0/model-access/ai-video-generation",
+      "revalidateBeforeUse": true,
+      "ttlDays": 14,
+      "note": "Kling also publishes a native Open Platform API. It is a separate provider surface and has no Globe adapter or binding."
+    },
+    {
+      "id": "kling-native-overview",
+      "authority": "provider_primary",
+      "kind": "native-api-overview",
+      "observedAt": "2026-08-05",
+      "reference": "https://kling.ai/document-api/quickStart/productIntroduction/overview",
+      "revalidateBeforeUse": true,
+      "ttlDays": 14,
+      "note": "Native Kling API identity and terms must not be mixed with Fal partner endpoints."
+    }
+  ],
+  "routes": [
+    {
+      "routeId": "ref/video/kling-3-pro-v1",
+      "kind": "standard",
+      "capability": "video-generate",
+      "operation": "create",
+      "provider": "fal",
+      "model": "kling-3-pro",
+      "version": "3.0",
+      "identityState": "resolved",
+      "endpointId": "fal.kling.v3.pro.text-to-video",
+      "region": null,
+      "completionDriver": "webhook+poll",
+      "lifecycle": "gated",
+      "exposure": { "governed": "candidate", "reader": "unknown", "producerUi": "not-exposed", "externalRollout": "gated" },
+      "inputs": [
+        { "slot": "prompt", "role": "direction", "mediaType": "text", "required": false, "valueShape": "text; mutually exclusive with multi_prompt" },
+        { "slot": "multi_prompt", "role": "storyboard", "mediaType": "text", "required": false, "cardinality": { "min": 1, "max": null }, "valueShape": "array<{prompt:text,duration:1..15}>; mutually exclusive with prompt" }
+      ],
+      "controls": [
+        { "name": "duration", "owner": "outputShape", "valueShape": "enum(3..15 seconds)", "mechanism": "Fal duration" },
+        { "name": "aspect-ratio", "owner": "outputShape", "valueShape": "enum(16:9|9:16|1:1)", "mechanism": "Fal aspect_ratio" },
+        { "name": "audio-mode", "owner": "outputShape", "valueShape": "enum(with-audio|silent)", "mechanism": "Fal generate_audio; embedded track must be inspected" },
+        { "name": "shot-type", "owner": "providerRequest", "valueShape": "enum(customize|intelligent)", "mechanism": "Fal shot_type" },
+        { "name": "negative-prompt", "owner": "providerRequest", "valueShape": "text", "mechanism": "Fal negative_prompt; route contract must prove the value is honored" },
+        { "name": "cfg-scale", "owner": "providerRequest", "valueShape": "number(0..1)", "mechanism": "Fal cfg_scale; exact bounds require OpenAPI revalidation" }
+      ],
+      "output": { "mediaType": "video", "mimeTypes": ["video/mp4"], "resolution": "provider-defined; byte-level verification required", "audio": "conditional embedded native audio", "durableAuthority": "Globe private content-addressed asset and governance readback" },
+      "transport": { "kind": "Fal queue", "auth": "server-only GLOBE_FAL_API_KEY", "providerSlug": "fal-ai/kling-video/v3/pro/text-to-video", "followUpReferences": "returned per submit; never derived", "webhook": "signed per request", "pollFallback": true, "browserAccess": "forbidden" },
+      "completion": { "driver": "webhook+poll", "providerOperation": "Fal queue request status/result", "resultAuthority": "Globe downloads, validates MIME/bytes and retains content-addressed output", "recovery": "readback first with same idempotency/correlation; no fallback route" },
+      "cables": {
+        "provider_supported": { "state": "verified", "evidenceRefs": ["fal-pro-text-api"] },
+        "contract_declared": { "state": "proposed", "evidenceRefs": ["task-1617", "adr-013", "adr-022"] },
+        "adapter_wired": { "state": "not_started", "evidenceRefs": ["globe-catalog", "task-1617"] },
+        "transport_verified": { "state": "unknown", "evidenceRefs": ["fal-queue", "fal-webhooks"], "note": "No controlled Globe submit or provider follow-up readback exists." },
+        "output_verified": { "state": "unknown", "evidenceRefs": ["fal-pro-text-api"], "note": "Provider schema says MP4; Globe still needs codec, dimensions, duration, audio and retention evidence." },
+        "billing_verified": { "state": "unknown", "evidenceRefs": ["fal-pricing"], "note": "Resolve exact per-second tier/audio rate before estimate." },
+        "rights_verified": { "state": "blocked", "evidenceRefs": ["fal-terms"], "note": "No model-exact Globe attestation/digest." },
+        "evaluated": { "state": "not_started", "evidenceRefs": ["task-1617"] },
+        "canary_passed": { "state": "not_started", "evidenceRefs": ["task-1617"] },
+        "promoted": { "state": "not_promoted", "evidenceRefs": ["globe-reader", "globe-catalog"] },
+        "available": { "state": "gated", "evidenceRefs": ["globe-reader", "globe-catalog"], "note": "No public Globe route is declared; availability belongs to the live reader." }
+      },
+      "evidenceRefs": ["task-1617", "globe-catalog", "fal-pro-text-api", "fal-queue", "fal-pricing", "fal-terms"],
+      "blockers": ["Add a route contract and Fal mapping in TASK-1617 without exposing the provider slug.", "Resolve exact rate/rights/evaluation/binding/canary evidence before promotion."]
+    },
+    {
+      "routeId": "ref/video/kling-3-pro-frames-v1",
+      "kind": "standard",
+      "capability": "video-frames",
+      "operation": "create",
+      "provider": "fal",
+      "model": "kling-3-pro",
+      "version": "3.0",
+      "identityState": "resolved",
+      "endpointId": "fal.kling.v3.pro.image-to-video",
+      "region": null,
+      "completionDriver": "webhook+poll",
+      "lifecycle": "gated",
+      "exposure": { "governed": "candidate", "reader": "unknown", "producerUi": "not-exposed", "externalRollout": "gated" },
+      "inputs": [
+        { "slot": "prompt", "role": "direction", "mediaType": "text", "required": false, "valueShape": "text; mutually exclusive with multi_prompt" },
+        { "slot": "multi_prompt", "role": "storyboard", "mediaType": "text", "required": false, "cardinality": { "min": 1, "max": null }, "valueShape": "array<{prompt:text,duration:1..15}>; mutually exclusive with prompt" },
+        { "slot": "start_frame", "role": "first-frame", "mediaType": "image", "required": true, "cardinality": { "min": 1, "max": 1 }, "valueShape": "authorized image reference; exact MIME/size limits require OpenAPI revalidation" },
+        { "slot": "end_frame", "role": "last-frame", "mediaType": "image", "required": false, "cardinality": { "min": 0, "max": 1 }, "valueShape": "authorized image reference" },
+        { "slot": "elements", "role": "character-or-object-reference", "mediaType": "image|video", "required": false, "cardinality": { "min": 0, "max": null }, "valueShape": "grouped element input; never flatten into an image list" }
+      ],
+      "controls": [
+        { "name": "duration", "owner": "outputShape", "valueShape": "enum(3..15 seconds)", "mechanism": "Fal duration" },
+        { "name": "audio-mode", "owner": "outputShape", "valueShape": "enum(with-audio|silent)", "mechanism": "Fal generate_audio; embedded track must be inspected" },
+        { "name": "shot-type", "owner": "providerRequest", "valueShape": "enum(customize|intelligent)", "mechanism": "Fal shot_type" },
+        { "name": "voice-control", "owner": "providerRequest", "valueShape": "server-only voice handle list(max 2)", "mechanism": "Fal voice_ids; never expose provider IDs in browser payload" },
+        { "name": "negative-prompt", "owner": "providerRequest", "valueShape": "text", "mechanism": "Fal negative_prompt; route contract must prove the value is honored" },
+        { "name": "cfg-scale", "owner": "providerRequest", "valueShape": "number(0..1)", "mechanism": "Fal cfg_scale; exact bounds require OpenAPI revalidation" }
+      ],
+      "output": { "mediaType": "video", "mimeTypes": ["video/mp4"], "resolution": "provider-defined; byte-level verification required", "aspectRatio": "inferred from start frame unless the exact endpoint proves otherwise", "audio": "conditional embedded native audio", "durableAuthority": "Globe private content-addressed asset and governance readback" },
+      "transport": { "kind": "Fal queue", "auth": "server-only GLOBE_FAL_API_KEY", "providerSlug": "fal-ai/kling-video/v3/pro/image-to-video", "followUpReferences": "returned per submit; never derived", "webhook": "signed per request", "pollFallback": true, "browserAccess": "forbidden" },
+      "completion": { "driver": "webhook+poll", "providerOperation": "Fal queue request status/result", "resultAuthority": "Globe downloads, validates MIME/bytes and retains content-addressed output", "recovery": "readback first with same idempotency/correlation; no fallback route" },
+      "cables": {
+        "provider_supported": { "state": "verified", "evidenceRefs": ["fal-pro-image-api"] },
+        "contract_declared": { "state": "proposed", "evidenceRefs": ["task-1617", "adr-013", "adr-022"] },
+        "adapter_wired": { "state": "not_started", "evidenceRefs": ["globe-catalog", "task-1617"] },
+        "transport_verified": { "state": "unknown", "evidenceRefs": ["fal-queue", "fal-webhooks"] },
+        "output_verified": { "state": "unknown", "evidenceRefs": ["fal-pro-image-api"], "note": "Provider schema says MP4; Globe still needs byte-level, audio and governance evidence." },
+        "billing_verified": { "state": "unknown", "evidenceRefs": ["fal-pricing"] },
+        "rights_verified": { "state": "blocked", "evidenceRefs": ["fal-terms"] },
+        "evaluated": { "state": "not_started", "evidenceRefs": ["task-1617"] },
+        "canary_passed": { "state": "not_started", "evidenceRefs": ["task-1617"] },
+        "promoted": { "state": "not_promoted", "evidenceRefs": ["globe-reader", "globe-catalog"] },
+        "available": { "state": "gated", "evidenceRefs": ["globe-reader", "globe-catalog"] }
+      },
+      "evidenceRefs": ["task-1617", "globe-catalog", "fal-pro-image-api", "fal-queue", "fal-pricing", "fal-terms"],
+      "blockers": ["Wire semantic start/end/elements slots through the governed contract; do not map reference-to-video to one generic image slot.", "Prove the actual output/audio/rights path with one exact canary before promotion."]
+    },
+    {
+      "routeId": "ref/video/kling-3-standard-v1",
+      "kind": "standard",
+      "capability": "video-generate",
+      "operation": "create",
+      "provider": "fal",
+      "model": "kling-3-standard",
+      "version": "3.0",
+      "identityState": "resolved",
+      "endpointId": "fal.kling.v3.standard.text-to-video",
+      "region": null,
+      "completionDriver": "webhook+poll",
+      "lifecycle": "gated",
+      "exposure": { "governed": "candidate", "reader": "unknown", "producerUi": "not-exposed", "externalRollout": "gated" },
+      "inputs": [
+        { "slot": "prompt", "role": "direction", "mediaType": "text", "required": false, "valueShape": "text; mutually exclusive with multi_prompt" },
+        { "slot": "multi_prompt", "role": "storyboard", "mediaType": "text", "required": false, "cardinality": { "min": 1, "max": null }, "valueShape": "array<{prompt:text,duration:1..15}>; mutually exclusive with prompt" }
+      ],
+      "controls": [
+        { "name": "duration", "owner": "outputShape", "valueShape": "enum(3..15 seconds)", "mechanism": "Fal duration" },
+        { "name": "aspect-ratio", "owner": "outputShape", "valueShape": "enum(16:9|9:16|1:1)", "mechanism": "Fal aspect_ratio" },
+        { "name": "audio-mode", "owner": "outputShape", "valueShape": "enum(with-audio|silent)", "mechanism": "Fal generate_audio; embedded track must be inspected" },
+        { "name": "shot-type", "owner": "providerRequest", "valueShape": "enum(customize|intelligent)", "mechanism": "Fal shot_type" }
+      ],
+      "output": { "mediaType": "video", "mimeTypes": ["video/mp4"], "resolution": "provider-defined; verify independently from Pro", "audio": "conditional embedded native audio", "durableAuthority": "Globe private content-addressed asset and governance readback" },
+      "transport": { "kind": "Fal queue", "auth": "server-only GLOBE_FAL_API_KEY", "providerSlug": "fal-ai/kling-video/v3/standard/text-to-video", "followUpReferences": "returned per submit; never derived", "webhook": "signed per request", "pollFallback": true, "browserAccess": "forbidden" },
+      "completion": { "driver": "webhook+poll", "providerOperation": "Fal queue request status/result", "resultAuthority": "Globe downloaded and retained bytes", "recovery": "readback first; no fallback route" },
+      "cables": {
+        "provider_supported": { "state": "verified", "evidenceRefs": ["fal-standard-text-api"] },
+        "contract_declared": { "state": "proposed", "evidenceRefs": ["task-1617", "adr-013", "adr-022"] },
+        "adapter_wired": { "state": "not_started", "evidenceRefs": ["globe-catalog", "task-1617"] },
+        "transport_verified": { "state": "unknown", "evidenceRefs": ["fal-queue", "fal-webhooks"] },
+        "output_verified": { "state": "unknown", "evidenceRefs": ["fal-standard-text-api"] },
+        "billing_verified": { "state": "unknown", "evidenceRefs": ["fal-pricing"] },
+        "rights_verified": { "state": "blocked", "evidenceRefs": ["fal-terms"] },
+        "evaluated": { "state": "not_started", "evidenceRefs": ["task-1617"] },
+        "canary_passed": { "state": "not_started", "evidenceRefs": ["task-1617"] },
+        "promoted": { "state": "not_promoted", "evidenceRefs": ["globe-reader", "globe-catalog"] },
+        "available": { "state": "gated", "evidenceRefs": ["globe-reader", "globe-catalog"] }
+      },
+      "evidenceRefs": ["task-1617", "globe-catalog", "fal-standard-text-api", "fal-queue", "fal-pricing", "fal-terms"],
+      "blockers": ["Keep Standard independent from Pro for schema, rate, rights, evaluation and canary."]
+    },
+    {
+      "routeId": "ref/video/kling-3-standard-frames-v1",
+      "kind": "standard",
+      "capability": "video-frames",
+      "operation": "create",
+      "provider": "fal",
+      "model": "kling-3-standard",
+      "version": "3.0",
+      "identityState": "resolved",
+      "endpointId": "fal.kling.v3.standard.image-to-video",
+      "region": null,
+      "completionDriver": "webhook+poll",
+      "lifecycle": "gated",
+      "exposure": { "governed": "candidate", "reader": "unknown", "producerUi": "not-exposed", "externalRollout": "gated" },
+      "inputs": [
+        { "slot": "prompt", "role": "direction", "mediaType": "text", "required": false, "valueShape": "text; mutually exclusive with multi_prompt" },
+        { "slot": "multi_prompt", "role": "storyboard", "mediaType": "text", "required": false, "cardinality": { "min": 1, "max": null }, "valueShape": "array<{prompt:text,duration:1..15}>; mutually exclusive with prompt" },
+        { "slot": "start_frame", "role": "first-frame", "mediaType": "image", "required": true, "cardinality": { "min": 1, "max": 1 }, "valueShape": "authorized image reference" },
+        { "slot": "end_frame", "role": "last-frame", "mediaType": "image", "required": false, "cardinality": { "min": 0, "max": 1 }, "valueShape": "authorized image reference" },
+        { "slot": "elements", "role": "character-or-object-reference", "mediaType": "image|video", "required": false, "cardinality": { "min": 0, "max": null }, "valueShape": "grouped element input; preserve semantic roles" }
+      ],
+      "controls": [
+        { "name": "duration", "owner": "outputShape", "valueShape": "enum(3..15 seconds)", "mechanism": "Fal duration" },
+        { "name": "audio-mode", "owner": "outputShape", "valueShape": "enum(with-audio|silent)", "mechanism": "Fal generate_audio; embedded track must be inspected" },
+        { "name": "shot-type", "owner": "providerRequest", "valueShape": "enum(customize|intelligent)", "mechanism": "Fal shot_type" }
+      ],
+      "output": { "mediaType": "video", "mimeTypes": ["video/mp4"], "resolution": "provider-defined; verify independently from Pro", "audio": "conditional embedded native audio", "durableAuthority": "Globe private content-addressed asset and governance readback" },
+      "transport": { "kind": "Fal queue", "auth": "server-only GLOBE_FAL_API_KEY", "providerSlug": "fal-ai/kling-video/v3/standard/image-to-video", "followUpReferences": "returned per submit; never derived", "webhook": "signed per request", "pollFallback": true, "browserAccess": "forbidden" },
+      "completion": { "driver": "webhook+poll", "providerOperation": "Fal queue request status/result", "resultAuthority": "Globe downloaded and retained bytes", "recovery": "readback first; no fallback route" },
+      "cables": {
+        "provider_supported": { "state": "verified", "evidenceRefs": ["fal-standard-image-api"] },
+        "contract_declared": { "state": "proposed", "evidenceRefs": ["task-1617", "adr-013", "adr-022"] },
+        "adapter_wired": { "state": "not_started", "evidenceRefs": ["globe-catalog", "task-1617"] },
+        "transport_verified": { "state": "unknown", "evidenceRefs": ["fal-queue", "fal-webhooks"] },
+        "output_verified": { "state": "unknown", "evidenceRefs": ["fal-standard-image-api"] },
+        "billing_verified": { "state": "unknown", "evidenceRefs": ["fal-pricing"] },
+        "rights_verified": { "state": "blocked", "evidenceRefs": ["fal-terms"] },
+        "evaluated": { "state": "not_started", "evidenceRefs": ["task-1617"] },
+        "canary_passed": { "state": "not_started", "evidenceRefs": ["task-1617"] },
+        "promoted": { "state": "not_promoted", "evidenceRefs": ["globe-reader", "globe-catalog"] },
+        "available": { "state": "gated", "evidenceRefs": ["globe-reader", "globe-catalog"] }
+      },
+      "evidenceRefs": ["task-1617", "globe-catalog", "fal-standard-image-api", "fal-queue", "fal-pricing", "fal-terms"],
+      "blockers": ["Validate grouped element and start/end frame semantics against the live Standard OpenAPI before wiring the Producer."]
+    },
+    {
+      "routeId": "ref/video/kling-3-4k-v1",
+      "kind": "standard",
+      "capability": "video-generate",
+      "operation": "create",
+      "provider": "fal",
+      "model": "kling-3-4k",
+      "version": "3.0",
+      "identityState": "resolved",
+      "endpointId": "fal.kling.v3.4k.text-to-video",
+      "region": "singapore",
+      "completionDriver": "webhook+poll",
+      "lifecycle": "gated",
+      "exposure": { "governed": "candidate", "reader": "unknown", "producerUi": "not-exposed", "externalRollout": "gated" },
+      "inputs": [
+        { "slot": "prompt", "role": "direction", "mediaType": "text", "required": false, "valueShape": "text; mutually exclusive with multi_prompt" },
+        { "slot": "multi_prompt", "role": "storyboard", "mediaType": "text", "required": false, "cardinality": { "min": 1, "max": null }, "valueShape": "array<{prompt:text,duration:1..15}>; mutually exclusive with prompt" }
+      ],
+      "controls": [
+        { "name": "duration", "owner": "outputShape", "valueShape": "enum(3..15 seconds)", "mechanism": "Fal duration" },
+        { "name": "resolution", "owner": "outputShape", "valueShape": "fixed(native-4k)", "mechanism": "Fal 4K endpoint" },
+        { "name": "aspect-ratio", "owner": "outputShape", "valueShape": "enum(16:9|9:16|1:1)", "mechanism": "Fal aspect_ratio" },
+        { "name": "audio-mode", "owner": "outputShape", "valueShape": "enum(with-audio|silent)", "mechanism": "Fal generate_audio; embedded track must be inspected" },
+        { "name": "shot-type", "owner": "providerRequest", "valueShape": "enum(customize|intelligent)", "mechanism": "Fal shot_type" }
+      ],
+      "output": { "mediaType": "video", "mimeTypes": ["video/mp4"], "resolution": "native 4K", "audio": "conditional embedded native audio", "durableAuthority": "Globe private content-addressed asset and governance readback" },
+      "transport": { "kind": "Fal queue", "auth": "server-only GLOBE_FAL_API_KEY", "providerSlug": "fal-ai/kling-video/v3/4k/text-to-video", "providerRegion": "Singapore-only per current Fal page", "followUpReferences": "returned per submit; never derived", "webhook": "signed per request", "pollFallback": true, "browserAccess": "forbidden" },
+      "completion": { "driver": "webhook+poll", "providerOperation": "Fal queue request status/result", "resultAuthority": "Globe downloaded and retained bytes", "recovery": "readback first; no fallback route" },
+      "cables": {
+        "provider_supported": { "state": "verified", "evidenceRefs": ["fal-4k-text-api"] },
+        "contract_declared": { "state": "proposed", "evidenceRefs": ["task-1617", "adr-013", "adr-022"] },
+        "adapter_wired": { "state": "not_started", "evidenceRefs": ["globe-catalog", "task-1617"] },
+        "transport_verified": { "state": "unknown", "evidenceRefs": ["fal-queue", "fal-webhooks"], "note": "Singapore routing and Globe egress/IAM have not been verified." },
+        "output_verified": { "state": "unknown", "evidenceRefs": ["fal-4k-text-api"] },
+        "billing_verified": { "state": "unknown", "evidenceRefs": ["fal-pricing"] },
+        "rights_verified": { "state": "blocked", "evidenceRefs": ["fal-terms"] },
+        "evaluated": { "state": "not_started", "evidenceRefs": ["task-1617"] },
+        "canary_passed": { "state": "not_started", "evidenceRefs": ["task-1617"] },
+        "promoted": { "state": "not_promoted", "evidenceRefs": ["globe-reader", "globe-catalog"] },
+        "available": { "state": "gated", "evidenceRefs": ["globe-reader", "globe-catalog"] }
+      },
+      "evidenceRefs": ["task-1617", "globe-catalog", "fal-4k-text-api", "fal-queue", "fal-pricing", "fal-terms"],
+      "blockers": ["Prove provider-region reachability and exact 4K output/codec before any spend.", "Do not expose 4K as selectable until a route-specific rate, rights attestation, evaluation and canary exist."]
+    },
+    {
+      "routeId": "ref/video/kling-3-4k-frames-v1",
+      "kind": "standard",
+      "capability": "video-frames",
+      "operation": "create",
+      "provider": "fal",
+      "model": "kling-3-4k",
+      "version": "3.0",
+      "identityState": "resolved",
+      "endpointId": "fal.kling.v3.4k.image-to-video",
+      "region": "singapore",
+      "completionDriver": "webhook+poll",
+      "lifecycle": "gated",
+      "exposure": { "governed": "candidate", "reader": "unknown", "producerUi": "not-exposed", "externalRollout": "gated" },
+      "inputs": [
+        { "slot": "prompt", "role": "direction", "mediaType": "text", "required": false, "valueShape": "text; mutually exclusive with multi_prompt" },
+        { "slot": "multi_prompt", "role": "storyboard", "mediaType": "text", "required": false, "cardinality": { "min": 1, "max": null }, "valueShape": "array<{prompt:text,duration:1..15}>; mutually exclusive with prompt" },
+        { "slot": "start_frame", "role": "first-frame", "mediaType": "image", "required": true, "cardinality": { "min": 1, "max": 1 }, "valueShape": "authorized image reference" },
+        { "slot": "end_frame", "role": "last-frame", "mediaType": "image", "required": false, "cardinality": { "min": 0, "max": 1 }, "valueShape": "authorized image reference" },
+        { "slot": "elements", "role": "character-or-object-reference", "mediaType": "image|video", "required": false, "cardinality": { "min": 0, "max": null }, "valueShape": "grouped element input; preserve semantic roles" }
+      ],
+      "controls": [
+        { "name": "duration", "owner": "outputShape", "valueShape": "enum(3..15 seconds)", "mechanism": "Fal duration" },
+        { "name": "resolution", "owner": "outputShape", "valueShape": "fixed(native-4k)", "mechanism": "Fal 4K endpoint" },
+        { "name": "audio-mode", "owner": "outputShape", "valueShape": "enum(with-audio|silent)", "mechanism": "Fal generate_audio; embedded track must be inspected" },
+        { "name": "shot-type", "owner": "providerRequest", "valueShape": "enum(customize|intelligent)", "mechanism": "Fal shot_type" },
+        { "name": "voice-control", "owner": "providerRequest", "valueShape": "server-only voice handle list(max 2)", "mechanism": "Fal voice_ids; never expose provider IDs in browser payload" }
+      ],
+      "output": { "mediaType": "video", "mimeTypes": ["video/mp4"], "resolution": "native 4K", "aspectRatio": "inherited from start image per Fal page", "audio": "conditional embedded native audio", "durableAuthority": "Globe private content-addressed asset and governance readback" },
+      "transport": { "kind": "Fal queue", "auth": "server-only GLOBE_FAL_API_KEY", "providerSlug": "fal-ai/kling-video/v3/4k/image-to-video", "providerRegion": "Singapore-only per current Fal page", "followUpReferences": "returned per submit; never derived", "webhook": "signed per request", "pollFallback": true, "browserAccess": "forbidden" },
+      "completion": { "driver": "webhook+poll", "providerOperation": "Fal queue request status/result", "resultAuthority": "Globe downloaded and retained bytes", "recovery": "readback first; no fallback route" },
+      "cables": {
+        "provider_supported": { "state": "verified", "evidenceRefs": ["fal-4k-image-api"] },
+        "contract_declared": { "state": "proposed", "evidenceRefs": ["task-1617", "adr-013", "adr-022"] },
+        "adapter_wired": { "state": "not_started", "evidenceRefs": ["globe-catalog", "task-1617"] },
+        "transport_verified": { "state": "unknown", "evidenceRefs": ["fal-queue", "fal-webhooks"], "note": "Singapore routing and Globe egress/IAM have not been verified." },
+        "output_verified": { "state": "unknown", "evidenceRefs": ["fal-4k-image-api"] },
+        "billing_verified": { "state": "unknown", "evidenceRefs": ["fal-pricing"] },
+        "rights_verified": { "state": "blocked", "evidenceRefs": ["fal-terms"] },
+        "evaluated": { "state": "not_started", "evidenceRefs": ["task-1617"] },
+        "canary_passed": { "state": "not_started", "evidenceRefs": ["task-1617"] },
+        "promoted": { "state": "not_promoted", "evidenceRefs": ["globe-reader", "globe-catalog"] },
+        "available": { "state": "gated", "evidenceRefs": ["globe-reader", "globe-catalog"] }
+      },
+      "evidenceRefs": ["task-1617", "globe-catalog", "fal-4k-image-api", "fal-queue", "fal-pricing", "fal-terms"],
+      "blockers": ["Prove provider-region reachability, grouped element semantics and exact 4K output before any spend.", "Do not inherit Pro/Standard canary or rights evidence."]
+    }
+  ],
+  "providerSurfaces": [
+    {
+      "surfaceId": "kling-native-v3-video",
+      "provider": "kling",
+      "endpointId": "kling-open-platform.video-generation.v3",
+      "status": "deferred",
+      "modes": ["native-kling-v3-video-generation"],
+      "cables": {
+        "provider_supported": { "state": "verified", "evidenceRefs": ["kling-native-api", "kling-native-overview"] },
+        "contract_declared": { "state": "proposed", "evidenceRefs": ["task-1617"], "note": "Native Kling is a separate provider contract, not a Fal route alias." },
+        "adapter_wired": { "state": "unsupported", "evidenceRefs": ["task-1617"], "note": "A direct native Kling adapter is outside this Fal-first slice." },
+        "transport_verified": { "state": "unknown", "evidenceRefs": ["kling-native-api"] },
+        "output_verified": { "state": "unknown", "evidenceRefs": ["kling-native-api"] },
+        "billing_verified": { "state": "unknown", "evidenceRefs": ["kling-native-api"] },
+        "rights_verified": { "state": "blocked", "evidenceRefs": ["kling-native-api", "kling-native-overview"], "note": "Native terms and Globe rights attestation are not yet resolved." },
+        "evaluated": { "state": "not_started", "evidenceRefs": ["task-1617"] },
+        "canary_passed": { "state": "not_started", "evidenceRefs": ["task-1617"] },
+        "promoted": { "state": "unsupported", "evidenceRefs": ["task-1617"] },
+        "available": { "state": "unsupported", "evidenceRefs": ["task-1617"] }
+      },
+      "evidenceRefs": ["kling-native-api", "kling-native-overview"],
+      "note": "Do not create a direct Kling adapter in this slice. Fal is the current integration candidate; the native API requires its own auth, contract, rights, rate, completion and rollout audit."
+    },
+    {
+      "surfaceId": "fal-kling-v3-motion-control",
+      "provider": "fal",
+      "endpointId": "fal-ai/kling-video/v3/pro/motion-control",
+      "status": "deferred",
+      "modes": ["motion-control", "image-plus-video-reference", "keep-original-sound", "character-orientation"],
+      "cables": {
+        "provider_supported": { "state": "unknown", "evidenceRefs": ["fal-pro-image-api"], "note": "The dedicated motion-control endpoint namespace and exact schema require revalidation before implementation." },
+        "contract_declared": { "state": "proposed", "evidenceRefs": ["task-1617"] },
+        "adapter_wired": { "state": "not_started", "evidenceRefs": ["task-1617"] },
+        "transport_verified": { "state": "unknown", "evidenceRefs": ["fal-queue"] },
+        "output_verified": { "state": "unknown", "evidenceRefs": ["fal-pro-image-api"] },
+        "billing_verified": { "state": "unknown", "evidenceRefs": ["fal-pricing"] },
+        "rights_verified": { "state": "blocked", "evidenceRefs": ["fal-terms"] },
+        "evaluated": { "state": "not_started", "evidenceRefs": ["task-1617"] },
+        "canary_passed": { "state": "not_started", "evidenceRefs": ["task-1617"] },
+        "promoted": { "state": "not_promoted", "evidenceRefs": ["task-1617"] },
+        "available": { "state": "gated", "evidenceRefs": ["task-1617"] }
+      },
+      "evidenceRefs": ["fal-pro-image-api", "task-1617"],
+      "note": "Do not map motion control to image-to-video or expose it until the dedicated endpoint and semantic input contract are confirmed."
+    },
+    {
+      "surfaceId": "fal-kling-create-voice",
+      "provider": "fal",
+      "endpointId": "fal-ai/kling-video/create-voice",
+      "status": "deferred",
+      "modes": ["voice-id-creation"],
+      "cables": {
+        "provider_supported": { "state": "unknown", "evidenceRefs": ["fal-pro-image-api"], "note": "The create-voice provider reference is linked from the V3 schema but is not independently verified here." },
+        "contract_declared": { "state": "proposed", "evidenceRefs": ["task-1617"] },
+        "adapter_wired": { "state": "not_started", "evidenceRefs": ["task-1617"] },
+        "transport_verified": { "state": "unknown", "evidenceRefs": ["fal-queue"] },
+        "output_verified": { "state": "unknown", "evidenceRefs": ["fal-pro-image-api"] },
+        "billing_verified": { "state": "unknown", "evidenceRefs": ["fal-pricing"] },
+        "rights_verified": { "state": "blocked", "evidenceRefs": ["fal-terms"] },
+        "evaluated": { "state": "not_started", "evidenceRefs": ["task-1617"] },
+        "canary_passed": { "state": "not_started", "evidenceRefs": ["task-1617"] },
+        "promoted": { "state": "not_promoted", "evidenceRefs": ["task-1617"] },
+        "available": { "state": "gated", "evidenceRefs": ["task-1617"] }
+      },
+      "evidenceRefs": ["fal-pro-image-api", "task-1617"],
+      "note": "Voice IDs remain provider-side handles; no Globe command, entitlement or client payload exists."
+    }
+  ],
+  "implementationChecklist": [
+    { "id": "catalog-and-reader", "status": "blocked", "ownerBoundary": "efeonce-globe producer catalog + live fleet reader", "evidenceRefs": ["globe-catalog", "globe-reader"], "note": "No Kling route, adapter mapping or governed binding exists in the current Globe checkout; implement under TASK-1617." },
+    { "id": "fal-namespace-and-submit", "status": "blocked", "ownerBoundary": "efeonce-globe Fal adapter", "evidenceRefs": ["fal-pro-text-api", "fal-pro-image-api", "fal-queue"], "note": "Resolve endpoint namespace and retain provider-returned follow-up references with a controlled submit before wiring a route." },
+    { "id": "creative-contract", "status": "open", "ownerBoundary": "Globe route contract + Producer catalog", "evidenceRefs": ["adr-022", "task-1617"], "note": "Separate prompt/multi_prompt, start/end frames and grouped elements; validate before reserve." },
+    { "id": "output-and-audio", "status": "open", "ownerBoundary": "Globe runner + Asset Governance", "evidenceRefs": ["fal-pro-image-api", "fal-4k-image-api"], "note": "Verify MP4 bytes, codec, dimensions, duration, embedded audio and retained governance state per route." },
+    { "id": "rates-and-rights", "status": "blocked", "ownerBoundary": "Globe rate ledger + commercial rights attestation", "evidenceRefs": ["fal-pricing", "fal-terms"], "note": "Resolve exact tier/audio/4K rates and model-exact terms digest before estimate or promotion." },
+    { "id": "evaluation-and-canary", "status": "open", "ownerBoundary": "Globe evaluation harness + promotion lane", "evidenceRefs": ["task-1617", "adr-013"], "note": "Each route identity needs its own evaluation, canary, settlement, output and readback; no evidence inheritance across Pro/Standard/4K." },
+    { "id": "o3-separation", "status": "deferred", "ownerBoundary": "TASK-1617 separate Kling O3 route card", "evidenceRefs": ["task-1617"], "note": "O3 is a separate model family/surface; do not alias it to Kling V3 or include its historical Fal edit artifact as V3 evidence." },
+    { "id": "external-rollout", "status": "deferred", "ownerBoundary": "Greenhouse entitlements + Globe commercial rollout", "evidenceRefs": ["task-1617"], "note": "Internal route availability does not authorize client or external rollout." }
+  ]
+}

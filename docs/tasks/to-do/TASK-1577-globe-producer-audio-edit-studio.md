@@ -19,7 +19,7 @@
 - Rank: `TBD`
 - Domain: `creative|ui|audio`
 - Blocked by: `TASK-1568`, `TASK-1575`, `TASK-1576`
-- Branch: `task/TASK-1577-globe-producer-audio-edit-studio`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 
 ## Summary

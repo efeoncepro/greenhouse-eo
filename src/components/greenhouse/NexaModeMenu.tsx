@@ -18,15 +18,14 @@ import type { NexaInteractionMode } from '@/lib/nexa/interaction-mode'
 const COPY = GH_NEXA.interactionMode
 
 const MODE_ICON: Record<NexaInteractionMode, string> = {
-  dock: 'tabler-message-circle',
   expandible: 'tabler-layout-bottombar-expand',
   lane: 'tabler-layout-sidebar-right'
 }
 
 /**
- * TASK-1079 — selector del modo de interacción con Nexa (dock A / expandible B /
- * lane C). Reusado por el header del panel flotante y el del lane. Solo ofrece los
- * modos disponibles (gating por flags). `tone='onNavy'` para los headers navy.
+ * TASK-1079 — selector del modo de interacción con Nexa (`expandible` / `lane`).
+ * Reusado por el header del panel flotante y el del lane. Solo ofrece los modos
+ * disponibles (gating por flags). `tone='onNavy'` para los headers navy.
  */
 const NexaModeMenu = ({ tone = 'default' }: { tone?: 'default' | 'onNavy' }) => {
   const theme = useTheme()

@@ -1,77 +1,185 @@
-# Manual — Fondear los créditos de Globe por el carril gobernado (propose → confirm)
+# Manual — Fondear los créditos de Globe por el carril gobernado
 
 > **Tipo de documento:** Manual de uso / runbook (orientado al operador)
-> **Version:** 1.0
+> **Version:** 1.5
 > **Creado:** 2026-07-26 por Claude (TASK-1566)
-> **Ultima actualizacion:** 2026-07-26 por Claude
+> **Ultima actualizacion:** 2026-08-02 por Codex (reconciliación documental TASK-1630)
 > **Documentacion tecnica:** [ADR-015](../../architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md) · [TASK-1566](../../tasks/complete/TASK-1566-globe-governed-credit-funding-command.md)
 
 ## Para qué sirve
 
 Este manual explica cómo **ponerle presupuesto al mes de créditos de Globe** — el combustible de la
-generación de imagen/video/audio — por el **carril gobernado**: propones un plan, lo revisas, y lo
-confirmas **tú, con tu sesión**. Reemplaza al break-glass (impersonar la service account y firmar a
-mano), que se usó tres veces para esta misma clase de acto y ya no debe usarse.
+generación de imagen/video/audio — por el **carril gobernado**: un usuario autenticado, humano o
+agente delegado, propone un plan, lo revisa y lo confirma por API. Reemplaza al break-glass
+(impersonar la service account y firmar a mano), que se usó tres veces para esta misma clase de acto
+y ya no debe usarse.
 
 Ejercido end-to-end por primera vez el 2026-07-26: `confirm` en 905 ms, grant +100, tope 400→800,
 atribuido al operador real. Este manual documenta ese camino verificado, con las dos correcciones de
 runbook que salieron de medirlo.
 
+> **Estado 2026-08-01:** operativo para el workspace interno. Greenhouse corre desde `develop`; Globe corre desde
+> su rama predeterminada, de integración y release `main`. Migraciones, seed OAuth y deploy están aplicados. La
+> UI rica, el CLI PKCE y Producer leyeron el mismo resultado live: 800 créditos efectivos, cap 1500 y cero
+> blockers. El canary posterior de Seedance consumió 16 y dejó 784 efectivos bajo el mismo cap 1500. Workbench y
+> self-view pasaron GVC y smoke Chrome autenticado; el estado mutable del rollout vive en
+> `GLOBE_RUNTIME_HANDOFF.md`.
+
 ## Antes de empezar
 
-- **Las dos capas de crédito NO son lo mismo.** El **ledger** (`credits.allocate`) es la caja; la
+- **Studio Credit no es dinero.** Es una unidad de operación generativa gobernada; no representa revenue,
+  efectivo, gift card, token o factura de proveedor. El carril documentado es interno y no habilita top-ups,
+  checkout, precios ni clientes externos.
+- **Las dos capas de crédito NO son lo mismo.** El **ledger** (`credits.allocate`) es el registro append-only; la
   **política** (`monthlyCap` + grants de pools activos) es lo que el gasto consulta. Cargar el ledger
   sin subir la política no habilita nada — el plan del propose te muestra exactamente eso.
 - **Un fondeo útil casi siempre sube `monthlyCap`.** Si el tope vigente es lo que restringe (caso
   típico), un grant sin `monthlyCap` deja `policyAvailableAfter` igual o menor que antes. El plan lo
   dice antes de confirmar; léelo.
-- **Quién hace qué:** un agente **puede proponer**; **confirmar es tuyo** — el trigger de la tabla de
-  intents rechaza principals de servicio, y confirmar con una persona de prueba dejaría una
-  atribución ficticia en una tabla append-only.
-- **Necesitas:** sesión activa en el portal de Greenhouse (staging:
-  `dev-greenhouse.efeoncepro.com`), el `poolId` vigente (ver
-  [`GLOBE_RUNTIME_HANDOFF.md`](../../operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md)), y que
+- **Quién hace qué:** una persona autenticada puede usar el carril manual con sus entitlements. El carril one-shot
+  liga exactamente usuario, modo de autenticación y OAuth client: funciona con la sesión humana real de Chrome y
+  también con `agent` cuando existe una identidad agente autenticada real. Nunca convierte una sesión humana en
+  agente por parámetro. Un workload, API key o principal de servicio genérico nunca confirma.
+- **Necesitas:** una sesión autenticada en Google Chrome para completar OAuth, los scopes
+  `globe.credits.funding.propose`, `confirm`, `read`, `reconcile` y `ensure`, los entitlements de
+  administración de créditos y que
   `GLOBE_CREDIT_ADMIN_LANE_ENABLED=true` esté en la revisión activa de `globe-api-internal`.
 - **La propuesta vence en 15 minutos.** Se confirma sobre el estado que se vio; si venció, se
   propone de nuevo.
+- **El bootstrap histórico de 500.000 no es capacidad.** Se conserva como auditoría append-only, pero está
+  excluido de status, UI, API, CLI, MCP y KPIs. No lo sumes, no lo borres y no lo compenses manualmente.
 
-## Paso a paso
+## Camino recomendado: instrucción CEO → ensure one-shot
 
-### 1. Proponer el plan
+Este camino evita que el agente calcule `poolId`, grant o tope. El CEO emite una autoridad con objetivo y techos;
+Globe lee su estado real, deriva el delta y devuelve `no_effect` si el sistema ya tenía fondos suficientes.
+Con `requireSecondConfirmer=OFF` en el workspace interno, una instrucción one-shot atribuida del CEO permite que
+el mismo usuario agente autenticado ejecute el flujo end-to-end; no se requiere una segunda persona.
+UI, API/CLI OAuth PKCE y MCP son adapters de esta misma operación: no tienen reglas, saldos o ledgers propios.
 
-Desde el browser logueado (consola del portal) o `curl` con tu cookie de sesión:
+### Opción A — Greenhouse UI (recomendada)
 
-```bash
-BASE=https://greenhouse-eo-env-staging-efeonce-7670142f.vercel.app
-COOKIE='__Secure-next-auth.session-token=<tu cookie del portal>'
-KEY="funding-$(date +%Y%m)-cap<tope>-grant<n>"   # estable y descriptiva
+Camino verificado y recomendado para una persona autorizada:
 
-curl -sS -X POST "$BASE/api/admin/globe/credit-funding/propose" \
-  -H "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" \
-  -H "x-idempotency-key: $KEY" -H 'Content-Type: application/json' -H "Cookie: $COOKIE" \
-  -d '{"globeWorkspaceId":"greenhouse-org:efeonce","poolId":"<pool vigente>","grantCredits":100,"monthlyCap":800,"periodStart":"2026-07-01T00:00:00Z","periodEnd":"2026-08-01T00:00:00Z"}'
+1. Abre `/admin/globe/credits` en Greenhouse con la sesión humana autorizada.
+2. Revisa la capacidad efectiva y pulsa `Asegurar capacidad`.
+3. Define `Disponible objetivo`, `Máximo a otorgar` y `Tope máximo resultante`; confirma el período mostrado.
+4. Pulsa `Autorizar y ejecutar`. El servidor emite y reclama una sola autoridad ligada a esa misma sesión; el
+   navegador no calcula el grant ni puede cambiar usuario, canal, client o modo de autenticación.
+5. Considera éxito únicamente `completed` o `no_effect`. Si aparece `Resultado por verificar`, selecciona la
+   operación y usa `Verificar y reconciliar`; no abras un fondeo nuevo.
+
+El workbench ampliado también permite inspeccionar pools, grants, budgets, forecast, alertas y ledger. Cada bloque
+declara su cobertura: si uno aparece no disponible, conserva el resto y no asumas que el valor faltante es cero.
+Antes de ejecutar, revisa el preview server-side; el servidor vuelve a validar el plan al confirmar.
+
+La UI exige simultáneamente la view `administracion.globe_credits` y los entitlements de emisión/ejecución. La
+operation key se conserva ante timeout o reintento incierto. Fue ejercido live el 2026-08-01 con la sesión Chrome
+de `jreyes@efeonce.cl`; la operación `23db5b0e-89dd-4661-9b8d-c12f9be4ad7a` terminó `completed`.
+
+### Opción B — autoridad OAuth para CLI/agente
+
+1. Desde una sesión humana autenticada del CEO, emitir `POST
+   /api/admin/globe/credits/funding/authorities` con un cuerpo como éste:
+
+```json
+{
+  "globeWorkspaceId": "greenhouse-org:efeonce",
+  "periodKey": "2026-08",
+  "periodStart": "2026-08-01T00:00:00.000Z",
+  "periodEnd": "2026-09-01T00:00:00.000Z",
+  "targetAvailableCredits": 800,
+  "maxGrantCredits": 1000,
+  "maxResultingCapCredits": 1500,
+  "executorClientId": "greenhouse-admin-cli",
+  "evidenceRef": "instruction:TASK-1629"
+}
 ```
 
-La respuesta trae `proposal.proposalId`, `proposal.fingerprint` (guárdalo **exacto**, ~250 chars) y
-`proposal.plan`.
+Usa `Idempotency-Key: globe-funding-2026-08-evaluation` en ese request. El servidor la conserva como
+`operationKey`; repetir el mismo request devuelve la misma autoridad incluso después de un timeout. Si omites
+`executorUserId` y `executorAuthMode`, la autoridad queda ligada al mismo usuario y modo autenticado que la emitió;
+éste es el camino correcto para ejecutar el CLI mediante la sesión Chrome de `jreyes@efeonce.cl`. Para una identidad
+agente real, envía ambos campos explícitamente y usa `executorAuthMode: "agent"`.
+
+2. Entregar únicamente el `authorityId` al agente. El agente ejecuta:
+
+```bash
+GREENHOUSE_API_BASE_URL=https://dev-greenhouse.efeoncepro.com \
+GLOBE_ADMIN_OAUTH_CLIENT_ID=greenhouse-admin-cli \
+pnpm tsx scripts/globe-credit-funding.ts ensure --authority-id <authority-id>
+```
+
+3. El resultado devuelve el mismo `authorityId`, un `executionId`, `outcome` (`completed`, `no_effect` u
+   `outcome_unknown`) y, cuando existe, el `operationId` autoritativo de Globe. Para un timeout, vuelve a ejecutar
+   el mismo comando: reclama la misma ejecución y lee/reconcilia antes de cualquier redispatch.
+
+4. Antes de reclamarla, el CEO puede revocar la autoridad con `POST
+   /api/admin/globe/credits/funding/authorities/<authorityId>/revoke`. Una vez reclamada, no se libera ni se
+   reemplaza: se recupera con la misma ejecución e idempotency keys derivadas.
+
+### Opción C — agente mediante Efeonce MCP
+
+Usa esta opción cuando el agente ya está autenticado contra `https://mcp.efeonce.org/mcp`. La emisión de la
+autoridad sigue ocurriendo en Greenhouse desde la sesión del CEO, pero debe fijar `executorChannel: "mcp"`,
+`executorClientId: "efeonce-mcp-gateway"` y `executorAuthMode: "agent"`. Entrega al agente solamente el ID.
+
+El agente llama la tool `globe.credits.funding.ensure` con el input estricto:
+
+```json
+{ "authorityId": "<authority-id>" }
+```
+
+La tool requiere el scope separado `efeonce.mcp.globe.credits.funding.ensure`. El gateway valida Entra, obtiene
+su workload identity, intercambia el token por un token Greenhouse de cinco minutos y llama exclusivamente el
+command canónico. No acepta monto, workspace, período, cap, actor ni instrucciones libres. El éxito terminal es
+`completed` o `no_effect`; ante `outcome_unknown`, reintenta únicamente el mismo `authorityId` para reconciliar.
+
+Canary live del 2026-08-01: autoridad `df166eab-2c22-4009-a674-b83c8df307e4`, ejecución MCP terminal
+`completed/no_effect`, operación Globe `b69ecd23-6e41-4a5c-9bdf-c3f212e8bbeb`. `no_effect` fue correcto porque
+el workspace ya tenía los 800 créditos objetivo; no se creó un segundo delta económico.
+
+## Camino manual compatible: propose → confirm
+
+### 1. Ejecutar el cliente OAuth gobernado
+
+Desde el repo de Greenhouse, usa el cliente canónico. Abre Google Chrome para autorizar mediante
+OAuth 2.0 Authorization Code + PKCE y conserva el token solo en memoria. La sesión puede pertenecer
+a una persona o a un agente autenticado; la política de delegación se valida nuevamente al confirmar.
+
+```bash
+GREENHOUSE_API_BASE_URL=https://dev-greenhouse.efeoncepro.com \
+GLOBE_ADMIN_OAUTH_CLIENT_ID=greenhouse-admin-cli \
+pnpm globe:credit-funding -- \
+  --input '{"globeWorkspaceId":"greenhouse-org:efeonce","poolId":"<pool-activo>","grantCredits":500,"monthlyCap":1500,"periodStart":"<inicio-UTC>","periodEnd":"<fin-UTC>"}' \
+  --propose-idempotency-key <clave-unica-propose> \
+  --confirm-idempotency-key <clave-unica-confirm> \
+  --yes true
+```
+
+Sin `--yes true`, el CLI muestra el plan y pide confirmación interactiva. `--yes true` es válido para
+un agente sólo cuando la autoridad/delegación ya existe en el runtime; la instrucción textual del operador no
+omite ninguna verificación server-side.
+
+Este comando legacy explícito sigue disponible para una persona autorizada y para diagnóstico controlado. Para agentes, usa
+`ensure --authority-id`: el gate one-shot impide que el carril crudo se convierta en delegación permanente.
+El camino recomendado `ensure` no recibe pool ni fechas: Globe deriva el mes UTC y crea o reutiliza el pool
+determinístico `internal-month:AAAA-MM` dentro de la misma transacción económica.
 
 ### 2. Revisar el plan — éste es el punto entero del carril
 
 El plan muestra el **delta**: `monthlyCapBefore/After`, `policyAvailableBefore/After`,
 `spentInPeriod` y, si hoy se niega, `currentDenialReason`. Reglas de lectura:
 
+- `propose` crea una intención durable con actor, idempotency key, fingerprint, preview y expiración. No es una
+  lectura pura, pero todavía no crea grant, allocation ni cambio de cap; esa mutación económica ocurre sólo al
+  confirmar.
+
 - Si `policyAvailableAfter` **no sube**, el fondeo no sirve como está — probablemente falta subir
   `monthlyCap`.
 - Un `monthlyCap` por debajo de lo ya gastado se rechaza en el propose (`invalid_request`).
 
-### 3. Confirmar — con clave de idempotencia PROPIA
-
-```bash
-curl -sS -X POST "$BASE/api/admin/globe/credit-funding/confirm" \
-  -H "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" \
-  -H "x-idempotency-key: ${KEY}-confirm" -H 'Content-Type: application/json' -H "Cookie: $COOKIE" \
-  -d '{"globeWorkspaceId":"greenhouse-org:efeonce","proposalId":"<…>","fingerprint":"<exacto del propose>"}'
-```
+### 3. Confirmar — con clave de idempotencia propia
 
 ⚠️ **Corrección de runbook (medida 2026-07-26):** el confirm **necesita su propia clave** — reusar
 la del propose devuelve `409 globe_funding_already_recorded` (el broker registra la intención por
@@ -83,12 +191,25 @@ tope) y `allocationEntryId`. Todo ocurre en **una** transacción: grant + asient
 
 ### 4. Verificar
 
-1. **Intents** (Greenhouse PG): `SELECT phase, actor_user_id FROM
-   greenhouse_core.globe_credit_funding_intents ORDER BY created_at DESC LIMIT 2` → `proposed` +
-   `confirmed` con **tu** user id.
-2. **Globe PG**: grant `posted`, política nueva `active` (la anterior `superseded`), asiento
-   `allocation` con los créditos.
-3. **Generación**: el estimado del Producer debe mostrar `withinDayCap`/disponible acorde al plan.
+Usa los comandos canónicos desplegados:
+
+```bash
+pnpm tsx scripts/globe-credit-funding.ts status --workspace-id greenhouse-org:efeonce --requested-credits 1
+pnpm tsx scripts/globe-credit-funding.ts operations list --workspace-id greenhouse-org:efeonce --limit 25
+pnpm tsx scripts/globe-credit-funding.ts operations get --workspace-id greenhouse-org:efeonce --operation-id <id>
+pnpm tsx scripts/globe-credit-funding.ts operations reconcile --workspace-id greenhouse-org:efeonce \
+  --operation-id <id> --idempotency-key <clave-estable>
+```
+
+No uses SQL para confirmar outcomes, reconstruir saldo o reparar una operación. Los readers y receipts anteriores
+son la evidencia causal y permiten recuperar ambigüedad sin saltarse la máquina de estados.
+
+Producer ya consume el self-status autoritativo. Úsalo como verificación independiente de experiencia, pero
+conserva el `operationId` y el reader `status/get` como evidencia causal de la operación.
+
+En Producer, `Parcial` o `Desactualizado` significa que debes reintentar la lectura antes de interpretar la
+cifra; el último valor válido puede permanecer visible, rotulado como stale. Un daily fence agotado bloquea
+producción sin reescribir la capacidad económica ni habilitar un CTA de fondeo dentro de Globe.
 
 ## Qué significan los estados de una propuesta
 
@@ -98,33 +219,41 @@ tope) y `allocationEntryId`. Todo ocurre en **una** transacción: grant + asient
 | `expired` | Venció sin confirmar | Proponer de nuevo |
 | `completed` | Fondeo ejecutado; apunta a grant/política/asiento | Nada — es el estado final feliz |
 | `confirm_failed` | La confirmación falló DESPUÉS de transicionar; la transacción revirtió | Leer el estado antes de reintentar; es evidencia, no se borra |
-| `confirmed` (sin completar) | Anomalía: la mutación no terminó (era el síntoma del deadlock pre-fix) | NO reintentar a ciegas; ver `pg_locks`; se terminaliza vía TASK-1469 |
+| `confirmed` (sin completar) | La mutación puede estar en curso o con outcome desconocido | Consultar `operations get/status` con la misma operation key; si no converge, ejecutar `operations reconcile` antes de cualquier nuevo intento |
 
 ## Qué NO hacer
 
 - **NO** reintentar un `confirm` tras un timeout del cliente sin leer primero el estado — puede
   haber completado en el servidor.
 - **NO** reusar la clave de idempotencia del propose en el confirm (409 garantizado).
-- **NO** confirmar con la persona agente (`user-agent-e2e-001`) ni con ningún principal de servicio:
-  la atribución es evidencia inmutable.
-- **NO** usar los scripts legacy de firma cliente (`raise-credit-monthly-cap.mjs`) ni el break-glass
-  para fondear: su premisa (firmar desde el cliente) contradice el diseño y están en retiro.
+- **NO** convertir una API key, service account o principal de workload en confirmador. Un agente
+  debe entrar como usuario autenticado y estar delegado por la política del workspace.
+- **NO** extraer cookies, tokens, `localStorage` ni contraseñas de Chrome. Chrome aporta únicamente
+  la sesión autenticada para la autorización OAuth; el CLI recibe el código PKCE por loopback.
+- **NO** recrear ni usar scripts legacy de firma cliente (`raise-credit-monthly-cap.mjs`) o break-glass para
+  fondear: su premisa contradice el diseño y el camino cliente fue retirado.
 - **NO** tocar las tablas de crédito con SQL manual.
+- **NO** tratar los 500.000 históricos como saldo operativo ni presentarlos en una superficie; ya están excluidos.
+- **NO** usar este carril interno para clientes, top-ups, checkout o facturación. Esas capacidades siguen gated.
 
 ## Problemas comunes
 
 | Síntoma | Causa probable | Salida |
 |---|---|---|
-| `409 globe_funding_already_recorded` | Reusaste una clave, o esa propuesta ya tiene decisión registrada (el anti-replay del broker es **por propuesta**: ningún confirm repetido pasa, con cualquier clave) | Leer el estado de la propuesta; si `completed`, ya está |
+| `409 globe_funding_already_recorded` | Reusaste una clave, o esa propuesta ya tiene decisión registrada (el anti-replay del broker es **por propuesta**: ningún confirm repetido pasa, con cualquier clave) | No reintentar. Consultar `operations get/status`; si está `completed`, usar ese receipt y readback |
 | `422 globe_funding_rejected` | Globe rechazó el payload (4xx real, no un problema de red) | Leer `code`; no reintentar igual |
-| `503 globe_unavailable` | El puente falló (red/WIF) | Reintentar; si persiste, `GET /api/internal/globe/health` |
+| `503 globe_unavailable` | El puente falló (red/WIF); si ocurrió durante confirm, el outcome puede ser desconocido | No repetir confirm a ciegas. Consultar `operations get/status` y luego `operations reconcile` con la misma operation key |
 | `401` | Sin sesión válida | Renovar sesión del portal |
+| `403 agent_confirmation_forbidden` | El usuario agente no tiene delegación persistente activa para ese workspace | Revisar la política gobernada; no usar una identidad humana como bypass |
+| `403 agent_one_shot_authority_required` | Falta una autoridad vigente, exacta o ligada al mismo agente/OAuth client | Emitir una autoridad nueva desde la sesión del CEO; no reutilizar otra |
+| `422 agent_funding_limit_exceeded` | El grant o el tope mensual excede la delegación del agente | Reducir el acto o elevar la política mediante el dueño del workspace |
 | `400 invalid_request` en propose | Tope < gastado, período inválido, o payload incompleto | Corregir el plan |
 | Plan con `currentDenialReason: pool_exhausted` | Los grants activos no cubren lo pedido | El plan igual se puede confirmar; la razón es el estado VIGENTE, no el resultante |
 
 ## Referencias técnicas
 
 - Decisión: [ADR-015 — Greenhouse administra Globe](../../architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md)
+- Programa de convergencia y autoridad CEO/agente: [TASK-1630](../../tasks/complete/TASK-1630-globe-credits-control-plane-convergence.md)
 - Implementación + evidencia del primer fondeo real: [TASK-1566](../../tasks/complete/TASK-1566-globe-governed-credit-funding-command.md) (Deltas 4–6)
 - Estado vivo (revisiones, pool, flags): [`GLOBE_RUNTIME_HANDOFF.md`](../../operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md)
 - Explicación en simple: [documentación funcional](../../documentation/creative-studio/fondeo-gobernado-creditos-globe.md)

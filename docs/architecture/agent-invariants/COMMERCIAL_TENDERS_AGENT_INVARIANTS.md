@@ -19,7 +19,7 @@
 | **Brand pack `axis`** (snapshot Figma PPT + ledger 78 bases + roles + font pack OFL + guard WCAG advisory) | ✅ `src/lib/artifact-composer/brand-packs/axis/` — compilado por `pnpm composer:brand-pack`; ⚠️ **71 altas `figma.status=proposed`** pendientes de validación del operador en `Sistema Axis - PPT` |
 | **Gate estético**: baseline 51 frames (28 sintéticos + deck SKY 23) + `pnpm composer:visual-gate` a **0 píxeles** + `BASELINE_DELTAS.md` dos-vías | ✅ `scripts/frontend/baselines/artifact-composer/**` — corre en cada cambio del dominio |
 | `ResolvedCompositionManifest` (input + hashes de catálogo/contratos/brand pack/fuentes + validadores) | ✅ **se emite junto al PDF/PNG** (`<artifactId>.manifest.json`); es lo único que TASK-1391 debe aceptar |
-| CLI `pnpm deck:compose <plan.json> [--out dir]` (outDir default `.captures/tender-deck`) | ✅ shipped — **ya NO es el único consumer** (ver renderer productivo abajo); no depende de ningún flag: es el camino local y el modo degradado |
+| CLI `pnpm deck:compose <plan.json> [--out dir]` (outDir default `.captures/tender-deck`) | ✅ shipped — **ya NO es el único consumer** (ver renderer productivo abajo); no depende de ningún flag: es el camino local y el modo degradado; **nunca cierra una Proposal por sí solo** |
 | State machine (12 estados, 3 gates humanos) | ✅ **PERSISTIDA** (TASK-1392): matriz en `proposal_state_matrix` + trigger de enforcement + historial append-only; TS ↔ DB con test de paridad. Terminales `won`/`lost` |
 | Aggregate `Proposal` · API routes · migración · capabilities · entitlement per-ORG · outbox | ✅ **existen** (TASK-1392): `greenhouse_commercial.proposal*`, `/api/commercial/proposals/**`, `commercial.proposal.{read,manage,gate,render}`, módulo `proposal_studio_v1`, 9 eventos `commercial.proposal.*` |
 | UI · Nexa/MCP surface | ❌ **no existen** (F5) |
@@ -38,6 +38,22 @@ referencia · accesibilidad · deadline vencido · validadores) y **en el worker
 font_fallback · blank_slide · peso · páginas). **El PDF NO es PDF/UA**: si el RFP exige accesibilidad, el
 render se rechaza al encolar (`accessibility_unsupported`) — *mejor no ofertar que entregar un artefacto
 inadmisible*.
+
+## Gate de cierre — taller ≠ Proposal gobernada
+
+La separación entre la carpeta de fuentes y el aggregate `Proposal` es load-bearing. Para evitar que un
+agente confunda un PDF local con un entregable productivo:
+
+- Todo workspace con deck conserva `proposal-studio.json`, cuyo contrato está en
+  `docs/commercial/tenders/PROPOSAL_STUDIO_CLOSURE_SCHEMA.md`.
+- `status=workshop_only` es el estado correcto después de `pnpm deck:compose`; no autoriza presentar,
+  enviar ni declarar la propuesta cerrada.
+- El único cierre PASS es `pnpm tender:canonical-gate <slug>` con `status=verified`: `proposalId`,
+  registro con actor `member`, `renderJob` `client_facing` en `completed`, `outputPdfAssetId` y
+  previews, vínculo `proposal_assets` con versión `final` y verificación autenticada del portal/API.
+- `.captures/`, un PDF local, una captura de pantalla o una fila copiada a mano no sustituyen el
+  registro gobernado. Si el gate falla, el estado es `code complete, rollout pendiente` o
+  `operativamente bloqueado`.
 
 ---
 

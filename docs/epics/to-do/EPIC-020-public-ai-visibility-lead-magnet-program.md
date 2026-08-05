@@ -6,14 +6,14 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Motor + 3 consumers backend completos (12/13 childs complete); falta encender la cara pública self-serve — solo TASK-1246 (H) abierta`
+- Status real: `Cara pública LIVE en think.efeoncepro.com (verificado runtime 2026-08-05); registro reconciliado: 49 childs reales — 33 complete, 16 abiertas (paridad Epic:↔child list verificada por `pnpm epic:lint`). Falta el smoke E2E del loop`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `unassigned`
 - Branch: `epic/EPIC-020-public-ai-visibility-lead-magnet-program`
 - GitHub Issue: `none`
 
-> **Estado y qué sigue de TODO el programa AEO** (no solo este epic): [`../AEO_PROGRAM_STATUS.md`](../AEO_PROGRAM_STATUS.md). El trabajo pendiente vive repartido en EPIC-020/021/022/024 + tasks sueltas (`TASK-1276` cockpit operador, `TASK-1321`/`1327` cara pública) + blockers de config multi-runtime. Empezar ahí para recuperar visibilidad.
+> **Estado y qué sigue de TODO el programa AEO** (no solo este epic): [`../AEO_PROGRAM_STATUS.md`](../AEO_PROGRAM_STATUS.md). El trabajo pendiente vive repartido en EPIC-020/021/022/024 + tasks sueltas. Empezar ahí para recuperar visibilidad, y leer su **Delta 2026-08-05 (b)** antes que nada: reconcilia 27 childs huérfanas y corrige el estado (`TASK-1276` está `complete`; la cara pública está live).
 
 ## Summary
 
@@ -39,7 +39,9 @@ El motor del grader está completo y verificado (TASK-1226/1227/1234/1235/1236/1
 
 ## Child Tasks
 
-> **Estado real (verificado por carpeta 2026-07-16):** 12/13 childs `complete`. **La única abierta es `TASK-1246` (H)** — el rollout de la cara pública self-serve. La lista abajo corrige el drift previo (varias figuraban como planificadas cuando ya están `complete`).
+> **Estado real (reconciliado 2026-08-05):** **49 childs — 33 `complete`, 16 abiertas** (conteo canónico: tasks cuyo campo `Epic:` dice EPIC-020; paridad verificada por el gate `epic-child-parity`). La lista A–M de abajo son los 13 hijos originales del diseño del epic; debajo de ella está el **bloque reconciliado** con las **22 tasks que declaran `Epic: EPIC-020` en su propia cabecera y nunca fueron registradas acá**. (Fueron 25: tres salieron el 2026-08-05 hacia su dueño correcto — `TASK-1335`/`1359` a [`EPIC-040`](EPIC-040-growth-public-forms-engine.md), `TASK-1326` a EPIC-019.)
+>
+> El conteo previo ("12/13 `complete`, sólo `TASK-1246` abierta") era una **ficción contable**: contaba únicamente el denominador original. El epic no está a una task de cerrar, está a **dieciséis**. Método de la reconciliación y falsos positivos descartados: [`../AEO_PROGRAM_STATUS.md`](../AEO_PROGRAM_STATUS.md) § Delta 2026-08-05 (b).
 
 - `TASK-1239` ✅ **complete (dev)** — **(A) Public Grader Report Snapshot + Token Reader** — `grader_reports` inmutable (run_id + score_version + report_version + recommendation_pack_version + as_of + DTO público congelado + token NO enumerable 256-bit + expires_at) + `readPublicGraderReport(reportToken)` + `publishGraderReportSnapshot` (idempotente, no publica gateados) + capability `report.publish` + endpoints admin/público. Foundation de parity pública. **P1.**
 - `TASK-1240` ✅ **code complete (dev); rollout pendiente** — **(B) Public Grader Run Intake + abuse/cost controls** — `createPublicGraderRun` (§9.2 input + consent + work email, **email nunca a providers**) → captcha (Turnstile) + rate-limit (per-IP 10/email 3) + presupuesto global diario (circuit breaker) + modo `light` → enqueue al worker async (TASK-1234). Lead dedicado `grader_leads` + `grader_intake_events`. Flag `GROWTH_AI_VISIBILITY_PUBLIC_INTAKE_ENABLED` default OFF. **P1. Pendiente:** sign-off legal consent + secret captcha + flag ON staging.
@@ -55,24 +57,103 @@ El motor del grader está completo y verificado (TASK-1226/1227/1234/1235/1236/1
 - `TASK-1250` ✅ **code complete (dev); rollout pendiente** — **(L) Email Report Delivery** (backend, communications): email transaccional al lead con resumen breve + insight prioritario + link tokenizado + **PDF completo adjunto** (TASK-1273), disparado write-side (reactive consumer del snapshot publicado) con idempotencia DB-level + consent-gate. Marca **Efeonce** (agencia), no el portal. Flag `GROWTH_AI_VISIBILITY_REPORT_EMAIL_ENABLED` default OFF. **P1. Pendiente:** redeploy ops-worker + flip flag dual-location + smoke staging (gated por TASK-1246).
 - `TASK-1252` ✅ **complete** — **(M) Report Artifact Design System** (ui-ux): visual y sistema reusable del informe completo del grader, con componentes/variants para web publica, portal cliente, attachment y admin preview. **P1.**
 
-## Estado actual y qué sigue (2026-07-16)
+### Childs reconciliadas (2026-08-05) — declaran `Epic: EPIC-020` y no estaban registradas
 
-**Backend maduro, cara pública apagada.** Los 3 consumers (público/admin/cliente) están cerrados a nivel backend y el motor corre en prod (brand-aware, EPIC-021). Lo que resta para "cerrar el epic" es **encender la puerta pública self-serve** (`TASK-1246` + decidir entre `TASK-1321`/`TASK-1327`) y destrabar los blockers de config.
+> Las 22 de abajo salieron de un barrido del corpus completo de tasks (`docs/tasks/{to-do,in-progress,complete}`) cruzando el campo `Epic:` de cada archivo contra esta lista. Todas se declaran hijas de este epic; ninguna aparecía acá. **6 están abiertas.**
 
-**Blockers de config (no son tasks nuevas; encienden lo ya hecho):**
+**Motor, scoring y contrato del reporte** (todas `complete`):
 
-- Provisionar property HubSpot `aeo_check_result` (script `scripts/growth/provision-ai-visibility-hubspot-properties.ts`) — sin ella el handoff (D) da 400 en el upsert de Company.
-- Flags AEO: **ya están ON en prod** (verificado runtime 2026-07-16 — Vercel prod y `ops-worker` rev. activa; el ledger estaba desactualizado). Acción restante = solo actualizar `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`, no prender nada.
-- `TASK-1341` (DataForSEO AIO en prod, `to-do`): hoy `missing_secret` → informes `partial`.
-- Poblar `grader_profiles.organization_id` para el consumer cliente (J).
+- `TASK-1257` ✅ — captura de Nombre + Apellido en el intake público (el handoff a HubSpot necesitaba el lead con nombre real).
+- `TASK-1263` ✅ — gate de correo corporativo aplicado al form del grader (`emailPolicy.mode=block_field`).
+- `TASK-1265` ✅ — **answer-engine coverage: Google AI Overviews / AI Mode** (~48-50% del mercado de respuesta que el grader no medía).
+- `TASK-1268` ✅ — citation source domain breakdown (qué dominios alimentan las respuestas → targeting de digital PR).
+- `TASK-1271` ✅ — router de extracción de prosa cost-efficient (desacopla el hook de un solo provider).
+- `TASK-1272` ✅ — category taxonomy + brand categorization contract (**cómo** categoriza el motor a la marca, no sólo si aparece).
+- `TASK-1280` ✅ — **public report model contract** (view-model headless; desbloqueó el render público).
 
-**Trabajo relacionado que vive FUERA de este epic** (por eso conviene mirar el doc de programa, no solo esta spec):
+**Producto AEO en el portal cliente** (todas `complete`):
 
-- `TASK-1276` (`to-do`) — **cockpit operador `/growth/aeo` + facet AEO en Account 360**. Gap #1 de operabilidad interna; backend listo (`TASK-1275/1279/1287` complete). No es child de EPIC-020 pero es lo que falta para operar el AEO como herramienta de venta/servicio desde el portal.
-- `TASK-1321` / `TASK-1327` (`in-progress`) — las dos candidatas de la cara pública self-serve.
-- `TASK-1270` (`in-progress`) — re-grade recurrente / SoV (faceta operativa recurrente del cliente).
+- `TASK-1277` ✅ — **AEO Entitlement & Metering Platform**: per-org tiers + chokepoint gobernado de run. Corrige el error de plano de `TASK-1248` (viewCode prendido a todos los roles cliente).
+- `TASK-1278` ✅ — tiering + PLG trial UX sobre el workbench `/aeo` (contratado / trial / locked).
 
-**Secuencia recomendada:** ver [`../AEO_PROGRAM_STATUS.md`](../AEO_PROGRAM_STATUS.md) §6 (olas 1→4). Resumen: Ola 1 config → Ola 2 `TASK-1276` → Ola 3 cara pública → Ola 4 cara del cliente contratado.
+**Hub público `efeonce-think` — render del informe:**
+
+- `TASK-1324` ✅ — repoint del link del email al hub público (todo correo del grader llevaba un enlace roto).
+- `TASK-1325` ✅ — levantar el hub (repo + Vercel) que renderiza el informe en `think.efeoncepro.com`.
+- `TASK-1328` ✅ — completitud de señales del reporte público (las que el grader ya producía y se perdían).
+- `TASK-1329` ✅ — polish visual/editorial del informe.
+- `TASK-1331` ✅ — endurecimiento del contrato view-model headless.
+- `TASK-1333` ✅ — señales productivas de categoría percibida (sección `06`).
+- `TASK-1334` ✅ — renderer Think de categoría percibida.
+- `TASK-1332` 📋 `to-do` — `ReportIcon` de Think a librería de iconos gobernada.
+- `TASK-1338` 📋 `to-do` — extracción del view-model del report (`[token].astro` ~1873 líneas → `report-view.ts`).
+
+**Abiertas de AEO puro:**
+
+- `TASK-1336` 🚧 `in-progress` — **contrato submit → `reportToken`/`reportUrl`**: Greenhouse como SSOT del submit, el estado del run, el token y la URL pública. Es el contrato que cierra el loop self-serve.
+- `TASK-1424` 📋 `to-do` — **Share of Voice per-motor** en el `ReportArtifactModel` (marca vs competidores por engine). Foundation.
+- `TASK-1425` 📋 `to-do` — panel **"Cómo te ve cada motor"** (UI del SoV per-motor) + estado honesto de run sin score.
+
+**Residuo de ops (no es AEO puro, pero lo toca):**
+
+- `TASK-1293` 📋 `to-do` — post-flag-rollout completion & hardening del release `056c2dde8`. Su alcance excede al AEO (rota credenciales y toca flags de Growth/Kortex/Notion/PPM); se conserva acá porque los flags AEO son parte de su deuda.
+
+**Formularios del AEO** (el motor es de [`EPIC-040`](EPIC-040-growth-public-forms-engine.md); estas son las tasks del formulario **que el AEO usa**, y sí le pertenecen):
+
+- `TASK-1257` ✅ · `TASK-1263` ✅ · `TASK-1296` ✅ · `TASK-1298` ✅ · `TASK-1336` 🚧 — intake, gate de correo corporativo, contrato Turnstile, migración de `/aeo-2/` y contrato submit→token del grader.
+
+> **Movidas fuera de este epic el 2026-08-05:** `TASK-1335` (CORS/allowlist) y `TASK-1359` (funnel → GA4) pasaron a **EPIC-040 — Growth Public Forms Engine**: son capacidades del motor, no del AEO; colgaban acá sólo porque el AEO fue su primer consumer. `TASK-1326` (control plane Astro multi-repo) pasó a **EPIC-019**, que es el control plane del sitio público.
+
+### Childs reconciliadas — segunda pasada (2026-08-05, gate `epic-child-parity`)
+
+> El gate nuevo `epic-child-parity` de `pnpm epic:lint` encontró 11 más: declaraban `Epic: EPIC-020` y sólo aparecían en la **prosa** del epic (secciones de estado, olas, blockers), nunca en esta lista. Un lector — o un conteo — que mirara `## Child Tasks` no las veía.
+
+**Operabilidad interna del AEO** (el cockpit y sus primitives; `complete`):
+
+- `TASK-1275` ✅ — capability de estado de ejecución de las recomendaciones (avance del Plan AEO).
+- `TASK-1276` ✅ — **AEO Operator View**: cockpit `/growth/aeo` + facet AEO en Account 360. *(El doc de programa lo declaró "gap #1 `to-do`" hasta el 2026-08-05; ya estaba construido.)*
+- `TASK-1287` ✅ — readers operator-scoped (cockpit cross-org + detalle).
+
+**Abiertas:**
+
+- `TASK-1251` 🚧 `in-progress` — convergencia Growth Forms ↔ Grader (wiring del intake sobre el motor).
+- `TASK-1269` 🚧 `in-progress` — **Fix-It Artifacts** (JSON-LD / `llms.txt` / briefs): los entregables accionables del diagnóstico.
+- `TASK-1270` 🚧 `in-progress` — Share-of-Voice recurrente + re-grade programado (la cadencia del cliente contratado).
+- `TASK-1330` 🚧 `in-progress` — short links del reporte (distribución comercial).
+- `TASK-1281` 📋 `to-do` — headless probe runtime (Chromium en `ops-worker`: CWV + WebMCP).
+- `TASK-1341` 📋 `to-do` — guard de config runtime de DataForSEO AI Overview.
+- `TASK-1282` 🚧 / `TASK-1283` 🚧 `in-progress` — conexión Search Console multi-tenant (OAuth + per-org) y su UI. Declaran `Epic: EPIC-020`; **EPIC-022 depende de su rollout** (`TASK-1302`). Si el programa decide que GSC es infraestructura de SEO, mover ambas a EPIC-022 — decisión de alcance, no de higiene.
+
+> **Corregido en la misma pasada:** `TASK-1266`, `1267`, `1279` y `1286` declaraban `Epic: EPIC-020` pero son hijas registradas de **EPIC-021**. Se corrigió su campo `Epic:`, no esta lista.
+
+### Anexo — trabajo AEO ejecutado sin registro (`Epic: none`)
+
+> No se re-registran como childs (están `complete` y su alcance ya fue absorbido), pero quedan acá para trazabilidad: fueron trabajo AEO real que ningún epic contabilizó.
+
+`TASK-1227` (normalization + scoring engine V1) · `TASK-1228` (discovery & eval spike que validó empíricamente el modelo de medición) · `TASK-1233` (provider Gemini) · `TASK-1236` (tendencia temporal) · `TASK-1237` (signal enrichment) · `TASK-1296` (contrato Turnstile del form AEO) · `TASK-1298` (migración de `/aeo-2/` a `<greenhouse-form>`) · `TASK-1410` (Radiografía AEO — muestra de trabajo publicada en Think).
+
+**Pendiente de decisión (no lo hice por mi cuenta):** `TASK-1284` (conexión GA4 multi-tenant como **nueva señal del grader**) está `to-do` con `Epic: none`. Es AEO-core y sin dueño. Asignarlo a este epic o a EPIC-022 es una decisión de alcance, no de higiene documental.
+
+## Estado actual y qué sigue (2026-08-05)
+
+**La cara pública ya está encendida; lo que falta es evidencia y las 16 childs abiertas.** Verificado en runtime el 2026-08-05:
+
+- `https://think.efeoncepro.com/brand-visibility` → **HTTP 200**, sirviendo el `<greenhouse-form>` gobernado (`surface=fhsf-ai-visibility-grader`, `base-url=greenhouse.efeoncepro.com`).
+- `GET /api/public/growth/forms/<formKey>` en **producción** → **200**, con campos (`brandName`, `websiteUrl`…), **Turnstile `required`** con site key real y `consentPolicyVersion: ai-visibility-grader-consent-v1`.
+
+Por tanto la hipótesis histórica del epic —"no existe puerta pública self-serve"— está **superseded** (ya lo declaraba el Delta 2026-07-27 de `TASK-1246`, sin propagarse a esta spec). `TASK-1246` dejó de ser "construir el lanzamiento" y es hoy el **gate de evidencia y cierre**.
+
+**Lo que resta para cerrar el epic:**
+
+1. **Smoke E2E real** `submit → run async → status → token → informe público → email → props `ai_visibility_*` en HubSpot`. Que el form renderice no prueba que el loop cierre; nadie registró ese smoke. Es el único residuo duro de `TASK-1246`.
+2. **Gobernanza del path público:** sign-off legal del consent (ojo: la definición publicada trae `consent.checkboxes` **vacío** — hay versión de política pero ningún checkbox renderizado; confirmar si es por diseño o es hueco), follow-ups de retención/PII, y revisar signals de costo/abuso con tráfico real (el path público es gasto LLM expuesto).
+3. **Las 16 childs abiertas restantes** (ver § Childs reconciliadas, ambas pasadas): `TASK-1336` (contrato submit→token) · `TASK-1424`/`1425` (SoV per-motor) · `TASK-1332`/`1338` (hub Think) · `TASK-1269` (Fix-It Artifacts) · `TASK-1270` (re-grade recurrente) · `TASK-1330` (short links) · `TASK-1281` (headless probe) · `TASK-1341` (DataForSEO AIO) · `TASK-1251` (convergencia Forms) · `TASK-1282`/`1283` (Search Console) · `TASK-1321` (self-serve de `/aeo-2/`: submit → grader → email con PDF + dedupe HubSpot; capacidad propia, NO duplicado de la landing de Think) · `TASK-1293` (residuo de ops).
+4. `TASK-1341` — DataForSEO AIO: confirmar con un run real que el secret resuelve (las creds ya están en la revisión activa del `ops-worker`; el `missing_secret` que citaba la versión previa de esta sección era stale).
+5. Poblar `grader_profiles.organization_id` para el consumer cliente (J).
+
+**Corrección de estado (2026-08-05):** `TASK-1276` (cockpit operador `/growth/aeo` + facet AEO en Account 360) está **`complete`**, no `to-do`. La versión previa de esta sección y el doc de programa lo declaraban "gap #1 de operabilidad interna" cuando ya estaba construido. La property HubSpot `aeo_check_result` **existe** (verificada live 2026-07-16); el bullet que pedía provisionarla también era stale.
+
+**Secuencia recomendada:** ver [`../AEO_PROGRAM_STATUS.md`](../AEO_PROGRAM_STATUS.md) § Delta 2026-08-05 (b).
 
 ## Existing Related Work
 

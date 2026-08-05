@@ -48,7 +48,7 @@ const main = () => {
     const committedFonts = fs.existsSync(DECK_FONTS_PATH) ? fs.readFileSync(DECK_FONTS_PATH, 'utf8') : ''
 
     if (committedTokens !== css || committedFonts !== fontsCss) {
-      console.error('✗ deck-tokens.css/deck-fonts.css NO sincronizados. Corré: pnpm composer:brand-pack')
+      console.error('✗ deck-tokens.css/deck-fonts.css NO sincronizados. Corre: pnpm composer:brand-pack')
       process.exit(1)
     }
 

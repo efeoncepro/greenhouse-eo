@@ -1,9 +1,9 @@
 # Manual — Correr un experimento en el Model Lab de Efeonce Globe
 
 > **Tipo de documento:** Manual de uso / runbook (orientado al operador)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-07-19 por Claude (TASK-1457)
-> **Ultima actualizacion:** 2026-07-19 por Claude (proveedores reales — TASK-1486/1487/1488)
+> **Ultima actualizacion:** 2026-08-02 por Codex (estado vigente de Studio Credits)
 
 ## Para qué sirve
 
@@ -40,14 +40,16 @@ El **runbook operativo completo** (habilitación con el flag, el flujo real por 
 - **NUNCA** trates `candidate_ready` como aprobación: la autorización de una pieza es un paso humano aparte.
 - **NUNCA** llames a un SDK de proveedor directo (ni por script/CLI/UI/MCP): todo pasa por command → adapter → runner. El proveedor real se inyecta en el runner, nunca se invoca por fuera.
 - **NUNCA** prendas el proveedor real sin credenciales federadas (WIF/ADC), bucket privado y alertas de presupuesto vivas (los deja la infra de `TASK-1464`).
-- **NUNCA** confundas el **spend fence** (freno de seguridad; durable en producción desde `TASK-1465`, en memoria en desarrollo/ensayo) con el registro contable de créditos comerciales (durable, capacidad aparte, aún pendiente).
+- **NUNCA** confundas el **spend fence** (freno de seguridad; durable en producción desde `TASK-1465`, en memoria
+  en desarrollo/ensayo) con el ledger append-only de Studio Credits, que ya está operativo en Globe y es consumido
+  por Greenhouse UI, API/CLI OAuth PKCE y MCP. Studio Credits no son dinero ni tokens de proveedor.
 - **NUNCA** compartas base de datos, sesión, bucket, secreto ni rol admin entre Globe y Greenhouse; **NUNCA** crees un registry/namespace de tareas paralelo en Globe.
 
 ## Problemas comunes
 
 - **Todo experimento responde `policy_blocked`:** el Lab está apagado. Enciéndelo con `GLOBE_LAB_ENABLED=true` (piloto interno) o confirma que la surface que usas no está `policy-blocked` (hoy la UI y el MCP lo están a propósito, hasta la promoción de ruta).
 - **`day_cap_exceeded` aunque tu corrida es chica:** el freno diario del espacio de trabajo ya se consumió con corridas previas del día. Espera al reinicio del día (UTC) o ajusta `GLOBE_LAB_DAILY_CAP_CREDITS` para el piloto.
-- **El tope diario "se reinició solo":** solo puede pasar en desarrollo/ensayo, donde el spend fence vive en memoria del proceso y se reinicia al reiniciar el servicio. **En producción no pasa**: desde `TASK-1465` el fence es durable (Cloud SQL) y el conteo diario sobrevive reinicios y réplicas. Sigue siendo un freno de seguridad, no el ledger comercial durable.
+- **El tope diario "se reinició solo":** solo puede pasar en desarrollo/ensayo, donde el spend fence vive en memoria del proceso y se reinicia al reiniciar el servicio. **En producción no pasa**: desde `TASK-1465` el fence es durable (Cloud SQL) y el conteo diario sobrevive reinicios y réplicas. Sigue siendo un freno de seguridad, no el ledger append-only de Studio Credits.
 - **No valida Globe con `pnpm local:check` de Greenhouse:** correcto, son toolchains distintos. Valida Globe con `pnpm check` / `pnpm build` dentro de `efeonce-globe`.
 
 ## Referencias técnicas

@@ -638,6 +638,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               { label: nl(GH_INTERNAL_NAV.adminNotifications), href: '/admin/notifications' },
               { label: nl(GH_INTERNAL_NAV.adminAiTools), href: '/admin/ai-tools' },
               { label: nl(GH_INTERNAL_NAV.adminCloudIntegrations), href: '/admin/cloud-integrations' },
+              { label: nl(GH_INTERNAL_NAV.adminGlobeCredits), href: '/admin/globe/credits', icon: 'tabler-gauge' },
               { label: nl(GH_INTERNAL_NAV.adminOpsHealth), href: '/admin/ops-health' },
               { label: nl(GH_INTERNAL_NAV.adminUntitledNotionPages), href: '/admin/data-quality/notion-titles' },
               { label: nl(GH_INTERNAL_NAV.adminOrganizationLogos), href: '/admin/data-quality/organization-logos' }
@@ -648,6 +649,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               if (item.href === '/admin/notifications') return canSeeView('administracion.notifications', true)
               if (item.href === '/admin/ai-tools') return canSeeView('ia.herramientas', true)
               if (item.href === '/admin/cloud-integrations') return canSeeView('administracion.cloud_integrations', true)
+              if (item.href === '/admin/globe/credits') return canSeeView('administracion.globe_credits', true)
               if (item.href === '/admin/ops-health') return canSeeView('administracion.ops_health', true)
               if (item.href === '/admin/data-quality/notion-titles') return canSeeView('administracion.cloud_integrations', true)
               if (item.href === '/admin/data-quality/organization-logos') return canSeeView('administracion.cloud_integrations', true)

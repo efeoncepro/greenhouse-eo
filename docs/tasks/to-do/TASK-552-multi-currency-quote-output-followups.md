@@ -1,5 +1,11 @@
 # TASK-552 — Multi-Currency Quote Output Follow-ups (Email + Bidirectional FX + Locked Rates + Line History + Drift Alerts + Client Portal)
 
+## Delta 2026-08-02 — Moneda contractual y package económico
+
+La separación output/payment currency, FX por línea, rate lock y drift debe alimentar el `QuotationVersion` y el
+`ProposalEconomicPackage` congelados. Esta task no crea una segunda política multi-moneda: consume Finance Core
+money/FX/UF y conserva native, contract, presentation, functional, settlement y reporting amounts con snapshot.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

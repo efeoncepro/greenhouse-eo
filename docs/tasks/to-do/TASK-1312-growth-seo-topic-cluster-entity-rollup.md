@@ -276,6 +276,8 @@ Ver el modelo en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §15 (topic cluster 
 
 ## Acceptance Criteria
 
+- [ ] **MCP tool en el mismo PR (mandato del operador 2026-08-05, patrón TASK-1645):** cada reader/lectura canónica que esta task cree queda expuesto como MCP tool read-only (handler en `src/mcp/greenhouse/tools.ts` + registro en `server.ts` + método en `http-client.ts` + ruta del lane ecosystem si aplica) EN EL MISMO PR. La task NO se cierra con el reader UI-only.
+
 - [ ] `seo_topic_clusters` + `seo_topic_cluster_members` creadas en `greenhouse_growth`, ancladas per-target (`seo_target_id` FK a `seo_targets`), con `public_id` sequence + `status` CHECK + `touch_updated_at`.
 - [ ] Membership append-only: `seo_topic_cluster_members` con `effective_from`/`effective_to` (DATE), CHECK `url IS NOT NULL OR keyword_set_id IS NOT NULL`; una URL/keyword-set sale cerrando `effective_to`, NUNCA con DELETE (espejo de `seo_keyword_set_members`; verificado por smoke).
 - [ ] Migración additive con marker `-- Up Migration` + DO-block que aborta si falta cualquier tabla/constraint/trigger; Down solo DROP (cero CREATE bajo `-- Down Migration`).

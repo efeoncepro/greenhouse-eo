@@ -21,7 +21,25 @@ const ACTIVE_TASK_LIFECYCLES = new Set(['to-do', 'in-progress'])
 const REQUIRED_IMPLEMENTATION_SECTIONS = ['detailed spec']
 const POLICY_TYPES = new Set(['umbrella', 'policy'])
 const SENSITIVE_DOMAINS = ['finance', 'payroll', 'auth', 'identity', 'billing', 'cloud', 'data', 'production']
-const UI_DOMAINS = ['ui', 'design-system', 'motion', 'accessibility']
+/*
+ * Se comparan por SEGMENTO, no por subcadena. Los dominios de UI reales se enumeran completos
+ * —`ui-platform` y `ui-ux` incluidos— porque antes entraban de rebote por el `includes` y al cerrar
+ * ese agujero habrian dejado de detectarse. `domain.includes('ui')` marcaba como UI a cualquier
+ * dominio con «ui» adentro — `build-tooling` disparaba el gate por el «ui» de *b·ui·ld*, y con él
+ * `guide`, `suite` o `circuit`. El efecto no era cosmético: una task de tooling quedaba obligada a
+ * declarar wireframe, flow y contrato de UI.
+ */
+const UI_DOMAINS = ['ui', 'ui-ux', 'ui-platform', 'design-system', 'motion', 'accessibility']
+
+const splitDomainSegments = domain =>
+  domain
+    // Los dominios reales vienen decorados —`` `cross-domain` (`people|hr|ui`) ``—, asi que el
+    // separador incluye backticks y parentesis. Sin ellos el ultimo segmento queda como ``ui`)`` y
+    // deja de matchear: fue el falso NEGATIVO que este mismo fix introdujo en TASK-969.
+    .split(/[|,/()`\s]+/)
+    .map(part => part.trim())
+    .filter(Boolean)
+
 const UI_IMPACTS = new Set(['copy', 'layout', 'interaction', 'motion', 'primitive', 'flow'])
 const UI_READY_VALUES = new Set(['yes', 'no', 'n/a', 'na'])
 const MODULAR_PLACEMENT_ADOPTION_ID = 1376
@@ -262,9 +280,9 @@ const isUiUxImpacted = task => {
   if (task.executionProfile === 'ui-ux') return true
   if (task.uiImpact && UI_IMPACTS.has(task.uiImpact)) return true
 
-  const lowerDomain = task.domain ?? ''
+  const segments = splitDomainSegments(task.domain ?? '')
 
-  return UI_DOMAINS.some(domain => lowerDomain.includes(domain))
+  return segments.some(segment => UI_DOMAINS.includes(segment))
 }
 
 const isBackendDataImpacted = task => {

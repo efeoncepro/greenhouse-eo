@@ -2,7 +2,7 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
-import { isNexaFloatingExpandableEnabled, isNexaInteractionLaneEnabled } from './flags'
+import { isNexaInteractionLaneEnabled } from './flags'
 import {
   coerceNexaInteractionMode,
   type NexaInteractionMode,
@@ -15,7 +15,6 @@ import {
  * lado server; el NEXT_PUBLIC mirror cubre el lado client).
  */
 export const resolveNexaInteractionAvailability = (): NexaInteractionModeAvailability => ({
-  expandableEnabled: isNexaFloatingExpandableEnabled(),
   laneEnabled: isNexaInteractionLaneEnabled()
 })
 

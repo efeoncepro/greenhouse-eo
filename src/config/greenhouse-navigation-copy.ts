@@ -73,6 +73,7 @@ const enUS: NavigationCopy = {
     adminCloudIntegrations: { label: 'Cloud & Integrations', subtitle: 'Syncs, webhooks, auth and runtime operations' },
     adminNotifications: { label: 'Notifications', subtitle: 'In-app and email notification system' },
     adminOpsHealth: { label: 'Ops Health', subtitle: 'Outbox, projections and serving freshness' },
+    adminGlobeCredits: { label: 'Globe credits', subtitle: 'Capacity, funding and operational traceability' },
     adminUntitledNotionPages: { label: 'Untitled Notion pages', subtitle: 'Tasks, projects and sprints without titles — fix in Notion' },
     adminOrganizationLogos: { label: 'Organization logos', subtitle: 'Brand coverage and candidates for non-legal organizations' },
     adminDesignSystem: { label: 'Design System', subtitle: 'AXIS catalog and product handoffs' },

@@ -10,6 +10,7 @@
 - **Objetivo del mes:** `[1-2 objetivos — ej: subir saves 20% + validar serie X]`
 - **Cadencia objetivo (ver tabla abajo):** `[X piezas/semana por red]`
 - **Día(s) de batching:** `[ej: martes grabación, jueves edición/programación]`
+- **Territorio/Pillar Experience relacionada:** `[nombre + URL/ID | n/a]`
 
 ## Cadencia objetivo por red *(as-of 2026-07 — reverificar en SOURCES.md)*
 | Red | Cadencia sostenible | Formato ancla | Nota |
@@ -31,13 +32,13 @@
 - 🛍️ **Producto** — feature, demo, oferta *(dosis baja: máx ~20% del mix)*
 
 ## Grilla del mes *(1 fila por pieza; agrega/quita filas según cadencia)*
-| Fecha | Día | Red | Formato | Pilar | Hook / tema | CTA | Responsable | Estado |
+| Fecha | Red | Formato | Pilar | Rol/nodo | Hook / tema | CTA/progreso | Responsable | Estado |
 |---|---|---|---|---|---|---|---|---|
-| `[01]` | Lun | `[IG]` | `[Reel]` | `[🎓]` | `[…]` | `[save]` | `[…]` | `[idea]` |
-| `[02]` | Mar | `[TikTok]` | `[video]` | `[😄]` | `[…]` | `[send]` | `[…]` | `[guion]` |
-| `[03]` | Mié | `[LinkedIn]` | `[carrusel]` | `[🤝]` | `[…]` | `[comenta]` | `[…]` | `[producción]` |
-| `[04]` | Jue | `[…]` | `[…]` | `[…]` | `[…]` | `[…]` | `[…]` | `[…]` |
-| `[05]` | Vie | `[…]` | `[…]` | `[…]` | `[…]` | `[…]` | `[…]` | `[…]` |
+| `[01]` | `[IG]` | `[Reel]` | `[🎓]` | `[recognition / ID o activation]` | `[…]` | `[save / siguiente nodo]` | `[…]` | `[idea]` |
+| `[02]` | `[TikTok]` | `[video]` | `[😄]` | `[comprehension / ID]` | `[…]` | `[send / siguiente nodo]` | `[…]` | `[guion]` |
+| `[03]` | `[LinkedIn]` | `[carrusel]` | `[🤝]` | `[evidence / ID]` | `[…]` | `[comenta / siguiente nodo]` | `[…]` | `[producción]` |
+| `[04]` | `[…]` | `[…]` | `[…]` | `[…]` | `[…]` | `[…]` | `[…]` | `[…]` |
+| `[05]` | `[…]` | `[…]` | `[…]` | `[…]` | `[…]` | `[…]` | `[…]` | `[…]` |
 | … | … | … | … | … | … | … | … | … |
 
 **Estados:** `idea → guion → producción → revisión → listo → programado → publicado`
@@ -46,6 +47,7 @@
 - **Mix de pilares (meta ~):** Educar 30% · Inspirar 15% · Entretener 20% · Prueba social 15% · Detrás 15% · Producto ≤20%
 - **% real:** `[llena tras armar la grilla — corrige si producto > 20%]`
 - **Piezas evergreen/buscables (cola larga):** `[cuántas]`
+- **Platform-native cluster nodes (superan criterios):** `[IDs + cuántas; no contar teasers]`
 - **Espacio para trend-jacking reactivo:** `[deja ~15-20% del mes sin llenar]`
 
 ## Notas de batching

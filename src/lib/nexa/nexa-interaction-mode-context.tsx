@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
 
-import { isNexaFloatingExpandableEnabled, isNexaInteractionLaneEnabled } from './flags'
+import { isNexaInteractionLaneEnabled } from './flags'
 import {
   availableNexaInteractionModes,
   type NexaInteractionMode,
@@ -46,7 +46,7 @@ export const NexaInteractionModeProvider = ({
   const [laneOpen, setLaneOpen] = useState<boolean>(initialMode === 'lane')
 
   const availability = useMemo<NexaInteractionModeAvailability>(
-    () => ({ expandableEnabled: isNexaFloatingExpandableEnabled(), laneEnabled: isNexaInteractionLaneEnabled() }),
+    () => ({ laneEnabled: isNexaInteractionLaneEnabled() }),
     []
   )
 
@@ -83,7 +83,7 @@ export const NexaInteractionModeProvider = ({
 }
 
 /**
- * Lectura segura del modo. Fuera del provider devuelve un fallback inerte (`dock`
+ * Lectura segura del modo. Fuera del provider devuelve un fallback inerte (`expandible`
  * sin acciones) → un consumer montado fuera del dashboard no rompe.
  */
 export const useNexaInteractionMode = (): NexaInteractionModeContextValue => {
@@ -91,9 +91,9 @@ export const useNexaInteractionMode = (): NexaInteractionModeContextValue => {
 
   if (!ctx) {
     return {
-      mode: 'dock',
-      availability: { expandableEnabled: false, laneEnabled: false },
-      availableModes: ['dock'],
+      mode: 'expandible',
+      availability: { laneEnabled: false },
+      availableModes: ['expandible'],
       setMode: () => {},
       laneOpen: false,
       setLaneOpen: () => {}

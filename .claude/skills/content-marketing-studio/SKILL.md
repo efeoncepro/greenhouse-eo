@@ -1,7 +1,7 @@
 ---
 name: content-marketing-studio
 description: >-
-  Studio de ejecución del motor de contenidos 2026. Operacionaliza estrategia editorial y produce, opera, atomiza, distribuye y mide blog/pillar, ebook/whitepaper, case study, newsletter, webinar, video y podcast. Incluye sistema visual editorial, infografías determinísticas con entrega SVG directa o raster basada en evidencia y Método de utilidad citable para link earning, backlinks, menciones y contenido que terceros puedan compartir, enlazar o citar. Encadena conversión a `growth-marketing-cro`, descubribilidad a `seo-aeo`, palabras a `copywriting`, social a `social-media-studio` y publicación a su skill dueña. Usar para estrategia/calendario editorial, pillar/cluster, topical authority, content ops, repurposing, distribución, content brief, newsletter, lead magnet, case study, thought leadership, infografía editorial, diagrama SVG, visualización exacta de datos/copy, linkable assets, contenido enlazable/citable, content ROI, AI content, content factory y content-led growth.
+  Studio de ejecución del motor de contenidos 2026. Operacionaliza estrategia editorial y produce, opera, atomiza, distribuye y mide blog/pillar, ebook/whitepaper, case study, newsletter, webinar, video y podcast. Incluye Content Engineering para diseñar contenido como sistema de conocimiento y experiencia de comprensión/decisión, sistema visual editorial, infografías determinísticas con entrega SVG directa o raster basada en evidencia y Método de utilidad citable para link earning, backlinks, menciones y contenido que terceros puedan compartir, enlazar o citar. Encadena conversión a `growth-marketing-cro`, descubribilidad a `seo-aeo`, palabras a `copywriting`, social a `social-media-studio` y publicación a su skill dueña. Usar para estrategia/calendario editorial, pillar/cluster, topical authority, content ops, repurposing, distribución, content brief, experiencias de contenido, contenido interactivo, newsletter, lead magnet, case study, thought leadership, infografía editorial, diagrama SVG, visualización exacta de datos/copy, linkable assets, contenido enlazable/citable, content ROI, AI content, content factory y content-led growth.
 type: skill
 user-invocable: true
 argument-hint: "[etapa del content engine o pregunta concreta]"
@@ -60,6 +60,12 @@ recuperación y medición. Nunca prometas enlaces.
 carga `references/metadata-translation-method.md`. Separa el problema que el lector ya reconoce del concepto
 técnico que la pieza enseña; no conviertas jerga ni taxonomía de una sola pieza en peaje de entrada.
 
+**Routing Content Engineering:** si el trabajo pregunta cómo pasar de una pieza estática a una experiencia de
+comprensión, decisión, citabilidad o conversión, carga `references/content-engineering.md`. Usa su escalera de
+complejidad y elige el nivel mínimo que resuelva el JTBD; interacción no equivale automáticamente a valor.
+Para Efeonce, la ubicación de una Pillar se rige por `docs/public-site/decisions/PDR-018-pillar-experience-arquitectura-editorial-y-runtime.md`:
+Think como producto editorial no implica el host `think.efeoncepro.com`.
+
 **Routing Creative Studio / Efeonce Globe:** si los assets se producen mediante Creative Studio, carga
 `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md`. El artículo, ebook,
 newsletter o átomo no es la unidad: estima cada operación generativa de media y separa copy, layout,
@@ -91,6 +97,7 @@ precio por crédito ni equivalencias por pieza.
 ├─ Diseñar utilidad citable para links/menciones/citas ............................. references/citation-utility-method
 ├─ Traducir tesis técnica a metadata y taxonomía comprensibles ..................... references/metadata-translation-method
 ├─ Madurar Pillar→ebook→tool→producto sin mezclar sources of truth ................. references/knowledge-to-product-ladder
+├─ Diseñar contenido como experiencia humana + computable + medible ................ references/content-engineering
 ├─ Qué NO hacer .................................................................... ANTIPATTERNS
 ├─ Vocabulario .................................................................... GLOSSARY
 ├─ Fuentes/benchmarks 2026 ........................................................ SOURCES
@@ -121,6 +128,16 @@ Carga selectiva: no traigas los 7 módulos de una.
 11. **El content plan no es un credit plan.** Un pillar y sus N átomos pueden reutilizar assets sin inferencia.
     Cobra/estima operaciones generativas reales, no cantidad de piezas, palabras, slides u horas; derechos y
     pass-through siempre van separados.
+12. **Utilidad antes que interactividad.** Una experiencia rica hace más trabajo por la persona; no acumula
+    componentes. Empieza en la respuesta editorial y sube de nivel sólo con una fricción o decisión demostrable.
+13. **Pillar es función, no post type.** Diseña una Pillar como hogar durable para aprender, explorar y decidir.
+    `post`, `page`, Gutenberg, Elementor o Astro son rails; no dupliques canonical, cuerpo, registry ni schema.
+14. **Cluster es sistema, no lista de posts.** Admite artículos, casos, templates, datasets, diagnósticos y tools sólo
+    cuando resuelven un JTBD del territorio. Cada nodo declara progreso y siguiente paso; no uses CTA universal.
+15. **Cluster federado, Pillar gobernada.** Una pieza platform-native puede ser nodo si entrega valor autónomo,
+    resuelve un JTBD y declara relación, roles y medición; un teaser sigue siendo activation asset. Mantén la Pillar
+    como hogar canónico y separa external search, platform search/recommendation y downstream progress: sus
+    impresiones no son aditivas ni equivalentes.
 
 ## Tabla de sinergias (nombra y encadena el hand-off)
 
@@ -128,7 +145,7 @@ Carga selectiva: no traigas los 7 módulos de una.
 |---|---|---|
 | **Rol del contenido en el mix / campaña integrada / content-led demand como canal** | operacionaliza la decisión | **`digital-marketing`** (módulo 02 le hace hand-off a este studio) |
 | **Conversión, loops de growth, experimentación, PLG, ¿el contenido convierte?** | produce la pieza que alimenta el loop | **`growth-marketing-cro`** |
-| **Descubribilidad + citabilidad (SEO técnico, schema, AEO/GEO por motor, entidad)** | produce contenido answer-first/citable | **`seo-aeo`** |
+| **Descubribilidad + citabilidad (SEO técnico, schema, AEO/GEO, external/platform search)** | produce contenido answer-first/citable y clasifica roles del nodo | **`seo-aeo`** |
 | **El craft de las palabras (headline, narrativa, estructura, edición)** | define la pieza + brief editorial | **`copywriting`** |
 | **Distribución social profunda por red + programar (Metricool)** | entrega el átomo social | **`social-media-studio`** (studio peer) |
 | **Assets: visual / motion / audio / imagen IA de la pieza** | dirige el asset (brief creativo) | `design-studio` · `motion-design-studio` · `audio-studio` · `greenhouse-ai-image-generator` |
@@ -168,6 +185,7 @@ Carga selectiva: no traigas los 7 módulos de una.
 | `references/citation-utility-method.md` | Método de utilidad citable: caso→objeto reutilizable→evidencia/límites→anchors→validación por pares→link earning/medición |
 | `references/metadata-translation-method.md` | Traducción editorial de metadata: problema reconocido→gate de jerga→trabajo por superficie→taxonomía→snapshot/readback |
 | `references/knowledge-to-product-ladder.md` | Escalera Pillar→satélites→ebook/workbook→tool diagnóstica→producto, con separación de evidencia y gates |
+| `references/content-engineering.md` | Doctrina para contenido como sistema de conocimiento y experiencia humana/computable: capas, escalera de complejidad, conversión, medición y fronteras |
 | `ANTIPATTERNS.md` · `GLOSSARY.md` · `SOURCES.md` | Antipatrones, vocabulario, fuentes/benchmarks 2026 |
 | `efeonce/EFEONCE_OVERLAY.md` | Ecosistema Efeonce: Think, Marketing con Manzanitas, Glitch, Content Factory, ebooks/lead magnets, bow-tie, ICPs |
 | `efeonce/EFEONCE_EDITORIAL_INFOGRAPHIC_SYSTEM.md` | Canon de infografías: precedentes, paleta, shell estable, arquetipos variables, sello URL, SVG directo, benchmark y gates |

@@ -118,9 +118,10 @@ Antes de usar un provider en una propuesta o publicarlo como partner, registrar:
 
 ## 8. Estado y fuente de evidencia
 
+El estado vigente por relación vive en el [`Efeonce Partnership Registry V1`](../operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md).
 La auditoría [`AI_PARTNER_PROGRAM_APPLICATIONS_2026-07-26.md`](../audits/commercial/AI_PARTNER_PROGRAM_APPLICATIONS_2026-07-26.md)
-registra postulaciones, estados observados y próximos pasos. No declarar como aprobado un programa sólo porque se haya
-enviado un formulario o exista una cuenta de partner.
+se conserva como fotografía histórica de las postulaciones de IA y no debe usarse como estado actual sin revalidación.
+No declarar como aprobado un programa sólo porque se haya enviado un formulario o exista una cuenta de partner.
 
 El modelo permanece `Approved for validation`: todavía requiere validar por relación casos de uso repetibles,
 economics, owner, términos contractuales y demanda antes de convertir cada provider en una oferta pública.

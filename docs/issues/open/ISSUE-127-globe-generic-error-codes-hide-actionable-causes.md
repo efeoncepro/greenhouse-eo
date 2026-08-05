@@ -18,6 +18,13 @@ Un operador —humano o agente— que intenta generar no puede saber **qué cont
 | `runner_error` | **todo** fallo del runner que no traiga un `reason` de nuestro vocabulario | ✅ **cerrado** (revisión `00098-45x`) |
 | `ProductionRouteDependencyError` | **28 sitios de throw sin argumento**: allowlist vacío, endpointId duplicado, endpoint ausente, provider que no calza, URL malformada, origin no permitido, regiones inválidas, persistencia de la decisión, forma del request compilado, placeholder de input no autorizado | ✅ **cerrado** (`17329f6`, 12 razones) |
 | `authentication_required` (API mode) | clase de credencial equivocada vs `--include-email` ausente vs audiencia incorrecta | 🔴 **abierto** |
+| `dependency_unavailable` (Asset Governance) | **quinta aparición, 2026-08-04.** `asset-governance-jobs.ts:82` colapsa todo error que no sea `AssetGovernanceDependencyError`, y su `SAFE_DEPENDENCY_CODES` sólo tiene los **cuatro códigos de C2PA**: los seis nombres de ClamAV/inspección que `apps/asset-governance/src/engines.ts` **ya emite bien** se destruyen en la frontera | 🔴 **abierto** — dueño `ISSUE-141` |
+
+> **Lo que enseña la quinta.** Las cuatro primeras se cerraron nombrando causas *hacia adelante*. Ésta invierte el
+> orden: el sistema **ya tenía los nombres** y los tiró en el borde. Por eso el arreglo no es agregar los seis
+> códigos al set —eso repite el defecto en la séptima causa— sino que la frontera **preserve el código nombrado** y
+> reserve el colapso para lo que genuinamente no lo tiene. Un allowlist que hay que ampliar cada vez es el mismo
+> bug con más filas.
 
 ## Causa raíz
 
@@ -104,6 +111,74 @@ porque `propose` y `confirm` fallan por razones distintas y exigen acciones dist
 mode **sigue abierta** — sus tres causas (clase de credencial equivocada, `--include-email` ausente,
 audiencia incorrecta) siguen colapsadas en el mismo 401/403. Es el único trabajo pendiente del issue.
 
+## Delta 2026-08-02 — DÉCIMA aparición, y esta vez los nombres correctos ya estaban escritos
+
+`route_creative_contract_mismatch` (`apps/creative-runner/src/production-route-compiler.ts:504-524,551`) colapsa
+**nueve causas accionables distintas** con acciones opuestas: contrato ausente · intent ausente · revisión
+desajustada · operación desajustada · slot inexistente · rol desajustado · media type inválido · MIME inválido ·
+input no materializado. Re-estimar, cambiar la operación, cambiar el asset o convertir el archivo son remedios
+distintos bajo el mismo código.
+
+**El agravante que la distingue de las nueve anteriores:** `TASK-1633` **ya tenía escritos los cinco nombres
+correctos** en su sección `Security and access` —`route_operation_unsupported`, `route_input_slot_invalid`,
+`route_input_combination_unsupported`, `route_control_unsupported`, `route_contract_revision_mismatch`— y los cinco
+tienen **cero ocurrencias** en Globe. No fue desconocimiento de la regla ni ausencia de diseño: el diseño nombró
+las causas y la implementación las colapsó igual. Y el criterio quedó marcado como cerrado porque, leído literal
+—"falla antes de reserva con error canónico"—, se cumple.
+
+Esto refuerza la conclusión de la novena aparición y la endurece: **conocer la regla no la aplica sola, y
+escribirla en la spec tampoco.** Lo único que funciona es mecánico — abrir las razones en el mismo commit que
+introduce el rechazo, con el patrón que este issue ya canonizó (las 24 razones de
+`ProductionRouteDependencyError`).
+
+**Agravante propio, que no tenían las anteriores:** ninguno de esos códigos está en `TERMINAL_CODES`
+(`packages/domain/src/governed-run-failure-policy.ts`), pese a cumplir su criterio de admisión al pie de la letra.
+Un desajuste de contrato es determinista: la próxima entrega falla idéntica. Hoy cae a `unknown` con tope 3 — la
+versión atenuada de las 705 entregas de `ISSUE-135`, y en el mismo camino de materialización de inputs. Un código
+sin razón nombrada **también queda sin clasificar**, porque no hay nada que clasificar.
+
+Dueño: `TASK-1633`, primer trabajo pendiente de su alcance restante.
+
+### Cerrada — `efeonce-globe@8986b45`
+
+Ocho códigos, uno por causa: `route_creative_contract_incomplete` (el pedido llegó a medias — su remedio es
+re-preparar, no cambiar el contrato, y por eso no comparte con los desajustes), `route_contract_revision_mismatch`,
+`route_operation_unsupported`, `route_input_slot_unknown`, `route_input_role_mismatch`,
+`route_input_media_type_invalid`, `route_input_mime_type_invalid`, `route_input_assignment_unresolved`.
+
+Media type y MIME quedaron separados porque **el remedio difiere**: uno pide otro asset, el otro pide convertir el
+que ya tienes. Es el mismo criterio que separó las doce de `snapshot_body_*` de las de endpoint.
+
+**La tabla de causas está probada en rojo:** colapsando dos a propósito, el test las atrapa. Y trae una aserción de
+unicidad, que es la defensa contra la recaída — si alguien vuelve a colapsar, dos filas esperan el mismo código.
+
+Sin migración: estas razones se registran como `route_dependency_unavailable`, así que el vocabulario cerrado de
+`production_router_decisions` no cambia.
+
+## Delta 2026-08-03 — UNDÉCIMA aparición, y la primera atrapada ANTES de mergear
+
+Al cablear la compilación del prompt por ruta (`91d1f71`, TASK-1633 Slice 3.5c), el `catch` que envolvía la
+llamada a `prompts.compile` colapsaba la razón **nueva** —`UnsupportedBriefControlError`, que nombra «la ruta no
+honra ese control»— en un `badRequest` genérico. En código escrito **precisamente para cerrar este bug class**,
+en la misma task que abrió los ocho códigos del contrato creativo.
+
+El colapso importaba porque las dos causas piden acciones **opuestas**: «el brief está mal formado» pide corregir
+el JSON; «la ruta no honra ese control» pide elegir otra ruta o quitar esa dirección — el pedido es válido. Hoy
+el catch re-lanza (`packages/domain/src/model-lab.ts:1106`) con el comentario que explica por qué.
+
+**Lo que la distingue de las diez anteriores: se atrapó antes de mergear.** Las diez costaron un canary o un
+deploy cada una; ésta costó cero. Y conviene ser honesto sobre por qué, porque la razón **no fue disciplina**: no
+hubo un checklist ni un gate que la detuviera. Fue que el trabajo de esa misma mañana —clasificar la espera de
+governance, que exigió rastrear cómo un nombre se perdía camino a la política— dejó al agente **mirando esos
+`catch` con otra pregunta**: no «¿sanitiza bien?» sino «¿qué nombre se está borrando acá?».
+
+> Eso matiza —no contradice— la conclusión de la novena aparición. Sigue siendo cierto que conocer la regla no la
+> aplica sola. Lo que se agrega es que **el contexto reciente sí cambia lo que uno ve**: haber perseguido un
+> nombre perdido durante horas vuelve visibles los lugares donde otro se pierde. Es un efecto real y también es
+> **frágil** — se evapora con la sesión, no escala a otro agente y no sobrevive a un cambio de tema. Por eso no
+> reemplaza al mecanismo; la defensa duradera sigue siendo la del cierre de la décima: un test que rompe el build
+> cuando una razón nace sin nombre o sin clasificar.
+
 ## Delta 2026-07-26 (b) — capa 8: el control que rechazaba, encontrado leyendo (commit `4eee1cc`)
 
 Se hizo esa lectura y **apareció la causa, sin desplegar nada**. El método funcionó por segunda vez.
@@ -138,7 +213,7 @@ El asset quedó `lifecycle: quarantined` con `governance.state: c2pa_verify` (`t
 
 **El canary NO completó de punta a punta**, por dos cosas que hay que registrar como propias:
 
-1. **Timeout del CLIENTE a los 10 min** mató la corrida mientras esperaba governance (el canary tolera 20). Es la trampa ya documentada, otra vez — esta vez sin costo, porque no reintenté a ciegas.
+1. **Timeout del CLIENTE a los 10 min** mató la corrida mientras esperaba governance (el canary toleraba 20 en ese momento; desde el 2026-08-04 tolera **45**, y la latencia real bajó a ~7,9 min con el cron `*/1` de `ISSUE-137`). Es la trampa ya documentada, otra vez — esta vez sin costo, porque no reintenté a ciegas.
 2. 🔴 **Mi técnica de "replay con la misma etiqueta" fue correcta en el gasto y FALSA en la premisa.** Verifiqué que `prepare`/`execute` llevan claves derivadas del `runLabel` y concluí que devolvería *el mismo* experimento. **No lo hizo: creó uno nuevo** (`d756055f`, `createdAt 13:44:02.287`, distinto del original). El gasto sí fue cero — el ledger lo prueba (`reservation 10` → `release 10`, `spent 0`) —, así que fue inocuo, pero la premisa era incorrecta. **Que una clave de idempotencia exista no prueba que el handler la honre**; hay que verificar el efecto, no la presencia del argumento.
 
 **Capa 9, abierta y NO diagnosticada.** El experimento nuevo falló en **177 ms** con `attempts: []` (o sea antes de cualquier llamada al proveedor), `failureReason: runner_error`, y su evento de servidor dice `errorName: "Error"`, `reasonShape: "absent"` — un `Error` pelado sin razón de nuestro vocabulario. El release fue `governed_schedule_failed`. **Hipótesis sin verificar:** colisión de `submissionKey` por reusar el `runLabel` de una corrida que ya había ejecutado — o sea, posiblemente un artefacto de mi propia técnica y no un defecto del camino de producto. Se marca como hipótesis a propósito: no leí ese camino.
@@ -152,6 +227,13 @@ El asset quedó `lifecycle: quarantined` con `governance.state: c2pa_verify` (`t
 ## Estado
 
 open — cuatro de los códigos cerrados (`409` de crédito, `runner_error`, `ProductionRouteDependencyError` con 24 razones, el catch que las destruía); `authentication_required` pendiente; y **la causa del bloqueo del canary encontrada y cerrada en código** (capa 8: el falso positivo de `credential_like` sobre `"Key visual"`, `4eee1cc`), pendiente de deploy + canary con gasto real. Antes decía: bloqueo acotado al sanitizador del body, sin causa identificada. La verificación runtime necesita desplegar `324be6b` + `4eee1cc`.
+
+**Once apariciones al 2026-08-03.** La décima cerrada en `8986b45` (ocho códigos del contrato creativo de ruta);
+la undécima atrapada antes de mergear (`91d1f71`, el `catch` que colapsaba `UnsupportedBriefControlError`). El
+issue sigue abierto como **referencia del bug class**, no sólo por `authentication_required`: cada vez que un
+código canónico colapsa más de una causa accionable, este documento es el precedente. Y el 2026-08-03 quedó
+probado que el costo no es sólo diagnóstico — un código sin nombre alimentó una política de reintentos que mató
+una pieza ya cobrada (`ISSUE-135`).
 
 ## Relacionado
 

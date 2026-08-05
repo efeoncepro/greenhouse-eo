@@ -145,7 +145,7 @@ Run periodically (or on PR). Looks for:
 
 ### 11. Typography — SoT + drift-guard + escala (TASK-1036 / TASK-1038)
 
-La tipografía tiene su propio SoT en código (espejo del patrón AXIS de color) — **cuando agregues/cambies un valor de tipografía, mové las 3 capas juntas o el drift-guard rompe el CI**:
+La tipografía tiene su propio SoT en código (espejo del patrón AXIS de color) — **cuando agregues/cambies un valor de tipografía, mueve las 3 capas juntas o el drift-guard rompe el CI**:
 
 | Capa | Archivo |
 |---|---|

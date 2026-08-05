@@ -30,7 +30,7 @@
 - Rank: `TBD`
 - Domain: `creative|storage|ops`
 - Blocked by: `TASK-1528`
-- Branch: `task/TASK-1529-globe-media-lifecycle-orphan-gc`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

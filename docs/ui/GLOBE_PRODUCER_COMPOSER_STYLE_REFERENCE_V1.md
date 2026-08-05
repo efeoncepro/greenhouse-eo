@@ -499,7 +499,7 @@ valor computado en browser, no por inspección del CSS.
 ### 2. `text-red-500` y `text-lg` NO EXISTEN
 
 El theme vacía los namespaces de Tailwind, así que su paleta y su escala tipográfica de fábrica no generan
-nada. Si escribís una y no pasa nada visualmente, no es un bug: es el contrato.
+nada. Si escribes una y no pasa nada visualmente, no es un bug: es el contrato.
 
 ### 0. ✅ Decidido 2026-07-27 — cuando un valor no cae en la escala, **se tokeniza**
 

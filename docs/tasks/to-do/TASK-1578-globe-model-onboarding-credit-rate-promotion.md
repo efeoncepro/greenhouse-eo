@@ -21,7 +21,7 @@
 - Rank: `TBD`
 - Domain: `creative|platform|finance|reliability`
 - Blocked by: `TASK-1468, TASK-1553, TASK-1554, TASK-1579`
-- Branch: `task/TASK-1578-globe-model-onboarding-credit-rate-promotion`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

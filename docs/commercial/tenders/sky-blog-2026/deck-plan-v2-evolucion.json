@@ -1,0 +1,644 @@
+{
+  "_readme": [
+    "Deck técnico V2 enriquecido de la licitación SKY — Evolución y visibilidad del Blog.",
+    "Esta versión es independiente del deck técnico anterior y conserva su evidencia operativa de alto valor.",
+    "La narrativa parte del contexto entregado por SKY en la reunión de segunda ronda: un blog maduro,",
+    "un universo mensual de 45–50 contenidos, Centro de Ayuda como fuente, Notion como hub editorial, publicación",
+    "en WordPress, newsletter mensual y necesidad de una nueva etapa editorial.",
+    "Recupera Stack Operativo, diagnóstico, escalera IA, informe, Content Hub, portal y prueba social; no contiene precios ni costos internos.",
+    "El plan declara contentType + slots; el catálogo selecciona las plantillas de forma determinista.",
+    "Componer: pnpm deck:compose docs/commercial/tenders/sky-blog-2026/deck-plan-v2-evolucion.json --out .captures/sky-bid-v2-evolucion-enriched"
+  ],
+  "tenderId": "SKY-BLOG-2026-TECHNICAL-V2",
+  "slides": [
+    {
+      "slideId": "portada",
+      "contentType": "cover",
+      "slots": {
+        "clientLogo": { "src": "assets/clients/sky-on-dark.svg" },
+        "proposalKind": "technical"
+      }
+    },
+    {
+      "slideId": "agenda",
+      "contentType": "agenda",
+      "slots": {
+        "sectionLabel": "LO QUE VAMOS A REVISAR",
+        "title": "Agenda",
+        "deckMeta": "<b>7</b> capítulos · propuesta técnica",
+        "chapters": [
+          { "number": "01", "title": "La nueva etapa", "description": "Qué necesita hoy el blog", "targetSlideId": "entendimiento" },
+          { "number": "02", "title": "La evidencia", "description": "Qué medimos y dónde está la oportunidad", "targetSlideId": "diagnostico" },
+          { "number": "03", "title": "La cartera", "description": "Cómo se priorizan 45–50 contenidos", "targetSlideId": "cartera" },
+          { "number": "04", "title": "La operación", "description": "Stack, flujo y revisión diaria", "targetSlideId": "stack-operativo" },
+          { "number": "05", "title": "La visibilidad", "description": "SEO, AEO y Content Hub", "targetSlideId": "seo-aeo" },
+          { "number": "06", "title": "El aprendizaje", "description": "Portal, medición y evolución", "targetSlideId": "portal" },
+          { "number": "07", "title": "La seguridad", "description": "Equipo, SLA y continuidad", "targetSlideId": "seguridad" }
+        ],
+        "footerLabel": "Propuesta técnica · Evolución del Blog SKY"
+      }
+    },
+    {
+      "slideId": "entendimiento",
+      "contentType": "narrative",
+      "slots": {
+        "sectionLabel": "LA NUEVA ETAPA",
+        "title": "SKY ya tiene un blog con tracción: la oportunidad es darle <em>una nueva etapa</em>",
+        "body": [
+          "<b>No proponemos reemplazar una operación que ya funciona.</b> El blog tiene posicionamiento, tráfico, un calendario editorial activo y un flujo de revisión y publicación establecido.",
+          "<b>Proponemos agregar una capa de inteligencia editorial.</b> El contenido debe informar con precisión, inspirar al viajero, ser comprendido por los motores de respuesta y reutilizarse en la newsletter y otros canales."
+        ],
+        "closing": "De un calendario de publicaciones a un <span class='ac'>sistema de decisiones editoriales.</span>",
+        "conceptLabel": "LA TESIS",
+        "conceptTitle": "Proteger y amplificar",
+        "conceptLegend": [
+          { "layer": "Proteger", "definition": "Centro de Ayuda, fuentes y precisión", "tone": "outer" },
+          { "layer": "Evolucionar", "definition": "Narrativa, intención y estructura", "tone": "middle" },
+          { "layer": "Amplificar", "definition": "SEO, IA, newsletter y canales", "tone": "core" }
+        ]
+      }
+    },
+    {
+      "slideId": "realidad",
+      "contentType": "dual-list",
+      "slots": {
+        "leftEyebrow": "LO QUE SKY YA TIENE",
+        "leftTitle": "Una operación editorial activa y con memoria",
+        "leftItems": [
+          { "lead": "Blog posicionado", "body": "Una base de tráfico y contenidos que ya tiene recorrido." },
+          { "lead": "Fuente oficial", "body": "El Centro de Ayuda es la referencia actualizada para información operativa." },
+          { "lead": "Base operativa", "body": "Fuentes oficiales, WordPress y reportes mensuales ya forman parte de la operación." },
+          { "lead": "Medición mensual", "body": "Reportes de SEO, clics, desempeño y visibilidad en IA." }
+        ],
+        "rightEyebrow": "LO QUE EFEONCE AGREGA",
+        "rightTitle": "Criterio para que cada contenido rinda más",
+        "rightItems": [
+          { "lead": "Cartera priorizada", "body": "45–50 oportunidades ordenadas por intención, vigencia y valor." },
+          { "lead": "Nueva narrativa", "body": "Contenido útil e inspirador, alineado con la experiencia del viajero." },
+          { "lead": "SEO + AEO", "body": "Estructura para ser encontrado, comprendido y citado." },
+          { "lead": "Content Hub en Notion", "body": "Grilla, brief, fuentes, comentarios, estados y aprobaciones en un solo lugar." }
+        ]
+      }
+    },
+    {
+      "slideId": "cartera",
+      "contentType": "several-kpis",
+      "slots": {
+        "title": "La cartera necesita criterio",
+        "subtitle": {
+          "client": "Blog de SKY Airline",
+          "context": "Reunión SKY · 27/07/2026"
+        },
+        "kpis": [
+          {
+            "kind": "visibility",
+            "value": "45–50",
+            "unit": "por mes",
+            "label": "Universo editorial mensual",
+            "qual": "La cartera combina contenidos nuevos y actualizaciones.",
+            "evidenceRef": "E4 · Reunión de trabajo SKY · 2026-07-27"
+          },
+          {
+            "kind": "gap",
+            "value": "Refresh",
+            "label": "Piezas con recorrido",
+            "qual": "La primera palanca es proteger rendimiento, precisión y vigencia.",
+            "evidenceRef": "E1–E2 · Semrush · 2026-07-11"
+          },
+          {
+            "kind": "authority",
+            "value": "Nuevo",
+            "label": "Nuevas oportunidades",
+            "qual": "La segunda palanca abre búsquedas, destinos y decisiones de viaje.",
+            "evidenceRef": "E4 · Reunión de trabajo SKY · 2026-07-27"
+          },
+          {
+            "kind": "engines",
+            "value": "10",
+            "unit": "edición",
+            "label": "Newsletter mensual",
+            "qual": "Curaduría y adaptación a partir del trabajo editorial aprobado.",
+            "evidenceRef": "E7 · Reunión de trabajo SKY · 2026-07-27"
+          }
+        ],
+        "readEyebrow": "LA DECISIÓN",
+        "readLead": "No todo contenido tiene la misma <em>profundidad</em>",
+        "readBody": "La grilla declara intervención, fuente, prioridad, complejidad y fecha. La capacidad se compra como una operación gobernada, no como una calculadora de artículos.",
+        "source": "Contexto entregado por SKY en reunión de trabajo · 27 de julio de 2026"
+      }
+    },
+    {
+      "slideId": "diagnostico",
+      "contentType": "one-metric",
+      "slots": {
+        "eyebrow": "EL DIAGNÓSTICO",
+        "leftVisual": { "src": "assets/clay3d/clay-ai-visibility.png" },
+        "title": "La IA <em>conoce</em> a SKY. Pero su contenido <em>no está</em> en la respuesta",
+        "narrative": [
+          "Medimos la marca antes de escribir esta propuesta, con el mismo instrumento con el que vamos a operar: nuestro AI Visibility Grader, sobre los cinco motores de respuesta y 35 respuestas resueltas.",
+          "La conversación sobre viajes la alimentan fuentes de terceros — <strong>la citabilidad del contenido propio es 0%</strong>. El informe está publicado: <a href=\"https://think.efeoncepro.com/brand-visibility/r/grt-9892e5684c394557a63f8171926871c26d3278216daf42a2a8100951ccb5537f\">puede recorrerlo entero</a>."
+        ],
+        "outcomesEyebrow": "LO QUE MEDIMOS",
+        "outcomesTitle": "Tres hechos, antes de proponer nada",
+        "goals": [
+          { "kind": "citability", "title": "Contenido propio citado", "metric": "0%", "body": "De las <strong>254 citas</strong> del estudio, ninguna es contenido editorial de SKY. Responden Trustpilot, Wikipedia e Instagram.", "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046 · 2026-07" },
+          { "kind": "growth", "title": "LATAM domina la categoría", "metric": "16 vs 9", "body": "LATAM se menciona <strong>16 veces</strong> y JetSMART 9. La conversación de categoría tiene dueño, y no es SKY.", "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046 · 2026-07" },
+          { "kind": "visibility", "title": "El blog ya trae tráfico", "metric": "~40.000", "body": "Visitas orgánicas al mes, con páginas <strong>a un paso del top 3</strong>. No partimos de cero: partimos de un activo desaprovechado.", "evidenceRef": "Semrush · database CL · 2026-07-11" }
+        ]
+      }
+    },
+    {
+      "slideId": "escalera",
+      "contentType": "maturity-ladder",
+      "slots": {
+        "sectionLabel": "DÓNDE ESTÁ SKY HOY",
+        "title": "Dos peldaños <em>firmes</em>. Tres por construir.",
+        "subject": { "name": "SKY Airline", "context": "5 motores · 35 respuestas · julio 2026" },
+        "rungs": [
+          { "label": "Que te encuentre", "anchor": "Be Found", "score": 40, "body": "Aparece en menos de la mitad de las respuestas de descubrimiento de la categoría.", "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046" },
+          { "label": "Que te entienda", "anchor": "Be Readable", "score": 70, "body": "La IA sabe quién es SKY y se apoya en fuentes creíbles. Fortaleza a defender.", "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046" },
+          { "label": "Que te describa bien", "anchor": "Be Correct", "score": 37, "body": "Cuando la IA habla de SKY, no usa su narrativa. Se corrige con contenido propio.", "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046" },
+          { "label": "Que pueda actuar", "anchor": "Be Actionable", "score": 8, "body": "La capa técnica ausente, medida: un agente de IA no puede operar con su sitio.", "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046" },
+          { "label": "Que te prefiera", "anchor": "Be Intrinsic", "score": 76, "body": "SKY ya es opción por defecto dentro de la categoría. Su otra fortaleza.", "evidenceRef": "AI Visibility Grader · run EO-GRUN-00046" }
+        ],
+        "readout": { "title": "Por eso el alcance", "body": "La escalera es acumulativa: un peldaño no subido bloquea los de arriba. El servicio ataca los tres críticos, empezando por el primero." }
+      }
+    },
+    {
+      "slideId": "informe",
+      "contentType": "artifact-showcase",
+      "slots": {
+        "sectionLabel": "LA MEDICIÓN",
+        "title": "El diagnóstico está <em>publicado</em>. Y se repite cada mes.",
+        "lead": "El informe completo del AI Visibility Grader — las siete dimensiones, los cinco motores y las fuentes citadas, una a una — <a href=\"https://think.efeoncepro.com/brand-visibility/r/grt-9892e5684c394557a63f8171926871c26d3278216daf42a2a8100951ccb5537f\">puede recorrerse en línea</a>. Es el instrumento del avance mensual.",
+        "artifact": { "src": "assets/product/informe-grader-sky.png" },
+        "caption": "Informe real de SKY Airline · run EO-GRUN-00046 · julio 2026",
+        "note": "AI Visibility Grader · Efeonce"
+      }
+    },
+    {
+      "slideId": "evolucion",
+      "contentType": "four-pillars",
+      "slots": {
+        "sectionLabel": "EL ENFOQUE",
+        "title": "Cuatro frentes para darle al blog <em>más aire y más impacto</em>",
+        "context": [
+          "La nueva etapa no agrega una capa teórica sobre la operación: cambia la forma en que se decide, se produce y se aprende.",
+          "Cada frente deja una decisión visible para el siguiente ciclo."
+        ],
+        "thesis": "El blog mejora cuando la <strong>evidencia decide el contenido</strong> y cada pieza puede trabajar en más de un canal.",
+        "pillars": [
+          { "kind": "data", "title": "Leer la cartera", "body": "Datos, intención, temporada y desempeño.", "detail": "La grilla ordena qué proteger, qué actualizar y qué crear." },
+          { "kind": "method", "title": "Escribir para decidir", "body": "Información útil, narrativa e inspiración.", "detail": "Cada contenido ayuda al viajero a avanzar en su planificación." },
+          { "kind": "ai", "title": "Hacerlo comprensible", "body": "SEO, AEO, entidades y estructura.", "detail": "La pieza se prepara para buscadores y motores de respuesta." },
+          { "kind": "human", "title": "Multiplicar su vida", "body": "Blog, newsletter y canales.", "detail": "La operación aprovecha el trabajo ya aprobado en nuevas superficies." }
+        ]
+      }
+    },
+    {
+      "slideId": "capa-tecnica",
+      "contentType": "dual-list",
+      "slots": {
+        "leftEyebrow": "LO QUE SU BLOG NO EMITE HOY",
+        "leftTitle": "La capa que el buscador lee no está escrita",
+        "leftItems": [
+          { "lead": "Meta descripción: ausente", "body": "El requisito 4 de estas Bases. Google redacta por su cuenta el texto del resultado." },
+          { "lead": "Datos estructurados: cero", "body": "Sin schema, buscadores y motores de IA tienen que adivinar de qué trata cada pieza." },
+          { "lead": "robots.txt: responde 404", "body": "El blog no declara política alguna para los rastreadores." },
+          { "lead": "llms.txt: no existe", "body": "La declaración equivalente para los motores de respuesta con IA." }
+        ],
+        "rightEyebrow": "LO QUE LA OPERACIÓN INSTALA",
+        "rightTitle": "Implementado sobre Notion y su WordPress — no recomendado en un informe",
+        "rightItems": [
+          { "lead": "Meta título y descripción", "body": "En el 100% de los artículos, nuevos y existentes. La diferencia se ve el primer mes." },
+          { "lead": "Datos estructurados por pieza", "body": "La capa que permite que un motor de respuesta cite el contenido de SKY." },
+          { "lead": "Política de rastreo", "body": "robots.txt y llms.txt declarados: qué pueden leer los buscadores y las IA." },
+          { "lead": "Enlazado interno del cluster", "body": "Cada artículo nuevo empuja a la página que ya existe, y hacia las rutas de SKY." }
+        ]
+      }
+    },
+    {
+      "slideId": "ciclo",
+      "contentType": "process-sequential",
+      "slots": {
+        "sectionLabel": "EL CICLO MENSUAL",
+        "title": "Notion ordena el flujo; cada etapa gana <em>criterio y trazabilidad</em>",
+        "steps": [
+          { "title": "Leer y priorizar", "description": "Revisamos señales SEO, calendario, Centro de Ayuda, destinos, campañas y cartera vigente.", "deliverable": "Grilla mensual aprobada" },
+          { "title": "Investigar y producir", "description": "Construimos contenido nuevo o refreshes con intención, fuentes, narrativa y estructura SEO/AEO.", "deliverable": "Contenido en Notion / Content Hub" },
+          { "title": "Revisar y publicar", "description": "SKY comenta y aprueba dentro del Content Hub; Efeonce corrige, valida y publica en WordPress.", "deliverable": "Pieza aprobada y publicada" },
+          { "title": "Reutilizar y aprender", "description": "Adaptamos contenidos para la newsletter, medimos y trasladamos el aprendizaje a la siguiente grilla.", "deliverable": "Reporte y siguiente acción" }
+        ]
+      }
+    },
+    {
+      "slideId": "stack-operativo",
+      "contentType": "tool-stack",
+      "slots": {
+        "sectionLabel": "STACK OPERATIVO",
+        "title": "Un sistema operativo para producir, revisar y <em>optimizar contenido</em>",
+        "badge": "Capacidades incluidas",
+        "lead": "Cada plataforma entra en una etapa concreta del ciclo, con trazabilidad, licencias y control humano de punta a punta.",
+        "stages": [
+          { "stage": "Planificar", "outcome": "Notion concentra la grilla, el brief, responsables, conversaciones y estados desde el inicio.", "tools": [{ "tool": "notion", "name": "Notion" }, { "tool": "microsoft-365", "name": "Microsoft 365" }] },
+          { "stage": "Investigar", "outcome": "KW mining, auditoría técnica y señales AEO sostienen cada decisión editorial.", "tools": [{ "tool": "semrush", "name": "Semrush" }, { "tool": "ahrefs", "name": "Ahrefs" }, { "tool": "screaming-frog", "name": "Screaming Frog" }, { "tool": "brand-visibility-grader", "name": "Brand Visibility Grader" }] },
+          { "stage": "Producir", "outcome": "Texto, diseño y piezas derivadas avanzan sobre una misma ruta de contenido.", "tools": [{ "tool": "adobe-illustrator", "name": "Illustrator" }, { "tool": "adobe-photoshop", "name": "Photoshop" }, { "tool": "adobe-premiere-pro", "name": "Premiere Pro" }, { "tool": "adobe-after-effects", "name": "After Effects" }, { "tool": "adobe-express", "name": "Adobe Express" }] },
+          { "stage": "Enriquecer", "outcome": "Exploración visual y mejoras asistidas amplían el territorio creativo sin perder marca.", "tools": [{ "tool": "adobe-firefly", "name": "Adobe Firefly" }, { "tool": "higgsfield", "name": "Higgsfield" }, { "tool": "magnific", "name": "Magnific" }] },
+          { "stage": "Revisar", "outcome": "Versiones, comentarios, QA y aprobaciones se cierran en Notion antes de publicar y aprender.", "tools": [{ "tool": "notion", "name": "Notion" }, { "tool": "frameio", "name": "Frame.io" }] }
+        ],
+        "supportLayer": {
+          "label": "Capa transversal",
+          "summary": "Comentarios, aprobaciones, licencias y fuentes aprobadas se mantienen trazables entre brief, contenido y assets.",
+          "tools": [{ "tool": "notion", "name": "Notion" }, { "tool": "microsoft-teams", "name": "Teams" }, { "tool": "slack", "name": "Slack" }, { "tool": "shutterstock", "name": "Shutterstock" }, { "tool": "adobe-stock", "name": "Adobe Stock" }, { "tool": "envato-elements", "name": "Envato Elements" }]
+        },
+        "footerNote": "Cada herramienta se activa según alcance, licencias y fuentes aprobadas; el criterio humano gobierna el ciclo."
+      }
+    },
+    {
+      "slideId": "dia-a-dia",
+      "contentType": "daily-operations",
+      "slots": {
+        "sectionLabel": "EL DÍA A DÍA CON EFEONCE",
+        "title": "El trabajo diario queda <em>visible, comentable y versionado</em> desde un solo hub",
+        "lead": "Conversaciones, research SEO/AEO, redacción y revisión visual avanzan sobre el mismo artículo, con una ruta de aprobación compartida.",
+        "workspaceName": "Content Hub editorial",
+        "liveStatus": "Operación compartida",
+        "conversation": {
+          "tool": "microsoft-teams",
+          "toolName": "Teams",
+          "channel": "#proyecto-editorial",
+          "cadence": "Ritual semanal · martes 10:00",
+          "messages": [
+            { "initials": "EO", "author": "Equipo Efeonce", "time": "09:42", "message": "La estructura SEO/AEO y las fuentes ya están listas para revisión." },
+            { "initials": "SKY", "author": "Equipo SKY", "time": "10:06", "message": "Dejamos un comentario en el H2 de recomendaciones y otro sobre el visual." },
+            { "initials": "EO", "author": "Equipo Efeonce", "time": "10:18", "message": "Perfecto. La v03 queda hoy en Frame.io con los ajustes aplicados." }
+          ],
+          "composerLabel": "Responder en el canal"
+        },
+        "workspace": {
+          "tool": "notion",
+          "toolName": "Notion · Content Hub",
+          "status": "En revisión",
+          "articleTitle": "Carretera Austral: cómo llegar, cuándo ir y cuántos días necesita",
+          "version": "Borrador v03",
+          "owner": "Owner · Equipo editorial",
+          "due": "Entrega · jueves",
+          "keyword": "carretera austral",
+          "intent": "planificación de viaje",
+          "excerpt": "El mismo espacio reúne brief, KW mining, fuentes, estructura, schema y texto; SKY comenta donde el equipo produce.",
+          "outline": [
+            { "tag": "H1", "title": "Carretera Austral: guía para planificar el viaje" },
+            { "tag": "H2", "title": "Cómo llegar y desde dónde comenzar la ruta" },
+            { "tag": "H2", "title": "Cuántos días necesita según el itinerario" },
+            { "tag": "H2", "title": "Cuándo viajar: clima, temporada y reservas" }
+          ],
+          "checklist": [
+            { "label": "KW mining", "state": "Listo" },
+            { "label": "Schema Article + FAQ", "state": "Listo" },
+            { "label": "Respuesta directa AEO", "state": "Revisión" }
+          ],
+          "commentInitials": "SKY",
+          "commentText": "Aclarar la diferencia entre temporada alta y clima favorable."
+        },
+        "reviewAsset": { "src": "assets/product/radiografia-sky-xray.png" },
+        "review": {
+          "tool": "frameio",
+          "toolName": "Frame.io",
+          "version": "Visual v03",
+          "status": "2 comentarios",
+          "assetTitle": "Visual principal · artículo ilustrativo",
+          "comments": [
+            { "author": "Equipo SKY", "message": "Mantener la fotografía, pero dar más aire al título." },
+            { "author": "Dirección de arte", "message": "Ajuste aplicado. La licencia y el crédito quedan documentados." }
+          ]
+        },
+        "workflowLabel": "Ruta visible del artículo",
+        "workflow": [
+          { "label": "Brief", "state": "done" },
+          { "label": "Research SEO/AEO", "state": "done" },
+          { "label": "Redacción", "state": "done" },
+          { "label": "Revisión SKY", "state": "active" },
+          { "label": "Visuales", "state": "next" },
+          { "label": "Publicar + aprender", "state": "next" }
+        ]
+      }
+    },
+    {
+      "slideId": "nuevo-aire",
+      "contentType": "dual-text",
+      "slots": {
+        "title": "El nuevo aire cambia lo que el contenido puede hacer",
+        "leftConcept": {
+          "label": "PARA EL VIAJERO",
+          "title": "De información a decisión de viaje",
+          "paragraphs": [
+            "Cada pieza responde una pregunta concreta: dónde ir, cuándo viajar, cómo llegar, qué hacer y cómo planificar mejor.",
+            "La narrativa agrega inspiración y contexto sin sacrificar exactitud ni utilidad."
+          ],
+          "icon": "users"
+        },
+        "rightConcept": {
+          "label": "PARA LA MARCA",
+          "title": "De artículo aislado a autoridad de destino",
+          "paragraphs": [
+            "Los contenidos se conectan por destinos, rutas e intenciones para construir una comprensión acumulativa de SKY.",
+            "La misma pieza puede alimentar blog, newsletter, social y respuestas de motores de IA cuando el alcance lo contempla."
+          ],
+          "icon": "ai"
+        },
+        "outcome": { "label": "LA JUGADA", "text": "El blog conserva su tracción y gana una <strong>narrativa más útil, visible y reutilizable</strong>." }
+      }
+    },
+    {
+      "slideId": "tipos-contenido",
+      "contentType": "bullet-list",
+      "slots": {
+        "brandTitle": "Una cartera, cuatro intervenciones",
+        "bullets": [
+          { "lead": "Contenido nuevo", "description": "Nuevas búsquedas, destinos, rutas o decisiones de viaje." },
+          { "lead": "Refresh ligero", "description": "Metadata, estructura, enlaces, imágenes, fuentes o datos puntuales." },
+          { "lead": "Refresh profundo", "description": "Reorganización, nueva investigación y reescritura de una pieza posicionada." },
+          { "lead": "Contenido ad-hoc", "description": "Campañas, nuevos destinos e iniciativas corporativas dentro de la priorización acordada." },
+          { "lead": "Newsletter", "description": "Curaduría, títulos, bajadas, llamados y enlaces para aproximadamente 10 contenidos." }
+        ]
+      }
+    },
+    {
+      "slideId": "lineas",
+      "contentType": "bullet-list",
+      "slots": {
+        "brandTitle": "Líneas editoriales",
+        "bullets": [
+          { "lead": "Destinos SKY", "description": "Guías por destino, cuándo viajar, cómo moverse." },
+          { "lead": "Qué hacer en el destino", "description": "Experiencias, imperdibles e itinerarios: la intención con más volumen." },
+          { "lead": "Gastronomía y cultura local", "description": "Alto potencial de tráfico y de citación por los motores con IA." },
+          { "lead": "Datos útiles para el viajero", "description": "Equipaje, documentos y temporada: contenido evergreen que posiciona en el largo plazo." },
+          { "lead": "Tendencias del turismo", "description": "Industria aérea y de viajes, y los contenidos que SKY defina." }
+        ]
+      }
+    },
+    {
+      "slideId": "seo-aeo",
+      "contentType": "capabilities-grid",
+      "slots": {
+        "eyebrow": "SEO Y AEO",
+        "headline": "Posicionar en el buscador <em>y</em> ser citado por la IA",
+        "intro": "Cada artículo se produce sobre tres capas: fundamentos técnicos, SEO clásico y AEO.",
+        "highlight": "El piso que exigen las bases está <strong>garantizado en cada pieza</strong>. El diferencial va por encima.",
+        "panelQuestion": "¿Qué hace que una respuesta lo cite a usted?",
+        "capabilities": [
+          { "kind": "search", "title": "SEO, el piso", "description": "Keywords con intención, títulos, metadatos, H1-H3 y enlace interno." },
+          { "kind": "conversation", "title": "Respuesta directa", "description": "El formato que los motores con IA privilegian para citar una fuente." },
+          { "kind": "authoring", "title": "Estructura citable", "description": "Tablas, listas y datos con fuente: más probabilidad de ser citado." },
+          { "kind": "data", "title": "Capa técnica", "description": "Datos estructurados y metadatos, implementados sobre su WordPress." },
+          { "kind": "measurement", "title": "Medición en 5 motores", "description": "ChatGPT, Gemini, Perplexity, Claude y Google AI Overview, mes a mes." }
+        ]
+      }
+    },
+    {
+      "slideId": "content-hub-anatomy",
+      "contentType": "content-hub-anatomy",
+      "slots": {
+        "sectionLabel": "DETRÁS DE LA RADIOGRAFÍA AEO",
+        "title": "La Radiografía empieza antes de publicar: <em>se construye en tres capas</em>",
+        "lead": "Aquí se documentan las decisiones que luego el comité podrá comprobar en el X-ray vivo.",
+        "proofKicker": "SIGUIENTE · PRUEBA VIVA",
+        "proofLink": "<a href=\"https://think.efeoncepro.com/muestras/sky-carretera-austral-861c18cc0e37/\">Abrir la Radiografía AEO ↗</a>",
+        "workspaceName": "Backstage de la Radiografía",
+        "documentPath": "Carretera Austral / En validación",
+        "version": "Borrador v07",
+        "status": "Validación SKY",
+        "research": {
+          "kicker": "01 · Research trail",
+          "title": "La decisión editorial",
+          "state": "Trazable",
+          "question": "¿Cómo planificar la Carretera Austral sin perder tiempo ni conexiones?",
+          "primaryKeyword": "carretera austral",
+          "intent": "planificación de viaje",
+          "clusterCount": "3 señales",
+          "clusters": [
+            { "name": "cómo llegar a Carretera Austral", "signal": "Alta", "strength": "high" },
+            { "name": "cuántos días necesita la ruta", "signal": "Media", "strength": "medium" },
+            { "name": "mejor época para viajar", "signal": "Foco", "strength": "focused" }
+          ],
+          "sourceCount": "3 fuentes",
+          "sources": [
+            { "type": "SKY", "title": "Rutas y destinos SKY", "note": "Vigencia revisada · 2026" },
+            { "type": "GOV", "title": "Sernatur · Carretera Austral", "note": "Fuente institucional" },
+            { "type": "METEO", "title": "Dirección Meteorológica", "note": "Clima y estacionalidad" }
+          ]
+        },
+        "article": {
+          "toolLabel": "Artículo vivo",
+          "owner": "Owner · Equipo editorial",
+          "eyebrow": "Guía de planificación",
+          "title": "Carretera Austral: cómo llegar, cuándo ir y cuántos días necesita",
+          "deck": "Una guía práctica para decidir punto de entrada, temporada y duración antes de reservar el viaje.",
+          "answerLabel": "Respuesta directa",
+          "directAnswer": "La ruta puede recorrerse en 7 a 14 días según el punto de inicio, las conexiones elegidas y el tiempo destinado a cada tramo.",
+          "sections": [
+            { "tag": "H2 · DECISIÓN 01", "title": "Cómo llegar y desde dónde comenzar la ruta", "copy": "El contenido compara accesos y conexiones para que la persona pueda elegir el punto de entrada más conveniente." },
+            { "tag": "H2 · DECISIÓN 02", "title": "Cuántos días necesita según su itinerario", "copy": "Tres escenarios de viaje ordenan las alternativas sin convertir la guía en una lista genérica de destinos." },
+            { "tag": "H2 · DECISIÓN 03", "title": "Cuándo viajar: clima, temporada y reservas", "copy": "La recomendación separa clima favorable, temporada alta y disponibilidad para evitar una respuesta simplista." }
+          ],
+          "evidenceCallout": "Cada recomendación conserva fuente, vigencia y responsable de revisión dentro del mismo documento.",
+          "commentInitials": "SKY",
+          "commentText": "Aclarar qué conexiones dependen de temporada antes de aprobar."
+        },
+        "machine": {
+          "kicker": "03 · X-ray técnico",
+          "title": "Lo que leerá la máquina",
+          "state": "Validado",
+          "metaTitle": "Carretera Austral: cómo llegar y cuántos días ir",
+          "metaDescription": "Planifique la Carretera Austral: accesos, temporada, conexiones y duración recomendada según su itinerario.",
+          "schemaLabel": "Schema conectado",
+          "schemaTypes": ["Article", "FAQPage", "BreadcrumbList"],
+          "schemaType": "Article + FAQPage",
+          "schemaAbout": "Carretera Austral",
+          "schemaEntity": "Cómo planificar el viaje",
+          "checks": [
+            { "label": "Intent + respuesta directa", "stateLabel": "Listo", "tone": "ready" },
+            { "label": "Entidades + enlaces internos", "stateLabel": "Con fuente", "tone": "evidence" },
+            { "label": "Metadata + canonical", "stateLabel": "Listo", "tone": "ready" },
+            { "label": "Vigencia de recomendaciones", "stateLabel": "Revisión", "tone": "review" }
+          ],
+          "commentInitials": "EO",
+          "comment": "La capa técnica se valida junto al texto; no se agrega como trámite después de redactar."
+        },
+        "layers": [
+          { "label": "Research trazable", "description": "La decisión parte de señales y fuentes.", "kind": "research" },
+          { "label": "Respuesta útil", "description": "La persona encuentra una respuesta antes del desarrollo.", "kind": "reader" },
+          { "label": "X-ray técnico", "description": "Metadata, schema y QA hacen recuperable la pieza.", "kind": "machine" }
+        ]
+      }
+    },
+    {
+      "slideId": "muestra",
+      "contentType": "artifact-showcase",
+      "slots": {
+        "sectionLabel": "LA PRUEBA VIVA",
+        "title": "No describimos la evolución: <em>la mostramos</em>",
+        "lead": "Efeonce preparó una pieza real para SKY con su capa de máquina visible. <a href=\"https://think.efeoncepro.com/muestras/sky-carretera-austral-861c18cc0e37/\">Recorrer la radiografía viva</a>.",
+        "artifact": { "src": "assets/product/radiografia-sky-xray.png" },
+        "caption": "Radiografía de Carretera Austral · artículo y capa técnica visible",
+        "note": "Muestra de Efeonce · pieza viva por enlace"
+      }
+    },
+    {
+      "slideId": "arranque",
+      "contentType": "timeline",
+      "slots": {
+        "sectionLabel": "PRIMEROS 90 DÍAS",
+        "title": "La nueva etapa comienza con <em>movimiento visible</em>",
+        "meta": "Operación, contenido y aprendizaje desde el primer ciclo",
+        "timeUnit": "month",
+        "timeAxis": ["Mes 1", "Mes 2", "Mes 3"],
+        "milestones": [
+          { "at": 1, "label": "Cartera priorizada", "caption": "Fin mes 1" },
+          { "at": 3, "label": "Primer aprendizaje", "caption": "Fin mes 3" }
+        ],
+        "phases": [
+          { "kind": "work", "startUnit": 1, "endUnit": 1, "title": "Baseline y clasificación", "description": "Inventario, fuentes, mezcla y prioridades.", "barLabel": "Decidir antes de producir" },
+          { "kind": "work", "startUnit": 2, "endUnit": 2, "title": "Ritmo editorial", "description": "Producción, refresh, Notion, WordPress y newsletter.", "barLabel": "Operar con trazabilidad" },
+          { "kind": "continuous", "startUnit": 3, "endUnit": 3, "title": "Medición y optimización", "description": "SEO, IA, rendimiento y siguientes acciones.", "barLabel": "Aprender para el siguiente ciclo" }
+        ]
+      }
+    },
+    {
+      "slideId": "medicion",
+      "contentType": "requirements-table",
+      "slots": {
+        "sectionLabel": "MEDICIÓN Y APRENDIZAJE",
+        "title": "El reporte mensual se convierte en <em>la siguiente decisión</em>",
+        "summary": { "value": "8 +", "label": "Indicadores y señales de evolución", "detail": "SEO, tráfico, contenido, newsletter y visibilidad en IA." },
+        "requirements": [
+          { "kind": "excluyente", "requirement": "Visualizaciones y usuarios alcanzados", "evidence": "Google Analytics 4", "status": "cubierto" },
+          { "kind": "excluyente", "requirement": "Clics y posicionamiento orgánico", "evidence": "Google Search Console + Semrush", "status": "cubierto" },
+          { "kind": "puntúa", "requirement": "Desempeño y keywords posicionadas", "evidence": "Reporte mensual con movimiento y contexto", "status": "cubierto" },
+          { "kind": "puntúa", "requirement": "Visibilidad en motores de respuesta", "evidence": "AI Visibility Grader y fuentes citadas", "status": "cubierto" },
+          { "kind": "puntúa", "requirement": "Oportunidades para el siguiente ciclo", "evidence": "Backlog priorizado y recomendaciones accionables", "status": "cubierto" }
+        ]
+      }
+    },
+    {
+      "slideId": "portal",
+      "contentType": "comparison",
+      "slots": {
+        "leftTitle": "Cómo reporta una agencia de contenido",
+        "rightTitle": "Greenhouse: SKY ve la misma verdad que vemos nosotros",
+        "rows": [
+          { "left": { "lead": "Un informe el día 10", "body": "El desempeño del mes llega en un PDF, semanas después de que ocurrió." }, "right": { "lead": "El tablero, en vivo", "body": "Ranking, keywords, salud SEO y citabilidad en IA, en un solo lugar." } },
+          { "left": { "lead": "SKY ve lo que le muestran", "body": "El proveedor elige qué entra al informe y qué queda fuera." }, "right": { "lead": "SKY audita lo que se hizo", "body": "Cada artículo con su estado, su responsable y su fecha comprometida." } },
+          { "left": { "lead": "¿Un dato a mitad de mes?", "body": "Se pide por correo y se espera la respuesta." }, "right": { "lead": "¿Un dato a mitad de mes?", "body": "SKY entra y lo mira. Sin pedirle nada a nadie." } },
+          { "left": { "lead": "Al cierre: una carpeta de PDF", "body": "Dos años de informes sueltos que nadie vuelve a abrir." }, "right": { "lead": "Al cierre: el historial completo", "body": "Dos años de operación, acumulada y consultable." } }
+        ]
+      }
+    },
+    {
+      "slideId": "portal-vista",
+      "contentType": "artifact-showcase",
+      "slots": {
+        "sectionLabel": "EL PORTAL",
+        "title": "El tablero <em>ya existe</em>. Y SKY entra cuando quiera.",
+        "lead": "Posición, keywords, salud técnica y citabilidad en los motores de IA, en un solo lugar. La misma verdad que ve el equipo que opera la cuenta — no una versión resumida para el cliente.",
+        "artifact": { "src": "assets/product/greenhouse-seo-dashboard.png" },
+        "caption": "Vista de ejemplo del portal. El tablero de SKY se puebla con los datos de SKY desde el mes 1.",
+        "note": "Greenhouse · el portal de clientes de Efeonce"
+      }
+    },
+    {
+      "slideId": "seguridad",
+      "contentType": "dual-list",
+      "slots": {
+        "leftEyebrow": "RIESGOS QUE CONTROLAMOS",
+        "leftTitle": "Precisión, continuidad y alcance visible",
+        "leftItems": [
+          { "lead": "Información incorrecta", "body": "Centro de Ayuda y fuentes aprobadas antes de redactar y publicar." },
+          { "lead": "Volumen variable", "body": "Grilla con tipo de intervención, profundidad y prioridad mensual." },
+          { "lead": "Cambios de tecnología", "body": "Efeonce coordina con el proveedor que sirve de nexo con TI de SKY." },
+          { "lead": "Crecimiento de alcance", "body": "Capacity envelope y Addons explícitos, sin precio unitario por artículo." }
+        ],
+        "rightEyebrow": "POR QUÉ EFEONCE",
+        "rightTitle": "Un ownership para estrategia y delivery",
+        "rightItems": [
+          { "lead": "Entendemos la operación", "body": "Notion como hub; WordPress, aprobaciones y fuentes oficiales se mantienen." },
+          { "lead": "Integramos disciplinas", "body": "Contenido, SEO/AEO, narrativa, visual, newsletter y medición." },
+          { "lead": "Trabajamos con evidencia", "body": "El diagnóstico, la muestra y el reporte tienen procedencia." },
+          { "lead": "Dejamos memoria", "body": "Cada ciclo produce aprendizaje y un backlog mejor priorizado." }
+        ]
+      }
+    },
+    {
+      "slideId": "equipo",
+      "contentType": "team-gallery",
+      "slots": {
+        "sectionLabel": "EL EQUIPO",
+        "title": "Las personas que <em>responden</em> por la evolución del blog",
+        "rosterMeta": "Pod asignado · capacidad reservada",
+        "members": [
+          { "photo": "julio", "name": "Julio", "role": "Responsable de Cuenta", "dedication": "12%" },
+          { "photo": "maria-fernanda", "name": "María Fernanda", "role": "SEO Copywriter", "dedication": "50%" },
+          { "photo": "daniela", "name": "Daniela", "role": "Creative Operations Lead", "dedication": "12%" },
+          { "photo": "melkin", "name": "Melkin", "role": "Senior Visual Designer", "dedication": "30%" },
+          { "photo": "andres", "name": "Andrés", "role": "SEO Specialist", "dedication": "25%" }
+        ]
+      }
+    },
+    {
+      "slideId": "clientes",
+      "contentType": "client-logos",
+      "slots": {
+        "sectionLabel": "QUIÉNES CONFÍAN EN EFEONCE",
+        "title": "SKY ya está en <em>muy buena compañía</em>",
+        "lead": "Consumo masivo, gobierno, servicios y educación: marcas que operan su contenido, su marca o su visibilidad con Efeonce.",
+        "logos": [
+          { "client": "sky", "emphasis": "primary" },
+          { "client": "carozzi", "emphasis": "none" },
+          { "client": "marca-chile", "emphasis": "none" },
+          { "client": "gobierno-santiago", "emphasis": "none" },
+          { "client": "berel", "emphasis": "none" },
+          { "client": "bresler", "emphasis": "none" },
+          { "client": "aguas-andinas", "emphasis": "none" },
+          { "client": "universidad-temuco", "emphasis": "none" },
+          { "client": "anam", "emphasis": "none" }
+        ],
+        "breadth": { "value": "+90", "kicker": "Presencia regional", "caption": "empresas en Chile, Colombia, México y Perú operan con Efeonce." }
+      }
+    },
+    {
+      "slideId": "testimonios",
+      "contentType": "testimonials",
+      "slots": {
+        "sectionLabel": "LA VOZ DE SKY",
+        "title": "Un año trabajando con SKY. <em>Esto dice su equipo.</em>",
+        "lead": "La relación no empieza con esta licitación: el equipo de SKY ya trabaja con Efeonce.",
+        "testimonials": [
+          { "quote": "Super contenta con el trabajo que hemos realizado este año. Nos han ayudado harto en las automatizaciones y en agilizar procesos. Hemos formado un muy bonito equipo, son personas super cálidas. Le agradezco a todo el equipo por estar siempre dispuestos a trabajar con nosotros y entregar lo mejor de si.", "who": "Constanza Rojas", "role": "Team SKY" },
+          { "quote": "Agradezco el super trabajo que hemos estado haciendo con efeonce. Hemos mejorado muchísimo en cuanto a las herramientas tecnológicas. Siento que hemos podido gracias a ellos agilizar mucho la carga de trabajo. Espero que a futuro vengan muchísimas cosas grandes y que siempre podamos estar trabajando de la mano.", "who": "Adriana Contreras", "role": "Team SKY" }
+        ],
+        "proofLink": "<a href=\"https://experiencia.efeoncepro.com\">Vea el <strong>primer año completo</strong> con SKY &nbsp;&rarr;</a>"
+      }
+    },
+    {
+      "slideId": "cumplimiento",
+      "contentType": "requirements-table",
+      "slots": {
+        "sectionLabel": "NIVELES DE SERVICIO",
+        "title": "Requisito por requisito, <em>con continuidad operacional</em>",
+        "summary": { "value": "9 de 9", "label": "SLA aceptados con el umbral de las Bases", "detail": "Entrega, correcciones, ad-hoc, SEO, reportes y responsable." },
+        "requirements": [
+          { "kind": "excluyente", "requirement": "Entrega según planificación aprobada", "evidence": "100% dentro de los plazos acordados", "status": "cubierto" },
+          { "kind": "excluyente", "requirement": "Respuesta a observaciones", "evidence": "Máximo 1 día hábil", "status": "cubierto" },
+          { "kind": "puntúa", "requirement": "Entrega de correcciones", "evidence": "Máximo 3 días hábiles", "status": "cubierto" },
+          { "kind": "puntúa", "requirement": "Entrega de contenidos ad-hoc", "evidence": "Hasta 5 días hábiles o plazo acordado", "status": "cubierto" },
+          { "kind": "excluyente", "requirement": "Reporte mensual", "evidence": "Primeros 10 días hábiles del mes siguiente", "status": "cubierto" }
+        ]
+      }
+    },
+    {
+      "slideId": "cierre",
+      "contentType": "back-cover",
+      "slots": {}
+    }
+  ]
+}

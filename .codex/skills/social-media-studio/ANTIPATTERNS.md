@@ -13,6 +13,9 @@
   engagement, Reel para alcance, foto cuando el visual es fuerte, long-form para profundidad.
 - ❌ **Repostear el mismo asset idéntico cross-platform.** Cada red tiene specs, cultura y
   algoritmo propios. ✅ Adapta hook, formato, caption y duración por red.
+- ❌ **Tratar toda pieza social como teaser o todo post como cluster node.** ✅ Una pieza sólo
+  entra al cluster si tiene JTBD propio, valor autónomo, relación gobernada, URL/ID, owner y
+  medición; el resto sigue siendo activación útil.
 - ❌ **Hooks lentos** (>2–3s para enganchar). El test batch te castiga. ✅ Hook visual +
   verbal + textual en el primer segundo.
 
@@ -50,6 +53,8 @@
   Reverifica con WebSearch y marca el `as-of` (ver `SOURCES.md`).
 - ❌ **Prometer resultados con benchmarks inflados.** ✅ Benchmark honesto; degrada la promesa
   antes que mentir.
+- ❌ **Sumar impresiones de Google, feeds y plataformas como "alcance total".** ✅ Separa
+  external search, platform search/recommendation y downstream progress.
 - ❌ **Confundir esta skill con digital-marketing / growth-marketing-cro.** ✅ Respeta el
   boundary (§5 del SKILL + `efeonce/SOCIAL_BOUNDARY.md`): acá es ejecución profunda por red.
 - ❌ **Producir copy de producto Greenhouse acá.** Eso es `greenhouse-ux-writing` +

@@ -3,10 +3,11 @@
 > **SSOT humano de "qué modelos/proveedores están integrados en Globe, en qué carril, y validados
 > cuándo".** Ledger vivo (como `FEATURE_FLAG_STATE_LEDGER.md`). **Léelo ANTES de asumir que un modelo
 > o proveedor "no está" o "hay que integrarlo"** — evita re-descubrir por forense lo que ya está hecho.
-> La verdad live de la promoción a producción es `globe.production-routing` + `globe.model-readiness.*`
-> (runtime); este doc es el mapa legible que las reconcilia.
+> La verdad live de disponibilidad para consumidores es `globe.producer.fleet.list`; la promoción se
+> sustenta en `globe.production-routing` + `globe.model-readiness.*`. Este documento es el mapa
+> legible que reconcilia ambas autoridades.
 >
-> **Creado:** 2026-07-24 (TASK-1553). **Última actualización:** 2026-07-24.
+> **Creado:** 2026-07-24 (TASK-1553). **Última actualización:** 2026-08-05.
 > **Contrato técnico:** `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md`,
 > `EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md`, `EFEONCE_GLOBE_ROUTE_BASED_MODEL_RESOLUTION_DECISION_V1.md` (ADR-013).
 
@@ -26,7 +27,8 @@ solo el Lab. La foundation de selección multi-modelo es ADR-013 (resolución po
 
 ## Fleet — estado por ruta/modelo
 
-Backbone = `PRODUCER_ROUTE_CATALOG` (`packages/domain/src/producer-catalog.ts`, `v1.3.0`). El nombre público
+Backbone = `PRODUCER_ROUTE_CATALOG` (`packages/domain/src/producer-catalog.ts`, runtime observado `v1.7.0`; este
+ledger conserva referencias históricas `v1.3.0`). El nombre público
 del modelo es señal de calidad (ADR-003); el slug de wire vive solo en el adapter/binding.
 
 Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (dependencia externa) · ⏳ pendiente.
@@ -34,22 +36,76 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 | Ruta (routeId) | Modelo público | Proveedor (slug wire) | Capacidad | Lab | Prod. gobernada | Gate / nota |
 |---|---|---|---|---|---|---|
 | `ref/still/rrss-v1` | Seedream · 5 Pro | Fal (`bytedance/seedream/v5/pro/text-to-image`) | image-generate | ✅ 07-19 | ✅ driver Fal | default vivo de imagen |
-| `ref/still/reference-v1` | Seedream · 5 Pro Edit | Fal (`…/v5/pro/edit`) | image-edit | ✅ 07-19 | ✅ driver Fal | — |
-| `ref/still/nanobanana-pro-v1` | Nano Banana · Pro | Vertex (`gemini-3-pro-image`) | image-generate | ✅ 07-24 | 🟢 canary verde 07-24; **promoción ADR-009 ⏳** | región `global`; driver gobernado `9b62b19` |
-| `ref/still/openai-v2` | GPT Image · 2 | OpenAI (`gpt-image-2`) | image-generate | ✅ 07-24 | 🔒 sin lane de producción | falta verifier OpenAI (`governed-production-composition.ts`) |
-| `ref/still/openai-v1-5` | GPT Image · 1.5 | OpenAI (`gpt-image-1.5`) | image-generate | ✅ 07-24 | 🔒 sin lane de producción | idem; slug a reverificar en canary |
+| `ref/still/reference-v1` | Seedream · 5 Pro Edit | Fal (`…/v5/pro/edit`) | image-edit | ✅ 07-19 | ✅ promoción sellada 08-05 (`canary_passed`) | reader live **`available`**; **única ruta de `operation: edit`** del catálogo; `promotion_4265dd26…`, run `b811d5fc…`, 10 cr = 10 cr |
+| `ref/still/nanobanana-pro-v1` | Nano Banana · Pro | Vertex (`gemini-3-pro-image`) | image-generate | ✅ 07-24 | ✅ driver + promoción gobernada 07-30 | región `global`; selector live `Disponible`; revisión `896a0620` |
+| `ref/still/nanobanana-2-v1` | Nano Banana · 2 | Vertex (`gemini-3.1-flash-image`) | image-generate | ✅ 07-30 | ✅ driver + promoción + generación UI real 07-30 | run UI `ce06f8b4-ebe9-43b6-9d47-8e4cc901f49a`; 10 créditos |
+| `ref/still/openai-v2` | GPT Image · 2 | OpenAI (`gpt-image-2`) | image-generate | ✅ 07-24 | ✅ driver + promoción + canary real 07-30 | run UI `a81c8049-7772-4933-82f2-1e2e59e5121c`; 14 créditos |
+| `ref/still/openai-v1-5` | GPT Image · 1.5 | OpenAI (`gpt-image-1.5`) | image-generate | ✅ 07-24 | ✅ driver + promoción + canary real gobernado 07-30 | run UI `bf8cd62b-e2d7-4e83-981a-7631a14a5d3a`; 10 créditos |
 | `ref/motion/loop-v1` | Seedance · 2.0 | Fal | video-generate | ✅ 07-19 | ✅ driver Fal | — |
-| `ref/motion/reference-v1` | Gemini Omni Flash · Preview | Vertex (Omni, Interactions API) | video-generate | ✅ 07-20 (40cr) | ⏳ **solo Lab** — Omni NO está en el path gobernado | ver "Delta" abajo |
-| `ref/video/frames-v1` | Veo · 2.0 | Vertex (`veo-…:predictLongRunning`) | video-frames | ✅ 07-20 (MP4 real, 32cr) | ✅ driver Veo gobernado (`vertex-video`, `us-central1`) desde 07-22 | — |
-| `ref/video/motion-v1` | Seedance · 2.0 | Fal | video-motion-control | ✅ 07-19 | ✅ driver Fal | — |
+| `ref/motion/reference-v1` | Gemini Omni Flash · Preview | Vertex (Omni, `vertex.omni.reference-to-video`, `global`) | video-generate | ✅ evaluación retenida (40cr) | 🟢 canary sellado 08-04 | `promotion_1a5d117e…` `canary_passed` rev. 9; run `74ea0dec…`, governance `eligible` |
+| `ref/video/frames-v1` | Veo · 3.1 | Vertex (`veo-3.1-generate-001`, `vertex.veo.frames`, `us-central1`) | video-frames | ✅ 07-20 (MP4 real, 32cr) | 🟢 canary sellado 08-04 | `promotion_ddd0977c…` `canary_passed` rev. 9 (terminal); run `d2788195…`, 32cr = 32cr, governance `eligible`; **canary por carril gobernado, no desde la UI** |
+| `ref/video/motion-v1` | Seedance · 2.0 | Fal | video-motion-control | ✅ evaluación/report 08-01 | 🟢 canary real gobernado 08-02 | TASK-1614 cerrada: run `bbe6dfff…`, output MP4 retenido, 16 créditos, `canary_passed` |
 | `ref/audio/foley-v1` | Seed Audio | Fal | audio-generate | ✅ 07-19 | ✅ driver Fal | atestación comercial firmada |
 | `ref/voice/tts-v1` | ElevenLabs · Multilingual v2 | ElevenLabs | speech-synthesize | ✅ 07-19 | ✅ driver Fal | — |
 | `ref/voice/change-v1` | ElevenLabs · Voice Changer | ElevenLabs | audio-change-voice | ✅ 07-20 | ✅ | — |
 | `ref/voice/translate-v1` | ElevenLabs · Dubbing | ElevenLabs | audio-translate | ✅ 07-20 | ✅ | — |
-| `ref/still/nanobanana-2-v1` | Nano Banana · 2 | Vertex (`gemini-3.1-flash-image`) | image-generate | 🔒 404 | 🔒 | **allowlist de Google pendiente**; ruta creada 07-25 (TASK-1555) para que la flota sea visible |
-| `ref/still/vector-v1` | Recraft · v4.1 | Fal (`fal-ai/recraft/v4.1/text-to-vector`) | image-vectorize | ✅ 07-19 | ⏳ sin lane | ruta creada 07-25; vectoriza desde TEXTO (`requiresInput: false`) |
+| `ref/still/vector-v1` | Recraft · v4.1 | Fal (`fal-ai/recraft/v4.1/text-to-vector`) | image-vectorize | ✅ 07-19 | ✅ driver + promoción + generación UI real 07-30 | run UI `b5631c86-707a-41d9-8ecc-ef61caa8200c`; SVG retenido; 4 créditos |
 | `ref/still/upscale-v1` | Topaz · Upscale | Fal (`fal-ai/topaz/upscale/image`) | image-upscale | ✅ 07-19 | ⏳ sin lane | ruta creada 07-25; exige 1 imagen de origen |
 | `ref/video/upscale-v1` | Topaz · Upscale | Fal (`fal-ai/topaz/upscale/video`) | video-upscale | ✅ 07-19 | ⏳ sin lane | ruta creada 07-25; exige 1 video de origen |
+
+## Identidades exactas de imagen auditadas (2026-08-04)
+
+Las fichas machine-readable enlazadas por la skill compartida son [`GPT Image 2`](../../architecture/creative-studio/model-fleet/routes/GPT_IMAGE_2_IMAGE_ROUTE_CARD_V1.json),
+[`Seedream 5 Pro`](../../architecture/creative-studio/model-fleet/routes/SEEDREAM_5_PRO_IMAGE_ROUTE_CARD_V1.json),
+[`Nano Banana 2`](../../architecture/creative-studio/model-fleet/routes/NANO_BANANA_2_IMAGE_ROUTE_CARD_V1.json) y
+[`Nano Banana Pro`](../../architecture/creative-studio/model-fleet/routes/NANO_BANANA_PRO_IMAGE_ROUTE_CARD_V1.json). La identidad de implementación completa
+es `routeId + capability + provider + model + version/endpoint + region + completionDriver`; el nombre comercial no sustituye el tuple.
+
+- “Imagen 2 de ChatGPT” corresponde a **GPT Image 2**: `ref/still/openai-v2` / OpenAI / `gpt-image-2` / `2026-04-21` /
+  `openai.gpt-image-2` / `us-central1` / `poll`. Globe expone generación prompt-only con PNG; `/v1/images/edits` queda fuera
+  hasta implementar un transporte multipart y una ruta gobernada propia.
+- Seedream generación: `ref/still/rrss-v1` / Fal / `seedream-5-pro` / `v5-pro` / `fal.seedream.text-to-image` /
+  `us-central1` / `webhook-and-poll`, **available**. Seedream edición: `ref/still/reference-v1` / Fal /
+  `seedream-5-pro-edit` / `v5-pro` / `fal.seedream.edit` / `us-central1` / `webhook-and-poll`, contrato
+  `preserve-set`, **available** desde el 2026-08-05: promoción sellada end-to-end y confirmada por readback live
+  del reader. Es la **única ruta del catálogo con `operation: 'edit'`**.
+- Nano Banana Pro: `ref/still/nanobanana-pro-v1` / Vertex / `gemini-3-pro-image` / `preview` /
+  `vertex.gemini.image` / `global` / `poll`, **available**. El lookup más reciente del circuito devolvió `not_found`;
+  no se debe gastar ni reintentar a ciegas hasta reconciliarlo.
+- Nano Banana 2: `ref/still/nanobanana-2-v1` / Vertex / `gemini-3.1-flash-image` / `preview` /
+  `vertex.gemini.image.flash` / `global` / `poll`, **available**. El endpoint global y el canary UI real son parte de la
+  evidencia; no debe reemplazarse por `gemini-2.5-flash-image` ni por el modelo Pro.
+- Google `imagen-2` no aparece como routeId, modelo, endpoint o adapter de Globe. No crear una ficha de integración para
+  esa familia; si el pedido usa ese nombre, confirmar primero si se refiere a GPT Image 2.
+- Seedream 5 Lite, edición Nano Banana y video-to-image de Nano Banana existen como superficies de proveedor o seams
+  genéricos, pero no tienen ruta pública, binding, canary y readback propios. No son variantes conectadas del Producer.
+
+> ⛔ **Superado el 2026-08-05 (TASK-1641).** El edit de Seedream **ya no está `gated`**: se promovió end-to-end
+> y el readback live del reader lo devuelve `available`. Lo que sigue vigente del párrafo original es la **regla**,
+> no el estado: el reader manda sobre este ledger, y esta fila se actualiza cuando exista un nuevo binding/circuit
+> readback — nunca por una edición del catálogo ni por una afirmación del proveedor.
+
+## Identidades exactas de video auditadas (2026-08-04)
+
+Las fichas machine-readable enlazadas por la skill compartida son [`Omni`](../../architecture/creative-studio/model-fleet/routes/GEMINI_OMNI_VIDEO_ROUTE_CARD_V1.json),
+[`Veo 3.1`](../../architecture/creative-studio/model-fleet/routes/VEO_3_1_VIDEO_ROUTE_CARD_V1.json) y
+[`Seedance 2.0`](../../architecture/creative-studio/model-fleet/routes/SEEDANCE_2_VIDEO_ROUTE_CARD_V1.json). La auditoría del runtime deja estas
+identidades, que no deben colapsarse por nombre comercial:
+
+- Seedance estándar: `bytedance/seedance-2.0/text-to-video`, modelo `seedance-2.0`, ruta pública
+  `ref/motion/loop-v1`.
+- Seedance R2V: `bytedance/seedance-2.0/reference-to-video`, modelo `seedance-2.0-r2v`, ruta pública
+  `ref/video/motion-v1`.
+- Seedance Mini/I2V: `bytedance/seedance-2.0/mini/image-to-video`, modelo interno `seedance-2.0-i2v`, solo en el
+  adapter Fal para `video-extend`. El proveedor lo ofrece, pero Globe no tiene `routeId` público, binding gobernado,
+  canary ni disponibilidad para esa superficie; **no es el Seedance que muestra la ruta pública 2.0**.
+- Veo gobernado: `veo-3.1-generate-001` `3.1` en `ref/video/frames-v1`. El adapter genérico también contiene
+  `veo-3.1-fast-generate-001` `3.1-fast`, pero Fast no tiene ruta pública ni binding gobernado en este ledger.
+- Omni gobernado: `gemini-omni-flash-preview` `preview` en `ref/motion/reference-v1`; el contrato público de Globe
+  limita la ruta a referencias de imagen aunque la documentación del proveedor describa una superficie más amplia.
+
+`video-extend` sigue sin ruta pública y las fichas no sustituyen `globe.producer.fleet.list`; la disponibilidad debe
+leerse siempre desde el reader live.
 
 > **Delta 2026-07-25 (TASK-1555):** Recraft y Topaz **ya tienen ruta pública** (arriba) — antes estaban
 > integrados y verificados en vivo pero eran **invisibles en el Producer**, porque sin ruta ninguna
@@ -68,14 +124,219 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 | 2026-07-22 | (`284eba6`) | **Nace el path de producción gobernado** — driver Veo (`vertex-video`) + Fal; región `us-central1` |
 | 2026-07-24 | TASK-1535 | Upgrade frontier: `gemini-2.5-flash-image` → **`gemini-3-pro-image`** (Nano Banana Pro); probe directo 200 / 1.23 MB @ `global`; adapter OpenAI GPT Image (Lab) |
 | 2026-07-24 | TASK-1553 | **Catálogo multi-modelo `v1.3.0` + resolución por-ruta (ADR-013)**; **driver Vertex-imagen gobernado** (`9b62b19`) + endpoint `global`; **canary real verde** |
+| 2026-07-30 | TASK-1553 | **Nano Banana Pro promovido** con revisión humana, readiness y binding gobernados; selector live `Disponible` |
+| 2026-07-30 | TASK-1553 | **GPT Image 2 + 1.5 promovidos** mediante el driver oficial OpenAI Images; generaciones reales desde Producer |
+| 2026-07-30 | TASK-1553 | **Nano Banana 2 promovido** tras despejar el allowlist; generación UI real y recuperación idempotente del mismo run después del fix `1fb5728` |
+| 2026-07-30 | TASK-1553 | **Recraft v4.1 promovido**; contrato SVG, evaluación/revisión/derechos, binding/readiness/circuito y generación real desde Producer; fix fail-closed `84d6a8e` |
+| 2026-08-01 | TASK-1614 | Seedance R2V: evaluación/report, governance, atestación, readiness y policy productiva completos |
+| 2026-08-02 | TASK-1614 | Canary nuevo gobernado verde: run `bbe6dfff…`, attempt `7bb11342…`, output SHA `93adbf46…`, 16 créditos, governance elegible y `canary_passed` |
+| 2026-08-02 | TASK-1504 | Gemini Omni: driver gobernado integrado en `62337b483`; fix de idempotencia en `fa286db`; evaluación de 40 créditos retenida, binding habilitado y readiness promovido; circuito aún abierto y canary final pendiente |
+| 2026-08-02 | TASK-1504 | API/worker desplegados desde `fa286db`; policy `arp_8090d31a…` releída con atestación corregida; saga `promotion_922157fa…` activada rev. 7; canary bloqueado por `Elementos` deshabilitado en Producer, sin gasto |
+| 2026-08-04 | TASK-1641 | Despliegue `38c528d` (API rev. `globe-api-internal-00211-8sp`, worker digest `sha256:14b80d2f…` tag `38c528d27b9a`) + migración `0050`: la vista `generated_asset_rights_authority_effective` pasa a 16 columnas |
+| 2026-08-04 | TASK-1641 | **Gemini Omni sellado:** `promotion_1a5d117e…` `canary_passed` rev. 9; run `74ea0dec…`, attempt `4f4ba0b4…`, output `sha256:2c3370a9…`, governance `eligible` |
+| 2026-08-04 | TASK-1641 | **Veo 3.1 sellado:** `promotion_ddd0977c…` `canary_passed` rev. 9 (terminal); run `d2788195…`, attempt `68a75b70…`, output `sha256:3a49d5ba…`, governance `eligible`, 32cr = 32cr. El canary se produjo por el **carril gobernado** (`globe.lab.experiment.estimate` → `prepare` → `execute`), no desde la UI: los dos caminos de entrada de referencia del Producer siguen rotos |
 
-## Evidencia de canary — Nano Banana Pro (gobernado, TASK-1553, 2026-07-24)
+## Evidencia Seedance R2V — canary gobernado verde (actualizado 2026-08-02)
+
+- Identidad exacta: `ref/video/motion-v1 / fal / seedance-2.0-r2v / 2.0`. Policy
+  `seedance-r2v-evaluation` v2, `purpose=evaluation`, `appliesTo=derived`.
+- Fuente canónica private-ingested: `asset_6e9c95d3-7b94-473d-b91a-00f8b35d9eec`, `video/mp4`, 773.219 bytes,
+  SHA-256 `69cbc966999963ed2959c9adedf409560097dce06700d4fe5c9719292a392509`, retención `working-30d` hasta
+  `2026-08-30T23:27:57.776Z`. Governance quedó elegible después del rollout/replay durable.
+- Evaluación `eval_16272c31b11f75be3e0369870f89746b`, attempt
+  `9361550f-6ce3-456d-b710-d5cd3ded6217`: reporte `candidate_ready`, output retenido
+  `sha256:58cc144e0092dbbcd585bdaff44046c7df83df6071ba32bcfc3e05191b28be41`. Fal no se repitió.
+- PRs `#74…#82` cerraron authority revision, scheduler lifecycle/recovery, replay de derived rights y grant mínimo
+  del report writer. Migraciones hasta `0042`, API, worker y Asset Governance están aplicados; Studio no se desplegó.
+- Atestación `mcra_abf61584-46b2-4aa1-adb5-1374d46a6966`, revisión
+  `review_8561c3a9-67ed-4a51-a777-5d7d98746d9f`, readiness
+  `readiness:3fec1f4037aad02f6eb07f471bc7c949`, policy productiva
+  `arp_77a9a0efe8b3f6d3d66a635bfcb05fba2e5268e07baa637ad1bfbe829a301dc4` siguen vigentes. La saga antigua
+  `promotion_4bda2e0f-6264-4633-a370-4aecf5deaa1a` expiró y se recuperó fail-closed. La nueva
+  `promotion_557d4df1-994e-45ac-92f7-7ef885aa967e` quedó `activated` revision 7; binding revision 5 habilitado y
+  circuito revision 5 cerrado (`30733163802`, `30733188021`, `30733212704`, `30733239029`).
+- El Producer autenticado seleccionó **Video → Movimiento/control cámara → Seedance 2.0** y generó exactamente una
+  pieza nueva. Run `bbe6dfff-41df-4569-95ef-07c51d555b97`, attempt `7bb11342-f0cd-4265-8c15-0c429617e1ae`, ambos
+  `completed`, `providerAccepted=true`, un solo cobro de 16 créditos. Output `video/mp4`, 788624 bytes, SHA
+  `sha256:93adbf46c85efecd1ad51e7ebbc577cec21c23055ad3e250c876638a70400a5f`; playback `readyState=4`, duración
+  `4.041667s`, `currentTime 0→~1.699s`, `paused true→false`, `ended=false`, error `null`.
+- Asset Governance readback final: `sourceKind=derived`, parent y ancestor `asset_6e9c95d3-7b94-473d-b91a-00f8b35d9eec`,
+  derechos `verified/derived-internal/parentRights=internal-owned`, scan clean, lifecycle active, elegible true,
+  governance `eligible/terminal=true`, retención `working-30d` hasta `2026-09-01T07:51:14.141Z`.
+- Saga `promotion_557d4df1-994e-45ac-92f7-7ef885aa967e` pasó a `canary_passed` rev. 9 mediante workflow
+  `30742268557`, conservando la identidad exacta y `governanceState=eligible`. No se repitió evaluación, provider
+  call ni fondeo. El arreglo de lineage fue append-only; Omni, Seed Audio, Seedance Loop, Veo y Seedream no se tocaron.
+
+## Gemini Omni — checkpoint de promoción TASK-1504 (2026-08-02)
+
+> **Superado el 2026-08-04 (TASK-1641):** el canary quedó sellado bajo la promoción
+> `promotion_1a5d117e-0a0c-4f63-92e7-817a808e0ff3` (`canary_passed`, revisión 9, terminal). Ver *Cierre del
+> canary* al final de esta sección; el bloqueo del modo `Elementos` y la saga `promotion_922157fa…` **ya no
+> describen el estado vigente** y se conservan sólo como trazabilidad.
+
+- Identidad exacta: `ref/motion/reference-v1 / vertex-omni / gemini-omni-flash-preview / preview`. Globe
+  `main@62337b483fd965cd3a518fa1b9d13c7b0ac6d3f4` integra el driver gobernado y la simetría API/worker; CI
+  `30743786928` terminó verde. Los readbacks exactos quedaron verdes en rights `30743848333`,
+  readiness `30743849301`, route `30743850171` y circuit `30743851095`.
+- Ya existe un candidato retenido de 40 créditos: reporte `5f20a731-26e3-423b-b453-f5f0758e160f`, revisión
+  `review_e77b2999-0da9-4eea-9081-3a0068b8a580` y attempt `d68605db-7d33-4ea6-b540-e6063668f3f7`.
+  Binding está habilitado rev. 5 y readiness `promoted` rev. 2; el circuito sigue `open` por
+  `promotion_recovery_canary_unattested`, así que el reader no debe tratar la ruta como `available`.
+- La atestación vigente es `mcra_8c59f455-8704-47b1-9489-26d468f8ff8d`, con `commercialUse=true`,
+  `clientDelivery=true`, `sublicensable=false` y digest
+  `sha256:04e949c5a43564c336d5380362b8cd2515766ee6bc85a736abec94cec7e53d4b`. No reutilizar
+  `mcra_3f32e30a-b4ff-4c34-82b0-7f1a0be4a6e9`: contiene términos genéricos y `sublicensable=true`.
+- Globe `main@fa286dbda0a3c1ce02de7d5a2ab173ba1bf34966` ya corrige la clave de idempotencia de `auto-promote`
+  para incorporar la atestación; el test de corrección de términos quedó verde y CI `30744034457` terminó verde
+  (`check` + `build`). Antes del canary final faltan deploy de API/worker, nueva policy derivada con readback y continuidad
+  de la saga; después se ejecuta exactamente un asset desde Producer con playback, cobro único, retención, lineage,
+  Asset Governance y `canary-confirm`. La evaluación existente no se repite.
+
+### Estado posterior al rollout
+
+- API `globe-api-internal-00187-9ht` y Producer worker quedaron desplegados desde
+  `fa286dbda0a3c1ce02de7d5a2ab173ba1bf34966`; OpenTofu registró `1 add, 2 change, 0 destroy`. La policy
+  `arp_8090d31ae570c016f84cad0f7aee09ba84578f1dbd3622074a38cfa03a839ff5` y los readbacks de rights/readiness/
+  route/circuit terminaron correctamente; la saga quedó `activated` rev. 7 y circuito `closed`.
+- El readback de créditos canónico mostró 784 disponibles y `budget.evaluate.allowed=true`. La sesión Producer
+  autenticada mostró `Gemini Omni Flash · Preview`, pero `Elementos` siguió deshabilitado en dos pestañas con
+  `Todavía no hay un modelo publicado para este modo`. No hay run/attempt/output/cobro/playback/governance ni
+  `canary-confirm`; la ruta permanece no disponible para el ledger hasta que exista el canary gobernado.
+- No se desplegó Studio, no se ejecutó bypass, no se reutilizó el candidato de evaluación y no se repitió la
+  evaluación. Estado: `code complete, rollout pendiente`.
+- El bloqueo no proviene del reader ni del driver: el bundle Studio live (`globe-studio-internal-00133-b9k`,
+  `595f0cb5460e`) deja `MODE_CAPABILITIES.video[3]` en `undefined`, por lo que el filtro del Composer deshabilita
+  `Elementos` aunque Omni figure `Disponible`. Corregir/desplegar Studio queda fuera del alcance autorizado.
+
+### Cierre del canary (2026-08-04, TASK-1641)
+
+- Identidad exacta vigente: `ref/motion/reference-v1 / gemini-omni-flash-preview / preview`, endpoint
+  `vertex.omni.reference-to-video`, región `global`, `completionDriver=poll`.
+- Promoción **`promotion_1a5d117e-0a0c-4f63-92e7-817a808e0ff3`** en **`canary_passed`** revisión 9 (terminal);
+  binding `enabled=true` revisión 10; circuito `closed` revisión 9.
+- Canary: run `74ea0dec-27c5-4d11-94d6-e0d459cfd61e`, attempt `4f4ba0b4-0f4a-49f9-9909-764aeeec940c`, output
+  `sha256:2c3370a9b3c9c804ff505e98dd288c2588628085a2f2f3bb1a86f5271562695d`, governance `eligible`, generado
+  `2026-08-04T20:50:57Z` — **posterior** a la activación de `20:49:43Z`, que es la condición que lo vuelve
+  elegible como canary.
+- Runtime del sello: Globe `main@38c528d`, API rev. `globe-api-internal-00211-8sp`, worker digest
+  `sha256:14b80d2f150b29d25b61862a7bba265da4fbd4bb25c7aa2bd0ae66cb573202d6`, migración `0050` aplicada.
+
+## Veo 3.1 — frames: promoción sellada (2026-08-04, TASK-1641)
+
+- Identidad exacta: `ref/video/frames-v1 / veo-3.1-generate-001 / 3.1`, endpoint `vertex.veo.frames`, región
+  `us-central1`, `completionDriver=poll`.
+- Promoción **`promotion_ddd0977c-c6e7-4fa6-bd31-61737c108d31`** en **`canary_passed`** revisión 9 (terminal: ya
+  no expira); binding `enabled=true` revisión 11; circuito `closed` revisión 11.
+- Canary: run/experimento `d2788195-3b13-4e33-b4fd-46e91638adc6`, attempt
+  `68a75b70-91dc-4a7e-bd65-0d63dd0942f5`, output
+  `sha256:3a49d5ba1fdfdcc94973ecaf85d8e61d8cea710540e9a694e769e62e3ef17f4b`, governance `eligible`, run creado
+  `2026-08-04T22:45:11Z` — **posterior** a la activación de `22:03:02Z`, como exige `resolveCanary`.
+- Economía exacta: **32 créditos reservados = 32 gastados**, liquidación sin diferencia.
+- Forma de salida usada: 720p, 8 segundos, 16:9, `silent`, `inputMode {kind:'frames', hasEndFrame:false}`. La
+  referencia de primer cuadro fue el output ya gobernado `output:8a5e24ec-0a92-4d9d-b9c8-5d52a37e5e5b:0`
+  (`sha256:b2762b738f45d6dd512cef9dfa0202046a2da9028e9af04d567411e9852093df`, `image/png`), declarado como
+  `authorizedInputs` con `rights: internal-owned`.
+- Sello ejecutado por `globe-operator-lane.yml` `mode=canary-confirm` `lane=checker`, run `30958027741`.
+- Evidencia gobernada del linaje: `rightsEvidenceId`
+  `arp_0bbbb5b5e8c880dd760a32879b505e32fbbe10278c009b0b1412b6dab4f13869:mcra_4da3c2f3-3be4-453d-84fd-b31764537951`
+  (expira 2027-07-31), `reviewId` `review_48829ea4-53c6-42b6-bdec-800714d4ba12`, `proposalId`
+  `readiness:dcc03360bb39d9b132f68d1a7b0c4d84`.
+
+⚠️ **El canary NO se produjo desde la UI del Producer.** Se produjo por el **carril gobernado**, con los commands
+canónicos del spine (`globe.lab.experiment.estimate` → `prepare` → `execute`) sobre el transporte de
+`scripts/producer-ui-canary-lib.mjs`. La promoción está sellada y la ruta habilitada, pero **el Scope 1 de
+TASK-1641 —un canary de ruta arbitraria canónico y committeado— sigue pendiente**.
+
+**Por qué la UI todavía no puede producirlo.** La ruta exige 1-2 referencias de imagen y sus **dos** caminos de
+entrada siguen rotos hoy — el botón «Usar como referencia» del feed no despacha ningún command
+(`ProducerFeedRoute.tsx` cablea `onReference`, `onRecreate`, `onFavorite` y `onDownload` a `() => undefined`), y
+sin referencia el estimado no se calcula:
+
+1. **«Usar como referencia» y «Recrear» en el feed del Producer no despachan ningún command** — cero
+   `POST /v1/commands`, cero consola. **«Añadir a favoritos» en la misma tarjeta sí registra**, así que el
+   defecto está acotado a esos dos controles y no al overlay.
+2. **La subida ingesta, pero Asset Governance falla en `inspecting` con `dependency_unavailable`** tras 5
+   intentos. Assets: `asset_f861b971-4a6b-44eb-afc0-95623718131b`, `asset_86670e74-c71f-498a-9727-92d2f9a60461`.
+
+⚠️ **Límite declarado del segundo hallazgo:** el ingest se disparó con un `File` sintético desde el browser.
+**Antes de tratarlo como defecto de plataforma hay que reproducirlo con una subida real por el selector de
+archivos.**
+
+> **Límite TASK-1632:** el wake desde completion de provider hacia finalización de Producer y Asset Governance es
+> un handoff interno de Globe, actualmente diseñado pero aún no implementado. No cambia este ledger de promoción,
+> Greenhouse no participa y TASK-1475 conserva cualquier proyección cross-product futura.
+
+## Evidencia de Nano Banana Pro — canary y promoción gobernada
 
 - Modelo `gemini-3-pro-image`, ruta `ref/still/nanobanana-pro-v1`, región `global`.
 - Experimento `a258dda8-ea6e-4a34-94f0-4cd9ca301d17`; gasto **10 créditos**.
 - Output `image/png`, **1,111,472 bytes**, SHA-256 `9e9edaf59cb927610d043e3af3cac9b90c321ed48e55eb34ec0300c72dc429cf`.
 - API + worker restaurados a `GLOBE_LAB_PROVIDER=composite`; break-glass IAM revocado (readback limpio).
-- Driver gobernado desplegado en `9b62b19`. **Falta:** ADR-009 (promover binding/readiness + readback de identidad `binding.modelId == estimate.model == readiness.route.modelId`) para que sea entregable a cliente.
+- Driver gobernado desplegado en `9b62b19`.
+- El 2026-07-30 se firmó la revisión humana desde el Producer autenticado; readiness quedó
+  `promoted`, el binding de producción `enabled` y el selector live pasó a `Disponible`.
+- El baseline del 2026-07-24, cuando el reader aún devolvía `gated/not_promoted`, queda supersedido
+  por este readback. No existe un pendiente de promoción de Nano Banana Pro dentro de TASK-1553.
+
+## Evidencia de promoción OpenAI — GPT Image 2 y 1.5 (2026-07-30)
+
+- Globe `main` quedó en `2b75272c49e05810bb37b1172f16daabedfd18ae`. CI
+  `30559712670`, API `30559850637` y worker `30560124218` terminaron `success`; API y worker
+  verificaron el SHA/digest desplegado.
+- El driver gobernado usa la API oficial de OpenAI Images. El compiler resuelve antes del gasto la
+  política comercial vigente por la identidad completa de la ruta y la fija en el snapshot; el asset
+  hereda esa versión inmutable. Esto corrige el rechazo
+  `generated_rights_policy_missing_or_expired` sin relajar la gobernanza.
+- GPT Image 2 generó desde el Producer autenticado el run
+  `a81c8049-7772-4933-82f2-1e2e59e5121c`, `image/png`, 14 créditos, y quedó `Listo`.
+- GPT Image 1.5 se promovió mediante la operación
+  `promotion_6d1ff645-2e1a-42c1-85b5-02d2ba3f696b`. La generación nueva desde el Producer
+  autenticado fue `bf8cd62b-e2d7-4e83-981a-7631a14a5d3a`, `image/png`, 10 créditos. El asset pasó
+  inspección, malware, provenance/C2PA y derechos; la UI habilitó `Ver candidato` y `Descargar`. El
+  checker confirmó el canary en el run `30561393336`.
+- El reader live de `greenhouse-org:efeonce` devuelve simultáneamente `available` para Seedream 5 Pro,
+  Nano Banana Pro, Nano Banana 2, GPT Image 2 y GPT Image 1.5.
+- Capturas: [`evidence/2026-07-30/README.md`](evidence/2026-07-30/README.md).
+
+## Evidencia de promoción Vertex — Nano Banana 2 (2026-07-30)
+
+- Un probe autenticado al endpoint oficial
+  `global/publishers/google/models/gemini-3.1-flash-image:generateContent` devolvió HTTP 200; el 404
+  histórico de allowlist dejó de representar el runtime.
+- Globe añadió el driver/ruta gobernada y rates estándar/HD en `f143936`; la migración `0034` quedó
+  aplicada. CI `30561907019`, migración `30562256644`, API `30562323309`, worker
+  `30562758591` y Studio `30562845688` terminaron `success`.
+- Evaluación exacta: reporte `51818214-863d-4542-8e9b-eb50c1cb5be9`, experimento
+  `82e3f630-63e8-4c59-a629-8ea670c79dd7`, 5/5 checks objetivos, `image/png`,
+  SHA-256 `aa3268e81afbd1ef3cd7794426500881abb6abd63b92569d0050107af5551b5e` y 10 créditos.
+- La revisión humana quedó firmada como
+  `review_8ce9fa89-b566-4d51-b150-1d83fce0dec6`; la atestación comercial es
+  `mcra_4a15625c-0186-4d01-bae1-472071c38e4d`. Readiness, binding y circuito se promovieron por
+  el operador canónico (`30564131652`, `30564134009`, `30564136579`, `30564202157`).
+- La prueba final se inició desde el Producer autenticado como Julio Reyes: run
+  `ce06f8b4-ebe9-43b6-9d47-8e4cc901f49a`, ruta exacta `ref/still/nanobanana-2-v1`, 10 créditos.
+  El smoke expuso un off-by-one en la reconstrucción del hash durable de Vertex; `1fb57285` lo
+  corrigió con regresión focal y el worker deploy `30565166238` recuperó el mismo run
+  idempotentemente, sin una segunda generación ni un segundo cobro. La UI mostró `Listo`; output
+  `image/png`, SHA-256 `b8a0eb45289558a2cb99e9989fa401aa794035c709505b10c58fba34e0768c1e`.
+
+## Evidencia de promoción Fal — Recraft v4.1 Vector (2026-07-30)
+
+- Ruta `ref/still/vector-v1`, endpoint `fal.recraft.text-to-vector`, modelo
+  `recraft-v4.1-vector`, versión `v4.1`, región `us-central1`.
+- Evaluación exacta: reporte `19504a56-3e70-43f5-a86a-bbc425312cd0`, experimento
+  `a11692b1-3241-434f-8949-8cb4fc1b63b6`, 4 créditos, `image/svg+xml` y output retenido.
+- Revisión humana `review_f38176d1-22b0-4639-884b-a1d61c00f5f4`; atestación comercial
+  `mcra_e7d74373-edbc-4de6-abd7-1c0888baa162`.
+- Generación real desde el Producer autenticado:
+  `b5631c86-707a-41d9-8ecc-ef61caa8200c`, 4 créditos, `completed/retained`. La UI muestra
+  `Listo`, vista previa SVG, estado `Guardada` y descarga habilitada.
+- El smoke reveló un mismatch de transporte documentado por Fal: el payload declara SVG y el CDN
+  responde `application/octet-stream`. Globe `84d6a8e` conserva fail-closed: sólo admite ese MIME
+  genérico para la salida Recraft esperada, verifica bytes SVG antes del ingest y añade CSP sandbox
+  al servirlos. Worker `30573508938` y ambos servicios internos `30573523066`/`30573523128`
+  terminaron `success`.
+- Captura autenticada: [`evidence/2026-07-30/globe-recraft-v4-1-real-generation.png`](evidence/2026-07-30/globe-recraft-v4-1-real-generation.png).
 
 ## El reader es el SoT *live* de disponibilidad (TASK-1554, cerrada 2026-07-25)
 
@@ -104,6 +365,12 @@ Manual: [operar la flota](../../manual-de-uso/creative-studio/operar-flota-model
 
 ## Consumers vivos de la flota
 
+- **Efeonce MCP Gateway (2026-08-01)** — `https://mcp.efeonce.org/mcp` consulta el reader canónico a través de
+  la tool `globe.producer.fleet.list`. Está limitado al workspace interno `greenhouse-org:efeonce` y a
+  `globe.producer.catalog.read`; no permite elegir workspace ni accede a runs, assets, review, delivery, créditos,
+  house, provider slug, costo de vendor o margen. El OAuth actual es internal-only: antes de cualquier cliente
+  externo debe existir entitlement B2B por tenant/capability y un canary con identidad base-only realmente
+  denegada para Globe.
 - **Producer Model Selector (TASK-1555, `efeonce-globe` `0258534`)** — la región **"Modelo"** del
   composer renderiza un **desplegable con el isotipo real de cada modelo** desde
   `globe.producer.fleet.list`. Lista **toda la flota de la modalidad activa** con su `availability`
@@ -112,48 +379,43 @@ Manual: [operar la flota](../../manual-de-uso/creative-studio/operar-flota-model
   lo declara y **cambia el modo al elegirlos** en vez de esconderlos detrás de un chip.
   Con el catálogo en **v1.4.0** cubre **12 de 14 capacidades**; faltan `model-3d-generate` y
   `video-extend`, ambas sin ruta.
-  **Promover una ruta la vuelve elegible en el Producer sin tocar la UI.** Consecuencia directa: como
-  hoy ninguna ruta de imagen está promovida, el Producer **no ofrece modelo de imagen elegible** hasta
-  que ADR-009 avance — el blocker dejó de ser invisible. `ref/audio/foley-v1` (promovida en el canary
-  ADR-010) sí queda elegible. Cero slug/costo/margen en el DOM.
+  **Promover una ruta la vuelve elegible en el Producer sin tocar la UI.** Hoy seis rutas de imagen
+  están disponibles, incluida Recraft v4.1 para vectorización. Cero slug/costo/margen en el DOM.
 
-## Delta / pendientes conocidos
+## Estado vigente y límites fuera de TASK-1553
 
-- **Gemini Omni en producción gobernada:** hoy Omni está **solo en el Lab**; el path gobernado tiene Fal + Veo + (ahora) Vertex-imagen, **no Omni**. Si `ref/motion/reference-v1` se quiere entregar a cliente, falta su driver gobernado (Interactions API) — análogo a lo que se hizo para Vertex-imagen.
-- **OpenAI (GPT Image 2/1.5):** canarean en el Lab; **sin lane de producción** hasta implementar el verifier oficial.
-- **Nano Banana 2:** espera **allowlist de Google**.
-- **Grant de créditos 409 → `ISSUE-124`:** el comando canónico de administración de créditos devuelve `409 conflict` en un grant adicional pese a pool activo + identidad válida + idempotencia nueva. No bloquea lo hecho (el canary corrió con el budget subido 100→110 + grant de 10). Documentado en `docs/issues/open/ISSUE-124-globe-credit-grant-canonical-409-root-cause-hidden.md` (Codex, 2026-07-24). No se hizo bypass ni mutación directa.
-- **Promoción ADR-009 bloqueada:** la saga de promoción de Nano Banana Pro espera **identidades de readiness firmadas** (paso humano/gobernado). Codex intentó y NO forzó (correcto). Hasta esa firma, todas las rutas siguen `gated/not_promoted` — ningún modelo queda `available` en el reader/selector.
+- **Gemini Omni en producción gobernada:** driver de Interactions API, policy corregida, saga y **canary sellado**
+  (`promotion_1a5d117e…`, `canary_passed` rev. 9, 2026-08-04). El bloqueo de `Elementos` del 08-02 ya no aplica.
+- **Veo 3.1 (`ref/video/frames-v1`):** promoción **sellada** (`promotion_ddd0977c…`, `canary_passed` rev. 9
+  terminal, 2026-08-04), binding habilitado y circuito cerrado. Con esto **las dos rutas de video quedaron
+  promovidas, selladas y habilitadas**. El canary se produjo por el **carril gobernado**, no desde la UI: los dos
+  caminos de entrada de referencia del Producer siguen rotos, así que la generación desde el Producer para rutas
+  con entrada obligatoria continúa bloqueada.
+- **OpenAI (GPT Image 2/1.5):** lane gobernado, promociones y canaries reales completados el 07-30.
+- **Nano Banana 2:** promovido y ejercitado desde el Producer el 07-30; el bloqueo de allowlist quedó retirado.
+- **Recraft v4.1:** promovido y ejercitado desde el Producer el 07-30; SVG retenido y descarga habilitada.
+- **Selector:** el consumer vigente es un desplegable compacto con isotipo real y disponibilidad del
+  reader. La dirección de galería fue rechazada y no forma parte del estado ni del roadmap.
+- **Topaz, Omni, 3D y otras expansiones:** conservan sus propios contratos de modalidad,
+  promociones y canaries. No son trabajo residual de las seis rutas de imagen entregadas por TASK-1553.
+- **Único pendiente de TASK-1553:** receipts transversales que demuestren, por cada ruta promovible,
+  una rate version vigente de TASK-1468 y el onboarding receipt de TASK-1578. Este pendiente no
+  cambia la disponibilidad live de las seis rutas ejercitadas.
 
-## Roadmap → "todos los modelos probados en el Producer"
+## Receta vigente para sumar otra ruta
 
-Meta: que **cada modelo ya validado sea elegible y entregable desde el Producer**, no solo desde el Lab.
-Para llevar una ruta del Lab al Producer hacen falta 4 cosas (las 2 primeras son las que faltan hoy):
+Una identidad nueva repite el mismo control, sin editar el consumer:
 
-1. **Driver gobernado + endpoint allowlist** para su proveedor/capacidad (código, `production-result-drivers.ts` +
-   `governed-production-composition.ts`). Estado: Fal ✅, Veo ✅, Vertex-imagen ✅ (`9b62b19`), **Omni ❌**, **OpenAI ❌**.
-2. **Promoción por ruta (ADR-009)** — binding `enabled` + readiness `promoted` + atestación (ADR-010) + readback de
-   identidad. Estado: pendiente para casi todas; Nano Banana Pro con canary verde, promoción ⏳.
-3. **Selector en la UI del Producer** — `TASK-1552` (consume el catálogo v1.3.0 vía ADR-013 como selector de modelo).
-4. **Gates externos despejados** donde aplique (OpenAI verifier, allowlist Google NB2).
+1. ruta pública + identidad ejecutable por `routeId`;
+2. rate version vigente y binding exacto;
+3. driver y endpoint allowlisted;
+4. evaluación exacta, revisión y atestación comercial;
+5. readiness, binding y circuito promovidos;
+6. readback en `globe.producer.fleet.list`;
+7. canary real desde la UI con estado terminal, gasto, MIME/hash, retención, vista previa y descarga.
 
-**Cola de trabajo concreta (por modelo):**
-
-| Modelo | Qué falta para el Producer | Dueño del paso |
-|---|---|---|
-| Seedream / Seedance / ElevenLabs / Seed Audio (Fal) | solo **promoción ADR-009** por ruta (driver ✅) | Codex/operador (gobernado) |
-| Veo (video) | solo **promoción ADR-009** (driver ✅) | Codex/operador |
-| **Nano Banana Pro** | **promoción ADR-009** (canary ✅, driver ✅, atestación ✅) — el más cercano | Codex/operador |
-| **Gemini Omni** | **construir driver gobernado** (Interactions API) → allowlist → promoción | código (Globe) + Codex |
-| GPT Image 2/1.5 | **verifier de producción OpenAI** (código) → promoción | código (Globe) + Codex |
-| Nano Banana 2 | **allowlist de Google** (externo) → luego ruta + driver + promoción | Google + luego equipo |
-| **Exponer la flota data-driven** | **`TASK-1554` — DESPLEGADO + live-verificado** (`c3b6bf4`, Codex): reader `globe.producer.fleet.list` vivo (availability `available\|gated\|blocked` + `recommendedDefaults`). ✅ dependencia de datos lista | backend-data |
-| **Selector visible (todos)** | **`TASK-1555` — in-progress:** dirección visual ELEGIDA ("Galería de láminas") + wireframe + motion robustos; **Slice 1a (data layer del client) done + typecheck verde** (local `d07a1cd`). Falta: render galería (HTML/CSS/controller) + GVC premium + scorecard 14 dims. `TASK-1552` = jerarquía del composer (distinto) | UI (ui-ux) |
-
-**Secuencia recomendada:** (a) promover las rutas que ya tienen driver (Fal + Veo + Nano Banana Pro) — es el
-camino más corto a "modelos reales elegibles"; (b) construir el driver gobernado de Omni; (c) `TASK-1552`
-para que el selector los exponga; (d) OpenAI verifier + allowlist Google en paralelo. El **409 del grant de
-créditos** (ver Delta) conviene resolverlo antes de la tanda de promociones/canarios para tener headroom de budget.
+El receipt transversal de los pasos anteriores pertenece a TASK-1578; este ledger conserva el estado
+humano y la evidencia, no crea un segundo workflow de onboarding.
 
 ## Cómo mantener este ledger (obligatorio)
 

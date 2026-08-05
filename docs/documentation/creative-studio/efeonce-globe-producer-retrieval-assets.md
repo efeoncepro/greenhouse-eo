@@ -27,7 +27,7 @@ digital de su contenido, y hay **un solo depósito para todos los clientes**. Es
 distintas mezcladas: las **piezas producidas** y los **bytes de las referencias que alguien subió como
 insumo**.
 
-Eso significa que un "servime cualquier archivo del depósito" filtraría dos cosas a la vez: la pieza de otro
+Eso significa que un "sírveme cualquier archivo del depósito" filtraría dos cosas a la vez: la pieza de otro
 cliente y el material de referencia que alguien declaró de forma privada. Y el depósito **no puede** cerrar
 esa puerta, porque no sabe qué archivo es de quién.
 
@@ -35,6 +35,11 @@ Por eso la puerta está en Globe, no en el depósito: cada descarga se autoriza 
 el espacio de trabajo de quien pregunta realmente produjo**.
 
 ## Cómo se comporta
+
+- **La ficha declara el formato REAL de la pieza, no uno por defecto.** Hasta el 2026-08-04 el tipo se adivinaba
+  por modalidad («todo audio es WAV»), y una modalidad admite varios formatos: el motor elige. Los bytes nunca
+  estuvieron mal —el que mentía era el rótulo—, pero un rótulo falso nombra mal la descarga y puede hacer fallar
+  un reproductor **sobre un archivo perfecto**, que es el peor síntoma posible para diagnosticar (`ISSUE-139`).
 
 - **Solo ves lo tuyo.** Una pieza de otro espacio de trabajo responde "no encontrada". No dice "existe pero no
   puedes"; dice exactamente lo mismo que si nunca hubiera existido — porque decir algo distinto ya sería una

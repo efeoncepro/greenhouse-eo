@@ -1,5 +1,13 @@
 # TASK-224 - Finance Document vs Cash Semantic Contract
 
+## Delta 2026-08-02 — Input formal de Finance Core
+
+La separación `documento → devengo → caja` pasa a ser input normativo del `EconomicEvent` de ADR-021. Esta task
+no crea cuentas ni journals propios: entrega el inventario y mappings que la build unit Economic Event +
+Journal-Ready Shadow debe reutilizar para evitar doble reconocimiento de factura, pago y distribución.
+
+Canon nuevo: `docs/architecture/GREENHOUSE_FINANCE_CORE_ACCOUNTING_FOUNDATION_DECISION_V1.md`.
+
 ## Delta 2026-04-03
 
 - Se aplicó un primer slice visible en el repo para dejar de presentar `income` / `expenses` como sinónimo de caja:

@@ -19,7 +19,7 @@
 - Rank: `TBD`
 - Domain: `ui|creative|product`
 - Blocked by: `TASK-1569`
-- Branch: `task/TASK-1570-globe-cinematic-canvas-video-experience`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 
 ## Summary
 

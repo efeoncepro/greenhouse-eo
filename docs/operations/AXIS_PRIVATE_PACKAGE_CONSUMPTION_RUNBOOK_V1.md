@@ -9,6 +9,9 @@ source control.
 ## Current state — 2026-07-30
 
 - Package repository: `efeoncepro/axis-design-system`.
+- Agent-facing visual guide: [`DESIGN.md`](https://github.com/efeoncepro/axis-design-system/blob/main/DESIGN.md), generated from `packages/tokens` and checked with `pnpm design:check` in the AXIS repository. It is a projection for agents, not a second token source of truth.
+- Lab runtime: `apps/lab` is Astro `7.1.6`, `output: 'static'`, public Vercel delivery, and builds to
+  `apps/lab/dist`; its HTML reference consumes AXIS registry/tokens and does not import Greenhouse/Globe adapters.
 - Private packages published at version `0.1.5` (was `0.1.4` until 2026-07-29; the bump corrected
   the `warning`/`danger` token drift and was the first release gated by CI):
   - `@efeoncepro/axis-tokens`

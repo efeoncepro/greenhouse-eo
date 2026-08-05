@@ -1,5 +1,12 @@
 # TASK-1206 — Commercial Q2C Canonical Close Command
 
+## Delta 2026-08-02 — Consumer de Finance Core, no owner contable
+
+El alcance actual se conserva. `closeQuoteToCash` sigue siendo el único owner forward-going de quote →
+contract/client/income/audit/events. Cuando existan `EconomicEvent` y posting eligibility, el command emitirá o
+referenciará esos contracts mediante adapters canónicos; no escribirá journal lines, no calculará CostCards y no
+creará otro ledger. El feedback actual-versus-standard queda downstream del Cost Subledger.
+
 ## Delta 2026-06-21 — runtime gobernado parametrizado ya disponible (TASK-1212)
 
 - TASK-1212 extendió el **runtime de Nexa governed actions a acciones PARAMETRIZADAS** (`NexaActionDefinition<TInput>` + `inputSchema` Zod; `resolveNexaActionProposal`/`confirmNexaAction` ahora parsean + re-validan input; el `propose_action` tool acepta `input`). El close command de esta task debe **reusar ese mismo runtime** (registrar una acción `close_quote`/`convert_to_cash` con su `inputSchema`), NO crear una integración Nexa paralela. Comparte el governed-action surface (dominio `commercial-q2c`) con `author_quote`.

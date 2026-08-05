@@ -48,4 +48,18 @@ describe('resolveOffboardingLane', () => {
     expect(decision.requiresHrDocuments).toBe(true)
     expect(decision.requiresAssetRecovery).toBe(true)
   })
+
+  it('routes international_internal contracts to internal payroll without Chile leave reconciliation', () => {
+    const decision = resolveOffboardingLane({
+      relationshipType: 'employee',
+      contractType: 'international_internal',
+      payRegime: 'international',
+      payrollVia: 'internal',
+      separationType: 'contract_end'
+    })
+
+    expect(decision.ruleLane).toBe('internal_payroll')
+    expect(decision.requiresPayrollClosure).toBe(true)
+    expect(decision.requiresLeaveReconciliation).toBe(false)
+  })
 })

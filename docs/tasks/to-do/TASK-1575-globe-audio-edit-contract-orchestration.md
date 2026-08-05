@@ -19,7 +19,7 @@
 - Rank: `TBD`
 - Domain: `creative|audio|ai`
 - Blocked by: `TASK-1490`, `TASK-1504`, `TASK-1528`, `TASK-1567`; provider lanes additionally `TASK-1576`
-- Branch: `task/TASK-1575-globe-audio-edit-contract-orchestration`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 
 ## Summary

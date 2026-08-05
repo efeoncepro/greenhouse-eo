@@ -331,6 +331,12 @@ jobs:
           # resuelve via secret ref en el worker; el login se inyecta acá como GH secret
           # (enmascarado en logs) y viaja como env plano al worker (el adapter lo lee directo).
           DATAFORSEO_API_LOGIN: ${{ secrets.DATAFORSEO_API_LOGIN }}
+          # TASK-1302 — El materializer GSC es el PRIMER consumer del reader de Search
+          # Console dentro del ops-worker; hasta ahora ese reader sólo corría en Vercel, así
+          # que el worker nunca tuvo su config OAuth. Sin el client id, el reader resuelve
+          # `disabled` y el batch degrada TODAS las orgs en silencio (misma bug class que
+          # ISSUE-113 con Perplexity). El client secret viaja por secret ref, no por acá.
+          GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID }}
 
       - name: Verify deployment health
         run: |

@@ -26,7 +26,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `api`
-- Epic: `optional`
+- Epic: `EPIC-040`
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|public-site|forms`

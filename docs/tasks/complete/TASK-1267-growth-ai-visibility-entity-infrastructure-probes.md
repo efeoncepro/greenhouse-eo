@@ -67,7 +67,7 @@ lo gobierna TASK-1252 (out of scope acá), sin regresión.
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `integration`
-- Epic: `EPIC-020`
+- Epic: `EPIC-021`
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|ai|integrations|reliability`

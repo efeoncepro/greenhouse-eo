@@ -1,5 +1,11 @@
 # TASK-393 — Management Accounting Period Governance, Restatements & Reclassification
 
+## Delta 2026-08-02 — Extensión de TASK-713 sobre Finance Core
+
+Esta task no crea otro store de períodos ni compite con `TASK-713`. Depende del período compartido
+`legal_entity + ledger + period` y del close/snapshot del Cost Subledger; agrega reopen, restatement,
+reclassification, supersede y explainability. La futura General Accounting reutiliza la misma cadena.
+
 ## Delta 2026-04-28 — Subordinada al programa Member Loaded Cost Model
 
 Esta task implementa **§5 Snapshots Inmutables + §6 Period Closing Workflow** del spec canónico `docs/architecture/GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1.md`. La función `closeAccountingPeriod()` y el modelo de restatement aquí descritos son la mecánica concreta para producir y reabrir los snapshots `member_loaded_cost_per_period_snapshot` y `client_full_cost_per_period_snapshot` (Fact 3/4 del modelo dimensional). Scope técnico no cambia.
@@ -18,7 +24,7 @@ Esta task implementa **§5 Snapshots Inmutables + §6 Period Closing Workflow** 
 - Status real: `Diseno estructural`
 - Rank: `TBD`
 - Domain: `finance`
-- Blocked by: `none` (TASK-392 completada — desbloqueada 2026-05-05)
+- Blocked by: `TASK-713 + Finance Core period contract pending registration`
 - Branch: `task/TASK-393-management-accounting-period-governance`
 - Legacy ID: `none`
 - GitHub Issue: `none`

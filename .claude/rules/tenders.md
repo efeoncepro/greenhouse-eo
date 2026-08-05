@@ -55,6 +55,12 @@ explica, no se propone). **El manifest se valida, NO se reescribe** (`.passthrou
 
 **Gates mecánicos del dominio — SIEMPRE al tocarlo:**
 
+- **Gate de cierre de la Proposal:** `pnpm deck:compose` y los PDFs/PNGs bajo `.captures/` son taller
+  local. En un workspace de licitación, conserva `proposal-studio.json` y ejecuta
+  `pnpm tender:canonical-gate <slug>`; solo `status=verified` permite declarar cierre. El gate exige
+  `proposalId`, render job productivo completado, asset versionado `client_facing` y verificación
+  autenticada. Contrato: `docs/commercial/tenders/PROPOSAL_STUDIO_CLOSURE_SCHEMA.md`.
+
 - `pnpm vitest run src/lib/artifact-composer` verde (12+ suites: boundary/composability/geometría/
   brand-pack-sync/gradient-inventory/…).
 - **`pnpm composer:visual-gate` a CERO píxeles** contra el baseline committeado

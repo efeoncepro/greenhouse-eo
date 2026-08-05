@@ -1,9 +1,9 @@
 # Programa AEO / AI Visibility — Estado y Qué Sigue
 
 > **Tipo de documento:** Estado de programa + roadmap operativo (SSOT de "dónde estamos / qué sigue")
-> **Versión:** 1.0
+> **Versión:** 1.2
 > **Creado:** 2026-07-16 por Claude (auditoría multi-agente del programa AEO)
-> **Última actualización:** 2026-07-16
+> **Última actualización:** 2026-08-05 (fin de día) por Claude (Delta (b) reconciliación + continuación del Delta EPIC-022: 6 tasks ejecutadas en el día, camino MCP-first code-complete)
 > **Documentación técnica:** [`../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`](../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 > **Epics que agrupa:** EPIC-020, EPIC-021, EPIC-022, EPIC-023, EPIC-024
 
@@ -13,7 +13,9 @@ Este documento existe para no volver a perder visibilidad de un programa que est
 
 ## Veredicto en una línea
 
-**El motor está terminado y en producción. Lo que falta no es el motor: es la cara (que el cliente/prospecto lo vea) y la operación (el cockpit interno para operarlo como herramienta de venta y de servicio recurrente).** Hoy tienes una máquina cara y bien construida sin las puertas por donde el cliente entra ni el tablero desde donde el operador la maneja.
+**El motor está terminado y en producción. La cara pública también está encendida y el cockpit del operador ya está construido. Lo que falta es evidencia de que el loop cierra, y 10 childs abiertas que el registro del epic nunca contó.**
+
+> ⚠️ **Leer el Delta 2026-08-05 (b) al final ANTES de actuar sobre las §2, §4 y §5.** Ese delta corrige tres cosas que las secciones de abajo declaran mal: (1) `TASK-1276` está `complete`, no `to-do` — el "gap #1" ya no existe; (2) la entrada pública self-serve **está live** en `think.efeoncepro.com/brand-visibility`, verificada en runtime; (3) el conteo "12/13 childs" de EPIC-020 era una ficción contable — el alcance real declarado son **49 childs, 16 abiertas**. Las §2–§5 describen el snapshot del 2026-07-16 y se conservan como historia, no como estado.
 
 ---
 
@@ -72,9 +74,9 @@ Este documento existe para no volver a perder visibilidad de un programa que est
 
 | EPIC | Título | Lifecycle | Lectura |
 |---|---|---|---|
-| **EPIC-020** | Public AI Visibility Lead Magnet Program | `to-do` (spec) · **12/13 childs `complete`** | Solo **`TASK-1246` (H) `in-progress`** bloquea el cierre. El gap real: la cara pública self-serve no está encendida. |
+| **EPIC-020** | Public AI Visibility Lead Magnet Program | `to-do` (spec) · ~~12/13~~ → **49 childs reales: 33 `complete`, 16 abiertas** (reconciliado 2026-08-05) | El "12/13" contaba sólo el denominador original. Cara pública **live**; falta el smoke E2E + 16 childs abiertas. Ver Delta (b). |
 | **EPIC-021** | AEO Brand-Aware Prompt Generation Engine | ✅ `complete` (2026-06-30) | Motor brand-aware live. Follow-up: UI de review del operador (no bloquea). |
-| **EPIC-022** | Growth SEO Module (Search Visibility 360) | `to-do` (diseño) | Módulo SEO clásico, casi todo sin construir. Único avance: GSC multi-tenant (`TASK-1282`, `in-progress`, Berel conectado en staging). Bloqueador fundacional `TASK-1299` (schema) sin empezar. |
+| **EPIC-022** | Growth SEO Module (Search Visibility 360) | 🚧 en ejecución (2026-08-05) · **6/22 childs con avance: 5 `complete` + `TASK-1645` code-complete** | Ejecutó 6 tasks el 2026-08-05: `TASK-1299` (schema) + `TASK-1301` (capabilities + entitlement + chokepoint) + `TASK-1300` (DataForSEO family registry) + `TASK-1302` (GSC materializer, **rollout live**) + `TASK-1305` (quadrant SEO↔AEO con primer cruce real) `complete`; `TASK-1645` (lane ecosystem + 3 MCP tools) code-complete con cutover pendiente. `TASK-1647` nueva (federación gateway). Prioridad **MCP-first**. Ver Delta 2026-08-05 (continuación fin de día). |
 | **EPIC-023** | Growth CTA & Popup CRO Engine | `to-do` | Adyacente. Vertical-slice ancla = follow-up CTA del reporte AI Visibility en Think. No arrancado. |
 | **EPIC-024** | HubSpot Portal Grader | `to-do` | Segundo lead magnet (motor en Kortex). No arrancado; childs desde `TASK-1353`. Fase 2 (OAuth) depende del cutover prod de Kortex. |
 
@@ -90,7 +92,7 @@ Este documento existe para no volver a perder visibilidad de un programa que est
 |---|---|---|---|
 | `TASK-1246` | (H) Public Launch Readiness + Rollout | Venta pública | **Único freno formal de EPIC-020.** Legal consent + Turnstile + flags + smoke + release. |
 | `TASK-1321` | `/aeo-2/` submit auto-runs grader + emails report | Venta pública | Candidato #1 para cerrar la entrada self-serve. El grader aún no está desplegado en esa ruta. |
-| `TASK-1327` | Public lead magnet landing form embed (Think) | Venta pública | Candidato #2 (landing `brand-visibility`). Sin deploy. |
+| ~~`TASK-1327`~~ | Public lead magnet landing form embed (Think) | Venta pública | ✅ **`complete` 2026-08-05** — la landing está live y verificada en runtime. Su fila en §5 queda como historia. |
 | `TASK-1251` | Growth Forms ↔ Grader convergence | Venta pública | Converge el intake sobre el motor Growth Forms (wiring del self-serve). |
 | `TASK-1270` | Recurring SoV + scheduled re-grade | Operativa cliente | Cadencia recurrente. Staging aplicado; E2E cliente pendiente. |
 | `TASK-1269` | Fix-It Artifacts (JSON-LD / llms.txt / briefs) | Operativa cliente | Entregables accionables del diagnóstico. |
@@ -126,7 +128,7 @@ Ordenado por ratio impacto/esfuerzo, minimizando código nuevo:
 
 **Ola 4 — Cara del cliente contratado.** Promover `/aeo` a item de nav, poblar `organization_id` + entitlement per-ORG, medir el costo del run self-serve (flags `PORTAL_RUN`/`TRIAL` ya ON — vigilar gasto), shippear tiering+trial fuera de mockup, activar re-grade recurrente (`TASK-1270`). En paralelo: segundo caso real de Radiografía + runbook del ciclo AEO recurrente (hoy inexistente; el conocimiento está disperso en 3 skills y 2 manuales).
 
-**Diferido (no bloquea lo anterior):** EPIC-022 (SEO clásico, empezar por `TASK-1299` schema), EPIC-023 (CRO), EPIC-024 (HubSpot Portal Grader).
+**Diferido (no bloquea lo anterior):** EPIC-023 (CRO), EPIC-024 (HubSpot Portal Grader). EPIC-022 dejó de estar diferido: arrancó ejecución el 2026-08-05 con prioridad MCP-first (ver Delta al final).
 
 ---
 
@@ -135,3 +137,114 @@ Ordenado por ratio impacto/esfuerzo, minimizando código nuevo:
 La cabecera de `EPIC-020` y su one-liner en `docs/epics/README.md` describían las child tasks C–M como "planificadas", cuando el lifecycle real (carpeta) las tiene `complete` — el único abierto es `TASK-1246`. Corregido en esta pasada para que el estado sea legible sin re-auditar. Fuente del estado: auditoría multi-agente 2026-07-16 (motor/operabilidad, cara pública, backlog, comercial) + verificación de lifecycle por carpeta.
 
 **Lección de método (2026-07-16):** la primera pasada de este doc fue una auditoría *doc-based* y arrastró el drift del `FEATURE_FLAG_STATE_LEDGER.md`. Al verificar contra runtime, **tres "blockers" reportados resultaron falsos**: flags OFF → en realidad ON (Vercel prod + ops-worker); property HubSpot ausente → existe; DataForSEO `missing_secret` → creds presentes en la revisión activa. Regla: el estado de flags/secrets/properties se verifica en el runtime vivo (`vercel env pull`, `gcloud run services describe`, HubSpot API), **nunca desde el ledger o docs**. El ledger describe el día que se escribió; el runtime describe hoy.
+
+---
+
+## Delta 2026-08-05 — EPIC-022 arrancó ejecución (MCP-first)
+
+Este delta corrige el estado de EPIC-022 (§4 y §6); el resto del doc sigue describiendo el snapshot verificado del 2026-07-16.
+
+- **EPIC-022 pasó de diseño a ejecución.** `TASK-1299` (schema time-series foundation) y `TASK-1301` (capabilities + entitlement per-org + chokepoint) están `complete` al 2026-08-05, con migraciones aplicadas en `greenhouse-pg-dev`, full suite (10076/0) y build de producción verdes. Specs: `docs/tasks/complete/TASK-1299-growth-seo-schema-timeseries-foundation.md` + `docs/tasks/complete/TASK-1301-growth-seo-capabilities-per-org-entitlement.md`.
+- **Contrato durable vivo:** chokepoint canónico `enforceSeoRunEntitlement` (`src/lib/growth/seo/entitlement.ts`) + módulo per-org `seo_v1` en `greenhouse_client_portal.modules`. Ninguna org tiene assignment todavía.
+- **Directivas del operador (2026-08-05):** (1) todo el módulo SEO nace **Full API Parity y usable por MCP** — nueva `TASK-1645` (lane ecosystem + MCP tools, P1) + exit criterion de parity en el epic; (2) **MCP-first**: operar SEO por MCP es la prioridad más alta, la UI va después — Ola B re-ordenada `1301 → 1302 → 1645 → 1300 → 1303 → UI`, con `TASK-1301`/`1302`/`1645` subidas a P1; (3) **destino Wave**: SV360 nace en Greenhouse pero eventualmente se habilita en `wave.efeonce.org` (EPIC-037) — seam de extracción contratado en `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §17.
+- **Pendiente conocido:** `TASK-1302` requiere rollout real de la conexión GSC (`TASK-1282`/`TASK-1283` code-complete sin rollout). *(Superado por la continuación de abajo: el materializer de 1302 quedó live el mismo día; lo que sigue pendiente es la conexión GSC de `efeoncepro.com` en particular.)*
+
+**Continuación fin de día (misma fecha) — el día no terminó en 2 tasks; EPIC-022 ejecutó SEIS:**
+
+- **`TASK-1300` y `TASK-1302` `complete` (otra sesión).** 1300: DataForSEO family registry + ledger de gasto como fuente única. 1302: GSC daily materializer + `readKeywordOpportunities`, **con rollout live** — la serie `greenhouse_growth.seo_gsc_daily` se materializa a diario en el ops-worker.
+- **`TASK-1305` `complete`:** `readSeoAeoGap` + matriz quadrant 360. **Primer quadrant real:** Berel — #1.75 orgánico × AEO 44.5 → cuadrante `riesgo`.
+- **`TASK-1645` code-complete, rollout pendiente:** lane ecosystem `/api/platform/ecosystem/growth/seo/{keyword-opportunities,visibility-360,entitlement}` + 3 MCP tools (`get_seo_keyword_opportunities` / `get_seo_visibility_360` / `get_seo_entitlement`). Falta: smoke e2e HTTP con binding real + `GROWTH_SEO_ENABLED` en Vercel + federación en el gateway.
+- **`TASK-1647` creada:** federación del provider Greenhouse-SEO en `mcp.efeonce.org` (adapter delgado; canaries antes de discovery).
+- **Efeonce provisionada own-brand (dogfooding)** sobre la org canónica `EO-ORG-0007` (Efeonce Group SpA): 4 perfiles grader ligados — **lente AEO ✓, cierra §2.A del programa para la marca propia** —, assignment `seo_v1` `contracted`/`own_brand`, target `efeoncepro.com`; `visibility-360` responde `no_seo_data` honesto hasta conectar GSC. SKY ya tenía su lente AEO ligada. Script: `scripts/growth/provision-efeonce-own-brand-seo.ts`.
+- **Mandatos amarrados como criterio de aceptación:** todo reader SEO futuro expone su MCP tool **en el mismo PR** (escrito en `TASK-1303`/`1304`/`1311`/`1312`/`1313`/`1314`/`1317`); destino Wave contratado en la arquitectura SEO §17.
+- **Pendientes del cutover para operar:** flag `GROWTH_SEO_ENABLED` en Vercel + smoke e2e con binding real (cierre de 1645) · `TASK-1647` (federación gateway) · merge HubSpot de las 2 auto-companies efeonce (`56011409567` / `57099835819`) hacia la canónica · `website_url` de `EO-ORG-0007` por puerta canónica · GSC de `efeoncepro.com` al destrabar `TASK-1282`/`1283`.
+
+**Cierre nocturno (misma fecha, después de lo anterior):** `TASK-1647` quedó **code-complete** — provider `greenhouse-seo` + 3 tools federados en el repo `efeonce-mcp` (main, `a53b77f`+`4870e90`, fail-closed default OFF, scope base `efeonce.mcp.read`, 6 tests + canary e2e committeado), con consumer sister-platform `EO-SPK-0004` + binding `EO-SPB-0004` provisionados en greenhouse (token en Secret Manager `efeonce-mcp-gateway-greenhouse-token`). El **canary e2e se verificó por HTTPS real** (provider del gateway → lane staging → readers → PG): Berel `domainQuadrant=riesgo`, 50 keywords, AEO 44.5 · Efeonce entitlement `contracted` 8/$50 + `no_seo_data` honesto · deny anti-oracle 404. `GROWTH_SEO_ENABLED=true` quedó aplicado en Vercel **staging** (redeploy incluido; el ops-worker ya estaba ON) y Berel quedó provisionada Fase 0 (`cpma-berel-seo-contracted` + target `seot-berel-fase0` → berel.com). **Único bloqueo restante para `mcp.efeonce.org`:** greenhouse PROD no tiene el lane — la secuencia de cierre (release develop→main → flag Vercel prod → env del provider en el gateway + deploy dispatch → smoke por `mcp.efeonce.org`) está documentada en `TASK-1647`.
+
+---
+
+## Delta 2026-08-05 (b) — reconciliación del registro: 27 childs huérfanas + tres correcciones de estado
+
+Este delta es el resultado de un barrido del **corpus completo de tasks** (1.720 archivos en `docs/tasks/{to-do,in-progress,complete}`) buscando trabajo AEO que ningún epic estuviera contando. Supersede lo que digan §2, §4 y §5 sobre estado; esas secciones quedan como snapshot histórico del 2026-07-16.
+
+**Método:** grep de señales AEO sobre todo el corpus (160 archivos candidatos) → diff contra el set registrado (childs de EPIC-020/021/022/023/024 + este doc) → 113 huérfanas candidatas → clasificación por 4 subagentes con evidencia literal → **verificación programática** del campo `Epic:` de cada archivo contra el `## Child Tasks` de su epic declarado. La verificación programática es la que manda: es la que convirtió una impresión ("faltan tasks") en un número.
+
+### Hallazgo 1 — 27 tasks declaran un epic AEO y no están en su lista de hijos
+
+No es que les falte dueño: **se declaran hijas de un epic que no las lista.** El campo `Epic:` de la task y el `## Child Tasks` del epic divergieron sin que nada lo detectara.
+
+| Epic | Huérfanas | Estado |
+|---|---|---|
+| EPIC-020 | 25 → **22** (16 `complete`, 6 abiertas) | ✅ reconciliadas; 3 movidas a su dueño correcto (ver abajo) |
+| EPIC-021 | 1 — `TASK-1390` (fix `ISSUE-120` del pipeline) | ✅ reconciliada |
+| EPIC-022 | 1 — `TASK-1426` (GSC multi-property) | ✅ reconciliada |
+
+**Consecuencia:** el "12/13 childs `complete`" de EPIC-020 era una **ficción contable** — contaba el denominador original (13) e ignoraba las 25 que se declaraban suyas. El alcance real es **49 childs: 33 `complete`, 16 abiertas** (conteo canónico por campo `Epic:`, con paridad verificada). El epic no estaba a una task de cerrar; está a diecisiete.
+
+**Las 6 abiertas reconciliadas de EPIC-020:** `TASK-1336` (contrato submit→`reportToken`) · `TASK-1424`/`1425` (Share of Voice per-motor: foundation + panel) · `TASK-1332`/`1338` (hub Think: icon library + extracción del view-model) · `TASK-1293` (post-flag-rollout hardening, residuo de ops).
+
+### Hallazgo 2 — 10 tasks AEO-core con `Epic: none`
+
+Trabajo AEO real que ningún epic contabilizó nunca. Nueve están `complete` y quedaron registradas como anexo de trazabilidad en EPIC-020: `TASK-1227` (normalization + scoring engine V1), `TASK-1228` (discovery & eval spike), `TASK-1233` (provider Gemini), `TASK-1236` (tendencia temporal), `TASK-1237` (signal enrichment), `TASK-1296` (contrato Turnstile del form AEO), `TASK-1298` (migración `/aeo-2/` a `<greenhouse-form>`), `TASK-1410` (Radiografía AEO), `TASK-1415` (chapter-author de diagnóstico SEO/AEO — su dueño natural es el Tender Proposal Studio).
+
+**La décima está abierta y sin dueño: `TASK-1284`** (conexión GA4 multi-tenant como nueva señal del grader). Es AEO-core, `to-do`, `Epic: none`. **Asignarla a EPIC-020 o a EPIC-022 es una decisión de alcance, no de higiene documental — queda abierta a propósito.**
+
+### Hallazgo 3 — hay AEO dentro de EPIC-022 que este doc no cuenta como AEO
+
+Siete hijas del módulo SEO son AEO de fondo, correctamente registradas en su epic pero invisibles como programa AEO: `TASK-1305` (gap SEO↔AEO), `TASK-1310` (quadrant 360), `TASK-1311` (atribución de citas IA por URL + grounded queries), `TASK-1313` (Visibility 360 unificado por página/cluster), `TASK-1314` (topical authority: ¿la pillar es la que cita la IA?), y el bloque E-E-A-T `TASK-1315`/`1316`/`1317` (extracción de señales, rúbrica de 4 pilares YMYL, scorecard).
+
+**Implicación:** la frontera "EPIC-020 = AEO / EPIC-022 = SEO" no describe la realidad. El eje AEO ya cruza los dos epics; cualquier plan que trate a EPIC-022 como "diferido, es SEO" va a diferir trabajo AEO sin saberlo.
+
+### Hallazgo 4 — 9 tasks AEO-consumer viven en EPIC-019
+
+Landings y ebooks que usan el grader como puente comercial: `TASK-1343` (landing SEO), `TASK-1352` (pillar HubSpot), `TASK-1374`/`1375` (ebook web agéntica), `TASK-1386`/`1387` (ebook Surround Discovery), `TASK-1402` (artículo con citación medida por el grader — dogfooding), `TASK-1411` (stock sourcing, nace del caso SKY), `TASK-1414` (láminas de propuesta). Su dueño correcto **es** EPIC-019; se listan acá sólo para que el programa AEO sepa quién depende de él.
+
+### Tres correcciones de estado
+
+1. **`TASK-1276` está `complete`, no `to-do`.** El cockpit del operador (`/growth/aeo` + facet AEO en Account 360) que §2.B declara "gap #1 de operabilidad interna" **ya está construido**. La § Ola 2 de §6 quedó sin objeto.
+2. **La entrada pública self-serve está LIVE.** Verificado en runtime 2026-08-05: `think.efeoncepro.com/brand-visibility` → HTTP 200 sirviendo el `<greenhouse-form>` gobernado; la definición pública del form responde 200 **en producción** con Turnstile `required` + site key real + `consentPolicyVersion: ai-visibility-grader-consent-v1`. §2.C ("no existe puerta pública donde un prospecto meta su dominio solo") es **stale**. `TASK-1246` dejó de ser "construir el lanzamiento": su residuo es el **smoke E2E** (`submit → run → status → token → informe → email → HubSpot`) y el gate de gobernanza (consent, PII/retención, signals de costo/abuso con tráfico real).
+3. **Ojo con el consent:** la definición publicada del form trae `consent.checkboxes` **vacío**. Hay versión de política pero ningún checkbox renderizado. Puede ser por diseño (aviso implícito) o ser un hueco de cumplimiento — **no lo asumas, confírmalo con el sign-off legal que `TASK-1246` tiene pendiente.**
+
+### Resuelto — nace EPIC-040 (Growth Public Forms Engine)
+
+La decisión quedó tomada el mismo día por el operador: **el motor Growth Forms es dueño de sí mismo, no del AEO.** Se fundó [`EPIC-040`](to-do/EPIC-040-growth-public-forms-engine.md) y el barrido del corpus por señales del motor (`growth forms`, `greenhouse-form`, `form_definition`, `growth.forms`) encontró **21 tasks sin epic dueño** — no las 4 que se veían desde el AEO: `TASK-1229`/`1230`/`1231`/`1232` (foundation), `1256`, `1294`, `1297`, `1318`, `1319` (`complete`), y `1253`, `1254`, `1255`, `1258`, `1259`, `1261`, `1264`, `1295`, `1320`, `1335`, `1342`, `1359` (abiertas). Casi todas con `Epic: none` u `optional`.
+
+**Reasignaciones aplicadas:**
+
+| Task | De | A | Razón |
+|---|---|---|---|
+| `TASK-1335` (CORS/allowlist) | EPIC-020 | **EPIC-040** | Capacidad del motor; el AEO sólo fue su primer consumer. |
+| `TASK-1359` (funnel → GA4) | EPIC-020 | **EPIC-040** | Íd. |
+| `TASK-1326` (control plane Astro multi-repo) | EPIC-020 | **EPIC-019** | Es control plane del sitio público, no AEO. |
+
+**Lo que el AEO conserva son sus propios formularios**, no el motor: `TASK-1251` (convergencia), `1257` (intake nombre), `1263` (gate corporativo del form del grader), `1296` (contrato Turnstile del form AEO), `1298` (migración `/aeo-2/`), `1327` (landing + embed), `1336` (contrato submit→token). `TASK-1293` se queda en EPIC-020 como residuo de ops (su alcance excede al AEO pero incluye sus flags).
+
+**Frontera declarada:** EPIC-040 gobierna el **motor**; EPIC-035 gobierna la **distribución** del bundle; los epics de dominio (020/011/019) son **consumers** y no contienen tasks de motor.
+
+### Falsos positivos descartados
+
+33 de las 113 candidatas eran ruido del grep (landings HubSpot sin relación, careers/ATS, decks, Nexa, composition shell, axis color): `TASK-038`, `830`, `879`, `1089`, `1093`, `1101`, `1110`, `1114`, `1118`, `1123`, `1322`, `1337`, `1345`, `1350`, `1351`, `1358`, `1361`, `1367`, `1369`, `1372`, `1373`, `1392`, `1401`, `1403`, `1404`, `1405`, `1406`, `1417`, `1418`, `1419`, `1420`, `1598`, `1600`.
+
+### Lección de método
+
+El drift anterior (§7) fue **doc vs runtime**. Éste es **doc vs doc**: el campo `Epic:` de una task y el `## Child Tasks` de su epic son dos escrituras independientes que nada reconcilia, así que divergen en silencio y el epic reporta un avance que no es el suyo. Un `12/13 complete` se lee como "casi cerrado" y esconde 25 tasks.
+
+**Regla:** el avance de un epic se calcula cruzando el campo `Epic:` de **todo** el corpus contra su lista de hijos, nunca leyendo la lista sola.
+
+### Gate mecánico implementado — `epic-child-parity`
+
+La regla dejó de depender de que alguien se acuerde. `pnpm epic:lint` incorpora el check **`epic-child-parity`** (`scripts/ci/ops-artifact-lint.mjs`): barre las ~1.720 tasks del corpus, lee el epic que cada una declara en su campo `Epic:` y verifica que su id aparezca en el `## Child Tasks` de ese epic. También detecta tasks que declaran un epic **inexistente**.
+
+**Lo primero que hizo el gate fue probar que el problema es del repo, no del AEO:**
+
+| | |
+|---|---|
+| Epics con drift | **15** |
+| Tasks declaradas y no listadas | **193** |
+| Peores casos | EPIC-028 (89) · EPIC-019 (21) · EPIC-013 (20) · EPIC-007 (14) · EPIC-011 (9) |
+
+Y en la segunda pasada sobre el propio AEO encontró **15 más en EPIC-020** que la reconciliación manual no había visto: declaraban el epic pero sólo aparecían en la **prosa** (secciones de estado, olas, blockers), nunca en la lista. Once eran suyas y se registraron (`TASK-1275`/`1276`/`1287` `complete`; `1251`/`1269`/`1270`/`1281`/`1282`/`1283`/`1330`/`1341` abiertas); cuatro (`TASK-1266`/`1267`/`1279`/`1286`) eran de EPIC-021 con el campo mal y se corrigió el campo.
+
+**Severidad: `warning` por defecto.** Con 193 violaciones preexistentes, hacerlo `error` hoy dejaría `pnpm epic:lint` rojo para todo el mundo por deuda ajena. Se enciende con **`pnpm epic:lint --strict-child-parity`** (exit 1), pensado para (a) verificar un epic recién reconciliado y (b) promoverse a gate de CI cuando el backlog esté limpio.
+
+**Estado tras esta pasada:** `EPIC-020`, `EPIC-021` y `EPIC-040` pasan `--strict-child-parity` limpios. Los otros 12 epics con drift quedan **fuera del alcance de este trabajo**: cada uno necesita el juicio de su dueño para decidir, task por task, si se agrega a la lista o si el campo `Epic:` está mal. No se tocaron a ciegas.

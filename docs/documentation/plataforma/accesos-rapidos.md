@@ -18,7 +18,7 @@ Ahora el panel es real:
 
 - los atajos que ves dependen de tu rol y tus permisos vigentes;
 - los recomendados se eligen por audiencia (admin ve admin primero, finance ve finance primero, cliente externo ve solo "Proyectos");
-- podes agregar y quitar tus propios atajos con el boton `+`;
+- puedes agregar y quitar tus propios atajos con el boton `+`;
 - lo que pineas se guarda y persiste entre sesiones.
 
 ---
@@ -63,7 +63,7 @@ Si el `+` esta deshabilitado, ya pineaste todos los atajos disponibles para tu c
 2. Apoya el cursor sobre el atajo que quieres quitar.
 3. Aparece una `×` arriba a la derecha del tile. Click ahi.
 
-El atajo desaparece. La accion es reversible: podes volver a pinearlo desde el `+`.
+El atajo desaparece. La accion es reversible: puedes volver a pinearlo desde el `+`.
 
 ### Sincronizacion con Home
 

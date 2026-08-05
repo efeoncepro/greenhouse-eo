@@ -18,7 +18,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `command`
-- Epic: `EPIC-020`
+- Epic: `EPIC-021`
 - Status real: `Complete 2026-06-29 — command + Sky trial runtime smoke`
 - Rank: `TBD`
 - Domain: `growth`

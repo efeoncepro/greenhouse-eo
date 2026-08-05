@@ -9,6 +9,19 @@
 
 ---
 
+## Delta 2026-08-05 — Lane ecosystem de Growth SEO (TASK-1645)
+
+El módulo SEO (EPIC-022) suma su lane ecosystem espejo del de Knowledge (TASK-1086), con una
+diferencia deliberada: la autorización no es scope-only sino **entitlement per-org** —
+`/api/platform/ecosystem/growth/seo/{keyword-opportunities,visibility-360,entitlement}` resuelve la
+organización desde el binding (org-scoped manda; `internal` exige `organizationId` como query param)
+y exige el módulo `seo_v1` vigente en `module_assignments` o responde **404 anti-oracle**. Payloads =
+passthrough de los readers canónicos (`readKeywordOpportunities`, `readSeoAeoGap`,
+`resolveSeoEntitlement` como lectura) — cero lógica de dominio en el lane. Consumido por 3 MCP tools
+read-only del server greenhouse (`get_seo_keyword_opportunities`, `get_seo_visibility_360`,
+`get_seo_entitlement`). Federación al gateway `mcp.efeonce.org` = `TASK-1647`. Builder:
+`src/lib/api-platform/resources/ecosystem-growth-seo.ts`.
+
 ## Delta 2026-06-15 — Command & Idempotency Foundation (TASK-655)
 
 Aterriza la capability shared de idempotencia + command audit que §12 y §8.5/§24.3 declaraban como pendiente. Cierra la brecha "writes seguros, idempotentes y auditables" del objetivo RESTful — primer proving ground: el event control plane.

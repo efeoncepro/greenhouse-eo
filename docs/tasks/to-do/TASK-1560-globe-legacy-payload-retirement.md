@@ -23,7 +23,7 @@
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `TASK-1524, TASK-1552, TASK-1558, TASK-1559`
-- Branch: `task/TASK-1560-globe-legacy-payload-retirement`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - GitHub Issue: `TBD`
 
 ## Summary

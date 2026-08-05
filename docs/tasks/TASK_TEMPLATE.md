@@ -54,7 +54,7 @@ Para tasks con impacto backend/data, ver [`TASK_BACKEND_DATA_ADDENDUM.md`](TASK_
 - Rank: `TBD`
 - Domain: `[finance|hr|platform|identity|ui|data|ops|content|crm|delivery|agency]`
 - Blocked by: `none`
-- Branch: `task/TASK-###-short-slug`
+- Branch: `[Greenhouse develop; Globe main; sin worktrees | contrato del repositorio aplicable]`
 - Legacy ID: `[optional]`
 - GitHub Issue: `[optional]`
 

@@ -25,6 +25,8 @@ type OAuthClientRow = {
   client_id: string
   client_name: string
   client_status: string
+  client_type: 'public' | 'confidential' | null
+  require_human_session: boolean | null
   redirect_uris: string[] | null
   allowed_scopes: string[] | null
   code_ttl_seconds: number
@@ -51,6 +53,7 @@ type OAuthCodeRow = {
   correlation_id: string | null
   expires_at: string | Date
   consumed_at: string | Date | null
+  session_auth_mode: string | null
 }
 
 type OAuthAccessTokenRow = {
@@ -64,6 +67,7 @@ type OAuthAccessTokenRow = {
   correlation_id: string | null
   expires_at: string | Date
   revoked_at: string | Date | null
+  session_auth_mode: string | null
 }
 
 type ConsumerTokenRow = {
@@ -84,6 +88,8 @@ export type SisterPlatformOAuthClient = {
   clientId: string
   clientName: string
   clientStatus: string
+  clientType: 'public' | 'confidential'
+  requireHumanSession: boolean
   redirectUris: string[]
   allowedScopes: string[]
   codeTtlSeconds: number
@@ -102,6 +108,7 @@ export type SisterPlatformOAuthIdentityPayload = {
   identityProfileId: string | null
   roles: string[]
   capabilities: string[]
+  authMode: string
   issuedAt: string
   expiresAt: string
   organization: {
@@ -150,6 +157,8 @@ export type UpsertSisterPlatformOAuthClientInput = {
   clientId: string
   clientName: string
   clientStatus?: 'draft' | 'active' | 'suspended' | 'deprecated'
+  clientType?: 'public' | 'confidential'
+  requireHumanSession?: boolean
   redirectUris: string[]
   allowedScopes?: string[]
   codeTtlSeconds?: number
@@ -256,6 +265,73 @@ const normalizeRedirectUris = (value: string[]) => {
   return uris
 }
 
+const isLoopbackPublicRedirectUri = (uri: string, allowRuntimeLocalhostAlias = false) => {
+  try {
+    const parsed = new URL(uri)
+
+    return (
+      parsed.protocol === 'http:' &&
+      (parsed.hostname === '127.0.0.1' || (allowRuntimeLocalhostAlias && parsed.hostname === 'localhost')) &&
+      !parsed.username &&
+      !parsed.password &&
+      !parsed.hash &&
+      Boolean(parsed.pathname)
+    )
+  } catch {
+    return false
+  }
+}
+
+const assertPublicClientRedirectUris = (redirectUris: readonly string[]) => {
+  if (redirectUris.some(uri => !isLoopbackPublicRedirectUri(uri))) {
+    throw new SisterPlatformOAuthError(
+      'Public OAuth clients must use an exact http://127.0.0.1 loopback redirect path.',
+      { errorCode: 'invalid_redirect_uri' }
+    )
+  }
+}
+
+const resolveClientRedirectUri = ({
+  client,
+  registeredRedirectUri,
+  requestedRedirectUri
+}: {
+  client: SisterPlatformOAuthClient
+  registeredRedirectUri: string
+  requestedRedirectUri: string
+}) => {
+  if (client.clientType === 'confidential') {
+    return registeredRedirectUri === requestedRedirectUri ? requestedRedirectUri : null
+  }
+
+  if (
+    !isLoopbackPublicRedirectUri(registeredRedirectUri) ||
+    !isLoopbackPublicRedirectUri(requestedRedirectUri, true)
+  ) {
+    return null
+  }
+
+  const registered = new URL(registeredRedirectUri)
+  const requested = new URL(requestedRedirectUri)
+
+  const matches =
+    registered.protocol === requested.protocol &&
+    (registered.hostname === requested.hostname ||
+      (registered.hostname === '127.0.0.1' && requested.hostname === 'localhost')) &&
+    registered.pathname === requested.pathname &&
+    registered.search === requested.search
+
+  if (!matches) return null
+
+  // Vercel/Next can normalize a 127.0.0.1 query parameter to localhost before
+  // the route sees it. Return the registered loopback host while preserving the
+  // RFC 8252 ephemeral port so authorization, callback and token exchange share
+  // one exact redirect_uri value.
+  requested.hostname = registered.hostname
+
+  return requested.toString()
+}
+
 const normalizeAllowedScopes = (value: string[] | undefined) => {
   const scopes = Array.from(
     new Set((value?.length ? value : DEFAULT_ALLOWED_SCOPES).map(scope => scope.trim()).filter(Boolean))
@@ -304,6 +380,8 @@ const mapOAuthClient = (row: OAuthClientRow): SisterPlatformOAuthClient => {
       clientId: row.client_id,
       clientName: row.client_name,
       clientStatus: row.client_status,
+      clientType: row.client_type === 'public' ? 'public' : 'confidential',
+      requireHumanSession: Boolean(row.require_human_session),
       redirectUris: normalizeStringArray(row.redirect_uris, []),
       allowedScopes,
       codeTtlSeconds: Number(row.code_ttl_seconds || 300),
@@ -385,6 +463,8 @@ export const loadSisterPlatformOAuthClient = async (clientId: string) => {
         oauth.client_id,
         oauth.client_name,
         oauth.client_status,
+        oauth.client_type,
+        oauth.require_human_session,
         oauth.redirect_uris,
         oauth.allowed_scopes,
         oauth.code_ttl_seconds,
@@ -409,6 +489,7 @@ export const upsertSisterPlatformOAuthClient = async (input: UpsertSisterPlatfor
   const clientId = input.clientId.trim().toLowerCase()
   const clientName = input.clientName.trim()
   const clientStatus = input.clientStatus ?? 'active'
+  const requestedClientType = input.clientType
   const redirectUris = normalizeRedirectUris(input.redirectUris)
   const allowedScopes = normalizeAllowedScopes(input.allowedScopes)
   const codeTtlSeconds = normalizeTtl(input.codeTtlSeconds, 300, 60, AUTHORIZATION_CODE_TTL_MAX_SECONDS)
@@ -424,10 +505,24 @@ export const upsertSisterPlatformOAuthClient = async (input: UpsertSisterPlatfor
     })
   }
 
+  if (requestedClientType === 'public') {
+    if (input.requirePkce === false) {
+      throw new SisterPlatformOAuthError('Public OAuth clients require PKCE.', {
+        errorCode: 'invalid_pkce_configuration'
+      })
+    }
+
+    assertPublicClientRedirectUris(redirectUris)
+  }
+
   await withTransaction(async pgClient => {
-    const existing = await pgClient.query<{ oauth_client_id: string }>(
+    const existing = await pgClient.query<{
+      oauth_client_id: string
+      client_type: 'public' | 'confidential' | null
+      require_human_session: boolean | null
+    }>(
       `
-        SELECT sister_platform_oauth_client_id AS oauth_client_id
+        SELECT sister_platform_oauth_client_id AS oauth_client_id, client_type, require_human_session
         FROM greenhouse_core.sister_platform_oauth_clients
         WHERE lower(client_id) = lower($1)
         LIMIT 1
@@ -437,6 +532,27 @@ export const upsertSisterPlatformOAuthClient = async (input: UpsertSisterPlatfor
     )
 
     if (existing.rows[0]) {
+      const existingClientType = existing.rows[0].client_type === 'public' ? 'public' : 'confidential'
+
+      if (requestedClientType && requestedClientType !== existingClientType) {
+        throw new SisterPlatformOAuthError('OAuth client_type is immutable after creation.', {
+          errorCode: 'invalid_client_configuration'
+        })
+      }
+
+      const clientType = existingClientType
+      const requireHumanSession = input.requireHumanSession ?? Boolean(existing.rows[0].require_human_session)
+
+      if (clientType === 'public') {
+        if (input.requirePkce === false) {
+          throw new SisterPlatformOAuthError('Public OAuth clients require PKCE.', {
+            errorCode: 'invalid_pkce_configuration'
+          })
+        }
+
+        assertPublicClientRedirectUris(redirectUris)
+      }
+
       await pgClient.query(
         `
           UPDATE greenhouse_core.sister_platform_oauth_clients
@@ -444,16 +560,18 @@ export const upsertSisterPlatformOAuthClient = async (input: UpsertSisterPlatfor
             sister_platform_consumer_id = $2,
             client_name = $3,
             client_status = $4,
-            redirect_uris = $5::text[],
-            allowed_scopes = $6::text[],
-            code_ttl_seconds = $7,
-            access_token_ttl_seconds = $8,
-            require_pkce = $9,
-            issue_identity_inline = $10,
-            policy_json = $11::jsonb,
-            metadata_json = $12::jsonb,
-            suspended_by_user_id = CASE WHEN $4 = 'suspended' THEN $13 ELSE NULL END,
-            deprecated_by_user_id = CASE WHEN $4 = 'deprecated' THEN $13 ELSE NULL END,
+            client_type = $5,
+            require_human_session = $6,
+            redirect_uris = $7::text[],
+            allowed_scopes = $8::text[],
+            code_ttl_seconds = $9,
+            access_token_ttl_seconds = $10,
+            require_pkce = $11,
+            issue_identity_inline = $12,
+            policy_json = $13::jsonb,
+            metadata_json = $14::jsonb,
+            suspended_by_user_id = CASE WHEN $4 = 'suspended' THEN $15 ELSE NULL END,
+            deprecated_by_user_id = CASE WHEN $4 = 'deprecated' THEN $15 ELSE NULL END,
             suspended_at = CASE WHEN $4 = 'suspended' THEN CURRENT_TIMESTAMP ELSE NULL END,
             deprecated_at = CASE WHEN $4 = 'deprecated' THEN CURRENT_TIMESTAMP ELSE NULL END,
             updated_at = CURRENT_TIMESTAMP
@@ -464,6 +582,8 @@ export const upsertSisterPlatformOAuthClient = async (input: UpsertSisterPlatfor
           input.sisterPlatformConsumerId,
           clientName,
           clientStatus,
+          clientType,
+          requireHumanSession,
           redirectUris,
           allowedScopes,
           codeTtlSeconds,
@@ -479,6 +599,8 @@ export const upsertSisterPlatformOAuthClient = async (input: UpsertSisterPlatfor
       return
     }
 
+    const clientType = requestedClientType ?? 'confidential'
+
     await pgClient.query(
       `
         INSERT INTO greenhouse_core.sister_platform_oauth_clients (
@@ -487,6 +609,8 @@ export const upsertSisterPlatformOAuthClient = async (input: UpsertSisterPlatfor
           client_id,
           client_name,
           client_status,
+          client_type,
+          require_human_session,
           redirect_uris,
           allowed_scopes,
           code_ttl_seconds,
@@ -501,12 +625,12 @@ export const upsertSisterPlatformOAuthClient = async (input: UpsertSisterPlatfor
           suspended_at,
           deprecated_at
         ) VALUES (
-          $1, $2, $3, $4, $5, $6::text[], $7::text[], $8, $9, $10, $11, $12::jsonb, $13::jsonb,
-          $14,
-          CASE WHEN $5 = 'suspended' THEN $14 ELSE NULL END,
-          CASE WHEN $5 = 'deprecated' THEN $14 ELSE NULL END,
-          CASE WHEN $5 = 'suspended' THEN CURRENT_TIMESTAMP ELSE NULL END,
-          CASE WHEN $5 = 'deprecated' THEN CURRENT_TIMESTAMP ELSE NULL END
+          $1, $2, $3, $4, $5, $6, $7, $8::text[], $9::text[], $10, $11, $12, $13, $14::jsonb, $15::jsonb,
+          $16,
+          CASE WHEN $4 = 'suspended' THEN $16 ELSE NULL END,
+          CASE WHEN $4 = 'deprecated' THEN $16 ELSE NULL END,
+          CASE WHEN $4 = 'suspended' THEN CURRENT_TIMESTAMP ELSE NULL END,
+          CASE WHEN $4 = 'deprecated' THEN CURRENT_TIMESTAMP ELSE NULL END
         )
       `,
       [
@@ -515,6 +639,8 @@ export const upsertSisterPlatformOAuthClient = async (input: UpsertSisterPlatfor
         clientId,
         clientName,
         clientStatus,
+        clientType,
+        input.requireHumanSession ?? false,
         redirectUris,
         allowedScopes,
         codeTtlSeconds,
@@ -534,6 +660,76 @@ export const upsertSisterPlatformOAuthClient = async (input: UpsertSisterPlatfor
     throw new SisterPlatformOAuthError('Unable to reload OAuth client after upsert.', {
       statusCode: 500,
       errorCode: 'client_reload_failed'
+    })
+  }
+
+  return client
+}
+
+/** Update only the session-provenance requirement; never restate scopes, redirects or TTLs. */
+export const updateSisterPlatformOAuthSessionRequirement = async (input: {
+  clientId: string
+  requireHumanSession: boolean
+  actorPrincipalId: string
+  reason: string
+}) => {
+  const clientId = input.clientId.trim().toLowerCase()
+  const actorPrincipalId = input.actorPrincipalId.trim()
+  const reason = input.reason.trim()
+
+  if (!clientId || !actorPrincipalId || reason.length < 8) {
+    throw new SisterPlatformOAuthError('clientId is required.', { errorCode: 'invalid_client' })
+  }
+
+  const rows = await query<{ oauth_client_id: string }>(
+    `UPDATE greenhouse_core.sister_platform_oauth_clients
+        SET require_human_session = $2, updated_at = CURRENT_TIMESTAMP
+      WHERE lower(client_id) = lower($1)
+      RETURNING sister_platform_oauth_client_id AS oauth_client_id`,
+    [clientId, input.requireHumanSession]
+  )
+
+  if (!rows[0]) {
+    throw new SisterPlatformOAuthError('OAuth client not found.', {
+      statusCode: 404,
+      errorCode: 'invalid_client'
+    })
+  }
+
+  const client = await loadSisterPlatformOAuthClient(clientId)
+
+  if (!client) {
+    throw new SisterPlatformOAuthError('Unable to reload OAuth client after session policy update.', {
+      statusCode: 500,
+      errorCode: 'client_reload_failed'
+    })
+  }
+
+  const evidence = await query<{ evidence_exists: boolean }>(
+    `SELECT EXISTS (
+       SELECT 1
+         FROM greenhouse_core.sister_platform_oauth_audit_log
+        WHERE sister_platform_oauth_client_id = $1
+          AND event_type = 'client_policy_changed'
+          AND metadata_json #>> '{policy}' = 'require_human_session'
+          AND metadata_json #>> '{requireHumanSession}' = $2
+          AND metadata_json #>> '{reason}' = $3
+     ) AS evidence_exists`,
+    [client.oauthClientId, String(input.requireHumanSession), reason]
+  )
+
+  if (!evidence[0]?.evidence_exists) {
+    await recordSisterPlatformOAuthAuditEvent({
+      client,
+      eventType: 'client_policy_changed',
+      outcome: 'success',
+      responseStatus: 200,
+      metadata: {
+        policy: 'require_human_session',
+        requireHumanSession: input.requireHumanSession,
+        actorPrincipalId,
+        reason
+      }
     })
   }
 
@@ -722,9 +918,7 @@ export const updateSisterPlatformOAuthTokenTtls = async (input: UpdateSisterPlat
     previousAccessTokenTtlSeconds = Number(row.access_token_ttl_seconds || 300)
     codeTtlSeconds = requestedCodeTtlSeconds ?? previousCodeTtlSeconds
     accessTokenTtlSeconds = requestedAccessTokenTtlSeconds ?? previousAccessTokenTtlSeconds
-    changed =
-      previousCodeTtlSeconds !== codeTtlSeconds ||
-      previousAccessTokenTtlSeconds !== accessTokenTtlSeconds
+    changed = previousCodeTtlSeconds !== codeTtlSeconds || previousAccessTokenTtlSeconds !== accessTokenTtlSeconds
 
     if (!changed) return
 
@@ -890,6 +1084,17 @@ const assertClientActive = (client: SisterPlatformOAuthClient) => {
       errorCode: 'consumer_expired'
     })
   }
+
+  if (client.clientType === 'public') {
+    if (!client.requirePkce) {
+      throw new SisterPlatformOAuthError('Public OAuth client PKCE configuration is invalid.', {
+        statusCode: 503,
+        errorCode: 'invalid_pkce_configuration'
+      })
+    }
+
+    assertPublicClientRedirectUris(client.redirectUris)
+  }
 }
 
 export const validateSisterPlatformAuthorizeRequest = async (url: URL): Promise<ValidatedAuthorizeRequest> => {
@@ -921,7 +1126,15 @@ export const validateSisterPlatformAuthorizeRequest = async (url: URL): Promise<
 
   assertClientActive(client)
 
-  if (!redirectUri || !client.redirectUris.includes(redirectUri)) {
+  const resolvedRedirectUri = redirectUri
+    ? client.redirectUris
+        .map(registeredRedirectUri =>
+          resolveClientRedirectUri({ client, registeredRedirectUri, requestedRedirectUri: redirectUri })
+        )
+        .find((candidate): candidate is string => Boolean(candidate))
+    : null
+
+  if (!resolvedRedirectUri) {
     throw new SisterPlatformOAuthError('Redirect URI is not registered for this OAuth client.', {
       statusCode: 400,
       errorCode: 'invalid_redirect_uri'
@@ -959,7 +1172,7 @@ export const validateSisterPlatformAuthorizeRequest = async (url: URL): Promise<
 
   return {
     client,
-    redirectUri,
+    redirectUri: resolvedRedirectUri,
     state,
     nonce,
     requestedScopes,
@@ -991,18 +1204,51 @@ export const assertTenantEligibleForSisterPlatformOAuth = (
   }
 }
 
+export type SisterPlatformOAuthSessionProvenance = {
+  provider: string
+  authMode: string
+}
+
+export const resolveSisterPlatformOAuthSessionAuthMode = (
+  provenance?: SisterPlatformOAuthSessionProvenance
+): string => {
+  const provider = provenance?.provider.trim().toLowerCase() || ''
+  const authMode = provenance?.authMode.trim().toLowerCase() || ''
+
+  return provider === 'agent' || authMode === 'agent' ? 'agent' : authMode || 'unknown'
+}
+
+export const assertSisterPlatformOAuthSessionProvenance = (
+  client: SisterPlatformOAuthClient,
+  provenance?: SisterPlatformOAuthSessionProvenance
+) => {
+  if (!client.requireHumanSession) return
+
+  const provider = provenance?.provider.trim().toLowerCase() || ''
+  const authMode = provenance?.authMode.trim().toLowerCase() || ''
+
+  if (!provider || !authMode || provider === 'agent' || authMode === 'agent') {
+    throw new SisterPlatformOAuthError('OAuth client requires a human-authenticated session.', {
+      statusCode: 403,
+      errorCode: 'human_session_required'
+    })
+  }
+}
+
 export const buildSisterPlatformOAuthIdentityPayload = ({
   tenant,
   client,
   requestedScopes,
   expiresAt,
-  workspaceBindings
+  workspaceBindings,
+  authMode
 }: {
   tenant: TenantAccessRecord
   client: SisterPlatformOAuthClient
   requestedScopes: string[]
   expiresAt: string
   workspaceBindings?: readonly GlobeOAuthWorkspaceBindingV1[]
+  authMode?: string
 }): SisterPlatformOAuthIdentityPayload => {
   const identity: SisterPlatformOAuthIdentityPayload = {
     sub: `greenhouse:user:${tenant.userId}`,
@@ -1012,6 +1258,7 @@ export const buildSisterPlatformOAuthIdentityPayload = ({
     identityProfileId: tenant.identityProfileId,
     roles: client.policy.claims.includeGreenhouseRoles ? tenant.roleCodes : [],
     capabilities: resolveSisterPlatformOAuthCapabilities(client.policy, requestedScopes),
+    authMode: authMode?.trim().toLowerCase() || tenant.authMode?.trim().toLowerCase() || 'unknown',
     issuedAt: new Date().toISOString(),
     expiresAt,
     organization: {
@@ -1021,7 +1268,7 @@ export const buildSisterPlatformOAuthIdentityPayload = ({
     }
   }
 
-  if (client.sisterPlatformKey === 'globe' && workspaceBindings) {
+  if (usesGlobeOAuthWorkspaceBindings(client) && workspaceBindings) {
     identity.workspaceBindings = workspaceBindings
   }
 
@@ -1032,24 +1279,31 @@ export const buildBrokerSisterPlatformOAuthIdentityPayload = async ({
   tenant,
   client,
   requestedScopes,
-  expiresAt
+  expiresAt,
+  authMode
 }: {
   tenant: TenantAccessRecord
   client: SisterPlatformOAuthClient
   requestedScopes: string[]
   expiresAt: string
+  authMode?: string
 }): Promise<SisterPlatformOAuthIdentityPayload> => {
-  const workspaceBindings =
-    client.sisterPlatformKey === 'globe' ? await resolveGlobeOAuthWorkspaceBindings(tenant) : undefined
+  const workspaceBindings = usesGlobeOAuthWorkspaceBindings(client)
+    ? await resolveGlobeOAuthWorkspaceBindings(tenant)
+    : undefined
 
   return buildSisterPlatformOAuthIdentityPayload({
     tenant,
     client,
     requestedScopes,
     expiresAt,
-    workspaceBindings
+    workspaceBindings,
+    authMode
   })
 }
+
+export const usesGlobeOAuthWorkspaceBindings = (client: SisterPlatformOAuthClient) =>
+  client.sisterPlatformKey === 'globe' || client.metadata?.workspaceBindingProvider === 'globe'
 
 export const recordSisterPlatformOAuthAuditEvent = async ({
   client,
@@ -1084,6 +1338,7 @@ export const recordSisterPlatformOAuthAuditEvent = async ({
     | 'redirect_rejected'
     | 'token_revoked'
     | 'client_status_changed'
+    | 'client_policy_changed'
   outcome: 'success' | 'rejected' | 'failure'
   errorCode?: string | null
   redirectUri?: string | null
@@ -1148,12 +1403,15 @@ export const recordSisterPlatformOAuthAuditEvent = async ({
 export const issueSisterPlatformAuthorizationCode = async ({
   authorizeRequest,
   tenant,
-  auditMetadata
+  auditMetadata,
+  sessionProvenance
 }: {
   authorizeRequest: ValidatedAuthorizeRequest
   tenant: TenantAccessRecord
   auditMetadata: OAuthRequestAuditMetadata
+  sessionProvenance?: SisterPlatformOAuthSessionProvenance
 }): Promise<IssuedAuthorizationCode> => {
+  assertSisterPlatformOAuthSessionProvenance(authorizeRequest.client, sessionProvenance)
   assertTenantEligibleForSisterPlatformOAuth(tenant, authorizeRequest.client, authorizeRequest.requestedScopes)
 
   const code = generateAuthorizationCode()
@@ -1204,7 +1462,10 @@ export const issueSisterPlatformAuthorizationCode = async ({
       expiresAt,
       auditMetadata.ipHash,
       auditMetadata.userAgentHash,
-      JSON.stringify({ codeChallengeMethod: 'S256' })
+      JSON.stringify({
+        codeChallengeMethod: 'S256',
+        sessionAuthMode: resolveSisterPlatformOAuthSessionAuthMode(sessionProvenance)
+      })
     ]
   )
 
@@ -1242,8 +1503,19 @@ export const authenticateSisterPlatformOAuthClient = async ({
   clientSecret
 }: {
   client: SisterPlatformOAuthClient
-  clientSecret: string
+  clientSecret?: string
 }) => {
+  if (client.clientType === 'public') {
+    if (clientSecret?.trim()) {
+      throw new SisterPlatformOAuthError('Public OAuth clients must not send a client secret.', {
+        statusCode: 401,
+        errorCode: 'invalid_client'
+      })
+    }
+
+    return null
+  }
+
   if (!clientSecret) {
     throw new SisterPlatformOAuthError('Missing client secret.', {
       statusCode: 401,
@@ -1310,7 +1582,7 @@ export const consumeSisterPlatformAuthorizationCode = async ({
   auditMetadata
 }: {
   clientId: string
-  clientSecret: string
+  clientSecret?: string
   code: string
   redirectUri: string
   codeVerifier: string
@@ -1360,7 +1632,8 @@ export const consumeSisterPlatformAuthorizationCode = async ({
           code_challenge_method,
           correlation_id,
           expires_at,
-          consumed_at
+          consumed_at,
+          metadata_json #>> '{sessionAuthMode}' AS session_auth_mode
         FROM greenhouse_core.sister_platform_authorization_codes
         WHERE code_hash = $1
         FOR UPDATE
@@ -1517,7 +1790,10 @@ export const consumeSisterPlatformAuthorizationCode = async ({
         requestedScopes,
         codeRow.correlation_id ?? auditMetadata.correlationId,
         expiresAt,
-        JSON.stringify({ source: 'TASK-948 token exchange' })
+        JSON.stringify({
+          source: 'TASK-948 token exchange',
+          sessionAuthMode: codeRow.session_auth_mode || 'unknown'
+        })
       ]
     )
 
@@ -1527,7 +1803,8 @@ export const consumeSisterPlatformAuthorizationCode = async ({
       tenant,
       requestedScopes,
       correlationId: codeRow.correlation_id ?? auditMetadata.correlationId,
-      expiresAt
+      expiresAt,
+      sessionAuthMode: codeRow.session_auth_mode || 'unknown'
     }
   }).catch(async error => {
     if (error instanceof SisterPlatformOAuthError && error.errorCode !== 'invalid_client') {
@@ -1550,7 +1827,8 @@ export const consumeSisterPlatformAuthorizationCode = async ({
     correlationId: result.correlationId,
     auditMetadata,
     metadata: {
-      expiresAt: result.expiresAt
+      expiresAt: result.expiresAt,
+      authMode: result.sessionAuthMode
     }
   }).catch(() => undefined)
 
@@ -1565,7 +1843,8 @@ export const consumeSisterPlatformAuthorizationCode = async ({
       tenant: result.tenant,
       client,
       requestedScopes: result.requestedScopes,
-      expiresAt: result.expiresAt
+      expiresAt: result.expiresAt,
+      authMode: result.sessionAuthMode
     })
   }
 }
@@ -1595,6 +1874,7 @@ export const resolveSisterPlatformOAuthUserinfo = async ({
         token.correlation_id,
         token.expires_at,
         token.revoked_at,
+        token.metadata_json #>> '{sessionAuthMode}' AS session_auth_mode,
         oauth.sister_platform_oauth_client_id AS oauth_client_id,
         oauth.sister_platform_consumer_id AS consumer_id,
         consumer.sister_platform_key,
@@ -1604,6 +1884,8 @@ export const resolveSisterPlatformOAuthUserinfo = async ({
         oauth.client_id,
         oauth.client_name,
         oauth.client_status,
+        oauth.client_type,
+        oauth.require_human_session,
         oauth.redirect_uris,
         oauth.allowed_scopes,
         oauth.code_ttl_seconds,
@@ -1684,7 +1966,8 @@ export const resolveSisterPlatformOAuthUserinfo = async ({
       tenant,
       client,
       requestedScopes,
-      expiresAt: toIsoString(row.expires_at) || new Date().toISOString()
+      expiresAt: toIsoString(row.expires_at) || new Date().toISOString(),
+      authMode: row.session_auth_mode || 'unknown'
     })
   }
 }

@@ -18,6 +18,8 @@ Indice de auditorias tecnicas y operativas versionadas dentro de `docs/`.
 - [ANAM commercial pipeline governance QA — 2026-07-17](ANAM_COMMERCIAL_PIPELINE_GOVERNANCE_QA_2026-07-17.md)
 - [TASK-1454 Globe identity bridge QA — 2026-07-19](platform/TASK-1454_GLOBE_IDENTITY_BRIDGE_QA_2026-07-19.md)
 - [TASK-1455 Globe brand shell QA — 2026-07-19](platform/TASK-1455_GLOBE_BRAND_SHELL_QA_2026-07-19.md)
+- [Higgsfield y Magnific — auditoría de UI y workflow — 2026-08-04](competitive-ui/COMPETITIVE_UI_AUDIT_HIGGSFIELD_MAGNIFIC_2026-08-04.md)
+- [Globe frente a Higgsfield y Magnific — benchmark comparativo — 2026-08-05](competitive-ui/GLOBE_COMPETITIVE_BENCHMARK_HIGGSFIELD_MAGNIFIC_2026-08-05.md)
 
 - [Design Tokens](design-tokens/README.md)
 - [Cloud Cost](cloud-cost/README.md)

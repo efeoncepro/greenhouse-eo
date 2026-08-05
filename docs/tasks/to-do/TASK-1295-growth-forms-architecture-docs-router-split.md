@@ -20,7 +20,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `none`
-- Epic: `optional`
+- Epic: `EPIC-040`
 - Status real: `Backlog documental`
 - Rank: `TBD`
 - Domain: `growth|architecture|docs`

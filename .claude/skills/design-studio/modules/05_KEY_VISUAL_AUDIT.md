@@ -81,9 +81,9 @@ El feedback inútil describe una emoción. El feedback útil nombra **qué + por
 |---|---|
 | "No me convence" | "El foco compite: el producto y el fondo tienen el mismo peso tonal (dim 3=2). Baja el fondo 20% en valor para que el producto salte." |
 | "Le falta algo" | "No hay elemento gráfico recurrente (dim 1/7). Suma el gradiente firmante de la marca en diagonal para que escale a los derivados." |
-| "El texto no se ve bien" | "Headline sobre la zona más clara de la foto → contraste ~2:1 (dim 8=1). Mové el headline a la banda superior o pon un scrim al 40%." |
-| "Se ve genérico" | "Composición centrada + foto de stock-look (dim 9=2). Rompé la simetría con la grilla de tercios y sustituí por una toma con dirección de luz propia." |
-| "Está muy IA" | "Manos/dedos con artefacto y textura plástica uniforme (dim 10=1). Regenerá el sujeto o handoff a retoque; suma grano para matar el look sintético." |
+| "El texto no se ve bien" | "Headline sobre la zona más clara de la foto → contraste ~2:1 (dim 8=1). Mueve el headline a la banda superior o pon un scrim al 40%." |
+| "Se ve genérico" | "Composición centrada + foto de stock-look (dim 9=2). Rompe la simetría con la grilla de tercios y sustituye por una toma con dirección de luz propia." |
+| "Está muy IA" | "Manos/dedos con artefacto y textura plástica uniforme (dim 10=1). Regenera el sujeto o handoff a retoque; suma grano para matar el look sintético." |
 
 **Estructura de cada nota de feedback:**
 `[dimensión afectada] + [observación específica con evidencia] + [acción concreta] + [prioridad]`.

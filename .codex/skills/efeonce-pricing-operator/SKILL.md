@@ -102,6 +102,30 @@ to-pay distintos. Cada tier debe declarar:
 
 No crear fences artificiales por features si no cambian valor, capacidad, riesgo o governance.
 
+### Creative Velocity y modular production
+
+La unidad pública recomendada es capacity envelope/outcome gobernado, no horas ni piezas. Separar Diagnostic,
+Sprint, Flex/Managed Capacity, Dedicated Creative Pod, Performance Creative Lane y Modular Production Lane. Una
+experiencia modular puede tener líneas distintas para capacidad, implementación/IP, gobierno/plataforma, derechos y
+pass-through; no convertir templates, assets o créditos en una calculadora de piezas.
+
+En SKY, Adobe Express y SharePoint son evidencia de delivery y herramientas de una implementación; no autorizan por
+sí solos precio de producto, equivalencias por asset o margin assumptions. Validar tiempo de configuración, template
+maintenance, QA, derechos, portabilidad, cost-to-serve y capacidad antes de pricear un producto independiente.
+
+`Embedded Managed Pod` no puede pricearse como Staff Augmentation. La capacidad reservada debe incluir integration
+cost: immersion, rituales, coordinación, memoria, continuidad, backup, soporte y governance. Separar fee de
+capacidad, implementación/immersion, platform/governance, rights y pass-through; validar margen y cost-to-serve por
+cuenta.
+
+Cuando Efeonce absorbe equipo, infraestructura, computadores, licencias, contratación, payroll, provisionales,
+reemplazos y soporte, el modelo es `Fully Managed Creative Capacity`: un fee mensual integral por una capacity
+envelope definida. No usar “llave en mano” para ocultar límites ni convertirlo en unlimited.
+
+La economía se calcula por país y pod: costo humano, infraestructura, licencias, administración laboral, impuestos,
+FX, proveedores, seguros, DPA, working capital, soporte y reserva de riesgo. La cobertura global de Efeonce no elimina
+la parametrización jurídica, fiscal y laboral local.
+
 ### 4. Construir revenue architecture
 
 Separar fee de diagnóstico, implementación, recurrente, squad/capacity, staff augmentation, platform/governance,

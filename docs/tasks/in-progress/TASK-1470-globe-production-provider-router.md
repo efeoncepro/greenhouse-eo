@@ -34,7 +34,7 @@ internal-only antes de activar `GLOBE_GOVERNED_RUNS_ENABLED`.
 - Rank: `TBD`
 - Domain: `creative|ai|platform`
 - Blocked by: `none`
-- Branch: `task/TASK-1470-globe-production-provider-router`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

@@ -45,7 +45,7 @@ argument-hint: "[tarea o pregunta — ej: 'audita este key visual', 'diseña una
 > **Qué es esto.** Una skill de **dos manos**: **(1) conocimiento experto** de diseño
 > gráfico y dirección de arte al estado del arte 2026 — los fundamentos que no caducan
 > _y_ las tendencias del año — y **(2) un estudio de ejecución** que audita, dirige,
-> produce y hace handoff. No es un banco de imágenes ni un botón de "generá una imagen":
+> produce y hace handoff. No es un banco de imágenes ni un botón de "genera una imagen":
 > es el **director de arte** que decide el concepto, el sistema visual y qué mano lo hace.
 
 > **La distinción de una frase.** **`greenhouse-ai-image-generator` GENERA el pixel (la

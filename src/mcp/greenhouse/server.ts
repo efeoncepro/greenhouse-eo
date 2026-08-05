@@ -242,6 +242,53 @@ export const createGreenhouseMcpServer = (
     async args => handlers.quotePrice(args)
   )
 
+  // TASK-1645 — Growth SEO (read-only, mandato MCP-first del operador 2026-08-05).
+  // Los tres tools delegan en el lane ecosystem: entitlement per-org `seo_v1` +
+  // anti-oracle + resolución de org por binding se aplican SERVER-SIDE. Para bindings
+  // internos, `organizationId` es requerido; para bindings org-scoped se omite.
+  server.registerTool(
+    'get_seo_keyword_opportunities',
+    {
+      title: 'Get SEO Keyword Opportunities',
+      description:
+        'List measured striking-distance SEO keyword opportunities for an organization (Google Search Console data: weighted position, impressions, estimated click gain, quick wins, cannibalization). Requires the organization to have the SEO module (seo_v1) assigned. When data.ok is false, report the errorCode (disabled, target_not_configured, no_data) honestly instead of inventing results.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        limit: z.number().int().positive().max(50).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getSeoKeywordOpportunities(args)
+  )
+
+  server.registerTool(
+    'get_seo_visibility_360',
+    {
+      title: 'Get Search Visibility 360',
+      description:
+        'Cross the two search internets for an organization: measured organic rank (GSC) vs AI citability (AEO grader score). Returns a 2x2 quadrant per keyword and for the domain — dominante (ranks + cited), riesgo (ranks but NOT cited by AI: organic authority without citability, cross-sell AEO), oportunidad (cited but not ranking), invisible (neither). The two axes are orthogonal and never averaged. When data.ok is false, report the errorCode (no_seo_data, no_aeo_data, target_not_configured, disabled) honestly — a missing lens is a state, not a zero.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getSeoVisibility360(args)
+  )
+
+  server.registerTool(
+    'get_seo_entitlement',
+    {
+      title: 'Get SEO Entitlement',
+      description:
+        'Read the SEO module entitlement state for an organization: whether seo_v1 is assigned, tier (contracted/trial/pilot), remaining monthly site-audit allowance and remaining provider budget (USD). Use this BEFORE proposing SEO operations to know if the organization is enabled and has quota. hasModule=false means the module is not assigned — do not infer anything else about the organization.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getSeoEntitlement(args)
+  )
+
   // Resource addressable: el mismo documento read-only por URI estable.
   server.registerResource(
     'knowledge_document',

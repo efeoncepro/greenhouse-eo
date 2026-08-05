@@ -111,7 +111,9 @@ export async function POST(request: Request) {
     featureFlags: tenant.featureFlags,
     timezone: tenant.timezone,
     portalHomePath,
-    authMode: tenant.authMode || 'agent',
+    // This endpoint is the agent authentication ceremony. The account's base login mode
+    // (credentials/SSO) must not overwrite the provenance of this specific session.
+    authMode: 'agent',
     provider: 'agent',
     microsoftEmail: tenant.microsoftEmail,
     googleEmail: tenant.googleEmail,

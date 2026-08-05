@@ -67,7 +67,7 @@ Un buen caso no es una ficha técnica: es una historia con arco.
 > **Problem:** (externo) la IA no lo cita; (interno) siente que su categoría se le escapa;
 > (filosófico) no es justo perder por no ser "legible" para máquinas.
 > **Guide:** Efeonce — "sabemos cómo te ve la IA, y cómo arreglarlo" (empatía + autoridad).
-> **Plan:** 1) corré tu grade gratis 2) mirá qué corregir 3) lo ejecutamos contigo.
+> **Plan:** 1) corre tu grade gratis 2) mira qué corregir 3) lo ejecutamos contigo.
 > **Action:** "Mira cómo te ve la IA →".
 > **Failure:** seguir invisible mientras otros se vuelven la respuesta por defecto.
 > **Success:** ser la marca que la IA recomienda en tu categoría.

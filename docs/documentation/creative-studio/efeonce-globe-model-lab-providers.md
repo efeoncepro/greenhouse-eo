@@ -1,9 +1,9 @@
 # Efeonce Globe — Proveedores del Model Lab (Vertex + Fal + Composite, 10 capacidades)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-07-19 por Claude (TASK-1486/1487/1488/1459)
-> **Ultima actualizacion:** 2026-07-20 por Claude (editar sobre lo generado + publicado interno)
+> **Ultima actualizacion:** 2026-08-02 por Codex (estado vigente de Studio Credits)
 > **Documentacion tecnica:** [`docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md`](../../architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md) (§"Realización — VertexCreativeAdapter" y §"Segundo adapter — Fal + Composite")
 
 ## De qué se trata este documento
@@ -100,7 +100,10 @@ Recordatorio de superficies y facturación: **generar** es keyless en Vertex; **
 - **Las 4 capacidades con archivo de entrada** (editar imagen, upscalear imagen/video, extender video) tienen su ruta verificada pero su corrida completa **espera la resolución de huella→bytes** desde el bucket privado.
 - **El editar encadenable está verificado solo en Omni (video).** Generalizarlo a los demás motores (Seedream, Seedance, Nano-Banana por referencia) y soportar **varias referencias o referencias combinadas** es `TASK-1490`, aún pendiente.
 - **La llave de Fal es provisoria.** El canary Fal se verificó usando temporalmente la key existente del repo de Greenhouse (excepción documentada); Globe debe **provisionar su propia** `GLOBE_FAL_API_KEY` antes de cualquier uso sostenido.
-- **No hay registro contable de créditos comerciales.** El freno de gasto de hoy es un **fence de seguridad**, no el ledger durable a prueba de pérdidas — esa es una capacidad aparte, aún pendiente. Desde `TASK-1465` el fence de seguridad ya corre durable en producción (sus topes se guardan en Cloud SQL y sobreviven reinicios y réplicas); en modo de desarrollo/ensayo sigue viviendo en memoria y se reinicia con el proceso.
+- **El ledger de Studio Credits ya está operativo.** Sigue separado del spend fence de seguridad: el fence frena
+  gasto por corrida/día; el ledger registra allocation, reserva y settlement de forma append-only. Greenhouse UI,
+  API/CLI OAuth PKCE y MCP convergen sobre esa misma autoridad de Globe. Un Studio Credit no es dinero, revenue ni
+  token de proveedor.
 - **No auto-elige el mejor motor.** La matriz de recomendación compara lo medible; el juicio creativo es siempre un paso humano.
 
 > **Detalle técnico y código (repo hermano `efeonce-globe`):**

@@ -4,9 +4,55 @@
 
 ## Alcance
 
-Este runbook cubre alertas `globe_producer_worker_failures`, edad de cola del Producer y fallas del Job de Asset
-Governance. Una alerta confirma una señal, no la causa: primero correlacionar ejecución, run/outbox y logs antes de
-reintentar o modificar estado.
+Este runbook cubre alertas `globe_producer_worker_failures`, edad de cola del Producer, fallas del Job de Asset
+Governance y las **tres alertas de salud del ciclo de corridas** vivas desde el 2026-08-04. Una alerta confirma
+una señal, no la causa: primero correlacionar ejecución, run/outbox y logs antes de reintentar o modificar estado.
+
+## ⚠️ Antes de triagear: ~8 minutos NO son una cola stale
+
+La latencia del camino en frío es **cadence-bound, no size-bound**: Asset Governance avanza **una etapa por tick
+de su cron**, así que el reloj lo pone el scheduler y no el peso del archivo. Con el cron cada minuto una corrida
+sana tarda **~7,9 min** (con `*/5` tardaba ~20-25). Que imagen y video midan casi lo mismo es la prueba.
+
+🔴 **Un canary que aborta por debajo de ese presupuesto reporta su propia impaciencia, no un defecto.** Ocurrió:
+una prueba automática abortó sobre una corrida perfecta que completó sola. Antes de tocar nada, mide el estado.
+
+## Las tres señales del ciclo de corridas
+
+| Alerta | Severidad | Qué significa | Primera acción |
+|---|---|---|---|
+| `outbox terminal attempts` | ERROR, sin espera | Intentos que **ya murieron**: trabajo pedido que no va a llegar | Mirar la **serie**, no el valor: distingue preexistente de recién causado |
+| `outbox retry storm` | WARNING, con ventana | Intentos que **insisten** por encima del umbral, sin cerrar | Alerta temprana; un `waiting` alto puede ser sano por contrato |
+| `run aggregate divergence` | ERROR | Un agregado que depende de una corrida terminal **no convergió** | Se mide **después** del barrido: >0 significa que el barrido no pudo cerrarlo |
+
+🔴 **La señal terminal cuenta INTENTOS DISTINTOS, no filas de outbox.** Se llamaba `outboxDeadLetter` y contaba
+filas —una por fase—, así que decía **3 para UN solo intento**. Toda lectura previa al 2026-08-04 que cite ese
+número está inflada.
+
+⚠️ **La cola stale de reconciles ya no es residuo esperado**: un barrido previo a cada tanda la cierra, y la
+divergencia medida fue **0**. Si aparece, es defecto nuevo.
+
+## Al crear o editar una alerta
+
+**El aligner es función del TIPO de métrica, no del gusto de la alerta.** `ALIGN_COUNT` sólo vale sobre
+DELTA/INT64 (métrica que cuenta entradas de log); una que **extrae un valor** es DELTA/DISTRIBUTION y necesita
+`ALIGN_PERCENTILE_99`. Copiarlo de la alerta hermana equivocada **falla en el apply con 400**, no antes.
+
+Y un **404 de la métrica recién creada no es defecto**: es propagación de Cloud Monitoring, hasta 10 minutos.
+
+
+⚠️ **Antes de concluir por una edad: las filas viejas de la cola tienen el reloj sucio.** De 131 filas terminadas
+medidas en producción, **23 eran contradictorias** (la peor decía haber terminado 9,7 horas antes de estar
+disponible). Desde el 2026-08-04 se sellan con el reloj real y las nuevas dan **0**. Una latencia calculada sobre
+filas anteriores a ese arreglo **no es evidencia**.
+
+**Conexión a la base de Globe** (para correlacionar por readback):
+
+```bash
+cloud-sql-proxy "efeonce-globe:southamerica-west1:globe-pg" --port 15433 --auto-iam-authn
+psql "host=127.0.0.1 port=15433 dbname=globe user=<tu email> sslmode=disable"
+-- y después, obligatorio:  set search_path to globe;
+```
 
 ## Primeros cinco minutos
 
@@ -62,3 +108,59 @@ cierra cuando la causa dejó de producir señal; silenciarla o subir umbral no c
 sostenida, riesgo de gasto repetido, cruce de tenant, corrupción/pérdida de evidencia o incapacidad de rollback.
 Asset Governance failure o firmas stale persistentes son `CRITICAL`. El payload de fallo sólo puede incluir
 referencia saneada a ejecución/correlación, nunca raw error ni secreto.
+
+## Delta 2026-08-04 — tres alertas nuevas de `TASK-1641`
+
+### `globe_promotion_window_closing` — WARNING
+
+Una promoción `activated` entra en los últimos **30 minutos** de su ventana de 3 h. Se emite una línea por
+promoción y por tick del worker (`*/1`), con `routeId`, `modelVersion` y `secondsRemaining`.
+
+**Qué hacer:** producir el canary de esa identidad exacta, ahora. El ciclo completo son ~10 min
+(generación ~1-2 min + Asset Governance ~8 min + `canary-confirm`), así que **todavía alcanza**, y ése es
+exactamente el punto de esta alerta. Procedimiento:
+[`GLOBE_ROUTE_PROMOTION_RUNBOOK_V1.md`](GLOBE_ROUTE_PROMOTION_RUNBOOK_V1.md) § El canary.
+
+🔴 **No la confundas con `stalled`** (`promotion_queue_oldest_age_seconds`), que mide edad de cola de
+operaciones **ya reclamables** (`deadline_at <= now`) y por tanto avisa **cuando la ventana venció**. Las
+cuatro promociones que murieron el 2026-08-04 lo hicieron a **+2 s, +18 s, +26 s y +40 s** del deadline: para
+todas ellas `stalled` llegaba tarde **por diseño**. Son los dos lados del mismo instante y ninguna sustituye a
+la otra. Si `window_closing` se apagó y `stalled` se encendió sobre la misma operación, la ventana ya se
+perdió: el remedio deja de ser el canary y pasa a ser el bloque siguiente.
+
+### `globe_promotion_readiness_divergent` — ERROR
+
+Una promoción revertida cuya `model_readiness_revisions` sigue en `promoted`. Es la señal que permite declarar
+ese agregado `observable` y que la palabra signifique algo: un `observable` sin señal es «no lo miramos».
+
+**Qué hacer:** pausar esa readiness por su **identidad exacta** (`globe.model-readiness.route.pause`,
+`promoted → paused`, append-only). Es un acto **humano y explícito** a propósito: la saga no porta
+`globe.model-readiness.pause`, y dársela dejaría que un rollback automático retire una promoción que un humano
+firmó. La señal se computa sobre el estado **leído ahora**, así que baja sola cuando alguien la cierra.
+
+🔴 **Pero ese remedio HOY NO TIENE CAMINO EJECUTABLE — verificado leyendo el código el 2026-08-05.**
+`transitionModelRoute` hace `requireHuman(c)` para todo destino distinto de `promoted`, así que un lane de
+service account **falla cerrado por diseño**; y `globe.model-readiness.pause` **no está** en
+`PRODUCER_HUMAN_CAPABILITY_SCOPES`, así que un humano por el BFF tampoco. Cerrarlo exige el rollout de 3 pasos
+del broker más una superficie que lo despache; dueño: `TASK-1463` (Delta 2026-08-05).
+
+✅ **Mitigación verificada mientras tanto: volver a promover la ruta también cierra la divergencia**, porque
+enciende el binding y vuelve coherente la readiness `promoted`. Ejercitado el 2026-08-05 sobre
+`ref/still/reference-v1`: la señal bajó de 1 a 0. Elige este camino cuando la decisión correcta sea **restaurar**
+la ruta; el `pause` sólo hace falta cuando la decisión es **retirarla**, y ése es justo el caso que espera un
+humano con autoridad.
+
+⚠️ **El predicado tiene DOS filtros y ninguno alcanza solo** (`efeonce-globe@b958a11`): sólo reporta la
+**última** promoción de cada identidad **y** exige que su **binding siga apagado**. El segundo se agregó porque
+sin él la señal era **mediblemente falsa**: el lane automatizado de ADR-010 habilita rutas **sin pasar por la
+saga**, así que no deja operación posterior que las supersede, y dos rutas **vivas** aparecían como
+divergentes. Verifica la identidad antes de actuar.
+
+### `globe_run_abandon_release_degraded` — WARNING
+
+La liberación rápida de una reserva **pre-gasto** falló y el sistema degradó al expiry (TTL 24 h). **No hay
+pérdida** —el crédito se recupera igual— pero el steady esperado es 0 y cualquier valor dice que la vía rápida
+se rompió.
+
+**Qué hacer:** el payload lleva `workspaceId`, `experimentId`, `attemptId` y `reservedCredits`. Revisa el
+dueño económico (fence / ledger). No hace falta acción manual sobre la reserva: el expiry la recoge.

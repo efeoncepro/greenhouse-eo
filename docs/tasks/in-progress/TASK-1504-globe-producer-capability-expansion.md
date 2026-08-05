@@ -1,5 +1,38 @@
 # TASK-1504 — Producer Capability Expansion (video frames/motion · audio change-voice/translate · multi-output omni · voice-preset registry)
 
+## Delta 2026-08-02 — corrección del contrato Omni y dependencia de TASK-1633
+
+La evidencia oficial actual corrige dos supuestos históricos de esta task: Gemini Omni no demuestra un output
+`{video,audio}` separado — entrega un MP4 con audio nativo— y `reference_to_video` no soporta hoy referencias de
+video/audio confiables. El contrato multi-output genérico permanece válido para otros providers, pero deja de usar
+Omni como prueba o requisito de dos outputs.
+
+TASK-1504 consume primero el descriptor de `TASK-1633` y migra Omni con estas reglas:
+
+- la ruta promovida `ref/motion/reference-v1` conserva identidad/evaluación/review/atestación/policy existentes y
+  se restringe a prompt + referencias de imagen; no se repite evaluación ni se reutiliza su candidato;
+- `duration` (3–10 s) y `aspectRatio` (`16:9|9:16`) llegan realmente a Vertex; 720p/24 FPS y audio nativo se
+  registran como output contract; `silent` no se ofrece como parámetro estructurado no verificable;
+- texto a video, imagen como first frame y reference-to-video son operaciones/rutas distintas. Cada ruta nueva
+  necesita identidad, rate, evaluación, atestación/policy, binding, promoción y canary propios;
+- video fuente, edición y continuidad conversacional pertenecen a `TASK-1573`; audio/video reference-to-video,
+  híbridos arbitrarios, voice editing, extensión e interpolación no se declaran soportados;
+- C2PA y SynthID son evidencia esperada de Omni y Asset Governance debe verificarlos sin inventarlos.
+
+Criterios exigibles adicionales:
+
+- [ ] La ruta actual rechaza referencias video/audio antes del estimate/fence y acepta sólo imágenes gobernadas.
+- [ ] Prompt, duración y ratio efectivos quedan en request snapshot/manifest; no se fijan o descartan en el adapter.
+- [ ] El output Omni se modela como un `video/mp4` con audio embebido, no como audio asset separado.
+- [ ] `text_to_video`, `image_to_video` y `reference_to_video` nunca comparten promoción/canary por transitividad.
+- [ ] El canary existente pendiente usa únicamente la ruta promovida exacta y una imagen de referencia gobernada.
+- [ ] La documentación retira toda afirmación de audio/video reference o multi-output Omni sin evidencia.
+- [ ] El rollout termina con exactamente una generación UI nueva de regresión en Seedance y una en Omni, cada una
+      con idempotency key distinta y única, un run facturable, un cobro, attempt terminal, output nuevo, playback,
+      retención, lineage y Asset Governance terminales.
+- [ ] El canary Seedance no reabre TASK-1614, no repite evaluación/promoción, no fondea y usa su ruta ya promovida;
+      ante respuesta ambigua se consulta run/attempt por la misma correlación antes de cualquier reintento.
+
 ## Delta 2026-07-22
 
 - `TASK-1503` **complete** — el retrieval gobernado y las asset actions ya existen (siguen fuera del
@@ -55,13 +88,74 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-028`
-- Status real: `Desplegada internal-only; ruta base video canariada, capacidades avanzadas aún requieren canarios propios`
+- Status real: `Omni desplegado y saga activada internal-only; canary gobernado bloqueado por la superficie Producer; otras capacidades avanzadas conservan canarios propios pendientes`
 - Rank: `TBD`
 - Domain: `creative|ai|platform`
-- Blocked by: `none`
-- Branch: `task/TASK-1504-globe-producer-capability-expansion`
+- Blocked by: `TASK-1633 para la corrección contractual Omni; los otros canarios de esta task conservan sus gates propios`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Checkpoint 2026-08-02 — Gemini Omni, handoff exacto de promoción internal-only
+
+- Identidad inmutable: `ref/motion/reference-v1 / vertex-omni / gemini-omni-flash-preview / preview`.
+  Globe `main@62337b483fd965cd3a518fa1b9d13c7b0ac6d3f4` ya contiene el driver gobernado, la simetría
+  API/Producer worker y el acceso condicional al secret Gemini. Este checkpoint no autoriza otro adapter,
+  routeId ni provider call directo.
+- La evaluación exacta ya existe y **no debe repetirse**: report
+  `5f20a731-26e3-423b-b453-f5f0758e160f`, attempt
+  `d68605db-7d33-4ea6-b540-e6063668f3f7` y review humana
+  `review_e77b2999-0da9-4eea-9081-3a0068b8a580`. Readiness está `promoted` revisión 2 y el binding de la
+  ruta está habilitado revisión 5.
+- El circuito permanece deliberadamente `open` con razón `promotion_recovery_canary_unattested`; por ello la
+  ruta todavía no es un canary gobernado cerrado ni debe presentarse como disponible por esta evidencia parcial.
+- La atestación aplicable es únicamente
+  `mcra_8c59f455-8704-47b1-9489-26d468f8ff8d`, con `sublicensable=false` y digest
+  `sha256:04e949c5a43564c336d5380362b8cd2515766ee6bc85a736abec94cec7e53d4b`. Sustituye la atestación
+  anterior jurídicamente inexacta; la historia inmutable no se reescribe.
+- La causa raíz de `auto-promote` ya quedó corregida y publicada en Globe
+  `main@fa286dbda0a3c1ce02de7d5a2ab173ba1bf34966`: la idempotency key incorpora la atestación/policy y el test
+  de regresión prueba una segunda atestación sin duplicar la route revision. CI `30744034457` terminó verde
+  (`check` + `build`); el runtime quedó desplegado y reconciliado en el estado de ejecución posterior.
+- Secuencia única restante: ejecutar **un solo canary nuevo** desde Producer autenticado cuando el modo
+  `Elementos` esté publicado → verificar playback, cobro único, retención, lineage y Asset Governance → ejecutar
+  `canary-confirm` y reconciliar el reader live. No repetir auto-promote, evaluación ni la saga ya activada.
+- `TASK-1504` continúa `in-progress`: cerrar Omni no certifica por transitividad `video-frames`,
+  `audio-change-voice`, `audio-translate`, otros casos multi-output ni las voces curadas pendientes.
+
+## Estado de ejecución 2026-08-02 — despliegue y saga verificados; canary bloqueado en Producer
+
+- Globe `main@fa286dbda0a3c1ce02de7d5a2ab173ba1bf34966` quedó desplegado sin Studio: API workflow
+  `30744857697` → revisión `globe-api-internal-00187-9ht`, 100% de tráfico; Producer worker workflow
+  `30744857698` → imagen con digest `sha256:764acd30c1e4678c87042e1fe004b25c984529cb92df3e0c5e18bd59b5e8a36a`.
+  OpenTofu fue aplicado con `1 add, 2 change, 0 destroy`: gate Omni `true` en API/worker y acceso IAM al
+  secret `globe-gemini-api-key` para ambas service accounts.
+- `auto-promote` workflow `30745031010` terminó `success` con la atestación
+  `mcra_8c59f455-8704-47b1-9489-26d468f8ff8d`; la policy derivada se leyó como
+  `arp_8090d31ae570c016f84cad0f7aee09ba84578f1dbd3622074a38cfa03a839ff5`, versión de policy igual a la
+  atestación, `no-sublicense`, términos y digest
+  `sha256:04e949c5a43564c336d5380362b8cd2515766ee6bc85a736abec94cec7e53d4b` exactos. Reader de policy:
+  `30745219391`.
+- La saga continuó una sola vez: operación
+  `promotion_922157fa-b708-45cc-8bbf-b08d761afb21`; start `30745272975`, stage `30745297572`, promote
+  `30745319614`, activate `30745343659`. Readbacks posteriores `30745513017`, `30745514170`,
+  `30745515254`, `30745516291` y `30745517313` reconciliaron operación `activated` rev. 7, readiness
+  `promoted` rev. 2, route rev. 7, binding habilitado y circuito cerrado por `promotion_activated`.
+- Créditos: readback canónico en Producer autenticado mostró `784` disponibles bajo cap `1500` y
+  `budget.evaluate.allowed=true`; no se ejecutó fondeo, evaluación, provider directo ni gasto.
+- El Producer autenticado con actor `user-efeonce-admin-julio-reyes` conserva la identidad y el selector
+  `Video → Gemini Omni Flash · Preview`, pero `Elementos` permanece deshabilitado en dos pestañas autenticadas
+  con el mensaje `Todavía no hay un modelo publicado para este modo`. Por eso no existe run/attempt nuevo,
+  cobro, output, playback, retención, lineage, Asset Governance ni `canary-confirm` en este corte. No se forzó
+  el control ni se ejecutó un payload de `Crear` disfrazado de `Elementos`.
+- Estado honesto: `code complete, rollout pendiente`; resolver la discrepancia de la superficie Producer/BFF
+  requiere una reconciliación de Studio/runtime que queda fuera de este alcance porque esta sesión no autoriza
+  desplegar Globe Studio. No reabrir la evaluación ni reutilizar su candidato retenido.
+- Diagnóstico live preciso: la revisión Studio `globe-studio-internal-00133-b9k` (`595f0cb5460e`) hidrata el client
+  bundle (`/_client-seam` → `Estado: 0`), pero su `MODE_CAPABILITIES.video` deja la posición de `Elementos`
+  como `undefined`; el Composer filtra por capability y por eso renderiza el chip deshabilitado aunque Omni sea
+  `Disponible`. Corregir y desplegar ese cliente queda fuera de alcance por la prohibición explícita de desplegar
+  Studio; no se debe simular el modo desde `Crear` ni forzar el control.
 
 ## Checkpoint 2026-07-23 — rollout parcial honesto
 
@@ -440,6 +534,12 @@ regresión + `assertInputModeSatisfied` (cuenta referencias **por tipo de medio*
 
 ### Pendiente bloqueante — gate humano, no trabajo de código
 
+> **Delta dominante 2026-08-02:** para Gemini Omni el driver, evaluación, review, readiness y binding ya existen.
+> Su pendiente exacto es el checkpoint anterior: desplegar el fix ya integrado con CI verde, repetir auto-promote
+> con la atestación vigente, verificar policy/readbacks, producir un único canary nuevo y confirmarlo. La lista
+> histórica siguiente continúa aplicando sólo a las demás capacidades todavía no canariadas y no autoriza repetir
+> la evaluación de Omni.
+
 - [ ] **Canario facturable por capability** (`video-frames`, `video-motion-control`,
       `audio-change-voice`, `audio-translate`, omni multi-output): 1 run real bajo el fence con
       `GLOBE_LAB_PROVIDER` real, registrando `actualRoute`, créditos y `outputs` con `sha256`.
@@ -451,6 +551,55 @@ regresión + `assertInputModeSatisfied` (cuenta referencias **por tipo de medio*
       curadas reales. Hasta entonces todo `voicePreset` de tipo `catalog` falla cerrado.
 
 Estado correcto mientras esto siga abierto: **`code complete, rollout pendiente`**, no `complete`.
+
+## Delta 2026-08-02 (b) — TASK-1504 recibe el canary de Omni y la declaración de mecanismos por ruta
+
+Reparto de alcance acordado con el operador: `TASK-1633` es foundation y **no puede quedar abierta esperando un
+canary que no controla**. Lo que sigue pasa a ser criterio de esta task, que ya es dueña de las identidades, el
+transporte, la promoción y el canary de Omni.
+
+### Delta 2026-08-03 — el bloqueo de IAM se levantó; el de transporte NO
+
+`TASK-1635` aplicó por Terraform el binding que faltaba (`efeonce-globe@786ee19`, plan `1 to add`), y la
+impersonación de `greenhouse-globe-caller@` quedó verificada con `token-returned`. El
+`IAM_PERMISSION_DENIED` sobre `iam.serviceAccounts.getAccessToken` que impedía correr `pnpm producer:canary`
+**ya no aplica**.
+
+⚠️ **Eso NO desbloquea el canary de Omni.** Eran dos bloqueos independientes y sólo cayó uno: el de
+herramienta. El de identidad sigue intacto —el binding declara `provider=vertex-omni` mientras el runtime
+inyecta el transporte de Generative Language— y es el que hace que un canary cobre por una identidad distinta
+de la aprobada. Confundirlos llevaría a ejecutar un canary inválido creyéndolo habilitado.
+
+### El bloqueo es de esta task, y es P0
+
+La identidad aprobada declara `provider=vertex-omni` sobre `aiplatform.googleapis.com`, pero API y worker todavía
+inyectan `createGeminiOmniTransport` por Generative Language (`apps/studio-web/src/app.ts:4173,4175`). **Un canary
+en ese estado cobraría por una identidad distinta de la aprobada.** El driver gobernado ya ejecuta por Vertex ADC
+y falla cerrado ante divergencia de endpoint (`efeonce-globe@55c3761`); lo que falta es la simetría API/worker.
+Mientras eso siga así, el canary de Omni no puede ejecutarse aunque la foundation esté completa.
+
+### Criterios que migran desde TASK-1633
+
+- [ ] Canary UI terminal de Omni: un run facturable, un attempt terminal y **un** cobro leído del ledger, con
+      output retenido, playback real, lineage, rights y governance terminales.
+- [ ] API y worker inyectan el **mismo** transporte Vertex ADC, verificado sobre la revisión activa, antes de
+      cualquier promoción o canary.
+
+El canary de Seedance ya quedó registrado el 2026-08-02 (`ref/motion/loop-v1`, `candidate_ready`, 16 cr, cobro
+único verificado) y no se repite.
+
+### Lo que ADR-022 Delta (c) le exige a cada ruta nueva de esta task
+
+`text_to_video`, `image_to_video` y `reference_to_video` **no pueden heredar el default `PROMPT_CONTROLS`**: cada
+una declara el mecanismo de sus controles contra el contrato oficial de Vertex. Dos consecuencias medidas el
+2026-08-02:
+
+- **Ningún adapter de Globe manda campo negativo nativo** (cero `negative_prompt` en `apps/creative-runner/src`),
+  y 13 de las 17 rutas heredan `negative-prompt: prompt-semantic` del default. Para Omni eso es una promesa sin
+  respaldo: la negación viaja como texto dentro del prompt, donde tiende a reforzar lo que niega. Declararlo
+  `unsupported` es más honesto que heredarlo, salvo evidencia oficial de un campo nativo.
+- Cámara, estilo, movimiento y temporalidad son `prompt-semantic` para Omni **salvo evidencia oficial de un
+  parámetro nativo exacto** — ya declarado en el plan y ahora exigible por ruta.
 
 ## Closing Protocol
 

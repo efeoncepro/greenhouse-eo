@@ -288,6 +288,14 @@ const publishCaseEvent = async (
 const assertPayrollExecutionReadiness = async (client: PoolClient, current: OffboardingCase) => {
   if (current.status !== 'scheduled' || current.ruleLane !== 'internal_payroll') return
 
+  // Chile dependent offboarding uses the final-settlement/document gates.
+  // international_internal is paid through Greenhouse but has no Chile
+  // settlement aggregate; its payroll cutoff is still closed at execution.
+  const requiresChileanFinalSettlement =
+    current.contractTypeSnapshot === 'indefinido' || current.contractTypeSnapshot === 'plazo_fijo'
+
+  if (!requiresChileanFinalSettlement) return
+
   if (current.requiresPayrollClosure) {
     const settlementRows = await client.query<{ calculation_status: string; readiness_has_blockers: boolean }>(
       `

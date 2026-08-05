@@ -59,7 +59,7 @@ assertions: [
 
 ## Microinteraction evidence V2
 
-Usá `interaction` cuando la incertidumbre sea el feedback de una acción, no solo una captura estática:
+Usa `interaction` cuando la incertidumbre sea el feedback de una acción, no solo una captura estática:
 
 ```ts
 {
@@ -110,7 +110,7 @@ baseline: {
 }
 ```
 
-Capturá mockup y runtime, luego compará con `pnpm fe:capture:diff <mockup-run> <runtime-run>`.
+Captura mockup y runtime, luego compara con `pnpm fe:capture:diff <mockup-run> <runtime-run>`.
 
 ### Contract gates V1.5 (TASK-1018)
 
@@ -138,7 +138,7 @@ quality: {
 
 Workflow mockup→runtime canónico:
 
-1. Capturá el mockup aprobado: `pnpm fe:capture <scenario> --env=local`.
+1. Captura el mockup aprobado: `pnpm fe:capture <scenario> --env=local`.
 2. Promové el baseline durable: `pnpm fe:capture:diff --promote .captures/<run>` → commiteá `scripts/frontend/baselines/<surfaceId>/`.
 3. El scenario runtime declara el mismo `baseline.surfaceId` + thresholds; `fe:capture` corre el diff solo.
 4. Sin baseline durable, el diff degrada honesto a `baseline_stale` (warning).
@@ -209,7 +209,7 @@ pnpm fe:capture <scenario-name> --env=staging --headed    # debug visual
 - `flipbook.gif` — opt (con `--gif`)
 - `stdout.log`
 
-## Observá antes de autorar (aria snapshot — TASK-1097)
+## Observa antes de autorar (aria snapshot — TASK-1097)
 
 No adivines selectores. Cada `mark` escribe `frames/<NN>-<label>.aria.txt` con el árbol de accesibilidad real (`manifest.frames[].ariaSnapshotPath`):
 
@@ -220,21 +220,21 @@ No adivines selectores. Cada `mark` escribe `frames/<NN>-<label>.aria.txt` con e
   - img "Efeonce"
 ```
 
-Leé ese archivo y escribí `getByRole('button', { name: 'Notifícame' })` contra lo que existe — en vez de `[class*="MuiButton"]:nth-child(3)` adivinado. **Preferí user-facing locators** (`getByRole`/`getByText`/data-markers `[data-capture]`) sobre CSS/`nth-child` (frágil). Detalle: skill `greenhouse-gvc-playwright`.
+Lee ese archivo y escribe `getByRole('button', { name: 'Notifícame' })` contra lo que existe — en vez de `[class*="MuiButton"]:nth-child(3)` adivinado. **Prefiere user-facing locators** (`getByRole`/`getByText`/data-markers `[data-capture]`) sobre CSS/`nth-child` (frágil). Detalle: skill `greenhouse-gvc-playwright`.
 
 ### Explore → promote (TASK-1098)
 
-En vez del throwaway manual, usá el modo explore:
+En vez del throwaway manual, usa el modo explore:
 
 ```bash
-pnpm fe:capture:explore --route=/finance/cash-out --env=staging   # observá la página viva (read-only)
+pnpm fe:capture:explore --route=/finance/cash-out --env=staging   # observa la página viva (read-only)
 pnpm fe:capture:promote --route=/finance/cash-out --name=mi-feature   # → scripts/frontend/scenarios/mi-feature.scenario.ts
-pnpm fe:capture mi-feature --env=staging   # revisá selectores/marks y capturá
+pnpm fe:capture mi-feature --env=staging   # revisa selectores/marks y captura
 ```
 
-`explore` persiste `.captures/_explore/<slug>/{session.json, aria.txt, snapshot.png}` con los candidatos + su `getByRole(...)` sugerido + uniqueness validada + markers + probes (`--probe 'role=button[name="X"]'`). `promote` cristaliza la sesión en un `.scenario.ts` válido (readiness auto + marks). **Revisá la readiness del scenario generado** (si ancla a un heading con copy dinámico es flaky → preferí un marker estable).
+`explore` persiste `.captures/_explore/<slug>/{session.json, aria.txt, snapshot.png}` con los candidatos + su `getByRole(...)` sugerido + uniqueness validada + markers + probes (`--probe 'role=button[name="X"]'`). `promote` cristaliza la sesión en un `.scenario.ts` válido (readiness auto + marks). **Revisa la readiness del scenario generado** (si ancla a un heading con copy dinámico es flaky → prefiere un marker estable).
 
-**Microinteracciones/coreografía (TASK-1099):** `pnpm fe:capture:explore --route=X --interaction 'hover:<selector>'` (hover/focus/click — read-only) performa la acción y observa `before`/`feedback`/`settled`; `promote` auto-emite un step `interaction` (V2) por cada interacción observada. Ajustás `intent`/timings. También podés autorar el step `interaction` a mano (abajo) o `fe:capture:micro`.
+**Microinteracciones/coreografía (TASK-1099):** `pnpm fe:capture:explore --route=X --interaction 'hover:<selector>'` (hover/focus/click — read-only) performa la acción y observa `before`/`feedback`/`settled`; `promote` auto-emite un step `interaction` (V2) por cada interacción observada. Ajustas `intent`/timings. También puedes autorar el step `interaction` a mano (abajo) o `fe:capture:micro`.
 
 ## Reglas duras
 

@@ -41,7 +41,7 @@ multi-paso) y estados (cargando / error / no disponible) desde fixtures.
 
 1. Edita la pagina con **Elementor**.
 2. En el buscador de widgets escribe **"Growth Form"** (categoria **Greenhouse**) y
-   arrastralo a la pagina.
+   arrástralo a la pagina.
 3. En el panel del widget:
    - **Formulario (catálogo)**: elige de la lista desplegable un formulario publicado de
      Greenhouse. Cada opcion muestra el nombre, la version y si esta listo para recibir
@@ -226,7 +226,7 @@ legible y `scrollWidth == clientWidth`.
 
 **Identidad estable `form-key` (TASK-1297, recomendado):** además de `form="<slug>"`, el
 renderer acepta `form-key="<UUID>"` — la identidad opaca, estable e inmutable del formulario
-(no cambia por nueva versión, rename de slug ni nuevo surface). Preferila sobre `slug` para
+(no cambia por nueva versión, rename de slug ni nuevo surface). Prefiérela sobre `slug` para
 embeds y mutaciones; `slug` queda como alias humano/backward-compatible. La misma ruta pública
 (`/api/public/growth/forms/{ref}`) resuelve por slug **o** por form-key (UUID) — no hay endpoint
 nuevo. El `form-key` es público/opaco; **NUNCA** es el HubSpot destination form GUID (server-only).

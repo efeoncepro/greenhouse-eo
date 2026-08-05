@@ -19,7 +19,7 @@
 - Rank: `TBD`
 - Domain: `ops`
 - Blocked by: `TASK-1521`, `TASK-1536`, `TASK-1537`, `TASK-1538`, `TASK-1539`, `TASK-1540`
-- Branch: `task/TASK-1541-globe-video-effectiveness-commercial-rollout`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 
 ## Summary

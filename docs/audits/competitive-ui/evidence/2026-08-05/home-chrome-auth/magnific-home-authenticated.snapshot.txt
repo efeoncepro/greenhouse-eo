@@ -1,0 +1,210 @@
+- navigation:
+  - link:
+    - /url: /app
+  - button:
+  - button "Create":
+    - generic: Create
+  - link "Home":
+    - /url: /app
+    - generic: Home
+  - button "Search":
+    - generic: Search
+  - link "Stock":
+    - /url: https://www.magnific.com/stock#from_element=mainmenu
+    - generic: Stock
+  - link "Explore":
+    - /url: /app/explore
+    - generic: Explore
+  - link "Projects":
+    - /url: /app/projects/work
+    - generic: Projects
+  - link "Library":
+    - /url: /app/library/characters
+    - generic: Library
+  - separator
+  - button "All tools":
+    - generic: All tools
+  - link "Spaces":
+    - /url: /app/spaces#from_element=mainmenu&from_view=pinned_tool
+    - button "Spaces":
+      - generic: Spaces
+      - button:
+  - link "Image Generator":
+    - /url: /app/ai-image-generator#from_element=mainmenu&from_view=pinned_tool
+    - button "Image Generator":
+      - generic: Image Generator
+      - button:
+  - link "Video Generator":
+    - /url: /app/ai-video-generator#from_element=mainmenu&from_view=pinned_tool
+    - button "Video Generator":
+      - generic: Video Generator
+      - button:
+  - link "Voice Generator":
+    - /url: /app/voiceover-generator#from_element=mainmenu&from_view=pinned_tool
+    - button "Voice Generator":
+      - generic: Voice Generator
+      - button:
+  - link "Designer":
+    - /url: /app/tools/designer#from_element=mainmenu&from_view=pinned_tool
+    - button "Designer":
+      - generic: Designer
+      - button:
+  - link "3D Scenes":
+    - /url: /app/tools/3d-scenes#from_element=mainmenu&from_view=pinned_tool
+    - button "3D Scenes":
+      - generic: 3D Scenes
+      - button:
+  - button:
+  - link:
+    - /url: /academy
+    - button:
+  - button "Notifications":
+  - generic: "17"
+  - button:
+  - button:
+- banner:
+  - button "AI Assistant":
+  - button:
+    - button:
+  - button "Customize":
+    - text: Customize
+- heading "Good evening, start creating!" [level=1]
+- generic: Ask Magnific or navigate to
+- generic: ⌘ K
+- link "Spaces":
+  - /url: /app/spaces
+  - generic: Spaces
+- link "Image":
+  - /url: /app/tools/image
+  - generic: Image
+- link "Video":
+  - /url: /app/tools/video
+  - generic: Video
+- link "Audio":
+  - /url: /app/tools/audio
+  - generic: Audio
+- link "Design":
+  - /url: /app/tools/design
+  - generic: Design
+- link "3D":
+  - /url: /app/tools/3d
+  - generic: 3D
+- link "Stock":
+  - /url: https://www.magnific.com/stock
+  - generic: Stock
+- button "All tools":
+  - generic: All tools
+- generic: "Magnific Originals: shorts and series, made with talent, powered by AI"
+- link "Explore Originals":
+  - /url: /app/explore/originals
+  - text: Explore Originals
+- button "Projects":
+  - text: Projects
+- button:
+- list:
+  - button:
+  - link "Personal":
+    - /url: /app/projects/c89d9df0-7481-4161-8b5e-8e94bf1bcb97
+    - paragraph: Personal
+  - button:
+  - region
+  - button "Team project Upgrade":
+    - paragraph: Team project
+    - generic: Upgrade
+- button "Spaces":
+  - text: Spaces
+- button:
+- button "Air Traffic Control Training Video Air Traffic Control Training Video 29 days ago":
+  - img "Air Traffic Control Training Video"
+  - generic: Air Traffic Control Training Video
+  - generic: 29 days ago
+- button "Sin título Sin título 3 months ago":
+  - img "Sin título"
+  - generic: Sin título
+  - generic: 3 months ago
+- button "Sin título Sin título 2 months ago":
+  - img "Sin título"
+  - generic: Sin título
+  - generic: 2 months ago
+- button "Sin título Sin título 7 months ago":
+  - img "Sin título"
+  - generic: Sin título
+  - generic: 7 months ago
+- 'button "Template: Create social media content Template: Create social media content 8 months ago"':
+  - 'img "Template: Create social media content"'
+  - generic: "Template: Create social media content"
+  - generic: 8 months ago
+- button "My work":
+  - text: My work
+- button "What's new"
+- button "Use cases"
+- button "Academy"
+- button "Community"
+- button:
+- button:
+- button "Explore all":
+  - text: Explore all
+- text: What's new
+- paragraph: "MiniMax H3: Video with native sound"
+- generic: Try it now
+- 'img "MiniMax H3: Video with native sound"'
+- link "What's new Magnific moved into InDesign Try it now Magnific moved into InDesign":
+  - /url: https://www.magnific.com/plugins/indesign
+  - text: What's new
+  - paragraph: Magnific moved into InDesign
+  - generic: Try it now
+  - img "Magnific moved into InDesign"
+- text: What's new
+- paragraph: Re-voice videos with Veed Lip Sync 2.0
+- generic: Try it now
+- img "Re-voice videos with Veed Lip Sync 2.0"
+- text: What's new
+- paragraph: "The Chronicles of Bone: Ch. 3"
+- generic: Watch it now
+- 'img "The Chronicles of Bone: Ch. 3"'
+- text: What's new
+- paragraph: Seed Audio 1.0 Voice. Music. SFX
+- generic: Try it now
+- img "Seed Audio 1.0 Voice. Music. SFX"
+- text: What's new
+- paragraph: "Google Gemini Omni: Edit with your words"
+- generic: Try it now
+- 'img "Google Gemini Omni: Edit with your words"'
+- text: What's new
+- paragraph: "Unlimited: Nano Banana 2 Lite"
+- generic: Create images
+- 'img "Unlimited: Nano Banana 2 Lite"'
+- text: What's new
+- paragraph: Seedance 2.0 Mini
+- generic: Try it now
+- img "Seedance 2.0 Mini"
+- text: What's new
+- paragraph: "Candela: Our first Studios Original"
+- generic: Find out more
+- 'img "Candela: Our first Studios Original"'
+- text: What's new
+- paragraph: Seedance 2.0 4K, sharper control
+- generic: Try it out
+- img "Seedance 2.0 4K, sharper control"
+- button
+- button
+- button
+- button
+- button
+- button
+- button
+- button
+- button
+- button [disabled]:
+- button:
+- generic: Customize
+- button:
+- button "Presets":
+  - generic: Presets
+- button:
+- generic: Search
+- button
+- separator
+- button "Save new preset"
+- button "Share feedback":
+  - text: Share feedback

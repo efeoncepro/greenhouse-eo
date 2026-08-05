@@ -44,7 +44,7 @@ export async function getVercelCliToken({ log = noop } = {}) {
         const expiresMs = typeof data.expiresAt === 'number' ? (data.expiresAt > 1e12 ? data.expiresAt : data.expiresAt * 1000) : null
 
         if (expiresMs !== null && expiresMs < Date.now()) {
-          log(`  bypass: token de ${path} expirado (expiresAt=${data.expiresAt}) — se ignora; exportá VERCEL_TOKEN o corré vercel login`)
+          log(`  bypass: token de ${path} expirado (expiresAt=${data.expiresAt}) — se ignora; exportá VERCEL_TOKEN o corre vercel login`)
           continue
         }
 

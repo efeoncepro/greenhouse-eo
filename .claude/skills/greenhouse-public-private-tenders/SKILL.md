@@ -88,6 +88,26 @@ En una licitación de contenidos **todas las ofertas dicen lo mismo** ("optimiza
 9. **Creative Studio se cotiza por capas, no por una falsa tarifa por pieza.** Si el bid incluye producción generativa, separa acceso/gobernanza, capacidad humana, Studio Credits, implementación/IP y derechos/licencias/pass-through. El precio total exigido por las bases puede consolidarse hacia afuera, pero la hoja económica interna conserva las cinco líneas y su margen.
 
 9. **El deal vive en un workspace canónico (el "DSR interno").** Arráncalo con `pnpm tender:new <slug>`: carpeta con `bases/` (RFP) · `research/` (investigación 🔒) · `oferta-tecnica.md` (fuente + ledger de evidencia) · `deck-plan.json` · `artifact-manifest.json` (piezas vivas por enlace) · `anexos/` · `*-INTERNO`. El discriminador que manda es **audiencia**: `research/` + `*-INTERNO` **nunca** cruzan al cliente. Las fuentes son archivos git (NO `proposal_assets`); el aggregate `Proposal` referencia la carpeta por `proposal_id`. Contrato: `docs/commercial/tenders/TENDER_WORKSPACE_TEMPLATE.md`.
+9 bis. **El PDF local no cierra el deal.** Todo workspace con deck debe conservar `proposal-studio.json` y pasar `pnpm tender:canonical-gate <slug>` con `status=verified`. El gate exige `proposalId`, render job gobernado completado, PDF/previews versionados en `proposal_assets` y verificación autenticada en Proposal Studio. `pnpm deck:compose` es taller/exploración; `.captures/` nunca es evidencia suficiente de cierre. El schema y la secuencia viven en `docs/commercial/tenders/PROPOSAL_STUDIO_CLOSURE_SCHEMA.md`.
+
+### Reglas generales aprendidas para la propuesta y el deck
+
+10. **Separa la fuente y gobernanza técnica/económica; no impongas separación física.** Según las bases y
+    la etapa, el paquete puede ser técnico solo, económico solo, separado, combinado o mixto. Todo monto
+    embebido deriva de la misma cotización aprobada; si existen artefactos independientes, cada uno conserva
+    narrativa, `deck-plan`, output, manifest y capturas propios. Nunca reemplaces el deck de otra licitación
+    ni mezcles sus assets.
+11. **Usa `PricingFull` para presentar la inversión.** La oferta económica debe mostrar la opción
+    recomendada, el desglose cotizado y las condiciones comerciales desde una cotización aprobada;
+    no autorices una tabla libre que omita la estructura del catálogo.
+12. **Declara siempre la base fiscal.** Cada monto client-facing debe indicar de forma visible si es
+    neto y si el IVA está excluido o incluido. La propuesta económica y el deck deben decir lo mismo.
+13. **Cuando aplique, presenta HubSpot CRM como beneficio incluido.** Especifica la configuración
+    inicial obsequiada, sus límites y las licencias o módulos pagados que quedan a cargo del cliente;
+    no lo confundas con una licencia ilimitada ni con una implementación enterprise.
+14. **Cierra con revisión visual completa.** Después de componer, inspecciona todos los frames
+    exportados de cada deck y verifica recortes, legibilidad, jerarquía, condiciones fiscales, assets
+    y consistencia. Los tests técnicos no bastan para declarar la oferta lista.
 
 ## Sinergias — tabla de hand-off
 

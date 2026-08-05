@@ -1,5 +1,10 @@
 # TASK-1310 — Growth SEO: Client Dashboard + Report Artifact + 360 Quadrant
 
+## Delta 2026-08-05
+
+- `readSeoAeoGap` YA existe (TASK-1305 complete): contrato `SeoAeoGapResult` en `src/lib/growth/seo/contracts.ts` + reader en `src/lib/growth/seo/gap/read-seo-aeo-gap.ts` + clasificador `classifyQuadrant` importable por la UI (leyendas). El quadrant 360 de esta task CONSUME ese contrato — no re-implementa el cruce. V1 con `aeoAxisGranularity='domain'`; degradaciones `no_seo_data`/`no_aeo_data` requieren empty states accionables.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

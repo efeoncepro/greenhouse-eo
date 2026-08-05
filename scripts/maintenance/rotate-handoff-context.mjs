@@ -8,6 +8,7 @@ const root = process.cwd()
 const apply = process.argv.includes('--apply')
 const bootstrapChangelog = process.argv.includes('--bootstrap-changelog')
 const maxSessions = positiveIntegerArg('--max-sessions=', 20)
+const maxHandoffLines = positiveIntegerArg('--max-handoff-lines=', 600)
 const maxChangelogEntries = positiveIntegerArg('--max-changelog-entries=', 60)
 const maxChangelogLines = positiveIntegerArg('--max-changelog-lines=', 2_000)
 
@@ -54,13 +55,28 @@ function hash(contents) {
 function planHandoffRotation() {
   const filePath = path.join(root, 'Handoff.md')
   const originalContents = readFileSync(filePath, 'utf8')
-  const matches = [...originalContents.matchAll(/^## Sesi[oó]n[^\n]*$/gim)]
+  /*
+   * Una sesión del Handoff es un heading `##` que lleva su FECHA, no uno que empiece con la palabra
+   * «Sesión».
+   *
+   * El patrón anterior (`^## Sesi[oó]n…`) matcheaba **1 de 40** secciones reales: la convención del
+   * archivo derivó hacia headings temáticos —`## ISSUE-137 — … (2026-08-04)`, `## TASK-1469 — …`,
+   * `## 2026-07-30 — Globe: …`— y la herramienta nunca la alcanzó. El efecto era peor que no rotar:
+   * `docs:context-check:strict` avisaba «994 líneas, budget 600» y **recomendaba correr esta misma
+   * rotación**, que respondía «1/20 sesiones activas; nada que archivar». Un gate que manda a ejecutar
+   * un comando incapaz de resolverlo enseña a ignorar el gate.
+   *
+   * La fecha es el ancla correcta porque el ranking de abajo ya ordena por ella; un heading sin fecha
+   * caería a `0000-00-00` y se archivaría primero, así que se exige explícitamente en el patrón en vez
+   * de aceptarlo y degradar en silencio.
+   */
+  const matches = [...originalContents.matchAll(/^## [^\n]*\d{4}-\d{2}-\d{2}[^\n]*$/gm)]
 
-  if (matches.length <= maxSessions) {
+  if (matches.length <= maxSessions && lineCount(originalContents) <= maxHandoffLines) {
     return {
       kind: 'Handoff',
       required: false,
-      summary: `${matches.length}/${maxSessions} active sessions; nothing to archive.`
+      summary: `${matches.length}/${maxSessions} active sessions and ${lineCount(originalContents)}/${maxHandoffLines} lines; nothing to archive.`
     }
   }
 
@@ -80,13 +96,25 @@ function planHandoffRotation() {
     return byDate || left.originalIndex - right.originalIndex
   })
 
-  const active = ranked.slice(0, maxSessions)
-  const archived = ranked.slice(maxSessions)
+  const active = []
+  const archived = []
+
+  for (const block of ranked) {
+    const candidate = `${preamble}\n\n${[...active, block].map(value => value.contents).join('\n\n')}\n`
+    const fitsSessionBudget = active.length < maxSessions
+    const fitsLineBudget = lineCount(candidate) <= maxHandoffLines
+
+    if (fitsSessionBudget && (fitsLineBudget || active.length === 0)) active.push(block)
+    else archived.push(block)
+  }
 
   return {
     kind: 'Handoff',
-    required: true,
-    summary: `keep ${active.length}; archive ${archived.length}.`,
+    required: archived.length > 0,
+    summary:
+      archived.length > 0
+        ? `keep ${active.length}; archive ${archived.length}.`
+        : `${active.length}/${maxSessions} active sessions still exceed ${maxHandoffLines} lines; manual compaction required.`,
     filePath,
     originalContents,
     preamble,

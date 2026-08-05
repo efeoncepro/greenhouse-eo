@@ -98,7 +98,8 @@ Manifest machine-readable y gateado: [`docs/operations/agent-context-router.json
 | Identity/roles/session/access                       | skill identity aplicable                                         | `agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md` + entitlements/roles architecture                                                                                          |
 | Organization/Client portal/Account 360              | skill producto aplicable                                         | `agent-invariants/ORG_CLIENT_AGENT_INVARIANTS.md`                                                                                                                                    |
 | Knowledge/Nexa                                      | `greenhouse-nexa-conversational`                                 | `agent-invariants/KNOWLEDGE_NEXA_AGENT_INVARIANTS.md`                                                                                                                                |
-| **Efeonce Globe / Creative Studio** (repo hermano `efeonce-globe`) · EPIC-028 | `greenhouse-globe` (+ `arch-architect`) | **Globe es un PRODUCTO COMERCIAL de Efeonce (ADR-010), NUNCA un lab/piloto interno; su estadio de rollout hoy es internal-only + `internal_smoke` + externos gated por TASK-1480 — estadio ≠ naturaleza.** `architecture/creative-studio/README.md` + `DECISIONS_INDEX.md` + `operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md` (estado vivo) + `operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md` + `GLOBE_MODEL_FLEET_STATUS.md`. **ADR-016 (`Accepted` 2026-07-27): el payload cliente usa Tailwind v4 con `tokens.ts` como theme — NUNCA un valor de diseño literal en `className` (`text-[#hex]`, `p-[13px]`); todo sale del theme, que sale del SSOT. Dueño: `TASK-1485`.** Valores exactos del composer: `docs/ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md` |
+| **Efeonce Globe / Creative Studio** (repo hermano `efeonce-globe`) · EPIC-028 | `greenhouse-globe` + `greenhouse-globe-model-fleet` para rutas de modelos/proveedores (+ `arch-architect`) | **Globe es un PRODUCTO COMERCIAL de Efeonce (ADR-010), NUNCA un lab/piloto interno; su estadio de rollout hoy es internal-only + `internal_smoke` + externos gated por TASK-1480 — estadio ≠ naturaleza.** `architecture/creative-studio/README.md` + `DECISIONS_INDEX.md` + `operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md` (estado vivo) + `operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md` + `GLOBE_MODEL_FLEET_STATUS.md`. **ADR-016 (`Accepted` 2026-07-27): el payload cliente usa Tailwind v4 con `tokens.ts` como theme — NUNCA un valor de diseño literal en `className` (`text-[#hex]`, `p-[13px]`); todo sale del theme, que sale del SSOT. Dueño: `TASK-1485`.** Valores exactos del composer: `docs/ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md` |
+| **Efeonce MCP Platform / federación de providers** · `mcp.efeonce.org`, Streamable HTTP, OAuth, tools/resources/prompts, Cloud Run/ALB/TLS | `efeonce-mcp-platform` + skill dueña del provider | [`EFEONCE_MCP_AGENT_SKILL_ROUTER_V1.md`](docs/architecture/EFEONCE_MCP_AGENT_SKILL_ROUTER_V1.md) + [`EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md`](docs/architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md) + [`EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md`](docs/operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md) + `TASK-1626`; para Globe cargar además `greenhouse-globe` y `TASK-1473`. El gateway es adapter neutral: nunca sustituye el contrato, datos ni policy del provider. Estado inicial vivo: `globe.producer.fleet.list` read-only interno, `concurrency=80`, `maxScale=5`; acceso de clientes espera entitlements B2B/multitenant verificables. |
 | **AXIS Design System** · tokens, contracts, registry, adapters y distribución privada | `axis-design-system` | `docs/architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md` + `docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md` + `docs/operations/AXIS_CONTINUITY_MAP_2026-07-29.md` |
 | Notion sync/work management                         | `notion-platform`                                                | `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md` + Notion architecture/runbook aplicable                                                                                                     |
 | HubSpot/CRM/services intake                         | `hubspot-greenhouse-bridge` o `hubspot-as-a-service`             | `GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1.md`                                                                                                                                           |
@@ -108,7 +109,7 @@ Manifest machine-readable y gateado: [`docs/operations/agent-context-router.json
 | Growth/SEO/AEO/forms/CTAs/GTM                       | skill growth/SEO/GTM aplicable                                   | arquitectura del subdominio + `docs/context/` + tracking/privacy contracts                                                                                                           |
 | Sitio público WordPress/Kinsta                      | `efeonce-public-site-wordpress`                                  | `docs/public-site/README.md` + Kinsta access invariants                                                                                                                              |
 | Radiografía AEO / repo `efeonce-think`              | `seo-aeo`, `seo-aeo-practice`, `astro`                           | `docs/think/radiografia-aeo-architecture.md` + runbook/manual; runtime no vive aquí                                                                                                  |
-| Creative/editorial/image/audio/decks                | skill studio específica                                          | docs/skills de producción; preservar provenance, licencia, evidencia y gates humanos                                                                                                 |
+| Creative/editorial/image/audio/decks                | `greenhouse-ai-creative-rights-governance` + skill studio específica | derechos, consentimiento, provenance, licencias, indemnidad, disclosure y gates enterprise; `GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md` + docs/skills de producción |
 | Licitaciones/propuestas/composer                    | `greenhouse-public-private-tenders`, `deck-studio`               | `agent-invariants/COMMERCIAL_TENDERS_AGENT_INVARIANTS.md`                                                                                                                            |
 | Documentación/contexto/handoff                      | `greenhouse-documentation-governor`                              | `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md` + `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md` + `docs/architecture/GREENHOUSE_AGENT_CONTEXT_ROUTER_DECISION_V1.md` |
 | QA/cierre no trivial                                | `greenhouse-qa-release-auditor`                                  | `pnpm qa:gates --changed` + skills especializadas que el auditor inyecte                                                                                                             |
@@ -187,20 +188,28 @@ y [`GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md`](docs/ui/GREENHOUSE_PREMIUM_U
 ## Git, verificación y cierre
 
 - Preservar cambios ajenos; usar cambios mínimos coherentes y commits enfocados.
-- No ejecutar comandos destructivos ni cambiar de branch/worktree compartido sin autorización.
+- **Prohibición absoluta de worktrees aislados:** trabajar sólo en el checkout compartido actual. Nunca crear,
+  usar, mover trabajo a, ni operar desde `git worktree`, checkouts aislados o carpetas clonadas; tampoco tocar
+  worktrees preexistentes salvo autorización explícita que indique ruta y acción exactas. Si el estado compartido
+  bloquea, detenerse y pedir decisión al operador. Canon:
+  [`REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md`](docs/architecture/agent-invariants/REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md).
+- No ejecutar comandos destructivos ni cambiar de branch en el checkout compartido sin autorización.
 - Validar proporcionalmente: tests/lint/build/manual/runtime según riesgo y dominio.
 - Implementaciones no triviales: `greenhouse-qa-release-auditor` + `pnpm qa:gates --changed`.
 - Cierre documental: `greenhouse-documentation-governor` + `pnpm docs:closure-check`.
-- Contexto/handoff: `pnpm docs:context-check:strict` antes de cerrar cambios a estos contratos.
+- Contexto/handoff: `pnpm docs:context-check:strict` antes de cerrar cambios a estos contratos. Si recomienda
+  rotar, ejecutar `pnpm docs:context-rotate --apply` y repetir strict; no basta cumplir sesiones/entradas si
+  lineas o tokens siguen fuera de presupuesto.
 - Estado honesto: `complete | code complete, rollout pendiente | operativamente bloqueado`.
 
 ## Documentación viva
 
 - `AGENTS.md`: reglas transversales y router; nunca volver a almacenar specs de dominio inline.
 - `project_context.md`: estado durable vigente; sin diario ni secciones `Delta`.
-- `Handoff.md`: continuidad activa, máximo 20 sesiones.
-- `changelog.md`: ventana reciente de cambios reales; el historial sale a `docs/changelog/internal/` mediante
-  `pnpm docs:context-rotate --apply`, nunca se elimina ni se vuelve a pegar en raíz.
+- `Handoff.md`: continuidad activa, máximo 20 sesiones, 600 líneas y ~12.000 tokens.
+- `changelog.md`: ventana reciente de cambios reales, máximo 60 entradas, 2.000 líneas y ~60.000 tokens; el
+  historial sale a `docs/changelog/internal/` mediante `pnpm docs:context-rotate --apply`, nunca se elimina ni se
+  vuelve a pegar en raíz.
 - Tasks/issues/ADRs/arquitectura: evidencia y contrato canónico.
 - Historia: `docs/operations/agent-context-history/`, buscable bajo demanda y nunca auto-cargada completa.
 - Toda capacidad mantiene documentación técnica, funcional y manual/runbook proporcional.

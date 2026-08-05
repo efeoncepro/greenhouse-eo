@@ -7,6 +7,7 @@ import type { OffboardingClosureCompleteness } from './closure-completeness'
 
 export type OffboardingClosureLaneCode =
   | 'final_settlement'
+  | 'international_payroll'
   | 'contractual_close'
   | 'external_provider'
   | 'needs_classification'

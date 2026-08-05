@@ -14,6 +14,7 @@
 | Límites de formato (duración Reels/Shorts) | **volátil** | cualquier número de minutos/segundos | 02 |
 | Cadencia óptima de publicación por red | **trimestral** | "IG 3–5 feed + 2–4 Reels/sem", etc. | 03 |
 | Social search / % que busca en redes | **semestral** | "1 de 3 salta Google", ">50% Gen Z" | 05 |
+| Indexación externa / Platform Properties / analytics nativo | **volátil** | plataformas soportadas, elegibilidad, rollout y métricas disponibles | 05, 09 |
 | Políticas de etiquetado de IA por plataforma | **volátil** | reglas de disclosure, tiers, penalizaciones | 05, 10 |
 | Cifras de social commerce | **volátil** | tamaño de mercado, TikTok Shop $, conversión % | 08 |
 | Live shopping conversión | **trimestral** | "12–18%", "hasta 30%" | 08 |
@@ -45,6 +46,15 @@
 - ButtonBlock — Social Commerce Guide 2026 — https://buttonblock.com/blog/social-commerce-guide-2026
 
 **Social search / AEO-social / IA**
+- Google Search Console Help — Platform Properties (Instagram, TikTok, X, YouTube; rollout gradual) — https://support.google.com/webmasters/answer/17148418?hl=en-GB
+- Meta Help — elegibilidad de posts/Reels públicos de Instagram para motores externos — https://www.facebook.com/help/147542625391305
+- TikTok Support — Creator Search Insights — https://support.tiktok.com/en/using-tiktok/growing-your-audience/creator-search-insights
+- YouTube Help — How YouTube Search works — https://support.google.com/youtube/answer/16090438
+- YouTube Help — Content performance / traffic sources — https://support.google.com/youtube/answer/12220281
+- Pinterest Business — Trends — https://help.pinterest.com/en/business/article/pinterest-trends
+- Pinterest Business — Pin performance and distribution — https://help.pinterest.com/en/business/article/pin-performance-and-distribution
+- LinkedIn Help — Page Search Appearances — https://www.linkedin.com/help/linkedin/answer/a7473929
+- LinkedIn Help — Post analytics — https://www.linkedin.com/help/linkedin/answer/a525196
 - Profound — What is Answer Engine Optimization — https://www.tryprofound.com/resources/articles/what-is-answer-engine-optimization
 - AuditSocials — TikTok AI Content Disclosure Rules 2026 — https://www.auditsocials.com/blog/tiktok-ai-content-disclosure-rules-2026
 - Marx Layne — AI in TikTok vs Instagram 2026 — https://marxlayne.com/blog/tiktik-vs-ig
@@ -66,7 +76,12 @@
   TikTok 5–10/sem · FB/X 1–2/día · YouTube 1–2 long-form/sem + 3–5 Shorts.
 - **Formato IG**: carruseles +109% engagement por persona alcanzada vs Reels; Reels 2,25×
   más alcance que foto única → elegir por objetivo (engagement vs alcance).
-- **Social search**: ~1 de 3 consumidores salta Google; >50% en Gen Z parte en redes.
+- **Social search**: varias plataformas ofrecen búsqueda, recomendación y analytics propios;
+  cualquier porcentaje de adopción por edad o mercado exige una fuente primaria reciente y contexto.
+- **External social search**: Search Console puede medir rendimiento en Google de cuentas de
+  Instagram, TikTok, X y YouTube mediante Platform Properties; el rollout es gradual y no
+  sustituye analytics nativo. Mantener external search, platform search y downstream progress
+  como planos separados.
 - **Social commerce**: mercado global ~$2,1–2,6T; TikTok Shop ~$23,4B US 2026 (+48% YoY),
   convierte ~4,7% (vs IG ~2,1%, FB ~1,8%). Live shopping 12–18% (hasta ~30%). Shoppable
   video <15s rinde mejor. Contenido de creador > contenido de marca (4–8× ROAS con

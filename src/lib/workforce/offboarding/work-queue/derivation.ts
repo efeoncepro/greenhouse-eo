@@ -37,6 +37,16 @@ export const resolveOffboardingClosureLane = (item: OffboardingCase): Offboardin
     }
   }
 
+  if (item.ruleLane === 'internal_payroll' && item.contractTypeSnapshot === 'international_internal' && item.payrollViaSnapshot === 'internal') {
+    return {
+      code: 'international_payroll',
+      label: copy.lane.internationalPayroll,
+      documentLabel: copy.lane.internationalPayroll,
+      allowsFinalSettlement: false,
+      helpText: copy.lane.internationalPayrollHelp
+    }
+  }
+
   if (item.ruleLane === 'non_payroll' || item.payrollViaSnapshot === 'none' || item.contractTypeSnapshot === 'honorarios') {
     return {
       code: 'contractual_close',
@@ -196,6 +206,10 @@ const deriveNextStep = ({
     return { code: 'review_payment', label: labelForNextStep('review_payment'), severity: 'info' }
   }
 
+  if (closureLane.code === 'international_payroll') {
+    return { code: 'review_payment', label: labelForNextStep('review_payment'), severity: 'info' }
+  }
+
   if (closureLane.code === 'external_provider') {
     return { code: 'external_provider_close', label: labelForNextStep('external_provider_close'), severity: 'info' }
   }
@@ -304,7 +318,7 @@ const deriveSecondaryActions = (
 ) => {
   const secondary: OffboardingWorkQueueActionDescriptor[] = []
 
-  if (item.status === 'needs_review') {
+  if (item.status === 'draft' || item.status === 'needs_review') {
     secondary.push(action({ code: 'transition_approve', severity: 'info' }))
   }
 

@@ -34,7 +34,7 @@ Registro canónico de asignación de IDs `EPIC-###` para evitar colisiones y ren
 | `EPIC-018` | `to-do` | `docs/epics/to-do/EPIC-018-performance-dashboard-storytelling-platform.md` |
 | `EPIC-019` | `to-do` | `docs/epics/to-do/EPIC-019-public-website-landing-control-plane.md` |
 | `EPIC-020` | `to-do` | `docs/epics/to-do/EPIC-020-public-ai-visibility-lead-magnet-program.md` |
-| `EPIC-021` | `to-do` | `docs/epics/to-do/EPIC-021-aeo-brand-aware-prompt-generation-engine.md` |
+| `EPIC-021` | `complete` | `docs/epics/complete/EPIC-021-aeo-brand-aware-prompt-generation-engine.md` |
 | `EPIC-022` | `to-do` | `docs/epics/to-do/EPIC-022-growth-seo-search-visibility-360-module.md` |
 | `EPIC-023` | `to-do` | `docs/epics/to-do/EPIC-023-growth-cta-popup-cro-engine.md` |
 | `EPIC-024` | `to-do` | `docs/epics/to-do/EPIC-024-hubspot-portal-grader.md` |
@@ -51,7 +51,10 @@ Registro canónico de asignación de IDs `EPIC-###` para evitar colisiones y ren
 | `EPIC-035` | `to-do` | `docs/epics/to-do/EPIC-035-efeonce-embed-runtime.md` |
 | `EPIC-036` | `to-do` | `docs/epics/to-do/EPIC-036-efeonce-experience-launchops.md` |
 | `EPIC-037` | `to-do` | `docs/epics/to-do/EPIC-037-wave-agentic-readiness-product-platform.md` |
+| `EPIC-038` | `to-do` | `docs/epics/to-do/EPIC-038-efeonce-talent-assurance-agentic-quality-system.md` |
+| `EPIC-039` | `to-do` | `docs/epics/to-do/EPIC-039-nextjs-typescript-toolchain-adoption.md` |
+| `EPIC-040` | `to-do` | `docs/epics/to-do/EPIC-040-growth-public-forms-engine.md` |
 
 ## Siguiente ID disponible
 
-- `EPIC-038`
+- `EPIC-041`

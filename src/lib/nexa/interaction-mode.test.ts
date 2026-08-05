@@ -7,69 +7,63 @@ import {
   isNexaInteractionMode
 } from './interaction-mode'
 
-const ALL_ON = { expandableEnabled: true, laneEnabled: true }
-const EXPANDABLE_ONLY = { expandableEnabled: true, laneEnabled: false }
-const ALL_OFF = { expandableEnabled: false, laneEnabled: false }
+const LANE_ON = { laneEnabled: true }
+const LANE_OFF = { laneEnabled: false }
 
 describe('isNexaInteractionMode', () => {
-  it('acepta los 3 modos válidos y rechaza el resto', () => {
-    expect(isNexaInteractionMode('dock')).toBe(true)
+  it('acepta los 2 modos válidos y rechaza el resto', () => {
     expect(isNexaInteractionMode('expandible')).toBe(true)
     expect(isNexaInteractionMode('lane')).toBe(true)
     expect(isNexaInteractionMode('floating')).toBe(false)
     expect(isNexaInteractionMode(null)).toBe(false)
     expect(isNexaInteractionMode(undefined)).toBe(false)
   })
+
+  it('rechaza el modo retirado `dock` (era el panel efímero pre-TASK-1078)', () => {
+    expect(isNexaInteractionMode('dock')).toBe(false)
+  })
 })
 
-describe('defaultNexaInteractionMode — preserva el comportamiento vigente', () => {
-  it('con expandible ON → panel B (default actual del flotante)', () => {
-    expect(defaultNexaInteractionMode(EXPANDABLE_ONLY)).toBe('expandible')
-  })
-
-  it('con expandible OFF → dock compacto', () => {
-    expect(defaultNexaInteractionMode(ALL_OFF)).toBe('dock')
-  })
-
-  it('nunca devuelve lane por default (opt-in explícito)', () => {
-    expect(defaultNexaInteractionMode(ALL_ON)).toBe('expandible')
+describe('defaultNexaInteractionMode', () => {
+  it('el panel ampliable es el piso incondicional', () => {
+    expect(defaultNexaInteractionMode()).toBe('expandible')
   })
 })
 
 describe('coerceNexaInteractionMode — gating default-safe', () => {
-  it('NULL → default (preserva comportamiento)', () => {
-    expect(coerceNexaInteractionMode(null, EXPANDABLE_ONLY)).toBe('expandible')
-    expect(coerceNexaInteractionMode(undefined, ALL_OFF)).toBe('dock')
+  it('NULL / valor inválido → default', () => {
+    expect(coerceNexaInteractionMode(null, LANE_ON)).toBe('expandible')
+    expect(coerceNexaInteractionMode(undefined, LANE_OFF)).toBe('expandible')
+    expect(coerceNexaInteractionMode('floating', LANE_ON)).toBe('expandible')
   })
 
-  it('valor inválido → default', () => {
-    expect(coerceNexaInteractionMode('floating', ALL_ON)).toBe('expandible')
+  it('`dock` persistido (modo retirado) degrada a expandible, nunca rompe', () => {
+    expect(coerceNexaInteractionMode('dock', LANE_ON)).toBe('expandible')
+    expect(coerceNexaInteractionMode('dock', LANE_OFF)).toBe('expandible')
   })
 
-  it('dock siempre se respeta', () => {
-    expect(coerceNexaInteractionMode('dock', ALL_ON)).toBe('dock')
-    expect(coerceNexaInteractionMode('dock', ALL_OFF)).toBe('dock')
-  })
-
-  it('expandible degrada a dock si el flag está OFF', () => {
-    expect(coerceNexaInteractionMode('expandible', ALL_ON)).toBe('expandible')
-    expect(coerceNexaInteractionMode('expandible', ALL_OFF)).toBe('dock')
+  it('expandible siempre se respeta (ya no depende de flag)', () => {
+    expect(coerceNexaInteractionMode('expandible', LANE_ON)).toBe('expandible')
+    expect(coerceNexaInteractionMode('expandible', LANE_OFF)).toBe('expandible')
   })
 
   it('lane degrada al default si su flag está OFF (default-safe)', () => {
-    expect(coerceNexaInteractionMode('lane', ALL_ON)).toBe('lane')
-    expect(coerceNexaInteractionMode('lane', EXPANDABLE_ONLY)).toBe('expandible')
-    expect(coerceNexaInteractionMode('lane', ALL_OFF)).toBe('dock')
+    expect(coerceNexaInteractionMode('lane', LANE_ON)).toBe('lane')
+    expect(coerceNexaInteractionMode('lane', LANE_OFF)).toBe('expandible')
   })
 })
 
 describe('availableNexaInteractionModes — solo ofrece lo disponible', () => {
-  it('dock siempre disponible', () => {
-    expect(availableNexaInteractionModes(ALL_OFF)).toEqual(['dock'])
+  it('expandible siempre disponible', () => {
+    expect(availableNexaInteractionModes(LANE_OFF)).toEqual(['expandible'])
   })
 
-  it('agrega expandible/lane según flags', () => {
-    expect(availableNexaInteractionModes(EXPANDABLE_ONLY)).toEqual(['dock', 'expandible'])
-    expect(availableNexaInteractionModes(ALL_ON)).toEqual(['dock', 'expandible', 'lane'])
+  it('agrega lane cuando su flag está ON', () => {
+    expect(availableNexaInteractionModes(LANE_ON)).toEqual(['expandible', 'lane'])
+  })
+
+  it('nunca ofrece el modo retirado `dock`', () => {
+    expect(availableNexaInteractionModes(LANE_ON)).not.toContain('dock')
+    expect(availableNexaInteractionModes(LANE_OFF)).not.toContain('dock')
   })
 })

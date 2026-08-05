@@ -19,7 +19,7 @@
 - Rank: `TBD`
 - Domain: `ui|creative`
 - Blocked by: `TASK-1580`, `TASK-1520`, `TASK-1498`
-- Branch: `task/TASK-1581-globe-producer-creative-entry-hub-session-feed`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 
 ## Summary
 

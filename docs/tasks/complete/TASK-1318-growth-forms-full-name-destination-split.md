@@ -20,7 +20,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `integration`
-- Epic: `optional`
+- Epic: `EPIC-040`
 - Status real: `complete — rollout production verified 2026-07-02`
 - Rank: `TBD`
 - Domain: `growth|public-site|hubspot`

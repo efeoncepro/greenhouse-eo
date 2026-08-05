@@ -77,10 +77,10 @@ referencias son durables).
 
 6. **Prender**: `producer_assets_enabled = true` en `variables.tf` — **en git**, no en un
    `terraform.tfvars` gitignoreado. Un flag cuyo estado real vive en un archivo sin trackear es el
-   mismo problema de estado efímero que moverlo con `gcloud`, mejor disfrazado. Comprobalo planeando
+   mismo problema de estado efímero que moverlo con `gcloud`, mejor disfrazado. Compruébalo planeando
    sin `terraform.tfvars`: debe dar `No changes`.
 
-7. **Canario** (abajo). Requiere impersonar la caller SA; si es un grant temporal, revocalo al
+7. **Canario** (abajo). Requiere impersonar la caller SA; si es un grant temporal, revócalo al
    terminar y verifica el corte.
 
 ## Verificación (canary)
@@ -125,6 +125,9 @@ Con una pieza real ya generada (un golden brief que haya retenido su salida):
   `--update-env-vars` sobrevive al próximo `tofu apply`.
 
 ## Problemas comunes
+
+| El archivo descargado tiene la extensión equivocada (un MP3 llamado `.wav`) | El descriptor anunciaba un MIME **adivinado por modalidad**, no el declarado por el intento (`ISSUE-139`) | Los bytes son correctos: renombrar o volver a descargar. **Nunca regenerar.** Al verificar, compara el `mimeType` del descriptor contra el del cable — si divergen, el que miente es el descriptor |
+
 
 | Síntoma | Causa probable | Diagnóstico |
 |---|---|---|

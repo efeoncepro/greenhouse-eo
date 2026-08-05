@@ -1,9 +1,9 @@
 # Manual — Operar la persistencia durable de Efeonce Globe
 
 > **Tipo de documento:** Manual de uso / runbook (orientado al operador)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-07-21 por Claude (TASK-1465)
-> **Ultima actualizacion:** 2026-07-21 por Claude
+> **Ultima actualizacion:** 2026-08-02 por Codex (estado vigente de Studio Credits)
 
 ## Para qué sirve
 
@@ -68,12 +68,14 @@ Si **falta** cualquiera, el servicio **arranca en memoria** (comportamiento prev
 - **NUNCA** compartas la base de datos (ni sesión, bucket, secreto o rol admin) **entre Globe y Greenhouse**. `globe-pg` es de Globe. Greenhouse la gobierna, no la conecta.
 - **NUNCA** dejes viva la contraseña del usuario `postgres` después del bootstrap: se revuelve al terminar. El modelo es sin contraseña de admin en pie.
 - **NUNCA** hagas `git commit --no-verify` / `git push --no-verify` sin autorización explícita del operador. Los hooks son el gate; bypassearlos deja errores para el próximo agente.
-- **NUNCA** trates el **spend fence** durable como el **ledger de créditos comerciales**: es un freno de seguridad, no el registro contable. El ledger comercial es capacidad aparte, pendiente.
+- **NUNCA** trates el **spend fence** durable como el ledger append-only de **Studio Credits**: es un freno de
+  seguridad separado. El ledger ya está operativo en Globe y es consumido por Greenhouse UI, API/CLI OAuth PKCE
+  y MCP; Studio Credits no son dinero, revenue ni tokens de proveedor.
 - **NUNCA** corras el `bootstrap.sql` en cada deploy: es setup de una sola vez.
 
 ## Problemas comunes
 
-- **El servicio arrancó en memoria (perdí estado tras un reinicio):** le falta alguna de las tres `GLOBE_POSTGRES_*` (`INSTANCE_CONNECTION_NAME`, `DATABASE`, `USER`). Declaralas en el servicio de Cloud Run (con su usuario IAM de runtime) y redespliega. Recuerda: correr en memoria sólo está permitido en `internal_smoke`.
+- **El servicio arrancó en memoria (perdí estado tras un reinicio):** le falta alguna de las tres `GLOBE_POSTGRES_*` (`INSTANCE_CONNECTION_NAME`, `DATABASE`, `USER`). Decláralas en el servicio de Cloud Run (con su usuario IAM de runtime) y redespliega. Recuerda: correr en memoria sólo está permitido en `internal_smoke`.
 - **El techo de réplicas ya no baja tras un deploy:** `TASK-1508` cerró ese drift-trap. `deploy-internal.yml` dejó de pasar `--max-instances` y Terraform gobierna los **dos** ceilings (servicio y revisión), hoy en 3/3. Cuidado con el workaround viejo `gcloud run services update <servicio> --max-instances=3`: escribía el ceiling de **revisión**, no el de **servicio**, y Cloud Run aplica el menor — dejaba el techo efectivo en 1 aparentando restaurarlo.
 - **La migración no aplica / no ve la instancia:** confirma `GLOBE_POSTGRES_INSTANCE_CONNECTION_NAME=efeonce-globe:southamerica-west1:globe-pg` y que `GLOBE_MIGRATOR_USER` sea un usuario IAM miembro de `globe_owner`. El runner aplica como `globe_owner`; un usuario sin ese rol no tiene los privilegios de DDL.
 - **No valida Globe con `pnpm local:check` de Greenhouse:** correcto, son toolchains distintos. Valida Globe con `pnpm check` / `pnpm build` dentro de `efeonce-globe`.

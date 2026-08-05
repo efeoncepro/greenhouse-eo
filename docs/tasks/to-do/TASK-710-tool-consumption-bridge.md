@@ -1,5 +1,12 @@
 # TASK-710 — Tool Consumption Bridge: provider→tool→assignment→consumption→client
 
+## Delta 2026-08-02 — Adapter de consumo hacia Cost Subledger
+
+Esta task deja de enriquecer o decidir el catálogo. `TASK-712` resuelve primero la convergencia del catálogo,
+vendor, lifecycle y unidad/cost model. `TASK-710` se limita a consumption facts, quantity/amount basis, allocation,
+actual cost, coverage e idempotencia, proyectados al Cost Subledger. No materializa un MLCM universal ni crea una
+segunda identidad de tools/providers.
+
 ## Status
 
 | Campo | Valor |
@@ -10,7 +17,7 @@
 | Effort | `Alto` |
 | Status real | `Diseño completo` |
 | Domain | Cost Intelligence / Tooling / Identity |
-| Sequence | Bloqueante para Fase 2 del programa Member Loaded Cost Model |
+| Sequence | Después de TASK-712 y de los contracts de Finance Core/Cost Subledger |
 
 ## Summary
 

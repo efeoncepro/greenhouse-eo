@@ -148,7 +148,7 @@ Present the task to the user. Explicitly call out:
 - The Type assigned and why
 - The Execution profile and UI impact
 - The Backend impact when applicable
-- The derived Branch: `task/TASK-###-short-slug`
+- The repository branch contract (currently Greenhouse `develop`; Globe `main`; no per-task branch or worktree)
 - Any inference you made (Priority, Effort, scope decisions)
 - Any item in `Open Questions` that needs resolution before an agent takes it
 - Any path marked with `[verificar]` that you could not confirm in the repo

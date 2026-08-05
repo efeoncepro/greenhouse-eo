@@ -21,7 +21,7 @@ Migrada a formato nuevo + gaps cerrados (arch-architect + overlay §17, greenhou
 ## Delta 2026-07-07
 
 - **Desbloqueada:** `TASK-353` (foundation) completa. Readers/commands + 8 capabilities + API `/api/hiring/**` ya existen (consumí esos, no lógica paralela).
-- **Views: te toca a ti.** TASK-353 NO seedeó los viewCodes del desk (`gestion.hiring`, `gestion.hiring_demand`, `gestion.hiring_pipeline`, `gestion.hiring_publication`, `gestion.hiring_application_detail`) a propósito — seedear un viewCode sin ruta alcanzable viola la governance de reachability + dispara `role_view_fallback`. Vos creas las rutas reales `(dashboard)` **y** el seed `VIEW_REGISTRY` TS + migración `view_registry`/`role_view_assignments` en el mismo PR (patrón TASK-827), + `route-reachability-manifest` (TASK-982).
+- **Views: te toca a ti.** TASK-353 NO seedeó los viewCodes del desk (`gestion.hiring`, `gestion.hiring_demand`, `gestion.hiring_pipeline`, `gestion.hiring_publication`, `gestion.hiring_application_detail`) a propósito — seedear un viewCode sin ruta alcanzable viola la governance de reachability + dispara `role_view_fallback`. Tú creas las rutas reales `(dashboard)` **y** el seed `VIEW_REGISTRY` TS + migración `view_registry`/`role_view_assignments` en el mismo PR (patrón TASK-827), + `route-reachability-manifest` (TASK-982).
 - El kanban mueve `HiringApplication` (unidad del pipeline) vía `updateHiringApplicationStage`. Publication Desk usa `buildPublicOpeningPayload` para el diff interno↔público.
 
 <!-- ═══════════════════════════════════════════════════════════

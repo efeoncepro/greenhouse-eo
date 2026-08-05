@@ -165,6 +165,31 @@ Las 4 capas verbales (en secuencia natural de conversación):
 
 > ⚠️ Coherencia de proof points: el corpus usa "120+ empresas" y "80% de renovación" (marca-agencia) y también "10+ años" (ecosistema). El GTM cita "win rate ~50%". Mantén consistencia y no infles cifras; ante duda, usa las del documento de autoridad correspondiente.
 
+### Content Engineering como doctrina editorial emergente
+
+Efeonce adopta **Content Engineering** como territorio de thought leadership y método para diseñar contenido que
+vuelva a la persona más capaz de comprender, verificar y decidir. La tesis conecta directamente con el Why: educar
+no significa entregar más piezas, sino construir experiencias útiles y conocimiento reusable.
+
+Definición de trabajo:
+
+> Content Engineering es la disciplina de diseñar, construir y operar sistemas de conocimiento que personas y
+> agentes puedan encontrar, comprender, verificar, explorar, reutilizar y convertir en decisiones.
+
+Estado de marca: **doctrina editorial y método en construcción**. No es una sub-marca, una quinta capability, un
+producto independiente ni una oferta comercial empaquetada. Cualquier evolución comercial requiere proceso,
+evidencia, capacidad operativa y decisión de packaging propios. El PDR público gobierna el territorio:
+`docs/public-site/decisions/PDR-017-content-engineering-territorio-editorial.md`; el canon operativo reusable vive
+en `content-marketing-studio/references/content-engineering.md`.
+
+Su arquitectura editorial usa **Pillar Experience** como hogar y **Cluster Experience federada** como sistema de
+nodos propios y platform-native conectados por trabajos y progreso. Un artículo, tool, video, reel, carrusel, pin,
+post o newsletter puede pertenecer si entrega valor autónomo y una relación gobernada; publicar sobre el territorio
+no basta. La Pillar conserva el hogar canónico. Think es el producto editorial, Marketing con Manzanitas es la
+publicación y ninguna de esas identidades obliga un host específico. Conversión significa avanzar desde reconocer y
+comprender hasta aplicar, verificar, decidir o pedir ayuda; no capturar un lead antes de entregar valor. El contrato
+operativo, la elegibilidad social y sus planos de medición viven en PDR-018, no en este context pack.
+
 ### Jerarquía de IP propietaria (cómo se nombra hacia el cliente)
 
 **Regla cardinal: el mercado escucha beneficios, no siglas.** Si mencionas una sigla en los primeros 30 segundos, hablas para ti, no para el cliente.

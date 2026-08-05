@@ -500,7 +500,8 @@ evidencia técnica; su plan operativo referencia las tasks canónicas y no crea 
 - Provider adapter order and contract tests from live accounts, not marketing claims.
 - Credit currency, expiry/refund policy, tax/invoicing and commercial packaging.
 - Exact responsibility schema, operating-mode entitlements, escalation commands and which metrics/SLA attach to each controlled scope.
-- Data retention, licensed asset policy, consent/deepfake policy and external upload scanner.
+- Data retention, licensed asset policy, consent/deepfake policy and external upload scanner; the enterprise
+  provider/data posture is governed by the proposed [`GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1`](../GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md).
 - Whether an audio-specific runtime later merits Python/GPU tooling. TypeScript/Cloud Run Jobs is the default until evidence proves otherwise.
 
 ## 14. External technical references

@@ -1,0 +1,202 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://greenhouse.efeoncepro.com/schemas/model-route-card.v1.json",
+  "title": "Greenhouse Globe model route card",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "cardId",
+    "snapshot",
+    "authority",
+    "modelFamily",
+    "evidence",
+    "routes",
+    "providerSurfaces",
+    "implementationChecklist"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "model-route-card.v1" },
+    "cardId": { "type": "string", "pattern": "^route-card/[a-z0-9-]+$" },
+    "snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["observedAt", "maxAgeDays", "revalidateBeforeUse"],
+      "properties": {
+        "observedAt": { "type": "string", "format": "date" },
+        "maxAgeDays": { "type": "integer", "minimum": 1 },
+        "revalidateBeforeUse": { "type": "boolean" }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["availabilityReader", "humanLedger", "providerEvidence"],
+      "properties": {
+        "availabilityReader": { "type": "string", "minLength": 1 },
+        "humanLedger": { "type": "string", "minLength": 1 },
+        "providerEvidence": { "type": "string", "minLength": 1 }
+      }
+    },
+    "modelFamily": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["publicName", "familyKey", "modality", "globeStatus"],
+      "properties": {
+        "publicName": { "type": "string", "minLength": 1 },
+        "familyKey": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "modality": { "type": "string", "minLength": 1 },
+        "globeStatus": { "enum": ["gated", "not_promoted", "available", "unsupported"] },
+        "summary": { "type": "string" },
+        "integrationDecision": { "type": "string" }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "authority", "kind", "observedAt", "reference", "revalidateBeforeUse"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+          "authority": { "enum": ["provider_primary", "runtime_primary", "repo_primary", "secondary"] },
+          "kind": { "type": "string", "minLength": 1 },
+          "observedAt": { "type": "string", "format": "date" },
+          "reference": { "type": "string", "minLength": 1 },
+          "revalidateBeforeUse": { "type": "boolean" },
+          "ttlDays": { "type": "integer", "minimum": 1 },
+          "expiresAt": { "type": "string", "format": "date" },
+          "digest": { "type": ["string", "null"] },
+          "note": { "type": "string" }
+        }
+      }
+    },
+    "routes": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/route" }
+    },
+    "providerSurfaces": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/providerSurface" }
+    },
+    "implementationChecklist": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "status", "ownerBoundary", "evidenceRefs"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "status": { "enum": ["open", "blocked", "verified", "deferred"] },
+          "ownerBoundary": { "type": "string", "minLength": 1 },
+          "evidenceRefs": { "type": "array", "items": { "type": "string" } },
+          "note": { "type": "string" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "cable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "evidenceRefs"],
+      "properties": {
+        "state": {
+          "enum": [
+            "verified",
+            "proposed",
+            "wired",
+            "not_started",
+            "blocked",
+            "unsupported",
+            "unknown",
+            "stale",
+            "gated",
+            "not_promoted",
+            "available"
+          ]
+        },
+        "evidenceRefs": { "type": "array", "items": { "type": "string" } },
+        "note": { "type": "string" }
+      }
+    },
+    "route": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "routeId",
+        "kind",
+        "capability",
+        "operation",
+        "provider",
+        "model",
+        "version",
+        "identityState",
+        "endpointId",
+        "region",
+        "completionDriver",
+        "lifecycle",
+        "inputs",
+        "controls",
+        "output",
+        "transport",
+        "completion",
+        "cables",
+        "evidenceRefs",
+        "blockers"
+      ],
+      "properties": {
+        "routeId": { "type": "string", "pattern": "^ref/[a-z0-9-]+/[a-z0-9-]+$" },
+        "kind": { "enum": ["standard", "draft", "draft-enhance", "direct-api-candidate"] },
+        "capability": { "type": "string", "minLength": 1 },
+        "operation": { "type": "string", "minLength": 1 },
+        "provider": { "type": "string", "minLength": 1 },
+        "model": { "type": "string", "minLength": 1 },
+        "version": { "type": ["string", "null"] },
+        "identityState": { "enum": ["resolved", "unknown"] },
+        "endpointId": { "type": "string", "minLength": 1 },
+        "region": { "type": ["string", "null"] },
+        "completionDriver": { "type": "string", "minLength": 1 },
+        "lifecycle": { "enum": ["gated", "not_promoted", "available", "unsupported"] },
+        "exposure": { "$ref": "#/$defs/exposure" },
+        "inputs": { "type": "array", "minItems": 1 },
+        "controls": { "type": "array" },
+        "output": { "type": "object" },
+        "transport": { "type": "object" },
+        "completion": { "type": "object" },
+        "cables": { "type": "object" },
+        "evidenceRefs": { "type": "array", "items": { "type": "string" } },
+        "blockers": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "exposure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["governed", "reader", "producerUi", "externalRollout"],
+      "properties": {
+        "governed": { "enum": ["candidate", "sealed", "promoted"] },
+        "reader": { "enum": ["available", "gated", "unknown"] },
+        "producerUi": { "enum": ["selectable", "visible-gated", "blocked", "not-exposed"] },
+        "externalRollout": { "enum": ["allowed", "gated", "deferred"] }
+      }
+    },
+    "providerSurface": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["surfaceId", "provider", "endpointId", "status", "cables", "evidenceRefs"],
+      "properties": {
+        "surfaceId": { "type": "string", "minLength": 1 },
+        "provider": { "type": "string", "minLength": 1 },
+        "endpointId": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["early_access", "deferred", "unsupported", "candidate"] },
+        "modes": { "type": "array", "items": { "type": "string" } },
+        "cables": { "type": "object" },
+        "evidenceRefs": { "type": "array", "items": { "type": "string" } },
+        "note": { "type": "string" }
+      }
+    }
+  }
+}

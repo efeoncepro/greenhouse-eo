@@ -1,5 +1,25 @@
 # TASK-1160 — CLAUDE.md Router Refactor + Token Budget Gate
 
+## Delta 2026-08-05 — el presupuesto se agotó y ya bloqueó una invariante real
+
+Medición: **34.998 / 35.000 tokens (100% usado)**, 1.290 líneas. Quedan ~2 tokens.
+
+Esto dejó de ser teórico. Durante el rollout de `TASK-1302` emergió una invariante dura nueva —
+**el `ops-worker` es un servicio Cloud Run ÚNICO compartido staging+prod, así que no existe un flip
+"sólo staging" y una capacidad worker-only queda LIVE al mergear a `develop`, sin release control
+plane**— y **no se pudo agregar inline**: cualquier línea rompe el gate `--strict` del workflow
+`claude-md-governance.yml`. Quedó sólo en el companion
+`agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md` + `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`.
+
+Consecuencia para esta task: **Slice 5 dejó de ser higiene y pasó a ser desbloqueante**. Mientras el
+budget siga en 100%, toda invariante nueva que merezca estar inline se degrada a load-on-demand por
+falta de espacio, no por decisión de diseño — que es exactamente el modo de falla que el gate existe
+para evitar.
+
+Recomendación registrada al liberar espacio: la frase de máxima relevancia/mínimo costo es una sola
+línea en el párrafo "⚠️ Prender un flag es MULTI-RUNTIME" de §`Runtime Rollout Completion Gate`,
+declarando la topología compartida del worker. Hoy no cabe.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

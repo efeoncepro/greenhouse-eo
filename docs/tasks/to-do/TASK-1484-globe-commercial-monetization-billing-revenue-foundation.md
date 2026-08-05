@@ -1,5 +1,11 @@
 # TASK-1484 — Globe Commercial Monetization, Billing and Revenue Foundation
 
+## Delta 2026-08-02 — Billing/revenue sobre Finance Core
+
+La monetización de Globe debe producir documentos, settlement y economic events compatibles con Finance Core y
+Q2C. El credits ledger sigue siendo owner de credits; no se convierte en cuentas por cobrar, revenue ledger ni GL.
+Posting, recognition y mappings contables permanecen en Finance.
+
 ## Delta 2026-07-26 — el carril interno de fondeo ya existe, y su trigger BLOQUEA el top-up de cliente
 
 `TASK-1566` entregó el carril gobernado de fondeo **interno** (`kind: 'internal'`). Buena parte es
@@ -38,7 +44,9 @@ al cajero que apruebe cada compra con tarjeta.
    `CreditGrantKindV1` / el vocabulario de administración). Borrar evidencia de dinero es exactamente
    lo que la tabla append-only impide.
 
-**Y el invariante que sobrevive a los dos carriles:** el agente/LLM **nunca** confirma ninguno.
+**Invariante vigente tras TASK-1629:** un workload o LLM sin identidad delegada **nunca** confirma.
+Un usuario agente autenticado puede confirmar el fondeo interno únicamente dentro de la política
+acotada del workspace; la autorización comercial de cobros conserva su propio gate.
 
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
@@ -61,7 +69,7 @@ al cajero que apruebe cada compra con tarjeta.
 - Rank: `TBD`
 - Domain: `commercial|finance|tax|payments|legal|reliability`
 - Blocked by: `TASK-1481, TASK-1468, TASK-1478, TASK-1480, TASK-1482`
-- Branch: `task/TASK-1484-globe-commercial-monetization-billing-revenue-foundation`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

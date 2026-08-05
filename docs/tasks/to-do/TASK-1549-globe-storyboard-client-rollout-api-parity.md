@@ -21,7 +21,7 @@
 - Rank: `TBD`
 - Domain: `ops`
 - Blocked by: `TASK-1521`, `TASK-1543`, `TASK-1544`, `TASK-1545`, `TASK-1546`, `TASK-1547`
-- Branch: `task/TASK-1549-globe-storyboard-client-rollout-api-parity`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 
 ## Summary

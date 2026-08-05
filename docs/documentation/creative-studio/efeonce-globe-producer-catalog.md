@@ -1,9 +1,9 @@
 # Efeonce Globe — Catálogo gobernado de rutas del Creative Producer
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.4
 > **Creado:** 2026-07-20 por Claude (TASK-1500)
-> **Ultima actualizacion:** 2026-07-24 por Claude (TASK-1553 — catálogo multi-modelo + resolución por-ruta)
+> **Ultima actualizacion:** 2026-08-02 (TASK-1633 — contrato creativo route-driven en implementación)
 > **Documentacion tecnica:** [EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md](../../architecture/creative-studio/EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md)
 
 ## Qué es y para qué sirve
@@ -28,16 +28,44 @@ Sin catálogo, la superficie del Producer tendría que adivinar qué opciones of
 - **Se lee por dos lectores gobernados** (`listar` y `obtener una ruta`), protegidos por la capability `globe.producer.catalog.read`. La audiencia se resuelve en el servidor y **falla cerrada hacia el cliente**: el modelo (nombre + versión) viaja siempre; la **casa** solo viaja si quien pregunta tiene la autoridad de operador (`globe.producer.route.reveal_house`).
 - **Una ruta desconocida es "no encontrada"**, sin pistas de si existe en otro lado.
 - **Los mismos datos alimentan a los consumidores internos** (validación pre-gasto y estimador) por funciones directas en el proceso — nadie reconstruye los límites por su cuenta.
-- **Las superficies UI y MCP nacen apagadas** (`policy-blocked`) hasta el gate de la superficie del Producer (`TASK-1505`); las superficies internas (HTTP/SDK/CLI/worker/E2E) están disponibles.
+- **Las superficies nacen fail-closed.** La UI del Producer fue promovida al cerrar `TASK-1505`; MCP conserva su
+  gate independiente. HTTP/SDK/CLI/worker/E2E siguen sus estados declarados en el capability registry.
+
+## Operación, inputs y controles son ejes distintos
+
+ADR-022 y TASK-1633 extienden cada revisión de ruta con un contrato creativo autocontenido. El objetivo es que
+Producer, BFF, SDK, MCP, CLI, compiler y workers lean la misma semántica, sin matrices paralelas por modelo:
+
+- `operation` dice qué intención ejecuta la ruta (`create`, `edit`, `extend`, `upscale`, etc.).
+- `inputSlots` dice qué significa cada asset y conserva rol, media, cardinalidad y orden. Una referencia visual,
+  first frame, edit source y motion source no son intercambiables aunque compartan MIME.
+- `inputCombinations` declara conjuntos válidos, incluidos caminos prompt-only o condicionados por asset.
+- `creativeControls` declara si cámara, estilo, movimiento, timing, audio u otro control se aplica como parámetro
+  nativo, semántica de prompt, referencia, pre/postproceso o si no está soportado.
+- `outputContract` declara modalidad, MIME y packaging real; un MP4 con audio embebido no se representa como dos
+  outputs ficticios.
+
+El adapter server-side sigue siendo el único lugar que conoce campos, endpoint o slug del proveedor. El browser
+no concatena instrucciones vendor-specific ni infiere tareas por cantidad/tipo de archivos. Durante la migración,
+`inputModes` y `referencePolicy` siguen disponibles para compatibilidad, pero una ruta nueva debe declarar el
+contrato creativo y fallar antes del gasto ante contradicciones.
+
+Estado honesto al 2026-08-02: el contrato y su threading están en WIP local sin commit/deploy. La UI route-driven,
+el transporte Omni Vertex ADC y los canaries todavía no están operativos. Continuidad:
+[`TASK-1633`](../../tasks/in-progress/TASK-1633-globe-producer-operation-input-control-contract.md) y
+[`plan`](../../tasks/plans/TASK-1633-plan.md).
 
 > Detalle técnico: tipos en `efeonce-globe/packages/contracts/src/producer-catalog.ts`; dato + guards + helpers + lectores en `efeonce-globe/packages/domain/src/producer-catalog.ts`; métodos SDK `listProducerRoutes` / `getProducerRoute`.
 
 ## Varios modelos por capacidad (multi-modelo, TASK-1553)
 
-La dirección del negocio es **usar los mejores modelos del mercado e ir agregándolos, sin que uno reemplace a otro**. El catálogo lo permite tratando **cada modelo/tier como una ruta**: hoy conviven, como imagen, Seedream, Nano Banana Pro, GPT Image 2 y GPT Image 1.5 (y Nano Banana 2 queda declarada, a la espera de que Google habilite el acceso). Dos ideas simples lo sostienen:
+La dirección del negocio es **usar los mejores modelos del mercado e ir agregándolos, sin que uno reemplace a otro**. El catálogo lo permite tratando **cada modelo/tier como una ruta**. Hoy conviven y fueron ejercitados desde el Producer: Seedream 5 Pro, **Seedream 5 Pro Edit** (la única ruta de `operation: edit`, sellada el 2026-08-05), Nano Banana Pro, Nano Banana 2, GPT Image 2, GPT Image 1.5 y Recraft v4.1 Vector.
 
 - **El modelo se elige por la ruta, no por la capacidad.** Antes, "generar imagen" resolvía a un único modelo fijo; ahora cada ruta resuelve a su propio modelo, así dos modelos del mismo proveedor (GPT Image 2 **y** 1.5; Nano Banana Pro **y** 2) pueden coexistir y elegirse. El nombre del modelo sigue siendo público (señal de calidad); el identificador de proveedor (el *slug*) nunca entra al catálogo.
 - **Actualizar ≠ agregar.** *Actualizar* un modelo es subir su versión **dentro de la misma ruta** (reemplaza). *Agregar* un modelo/tier es una **ruta nueva** que coexiste con las demás. Nunca se cambia el proveedor/linaje de una ruta existente para "reusarla" como otro modelo — eso sería sustituir un modelo por otro a escondidas, y está prohibido.
 - **Recomendado por defecto.** El catálogo puede declarar, por capacidad, una **ruta recomendada por defecto** (hoy, imagen → Seedream), para que quien no elija explícitamente conserve el comportamiento actual. La selección explícita sigue siendo el contrato principal; la forma del selector visible es trabajo de `TASK-1552`.
+- **Disponible no significa sólo “aparece”.** La disponibilidad se deriva de readiness + binding por workspace. La
+  prueba de salida de una promoción incluye una generación real desde la UI autenticada, no sólo tests o un probe
+  directo al proveedor.
 
 > Detalle técnico: decisión y contrato en [ADR-013 — Route-Based Model Resolution](../../architecture/creative-studio/EFEONCE_GLOBE_ROUTE_BASED_MODEL_RESOLUTION_DECISION_V1.md). Resolución por-ruta en los adapters (`efeonce-globe/apps/creative-runner/src/{openai,vertex,fal}-adapter.ts`), política del composite por-ruta (`composite-adapter.ts`), rutas + `recommendedDefault` en `packages/domain/src/producer-catalog.ts`. Una ruta nueva es **inerte hasta promoverse** (readiness `promoted` + binding `enabled`).

@@ -5,6 +5,8 @@
 > **Skills:** `info-architecture`, `arch-architect`, `commercial-expert`.
 > **Sibling:** `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md` es la vista de
 > **repos/pipelines** (ops); este PDR es la vista de **capas de producto/marca**.
+> **Placement de Pillars:** [PDR-018](PDR-018-pillar-experience-arquitectura-editorial-y-runtime.md)
+> distingue Think como producto editorial de `think.efeoncepro.com` como runtime especializado.
 
 ## Contexto
 
@@ -23,7 +25,7 @@ EJE A — SUPERFICIES front-of-house  (mapeadas al BOW-TIE: adquisición → exp
 
   ── LADO IZQUIERDO: ADQUISICIÓN (un continuo por etapa de funnel) ──
 
-  1. Demand GEN + nurturing (top-of-funnel)  =  THINK (hub de contenido · web + email)
+  1. Demand GEN + nurturing (top-of-funnel)  =  THINK (producto/hub de contenido · web + email)
        ├─ Marketing con Manzanitas   (BLOG · marca editorial flagship)
        │      └─ Glitch              (sección de noticias: blogpost + newsletter
        │                              semanal — IA, Marketing, Negocios)
@@ -31,7 +33,7 @@ EJE A — SUPERFICIES front-of-house  (mapeadas al BOW-TIE: adquisición → exp
        ├─ Ebooks · Webinars · Podcast (lead magnets / thought leadership)
        ├─ YouTube · canales sociales (distribución y confianza)
        └─ los forms capturan usuarios en etapa temprana → base de nurturing
-                          think.efeoncepro.com (Astro) + efeoncepro.com/blog (WP)
+                          efeoncepro.com/blog (WP) + experiencias think.efeoncepro.com (Astro)
 
   2. Demand CAPTURE + conversión (mid/bottom-funnel)  =  efeoncepro.com  (WP → Astro)
        └─ marketing, servicios, /visibilidad, contacto — intención comercial
@@ -74,6 +76,11 @@ EJE B — PLATAFORMAS / BACKBONES  ("con qué operas por dentro" + "qué más ve
 - **Superficies por audiencia/etapa, no por host.** Una superficie puede correr en
   varios hosts/runtimes (ej. contenido = WP `/blog` + Astro `think`); el runtime
   puede converger sin cambiar la capa.
+- **Think como producto no equivale al host `think.efeoncepro.com`.** Think nombra
+  la capa de demand gen, nurturing y autoridad. El subdominio es hoy un runtime
+  especializado para tools, reportes y experiencias enfocadas. Una Pillar puede
+  pertenecer a Think y conservar canonical en `efeoncepro.com`; PDR-018 gobierna
+  el placement.
 - **La capa de experiencia tiene dos caras** — cliente (sky → `experiencia.efeoncepro.com`)
   y operador (cockpit Greenhouse). Mismo runtime, audiencias y jobs distintos
   (esto es lo que separa Nexa cliente vs Nexa operador y su navegación).
@@ -82,7 +89,7 @@ EJE B — PLATAFORMAS / BACKBONES  ("con qué operas por dentro" + "qué más ve
   networking y memoria. Greenhouse es el command center que vuelve esa experiencia
   visible y acumulable; no sustituye YouTube, sociales, webinars, podcast, ebooks
   ni sesiones de comunidad.
-- **Think es EL hub de contenido** (destino), con jerarquía de propiedades:
+- **Think es EL producto/hub de contenido** (destino de marca, no host obligatorio), con jerarquía de propiedades:
   `Think (hub) → Marketing con Manzanitas (blog · marca editorial flagship) →
   Glitch (sección de noticias: blogpost + newsletter semanal, IA/Marketing/
   Negocios)`, más tools/lead magnets como hermanos del blog (grader, ebooks,
@@ -96,7 +103,8 @@ EJE B — PLATAFORMAS / BACKBONES  ("con qué operas por dentro" + "qué más ve
   limpio y no se duplique en el índice. Convergencia a Astro headless prevista en
   el route-ownership matrix.
 - **Naming de marca (default de trabajo, revisable por el operador):** `Think` = el
-  hub/destino (aloja tools + blog + newsletter); `Marketing con Manzanitas` = la
+  hub/destino de producto (agrupa tools + blog + newsletter aunque no los sirva
+  todos desde un mismo host); `Marketing con Manzanitas` = la
   marca editorial (el blog) DENTRO de Think. Alternativa si Manzanitas carga más
   equity: Manzanitas como marca de contenido y Think como host técnico. Decisión
   de branding pendiente de confirmación.
@@ -140,6 +148,8 @@ EJE B — PLATAFORMAS / BACKBONES  ("con qué operas por dentro" + "qué más ve
 - **NUNCA** meter Kortex/Verk/Creative Studio (eje B) en las capas front-of-house (eje A).
 - **NUNCA** tratar Think y el blog como superficies que compiten — son el mismo
   hub de contenido; resolver la coexistencia por canonical URL, no separándolos.
+- **NUNCA** usar `Think` como sinónimo automático de `think.efeoncepro.com` ni
+  asignar una Pillar al subdominio sin decisión de route ownership.
 - **NUNCA** modelar "experiencia" como una sola audiencia — cliente y operador
   son caras distintas.
 - **NUNCA** tratar Think como "solo contenido" desligado de adquisición — es
@@ -159,6 +169,7 @@ EJE B — PLATAFORMAS / BACKBONES  ("con qué operas por dentro" + "qué más ve
   `GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md`.
 - Glitch/blog: `docs/documentation/public-site/glitch-drop-gutenberg-block.md`.
 - Think (docs): [`docs/think/README.md`](../../think/README.md).
+- Pillar Experience y placement: [PDR-018](PDR-018-pillar-experience-arquitectura-editorial-y-runtime.md).
 - Bow-tie / funnel: skill `commercial-expert` (overlay GH) + `spec/Arquitectura_BowTie_Efeonce_v1_1.md`.
 
 ## Delta 2026-07-18 — Glitch numerado y Glitch táctico

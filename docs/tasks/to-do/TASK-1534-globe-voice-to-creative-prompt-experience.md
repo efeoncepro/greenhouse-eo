@@ -21,7 +21,7 @@
 - Rank: `TBD`
 - Domain: `creative|ui|audio|accessibility`
 - Blocked by: `TASK-1533`
-- Branch: `task/TASK-1534-globe-voice-to-creative-prompt-experience`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

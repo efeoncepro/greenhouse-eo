@@ -21,7 +21,7 @@
 - Rank: `TBD`
 - Domain: `creative|campaign|ops`
 - Blocked by: `TASK-1459`
-- Branch: `task/TASK-1462-globe-first-reproducible-professional-campaign`
+- Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

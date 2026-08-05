@@ -68,7 +68,7 @@ Para cualquier task que invoque esta skill:
 5. **Si evalúas Workers**: `developer-platform-2026/workers-canonical.md` + `decision-frameworks/workers-vs-cloud-run.md`
 6. **Si evalúas Agents**: `developer-platform-2026/external-agents-api.md` + `developer-platform-2026/agent-tools.md`
 7. **Si tocas Greenhouse-specific**: `greenhouse-runtime/tenant-config.md` + `greenhouse-runtime/demo-teamspace.md` + `greenhouse-runtime/property-allowlist.md`
-   - **Si vinculás/onboardeás el teamspace de un cliente nuevo** (Berel, ANAM, …): `greenhouse-runtime/teamspace-linking-per-client-token.md` (token POR teamspace — el token ES el scope; REST NO enumera teamspaces; MCP NO es runtime-available)
+   - **Si vinculas/onboardeas el teamspace de un cliente nuevo** (Berel, ANAM, …): `greenhouse-runtime/teamspace-linking-per-client-token.md` (token POR teamspace — el token ES el scope; REST NO enumera teamspaces; MCP NO es runtime-available)
 8. **Si generas o actualizas el body de una page**: `api-reference/enhanced-markdown-canonical.md` + `patterns-canonical/enhanced-markdown-renderer.md`
 9. **Si creas o consultas proyectos/tareas/subtareas**: `use-cases-greenhouse/work-management.md` + `greenhouse-runtime/work-space-registry.md`; para bodies, cargar además `output-templates/work-management-markdown-templates.md`
 10. **Siempre antes de cerrar**: `anti-patterns-catalog.md` + `edge-cases-and-gotchas.md`

@@ -1,8 +1,9 @@
 # GREENHOUSE — Tender Proposal Studio (arquitectura V1)
 
 > **Tipo:** Architecture spec / ADR — **diseño del aggregate; parcialmente implementado** (ver §0)
-> **Versión:** 0.6 · **Status:** **Implemented (F0 operativo)** — aggregate `Proposal` + state machine persistida + API parity + intake agent + proyección de render, con **staging smoke verde** y el módulo `proposal_studio_v1` **activo para Efeonce** (2026-07-12). **§5-ter: Accepted** (topología del runtime del composer).
+> **Versión:** 0.7 · **Status:** **Implemented (F0 operativo)** — aggregate `Proposal` + state machine persistida + API parity + intake agent + proyección de render, con **staging smoke verde** y el módulo `proposal_studio_v1` **activo para Efeonce** (2026-07-12). **§5-ter: Accepted** (topología del runtime del composer).
 > **Creado:** 2026-07-11 por Claude (skill `arch-architect`) con Julio Reyes
+> **v0.7 (2026-08-02, clarificación de diseño; sin cambio runtime):** Proposal Studio deja de modelarse como un paquete físico fijo “técnica + económica”. La separación técnica/económica es lógica y de gobernanza; la entrega puede ser técnica sola, económica sola, separada o combinada. La económica client-facing deriva siempre de una versión congelada del cotizador headless. Se documentan como gaps el `quote_id` universal post-GO, el snapshot parcial y la proyección económica todavía incompleta.
 > **v0.5 (2026-07-12, TASK-1392 F0 code-complete):** el aggregate **`Proposal` YA EXISTE** — schema `greenhouse_commercial.proposal*` aplicado a dev (state machine persistida: matriz de transiciones en tabla + triggers append-only/anti-DELETE/immutable-fields + gate humano exigido por la DB), commands/readers idempotentes + API parity (`/api/commercial/proposals/**`), entitlement per-ORG (`module_assignments: proposal_studio_v1` — un rol no se factura, un módulo sí), 3 capabilities `commercial.proposal.{read,manage,gate}` con grants, outbox (6 eventos `commercial.proposal.*`), costura al cotizador (`quote_id` + gate de margen en `fit_review` fail-closed + snapshot congelado), **Proposal Intake Agent Contract** (contexto allowlisted → propuesta tipada validada fail-closed → confirmación humana ejecuta el MISMO command; eval fixture como gate del prompt) y **proyección allowlisted de render** (`render-projection.ts` — el contrato de TASK-1391; un artefacto client_facing con una sola evidencia internal falla cerrado). Además **TASK-1393 movió el composer** a `src/lib/artifact-composer/**` (primitive domain-free; el deck es el catálogo `deck-axis`). **Rollout: ejecutado 2026-07-12** — módulo `proposal_studio_v1` activo para Efeonce (`module_assignments`, autorización explícita del operador) + staging smoke end-to-end verde (idempotencia · org isolation · gates humanos rechazando al agente · proyección client_facing sin material interno · outbox published). Otras orgs siguen OFF (per-ORG por diseño).
 > **v0.4 (2026-07-12):** corrige la mentira de estado (el doc decía "diseño, NO implementación" y "cada iteración es doc-only" con ~2.000 LOC en `src/lib/commercial/tenders/**`). Agrega §0 (estado real), declara que la state machine es **TS puro sin DB**, registra que **el roadmap se ejecutó invertido** (F4 antes que F0-F2) y **retira el Apéndice B** en la parte que contradecía al composer (raster de Figma como fondo).
 > **v0.3 (2026-07-11):** la topología del runtime del composer se promueve a **ADR (§5-ter, Accepted)**: orquestador + fan-out por capítulo + resto determinista, con 4-pilar y hard rules. **Corrección de dependencia:** el composer **NO** depende del `agent-runtime` (Q8 v0.2 era falsa en ambas mitades — hay prior art en Nexa, y los 3 nodos de juicio son *structured output*, no tool-chains).
@@ -426,6 +427,27 @@ servicio-agnóstico** en `src/lib/commercial/tenders/proposals/authoring/`:
 
 **Corrección de diseño (co-creación 2026-07-11): la fuente de los números es SIEMPRE Greenhouse.** El cotizador (`quote-to-cash`) es la **única fuente de verdad** del cálculo (loaded cost → pricing → line items → total → moneda). NO hay fuentes alternativas — esto le da al cotizador (`commercial.quote_to_cash.execute`, hoy huérfana) su consumer canónico.
 
+### Composición opcional del paquete
+
+La `Proposal` gobierna entregables; no exige que toda oportunidad produzca siempre una propuesta técnica y
+otra económica. El requisito-set y la etapa comercial determinan uno de estos modos:
+
+- **técnica sola**, sin precio client-facing en esa fase;
+- **económica sola**;
+- **técnica y económica separadas**;
+- **combinada**, con un módulo económico dentro del artefacto técnico —caso SKY—;
+- **mixta**, con resumen económico embebido y anexos/planillas económicas independientes.
+
+La separación obligatoria es entre **fuentes, permisos y aprobaciones**, no entre archivos. Incluso cuando
+un comprador exige un solo deck, el contenido económico conserva su versión, aprobación, condiciones y
+provenance. Un artefacto combinado solo co-renderiza una proyección económica sanitizada; no copia ni
+recalcula montos.
+
+Antes del GO que compromete capacidad debe existir una evaluación económica interna basada en `CostCard`,
+coverage, freshness y margen. Una cotización client-facing se vuelve obligatoria cuando la fase declara
+`commercial_commitment=indicative|binding` o el requisito-set exige precio; una RFI, precalificación o
+propuesta técnica temprana puede conservar `commercial_commitment=none`.
+
 Lo que varía es el **formato del artefacto de salida**, porque cada comprador lo pide distinto (unas empresas exigen Excel, otras un PDF aparte, otras la cotización formal). Por eso la económica **no puede estar cerrada a un solo artefacto**. Un `TenderQuote` canónico (SSOT) → **N renderers de salida**:
 
 | Formato de salida | Cuándo | Reusa |
@@ -440,6 +462,27 @@ Es el patrón canónico **un modelo → N renderers** (espejo del **Report Artif
 **Validación contra el requisito-set (refinamiento §9-ter #2):** `attach_quote` no "adjunta un número" — **cross-checkea que el `TenderQuote` cumple los mínimos económicos** capturados como filas `economic_minimum` en `tender_requirements` (precio · forma de pago · reajuste · término · desembolsos — el que faltó en SKY). Si un mínimo no se cubre, el quote queda `incomplete` y **bloquea `ready_to_submit`** (§2). El formato de salida se resuelve por lo que exige el RFP (`format` en el requisito-set), no se hardcodea.
 
 **Hard rules:** NUNCA una fuente de números paralela a Greenhouse (SSOT único). NUNCA ramificar el *cálculo* por formato — el cálculo es uno, el *render* es N. NUNCA marcar `ready_to_submit` con un quote que no pasó los mínimos económicos del requisito-set.
+
+### Conformidad actual y gaps explícitos
+
+La sección anterior describe el contrato objetivo. El runtime verificado al 2026-08-02 todavía no lo cumple
+por completo:
+
+1. la restricción DB `proposals_post_go_requires_quote` exige `quote_id` en todo estado post-GO y colapsa
+   evaluación interna con cotización client-facing;
+2. `attachProposalQuote` valida el vínculo y el cliente, pero no materializa por sí solo el cross-check
+   completo de `economic_minimum` al pasar a `ready_to_submit`;
+3. el snapshot actual de packaging serializa la cabecera de la cotización, no el paquete completo con versión,
+   líneas, impuestos, FX, términos, requerimientos y aprobación;
+4. la proyección allowlisted de render no incluye todavía una `ProposalEconomicProjection` completa;
+5. `economica.json` en workspaces históricos/taller sigue siendo una fuente manual transitoria y no debe
+   tratarse como SSOT ni como cierre canónico;
+6. los registros de versiones existentes no deben asumirse inmutables solo por nombre: el write path vigente
+   permite actualización ante conflicto y requiere endurecimiento antes del paquete congelado.
+
+Cerrar estos gaps requiere ADR aceptado, tasks dependientes y migraciones explícitas. Esta v0.7 no autoriza
+modificar schema ni runtime. El contrato headless y la secuencia propuesta viven en
+[`GREENHOUSE_AGENTIC_QUOTATION_ORCHESTRATION_DECISION_V1.md`](GREENHOUSE_AGENTIC_QUOTATION_ORCHESTRATION_DECISION_V1.md).
 
 ---
 
