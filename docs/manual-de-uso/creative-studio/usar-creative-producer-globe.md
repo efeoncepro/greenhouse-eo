@@ -1,11 +1,12 @@
 # Usar Efeonce Globe Creative Producer
 
 > **Tipo de documento:** Manual de uso / runbook (orientado al operador)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-07-23 por Claude
-> **Ultima actualizacion:** 2026-08-04 por Claude (presupuesto de espera de una generación sana)
+> **Ultima actualizacion:** 2026-08-05 por Codex (benchmark competitivo y estado React revalidado)
 > **Doc funcional:** [efeonce-globe-creative-producer.md](../../documentation/creative-studio/efeonce-globe-creative-producer.md)
 > **Doc tecnica:** [Creative Producer V1](../../architecture/creative-studio/EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md)
+> **Benchmark de referencia:** [comparativo Globe, Higgsfield y Magnific](../../audits/competitive-ui/GLOBE_COMPETITIVE_BENCHMARK_HIGGSFIELD_MAGNIFIC_2026-08-05.md)
 
 > Estado actual: operativo internal-only en `https://globe.efeoncepro.com/producer` para personas con grants
 > Producer. No equivale a acceso comercial externo.
@@ -97,9 +98,16 @@ qué estado está el estimado**.
 
 ## Explorar y continuar
 
+> **Corte operativo 2026-08-05:** el contrato y el diseño contemplan Reference, Recreate, Favorite y
+> Download, pero la superficie React activa todavía no conecta esas acciones desde ProducerFeedRoute.
+> No interpretes un control visible o una capacidad listada como evidencia de que la operación ya se ejecuta;
+> verifica TASK-1641 y Handoff antes de intentar una continuación.
+
 - Abre un candidato para ver modelo/versión, recipe efectiva, costo, lineage, provenance y review.
-- `Recrear` reutiliza la recipe gobernada; `Variación` crea hijos explícitos; `Inpaint` exige máscara e intención.
-- Favoritos, collections y selección batch son durables. Un toast no sustituye el resultado persistido.
+- Cuando la acción está habilitada en la superficie, Recrear reutiliza la recipe gobernada; Variación crea hijos
+  explícitos e Inpaint exige máscara e intención.
+- En la React auditada el 2026-08-05, no asumas que Favorite, Reference, Recreate o Download funcionan sólo
+  porque el control aparece: verifica TASK-1641 y Handoff.
 - Usa `J/K` para navegar, `Enter` para abrir, `F` para favorito, `R` para recrear, `G` para ir al prompt y `⌘/Ctrl+K`
   para la paleta. Todos los dialogs restauran el foco al cerrar.
 

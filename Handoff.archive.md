@@ -9,4 +9,6 @@ verificado.
 - [Archivo histórico preservado 2026-07-19](docs/operations/agent-context-history/2026-07-19/Handoff.archive.legacy.md)
 - [Archivo histórico preservado 2026-07-29](docs/operations/agent-context-history/2026-07-19/Handoff.archive.legacy-2026-07-29.md)
 
+- [2026-08](docs/operations/agent-context-history/handoff/2026-08.md)
+
 No volver a pegar historia completa en este índice.

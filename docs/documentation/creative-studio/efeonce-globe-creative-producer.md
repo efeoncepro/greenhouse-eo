@@ -1,15 +1,19 @@
 # Efeonce Globe Creative Producer
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-07-23 por Claude
-> **Ultima actualizacion:** 2026-08-03 por Claude (delta: contrato creativo por ruta; conteo real de rutas)
+> **Ultima actualizacion:** 2026-08-05 por Codex (benchmark competitivo y estado React revalidado)
 > **Documentacion tecnica:** [Creative Producer V1](../../architecture/creative-studio/EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md) · [ADR-014 — Client Application](../../architecture/creative-studio/EFEONCE_GLOBE_CLIENT_APPLICATION_DECISION_V1.md)
 
 Creative Producer es la consola prompt-first de Globe para crear y continuar activos de imagen, video y audio.
 El diseño aprobado es el producto completo: composer multimodal, referencias privadas, estimación pre-spend,
 biblioteca editorial, viewer/refinamiento, organización, revisión y sharing. Las capacidades no se eliminan cuando
 un backend está apagado; la UI muestra su estado real y el dueño que debe habilitarlo.
+
+El [benchmark comparativo frente a Higgsfield y Magnific](./efeonce-globe-competitive-benchmark.md) documenta
+qué partes de ese workflow ya están entregadas y qué partes siguen pendientes en la superficie React activa.
+La comparación es una referencia de producto fechada, no un cambio al contrato runtime.
 
 ## Qué puede hacer
 
@@ -149,6 +153,12 @@ disponibilidad para quien consume es la propia flota del Producer.
 Los originales se alojan en GCS privado por hash; el bucket no autoriza acceso. Globe valida workspace, ownership,
 estado e integridad antes de servirlos mediante un grant corto same-origin. Una sesión válida con CSRF rotado se
 recupera automáticamente; una sesión realmente expirada todavía necesita un CTA de reautenticación más claro.
+
+El benchmark del 2026-08-05 revalidó una diferencia importante entre contrato y consumer: ProducerFeedRoute todavía
+deja Reference, Recreate, Favorite y Download sin handlers reales, y ProducerComposer todavía no consume
+creativeContract de forma completa. Por eso las listas de capacidades anteriores describen el producto aprobado
+y sus contratos, no una afirmación de que cada acción esté operativa en la UI React actual. El estado de esas
+brechas vive en TASK-1641, TASK-1552 y Handoff.
 
 Continúan abiertos la limpieza semántica de reconciliaciones obsoletas que inflan la edad de cola, la promoción
 independiente de las otras siete rutas y la arquitectura de derivados/streaming para previews grandes. Clientes

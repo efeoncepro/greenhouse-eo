@@ -1,0 +1,802 @@
+- banner:
+  - button "Unlimited NEW SEEDANCE 2.5. Purchase now with a special discount. Get Unlimited Seedance 2.5":
+    - paragraph: Unlimited NEW SEEDANCE 2.5. Purchase now with a special discount.
+    - generic: Get Unlimited Seedance 2.5
+  - button:
+- banner:
+  - link "Higgsfield":
+    - /url: /
+    - img "Higgsfield":
+  - navigation "Main":
+    - list:
+      - link "Explore":
+        - /url: /
+      - separator
+      - link "Image":
+        - /url: /ai/image?model=nano-banana-pro
+      - link "Video":
+        - /url: /ai/video
+      - link "Audio":
+        - /url: /audio
+      - link "Cinema Studio":
+        - /url: /generate
+      - link "Free Seedance 2.0 4K":
+        - /url: /seedance-4k
+      - separator
+      - link "MCP & CLI New":
+        - /url: /mcp
+        - text: MCP & CLI
+        - generic: New
+      - link "Academy New":
+        - /url: /academy
+        - text: Academy
+        - generic: New
+      - link "Supercomputer":
+        - /url: /supercomputer
+        - generic: Supercomputer
+      - link "Community":
+        - /url: /community
+      - link "Contests New":
+        - /url: /contests
+        - text: Contests
+        - generic: New
+      - link "Plugins":
+        - /url: /plugins/after-effects
+      - link "Marketing Studio":
+        - /url: /marketing-studio/product
+      - link "Canvas":
+        - /url: /canvas
+      - link "Originals":
+        - /url: /original-series
+      - link "Shorts Studio":
+        - /url: /shorts-studio
+      - link "Explainer":
+        - /url: /explainer
+  - button "Search Higgsfield":
+  - link "Upgrade 30% OFF":
+    - /url: /pricing
+    - text: Upgrade
+    - generic: 30% OFF
+  - link "Enterprise":
+    - /url: https://higgsfield.ai/enterprise
+    - generic: Enterprise
+  - link "Folder icon Assets":
+    - /url: /asset/all
+    - img "Folder icon"
+    - generic: Assets
+  - button "Notifications":
+  - button "Account menu":
+    - img "user profile"
+- main:
+  - list:
+    - link "Open Higgsfield Global Film Festival":
+      - /url: https://higgsfield.ai/contests/higgsfield-global-film-festival
+      - generic: Open Higgsfield Global Film Festival
+    - 'figure "Higgsfield Global Film Festival: 14 awards. 1M$ prize. Your story, on the world''s stage."':
+      - generic "Higgsfield Global Film Festival - 14 awards. 1M$ prize. Your story, on the world's stage.": Your browser does not support the video.
+    - heading "Higgsfield Global Film Festival" [level=3]
+    - paragraph: 14 awards. 1M$ prize. Your story, on the world's stage.
+    - link "Open Hell Grind":
+      - /url: https://higgsfield.ai/@higgsfield.studio/projects/hell-grind
+      - generic: Open Hell Grind
+    - 'figure "Hell Grind: 95 minutes. Fully AI. Fully open source."':
+      - generic "Hell Grind - 95 minutes. Fully AI. Fully open source.": Your browser does not support the video.
+    - heading "Hell Grind" [level=3]
+    - paragraph: 95 minutes. Fully AI. Fully open source.
+    - 'link "Open Supercomputer: Free Mode"':
+      - /url: https://higgsfield.ai/supercomputer
+      - generic: "Open Supercomputer: Free Mode"
+    - 'figure "Supercomputer: Free Mode: Run the Supercomputer LLM without spending credits"':
+      - 'generic "Supercomputer: Free Mode - Run the Supercomputer LLM without spending credits"': Your browser does not support the video.
+    - 'heading "Supercomputer: Free Mode" [level=3]'
+    - paragraph: Run the Supercomputer LLM without spending credits
+    - link "Open Higgsfield Academy":
+      - /url: https://higgsfield.ai/academy
+      - generic: Open Higgsfield Academy
+    - 'figure "Higgsfield Academy: Learn how to make films"':
+      - img "Loading the media file..."
+      - generic "Higgsfield Academy - Learn how to make films": Your browser does not support the video.
+    - heading "Higgsfield Academy" [level=3]
+    - paragraph: Learn how to make films
+    - link "Open Higgsfield MCP/Plugin for After Effects":
+      - /url: https://higgsfield.ai/plugins/after-effects
+      - generic: Open Higgsfield MCP/Plugin for After Effects
+    - 'figure "Higgsfield MCP/Plugin for After Effects: Powered by Fable 5"':
+      - img "Loading the media file..."
+      - generic "Higgsfield MCP/Plugin for After Effects - Powered by Fable 5": Your browser does not support the video.
+    - heading "Higgsfield MCP/Plugin for After Effects" [level=3]
+    - paragraph: Powered by Fable 5
+    - heading [level=3]
+    - heading [level=3]
+    - heading [level=3]
+    - heading [level=3]
+    - heading [level=3]
+  - button:
+  - button "new Seedance 2.5 7-day unlimited access The most advanced video model. Available on presale. Get Unlimited Seedance 2.5":
+    - generic: Your browser does not support the video.
+    - heading "new Seedance 2.5 7-day unlimited access" [level=3]:
+      - generic: new Seedance 2.5
+      - generic: 7-day unlimited access
+    - paragraph: The most advanced video model. Available on presale.
+    - generic: Get Unlimited Seedance 2.5
+  - link "Seedance 2.5 New The most advanced video model Coming soon":
+    - /url: /seedance-2.5
+    - generic: Seedance 2.5
+    - paragraph: New
+    - paragraph: The most advanced video model
+    - generic: Coming soon
+  - link "Seedance 2.0 Create high-quality videos Video":
+    - /url: /ai/video?model=seedance_2_0
+    - generic: Seedance 2.0
+    - paragraph: Create high-quality videos
+    - text: Video
+  - link "Supercomputer Automation, skills, apps and more":
+    - /url: /supercomputer
+    - generic: Supercomputer
+    - paragraph: Automation, skills, apps and more
+  - link "Higgsfield Academy Learn how to use Higgsfield":
+    - /url: /academy
+    - generic: Higgsfield Academy
+    - paragraph: Learn how to use Higgsfield
+  - link "MCP & CLI Turn Claude into a creative engine":
+    - /url: /mcp
+    - generic: MCP & CLI
+    - paragraph: Turn Claude into a creative engine
+  - link "Cinema Studio 3.5 Create cinematic scenes effortlessly":
+    - /url: /generate
+    - generic: Cinema Studio 3.5
+    - paragraph: Create cinematic scenes effortlessly
+  - region "Hell Grind":
+    - generic: Your browser does not support the video.
+    - 'heading "Hell Grind: a 95-minute AI film, fully open-sourced" [level=2]':
+      - text: "Hell Grind: a 95-minute"
+      - text: AI film, fully open-sourced
+    - paragraph: 95 minutes. Every prompt, asset and canvas included.
+    - generic: View full project
+    - link "View full project":
+      - /url: /@higgsfield.studio/projects/hell-grind
+  - img "Seedance 2.5 — coming soon"
+  - paragraph: The world's best video generation model coming to Higgsfield soon
+  - link "Explore Seedance 2.5":
+    - /url: /seedance-2.5
+  - button "Play Seedance 2.5 sample video":
+    - img "Loading the media file..."
+    - generic: Your browser does not support the video.
+  - button "Play Seedance 2.5 sample video":
+  - button "Play Seedance 2.5 sample video":
+  - button "Play Seedance 2.5 sample video":
+  - button "Play Seedance 2.5 sample video":
+    - img "Loading the media file..."
+    - generic: Your browser does not support the video.
+  - button "Play Seedance 2.5 sample video":
+  - button "Play Seedance 2.5 sample video":
+  - button "Play Seedance 2.5 sample video":
+  - button "Play Seedance 2.5 sample video":
+    - img "Loading the media file..."
+    - generic: Your browser does not support the video.
+  - button "Play Seedance 2.5 sample video":
+  - button "Play Seedance 2.5 sample video":
+  - button "Play Seedance 2.5 sample video":
+  - button "Play Seedance 2.5 sample video":
+    - img "Loading the media file..."
+    - generic: Your browser does not support the video.
+  - button "Play Seedance 2.5 sample video":
+  - button "Play Seedance 2.5 sample video":
+  - button "Play Seedance 2.5 sample video":
+  - link "Learn more about Seedance 2.5":
+    - /url: /seedance-2.5
+    - text: Learn more about Seedance 2.5
+  - heading "Explore the inside of every project" [level=2]
+  - paragraph: See all prompts, assets, and how each project was created
+  - link "Higgsfield Studio HELL GRIND by Higgsfield Studio Public":
+    - /url: /@higgsfield.studio/projects/hell-grind
+    - figure
+    - img "Higgsfield Studio"
+    - paragraph: HELL GRIND by Higgsfield Studio
+    - paragraph: Public
+  - link "Higgsfield Studio Kok Boru by Higgsfield Studio Public":
+    - /url: /@pocket_corallo_2/projects/kok-boru
+    - figure
+    - img "Higgsfield Studio"
+    - paragraph: Kok Boru by Higgsfield Studio
+    - paragraph: Public
+  - link "Higgsfield Launch Anime production - Launch video by Higgsfield Launch Public":
+    - /url: /@mixingburrito1329/projects/anime-production
+    - figure
+    - img "Higgsfield Launch"
+    - paragraph: Anime production - Launch video by Higgsfield Launch
+    - paragraph: Public
+  - link "Higgsfield Soul REWIND CLUB by Higgsfield Soul Public":
+    - /url: /@sateesfaction/projects/rewind-club
+    - figure
+    - img "Higgsfield Soul"
+    - paragraph: REWIND CLUB by Higgsfield Soul
+    - paragraph: Public
+  - link "Higgsfield Creative H Nala - Heads Drop by Higgsfield Creative Public":
+    - /url: /@higgscreator/projects/nala-heads-drop
+    - figure
+    - img "Higgsfield Creative"
+    - generic: H
+    - paragraph: Nala - Heads Drop by Higgsfield Creative
+    - paragraph: Public
+  - link "Higgsfield Soul H Space Chores by Higgsfield Soul Public":
+    - /url: /@sateesfaction/projects/spacechores
+    - figure
+    - img "Higgsfield Soul"
+    - generic: H
+    - paragraph: Space Chores by Higgsfield Soul
+    - paragraph: Public
+  - link "Higgsfield Launch H Higgsfield Academy by Higgsfield Launch Public":
+    - /url: /@askar_yedil/projects/higgsfield-academy
+    - figure
+    - img "Higgsfield Launch"
+    - generic: H
+    - paragraph: Higgsfield Academy by Higgsfield Launch
+    - paragraph: Public
+  - link "Higgsfield Soul H The new girl by Higgsfield Soul Public":
+    - /url: /@alishaqantaar/projects/the-new-girl
+    - figure
+    - img "Higgsfield Soul"
+    - generic: H
+    - paragraph: The new girl by Higgsfield Soul
+    - paragraph: Public
+  - link "Explore community":
+    - /url: /community
+    - text: Explore community
+  - region "The Adathon":
+    - paragraph: The Adathon
+    - paragraph: Skip the deck. Make the ad
+    - generic: Join the contest
+    - link "Join the contest":
+      - /url: /contests/adathon
+  - region "Higgsfield App Contest":
+    - link "Join the Higgsfield Apps Contest":
+      - /url: /supercomputer/apps
+      - generic: Winners announced on
+      - generic: AUGUST 6
+      - generic: $100,000
+      - heading "Higgsfield App Contest" [level=2]:
+        - text: Higgsfield
+        - text: App Contest
+      - paragraph: Build your best app on Higgsfield
+      - generic: Explore all apps
+    - tablist:
+      - tab "All apps" [selected]:
+        - generic: All apps
+      - tab "Made by Higgsfield":
+        - generic: Made by Higgsfield
+    - searchbox "Search apps"
+    - article:
+      - link "Open Video Editor":
+        - /url: /supercomputer/apps/268ef125-85a4-4ea6-94d7-3c73e9adb14d/view?src=home_contest_banner&pos=0
+      - button "Actions for Video Editor":
+      - heading "Video Editor" [level=3]
+      - text: 28.6K views
+      - text: 2,112 credits
+      - link "Open":
+        - /url: /supercomputer/apps/268ef125-85a4-4ea6-94d7-3c73e9adb14d/view?src=home_contest_banner&pos=0
+    - article:
+      - link "Open Hook Studio":
+        - /url: /supercomputer/apps/f7fcbb0e-96c8-40f8-980c-1f53c8ffa7c7/view?src=home_contest_banner&pos=1
+      - button "Actions for Hook Studio":
+      - heading "Hook Studio" [level=3]
+      - text: 29.6K views
+      - text: 113.3K credits
+      - link "Open":
+        - /url: /supercomputer/apps/f7fcbb0e-96c8-40f8-980c-1f53c8ffa7c7/view?src=home_contest_banner&pos=1
+    - article:
+      - link "Open Your Next Opponent is YOU":
+        - /url: /supercomputer/apps/c455cf00-8540-444d-8df3-9ad11b904230/view?src=home_contest_banner&pos=2
+      - button "Actions for Your Next Opponent is YOU":
+      - heading "Your Next Opponent is YOU" [level=3]
+      - text: 31.1K views
+      - text: 144.3K credits
+      - link "Open":
+        - /url: /supercomputer/apps/c455cf00-8540-444d-8df3-9ad11b904230/view?src=home_contest_banner&pos=2
+    - article:
+      - link "Open Somewhere":
+        - /url: /supercomputer/apps/c2fd7842-b2d6-4ec4-be8a-6e4454fb1710/view?src=home_contest_banner&pos=3
+      - button "Actions for Somewhere":
+      - heading "Somewhere" [level=3]
+      - text: 14K views
+      - text: 103.1K credits
+      - link "Open":
+        - /url: /supercomputer/apps/c2fd7842-b2d6-4ec4-be8a-6e4454fb1710/view?src=home_contest_banner&pos=3
+    - article:
+      - link "Open StickerPack":
+        - /url: /supercomputer/apps/900497e3-ae1d-479c-97ba-3d492c160fa1/view?src=home_contest_banner&pos=4
+      - button "Actions for StickerPack":
+      - heading "StickerPack" [level=3]
+      - text: 4,477 views
+      - text: 4,381 credits
+      - link "Open":
+        - /url: /supercomputer/apps/900497e3-ae1d-479c-97ba-3d492c160fa1/view?src=home_contest_banner&pos=4
+    - article:
+      - link "Open FaceLab — One-Tap Face Transformations":
+        - /url: /supercomputer/apps/9d167a5e-643d-4c22-8fa4-8d5e2e437d15/view?src=home_contest_banner&pos=5
+      - button "Actions for FaceLab — One-Tap Face Transformations":
+      - heading "FaceLab — One-Tap Face Transformations" [level=3]
+      - text: 5,841 views
+      - text: 816 credits
+      - link "Open":
+        - /url: /supercomputer/apps/9d167a5e-643d-4c22-8fa4-8d5e2e437d15/view?src=home_contest_banner&pos=5
+    - article:
+      - link "Open Kitten Claw":
+        - /url: /supercomputer/apps/b483a597-5c10-4955-9ec7-dbdd645faeaa/view?src=home_contest_banner&pos=6
+      - button "Actions for Kitten Claw":
+      - heading "Kitten Claw" [level=3]
+      - text: 5,219 views
+      - text: 28.8K credits
+      - link "Open":
+        - /url: /supercomputer/apps/b483a597-5c10-4955-9ec7-dbdd645faeaa/view?src=home_contest_banner&pos=6
+    - article:
+      - link "Open Magic Mirror":
+        - /url: /supercomputer/apps/c7b8ac3d-e0f8-4903-97af-503c280f54c7/view?src=home_contest_banner&pos=7
+      - button "Actions for Magic Mirror":
+      - heading "Magic Mirror" [level=3]
+      - text: 5,492 views
+      - text: 722 credits
+      - link "Open":
+        - /url: /supercomputer/apps/c7b8ac3d-e0f8-4903-97af-503c280f54c7/view?src=home_contest_banner&pos=7
+    - article:
+      - link "Open MicroDrama Studio":
+        - /url: /supercomputer/apps/9312fb05-b567-4b02-ac29-fd3aaccdfcb2/view?src=home_contest_banner&pos=8
+      - button "Actions for MicroDrama Studio":
+      - heading "MicroDrama Studio" [level=3]
+      - text: 17.4K views
+      - text: 141.8K credits
+      - link "Open":
+        - /url: /supercomputer/apps/9312fb05-b567-4b02-ac29-fd3aaccdfcb2/view?src=home_contest_banner&pos=8
+    - article:
+      - link "Open SpriteForge, game sprite & animation studio":
+        - /url: /supercomputer/apps/637e9e64-edf9-475e-9eb3-9544b0741ea2/view?src=home_contest_banner&pos=9
+      - button "Actions for SpriteForge, game sprite & animation studio":
+      - heading "SpriteForge, game sprite & animation studio" [level=3]
+      - text: 6,817 views
+      - text: 3,832 credits
+      - link "Open":
+        - /url: /supercomputer/apps/637e9e64-edf9-475e-9eb3-9544b0741ea2/view?src=home_contest_banner&pos=9
+    - article:
+      - link "Open Photobooth Studio":
+        - /url: /supercomputer/apps/1a2a8eef-5749-4ba6-aa8b-8ae439b96065/view?src=home_contest_banner&pos=10
+      - button "Actions for Photobooth Studio":
+      - heading "Photobooth Studio" [level=3]
+      - text: 2,911 views
+      - text: 2,737 credits
+      - link "Open":
+        - /url: /supercomputer/apps/1a2a8eef-5749-4ba6-aa8b-8ae439b96065/view?src=home_contest_banner&pos=10
+    - article:
+      - link "Open CutItOut - Free AI Background Remover":
+        - /url: /supercomputer/apps/04b14bf0-c3cd-42fa-8ef9-68e28b1c2e5e/view?src=home_contest_banner&pos=11
+      - button "Actions for CutItOut - Free AI Background Remover":
+      - heading "CutItOut - Free AI Background Remover" [level=3]
+      - text: 3,808 views
+      - link "Open":
+        - /url: /supercomputer/apps/04b14bf0-c3cd-42fa-8ef9-68e28b1c2e5e/view?src=home_contest_banner&pos=11
+    - article:
+      - link "Open BannerCraft":
+        - /url: /supercomputer/apps/7be964a9-3c76-4c3d-b7a8-cb586f5a1d2b/view?src=home_contest_banner&pos=12
+      - button "Actions for BannerCraft":
+      - heading "BannerCraft" [level=3]
+      - text: 3,493 views
+      - text: 1,260 credits
+      - link "Open":
+        - /url: /supercomputer/apps/7be964a9-3c76-4c3d-b7a8-cb586f5a1d2b/view?src=home_contest_banner&pos=12
+    - article:
+      - link "Open FaceSplainer":
+        - /url: /supercomputer/apps/144430ce-5308-486c-874a-89009671e53f/view?src=home_contest_banner&pos=13
+      - button "Actions for FaceSplainer":
+      - heading "FaceSplainer" [level=3]
+      - text: 3,053 views
+      - text: 2,580 credits
+      - link "Open":
+        - /url: /supercomputer/apps/144430ce-5308-486c-874a-89009671e53f/view?src=home_contest_banner&pos=13
+    - article:
+      - link "Open Fitting Room":
+        - /url: /supercomputer/apps/77603634-1fcf-48bd-9e27-2f5e820677b2/view?src=home_contest_banner&pos=14
+      - button "Actions for Fitting Room":
+      - heading "Fitting Room" [level=3]
+      - text: 7,417 views
+      - text: 3,826 credits
+      - link "Open":
+        - /url: /supercomputer/apps/77603634-1fcf-48bd-9e27-2f5e820677b2/view?src=home_contest_banner&pos=14
+    - article:
+      - link "Open LayerLab — AI layer decomposition":
+        - /url: /supercomputer/apps/6f01a9a0-e731-4618-abe5-4e08b11348fd/view?src=home_contest_banner&pos=15
+      - button "Actions for LayerLab — AI layer decomposition":
+      - heading "LayerLab — AI layer decomposition" [level=3]
+      - text: 4,170 views
+      - text: 2,045 credits
+      - link "Open":
+        - /url: /supercomputer/apps/6f01a9a0-e731-4618-abe5-4e08b11348fd/view?src=home_contest_banner&pos=15
+    - link "Explore all apps":
+      - /url: /supercomputer/apps
+      - text: Explore all apps
+  - heading "Higgsfield Viral Presets" [level=2]:
+    - link "Higgsfield Viral Presets":
+      - /url: /viral-presets
+  - paragraph: Big-budget visual effects, from explosions to surreal transformations.
+  - button "EARTH ZOOM"
+  - button "MIGHTY FIGHTER"
+  - button "FAIRYTALE CASTLE"
+  - button "MOONWALK"
+  - button "SKETCH TO FABRIC"
+  - button "FLOAT SPIN"
+  - button "STICKER PEEL"
+  - button "SELFIE TWIN"
+  - button "CARDBOARD CUTOUT"
+  - button "ORBIT 360"
+  - button "ELEVATE"
+  - button "ACTION FIGURE"
+  - button "BLUE DEPTH"
+  - button "ORBITAL PRESENCE"
+  - button "ICE STATUE"
+  - button "CGI BREAKDOWN"
+  - button "DROWN IN MUSIC"
+  - button "BASEBALL GAME"
+  - button "DRIFT RACING"
+  - button "FOOTBALL INVADER"
+  - button "SUMMER HAZE"
+  - button "KUNG FU HIT"
+  - button "FINAL SERVE"
+  - button "ANDROID ASSEMBLE"
+  - button "3D RENDER"
+  - button "STORM GIANT"
+  - button "ZOMBIE DANCE"
+  - button "GOLF MAJOR"
+  - button "2000'S PAPARAZZI"
+  - button "CANDID PAPARAZZI"
+  - button "RACE TRACK"
+  - button "NIGHTLINE"
+  - button "FREE FALL"
+  - button "RED CARPET"
+  - button "CLAY FIGURINE"
+  - button "NEON CITY"
+  - button "SOUL FIGHTER"
+  - button "TUSCAN YOGA"
+  - button "APEX HUNTER"
+  - button "IN THE DARK"
+  - button "RED THREAD"
+  - button "EXIT THE DREAM"
+  - button "ENDING FAIRY"
+  - button "DRAGON FANTASY"
+  - button "FAN MEETING"
+  - button "NIGHT VISION"
+  - button "OFFICE CCTV"
+  - button "RACE WINNER"
+  - button [disabled]:
+  - button:
+  - button "EARTH ZOOM":
+    - paragraph: EARTH ZOOM
+  - button "FLOAT SPIN":
+    - paragraph: FLOAT SPIN
+  - button "ELEVATE":
+    - paragraph: ELEVATE
+  - button "MIGHTY FIGHTER":
+    - paragraph: MIGHTY FIGHTER
+  - button "STICKER PEEL":
+    - paragraph: STICKER PEEL
+  - button "ACTION FIGURE":
+    - paragraph: ACTION FIGURE
+  - button "FAIRYTALE CASTLE":
+    - paragraph: FAIRYTALE CASTLE
+  - button "SELFIE TWIN":
+    - paragraph: SELFIE TWIN
+  - button "BLUE DEPTH":
+    - paragraph: BLUE DEPTH
+  - button "MOONWALK":
+    - paragraph: MOONWALK
+  - button "CARDBOARD CUTOUT":
+    - paragraph: CARDBOARD CUTOUT
+  - button "ORBITAL PRESENCE by Buralqy":
+    - paragraph: ORBITAL PRESENCE
+    - img "by Buralqy"
+  - button "SKETCH TO FABRIC":
+    - paragraph: SKETCH TO FABRIC
+  - button "ORBIT 360":
+    - paragraph: ORBIT 360
+  - button "ICE STATUE":
+    - paragraph: ICE STATUE
+  - link "View all presets":
+    - /url: /viral-presets
+    - text: View all presets
+  - link "Supercomputer One superagent for your entire creative stack Try Supercomputer":
+    - /url: /supercomputer
+    - heading "Supercomputer" [level=2]
+    - paragraph: One superagent for your entire creative stack
+    - generic: Try Supercomputer
+  - link "GPT Image 2":
+    - /url: /gpt-image-2-community
+  - paragraph: 4K images with near-perfect text rendering.
+  - link "View all of GPT Image 2":
+    - /url: /gpt-image-2-community
+    - text: View all of GPT Image 2
+  - link "Try Canvas":
+    - /url: /canvas
+    - generic: New feature
+    - heading "ONE CANVAS. EVERY WORKFLOW." [level=2]:
+      - text: ONE CANVAS.
+      - text: EVERY WORKFLOW.
+    - paragraph:
+      - text: Moodboard, chain workflows, and share
+      - text: with your team - all on one canvas
+    - text: Try Canvas
+  - link "Marketing Studio":
+    - /url: /marketing-studio-community
+  - paragraph: See what creators and brands are making with Marketing Studio.
+  - link "View all of Marketing Studio":
+    - /url: /marketing-studio-community
+    - text: View all of Marketing Studio
+  - link "Seedance 2.0":
+    - /url: /seedance-2-community
+  - paragraph: Browse premium AI video generations from the Higgsfield community.
+  - link "View all of Seedance 2.0":
+    - /url: /seedance-2-community
+    - text: View all of Seedance 2.0
+  - link "Try Photodump":
+    - /url: /ai/image?model=soul-v2&modal-photo-dump=true&skip-preview=true
+    - generic: Try Photodump
+  - generic: photodump
+  - heading "Different Scenes Same Star" [level=2]:
+    - text: Different Scenes
+    - text: Same Star
+  - paragraph: Build your character. One click does the rest
+  - generic: Try Photodump
+  - link "Higgsfield Soul Cinema":
+    - /url: /soul-cinema-community
+  - paragraph: Explore Higgsfield Community gallery for stunning Higgsfield Soul Cinema creations.
+  - link "View all of Higgsfield Soul Cinema":
+    - /url: /soul-cinema-community
+    - text: View all of Higgsfield Soul Cinema
+  - link "Higgsfield Soul 2.0":
+    - /url: /soul-community
+  - paragraph: A culture-native photo model built for fashion, aesthetics, and creative expression.
+  - link "View all of Higgsfield Soul 2.0":
+    - /url: /soul-community
+    - text: View all of Higgsfield Soul 2.0
+  - heading "Explore more ai features" [level=2]
+  - link "Cinema Studio":
+    - /url: /cinematic-video-generator
+  - link "Visual Effects":
+    - /url: /ai/video
+  - link "Higgsfield Soul":
+    - /url: /ai/image?model=soul
+  - link "Kling 2.1 Master":
+    - /url: /ai/video?model=kling-v2-1-master
+  - link "Camera Controls":
+    - /url: /ai/video
+  - link "Viral":
+    - /url: /ai/video
+  - link "Action movements":
+    - /url: /ai/video
+  - link "Commercial":
+    - /url: /ai/video
+  - link "MiniMax Hailuo 02":
+    - /url: /ai/video?model=minimax
+  - link "Seedance Pro":
+    - /url: /ai/video?model=seedance_pro
+  - link "Community":
+    - /url: /community
+  - link "Wan 2.2 Image":
+    - /url: /ai/image?model=wan2-2
+  - link "Seedream 4.0":
+    - /url: /ai/image?model=seedream
+  - link "Nano Banana":
+    - /url: /ai/image?model=nano_banana
+  - link "Flux Kontext":
+    - /url: /ai/image?model=kontext
+  - link "GPT Image":
+    - /url: /ai/image?model=gpt
+  - link "Topaz":
+    - /url: /upscale
+  - link "Google Veo3":
+    - /url: /ai/video?model=veo-3-preview
+  - link "Kling 2.5 Turbo":
+    - /url: /ai/video?model=kling-v2-5-turbo
+  - link "Kling Avatars 2.0":
+    - /url: /lipsync-studio
+  - link "Claude MCP":
+    - /url: /claude-ai-video-generator
+  - link "Wan 2.5":
+    - /url: /wan-ai-video
+  - link "Sora 2":
+    - /url: /sora-2
+  - link "Sora 2 Presets":
+    - /url: /sora-2-ai-video-presets
+  - link "Banana Placement":
+    - /url: /ai/image?model=nano_banana
+  - link "Edit Image":
+    - /url: /edit?model=nano_banana_pro_inpaint
+  - link "Multi Reference":
+    - /url: /character
+  - link "Upscale":
+    - /url: /upscale
+  - link "Assists":
+    - /url: /ai-assist
+  - link "YouTube":
+    - /url: /sora-2-youtube
+  - link "TikTok":
+    - /url: /sora-2-tiktok
+  - link "Instagram Reels":
+    - /url: /sora-2-reels
+  - link "YouTube Shorts":
+    - /url: /sora-2-shorts
+  - link "Nano Banana Pro":
+    - /url: /ai/image?model=nano-banana-pro
+  - link "Kling o1":
+    - /url: /kling-3.0
+  - link "Mixed Media Community":
+    - /url: /mixed-media-community
+  - link "Soul Presets":
+    - /url: /soul
+  - link "Visual Effects Collection":
+    - /url: /collection/effects
+  - heading "THE ULTIMATE AI-POWERED CAMERA CONTROL FOR FILMMAKERS & CREATORS" [level=2]
+  - heading "Higgsfield AI" [level=3]
+  - list:
+    - link "About":
+      - /url: /about
+    - link "Trust":
+      - /url: /trust
+    - link "Careers":
+      - /url: https://jobs.ashbyhq.com/higgsfieldai
+    - link "Contact":
+      - /url: /contact
+    - link "Pricing":
+      - /url: /pricing
+    - link "Apps":
+      - /url: /apps
+    - link "Supercomputer":
+      - /url: /supercomputer-intro
+    - link "Cinema Studio":
+      - /url: /cinematic-video-generator
+    - link "Marketing Studio":
+      - /url: /marketing-studio-intro
+    - link "Higgsfield Canvas":
+      - /url: /canvas-intro
+    - link "Higgsfield Collab":
+      - /url: /chat-intro
+    - link "Higgsfield MCP":
+      - /url: /mcp
+    - link "Higgsfield Games":
+      - /url: /games-intro
+    - link "AI Influencer":
+      - /url: /ai-influencer
+    - link "Community":
+      - /url: /community
+    - link "Enterprise":
+      - /url: /enterprise
+    - link "Team":
+      - /url: /team-plan
+    - link "AI Assist":
+      - /url: /ai-assist
+    - link "Reference Extension":
+      - /url: https://chromewebstore.google.com/detail/higgsfield-reference/oohmjaflbknghbidmaoonmchcodhmkgj
+    - link "Blog":
+      - /url: /blog
+    - link "Creator Hub":
+      - /url: /creator-hub
+    - link "Help center":
+      - /url: /creator-hub/help-center
+    - link "Contests":
+      - /url: /contests
+    - link "Discord":
+      - /url: https://discord.gg/higgsfield
+  - heading "Image" [level=3]
+  - list:
+    - link "AI Image":
+      - /url: /ai-image
+    - link "Soul ID Character":
+      - /url: /character
+    - link "Draw to Edit":
+      - /url: /ai/video?image-inpaint=true
+    - link "Fashion Factory":
+      - /url: /fashion-factory
+    - link "Edit Image":
+      - /url: /edit?model=nano_banana_pro_inpaint
+    - link "Image Upscale":
+      - /url: /upscale
+    - link "Photodump Studio":
+      - /url: /photodump-studio
+    - link "Higgsfield Popcorn":
+      - /url: /storyboard-generator
+    - link "Nano Banana":
+      - /url: /nano-banana-intro
+    - link "Prompt Guide":
+      - /url: /nano-banana-pro-prompt-guide
+    - link "Flux 2":
+      - /url: /flux-2-intro
+    - link "Seedream 5":
+      - /url: /seedream-5.0
+    - link "GPT Image 2":
+      - /url: /gpt-2
+    - link "Inpaint":
+      - /url: /image-editing
+    - link "Soul 2.0":
+      - /url: /soul-intro
+    - link "Soul Cinema":
+      - /url: /soul-cinema
+    - link "Soul Cast":
+      - /url: /soul-cast-intro
+  - heading "Video" [level=3]
+  - list:
+    - link "AI Video":
+      - /url: /ai-video
+    - link "Mixed media":
+      - /url: /mixed-media-intro
+    - link "Sora 2 Introduction":
+      - /url: /sora-2
+    - link "Veo 3.1 Introduction":
+      - /url: /veo3.1
+    - link "Create Video":
+      - /url: /ai/video
+    - link "Lipsync Studio":
+      - /url: /lipsync-studio
+    - link "Talking Avatar":
+      - /url: /lipsync-studio
+    - link "Draw to Video":
+      - /url: /ai/video?video-inpaint=true&generationType=video
+    - link "UGC Factory":
+      - /url: /ugc-factory
+    - link "Video Upscale":
+      - /url: /upscale
+    - link "Kling 3.0":
+      - /url: /kling-3.0
+    - link "WAN 2.6":
+      - /url: /wan-2.6
+    - link "Seedance 2.5":
+      - /url: /seedance/2.5
+    - link "Seedance 2.0":
+      - /url: /seedance/2.0
+    - link "Grok Imagine 1.5":
+      - /url: /grok-imagine-1.5
+    - link "Gemini Omni Flash":
+      - /url: /gemini-omni-flash
+  - heading "Edit" [level=3]
+  - list:
+    - link "Banana Placement":
+      - /url: /edit?model=banana_placement
+    - link "Product Placement":
+      - /url: /edit?model=canvas
+    - link "Edit Image":
+      - /url: /edit?model=nano_banana_pro_inpaint
+    - link "Multi Reference":
+      - /url: /edit?model=multi
+    - link "Upscale":
+      - /url: /upscale
+    - link "Sora 2 Upscale":
+      - /url: /sora-2-upscale
+  - paragraph: 535 Mission St, 14th floor, San Francisco, CA, 94105
+  - list:
+    - link "X / Twitter":
+      - /url: https://x.com/higgsfield
+    - link "Youtube":
+      - /url: https://www.youtube.com/@HiggsfieldAI
+    - link "Instagram":
+      - /url: https://www.instagram.com/higgsfield.ai
+    - link "LinkedIn":
+      - /url: https://www.linkedin.com/company/higgsfield
+    - link "Tiktok":
+      - /url: https://www.tiktok.com/@higgsfield.ai90
+- contentinfo:
+  - navigation:
+    - paragraph:
+      - generic: © 2026 Higgsfield, Inc.
+      - generic: All rights reserved.
+    - list:
+      - link "Help center":
+        - /url: /creator-hub/help-center
+      - link "Cookie Notice":
+        - /url: /cookie-notice
+      - link "Terms":
+        - /url: /terms-of-use-agreement
+      - link "Privacy":
+        - /url: /privacy-policy
+- region "Notifications Alt+T"
+- alert
+- alert
+- alert
+- alert
+- alert
+- alert
+- region "Notifications alt+T"

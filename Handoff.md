@@ -34,6 +34,12 @@ corridas, `mode=build` y después `mode=deploy`— y `tofu apply`; plan honesto 
 contra el workflow en verde. Detalle:
 [`TASK_1641_SESSION_HANDOFF_2026-08-04.md`](docs/operations/creative-studio/TASK_1641_SESSION_HANDOFF_2026-08-04.md).
 
+**Benchmark de producto (2026-08-05):** la comparación autenticada de Higgsfield/Magnific y la verificación de
+Globe main@21d6ee3 están documentadas en
+[GLOBE_COMPETITIVE_BENCHMARK_HIGGSFIELD_MAGNIFIC_2026-08-05](docs/audits/competitive-ui/GLOBE_COMPETITIVE_BENCHMARK_HIGGSFIELD_MAGNIFIC_2026-08-05.md).
+El hallazgo load-bearing coincide con este handoff: la UI React todavía deja Reference, Recreate, Favorite y
+Download sin handlers reales; no declarar cerrado el loop de Producer hasta TASK-1641/TASK-1552.
+
 ## TASK-1641 — Globe: el sello del canary funciona; Omni y Veo SELLADAS (2026-08-04)
 
 **Estado:** `in-progress`. **Causa raíz cerrada y las dos rutas de video promovidas, selladas y habilitadas.**
@@ -591,43 +597,3 @@ mientras el Connector se cuelga (`invalid_rapt` es reauth). Comandos en
   referencia orbital HTML/CSS sin SVG privado ni GSAP. El Lab queda en 27 páginas y 21 contratos; build, lint,
   typecheck, tests y 32 E2E pasan (4 escenarios con skip por proyecto). `axis.efeonce.org` ya resuelve a `76.76.21.21` y el smoke HTTPS devuelve `200`.
   La siguiente continuidad debe continuar con `handoff`, `microinteractions` y las superficies con API.
-
-## Globe Producer — seis defectos de superficie, el pie de la app y la paginación del feed (2026-08-01)
-
-Sesión reportada por el operador **mirando la pantalla**. Tres PRs mergeados y **desplegados**:
-[#66](https://github.com/efeoncepro/efeonce-globe/pull/66), [#69](https://github.com/efeoncepro/efeonce-globe/pull/69),
-[#73](https://github.com/efeoncepro/efeonce-globe/pull/73) — main `8989074`, verificado en vivo en
-`globe.efeoncepro.com`.
-
-**Lo entregado:** barra del documento tokenizada + `scroll-behavior: smooth` y barra del composer que se revela
-en hover; anillo de créditos con hueco opaco que ahora mide el **ciclo** y no el stock, con `flame` en vez del
-`sparkles` genérico de IA; `⌘K` como unidad (8 px → 2); controles de selección de las cards centrados y
-honestamente apagados; **pie de la aplicación** con el wordmark de Efeonce, que el port a React había perdido;
-barra del feed con alturas uniformes y alineada; y **paginación hacia atrás** del feed (25 → 50 piezas
-verificado en vivo).
-
-🔴 **Dos veces el mismo patrón en un día: la capability existe y la UI consume la mitad.** El compare de las
-cards tiene su diálogo sólo en el legacy, y el feed tenía cursor keyset en el backend desde `TASK-1525` con el
-`nextCursor` ignorado. Antes de declarar que «falta» una capacidad en el Producer, **verificar si ya está en el
-contrato y sólo falta cablearla**.
-
-🔴 **Regla del feed que no se ve desde el cliente:** una página hacia atrás no puede mover el `watermark` — el
-backend lo calcula desde el último item, que hacia atrás es el más viejo, y adoptarlo hace re-traer todo lo ya
-visto con la pantalla viéndose perfecta. Por eso el modo (`sync`/`changes`/`older`) viaja explícito.
-
-⚠️ **Trampa operativa que costó reencauzar trabajo:** `gh pr merge --delete-branch` deja al agente en `main`
-**local**, que en `efeonce-globe` suele estar viejo y divergente; se siguió editando sobre esa base sin notarlo.
-Después de cualquier merge, `git rev-parse --abbrev-ref HEAD` antes de seguir.
-
-⚠️ **Merge a `main` NO despliega.** `deploy-internal.yml` es `workflow_dispatch` manual: el operador vio el
-`sparkles` viejo después del merge y eso es indistinguible de «el cambio no funcionó».
-
-**Documentado en:** la skill `greenhouse-globe` (ambas copias, con el catálogo de las seis clases de defecto y
-las trampas operativas) y el `Delta 2026-08-01` de
-[`TASK-1559`](docs/tasks/in-progress/TASK-1559-globe-feed-viewer-client-port.md).
-
-**Abierto:** (1) la píldora «N nuevas» — las novedades siguen entrando solas y empujando el contenido;
-(2) **el anillo de créditos hoy no comunica capacidad operativa** porque el reader no expresa correctamente
-período, funding, caps y holds. La decisión ya no está abierta: TASK-1482 corrige la verdad, TASK-1586 publica el
-self-status y TASK-1628 lo consume sin matemática local;
-(3) el `main` local del operador sigue divergente con 2 duplicados de trabajo ya mergeado.

@@ -160,6 +160,7 @@ Indice maestro de la documentacion no operativa del repo.
 
 - [Audits Index](audits/README.md)
 - Regla de uso: las auditorias deben consumirse frecuentemente cuando el trabajo toque esa zona, pero siempre revalidando si sus hallazgos siguen vigentes o si hace falta una auditoria nueva/refresh.
+- [Globe UI competitive benchmark — Higgsfield y Magnific — 2026-08-05](audits/competitive-ui/GLOBE_COMPETITIVE_BENCHMARK_HIGGSFIELD_MAGNIFIC_2026-08-05.md)
 - [ICO Audits](audits/ico/README.md)
 - [ICO_ENGINE_AUDIT_2026-04-30.md](audits/ico/ICO_ENGINE_AUDIT_2026-04-30.md)
 - [Notion Audits](audits/notion/README.md)
