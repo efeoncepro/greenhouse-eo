@@ -17,8 +17,15 @@ import { captureWithDomain } from '@/lib/observability/capture'
 
 import { materializeGscDailySnapshot } from './gsc-daily-materializer'
 
+/**
+ * Ventana móvil por defecto. 5 días cubre con holgura el lag típico de publicación de
+ * GSC (~2 días, sin garantía) más la consolidación tardía de los días ya capturados.
+ */
+const DEFAULT_LOOKBACK_DAYS = 5
+
 export interface GscDailyBatchOrgOutcome {
   organizationId: string
+  captureDate: string
   status: 'materialized' | 'degraded' | 'failed'
   rowsWritten: number
   truncated: boolean
@@ -26,7 +33,7 @@ export interface GscDailyBatchOrgOutcome {
 }
 
 export interface GscDailyBatchResult {
-  captureDate: string
+  captureDates: string[]
   orgs: number
   materialized: number
   degraded: number
@@ -37,30 +44,40 @@ export interface GscDailyBatchResult {
 }
 
 /**
- * Fecha objetivo por defecto: **ayer** en `America/Santiago`.
+ * Ventana por defecto: **una ventana móvil de días recientes**, no un solo día.
  *
- * Ayer y no hoy porque GSC no publica el día en curso; pedirlo devolvería un día
- * incompleto y grabaría una medición engañosa. El re-run posterior del mismo día corrige
- * el consolidado tardío de Google gracias al UPSERT idempotente.
+ * ⚠️ Medido en vivo el 2026-08-05 durante el rollout: **GSC no publica D-1**. La consulta
+ * a D-1 responde `ok` con CERO filas y recién D-2 trae datos. Un job que materializara
+ * sólo "ayer" escribiría un día vacío cada vez y **nunca volvería a buscarlo** cuando el
+ * dato llegara — la serie quedaría permanentemente vacía, con el batch reportando éxito.
+ *
+ * Rematerializar una ventana en cada corrida resuelve dos cosas con el mismo mecanismo:
+ * absorbe el lag de publicación (que Google no garantiza y varía) y corrige el
+ * consolidado tardío (~48h) de los días ya capturados. Es seguro por construcción porque
+ * el UPSERT es idempotente por `(org, capture_date, query, page)`.
  */
-export const resolveDefaultCaptureDate = (at?: Date): string => {
-  const now = at ?? new Date()
-  const parts = getSantiagoDateParts(now)
+export const resolveDefaultCaptureWindow = (lookbackDays = DEFAULT_LOOKBACK_DAYS, at?: Date): string[] => {
+  const parts = getSantiagoDateParts(at ?? new Date())
 
-  // El helper canónico devuelve null ante una fecha no parseable. Acá `now` siempre es
-  // un Date válido, pero se degrada explícito en vez de asumirlo: una fecha mal resuelta
-  // escribiría la serie en el día equivocado, que es peor que no escribirla.
+  // El helper canónico devuelve null ante una fecha no parseable. Se degrada explícito en
+  // vez de asumirlo: una fecha mal resuelta escribiría la serie en el día equivocado, que
+  // es peor que no escribirla.
   if (!parts) {
-    throw new Error('resolveDefaultCaptureDate: no se pudo resolver la fecha en America/Santiago')
+    throw new Error('resolveDefaultCaptureWindow: no se pudo resolver la fecha en America/Santiago')
   }
 
-  // Date.UTC + setUTCDate(-1) evita el bug de restar 86_400_000 ms, que se equivoca en
-  // los cambios de horario de verano de Chile.
-  const yesterday = new Date(Date.UTC(parts.year, parts.month - 1, parts.day))
+  const days: string[] = []
 
-  yesterday.setUTCDate(yesterday.getUTCDate() - 1)
+  for (let back = 1; back <= Math.max(1, lookbackDays); back += 1) {
+    // Date.UTC + setUTCDate evita el bug de restar 86_400_000 ms, que se equivoca en los
+    // cambios de horario de verano de Chile.
+    const day = new Date(Date.UTC(parts.year, parts.month - 1, parts.day))
 
-  return yesterday.toISOString().slice(0, 10)
+    day.setUTCDate(day.getUTCDate() - back)
+    days.push(day.toISOString().slice(0, 10))
+  }
+
+  return days
 }
 
 /**
@@ -71,53 +88,63 @@ export const resolveDefaultCaptureDate = (at?: Date): string => {
  * y esa serie no se puede reconstruir después.
  */
 export const runGscDailySnapshotBatch = async (
-  options: { captureDate?: string; maxOrgs?: number } = {}
+  options: { captureDate?: string; lookbackDays?: number; maxOrgs?: number } = {}
 ): Promise<GscDailyBatchResult> => {
-  const captureDate = options.captureDate ?? resolveDefaultCaptureDate()
+  // `captureDate` explícito ⇒ un solo día (re-materialización puntual). Sin él, la ventana
+  // móvil, que es lo que corre a diario.
+  const captureDates = options.captureDate
+    ? [options.captureDate]
+    : resolveDefaultCaptureWindow(options.lookbackDays)
+
   const allOrgs = await listActiveSearchConsoleOrganizations()
   const orgs = typeof options.maxOrgs === 'number' && options.maxOrgs > 0 ? allOrgs.slice(0, options.maxOrgs) : allOrgs
 
   const outcomes: GscDailyBatchOrgOutcome[] = []
 
   for (const org of orgs) {
-    try {
-      const result = await materializeGscDailySnapshot(org.organizationId, captureDate)
+    for (const captureDate of captureDates) {
+      try {
+        const result = await materializeGscDailySnapshot(org.organizationId, captureDate)
 
-      if (result.ok) {
-        outcomes.push({
-          organizationId: org.organizationId,
-          status: 'materialized',
-          rowsWritten: result.rowsWritten,
-          truncated: result.truncated,
-          errorCode: null
+        if (result.ok) {
+          outcomes.push({
+            organizationId: org.organizationId,
+            captureDate,
+            status: 'materialized',
+            rowsWritten: result.rowsWritten,
+            truncated: result.truncated,
+            errorCode: null
+          })
+        } else {
+          outcomes.push({
+            organizationId: org.organizationId,
+            captureDate,
+            status: 'degraded',
+            rowsWritten: 0,
+            truncated: false,
+            errorCode: result.errorCode
+          })
+        }
+      } catch (error) {
+        captureWithDomain(error, 'growth', {
+          tags: { source: 'seo_gsc_daily_batch' },
+          extra: { organizationId: org.organizationId, captureDate }
         })
-      } else {
+
         outcomes.push({
           organizationId: org.organizationId,
-          status: 'degraded',
+          captureDate,
+          status: 'failed',
           rowsWritten: 0,
           truncated: false,
-          errorCode: result.errorCode
+          errorCode: 'unexpected_error'
         })
       }
-    } catch (error) {
-      captureWithDomain(error, 'growth', {
-        tags: { source: 'seo_gsc_daily_batch' },
-        extra: { organizationId: org.organizationId, captureDate }
-      })
-
-      outcomes.push({
-        organizationId: org.organizationId,
-        status: 'failed',
-        rowsWritten: 0,
-        truncated: false,
-        errorCode: 'unexpected_error'
-      })
     }
   }
 
   return {
-    captureDate,
+    captureDates,
     orgs: orgs.length,
     materialized: outcomes.filter(outcome => outcome.status === 'materialized').length,
     degraded: outcomes.filter(outcome => outcome.status === 'degraded').length,

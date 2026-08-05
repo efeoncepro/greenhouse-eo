@@ -1799,13 +1799,19 @@ const handleGrowthFormsDispatch = async (req: IncomingMessage, res: ServerRespon
 // Gate prod-safe: con GROWTH_SEO_ENABLED OFF (default) el handler hace no-op sin tocar
 // la DB ni Google — el scheduler puede existir pausado sin acoplarse a prod.
 //
-// Body opcional: {captureDate?: 'YYYY-MM-DD', maxOrgs?: number}. Sin `captureDate` usa
-// AYER en America/Santiago (el día en curso todavía no está publicado por GSC).
+// Body opcional: {captureDate?: 'YYYY-MM-DD', lookbackDays?: number, maxOrgs?: number}.
+// Sin `captureDate` materializa una VENTANA MÓVIL de días recientes: medido en vivo
+// (2026-08-05) que GSC no publica D-1, así que apuntar sólo a "ayer" escribiría días
+// vacíos para siempre. `captureDate` explícito fuerza un único día.
 const handleSeoGscSnapshotBatch = async (req: IncomingMessage, res: ServerResponse) => {
   const body = await readBody(req)
 
   const captureDate = typeof body.captureDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(body.captureDate)
     ? body.captureDate
+    : undefined
+
+  const lookbackDays = typeof body.lookbackDays === 'number' && body.lookbackDays > 0
+    ? Math.min(30, Math.floor(body.lookbackDays))
     : undefined
 
   const maxOrgs = typeof body.maxOrgs === 'number' && body.maxOrgs > 0 ? Math.floor(body.maxOrgs) : undefined
@@ -1816,13 +1822,16 @@ const handleSeoGscSnapshotBatch = async (req: IncomingMessage, res: ServerRespon
     return
   }
 
-  console.log(`[ops-worker] POST /seo/gsc/snapshot-batch — captureDate=${captureDate ?? 'yesterday'}`)
+  console.log(
+    `[ops-worker] POST /seo/gsc/snapshot-batch — captureDate=${captureDate ?? 'window'} ` +
+    `lookbackDays=${lookbackDays ?? 'default'}`
+  )
 
   try {
-    const summary = await runGscDailySnapshotBatch({ captureDate, maxOrgs })
+    const summary = await runGscDailySnapshotBatch({ captureDate, lookbackDays, maxOrgs })
 
     console.log(
-      `[ops-worker] /seo/gsc/snapshot-batch done — captureDate=${summary.captureDate} ` +
+      `[ops-worker] /seo/gsc/snapshot-batch done — dates=${summary.captureDates.join(',')} ` +
       `orgs=${summary.orgs} materialized=${summary.materialized} degraded=${summary.degraded} ` +
       `failed=${summary.failed} rows=${summary.rowsWritten} truncatedOrgs=${summary.truncatedOrgs}`
     )
@@ -1831,7 +1840,7 @@ const handleSeoGscSnapshotBatch = async (req: IncomingMessage, res: ServerRespon
     // puede recuperar pasada la ventana de Google: se grita, no se deja en el detalle.
     if (summary.truncatedOrgs > 0) {
       captureMessageWithDomain(
-        `[TASK-1302] ${summary.truncatedOrgs} org(s) truncaron la materialización GSC de ${summary.captureDate}`,
+        `[TASK-1302] ${summary.truncatedOrgs} captura(s) truncaron la materialización GSC de ${summary.captureDates.join(',')}`,
         'growth',
         { level: 'warning', tags: { source: 'ops_worker_seo_gsc_snapshot_batch' } }
       )
