@@ -23,6 +23,24 @@
 - `pnpm docs:closure-check` ya no emite `architecture_doc_monolith` para ese path; referrers vivos con anclas
   `§4.9`/`§5` actualizados a los temáticos.
 
+## 2026-08-05 — Growth SEO (EPIC-022): registry de familias DataForSEO + ledger de gasto (TASK-1300)
+
+- El cliente DataForSEO deja de estar candado a `/v3/serp/`: allowlist cerrado de 5 familias, con
+  `normalizeEndpoint(endpoint, family)` table-driven y un transporte único (`postDataForSeoTask`).
+  `postDataForSeoSerpLiveAdvanced` delega sin cambiar contrato — el AEO pasó sin tocar ninguno de sus archivos.
+- **Circuit breaker por familia**: una familia caída no arrastra a las demás pese a compartir credenciales.
+- **`seo_provider_spend_daily` pasa a ser la fuente ÚNICA de presupuesto.** Lo escribe el transporte en cada
+  llamada cobrada, así que una captura no puede gastar sin quedar contabilizada; `enforceSeoRunEntitlement` dejó
+  de sumar el `provider_cost` de los snapshots, que contaba el mismo gasto dos veces. Ese hook estaba declarado
+  en TASK-1301 pero sin dueño desde que esa task cerró.
+- Endurecido sobre la spec: `organizationId` obligatorio por tipo en las familias que gastan, y el transporte
+  **lanza** si el runtime no registró el contador — gastar sin contabilizar se descubre en la factura.
+- **`code complete, rollout pendiente`: la cuenta DataForSEO tiene USD 0,90**, así que el smoke por familia está
+  bloqueado por saldo. Sanity live 7/7 contra PG real; suite 10130/0 + build prod verdes.
+- Hallazgo transversal: el patrón `BEGIN`/`ROLLBACK` de los sanity scripts **no es transaccionalmente seguro**
+  (el helper toma una conexión del pool por llamada). Este se reescribió sobre `withGreenhousePostgresTransaction`;
+  los de TASK-1301/1302 quedan por revisar.
+
 ## 2026-08-05 — Growth SEO (EPIC-022): serie GSC propia + striking-distance (TASK-1302)
 
 - Google Search Console deja de ser read-through: `greenhouse_growth.seo_gsc_daily` materializa query×page por
@@ -902,13 +920,3 @@ y [`docs/changelog/internal/2026-07.md`](docs/changelog/internal/2026-07.md).
   coordinación de terceros, performance fee condicionado, mínimos y condiciones de pago.
 - Se fijó como hipótesis el modelo `fee base + pass-through`; las comisiones no pueden ser ocultas ni sustituir el
   delivery fee. Finance, Legal y Commercial deben validar cost-to-serve, derechos, atribución y willingness-to-pay.
-
-## 2026-07-29 — Creator Influence & Content: benchmark de mercado y modelo escalable
-
-- Se investigaron agencias y plataformas líderes, incluyendo Aspire, NeoReach, Upfluence, CreatorIQ e Influentials,
-  además de referencias públicas de pricing y guidance de disclosure/rights.
-- Se añadió el benchmark comercial con patrones adoptados y descartados: end-to-end modular, rights at signing,
-  paid amplification, affiliate con tracking, transparencia y source of truth portable; fuera quedan per-post,
-  performance-only, comisión oculta y porcentaje de media spend.
-- El modelo propio queda orientado a capacidad gobernada por lane, no a volumen de publicaciones, y permanece en
-  `Approved for validation`.

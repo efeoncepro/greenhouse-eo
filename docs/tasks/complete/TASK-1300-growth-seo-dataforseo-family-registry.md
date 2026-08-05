@@ -13,7 +13,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -26,7 +26,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `en ejecución` — Slice 1-2; la verificación live por familia queda condicionada al saldo de la cuenta DataForSEO (USD 0,90 medido 2026-08-05)
+- Status real: `code complete, rollout pendiente` — Slices 1-2 implementados y verificados contra PG real; el smoke live por familia queda bloqueado por el saldo de la cuenta DataForSEO (USD 0,90 medido 2026-08-05)
 - Rank: `TBD`
 - Domain: `growth|integrations|ai`
 - Blocked by: `none`
@@ -170,11 +170,11 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
 
 ## Capability Definition of Done — Full API Parity gate
 
@@ -264,15 +264,15 @@ Ver el contrato canónico en `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTU
 
 ## Acceptance Criteria
 
-- [ ] `DATAFORSEO_FAMILIES` define las 5 familias (`serp`, `labs`, `backlinks`, `onpage`, `domain`) como allowlist cerrado; `normalizeEndpoint(endpoint, family)` es table-driven y rechaza prefijo ajeno a la familia + familia desconocida.
-- [ ] `postDataForSeoTask({ family, endpoint, tasks })` genérico existe sobre el transporte compartido; NO hay un cliente por familia.
-- [ ] `postDataForSeoSerpLiveAdvanced` conserva firma y shape de retorno; el AEO (`runDataForSeoGoogleAiModeSerp`) pasa un test de no-regresión.
-- [ ] `normalizeEndpoint` NUNCA acepta un prefijo arbitrario del caller (test de mismatch verde).
-- [ ] Circuit breaker por familia: un breaker abierto de una familia deja pasar las demás (test de aislamiento verde).
-- [ ] Cost-tracking por familia: cada call exitoso con `cost != null` persiste en `seo_provider_spend_daily` vía UPSERT idempotente por `(organization_id, family, spend_date)` con incrementos atómicos.
-- [ ] Honest degradation: fallo real → `ok: false` sin fabricar `tasks`/`cost`; error vía `captureWithDomain`, no `Sentry.captureException` directo.
-- [ ] Migración additive con marker `-- Up Migration` + DO-block; Down solo DROP; GRANT read/write a `greenhouse_runtime`, ownership `greenhouse_ops`.
-- [ ] `db.d.ts` regenerado; `pnpm typecheck` + `pnpm lint` + `pnpm test src/lib/ai` verdes.
+- [x] `DATAFORSEO_FAMILIES` define las 5 familias (`serp`, `labs`, `backlinks`, `onpage`, `domain`) como allowlist cerrado; `normalizeEndpoint(endpoint, family)` es table-driven y rechaza prefijo ajeno a la familia + familia desconocida.
+- [x] `postDataForSeoTask({ family, endpoint, tasks })` genérico existe sobre el transporte compartido; NO hay un cliente por familia.
+- [x] `postDataForSeoSerpLiveAdvanced` conserva firma y shape de retorno; el AEO (`runDataForSeoGoogleAiModeSerp`) pasa un test de no-regresión.
+- [x] `normalizeEndpoint` NUNCA acepta un prefijo arbitrario del caller (test de mismatch verde).
+- [x] Circuit breaker por familia: un breaker abierto de una familia deja pasar las demás (test de aislamiento verde).
+- [x] Cost-tracking por familia: cada call exitoso con `cost != null` persiste en `seo_provider_spend_daily` vía UPSERT idempotente por `(organization_id, family, spend_date)` con incrementos atómicos.
+- [x] Honest degradation: fallo real → `ok: false` sin fabricar `tasks`/`cost`; error vía `captureWithDomain`, no `Sentry.captureException` directo.
+- [x] Migración additive con marker `-- Up Migration` + DO-block; Down solo DROP; GRANT read/write a `greenhouse_runtime`, ownership `greenhouse_ops`.
+- [x] `db.d.ts` regenerado; `pnpm typecheck` + `pnpm lint` + `pnpm test src/lib/ai` verdes.
 
 ## Verification
 
@@ -284,13 +284,13 @@ Ver el contrato canónico en `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTU
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] el archivo vive en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] chequeo de impacto cruzado (TASK-1301 lee el contador `seo_provider_spend_daily`; TASK-1303/1304 consumen `postDataForSeoTask`)
-- [ ] documentación técnica (arquitectura del dominio SEO §6 refleja la implementación real del registry/breaker/cost)
+- [x] `Lifecycle` sincronizado
+- [x] el archivo vive en la carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado
+- [x] chequeo de impacto cruzado (TASK-1301 lee el contador `seo_provider_spend_daily`; TASK-1303/1304 consumen `postDataForSeoTask`)
+- [x] documentación técnica (arquitectura del dominio SEO §6 refleja la implementación real del registry/breaker/cost)
 
 ## Follow-ups
 
@@ -315,3 +315,37 @@ Ver el contrato canónico en `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTU
 1. ¿El registry `DATAFORSEO_FAMILIES` vive inline en `dataforseo.ts` o en un módulo aparte `dataforseo-families.ts`? Propuesta: módulo aparte para reuso limpio por consumers; confirmar en Discovery.
 2. ¿El writer del contador vive en `src/lib/growth/seo/provider-spend.ts` o en `src/lib/ai/`? Propuesta: `src/lib/growth/seo/` (es dato de dominio growth, no del cliente genérico) y el cliente lo invoca vía callback/hook opcional. [verificar]
 3. ¿La cuenta DataForSEO tiene habilitadas Labs/OnPage/Backlinks/Domain hoy? Resolver con el operador antes del smoke por familia.
+
+## Resolución de ejecución (2026-08-05)
+
+### Open Questions — resueltas
+
+1. **¿Registry inline o módulo aparte?** → **Módulo aparte** (`dataforseo-families.ts`), sin `server-only`: es sólo datos y tipos, así que tests y consumers de tipos lo importan sin arrastrar el transporte.
+2. **¿Writer en `growth/seo` o en `ai/`?** → **`src/lib/growth/seo/provider-spend.ts`**. El cliente genérico no debe conocer una tabla de `greenhouse_growth`: expone un hook (`setDataForSeoSpendRecorder`) que `register-provider-spend.ts` llena. La dependencia apunta de growth hacia ai, nunca al revés.
+3. **¿La cuenta tiene habilitadas las 4 familias nuevas?** → **No verificable sin gastar, y el saldo lo impide.** `/v3/appendix/user_data` no expone un mapa de familias habilitadas (`rates` sólo trae `limits`/`statistics`); la prueba definitiva es una llamada real por familia. **Medición del 2026-08-05: `money.total: 1`, `money.balance: 0.9`** — la cuenta tiene USD 0,90. No se gastó saldo probando: queda como decisión del operador.
+
+### Adiciones de alcance (deliberadas, con su razón)
+
+- **Cambio de fuente del presupuesto en `enforceSeoRunEntitlement`.** La spec lo ponía en Out of Scope ("es de TASK-1301"), pero TASK-1301 está `complete` y su hook declarado (`entitlement.ts:24`) nunca tuvo dueño. Dejarlo abierto habría permitido que TASK-1303 cableara ambas fuentes y **contara el mismo gasto dos veces**, agotando presupuestos a la mitad en silencio. Hoy el cambio es no-op verificable (ambas fuentes vacías); cerrarlo después habría sido más caro.
+- **`organizationId` obligatorio por tipo en las 4 familias SEO + throw si falta el contador registrado.** La spec decía "cuando el caller pasa `organizationId`", lo que deja el gasto sin registrar si alguien lo olvida. Es el mismo modo de falla silenciosa de TASK-1302 (runtime nuevo sin su config), pero con dinero de por medio.
+
+### Correcciones a la spec
+
+- Pedía `captureWithDomain(err, 'integrations', …)`; ese dominio **no existe** en el enum (sólo `integrations.<proveedor>`). Se usa `growth`, registrado por TASK-1226 justo para los adapters de proveedor de este dominio.
+- Afirmaba implícitamente que el gasto de `serp` no es atribuible. **Falso:** `grader_profiles.organization_id` existe y es nullable (TASK-1243). La razón real es que `ProviderAdapterContext` no transporta la organización — corregido en los comentarios del registry y registrado como follow-up.
+
+### Evidencia
+
+- Migración `20260805194114467` aplicada en `greenhouse-pg-dev`. Sanity live `_sanity-seo-provider-spend.ts`: **7/7 contra PG real con cero residuo** (acumulación atómica 3→1 fila, suma NUMERIC exacta, grano por familia, CHECK del allowlist rechazando `keywords_data`, y el fragmento del gate leyendo el total del mes).
+- **57 tests focales** de `src/lib/ai` + **suite completa 10130/0** + **`pnpm build` de producción** verdes. El AEO pasó sin que se tocara ninguno de sus archivos.
+
+### Hallazgo transversal — el patrón de sanity del repo es frágil
+
+`BEGIN`/`ROLLBACK` mediante `runGreenhousePostgresQuery` **no es transaccionalmente seguro**: ese helper toma una conexión del pool por llamada, así que el `BEGIN` no cubre lo que sigue. Se descubrió acá porque un `SAVEPOINT` reventó con `25P01 CheckTransactionBlock`. Este sanity se reescribió sobre `withGreenhousePostgresTransaction` (fija el cliente) y ejercita el **SQL exportado** por el módulo para que no pueda derivar. ⚠️ Los sanity de **TASK-1301 y TASK-1302 usan el patrón frágil** y pueden estar pasando por suerte — trabajo aparte.
+
+### Rollout pendiente (por qué NO es `operationally complete`)
+
+1. **Fondear la cuenta DataForSEO** (USD 0,90 hoy). Sin saldo no hay smoke por familia ni captura real de TASK-1303/1304.
+2. Confirmar con el proveedor que Labs/OnPage/Backlinks/Domain están habilitadas en el plan (un 402/403 en el smoke sería del plan, no del cliente).
+3. Smoke por familia: una llamada barata a Labs → confirmar 200, `provider_cost` capturado y fila incrementada en `seo_provider_spend_daily`.
+4. La migración corre en la única instancia Cloud SQL (ya aplicada); el código llega a runtime con el próximo deploy. **Nada se ejerce hasta que TASK-1303/1304 llamen al transporte**, así que el riesgo de tenerlo mergeado es nulo.

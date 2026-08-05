@@ -115,7 +115,7 @@ Se envuelven en una sola narrativa de producto: **Search Visibility 360** = los 
 
 ## 6. DataForSEO governance
 
-`normalizeEndpoint()` hoy hard-codea `/v3/serp/`. Se parametriza a un **registry declarativo de familias** (allowlist cerrado):
+**Implementado por TASK-1300** (`src/lib/ai/dataforseo-families.ts` + `dataforseo-breaker.ts` + `src/lib/growth/seo/provider-spend.ts`). `normalizeEndpoint(endpoint, family)` es table-driven contra un **registry declarativo de familias** (allowlist cerrado):
 
 ```
 serp      /v3/serp/              (AEO usa esto hoy — no romper)
@@ -125,9 +125,10 @@ onpage    /v3/on_page/           site audit (task-based async → ops-worker, no
 domain    /v3/domain_analytics/  domain metrics
 ```
 
-- **Un cliente, familias como config** (no un cliente por familia): transporte compartido + gate de familia + instrumentación por familia.
-- **Cost tracking:** cada call persiste `provider_cost` en el snapshot + incrementa un contador `seo_provider_spend_daily` per-org (event-sourced) para el quota enforcement.
-- **Circuit breaker por familia:** un Backlinks roto no hunde el cron de rank tracking; aísla SERP-AI (AEO) de Labs/OnPage/Backlinks (SEO) aunque compartan credenciales.
+- **Un cliente, familias como config** (no un cliente por familia): transporte compartido `postDataForSeoTask({ family, endpoint, tasks, organizationId })` + gate de familia + instrumentación por familia. `postDataForSeoSerpLiveAdvanced` delega en él con `family: 'serp'` sin cambiar su contrato — el AEO no se toca.
+- **Cost tracking — `seo_provider_spend_daily` es la FUENTE ÚNICA de presupuesto.** El contador lo escribe el **transporte** en cada llamada cobrada (UPSERT atómico por `organization_id × family × spend_date`), así que una captura nueva no puede gastar sin quedar contabilizada por haber olvidado el registro; cubre además las llamadas que no dejan fila (tarea `on_page` async, consulta con cero resultados). `enforceSeoRunEntitlement` lee **sólo** este ledger: sumarlo además con el `provider_cost` de las tablas snapshot contaría el mismo gasto dos veces y agotaría los presupuestos a la mitad, en silencio. Ese `provider_cost` queda como procedencia por fila.
+- **Atribución obligatoria por tipo.** Las 4 familias SEO exigen `organizationId` (el tipo lo impone y el runtime lo revalida) y el transporte **lanza** si el runtime no registró el contador — gastar sin contabilizar se descubre en la factura; un throw se descubre en desarrollo. ⚠️ `serp` lo deja opcional por una limitación actual, NO porque su gasto sea inatribuible: `grader_profiles.organization_id` existe y es nullable (TASK-1243), pero `ProviderAdapterContext` no transporta la organización, así que **el gasto AEO de perfiles ligados a un cliente no entra en su presupuesto** (follow-up con dueño en EPIC-020).
+- **Circuit breaker por familia:** un Backlinks roto no hunde el cron de rank tracking; aísla SERP-AI (AEO) de Labs/OnPage/Backlinks (SEO) aunque compartan credenciales. `breakerOpen` en el resultado distingue "no se intentó" de "se intentó y falló".
 - **Honest degradation:** un audit que crawlea y devuelve 0 findings (`succeeded`) ≠ uno que falló el crawl (`failed`). Nunca fabricar snapshot.
 - **OnPage es task-based (async):** POST crea task, se poll-ea → ops-worker (queue+poll), no Vercel route handler.
 

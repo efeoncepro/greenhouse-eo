@@ -1,5 +1,40 @@
 # Handoff activo
 
+### TASK-1300 — Registry de familias DataForSEO + ledger de gasto (2026-08-05)
+
+**`code complete, rollout pendiente`.** El cliente DataForSEO pasa de candado hard-code a `/v3/serp/` a un
+allowlist cerrado de 5 familias con transporte único. El AEO pasó **sin que se tocara ninguno de sus archivos**.
+
+**Tres decisiones que conviene no re-litigar:**
+
+1. **`seo_provider_spend_daily` es la FUENTE ÚNICA de presupuesto.** `enforceSeoRunEntitlement` dejó de sumar
+   el `provider_cost` de las 3 tablas snapshot: hacer ambas contaría el mismo gasto DOS VECES. El hook estaba
+   declarado en TASK-1301 (`entitlement.ts:24`) pero esa task ya estaba `complete`, así que **el cambio no
+   tenía dueño** — se tomó acá porque hoy es no-op verificable y después habría sido caro.
+2. **El contador lo escribe el TRANSPORTE, no el caller**, y las 4 familias SEO exigen `organizationId` por
+   tipo. Además el transporte **lanza** si el runtime no registró el contador: gastar sin contabilizar se
+   descubre en la factura; un throw se descubre en desarrollo (lección de TASK-1302).
+3. **`serp` deja `organizationId` opcional por una limitación del contexto del adapter AEO, NO porque su gasto
+   sea inatribuible** — corrección que salió de una objeción del operador. Ver el hueco abierto abajo.
+
+**🔴 Dos cosas que bloquean o cuestan plata:**
+
+- **La cuenta DataForSEO tiene USD 0,90** (`money.total: 1`, medido en vivo). El smoke por familia y cualquier
+  captura de TASK-1303/1304 están bloqueados por saldo. No se gastó probando: es decisión del operador.
+- **El gasto AEO de perfiles ligados a un cliente NO entra en su presupuesto.** `grader_profiles.organization_id`
+  existe y es nullable (TASK-1243), pero `ProviderAdapterContext` no transporta la organización. Follow-up con
+  dueño en EPIC-020; cuando `serp` reciba `organizationId`, el transporte ya lo contabiliza solo.
+
+**⚠️ Hallazgo transversal — el patrón de sanity del repo es frágil.** `BEGIN`/`ROLLBACK` vía
+`runGreenhousePostgresQuery` **no es transaccionalmente seguro**: ese helper toma una conexión del pool por
+llamada, así que el `BEGIN` no cubre lo que sigue (y puede dejar escrituras fuera del rollback). Se descubrió
+porque un `SAVEPOINT` reventó con `25P01`. Este sanity se reescribió sobre `withGreenhousePostgresTransaction`;
+**los de TASK-1301 y TASK-1302 usan el patrón frágil y pueden estar pasando por suerte** — trabajo aparte.
+
+**Nota de concurrencia:** otra sesión commiteó estos archivos en un estado intermedio (`6a6923900`) por el
+índice compartido del checkout; `3a2e1baf5` corrige encima. Evidencia: sanity live 7/7 con cero residuo, suite
+10130/0, build prod. Nada se ejerce hasta que TASK-1303/1304 llamen al transporte.
+
 ### TASK-1646 — Cloud Infrastructure doc particionado: temáticos + HISTORIAL + stub (2026-08-05)
 
 **Complete.** El monolito `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` (1340 líneas / 24 deltas, finding
