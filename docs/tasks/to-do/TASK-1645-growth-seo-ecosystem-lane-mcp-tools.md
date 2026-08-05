@@ -80,7 +80,7 @@ Reglas obligatorias:
 ### Blocks / Impacts
 
 - Exit criterion de parity de `EPIC-022` (delta 2026-08-05): el epic no cierra sin lane ecosystem + MCP tools live.
-- Gateway `efeonce-mcp-platform` (TASK-1626): los tools quedan disponibles para federación cuando el provider greenhouse se registre.
+- Gateway `efeonce-mcp-platform` (TASK-1626): la disponibilidad en `mcp.efeonce.org` requiere registrar Greenhouse-SEO como provider en el registry del gateway (adapter delgado sobre este lane). Esta task DEBE dejar ese registro hecho o con task dedicada creada — ver criterio de aceptación.
 
 ### Files owned
 
@@ -253,6 +253,7 @@ Espejar TASK-1086 end-to-end: lane con `runEcosystemReadRoute` (subject binding 
 - [ ] Shape `{ ok } | { ok: false, errorCode, status }` idéntico al del reader en los 3 consumers (test de paridad).
 - [ ] Ningún write path expuesto como tool; follow-up de governed action loop declarado.
 - [ ] Smoke staging: org entitled → data; org no entitled → deny; 1 invocación MCP e2e documentada.
+- [ ] **Disponibilidad en `mcp.efeonce.org` con dueño:** provider Greenhouse-SEO registrado en el gateway (TASK-1626) federando los 3 tools bajo scope read + smoke por el gateway, O — si el gateway aún no está GA al cerrar esta task — task dedicada de federación creada, registrada y referenciada acá (NUNCA un "pendiente" sin task).
 - [ ] `pnpm lint` + `pnpm typecheck` + tests focales verdes.
 
 ## Verification
@@ -275,7 +276,7 @@ Espejar TASK-1086 end-to-end: lane con `runEcosystemReadRoute` (subject binding 
 ## Follow-ups
 
 - Writes SEO vía agente (configure target / track keywords) por governed action loop `propose → confirm → execute`.
-- Registro del provider greenhouse-SEO en el gateway federado (`efeonce-mcp-platform`, TASK-1626).
+- Registro del provider greenhouse-SEO en el gateway federado (`efeonce-mcp-platform`, TASK-1626) — SOLO si el gateway no está GA al cierre; en ese caso el criterio de aceptación exige crear la task dedicada, no dejarlo como nota.
 - Exposición MCP del módulo AEO/grader (task hermana si se prioriza).
 
 ## Open Questions
