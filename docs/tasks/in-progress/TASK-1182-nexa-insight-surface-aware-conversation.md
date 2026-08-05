@@ -1,5 +1,47 @@
 # TASK-1182 — Nexa Insight Surface-Aware Conversation (Bridge Slice 2)
 
+## Delta 2026-08-05 — el Slice 2 se quedó sin consumer: el `focusRef` vivía SOLO en el panel legacy
+
+**Qué pasó.** Al retirar el modo de interacción `dock` ("Compacto") — el panel flotante efímero previo a
+TASK-1078, que sobrevivió como opción del selector sin ser una modalidad vigente — se descubrió que el
+transporte del `focusRef` y el auto-envío de la pregunta semilla estaban implementados **únicamente** en
+ese panel: `createFloatingAdapter(modelRef, modelModeRef, focusRefRef)` + `NexaSeedAutoSend`, ambos dentro
+de `NexaFloatingButton`. El panel vigente (`NexaFloatingPanel`, modo `expandible`) usa
+`useNexaPersistentRuntime`, **que no acepta `focusRef`**.
+
+**Consecuencia — la capability ya estaba inoperante ANTES de este cambio.** Con
+`NEXA_FLOATING_EXPANDABLE_ENABLED` ON en los 3 environments desde 2026-06 y el default de modo en
+`expandible`, la rama legacy no se montaba en producción: el CTA "Pregúntale a Nexa sobre este insight"
+abría el chat, pero no anclaba el insight ni auto-enviaba la semilla. El retiro de `dock` no causó la
+regresión — la hizo visible y eliminó el código muerto que la disimulaba.
+
+**Estado real de los criterios de aceptación:**
+
+| Criterio | Estado |
+|---|---|
+| `NexaRuntimeContext` tiene `focusRef?`; `/api/home/nexa` lo acepta | ✅ vigente (Slice 1, backend intacto) |
+| `NexaService` pre-resuelve con el reader anti-oracle y ancla | ✅ vigente (Slice 1) |
+| El CTA abre el chat flotante **enfocado** con `seedPrompt` + `focusRef` | ❌ **abre el chat, sin ancla ni semilla** — el productor del `focusRef` se fue con el panel legacy |
+| `focusRef` NO amplía acceso (test multi-persona) | ✅ vigente (el gate está en el servidor) |
+
+**Trabajo restante (redefine el Slice 2).** Portar el ancla al runtime persistente, que es el que comparten
+las DOS modalidades vigentes:
+
+1. `useNexaPersistentRuntime` (`src/lib/nexa/use-nexa-runtime.ts`) acepta un `focusRef` opcional por ref y
+   lo pasa al body en `createNexaChatAdapter` — mismo patrón aditivo que `modelMode`.
+2. `NexaFloatingPanel` y `NexaLanePanel` reciben el `focusRef` + `seedPrompt` del `NEXA_FLOATING_OPEN_EVENT`
+   (hoy `NexaFloatingButton` ya escucha el evento; solo propaga la apertura).
+3. Reponer el auto-envío de la semilla dentro del provider del runtime persistente (el equivalente vivo de
+   `NexaSeedAutoSend`, que se eliminó con el panel legacy).
+4. El lane (`lane`) queda cubierto por construcción: comparte el mismo runtime. El Slice 2 original solo
+   contemplaba el flotante — **ampliar la evidencia a ambas modalidades**.
+
+**Sin cambio de contrato backend:** Slice 1 sigue en pie tal cual; esto es exclusivamente el lado cliente.
+
+**Procedencia:** retiro del modo `dock` — commit `e1662f3b3`, migración `20260805110418197`, entrada de
+`changelog.md` 2026-08-05 y `docs/architecture/nexa-intelligence/experience/conversational-experience.md`
+(§"Deuda conocida — `focusRef` / pregunta semilla").
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -13,6 +55,8 @@
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `interaction`
+- UI ready: `no`
+- Wireframe: `docs/ui/wireframes/TASK-1182-nexa-insight-surface-aware-conversation.md`
 - Backend impact: `api`
 - Epic: `none`
 - Status real: `Diseno`
