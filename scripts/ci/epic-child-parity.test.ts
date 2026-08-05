@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 
-// @ts-expect-error — el linter operativo es un .mjs sin tipos.
 import { lintOperationalArtifacts, parseDeclaredEpic } from './ops-artifact-lint.mjs'
 
 /**

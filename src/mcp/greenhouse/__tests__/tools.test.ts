@@ -32,7 +32,10 @@ describe('createGreenhouseMcpHandlers', () => {
       searchKnowledge: vi.fn(),
       getKnowledgeDocument: vi.fn(),
       searchServices: vi.fn(),
-      simulateQuote: vi.fn()
+      simulateQuote: vi.fn(),
+      getSeoKeywordOpportunities: vi.fn(),
+      getSeoVisibility360: vi.fn(),
+      getSeoEntitlement: vi.fn()
     })
 
     const result = await handlers.getContext()
@@ -110,7 +113,10 @@ describe('createGreenhouseMcpHandlers', () => {
       searchKnowledge: vi.fn(),
       getKnowledgeDocument: vi.fn(),
       searchServices: vi.fn(),
-      simulateQuote: vi.fn()
+      simulateQuote: vi.fn(),
+      getSeoKeywordOpportunities: vi.fn(),
+      getSeoVisibility360: vi.fn(),
+      getSeoEntitlement: vi.fn()
     })
 
     const forbiddenResult = await handlers.getOrganization({ id: 'org-1' })
