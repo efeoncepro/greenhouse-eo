@@ -18,7 +18,7 @@ TASK-1254 agregó verificación de email + cache. Postura PII ya alineada con es
 - Execution profile: `backend-data`
 - UI impact: `none`
 - Backend impact: `migration`
-- Epic: `none`
+- Epic: `EPIC-040`
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `data`

@@ -15,7 +15,7 @@ Este documento existe para no volver a perder visibilidad de un programa que est
 
 **El motor está terminado y en producción. La cara pública también está encendida y el cockpit del operador ya está construido. Lo que falta es evidencia de que el loop cierra, y 10 childs abiertas que el registro del epic nunca contó.**
 
-> ⚠️ **Leer el Delta 2026-08-05 (b) al final ANTES de actuar sobre las §2, §4 y §5.** Ese delta corrige tres cosas que las secciones de abajo declaran mal: (1) `TASK-1276` está `complete`, no `to-do` — el "gap #1" ya no existe; (2) la entrada pública self-serve **está live** en `think.efeoncepro.com/brand-visibility`, verificada en runtime; (3) el conteo "12/13 childs" de EPIC-020 era una ficción contable — el alcance real declarado son **38 childs, 10 abiertas**. Las §2–§5 describen el snapshot del 2026-07-16 y se conservan como historia, no como estado.
+> ⚠️ **Leer el Delta 2026-08-05 (b) al final ANTES de actuar sobre las §2, §4 y §5.** Ese delta corrige tres cosas que las secciones de abajo declaran mal: (1) `TASK-1276` está `complete`, no `to-do` — el "gap #1" ya no existe; (2) la entrada pública self-serve **está live** en `think.efeoncepro.com/brand-visibility`, verificada en runtime; (3) el conteo "12/13 childs" de EPIC-020 era una ficción contable — el alcance real declarado son **49 childs, 17 abiertas**. Las §2–§5 describen el snapshot del 2026-07-16 y se conservan como historia, no como estado.
 
 ---
 
@@ -74,7 +74,7 @@ Este documento existe para no volver a perder visibilidad de un programa que est
 
 | EPIC | Título | Lifecycle | Lectura |
 |---|---|---|---|
-| **EPIC-020** | Public AI Visibility Lead Magnet Program | `to-do` (spec) · ~~12/13~~ → **38 childs reales: 28 `complete`, 10 abiertas** (reconciliado 2026-08-05) | El "12/13" contaba sólo el denominador original. Cara pública **live**; falta el smoke E2E + 9 childs reconciliadas. Ver Delta (b). |
+| **EPIC-020** | Public AI Visibility Lead Magnet Program | `to-do` (spec) · ~~12/13~~ → **49 childs reales: 32 `complete`, 17 abiertas** (reconciliado 2026-08-05) | El "12/13" contaba sólo el denominador original. Cara pública **live**; falta el smoke E2E + 17 childs abiertas. Ver Delta (b). |
 | **EPIC-021** | AEO Brand-Aware Prompt Generation Engine | ✅ `complete` (2026-06-30) | Motor brand-aware live. Follow-up: UI de review del operador (no bloquea). |
 | **EPIC-022** | Growth SEO Module (Search Visibility 360) | 🚧 en ejecución (2026-08-05) · **2/21 childs `complete`** | Arrancó: `TASK-1299` (schema) + `TASK-1301` (capabilities + entitlement per-org + chokepoint) `complete`, migraciones aplicadas. Prioridad **MCP-first** (operar por MCP antes que UI); `TASK-1645` nueva (parity/MCP, P1); destino Wave declarado. Ver Delta 2026-08-05 al final. |
 | **EPIC-023** | Growth CTA & Popup CRO Engine | `to-do` | Adyacente. Vertical-slice ancla = follow-up CTA del reporte AI Visibility en Think. No arrancado. |
@@ -163,13 +163,13 @@ No es que les falte dueño: **se declaran hijas de un epic que no las lista.** E
 
 | Epic | Huérfanas | Estado |
 |---|---|---|
-| EPIC-020 | 25 (16 `complete`, 9 abiertas) | ✅ reconciliadas en su § Childs reconciliadas |
+| EPIC-020 | 25 → **22** (16 `complete`, 6 abiertas) | ✅ reconciliadas; 3 movidas a su dueño correcto (ver abajo) |
 | EPIC-021 | 1 — `TASK-1390` (fix `ISSUE-120` del pipeline) | ✅ reconciliada |
 | EPIC-022 | 1 — `TASK-1426` (GSC multi-property) | ✅ reconciliada |
 
-**Consecuencia:** el "12/13 childs `complete`" de EPIC-020 era una **ficción contable** — contaba el denominador original (13) e ignoraba las 25 que se declaraban suyas. El alcance real es **38 childs: 28 `complete`, 10 abiertas.** El epic no estaba a una task de cerrar; está a diez.
+**Consecuencia:** el "12/13 childs `complete`" de EPIC-020 era una **ficción contable** — contaba el denominador original (13) e ignoraba las 25 que se declaraban suyas. El alcance real es **49 childs: 32 `complete`, 17 abiertas** (conteo canónico por campo `Epic:`, con paridad verificada). El epic no estaba a una task de cerrar; está a diecisiete.
 
-**Las 9 abiertas reconciliadas de EPIC-020:** `TASK-1336` (contrato submit→`reportToken`) · `TASK-1424`/`1425` (Share of Voice per-motor: foundation + panel) · `TASK-1332`/`1338` (hub Think: icon library + extracción del view-model) · y 4 de infra Growth Forms: `TASK-1335` (CORS/allowlist), `TASK-1293` (post-flag-rollout hardening), `TASK-1326` (control plane Astro multi-repo), `TASK-1359` (funnel multi-step → GA4).
+**Las 6 abiertas reconciliadas de EPIC-020:** `TASK-1336` (contrato submit→`reportToken`) · `TASK-1424`/`1425` (Share of Voice per-motor: foundation + panel) · `TASK-1332`/`1338` (hub Think: icon library + extracción del view-model) · `TASK-1293` (post-flag-rollout hardening, residuo de ops).
 
 ### Hallazgo 2 — 10 tasks AEO-core con `Epic: none`
 
@@ -193,9 +193,21 @@ Landings y ebooks que usan el grader como puente comercial: `TASK-1343` (landing
 2. **La entrada pública self-serve está LIVE.** Verificado en runtime 2026-08-05: `think.efeoncepro.com/brand-visibility` → HTTP 200 sirviendo el `<greenhouse-form>` gobernado; la definición pública del form responde 200 **en producción** con Turnstile `required` + site key real + `consentPolicyVersion: ai-visibility-grader-consent-v1`. §2.C ("no existe puerta pública donde un prospecto meta su dominio solo") es **stale**. `TASK-1246` dejó de ser "construir el lanzamiento": su residuo es el **smoke E2E** (`submit → run → status → token → informe → email → HubSpot`) y el gate de gobernanza (consent, PII/retención, signals de costo/abuso con tráfico real).
 3. **Ojo con el consent:** la definición publicada del form trae `consent.checkboxes` **vacío**. Hay versión de política pero ningún checkbox renderizado. Puede ser por diseño (aviso implícito) o ser un hueco de cumplimiento — **no lo asumas, confírmalo con el sign-off legal que `TASK-1246` tiene pendiente.**
 
-### Decisión pendiente — Growth Forms no tiene epic dueño
+### Resuelto — nace EPIC-040 (Growth Public Forms Engine)
 
-Cuatro de las childs reconciliadas de EPIC-020 (`TASK-1335`, `1293`, `1326`, `1359`) son **infra del motor Growth Forms**, no AEO. Su dueño natural sería un epic de Growth Forms que **no existe** (EPIC-035 gobierna la distribución/hosting de los renderers portables, no el motor). No se inventó uno: quedaron listadas en EPIC-020 marcadas como "infra compartida que el epic arrastra". **Crear ese epic —o asignarlas a EPIC-035— es una decisión de arquitectura de programa que requiere al operador.**
+La decisión quedó tomada el mismo día por el operador: **el motor Growth Forms es dueño de sí mismo, no del AEO.** Se fundó [`EPIC-040`](to-do/EPIC-040-growth-public-forms-engine.md) y el barrido del corpus por señales del motor (`growth forms`, `greenhouse-form`, `form_definition`, `growth.forms`) encontró **21 tasks sin epic dueño** — no las 4 que se veían desde el AEO: `TASK-1229`/`1230`/`1231`/`1232` (foundation), `1256`, `1294`, `1297`, `1318`, `1319` (`complete`), y `1253`, `1254`, `1255`, `1258`, `1259`, `1261`, `1264`, `1295`, `1320`, `1335`, `1342`, `1359` (abiertas). Casi todas con `Epic: none` u `optional`.
+
+**Reasignaciones aplicadas:**
+
+| Task | De | A | Razón |
+|---|---|---|---|
+| `TASK-1335` (CORS/allowlist) | EPIC-020 | **EPIC-040** | Capacidad del motor; el AEO sólo fue su primer consumer. |
+| `TASK-1359` (funnel → GA4) | EPIC-020 | **EPIC-040** | Íd. |
+| `TASK-1326` (control plane Astro multi-repo) | EPIC-020 | **EPIC-019** | Es control plane del sitio público, no AEO. |
+
+**Lo que el AEO conserva son sus propios formularios**, no el motor: `TASK-1251` (convergencia), `1257` (intake nombre), `1263` (gate corporativo del form del grader), `1296` (contrato Turnstile del form AEO), `1298` (migración `/aeo-2/`), `1327` (landing + embed), `1336` (contrato submit→token). `TASK-1293` se queda en EPIC-020 como residuo de ops (su alcance excede al AEO pero incluye sus flags).
+
+**Frontera declarada:** EPIC-040 gobierna el **motor**; EPIC-035 gobierna la **distribución** del bundle; los epics de dominio (020/011/019) son **consumers** y no contienen tasks de motor.
 
 ### Falsos positivos descartados
 
@@ -205,4 +217,22 @@ Cuatro de las childs reconciliadas de EPIC-020 (`TASK-1335`, `1293`, `1326`, `13
 
 El drift anterior (§7) fue **doc vs runtime**. Éste es **doc vs doc**: el campo `Epic:` de una task y el `## Child Tasks` de su epic son dos escrituras independientes que nada reconcilia, así que divergen en silencio y el epic reporta un avance que no es el suyo. Un `12/13 complete` se lee como "casi cerrado" y esconde 25 tasks.
 
-**Regla:** el avance de un epic se calcula cruzando el campo `Epic:` de **todo** el corpus contra su lista de hijos, nunca leyendo la lista sola. Un candidato natural a gate mecánico (`pnpm epic:lint`): fallar cuando una task declara `Epic: EPIC-###` y no aparece en el `## Child Tasks` de ese epic — la asimetría es detectable con un script y hoy no la mira nadie.
+**Regla:** el avance de un epic se calcula cruzando el campo `Epic:` de **todo** el corpus contra su lista de hijos, nunca leyendo la lista sola.
+
+### Gate mecánico implementado — `epic-child-parity`
+
+La regla dejó de depender de que alguien se acuerde. `pnpm epic:lint` incorpora el check **`epic-child-parity`** (`scripts/ci/ops-artifact-lint.mjs`): barre las ~1.720 tasks del corpus, lee el epic que cada una declara en su campo `Epic:` y verifica que su id aparezca en el `## Child Tasks` de ese epic. También detecta tasks que declaran un epic **inexistente**.
+
+**Lo primero que hizo el gate fue probar que el problema es del repo, no del AEO:**
+
+| | |
+|---|---|
+| Epics con drift | **15** |
+| Tasks declaradas y no listadas | **193** |
+| Peores casos | EPIC-028 (89) · EPIC-019 (21) · EPIC-013 (20) · EPIC-007 (14) · EPIC-011 (9) |
+
+Y en la segunda pasada sobre el propio AEO encontró **15 más en EPIC-020** que la reconciliación manual no había visto: declaraban el epic pero sólo aparecían en la **prosa** (secciones de estado, olas, blockers), nunca en la lista. Once eran suyas y se registraron (`TASK-1275`/`1276`/`1287` `complete`; `1251`/`1269`/`1270`/`1281`/`1282`/`1283`/`1330`/`1341` abiertas); cuatro (`TASK-1266`/`1267`/`1279`/`1286`) eran de EPIC-021 con el campo mal y se corrigió el campo.
+
+**Severidad: `warning` por defecto.** Con 193 violaciones preexistentes, hacerlo `error` hoy dejaría `pnpm epic:lint` rojo para todo el mundo por deuda ajena. Se enciende con **`pnpm epic:lint --strict-child-parity`** (exit 1), pensado para (a) verificar un epic recién reconciliado y (b) promoverse a gate de CI cuando el backlog esté limpio.
+
+**Estado tras esta pasada:** `EPIC-020`, `EPIC-021` y `EPIC-040` pasan `--strict-child-parity` limpios. Los otros 12 epics con drift quedan **fuera del alcance de este trabajo**: cada uno necesita el juicio de su dueño para decidir, task por task, si se agrega a la lista o si el campo `Epic:` está mal. No se tocaron a ciegas.

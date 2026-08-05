@@ -72,7 +72,7 @@ Implementation guidance:
 - Execution profile: `ui-ux`
 - UI impact: `flow`
 - Backend impact: `integration`
-- Epic: `none`
+- Epic: `EPIC-040`
 - Status real: `Complete — cockpit enterprise + gate #1 →destination probado live (TEST form); WordPress-live smoke → TASK-1258, contraste → ISSUE-108`
 - Rank: `TBD`
 - Domain: `growth|public-site|hubspot|ui|api`

@@ -53,7 +53,8 @@ Registro canónico de asignación de IDs `EPIC-###` para evitar colisiones y ren
 | `EPIC-037` | `to-do` | `docs/epics/to-do/EPIC-037-wave-agentic-readiness-product-platform.md` |
 | `EPIC-038` | `to-do` | `docs/epics/to-do/EPIC-038-efeonce-talent-assurance-agentic-quality-system.md` |
 | `EPIC-039` | `to-do` | `docs/epics/to-do/EPIC-039-nextjs-typescript-toolchain-adoption.md` |
+| `EPIC-040` | `to-do` | `docs/epics/to-do/EPIC-040-growth-public-forms-engine.md` |
 
 ## Siguiente ID disponible
 
-- `EPIC-040`
+- `EPIC-041`

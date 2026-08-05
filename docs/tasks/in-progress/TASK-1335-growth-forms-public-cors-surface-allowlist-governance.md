@@ -27,7 +27,7 @@ con origins permitidos y rechazados en el environment productivo, y registrar es
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `api`
-- Epic: `EPIC-020`
+- Epic: `EPIC-040`
 - Status real: `Think live; matriz CORS productiva y cierre formal pendientes`
 - Rank: `TBD`
 - Domain: `growth|public-site|forms|api`

@@ -54,7 +54,7 @@ Evidencia actualizada: `pnpm fe:capture growth-forms-success-card --env=local` v
 - Flow: `docs/ui/flows/TASK-1320-growth-forms-success-card-renderer-flow.md`
 - Motion: `docs/ui/motion/TASK-1320-growth-forms-success-card-renderer-motion.md`
 - Backend impact: `none`
-- Epic: `optional`
+- Epic: `EPIC-040`
 - Status real: `Code complete, rollout pendiente`
 - Rank: `TBD`
 - Domain: `growth|public-site|forms|ui`

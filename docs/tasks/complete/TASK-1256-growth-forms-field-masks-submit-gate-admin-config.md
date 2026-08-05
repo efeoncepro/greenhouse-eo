@@ -18,7 +18,7 @@ El submit-gating de email que esta task expone en UI ya tiene su backend goberna
 - Execution profile: `ui-ux`
 - UI impact: `interaction`
 - Backend impact: `none`
-- Epic: `none`
+- Epic: `EPIC-040`
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `ui`
