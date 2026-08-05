@@ -70,7 +70,7 @@ con el cliente que ya tienes.)*
 | **Landing de SEO** (`/servicios/posicionamiento-seo`) | ✅ **Live** (TASK-1343) | — |
 | **Landing de AEO** (`/aeo-2/`) | ✅ **Live** | — |
 | **Squad blueprint** | ✅ Método probado (SKY) | 🔴 **Existe para un cliente de licitación y no para el que paga todos los meses** |
-| **EPIC-022 · Search Visibility 360** | 🟡 **Arrancó** *(2026-08-05: TASK-1299 schema `greenhouse_growth.seo_*` + TASK-1301 entitlement `seo_v1`/chokepoint `enforceSeoRunEntitlement` COMPLETE; MCP-first vía TASK-1645 y destino Wave/EPIC-037; aún sin superficie cliente)* | El nombre ya declara la estrategia: **vender visibilidad, no SEO** |
+| **EPIC-022 · Search Visibility 360** | 🟡 **Motor real, sin cara** *(2026-08-05 fin de día: COMPLETE TASK-1299 schema `greenhouse_growth.seo_*` + TASK-1301 entitlement `seo_v1`/chokepoint `enforceSeoRunEntitlement` + TASK-1300 registry DataForSEO/ledger + TASK-1302 materializer GSC LIVE/`readKeywordOpportunities` + TASK-1305 `readSeoAeoGap`/quadrant 360 — primer quadrant real: **Berel #1.75 orgánico × AEO 44.5 → `riesgo`**, autoridad sin citabilidad = cross-sell al AEO. TASK-1645: 3 MCP tools code-complete, federación gateway = TASK-1647. Efeonce own-brand provisionada `EO-ORG-0007` con lente AEO propia + assignment `seo_v1`; SKY con lente AEO ligada. Aún sin superficie cliente — no venderlo como autoservicio)* | El nombre ya declara la estrategia: **vender visibilidad, no SEO** |
 
 ---
 

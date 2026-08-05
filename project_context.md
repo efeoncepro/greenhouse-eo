@@ -91,7 +91,11 @@ El módulo Growth SEO (`growth.seo`, EPIC-022) autoriza todo run por un único c
 (`src/lib/growth/seo/entitlement.ts`), con entitlement per-org vía el módulo `seo_v1` de
 `greenhouse_client_portal.modules`; contrato en
 [`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §9 (§17
-contrata el seam de extracción hacia Wave). Su primera captura corre live desde 2026-08-05: la serie propia de
+contrata el seam de extracción hacia Wave). Los reads del módulo son readers canónicos consumer-agnósticos —
+`readKeywordOpportunities` y `readSeoAeoGap` (este último cruza SEO↔AEO respetando el boundary de §1.1) —
+expuestos por el lane ecosystem `/api/platform/ecosystem/growth/seo/*` y sus 3 MCP tools (TASK-1645); regla
+durable del módulo: **todo reader SEO nuevo expone su MCP tool en el mismo PR**. Su primera captura corre live
+desde 2026-08-05: la serie propia de
 Google Search Console (`greenhouse_growth.seo_gsc_daily`) se materializa a diario en el **ops-worker** —
 **servicio Cloud Run único compartido staging+prod**, así que una capacidad worker-only queda viva al mergear a
 `develop`, sin release control plane, y **no existe un flip "sólo staging"** (invariantes en

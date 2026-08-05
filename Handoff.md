@@ -587,30 +587,6 @@ proyecta el attempt en vuelo, y el cierre de la cola se sella con reloj real en 
 Detalle completo y cronología:
 [`ISSUE-137`](docs/issues/resolved/ISSUE-137-globe-experiment-running-forever-zero-attempts.md).
 
-## Cierre documental de la sesión de captura de completitud (2026-08-04)
-
-**El hueco más grande no era un defecto de código: era que el contrato no existía.** Ningún documento de
-arquitectura mencionaba siquiera la palabra «webhook» — la captura de completitud vivía sólo en el código, y
-esa ausencia es lo que dejó acumular trece defectos sin que nadie los viera.
-
-- **[ADR-021](docs/architecture/creative-studio/EFEONCE_GLOBE_PROVIDER_COMPLETION_CAPTURE_DECISION_V1.md)**
-  (nuevo): cada proveedor avisa distinto y el sistema respeta esa diferencia. Incluye el invariante de
-  convergencia terminal y el presupuesto de latencia del camino en frío.
-- **Skills, ambos espejos + overlay de arquitectura**: se corrigieron **cuatro contradicciones activas**, que
-  son lo peligroso porque enseñan lo contrario de lo aprendido — la peor, que la skill presentaba
-  `outboxDeadLetter` como el instrumento *confiable* de blast radius cuando su número estaba inflado ×3.
-- **Doc funcional y manual**: el manual tenía un `NUNCA` **invertido por los hechos**, y le faltaba el paso 0
-  del diagnóstico (`~8 min no son un cuelgue`), sin el cual manda a diagnosticar corridas sanas.
-- **Runbooks de alertas y rollout**: las tres alertas nuevas, la regla del aligner por tipo de métrica, y la
-  trampa del `tofu apply` que destruye 20 recursos con el plan en verde.
-- **Guard nuevo en Globe**: cada endpoint de Fal declara su base de seguimiento o declara que no la tiene
-  (6 con base, 5 sin recuperación declarada). «Correcto por diseño» y «nadie se entera» son cosas distintas.
-
-🔴 **Corrección de algo que yo mismo escribí:** el mensaje del arreglo de la lease decía que el worker corría
-con 60 s. **No era cierto** — `producer_worker_job.tf` la fija en 15 min desde antes de la sesión, así que el
-modo de fallo que describí no pudo ocurrir en producción. El cambio de default sigue siendo correcto (protege
-a runtimes que no seteen la variable), pero exageré su impacto. Queda escrito en el código.
-
 ## WIP saneado — Globe, Brightcell y Polpaico (2026-08-01)
 
 - ADR-019 `Accepted`; ADR-020 `Proposed`. Brightcell: **no enviar** hasta Finance. Polpaico: `HOLD / NO-BID`, sin precio/deck emitible. Detalle en `changelog.md`.

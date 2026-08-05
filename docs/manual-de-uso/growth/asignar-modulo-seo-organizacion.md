@@ -1,9 +1,9 @@
 # Manual — Asignar el modulo SEO a una organizacion
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-08-05 por Claude (TASK-1301)
-> **Ultima actualizacion:** 2026-08-05 por Claude
+> **Ultima actualizacion:** 2026-08-05 por Claude (caso ejecutado Efeonce own-brand)
 > **Modulo:** Growth / SEO (Search Visibility 360)
 > **Ruta en portal:** sin UI todavia (paso manual SQL; UI llega con TASK-1306+)
 > **Documentacion relacionada:** [doc funcional del modulo](../../documentation/growth/modulo-seo-search-visibility-360.md) · [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
@@ -86,6 +86,17 @@ Debe existir exactamente una fila `active` con el tier esperado y `effective_to`
 ### 3. (Cuando exista runtime) confirmar que las corridas pasan
 
 Hoy no hay crons ni readers (llegan en TASK-1302+), así que el alta no produce efectos visibles todavía. Cuando el runtime exista, la confirmación final será que una corrida de la org pasa el gate (`allowed = true`) en vez de bloquearse.
+
+## Caso ejecutado: Efeonce own-brand (2026-08-05)
+
+El primer alta real del módulo fue la propia agencia, como dogfooding: **Efeonce se trackea como su propio cliente** dentro del 360. La decisión de modelado fue no inventar una org especial — se usó la org canónica ya existente `EO-ORG-0007` (Efeonce Group SpA, `is_operating_entity=true`) y sobre ella quedaron: el assignment `cpma-efeonce-seo-own-brand` (`seo_v1`, tier `contracted`, con nota `own_brand` en `metadata_json`), el target `seot-efeonce-own-brand` (`efeoncepro.com`, CL/es) y los 4 perfiles del grader ligados a la org.
+
+Todo el alta se hizo con un **script idempotente committeado**: [`scripts/growth/provision-efeonce-own-brand-seo.ts`](../../../scripts/growth/provision-efeonce-own-brand-seo.ts). Ese script sirve de **plantilla reutilizable** para provisionar cualquier otra org: sigue el patrón commit + verificación con el chokepoint (`enforceSeoRunEntitlement`), y en esencia solo hay que cambiar el `organization_id` y el dominio del target (más el tier/tags que correspondan al acuerdo). Preferirlo por sobre SQL suelto: deja evidencia versionada y se puede re-correr sin duplicar filas.
+
+⚠️ **El assignment solo abre la puerta del entitlement; no completa el 360.** Para que la org quede realmente operativa en Search Visibility 360 necesita además:
+
+- su fila en `seo_target` (dominio + país/idioma) — sin target no hay qué medir;
+- las **dos lentes** conectadas: el perfil del grader ligado a la org (lente AEO) **y** la propiedad de Google Search Console conectada (lente SEO). Con una sola lente, los readers de cruce (`readSeoAeoGap`) degradan honesto (`no_seo_data` / `no_aeo_data`) — eso es esperado, no un bug.
 
 ## Como revocar
 

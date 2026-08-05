@@ -58,17 +58,28 @@ producto con mejor ROI de la práctica.**
 
 ## 2. 🔴 SEO — el hueco
 
-**EPIC-022 "Search Visibility 360" ya arrancó (delta 2026-08-05): TASK-1299 (schema `greenhouse_growth.seo_*` —
-8 tablas config + serie temporal append-only por `capture_date`) y TASK-1301 (5 capabilities `growth.seo.*` +
-módulo per-org `seo_v1` + chokepoint único `enforceSeoRunEntitlement` en `src/lib/growth/seo/entitlement.ts`)
-están COMPLETE con migraciones aplicadas (`20260805*`). Es fundación backend: para el cliente el portal sigue
-mostrando NADA de SEO.**
+**EPIC-022 "Search Visibility 360" pasó de fundación a motor en un día (delta 2026-08-05, fin de jornada):
+COMPLETE — TASK-1299 (schema `greenhouse_growth.seo_*` — 8 tablas config + serie temporal append-only por
+`capture_date`), TASK-1301 (5 capabilities `growth.seo.*` + módulo per-org `seo_v1` + chokepoint único
+`enforceSeoRunEntitlement` en `src/lib/growth/seo/entitlement.ts`), TASK-1300 (registry DataForSEO + ledger de
+costo), TASK-1302 (materializer GSC + `readKeywordOpportunities` — CON ROLLOUT LIVE) y TASK-1305
+(`readSeoAeoGap` + quadrant SEO×AEO del 360 — **primer quadrant real: Berel #1.75 orgánico × AEO 44.5 →
+`riesgo`**, autoridad sin citabilidad = la señal de cross-sell al AEO). TASK-1645 (lane ecosystem
+`/api/platform/ecosystem/growth/seo/*` + 3 MCP tools read-only: `get_seo_keyword_opportunities`,
+`get_seo_visibility_360`, `get_seo_entitlement`) quedó CODE COMPLETE con rollout pendiente (flag Vercel +
+smoke con binding + federación al gateway = TASK-1647, creada). Ya hay motor operable por MCP a nivel código
+y cruce SEO↔AEO real — pero para el cliente el portal sigue mostrando NADA de SEO.**
 
 > 🧭 **Directivas vigentes (2026-08-05):** **MCP-first** — SV360 se opera por MCP antes que por UI
-> (TASK-1645: lane ecosystem `/api/platform/ecosystem/growth/seo/*` + 3 MCP tools read-only, espejo del
-> TASK-1086 de Knowledge, con criterio de disponibilidad en el gateway `mcp.efeonce.org`/TASK-1626) — y
-> destino **Wave**: SV360 eventualmente vive en `wave.efeonce.org` (seam en la arch doc SEO §17, EPIC-037).
-> Regla dura del dominio: todo write provider-facing (costo DataForSEO) pasa por `enforceSeoRunEntitlement`.
+> (TASK-1645 code-complete, espejo del TASK-1086 de Knowledge; la federación al gateway `mcp.efeonce.org`
+> es TASK-1647: adapter delgado, canaries antes de discovery) — y destino **Wave**: SV360 eventualmente vive
+> en `wave.efeonce.org` (seam en la arch doc SEO §17, EPIC-037). Reglas duras del dominio: todo write
+> provider-facing (costo DataForSEO) pasa por `enforceSeoRunEntitlement`, y **todo reader SEO/E-E-A-T futuro
+> expone su MCP tool EN EL MISMO PR** (criterio ya sembrado en 1303/1304/1311-1314/1317).
+> Own-brand: Efeonce quedó provisionada como org canónica `EO-ORG-0007` (4 perfiles grader ligados = lente
+> AEO propia disponible, assignment `seo_v1`, target `efeoncepro.com`); SKY tiene su lente AEO ligada.
+> El 360 de cualquier org = 3 piezas: assignment + lente AEO ligada + GSC conectada (o esperar
+> TASK-1303/DataForSEO para marcas ajenas).
 
 | Lo que se vende | Lo que existe en el portal |
 |---|---|
@@ -78,7 +89,7 @@ mostrando NADA de SEO.**
 | E-E-A-T scoring | 🔴 **Nada** |
 | Topic clusters / topical authority | 🔴 **Nada** |
 | Reportería SEO | 🔴 **Nada** |
-| **Search Console** | ⚠️ **Panel de conexión OAuth** (TASK-1282/1283) — **staging ON, prod OFF.** Read-through, **sin histórico** |
+| **Search Console** | ⚠️ **Panel de conexión OAuth** (TASK-1282/1283) — **staging ON, prod OFF.** *(Delta 2026-08-05: el materializer GSC ya corre LIVE — TASK-1302 — y acumula serie temporal append-only en `greenhouse_growth.seo_*`: el histórico ahora existe **en el motor**, no en una superficie cliente)* |
 
 > 🔴 **Consecuencia dura para la venta:**
 > **La "capa 3 — plataforma" de `03_OFERTA` (el ancla que nunca se descuenta) SOLO existe para AEO.**

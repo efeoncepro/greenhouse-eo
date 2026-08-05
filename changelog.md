@@ -7,6 +7,17 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-05 — Efeonce provisionada como org own-brand del 360 (dogfooding)
+
+- **Decisión de modelado:** la agencia se trackea como su propio cliente sobre la org canónica `EO-ORG-0007`
+  (Efeonce Group SpA, `is_operating_entity=true`) — sin org especial paralela.
+- **Quedó provisionado:** assignment `cpma-efeonce-seo-own-brand` (`seo_v1`, `contracted`, nota `own_brand`),
+  target `seot-efeonce-own-brand` (`efeoncepro.com`, CL/es) y los 4 perfiles del grader ligados. Script
+  idempotente committeado `scripts/growth/provision-efeonce-own-brand-seo.ts` (patrón commit + verificación con
+  chokepoint) como plantilla para provisionar otras orgs.
+- **Pendientes:** conectar la propiedad de Google Search Console (segunda lente del 360) y el merge/dedupe del
+  registro en HubSpot.
+
 ## 2026-08-05 — TASK-1327 `complete`: la landing pública del lead magnet está live y verificada en runtime
 
 - `TASK-1327` (landing `think.efeoncepro.com/brand-visibility` + embed del form gobernado) cerrada con
@@ -945,12 +956,3 @@ y [`docs/changelog/internal/2026-07.md`](docs/changelog/internal/2026-07.md).
   un `<img>`. Registrados con su patrón en
   [`GLOBE_PRODUCER_VERIFICATION_BLIND_SPOTS_2026-07-29.md`](docs/audits/globe/GLOBE_PRODUCER_VERIFICATION_BLIND_SPOTS_2026-07-29.md).
 - **TASK-1552 Slice 3 sigue abierta**; nada de esto la cierra.
-
-## 2026-07-29 — Magnific: Go-to-Market, workflows y expansión de plataforma documentados
-
-- Se añadió una auditoría comercial sobre el wedge de upscaling, PLG, content/community, Flows/Agents, plugins, API, MCP,
-  Business, Enterprise, services y value capture.
-- Se clasificaron adquisición, integración, contributors, affiliates, Creative Partners, casos de agencia y enterprise;
-  la evidencia pública no permite llamar partnership formal a la mayoría de esas relaciones ni validar claims de escala.
-- El patrón transferible para Globe queda definido como `builder experto → workflow → runner → pod/workspace`, con
-  derechos, provenance, QA, aprobación, costos y accountability; no se copian créditos, unlimited ni logos.

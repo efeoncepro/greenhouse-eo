@@ -3,7 +3,7 @@
 > **Tipo de documento:** Estado de programa + roadmap operativo (SSOT de "dónde estamos / qué sigue")
 > **Versión:** 1.2
 > **Creado:** 2026-07-16 por Claude (auditoría multi-agente del programa AEO)
-> **Última actualización:** 2026-08-05 por Claude (Delta (b): reconciliación del registro — 27 childs huérfanas + correcciones de estado)
+> **Última actualización:** 2026-08-05 (fin de día) por Claude (Delta (b) reconciliación + continuación del Delta EPIC-022: 6 tasks ejecutadas en el día, camino MCP-first code-complete)
 > **Documentación técnica:** [`../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`](../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 > **Epics que agrupa:** EPIC-020, EPIC-021, EPIC-022, EPIC-023, EPIC-024
 
@@ -76,7 +76,7 @@ Este documento existe para no volver a perder visibilidad de un programa que est
 |---|---|---|---|
 | **EPIC-020** | Public AI Visibility Lead Magnet Program | `to-do` (spec) · ~~12/13~~ → **49 childs reales: 33 `complete`, 16 abiertas** (reconciliado 2026-08-05) | El "12/13" contaba sólo el denominador original. Cara pública **live**; falta el smoke E2E + 16 childs abiertas. Ver Delta (b). |
 | **EPIC-021** | AEO Brand-Aware Prompt Generation Engine | ✅ `complete` (2026-06-30) | Motor brand-aware live. Follow-up: UI de review del operador (no bloquea). |
-| **EPIC-022** | Growth SEO Module (Search Visibility 360) | 🚧 en ejecución (2026-08-05) · **2/21 childs `complete`** | Arrancó: `TASK-1299` (schema) + `TASK-1301` (capabilities + entitlement per-org + chokepoint) `complete`, migraciones aplicadas. Prioridad **MCP-first** (operar por MCP antes que UI); `TASK-1645` nueva (parity/MCP, P1); destino Wave declarado. Ver Delta 2026-08-05 al final. |
+| **EPIC-022** | Growth SEO Module (Search Visibility 360) | 🚧 en ejecución (2026-08-05) · **6/22 childs con avance: 5 `complete` + `TASK-1645` code-complete** | Ejecutó 6 tasks el 2026-08-05: `TASK-1299` (schema) + `TASK-1301` (capabilities + entitlement + chokepoint) + `TASK-1300` (DataForSEO family registry) + `TASK-1302` (GSC materializer, **rollout live**) + `TASK-1305` (quadrant SEO↔AEO con primer cruce real) `complete`; `TASK-1645` (lane ecosystem + 3 MCP tools) code-complete con cutover pendiente. `TASK-1647` nueva (federación gateway). Prioridad **MCP-first**. Ver Delta 2026-08-05 (continuación fin de día). |
 | **EPIC-023** | Growth CTA & Popup CRO Engine | `to-do` | Adyacente. Vertical-slice ancla = follow-up CTA del reporte AI Visibility en Think. No arrancado. |
 | **EPIC-024** | HubSpot Portal Grader | `to-do` | Segundo lead magnet (motor en Kortex). No arrancado; childs desde `TASK-1353`. Fase 2 (OAuth) depende del cutover prod de Kortex. |
 
@@ -147,7 +147,17 @@ Este delta corrige el estado de EPIC-022 (§4 y §6); el resto del doc sigue des
 - **EPIC-022 pasó de diseño a ejecución.** `TASK-1299` (schema time-series foundation) y `TASK-1301` (capabilities + entitlement per-org + chokepoint) están `complete` al 2026-08-05, con migraciones aplicadas en `greenhouse-pg-dev`, full suite (10076/0) y build de producción verdes. Specs: `docs/tasks/complete/TASK-1299-growth-seo-schema-timeseries-foundation.md` + `docs/tasks/complete/TASK-1301-growth-seo-capabilities-per-org-entitlement.md`.
 - **Contrato durable vivo:** chokepoint canónico `enforceSeoRunEntitlement` (`src/lib/growth/seo/entitlement.ts`) + módulo per-org `seo_v1` en `greenhouse_client_portal.modules`. Ninguna org tiene assignment todavía.
 - **Directivas del operador (2026-08-05):** (1) todo el módulo SEO nace **Full API Parity y usable por MCP** — nueva `TASK-1645` (lane ecosystem + MCP tools, P1) + exit criterion de parity en el epic; (2) **MCP-first**: operar SEO por MCP es la prioridad más alta, la UI va después — Ola B re-ordenada `1301 → 1302 → 1645 → 1300 → 1303 → UI`, con `TASK-1301`/`1302`/`1645` subidas a P1; (3) **destino Wave**: SV360 nace en Greenhouse pero eventualmente se habilita en `wave.efeonce.org` (EPIC-037) — seam de extracción contratado en `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §17.
-- **Pendiente conocido:** `TASK-1302` requiere rollout real de la conexión GSC (`TASK-1282`/`TASK-1283` code-complete sin rollout).
+- **Pendiente conocido:** `TASK-1302` requiere rollout real de la conexión GSC (`TASK-1282`/`TASK-1283` code-complete sin rollout). *(Superado por la continuación de abajo: el materializer de 1302 quedó live el mismo día; lo que sigue pendiente es la conexión GSC de `efeoncepro.com` en particular.)*
+
+**Continuación fin de día (misma fecha) — el día no terminó en 2 tasks; EPIC-022 ejecutó SEIS:**
+
+- **`TASK-1300` y `TASK-1302` `complete` (otra sesión).** 1300: DataForSEO family registry + ledger de gasto como fuente única. 1302: GSC daily materializer + `readKeywordOpportunities`, **con rollout live** — la serie `greenhouse_growth.seo_gsc_daily` se materializa a diario en el ops-worker.
+- **`TASK-1305` `complete`:** `readSeoAeoGap` + matriz quadrant 360. **Primer quadrant real:** Berel — #1.75 orgánico × AEO 44.5 → cuadrante `riesgo`.
+- **`TASK-1645` code-complete, rollout pendiente:** lane ecosystem `/api/platform/ecosystem/growth/seo/{keyword-opportunities,visibility-360,entitlement}` + 3 MCP tools (`get_seo_keyword_opportunities` / `get_seo_visibility_360` / `get_seo_entitlement`). Falta: smoke e2e HTTP con binding real + `GROWTH_SEO_ENABLED` en Vercel + federación en el gateway.
+- **`TASK-1647` creada:** federación del provider Greenhouse-SEO en `mcp.efeonce.org` (adapter delgado; canaries antes de discovery).
+- **Efeonce provisionada own-brand (dogfooding)** sobre la org canónica `EO-ORG-0007` (Efeonce Group SpA): 4 perfiles grader ligados — **lente AEO ✓, cierra §2.A del programa para la marca propia** —, assignment `seo_v1` `contracted`/`own_brand`, target `efeoncepro.com`; `visibility-360` responde `no_seo_data` honesto hasta conectar GSC. SKY ya tenía su lente AEO ligada. Script: `scripts/growth/provision-efeonce-own-brand-seo.ts`.
+- **Mandatos amarrados como criterio de aceptación:** todo reader SEO futuro expone su MCP tool **en el mismo PR** (escrito en `TASK-1303`/`1304`/`1311`/`1312`/`1313`/`1314`/`1317`); destino Wave contratado en la arquitectura SEO §17.
+- **Pendientes del cutover para operar:** flag `GROWTH_SEO_ENABLED` en Vercel + smoke e2e con binding real (cierre de 1645) · `TASK-1647` (federación gateway) · merge HubSpot de las 2 auto-companies efeonce (`56011409567` / `57099835819`) hacia la canónica · `website_url` de `EO-ORG-0007` por puerta canónica · GSC de `efeoncepro.com` al destrabar `TASK-1282`/`1283`.
 
 ---
 

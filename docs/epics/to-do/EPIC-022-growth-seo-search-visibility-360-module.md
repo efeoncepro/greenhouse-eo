@@ -211,3 +211,21 @@ de TASK-1303 (V1 = GSC medido × grader; rank snapshots enriquecen después) y e
 **1301 → 1302 → 1305 → 1645**, para que el tool MCP `get_seo_visibility_360` nazca con el cruce real.
 Las sinergias posteriores (1311 citation attribution URL, 1313 unified read, 1314 topical authority,
 1315-17 E-E-A-T sobre probes del grader) siguen su secuencia, pero el quadrant 360 no espera.
+
+## Delta 2026-08-05 (e) — Cierre del día
+
+El día cerró con **seis tasks ejecutadas**: `TASK-1299` (schema) · `TASK-1301` (capabilities + entitlement
+per-org `seo_v1` + chokepoint `enforceSeoRunEntitlement`) · `TASK-1300` (DataForSEO family registry + ledger de
+gasto como fuente única) · `TASK-1302` (GSC daily materializer + `readKeywordOpportunities`, **rollout live**) ·
+`TASK-1305` (`readSeoAeoGap` + quadrant 360; primer cruce real: Berel #1.75 orgánico × AEO 44.5 → `riesgo`),
+todas `complete`, más `TASK-1645` **code-complete** (lane ecosystem
+`/api/platform/ecosystem/growth/seo/{keyword-opportunities,visibility-360,entitlement}` + 3 MCP tools
+`get_seo_keyword_opportunities` / `get_seo_visibility_360` / `get_seo_entitlement`). Los mandatos quedaron
+amarrados: MCP-first, todo reader futuro expone su MCP tool en el mismo PR (criterio de aceptación en
+`TASK-1303`/`1304`/`1311`/`1312`/`1313`/`1314`/`1317`) y destino Wave en la arquitectura §17. Efeonce quedó
+provisionada **own-brand** (dogfooding) sobre `EO-ORG-0007`: 4 perfiles grader con lente AEO ligada (SKY ya la
+tenía), assignment `seo_v1` `contracted`/`own_brand`, target `efeoncepro.com`; `visibility-360` responde
+`no_seo_data` honesto hasta conectar GSC (script: `scripts/growth/provision-efeonce-own-brand-seo.ts`).
+**Para operar falta el cutover:** `GROWTH_SEO_ENABLED` en Vercel + smoke e2e HTTP con binding real (cierre de
+1645) · `TASK-1647` (federación del provider en `mcp.efeonce.org`, adapter delgado con canaries antes de
+discovery) · conexión GSC per-org de `efeoncepro.com` al destrabar `TASK-1282`/`1283`.
