@@ -1,5 +1,42 @@
 # TASK-1463 — Globe Model Promotion and Readiness Registry
 
+## Delta 2026-08-05 — 🔴 `pause` NO tiene camino ejecutable, y lo destapó una señal en producción
+
+Descubierto ejercitando `TASK-1641`, que desplegó la señal `globe_promotion_readiness_divergent`: cuando
+un rollback de promoción deja readiness en `promoted` con el binding apagado, **el remedio que la señal
+recomienda no lo puede ejecutar nadie hoy**.
+
+Las dos puertas están cerradas, y por razones distintas:
+
+1. **Los lanes de service account fallan cerrado por diseño.** `transitionModelRoute`
+   (`packages/domain/src/model-readiness.ts:106`) hace `if (target !== 'promoted') requireHuman(c)`, y
+   `requireHuman` (`:139`) lanza `ModelReadinessEvidenceDeniedError` salvo
+   `principalType === 'human'`. Por eso `readiness-promote` sí funciona por el operator lane
+   (`tenancy-operator`) y `pause` **no puede**. La asimetría es deliberada: promover exige evidencia,
+   retirar exige una persona.
+2. **El humano tampoco puede: no tiene la capability.** `globe.model-readiness.pause` **no está** en
+   `PRODUCER_HUMAN_CAPABILITY_SCOPES` (`apps/studio-web/src/app.ts`) — el grant humano lleva
+   `globe.model-readiness.propose` y `.review`, no `.pause`.
+
+⚠️ **Se estuvo a punto de construir un modo `readiness-pause` en el operator lane y se descartó al LEER
+el código**: habría sido un camino muerto que compila, despliega y falla en runtime. Vale registrarlo
+porque el error era barato de cometer y caro de detectar.
+
+**Cerrar esto NO es agregar un modo al workflow.** Exige, en este orden:
+
+1. El **rollout de 3 pasos cero-downtime del broker** para sumar `globe.model-readiness.pause` al grant
+   humano — el mismo procedimiento que ya tumbó **todo el login de Globe** una vez, porque el broker
+   impone `capabilityScopes ⊆ requiredScopes` y ambos repos hardcodean su lista. Canon: skill
+   `greenhouse-globe` §«El grant SSO acopla dos repos y rompió el login».
+2. Una **superficie que lo despache** con sesión humana: UI del Producer, o un CLI OAuth público con
+   PKCE siguiendo el patrón ya canonizado en `TASK-1629`.
+
+**Mitigación vigente, y por qué no urge tanto como parecía:** promover la ruta otra vez también cierra la
+divergencia, porque enciende el binding y vuelve coherente la readiness `promoted`. Se ejercitó el
+2026-08-05 sobre `ref/still/reference-v1` y la señal bajó de 1 a 0. O sea el hueco muerde **sólo cuando
+la decisión correcta es retirar la ruta, no restaurarla** — que es justo el caso que un humano debe
+firmar.
+
 ## Delta 2026-07-19 — TASK-1458 complete: el artefacto de evidencia para promoción ya existe
 
 `TASK-1458` (Golden Briefs & Evaluation Harness, SPEC-003) quedó **complete** (fake canary). Es una de las cuatro dependencias directas de esta task (`TASK-1458, 1459, 1460, 1461`) y aporta el **artefacto de evidencia** que las transiciones de estado del registry referencian: el `EvaluationReportV1` versionado (con `fixtureVersion` + `rubricVersion` + `schemaVersion`), scopeado al workspace del caller y con sus **limitaciones declaradas** (proveedor fake, muestra única). Esto alimenta directamente las AC "Cambio de estado exige evidencia y actor autorizado" y los `evidence refs` de los commands `propose`/`promote`/`pause`/`retire`.

@@ -169,9 +169,18 @@ Recorrido:
   familia no fue una señal ausente: fue una presente que contaba filas donde debía contar intentos.
 - **NUNCA** declares un dead letter como propio (ni ajeno) por su valor puntual. Sin serie temporal
   no hay conclusión.
-- **NUNCA** metas movimientos de crédito en el camino de abandono. La liquidación es autoridad de otro
-  dueño y ya decidió; tocarla ahí arriesga un segundo movimiento sobre una corrida ya liquidada. Una
-  reserva colgada la recoge el vencimiento de reservas.
+- **NUNCA** toques la liquidación **post-gasto** en el camino de abandono: si el proveedor aceptó, ya
+  decidió, y tocarla arriesga un segundo movimiento sobre una corrida ya liquidada. Esa reserva es del
+  vencimiento de reservas.
+  ⚠️ **Corregido el 2026-08-05:** esta regla decía «nunca metas movimientos de crédito en el camino de
+  abandono», sin más. Era demasiado ancha y **el runtime desplegado ya no la cumple**: una corrida que
+  murió **antes** de que el proveedor aceptara no cobró nada, así que su reserva **se devuelve de
+  inmediato** en vez de esperar 24 h. Si ves esa devolución, **no es un defecto**. Lo que decide es el
+  hecho durable (`attempt.providerOperation`), no el nombre de la fase.
+- **NUNCA** dejes que un fallo al devolver la reserva rompa el cierre de la corrida. El abandono corre
+  **después** de que la cola cerró la entrega, así que lanzar dejaría el experimento «generando» para
+  siempre — peor que la reserva colgada que se quería evitar. Degrada al vencimiento de 24 h y **avisa**
+  (`globe_run_abandon_release_degraded`, steady esperado 0).
 - **NUNCA** le pongas pausas crecientes a una espera. El crecimiento existe para no golpear a un
   sistema **caído**; Asset Governance no está caído, está trabajando, y la pausa sólo agrega latencia
   después de que el trabajo ya terminó.

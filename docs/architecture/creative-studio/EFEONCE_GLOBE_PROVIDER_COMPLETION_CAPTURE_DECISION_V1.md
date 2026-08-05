@@ -159,8 +159,37 @@ así es la forma elegante de no hacerse cargo.
 |---|---|---|
 | `governed_run_outbox` | converge | `supersedeNonReclaimableReconciles`, pre-batch |
 | `experiments` | converge | `RunFinalizerPort.abandon` — camino terminal **y** barrido de recuperación |
-| `credit_reservations` | observable | expiry de reservas, con su propia alerta de latencia |
+| `credit_reservations` | **converge (pre-gasto)** · observable (post-gasto) | `RunFinalizerPort.abandon` si el proveedor nunca aceptó · expiry de reservas si ya cobró |
 | `asset_governance_jobs` | converge | lease y `max_attempts` propios del Job |
+
+### Delta 2026-08-05 — la postura puede depender del CASO, y `abandon` sí toca créditos en uno
+
+🔴 **Una fila que promedia dos casos esconde el que está mal.** `credit_reservations` era `observable` entera,
+delegando en el TTL de 24 h. **Post-gasto eso es correcto** —el settlement ya decidió y tocar dinero arriesga un
+doble movimiento—, pero **pre-gasto era falso**: un run que murió sin que el proveedor aceptara no cobró nada.
+Medido contra `globe-pg` el 2026-08-04: la **única** reserva `held` de toda la base era pre-gasto (32 créditos)
+y había **cero** post-gasto, o sea el **100 %** del crédito inmovilizado estaba amparado por un razonamiento que
+no le correspondía.
+
+`RunDependentAggregateV1` gana un campo opcional **`condition`** (`when` + `otherwise{when, posture, closedBy,
+signal}`). **No son dos filas a propósito:** `aggregate` es el **nombre físico de la tabla**, verificable contra
+el runtime sin traducir, y partirlo en `credit_reservations (pre-spend)` rompería justo la propiedad que lo
+sostiene. El test de cobertura gana dos reglas: con `condition` presente exige **dueño y señal en AMBAS ramas**,
+y **rechaza dos ramas con la misma postura** (una condición que no distingue nada esconde por qué se escribió).
+
+**El discriminador es el hecho DURABLE, no el nombre de la fase.** `POST_SPEND_KINDS` nombra bien la asimetría
+pero clasifica **topes de reintento**: una entrega de `submit` puede haber sido aceptada con la respuesta
+perdida, y ése es justamente el caso ambiguo que no se debe liberar a ciegas. Decide
+**`attempt.providerOperation`**.
+
+🔴 **Y un fallo al liberar NUNCA se propaga.** `abandon` corre **después** de que la outbox cerró la entrega, así
+que un throw dejaría el experimento `running` para siempre — peor que la reserva colgada que el cambio evita.
+Degrada al TTL, que es el dueño declarado de ese caso, y **se observa**
+(`globe_run_abandon_release_degraded`, WARNING, steady 0): sin esa línea, «se liberó rápido» y «se cayó al TTL de
+24 h» serían indistinguibles desde afuera. El puerto gana una dependencia opcional `observe` porque el dominio es
+transport-neutral y no tiene `console`.
+
+⚠️ **El barrido de recuperación cubre exactamente la rama que la condición nombra, nunca la otra.**
 
 **El barrido hacia atrás reusa el MISMO `abandon`** del camino hacia adelante. Una lógica de cierre propia
 serían dos definiciones de «converger» capaces de divergir entre sí — el bug class original, una capa más

@@ -91,6 +91,17 @@ no crea un segundo ledger ni una segunda promoción.
 > el 2026-08-04— tuvo que producirse por el **carril gobernado**, no desde el Producer. La promoción quedó
 > sellada y la ruta habilitada, pero generar desde el Producer un modelo que exige referencias todavía no
 > funciona.
+>
+> ✅ **Y el canary ya no se escribe a mano** (2026-08-05): `pnpm producer:canary --route=<routeId>` ejecuta la
+> secuencia completa por los commands canónicos, deriva la forma de salida desde el catálogo y resuelve las
+> referencias desde el feed retenido. **Sin `--execute` no gasta un crédito**, así que es el primer diagnóstico
+> —no el último recurso— y conviene correrlo **antes de pedir autorización de gasto**. Con `--execute` exige
+> `--route-prompt`: el instrumento no inventa dirección creativa para un gasto real. Procedimiento completo:
+> [`GLOBE_ROUTE_PROMOTION_RUNBOOK_V1.md`](../../operations/creative-studio/GLOBE_ROUTE_PROMOTION_RUNBOOK_V1.md).
+>
+> 🔔 **Y ahora avisa antes de perder la ventana:** `globe_promotion_window_closing` (WARNING) se dispara a
+> **30 minutos** del vencimiento de cada promoción `activated`. No lo confundas con `stalled`, que mide
+> operaciones **ya vencidas** — son los dos lados del mismo instante.
 
 ### Canary Recraft v4.1 de referencia
 
@@ -166,7 +177,7 @@ por workspace, recomendado honesto, y que **el identificador del proveedor nunca
 | El modelo no aparece en ninguna modalidad | No tiene ruta en el catálogo | Declarar la ruta (paso 1 de "Agregar") |
 | Aparece en un workspace y no en otro | Comportamiento correcto: promoción por workspace | Promover donde haga falta |
 | Dice "Próximamente" y sabes que funciona | Verificado en el Model Lab, **no promovido** a producción | Revisar el ledger; promover si corresponde |
-| **Estaba disponible y dejó de estarlo**, sin error ni cambio de modelo | La promoción venció **sin su canary** y se revirtió sola (binding deshabilitado, circuito abierto) | Volver a promover y **sellar el canary dentro de la ventana**; si el sello falla con un error genérico, es defecto de plataforma, no falta de evidencia |
+| **Estaba disponible y dejó de estarlo**, sin error ni cambio de modelo | La promoción venció **sin su canary** y se revirtió sola (binding deshabilitado, circuito abierto) | Volver a promover y **sellar el canary dentro de la ventana**; si el sello falla con un error genérico, es defecto de plataforma, no falta de evidencia. Desde el 2026-08-05 `globe_promotion_window_closing` avisa **30 min antes** de que la ventana venza |
 | Nexa y la pantalla muestran distinto | **Un consumer se armó su propia lista** | Bug: buscar el cálculo paralelo y borrarlo |
 | Falla después de reservar crédito | Se ofreció ejecutable donde no puede correr | Bug: reportar con la ruta y el modo |
 | Un run pagado queda sin finalizar tras un fix | El proveedor terminó, pero falló la reconciliación local | Leer el run/attempt y recuperar idempotentemente; no generar otra vez |
@@ -174,7 +185,7 @@ por workspace, recomendado honesto, y que **el identificador del proveedor nunca
 
 ## Estado operativo de la flota de imagen
 
-Al 2026-07-30 están disponibles y ejercitadas desde la UI las seis rutas de imagen: Seedream 5 Pro,
+Al 2026-07-30 están disponibles y ejercitadas desde la UI las siete rutas de imagen: Seedream 5 Pro,
 Nano Banana Pro, Nano Banana 2, GPT Image 2, GPT Image 1.5 y Recraft v4.1. El selector vigente es un
 desplegable compacto; la antigua dirección de galería no se usa.
 

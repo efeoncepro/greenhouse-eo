@@ -1,9 +1,9 @@
 # Flota de modelos del Producer — disponibilidad por workspace
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-07-25 por Claude (TASK-1554)
-> **Ultima actualizacion:** 2026-08-04 por Claude (TASK-1641)
+> **Ultima actualizacion:** 2026-08-05 por Claude (TASK-1641)
 > **Documentacion tecnica:** [`GLOBE_MODEL_FLEET_STATUS.md`](../../operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md) · [`EFEONCE_GLOBE_CREATIVE_STUDIO_ARCHITECTURE_V1.md`](../../architecture/EFEONCE_GLOBE_CREATIVE_STUDIO_ARCHITECTURE_V1.md)
 
 ## Qué resuelve
@@ -64,7 +64,7 @@ Recraft v4.1 lo demuestra: `ref/still/vector-v1` pasó de existir como ruta no e
 disponible sin modificar el selector. La prueba real desde Producer produjo y retuvo un SVG de
 4 créditos, con vista previa y descarga habilitadas.
 
-## Estado verificado el 2026-07-30
+## Estado verificado el 2026-08-05
 
 El workspace interno ofrece simultáneamente seis rutas de imagen:
 

@@ -22,6 +22,21 @@
   camino muerto; cerrarlo exige el rollout de 3 pasos del broker. Queda como follow-up.
 - ⚠️ El canary **se negó a ejecutar sin `--route-prompt`**: no inventa dirección creativa para un gasto
   real. Guardrail funcionando, no defecto.
+- **Barrido documental del cierre** (4 auditorías en paralelo). Lo que destapó, por orden de gravedad:
+  - 🔴 **Dos reglas `NUNCA` que el runtime desplegado ya violaba.** El doc funcional y el manual del ciclo de
+    corridas decían que `abandon` «no toca créditos, a propósito» — un operador que las leyera habría tratado
+    la liberación pre-gasto como un bug. Corregidas con la regla fina: no se toca la liquidación **post**-gasto,
+    y un fallo al liberar degrada al TTL y se observa.
+  - 🔴 **Dos runbooks prescribían un remedio imposible.** El triage de alertas y el runbook de promoción
+    mandaban «pausar esa readiness», que hoy no puede ejecutar nadie. Ahora declaran el hueco y la mitigación
+    verificada (volver a promover).
+  - 🔴 **ADR-010 declaraba «exactamente dos chokepoints humanos» en readiness. Son tres**: `transitionModelRoute`
+    exige humano para todo destino distinto de `promoted`, así que `pause`/`retire` son el tercero — y el que
+    no tiene despachador.
+  - **ADR-021 tenía una fila factualmente incorrecta**: `credit_reservations | observable`, justo la postura
+    que era falsa pre-gasto.
+  - **Gate rojo preexistente**: la ficha de Seedance depende de evidencia de proveedor que venció el
+    2026-08-05. Registrado en riesgos abiertos, **no parcheado en silencio**.
 
 ## 2026-08-05 — TASK-1641 desplegado, y el primer ciclo real destapó un falso positivo
 

@@ -59,7 +59,7 @@ el transporte Omni Vertex ADC y los canaries todavía no están operativos. Cont
 
 ## Varios modelos por capacidad (multi-modelo, TASK-1553)
 
-La dirección del negocio es **usar los mejores modelos del mercado e ir agregándolos, sin que uno reemplace a otro**. El catálogo lo permite tratando **cada modelo/tier como una ruta**. Hoy conviven y fueron ejercitados desde el Producer: Seedream 5 Pro, Nano Banana Pro, Nano Banana 2, GPT Image 2, GPT Image 1.5 y Recraft v4.1 Vector.
+La dirección del negocio es **usar los mejores modelos del mercado e ir agregándolos, sin que uno reemplace a otro**. El catálogo lo permite tratando **cada modelo/tier como una ruta**. Hoy conviven y fueron ejercitados desde el Producer: Seedream 5 Pro, **Seedream 5 Pro Edit** (la única ruta de `operation: edit`, sellada el 2026-08-05), Nano Banana Pro, Nano Banana 2, GPT Image 2, GPT Image 1.5 y Recraft v4.1 Vector.
 
 - **El modelo se elige por la ruta, no por la capacidad.** Antes, "generar imagen" resolvía a un único modelo fijo; ahora cada ruta resuelve a su propio modelo, así dos modelos del mismo proveedor (GPT Image 2 **y** 1.5; Nano Banana Pro **y** 2) pueden coexistir y elegirse. El nombre del modelo sigue siendo público (señal de calidad); el identificador de proveedor (el *slug*) nunca entra al catálogo.
 - **Actualizar ≠ agregar.** *Actualizar* un modelo es subir su versión **dentro de la misma ruta** (reemplaza). *Agregar* un modelo/tier es una **ruta nueva** que coexiste con las demás. Nunca se cambia el proveedor/linaje de una ruta existente para "reusarla" como otro modelo — eso sería sustituir un modelo por otro a escondidas, y está prohibido.

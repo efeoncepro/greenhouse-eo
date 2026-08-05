@@ -1,5 +1,27 @@
 # Handoff activo
 
+### EPIC-028 — Producer V3: contratos de diseño y plan de ejecución (2026-08-05)
+
+**Estado:** contratos de diseño `design-ready`; no se modificó runtime ni se creó una task paraguas. La
+decisión es un solo shell del Producer con tres estudios adaptativos —Image, Video y Audio— gobernados por
+`RouteCreativeContract`, con feed/muro y asset workspace compartidos.
+
+**Artefactos creados:** dirección visual, wireframes, flujo de usuario, contrato de motion y plan operativo:
+
+- [`EPIC-028-producer-v3-unified-studios.md`](docs/ui/visual-directions/EPIC-028-producer-v3-unified-studios.md)
+- [`EPIC-028-producer-v3-unified-studios.md`](docs/ui/wireframes/EPIC-028-producer-v3-unified-studios.md)
+- [`EPIC-028-producer-v3-unified-studios-flow.md`](docs/ui/flows/EPIC-028-producer-v3-unified-studios-flow.md)
+- [`EPIC-028-producer-v3-unified-studios-motion.md`](docs/ui/motion/EPIC-028-producer-v3-unified-studios-motion.md)
+- [`EPIC_028_PRODUCER_V3_EXECUTION_PLAN_V1.md`](docs/operations/creative-studio/EPIC_028_PRODUCER_V3_EXECUTION_PLAN_V1.md)
+
+**Owners actualizados:** TASK-1523, TASK-1633, TASK-1552 y TASK-1643 contienen ahora los criterios de
+aceptación y límites de ownership. TASK-1641 permanece restringida al lane backend/API de promoción; no se le
+añadió UI. No se detectó un hueco que justificara una task nueva.
+
+**Validación:** `git diff --check`, `pnpm task:lint --changed`, `pnpm ops:lint --changed` y el chequeo de enlaces
+Markdown pasan. La implementación sigue condicionada a que cada task dueña cierre su mapeo UI, evidencia GVC,
+dossier y decision log; estos documentos no habilitan por sí solos `UI ready` ni rollout.
+
 ## TASK-1641 — Globe: DESPLEGADO + promoción end-to-end ejecutada (2026-08-05)
 
 **Estado:** `in-progress`, **desplegado y aplicado**. Globe `main@b958a11`; API
@@ -559,59 +581,3 @@ mientras el Connector se cuelga (`invalid_rapt` es reauth). Comandos en
   por TASK-1631.
 - TASK-1631 separa sesiones, no identidades: un `identity_profile` + Account 360; linking, revocación y convergencia
   posterior del login Greenhouse preceden el rollout.
-
-## AXIS — guía visual agent-facing publicada (2026-08-01)
-
-- `efeoncepro/axis-design-system` publicó `DESIGN.md` en `main` mediante `0e3c4d6`.
-- El documento sigue el formato alpha de Google, pero es una proyección generada desde `packages/tokens`,
-  no un segundo SSOT. `pnpm design:generate` lo regenera y `pnpm design:check` detecta drift; CI lo valida.
-- Las skills AXIS de Codex y Claude, el runbook, la arquitectura UI y `project_context.md` ya apuntan a la
-  guía. Greenhouse conserva su `DESIGN.md` separado como contrato específico MUI/Vuexy.
-- `TASK-1590` llevó el Lab desde Vite vanilla a Astro `7.1.6`: salida estática, Content Loader tipado,
-  catálogo y rutas por pattern, documentación MDX, sitemap, metadata SEO, script vanilla mínimo, Vitest y
-  Playwright desktop/mobile. No hay React, SSR, Actions, secretos ni imports desde Greenhouse/Globe.
-- Verificado en el repo AXIS: `pnpm install --frozen-lockfile`, `pnpm design:check`, `pnpm build`,
-  `pnpm typecheck`, `pnpm test`, `pnpm lint`, `git diff --check` y preview local HTTP 200.
-- Estado honesto: el runtime base está desplegado, pero la migración del catálogo Greenhouse sigue abierta.
-  Las entradas no reconstruidas son `reference skeletons`; no se retira `/design-system` hasta cerrar parity
-  contractual, funcional, estética, motion, accesibilidad y evidencia de consumidor. `TASK-1382` no es dependencia.
-- Rollout realizado el 2026-08-01: deployment `dpl_8TohYh27fJizvDVC3MV5aoemvFPK`, alias público
-  `https://axis-design-system-lab.vercel.app`, `READY`, Astro/output `apps/lab/dist`, Node 24. Se retiró la
-  protección SSO del proyecto porque el Lab ya tenía decisión explícita de ser público; `/`, `/docs/`,
-  `/references/colors/` y `/sitemap-index.xml` responden `200`.
-- Empezó la migración Greenhouse → AXIS: `colors`, `typography`, `geometry` y `elevation` ya tienen referencias
-  token-backed en `/references/colors/`, `/references/typography/`, `/references/geometry/` y
-  `/references/elevation/`; el inventario y el triage están en
-  [`AXIS_GREENHOUSE_LAB_MIGRATION_INVENTORY_V1.md`](docs/architecture/AXIS_GREENHOUSE_LAB_MIGRATION_INVENTORY_V1.md).
-- El primer bloque pure-UI tiene contratos publicados; `button`, `chip`, `breadcrumbs`, `floating-surface`, `motion` y
-  `charts` y `disclosure` están documentados como `candidate parity`; `loaders` sigue siendo skeleton. La
-  migración continúa y `/design-system` permanece como fallback hasta cerrar parity visual y de consumidores.
-- También quedaron publicados `motion` y `border-beam` como contratos portables; `motion` ya tiene una reconstrucción
-  de candidate parity en AXIS (`95bc3f2`): seis duraciones, cuatro easings, cuatro variantes, replay, estado
-  manual sin motion y E2E responsive/reduced-motion. `microinteractions` sigue fuera
-  del traslado inicial porque mezcla múltiples primitivas y estados de producto.
-- `composition-shell` y `card-density` ya tienen fixtures estáticos en AXIS; el shell de Portal y su telemetría
-  siguen excluidos del Lab público.
-- El catálogo pure-UI también cubre `charts`, `roadmap-timeline`, `team-avatar-group` y `surface-recipes`; aún
-  faltan las comparaciones visuales contra consumidores antes de retirar el fallback Greenhouse.
-- `gradients` ya tiene fixture portable y `utilities` ahora se representa mediante `efeonce.activity-timeline`,
-  sin datos operativos ni registros de auditoría.
-- `brand-logos` ya tiene el gate público de provenance; los assets reales no se trasladan hasta tener source,
-  licencia y checksum aprobados.
-- `buttons` ya tiene una reconstrucción de candidate parity en AXIS (`b1c9869`): boards light/dark, 152 controles,
-  matrices completas y E2E responsive/reduced-motion; falta el compare visual/computed contra Greenhouse MUI/Vuexy.
-- `chips` ya tiene una reconstrucción de candidate parity en AXIS (`028dba2`): boards light/dark, 72 especímenes,
-  avatar/closable, feedback atoms, spotlight/signal motion y reduced-motion; falta el compare visual/computed y
-  provenance del avatar sintético.
-- `breadcrumbs` ya tiene una reconstrucción de candidate parity en AXIS (`6979641`): cuatro ports, overflow nativo,
-  variantes/kinds, hit area cómoda, motion sutil y reduced-motion; falta el compare visual/computed contra Greenhouse.
-- `floating-surface` ya tiene una reconstrucción de candidate parity en AXIS (`72d03f4`): seis variantes V1, roles
-  tooltip/menu/dialog, menú, editor dirty-safe, motion anchored y reduced-motion; falta compare visual/computed y
-  focus return real contra el consumer Greenhouse.
-- `disclosure` ya tiene una reconstrucción de candidate parity en AXIS (`0.1.1`): cuatro triggers con rotación/morph,
-  contextualEditor, actionMenu, Escape, outside press, focus return, dirty guard y quickPeek explícitamente fuera de
-  scope; falta compare visual/computed contra Greenhouse y canary del consumer.
-- `leaderboard` ya tiene contrato y fixture estática con datos sintéticos; `brand-motion` ya tiene contrato y
-  referencia orbital HTML/CSS sin SVG privado ni GSAP. El Lab queda en 27 páginas y 21 contratos; build, lint,
-  typecheck, tests y 32 E2E pasan (4 escenarios con skip por proyecto). `axis.efeonce.org` ya resuelve a `76.76.21.21` y el smoke HTTPS devuelve `200`.
-  La siguiente continuidad debe continuar con `handoff`, `microinteractions` y las superficies con API.

@@ -122,6 +122,14 @@ binding/readiness/circuito, canary con spend fence, output retenido, settlement 
 `globe.producer.fleet.list`. Un canary de una ruta no habilita las demás. Si hay timeout, lee primero el estado con
 la misma correlación/idempotencia; nunca repitas un submit billable a ciegas.
 
+No escribas esa secuencia a mano: `pnpm producer:canary --route=<routeId>` la ejecuta completa, deriva el
+`outputShape` desde `constraints` y resuelve las entradas desde el feed retenido. **Sin `--execute` no gasta**,
+y ése es el primer diagnóstico, no el último recurso. Con `--execute` exige dirección creativa explícita: sin
+`--route-prompt` aborta con `producer_canary_route_prompt_required`. El instrumento **no inventa un prompt para
+un gasto real** — y el dry-run sí corre sin él, así que la ausencia se descubre justo en la corrida que iba a
+costar. Si no sabes qué debe producir la ruta, la ruta todavía no está lista para gastarse. El gasto se aprueba
+con `--approve-route=N`, excluyente de `--approve`.
+
 ## FLUX 3 inicial
 
 Carga [`FLUX_3_VIDEO_ROUTE_CARD_V1.json`](../../../docs/architecture/creative-studio/model-fleet/routes/FLUX_3_VIDEO_ROUTE_CARD_V1.json)

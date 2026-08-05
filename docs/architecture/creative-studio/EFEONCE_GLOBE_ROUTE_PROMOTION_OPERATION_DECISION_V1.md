@@ -262,3 +262,54 @@ Evidencia viva (revisiones desplegadas, promociones, bindings y canarios) en
   Los dos defectos fatales de `0050` eran invisibles leyéndola.
 - **SIEMPRE** cubrir la frontera consumidor↔schema por los dos lados (test sin base + verificación en el apply).
   Un gate solo deja pasar exactamente el hueco que ya se coló.
+
+## Delta 2026-08-05 — la saga declara su convergencia, y su ventana se observa ANTES de vencer
+
+### El contrato de convergencia de la saga
+
+`PROMOTION_DEPENDENT_AGGREGATES` (`packages/domain/src/promotion-aggregate-convergence.ts`) declara los tres
+agregados que la saga mueve, con test bidireccional — una postura sin señal rompe el build:
+
+| Agregado | Postura | Lo cierra |
+|---|---|---|
+| `production_routing_circuits` | `converges` | la saga (`setCircuit`, **antes** que el binding: fail-closed) |
+| `production_route_bindings` | `converges` | la saga (`setBinding enabled=false`) |
+| `model_readiness_revisions` | **`observable`** | `globe.model-readiness.route.pause` — **autoridad disjunta** |
+
+🔴 **Readiness es `observable` por una frontera de AUTORIDAD.** `pause` exige `globe.model-readiness.pause` y la
+saga sólo porta `globe.production-promotion.*`; son disjuntas a propósito — es la separación maker/checker que
+hace vendible el régimen humano. Dársela dejaría que un **rollback automático retire una promoción que un humano
+firmó**. Por eso la fase `rollback` (§ arriba) deja `model_readiness_revisions` en `promoted` **deliberadamente**,
+y la divergencia se **cuenta y se hace visible** en vez de cerrarse sola.
+
+⚠️ Y hoy ese remedio **no tiene camino ejecutable por ningún carril** (ver ADR-010 § chokepoints corregidos);
+dueño del follow-up: `TASK-1463`.
+
+### Dos señales nuevas, y una de ellas es el complemento estricto de `stalled`
+
+- **`globe_promotion_window_closing`** (WARNING, 30 min de antelación): promociones `activated` con
+  `deadline_at > now` dentro del umbral. 🔴 **No sustituye a `stalled`, lo complementa por el otro lado del mismo
+  instante**: `stalled` / `promotion_queue_oldest_age_seconds` miden `deadline_at <= now`, o sea avisan **cuando
+  la ventana ya venció**. Las cuatro promociones que murieron el 2026-08-04 lo hicieron a +2 s, +18 s, +26 s y
+  +40 s del deadline: para todas ellas esa alerta llegaba tarde **por diseño**. Una ventana vencida **no** entra
+  en la señal nueva — contarla dos veces borraría la frontera.
+- **`globe_promotion_readiness_divergent`** (ERROR): rollbacks cuya readiness sigue `promoted`. Es la señal que
+  permite declarar ese agregado `observable` y que la palabra signifique algo.
+
+Ambas las emite un **solo consumidor** en el worker, porque son el mismo lector cross-workspace; usa la política
+de scan que ya existía (`app.promotion_recovery_scan`, migración `0028`) mediante
+`PromotionConvergenceObservationStorePort` + `PromotionReadinessStateReaderPort` — **sin migración nueva**.
+
+### 🔴 El invariante de predicado que esta sesión ganó
+
+Un predicado derivado de historia append-only necesita su **cláusula de vigencia**, y hicieron falta **dos**:
+supersede por promoción posterior **y** binding vigente apagado. El segundo se descubrió con la señal ya
+desplegada, porque el **lane automatizado de ADR-010 habilita rutas sin pasar por la saga** y no deja operación
+posterior que las supersede. **Cuando dos mecanismos pueden mover el mismo estado, derivar de la historia de uno
+solo es incorrecto por construcción**: el predicado se cierra sobre el **estado actual del efecto**.
+
+### Métrica: la forma la decide la dirección de la magnitud
+
+«Segundos restantes» se alinea al revés — pediría `COMPARISON_LT`, y **no existe `ALIGN_MIN` para DISTRIBUTION**,
+así que un `ALIGN_PERCENTILE_99` alertaría sobre la promoción **menos** urgente. Se emite el **evento discreto
+contable** (DELTA/INT64 + `ALIGN_SUM`) y el número vive en la línea de log que un humano lee.

@@ -151,9 +151,18 @@ Tres decisiones de diseño que vale la pena nombrar:
 - **El cierre del agregado visible es obligatorio, no opcional.** Quien no lo implemente rompe la
   compilación — y en la práctica atrapó cuatro implementaciones incompletas, que es exactamente lo
   que tenía que pasar.
-- **No toca créditos, a propósito.** La liquidación es autoridad de otro dueño y ya decidió; meter
-  dinero ahí arriesgaría un segundo movimiento sobre una corrida ya liquidada. Una reserva que quede
-  colgada la recoge el vencimiento de reservas.
+- **Toca créditos sólo cuando el proveedor NUNCA cobró** (desde el 2026-08-05). La pregunta que decide
+  no es en qué paso murió la corrida, sino un hecho durable: si el proveedor llegó a aceptarla.
+  - **Si no aceptó**, no cobró nada: retener la reserva 24 horas inmovilizaba crédito protegiendo un
+    escenario que no existe. Ahora se devuelve de inmediato, por los mismos mecanismos que usa el
+    camino normal. Se midió antes de cambiarlo: **el 100 % del crédito retenido en toda la base
+    pertenecía a este caso**.
+  - **Si aceptó**, la liquidación ya decidió y no se toca — meter dinero ahí arriesgaría un segundo
+    movimiento sobre una corrida ya liquidada. Esa reserva sigue siendo del vencimiento de reservas.
+  - **Y si la devolución falla, no rompe nada:** la corrida igual se cierra y la reserva cae al
+    vencimiento de 24 h, que queda como red de abajo. Esa caída **se avisa**
+    (`globe_run_abandon_release_degraded`), porque si no, "se devolvió rápido" y "se cayó al plazo
+    largo" serían indistinguibles desde afuera.
 - **Nombra la causa real.** En un abandono el proveedor **sí** entregó; reportarlo como "falló el
   proveedor" sería nombrar mal la causa, que es justamente el defecto de `ISSUE-127`.
 

@@ -7,7 +7,7 @@
 > sustenta en `globe.production-routing` + `globe.model-readiness.*`. Este documento es el mapa
 > legible que reconcilia ambas autoridades.
 >
-> **Creado:** 2026-07-24 (TASK-1553). **Última actualización:** 2026-08-04.
+> **Creado:** 2026-07-24 (TASK-1553). **Última actualización:** 2026-08-05.
 > **Contrato técnico:** `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md`,
 > `EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md`, `EFEONCE_GLOBE_ROUTE_BASED_MODEL_RESOLUTION_DECISION_V1.md` (ADR-013).
 
@@ -36,7 +36,7 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 | Ruta (routeId) | Modelo público | Proveedor (slug wire) | Capacidad | Lab | Prod. gobernada | Gate / nota |
 |---|---|---|---|---|---|---|
 | `ref/still/rrss-v1` | Seedream · 5 Pro | Fal (`bytedance/seedream/v5/pro/text-to-image`) | image-generate | ✅ 07-19 | ✅ driver Fal | default vivo de imagen |
-| `ref/still/reference-v1` | Seedream · 5 Pro Edit | Fal (`…/v5/pro/edit`) | image-edit | ✅ 07-19 | 🔒 binding deshabilitado; reader `gated` | Fal y adapter cableados; requiere reconciliar binding/circuit antes de volver a afirmar disponibilidad |
+| `ref/still/reference-v1` | Seedream · 5 Pro Edit | Fal (`…/v5/pro/edit`) | image-edit | ✅ 07-19 | ✅ promoción sellada 08-05 (`canary_passed`) | reader live **`available`**; **única ruta de `operation: edit`** del catálogo; `promotion_4265dd26…`, run `b811d5fc…`, 10 cr = 10 cr |
 | `ref/still/nanobanana-pro-v1` | Nano Banana · Pro | Vertex (`gemini-3-pro-image`) | image-generate | ✅ 07-24 | ✅ driver + promoción gobernada 07-30 | región `global`; selector live `Disponible`; revisión `896a0620` |
 | `ref/still/nanobanana-2-v1` | Nano Banana · 2 | Vertex (`gemini-3.1-flash-image`) | image-generate | ✅ 07-30 | ✅ driver + promoción + generación UI real 07-30 | run UI `ce06f8b4-ebe9-43b6-9d47-8e4cc901f49a`; 10 créditos |
 | `ref/still/openai-v2` | GPT Image · 2 | OpenAI (`gpt-image-2`) | image-generate | ✅ 07-24 | ✅ driver + promoción + canary real 07-30 | run UI `a81c8049-7772-4933-82f2-1e2e59e5121c`; 14 créditos |
@@ -66,8 +66,9 @@ es `routeId + capability + provider + model + version/endpoint + region + comple
   hasta implementar un transporte multipart y una ruta gobernada propia.
 - Seedream generación: `ref/still/rrss-v1` / Fal / `seedream-5-pro` / `v5-pro` / `fal.seedream.text-to-image` /
   `us-central1` / `webhook-and-poll`, **available**. Seedream edición: `ref/still/reference-v1` / Fal /
-  `seedream-5-pro-edit` / `v5-pro` / `fal.seedream.edit` / `us-central1` / `webhook-and-poll`; la superficie del
-  proveedor y el adapter existen, pero el último readback del reader la deja **gated** con binding deshabilitado.
+  `seedream-5-pro-edit` / `v5-pro` / `fal.seedream.edit` / `us-central1` / `webhook-and-poll`, contrato
+  `preserve-set`, **available** desde el 2026-08-05: promoción sellada end-to-end y confirmada por readback live
+  del reader. Es la **única ruta del catálogo con `operation: 'edit'`**.
 - Nano Banana Pro: `ref/still/nanobanana-pro-v1` / Vertex / `gemini-3-pro-image` / `preview` /
   `vertex.gemini.image` / `global` / `poll`, **available**. El lookup más reciente del circuito devolvió `not_found`;
   no se debe gastar ni reintentar a ciegas hasta reconciliarlo.
@@ -79,9 +80,10 @@ es `routeId + capability + provider + model + version/endpoint + region + comple
 - Seedream 5 Lite, edición Nano Banana y video-to-image de Nano Banana existen como superficies de proveedor o seams
   genéricos, pero no tienen ruta pública, binding, canary y readback propios. No son variantes conectadas del Producer.
 
-**Delta operativo del reader:** la disponibilidad anterior del edit de Seedream que decía “✅ driver Fal” queda supersedida
-por el readback live más reciente (`binding enabled=false`, `gated`). El reader manda sobre este ledger; actualiza esta fila
-cuando exista un nuevo binding/circuit readback, no por una edición del catálogo o una afirmación del proveedor.
+> ⛔ **Superado el 2026-08-05 (TASK-1641).** El edit de Seedream **ya no está `gated`**: se promovió end-to-end
+> y el readback live del reader lo devuelve `available`. Lo que sigue vigente del párrafo original es la **regla**,
+> no el estado: el reader manda sobre este ledger, y esta fila se actualiza cuando exista un nuevo binding/circuit
+> readback — nunca por una edición del catálogo ni por una afirmación del proveedor.
 
 ## Identidades exactas de video auditadas (2026-08-04)
 

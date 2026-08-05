@@ -138,9 +138,23 @@ ese agregado `observable` y que la palabra signifique algo: un `observable` sin 
 `globe.model-readiness.pause`, y dársela dejaría que un rollback automático retire una promoción que un humano
 firmó. La señal se computa sobre el estado **leído ahora**, así que baja sola cuando alguien la cierra.
 
-⚠️ **Sólo reporta la ÚLTIMA promoción de cada identidad.** Si la ruta se volvió a promover y quedó sellada, su
-readiness dice `promoted` por esa promoción posterior, que es legítima — pausarla retiraría una ruta viva.
-Verifica la identidad antes de actuar.
+🔴 **Pero ese remedio HOY NO TIENE CAMINO EJECUTABLE — verificado leyendo el código el 2026-08-05.**
+`transitionModelRoute` hace `requireHuman(c)` para todo destino distinto de `promoted`, así que un lane de
+service account **falla cerrado por diseño**; y `globe.model-readiness.pause` **no está** en
+`PRODUCER_HUMAN_CAPABILITY_SCOPES`, así que un humano por el BFF tampoco. Cerrarlo exige el rollout de 3 pasos
+del broker más una superficie que lo despache; dueño: `TASK-1463` (Delta 2026-08-05).
+
+✅ **Mitigación verificada mientras tanto: volver a promover la ruta también cierra la divergencia**, porque
+enciende el binding y vuelve coherente la readiness `promoted`. Ejercitado el 2026-08-05 sobre
+`ref/still/reference-v1`: la señal bajó de 1 a 0. Elige este camino cuando la decisión correcta sea **restaurar**
+la ruta; el `pause` sólo hace falta cuando la decisión es **retirarla**, y ése es justo el caso que espera un
+humano con autoridad.
+
+⚠️ **El predicado tiene DOS filtros y ninguno alcanza solo** (`efeonce-globe@b958a11`): sólo reporta la
+**última** promoción de cada identidad **y** exige que su **binding siga apagado**. El segundo se agregó porque
+sin él la señal era **mediblemente falsa**: el lane automatizado de ADR-010 habilita rutas **sin pasar por la
+saga**, así que no deja operación posterior que las supersede, y dos rutas **vivas** aparecían como
+divergentes. Verifica la identidad antes de actuar.
 
 ### `globe_run_abandon_release_degraded` — WARNING
 

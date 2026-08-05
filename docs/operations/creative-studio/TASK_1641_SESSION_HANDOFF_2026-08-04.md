@@ -1,5 +1,15 @@
 # TASK-1641 — arranque de sesión nueva (corte 2026-08-04)
 
+> ⛔ **SUPERADO el 2026-08-05: los seis scopes están cerrados, desplegados y verificados en runtime.**
+> Este documento se conserva como trazabilidad del punto intermedio; **su sección «Lo único que falta:
+> el ROLLOUT» ya no describe el estado vigente**. Para el estado real ve a
+> [`GLOBE_RUNTIME_HANDOFF.md`](GLOBE_RUNTIME_HANDOFF.md) § cortes del 2026-08-05, y para el
+> procedimiento a [`GLOBE_ROUTE_PROMOTION_RUNBOOK_V1.md`](GLOBE_ROUTE_PROMOTION_RUNBOOK_V1.md).
+>
+> Lo que sigue vigente de esta página son **las trampas ya pagadas** (`referenceHashes`, elección de
+> `inputMode`, el alcance real de `stalled`) y las **lecciones de método**, que se movieron a la skill
+> `greenhouse-globe`.
+
 > Para retomar `TASK-1641` (canary post-promoción operable + convergencia terminal de la saga) sin
 > releer la sesión entera. La task sigue siendo la fuente de verdad:
 > `docs/tasks/in-progress/TASK-1641-globe-promotion-canary-operability-and-terminal-convergence.md`.
@@ -27,7 +37,7 @@
 Promociones **selladas** (terminal, no expiran): Omni `promotion_1a5d117e…` y Veo
 `promotion_ddd0977c…`, ambas `canary_passed` con binding `enabled` y circuito `closed`.
 
-## Lo único que falta: el ROLLOUT
+## ⛔ Lo único que falta: el ROLLOUT — **EJECUTADO el 2026-08-05, esta sección es histórica**
 
 🔴 **Todo lo de arriba es `code complete, rollout pendiente`.** No hay deploy ni `tofu apply`, así que las
 tres alertas **no existen en el proyecto** y la liberación pre-gasto **no corre**. El último criterio de

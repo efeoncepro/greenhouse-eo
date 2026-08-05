@@ -671,6 +671,18 @@ autoridad que el diseño le negó **en el camino normal**: un rollback automáti
 que un humano firmó. Por eso la divergencia **se cuenta y se hace visible**. Cambiar esa fila es reabrir el
 ADR, no editar una palabra — y el test lo pinea.
 
+🔴 **Y hoy `route.pause` NO tiene camino ejecutable por NINGÚN carril — verificado leyendo el código el
+2026-08-05.** `transitionModelRoute` hace `requireHuman(c)` para todo destino distinto de `promoted`
+(`packages/domain/src/model-readiness.ts:106`), así que el operator lane de service account **falla cerrado por
+diseño** aunque su principal declare la capability; y `globe.model-readiness.pause` **no está** en
+`PRODUCER_HUMAN_CAPABILITY_SCOPES`, así que un humano por el BFF tampoco. Se estuvo a punto de construir un modo
+`readiness-pause` en el operator lane y **se descartó LEYENDO el código** — habría sido un camino muerto que
+compila, despliega y falla en runtime. **NUNCA construyas un modo sobre una capability sin leer antes su handler
+y su lista de scopes: una capability concedida no es una capability ejecutable.** Dueño: `TASK-1463` (Delta
+2026-08-05). ✅ **Mitigación verificada:** volver a promover la ruta también cierra la divergencia —enciende el
+binding y vuelve coherente la readiness—, ejercitado el 2026-08-05 con la señal bajando de 1 a 0. El `pause`
+sólo hace falta cuando la decisión es **retirar** la ruta, no restaurarla.
+
 **La señal se computa sobre el estado LEÍDO AHORA**, nunca sobre la evidencia que la saga guardó al revertir:
 la evidencia dice qué pasó entonces y la pregunta es si alguien ya lo cerró. Una señal que no baja enseña a
 ignorarla, y eso es peor que no tenerla.
@@ -2453,6 +2465,13 @@ con `copyAsReference`. Sin `--execute` estima sin gastar. El gasto va por **`--a
 **excluyente** de `--approve` (una aprobación escrita para un canary no puede autorizar el gasto del
 otro). Flags: `--route-capability=` (obligatoria si un `routeId` sirve a varias: se **niega** a elegir),
 `--route-references=`, `--route-target-lang=`, `--route-prompt=`.
+
+🔴 **`--route-prompt` es OBLIGATORIA con `--execute`**: sin ella aborta con
+`producer_canary_route_prompt_required`. El canary **no inventa dirección creativa para un gasto real**, y el
+dry-run **sí** corre sin prompt — así que la ausencia se descubre justo en la corrida que iba a costar. Si no
+sabes qué debe producir la ruta, la ruta no está lista para gastarse. Ejercitado el 2026-08-05 promoviendo
+`ref/still/reference-v1` (Seedream 5 Pro Edit / Fal), **única ruta del catálogo con `operation: 'edit'`**, por
+el runbook completo y con 10 créditos.
 
 Verificado en vivo: sobre `ref/video/frames-v1` el plan derivado reproduce **exactamente** lo que un
 humano armó a mano —720p / 8 s / 16:9 / `silent` / `frames` sin cuadro final, la misma referencia y los

@@ -506,6 +506,16 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
 
 ## Riesgos abiertos
 
+- 🔴 **El gate de fichas de ruta está ROJO por evidencia de proveedor vencida, y es preexistente.**
+  `SEEDANCE_2_VIDEO_ROUTE_CARD_V1.json` declara `seedance-text-api` (`authority: provider_primary`,
+  observada 2026-07-22, `ttlDays: 14`), que **venció el 2026-08-05**; su edge `provider_supported` depende de
+  ella, así que `validate-route-cards.mjs` falla incluso sin `--strict-freshness`. **No lo causó el trabajo de
+  `TASK-1641`** (verificado corriendo el validador con `--as-of 2026-08-04`). Cerrarlo honestamente exige
+  revalidar el endpoint contra Fal —probe de gasto cero, `POST {}` a `https://fal.run/<slug>`: 404 = no existe,
+  422 = existe— y subir `observedAt`; **no** editar la fecha sin volver a mirar. Marcar el edge `stale` es la
+  alternativa aceptable si nadie va a revalidar ahora.
+
+
 - Rollout externo/comercial sigue gated por `TASK-1480`; `internal_smoke` describe el estadio, no
   la naturaleza del producto.
 - `TASK-1553` no puede cerrarse hasta registrar los receipts transversales de `TASK-1468` y

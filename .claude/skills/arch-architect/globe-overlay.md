@@ -366,6 +366,32 @@ Every Globe architecture decision still lands as an **ADR in `docs/architecture/
 - **SIEMPRE** declarar la convergencia de cada agregado que dependa del estado de un run (`converge` u
   `observable`, y un `observable` sin señal se rechaza); el barrido de recuperación reusa el MISMO primitive
   del camino hacia adelante.
+- 🔴 **SIEMPRE** cerrar el predicado de una señal derivada de historia append-only sobre el **estado actual del
+  efecto**, nunca sobre el **registro del acto**. Medido 2026-08-05: `globe_promotion_readiness_divergent`
+  reportó 3 divergencias y **2 eran rutas VIVAS**, porque se derivaba de «la última promoción de la saga terminó
+  revertida» mientras el **lane automatizado de ADR-010 habilita rutas SIN pasar por la saga** y no deja
+  operación posterior que las supersede; el remedio que sugería las **habría retirado**. **Cuando dos mecanismos
+  pueden mover el mismo estado, derivar de la historia de UNO es incorrecto por construcción.**
+- **NUNCA** dar por verificada una señal nueva porque sus tests pasan: esos dos falsos positivos **no los atrapó
+  ningún test**, aparecieron leyendo su **primer ciclo real contra datos de producción**. Una señal no está
+  verificada hasta comprobar sus primeras emisiones **una por una** contra el estado real.
+- **NUNCA** declarar una postura de convergencia **única** cuando el caso la cambia: una fila que promedia dos
+  casos **esconde el que está mal**. `credit_reservations` era `observable` entera y pre-gasto eso era falso —
+  medido, el 100 % del crédito inmovilizado estaba en esa rama. Se declara con `condition` y el test exige dueño
+  y señal en **ambas**.
+- **NUNCA** discriminar si hubo **gasto** por el nombre de la fase (`lease.kind`): el discriminador es el hecho
+  **durable** (`attempt.providerOperation`). Una entrega de `submit` puede haber sido aceptada con la respuesta
+  perdida — la fase dice qué se intentaba, no qué ocurrió.
+- **NUNCA** propagar un fallo de liberación desde `abandon`: corre **después** de que la outbox cerró la entrega,
+  así que lanzar dejaría el experimento `running` para siempre — peor que la reserva colgada que evita. Degrada
+  al TTL y **se observa**.
+- **NUNCA** elegir la métrica por el aligner que tengas a mano: si la magnitud es **«cuánto falta»** se alinea al
+  revés — pediría `COMPARISON_LT`, y **no existe `ALIGN_MIN` para DISTRIBUTION**, así que un
+  `ALIGN_PERCENTILE_99` alerta sobre el caso **menos** urgente. Emite el **evento discreto contable**.
+- 🔴 **NUNCA** dar por ejecutable una capability sólo porque está **concedida**: `globe.model-readiness.route.pause`
+  no tiene camino por ningún carril (`requireHuman` rechaza los lanes de service account; el scope no está en el
+  grant humano). Se estuvo a punto de construir un modo muerto en el operator lane y se descartó **leyendo el
+  código**. **Lee el handler y la lista de scopes antes de construir encima.**
 - **NUNCA** crear documentación gobernante de Globe en `efeonce-globe/docs/**`.
 - **SIEMPRE** leer `GLOBE_MODEL_FLEET_STATUS.md` antes de afirmar que un modelo/proveedor no está integrado.
 - **SIEMPRE** separar por **remedio** al abrir razones: dos causas con la misma acción pueden compartir código; dos con acciones opuestas, nunca.

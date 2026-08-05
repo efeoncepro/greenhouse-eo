@@ -27,6 +27,13 @@ readiness review per route × workspace.
 The governed promotion path today (ADR-009 / TASK-1527) is correct but does not scale to breadth. Grounded in the
 code:
 
+- 🔴 **Corrected 2026-08-05: readiness has THREE human chokepoints, not two.** `transitionModelRoute` calls
+  `requireHuman(c)` for **every target other than `promoted`** (`packages/domain/src/model-readiness.ts:106`), so
+  `pause` and `retire` are a third one. And that third one **has no executable path today**:
+  `globe.model-readiness.pause` is absent from `PRODUCER_HUMAN_CAPABILITY_SCOPES`, so a human through the BFF
+  cannot dispatch it either, while a service lane fails closed by design. Nobody can pause a readiness. Closing
+  it costs the three-step broker rollout described below plus a surface that dispatches it; owner is
+  `TASK-1463` (Delta 2026-08-05). The paragraph below is otherwise accurate for the **forward** path.
 - Model readiness has **exactly two** human chokepoints: `recordModelReadinessReview` and `proposeModelRoute` each
   call `requireHuman(c)` — a service principal is rejected (`packages/domain/src/model-readiness.ts:139, :85, :98`;
   `principalType` is branded server context from `deriveTrustedContext`, never caller JSON —
@@ -148,6 +155,31 @@ guarantees:
   the derivation from attestation → `GeneratedRightsPolicyV1.effectiveRestrictions`.
 - **Does not touch:** the Model Lab spend fence, the Producer catalog naming invariants, the asset-governance
   worker, the front door.
+
+
+## Delta 2026-08-05 — el lane no deja rastro de saga, y eso ciega (o engaña) a cualquier señal derivada de ella
+
+Que el lane automatizado **no enrute por la saga ADR-009** es correcto y no cambia. Lo que faltaba escrito es su
+**consecuencia**: una ruta habilitada por el lane **no deja una operación de promoción**, así que cualquier señal
+derivada de la historia de la saga es ciega a ella — o peor, **la acusa en falso**.
+
+Medido el 2026-08-05, con la señal `globe_promotion_readiness_divergent` ya desplegada: reportó **3 divergencias
+y 2 eran rutas VIVAS** (`ref/still/rrss-v1` y `ref/still/openai-v2`). Su última promoción de la saga está
+`rolled_back` **y su binding está `enabled`**, porque las habilitó el lane. El remedio que la señal sugiere
+—pausar esa readiness— **las habría retirado**.
+
+**La lección es de forma, no de esta señal:** «última promoción revertida» era un **proxy** de «el rollback sigue
+en pie», y un proxy falla exactamente donde otra autoridad puede deshacerlo. Cuando **dos mecanismos** pueden
+mover el mismo estado, derivar de la historia de **uno** es incorrecto por construcción. El predicado se cierra
+sobre el **estado vigente del efecto** (`bindingEnabled !== true`), no sobre el registro del acto.
+
+Corregido en `efeonce-globe@b958a11`; la señal bajó de 3 a 1 en el ciclo siguiente.
+
+### Hard rule que deja este Delta
+
+- **SIEMPRE** compute a promotion-state signal from the **current state of the effect** (binding / circuit /
+  readiness read now), never from the history of a single mechanism. Globe has two paths that can promote a
+  route — the ADR-009 saga and this automated lane — and only the effect is common to both.
 
 ## Hard rules (NUNCA / SIEMPRE)
 
