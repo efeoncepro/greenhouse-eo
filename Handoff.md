@@ -53,6 +53,25 @@ todas las keywords salían vacías. Los mocks ejercitan el TS, nunca el SQL (gat
 cero residuo; smoke de la migración (idempotencia, DELETE rechazado, tipos DATE/TIMESTAMPTZ); 38 tests focales;
 suite completa **10102/0**; `pnpm build` prod; gates de worker; `flags:audit --strict`.
 
+**Documentación de cierre (3 subagentes, 2026-08-05).** Capa funcional + manual + invariantes + skills:
+`docs/documentation/growth/{modulo-seo-search-visibility-360,conexion-search-console}.md` (v1.1) y el manual nuevo
+[`operar-serie-search-console.md`](docs/manual-de-uso/growth/operar-serie-search-console.md) (operación por CLI/logs,
+sin UI hasta TASK-1306/1308). Las tres trampas del rollout quedaron canonizadas en
+`OPS_RELIABILITY_AGENT_INVARIANTS.md` + `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` (cuyo `Delta 2026-04-15` decía
+"por ahora" sobre la topología compartida — quedó marcado como superseded: es canónica). Los hallazgos de oficio
+(GSC no publica D-1; la posición se pondera por impresiones; striking-distance sin datos de mercado) entraron a la
+skill `seo-aeo` como **medidos**, no estimados.
+
+**Dos deudas descubiertas, ambas con dueño declarado:**
+
+1. **`CLAUDE.md` está al 100% de su presupuesto** (34.998/35.000 tokens). La invariante de la topología compartida
+   del worker **no cupo inline** y quedó sólo en el companion. Registrado como `## Delta 2026-08-05` en
+   `TASK-1160`, que es la dueña de bajar a 30.000: su Slice 5 dejó de ser higiene y pasó a ser desbloqueante.
+2. **La skill `seo-aeo` tiene su copia Claude FUERA del repo** (`~/.claude/skills/`, sin versionar) mientras la
+   Codex sí está versionada. Consecuencia real ya materializada: a la copia Claude le faltaban 2 referencias,
+   incluida `google-search-console-api-indexing.md` — justo la pertinente. Copié las faltantes; queda drift de
+   contenido en 8 archivos y el gate `skills:mirrors` **no puede verlo** porque la skill no está en su manifiesto.
+
 **Próximo paso del epic:** TASK-1300 (paralela) o TASK-1303. Nota para quien tome TASK-1306/1308: la serie ya
 tiene datos reales, así que esas UIs se pueden construir contra datos vivos, no contra fixtures.
 

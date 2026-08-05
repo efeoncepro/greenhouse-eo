@@ -1,8 +1,45 @@
 # Greenhouse EO — Cloud Infrastructure Reference
 
-> **Version:** 1.8
-> **Last updated:** 2026-07-12
+> **Version:** 1.9
+> **Last updated:** 2026-08-05
 > **Audience:** Platform engineers, DevOps, on-call operators
+
+## Delta 2026-08-05 — La topología compartida del `ops-worker` es CANÓNICA, no transitoria (TASK-1302)
+
+El rollout de TASK-1302 obligó a cerrar una ambigüedad que arrastraba el Delta 2026-04-15 ("staging y
+production no tienen workers ni instancias PostgreSQL separadas **por ahora**"). Ese "por ahora" ya no
+describe la realidad: `services/ops-worker/deploy.sh` (§Environment) lo declara textualmente —
+*"The ops-worker is a SINGLE Cloud Run service intentionally shared by both staging and production
+(same DB, same scheduler jobs, same runtime revision). **This is the canonical topology, not a
+temporary shortcut.**"*
+
+Lo que hay que leer de ahí, y que el doc omitía:
+
+- **`ENV` no parte la infraestructura.** `ENV=staging|production` sólo selecciona qué secret refs de
+  NextAuth/Resend se montan sobre el **mismo** servicio, la **misma** revisión y los **mismos** Cloud
+  Scheduler jobs. Un `ENV` equivocado no crea un ambiente aparte: intercambia credenciales en un
+  servicio vivo compartido (por eso el script exige `ENV` explícito y no tiene default silencioso).
+- **No existe un flip "sólo staging"** para nada hospedado en el `ops-worker`: flags, crons y
+  credenciales quedan efectivos para todos los ambientes a la vez. El rollout gradual real se gatea
+  **en datos** (per-org / per-perfil / opt-in persistido), no por ambiente.
+- **Una capacidad que vive sólo en el worker queda LIVE al mergear a `develop`.** El deploy se dispara
+  desde `develop` vía `.github/workflows/ops-worker-deploy.yml`; no hay promoción a `main` ni paso por
+  el release control plane. El blast radius se declara antes del merge.
+- **Tampoco hay "migrar primero en staging".** Sigue habiendo una única instancia Cloud SQL
+  (`greenhouse-pg-dev`): una migración aplicada es una migración aplicada en producción.
+- **Un runtime nuevo necesita su propia copia de la config.** Un reader que antes sólo corría en rutas
+  Vercel no hereda nada al empezar a correr en Cloud Run: flag, credenciales y `*_SECRET_REF` se
+  declaran otra vez en `deploy.sh`, y el check previo a prender es
+  `gcloud run services describe ops-worker --region us-east4 --format=json` contra la revisión activa
+  (TASK-1302 movió el reader de Google Search Console al worker sin ninguna de sus variables; misma bug
+  class que ISSUE-113, `PERPLEXITY_ENABLED` ON con su secret ref nunca cableado).
+- **El estado de pausa de un Cloud Scheduler job es declarativo.** `upsert_scheduler_job` recibe un 5º
+  argumento `paused` y lo **re-aplica en cada deploy**: un `gcloud scheduler jobs resume|pause` a mano se
+  revierte solo en el siguiente deploy, en silencio — el mismo patrón que un env var aplicado sólo con
+  `--update-env-vars` frente al `--set-env-vars` destructivo del script.
+
+Invariantes de agente derivados: `docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md`
+§`Cloud Run ops-worker`.
 
 ## Delta 2026-07-12 — `artifact-worker`: el PRIMER Cloud Run **Job** del ecosistema (TASK-1391)
 
@@ -131,6 +168,11 @@ Actualizacion a §9 Security Notes: WIF ya esta implementado (antes listado como
 ---
 
 ## Delta 2026-04-15 — Shared runtime topology formalized for portal + reactive workers
+
+> **Superseded en parte por el Delta 2026-08-05 (TASK-1302):** el "por ahora" de abajo ya no aplica. La
+> topología compartida del `ops-worker` (un servicio para staging y producción) es **canónica**, no
+> transitoria, y trae consecuencias operativas duras (no hay flip sólo-staging; worker-only queda live al
+> mergear a `develop`). Leer ese delta antes que este.
 
 - Greenhouse opera hoy sobre una **infraestructura compartida** para el runtime principal del portal y el runtime reactivo:
   - un único servicio Cloud Run `ops-worker`
@@ -677,7 +719,7 @@ La auditoría live confirmó `13` servicios serverless:
 
 | Service | Region | Identity | Exposure | Secret posture | Nota |
 | --- | --- | --- | --- | --- | --- |
-| `ops-worker` | `us-east4` | `greenhouse-portal@...` | IAM only | Secret Manager | worker moderno, OIDC desde Scheduler |
+| `ops-worker` | `us-east4` | `greenhouse-portal@...` | IAM only | Secret Manager | worker moderno, OIDC desde Scheduler. **Servicio ÚNICO compartido por staging y producción** (misma revisión, mismos scheduler jobs, misma Cloud SQL); `ENV` sólo elige secret refs de NextAuth/Resend — topología canónica, ver Delta 2026-08-05 |
 | `commercial-cost-worker` | `us-east4` | `greenhouse-portal@...` | IAM only | Secret Manager | worker moderno dedicado |
 | `ico-batch-worker` | `us-east4` | `greenhouse-portal@...` | IAM only | **mixto** | mantiene `GREENHOUSE_POSTGRES_PASSWORD` en env plano |
 | `hubspot-greenhouse-integration` | `us-central1` | default compute SA | **public** (`allUsers`) | parcial | revisar si el exposure público es realmente el deseado |

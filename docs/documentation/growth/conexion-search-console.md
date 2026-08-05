@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-06-29 por Claude (TASK-1282)
-> **Ultima actualizacion:** 2026-07-16 por Codex (frontera de Platform Properties; sin rollout)
+> **Ultima actualizacion:** 2026-08-05 por Claude (TASK-1302)
 > **Documentacion tecnica:** [GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md](../../architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md) · [TASK-1282](../../tasks/in-progress/TASK-1282-growth-search-console-multitenant-connection.md)
 
 # Conexion a Google Search Console (Growth)
@@ -32,11 +32,14 @@ Operadores internos de Growth/Account con la capability `growth.search_console.c
 
 ## Quien consume estos datos
 
+- La **serie diaria del modulo SEO** (TASK-1302): desde el 2026-08-05, un trabajo automatico recorre cada dia todas las organizaciones con la conexion activa y **guarda** lo que Google publico, para que la historia sobreviva a la ventana de 16 meses de Google. Ver [Modulo SEO — Search Visibility 360](modulo-seo-search-visibility-360.md).
 - El **AI Visibility / AEO Grader** (EPIC-020) y el motor de medicion, para cruzar la visibilidad en buscadores con la visibilidad en respuestas de IA.
 - Superficies de reporte de busqueda por cliente (a futuro).
 - Nexa (puede reportar el estado de conexion por el mismo contrato gobernado).
 
 Todos consumen el **mismo reader canonico** (`readSearchConsoleAnalytics`), no cada uno su propia logica.
+
+⚠️ **Consecuencia operativa de la serie diaria:** desde TASK-1302 esta conexion dejo de ser solo una consulta a demanda — es la fuente de una serie que se acumula todos los dias. Si el acceso a Google se revoca, esa marca **deja de acumular historia** y esos dias **no se pueden recuperar** pasada la ventana de Google. Reconectar cuanto antes deja de ser opcional. La captura no se detiene para las demas marcas: un token revocado en un cliente nunca frena la de los otros.
 
 ## Propiedades de plataformas sociales
 

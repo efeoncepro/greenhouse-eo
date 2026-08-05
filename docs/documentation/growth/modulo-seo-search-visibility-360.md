@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-08-05 por Claude (TASK-1299 + TASK-1301)
-> **Ultima actualizacion:** 2026-08-05 por Claude
+> **Ultima actualizacion:** 2026-08-05 por Claude (TASK-1302)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
 
 # Modulo SEO — Search Visibility 360 (Growth)
@@ -12,7 +12,7 @@ El modulo SEO es la mitad "buscadores clasicos" de **Search Visibility 360**: mi
 
 La idea central es que la visibilidad no es una foto: es una **serie de tiempo**. El valor del módulo no está en saber "hoy estás en la posición 7", sino en poder mostrar "hace tres meses estabas en la 15, hoy estás en la 7, y este competidor te está alcanzando". Por eso todo el modelo de datos está construido como mediciones append-only: cada captura se guarda y **nunca** se edita ni se borra.
 
-Este documento describe el estado real al 2026-08-05: las dos primeras capas están construidas (modelo de datos + modelo de acceso). Las capturas automáticas, los readers y la UI llegan en las tasks siguientes de `EPIC-022`.
+Este documento describe el estado real al 2026-08-05: están construidas las tres primeras capas (modelo de datos, modelo de acceso y la primera captura automática — la serie diaria de Google Search Console). Las capturas pagadas (rankings, site audit, backlinks) y toda la UI llegan en las tasks siguientes de `EPIC-022`.
 
 ## Que existe hoy
 
@@ -62,13 +62,38 @@ El presupuesto consumido se calcula sumando el `provider_cost` de los snapshots 
 
 > Detalle técnico: [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md §9](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) (entitlements) · chokepoint en [`src/lib/growth/seo/entitlement.ts`](../../../src/lib/growth/seo/entitlement.ts) · sanity live [`scripts/growth/_sanity-seo-entitlement.ts`](../../../scripts/growth/_sanity-seo-entitlement.ts).
 
+### 3. La serie propia de Search Console (TASK-1302)
+
+Hasta ahora, ver los datos de Google Search Console significaba **preguntarle a Google en el momento**. Eso tiene dos problemas de fondo: Google solo conserva 16 meses de historia, y no se puede comparar "hoy contra hace un año" si nadie guardó ese año. Search Visibility 360 vende serie de tiempo, así que depender de la memoria de Google era una promesa que no se podía cumplir.
+
+TASK-1302 convierte esa consulta en vivo en una **serie propia de Greenhouse**: todos los días se guarda una foto de qué consultas trajeron clics e impresiones y a qué página llegaron, y esa foto ya no se pierde cuando Google la olvida. La foto se guarda por organización (la marca), no por configuración de SEO — el dato es de la marca y sobrevive a cualquier cambio en qué keywords se están trackeando.
+
+**Cómo corre.** Una vez al día, a las 9:00 de Santiago, un trabajo programado recorre todas las organizaciones que tienen su Search Console conectada y guarda lo que Google publicó. No usa presupuesto de proveedor: los datos de Search Console son gratis y vienen de la propia propiedad del cliente.
+
+**Los cuatro comportamientos que hay que entender:**
+
+1. **Se materializa una ventana móvil de 5 días, no "ayer".** Medido en vivo: Google **no publica el día anterior** — si se le pregunta por D-1 responde sin datos, y recién D-2 trae información. Además Google consolida sus propias métricas con alrededor de 48 horas de retraso, así que volver a capturar un día reciente **corrige** los números en vez de duplicarlos. Un trabajo que apuntara solo a "ayer" habría escrito un día vacío cada vez, para siempre, reportando éxito. Re-ejecutar es seguro por diseño.
+2. **Un día sin datos no se inventa.** Si Google responde sin filas, no se escribe nada. Un día vacío y un día que falló son **estados distintos y visibles**; nunca aparecen ceros fantasma que después alguien lea como "ese día no hubo tráfico".
+3. **Si una organización falla, las demás siguen capturando.** Un token revocado de un cliente no puede frenar la captura del resto: esa serie no se puede reconstruir después, porque la ventana de Google se cierra. La organización que falla queda registrada como tal y se reintenta al día siguiente.
+4. **Sin conexión activa, la organización se salta.** No es un error silencioso: es una degradación explícita con motivo (`no conectado`, `token no sano`, `consulta falló`).
+
+**Qué se puede leer con esa serie.** Sobre estos datos vive el primer reader del módulo: las **oportunidades de "distancia corta"** (striking distance) — las consultas donde la marca ya aparece pero un poco más abajo de donde convierte. Dos cosas lo hacen distinto de una lista genérica:
+
+- **El score se expresa en clics incrementales estimados**, no en un puntaje abstracto. Y se calcula con la **curva de CTR de la propia organización** — cuánto suele hacer clic la gente en *ese* sitio en cada posición — no con una tabla de industria. Eso importa porque los AI Overviews de Google están cambiando cuánto tráfico deja cada posición, y ese efecto real ya está adentro del número.
+- **Las oportunidades marcadas como "canibalizadas"** (la misma consulta traccionando más de una página del sitio) piden una acción **distinta**: consolidar — unificar o redirigir esas páginas — no optimizarlas. No es una variante del mismo consejo; es otro trabajo.
+
+**Estado live (2026-08-05):** la serie está corriendo con datos reales. Primera marca capturada: `sc-domain:berel.com`, con 26.192 filas guardadas cubriendo 4 días y 375 consultas identificadas en distancia corta.
+
+**Todavía no hay pantalla.** La operación de esta serie es hoy por línea de comandos y logs — verificar la corrida, re-materializar un día puntual, revertir. El paso a paso está en el manual [Operar la serie diaria de Search Console](../../manual-de-uso/growth/operar-serie-search-console.md). Las pantallas llegan con TASK-1306 (overview) y TASK-1308 (oportunidades).
+
+> Detalle técnico: [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) · materializador y batch en [`src/lib/growth/seo/`](../../../src/lib/growth/seo/) · reader de oportunidades en [`src/lib/growth/seo/keyword-opportunities-reader.ts`](../../../src/lib/growth/seo/keyword-opportunities-reader.ts) · la conexión de origen es la de [Conexion a Google Search Console](conexion-search-console.md).
+
 ## Que NO existe todavia
 
-Nada de lo siguiente está construido; las tablas están vacías hasta que lleguen sus tasks:
+Nada de lo siguiente está construido; esas tablas están vacías hasta que lleguen sus tasks (la única serie que ya se está llenando es la de Search Console):
 
 | Falta | Task que lo trae |
 |---|---|
-| Materialización diaria de Search Console (`seo_gsc_daily`) + reader de keyword opportunities | TASK-1302 |
 | Captura diaria de rankings (Cloud Scheduler + ops-worker + mirror BigQuery) | TASK-1303 |
 | Site audit (queue + poll OnPage async) y snapshot semanal de backlinks | TASK-1304 |
 | Derived read SEO ↔ AEO (`readSeoAeoGap`) | TASK-1305 |
@@ -78,7 +103,9 @@ Nada de lo siguiente está construido; las tablas están vacías hasta que llegu
 | Site audit (UI) | TASK-1309 |
 | Superficie cliente + Report Artifact + quadrant 360 | TASK-1310 |
 
-Además: **ninguna organización tiene todavía el assignment `seo_v1`**. El primer alta (por ejemplo Grupo Berel) es un paso operativo manual — ver el manual [Asignar el módulo SEO a una organización](../../manual-de-uso/growth/asignar-modulo-seo-organizacion.md). Todo el runtime queda gateado por el flag `GROWTH_SEO_ENABLED` (default OFF, registrado en el Feature Flag State Ledger cuando exista consumo).
+Además: el alta del módulo `seo_v1` a una organización sigue siendo un **paso operativo manual** — ver el manual [Asignar el módulo SEO a una organización](../../manual-de-uso/growth/asignar-modulo-seo-organizacion.md).
+
+Sobre el interruptor general `GROWTH_SEO_ENABLED`: está **encendido desde el 2026-08-05**, y lo lee el trabajador de fondo (no el portal). Encenderlo habilita únicamente la captura de Search Console, que no gasta presupuesto porque el dato de Google es gratis. Las corridas que **sí** cuestan dinero (rankings, site audit, backlinks) siguen exigiendo el assignment `seo_v1` de la organización y pasan por el chokepoint de cupos y presupuesto.
 
 ## Relacion con el AI Visibility Grader (motores hermanos)
 

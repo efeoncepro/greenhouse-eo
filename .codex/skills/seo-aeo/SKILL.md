@@ -119,6 +119,7 @@ decláralo. Ramifica la recomendación según las respuestas.
 | Backlinks, digital PR, brand SERP, menciones, **Reddit/UGC** | `modules/05_OFFPAGE_AUTHORITY.md` |
 | Google Business Profile / local pack, multirregión, hreflang, localización | `modules/06_LOCAL_INTERNATIONAL.md` |
 | Medir resultados: GSC/GA4/BigQuery + **Share of Voice IA** + tráfico IA + exactitud | `modules/07_MEASUREMENT.md` |
+| **Priorizar sólo con datos propios de GSC**: striking distance 8–20, curva de CTR del propio sitio, canibalización como consolidación; y **frescura real de GSC** (no hay D-1) + posición ponderada por impresiones | `modules/02_SEO_CONTENT.md` + `modules/07_MEASUREMENT.md` (**medido** as-of 2026-08-05) |
 | Auditoría completa, migración, recuperación de penalización/caída, lanzamiento | `modules/08_PLAYBOOKS.md` |
 | Qué **NO** hacer (black-hat, spam IA, riesgos) | `ANTIPATTERNS.md` |
 | Vocabulario (AEO vs GEO vs LLMO vs SGE vs AI Mode, etc.) | `GLOSSARY.md` |
