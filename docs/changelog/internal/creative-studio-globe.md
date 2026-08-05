@@ -6,10 +6,30 @@
 
 # Changelog
 
-## 2026-08-04 (c) — La saga de promoción se observa, y la reserva pre-gasto deja de esperar 24 h
+## 2026-08-05 — TASK-1641 desplegado, y el primer ciclo real destapó un falso positivo
 
-> `code complete, rollout pendiente`: nada de esto está desplegado ni aplicado. Las tres alertas no existen
-> todavía en el proyecto. Plan honesto verificado: `6 to add, 1 to change, 0 to destroy`.
+- **Desplegado y aplicado.** Globe `main@b958a11`; API `globe-api-internal-00213-5z9` (tráfico 100%), Job
+  worker por digest `sha256:82a4f2d3e0a6…` con sus dos corridas de contrato, y `tofu apply` sobre plan
+  guardado (`6 to add, 1 to change, 0 to destroy`) con `No changes` posterior. Las 3 métricas, sus 3 alertas
+  y `GLOBE_PROMOTION_WINDOW_WARNING_SECONDS=1800` verificados contra el runtime.
+- 🔴 **La señal de readiness divergente reportó 3 casos y DOS eran rutas VIVAS.** `ref/still/rrss-v1` y
+  `ref/still/openai-v2` tienen su última promoción de la saga en `rolled_back` **y su binding `enabled`**,
+  porque las habilitó el lane automatizado de ADR-010, que no enruta por la saga y por tanto no deja
+  operación posterior que las supersede. El remedio que la señal sugiere —pausar esa readiness— las habría
+  retirado.
+- **La lección generalizable:** «última promoción revertida» era un **proxy** de «el rollback sigue en pie»,
+  y un proxy falla exactamente donde otra autoridad puede deshacerlo. Cuando **dos mecanismos** pueden mover
+  el mismo estado, derivar de la historia de uno solo es incorrecto por construcción: el predicado se cierra
+  sobre el **estado actual del efecto**, no sobre el registro del acto. Arreglado en `@b958a11` exigiendo el
+  binding vigente apagado; **medido en runtime: la señal bajó de 3 a 1**.
+- ⚠️ **Ningún test atrapó esos dos falsos positivos.** Aparecieron leyendo las primeras emisiones reales
+  contra datos de producción. Una señal nueva no está verificada hasta comprobar sus primeras líneas una por
+  una contra el estado real.
+- **La divergencia que queda es genuina:** `ref/still/reference-v1` `v5-pro`, binding `enabled=false` y
+  readiness `promoted`. Su remedio (`globe.model-readiness.route.pause`) es un acto de operador, por la
+  frontera de autoridad que el contrato declara.
+
+## 2026-08-04 (c) — La saga de promoción se observa, y la reserva pre-gasto deja de esperar 24 h
 
 - **`TASK-1641` Scopes 2 y 3, cerrados por un solo consumidor** (`efeonce-globe@17c3fef`). Las dos señales
   parten del mismo lector cross-workspace después del batch de recuperación, por la política de scan que ya

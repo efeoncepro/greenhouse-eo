@@ -13,6 +13,46 @@
 > `d3fe90e`, digest `sha256:d8295862dc12c14427e90e0bb413577802916c37ca6bf32c202680492ca7bae9`,
 > deploy `30717266572` y baseline IaC `e369ef8` sin drift.
 
+## Corte 2026-08-05 — TASK-1641 DESPLEGADO, y el primer ciclo real destapó un falso positivo
+
+**Runtime vigente:** Globe `main@b958a116a23a146b0523d04196e447ae11eb0d58`.
+
+- API `globe-api-internal`, revisión activa **`globe-api-internal-00213-5z9`**, imagen tag `b958a116a23a`,
+  tráfico **100%** (verificado con `run services describe`, no con el workflow en verde).
+- Job `globe-producer-worker`, imagen por digest
+  `sha256:82a4f2d3e0a6efce6e99cbbe91bf95d0a1a8d07128c4c2c9fc1db059ca8c25ed`. Las **dos** corridas del
+  contrato (`mode=build` run `30990497627`, `mode=deploy` run `30990750079`).
+- `tofu apply` ejecutado sobre plan guardado: **`6 to add, 1 to change, 0 to destroy`**; `tofu plan`
+  posterior en **`No changes`**. Verificado en vivo: las 3 métricas
+  (`globe_promotion_window_closing`, `globe_promotion_readiness_divergent`,
+  `globe_run_abandon_release_degraded`), sus 3 alert policies, y
+  `GLOBE_PROMOTION_WINDOW_WARNING_SECONDS=1800` en el Job.
+
+**El consumidor está vivo:** `globe_worker_completed` publica `promotionWindowClosing=0` (correcto: no hay
+promociones `activated`) y `promotionReadinessDivergent`.
+
+### 🔴 El primer ciclo reportó 3 divergencias y DOS eran rutas VIVAS
+
+`ref/still/rrss-v1` y `ref/still/openai-v2` tienen su última promoción de la saga en `rolled_back` **y su
+binding `enabled`**: las habilitó el **lane automatizado de ADR-010, que no enruta por la saga** y por tanto
+no deja operación posterior que las supersede. El remedio que la señal sugiere —pausar esa readiness— **las
+habría retirado**.
+
+La divergencia que fundó el contrato nunca fue «hubo un rollback» sino «el binding quedó apagado y la
+readiness se quedó en `promoted`». «Última promoción revertida» era un **proxy**, y un proxy falla donde otra
+autoridad puede deshacerlo. Arreglado en `efeonce-globe@b958a11` (el predicado exige el binding vigente
+apagado); **medido en runtime: la señal bajó de 3 a 1** en el ciclo de las 08:55:14Z.
+
+⚠️ **Ningún test atrapó esos dos falsos positivos** — aparecieron leyendo las primeras emisiones reales. Una
+señal nueva no está verificada hasta comprobar sus primeras líneas una por una contra el estado real.
+
+### La divergencia que queda es genuina y espera un acto humano
+
+`ref/still/reference-v1` `v5-pro`: binding `enabled=false` (revisión 3), readiness `promoted` (revisión 2),
+última promoción `promotion_3db707a6…` revertida el 2026-07-31. El remedio es
+`globe.model-readiness.route.pause` sobre esa identidad exacta — autoridad disjunta de la saga a propósito,
+así que es un acto de operador, no algo que el sistema deba cerrar solo.
+
 ## Corte 2026-08-04 (d) — TASK-1641: Scopes 2, 3, 5 y 6 cerrados en código; **rollout PENDIENTE**
 
 `efeonce-globe@17c3fef` (Scopes 2 y 3) + `@21d6ee3` (Scope 5). `pnpm check` (1.680 tests) y `pnpm build` en

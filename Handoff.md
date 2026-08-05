@@ -1,10 +1,23 @@
 # Handoff activo
 
-## TASK-1641 — Globe: los seis scopes están en código; falta el ROLLOUT (2026-08-04, corte más reciente)
+## TASK-1641 — Globe: DESPLEGADO; el primer ciclo real destapó un falso positivo (2026-08-05)
 
-**Estado:** `in-progress`, **`code complete, rollout pendiente`**. Globe `main@21d6ee3`; `pnpm check` (1.680
-tests) y `pnpm build` en verde. 🔴 **Nada desplegado, nada aplicado**: las tres alertas nuevas no existen en el
-proyecto y la liberación pre-gasto no corre en runtime.
+**Estado:** `in-progress`, **desplegado y aplicado**. Globe `main@b958a11`; API
+`globe-api-internal-00213-5z9` (tag `b958a116a23a`, tráfico 100%), Job worker por digest
+`sha256:82a4f2d3e0a6…`, `tofu apply` sobre plan guardado (`6 to add, 1 to change, 0 to destroy`) y `No
+changes` posterior. Las 3 métricas, sus 3 alertas y `GLOBE_PROMOTION_WINDOW_WARNING_SECONDS=1800`
+verificados contra el runtime, no contra el workflow en verde.
+
+🔴 **El primer ciclo reportó 3 divergencias y DOS eran rutas VIVAS.** `ref/still/rrss-v1` y
+`ref/still/openai-v2` tienen su última promoción de la saga en `rolled_back` **y su binding `enabled`**,
+porque las habilitó el lane automatizado de ADR-010, que no enruta por la saga. El remedio que la señal
+sugiere las habría retirado. «Última promoción revertida» era un **proxy** de «el rollback sigue en pie», y
+un proxy falla donde otra autoridad puede deshacerlo: cuando dos mecanismos mueven el mismo estado, hay que
+cerrar el predicado sobre el **estado actual del efecto**. Arreglado en `@b958a11`; **medido: la señal bajó
+de 3 a 1**. Ningún test lo atrapó — apareció leyendo las primeras emisiones reales.
+
+**Divergencia genuina que queda, y espera un acto humano:** `ref/still/reference-v1` `v5-pro` (binding
+`enabled=false`, readiness `promoted`). Remedio: `globe.model-readiness.route.pause` sobre esa identidad.
 
 | Scope | Estado | Evidencia |
 |---|---|---|
@@ -28,10 +41,9 @@ exacta, la señal habría acusado de divergencia justo a las dos rutas que conve
 pre-gasto (32 créditos) y hay **cero** post-gasto. El discriminador es `attempt.providerOperation`, no
 `lease.kind`. Un fallo al liberar degrada al TTL y se observa, nunca se propaga.
 
-**Siguiente paso (necesita autorización):** deploy de API + worker desde el SHA exacto —el worker en **dos**
-corridas, `mode=build` y después `mode=deploy`— y `tofu apply`; plan honesto verificado:
-**`6 to add, 1 to change, 0 to destroy`**. Verificar contra la revisión activa y el digest etiquetado, nunca
-contra el workflow en verde. Detalle:
+**Único criterio abierto:** una promoción completa end-to-end hasta `canary_passed` sin intervención
+artesanal. La plataforma ya está desplegada y las señales vivas; falta elegir una ruta y autorizar el gasto
+del canary. Detalle:
 [`TASK_1641_SESSION_HANDOFF_2026-08-04.md`](docs/operations/creative-studio/TASK_1641_SESSION_HANDOFF_2026-08-04.md).
 
 **Benchmark de producto (2026-08-05):** la comparación autenticada de Higgsfield/Magnific y la verificación de

@@ -77,6 +77,40 @@ dos familias distintas.
 > [`docs/operations/creative-studio/TASK_1641_SESSION_HANDOFF_2026-08-04.md`](../../operations/creative-studio/TASK_1641_SESSION_HANDOFF_2026-08-04.md)
 > — qué está cerrado con su evidencia, por dónde seguir y las trampas ya pagadas.
 
+## Delta 2026-08-05 (g) — DESPLEGADO, y el primer ciclo real destapó un falso positivo
+
+Globe `main@b958a11`. API `globe-api-internal-00213-5z9` (tag `b958a116a23a`, tráfico 100%), Job worker por
+digest `sha256:82a4f2d3e0a6…`, `tofu apply` sobre plan guardado (`6 to add, 1 to change, 0 to destroy`) con
+`No changes` posterior. Las 3 métricas, sus 3 alertas y `GLOBE_PROMOTION_WINDOW_WARNING_SECONDS=1800`
+verificados en vivo.
+
+### 🔴 3 divergencias reportadas, 2 eran rutas VIVAS
+
+`ref/still/rrss-v1` y `ref/still/openai-v2` tienen su última promoción de la saga en `rolled_back` **y su
+binding `enabled`**: las habilitó el **lane automatizado de ADR-010, que NO enruta por la saga** y por tanto
+no deja operación posterior que las supersede. El remedio que la señal sugiere —pausar esa readiness— **las
+habría retirado**.
+
+Es el mismo error del supersede entrando por otra puerta: **preguntarle a la HISTORIA algo que sólo el ESTADO
+ACTUAL puede responder.** La divergencia que fundó el contrato nunca fue «hubo un rollback» sino «el binding
+quedó apagado y la readiness se quedó en `promoted`»; «última promoción revertida» era un **proxy** de «el
+rollback sigue en pie», y un proxy falla exactamente donde otra autoridad puede deshacerlo. Cuando dos
+mecanismos pueden mover el mismo estado, derivar de la historia de uno solo es incorrecto por construcción.
+
+Arreglado en `efeonce-globe@b958a11`: el predicado exige el **binding vigente apagado**, resuelto por
+`LEFT JOIN LATERAL` en el mismo `SELECT`. **Medido en runtime: la señal bajó de 3 a 1** en el ciclo de las
+08:55:14Z. Probado en rojo con el caso real como fixture.
+
+⚠️ **Ningún test atrapó esos dos falsos positivos.** Aparecieron leyendo las primeras emisiones reales contra
+datos de producción. Una señal nueva no está verificada hasta comprobar sus primeras líneas **una por una**
+contra el estado real.
+
+### La divergencia que queda es genuina
+
+`ref/still/reference-v1` `v5-pro`: binding `enabled=false` rev 3, readiness `promoted` rev 2, promoción
+`promotion_3db707a6…` revertida el 2026-07-31. Su remedio es `globe.model-readiness.route.pause` sobre la
+identidad exacta — acto de operador, autoridad disjunta de la saga a propósito.
+
 ## Delta 2026-08-04 (f) — Scope 6: runbook publicado
 
 `docs/operations/creative-studio/GLOBE_ROUTE_PROMOTION_RUNBOOK_V1.md`, indexado en el README del
@@ -570,29 +604,26 @@ sigue siendo el recovery.
       exigen referencias, sin escribir la secuencia a mano. — `efeonce-globe@1767138`, verificado en
       dry-run contra el runtime sobre 4 rutas **y con GASTO REAL** sobre `ref/motion/reference-v1`
       (run `6a6112f4…`, MP4 661.995 B, 12 = 12 créditos). Ver Delta 2026-08-04 (b).
-- [x] Una promoción `activated` próxima a expirar emite señal observable, con alerta. —
-      `efeonce-globe@17c3fef`: `globe_promotion_window_closing` (WARNING) a 30 min del deadline, complemento
-      estricto de `stalled`. **Código y IaC listos; la alerta NO está aplicada** (`tofu plan`
-      `6 to add / 0 to destroy`, sin aplicar).
+- [x] Una promoción `activated` próxima a expirar emite señal observable, con alerta. — **APLICADA y viva**:
+      métrica `globe_promotion_window_closing` + alert policy WARNING en `efeonce-globe`, el worker publica
+      `promotionWindowClosing` en `globe_worker_completed`.
 - [x] Los agregados dependientes de la saga están declarados en un array enumerable, con test en ambas
       direcciones; un `observable` sin señal se rechaza. — `efeonce-globe@4a0a18b`, probado en rojo.
-- [x] Un rollback deja readiness convergido o su divergencia contada y observable. —
-      `efeonce-globe@17c3fef`: `globe_promotion_readiness_divergent` (ERROR), computada sobre el estado leído
-      ahora y con supersede por identidad exacta. **Pendiente de apply** para pasar de «computable» a
-      «observada» en el runtime.
+- [x] Un rollback deja readiness convergido o su divergencia contada y observable. — **OBSERVADA en
+      runtime**: `globe_promotion_readiness_divergent` (ERROR) reporta hoy exactamente una divergencia real
+      (`ref/still/reference-v1` v5-pro), tras corregir el predicado con el binding vigente (`@b958a11`).
 - [x] `canary-confirm` nunca responde `internal_error`: cada causa de no-resolución tiene razón nombrada, y un
       fallo deja la saga en un estado desde el que se puede reintentar. — `efeonce-globe@38c528d`, sellado en
       vivo por Omni y Veo.
 - [x] Una reserva de un run muerto **antes del gasto** converge por el camino terminal, sin esperar el TTL de 24 h;
-      la postura `observable` se conserva para el caso post-gasto. — `efeonce-globe@21d6ee3`, con la medición
-      contra `globe-pg` que muestra que el 100 % del crédito hoy inmovilizado es de esa rama. **Code complete,
-      rollout pendiente.**
+      la postura `observable` se conserva para el caso post-gasto. — `efeonce-globe@21d6ee3`, desplegado; la
+      medición contra `globe-pg` mostró que el 100 % del crédito inmovilizado era de esa rama. Su señal de
+      degradación (`globe_run_abandon_release_degraded`) está aplicada y en 0.
 - [x] Runbook publicado con el canary como paso explícito. —
       `docs/operations/creative-studio/GLOBE_ROUTE_PROMOTION_RUNBOOK_V1.md`.
-- [ ] Una promoción completa end-to-end llega a `canary_passed` sin intervención artesanal. — **requiere
-      rollout**: desplegar API + worker desde el SHA exacto (dos corridas del worker: `build` y después
-      `deploy`), aplicar `tofu` y ejercitar una promoción real. Es el único criterio que no se puede cerrar sin
-      autorización del operador.
+- [ ] Una promoción completa end-to-end llega a `canary_passed` sin intervención artesanal. — **el único
+      abierto.** La plataforma ya está desplegada y las señales vivas; falta ejercitar una promoción real,
+      que implica elegir una ruta y autorizar el gasto del canary.
 
 ## Verification
 

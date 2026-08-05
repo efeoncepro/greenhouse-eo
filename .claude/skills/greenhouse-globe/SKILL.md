@@ -680,18 +680,35 @@ en `apps/studio-web/src/promotion-observation.ts`), junto con la señal de venta
 lector** cross-workspace y separarlos duplicaría el escaneo. Usa la política de scan que ya existía
 (`app.promotion_recovery_scan`, migración `0028`) — **sin migración nueva**.
 
-### 🔴 Una señal sobre historia append-only necesita su predicado de VIGENCIA, o su primer disparo es falso
+### 🔴 Una señal sobre historia append-only necesita su predicado de VIGENCIA — y hacen falta DOS
 
-La versión ingenua del consumidor —leer las `rolled_back` y reportar las que tienen readiness `promoted`—
-**habría acusado de divergencia justo a las dos rutas que sí convergieron**. Medido: de las 10 promociones
-revertidas, `ref/motion/reference-v1` y `ref/video/frames-v1` pertenecen a identidades que **después se
-volvieron a promover y quedaron selladas**; su readiness dice `promoted` **por esa promoción posterior, que es
-legítima**. Y el remedio que la señal sugiere —pausar esa readiness— **habría retirado dos rutas vivas**.
+El predicado tuvo que aprenderse **dos veces**, y la segunda ya con la señal desplegada. Es el mismo error
+entrando por dos puertas: **preguntarle a la HISTORIA algo que sólo el ESTADO ACTUAL puede responder.**
 
-Por eso el lector aplica supersede por identidad exacta (`NOT EXISTS` de una promoción posterior sobre el
-mismo `routeId + modelVersion`, con comparación de tupla para desempatar): **una identidad produce como máximo
-una fila**, y si la posterior también terminó revertida, ella es la que reporta. **NUNCA** derives una señal
-de un agregado append-only sin preguntarte qué fila la supersede.
+1. **Supersede por promoción posterior** (razonado antes de shipear). La versión ingenua —leer las
+   `rolled_back` y reportar las que tienen readiness `promoted`— habría acusado a `ref/motion/reference-v1` y
+   `ref/video/frames-v1`, que se **re-promovieron y quedaron selladas**: su readiness dice `promoted` por esa
+   promoción posterior, que es legítima. `NOT EXISTS` de una promoción posterior sobre el mismo
+   `routeId + modelVersion`, con comparación de tupla para desempatar.
+2. 🔴 **Binding vigente apagado** (descubierto **en producción, 2026-08-05, con la señal ya viva**). En su
+   primer ciclo reportó **3 divergencias y 2 eran rutas VIVAS**: `ref/still/rrss-v1` y `ref/still/openai-v2`
+   tienen su última promoción de la saga en `rolled_back` **y su binding `enabled`**, porque las habilitó el
+   **lane automatizado de ADR-010, que NO enruta por la saga** y por tanto no deja ninguna operación posterior
+   que las supersede. El remedio que la señal sugiere las **habría retirado**.
+
+**La lección generalizable:** la divergencia que fundó el contrato nunca fue *«hubo un rollback»* — fue *«el
+binding quedó apagado y la readiness se quedó en `promoted`»*. «Última promoción revertida» era un **PROXY**
+de «el rollback sigue en pie», y **un proxy falla exactamente donde otra autoridad puede deshacerlo**. Cuando
+un sistema tiene **más de un mecanismo** que puede mover el mismo estado (acá: saga ADR-009 y lane ADR-010),
+derivar de la historia de UNO de ellos es incorrecto por construcción. **SIEMPRE** cierra el predicado sobre
+el **estado actual del efecto**, no sobre el registro del acto.
+
+Tras el arreglo (`efeonce-globe@b958a11`) la señal bajó de **3 a 1** en el ciclo siguiente, y la que queda
+—`ref/still/reference-v1` v5-pro, binding `enabled=false`, readiness `promoted`— es genuina.
+
+⚠️ Y el corolario de método: **los dos falsos positivos no los atrapó ningún test.** Aparecieron mirando el
+primer ciclo real de la señal contra datos de producción. Una señal nueva no está verificada hasta que se
+**leen sus primeras emisiones y se comprueba una por una contra el estado real**.
 
 ### La métrica de conteo no se elige sólo por el aligner
 
