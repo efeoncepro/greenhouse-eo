@@ -121,6 +121,9 @@ initial audited baseline now also includes:
 - [`NANO_BANANA_PRO_IMAGE_ROUTE_CARD_V1.json`](model-fleet/routes/NANO_BANANA_PRO_IMAGE_ROUTE_CARD_V1.json) for
   the Vertex `gemini-3-pro-image` `preview` route in `global`; the reader reports it available, while a missing circuit
   readback remains an explicit operational blocker.
+- [`KLING_3_VIDEO_ROUTE_CARD_V1.json`](model-fleet/routes/KLING_3_VIDEO_ROUTE_CARD_V1.json) for the separate Fal
+  Kling 3.0 Pro, Standard and native 4K text/image-to-video candidate surfaces. Globe has no Kling route, adapter or
+  governed binding; Kling O3 remains a separate family and is not aliased to V3.
 
 The cards preserve the distinction between sealed governed evidence and live availability. FLUX 3 and the deferred
 variants remain gated; Omni and Veo have sealed canaries but still require live-reader and Producer-input checks before
@@ -207,6 +210,7 @@ promotion. It creates these Greenhouse-owned artifacts:
 - `docs/architecture/creative-studio/model-fleet/routes/SEEDREAM_5_PRO_IMAGE_ROUTE_CARD_V1.json`;
 - `docs/architecture/creative-studio/model-fleet/routes/NANO_BANANA_2_IMAGE_ROUTE_CARD_V1.json`;
 - `docs/architecture/creative-studio/model-fleet/routes/NANO_BANANA_PRO_IMAGE_ROUTE_CARD_V1.json`;
+- `docs/architecture/creative-studio/model-fleet/routes/KLING_3_VIDEO_ROUTE_CARD_V1.json`;
 - `pnpm model-fleet:validate` and the mirrored-skill manifest entry;
 - router pointers in `AGENTS.md`, `CLAUDE.md` and `agent-context-router.json`.
 

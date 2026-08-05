@@ -170,6 +170,11 @@ y el reader la devuelve `gated`; no debe promocionarse por herencia de Seedream 
 superficies diferidas la edición de OpenAI/Nano Banana y Seedream 5 Lite. Nano Banana Pro requiere reconciliar un lookup
 de circuito `not_found` antes de nuevo gasto. No hubo cambios de runtime, secrets, bindings, rates ni deploy.
 
+La auditoría de Kling 3.0 añadió [`KLING_3_VIDEO_ROUTE_CARD_V1.json`](docs/architecture/creative-studio/model-fleet/routes/KLING_3_VIDEO_ROUTE_CARD_V1.json)
+y enlazó la evidencia con `TASK-1617`. Fal tiene superficies candidatas Pro, Standard y 4K para text/image-to-video;
+Globe no tiene routeId, adapter ni binding Kling y la card permanece `gated`. La API nativa de Kling y Kling O3 quedan
+separadas de la vía Fal/V3. No hubo submit, gasto, cambio de runtime, secret, rate, binding ni promoción.
+
 ## EPIC-039 — Next.js 16.3 + TypeScript 7 Toolchain Adoption (2026-08-04)
 
 Estado: **to-do / diseño**. Se registraron el epic y sus dos tasks hijas:

@@ -15,9 +15,9 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `Diseño documental; Fal activo, Globe no integrado`
+- Status real: `Card documental creada 2026-08-05; Fal tiene superficies V3, Globe no integrado`
 - Domain: `platform|producer|video`
-- Blocked by: `TASK-1553`, `TASK-1573`, `TASK-1578`, `TASK-1535`, `TASK-1614`; coordinar `TASK-1616`
+- Blocked by: `TASK-1553`, `TASK-1573`, `TASK-1578`, `TASK-1535`; coordinar `TASK-1616` (`TASK-1614` completada)
 - Branch: `Greenhouse develop; Globe main; sin worktrees`
 
 ## Summary
@@ -35,6 +35,7 @@ Registrar Kling 3 y O3 como rutas gobernadas de video, cubriendo texto/imagen, r
 - `docs/architecture/creative-studio/EFEONCE_GLOBE_FAL_CHALLENGER_MODELS_PRODUCER_INTEGRATION_PROPOSAL_V1.md`
 - `docs/architecture/creative-studio/EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md`
 - `docs/architecture/creative-studio/EFEONCE_GLOBE_ROUTE_BASED_MODEL_RESOLUTION_DECISION_V1.md`
+- `docs/architecture/creative-studio/model-fleet/routes/KLING_3_VIDEO_ROUTE_CARD_V1.json`
 - `docs/operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md`
 - `docs/tasks/in-progress/TASK-1553-globe-extensible-multi-model-provider-catalog.md`
 - `docs/tasks/to-do/TASK-1573-globe-video-edit-capability-and-governed-continuation.md`
@@ -78,6 +79,7 @@ Wireframe y flow son obligatorios al tomar la task. El Producer debe operar star
 ### Slice 0 — Schema y decisión
 
 - Consultar catálogo, OpenAPI y pricing autenticados; fijar capabilities y límites reales.
+- Usar la card de Kling 3.0 como mapa de evidencia: separar Pro, Standard y 4K por modalidad y mantener Kling O3 en una card/familia independiente.
 - Proponer ADR si se amplía el contrato de audio, referencias o video-edit.
 
 ### Slice 1 — Routing y catálogo
@@ -102,6 +104,7 @@ Wireframe y flow son obligatorios al tomar la task. El Producer debe operar star
 - [ ] Audio solo se declara cuando el output real contiene audio y pasa governance.
 - [ ] Multi-shot, elementos agrupados y referencias O3 se materializan sin aplanamiento semántico.
 - [ ] Video-to-video edit/reference nunca resuelve al endpoint genérico text-to-video.
+- [ ] La card de Kling 3.0 permanece `gated` hasta demostrar catálogo, binding, rates, rights, evaluación, canary y readback en Globe.
 - [ ] `voice_id` permanece privado dentro del binding/adapter y no aparece en el payload cliente.
 - [ ] Edición, referencias y motion control validan antes de reservar créditos.
 - [ ] Existe evidencia durable de evaluación, MIME/hash, lineage, settlement y recovery sin doble cobro.
