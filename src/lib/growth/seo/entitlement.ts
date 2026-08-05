@@ -1,0 +1,332 @@
+import 'server-only'
+
+/**
+ * TASK-1301 Slice 2 — Chokepoint de entitlement/allowance/budget del módulo SEO per-org.
+ *
+ * El SEO es un servicio con entitlement POR ORGANIZACIÓN (módulo `seo_v1` en
+ * `greenhouse_client_portal.module_assignments`), NO un viewCode role-wide (lección
+ * TASK-1248, espejo del AEO `resolveAeoEntitlement`). Este resolver responde, para una
+ * org: tier (`contracted` | `trial` | `pilot`), allowance de site-audits del período
+ * (runs/mes con reset mensual) y budget de gasto provider del período (USD/mes).
+ *
+ * `enforceSeoRunEntitlement` es el ÚNICO gate de costo DataForSEO (riesgo #1 del módulo,
+ * EPIC-022 §13.1): TODO write provider-facing (rank capture, site audit, backlinks) pasa
+ * por acá antes de gastar; ningún cron/command/consumer lo reimplementa inline. Es
+ * consumer-agnóstico por diseño (mandato parity+MCP 2026-08-05): el MISMO gate sirve
+ * UI, Nexa, lane `app` y lane `ecosystem`/MCP — el plano fino de capability (`can()`)
+ * vive en el consumer; acá solo entitlement → ventana → allowance → budget.
+ *
+ * Fuentes de datos:
+ * - Assignment/tier: `module_assignments` (`metadata_json.seo_tier`; override de cupo
+ *   pilot vía `metadata_json.seo_audit_runs_per_month`).
+ * - Allowance usada: COUNT de `seo_site_audit_runs` del mes (JOIN `seo_targets` por org).
+ * - Budget usado: SUM(`provider_cost`) del mes de las 3 tablas snapshot (TASK-1299).
+ *   HOOK TASK-1300: cuando exista el contador dedicado `seo_provider_spend_daily`, este
+ *   resolver cambia de fuente a ese ledger (misma interfaz; solo cambia el SQL).
+ */
+
+import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+
+export const SEO_MODULE_KEY = 'seo_v1' as const
+
+export type SeoTier = 'contracted' | 'trial' | 'pilot'
+
+export type SeoBlockedReason =
+  | 'no_entitlement'
+  | 'expired'
+  | 'quota_exhausted'
+  | 'budget_exhausted'
+
+export interface SeoAllowanceConfig {
+  contractedAuditRunsPerMonth: number
+  trialAuditRunsPerMonth: number
+  pilotAuditRunsPerMonth: number
+  contractedMonthlyBudgetUsd: number
+  trialMonthlyBudgetUsd: number
+  pilotMonthlyBudgetUsd: number
+}
+
+export interface SeoEntitlement {
+  organizationId: string
+  /** ¿La org tiene el módulo SEO asignado y vigente? */
+  hasModule: boolean
+  tier: SeoTier | null
+  assignmentId: string | null
+  /** status del assignment (`active`/`pilot`). */
+  status: string | null
+  /** Cupo de site-audits del período según el tier. */
+  allowanceCap: number
+  /** Site-audits consumidos este mes por la org. */
+  allowanceUsed: number
+  /** Cupo restante (>= 0). */
+  allowanceRemaining: number
+  /** Budget provider del período según el tier (USD). */
+  budgetCapUsd: number
+  /** Gasto provider del mes (USD, SUM de provider_cost de los snapshots). */
+  budgetUsedUsd: number
+  /** Budget restante (>= 0, USD). */
+  budgetRemainingUsd: number
+  /** Inicio del próximo período (reset mensual), ISO. */
+  periodResetAt: string
+  /** Razón de bloqueo si no puede correr ahora; null = puede correr. */
+  blockedReason: SeoBlockedReason | null
+}
+
+export interface SeoRunGate {
+  allowed: boolean
+  tier: SeoTier | null
+  allowanceRemaining: number
+  budgetRemainingUsd: number
+  blockedReason: SeoBlockedReason | null
+}
+
+const VALID_TIERS: ReadonlySet<string> = new Set<SeoTier>(['contracted', 'trial', 'pilot'])
+
+const toPositiveFloat = (raw: string | undefined, fallback: number): number => {
+  const parsed = raw === undefined ? Number.NaN : Number.parseFloat(raw)
+
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback
+}
+
+const toPositiveInt = (raw: string | undefined, fallback: number): number => {
+  const parsed = raw === undefined ? Number.NaN : Number.parseInt(raw, 10)
+
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback
+}
+
+/**
+ * Config de allowance/budget por tier. Son knobs de configuración con default (NO
+ * feature flags `*_ENABLED`); ajustables por env sin deploy de código.
+ */
+export const resolveSeoAllowanceConfig = (env: NodeJS.ProcessEnv = process.env): SeoAllowanceConfig => ({
+  contractedAuditRunsPerMonth: toPositiveInt(env.GROWTH_SEO_CONTRACTED_AUDIT_RUNS_PER_MONTH, 8),
+  trialAuditRunsPerMonth: toPositiveInt(env.GROWTH_SEO_TRIAL_AUDIT_RUNS_PER_MONTH, 1),
+  pilotAuditRunsPerMonth: toPositiveInt(env.GROWTH_SEO_PILOT_AUDIT_RUNS_PER_MONTH, 2),
+  contractedMonthlyBudgetUsd: toPositiveFloat(env.GROWTH_SEO_CONTRACTED_MONTHLY_BUDGET_USD, 50),
+  trialMonthlyBudgetUsd: toPositiveFloat(env.GROWTH_SEO_TRIAL_MONTHLY_BUDGET_USD, 2),
+  pilotMonthlyBudgetUsd: toPositiveFloat(env.GROWTH_SEO_PILOT_MONTHLY_BUDGET_USD, 10)
+})
+
+interface AssignmentRow extends Record<string, unknown> {
+  assignment_id: string
+  status: string
+  metadata_json: Record<string, unknown> | null
+  expires_at: string | null
+}
+
+interface UsageRow extends Record<string, unknown> {
+  audit_runs_used: number
+  spend_used_usd: number
+  period_reset_at: string
+}
+
+const resolveTier = (status: string, metadata: Record<string, unknown> | null): SeoTier => {
+  const declared = typeof metadata?.seo_tier === 'string' ? metadata.seo_tier : null
+
+  if (declared && VALID_TIERS.has(declared)) {
+    return declared as SeoTier
+  }
+
+  // Fallback conservador (espejo AEO): pilot por status; en otro caso el tier de menor cupo.
+  return status === 'pilot' ? 'pilot' : 'trial'
+}
+
+const resolveAuditCap = (
+  tier: SeoTier,
+  metadata: Record<string, unknown> | null,
+  config: SeoAllowanceConfig
+): number => {
+  if (tier === 'contracted') {
+    return config.contractedAuditRunsPerMonth
+  }
+
+  if (tier === 'pilot') {
+    const override = metadata?.seo_audit_runs_per_month
+
+    if (typeof override === 'number' && Number.isFinite(override) && override >= 0) {
+      return Math.floor(override)
+    }
+
+    return config.pilotAuditRunsPerMonth
+  }
+
+  return config.trialAuditRunsPerMonth
+}
+
+const resolveBudgetCap = (tier: SeoTier, config: SeoAllowanceConfig): number => {
+  if (tier === 'contracted') {
+    return config.contractedMonthlyBudgetUsd
+  }
+
+  if (tier === 'pilot') {
+    return config.pilotMonthlyBudgetUsd
+  }
+
+  return config.trialMonthlyBudgetUsd
+}
+
+/**
+ * Resuelve el entitlement SEO de una org. Read-only: no incurre costo ni muta nada.
+ */
+export const resolveSeoEntitlement = async (
+  organizationId: string,
+  env: NodeJS.ProcessEnv = process.env
+): Promise<SeoEntitlement> => {
+  const config = resolveSeoAllowanceConfig(env)
+
+  // Uso del período (allowance + spend) siempre disponible, incluso sin entitlement.
+  // El spend suma provider_cost de las 3 tablas snapshot de TASK-1299 (JOIN por target→org).
+  const usageRows = await runGreenhousePostgresQuery<UsageRow>(
+    `SELECT
+       (SELECT COUNT(*)
+          FROM greenhouse_growth.seo_site_audit_runs r
+          JOIN greenhouse_growth.seo_targets t ON t.seo_target_id = r.seo_target_id
+         WHERE t.organization_id = $1
+           AND r.created_at >= date_trunc('month', CURRENT_DATE))::int AS audit_runs_used,
+       (COALESCE((SELECT SUM(s.provider_cost)
+          FROM greenhouse_growth.seo_rank_snapshots s
+          JOIN greenhouse_growth.seo_targets t ON t.seo_target_id = s.seo_target_id
+         WHERE t.organization_id = $1
+           AND s.captured_at >= date_trunc('month', CURRENT_DATE)), 0)
+        + COALESCE((SELECT SUM(r.provider_cost)
+          FROM greenhouse_growth.seo_site_audit_runs r
+          JOIN greenhouse_growth.seo_targets t ON t.seo_target_id = r.seo_target_id
+         WHERE t.organization_id = $1
+           AND r.created_at >= date_trunc('month', CURRENT_DATE)), 0)
+        + COALESCE((SELECT SUM(b.provider_cost)
+          FROM greenhouse_growth.seo_backlink_snapshots b
+          JOIN greenhouse_growth.seo_targets t ON t.seo_target_id = b.seo_target_id
+         WHERE t.organization_id = $1
+           AND b.captured_at >= date_trunc('month', CURRENT_DATE)), 0))::float8 AS spend_used_usd,
+       (date_trunc('month', CURRENT_DATE) + INTERVAL '1 month')::timestamptz AS period_reset_at`,
+    [organizationId]
+  )
+
+  const periodResetAt = usageRows[0]?.period_reset_at
+    ? new Date(usageRows[0].period_reset_at).toISOString()
+    : new Date().toISOString()
+
+  const auditRunsUsed = usageRows[0]?.audit_runs_used ?? 0
+  const spendUsedUsd = usageRows[0]?.spend_used_usd ?? 0
+
+  // Assignment vigente por effective_to/status; la EXPIRACIÓN se clasifica aparte
+  // (blockedReason 'expired', distinto de 'no_entitlement') — por eso NO se filtra acá.
+  const assignmentRows = await runGreenhousePostgresQuery<AssignmentRow>(
+    `SELECT assignment_id, status, metadata_json, expires_at
+       FROM greenhouse_client_portal.module_assignments
+      WHERE organization_id = $1
+        AND module_key = $2
+        AND effective_to IS NULL
+        AND status IN ('active', 'pilot')
+      ORDER BY created_at DESC
+      LIMIT 1`,
+    [organizationId, SEO_MODULE_KEY]
+  )
+
+  const assignment = assignmentRows[0]
+
+  if (!assignment) {
+    return {
+      organizationId,
+      hasModule: false,
+      tier: null,
+      assignmentId: null,
+      status: null,
+      allowanceCap: 0,
+      allowanceUsed: auditRunsUsed,
+      allowanceRemaining: 0,
+      budgetCapUsd: 0,
+      budgetUsedUsd: spendUsedUsd,
+      budgetRemainingUsd: 0,
+      periodResetAt,
+      blockedReason: 'no_entitlement'
+    }
+  }
+
+  const tier = resolveTier(assignment.status, assignment.metadata_json)
+  const allowanceCap = resolveAuditCap(tier, assignment.metadata_json, config)
+  const allowanceRemaining = Math.max(0, allowanceCap - auditRunsUsed)
+  const budgetCapUsd = resolveBudgetCap(tier, config)
+  const budgetRemainingUsd = Math.max(0, budgetCapUsd - spendUsedUsd)
+
+  const expired =
+    assignment.expires_at !== null && new Date(assignment.expires_at).getTime() <= Date.now()
+
+  let blockedReason: SeoBlockedReason | null = null
+
+  if (expired) {
+    blockedReason = 'expired'
+  } else if (allowanceRemaining <= 0) {
+    blockedReason = 'quota_exhausted'
+  } else if (budgetRemainingUsd <= 0) {
+    blockedReason = 'budget_exhausted'
+  }
+
+  return {
+    organizationId,
+    hasModule: true,
+    tier,
+    assignmentId: assignment.assignment_id,
+    status: assignment.status,
+    allowanceCap,
+    allowanceUsed: auditRunsUsed,
+    allowanceRemaining,
+    budgetCapUsd,
+    budgetUsedUsd: spendUsedUsd,
+    budgetRemainingUsd,
+    periodResetAt,
+    blockedReason
+  }
+}
+
+/**
+ * Chokepoint ÚNICO del gate de costo SEO. Todo write provider-facing (rank capture,
+ * site audit, backlinks) DEBE invocarlo antes de gastar; ningún consumer lo
+ * reimplementa inline. Si `estimatedCostUsd` viene, además valida que el run estimado
+ * quepa en el budget restante del período (no deja pasar un run que exceda el cap).
+ *
+ * El plano fino de capability (`can(subject, 'growth.seo.*', ...)`) es responsabilidad
+ * del consumer (route/command); este gate es deliberadamente subject-agnóstico para
+ * servir idéntico a UI, Nexa, lane app y lane ecosystem/MCP (Full API Parity).
+ */
+export const enforceSeoRunEntitlement = async (
+  organizationId: string,
+  options: { estimatedCostUsd?: number } = {},
+  env: NodeJS.ProcessEnv = process.env
+): Promise<SeoRunGate> => {
+  const entitlement = await resolveSeoEntitlement(organizationId, env)
+
+  if (entitlement.blockedReason) {
+    return {
+      allowed: false,
+      tier: entitlement.tier,
+      allowanceRemaining: entitlement.allowanceRemaining,
+      budgetRemainingUsd: entitlement.budgetRemainingUsd,
+      blockedReason: entitlement.blockedReason
+    }
+  }
+
+  const estimated = options.estimatedCostUsd
+
+  if (
+    typeof estimated === 'number' &&
+    Number.isFinite(estimated) &&
+    estimated > entitlement.budgetRemainingUsd
+  ) {
+    return {
+      allowed: false,
+      tier: entitlement.tier,
+      allowanceRemaining: entitlement.allowanceRemaining,
+      budgetRemainingUsd: entitlement.budgetRemainingUsd,
+      blockedReason: 'budget_exhausted'
+    }
+  }
+
+  return {
+    allowed: true,
+    tier: entitlement.tier,
+    allowanceRemaining: entitlement.allowanceRemaining,
+    budgetRemainingUsd: entitlement.budgetRemainingUsd,
+    blockedReason: null
+  }
+}

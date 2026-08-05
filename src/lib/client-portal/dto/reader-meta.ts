@@ -42,6 +42,7 @@ export type ClientPortalDataSource =
   | 'assigned_team.assignments'
   | 'identity.organizations'
   | 'growth.ai_visibility'
+  | 'growth.seo'
 
 /**
  * Closed enumeration of producer domains that may *own* a BFF curated
