@@ -200,3 +200,13 @@ Re-priorización: `TASK-1301`, `TASK-1302` y `TASK-1645` suben a **P1**; `TASK-1
 con el primer reader (GSC). Los readers posteriores (1303/1305) registran su MCP tool **en su propio PR**
 (parity-at-birth incremental). Ola B re-ordenada: `1301 → 1302 → 1645 (lane+tools V1) → 1300 → 1303 (+tool rank)
 → UI 1306/1307`. La UI no bloquea ninguna entrega MCP.
+
+## Delta 2026-08-05 (d) — Sinergia SEO↔AEO adelantada al camino crítico (directiva del operador)
+
+El operador exige que las sinergias directas con el AEO **ocurran** — no son un nice-to-have de Ola C.
+Con `seo_gsc_daily` materializándose en vivo (TASK-1302 rollout 2026-08-05) y `grader_scores` en producción,
+el cruce ya es computable HOY. `TASK-1305` (`readSeoAeoGap` + matriz quadrant 360) sube P3→P1, se desbloquea
+de TASK-1303 (V1 = GSC medido × grader; rank snapshots enriquecen después) y entra a la Ola B:
+**1301 → 1302 → 1305 → 1645**, para que el tool MCP `get_seo_visibility_360` nazca con el cruce real.
+Las sinergias posteriores (1311 citation attribution URL, 1313 unified read, 1314 topical authority,
+1315-17 E-E-A-T sobre probes del grader) siguen su secuencia, pero el quadrant 360 no espera.

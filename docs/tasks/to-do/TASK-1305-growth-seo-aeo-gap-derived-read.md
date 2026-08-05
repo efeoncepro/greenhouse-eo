@@ -1,5 +1,21 @@
 # TASK-1305 — Growth SEO: SEO↔AEO Gap Derived Read (report layer 360)
 
+## Delta 2026-08-05 — La sinergia SEO↔AEO entra al camino crítico MCP-first (directiva del operador)
+
+Directiva del operador: las sinergias directas con el AEO **deben ocurrir**, no quedar en Ola C. Dos hechos
+las desbloquean HOY: (1) `seo_gsc_daily` se materializa en vivo (TASK-1302 rolled out 2026-08-05) — posición
+real medida por query, verdad de primera parte; (2) `grader_scores` está en producción hace meses. Cambios:
+
+- **P3 → P1** y **desbloqueada de TASK-1303**: el V1 de `readSeoAeoGap` cruza `seo_gsc_daily` (lente SEO
+  medida) × `grader_scores` (lente AEO) por `organization_id`. Cuando TASK-1303 aterrice, `seo_rank_snapshots`
+  se suma como lente de mercado (estimada) SIN cambiar el contrato — GSC medido y DataForSEO estimado son
+  lentes complementarias, nunca promediadas (§3 del doc maestro).
+- **Secuencia nueva (Ola B): 1301 → 1302 → 1305 → 1645** — el tool MCP `get_seo_visibility_360` (TASK-1645)
+  debe NACER con el cruce AEO real, no con la degradación honesta como estado permanente.
+- Todo el boundary duro de esta spec sigue intacto: cruce por `organization_id` en memoria, cero FK/merge
+  cross-motor, degradación honesta (`no_aeo_data`/`no_seo_data`), nunca ceros fantasma ni promedios.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -7,7 +23,7 @@
 ## Status
 
 - Lifecycle: `to-do`
-- Priority: `P3`
+- Priority: `P1`
 - Impact: `Medio`
 - Effort: `Medio`
 - Type: `implementation`
@@ -22,7 +38,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|ai|data`
-- Blocked by: `TASK-1303`
+- Blocked by: `none` (V1 sobre seo_gsc_daily live + grader_scores en prod; TASK-1303 solo ENRIQUECE)
 - Branch: `task/TASK-1305-growth-seo-aeo-gap-derived-read`
 - Legacy ID: `none`
 - GitHub Issue: `none`

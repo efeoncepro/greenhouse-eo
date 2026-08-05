@@ -92,7 +92,7 @@ Reglas obligatorias:
 - `TASK-1301` — capabilities `growth.seo.*` + entitlement per-org + chokepoint (el lane reusa ese gate).
 - `TASK-1302` — `readKeywordOpportunities` (primer reader expuesto; quick win GSC).
 - `TASK-1303` — `readRankEvolution` / `readRankSnapshotLatest`.
-- `TASK-1305` — `readSeoAeoGap` (opcional en V1 del lane; si no está, el tool 360 degrada honesto a solo-SEO).
+- `TASK-1305` — `readSeoAeoGap` (re-secuenciada a Ola B ANTES de esta task, delta 2026-08-05: el tool `get_seo_visibility_360` debe NACER con el cruce AEO real; la degradación honesta a solo-SEO queda solo como fallback transitorio si 1305 se atrasa).
 
 ### Blocks / Impacts
 
