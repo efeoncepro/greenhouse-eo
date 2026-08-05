@@ -14,7 +14,7 @@
     ]
   },
   "scripts": {
-    "local:check": "pnpm nul-byte-gate && pnpm lint && NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit",
+    "local:check": "pnpm nul-byte-gate && pnpm skills:mirrors && pnpm lint && NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit",
     "typecheck": "NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit",
     "local:check:full": "pnpm local:check && pnpm test && pnpm build",
     "local:check:ui": "pnpm local:check && pnpm design:lint && pnpm design-contract:lint && pnpm ui:code-lint --changed && pnpm build",

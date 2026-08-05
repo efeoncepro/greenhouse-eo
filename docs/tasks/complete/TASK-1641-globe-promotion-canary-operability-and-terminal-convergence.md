@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-028`
-- Status real: `Diseno`
+- Status real: `Complete — desplegado, aplicado y verificado en runtime 2026-08-05; promoción end-to-end ejercitada`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`

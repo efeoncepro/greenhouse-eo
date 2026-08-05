@@ -4,6 +4,20 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-05 — `TASK-1641` quedó COMPLETE y su gate ya está vivo
+
+`TASK-1641` cerró: desplegada, aplicada y verificada en runtime, con una promoción end-to-end ejercitada
+(`ref/still/reference-v1`, `canary_passed`, 10 = 10 créditos). Lo que eso cambia para esta task:
+
+- **El canary de una ruta arbitraria ya es un comando**, no una secuencia a mano:
+  `pnpm producer:canary --route=<routeId>`; sin `--execute` no gasta y es el primer diagnóstico. Procedimiento:
+  `docs/operations/creative-studio/GLOBE_ROUTE_PROMOTION_RUNBOOK_V1.md`.
+- **La divergencia binding/readiness ya tiene señal viva**: `globe_promotion_readiness_divergent` (ERROR), con
+  su predicado corregido para no acusar rutas vivas. Y `globe_promotion_window_closing` (WARNING) avisa 30 min
+  antes de que una ventana de promoción venza — el hueco que mató 4 promociones.
+- ⚠️ **Pero pausar una readiness sigue sin camino ejecutable** (ver `TASK-1463`, Delta 2026-08-05): si esta
+  task necesita retirar una ruta, la única salida hoy es volver a promoverla.
+
 ## Status
 
 - Lifecycle: `to-do`
