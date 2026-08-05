@@ -580,6 +580,14 @@ GROWTH_FORMS_DISPATCH_ENABLED="${GROWTH_FORMS_DISPATCH_ENABLED:-${DEFAULT_FORMS_
 GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED="${GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED:-${DEFAULT_FORMS_HUBSPOT_ENABLED}}"
 ENV_VARS="${ENV_VARS},GROWTH_FORMS_DISPATCH_ENABLED=${GROWTH_FORMS_DISPATCH_ENABLED}"
 ENV_VARS="${ENV_VARS},GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED=${GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED}"
+# TASK-1302 — Módulo SEO (materialización diaria GSC). Default OFF en AMBOS entornos:
+# el módulo nace code-complete y el flip es acción de operador staging-first, después de
+# aplicar la migración y despausar `ops-seo-gsc-snapshot`. Declarativo acá porque
+# `--set-env-vars` es destructivo y borraría el flag puesto out-of-band en el próximo deploy.
+# ⚠️ Este flag lo lee el ops-worker, NO Vercel: prenderlo sólo en Vercel deja el
+# materializer muerto (CLAUDE.md §Feature Flag State Ledger — prender un flag es multi-runtime).
+GROWTH_SEO_ENABLED="${GROWTH_SEO_ENABLED:-false}"
+ENV_VARS="${ENV_VARS},GROWTH_SEO_ENABLED=${GROWTH_SEO_ENABLED}"
 ENV_VARS="${ENV_VARS},OPENAI_API_KEY_SECRET_REF=${OPENAI_API_KEY_SECRET_REF}"
 ENV_VARS="${ENV_VARS},ANTHROPIC_API_KEY_SECRET_REF=${ANTHROPIC_API_KEY_SECRET_REF}"
 ENV_VARS="${ENV_VARS},PERPLEXITY_API_KEY_SECRET_REF=${PERPLEXITY_API_KEY_SECRET_REF}"
@@ -1028,6 +1036,25 @@ upsert_scheduler_job \
   "/growth/forms/dispatch" \
   '{}'
 echo "  -> ops-growth-forms-dispatch: */2 * * * * (Growth Forms delivery, TASK-1229)"
+
+# SEO — materialización diaria de Google Search Console (TASK-1302).
+#
+# Cron 0 9 * * * America/Santiago: una vez al día, tras la madrugada, para capturar
+# AYER (GSC no publica el día en curso). Convierte el read-through de GSC en una serie
+# propia que sobrevive la ventana de 16 meses de Google, y es idempotente por
+# `capture_date`: el re-run corrige el consolidado tardío (~48h) sin duplicar.
+#
+# ⚠️ Nace PAUSADO (quinto argumento `true`). No despausar hasta que se cumplan las tres
+# condiciones: migración aplicada en el target, ops-worker redeployado con el handler y
+# GROWTH_SEO_ENABLED=true en ESTE servicio (el flag lo lee el worker, NO Vercel).
+# Aun despausado con el flag OFF el handler hace no-op, así que el orden es seguro.
+upsert_scheduler_job \
+  "ops-seo-gsc-snapshot" \
+  "0 9 * * *" \
+  "/seo/gsc/snapshot-batch" \
+  '{}' \
+  "true"
+echo "  -> ops-seo-gsc-snapshot: 0 9 * * * PAUSADO (materialización GSC diaria, TASK-1302)"
 
 # Email deliverability monitor — TASK-775 Slice 2.
 #

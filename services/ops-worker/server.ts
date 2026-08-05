@@ -129,6 +129,8 @@ import { drainPendingGraderRuns, recoverStuckRunningRuns } from '@/lib/growth/ai
 import { isGraderEnabled } from '@/lib/growth/ai-visibility/flags'
 import { handleRecurringRegradeBatch } from '@/lib/growth/ai-visibility/regrade'
 import { dispatchPendingSubmissions } from '@/lib/growth/forms/dispatch'
+import { runGscDailySnapshotBatch } from '@/lib/growth/seo/gsc-daily-batch'
+import { isSeoModuleEnabled } from '@/lib/growth/seo/flags'
 import { dispatchNextRenderJob } from '@/lib/commercial/tenders/proposals/render-dispatch'
 import { isFormsDispatchEnabled } from '@/lib/growth/forms/flags'
 
@@ -1784,6 +1786,67 @@ const handleGrowthFormsDispatch = async (req: IncomingMessage, res: ServerRespon
   }
 }
 
+// ─── /seo/gsc/snapshot-batch ────────────────────────────────────────────────
+//
+// TASK-1302 — Materialización diaria de Google Search Console. Google retiene 16
+// meses y muestrea; este batch convierte el read-through en una serie propia que
+// sobrevive esa ventana. Idempotente por `capture_date`: re-correr el mismo día no
+// duplica y además corrige el consolidado tardío de Google (~48h).
+//
+// Cloud Scheduler y NO Vercel cron: Vercel sólo ejecuta crons en Production, así que
+// en staging la serie arrancaría con un hueco invisible (CLAUDE.md §Outbox canónico).
+//
+// Gate prod-safe: con GROWTH_SEO_ENABLED OFF (default) el handler hace no-op sin tocar
+// la DB ni Google — el scheduler puede existir pausado sin acoplarse a prod.
+//
+// Body opcional: {captureDate?: 'YYYY-MM-DD', maxOrgs?: number}. Sin `captureDate` usa
+// AYER en America/Santiago (el día en curso todavía no está publicado por GSC).
+const handleSeoGscSnapshotBatch = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+
+  const captureDate = typeof body.captureDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(body.captureDate)
+    ? body.captureDate
+    : undefined
+
+  const maxOrgs = typeof body.maxOrgs === 'number' && body.maxOrgs > 0 ? Math.floor(body.maxOrgs) : undefined
+
+  if (!isSeoModuleEnabled()) {
+    json(res, 200, { ok: true, skipped: 'seo_module_disabled', orgs: 0, materialized: 0, rowsWritten: 0 })
+
+    return
+  }
+
+  console.log(`[ops-worker] POST /seo/gsc/snapshot-batch — captureDate=${captureDate ?? 'yesterday'}`)
+
+  try {
+    const summary = await runGscDailySnapshotBatch({ captureDate, maxOrgs })
+
+    console.log(
+      `[ops-worker] /seo/gsc/snapshot-batch done — captureDate=${summary.captureDate} ` +
+      `orgs=${summary.orgs} materialized=${summary.materialized} degraded=${summary.degraded} ` +
+      `failed=${summary.failed} rows=${summary.rowsWritten} truncatedOrgs=${summary.truncatedOrgs}`
+    )
+
+    // Un truncamiento significa que la serie de ese día quedó incompleta y el dato NO se
+    // puede recuperar pasada la ventana de Google: se grita, no se deja en el detalle.
+    if (summary.truncatedOrgs > 0) {
+      captureMessageWithDomain(
+        `[TASK-1302] ${summary.truncatedOrgs} org(s) truncaron la materialización GSC de ${summary.captureDate}`,
+        'growth',
+        { level: 'warning', tags: { source: 'ops_worker_seo_gsc_snapshot_batch' } }
+      )
+    }
+
+    json(res, 200, { ok: true, ...summary })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown SEO GSC snapshot error'
+
+    console.error('[ops-worker] /seo/gsc/snapshot-batch failed:', message)
+    captureWithDomain(error, 'growth', { tags: { source: 'ops_worker_seo_gsc_snapshot_batch' } })
+    json(res, 502, { error: message })
+  }
+}
+
 // ─── /email-deliverability-monitor ──────────────────────────────────────────
 //
 // TASK-775 Slice 2 — Email deliverability monitor migrado de Vercel cron a
@@ -2455,6 +2518,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/growth/forms/dispatch') {
       await handleGrowthFormsDispatch(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/seo/gsc/snapshot-batch') {
+      await handleSeoGscSnapshotBatch(req, res)
 
       return
     }
