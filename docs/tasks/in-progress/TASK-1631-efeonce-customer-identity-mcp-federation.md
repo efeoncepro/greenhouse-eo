@@ -369,13 +369,20 @@ Reglas obligatorias:
 1. **S0.1 — Matriz de tokens live + prueba base-only** (cierra el pendiente de TASK-1626): capturar redactado
    `iss`, `aud`, `sub`, `azp`/`client_id`, `scp`, `scope`, `roles`, claim organizacional y `exp` por cliente
    objetivo, cubriendo redirect loopback y HTTPS hospedado donde el cliente lo permita.
-2. **S0.2 — Estimación de costo operativo del broker native/hybrid** (hardening, MFA/recovery,
-   metadata/CIMD/DCR, callbacks HTTPS, verificación de tokens, observabilidad, soporte, operación 24/7) +
-   cierre de las dos incógnitas WorkOS (curva SSO/SAML USD 125/conexión/mes y portabilidad del binding) →
-   tabla comparativa WorkOS vs native vs hybrid en costo total/seguridad/compatibilidad/privacidad/migración/salida.
-3. **S0.3 — Revisión de privacidad/subprocesador** (`legal-privacy-ip-operator`): datos personales enviados,
-   DPA, subprocesadores, región, retención, derechos ARCO, notificación contractual (CL + CO/MX/PE).
-   Entregable: memo de revisión; la firma del DPA queda con el operador.
+2. **S0.2 — Estimación de costo operativo del broker native/hybrid** — **HECHO 2026-08-05.** Comparación
+   costeada registrada en el ADR §`Slice 0 measurement — build vs buy vs hybrid (2026-08-05)`: native =
+   7–10.5 semanas senior + operación permanente (medido contra el código real: el broker no tiene capa propia
+   de autenticación de personas — depende de la sesión NextAuth del portal); WorkOS = USD 99/mes planos con
+   curva SSO USD 125/conexión/mes y trigger de revisita a ≥5 conexiones enterprise; exit cerrado por diseño
+   (subjects = source links re-enlazables, sin migración de credenciales). Recomendación del Slice 0: WorkOS
+   con binding provider-neutral + contrato de salida — **pendiente de aprobación del operador**. Checklist
+   pre-firma bloqueante: CIMD en discovery live de WorkOS, `subject_types_supported: public` en el tenant
+   real, DPA + lista de subprocesadores vigente.
+3. **S0.3 — Revisión de privacidad/subprocesador** — **HECHO 2026-08-05** (memo, no cierre legal). Entregable:
+   `docs/operations/EFEONCE_CUSTOMER_IDENTITY_PRIVACY_REVIEW_V1.md` (roles controller/processor, datos
+   enviados vs retenidos con minimización, checklist DPA/subprocesadores/región/retención/ARCO/notificación
+   contractual por país, comparación de riesgo por ruta). La firma del DPA y la validación con abogado
+   habilitado quedan con el operador; el gate sigue ABIERTO hasta ese cierre.
 4. **S0.4 — Schema aditivo de binding provider-neutral** (propuesta, sin migración aplicada): organización
    canónica ↔ binding IDP externo ↔ membership/grant por capability namespaceada; commands
    allowlist/invitación/revocación con capabilities dedicadas; contrato de account linking, colisión, recovery

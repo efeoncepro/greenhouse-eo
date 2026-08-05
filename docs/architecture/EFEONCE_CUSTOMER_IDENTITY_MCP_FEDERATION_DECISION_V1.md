@@ -74,6 +74,60 @@ The provider decision is therefore explicitly three-way:
 No option is approved by this ADR yet. Slice 0 must measure compatibility, security/operations, cost, privacy,
 migration and exit before production provisioning.
 
+### Slice 0 measurement — build vs buy vs hybrid (2026-08-05)
+
+Costed comparison executed under `TASK-1631` Slice 0 (S0.2). Pricing figures come from the 2026-08-02 official-page
+benchmark (eleven providers); the native estimate comes from direct inspection of the broker code on 2026-08-05.
+
+**What the native broker actually has and lacks (measured, not assumed).** The sister-platform broker is ~6,685
+lines in `src/lib/sister-platforms/**` (with tests) plus three routes (`authorize` 161, `token` 197, `userinfo` 72
+lines). It implements authorization-code + PKCE, exact redirect allowlists, public/confidential client policy,
+hashed opaque tokens, TTLs, revocation, audit and workspace bindings. Its `authorize` route depends on
+`getOptionalServerSession()` and redirects to the Greenhouse `/login` — i.e., the person-authentication layer IS
+the Greenhouse portal session. Going native for external customers therefore requires building, not extracting:
+
+| Gap | Work | Estimate |
+| --- | --- | --- |
+| Independent runtime at `auth.efeonce.org` (deploy, session store, cookie namespace, secrets, CI/CD, rollback) | new Cloud Run deployable + session layer decoupled from NextAuth | 1.5–2 wk |
+| External-person authentication (credentials/passkeys/magic-link, MFA/TOTP, recovery) — today the broker has none of its own | new surface + flows + abuse hardening | 2–3 wk |
+| AS metadata + **CIMD** + DCR + hosted HTTPS callback policy (today loopback-oriented) | protocol work vs current MCP spec | 1–1.5 wk |
+| Consent/grant surface + storage per capability | UI + primitives | 1 wk |
+| Gateway verification contract for opaque tokens (introspection or short-lived signed tokens + revocation checks) | gateway + broker change | 0.5–1 wk |
+| Observability, rate limiting, security review, pentest, runbooks | hardening | 1–2 wk |
+
+Total build: **7–10.5 senior-weeks** before the first customer, plus **permanent operations**: patching, key
+rotation, incident response and 24/7 accountability for a public authentication service — precisely when Chile's
+Ley 21.719 (GDPR-like, with a sanctioning agency) reaches full effect on 2026-12-01. At any reasonable loaded
+cost, the build alone exceeds a decade of WorkOS's published flat fee, before counting operations.
+
+**WorkOS cost curve (the SSO unknown, closed).** Flat **USD 99/month** (custom domain; organizations and users at
+cohort scale have no charge or cap — 2026-08-02 benchmark). The scaling cost is enterprise federation:
+**USD 125 per SSO/SAML connection per month** when a customer demands their own IdP. Curve: 0 connections =
+USD 1,188/yr; 3 = USD 5,688/yr; 5 = USD 8,688/yr; 10 = USD 16,188/yr. Two consequences: (a) at cohort start
+(0–2 connections) WorkOS is an order of magnitude cheaper than building; (b) if enterprise-SSO demand
+materializes at ≥5–10 connections, the native/hybrid route becomes financially competitive — that is the
+**revisit trigger**, recorded here so the decision has an explicit expiry condition instead of being eternal.
+
+**Exit/portability (the second unknown, closed by design).** The binding model already neutralizes most exit
+cost: external subjects are **source links** to the canonical `identity_profile`, never the person record. A
+provider change means re-linking subjects under a new issuer (a re-authentication ceremony per person, operator
+re-invitation at worst), with Account 360, memberships, grants and audit untouched. Password/credential export
+from WorkOS is not assumed; the exit plan is re-invitation, not credential migration. Contractual condition
+before signing: no term may claim ownership of the organization/member directory.
+
+**Pre-signature verification checklist (blocking):** confirm against live WorkOS discovery that it publishes
+`client_id_metadata_document_supported` (CIMD is the primary MCP registration mechanism; DCR alone fails the
+invariant), confirm `subject_types_supported: public` on the actual tenant, and obtain the current DPA +
+subprocessor list for the privacy review below.
+
+**Slice 0 recommendation (pending operator approval, not self-executing):** adopt **WorkOS** for the first
+external cohort with the provider-neutral binding and the exit contract above, and **defer native/hybrid** to the
+explicit revisit trigger (≥5 enterprise SSO connections or a WorkOS pricing/term change). Rationale: the cohort
+is small and allowlisted, speed matters for the B2B MCP program, the marginal money cost is trivial against
+7–10.5 build weeks plus permanent security operations, and the binding design keeps the exit reversible. The
+privacy/subprocessor gate remains independent: see
+[`EFEONCE_CUSTOMER_IDENTITY_PRIVACY_REVIEW_V1.md`](../operations/EFEONCE_CUSTOMER_IDENTITY_PRIVACY_REVIEW_V1.md).
+
 ### Relationship with the Greenhouse login
 
 `auth.efeonce.org` is operationally independent from the Greenhouse deployable, but it is not an independent

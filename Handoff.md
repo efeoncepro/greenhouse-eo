@@ -1,16 +1,26 @@
 # Handoff activo
 
-### TASK-1631 — intake + plan Slice 0; checkpoint P0 pendiente (2026-08-05)
+### TASK-1631 — Slice 0: comparación build-vs-buy y memo de privacidad entregados (2026-08-05)
 
-TASK-1631 (Efeonce Customer Identity + MCP Federation) pasó a `in-progress` en `develop`. Se re-verificó contra
-runtime que el gateway sigue single-issuer con `clientId = azp ?? sub`, `sub` descartado y fusión
-`scp ∪ scope ∪ roles` (`../efeonce-mcp/src/auth/token-verifier.ts`, `src/config.ts`) — la spec no tiene drift.
-El plan de ejecución del Slice 0 quedó registrado en la ZONE 2 de la task (S0.1 matriz de tokens live +
-base-only de TASK-1626 → S0.7 paquete de decisión). **Bloqueo vigente:** el ADR
-`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md` sigue `Proposed`; composición
-(WorkOS/native/hybrid), plan comercial y revisión de privacidad sin aprobar. Slices 1-3 bloqueados; nada
-externo se provisiona. **Próximo paso:** el operador aprueba el plan del Slice 0 (checkpoint P0 del harness)
-y luego el paquete de decisión S0.7 habilita los Slices 1-3.
+TASK-1631 (Efeonce Customer Identity + MCP Federation) está `in-progress` en `develop`. Intake verificó contra
+runtime que la spec no tiene drift (gateway single-issuer, `clientId = azp ?? sub`, fusión `scp∪scope∪roles`).
+Con aprobación del operador se ejecutaron **S0.2 y S0.3** del Slice 0:
+
+- **S0.2 (costos):** ADR §`Slice 0 measurement — build vs buy vs hybrid (2026-08-05)`. Native medido contra el
+  código real = 7–10.5 semanas senior + operación permanente (el broker sister-platform NO tiene capa propia de
+  autenticación de personas; depende de la sesión NextAuth del portal). WorkOS = USD 99/mes planos; curva SSO
+  USD 125/conexión/mes con **trigger de revisita a ≥5 conexiones enterprise**; exit re-enlazable por diseño.
+  **Recomendación Slice 0: WorkOS** con binding provider-neutral — pendiente de aprobación del operador.
+- **S0.3 (privacidad):** memo `docs/operations/EFEONCE_CUSTOMER_IDENTITY_PRIVACY_REVIEW_V1.md` — Efeonce
+  controller / IDP encargado, minimización (qué se envía vs qué queda), checklist DPA/subprocesadores/región/
+  retención/ARCO/notificación contractual (CL 21.719 plena el 1-dic-2026 + CO/MX/PE). **El gate sigue abierto**:
+  falta DPA firmado + validación con abogado habilitado.
+
+**Bloqueo restante para Slices 1-3:** aceptación del ADR (sigue `Proposed`) + aprobación de composición/plan +
+cierre legal del gate de privacidad. Checklist pre-firma bloqueante: CIMD en discovery live de WorkOS,
+`subject_types_supported: public` del tenant real, DPA + subprocesadores vigentes. Pendientes del Slice 0:
+S0.1 (matriz de tokens live + base-only de TASK-1626), S0.4-S0.6 (schema binding, contratos gateway, contrato
+de diseño `auth.efeonce.org` + task ui-ux). Nada externo se provisionó.
 
 ### Registro de partnerships — fuente operativa creada (2026-08-05)
 
@@ -583,16 +593,6 @@ consumers es de 1552.
 Tres carriles de credenciales distintos —`gcloud` CLI, ADC y el Cloud SQL **Connector**— y el CLI puede estar vivo
 mientras el Connector se cuelga (`invalid_rapt` es reauth). Comandos en
 [el manual](docs/manual-de-uso/creative-studio/operar-contrato-creativo-ruta-globe.md).
-
-## Finance Core + Cost Accounting + cotización agentic — planificación (2026-08-02)
-
-- [ADR-021](docs/architecture/GREENHOUSE_FINANCE_CORE_ACCOUNTING_FOUNDATION_DECISION_V1.md) aceptado; `EPIC-012`
-  es owner. Sus 11 candidatas no estaban reservadas y deben reenumerarse desde TASK-1634 al confirmarlas.
-
-## TASK-1614 — canary cerrado (2026-08-02)
-
-- TASK-1614 está completa: Seedance motion terminó `canary_passed` con 16 créditos, playback/governance y lineage.
-  No reabrir su evaluación/promoción/fondeo; el próximo Seedance es sólo la regresión UI exigida por TASK-1633.
 
 ## WIP saneado — Globe, Brightcell y Polpaico (2026-08-01)
 
