@@ -58,7 +58,17 @@ producto con mejor ROI de la práctica.**
 
 ## 2. 🔴 SEO — el hueco
 
-**EPIC-022 "Search Visibility 360": 19 tasks, TODAS en `to-do`. Cero código.**
+**EPIC-022 "Search Visibility 360" ya arrancó (delta 2026-08-05): TASK-1299 (schema `greenhouse_growth.seo_*` —
+8 tablas config + serie temporal append-only por `capture_date`) y TASK-1301 (5 capabilities `growth.seo.*` +
+módulo per-org `seo_v1` + chokepoint único `enforceSeoRunEntitlement` en `src/lib/growth/seo/entitlement.ts`)
+están COMPLETE con migraciones aplicadas (`20260805*`). Es fundación backend: para el cliente el portal sigue
+mostrando NADA de SEO.**
+
+> 🧭 **Directivas vigentes (2026-08-05):** **MCP-first** — SV360 se opera por MCP antes que por UI
+> (TASK-1645: lane ecosystem `/api/platform/ecosystem/growth/seo/*` + 3 MCP tools read-only, espejo del
+> TASK-1086 de Knowledge, con criterio de disponibilidad en el gateway `mcp.efeonce.org`/TASK-1626) — y
+> destino **Wave**: SV360 eventualmente vive en `wave.efeonce.org` (seam en la arch doc SEO §17, EPIC-037).
+> Regla dura del dominio: todo write provider-facing (costo DataForSEO) pasa por `enforceSeoRunEntitlement`.
 
 | Lo que se vende | Lo que existe en el portal |
 |---|---|

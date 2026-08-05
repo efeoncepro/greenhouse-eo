@@ -168,7 +168,7 @@ es el moat.**
 | | ¿Existe en el portal? |
 |---|---|
 | 🎯 **AEO** *(el Grader: 7 dimensiones · 14 probes · 5 motores · **el reporte del cliente en `/aeo`**)* | ✅ **Live en producción** |
-| 🔴 **SEO** *(rank tracking · site audit · backlinks · E-E-A-T · reportería)* | 🔴 **NADA.** EPIC-022 son **19 tasks, todas en `to-do`, cero código** |
+| 🔴 **SEO** *(rank tracking · site audit · backlinks · E-E-A-T · reportería)* | 🔴 **Nada visible al cliente.** *(Delta 2026-08-05: EPIC-022 arrancó — schema `greenhouse_growth.seo_*` + entitlement per-org `seo_v1`/chokepoint `enforceSeoRunEntitlement` COMPLETE (TASK-1299/1301); rumbo MCP-first (TASK-1645) y destino Wave. Pero la superficie autoservicio sigue sin existir)* |
 | Search Console | ⚠️ Panel de conexión — **staging ON, producción OFF** |
 
 > 🔴 **Cuando vendes un retainer de SEO y dices *"puedes entrar al portal y ver todo"*, para SEO eso todavía

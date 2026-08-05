@@ -87,6 +87,12 @@ sin segundo ledger y Globe Producer muestra un self-view read-only de effective/
 Cobertura parcial o stale nunca se representa como cero. Los IDs mutables del rollout viven en `Handoff.md` y
 `GLOBE_RUNTIME_HANDOFF.md`, no en este contrato durable.
 
+El módulo Growth SEO (`growth.seo`, EPIC-022) autoriza todo run por un único chokepoint, `enforceSeoRunEntitlement`
+(`src/lib/growth/seo/entitlement.ts`), con entitlement per-org vía el módulo `seo_v1` de
+`greenhouse_client_portal.modules`; contrato en
+[`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §9 (§17
+contrata el seam de extracción hacia Wave).
+
 ### Lectura mínima obligatoria
 
 1. [AGENTS.md](AGENTS.md): reglas transversales y router de dominios.

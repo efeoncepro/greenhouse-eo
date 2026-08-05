@@ -879,22 +879,3 @@ y [`docs/changelog/internal/2026-07.md`](docs/changelog/internal/2026-07.md).
   amplificación, medición, presupuesto de planificación y decisión go/no-go.
 - Se enlazó desde la documentación funcional, el manual de operación, el índice de auditorías comerciales y las
   skills Codex/Claude de Creator/UGC. No constituye caso de éxito, disponibilidad confirmada ni cotización aprobada.
-
-## 2026-07-29 — Globe: CEO conditional-go para primer servicio comercial gestionado
-
-Se formalizó la autorización CEO para sacar Globe al mercado mediante un `Managed Creative Production Sprint powered by
-Globe`: un cliente, un workflow y una ruta promovida, operado por Efeonce, con SOW/factura directa y sin acceso directo
-del cliente al runtime. El contrato operativo queda en `docs/services/creative-studio/`; `TASK-1480` continúa
-`in-progress` hasta reunir evidencia route-specific y ejecutar el primer sprint.
-
-Corrección de fuente de verdad: el cliente inicial es **SKY Agencia Creativa**, con módulos `agencia_creativa` +
-`globe`. La licitación SKY Blog/Wherex queda fuera del rollout; el brief correcto vive en
-`docs/services/creative-studio/SKY_GLOBE_DESIGN_PARTNER_PILOT_BRIEF_V1.md`.
-
-## 2026-07-28 — Contrato de producción visual social para reportes
-
-- Se documentó el contrato técnico, funcional y operativo para producir posts de Instagram con reportes reales,
-  incluyendo el patrón proof-first/score dominante, crop nativo 4:5, logo único, composición determinística y gates
-  contra tarjetas azules, dashboards ilegibles, clipping y decoración genérica.
-- Se sincronizaron las skills Codex/Claude de `design-studio`, `social-media-studio` y
-  `greenhouse-ai-image-generator`.

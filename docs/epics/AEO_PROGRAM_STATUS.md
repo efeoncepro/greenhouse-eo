@@ -1,9 +1,9 @@
 # Programa AEO / AI Visibility — Estado y Qué Sigue
 
 > **Tipo de documento:** Estado de programa + roadmap operativo (SSOT de "dónde estamos / qué sigue")
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-07-16 por Claude (auditoría multi-agente del programa AEO)
-> **Última actualización:** 2026-07-16
+> **Última actualización:** 2026-08-05 por Claude (Delta EPIC-022: arranque de ejecución MCP-first)
 > **Documentación técnica:** [`../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`](../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 > **Epics que agrupa:** EPIC-020, EPIC-021, EPIC-022, EPIC-023, EPIC-024
 
@@ -74,7 +74,7 @@ Este documento existe para no volver a perder visibilidad de un programa que est
 |---|---|---|---|
 | **EPIC-020** | Public AI Visibility Lead Magnet Program | `to-do` (spec) · **12/13 childs `complete`** | Solo **`TASK-1246` (H) `in-progress`** bloquea el cierre. El gap real: la cara pública self-serve no está encendida. |
 | **EPIC-021** | AEO Brand-Aware Prompt Generation Engine | ✅ `complete` (2026-06-30) | Motor brand-aware live. Follow-up: UI de review del operador (no bloquea). |
-| **EPIC-022** | Growth SEO Module (Search Visibility 360) | `to-do` (diseño) | Módulo SEO clásico, casi todo sin construir. Único avance: GSC multi-tenant (`TASK-1282`, `in-progress`, Berel conectado en staging). Bloqueador fundacional `TASK-1299` (schema) sin empezar. |
+| **EPIC-022** | Growth SEO Module (Search Visibility 360) | 🚧 en ejecución (2026-08-05) · **2/21 childs `complete`** | Arrancó: `TASK-1299` (schema) + `TASK-1301` (capabilities + entitlement per-org + chokepoint) `complete`, migraciones aplicadas. Prioridad **MCP-first** (operar por MCP antes que UI); `TASK-1645` nueva (parity/MCP, P1); destino Wave declarado. Ver Delta 2026-08-05 al final. |
 | **EPIC-023** | Growth CTA & Popup CRO Engine | `to-do` | Adyacente. Vertical-slice ancla = follow-up CTA del reporte AI Visibility en Think. No arrancado. |
 | **EPIC-024** | HubSpot Portal Grader | `to-do` | Segundo lead magnet (motor en Kortex). No arrancado; childs desde `TASK-1353`. Fase 2 (OAuth) depende del cutover prod de Kortex. |
 
@@ -126,7 +126,7 @@ Ordenado por ratio impacto/esfuerzo, minimizando código nuevo:
 
 **Ola 4 — Cara del cliente contratado.** Promover `/aeo` a item de nav, poblar `organization_id` + entitlement per-ORG, medir el costo del run self-serve (flags `PORTAL_RUN`/`TRIAL` ya ON — vigilar gasto), shippear tiering+trial fuera de mockup, activar re-grade recurrente (`TASK-1270`). En paralelo: segundo caso real de Radiografía + runbook del ciclo AEO recurrente (hoy inexistente; el conocimiento está disperso en 3 skills y 2 manuales).
 
-**Diferido (no bloquea lo anterior):** EPIC-022 (SEO clásico, empezar por `TASK-1299` schema), EPIC-023 (CRO), EPIC-024 (HubSpot Portal Grader).
+**Diferido (no bloquea lo anterior):** EPIC-023 (CRO), EPIC-024 (HubSpot Portal Grader). EPIC-022 dejó de estar diferido: arrancó ejecución el 2026-08-05 con prioridad MCP-first (ver Delta al final).
 
 ---
 
@@ -135,3 +135,14 @@ Ordenado por ratio impacto/esfuerzo, minimizando código nuevo:
 La cabecera de `EPIC-020` y su one-liner en `docs/epics/README.md` describían las child tasks C–M como "planificadas", cuando el lifecycle real (carpeta) las tiene `complete` — el único abierto es `TASK-1246`. Corregido en esta pasada para que el estado sea legible sin re-auditar. Fuente del estado: auditoría multi-agente 2026-07-16 (motor/operabilidad, cara pública, backlog, comercial) + verificación de lifecycle por carpeta.
 
 **Lección de método (2026-07-16):** la primera pasada de este doc fue una auditoría *doc-based* y arrastró el drift del `FEATURE_FLAG_STATE_LEDGER.md`. Al verificar contra runtime, **tres "blockers" reportados resultaron falsos**: flags OFF → en realidad ON (Vercel prod + ops-worker); property HubSpot ausente → existe; DataForSEO `missing_secret` → creds presentes en la revisión activa. Regla: el estado de flags/secrets/properties se verifica en el runtime vivo (`vercel env pull`, `gcloud run services describe`, HubSpot API), **nunca desde el ledger o docs**. El ledger describe el día que se escribió; el runtime describe hoy.
+
+---
+
+## Delta 2026-08-05 — EPIC-022 arrancó ejecución (MCP-first)
+
+Este delta corrige el estado de EPIC-022 (§4 y §6); el resto del doc sigue describiendo el snapshot verificado del 2026-07-16.
+
+- **EPIC-022 pasó de diseño a ejecución.** `TASK-1299` (schema time-series foundation) y `TASK-1301` (capabilities + entitlement per-org + chokepoint) están `complete` al 2026-08-05, con migraciones aplicadas en `greenhouse-pg-dev`, full suite (10076/0) y build de producción verdes. Specs: `docs/tasks/complete/TASK-1299-growth-seo-schema-timeseries-foundation.md` + `docs/tasks/complete/TASK-1301-growth-seo-capabilities-per-org-entitlement.md`.
+- **Contrato durable vivo:** chokepoint canónico `enforceSeoRunEntitlement` (`src/lib/growth/seo/entitlement.ts`) + módulo per-org `seo_v1` en `greenhouse_client_portal.modules`. Ninguna org tiene assignment todavía.
+- **Directivas del operador (2026-08-05):** (1) todo el módulo SEO nace **Full API Parity y usable por MCP** — nueva `TASK-1645` (lane ecosystem + MCP tools, P1) + exit criterion de parity en el epic; (2) **MCP-first**: operar SEO por MCP es la prioridad más alta, la UI va después — Ola B re-ordenada `1301 → 1302 → 1645 → 1300 → 1303 → UI`, con `TASK-1301`/`1302`/`1645` subidas a P1; (3) **destino Wave**: SV360 nace en Greenhouse pero eventualmente se habilita en `wave.efeonce.org` (EPIC-037) — seam de extracción contratado en `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §17.
+- **Pendiente conocido:** `TASK-1302` requiere rollout real de la conexión GSC (`TASK-1282`/`TASK-1283` code-complete sin rollout).
