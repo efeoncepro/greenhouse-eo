@@ -683,6 +683,18 @@ y su lista de scopes: una capability concedida no es una capability ejecutable.*
 binding y vuelve coherente la readiness—, ejercitado el 2026-08-05 con la señal bajando de 1 a 0. El `pause`
 sólo hace falta cuando la decisión es **retirar** la ruta, no restaurarla.
 
+🔴 **Y el corolario de ORDEN, medido el 2026-08-05 al intentar cerrarlo:** conceder el scope **no es el primer
+paso**, es el último. El instinto —extender el CLI OAuth público de `TASK-1629`, que ya tiene PKCE y despacho
+por comando— **no cierra el problema**: el tramo Greenhouse → Globe viaja con **ID token de service account**,
+Globe lo resuelve como `principalType: 'service'` y `requireHuman` lo rechaza. Y el truco del fondeo —gate
+humano del lado Greenhouse— **no aplica**, porque ahí quien exige humano es Greenhouse y acá es **Globe, en su
+propio dominio**. La única superficie que produce `human` es la sesión de Globe vía su BFF.
+
+Así que correr el rollout de 3 pasos del broker sin superficie **entrega CERO capacidad** y arriesga el SSO de
+todos: un humano con un scope que no tiene dónde usar. **SIEMPRE superficie primero, grant después.** Detalle
+del procedimiento, sus riesgos y su rollback: `TASK-1463`, Delta 2026-08-05 (b).
+
+
 **La señal se computa sobre el estado LEÍDO AHORA**, nunca sobre la evidencia que la saga guardó al revertir:
 la evidencia dice qué pasó entonces y la pregunta es si alguien ya lo cerró. Una señal que no baja enseña a
 ignorarla, y eso es peor que no tenerla.

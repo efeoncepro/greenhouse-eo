@@ -1,5 +1,88 @@
 # TASK-1463 — Globe Model Promotion and Readiness Registry
 
+## Delta 2026-08-05 (b) — el rollout del scope NO es el primer paso, y hacerlo solo no entrega nada
+
+Mapeados los dos repos antes de tocar el broker. El hallazgo cambia el orden del trabajo.
+
+### 🔴 El CLI de Greenhouse NO puede despachar `pause`, y no es cuestión de agregarle un comando
+
+El instinto era extender el CLI OAuth público de `TASK-1629` (`pnpm globe:credit-funding`), que ya tiene PKCE,
+loopback y despacho por comando. Mecánicamente sería fácil. **Pero no cierra el problema:** el último tramo
+Greenhouse → Globe viaja con **ID token de service account** (`src/lib/globe/client.ts:131-148`), y Globe lo
+resuelve como `principalType: 'service'`. `transitionModelRoute` haría `requireHuman(c)` y lanzaría
+`ModelReadinessEvidenceDeniedError`.
+
+El truco que usa el fondeo —gate humano **del lado Greenhouse**, con `globe_credit_funding_intents` rechazando
+principals de servicio— **no aplica acá**: ahí quien exige humano es Greenhouse; en readiness quien exige humano
+es **Globe, en su propio dominio**. Refuerzos de que está cerrado por diseño: la coverage declarada de `pause`
+es `ui: 'policy-blocked'` y `'sister-platform': 'policy-blocked'`
+(`packages/domain/src/model-readiness.ts:27,75`), y Globe **ignora** actores suplantados por header.
+
+**La única superficie que produce `principalType: 'human'`** es la sesión humana de Globe: cookie →
+`resolveHumanPrincipal` → el BFF firma un token de delegación con actor y capabilities → la API privada lo
+verifica y reconstruye `human`. O sea **el despachador del `pause` es la UI de Globe (o su carril BFF), no un
+CLI de Greenhouse**.
+
+### 🔴 Consecuencia de orden: hacer el rollout del scope AHORA entregaría CERO capacidad
+
+Conceder `globe.model-readiness.pause` sin superficie deja a un humano con un scope que no tiene dónde usar —
+y para eso hay que correr el rollout de 3 pasos que **ya tumbó todo el login de Globe una vez**. Es exactamente
+el anti-patrón que esta plataforma acaba de canonizar: *una capability concedida no es una capability
+ejecutable*. **Riesgo alto de SSO a cambio de nada visible.**
+
+**El orden correcto es: superficie primero, grant después.** Concretamente, antes del rollout hace falta
+decidir y construir:
+
+1. cambiar la coverage de `pause` a `ui: 'available'` (`model-readiness.ts:75`);
+2. el control en la superficie de readiness, con payload `routeId + modelVersion + expectedRevision +
+   reasonCode`;
+3. sólo entonces, el grant.
+
+Alternativa si se quiere el CLI igual: exige un **ADR previo** —que Globe acepte un envelope humano-delegado de
+Greenhouse para model-readiness, hoy `policy-blocked` para `sister-platform`—. Eso reabre ADR-015, no es una
+línea de código.
+
+### El procedimiento de 3 pasos, para cuando exista la superficie
+
+Las tres listas del cliente `globe` **se derivan de una sola constante**
+(`src/lib/sister-platforms/globe-oauth-grants.ts:23-78`): `capabilityScopes = GLOBE_PRODUCER_CAPABILITY_SCOPES`,
+`requiredScopes = ['openid', ...capabilityScopes]`, `allowedScopes = [...OIDC, ...capabilityScopes]`. Por eso no
+existe «otorgado pero opcional»: `oauth-policy.ts:32-52` exige `capabilityScopes ⊆ requiredScopes`.
+
+| Paso | Dónde | Qué | Verificación |
+|---|---|---|---|
+| **1** | Greenhouse | scope a una lista transicional que sólo suma a `allowedScopes` | `pnpm globe:oauth-grants` (dry-run) → gana **1** scope; luego `--apply`; smoke de federación humana → `human_federation_ok` |
+| **2** | Globe | scope a `PRODUCER_HUMAN_CAPABILITY_SCOPES` (`app.ts:257-282`) + **deploy de studio-web** | `curl` a `/auth/start` y confirmar el scope en el `location` **del deployment real**, no del código |
+| **3** | Greenhouse | mover el scope a `GLOBE_PRODUCER_CAPABILITY_SCOPES` | smoke con `GLOBE_SMOKE_PRODUCER_BFF=1 GLOBE_SMOKE_REQUIRED_CAPABILITIES=globe.model-readiness.pause` |
+
+Precedente literal a copiar: ADR-010 / `TASK-1535` — fallo `07550a0a4` → revert `0b93eef0c` → paso 1 `697776e57`
+→ paso 3 `14d00cf7f`.
+
+### 🔴 Riesgos, con su blast radius medido
+
+- **Paso 3 antes del 2 = el incidente otra vez, y peor de lo que suena.** El scope pasa a `requiredScopes`, el
+  cliente desplegado no lo pide → `required_scope_missing`. No sólo muere todo login nuevo: **las sesiones vivas
+  también caen**, porque `userinfo` revalida contra la política **actual** y Globe fuerza esa revalidación en
+  **cada** llamada a la API privada. **No hay ventana de gracia**; el radio es *todos los humanos de Globe*.
+- **Paso 2 antes del 1** falla ruidoso y detectable (`scope_not_allowed` 403): muere el login nuevo, sobreviven
+  las sesiones.
+- ⚠️ **El dry-run del script NO diffea la política**, sólo `allowedScopes` y TTLs. En el paso 3 va a mostrar
+  `current == target` y **parecer un no-op**. No lo uses como señal de que no pasa nada.
+- ⚠️ **`--rollback` NO es el rollback de esto**: es `shell-only` y degrada el grant a un solo scope, **rompiendo
+  el Producer entero**. El rollback correcto es revertir el archivo y re-aplicar; el script lee el **working
+  tree**, así que es efecto inmediato sin deploy ni merge. **Ten el diff de reversa preparado ANTES del paso 3**,
+  y recuerda que el orden de reversa es estrictamente **3 → 2 → 1**.
+
+✅ **Verificado y descartado como riesgo:** `apps/studio-web/dist/` **no está committeado** — el Dockerfile
+reconstruye, así que el paso 2 sí es efectivo. Era la duda que habría convertido el paso 3 en el incidente.
+
+### Mitigación vigente, que baja la urgencia
+
+Volver a promover la ruta **también** cierra la divergencia de readiness (enciende el binding y vuelve coherente
+el `promoted`). Ejercitado el 2026-08-05 sobre `ref/still/reference-v1`: la señal bajó de 1 a 0. O sea el hueco
+muerde **sólo cuando la decisión correcta es RETIRAR una ruta**, no restaurarla — y ése es justo el caso que el
+diseño quiere que firme una persona.
+
 ## Delta 2026-08-05 — 🔴 `pause` NO tiene camino ejecutable, y lo destapó una señal en producción
 
 Descubierto ejercitando `TASK-1641`, que desplegó la señal `globe_promotion_readiness_divergent`: cuando

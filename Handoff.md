@@ -22,6 +22,37 @@ añadió UI. No se detectó un hueco que justificara una task nueva.
 Markdown pasan. La implementación sigue condicionada a que cada task dueña cierre su mapeo UI, evidencia GVC,
 dossier y decision log; estos documentos no habilitan por sí solos `UI ready` ni rollout.
 
+## Globe — cierre de sesión 2026-08-05: 4 gates nuevos, y dos decisiones de NO hacer
+
+**Hecho y desplegado.** `TASK-1641` **complete** (los 8 criterios verificados en runtime, promoción end-to-end
+de `ref/still/reference-v1` con 10 = 10 créditos). Globe `main@2cdd4d8`, Greenhouse `develop`.
+
+**Cuatro gates nuevos, todos probados EN ROJO** — porque la disciplina humana no escala y el build sí:
+
+| Gate | Qué impide | Dónde corre |
+|---|---|---|
+| `dead-affordance` | un control que se ve accionable y no hace nada | `pnpm check` de Globe |
+| `producer-item-actions` | que agregar una acción sea cablear en 4 sitios | idem |
+| `creative-studio-doc-index` | un doc que existe y nadie encuentra | `docs:closure-check` |
+| `skills:mirrors` | drift silencioso Claude/Codex | `local:check` (pre-push) |
+
+**El despachador canónico de acciones del feed** (`data/producer-item-actions.ts`): una **tabla**, no cuatro
+callbacks. Favorite y Download resueltos a nivel contrato; Reference y Recreate **declarados con dueño y
+razón** en vez de cableados a la fuerza.
+
+### 🔴 Dos cosas que decidí NO hacer, y por qué
+
+1. **No cablear Reference/Recreate.** Necesitan `ProducerComposer.tsx`, que es de `TASK-1552`. Y «Recrear
+   zero-spend» **contradice el único contrato que existe** (`relaunch` gasta): elegir si el botón gasta o
+   precarga es decisión de producto. Corregido en `TASK-1643`, Delta 2026-08-05 (b).
+2. **No correr el rollout del scope `pause`.** El CLI de Greenhouse **no puede despacharlo** —viaja con ID
+   token de service account y Globe exige `human` en su propio dominio—, así que el rollout entregaría **cero
+   capacidad** arriesgando el SSO de todos. **Superficie primero, grant después.** Procedimiento completo con
+   riesgos y rollback en `TASK-1463`, Delta 2026-08-05 (b).
+
+**Siguiente paso ejecutable:** coordinar `TASK-1552` ↔ `TASK-1643` para el canal feed → composer, y decidir la
+semántica de «Recrear». Nada de eso lo puedo resolver implementando.
+
 ## TASK-1641 — Globe: DESPLEGADO + promoción end-to-end ejecutada (2026-08-05)
 
 **Estado:** `in-progress`, **desplegado y aplicado**. Globe `main@b958a11`; API
