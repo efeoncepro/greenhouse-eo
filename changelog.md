@@ -887,16 +887,3 @@ Corrección de fuente de verdad: el cliente inicial es **SKY Agencia Creativa**,
 - Build, lint, 118 tests del cliente, gates de diseño, reduced-motion y Tailwind engine canary están verdes.
 - `producerStyles` sigue únicamente en el fallback vanilla de `/producer`; su retiro continúa siendo el gate de
   `TASK-1560`, por lo que el rollout global aún no se declara cerrado.
-
-## 2026-07-28 — Contrato operator-first y research primario
-
-- Se canonizó `EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md`: las Product Services construyen la
-  superficie operatoria; Greenhouse soporta assurance ejecutivo, memoria, coordinación y expansión.
-- Se formalizó el ciclo `operador → operator-champion → sponsor/director → compra recurrente → evangelista` y se
-  separaron los roles de usuario, problem owner, champion, sponsor, economic buyer y governance owner.
-- Se creó `RESEARCH-010` con evidencia secundaria, hipótesis falsables, guion de entrevistas, scorecard y gates
-  para validar la adopción primaria. No autoriza implementación ni venta general.
-- Se sincronizaron `docs/context/*`, `project_context.md` y skills Codex/Claude relevantes.
-- Se documentó que el mapa de dolores de agencia sigue vigente y debe traducirse, por oferta, en capacidades de
-  memoria, consistencia, aprobaciones, evidencia, coordinación, governance y transferencia de capacidad; el
-  operator-champion es señal de adopción, no sustituto de la solución.
