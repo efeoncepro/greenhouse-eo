@@ -78,6 +78,15 @@ export interface SearchConsoleAnalyticsParams {
   range: { startDate: string; endDate: string }
   dimensions?: SearchConsoleAnalyticsDimension[]
   rowLimit?: number
+  /**
+   * Offset de paginación de la Search Analytics API (TASK-1302, aditivo).
+   *
+   * Omitirlo conserva el comportamiento previo byte a byte (Google asume 0). Existe
+   * porque un consumer que materializa la serie completa (query×page) supera de largo
+   * cualquier `rowLimit` de una sola llamada: sin paginar, la respuesta se corta en el
+   * límite SIN señal alguna, y en una serie histórica eso es pérdida permanente.
+   */
+  startRow?: number
 }
 
 /** Resultado del reader (honest degradation: nunca inventa filas). */

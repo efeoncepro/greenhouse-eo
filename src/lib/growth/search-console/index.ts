@@ -17,7 +17,8 @@ export {
 } from './command'
 
 export {
-  getSearchConsoleConnection
+  getSearchConsoleConnection,
+  listActiveSearchConsoleOrganizations
 } from './connection-store'
 
 export { readSearchConsoleAnalytics } from './reader'
