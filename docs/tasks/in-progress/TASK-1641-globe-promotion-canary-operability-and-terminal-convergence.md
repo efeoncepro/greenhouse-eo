@@ -73,6 +73,40 @@ llega a terminal, todo agregado que dependa de su estado converge o queda observ
 saga. Se declara como invariante y no como arreglo de un caso porque el mismo defecto ya apareció en
 dos familias distintas.
 
+## Delta 2026-08-04 (c) — Scope 3: el contrato de convergencia de la saga
+
+`efeonce-globe@4a0a18b`. `PROMOTION_DEPENDENT_AGGREGATES` declara los **tres** agregados que la saga
+movió el 2026-08-04, con test **bidireccional** —una postura sin señal rompe el build— probado en
+rojo y registrado a mano en el script `test` del package.
+
+| Agregado | Postura | Lo cierra |
+|---|---|---|
+| `production_routing_circuits` | `converges` | la saga (`setCircuit`, y **antes** que el binding: fail-closed) |
+| `production_route_bindings` | `converges` | la saga (`setBinding enabled=false`) |
+| `model_readiness_revisions` | **`observable`** | `globe.model-readiness.route.pause` — **otro dueño** |
+
+### 🔴 Readiness es `observable` por una frontera de AUTORIDAD, no por comodidad
+
+Su primitive de reversa **ya existe** y es el del camino hacia adelante: `route.pause`
+(`promoted → paused`, append-only, sin borrar evidencia). Lo que no existe es la autoridad: `pause`
+exige `globe.model-readiness.pause` y la saga sólo porta `globe.production-promotion.*`. Son
+**disjuntas a propósito** — es la separación maker/checker que hace vendible el régimen humano.
+
+Que la saga se pausara readiness a sí misma le daría **en el camino de recuperación** una autoridad
+que el diseño le negó **en el camino normal**, y un rollback automático podría retirar una promoción
+que un humano firmó. Por eso la divergencia **se cuenta y se hace visible**, que es exactamente lo
+que el criterio pide: *«convergido **o** su divergencia contada y observable»*. Mover esa fila a
+`converges` es proponer lo contrario, y merece reabrir el ADR — no un cambio de una palabra. El test
+lo pinea.
+
+La señal se computa sobre el estado **leído ahora**, nunca sobre la evidencia que la saga guardó al
+revertir: una señal que no baja cuando un operador ya pausó enseña a ignorarla, y eso es peor que no
+tenerla.
+
+⚠️ **Lo que falta del Scope 3:** el contrato y el cómputo existen; **falta el consumidor** que lea las
+promociones `rolled_back` con su readiness y emita la señal (el mismo lugar donde vivirá la del
+Scope 2). Hasta entonces la divergencia es computable, no observada.
+
 ## Delta 2026-08-04 (b) — Scope 1 CERRADO: el canary produce la ruta arbitraria
 
 `efeonce-globe@1767138`. `pnpm producer:canary --route=<routeId>` resuelve la ruta del catálogo,
@@ -447,9 +481,10 @@ sigue siendo el recovery.
       dry-run contra el runtime sobre 4 rutas **y con GASTO REAL** sobre `ref/motion/reference-v1`
       (run `6a6112f4…`, MP4 661.995 B, 12 = 12 créditos). Ver Delta 2026-08-04 (b).
 - [ ] Una promoción `activated` próxima a expirar emite señal observable, con alerta.
-- [ ] Los agregados dependientes de la saga están declarados en un array enumerable, con test en ambas
-      direcciones; un `observable` sin señal se rechaza.
-- [ ] Un rollback deja readiness convergido o su divergencia contada y observable.
+- [x] Los agregados dependientes de la saga están declarados en un array enumerable, con test en ambas
+      direcciones; un `observable` sin señal se rechaza. — `efeonce-globe@4a0a18b`, probado en rojo.
+- [ ] Un rollback deja readiness convergido o su divergencia contada y observable. — **contable, aún
+      no observada**: falta el consumidor que emita la señal (comparte dueño con el Scope 2).
 - [ ] `canary-confirm` nunca responde `internal_error`: cada causa de no-resolución tiene razón nombrada, y un
       fallo deja la saga en un estado desde el que se puede reintentar.
 - [ ] Una reserva de un run muerto **antes del gasto** converge por el camino terminal, sin esperar el TTL de 24 h;
