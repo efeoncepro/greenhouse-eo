@@ -62,6 +62,7 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1316` — [planificada, backend-data] E-E-A-T rater (rúbrica 4 pilares, YMYL-aware) — assessment LLM reusando brand-intelligence + evals/accuracy, con confianza calibrada (anti falso-0).
 - `TASK-1317` — [planificada, backend-data] E-E-A-T scorecard reader + integración (`readEeatScorecard`; alimenta topical authority 1314 + el 360; medido vs evaluado).
 - `TASK-1645` — [planificada, backend-data] **Ecosystem lane + MCP tools** (`/api/platform/ecosystem/growth/seo/*` vía `runEcosystemReadRoute` + 3 tools read-only en `src/mcp/greenhouse/**`, espejo TASK-1086). Materializa el mandato parity+MCP (delta 2026-08-05). Blocked by 1301/1302/1303.
+- `TASK-1426` — [reconciliada 2026-08-05, backend-data] **Search Console multi-property + URL Inspection + post-publish discovery.** Declaraba `Epic: EPIC-022` en su cabecera pero no estaba en esta lista (su única traza era la mención en la Ola D). Extiende la conexión GSC de una propiedad única por organización a un contrato multi-property canónico.
 
 ## Existing Related Work
 
