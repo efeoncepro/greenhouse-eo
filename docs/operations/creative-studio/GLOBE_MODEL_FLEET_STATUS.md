@@ -52,6 +52,28 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 | `ref/still/upscale-v1` | Topaz · Upscale | Fal (`fal-ai/topaz/upscale/image`) | image-upscale | ✅ 07-19 | ⏳ sin lane | ruta creada 07-25; exige 1 imagen de origen |
 | `ref/video/upscale-v1` | Topaz · Upscale | Fal (`fal-ai/topaz/upscale/video`) | video-upscale | ✅ 07-19 | ⏳ sin lane | ruta creada 07-25; exige 1 video de origen |
 
+## Identidades exactas de video auditadas (2026-08-04)
+
+Las fichas machine-readable enlazadas por la skill compartida son [`Omni`](../../architecture/creative-studio/model-fleet/routes/GEMINI_OMNI_VIDEO_ROUTE_CARD_V1.json),
+[`Veo 3.1`](../../architecture/creative-studio/model-fleet/routes/VEO_3_1_VIDEO_ROUTE_CARD_V1.json) y
+[`Seedance 2.0`](../../architecture/creative-studio/model-fleet/routes/SEEDANCE_2_VIDEO_ROUTE_CARD_V1.json). La auditoría del runtime deja estas
+identidades, que no deben colapsarse por nombre comercial:
+
+- Seedance estándar: `bytedance/seedance-2.0/text-to-video`, modelo `seedance-2.0`, ruta pública
+  `ref/motion/loop-v1`.
+- Seedance R2V: `bytedance/seedance-2.0/reference-to-video`, modelo `seedance-2.0-r2v`, ruta pública
+  `ref/video/motion-v1`.
+- Seedance Mini/I2V: `bytedance/seedance-2.0/mini/image-to-video`, modelo interno `seedance-2.0-i2v`, solo en el
+  adapter Fal para `video-extend`. El proveedor lo ofrece, pero Globe no tiene `routeId` público, binding gobernado,
+  canary ni disponibilidad para esa superficie; **no es el Seedance que muestra la ruta pública 2.0**.
+- Veo gobernado: `veo-3.1-generate-001` `3.1` en `ref/video/frames-v1`. El adapter genérico también contiene
+  `veo-3.1-fast-generate-001` `3.1-fast`, pero Fast no tiene ruta pública ni binding gobernado en este ledger.
+- Omni gobernado: `gemini-omni-flash-preview` `preview` en `ref/motion/reference-v1`; el contrato público de Globe
+  limita la ruta a referencias de imagen aunque la documentación del proveedor describa una superficie más amplia.
+
+`video-extend` sigue sin ruta pública y las fichas no sustituyen `globe.producer.fleet.list`; la disponibilidad debe
+leerse siempre desde el reader live.
+
 > **Delta 2026-07-25 (TASK-1555):** Recraft y Topaz **ya tienen ruta pública** (arriba) — antes estaban
 > integrados y verificados en vivo pero eran **invisibles en el Producer**, porque sin ruta ninguna
 > superficie puede nombrarlos. Queda **Hyper3D Rodin** (`model-3d-generate`) sin ruta: `ProducerRouteModality`

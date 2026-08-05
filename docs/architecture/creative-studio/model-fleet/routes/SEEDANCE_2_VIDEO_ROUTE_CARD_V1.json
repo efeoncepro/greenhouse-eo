@@ -1,0 +1,359 @@
+{
+  "schemaVersion": "model-route-card.v1",
+  "cardId": "route-card/seedance-2-video",
+  "snapshot": {
+    "observedAt": "2026-08-04",
+    "maxAgeDays": 14,
+    "revalidateBeforeUse": true
+  },
+  "authority": {
+    "availabilityReader": "efeonce-globe:globe.producer.fleet.list",
+    "humanLedger": "docs/operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md",
+    "providerEvidence": "Fal Seedance 2.0 endpoint/API pages, ByteDance product page and Fal terms"
+  },
+  "modelFamily": {
+    "publicName": "Seedance 2.0",
+    "familyKey": "seedance-2-video",
+    "modality": "video",
+    "globeStatus": "gated",
+    "summary": "Globe has a full Seedance 2.0 text-to-video route and a Seedance 2.0 R2V route. A separate Mini/I2V slug exists only in the Fal adapter's generic video-extend capability; it is not a public Producer route or governed production binding.",
+    "integrationDecision": "Keep standard, R2V and Mini/I2V as distinct identities. The public label Seedance 2.0 must not silently resolve to Mini, and R2V must not inherit the standard route's evidence or promotion state."
+  },
+  "evidence": [
+    {
+      "id": "fleet-ledger",
+      "authority": "runtime_primary",
+      "kind": "human-model-ledger",
+      "observedAt": "2026-08-04",
+      "reference": "docs/operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md",
+      "revalidateBeforeUse": true
+    },
+    {
+      "id": "runtime-handoff",
+      "authority": "runtime_primary",
+      "kind": "governed-canary-handoff",
+      "observedAt": "2026-08-04",
+      "reference": "docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md",
+      "revalidateBeforeUse": true
+    },
+    {
+      "id": "route-catalog",
+      "authority": "repo_primary",
+      "kind": "producer-route-catalog",
+      "observedAt": "2026-08-04",
+      "reference": "efeonce-globe:packages/domain/src/producer-catalog.ts",
+      "revalidateBeforeUse": false
+    },
+    {
+      "id": "fal-adapter",
+      "authority": "repo_primary",
+      "kind": "fal-model-routing-table",
+      "observedAt": "2026-08-04",
+      "reference": "efeonce-globe:apps/creative-runner/src/fal-adapter.ts",
+      "revalidateBeforeUse": false,
+      "note": "This is the source that exposes the exact full, R2V and Mini/I2V adapter identities."
+    },
+    {
+      "id": "governed-composition",
+      "authority": "repo_primary",
+      "kind": "governed-endpoint-composition",
+      "observedAt": "2026-08-04",
+      "reference": "efeonce-globe:apps/studio-web/src/governed-production-composition.ts",
+      "revalidateBeforeUse": false
+    },
+    {
+      "id": "seedance-loop-terms",
+      "authority": "runtime_primary",
+      "kind": "model-exact-terms-evidence",
+      "observedAt": "2026-07-22",
+      "reference": "efeonce-globe:scripts/evidence/producer-canary-seedance-2-terms.json",
+      "revalidateBeforeUse": true,
+      "ttlDays": 30
+    },
+    {
+      "id": "seedance-r2v-rights",
+      "authority": "runtime_primary",
+      "kind": "model-exact-rights-evidence",
+      "observedAt": "2026-07-31",
+      "reference": "efeonce-globe:scripts/evidence/fal-seedance-2-r2v-commercial-terms.json",
+      "revalidateBeforeUse": true,
+      "ttlDays": 30
+    },
+    {
+      "id": "seedance-product",
+      "authority": "provider_primary",
+      "kind": "product-documentation",
+      "observedAt": "2026-08-04",
+      "reference": "https://seed.bytedance.com/en/seedance2_0",
+      "revalidateBeforeUse": true,
+      "ttlDays": 14,
+      "note": "Primary family-level evidence; it does not prove a Globe route or binding."
+    },
+    {
+      "id": "seedance-text-api",
+      "authority": "provider_primary",
+      "kind": "endpoint-api",
+      "observedAt": "2026-07-22",
+      "reference": "https://fal.ai/models/bytedance/seedance-2.0/text-to-video/api",
+      "revalidateBeforeUse": true,
+      "ttlDays": 14
+    },
+    {
+      "id": "seedance-r2v-api",
+      "authority": "provider_primary",
+      "kind": "endpoint-api",
+      "observedAt": "2026-07-31",
+      "reference": "https://fal.ai/models/bytedance/seedance-2.0/reference-to-video/api",
+      "revalidateBeforeUse": true,
+      "ttlDays": 14
+    },
+    {
+      "id": "seedance-mini-api",
+      "authority": "provider_primary",
+      "kind": "endpoint-api",
+      "observedAt": "2026-08-04",
+      "reference": "https://fal.ai/models/bytedance/seedance-2.0/mini/image-to-video/api",
+      "revalidateBeforeUse": true,
+      "ttlDays": 14,
+      "note": "Mini exists at the provider, but provider support is not a Globe public-route claim."
+    },
+    {
+      "id": "adr-023",
+      "authority": "repo_primary",
+      "kind": "route-card-decision",
+      "observedAt": "2026-08-04",
+      "reference": "docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_ROUTE_CARDS_DECISION_V1.md",
+      "revalidateBeforeUse": false
+    },
+    {
+      "id": "seedance-r2v-canary",
+      "authority": "runtime_primary",
+      "kind": "terminal-canary-evidence",
+      "observedAt": "2026-08-02",
+      "reference": "efeonce-globe:promotion_557d4df1-994e-45ac-92f7-7ef885aa967e",
+      "revalidateBeforeUse": true,
+      "note": "R2V canary passed with a retained MP4, one 16-credit settlement and closed circuit under the exact R2V identity."
+    }
+  ],
+  "routes": [
+    {
+      "routeId": "ref/motion/loop-v1",
+      "kind": "standard",
+      "capability": "video-generate",
+      "operation": "create",
+      "provider": "fal",
+      "model": "seedance-2.0",
+      "version": "2.0",
+      "identityState": "resolved",
+      "endpointId": "fal.seedance.text-to-video",
+      "region": null,
+      "completionDriver": "webhook+poll",
+      "lifecycle": "not_promoted",
+      "exposure": {
+        "governed": "candidate",
+        "reader": "unknown",
+        "producerUi": "not-exposed",
+        "externalRollout": "gated"
+      },
+      "inputs": [
+        {
+          "slot": "prompt",
+          "role": "direction",
+          "mediaType": "text",
+          "required": true,
+          "valueShape": "text"
+        }
+      ],
+      "controls": [
+        { "name": "resolution", "owner": "outputShape", "valueShape": "enum(720p)", "mechanism": "Seedance provider field" },
+        { "name": "duration", "owner": "outputShape", "valueShape": "integer(4..10 seconds)", "mechanism": "Seedance provider field" },
+        { "name": "aspect-ratio", "owner": "outputShape", "valueShape": "enum(16:9|9:16)", "mechanism": "Seedance provider field" },
+        { "name": "audio-mode", "owner": "outputShape", "valueShape": "enum(with-audio|silent)", "mechanism": "generate_audio" }
+      ],
+      "output": {
+        "mediaType": "video",
+        "mimeTypes": ["video/mp4"],
+        "audio": "selectable embedded-or-none",
+        "durableAuthority": "Globe private content-addressed asset and governance readback"
+      },
+      "transport": {
+        "kind": "Fal queue",
+        "auth": "server-side provider credential",
+        "providerSlug": "bytedance/seedance-2.0/text-to-video",
+        "followUpReferences": "returned by Fal submit; never derived from the slug",
+        "webhook": "signed and idempotent",
+        "pollFallback": true,
+        "browserAccess": "forbidden"
+      },
+      "completion": {
+        "driver": "webhook+poll",
+        "providerOperation": "Fal queue status and result references",
+        "resultAuthority": "Globe downloaded bytes, MIME and content hash",
+        "recovery": "readback before retry; no route fallback"
+      },
+      "cables": {
+        "provider_supported": { "state": "verified", "evidenceRefs": ["seedance-product", "seedance-text-api", "seedance-loop-terms"] },
+        "contract_declared": { "state": "verified", "evidenceRefs": ["route-catalog", "fal-adapter", "governed-composition"] },
+        "adapter_wired": { "state": "wired", "evidenceRefs": ["fal-adapter", "governed-composition"] },
+        "transport_verified": { "state": "verified", "evidenceRefs": ["fleet-ledger", "fal-adapter"] },
+        "output_verified": { "state": "unknown", "evidenceRefs": ["fleet-ledger"], "note": "The ledger records prior live validation but this card has no current retained output reference for the standard route." },
+        "billing_verified": { "state": "unknown", "evidenceRefs": ["fleet-ledger", "seedance-loop-terms"] },
+        "rights_verified": { "state": "unknown", "evidenceRefs": ["seedance-loop-terms"], "note": "Provider terms evidence exists; a current Globe model-exact attestation is not claimed here." },
+        "evaluated": { "state": "verified", "evidenceRefs": ["fleet-ledger"] },
+        "canary_passed": { "state": "not_started", "evidenceRefs": ["fleet-ledger"], "note": "Do not borrow the R2V canary for the text-to-video route." },
+        "promoted": { "state": "not_promoted", "evidenceRefs": ["fleet-ledger", "runtime-handoff"] },
+        "available": { "state": "gated", "evidenceRefs": ["fleet-ledger"], "note": "Availability belongs to the live reader; this card records a driver/evaluation path, not an external entitlement." }
+      },
+      "evidenceRefs": ["route-catalog", "fal-adapter", "seedance-text-api", "fleet-ledger"],
+      "blockers": [
+        "Re-read the live fleet reader and current route binding before treating the standard route as production available.",
+        "Capture current output, billing and model-exact rights evidence for this route; do not inherit R2V evidence.",
+        "Keep the public Seedance 2.0 label mapped to the full text-to-video identity, never to Mini."
+      ]
+    },
+    {
+      "routeId": "ref/video/motion-v1",
+      "kind": "standard",
+      "capability": "video-motion-control",
+      "operation": "create",
+      "provider": "fal",
+      "model": "seedance-2.0-r2v",
+      "version": "2.0",
+      "identityState": "resolved",
+      "endpointId": "fal.seedance.reference-to-video",
+      "region": "us-central1",
+      "completionDriver": "webhook-and-poll",
+      "lifecycle": "gated",
+      "exposure": {
+        "governed": "sealed",
+        "reader": "unknown",
+        "producerUi": "blocked",
+        "externalRollout": "gated"
+      },
+      "inputs": [
+        {
+          "slot": "references",
+          "role": "motion-source",
+          "mediaType": "image|video",
+          "mimeTypes": ["image/jpeg", "image/png", "image/webp", "video/mp4"],
+          "cardinality": { "min": 1, "max": 4 },
+          "ordered": true,
+          "requiresVideo": true,
+          "mechanism": "separate image_urls and video_urls fields"
+        },
+        {
+          "slot": "prompt",
+          "role": "direction",
+          "mediaType": "text",
+          "required": true,
+          "valueShape": "text"
+        }
+      ],
+      "controls": [
+        { "name": "resolution", "owner": "outputShape", "valueShape": "enum(480p|720p|1080p)", "mechanism": "Seedance provider field" },
+        { "name": "duration", "owner": "outputShape", "valueShape": "integer(4..15 seconds)", "mechanism": "Seedance provider field" },
+        { "name": "aspect-ratio", "owner": "outputShape", "valueShape": "enum(16:9|9:16)", "mechanism": "Seedance provider field" },
+        { "name": "audio-mode", "owner": "outputShape", "valueShape": "enum(with-audio|silent)", "mechanism": "generate_audio; Globe currently sends no audio input" }
+      ],
+      "output": {
+        "mediaType": "video",
+        "mimeTypes": ["video/mp4"],
+        "audio": "selectable embedded-or-none",
+        "durableAuthority": "Globe private content-addressed asset and governance readback"
+      },
+      "transport": {
+        "kind": "Fal queue",
+        "auth": "server-side provider credential",
+        "providerSlug": "bytedance/seedance-2.0/reference-to-video",
+        "followUpReferences": "returned by Fal submit; never derived from the slug",
+        "webhook": "signed and idempotent",
+        "pollFallback": true,
+        "browserAccess": "forbidden"
+      },
+      "completion": {
+        "driver": "webhook-and-poll",
+        "providerOperation": "Fal queue status and result references",
+        "resultAuthority": "Globe downloaded bytes, MIME and content hash",
+        "recovery": "readback before retry; no route fallback"
+      },
+      "cables": {
+        "provider_supported": { "state": "verified", "evidenceRefs": ["seedance-product", "seedance-r2v-api", "seedance-r2v-rights"] },
+        "contract_declared": { "state": "verified", "evidenceRefs": ["route-catalog", "fal-adapter", "governed-composition"] },
+        "adapter_wired": { "state": "wired", "evidenceRefs": ["fal-adapter", "governed-composition"] },
+        "transport_verified": { "state": "verified", "evidenceRefs": ["seedance-r2v-canary", "runtime-handoff"] },
+        "output_verified": { "state": "verified", "evidenceRefs": ["seedance-r2v-canary", "runtime-handoff"], "note": "Retained MP4, hash and playback/governance readback are recorded in the handoff." },
+        "billing_verified": { "state": "verified", "evidenceRefs": ["seedance-r2v-canary", "runtime-handoff"], "note": "The governed canary records one 16-credit settlement." },
+        "rights_verified": { "state": "verified", "evidenceRefs": ["seedance-r2v-rights", "seedance-r2v-api"] },
+        "evaluated": { "state": "verified", "evidenceRefs": ["fleet-ledger", "seedance-r2v-canary"] },
+        "canary_passed": { "state": "verified", "evidenceRefs": ["seedance-r2v-canary", "runtime-handoff"] },
+        "promoted": { "state": "verified", "evidenceRefs": ["seedance-r2v-canary", "runtime-handoff"] },
+        "available": { "state": "gated", "evidenceRefs": ["fleet-ledger", "runtime-handoff"], "note": "The route is internally governed; external rollout remains gated and the card never overrides the live reader." }
+      },
+      "evidenceRefs": ["route-catalog", "fal-adapter", "seedance-r2v-api", "seedance-r2v-canary", "runtime-handoff"],
+      "blockers": [
+        "Re-read the live fleet reader before any client-facing availability claim.",
+        "Keep Globe's four-reference image/video contract distinct from the broader provider capability set.",
+        "Keep the governed motion-source requirement explicit: the current canary fixture requires a video input even though the catalog accepts image/video media types.",
+        "Keep Producer reference-input UI and private-ingest findings separate from the sealed governed canary."
+      ]
+    }
+  ],
+  "providerSurfaces": [
+    {
+      "surfaceId": "fal-seedance-2-mini-i2v-adapter",
+      "provider": "fal",
+      "endpointId": "bytedance/seedance-2.0/mini/image-to-video",
+      "status": "deferred",
+      "modes": ["image-to-video", "video-extend"],
+      "cables": {
+        "provider_supported": { "state": "verified", "evidenceRefs": ["seedance-mini-api", "seedance-product"] },
+        "contract_declared": { "state": "proposed", "evidenceRefs": ["fal-adapter"], "note": "The generic `video-extend` adapter shape declares one image input, but no public Globe route contract exists." },
+        "adapter_wired": { "state": "wired", "evidenceRefs": ["fal-adapter"] },
+        "transport_verified": { "state": "unknown", "evidenceRefs": ["fal-adapter"], "note": "Adapter tests and a slug are not a governed provider canary for Mini." },
+        "output_verified": { "state": "unknown", "evidenceRefs": ["fal-adapter"] },
+        "billing_verified": { "state": "unknown", "evidenceRefs": ["seedance-mini-api"] },
+        "rights_verified": { "state": "unknown", "evidenceRefs": ["seedance-mini-api"], "note": "No model-exact Globe rights attestation for Mini is claimed." },
+        "evaluated": { "state": "not_started", "evidenceRefs": ["fal-adapter"] },
+        "canary_passed": { "state": "not_started", "evidenceRefs": ["fal-adapter"] },
+        "promoted": { "state": "not_promoted", "evidenceRefs": ["fleet-ledger"] },
+        "available": { "state": "gated", "evidenceRefs": ["fleet-ledger"], "note": "No `video-extend` route appears in the public Producer catalog or governed production bindings." }
+      },
+      "evidenceRefs": ["fal-adapter", "seedance-mini-api", "fleet-ledger"],
+      "note": "The adapter names the internal model `seedance-2.0-i2v`. Mini exists at Fal, but it is Lab/legacy wiring only; do not report it as the Seedance model connected to the public Seedance 2.0 routes."
+    }
+  ],
+  "implementationChecklist": [
+    {
+      "id": "seedance-full-route-identity",
+      "status": "verified",
+      "ownerBoundary": "efeonce-globe route catalog, Fal adapter and text-to-video composition",
+      "evidenceRefs": ["route-catalog", "fal-adapter", "governed-composition", "seedance-text-api"]
+    },
+    {
+      "id": "seedance-r2v-route-identity",
+      "status": "verified",
+      "ownerBoundary": "efeonce-globe R2V adapter, governed evaluation and production routing",
+      "evidenceRefs": ["route-catalog", "fal-adapter", "governed-composition", "seedance-r2v-canary"]
+    },
+    {
+      "id": "seedance-r2v-canary-and-rights",
+      "status": "verified",
+      "ownerBoundary": "Globe evaluation, rights, credits, canary and Asset Governance",
+      "evidenceRefs": ["seedance-r2v-rights", "seedance-r2v-canary", "runtime-handoff"]
+    },
+    {
+      "id": "seedance-mini-public-route",
+      "status": "blocked",
+      "ownerBoundary": "Globe route contract, Producer catalog and production binding",
+      "evidenceRefs": ["fal-adapter", "seedance-mini-api", "fleet-ledger"],
+      "note": "Mini is not public or production-governed. A future exposure requires its own routeId, contract, rate, rights, evaluation and canary."
+    },
+    {
+      "id": "seedance-standard-current-readback",
+      "status": "open",
+      "ownerBoundary": "Globe live fleet reader and model ledger",
+      "evidenceRefs": ["fleet-ledger", "runtime-handoff"],
+      "note": "The standard 2.0 driver is wired and evaluated, but this card does not borrow R2V's promotion evidence."
+    }
+  ]
+}

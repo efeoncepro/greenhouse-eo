@@ -69,6 +69,10 @@ provider_supported → contract_declared → adapter_wired → transport_verifie
 Every cable has an explicit state. `unknown`, `unsupported`, `blocked` and `stale` are valid outcomes and must not be
 omitted. A provider-supported route may therefore remain `adapter_wired=not_started` and `available=gated`.
 
+Cards may additionally declare `exposure` to keep governed state, live-reader state, Producer UI exposure and external
+rollout separate. A sealed canary is not the same claim as `reader=available`, `producerUi=selectable` or
+`externalRollout=allowed`; these audiences require their own evidence and readback.
+
 ### 3. Runtime authority remains in Globe
 
 The sources of truth are assigned by concern:
@@ -96,10 +100,20 @@ Adding a semantically different provider mode, model lineage, tier or operation 
 new `routeId`. Updating a model within the same lineage creates a new version and evidence revision. No route inherits
 adapter, rate, rights, evaluation, canary, binding or availability from a neighboring route.
 
-The first FLUX 3 card is [`FLUX_3_VIDEO_ROUTE_CARD_V1.json`](model-fleet/routes/FLUX_3_VIDEO_ROUTE_CARD_V1.json). It
-records five standard Fal routes, five draft routes, `draft-enhance` and the BFL direct Early Access surface. All
-routes are `gated`; the namespace conflict, draft cache, keyframe contract, pricing, output bytes and rights remain
-explicit blockers where evidence is incomplete.
+The first concrete card is [`FLUX_3_VIDEO_ROUTE_CARD_V1.json`](model-fleet/routes/FLUX_3_VIDEO_ROUTE_CARD_V1.json). It
+records five standard Fal routes, five draft routes, `draft-enhance` and the BFL direct Early Access surface. The
+initial audited baseline now also includes:
+
+- [`GEMINI_OMNI_VIDEO_ROUTE_CARD_V1.json`](model-fleet/routes/GEMINI_OMNI_VIDEO_ROUTE_CARD_V1.json) for the exact
+  Vertex `gemini-omni-flash-preview` reference-to-video route;
+- [`VEO_3_1_VIDEO_ROUTE_CARD_V1.json`](model-fleet/routes/VEO_3_1_VIDEO_ROUTE_CARD_V1.json) for the exact Vertex
+  `veo-3.1-generate-001` frames route, while keeping the adapter's Fast variant separate;
+- [`SEEDANCE_2_VIDEO_ROUTE_CARD_V1.json`](model-fleet/routes/SEEDANCE_2_VIDEO_ROUTE_CARD_V1.json) for full Seedance
+  2.0, Seedance 2.0 R2V and the deferred Mini/I2V adapter surface.
+
+The cards preserve the distinction between sealed governed evidence and live availability. FLUX 3 and the deferred
+variants remain gated; Omni and Veo have sealed canaries but still require live-reader and Producer-input checks before
+consumer-facing claims. Seedance's public routes are full 2.0 and R2V; Mini is not a public Producer route.
 
 ### 5. Provider and Globe capability are separate claims
 
@@ -170,6 +184,9 @@ promotion. It creates these Greenhouse-owned artifacts:
 - `references/ROUTE_CARD_CONTRACT.md` and `route-card.schema.json`;
 - `scripts/validate-route-cards.mjs`;
 - `docs/architecture/creative-studio/model-fleet/routes/FLUX_3_VIDEO_ROUTE_CARD_V1.json`;
+- `docs/architecture/creative-studio/model-fleet/routes/GEMINI_OMNI_VIDEO_ROUTE_CARD_V1.json`;
+- `docs/architecture/creative-studio/model-fleet/routes/VEO_3_1_VIDEO_ROUTE_CARD_V1.json`;
+- `docs/architecture/creative-studio/model-fleet/routes/SEEDANCE_2_VIDEO_ROUTE_CARD_V1.json`;
 - `pnpm model-fleet:validate` and the mirrored-skill manifest entry;
 - router pointers in `AGENTS.md`, `CLAUDE.md` and `agent-context-router.json`.
 

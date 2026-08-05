@@ -52,6 +52,19 @@
   ruta arbitraria canónico y committeado— sigue pendiente**, y la generación desde el Producer para rutas con
   entrada obligatoria sigue bloqueada.
 
+## 2026-08-04 — Globe: el inventario de video deja de mezclar modelos y variantes
+
+- La skill compartida `greenhouse-globe-model-fleet` ahora enlaza fichas auditadas para Gemini Omni, Veo 3.1 y
+  Seedance 2.0, además de FLUX 3; Codex y Claude reciben el mismo método y la misma separación de evidencias.
+- La auditoría confirma que las rutas públicas de Seedance usan `seedance-2.0` (text-to-video) y
+  `seedance-2.0-r2v` (R2V). `seedance-2.0-i2v` / `bytedance/seedance-2.0/mini/image-to-video` existe solo en
+  el adapter Fal para `video-extend`, sin routeId público, binding gobernado ni canary de producción.
+- La ruta sellada de Veo usa `veo-3.1-generate-001`; `veo-3.1-fast-generate-001` queda documentado como superficie
+  Lab separada. Omni queda documentado como `gemini-omni-flash-preview` por Vertex Interactions, con sus límites de
+  contrato actuales y sus superficies proveedoras diferidas.
+- No cambió el runtime de Globe, el catálogo, los adapters, los secrets ni la disponibilidad. Las fichas son mapas de
+  evidencia; `globe.producer.fleet.list` conserva la autoridad live.
+
 ## 2026-08-04 — Globe: skill compartida para integrar modelos por ruta
 
 - **ADR-023 implementa `greenhouse-globe-model-fleet`** como skill espejada para Codex y Claude, con contrato de
@@ -862,17 +875,3 @@ Corrección de fuente de verdad: el cliente inicial es **SKY Agencia Creativa**,
   service blueprint mínimo, recovery, métricas y señales de Greenhouse.
 - La investigación externa reciente refuerza confianza/transparencia, procurement/coordinación y governance de IA;
   la validación primaria en Chile/LatAm permanece pendiente.
-
-## 2026-07-28 — Operator-first como mecanismo del Why
-
-- Se documentó la relación entre el Why de Efeonce y el contrato operator-first en estrategia, marca, experiencia,
-  ecosistema, Greenhouse y skills.
-- Se fijó la regla transversal: el valor debe ganarse por `capacidad + memoria`, nunca por dependencia u opacidad.
-- Se conectó cada dolor del operador con la promesa de dejar al cliente más capaz y mejorar cada ciclo.
-
-## 2026-07-28 — Content-to-Capability Loop y learn moments
-
-- Se creó `EFEONCE_CONTENT_TO_CAPABILITY_LOOP_V1.md` para conectar Glitch, blog, YouTube, microcapacitaciones,
-  Product Services y Greenhouse como un sistema de aprendizaje y autoridad.
-- Se definió el `Learn Moment Contract` para convertir contenido en aprendizaje contextual, acción, evidencia y
-  memoria dentro de los productos.

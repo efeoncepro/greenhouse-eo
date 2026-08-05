@@ -86,6 +86,11 @@ Usa solo estos estados de edge: `verified`, `proposed`, `wired`, `not_started`, 
 `provider_supported` no implica `globe_supported`; `available` exige reader live, binding/readiness, derechos,
 evaluación, canary y promoción convergentes.
 
+Cuando una ficha declare `exposure`, conserva cuatro audiencias distintas: estado gobernado (`candidate|sealed|promoted`),
+reader (`available|gated|unknown`), Producer UI (`selectable|visible-gated|blocked|not-exposed`) y rollout externo
+(`allowed|gated|deferred`). Un canary sellado no demuestra por sí solo que la UI pueda resolver inputs obligatorios ni
+que exista disponibilidad externa.
+
 ### 4. Validar antes de gastar
 
 Antes de estimate, prepare o reserve, valida shape, MIME, tamaño, cardinalidad, orden, índices temporales, audio,
@@ -128,6 +133,35 @@ skill, para que la skill no se convierta en un segundo catálogo.
 La primera implementación prevista usa el adapter Fal existente de Globe; no crea SDK ni adapter BFL paralelo. Todas
 las rutas parten `gated`. Resuelve primero los gaps de namespace, OpenAPI auténtico, pricing, keyframe/draft contract,
 result schema y rights antes de tocar disponibilidad.
+
+## Inventario inicial auditado: Omni, Veo y Seedance
+
+La primera ficha de FLUX 3 no era un inventario completo de Globe. El conjunto inicial de fichas concretas ahora cubre
+las rutas de video ya encontradas en el runtime y conserva las variantes que todavía no son rutas públicas:
+
+- [`GEMINI_OMNI_VIDEO_ROUTE_CARD_V1.json`](../../../docs/architecture/creative-studio/model-fleet/routes/GEMINI_OMNI_VIDEO_ROUTE_CARD_V1.json)
+  — `ref/motion/reference-v1`, `gemini-omni-flash-preview` `preview`, Vertex Interactions, región `global`,
+  `reference-to-video`, completion `poll`.
+- [`VEO_3_1_VIDEO_ROUTE_CARD_V1.json`](../../../docs/architecture/creative-studio/model-fleet/routes/VEO_3_1_VIDEO_ROUTE_CARD_V1.json)
+  — `ref/video/frames-v1`, `veo-3.1-generate-001` `3.1`, Vertex `predictLongRunning`, región `us-central1`,
+  primer cuadro y último cuadro opcional, completion `poll`.
+- [`SEEDANCE_2_VIDEO_ROUTE_CARD_V1.json`](../../../docs/architecture/creative-studio/model-fleet/routes/SEEDANCE_2_VIDEO_ROUTE_CARD_V1.json)
+  — Seedance 2.0 completo para `ref/motion/loop-v1`, Seedance 2.0 R2V para `ref/video/motion-v1` y la superficie
+  Mini/I2V separada.
+
+La respuesta a “¿qué Seedance está conectado?” requiere distinguir tres identidades: `seedance-2.0` para el loop
+text-to-video, `seedance-2.0-r2v` para motion/reference-to-video y `seedance-2.0-i2v` detrás del slug
+`bytedance/seedance-2.0/mini/image-to-video` para el capability genérico `video-extend`. Mini existe en Fal y está
+alambrado en el adapter Lab, pero no tiene `routeId` público, binding gobernado ni canary de producción; no es el
+Seedance que muestra la ruta pública “Seedance 2.0”.
+
+La misma separación aplica a Veo: el adapter genérico contiene `veo-3.1-fast-generate-001`, pero el binding sellado
+de `ref/video/frames-v1` usa exactamente `veo-3.1-generate-001`. Omni tiene una ruta pública de referencias de imagen;
+las capacidades de video-reference o edición stateful del proveedor quedan como superficies diferidas hasta tener
+routeId, contrato, evidencia, canary y readback propios.
+
+Estas fichas reflejan evidencia observada, no disponibilidad final. Antes de afirmar `available`, lee siempre
+`globe.producer.fleet.list` y reconcilia el resultado con el ledger y el handoff de Globe.
 
 ## Cómo leer y modificar una ficha
 

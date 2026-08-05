@@ -53,8 +53,10 @@ evaluación/derechos/readbacks y una generación real desde la UI autenticada. U
 amplía la allowlist global: sólo puede aceptarse para una salida exacta esperada después de verificar sus bytes.
 El método transversal para añadir o auditar proveedores es `greenhouse-globe-model-fleet`, espejado para Codex y
 Claude; sus route cards machine-readable viven en `docs/architecture/creative-studio/model-fleet/routes/` y nunca
-sustituyen la autoridad live del reader. ADR-023 y el primer card de FLUX 3 fijan la separación entre evidencia del
-proveedor, cables de integración y disponibilidad de Globe.
+sustituyen la autoridad live del reader. ADR-023 y el card inicial de FLUX 3 fijan la separación entre evidencia del
+proveedor, cables de integración y disponibilidad de Globe; el baseline auditado también cubre Gemini Omni, Veo 3.1
+y Seedance 2.0/R2V. Seedance Mini/I2V y Veo Fast quedan documentados como superficies no públicas hasta tener ruta,
+binding, canary y readback propios.
 Las atestaciones comerciales son inmutables por identidad de modelo + digest de términos: una corrección jurídica
 crea una atestación y policy derivada nuevas, nunca modifica la anterior. La idempotencia de `auto-promote` debe
 incluir esa autoridad legal; ruta/workspace/report por sí solos no distinguen una nueva versión de términos. Un

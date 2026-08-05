@@ -48,6 +48,22 @@ inputs, controls, output, transport, completion, cables, evidenceRefs, blockers
 implementation details. A route may expose a human-readable model name, but never a vendor slug in the browser
 catalog.
 
+### Exposure is separate from lifecycle
+
+When the route card has enough evidence to distinguish rollout surfaces, declare `exposure` explicitly:
+
+```text
+governed: candidate | sealed | promoted
+reader: available | gated | unknown
+producerUi: selectable | visible-gated | blocked | not-exposed
+externalRollout: allowed | gated | deferred
+```
+
+`canary_passed`, `promoted` and a closed circuit do not by themselves mean that the live reader reports `available`,
+that the Producer can supply mandatory inputs, or that external delivery is allowed. Use `exposure` to preserve those
+four independent audiences. The route card still cannot override `globe.producer.fleet.list`; it records the observed
+state and its evidence.
+
 ### Contract dimensions
 
 - `inputs` describes semantic slots, media type, MIME, cardinality, order and limits.

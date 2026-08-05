@@ -1,0 +1,257 @@
+{
+  "schemaVersion": "model-route-card.v1",
+  "cardId": "route-card/veo-3-1-video",
+  "snapshot": {
+    "observedAt": "2026-08-04",
+    "maxAgeDays": 14,
+    "revalidateBeforeUse": true
+  },
+  "authority": {
+    "availabilityReader": "efeonce-globe:globe.producer.fleet.list",
+    "humanLedger": "docs/operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md",
+    "providerEvidence": "Google Cloud Veo model documentation, release notes and service terms"
+  },
+  "modelFamily": {
+    "publicName": "Veo 3.1",
+    "familyKey": "veo-3-1-video",
+    "modality": "video",
+    "globeStatus": "gated",
+    "summary": "The sealed Globe frames route is bound to Veo 3.1 Generate, not the adapter's generic Fast Generate path. It uses Vertex long-running prediction and produces silent MP4 for the current route contract.",
+    "integrationDecision": "Treat `veo-3.1-generate-001` and `veo-3.1-fast-generate-001` as distinct model identities. The governed `ref/video/frames-v1` route uses Generate; Fast remains a non-promoted adapter surface until it receives its own route, binding and evidence."
+  },
+  "evidence": [
+    {
+      "id": "fleet-ledger",
+      "authority": "runtime_primary",
+      "kind": "human-model-ledger",
+      "observedAt": "2026-08-04",
+      "reference": "docs/operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md",
+      "revalidateBeforeUse": true
+    },
+    {
+      "id": "runtime-handoff",
+      "authority": "runtime_primary",
+      "kind": "governed-canary-handoff",
+      "observedAt": "2026-08-04",
+      "reference": "docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md",
+      "revalidateBeforeUse": true
+    },
+    {
+      "id": "route-catalog",
+      "authority": "repo_primary",
+      "kind": "producer-route-catalog",
+      "observedAt": "2026-08-04",
+      "reference": "efeonce-globe:packages/domain/src/producer-catalog.ts",
+      "revalidateBeforeUse": false
+    },
+    {
+      "id": "governed-composition",
+      "authority": "repo_primary",
+      "kind": "governed-endpoint-composition",
+      "observedAt": "2026-08-04",
+      "reference": "efeonce-globe:apps/studio-web/src/governed-production-composition.ts",
+      "revalidateBeforeUse": false
+    },
+    {
+      "id": "veo-adapter",
+      "authority": "repo_primary",
+      "kind": "vertex-video-adapter-and-lifecycle",
+      "observedAt": "2026-08-04",
+      "reference": "efeonce-globe:apps/creative-runner/src/vertex-video-adapter.ts",
+      "revalidateBeforeUse": false
+    },
+    {
+      "id": "veo-rights",
+      "authority": "runtime_primary",
+      "kind": "model-exact-rights-evidence",
+      "observedAt": "2026-07-31",
+      "reference": "efeonce-globe:scripts/evidence/vertex-veo-3.1-commercial-terms.json",
+      "revalidateBeforeUse": true,
+      "ttlDays": 30
+    },
+    {
+      "id": "veo-docs",
+      "authority": "provider_primary",
+      "kind": "model-documentation",
+      "observedAt": "2026-07-31",
+      "reference": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/veo/3-1-generate",
+      "revalidateBeforeUse": true,
+      "ttlDays": 14,
+      "note": "Primary source for the exact Veo 3.1 Generate identity and image-to-video/frames surface."
+    },
+    {
+      "id": "veo-release-notes",
+      "authority": "provider_primary",
+      "kind": "lifecycle-release-notes",
+      "observedAt": "2026-07-31",
+      "reference": "https://docs.cloud.google.com/vertex-ai/generative-ai/docs/release-notes",
+      "revalidateBeforeUse": true,
+      "ttlDays": 14,
+      "note": "Lifecycle authority for the current model and retired predecessor versions."
+    },
+    {
+      "id": "veo-terms",
+      "authority": "provider_primary",
+      "kind": "service-terms",
+      "observedAt": "2026-07-31",
+      "reference": "https://cloud.google.com/terms/service-terms",
+      "revalidateBeforeUse": true,
+      "ttlDays": 30
+    },
+    {
+      "id": "adr-023",
+      "authority": "repo_primary",
+      "kind": "route-card-decision",
+      "observedAt": "2026-08-04",
+      "reference": "docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_ROUTE_CARDS_DECISION_V1.md",
+      "revalidateBeforeUse": false
+    },
+    {
+      "id": "veo-canary",
+      "authority": "runtime_primary",
+      "kind": "terminal-canary-evidence",
+      "observedAt": "2026-08-04",
+      "reference": "efeonce-globe:promotion_ddd0977c-c6e7-4fa6-bd31-61737c108d31",
+      "revalidateBeforeUse": true,
+      "note": "Canary passed under the Generate model identity; 32 credits reserved and spent, with retained MP4 and governance readback in the runtime handoff."
+    }
+  ],
+  "routes": [
+    {
+      "routeId": "ref/video/frames-v1",
+      "kind": "standard",
+      "capability": "video-frames",
+      "operation": "create",
+      "provider": "vertex-video",
+      "model": "veo-3.1-generate-001",
+      "version": "3.1",
+      "identityState": "resolved",
+      "endpointId": "vertex.veo.frames",
+      "region": "us-central1",
+      "completionDriver": "poll",
+      "lifecycle": "gated",
+      "exposure": {
+        "governed": "sealed",
+        "reader": "unknown",
+        "producerUi": "blocked",
+        "externalRollout": "gated"
+      },
+      "inputs": [
+        {
+          "slot": "frames",
+          "role": "reference",
+          "mediaType": "image",
+          "mimeTypes": ["image/jpeg", "image/png", "image/webp"],
+          "cardinality": { "min": 1, "max": 2 },
+          "ordered": true,
+          "roles": ["first-frame", "optional-last-frame"],
+          "mechanism": "first-last-frame"
+        },
+        {
+          "slot": "prompt",
+          "role": "direction",
+          "mediaType": "text",
+          "required": true,
+          "valueShape": "text"
+        }
+      ],
+      "controls": [
+        { "name": "duration", "owner": "outputShape", "valueShape": "integer(8 seconds)", "mechanism": "Globe image-to-video route restriction" },
+        { "name": "resolution", "owner": "outputShape", "valueShape": "enum(720p)", "mechanism": "Globe route contract" },
+        { "name": "aspect-ratio", "owner": "outputShape", "valueShape": "enum(16:9|9:16)", "mechanism": "Vertex parameters.aspectRatio" },
+        { "name": "audio-mode", "owner": "outputShape", "valueShape": "enum(silent)", "mechanism": "governed route forces generateAudio=false" }
+      ],
+      "output": {
+        "mediaType": "video",
+        "mimeTypes": ["video/mp4"],
+        "audio": "none for the governed frames route",
+        "durableAuthority": "Globe private content-addressed asset and governance readback"
+      },
+      "transport": {
+        "kind": "Vertex predictLongRunning",
+        "auth": "server-side ADC/WIF",
+        "requestMode": "long-running operation",
+        "endpointSource": "governed allowlist using VEO_MODEL_LIFECYCLE.generate",
+        "followUpReferences": "provider operation name returned by submit; poll fetchPredictOperation",
+        "browserAccess": "forbidden"
+      },
+      "completion": {
+        "driver": "poll",
+        "providerOperation": "predictLongRunning followed by fetchPredictOperation",
+        "resultAuthority": "Globe result driver after inline or GCS output retrieval",
+        "recovery": "readback before retry; no model fallback"
+      },
+      "cables": {
+        "provider_supported": { "state": "verified", "evidenceRefs": ["veo-docs", "veo-release-notes", "veo-rights"] },
+        "contract_declared": { "state": "verified", "evidenceRefs": ["route-catalog", "governed-composition", "adr-023"] },
+        "adapter_wired": { "state": "wired", "evidenceRefs": ["veo-adapter", "governed-composition"] },
+        "transport_verified": { "state": "verified", "evidenceRefs": ["veo-canary", "runtime-handoff"] },
+        "output_verified": { "state": "verified", "evidenceRefs": ["veo-canary", "runtime-handoff"], "note": "Retained MP4, hash and playback/governance readback are recorded in the handoff." },
+        "billing_verified": { "state": "verified", "evidenceRefs": ["veo-canary", "runtime-handoff"], "note": "The terminal canary records 32 credits reserved and 32 spent." },
+        "rights_verified": { "state": "verified", "evidenceRefs": ["veo-rights", "veo-terms"] },
+        "evaluated": { "state": "verified", "evidenceRefs": ["fleet-ledger", "veo-canary"] },
+        "canary_passed": { "state": "verified", "evidenceRefs": ["veo-canary", "runtime-handoff"] },
+        "promoted": { "state": "verified", "evidenceRefs": ["veo-canary", "runtime-handoff"] },
+        "available": { "state": "gated", "evidenceRefs": ["fleet-ledger", "runtime-handoff"], "note": "The route is sealed and enabled internally, but live availability and external rollout remain governed by Globe; the Producer reference-input path is still blocked." }
+      },
+      "evidenceRefs": ["route-catalog", "governed-composition", "veo-adapter", "veo-docs", "veo-canary", "runtime-handoff"],
+      "blockers": [
+        "Re-read globe.producer.fleet.list before any consumer-facing availability claim.",
+        "Keep the Producer reference-input and private-ingest blockers separate from the sealed governed canary.",
+        "Do not substitute the generic Fast model for this Generate route without a new exact identity and canary."
+      ]
+    }
+  ],
+  "providerSurfaces": [
+    {
+      "surfaceId": "vertex-veo-3-1-fast-generate",
+      "provider": "vertex-video",
+      "endpointId": "veo-3.1-fast-generate-001",
+      "status": "deferred",
+      "modes": ["text-to-video", "image-to-video"],
+      "cables": {
+        "provider_supported": { "state": "verified", "evidenceRefs": ["veo-docs", "veo-release-notes"] },
+        "contract_declared": { "state": "proposed", "evidenceRefs": ["veo-adapter"], "note": "The generic adapter declares this lifecycle, but the public governed catalog route in this card does not bind to it." },
+        "adapter_wired": { "state": "wired", "evidenceRefs": ["veo-adapter"] },
+        "transport_verified": { "state": "unknown", "evidenceRefs": ["veo-adapter"], "note": "Adapter tests are not a provider canary for this exact surface." },
+        "output_verified": { "state": "unknown", "evidenceRefs": ["veo-adapter"] },
+        "billing_verified": { "state": "unknown", "evidenceRefs": ["veo-docs"] },
+        "rights_verified": { "state": "unknown", "evidenceRefs": ["veo-rights"], "note": "The model-exact evidence covers Veo 3.1 but does not authorize a new Globe binding by itself." },
+        "evaluated": { "state": "not_started", "evidenceRefs": ["veo-adapter"] },
+        "canary_passed": { "state": "not_started", "evidenceRefs": ["veo-adapter"] },
+        "promoted": { "state": "not_promoted", "evidenceRefs": ["fleet-ledger"] },
+        "available": { "state": "gated", "evidenceRefs": ["fleet-ledger"], "note": "No exact public route/binding for Fast is documented here." }
+      },
+      "evidenceRefs": ["veo-adapter", "veo-docs", "veo-release-notes"],
+      "note": "Do not report Fast as the model behind ref/video/frames-v1; that governed route is explicitly Generate."
+    }
+  ],
+  "implementationChecklist": [
+    {
+      "id": "veo-generate-route-identity",
+      "status": "verified",
+      "ownerBoundary": "efeonce-globe route catalog, governed composition and Vertex video adapter",
+      "evidenceRefs": ["route-catalog", "governed-composition", "veo-adapter"]
+    },
+    {
+      "id": "veo-canary-and-settlement",
+      "status": "verified",
+      "ownerBoundary": "Globe readiness, routing, canary, credits and Asset Governance",
+      "evidenceRefs": ["veo-canary", "runtime-handoff"]
+    },
+    {
+      "id": "veo-producer-reference-input",
+      "status": "blocked",
+      "ownerBoundary": "Globe Producer UI and private ingest",
+      "evidenceRefs": ["fleet-ledger", "runtime-handoff"],
+      "note": "The governed canary used the operator lane; it does not prove the mandatory-input Producer UI path."
+    },
+    {
+      "id": "veo-fast-separate-route",
+      "status": "deferred",
+      "ownerBoundary": "Globe route catalog, binding and promotion",
+      "evidenceRefs": ["veo-adapter", "veo-docs", "fleet-ledger"],
+      "note": "If Fast is to be offered, create a separate route identity and repeat contract, rate, rights, evaluation and canary gates."
+    }
+  ]
+}

@@ -161,6 +161,7 @@
         "region": { "type": ["string", "null"] },
         "completionDriver": { "type": "string", "minLength": 1 },
         "lifecycle": { "enum": ["gated", "not_promoted", "available", "unsupported"] },
+        "exposure": { "$ref": "#/$defs/exposure" },
         "inputs": { "type": "array", "minItems": 1 },
         "controls": { "type": "array" },
         "output": { "type": "object" },
@@ -169,6 +170,17 @@
         "cables": { "type": "object" },
         "evidenceRefs": { "type": "array", "items": { "type": "string" } },
         "blockers": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "exposure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["governed", "reader", "producerUi", "externalRollout"],
+      "properties": {
+        "governed": { "enum": ["candidate", "sealed", "promoted"] },
+        "reader": { "enum": ["available", "gated", "unknown"] },
+        "producerUi": { "enum": ["selectable", "visible-gated", "blocked", "not-exposed"] },
+        "externalRollout": { "enum": ["allowed", "gated", "deferred"] }
       }
     },
     "providerSurface": {

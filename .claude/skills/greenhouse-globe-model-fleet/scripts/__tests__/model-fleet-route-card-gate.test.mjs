@@ -41,6 +41,20 @@ test('fails when exact route identity is incomplete', () => {
   )
 })
 
+test('fails when exposure mixes governed and audience states', () => {
+  assert.throws(
+    () => runCard(card => {
+      card.routes[0].exposure = {
+        governed: 'sealed',
+        reader: 'available',
+        producerUi: 'unknown',
+        externalRollout: 'gated',
+      }
+    }),
+    error => /producerUi|value is outside the schema enum/.test(`${error.stdout ?? ''}${error.stderr ?? ''}`),
+  )
+})
+
 test('fails stale snapshots in strict mode', () => {
   assert.throws(
     () => runCard(card => { card.snapshot.observedAt = '2026-07-01' }),
