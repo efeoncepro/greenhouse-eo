@@ -278,6 +278,8 @@ Ver el contrato en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §15 (granularidad
 
 ## Acceptance Criteria
 
+- [ ] **MCP tool en el mismo PR (mandato del operador 2026-08-05, patrón TASK-1645):** cada reader/lectura canónica que esta task cree queda expuesto como MCP tool read-only (handler en `src/mcp/greenhouse/tools.ts` + registro en `server.ts` + método en `http-client.ts` + ruta del lane ecosystem si aplica) EN EL MISMO PR. La task NO se cierra con el reader UI-only.
+
 - [ ] `readUrlCitationAttribution({ organizationId, domain, url?, range })` existe en `src/lib/growth/ai-visibility/**`, gateado por `growth.ai_visibility.observation.read`, con shape `{ ok: true, groundedQueries, byUrl, byEngine, window } | { ok: false, errorCode, status }`.
 - [ ] **Cero re-captura verificada:** el reader NO llama providers, NO parsea DataForSEO, NO ejecuta grader runs; lee las citas ya persistidas en `provider_observations.citations` (verificado por test — mock de provider nunca invocado — y por review).
 - [ ] Atribución correcta: solo se atribuyen a la org las citas cuyo `domain` == dominio propio (server-side); se mapean a la URL específica; se agrupan por grounded query (`promptId`) + engine (`provider`) + tiempo.

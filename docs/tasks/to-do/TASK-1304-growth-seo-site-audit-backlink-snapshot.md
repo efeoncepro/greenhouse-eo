@@ -304,6 +304,8 @@ Ver el contrato completo en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §3 (OnPa
 
 ## Acceptance Criteria
 
+- [ ] **MCP tool en el mismo PR (mandato del operador 2026-08-05, patrón TASK-1645):** cada reader/lectura canónica que esta task cree queda expuesto como MCP tool read-only (handler en `src/mcp/greenhouse/tools.ts` + registro en `server.ts` + método en `http-client.ts` + ruta del lane ecosystem si aplica) EN EL MISMO PR. La task NO se cierra con el reader UI-only.
+
 - [ ] `queueSiteAudit(targetId, actor)` existe, gateado por `growth.seo.audit.run` + entitlement per-org, dispara OnPage `task_post` y persiste `seo_site_audit_runs` con `status=running` + `provider_task_id` + `provider_cost`.
 - [ ] Ciclo async: `seo-audit-enqueue` (semanal) + `seo-audit-collect` (30 min, poll idempotente por `provider_task_id` con `FOR UPDATE SKIP LOCKED`); un `collect` sobre task incompleta = no-op; dos `collect` concurrentes → una sola materialización.
 - [ ] Honest degradation verificada: crawl OK + 0 findings = `succeeded`; crawl parcial = `degraded`; crawl no completó = `failed`. NUNCA se fabrica snapshot.

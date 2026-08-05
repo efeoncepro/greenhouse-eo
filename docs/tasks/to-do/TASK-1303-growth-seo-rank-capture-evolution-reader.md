@@ -314,6 +314,8 @@ Ver `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §5 (rank tracking: DataForSEO SE
 
 ## Acceptance Criteria
 
+- [ ] **MCP tool en el mismo PR (mandato del operador 2026-08-05, patrón TASK-1645):** cada reader/lectura canónica que esta task cree queda expuesto como MCP tool read-only (handler en `src/mcp/greenhouse/tools.ts` + registro en `server.ts` + método en `http-client.ts` + ruta del lane ecosystem si aplica) EN EL MISMO PR. La task NO se cierra con el reader UI-only.
+
 - [ ] Source of truth nombrado: `seo_rank_snapshots` (PG hot window) + `greenhouse_growth_analytics.seo_rank_history` (BQ historia larga) + `seo_provider_spend_daily` (cost counter).
 - [ ] `captureRankSnapshot(targetId, actor)` es command gobernado: llama `enforceSeoRunEntitlement` ANTES de pegar DataForSEO; UPSERT idempotente por `capture_date`; persiste `provider_cost` + incrementa `seo_provider_spend_daily`.
 - [ ] Idempotencia verificada: re-run del cron el mismo `capture_date` NO duplica snapshots.

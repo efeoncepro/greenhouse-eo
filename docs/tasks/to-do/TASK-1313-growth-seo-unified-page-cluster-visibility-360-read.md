@@ -294,6 +294,8 @@ Ver el contrato en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` **§15** (granular
 
 ## Acceptance Criteria
 
+- [ ] **MCP tool en el mismo PR (mandato del operador 2026-08-05, patrón TASK-1645):** cada reader/lectura canónica que esta task cree queda expuesto como MCP tool read-only (handler en `src/mcp/greenhouse/tools.ts` + registro en `server.ts` + método en `http-client.ts` + ruta del lane ecosystem si aplica) EN EL MISMO PR. La task NO se cierra con el reader UI-only.
+
 - [ ] `readPageVisibility360({ organizationId, url, range })` y `readClusterVisibility360({ organizationId, clusterId, range })` existen en `src/lib/growth/seo/**`, gateados por `growth.seo.observation.read` + el gate existente de lectura AEO, con shape `{ ok: true, keywords, avgPosition, clicks, groundedQueries, citationShare, engines, quadrant360, seoLens, aeoLens } | { ok: false, errorCode, status }`.
 - [ ] **Boundary duro verificado:** el cruce es por `organization_id + url` (o cluster) con **dos reads separados unidos en memoria**; CERO JOIN SQL / VIEW / FK entre `seo_*` y la atribución de citas AEO (verificado por test + review). Juntar por `url` es un join más rico, no un merge.
 - [ ] **Cero promedio:** los dos ejes (rankeo por URL, citabilidad por URL) se mantienen ortogonales en la matriz quadrant granular; NUNCA un score combinado único.

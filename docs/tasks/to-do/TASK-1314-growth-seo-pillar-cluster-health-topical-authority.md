@@ -305,6 +305,8 @@ Ver el contrato en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` **§15.1** (pillar
 
 ## Acceptance Criteria
 
+- [ ] **MCP tool en el mismo PR (mandato del operador 2026-08-05, patrón TASK-1645):** cada reader/lectura canónica que esta task cree queda expuesto como MCP tool read-only (handler en `src/mcp/greenhouse/tools.ts` + registro en `server.ts` + método en `http-client.ts` + ruta del lane ecosystem si aplica) EN EL MISMO PR. La task NO se cierra con el reader UI-only.
+
 - [ ] `readPillarClusterHealth({ organizationId, clusterId, range })` existe en `src/lib/growth/seo/**`, gateado por `growth.seo.observation.read` + el gate existente de lectura AEO, con shape `{ ok: true, clusterId, range, coverage, structure, performance, aeoAuthority, topicalAuthorityScore, gaps } | { ok: false, errorCode, status }`.
 - [ ] **"Compone, no captura" verificado:** cero tabla nueva, cero provider call, cero cron, cero materialización; toda fuente sale de un reader existente (`readTopicClusterRollup` TASK-1312, `readClusterVisibility360` TASK-1313 o sus fuentes, `readSiteAuditReport` TASK-1304, `readRankEvolution` TASK-1303, `readUrlCitationAttribution` TASK-1311).
 - [ ] **Boundary duro verificado:** la composición es por `organization_id + cluster/url` con **readers separados unidos en memoria**; CERO JOIN SQL / VIEW / FK entre `seo_*`, el grafo de enlaces internos y la atribución de citas AEO (verificado por test + review).
