@@ -307,3 +307,47 @@ E-E-A-T (Experience · Expertise · Authoritativeness · Trustworthiness) es el 
 - Entitlements: `GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
 - Full API Parity: `GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`
 - Funcional + manual: pendientes (exit criteria EPIC-022 — documentación triple).
+
+## 17. Placement y camino de extracción a Wave (`wave.efeonce.org`) — vigente 2026-08-05
+
+**Decisión del operador (2026-08-05):** Search Visibility 360 **nace en greenhouse-eo** (la plataforma que existe
+hoy) y **eventualmente se habilita como producto en `wave.efeonce.org`** — consistente con `EPIC-037`, que declara
+a Wave como casa de la capa de producto de Search Visibility 360 y a Greenhouse como administrador (orgs, acceso,
+entitlements administrativos, handoffs comerciales, proyecciones), NUNCA como runtime ni source of truth del
+producto a largo plazo. Mientras `EPIC-027` esté activo, ninguna task de EPIC-022 crea deployables ni paquetes por
+anticipado: el módulo nace **extraction-ready dentro del monolito** y la extracción física es un programa posterior
+(Wave, con sus propias tasks).
+
+### 17.1 Inventario del seam de extracción (qué se levanta como unidad)
+
+| Pieza | Home actual | Destino en extracción |
+|---|---|---|
+| Datos | `greenhouse_growth.seo_*` (8 tablas TASK-1299 + `seo_gsc_daily` TASK-1302) | DB de Wave; el schema es una unidad autocontenida (IDs TEXT prefijados, cero FK a otros dominios) |
+| Dominio | `src/lib/growth/seo/**` (readers/commands/chokepoint) | `domain-package` → runtime Wave |
+| Lanes | `app` (UI/Nexa) + `ecosystem` (`/api/platform/ecosystem/growth/seo/*`, TASK-1645) | El lane ecosystem ES el contrato sister-platform: Greenhouse lo consume desde Wave tras el cutover |
+| Entitlements | `module_assignments` per-org + capabilities `growth.seo.*` | Enforcement local de Wave + administración federada desde Greenhouse (modelo EPIC-037) |
+| Historia | BQ mirror (TASK-1303) | Viaja con el producto; dataset separado del resto de Greenhouse |
+
+### 17.2 El único acople deliberado: la FK a la org canónica
+
+`seo_targets.organization_id` → `greenhouse_core.organizations` (FK dura, ON DELETE RESTRICT). **Se mantiene**
+mientras el módulo viva en el monolito (integridad hoy > pureza especulativa; regla canónica 360: extender objetos
+canónicos, nunca identidades paralelas). En la extracción, la FK se reemplaza por integridad app-level + identidad
+federada (los `organization_id` son TEXT opacos y viajan tal cual). Este intercambio es el paso 1 conocido del
+runbook de extracción, no deuda oculta.
+
+### 17.3 Reglas duras para TODO el trabajo de EPIC-022 (nacer extraction-ready)
+
+- **NUNCA** agregar una FK nueva desde `seo_*` hacia ningún schema de Greenhouse distinto del ancla org ya
+  declarada (ni `grader_*`, ni core adicional, ni delivery/finance/payroll). Cruces = por `organization_id` en
+  derived reads.
+- **NUNCA** importar desde `src/lib/growth/seo/**` módulos de otros dominios de Greenhouse, salvo primitives
+  transversales canónicas (postgres client, entitlements runtime, copy, observabilidad). El grafo de imports del
+  dominio debe poder cortarse con el seam.
+- **SIEMPRE** que un consumer nuevo necesite datos SEO (UI, Nexa, MCP, sister platform), entrar por los readers
+  canónicos o el lane ecosystem — nunca SQL directo cross-dominio. El lane ecosystem es el contrato que sobrevive
+  la extracción.
+- **SIEMPRE** declarar en el `Modular Placement Contract` de cada child task: `Future candidate home:
+  domain-package` + nota Wave. La extracción física NO se autoriza desde una task de feature.
+
+Fuente: directiva del operador 2026-08-05 + `EPIC-037` + `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`.

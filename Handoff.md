@@ -17,6 +17,13 @@ tools read-only, espejo TASK-1086 de Knowledge; blocked by 1301/1302/1303), exit
 (el epic NO cierra UI-only), DoD reforzado en TASK-1301 (chokepoint consumer-agnóstico) y deltas de impacto
 cruzado en 1302/1303/1304 (el schema ya existe; readers nacen consumer-agnósticos).
 
+**Delta misma sesión — destino Wave declarado.** El operador comunicó que SV360 nace en Greenhouse pero
+eventualmente se habilita como producto en `wave.efeonce.org` (consistente con EPIC-037). Materializado como
+contrato, no como código: `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` **§17** (inventario del seam de extracción,
+FK org = único acople deliberado que se intercambia en la extracción, reglas duras extraction-ready para TODA
+child task de EPIC-022), deltas en EPIC-022/EPIC-037/TASK-1299/TASK-1645. El schema aplicado NO cambió — ya era
+extraction-ready. La extracción física NO queda autorizada (programa posterior de Wave; EPIC-027 manda hoy).
+
 **Rollout:** schema inerte por diseño (cero consumers hasta 1302+); prod recibe la migración vía release
 control plane cuando el módulo se secuencie. Próximo paso del epic: `TASK-1300` (DataForSEO families, paralela)
 y `TASK-1301` (capabilities). Nota de sesión: hubo commits concurrentes de otro agente (`aa00683bb` absorbió

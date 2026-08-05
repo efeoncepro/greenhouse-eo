@@ -87,7 +87,7 @@ Las tasks de implementación se crearán después de aceptar el ADR y cerrar el 
 
 - `EPIC-020` — Public AI Visibility Lead Magnet Program; current Greenhouse grader and acquisition rail.
 - `EPIC-021` — AEO brand-aware prompt generation engine.
-- `EPIC-022` — Growth SEO/Search Visibility 360 module.
+- `EPIC-022` — Growth SEO/Search Visibility 360 module. **Delta 2026-08-05:** arrancó ejecución en greenhouse-eo (TASK-1299 schema complete) con destino Wave declarado y seam de extracción contratado en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §17 (nace extraction-ready; lane ecosystem TASK-1645 = futuro contrato sister-platform).
 - `TASK-1266` / `TASK-1281` — technical/entity/agentic readiness probe substrate and headless probe runtime gap.
 - Current AI Visibility Grader documentation and runtime in `docs/documentation/growth/ai-visibility-grader.md`.
 

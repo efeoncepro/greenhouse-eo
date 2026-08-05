@@ -1,5 +1,12 @@
 # TASK-1299 — Growth SEO: Schema + Time-Series Foundation
 
+## Delta 2026-08-05 (post-complete) — destino Wave declarado
+
+El operador declaró que Search Visibility 360 eventualmente vive en `wave.efeonce.org` (EPIC-037). El schema
+aplicado NO cambia: ya es extraction-ready (unidad autocontenida, IDs TEXT, cero FK cross-dominio salvo el ancla
+org, que es el único acople deliberado y se intercambia por integridad app-level en la extracción). Contrato del
+seam: `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §17.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

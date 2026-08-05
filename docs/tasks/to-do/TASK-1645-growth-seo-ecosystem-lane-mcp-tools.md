@@ -105,7 +105,7 @@ Reglas obligatorias:
 - Topology impact: `none`
 - Current home: `src/app/api/platform/ecosystem/growth/seo/**` (lane) + `src/mcp/greenhouse/**` (tools) + readers en `src/lib/growth/seo/**`.
 - Future candidate home: `domain-package`
-- Boundary: el lane y los tools son adapters delgados sobre los readers canónicos; la lógica de dominio vive exclusivamente en `src/lib/growth/seo/**`.
+- Boundary: el lane y los tools son adapters delgados sobre los readers canónicos; la lógica de dominio vive exclusivamente en `src/lib/growth/seo/**`. Nota Wave: el lane ecosystem de esta task es el futuro contrato sister-platform cuando SV360 se habilite en `wave.efeonce.org` (arch doc SEO §17; EPIC-037).
 - Server/browser split: 100% server-only (lane machine-authed + MCP server); nada de este trabajo entra al bundle browser.
 - Build impact: ninguno nuevo (reusa runtime API existente; sin SDK externo).
 - Extraction blocker: ninguno; el trabajo queda dentro del monolito actual. No se autoriza crear `apps/*`, `packages/*` ni deployables nuevos.

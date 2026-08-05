@@ -183,3 +183,12 @@ Commercial, Pricing, Finance, Legal y Operations conservan sus decisiones propia
 
 - **`TASK-1299` (schema fundacional) en ejecución:** migración `20260805134439202_task-1299-growth-seo-schema.sql` aplicada en `greenhouse-pg-dev` — 8 tablas `seo_*` (config + serie temporal append-only), UNIQUEs de idempotencia, triggers `block_seo_row_mutation`, GRANTs least-privilege, `db.d.ts` regenerado, smoke live anti-mutation verificado. El bloqueador fundacional dejó de serlo.
 - **Mandato del operador (directiva de sesión 2026-08-05):** todo lo que el módulo SEO construya **nace Full API Parity y usable por MCP**. Materialización: exit criterion nuevo (parity+MCP verificados como consumers reales), child task `TASK-1645` (lane ecosystem + MCP tools, espejo `TASK-1086` de Knowledge) y DoD reforzado en `TASK-1301` (capability ⇒ el chokepoint sirve a TODOS los lanes, nunca un gate paralelo por consumer). Los writes de agente se declaran vía governed action loop como follow-up explícito.
+
+## Delta 2026-08-05 (b) — Destino Wave declarado: nace en Greenhouse, se habilita en `wave.efeonce.org`
+
+Directiva del operador: Search Visibility 360 nace en greenhouse-eo (la plataforma vigente) y eventualmente se
+habilita como producto en `wave.efeonce.org` (consistente con `EPIC-037`: Wave = casa del producto; Greenhouse =
+administrador, no runtime de largo plazo). Implicación para TODAS las child tasks: nacer **extraction-ready** según
+`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §17 (inventario del seam, FK org como único acople deliberado, reglas
+duras de imports/FKs/consumers). La extracción física NO se autoriza desde este epic mientras `EPIC-027` esté
+activo; es programa posterior de Wave.
