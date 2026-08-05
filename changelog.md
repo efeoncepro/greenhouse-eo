@@ -7,6 +7,24 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-05 — Agent Context Governance: la rotación respeta también el presupuesto de líneas
+
+- Se corrigió `scripts/maintenance/rotate-handoff-context.mjs`: el plan de Handoff ahora conserva las sesiones más
+  recientes hasta cumplir tanto el límite de sesiones como el límite de 600 líneas.
+- Se agregó una prueba de regresión para el caso que rompía CI: 20 sesiones o menos, pero `Handoff.md` demasiado
+  largo. La rotación canónica vuelve a resolver el warning que `docs:context-check:strict` reporta.
+
+## 2026-08-05 — Registro maestro de partnerships y providers
+
+- Se creó [`EFEONCE_PARTNERSHIP_REGISTRY_V1.md`](docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md) como fuente
+  operativa para registrar estados, evidencia, owners y próximos pasos de Google Cloud, Claude, OpenAI, BytePlus,
+  Runway, ElevenLabs, FLUX, AWS, Salesforce, HubSpot y demás relaciones.
+- El refresh de Google Cloud corrige la interpretación comercial: Efeonce está registrada en Partner Network Hub,
+  pero la due diligence sigue en curso, las rutas aparecen como `Registrado` y no hay aún un nivel Select/Premier/
+  Diamond ni capacidad para crear oportunidades.
+- Se documentó el plan de activación: Services/Co-sell como ruta principal, Artificial Intelligence como primera
+  competencia, un pod interno pequeño, dos casos Google-ready y reventa con Ingram/Xvantage como carril paralelo.
+
 ## 2026-08-05 — Nexa: se retiró el modo "Compacto" (el chat viejo que sobrevivió al cutover)
 
 - El selector "Modo de Nexa" queda en **Panel** (piso incondicional) y **Lateral**. El modo `dock`
@@ -864,26 +882,3 @@ Corrección de fuente de verdad: el cliente inicial es **SKY Agencia Creativa**,
   contra tarjetas azules, dashboards ilegibles, clipping y decoración genérica.
 - Se sincronizaron las skills Codex/Claude de `design-studio`, `social-media-studio` y
   `greenhouse-ai-image-generator`.
-
-## 2026-07-28 — HISTÓRICO SUPERSEDIDO — Plataforma UI compartida Efeonce: foundation local
-
-- Se creó `EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1` para superseder parcialmente el modelo Globe-local y separar gobierno Greenhouse, packages portables, adapters por runtime y Lab independiente.
-- Se registraron `TASK-1588` y `TASK-1589…1592`.
-- Se inició `../axis-design-system` con tokens, contracts, registry y un Lab Vite navegable; build y tests pasan.
-- Se creó `efeoncepro/axis-design-system`, se desplegó `axis-design-system-lab.vercel.app` y se publicaron
-  `@efeoncepro/axis-tokens`, `@efeoncepro/axis-ui-contracts` y `@efeoncepro/axis-ui-registry` en GitHub Packages como `0.1.2`.
-- En ese corte Greenhouse/Globe todavía no importaban los packages en runtime; la adopción quedó
-  verificada como canary opt-in en `TASK-1591` el 2026-07-29.
-- Se completaron las precondiciones de distribución privada: permisos GitHub Packages para Greenhouse/Globe,
-  `NPM_RC` del Lab en Vercel y secreto/IAM de lectura para Cloud Build en `efeonce-globe`. El runbook operativo
-  queda en `docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`; el PAT operator-owned debe rotarse
-  antes de cualquier rollout externo.
-
-## 2026-07-28 — Globe: payload React migrado al pipeline Tailwind v4
-
-- En `../efeonce-globe`, composer, shell, diálogos, feed, viewer, share board, primitives y base/motion dejaron
-  de depender de hojas CSS de superficie; los estilos quedan en `studio-client/src/styles/tailwind.css`, con
-  theme generado desde `tokens.ts`.
-- Build, lint, 118 tests del cliente, gates de diseño, reduced-motion y Tailwind engine canary están verdes.
-- `producerStyles` sigue únicamente en el fallback vanilla de `/producer`; su retiro continúa siendo el gate de
-  `TASK-1560`, por lo que el rollout global aún no se declara cerrado.

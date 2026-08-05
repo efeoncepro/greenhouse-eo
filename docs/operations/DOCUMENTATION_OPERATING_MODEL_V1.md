@@ -141,7 +141,9 @@ No mezclar las capas:
 - El historial interno vive bajo `docs/changelog/internal/`: el primer corte conserva un snapshot byte-for-byte
   con manifest SHA-256 y las rotaciones posteriores crean shards mensuales con hash por entrada.
 - La rotacion canonica es `pnpm docs:context-rotate --apply`; el dry-run omite `--apply`. El proceso debe ser
-  idempotente, mantener entradas completas y abortar la reescritura si detecta una edicion concurrente.
+  idempotente, mantener entradas completas y abortar la reescritura si detecta una edicion concurrente. La
+  rotacion de contexto debe satisfacer todos los techos activos, no solo el conteo principal: `Handoff.md` rota por
+  sesiones, lineas y tokens; `changelog.md` rota por entradas, lineas y tokens.
 - Buscar historia por keyword en el indice/snapshots; una entrada antigua es evidencia secundaria y no reemplaza
   task, issue, ADR, arquitectura ni runtime vigente.
 

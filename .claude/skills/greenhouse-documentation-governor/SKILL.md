@@ -72,7 +72,11 @@ or operational doc for that domain.
 6. Validate proportionally.
    - Closure heuristic: run `pnpm docs:closure-check` on the relevant diff; use
      `--strict` only when the team wants warnings to fail the command.
-   - Docs-only: run `pnpm docs:context-check` when handoff/context/changelog governance changed.
+   - Docs-only: run `pnpm docs:context-check` when handoff/context/changelog governance changed; use
+     `pnpm docs:context-check:strict` before closing changes to those contracts.
+   - If strict recommends `pnpm docs:context-rotate --apply`, run it and then re-run strict. Rotation must satisfy
+     every active budget, not only the primary count: `Handoff.md` uses sessions + lines + tokens, and
+     `changelog.md` uses entries + lines + tokens.
    - Task docs: run `pnpm task:lint --changed` or the focal task command.
    - UI docs with visible runtime: include GVC evidence or state the exact
      blocker.
@@ -156,6 +160,9 @@ Use this matrix to choose the smallest complete update set.
   full session history in the root handoff/archive index.
 - Never let `changelog.md` become an append-only archive. Keep complete recent entries in root, rotate older
   entries to integrity-marked monthly shards, and preserve the initial cut byte-for-byte.
+- Never close context governance with warnings. If the checker says rotation is required but the rotator says
+  nothing can be archived, treat that as a rotator bug or a documented exception; fix the cause and re-run
+  `pnpm docs:context-check:strict`.
 - Never move a task to `complete/` without acceptance evidence and proportional
   verification.
 - Never update docs based only on stale audit/handoff memory; re-check code,

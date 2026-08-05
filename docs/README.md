@@ -170,6 +170,7 @@ Indice maestro de la documentacion no operativa del repo.
 ### Operations
 
 - [Issue Tracker](issues/README.md)
+- [Efeonce Partnership Registry V1](operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md)
 - [AXIS Private Package Consumption Runbook](operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md)
 - [Agent Context History](operations/agent-context-history/README.md)
 - [Agent Context Router Decision](architecture/GREENHOUSE_AGENT_CONTEXT_ROUTER_DECISION_V1.md)

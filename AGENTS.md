@@ -197,16 +197,19 @@ y [`GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md`](docs/ui/GREENHOUSE_PREMIUM_U
 - Validar proporcionalmente: tests/lint/build/manual/runtime según riesgo y dominio.
 - Implementaciones no triviales: `greenhouse-qa-release-auditor` + `pnpm qa:gates --changed`.
 - Cierre documental: `greenhouse-documentation-governor` + `pnpm docs:closure-check`.
-- Contexto/handoff: `pnpm docs:context-check:strict` antes de cerrar cambios a estos contratos.
+- Contexto/handoff: `pnpm docs:context-check:strict` antes de cerrar cambios a estos contratos. Si recomienda
+  rotar, ejecutar `pnpm docs:context-rotate --apply` y repetir strict; no basta cumplir sesiones/entradas si
+  lineas o tokens siguen fuera de presupuesto.
 - Estado honesto: `complete | code complete, rollout pendiente | operativamente bloqueado`.
 
 ## Documentación viva
 
 - `AGENTS.md`: reglas transversales y router; nunca volver a almacenar specs de dominio inline.
 - `project_context.md`: estado durable vigente; sin diario ni secciones `Delta`.
-- `Handoff.md`: continuidad activa, máximo 20 sesiones.
-- `changelog.md`: ventana reciente de cambios reales; el historial sale a `docs/changelog/internal/` mediante
-  `pnpm docs:context-rotate --apply`, nunca se elimina ni se vuelve a pegar en raíz.
+- `Handoff.md`: continuidad activa, máximo 20 sesiones, 600 líneas y ~12.000 tokens.
+- `changelog.md`: ventana reciente de cambios reales, máximo 60 entradas, 2.000 líneas y ~60.000 tokens; el
+  historial sale a `docs/changelog/internal/` mediante `pnpm docs:context-rotate --apply`, nunca se elimina ni se
+  vuelve a pegar en raíz.
 - Tasks/issues/ADRs/arquitectura: evidencia y contrato canónico.
 - Historia: `docs/operations/agent-context-history/`, buscable bajo demanda y nunca auto-cargada completa.
 - Toda capacidad mantiene documentación técnica, funcional y manual/runbook proporcional.

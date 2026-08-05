@@ -157,6 +157,8 @@ Si el cambio toca UI visible, levantar `pnpm dev` y entregar la URL `localhost` 
 
 Todo trabajo formal debe respetar el ciclo `intake -> taxonomy -> plan -> execution -> verification -> closure -> handoff`.
 El uso de `project_context.md`, `Handoff.md` y `Handoff.archive.md` se rige por `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md`.
+Context governance: cambios a contexto/handoff/changelog exigen `pnpm docs:context-check:strict`; si pide rotar,
+`pnpm docs:context-rotate --apply` y repetir. Techos: sesiones/entradas, lineas, tokens.
 
 Comandos canonicos:
 
