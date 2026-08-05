@@ -1,5 +1,11 @@
 # TASK-1303 — Growth SEO: Rank Capture + Evolution Reader
 
+## Delta 2026-08-05
+
+- El schema fundacional ya existe: TASK-1299 aplicó `20260805134439202_task-1299-growth-seo-schema.sql` en `greenhouse-pg-dev` (8 tablas `seo_*`, UNIQUEs de idempotencia, triggers `block_seo_row_mutation`, `db.d.ts` regenerado). Actualizar el supuesto "schema no existe" en Discovery: verificar columnas reales contra `db.d.ts`/`information_schema`, no re-crear DDL.
+- Mandato parity+MCP del operador (2026-08-05): los readers/commands de esta task nacen consumer-agnósticos — los expondrá `TASK-1645` (lane ecosystem + MCP tools). Shape `{ ok } | { ok: false, errorCode, status }` obligatorio.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

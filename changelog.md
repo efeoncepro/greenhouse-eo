@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-05 — Growth SEO (EPIC-022): schema fundacional aplicado + mandato Full API Parity/MCP
+
+- TASK-1299: migración `20260805134439202` aplicada en `greenhouse-pg-dev` — 8 tablas `seo_*` en
+  `greenhouse_growth` (config + serie temporal append-only por `capture_date`), UNIQUEs de idempotencia,
+  triggers anti-mutation, GRANTs least-privilege, `db.d.ts` regenerado. Smoke live verificado con rollback.
+- Directiva del operador: todo el módulo SEO nace Full API Parity y usable por MCP. Se creó `TASK-1645`
+  (lane ecosystem + MCP tools, espejo TASK-1086), exit criterion nuevo en EPIC-022 y DoD consumer-agnóstico
+  en TASK-1301.
+
 ## 2026-08-05 — Agent Context Governance: la rotación respeta también el presupuesto de líneas
 
 - Se corrigió `scripts/maintenance/rotate-handoff-context.mjs`: el plan de Handoff ahora conserva las sesiones más
