@@ -1,5 +1,17 @@
 # Handoff activo
 
+### Registro de partnerships — fuente operativa creada (2026-08-05)
+
+Se creó [`EFEONCE_PARTNERSHIP_REGISTRY_V1.md`](docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md) como registro
+central de partnerships, providers y postulaciones de Efeonce. El primer refresh documenta Google Cloud con evidencia
+del Partner Network Hub: la cuenta está `Partner registrado`, las rutas aparecen como `Registrado`, y la debida
+diligencia está `En curso`; todavía no hay nivel Select/Premier/Diamond activo ni capacidad para crear oportunidades.
+
+El registro también consolida Claude, OpenAI, BytePlus, Runway, ElevenLabs, FLUX, AWS, Salesforce, HubSpot, Lovable,
+HeyGen y otras relaciones, separando partnership activo, cuenta registrada, postulación, provider en uso, bloqueo y
+target. Próximo paso operativo: responder las decisiones de due diligence de Google Cloud y actualizar el registro sólo
+con evidencia primaria. La auditoría de postulaciones de IA del 2026-07-26 queda como fotografía histórica.
+
 ### Nexa — retiro del modo "Compacto" + diagnóstico del lane que se abría solo (2026-08-05)
 
 **Origen.** El operador reportó que al iniciar sesión el chat de Nexa aparecía abierto a la derecha. Causa
@@ -14,9 +26,11 @@ local, sin historial) que sobrevivió como opción del selector tras el cutover 
 con él su código muerto en `NexaFloatingButton` y el flag `NEXA_FLOATING_EXPANDABLE_ENABLED` + mirror
 `NEXT_PUBLIC_*` (su único fallback era ese modo). Modos vigentes: `expandible` (piso incondicional) y `lane`.
 
-**Estado:** code complete + migración aplicada; **rollout pendiente en un punto**: borrar de Vercel las 4
-env vars huérfanas del flag retirado (Production/staging/Preview) — el código ya no las lee, así que no
-bloquean, pero quedan como basura de configuración. Requiere decisión del operador.
+**Estado:** code complete + migración aplicada; **rollout pendiente en un punto**: borrar de Vercel las 3
+env vars huérfanas del flag retirado — `NEXT_PUBLIC_NEXA_FLOATING_EXPANDABLE_ENABLED` en Production,
+staging y Preview (develop). Verificado con `vercel env ls`: la var server `NEXA_FLOATING_EXPANDABLE_ENABLED`
+nunca existió en Vercel, solo el mirror. El código ya no las lee, así que no bloquean, pero quedan como
+basura de configuración. Requiere decisión del operador.
 
 **Verificación:** `pnpm local:check`, `pnpm test` (10.064 pass), `pnpm build`, `pnpm flags:audit --strict`
 verdes. Menú verificado con Playwright contra localhost: solo Panel/Lateral, switch a Lateral y vuelta con
