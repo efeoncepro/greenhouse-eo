@@ -7456,6 +7456,20 @@ export interface GreenhouseGrowthSeoCompetitors {
   seo_target_id: string;
 }
 
+export interface GreenhouseGrowthSeoGscDaily {
+  capture_date: Timestamp;
+  clicks: Generated<number>;
+  ctr: Generated<Numeric>;
+  gsc_daily_id: Generated<string>;
+  impressions: Generated<number>;
+  materialized_at: Generated<Timestamp>;
+  organization_id: string;
+  page: string;
+  position: Numeric;
+  query: string;
+  site_url: string;
+}
+
 export interface GreenhouseGrowthSeoKeywordSetMembers {
   created_at: Generated<Timestamp>;
   effective_from: Generated<Timestamp>;
@@ -12156,6 +12170,7 @@ export interface DB {
   "greenhouse_growth.search_console_oauth_states": GreenhouseGrowthSearchConsoleOauthStates;
   "greenhouse_growth.seo_backlink_snapshots": GreenhouseGrowthSeoBacklinkSnapshots;
   "greenhouse_growth.seo_competitors": GreenhouseGrowthSeoCompetitors;
+  "greenhouse_growth.seo_gsc_daily": GreenhouseGrowthSeoGscDaily;
   "greenhouse_growth.seo_keyword_set_members": GreenhouseGrowthSeoKeywordSetMembers;
   "greenhouse_growth.seo_keyword_sets": GreenhouseGrowthSeoKeywordSets;
   "greenhouse_growth.seo_rank_snapshots": GreenhouseGrowthSeoRankSnapshots;

@@ -12,7 +12,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -29,7 +29,7 @@
 - Rank: `TBD`
 - Domain: `growth|data`
 - Blocked by: `TASK-1299`
-- Branch: `task/TASK-1302-growth-seo-gsc-daily-snapshot-materializer`
+- Branch: `develop` (contrato del repo: una task NO crea rama propia; local-first, sin push automático)
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
