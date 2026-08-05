@@ -16,7 +16,7 @@ parity+MCP verificados como consumers reales.
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -29,7 +29,7 @@ parity+MCP verificados como consumers reales.
 - Motion: `none`
 - Backend impact: `db`
 - Epic: `EPIC-022`
-- Status real: `Diseno`
+- Status real: `Complete 2026-08-05 — capabilities+grants+chokepoint live en dev/staging; prod via release control plane`
 - Rank: `TBD`
 - Domain: `growth|identity`
 - Blocked by: `none`

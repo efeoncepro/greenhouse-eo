@@ -172,17 +172,19 @@ Cloud Scheduler + ops-worker (async-critical), nunca Vercel cron.
 
 ## 9. Entitlements (`growth.seo.*`, per-org)
 
-Capabilities (grain espejo de `growth.ai_visibility.*`), seedeadas en la misma migración que `entitlements-catalog.ts` (capability-grant coverage rule):
+**Implementado (TASK-1301, 2026-08-05).** Capabilities (grain espejo de `growth.ai_visibility.*`), seedeadas en `capabilities_registry` en el mismo PR que `entitlements-catalog.ts` + grants en `runtime.ts` (capability-grant coverage verde):
 
 ```
-growth.seo.target.configure     (execute, tenant)  autor de targets/keywords/competitors
-growth.seo.audit.run            (execute, tenant)  disparar site audit
-growth.seo.observation.read     (read, tenant)     rank/backlink/audit reads (contratado/operador)
-growth.seo.report.read_client   (read, tenant)     gate del report cliente
-growth.seo.entitlement.manage   (execute, tenant)  operador grantea acceso per-org
+growth.seo.target.configure     (execute, tenant)  autor de targets/keywords/competitors — set operador
+growth.seo.audit.run            (execute, tenant)  disparar site audit — set operador
+growth.seo.observation.read     (read, tenant)     rank/backlink/audit reads — set interno base
+growth.seo.report.read_client   (read, own)        gate del report cliente (client_* scope own)
+growth.seo.entitlement.manage   (execute, tenant)  SOLO EFEONCE_ADMIN + EFEONCE_ACCOUNT (espejo AEO)
 ```
 
-**Acceso per-org vía `module_assignments`** (no por rol — lección TASK-1248). Las **4 puertas**: operador (`entitlement.manage`, interno, todas las orgs), contratado (assignment activo → observación + report), trial/PLG (assignment con quota cap + expiry), público (quick-check rate-limited de 1 dominio, sin persistencia más allá de lead capture — reusa el patrón `public-submission` + `grader_leads`). Chokepoint único `enforceSeoRunEntitlement` con **quota cap por-org** (gate de costo DataForSEO).
+**Acceso per-org vía `module_assignments`** (no por rol — lección TASK-1248), con `module_key='seo_v1'` seedeado en `greenhouse_client_portal.modules` (la FK del catálogo lo exige; tier=addon, `data_sources=['growth.seo']` con parity al union `ClientPortalDataSource`; `view_codes=[]` hasta TASK-1310). El tier vive en `metadata_json.seo_tier` (`contracted|trial|pilot`; override de cupo pilot vía `metadata_json.seo_audit_runs_per_month`). Las **4 puertas**: operador (`entitlement.manage`, interno, todas las orgs), contratado (assignment activo → observación + report), trial/PLG (assignment con quota cap + expiry), público (quick-check rate-limited de 1 dominio, diferida — reusa el patrón `public-submission` + `grader_leads`).
+
+**Chokepoint único `enforceSeoRunEntitlement`** (`src/lib/growth/seo/entitlement.ts`) con **quota cap por-org** (gate de costo DataForSEO): entitlement → expiración (`expired` explícito) → allowance (site-audits/mes por tier) → budget (USD/mes por tier; gasto = `SUM(provider_cost)` mensual de los snapshots TASK-1299 — **hook TASK-1300**: al existir `seo_provider_spend_daily`, el resolver cambia de fuente). Acepta `estimatedCostUsd` y no deja pasar un run que exceda el budget restante. Consumer-agnóstico por diseño (mandato parity+MCP 2026-08-05): el plano fino de capability (`can()`) vive en el consumer; el MISMO gate sirve UI, Nexa, lane `app` y lane `ecosystem`/MCP. Knobs por env con default: `GROWTH_SEO_{CONTRACTED|TRIAL|PILOT}_{AUDIT_RUNS_PER_MONTH|MONTHLY_BUDGET_USD}`. Sanity live: `scripts/growth/_sanity-seo-entitlement.ts`.
 
 ---
 

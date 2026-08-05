@@ -1,5 +1,29 @@
 # Handoff activo
 
+### TASK-1301 — Capabilities + entitlement per-org SEO COMPLETE (2026-08-05)
+
+Segundo eslabón de la Ola B MCP-first de EPIC-022, cerrado el mismo día que TASK-1299. Entregado:
+5 capabilities `growth.seo.*` (catálogo + seed `capabilities_registry` migración `20260805162304440` +
+grants en `runtime.ts`: `observation.read` set interno base; `target.configure`/`audit.run` set operador;
+`entitlement.manage` SOLO ADMIN+ACCOUNT; `report.read_client` client_* scope own) — coverage verde.
+Módulo **`seo_v1`** seedeado en `greenhouse_client_portal.modules` (migración `20260805163024516`;
+descubierto en smoke live que `module_assignments.module_key` tiene FK al catálogo — la spec no lo
+declaraba) con `data_sources=['growth.seo']` + union `ClientPortalDataSource` (parity verde).
+**Chokepoint único `enforceSeoRunEntitlement`** (`src/lib/growth/seo/entitlement.ts`): consumer-agnóstico
+(mandato parity+MCP), tier `metadata_json.seo_tier`, `expired` explícito, allowance audits/mes + budget
+USD/mes por tier (env-knobs `GROWTH_SEO_*` con defaults — son config, no flags `*_ENABLED`), gasto =
+`SUM(provider_cost)` de los snapshots de 1299 con hook declarado a `seo_provider_spend_daily` (TASK-1300).
+
+Evidencia: 12 tests focales + coverage + parity; smoke E2E live contra PG real
+(`scripts/growth/_sanity-seo-entitlement.ts`: no_entitlement → allowed contracted → budget_exhausted
+con costo estimado → revocado; cero residuo). Full suite **10076/0** + build prod verdes. Migraciones
+aplicadas en `greenhouse-pg-dev`. Commits `de94363df` (Slice 1) + `100ee9fec` (Slice 2). Sin push aún.
+
+**Rollout:** ninguna org tiene assignment `seo_v1` (primer assignment = paso operativo, Berel Fase 0,
+vía `entitlement.manage`). Prod recibe migraciones+código vía release control plane. **Próximo paso:**
+`TASK-1302` (GSC materializer + `readKeywordOpportunities` — OJO: requiere rollout real de la conexión
+GSC de TASK-1282/1283) y luego `TASK-1645` (lane ecosystem + MCP tools). `TASK-1300` puede ir en paralelo.
+
 ### TASK-1299 — Schema SEO fundacional aplicado + contrato parity/MCP de EPIC-022 (2026-08-05)
 
 TASK-1299 (schema `growth.seo`, bloqueador fundacional de EPIC-022) quedó implementada y verificada en vivo:

@@ -7,6 +7,13 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-05 — Growth SEO (EPIC-022): capabilities + entitlement per-org + chokepoint de costo (TASK-1301)
+
+- 5 capabilities `growth.seo.*` seedeadas (catálogo + registry + grants; coverage verde) y módulo `seo_v1`
+  en el catálogo del client portal (parity `data_sources` al union TS).
+- Chokepoint único `enforceSeoRunEntitlement` per-org (tier/allowance/budget con env-knobs, consumer-agnóstico
+  para UI/Nexa/MCP) verificado con smoke E2E contra PG real. Full suite 10076/0 + build prod verdes.
+
 ## 2026-08-05 — Growth SEO (EPIC-022): schema fundacional aplicado + mandato Full API Parity/MCP
 
 - TASK-1299: migración `20260805134439202` aplicada en `greenhouse-pg-dev` — 8 tablas `seo_*` en
