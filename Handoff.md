@@ -1,5 +1,39 @@
 # Handoff activo
 
+### TASK-1302 — Serie GSC propia + striking-distance COMPLETE, rollout pendiente (2026-08-05)
+
+Tercer eslabón de EPIC-022 (quick win del camino min-costo). **`code complete, rollout pendiente`.**
+
+**Lo entregado.** Tabla `greenhouse_growth.seo_gsc_daily` (migración `20260805171834316`, aplicada en
+`greenhouse-pg-dev`) + `materializeGscDailySnapshot` + batch per-org en ops-worker
+(`POST /seo/gsc/snapshot-batch`) + Cloud Scheduler `ops-seo-gsc-snapshot` (`0 9 * * *`, nace **PAUSADO**) +
+`readKeywordOpportunities`. Commits `88bc...`→Slice 4 (ver `git log --grep TASK-1302`). Sin push aún.
+
+**Tres decisiones que conviene no re-litigar:**
+
+1. **`seo_gsc_daily` ancla en `organization_id`, NO en `seo_target_id`** — es la única tabla de la serie SEO que
+   lo hace, y es deliberado: GSC entrega al grano de la *propiedad verificada* (`search_console_connections`,
+   org UNIQUE), mientras `seo_targets` tiene grano **más fino** (`location_code`+`language_code`, que GSC no
+   particiona). FKear al target obligaría a asignar cada fila arbitrariamente. Evidencia al tomar la task: 0
+   filas en `seo_targets` y 1 conexión GSC activa — habría bloqueado la captura de una serie irreconstruible.
+2. **Su trigger bloquea DELETE pero NO UPDATE**, al revés que las demás tablas de medición: GSC consolida con
+   ~48h de retraso y el re-run del mismo día **debe** poder corregir el valor.
+3. **El score de oportunidad NO usa datos de mercado.** Las impresiones de GSC ya son demanda medida, y la curva
+   de CTR se deriva de la propia org (así absorbe sola el efecto de los AI Overviews en ese sitio). DataForSEO
+   (TASK-1300) queda como enriquecimiento, no como corazón — por eso 1302 aterrizó sin esperarla.
+
+**Bug que sólo el sanity live atrapó:** la SQL seleccionaba `pq.query` mientras el TS leía `row.keyword` →
+todas las keywords salían vacías. Los mocks ejercitan el TS, nunca el SQL (gate TASK-893).
+
+**Evidencia:** 9/9 checks de `scripts/growth/_sanity-seo-keyword-opportunities.ts` contra PG real con rollback y
+cero residuo; smoke de la migración (idempotencia, DELETE rechazado, tipos DATE/TIMESTAMPTZ); 38 tests focales;
+suite completa **10102/0**; `pnpm build` prod; gates de worker; `flags:audit --strict`.
+
+**Rollout pendiente (4 pasos, ninguno hecho):** (1) migración en prod vía release control plane; (2) redeploy del
+ops-worker (el handler no existe en la revisión activa); (3) `GROWTH_SEO_ENABLED=true` **en el ops-worker, NO en
+Vercel**; (4) **despausar** `ops-seo-gsc-snapshot`. Los pasos 3 y 4 son ambos necesarios: flag ON + job pausado no
+corre nada; job activo + flag OFF hace no-op. **Próximo paso del epic:** TASK-1300 (paralela) o TASK-1303.
+
 ### TASK-1301 — Capabilities + entitlement per-org SEO COMPLETE (2026-08-05)
 
 Segundo eslabón de la Ola B MCP-first de EPIC-022, cerrado el mismo día que TASK-1299. Entregado:
@@ -543,36 +577,6 @@ con gasto real, o sea decisión tuya.
 `-var development_environment_enabled=true -var 'development_operator_principal=user:julio.reyes@efeonce.org'`
 → `0 to destroy`. El arreglo de fondo —el estado real de un flag no puede vivir en un archivo sin trackear—
 sigue abierto.
-
-## TASK-1635 — `pnpm globe:dev`: el loop rápido de Globe, funcionando (2026-08-03)
-
-Ver un cambio de UI de Globe costaba construir imagen y desplegar tres runtimes. Ahora cuesta guardar el
-archivo. Detalle y las dos correcciones de tesis en
-[`TASK-1635`](docs/tasks/in-progress/TASK-1635-globe-local-development-multimodal-harness.md) — leer su
-**último Delta**, que es el estado vigente.
-
-Commiteado en Globe `main`, local, **sin push**: `864ce68` · `f1b8e6e` · `8c91fa9` · `9d44091` · `68c4b99` ·
-`c8767d0` · `ee8872f`. `pnpm check` en verde.
-
-- `pnpm globe:dev` sirve el **mismo shell que producción** con un bundle que apunta a Vite. **HMR verificado de
-  punta a punta en navegador real**: se editó copy, entró sin recarga, se restauró y volvió.
-- Dos defectos que **sólo se veían mirando la pantalla**: el preamble de Fast Refresh que falta cuando el
-  documento no lo sirve Vite (pantalla negra, consola limpia), y que **un nonce en `style-src` anula
-  `'unsafe-inline'`** (contenido correcto, cero estilos). Ninguno aparece en un test ni en un código HTTP.
-- **La premisa inicial era falsa** y la desarmó una pregunta del operador: Globe ya separa por `workspace_id`
-  y el tope de gasto también, así que una base de datos aparte sólo aporta cuando el cambio toca el **schema**.
-  Se construyó infraestructura antes de preguntar qué clase de cambios se iban a hacer.
-- Lo que quedó del desvío y sirve igual: `packages/database` ahora **se puede ejercitar sin nube** (antes el
-  connector estaba cableado a la fuerza) y un Postgres local en la versión exacta de producción, listo para el
-  día que un cambio toque el schema. La base creada en Cloud SQL fue destruida; instancia y base productiva
-  intactas.
-
-**Pendiente con bloqueo nombrado:** datos reales en el loop. El cableado está hecho (el dev shell actúa como el
-BFF y mintea el token server-side), pero el usuario operador **no tiene `serviceAccountTokenCreator` sobre
-`greenhouse-globe-caller`**. Otorgarlo es decisión: ese principal carga `globe.lab.experiment.run`, o sea
-autoridad de gasto.
-
-El despliegue por lote sigue en [`TASK-1636`](docs/tasks/to-do/TASK-1636-globe-deployable-promotion-bundle.md).
 
 ## SKY Blog — propuesta técnica V2 y arquitectura económica (2026-08-03)
 

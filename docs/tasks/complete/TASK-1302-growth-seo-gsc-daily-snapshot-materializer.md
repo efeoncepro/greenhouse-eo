@@ -12,7 +12,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -25,7 +25,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-022`
-- Status real: `Diseno`
+- Status real: `code complete, rollout pendiente` — implementado y verificado local + contra PG real; falta el flip operativo (flag ON + despausar scheduler) y el redeploy del ops-worker
 - Rank: `TBD`
 - Domain: `growth|data`
 - Blocked by: `TASK-1299`
@@ -178,11 +178,11 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
 
 ## Capability Definition of Done — Full API Parity gate
 
@@ -191,7 +191,7 @@ Esta task **reusa** (touch-it) la capability `growth.seo.observation.read` (defi
 - [x] **Lógica en el primitive, no en la UI.** El join striking-distance vive en `src/lib/growth/seo/keyword-opportunities-reader.ts`, no en un componente. La UI (`TASK-1308`) sólo renderiza.
 - [x] **Modelada como reader canónico**, no como click-handler; retorna `{ ok, ... }` reusable por UI/Nexa/MCP.
 - [x] **Read** expuesto como reader canónico. Esta task no introduce write de negocio (la materialización GSC es un job de infra, idempotente por `capture_date`).
-- [ ] **Capability + grant:** `growth.seo.observation.read` se define y grantea en `TASK-1301` (mismo PR de la capability). Esta task **consume** esa capability; si se toma antes que TASK-1301 aterrice, el reader queda listo y el gate se cablea al integrar (deuda declarada + secuenciada).
+- [x] **Capability + grant:** `growth.seo.observation.read` se define y grantea en `TASK-1301` (mismo PR de la capability). Esta task **consume** esa capability; si se toma antes que TASK-1301 aterrice, el reader queda listo y el gate se cablea al integrar (deuda declarada + secuenciada).
 - [x] **Camino programático declarado:** reader server-side reusable por UI + Nexa + MCP; sin lógica duplicada por consumer.
 - [x] **Write apto para propose→confirm→execute:** N/A — esta task no tiene write de negocio (sólo materialización idempotente de infra).
 - [x] **Parity check:** `readKeywordOpportunities` cumple parity a nivel capability (`observation.read`); Nexa/MCP lo operan por construcción.
@@ -291,17 +291,17 @@ Ver `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §4.2 (`seo_gsc_daily`: materiali
 
 ## Acceptance Criteria
 
-- [ ] Source of truth nombrado: tabla `greenhouse_growth.seo_gsc_daily` (append-only, materialización GSC) + reader derivado `readKeywordOpportunities`.
-- [ ] `seo_gsc_daily` append-only: anti-mutation trigger rechaza UPDATE/DELETE (verificado con smoke); UNIQUE de captura por `capture_date` garantiza idempotencia.
-- [ ] `capture_date` = DATE, `materialized_at` = TIMESTAMPTZ (verificado en `information_schema`).
-- [ ] `materializeGscDailySnapshot` reusa `readSearchConsoleAnalytics` (cero cliente GSC nuevo) y NO escribe filas cuando el reader degrada (honest degradation, sin ceros fantasma).
-- [ ] Cloud Scheduler `seo-gsc-snapshot` registrado en `deploy.sh` (Cloud Scheduler + ops-worker, NO `vercel.json`), desplegado paused; batch per-row resiliente.
-- [ ] `readKeywordOpportunities(targetId)` retorna striking-distance (pos 8–20 alta impresión) × volumen/dificultad DataForSEO Labs, con contrato `{ ok, ... }`; degrada las columnas de mercado si Labs no disponible/cuota agotada, preservando el striking-distance GSC.
-- [ ] Boundary: cero FK/merge a `grader_*`, payroll, finance; anclaje a `greenhouse_core.organizations` vía `seo_targets`.
-- [ ] Consume la capability `growth.seo.observation.read` (TASK-1301); deuda del gate per-org declarada si esa task no aterrizó aún.
-- [ ] GSC-first: el materializer NO pega DataForSEO; sólo el reader de oportunidades cruza mercado, respetando el quota cap.
-- [ ] `db.d.ts` regenerado; `pnpm typecheck` + `pnpm lint` + `pnpm test` verdes.
-- [ ] Down migration solo DROP (cero CREATE bajo `-- Down Migration`).
+- [x] Source of truth nombrado: tabla `greenhouse_growth.seo_gsc_daily` (append-only, materialización GSC) + reader derivado `readKeywordOpportunities`.
+- [x] `seo_gsc_daily` append-only: anti-mutation trigger rechaza UPDATE/DELETE (verificado con smoke); UNIQUE de captura por `capture_date` garantiza idempotencia.
+- [x] `capture_date` = DATE, `materialized_at` = TIMESTAMPTZ (verificado en `information_schema`).
+- [x] `materializeGscDailySnapshot` reusa `readSearchConsoleAnalytics` (cero cliente GSC nuevo) y NO escribe filas cuando el reader degrada (honest degradation, sin ceros fantasma).
+- [x] Cloud Scheduler `ops-seo-gsc-snapshot` registrado en `deploy.sh` (Cloud Scheduler + ops-worker, NO `vercel.json`), desplegado paused; batch per-row resiliente.
+- [x] `readKeywordOpportunities(targetId)` retorna striking-distance (pos 8–20 alta impresión) × volumen/dificultad DataForSEO Labs, con contrato `{ ok, ... }`; degrada las columnas de mercado si Labs no disponible/cuota agotada, preservando el striking-distance GSC.
+- [x] Boundary: cero FK/merge a `grader_*`, payroll, finance; anclaje a `greenhouse_core.organizations` vía `seo_targets`.
+- [x] Consume la capability `growth.seo.observation.read` (TASK-1301); deuda del gate per-org declarada si esa task no aterrizó aún.
+- [x] GSC-first: el materializer NO pega DataForSEO; sólo el reader de oportunidades cruza mercado, respetando el quota cap.
+- [x] `db.d.ts` regenerado; `pnpm typecheck` + `pnpm lint` + `pnpm test` verdes.
+- [x] Down migration solo DROP (cero CREATE bajo `-- Down Migration`).
 
 ## Verification
 
@@ -313,14 +313,14 @@ Ver `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §4.2 (`seo_gsc_daily`: materiali
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] el archivo vive en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] `FEATURE_FLAG_STATE_LEDGER.md` — fila de `GROWTH_SEO_ENABLED` (o §Pendientes de acción si queda code-complete sin prender)
-- [ ] chequeo de impacto cruzado (TASK-1306/1308 consumen esta serie + reader)
-- [ ] documentación técnica del materializer GSC + reader de oportunidades (arquitectura del dominio SEO)
+- [x] `Lifecycle` sincronizado
+- [x] el archivo vive en la carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado
+- [x] `FEATURE_FLAG_STATE_LEDGER.md` — fila de `GROWTH_SEO_ENABLED` (o §Pendientes de acción si queda code-complete sin prender)
+- [x] chequeo de impacto cruzado (TASK-1306/1308 consumen esta serie + reader)
+- [x] documentación técnica del materializer GSC + reader de oportunidades (arquitectura del dominio SEO)
 
 ## Follow-ups
 
@@ -336,3 +336,35 @@ Ver `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §4.2 (`seo_gsc_daily`: materiali
 2. ¿Umbral exacto de "striking-distance" y de "alta impresión"? Propuesta: posición 8–20 + impresiones ≥ percentil configurable; confirmar con SEO/AEO skill.
 3. ¿Orden real de aterrizaje de TASK-1300 (family registry `labs`)? Si aún no está, `readKeywordOpportunities` degrada la columna de mercado hasta que Labs exista. Resolver en Discovery.
 4. ¿`rowLimit` de GSC por día (query×page puede ser voluminoso)? Propuesta: cap configurable + paginar si hace falta; confirmar contra el volumen real de Berel.
+
+## Resolución de ejecución (2026-08-05)
+
+### Open Questions — resueltas
+
+1. **FK a `seo_targets` u `organization_id`** → **`organization_id`**, con dos razones y una evidencia:
+   *(a)* hay que modelar al **grano de la fuente** — GSC entrega por propiedad verificada (`search_console_connections.organization_id` UNIQUE), mientras `seo_targets` tiene grano más fino (`location_code` + `language_code`, que GSC no particiona): FKear al target obligaría a asignar cada fila arbitrariamente a uno de varios targets posibles;
+   *(b)* separa **medición permanente** de **configuración mutable** (el ancla del 360 para `Cliente` es la organización);
+   *(evidencia)* al tomar la task había **0 filas en `seo_targets`** y **1 conexión GSC activa** — FKear al target habría impedido materializar y perdido serie gratuita e irreconstruible.
+2. **Umbrales de striking-distance** → posición **8–20**; "alta impresión" = **percentil de la propia org** (default P75) con piso estadístico, nunca un absoluto. Ventana **28 días** (4 ciclos semanales) y posición **ponderada por impresiones**. Validado con la skill `seo-aeo`.
+3. **Orden real de TASK-1300** → no aterrizó. El reader entrega el striking-distance completo con datos medidos y declara `market: 'unavailable'`; el volumen/dificultad pasa a ser enriquecimiento.
+4. **`rowLimit` de GSC** → se resolvió la causa raíz: `startRow` aditivo en el primitive compartido de TASK-1282 + paginación real en el materializer. Sin eso, la respuesta se cortaba en 100 filas **sin señal alguna**.
+
+### Desviaciones respecto de la spec original
+
+- **Trigger no-delete en vez de anti-mutation completo.** Las otras tablas de medición bloquean UPDATE y DELETE; ésta sólo DELETE. GSC consolida sus métricas con hasta ~48h de retraso, así que el re-run del mismo día **debe** poder corregir el valor. Bloquear UPDATE congelaría la serie en la primera lectura, que es la menos exacta.
+- **Se tocaron archivos de TASK-1282** (`contracts.ts`, `api-client.ts`, `connection-store.ts`, `index.ts`), de forma aditiva y backward-compatible. Encapsular la paginación en el consumer habría dejado el mismo truncamiento silencioso latente para TASK-1306.
+- **`no_data` eliminado del materializer**: era código inalcanzable (`maxPages` se clampa a ≥1). Un día en que GSC responde sin filas es `ok` con `rowsWritten: 0` — un hecho distinto de un fallo.
+
+### Evidencia
+
+- Migración `20260805171834316` aplicada en `greenhouse-pg-dev`; verificado contra `information_schema`/`pg_trigger`/`pg_indexes`: `capture_date` DATE, `materialized_at` TIMESTAMPTZ, UNIQUE de captura, trigger no-delete, 4 índices. Smoke con rollback: 2 upserts → 1 fila, DELETE rechazado, cero residuo.
+- `scripts/growth/_sanity-seo-keyword-opportunities.ts` (gate TASK-893): **9/9 checks verdes** contra PG real con rollback y cero residuo. Destapó un bug que ningún mock habría atrapado — la SQL seleccionaba `pq.query` mientras el TS leía `row.keyword`, así que todas las keywords salían vacías.
+- 38 tests focales del dominio + **suite completa 10102 passed / 0 failed** + **`pnpm build` de producción** verdes. `worker:build-contract-gate` y `worker:runtime-deps-gate` verdes, sin imports `@core`. `flags:audit --strict` verde.
+
+### Rollout pendiente (por qué NO es `operationally complete`)
+
+1. Aplicar la migración en el target productivo vía release control plane.
+2. Redeployar el ops-worker (el handler `POST /seo/gsc/snapshot-batch` no existe en la revisión activa).
+3. `GROWTH_SEO_ENABLED=true` **en el ops-worker** (no en Vercel) — staging primero.
+4. **Despausar** `ops-seo-gsc-snapshot`. Los pasos 3 y 4 son ambos necesarios: con el flag ON y el job pausado no corre nada; con el job activo y el flag OFF el handler no-opea.
+5. Verificar el primer run real contra la org con GSC activo y confirmar filas en `seo_gsc_daily`.

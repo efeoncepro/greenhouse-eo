@@ -1,5 +1,12 @@
 # TASK-1300 — Growth SEO: DataForSEO Family Registry
 
+## Delta 2026-08-05
+
+- **TASK-1302 aterrizó sin esperar a esta task.** `readKeywordOpportunities` calcula el striking-distance **sólo con datos medidos de GSC** (impresiones como demanda real, curva de CTR derivada de la propia org) y declara `market: 'unavailable'`.
+- **Consecuencia de alcance:** la familia `labs` (search_volume/keyword_difficulty) pasa a ser **enriquecimiento** del reader, no su corazón. Al aterrizar, esta task debe poblar `searchVolume`/`difficulty` (hoy `null`) y cambiar `market` a `'available'` — sin reescribir el score, que ya es defendible sin datos de mercado.
+- No hay urgencia derivada de TASK-1302: el quick-win del camino min-costo ya entrega valor sin gastar cuota DataForSEO.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

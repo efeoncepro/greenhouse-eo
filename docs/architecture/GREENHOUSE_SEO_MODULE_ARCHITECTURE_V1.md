@@ -93,7 +93,7 @@ Se envuelven en una sola narrativa de producto: **Search Visibility 360** = los 
 - `seo_site_audit_runs` — 1 fila por crawl (semanal): `status` CHECK(`running|succeeded|degraded|failed`), `health_score`, `crawled_pages`, `provider_task_id`.
 - `seo_site_audit_findings` — issues por crawl (append-only): `url`, `issue_type`, `severity` CHECK(`critical|warning|notice`), `detail` JSONB.
 - `seo_backlink_snapshots` — snapshot de perfil (semanal): `referring_domains`, `backlinks_total`, `domain_rank`, `toxic_share`, `new_lost_delta` JSONB. UNIQUE(target, capture_date). Anti-mutation trigger.
-- `seo_gsc_daily` — materialización diaria de GSC (query×page) append-only por `capture_date` (TASK-1302; convierte el read-through en serie propia > 16 meses).
+- `seo_gsc_daily` — materialización diaria de GSC (query×page) por `capture_date` (TASK-1302; convierte el read-through en serie propia > 16 meses). UNIQUE(organization_id, capture_date, query, page). **Anclada a `organization_id`, NO a `seo_target_id`** — es la única tabla de la serie que se ancla a la org, y es deliberado: (a) GSC entrega por *propiedad verificada*, que vive en `search_console_connections` con `organization_id` UNIQUE, mientras `seo_targets` tiene grano **más fino** (`location_code` + `language_code`, dimensiones que GSC no particiona) — FKear al target obligaría a asignar cada fila arbitrariamente a uno de varios targets posibles; (b) separa medición permanente e irreemplazable de configuración mutable y archivable. Trigger **no-delete** (no anti-UPDATE, a diferencia de las demás): GSC consolida con ~48h de retraso, así que el re-run del mismo día debe poder corregir el valor.
 
 **Decisión temporal:** snapshots = event rows append-only keyed por `capture_date` (mediciones, no supersede). Config = membership append-only con `effective_from/to` (términos). Reads temporales: `ORDER BY capture_date DESC` sobre la ventana caliente; índice compuesto `(seo_target_id, keyword, capture_date DESC)`.
 
@@ -150,7 +150,12 @@ Cada capacidad = primitive gobernado `src/lib/growth/seo/**`, reusable por UI + 
 - `readRankSnapshotLatest(targetId)` → standings + WoW delta.
 - `readSiteAuditReport(targetId, auditRunId?)` → health + findings por severidad.
 - `readBacklinkProfile(targetId, { range })`.
-- `readKeywordOpportunities(targetId)` → **join SEO↔GSC** (striking-distance pos 8–20 alta impresión × volumen/dificultad DataForSEO).
+- `readKeywordOpportunities(targetId)` → **striking-distance** sobre la serie GSC (TASK-1302, implementado). Método fijado con la skill `seo-aeo`:
+  - **Posición 8–20** ponderada por impresiones: `SUM(position × impressions) / SUM(impressions)` sobre una ventana de **28 días** (4 ciclos semanales completos). `AVG(position)` entre días es incorrecto — GSC ya entrega su `position` ponderada dentro del período, así que promediar días planos daría el mismo peso a un día de 2 impresiones que a uno de 500.
+  - **"Alta impresión" es un percentil de la propia organización** (default P75), no un número absoluto: un sitio de 100 impresiones/día y uno de 1M no comparten umbral. Con piso estadístico (bajo ~10 impresiones la posición media no es interpretable).
+  - **Score = clics incrementales estimados**: `impresiones × max(0, CTR_objetivo − CTR_actual)`. Las impresiones de GSC **ya son demanda medida** — y de la propia SERP, mejor que un volumen estimado por un tercero. La curva de CTR por posición se **deriva de los datos de la propia org**, de modo que absorbe sola el efecto de los AI Overviews en ese sitio; hay una curva pública de fallback sólo para posiciones sin datos propios.
+  - **Canibalización se marca, no se descarta** (`cannibalized` + `competingPages`): una query con >1 página es una oportunidad de **consolidación**, no de optimización.
+  - Volumen/dificultad de DataForSEO Labs (TASK-1300) es **enriquecimiento**, no el corazón: mientras no aterrice, el reader responde `market: 'unavailable'` con el striking-distance completo.
 - `readSeoAeoGap(targetId)` → **derived read cross-módulo** (`seo_rank_snapshots` × `grader_scores` por keyword/domain).
 
 Todo reader retorna `{ ok: true, ... } | { ok: false, errorCode, status }` (espejo `SearchConsoleAnalyticsResult`).
@@ -164,7 +169,11 @@ Cloud Scheduler + ops-worker (async-critical), nunca Vercel cron.
 - **Rank diario:** `seo-rank-capture` (~05:00 CLT) → `POST /seo/rank/capture-batch` → por target×keyword call DataForSEO, UPSERT `seo_rank_snapshots` (idempotente por capture_date), outbox → reactive BQ mirror.
 - **Site audit semanal (2 fases, OnPage async):** `seo-audit-enqueue` (semanal, encola) + `seo-audit-collect` (cada 30min, poll idempotente por `provider_task_id`).
 - **Backlinks semanal:** `seo-backlink-capture`.
-- **GSC snapshot diario:** `seo-gsc-snapshot` → `readSearchConsoleAnalytics(orgId, {ayer, ['query','page']})` → `seo_gsc_daily` (arregla el read-through + sobrevive los 16 meses de GSC).
+- **GSC snapshot diario (TASK-1302, implementado):** Cloud Scheduler `ops-seo-gsc-snapshot` (`0 9 * * *` CLT, nace **pausado**) → `POST /seo/gsc/snapshot-batch` en ops-worker → `materializeGscDailySnapshot` por org → `seo_gsc_daily`. Captura **ayer** (GSC no publica el día en curso). Reusa `readSearchConsoleAnalytics` de TASK-1282: cero cliente GSC nuevo.
+  - **Paginación real:** el primitive compartido ganó `startRow` opcional (aditivo). Sin él, `querySearchAnalytics` cortaba en 100 filas **sin señal** — sobre una serie histórica eso es pérdida permanente. Si se alcanza el techo de páginas se reporta `truncated` y el handler emite un warning; nunca se trunca en silencio.
+  - **Honest degradation:** si el reader degrada, **no se escribe ninguna fila** — un día sin conexión jamás puede parecerse a un día con cero tráfico. Un día en que GSC respondió sin filas es `ok` con `rowsWritten: 0`, que es un hecho distinto de un fallo.
+  - **Resiliencia per-org:** una org que falla se registra y el batch continúa; un token revocado de un cliente no puede impedir capturar la serie de los demás.
+  - Gate: `GROWTH_SEO_ENABLED` (default OFF, lo lee el **ops-worker**, no Vercel). El flip son **dos pasos**: prender el flag *y* despausar el scheduler.
 
 **Reliability signals** (`/admin/operations`, subsistema Growth Health): `seo.rank.capture_lag` (steady=0), `seo.audit.stuck_tasks`, `seo.provider.cost_over_budget`.
 

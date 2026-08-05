@@ -1,5 +1,13 @@
 # TASK-1645 — Growth SEO: Ecosystem Lane + MCP Tools (Full API Parity)
 
+## Delta 2026-08-05
+
+- **TASK-1302 complete:** el reader `readKeywordOpportunities` ya nace consumer-agnóstico (server-side, sin acoplamiento a UI) con shape `{ ok } | { ok: false, errorCode, status }`, tal como exige el mandato parity+MCP. Se puede exponer al lane ecosystem y como MCP tool sin adaptador ni lógica duplicada.
+- Contratos de tipos en `src/lib/growth/seo/contracts.ts` (`KeywordOpportunity`, `KeywordOpportunitiesResult`, `GscDailySnapshotResult`) — ese archivo NO importa `server-only`, así que es importable desde cualquier consumer.
+- El materializer/batch es **infra (cron)**, no una capability de negocio: NO debe exponerse como MCP tool.
+- Dependencia restante para el bloqueo declarado: TASK-1303.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

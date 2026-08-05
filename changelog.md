@@ -7,6 +7,21 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-05 — Growth SEO (EPIC-022): serie GSC propia + striking-distance (TASK-1302)
+
+- Google Search Console deja de ser read-through: `greenhouse_growth.seo_gsc_daily` materializa query×page por
+  `capture_date` y la serie sobrevive la ventana de 16 meses de Google. Anclada a `organization_id` (grano de la
+  propiedad verificada) y no a `seo_target_id`, que tiene grano más fino que GSC no particiona.
+- El primitive GSC compartido ganó paginación real (`startRow` aditivo): antes cortaba en 100 filas **sin señal**,
+  lo que sobre una serie histórica es pérdida permanente. Si se topa el techo se declara `truncated` + warning.
+- `readKeywordOpportunities`: striking-distance 8–20 con posición ponderada por impresiones, umbral por percentil
+  de la propia org y score en **clics incrementales estimados** con curva de CTR derivada de la propia
+  organización — no depende de datos de mercado, así que aterrizó sin esperar a TASK-1300.
+- Batch diario en Cloud Scheduler + ops-worker (nunca Vercel cron), resiliente per-org. Job creado **pausado** y
+  `GROWTH_SEO_ENABLED` default OFF: `code complete, rollout pendiente`.
+- Sanity live 9/9 contra PG real destapó un bug de alias SQL↔TS que ningún mock atrapaba. Suite 10102/0 + build
+  prod verdes.
+
 ## 2026-08-05 — Growth SEO (EPIC-022): capabilities + entitlement per-org + chokepoint de costo (TASK-1301)
 
 - 5 capabilities `growth.seo.*` seedeadas (catálogo + registry + grants; coverage verde) y módulo `seo_v1`
@@ -871,11 +886,3 @@ y [`docs/changelog/internal/2026-07.md`](docs/changelog/internal/2026-07.md).
   5–15% para creator affiliate, 2–5% para Efeonce success fee, 15–35% por 30 días de paid usage y 15–30% por exclusividad.
 - Las skills Codex/Claude de Creator/UGC ahora incluyen las bandas, porcentajes, regla de no doble cobro y prohibición
   de presentar estos números como pricing público.
-
-## 2026-07-29 — Creator Influence & Content: simulación end-to-end documentada
-
-- Se añadió un caso comercial sintético para una campaña de perfume masculino con tres deportistas chilenos.
-- El caso recorre intake, casting, vetting, contacto con representantes, negociación, derechos, producción,
-  amplificación, medición, presupuesto de planificación y decisión go/no-go.
-- Se enlazó desde la documentación funcional, el manual de operación, el índice de auditorías comerciales y las
-  skills Codex/Claude de Creator/UGC. No constituye caso de éxito, disponibilidad confirmada ni cotización aprobada.
