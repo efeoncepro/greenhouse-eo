@@ -192,3 +192,11 @@ administrador, no runtime de largo plazo). Implicación para TODAS las child tas
 `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §17 (inventario del seam, FK org como único acople deliberado, reglas
 duras de imports/FKs/consumers). La extracción física NO se autoriza desde este epic mientras `EPIC-027` esté
 activo; es programa posterior de Wave.
+
+## Delta 2026-08-05 (c) — Prioridad MCP-first (directiva del operador)
+
+Operar las herramientas SEO **por MCP es la prioridad más alta del módulo**; la UI es necesaria pero va después.
+Re-priorización: `TASK-1301`, `TASK-1302` y `TASK-1645` suben a **P1**; `TASK-1645` se desbloquea de 1303 y sale
+con el primer reader (GSC). Los readers posteriores (1303/1305) registran su MCP tool **en su propio PR**
+(parity-at-birth incremental). Ola B re-ordenada: `1301 → 1302 → 1645 (lane+tools V1) → 1300 → 1303 (+tool rank)
+→ UI 1306/1307`. La UI no bloquea ninguna entrega MCP.

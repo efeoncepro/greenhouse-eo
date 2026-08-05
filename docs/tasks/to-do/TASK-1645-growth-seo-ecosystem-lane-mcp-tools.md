@@ -7,7 +7,7 @@
 ## Status
 
 - Lifecycle: `to-do`
-- Priority: `P2`
+- Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
@@ -22,10 +22,19 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|mcp|platform|api`
-- Blocked by: `TASK-1301, TASK-1302, TASK-1303`
+- Blocked by: `TASK-1301, TASK-1302`
 - Branch: `task/TASK-1645-growth-seo-ecosystem-lane-mcp-tools`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Delta 2026-08-05 (b) — MCP-first: prioridad P1 y desbloqueo de TASK-1303
+
+Directiva del operador: operar las herramientas SEO por MCP es la prioridad más alta del módulo; la UI es
+necesaria pero va después. Cambios: (1) P2→P1; (2) ya NO bloqueada por TASK-1303 — el V1 del lane + tools sale
+apenas existan chokepoint (1301) y el primer reader GSC (1302): `get_seo_keyword_opportunities` +
+`get_seo_visibility_360` (degradación honesta solo-GSC). `get_seo_rank_evolution` se registra incrementalmente
+cuando TASK-1303 aterrice (esa task lo agrega en su propio PR siguiendo el patrón de esta). La secuencia de la
+Ola B queda: 1301 → 1302 → **1645** → (1300 → 1303 → tool de rank) → UI 1306/1307.
 
 ## Summary
 

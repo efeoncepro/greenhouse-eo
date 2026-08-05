@@ -17,7 +17,7 @@ parity+MCP verificados como consumers reales.
 ## Status
 
 - Lifecycle: `to-do`
-- Priority: `P2`
+- Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`

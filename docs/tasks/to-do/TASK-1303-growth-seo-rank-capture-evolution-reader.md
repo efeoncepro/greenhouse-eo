@@ -3,7 +3,7 @@
 ## Delta 2026-08-05
 
 - El schema fundacional ya existe: TASK-1299 aplicó `20260805134439202_task-1299-growth-seo-schema.sql` en `greenhouse-pg-dev` (8 tablas `seo_*`, UNIQUEs de idempotencia, triggers `block_seo_row_mutation`, `db.d.ts` regenerado). Actualizar el supuesto "schema no existe" en Discovery: verificar columnas reales contra `db.d.ts`/`information_schema`, no re-crear DDL.
-- Mandato parity+MCP del operador (2026-08-05): los readers/commands de esta task nacen consumer-agnósticos — los expondrá `TASK-1645` (lane ecosystem + MCP tools). Shape `{ ok } | { ok: false, errorCode, status }` obligatorio.
+- Mandato parity+MCP del operador (2026-08-05, reforzado MCP-first): los readers/commands de esta task nacen consumer-agnósticos. TASK-1645 (lane + tools base) ya NO espera a esta task: al aterrizar ésta, DEBE registrar `get_seo_rank_evolution` en el server MCP + ruta del lane **en el mismo PR** (patrón TASK-1645, adapter delgado, cero lógica). Shape `{ ok } | { ok: false, errorCode, status }` obligatorio.
 
 
 <!-- ═══════════════════════════════════════════════════════════
