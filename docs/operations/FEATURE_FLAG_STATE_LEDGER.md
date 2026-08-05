@@ -185,7 +185,7 @@ _(Agrega acá cualquier flag que dejes code-complete sin prender. Si está vací
 | `COMMERCIAL_Q2C_CONTRACT_ONLY_ENABLED` | — | — | — | TASK-1206 |
 | `TENDER_CHAPTER_AUTHOR_ENABLED` | — | — | — | TASK-1415 |
 | `PUBLIC_SITE_COMPARISON_TABLE_WRITES_ENABLED` | — | ✅ (2026-06-23, write path live + proven) | — | TASK-1225 |
-| ~~`NEXT_PUBLIC_NEXA_FLOATING_EXPANDABLE_ENABLED`~~ | 🗑️ retirado 2026-08-05 | 🗑️ | 🗑️ | TASK-1078 — rollout completado; el panel ampliable es el comportamiento base incondicional. El código ya no lee el flag (ni el server var ni el mirror). **Env vars huérfanas en Vercel: borrar** (Production/staging/Preview). Salió junto al modo `dock` ("Compacto"), el único fallback que gateaba. |
+| ~~`NEXT_PUBLIC_NEXA_FLOATING_EXPANDABLE_ENABLED`~~ | 🗑️ retirado 2026-08-05 | 🗑️ | 🗑️ | TASK-1078 — rollout completado; el panel ampliable es el comportamiento base incondicional. El código ya no lee el flag (ni el server var ni el mirror). **Env vars borradas de Vercel el 2026-08-05** (Production/staging/Preview develop; solo existía el mirror `NEXT_PUBLIC_*`, verificado con `vercel env ls` antes y después). Salió junto al modo `dock` ("Compacto"), el único fallback que gateaba. |
 | `KNOWLEDGE_SEARCH_HYBRID_ENABLED` | — | ✅ | — | TASK-1151 |
 | `KNOWLEDGE_SEARCH_RERANK_ENABLED` | — | ✅ | — | TASK-1140 |
 | `NOTION_KNOWLEDGE_WEBHOOK_ENABLED` | ✅ | — | — | TASK-1094 |

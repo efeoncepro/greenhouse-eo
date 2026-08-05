@@ -26,22 +26,26 @@ local, sin historial) que sobrevivió como opción del selector tras el cutover 
 con él su código muerto en `NexaFloatingButton` y el flag `NEXA_FLOATING_EXPANDABLE_ENABLED` + mirror
 `NEXT_PUBLIC_*` (su único fallback era ese modo). Modos vigentes: `expandible` (piso incondicional) y `lane`.
 
-**Estado:** code complete + migración aplicada; **rollout pendiente en un punto**: borrar de Vercel las 3
-env vars huérfanas del flag retirado — `NEXT_PUBLIC_NEXA_FLOATING_EXPANDABLE_ENABLED` en Production,
-staging y Preview (develop). Verificado con `vercel env ls`: la var server `NEXA_FLOATING_EXPANDABLE_ENABLED`
-nunca existió en Vercel, solo el mirror. El código ya no las lee, así que no bloquean, pero quedan como
-basura de configuración. Requiere decisión del operador.
+**Estado: cerrado.** Code complete, migración aplicada, **pusheado a `develop`** (`8dbd11e5e`) y las 3 env
+vars huérfanas del flag retirado borradas de Vercel el 2026-08-05
+(`NEXT_PUBLIC_NEXA_FLOATING_EXPANDABLE_ENABLED` en Production, staging y Preview develop; la var server
+nunca existió, solo el mirror). Verificado con `vercel env ls` post-borrado: cero restos del flag retirado,
+`NEXA_INTERACTION_LANE_ENABLED` intacto.
 
 **Verificación:** `pnpm local:check`, `pnpm test` (10.064 pass), `pnpm build`, `pnpm flags:audit --strict`
 verdes. Menú verificado con Playwright contra localhost: solo Panel/Lateral, switch a Lateral y vuelta con
 `PATCH /api/home/preferences` 200, cero errores de consola. CHECK de DB leído post-migración:
 `('expandible','lane')`, 0 filas en `dock`.
 
-**Deuda descubierta (no tocada):** el `focusRef` + pregunta semilla de TASK-1182 estaba implementado **solo**
-en el panel legacy, nunca en `NexaFloatingPanel`. Como el default en producción era `expandible`, el CTA
-"Pregúntale a Nexa" ya no anclaba el insight ni auto-enviaba la semilla **antes** de este cambio. Los CTAs
-siguen abriendo el chat; portar el ancla a `useNexaPersistentRuntime` (que no acepta `focusRef`) es trabajo
-propio pendiente de task.
+**Deuda descubierta → devuelta a su dueña, no a una task nueva.** El `focusRef` + pregunta semilla vivía
+**solo** en el panel legacy, nunca en `NexaFloatingPanel`. Como el default en producción era `expandible`,
+el CTA "Pregúntale a Nexa" ya no anclaba el insight ni auto-enviaba la semilla **antes** de este cambio. El
+barrido por dominio mostró que **TASK-1182 sigue `in-progress`** y es la dueña del `focusRef`: se le agregó
+`## Delta 2026-08-05` con el estado real de sus criterios y el trabajo restante redefinido (portar el ancla
+a `useNexaPersistentRuntime`, que cubre Panel y Lateral por construcción). De paso se cerraron dos huecos
+preexistentes de su Status que la hacían no-tomable: `UI ready: no` + wireframe registrado
+(`docs/ui/wireframes/TASK-1182-nexa-insight-surface-aware-conversation.md`, con las 3 decisiones de
+comportamiento abiertas que bloquean `UI ready: yes`). `task:lint` y `ops:lint --changed` en 0/0.
 
 ### EPIC-028 — Producer V3: contratos de diseño y plan de ejecución (2026-08-05)
 
