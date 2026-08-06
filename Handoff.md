@@ -12,14 +12,18 @@ y signal `seo.rank.capture_lag`. Evidencia: suite full 10.218/0, build prod, wor
 8/8 contra PG real. `enforceSeoRunEntitlement` ganó `consumesAuditAllowance:false` (el rank capture
 no consume audit runs).
 
-**Próximo paso (operador):** push → redeploy ops-worker (4 workflows en success) → smoke staging con
-Berel (⚠️ saldo DataForSEO USD 0.90 — recargar; ~USD 0.01/keyword/día con depth 20 + AIO) → despausar
-el scheduler cambiando el 5.º arg a "false" en `deploy.sh` (NUNCA `jobs resume` a mano: el deploy lo
-revierte). Runbook completo: `docs/manual-de-uso/growth/operar-captura-rankings-seo.md`. Mientras esté
-pausado, `seo.rank.capture_lag` = warning para los targets elegibles (honesto: serie contratada que no
-corre). Verificar antes del primer run que `seot-berel-fase0` tenga keywords vigentes en
-`seo_keyword_set_members` (un target sin keywords degrada `no_keywords`). Desbloqueadas: TASK-1307
-(★ UI, consume `readRankEvolution`) y TASK-1304 (replica el patrón captura+mirror).
+**Smoke REAL ejecutado (2026-08-06 ~11:30Z):** push hecho, Ops Worker Deploy en success, job
+`ops-seo-rank-capture` existe PAUSED. Sembradas 8 keywords para Berel (top GSC medidas, script
+`_seed-task-1303-berel-keywords.ts`) → captura real via worker HTTP: 8/8 snapshots (berel #1,
+"pintura para alberca" #2 CON `ai_overview` presente), costo real USD 0.03 (0.00375/call) →
+ledger `serp` correcto → re-run `skipped` USD 0 (idempotencia) → mirror BQ 8 filas →
+`readRankEvolution` 8 series → signal warning honesto (Efeonce sin captura inicial). Dos fixes
+operativos aplicados en vivo: (1) grant WRITER de `greenhouse-portal@` en el dataset BQ nuevo
+(el mirror falló con Access Denied y el retry lo absorbió); (2) el replay de eventos en `retry`
+es EXPLÍCITO vía `POST /api/admin/ops/replay-reactive` (la lane periódica no los re-reclama) —
+ambos documentados en el runbook. **Único paso restante: despausar** (5.º arg a "false" en
+`deploy.sh` + redeploy). Pendiente menor: sembrar keywords para `seot-efeonce-own-brand`
+(elegible, 0 keywords → hoy degrada `no_keywords`).
 
 
 ### Efeonce dejó de ser cliente de sí misma — modelado corregido (2026-08-06)

@@ -50,6 +50,16 @@ bq --project_id=efeonce-group query --use_legacy_sql=false 'SELECT capture_date,
 - Por MCP: tool `get_seo_rank_evolution` (organizationId para bindings internos; rangeDays/engine/device/keywords opcionales).
 - Por codigo: `readRankEvolution(seoTargetId, { rangeDays })` — ≤180 dias desde PG, mas desde BigQuery.
 
+## Verificacion ejecutada (2026-08-06 — smoke real)
+
+La cadena completa quedo verificada con dinero real el 2026-08-06 (Berel, 8 keywords sembradas
+desde las top queries medidas de GSC): captura via worker HTTP → 8 snapshots con
+posicion/URL/features reales (berel #1; "pintura para alberca" #2 **con `ai_overview`
+presente**) a costo real USD 0.03 (USD 0.00375/call, bajo el estimador 0.01) → ledger `serp`
+8 calls escrito por el transporte → re-run mismo dia = `skipped` con USD 0 → outbox
+`published` → mirror BQ con las 8 filas → `readRankEvolution` sirviendo las 8 series →
+signal en warning honesto (Efeonce elegible sin captura inicial). Falta solo despausar.
+
 ## Que significan los estados
 
 | Estado | Significado |
@@ -76,6 +86,8 @@ bq --project_id=efeonce-group query --use_legacy_sql=false 'SELECT capture_date,
 | Corrida con `breakerOpen` en todos los combos | Circuit breaker de la familia `serp` abierto (5 fallos seguidos del proveedor) | Esperar el cooldown (60 s) o revisar credencial/saldo DataForSEO |
 | `seo.rank.capture_lag` en warning con el cron activo | Un target dejo de capturarse (presupuesto agotado o proveedor caido) | Revisar outcomes de la ultima corrida en los logs del worker |
 | Snapshots en PG pero no en BigQuery | Outbox atascado o lane reactiva con dead-letter | Revisar `sync.outbox.unpublished_lag` y `sync.outbox.dead_letter` en `/admin/operations` |
+| Mirror con `Access Denied: bigquery.tables.updateData` | El dataset BQ nuevo no tiene grant WRITER para el SA del worker (`greenhouse-portal@`) | Agregar el access entry WRITER al dataset (patron de `greenhouse_conformed`); resuelto para `greenhouse_growth_analytics` el 2026-08-06 |
+| Evento del mirror quedo en `result='retry'` y no avanza | La lane periodica NO re-reclama eventos en retry — el replay es explicito | `pnpm staging:request POST /api/admin/ops/replay-reactive '{"domain":"growth","handlerKeys":["seo_rank_history_bq_sync:growth.seo.rank_snapshot.captured"],"replayFailedHandlers":true}'` |
 
 ## Referencias tecnicas
 
