@@ -6,7 +6,7 @@
 - **Scope:** repositorio `efeonce-mcp`, transporte MCP remoto, autenticación, federación de productos, Cloud Run, front door y dominio público
 - **Reversibility:** two-way-but-slow
 - **Confidence:** high para boundary, hosting, hostname, authorization server y el primer reader Globe después del canary PKCE real
-- **Validated as of:** 2026-08-01
+- **Validated as of:** 2026-08-06 (delta shim DCR; base 2026-08-01)
 - **Implementation owner:** [`TASK-1626`](../tasks/in-progress/TASK-1626-efeonce-mcp-platform-gateway.md)
 - **First provider owner:** [`TASK-1473`](../tasks/in-progress/TASK-1473-globe-contract-packaging-parity-certification.md)
 
@@ -179,6 +179,36 @@ La propuesta de identidad cliente, el vínculo con Account 360 y el gate de prov
 [`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`](EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md)
 y [`TASK-1631`](../tasks/to-do/TASK-1631-efeonce-customer-identity-mcp-federation.md). Esta adición no acepta un
 proveedor ni altera el reader Globe interno habilitado.
+
+### Delta 2026-08-06 — shim de compatibilidad DCR para clientes MCP estándar
+
+Los clientes MCP estándar (Claude Code, custom connectors de claude.ai, Claude Desktop) exigen dynamic client
+registration RFC 7591 durante el flujo de autorización, y Microsoft Entra no lo soporta. Para no bloquear a esos
+clientes, el gateway incorpora un shim de compatibilidad (formalización pendiente como `TASK-1654`):
+
+1. El protected-resource metadata anuncia al **propio gateway** como authorization server.
+2. El gateway publica `/.well-known/oauth-authorization-server` espejando los endpoints reales de Entra
+   (authorize/token/jwks, cacheados de su configuración OIDC) y agrega un `registration_endpoint` propio.
+3. `POST /register` **nunca crea aplicaciones**: devuelve siempre el cliente público pre-registrado
+   `32617b87-e7ef-493a-838f-1ff3f0213b93` (PKCE, `token_endpoint_auth_method: none`). El shim está gateado por
+   la variable `OAUTH_PUBLIC_CLIENT_ID`, declarada en `deploy.yml` con default.
+4. Los scopes se anuncian cualificados como `https://mcp.efeonce.org/mcp/<scope>`, porque Entra v2 resuelve un
+   scope pelado contra Microsoft Graph (error `AADSTS650053`). El claim `scp` del token vuelve pelado, así que
+   el verifier y los checks por-tool no cambiaron.
+
+El shim **no compromete la neutralidad del gateway**: no lo convierte en authorization authority. Sólo
+re-anuncia metadata de descubrimiento y un client fijo; los tokens los emite y valida Entra exactamente igual
+que antes. El gateway no emite credenciales, no crea clientes y no altera audiencia ni scopes efectivos.
+
+Alternativa rechazada: pedir a cada usuario registrar su propia aplicación Entra. Impone fricción y carga
+administrativa por usuario y no interopera con la UX de los clientes MCP estándar, que asumen registro dinámico
+automático durante la conexión.
+
+Verificado con el cliente real: Claude Code autenticó y conectó contra `mcp.efeonce.org`. Las redirect URIs de
+la app Entra se ampliaron a `http://localhost` (loopback de Claude Code) y
+`https://claude.ai/api/mcp/auth_callback`, además de la previa `http://localhost:8765/callback`. Esta adición
+amplía la conectividad de usuarios internos del tenant; no habilita clientes externos ni altera el gate
+B2B/multitenant del delta anterior.
 
 ### Benefits
 

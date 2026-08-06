@@ -1,9 +1,9 @@
 # MCP Greenhouse Read-Only
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-04-30 por Codex
-> **Ultima actualizacion:** 2026-08-06 por Claude (TASK-1303: tool `get_seo_rank_evolution`)
+> **Ultima actualizacion:** 2026-08-06 por Claude (gateway `mcp.efeonce.org` acepta clientes MCP estándar con login de usuario; federación de `get_seo_rank_evolution` completada)
 > **Modulo:** plataforma / MCP
 > **Ruta en portal:** `N/A` (server MCP local `stdio` o remoto HTTP)
 > **Documentacion relacionada:** [API Platform Ecosystem](../../documentation/plataforma/api-platform-ecosystem.md), [Platform Health API](../../documentation/plataforma/platform-health-api.md), [GREENHOUSE_MCP_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md)
@@ -96,6 +96,22 @@ El modo remoto V1 es stateless. Eso significa:
 - cada request vuelve a usar el runtime MCP compartido y el scope server-side configurado
 
 Este diseño es intencional para V1: permite publicar una URL operable sin confundirla con hosted auth multiusuario.
+
+### Conectarse con tu propio cliente (Claude Code / claude.ai)
+
+Desde el 2026-08-06 el gateway público `mcp.efeonce.org` acepta **clientes MCP estándar con login de usuario** (cuenta corporativa Entra del tenant Efeonce). Para las tools federadas no necesitas token de consumer ni levantar este server: el gateway autentica a la persona y transporta la consulta hasta Greenhouse.
+
+**Claude Code:**
+
+```bash
+claude mcp add --transport http efeonce-mcp https://mcp.efeonce.org/mcp
+```
+
+Luego, en una sesión interactiva, ejecuta `/mcp`, elige el server y usa `Authenticate`: se abre el login Entra en el navegador y al volver el server queda `connected` con las 4 tools SEO federadas (más el lector de Globe).
+
+**claude.ai / Claude Desktop:** `Settings` → `Connectors` → `Add custom connector` con la URL `https://mcp.efeonce.org/mcp`, y autentica con la misma cuenta Entra.
+
+Recuerda que los conectores se cargan al **iniciar** la sesión: un conector agregado con una sesión ya abierta no aparece hasta abrir una nueva.
 
 ## Que puede hacer hoy
 
@@ -211,10 +227,11 @@ Reglas que el agente debe respetar:
 - **En `get_seo_rank_evolution`, `position: null` en una fecha significa que el dominio no rankeó ese día.** Es una medición válida, no un error ni un hueco a rellenar. Y esa serie (DataForSEO) **nunca se promedia** con la serie de GSC — son fuentes distintas.
 - Es **read-only**: ninguna de estas tools dispara capturas ni gasta presupuesto de proveedor.
 
-Desde el 2026-08-06 las tres primeras tools están **federadas al gateway público `mcp.efeonce.org`** (TASK-1647),
-así que un cliente MCP externo autenticado por OAuth las alcanza sin levantar este server. Es el mismo lane y el
-mismo entitlement: el gateway solo transporta. La cuarta (`get_seo_rank_evolution`, TASK-1303) vive por ahora
-solo en este MCP interno de producción; su federación al gateway es `TASK-1653`. Lectura funcional en
+Desde el 2026-08-06 las cuatro primeras tools están **federadas al gateway público `mcp.efeonce.org`**
+(TASK-1647; `get_seo_rank_evolution` se federó ese mismo día vía TASK-1653), así que un cliente MCP externo
+autenticado por OAuth las alcanza sin levantar este server. Es el mismo lane y el mismo entitlement: el
+gateway solo transporta. Las dos de TASK-1304 (`get_seo_site_audit_report`, `get_seo_backlink_profile`)
+viven por ahora solo en este MCP interno de producción. Lectura funcional en
 [Search Visibility 360 por MCP](../../documentation/growth/search-visibility-360-por-mcp.md); operación en
 [Operar el provider Greenhouse-SEO del MCP](operar-provider-greenhouse-seo-mcp.md).
 
