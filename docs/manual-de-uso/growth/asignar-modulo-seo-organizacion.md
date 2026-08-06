@@ -1,9 +1,9 @@
 # Manual — Asignar el modulo SEO a una organizacion
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-08-05 por Claude (TASK-1301)
-> **Ultima actualizacion:** 2026-08-05 por Claude (caso ejecutado Efeonce own-brand)
+> **Ultima actualizacion:** 2026-08-06 por Claude (delta: el modulo no requiere organization_type='client')
 > **Modulo:** Growth / SEO (Search Visibility 360)
 > **Ruta en portal:** sin UI todavia (paso manual SQL; UI llega con TASK-1306+)
 > **Documentacion relacionada:** [doc funcional del modulo](../../documentation/growth/modulo-seo-search-visibility-360.md) · [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
@@ -89,7 +89,7 @@ Hoy no hay crons ni readers (llegan en TASK-1302+), así que el alta no produce 
 
 ## Caso ejecutado: Efeonce own-brand (2026-08-05)
 
-El primer alta real del módulo fue la propia agencia, como dogfooding: **Efeonce se trackea como su propio cliente** dentro del 360. La decisión de modelado fue no inventar una org especial — se usó la org canónica ya existente `EO-ORG-0007` (Efeonce Group SpA, `is_operating_entity=true`) y sobre ella quedaron: el assignment `cpma-efeonce-seo-own-brand` (`seo_v1`, tier `contracted`, con nota `own_brand` en `metadata_json`), el target `seot-efeonce-own-brand` (`efeoncepro.com`, CL/es) y los 4 perfiles del grader ligados a la org.
+El primer alta real del módulo fue la propia agencia, como dogfooding: **Efeonce se trackea a sí misma con el mismo rigor que a un cliente** dentro del 360 (sin ser cliente — ver el delta 2026-08-06 más abajo). La decisión de modelado fue no inventar una org especial — se usó la org canónica ya existente `EO-ORG-0007` (Efeonce Group SpA, `is_operating_entity=true`) y sobre ella quedaron: el assignment `cpma-efeonce-seo-own-brand` (`seo_v1`, tier `contracted`, con nota `own_brand` en `metadata_json`), el target `seot-efeonce-own-brand` (`efeoncepro.com`, CL/es) y los 4 perfiles del grader ligados a la org.
 
 Todo el alta se hizo con un **script idempotente committeado**: [`scripts/growth/provision-efeonce-own-brand-seo.ts`](../../../scripts/growth/provision-efeonce-own-brand-seo.ts). Ese script sirve de **plantilla reutilizable** para provisionar cualquier otra org: sigue el patrón commit + verificación con el chokepoint (`enforceSeoRunEntitlement`), y en esencia solo hay que cambiar el `organization_id` y el dominio del target (más el tier/tags que correspondan al acuerdo). Preferirlo por sobre SQL suelto: deja evidencia versionada y se puede re-correr sin duplicar filas.
 
@@ -97,6 +97,22 @@ Todo el alta se hizo con un **script idempotente committeado**: [`scripts/growth
 
 - su fila en `seo_target` (dominio + país/idioma) — sin target no hay qué medir;
 - las **dos lentes** conectadas: el perfil del grader ligado a la org (lente AEO) **y** la propiedad de Google Search Console conectada (lente SEO). Con una sola lente, los readers de cruce (`readSeoAeoGap`) degradan honesto (`no_seo_data` / `no_aeo_data`) — eso es esperado, no un bug.
+
+### Delta 2026-08-06 — el módulo NO requiere que la org sea "cliente"
+
+Se corrigió un modelado: Efeonce (`EO-ORG-0007`) tenía `organization_type='client'` por herencia de un space de cliente de marzo 2026, y se bajó a `'other'`. **El dogfooding SEO no se vio afectado en nada** — el assignment, el target y los 4 perfiles del grader siguen intactos, verificado con el canary contra producción (`hasModule=true`, `tier=contracted`).
+
+Por qué no se ve afectado: **el módulo se resuelve por `module_assignments`, no por el rol comercial de la org**. El chokepoint `enforceSeoRunEntitlement` consulta sólo `organization_id` + `module_key`; `organization_type` no entra en la decisión. Son ejes distintos:
+
+| Eje | Pregunta | Dónde vive |
+|---|---|---|
+| Identidad legal | ¿quién soy? | `is_operating_entity` |
+| Rol comercial | ¿qué soy frente al mercado? | `organization_type` |
+| Capabilities | ¿qué hace la plataforma por mí? | `module_assignments` ← **acá vive el módulo SEO** |
+
+Consecuencia práctica: **puedes asignar `seo_v1` a cualquier organización del backbone canónico** — cliente, prospecto, la propia operadora — sin tocar su `organization_type`. En particular, `'other'` significa *sin rol comercial*, no *sin clasificar*: la operadora lo lleva a propósito porque Efeonce no se vende a sí misma.
+
+> Contrato: [`GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md` §Organization Types](../../architecture/GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md) · invariantes para agentes: [`ORG_CLIENT_AGENT_INVARIANTS.md`](../../architecture/agent-invariants/ORG_CLIENT_AGENT_INVARIANTS.md).
 
 ## Como revocar
 
@@ -132,6 +148,7 @@ Cuando el chokepoint `enforceSeoRunEntitlement` bloquea una corrida, devuelve un
 
 - **No borres historia.** Nunca `DELETE` de un assignment con snapshots asociados, y nunca `UPDATE`/`DELETE` sobre las tablas de mediciones `seo_rank_snapshots` / `seo_backlink_snapshots` / `seo_site_audit_*` (los triggers anti-mutation lo rechazan, y está bien que así sea).
 - **No asignes SEO por rol ni por capability suelta.** El acceso es per-org vía `module_assignments`; darle a un rol interno un "acceso SEO" paralelo rompe el modelo (lección TASK-1248 del AEO).
+- **No promuevas una org a `organization_type='client'` para "que le llegue el módulo".** No hace falta (el chokepoint no lee esa columna) y, si la org es la entidad legal operadora, la mete en los listados de clientes facturables — con riesgo de autofacturación. El alta del módulo es el `INSERT` en `module_assignments` y nada más.
 - **No uses otro `module_key`.** Es `seo_v1` literal, seedeado en el catálogo `greenhouse_client_portal.modules`; un key inventado falla por FK.
 - **No edites los env-knobs `GROWTH_SEO_*` para favorecer a una org.** Los knobs son globales por tier; el único ajuste por org es el override pilot en `metadata_json`.
 - **No repliques la lógica del gate en otro lado.** Cualquier consumer nuevo (UI, Nexa, MCP, cron) pasa por `enforceSeoRunEntitlement` — es el chokepoint único por diseño.

@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-08-05 por Claude (TASK-1299 + TASK-1301)
-> **Ultima actualizacion:** 2026-08-05 por Claude (TASK-1305 + TASK-1645: cruce SEO↔AEO + operable por MCP)
+> **Ultima actualizacion:** 2026-08-06 por Claude (TASK-1647: cutover MCP-first a produccion — provider federado en el gateway)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
 
 # Modulo SEO — Search Visibility 360 (Growth)
@@ -90,7 +90,7 @@ TASK-1302 convierte esa consulta en vivo en una **serie propia de Greenhouse**: 
 
 ## Que NO existe todavia
 
-Lo siguiente aún no está construido (la serie que ya se llena es la de Search Console). **Sí existen ya** — además del schema y el modelo de acceso — el cruce SEO ↔ AEO (`readSeoAeoGap` + matriz quadrant 360, TASK-1305) y la **operación por MCP** (TASK-1645: lane ecosystem + 3 tools read-only — `get_seo_entitlement`, `get_seo_keyword_opportunities`, `get_seo_visibility_360`; ver el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md) §8). Pendiente:
+Lo siguiente aún no está construido (la serie que ya se llena es la de Search Console). **Sí existen ya** — además del schema y el modelo de acceso — el cruce SEO ↔ AEO (`readSeoAeoGap` + matriz quadrant 360, TASK-1305) y la **operación por MCP live en producción desde el 2026-08-06**: lane ecosystem + 3 tools read-only (`get_seo_entitlement`, `get_seo_keyword_opportunities`, `get_seo_visibility_360`) en el MCP interno de Greenhouse (TASK-1645, ver el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md) §8) **y federadas al gateway público `mcp.efeonce.org`** (TASK-1647). La lectura funcional completa de esa capacidad está en [Search Visibility 360 por MCP](search-visibility-360-por-mcp.md). Pendiente:
 
 | Falta | Task que lo trae |
 |---|---|
@@ -104,7 +104,7 @@ Lo siguiente aún no está construido (la serie que ya se llena es la de Search 
 
 Además: el alta del módulo `seo_v1` a una organización sigue siendo un **paso operativo manual** — ver el manual [Asignar el módulo SEO a una organización](../../manual-de-uso/growth/asignar-modulo-seo-organizacion.md).
 
-Sobre el interruptor general `GROWTH_SEO_ENABLED`: está **encendido desde el 2026-08-05**, y lo lee el trabajador de fondo (no el portal). Encenderlo habilita únicamente la captura de Search Console, que no gasta presupuesto porque el dato de Google es gratis. Las corridas que **sí** cuestan dinero (rankings, site audit, backlinks) siguen exigiendo el assignment `seo_v1` de la organización y pasan por el chokepoint de cupos y presupuesto.
+Sobre el interruptor general `GROWTH_SEO_ENABLED`: está **encendido desde el 2026-08-05** y es **multi-runtime** — lo leen dos procesos distintos con su propia copia de la variable: el trabajador de fondo (`ops-worker`, para la captura diaria de Search Console) y el portal en Vercel (para el lane que sirve las consultas por MCP). Encenderlo en un solo runtime deja el otro camino muerto. Desde el 2026-08-06 está en `true` en Vercel Production. Encenderlo no gasta presupuesto: la captura de Search Console es gratis y las consultas por MCP son de lectura. Las corridas que **sí** cuestan dinero (rankings, site audit, backlinks) siguen exigiendo el assignment `seo_v1` de la organización y pasan por el chokepoint de cupos y presupuesto.
 
 ## Relacion con el AI Visibility Grader (motores hermanos)
 
