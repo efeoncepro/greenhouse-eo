@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-08-05 por Claude (TASK-1299 + TASK-1301)
-> **Ultima actualizacion:** 2026-08-06 por Claude (TASK-1647: cutover MCP-first a produccion — provider federado en el gateway)
+> **Ultima actualizacion:** 2026-08-06 por Claude (TASK-1303: captura diaria de rankings + reader de evolucion + tool MCP `get_seo_rank_evolution`)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
 
 # Modulo SEO — Search Visibility 360 (Growth)
@@ -88,13 +88,28 @@ TASK-1302 convierte esa consulta en vivo en una **serie propia de Greenhouse**: 
 
 > Detalle técnico: [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) · materializador y batch en [`src/lib/growth/seo/`](../../../src/lib/growth/seo/) · reader de oportunidades en [`src/lib/growth/seo/keyword-opportunities-reader.ts`](../../../src/lib/growth/seo/keyword-opportunities-reader.ts) · la conexión de origen es la de [Conexion a Google Search Console](conexion-search-console.md).
 
+### 4. La captura diaria de rankings y su serie de evolucion (TASK-1303 — code complete, cron pausado)
+
+La segunda captura automatica del modulo: cada madrugada (05:00 Chile), para cada organizacion con el modulo `seo_v1` asignado, el sistema le pregunta a Google (via el proveedor DataForSEO) **en que posicion exacta aparece el dominio para cada keyword trackeada** — incluyendo si el resultado trae AI Overview u otras features del buscador. Cada medicion se guarda como una fila inmutable en `seo_rank_snapshots` y se espeja automaticamente a BigQuery (`greenhouse_growth_analytics.seo_rank_history`) para conservar la historia larga.
+
+Piezas clave, en lenguaje simple:
+
+- **Esta captura cuesta dinero** (cada consulta a DataForSEO se paga, ~USD 0.01 por keyword al dia). Por eso pasa SIEMPRE por el control de presupuesto por organizacion antes de gastar, y ademas re-verifica el presupuesto cada 10 consultas dentro de una misma corrida — si el presupuesto del mes se agota a mitad de la corrida, el resto se frena y queda registrado como frenado, no como error misterioso.
+- **Repetir la corrida el mismo dia no gasta de nuevo**: lo ya capturado hoy se detecta antes de consultar al proveedor.
+- **Una keyword donde el dominio no aparece igualmente se registra** (posicion vacia): "no rankeo hoy" es un dato de la serie, no un error.
+- **El reader de evolucion** (`readRankEvolution`) devuelve la pelicula: por keyword, la lista de fechas con posicion y URL. Rangos de hasta 6 meses salen de la base operativa; rangos mas largos, de la historia en BigQuery. Esta serie es la de mercado (posicion exacta) y **nunca se mezcla ni promedia** con la serie de Search Console (posicion promediada del propio dominio) — son fuentes distintas que se leen juntas recien en la capa de reporte.
+- **Ya se puede consultar por MCP**: la tool `get_seo_rank_evolution` quedo registrada en el mismo PR (mandato parity), junto a las tres de TASK-1645.
+
+**Estado real (2026-08-06):** el codigo esta completo y probado, pero el cron nace **PAUSADO** a proposito: el costo del proveedor es el riesgo #1 del programa y la primera corrida real se habilita a mano tras verificar el control de presupuesto en staging (Berel primero). Mientras este pausado, la señal `seo.rank.capture_lag` en `/admin/operations` muestra warning para los targets elegibles sin captura — es el recordatorio honesto de que hay una serie contratada que aun no corre. El paso a paso para despausar, verificar y revertir esta en el manual [Operar la captura diaria de rankings](../../manual-de-uso/growth/operar-captura-rankings-seo.md).
+
+> Detalle tecnico: command y batch en [`src/lib/growth/seo/rank-capture.ts`](../../../src/lib/growth/seo/rank-capture.ts) y [`rank-capture-batch.ts`](../../../src/lib/growth/seo/rank-capture-batch.ts) · reader en [`rank-evolution-reader.ts`](../../../src/lib/growth/seo/rank-evolution-reader.ts) · mirror en [`rank-history-bq-mirror.ts`](../../../src/lib/growth/seo/rank-history-bq-mirror.ts) · arquitectura §8 de [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md).
+
 ## Que NO existe todavia
 
-Lo siguiente aún no está construido (la serie que ya se llena es la de Search Console). **Sí existen ya** — además del schema y el modelo de acceso — el cruce SEO ↔ AEO (`readSeoAeoGap` + matriz quadrant 360, TASK-1305) y la **operación por MCP live en producción desde el 2026-08-06**: lane ecosystem + 3 tools read-only (`get_seo_entitlement`, `get_seo_keyword_opportunities`, `get_seo_visibility_360`) en el MCP interno de Greenhouse (TASK-1645, ver el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md) §8) **y federadas al gateway público `mcp.efeonce.org`** (TASK-1647). La lectura funcional completa de esa capacidad está en [Search Visibility 360 por MCP](search-visibility-360-por-mcp.md). Pendiente:
+Lo siguiente aún no está construido (las series que ya se llenan: Search Console live; rankings code-complete con cron pausado). **Sí existen ya** — además del schema y el modelo de acceso — el cruce SEO ↔ AEO (`readSeoAeoGap` + matriz quadrant 360, TASK-1305) y la **operación por MCP live en producción desde el 2026-08-06**: lane ecosystem + 3 tools read-only (`get_seo_entitlement`, `get_seo_keyword_opportunities`, `get_seo_visibility_360`) en el MCP interno de Greenhouse (TASK-1645, ver el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md) §8) **y federadas al gateway público `mcp.efeonce.org`** (TASK-1647). La lectura funcional completa de esa capacidad está en [Search Visibility 360 por MCP](search-visibility-360-por-mcp.md). Pendiente:
 
 | Falta | Task que lo trae |
 |---|---|
-| Captura diaria de rankings (Cloud Scheduler + ops-worker + mirror BigQuery) | TASK-1303 |
 | Site audit (queue + poll OnPage async) y snapshot semanal de backlinks | TASK-1304 |
 | UI operador `/admin/growth/seo` (overview) | TASK-1306 |
 | Pantalla ancla: Rank & URL performance over time | TASK-1307 |

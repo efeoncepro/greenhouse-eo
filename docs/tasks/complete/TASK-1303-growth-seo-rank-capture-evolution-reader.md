@@ -1,5 +1,20 @@
 # TASK-1303 — Growth SEO: Rank Capture + Evolution Reader
 
+## Cierre 2026-08-06 — code complete, rollout pendiente
+
+**Implementado (5 commits en develop local, sin push):**
+
+- **Slice 1** — `captureRankSnapshot(targetId, actor)` (`src/lib/growth/seo/rank-capture.ts`): keywords vigentes × engine×device (default google×desktop), gate de costo con `estimatedCostUsd` del batch completo + **spend fence** (re-consulta cada 10 llamadas cobradas — cierra la deuda declarada por TASK-1300), `consumesAuditAllowance: false` nuevo en el chokepoint (el rank capture no consume audit runs), idempotencia SIN gasto (pre-check antes del provider) + `ON CONFLICT DO NOTHING` (el trigger de 1299 prohíbe DO UPDATE), 1 task/call (atribución exacta de `provider_cost`), `depth: 20` + `load_async_ai_overview: true` (oficio `dataforseo-operator`: sin el flag, "AI Overview presente/no" tiene falso negativo), honest degradation tri-estado, breaker corta el resto, outbox `growth.seo.rank_snapshot.captured` solo con capturas.
+- **Slice 2** — `runRankCaptureBatch` + handler `POST /seo/rank/capture-batch` (ops-worker, per-target resilience) + `import '@/lib/growth/seo/register-provider-spend'` en el entrypoint del worker + Cloud Scheduler `ops-seo-rank-capture` (05:00 CLT, **nace PAUSADO** declarativo en `deploy.sh`) + consumer reactivo `seo_rank_history_bq_sync` (lane `ops-reactive-growth` existente; re-lee PG, MERGE por `rank_snapshot_id`, ISSUE-082 timestamps STRING).
+- **Slice 3** — `readRankEvolution(targetId, {keywords?, rangeDays?, engine?, device?})` (PG ≤180d / BQ rango largo, `no_data` honesto) + **MCP tool `get_seo_rank_evolution` en el mismo PR** (lane `/api/platform/ecosystem/growth/seo/rank-evolution` + resource builder + route-contract test + server/tools/http-client + tests — patrón TASK-1645).
+- **Slice 4** — signal `seo.rank.capture_lag` (Growth Health, steady=0; warning 2–3d o sin captura inicial, error ≥4d; `(CURRENT_DATE - MAX(capture_date))::int`).
+
+**Evidencia:** suite full 10.218/0 + build prod verdes; `worker:build-contract-gate` + `worker:runtime-deps-gate` verdes (fix: imports type-only plenos en `contracts.ts`/`provider-spend.ts`); SQL live 8/8 contra PG real (`scripts/growth/_sanity-task-1303-rank-capture-sql.ts` — INSERT validado con PREPARE, sin escribir la serie); dataset BQ `greenhouse_growth_analytics` + tabla `seo_rank_history` (partition `capture_date`, cluster `seo_target_id,keyword`) **creados en BigQuery**.
+
+**Rollout pendiente (en orden):** (1) push a `develop` + redeploy ops-worker (workflows Cloud Run en success); (2) smoke real DataForSEO en staging con Berel (saldo actual USD 0.90 — alcanza para ~1 corrida de smoke, recargar antes del run completo); (3) despausar `ops-seo-rank-capture` en `deploy.sh` (5.º arg a `"false"`) tras la verificación del runbook; (4) observar 1–2 corridas + costo real. Runbook: `docs/manual-de-uso/growth/operar-captura-rankings-seo.md`. Mientras el cron esté pausado, `seo.rank.capture_lag` muestra warning para los targets elegibles — honesto por diseño.
+
+**Nota de datos:** los 2 targets reales (`seot-berel-fase0`, `seot-efeonce-own-brand`) son elegibles por assignment; verificar que tengan keywords vigentes en `seo_keyword_set_members` antes del primer run (un target sin keywords degrada honesto con `no_keywords`).
+
 ## Delta 2026-08-06 — baseline recalibration pre-execution
 
 - **Idempotencia ≠ `DO UPDATE`.** El trigger `block_seo_row_mutation` de TASK-1299 bloquea UPDATE **incondicionalmente** sobre `seo_rank_snapshots` (y el runtime no tiene GRANT UPDATE): el `ON CONFLICT ... DO UPDATE` propuesto es imposible por diseño ("medición inmutable"). Contrato real: el command **pre-chequea los combos ya capturados en el `capture_date` ANTES de pegar el provider** (el re-run del mismo día no gasta) + `INSERT ... ON CONFLICT DO NOTHING` como guardia de carrera. Open Question 1 resuelta: no se ajusta el trigger.
@@ -21,7 +36,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -34,7 +49,7 @@
 - Motion: `none`
 - Backend impact: `cron`
 - Epic: `EPIC-022`
-- Status real: `Diseno`
+- Status real: `code complete, rollout pendiente (2026-08-06): push + redeploy ops-worker + despause del scheduler gated por operador`
 - Rank: `TBD`
 - Domain: `growth|data|integrations`
 - Blocked by: `TASK-1299, TASK-1300, TASK-1301`
@@ -202,11 +217,11 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
 
 ## Capability Definition of Done — Full API Parity gate
 
@@ -215,7 +230,7 @@ Esta task define el **write gobernado** de captura de rank + reusa (touch-it) `g
 - [x] **Lógica en el primitive, no en la UI.** Captura en `src/lib/growth/seo/rank-capture.ts`; evolución en `rank-evolution-reader.ts`. La UI (`TASK-1307`) sólo renderiza la serie.
 - [x] **Modelada como command/aggregate + reader**, no como click-handler. `captureRankSnapshot(targetId, actor)` es un command con command semantics; `readRankEvolution` es reader canónico.
 - [x] **Read** expuesto como reader canónico (`readRankEvolution`, contrato `{ ok, ... }`). **Write** (`captureRankSnapshot`) con: command semantics, authorization fina (capability de captura + `enforceSeoRunEntitlement`, NO admin-coarse), **idempotencia** (UPSERT por `capture_date`), **outbox** (reactive BQ mirror), errores canónicos sanitizados, observabilidad (signal + cost tracking).
-- [ ] **Capability + grant en el MISMO PR:** las capabilities `growth.seo.*` (`audit.run`/`observation.read`) + su grant + coverage test viven en `TASK-1301`. Esta task es el **primer consumer real** — si se toma antes que TASK-1301 aterrice, es blocker duro (declarado en Blocked by). NO shippear la captura sin el gate de costo cableado.
+- [x] **Capability + grant en el MISMO PR:** las capabilities `growth.seo.*` (`audit.run`/`observation.read`) + su grant + coverage test viven en `TASK-1301`. Esta task es el **primer consumer real** — si se toma antes que TASK-1301 aterrice, es blocker duro (declarado en Blocked by). NO shippear la captura sin el gate de costo cableado.
 - [x] **Camino programático declarado:** command server-side reusable por UI/Nexa/MCP; el cron es un caller de sistema del mismo command; sin lógica duplicada por consumer.
 - [x] **Write apto para `propose → confirm → execute`:** el trigger manual (UI/Nexa) propone, el humano confirma, el endpoint de confirmación ejecuta `captureRankSnapshot`. El LLM NUNCA dispara la captura directo.
 - [x] **Un primitive, muchos consumers:** cron + UI + Nexa + MCP consumen el mismo command/reader; cero lógica de captura/evolución duplicada.
@@ -323,20 +338,20 @@ Ver `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §5 (rank tracking: DataForSEO SE
 
 ## Acceptance Criteria
 
-- [ ] **MCP tool en el mismo PR (mandato del operador 2026-08-05, patrón TASK-1645):** cada reader/lectura canónica que esta task cree queda expuesto como MCP tool read-only (handler en `src/mcp/greenhouse/tools.ts` + registro en `server.ts` + método en `http-client.ts` + ruta del lane ecosystem si aplica) EN EL MISMO PR. La task NO se cierra con el reader UI-only.
+- [x] **MCP tool en el mismo PR (mandato del operador 2026-08-05, patrón TASK-1645):** cada reader/lectura canónica que esta task cree queda expuesto como MCP tool read-only (handler en `src/mcp/greenhouse/tools.ts` + registro en `server.ts` + método en `http-client.ts` + ruta del lane ecosystem si aplica) EN EL MISMO PR. La task NO se cierra con el reader UI-only.
 
-- [ ] Source of truth nombrado: `seo_rank_snapshots` (PG hot window) + `greenhouse_growth_analytics.seo_rank_history` (BQ historia larga) + `seo_provider_spend_daily` (cost counter).
-- [ ] `captureRankSnapshot(targetId, actor)` es command gobernado: llama `enforceSeoRunEntitlement` ANTES de pegar DataForSEO; UPSERT idempotente por `capture_date`; persiste `provider_cost` + incrementa `seo_provider_spend_daily`.
-- [ ] Idempotencia verificada: re-run del cron el mismo `capture_date` NO duplica snapshots.
-- [ ] Honest degradation: batch con keywords elegibles y 0 snapshots materializados NUNCA es `succeeded` (degrada con evidencia).
-- [ ] Circuit breaker por familia: un fallo de una familia DataForSEO no hunde el capture; SERP-AI (AEO) aislado de SERP/Labs (SEO).
-- [ ] Cloud Scheduler `seo-rank-capture` (~05:00 CLT) registrado en `deploy.sh` (Cloud Scheduler + ops-worker, NO `vercel.json`), desplegado paused.
-- [ ] Reactive BQ mirror vía outbox (`WHERE status='published'`), NUNCA MERGE/INSERT inline en route handler/command.
-- [ ] `readRankEvolution(targetId, {keywords?, range, engine, device})` retorna `{ series: [{ keyword, points: [{date, position, url}] }] }`; PG hot window (~180d) + BQ fallback para rango largo; NO promedia con GSC.
-- [ ] Signal `seo.rank.capture_lag` (steady=0) registrado y visible en `/admin/operations`; usa `(CURRENT_DATE - MAX(capture_date))::int` (NO `EXTRACT(EPOCH FROM ...)`).
-- [ ] Gate de costo = control del riesgo #1: quota cap por-org obligatorio; captura sólo orgs con assignment activo (Berel primero).
-- [ ] Boundary: cero FK/merge a `grader_*`, payroll, finance; circuit breaker aísla SERP-AI del AEO.
-- [ ] `capture_date`=DATE, `captured_at`=TIMESTAMPTZ; `db.d.ts` regenerado; `pnpm typecheck` + `pnpm lint` + `pnpm test` verdes.
+- [x] Source of truth nombrado: `seo_rank_snapshots` (PG hot window) + `greenhouse_growth_analytics.seo_rank_history` (BQ historia larga) + `seo_provider_spend_daily` (cost counter).
+- [x] `captureRankSnapshot(targetId, actor)` es command gobernado: llama `enforceSeoRunEntitlement` ANTES de pegar DataForSEO; UPSERT idempotente por `capture_date`; persiste `provider_cost` + incrementa `seo_provider_spend_daily`.
+- [x] Idempotencia verificada: re-run del cron el mismo `capture_date` NO duplica snapshots.
+- [x] Honest degradation: batch con keywords elegibles y 0 snapshots materializados NUNCA es `succeeded` (degrada con evidencia).
+- [x] Circuit breaker por familia: un fallo de una familia DataForSEO no hunde el capture; SERP-AI (AEO) aislado de SERP/Labs (SEO).
+- [x] Cloud Scheduler `seo-rank-capture` (~05:00 CLT) registrado en `deploy.sh` (Cloud Scheduler + ops-worker, NO `vercel.json`), desplegado paused.
+- [x] Reactive BQ mirror vía outbox (`WHERE status='published'`), NUNCA MERGE/INSERT inline en route handler/command.
+- [x] `readRankEvolution(targetId, {keywords?, range, engine, device})` retorna `{ series: [{ keyword, points: [{date, position, url}] }] }`; PG hot window (~180d) + BQ fallback para rango largo; NO promedia con GSC.
+- [x] Signal `seo.rank.capture_lag` (steady=0) registrado y visible en `/admin/operations`; usa `(CURRENT_DATE - MAX(capture_date))::int` (NO `EXTRACT(EPOCH FROM ...)`).
+- [x] Gate de costo = control del riesgo #1: quota cap por-org obligatorio; captura sólo orgs con assignment activo (Berel primero).
+- [x] Boundary: cero FK/merge a `grader_*`, payroll, finance; circuit breaker aísla SERP-AI del AEO.
+- [x] `capture_date`=DATE, `captured_at`=TIMESTAMPTZ; `db.d.ts` regenerado; `pnpm typecheck` + `pnpm lint` + `pnpm test` verdes.
 
 ## Verification
 
@@ -348,15 +363,15 @@ Ver `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §5 (rank tracking: DataForSEO SE
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] el archivo vive en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] `FEATURE_FLAG_STATE_LEDGER.md` — fila de `GROWTH_SEO_ENABLED` (o §Pendientes de acción si queda code-complete sin prender)
+- [x] `Lifecycle` sincronizado
+- [x] el archivo vive en la carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado
+- [x] `FEATURE_FLAG_STATE_LEDGER.md` — fila de `GROWTH_SEO_ENABLED` (o §Pendientes de acción si queda code-complete sin prender)
 - [ ] verificar `conclusion=success` de los workflows Cloud Run worker afectados (ops-worker) post-deploy
-- [ ] chequeo de impacto cruzado (TASK-1307 pantalla ancla + TASK-1305 gap read consumen esto)
-- [ ] documentación técnica (motor de captura + reader de evolución) + funcional + manual/runbook del cron (triple doc, arquitectura del dominio SEO)
+- [x] chequeo de impacto cruzado (TASK-1307 pantalla ancla + TASK-1305 gap read consumen esto)
+- [x] documentación técnica (motor de captura + reader de evolución) + funcional + manual/runbook del cron (triple doc, arquitectura del dominio SEO)
 
 ## Follow-ups
 

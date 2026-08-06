@@ -7,6 +7,23 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-06 — TASK-1303: captura diaria de rankings + reader de evolución (backend de la pantalla ancla)
+
+- **`captureRankSnapshot` + batch ops-worker + mirror BQ + `readRankEvolution` + signal + MCP tool**:
+  la serie diaria de posiciones exactas (DataForSEO SERP, depth 20 + AI Overview async) queda
+  code-complete con gate de costo + **spend fence** (re-consulta el gate cada 10 llamadas — cierra
+  la deuda medida por TASK-1300 de 3× de sobregiro), idempotencia sin gasto (pre-check antes del
+  provider; el trigger de 1299 prohíbe DO UPDATE → `ON CONFLICT DO NOTHING`), y el ledger de gasto
+  escrito solo por el transporte.
+- **`enforceSeoRunEntitlement` gana `consumesAuditAllowance`** (default true): el rank capture no
+  crea audit runs — un org con el cupo de audits agotado ya no queda con la serie diaria congelada.
+- **Cloud Scheduler `ops-seo-rank-capture` (05:00 CLT) nace PAUSADO** declarativo en `deploy.sh`;
+  dataset BQ `greenhouse_growth_analytics` + tabla `seo_rank_history` creados. Rollout pendiente:
+  push + redeploy ops-worker + despause tras verificar gate de costo en staging (runbook
+  `docs/manual-de-uso/growth/operar-captura-rankings-seo.md`).
+- Parity MCP-first: tool `get_seo_rank_evolution` + lane
+  `/api/platform/ecosystem/growth/seo/rank-evolution` en el mismo PR (patrón TASK-1645).
+
 ## 2026-08-06 — Efeonce deja de ser cliente de sí misma: rol comercial corregido
 
 - **`EO-ORG-0007` (la entidad legal operadora) tenía `organization_type='client'`**, herencia del
@@ -978,13 +995,3 @@ y [`docs/changelog/internal/2026-07.md`](docs/changelog/internal/2026-07.md).
   `sentry_critical_issues` timeout de 6 s; el último ya no tuvo bloqueos de smoke ni staging.
 - El rollout queda pendiente. No se activó `bypass_preflight`; requiere `platform.release.bypass_preflight` y razón
   auditada de al menos 20 caracteres.
-
-## 2026-07-29 — PR #164: autenticación de paquetes privados y gobierno de release
-
-- Los workflows con instalación de dependencias privadas usan `GITHUB_TOKEN` con `packages: read` y un `.npmrc`
-  efímero en `$RUNNER_TEMP`; no se versionan tokens ni se exponen credenciales en runtime o artefactos.
-- Vercel `efeonce-7670142f/greenhouse-eo` recibió `NPM_RC` cifrado para Preview (`develop`) y Production, siguiendo
-  el runbook de AXIS. La credencial operator-owned es temporal y requiere reemplazo por una identidad read-only antes
-  del rollout externo.
-- `CLAUDE.md` quedó bajo el techo estricto de 35k tokens (34.945) y la auditoría de contenido quedó sin huérfanas;
-  el detalle del Design System vive en `docs/architecture/ui-platform/README.md`.

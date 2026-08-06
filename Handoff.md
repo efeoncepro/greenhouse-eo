@@ -1,5 +1,27 @@
 # Handoff activo
 
+### TASK-1303 — rank capture + evolution reader: code complete, rollout pendiente (2026-08-06)
+
+El backend de la pantalla ancla de EPIC-022 quedó completo en `develop` **local (sin push)**: command
+`captureRankSnapshot` (gate de costo + spend fence cada 10 llamadas + idempotencia sin gasto +
+`ON CONFLICT DO NOTHING` — el trigger de 1299 prohíbe DO UPDATE), batch `POST /seo/rank/capture-batch`
+en ops-worker, Cloud Scheduler `ops-seo-rank-capture` (05:00 CLT) **declarado PAUSADO** en `deploy.sh`,
+mirror reactivo a BQ `greenhouse_growth_analytics.seo_rank_history` (dataset+tabla YA creados),
+`readRankEvolution` (PG ≤180d / BQ largo) + MCP tool `get_seo_rank_evolution` (mismo PR, patrón 1645)
+y signal `seo.rank.capture_lag`. Evidencia: suite full 10.218/0, build prod, worker gates, SQL live
+8/8 contra PG real. `enforceSeoRunEntitlement` ganó `consumesAuditAllowance:false` (el rank capture
+no consume audit runs).
+
+**Próximo paso (operador):** push → redeploy ops-worker (4 workflows en success) → smoke staging con
+Berel (⚠️ saldo DataForSEO USD 0.90 — recargar; ~USD 0.01/keyword/día con depth 20 + AIO) → despausar
+el scheduler cambiando el 5.º arg a "false" en `deploy.sh` (NUNCA `jobs resume` a mano: el deploy lo
+revierte). Runbook completo: `docs/manual-de-uso/growth/operar-captura-rankings-seo.md`. Mientras esté
+pausado, `seo.rank.capture_lag` = warning para los targets elegibles (honesto: serie contratada que no
+corre). Verificar antes del primer run que `seot-berel-fase0` tenga keywords vigentes en
+`seo_keyword_set_members` (un target sin keywords degrada `no_keywords`). Desbloqueadas: TASK-1307
+(★ UI, consume `readRankEvolution`) y TASK-1304 (replica el patrón captura+mirror).
+
+
 ### Efeonce dejó de ser cliente de sí misma — modelado corregido (2026-08-06)
 
 `EO-ORG-0007` (Efeonce, `is_operating_entity=true`) tenía `organization_type='client'`, herencia
@@ -518,64 +540,6 @@ razón** en vez de cableados a la fuerza.
 
 **Siguiente paso ejecutable:** coordinar `TASK-1552` ↔ `TASK-1643` para el canal feed → composer, y decidir la
 semántica de «Recrear». Nada de eso lo puedo resolver implementando.
-
-## TASK-1641 — Globe: DESPLEGADO + promoción end-to-end ejecutada (2026-08-05)
-
-**Estado:** `in-progress`, **desplegado y aplicado**. Globe `main@b958a11`; API
-`globe-api-internal-00213-5z9` (tag `b958a116a23a`, tráfico 100%), Job worker por digest
-`sha256:82a4f2d3e0a6…`, `tofu apply` sobre plan guardado (`6 to add, 1 to change, 0 to destroy`) y `No
-changes` posterior. Las 3 métricas, sus 3 alertas y `GLOBE_PROMOTION_WINDOW_WARNING_SECONDS=1800`
-verificados contra el runtime, no contra el workflow en verde.
-
-🔴 **El primer ciclo reportó 3 divergencias y DOS eran rutas VIVAS.** `ref/still/rrss-v1` y
-`ref/still/openai-v2` tienen su última promoción de la saga en `rolled_back` **y su binding `enabled`**,
-porque las habilitó el lane automatizado de ADR-010, que no enruta por la saga. El remedio que la señal
-sugiere las habría retirado. «Última promoción revertida» era un **proxy** de «el rollback sigue en pie», y
-un proxy falla donde otra autoridad puede deshacerlo: cuando dos mecanismos mueven el mismo estado, hay que
-cerrar el predicado sobre el **estado actual del efecto**. Arreglado en `@b958a11`; **medido: la señal bajó
-de 3 a 1**. Ningún test lo atrapó — apareció leyendo las primeras emisiones reales.
-
-**Divergencia genuina que queda, y espera un acto humano:** `ref/still/reference-v1` `v5-pro` (binding
-`enabled=false`, readiness `promoted`). Remedio: `globe.model-readiness.route.pause` sobre esa identidad.
-
-| Scope | Estado | Evidencia |
-|---|---|---|
-| 1 canary de ruta arbitraria | ✅ ejercitado con gasto real | `@1767138` + `@a6ff46f` |
-| 2 señal de ventana por expirar | ✅ código + IaC, sin aplicar | `@17c3fef` |
-| 3 convergencia + su consumidor | ✅ cerrado | `@4a0a18b` + `@17c3fef` |
-| 4 `canary-confirm` sin 500 opaco | ✅ cerrado | `@38c528d` |
-| 5 reserva pre-gasto | ✅ código, sin desplegar | `@21d6ee3` |
-| 6 runbook | ✅ publicado | `GLOBE_ROUTE_PROMOTION_RUNBOOK_V1.md` |
-
-**Scopes 2 y 3 son un solo consumidor** porque son el mismo lector cross-workspace; usan la política de scan
-que ya existía (`app.promotion_recovery_scan`, migración `0028`) — **sin migración nueva**. La señal de
-ventana es el **complemento estricto** de `stalled`, que mide `deadline_at <= now` y avisa cuando ya venció.
-
-🔴 **El hallazgo que evitó una señal falsa:** dos de las diez promociones revertidas pertenecen a identidades
-que **después se volvieron a promover y quedaron selladas**. Sin el predicado de supersede por identidad
-exacta, la señal habría acusado de divergencia justo a las dos rutas que convergieron, y su remedio habría
-**retirado dos rutas vivas**.
-
-**Scope 5, medido contra `globe-pg` antes de tocar código:** la **única** reserva `held` de toda la base es
-pre-gasto (32 créditos) y hay **cero** post-gasto. El discriminador es `attempt.providerOperation`, no
-`lease.kind`. Un fallo al liberar degrada al TTL y se observa, nunca se propaga.
-
-**Los 8 criterios de aceptación están cerrados.** `ref/still/reference-v1` se promovió de punta a punta
-(`promotion_4265dd26…` → `canary_passed` rev 9, binding `enabled` rev 5, 10 = 10 créditos) con el runbook
-nuevo y sin una sola secuencia a mano — y esa promoción **cerró la divergencia**: la señal pasó de 1 a 0.
-
-🔴 **Follow-up abierto: pausar una readiness no tiene camino ejecutable.** `requireHuman` rechaza a los
-lanes de service account y `globe.model-readiness.pause` no está en los scopes humanos, así que hoy nadie
-puede. No se construyó el modo en el operator lane porque habría sido un camino muerto; cerrarlo exige el
-rollout de 3 pasos del broker. Detalle:
-[`TASK_1641_SESSION_HANDOFF_2026-08-04.md`](docs/operations/creative-studio/TASK_1641_SESSION_HANDOFF_2026-08-04.md).
-
-**Benchmark de producto (2026-08-05):** la comparación autenticada de Higgsfield/Magnific y la verificación de
-Globe main@21d6ee3 están documentadas en
-[GLOBE_COMPETITIVE_BENCHMARK_HIGGSFIELD_MAGNIFIC_2026-08-05](docs/audits/competitive-ui/GLOBE_COMPETITIVE_BENCHMARK_HIGGSFIELD_MAGNIFIC_2026-08-05.md).
-El hallazgo load-bearing coincide con este handoff: la UI React todavía deja Reference, Recreate, Favorite y
-Download sin handlers reales; no declarar cerrado el loop de Producer hasta TASK-1643/TASK-1552. TASK-1641 queda
-limitada al lane backend/API de promoción y conserva como único criterio abierto el canary end-to-end.
 
 ## EPIC-039 — Next.js 16.3 + TypeScript 7 Toolchain Adoption (2026-08-04)
 
