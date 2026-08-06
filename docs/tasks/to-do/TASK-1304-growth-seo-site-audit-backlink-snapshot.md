@@ -1,5 +1,10 @@
 # TASK-1304 — Growth SEO: Site Audit (Queue+Poll) + Backlink Snapshot
 
+## Delta 2026-08-06
+
+- **El patrón captura+mirror que esta task replica ya está implementado** por TASK-1303: command con gate + spend fence (`src/lib/growth/seo/rank-capture.ts`), batch ops-worker con per-target resilience (`rank-capture-batch.ts` + handler `POST /seo/rank/capture-batch`), outbox event de dominio (`contracts.ts`, patrón growth-forms — NO el catálogo TS central) → consumer reactivo `src/lib/sync/projections/seo-rank-history-bq-sync.ts` → MERGE BQ (`rank-history-bq-mirror.ts`, ISSUE-082 timestamps STRING), scheduler paused en `deploy.sh` y signal de lag. El dataset BQ `greenhouse_growth_analytics` YA existe. El entrypoint del ops-worker YA importa `register-provider-spend` (TASK-1303) — esta task no debe re-importarlo.
+- ⚠️ Gotcha del transporte para OnPage: `postDataForSeoTask` es POST-only; los reads OnPage (`summary`, `pages`) son POST con id en el body así que FUNCIONAN, pero `task_get` GET-por-path NO (skill `dataforseo-operator` §límites). El anti-mutation trigger de 1299 en `seo_backlink_snapshots` bloquea UPDATE incondicionalmente → idempotencia = pre-check + `ON CONFLICT DO NOTHING` (mismo hallazgo de 1303; el `DO UPDATE` de la spec de 1299 no es posible).
+
 ## Delta 2026-08-05
 
 - El schema fundacional ya existe: TASK-1299 aplicó `20260805134439202_task-1299-growth-seo-schema.sql` en `greenhouse-pg-dev` (8 tablas `seo_*`, UNIQUEs de idempotencia, triggers `block_seo_row_mutation`, `db.d.ts` regenerado). Actualizar el supuesto "schema no existe" en Discovery: verificar columnas reales contra `db.d.ts`/`information_schema`, no re-crear DDL.
