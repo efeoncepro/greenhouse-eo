@@ -11,9 +11,15 @@ el workflow declara la var así que el próximo deploy normal converge). Revisi�
 `registration_endpoint` + authorize/token reales de Entra, protected-resource apuntando al
 gateway, `/register` devolviendo el client fijo, `/mcp` anónimo 401, y canary 4/4 (rank-evolution
 series=31). Rollback: snapshot de la revisión previa en scratchpad + `gcloud run services
-update-traffic` a `00014`. Falta solo: que el operador reintente `/mcp` → Authenticate en Claude
-Code (ya sin el error de DCR) y formalizar TASK-1654 (el shim entró como break-glass documentado;
-crear la task spec retroactiva con el detalle).
+update-traffic` a `00014`. **VERIFICADO CON EL CLIENTE REAL (2026-08-06 ~17:50Z): Claude Code
+autenticó exitosamente contra el gateway** ("Authentication successful / Connected") tras el
+segundo fix — scopes CUALIFICADOS en el protected-resource metadata (`56e46f7`, revisión
+`00016-6zh`): Entra v2 resuelve scopes pelados contra Graph (AADSTS650053); el valor requestable
+es `https://mcp.efeonce.org/mcp/<scope>` y el `scp` del token vuelve pelado (verifier intacto,
+validado con arch-architect). Pendientes: (1) formalizar TASK-1654 retroactiva (shim DCR + scope
+fix, ambos break-glass documentados); (2) cuando GitHub Actions se recupere del major outage,
+correr el deploy normal del workflow para converger el carril canónico (declara la env var; el
+código ya está en main `56e46f7`).
 
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md).
