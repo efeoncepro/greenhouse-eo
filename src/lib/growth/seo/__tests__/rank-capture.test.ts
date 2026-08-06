@@ -86,6 +86,8 @@ vi.mock('@/lib/observability/capture', () => ({
 }))
 
 import {
+  SERP_RANK_CAPTURE_DEPTH,
+  SERP_RANK_CAPTURE_ESTIMATED_COST_USD,
   SPEND_FENCE_RECHECK_EVERY,
   captureRankSnapshot,
   parseSerpRankObservation
@@ -167,8 +169,22 @@ describe('captureRankSnapshot — gate de costo', () => {
     await captureRankSnapshot('seot-1', 'system:test')
 
     expect(gateMock).toHaveBeenCalledWith('org-1', {
-      estimatedCostUsd: expect.closeTo(2 * 0.003, 10),
+      estimatedCostUsd: expect.closeTo(2 * SERP_RANK_CAPTURE_ESTIMATED_COST_USD, 10),
       consumesAuditAllowance: false
+    })
+  })
+
+  it('la task SERP lleva depth 20 + load_async_ai_overview (promesa AI Overview §5)', async () => {
+    await captureRankSnapshot('seot-1', 'system:test')
+
+    const input = providerMock.mock.calls[0][0] as { tasks: Array<Record<string, unknown>> }
+
+    expect(input.tasks[0]).toMatchObject({
+      depth: SERP_RANK_CAPTURE_DEPTH,
+      load_async_ai_overview: true,
+      language_code: 'es',
+      location_code: 2152,
+      device: 'desktop'
     })
   })
 

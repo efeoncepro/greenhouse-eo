@@ -47,11 +47,26 @@ import { enforceSeoRunEntitlement } from './entitlement'
 import { isSeoModuleEnabled } from './flags'
 
 /**
- * Estimación conservadora por llamada SERP live/advanced (prioridad regular ~USD 0.002).
- * Solo alimenta el gate/fence — el costo REAL lo reporta el provider y lo contabiliza el
- * transporte en el ledger.
+ * Estimación conservadora por llamada SERP live/advanced con los parámetros de captura.
+ *
+ * Fórmula del proveedor (skill `dataforseo-operator`, as-of 2026-08-06):
+ * `cost = base × C × K × (depth/10)` — base live advanced ~0.002; C=×2 por
+ * `load_async_ai_overview`; depth 20 = ×2 → ~USD 0.008/call. Se redondea a 0.01 para que
+ * el gate/fence sobreestime. El costo REAL lo reporta el provider y lo contabiliza el
+ * transporte en el ledger — esta constante solo alimenta el gate.
+ *
+ * Follow-up de escala declarado: SERP task-based standard es ~3.3× más barato, pero exige
+ * ampliar el transporte canónico (`task_get` es GET-por-path y `postDataForSeoTask` es
+ * POST-only) — trabajo gobernado, no un fetch suelto.
  */
-export const SERP_RANK_CAPTURE_ESTIMATED_COST_USD = 0.003
+export const SERP_RANK_CAPTURE_ESTIMATED_COST_USD = 0.01
+
+/**
+ * Top-20: la pantalla ancla cuenta la historia "subió de 8 a 3" y el striking distance
+ * vive en 8–20 — el default del proveedor (10) la dejaría ciega. Cada +10 de depth
+ * multiplica el costo (D/10 en la fórmula), así que 20 es el balance V1.
+ */
+export const SERP_RANK_CAPTURE_DEPTH = 20
 
 /**
  * Cada cuántas llamadas cobradas se re-consulta el gate (spend fence, deuda declarada por
@@ -211,7 +226,13 @@ const buildSerpTask = (
   const task: DataForSeoSerpTask = {
     keyword,
     language_code: target.language_code,
-    device
+    device,
+    depth: SERP_RANK_CAPTURE_DEPTH,
+
+    // Sin este flag, los AI Overviews asíncronos NO aparecen y "AI Overview presente/no"
+    // (promesa §5 del arch doc) tendría falso negativo silencioso. Duplica el costo del
+    // request — ya incluido en la estimación del gate.
+    load_async_ai_overview: true
   }
 
   // TASK-1299 guarda `location_code` como TEXT: numérico = location_code de DataForSEO;
