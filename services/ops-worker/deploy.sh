@@ -1119,33 +1119,33 @@ echo "  -> ops-seo-rank-capture: 0 5 * * * ACTIVO (rank capture diario, TASK-130
 # (claim FOR UPDATE SKIP LOCKED) y materializa runs + findings cuando la task termina.
 # Backlinks es live: snapshot semanal (lunes 07:00 CLT) idempotente por capture_date.
 #
-# Los TRES nacen PAUSADOS (5º arg "true") hasta verificar en staging el smoke real
-# OnPage/Backlinks (enqueue→collect→reader + idempotencia). NUNCA despausar `collect`
-# antes de que `enqueue` haya persistido provider_task_id (orden duro de la task).
-# Despausar = cambiar el 5º arg ACÁ + redeploy (el estado se re-aplica en CADA deploy).
+# Nacieron PAUSADOS y se despausaron ACÁ el 2026-08-06 (autorización del operador,
+# "termina todo lo que falte") tras el smoke E2E real (crawl + backlinks con dinero real,
+# exactly-once verificado) y la verificación de los 3 handlers vía HTTP en el worker
+# desplegado. Re-pausar = 5º arg a "true" + redeploy (el estado se re-aplica en CADA deploy).
 upsert_scheduler_job \
   "ops-seo-audit-enqueue" \
   "0 6 * * 1" \
   "/seo/audit/enqueue-batch" \
   '{}' \
-  "true"
-echo "  -> ops-seo-audit-enqueue: 0 6 * * 1 PAUSADO (site audit enqueue semanal, TASK-1304)"
+  "false"
+echo "  -> ops-seo-audit-enqueue: 0 6 * * 1 ACTIVO (site audit enqueue semanal, TASK-1304 — despausado 2026-08-06)"
 
 upsert_scheduler_job \
   "ops-seo-audit-collect" \
   "*/30 * * * *" \
   "/seo/audit/collect" \
   '{}' \
-  "true"
-echo "  -> ops-seo-audit-collect: */30 * * * * PAUSADO (site audit poll idempotente, TASK-1304)"
+  "false"
+echo "  -> ops-seo-audit-collect: */30 * * * * ACTIVO (site audit poll idempotente, TASK-1304 — despausado 2026-08-06)"
 
 upsert_scheduler_job \
   "ops-seo-backlink-capture" \
   "0 7 * * 1" \
   "/seo/backlinks/capture-batch" \
   '{}' \
-  "true"
-echo "  -> ops-seo-backlink-capture: 0 7 * * 1 PAUSADO (backlink snapshot semanal, TASK-1304)"
+  "false"
+echo "  -> ops-seo-backlink-capture: 0 7 * * 1 ACTIVO (backlink snapshot semanal, TASK-1304 — despausado 2026-08-06)"
 
 # Email deliverability monitor — TASK-775 Slice 2.
 #
