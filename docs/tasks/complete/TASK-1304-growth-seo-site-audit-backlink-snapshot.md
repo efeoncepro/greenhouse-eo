@@ -27,7 +27,7 @@ Los 6 slices están implementados y verificados **local-first, sin push** (commi
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P3`
 - Impact: `Medio`
 - Effort: `Alto`
@@ -40,7 +40,7 @@ Los 6 slices están implementados y verificados **local-first, sin push** (commi
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Code complete + smoke E2E real; rollout pendiente (schedulers pausados, worker sin deploy)`
+- Status real: `LIVE — rollout ejecutado 2026-08-06 (schedulers ACTIVOS, datos reales de Berel fluyendo); release prod + federación gateway pendientes por outage de Actions`
 - Rank: `TBD`
 - Domain: `growth|integrations|data`
 - Blocked by: `TASK-1299, TASK-1300, TASK-1303`
