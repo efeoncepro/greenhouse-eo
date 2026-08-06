@@ -18,13 +18,10 @@ const main = async () => {
 
   const connection = await checkDataForSeoConnection({ timeoutMs: 20_000 })
 
+  // El health check es un carril mínimo a propósito: confirma credenciales/conectividad
+  // (ok/httpStatus) y no expone el body — el saldo real se verifica en la consola del
+  // proveedor o con el costo del propio smoke.
   console.log('[balance] ok=%s status=%s', connection.ok, connection.httpStatus)
-
-  const task = (connection.tasks?.[0] ?? null) as Record<string, unknown> | null
-  const result = Array.isArray(task?.result) ? (task?.result as Array<Record<string, unknown>>)[0] : null
-  const money = result?.money as Record<string, unknown> | undefined
-
-  console.log('[balance] money=%s', JSON.stringify(money ?? result ?? task ?? 'sin datos'))
 
   const rows = await runGreenhousePostgresQuery<Record<string, unknown>>(
     `SELECT t.seo_target_id,
