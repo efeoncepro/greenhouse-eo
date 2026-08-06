@@ -1095,20 +1095,22 @@ echo "  -> ops-seo-gsc-snapshot: 0 9 * * * ACTIVO (materialización GSC diaria, 
 # `serp`) de las keywords vigentes de cada target activo con assignment `seo_v1`. La
 # madrugada da un capture_date consistente para toda la serie del día.
 #
-# ⚠️ NACE PAUSADO A PROPÓSITO — el costo DataForSEO es el riesgo #1 del programa
-# (arch SEO §13.1). Despausar SOLO tras verificar en staging con Berel: gate de costo
-# (enforceSeoRunEntitlement + spend fence), idempotencia del re-run y el mirror BQ.
-# Para despausar: cambiar el 5º arg a "false" ACÁ (el estado se re-aplica en CADA deploy;
-# despausar out-of-band se revierte solo en el siguiente deploy, en silencio).
+# ACTIVO desde 2026-08-06 (autorización del operador). Nació pausado por diseño y se
+# despausó ACÁ (no a mano) tras el smoke real E2E del mismo día: captura Berel 8/8 con
+# costo real USD 0.03, gate + spend fence verificados, re-run idempotente USD 0, mirror
+# BQ con las 8 filas y signal honesto. Evidencia: runbook
+# docs/manual-de-uso/growth/operar-captura-rankings-seo.md §Verificacion ejecutada.
 # El blast radius real lo controla el assignment per-org (Berel primero, §11): el batch
 # solo itera orgs con `module_assignments.seo_v1` vigente.
+# Rollback (<5 min): volver el 5º arg a "true" + redeploy (el estado se re-aplica en
+# CADA deploy; pausar out-of-band se revierte solo en el siguiente deploy, en silencio).
 upsert_scheduler_job \
   "ops-seo-rank-capture" \
   "0 5 * * *" \
   "/seo/rank/capture-batch" \
   '{}' \
-  "true"
-echo "  -> ops-seo-rank-capture: 0 5 * * * PAUSADO (rank capture diario, TASK-1303 — despausar tras verificar gate de costo en staging)"
+  "false"
+echo "  -> ops-seo-rank-capture: 0 5 * * * ACTIVO (rank capture diario, TASK-1303 — despausado 2026-08-06 tras smoke E2E)"
 
 # Email deliverability monitor — TASK-775 Slice 2.
 #
