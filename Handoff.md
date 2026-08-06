@@ -1,5 +1,21 @@
 # Handoff activo
 
+### Break-glass deploy del gateway MCP — shim DCR LIVE (TASK-1654, 2026-08-06)
+
+GitHub Actions cayó en **major outage** (4 intentos de deploy muertos: 2 cancelados en cola, 1
+flake WIF, 1 sin poder descargar actions). Con autorización explícita del operador se desplegó
+por **break-glass gcloud directo**: Cloud Build local→imagen `gateway:ae8f2f7` (38s) + `gcloud
+run deploy --update-env-vars OAUTH_PUBLIC_CLIENT_ID=…` (aditivo, hereda el resto de la revisión;
+el workflow declara la var así que el próximo deploy normal converge). Revisión
+`efeonce-mcp-gateway-00015-4st` sirviendo 100%. Verificado live: AS metadata con
+`registration_endpoint` + authorize/token reales de Entra, protected-resource apuntando al
+gateway, `/register` devolviendo el client fijo, `/mcp` anónimo 401, y canary 4/4 (rank-evolution
+series=31). Rollback: snapshot de la revisión previa en scratchpad + `gcloud run services
+update-traffic` a `00014`. Falta solo: que el operador reintente `/mcp` → Authenticate en Claude
+Code (ya sin el error de DCR) y formalizar TASK-1654 (el shim entró como break-glass documentado;
+crear la task spec retroactiva con el detalle).
+
+
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md).
 
 ### TASK-1304 — site audit + backlinks: code complete + smoke E2E real, rollout pendiente (2026-08-06)
