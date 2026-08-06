@@ -239,7 +239,12 @@ export const createGoogleAiOverviewProviderAdapter = (): ProviderAdapter => ({
           context,
           provider: PROVIDER,
           model: GOOGLE_AI_OVERVIEW_PROVIDER_MODEL,
-          errorCode: mapHttpStatusToErrorCode(result.httpStatus),
+          // ⚠️ El breaker corta SIN llamar y devuelve `httpStatus: 0` (TASK-1300). Ese 0 no
+          // entra en ninguna rama de `mapHttpStatusToErrorCode` y caería en
+          // `invalid_response`, que culpa al parser cuando el proveedor ni se consultó —
+          // manda al operador a diagnosticar el lugar equivocado. `provider_error` es el
+          // código honesto: el proveedor está degradado y por eso frenamos.
+          errorCode: result.breakerOpen ? 'provider_error' : mapHttpStatusToErrorCode(result.httpStatus),
           latencyMs: result.latencyMs
         })
       }

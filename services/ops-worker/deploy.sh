@@ -1089,6 +1089,29 @@ upsert_scheduler_job \
   "false"
 echo "  -> ops-seo-gsc-snapshot: 0 9 * * * ACTIVO (materialización GSC diaria, TASK-1302)"
 
+# Rank capture diario — TASK-1303.
+#
+# Cron 0 5 * * * America/Santiago: captura la posición EXACTA (DataForSEO SERP, familia
+# `serp`) de las keywords vigentes de cada target activo con assignment `seo_v1`. La
+# madrugada da un capture_date consistente para toda la serie del día.
+#
+# ACTIVO desde 2026-08-06 (autorización del operador). Nació pausado por diseño y se
+# despausó ACÁ (no a mano) tras el smoke real E2E del mismo día: captura Berel 8/8 con
+# costo real USD 0.03, gate + spend fence verificados, re-run idempotente USD 0, mirror
+# BQ con las 8 filas y signal honesto. Evidencia: runbook
+# docs/manual-de-uso/growth/operar-captura-rankings-seo.md §Verificacion ejecutada.
+# El blast radius real lo controla el assignment per-org (Berel primero, §11): el batch
+# solo itera orgs con `module_assignments.seo_v1` vigente.
+# Rollback (<5 min): volver el 5º arg a "true" + redeploy (el estado se re-aplica en
+# CADA deploy; pausar out-of-band se revierte solo en el siguiente deploy, en silencio).
+upsert_scheduler_job \
+  "ops-seo-rank-capture" \
+  "0 5 * * *" \
+  "/seo/rank/capture-batch" \
+  '{}' \
+  "false"
+echo "  -> ops-seo-rank-capture: 0 5 * * * ACTIVO (rank capture diario, TASK-1303 — despausado 2026-08-06 tras smoke E2E)"
+
 # Email deliverability monitor — TASK-775 Slice 2.
 #
 # Cron 0 */6 * * * America/Santiago: 4 runs/día. Cómputa bounce/complaint rate

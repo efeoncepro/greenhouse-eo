@@ -39,9 +39,14 @@ CREATE TABLE IF NOT EXISTS greenhouse_growth.seo_provider_spend_daily (
 CREATE INDEX IF NOT EXISTS seo_provider_spend_daily_org_date_idx
   ON greenhouse_growth.seo_provider_spend_daily (organization_id, spend_date DESC);
 
--- El CHECK de `family` duplica a propósito el allowlist del registry TS. Es defensa en
--- profundidad: si alguien agrega una familia en el código sin migrar, el INSERT falla loud
--- en vez de crear un bucket de gasto que ningún reporte suma.
+-- El CHECK de `family` duplica a propósito el allowlist del registry TS.
+--
+-- ⚠️ NO basta como defensa por sí solo: si el TS agrega una familia sin migrar el CHECK, el
+-- INSERT del contador falla pero el transporte NO invalida un resultado que el proveedor ya
+-- cobró (lo observa y sigue) — así que el gasto sería real y el contador quedaría en cero
+-- para esa familia, indefinidamente. Por eso el drift lo cierra un test que rompe el build:
+-- `src/lib/ai/__tests__/dataforseo-family-check-parity.test.ts` compara este CHECK contra
+-- `DATAFORSEO_FAMILY_NAMES`. El CHECK es la segunda capa, no la primera.
 
 -- Anti pre-up-marker guard (CLAUDE.md §Database — Migration markers).
 DO $$

@@ -289,6 +289,25 @@ export const createGreenhouseMcpServer = (
     async args => handlers.getSeoEntitlement(args)
   )
 
+  // TASK-1303 — rank evolution: la película de posiciones en el tiempo (pantalla ancla).
+  server.registerTool(
+    'get_seo_rank_evolution',
+    {
+      title: 'Get SEO Rank Evolution',
+      description:
+        'Time series of exact organic positions (DataForSEO SERP, market truth: includes SERP features like AI Overview presence) for the tracked keywords of an organization. Returns { series: [{ keyword, points: [{date, position, url}] }] }; position=null on a date means the domain did not rank that day (a valid measurement, not an error). Served from the hot window (~180 days, Postgres) or long history (BigQuery) depending on rangeDays. This series is NEVER averaged with GSC data — they are different sources. When data.ok is false, report the errorCode (disabled, target_not_configured, no_data, query_failed) honestly.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        rangeDays: z.number().int().positive().max(1825).optional(),
+        engine: z.string().trim().min(1).optional(),
+        device: z.enum(['desktop', 'mobile', 'tablet']).optional(),
+        keywords: z.array(z.string().trim().min(1)).max(100).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getSeoRankEvolution(args)
+  )
+
   // Resource addressable: el mismo documento read-only por URI estable.
   server.registerResource(
     'knowledge_document',

@@ -130,7 +130,13 @@ import { isGraderEnabled } from '@/lib/growth/ai-visibility/flags'
 import { handleRecurringRegradeBatch } from '@/lib/growth/ai-visibility/regrade'
 import { dispatchPendingSubmissions } from '@/lib/growth/forms/dispatch'
 import { runGscDailySnapshotBatch } from '@/lib/growth/seo/gsc-daily-batch'
+import { runRankCaptureBatch } from '@/lib/growth/seo/rank-capture-batch'
 import { isSeoModuleEnabled } from '@/lib/growth/seo/flags'
+
+// TASK-1303 — el rank capture pega familias DataForSEO que GASTAN: sin este side-effect
+// import el transporte LANZA en la primera llamada cobrada (gastar sin contabilizar se
+// descubre en la factura; un throw se descubre en desarrollo — contrato TASK-1300).
+import '@/lib/growth/seo/register-provider-spend'
 import { dispatchNextRenderJob } from '@/lib/commercial/tenders/proposals/render-dispatch'
 import { isFormsDispatchEnabled } from '@/lib/growth/forms/flags'
 
@@ -1856,6 +1862,64 @@ const handleSeoGscSnapshotBatch = async (req: IncomingMessage, res: ServerRespon
   }
 }
 
+// ─── /seo/rank/capture-batch ────────────────────────────────────────────────
+//
+// TASK-1303 — captura diaria de rankings (DataForSEO SERP) para los targets activos de
+// orgs con assignment `seo_v1` vigente. Cloud Scheduler `ops-seo-rank-capture`
+// (~05:00 CLT, nace PAUSADO — el gate de costo es el control del riesgo #1 y se
+// despausa tras verificarlo en staging con Berel).
+//
+// El handler queda fino: el batch vive en `@/lib/growth/seo/rank-capture-batch` y cada
+// target pasa por el command gobernado (gate + spend fence + idempotencia + outbox →
+// reactive BQ mirror). Body opcional: {captureDate?: 'YYYY-MM-DD', maxTargets?: number}.
+const handleSeoRankCaptureBatch = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+
+  const captureDate = typeof body.captureDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(body.captureDate)
+    ? body.captureDate
+    : undefined
+
+  const maxTargets = typeof body.maxTargets === 'number' && body.maxTargets > 0 ? Math.floor(body.maxTargets) : undefined
+
+  if (!isSeoModuleEnabled()) {
+    json(res, 200, { ok: true, skipped: 'seo_module_disabled', targets: 0, snapshots: 0, costUsd: 0 })
+
+    return
+  }
+
+  console.log(
+    `[ops-worker] POST /seo/rank/capture-batch — captureDate=${captureDate ?? 'today'} maxTargets=${maxTargets ?? 'all'}`
+  )
+
+  try {
+    const summary = await runRankCaptureBatch({ captureDate, maxTargets })
+
+    console.log(
+      `[ops-worker] /seo/rank/capture-batch done — targets=${summary.targets} snapshots=${summary.snapshots} ` +
+      `cost=$${summary.costUsd.toFixed(4)} skipped=${summary.skippedTargets} blocked=${summary.blockedTargets} ` +
+      `degraded=${summary.degradedTargets} failed=${summary.failedTargets}`
+    )
+
+    // Un target degradado/fallido significa un día SIN medición para ese cliente — la
+    // serie no se reconstruye después (la SERP de hoy no existe mañana): se grita.
+    if (summary.degradedTargets > 0 || summary.failedTargets > 0) {
+      captureMessageWithDomain(
+        `[TASK-1303] rank capture con ${summary.degradedTargets} target(s) degradado(s) y ${summary.failedTargets} fallido(s)`,
+        'growth',
+        { level: 'warning', tags: { source: 'ops_worker_seo_rank_capture_batch' } }
+      )
+    }
+
+    json(res, 200, { ok: true, ...summary })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown SEO rank capture error'
+
+    console.error('[ops-worker] /seo/rank/capture-batch failed:', message)
+    captureWithDomain(error, 'growth', { tags: { source: 'ops_worker_seo_rank_capture_batch' } })
+    json(res, 502, { error: message })
+  }
+}
+
 // ─── /email-deliverability-monitor ──────────────────────────────────────────
 //
 // TASK-775 Slice 2 — Email deliverability monitor migrado de Vercel cron a
@@ -2533,6 +2597,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/seo/gsc/snapshot-batch') {
       await handleSeoGscSnapshotBatch(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/seo/rank/capture-batch') {
+      await handleSeoRankCaptureBatch(req, res)
 
       return
     }

@@ -1,5 +1,142 @@
 # Handoff activo
 
+### TASK-1303 — rank capture + evolution reader: code complete, rollout pendiente (2026-08-06)
+
+El backend de la pantalla ancla de EPIC-022 quedó completo en `develop` **local (sin push)**: command
+`captureRankSnapshot` (gate de costo + spend fence cada 10 llamadas + idempotencia sin gasto +
+`ON CONFLICT DO NOTHING` — el trigger de 1299 prohíbe DO UPDATE), batch `POST /seo/rank/capture-batch`
+en ops-worker, Cloud Scheduler `ops-seo-rank-capture` (05:00 CLT) **declarado PAUSADO** en `deploy.sh`,
+mirror reactivo a BQ `greenhouse_growth_analytics.seo_rank_history` (dataset+tabla YA creados),
+`readRankEvolution` (PG ≤180d / BQ largo) + MCP tool `get_seo_rank_evolution` (mismo PR, patrón 1645)
+y signal `seo.rank.capture_lag`. Evidencia: suite full 10.218/0, build prod, worker gates, SQL live
+8/8 contra PG real. `enforceSeoRunEntitlement` ganó `consumesAuditAllowance:false` (el rank capture
+no consume audit runs).
+
+**Smoke REAL ejecutado (2026-08-06 ~11:30Z):** push hecho, Ops Worker Deploy en success, job
+`ops-seo-rank-capture` existe PAUSED. Sembradas 8 keywords para Berel (top GSC medidas, script
+`_seed-task-1303-berel-keywords.ts`) → captura real via worker HTTP: 8/8 snapshots (berel #1,
+"pintura para alberca" #2 CON `ai_overview` presente), costo real USD 0.03 (0.00375/call) →
+ledger `serp` correcto → re-run `skipped` USD 0 (idempotencia) → mirror BQ 8 filas →
+`readRankEvolution` 8 series → signal warning honesto (Efeonce sin captura inicial). Dos fixes
+operativos aplicados en vivo: (1) grant WRITER de `greenhouse-portal@` en el dataset BQ nuevo
+(el mirror falló con Access Denied y el retry lo absorbió); (2) el replay de eventos en `retry`
+es EXPLÍCITO vía `POST /api/admin/ops/replay-reactive` (la lane periódica no los re-reclama) —
+ambos documentados en el runbook. **DESPAUSADO 2026-08-06** (autorización del
+operador): 5.º arg a "false" en `deploy.sh`, deploy en success, scheduler `ENABLED 0 5 * * *` —
+la serie corre sola desde mañana 05:00 CLT (~USD 0.03/día con las 8 keywords actuales).
+Pendientes: (1) promoción develop→main para que el lane `rank-evolution` + la MCP tool interna
+lleguen a Vercel PRODUCTION (la captura ya corre igual: el worker es compartido y PG es única;
+solo las superficies de lectura prod esperan release); (2) federar `get_seo_rank_evolution` al
+gateway `mcp.efeonce.org` (repo `efeonce-mcp`, `src/mcp.ts` + provider `greenhouse-seo.ts` —
+adapter hardcodea 3 métodos, NO es proxy dinámico; hacerlo DESPUÉS del release prod o el
+gateway vería 404); (3) sembrar keywords para `seot-efeonce-own-brand` (elegible, 0 keywords →
+degrada `no_keywords`) y curar el set completo de Berel (la serie de cada keyword empieza el
+día que entra al set).
+
+
+### Efeonce dejó de ser cliente de sí misma — modelado corregido (2026-08-06)
+
+`EO-ORG-0007` (Efeonce, `is_operating_entity=true`) tenía `organization_type='client'`, herencia
+del space de cliente de **marzo 2026** — de cuando aún no se había decidido que la operadora no
+es cliente. No lo causó el dogfooding SEO: el script de provisión no escribe en `organizations`,
+y la única transición registrada es `null → inactive` del 2026-04-21 (backfill TASK-535).
+
+**Qué exponía.** 5 readers filtran `organization_type IN ('client','both')` **sin consultar el
+flag**: lista y detalle de `/finance/clients`, `finance/canonical.ts`, el backfill de
+`client_profiles` y el picker del wizard de onboarding. Efeonce salía **primera** de 17 clientes
+(orden por `updated_at DESC`). Y `resolveFinanceClientContext` la aceptaba como cliente
+facturable, siendo la misma org el emisor fiscal — autofacturación posible. Daño consumado
+verificado: **0 income, 0 contratos, 0 usuarios de portal**. Puerta abierta, no incendio.
+
+**Corregido** con `scripts/commercial/reset-organization-commercial-role.ts` (nuevo): baja el rol
+a `'other'` por el writer canónico. Hizo falta una puerta dedicada porque
+**`deriveOrganizationType` es monótona** — nunca degrada un rol adquirido, así que un
+`upsertCanonicalOrganization` normal lo perpetúa (mi escritura de `website_url` de ese mismo día
+lo hizo). El script declara `currentType='other'` explícitamente, con guardas: aborta si el
+lifecycle implica rol real o si hay income.
+
+**Verificado tras el cambio:** `organization_type='other'`, `is_operating_entity=true` intacto,
+2 `module_assignments` intactos, y el canary SEO contra producción sigue devolviendo
+`hasModule=true tier=contracted 8 audits $50`.
+
+**El modelo ya soportaba esto — no había que inventar nada.** Tres ejes ortogonales: identidad
+legal (`is_operating_entity`), rol comercial (`organization_type`) y capabilities
+(`module_assignments`). La operadora monitorea su propio SEO/AEO/GA4 por el tercer eje;
+`enforceSeoRunEntitlement` resuelve sólo por `organization_id` + `module_key`, cero dependencia
+del tipo. `'other'` no significa "sin clasificar": significa **sin rol comercial**, que es lo
+que la operadora es. Contrato semántico escrito en `GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md`
+§Organization Types, junto con el **NUNCA** de agregar un valor de identidad al enum (ya se
+intentó: quedó una rama muerta contra `'efeonce_internal'`, que es un `tenant_type` de usuarios,
+no un tipo de organización).
+
+**Follow-ups con dueño:** `TASK-1648` (guard por flag en los 5 readers — cierra la causa),
+`TASK-1649` (el `space` y `client_profile` de marzo, con inventario antes de tocar),
+`TASK-1650` (el emisor legal de cotizaciones compartidas: query a columnas inexistentes +
+`catch` mudo ⇒ todo quote imprime un hardcode; incluye la discrepancia `of 05` vs `Of 1105`).
+
+**Pendiente de decisión tuya:** el merge/borrado en HubSpot de las auto-companies `efeonce.org`
+(56011409567) y `efeonce` (57099835819). La canónica **nunca estuvo en HubSpot**
+(`hubspot_company_id` es `null`); esas dos son auto-companies creadas desde el dominio del correo
+de formularios de prueba. Mergear exigiría *crear* una company canónica de Efeonce, que es
+justo lo que no debe existir — corresponde borrarlas, y primero en HubSpot (si se borran sólo en
+Greenhouse, el sync las repone). Sin exclusión de dominios internos en el inbound, vuelven.
+
+### Cutover MCP-first de Search Visibility 360 — COMPLETO en producción (2026-08-06)
+
+Las 4 capas quedaron vivas y verificadas, en este orden. **TASK-1645 y TASK-1647 pasan a `complete`.**
+
+**1. Release `develop→main`** — PR #177, SHA `70e912056273d0a30e2aa8dacc2f4e62076e3b44`,
+`release_id=70e912056273-03c36b47-eb75-469c-886f-51c691cd7c34`, run `31058032196`, manifest `released`,
+workflow 10m51s. Batch grande (355 commits, 221 archivos de código, 14 migraciones: EPIC-022 SEO
+completo, EPIC-028 Globe, identity 1616/1631, payroll 1630, Nexa 1182, EPIC-040). **Pasó a la primera,
+sin bypass y sin retry** porque los 3 gotchas conocidos se pre-emptaron: merge canónico
+`origin/main -X ours` antes del PR (conflicto modify/delete de TASK-1590 resuelto conservando develop),
+marker `[release-coupled: …]` en el cuerpo del squash (batch policy → `ship`), y
+`gh workflow run playwright.yml --ref main` antes del dispatch (3m10s) en vez de bypassear el
+`playwright_smoke` ausente del squash. Watchdog `drift_count=0`; el residual change-gated de
+`ops-worker` (`558558263e80`, diff runtime vacío) ya lo clasifica bien el fix que entró en `6f7e246ea`.
+
+**2. `GROWTH_SEO_ENABLED=true` en Vercel Production** + redeploy `dpl_GyGkdEQQTk65qkCs1S3TEH6Jquy9`
+(Vercel congela env vars al crear el build). Multi-runtime: el mismo flag ya estaba ON en el
+`ops-worker` para el materializer GSC. Ledger actualizado.
+
+**3. Canary del provider contra producción** (`greenhouse.efeoncepro.com`, service identity del
+gateway): **Berel `domainQuadrant=riesgo`, 50 keywords, AEO 44.5** · Efeonce `hasModule=true
+tier=contracted` + `no_seo_data` honesto · deny anti-oracle `404 greenhouse_seo_lane_404`.
+
+**4. Provider habilitado en el gateway** — `efeonce-mcp` `76cb121`, workflow `31059346243`, revisión
+`efeonce-mcp-gateway-00012-dkj` `Ready=True` con `GREENHOUSE_ECOSYSTEM_TOKEN` como **secret ref** de
+Cloud Run. Hallazgo: el secreto `efeonce-mcp-gateway-greenhouse-token` se había creado **sin ninguna
+binding IAM** — sin el `secretAccessor` scoped al SA del gateway el deploy habría fallado. Front door
+verificado: health `200`, protected-resource metadata `200` (3 scopes), `POST /mcp` anónimo `401` con
+`WWW-Authenticate` correcto.
+
+**5. Smoke MCP autenticado por `mcp.efeonce.org` — VERDE.** `scripts/oauth-canary.mjs` quedó
+**extendido en este cierre** con las tools SEO. Flujo Entra authorization-code + PKCE real (login
+humano), token con `aud=c5363215-…` y `scp` incluyendo `efeonce.mcp.read`:
+
+```bash
+MCP_CANARY_SEO_ORGANIZATION_ID=org-32333527-02a8-487b-819e-6f76a761777d \
+MCP_CANARY_SEO_DENY_ORGANIZATION_ID=org-00000000-0000-0000-0000-000000000000 \
+node scripts/oauth-canary.mjs
+```
+
+→ `initialize 200` · `seoEntitlementStatus 200` · `seoVisibility360Status 200` ·
+**`seoDomainQuadrant: "riesgo"`** · `seoDenyFailedClosed: true` (+ Globe capabilities/fleet 200).
+
+**Ese `riesgo` es el quadrant real de Berel devuelto por el front door público**: la cadena
+Entra → gateway → provider → lane → readers → PG está cerrada end-to-end. El objetivo de la sesión
+—preguntar por MCP por la visibilidad 360 de Berel y recibir el quadrant real— está cumplido.
+El smoke exige login interactivo, así que es asistido por humano, no automatizable en CI.
+
+**Pendientes menores heredados (sin tocar):** merge en HubSpot de las auto-companies `efeonce.org`
+(56011409567) y `efeonce` (57099835819) hacia la company canónica — el sync propaga, NUNCA borrar por
+SQL; ~~`website_url` en EO-ORG-0007~~ **HECHO 2026-08-06**: `https://efeoncepro.com` poblada por
+`upsertCanonicalOrganization` (script `scripts/growth/_sanity-efeonce-website-url.ts`, idempotente,
+sin `overrideIdentity` para no pisar un valor ajeno; `organization_type` se mantuvo `client`);
+conexión GSC de
+`efeoncepro.com` gated por TASK-1282/1283.
+
 ### TASK-1647 — Provider Greenhouse-SEO federado: CODE COMPLETE, enable pendiente del release (2026-08-05)
 
 El segundo salto MCP quedó construido y verificado e2e. Gateway (`efeonce-mcp` main `a53b77f`+`4870e90`):
@@ -33,8 +170,8 @@ sincronizadas como ruido). Aplicado con `scripts/growth/provision-efeonce-own-br
 
 **Pendientes operativos:** (1) merge en HubSpot de las auto-companies `efeonce.org` (56011409567) y
 `efeonce` (57099835819) hacia la company canónica — el sync propaga; NUNCA borrarlas por SQL. (2)
-`website_url` de EO-ORG-0007 está vacío (`efeoncepro.com`) — completar por la puerta canónica
-(`upsertCanonicalOrganization`), no SQL directo. (3) Conectar GSC de efeoncepro.com cuando 1282/1283
+~~`website_url` de EO-ORG-0007 vacío~~ **CERRADO 2026-08-06** — `https://efeoncepro.com` por la puerta
+canónica `upsertCanonicalOrganization`. (3) Conectar GSC de efeoncepro.com cuando 1282/1283
 destraben su rollout. SKY ya tiene lente AEO ligada; su SEO sigue igual de pendiente que Efeonce.
 
 ### TASK-1645 — SEO operable por MCP: CODE COMPLETE, rollout pendiente (2026-08-05)
@@ -113,7 +250,25 @@ allowlist cerrado de 5 familias con transporte único. El AEO pasó **sin que se
 `runGreenhousePostgresQuery` **no es transaccionalmente seguro**: ese helper toma una conexión del pool por
 llamada, así que el `BEGIN` no cubre lo que sigue (y puede dejar escrituras fuera del rollback). Se descubrió
 porque un `SAVEPOINT` reventó con `25P01`. Este sanity se reescribió sobre `withGreenhousePostgresTransaction`;
-**los de TASK-1301 y TASK-1302 usan el patrón frágil y pueden estar pasando por suerte** — trabajo aparte.
+**verificado: ningún sanity del repo usa hoy el patrón frágil** (el de 1301 ya limpiaba en `finally`; el de 1302 se migró en `1a02b4b99`). La regla de decisión quedó canonizada en `SQL_DATE_MATH_AGENT_INVARIANTS`.
+
+**Auditoría adversarial (2026-08-06, 3 verificadores).** 6 defectos corregidos. El más caro:
+**`serp` con `organizationId` y sin contador gastaba sin registrar y NO lanzaba** — el guard
+condicionaba por "¿la familia exige organización?" en vez de "¿hay organización?", y TASK-1303 usará
+`serp` para rank capture desde un cron. También: el AEO reportaba `invalid_response` cuando el breaker
+cortaba (culpaba al parser); un 4xx del caller abría el breaker y degradaba al AEO; `half-open` dejaba
+pasar todas las llamadas concurrentes; y 3 de 4 familias no compilaban sin un cast que anulaba el
+chequeo del payload.
+
+**🔴 Corrección de una afirmación mía que era FALSA:** dije que `GROWTH_SEO_ENABLED` "lo lee el
+ops-worker, NO Vercel". **Vercel también lo lee** — el lane ecosystem/MCP (TASK-1645) y el reader del
+cruce SEO↔AEO (TASK-1305), ambos aterrizados el mismo día. **El flip es de TRES pasos** y, crítico:
+**apagarlo sólo en `deploy.sh` NO apaga el módulo**, el lane de Vercel sigue sirviendo. El bloque de
+rollback de TASK-1302 quedaba incompleto y parecía exitoso. Corregido en `flags.ts` y en la arquitectura.
+
+**Límite del gate que hay que conocer antes de TASK-1303:** el presupuesto se consulta UNA vez y el
+gasto se acumula DESPUÉS. Medido: batch de 120 keywords con budget `trial` → gastó 3× el presupuesto.
+Sin reserva previa no hay tope por corrida. Declarado en el docstring de `enforceSeoRunEntitlement`.
 
 **Nota de concurrencia:** otra sesión commiteó estos archivos en un estado intermedio (`6a6923900`) por el
 índice compartido del checkout; `3a2e1baf5` corrige encima. Evidencia: sanity live 7/7 con cero residuo, suite
@@ -398,159 +553,6 @@ razón** en vez de cableados a la fuerza.
 **Siguiente paso ejecutable:** coordinar `TASK-1552` ↔ `TASK-1643` para el canal feed → composer, y decidir la
 semántica de «Recrear». Nada de eso lo puedo resolver implementando.
 
-## TASK-1641 — Globe: DESPLEGADO + promoción end-to-end ejecutada (2026-08-05)
-
-**Estado:** `in-progress`, **desplegado y aplicado**. Globe `main@b958a11`; API
-`globe-api-internal-00213-5z9` (tag `b958a116a23a`, tráfico 100%), Job worker por digest
-`sha256:82a4f2d3e0a6…`, `tofu apply` sobre plan guardado (`6 to add, 1 to change, 0 to destroy`) y `No
-changes` posterior. Las 3 métricas, sus 3 alertas y `GLOBE_PROMOTION_WINDOW_WARNING_SECONDS=1800`
-verificados contra el runtime, no contra el workflow en verde.
-
-🔴 **El primer ciclo reportó 3 divergencias y DOS eran rutas VIVAS.** `ref/still/rrss-v1` y
-`ref/still/openai-v2` tienen su última promoción de la saga en `rolled_back` **y su binding `enabled`**,
-porque las habilitó el lane automatizado de ADR-010, que no enruta por la saga. El remedio que la señal
-sugiere las habría retirado. «Última promoción revertida» era un **proxy** de «el rollback sigue en pie», y
-un proxy falla donde otra autoridad puede deshacerlo: cuando dos mecanismos mueven el mismo estado, hay que
-cerrar el predicado sobre el **estado actual del efecto**. Arreglado en `@b958a11`; **medido: la señal bajó
-de 3 a 1**. Ningún test lo atrapó — apareció leyendo las primeras emisiones reales.
-
-**Divergencia genuina que queda, y espera un acto humano:** `ref/still/reference-v1` `v5-pro` (binding
-`enabled=false`, readiness `promoted`). Remedio: `globe.model-readiness.route.pause` sobre esa identidad.
-
-| Scope | Estado | Evidencia |
-|---|---|---|
-| 1 canary de ruta arbitraria | ✅ ejercitado con gasto real | `@1767138` + `@a6ff46f` |
-| 2 señal de ventana por expirar | ✅ código + IaC, sin aplicar | `@17c3fef` |
-| 3 convergencia + su consumidor | ✅ cerrado | `@4a0a18b` + `@17c3fef` |
-| 4 `canary-confirm` sin 500 opaco | ✅ cerrado | `@38c528d` |
-| 5 reserva pre-gasto | ✅ código, sin desplegar | `@21d6ee3` |
-| 6 runbook | ✅ publicado | `GLOBE_ROUTE_PROMOTION_RUNBOOK_V1.md` |
-
-**Scopes 2 y 3 son un solo consumidor** porque son el mismo lector cross-workspace; usan la política de scan
-que ya existía (`app.promotion_recovery_scan`, migración `0028`) — **sin migración nueva**. La señal de
-ventana es el **complemento estricto** de `stalled`, que mide `deadline_at <= now` y avisa cuando ya venció.
-
-🔴 **El hallazgo que evitó una señal falsa:** dos de las diez promociones revertidas pertenecen a identidades
-que **después se volvieron a promover y quedaron selladas**. Sin el predicado de supersede por identidad
-exacta, la señal habría acusado de divergencia justo a las dos rutas que convergieron, y su remedio habría
-**retirado dos rutas vivas**.
-
-**Scope 5, medido contra `globe-pg` antes de tocar código:** la **única** reserva `held` de toda la base es
-pre-gasto (32 créditos) y hay **cero** post-gasto. El discriminador es `attempt.providerOperation`, no
-`lease.kind`. Un fallo al liberar degrada al TTL y se observa, nunca se propaga.
-
-**Los 8 criterios de aceptación están cerrados.** `ref/still/reference-v1` se promovió de punta a punta
-(`promotion_4265dd26…` → `canary_passed` rev 9, binding `enabled` rev 5, 10 = 10 créditos) con el runbook
-nuevo y sin una sola secuencia a mano — y esa promoción **cerró la divergencia**: la señal pasó de 1 a 0.
-
-🔴 **Follow-up abierto: pausar una readiness no tiene camino ejecutable.** `requireHuman` rechaza a los
-lanes de service account y `globe.model-readiness.pause` no está en los scopes humanos, así que hoy nadie
-puede. No se construyó el modo en el operator lane porque habría sido un camino muerto; cerrarlo exige el
-rollout de 3 pasos del broker. Detalle:
-[`TASK_1641_SESSION_HANDOFF_2026-08-04.md`](docs/operations/creative-studio/TASK_1641_SESSION_HANDOFF_2026-08-04.md).
-
-**Benchmark de producto (2026-08-05):** la comparación autenticada de Higgsfield/Magnific y la verificación de
-Globe main@21d6ee3 están documentadas en
-[GLOBE_COMPETITIVE_BENCHMARK_HIGGSFIELD_MAGNIFIC_2026-08-05](docs/audits/competitive-ui/GLOBE_COMPETITIVE_BENCHMARK_HIGGSFIELD_MAGNIFIC_2026-08-05.md).
-El hallazgo load-bearing coincide con este handoff: la UI React todavía deja Reference, Recreate, Favorite y
-Download sin handlers reales; no declarar cerrado el loop de Producer hasta TASK-1643/TASK-1552. TASK-1641 queda
-limitada al lane backend/API de promoción y conserva como único criterio abierto el canary end-to-end.
-
-## TASK-1641 — Globe: el sello del canary funciona; Omni y Veo SELLADAS (2026-08-04)
-
-**Estado:** `in-progress`. **Causa raíz cerrada y las dos rutas de video promovidas, selladas y habilitadas.**
-
-| Ruta | Promoción | Binding | Circuito | Canary |
-|---|---|---|---|---|
-| `ref/motion/reference-v1` (Omni) | **`canary_passed`** rev 9 | `enabled` rev 10 | `closed` rev 9 | run `74ea0dec…`, output `sha256:2c3370a9…`, `eligible` |
-| `ref/video/frames-v1` (Veo 3.1) | **`canary_passed`** rev 9 | `enabled` rev 11 | `closed` rev 11 | run `d2788195…`, attempt `68a75b70…`, output `sha256:3a49d5ba…`, `eligible`, 32 cr reservados = 32 gastados |
-
-Las dos son terminales: ya no expiran.
-
-**Desplegado:** `efeonce-globe@38c528d`. API `globe-api-internal-00211-8sp` (tag `38c528d27b9a`) y Job
-`globe-producer-worker` (digest `sha256:14b80d2f…`, mismo tag). Migración `0050` aplicada por el workflow keyless
-(run `30953709590`); la vista proyecta **16 columnas** y conserva SELECT para los cuatro runtimes.
-
-**Los dos defectos que la migración committeada TENÍA y no se veían leyéndola** (medidos contra PG real, en una
-transacción con ROLLBACK, antes de aplicar):
-
-1. `CREATE OR REPLACE VIEW` **no puede** reordenar ni renombrar columnas — sólo agregar al final. Poner
-   `source_kind` en la tercera posición aborta con **`42P16`**. Va `DROP` + `CREATE`, sin `CASCADE`.
-2. El runner de Globe hace `tx.query(sql)` con el **archivo completo**: no parsea markers. La sección
-   `-- Down Migration` se ejecutaba y **re-creaba la vista rota tres líneas después de arreglarla**, quedando
-   registrada como aplicada. Esa convención es de `node-pg-migrate` (Greenhouse), no de Globe.
-
-**Lo demás que entró:** el checkpoint `activated → verifying_canary` ahora ocurre **después** de leer la
-evidencia (era una lectura pura delante de un estado sin retorno: cada intento fallido quemaba una promoción);
-un `DatabaseError` de pg deja de ser `internal_error` opaco —infraestructura `08/40/53/55/57` →
-`dependency_unavailable`, las deterministas siguen `internal_error`, que es la verdad— y todo error de Postgres
-emite su SQLSTATE en `globe.dispatch.database_error`; y el path tiene test real (estructural sin base + en vivo
-opt-in), registrado en el script `test` del package y probado en rojo y en verde.
-
-### 🔴 Cómo se produjo el canary de Veo, y qué NO prueba
-
-Por el **carril gobernado**, con los commands canónicos del spine (`estimate` → `prepare` → `execute`) sobre el
-transporte de `scripts/producer-ui-canary-lib.mjs`. Forma: 720p, 8 s, 16:9, `silent`,
-`inputMode {kind:'frames', hasEndFrame:false}`; primer cuadro = el output ya gobernado
-`output:8a5e24ec-…:0` declarado como `authorizedInputs`.
-
-**NO se produjo desde la UI del Producer, y la UI sigue sin poder producirlo.** `ProducerFeedRoute.tsx` cablea
-`onReference`, `onRecreate`, `onFavorite` y `onDownload` a **`() => undefined`** — no-ops explícitos —, así que
-«Usar como referencia» no despacha ningún command y sin referencia el estimado no se calcula. El comentario del
-propio archivo ya razonó que un no-op deja el botón mintiendo, pero sólo lo aplicaron a `onSelect`.
-
-Consecuencias, sin adornos: **el Scope 1 de la task —un canary de ruta arbitraria canónico y committeado— sigue
-pendiente**, y **la generación desde el Producer para rutas con entrada obligatoria sigue bloqueada**. Ambos
-defectos tienen chip propio.
-
-**Y un hallazgo sobre el ingest privado, con su límite declarado.** Dos subidas de referencia murieron en la
-etapa `inspecting` con `dependency_unavailable` tras 5 intentos, mientras el asset **generado** de este mismo
-canary pasó `inspecting` y `malware_scan` sin problema — o sea el worker está sano y lo que falla es el camino
-private-ingest. ⚠️ Esas subidas se dispararon con un `File` **sintético** desde el browser, así que antes de
-llamarlo defecto de plataforma hay que reproducirlo con el selector real. Lo que **sí** queda verificado es el
-**enmascaramiento**: `SAFE_DEPENDENCY_CODES` sólo deja pasar los cuatro códigos de C2PA, así que los nombres de
-ClamAV y de inspección que `engines.ts` ya emite se destruyen en la frontera. Tercera aparición de ISSUE-127 en
-el día.
-
-Historia anterior: [Handoff.archive.md](Handoff.archive.md).
-
-## ADR-023 — Model Route Cards y skill compartida (2026-08-04)
-
-**Estado:** implementado como contrato documental y de tooling; no cambia el runtime de Globe. La skill
-`greenhouse-globe-model-fleet` existe en `.codex/skills/` y `.claude/skills/`, con paridad byte a byte, schema y
-validador local. El baseline de fichas incluye FLUX 3, Gemini Omni, Veo 3.1, Seedance 2.0/R2V, GPT Image 2,
-Seedream 5 Pro y Nano Banana 2/Pro:
-[`FLUX_3_VIDEO_ROUTE_CARD_V1.json`](docs/architecture/creative-studio/model-fleet/routes/FLUX_3_VIDEO_ROUTE_CARD_V1.json),
-[`GEMINI_OMNI_VIDEO_ROUTE_CARD_V1.json`](docs/architecture/creative-studio/model-fleet/routes/GEMINI_OMNI_VIDEO_ROUTE_CARD_V1.json),
-[`VEO_3_1_VIDEO_ROUTE_CARD_V1.json`](docs/architecture/creative-studio/model-fleet/routes/VEO_3_1_VIDEO_ROUTE_CARD_V1.json) y
-[`SEEDANCE_2_VIDEO_ROUTE_CARD_V1.json`](docs/architecture/creative-studio/model-fleet/routes/SEEDANCE_2_VIDEO_ROUTE_CARD_V1.json),
-[`GPT_IMAGE_2_IMAGE_ROUTE_CARD_V1.json`](docs/architecture/creative-studio/model-fleet/routes/GPT_IMAGE_2_IMAGE_ROUTE_CARD_V1.json),
-[`SEEDREAM_5_PRO_IMAGE_ROUTE_CARD_V1.json`](docs/architecture/creative-studio/model-fleet/routes/SEEDREAM_5_PRO_IMAGE_ROUTE_CARD_V1.json),
-[`NANO_BANANA_2_IMAGE_ROUTE_CARD_V1.json`](docs/architecture/creative-studio/model-fleet/routes/NANO_BANANA_2_IMAGE_ROUTE_CARD_V1.json) y
-[`NANO_BANANA_PRO_IMAGE_ROUTE_CARD_V1.json`](docs/architecture/creative-studio/model-fleet/routes/NANO_BANANA_PRO_IMAGE_ROUTE_CARD_V1.json).
-
-La auditoría confirmó que las rutas públicas de Seedance usan `seedance-2.0` (text-to-video) y `seedance-2.0-r2v`
-(R2V). `seedance-2.0-i2v`, bajo `bytedance/seedance-2.0/mini/image-to-video`, existe solo en el adapter Fal para
-`video-extend`: no tiene routeId público, binding gobernado ni canary de producción. El adapter genérico de Veo también
-contiene `veo-3.1-fast-generate-001`, pero el binding sellado de `ref/video/frames-v1` usa `veo-3.1-generate-001`.
-
-**Estado honesto:** FLUX 3 sigue `gated` y no está declarado en `globe.producer.fleet.list`. Fal es la vía candidata;
-BFL directo permanece Early Access y fuera de alcance. Próximo paso operativo: revalidar namespace/OpenAPI/pricing
-con credenciales en Globe y ejecutar el Slice 0 de `TASK-1642`; no hacer submit billable ni promoción desde esta
-skill.
-
-La auditoría de imagen resolvió “Imagen 2 de ChatGPT” como GPT Image 2 (`gpt-image-2`); Google `imagen-2` no tiene
-routeId, adapter ni binding en Globe. El reader live confirma disponibles GPT Image 2, Nano Banana 2 y Nano Banana Pro,
-y Seedream 5 Pro para generación. Seedream Edit conserva provider/adapter cableados, pero su binding está deshabilitado
-y el reader la devuelve `gated`; no debe promocionarse por herencia de Seedream T2I. Las cards mantienen además como
-superficies diferidas la edición de OpenAI/Nano Banana y Seedream 5 Lite. Nano Banana Pro requiere reconciliar un lookup
-de circuito `not_found` antes de nuevo gasto. No hubo cambios de runtime, secrets, bindings, rates ni deploy.
-
-La auditoría de Kling 3.0 añadió [`KLING_3_VIDEO_ROUTE_CARD_V1.json`](docs/architecture/creative-studio/model-fleet/routes/KLING_3_VIDEO_ROUTE_CARD_V1.json)
-y enlazó la evidencia con `TASK-1617`. Fal tiene superficies candidatas Pro, Standard y 4K para text/image-to-video;
-Globe no tiene routeId, adapter ni binding Kling y la card permanece `gated`. La API nativa de Kling y Kling O3 quedan
-separadas de la vía Fal/V3. No hubo submit, gasto, cambio de runtime, secret, rate, binding ni promoción.
-
 ## EPIC-039 — Next.js 16.3 + TypeScript 7 Toolchain Adoption (2026-08-04)
 
 Estado: **to-do / diseño**. Se registraron el epic y sus dos tasks hijas:
@@ -563,3 +565,5 @@ deploy ni producción. Siguiente paso: tomar `TASK-1638`; `TASK-1639` permanece 
 ## WIP saneado — Globe, Brightcell y Polpaico (2026-08-01)
 
 - ADR-019 `Accepted`; ADR-020 `Proposed`. Brightcell: **no enviar** hasta Finance. Polpaico: `HOLD / NO-BID`, sin precio/deck emitible. Detalle en `changelog.md`.
+
+Historia anterior: [Handoff.archive.md](Handoff.archive.md).

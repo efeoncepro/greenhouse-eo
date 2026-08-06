@@ -183,6 +183,23 @@ export class GreenhouseApiPlatformClient {
     })
   }
 
+  // TASK-1303 — serie temporal de posiciones (rank evolution, DataForSEO).
+  async getSeoRankEvolution(input: {
+    organizationId?: string
+    rangeDays?: number
+    engine?: string
+    device?: string
+    keywords?: string[]
+  }) {
+    return this.request('/api/platform/ecosystem/growth/seo/rank-evolution', {
+      organizationId: input.organizationId,
+      rangeDays: input.rangeDays,
+      engine: input.engine,
+      device: input.device,
+      keywords: input.keywords && input.keywords.length > 0 ? input.keywords.join(',') : undefined
+    })
+  }
+
   // TASK-1211 — Cotizador (read-only). Resolver de servicios + simulación de precio
   // (estimado referencial NO vinculante). Lane ecosystem; scope por binding.
   async searchServices(input: { query?: string; limit?: number }) {

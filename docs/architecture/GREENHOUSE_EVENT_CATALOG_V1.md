@@ -1249,3 +1249,11 @@ Spec: `docs/tasks/in-progress/TASK-1175-design-handoff-control-plane-full-api-pa
 | `growth.cta.kill_switch_changed` | v1 | `growth_cta_kill_switch` (`global` \| `csur-{uuid}`) | `setCtaKillSwitch` (`src/lib/growth/ctas/kill-switch.ts`), in-tx con el INSERT append-only en `cta_kill_switch_event` | — (audit trail del stop de emergencia §16.3; el estado vigente lo lee el render path directo de la tabla) |
 
 **Payload v1**: `{ schemaVersion: 1, scope: 'global'|'surface', surfaceId, action: 'engage'|'release', reason, actorRef }` — `actorRef` es identidad interna del operador (jamás cruza al browser; el render público solo recibe `engineState: 'killed'`). El command es idempotente-observable: si el estado vigente ya es el pedido no inserta evento ni emite outbox (un retry no infla el audit). La exposición Tier B (`eligible/suppressed/viewed`) NO pasa por el outbox: va al rollup agregado `cta_exposure_rollup` (arch §9.4 — jamás 1 fila por pageview).
+
+## Delta 2026-08-06 — TASK-1303: `growth.seo.rank_snapshot.captured` (rank capture → mirror BQ)
+
+| Evento | Versión | Aggregate | Emisor | Consumer |
+| --- | --- | --- | --- | --- |
+| `growth.seo.rank_snapshot.captured` | v1 | `seo_target` (`seot-{uuid}`) | command `captureRankSnapshot` (`src/lib/growth/seo/rank-capture.ts`), tras insertar los snapshots del día (solo si `captured > 0`) | `seo_rank_history_bq_sync` (ProjectionDefinition, domain `growth`, lane `ops-reactive-growth`) → MERGE PG → BQ `greenhouse_growth_analytics.seo_rank_history` |
+
+**Payload v1**: `{ seoTargetId, organizationId, captureDate, snapshotCount, sourceRunId, actor }` — coordenadas del scope, nunca los datos: el consumer **re-lee PG** por `(seoTargetId, captureDate)` y MERGEa por `rank_snapshot_id` (idempotente; timestamps STRING + cast en SQL — ISSUE-082). La constante del event type vive en el dominio (`src/lib/growth/seo/contracts.ts`, patrón growth-forms) y no en el catálogo TS central: el seam de extracción a Wave (arch SEO §17.3) prohíbe acoplar `src/lib/growth/seo/**` a módulos de otros dominios. Un replay del evento tras un prune de la ventana caliente PG es no-op declarado (0 filas → no fabrica historia).

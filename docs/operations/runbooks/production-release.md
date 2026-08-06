@@ -3,7 +3,7 @@
 > **Audience:** EFEONCE_ADMIN + DEVOPS_OPERATOR
 > **Spec canónico:** [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md)
 > **Source task:** TASK-848 V1 (parcial; V1.1 follow-ups en TASK-850..855)
-> **Last updated:** 2026-07-21
+> **Last updated:** 2026-08-06
 > **Timing ledger:** [PRODUCTION_RELEASE_TIMING_LEDGER.md](../PRODUCTION_RELEASE_TIMING_LEDGER.md)
 
 Este runbook es el contrato operativo para promover `develop` → `main` y para ejecutar rollback de emergencia.
@@ -76,6 +76,10 @@ runtime-green elapsed, desglose de fases, bloqueo principal y aprendizaje.
               │    released/degraded         │
               └──────────────────────────────┘
 ```
+
+> **Antes del paso 1, correr §2.4** (pre-empción de los 3 gotchas del
+> squash-merge). Es la diferencia verificada entre un release que pasa a la
+> primera y uno que quema runs, bypasses y retries.
 
 `production-release.yml` es el brazo activo canonico del release a
 produccion. Los workflows individuales de workers conservan `push:develop`
@@ -216,6 +220,152 @@ El flujo de promoción por **squash-merge** hace que `main` (commits squash de r
 
 > El ops-worker que queda con GIT_SHA rezagado tras el release **no es drift** — ver §4.1 (change-gate `deploy_needed=false` cuando el código de worker no cambió).
 
+### 2.4. Camino recomendado: pre-emptar los 3 gotchas ANTES del PR (verificado 2026-08-06)
+
+Los gotchas de §2.3 no hay que sufrirlos: hay que **pre-emptarlos**. El release
+del 2026-08-06 (`70e912056273d0a30e2aa8dacc2f4e62076e3b44`, run `31058032196`,
+PR #177, 355 commits / 221 archivos de código / 14 migraciones) fue el primero
+del ledger que **pasó a la primera, sin `bypass_preflight_reason` y sin retry**,
+con `drift_count=0` en el watchdog. Lo que cambió no fue el batch: fue el orden.
+
+Esta es la secuencia recomendada. Cada bloque neutraliza un gotcha **antes** de
+que llegue al control plane.
+
+#### Paso A — Gotcha #1: merge canónico en `develop` ANTES de crear el PR
+
+```bash
+date -u +%Y-%m-%dT%H:%M:%SZ          # ancla del timer agente E2E (ver §0)
+git status --short                    # árbol limpio; el checkout es compartido
+git fetch origin
+
+git switch develop
+git merge origin/main -X ours --no-edit
+```
+
+`develop` es autoritativo: contiene todo `main` por construcción, porque los
+squash de `main` son DE commits de `develop`. `-X ours` resuelve los conflictos
+de contenido a favor de `develop` **automáticamente**, pero **no** resuelve los
+conflictos `modify/delete`: esos quedan detenidos y hay que decidirlos a mano.
+
+**Caso real 2026-08-06 (modify/delete):** `TASK-1590` estaba **borrada** en
+`develop` (se había movido de `to-do/` a `in-progress/`) y **modificada** en
+`main`. Git no puede elegir solo. La resolución correcta conserva el estado de
+`develop` — borrar la copia que `main` quiere resucitar:
+
+```bash
+git status --short | grep '^DU\|^UD'          # listar los modify/delete
+git rm docs/tasks/to-do/TASK-1590-*.md        # develop manda: la task ya migró
+git commit --no-edit
+```
+
+**Verificación dura — las dos deben salir vacías antes de pushear:**
+
+```bash
+git log origin/main --not HEAD --oneline                        # main ⊆ develop
+git diff HEAD@{1} HEAD -- src/ scripts/ services/ migrations/   # 0 código movido
+```
+
+La primera prueba que no dejaste nada de `main` fuera; la segunda prueba que el
+merge fue **documental**, no que `-X ours` te comió código de producción. Recién
+ahí:
+
+```bash
+git push origin develop     # → el PR develop→main queda MERGEABLE
+```
+
+Bonus: avanza la merge-base y reduce la divergencia del próximo release.
+**NUNCA** cherry-pick a `main` para evitar el conflicto (duplica SHAs).
+
+#### Paso B — Gotcha #2: marker `[release-coupled: …]` en el cuerpo del squash
+
+El preflight **local** corre con diff *three-dot* y sobre un batch periódico
+grande va a decir `release_batch_policy=split_batch` (o
+`requires_break_glass`) aunque no exista acoplamiento real. El 2026-08-06 dio
+`split_batch` por "payroll + auth_access mezclados" sobre **1051 archivos**
+inflados; los archivos de código reales eran 221.
+
+La respuesta canónica **no** es `bypass_preflight_reason`: es declarar la razón
+en el **cuerpo del commit de squash**, que es lo que el classifier del
+orquestador lee.
+
+```bash
+pnpm release:preflight --target-sha=$(git rev-parse develop) --target-branch=main
+
+gh pr create --base main --head develop \
+  --title "release: promote develop to production" --body "<scope del batch>"
+
+gh pr merge <pr> --squash --body "$(cat <<'EOF'
+[release-coupled: batch periódico develop→main; los dominios mezclados son
+acumulación de una semana de trabajo independiente y ya verde, no un
+acoplamiento de diseño. Rollback = revertir el squash.]
+EOF
+)"
+```
+
+El marker debe explicar **por qué los dominios conviven**, no pedir permiso. Con
+él, el preflight del orquestador pasó `ship` sin bypass. Si la razón honesta es
+"son cambios acoplados de verdad y no sé explicar el rollback en una frase",
+entonces el batch **sí** hay que partirlo (§2.2), no marcarlo.
+
+#### Paso C — Gotcha #3: disparar el smoke sobre `main`, no bypassearlo
+
+`playwright_smoke` no existe para el SHA de squash. La alternativa **honesta** al
+bypass es producir el check de verdad:
+
+```bash
+gh workflow run playwright.yml --ref main
+gh run list --workflow=playwright.yml --branch main --limit 1
+```
+
+El 2026-08-06 tardó **3m10s** (run `31057847351`) y quedó verde sobre el SHA de
+`main`. Ese es el costo total de no bypassear nada. Usa
+`bypass_preflight_reason` sólo si el smoke **falla por infraestructura** y el
+operador lo autoriza explícitamente — nunca por ahorrarse 3 minutos.
+
+#### Paso D — Esperar la evidencia del SHA exacto antes del dispatch
+
+Todos verdes **para el SHA de `main`**, no para el de `develop`:
+
+- `CI` → `completed/success`
+- `CI Deep Verification` → `completed/success`
+- Vercel Production → `Ready` y **aliased** al custom domain
+- el smoke recién disparado del Paso C
+
+```bash
+SHA=$(git rev-parse origin/main)
+gh run list --branch main --commit "$SHA" --limit 10 \
+  --json name,status,conclusion --jq '.[] | "\(.name)\t\(.status)/\(.conclusion)"'
+vercel ls greenhouse-eo --target=production --limit 1 --scope efeonce-7670142f
+```
+
+**Piso duro: no dispatchar antes de 8 min desde el push a `main`** (Vercel
+`BUILDING` race). El 2026-08-06: push `23:32Z`, dispatch `23:56:03Z` → **24 min**,
+holgado. El workflow cerró en 10m51s (`23:56:03Z`→`00:06:54Z`) con el manifest
+`released`.
+
+#### Paso E — Aprobar los gates poleando `pending_deployments`, no `run.status`
+
+El entorno `production` se pide **dos veces** (§3 y gotcha #6 de la skill). Polea
+`pending_deployments` en loop desde el arranque: el 2026-08-06 el primer gate
+apareció a los ~2m45s del arranque y se aprobó ahí mismo; el run cerró sin stall.
+Los jobs Azure terminaron en `Skip Bicep deploy (no diff)` + `skipped`, que es el
+no-op esperado (§4.1), no una falla.
+
+```bash
+gh api "repos/efeoncepro/greenhouse-eo/actions/runs/<run_id>/pending_deployments" \
+  --jq '.[] | {env:.environment.name, id:.environment.id, canApprove:.current_user_can_approve}'
+```
+
+#### Paso F — Post-release: flags nuevos exigen redeploy, no sólo `env add`
+
+Vercel **congela las env vars al crear el build**: un flag agregado después del
+build productivo del release no existe para el runtime hasta que hay un
+deployment nuevo. El 2026-08-06, `GROWTH_SEO_ENABLED=true` en Production requirió
+redeploy explícito (`dpl_GyGkdEQQTk65qkCs1S3TEH6Jquy9`) para quedar vivo. Si el
+flag se puede prender **antes** del merge del PR, el build del release lo hornea
+y ahorras el redeploy. Y recuerda que prender un flag es **multi-runtime**: mapea
+dónde se lee antes de tocar nada (§4 check #6 + `FEATURE_FLAG_STATE_LEDGER.md`).
+
 ## 3. Approval del environment Production
 
 En el flujo canonico se aprueba el job `approval-gate` del workflow
@@ -270,7 +420,7 @@ Reason: el concurrency fix Opcion A (TASK-848 Slice 3) cancela pending nuevos cu
 | 4 | Smoke flows críticos | Browser real: login, `/finance/cash-out`, `/agency/operations`, `/admin/operations` |
 | 5 | Reliability signals OK | `/admin/operations` subsystem `Platform Release` debe estar OK |
 | 6 | **Flags pendientes de prender** | Revisar `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` → **§ Pendientes de acción**: ¿hay flags `*_ENABLED` code-complete cuyo flip estaba gated a este release? Si sí, `vercel env add <FLAG>=true Production` (+ ops-worker si aplica) + redeploy + smoke del flujo + actualizar la fila del ledger. **El deploy del código NO prende los flags** (default OFF); olvidarlo deja la feature invisible en prod (deuda cognitiva). |
-| 7 | Watchdog sin drift real | `GITHUB_RELEASE_OBSERVER_TOKEN="$(gh auth token)" pnpm release:watchdog --json` debe quedar `aggregateSeverity: ok`; workers esperados: `ops-worker`, `commercial-cost-worker`, `ico-batch-worker`, `hubspot-greenhouse-integration`. Excepcion V1: si solo `ops-worker` reporta drift pero el diff runtime Cloud Run SHA → target es vacio y `deploy_needed=false`, documentar residual de label y no redeployar. |
+| 7 | Watchdog sin drift real | `GITHUB_RELEASE_OBSERVER_TOKEN="$(gh auth token)" pnpm release:watchdog --json` debe quedar `aggregateSeverity: ok`; workers esperados: `ops-worker`, `commercial-cost-worker`, `ico-batch-worker`, `hubspot-greenhouse-integration`. Excepcion V1: si solo `ops-worker` reporta drift pero el diff runtime Cloud Run SHA → target es vacio y `deploy_needed=false`, documentar residual de label y no redeployar. Desde el fix de `6f7e246ea` el watchdog ya devuelve `drift_count=0` y explica el residual change-gated en su `detail` — ver §4.1.1. |
 | 8 | Timing ledger actualizado | Agregar/actualizar fila en `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md` con agente, fecha, release ID, run ID, SHA, **tiempo agente E2E** (principal), subtiempos técnicos, desglose por fase, bloqueo principal y aprendizaje. |
 
 ### 4.1. Leccion TASK-1328: skip esperado vs drift real
@@ -319,6 +469,19 @@ Si el comando no devuelve archivos, el workflow summary indica
 verde, tratarlo como **residual de label por change-gate**, no como incidente.
 Documentar el hallazgo en `Handoff.md` y no gastar otra corrida para empujar una
 revision identica.
+
+**Delta 2026-08-06 — el watchdog ya lo clasifica bien.** Hasta el release
+`503186d7147a` (2026-07-17), el watchdog reportaba este residual como
+`severity=error` por comparación mecánica de SHA, sin el contexto del
+change-gate, y cada agente tenía que refutarlo a mano con el `git diff` de
+arriba. El fix vive en el commit `6f7e246ea` de `main`: en el release
+`70e912056273` el `ops-worker` quedó en `558558263e80` (un SHA de `develop` del
+mismo día) y el watchdog reportó **`drift_count=0`**, explicando el residual en
+su propio `detail` (`change-gated — rutas runtime sin cambios`). Consecuencia
+operativa: si hoy ves `severity=error` por `ops-worker` con diff runtime vacío,
+**no es el falso positivo histórico** — revisa que estés corriendo el reader del
+`main` actual antes de asumirlo benigno. El `git diff` de arriba sigue siendo la
+verificación que manda.
 
 ### 4.1.2. Transition final en cola tras runtime verde
 

@@ -66,13 +66,15 @@ costo), TASK-1302 (materializer GSC + `readKeywordOpportunities` — CON ROLLOUT
 (`readSeoAeoGap` + quadrant SEO×AEO del 360 — **primer quadrant real: Berel #1.75 orgánico × AEO 44.5 →
 `riesgo`**, autoridad sin citabilidad = la señal de cross-sell al AEO). TASK-1645 (lane ecosystem
 `/api/platform/ecosystem/growth/seo/*` + 3 MCP tools read-only: `get_seo_keyword_opportunities`,
-`get_seo_visibility_360`, `get_seo_entitlement`) quedó CODE COMPLETE con rollout pendiente (flag Vercel +
-smoke con binding + federación al gateway = TASK-1647, creada). Ya hay motor operable por MCP a nivel código
+`get_seo_visibility_360`, `get_seo_entitlement`) y TASK-1647 (federación al gateway) quedaron **COMPLETE el
+2026-08-06: el motor está VIVO EN PRODUCCIÓN y se opera por `mcp.efeonce.org`** (release `70e912056273` +
+`GROWTH_SEO_ENABLED` en Vercel Production + revisión `efeonce-mcp-gateway-00012-dkj`; canary contra prod:
+Berel `riesgo`/50 keywords/AEO 44.5, deny anti-oracle 404). Ya hay motor operable por MCP de verdad
 y cruce SEO↔AEO real — pero para el cliente el portal sigue mostrando NADA de SEO.**
 
-> 🧭 **Directivas vigentes (2026-08-05):** **MCP-first** — SV360 se opera por MCP antes que por UI
-> (TASK-1645 code-complete, espejo del TASK-1086 de Knowledge; la federación al gateway `mcp.efeonce.org`
-> es TASK-1647: adapter delgado, canaries antes de discovery) — y destino **Wave**: SV360 eventualmente vive
+> 🧭 **Directivas vigentes (2026-08-05, cutover cerrado el 2026-08-06):** **MCP-first** — SV360 se opera por
+> MCP antes que por UI (TASK-1645 + TASK-1647 complete, espejo del TASK-1086 de Knowledge; el provider
+> `greenhouse-seo` ya sirve en `mcp.efeonce.org`) — y destino **Wave**: SV360 eventualmente vive
 > en `wave.efeonce.org` (seam en la arch doc SEO §17, EPIC-037). Reglas duras del dominio: todo write
 > provider-facing (costo DataForSEO) pasa por `enforceSeoRunEntitlement`, y **todo reader SEO/E-E-A-T futuro
 > expone su MCP tool EN EL MISMO PR** (criterio ya sembrado en 1303/1304/1311-1314/1317).

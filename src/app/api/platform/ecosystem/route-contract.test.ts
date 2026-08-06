@@ -48,11 +48,13 @@ vi.mock('@/lib/api-platform/resources/platform-health', () => ({
 const mockGetSeoKeywordOpportunities = vi.fn()
 const mockGetSeoVisibility360 = vi.fn()
 const mockGetSeoEntitlement = vi.fn()
+const mockGetSeoRankEvolution = vi.fn()
 
 vi.mock('@/lib/api-platform/resources/ecosystem-growth-seo', () => ({
   getEcosystemSeoKeywordOpportunitiesPayload: (...args: unknown[]) => mockGetSeoKeywordOpportunities(...args),
   getEcosystemSeoVisibility360Payload: (...args: unknown[]) => mockGetSeoVisibility360(...args),
-  getEcosystemSeoEntitlementPayload: (...args: unknown[]) => mockGetSeoEntitlement(...args)
+  getEcosystemSeoEntitlementPayload: (...args: unknown[]) => mockGetSeoEntitlement(...args),
+  getEcosystemSeoRankEvolutionPayload: (...args: unknown[]) => mockGetSeoRankEvolution(...args)
 }))
 
 vi.mock('@/lib/api-platform/resources/events', () => ({
@@ -80,6 +82,7 @@ const webhookDeliveryDetailRetryRoute = await import('./webhook-deliveries/[id]/
 const seoKeywordOpportunitiesRoute = await import('./growth/seo/keyword-opportunities/route')
 const seoVisibility360Route = await import('./growth/seo/visibility-360/route')
 const seoEntitlementRoute = await import('./growth/seo/entitlement/route')
+const seoRankEvolutionRoute = await import('./growth/seo/rank-evolution/route')
 
 describe('api platform ecosystem route contracts', () => {
   beforeEach(() => {
@@ -252,6 +255,15 @@ describe('api platform ecosystem route contracts', () => {
 
     expect(entBody.routeKey).toBe('platform.ecosystem.growth.seo.entitlement')
     expect(mockGetSeoEntitlement).toHaveBeenCalledWith(expect.objectContaining({ request: entRequest }))
+
+    // TASK-1303 — rank evolution (la serie temporal de posiciones)
+    mockGetSeoRankEvolution.mockResolvedValue({ data: { ok: true }, meta: {} })
+
+    const evoRequest = new Request('https://example.com/api/platform/ecosystem/growth/seo/rank-evolution')
+    const evoBody = await (await seoRankEvolutionRoute.GET(evoRequest)).json()
+
+    expect(evoBody.routeKey).toBe('platform.ecosystem.growth.seo.rank_evolution')
+    expect(mockGetSeoRankEvolution).toHaveBeenCalledWith(expect.objectContaining({ request: evoRequest }))
   })
 
   it('routes event control plane commands through the idempotent command harness (TASK-655)', async () => {

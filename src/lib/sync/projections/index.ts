@@ -86,6 +86,7 @@ import { growthGraderRunFromSubmissionProjection } from './growth-grader-run-fro
 import { growthHiringApplicationFromSubmissionProjection } from './growth-hiring-application-from-submission'
 import { growthAiVisibilityLeadHandoffProjection } from './growth-ai-visibility-lead-handoff'
 import { growthAiVisibilityOperatorSendProjection } from './growth-ai-visibility-operator-send'
+import { seoRankHistoryBqSyncProjection } from './seo-rank-history-bq-sync'
 import { growthAiVisibilityReportEmailProjection } from './growth-ai-visibility-report-email'
 
 // DEPRECATED: personOperationalProjection removed — replaced by personIntelligenceProjection
@@ -185,4 +186,5 @@ registerProjection(contractorPayableExpenseMaterializeProjection)
   registerProjection(growthAiVisibilityLeadHandoffProjection) // TASK-1242 — growth.ai_visibility.lead_handoff_requested → upsert contact/company en HubSpot (in-app directo, idempotente, consent+score gated); drenado por ops-reactive-growth
   registerProjection(growthAiVisibilityReportEmailProjection) // TASK-1250 — growth.ai_visibility.report_email_requested → email de entrega del informe al lead (adjunto PDF público-safe, consent+estado gated, idempotente DB-level); drenado por ops-reactive-growth
   registerProjection(growthAiVisibilityOperatorSendProjection) // TASK-1279 — growth.ai_visibility.report_send_requested → envío operador del informe + creación del Lead HubSpot (cross-sell, público-safe, consent-gated, idempotente por sub-paso); drenado por ops-reactive-growth
+  registerProjection(seoRankHistoryBqSyncProjection) // TASK-1303 — growth.seo.rank_snapshot.captured → MERGE seo_rank_snapshots PG → BQ greenhouse_growth_analytics.seo_rank_history (re-read PG, idempotente por rank_snapshot_id); drenado por ops-reactive-growth
 }

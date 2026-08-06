@@ -1,8 +1,9 @@
 # Production Release Incident Playbook V1
 
 > **Tipo de documento:** Playbook operativo canónico
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-05-12 por Claude Opus 4.7 (post incidente TASK-870)
+> **Ultima actualizacion:** 2026-08-06 por Claude Opus 5 (caso positivo release `70e912056273`)
 > **Audience:** Cualquier agente AI (Claude, Codex, Cursor) y operadores humanos que enfrenten un `Production Release Orchestrator` fallando
 
 ---
@@ -256,6 +257,89 @@ del camino de producción.
 
 ---
 
+## Caso positivo 2026-08-06 — el release que no generó incidente
+
+Hasta esta versión, este playbook sólo documentaba incidentes. Eso deja un sesgo:
+enseña a salir de un pozo, no a no caerse. El release
+`70e912056273d0a30e2aa8dacc2f4e62076e3b44` (release_id
+`70e912056273-03c36b47-eb75-469c-886f-51c691cd7c34`, run `31058032196`, PR #177)
+es el primer registro del ledger que **pasó a la primera: sin
+`bypass_preflight_reason`, sin retry del orquestador y con `drift_count=0`** en el
+watchdog. Workflow 10m51s (`23:56:03Z`→`00:06:54Z`), manifest `released`.
+
+Y no fue por ser un release chico: **355 commits, 221 archivos de código y 14
+migraciones** (EPIC-022 SEO, EPIC-028 Globe, identity 1616/1631, payroll 1630,
+Nexa 1182, EPIC-040). Es exactamente el perfil de batch que en releases
+anteriores producía `requires_break_glass`, bypass documentado y un retry.
+
+### Qué se hizo distinto
+
+**Los tres gotchas conocidos se pre-emptaron en vez de sufrirlos.** Esa es toda
+la diferencia. La secuencia con comandos exactos vive en el runbook
+(`docs/operations/runbooks/production-release.md` §2.4); acá queda el principio,
+que es lo que este playbook debe enseñar:
+
+| Gotcha | Lo que se venía haciendo (reactivo) | Lo que se hizo (pre-emptivo) |
+|---|---|---|
+| #1 PR conflictivo | Descubrir el conflicto al crear el PR y pelearlo contra el reloj | `git merge origin/main -X ours --no-edit` en `develop` **antes** de crear el PR → PR MERGEABLE de entrada |
+| #2 batch policy | Aceptar `requires_break_glass` y pedir `bypass_preflight_reason` | Marker `[release-coupled: <razón>]` en el **cuerpo del commit de squash** → preflight del orquestador pasa `ship` sin bypass |
+| #3 `playwright_smoke` ausente | Bypassear el check que no existe para el SHA de squash | `gh workflow run playwright.yml --ref main` y esperar verde (3m10s, run `31057847351`) → el check **existe de verdad** |
+
+Detalle del #1 que conviene no perder: hubo un conflicto **modify/delete** real
+(`TASK-1590` borrada en `develop` porque migró a `in-progress/`, modificada en
+`main`). `-X ours` no resuelve modify/delete — hay que decidirlo a mano. Se
+resolvió conservando el estado de `develop` (`git rm` de la copia en `to-do/`) y
+se verificó con `git log origin/main --not HEAD` vacío **y**
+`git diff HEAD@{1} HEAD -- src/ scripts/ services/ migrations/` vacío. Esa
+segunda verificación es la que prueba que el merge fue documental y que `-X ours`
+no se comió código de producción.
+
+### El principio general
+
+> **Un gotcha documentado y no pre-emptado es un incidente agendado.**
+
+Los tres gotchas de §2.3 del runbook estaban escritos hace más de un mes. Que
+estuvieran escritos no evitó ni un solo bypass: se leían **después** de tropezar.
+La regla que este caso deja es de orden, no de conocimiento — el catálogo de
+gotchas se aplica **antes** de crear el PR, no cuando el gate ya está rojo.
+
+Corolario sobre el bypass: `bypass_preflight_reason` casi nunca es la única
+salida. En este release, el gotcha #2 tenía una respuesta declarativa (el marker)
+y el #3 tenía una respuesta ejecutable (disparar el smoke por 3 minutos). Antes
+de escribir un bypass, la pregunta correcta es **"¿puedo producir la evidencia
+que falta?"**, no "¿cómo justifico saltármela?".
+
+### Lo demás que salió bien y por qué
+
+- **Espera de evidencia sobre el SHA exacto de `main`** — `CI`, `CI Deep
+  Verification`, Vercel Production `Ready` (deployment
+  `dpl_8ygHujBn7ahfC1Yk6671iY7xZ6Re`, aliased a `greenhouse.efeoncepro.com`) y el
+  smoke recién disparado. Push a `main` `23:32Z`, dispatch `23:56Z` → **24 min**,
+  muy por encima del piso de 8 min que evita la carrera con Vercel `BUILDING`.
+- **Gates aprobados con loop sobre `pending_deployments`, no sobre `run.status`** —
+  el primer gate se aprobó a los ~2m45s del arranque y el run cerró sin stall.
+  Comparar con el release `41aefb457`, donde el 2do gate sin aprobar stalleó ~43
+  min. Los jobs Azure cerraron en `Skip Bicep deploy (no diff)` + `skipped`: el
+  no-op esperado, no una falla (anti-pattern #7).
+- **Residual `ops-worker` ya clasificado por el watchdog** — quedó en
+  `558558263e80` con diff de rutas runtime vacío y `Ready=True`. Novedad respecto
+  de todos los releases anteriores: el watchdog reportó `drift_count=0` y explicó
+  el residual en su propio `detail` (`change-gated`), en vez del `severity=error`
+  mecánico. El fix vive en el commit `6f7e246ea` de `main`. El bug class del
+  anti-pattern #7 dejó de requerir refutación manual.
+
+### Lo que igual costó tiempo (para el próximo)
+
+- **Vercel congela las env vars al crear el build.** `GROWTH_SEO_ENABLED=true` en
+  Production requirió **redeploy** (`dpl_GyGkdEQQTk65qkCs1S3TEH6Jquy9`) para
+  quedar vivo. Si el flag se puede prender antes del merge del PR, el build del
+  release lo hornea y el redeploy no existe.
+
+Registro completo de tiempos y desglose por fase:
+`docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md`, fila 2026-08-06.
+
+---
+
 ## Decisión: ¿cuándo eliminar / relajar el preflight?
 
 **Respuesta corta: nunca, salvo bug class del check itself.**
@@ -273,6 +357,11 @@ El preflight detectó el incidente actual correctamente: env var corrupta produc
 ## Single-source-of-truth de aprendizajes
 
 Si emerge un nuevo failure mode no cubierto por este playbook, documentarlo aquí + arch-architect review + commit canónico. Este playbook ES el aprendizaje canónico cross-agent.
+
+Desde la V1.1 esto también aplica al revés: si un release **evitó** un blocker
+conocido por una secuencia replicable, documentar el caso positivo (qué se hizo
+distinto y en qué orden) y llevar los comandos exactos al runbook. Un playbook
+que sólo colecciona incidentes enseña a salir del pozo, no a no caerse.
 
 **Referencias**:
 - `docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md` (TASK-848)

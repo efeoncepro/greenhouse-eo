@@ -11,8 +11,14 @@ Efeonce MCP Gateway es el punto de acceso federado para que un cliente MCP use c
 mediante una URL estable: `https://mcp.efeonce.org/mcp`. No vive en Greenhouse ni Globe: es un servicio
 independiente que autentica al cliente y delega cada lectura al producto dueño.
 
-La primera capacidad activa es `globe.producer.fleet.list`. Permite consultar las rutas de modelos disponibles de
+La primera capacidad activa fue `globe.producer.fleet.list`. Permite consultar las rutas de modelos disponibles de
 Globe para el workspace interno autorizado. El gateway no recrea catálogo, routing ni reglas de Globe.
+
+Desde el 6 de agosto de 2026 hay una **segunda capacidad federada**: Search Visibility 360 de Greenhouse, con tres
+consultas de solo lectura sobre el estado del módulo SEO de una organización, sus oportunidades de keyword medidas
+y el cruce entre posición orgánica y citabilidad en motores de IA. Igual que con Globe, el gateway no recrea
+lógica: transporta la pregunta y Greenhouse decide qué se puede ver. Detalle funcional en
+[Search Visibility 360 por MCP](../growth/search-visibility-360-por-mcp.md).
 
 ## Cómo se comporta
 
@@ -31,6 +37,9 @@ Disponible hoy:
 
 - `globe.capabilities.list` para discovery.
 - `globe.producer.fleet.list` para disponibilidad de rutas de Globe.
+- `get_seo_entitlement`, `get_seo_keyword_opportunities` y `get_seo_visibility_360` para Search Visibility 360 de
+  Greenhouse, bajo el permiso base de conexión. Son de lectura: no configuran mediciones, no disparan capturas y
+  no gastan presupuesto de proveedor. Cada una queda acotada por el módulo SEO asignado a la organización.
 
 No disponible:
 

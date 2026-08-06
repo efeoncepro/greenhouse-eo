@@ -5,6 +5,8 @@
 ## Invariantes operativos para agentes — Organization Workspace + Client Portal (TASK-611, 613, 822)
 
 > **Relocados de `CLAUDE.md` por TASK-1160 (2026-06-16), verbatim.** Contrato: `GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md` (611/613), `GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md` (822). Dedup = Slice 4.
+>
+> **Delta 2026-08-06:** se agregó al final la sección §`Identidad vs rol comercial vs capabilities — los tres ejes ortogonales`. Cárgala **antes** de tocar cualquier reader/listado que filtre organizaciones por `organization_type`. Contrato semántico: `GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md` §`Organization Types`.
 
 ### Organization Workspace projection invariants (TASK-611)
 
@@ -167,3 +169,34 @@ const FinanceFacet = ({ organizationId, entrypointContext }: FacetContentProps) 
 El facet sigue siendo self-contained: queries propias, drawers propios. NO renderiza chrome — el shell ya lo hace. Es el patrón de referencia cuando un facet necesite divergir per-entrypoint sin fragmentar el FACET_REGISTRY.
 
 **Spec canónica**: `docs/architecture/GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md` Delta 2026-05-08 (receta detallada). Tasks de referencia: TASK-611 (foundation), TASK-612 (shell + Agency entrypoint), TASK-613 (Finance entrypoint + dual-dispatch pattern).
+
+---
+
+### Identidad vs rol comercial vs capabilities — los tres ejes ortogonales (desde 2026-08-06)
+
+> **Contrato semántico completo:** `docs/architecture/GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md` §`Organization Types`. Acá viven sólo los NUNCA/SIEMPRE operativos que un agente carga al tocar cualquier surface que liste, filtre o clasifique organizaciones.
+
+Una organización se describe con **tres preguntas independientes**. Confundirlas es el bug class de la tabla `greenhouse_core.organizations`:
+
+| Eje | Pregunta | Dónde vive |
+|---|---|---|
+| Identidad legal | ¿quién soy? | `is_operating_entity` |
+| Rol comercial | ¿qué soy frente al mercado? | `organization_type` |
+| Capabilities | ¿qué hace la plataforma por mí? | `greenhouse_client_portal.module_assignments` |
+
+**`organization_type` modela un ROL COMERCIAL, no una identidad.** El nombre de la columna es histórico; lo que modela es `commercial_role`. **`'other'` significa "sin rol comercial", NO "sin clasificar"**. Verificado 2026-08-06: **cero** queries del repo filtran `WHERE organization_type = 'other'` como criterio de negocio — todas las apariciones son defaults (`?? 'other'`, `COALESCE(...,'other')`), fixtures o comentarios. La entidad legal operadora (`is_operating_entity=TRUE`, hoy `EO-ORG-0007`) lleva `'other'` **porque no tiene rol comercial**: Efeonce no se vende ni se compra a sí misma.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** agregar un valor de identidad al enum (`'internal'`, `'efeonce_internal'`, `'legal_entity'`): mezcla dos ejes en una columna. Ya se intentó y quedó una rama muerta comparando `organization_type === 'efeonce_internal'` en `src/lib/commercial/party/commands/instantiate-client-for-party.ts:96-98`, contra un valor que el CHECK `organizations_type_check` nunca admitió. `efeonce_internal` es un **`tenant_type` de la tabla de usuarios** (interno vs cliente, lo consumen `session_360` y SCIM), no un tipo de organización.
+- **NUNCA** escribir el guard "la operadora no es cliente" contra el nombre, el `public_id` o el `organization_id` de la org. **El guard es POR FLAG**: `!org.isOperatingEntity`. Referencia viva y única correcta en toda la app de negocio: `src/app/(dashboard)/growth/aeo/page.tsx:107` → `.filter(org => org.active && !org.isOperatingEntity && …)`.
+- **NUNCA** asumir que un reader client-facing ya excluye a la operadora por filtrar el tipo. Verificado 2026-08-06: **5 readers** filtran `organization_type IN ('client','both')` **sin consultar `is_operating_entity`** — `src/app/api/finance/clients/route.ts:102-105`, `src/app/api/finance/clients/[id]/route.ts:273-274`, `src/lib/finance/canonical.ts:196-197,241-242`, `src/lib/finance/postgres-store-slice2.ts:1374-1375`, `src/lib/client-onboarding/org-search.ts:36-44`. Mientras la operadora tenga `'other'` no aparece, pero el filtro por tipo **no es** un guard de identidad: cualquier writer que la promueva la vuelve a colar, incluida la puerta de facturación `resolveFinanceClientContext` (la misma org como emisor fiscal y como cliente facturable → autofacturación que contamina P&L/F29).
+- **NUNCA** condicionar una capability de plataforma a `organization_type`. Las capabilities viven en `module_assignments` y se resuelven por `organization_id` + `module_key`. Referencia verificada: `enforceSeoRunEntitlement` (`src/lib/growth/seo/entitlement.ts:212-214`) no lee `organization_type` en ningún punto. Por eso **la operadora puede monitorear su propio SEO/AEO/GA4/RRSS sin ser cliente**.
+- **NUNCA** intentar bajar el rol comercial con un `upsertCanonicalOrganization` normal: **`deriveOrganizationType` es MONÓTONA** (`src/lib/account-360/organization-type.ts:74-88`, rama `isClientCapable(currentType)`) — nunca degrada un rol ya adquirido, así que una llamada corriente **perpetúa** el tipo actual. La única puerta de bajada es `scripts/commercial/reset-organization-commercial-role.ts`, que declara `currentType='other'` explícito y **igual pasa por `upsertCanonicalOrganization`**. `scripts/commercial/remediate-half-baked-orgs.ts` **NO sirve** para esto: su criterio es `lifecycle='active_client' AND type NOT IN ('client','both')`, o sea sólo promueve.
+- **NUNCA** corregir un rol comercial con SQL directo sobre `greenhouse_core.organizations`. Toda escritura pasa por `upsertCanonicalOrganization` (invariante TASK-991, `GREENHOUSE_CLIENT_LIFECYCLE_V1.md`).
+- **SIEMPRE** que emerja un reader, listado o selector nuevo de "clientes" / "cuentas facturables" / "orgs a facturar", agregar el guard `!isOperatingEntity` **además** del filtro por `organization_type`. Los dos ejes son independientes; filtrar uno no cubre el otro.
+- **SIEMPRE** que la operadora necesite una capability nueva (GA4, RRSS, lo que venga), habilitarla por `module_assignments` — **nunca** promoviéndola a `'client'` "para que le llegue el módulo".
+
+**Gap declarado (no cerrado)**: verificado contra `pg_constraint` el 2026-08-06 — sobre `greenhouse_core.organizations` sólo existen CHECKs de enum y **cero triggers**; **no** hay índice único parcial que garantice una sola fila con `is_operating_entity=TRUE`. Relevante para el roadmap multi-entidad legal.
+
+**Caso fuente (2026-08-06)**: `EO-ORG-0007` (Efeonce) tenía `organization_type='client'` por herencia del space de cliente de marzo 2026 — antes de decidir que la operadora no es cliente. **NO** lo causó el dogfooding SEO (el script de provisión no escribe en `organizations`). Reseteada a `'other'`; `is_operating_entity`, los 2 `module_assignments` y el dogfooding SEO quedaron intactos, verificado con el canary contra producción. Daño consumado: 0 income, 0 contratos, 0 usuarios de portal.

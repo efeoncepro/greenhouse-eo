@@ -1,0 +1,6 @@
+interface:
+  display_name: "DataForSEO Operator"
+  short_description: "Oficio de la API DataForSEO v3 + contrato Greenhouse (cliente canónico, allowlist, spend guard) para SERP, Labs, Backlinks, OnPage, Domain Analytics y visibilidad AI (AI Mode, LLM Mentions)."
+  default_prompt: "Use $dataforseo-operator to design or implement any DataForSEO call (endpoint choice, live vs task-based, cost optimization, allowlist governance) for SEO/AEO/AI-visibility work in Greenhouse."
+policy:
+  allow_implicit_invocation: true

@@ -1,5 +1,10 @@
 # TASK-1307 — Growth SEO: Rank & URL Performance Over Time UI ★
 
+## Delta 2026-08-06
+
+- **El backend YA existe** — cerrado por TASK-1303: `readRankEvolution(seoTargetId, { keywords?, rangeDays?, engine?, device? })` en `src/lib/growth/seo/rank-evolution-reader.ts` retorna `{ ok:true, seoTargetId, organizationId, engine, device, range: {from,to,days}, source: 'postgres'|'bigquery', series: [{ keyword, points: [{date, position, url}] }] } | { ok:false, errorCode: 'disabled'|'target_not_found'|'no_data'|'query_failed' }`. `position: null` en un punto = "el dominio no rankeó ese día en el top-20" (dato válido a graficar como hueco, no error). También existen el lane ecosystem `/api/platform/ecosystem/growth/seo/rank-evolution` y la MCP tool `get_seo_rank_evolution`.
+- ⚠️ La serie empieza a llenarse recién cuando el operador despause el scheduler `ops-seo-rank-capture` (nace pausado; runbook `docs/manual-de-uso/growth/operar-captura-rankings-seo.md`). Diseñar la UI con el estado `no_data` como primera pantalla real.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

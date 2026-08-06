@@ -94,7 +94,12 @@ El módulo Growth SEO (`growth.seo`, EPIC-022) autoriza todo run por un único c
 contrata el seam de extracción hacia Wave). Los reads del módulo son readers canónicos consumer-agnósticos —
 `readKeywordOpportunities` y `readSeoAeoGap` (este último cruza SEO↔AEO respetando el boundary de §1.1) —
 expuestos por el lane ecosystem `/api/platform/ecosystem/growth/seo/*` y sus 3 MCP tools (TASK-1645); regla
-durable del módulo: **todo reader SEO nuevo expone su MCP tool en el mismo PR**. Su primera captura corre live
+durable del módulo: **todo reader SEO nuevo expone su MCP tool en el mismo PR**. Desde 2026-08-06 ese camino
+está **vivo en producción y federado en `mcp.efeonce.org`** (TASK-1645 + TASK-1647 complete; provider
+`greenhouse-seo` en el gateway, revisión `efeonce-mcp-gateway-00012-dkj`): preguntar por MCP por la
+visibilidad 360 de una org entitled devuelve su quadrant real, y una org fuera del binding falla cerrada.
+El flag `GROWTH_SEO_ENABLED` es **multi-runtime** — Vercel (lane) + `ops-worker` (materializer GSC);
+prenderlo en uno solo deja el otro camino muerto. Su primera captura corre live
 desde 2026-08-05: la serie propia de
 Google Search Console (`greenhouse_growth.seo_gsc_daily`) se materializa a diario en el **ops-worker** —
 **servicio Cloud Run único compartido staging+prod**, así que una capacidad worker-only queda viva al mergear a

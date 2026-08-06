@@ -8,7 +8,7 @@
 
 import 'server-only'
 
-import { type DataForSeoFamily } from '@/lib/ai/dataforseo-families'
+import type { DataForSeoFamily } from '@/lib/ai/dataforseo-families'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 export interface RecordSeoProviderSpendInput {
@@ -48,10 +48,16 @@ export const SEO_PROVIDER_SPEND_UPSERT_SQL = `INSERT INTO greenhouse_growth.seo_
  *
  * Lo consume `enforceSeoRunEntitlement` como subquery de su SELECT y el sanity live lo
  * ejercita tal cual: una sola definición del "cuánto lleva gastado esta organización".
+ *
+ * ⚠️ Toma el placeholder por parámetro en vez de fijar `$1`. Un fragmento interpolable con
+ * posición fija es un footgun: el segundo consumer que lo meta en una query donde la
+ * organización sea `$2` sumaría el gasto de OTRA organización **sin que PostgreSQL falle**
+ * (si el parámetro de esa posición también es `text`). El bug sería silencioso y de dinero.
  */
-export const SEO_PROVIDER_SPEND_MONTHLY_SUM_SQL = `COALESCE((SELECT SUM(sp.provider_cost_usd)
+export const buildSeoProviderSpendMonthlySumSql = (organizationPlaceholder: string): string =>
+  `COALESCE((SELECT SUM(sp.provider_cost_usd)
           FROM greenhouse_growth.seo_provider_spend_daily sp
-         WHERE sp.organization_id = $1
+         WHERE sp.organization_id = ${organizationPlaceholder}
            AND sp.spend_date >= date_trunc('month', CURRENT_DATE)::date), 0)`
 
 export const recordSeoProviderSpend = async (input: RecordSeoProviderSpendInput): Promise<void> => {

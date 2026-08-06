@@ -204,6 +204,12 @@ Reglas que el agente debe respetar:
 - **Los dos ejes del 360 nunca se promedian**: rankeo y citabilidad son verdades ortogonales de motores distintos.
 - Es **read-only**: ninguna de estas tools dispara capturas ni gasta presupuesto de proveedor.
 
+Desde el 2026-08-06 estas mismas tres tools están **federadas al gateway público `mcp.efeonce.org`** (TASK-1647),
+así que un cliente MCP externo autenticado por OAuth las alcanza sin levantar este server. Es el mismo lane y el
+mismo entitlement: el gateway solo transporta. Lectura funcional en
+[Search Visibility 360 por MCP](../../documentation/growth/search-visibility-360-por-mcp.md); operación en
+[Operar el provider Greenhouse-SEO del MCP](operar-provider-greenhouse-seo-mcp.md).
+
 ## Que no puede hacer
 
 Este MCP no hace lo siguiente:

@@ -5,9 +5,16 @@
  * handler hace no-op prod-safe: cero queries, cero llamadas a Google, cero ruido en
  * Sentry — el Cloud Scheduler puede existir sin acoplarse a producción.
  *
- * ⚠️ El runtime que LEE este flag es el **ops-worker (Cloud Run)**, NO Vercel. Prenderlo
- * sólo en Vercel dejaría el materializer muerto (CLAUDE.md §Feature Flag State Ledger:
- * prender un flag es multi-runtime). En Cloud Run el SoT es `services/ops-worker/deploy.sh`.
+ * ⚠️ LO LEEN **DOS** RUNTIMES, y prenderlo es un flip de **tres pasos**:
+ *   1. `services/ops-worker/deploy.sh` — Cloud Run. Gatea el batch diario (TASK-1302).
+ *   2. Vercel — gatea el lane ecosystem/MCP (`api-platform/resources/ecosystem-growth-seo.ts`,
+ *      TASK-1645) y el reader del cruce SEO↔AEO (`gap/read-seo-aeo-gap.ts`, TASK-1305).
+ *   3. Despausar el Cloud Scheduler `ops-seo-gsc-snapshot`, cuyo estado se declara en el
+ *      5.º argumento de `upsert_scheduler_job` (se re-aplica en CADA deploy).
+ *
+ * Prenderlo en un solo runtime deja la mitad del módulo muerta, y **apagarlo sólo en el
+ * worker NO apaga el módulo**: el lane de Vercel sigue sirviendo. Cada uno tiene su SoT
+ * distinto (CLAUDE.md §Feature Flag State Ledger: prender un flag es multi-runtime).
  *
  * Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md (gate docs:closure-check).
  *

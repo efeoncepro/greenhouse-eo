@@ -1,5 +1,35 @@
 # TASK-991 — Canonical Organization Write SSOT + Birth Completeness
 
+## Delta 2026-08-06 — la precondición del CHECK diferido YA se cumple
+
+El paso 2 del rollout (aplicar el CHECK `organizations_type_lifecycle_consistent` **sólo después**
+de que el código nuevo esté en producción) estaba esperando esa condición. **Ya se cumple**:
+`upsertCanonicalOrganization` y `deriveOrganizationType` están en `origin/main` — verificado el
+2026-08-06. El hazard de deploy-ordering contra el Cloud SQL compartido que motivó el diferimiento
+ya no aplica, porque producción no corre el código viejo que escribía `active_client + other`.
+
+**Estado real de la defensa hoy:** el CHECK **no existe** en la base. Consulta a `pg_constraint`
+sobre `greenhouse_core.organizations` (2026-08-06): sólo enums
+(`organizations_type_check`, `organizations_lifecycle_stage_valid`, `organizations_origin_valid`,
+`organizations_default_locale_check`) y **cero triggers**. Tampoco aparece en ninguna migración.
+Los comentarios de `src/lib/account-360/organization-type.ts:13,104` lo dan por activo y están
+**stale** — describen una red de seguridad que nunca se construyó. Corregir esos comentarios es
+trabajo de código y va con este paso.
+
+**Antes de aplicarlo, verificar violadores incluyendo filas inactivas.** La distribución medida el
+2026-08-06 sobre orgs `active = TRUE` no tenía ningún `active_client` con tipo fuera de
+`('client','both')` (378 `other/prospect`, 40 `other/opportunity`, 24 `supplier/prospect`,
+12 `client/active_client`, 4 `client/inactive`, 1 `other/disqualified`, 1 `client/churned`), pero el
+CHECK aplica a **todas** las filas, así que hay que repetir el conteo sin el filtro `active`.
+
+**Contexto que llegó desde otro frente:** el 2026-08-06 se corrigió `EO-ORG-0007` (la entidad legal
+operadora) de `organization_type='client'` a `'other'` con
+`scripts/commercial/reset-organization-commercial-role.ts` — puerta nueva que rompe la monotonía de
+`deriveOrganizationType` de forma explícita y auditada. Esa fila satisface el CHECK de forma vacua
+(`inactive ≠ active_client`), así que no lo bloquea. El contrato semántico de `organization_type`
+(rol comercial, `'other'` = sin rol) quedó escrito en
+`docs/architecture/GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md` §Organization Types.
+
 ## Delta 2026-06-03 — Berel nacido por la puerta canónica (programa EPIC-CLIENT-360)
 
 **Contexto programa:** foundation del programa "incorporar clientes" disparado por **Grupo Berel** (primer cliente MXN). El nacimiento de Berel pasó por el SSOT de esta task (`upsertCanonicalOrganization` + `deriveOrganizationType` + `promoteParty`), no por las puertas fragmentadas que esta task elimina.

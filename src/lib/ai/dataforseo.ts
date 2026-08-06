@@ -3,7 +3,7 @@ import 'server-only'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { resolveSecret, type SecretResolutionSource } from '@/lib/secrets/secret-manager'
 
-import { dataForSeoBreaker } from './dataforseo-breaker'
+import { dataForSeoBreaker, isProviderHealthFailure } from './dataforseo-breaker'
 import {
   DATAFORSEO_FAMILIES,
   normalizeEndpoint,
@@ -15,6 +15,13 @@ const DATAFORSEO_API_BASE_URL = 'https://api.dataforseo.com'
 export const DATAFORSEO_DEFAULT_AI_MODE_ENDPOINT = '/v3/serp/google/ai_mode/live/advanced'
 export const DATAFORSEO_DEFAULT_ORGANIC_ENDPOINT = '/v3/serp/google/organic/live/advanced'
 
+/**
+ * Payload de una tarea SERP. `keyword` es obligatorio porque en `/v3/serp/` lo es.
+ *
+ * ⚠️ NO sirve para las demás familias: OnPage y Backlinks toman `target`, y Labs bulk toma
+ * `keywords: string[]`. Usar este tipo ahí obliga a un cast que **anula el chequeo del
+ * payload entero**. Para esas familias existe `DataForSeoTaskPayload` (abajo).
+ */
 export interface DataForSeoSerpTask {
   keyword: string
   location_name?: string
@@ -25,6 +32,16 @@ export interface DataForSeoSerpTask {
   depth?: number
   [key: string]: unknown
 }
+
+/**
+ * Payload genérico de una tarea de cualquier familia.
+ *
+ * Cada familia de DataForSEO tiene su propia forma —`keyword` en SERP, `target` en
+ * OnPage/Backlinks, `keywords[]` en Labs bulk— y no hay un campo común. Forzarlas todas al
+ * shape de SERP sólo lograba que 3 de 4 necesitaran `as unknown as`, que es peor: apaga la
+ * validación en vez de expresarla. La forma exacta por endpoint la valida el proveedor.
+ */
+export type DataForSeoTaskPayload = Record<string, unknown>
 
 export interface DataForSeoSerpResult {
   ok: boolean
@@ -126,7 +143,8 @@ export type DataForSeoTaskInput =
   | {
       family: Exclude<DataForSeoFamily, 'serp'>
       endpoint: string
-      tasks: DataForSeoSerpTask[]
+      // Genérico a propósito: OnPage/Backlinks toman `target`, Labs bulk toma `keywords[]`.
+      tasks: DataForSeoTaskPayload[]
       timeoutMs?: number
       organizationId: string
     }
@@ -151,9 +169,16 @@ export const postDataForSeoTask = async (input: DataForSeoTaskInput): Promise<Da
   // sin quedar contabilizado, y el gate de presupuesto leería cero para siempre.
   // Un throw en la primera llamada del entorno nuevo se descubre en desarrollo; un
   // contador en cero se descubre en la factura.
-  if (definition?.requiresOrganization && !spendRecorder) {
+  // ⚠️ La condición es "¿HAY organización?", NO "¿la familia exige organización?".
+  //
+  // Atarlo a `requiresOrganization` dejaba abierto el agujero más caro del contrato: una
+  // llamada `serp` CON `organizationId` y sin contador registrado gastaba de verdad, no
+  // lanzaba, y el ledger quedaba en cero — con el gate de presupuesto leyendo cero para
+  // siempre. Y `serp` es justamente lo que TASK-1303 usará para rank capture desde un cron.
+  // Si hay organización, hay atribución posible; entonces es obligatoria.
+  if (input.organizationId && !spendRecorder) {
     throw new Error(
-      `La familia DataForSEO "${family}" gasta presupuesto y este runtime no registró el contador. ` +
+      `La llamada a DataForSEO ("${family}") declara organizationId y este runtime no registró el contador de gasto. ` +
         'Importa `@/lib/growth/seo/register-provider-spend` en el punto de entrada antes de llamar.'
     )
   }
@@ -172,7 +197,10 @@ export const postDataForSeoTask = async (input: DataForSeoTaskInput): Promise<Da
       tasks: [],
       cost: null,
       latencyMs: 0,
-      secretSource: 'env',
+      // NO se resolvió ningún secreto: el return está antes de resolver credenciales.
+      // Declarar 'env' afirmaría un origen que nunca se consultó y contaminaría el campo
+      // que existe para diagnosticar de dónde salió la credencial.
+      secretSource: 'unconfigured',
       family,
       breakerOpen: true
     }
@@ -199,7 +227,14 @@ export const postDataForSeoTask = async (input: DataForSeoTaskInput): Promise<Da
 
     if (!response.ok) {
       await response.text().catch(() => undefined)
-      dataForSeoBreaker.recordFailure(family)
+
+      // Sólo los fallos que hablan de la SALUD del proveedor abren el breaker. Un 4xx de
+      // caller (payload mal formado) es determinista y se repetiría en cada llamada de la
+      // corrida: contarlo abriría el breaker y degradaría a callers sanos que comparten la
+      // familia — incluido el AEO sobre `serp`.
+      if (isProviderHealthFailure(response.status)) {
+        dataForSeoBreaker.recordFailure(family)
+      }
 
       return {
         ok: false,

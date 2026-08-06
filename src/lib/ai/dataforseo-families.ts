@@ -66,6 +66,32 @@ export const DATAFORSEO_FAMILIES = {
   }
 } as const satisfies Record<string, DataForSeoFamilyDefinition>
 
+/**
+ * ═══ LÍMITES CONOCIDOS DEL TRANSPORTE (medidos, no supuestos) ═══
+ *
+ * Que una familia esté en el allowlist significa "el prefijo se acepta", NO "el transporte
+ * puede llamar ese endpoint". Antes de integrar una capability nueva, contrastá contra esto:
+ *
+ * 1. **El transporte es POST-only, con el body `JSON.stringify(tasks)`.** Toda la convención
+ *    `task_get/$id` y `tasks_ready` de DataForSEO es **GET, con el id en el path y sin
+ *    body** — `normalizeEndpoint` los aceptaría (el prefijo calza) y el proveedor
+ *    respondería 404/405. OnPage se salva porque `summary`/`pages` son POST; **Lighthouse
+ *    (`lighthouse/task_get/json/$id`) y el SERP task-based NO**. Si los necesitas, el
+ *    transporte requiere soporte de método/path, no un prefijo nuevo.
+ * 2. **`cost` es del BATCH, no de la tarea.** Se lee de `json.cost` en la raíz de la
+ *    respuesta. Con N tareas en un POST no hay forma de repartirlo entre N filas, así que un
+ *    `provider_cost` "por fila" en una tabla snapshot no se puede poblar con exactitud desde
+ *    un batch: o mandas una tarea por llamada, o el costo se atribuye al lote.
+ * 3. **El breaker es por FAMILIA, no por operación.** En un flujo task-based, los polls que
+ *    fallan abren el breaker de la familia y apagan también la creación de tareas nuevas.
+ * 4. **`checkDataForSeoConnection` es un carril aparte, deliberado**: pega a
+ *    `/v3/appendix/user_data` sin familia, sin allowlist y sin breaker. Es un health check
+ *    de credenciales, no una capability — por eso no pasa por `postDataForSeoTask`.
+ * 5. **Familias ausentes a propósito**: `keywords_data` (el volumen y la dificultad salen de
+ *    `labs`; ver §3 de la arquitectura del módulo SEO) y `business_data` (reseñas/GBP, fuera
+ *    de alcance). Si buscabas `/v3/keywords_data/.../search_volume/live`, el equivalente
+ *    dentro del allowlist es `labs` (`keyword_ideas` lo trae inline).
+ */
 export type DataForSeoFamily = keyof typeof DATAFORSEO_FAMILIES
 
 export const DATAFORSEO_FAMILY_NAMES = Object.keys(DATAFORSEO_FAMILIES) as DataForSeoFamily[]

@@ -28,7 +28,7 @@ https://greenhouse.efeoncepro.com` + secret ref del token) + deploy dispatch, (4
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -264,12 +264,73 @@ Seguir el protocolo de providers de la skill `efeonce-mcp-platform`: clasificar 
 
 ## Acceptance Criteria
 
-- [ ] Provider Greenhouse-SEO registrado en el gateway con adapter delgado (cero lógica de dominio) delegando en el lane ecosystem.
-- [ ] Los 3 tools de TASK-1645 alcanzables vía `mcp.efeonce.org` bajo scope read; nombres y shapes passthrough sin re-mapear.
-- [ ] Canaries allow/deny/scope/redaction verdes ANTES de discovery.
-- [ ] Smoke e2e documentado: org entitled → data real; org no entitled → deny anti-oracle; cross-org denegado.
-- [ ] La autorización de datos queda íntegra en el lane (el gateway no la re-implementa ni la relaja).
-- [ ] Manual MCP actualizado (tools SEO vía gateway) + referencia en el cierre de TASK-1645/EPIC-022.
+- [x] Provider Greenhouse-SEO registrado en el gateway con adapter delgado (cero lógica de dominio) delegando en el lane ecosystem.
+- [x] Los 3 tools de TASK-1645 alcanzables vía `mcp.efeonce.org` bajo scope read; nombres y shapes passthrough sin re-mapear.
+- [x] Canaries allow/deny/scope/redaction verdes ANTES de discovery.
+- [x] Smoke e2e documentado: org entitled → data real; org no entitled → deny anti-oracle; cross-org denegado.
+- [x] La autorización de datos queda íntegra en el lane (el gateway no la re-implementa ni la relaja).
+- [x] Manual MCP actualizado (tools SEO vía gateway) + referencia en el cierre de TASK-1645/EPIC-022.
+
+## Evidencia del cutover a producción — 2026-08-06
+
+Secuencia ejecutada (cada capa verificada antes de habilitar la siguiente):
+
+1. **Release `develop→main`** — SHA `70e912056273d0a30e2aa8dacc2f4e62076e3b44`,
+   `release_id=70e912056273-03c36b47-eb75-469c-886f-51c691cd7c34`, run `31058032196`,
+   manifest `released`, watchdog `drift_count=0`.
+2. **`GROWTH_SEO_ENABLED=true` en Vercel Production** + redeploy
+   `dpl_GyGkdEQQTk65qkCs1S3TEH6Jquy9` (Vercel congela env vars al crear el build).
+3. **Canary del provider contra producción** — `GREENHOUSE_ECOSYSTEM_API_URL=https://greenhouse.efeoncepro.com`
+   `node scripts/greenhouse-seo-canary.mjs org-2df565fb-… org-32333527-…`:
+
+   ```text
+   ✓ entitlement(org-2df565fb-…): {"hasModule":true,"tier":"contracted","audits":8,"budgetUsd":50}
+   ✓ visibility-360(org-2df565fb-…): degradación honesta → {"ok":false,"errorCode":"no_seo_data","status":null}
+   ✓ entitlement(org-32333527-…): {"hasModule":true,"tier":"contracted","audits":8,"budgetUsd":50}
+   ✓ visibility-360(org-32333527-…): domainQuadrant=riesgo keywords=50 aeo=44.5
+   ✓ deny anti-oracle (org inexistente): status=404 greenhouse_seo_lane_404
+   ```
+
+4. **Enable del provider en el gateway** — `efeonce-mcp` `76cb121`, workflow `31059346243`,
+   revisión Cloud Run `efeonce-mcp-gateway-00012-dkj` `Ready=True` con
+   `GREENHOUSE_SEO_PROVIDER_ENABLED=true`, `GREENHOUSE_ECOSYSTEM_API_URL=https://greenhouse.efeoncepro.com`
+   y `GREENHOUSE_ECOSYSTEM_TOKEN` como **secret ref** (`efeonce-mcp-gateway-greenhouse-token:latest`,
+   nunca valor plano). El SA `efeonce-mcp-gateway@efeonce-group` recibió `secretAccessor` scoped
+   sobre ese secreto (el secreto se había creado sin ninguna binding: el deploy habría fallado).
+5. **Front door público** — `GET /health` `200`; `GET /.well-known/oauth-protected-resource` `200`
+   declarando los 3 scopes; `POST /mcp` anónimo `401` con
+   `WWW-Authenticate: Bearer resource_metadata=… scope="efeonce.mcp.read"`. Fail-closed correcto.
+6. **Smoke MCP autenticado por `mcp.efeonce.org` — VERDE.** El canary OAuth
+   (`scripts/oauth-canary.mjs`) quedó extendido en este cierre con las tools SEO
+   (`MCP_CANARY_SEO_ORGANIZATION_ID` + `MCP_CANARY_SEO_DENY_ORGANIZATION_ID`).
+   Flujo real Entra authorization-code + PKCE (login humano), token con
+   `aud=c5363215-b9a6-4bf1-bb1c-e61963b37dac` y `scp` incluyendo `efeonce.mcp.read`:
+
+   ```bash
+   MCP_CANARY_SEO_ORGANIZATION_ID=org-32333527-02a8-487b-819e-6f76a761777d \
+   MCP_CANARY_SEO_DENY_ORGANIZATION_ID=org-00000000-0000-0000-0000-000000000000 \
+   node scripts/oauth-canary.mjs
+   ```
+
+   ```json
+   {
+     "oauth": "passed",
+     "initializeStatus": 200,
+     "initializeContentType": "text/event-stream",
+     "globeCapabilitiesStatus": 200,
+     "globeFleetStatus": 200,
+     "seoEntitlementStatus": 200,
+     "seoVisibility360Status": 200,
+     "seoDomainQuadrant": "riesgo",
+     "seoDenyFailedClosed": true
+   }
+   ```
+
+   **`seoDomainQuadrant=riesgo` es el quadrant real de Berel devuelto por el front door
+   público**, con token Entra real, sobre el scope base `efeonce.mcp.read`: la cadena
+   Entra → gateway → provider → lane ecosystem → readers → PG está cerrada end-to-end.
+   El deny anti-oracle también falla cerrado por esta ruta. Requiere login interactivo,
+   así que es un smoke asistido por humano, no automatizable en CI.
 
 ## Verification
 
@@ -279,13 +340,13 @@ Seguir el protocolo de providers de la skill `efeonce-mcp-platform`: clasificar 
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] el archivo vive en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] chequeo de impacto cruzado (EPIC-022 exit criterion parity+MCP; TASK-1645 referencia cerrada; TASK-1626 registry de providers)
-- [ ] manual MCP + doc del gateway actualizados
+- [x] `Lifecycle` sincronizado
+- [x] el archivo vive en la carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado
+- [x] chequeo de impacto cruzado (EPIC-022 exit criterion parity+MCP; TASK-1645 referencia cerrada; TASK-1626 registry de providers)
+- [x] manual MCP + doc del gateway actualizados
 
 ## Follow-ups
 

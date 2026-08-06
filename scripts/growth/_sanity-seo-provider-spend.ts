@@ -36,7 +36,7 @@ const main = async () => {
     '@/lib/postgres/client'
   )
 
-  const { SEO_PROVIDER_SPEND_UPSERT_SQL, SEO_PROVIDER_SPEND_MONTHLY_SUM_SQL } = await import(
+  const { SEO_PROVIDER_SPEND_UPSERT_SQL, buildSeoProviderSpendMonthlySumSql } = await import(
     '@/lib/growth/seo/provider-spend'
   )
 
@@ -115,7 +115,7 @@ const main = async () => {
       // 4. El fragmento que consume el gate de presupuesto ve el total del mes.
       const spend = (
         await client.query<{ spend: string }>(
-          `SELECT ${SEO_PROVIDER_SPEND_MONTHLY_SUM_SQL}::text AS spend`,
+          `SELECT ${buildSeoProviderSpendMonthlySumSql('$1')}::text AS spend`,
           [orgId]
         )
       ).rows[0]

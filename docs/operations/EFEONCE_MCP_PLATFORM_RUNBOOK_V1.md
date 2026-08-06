@@ -35,9 +35,13 @@ Un front door con DNS publicado pero certificado no `ACTIVE` no califica como `p
 rollout TLS pendiente. No presentar `private_canary`, `edge_ready` ni ese estado transitorio como producción
 pública.
 
-**Estado vigente:** `public_read_only`, con OAuth obligatorio y el único reader federado
-`globe.producer.fleet.list`. El provider Globe continúa limitado al workspace interno exacto; este estado no
-habilita clientes externos ni multitenancy.
+**Estado vigente:** `public_read_only`, con OAuth obligatorio y dos providers read-only federados:
+
+- Globe, con el reader `globe.producer.fleet.list`, limitado al workspace interno exacto;
+- Greenhouse-SEO, con `get_seo_entitlement`, `get_seo_keyword_opportunities` y `get_seo_visibility_360`,
+  habilitado el 2026-08-06 y acotado por el entitlement per-org del módulo SEO de Greenhouse.
+
+Este estado no habilita clientes externos ni multitenancy.
 
 ## Preflight
 
@@ -73,6 +77,9 @@ habilita clientes externos ni multitenancy.
 | `GREENHOUSE_API_URL` | no | origin Greenhouse exacto para el command de funding |
 | `GREENHOUSE_TOKEN_EXCHANGE_URL` | no | endpoint RFC 8693 exacto y audience del ID token WIF |
 | `GREENHOUSE_VERCEL_BYPASS_SECRET` | sí | inyectado desde `greenhouse-vercel-automation-bypass` en GCP Secret Manager; nunca GitHub var/env file |
+| `GREENHOUSE_SEO_PROVIDER_ENABLED` | no | default `false`; `true` sólo con lane Greenhouse verde y canary aprobado |
+| `GREENHOUSE_ECOSYSTEM_API_URL` | no | origin Greenhouse exacto del lane ecosystem; en producción `https://greenhouse.efeoncepro.com` |
+| `GREENHOUSE_ECOSYSTEM_TOKEN` | sí | inyectado desde `efeonce-mcp-gateway-greenhouse-token` en GCP Secret Manager; nunca valor plano en `vars`, workflow ni env file |
 
 Si falta configuración OAuth, `/health` responde pero `/mcp` devuelve `503 oauth_not_configured`. Esto es el
 comportamiento seguro esperado, no una razón para habilitar acceso anónimo.
@@ -169,6 +176,157 @@ el scope básico de un tenant único en una autorización comercial o multi-tena
 - Canary certificado 2026-08-01: gateway `3add7b2`, workflow `30723992263`, authority
   `df166eab-2c22-4009-a674-b83c8df307e4`, outcome `completed/no_effect`, operación Globe
   `b69ecd23-6e41-4a5c-9bdf-c3f212e8bbeb` y capacidad efectiva sin cambio en 800.
+
+## Provider Greenhouse-SEO (Search Visibility 360)
+
+> Task dueña: `TASK-1647` (federación al gateway) sobre `TASK-1645` (lane ecosystem + tools en el MCP de
+> Greenhouse). Habilitado en producción el 2026-08-06.
+
+El provider `greenhouse-seo` es un **adapter delgado**: transporte, auth y routing. No tiene lógica de dominio.
+Delega en el lane ecosystem de Greenhouse (`/api/platform/ecosystem/growth/seo/*`), que ya aplica el entitlement
+per-org `seo_v1`, el 404 anti-oracle y las degradaciones honestas. Los payloads se pasan tal cual (`data` del
+envelope del lane), así que un cliente MCP ve exactamente los mismos shapes que la UI y Nexa.
+
+Tools publicadas, todas read-only y bajo el **scope base** `efeonce.mcp.read` (no hay un scope `seo` propio):
+
+| Tool | Recurso del lane |
+| --- | --- |
+| `get_seo_entitlement` | `GET /api/platform/ecosystem/growth/seo/entitlement` |
+| `get_seo_keyword_opportunities` | `GET /api/platform/ecosystem/growth/seo/keyword-opportunities` |
+| `get_seo_visibility_360` | `GET /api/platform/ecosystem/growth/seo/visibility-360` |
+
+Identidad hacia Greenhouse: consumer sister-platform `EO-SPK-0004` con binding `EO-SPB-0004` (scope `internal`,
+por lo que `organizationId` es un parámetro requerido). El gateway envía `x-greenhouse-sister-platform-key:
+efeonce-mcp-gateway` y un `x-correlation-id`. Timeout upstream 10 s. Un error del lane se propaga como código
+sanitizado (`greenhouse_seo_lane_<status>`), nunca el body crudo.
+
+### Configuración runtime
+
+- `GREENHOUSE_SEO_PROVIDER_ENABLED=true`
+- `GREENHOUSE_ECOSYSTEM_API_URL=https://greenhouse.efeoncepro.com`
+- `GREENHOUSE_ECOSYSTEM_TOKEN` como **secret ref** de Cloud Run → `efeonce-mcp-gateway-greenhouse-token:latest`
+
+El arranque falla en `loadConfig` si `GREENHOUSE_SEO_PROVIDER_ENABLED=true` y falta la URL o el token. Con el
+provider apagado o mal configurado, las tres tools responden `503 greenhouse_seo_policy_blocked` — fail-closed
+esperado, no una razón para pasar el token como valor plano.
+
+Del lado de Greenhouse, el flag del módulo es `GROWTH_SEO_ENABLED` y es **multi-runtime**: Vercel lo lee para el
+lane ecosystem y el `ops-worker` lo lee para el materializador de Search Console. Prenderlo en un solo runtime
+deja el otro camino muerto. Está `true` en Vercel Production desde el redeploy `dpl_GyGkdEQQTk65qkCs1S3TEH6Jquy9`.
+
+### Patrón de secret ref — dos gotchas que rompen el deploy
+
+1. **El secreto puede nacer sin ninguna binding IAM.** `efeonce-mcp-gateway-greenhouse-token` se creó sin
+   políticas, y Cloud Run no puede montar lo que la service account no puede leer: el deploy falla. Hay que
+   otorgar `roles/secretmanager.secretAccessor` **scoped al secreto** para la SA de runtime del gateway:
+
+   ```bash
+   gcloud secrets add-iam-policy-binding efeonce-mcp-gateway-greenhouse-token \
+     --project=efeonce-group \
+     --member=serviceAccount:efeonce-mcp-gateway@efeonce-group.iam.gserviceaccount.com \
+     --role=roles/secretmanager.secretAccessor
+   ```
+
+   No lo resuelvas con un rol a nivel de proyecto ni reutilizando otra service account.
+
+2. **`--set-secrets` es destructivo, igual que `--set-env-vars`.** Reemplaza el conjunto completo de secretos de
+   la revisión. Todos los secretos del gateway van en la **misma** bandera del `deploy.yml`; si declaras uno y
+   omites otro, el próximo deploy borra el omitido en silencio. Hoy la bandera declara juntos
+   `GREENHOUSE_VERCEL_BYPASS_SECRET` y `GREENHOUSE_ECOSYSTEM_TOKEN`. Aplicar un secreto sólo con
+   `gcloud run services update --update-secrets` fuera del workflow tiene el mismo destino: dura hasta el
+   siguiente deploy.
+
+### Canary del provider contra el lane
+
+Ejercita el provider real (compilado) con la service identity del gateway, sin pasar por OAuth ni por el front
+door. Aísla "¿el adapter y el lane hablan?" de "¿el borde público autentica?". Requiere `pnpm build` previo.
+
+```bash
+cd ~/Documents/efeonce-mcp
+pnpm build
+GREENHOUSE_ECOSYSTEM_API_URL=https://greenhouse.efeoncepro.com \
+GREENHOUSE_ECOSYSTEM_TOKEN=$(gcloud secrets versions access latest \
+  --secret=efeonce-mcp-gateway-greenhouse-token --project=efeonce-group) \
+node scripts/greenhouse-seo-canary.mjs <organizationId> [<orgSinModulo>...]
+```
+
+El script nunca imprime el token. Resultado esperado: entitlement por org, `visibility-360` con `domainQuadrant`
+o una degradación honesta explícita, y `404` para una org sin el módulo. Contra un entorno con Vercel Deployment
+Protection agrega `GREENHOUSE_ECOSYSTEM_VERCEL_BYPASS_SECRET`; nunca envíes ese bypass a Globe ni lo dejes en logs.
+
+Corrida de certificación 2026-08-06 contra producción:
+
+- Berel: `domainQuadrant=riesgo`, 50 keywords, score AEO 44.5;
+- Efeonce: `hasModule=true`, `tier=contracted`, con degradación honesta `no_seo_data` (entitled, sin serie SEO);
+- org sin módulo: deny anti-oracle `404` → `greenhouse_seo_lane_404`.
+
+### Smoke autenticado por el front door
+
+El canary OAuth (`scripts/oauth-canary.mjs`) cubre las tools SEO cuando se le pasan las dos organizaciones:
+
+```bash
+MCP_CANARY_SEO_ORGANIZATION_ID=<org-entitled> \
+MCP_CANARY_SEO_DENY_ORGANIZATION_ID=<org-sin-modulo> \
+pnpm oauth:canary
+```
+
+Resultado 2026-08-06 con token Entra real sobre el scope base: `initialize 200`, `seoEntitlementStatus 200`,
+`seoVisibility360Status 200`, `seoDomainQuadrant="riesgo"` (el cuadrante real de Berel a través del hostname
+público) y `seoDenyFailedClosed=true`.
+
+**Este smoke exige un login Entra interactivo** (authorization-code + PKCE con callback en `localhost:8765`): es
+asistido por humano y **no es automatizable en CI**. No lo sustituyas por el canary del provider — ese no pasa
+por OAuth ni por el edge.
+
+La pantalla de callback del canary es una página HTML autocontenida (light/dark, logotipo Efeonce inline) que
+**limpia el authorization code de la URL con `history.replaceState`**: el code viajaba en el query string y
+quedaba en el historial del navegador. Responde con `cache-control: no-store` y `referrer-policy: no-referrer`, y
+escapa el `error_description` del IdP, que es entrada no confiable. No la reemplaces por un `text/plain` que
+conserve el code en la barra de direcciones.
+
+### Smoke del front door
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' https://mcp.efeonce.org/health
+curl -s https://mcp.efeonce.org/.well-known/oauth-protected-resource
+curl -s -i -X POST https://mcp.efeonce.org/mcp -H 'content-type: application/json' -d '{}' | head -20
+```
+
+Esperado el 2026-08-06: `/health` `200`; protected-resource metadata `200` declarando los 3 scopes; `POST /mcp`
+anónimo `401` con `WWW-Authenticate: Bearer resource_metadata=… scope="efeonce.mcp.read"`.
+
+### Rollback del provider
+
+`GREENHOUSE_SEO_PROVIDER_ENABLED=false` y deploy: las tools pasan a `503 greenhouse_seo_policy_blocked` y el resto
+del gateway sigue operando. No retires el gateway ni el front door por una falla del lane SEO.
+
+Segundo nivel, del lado de Greenhouse: `GROWTH_SEO_ENABLED=false`. Recuerda que es multi-runtime — apagarlo en
+Vercel deja el lane muerto pero **no** detiene el materializador del `ops-worker`, y viceversa. Tercer nivel, por
+organización: revocar el assignment `seo_v1` (con `effective_to`/`status`, nunca `DELETE` de historia) apaga a esa
+org sin tocar runtime.
+
+Nunca resuelvas un problema del provider ampliando el scope, quitando el entitlement per-org ni convirtiendo el
+`404` anti-oracle en un `403` que revele la existencia de la organización.
+
+### Registro de habilitación — 2026-08-06
+
+- Greenhouse: release `develop→main` SHA `70e912056273d0a30e2aa8dacc2f4e62076e3b44`, `release_id`
+  `70e912056273-03c36b47-eb75-469c-886f-51c691cd7c34`, run `31058032196`, manifest `released`, watchdog
+  `drift_count=0`;
+- Greenhouse runtime: `GROWTH_SEO_ENABLED=true` en Vercel Production, redeploy
+  `dpl_GyGkdEQQTk65qkCs1S3TEH6Jquy9`;
+- Gateway: repo `efeoncepro/efeonce-mcp` commit `76cb121`, workflow run `31059346243`, revisión Cloud Run
+  `efeonce-mcp-gateway-00012-dkj` con `Ready=True` en `southamerica-west1` / `efeonce-group`;
+- identidad hacia Greenhouse: consumer `EO-SPK-0004` + binding `EO-SPB-0004`;
+- canary del provider contra producción: Berel `riesgo` (50 keywords, AEO 44.5) · Efeonce `contracted` con
+  `no_seo_data` · deny `404`;
+- smoke autenticado por `mcp.efeonce.org`: `initialize 200`, entitlement `200`, visibility-360 `200`,
+  `domainQuadrant="riesgo"`, deny fail-closed;
+- front door: `/health` `200`, protected-resource metadata `200` con 3 scopes, `POST /mcp` anónimo `401`;
+- rollback: `GREENHOUSE_SEO_PROVIDER_ENABLED=false` + deploy, o revisión previa del gateway. **[verificar]** la
+  revisión previa exacta a la que revertir no quedó registrada en esta sesión; léela con
+  `gcloud run revisions list --service=efeonce-mcp-gateway --region=southamerica-west1 --project=efeonce-group`
+  antes de necesitarla.
 
 ## Front door and DNS
 

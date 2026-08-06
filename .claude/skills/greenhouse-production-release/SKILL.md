@@ -130,6 +130,10 @@ The normal release path is:
    - `--fail-on-error` must fail on any `readyToDeploy=false` payload; do
      not promote a degraded or unknown preflight.
 4. Promote the intended SHA to `main` through the repo-approved merge/push path.
+   - **Antes de crear el PR, corre la pre-empción de los 3 gotchas** (ver
+     `## Pre-empción de los 3 gotchas` más abajo + runbook §2.4). Es la
+     diferencia verificada entre un release que pasa a la primera y uno que
+     quema runs, bypasses y retries.
    - The orchestrator expects `target_sha` to already exist on `main`.
    - Vercel production deploy is triggered by Git integration on push to `main`; the orchestrator waits for that deployment to be READY.
    - Worker Cloud Run production deploys are not triggered by `push:main`; the orchestrator owns them through `workflow_call`.
@@ -186,7 +190,7 @@ GITHUB_RELEASE_OBSERVER_TOKEN="$(gh auth token)" pnpm release:watchdog --json
    not contain `.npmrc`, the package token, or an unscoped registry credential.
 10. **Prender los flags pendientes de este release — en TODOS los runtimes, no sólo Vercel.** Revisar `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` → `§ Pendientes de acción`. Por cada feature `code-complete` cuyo flip estaba gated a este release:
     - **Paso 0 obligatorio — mapear dónde se LEE el flag:** `grep -rn "<FLAG>" src/ services/ | grep -v __tests__`. Hay **5 runtimes con env vars independientes**: Vercel (app Next.js) + 4 Cloud Run (`ops-worker`, `commercial-cost-worker`, `ico-batch-worker`, `hubspot-greenhouse-integration`). Prenderlo en uno **NO** lo prende en los otros. **Heurística:** si gatea algo **async** (email, projection reactiva, consumer del outbox, cron de Cloud Scheduler, materializer) vive en el **`ops-worker`, NO en Vercel** — prenderlo en Vercel no hace nada; si gatea una ruta/superficie visible vive en Vercel; puede vivir en **ambos**.
-    - **Aplicar en cada runtime del mapeo:** Vercel → `vercel env add <FLAG> Production` + redeploy. Cloud Run → **los DOS pasos**: (a) declarar el flag en `services/<worker>/deploy.sh` (SoT; esos scripts usan `--set-env-vars` **destructivo**, que borra cualquier var agregada out-of-band) y (b) `gcloud run services update <svc> --region <us-east4|us-central1> --project efeonce-group --update-env-vars <FLAG>=true` para efecto inmediato. Hacer sólo (b) = el flag desaparece en el próximo deploy del worker, en silencio.
+    - **Aplicar en cada runtime del mapeo:** Vercel → `vercel env add <FLAG> Production` + **redeploy obligatorio** (Vercel **congela las env vars al crear el build**: un flag agregado después del build productivo del release no existe para el runtime hasta que hay un deployment nuevo — caso 2026-08-06, `GROWTH_SEO_ENABLED` requirió `dpl_GyGkdEQQTk65qkCs1S3TEH6Jquy9`). Si el flag se puede prender **antes** del merge del PR, el build del release lo hornea y el redeploy no existe. Cloud Run → **los DOS pasos**: (a) declarar el flag en `services/<worker>/deploy.sh` (SoT; esos scripts usan `--set-env-vars` **destructivo**, que borra cualquier var agregada out-of-band) y (b) `gcloud run services update <svc> --region <us-east4|us-central1> --project efeonce-group --update-env-vars <FLAG>=true` para efecto inmediato. Hacer sólo (b) = el flag desaparece en el próximo deploy del worker, en silencio.
     - **Verificar en el deploy/revisión ACTIVO** (`vercel env ls` · `gcloud run revisions describe <rev> --format="json(spec.containers[0].env)"`) **y ejercitar el flujo real** — que la var exista ≠ que el consumer funcione.
     - **Actualizar la fila del ledger declarando el/los runtime(s)** + fecha + revisión Cloud Run. Sin el runtime explícito, el próximo agente asume Vercel y se equivoca.
 
@@ -201,17 +205,59 @@ GITHUB_RELEASE_OBSERVER_TOKEN="$(gh auth token)" pnpm release:watchdog --json
     anterior conocido, verificar salud y smoke del rollback, y conservar ambos digests/SHA y la evidencia.
     Restaurar tráfico sin conservar la configuración de build/credencial no es un rollback reproducible.
 
-## Gotchas conocidos del release (verificados 2026-07-03 #139; fix de raíz = ISSUE-114)
+## Pre-empción de los 3 gotchas (camino recomendado — verificado 2026-08-06)
+
+Los gotchas #1/#2/#3 de abajo **no hay que sufrirlos: hay que pre-emptarlos**. El
+release `70e912056273d0a30e2aa8dacc2f4e62076e3b44` (release_id
+`70e912056273-03c36b47-eb75-469c-886f-51c691cd7c34`, run `31058032196`, PR #177,
+355 commits / 221 archivos de código / 14 migraciones) fue el primero del ledger
+que **pasó a la primera: sin `bypass_preflight_reason`, sin retry y con
+`drift_count=0`**. No fue por ser un batch chico — fue por el orden.
+
+> **Un gotcha documentado y no pre-emptado es un incidente agendado.** El
+> catálogo se aplica ANTES de crear el PR, no cuando el gate ya está rojo.
+> Antes de escribir un bypass, la pregunta correcta es **"¿puedo producir la
+> evidencia que falta?"**, no "¿cómo justifico saltármela?".
+
+Secuencia (comandos exactos + verificaciones en el runbook §2.4):
+
+```bash
+# A — Gotcha #1: merge canónico en develop ANTES de crear el PR
+git fetch origin && git switch develop
+git merge origin/main -X ours --no-edit
+#   -X ours NO resuelve modify/delete: esos se deciden a mano, develop manda.
+#   git status --short | grep '^DU\|^UD'  →  git rm <ruta-que-main-resucita>
+git log origin/main --not HEAD --oneline                        # debe salir vacío
+git diff HEAD@{1} HEAD -- src/ scripts/ services/ migrations/   # debe salir vacío
+git push origin develop     # → el PR queda MERGEABLE
+
+# B — Gotcha #2: marker en el CUERPO del commit de squash (no bypass)
+gh pr merge <pr> --squash --body "[release-coupled: <por qué conviven los dominios>]"
+
+# C — Gotcha #3: producir el smoke sobre main en vez de bypassearlo (~3 min)
+gh workflow run playwright.yml --ref main
+```
+
+Después: esperar `CI` + `CI Deep Verification` + Vercel `Ready` **para el SHA de
+`main`** + el smoke recién disparado; piso duro de **8 min** desde el push antes
+del dispatch (el 2026-08-06 fueron 24 min); y polear `pending_deployments` en
+loop desde el arranque para los DOS gates `production` (gotcha #6).
+
+## Gotchas conocidos del release (verificados 2026-07-03 #139 y 2026-08-06 #177; fix de raíz de #2 = ISSUE-114)
 
 El flujo de **squash-merge** produce condiciones recurrentes que NO son fallas reales. No las persigas como bugs; aplica la mitigación:
 
-1. **El PR `develop→main` conflicta ("merge commit cannot be cleanly created").** `main` (squashes de releases previos) no es ancestro de `develop` → conflictos (docs Handoff/changelog/README/registry y a veces código). **Resolución robusta:** en `develop`, `git merge origin/main -X ours --no-edit` (`develop` es autoritativo — contiene todo `main` por construcción: los squash de `main` son DE commits de `develop`). Verifica: `git log origin/main --not develop` vacío **y** `git diff HEAD@{1} HEAD -- src/ scripts/` sin cambios de código. Push `develop` → el PR queda MERGEABLE. Bonus: **avanza la merge-base** y reduce la divergencia del próximo release. **NUNCA** cherry-pick a `main` (duplica SHAs).
+1. **El PR `develop→main` conflicta ("merge commit cannot be cleanly created").** `main` (squashes de releases previos) no es ancestro de `develop` → conflictos (docs Handoff/changelog/README/registry y a veces código). **Resolución robusta:** en `develop`, `git merge origin/main -X ours --no-edit` (`develop` es autoritativo — contiene todo `main` por construcción: los squash de `main` son DE commits de `develop`). Verifica: `git log origin/main --not HEAD` vacío **y** `git diff HEAD@{1} HEAD -- src/ scripts/ services/ migrations/` sin cambios de código. Push `develop` → el PR queda MERGEABLE. Bonus: **avanza la merge-base** y reduce la divergencia del próximo release. **NUNCA** cherry-pick a `main` (duplica SHAs).
+   **Resolución verificada 2026-08-06:** `-X ours` resuelve los conflictos de **contenido**, pero **no** los `modify/delete` — ésos quedan detenidos y se deciden a mano. Caso real: `TASK-1590` estaba **borrada** en `develop` (migró de `to-do/` a `in-progress/`) y **modificada** en `main`; se resolvió conservando el estado de `develop` (`git rm` de la copia en `to-do/`). Las dos verificaciones salieron vacías y el PR quedó MERGEABLE de entrada. La segunda verificación es la que prueba que el merge fue documental y que `-X ours` no se comió código de producción — no la omitas.
 
-2. **Preflight `release_batch_policy=requires_break_glass` falso positivo.** El classifier usa diff *three-dot* (`origin/main...target`, merge-base) → resucita archivos ya desplegados en un release previo (ej. `services/ops-worker/deploy.sh`) como `cloud_release` irreversible. Confirma el fantasma: `git diff origin/main..target -- <archivo>` = 0 líneas. Post-merge (target = HEAD de `main`) el batch-policy del orchestrator ve diff vacío y pasa. Fix de raíz pendiente = **ISSUE-114** (three-dot → two-dot).
+2. **Preflight `release_batch_policy` falso positivo (`requires_break_glass` o `split_batch`).** El classifier usa diff *three-dot* (`origin/main...target`, merge-base) → resucita archivos ya desplegados en un release previo (ej. `services/ops-worker/deploy.sh`) como `cloud_release` irreversible, e infla el conteo de archivos. Confirma el fantasma: `git diff origin/main..target -- <archivo>` = 0 líneas. Post-merge (target = HEAD de `main`) el batch-policy del orchestrator ve diff vacío y pasa. Fix de raíz pendiente = **ISSUE-114** (three-dot → two-dot).
+   **Resolución verificada 2026-08-06:** el preflight **local** dio `split_batch` por "payroll + auth_access mezclados" sobre **1051 archivos** inflados (los de código reales eran 221). La respuesta canónica **no fue** `bypass_preflight_reason`, sino el marker `[release-coupled: <razón>]` en el **cuerpo del commit de squash** — que es lo que lee el classifier del orquestador —, explicando que los dominios mezclados son acumulación de una semana de trabajo independiente y ya verde, no un acoplamiento de diseño. Con eso el preflight del orquestador pasó `ship` **sin bypass**. Si la razón honesta fuera "son cambios acoplados de verdad y no sé explicar el rollback en una frase", el batch hay que **partirlo**, no marcarlo.
 
-3. **`playwright_smoke` (0 runs) + evidencia aún corriendo en el squash commit fresco de `main`.** El smoke corre en `develop` (ya verde); el commit de `main` no tiene su propio smoke. Antes del primer dispatch, esperar `CI`, `CI Deep Verification` y Vercel Production `READY` para el SHA exacto. Con esos prerequisitos verdes, un `bypass_preflight_reason` forense (≥20 chars) puede cubrir sólo la ausencia inevitable del smoke en el squash; nunca cubrir checks pendientes o fallidos.
+3. **`playwright_smoke` (0 runs) + evidencia aún corriendo en el squash commit fresco de `main`.** El smoke corre en `develop` (ya verde); el commit de `main` no tiene su propio smoke. Antes del primer dispatch, esperar `CI`, `CI Deep Verification` y Vercel Production `READY` para el SHA exacto.
+   **Resolución verificada 2026-08-06 — la alternativa HONESTA al bypass es producir el check:** `gh workflow run playwright.yml --ref main` sobre el SHA de `main` y esperar verde. Tardó **3m10s** (run `31057847351`). Ése es el costo total de no bypassear nada. Un `bypass_preflight_reason` forense (≥20 chars) queda reservado para cuando el smoke **falla por infraestructura** y el operador lo autoriza; nunca para ahorrarse 3 minutos, y nunca para cubrir checks pendientes o fallidos.
 
 4. **ops-worker puede quedar con GIT_SHA rezagado tras el release — NO es drift si el diff runtime está vacío.** `ops-worker-deploy` es *change-gated*: si ningún worker-runtime-path cambió desde `EXPECTED_SHA`, salta el rebuild (`deploy_needed=false`) y el servicio conserva el SHA del último deploy que sí tocó código de worker (código idéntico al target, por diseño — ver el step de worker-drift del workflow). Si el watchdog final marca solo `ops-worker`, comparar Cloud Run `GIT_SHA` contra `target_sha` en rutas runtime; si `git diff --name-only <cloud_run_git_sha> <target_sha> -- package.json pnpm-lock.yaml tsconfig.json services/ops-worker scripts/ops-worker src/lib/ops src/lib/release` no devuelve archivos y Cloud Run está `Ready=True`, parar: documenta residual de label y **NO** fuerces redeploy para "alinear el label". Los otros 3 workers sí redeployan al target.
+   **Delta 2026-08-06 — el watchdog YA clasifica bien este residual.** Hasta el release `503186d7147a` (2026-07-17) lo reportaba como `severity=error` por comparación mecánica de SHA, y cada agente tenía que refutarlo a mano. El fix vive en el commit `6f7e246ea` de `main`: en el release `70e912056273` el `ops-worker` quedó en `558558263e80` (un SHA de `develop` del mismo día), con diff de rutas runtime vacío y `Ready=True`, y el watchdog reportó **`drift_count=0`** explicándolo en su propio `detail` (`change-gated — rutas runtime sin cambios`). Consecuencia: si hoy ves `severity=error` por `ops-worker` con diff vacío, **no lo asumas benigno por costumbre** — verifica que estás corriendo el reader del `main` actual. El `git diff` de arriba sigue siendo la verificación que manda.
 
 5. **Vercel Ignored Build Step no aplica a production/main.** Desde 2026-07-08,
    `vercel.json` puede cancelar builds docs-only de `develop`/previews mediante

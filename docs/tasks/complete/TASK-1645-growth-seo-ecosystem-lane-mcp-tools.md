@@ -40,7 +40,7 @@ cero residuo. Full suite 10168/0 + build prod verdes.
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -292,12 +292,27 @@ Espejar TASK-1086 end-to-end: lane con `runEcosystemReadRoute` (subject binding 
 ## Acceptance Criteria
 
 - [ ] Lane `GET /api/platform/ecosystem/growth/seo/*` live con `runEcosystemReadRoute`, org derivada del binding, entitlement chokepoint de TASK-1301 y anti-oracle 404.
-- [ ] 3 MCP tools registrados delegando en readers canónicos; cero SQL directo a `seo_*` fuera de `src/lib/growth/seo/**` (verificable por grep).
-- [ ] Shape `{ ok } | { ok: false, errorCode, status }` idéntico al del reader en los 3 consumers (test de paridad).
-- [ ] Ningún write path expuesto como tool; follow-up de governed action loop declarado.
-- [ ] Smoke staging: org entitled → data; org no entitled → deny; 1 invocación MCP e2e documentada.
-- [ ] **Disponibilidad en `mcp.efeonce.org` con dueño:** provider Greenhouse-SEO registrado en el gateway (TASK-1626) federando los 3 tools bajo scope read + smoke por el gateway, O — si el gateway aún no está GA al cerrar esta task — task dedicada de federación creada, registrada y referenciada acá (NUNCA un "pendiente" sin task).
-- [ ] `pnpm lint` + `pnpm typecheck` + tests focales verdes.
+- [x] 3 MCP tools registrados delegando en readers canónicos; cero SQL directo a `seo_*` fuera de `src/lib/growth/seo/**` (verificable por grep).
+- [x] Shape `{ ok } | { ok: false, errorCode, status }` idéntico al del reader en los 3 consumers (test de paridad).
+- [x] Ningún write path expuesto como tool; follow-up de governed action loop declarado.
+- [x] Smoke staging: org entitled → data; org no entitled → deny; 1 invocación MCP e2e documentada.
+- [x] **Disponibilidad en `mcp.efeonce.org` con dueño:** provider Greenhouse-SEO registrado en el gateway (TASK-1626) federando los 3 tools bajo scope read — cerrado por **TASK-1647** (revisión `efeonce-mcp-gateway-00012-dkj`, 2026-08-06).
+- [x] `pnpm lint` + `pnpm typecheck` + tests focales verdes.
+
+## Delta 2026-08-06 — rollout a producción cerrado
+
+El lane quedó **vivo en producción**: release `70e912056273`
+(`release_id=70e912056273-03c36b47-eb75-469c-886f-51c691cd7c34`, run `31058032196`,
+manifest `released`) + `GROWTH_SEO_ENABLED=true` en Vercel Production con redeploy
+`dpl_GyGkdEQQTk65qkCs1S3TEH6Jquy9`.
+
+Verificado con **tráfico real contra `https://greenhouse.efeoncepro.com`** (no con `vercel env ls`),
+usando la service identity del gateway (consumer `EO-SPK-0004` / binding `EO-SPB-0004`):
+Berel `domainQuadrant=riesgo` con 50 keywords y AEO 44.5; Efeonce `hasModule=true tier=contracted`
+con degradación honesta `no_seo_data`; deny anti-oracle `404 greenhouse_seo_lane_404`.
+
+El flag es **multi-runtime**: el mismo `GROWTH_SEO_ENABLED` gatea el materializer GSC en el
+`ops-worker` (TASK-1302) y este lane en Vercel. Prenderlo en uno solo deja el otro camino muerto.
 
 ## Verification
 
@@ -308,13 +323,13 @@ Espejar TASK-1086 end-to-end: lane con `runEcosystemReadRoute` (subject binding 
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] el archivo vive en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] chequeo de impacto cruzado (EPIC-022 exit criteria; TASK-1626 gateway)
-- [ ] Delta en `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` (lane growth/seo) + manual MCP
+- [x] `Lifecycle` sincronizado
+- [x] el archivo vive en la carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado
+- [x] chequeo de impacto cruzado (EPIC-022 exit criteria; TASK-1626 gateway → TASK-1647)
+- [x] Delta en `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` (lane growth/seo) + manual MCP
 
 ## Follow-ups
 

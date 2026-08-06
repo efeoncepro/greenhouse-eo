@@ -17,12 +17,16 @@ const state = {
     expires_at: string | null
   } | null,
   auditRunsUsed: 0,
-  spendUsedUsd: 0
+  spendUsedUsd: 0,
+  /** SQL capturado de la query de uso, para verificar DE DÓNDE sale el gasto. */
+  usageSql: ''
 }
 
 vi.mock('@/lib/postgres/client', () => ({
   runGreenhousePostgresQuery: async (sql: string) => {
     if (sql.includes('audit_runs_used')) {
+      state.usageSql = sql
+
       return [
         {
           audit_runs_used: state.auditRunsUsed,
@@ -41,6 +45,30 @@ vi.mock('@/lib/postgres/client', () => ({
 }))
 
 import { enforceSeoRunEntitlement, resolveSeoEntitlement } from '../entitlement'
+
+/**
+ * TASK-1300 — El gasto sale de UNA sola fuente.
+ *
+ * El resto de los tests mockea el resultado de la query sin mirar de qué tabla viene, así
+ * que pasarían igual si alguien revirtiera la fuente a las tablas snapshot — o, peor, si
+ * sumara AMBAS (el doble conteo que esta task cerró: agotaría los presupuestos a la mitad,
+ * en silencio). Esto lo verifica sobre el SQL real.
+ */
+describe('fuente del gasto del período', () => {
+  it('lee el ledger `seo_provider_spend_daily` y NO el provider_cost de los snapshots', async () => {
+    state.usageSql = ''
+    await resolveSeoEntitlement('org-1')
+
+    expect(state.usageSql).toContain('seo_provider_spend_daily')
+    expect(state.usageSql).toContain('provider_cost_usd')
+
+    // Las 3 tablas snapshot de TASK-1299 ya no son fuente de presupuesto: su
+    // `provider_cost` queda como procedencia por fila.
+    expect(state.usageSql).not.toContain('seo_rank_snapshots')
+    expect(state.usageSql).not.toContain('seo_backlink_snapshots')
+    expect(state.usageSql).not.toMatch(/SUM\(\s*\w+\.provider_cost\s*\)/)
+  })
+})
 
 // Defaults: contracted 8 audits / USD 50; trial 1 / USD 2; pilot 2 / USD 10.
 const ENV = {} as NodeJS.ProcessEnv
@@ -210,6 +238,52 @@ describe('enforceSeoRunEntitlement', () => {
     const gate = await enforceSeoRunEntitlement('org-berel', { estimatedCostUsd: 4 }, ENV)
 
     expect(gate.allowed).toBe(true)
+  })
+
+  // TASK-1303 — el rank capture no crea audit runs: quota_exhausted no puede congelar la
+  // serie diaria de un org que agotó sus audits. El freno de esa capability es budget.
+  it('quota_exhausted + consumesAuditAllowance=false → allowed=true (rank capture)', async () => {
+    state.assignment = {
+      assignment_id: 'cpma-2',
+      status: 'active',
+      metadata_json: { seo_tier: 'trial' },
+      expires_at: null
+    }
+    state.auditRunsUsed = 1 // trial cap = 1 → quota_exhausted
+
+    const audit = await enforceSeoRunEntitlement('org-trial', {}, ENV)
+
+    expect(audit.allowed).toBe(false)
+    expect(audit.blockedReason).toBe('quota_exhausted')
+
+    const rankCapture = await enforceSeoRunEntitlement('org-trial', { consumesAuditAllowance: false }, ENV)
+
+    expect(rankCapture.allowed).toBe(true)
+    expect(rankCapture.blockedReason).toBeNull()
+  })
+
+  it('consumesAuditAllowance=false NO salta el freno de budget ni el de expiración', async () => {
+    state.assignment = {
+      assignment_id: 'cpma-2',
+      status: 'active',
+      metadata_json: { seo_tier: 'trial' },
+      expires_at: null
+    }
+    state.auditRunsUsed = 1
+    state.spendUsedUsd = 2 // trial budget cap = 2 → restante 0
+
+    const gate = await enforceSeoRunEntitlement('org-trial', { consumesAuditAllowance: false }, ENV)
+
+    expect(gate.allowed).toBe(false)
+    expect(gate.blockedReason).toBe('budget_exhausted')
+
+    state.spendUsedUsd = 0
+    state.assignment.expires_at = '2026-01-01T00:00:00.000Z'
+
+    const expired = await enforceSeoRunEntitlement('org-trial', { consumesAuditAllowance: false }, ENV)
+
+    expect(expired.allowed).toBe(false)
+    expect(expired.blockedReason).toBe('expired')
   })
 
   it('config por env sobreescribe defaults (trial budget)', async () => {

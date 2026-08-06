@@ -25,6 +25,15 @@ const DEFAULT_COOLDOWN_MS = 60_000
 interface FamilyBreakerEntry {
   consecutiveFailures: number
   openedAt: number | null
+  /**
+   * `true` mientras una sonda de half-open está en vuelo.
+   *
+   * Sin esto, `canAttempt` sería una función pura del reloj y **todas** las llamadas
+   * concurrentes pasarían en el instante en que se cumple el cooldown — justo la estampida
+   * que el breaker existe para evitar. Con un consumer secuencial no se nota; con los crons
+   * SEO por organización, sí.
+   */
+  probeInFlight: boolean
 }
 
 export interface DataForSeoBreakerOptions {
@@ -56,7 +65,7 @@ export const createDataForSeoBreaker = (options: DataForSeoBreakerOptions = {}):
 
     if (existing) return existing
 
-    const created: FamilyBreakerEntry = { consecutiveFailures: 0, openedAt: null }
+    const created: FamilyBreakerEntry = { consecutiveFailures: 0, openedAt: null, probeInFlight: false }
 
     entries.set(family, created)
 
@@ -74,21 +83,37 @@ export const createDataForSeoBreaker = (options: DataForSeoBreakerOptions = {}):
   return {
     state,
 
-    // `half-open` deja pasar la sonda: si funciona, `recordSuccess` cierra el breaker; si
-    // falla, `recordFailure` reinicia el cooldown desde ahora.
-    canAttempt: family => state(family) !== 'open',
+    // `half-open` deja pasar UNA sola sonda, y la marca en vuelo: si funciona,
+    // `recordSuccess` cierra el breaker; si falla, `recordFailure` reinicia el cooldown.
+    // Las demás llamadas concurrentes siguen viendo el breaker cerrado al paso.
+    canAttempt: family => {
+      const current = state(family)
+
+      if (current === 'closed') return true
+      if (current === 'open') return false
+
+      const entry = entryFor(family)
+
+      if (entry.probeInFlight) return false
+
+      entry.probeInFlight = true
+
+      return true
+    },
 
     recordSuccess: family => {
       const entry = entryFor(family)
 
       entry.consecutiveFailures = 0
       entry.openedAt = null
+      entry.probeInFlight = false
     },
 
     recordFailure: family => {
       const entry = entryFor(family)
 
       entry.consecutiveFailures += 1
+      entry.probeInFlight = false
 
       if (entry.consecutiveFailures >= failureThreshold) {
         entry.openedAt = now()
@@ -104,3 +129,18 @@ export const createDataForSeoBreaker = (options: DataForSeoBreakerOptions = {}):
 
 /** Breaker compartido del proceso. Los tests crean el suyo con `createDataForSeoBreaker`. */
 export const dataForSeoBreaker = createDataForSeoBreaker()
+
+/**
+ * ¿Este HTTP status indica que el PROVEEDOR está en problemas?
+ *
+ * El breaker sólo debe contar señales de salud del proveedor. Un `400` por payload mal
+ * formado es un bug del caller: es determinista, se repite en cada llamada de esa corrida y
+ * abriría el breaker castigando a callers que sí funcionan — incluido el AEO, que comparte
+ * la familia `serp`. Lo mismo un `404` de endpoint equivocado.
+ *
+ * Sí cuentan: `429` (rate limit), `5xx` (el proveedor falla), y `402/403` porque indican
+ * saldo agotado o credencial revocada — condiciones que no se arreglan reintentando y donde
+ * frenar es exactamente lo correcto.
+ */
+export const isProviderHealthFailure = (httpStatus: number): boolean =>
+  httpStatus === 429 || httpStatus === 402 || httpStatus === 403 || httpStatus >= 500

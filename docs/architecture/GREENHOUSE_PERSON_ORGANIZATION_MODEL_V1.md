@@ -198,6 +198,53 @@ Gap residual catalogado en `TASK-193` (G5).
 
 Regla de promoción: cuando una org tipo `client` se usa como proveedor (vía `ensureOrganizationForSupplier`), su tipo se promueve a `both`. Implementado en `src/lib/account-360/organization-identity.ts`.
 
+### `organization_type` es un ROL COMERCIAL, no una identidad — y `'other'` significa "ninguno"
+
+La columna se llama `organization_type`, pero lo que modela es **`commercial_role`**: qué juega esa
+organización *frente a Efeonce en el mercado*. Y `'other'` no significa "sin clasificar / a medio
+cocinar": significa **sin rol comercial**. Si la columna se llamara `commercial_role` y el valor
+`'none'`, nadie dudaría. Se conserva el nombre histórico porque renombrar el enum toca todo el
+codebase; esta sección es el contrato semántico.
+
+**Corolario que genera dudas recurrentes:** la entidad legal operadora lleva `'other'` **porque no
+tiene rol comercial** — Efeonce no se vende ni se compra a sí misma. No es un hueco del modelo ni un
+estado "a medio cocinar". Su identidad la carga `is_operating_entity`, que es lo único que leen
+`getOperatingEntityIdentity`, los ledgers de IVA/PPM/retención, los PDF de nómina y finiquito, los
+contratos y los footers.
+
+**NUNCA** agregar un valor de identidad (`'internal'`, `'efeonce_internal'`, `'legal_entity'`) al
+enum: mezcla dos ejes. Ya se intentó y el modelo lo rechazó — quedó una rama muerta comparando
+`organization_type === 'efeonce_internal'` en
+`src/lib/commercial/party/commands/instantiate-client-for-party.ts`, contra un valor que el CHECK
+`organizations_type_check` nunca admitió. `efeonce_internal` es un **`tenant_type` de usuarios**
+(interno vs cliente, lo consume `session_360`/SCIM), no un tipo de organización.
+
+### Los tres ejes son ortogonales
+
+Una organización se describe con tres preguntas independientes; confundirlas es el bug class de
+esta tabla:
+
+| Eje | Pregunta | Dónde vive |
+|---|---|---|
+| Identidad legal | ¿quién soy? | `is_operating_entity` |
+| Rol comercial | ¿qué soy frente al mercado? | `organization_type` |
+| Capabilities | ¿qué hace la plataforma por mí? | `greenhouse_client_portal.module_assignments` |
+
+Por eso **la operadora puede monitorear sus propias métricas sin ser cliente**: SEO, AEO y lo que
+venga (GA4, RRSS) se habilitan por `module_assignments`, y ningún reader de módulos filtra por
+`organization_type`. Verificado con `enforceSeoRunEntitlement`
+(`src/lib/growth/seo/entitlement.ts`), que resuelve sólo por `organization_id` + `module_key`.
+
+> **Delta 2026-08-06.** EO-ORG-0007 (Efeonce) tenía `organization_type='client'`, herencia del
+> space de cliente de marzo 2026 — antes de decidir que la operadora no es cliente. Eso la metía en
+> los 5 readers client-facing (`api/finance/clients` y su detalle, `finance/canonical.ts`,
+> `postgres-store-slice2.ts`, `client-onboarding/org-search.ts`), incluida la puerta de facturación
+> `resolveFinanceClientContext`. Reseteada a `'other'` con
+> `scripts/commercial/reset-organization-commercial-role.ts`; los 2 `module_assignments`
+> (`seo_v1`, `proposal_studio_v1`) y el dogfooding SEO siguieron intactos, verificado con el canary
+> contra producción. **`deriveOrganizationType` es monótona** (nunca degrada un rol adquirido), así
+> que bajar el tipo exige esa puerta explícita: un `upsertCanonicalOrganization` normal lo perpetúa.
+
 ---
 
 ## Two Graphs: Operational and Structural

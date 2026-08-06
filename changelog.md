@@ -7,6 +7,71 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-06 — TASK-1303: captura diaria de rankings + reader de evolución (backend de la pantalla ancla)
+
+- **`captureRankSnapshot` + batch ops-worker + mirror BQ + `readRankEvolution` + signal + MCP tool**:
+  la serie diaria de posiciones exactas (DataForSEO SERP, depth 20 + AI Overview async) queda
+  code-complete con gate de costo + **spend fence** (re-consulta el gate cada 10 llamadas — cierra
+  la deuda medida por TASK-1300 de 3× de sobregiro), idempotencia sin gasto (pre-check antes del
+  provider; el trigger de 1299 prohíbe DO UPDATE → `ON CONFLICT DO NOTHING`), y el ledger de gasto
+  escrito solo por el transporte.
+- **`enforceSeoRunEntitlement` gana `consumesAuditAllowance`** (default true): el rank capture no
+  crea audit runs — un org con el cupo de audits agotado ya no queda con la serie diaria congelada.
+- **Cloud Scheduler `ops-seo-rank-capture` (05:00 CLT) nace PAUSADO** declarativo en `deploy.sh`;
+  dataset BQ `greenhouse_growth_analytics` + tabla `seo_rank_history` creados. Rollout pendiente:
+  push + redeploy ops-worker + despause tras verificar gate de costo en staging (runbook
+  `docs/manual-de-uso/growth/operar-captura-rankings-seo.md`).
+- Parity MCP-first: tool `get_seo_rank_evolution` + lane
+  `/api/platform/ecosystem/growth/seo/rank-evolution` en el mismo PR (patrón TASK-1645).
+
+## 2026-08-06 — Efeonce deja de ser cliente de sí misma: rol comercial corregido
+
+- **`EO-ORG-0007` (la entidad legal operadora) tenía `organization_type='client'`**, herencia del
+  space de cliente de marzo 2026. La exponía en 5 readers que filtran `IN ('client','both')` sin
+  consultar `is_operating_entity` — salía primera de 17 en `/finance/clients` — y
+  `resolveFinanceClientContext` la aceptaba como cliente facturable, con la misma org como emisor
+  fiscal. Daño consumado: 0 income, 0 contratos, 0 usuarios de portal.
+- **Nueva puerta canónica `scripts/commercial/reset-organization-commercial-role.ts`**: baja el rol
+  a `'other'` vía `upsertCanonicalOrganization`, nunca SQL directo. Existe porque
+  `deriveOrganizationType` es **monótona** (nunca degrada un rol adquirido), así que ninguna
+  llamada normal puede bajar el tipo; el script declara `currentType='other'` explícitamente y
+  aborta si el lifecycle implica rol real o si hay income. `remediate-half-baked-orgs.ts` no
+  servía: sólo cubre el drift contrario.
+- **Verificado tras el cambio**: `is_operating_entity` y los 2 `module_assignments` intactos, y el
+  canary SEO contra producción sigue dando `hasModule=true tier=contracted`. El dogfooding no
+  dependía del tipo.
+- **Contrato semántico escrito** en `GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md` §Organization
+  Types: `organization_type` es un **rol comercial**, `'other'` significa **sin rol comercial**
+  (no "sin clasificar"), los tres ejes son ortogonales (identidad legal / rol comercial /
+  capabilities), y **NUNCA** se agrega un valor de identidad al enum — ya se intentó y quedó una
+  rama muerta contra `'efeonce_internal'`, que es un `tenant_type` de usuarios.
+- **Follow-ups creados**: `TASK-1648` (guard por flag en los 5 readers), `TASK-1649` (el `space` y
+  `client_profile` heredados, con inventario antes de tocar), `TASK-1650` (emisor legal de
+  cotizaciones compartidas: query a columnas inexistentes tapada por un `catch` mudo).
+
+## 2026-08-06 — Search Visibility 360 operable por MCP en producción (TASK-1645 + TASK-1647 complete)
+
+- **Release `develop→main` `70e912056273`** (PR #177, `release_id=70e912056273-03c36b47-eb75-469c-886f-51c691cd7c34`,
+  run `31058032196`, manifest `released`, workflow 10m51s, watchdog `drift_count=0`). Batch de 355 commits /
+  221 archivos de código / 14 migraciones: EPIC-022 SEO completo (1299/1300/1301/1302/1305/1645), EPIC-028
+  Globe (1629/1630/1641/1586), identity 1616 + 1631 Slice 0, payroll 1630, Nexa 1182, EPIC-040. Pasó a la
+  primera sin `bypass_preflight_reason`: merge canónico `-X ours` antes del PR, marker `[release-coupled: …]`
+  en el squash y `playwright.yml` disparado sobre `main` antes del dispatch.
+- **`GROWTH_SEO_ENABLED=true` en Vercel Production** + redeploy `dpl_GyGkdEQQTk65qkCs1S3TEH6Jquy9`. El flag es
+  multi-runtime: ya estaba ON en el `ops-worker` (materializer GSC) y ahora también gatea el lane ecosystem.
+- **Canary del provider contra producción**: Berel `domainQuadrant=riesgo` (50 keywords, AEO 44.5), Efeonce
+  `contracted` con `no_seo_data` honesto, deny anti-oracle `404`.
+- **Provider habilitado en `mcp.efeonce.org`**: `efeonce-mcp` `76cb121`, workflow `31059346243`, revisión
+  `efeonce-mcp-gateway-00012-dkj` con el token como secret ref de Cloud Run. El secreto se había creado sin
+  ninguna binding IAM; se le otorgó `secretAccessor` scoped al SA del gateway. Front door: health 200,
+  protected-resource metadata 200, `POST /mcp` anónimo 401 con challenge.
+- **Smoke MCP autenticado por `mcp.efeonce.org` VERDE**: `scripts/oauth-canary.mjs` extendido con las tools
+  SEO (`MCP_CANARY_SEO_ORGANIZATION_ID` + `MCP_CANARY_SEO_DENY_ORGANIZATION_ID`); con token Entra real
+  (authorization-code + PKCE) sobre el scope base `efeonce.mcp.read` devolvió `initialize 200`,
+  `seoEntitlementStatus 200`, `seoVisibility360Status 200`, **`seoDomainQuadrant: "riesgo"`** (el quadrant
+  real de Berel por el front door público) y `seoDenyFailedClosed: true`. Exige login interactivo → paso
+  asistido por humano, no automatizable en CI.
+
 ## 2026-08-05 — Provider Greenhouse-SEO federado en el gateway MCP (TASK-1647, code complete)
 
 - **Provider `greenhouse-seo` + 3 tools federados en el repo `efeonce-mcp`** (main, commits `a53b77f`+`4870e90`):
@@ -31,6 +96,25 @@
   chokepoint) como plantilla para provisionar otras orgs.
 - **Pendientes:** conectar la propiedad de Google Search Console (segunda lente del 360) y el merge/dedupe del
   registro en HubSpot.
+
+## 2026-08-05 — ISSUE-142: los dos formularios públicos del AEO registran consentimiento a una política que nunca se mostró
+
+- Al cerrar `TASK-1327` quedó anotado "confirmar, no asumir" sobre un `consent.checkboxes` vacío. Confirmado
+  contra producción: **es un hueco de cumplimiento (Ley 21.719)**, no una decisión de diseño.
+- **La cadena:** las definiciones publicadas de `ai-visibility-grader` (landing de Think) y
+  `efeonce-aeo-diagnostic` (`/aeo-2/`) traen `checkboxes: []` **y sin `noticeText`** → `renderConsent()` retorna
+  `null` y no pinta nada en pantalla; pero el renderer envía `consent: true` igual, porque
+  `(checkboxes ?? []).length === 0` cuenta como otorgado. El gate server-side existe y es correcto
+  (`commands.ts:404-406`) — recibe un `true` fabricado por el cliente. La submission queda con
+  `consentPolicyVersion` afirmativo. **El registro es peor que un vacío: documenta algo que no ocurrió.**
+- **No es falla del motor Growth Forms:** auditados los 5 formularios públicos, **3 tienen su bloque de consent
+  correcto** (`efeonce-lead-gen-web`, `efeonce-seo-diagnostic`, `efeonce-web-agentica-ebook`). Los dos afectados
+  son justo los del AEO: se publicaron sin él y el fallback del renderer lo volvió silencioso en vez de ruidoso.
+- **Nada se aplicó.** Publicar texto legal en un formulario público live es decisión de operador + legal. El issue
+  documenta la contención, el fix de las dos definiciones, el fix del bug class (que publicar un form sin bloque
+  de consent **falle**, en vez de registrar consentimiento inventado) y el destino de los leads ya capturados.
+- `TASK-1246` no puede declarar su sign-off legal cumplido mientras `ISSUE-142` siga `open`; queda cruzado en
+  ambas direcciones. Bug class al motor: `EPIC-040` / `TASK-1255`.
 
 ## 2026-08-05 — TASK-1327 `complete`: la landing pública del lead magnet está live y verificada en runtime
 
@@ -117,7 +201,7 @@
   bloqueado por saldo. Sanity live 7/7 contra PG real; suite 10130/0 + build prod verdes.
 - Hallazgo transversal: el patrón `BEGIN`/`ROLLBACK` de los sanity scripts **no es transaccionalmente seguro**
   (el helper toma una conexión del pool por llamada). Este se reescribió sobre `withGreenhousePostgresTransaction`;
-  los de TASK-1301/1302 quedan por revisar.
+  verificado que ningún otro sanity del repo lo usaba (el de 1301 ya limpiaba en `finally`); la regla de decisión quedó canonizada en `SQL_DATE_MATH_AGENT_INVARIANTS`.
 
 ## 2026-08-05 — Growth SEO (EPIC-022): serie GSC propia + striking-distance (TASK-1302)
 
@@ -911,40 +995,3 @@ y [`docs/changelog/internal/2026-07.md`](docs/changelog/internal/2026-07.md).
   `sentry_critical_issues` timeout de 6 s; el último ya no tuvo bloqueos de smoke ni staging.
 - El rollout queda pendiente. No se activó `bypass_preflight`; requiere `platform.release.bypass_preflight` y razón
   auditada de al menos 20 caracteres.
-
-## 2026-07-29 — PR #164: autenticación de paquetes privados y gobierno de release
-
-- Los workflows con instalación de dependencias privadas usan `GITHUB_TOKEN` con `packages: read` y un `.npmrc`
-  efímero en `$RUNNER_TEMP`; no se versionan tokens ni se exponen credenciales en runtime o artefactos.
-- Vercel `efeonce-7670142f/greenhouse-eo` recibió `NPM_RC` cifrado para Preview (`develop`) y Production, siguiendo
-  el runbook de AXIS. La credencial operator-owned es temporal y requiere reemplazo por una identidad read-only antes
-  del rollout externo.
-- `CLAUDE.md` quedó bajo el techo estricto de 35k tokens (34.945) y la auditoría de contenido quedó sin huérfanas;
-  el detalle del Design System vive en `docs/architecture/ui-platform/README.md`.
-
-## 2026-07-29 — EPIC-028: cinco workstreams comerciales añadidos
-
-- Se añadieron `TASK-1593`–`TASK-1597` como policy tasks dentro de EPIC-028: enterprise ICP/design partners, Agency
-  Workflow Sprint, Campaign Variant Workflow, Distribution/Activation y Packaging/Unit Economics.
-- Las tasks consumen los gates comerciales existentes sin duplicarlos y mantienen el runtime, pricing público,
-  checkout, reseller rights, co-selling y clientes externos bloqueados.
-- El orden recomendado es `TASK-1595 → TASK-1594`; `TASK-1593`, `TASK-1596` y `TASK-1597` avanzan en paralelo documental.
-
-## 2026-07-29 — EPIC-028: revisión de alineación con la visión de mercado
-
-- Se auditó lo construido y lo pendiente del epic frente a la estrategia de Globe: enterprise como ICP estratégico,
-  beachhead operativo por unidad, agencias como canal, e-commerce/DTC como wedge y creators/SMB como distribución.
-- Veredicto: la fundación de producto, gobernanza y operación está alineada; la arquitectura comercial, distribución,
-  verticalización y exit criteria de negocio todavía están incompletos.
-- Se recomendó añadir dentro del mismo epic workstreams de enterprise design partners, Agency Workflow Sprint,
-  Campaign Variant Workflow, activation/distribution y packaging/economics, sin duplicar owners técnicos.
-
-## 2026-07-29 — Globe: estrategia de mercado, distribución y monetización V1
-
-- Se integraron los benchmarks de Higgsfield y Magnific en una estrategia de segmentos, oportunidades, distribución
-  masiva, ventas B2B/enterprise, canales, packaging y validación.
-- Se fijó enterprise marketing organizations como ICP estratégico; mid-market o una unidad enterprise como beachhead
-  operativo; agencias/productoras como canal multiplicador; e-commerce/DTC como vertical wedge; creators y SMB como
-  adquisición y aprendizaje inicial.
-- Se documentaron loops de artifact/template/creator/referral/content/integration/agency, límites entre software,
-  Product Service, managed/co-operated y canal, revenue architecture, cost-to-serve y pilotos de 90 días.
