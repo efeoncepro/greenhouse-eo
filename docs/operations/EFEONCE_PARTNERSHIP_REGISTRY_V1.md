@@ -71,6 +71,22 @@ estado por relación, la evidencia observable y el siguiente paso.
   Business & Pro Services, Data & Analytics y Gemini Enterprise. `Apto` no significa que la competencia ya esté
   concedida.
 
+### Due diligence formal — evidencia de Outlook 2026-08-06
+
+Google envió a `jreyes@efeoncepro.com` el correo `[ACTION REQUIRED] for Efeonce Group Spa - Please complete Google
+Business Partner Due Diligence Questionnaire`, desde `due-diligence@google.com`. El proceso corresponde a la revisión
+anti-soborno y background check de partners. La fecha límite indicada es **13 de agosto de 2026**. El correo advierte
+que Efeonce no puede comenzar a trabajar con Google hasta completar el proceso y que una relación existente podría
+quedar en pausa mientras esté incompleta.
+
+La invitación contiene un enlace individual de Aravo. No se registra en este repositorio el enlace, contraseña ni
+ningún token de acceso.
+
+El 2026-08-06 el CEO aclaró que Efeonce contempla la posibilidad de vender o implementar soluciones de Google Cloud
+para el Estado de Chile. Esto no debe declararse como una relación gubernamental actual si no existe una oportunidad o
+contrato vigente, pero sí debe informarse como actividad pública potencial en el cuestionario. Cualquier respuesta debe
+distinguir entre actividad actual, actividad prevista y ausencia de actividad.
+
 ### Datos solicitados por due diligence
 
 El formulario todavía requiere decidir y/o completar:
@@ -82,7 +98,7 @@ El formulario todavía requiere decidir y/o completar:
 5. Información del CEO y contacto operativo.
 
 No se enviaron respuestas ni se aceptaron condiciones durante la revisión. El siguiente acto recomendado es completar
-esta debida diligencia después de confirmar las cuatro decisiones operativas anteriores.
+esta debida diligencia antes del 13 de agosto, después de confirmar las cuatro decisiones operativas anteriores.
 
 ### Interpretación comercial
 
