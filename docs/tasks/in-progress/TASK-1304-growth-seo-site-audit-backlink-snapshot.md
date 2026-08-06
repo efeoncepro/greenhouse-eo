@@ -1,5 +1,14 @@
 # TASK-1304 — Growth SEO: Site Audit (Queue+Poll) + Backlink Snapshot
 
+## Delta 2026-08-06 (implementación) — CODE COMPLETE + smoke E2E real; rollout pendiente
+
+Los 6 slices están implementados y verificados **local-first, sin push** (commits `46051c769`…`c7ba79641` en `develop`):
+
+- **Evidencia del smoke E2E real** (`scripts/growth/_smoke-task-1304-live.ts`, dinero real ~USD 0.05 bajo el gate): enqueue OnPage real (task `08061607-1987-…`, USD 0.0015, 10 págs sobre efeoncepro.com) → re-enqueue `audit_already_running` (cero gasto) → collect materializó **exactly-once** (`succeeded`, health 93.41, 60 findings 0c/32w/28n) → re-collect `pending=0` → `readSiteAuditReport` OK → backlinks real (USD 0.048: 15 ref domains, 455 backlinks, rank 44/100, new/lost 5/0) → re-run `already_captured` USD 0 → mirrors BQ 1 fila c/u (`seo_site_audit_history` + `seo_backlink_history`, tablas creadas con `bq mk`) → signal `ok` → ledger del transporte (`onpage` 1 call / `backlinks` 2 calls). Sanity SQL live 17 checks (`_sanity-task-1304-audit-backlinks-sql.ts`).
+- **🔴 Gotcha resuelto en vivo (corrige el delta anterior):** el poll `summary` de OnPage es POST con **id en el BODY** (`[{id}]`); la variante POST-por-path `summary/$id` responde 200 **sin `tasks`** y el collect quedaba ciego en `in_progress` eterno. Fix + guard de regresión en test + corrección de la reference del skill `dataforseo-operator`.
+- **Resoluciones de Open Questions:** (1) `seo_provider_spend_daily` existe (TASK-1300) y lo escribe el TRANSPORTE — esta task no lo toca; (2) signal warning ≥6h / error ≥30h, el collect degrada a `failed` a las 24h; (3) on-demand y programado COMPARTEN el cupo mensual; (4) if-chain en `server.ts` + `upsert_scheduler_job` en `deploy.sh`.
+- **Rollout pendiente (qué falta para operativamente completo):** push a `develop` → deploy del ops-worker (handlers + projections nuevas) → verificación de los 3 Cloud Scheduler creados PAUSADOS → despausar por decisión del operador (`enqueue` SIEMPRE antes que `collect`) → los eventos outbox del smoke necesitan replay explícito (`POST /api/admin/ops/replay-reactive`) si se quiere que la lane reactiva los procese (los mirrors del smoke se corrieron manualmente). Runbook: `docs/manual-de-uso/growth/operar-site-audit-backlinks-seo.md`.
+
 ## Delta 2026-08-06
 
 - **El patrón captura+mirror que esta task replica ya está implementado** por TASK-1303: command con gate + spend fence (`src/lib/growth/seo/rank-capture.ts`), batch ops-worker con per-target resilience (`rank-capture-batch.ts` + handler `POST /seo/rank/capture-batch`), outbox event de dominio (`contracts.ts`, patrón growth-forms — NO el catálogo TS central) → consumer reactivo `src/lib/sync/projections/seo-rank-history-bq-sync.ts` → MERGE BQ (`rank-history-bq-mirror.ts`, ISSUE-082 timestamps STRING), scheduler paused en `deploy.sh` y signal de lag. El dataset BQ `greenhouse_growth_analytics` YA existe. El entrypoint del ops-worker YA importa `register-provider-spend` (TASK-1303) — esta task no debe re-importarlo.
@@ -30,7 +39,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Diseno`
+- Status real: `Code complete + smoke E2E real; rollout pendiente (schedulers pausados, worker sin deploy)`
 - Rank: `TBD`
 - Domain: `growth|integrations|data`
 - Blocked by: `TASK-1299, TASK-1300, TASK-1303`
@@ -309,19 +318,19 @@ Ver el contrato completo en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §3 (OnPa
 
 ## Acceptance Criteria
 
-- [ ] **MCP tool en el mismo PR (mandato del operador 2026-08-05, patrón TASK-1645):** cada reader/lectura canónica que esta task cree queda expuesto como MCP tool read-only (handler en `src/mcp/greenhouse/tools.ts` + registro en `server.ts` + método en `http-client.ts` + ruta del lane ecosystem si aplica) EN EL MISMO PR. La task NO se cierra con el reader UI-only.
+- [x] **MCP tool en el mismo PR (mandato del operador 2026-08-05, patrón TASK-1645):** cada reader/lectura canónica que esta task cree queda expuesto como MCP tool read-only (handler en `src/mcp/greenhouse/tools.ts` + registro en `server.ts` + método en `http-client.ts` + ruta del lane ecosystem si aplica) EN EL MISMO PR. La task NO se cierra con el reader UI-only.
 
-- [ ] `queueSiteAudit(targetId, actor)` existe, gateado por `growth.seo.audit.run` + entitlement per-org, dispara OnPage `task_post` y persiste `seo_site_audit_runs` con `status=running` + `provider_task_id` + `provider_cost`.
-- [ ] Ciclo async: `seo-audit-enqueue` (semanal) + `seo-audit-collect` (30 min, poll idempotente por `provider_task_id` con `FOR UPDATE SKIP LOCKED`); un `collect` sobre task incompleta = no-op; dos `collect` concurrentes → una sola materialización.
-- [ ] Honest degradation verificada: crawl OK + 0 findings = `succeeded`; crawl parcial = `degraded`; crawl no completó = `failed`. NUNCA se fabrica snapshot.
-- [ ] `seo-backlink-capture` (semanal) escribe `seo_backlink_snapshots` idempotente por `(target, capture_date)`.
-- [ ] `readSiteAuditReport(targetId, auditRunId?)` y `readBacklinkProfile(targetId, { range })` gateados por `growth.seo.observation.read`, con shape `{ ok }` y degradación honesta (no `0`).
-- [ ] Signal `seo.audit.stuck_tasks` (steady=0) registrada en Growth Health; query validada contra PG real (`capture_date`=DATE, `*_at`=TIMESTAMPTZ).
-- [ ] OnPage y Backlinks corren por el family registry (TASK-1300) con breaker por familia; un Backlinks caído NO hunde audit/rank; cost tracking por familia incrementa `seo_provider_spend_daily`.
-- [ ] Todos los crons en `services/ops-worker/deploy.sh` (Cloud Scheduler), NUNCA en `vercel.json`; jobs creados `disabled`.
-- [ ] `GROWTH_SEO_ENABLED` default OFF + fila en `FEATURE_FLAG_STATE_LEDGER.md`.
-- [ ] Cero FK/merge a `grader_*`, payroll o finance.
-- [ ] `pnpm typecheck` + `pnpm lint` + `pnpm test` verdes; smoke DataForSEO en staging documentado.
+- [x] `queueSiteAudit(targetId, actor)` existe, gateado por `growth.seo.audit.run` + entitlement per-org, dispara OnPage `task_post` y persiste `seo_site_audit_runs` con `status=running` + `provider_task_id` + `provider_cost`.
+- [x] Ciclo async: `seo-audit-enqueue` (semanal) + `seo-audit-collect` (30 min, poll idempotente por `provider_task_id` con `FOR UPDATE SKIP LOCKED`); un `collect` sobre task incompleta = no-op; dos `collect` concurrentes → una sola materialización.
+- [x] Honest degradation verificada: crawl OK + 0 findings = `succeeded`; crawl parcial = `degraded`; crawl no completó = `failed`. NUNCA se fabrica snapshot.
+- [x] `seo-backlink-capture` (semanal) escribe `seo_backlink_snapshots` idempotente por `(target, capture_date)`.
+- [x] `readSiteAuditReport(targetId, auditRunId?)` y `readBacklinkProfile(targetId, { range })` gateados por `growth.seo.observation.read`, con shape `{ ok }` y degradación honesta (no `0`).
+- [x] Signal `seo.audit.stuck_tasks` (steady=0) registrada en Growth Health; query validada contra PG real (`capture_date`=DATE, `*_at`=TIMESTAMPTZ).
+- [x] OnPage y Backlinks corren por el family registry (TASK-1300) con breaker por familia; un Backlinks caído NO hunde audit/rank; cost tracking por familia incrementa `seo_provider_spend_daily`.
+- [x] Todos los crons en `services/ops-worker/deploy.sh` (Cloud Scheduler), NUNCA en `vercel.json`; jobs creados `disabled`.
+- [x] `GROWTH_SEO_ENABLED` default OFF + fila en `FEATURE_FLAG_STATE_LEDGER.md`.
+- [x] Cero FK/merge a `grader_*`, payroll o finance.
+- [x] `pnpm typecheck` + `pnpm lint` + `pnpm test` verdes; smoke DataForSEO en staging documentado.
 
 ## Verification
 

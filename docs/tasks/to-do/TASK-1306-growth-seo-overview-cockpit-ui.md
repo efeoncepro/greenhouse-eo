@@ -1,5 +1,11 @@
 # TASK-1306 — Growth SEO: Overview Cockpit UI
 
+## Delta 2026-08-06
+
+- TASK-1304 completó los readers de audit/backlinks que este cockpit consume:
+  `readSiteAuditReport` + `readBacklinkProfile` (+ lanes ecosystem y MCP tools). Las 4 series
+  del módulo (GSC, rankings, audit, backlinks) ya tienen backend.
+
 ## Delta 2026-08-05
 
 - **Desbloqueada parcialmente por TASK-1302 (complete).** La serie GSC existe: `greenhouse_growth.seo_gsc_daily` (query×page por `capture_date`, anclada a `organization_id`, NO a `seo_target_id`). Los KPIs GSC del cockpit (clicks/impresiones/CTR/posición) se leen de esa tabla, no del read-through en vivo.

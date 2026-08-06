@@ -7,6 +7,27 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-06 — TASK-1304: site audit OnPage (queue+poll) + backlink snapshot (code complete, schedulers pausados)
+
+- **Ciclo async OnPage en 2 fases**: `queueSiteAudit` (gate de costo que SÍ consume el cupo
+  mensual de audits + guard anti doble-encolado sin gasto) crea la task y persiste el run
+  `running`; `collectSiteAuditRuns` poll-ea con claim `FOR UPDATE SKIP LOCKED` y materializa
+  run + findings + outbox **en la misma transacción** (exactly-once por construcción). Mapeo
+  honesto: 0 findings = `succeeded` (sitio limpio) ≠ `degraded` (parcial) ≠ `failed` (0 páginas
+  o task colgada >24h). Findings desde un **allowlist curado** de checks OnPage (true=problema).
+- **Backlink snapshot semanal**: `summary/live` (rank 0–100) + `bulk_new_lost`; idempotente por
+  `(target, capture_date)`; `partial` honesto si el delta falla. `toxic_share` = spam score del
+  perfil entrante / 100 (proxy documentado).
+- **Parity en el mismo PR**: readers `readSiteAuditReport`/`readBacklinkProfile` + lanes ecosystem
+  + MCP tools `get_seo_site_audit_report`/`get_seo_backlink_profile`; signal
+  `seo.audit.stuck_tasks` (6h warn / 30h error = el collect no corre); mirrors BQ
+  `seo_site_audit_history`/`seo_backlink_history` (tablas creadas).
+- **Smoke E2E con dinero real** (~USD 0.05, efeoncepro.com): crawl 10 págs → health 93.41,
+  60 findings; backlinks 15 ref domains / 455 links / rank 44. **Gotcha cazado en vivo**: el poll
+  `summary` es POST con id en el BODY — la variante por path responde 200 sin tasks (fix + guard).
+- **Rollout pendiente**: 3 Cloud Scheduler (`ops-seo-audit-enqueue`/`-collect`/`ops-seo-backlink-capture`)
+  nacen PAUSADOS en `deploy.sh`; falta push + deploy del worker + despausar (enqueue antes que collect).
+
 ## 2026-08-06 — TASK-1303: captura diaria de rankings + reader de evolución (backend de la pantalla ancla)
 
 - **`captureRankSnapshot` + batch ops-worker + mirror BQ + `readRankEvolution` + signal + MCP tool**:
@@ -986,12 +1007,3 @@ y [`docs/changelog/internal/2026-07.md`](docs/changelog/internal/2026-07.md).
   preflight por falta de smoke asociado al SHA de `main`; el smoke manual `30452463889` pasó verde posteriormente.
 - Queda pendiente reintentar el orchestrator sin bypass cuando la API de GitHub Actions responda. No hubo manifest,
   deploy de workers ni promoción parcial.
-
-## 2026-07-29 — PR #164: bloqueo persistente del preflight Sentry
-
-- Smoke manual `30452463889` pasó y staging fue recuperado a `READY` mediante redeploy del deployment existente del
-  proyecto Greenhouse; Production permaneció READY.
-- Los orchestrators `30452924614`, `30453278402` y `30453818726` fallaron antes del manifest por
-  `sentry_critical_issues` timeout de 6 s; el último ya no tuvo bloqueos de smoke ni staging.
-- El rollout queda pendiente. No se activó `bypass_preflight`; requiere `platform.release.bypass_preflight` y razón
-  auditada de al menos 20 caracteres.

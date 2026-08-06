@@ -1,5 +1,35 @@
 # Handoff activo
 
+> Historial rotado: [Handoff.archive.md](Handoff.archive.md).
+
+### TASK-1304 — site audit + backlinks: code complete + smoke E2E real, rollout pendiente (2026-08-06)
+
+Los fundamentos técnicos + off-page de EPIC-022 quedaron completos en `develop` **local (sin push)**:
+`queueSiteAudit` (OnPage async, gate consume cupo de audits, guard anti doble-encolado),
+`collectSiteAuditRuns` (claim `FOR UPDATE SKIP LOCKED`; UPDATE + findings + outbox en la MISMA tx =
+exactly-once; gave_up a las 24h), `captureBacklinkSnapshot` (pre-check + `ON CONFLICT DO NOTHING`;
+`partial` honesto si el delta falla), readers `readSiteAuditReport`/`readBacklinkProfile`, signal
+`seo.audit.stuck_tasks` (6h warn / 30h error), 3 handlers ops-worker + 3 Cloud Scheduler **PAUSADOS**
+en `deploy.sh`, mirrors BQ `seo_site_audit_history`/`seo_backlink_history` (tablas creadas con
+`bq mk`) y — mandato parity — 2 lanes ecosystem + MCP tools `get_seo_site_audit_report` /
+`get_seo_backlink_profile` en el mismo PR.
+
+**Smoke REAL ejecutado** (~USD 0.05, efeoncepro.com dogfooding): enqueue task OnPage real (10 págs,
+USD 0.0015) → collect materializó exactly-once (`succeeded`, health 93.41, 60 findings 0c/32w/28n) →
+re-collect no-op → backlinks USD 0.048 (15 ref domains, 455 backlinks, rank 44/100, new/lost 5/0) →
+re-run `already_captured` USD 0 → mirrors BQ 1 fila c/u (manuales — el worker desplegado aún no tiene
+las projections) → signal ok → ledger del transporte correcto. **Gotcha cazado en vivo:** el poll
+`summary` de OnPage es POST con id en el BODY (`[{id}]`) — la variante POST-por-path responde 200
+sin tasks y el collect quedaba ciego (fix + guard de regresión + reference del skill corregida).
+Gates: suite full verde, build prod, worker gates, sanity SQL 17 checks, docs:closure-check.
+
+**Pendiente para operativamente completo (decisión de push del operador):** (1) push a `develop` →
+deploy ops-worker (handlers + projections) → verificar los 3 schedulers creados PAUSADOS; (2)
+despausar cuando se decida (editar 5.º arg en `deploy.sh`; `enqueue` SIEMPRE antes que `collect`);
+(3) replay reactivo explícito de los eventos del smoke si se quiere que la lane los procese; (4)
+federar las 2 tools al gateway `efeonce-mcp` DESPUÉS del release prod (patrón TASK-1653, lista de
+paridad en ese repo). Runbook: `docs/manual-de-uso/growth/operar-site-audit-backlinks-seo.md`.
+
 ### Hallazgo MCP gateway — clientes Claude no conectan por falta de DCR (2026-08-06)
 
 Al intentar conectar Claude Code al gateway (`claude mcp add` + `/mcp` → Authenticate) falla con
@@ -42,40 +72,6 @@ verif1 vacío y drift regresivo, `-s ours` (árbol develop exacto) es la resoluc
 TASK-1653** (federar `get_seo_rank_evolution` al gateway + guard de paridad) quedó DESBLOQUEADA
 por este release. La serie de rankings corre sola desde mañana 05:00 CLT (scheduler ENABLED,
 Berel 31 keywords).
-
-
-### TASK-1303 — rank capture + evolution reader: code complete, rollout pendiente (2026-08-06)
-
-El backend de la pantalla ancla de EPIC-022 quedó completo en `develop` **local (sin push)**: command
-`captureRankSnapshot` (gate de costo + spend fence cada 10 llamadas + idempotencia sin gasto +
-`ON CONFLICT DO NOTHING` — el trigger de 1299 prohíbe DO UPDATE), batch `POST /seo/rank/capture-batch`
-en ops-worker, Cloud Scheduler `ops-seo-rank-capture` (05:00 CLT) **declarado PAUSADO** en `deploy.sh`,
-mirror reactivo a BQ `greenhouse_growth_analytics.seo_rank_history` (dataset+tabla YA creados),
-`readRankEvolution` (PG ≤180d / BQ largo) + MCP tool `get_seo_rank_evolution` (mismo PR, patrón 1645)
-y signal `seo.rank.capture_lag`. Evidencia: suite full 10.218/0, build prod, worker gates, SQL live
-8/8 contra PG real. `enforceSeoRunEntitlement` ganó `consumesAuditAllowance:false` (el rank capture
-no consume audit runs).
-
-**Smoke REAL ejecutado (2026-08-06 ~11:30Z):** push hecho, Ops Worker Deploy en success, job
-`ops-seo-rank-capture` existe PAUSED. Sembradas 8 keywords para Berel (top GSC medidas, script
-`_seed-task-1303-berel-keywords.ts`) → captura real via worker HTTP: 8/8 snapshots (berel #1,
-"pintura para alberca" #2 CON `ai_overview` presente), costo real USD 0.03 (0.00375/call) →
-ledger `serp` correcto → re-run `skipped` USD 0 (idempotencia) → mirror BQ 8 filas →
-`readRankEvolution` 8 series → signal warning honesto (Efeonce sin captura inicial). Dos fixes
-operativos aplicados en vivo: (1) grant WRITER de `greenhouse-portal@` en el dataset BQ nuevo
-(el mirror falló con Access Denied y el retry lo absorbió); (2) el replay de eventos en `retry`
-es EXPLÍCITO vía `POST /api/admin/ops/replay-reactive` (la lane periódica no los re-reclama) —
-ambos documentados en el runbook. **DESPAUSADO 2026-08-06** (autorización del
-operador): 5.º arg a "false" en `deploy.sh`, deploy en success, scheduler `ENABLED 0 5 * * *` —
-la serie corre sola desde mañana 05:00 CLT (~USD 0.03/día con las 8 keywords actuales).
-Pendientes: (1) promoción develop→main para que el lane `rank-evolution` + la MCP tool interna
-lleguen a Vercel PRODUCTION (la captura ya corre igual: el worker es compartido y PG es única;
-solo las superficies de lectura prod esperan release); (2) federar `get_seo_rank_evolution` al
-gateway `mcp.efeonce.org` (repo `efeonce-mcp`, `src/mcp.ts` + provider `greenhouse-seo.ts` —
-adapter hardcodea 3 métodos, NO es proxy dinámico; hacerlo DESPUÉS del release prod o el
-gateway vería 404); (3) sembrar keywords para `seot-efeonce-own-brand` (elegible, 0 keywords →
-degrada `no_keywords`) y curar el set completo de Berel (la serie de cada keyword empieza el
-día que entra al set).
 
 
 ### Efeonce dejó de ser cliente de sí misma — modelado corregido (2026-08-06)
@@ -596,18 +592,3 @@ razón** en vez de cableados a la fuerza.
 
 **Siguiente paso ejecutable:** coordinar `TASK-1552` ↔ `TASK-1643` para el canal feed → composer, y decidir la
 semántica de «Recrear». Nada de eso lo puedo resolver implementando.
-
-## EPIC-039 — Next.js 16.3 + TypeScript 7 Toolchain Adoption (2026-08-04)
-
-Estado: **to-do / diseño**. Se registraron el epic y sus dos tasks hijas:
-[`EPIC-039`](docs/epics/to-do/EPIC-039-nextjs-typescript-toolchain-adoption.md),
-[`TASK-1638`](docs/tasks/to-do/TASK-1638-nextjs-16-3-framework-alignment.md) para el alineamiento del framework y
-[`TASK-1639`](docs/tasks/to-do/TASK-1639-typescript-7-dual-compiler-adoption.md) para el lane dual TS7/TS6.
-Los linters de tasks/epic/ops y el cierre documental pasan. No hubo cambios de código, dependencias, runtime,
-deploy ni producción. Siguiente paso: tomar `TASK-1638`; `TASK-1639` permanece bloqueada hasta su cierre.
-
-## WIP saneado — Globe, Brightcell y Polpaico (2026-08-01)
-
-- ADR-019 `Accepted`; ADR-020 `Proposed`. Brightcell: **no enviar** hasta Finance. Polpaico: `HOLD / NO-BID`, sin precio/deck emitible. Detalle en `changelog.md`.
-
-Historia anterior: [Handoff.archive.md](Handoff.archive.md).

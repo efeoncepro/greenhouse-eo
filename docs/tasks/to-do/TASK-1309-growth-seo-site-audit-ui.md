@@ -1,5 +1,17 @@
 # TASK-1309 — Growth SEO: Site Audit UI
 
+## Delta 2026-08-06
+
+- **El backend que esta UI consume YA EXISTE** — TASK-1304 quedó code complete + smoke E2E real:
+  `readSiteAuditReport(targetId, auditRunId?)` en `src/lib/growth/seo/site-audit/reader.ts`
+  (run + findings agrupados por severidad con `issueType` = check OnPage estable — el
+  `[issueGroup]` de esta UI agrupa por ese campo; allowlist en `site-audit/findings-map.ts`),
+  lane `/api/platform/ecosystem/growth/seo/site-audit-report` y MCP tool
+  `get_seo_site_audit_report`. Un run `running` se reporta como "audit en curso" (estado que
+  esta UI debe renderizar como hecho, no como error); `succeeded` con 0 findings = sitio limpio.
+  Primer reporte real: efeoncepro.com health 93.41, 10 páginas, 60 findings (0c/32w/28n).
+  Rollout de los crons pendiente (schedulers pausados) — la UI puede construirse contra datos ya materializados.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
