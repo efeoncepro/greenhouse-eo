@@ -104,13 +104,45 @@ Piezas clave, en lenguaje simple:
 
 > Detalle tecnico: command y batch en [`src/lib/growth/seo/rank-capture.ts`](../../../src/lib/growth/seo/rank-capture.ts) y [`rank-capture-batch.ts`](../../../src/lib/growth/seo/rank-capture-batch.ts) · reader en [`rank-evolution-reader.ts`](../../../src/lib/growth/seo/rank-evolution-reader.ts) · mirror en [`rank-history-bq-mirror.ts`](../../../src/lib/growth/seo/rank-history-bq-mirror.ts) · arquitectura §8 de [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md).
 
+## El site audit tecnico y el perfil de enlaces (TASK-1304)
+
+Las otras dos preguntas del modulo — "¿qué está roto técnicamente?" y "¿qué te
+enlaza?" — se responden con dos capturas semanales:
+
+- **Site audit (OnPage)**: un crawl del sitio del cliente que produce un puntaje de
+  salud (0–100), el conteo de páginas crawleadas y una lista de hallazgos agrupados por
+  severidad (críticos, advertencias, avisos): páginas rotas, canonicals mal apuntados,
+  títulos/descripciones faltantes o duplicados, datos estructurados con errores, etc.
+  Como el crawl puede tardar de minutos a horas, funciona en **dos fases**: un proceso
+  encola el crawl (lunes de madrugada) y otro pasa cada 30 minutos preguntando si
+  terminó; cuando termina, guarda el resultado exactamente una vez. Un audit que
+  termina **sin hallazgos** significa "sitio técnicamente limpio" — nunca se confunde
+  con un crawl que falló.
+- **Snapshot de backlinks**: una foto semanal del perfil de enlaces — cuántos dominios
+  enlazan al sitio, cuántos enlaces en total, el rank del dominio en escala 0–100
+  (comparable con el DR/DA de otras suites), qué proporción del perfil es tóxica y
+  cuántos enlaces se ganaron/perdieron en los últimos 30 días.
+
+Ambas corridas cuestan dinero del proveedor y pasan por el mismo chokepoint de cupos y
+presupuesto; el site audit además consume el **cupo mensual de audits** del tier. Los
+resultados se consultan con los readers `readSiteAuditReport` y `readBacklinkProfile`,
+por MCP (`get_seo_site_audit_report`, `get_seo_backlink_profile`) y — cuando llegue
+TASK-1309 — en la UI del portal. La señal `seo.audit.stuck_tasks` en `/admin/operations`
+vigila que ningún crawl quede colgado.
+
+**Estado real (2026-08-06):** código completo y verificado con un smoke real
+(crawl acotado + snapshot de backlinks con dinero real), pero los tres schedulers
+**nacen pausados** hasta el rollout. El paso a paso está en el manual
+[Operar el site audit y los backlinks](../../manual-de-uso/growth/operar-site-audit-backlinks-seo.md).
+
+> Detalle tecnico: commands y readers en [`src/lib/growth/seo/site-audit/`](../../../src/lib/growth/seo/site-audit/) y [`backlinks/`](../../../src/lib/growth/seo/backlinks/) · handlers y schedulers en `services/ops-worker/` · arquitectura §6–§8 de [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md).
+
 ## Que NO existe todavia
 
 Lo siguiente aún no está construido (las series que ya se llenan: Search Console live; rankings live desde el 2026-08-06). **Sí existen ya** — además del schema y el modelo de acceso — el cruce SEO ↔ AEO (`readSeoAeoGap` + matriz quadrant 360, TASK-1305) y la **operación por MCP live en producción desde el 2026-08-06**: lane ecosystem + 3 tools read-only (`get_seo_entitlement`, `get_seo_keyword_opportunities`, `get_seo_visibility_360`) en el MCP interno de Greenhouse (TASK-1645, ver el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md) §8) **y federadas al gateway público `mcp.efeonce.org`** (TASK-1647). La lectura funcional completa de esa capacidad está en [Search Visibility 360 por MCP](search-visibility-360-por-mcp.md). Pendiente:
 
 | Falta | Task que lo trae |
 |---|---|
-| Site audit (queue + poll OnPage async) y snapshot semanal de backlinks | TASK-1304 |
 | UI operador `/admin/growth/seo` (overview) | TASK-1306 |
 | Pantalla ancla: Rank & URL performance over time | TASK-1307 |
 | Keyword opportunities (UI) | TASK-1308 |

@@ -184,12 +184,14 @@ Reglas que el agente debe respetar:
 - Un documento marcado como "no usado por agentes", borrador, deprecado o no-interno **no aparece** (responde `404` por id, o simplemente no entra en la búsqueda). Lo que queda fuera por política se **cuenta** sin mostrar su contenido.
 - Es **read-only**: estas tools nunca crean, editan ni publican conocimiento.
 
-### 8. SEO / Search Visibility 360 (TASK-1645 + TASK-1303)
+### 8. SEO / Search Visibility 360 (TASK-1645 + TASK-1303 + TASK-1304)
 
 - `get_seo_entitlement`
 - `get_seo_keyword_opportunities`
 - `get_seo_visibility_360`
 - `get_seo_rank_evolution`
+- `get_seo_site_audit_report`
+- `get_seo_backlink_profile`
 
 Qué entregan:
 
@@ -197,6 +199,8 @@ Qué entregan:
 - `get_seo_keyword_opportunities` lista las oportunidades striking-distance **medidas** (Google Search Console): posición ponderada, impresiones, clics incrementales estimados, quick wins y canibalización.
 - `get_seo_visibility_360` cruza los dos internets de búsqueda: posición orgánica medida (GSC) × citabilidad IA (score del AEO grader). Devuelve la **matriz quadrant** por keyword y del dominio: `dominante` (rankea y la IA lo cita), `riesgo` (rankea pero la IA NO lo cita — autoridad sin citabilidad, la señal de venta cruzada al AEO), `oportunidad` (citado sin rankear) e `invisible`.
 - `get_seo_rank_evolution` devuelve la serie temporal de **posiciones exactas por keyword** (fuente DataForSEO SERP; la captura diaria ya corrió sola — la tool solo lee). Parámetros opcionales: `organizationId` (obligatorio para binding `internal`), `rangeDays` (ventana en días, máx 1825), `engine`, `device` (`desktop`/`mobile`/`tablet`) y `keywords` (subset, máx 100). Ejemplo: `get_seo_rank_evolution {"organizationId": "…", "rangeDays": 30, "device": "desktop", "keywords": ["pintura para piscinas"]}` → `{ series: [{ keyword, points: [{ date, position, url }] }] }`.
+- `get_seo_site_audit_report` (TASK-1304) devuelve el **audit técnico del sitio**: health score sitewide (0–100), páginas crawleadas y findings agrupados por severidad (`critical`/`warning`/`notice`) con `issueType` estable (p. ej. `is_4xx_code`, `no_description`, `has_micromarkup_errors`). Un run `running` significa "crawl en curso" (hecho, no error); un `succeeded` con 0 findings significa sitio técnicamente limpio. Parámetro opcional `auditRunId` para leer un run histórico puntual.
+- `get_seo_backlink_profile` (TASK-1304) devuelve la **serie semanal del perfil de enlaces**: dominios referentes, backlinks totales, rank del dominio 0–100 (comparable a DR/DA), `toxicShare` (0–1, proxy del spam score del perfil entrante) y delta new/lost de la ventana de 30 días del proveedor. Parámetro opcional `rangeDays` (default 365).
 
 Reglas que el agente debe respetar:
 
