@@ -50,7 +50,10 @@ El smoke exige login interactivo, así que es asistido por humano, no automatiza
 
 **Pendientes menores heredados (sin tocar):** merge en HubSpot de las auto-companies `efeonce.org`
 (56011409567) y `efeonce` (57099835819) hacia la company canónica — el sync propaga, NUNCA borrar por
-SQL; `website_url=efeoncepro.com` en EO-ORG-0007 por `upsertCanonicalOrganization`; conexión GSC de
+SQL; ~~`website_url` en EO-ORG-0007~~ **HECHO 2026-08-06**: `https://efeoncepro.com` poblada por
+`upsertCanonicalOrganization` (script `scripts/growth/_sanity-efeonce-website-url.ts`, idempotente,
+sin `overrideIdentity` para no pisar un valor ajeno; `organization_type` se mantuvo `client`);
+conexión GSC de
 `efeoncepro.com` gated por TASK-1282/1283.
 
 ### TASK-1647 — Provider Greenhouse-SEO federado: CODE COMPLETE, enable pendiente del release (2026-08-05)
@@ -86,8 +89,8 @@ sincronizadas como ruido). Aplicado con `scripts/growth/provision-efeonce-own-br
 
 **Pendientes operativos:** (1) merge en HubSpot de las auto-companies `efeonce.org` (56011409567) y
 `efeonce` (57099835819) hacia la company canónica — el sync propaga; NUNCA borrarlas por SQL. (2)
-`website_url` de EO-ORG-0007 está vacío (`efeoncepro.com`) — completar por la puerta canónica
-(`upsertCanonicalOrganization`), no SQL directo. (3) Conectar GSC de efeoncepro.com cuando 1282/1283
+~~`website_url` de EO-ORG-0007 vacío~~ **CERRADO 2026-08-06** — `https://efeoncepro.com` por la puerta
+canónica `upsertCanonicalOrganization`. (3) Conectar GSC de efeoncepro.com cuando 1282/1283
 destraben su rollout. SKY ya tiene lente AEO ligada; su SEO sigue igual de pendiente que Efeonce.
 
 ### TASK-1645 — SEO operable por MCP: CODE COMPLETE, rollout pendiente (2026-08-05)
