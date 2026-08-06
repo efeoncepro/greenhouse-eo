@@ -1,5 +1,14 @@
 # TASK-1303 — Growth SEO: Rank Capture + Evolution Reader
 
+## Delta 2026-08-06 — baseline recalibration pre-execution
+
+- **Idempotencia ≠ `DO UPDATE`.** El trigger `block_seo_row_mutation` de TASK-1299 bloquea UPDATE **incondicionalmente** sobre `seo_rank_snapshots` (y el runtime no tiene GRANT UPDATE): el `ON CONFLICT ... DO UPDATE` propuesto es imposible por diseño ("medición inmutable"). Contrato real: el command **pre-chequea los combos ya capturados en el `capture_date` ANTES de pegar el provider** (el re-run del mismo día no gasta) + `INSERT ... ON CONFLICT DO NOTHING` como guardia de carrera. Open Question 1 resuelta: no se ajusta el trigger.
+- **El command NO incrementa `seo_provider_spend_daily`.** Post-TASK-1300 el ledger lo escribe el TRANSPORTE (`postDataForSeoTask`) — fuente única del presupuesto. El caller pasa `organizationId` e importa `@/lib/growth/seo/register-provider-spend` en el entrypoint del runtime; `provider_cost` por snapshot queda como atribución por fila, jamás se suma al ledger.
+- **Spend fence es scope de esta task** (deuda asignada por TASK-1300, docstring de `enforceSeoRunEntitlement`): el gate una-vez + gasto acumulado después sobregiró 3× un budget trial en la medición. El command pasa `estimatedCostUsd` del batch completo y re-consulta el gate cada K llamadas; para rank capture el único freno es budget (`quota_exhausted` cuenta audit runs, no aplica).
+- **Dataset BQ `greenhouse_growth_analytics` no existe** (verificado `bq ls` 2026-08-06): esta task lo crea como paso de rollout (`bq mk`), nunca auto-create en hot path (precedente de todos los mirrors). Open Question 2 resuelta.
+- **Sin migración PG**: `seo_provider_spend_daily` lo creó TASK-1300; los event types del outbox viven en el catálogo TS. Open Question 3 resuelta.
+- Ventana caliente 180d + umbrales lag warning ≥2d / error ≥4d (Open Q4); batch secuencial por target con per-row resilience, sin locks (Open Q5).
+
 ## Delta 2026-08-05
 
 - El schema fundacional ya existe: TASK-1299 aplicó `20260805134439202_task-1299-growth-seo-schema.sql` en `greenhouse-pg-dev` (8 tablas `seo_*`, UNIQUEs de idempotencia, triggers `block_seo_row_mutation`, `db.d.ts` regenerado). Actualizar el supuesto "schema no existe" en Discovery: verificar columnas reales contra `db.d.ts`/`information_schema`, no re-crear DDL.
@@ -12,7 +21,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Muy alto`
 - Effort: `Alto`
