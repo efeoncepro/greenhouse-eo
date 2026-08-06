@@ -1,9 +1,12 @@
 'use client'
 
+import { forwardRef } from 'react'
+
 import Link from 'next/link'
 
 import TabContext from '@mui/lab/TabContext'
 import Tab from '@mui/material/Tab'
+import type { TabProps } from '@mui/material/Tab'
 import Tooltip from '@mui/material/Tooltip'
 
 import CustomTabList from '@core/components/mui/TabList'
@@ -64,6 +67,32 @@ const TABS: readonly SeoSearchVisibilityTab[] = [
   }
 ]
 
+/**
+ * Tab no disponible, con el motivo en un tooltip.
+ *
+ * ⚠️ `Tabs` inyecta props de contexto (`fullWidth`, `indicator`, `selectionFollowsFocus`,
+ * `textColor`, `value`…) en sus hijos DIRECTOS. Si el hijo directo fuera el `<Tooltip>`,
+ * esos props aterrizarían en el `<span>` del DOM y React tiraría 4 errores de atributo
+ * desconocido en consola (pasó: los 4 issues del overlay de dev salían justo de acá).
+ *
+ * Por eso este wrapper existe: recibe lo inyectado y lo REENVÍA al `Tab`, que sí lo
+ * entiende. El `<span>` intermedio sigue siendo necesario porque MUI no dispara eventos
+ * de hover sobre un control deshabilitado — sin él, el tooltip nunca aparecería y el
+ * usuario no sabría por qué el tab no responde.
+ */
+const UnavailableTab = forwardRef<HTMLSpanElement, TabProps & { tooltipTitle: string }>(function UnavailableTab(
+  { tooltipTitle, ...tabProps },
+  ref
+) {
+  return (
+    <Tooltip title={tooltipTitle}>
+      <span ref={ref}>
+        <Tab {...tabProps} disabled />
+      </span>
+    </Tooltip>
+  )
+})
+
 interface Props {
   /** Tab activa. Cada ruta hermana pasa la suya. */
   activeTab: string
@@ -93,19 +122,14 @@ const SeoSearchVisibilityTabs = ({ activeTab, spaceId }: Props) => {
               aria-current={tab.value === activeTab ? 'page' : undefined}
             />
           ) : (
-            // `span` envolvente: MUI no dispara eventos de hover sobre un Tab deshabilitado,
-            // así que sin él el tooltip nunca aparecería y el usuario no sabría el motivo.
-            <Tooltip key={tab.value} title={GH_GROWTH_SEO_OVERVIEW.tabs.unavailableHint}>
-              <span>
-                <Tab
-                  value={tab.value}
-                  label={tab.label}
-                  icon={<i className={tab.icon} />}
-                  iconPosition='start'
-                  disabled
-                />
-              </span>
-            </Tooltip>
+            <UnavailableTab
+              key={tab.value}
+              value={tab.value}
+              label={tab.label}
+              icon={<i className={tab.icon} />}
+              iconPosition='start'
+              tooltipTitle={GH_GROWTH_SEO_OVERVIEW.tabs.unavailableHint}
+            />
           )
         )}
       </CustomTabList>
