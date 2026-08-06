@@ -3,6 +3,8 @@ import 'server-only'
 import { getSearchConsoleConnection } from '@/lib/growth/search-console'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
+import { isSeoModuleEnabled } from '../flags'
+
 /**
  * TASK-1306 — Estado de la fuente MEDIDA (Search Console) para el cockpit Overview.
  *
@@ -28,6 +30,10 @@ export interface SeoOverviewConnection {
 }
 
 export const readSeoOverviewConnection = async (organizationId: string): Promise<SeoOverviewConnection> => {
+  if (!isSeoModuleEnabled()) {
+    return { state: 'not_connected', dataAsOf: null }
+  }
+
   const connection = await getSearchConsoleConnection(organizationId)
 
   // Mismo predicado que usa `readSearchConsoleAnalytics` para decidir `not_connected`:

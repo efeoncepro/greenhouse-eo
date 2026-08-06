@@ -2,6 +2,8 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
+import { isSeoModuleEnabled } from '../flags'
+
 /**
  * TASK-1306 — KPIs norte + serie de visibilidad del cockpit Overview.
  *
@@ -107,7 +109,19 @@ const buildTotals = (row: TotalsRow | undefined): SeoOverviewKpiTotals | null =>
 const hasAnyVolume = (totals: SeoOverviewKpiTotals | null): boolean =>
   totals !== null && (totals.impressions > 0 || totals.clicks > 0)
 
+const EMPTY_KPIS = (rangeDays: number): SeoOverviewKpis => ({
+  current: { clicks: 0, impressions: 0, position: null, ctr: null },
+  previous: null,
+  series: [],
+  rangeDays
+})
+
 export const readSeoOverviewKpis = async (organizationId: string, rangeDays = 28): Promise<SeoOverviewKpis> => {
+  // Consistencia con el dominio: módulo apagado ⇒ no se leen métricas.
+  if (!isSeoModuleEnabled()) {
+    return EMPTY_KPIS(rangeDays)
+  }
+
   // Ancla en el último día materializado, NO en CURRENT_DATE: la captura corre con lag,
   // así que anclar en "hoy" mostraría una ventana que termina en días vacíos y haría ver
   // una caída de tráfico que no ocurrió.
@@ -121,12 +135,7 @@ export const readSeoOverviewKpis = async (organizationId: string, rangeDays = 28
   const anchor = anchorRows[0]?.anchor ?? null
 
   if (!anchor) {
-    return {
-      current: { clicks: 0, impressions: 0, position: null, ctr: null },
-      previous: null,
-      series: [],
-      rangeDays
-    }
+    return EMPTY_KPIS(rangeDays)
   }
 
   const totalsSql = `

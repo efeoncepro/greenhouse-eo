@@ -3,6 +3,7 @@ import 'server-only'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import { SEO_MODULE_KEY } from '../entitlement'
+import { isSeoModuleEnabled } from '../flags'
 
 /**
  * TASK-1306 — Spaces elegibles del cockpit Overview SEO.
@@ -30,6 +31,12 @@ export interface SeoSpaceOption {
 }
 
 export const listSeoEligibleSpaces = async (): Promise<SeoSpaceOption[]> => {
+  // Mismo gate que el resto del dominio: con el módulo apagado NO se ofrece ningún Space.
+  // Sin esto, el flag apagaría los readers de negocio pero el picker seguiría poblado.
+  if (!isSeoModuleEnabled()) {
+    return []
+  }
+
   const rows = await runGreenhousePostgresQuery<{
     organization_id: string
     organization_name: string | null

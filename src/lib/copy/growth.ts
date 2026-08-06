@@ -1593,17 +1593,25 @@ export const GH_GROWTH_SEO_OVERVIEW = {
     scoreLabel: 'Puntaje de salud',
     findingsLabel: 'Hallazgos por severidad',
     cta: 'Ver auditoría',
-    lastRun: 'Última auditoría: {date}'
+    lastRun: 'Última auditoría: {date}',
+    severity: {
+      critical: 'Críticos',
+      warning: 'Avisos',
+      notice: 'Menores'
+    },
+    scoreAria: 'Salud del sitio: {score} de 100'
   },
 
   movers: {
     title: 'Movimientos de la semana',
-    subtitle: 'Las keywords que más subieron y bajaron de posición.',
+    subtitle: 'Cambios de posición de 5 o más frente a la semana anterior.',
     gained: 'Subieron',
     lost: 'Bajaron',
     cta: 'Ver rendimiento',
-    positionsUp: 'Subió {n} posiciones',
-    positionsDown: 'Bajó {n} posiciones'
+    positionsUp: 'Subió {n} posiciones: de {from} a {to}',
+    positionsDown: 'Bajó {n} posiciones: de {from} a {to}',
+    emptyTitle: 'Sin movimientos relevantes',
+    emptyDescription: 'Ninguna keyword cambió 5 posiciones o más esta semana.'
   },
 
   aeoGap: {
@@ -1612,7 +1620,9 @@ export const GH_GROWTH_SEO_OVERVIEW = {
     subtitle:
       'Keywords donde tu sitio rankea bien en Google pero no aparece citado en respuestas de IA. Son dos motores distintos: no se promedian.',
     cta: 'Ver AEO Grader',
-    countLabel: '{n} keywords con esta señal'
+    countLabel: '{n} keywords con esta señal',
+    noneTitle: 'Sin brecha detectada',
+    noneDescription: 'Donde rankeas, la IA también te está citando.'
   },
 
   states: {

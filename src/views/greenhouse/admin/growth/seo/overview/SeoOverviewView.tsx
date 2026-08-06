@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 
 import Box from '@mui/material/Box'
+import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
@@ -18,8 +19,10 @@ import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
 import { GH_GROWTH_SEO_OVERVIEW } from '@/lib/copy/growth'
 import type { SeoSpaceOption } from '@/lib/growth/seo/overview/list-seo-spaces'
 import type { SeoOverviewKpis } from '@/lib/growth/seo/overview/read-overview-kpis'
+import type { SeoOverviewSidebar as SeoOverviewSidebarData } from '@/lib/growth/seo/overview/read-overview-sidebar'
 
 import SeoKpiRow from './SeoKpiRow'
+import SeoOverviewSidebar from './SeoOverviewSidebar'
 import SeoSearchVisibilityTabs from './SeoSearchVisibilityTabs'
 import SeoVisibilityEvolutionChart from './SeoVisibilityEvolutionChart'
 
@@ -51,6 +54,8 @@ interface Props {
   canConnectSearchConsole?: boolean
   /** KPIs + serie del Space vigente. `null` cuando no hay nada medido todavía. */
   kpis?: SeoOverviewKpis | null
+  /** Salud + movers + cruce AEO. Cada región degrada por separado. */
+  sidebar?: SeoOverviewSidebarData | null
 }
 
 const SeoOverviewView = ({
@@ -59,7 +64,8 @@ const SeoOverviewView = ({
   connectionState = 'not_connected',
   dataAsOf = null,
   canConnectSearchConsole = false,
-  kpis = null
+  kpis = null,
+  sidebar = null
 }: Props) => {
   const router = useRouter()
 
@@ -247,7 +253,17 @@ const SeoOverviewView = ({
     return (
       <Stack spacing={6}>
         <SeoKpiRow kpis={kpis} periodLabel={periodLabel} />
-        <SeoVisibilityEvolutionChart series={kpis.series} />
+
+        {/* main + sidebar que APILA bajo lg — el sidebar nunca se comprime hasta
+            volverse ilegible; pasa abajo a ancho completo. */}
+        <Grid container spacing={6} alignItems='flex-start'>
+          <Grid size={{ xs: 12, lg: 8 }}>
+            <SeoVisibilityEvolutionChart series={kpis.series} />
+          </Grid>
+          <Grid size={{ xs: 12, lg: 4 }}>
+            {sidebar ? <SeoOverviewSidebar sidebar={sidebar} spaceId={selectedSpaceId} /> : null}
+          </Grid>
+        </Grid>
       </Stack>
     )
   }

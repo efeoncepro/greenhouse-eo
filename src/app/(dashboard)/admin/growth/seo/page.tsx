@@ -1,11 +1,13 @@
-import { redirect } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 
 import type { Metadata } from 'next'
 
 import { can } from '@/lib/entitlements/runtime'
+import { isSeoModuleEnabled } from '@/lib/growth/seo/flags'
 import { listSeoEligibleSpaces } from '@/lib/growth/seo/overview/list-seo-spaces'
 import { readSeoOverviewConnection } from '@/lib/growth/seo/overview/read-overview-connection'
 import { readSeoOverviewKpis } from '@/lib/growth/seo/overview/read-overview-kpis'
+import { readSeoOverviewSidebar } from '@/lib/growth/seo/overview/read-overview-sidebar'
 import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 import SeoOverviewView from '@/views/greenhouse/admin/growth/seo/overview/SeoOverviewView'
@@ -38,6 +40,12 @@ interface PageProps {
 }
 
 export default async function Page({ searchParams }: PageProps) {
+  // Puerta 0 — flag del módulo (EPIC-022, default OFF). Con el módulo apagado la ruta
+  // NO existe: un 404 es más honesto que una pantalla vacía que sugiere "no hay datos".
+  if (!isSeoModuleEnabled()) {
+    notFound()
+  }
+
   const tenant = await getTenantContext()
 
   if (!tenant) {
@@ -75,9 +83,12 @@ export default async function Page({ searchParams }: PageProps) {
 
   // Sólo se leen KPIs cuando hay algo materializado: pedirlos en `not_connected`
   // gastaría 4 queries para devolver ceros que la UI no debe mostrar igual.
-  const kpis = selectedSpace && connection.state === 'connected'
-    ? await readSeoOverviewKpis(selectedSpace.organizationId)
-    : null
+  // KPIs y sidebar en paralelo: son independientes y secuenciarlos duplicaría la latencia
+  // del primer paint sin ganar nada.
+  const [kpis, sidebar] = await Promise.all([
+    selectedSpace && connection.state === 'connected' ? readSeoOverviewKpis(selectedSpace.organizationId) : null,
+    selectedSpace ? readSeoOverviewSidebar(selectedSpace.organizationId) : null
+  ])
 
   return (
     <SeoOverviewView
@@ -87,6 +98,7 @@ export default async function Page({ searchParams }: PageProps) {
       dataAsOf={connection.dataAsOf}
       canConnectSearchConsole={can(tenant, 'growth.search_console.connect', 'execute', 'tenant')}
       kpis={kpis}
+      sidebar={sidebar}
     />
   )
 }
