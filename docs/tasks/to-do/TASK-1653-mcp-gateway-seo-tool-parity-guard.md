@@ -98,8 +98,10 @@ El mandato parity+MCP (2026-08-05) hace que cada reader SEO nuevo nazca con su M
 
 - Topology impact: none
 - Nota: extensión in-place de un servicio ya extraído en repo hermano (`efeonce-mcp`).
-- Current home: `efeonce-mcp` (gateway Cloud Run) — ya extraído; no aplica candidate home ni extracción.
-- Canonical boundary: el gateway consume SOLO el lane ecosystem (contrato sister-platform); cero import de dominio Greenhouse.
+- Current home: `efeonce-mcp` (gateway Cloud Run) — ya extraído.
+- Future candidate home: remain-shared
+- Nota placement: el gateway ES el home final (servicio ya extraído); sin extracción pendiente.
+- Boundary: el gateway consume SOLO el lane ecosystem (contrato sister-platform); cero import de dominio Greenhouse.
 - Server/browser split: n/a (servicio server-only).
 - Build impact: ninguno en greenhouse-eo.
 - Extraction blocker: none.
