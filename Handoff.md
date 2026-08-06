@@ -1,5 +1,18 @@
 # Handoff activo
 
+### Hallazgo MCP gateway — clientes Claude no conectan por falta de DCR (2026-08-06)
+
+Al intentar conectar Claude Code al gateway (`claude mcp add` + `/mcp` → Authenticate) falla con
+`Incompatible auth server: does not support dynamic client registration`. Causa: el cliente MCP de
+Claude (Code y claude.ai custom connectors) exige DCR (RFC 7591) para auto-registrarse, y **Entra no
+soporta DCR**. El canary OAuth funciona porque usa la app Entra PRE-registrada (client `32617b87-…`).
+**Fix propuesto (task nueva en `efeonce-mcp`)**: shim de DCR en el gateway — endpoint `/register` que
+devuelve el client_id público pre-registrado + metadata del authorization server; patrón conocido para
+gateways MCP respaldados por Entra (~50-80 líneas). Con eso Claude Code/claude.ai/Desktop conectan sin
+fricción. Hasta entonces, la vía operable del 360 por MCP sigue siendo la service identity (canary) y
+el smoke OAuth del script.
+
+
 ### TASK-1653 cerrada — las 4 tools SEO federadas al gateway + guard de paridad (2026-08-06)
 
 Ejecutada el mismo día en `efeonce-mcp` (`ff68078`+`2365ef9`, deploy `31112222516`, revisión
