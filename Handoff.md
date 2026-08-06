@@ -52,7 +52,10 @@ ops-worker (mismo patrón que el gateway ese día): revisión **`ops-worker-0052
 ENABLED) y handlers ejercitados por el camino real Scheduler→OIDC: **primer audit de Berel
 encolado** (USD 0.015, 100 págs) + **primer backlink snapshot de Berel** (USD 0.048: 315 ref
 domains, 53.684 backlinks, rank 50/100); efeonce skip por idempotencia. Lanes staging vivos
-(400 `missing_external_scope_type`). **Pendiente restante — bloqueado por el outage de Actions:**
+(400 `missing_external_scope_type`). **Ciclo autónomo COMPLETO verificado el mismo día:** el
+collect PROGRAMADO (tick del cron, cero intervención) materializó el audit de Berel —
+`succeeded`, 100 páginas, health 95.40, 519 findings (0 críticos) — y la lane reactiva espejó el
+backlink snapshot de Berel a BQ orgánicamente (2 filas en `seo_backlink_history`). **Pendiente restante — bloqueado por el outage de Actions:**
 release develop→main (los lanes/MCP tools a Vercel Production; NUNCA dispatchar el orquestador en
 outage: `main` quedaría sin manifest) y DESPUÉS federar las 2 tools al gateway (patrón TASK-1653 —
 antes del release el gateway vería 404). Si el run varado de Actions (31126022507) despierta,
