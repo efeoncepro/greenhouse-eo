@@ -172,3 +172,123 @@ export type SeoAeoGapResult =
       errorCode: 'disabled' | 'target_not_found' | 'no_seo_data' | 'no_aeo_data' | 'query_failed'
       status: null
     }
+
+/**
+ * ═══ TASK-1303 — Rank capture + evolución temporal ═══
+ *
+ * La serie DataForSEO (posición EXACTA en una SERP concreta, con competidores y SERP
+ * features) es una fuente DISTINTA de la serie GSC (posición promediada del propio
+ * dominio). El contrato de honestidad del doc maestro §5 prohíbe promediarlas: el
+ * reader de evolución sirve SOLO la serie DataForSEO; el cruce vive en el report layer.
+ */
+
+/**
+ * Evento outbox del batch de captura (constante local del dominio, patrón growth-forms:
+ * el seam de extracción §17.3 evita acoplar `src/lib/growth/seo/**` al catálogo central).
+ */
+export const SEO_RANK_SNAPSHOT_CAPTURED_EVENT = 'growth.seo.rank_snapshot.captured'
+
+/** Aggregate type del evento de captura (identity: `seo_target_id`, 'seot-{uuid}'). */
+export const SEO_RANK_SNAPSHOT_AGGREGATE_TYPE = 'seo_target'
+
+/** Devices soportados por el schema (CHECK de TASK-1299). */
+export type SeoRankDevice = 'desktop' | 'mobile' | 'tablet'
+
+/** Resultado de una combinación keyword×engine×device dentro de una captura. */
+export type SeoRankCaptureComboStatus =
+  /** Snapshot insertado (position puede ser null: keyword trackeada, dominio no rankea). */
+  | 'captured'
+  /** Ya existía snapshot para este `capture_date` — no se pega el provider (idempotencia sin gasto). */
+  | 'already_captured'
+  /** El spend fence re-consultó el gate a mitad del batch y frenó el resto. */
+  | 'budget_blocked'
+  /** Circuit breaker de la familia abierto: no se intentó (≠ intentado y fallido). */
+  | 'breaker_open'
+  /** El provider respondió error o el parse no encontró un resultado utilizable. */
+  | 'provider_error'
+
+export interface SeoRankCaptureComboOutcome {
+  keyword: string
+  engine: string
+  device: SeoRankDevice
+  status: SeoRankCaptureComboStatus
+  position: number | null
+  url: string | null
+  /** Costo del call atribuido a la fila (procedencia). El presupuesto vive en el ledger. */
+  providerCostUsd: number
+  errorCode: string | null
+}
+
+/**
+ * Estado agregado de la captura de un target. `succeeded` exige capturar TODO lo
+ * elegible; `degraded` (elegibles > 0, capturados = 0) NUNCA se reporta como éxito —
+ * espejo de la regla BigQuery DML de CLAUDE.md.
+ */
+export type SeoRankCaptureStatus = 'succeeded' | 'partial' | 'degraded' | 'skipped'
+
+export type SeoRankCaptureResult =
+  | {
+      ok: true
+      seoTargetId: string
+      organizationId: string
+      captureDate: string
+      status: SeoRankCaptureStatus
+      /** Combos keyword×engine×device del scope que faltaban por capturar hoy. */
+      eligible: number
+      captured: number
+      alreadyCaptured: number
+      budgetBlocked: number
+      providerErrors: number
+      breakerOpen: number
+      /** Suma de costos reportados por el provider en esta corrida (informativo). */
+      costUsd: number
+      sourceRunId: string
+      outcomes: SeoRankCaptureComboOutcome[]
+    }
+  | {
+      ok: false
+      errorCode:
+        | 'disabled'
+        | 'target_not_found'
+        | 'target_not_active'
+        | 'no_keywords'
+        | 'no_entitlement'
+        | 'expired'
+        | 'budget_exhausted'
+      status: null
+    }
+
+/** Punto de la serie de evolución: una medición diaria de una keyword. */
+export interface RankEvolutionPoint {
+  /** `capture_date` (YYYY-MM-DD). */
+  date: string
+  /** Posición orgánica medida; null = trackeada pero el dominio no rankeó ese día. */
+  position: number | null
+  url: string | null
+}
+
+export interface RankEvolutionSeries {
+  keyword: string
+  points: RankEvolutionPoint[]
+}
+
+export type RankEvolutionSource = 'postgres' | 'bigquery'
+
+export type RankEvolutionResult =
+  | {
+      ok: true
+      seoTargetId: string
+      organizationId: string
+      engine: string
+      device: SeoRankDevice
+      /** Ventana efectivamente servida. */
+      range: { from: string; to: string; days: number }
+      /** PG = ventana caliente (~180d); BigQuery = historia larga (rango mayor). */
+      source: RankEvolutionSource
+      series: RankEvolutionSeries[]
+    }
+  | {
+      ok: false
+      errorCode: 'disabled' | 'target_not_found' | 'no_data' | 'query_failed'
+      status: null
+    }

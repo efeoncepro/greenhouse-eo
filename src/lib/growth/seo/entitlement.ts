@@ -304,21 +304,40 @@ export const resolveSeoEntitlement = async (
  *
  * Cerrar esto de verdad pide una reserva previa al gasto (patrón del spend fence de Globe),
  * que es trabajo de la task que introduzca el primer batch real — TASK-1303.
+ *
+ * Delta TASK-1303 (spend fence del rank capture): el caller del primer batch real aplica
+ * las tres mitigaciones (estimatedCostUsd del batch completo + re-consulta cada K llamadas
+ * + pre-check de idempotencia que evita re-gastar). `consumesAuditAllowance: false` existe
+ * porque el rank capture no crea `seo_site_audit_runs`: sin él, un org que agotó su cupo
+ * de audits quedaría con la serie diaria de rankings CONGELADA por un contador que no
+ * consume — el freno correcto para esa capability es solo presupuesto/expiración.
+ * Residual conocido: un timeout DESPUÉS de que el proveedor cobró sigue sin registrarse.
  */
 export const enforceSeoRunEntitlement = async (
   organizationId: string,
-  options: { estimatedCostUsd?: number } = {},
+  options: { estimatedCostUsd?: number; consumesAuditAllowance?: boolean } = {},
   env: NodeJS.ProcessEnv = process.env
 ): Promise<SeoRunGate> => {
   const entitlement = await resolveSeoEntitlement(organizationId, env)
+  const consumesAuditAllowance = options.consumesAuditAllowance !== false
 
-  if (entitlement.blockedReason) {
+  // `quota_exhausted` cuenta audit runs. Para capabilities que no los consumen (rank
+  // capture), se re-deriva el bloqueo sin ese contador — en el MISMO orden del resolver
+  // (expired > budget), nunca inline en un consumer.
+  const effectiveBlockedReason =
+    entitlement.blockedReason === 'quota_exhausted' && !consumesAuditAllowance
+      ? entitlement.budgetRemainingUsd <= 0
+        ? 'budget_exhausted'
+        : null
+      : entitlement.blockedReason
+
+  if (effectiveBlockedReason) {
     return {
       allowed: false,
       tier: entitlement.tier,
       allowanceRemaining: entitlement.allowanceRemaining,
       budgetRemainingUsd: entitlement.budgetRemainingUsd,
-      blockedReason: entitlement.blockedReason
+      blockedReason: effectiveBlockedReason
     }
   }
 
