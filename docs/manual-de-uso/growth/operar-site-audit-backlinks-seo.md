@@ -43,7 +43,13 @@ una fila por `(target, semana)`, idempotente.
 
 ## Paso a paso — habilitar los crons (rollout)
 
-Los 3 schedulers **nacen pausados**. Para habilitarlos:
+> **Estado 2026-08-06: los 3 schedulers están ACTIVOS** (despausados el mismo día del
+> rollout vía deploy break-glass local — outage de GitHub Actions — con autorización del
+> operador; revisión `ops-worker-00528-zgr`). Esta sección queda como referencia para
+> re-pausar/re-habilitar; recuerda que el `deploy-contract.test.ts` asserta el estado
+> declarado vigente y debe cambiar junto con `deploy.sh`.
+
+Los 3 schedulers nacieron pausados. Para cambiar su estado:
 
 1. Editar `services/ops-worker/deploy.sh`: cambiar el 5.º argumento de
    `upsert_scheduler_job` de `"true"` a `"false"` para el job correspondiente.

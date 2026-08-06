@@ -45,12 +45,19 @@ las projections) → signal ok → ledger del transporte correcto. **Gotcha caza
 sin tasks y el collect quedaba ciego (fix + guard de regresión + reference del skill corregida).
 Gates: suite full verde, build prod, worker gates, sanity SQL 17 checks, docs:closure-check.
 
-**Pendiente para operativamente completo (decisión de push del operador):** (1) push a `develop` →
-deploy ops-worker (handlers + projections) → verificar los 3 schedulers creados PAUSADOS; (2)
-despausar cuando se decida (editar 5.º arg en `deploy.sh`; `enqueue` SIEMPRE antes que `collect`);
-(3) replay reactivo explícito de los eventos del smoke si se quiere que la lane los procese; (4)
-federar las 2 tools al gateway `efeonce-mcp` DESPUÉS del release prod (patrón TASK-1653, lista de
-paridad en ese repo). Runbook: `docs/manual-de-uso/growth/operar-site-audit-backlinks-seo.md`.
+**ROLLOUT EJECUTADO (2026-08-06 tarde, autorización "termina todo lo que falte"):** push develop
+hecho; Actions en outage mayor mató 2 runs del worker en cola → **break-glass local** del
+ops-worker (mismo patrón que el gateway ese día): revisión **`ops-worker-00528-zgr`** con
+`GIT_SHA=26005a619`. **Los 3 schedulers ACTIVOS** (deploy-contract test ahora protege el estado
+ENABLED) y handlers ejercitados por el camino real Scheduler→OIDC: **primer audit de Berel
+encolado** (USD 0.015, 100 págs) + **primer backlink snapshot de Berel** (USD 0.048: 315 ref
+domains, 53.684 backlinks, rank 50/100); efeonce skip por idempotencia. Lanes staging vivos
+(400 `missing_external_scope_type`). **Pendiente restante — bloqueado por el outage de Actions:**
+release develop→main (los lanes/MCP tools a Vercel Production; NUNCA dispatchar el orquestador en
+outage: `main` quedaría sin manifest) y DESPUÉS federar las 2 tools al gateway (patrón TASK-1653 —
+antes del release el gateway vería 404). Si el run varado de Actions (31126022507) despierta,
+deploya el mismo SHA — converge inofensivo. Runbook:
+`docs/manual-de-uso/growth/operar-site-audit-backlinks-seo.md`.
 
 ### Hallazgo MCP gateway — clientes Claude no conectan por falta de DCR (2026-08-06)
 
@@ -524,8 +531,9 @@ diligencia está `En curso`; todavía no hay nivel Select/Premier/Diamond activo
 
 El registro también consolida Claude, OpenAI, BytePlus, Runway, ElevenLabs, FLUX, AWS, Salesforce, HubSpot, Lovable,
 HeyGen y otras relaciones, separando partnership activo, cuenta registrada, postulación, provider en uso, bloqueo y
-target. Próximo paso operativo: responder las decisiones de due diligence de Google Cloud y actualizar el registro sólo
-con evidencia primaria. La auditoría de postulaciones de IA del 2026-07-26 queda como fotografía histórica.
+target. Google envió el 2026-08-06 la solicitud formal de due diligence anti-soborno, con fecha límite 2026-08-13; el
+próximo paso operativo es responder las decisiones del formulario antes de esa fecha y actualizar el registro sólo con
+evidencia primaria. La auditoría de postulaciones de IA del 2026-07-26 queda como fotografía histórica.
 
 ### Nexa — retiro del modo "Compacto" + diagnóstico del lane que se abría solo (2026-08-05)
 
