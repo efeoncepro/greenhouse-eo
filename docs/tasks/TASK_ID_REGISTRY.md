@@ -1742,7 +1742,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 
 `TASK-1653`
 
-|`TASK-1653`|`to-do` | MCP Gateway: federar `get_seo_rank_evolution` + guard de paridad de tools SEO (EPIC-022) — 4.ª tool al gateway `mcp.efeonce.org` (patrón TASK-1645/1647, bloqueada por release prod de TASK-1303) + check de paridad inventario interno vs allowlist del gateway con exclusiones declaradas (anti drift silencioso; el allowlist explícito se conserva). Repo `efeonce-mcp`. P2. Impact Alto. Effort Bajo. Type implementation. Execution profile backend-data. Backend impact integration. Domain: growth\|integrations\|mcp. |`docs/tasks/to-do/TASK-1653-mcp-gateway-seo-tool-parity-guard.md`|
+|`TASK-1653`|`complete` | MCP Gateway: federar `get_seo_rank_evolution` + guard de paridad de tools SEO (EPIC-022) — 4.ª tool al gateway `mcp.efeonce.org` (patrón TASK-1645/1647, bloqueada por release prod de TASK-1303) + check de paridad inventario interno vs allowlist del gateway con exclusiones declaradas (anti drift silencioso; el allowlist explícito se conserva). Repo `efeonce-mcp`. P2. Impact Alto. Effort Bajo. Type implementation. Execution profile backend-data. Backend impact integration. Domain: growth\|integrations\|mcp. |`docs/tasks/complete/TASK-1653-mcp-gateway-seo-tool-parity-guard.md`|
 
 > Nota 2026-08-06 (3): `TASK-1653` quedó tomada por la federación de la 4.ª tool SEO + guard de paridad del gateway MCP; el siguiente ID libre es `TASK-1654`.
 

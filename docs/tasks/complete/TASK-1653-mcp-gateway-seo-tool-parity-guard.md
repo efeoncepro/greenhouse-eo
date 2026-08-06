@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Bajo`
@@ -19,10 +19,10 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Diseño`
+- Status real: `complete (2026-08-06): 4 tools federadas + guard CI fail-closed; revisión gateway 00014-fcg Ready`
 - Rank: `TBD`
 - Domain: `growth|integrations|mcp`
-- Blocked by: `release develop→main con TASK-1303 (el lane rank-evolution debe existir en prod ANTES de federarlo, o el gateway vería 404)`
+- Blocked by: `none (blocker cumplido: release fcee5ab9f7ce en prod 2026-08-06)`
 - Branch: `main` (repo `efeonce-mcp`; los docs de esta task viven en greenhouse-eo)
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -176,13 +176,17 @@ Ver patrón exacto de las 3 tools existentes en `providers/greenhouse-seo.ts` + 
      ZONE 4 — VERIFICATION & CLOSING
      ═══════════════════════════════════════════════════════════ -->
 
+## Cierre 2026-08-06
+
+Ejecutada el mismo día de su creación (blocker cumplido por el release `fcee5ab9f7ce`). En `efeonce-mcp` (commits `ff68078` + `2365ef9`, CI verde, deploy run `31112222516`, revisión `efeonce-mcp-gateway-00014-fcg` Ready): (1) provider `getRankEvolution` (keywords CSV) + interface + `registerTool` con schema espejo del MCP interno; (2) guard de paridad: lista esperada versionada (`greenhouse-seo-tool-parity.ts`) + exclusiones con razón + test CI fail-closed sobre `src/mcp.ts` — **rojo forzado verificado** con mensaje accionable y verde restaurado; (3) canary extendido y corrido contra producción **4/4**: entitlement Berel contracted (budget 49.86 refleja el gasto real del día), visibility-360 `riesgo`, **rank-evolution `source=postgres series=31`** (la serie real capturada hoy), deny anti-oracle 404; (4) contrato "cómo agregar una tool" en `AGENTS.md` del gateway. Front door verificado: metadata 200, `POST /mcp` anónimo 401. **Paso asistido pendiente (no bloqueante)**: smoke autenticado por `mcp.efeonce.org` exige login Entra humano (limitación conocida del OAuth interactivo); la evidencia automatizable quedó completa.
+
 ## Acceptance Criteria
 
-- [ ] `get_seo_rank_evolution` invocable vía `mcp.efeonce.org` con payload passthrough idéntico al lane (canary verde contra producción).
-- [ ] Las 3 tools preexistentes siguen verdes en el mismo canary.
-- [ ] El guard falla (exit 1, mensaje accionable) ante una divergencia sintética y pasa en verde con el estado real.
-- [ ] Las exclusiones del guard llevan razón declarada; cero auto-federación.
-- [ ] Contrato de "cómo agregar una tool" documentado en `efeonce-mcp`.
+- [x] `get_seo_rank_evolution` invocable vía `mcp.efeonce.org` con payload passthrough idéntico al lane (canary verde contra producción).
+- [x] Las 3 tools preexistentes siguen verdes en el mismo canary.
+- [x] El guard falla (exit 1, mensaje accionable) ante una divergencia sintética y pasa en verde con el estado real.
+- [x] Las exclusiones del guard llevan razón declarada; cero auto-federación.
+- [x] Contrato de "cómo agregar una tool" documentado en `efeonce-mcp`.
 
 ## Verification
 

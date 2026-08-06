@@ -1,5 +1,19 @@
 # Handoff activo
 
+### TASK-1653 cerrada — las 4 tools SEO federadas al gateway + guard de paridad (2026-08-06)
+
+Ejecutada el mismo día en `efeonce-mcp` (`ff68078`+`2365ef9`, deploy `31112222516`, revisión
+`efeonce-mcp-gateway-00014-fcg` Ready): `get_seo_rank_evolution` federada (provider + registerTool
+espejo del MCP interno) + **guard de paridad CI fail-closed** (lista esperada versionada +
+exclusiones con razón; rojo forzado verificado). Canary 4/4 contra producción: rank-evolution
+sirvió `series=31` — la serie real de Berel capturada hoy — y el budget del entitlement ya refleja
+el gasto (49.86/50). Contrato "cómo agregar una tool" en el AGENTS.md del gateway: las tasks del
+mandato (1304/1311/1313/1314/1317) agregan su tool a la lista esperada EN EL MISMO PR. Pendiente
+asistido no bloqueante: smoke autenticado vía `mcp.efeonce.org` (login Entra humano). Con esto, el
+programa SEO del día queda entero: captura diaria activa + 4 tools E2E + release en prod. Siguiente
+frente: TASK-1307 (UI pantalla ancla) y TASK-1304.
+
+
 ### Release `fcee5ab9f7ce` — TASK-1303 en producción (2026-08-06)
 
 PR #178 → manifest **`released`** (`fcee5ab9f7ce-1a85e0aa-cbad-42ab-bad0-2b4851d999cc`, run
