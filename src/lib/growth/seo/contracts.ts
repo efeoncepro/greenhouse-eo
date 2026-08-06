@@ -261,6 +261,179 @@ export type SeoRankCaptureResult =
       status: null
     }
 
+/**
+ * ═══ TASK-1304 — Site audit (OnPage async) + backlink snapshot ═══
+ *
+ * OnPage es task-based ASYNC: el ciclo son DOS fases desacopladas (enqueue crea la task y
+ * persiste `provider_task_id` con `status=running`; collect poll-ea idempotente y
+ * materializa exactamente una vez). Backlinks es live síncrono (snapshot semanal).
+ * Eventos como constantes locales del dominio (patrón growth-forms, seam §17.3).
+ */
+
+/** Evento de rastro: se creó una task OnPage (aún sin resultado). */
+export const SEO_SITE_AUDIT_QUEUED_EVENT = 'growth.seo.site_audit.queued'
+
+/** Evento de materialización: el collect cerró el run (dispara el mirror BQ reactivo). */
+export const SEO_SITE_AUDIT_COMPLETED_EVENT = 'growth.seo.site_audit.completed'
+
+/** Evento de captura de backlink snapshot (dispara el mirror BQ reactivo). */
+export const SEO_BACKLINK_SNAPSHOT_CAPTURED_EVENT = 'growth.seo.backlink_snapshot.captured'
+
+/** Estados del run de audit (CHECK de TASK-1299). `running` es el único no-terminal. */
+export type SeoSiteAuditRunStatus = 'running' | 'succeeded' | 'degraded' | 'failed'
+
+/** Severidades de finding (CHECK de TASK-1299). */
+export type SeoSiteAuditFindingSeverity = 'critical' | 'warning' | 'notice'
+
+export type SeoSiteAuditQueueResult =
+  | {
+      ok: true
+      auditRunId: string
+      seoTargetId: string
+      organizationId: string
+      captureDate: string
+      providerTaskId: string
+      /** Costo reportado por el provider al crear la task (procedencia; el presupuesto vive en el ledger). */
+      providerCostUsd: number
+      status: 'running'
+    }
+  | {
+      ok: false
+      errorCode:
+        | 'disabled'
+        | 'target_not_found'
+        | 'target_not_active'
+        /** Ya hay una task OnPage en vuelo para el target (el collect aún no la cierra). */
+        | 'audit_already_running'
+        /** Hoy ya hay un audit exitoso para el target — re-encolar sería gasto duplicado. */
+        | 'already_captured_today'
+        | 'no_entitlement'
+        | 'expired'
+        | 'quota_exhausted'
+        | 'budget_exhausted'
+        | 'breaker_open'
+        | 'provider_error'
+      status: null
+    }
+
+/** Resultado de un ciclo de collect sobre UN run en `running`. */
+export type SeoSiteAuditCollectRunOutcome =
+  /** La task OnPage sigue crawleando — no-op honesto, se reintenta en el próximo ciclo. */
+  | 'in_progress'
+  /** Run materializado (status final + findings) en esta pasada. */
+  | 'materialized'
+  /** Otro proceso tenía el claim (SKIP LOCKED) — no se tocó. */
+  | 'claimed_elsewhere'
+  /** El poll al provider falló (breaker/HTTP) — el run queda `running` para reintento. */
+  | 'poll_failed'
+  /** El run superó la edad máxima sin completar y se degradó a `failed`. */
+  | 'gave_up'
+
+export interface SeoSiteAuditCollectSummary {
+  /** Runs en `running` visibles al iniciar el ciclo. */
+  pending: number
+  materialized: number
+  inProgress: number
+  pollFailed: number
+  gaveUp: number
+  claimedElsewhere: number
+  outcomes: Array<{
+    auditRunId: string
+    seoTargetId: string
+    outcome: SeoSiteAuditCollectRunOutcome
+    finalStatus: SeoSiteAuditRunStatus | null
+    findings: number
+  }>
+}
+
+export interface SeoSiteAuditFindingView {
+  url: string
+  issueType: string
+  severity: SeoSiteAuditFindingSeverity
+  detail: Record<string, unknown>
+}
+
+export interface SeoSiteAuditRunView {
+  auditRunId: string
+  captureDate: string
+  status: SeoSiteAuditRunStatus
+  crawledPages: number | null
+  healthScore: number | null
+  startedAt: string | null
+  finishedAt: string | null
+}
+
+export type SiteAuditReportResult =
+  | {
+      ok: true
+      seoTargetId: string
+      organizationId: string
+      run: SeoSiteAuditRunView
+      /** Findings agrupados por severidad (orden: critical → warning → notice). */
+      findings: Record<SeoSiteAuditFindingSeverity, SeoSiteAuditFindingView[]>
+      totals: Record<SeoSiteAuditFindingSeverity, number>
+    }
+  | {
+      ok: false
+      errorCode: 'disabled' | 'target_not_found' | 'run_not_found' | 'no_data' | 'query_failed'
+      status: null
+    }
+
+export type SeoBacklinkCaptureResult =
+  | {
+      ok: true
+      seoTargetId: string
+      organizationId: string
+      captureDate: string
+      /**
+       * `captured` = snapshot completo · `already_captured` = idempotencia sin gasto ·
+       * `partial` = summary OK pero el delta new/lost no se pudo obtener (se persiste
+       * el snapshot con `new_lost_delta` vacío — honesto, no fabricado).
+       */
+      status: 'captured' | 'already_captured' | 'partial'
+      providerCostUsd: number
+    }
+  | {
+      ok: false
+      errorCode:
+        | 'disabled'
+        | 'target_not_found'
+        | 'target_not_active'
+        | 'no_entitlement'
+        | 'expired'
+        | 'budget_exhausted'
+        | 'breaker_open'
+        | 'provider_error'
+      status: null
+    }
+
+/** Punto de la serie semanal del perfil de enlaces (una fila por `capture_date`). */
+export interface BacklinkProfilePoint {
+  /** `capture_date` (YYYY-MM-DD). */
+  date: string
+  referringDomains: number | null
+  backlinksTotal: number | null
+  /** Rank del dominio en escala 0–100 (`rank_scale: one_hundred`). */
+  domainRank: number | null
+  /** Proxy de toxicidad 0–1 (spam score promedio del perfil entrante / 100). */
+  toxicShare: number | null
+  newLostDelta: Record<string, unknown>
+}
+
+export type BacklinkProfileResult =
+  | {
+      ok: true
+      seoTargetId: string
+      organizationId: string
+      range: { from: string; to: string; days: number }
+      points: BacklinkProfilePoint[]
+    }
+  | {
+      ok: false
+      errorCode: 'disabled' | 'target_not_found' | 'no_data' | 'query_failed'
+      status: null
+    }
+
 /** Punto de la serie de evolución: una medición diaria de una keyword. */
 export interface RankEvolutionPoint {
   /** `capture_date` (YYYY-MM-DD). */
