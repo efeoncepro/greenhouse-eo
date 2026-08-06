@@ -8,8 +8,9 @@ espejo del MCP interno) + **guard de paridad CI fail-closed** (lista esperada ve
 exclusiones con razón; rojo forzado verificado). Canary 4/4 contra producción: rank-evolution
 sirvió `series=31` — la serie real de Berel capturada hoy — y el budget del entitlement ya refleja
 el gasto (49.86/50). Contrato "cómo agregar una tool" en el AGENTS.md del gateway: las tasks del
-mandato (1304/1311/1313/1314/1317) agregan su tool a la lista esperada EN EL MISMO PR. Pendiente
-asistido no bloqueante: smoke autenticado vía `mcp.efeonce.org` (login Entra humano). Con esto, el
+mandato (1304/1311/1313/1314/1317) agregan su tool a la lista esperada EN EL MISMO PR. El smoke
+autenticado vía `mcp.efeonce.org` también quedó VERDE el mismo día (4 tools en 200; rank-evolution
+series=31 por el tramo Entra→gateway; canary extendido en `83cdefc`). Con esto, el
 programa SEO del día queda entero: captura diaria activa + 4 tools E2E + release en prod. Siguiente
 frente: TASK-1307 (UI pantalla ancla) y TASK-1304.
 
