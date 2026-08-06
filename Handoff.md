@@ -1,5 +1,21 @@
 # Handoff activo
 
+### Release `fcee5ab9f7ce` — TASK-1303 en producción (2026-08-06)
+
+PR #178 → manifest **`released`** (`fcee5ab9f7ce-1a85e0aa-cbad-42ab-bad0-2b4851d999cc`, run
+`31105434129`, 10m04s), watchdog `drift_count=0`, health verde. El lane
+`/api/platform/ecosystem/growth/seo/rank-evolution` responde en producción (400 sin auth = ruta
+viva) y la tool interna `get_seo_rank_evolution` quedó en el MCP de prod. Dos hallazgos para el
+próximo release (ya en el timing ledger): (a) pushes docs-only a develop justo antes del release
+cancelan el build de staging (ignore-build) y bloquean el preflight `vercel_environments` —
+pre-empción: `vercel redeploy` del deployment cancelado; (b) el merge canónico `-X ours` intentó
+colar 1 línea regresiva de main (`recordFailure` incondicional pre-auditoría TASK-1300) — con
+verif1 vacío y drift regresivo, `-s ours` (árbol develop exacto) es la resolución. **Siguiente:
+TASK-1653** (federar `get_seo_rank_evolution` al gateway + guard de paridad) quedó DESBLOQUEADA
+por este release. La serie de rankings corre sola desde mañana 05:00 CLT (scheduler ENABLED,
+Berel 31 keywords).
+
+
 ### TASK-1303 — rank capture + evolution reader: code complete, rollout pendiente (2026-08-06)
 
 El backend de la pantalla ancla de EPIC-022 quedó completo en `develop` **local (sin push)**: command
