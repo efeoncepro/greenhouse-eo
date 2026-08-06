@@ -8,7 +8,7 @@
 
 import 'server-only'
 
-import { type DataForSeoFamily } from '@/lib/ai/dataforseo-families'
+import type { DataForSeoFamily } from '@/lib/ai/dataforseo-families'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 export interface RecordSeoProviderSpendInput {

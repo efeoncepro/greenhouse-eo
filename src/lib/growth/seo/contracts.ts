@@ -8,7 +8,10 @@
  * Este archivo NO importa `server-only`: es sólo tipos, y la UI necesita importarlos.
  */
 
-import { type SearchConsoleConnectionStatus } from '@/lib/growth/search-console'
+// `import type` pleno (no `{ type X }`): el bundle del ops-worker preserva el side-effect
+// import de la forma con especificadores y lo deja como external sin resolver — el gate
+// worker:runtime-deps-gate lo detecta como paquete fantasma `@/lib`.
+import type { SearchConsoleConnectionStatus } from '@/lib/growth/search-console'
 
 /** Códigos de degradación honesta compartidos por el dominio SEO. */
 export type SeoDegradationCode =

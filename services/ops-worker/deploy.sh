@@ -1089,6 +1089,27 @@ upsert_scheduler_job \
   "false"
 echo "  -> ops-seo-gsc-snapshot: 0 9 * * * ACTIVO (materialización GSC diaria, TASK-1302)"
 
+# Rank capture diario — TASK-1303.
+#
+# Cron 0 5 * * * America/Santiago: captura la posición EXACTA (DataForSEO SERP, familia
+# `serp`) de las keywords vigentes de cada target activo con assignment `seo_v1`. La
+# madrugada da un capture_date consistente para toda la serie del día.
+#
+# ⚠️ NACE PAUSADO A PROPÓSITO — el costo DataForSEO es el riesgo #1 del programa
+# (arch SEO §13.1). Despausar SOLO tras verificar en staging con Berel: gate de costo
+# (enforceSeoRunEntitlement + spend fence), idempotencia del re-run y el mirror BQ.
+# Para despausar: cambiar el 5º arg a "false" ACÁ (el estado se re-aplica en CADA deploy;
+# despausar out-of-band se revierte solo en el siguiente deploy, en silencio).
+# El blast radius real lo controla el assignment per-org (Berel primero, §11): el batch
+# solo itera orgs con `module_assignments.seo_v1` vigente.
+upsert_scheduler_job \
+  "ops-seo-rank-capture" \
+  "0 5 * * *" \
+  "/seo/rank/capture-batch" \
+  '{}' \
+  "true"
+echo "  -> ops-seo-rank-capture: 0 5 * * * PAUSADO (rank capture diario, TASK-1303 — despausar tras verificar gate de costo en staging)"
+
 # Email deliverability monitor — TASK-775 Slice 2.
 #
 # Cron 0 */6 * * * America/Santiago: 4 runs/día. Cómputa bounce/complaint rate
