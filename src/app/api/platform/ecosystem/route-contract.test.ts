@@ -49,12 +49,16 @@ const mockGetSeoKeywordOpportunities = vi.fn()
 const mockGetSeoVisibility360 = vi.fn()
 const mockGetSeoEntitlement = vi.fn()
 const mockGetSeoRankEvolution = vi.fn()
+const mockGetSeoSiteAuditReport = vi.fn()
+const mockGetSeoBacklinkProfile = vi.fn()
 
 vi.mock('@/lib/api-platform/resources/ecosystem-growth-seo', () => ({
   getEcosystemSeoKeywordOpportunitiesPayload: (...args: unknown[]) => mockGetSeoKeywordOpportunities(...args),
   getEcosystemSeoVisibility360Payload: (...args: unknown[]) => mockGetSeoVisibility360(...args),
   getEcosystemSeoEntitlementPayload: (...args: unknown[]) => mockGetSeoEntitlement(...args),
-  getEcosystemSeoRankEvolutionPayload: (...args: unknown[]) => mockGetSeoRankEvolution(...args)
+  getEcosystemSeoRankEvolutionPayload: (...args: unknown[]) => mockGetSeoRankEvolution(...args),
+  getEcosystemSeoSiteAuditReportPayload: (...args: unknown[]) => mockGetSeoSiteAuditReport(...args),
+  getEcosystemSeoBacklinkProfilePayload: (...args: unknown[]) => mockGetSeoBacklinkProfile(...args)
 }))
 
 vi.mock('@/lib/api-platform/resources/events', () => ({
@@ -83,6 +87,8 @@ const seoKeywordOpportunitiesRoute = await import('./growth/seo/keyword-opportun
 const seoVisibility360Route = await import('./growth/seo/visibility-360/route')
 const seoEntitlementRoute = await import('./growth/seo/entitlement/route')
 const seoRankEvolutionRoute = await import('./growth/seo/rank-evolution/route')
+const seoSiteAuditReportRoute = await import('./growth/seo/site-audit-report/route')
+const seoBacklinkProfileRoute = await import('./growth/seo/backlink-profile/route')
 
 describe('api platform ecosystem route contracts', () => {
   beforeEach(() => {
@@ -264,6 +270,22 @@ describe('api platform ecosystem route contracts', () => {
 
     expect(evoBody.routeKey).toBe('platform.ecosystem.growth.seo.rank_evolution')
     expect(mockGetSeoRankEvolution).toHaveBeenCalledWith(expect.objectContaining({ request: evoRequest }))
+
+    // TASK-1304 — site audit report + backlink profile
+    mockGetSeoSiteAuditReport.mockResolvedValue({ data: { ok: true }, meta: {} })
+    mockGetSeoBacklinkProfile.mockResolvedValue({ data: { ok: true }, meta: {} })
+
+    const auditRequest = new Request('https://example.com/api/platform/ecosystem/growth/seo/site-audit-report')
+    const auditBody = await (await seoSiteAuditReportRoute.GET(auditRequest)).json()
+
+    expect(auditBody.routeKey).toBe('platform.ecosystem.growth.seo.site_audit_report')
+    expect(mockGetSeoSiteAuditReport).toHaveBeenCalledWith(expect.objectContaining({ request: auditRequest }))
+
+    const backlinkRequest = new Request('https://example.com/api/platform/ecosystem/growth/seo/backlink-profile')
+    const backlinkBody = await (await seoBacklinkProfileRoute.GET(backlinkRequest)).json()
+
+    expect(backlinkBody.routeKey).toBe('platform.ecosystem.growth.seo.backlink_profile')
+    expect(mockGetSeoBacklinkProfile).toHaveBeenCalledWith(expect.objectContaining({ request: backlinkRequest }))
   })
 
   it('routes event control plane commands through the idempotent command harness (TASK-655)', async () => {

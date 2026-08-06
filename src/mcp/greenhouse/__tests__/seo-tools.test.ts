@@ -30,6 +30,8 @@ const buildClient = (overrides: Record<string, unknown> = {}) =>
     getSeoVisibility360: vi.fn(),
     getSeoEntitlement: vi.fn(),
     getSeoRankEvolution: vi.fn(),
+    getSeoSiteAuditReport: vi.fn(),
+    getSeoBacklinkProfile: vi.fn(),
     ...overrides
   }) as never
 
@@ -222,5 +224,107 @@ describe('get_seo_rank_evolution handler (TASK-1303)', () => {
 
     expect(result.isError).toBe(true)
     expect(result.content[0].text).toContain('404')
+  })
+})
+
+describe('get_seo_site_audit_report handler (TASK-1304)', () => {
+  it('passthrough del payload + summary con health y totales por severidad', async () => {
+    const payload = {
+      ok: true,
+      run: { auditRunId: 'seoar-1', status: 'succeeded', healthScore: 87.5 },
+      findings: { critical: [], warning: [], notice: [] },
+      totals: { critical: 1, warning: 3, notice: 5 }
+    }
+
+    const handlers = createGreenhouseMcpHandlers(
+      buildClient({ getSeoSiteAuditReport: vi.fn().mockResolvedValue(okEnvelope(payload)) })
+    )
+
+    const result = await handlers.getSeoSiteAuditReport({ organizationId: 'org-1' })
+
+    expect(result.isError).toBe(false)
+    expect(result.structuredContent).toMatchObject({ ok: true, data: payload })
+    expect(result.content[0].text).toContain('status=succeeded')
+    expect(result.content[0].text).toContain('1 critical / 3 warning / 5 notice')
+  })
+
+  it('run en curso se reporta como tal, sin fabricar findings', async () => {
+    const handlers = createGreenhouseMcpHandlers(
+      buildClient({
+        getSeoSiteAuditReport: vi
+          .fn()
+          .mockResolvedValue(okEnvelope({ ok: true, run: { status: 'running', healthScore: null }, totals: { critical: 0, warning: 0, notice: 0 } }))
+      })
+    )
+
+    const result = await handlers.getSeoSiteAuditReport({ organizationId: 'org-1' })
+
+    expect(result.content[0].text).toContain('still running')
+  })
+
+  it('degradación honesta: data.ok=false se reporta con su errorCode', async () => {
+    const handlers = createGreenhouseMcpHandlers(
+      buildClient({
+        getSeoSiteAuditReport: vi.fn().mockResolvedValue(okEnvelope({ ok: false, errorCode: 'no_data', status: null }))
+      })
+    )
+
+    const result = await handlers.getSeoSiteAuditReport({ organizationId: 'org-1' })
+
+    expect(result.isError).toBe(false)
+    expect(result.content[0].text).toContain('unavailable (no_data)')
+  })
+
+  it('propaga el error del lane (anti-oracle 404) sin inventar datos', async () => {
+    const handlers = createGreenhouseMcpHandlers(
+      buildClient({
+        getSeoSiteAuditReport: vi.fn().mockRejectedValue(
+          new GreenhouseMcpApiError('SEO resource not found for the resolved scope.', {
+            status: 404,
+            code: 'not_found',
+            requestId: 'req-x'
+          })
+        )
+      })
+    )
+
+    const result = await handlers.getSeoSiteAuditReport({ organizationId: 'org-ajena' })
+
+    expect(result.isError).toBe(true)
+    expect(result.content[0].text).toContain('404')
+  })
+})
+
+describe('get_seo_backlink_profile handler (TASK-1304)', () => {
+  it('passthrough del payload + summary con conteo de snapshots', async () => {
+    const payload = {
+      ok: true,
+      range: { from: '2025-08-07', to: '2026-08-06', days: 365 },
+      points: [{ date: '2026-07-30' }, { date: '2026-08-06' }]
+    }
+
+    const handlers = createGreenhouseMcpHandlers(
+      buildClient({ getSeoBacklinkProfile: vi.fn().mockResolvedValue(okEnvelope(payload)) })
+    )
+
+    const result = await handlers.getSeoBacklinkProfile({ organizationId: 'org-1' })
+
+    expect(result.isError).toBe(false)
+    expect(result.structuredContent).toMatchObject({ ok: true, data: payload })
+    expect(result.content[0].text).toContain('2 weekly snapshots')
+    expect(result.content[0].text).toContain('365 days')
+  })
+
+  it('degradación honesta: serie vacía = no_data reportado, nunca ceros', async () => {
+    const handlers = createGreenhouseMcpHandlers(
+      buildClient({
+        getSeoBacklinkProfile: vi.fn().mockResolvedValue(okEnvelope({ ok: false, errorCode: 'no_data', status: null }))
+      })
+    )
+
+    const result = await handlers.getSeoBacklinkProfile({ organizationId: 'org-1' })
+
+    expect(result.isError).toBe(false)
+    expect(result.content[0].text).toContain('unavailable (no_data)')
   })
 })

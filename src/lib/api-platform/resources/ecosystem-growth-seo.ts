@@ -2,10 +2,19 @@ import 'server-only'
 
 import type { ApiPlatformRequestContext, ApiPlatformSuccessResult } from '@/lib/api-platform/core/context'
 import { ApiPlatformError } from '@/lib/api-platform/core/errors'
+import { readBacklinkProfile } from '@/lib/growth/seo/backlinks/reader'
 import { readSeoAeoGap } from '@/lib/growth/seo/gap/read-seo-aeo-gap'
 import { readKeywordOpportunities } from '@/lib/growth/seo/keyword-opportunities-reader'
 import { readRankEvolution } from '@/lib/growth/seo/rank-evolution-reader'
-import type { KeywordOpportunitiesResult, RankEvolutionResult, SeoAeoGapResult, SeoRankDevice } from '@/lib/growth/seo/contracts'
+import { readSiteAuditReport } from '@/lib/growth/seo/site-audit/reader'
+import type {
+  BacklinkProfileResult,
+  KeywordOpportunitiesResult,
+  RankEvolutionResult,
+  SeoAeoGapResult,
+  SeoRankDevice,
+  SiteAuditReportResult
+} from '@/lib/growth/seo/contracts'
 import { resolveSeoEntitlement, type SeoTier } from '@/lib/growth/seo/entitlement'
 import { isSeoModuleEnabled } from '@/lib/growth/seo/flags'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
@@ -228,6 +237,84 @@ export const getEcosystemSeoRankEvolutionPayload = async ({
     : undefined
 
   const result = await readRankEvolution(subject.seoTargetId, { rangeDays, engine, device, keywords })
+
+  return {
+    data: result,
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId }
+  }
+}
+
+export type EcosystemSeoSiteAuditReportPayload = SiteAuditReportResult | SeoTargetNotConfiguredPayload
+
+/**
+ * GET /api/platform/ecosystem/growth/seo/site-audit-report — salud técnica del sitio
+ * (TASK-1304). Passthrough del reader canónico `readSiteAuditReport` (último run o run
+ * puntual con `auditRunId`). Findings agrupados por severidad; un run `running` se
+ * reporta como "audit en curso" (hecho, no error).
+ */
+export const getEcosystemSeoSiteAuditReportPayload = async ({
+  context,
+  request
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+}): Promise<ApiPlatformSuccessResult<EcosystemSeoSiteAuditReportPayload>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  const subject = await resolveSeoLaneSubject(context, request)
+
+  if (!subject.seoTargetId) {
+    return {
+      data: { ok: false, errorCode: 'target_not_configured', organizationId: subject.organizationId },
+      meta: { module: 'growth.seo', tier: subject.tier }
+    }
+  }
+
+  const url = new URL(request.url)
+  const auditRunId = (url.searchParams.get('auditRunId') ?? '').trim() || undefined
+
+  const result = await readSiteAuditReport(subject.seoTargetId, auditRunId)
+
+  return {
+    data: result,
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId }
+  }
+}
+
+export type EcosystemSeoBacklinkProfilePayload = BacklinkProfileResult | SeoTargetNotConfiguredPayload
+
+/**
+ * GET /api/platform/ecosystem/growth/seo/backlink-profile — serie semanal del perfil de
+ * enlaces (TASK-1304). Passthrough del reader canónico `readBacklinkProfile`.
+ * Query params: `rangeDays` (default 365, máx 1825).
+ */
+export const getEcosystemSeoBacklinkProfilePayload = async ({
+  context,
+  request
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+}): Promise<ApiPlatformSuccessResult<EcosystemSeoBacklinkProfilePayload>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  const subject = await resolveSeoLaneSubject(context, request)
+
+  if (!subject.seoTargetId) {
+    return {
+      data: { ok: false, errorCode: 'target_not_configured', organizationId: subject.organizationId },
+      meta: { module: 'growth.seo', tier: subject.tier }
+    }
+  }
+
+  const url = new URL(request.url)
+  const rawRange = Number(url.searchParams.get('rangeDays'))
+  const rangeDays = Number.isFinite(rawRange) && rawRange > 0 ? Math.floor(rawRange) : undefined
+
+  const result = await readBacklinkProfile(subject.seoTargetId, rangeDays ? { rangeDays } : {})
 
   return {
     data: result,
