@@ -17,12 +17,16 @@ const state = {
     expires_at: string | null
   } | null,
   auditRunsUsed: 0,
-  spendUsedUsd: 0
+  spendUsedUsd: 0,
+  /** SQL capturado de la query de uso, para verificar DE DÓNDE sale el gasto. */
+  usageSql: ''
 }
 
 vi.mock('@/lib/postgres/client', () => ({
   runGreenhousePostgresQuery: async (sql: string) => {
     if (sql.includes('audit_runs_used')) {
+      state.usageSql = sql
+
       return [
         {
           audit_runs_used: state.auditRunsUsed,
@@ -41,6 +45,30 @@ vi.mock('@/lib/postgres/client', () => ({
 }))
 
 import { enforceSeoRunEntitlement, resolveSeoEntitlement } from '../entitlement'
+
+/**
+ * TASK-1300 — El gasto sale de UNA sola fuente.
+ *
+ * El resto de los tests mockea el resultado de la query sin mirar de qué tabla viene, así
+ * que pasarían igual si alguien revirtiera la fuente a las tablas snapshot — o, peor, si
+ * sumara AMBAS (el doble conteo que esta task cerró: agotaría los presupuestos a la mitad,
+ * en silencio). Esto lo verifica sobre el SQL real.
+ */
+describe('fuente del gasto del período', () => {
+  it('lee el ledger `seo_provider_spend_daily` y NO el provider_cost de los snapshots', async () => {
+    state.usageSql = ''
+    await resolveSeoEntitlement('org-1')
+
+    expect(state.usageSql).toContain('seo_provider_spend_daily')
+    expect(state.usageSql).toContain('provider_cost_usd')
+
+    // Las 3 tablas snapshot de TASK-1299 ya no son fuente de presupuesto: su
+    // `provider_cost` queda como procedencia por fila.
+    expect(state.usageSql).not.toContain('seo_rank_snapshots')
+    expect(state.usageSql).not.toContain('seo_backlink_snapshots')
+    expect(state.usageSql).not.toMatch(/SUM\(\s*\w+\.provider_cost\s*\)/)
+  })
+})
 
 // Defaults: contracted 8 audits / USD 50; trial 1 / USD 2; pilot 2 / USD 10.
 const ENV = {} as NodeJS.ProcessEnv

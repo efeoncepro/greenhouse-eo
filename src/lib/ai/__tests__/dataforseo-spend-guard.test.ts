@@ -53,6 +53,20 @@ describe('postDataForSeoTask — guardas antes de gastar', () => {
     ).rejects.toThrow(/exige organizationId/)
   })
 
+  it('LANZA en `serp` CON organización y sin contador — el caso destructivo', async () => {
+    // Este es el agujero que el guard cerró: `serp` no "exige" organización, pero si el
+    // caller la declara, el gasto ES atribuible y omitirlo lo perdería en silencio. Es
+    // exactamente lo que haría un rank capture (TASK-1303) desde un cron.
+    await expect(
+      postDataForSeoTask({
+        family: 'serp',
+        endpoint: '/v3/serp/google/organic/live/advanced',
+        tasks: [{ keyword: 'x' }],
+        organizationId: 'org-1'
+      })
+    ).rejects.toThrow(/no registró el contador/)
+  })
+
   it('deja pasar `serp` sin contador ni organización — el AEO corre sobre prospectos', async () => {
     globalThis.fetch = (async () =>
       new Response(JSON.stringify({ tasks: [{ id: '1' }], cost: 0.002 }), { status: 200 })) as typeof fetch

@@ -216,7 +216,25 @@ allowlist cerrado de 5 familias con transporte único. El AEO pasó **sin que se
 `runGreenhousePostgresQuery` **no es transaccionalmente seguro**: ese helper toma una conexión del pool por
 llamada, así que el `BEGIN` no cubre lo que sigue (y puede dejar escrituras fuera del rollback). Se descubrió
 porque un `SAVEPOINT` reventó con `25P01`. Este sanity se reescribió sobre `withGreenhousePostgresTransaction`;
-**los de TASK-1301 y TASK-1302 usan el patrón frágil y pueden estar pasando por suerte** — trabajo aparte.
+**verificado: ningún sanity del repo usa hoy el patrón frágil** (el de 1301 ya limpiaba en `finally`; el de 1302 se migró en `1a02b4b99`). La regla de decisión quedó canonizada en `SQL_DATE_MATH_AGENT_INVARIANTS`.
+
+**Auditoría adversarial (2026-08-06, 3 verificadores).** 6 defectos corregidos. El más caro:
+**`serp` con `organizationId` y sin contador gastaba sin registrar y NO lanzaba** — el guard
+condicionaba por "¿la familia exige organización?" en vez de "¿hay organización?", y TASK-1303 usará
+`serp` para rank capture desde un cron. También: el AEO reportaba `invalid_response` cuando el breaker
+cortaba (culpaba al parser); un 4xx del caller abría el breaker y degradaba al AEO; `half-open` dejaba
+pasar todas las llamadas concurrentes; y 3 de 4 familias no compilaban sin un cast que anulaba el
+chequeo del payload.
+
+**🔴 Corrección de una afirmación mía que era FALSA:** dije que `GROWTH_SEO_ENABLED` "lo lee el
+ops-worker, NO Vercel". **Vercel también lo lee** — el lane ecosystem/MCP (TASK-1645) y el reader del
+cruce SEO↔AEO (TASK-1305), ambos aterrizados el mismo día. **El flip es de TRES pasos** y, crítico:
+**apagarlo sólo en `deploy.sh` NO apaga el módulo**, el lane de Vercel sigue sirviendo. El bloque de
+rollback de TASK-1302 quedaba incompleto y parecía exitoso. Corregido en `flags.ts` y en la arquitectura.
+
+**Límite del gate que hay que conocer antes de TASK-1303:** el presupuesto se consulta UNA vez y el
+gasto se acumula DESPUÉS. Medido: batch de 120 keywords con budget `trial` → gastó 3× el presupuesto.
+Sin reserva previa no hay tope por corrida. Declarado en el docstring de `enforceSeoRunEntitlement`.
 
 **Nota de concurrencia:** otra sesión commiteó estos archivos en un estado intermedio (`6a6923900`) por el
 índice compartido del checkout; `3a2e1baf5` corrige encima. Evidencia: sanity live 7/7 con cero residuo, suite

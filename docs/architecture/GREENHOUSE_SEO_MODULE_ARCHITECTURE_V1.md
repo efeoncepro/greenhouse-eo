@@ -188,7 +188,7 @@ Cloud Scheduler + ops-worker (async-critical), nunca Vercel cron.
   - **Paginación real:** el primitive compartido ganó `startRow` opcional (aditivo). Sin él, `querySearchAnalytics` cortaba en 100 filas **sin señal** — sobre una serie histórica eso es pérdida permanente. Si se alcanza el techo de páginas se reporta `truncated` y el handler emite un warning; nunca se trunca en silencio.
   - **Honest degradation:** si el reader degrada, **no se escribe ninguna fila** — un día sin conexión jamás puede parecerse a un día con cero tráfico. Un día en que GSC respondió sin filas es `ok` con `rowsWritten: 0`, que es un hecho distinto de un fallo.
   - **Resiliencia per-org:** una org que falla se registra y el batch continúa; un token revocado de un cliente no puede impedir capturar la serie de los demás.
-  - Gate: `GROWTH_SEO_ENABLED` (default OFF, lo lee el **ops-worker**, no Vercel). El flip son **dos pasos**: prender el flag *y* despausar el scheduler.
+  - Gate: `GROWTH_SEO_ENABLED`. ⚠️ **Lo leen DOS runtimes y el flip es de TRES pasos**: (1) el ops-worker (`deploy.sh`) para el batch diario; (2) **Vercel**, que gatea el lane ecosystem/MCP (TASK-1645) y el reader del cruce SEO↔AEO (TASK-1305); (3) despausar el scheduler, cuyo estado de pausa se declara en el 5.º argumento de `upsert_scheduler_job` y se re-aplica en cada deploy. **Apagarlo sólo en el worker NO apaga el módulo**: el lane de Vercel sigue sirviendo, así que un rollback que sólo toque `deploy.sh` queda incompleto y parece exitoso.
 
 **Reliability signals** (`/admin/operations`, subsistema Growth Health): `seo.rank.capture_lag` (steady=0), `seo.audit.stuck_tasks`, `seo.provider.cost_over_budget`.
 

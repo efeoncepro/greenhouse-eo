@@ -27,7 +27,7 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
-import { SEO_PROVIDER_SPEND_MONTHLY_SUM_SQL } from './provider-spend'
+import { buildSeoProviderSpendMonthlySumSql } from './provider-spend'
 
 export const SEO_MODULE_KEY = 'seo_v1' as const
 
@@ -193,7 +193,7 @@ export const resolveSeoEntitlement = async (
           JOIN greenhouse_growth.seo_targets t ON t.seo_target_id = r.seo_target_id
          WHERE t.organization_id = $1
            AND r.created_at >= date_trunc('month', CURRENT_DATE))::int AS audit_runs_used,
-       ${SEO_PROVIDER_SPEND_MONTHLY_SUM_SQL}::float8 AS spend_used_usd,
+       ${buildSeoProviderSpendMonthlySumSql('$1')}::float8 AS spend_used_usd,
        (date_trunc('month', CURRENT_DATE) + INTERVAL '1 month')::timestamptz AS period_reset_at`,
     [organizationId]
   )
@@ -284,6 +284,26 @@ export const resolveSeoEntitlement = async (
  * El plano fino de capability (`can(subject, 'growth.seo.*', ...)`) es responsabilidad
  * del consumer (route/command); este gate es deliberadamente subject-agnóstico para
  * servir idéntico a UI, Nexa, lane app y lane ecosystem/MCP (Full API Parity).
+ */
+/**
+ * ⚠️ LÍMITE CONOCIDO — este gate se consulta UNA vez y el gasto se acumula DESPUÉS.
+ *
+ * No hay reserva ni claim: N llamadas del mismo batch leen el mismo `budgetRemainingUsd` y
+ * pasan todas. Medido: un batch de 120 keywords con budget `trial` (USD 2) llegó a gastar
+ * USD 6 — sobregiro de 3×. El overrun por corrida es `N × costo_unitario`, sin techo.
+ *
+ * Mitigaciones disponibles HOY, que el caller debe aplicar:
+ *   - Pasar `estimatedCostUsd` con el costo del **batch completo**, no de una llamada.
+ *   - Re-consultar el gate cada K llamadas dentro de un batch largo.
+ *   - Acotar el tamaño del batch a algo cuyo peor caso quepa en el presupuesto del tier.
+ *
+ * Además: `quota_exhausted` cuenta `seo_site_audit_runs`, así que **no aplica al rank
+ * capture** (no crea audit runs) — para esa capability el único freno es el presupuesto.
+ * Y si una llamada hace timeout DESPUÉS de que el proveedor la procesó y cobró, el costo no
+ * se registra: dinero gastado que el gate no ve.
+ *
+ * Cerrar esto de verdad pide una reserva previa al gasto (patrón del spend fence de Globe),
+ * que es trabajo de la task que introduzca el primer batch real — TASK-1303.
  */
 export const enforceSeoRunEntitlement = async (
   organizationId: string,

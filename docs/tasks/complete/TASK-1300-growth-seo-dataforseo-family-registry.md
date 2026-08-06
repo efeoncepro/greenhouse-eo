@@ -341,7 +341,7 @@ Ver el contrato canónico en `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTU
 
 ### Hallazgo transversal — el patrón de sanity del repo es frágil
 
-`BEGIN`/`ROLLBACK` mediante `runGreenhousePostgresQuery` **no es transaccionalmente seguro**: ese helper toma una conexión del pool por llamada, así que el `BEGIN` no cubre lo que sigue. Se descubrió acá porque un `SAVEPOINT` reventó con `25P01 CheckTransactionBlock`. Este sanity se reescribió sobre `withGreenhousePostgresTransaction` (fija el cliente) y ejercita el **SQL exportado** por el módulo para que no pueda derivar. ⚠️ Los sanity de **TASK-1301 y TASK-1302 usan el patrón frágil** y pueden estar pasando por suerte — trabajo aparte.
+`BEGIN`/`ROLLBACK` mediante `runGreenhousePostgresQuery` **no es transaccionalmente seguro**: ese helper toma una conexión del pool por llamada, así que el `BEGIN` no cubre lo que sigue. Se descubrió acá porque un `SAVEPOINT` reventó con `25P01 CheckTransactionBlock`. Este sanity se reescribió sobre `withGreenhousePostgresTransaction` (fija el cliente) y ejercita el **SQL exportado** por el módulo para que no pueda derivar. **Verificado 2026-08-06:** el de TASK-1301 ya usaba limpieza explícita en `finally` y el de TASK-1302 se migró a conexión fijada en `1a02b4b99`. **Ningún sanity del repo usa hoy el patrón frágil** — la afirmación previa de que quedaban dos por revisar era incorrecta.
 
 ### Rollout pendiente (por qué NO es `operationally complete`)
 
@@ -349,3 +349,20 @@ Ver el contrato canónico en `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTU
 2. Confirmar con el proveedor que Labs/OnPage/Backlinks/Domain están habilitadas en el plan (un 402/403 en el smoke sería del plan, no del cliente).
 3. Smoke por familia: una llamada barata a Labs → confirmar 200, `provider_cost` capturado y fila incrementada en `seo_provider_spend_daily`.
 4. La migración corre en la única instancia Cloud SQL (ya aplicada); el código llega a runtime con el próximo deploy. **Nada se ejerce hasta que TASK-1303/1304 llamen al transporte**, así que el riesgo de tenerlo mergeado es nulo.
+
+### Auditoría adversarial post-implementación (2026-08-06)
+
+Tres verificadores independientes (revisión adversarial de código, auditoría de veracidad de los docs, y el **test del segundo consumidor** simulando TASK-1303/1304). Resultado: **6 defectos corregidos**, 4 afirmaciones falsas rectificadas y 8 límites del contrato declarados.
+
+**Corregido en código:**
+
+1. 🔴 **`serp` con `organizationId` y sin contador gastaba sin registrar y NO lanzaba.** El guard condicionaba por `requiresOrganization` en vez de por "¿hay organización?". Era el agujero más caro: TASK-1303 usará `serp` para rank capture desde un cron, y el ledger habría quedado en cero con el gate leyendo cero para siempre. Ahora la condición es `input.organizationId && !spendRecorder`, con test del caso destructivo.
+2. **El AEO reportaba `invalid_response` cuando el breaker cortaba.** `httpStatus: 0` no entra en ninguna rama de `mapHttpStatusToErrorCode` y caía en el fallback, culpando al parser cuando el proveedor ni se consultó. El adapter ahora lee `breakerOpen` — que además dejó de ser código muerto.
+3. **Un 4xx del caller abría el breaker** y degradaba al AEO, que comparte la familia `serp`. Sólo cuentan señales de salud del proveedor (`isProviderHealthFailure`: 429, 402, 403, 5xx).
+4. **`half-open` dejaba pasar TODAS las llamadas concurrentes**, contra lo que afirmaban su comentario y su test. Ahora hay token de sonda.
+5. **`DataForSeoSerpTask` exigía `keyword`**, así que 3 de las 4 familias que gastan no compilaban sin un cast que anulaba el chequeo del payload entero. Se separó `DataForSeoTaskPayload`.
+6. **`secretSource: 'env'` en el retorno del breaker era falso** (no se resolvió ningún secreto) → `'unconfigured'`. Y el fragmento SQL exportado fijaba `$1`: ahora toma el placeholder por parámetro, porque interpolarlo donde la organización fuera `$2` sumaría el gasto de otra organización **sin que PostgreSQL falle**.
+
+**Cerrado con test en vez de con manejo:** la migración afirmaba que el CHECK de `family` "falla loud" ante drift. No era cierto — el transporte observa el error y sigue, así que el gasto sería real y el contador quedaría en cero. Ahora un test compara el CHECK contra `DATAFORSEO_FAMILY_NAMES` y rompe el build. También se agregó un assert sobre el SQL del entitlement (verificado en rojo simulando la regresión de doble conteo: el resto de sus tests pasaban igual porque el mock no mira de qué tabla sale el gasto).
+
+**Límites declarados, no cerrados** (documentados donde se tropiezan): el transporte es POST-only y no sirve para `task_get`/`tasks_ready` (GET) — relevante para Lighthouse en TASK-1304; `cost` es del batch, no de la tarea; el breaker es por familia, no por operación; `checkDataForSeoConnection` es un carril aparte deliberado; `keywords_data`/`business_data` están fuera a propósito. Y el más importante: **el gate de presupuesto se consulta una vez y el gasto se acumula después** — medido, un batch de 120 keywords con budget `trial` gastó 3× el presupuesto. Sin reserva previa al gasto no hay tope por corrida; cerrarlo pide el patrón de spend fence y es trabajo de TASK-1303, declarado en el docstring de `enforceSeoRunEntitlement`.
