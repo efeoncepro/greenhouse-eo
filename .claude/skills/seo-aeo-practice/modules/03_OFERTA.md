@@ -168,7 +168,7 @@ es el moat.**
 | | ¿Existe en el portal? |
 |---|---|
 | 🎯 **AEO** *(el Grader: 7 dimensiones · 14 probes · 5 motores · **el reporte del cliente en `/aeo`**)* | ✅ **Live en producción** |
-| 🔴 **SEO** *(rank tracking · site audit · backlinks · E-E-A-T · reportería)* | 🔴 **Nada visible al cliente.** *(Delta 2026-08-05 fin de día: EPIC-022 ya tiene motor — schema `greenhouse_growth.seo_*` + entitlement `seo_v1`/chokepoint (TASK-1299/1301), registry DataForSEO + ledger (TASK-1300), materializer GSC LIVE + `readKeywordOpportunities` (TASK-1302), cruce SEO↔AEO real `readSeoAeoGap`/quadrant 360 (TASK-1305) y 3 MCP tools code-complete (TASK-1645; federación gateway = TASK-1647). Operable por MCP a nivel código, rumbo Wave. **Pero la superficie autoservicio del cliente sigue sin existir — la advertencia de abajo sigue vigente**)* |
+| 🔴 **SEO** *(rank tracking · site audit · backlinks · E-E-A-T · reportería)* | 🔴 **Nada visible al cliente.** *(Delta 2026-08-05 fin de día: EPIC-022 ya tiene motor — schema `greenhouse_growth.seo_*` + entitlement `seo_v1`/chokepoint (TASK-1299/1301), registry DataForSEO + ledger (TASK-1300), materializer GSC LIVE + `readKeywordOpportunities` (TASK-1302), cruce SEO↔AEO real `readSeoAeoGap`/quadrant 360 (TASK-1305) y 3 MCP tools **live en producción** (TASK-1645 + TASK-1647 complete 2026-08-06: el provider `greenhouse-seo` sirve en `mcp.efeonce.org`). Operable por MCP de verdad, rumbo Wave. **Pero la superficie autoservicio del cliente sigue sin existir — la advertencia de abajo sigue vigente**)* |
 | Search Console | ⚠️ Panel de conexión — **staging ON, producción OFF** |
 
 > 🔴 **Cuando vendes un retainer de SEO y dices *"puedes entrar al portal y ver todo"*, para SEO eso todavía

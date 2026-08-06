@@ -1,5 +1,58 @@
 # Handoff activo
 
+### Cutover MCP-first de Search Visibility 360 — COMPLETO en producción (2026-08-06)
+
+Las 4 capas quedaron vivas y verificadas, en este orden. **TASK-1645 y TASK-1647 pasan a `complete`.**
+
+**1. Release `develop→main`** — PR #177, SHA `70e912056273d0a30e2aa8dacc2f4e62076e3b44`,
+`release_id=70e912056273-03c36b47-eb75-469c-886f-51c691cd7c34`, run `31058032196`, manifest `released`,
+workflow 10m51s. Batch grande (355 commits, 221 archivos de código, 14 migraciones: EPIC-022 SEO
+completo, EPIC-028 Globe, identity 1616/1631, payroll 1630, Nexa 1182, EPIC-040). **Pasó a la primera,
+sin bypass y sin retry** porque los 3 gotchas conocidos se pre-emptaron: merge canónico
+`origin/main -X ours` antes del PR (conflicto modify/delete de TASK-1590 resuelto conservando develop),
+marker `[release-coupled: …]` en el cuerpo del squash (batch policy → `ship`), y
+`gh workflow run playwright.yml --ref main` antes del dispatch (3m10s) en vez de bypassear el
+`playwright_smoke` ausente del squash. Watchdog `drift_count=0`; el residual change-gated de
+`ops-worker` (`558558263e80`, diff runtime vacío) ya lo clasifica bien el fix que entró en `6f7e246ea`.
+
+**2. `GROWTH_SEO_ENABLED=true` en Vercel Production** + redeploy `dpl_GyGkdEQQTk65qkCs1S3TEH6Jquy9`
+(Vercel congela env vars al crear el build). Multi-runtime: el mismo flag ya estaba ON en el
+`ops-worker` para el materializer GSC. Ledger actualizado.
+
+**3. Canary del provider contra producción** (`greenhouse.efeoncepro.com`, service identity del
+gateway): **Berel `domainQuadrant=riesgo`, 50 keywords, AEO 44.5** · Efeonce `hasModule=true
+tier=contracted` + `no_seo_data` honesto · deny anti-oracle `404 greenhouse_seo_lane_404`.
+
+**4. Provider habilitado en el gateway** — `efeonce-mcp` `76cb121`, workflow `31059346243`, revisión
+`efeonce-mcp-gateway-00012-dkj` `Ready=True` con `GREENHOUSE_ECOSYSTEM_TOKEN` como **secret ref** de
+Cloud Run. Hallazgo: el secreto `efeonce-mcp-gateway-greenhouse-token` se había creado **sin ninguna
+binding IAM** — sin el `secretAccessor` scoped al SA del gateway el deploy habría fallado. Front door
+verificado: health `200`, protected-resource metadata `200` (3 scopes), `POST /mcp` anónimo `401` con
+`WWW-Authenticate` correcto.
+
+**5. Smoke MCP autenticado por `mcp.efeonce.org` — VERDE.** `scripts/oauth-canary.mjs` quedó
+**extendido en este cierre** con las tools SEO. Flujo Entra authorization-code + PKCE real (login
+humano), token con `aud=c5363215-…` y `scp` incluyendo `efeonce.mcp.read`:
+
+```bash
+MCP_CANARY_SEO_ORGANIZATION_ID=org-32333527-02a8-487b-819e-6f76a761777d \
+MCP_CANARY_SEO_DENY_ORGANIZATION_ID=org-00000000-0000-0000-0000-000000000000 \
+node scripts/oauth-canary.mjs
+```
+
+→ `initialize 200` · `seoEntitlementStatus 200` · `seoVisibility360Status 200` ·
+**`seoDomainQuadrant: "riesgo"`** · `seoDenyFailedClosed: true` (+ Globe capabilities/fleet 200).
+
+**Ese `riesgo` es el quadrant real de Berel devuelto por el front door público**: la cadena
+Entra → gateway → provider → lane → readers → PG está cerrada end-to-end. El objetivo de la sesión
+—preguntar por MCP por la visibilidad 360 de Berel y recibir el quadrant real— está cumplido.
+El smoke exige login interactivo, así que es asistido por humano, no automatizable en CI.
+
+**Pendientes menores heredados (sin tocar):** merge en HubSpot de las auto-companies `efeonce.org`
+(56011409567) y `efeonce` (57099835819) hacia la company canónica — el sync propaga, NUNCA borrar por
+SQL; `website_url=efeoncepro.com` en EO-ORG-0007 por `upsertCanonicalOrganization`; conexión GSC de
+`efeoncepro.com` gated por TASK-1282/1283.
+
 ### TASK-1647 — Provider Greenhouse-SEO federado: CODE COMPLETE, enable pendiente del release (2026-08-05)
 
 El segundo salto MCP quedó construido y verificado e2e. Gateway (`efeonce-mcp` main `a53b77f`+`4870e90`):
@@ -513,43 +566,6 @@ ClamAV y de inspección que `engines.ts` ya emite se destruyen en la frontera. T
 el día.
 
 Historia anterior: [Handoff.archive.md](Handoff.archive.md).
-
-## ADR-023 — Model Route Cards y skill compartida (2026-08-04)
-
-**Estado:** implementado como contrato documental y de tooling; no cambia el runtime de Globe. La skill
-`greenhouse-globe-model-fleet` existe en `.codex/skills/` y `.claude/skills/`, con paridad byte a byte, schema y
-validador local. El baseline de fichas incluye FLUX 3, Gemini Omni, Veo 3.1, Seedance 2.0/R2V, GPT Image 2,
-Seedream 5 Pro y Nano Banana 2/Pro:
-[`FLUX_3_VIDEO_ROUTE_CARD_V1.json`](docs/architecture/creative-studio/model-fleet/routes/FLUX_3_VIDEO_ROUTE_CARD_V1.json),
-[`GEMINI_OMNI_VIDEO_ROUTE_CARD_V1.json`](docs/architecture/creative-studio/model-fleet/routes/GEMINI_OMNI_VIDEO_ROUTE_CARD_V1.json),
-[`VEO_3_1_VIDEO_ROUTE_CARD_V1.json`](docs/architecture/creative-studio/model-fleet/routes/VEO_3_1_VIDEO_ROUTE_CARD_V1.json) y
-[`SEEDANCE_2_VIDEO_ROUTE_CARD_V1.json`](docs/architecture/creative-studio/model-fleet/routes/SEEDANCE_2_VIDEO_ROUTE_CARD_V1.json),
-[`GPT_IMAGE_2_IMAGE_ROUTE_CARD_V1.json`](docs/architecture/creative-studio/model-fleet/routes/GPT_IMAGE_2_IMAGE_ROUTE_CARD_V1.json),
-[`SEEDREAM_5_PRO_IMAGE_ROUTE_CARD_V1.json`](docs/architecture/creative-studio/model-fleet/routes/SEEDREAM_5_PRO_IMAGE_ROUTE_CARD_V1.json),
-[`NANO_BANANA_2_IMAGE_ROUTE_CARD_V1.json`](docs/architecture/creative-studio/model-fleet/routes/NANO_BANANA_2_IMAGE_ROUTE_CARD_V1.json) y
-[`NANO_BANANA_PRO_IMAGE_ROUTE_CARD_V1.json`](docs/architecture/creative-studio/model-fleet/routes/NANO_BANANA_PRO_IMAGE_ROUTE_CARD_V1.json).
-
-La auditoría confirmó que las rutas públicas de Seedance usan `seedance-2.0` (text-to-video) y `seedance-2.0-r2v`
-(R2V). `seedance-2.0-i2v`, bajo `bytedance/seedance-2.0/mini/image-to-video`, existe solo en el adapter Fal para
-`video-extend`: no tiene routeId público, binding gobernado ni canary de producción. El adapter genérico de Veo también
-contiene `veo-3.1-fast-generate-001`, pero el binding sellado de `ref/video/frames-v1` usa `veo-3.1-generate-001`.
-
-**Estado honesto:** FLUX 3 sigue `gated` y no está declarado en `globe.producer.fleet.list`. Fal es la vía candidata;
-BFL directo permanece Early Access y fuera de alcance. Próximo paso operativo: revalidar namespace/OpenAPI/pricing
-con credenciales en Globe y ejecutar el Slice 0 de `TASK-1642`; no hacer submit billable ni promoción desde esta
-skill.
-
-La auditoría de imagen resolvió “Imagen 2 de ChatGPT” como GPT Image 2 (`gpt-image-2`); Google `imagen-2` no tiene
-routeId, adapter ni binding en Globe. El reader live confirma disponibles GPT Image 2, Nano Banana 2 y Nano Banana Pro,
-y Seedream 5 Pro para generación. Seedream Edit conserva provider/adapter cableados, pero su binding está deshabilitado
-y el reader la devuelve `gated`; no debe promocionarse por herencia de Seedream T2I. Las cards mantienen además como
-superficies diferidas la edición de OpenAI/Nano Banana y Seedream 5 Lite. Nano Banana Pro requiere reconciliar un lookup
-de circuito `not_found` antes de nuevo gasto. No hubo cambios de runtime, secrets, bindings, rates ni deploy.
-
-La auditoría de Kling 3.0 añadió [`KLING_3_VIDEO_ROUTE_CARD_V1.json`](docs/architecture/creative-studio/model-fleet/routes/KLING_3_VIDEO_ROUTE_CARD_V1.json)
-y enlazó la evidencia con `TASK-1617`. Fal tiene superficies candidatas Pro, Standard y 4K para text/image-to-video;
-Globe no tiene routeId, adapter ni binding Kling y la card permanece `gated`. La API nativa de Kling y Kling O3 quedan
-separadas de la vía Fal/V3. No hubo submit, gasto, cambio de runtime, secret, rate, binding ni promoción.
 
 ## EPIC-039 — Next.js 16.3 + TypeScript 7 Toolchain Adoption (2026-08-04)
 

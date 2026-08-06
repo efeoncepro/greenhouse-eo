@@ -61,7 +61,8 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1315` — [planificada, backend-data] E-E-A-T signal extraction (entity + author + trust) — capa de autor + probes de trust, reusando entity probes (KG/Wikidata/Reddit) + json-ld.
 - `TASK-1316` — [planificada, backend-data] E-E-A-T rater (rúbrica 4 pilares, YMYL-aware) — assessment LLM reusando brand-intelligence + evals/accuracy, con confianza calibrada (anti falso-0).
 - `TASK-1317` — [planificada, backend-data] E-E-A-T scorecard reader + integración (`readEeatScorecard`; alimenta topical authority 1314 + el 360; medido vs evaluado).
-- `TASK-1645` — [planificada, backend-data] **Ecosystem lane + MCP tools** (`/api/platform/ecosystem/growth/seo/*` vía `runEcosystemReadRoute` + 3 tools read-only en `src/mcp/greenhouse/**`, espejo TASK-1086). Materializa el mandato parity+MCP (delta 2026-08-05). Blocked by 1301/1302/1303.
+- `TASK-1645` — [**complete 2026-08-06**, backend-data] **Ecosystem lane + MCP tools** (`/api/platform/ecosystem/growth/seo/*` vía `runEcosystemReadRoute` + 3 tools read-only en `src/mcp/greenhouse/**`, espejo TASK-1086). Materializa el mandato parity+MCP (delta 2026-08-05). **LIVE en producción** con `GROWTH_SEO_ENABLED` ON en Vercel Production.
+- `TASK-1647` — [**complete 2026-08-06**, backend-data/integration] **Federación del provider Greenhouse-SEO en el gateway MCP** (`mcp.efeonce.org`, skill `efeonce-mcp-platform`). Adapter delgado sobre el lane de 1645, 3 tools bajo scope base `efeonce.mcp.read`, canaries antes de discovery. **Habilitado en producción** (revisión `efeonce-mcp-gateway-00012-dkj`); smoke autenticado por el front door devolvió el `domainQuadrant=riesgo` real de Berel.
 - `TASK-1426` — [reconciliada 2026-08-05, backend-data] **Search Console multi-property + URL Inspection + post-publish discovery.** Declaraba `Epic: EPIC-022` en su cabecera pero no estaba en esta lista (su única traza era la mención en la Ola D). Extiende la conexión GSC de una propiedad única por organización a un contrato multi-property canónico.
 
 ## Existing Related Work
@@ -236,3 +237,29 @@ real** (gateway → lane staging → readers → PG: Berel `riesgo`/50 keywords/
 `no_seo_data` honesto, deny anti-oracle 404). `GROWTH_SEO_ENABLED=true` aplicado en Vercel **staging** +
 redeploy; Berel provisionada Fase 0 (`cpma-berel-seo-contracted` + `seot-berel-fase0`). Único bloqueo:
 greenhouse PROD sin el lane (release develop→main); secuencia de cierre en `TASK-1647`.
+
+## Delta 2026-08-06 — cutover MCP-first a producción cerrado
+
+`TASK-1645` y `TASK-1647` pasan a **complete**. El camino MCP-first del módulo SEO está **vivo en
+producción**, en este orden y con verificación por capa:
+
+1. Release `develop→main` `70e912056273d0a30e2aa8dacc2f4e62076e3b44`
+   (`release_id=70e912056273-03c36b47-eb75-469c-886f-51c691cd7c34`, run `31058032196`), manifest
+   `released`, watchdog `drift_count=0`. Incluye las 5 migraciones SEO (1299/1301×2/1302/1300).
+2. `GROWTH_SEO_ENABLED=true` en Vercel Production + redeploy `dpl_GyGkdEQQTk65qkCs1S3TEH6Jquy9`
+   (multi-runtime: el mismo flag ya estaba ON en el `ops-worker` para el materializer GSC).
+3. Canary del provider contra `https://greenhouse.efeoncepro.com`: **Berel `domainQuadrant=riesgo`,
+   50 keywords, AEO 44.5**; Efeonce `hasModule=true tier=contracted` con `no_seo_data` honesto;
+   deny anti-oracle `404`.
+4. Provider habilitado en el gateway: revisión `efeonce-mcp-gateway-00012-dkj` `Ready=True`, token
+   por **secret ref** de Cloud Run. Front door: health 200, protected-resource metadata 200,
+   `POST /mcp` anónimo 401 con challenge OAuth.
+5. **Smoke MCP autenticado por `mcp.efeonce.org` verde** (token Entra real, scope base
+   `efeonce.mcp.read`): `get_seo_entitlement` 200 · `get_seo_visibility_360` 200 con
+   **`domainQuadrant=riesgo`** · deny anti-oracle cerrado. Preguntar por MCP por la visibilidad 360
+   de Berel devuelve el quadrant real.
+
+**Efecto en el exit criterion parity+MCP:** la superficie MCP deja de ser "task creada con dueño" y
+pasa a ser **disponibilidad real en `mcp.efeonce.org`**. El criterio sigue abierto sólo por la pata
+de UI/Nexa (`TASK-1310` y siguientes): el módulo no es UI-only, pero tampoco tiene aún su superficie
+visible. Pendiente operativo: conexión GSC per-org de `efeoncepro.com` (`TASK-1282`/`1283`).
