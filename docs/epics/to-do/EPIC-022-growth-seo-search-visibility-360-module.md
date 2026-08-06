@@ -46,7 +46,7 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1300` — DataForSEO family registry (ampliar allowlist + breaker + cost por familia) — bloquea todo lo provider-facing.
 - `TASK-1301` — capabilities `growth.seo.*` + entitlement per-org + chokepoint `enforceSeoRunEntitlement`.
 - `TASK-1302` — [planificada] GSC daily snapshot materializer + `readKeywordOpportunities` (quick win, reusa TASK-1282).
-- `TASK-1303` — [planificada] rank capture command + `readRankEvolution` + Cloud Scheduler + reactive BQ mirror.
+- `TASK-1303` — [**complete 2026-08-06**, en producción] rank capture command + `readRankEvolution` + Cloud Scheduler + reactive BQ mirror. Release `fcee5ab9f7ce` (manifest released); scheduler `ops-seo-rank-capture` diario 05:00 CLT ACTIVO; serie día-1 de Berel con 31 keywords; señal `seo.rank.capture_lag` en Growth Health; 4.ª MCP tool `get_seo_rank_evolution` viva en el MCP interno de producción (federación al gateway = TASK-1653).
 - `TASK-1304` — [planificada] site audit (queue+poll OnPage) + backlink snapshot.
 - `TASK-1305` — [planificada] `readSeoAeoGap` derived read cross-módulo (report layer).
 - `TASK-1306` — [planificada, ui-ux] SEO Overview operador `/admin/growth/seo`.
@@ -65,6 +65,7 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1647` — [**complete 2026-08-06**, backend-data/integration] **Federación del provider Greenhouse-SEO en el gateway MCP** (`mcp.efeonce.org`, skill `efeonce-mcp-platform`). Adapter delgado sobre el lane de 1645, 3 tools bajo scope base `efeonce.mcp.read`, canaries antes de discovery. **Habilitado en producción** (revisión `efeonce-mcp-gateway-00012-dkj`); smoke autenticado por el front door devolvió el `domainQuadrant=riesgo` real de Berel.
 - `TASK-1426` — [reconciliada 2026-08-05, backend-data] **Search Console multi-property + URL Inspection + post-publish discovery.** Declaraba `Epic: EPIC-022` en su cabecera pero no estaba en esta lista (su única traza era la mención en la Ola D). Extiende la conexión GSC de una propiedad única por organización a un contrato multi-property canónico.
 - `TASK-1651` — [creada 2026-08-06, backend-data/integration, backend-critical] **Familia `ai_optimization` (DataForSEO) + fundación SoV de marca en LLMs per-org.** Amplía el allowlist con `/v3/ai_optimization/` (familia + CHECK del spend ledger + parity test en el mismo PR) y funda la captura batch de LLM Mentions (base longitudinal del proveedor: ChatGPT US/EN + Google AI Overview) hacia snapshots append-only per-org, con readers + MCP tools en el mismo PR. Lente ◑ complementaria del SoV per-engine del grader (TASK-1424, EPIC-020) — nunca fusionadas. Blocked by TASK-1303. Investigación fuente: skill `dataforseo-operator` (references/08, as-of 2026-08-06).
+- `TASK-1653` — [creada 2026-08-06, backend-data/integration] **Federar `get_seo_rank_evolution` al gateway `mcp.efeonce.org` + guard de paridad de tools SEO** (repo hermano `efeonce-mcp`; patrón exacto de las 3 tools de TASK-1647). El guard compara el inventario de tools SEO del MCP interno contra el allowlist del gateway y falla loud cuando divergen (el allowlist explícito se conserva; el guard convierte el olvido silencioso en divergencia visible). Su blocker (TASK-1303 en producción) quedó cumplido el mismo 2026-08-06.
 
 ## Existing Related Work
 

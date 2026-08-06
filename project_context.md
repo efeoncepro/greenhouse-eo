@@ -93,7 +93,8 @@ El módulo Growth SEO (`growth.seo`, EPIC-022) autoriza todo run por un único c
 [`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §9 (§17
 contrata el seam de extracción hacia Wave). Los reads del módulo son readers canónicos consumer-agnósticos —
 `readKeywordOpportunities` y `readSeoAeoGap` (este último cruza SEO↔AEO respetando el boundary de §1.1) —
-expuestos por el lane ecosystem `/api/platform/ecosystem/growth/seo/*` y sus 3 MCP tools (TASK-1645); regla
+expuestos por el lane ecosystem `/api/platform/ecosystem/growth/seo/*` y sus 4 MCP tools (TASK-1645 +
+`get_seo_rank_evolution`, TASK-1303); regla
 durable del módulo: **todo reader SEO nuevo expone su MCP tool en el mismo PR**. Desde 2026-08-06 ese camino
 está **vivo en producción y federado en `mcp.efeonce.org`** (TASK-1645 + TASK-1647 complete; provider
 `greenhouse-seo` en el gateway, revisión `efeonce-mcp-gateway-00012-dkj`): preguntar por MCP por la
@@ -105,6 +106,12 @@ Google Search Console (`greenhouse_growth.seo_gsc_daily`) se materializa a diari
 **servicio Cloud Run único compartido staging+prod**, así que una capacidad worker-only queda viva al mergear a
 `develop`, sin release control plane, y **no existe un flip "sólo staging"** (invariantes en
 [`OPS_RELIABILITY_AGENT_INVARIANTS.md`](docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md)).
+`TASK-1303` (rank capture + `readRankEvolution`) está **complete y en producción** (release `fcee5ab9f7ce`,
+manifest released): el scheduler `ops-seo-rank-capture` captura posiciones a diario (05:00 CLT) y la serie
+acumula desde 2026-08-06 (día-1: Berel, 31 keywords), con la señal `seo.rank.capture_lag` en Growth Health.
+La 4.ª MCP tool vive en el MCP interno de producción pero **aún no está federada** al gateway
+`mcp.efeonce.org` — eso es `TASK-1653`. Siguiente frente del programa: `TASK-1653` (gateway) +
+`TASK-1307` (pantalla ancla de performance) + `TASK-1304` (site audit + backlinks).
 
 ### Lectura mínima obligatoria
 

@@ -165,7 +165,7 @@ Regla de composición: esta skill **nunca decide la estrategia SEO/AEO** (eso es
 
 ## Estado del runtime y drift conocido (as-of 2026-08-06)
 
-- Consumers productivos: adapter `google_ai_overview` del grader (AI Mode live) **y el rank capture de TASK-1303** (familia `serp` organic live/advanced, 1 task/call, depth 20 + `load_async_ai_overview` — code complete 2026-08-06, scheduler `ops-seo-rank-capture` PAUSADO hasta verificar gate de costo en staging; runbook `docs/manual-de-uso/growth/operar-captura-rankings-seo.md`). Familias `labs/onpage/backlinks/domain` sin consumer runtime aún — TASK-1304 (site audit + backlinks) los introduce.
+- Consumers productivos: adapter `google_ai_overview` del grader (AI Mode live) **y el rank capture de TASK-1303** (familia `serp` organic live/advanced, 1 task/call, depth 20 + `load_async_ai_overview` — LIVE en producción 2026-08-06: release `fcee5ab9f7ce`, scheduler `ops-seo-rank-capture` ACTIVO 05:00 CLT, día-1 Berel 31 keywords; runbook `docs/manual-de-uso/growth/operar-captura-rankings-seo.md`). Familias `labs/onpage/backlinks/domain` sin consumer runtime aún — TASK-1304 (site audit + backlinks) los introduce.
 - El hook de spend (`register-provider-spend`) está cableado en el entrypoint del **ops-worker** (TASK-1303, `services/ops-worker/server.ts`). Cualquier runtime NUEVO que llame familias SEO con org (p. ej. una route Vercel) debe importarlo también o la primera llamada cobrada LANZA — el guard es a propósito.
 - TASK-1341 pendiente: guard de deploy para no prender AIO sin creds en ops-worker.
 - Rotación del password DataForSEO pendiente pre-producción (la credencial circuló por chat; TASK-1265/1341).
