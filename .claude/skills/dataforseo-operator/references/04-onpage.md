@@ -27,7 +27,7 @@ Lista completa de endpoints documentados bajo On-Page API:
 | 1 | `POST /v3/on_page/task_post` | Montar crawl (hasta 100 tasks/llamada, 2000 llamadas/min) |
 | 2 | `POST /v3/on_page/force_stop` | Detener un crawl en curso |
 | 3 | `GET /v3/on_page/tasks_ready` | IDs de tasks completadas no recogidas |
-| 4 | `POST /v3/on_page/summary/$id` | Overview del sitio + progreso de crawl |
+| 4 | `POST /v3/on_page/summary` (id en el BODY `[{id}]`) | Overview del sitio + progreso de crawl. ⚠️ Verificado en vivo (TASK-1304, 2026-08-06): la variante POST-por-path `summary/$id` responde 200 **sin `tasks`** — el `$id` en el path es solo para el GET |
 | 5 | `POST /v3/on_page/pages` | Páginas crawleadas con métricas y checks |
 | 6 | `POST /v3/on_page/page_by_resource` | Páginas que contienen un resource dado |
 | 7 | `POST /v3/on_page/resources` | Inventario de resources (img/css/js) |

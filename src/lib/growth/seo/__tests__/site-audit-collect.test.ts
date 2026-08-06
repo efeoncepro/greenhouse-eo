@@ -226,6 +226,15 @@ describe('collectSiteAuditRuns', () => {
 
     const summary = await collectSiteAuditRuns()
 
+    // Gotcha verificado en vivo (2026-08-06): el poll `summary` lleva el id en el BODY
+    // (`[{id}]`); la variante POST-por-path responde 200 SIN tasks y el collect quedaría
+    // ciego para siempre (in_progress eterno).
+    expect(providerMock.mock.calls[0][0]).toMatchObject({
+      family: 'onpage',
+      endpoint: '/v3/on_page/summary',
+      tasks: [{ id: 'task-1' }]
+    })
+
     expect(summary.inProgress).toBe(1)
     expect(summary.materialized).toBe(0)
     expect(state.updates).toHaveLength(0)

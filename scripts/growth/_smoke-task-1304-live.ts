@@ -29,9 +29,12 @@ process.env.DATAFORSEO_API_LOGIN = process.env.DATAFORSEO_API_LOGIN ?? 'jreyes@e
 process.env.DATAFORSEO_API_PASSWORD_SECRET_REF =
   process.env.DATAFORSEO_API_PASSWORD_SECRET_REF ?? 'greenhouse-dataforseo-api-password'
 
+// El crawl OnPage puede pasar >10 min en la cola del proveedor: la ventana es
+// configurable y el smoke es RE-EJECUTABLE (el enqueue re-entrante devuelve
+// `audit_already_running` y el ciclo continúa con el run existente).
 const SMOKE_MAX_CRAWL_PAGES = 10
-const COLLECT_POLL_INTERVAL_MS = 30_000
-const COLLECT_MAX_POLLS = 20 // ~10 min de espera máxima
+const COLLECT_POLL_INTERVAL_MS = Number(process.env.SMOKE_POLL_INTERVAL_MS ?? 30_000)
+const COLLECT_MAX_POLLS = Number(process.env.SMOKE_MAX_POLLS ?? 20)
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 

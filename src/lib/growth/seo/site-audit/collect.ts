@@ -48,11 +48,12 @@ import { isSeoModuleEnabled } from '../flags'
 import { mapOnPagePagesToFindings, type OnPageAuditFinding } from './findings-map'
 
 /**
- * Endpoints de lectura post-crawl (POST, gratis 30 días post-task). `summary` lleva el
- * id en el path (doc verificada as-of 2026-08-06); `pages` lo lleva en el body.
+ * Endpoints de lectura post-crawl (POST, gratis 30 días post-task). AMBOS llevan el id
+ * en el BODY (`[{ id }]`): la variante POST-por-path (`summary/$id`) responde HTTP 200
+ * pero SIN tasks — verificado contra el provider en vivo 2026-08-06 (smoke TASK-1304);
+ * la tabla de la doc que muestra `summary/$id` describe el GET, no el POST.
  */
-export const onPageSummaryEndpoint = (providerTaskId: string): string =>
-  `/v3/on_page/summary/${providerTaskId}`
+export const ONPAGE_SUMMARY_ENDPOINT = '/v3/on_page/summary'
 
 export const ONPAGE_PAGES_ENDPOINT = '/v3/on_page/pages'
 
@@ -204,8 +205,8 @@ const collectOneRun = async (auditRunId: string): Promise<CollectRunResult> =>
     try {
       summaryResult = await postDataForSeoTask({
         family: 'onpage',
-        endpoint: onPageSummaryEndpoint(run.provider_task_id),
-        tasks: [],
+        endpoint: ONPAGE_SUMMARY_ENDPOINT,
+        tasks: [{ id: run.provider_task_id }],
         organizationId: run.organization_id
       })
     } catch (error) {
