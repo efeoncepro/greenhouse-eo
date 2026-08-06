@@ -153,6 +153,10 @@ const extractHost = (url: string): string | null => {
 const isOwnDomain = (candidate: string, rootDomain: string): boolean =>
   candidate === rootDomain || candidate.endsWith(`.${rootDomain}`)
 
+// Clave de combo sin colisiones (una keyword puede contener cualquier separador plano).
+const comboId = (keyword: string, engine: string, device: string): string =>
+  JSON.stringify([keyword, engine, device])
+
 const asRecord = (value: unknown): Record<string, unknown> | null =>
   value !== null && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : null
 
@@ -366,7 +370,7 @@ export const captureRankSnapshot = async (
     [seoTargetId, captureDate]
   )
 
-  const existing = new Set(existingRows.map(row => `${row.keyword} ${row.engine} ${row.device}`))
+  const existing = new Set(existingRows.map(row => comboId(row.keyword, row.engine, row.device)))
 
   const combos: ComboKey[] = []
   const outcomes: SeoRankCaptureComboOutcome[] = []
@@ -375,7 +379,7 @@ export const captureRankSnapshot = async (
   for (const { keyword } of keywordRows) {
     for (const engine of engines) {
       for (const device of devices) {
-        if (existing.has(`${keyword} ${engine} ${device}`)) {
+        if (existing.has(comboId(keyword, engine, device))) {
           alreadyCaptured += 1
           outcomes.push({
             keyword,
