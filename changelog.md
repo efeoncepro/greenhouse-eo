@@ -7,6 +7,31 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-06 — Efeonce deja de ser cliente de sí misma: rol comercial corregido
+
+- **`EO-ORG-0007` (la entidad legal operadora) tenía `organization_type='client'`**, herencia del
+  space de cliente de marzo 2026. La exponía en 5 readers que filtran `IN ('client','both')` sin
+  consultar `is_operating_entity` — salía primera de 17 en `/finance/clients` — y
+  `resolveFinanceClientContext` la aceptaba como cliente facturable, con la misma org como emisor
+  fiscal. Daño consumado: 0 income, 0 contratos, 0 usuarios de portal.
+- **Nueva puerta canónica `scripts/commercial/reset-organization-commercial-role.ts`**: baja el rol
+  a `'other'` vía `upsertCanonicalOrganization`, nunca SQL directo. Existe porque
+  `deriveOrganizationType` es **monótona** (nunca degrada un rol adquirido), así que ninguna
+  llamada normal puede bajar el tipo; el script declara `currentType='other'` explícitamente y
+  aborta si el lifecycle implica rol real o si hay income. `remediate-half-baked-orgs.ts` no
+  servía: sólo cubre el drift contrario.
+- **Verificado tras el cambio**: `is_operating_entity` y los 2 `module_assignments` intactos, y el
+  canary SEO contra producción sigue dando `hasModule=true tier=contracted`. El dogfooding no
+  dependía del tipo.
+- **Contrato semántico escrito** en `GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md` §Organization
+  Types: `organization_type` es un **rol comercial**, `'other'` significa **sin rol comercial**
+  (no "sin clasificar"), los tres ejes son ortogonales (identidad legal / rol comercial /
+  capabilities), y **NUNCA** se agrega un valor de identidad al enum — ya se intentó y quedó una
+  rama muerta contra `'efeonce_internal'`, que es un `tenant_type` de usuarios.
+- **Follow-ups creados**: `TASK-1648` (guard por flag en los 5 readers), `TASK-1649` (el `space` y
+  `client_profile` heredados, con inventario antes de tocar), `TASK-1650` (emisor legal de
+  cotizaciones compartidas: query a columnas inexistentes tapada por un `catch` mudo).
+
 ## 2026-08-06 — Search Visibility 360 operable por MCP en producción (TASK-1645 + TASK-1647 complete)
 
 - **Release `develop→main` `70e912056273`** (PR #177, `release_id=70e912056273-03c36b47-eb75-469c-886f-51c691cd7c34`,
@@ -963,11 +988,3 @@ y [`docs/changelog/internal/2026-07.md`](docs/changelog/internal/2026-07.md).
   del rollout externo.
 - `CLAUDE.md` quedó bajo el techo estricto de 35k tokens (34.945) y la auditoría de contenido quedó sin huérfanas;
   el detalle del Design System vive en `docs/architecture/ui-platform/README.md`.
-
-## 2026-07-29 — EPIC-028: cinco workstreams comerciales añadidos
-
-- Se añadieron `TASK-1593`–`TASK-1597` como policy tasks dentro de EPIC-028: enterprise ICP/design partners, Agency
-  Workflow Sprint, Campaign Variant Workflow, Distribution/Activation y Packaging/Unit Economics.
-- Las tasks consumen los gates comerciales existentes sin duplicarlos y mantienen el runtime, pricing público,
-  checkout, reseller rights, co-selling y clientes externos bloqueados.
-- El orden recomendado es `TASK-1595 → TASK-1594`; `TASK-1593`, `TASK-1596` y `TASK-1597` avanzan en paralelo documental.
