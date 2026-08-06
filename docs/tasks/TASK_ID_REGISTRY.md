@@ -1735,10 +1735,15 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-1648` | `to-do` | **Guard `is_operating_entity` en los readers client-facing.** backend-data/reader; P1/Alto/Bajo. Las 5 superficies que filtran `organization_type IN ('client','both')` (lista y detalle de `/finance/clients`, `finance/canonical.ts` incluido el write path de income, backfill de `client_profiles`, picker del wizard de onboarding) no consultan `is_operating_entity`. El patrón correcto ya existe y está probado en `growth/aeo/page.tsx:107`. Cierra la causa, no el síntoma: el dato de `EO-ORG-0007` ya se corrigió el 2026-08-06, pero `deriveOrganizationType` es monótona y puede volver a promover la org. | `docs/tasks/to-do/TASK-1648-operating-entity-guard-client-readers.md` |
 | `TASK-1649` | `to-do` | **Revisión del `space` y `client_profile` heredados de Efeonce.** backend-data/db; P2/Medio/Medio. Blocked by TASK-1648. El `space` `client_space` de Efeonce y su fila en `client_profiles` sobreviven desde marzo 2026, son independientes de `organization_type` y alimentan los conteos de cliente. Los spaces mueven asignación de equipo e ICO: Slice 1 es inventario read-only, la mutación exige sign-off. NUNCA borrar, sólo desactivar o reclasificar. | `docs/tasks/to-do/TASK-1649-efeonce-legacy-client-space-review.md` |
 | `TASK-1650` | `to-do` | **El emisor legal de las cotizaciones compartidas nunca se lee de la base.** backend-data/reader; P1/Alto/Bajo. La query de `quote-share` selecciona `registered_address` y `website`, columnas inexistentes (son `legal_address` y `website_url`); falla siempre y un `catch` mudo la tapa, así que toda cotización imprime un `DEFAULT_LEGAL_ENTITY` hardcodeado. Rompe el contrato multi-entidad ("NUNCA hardcodear Efeonce"). Incluye resolver la discrepancia de domicilio entre la base (`of 05`) y el SSOT de marca (`Of 1105`). | `docs/tasks/to-do/TASK-1650-quote-share-legal-issuer-dead-query.md` |
+| `TASK-1651` | `to-do` | **Growth SEO: familia `ai_optimization` (DataForSEO) + fundación SoV de marca en LLMs per-org.** EPIC-022; backend-data/integration; backend-critical; P1/Alto/Alto. Amplía el allowlist DataForSEO con `/v3/ai_optimization/` (proceso gobernado: familia + CHECK del spend ledger + parity test en el mismo PR) y funda la captura batch de LLM Mentions (SoV longitudinal de marca en ChatGPT US/EN + Google AI Overview, ~$1.1/1.000 filas) hacia snapshots append-only per-org, con readers + MCP tools en el mismo PR (mandato TASK-1645). Lente ◑ del proveedor, complementaria y NUNCA fusionada con el SoV per-engine del grader (TASK-1424). Blocked by TASK-1303 (patrón spend fence). Investigación fuente: skill `dataforseo-operator` references/08. | `docs/tasks/to-do/TASK-1651-growth-seo-dataforseo-ai-optimization-llm-sov-foundation.md` |
 
 ## Siguiente ID disponible
 
-`TASK-1647`
+`TASK-1652`
+
+> Nota 2026-08-06: el pie decía `TASK-1647` pero el filesystem ya tenía archivos hasta `TASK-1650`
+> (regla vigente: verificar contra `ls docs/tasks/*/TASK-*.md`, no contra este pie). `TASK-1651`
+> quedó tomada por la fundación SoV en LLMs (familia `ai_optimization`, EPIC-022).
 
 > **Reserva 2026-08-05 (2).** `TASK-1646` quedó asignada a la reestructuración del doc de Cloud
 > Infrastructure y `TASK-1647` a la federación del provider Greenhouse-SEO en el gateway
