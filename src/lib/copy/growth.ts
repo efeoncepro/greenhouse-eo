@@ -1494,3 +1494,170 @@ export const GH_GROWTH_CTA_OPERATOR = {
     }
   }
 } as const
+
+/**
+ * Growth · SEO — Overview cockpit microcopy (TASK-1306, EPIC-022).
+ *
+ * Copy reusable es-CL (tuteo) del cockpit `/admin/growth/seo`: KPIs norte, curva
+ * de visibilidad, salud del sitio, movers, cross-link AEO y la matriz completa de
+ * estados honestos (§10.5 del arch doc).
+ *
+ * Reglas de honestidad que este copy codifica y NO se pueden ablandar:
+ * - Sin Search Console conectado NO hay panel: el estado es un empty accionable,
+ *   nunca ceros fantasma (un 0 dice "medimos y dio cero"; la verdad es "no medimos").
+ * - Medido (GSC, ●) y estimado (DataForSEO, ◑) se nombran distinto SIEMPRE y nunca
+ *   se promedian. Un slot que no resuelve dice "Pendiente" + razón, nunca 0 ni NaN.
+ * - La posición tiene semántica INVERTIDA: bajar de número es mejorar. El copy lo
+ *   dice explícito en el tooltip y en el aria-label, no lo deja al color de la flecha.
+ * - SEO y AEO NUNCA se funden en un score único (boundary §1.1): rankear #1 y no ser
+ *   citado por la IA es una señal legítima, no un bug que haya que promediar.
+ *
+ * Validado con la skill `greenhouse-ux-writing`: tuteo es-CL, sentence case, número
+ * nunca sin contexto, error = qué pasó + cómo se arregla, sin blame al usuario.
+ */
+export const GH_GROWTH_SEO_OVERVIEW = {
+  pageTitle: 'SEO',
+  pageSubtitle: 'Salud de búsqueda del Space: qué se mide, qué se estima y qué necesita atención.',
+  sectionTitle: 'Search Visibility',
+
+  tabs: {
+    overview: 'Resumen',
+    performance: 'Rendimiento',
+    keywords: 'Keywords',
+    audit: 'Auditoría',
+    unavailableHint: 'Disponible próximamente'
+  },
+
+  toolbar: {
+    spaceLabel: 'Space',
+    spacePlaceholder: 'Elige un Space',
+    rangeLabel: 'Período',
+    refresh: 'Actualizar',
+    refreshPending: 'Actualizando…',
+    // El botón relee snapshots ya materializados: NO dispara un crawl nuevo.
+    refreshHint: 'Relee los últimos datos guardados. No dispara un análisis nuevo.',
+    freshness: 'Search Console: datos hasta {date}',
+    freshnessUnknown: 'Search Console: sin fecha de corte disponible'
+  },
+
+  legend: {
+    measured: 'Medido',
+    measuredHint: 'Dato de Search Console: lo que Google registró de tu sitio.',
+    estimated: 'Estimado',
+    estimatedHint: 'Dato de proveedor externo: una estimación de mercado, no tu dato medido.',
+    ariaLabel: 'Leyenda de origen de los datos: medido y estimado'
+  },
+
+  kpis: {
+    clicks: {
+      title: 'Clics',
+      tooltip: 'Veces que alguien llegó a tu sitio desde la búsqueda en el período.'
+    },
+    impressions: {
+      title: 'Impresiones',
+      tooltip: 'Veces que tu sitio apareció en resultados de búsqueda en el período.'
+    },
+    position: {
+      title: 'Posición media',
+      // La inversión se explica en palabras, no sólo con el color de la flecha.
+      tooltip: 'Posición promedio ponderada por impresiones. Más bajo es mejor: pasar de 8 a 3 es una mejora.',
+      ariaImprovement: 'Mejora: la posición bajó de {from} a {to}, y una posición más baja es mejor.',
+      ariaDecline: 'Retroceso: la posición subió de {from} a {to}, y una posición más alta es peor.'
+    },
+    ctr: {
+      title: 'CTR',
+      tooltip: 'Porcentaje de impresiones que terminaron en clic.'
+    },
+    comparison: 'vs. período anterior',
+    noComparison: 'Primer período con datos'
+  },
+
+  evolution: {
+    title: 'Evolución de visibilidad',
+    subtitle: 'Clics medidos y posición media en el tiempo. En posición, más abajo es mejor.',
+    clicksSeries: 'Clics',
+    positionSeries: 'Posición media',
+    showTable: 'Ver tabla de datos',
+    hideTable: 'Ocultar tabla de datos',
+    tableCaption: 'Clics y posición media por fecha',
+    ariaLabel:
+      'Gráfico de evolución de visibilidad. Muestra clics medidos y posición media por fecha; en el eje de posición, 1 es lo mejor y está arriba.'
+  },
+
+  health: {
+    title: 'Salud del sitio',
+    subtitle: 'Resultado de la última auditoría técnica.',
+    scoreLabel: 'Puntaje de salud',
+    findingsLabel: 'Hallazgos por severidad',
+    cta: 'Ver auditoría',
+    lastRun: 'Última auditoría: {date}'
+  },
+
+  movers: {
+    title: 'Movimientos de la semana',
+    subtitle: 'Las keywords que más subieron y bajaron de posición.',
+    gained: 'Subieron',
+    lost: 'Bajaron',
+    cta: 'Ver rendimiento',
+    positionsUp: 'Subió {n} posiciones',
+    positionsDown: 'Bajó {n} posiciones'
+  },
+
+  aeoGap: {
+    title: 'Rankean pero la IA no las cita',
+    // Copy deliberadamente de SEÑAL, no de score fusionado (boundary §1.1).
+    subtitle:
+      'Keywords donde tu sitio rankea bien en Google pero no aparece citado en respuestas de IA. Son dos motores distintos: no se promedian.',
+    cta: 'Ver AEO Grader',
+    countLabel: '{n} keywords con esta señal'
+  },
+
+  states: {
+    loading: 'Cargando panel SEO…',
+
+    // Sin GSC: el CTA es conectar. NUNCA renderizar 0 en los KPIs acá.
+    emptyNoGsc: {
+      title: 'Conecta Search Console para ver el panel',
+      description:
+        'Los KPIs de este cockpit salen de datos medidos por Google. Sin la conexión no hay nada que medir todavía.',
+      cta: 'Conectar Search Console'
+    },
+
+    emptyNoSnapshots: {
+      title: 'Aún no hay datos históricos',
+      description:
+        'La conexión está activa, pero todavía no se guardó ningún día de datos. La captura diaria los irá llenando.',
+      cta: 'Ver estado de sincronización'
+    },
+
+    error: {
+      title: 'No pudimos cargar el panel SEO',
+      description: 'Puede ser algo temporal de nuestro lado. Intenta de nuevo en unos minutos.',
+      cta: 'Reintentar'
+    },
+
+    denied: {
+      title: 'No tienes acceso al módulo SEO',
+      // Sin CTA de reintentar: la causa es estructural, reintentar no la resuelve.
+      description: 'Pídele a un administrador que te habilite el módulo SEO para este Space.'
+    },
+
+    degradedProviderDown: {
+      title: 'Mostrando solo datos medidos',
+      description:
+        'El proveedor de datos estimados no respondió. Los clics, impresiones y posición de Search Console siguen siendo válidos; lo estimado quedó pendiente.'
+    },
+
+    pending: 'Pendiente',
+    pendingReason: 'Pendiente: {reason}',
+    pendingReasons: {
+      disabled: 'el módulo no está habilitado para este Space',
+      not_connected: 'falta conectar la fuente de datos',
+      token_unhealthy: 'la conexión necesita reautorizarse',
+      query_failed: 'la consulta al proveedor falló',
+      no_data: 'todavía no hay datos capturados'
+    },
+
+    spaceUpdated: 'Panel de {space} actualizado'
+  }
+} as const

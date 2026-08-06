@@ -595,6 +595,22 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'admin'
   },
   {
+    // TASK-1306 — Cockpit Overview del módulo SEO (EPIC-022) y casa de la sección local
+    // "Search Visibility" (tabs Overview·Rendimiento·Keywords·Auditoría, TASK-1307/1308/1309
+    // cuelgan de este mismo viewCode como child routes).
+    // Sembrado SOLO a efeonce_admin + ai_tooling_admin (los roles con la capability
+    // growth.seo.observation.read de TASK-1301). NUNCA client_*: el acceso cliente al módulo
+    // va por growth.seo.report.read_client scope 'own' y su propia surface.
+    // El acceso a una ORG concreta lo gobierna el chokepoint per-org (module_assignments seo_v1).
+    viewCode: 'administracion.growth_seo',
+    section: 'administracion',
+    label: 'SEO',
+    description:
+      'Cockpit de salud SEO por Space: KPIs medidos de Search Console, evolución de visibilidad, salud del sitio y movers.',
+    routePath: '/admin/growth/seo',
+    routeGroup: 'admin'
+  },
+  {
     // TASK-1276 — Vista OPERADOR del programa AEO (nodos S8-S12 EPIC-020): cockpit /growth/aeo +
     // detalle /growth/aeo/[organizationId]. NO vive en /admin (admin = salud de plataforma; Growth =
     // programa cross-cliente). Sembrado al set operador (mismos roles con la capability

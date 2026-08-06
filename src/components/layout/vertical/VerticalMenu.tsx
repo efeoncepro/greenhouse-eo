@@ -255,7 +255,12 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
     // TASK-1340 — gobernanza del motor de CTAs (delta operador: vive en Growth).
     const canSeeGrowthCtas = canSeeView('gestion.growth_ctas', isAdminUser)
 
-    if (canSeeGrowthForms || canSeeGrowthAiVisibility || canSeeGrowthAeo || canSeeGrowthCtas) {
+    // TASK-1306 — cockpit Overview del módulo SEO (EPIC-022). Casa de la sección local
+    // "Search Visibility"; las hermanas (Rendimiento/Keywords/Auditoría) cuelgan por tabs
+    // del MISMO viewCode, así que no suman ítems de menú.
+    const canSeeGrowthSeo = canSeeView('administracion.growth_seo', isAdminUser)
+
+    if (canSeeGrowthForms || canSeeGrowthAiVisibility || canSeeGrowthAeo || canSeeGrowthCtas || canSeeGrowthSeo) {
       menuData.push({
         label: nl(GH_INTERNAL_NAV.growth),
         icon: 'tabler-trending-up',
@@ -293,6 +298,15 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
                   label: nl(GH_INTERNAL_NAV.growthAiVisibility),
                   href: '/admin/growth/ai-visibility',
                   icon: 'tabler-robot'
+                }
+              ]
+            : []),
+          ...(canSeeGrowthSeo
+            ? [
+                {
+                  label: nl(GH_INTERNAL_NAV.growthSeo),
+                  href: '/admin/growth/seo',
+                  icon: 'tabler-chart-arrows-vertical'
                 }
               ]
             : [])
