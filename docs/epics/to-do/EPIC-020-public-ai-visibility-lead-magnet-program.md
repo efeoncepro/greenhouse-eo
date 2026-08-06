@@ -39,7 +39,7 @@ El motor del grader está completo y verificado (TASK-1226/1227/1234/1235/1236/1
 
 ## Child Tasks
 
-> **Estado real (reconciliado 2026-08-05):** **49 childs — 33 `complete`, 16 abiertas** (conteo canónico: tasks cuyo campo `Epic:` dice EPIC-020; paridad verificada por el gate `epic-child-parity`). La lista A–M de abajo son los 13 hijos originales del diseño del epic; debajo de ella está el **bloque reconciliado** con las **22 tasks que declaran `Epic: EPIC-020` en su propia cabecera y nunca fueron registradas acá**. (Fueron 25: tres salieron el 2026-08-05 hacia su dueño correcto — `TASK-1335`/`1359` a [`EPIC-040`](EPIC-040-growth-public-forms-engine.md), `TASK-1326` a EPIC-019.)
+> **Estado real (reconciliado 2026-08-05; +`TASK-1652` registrada al crearse, 2026-08-06):** **50 childs — 33 `complete`, 17 abiertas** (conteo canónico: tasks cuyo campo `Epic:` dice EPIC-020; paridad verificada por el gate `epic-child-parity`). La lista A–M de abajo son los 13 hijos originales del diseño del epic; debajo de ella está el **bloque reconciliado** con las **22 tasks que declaran `Epic: EPIC-020` en su propia cabecera y nunca fueron registradas acá**. (Fueron 25: tres salieron el 2026-08-05 hacia su dueño correcto — `TASK-1335`/`1359` a [`EPIC-040`](EPIC-040-growth-public-forms-engine.md), `TASK-1326` a EPIC-019.)
 >
 > El conteo previo ("12/13 `complete`, sólo `TASK-1246` abierta") era una **ficción contable**: contaba únicamente el denominador original. El epic no está a una task de cerrar, está a **dieciséis**. Método de la reconciliación y falsos positivos descartados: [`../AEO_PROGRAM_STATUS.md`](../AEO_PROGRAM_STATUS.md) § Delta 2026-08-05 (b).
 
@@ -122,6 +122,7 @@ El motor del grader está completo y verificado (TASK-1226/1227/1234/1235/1236/1
 - `TASK-1330` 🚧 `in-progress` — short links del reporte (distribución comercial).
 - `TASK-1281` 📋 `to-do` — headless probe runtime (Chromium en `ops-worker`: CWV + WebMCP).
 - `TASK-1341` 📋 `to-do` — guard de config runtime de DataForSEO AI Overview.
+- `TASK-1652` 📋 `to-do` — corrección del request AI Mode DataForSEO en el adapter `google_ai_overview` (market ISO-2 → `location_code`, gate per-task por `status_code`, citas anidadas en `ai_overview_element`). Complementaria a `TASK-1341` (aquella cubre creds/deploy; ésta la correctitud del request/parseo).
 - `TASK-1282` 🚧 / `TASK-1283` 🚧 `in-progress` — conexión Search Console multi-tenant (OAuth + per-org) y su UI. Declaran `Epic: EPIC-020`; **EPIC-022 depende de su rollout** (`TASK-1302`). Si el programa decide que GSC es infraestructura de SEO, mover ambas a EPIC-022 — decisión de alcance, no de higiene.
 
 > **Corregido en la misma pasada:** `TASK-1266`, `1267`, `1279` y `1286` declaraban `Epic: EPIC-020` pero son hijas registradas de **EPIC-021**. Se corrigió su campo `Epic:`, no esta lista.
