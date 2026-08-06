@@ -3,9 +3,6 @@
 import { useRouter } from 'next/navigation'
 
 import Box from '@mui/material/Box'
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
-import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
@@ -20,8 +17,11 @@ import CompositionShell from '@/components/greenhouse/primitives/composition-she
 import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
 import { GH_GROWTH_SEO_OVERVIEW } from '@/lib/copy/growth'
 import type { SeoSpaceOption } from '@/lib/growth/seo/overview/list-seo-spaces'
+import type { SeoOverviewKpis } from '@/lib/growth/seo/overview/read-overview-kpis'
 
+import SeoKpiRow from './SeoKpiRow'
 import SeoSearchVisibilityTabs from './SeoSearchVisibilityTabs'
+import SeoVisibilityEvolutionChart from './SeoVisibilityEvolutionChart'
 
 /**
  * TASK-1306 — Cockpit Overview del módulo SEO.
@@ -49,6 +49,8 @@ interface Props {
    * que la persona no puede ejecutar.
    */
   canConnectSearchConsole?: boolean
+  /** KPIs + serie del Space vigente. `null` cuando no hay nada medido todavía. */
+  kpis?: SeoOverviewKpis | null
 }
 
 const SeoOverviewView = ({
@@ -56,11 +58,18 @@ const SeoOverviewView = ({
   selectedSpaceId,
   connectionState = 'not_connected',
   dataAsOf = null,
-  canConnectSearchConsole = false
+  canConnectSearchConsole = false,
+  kpis = null
 }: Props) => {
   const router = useRouter()
 
   const selectedSpace = spaces.find(space => space.organizationId === selectedSpaceId) ?? null
+
+  // El período se nombra con el rango REAL leído, no con un literal: si la serie cubre
+  // menos días que la ventana pedida, decirlo evita prometer una comparación que no hay.
+  const periodLabel = kpis
+    ? GH_GROWTH_SEO_OVERVIEW.toolbar.periodLabel.replace('{days}', String(kpis.rangeDays))
+    : GH_GROWTH_SEO_OVERVIEW.states.pending
 
   const handleSpaceChange = (next: SeoSpaceOption | null) => {
     if (!next) {
@@ -76,7 +85,11 @@ const SeoOverviewView = ({
       {/* "Growth" es un grupo de menú, no una ruta: va sin href para no prometer
           una página que no existe. */}
       <GreenhouseBreadcrumbs
-        items={[{ label: GH_INTERNAL_NAV.growth.label }, { label: GH_GROWTH_SEO_OVERVIEW.pageTitle }]}
+        items={[
+          { label: GH_INTERNAL_NAV.growth.label },
+          { label: GH_GROWTH_SEO_OVERVIEW.breadcrumbSection },
+          { label: GH_INTERNAL_NAV.growthSeo.label }
+        ]}
       />
 
       <Stack
@@ -217,18 +230,25 @@ const SeoOverviewView = ({
       )
     }
 
+    // La conexión dice "connected" pero los KPIs no llegaron: es un fallo del reader,
+    // no un Space vacío. Se degrada honestamente en vez de renderizar ceros o reventar.
+    if (!kpis) {
+      return (
+        <Box data-capture='seo-overview-degraded'>
+          <EmptyState
+            icon='tabler-alert-triangle'
+            title={GH_GROWTH_SEO_OVERVIEW.states.error.title}
+            description={GH_GROWTH_SEO_OVERVIEW.states.error.description}
+          />
+        </Box>
+      )
+    }
+
     return (
-      <Grid container spacing={6}>
-        <Grid size={{ xs: 12 }} data-capture='seo-overview-kpis'>
-          <Card>
-            <CardContent>
-              <Typography variant='body2' color='text.secondary'>
-                {GH_GROWTH_SEO_OVERVIEW.states.pending}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+      <Stack spacing={6}>
+        <SeoKpiRow kpis={kpis} periodLabel={periodLabel} />
+        <SeoVisibilityEvolutionChart series={kpis.series} />
+      </Stack>
     )
   }
 

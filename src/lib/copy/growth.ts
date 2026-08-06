@@ -1516,9 +1516,10 @@ export const GH_GROWTH_CTA_OPERATOR = {
  * nunca sin contexto, error = qué pasó + cómo se arregla, sin blame al usuario.
  */
 export const GH_GROWTH_SEO_OVERVIEW = {
-  pageTitle: 'SEO',
+  pageTitle: 'Search Visibility · SEO',
   pageSubtitle: 'Salud de búsqueda del Space: qué se mide, qué se estima y qué necesita atención.',
   sectionTitle: 'Search Visibility',
+  breadcrumbSection: 'Search Visibility',
 
   tabs: {
     overview: 'Resumen',
@@ -1532,6 +1533,7 @@ export const GH_GROWTH_SEO_OVERVIEW = {
     spaceLabel: 'Space',
     spacePlaceholder: 'Elige un Space',
     rangeLabel: 'Período',
+    periodLabel: 'Últimos {days} días',
     refresh: 'Actualizar',
     refreshPending: 'Actualizando…',
     // El botón relee snapshots ya materializados: NO dispara un crawl nuevo.
@@ -1541,9 +1543,9 @@ export const GH_GROWTH_SEO_OVERVIEW = {
   },
 
   legend: {
-    measured: 'Medido',
+    measured: 'Medido · GSC',
     measuredHint: 'Dato de Search Console: lo que Google registró de tu sitio.',
-    estimated: 'Estimado',
+    estimated: 'Estimado · DataForSEO',
     estimatedHint: 'Dato de proveedor externo: una estimación de mercado, no tu dato medido.',
     ariaLabel: 'Leyenda de origen de los datos: medido y estimado'
   },
@@ -1558,7 +1560,7 @@ export const GH_GROWTH_SEO_OVERVIEW = {
       tooltip: 'Veces que tu sitio apareció en resultados de búsqueda en el período.'
     },
     position: {
-      title: 'Posición media',
+      title: 'Posición promedio',
       // La inversión se explica en palabras, no sólo con el color de la flecha.
       tooltip: 'Posición promedio ponderada por impresiones. Más bajo es mejor: pasar de 8 a 3 es una mejora.',
       ariaImprovement: 'Mejora: la posición bajó de {from} a {to}, y una posición más baja es mejor.',
@@ -1574,12 +1576,13 @@ export const GH_GROWTH_SEO_OVERVIEW = {
 
   evolution: {
     title: 'Evolución de visibilidad',
-    subtitle: 'Clics medidos y posición media en el tiempo. En posición, más abajo es mejor.',
+    subtitle: 'Clics medidos y posición promedio en el tiempo. En posición, más abajo es mejor.',
     clicksSeries: 'Clics',
     positionSeries: 'Posición media',
     showTable: 'Ver tabla de datos',
     hideTable: 'Ocultar tabla de datos',
-    tableCaption: 'Clics y posición media por fecha',
+    tableCaption: 'Clics y posición promedio por fecha',
+    tableDateHeader: 'Fecha',
     ariaLabel:
       'Gráfico de evolución de visibilidad. Muestra clics medidos y posición media por fecha; en el eje de posición, 1 es lo mejor y está arriba.'
   },

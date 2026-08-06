@@ -5,6 +5,7 @@ import type { Metadata } from 'next'
 import { can } from '@/lib/entitlements/runtime'
 import { listSeoEligibleSpaces } from '@/lib/growth/seo/overview/list-seo-spaces'
 import { readSeoOverviewConnection } from '@/lib/growth/seo/overview/read-overview-connection'
+import { readSeoOverviewKpis } from '@/lib/growth/seo/overview/read-overview-kpis'
 import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 import SeoOverviewView from '@/views/greenhouse/admin/growth/seo/overview/SeoOverviewView'
@@ -72,6 +73,12 @@ export default async function Page({ searchParams }: PageProps) {
     ? await readSeoOverviewConnection(selectedSpace.organizationId)
     : { state: 'not_connected' as const, dataAsOf: null }
 
+  // Sólo se leen KPIs cuando hay algo materializado: pedirlos en `not_connected`
+  // gastaría 4 queries para devolver ceros que la UI no debe mostrar igual.
+  const kpis = selectedSpace && connection.state === 'connected'
+    ? await readSeoOverviewKpis(selectedSpace.organizationId)
+    : null
+
   return (
     <SeoOverviewView
       spaces={spaces}
@@ -79,6 +86,7 @@ export default async function Page({ searchParams }: PageProps) {
       connectionState={connection.state}
       dataAsOf={connection.dataAsOf}
       canConnectSearchConsole={can(tenant, 'growth.search_console.connect', 'execute', 'tenant')}
+      kpis={kpis}
     />
   )
 }
