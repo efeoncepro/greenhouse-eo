@@ -92,3 +92,35 @@ describe('ops-worker deploy Globe tenancy reconciliation contract', () => {
     expect(script.slice(jobIndex, jobIndex + 220)).toContain('"/globe/tenancy/reconcile"')
   })
 })
+
+describe('ops-worker deploy SEO site audit + backlinks contract (TASK-1304)', () => {
+  it('declares the weekly audit enqueue job born paused', () => {
+    const script = deployScript()
+    const jobIndex = script.indexOf('"ops-seo-audit-enqueue"')
+
+    expect(jobIndex).toBeGreaterThan(0)
+    expect(script.slice(jobIndex, jobIndex + 220)).toContain('"0 6 * * 1"')
+    expect(script.slice(jobIndex, jobIndex + 220)).toContain('"/seo/audit/enqueue-batch"')
+    expect(script.slice(jobIndex, jobIndex + 220)).toContain('"true"')
+  })
+
+  it('declares the 30-minute collect poll born paused', () => {
+    const script = deployScript()
+    const jobIndex = script.indexOf('"ops-seo-audit-collect"')
+
+    expect(jobIndex).toBeGreaterThan(0)
+    expect(script.slice(jobIndex, jobIndex + 220)).toContain('"*/30 * * * *"')
+    expect(script.slice(jobIndex, jobIndex + 220)).toContain('"/seo/audit/collect"')
+    expect(script.slice(jobIndex, jobIndex + 220)).toContain('"true"')
+  })
+
+  it('declares the weekly backlink capture job born paused', () => {
+    const script = deployScript()
+    const jobIndex = script.indexOf('"ops-seo-backlink-capture"')
+
+    expect(jobIndex).toBeGreaterThan(0)
+    expect(script.slice(jobIndex, jobIndex + 220)).toContain('"0 7 * * 1"')
+    expect(script.slice(jobIndex, jobIndex + 220)).toContain('"/seo/backlinks/capture-batch"')
+    expect(script.slice(jobIndex, jobIndex + 220)).toContain('"true"')
+  })
+})
