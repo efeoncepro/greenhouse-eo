@@ -134,3 +134,30 @@ FROM greenhouse_finance.account_balances;
 - **SIEMPRE** que el bug class se manifieste vía Sentry alert, escalation es: (1) audit global, (2) fix sistemático, (3) lint rule update (si falta cobertura), (4) CLAUDE.md update. NO fixear un callsite y shippear.
 
 **Spec canónica**: lint rule en `eslint-plugins/greenhouse/rules/no-extract-epoch-from-date-subtraction.mjs` + tests en `__tests__/`. Override block en `eslint.config.mjs`.
+
+---
+
+### Aislamiento de los sanity scripts (TASK-1300, medido 2026-08-05)
+
+El gate de arriba exige ejercitar el SQL contra PG real. Eso implica **escribir datos de prueba en la base real**, así que cada `scripts/**/_sanity-*.ts` necesita una estrategia de limpieza — y elegir la equivocada deja residuo o produce falsos negativos.
+
+**🔴 `BEGIN`/`ROLLBACK` a través de `runGreenhousePostgresQuery` NO es transaccionalmente seguro.** Ese helper llama `pool.query()`, que toma una conexión del pool **por llamada** y la devuelve enseguida: no hay afinidad. El `BEGIN` abre la transacción en una conexión que vuelve al pool, y las llamadas siguientes pueden salir por otra — donde **se confirman al instante** y el `ROLLBACK` posterior no las alcanza. Se descubrió porque un `SAVEPOINT` reventó con `25P01 CheckTransactionBlock`. Funciona casi siempre porque el pool devuelve la conexión usada más recientemente; funciona **por coincidencia, no por diseño**.
+
+Cuál usar se decide por una sola pregunta — *¿la tabla se puede limpiar con `DELETE`?*:
+
+| Situación | Estrategia | Ejemplos en el repo |
+|---|---|---|
+| La tabla admite `DELETE` (config, assignments, targets) | **Limpieza explícita**: insertar con marcador (`created_by = 'sanity-task-NNNN'`), verificar llamando a las **funciones del producto**, y borrar en un `finally`. | `_sanity-seo-aeo-gap.ts`, `_sanity-seo-entitlement.ts`, `_sanity-hiring-activation.ts` |
+| La tabla es **append-only** (trigger no-delete) y sus filas no se pueden borrar | **Transacción sobre conexión fijada** (`withGreenhousePostgresTransaction`) que **aborta siempre** con un sentinel. | `_sanity-seo-keyword-opportunities.ts`, `_sanity-seo-provider-spend.ts` |
+
+**⚠️ El costo de la segunda opción**: las funciones del producto usan el pool por dentro, así que **no pueden ver la transacción de prueba**. Por eso esos scripts ejercitan el **SQL exportado por el módulo** (`SEO_KEYWORD_OPPORTUNITIES_SQL`, `SEO_PROVIDER_SPEND_UPSERT_SQL`) en vez de llamar a la función. Debe ser **exportado, nunca copiado**: una copia deja al script verde probando una versión vieja del SQL.
+
+**Reglas duras**:
+
+- **NUNCA** usar `runGreenhousePostgresQuery('BEGIN')` / `('ROLLBACK')` para aislar un sanity. Si necesitas transacción, es `withGreenhousePostgresTransaction`.
+- **NUNCA** duplicar el SQL productivo dentro de un sanity. Expórtalo como constante desde el módulo y consúmelo.
+- **NUNCA** llamar a una función del producto esperando que vea datos escritos dentro de `withGreenhousePostgresTransaction`: usa el `client` fijado, o cambia a limpieza por `DELETE`.
+- **SIEMPRE** cerrar el sanity con una verificación de residuo **por conteo antes/después**, no sólo con el conteo final — un conteo final de `0` puede venir de una conexión que no ve lo que quedó escrito en otra.
+- **SIEMPRE** evaluar el veredicto **después** del bloque de limpieza: un `process.exit()` dentro del `try` se salta el `finally` y deja residuo justo cuando algo salió mal.
+
+**Mitigación de plataforma (medida, no asumida)**: `idle_in_transaction_session_timeout = 5min` está seteado **por rol** vía `ALTER ROLE` en `greenhouse_app` y `greenhouse_ops` — no como database flag de la instancia, así que no aparece en `gcloud sql instances describe`. Acota el lock leak de una transacción huérfana, pero **no protege del riesgo real**: los datos que se confirmaron en otra conexión ya están escritos y ningún timeout los revierte. `greenhouse_migrator_user` **no tiene ese override**.

@@ -49,6 +49,57 @@ const DEFAULT_IMPRESSIONS_PERCENTILE = 0.75
 const MIN_IMPRESSIONS_FLOOR = 10
 const DEFAULT_LIMIT = 50
 
+/**
+ * SQL del striking-distance, exportado para que el sanity live lo ejercite EXACTAMENTE.
+ *
+ * `seo_gsc_daily` es append-only (trigger no-delete), así que un sanity no puede limpiar con
+ * `DELETE` como hacen los demás del repo: tiene que correr dentro de una transacción que
+ * aborta. Y una transacción de prueba no puede ver lo que hace este reader, porque el reader
+ * usa el pool. Por eso el script ejercita este SQL sobre su conexión fijada — y lo importa de
+ * acá en vez de copiarlo, para que no pueda quedar verde probando una versión vieja.
+ *
+ * Nota date-math (gate TASK-893): `capture_date` es DATE. No se usa `EXTRACT(EPOCH FROM
+ * (a - b))` en ningún punto — sólo comparación contra `CURRENT_DATE - $n::int`, que es la
+ * forma segura sobre columnas DATE.
+ *
+ * Parámetros: `$1` organizationId · `$2` windowDays · `$3` minPosition · `$4` maxPosition ·
+ * `$5` impressionsThreshold · `$6` limit.
+ */
+export const SEO_KEYWORD_OPPORTUNITIES_SQL = `WITH per_query AS (
+         SELECT query,
+                SUM(impressions)                                            AS impressions,
+                SUM(clicks)                                                 AS clicks,
+                -- Ponderada por impresiones: promediar días planos daría el mismo peso
+                -- a un día de 2 impresiones que a uno de 500.
+                SUM(position * impressions) / NULLIF(SUM(impressions), 0)    AS weighted_position,
+                COUNT(DISTINCT page)                                         AS competing_pages
+           FROM greenhouse_growth.seo_gsc_daily
+          WHERE organization_id = $1
+            AND capture_date >= (CURRENT_DATE - $2::int)
+          GROUP BY query
+       ),
+       best_page AS (
+         SELECT DISTINCT ON (query) query, page
+           FROM greenhouse_growth.seo_gsc_daily
+          WHERE organization_id = $1
+            AND capture_date >= (CURRENT_DATE - $2::int)
+          GROUP BY query, page
+          ORDER BY query, SUM(impressions) DESC, MIN(position) ASC
+       )
+       SELECT pq.query AS keyword,
+              bp.page,
+              pq.weighted_position,
+              pq.impressions,
+              pq.clicks,
+              pq.competing_pages
+         FROM per_query pq
+         JOIN best_page bp ON bp.query = pq.query
+        WHERE pq.weighted_position >= $3::numeric
+          AND pq.weighted_position <= $4::numeric
+          AND pq.impressions >= $5::int
+        ORDER BY pq.impressions DESC
+        LIMIT $6::int`
+
 export interface ReadKeywordOpportunitiesOptions {
   windowDays?: number
   minPosition?: number
@@ -168,40 +219,7 @@ export const readKeywordOpportunities = async (
     // EXTRACT(EPOCH FROM (a - b)) en ningún punto — sólo comparación contra
     // `CURRENT_DATE - $n::int`, que es la forma segura sobre columnas DATE.
     const rows = await runGreenhousePostgresQuery<OpportunityRow>(
-      `WITH per_query AS (
-         SELECT query,
-                SUM(impressions)                                            AS impressions,
-                SUM(clicks)                                                 AS clicks,
-                -- Ponderada por impresiones: promediar días planos daría el mismo peso
-                -- a un día de 2 impresiones que a uno de 500.
-                SUM(position * impressions) / NULLIF(SUM(impressions), 0)    AS weighted_position,
-                COUNT(DISTINCT page)                                         AS competing_pages
-           FROM greenhouse_growth.seo_gsc_daily
-          WHERE organization_id = $1
-            AND capture_date >= (CURRENT_DATE - $2::int)
-          GROUP BY query
-       ),
-       best_page AS (
-         SELECT DISTINCT ON (query) query, page
-           FROM greenhouse_growth.seo_gsc_daily
-          WHERE organization_id = $1
-            AND capture_date >= (CURRENT_DATE - $2::int)
-          GROUP BY query, page
-          ORDER BY query, SUM(impressions) DESC, MIN(position) ASC
-       )
-       SELECT pq.query AS keyword,
-              bp.page,
-              pq.weighted_position,
-              pq.impressions,
-              pq.clicks,
-              pq.competing_pages
-         FROM per_query pq
-         JOIN best_page bp ON bp.query = pq.query
-        WHERE pq.weighted_position >= $3::numeric
-          AND pq.weighted_position <= $4::numeric
-          AND pq.impressions >= $5::int
-        ORDER BY pq.impressions DESC
-        LIMIT $6::int`,
+      SEO_KEYWORD_OPPORTUNITIES_SQL,
       [organizationId, windowDays, minPosition, maxPosition, impressionsThreshold, limit]
     )
 
