@@ -21,9 +21,17 @@ ledger `serp` correcto → re-run `skipped` USD 0 (idempotencia) → mirror BQ 8
 operativos aplicados en vivo: (1) grant WRITER de `greenhouse-portal@` en el dataset BQ nuevo
 (el mirror falló con Access Denied y el retry lo absorbió); (2) el replay de eventos en `retry`
 es EXPLÍCITO vía `POST /api/admin/ops/replay-reactive` (la lane periódica no los re-reclama) —
-ambos documentados en el runbook. **Único paso restante: despausar** (5.º arg a "false" en
-`deploy.sh` + redeploy). Pendiente menor: sembrar keywords para `seot-efeonce-own-brand`
-(elegible, 0 keywords → hoy degrada `no_keywords`).
+ambos documentados en el runbook. **DESPAUSADO 2026-08-06** (autorización del
+operador): 5.º arg a "false" en `deploy.sh`, deploy en success, scheduler `ENABLED 0 5 * * *` —
+la serie corre sola desde mañana 05:00 CLT (~USD 0.03/día con las 8 keywords actuales).
+Pendientes: (1) promoción develop→main para que el lane `rank-evolution` + la MCP tool interna
+lleguen a Vercel PRODUCTION (la captura ya corre igual: el worker es compartido y PG es única;
+solo las superficies de lectura prod esperan release); (2) federar `get_seo_rank_evolution` al
+gateway `mcp.efeonce.org` (repo `efeonce-mcp`, `src/mcp.ts` + provider `greenhouse-seo.ts` —
+adapter hardcodea 3 métodos, NO es proxy dinámico; hacerlo DESPUÉS del release prod o el
+gateway vería 404); (3) sembrar keywords para `seot-efeonce-own-brand` (elegible, 0 keywords →
+degrada `no_keywords`) y curar el set completo de Berel (la serie de cada keyword empieza el
+día que entra al set).
 
 
 ### Efeonce dejó de ser cliente de sí misma — modelado corregido (2026-08-06)
