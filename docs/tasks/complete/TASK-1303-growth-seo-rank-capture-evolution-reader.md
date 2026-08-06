@@ -11,7 +11,7 @@
 
 **Evidencia:** suite full 10.218/0 + build prod verdes; `worker:build-contract-gate` + `worker:runtime-deps-gate` verdes (fix: imports type-only plenos en `contracts.ts`/`provider-spend.ts`); SQL live 8/8 contra PG real (`scripts/growth/_sanity-task-1303-rank-capture-sql.ts` — INSERT validado con PREPARE, sin escribir la serie); dataset BQ `greenhouse_growth_analytics` + tabla `seo_rank_history` (partition `capture_date`, cluster `seo_target_id,keyword`) **creados en BigQuery**.
 
-**Rollout pendiente (en orden):** (1) push a `develop` + redeploy ops-worker (workflows Cloud Run en success); (2) smoke real DataForSEO en staging con Berel (saldo actual USD 0.90 — alcanza para ~1 corrida de smoke, recargar antes del run completo); (3) despausar `ops-seo-rank-capture` en `deploy.sh` (5.º arg a `"false"`) tras la verificación del runbook; (4) observar 1–2 corridas + costo real. Runbook: `docs/manual-de-uso/growth/operar-captura-rankings-seo.md`. Mientras el cron esté pausado, `seo.rank.capture_lag` muestra warning para los targets elegibles — honesto por diseño.
+**Rollout EJECUTADO 2026-08-06** (smoke E2E real USD 0.03 + grant BQ + replay + despause autorizado; scheduler `ENABLED 0 5 * * *`; serie dia-1: Berel 31 keywords, USD ~0.14 total). Pendientes fuera del scope runtime: release develop→main (lleva lane+MCP tool a prod Vercel) y federacion de `get_seo_rank_evolution` al gateway (`efeonce-mcp`). Plan original de rollout (referencia): (1) push a `develop` + redeploy ops-worker (workflows Cloud Run en success); (2) smoke real DataForSEO en staging con Berel (saldo actual USD 0.90 — alcanza para ~1 corrida de smoke, recargar antes del run completo); (3) despausar `ops-seo-rank-capture` en `deploy.sh` (5.º arg a `"false"`) tras la verificación del runbook; (4) observar 1–2 corridas + costo real. Runbook: `docs/manual-de-uso/growth/operar-captura-rankings-seo.md`. Mientras el cron esté pausado, `seo.rank.capture_lag` muestra warning para los targets elegibles — honesto por diseño.
 
 **Nota de datos:** los 2 targets reales (`seot-berel-fase0`, `seot-efeonce-own-brand`) son elegibles por assignment; verificar que tengan keywords vigentes en `seo_keyword_set_members` antes del primer run (un target sin keywords degrada honesto con `no_keywords`).
 
@@ -49,7 +49,7 @@
 - Motion: `none`
 - Backend impact: `cron`
 - Epic: `EPIC-022`
-- Status real: `code complete, rollout pendiente (2026-08-06): push + redeploy ops-worker + despause del scheduler gated por operador`
+- Status real: `operativamente completo (2026-08-06): smoke E2E real + scheduler ACTIVO + serie dia-1 de Berel con 31 keywords; superficies de lectura prod esperan release develop->main`
 - Rank: `TBD`
 - Domain: `growth|data|integrations`
 - Blocked by: `TASK-1299, TASK-1300, TASK-1301`
@@ -369,7 +369,7 @@ Ver `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §5 (rank tracking: DataForSEO SE
 - [x] `Handoff.md` actualizado
 - [x] `changelog.md` actualizado
 - [x] `FEATURE_FLAG_STATE_LEDGER.md` — fila de `GROWTH_SEO_ENABLED` (o §Pendientes de acción si queda code-complete sin prender)
-- [ ] verificar `conclusion=success` de los workflows Cloud Run worker afectados (ops-worker) post-deploy
+- [x] verificar `conclusion=success` de los workflows Cloud Run worker afectados (ops-worker) post-deploy
 - [x] chequeo de impacto cruzado (TASK-1307 pantalla ancla + TASK-1305 gap read consumen esto)
 - [x] documentación técnica (motor de captura + reader de evolución) + funcional + manual/runbook del cron (triple doc, arquitectura del dominio SEO)
 
