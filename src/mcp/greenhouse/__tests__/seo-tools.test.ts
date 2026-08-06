@@ -29,6 +29,7 @@ const buildClient = (overrides: Record<string, unknown> = {}) =>
     getSeoKeywordOpportunities: vi.fn(),
     getSeoVisibility360: vi.fn(),
     getSeoEntitlement: vi.fn(),
+    getSeoRankEvolution: vi.fn(),
     ...overrides
   }) as never
 
@@ -167,5 +168,59 @@ describe('get_seo_entitlement handler', () => {
 
     expect(result.content[0].text).toContain('hasModule=false')
     expect(result.content[0].text).toContain('tier=none')
+  })
+})
+
+describe('get_seo_rank_evolution handler (TASK-1303)', () => {
+  it('passthrough del payload + summary con conteo de series y source', async () => {
+    const payload = {
+      ok: true,
+      source: 'postgres',
+      range: { from: '2026-05-09', to: '2026-08-06', days: 90 },
+      series: [{ keyword: 'a', points: [] }, { keyword: 'b', points: [] }]
+    }
+
+    const handlers = createGreenhouseMcpHandlers(
+      buildClient({ getSeoRankEvolution: vi.fn().mockResolvedValue(okEnvelope(payload)) })
+    )
+
+    const result = await handlers.getSeoRankEvolution({ organizationId: 'org-1', rangeDays: 90 })
+
+    expect(result.isError).toBe(false)
+    expect(result.structuredContent).toMatchObject({ ok: true, data: payload })
+    expect(result.content[0].text).toContain('2 keywords')
+    expect(result.content[0].text).toContain('source=postgres')
+  })
+
+  it('degradación honesta: data.ok=false se reporta con su errorCode', async () => {
+    const handlers = createGreenhouseMcpHandlers(
+      buildClient({
+        getSeoRankEvolution: vi.fn().mockResolvedValue(okEnvelope({ ok: false, errorCode: 'no_data', status: null }))
+      })
+    )
+
+    const result = await handlers.getSeoRankEvolution({ organizationId: 'org-1' })
+
+    expect(result.isError).toBe(false)
+    expect(result.content[0].text).toContain('unavailable (no_data)')
+  })
+
+  it('propaga el error del lane (anti-oracle 404) sin inventar datos', async () => {
+    const handlers = createGreenhouseMcpHandlers(
+      buildClient({
+        getSeoRankEvolution: vi.fn().mockRejectedValue(
+          new GreenhouseMcpApiError('SEO resource not found for the resolved scope.', {
+            status: 404,
+            code: 'not_found',
+            requestId: 'req-x'
+          })
+        )
+      })
+    )
+
+    const result = await handlers.getSeoRankEvolution({ organizationId: 'org-ajena' })
+
+    expect(result.isError).toBe(true)
+    expect(result.content[0].text).toContain('404')
   })
 })

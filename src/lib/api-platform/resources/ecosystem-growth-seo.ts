@@ -4,7 +4,8 @@ import type { ApiPlatformRequestContext, ApiPlatformSuccessResult } from '@/lib/
 import { ApiPlatformError } from '@/lib/api-platform/core/errors'
 import { readSeoAeoGap } from '@/lib/growth/seo/gap/read-seo-aeo-gap'
 import { readKeywordOpportunities } from '@/lib/growth/seo/keyword-opportunities-reader'
-import type { KeywordOpportunitiesResult, SeoAeoGapResult } from '@/lib/growth/seo/contracts'
+import { readRankEvolution } from '@/lib/growth/seo/rank-evolution-reader'
+import type { KeywordOpportunitiesResult, RankEvolutionResult, SeoAeoGapResult, SeoRankDevice } from '@/lib/growth/seo/contracts'
 import { resolveSeoEntitlement, type SeoTier } from '@/lib/growth/seo/entitlement'
 import { isSeoModuleEnabled } from '@/lib/growth/seo/flags'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
@@ -174,6 +175,59 @@ export const getEcosystemSeoVisibility360Payload = async ({
   }
 
   const result = await readSeoAeoGap(subject.seoTargetId)
+
+  return {
+    data: result,
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId }
+  }
+}
+
+export type EcosystemSeoRankEvolutionPayload = RankEvolutionResult | SeoTargetNotConfiguredPayload
+
+/**
+ * GET /api/platform/ecosystem/growth/seo/rank-evolution — la serie temporal de
+ * posiciones (TASK-1303). Passthrough del reader canónico `readRankEvolution`
+ * (PG hot window ~180d / BQ para rango largo). Query params: `rangeDays`, `engine`,
+ * `device`, `keywords` (CSV, máx 100).
+ */
+export const getEcosystemSeoRankEvolutionPayload = async ({
+  context,
+  request
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+}): Promise<ApiPlatformSuccessResult<EcosystemSeoRankEvolutionPayload>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  const subject = await resolveSeoLaneSubject(context, request)
+
+  if (!subject.seoTargetId) {
+    return {
+      data: { ok: false, errorCode: 'target_not_configured', organizationId: subject.organizationId },
+      meta: { module: 'growth.seo', tier: subject.tier }
+    }
+  }
+
+  const url = new URL(request.url)
+
+  const rawRange = Number(url.searchParams.get('rangeDays'))
+  const rangeDays = Number.isFinite(rawRange) && rawRange > 0 ? Math.floor(rawRange) : undefined
+
+  const rawEngine = (url.searchParams.get('engine') ?? '').trim()
+  const engine = rawEngine || undefined
+
+  const rawDevice = (url.searchParams.get('device') ?? '').trim()
+  const device = rawDevice === 'desktop' || rawDevice === 'mobile' || rawDevice === 'tablet' ? (rawDevice as SeoRankDevice) : undefined
+
+  const rawKeywords = (url.searchParams.get('keywords') ?? '').trim()
+
+  const keywords = rawKeywords
+    ? rawKeywords.split(',').map(keyword => keyword.trim()).filter(Boolean)
+    : undefined
+
+  const result = await readRankEvolution(subject.seoTargetId, { rangeDays, engine, device, keywords })
 
   return {
     data: result,

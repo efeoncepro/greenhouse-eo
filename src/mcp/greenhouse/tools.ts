@@ -182,6 +182,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   | 'getSeoKeywordOpportunities'
   | 'getSeoVisibility360'
   | 'getSeoEntitlement'
+  | 'getSeoRankEvolution'
 >) => ({
   async getContext() {
     return callReadTool(
@@ -434,6 +435,37 @@ export const createGreenhouseMcpHandlers = (client: Pick<
         )} (${result.requestId}).`
       },
       () => client.getSeoEntitlement(input)
+    )
+  },
+  // TASK-1303 — la serie temporal de posiciones (pantalla ancla de EPIC-022).
+  async getSeoRankEvolution(input: {
+    organizationId?: string
+    rangeDays?: number
+    engine?: string
+    device?: string
+    keywords?: string[]
+  }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          source?: string
+          series?: unknown[]
+          range?: { from?: string; to?: string; days?: number }
+        }
+
+        if (data.ok === false) {
+          return `SEO rank evolution unavailable (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        const count = Array.isArray(data.series) ? data.series.length : 0
+
+        return `Loaded rank evolution for ${count} keywords over ${String(data.range?.days ?? '?')} days (source=${String(
+          data.source ?? 'unknown'
+        )}) (${result.requestId}).`
+      },
+      () => client.getSeoRankEvolution(input)
     )
   }
 })
