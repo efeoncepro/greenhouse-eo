@@ -37,6 +37,7 @@ describe('createGreenhouseMcpHandlers', () => {
       getSeoVisibility360: vi.fn(),
       getSeoEntitlement: vi.fn(),
       getSeoRankEvolution: vi.fn(),
+      getSeoOverviewKpis: vi.fn(),
       getSeoSiteAuditReport: vi.fn(),
       getSeoBacklinkProfile: vi.fn()
     })
@@ -121,6 +122,7 @@ describe('createGreenhouseMcpHandlers', () => {
       getSeoVisibility360: vi.fn(),
       getSeoEntitlement: vi.fn(),
       getSeoRankEvolution: vi.fn(),
+      getSeoOverviewKpis: vi.fn(),
       getSeoSiteAuditReport: vi.fn(),
       getSeoBacklinkProfile: vi.fn()
     })

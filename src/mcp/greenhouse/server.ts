@@ -308,6 +308,22 @@ export const createGreenhouseMcpServer = (
     async args => handlers.getSeoRankEvolution(args)
   )
 
+  // TASK-1306 — KPIs norte del cockpit Overview (la foto medida del período).
+  server.registerTool(
+    'get_seo_overview_kpis',
+    {
+      title: 'Get SEO Overview KPIs',
+      description:
+        'North-star KPIs of the SEO Overview cockpit for an organization, from MEASURED Google Search Console data (first-party truth, never estimated): clicks, impressions, average position and CTR aggregated over the period, plus the daily series and the equivalent previous window for comparison. Average position is weighted BY IMPRESSIONS (never a flat average of daily positions) and CTR is total clicks over total impressions (never an average of daily ratios). Position semantics are INVERTED: a lower number is better, so a negative delta is an improvement. previous=null means there is no comparable previous window — report it as "no comparison available", never as a 100% change. position/ctr are null when there were no impressions; that is "not measured", never zero. When data.ok is false, report the errorCode (disabled, target_not_configured) honestly.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        rangeDays: z.number().int().positive().max(365).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getSeoOverviewKpis(args)
+  )
+
   // TASK-1304 — site audit report: salud técnica del sitio (OnPage async queue+poll).
   server.registerTool(
     'get_seo_site_audit_report',

@@ -183,6 +183,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   | 'getSeoVisibility360'
   | 'getSeoEntitlement'
   | 'getSeoRankEvolution'
+  | 'getSeoOverviewKpis'
   | 'getSeoSiteAuditReport'
   | 'getSeoBacklinkProfile'
 >) => ({
@@ -468,6 +469,36 @@ export const createGreenhouseMcpHandlers = (client: Pick<
         )}) (${result.requestId}).`
       },
       () => client.getSeoRankEvolution(input)
+    )
+  },
+  // TASK-1306 — KPIs norte del cockpit Overview (Search Console medido).
+  async getSeoOverviewKpis(input: { organizationId?: string; rangeDays?: number }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          current?: { clicks?: number; impressions?: number; position?: number | null; ctr?: number | null }
+          previous?: unknown
+          rangeDays?: number
+        }
+
+        if (data.ok === false) {
+          return `SEO overview KPIs unavailable (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        const position = data.current?.position
+        // `previous: null` NO es cero: es "no hay ventana anterior con datos". Se dice
+        // así para que el consumidor no reporte una caída del 100% inventada.
+        const comparison = data.previous ? 'with previous-window comparison' : 'no comparable previous window'
+
+        return `Loaded SEO overview KPIs over ${String(data.rangeDays ?? '?')} days: ${String(
+          data.current?.clicks ?? 0
+        )} clicks, ${String(data.current?.impressions ?? 0)} impressions, avg position ${
+          position === null || position === undefined ? 'n/a' : position.toFixed(1)
+        } (${comparison}) (${result.requestId}).`
+      },
+      () => client.getSeoOverviewKpis(input)
     )
   },
   // TASK-1304 — reporte del site audit técnico (OnPage: health + findings por severidad).

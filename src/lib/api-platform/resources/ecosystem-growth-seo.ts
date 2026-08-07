@@ -6,6 +6,7 @@ import { readBacklinkProfile } from '@/lib/growth/seo/backlinks/reader'
 import { readSeoAeoGap } from '@/lib/growth/seo/gap/read-seo-aeo-gap'
 import { readKeywordOpportunities } from '@/lib/growth/seo/keyword-opportunities-reader'
 import { readRankEvolution } from '@/lib/growth/seo/rank-evolution-reader'
+import { readSeoOverviewKpis } from '@/lib/growth/seo/overview/read-overview-kpis'
 import { readSiteAuditReport } from '@/lib/growth/seo/site-audit/reader'
 import type {
   BacklinkProfileResult,
@@ -252,6 +253,40 @@ export type EcosystemSeoSiteAuditReportPayload = SiteAuditReportResult | SeoTarg
  * puntual con `auditRunId`). Findings agrupados por severidad; un run `running` se
  * reporta como "audit en curso" (hecho, no error).
  */
+/**
+ * TASK-1306 — KPIs norte del cockpit Overview (Search Console MEDIDO, agregado del período).
+ *
+ * Se expone en el lane ecosystem porque `readSeoOverviewKpis` proyecta algo que ninguna
+ * otra tool entrega: el agregado del período con la posición PONDERADA POR IMPRESIONES y
+ * la ventana previa comparable. Mandato del dominio: todo reader nuevo nace con su tool.
+ */
+export const getEcosystemSeoOverviewKpisPayload = async ({
+  context,
+  request
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+}): Promise<ApiPlatformSuccessResult<unknown>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  const subject = await resolveSeoLaneSubject(context, request)
+
+  const url = new URL(request.url)
+  const rawRange = Number.parseInt(url.searchParams.get('rangeDays') ?? '', 10)
+  // Techo de 365: la ventana caliente de PG es ~180d; pedir más no rompe pero tampoco
+  // aporta, y un número sin límite deja la puerta abierta a un escaneo caro.
+  const rangeDays = Number.isFinite(rawRange) && rawRange > 0 ? Math.min(rawRange, 365) : 28
+
+  const result = await readSeoOverviewKpis(subject.organizationId, rangeDays)
+
+  return {
+    data: { ok: true, organizationId: subject.organizationId, ...result },
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId }
+  }
+}
+
 export const getEcosystemSeoSiteAuditReportPayload = async ({
   context,
   request

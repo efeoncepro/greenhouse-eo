@@ -30,6 +30,7 @@ const buildClient = (overrides: Record<string, unknown> = {}) =>
     getSeoVisibility360: vi.fn(),
     getSeoEntitlement: vi.fn(),
     getSeoRankEvolution: vi.fn(),
+    getSeoOverviewKpis: vi.fn(),
     getSeoSiteAuditReport: vi.fn(),
     getSeoBacklinkProfile: vi.fn(),
     ...overrides
@@ -326,5 +327,82 @@ describe('get_seo_backlink_profile handler (TASK-1304)', () => {
 
     expect(result.isError).toBe(false)
     expect(result.content[0].text).toContain('unavailable (no_data)')
+  })
+})
+
+describe('get_seo_overview_kpis handler (TASK-1306)', () => {
+  it('resume los KPIs medidos del período y declara la comparación disponible', async () => {
+    const payload = {
+      ok: true,
+      organizationId: 'org-1',
+      current: { clicks: 2596, impressions: 136146, position: 5.783, ctr: 0.0191 },
+      previous: { clicks: 2100, impressions: 120000, position: 6.4, ctr: 0.0175 },
+      series: [],
+      rangeDays: 28
+    }
+
+    const handlers = createGreenhouseMcpHandlers(
+      buildClient({ getSeoOverviewKpis: vi.fn().mockResolvedValue(okEnvelope(payload)) })
+    )
+
+    const result = await handlers.getSeoOverviewKpis({ organizationId: 'org-1', rangeDays: 28 })
+
+    expect(result.isError).toBe(false)
+    expect(result.content[0].text).toContain('2596 clicks')
+    expect(result.content[0].text).toContain('avg position 5.8')
+    expect(result.content[0].text).toContain('with previous-window comparison')
+  })
+
+  it('sin ventana previa comparable lo DICE, en vez de sugerir una caída del 100%', async () => {
+    const payload = {
+      ok: true,
+      organizationId: 'org-1',
+      current: { clicks: 10, impressions: 100, position: 4.2, ctr: 0.1 },
+      // El caso real de un Space recién conectado: 5 días de serie, sin ventana anterior.
+      previous: null,
+      series: [],
+      rangeDays: 28
+    }
+
+    const handlers = createGreenhouseMcpHandlers(
+      buildClient({ getSeoOverviewKpis: vi.fn().mockResolvedValue(okEnvelope(payload)) })
+    )
+
+    const result = await handlers.getSeoOverviewKpis({ organizationId: 'org-1' })
+
+    expect(result.content[0].text).toContain('no comparable previous window')
+  })
+
+  it('sin impresiones, position/ctr null se reportan como n/a y NUNCA como cero', async () => {
+    const payload = {
+      ok: true,
+      organizationId: 'org-1',
+      current: { clicks: 0, impressions: 0, position: null, ctr: null },
+      previous: null,
+      series: [],
+      rangeDays: 28
+    }
+
+    const handlers = createGreenhouseMcpHandlers(
+      buildClient({ getSeoOverviewKpis: vi.fn().mockResolvedValue(okEnvelope(payload)) })
+    )
+
+    const result = await handlers.getSeoOverviewKpis({ organizationId: 'org-1' })
+
+    expect(result.content[0].text).toContain('avg position n/a')
+    expect(result.content[0].text).not.toContain('avg position 0.0')
+  })
+
+  it('degradación honesta: data.ok=false se reporta con su errorCode', async () => {
+    const handlers = createGreenhouseMcpHandlers(
+      buildClient({
+        getSeoOverviewKpis: vi.fn().mockResolvedValue(okEnvelope({ ok: false, errorCode: 'disabled', status: null }))
+      })
+    )
+
+    const result = await handlers.getSeoOverviewKpis({ organizationId: 'org-1' })
+
+    expect(result.isError).toBe(false)
+    expect(result.content[0].text).toContain('unavailable (disabled)')
   })
 })

@@ -200,6 +200,14 @@ export class GreenhouseApiPlatformClient {
     })
   }
 
+  // TASK-1306 — KPIs norte del cockpit Overview (GSC medido, agregado del período).
+  async getSeoOverviewKpis(input: { organizationId?: string; rangeDays?: number }) {
+    return this.request('/api/platform/ecosystem/growth/seo/overview-kpis', {
+      organizationId: input.organizationId,
+      rangeDays: input.rangeDays
+    })
+  }
+
   // TASK-1304 — reporte del site audit técnico (OnPage, health + findings por severidad).
   async getSeoSiteAuditReport(input: { organizationId?: string; auditRunId?: string }) {
     return this.request('/api/platform/ecosystem/growth/seo/site-audit-report', {
