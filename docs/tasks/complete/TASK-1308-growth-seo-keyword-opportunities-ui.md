@@ -101,7 +101,14 @@ oportunidades pero no hace crecer su propia factura.
 
 ### Pendiente de rollout
 
-- **Scope en Entra**: `efeonce.mcp.seo.write` todavía no existe en la app
+- **Scope en Entra**: `efeonce.mcp.seo.write` **CREADO 2026-08-07** (`type: Admin`,
+  `isEnabled: true`, id `17f923ad-537a-4c2f-ab5b-2a14ed650183`) con round-trip verificado: los
+  3 scopes de Globe siguen intactos y `requestedAccessTokenVersion: 2` preservado. **No se
+  cableó al cliente PKCE compartido** y no debe cablearse — ver el ADR del gateway, §"El scope
+  de escritura NO se cablea al cliente público compartido": en el lane ecosystem el actor es la
+  máquina, así que el scope es la única puerta que depende de la persona. Las tools quedan
+  fail-closed hasta que exista un cliente con grant controlable (`TASK-1631`).
+- ~~**Scope en Entra**: `efeonce.mcp.seo.write` todavía no existe en la app~~
   `Efeonce MCP Resource` (`c5363215-b9a6-4bf1-bb1c-e61963b37dac`). Hasta provisionarlo la
   tool federada responde `insufficient_scope` — fail-closed por diseño.
 - **Push del gateway**: commit local sin push (el repo tiene deploy productivo en push).
