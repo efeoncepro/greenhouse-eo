@@ -1,5 +1,14 @@
 # Handoff activo
 
+### Autenticación local Gcloud con Playwright (2026-08-07)
+
+Se agregó el proceso manual `pnpm gcloud:auth:playwright` para renovar CLI + ADC cuando el operador lo
+solicite, con `--force` para repetir OAuth y `--check-only` para verificar sin abrir navegador. El setup
+`pnpm gcloud:auth:playwright:setup` guarda la cuenta y la clave en `.auth/gcloud-auth-credentials.json`
+ignorado por Git y con permisos `0600`; el perfil Chrome aislado queda en `.auth/gcloud-auth-profile`.
+El flujo usa Playwright visible, no imprime URLs/códigos/cookies y termina con `gcloud-auth-preflight.sh`.
+No hay scheduler ni rollout remoto.
+
 ### TASK-1306 — cockpit SEO Overview: code complete, deploy pendiente (2026-08-06)
 
 `/admin/growth/seo` en `develop` **local (sin push)**, 5 slices. Suite **10281/0**, build prod
@@ -317,59 +326,6 @@ el reader lo consumirán TASK-1645/1310 — cada consumer valida el flag en su r
 del camino MCP-first: `TASK-1645`** (lane ecosystem + MCP tools — get_seo_visibility_360 nace con este
 cruce). Sin push aún.
 
-### TASK-1300 — Registry de familias DataForSEO + ledger de gasto (2026-08-05)
-
-**`code complete, rollout pendiente`.** El cliente DataForSEO pasa de candado hard-code a `/v3/serp/` a un
-allowlist cerrado de 5 familias con transporte único. El AEO pasó **sin que se tocara ninguno de sus archivos**.
-
-**Tres decisiones que conviene no re-litigar:**
-
-1. **`seo_provider_spend_daily` es la FUENTE ÚNICA de presupuesto.** `enforceSeoRunEntitlement` dejó de sumar
-   el `provider_cost` de las 3 tablas snapshot: hacer ambas contaría el mismo gasto DOS VECES. El hook estaba
-   declarado en TASK-1301 (`entitlement.ts:24`) pero esa task ya estaba `complete`, así que **el cambio no
-   tenía dueño** — se tomó acá porque hoy es no-op verificable y después habría sido caro.
-2. **El contador lo escribe el TRANSPORTE, no el caller**, y las 4 familias SEO exigen `organizationId` por
-   tipo. Además el transporte **lanza** si el runtime no registró el contador: gastar sin contabilizar se
-   descubre en la factura; un throw se descubre en desarrollo (lección de TASK-1302).
-3. **`serp` deja `organizationId` opcional por una limitación del contexto del adapter AEO, NO porque su gasto
-   sea inatribuible** — corrección que salió de una objeción del operador. Ver el hueco abierto abajo.
-
-**🔴 Dos cosas que bloquean o cuestan plata:**
-
-- **La cuenta DataForSEO tiene USD 0,90** (`money.total: 1`, medido en vivo). El smoke por familia y cualquier
-  captura de TASK-1303/1304 están bloqueados por saldo. No se gastó probando: es decisión del operador.
-- **El gasto AEO de perfiles ligados a un cliente NO entra en su presupuesto.** `grader_profiles.organization_id`
-  existe y es nullable (TASK-1243), pero `ProviderAdapterContext` no transporta la organización. Follow-up con
-  dueño en EPIC-020; cuando `serp` reciba `organizationId`, el transporte ya lo contabiliza solo.
-
-**⚠️ Hallazgo transversal — el patrón de sanity del repo es frágil.** `BEGIN`/`ROLLBACK` vía
-`runGreenhousePostgresQuery` **no es transaccionalmente seguro**: ese helper toma una conexión del pool por
-llamada, así que el `BEGIN` no cubre lo que sigue (y puede dejar escrituras fuera del rollback). Se descubrió
-porque un `SAVEPOINT` reventó con `25P01`. Este sanity se reescribió sobre `withGreenhousePostgresTransaction`;
-**verificado: ningún sanity del repo usa hoy el patrón frágil** (el de 1301 ya limpiaba en `finally`; el de 1302 se migró en `1a02b4b99`). La regla de decisión quedó canonizada en `SQL_DATE_MATH_AGENT_INVARIANTS`.
-
-**Auditoría adversarial (2026-08-06, 3 verificadores).** 6 defectos corregidos. El más caro:
-**`serp` con `organizationId` y sin contador gastaba sin registrar y NO lanzaba** — el guard
-condicionaba por "¿la familia exige organización?" en vez de "¿hay organización?", y TASK-1303 usará
-`serp` para rank capture desde un cron. También: el AEO reportaba `invalid_response` cuando el breaker
-cortaba (culpaba al parser); un 4xx del caller abría el breaker y degradaba al AEO; `half-open` dejaba
-pasar todas las llamadas concurrentes; y 3 de 4 familias no compilaban sin un cast que anulaba el
-chequeo del payload.
-
-**🔴 Corrección de una afirmación mía que era FALSA:** dije que `GROWTH_SEO_ENABLED` "lo lee el
-ops-worker, NO Vercel". **Vercel también lo lee** — el lane ecosystem/MCP (TASK-1645) y el reader del
-cruce SEO↔AEO (TASK-1305), ambos aterrizados el mismo día. **El flip es de TRES pasos** y, crítico:
-**apagarlo sólo en `deploy.sh` NO apaga el módulo**, el lane de Vercel sigue sirviendo. El bloque de
-rollback de TASK-1302 quedaba incompleto y parecía exitoso. Corregido en `flags.ts` y en la arquitectura.
-
-**Límite del gate que hay que conocer antes de TASK-1303:** el presupuesto se consulta UNA vez y el
-gasto se acumula DESPUÉS. Medido: batch de 120 keywords con budget `trial` → gastó 3× el presupuesto.
-Sin reserva previa no hay tope por corrida. Declarado en el docstring de `enforceSeoRunEntitlement`.
-
-**Nota de concurrencia:** otra sesión commiteó estos archivos en un estado intermedio (`6a6923900`) por el
-índice compartido del checkout; `3a2e1baf5` corrige encima. Evidencia: sanity live 7/7 con cero residuo, suite
-10130/0, build prod. Nada se ejerce hasta que TASK-1303/1304 llamen al transporte.
-
 ### TASK-1646 — Cloud Infrastructure doc particionado: temáticos + HISTORIAL + stub (2026-08-05)
 
 **Complete.** El monolito `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` (1340 líneas / 24 deltas, finding
@@ -388,81 +344,6 @@ Sin reserva previa no hay tope por corrida. Declarado en el docstring de `enforc
   El detalle de qué se descartó y por qué está en el ADR + anotaciones `⚠️ Superseded` del HISTORIAL.
 - Gates verdes: `docs:closure-check` sin `architecture_doc_monolith`, `docs:context-check:strict`
   0/0, `task:lint` template=1/0/0. Re-auditoría live GCP sigue siendo TASK-127.
-
-### TASK-1302 — Serie GSC propia LIVE: 26.192 filas reales materializadas (2026-08-05)
-
-Tercer eslabón de EPIC-022. **Rollout EJECUTADO — operativamente completo.** Revisión
-`ops-worker-00524-5wg`, scheduler `ops-seo-gsc-snapshot` ACTIVO (`0 9 * * *` CLT), serie real de
-`sc-domain:berel.com` acumulando (26.192 filas / 4 días; el 5.º día devolvió 0 filas y NO se
-fabricó — degradación honesta funcionando). `readKeywordOpportunities` ejercitado contra esa serie:
-**375 keywords en striking-distance**.
-
-**Dos defectos que sólo el rollout real podía revelar — leer antes de tocar este dominio:**
-
-1. **El ops-worker no tenía NINGUNA variable de Search Console.** TASK-1302 introdujo el primer
-   consumer del reader GSC en ese runtime (antes sólo corría en Vercel) y su entorno nunca se
-   provisionó. Prender el flag sin eso habría degradado TODAS las orgs en silencio — misma bug
-   class que ISSUE-113. Ya cableado en `deploy.sh` + GH secret.
-2. **GSC no publica D-1.** El primer run dio `materialized=1, rows=0`. Medido contra la API: D-1
-   responde `ok` con cero filas, D-2 sí trae datos. El materializer apuntaba a "ayer" (como pedía
-   la spec) ⇒ habría escrito días vacíos para siempre sin volver por ellos. **Arreglado con ventana
-   móvil de 5 días**, que además corrige el consolidado tardío de Google.
-
-**Simplificación operativa confirmada:** una sola instancia Cloud SQL y **un solo ops-worker
-compartido staging+prod** desplegado desde `develop` ⇒ la capacidad quedó viva **sin promoción a
-`main`**, y **no existe un flip "sólo staging"** para este dominio.
-
-**Rollback (<5 min):** `GROWTH_SEO_ENABLED=false` en `deploy.sh` + redeploy, o pausar el scheduler
-**y** poner su 5º arg en `"true"` (si no, el próximo deploy lo despausa solo).
-
-Lo que sigue abajo es el detalle de la implementación previa al rollout.
-
-**Lo entregado.** Tabla `greenhouse_growth.seo_gsc_daily` (migración `20260805171834316`, aplicada en
-`greenhouse-pg-dev`) + `materializeGscDailySnapshot` + batch per-org en ops-worker
-(`POST /seo/gsc/snapshot-batch`) + Cloud Scheduler `ops-seo-gsc-snapshot` + `readKeywordOpportunities`.
-7 commits pusheados a `develop` (`git log --grep TASK-1302`).
-
-**Tres decisiones que conviene no re-litigar:**
-
-1. **`seo_gsc_daily` ancla en `organization_id`, NO en `seo_target_id`** — es la única tabla de la serie SEO que
-   lo hace, y es deliberado: GSC entrega al grano de la *propiedad verificada* (`search_console_connections`,
-   org UNIQUE), mientras `seo_targets` tiene grano **más fino** (`location_code`+`language_code`, que GSC no
-   particiona). FKear al target obligaría a asignar cada fila arbitrariamente. Evidencia al tomar la task: 0
-   filas en `seo_targets` y 1 conexión GSC activa — habría bloqueado la captura de una serie irreconstruible.
-2. **Su trigger bloquea DELETE pero NO UPDATE**, al revés que las demás tablas de medición: GSC consolida con
-   ~48h de retraso y el re-run del mismo día **debe** poder corregir el valor.
-3. **El score de oportunidad NO usa datos de mercado.** Las impresiones de GSC ya son demanda medida, y la curva
-   de CTR se deriva de la propia org (así absorbe sola el efecto de los AI Overviews en ese sitio). DataForSEO
-   (TASK-1300) queda como enriquecimiento, no como corazón — por eso 1302 aterrizó sin esperarla.
-
-**Bug que sólo el sanity live atrapó:** la SQL seleccionaba `pq.query` mientras el TS leía `row.keyword` →
-todas las keywords salían vacías. Los mocks ejercitan el TS, nunca el SQL (gate TASK-893).
-
-**Evidencia:** 9/9 checks de `scripts/growth/_sanity-seo-keyword-opportunities.ts` contra PG real con rollback y
-cero residuo; smoke de la migración (idempotencia, DELETE rechazado, tipos DATE/TIMESTAMPTZ); 38 tests focales;
-suite completa **10102/0**; `pnpm build` prod; gates de worker; `flags:audit --strict`.
-
-**Documentación de cierre (3 subagentes, 2026-08-05).** Capa funcional + manual + invariantes + skills:
-`docs/documentation/growth/{modulo-seo-search-visibility-360,conexion-search-console}.md` (v1.1) y el manual nuevo
-[`operar-serie-search-console.md`](docs/manual-de-uso/growth/operar-serie-search-console.md) (operación por CLI/logs,
-sin UI hasta TASK-1306/1308). Las tres trampas del rollout quedaron canonizadas en
-`OPS_RELIABILITY_AGENT_INVARIANTS.md` + `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` (cuyo `Delta 2026-04-15` decía
-"por ahora" sobre la topología compartida — quedó marcado como superseded: es canónica). Los hallazgos de oficio
-(GSC no publica D-1; la posición se pondera por impresiones; striking-distance sin datos de mercado) entraron a la
-skill `seo-aeo` como **medidos**, no estimados.
-
-**Dos deudas descubiertas, ambas con dueño declarado:**
-
-1. **`CLAUDE.md` está al 100% de su presupuesto** (34.998/35.000 tokens). La invariante de la topología compartida
-   del worker **no cupo inline** y quedó sólo en el companion. Registrado como `## Delta 2026-08-05` en
-   `TASK-1160`, que es la dueña de bajar a 30.000: su Slice 5 dejó de ser higiene y pasó a ser desbloqueante.
-2. **La skill `seo-aeo` tiene su copia Claude FUERA del repo** (`~/.claude/skills/`, sin versionar) mientras la
-   Codex sí está versionada. Consecuencia real ya materializada: a la copia Claude le faltaban 2 referencias,
-   incluida `google-search-console-api-indexing.md` — justo la pertinente. Copié las faltantes; queda drift de
-   contenido en 8 archivos y el gate `skills:mirrors` **no puede verlo** porque la skill no está en su manifiesto.
-
-**Próximo paso del epic:** TASK-1300 (paralela) o TASK-1303. Nota para quien tome TASK-1306/1308: la serie ya
-tiene datos reales, así que esas UIs se pueden construir contra datos vivos, no contra fixtures.
 
 ### TASK-1301 — Capabilities + entitlement per-org SEO COMPLETE (2026-08-05)
 

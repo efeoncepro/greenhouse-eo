@@ -7,6 +7,13 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-07 — Autenticación local Gcloud con Playwright
+
+Se agregó `pnpm gcloud:auth:playwright` para renovar bajo solicitud los dos carriles de Google Cloud
+(`gcloud auth login` y ADC) usando Playwright como navegador visible, con verificación final mediante el
+preflight canónico. La credencial local se configura con `pnpm gcloud:auth:playwright:setup` en `.auth/`
+ignorado por Git y protegido con permisos `0600`; no se habilitó scheduler ni ejecución automática.
+
 ## 2026-08-06 — Cockpit SEO Overview (TASK-1306)
 
 Nueva superficie operador `/admin/growth/seo`: la puerta de entrada del módulo SEO y la casa de
@@ -1006,12 +1013,3 @@ y [`docs/changelog/internal/2026-07.md`](docs/changelog/internal/2026-07.md).
   puerto 4326 por corrida; y el H9 del feed, cuyo `…` no es CSS (`DISPLAY_TITLE_MAX_LENGTH = 96` recorta
   por conteo de caracteres antes de que exista layout, así que ningún ancho lo arregla).
 - Detalle de runtime: `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`.
-
-## 2026-07-29 — Release preflight: corrección de latencia del check Sentry
-
-- La causa del timeout persistente de `sentry_critical_issues` era la consulta de hasta 100 issues, que tardaba
-  8,5–9,1 s en Sentry aunque no hubiera resultados; el presupuesto externo e interno anterior era de 6 s.
-- El check ahora solicita 10 resultados, suficiente para detectar el umbral bloqueante `>=10`, mantiene la semántica
-  estricta ante errores, usa un deadline API de 15 s y un presupuesto de runner de 20 s. El runner reporta el budget
-  efectivo de cada check.
-- El cambio está en `develop`; todavía no se ha repetido el orchestrator ni se ha desplegado producción.
