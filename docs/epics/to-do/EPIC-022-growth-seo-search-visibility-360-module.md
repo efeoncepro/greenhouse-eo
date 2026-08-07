@@ -48,6 +48,34 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1302` — [planificada] GSC daily snapshot materializer + `readKeywordOpportunities` (quick win, reusa TASK-1282).
 - `TASK-1303` — [**complete 2026-08-06**, en producción] rank capture command + `readRankEvolution` + Cloud Scheduler + reactive BQ mirror. Release `fcee5ab9f7ce` (manifest released); scheduler `ops-seo-rank-capture` diario 05:00 CLT ACTIVO; serie día-1 de Berel con 31 keywords; señal `seo.rank.capture_lag` en Growth Health; 4.ª MCP tool `get_seo_rank_evolution` viva en el MCP interno de producción (federación al gateway = TASK-1653).
 - `TASK-1304` — [planificada] site audit (queue+poll OnPage) + backlink snapshot.
+
+### Carril de keywords OBJETIVO (creado 2026-08-07 al cuestionar TASK-1308)
+
+> 🔴 **El módulo responde TRES preguntas, no una.** Hasta ahora sólo tenía superficie la primera.
+>
+> | Pregunta | Fuente | Estado |
+> |---|---|---|
+> | ¿Qué empujo de lo que ya tengo? | GSC medido | **construida** (TASK-1308) |
+> | ¿Dónde quiere estar el cliente? | **declarado por humano** | `TASK-1659` + `TASK-1660` |
+> | ¿Qué me pierdo entero? | competencia + Labs | `TASK-1661` + `TASK-1662` |
+>
+> La segunda es la que ancla comercialmente a las otras dos, porque es el compromiso con el cliente
+> y el material del QBR. Y **Search Console es estructuralmente ciego** a las dos últimas: sin top
+> ~100 no hay impresiones, así que esas búsquedas no existen en los datos del cliente. Por eso el
+> dato de mercado deja de ser "enriquecimiento" y pasa a ser dependencia dura del carril
+> aspiracional: es la única forma de contestar *¿vale la pena?* y *¿cuánto cuesta?* antes de
+> aceptar un objetivo.
+
+- `TASK-1659` — [planificada, backend-data] modelo de **intención** en el set monitoreado: objetivo declarado vs oportunidad detectada, con autoría. `source` (TASK-1308) es procedencia, no intención. Append-only: cambiar la intención cierra y abre, nunca `UPDATE`.
+- `TASK-1660` — [planificada, ui-ux] lente **Objetivos** sobre `/admin/growth/seo/keywords` — extiende el **nodo S3** del master UI flow. Full API Parity al revés: `trackKeywords` **ya** acepta keywords que el cliente no rankea y no tiene botón. Bloqueada por `TASK-1659`.
+- `TASK-1661` — [planificada, backend-data] volumen y dificultad por keyword. ⚠️ **No es esperar a `TASK-1300`**, que está complete: falta el fetch, las columnas y el reader. Alcance V1 acotado al set monitoreado.
+- `TASK-1662` — [planificada, backend-data] **keyword gap**: qué gana la competencia donde el cliente es invisible. La superficie va aparte. Bloqueada por `TASK-1661`.
+
+### Plataforma del módulo
+
+- `TASK-1655` — [en curso] Historical Data Platform del módulo SEO (semilla histórica de rank vía `historical_serps`).
+- `TASK-1658` — [planificada, backend-data] drift de federación MCP + punto ciego del guard de paridad: 3 tools SEO viven en el MCP interno de Greenhouse y no están ni federadas ni excluidas en el gateway, y el guard no puede verlo porque compara contra lo registrado EN EL GATEWAY, nunca contra Greenhouse.
+
 - `TASK-1305` — [planificada] `readSeoAeoGap` derived read cross-módulo (report layer).
 - `TASK-1306` — [**complete 2026-08-06**, ui-ux] SEO Overview operador `/admin/growth/seo` — **la primera superficie visible del módulo (nodo S1 del master UI flow)**. Guard de 3 puertas (viewCode `administracion.growth_seo` + capability `growth.seo.observation.read` + `module_assignment` per-org), sección local "Search Visibility" con el conmutador a las hermanas, 4 KPIs norte (posición con semántica invertida), curva de visibilidad en 2 charts apilados y sidebar salud/movers/cruce AEO que degrada por región. MCP tool `get_seo_overview_kpis` + lane `/api/platform/ecosystem/growth/seo/overview-kpis` en el mismo PR. **Code complete en `develop`; promoción a `main` pendiente** (mientras viva sólo en `develop`, `syncViewRegistry` de producción vuelve a apagar el viewCode recién sembrado).
 - `TASK-1307` — [**complete 2026-08-07**, ui-ux] ★ Rank & URL performance over time `/admin/growth/seo/performance` — nodo S2, la pantalla ancla. Comparación de hasta 8 URLs o keywords con eje de posición invertido declarado en palabras, cobertura explícita ("N de M días con medición"), huecos que cortan la línea en vez de rellenarse con cero, y la fuente nombrada (◑ exacta de mercado vs ● medida de Search Console, nunca promediadas). Primer consumer de **ECharts** del repo — la decisión de librería del módulo. Su tab quedó habilitada; la spec vive en `docs/tasks/complete/`.

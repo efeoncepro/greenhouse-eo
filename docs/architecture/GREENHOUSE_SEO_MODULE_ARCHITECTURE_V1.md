@@ -320,6 +320,42 @@ Evolución posición = line multi-serie (Y invertido); clicks/impresiones = area
 >
 > ⚠️ **Canibalización es una ACCIÓN, no una variante visual de "oportunidad".** Una query con más de una página no se optimiza: se **consolida** (unificar, 301, canonical o diferenciar intención). Tiene serie propia, forma propia y verbo propio en toda la superficie, y su clasificador vive en un módulo compartido para que mapa, filtros y tabla no puedan derivar entre sí.
 
+### Delta 2026-08-07 — el módulo responde TRES preguntas, y sólo una tenía superficie
+
+Cuestionando el encoding del scatter apareció que el módulo tiene **tres preguntas distintas**, con
+fuentes distintas, y que hasta ahora sólo la primera existía como producto:
+
+| Pregunta | Fuente | Estado |
+|---|---|---|
+| ¿Qué empujo de lo que ya tengo? | GSC **medido** | construida (`TASK-1308`) |
+| ¿Dónde quiere estar el cliente? | **declarado por un humano** | `TASK-1659` (modelo) + `TASK-1660` (superficie) |
+| ¿Qué me pierdo entero? | competencia + Labs | `TASK-1661` (mercado) + `TASK-1662` (gap) |
+
+🔴 **Search Console es estructuralmente ciego a las dos últimas.** Si el cliente no está en el top
+~100 no hay impresiones, así que esa búsqueda **no existe** en sus datos. No es una limitación del
+reader: es una propiedad de la fuente. Por lo tanto ninguna superficie construida sobre GSC podrá
+nunca contestar «¿qué me estoy perdiendo?».
+
+**Consecuencia sobre el dato de mercado, que corrige lo dicho más arriba.** Para una keyword donde
+el cliente **sí** rankea, el volumen de mercado es enriquecimiento y los ejes medidos siguen siendo
+lo correcto. Pero para una keyword donde **no** rankea, GSC no entrega nada, y volumen y dificultad
+pasan a ser la **única** forma de contestar *¿vale la pena?* y *¿cuánto cuesta?*. Ahí dejan de ser
+opcionales: son **dependencia dura** del carril aspiracional, y sin ellos se aceptan objetivos a
+ciegas.
+
+**Lo que ya existía sin que nadie lo notara.** `trackKeywords` **acepta strings arbitrarios** — no
+valida contra la lista de oportunidades (verificado 2026-08-07). O sea que seguir una keyword que el
+cliente no rankea **ya funciona por contrato** desde `TASK-1308`: el rank capture la mide igual. Lo
+que falta es la superficie. Es Full API Parity **al revés** — el pecado habitual es "la UI lo hace y
+no hay contrato"; acá el contrato existe y no hay botón, así que la capacidad sólo es alcanzable por
+MCP o `curl`, justo donde no hay confirmación visual del cupo ni del gasto comprometido.
+
+**Y lo que falta modelar.** El set monitoreado no sabe **por qué** una keyword está ahí: `source`
+(`TASK-1308`) es procedencia —quién la metió—, no intención. Sin esa distinción, "estoy en la 12 y
+quiero la 5" y "el cliente quiere rankear acá y estoy en la 60" son la misma fila, no hay avance
+contra objetivo, y un objetivo lejano contamina cualquier KPI agregado leyéndose como fracaso
+permanente.
+
 > **Nota de estado (2026-07-01):** ECharts aún NO está instalado (el repo corre ApexCharts 3.49 + Recharts). Instalar `echarts` + `echarts-for-react` (lazy por ruta) es Slice 0 de la pantalla ancla `TASK-1307` — Greenhouse sería el primer consumer del stack ECharts (alineado con la deprecación oportunista de ApexCharts, TASK-518). La alternativa B (line multi-serie Y-invertido sobre ApexCharts con `yaxis.reversed` + annotations) queda documentada en TASK-1307 por si Discovery la prefiere. `CustomChip`/`CustomAutocomplete` no existen como tal → usar `GreenhouseChip` + `@core/components/mui/Autocomplete`.
 
 ### 10.5 Estados y honestidad (state-design)
