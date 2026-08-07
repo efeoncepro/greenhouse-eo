@@ -174,6 +174,7 @@ y [`GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md`](docs/ui/GREENHOUSE_PREMIUM_U
 ## Tooling operativo
 
 - CLIs autenticados: `az`, `gcloud`, `gh`, `vercel`, `psql` vía `pnpm pg:connect`.
+- **Correo laboral:** el correo de trabajo de Efeonce y sus clientes, incluido ANAM, vive en Outlook/Microsoft 365. Buscar allí primero mediante el conector o sesión de Outlook disponible. Gmail, incluido `jreysgo@gmail.com`, es correo personal y no es fuente de verdad laboral; si Outlook no está disponible, informar el bloqueo y no sustituirlo por Gmail.
 - GCP interactivo local requiere ambos flujos: `gcloud auth login` y
   `gcloud auth application-default login`.
 - Cuando el operador solicite autenticación o renovación Gcloud, invocar
