@@ -195,6 +195,10 @@ const KeywordOpportunityTable = ({
   )
 
   const toggleSort = (column: SortColumn) => {
+    // Reordenar vuelve al principio: quedarse en la página 3 de una lista que acaba de
+    // reordenarse es un salto sin explicación — el usuario pidió otro orden, no otro tramo.
+    setPage(0)
+
     if (column === sortColumn) {
       setSortDirection(current => (current === 'asc' ? 'desc' : 'asc'))
 
@@ -479,7 +483,7 @@ const KeywordOpportunityTable = ({
                       <TableCell align='right'>{copy.table.colDifficulty}</TableCell>
                     </>
                   )}
-                  {canTrack ? <TableCell align='right'>{copy.follow.cta}</TableCell> : null}
+                  {canTrack ? <TableCell align='right'>{copy.table.colTracking}</TableCell> : null}
                 </TableRow>
               </TableHead>
               <TableBody>

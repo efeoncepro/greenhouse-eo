@@ -122,10 +122,17 @@ const KeywordOpportunityVerdict = ({
     }
   }, [counts, total, copy.verdict])
 
+  /**
+   * Etiqueta CORTA en el segmento, larga en el tooltip.
+   *
+   * Con el ancho proporcional, "Empujar (fruta madura)" se truncaba a "Empujar (f…" y el
+   * grupo de 2 se quedaba sin etiqueta: había hecho legible la proporción a costa de la
+   * lectura. Las formas cortas son distintas entre sí y caben; el matiz vive en el hover.
+   */
   const segmentMeta: Record<KeywordAction, { label: string; hint: string; tone: 'success' | 'info' | 'warning' }> = {
-    quickWin: { label: copy.action.quickWin, hint: copy.action.quickWinHint, tone: 'success' },
-    striking: { label: copy.action.striking, hint: copy.action.strikingHint, tone: 'info' },
-    cannibalized: { label: copy.action.cannibalized, hint: copy.action.cannibalizedHint, tone: 'warning' }
+    quickWin: { label: copy.action.quickWinShort, hint: copy.action.quickWinHint, tone: 'success' },
+    striking: { label: copy.action.strikingShort, hint: copy.action.strikingHint, tone: 'info' },
+    cannibalized: { label: copy.action.cannibalizedShort, hint: copy.action.cannibalizedHint, tone: 'warning' }
   }
 
   /** El glyph replica el símbolo del canvas: la leyenda sobrevive en monocromo (WCAG 1.4.1). */
@@ -234,8 +241,15 @@ const KeywordOpportunityVerdict = ({
                     // `aria-pressed` y no `role=tab`: son filtros conmutables, no navegación.
                     aria-pressed={isActive}
                     sx={theme => ({
-                      flex: { sm: 1 },
-                      minInlineSize: { sm: 0 },
+                      // 🔴 ANCHO PROPORCIONAL AL CONTEO. Con `flex: 1` los tres segmentos
+                      // medían lo mismo y la distribución real (42 · 6 · 2, una razón de
+                      // 7:1) sólo se veía LEYENDO los números. El ancho la hace evidente de
+                      // un vistazo, que es justo el trabajo de esta banda. El piso de 1
+                      // evita que el grupo de 2 quede invisible.
+                      flex: { sm: Math.max(1, counts[action]) },
+                      // Piso que garantiza que la etiqueta quepa: la proporción no puede
+                      // comprarse cortando el texto que explica qué es cada grupo.
+                      minInlineSize: { sm: 150 },
                       justifyContent: 'flex-start',
                       gap: 2.5,
                       paddingBlock: 2.5,

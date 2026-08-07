@@ -1,8 +1,10 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import Collapse from '@mui/material/Collapse'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Stack from '@mui/material/Stack'
@@ -123,6 +125,16 @@ const KeywordOpportunityMap = ({
 }: KeywordOpportunityMapProps) => {
   const theme = useTheme()
   const prefersReduced = useReducedMotion()
+
+  /**
+   * El mapa se puede plegar.
+   *
+   * En 1440×900 el fold llegaba hasta el borde superior del canvas y la TABLA — que es
+   * donde se actúa — quedaba a dos scrolls. El mapa cobra título, subtítulo, cobertura,
+   * 380px de lienzo y dos líneas de pie. Plegarlo deja la decisión al operador: la primera
+   * vez quiere el mapa, la décima ya sabe qué busca y quiere la lista.
+   */
+  const [expanded, setExpanded] = useState(true)
   const copy = GH_GROWTH_SEO_KEYWORDS
 
   const axisInk = resolveChartColor(theme.palette.text.secondary, '#6B6876')
@@ -413,6 +425,7 @@ const KeywordOpportunityMap = ({
     <Card data-capture='seo-keywords-map'>
       <CardContent>
         <Stack spacing={4}>
+          <Stack direction='row' spacing={3} justifyContent='space-between' alignItems='flex-start'>
           <Stack spacing={1}>
             <Typography variant='h5' component='h2'>
               {copy.map.title}
@@ -428,6 +441,24 @@ const KeywordOpportunityMap = ({
             </Typography>
           </Stack>
 
+            <Button
+              size='small'
+              variant='text'
+              onClick={() => setExpanded(current => !current)}
+              aria-expanded={expanded}
+              sx={theme => ({
+                flexShrink: 0,
+                '&.Mui-focusVisible, &:focus-visible, &:focus': {
+                  outline: `2px solid ${theme.palette.primary.main}`,
+                  outlineOffset: 2
+                }
+              })}
+            >
+              {expanded ? copy.map.collapse : copy.map.expand}
+            </Button>
+          </Stack>
+
+          <Collapse in={expanded} timeout={prefersReduced ? 0 : 300} unmountOnExit>
           <Box role='img' aria-label={ariaLabel}>
             <AppECharts
               option={option}
@@ -440,6 +471,7 @@ const KeywordOpportunityMap = ({
               }}
             />
           </Box>
+          </Collapse>
 
           <Stack spacing={1} data-capture='seo-keywords-degraded'>
             {/* Qué significa el tamaño: sin decirlo, la burbuja grande se lee como

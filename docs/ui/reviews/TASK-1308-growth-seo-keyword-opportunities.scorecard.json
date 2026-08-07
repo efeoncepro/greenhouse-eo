@@ -14,14 +14,14 @@
     "note": "Ruta nueva; no existe before. La hermana `growth.seo.performance` (TASK-1307) es el benchmark nativo: misma recipe `analyticsReport`, mismo conmutador de tabs, mismo contrato de leyenda medido/estimado."
   },
   "evidence": {
-    "desktop": ".captures/2026-08-07T20-18-40_growth-seo-keywords/01-desktop",
-    "mobile": ".captures/2026-08-07T20-18-40_growth-seo-keywords/02-mobile",
-    "dossier": ".captures/2026-08-07T20-18-40_growth-seo-keywords/review-dossier.md",
+    "desktop": ".captures/2026-08-07T20-55-09_growth-seo-keywords/01-desktop",
+    "mobile": ".captures/2026-08-07T20-55-09_growth-seo-keywords/02-mobile",
+    "dossier": ".captures/2026-08-07T20-55-09_growth-seo-keywords/review-dossier.md",
     "data": "Datos REALES de berel.com: 50 oportunidades striking-distance, 31 keywords ya seguidas, umbral de impresiones 10. Cero fixtures.",
     "reducedMotion": "Ejercitado por el GVC (`reducedMotionCheck: true`), no sólo declarado.",
     "axe": "@axe-core/playwright scopeado a la surface con `failOnViolations: true` — 0 violations en 1440x900 y 390x844.",
     "notCovered": "Los estados empty (sin oportunidades), error y denied NO tienen frame: ningún Space de dev los produce hoy (Berel tiene datos, Efeonce no tiene target). Implementados y cubiertos por lectura de código, no por evidencia visual. Declarado, no asumido verde.",
-    "iterations": "Once pasadas de GVC con revisión del frame entre cada una. La v1 pasaba los cuatro gates y se veía mal; lo que la arregló fue mirar. Dos hallazgos vinieron del operador sobre el frame (selectores flotando sobre el fondo gris, tabla sin paginar) y uno del gate de runtime (mismatch de hidratación por `useId`).",
+    "iterations": "Diecisiete pasadas de GVC y tres rondas de análisis de producto, mirando el frame entre cada una. Los cuatro gates estuvieron en verde desde la primera versión: todo lo que se corrigió salió de mirar, no de medir.",
     "states": [
       "ready",
       "degraded (mercado no disponible)",
@@ -36,7 +36,7 @@
   "dimensions": {
     "hierarchy": {
       "score": 5,
-      "rationale": "El fold ahora ABRE con el significado: \"42 de 50 keywords compiten contra tu propio sitio\" en h4, con la ganancia total a la derecha, y recién después el mapa. En la v1 ese hallazgo era un número al final de una leyenda, detrás de seis bandas de chrome. Orden verificado en el frame: titular → barra (tabs + contexto) → veredicto → mapa → filtros → tabla.",
+      "rationale": "El fold ahora ABRE con el significado: \"42 de 50 keywords compiten contra tu propio sitio\" en h4, con la ganancia total a la derecha, y recién después el mapa. En la v1 ese hallazgo era un número al final de una leyenda, detrás de seis bandas de chrome. Orden verificado en el frame: titular → barra (tabs + contexto) → veredicto → mapa → filtros → tabla. El mapa es plegable: en 1440x900 el fold llegaba al borde del canvas y la tabla —donde se actúa— quedaba a dos scrolls.",
       "evidence": "01-desktop/frames/01-default.png, 02-verdict.png"
     },
     "proportions": {
@@ -51,7 +51,7 @@
     },
     "density": {
       "score": 5,
-      "rationale": "Alta y deliberada, y ahora paginada: 25 filas por página sobre un techo de 50 del reader. 25 y no 10 porque la lista está ORDENADA POR GANANCIA — la primera página tiene que contener toda la cabeza accionable, no cortarla en el ítem 10. La página se ACOTA al total en vez de resetearse por efecto: filtrar estando en la página 3 dejaría al operador mirando una tabla vacía que parece un bug. Las columnas de mercado NO se renderizan mientras no haya dato: repetían \"Sin dato\" 50 veces y empujaban la acción primaria fuera de la pantalla. La ausencia sigue dicha, una vez, al pie del mapa.",
+      "rationale": "Alta y deliberada, y ahora paginada: 25 filas por página sobre un techo de 50 del reader. 25 y no 10 porque la lista está ORDENADA POR GANANCIA — la primera página tiene que contener toda la cabeza accionable, no cortarla en el ítem 10. La página se ACOTA al total en vez de resetearse por efecto: filtrar estando en la página 3 dejaría al operador mirando una tabla vacía que parece un bug. Las columnas de mercado NO se renderizan mientras no haya dato: repetían \"Sin dato\" 50 veces y empujaban la acción primaria fuera de la pantalla. La ausencia sigue dicha, una vez, al pie del mapa. Los segmentos del veredicto llevan ancho proporcional al conteo con piso para la etiqueta: con flex igual, una razón de 7:1 sólo se veía leyendo los números; con proporcional puro se truncaban dos de las tres etiquetas.",
       "evidence": "01-desktop/frames/05-table.png"
     },
     "depth": {
@@ -66,7 +66,7 @@
     },
     "visualImpact": {
       "score": 5,
-      "rationale": "Tres cambios que sólo se ven mirando el frame: el titular del hallazgo, las cinco keywords de mayor ganancia ETIQUETADAS sobre el lienzo (un scatter de 50 puntos anónimos no es accionable) y el eje log acotado a los datos ±30% — el auto-scale redondeaba a décadas y dejaba el 40% del alto vacío, con la banda verde de fruta madura pintando un bloque de color sin datos.",
+      "rationale": "Tres cambios que sólo se ven mirando el frame: el titular del hallazgo, las cinco keywords de mayor ganancia ETIQUETADAS sobre el lienzo (un scatter de 50 puntos anónimos no es accionable) y el eje log acotado a los datos ±30% — el auto-scale redondeaba a décadas y dejaba el 40% del alto vacío, con la banda verde de fruta madura pintando un bloque de color sin datos. Y la zona sombreada dejó de mentir: decía \"Fruta madura\", que es el nombre de UNA de las tres acciones, sobre una región que abarca las posiciones 8-10 e incluye canibalizadas. Ahora dice \"Primera plana\" — un hecho posicional, no un juicio de acción.",
       "evidence": "01-desktop/frames/03-map.png"
     },
     "typography": {
@@ -113,7 +113,8 @@
     "El eje log con cotas explícitas rotula sus extremos con valores no-década (68 y 1.790). Es el precio de no desperdiciar el 40% del alto.",
     "La nota al pie del mapa pasa por debajo del botón flotante de Nexa en desktop. Es el FAB portal-wide, no de esta surface.",
     "Los estados empty, error y denied no tienen frame porque ningún Space de dev los produce. Cubiertos por código, no por evidencia visual.",
-    "ui:code-lint reporta findings (raw-hex e inline-font-size) en el chart: fallbacks de resolveChartColor y fontSize de canvas de ECharts. La hermana de TASK-1307 arrastra los mismos. Fix de causa raíz propuesto: módulo canónico de chart-tokens en la allow-list del linter."
+    "ui:code-lint reporta findings (raw-hex e inline-font-size) en el chart: fallbacks de resolveChartColor y fontSize de canvas de ECharts. La hermana de TASK-1307 arrastra los mismos. Fix de causa raíz propuesto: módulo canónico de chart-tokens en la allow-list del linter.",
+    "El export de CSV arma el archivo en cliente sobre el subconjunto filtrado. Si el reader sube su techo muy por encima de 50, conviene moverlo a un endpoint."
   ],
   "direction": "docs/ui/visual-directions/TASK-1308-growth-seo-keyword-opportunities-direction.md",
   "computed": {

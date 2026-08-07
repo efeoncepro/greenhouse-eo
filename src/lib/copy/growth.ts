@@ -1878,6 +1878,7 @@ export const GH_GROWTH_SEO_PERFORMANCE = {
 export const GH_GROWTH_SEO_KEYWORDS = {
   pageTitle: 'Oportunidades de keywords',
   pageSubtitle: 'Dónde crecer en búsqueda: lo que ya rankea y está a un empujón de la primera plana.',
+  loadingAria: 'Cargando oportunidades de keywords',
 
   toolbar: {
     searchPlaceholder: 'Buscar keyword',
@@ -1938,16 +1939,26 @@ export const GH_GROWTH_SEO_KEYWORDS = {
   map: {
     title: 'Mapa de oportunidad',
     subtitle: 'Más a la izquierda, más cerca de la primera plana. Más arriba, más gente lo busca.',
-    // La zona sombreada nombra el criterio, no un adjetivo suelto.
-    quickWinLabel: 'Fruta madura',
-    quickWinHint: 'Ya estás en la primera plana (posición 10 o mejor) y hay demanda medida: el empujón más barato.',
+    /**
+     * 🔴 LA ZONA MARCA UN HECHO, NO UNA ACCIÓN.
+     *
+     * Decía "Fruta madura" — que es el nombre de UNA de las tres acciones. Pero la zona
+     * abarca las posiciones 8–10, y dentro caen también las canibalizadas: una keyword en
+     * posición 9 con 13 páginas compitiendo está en primera plana Y NO es fruta madura, es
+     * consolidación. Etiquetar una región posicional con un nombre de acción hacía que el
+     * mapa se contradijera con su propia leyenda.
+     */
+    quickWinLabel: 'Primera plana',
+    quickWinHint: 'Posición 10 o mejor. Estar acá no dice qué hacer — eso lo dice la forma de cada punto.',
     axisX: 'Posición actual',
     axisY: 'Impresiones (28 días)',
     bubbleHint: 'El tamaño de cada punto son los clics que ganarías al llegar a la posición objetivo.',
     aria:
       'Dispersión de {count} keywords: el eje horizontal es la posición actual (más a la izquierda es mejor) y el vertical las impresiones medidas. El tamaño indica los clics incrementales estimados y la forma la acción recomendada.',
     coverage: '{count} keywords entre las posiciones 8 y 20, con al menos {threshold} impresiones en la ventana.',
-    zoomHint: 'Pasa el cursor por un punto para ver su detalle. La tabla de abajo tiene los valores exactos.'
+    zoomHint: 'Pasa el cursor por un punto para ver su detalle. La tabla de abajo tiene los valores exactos.',
+    collapse: 'Ocultar mapa',
+    expand: 'Ver mapa'
   },
 
   /**
@@ -1975,6 +1986,12 @@ export const GH_GROWTH_SEO_KEYWORDS = {
     title: 'Detalle',
     ariaLabel: 'Oportunidades de keywords con su posición, demanda medida y acción recomendada',
     colKeyword: 'Keyword',
+    // La columna contiene "Seguir" Y "Dejar de seguir": nombrarla con una de las dos
+    // acciones describía mal la mitad de su contenido.
+    colTracking: 'Seguimiento',
+    export: 'Exportar CSV',
+    exportHint: 'Descarga lo que estás viendo, con los filtros aplicados. Para el ticket, el SOW o el mail al cliente.',
+    exportFilename: 'oportunidades-keywords',
     colAction: 'Acción',
     colPosition: 'Posición',
     colPositionHint: 'Posición media ponderada por impresiones en la ventana. Más bajo es mejor.',
@@ -2052,6 +2069,7 @@ export const GH_GROWTH_SEO_KEYWORDS = {
     positionSecondPage: 'Segunda plana (11–20)',
     clear: 'Limpiar filtros',
     resultCount: '{count} de {total} keywords',
+    resultAnnounce: '{count} keywords tras aplicar los filtros',
     viewingSubset: 'Viendo {count} de {total}'
   },
 

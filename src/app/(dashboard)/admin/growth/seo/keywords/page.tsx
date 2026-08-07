@@ -37,9 +37,26 @@ const VIEW_CODE = 'administracion.growth_seo'
 const ALLOWED_WINDOW_DAYS = new Set([28, 90])
 const DEFAULT_WINDOW_DAYS = 28
 
+/**
+ * Los filtros locales también entran por la URL.
+ *
+ * No los lee el reader —el filtrado es en cliente sobre filas ya cargadas— pero sí tienen
+ * que sobrevivir a un enlace pegado: esta pantalla se comparte ("mira estas 42 de
+ * consolidación"). El cliente los sincroniza de vuelta con `history.replaceState`, sin
+ * round-trip por tecla.
+ */
 interface PageProps {
-  searchParams: Promise<{ space?: string; window?: string }>
+  searchParams: Promise<{
+    space?: string
+    window?: string
+    q?: string
+    action?: string
+    position?: string
+  }>
 }
+
+const ALLOWED_ACTIONS = new Set(['quickWin', 'striking', 'cannibalized'])
+const ALLOWED_POSITIONS = new Set(['firstPage', 'secondPage'])
 
 export default async function Page({ searchParams }: PageProps) {
   // Puerta 0 — flag del módulo (default OFF). Con el módulo apagado la ruta NO existe.
@@ -80,6 +97,15 @@ export default async function Page({ searchParams }: PageProps) {
   const parsedWindow = Number.parseInt(params.window ?? '', 10)
   const windowDays = ALLOWED_WINDOW_DAYS.has(parsedWindow) ? parsedWindow : DEFAULT_WINDOW_DAYS
 
+  // Un valor fuera de la allowlist cae al default, igual que `?window=`: un enlace pegado
+  // no puede meter un filtro que la UI no sabe representar.
+  const initialSearch = (params.q ?? '').slice(0, 120)
+  const initialAction = ALLOWED_ACTIONS.has(params.action ?? '') ? (params.action as 'quickWin' | 'striking' | 'cannibalized') : 'all'
+
+  const initialPosition = ALLOWED_POSITIONS.has(params.position ?? '')
+    ? (params.position as 'firstPage' | 'secondPage')
+    : 'all'
+
   const canTrackKeywords = can(tenant, 'growth.seo.target.configure', 'execute', 'tenant')
   const capacity = resolveTrackedKeywordCapacity()
 
@@ -88,6 +114,9 @@ export default async function Page({ searchParams }: PageProps) {
     // honesto "sin Spaces con SEO", y la view lo dice con esas palabras.
     return (
       <KeywordOpportunitiesView
+        initialSearch={initialSearch}
+        initialAction={initialAction}
+        initialPosition={initialPosition}
         spaces={spaces}
         selectedSpaceId={null}
         rootDomain={null}
@@ -110,6 +139,9 @@ export default async function Page({ searchParams }: PageProps) {
   if (connection.state === 'not_connected' || connection.state === 'no_snapshots') {
     return (
       <KeywordOpportunitiesView
+        initialSearch={initialSearch}
+        initialAction={initialAction}
+        initialPosition={initialPosition}
         spaces={spaces}
         selectedSpaceId={selectedSpace.organizationId}
         rootDomain={null}
@@ -140,6 +172,9 @@ export default async function Page({ searchParams }: PageProps) {
   if (!target) {
     return (
       <KeywordOpportunitiesView
+        initialSearch={initialSearch}
+        initialAction={initialAction}
+        initialPosition={initialPosition}
         spaces={spaces}
         selectedSpaceId={selectedSpace.organizationId}
         rootDomain={null}
@@ -172,6 +207,9 @@ export default async function Page({ searchParams }: PageProps) {
 
   return (
     <KeywordOpportunitiesView
+      initialSearch={initialSearch}
+      initialAction={initialAction}
+      initialPosition={initialPosition}
       spaces={spaces}
       selectedSpaceId={selectedSpace.organizationId}
       seoTargetId={target.seo_target_id}

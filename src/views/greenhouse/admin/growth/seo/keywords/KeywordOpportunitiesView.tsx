@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState, useTransition, type ReactNode } from 'react'
+import { useEffect, useMemo, useState, useTransition, type ReactNode } from 'react'
 
 import { useRouter } from 'next/navigation'
 
@@ -82,6 +82,9 @@ export interface KeywordOpportunitiesViewProps {
   selectedSpaceId: string | null
   seoTargetId?: string
   rootDomain: string | null
+  initialSearch: string
+  initialAction: KeywordAction | 'all'
+  initialPosition: PositionFilter
   connectionState: SeoConnectionState
   /** Hasta qué día llega la serie medida. `null` = no se pudo determinar, y se dice. */
   dataAsOf: string | null
@@ -97,6 +100,9 @@ export interface KeywordOpportunitiesViewProps {
 const KeywordOpportunitiesView = ({
   spaces,
   selectedSpaceId,
+  initialSearch,
+  initialAction,
+  initialPosition,
   seoTargetId,
   rootDomain,
   connectionState,
@@ -115,9 +121,10 @@ const KeywordOpportunitiesView = ({
   // pending real es el de la transición de router; un flag local mentiría sobre cuándo terminó.
   const [isPending, startTransition] = useTransition()
 
-  const [search, setSearch] = useState('')
-  const [actionFilter, setActionFilter] = useState<KeywordAction | 'all'>('all')
-  const [positionFilter, setPositionFilter] = useState<PositionFilter>('all')
+  // Los filtros nacen de la URL: es lo que hace compartible "mira estas 42 de consolidación".
+  const [search, setSearch] = useState(initialSearch)
+  const [actionFilter, setActionFilter] = useState<KeywordAction | 'all'>(initialAction)
+  const [positionFilter, setPositionFilter] = useState<PositionFilter>(initialPosition)
 
   const [tracked, setTracked] = useState<Set<string>>(() => new Set(trackedKeywords))
   const [trackingState, setTrackingState] = useState<Record<string, GreenhouseAsyncActionState>>({})
@@ -157,6 +164,33 @@ const KeywordOpportunitiesView = ({
       router.push(`/admin/growth/seo/keywords?${params.toString()}`)
     })
   }
+
+  /**
+   * Los filtros viajan a la URL con `history.replaceState`, NO con `router.push`.
+   *
+   * ⚠️ La distinción es el punto: `router.push` dispararía un render de servidor por cada
+   * tecla del buscador para no traer un solo dato nuevo — el filtrado es local sobre filas
+   * ya cargadas. `replaceState` deja la barra de direcciones compartible sin round-trip, y
+   * el servidor los lee al entrar por un enlace pegado.
+   */
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const params = new URLSearchParams(window.location.search)
+
+    const sync = (key: string, value: string, fallback: string) => {
+      if (value === fallback) params.delete(key)
+      else params.set(key, value)
+    }
+
+    sync('q', search.trim(), '')
+    sync('action', actionFilter, 'all')
+    sync('position', positionFilter, 'all')
+
+    const query = params.toString()
+
+    window.history.replaceState(null, '', `${window.location.pathname}${query ? `?${query}` : ''}`)
+  }, [search, actionFilter, positionFilter])
 
   const filtered = useMemo(() => {
     const needle = search.trim().toLowerCase()
@@ -464,6 +498,68 @@ const KeywordOpportunitiesView = ({
       return next
     })
 
+  /**
+   * Export de lo que se está viendo, con los filtros aplicados.
+   *
+   * El trabajo de consolidar 42 URLs no ocurre en el portal: ocurre en un ticket, un SOW o
+   * un mail al cliente. Sin salida del dato, la única opción era copiar a mano. Exporta el
+   * SUBCONJUNTO filtrado y no el total — lo que ves es lo que te llevas.
+   */
+  const exportCsv = () => {
+    const header = [
+      copy.table.colKeyword,
+      copy.table.page,
+      copy.action.label,
+      copy.table.colPosition,
+      copy.table.colImpressions,
+      copy.table.colClicks,
+      copy.table.colCtr,
+      copy.table.colGain,
+      copy.table.colConflict,
+      copy.follow.following
+    ]
+
+    const actionLabel: Record<KeywordAction, string> = {
+      quickWin: copy.action.quickWinShort,
+      striking: copy.action.strikingShort,
+      cannibalized: copy.action.cannibalizedShort
+    }
+
+    // Comillas dobladas y campo entrecomillado: una keyword con coma o comilla rompería el
+    // CSV en la hoja de cálculo del cliente, que es donde nadie lo vería hasta que importa.
+    const cell = (value: string | number) => `"${String(value).replace(/"/g, '""')}"`
+
+    const lines = [
+      header.map(cell).join(','),
+      ...filtered.map(row =>
+        [
+          row.keyword,
+          row.page,
+          actionLabel[resolveKeywordAction(row)],
+          row.position.toFixed(1),
+          row.impressions,
+          row.clicks,
+          (row.ctr * 100).toFixed(2),
+          row.estimatedClickGain,
+          row.competingPages,
+          tracked.has(row.keyword) ? 'si' : 'no'
+        ]
+          .map(cell)
+          .join(',')
+      )
+    ]
+
+    // BOM: sin él Excel abre el CSV en latin-1 y rompe cada tilde y cada ñ.
+    const blob = new Blob([`\uFEFF${lines.join('\n')}`], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+
+    link.href = url
+    link.download = `${copy.table.exportFilename}-${rootDomain ?? 'space'}-${windowDays}d.csv`
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
   /** Puente al nodo S2: la misma keyword, su película en el tiempo. */
   const drillToPerformance = (keyword: string) => {
     const params = new URLSearchParams()
@@ -689,12 +785,25 @@ const KeywordOpportunitiesView = ({
               <MenuItem value='secondPage'>{copy.filters.positionSecondPage}</MenuItem>
             </CustomTextField>
 
-            <Stack direction='row' spacing={2} alignItems='center'>
-              <Typography variant='caption' color='text.secondary'>
+            <Stack direction='row' spacing={2} alignItems='center' flexWrap='wrap' useFlexGap>
+              {/* `role=status`: el conteo cambiaba de 50 a 8 en silencio para un lector de
+                  pantalla, que es justo la señal de que el filtro hizo algo. */}
+              <Typography
+                variant='caption'
+                color='text.secondary'
+                role='status'
+                aria-label={copy.filters.resultAnnounce.replace('{count}', String(filtered.length))}
+              >
                 {copy.filters.resultCount
                   .replace('{count}', String(filtered.length))
                   .replace('{total}', String(rows.length))}
               </Typography>
+
+              <Tooltip title={copy.table.exportHint}>
+                <Button size='small' variant='text' startIcon={<i className='tabler-download' />} onClick={exportCsv}>
+                  {copy.table.export}
+                </Button>
+              </Tooltip>
               {hasActiveFilters ? (
                 <Button size='small' variant='text' onClick={clearFilters}>
                   {copy.filters.clear}
