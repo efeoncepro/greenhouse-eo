@@ -12,9 +12,10 @@ forense `src/lib/release/preflight/ignored-pending-runs.ts`** (razón + vencimie
 evidencia en manifest; la reliability signal NO la consume, por eso el watchdog seguirá mostrando
 `pending_without_jobs: error` A PROPÓSITO hasta que GitHub recolecte el zombie — NO es un incidente
 nuevo); **(b) Cloud Build de ico-batch >600s** (backlog post-outage) abortó el intento 3 — dejar
-terminar el build huérfano cachea la imagen y el retry pasa limpio. **Pendiente que esto desbloquea:
-federar `get_seo_site_audit_report` + `get_seo_backlink_profile` al gateway `efeonce-mcp`** (patrón
-TASK-1653: provider + registerTool + lista de paridad + canary).
+terminar el build huérfano cachea la imagen y el retry pasa limpio. **Federación EJECUTADA el mismo día**
+(`efeonce-mcp` `bfb3832`, deploy `31182267290` success): provider + registerTool + lista de paridad
+(6 tools SEO) + canary extendido — **canary 11/11 verde contra producción** con los datos reales de
+Berel y Efeonce. TASK-1304 operativamente completa de punta a punta; cero pendientes.
 
 ### Autenticación local Gcloud con Playwright (2026-08-07)
 
