@@ -8,7 +8,7 @@
 ## Antes de empezar
 
 - Necesitas la capability `growth.search_console.connect` (operador interno admin/account/operations/ai_tooling_admin). Sin ella ves el estado pero no los botones.
-- El flujo esta **ON en staging**. En produccion aun no (pendiente release control plane).
+- El flujo esta **ON en staging y en produccion** (produccion cableada el 2026-08-07; si el consent de prod devuelve `redirect_uri_mismatch`, falta registrar el callback de prod en el OAuth client de Google — ver doc funcional).
 - **Prerrequisito clave:** la cuenta de Google con la que vas a consentir debe **tener acceso a la propiedad** del cliente en Search Console. El modelo normal: el cliente comparte su propiedad de Search Console con tu correo de operador (ej. `jreyes@efeoncepro.com`). Si tu cuenta no ve la propiedad, no aparecera en el menu.
 
 ## Paso a paso
