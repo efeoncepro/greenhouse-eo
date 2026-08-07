@@ -12,3 +12,17 @@ verificado.
 - [2026-08](docs/operations/agent-context-history/handoff/2026-08.md)
 
 No volver a pegar historia completa en este índice.
+
+## Entradas archivadas desde Handoff activo
+
+Punteros, no contenido: el detalle canónico de cada una vive en la spec de su task.
+
+- **TASK-1302 — serie GSC propia LIVE** (2026-08-05). 26.192 filas reales de
+  `sc-domain:berel.com` materializadas, scheduler `ops-seo-gsc-snapshot` ACTIVO, 375
+  keywords en striking-distance. El rollout destapó dos defectos invisibles en tests: el
+  ops-worker no tenía config de Search Console (habría degradado todo en silencio) y GSC
+  no publica D-1 (ventana móvil de 5 días). Spec:
+  `docs/tasks/complete/TASK-1302-growth-seo-gsc-daily-snapshot-materializer.md`.
+- **TASK-1300 — registry de familias DataForSEO + ledger de gasto** (2026-08-05).
+  Allowlist de familias, breaker y spend guard; el ledger lo escribe el transporte, nunca
+  el caller. Spec: `docs/tasks/complete/TASK-1300-growth-seo-dataforseo-family-registry.md`.

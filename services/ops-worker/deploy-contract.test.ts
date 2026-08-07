@@ -92,3 +92,38 @@ describe('ops-worker deploy Globe tenancy reconciliation contract', () => {
     expect(script.slice(jobIndex, jobIndex + 220)).toContain('"/globe/tenancy/reconcile"')
   })
 })
+
+describe('ops-worker deploy SEO site audit + backlinks contract (TASK-1304)', () => {
+  // Los 3 jobs nacieron paused y se despausaron el 2026-08-06 (smoke E2E real +
+  // verificación de handlers). El assert protege el estado DECLARADO vigente contra
+  // drift accidental — re-pausar exige cambiar deploy.sh Y este test a la vez.
+  it('declares the weekly audit enqueue job enabled', () => {
+    const script = deployScript()
+    const jobIndex = script.indexOf('"ops-seo-audit-enqueue"')
+
+    expect(jobIndex).toBeGreaterThan(0)
+    expect(script.slice(jobIndex, jobIndex + 220)).toContain('"0 6 * * 1"')
+    expect(script.slice(jobIndex, jobIndex + 220)).toContain('"/seo/audit/enqueue-batch"')
+    expect(script.slice(jobIndex, jobIndex + 220)).toContain('"false"')
+  })
+
+  it('declares the 30-minute collect poll enabled', () => {
+    const script = deployScript()
+    const jobIndex = script.indexOf('"ops-seo-audit-collect"')
+
+    expect(jobIndex).toBeGreaterThan(0)
+    expect(script.slice(jobIndex, jobIndex + 220)).toContain('"*/30 * * * *"')
+    expect(script.slice(jobIndex, jobIndex + 220)).toContain('"/seo/audit/collect"')
+    expect(script.slice(jobIndex, jobIndex + 220)).toContain('"false"')
+  })
+
+  it('declares the weekly backlink capture job enabled', () => {
+    const script = deployScript()
+    const jobIndex = script.indexOf('"ops-seo-backlink-capture"')
+
+    expect(jobIndex).toBeGreaterThan(0)
+    expect(script.slice(jobIndex, jobIndex + 220)).toContain('"0 7 * * 1"')
+    expect(script.slice(jobIndex, jobIndex + 220)).toContain('"/seo/backlinks/capture-batch"')
+    expect(script.slice(jobIndex, jobIndex + 220)).toContain('"false"')
+  })
+})

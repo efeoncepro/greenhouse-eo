@@ -22,6 +22,7 @@ import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip as RTooltip
 
 // Greenhouse Imports
 import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
+import { formatInteger } from '@/lib/format'
 import useReducedMotion from '@/hooks/useReducedMotion'
 import { motion, AnimatePresence } from '@/libs/FramerMotion'
 
@@ -74,6 +75,32 @@ export type MetricTrendCardProps = {
   format?: MetricFormat
   /** Suffix for the month-over-month delta chip, e.g. "pts". */
   deltaUnit?: string
+  /**
+   * TASK-1306 — dirección semántica del delta. Default `'higher-is-better'` (legacy,
+   * byte-idéntico: subir = verde).
+   *
+   * `'lower-is-better'` INVIERTE sólo el color y el texto accesible, **nunca el signo ni
+   * la flecha**: un −1.2 sigue mostrándose como −1.2 con flecha abajo, pero pintado en
+   * verde y anunciado como "mejora". Es el caso de la posición de búsqueda (pasar de 8 a
+   * 3 es mejorar) y de cualquier métrica donde menos es mejor (latencia, churn, costo).
+   *
+   * Falsear el signo para que "se vea positivo" sería mentir sobre el dato; lo que cambia
+   * es la LECTURA (bueno/malo), no el número.
+   */
+  deltaSemantics?: 'higher-is-better' | 'lower-is-better'
+  /**
+   * TASK-1306 — delta EXPLÍCITO, que reemplaza al derivado de los dos últimos puntos.
+   *
+   * Por qué existe: el delta por defecto compara los dos últimos puntos de la serie. Eso
+   * es correcto cuando el hero value ES el último punto (una métrica mensual), pero MIENTE
+   * cuando el hero es un AGREGADO del período completo: el número grande resume N días y
+   * la flecha compararía sólo los dos últimos, sugiriendo una caída del período que en
+   * realidad fue de un día.
+   *
+   * `null` explícito = hay que comparar pero no hay contra qué (primer período con datos):
+   * no se dibuja delta, en vez de inventar un +100% contra una ventana vacía.
+   */
+  deltaOverride?: number | null
   /** Optional 3-dot menu items. When omitted, the menu is not rendered. */
   menuOptions?: OptionType[]
   /** Tooltip for the 3-dot trigger. */
@@ -101,7 +128,9 @@ export type MetricTrendCardProps = {
 const formatValue = (value: number, format: MetricFormat): string => {
   switch (format) {
     case 'integer':
-      return String(Math.round(value))
+      // Separador de miles: `136146` a tamaño hero es ilegible de un vistazo; `136.146` no.
+      // Helper canónico (lint `no-raw-locale-formatting`): respeta el locale del contexto.
+      return formatInteger(Math.round(value))
     case 'decimal':
       return value.toFixed(1)
     case 'percentage':
@@ -220,6 +249,8 @@ const MetricTrendCard = ({
   tone = null,
   format = 'percentage',
   deltaUnit,
+  deltaSemantics = 'higher-is-better',
+  deltaOverride,
   menuOptions,
   menuTooltip,
   dataCapture,
@@ -371,19 +402,39 @@ const MetricTrendCard = ({
     return [Math.max(0, dataMin - pad), dataMax + pad]
   }, [realPoints])
 
-  // Month-over-month delta (last two real points).
+  // Delta explícito (si el caller lo pasa) o derivado de los dos últimos puntos reales.
+  // `deltaOverride === null` es una decisión del caller ("no hay con qué comparar"), NO
+  // un "no me pasaron nada": por eso se distingue de `undefined` y suprime el derivado.
   const delta = useMemo(() => {
+    if (deltaOverride !== undefined) {
+      if (deltaOverride === null || Math.abs(deltaOverride) < 0.05) return null
+
+      return deltaOverride
+    }
+
     if (realPoints.length < 2) return null
     const diff = realPoints[realPoints.length - 1].value - realPoints[realPoints.length - 2].value
 
     if (Math.abs(diff) < 0.05) return null
 
     return diff
-  }, [realPoints])
+  }, [realPoints, deltaOverride])
+
+  // ¿El movimiento del delta es una mejora? Con `lower-is-better` bajar es mejorar.
+  // Sólo cambia la lectura (color + palabra), nunca el signo ni la flecha.
+  const deltaIsImprovement = delta === null ? null : deltaSemantics === 'lower-is-better' ? delta < 0 : delta > 0
 
   const ariaSummary = `${metricName ?? title}, ${periodLabel}: ${
     value !== null ? formatValue(value, format) : 'sin dato'
-  }${delta !== null ? `, ${delta > 0 ? 'sube' : 'baja'} ${Math.abs(delta).toFixed(1)} ${deltaUnit ?? ''}`.trimEnd() : ''}`
+  }${
+    delta !== null
+      ? `, ${delta > 0 ? 'sube' : 'baja'} ${Math.abs(delta).toFixed(1)} ${deltaUnit ?? ''}${
+          // En una métrica invertida el lector de pantalla necesita el juicio explícito:
+          // "baja 1.2" a secas suena a empeoramiento cuando en realidad mejoró.
+          deltaSemantics === 'lower-is-better' ? ` (${deltaIsImprovement ? 'mejora' : 'retrocede'})` : ''
+        }`.trimEnd()
+      : ''
+  }`
 
   // Dots only on real points (never the edge anchors); the last (current) month
   // is emphasised.
@@ -498,9 +549,11 @@ const MetricTrendCard = ({
               direction='row'
               alignItems='center'
               spacing={0.5}
-              sx={{ color: delta > 0 ? 'success.dark' : 'error.main' }}
+              sx={{ color: deltaIsImprovement ? 'success.dark' : 'error.main' }}
             >
               <i
+                // La flecha sigue la DIRECCIÓN real del número, no el juicio: en una
+                // métrica invertida la mejora se ve como flecha abajo en verde.
                 className={delta > 0 ? 'tabler-trending-up' : 'tabler-trending-down'}
                 style={{ fontSize: '1rem' }}
                 aria-hidden='true'

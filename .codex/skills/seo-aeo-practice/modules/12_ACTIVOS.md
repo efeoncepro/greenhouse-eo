@@ -80,12 +80,13 @@ y cruce SEO↔AEO real — pero para el cliente el portal sigue mostrando NADA d
 > expone su MCP tool EN EL MISMO PR** (criterio ya sembrado en 1303/1304/1311-1314/1317).
 > Own-brand: Efeonce quedó provisionada como org canónica `EO-ORG-0007` (4 perfiles grader ligados = lente
 > AEO propia disponible, assignment `seo_v1`, target `efeoncepro.com`); SKY tiene su lente AEO ligada.
-> El 360 de cualquier org = 3 piezas: assignment + lente AEO ligada + GSC conectada (o esperar
-> TASK-1303/DataForSEO para marcas ajenas).
+> El 360 de cualquier org = 3 piezas: assignment + lente AEO ligada + GSC conectada (o
+> TASK-1303/DataForSEO para marcas ajenas — **ya no se espera: el rank capture corre en producción
+> desde 2026-08-06**, ver fila Rank tracking).
 
 | Lo que se vende | Lo que existe en el portal |
 |---|---|
-| Rank tracking | 🔴 **Nada** |
+| Rank tracking | ⚠️ **Motor LIVE, sin superficie cliente.** *(Delta 2026-08-06 — TASK-1303 complete y EN PRODUCCIÓN, release `fcee5ab9f7ce`: serie diaria de **posiciones exactas** vía DataForSEO — cron Cloud Scheduler `ops-seo-rank-capture` ACTIVO, 05:00 CLT → `captureRankSnapshot` en ops-worker con gate de costo + spend fence; serie día-1: Berel 31 keywords, **con AI Overview presence por keyword — dato vendible para AEO**. Consultable por `readRankEvolution` (PG ≤180d / BQ histórico) y la 4.ª MCP tool `get_seo_rank_evolution` (interna prod; gateway pendiente TASK-1653). El portal cliente sigue mostrando nada)* |
 | Site audit | 🔴 **Nada** |
 | Backlinks | 🔴 **Nada** |
 | E-E-A-T scoring | 🔴 **Nada** |

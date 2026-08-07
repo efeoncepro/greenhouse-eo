@@ -41,6 +41,7 @@ Greenhouse — plataforma operativa/subproducto de Efeonce Group dentro del mode
 | PostgreSQL (conexión/migraciones/SQL readers) | `greenhouse-postgres` | inline (PostgreSQL Access + Migration markers + SQL gate) |
 | Backend (API routes/stores/outbox/reactive) | `greenhouse-backend` | inline (Full API Parity + canonical error contract + auth helpers) |
 | Secret hygiene / rotación | `greenhouse-secret-hygiene` | inline (Secret Manager Hygiene) |
+| Gcloud auth | `greenhouse-gcloud-auth-playwright` | `gcloud-auth-playwright.md` |
 | Sitio público (landings/posicionamiento/roadmap/blogposts agentic) | `efeonce-public-site-wordpress` + `seo-aeo`/`commercial-expert` | `docs/public-site/` + `architecture/agent-invariants/PUBLIC_SITE_KINSTA_ACCESS_AGENT_INVARIANTS.md` (`ssh-check` primero; API y SSH son carriles independientes) + `docs/operations/public-site-content-factory/AGENTIC_BLOGPOST_END_TO_END_RUNBOOK_V1.md` (private por defecto; publish con autorización, snapshot, rollback y QA live) |
 | Licitaciones / RFP-RFQ · **Artifact Composer** (motor de composición domain-free; catálogos deck/carrusel) + aggregate `Proposal` (`src/lib/commercial/tenders/**` → `artifact-composer/**`) | `greenhouse-public-private-tenders` (+ `commercial-expert`) | `architecture/agent-invariants/COMMERCIAL_TENDERS_AGENT_INVARIANTS.md` |
 | **Decks / presentaciones / láminas** (cualquier deck: oferta a comité · pitch · QBR · board · readout · webinar) — **domain-free** | `deck-studio` (+ `copywriting`/`dataviz-design`/`typography-design`) | inline (craft del oficio; la skill de licitaciones es **consumer**, no dueña) |
@@ -285,6 +286,7 @@ Cuando una instrucción menciona "repos hermanos" o pide aplicar un cambio a mú
 - **PostgreSQL health:** `pnpm pg:doctor`
 - **Migrations:** `pnpm migrate:up`, `pnpm migrate:down`, `pnpm migrate:create <nombre>`, `pnpm migrate:status`
 - **DB types:** `pnpm db:generate-types` (regenerar después de cada migración)
+- **Correo laboral:** el correo de trabajo de Efeonce y sus clientes, incluido ANAM, vive en Outlook/Microsoft 365. Gmail, incluido `jreysgo@gmail.com`, es correo personal y no es fuente de verdad laboral; si Outlook no está disponible, informar el bloqueo y no sustituirlo por Gmail.
 
 ### Solution Quality Contract
 
@@ -1122,12 +1124,6 @@ Los invariantes operativos de Finance ledger/bank — internal account number al
 Estos CLIs están autenticados localmente. Cuando una task toca su dominio, **úsalos directamente** en vez de pedirle al usuario que lo haga manualmente desde portal/web UI:
 
 - **Azure CLI (`az`)**: autenticado contra el tenant Microsoft de Efeonce `a80bf6c1-7c45-4d70-b043-51389622a0e4`. Se usa para gestionar Azure AD App Registrations (redirect URIs, client secrets, tenant config), Bot Service, Logic Apps, Resource Groups, etc. Comandos canónicos: `az ad app show --id <client-id>`, `az ad app update`, `az ad app credential reset`, `az ad sp show`. Subscription ID: `e1cfff3e-8c21-4170-8b28-ad083b741266`.
-- **Google Cloud CLI (`gcloud`)**: autenticado como `julio.reyes@efeonce.org` con ADC. Usar para Secret Manager, Cloud Run, Cloud SQL, Cloud Scheduler, BigQuery, Cloud Build, Workload Identity Federation. Project canónico: `efeonce-group`.
-  - **GCP multi-proyecto:** `globe` para Globe; restaurar `default`.
-  - **Regla operativa obligatoria**: cuando un agente necesite acceso interactivo local a GCP, debe lanzar **siempre ambos** flujos y no asumir que uno reemplaza al otro:
-    - `gcloud auth login`
-    - `gcloud auth application-default login`
-  - Motivo: `gcloud` CLI y ADC pueden quedar desalineados; si solo se autentica uno, pueden fallar `bq`, `psql` via Cloud SQL tooling, Secret Manager o scripts del repo de forma parcial y confusa.
 - **GitHub CLI (`gh`)**: autenticado contra `efeoncepro/greenhouse-eo`. Usar para issues, PRs, workflow runs, releases.
 - **Vercel CLI (`vercel`)**: autenticado contra el team `efeonce-7670142f`. Usar para env vars, deployments, project config. Token en `.env.local` o config global.
 - **PostgreSQL CLI (`psql`)** vía `pnpm pg:connect`: levanta proxy Cloud SQL + conexión auto. No requiere credenciales manuales.

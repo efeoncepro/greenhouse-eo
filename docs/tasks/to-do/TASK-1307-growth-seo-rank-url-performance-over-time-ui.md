@@ -1,9 +1,115 @@
 # TASK-1307 — Growth SEO: Rank & URL Performance Over Time UI ★
 
+## Delta 2026-08-07 — TASK-1306 cerró: el blocker cayó y te dejó cuatro cosas servidas
+
+El bloqueador declarado (`Blocked by: TASK-1306`) está **cerrado** (code complete en `develop`).
+Lo que cambia concretamente para esta task:
+
+**Servido — no lo vuelvas a construir:**
+
+1. **El shell de la sección ya existe.** `SeoSearchVisibilityTabs`
+   (`src/views/greenhouse/admin/growth/seo/overview/`) declara las 4 tabs y propaga el
+   `?space=`. **Activar la tab "Rendimiento" es quitar `available: false` de su entrada en
+   `TABS`** — una línea, no un refactor. No construyas navegación local propia.
+2. **El viewCode `administracion.growth_seo` está sembrado** (migración
+   `20260806223132770`), en `view-access-catalog.ts`, con grants a `efeonce_admin` +
+   `ai_tooling_admin`, y el único ítem de menú (`/admin/growth/seo`) ya existe. Esta ruta
+   es **child del MISMO viewCode**: NO siembres uno nuevo, NO agregues nav. **SÍ** declárate
+   en `route-reachability-manifest.ts` con `parent: '/admin/growth/seo'`, `via: 'tab'` y
+   `reason` — el gate de alcanzabilidad falla con una `page.tsx` huérfana.
+3. **`MetricTrendCard` ya tiene lo que tu Δ30d necesita** — se extendió en 1306 y **lo
+   heredas, no lo reimplementes**: `deltaSemantics='lower-is-better'` invierte **sólo** el
+   color y el texto accesible, **nunca el signo ni la flecha** (un −1.2 sigue siendo −1.2
+   con flecha abajo, pintado verde y anunciado "mejora"); `deltaOverride` reemplaza el delta
+   derivado de los dos últimos puntos, que **miente cuando el hero value es un agregado del
+   período** (mostraba "2.596 clics −76" sugiriendo caída del período cuando era la caída de
+   un día). `deltaOverride: null` explícito = "hay que comparar pero no hay contra qué":
+   no se dibuja delta, en vez de inventar un +100% contra una ventana vacía. Ambos son
+   opt-in; el comportamiento legacy quedó byte-idéntico.
+4. **El guard de 3 puertas ya tiene forma canónica** en
+   `src/app/(dashboard)/admin/growth/seo/page.tsx`: viewCode + capability
+   `growth.seo.observation.read` + `module_assignment` (vía Spaces elegibles), más
+   `notFound()` con el flag apagado y redirect si `tenantType === 'client'`. Cópiala.
+
+**Corrección de supuesto — esto la spec lo tiene MAL en varios lugares:**
+
+⚠️ **`readRankSnapshotLatest` NO EXISTE.** Esta task lo cita como bloqueador de datos, en
+`Current Repo State`, en el `## Backend/Data Contract` y en Acceptance Criteria, como si
+`TASK-1303` lo hubiera entregado. **No lo entregó**: sólo existe `readRankEvolution`. En
+1306 los movers WoW se derivaron de la serie de evolución (último punto medido vs el más
+cercano a 7 días atrás). **Tu Δ30d y tus standings salen de `readRankEvolution`**, o
+autoras el reader faltante con su propia MCP tool en el mismo PR (mandato del dominio) —
+pero no asumas que ya está.
+
+**Sigue siendo TU decisión (1306 no la tocó):**
+
+**La librería de charts.** `TASK-1306` **no instaló nada nuevo**: usó ApexCharts + Recharts,
+ya presentes en el repo. **ECharts sigue sin estar instalado** y el Slice 0 de esta task
+conserva íntegra la decisión ECharts (opción A) vs ApexCharts (opción B). 1306 **no la
+resolvió ni la prejuzgó**.
+
+Si terminas en Apex, tres hallazgos de runtime de 1306 que te ahorran horas:
+
+- 🔴 **`resolveApexColor` (`src/libs/styles/`) es obligatorio.** Con `cssVariables: true`,
+  `theme.palette.*` devuelve `var(--mui-palette-*)` y Apex lanza
+  `Cannot read properties of null (reading '1')` — sin pintar nada y **sin error visible**
+  (8 pageerrors por corrida, sólo los vio el gate de runtime del GVC).
+- **Series con huecos: formato `{x, y}`, nunca array plano** (con array plano un `null`
+  revienta Apex; con `{x, y}` el `y: null` es un hueco de primera clase, que es justo lo que
+  tu serie necesita: un día sin ranking se dibuja como hueco, no interpolado). Y con `{x, y}`
+  **no** declares `xaxis.categories`: son dos definiciones del eje X en conflicto.
+- **El `radialBar` de Apex no dibuja en contenedor fluido** (mide 0 al montar).
+
+Y para el GVC: **no uses `fullPage`** en los scenarios de esta ruta. Playwright redimensiona
+el viewport al capturarlo y los charts que miden su contenedor quedan en 0 — produce
+evidencia con cards vacías que parecen un bug inexistente. Usa `clipSelector` sobre
+`data-capture`.
+
+## Pendiente heredado de TASK-1306 — promoción a `main` (registrado 2026-08-07)
+
+**Qué:** al cerrar TASK-1307, promover `develop` → `main` con el release control plane
+(skill `greenhouse-production-release`). La promoción cubre 1306 + 1307 juntas.
+
+**Por qué NO se puede dejar indefinidamente:** Greenhouse tiene **una sola instancia Cloud
+SQL con una sola base (`greenhouse_app`) compartida por dev, staging y producción**, y
+`syncViewRegistryCatalog` (`src/lib/admin/view-access-store.ts`) desactiva **todo viewCode
+ausente del catálogo TS del código EN EJECUCIÓN**:
+
+```sql
+UPDATE greenhouse_core.view_registry SET active = FALSE
+ WHERE view_code <> ALL($catalogoTS)
+```
+
+Mientras 1306 viva sólo en `develop`, el runtime de producción corre con un catálogo que
+NO conoce `administracion.growth_seo` ⇒ **lo apaga en cada sincronización, en silencio**
+(sin error, sin log). El síntoma es que la sección SEO desaparece del menú y no se parece
+en nada a la causa. Ya ocurrió una vez el 2026-08-07 (`active=false`,
+`updated_by='system'`); se reactivó a mano, pero **la reactivación manual no es estable**:
+se revierte sola en la siguiente corrida.
+
+**Cómo verificar que quedó resuelto** (después de promover, contra la base real):
+
+```sql
+SELECT view_code, active, updated_by
+  FROM greenhouse_core.view_registry
+ WHERE view_code = 'administracion.growth_seo';
+```
+
+Debe quedar `active = true` **y mantenerse** tras una sincronización posterior. Si vuelve a
+`false` con `updated_by = 'system'`, el código promovido no incluye la entrada del catálogo.
+
+**Contrato completo:** `GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md` §"View
+Registry — el seed se AUTO-REVIERTE si el código no está desplegado".
+
+**Si TASK-1307 se demora o se cancela**, esta promoción NO debe esperarla: sácala como
+acción propia, porque el costo de postergarla lo paga la superficie ya entregada de 1306.
+
 ## Delta 2026-08-06
 
 - **El backend YA existe** — cerrado por TASK-1303: `readRankEvolution(seoTargetId, { keywords?, rangeDays?, engine?, device? })` en `src/lib/growth/seo/rank-evolution-reader.ts` retorna `{ ok:true, seoTargetId, organizationId, engine, device, range: {from,to,days}, source: 'postgres'|'bigquery', series: [{ keyword, points: [{date, position, url}] }] } | { ok:false, errorCode: 'disabled'|'target_not_found'|'no_data'|'query_failed' }`. `position: null` en un punto = "el dominio no rankeó ese día en el top-20" (dato válido a graficar como hueco, no error). También existen el lane ecosystem `/api/platform/ecosystem/growth/seo/rank-evolution` y la MCP tool `get_seo_rank_evolution`.
 - ⚠️ La serie empieza a llenarse recién cuando el operador despause el scheduler `ops-seo-rank-capture` (nace pausado; runbook `docs/manual-de-uso/growth/operar-captura-rankings-seo.md`). Diseñar la UI con el estado `no_data` como primera pantalla real.
+- **Dirección visual APROBADA vía `product-design-loop` (2026-08-06): concepto C — "Evidencia narrativa".** Se generaron 3 conceptos con `gpt-image-2` (`.captures/concepts/task1307-seo-performance/`, gitignored): (A) analista denso stacked, (B) inspector lateral con leyenda-como-control, (C) narrativa/evidencia. El operador eligió **C**. Composición aprobada: **banda de 4 KPI cards arriba** (titular legible de un vistazo, con estado honesto `— Pendiente` en vez de cero fantasma) → **chart hero editorial** con anotaciones inline ancladas a puntos + meta top-3 + band de evento + `dataZoom` + last-value labels → **tabla de detalle comprimida** (row-height generosa, sigue siendo `DataTableShell` y el fallback tabular obligatorio). Los KPI de posición usan semántica invertida (flecha abajo = verde = mejora); el chart declara la inversión también como texto visible bajo el título, no solo en `aria-label`.
+- **Nota de lectura del concepto C:** la imagen generada rotuló las series como "Competidor A/B/C" — eso es artefacto del modelo, NO el contrato. Las series son las URLs/keywords del set elegido por el operador (`?urls=`/`?keywords=`). La imagen es intención (layout, jerarquía, densidad), nunca valores ni semántica literal.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -206,6 +312,7 @@ Reglas obligatorias:
 - Reuse / extend / new primitive: reuse total de primitives Greenhouse; componentes locales son composición.
 - **Charts — decisión de librería (LA decisión de esta task):** el chart ancla (Y invertido + `dataZoom` + crosshair multi-serie + band + last-value labels) es un caso donde **ECharts brilla** y lo recomienda el arch doc §10.4 + política CLAUDE.md (ECharts para alto impacto, lazy por ruta). **ECharts NO está instalado hoy.** Discovery decide y reporta reuse/extend/new: **(A) recomendada** — instalar `echarts` + `echarts-for-react` lazy-loaded solo en esta ruta (`dataZoom`/Y-invertido/band de primera clase; +~250-400KB lazy, primer consumer del stack); **(B)** construir sobre ApexCharts (`yaxis.reversed=true` + annotations target/band + brush zoom; sin librería nueva pero crosshair multi-serie/last-value más artesanales). Ambas DEBEN cumplir el 11-row chart floor. La decisión se toma acá; 1306/1308/1310 la heredan.
 - Open risks: (1) series ralas de keywords nuevas → dibujar honestamente sin interpolar; (2) límite ≤8 series (legibilidad/colorblind) → degradar con aviso, no romper; (3) device/engine deben propagarse al reader (SERP móvil ≠ escritorio); (4) el reader `readRankEvolution` debe soportar filtro por URL además de keyword (coordinar con TASK-1303 si falta).
+- **Dirección visual aprobada (`product-design-loop`, 2026-08-06): concepto C "Evidencia narrativa"** — banda de 4 KPI → chart hero editorial con anotaciones inline → tabla comprimida. Conceptos en `.captures/concepts/task1307-seo-performance/` (gitignored; `manifest.json` con los prompts). Alternativas descartadas: (A) analista denso — máxima densidad pero el Δ30d por serie obliga a bajar a la tabla; (B) inspector lateral — mejor control de comparación, pero cede ~30% de ancho al chart y empuja el fallback tabular bajo el fold. **Deuda que C hereda y hay que resolver en implementación:** el selector de set pierde protagonismo visual frente a la banda KPI → mantenerlo alcanzable y primero en el orden de foco (toolbar→tabs→set→métrica→chart→tabla), y la tabla comprimida NO puede perder columnas del contrato (7 cols + `aria-sort` + sparkline).
 - Follow-up: al aprobar `product-design-loop`, referenciar PNG + subir `UI ready` a `yes`. Drill `?url=X` puede evolucionar a vista dedicada de una URL (histórico + queries que la traen).
 
 ### Visual verification
@@ -427,6 +534,11 @@ Slice 0 (decisión librería) → Slice 1 (ruta + selector + estados) → Slice 
 - [ ] route/nav/reachability actualizados
 - [ ] `FEATURE_FLAG_STATE_LEDGER.md` refleja `GROWTH_SEO_ENABLED` si se toca
 - [ ] decisión de librería de charts documentada (ADR corto o nota en el módulo si se instala ECharts)
+- [ ] **🔴 HEREDADO DE TASK-1306 — promover `develop` → `main` al cerrar esta task.** Ver
+  `## Pendiente heredado` arriba. NO es opcional ni cosmético: hasta que se promueva, cada
+  sincronización desde producción APAGA el viewCode `administracion.growth_seo` y la
+  sección SEO entera desaparece del menú. Usar la skill `greenhouse-production-release`
+  (release control plane), nunca un push directo a `main`.
 
 ## Follow-ups
 

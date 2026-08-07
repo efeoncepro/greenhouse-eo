@@ -1,7 +1,7 @@
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-08-06 por Claude (TASK-1303)
-> **Ultima actualizacion:** 2026-08-06 por Claude (TASK-1303)
+> **Ultima actualizacion:** 2026-08-06 por Claude (sync post-rollout: cron ACTIVO, saldo recargado)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §8
 
 # Operar la captura diaria de rankings (SEO)
@@ -12,9 +12,9 @@ La captura diaria de rankings mide, una vez al dia, en que posicion exacta apare
 
 ## Antes de empezar
 
-- El cron `ops-seo-rank-capture` (Cloud Scheduler, `0 5 * * *` America/Santiago) **nace PAUSADO**. No lo despauses sin completar la verificacion de staging de este manual.
+- El cron `ops-seo-rank-capture` (Cloud Scheduler, `0 5 * * *` America/Santiago) esta **ACTIVO desde el 2026-08-06** (despausado tras el smoke E2E real de este manual). Nacio pausado por diseño; el estado declarado vive en `deploy.sh` (ver "Pausar/despausar" abajo).
 - El flag `GROWTH_SEO_ENABLED` ya esta ON en el ops-worker y en Vercel (ver `FEATURE_FLAG_STATE_LEDGER.md`).
-- La cuenta DataForSEO debe tener saldo (al 2026-08-06 tenia USD 0.90 — verificar con `/v3/appendix/user_data` antes de habilitar).
+- La cuenta DataForSEO debe tener saldo (recargada el 2026-08-06 — verificar el saldo vigente con `/v3/appendix/user_data` antes de expandir a mas organizaciones).
 - El blast radius real lo controla el **assignment per-org**: el batch solo itera organizaciones con `module_assignments.seo_v1` vigente. Berel primero (Fase 0).
 
 ## Paso a paso
@@ -40,10 +40,12 @@ bq --project_id=efeonce-group query --use_legacy_sql=false 'SELECT capture_date,
 
 6. Verificar el gasto contabilizado en `greenhouse_growth.seo_provider_spend_daily` (familia `serp`).
 
-### Despausar (habilitacion real)
+### Pausar/despausar (cambio de estado)
 
-1. En `services/ops-worker/deploy.sh`, cambiar el 5.º argumento del job `ops-seo-rank-capture` de `"true"` a `"false"` y redeployar. **No despausar a mano con `gcloud scheduler jobs resume`**: el estado declarado en `deploy.sh` se re-aplica en cada deploy y revertiria el cambio en silencio.
-2. Observar 1–2 corridas reales: costo en `seo_provider_spend_daily`, snapshots por dia, signal `seo.rank.capture_lag` en verde en `/admin/operations`.
+> La habilitacion inicial ya se ejecuto el 2026-08-06 (cron ACTIVO). Esta subseccion queda como referencia para cualquier cambio de estado futuro — incluido el rollback inverso (volver a pausar).
+
+1. En `services/ops-worker/deploy.sh`, cambiar el 5.º argumento del job `ops-seo-rank-capture` (`"false"` = activo, `"true"` = pausado) y redeployar. **No cambiar el estado a mano con `gcloud scheduler jobs resume`/`pause`**: el estado declarado en `deploy.sh` se re-aplica en cada deploy y revertiria el cambio en silencio.
+2. Tras activar, observar 1–2 corridas reales: costo en `seo_provider_spend_daily`, snapshots por dia, signal `seo.rank.capture_lag` en verde en `/admin/operations`.
 
 ### Consultar la serie
 
@@ -58,7 +60,8 @@ posicion/URL/features reales (berel #1; "pintura para alberca" #2 **con `ai_over
 presente**) a costo real USD 0.03 (USD 0.00375/call, bajo el estimador 0.01) → ledger `serp`
 8 calls escrito por el transporte → re-run mismo dia = `skipped` con USD 0 → outbox
 `published` → mirror BQ con las 8 filas → `readRankEvolution` sirviendo las 8 series →
-signal en warning honesto (Efeonce elegible sin captura inicial). Falta solo despausar.
+signal en warning honesto (Efeonce elegible sin captura inicial). Tras el smoke, el cron se
+despauso el mismo dia (serie dia-1: Berel con 31 keywords).
 
 ## Que significan los estados
 

@@ -200,6 +200,30 @@ export class GreenhouseApiPlatformClient {
     })
   }
 
+  // TASK-1306 — KPIs norte del cockpit Overview (GSC medido, agregado del período).
+  async getSeoOverviewKpis(input: { organizationId?: string; rangeDays?: number }) {
+    return this.request('/api/platform/ecosystem/growth/seo/overview-kpis', {
+      organizationId: input.organizationId,
+      rangeDays: input.rangeDays
+    })
+  }
+
+  // TASK-1304 — reporte del site audit técnico (OnPage, health + findings por severidad).
+  async getSeoSiteAuditReport(input: { organizationId?: string; auditRunId?: string }) {
+    return this.request('/api/platform/ecosystem/growth/seo/site-audit-report', {
+      organizationId: input.organizationId,
+      auditRunId: input.auditRunId
+    })
+  }
+
+  // TASK-1304 — serie semanal del perfil de enlaces (referring domains, rank, toxicidad).
+  async getSeoBacklinkProfile(input: { organizationId?: string; rangeDays?: number }) {
+    return this.request('/api/platform/ecosystem/growth/seo/backlink-profile', {
+      organizationId: input.organizationId,
+      rangeDays: input.rangeDays
+    })
+  }
+
   // TASK-1211 — Cotizador (read-only). Resolver de servicios + simulación de precio
   // (estimado referencial NO vinculante). Lane ecosystem; scope por binding.
   async searchServices(input: { query?: string; limit?: number }) {

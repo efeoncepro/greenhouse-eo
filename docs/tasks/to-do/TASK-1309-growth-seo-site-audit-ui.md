@@ -1,5 +1,69 @@
 # TASK-1309 — Growth SEO: Site Audit UI
 
+## Delta 2026-08-07 — TASK-1306 cerró: shell servido y el gauge de salud necesita replanteo
+
+**Servido — no lo vuelvas a construir:**
+
+1. **Shell y conmutador ya existen.** `SeoSearchVisibilityTabs`
+   (`src/views/greenhouse/admin/growth/seo/overview/`) declara las 4 tabs y propaga el
+   `?space=`. **Activar la tab "Auditoría" es quitar `available: false` de su entrada en
+   `TABS`** — una línea, no un refactor.
+2. **viewCode `administracion.growth_seo` sembrado** (migración `20260806223132770`) + en
+   `view-access-catalog.ts` + grants a `efeonce_admin`/`ai_tooling_admin` + ítem de menú
+   único (`/admin/growth/seo`). Donde tu spec dice "`[verificar]` viewCode canónico"
+   (`Dependencies & Impact`) y "registrar key nav" (Slice 1): **ya está**. Esta ruta es
+   **child del MISMO viewCode**: NO siembra uno nuevo, NO agrega ítem de menú. **SÍ** debes
+   declararte en `route-reachability-manifest.ts` con `parent: '/admin/growth/seo'`,
+   `via: 'tab'` y `reason`.
+3. **`readSiteAuditReport` ya tiene un consumer de producción y su shape está probado
+   contra datos reales.** El sidebar del Overview (`readSeoOverviewSidebar`, región de
+   salud) consume `report.run.healthScore` + `report.totals` por severidad. Resultado live
+   verificado (Grupo Berel): **health 95.4 · 0 críticos · 138 avisos · 381 menores**. Tu
+   `[issueGroup]` agrupa por el mismo `issueType`.
+4. **`healthScore` puede venir `null`, y `null` NO es 0.** En 1306 se propaga tal cual y la
+   UI dice "Pendiente" — un `0/100` leería como "sitio pésimo" cuando en realidad el score
+   no se calculó. Mismo criterio acá.
+5. **Guard de 3 puertas con forma canónica** en
+   `src/app/(dashboard)/admin/growth/seo/page.tsx` (viewCode + capability
+   `growth.seo.observation.read` + `module_assignment`, más `notFound()` con el flag apagado
+   y redirect si `tenantType === 'client'`). Cópiala. Para "Correr auditoría" recuerda que la
+   capability es `growth.seo.audit.run` y el gasto pasa por `enforceSeoRunEntitlement`.
+
+**⚠️ Corrección que te toca directo — el gauge de salud:**
+
+Tu Design Decision Log dice *"radialBar ApexCharts (no ECharts). Why: arch §10.4 lo
+especifica; un gauge simple no justifica ECharts"*. **Ese razonamiento sigue siendo válido,
+pero el radialBar de Apex NO FUNCIONA en un contenedor fluido**: mide 0 al montar y
+simplemente no dibuja. Lo descubrió 1306 ejercitando runtime, y por eso su gauge de salud
+del sitio pasó a un **arco SVG determinista**. Replantea: o reusas ese arco SVG (misma
+métrica, misma pantalla hermana, consistencia gratis) o le fijas dimensiones explícitas al
+radialBar y lo verificas en GVC antes de darlo por bueno.
+
+**Si usas cualquier chart Apex:**
+
+- 🔴 **`resolveApexColor` (`src/libs/styles/`) es obligatorio.** Con `cssVariables: true`,
+  `theme.palette.*` devuelve `var(--mui-palette-*)`; Apex lanza
+  `Cannot read properties of null (reading '1')` — sin pintar nada y **sin error visible**.
+  Sólo lo vio el gate de runtime del GVC (8 pageerrors por corrida).
+- **En el GVC no uses `fullPage`**: Playwright redimensiona el viewport al capturarlo y los
+  charts que miden su contenedor quedan en 0 → evidencia con cards vacías que parecen un bug
+  inexistente. Usa `clipSelector` sobre `data-capture`.
+
+**Sigue abierto:** la decisión de librería del módulo (ECharts vs Apex) es el **Slice 0 de
+TASK-1307**; `TASK-1306` **no instaló ninguna librería nueva** ni prejuzgó esa decisión.
+
+## Delta 2026-08-06
+
+- **El backend que esta UI consume YA EXISTE** — TASK-1304 quedó code complete + smoke E2E real:
+  `readSiteAuditReport(targetId, auditRunId?)` en `src/lib/growth/seo/site-audit/reader.ts`
+  (run + findings agrupados por severidad con `issueType` = check OnPage estable — el
+  `[issueGroup]` de esta UI agrupa por ese campo; allowlist en `site-audit/findings-map.ts`),
+  lane `/api/platform/ecosystem/growth/seo/site-audit-report` y MCP tool
+  `get_seo_site_audit_report`. Un run `running` se reporta como "audit en curso" (estado que
+  esta UI debe renderizar como hecho, no como error); `succeeded` con 0 findings = sitio limpio.
+  Primer reporte real: efeoncepro.com health 93.41, 10 páginas, 60 findings (0c/32w/28n).
+  Rollout de los crons pendiente (schedulers pausados) — la UI puede construirse contra datos ya materializados.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

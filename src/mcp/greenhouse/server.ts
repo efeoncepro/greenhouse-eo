@@ -308,6 +308,54 @@ export const createGreenhouseMcpServer = (
     async args => handlers.getSeoRankEvolution(args)
   )
 
+  // TASK-1306 — KPIs norte del cockpit Overview (la foto medida del período).
+  server.registerTool(
+    'get_seo_overview_kpis',
+    {
+      title: 'Get SEO Overview KPIs',
+      description:
+        'North-star KPIs of the SEO Overview cockpit for an organization, from MEASURED Google Search Console data (first-party truth, never estimated): clicks, impressions, average position and CTR aggregated over the period, plus the daily series and the equivalent previous window for comparison. Average position is weighted BY IMPRESSIONS (never a flat average of daily positions) and CTR is total clicks over total impressions (never an average of daily ratios). Position semantics are INVERTED: a lower number is better, so a negative delta is an improvement. previous=null means there is no comparable previous window — report it as "no comparison available", never as a 100% change. position/ctr are null when there were no impressions; that is "not measured", never zero. When data.ok is false, report the errorCode (disabled, target_not_configured) honestly.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        rangeDays: z.number().int().positive().max(365).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getSeoOverviewKpis(args)
+  )
+
+  // TASK-1304 — site audit report: salud técnica del sitio (OnPage async queue+poll).
+  server.registerTool(
+    'get_seo_site_audit_report',
+    {
+      title: 'Get SEO Site Audit Report',
+      description:
+        'Technical site audit report (DataForSEO OnPage crawl) for the SEO target of an organization: sitewide health score (0-100), crawled pages, and findings grouped by severity (critical/warning/notice) with stable issue types (e.g. is_4xx_code, no_description, has_micromarkup_errors). A run with status=running means the crawl is still in progress (a fact, not an error); a succeeded run with zero findings means the site is technically clean. Pass auditRunId to read a specific historical run. When data.ok is false, report the errorCode (disabled, target_not_configured, no_data, run_not_found, query_failed) honestly — never fabricate findings.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        auditRunId: z.string().trim().min(1).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getSeoSiteAuditReport(args)
+  )
+
+  // TASK-1304 — backlink profile: la serie semanal del perfil de enlaces.
+  server.registerTool(
+    'get_seo_backlink_profile',
+    {
+      title: 'Get SEO Backlink Profile',
+      description:
+        'Weekly time series of the backlink profile (DataForSEO Backlinks) for the SEO target of an organization: referring domains, total backlinks, domain rank on a 0-100 scale (comparable to DR/DA), toxic share (0-1 proxy derived from the average spam score of the incoming profile), and new/lost deltas over the provider 30-day window. Points are weekly snapshots; use rangeDays to widen the window (default 365). When data.ok is false, report the errorCode (disabled, target_not_configured, no_data, query_failed) honestly.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        rangeDays: z.number().int().positive().max(1825).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getSeoBacklinkProfile(args)
+  )
+
   // Resource addressable: el mismo documento read-only por URI estable.
   server.registerResource(
     'knowledge_document',

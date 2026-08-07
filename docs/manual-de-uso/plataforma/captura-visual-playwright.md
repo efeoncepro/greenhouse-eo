@@ -1,8 +1,9 @@
 # Greenhouse Visual Capture — Capturar visuales + microinteractions
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-05-12
+> **Ultima actualizacion:** 2026-08-07 por Claude (hallazgos TASK-1306: fullPage vs charts, lectura del quality gate, falsos positivos, Turbopack, sesión expirada)
 > **Modulo:** Plataforma (frontend tooling)
 > **Ruta en portal:** Transversal (uso desde CLI local o CI)
 > **Documentacion relacionada:** [Arquitectura Greenhouse Visual Capture](../../architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md) · [scripts/frontend/README.md](../../../scripts/frontend/README.md) · [Agent Auth canónico](../../../CLAUDE.md#agent-auth-acceso-headless-para-agentes-y-e2e)
@@ -36,7 +37,8 @@ Cuando un agente o persona verifique UI visible de Greenhouse, la evidencia visu
 | Ruta simple / sanity visual | `pnpm fe:capture --route=/ruta --env=staging --hold=3000` |
 | Ruta simple con readiness estable | `pnpm fe:capture --route=/ruta --env=local --ready='[data-capture="surface"]'` |
 | Flujo repetible o microinteraction | `pnpm fe:capture <scenario> --env=staging` |
-| Pantalla larga completa | Scenario con `{ kind: 'mark', label: 'full-page', fullPage: true }` |
+| Pantalla larga completa (⚠️ sin charts, sin sidebar fijo) | Scenario con `{ kind: 'mark', label: 'full-page', fullPage: true }` |
+| Pantalla larga **con charts** | Frame del viewport real + un `mark clipSelector` por región (ver "Charts y `fullPage`") |
 | Sección específica tras scroll | Scenario con `scroll selector` + `mark clipSelector` |
 | Dossier para review UI/UX | `pnpm fe:capture:review <scenario-or-capture-dir> --env=staging` |
 | Before/after | `pnpm fe:capture:diff .captures/<prev> .captures/<curr>` |
@@ -182,11 +184,14 @@ steps: [
 ]
 ```
 
-Si necesitas auditar toda la pantalla, usa `fullPage`:
+Si necesitas auditar toda la pantalla y **no hay charts ni sidebar fijo**, usa `fullPage`:
 
 ```ts
 { kind: 'mark', label: 'full-page', fullPage: true }
 ```
+
+⚠️ Antes de escribir ese `fullPage`, lee la sección **"Charts y `fullPage`"** más abajo: en pantallas con
+gráficos la evidencia sale con las cards vacías y parece un bug que no existe.
 
 Para ir al inicio o final sin calcular píxeles:
 
@@ -389,6 +394,94 @@ pnpm fe:capture <scenario> --env=production --prod
 
 Solo decláralos si **sabes** que posees la capability vigente. El audit log registra al actor para forensic post-hoc.
 
+## Charts y `fullPage` — la trampa que hace parecer que el producto está roto
+
+**Si la pantalla tiene gráficos, no uses `fullPage`.**
+
+Para armar una captura de página completa, Playwright **redimensiona el viewport**. Todo chart que calcula
+su tamaño a partir del contenedor re-mide durante ese redimensionamiento y queda en **tamaño 0**. El
+resultado: la evidencia sale con las cards de métrica **vacías** — el marco, el título y el número están,
+pero donde iba el gráfico hay un rectángulo en blanco. En el browser la misma pantalla se ve perfecta.
+
+Esto afecta hoy a:
+
+- los sparklines de `MetricTrendCard` (Recharts),
+- las curvas de evolución (ApexCharts),
+- cualquier componente futuro que use un contenedor responsive para medirse.
+
+Es especialmente caro porque **no se lee como un problema de la captura**: se lee como dato faltante o como
+un reader degradado, y se pierde tiempo depurando un bug de producto que no existe.
+
+**Qué hacer en su lugar** — el frame del viewport real (que no toca el viewport) más un clip por región:
+
+```ts
+// desktop
+{ kind: 'mark', label: 'default', note: 'Cockpit poblado en viewport real' },
+{ kind: 'mark', label: 'kpis',    clipSelector: '[data-capture="seo-overview-kpis"]' },
+{ kind: 'mark', label: 'sidebar', clipSelector: '[data-capture="seo-overview-sidebar"]' }
+```
+
+```ts
+// mobile — scroll + un mark por zona, nunca un fullPage del stack completo
+{ kind: 'mark', label: 'mobile-top' },
+{ kind: 'scroll', selector: '[data-capture="seo-overview-sidebar"]' },
+{ kind: 'sleep', ms: 600 },
+{ kind: 'mark', label: 'mobile-sidebar' }
+```
+
+`clipSelector` captura a resolución real sin redimensionar nada, así que el chart nunca re-mide. Scenarios
+de referencia ya escritos con este patrón (y con el porqué comentado dentro):
+`scripts/frontend/scenarios/growth-seo-overview.scenario.ts` y `growth-seo-overview-mobile.scenario.ts`.
+
+`fullPage` sigue siendo válido para "ver el largo total" de una pantalla **sin charts y sin sidebar fijo**.
+
+## Leer el quality gate — el PNG no basta
+
+Cuando el scenario declara `qualityProfile: 'standard'`, GVC corre gates automáticos sobre la página viva:
+accesibilidad (axe), integridad de layout (overflow, targets < 24px, texto cortado), errores de runtime,
+integridad de assets, budgets de performance y rúbrica enterprise.
+
+```ts
+export const scenario: CaptureScenario = {
+  name: 'mi-superficie',
+  route: '/mi/ruta',
+  qualityProfile: 'standard',   // warning-first; `premium` los vuelve bloqueantes
+  // ...
+}
+```
+
+**Encuentra cosas que el ojo no ve.** En una pantalla que a la vista estaba impecable, este perfil destapó:
+8 excepciones de runtime por corrida, violaciones axe reales (`aria-required-children`,
+`aria-valid-attr-value`), overflow horizontal y targets interactivos bajo el piso de 24px.
+
+**Dónde está el diagnóstico:** en el `manifest.json` del run, **no** en el log de consola.
+
+| Campo del manifest | Qué te dice |
+|---|---|
+| `qualityFindings[]` | Un objeto por hallazgo con `severity` (`info`/`warning`/`error`), `category`, `code`, `selector` y `message`. El `selector` es lo que te lleva al nodo exacto. |
+| `runtimeSummary.pageErrorCount` | Cuántas excepciones lanzó la página. **Mayor que 0 con la pantalla renderizando bien es el caso que ningún screenshot revela.** |
+| `runtimeSummary.pageErrorSamples[]` | El texto de esas excepciones (saneado y truncado). |
+| `runtimeSummary.consoleErrorSamples[]` · `hydrationWarningSamples[]` · `httpFailureSamples[]` | Consola, hidratación y respuestas 4xx/5xx. |
+
+Triage rápido:
+
+```bash
+jq '.qualityFindings, .runtimeSummary' .captures/<run>/manifest.json
+```
+
+Los mismos bloques vienen ya formateados en el `index.html` del run y en `pnpm fe:capture:review`.
+
+**Regla:** una captura que "se ve bien" con findings sin leer es una verificación incompleta.
+
+## Falsos positivos conocidos (no los persigas)
+
+| Finding | Por qué aparece | Cómo confirmar que es falso positivo |
+|---|---|---|
+| `layout_element_overflow` sobre la tabla `sr-only` de `MetricTrendCard` | Esa tabla es el fallback accesible de la serie y usa `visuallyHidden` de MUI, que **la posiciona fuera del viewport a propósito** (`position: absolute` + `width: 1px` + `whiteSpace: nowrap`). Es exactamente la firma que busca el guard. | 1) El `selector` del finding resuelve a un nodo con `visuallyHidden` / `.sr-only` / `clip-path: inset(50%)`. 2) No hay `layout_horizontal_overflow` de página (`scrollWidth == clientWidth`). 3) En el frame **no se ve** nada cortado. Un overflow real siempre se ve. |
+
+Antes de "arreglar" un overflow, verifica que el elemento reportado sea visible. Si es un elemento
+`sr-only`, el patrón es deliberado y quitarlo rompe la accesibilidad.
+
 ## Que significan los estados / señales
 
 | Indicador | Significado |
@@ -407,6 +500,8 @@ Solo decláralos si **sabes** que posees la capability vigente. El audit log reg
 - **NUNCA** crear scenarios con `mutating: true` que toquen surfaces irreversibles (Pagos, Finiquitos, Releases) sin coordinar primero. Esos scenarios crean entidades reales en staging.
 - **NUNCA** invocar `tsx scripts/frontend/capture.ts` directo — usa siempre `pnpm fe:capture` para que el script entrypoint del package corra el resolve correcto.
 - **NUNCA** reinventar la generación del cookie de agent — el helper delega a `scripts/playwright-auth-setup.mjs` canónico.
+- **NUNCA** usar `mark fullPage` en una pantalla con charts — la evidencia sale con las cards vacías y se lee como un bug de producto inexistente. Usa `clipSelector` por región.
+- **NUNCA** cerrar una verificación mirando solo el PNG cuando el scenario declara `qualityProfile`. Lee `qualityFindings[]` + `runtimeSummary` del `manifest.json`.
 
 ## Problemas comunes
 
@@ -418,6 +513,10 @@ Solo decláralos si **sabes** que posees la capability vigente. El audit log reg
 | Step `hover` / `click` falla con timeout | Verifica el selector — usa DevTools del browser (con `--headed`) para inspeccionar y ajustar el selector |
 | GIF muy grande / muy lento | Reducir el `--gif` workflow — el helper produce 12 fps 800px por default. Para casos pesados, abrir `flipbook.gif` y comprimirlo con `gifsicle` después |
 | Tests vitest fallan luego de agregar steps | Los tests usan `getByText`/`getByRole`; al agregar elementos nuevos puedes introducir duplicados. Cambiar a `findByText`/`getAllByText` |
+| Las cards de métrica salen **vacías** en la captura pero se ven bien en el browser | Estás usando `mark fullPage` en una pantalla con charts. El fullPage redimensiona el viewport y el chart re-mide a tamaño 0. **No es un bug de producto.** Quita el `fullPage` y cubre con el frame del viewport real + `mark clipSelector` por región (ver "Charts y `fullPage`"). (TASK-1306, 2026-08-07.) |
+| `failureCategory: visual_timeout` en `--env=local`, pero la ruta abre bien en el browser | Es compilación de Turbopack, no un bug. El primer hit a una ruta nueva en `pnpm dev` puede pasar los 60s del `page.goto` (medido: 64s la primera vez, 0.1s la segunda). **Calienta la ruta antes de capturar:** `curl -s -o /dev/null -w '%{http_code} %{time_total}s\n' 'http://localhost:3000/mi/ruta'` y recién ahí corre `pnpm fe:capture`. Si el segundo intento también tarda, ahí sí es real → secuencia Turbopack canónica de `CLAUDE.md` antes de `pnpm clean`. |
+| La captura "funciona" pero grabó `/login`; o un script propio de Playwright con `.auth/storageState.json` no encuentra los selectores | La sesión del GVC expiró. Regenérala: `AGENT_AUTH_EMAIL=agent@greenhouse.efeonce.org node scripts/playwright-auth-setup.mjs`. ⚠️ El script **exige** `AGENT_AUTH_EMAIL`, no tiene default. Usa la persona de menor privilegio que represente el caso. Para que esto falle loud en vez de producir evidencia falsa, declara siempre en el scenario `assertions: [{ kind: 'noLoginRedirect' }]` + `readiness.absentSelectors: ['[data-testid="login-card"]']`. |
+| Findings de `layout_element_overflow` que no se ven en el frame | Puede ser el falso positivo conocido de la tabla `sr-only` de `MetricTrendCard`. Ver "Falsos positivos conocidos" antes de tocar nada. |
 | `mark fullPage` sale ilegible / con la barra lateral repetida | Artefacto conocido del stitch de `fullPage` cuando hay un sidebar `position: fixed` (la barra se pinta a cada altura de scroll) + el escalado achica el texto. **No uses `fullPage` para leer una sección puntual.** Agrega un `data-capture` a la sección y usa `{ kind: 'scroll', selector: '[data-capture="x"]' }` + `{ kind: 'mark', clipSelector: '[data-capture="x"]' }` → captura crisp a resolución real. `fullPage` queda para "ver el largo total", no para leer detalle. (TASK-1006, 2026-06-04.) |
 
 ## Referencias técnicas

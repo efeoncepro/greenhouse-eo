@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-08-05 por Claude (TASK-1299 + TASK-1301)
-> **Ultima actualizacion:** 2026-08-06 por Claude (TASK-1303: captura diaria de rankings + reader de evolucion + tool MCP `get_seo_rank_evolution`)
+> **Ultima actualizacion:** 2026-08-06 por Claude (captura de rankings ACTIVA en produccion — scheduler despausado, primera serie real de Berel)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
 
 # Modulo SEO — Search Visibility 360 (Growth)
@@ -88,7 +88,7 @@ TASK-1302 convierte esa consulta en vivo en una **serie propia de Greenhouse**: 
 
 > Detalle técnico: [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) · materializador y batch en [`src/lib/growth/seo/`](../../../src/lib/growth/seo/) · reader de oportunidades en [`src/lib/growth/seo/keyword-opportunities-reader.ts`](../../../src/lib/growth/seo/keyword-opportunities-reader.ts) · la conexión de origen es la de [Conexion a Google Search Console](conexion-search-console.md).
 
-### 4. La captura diaria de rankings y su serie de evolucion (TASK-1303 — code complete, cron pausado)
+### 4. La captura diaria de rankings y su serie de evolucion (TASK-1303 — ACTIVA en produccion)
 
 La segunda captura automatica del modulo: cada madrugada (05:00 Chile), para cada organizacion con el modulo `seo_v1` asignado, el sistema le pregunta a Google (via el proveedor DataForSEO) **en que posicion exacta aparece el dominio para cada keyword trackeada** — incluyendo si el resultado trae AI Overview u otras features del buscador. Cada medicion se guarda como una fila inmutable en `seo_rank_snapshots` y se espeja automaticamente a BigQuery (`greenhouse_growth_analytics.seo_rank_history`) para conservar la historia larga.
 
@@ -100,17 +100,99 @@ Piezas clave, en lenguaje simple:
 - **El reader de evolucion** (`readRankEvolution`) devuelve la pelicula: por keyword, la lista de fechas con posicion y URL. Rangos de hasta 6 meses salen de la base operativa; rangos mas largos, de la historia en BigQuery. Esta serie es la de mercado (posicion exacta) y **nunca se mezcla ni promedia** con la serie de Search Console (posicion promediada del propio dominio) — son fuentes distintas que se leen juntas recien en la capa de reporte.
 - **Ya se puede consultar por MCP**: la tool `get_seo_rank_evolution` quedo registrada en el mismo PR (mandato parity), junto a las tres de TASK-1645.
 
-**Estado real (2026-08-06):** el codigo esta completo y probado, pero el cron nace **PAUSADO** a proposito: el costo del proveedor es el riesgo #1 del programa y la primera corrida real se habilita a mano tras verificar el control de presupuesto en staging (Berel primero). Mientras este pausado, la señal `seo.rank.capture_lag` en `/admin/operations` muestra warning para los targets elegibles sin captura — es el recordatorio honesto de que hay una serie contratada que aun no corre. El paso a paso para despausar, verificar y revertir esta en el manual [Operar la captura diaria de rankings](../../manual-de-uso/growth/operar-captura-rankings-seo.md).
+**Estado real (2026-08-06):** la captura esta **ACTIVA en produccion**. El cron nacio pausado a proposito (el costo del proveedor es el riesgo #1 del programa) y se habilito el mismo 2026-08-06 tras verificar la cadena completa con dinero real: smoke E2E con Berel (captura → gate de costo → ledger → mirror BigQuery → reader). El scheduler corre todos los dias a las 05:00 de Santiago, y la primera serie real ya existe: **Berel con 31 keywords** — la marca en #1 y "pintura para alberca" en #2 **con AI Overview presente** en el SERP. La señal `seo.rank.capture_lag` en `/admin/operations` vigila que la serie siga corriendo (warning si un target elegible deja de capturarse). El paso a paso para operar, verificar y revertir esta en el manual [Operar la captura diaria de rankings](../../manual-de-uso/growth/operar-captura-rankings-seo.md).
 
 > Detalle tecnico: command y batch en [`src/lib/growth/seo/rank-capture.ts`](../../../src/lib/growth/seo/rank-capture.ts) y [`rank-capture-batch.ts`](../../../src/lib/growth/seo/rank-capture-batch.ts) · reader en [`rank-evolution-reader.ts`](../../../src/lib/growth/seo/rank-evolution-reader.ts) · mirror en [`rank-history-bq-mirror.ts`](../../../src/lib/growth/seo/rank-history-bq-mirror.ts) · arquitectura §8 de [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md).
 
+## El site audit tecnico y el perfil de enlaces (TASK-1304)
+
+Las otras dos preguntas del modulo — "¿qué está roto técnicamente?" y "¿qué te
+enlaza?" — se responden con dos capturas semanales:
+
+- **Site audit (OnPage)**: un crawl del sitio del cliente que produce un puntaje de
+  salud (0–100), el conteo de páginas crawleadas y una lista de hallazgos agrupados por
+  severidad (críticos, advertencias, avisos): páginas rotas, canonicals mal apuntados,
+  títulos/descripciones faltantes o duplicados, datos estructurados con errores, etc.
+  Como el crawl puede tardar de minutos a horas, funciona en **dos fases**: un proceso
+  encola el crawl (lunes de madrugada) y otro pasa cada 30 minutos preguntando si
+  terminó; cuando termina, guarda el resultado exactamente una vez. Un audit que
+  termina **sin hallazgos** significa "sitio técnicamente limpio" — nunca se confunde
+  con un crawl que falló.
+- **Snapshot de backlinks**: una foto semanal del perfil de enlaces — cuántos dominios
+  enlazan al sitio, cuántos enlaces en total, el rank del dominio en escala 0–100
+  (comparable con el DR/DA de otras suites), qué proporción del perfil es tóxica y
+  cuántos enlaces se ganaron/perdieron en los últimos 30 días.
+
+Ambas corridas cuestan dinero del proveedor y pasan por el mismo chokepoint de cupos y
+presupuesto; el site audit además consume el **cupo mensual de audits** del tier. Los
+resultados se consultan con los readers `readSiteAuditReport` y `readBacklinkProfile`,
+por MCP (`get_seo_site_audit_report`, `get_seo_backlink_profile`) y — cuando llegue
+TASK-1309 — en la UI del portal. La señal `seo.audit.stuck_tasks` en `/admin/operations`
+vigila que ningún crawl quede colgado.
+
+**Estado real (2026-08-06):** código completo y verificado con un smoke real
+(crawl acotado + snapshot de backlinks con dinero real), pero los tres schedulers
+**nacen pausados** hasta el rollout. El paso a paso está en el manual
+[Operar el site audit y los backlinks](../../manual-de-uso/growth/operar-site-audit-backlinks-seo.md).
+
+> Detalle tecnico: commands y readers en [`src/lib/growth/seo/site-audit/`](../../../src/lib/growth/seo/site-audit/) y [`backlinks/`](../../../src/lib/growth/seo/backlinks/) · handlers y schedulers en `services/ops-worker/` · arquitectura §6–§8 de [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md).
+
+
+## 5. El cockpit Overview: la primera pantalla del modulo (TASK-1306)
+
+`/admin/growth/seo` es la puerta de entrada operador del modulo y la casa de la seccion
+local **Search Visibility** (pestañas Resumen · Rendimiento · Keywords · Auditoria).
+Responde una sola pregunta: **¿como esta la salud de busqueda de este Space y que necesita
+atencion hoy?**
+
+**Que muestra**
+
+| Zona | Que responde |
+|---|---|
+| Selector de Space + chip de frescura | Sobre que cliente miras y hasta que dia llegan los datos medidos |
+| Leyenda medido / estimado | De donde sale cada numero |
+| 4 KPIs norte | Clics, impresiones, posicion promedio y CTR del periodo |
+| Evolucion de visibilidad | Como se movieron los clics y la posicion en el tiempo |
+| Salud del sitio | Puntaje tecnico de la ultima auditoria + hallazgos por severidad |
+| Movimientos de la semana | Keywords que subieron o bajaron 5 posiciones o mas |
+| Rankean pero la IA no las cita | Donde apareces en Google pero no en respuestas de IA |
+
+**Quien la ve.** Hacen falta tres cosas a la vez: un rol con la vista habilitada
+(`efeonce_admin` o `ai_tooling_admin`), el permiso `growth.seo.observation.read`, y que el
+Space tenga el modulo SEO contratado. Si falta lo tercero, el Space no aparece en el
+selector. Con el modulo apagado por flag, la ruta directamente no existe (404).
+
+**Las reglas de honestidad que codifica**
+
+- **La posicion funciona al reves.** Pasar de la posicion 8 a la 3 es mejorar: la flecha
+  hacia abajo se pinta **verde** y el texto lo dice; no se deja al color.
+- **Sin Search Console no hay panel.** Se muestra un aviso accionable, nunca ceros: un
+  cero significa "medimos y dio cero", cuando la verdad es "no medimos".
+- **Medido no es estimado.** Search Console es dato real del sitio; el proveedor externo
+  es estimacion de mercado. Se marcan distinto y **nunca se promedian**.
+- **Si falta un dato, dice que falta y por que.** Cada tarjeta del panel derecho degrada
+  por separado: si la auditoria no responde, esa tarjeta dice "Pendiente: ..." y las
+  otras dos siguen funcionando.
+- **Si no hay con que comparar, no se inventa la comparacion.** Un Space recien conectado
+  no muestra flechas de variacion porque no existe un periodo anterior con datos.
+- **SEO y AEO nunca se funden.** Rankear primero y no ser citado por la IA es una señal de
+  negocio, no un error a reconciliar en un puntaje unico.
+
+**Que NO hace.** No edita keywords ni configuracion, no dispara analisis nuevos (relee lo
+guardado, sin gastar presupuesto de proveedor), no muestra dos Spaces a la vez, y no es la
+pelicula por URL (esa es la pestaña **Rendimiento**, TASK-1307, todavia en construccion —
+las pestañas hermanas aparecen deshabilitadas hasta que existan).
+
+> Detalle tecnico: la surface es consumidora de solo lectura de los readers gobernados de
+> `src/lib/growth/seo/**`. El mismo calculo de KPIs lo consumen Nexa y el lane MCP
+> (`get_seo_overview_kpis`) por construccion — no hay una segunda implementacion.
+
 ## Que NO existe todavia
 
-Lo siguiente aún no está construido (las series que ya se llenan: Search Console live; rankings code-complete con cron pausado). **Sí existen ya** — además del schema y el modelo de acceso — el cruce SEO ↔ AEO (`readSeoAeoGap` + matriz quadrant 360, TASK-1305) y la **operación por MCP live en producción desde el 2026-08-06**: lane ecosystem + 3 tools read-only (`get_seo_entitlement`, `get_seo_keyword_opportunities`, `get_seo_visibility_360`) en el MCP interno de Greenhouse (TASK-1645, ver el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md) §8) **y federadas al gateway público `mcp.efeonce.org`** (TASK-1647). La lectura funcional completa de esa capacidad está en [Search Visibility 360 por MCP](search-visibility-360-por-mcp.md). Pendiente:
+Lo siguiente aún no está construido (las series que ya se llenan: Search Console live; rankings live desde el 2026-08-06). **Sí existen ya** — además del schema y el modelo de acceso — el cruce SEO ↔ AEO (`readSeoAeoGap` + matriz quadrant 360, TASK-1305) y la **operación por MCP live en producción desde el 2026-08-06**: lane ecosystem + 3 tools read-only (`get_seo_entitlement`, `get_seo_keyword_opportunities`, `get_seo_visibility_360`) en el MCP interno de Greenhouse (TASK-1645, ver el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md) §8) **y federadas al gateway público `mcp.efeonce.org`** (TASK-1647). La lectura funcional completa de esa capacidad está en [Search Visibility 360 por MCP](search-visibility-360-por-mcp.md). Pendiente:
 
 | Falta | Task que lo trae |
 |---|---|
-| Site audit (queue + poll OnPage async) y snapshot semanal de backlinks | TASK-1304 |
 | UI operador `/admin/growth/seo` (overview) | TASK-1306 |
 | Pantalla ancla: Rank & URL performance over time | TASK-1307 |
 | Keyword opportunities (UI) | TASK-1308 |

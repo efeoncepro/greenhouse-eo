@@ -212,6 +212,7 @@ import type { OperationsOverview } from '@/lib/operations/get-operations-overvie
 - No usar `elevation > 0` en cards internas (usar `variant='outlined'`)
 - No mezclar español e inglés en la misma surface
 - No hardcodear colores — siempre `theme.palette.*`
+- No pasar `theme.palette.*` crudo a las opciones de un chart **ApexCharts**: el theme corre con `cssVariables: true`, así que el valor es `var(--mui-palette-*)` y el parser de color de Apex revienta con un `pageerror` silencioso (el chart no pinta y no se ve ningún error). Usar `resolveApexColor(valor, fallbackHex)` — contrato en [PRIMITIVES.md § Color del theme en ApexCharts](./PRIMITIVES.md#color-del-theme-en-apexcharts--resolveapexcolor-task-1306). Recharts no lo necesita (resuelve la var el navegador)
 - No hardcodear spacing/radius — spacing usa `theme.spacing(N)`; radius usa `theme.shape.customBorderRadius.*` convertido a CSS length (`${...}px`) dentro de `sx`
 - No crear stat displays custom cuando un card-statistics component sirve
 - No usar Redux para estado local — `useState` o `react-hook-form`

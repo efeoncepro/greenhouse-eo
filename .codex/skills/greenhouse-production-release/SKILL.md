@@ -243,7 +243,11 @@ Después: esperar `CI` + `CI Deep Verification` + Vercel `Ready` **para el SHA d
 del dispatch (el 2026-08-06 fueron 24 min); y polear `pending_deployments` en
 loop desde el arranque para los DOS gates `production` (gotcha #6).
 
-## Gotchas conocidos del release (verificados 2026-07-03 #139 y 2026-08-06 #177; fix de raíz de #2 = ISSUE-114)
+La pre-empción incluye además verificar que el último deploy de **staging** no
+esté `CANCELED` (gotcha #7) antes del dispatch — un push docs-only a `develop`
+cancelado por el ignore-build quema el run del orquestador.
+
+## Gotchas conocidos del release (verificados 2026-07-03 #139 y 2026-08-06 #177/#178; fix de raíz de #2 = ISSUE-114)
 
 El flujo de **squash-merge** produce condiciones recurrentes que NO son fallas reales. No las persigas como bugs; aplica la mitigación:
 
@@ -285,6 +289,33 @@ El flujo de **squash-merge** produce condiciones recurrentes que NO son fallas r
    se omite:** en `41aefb457` el 2do gate quedó sin aprobar ~43 min → el run stalleó todo
    ese tiempo. **Regla: aprobar SIEMPRE ambos gates `production` de inmediato.** (Este es
    el "siempre se quedan waiting" de los jobs Azure: no es una falla, es el 2do gate.)
+
+7. **Pushes docs-only a `develop` justo antes del release cancelan el build de staging y bloquean el
+   preflight (verificado 2026-08-06, release `fcee5ab9f7ce`).** El Ignored Build Step de Vercel
+   (`scripts/ci/vercel-ignore-build.mjs`, gotcha #5) cancela los builds docs-only de `develop`; el
+   check `vercel_environments` del preflight exige que el deploy más reciente de **staging** esté
+   `READY` y falla con "Production READY, pero staging deploy CANCELED" (severity `warning` pero
+   **exit 1** → run del orquestador quemado: run `31104631142`).
+   **Resolución verificada 2026-08-06 — producir la evidencia, no bypassear:**
+   `vercel redeploy <url-del-deployment-cancelado> --scope efeonce-7670142f` (~6 min de build),
+   esperar `READY` y re-dispatchar. Pre-empción: **secuenciar los pushes docs-only para DESPUÉS del
+   release** y verificar que el último deploy de staging no esté `CANCELED` antes del dispatch.
+
+8. **El merge canónico `-X ours` puede colar contenido de `main` que `develop` corrigió DESPUÉS del
+   último release (verificado 2026-08-06, release `fcee5ab9f7ce`).** `-X ours` solo decide los hunks
+   en conflicto; los hunks de `main` que aplican limpio **entran** — y si `develop` había eliminado
+   esa línea después del release anterior, el merge la resucita como regresión real. Caso real:
+   `git merge origin/main -X ours` trajo a `develop` 1 línea de `src/lib/ai/dataforseo.ts`
+   (`dataForSeoBreaker.recordFailure(family)` incondicional) que la auditoría de TASK-1300 había
+   eliminado en `develop` después del release anterior — habría contado 4xx de caller y abierto el
+   breaker. La verificación 2 del gotcha #1 (`git diff HEAD@{1} HEAD -- src/ scripts/ services/
+   migrations/` vacío) es exactamente la que lo detecta — por eso no se omite.
+   **Resolución verificada 2026-08-06:** cuando la verificación 1 (`git log origin/main --not HEAD`)
+   está vacía y la 2 muestra drift regresivo main→develop: `git reset --hard HEAD@{1}` y
+   `git merge origin/main -s ours --no-edit` (estrategia `ours` COMPLETA: árbol de `develop` EXACTO,
+   ancestría avanzada, PR MERGEABLE). Verificar que `git diff HEAD@{1} HEAD` salga **totalmente**
+   vacío. Regla: `-s ours` solo es legítimo cuando la verificación 1 está vacía (`main` no tiene
+   commits únicos); si no lo está, esos commits se perderían — ahí el merge se resuelve a mano.
 
 ## What The Orchestrator Owns
 

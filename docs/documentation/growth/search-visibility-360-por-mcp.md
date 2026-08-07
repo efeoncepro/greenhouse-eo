@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.2
 > **Creado:** 2026-08-06 por Claude (TASK-1645 + TASK-1647)
-> **Ultima actualizacion:** 2026-08-06 por Claude (cutover MCP-first a produccion)
+> **Ultima actualizacion:** 2026-08-06 por Claude (clientes MCP estándar con login de usuario; cuarta consulta federada al gateway)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) · [EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md](../../architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md)
 > **Manual de uso:** [Operar el provider Greenhouse-SEO del MCP](../../manual-de-uso/plataforma/operar-provider-greenhouse-seo-mcp.md)
 
@@ -23,11 +23,13 @@ Hay tres piezas y cada una tiene un dueño distinto:
 2. **El adaptador de SEO** dentro de ese punto de acceso no sabe nada de SEO. Solo transporta la pregunta hasta Greenhouse con la identidad de servicio del gateway.
 3. **Greenhouse decide y responde.** Ahí vive todo: si la organización tiene el módulo contratado, cuánto cupo le queda, qué datos existen y cuáles no.
 
+Desde ese mismo 6 de agosto, conectarse ya no exige una identidad de servicio ni un script especial: **cualquier persona del tenant Entra de Efeonce puede conectar su propio cliente MCP estándar** (Claude Code, claude.ai o Claude Desktop) al punto de acceso, iniciar sesión con su cuenta corporativa y operar las cuatro consultas conversacionalmente. Los pasos exactos están en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md).
+
 La consecuencia práctica: **conectar un asistente de IA no otorga ningún permiso nuevo**. Las mismas reglas que aplican a la UI aplican a la consulta por MCP, porque es literalmente la misma puerta. Si un dato no se puede ver en el portal, tampoco se puede ver desde un asistente.
 
 ## Que responde cada consulta
 
-Hay **tres consultas disponibles, todas de solo lectura**. Ninguna dispara una medición nueva ni gasta presupuesto de proveedor.
+Hay **cuatro consultas disponibles, todas de solo lectura**. Ninguna dispara una medición nueva ni gasta presupuesto de proveedor. Las cuatro están federadas en el punto de acceso público (la cuarta se federó el mismo 6 de agosto, `TASK-1653`).
 
 ### 1. Estado del módulo (`get_seo_entitlement`)
 
@@ -69,6 +71,19 @@ Es la lectura que da nombre al producto: cruza **posición orgánica medida** (�
 
 **Los dos ejes nunca se promedian.** "Rankeas primero y la IA no te cita" no es un error de medición ni un dato que haya que reconciliar: es una celda de la matriz. Promediar rankeo y citabilidad produciría un número intermedio que no describe ninguna situación real y esconde exactamente la que más importa (`riesgo`).
 
+### 4. Evolución de posiciones (`get_seo_rank_evolution`)
+
+Es la serie temporal de **posiciones exactas por keyword**: dónde apareció el dominio en Google cada día. La fuente es el proveedor de rankings (DataForSEO), que mide la posición observada en el mercado — no una estimación. La captura corre sola una vez al día; esta consulta **solo lee** lo ya capturado.
+
+Acepta cuatro filtros opcionales: la ventana en días (`rangeDays`), el motor (`engine`), el dispositivo (`device`: escritorio, móvil o tablet) y un subconjunto de keywords (`keywords`).
+
+Dos reglas de lectura que un asistente está obligado a respetar:
+
+- **`position: null` en una fecha significa "ese día el dominio no rankeó"**. Es una medición válida — el proveedor buscó y el dominio no apareció —, no un dato faltante ni un error. No se rellena ni se interpola.
+- **Esta serie nunca se promedia con la de Search Console.** Miden cosas distintas: DataForSEO mide la posición exacta observada; Search Console reporta la posición ponderada por impresiones reales. Mezclarlas produce un número que no describe ninguna de las dos verdades.
+
+**Estado de esta consulta:** está viva en el MCP interno de producción desde el 6 de agosto de 2026, con captura diaria activa, y ese mismo día quedó federada al punto de acceso público `mcp.efeonce.org` (`TASK-1653`) — un cliente del gateway ya la ve junto a las otras tres.
+
 ## Que pasa cuando falta una lente
 
 Esta es la regla más importante para leer una respuesta y **la que un asistente de IA está obligado a respetar**: cuando un dato no está, se dice que no está. Nunca se rellena con ceros.
@@ -98,7 +113,7 @@ Sobre una organización **sin** el módulo, las dos consultas de datos responden
 
 ## Que NO se puede hacer por aquí
 
-- **Nada que escriba.** Las tres consultas son de lectura. No configuran targets, no agregan keywords, no disparan auditorías, no cambian entitlements.
+- **Nada que escriba.** Las cuatro consultas son de lectura. No configuran targets, no agregan keywords, no disparan auditorías, no cambian entitlements.
 - **Nada que cueste dinero.** Ninguna consulta llama al proveedor pagado. Las corridas que sí cuestan (rankings, auditoría técnica, backlinks) pasan por el control de cupo y presupuesto del módulo, y no están expuestas por MCP.
 - **Nada fuera del alcance del conector.** Un conector ligado a una organización solo ve la suya. Pedir otra devuelve "no existe".
 
@@ -109,4 +124,4 @@ Sobre una organización **sin** el módulo, las dos consultas de datos responden
 - El [módulo SEO](modulo-seo-search-visibility-360.md) es el motor que produce los datos que estas consultas leen.
 - El [AI Visibility Grader](ai-visibility-grader.md) aporta el eje de citabilidad IA del cruce 360.
 - El [Efeonce MCP Gateway](../plataforma/efeonce-mcp-gateway.md) es el punto de acceso federado; Search Visibility 360 es su segunda capacidad, después del lector de flota de Globe.
-- El [MCP read-only de Greenhouse](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md) expone las mismas tres consultas para uso interno del portal, sin pasar por el gateway público.
+- El [MCP read-only de Greenhouse](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md) expone estas mismas consultas para uso interno del portal, sin pasar por el gateway público.

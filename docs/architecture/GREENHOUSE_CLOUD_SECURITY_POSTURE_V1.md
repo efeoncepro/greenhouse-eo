@@ -2,7 +2,7 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-28
-> **Last updated:** 2026-05-09
+> **Last updated:** 2026-08-07
 > **Audience:** Platform engineers, security reviewers, on-call operators
 > **Companion doc:** `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` (resource inventory)
 > **Task track:** TASK-096, TASK-098 through TASK-103 (Cloud Posture Hardening 1–7)
@@ -336,6 +336,18 @@ It is **not** a task execution plan — each task has its own detailed spec unde
 ---
 
 ## 3. Target Architecture
+
+### 3.0 Local agent authentication lane
+
+La autenticación interactiva local de Gcloud tiene dos carriles independientes: `gcloud auth login` para la
+CLI y `gcloud auth application-default login` para ADC. Cuando el operador solicita una renovación, Codex o
+Claude deben invocar `greenhouse-gcloud-auth-playwright` y usar `pnpm gcloud:auth:playwright -- --force`, que
+completa el OAuth estándar mediante Playwright y termina con `scripts/gcloud-auth-preflight.sh`.
+
+Este carril es tooling local: no cambia IAM, runtime, deploy ni la postura de credenciales de producción. La
+clave auxiliar vive solo en `.auth/gcloud-auth-credentials.json`, ignorada por Git y protegida con `0600`;
+nunca se registra su valor, el código OAuth, las cookies ni las URLs de autorización. El procedimiento operativo
+completo está en [`gcloud-auth-playwright.md`](../manual-de-uso/operations/gcloud-auth-playwright.md).
 
 ### 3.1 Secret Management Strategy
 

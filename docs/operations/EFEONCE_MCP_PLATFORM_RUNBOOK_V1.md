@@ -70,6 +70,7 @@ Este estado no habilita clientes externos ni multitenancy.
 | `OAUTH_ISSUER` | no | issuer exacto descubierto y validado |
 | `OAUTH_JWKS_URI` | no | JWKS HTTPS del authorization server |
 | `OAUTH_AUDIENCE` | no | identificador exacto emitido en `aud`; Entra v2 usa el App ID del recurso, no su URL pública |
+| `OAUTH_PUBLIC_CLIENT_ID` | no | client público PKCE pre-registrado que devuelve `POST /register` (shim DCR); declarada en `deploy.yml` con default `32617b87-e7ef-493a-838f-1ff3f0213b93` |
 | `GLOBE_PROVIDER_ENABLED` | no | default `false`; sólo `true` con canary/IAM verdes |
 | `GLOBE_API_URL` | no | URL IAM-private de la API Globe |
 | `GLOBE_API_AUDIENCE` | no | audience exacta para el ID token Google |
@@ -129,7 +130,8 @@ o no honra el resource/audience del endpoint canónico.
 Canary Entra vigente:
 
 - resource parameter: `https://mcp.efeonce.org/mcp`;
-- cliente público PKCE de diagnóstico: `32617b87-e7ef-493a-838f-1ff3f0213b93`, sin secreto;
+- cliente público PKCE de diagnóstico: `32617b87-e7ef-493a-838f-1ff3f0213b93`, sin secreto; desde 2026-08-06
+  es también el client que el shim DCR devuelve a todo cliente MCP estándar (ver sección del shim más abajo);
 - canary público end-to-end aprobado por `mcp.efeonce.org`: initialize autenticado `200` y
   `globe.producer.fleet.list` `200` con rutas derivadas de Globe.
 
@@ -148,6 +150,76 @@ Cuando la caché del resolver local no contiene el record recién publicado, el 
 de diagnóstico hacia la IP global **con SNI y `Host` públicos** para validar el front door. Ese override no es
 configuración runtime, no cambia DNS autoritativo ni permite omitir TLS/OAuth; los resultados de producción se
 atribuyen al hostname canónico `mcp.efeonce.org`.
+
+## Shim DCR para clientes MCP estándar — 2026-08-06
+
+Los clientes MCP estándar (Claude Code, custom connectors de claude.ai, Claude Desktop) exigen dynamic client
+registration RFC 7591, que Entra no soporta. El gateway lo resuelve con un shim de compatibilidad (racional y
+alternativa rechazada en el delta 2026-08-06 del ADR del gateway; formalización pendiente como `TASK-1654`):
+
+- el protected-resource metadata anuncia al propio gateway como authorization server;
+- el gateway publica `/.well-known/oauth-authorization-server` espejando los endpoints reales de Entra
+  (authorize/token/jwks, cacheados de su configuración OIDC) más un `registration_endpoint` propio;
+- `POST /register` nunca crea aplicaciones: devuelve siempre el cliente público pre-registrado
+  `32617b87-e7ef-493a-838f-1ff3f0213b93` (PKCE, `token_endpoint_auth_method: none`), gateado por
+  `OAUTH_PUBLIC_CLIENT_ID`;
+- los scopes se anuncian cualificados como `https://mcp.efeonce.org/mcp/<scope>`, porque Entra v2 resuelve un
+  scope pelado contra Microsoft Graph (`AADSTS650053`); el claim `scp` del token vuelve pelado, así que el
+  verifier y los checks por-tool no cambiaron.
+
+Los tokens los sigue emitiendo y validando Entra; el shim sólo re-anuncia metadata de descubrimiento y un
+client fijo. No habilita clientes externos ni B2B: sólo usuarios con cuenta Entra del tenant.
+
+### Verificación del shim
+
+```bash
+curl -s https://mcp.efeonce.org/.well-known/oauth-protected-resource
+curl -s https://mcp.efeonce.org/.well-known/oauth-authorization-server
+curl -s -X POST https://mcp.efeonce.org/register \
+  -H 'content-type: application/json' \
+  -d '{"redirect_uris":["http://localhost"]}'
+```
+
+Esperado:
+
+1. el protected-resource metadata anuncia `https://mcp.efeonce.org` como authorization server y los scopes
+   cualificados `https://mcp.efeonce.org/mcp/<scope>`;
+2. el authorization-server metadata espeja authorize/token/jwks reales de Entra y declara el
+   `registration_endpoint` del gateway;
+3. `POST /register` responde el `client_id` `32617b87-e7ef-493a-838f-1ff3f0213b93` sin crear ninguna app
+   (verifica en el tenant Entra que no aparezcan app registrations nuevas).
+
+Prueba end-to-end: conectar un cliente MCP real. Verificado el 2026-08-06 con Claude Code, que autenticó y
+conectó ("Authentication successful"/Connected) contra `mcp.efeonce.org`.
+
+### Redirect URIs de la app Entra
+
+La app pública `32617b87-e7ef-493a-838f-1ff3f0213b93` declara tres redirect URIs:
+
+- `http://localhost` — loopback de Claude Code;
+- `https://claude.ai/api/mcp/auth_callback` — custom connectors de claude.ai;
+- `http://localhost:8765/callback` — canary/scripts locales (previa).
+
+### Precedente break-glass — deploy por gcloud durante outage de GitHub Actions
+
+Los dos fixes del shim se desplegaron por `gcloud` directo porque GitHub Actions estaba en major outage:
+
+- revisión `efeonce-mcp-gateway-00015-4st` — shim DCR;
+- revisión `efeonce-mcp-gateway-00016-6zh` — scopes cualificados;
+- commits en `main` de `efeonce-mcp`: `ff68078`, `2365ef9`, `ae8f2f7`, `56e46f7`;
+- canary 4/4 verde post-deploy.
+
+Cuando Actions se recupere, el deploy normal del workflow converge sin trabajo extra: `deploy.yml` ya declara
+`OAUTH_PUBLIC_CLIENT_ID` (con default). Rollback del shim: mover el tráfico a la revisión previa verificada:
+
+```bash
+gcloud run services update-traffic efeonce-mcp-gateway \
+  --region=southamerica-west1 --project=efeonce-group \
+  --to-revisions=<revision-previa>=100
+```
+
+Un break-glass exige commits ya en `main` (nunca working tree sucio), canary completo post-deploy y registro en
+este runbook; no se convierte en el camino normal de deploy.
 
 ## Globe canary
 
@@ -276,7 +348,9 @@ público) y `seoDenyFailedClosed=true`.
 
 **Este smoke exige un login Entra interactivo** (authorization-code + PKCE con callback en `localhost:8765`): es
 asistido por humano y **no es automatizable en CI**. No lo sustituyas por el canary del provider — ese no pasa
-por OAuth ni por el edge.
+por OAuth ni por el edge. Desde 2026-08-06 el script ya no es la única vía autenticada: cualquier usuario con
+cuenta Entra del tenant puede conectar un cliente MCP estándar (Claude Code, claude.ai, Claude Desktop) gracias
+al shim DCR (ver su sección), pero la restricción para CI sigue vigente.
 
 La pantalla de callback del canary es una página HTML autocontenida (light/dark, logotipo Efeonce inline) que
 **limpia el authorization code de la URL con `history.replaceState`**: el code viajaba en el query string y
@@ -292,8 +366,9 @@ curl -s https://mcp.efeonce.org/.well-known/oauth-protected-resource
 curl -s -i -X POST https://mcp.efeonce.org/mcp -H 'content-type: application/json' -d '{}' | head -20
 ```
 
-Esperado el 2026-08-06: `/health` `200`; protected-resource metadata `200` declarando los 3 scopes; `POST /mcp`
-anónimo `401` con `WWW-Authenticate: Bearer resource_metadata=… scope="efeonce.mcp.read"`.
+Esperado el 2026-08-06: `/health` `200`; protected-resource metadata `200` declarando los 3 scopes (desde el
+shim DCR, anunciados cualificados como `https://mcp.efeonce.org/mcp/<scope>`); `POST /mcp` anónimo `401` con
+`WWW-Authenticate: Bearer resource_metadata=… scope="efeonce.mcp.read"`.
 
 ### Rollback del provider
 

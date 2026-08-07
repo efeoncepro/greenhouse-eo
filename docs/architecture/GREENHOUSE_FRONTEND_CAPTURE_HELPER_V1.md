@@ -7,7 +7,7 @@ Nombre canonico de producto interno: **Greenhouse Visual Capture** (`GVC`).
 ## Status
 
 - Estado: `accepted`
-- Version: `1.8`
+- Version: `1.11`
 - Fecha V1.0: `2026-05-12 mañana` — Slice 0-3 (CLI + scenario + recorder + docs)
 - Fecha V1.1: `2026-05-12 tarde` — Delta OQ-1..OQ-6 (upload, device, diff, capability, reliability, ui-review scaffolding)
 - Fecha V1.2: `2026-05-29` — Hook operativo para verificación visual UI obligatoria vía `pnpm fe:capture` y comandos relacionados
@@ -20,6 +20,7 @@ Nombre canonico de producto interno: **Greenhouse Visual Capture** (`GVC`).
 - Fecha V1.8: `2026-06-12` — explore mode + scenario promotion (TASK-1098): `pnpm fe:capture:explore --route=X` observa la página viva (read-only) y persiste `.captures/_explore/<slug>/` con candidatos `getByRole(...)` + uniqueness validada + markers + probes; `pnpm fe:capture:promote --route=X --name=<n>` cristaliza la sesión en un `.scenario.ts` válido (gate `validateScenario`). Cierra el loop observe→author→determinismo (`spawn→inspect→discard` de Webwright aplicado a la autoría). El output durable se queda gobernado/determinístico; cero code-as-action en runtime. Microinteracciones/coreografía siguen vía el step `interaction` (V2) / `fe:capture:micro` — promote emite baseline estático.
 - Fecha V1.9: `2026-06-12` — explore de microinteracciones (TASK-1099): `fe:capture:explore --route=X --interaction '<hover|focus|click>:<selector>'` performa la acción (read-only — rechaza fill/press) y observa `before`/`feedback`/`settled`; `promote` auto-emite un step `interaction` (V2) válido (frames + keyboardEquivalent + `reducedMotion:'capture'`). Lleva el loop observe→author a la coreografía. Hallazgo: la readiness auto de promote, anclada a un heading con copy dinámico, es flaky → revisar/preferir marker estable.
 - Fecha V1.10: `2026-06-12` — explore mide los timings reales de la microinteracción (TASK-1100): tras la acción muestrea el clip del target cada 50ms hasta `--interaction-window` (default 1000) y deriva `feedback`/`settled` por pixel-diff (`detectInteractionTimings` + `lib/visual-diff`). Mide cualquier motion (CSS/framer-motion/GSAP). `measuredTimings:false` + fallback honesto si no hay cambio visible. `promote` emite el step `interaction` con los `atMs` medidos.
+- Fecha V1.11: `2026-08-07` — hallazgos operativos verificados en TASK-1306 (cockpit SEO Overview): `fullPage` incompatible con superficies que tienen charts que miden su contenedor; `qualityProfile: 'standard'` como gate real (no adorno) y cómo leer su salida en el manifest; falso positivo conocido `layout_element_overflow` sobre tablas `sr-only`; `visual_timeout` en local suele ser compilación Turbopack; expiración de `.auth/storageState.json`. Ver § Delta 2026-08-07.
 - Owner: `Claude / Greenhouse frontend tooling`
 - Relacionado con:
   - `scripts/frontend/` (implementación canónica)
@@ -353,6 +354,8 @@ Append-only JSONL en `.captures/audit.jsonl`. Cada run agrega: timestamp, route,
 - **NUNCA** invocar `tsx scripts/frontend/capture.ts` directo — usar `pnpm fe:capture` para que tsx resuelva paths correctamente.
 - **NUNCA** usar `scrollY` como unica forma de llegar a una sección estable si existe un selector posible.
 - **NUNCA** combinar `fullPage` y `clipSelector` en el mismo `mark`.
+- **NUNCA** usar `mark fullPage` en una superficie que renderiza charts que miden su contenedor (Recharts `ResponsiveContainer`, ApexCharts). El screenshot fullPage de Playwright redimensiona el viewport para hacer el stitch y el chart re-mide a tamaño 0 → la evidencia sale con las cards **vacías** y parece un bug de producto que NO existe (TASK-1306, 2026-08-07). Cubrir con el frame del viewport real + `clipSelector` por región; en mobile, `scroll` + un `mark` por zona.
+- **NUNCA** cerrar una verificación visual mirando solo el PNG cuando el scenario declara `qualityProfile`. El diagnóstico vive en `manifest.qualityFindings[]` + `manifest.runtimeSummary`, no en el frame ni en el log de consola: hay clases enteras de defecto (excepciones de runtime, violaciones axe, overflow, targets <24px) que el ojo no ve.
 - **NUNCA** usar `mark fullPage` para LEER el detalle de una sección cuando la pantalla tiene un sidebar `position: fixed` — el stitch de fullPage repite el elemento fijo a cada altura de scroll y el escalado vuelve el texto ilegible (TASK-1006, 2026-06-04). Para leer detalle/copy: `data-capture` en la sección + `scroll selector` + `mark clipSelector` (crisp, resolución real). `fullPage` es para "ver el largo total", no para auditar detalle.
 - **NUNCA** committear `.captures/` ni `.auth/` — ambos en `.gitignore`.
 - **NUNCA** loggear bypass secret a stdout / manifest / audit / stderr.
@@ -515,3 +518,152 @@ tsx/esbuild `keepNames` envuelve arrow-consts nombradas dentro de `page.evaluate
 ### Verificación live (2026-06-07, `--env=local`)
 
 `stale → promote → match (0px)` end-to-end; hydration warning detectado; layout/perf/rubric/keyboard funcionando; `fe:capture:review` (resumen ejecutivo + baseline diff + rubric) y `fe:capture:health` (tolerante a manifests mixtos) verdes.
+
+## Delta 2026-08-07 — Hallazgos operativos verificados en TASK-1306 (V1.11)
+
+Cinco hallazgos reales del loop GVC del cockpit SEO Overview (`/admin/growth/seo`, EPIC-022). Todos son
+**trampas que cuestan tiempo de diagnóstico equivocado**: cuatro de las cinco hacen que el operador crea
+que hay un bug de producto cuando el defecto está en la captura o en el entorno. Se canonizan acá porque
+ninguna es específica de esa pantalla — cualquier superficie con charts, cualquier ruta nueva en local y
+cualquier sesión larga las vuelve a pisar.
+
+Scenarios de referencia (leerlos como plantilla, incluyen el porqué inline):
+`scripts/frontend/scenarios/growth-seo-overview.scenario.ts` (desktop 1440×900) y
+`growth-seo-overview-mobile.scenario.ts` (390×844 + `viewports: [{ device: 'iPhone 13' }]`).
+
+### 1. `fullPage: true` rompe el render de los charts
+
+**Síntoma:** la captura sale con las cards de métrica **vacías** — el marco, el título y el número están,
+pero el área del gráfico es un rectángulo en blanco. En el browser la misma pantalla se ve perfecta.
+
+**Causa:** para hacer el stitch de una página completa, Playwright **redimensiona el viewport**. Todo chart
+que derive su tamaño del contenedor re-mide durante ese redimensionamiento y queda en 0×0:
+
+- **Recharts `ResponsiveContainer`** — los sparklines de `MetricTrendCard`
+  (`src/components/greenhouse/primitives/MetricTrendCard.tsx`, `width='100%'` + `overflowX: 'clip'`).
+- **ApexCharts** — las curvas de evolución, por el mismo mecanismo de medición del contenedor.
+
+No es un bug del producto ni del componente: es una interacción entre el modo fullPage y el contrato de
+"mido mi contenedor" del chart. Es idéntico en severidad al artefacto del sidebar `position: fixed`
+(Delta 2026-06-04), pero **peor de diagnosticar**, porque el fullPage con sidebar sale *ilegible* (obvio)
+mientras que éste sale *vacío* (se lee como dato faltante o reader degradado).
+
+**Regla:** en superficies con charts, **NO usar `fullPage`**. Cobertura canónica:
+
+```ts
+// desktop — frame del viewport real + clips por región
+{ kind: 'mark', label: 'default', note: 'Cockpit poblado en viewport real' },
+{ kind: 'mark', label: 'kpis', clipSelector: '[data-capture="seo-overview-kpis"]' },
+{ kind: 'mark', label: 'sidebar', clipSelector: '[data-capture="seo-overview-sidebar"]' }
+
+// mobile — scroll + un mark por zona (nunca un fullPage del stack completo)
+{ kind: 'mark', label: 'mobile-top' },
+{ kind: 'scroll', selector: '[data-capture="seo-overview-sidebar"]' },
+{ kind: 'sleep', ms: 600 },
+{ kind: 'mark', label: 'mobile-sidebar' }
+```
+
+El `clipSelector` captura a resolución real sin tocar el viewport, así que el chart nunca re-mide. Como
+efecto secundario, el `data-capture` que necesitas para clipear es el mismo ancla estable que recomienda
+la Delta 2026-05-30 — el patrón converge.
+
+### 2. `qualityProfile: 'standard'` encuentra lo que el ojo no ve
+
+Declarar `qualityProfile: 'standard'` en el scenario no es decoración: `resolveCaptureQualityProfile`
+(`scripts/frontend/lib/scenario.ts`) enciende accessibility (axe), layout integrity (`minTargetSize: 24`),
+runtime collectors, asset integrity, performance budgets y enterprise rubric, con `failOnPageError: true`
+y `failOnHydrationWarning: true` (el resto **warning-first**; `premium` los vuelve bloqueantes).
+
+En TASK-1306 destapó, sobre una pantalla que a ojo se veía bien:
+
+| Hallazgo | Dónde aparece |
+|---|---|
+| **8 excepciones de runtime por corrida** — invisibles en pantalla | `runtimeSummary.pageErrorCount` + `pageErrorSamples` |
+| Violaciones axe reales: `aria-required-children`, `aria-valid-attr-value` | `qualityFindings[]` code `axe_violations` |
+| Overflow horizontal | `qualityFindings[]` codes `layout_horizontal_overflow` / `layout_element_overflow` |
+| Targets interactivos < 24px (piso WCAG 2.2 AA 2.5.8) | `qualityFindings[]` code `layout_target_too_small` |
+
+**Cómo se lee el resultado — el diagnóstico está en el `manifest.json` del run, NO en el log de consola:**
+
+- `manifest.qualityFindings[]` — cada finding trae `severity` (`info|warning|error`), `category`, `code`
+  (SSOT en `scripts/frontend/lib/failure-taxonomy.ts`), `selector` y `message`. El `selector` es lo que
+  te lleva al nodo exacto; el log de stdout solo dice cuántos hubo.
+- `manifest.runtimeSummary` — `pageErrorCount`, `pageErrorSamples[]`, `consoleErrorSamples[]`,
+  `hydrationWarningSamples[]`, `httpFailureSamples[]` (saneados: bearer/jwt/cookie/email/hex redactados
+  y truncados). Un `pageErrorCount > 0` con la pantalla renderizando bien es exactamente el caso que
+  ningún screenshot revela.
+- `index.html` del run y `pnpm fe:capture:review` renderizan ambos bloques ya formateados; para triage
+  rápido sirve `jq '.qualityFindings, .runtimeSummary' .captures/<run>/manifest.json`.
+
+**Regla:** mirar el PNG **no sustituye** el gate. Una captura verde a la vista con findings sin leer es
+una verificación incompleta.
+
+### 3. Falso positivo conocido — tabla `sr-only` de `MetricTrendCard`
+
+`MetricTrendCard` renderiza el fallback accesible de su serie como `<Box component='table' sx={visuallyHidden}>`.
+`visuallyHidden` de MUI **posiciona el elemento fuera del viewport a propósito** (`position: absolute` +
+`width: 1px` + `whiteSpace: nowrap`), que es justo la firma que el guard de layout busca → dispara
+`layout_element_overflow`.
+
+**No es un overflow real y no se "arregla".** Cómo distinguirlo antes de perseguirlo:
+
+1. Mira el `selector` del finding: si resuelve a un nodo con `visuallyHidden` / `.sr-only` / `clip-path: inset(50%)`,
+   es el patrón accesible, no un desborde.
+2. Contrasta con `layout_horizontal_overflow` (overflow de **página**): si `scrollWidth == clientWidth`,
+   la página no se arrastra y el elemento reportado está clipado por su propio contenedor.
+3. Confirma en el frame: un overflow real se **ve** (contenido cortado o barra horizontal); éste no.
+
+El propio `MetricTrendCard` ya se defiende del riesgo verdadero — envuelve el chart en un ancestro
+`position: relative` para que la tabla `sr-only` no escape al viewport y su `whiteSpace: nowrap` no empuje
+el `scrollWidth` de la página (clase TASK-742 / ISSUE-015). Ese comentario en el componente es la evidencia
+de que el patrón es deliberado.
+
+### 4. `visual_timeout` en local suele ser compilación de Turbopack, no un bug
+
+`page.goto` de GVC corta a los **60s**. En `pnpm dev`, el **primer** hit a una ruta nueva la compila on-demand
+y puede pasar ese techo: medido en TASK-1306, **64s la primera vez y 0.1s la segunda** — la misma ruta,
+sin cambiar una línea. El manifest queda con `failureCategory: 'visual_timeout'`, que se lee como "la UI no
+carga" y empuja a debuggear el reader, la readiness o el servidor.
+
+**Receta:** calentar la ruta antes de capturar.
+
+```bash
+# calienta la ruta (compila una vez; el status no importa, importa que Turbopack termine)
+curl -s -o /dev/null -w '%{http_code} %{time_total}s\n' 'http://localhost:3000/admin/growth/seo?space=<id>'
+# recién ahora captura
+pnpm fe:capture growth-seo-overview --env=local
+```
+
+Es complementario a la readiness DSL (Delta 2026-06-12): la readiness resuelve el *estado de la UI* una vez
+que el documento llegó; esto resuelve que el documento llegue dentro del techo de navegación. Si el segundo
+intento tarda igual que el primero, ahí sí el problema es real y aplica la secuencia Turbopack canónica de
+`CLAUDE.md` antes de `pnpm clean`.
+
+### 5. La sesión del GVC expira
+
+`.auth/storageState.json` caduca. El síntoma es engañoso: la captura **"funciona"** (exit 0 posible, frames
+emitidos) pero lo que grabó es `/login`; en un script propio de Playwright que reusa ese storageState, el
+síntoma es que **no encuentra los selectores** de la pantalla esperada.
+
+Regenerar:
+
+```bash
+AGENT_AUTH_EMAIL=agent@greenhouse.efeonce.org node scripts/playwright-auth-setup.mjs
+```
+
+⚠️ El script **exige** `AGENT_AUTH_EMAIL` y **no tiene default** (`scripts/playwright-auth-setup.mjs` aborta
+con `ERROR: AGENT_AUTH_EMAIL is required.`). Elegir la persona de menor privilegio que represente el caso
+(superadmin / collaborator / client, ver CLAUDE.md § Agent Auth).
+
+Defensa que ya existe y conviene declarar siempre en el scenario, para que la expiración falle **loud** en
+vez de producir evidencia falsa:
+
+```ts
+assertions: [
+  { kind: 'noLoginRedirect', reason: 'ruta autenticada: la sesión agente debe sostenerse' },
+  { kind: 'noErrorBoundary', reason: 'la evidencia no debe ser un error de app' }
+],
+readiness: {
+  absentSelectors: ['.MuiSkeleton-root', '[data-testid="login-card"]']
+}
+```

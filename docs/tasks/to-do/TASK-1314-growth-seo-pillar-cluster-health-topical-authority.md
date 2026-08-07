@@ -1,5 +1,15 @@
 # TASK-1314 — Growth SEO: Pillar-Cluster Health / Topical Authority
 
+## Delta 2026-08-06
+
+- **El bloqueador TASK-1304 quedó code complete** (smoke E2E real): el audit OnPage materializa
+  `seo_site_audit_runs` + `seo_site_audit_findings` con `issue_type` estable — la señal de
+  estructura (¿supporting enlazan al pillar?) puede leer los findings de linking del audit
+  (p. ej. `is_orphan_page`) vía `readSiteAuditReport`, NUNCA re-crawleando. Nota: el crawl V1
+  corre con `max_crawl_pages: 100` sin `links` endpoint materializado — si esta task necesita
+  el grafo interno de links completo, debe declararlo como extensión del collect (endpoint
+  `POST /v3/on_page/links`, gratis post-crawl), no como captura nueva.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

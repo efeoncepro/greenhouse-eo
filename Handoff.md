@@ -1,37 +1,150 @@
 # Handoff activo
 
-### TASK-1303 — rank capture + evolution reader: code complete, rollout pendiente (2026-08-06)
+### Autenticación local Gcloud con Playwright (2026-08-07)
 
-El backend de la pantalla ancla de EPIC-022 quedó completo en `develop` **local (sin push)**: command
-`captureRankSnapshot` (gate de costo + spend fence cada 10 llamadas + idempotencia sin gasto +
-`ON CONFLICT DO NOTHING` — el trigger de 1299 prohíbe DO UPDATE), batch `POST /seo/rank/capture-batch`
-en ops-worker, Cloud Scheduler `ops-seo-rank-capture` (05:00 CLT) **declarado PAUSADO** en `deploy.sh`,
-mirror reactivo a BQ `greenhouse_growth_analytics.seo_rank_history` (dataset+tabla YA creados),
-`readRankEvolution` (PG ≤180d / BQ largo) + MCP tool `get_seo_rank_evolution` (mismo PR, patrón 1645)
-y signal `seo.rank.capture_lag`. Evidencia: suite full 10.218/0, build prod, worker gates, SQL live
-8/8 contra PG real. `enforceSeoRunEntitlement` ganó `consumesAuditAllowance:false` (el rank capture
-no consume audit runs).
+Se agregó el proceso local explícito `pnpm gcloud:auth:playwright`, invocable por Codex o Claude, para
+renovar CLI + ADC cuando el operador lo solicite, con `--force` para repetir OAuth y `--check-only` para
+verificar sin abrir navegador. La skill espejo `greenhouse-gcloud-auth-playwright` fija este recorrido. El setup
+`pnpm gcloud:auth:playwright:setup` guarda la cuenta y la clave en `.auth/gcloud-auth-credentials.json`
+ignorado por Git y con permisos `0600`; el perfil Chrome aislado queda en `.auth/gcloud-auth-profile`.
+El flujo usa Playwright visible, no imprime URLs/códigos/cookies y termina con `gcloud-auth-preflight.sh`.
+No hay scheduler ni rollout remoto.
 
-**Smoke REAL ejecutado (2026-08-06 ~11:30Z):** push hecho, Ops Worker Deploy en success, job
-`ops-seo-rank-capture` existe PAUSED. Sembradas 8 keywords para Berel (top GSC medidas, script
-`_seed-task-1303-berel-keywords.ts`) → captura real via worker HTTP: 8/8 snapshots (berel #1,
-"pintura para alberca" #2 CON `ai_overview` presente), costo real USD 0.03 (0.00375/call) →
-ledger `serp` correcto → re-run `skipped` USD 0 (idempotencia) → mirror BQ 8 filas →
-`readRankEvolution` 8 series → signal warning honesto (Efeonce sin captura inicial). Dos fixes
-operativos aplicados en vivo: (1) grant WRITER de `greenhouse-portal@` en el dataset BQ nuevo
-(el mirror falló con Access Denied y el retry lo absorbió); (2) el replay de eventos en `retry`
-es EXPLÍCITO vía `POST /api/admin/ops/replay-reactive` (la lane periódica no los re-reclama) —
-ambos documentados en el runbook. **DESPAUSADO 2026-08-06** (autorización del
-operador): 5.º arg a "false" en `deploy.sh`, deploy en success, scheduler `ENABLED 0 5 * * *` —
-la serie corre sola desde mañana 05:00 CLT (~USD 0.03/día con las 8 keywords actuales).
-Pendientes: (1) promoción develop→main para que el lane `rank-evolution` + la MCP tool interna
-lleguen a Vercel PRODUCTION (la captura ya corre igual: el worker es compartido y PG es única;
-solo las superficies de lectura prod esperan release); (2) federar `get_seo_rank_evolution` al
-gateway `mcp.efeonce.org` (repo `efeonce-mcp`, `src/mcp.ts` + provider `greenhouse-seo.ts` —
-adapter hardcodea 3 métodos, NO es proxy dinámico; hacerlo DESPUÉS del release prod o el
-gateway vería 404); (3) sembrar keywords para `seot-efeonce-own-brand` (elegible, 0 keywords →
-degrada `no_keywords`) y curar el set completo de Berel (la serie de cada keyword empieza el
-día que entra al set).
+### TASK-1306 — cockpit SEO Overview: code complete, deploy pendiente (2026-08-06)
+
+`/admin/growth/seo` en `develop` **local (sin push)**, 5 slices. Suite **10281/0**, build prod
+verde, GVC 1440+390 con `pageErrors 0`. Detalle completo en el `## Closure Report` de
+`docs/tasks/complete/TASK-1306-growth-seo-overview-cockpit-ui.md`.
+
+**Lo que necesita quien siga:**
+
+1. **`resolveApexColor` (`src/libs/styles/`) es un hallazgo compartido.** Con `cssVariables: true`
+   el theme devuelve `var(--mui-palette-*)` y ApexCharts revienta al parsearlo — 8 excepciones por
+   corrida, invisibles (el chart no termina de pintar). **Los ~32 consumidores de Apex del repo
+   tienen el mismo bug latente**; candidato a task propia.
+2. **`MetricTrendCard` ganó `deltaOverride` + `deltaSemantics`** (opt-in, legacy byte-idéntico).
+   **TASK-1307 las necesita** para su Δ30d de posición: no reimplementarlas.
+3. **`readRankSnapshotLatest` NO existe** aunque 1306/1307 lo citen: sólo `readRankEvolution`.
+4. **`GROWTH_SEO_ENABLED` ya está ON en Production** — la ruta queda viva al desplegar; el control
+   de exposición restante es el viewCode + el `module_assignment` per-org.
+
+**Rollout pendiente — promover `develop` → `main`.** Corregido: NO hay una migración
+pendiente por entorno; hay UNA sola base (`greenhouse_app`) compartida por dev/staging/prod
+y el viewCode ya está sembrado. Lo que falta es la promoción, y **no es cosmética**:
+`syncViewRegistryCatalog` apaga todo viewCode ausente del catálogo TS del código EN
+EJECUCIÓN, así que mientras 1306 viva sólo en `develop`, producción **apaga
+`administracion.growth_seo` en cada sincronización** (ya pasó una vez; se reactivó a mano,
+pero la reactivación manual se revierte sola). Queda registrado como checkbox de cierre en
+`TASK-1307` (§Pendiente heredado) — si 1307 se demora o se cancela, sacar la promoción
+igual, por su cuenta.
+
+**Próximo paso:** TASK-1307, con dirección visual ya aprobada (concepto C "Evidencia narrativa",
+`product-design-loop` 2026-08-06) y Slice 0 (ECharts vs Apex) todavía abierto.
+
+### Break-glass deploy del gateway MCP — shim DCR LIVE (TASK-1654, 2026-08-06)
+
+GitHub Actions cayó en **major outage** (4 intentos de deploy muertos: 2 cancelados en cola, 1
+flake WIF, 1 sin poder descargar actions). Con autorización explícita del operador se desplegó
+por **break-glass gcloud directo**: Cloud Build local→imagen `gateway:ae8f2f7` (38s) + `gcloud
+run deploy --update-env-vars OAUTH_PUBLIC_CLIENT_ID=…` (aditivo, hereda el resto de la revisión;
+el workflow declara la var así que el próximo deploy normal converge). Revisión
+`efeonce-mcp-gateway-00015-4st` sirviendo 100%. Verificado live: AS metadata con
+`registration_endpoint` + authorize/token reales de Entra, protected-resource apuntando al
+gateway, `/register` devolviendo el client fijo, `/mcp` anónimo 401, y canary 4/4 (rank-evolution
+series=31). Rollback: snapshot de la revisión previa en scratchpad + `gcloud run services
+update-traffic` a `00014`. **VERIFICADO CON EL CLIENTE REAL (2026-08-06 ~17:50Z): Claude Code
+autenticó exitosamente contra el gateway** ("Authentication successful / Connected") tras el
+segundo fix — scopes CUALIFICADOS en el protected-resource metadata (`56e46f7`, revisión
+`00016-6zh`): Entra v2 resuelve scopes pelados contra Graph (AADSTS650053); el valor requestable
+es `https://mcp.efeonce.org/mcp/<scope>` y el `scp` del token vuelve pelado (verifier intacto,
+validado con arch-architect). Pendientes: (1) formalizar TASK-1654 retroactiva (shim DCR + scope
+fix, ambos break-glass documentados); (2) cuando GitHub Actions se recupere del major outage,
+correr el deploy normal del workflow para converger el carril canónico (declara la env var; el
+código ya está en main `56e46f7`).
+
+
+> Historial rotado: [Handoff.archive.md](Handoff.archive.md).
+
+### TASK-1304 — site audit + backlinks: code complete + smoke E2E real, rollout pendiente (2026-08-06)
+
+Los fundamentos técnicos + off-page de EPIC-022 quedaron completos en `develop` **local (sin push)**:
+`queueSiteAudit` (OnPage async, gate consume cupo de audits, guard anti doble-encolado),
+`collectSiteAuditRuns` (claim `FOR UPDATE SKIP LOCKED`; UPDATE + findings + outbox en la MISMA tx =
+exactly-once; gave_up a las 24h), `captureBacklinkSnapshot` (pre-check + `ON CONFLICT DO NOTHING`;
+`partial` honesto si el delta falla), readers `readSiteAuditReport`/`readBacklinkProfile`, signal
+`seo.audit.stuck_tasks` (6h warn / 30h error), 3 handlers ops-worker + 3 Cloud Scheduler **PAUSADOS**
+en `deploy.sh`, mirrors BQ `seo_site_audit_history`/`seo_backlink_history` (tablas creadas con
+`bq mk`) y — mandato parity — 2 lanes ecosystem + MCP tools `get_seo_site_audit_report` /
+`get_seo_backlink_profile` en el mismo PR.
+
+**Smoke REAL ejecutado** (~USD 0.05, efeoncepro.com dogfooding): enqueue task OnPage real (10 págs,
+USD 0.0015) → collect materializó exactly-once (`succeeded`, health 93.41, 60 findings 0c/32w/28n) →
+re-collect no-op → backlinks USD 0.048 (15 ref domains, 455 backlinks, rank 44/100, new/lost 5/0) →
+re-run `already_captured` USD 0 → mirrors BQ 1 fila c/u (manuales — el worker desplegado aún no tiene
+las projections) → signal ok → ledger del transporte correcto. **Gotcha cazado en vivo:** el poll
+`summary` de OnPage es POST con id en el BODY (`[{id}]`) — la variante POST-por-path responde 200
+sin tasks y el collect quedaba ciego (fix + guard de regresión + reference del skill corregida).
+Gates: suite full verde, build prod, worker gates, sanity SQL 17 checks, docs:closure-check.
+
+**ROLLOUT EJECUTADO (2026-08-06 tarde, autorización "termina todo lo que falte"):** push develop
+hecho; Actions en outage mayor mató 2 runs del worker en cola → **break-glass local** del
+ops-worker (mismo patrón que el gateway ese día): revisión **`ops-worker-00528-zgr`** con
+`GIT_SHA=26005a619`. **Los 3 schedulers ACTIVOS** (deploy-contract test ahora protege el estado
+ENABLED) y handlers ejercitados por el camino real Scheduler→OIDC: **primer audit de Berel
+encolado** (USD 0.015, 100 págs) + **primer backlink snapshot de Berel** (USD 0.048: 315 ref
+domains, 53.684 backlinks, rank 50/100); efeonce skip por idempotencia. Lanes staging vivos
+(400 `missing_external_scope_type`). **Ciclo autónomo COMPLETO verificado el mismo día:** el
+collect PROGRAMADO (tick del cron, cero intervención) materializó el audit de Berel —
+`succeeded`, 100 páginas, health 95.40, 519 findings (0 críticos) — y la lane reactiva espejó el
+backlink snapshot de Berel a BQ orgánicamente (2 filas en `seo_backlink_history`). **Pendiente restante — bloqueado por el outage de Actions:**
+release develop→main (los lanes/MCP tools a Vercel Production; NUNCA dispatchar el orquestador en
+outage: `main` quedaría sin manifest) y DESPUÉS federar las 2 tools al gateway (patrón TASK-1653 —
+antes del release el gateway vería 404). Si el run varado de Actions (31126022507) despierta,
+deploya el mismo SHA — converge inofensivo. Runbook:
+`docs/manual-de-uso/growth/operar-site-audit-backlinks-seo.md`.
+
+### Hallazgo MCP gateway — clientes Claude no conectan por falta de DCR (2026-08-06)
+
+Al intentar conectar Claude Code al gateway (`claude mcp add` + `/mcp` → Authenticate) falla con
+`Incompatible auth server: does not support dynamic client registration`. Causa: el cliente MCP de
+Claude (Code y claude.ai custom connectors) exige DCR (RFC 7591) para auto-registrarse, y **Entra no
+soporta DCR**. El canary OAuth funciona porque usa la app Entra PRE-registrada (client `32617b87-…`).
+**Fix propuesto (task nueva en `efeonce-mcp`)**: shim de DCR en el gateway — endpoint `/register` que
+devuelve el client_id público pre-registrado + metadata del authorization server; patrón conocido para
+gateways MCP respaldados por Entra (~50-80 líneas). Con eso Claude Code/claude.ai/Desktop conectan sin
+fricción. Hasta entonces, la vía operable del 360 por MCP sigue siendo la service identity (canary) y
+el smoke OAuth del script.
+
+
+### TASK-1653 cerrada — las 4 tools SEO federadas al gateway + guard de paridad (2026-08-06)
+
+Ejecutada el mismo día en `efeonce-mcp` (`ff68078`+`2365ef9`, deploy `31112222516`, revisión
+`efeonce-mcp-gateway-00014-fcg` Ready): `get_seo_rank_evolution` federada (provider + registerTool
+espejo del MCP interno) + **guard de paridad CI fail-closed** (lista esperada versionada +
+exclusiones con razón; rojo forzado verificado). Canary 4/4 contra producción: rank-evolution
+sirvió `series=31` — la serie real de Berel capturada hoy — y el budget del entitlement ya refleja
+el gasto (49.86/50). Contrato "cómo agregar una tool" en el AGENTS.md del gateway: las tasks del
+mandato (1304/1311/1313/1314/1317) agregan su tool a la lista esperada EN EL MISMO PR. El smoke
+autenticado vía `mcp.efeonce.org` también quedó VERDE el mismo día (4 tools en 200; rank-evolution
+series=31 por el tramo Entra→gateway; canary extendido en `83cdefc`). Con esto, el
+programa SEO del día queda entero: captura diaria activa + 4 tools E2E + release en prod. Siguiente
+frente: TASK-1307 (UI pantalla ancla) y TASK-1304.
+
+
+### Release `fcee5ab9f7ce` — TASK-1303 en producción (2026-08-06)
+
+PR #178 → manifest **`released`** (`fcee5ab9f7ce-1a85e0aa-cbad-42ab-bad0-2b4851d999cc`, run
+`31105434129`, 10m04s), watchdog `drift_count=0`, health verde. El lane
+`/api/platform/ecosystem/growth/seo/rank-evolution` responde en producción (400 sin auth = ruta
+viva) y la tool interna `get_seo_rank_evolution` quedó en el MCP de prod. Dos hallazgos para el
+próximo release (ya en el timing ledger): (a) pushes docs-only a develop justo antes del release
+cancelan el build de staging (ignore-build) y bloquean el preflight `vercel_environments` —
+pre-empción: `vercel redeploy` del deployment cancelado; (b) el merge canónico `-X ours` intentó
+colar 1 línea regresiva de main (`recordFailure` incondicional pre-auditoría TASK-1300) — con
+verif1 vacío y drift regresivo, `-s ours` (árbol develop exacto) es la resolución. **Siguiente:
+TASK-1653** (federar `get_seo_rank_evolution` al gateway + guard de paridad) quedó DESBLOQUEADA
+por este release. La serie de rankings corre sola desde mañana 05:00 CLT (scheduler ENABLED,
+Berel 31 keywords).
 
 
 ### Efeonce dejó de ser cliente de sí misma — modelado corregido (2026-08-06)
@@ -221,59 +334,6 @@ el reader lo consumirán TASK-1645/1310 — cada consumer valida el flag en su r
 del camino MCP-first: `TASK-1645`** (lane ecosystem + MCP tools — get_seo_visibility_360 nace con este
 cruce). Sin push aún.
 
-### TASK-1300 — Registry de familias DataForSEO + ledger de gasto (2026-08-05)
-
-**`code complete, rollout pendiente`.** El cliente DataForSEO pasa de candado hard-code a `/v3/serp/` a un
-allowlist cerrado de 5 familias con transporte único. El AEO pasó **sin que se tocara ninguno de sus archivos**.
-
-**Tres decisiones que conviene no re-litigar:**
-
-1. **`seo_provider_spend_daily` es la FUENTE ÚNICA de presupuesto.** `enforceSeoRunEntitlement` dejó de sumar
-   el `provider_cost` de las 3 tablas snapshot: hacer ambas contaría el mismo gasto DOS VECES. El hook estaba
-   declarado en TASK-1301 (`entitlement.ts:24`) pero esa task ya estaba `complete`, así que **el cambio no
-   tenía dueño** — se tomó acá porque hoy es no-op verificable y después habría sido caro.
-2. **El contador lo escribe el TRANSPORTE, no el caller**, y las 4 familias SEO exigen `organizationId` por
-   tipo. Además el transporte **lanza** si el runtime no registró el contador: gastar sin contabilizar se
-   descubre en la factura; un throw se descubre en desarrollo (lección de TASK-1302).
-3. **`serp` deja `organizationId` opcional por una limitación del contexto del adapter AEO, NO porque su gasto
-   sea inatribuible** — corrección que salió de una objeción del operador. Ver el hueco abierto abajo.
-
-**🔴 Dos cosas que bloquean o cuestan plata:**
-
-- **La cuenta DataForSEO tiene USD 0,90** (`money.total: 1`, medido en vivo). El smoke por familia y cualquier
-  captura de TASK-1303/1304 están bloqueados por saldo. No se gastó probando: es decisión del operador.
-- **El gasto AEO de perfiles ligados a un cliente NO entra en su presupuesto.** `grader_profiles.organization_id`
-  existe y es nullable (TASK-1243), pero `ProviderAdapterContext` no transporta la organización. Follow-up con
-  dueño en EPIC-020; cuando `serp` reciba `organizationId`, el transporte ya lo contabiliza solo.
-
-**⚠️ Hallazgo transversal — el patrón de sanity del repo es frágil.** `BEGIN`/`ROLLBACK` vía
-`runGreenhousePostgresQuery` **no es transaccionalmente seguro**: ese helper toma una conexión del pool por
-llamada, así que el `BEGIN` no cubre lo que sigue (y puede dejar escrituras fuera del rollback). Se descubrió
-porque un `SAVEPOINT` reventó con `25P01`. Este sanity se reescribió sobre `withGreenhousePostgresTransaction`;
-**verificado: ningún sanity del repo usa hoy el patrón frágil** (el de 1301 ya limpiaba en `finally`; el de 1302 se migró en `1a02b4b99`). La regla de decisión quedó canonizada en `SQL_DATE_MATH_AGENT_INVARIANTS`.
-
-**Auditoría adversarial (2026-08-06, 3 verificadores).** 6 defectos corregidos. El más caro:
-**`serp` con `organizationId` y sin contador gastaba sin registrar y NO lanzaba** — el guard
-condicionaba por "¿la familia exige organización?" en vez de "¿hay organización?", y TASK-1303 usará
-`serp` para rank capture desde un cron. También: el AEO reportaba `invalid_response` cuando el breaker
-cortaba (culpaba al parser); un 4xx del caller abría el breaker y degradaba al AEO; `half-open` dejaba
-pasar todas las llamadas concurrentes; y 3 de 4 familias no compilaban sin un cast que anulaba el
-chequeo del payload.
-
-**🔴 Corrección de una afirmación mía que era FALSA:** dije que `GROWTH_SEO_ENABLED` "lo lee el
-ops-worker, NO Vercel". **Vercel también lo lee** — el lane ecosystem/MCP (TASK-1645) y el reader del
-cruce SEO↔AEO (TASK-1305), ambos aterrizados el mismo día. **El flip es de TRES pasos** y, crítico:
-**apagarlo sólo en `deploy.sh` NO apaga el módulo**, el lane de Vercel sigue sirviendo. El bloque de
-rollback de TASK-1302 quedaba incompleto y parecía exitoso. Corregido en `flags.ts` y en la arquitectura.
-
-**Límite del gate que hay que conocer antes de TASK-1303:** el presupuesto se consulta UNA vez y el
-gasto se acumula DESPUÉS. Medido: batch de 120 keywords con budget `trial` → gastó 3× el presupuesto.
-Sin reserva previa no hay tope por corrida. Declarado en el docstring de `enforceSeoRunEntitlement`.
-
-**Nota de concurrencia:** otra sesión commiteó estos archivos en un estado intermedio (`6a6923900`) por el
-índice compartido del checkout; `3a2e1baf5` corrige encima. Evidencia: sanity live 7/7 con cero residuo, suite
-10130/0, build prod. Nada se ejerce hasta que TASK-1303/1304 llamen al transporte.
-
 ### TASK-1646 — Cloud Infrastructure doc particionado: temáticos + HISTORIAL + stub (2026-08-05)
 
 **Complete.** El monolito `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` (1340 líneas / 24 deltas, finding
@@ -292,81 +352,6 @@ Sin reserva previa no hay tope por corrida. Declarado en el docstring de `enforc
   El detalle de qué se descartó y por qué está en el ADR + anotaciones `⚠️ Superseded` del HISTORIAL.
 - Gates verdes: `docs:closure-check` sin `architecture_doc_monolith`, `docs:context-check:strict`
   0/0, `task:lint` template=1/0/0. Re-auditoría live GCP sigue siendo TASK-127.
-
-### TASK-1302 — Serie GSC propia LIVE: 26.192 filas reales materializadas (2026-08-05)
-
-Tercer eslabón de EPIC-022. **Rollout EJECUTADO — operativamente completo.** Revisión
-`ops-worker-00524-5wg`, scheduler `ops-seo-gsc-snapshot` ACTIVO (`0 9 * * *` CLT), serie real de
-`sc-domain:berel.com` acumulando (26.192 filas / 4 días; el 5.º día devolvió 0 filas y NO se
-fabricó — degradación honesta funcionando). `readKeywordOpportunities` ejercitado contra esa serie:
-**375 keywords en striking-distance**.
-
-**Dos defectos que sólo el rollout real podía revelar — leer antes de tocar este dominio:**
-
-1. **El ops-worker no tenía NINGUNA variable de Search Console.** TASK-1302 introdujo el primer
-   consumer del reader GSC en ese runtime (antes sólo corría en Vercel) y su entorno nunca se
-   provisionó. Prender el flag sin eso habría degradado TODAS las orgs en silencio — misma bug
-   class que ISSUE-113. Ya cableado en `deploy.sh` + GH secret.
-2. **GSC no publica D-1.** El primer run dio `materialized=1, rows=0`. Medido contra la API: D-1
-   responde `ok` con cero filas, D-2 sí trae datos. El materializer apuntaba a "ayer" (como pedía
-   la spec) ⇒ habría escrito días vacíos para siempre sin volver por ellos. **Arreglado con ventana
-   móvil de 5 días**, que además corrige el consolidado tardío de Google.
-
-**Simplificación operativa confirmada:** una sola instancia Cloud SQL y **un solo ops-worker
-compartido staging+prod** desplegado desde `develop` ⇒ la capacidad quedó viva **sin promoción a
-`main`**, y **no existe un flip "sólo staging"** para este dominio.
-
-**Rollback (<5 min):** `GROWTH_SEO_ENABLED=false` en `deploy.sh` + redeploy, o pausar el scheduler
-**y** poner su 5º arg en `"true"` (si no, el próximo deploy lo despausa solo).
-
-Lo que sigue abajo es el detalle de la implementación previa al rollout.
-
-**Lo entregado.** Tabla `greenhouse_growth.seo_gsc_daily` (migración `20260805171834316`, aplicada en
-`greenhouse-pg-dev`) + `materializeGscDailySnapshot` + batch per-org en ops-worker
-(`POST /seo/gsc/snapshot-batch`) + Cloud Scheduler `ops-seo-gsc-snapshot` + `readKeywordOpportunities`.
-7 commits pusheados a `develop` (`git log --grep TASK-1302`).
-
-**Tres decisiones que conviene no re-litigar:**
-
-1. **`seo_gsc_daily` ancla en `organization_id`, NO en `seo_target_id`** — es la única tabla de la serie SEO que
-   lo hace, y es deliberado: GSC entrega al grano de la *propiedad verificada* (`search_console_connections`,
-   org UNIQUE), mientras `seo_targets` tiene grano **más fino** (`location_code`+`language_code`, que GSC no
-   particiona). FKear al target obligaría a asignar cada fila arbitrariamente. Evidencia al tomar la task: 0
-   filas en `seo_targets` y 1 conexión GSC activa — habría bloqueado la captura de una serie irreconstruible.
-2. **Su trigger bloquea DELETE pero NO UPDATE**, al revés que las demás tablas de medición: GSC consolida con
-   ~48h de retraso y el re-run del mismo día **debe** poder corregir el valor.
-3. **El score de oportunidad NO usa datos de mercado.** Las impresiones de GSC ya son demanda medida, y la curva
-   de CTR se deriva de la propia org (así absorbe sola el efecto de los AI Overviews en ese sitio). DataForSEO
-   (TASK-1300) queda como enriquecimiento, no como corazón — por eso 1302 aterrizó sin esperarla.
-
-**Bug que sólo el sanity live atrapó:** la SQL seleccionaba `pq.query` mientras el TS leía `row.keyword` →
-todas las keywords salían vacías. Los mocks ejercitan el TS, nunca el SQL (gate TASK-893).
-
-**Evidencia:** 9/9 checks de `scripts/growth/_sanity-seo-keyword-opportunities.ts` contra PG real con rollback y
-cero residuo; smoke de la migración (idempotencia, DELETE rechazado, tipos DATE/TIMESTAMPTZ); 38 tests focales;
-suite completa **10102/0**; `pnpm build` prod; gates de worker; `flags:audit --strict`.
-
-**Documentación de cierre (3 subagentes, 2026-08-05).** Capa funcional + manual + invariantes + skills:
-`docs/documentation/growth/{modulo-seo-search-visibility-360,conexion-search-console}.md` (v1.1) y el manual nuevo
-[`operar-serie-search-console.md`](docs/manual-de-uso/growth/operar-serie-search-console.md) (operación por CLI/logs,
-sin UI hasta TASK-1306/1308). Las tres trampas del rollout quedaron canonizadas en
-`OPS_RELIABILITY_AGENT_INVARIANTS.md` + `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` (cuyo `Delta 2026-04-15` decía
-"por ahora" sobre la topología compartida — quedó marcado como superseded: es canónica). Los hallazgos de oficio
-(GSC no publica D-1; la posición se pondera por impresiones; striking-distance sin datos de mercado) entraron a la
-skill `seo-aeo` como **medidos**, no estimados.
-
-**Dos deudas descubiertas, ambas con dueño declarado:**
-
-1. **`CLAUDE.md` está al 100% de su presupuesto** (34.998/35.000 tokens). La invariante de la topología compartida
-   del worker **no cupo inline** y quedó sólo en el companion. Registrado como `## Delta 2026-08-05` en
-   `TASK-1160`, que es la dueña de bajar a 30.000: su Slice 5 dejó de ser higiene y pasó a ser desbloqueante.
-2. **La skill `seo-aeo` tiene su copia Claude FUERA del repo** (`~/.claude/skills/`, sin versionar) mientras la
-   Codex sí está versionada. Consecuencia real ya materializada: a la copia Claude le faltaban 2 referencias,
-   incluida `google-search-console-api-indexing.md` — justo la pertinente. Copié las faltantes; queda drift de
-   contenido en 8 archivos y el gate `skills:mirrors` **no puede verlo** porque la skill no está en su manifiesto.
-
-**Próximo paso del epic:** TASK-1300 (paralela) o TASK-1303. Nota para quien tome TASK-1306/1308: la serie ya
-tiene datos reales, así que esas UIs se pueden construir contra datos vivos, no contra fixtures.
 
 ### TASK-1301 — Capabilities + entitlement per-org SEO COMPLETE (2026-08-05)
 
@@ -462,8 +447,9 @@ diligencia está `En curso`; todavía no hay nivel Select/Premier/Diamond activo
 
 El registro también consolida Claude, OpenAI, BytePlus, Runway, ElevenLabs, FLUX, AWS, Salesforce, HubSpot, Lovable,
 HeyGen y otras relaciones, separando partnership activo, cuenta registrada, postulación, provider en uso, bloqueo y
-target. Próximo paso operativo: responder las decisiones de due diligence de Google Cloud y actualizar el registro sólo
-con evidencia primaria. La auditoría de postulaciones de IA del 2026-07-26 queda como fotografía histórica.
+target. Google envió el 2026-08-06 la solicitud formal de due diligence anti-soborno, con fecha límite 2026-08-13; el
+próximo paso operativo es responder las decisiones del formulario antes de esa fecha y actualizar el registro sólo con
+evidencia primaria. La auditoría de postulaciones de IA del 2026-07-26 queda como fotografía histórica.
 
 ### Nexa — retiro del modo "Compacto" + diagnóstico del lane que se abría solo (2026-08-05)
 
@@ -552,18 +538,3 @@ razón** en vez de cableados a la fuerza.
 
 **Siguiente paso ejecutable:** coordinar `TASK-1552` ↔ `TASK-1643` para el canal feed → composer, y decidir la
 semántica de «Recrear». Nada de eso lo puedo resolver implementando.
-
-## EPIC-039 — Next.js 16.3 + TypeScript 7 Toolchain Adoption (2026-08-04)
-
-Estado: **to-do / diseño**. Se registraron el epic y sus dos tasks hijas:
-[`EPIC-039`](docs/epics/to-do/EPIC-039-nextjs-typescript-toolchain-adoption.md),
-[`TASK-1638`](docs/tasks/to-do/TASK-1638-nextjs-16-3-framework-alignment.md) para el alineamiento del framework y
-[`TASK-1639`](docs/tasks/to-do/TASK-1639-typescript-7-dual-compiler-adoption.md) para el lane dual TS7/TS6.
-Los linters de tasks/epic/ops y el cierre documental pasan. No hubo cambios de código, dependencias, runtime,
-deploy ni producción. Siguiente paso: tomar `TASK-1638`; `TASK-1639` permanece bloqueada hasta su cierre.
-
-## WIP saneado — Globe, Brightcell y Polpaico (2026-08-01)
-
-- ADR-019 `Accepted`; ADR-020 `Proposed`. Brightcell: **no enviar** hasta Finance. Polpaico: `HOLD / NO-BID`, sin precio/deck emitible. Detalle en `changelog.md`.
-
-Historia anterior: [Handoff.archive.md](Handoff.archive.md).

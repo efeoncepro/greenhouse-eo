@@ -1112,6 +1112,41 @@ upsert_scheduler_job \
   "false"
 echo "  -> ops-seo-rank-capture: 0 5 * * * ACTIVO (rank capture diario, TASK-1303 — despausado 2026-08-06 tras smoke E2E)"
 
+# Site audit OnPage (2 fases desacopladas) + backlink snapshot — TASK-1304.
+#
+# OnPage es task-based ASYNC: `enqueue` (lunes 06:00 CLT) crea el crawl y persiste
+# `provider_task_id` con status=running; `collect` (cada 30 min) poll-ea idempotente
+# (claim FOR UPDATE SKIP LOCKED) y materializa runs + findings cuando la task termina.
+# Backlinks es live: snapshot semanal (lunes 07:00 CLT) idempotente por capture_date.
+#
+# Nacieron PAUSADOS y se despausaron ACÁ el 2026-08-06 (autorización del operador,
+# "termina todo lo que falte") tras el smoke E2E real (crawl + backlinks con dinero real,
+# exactly-once verificado) y la verificación de los 3 handlers vía HTTP en el worker
+# desplegado. Re-pausar = 5º arg a "true" + redeploy (el estado se re-aplica en CADA deploy).
+upsert_scheduler_job \
+  "ops-seo-audit-enqueue" \
+  "0 6 * * 1" \
+  "/seo/audit/enqueue-batch" \
+  '{}' \
+  "false"
+echo "  -> ops-seo-audit-enqueue: 0 6 * * 1 ACTIVO (site audit enqueue semanal, TASK-1304 — despausado 2026-08-06)"
+
+upsert_scheduler_job \
+  "ops-seo-audit-collect" \
+  "*/30 * * * *" \
+  "/seo/audit/collect" \
+  '{}' \
+  "false"
+echo "  -> ops-seo-audit-collect: */30 * * * * ACTIVO (site audit poll idempotente, TASK-1304 — despausado 2026-08-06)"
+
+upsert_scheduler_job \
+  "ops-seo-backlink-capture" \
+  "0 7 * * 1" \
+  "/seo/backlinks/capture-batch" \
+  '{}' \
+  "false"
+echo "  -> ops-seo-backlink-capture: 0 7 * * 1 ACTIVO (backlink snapshot semanal, TASK-1304 — despausado 2026-08-06)"
+
 # Email deliverability monitor — TASK-775 Slice 2.
 #
 # Cron 0 */6 * * * America/Santiago: 4 runs/día. Cómputa bounce/complaint rate

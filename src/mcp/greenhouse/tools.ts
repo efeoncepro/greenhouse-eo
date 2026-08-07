@@ -183,6 +183,9 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   | 'getSeoVisibility360'
   | 'getSeoEntitlement'
   | 'getSeoRankEvolution'
+  | 'getSeoOverviewKpis'
+  | 'getSeoSiteAuditReport'
+  | 'getSeoBacklinkProfile'
 >) => ({
   async getContext() {
     return callReadTool(
@@ -466,6 +469,90 @@ export const createGreenhouseMcpHandlers = (client: Pick<
         )}) (${result.requestId}).`
       },
       () => client.getSeoRankEvolution(input)
+    )
+  },
+  // TASK-1306 — KPIs norte del cockpit Overview (Search Console medido).
+  async getSeoOverviewKpis(input: { organizationId?: string; rangeDays?: number }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          current?: { clicks?: number; impressions?: number; position?: number | null; ctr?: number | null }
+          previous?: unknown
+          rangeDays?: number
+        }
+
+        if (data.ok === false) {
+          return `SEO overview KPIs unavailable (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        const position = data.current?.position
+        // `previous: null` NO es cero: es "no hay ventana anterior con datos". Se dice
+        // así para que el consumidor no reporte una caída del 100% inventada.
+        const comparison = data.previous ? 'with previous-window comparison' : 'no comparable previous window'
+
+        return `Loaded SEO overview KPIs over ${String(data.rangeDays ?? '?')} days: ${String(
+          data.current?.clicks ?? 0
+        )} clicks, ${String(data.current?.impressions ?? 0)} impressions, avg position ${
+          position === null || position === undefined ? 'n/a' : position.toFixed(1)
+        } (${comparison}) (${result.requestId}).`
+      },
+      () => client.getSeoOverviewKpis(input)
+    )
+  },
+  // TASK-1304 — reporte del site audit técnico (OnPage: health + findings por severidad).
+  async getSeoSiteAuditReport(input: { organizationId?: string; auditRunId?: string }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          run?: { status?: string; healthScore?: number | null }
+          totals?: { critical?: number; warning?: number; notice?: number }
+        }
+
+        if (data.ok === false) {
+          return `SEO site audit report unavailable (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        if (data.run?.status === 'running') {
+          return `Site audit still running — findings will materialize when the crawl finishes (${result.requestId}).`
+        }
+
+        const totals = data.totals ?? {}
+
+        return `Loaded site audit report (status=${String(data.run?.status ?? 'unknown')}, health=${String(
+          data.run?.healthScore ?? 'n/a'
+        )}, findings: ${String(totals.critical ?? 0)} critical / ${String(totals.warning ?? 0)} warning / ${String(
+          totals.notice ?? 0
+        )} notice) (${result.requestId}).`
+      },
+      () => client.getSeoSiteAuditReport(input)
+    )
+  },
+  // TASK-1304 — serie semanal del perfil de enlaces.
+  async getSeoBacklinkProfile(input: { organizationId?: string; rangeDays?: number }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          points?: unknown[]
+          range?: { days?: number }
+        }
+
+        if (data.ok === false) {
+          return `SEO backlink profile unavailable (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        const count = Array.isArray(data.points) ? data.points.length : 0
+
+        return `Loaded backlink profile with ${count} weekly snapshots over ${String(
+          data.range?.days ?? '?'
+        )} days (${result.requestId}).`
+      },
+      () => client.getSeoBacklinkProfile(input)
     )
   }
 })

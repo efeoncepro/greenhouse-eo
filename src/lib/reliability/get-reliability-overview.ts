@@ -192,6 +192,7 @@ import { getGrowthAiVisibilityOperatorGateSignals } from './queries/growth-ai-vi
 import { getGrowthAiVisibilityEntitlementSignals } from './queries/growth-ai-visibility-entitlement-signals'
 import { getGrowthAiVisibilityRegradeSignals } from './queries/growth-ai-visibility-regrade-signals'
 import { getGrowthSearchConsoleTokenHealthSignal } from './queries/growth-search-console-token-health'
+import { getSeoAuditStuckTasksSignal } from './queries/seo-audit-stuck-tasks'
 import { getSeoRankCaptureLagSignal } from './queries/seo-rank-capture-lag'
 // TASK-1082 — Knowledge Platform ingestion signals (moduleKey 'knowledge').
 import { getKnowledgeNotionIngestDeadLetterSignal } from './queries/knowledge-notion-ingest-dead-letter'
@@ -667,6 +668,7 @@ interface ReliabilityOverviewSources {
   growthAiVisibilityRegrade?: ReliabilitySignal[] | null
   growthSearchConsoleTokenHealth?: ReliabilitySignal | null
   seoRankCaptureLag?: ReliabilitySignal | null
+  seoAuditStuckTasks?: ReliabilitySignal | null
 
   /** TASK-1201 — Finance AI anomaly-materialization staleness (heartbeat del SoT de signals). */
   financeAiStaleMaterialization?: ReliabilitySignal | null
@@ -1101,6 +1103,7 @@ export const buildReliabilityOverview = (
     ...(sources.growthAiVisibilityRegrade ?? []),
     ...(sources.growthSearchConsoleTokenHealth ? [sources.growthSearchConsoleTokenHealth] : []),
     ...(sources.seoRankCaptureLag ? [sources.seoRankCaptureLag] : []),
+    ...(sources.seoAuditStuckTasks ? [sources.seoAuditStuckTasks] : []),
     // TASK-812 — Previred/LRE artifact registry drift.
     ...(sources.payrollComplianceExportDrift ? [sources.payrollComplianceExportDrift] : []),
     // TASK-863 V1.5.2 — Final settlement PDF status drift (DB document_status vs
@@ -1609,6 +1612,11 @@ export const getReliabilityOverview = async (
     preloadedSources.seoRankCaptureLag !== undefined
       ? preloadedSources.seoRankCaptureLag
       : await getSeoRankCaptureLagSignal().catch(() => null)
+
+  const seoAuditStuckTasks =
+    preloadedSources.seoAuditStuckTasks !== undefined
+      ? preloadedSources.seoAuditStuckTasks
+      : await getSeoAuditStuckTasksSignal().catch(() => null)
 
   // TASK-957 Slice A — Contractor double-rail overlap. Corre regardless del flag
   // PAYROLL_CONTRACTOR_ENGAGEMENT_EXCLUSION_ENABLED (detector temprano). Steady=0:
@@ -2565,6 +2573,7 @@ export const getReliabilityOverview = async (
     growthAiVisibilityRegrade,
     growthSearchConsoleTokenHealth,
     seoRankCaptureLag,
+    seoAuditStuckTasks,
     payrollComplianceExportDrift,
     payrollContractorDoubleRailOverlap,
     payrollDeelMemberWithoutContractId,
