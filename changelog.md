@@ -7,6 +7,29 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-07 — Growth SEO: pantalla ancla Rendimiento + Historical Data Platform (TASK-1307 + TASK-1655)
+
+- **`/admin/growth/seo/performance` (tab Rendimiento) COMPLETA** — la feature ancla de EPIC-022: chart
+  hero ECharts (primer consumer del stack; decisión de librería tomada acá y heredada por el módulo) con
+  eje de posición invertido declarado en palabras, meta top-3, dataZoom, colorblind-safe por forma,
+  cobertura real declarada ("N de M días con medición"); banda KPI `MetricTrendCard`; tabla
+  `DataTableShell` con Δ30d invertido + sparkline + drill; set compartible en `?urls=`/`?keywords=`.
+  Readers nuevos `readSeoPerformance`/`readSeoPerformanceCatalog` con parity (lane + MCP tools mismo PR)
+  y **fallback de fuentes por cobertura** (◑ exacta ↔ ● medida, nunca promediadas). GVC premium: rubric
+  enterprise pass, ui:quality 4.56/4.5. Primitives nuevas: `CustomTabsNav` (@core), `SurfaceRecipe.plane`,
+  `AppECharts`.
+- **El módulo SEO dejó de ser forward-only (TASK-1655, Slices 1-4)** — hallazgo de la ejecución: había 5
+  días de GSC teniendo 16 meses en la API. Ahora: mirror `seo_gsc_history` en BigQuery (SoT del
+  histórico; PG = ventana caliente) espejado por el batch diario, backfill por API ejecutado (**Berel
+  487/487 días · 6,67M filas · 0 fallos; Efeonce 474 días** — su OAuth GSC conectado hoy), split de
+  lectura por cobertura (180 días servidos desde BQ con ventana previa comparable, verificado), y semilla
+  histórica de rank vía `historical_serps` (granularidad dispersa verificada en sandbox ANTES de gastar;
+  4 keywords con historia real hasta 2025-08). Pendiente de 1655: export nativo GSC en la propiedad de
+  Berel (permiso Owner, out-of-band) y promoción para que el espejo diario corra en el ops-worker real.
+- **OAuth Search Console cableado en producción** — el flag llevaba ON pero el cliente OAuth existía solo
+  en staging (`oauth/start` respondía `not_configured`; clase "flag sin cablear"). Vars en Vercel
+  Production + redeploy; verificación del redirect URI al primer consent real.
+
 ## 2026-08-07 — Growth SEO: Oportunidades de keywords + command `trackKeywords` (TASK-1308)
 
 Nueva ruta operador `/admin/growth/seo/keywords` (tab **Keywords** de Search Visibility, child del
@@ -37,7 +60,7 @@ ignorado por Git y protegido con permisos `0600`; no se habilitó scheduler ni e
 
 ## 2026-08-07 — Capacitación HubSpot ANAM · deck y material operativo
 
-Se alineó el deck de 25 láminas con la pauta recibida por Outlook y el caso canónico de ANAM: objetos y
+Se alineó el deck de 26 láminas con la pauta recibida por Outlook y el caso canónico de ANAM: objetos y
 asociaciones, Growth/Renovación, Service/Ticket, dashboards, estados de madurez, Breeze, Meeting Notetaker,
 handoff de los tres intents y ejercicio integrado. Se dejaron el PDF/PNG derivado en `.captures/` y el
 runbook/handout como fuentes operativas; no se modificó la configuración live de HubSpot.
@@ -969,26 +992,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
 - AXIS publica la paleta portable completa y Greenhouse consume `@efeoncepro/axis-tokens@0.2.1` mediante adapters; `0.2.0` queda como publicación manual histórica y `v0.2.1` fue regularizada con el pipeline gobernado (`30525304584`, success), incluyendo publish idempotente.
 - GVC staging pasó rampas light en 1440/390, captura dark real en 1440/390 y dos capturas repetidas fueron pixel-identical; queda una diferencia de altura del full-page histórico pendiente de aprobación/re-baseline.
 - Finance PDF y report-artifact comparados contra el parent commit: raster diff 144 dpi = 0 píxeles. Rollback rehearsal sobre `0.1.5` pasó 43 tests.
-
-## 2026-07-29 — Social Media: modelo de negocio y Product Service V1
-
-- Se documentó Social Media como servicio recurrente humano y gestionado por personas, con estrategia, contenido,
-  publicación, community management, escucha, reporting y aprendizaje.
-- Se añadieron el Product Service Contract, Business Model y Pricing Integrity Pack con packaging por capacidad,
-  hipótesis de bandas, economics, guardrails y gates de validación.
-- Se añadió el benchmark comercial [`Social Media Service Market Research`](docs/audits/commercial/SOCIAL_MEDIA_SERVICE_MARKET_RESEARCH_2026-07-29.md), con agencias globales, Chile/LATAM, tendencias, patrones de venta, pricing público y confidence/limitaciones.
-- Se añadió el [`Social Media Subservices Catalog V1`](docs/services/creative-services/EFEONCE_SOCIAL_MEDIA_SUBSERVICES_CATALOG_V1.md), que detalla dirección, editorial, contenido, publishing, community, listening, trendjacking, social search, measurement, activaciones y fronteras con otras líneas.
-- Se documentó [`Search + Social Visibility Composition V1`](docs/business-models/search-visibility-360/SEARCH_SOCIAL_VISIBILITY_COMPOSITION_V1.md) como composición propuesta entre Search Visibility 360 y Social Media, con workflow compartido, RACI, wedges, economics separados y gates para evaluar un futuro Product Service compuesto.
-- Se añadió el [`Social Media Operating Model`](docs/services/creative-services/EFEONCE_SOCIAL_MEDIA_OPERATING_MODEL_V1.md), con squad, capacidad, onboarding, cadence, SLA, community/care, crisis y fallbacks.
-- Se añadió el [`Social Media Customer Model Integrity Pack`](docs/business-models/creative-services/EFEONCE_SOCIAL_MEDIA_CUSTOMER_MODEL_INTEGRITY_PACK_V1.md), con beachhead B2B experto, buying group, anti-ICP, triggers y motion de validación.
-- Se añadió el [`Search + Social Measurement Contract`](docs/business-models/search-visibility-360/SEARCH_SOCIAL_MEASUREMENT_CONTRACT_V1.md), con Social Search, ownership, instrumentación, confidence y gates contra claims causales.
-- Se añadió un [`Pricing Validation Addendum`](docs/business-models/creative-services/EFEONCE_SOCIAL_MEDIA_PRICING_VALIDATION_ADDENDUM_2026-07-29.md) con ladder revisada, escenarios de economics y condiciones comerciales de prueba; sigue sujeto a Finance.
-- Se documentó el [`Differentiation & Positioning V1`](docs/business-models/creative-services/EFEONCE_SOCIAL_MEDIA_DIFFERENTIATION_POSITIONING_V1.md): autoridad y demanda, Social + Search, squad gobernado, transparencia, enemigo commodity, proof system y claims permitidos.
-- Se incorporó **Efeonce Run & Gun Studio** como ventaja real de delivery de Social Media: equipos profesionales, captura en terreno y producción social-first componible con SOW, derechos y economics propios.
-- Se creó [`Efeonce Run & Gun Production — Offer V1`](docs/services/creative-services/EFEONCE_RUN_AND_GUN_PRODUCTION_OFFER_V1.md) con Content Capture Day, Executive/Interview Capture, Social-First Production Sprint y Brand Story/Campaign Capture; la capability se normalizó como Efeonce Run & Gun Studio.
-- Globe / Creative Studio quedó explícitamente fuera de la promesa y pricing base actual; Paid Social, Creator/UGC
-  y Producción Especial quedaron como módulos separados.
-- Estado honesto: `Approved for validation`; no habilita precios públicos ni venta self-serve.
-
-La continuidad consolidada de esta sesión y el índice histórico mensual quedan reflejados en [`Handoff.md`](Handoff.md)
-y [`docs/changelog/internal/2026-07.md`](docs/changelog/internal/2026-07.md).

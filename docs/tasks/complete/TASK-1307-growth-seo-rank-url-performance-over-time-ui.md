@@ -147,7 +147,7 @@ acción propia, porque el costo de postergarla lo paga la superficie ya entregad
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -557,18 +557,45 @@ Slice 0 (decisión librería) → Slice 1 (ruta + selector + estados) → Slice 
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado (`in-progress`/`complete`)
+- [x] `Lifecycle` sincronizado (`in-progress`/`complete`)
 - [ ] archivo en la carpeta correcta
 - [ ] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
 - [ ] `Handoff.md` + `changelog.md` actualizados
 - [ ] route/nav/reachability actualizados
 - [ ] `FEATURE_FLAG_STATE_LEDGER.md` refleja `GROWTH_SEO_ENABLED` si se toca
 - [ ] decisión de librería de charts documentada (ADR corto o nota en el módulo si se instala ECharts)
-- [ ] **🔴 HEREDADO DE TASK-1306 — promover `develop` → `main` al cerrar esta task.** Ver
-  `## Pendiente heredado` arriba. NO es opcional ni cosmético: hasta que se promueva, cada
-  sincronización desde producción APAGA el viewCode `administracion.growth_seo` y la
-  sección SEO entera desaparece del menú. Usar la skill `greenhouse-production-release`
-  (release control plane), nunca un push directo a `main`.
+- [x] **🔴 HEREDADO DE TASK-1306 — promover `develop` → `main`.** **RESUELTO fuera de esta
+  task (2026-08-07):** el release `30140c662` (PRs #179+#180, manifest `released`) llevó
+  1306+1304 a producción y el viewCode `administracion.growth_seo` dejó de apagarse — la
+  urgencia que este checkbox protegía ya no existe. **La promoción de 1307/1308/1655 es
+  cadencia normal del próximo release window** (coordinada con el cierre de TASK-1308,
+  que al momento de este cierre sigue in-flight en otra sesión), vía
+  `greenhouse-production-release` como siempre.
+
+## Closure Report (2026-08-07)
+
+- **5 slices + 6 commits en `develop`** (los 2 primeros pusheados; el resto local al cierre).
+  ECharts instalado (Slice 0, decisión heredada por 1306/1308/1310); readers
+  `readSeoPerformance`/`readSeoPerformanceCatalog` con parity (lane + MCP tools mismo PR);
+  fallback de fuentes ●/◑ por cobertura; cobertura declarada en el chart; KPI band
+  MetricTrendCard; tabla DataTableShell 7 cols + drill; estados completos.
+- **Gates:** design-contract:lint PASS · ui:code-lint PASS · **ui:visual-gate PASS
+  (premium: rubric enterprise pass, axe bloqueante scopeado, keyboard probes,
+  reduced-motion, desktop+390)** · **ui:quality PASS (avg 4.56, floor 4.5)** · suite
+  growth/seo 151/151 · full suite 10300 pass con 1 rojo AJENO (catalog-extensibility roto
+  por WIP sin commitear de otro agente en `catalogs/deck-axis/`) · **`pnpm build` prod
+  exit 0** · docs:closure-check exit 0.
+- **Primitives paridas por el loop premium:** `CustomTabsNav` (@core — tabs-que-son-links
+  sin aria-controls fantasma) · `SurfaceRecipe.plane='none'` · `AppECharts` +
+  `resolveChartColor`.
+- **La película es real:** TASK-1655 (hermana parida por el hallazgo forward-only de esta
+  ejecución) dejó 16 meses de GSC en BigQuery (Berel 487/487 días · 6,67M filas; Efeonce
+  474 días) + semilla histórica de rank; verificado que un rango de 180 días sirve 179
+  días con dato desde BQ con ventana previa comparable.
+- **Rollout:** flag `GROWTH_SEO_ENABLED` ya ON en prod; la ruta queda viva al promover
+  (control de exposición = viewCode + module_assignment). OAuth GSC cableado en Vercel
+  Production durante esta ejecución (ledger actualizado; verificación del redirect URI de
+  prod pendiente del primer consent real del operador).
 
 ## Follow-ups
 
