@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, type ReactNode } from 'react'
 
 import Box from '@mui/material/Box'
 import ButtonBase from '@mui/material/ButtonBase'
@@ -46,6 +46,18 @@ export interface KeywordOpportunityVerdictProps {
   opportunities: KeywordOpportunity[]
   activeAction: KeywordAction | 'all'
   onActionChange: (action: KeywordAction | 'all') => void
+  /**
+   * Los selectores de Space y ventana.
+   *
+   * ⚠️ VIVEN ACÁ, no en una barra suelta arriba. Sueltos sobre el fondo gris de la página
+   * eran dos cajas con relleno propio flotando sin superficie — se veían sin colocar. Y
+   * darles una card propia habría dejado cinco cards apiladas, que es card wallpaper.
+   *
+   * Acá además dicen la verdad compositiva: el veredicto afirma "42 de 50 keywords compiten
+   * contra tu propio sitio", y estos controles son EL SUJETO de esa frase — de qué Space y
+   * sobre qué ventana. El control pertenece a la superficie cuyo contenido gobierna.
+   */
+  context?: ReactNode
 }
 
 /** Umbral para llamar "dominante" a un reparto. Menos de esto es una mezcla, no un hallazgo. */
@@ -54,7 +66,8 @@ const DOMINANCE_RATIO = 0.6
 const KeywordOpportunityVerdict = ({
   opportunities,
   activeAction,
-  onActionChange
+  onActionChange,
+  context
 }: KeywordOpportunityVerdictProps) => {
   const copy = GH_GROWTH_SEO_KEYWORDS
 
@@ -138,37 +151,53 @@ const KeywordOpportunityVerdict = ({
     <Card data-capture='seo-keywords-verdict'>
       <CardContent>
         <Stack spacing={5}>
+          {/* `useFlexGap` es obligatorio acá, no cosmético: el espaciado por defecto de Stack
+              es margen sobre el ORDEN DEL DOM, y el hijo que reordenamos con `order` deja de
+              ser el primero visualmente — el margen caía en el lugar equivocado y el titular
+              quedaba pegado al selector de ventana. `gap` respeta el orden visual. */}
           <Stack
             direction={{ xs: 'column', md: 'row' }}
-            spacing={3}
+            spacing={5}
+            useFlexGap
             justifyContent='space-between'
-            alignItems={{ md: 'baseline' }}
+            alignItems={{ md: 'flex-start' }}
           >
-            <Stack spacing={1} sx={{ maxInlineSize: '68ch' }}>
+            {/* El enunciado completo: hallazgo → cuánto vale → qué hacer al respecto.
+                La ganancia vive ACÁ y no con los selectores: es la segunda mitad de la
+                lectura, no contexto. Cuando iba agrupada con el contexto, el `order` de
+                mobile se la llevaba arriba y la cifra aparecía ANTES del hallazgo que
+                cuantifica. */}
+            <Stack spacing={2} sx={{ maxInlineSize: '68ch' }}>
               {/* `h4` y no `surfaceHeroTitle`: el titular de la página ya existe arriba y este
                   no puede competir con él — dice más, pero es su subordinado. */}
               <Typography variant='h4' component='p'>
                 {headline.text}
               </Typography>
+
+              {totalGain > 0 ? (
+                <Tooltip title={copy.verdict.gainTotalHint}>
+                  <Typography
+                    variant='h5'
+                    component='p'
+                    color='success.dark'
+                    sx={{ fontVariantNumeric: 'tabular-nums', alignSelf: 'flex-start' }}
+                  >
+                    {copy.verdict.gainTotal.replace('{value}', formatInteger(totalGain))}
+                  </Typography>
+                </Tooltip>
+              ) : null}
+
               <Typography variant='body2' color='text.secondary'>
                 {headline.hint}
               </Typography>
             </Stack>
 
-            {/* La ganancia total es la otra mitad de la lectura: cuánto hay sobre la mesa.
-                Va alineada a la derecha y con `tabular-nums` para que no baile al filtrar. */}
-            {totalGain > 0 ? (
-              <Tooltip title={copy.verdict.gainTotalHint}>
-                <Typography
-                  variant='h5'
-                  component='p'
-                  color='success.dark'
-                  sx={{ fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}
-                >
-                  {copy.verdict.gainTotal.replace('{value}', formatInteger(totalGain))}
-                </Typography>
-              </Tooltip>
-            ) : null}
+            {/* ⚠️ En columna (mobile) el contexto va PRIMERO. En su orden de DOM quedaba en
+                medio del enunciado: leías el hallazgo, te topabas con dos campos de
+                formulario, y recién después el resto. Adelantado se lee natural — "Grupo
+                Berel, últimos 28 días → esto es lo que encontramos" — y en fila (desktop)
+                vuelve a su sitio arriba a la derecha. */}
+            <Stack sx={{ order: { xs: -1, md: 0 }, inlineSize: { xs: '100%', md: 'auto' } }}>{context}</Stack>
           </Stack>
 
           {/* Los segmentos: leyenda del scatter y filtro de la tabla en el mismo objeto. */}

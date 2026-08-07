@@ -1987,6 +1987,9 @@ export const GH_GROWTH_SEO_KEYWORDS = {
     marketUnavailableHint:
       'El enriquecimiento de mercado (volumen y dificultad) todavía no está habilitado en este Space. La priorización de arriba no lo necesita: usa tu demanda medida.',
     page: 'Página',
+    rowsPerPage: 'Filas por página',
+    paginationRange: '{from}–{to} de {count}',
+    sortedByGain: 'Ordenadas por ganancia estimada: lo de arriba es lo que más rinde.',
     competingPages: '{count} páginas compiten',
     gainUnit: '+{value} clics/mes est.',
     noGain: 'Sin ganancia estimada',

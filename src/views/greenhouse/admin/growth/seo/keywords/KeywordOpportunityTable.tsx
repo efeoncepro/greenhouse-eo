@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 
 import Card from '@mui/material/Card'
+import Divider from '@mui/material/Divider'
 import CardContent from '@mui/material/CardContent'
 import Stack from '@mui/material/Stack'
 import Table from '@mui/material/Table'
@@ -10,6 +11,7 @@ import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
+import TablePagination from '@mui/material/TablePagination'
 import TableSortLabel from '@mui/material/TableSortLabel'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
@@ -44,6 +46,17 @@ import { resolveKeywordAction, type KeywordAction } from './keyword-opportunity-
 type SortColumn = 'keyword' | 'position' | 'impressions' | 'clicks' | 'ctr' | 'gain'
 type SortDirection = 'asc' | 'desc'
 
+/**
+ * 25 por defecto, no 10.
+ *
+ * La lista está ORDENADA POR GANANCIA: la primera página tiene que contener toda la cabeza
+ * accionable, no cortarla en el ítem 10 y esconder el resto detrás de un click. 25 cubre la
+ * mitad del techo del reader (50) y deja la cola a una página de distancia.
+ */
+const DEFAULT_ROWS_PER_PAGE = 25
+const ROWS_PER_PAGE_OPTIONS = [10, 25, 50]
+const ROWS_PER_PAGE_SELECT_ID = 'seo-keywords-rows-per-page'
+
 export interface KeywordOpportunityTableProps {
   opportunities: KeywordOpportunity[]
   trackedKeywords: Set<string>
@@ -69,6 +82,8 @@ const KeywordOpportunityTable = ({
   // ("¿qué persigo primero?"), y el score del reader ya está en clics, no en un índice.
   const [sortColumn, setSortColumn] = useState<SortColumn>('gain')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
+  const [page, setPage] = useState(0)
+  const [rowsPerPage, setRowsPerPage] = useState(DEFAULT_ROWS_PER_PAGE)
 
   const actionLabel: Record<KeywordAction, string> = {
     quickWin: copy.action.quickWinShort,
@@ -107,6 +122,22 @@ const KeywordOpportunityTable = ({
 
     return rows
   }, [opportunities, sortColumn, sortDirection])
+
+  /**
+   * Página ACOTADA, no reseteada por efecto.
+   *
+   * Los filtros de arriba cambian el total en cualquier momento: filtrar estando en la
+   * página 3 dejaría al operador mirando una tabla vacía que parece un bug. Derivar la
+   * página válida del total actual lo resuelve sin un `useEffect` que corra un render tarde
+   * — y sin perder la página cuando el filtro no achica lo suficiente como para invalidarla.
+   */
+  const lastPage = Math.max(0, Math.ceil(sorted.length / rowsPerPage) - 1)
+  const safePage = Math.min(page, lastPage)
+
+  const visible = useMemo(
+    () => sorted.slice(safePage * rowsPerPage, safePage * rowsPerPage + rowsPerPage),
+    [sorted, safePage, rowsPerPage]
+  )
 
   const toggleSort = (column: SortColumn) => {
     if (column === sortColumn) {
@@ -151,9 +182,15 @@ const KeywordOpportunityTable = ({
     <Card data-capture='seo-keywords-table'>
       <CardContent>
         <Stack spacing={4}>
-          <Typography variant='h5' component='h2'>
-            {copy.table.title}
-          </Typography>
+          <Stack spacing={1}>
+            <Typography variant='h5' component='h2'>
+              {copy.table.title}
+            </Typography>
+            {/* El criterio de orden, dicho: sin esto la primera página parece arbitraria. */}
+            <Typography variant='caption' color='text.secondary'>
+              {copy.table.sortedByGain}
+            </Typography>
+          </Stack>
 
           <DataTableShell identifier='seo-keyword-opportunities' ariaLabel={copy.table.ariaLabel} stickyFirstColumn>
             <Table size='small'>
@@ -190,7 +227,7 @@ const KeywordOpportunityTable = ({
                 </TableRow>
               </TableHead>
               <TableBody>
-                {sorted.map(row => {
+                {visible.map(row => {
                   const action = resolveKeywordAction(row)
                   const isTracked = trackedKeywords.has(row.keyword)
                   const state = trackingState[row.keyword] ?? 'idle'
@@ -294,6 +331,32 @@ const KeywordOpportunityTable = ({
           </DataTableShell>
         </Stack>
       </CardContent>
+
+      <Divider />
+
+      <TablePagination
+        component='div'
+        count={sorted.length}
+        page={safePage}
+        onPageChange={(_, nextPage) => setPage(nextPage)}
+        rowsPerPage={rowsPerPage}
+        rowsPerPageOptions={ROWS_PER_PAGE_OPTIONS}
+        onRowsPerPageChange={event => {
+          setRowsPerPage(Number(event.target.value))
+          setPage(0)
+        }}
+        labelRowsPerPage={copy.table.rowsPerPage}
+        // Ids declarados, no `useId`: el select de filas-por-página vive dentro del subárbol
+        // que la recipe adapta al ancho en cliente, así que su id derivado de la ruta del
+        // árbol no coincidía entre servidor y cliente (mismatch reproducible sólo en 390px).
+        SelectProps={{ id: ROWS_PER_PAGE_SELECT_ID, labelId: `${ROWS_PER_PAGE_SELECT_ID}-label` }}
+        labelDisplayedRows={({ from, to, count }) =>
+          copy.table.paginationRange
+            .replace('{from}', String(from))
+            .replace('{to}', String(to))
+            .replace('{count}', String(count))
+        }
+      />
     </Card>
   )
 }

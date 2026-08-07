@@ -14,14 +14,14 @@
     "note": "Ruta nueva; no existe before. La hermana `growth.seo.performance` (TASK-1307) es el benchmark nativo: misma recipe `analyticsReport`, mismo conmutador de tabs, mismo contrato de leyenda medido/estimado."
   },
   "evidence": {
-    "desktop": ".captures/2026-08-07T19-15-07_growth-seo-keywords/01-desktop",
-    "mobile": ".captures/2026-08-07T19-15-07_growth-seo-keywords/02-mobile",
-    "dossier": ".captures/2026-08-07T19-15-07_growth-seo-keywords/review-dossier.md",
+    "desktop": ".captures/2026-08-07T19-41-01_growth-seo-keywords/01-desktop",
+    "mobile": ".captures/2026-08-07T19-41-01_growth-seo-keywords/02-mobile",
+    "dossier": ".captures/2026-08-07T19-41-01_growth-seo-keywords/review-dossier.md",
     "data": "Datos REALES de berel.com: 50 oportunidades striking-distance, 31 keywords ya seguidas, umbral de impresiones 10. Cero fixtures.",
     "reducedMotion": "Ejercitado por el GVC (`reducedMotionCheck: true`), no sólo declarado.",
     "axe": "@axe-core/playwright scopeado a la surface con `failOnViolations: true` — 0 violations en 1440x900 y 390x844.",
     "notCovered": "Los estados empty (sin oportunidades), error y denied NO tienen frame: ningún Space de dev los produce hoy (Berel tiene datos, Efeonce no tiene target). Implementados y cubiertos por lectura de código, no por evidencia visual. Declarado, no asumido verde.",
-    "iterations": "Cuatro pasadas de GVC con revisión del frame entre cada una. La v1 pasaba los cuatro gates y se veía mal; lo que la arregló fue mirar, no medir."
+    "iterations": "Once pasadas de GVC con revisión del frame entre cada una. La v1 pasaba los cuatro gates y se veía mal; lo que la arregló fue mirar. Dos hallazgos vinieron del operador sobre el frame (selectores flotando sobre el fondo gris, tabla sin paginar) y uno del gate de runtime (mismatch de hidratación por `useId`)."
   },
   "dimensions": {
     "hierarchy": {
@@ -41,8 +41,8 @@
     },
     "density": {
       "score": 5,
-      "rationale": "Alta y deliberada: 50 puntos en el scatter y 50 filas por 10 columnas en la tabla. Es un cockpit de operador que responde cuál persigo primero — condensar escondería justo la cola larga donde vive la decisión. DataTableShell resuelve densidad por ancho real y da scroll horizontal interno.",
-      "evidence": "01-desktop/frames/04-table.png"
+      "rationale": "Alta y deliberada, y ahora paginada: 25 filas por página sobre un techo de 50 del reader. 25 y no 10 porque la lista está ORDENADA POR GANANCIA — la primera página tiene que contener toda la cabeza accionable, no cortarla en el ítem 10. La página se ACOTA al total en vez de resetearse por efecto: filtrar estando en la página 3 dejaría al operador mirando una tabla vacía que parece un bug.",
+      "evidence": "01-desktop/frames/05-table.png"
     },
     "depth": {
       "score": 5,
@@ -51,7 +51,7 @@
     },
     "surfaceEconomy": {
       "score": 5,
-      "rationale": "De seis bandas de chrome antes del primer dato a tres. Se eliminaron el Alert full-width de mercado (ahora nota al pie del mapa), la fila de chips de origen y la leyenda de formas del chart: los tres colapsaron en una sola banda de veredicto que además es el filtro. Cuatro superficies hermanas, cero card-on-card.",
+      "rationale": "De seis bandas de chrome antes del primer dato a tres. Se eliminaron el Alert full-width de mercado (ahora nota al pie del mapa), la fila de chips de origen y la leyenda de formas del chart: los tres colapsaron en una sola banda de veredicto que además es el filtro. Cuatro superficies hermanas, cero card-on-card. Los selectores de contexto viven DENTRO de la card del veredicto: sueltos sobre el fondo gris eran dos cajas con relleno propio flotando sin superficie, y darles card propia habría dejado cinco cards apiladas.",
       "evidence": "01-desktop/frames/01-default.png"
     },
     "visualImpact": {
@@ -97,10 +97,11 @@
   },
   "verdict": "PASS",
   "openRisks": [
-    "El eje log con cotas explícitas rotula sus extremos con valores no-década (68 y 1.790). Es el precio de no desperdiciar el 40% del alto; los ticks internos siguen siendo décadas.",
+    "🔴 BUG DE PLATAFORMA SOSPECHADO, no cerrado: los controles MUI dentro del subárbol de la recipe producen mismatch de hidratación por `useId` — el `htmlFor` del label difiere entre servidor y cliente, reproducible SÓLO en 390px. Se cerró declarando ids estables en los cinco controles de esta surface, pero la causa raíz (la recipe adapta el árbol midiendo en cliente) afectaría a cualquier form control en cualquier surface adaptativa. Merece task propia.",
+    "El eje log con cotas explícitas rotula sus extremos con valores no-década (68 y 1.790). Es el precio de no desperdiciar el 40% del alto.",
     "La nota al pie del mapa pasa por debajo del botón flotante de Nexa en desktop. Es el FAB portal-wide, no de esta surface.",
     "Los estados empty, error y denied no tienen frame porque ningún Space de dev los produce. Cubiertos por código, no por evidencia visual.",
-    "ui:code-lint reporta findings (raw-hex e inline-font-size) en el chart: son fallbacks de resolveChartColor y fontSize de canvas de ECharts. La hermana de TASK-1307 arrastra los mismos. Fix de causa raíz propuesto: módulo canónico de chart-tokens en la allow-list del linter."
+    "ui:code-lint reporta findings (raw-hex e inline-font-size) en el chart: fallbacks de resolveChartColor y fontSize de canvas de ECharts. La hermana de TASK-1307 arrastra los mismos. Fix de causa raíz propuesto: módulo canónico de chart-tokens en la allow-list del linter."
   ],
   "direction": "docs/ui/visual-directions/TASK-1308-growth-seo-keyword-opportunities-direction.md",
   "computed": {

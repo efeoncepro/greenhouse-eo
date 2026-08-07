@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState, useTransition } from 'react'
+import { useMemo, useState, useTransition, type ReactNode } from 'react'
 
 import { useRouter } from 'next/navigation'
 
@@ -54,6 +54,22 @@ import { resolveKeywordAction, type KeywordAction } from './keyword-opportunity-
  */
 
 const TRACK_ENDPOINT = '/api/admin/growth/seo/keywords/track'
+
+/**
+ * Ids ESTABLES para los dos controles de contexto.
+ *
+ * 🔴 Sin esto MUI los deriva de `useId`, y el `htmlFor` del label salía distinto en servidor
+ * y en cliente — un mismatch de hidratación REAL, reproducible sólo en 390px, que el gate de
+ * runtime del GVC atrapó. La causa: los controles viven dentro del subárbol de la recipe,
+ * que se adapta al ancho midiendo en cliente, así que la ruta del árbol con la que `useId`
+ * calcula el identificador no es la misma en las dos pasadas. Un id declarado no depende de
+ * la ruta — y de paso hace determinista el vínculo label↔control, que es lo que sostiene el
+ * `htmlFor` para lectores de pantalla.
+ */
+const SPACE_FIELD_ID = 'seo-keywords-space'
+const WINDOW_FIELD_ID = 'seo-keywords-window'
+const SEARCH_FIELD_ID = 'seo-keywords-search'
+const POSITION_FIELD_ID = 'seo-keywords-position'
 
 type PositionFilter = 'all' | 'firstPage' | 'secondPage'
 
@@ -197,6 +213,79 @@ const KeywordOpportunitiesView = ({
     }
   }
 
+  /**
+   * Space + ventana: el SUJETO de lo que la pantalla afirma.
+   *
+   * ⚠️ No se renderizan sueltos arriba. Sobre el fondo gris de la página eran dos cajas con
+   * relleno propio flotando sin superficie — se veían sin colocar (hallazgo del operador
+   * sobre el frame de 390px). Y darles una card propia habría dejado cinco cards apiladas,
+   * que es card wallpaper. Viajan a la superficie principal, que es donde dicen la verdad
+   * compositiva: el veredicto afirma "42 de 50 keywords compiten contra tu propio sitio", y
+   * estos controles son el sujeto de esa frase.
+   */
+  const contextControls = (
+    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} sx={{ inlineSize: { xs: '100%', sm: 'auto' } }}>
+      <CustomAutocomplete
+        // El `id` va acá y no en el `renderInput`: Autocomplete deriva el id de su propio
+        // input (y el `htmlFor` del label) de este prop, cayendo a `useId` si falta.
+        id={SPACE_FIELD_ID}
+        options={spaces}
+        value={selectedSpace}
+        disableClearable={false}
+        getOptionLabel={(option: SeoSpaceOption | string) =>
+          typeof option === 'string' ? option : option.organizationName
+        }
+        isOptionEqualToValue={(option: SeoSpaceOption, value: SeoSpaceOption) =>
+          option.organizationId === value.organizationId
+        }
+        onChange={(_, value) => (value ? pushQuery({ space: (value as SeoSpaceOption).organizationId }) : undefined)}
+        sx={{ minInlineSize: 200 }}
+        renderInput={params => (
+          <CustomTextField
+            {...params}
+            label={GH_GROWTH_SEO_OVERVIEW.toolbar.spaceLabel}
+            placeholder={GH_GROWTH_SEO_OVERVIEW.toolbar.spacePlaceholder}
+          />
+        )}
+      />
+
+      {/* El motivo va en `title` y no en `helperText`: la línea de ayuda medía casi lo mismo
+          que el propio control y era la que forzaba el wrap del header. */}
+      <CustomTextField
+        select
+        id={WINDOW_FIELD_ID}
+        label={copy.toolbar.windowLabel}
+        value={String(windowDays)}
+        title={copy.toolbar.windowHint}
+        onChange={event => pushQuery({ window: Number(event.target.value) })}
+        sx={{ minInlineSize: 170 }}
+      >
+        {Object.entries(copy.toolbar.windowOptions).map(([days, label]) => (
+          <MenuItem key={days} value={days}>
+            {label}
+          </MenuItem>
+        ))}
+      </CustomTextField>
+    </Stack>
+  )
+
+  /**
+   * Los estados sin datos también llevan los controles: el picker vive en el veredicto, y el
+   * veredicto no se renderiza sin datos. Sin esto, un Space sin Search Console dejaría al
+   * operador sin forma de cambiar de Space — la salida del estado vacío tiene que estar
+   * DENTRO del estado vacío.
+   */
+  const stateSurface = (marker: string, node: ReactNode) => (
+    <Card data-capture={marker}>
+      <CardContent>
+        <Stack spacing={6}>
+          {contextControls}
+          {node}
+        </Stack>
+      </CardContent>
+    </Card>
+  )
+
   const header = (
     <Stack spacing={4}>
       {/* Sin hrefs (misma convención del Overview y Rendimiento): "Growth" es un grupo de
@@ -224,58 +313,10 @@ const KeywordOpportunitiesView = ({
         </Typography>
       </Stack>
 
-      {/* Una sola banda: navegación entre hermanas + el contexto que decide qué se lee. */}
-      <Stack
-        direction={{ xs: 'column', lg: 'row' }}
-        spacing={4}
-        justifyContent='space-between'
-        alignItems={{ lg: 'center' }}
-        data-capture='seo-keywords-tabs'
-      >
+      {/* Los tabs SÍ pueden ir sobre el fondo: son navegación, no cajas con relleno. */}
+      <Box data-capture='seo-keywords-tabs'>
         <SeoSearchVisibilityTabs activeTab='keywords' spaceId={selectedSpaceId} />
-
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} alignItems={{ sm: 'center' }}>
-          <CustomAutocomplete
-            options={spaces}
-            value={selectedSpace}
-            disableClearable={false}
-            getOptionLabel={(option: SeoSpaceOption | string) =>
-              typeof option === 'string' ? option : option.organizationName
-            }
-            isOptionEqualToValue={(option: SeoSpaceOption, value: SeoSpaceOption) =>
-              option.organizationId === value.organizationId
-            }
-            onChange={(_, value) => (value ? pushQuery({ space: (value as SeoSpaceOption).organizationId }) : undefined)}
-            sx={{ minInlineSize: 200 }}
-            renderInput={params => (
-              <CustomTextField
-                {...params}
-                label={GH_GROWTH_SEO_OVERVIEW.toolbar.spaceLabel}
-                placeholder={GH_GROWTH_SEO_OVERVIEW.toolbar.spacePlaceholder}
-              />
-            )}
-          />
-
-          {/* El motivo pasó de `helperText` a `title`: la línea de ayuda medía casi lo mismo
-              que el propio control y era la que forzaba el wrap. El dato no se pierde —
-              está en el hover y en la nota de cobertura del mapa. */}
-          <CustomTextField
-            select
-            label={copy.toolbar.windowLabel}
-            value={String(windowDays)}
-            title={copy.toolbar.windowHint}
-            onChange={event => pushQuery({ window: Number(event.target.value) })}
-            sx={{ minInlineSize: 170 }}
-          >
-            {Object.entries(copy.toolbar.windowOptions).map(([days, label]) => (
-              <MenuItem key={days} value={days}>
-                {label}
-              </MenuItem>
-            ))}
-          </CustomTextField>
-        </Stack>
-      </Stack>
-
+      </Box>
     </Stack>
   )
 
@@ -291,8 +332,8 @@ const KeywordOpportunitiesView = ({
 
     // Sin Search Console no hay demanda medida: mostrar ceros sería mentir.
     if (connectionState === 'not_connected') {
-      return (
-        <Box data-capture='seo-keywords-empty'>
+      return stateSurface(
+          'seo-keywords-empty',
           <EmptyState
             icon='tabler-plug-connected-x'
             title={copy.states.emptyNoGsc.title}
@@ -310,25 +351,23 @@ const KeywordOpportunitiesView = ({
               ) : undefined
             }
           />
-        </Box>
       )
     }
 
     if (connectionState === 'no_snapshots') {
-      return (
-        <Box data-capture='seo-keywords-empty'>
+      return stateSurface(
+          'seo-keywords-empty',
           <EmptyState
             icon='tabler-clock-pause'
             title={copy.states.emptyNoSnapshots.title}
             description={copy.states.emptyNoSnapshots.description}
           />
-        </Box>
       )
     }
 
     if (!opportunities || !opportunities.ok) {
-      return (
-        <Box data-capture='seo-keywords-error'>
+      return stateSurface(
+          'seo-keywords-error',
           <EmptyState
             icon='tabler-alert-triangle'
             title={copy.states.error.title}
@@ -340,13 +379,12 @@ const KeywordOpportunitiesView = ({
               </Button>
             }
           />
-        </Box>
       )
     }
 
     if (rows.length === 0) {
-      return (
-        <Box data-capture='seo-keywords-empty'>
+      return stateSurface(
+          'seo-keywords-empty',
           <EmptyState
             icon='tabler-search'
             title={copy.states.emptyNoOpportunities.title}
@@ -355,7 +393,6 @@ const KeywordOpportunitiesView = ({
               rootDomain ?? selectedSpace.organizationName
             )}
           />
-        </Box>
       )
     }
 
@@ -381,6 +418,7 @@ const KeywordOpportunitiesView = ({
           opportunities={rows}
           activeAction={actionFilter}
           onActionChange={setActionFilter}
+          context={contextControls}
         />
 
         <KeywordOpportunityMap
@@ -421,6 +459,7 @@ const KeywordOpportunitiesView = ({
             useFlexGap
           >
             <DebouncedInput
+              id={SEARCH_FIELD_ID}
               value={search}
               onChange={value => setSearch(String(value))}
               placeholder={copy.toolbar.searchPlaceholder}
@@ -430,6 +469,7 @@ const KeywordOpportunitiesView = ({
 
             <CustomTextField
               select
+              id={POSITION_FIELD_ID}
               label={copy.filters.positionLabel}
               value={positionFilter}
               onChange={event => setPositionFilter(event.target.value as PositionFilter)}
