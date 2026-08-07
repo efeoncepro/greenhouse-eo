@@ -45,7 +45,8 @@ const TABS: readonly SeoSearchVisibilityTab[] = [
     label: GH_GROWTH_SEO_OVERVIEW.tabs.performance,
     href: '/admin/growth/seo/performance',
     icon: 'tabler-chart-line',
-    available: false
+    // TASK-1307 — la hermana aterrizó: el tab navega de verdad.
+    available: true
   },
   {
     value: 'keywords',

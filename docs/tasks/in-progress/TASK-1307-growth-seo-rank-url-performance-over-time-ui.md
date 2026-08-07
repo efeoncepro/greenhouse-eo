@@ -1,5 +1,35 @@
 # TASK-1307 — Growth SEO: Rank & URL Performance Over Time UI ★
 
+## Delta 2026-08-07 (ejecución) — hallazgo de runtime: el módulo era forward-only → TASK-1655
+
+Al ejercitar la pantalla contra la base real emergió que **ninguna superficie del módulo
+puede mostrar "la película"**: `seo_gsc_daily` tenía 5 días y `seo_rank_snapshots` 2,
+porque los dos pipelines solo capturan hacia adelante y el historial (16 meses en la API
+GSC; `historical_serps` en DataForSEO Labs) nunca se trajo. Además el destino estaba mal
+dimensionado (5 días = 27 MB en Cloud SQL; 180 días ≈ ~1 GB OLTP). Se registró
+**`TASK-1655` (Historical Data Platform)**: mirror GSC→BQ + split PG/BQ en los readers +
+backfill 16 meses por org + export nativo por propiedad + semilla rank. Esta UI no cambia
+cuando 1655 aterrice — el reader es el que crece.
+
+**Deltas de diseño tomados en ejecución (vigentes):**
+
+1. **`readSeoPerformance` + `readSeoPerformanceCatalog` nuevos** (spec decía `Backend
+   impact: none` — era falso: el eje URL y clics/impr/CTR viven en `seo_gsc_daily`, no en
+   el reader de rank). Parity completa: lane ecosystem + MCP tools en el mismo PR.
+2. **Fallback entre fuentes (regla del operador):** keyword×posición INTENTA DataForSEO
+   (◑ exacta), pero si esa serie es más joven que la medida, el reader sirve la posición
+   ponderada de GSC (●) y lo declara en `source`. Nunca promediadas.
+3. **Cobertura declarada en el chart:** "N de M días con medición · desde–hasta" pegado
+   al título — el período pedido y el medido casi nunca coinciden y callarlo hacía el
+   gráfico ilegible.
+4. **ECharts elegido e instalado** (echarts 6.1.0 + echarts-for-react 3.0.6, lazy vía
+   `AppECharts` `ssr:false`). Eje X `category` sobre la unión de fechas (no `time`: con
+   pocos días repartía ticks por hora); Y de posición con `max ≥ 10` para que la meta
+   top-3 nunca quede fuera; `labelLayout shiftY` para last-value labels empatados.
+5. **KPI band = `MetricTrendCard`** (mismo tier que 1306) alimentada por `summary` del
+   reader (agregado diario del conjunto, ponderado por impresiones, ventana previa
+   comparable). Las cards planas iniciales se descartaron por regresión de tier.
+
 ## Delta 2026-08-07 — TASK-1306 cerró: el blocker cayó y te dejó cuatro cosas servidas
 
 El bloqueador declarado (`Blocked by: TASK-1306`) está **cerrado** (code complete en `develop`).

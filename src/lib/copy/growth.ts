@@ -1680,3 +1680,184 @@ export const GH_GROWTH_SEO_OVERVIEW = {
     spaceUpdated: 'Panel de {space} actualizado'
   }
 } as const
+
+/**
+ * TASK-1307 — copy de la pantalla ancla `/admin/growth/seo/performance` (tab Rendimiento).
+ *
+ * Tres decisiones de contenido que atraviesan todo el bloque:
+ *
+ * 1. **La inversión de posición se dice con PALABRAS**, no sólo con el eje ni con el color
+ *    de una flecha. "Más abajo es mejor" aparece en el subtítulo visible del chart, en el
+ *    tooltip de la columna y en el `aria-label`. Un operador que llega de Semrush lo da por
+ *    hecho; uno que llega de un reporte de tráfico, no.
+ * 2. **La fuente se nombra en cada lectura** (● medido / ◑ estimado). No es decoración
+ *    legal: la posición exacta de DataForSEO y la posición promedio de Search Console son
+ *    números distintos que responden preguntas distintas, y el módulo tiene prohibido
+ *    promediarlos. Si la pantalla no dice cuál está mostrando, el operador los mezcla.
+ * 3. **Un hueco se llama "Pendiente", nunca 0.** Posición 0 no existe y "0 clics" afirma
+ *    que apareciste y nadie hizo clic. Todo el copy de vacío evita el cero fantasma.
+ */
+export const GH_GROWTH_SEO_PERFORMANCE = {
+  pageTitle: 'Rendimiento',
+  pageSubtitle: 'Cómo evoluciona en el tiempo el conjunto de URLs o keywords que elijas.',
+
+  toolbar: {
+    rangeLabel: 'Período',
+    rangeOptions: {
+      '28': 'Últimos 28 días',
+      '90': 'Últimos 90 días',
+      '180': 'Últimos 180 días'
+    },
+    deviceLabel: 'Dispositivo',
+    deviceOptions: {
+      desktop: 'Escritorio',
+      mobile: 'Móvil',
+      tablet: 'Tablet'
+    },
+    // El device no es un filtro de presentación: cambia la SERP que se consultó.
+    deviceHint: 'La búsqueda en móvil y en escritorio devuelve resultados distintos.',
+    freshness: 'Datos hasta {date}',
+    freshnessUnknown: 'Sin fecha de corte disponible'
+  },
+
+  source: {
+    measured: 'Medido · Search Console',
+    measuredHint: 'Lo que Google registró de tu sitio: posición promedio, clics e impresiones.',
+    estimated: 'Estimado · DataForSEO',
+    estimatedHint: 'Posición exacta observada en la búsqueda por un proveedor externo.',
+    // Se explica POR QUÉ no se mezclan, no sólo que son distintas.
+    ariaLabel: 'Origen de los datos de este gráfico',
+    mixHint: 'Son dos mediciones distintas de la misma realidad. Nunca se promedian entre sí.'
+  },
+
+  set: {
+    title: 'Qué comparar',
+    modeLabel: 'Comparar por',
+    modeByUrl: 'URL',
+    modeByKeyword: 'Keyword',
+    picker: 'Elegir qué comparar',
+    pickerPlaceholder: 'Busca y agrega…',
+    pickerHelperKeyword: 'Keywords con datos medidos o con seguimiento de posición activo.',
+    pickerHelperUrl: 'Páginas con impresiones registradas en el período.',
+    trackedBadge: 'Con seguimiento',
+    trackedHint: 'Esta keyword tiene serie de posición exacta.',
+    impressionsHint: '{impressions} impresiones en el período',
+    noImpressionsHint: 'Todavía sin impresiones registradas',
+    removeAria: 'Quitar {item} de la comparación',
+    max: 'Puedes comparar hasta {max} a la vez.',
+    maxReached: 'Llegaste al máximo de {max}. Quita uno para agregar otro.',
+    liveRegion: '{count} en comparación',
+    clear: 'Limpiar selección'
+  },
+
+  metric: {
+    label: 'Métrica',
+    position: 'Posición',
+    clicks: 'Clics',
+    impressions: 'Impresiones',
+    ctr: 'CTR'
+  },
+
+  chart: {
+    title: 'Evolución de {metric}',
+    // La inversión, visible y en palabras. No se deja al eje ni a la intuición.
+    subtitlePosition: 'Más abajo en el número es mejor: pasar de 8 a 3 es una mejora, y en el gráfico se ve subiendo.',
+    subtitleVolume: 'Volumen medido por Search Console en el período.',
+    // ⚠️ Cobertura EXPLÍCITA: el período pedido y los días realmente medidos casi nunca
+    // coinciden (una keyword recién trackeada tiene 2 días dentro de una ventana de 90).
+    // Sin decirlo, el gráfico promete una película que el dato todavía no puede contar.
+    coverage: '{measured} de {requested} días con medición · {from} a {to}',
+    coverageSingle: 'Una sola medición ({from}). Todavía no hay evolución que mostrar: la serie empieza a formarse con el próximo día capturado.',
+    coverageShort: 'Serie recién iniciada: {measured} días medidos. La tendencia se vuelve legible con más días capturados.',
+    targetLabel: 'Meta: top 3',
+    targetHint: 'Referencia comercial del módulo: estar entre los tres primeros resultados.',
+    showTable: 'Ver tabla de datos',
+    hideTable: 'Ocultar tabla de datos',
+    tableCaption: 'Valores por fecha de cada serie en comparación',
+    tableDateHeader: 'Fecha',
+    zoomHint: 'Arrastra bajo el gráfico para acercarte a un tramo.',
+    ariaPosition:
+      'Gráfico de evolución de posición de {count} series entre {from} y {to}. El eje está invertido: la posición 1 es la mejor y está arriba. Un día sin medición se dibuja como hueco, no como cero.',
+    ariaVolume:
+      'Gráfico de evolución de {metric} de {count} series entre {from} y {to}. Un día sin medición se dibuja como hueco, no como cero.'
+  },
+
+  table: {
+    title: 'Detalle por {axis}',
+    axisUrl: 'URL',
+    axisKeyword: 'keyword',
+    ariaLabel: 'Detalle de rendimiento por elemento en comparación',
+    colItemUrl: 'URL',
+    colItemKeyword: 'Keyword',
+    colPosition: 'Posición',
+    colPositionHint: 'Última posición medida en el período. Más abajo es mejor.',
+    colDelta: 'Δ 30 días',
+    colDeltaHint: 'Cambio de posición frente a hace 30 días. Bajar de número es mejorar.',
+    colClicks: 'Clics',
+    colImpressions: 'Impresiones',
+    colCtr: 'CTR',
+    colTrend: 'Tendencia',
+    colTrendHint: 'Posición a lo largo del período.',
+    // Sin dato NUNCA es un cero: la celda lo dice.
+    pending: 'Pendiente',
+    noComparison: 'Sin comparación',
+    noComparisonHint: 'Todavía no hay una medición de hace 30 días con la cual comparar.',
+    trendUnavailable: 'Sin histórico suficiente',
+    drillAria: 'Ver el detalle de {item}',
+    sortAria: 'Ordenar por {column}'
+  },
+
+  states: {
+    loading: 'Cargando el rendimiento del conjunto…',
+
+    emptyNoGsc: {
+      title: 'Conecta Search Console para ver el rendimiento',
+      description:
+        'La evolución se reconstruye con datos medidos por Google. Sin la conexión no hay historia que mostrar todavía.',
+      cta: 'Conectar Search Console'
+    },
+
+    emptyNoSnapshots: {
+      title: 'Aún no hay días guardados',
+      description:
+        'La conexión está activa, pero la captura diaria todavía no guardó ningún día. La película empieza en cuanto lo haga.'
+    },
+
+    // Estado inicial legítimo del flujo, no un error: por eso no habla de "problema".
+    emptyNoSet: {
+      title: 'Elige qué comparar',
+      description: 'Agrega hasta {max} URLs o keywords y verás cómo evolucionan lado a lado.',
+      cta: 'Elegir URLs o keywords'
+    },
+
+    emptyNoData: {
+      title: 'Sin datos para esta selección en {range}',
+      description: 'Prueba un período más amplio, cambia el dispositivo o elige otros elementos.',
+      cta: 'Ampliar el período'
+    },
+
+    error: {
+      title: 'No pudimos cargar la evolución',
+      description: 'Puede ser algo temporal de nuestro lado. Intenta de nuevo en unos minutos.',
+      cta: 'Reintentar'
+    },
+
+    denied: {
+      title: 'No tienes acceso al módulo SEO',
+      // Sin CTA de reintentar: la causa es estructural y reintentar no la resuelve.
+      description: 'Pídele a un administrador que te habilite el módulo SEO para este Space.'
+    },
+
+    // Degradación honesta: se nombra lo que falta en vez de dibujarlo en cero.
+    partialMissing: {
+      title: 'Mostramos lo que sí está medido',
+      description: 'Sin datos en el período: {items}. Quedan fuera del gráfico en vez de aparecer en cero.'
+    },
+
+    sparseSeries: {
+      title: 'Algunas series tienen pocos días medidos',
+      description:
+        'Series con seguimiento reciente: {items}. Se dibujan hasta donde hay dato, con el hueco a la vista — no se rellenan.'
+    }
+  }
+} as const

@@ -493,6 +493,12 @@ export type RankEvolutionResult =
  *
  * No hay celda mixta: una serie entera pertenece a una sola fuente. Es lo que permite
  * decir "◑ estimado" o "● medido" del gráfico completo sin una mentira por serie.
+ *
+ * ⚠️ FALLBACK entre fuentes (2026-08-07): la celda keyword×position es una INTENCIÓN, no
+ * una promesa ciega. GSC también mide posición por keyword (promedio ponderado), así que
+ * cuando la serie exacta de DataForSEO es más joven que la medida (rank capture recién
+ * arrancado vs. historial GSC), el reader sirve la de GSC y lo DECLARA en `source`.
+ * "Si no vienen de uno, vienen del otro" — pero jamás promediadas.
  */
 
 /** Eje del set elegido: comparar keywords entre sí, o URLs entre sí. Nunca mezclados. */
@@ -543,6 +549,40 @@ export interface SeoPerformanceStanding {
   trend: Array<number | null>
 }
 
+/** Agregado MEDIDO del conjunto en un día (Search Console, siempre — nunca DataForSEO). */
+export interface SeoPerformanceDailyTotal {
+  date: string
+  clicks: number
+  impressions: number
+  /**
+   * Posición del conjunto PONDERADA POR IMPRESIONES: `Σ(posición×impresiones)/Σ(impresiones)`.
+   * Un promedio plano le daría el mismo peso a un ítem de 2 impresiones que a uno de 500.
+   * `null` sin impresiones ese día.
+   */
+  position: number | null
+  ctr: number | null
+}
+
+export interface SeoPerformanceTotals {
+  clicks: number
+  impressions: number
+  position: number | null
+  ctr: number | null
+}
+
+/**
+ * Titular del conjunto: el agregado del período, la ventana previa comparable y la serie
+ * diaria que alimenta el sparkline de cada KPI.
+ *
+ * `previous: null` = no hay ventana anterior con datos. La UI NO dibuja delta en ese caso:
+ * comparar contra una ventana vacía fabricaría un +100% inventado.
+ */
+export interface SeoPerformanceSummary {
+  current: SeoPerformanceTotals
+  previous: SeoPerformanceTotals | null
+  series: SeoPerformanceDailyTotal[]
+}
+
 export type SeoPerformanceResult =
   | {
       ok: true
@@ -556,6 +596,8 @@ export type SeoPerformanceResult =
       source: SeoPerformanceSource
       series: SeoPerformanceSeries[]
       standings: SeoPerformanceStanding[]
+      /** Titular medido del conjunto (banda de KPI). Siempre GSC, sea cual sea la métrica. */
+      summary: SeoPerformanceSummary
       /**
        * Ítems pedidos que no tienen NINGÚN dato en la ventana. Se nombran en vez de
        * omitirse en silencio: "pediste 4 y te muestro 2" tiene que ser visible.

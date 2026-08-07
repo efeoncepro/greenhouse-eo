@@ -95,6 +95,10 @@ const enUS: NavigationCopy = {
     growthForms: { label: 'Forms', subtitle: 'Public forms, submissions and destinations' },
     growthAiVisibility: { label: 'AEO Grader', subtitle: 'Review AI visibility reports before delivery' },
     growthSeo: { label: 'SEO', subtitle: 'Search health per Space: rankings, visibility and site' },
+    growthSeoPerformance: {
+      label: 'Performance',
+      subtitle: 'How a chosen set of URLs or keywords evolves over time'
+    },
     growthAeo: { label: 'AEO', subtitle: 'AEO program: per-client score and plan + cross-sell' },
     growthCtas: { label: 'CTAs', subtitle: 'CTA/popup engine: inventory, lifecycle and preview' },
     adminCommercialProposals: { label: 'Proposals', subtitle: 'Commercial proposals: state, artifact versions and downloads' },

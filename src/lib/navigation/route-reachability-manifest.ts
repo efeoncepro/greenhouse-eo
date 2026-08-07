@@ -35,6 +35,17 @@ export interface ChildRouteDeclaration {
 
 export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
   {
+    // TASK-1307 — pantalla ancla del módulo SEO. Las 4 rutas de "Search Visibility"
+    // comparten el viewCode `administracion.growth_seo` y UN solo ítem de menú
+    // (`/admin/growth/seo`); las hermanas son child routes navegadas desde su conmutador
+    // de tabs. Sumarla al menú duplicaría la sección para el mismo permiso.
+    route: '/admin/growth/seo/performance',
+    parent: '/admin/growth/seo',
+    via: 'tab',
+    reason:
+      'Tab "Rendimiento" de Search Visibility (TASK-1307, EPIC-022): child del viewCode compartido administracion.growth_seo, alcanzable desde el conmutador de tabs del cockpit SEO. No siembra viewCode ni ítem de nav propios.'
+  },
+  {
     route: '/agency/hiring/pipeline',
     parent: '/agency/hiring',
     via: 'tab',
