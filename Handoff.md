@@ -2,6 +2,15 @@
 
 ### TASK-1308 — Keyword Opportunities COMPLETE, 2 pendientes de rollout (2026-08-07)
 
+⚠️ **Atribución de commits.** El último lote de esta task (tool MCP `untrack_seo_keywords`,
+lane ecosystem, `clock_timestamp()`, sanity 16/16, corrección del manual, cierre documental)
+quedó dentro de **`e39427af7 feat(commercial): add ANAM HubSpot training deck`** — un commit
+de OTRA sesión cuyo mensaje no tiene relación con el contenido. Causa: el índice de git es
+compartido entre sesiones y la otra commiteó mientras esta hacía `git add`. Ya había pasado
+antes en el día (`1a076131e` se llevó el rename de la task a `in-progress`). No se reescribió
+la historia porque hay otra sesión activa sobre `develop`. Si alguien busca el cierre de
+1308 por mensaje de commit, no lo va a encontrar: está ahí.
+
 Ruta `/admin/growth/seo/keywords` cerrada y movida a `complete/`. Nació `Backend impact:
 none` y terminó con migración, dos commands, dos rutas app-lane, dos rutas del lane
 ecosystem y **dos tools MCP federadas** — porque `trackKeywords`, que la spec daba por
