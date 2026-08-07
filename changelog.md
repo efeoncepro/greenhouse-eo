@@ -25,6 +25,14 @@
   Diario/Semanal (default semanal >120 días medidos); métrica integrada al selector; affordance visible
   de drill; bandas de updates confirmados de Google (registro curado `algorithm-updates.ts`). Fix del
   primitive `MetricTrendCard`: con `invertY` el área se pintaba sobre la línea (`baseValue='dataMax'`).
+- **Un solo header canónico para las tres pestañas de Search Visibility** — Resumen, Rendimiento y
+  Keywords resolvían su chrome de tres formas distintas (y ninguna usaba la región `header` de la
+  recipe, así que los controles flotaban sobre el lienzo gris). Ahora las tres usan
+  `SurfaceRecipe header={<WorkbenchHeader kind='report'>}` con el mismo reparto: alcance en
+  `secondaryActions`, frescura en `meta`, tabs en `supporting`. Keywords deja de duplicar los
+  controles dentro del veredicto y de cada superficie de estado; Rendimiento baja la leyenda ●/◑ a
+  la card del gráfico. Dos defectos de 390px corregidos: el tab activo recortado bajo las flechas de
+  scroll y el período truncando su valor vigente.
 - **El módulo SEO dejó de ser forward-only (TASK-1655, Slices 1-4)** — hallazgo de la ejecución: había 5
   días de GSC teniendo 16 meses en la API. Ahora: mirror `seo_gsc_history` en BigQuery (SoT del
   histórico; PG = ventana caliente) espejado por el batch diario, backfill por API ejecutado (**Berel
