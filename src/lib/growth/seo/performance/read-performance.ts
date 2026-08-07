@@ -527,7 +527,13 @@ export const readSeoPerformance = async (
       for (const serie of rankEvolution.series) {
         positionByItem.set(
           serie.keyword,
-          serie.points.map(point => ({ date: point.date, value: point.position }))
+          serie.points.map(point => ({
+            date: point.date,
+            value: point.position,
+            // AIO sólo viaja en la serie ◑ (DataForSEO): es un hecho del SERP capturado.
+            // La serie ● (GSC) no lo trae — Search Console no reporta features del SERP.
+            ...(point.aiOverview ? { aiOverview: true } : {})
+          }))
         )
       }
     }

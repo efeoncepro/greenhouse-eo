@@ -1538,7 +1538,8 @@ export const GH_GROWTH_SEO_OVERVIEW = {
       '7': 'Últimos 7 días',
       '28': 'Últimos 28 días',
       '90': 'Últimos 90 días',
-      '180': 'Últimos 180 días'
+      '180': 'Últimos 180 días',
+      '365': 'Últimos 12 meses'
     },
     refresh: 'Actualizar',
     refreshPending: 'Actualizando…',
@@ -1706,7 +1707,8 @@ export const GH_GROWTH_SEO_PERFORMANCE = {
     rangeOptions: {
       '28': 'Últimos 28 días',
       '90': 'Últimos 90 días',
-      '180': 'Últimos 180 días'
+      '180': 'Últimos 180 días',
+      '365': 'Últimos 12 meses'
     },
     deviceLabel: 'Dispositivo',
     deviceOptions: {
@@ -1747,7 +1749,11 @@ export const GH_GROWTH_SEO_PERFORMANCE = {
     max: 'Puedes comparar hasta {max} a la vez.',
     maxReached: 'Llegaste al máximo de {max}. Quita uno para agregar otro.',
     liveRegion: '{count} en comparación',
-    clear: 'Limpiar selección'
+    clear: 'Limpiar selección',
+    // Presets data-driven: los sets nombrados que el operador configuró en el target.
+    presetsLabel: 'Tus grupos',
+    presetAria: 'Comparar el grupo {name} ({count} keywords)',
+    presetTruncated: 'El grupo tiene {total} keywords; se comparan las primeras {max}.'
   },
 
   metric: {
@@ -1761,6 +1767,19 @@ export const GH_GROWTH_SEO_PERFORMANCE = {
   kpis: {
     // El "contra qué" del delta, declarado junto al período (regla dura de dataviz).
     comparison: 'vs período anterior'
+  },
+
+  // Lectura cruzada de los 4 KPIs (deriveSeoPerformanceInsight). Sólo aparece cuando el
+  // patrón es inequívoco; jamás especula. La variante ctr_erosion NOMBRA la hipótesis AIO
+  // sin afirmarla como hecho: el dato dice "CTR cae con posición estable", no "fue la IA".
+  insight: {
+    title: 'Lectura del período',
+    demand_drop:
+      'Los clics ({clicks}) y las impresiones ({impressions}) caen juntos con la posición estable: la demanda de estas búsquedas bajó, no tu ranking.',
+    ctr_erosion:
+      'La posición se mantiene y las impresiones también, pero el CTR cae {ctr} puntos: el SERP está capturando el clic (AI Overviews u otros elementos) antes de llegar a tu resultado.',
+    rank_gain: 'La mejora de posición ({position}) explica el alza de clics ({clicks}).',
+    rank_loss: 'La pérdida de posición ({position}) explica la caída de clics ({clicks}).'
   },
 
   chart: {
@@ -1781,6 +1800,16 @@ export const GH_GROWTH_SEO_PERFORMANCE = {
     tableCaption: 'Valores por fecha de cada serie en comparación',
     tableDateHeader: 'Fecha',
     zoomHint: 'Arrastra bajo el gráfico para acercarte a un tramo.',
+    // Granularidad: en rangos largos el día a día es ruido; la semana muestra la forma.
+    granularityLabel: 'Granularidad',
+    granularityDaily: 'Diario',
+    granularityWeekly: 'Semanal',
+    granularityWeeklyHint: 'Cada punto agrega una semana de mediciones.',
+    // AI Overview: marcador honesto — sólo existe en la serie ◑ (DataForSEO captura la SERP).
+    aioLegend: 'AI Overview presente en la búsqueda',
+    aioMarker: 'Con AI Overview',
+    // Updates confirmados de Google: contexto, no excusa. Registro curado en algorithm-updates.ts.
+    updatesLegend: 'Update confirmado de Google',
     ariaPosition:
       'Gráfico de evolución de posición de {count} series entre {from} y {to}. El eje está invertido: la posición 1 es la mejor y está arriba. Un día sin medición se dibuja como hueco, no como cero.',
     ariaVolume:

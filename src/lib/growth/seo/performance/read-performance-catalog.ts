@@ -3,7 +3,12 @@ import 'server-only'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
-import type { SeoPerformanceCatalogItem, SeoPerformanceCatalogResult, SeoPerformanceMode } from '../contracts'
+import type {
+  SeoPerformanceCatalogItem,
+  SeoPerformanceCatalogResult,
+  SeoPerformanceCatalogSet,
+  SeoPerformanceMode
+} from '../contracts'
 import { isSeoModuleEnabled } from '../flags'
 
 /**
@@ -102,6 +107,36 @@ export const readSeoPerformanceCatalog = async (
           )
         : []
 
+    // Presets data-driven: los sets NOMBRADOS que el operador ya configuró en el target
+    // activo (`seo_keyword_sets`). Miembros vigentes solamente (`effective_to IS NULL` —
+    // la tabla es append-only, el "borrado" es cierre de vigencia). La UI ofrece estos
+    // grupos como chips de un click; no inventa agrupaciones propias.
+    const setRows =
+      mode === 'keyword'
+        ? await runGreenhousePostgresQuery<{ name: string; keyword: string }>(
+            `SELECT s.name, m.keyword
+               FROM greenhouse_growth.seo_keyword_set_members m
+               JOIN greenhouse_growth.seo_keyword_sets s ON s.keyword_set_id = m.keyword_set_id
+               JOIN greenhouse_growth.seo_targets t ON t.seo_target_id = s.seo_target_id
+              WHERE t.organization_id = $1
+                AND t.status = 'active'
+                AND m.effective_to IS NULL
+              ORDER BY s.name, m.keyword`,
+            [organizationId]
+          )
+        : []
+
+    const setsByName = new Map<string, string[]>()
+
+    for (const row of setRows) {
+      const keywords = setsByName.get(row.name) ?? []
+
+      keywords.push(row.keyword)
+      setsByName.set(row.name, keywords)
+    }
+
+    const sets: SeoPerformanceCatalogSet[] = [...setsByName.entries()].map(([name, keywords]) => ({ name, keywords }))
+
     const tracked = new Set(trackedKeywords.map(row => row.keyword))
     const byItem = new Map<string, SeoPerformanceCatalogItem>()
 
@@ -129,7 +164,7 @@ export const readSeoPerformanceCatalog = async (
       return { ok: false, errorCode: 'no_data', status: null }
     }
 
-    return { ok: true, organizationId, mode, items }
+    return { ok: true, organizationId, mode, items, ...(sets.length > 0 ? { sets } : {}) }
   } catch (error) {
     captureWithDomain(error, 'growth', {
       tags: { source: 'seo_performance_catalog_reader' },

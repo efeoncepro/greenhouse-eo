@@ -193,6 +193,9 @@ const SeoPerformanceTable = ({ standings, mode, onDrill }: SeoPerformanceTablePr
                       <span>{copy.colTrend}</span>
                     </Tooltip>
                   </TableCell>
+                  {/* Columna del affordance de drill: sin encabezado visible (el aria-label
+                      de la fila ya narra la acción). */}
+                  <TableCell align='right' aria-hidden='true' sx={{ inlineSize: 40 }} />
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -293,6 +296,19 @@ const SeoPerformanceTable = ({ standings, mode, onDrill }: SeoPerformanceTablePr
                             {copy.trendUnavailable}
                           </Typography>
                         )}
+                      </TableCell>
+                      <TableCell align='right' sx={{ inlineSize: 40 }}>
+                        {/* Affordance VISIBLE del drill (hallazgo de la revisión de diseño:
+                            una fila clickeable sin señal es un easter egg). DECORATIVO a
+                            propósito — la fila entera ya es el botón (role='button'); un
+                            IconButton anidado sería un interactive dentro de otro (axe
+                            nested-interactive) y un tab-stop duplicado por fila. */}
+                        <Box
+                          component='i'
+                          aria-hidden='true'
+                          className='tabler-chevron-right'
+                          sx={{ fontSize: 18, color: 'text.secondary', verticalAlign: 'middle' }}
+                        />
                       </TableCell>
                     </TableRow>
                   )

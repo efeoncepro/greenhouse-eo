@@ -441,6 +441,12 @@ export interface RankEvolutionPoint {
   /** Posición orgánica medida; null = trackeada pero el dominio no rankeó ese día. */
   position: number | null
   url: string | null
+  /**
+   * TASK-1307 — el SERP de ese día mostró AI Overview (`serp_features ? 'ai_overview'`).
+   * Aditivo: los consumers que no lo leen no cambian. Es el puente SEO↔AEO de la
+   * pantalla ancla: una caída de CTR sin caída de posición suele explicarse acá.
+   */
+  aiOverview?: boolean
 }
 
 export interface RankEvolutionSeries {
@@ -514,6 +520,8 @@ export type SeoPerformanceSource = 'gsc_measured' | 'dataforseo_estimated'
 export interface SeoPerformancePoint {
   date: string
   value: number | null
+  /** El SERP de ese día mostró AI Overview. Sólo presente en la serie ◑ (DataForSEO). */
+  aiOverview?: boolean
 }
 
 export interface SeoPerformanceSeries {
@@ -619,12 +627,24 @@ export interface SeoPerformanceCatalogItem {
   tracked: boolean
 }
 
+/** Un set nombrado de keywords (config del target) ofrecido como preset de comparación. */
+export interface SeoPerformanceCatalogSet {
+  name: string
+  keywords: string[]
+}
+
 export type SeoPerformanceCatalogResult =
   | {
       ok: true
       organizationId: string
       mode: SeoPerformanceMode
       items: SeoPerformanceCatalogItem[]
+      /**
+       * Presets: los `seo_keyword_sets` nombrados del target activo (sólo modo keyword).
+       * Data-driven — la UI ofrece EXACTAMENTE los grupos que el operador configuró
+       * ("Marca", "Categoría"); no inventa agrupaciones.
+       */
+      sets?: SeoPerformanceCatalogSet[]
     }
   | { ok: false; errorCode: 'disabled' | 'no_data' | 'query_failed'; status: null }
 

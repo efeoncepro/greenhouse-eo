@@ -681,6 +681,11 @@ const MetricTrendCard = ({
                       strokeWidth={2.5}
                       strokeLinecap='round'
                       fill={`url(#${gradientId})`}
+                      // Con el eje invertido la base default del área (el "0" del eje)
+                      // queda ARRIBA y el gradiente se pinta sobre la línea como una
+                      // mancha flotante. `dataMax` es el borde inferior del lienzo cuando
+                      // `reversed`, así el relleno vuelve a caer BAJO la línea.
+                      baseValue={invertY ? 'dataMax' : undefined}
                       dot={renderDot}
                       activeDot={renderActiveDot}
                       isAnimationActive={!prefersReduced}

@@ -8,6 +8,8 @@ import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Stack from '@mui/material/Stack'
 import Table from '@mui/material/Table'
+import ToggleButton from '@mui/material/ToggleButton'
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
@@ -53,10 +55,11 @@ export interface SeoRankEvolutionChartProps {
   metric: SeoPerformanceMetric
   range: { from: string; to: string; days: number }
   /**
-   * Bandas de contexto (ej. una actualización de algoritmo). Hoy siempre vacío: el dominio
-   * NO tiene todavía una fuente de eventos de algoritmo, y hardcodear fechas conocidas de
-   * la industria pintaría en el gráfico del cliente un hecho que Greenhouse no midió. El
-   * componente lo soporta para cuando exista la fuente (follow-up declarado en la task).
+   * Bandas de contexto: updates CONFIRMADOS del algoritmo de Google dentro del rango
+   * (fuente: el registro curado `algorithm-updates.ts` — sólo entradas confirmadas por
+   * Google, nunca rumores de terceros). Una caída colectiva dentro de una banda tiene una
+   * explicación distinta a una caída propia del sitio, y esa distinción es exactamente la
+   * conversación con el cliente.
    */
   events?: Array<{ from: string; to: string; label: string }>
 }
@@ -70,18 +73,77 @@ const formatValue = (value: number, metric: SeoPerformanceMetric): string => {
   return formatInteger(Math.round(value))
 }
 
+/** Lunes de la semana calendario de una fecha ISO — la clave del bucket semanal. */
+const weekStartOf = (date: string): string => {
+  const parsed = new Date(`${date}T00:00:00Z`)
+  const offset = (parsed.getUTCDay() + 6) % 7
+
+  parsed.setUTCDate(parsed.getUTCDate() - offset)
+
+  return parsed.toISOString().slice(0, 10)
+}
+
+/**
+ * Agregación SEMANAL de una serie diaria. Reglas por métrica (las del módulo, no promedios
+ * ingenuos indiscriminados): volumen (clics/impresiones) se SUMA; posición y CTR se
+ * promedian sobre los días MEDIDOS de la semana (los `null` no diluyen — un hueco no es un
+ * cero). Una semana sin ninguna medición da `null` (hueco visible). `aiOverview` es "hubo
+ * AI Overview en ALGÚN día de la semana".
+ */
+const toWeekly = (
+  points: SeoPerformanceSeries['points'],
+  metric: SeoPerformanceMetric
+): SeoPerformanceSeries['points'] => {
+  const byWeek = new Map<string, { sum: number; measured: number; aio: boolean }>()
+
+  for (const point of points) {
+    const key = weekStartOf(point.date)
+    const bucket = byWeek.get(key) ?? { sum: 0, measured: 0, aio: false }
+
+    if (point.value !== null) {
+      bucket.sum += point.value
+      bucket.measured += 1
+    }
+
+    bucket.aio = bucket.aio || point.aiOverview === true
+    byWeek.set(key, bucket)
+  }
+
+  const sumMetric = metric === 'clicks' || metric === 'impressions'
+
+  return [...byWeek.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([date, bucket]) => ({
+      date,
+      value: bucket.measured === 0 ? null : sumMetric ? bucket.sum : bucket.sum / bucket.measured,
+      ...(bucket.aio ? { aiOverview: true } : {})
+    }))
+}
+
+/**
+ * Ajusta una banda de evento al eje de categorías: `markArea` sobre un eje `category`
+ * necesita valores que EXISTAN como categorías. Se recorta la ventana del evento a las
+ * fechas medidas que caen dentro; si ninguna cae, la banda no se dibuja (no se inventa).
+ */
+const resolveEventSpan = (
+  dates: string[],
+  event: { from: string; to: string }
+): { from: string; to: string } | null => {
+  const inside = dates.filter(date => date >= event.from && date <= event.to)
+
+  return inside.length === 0 ? null : { from: inside[0], to: inside[inside.length - 1] }
+}
+
+/** Umbral de días medidos sobre el cual el default pasa a semanal (el diario es ruido). */
+const WEEKLY_DEFAULT_THRESHOLD = 120
+
 const SeoRankEvolutionChart = ({ series, metric, range, events = [] }: SeoRankEvolutionChartProps) => {
   const theme = useTheme()
   const prefersReduced = useReducedMotion()
   const [showTable, setShowTable] = useState(false)
 
-  const isDark = theme.palette.mode === 'dark'
-  const isPosition = metric === 'position'
-  const metricLabel = GH_GROWTH_SEO_PERFORMANCE.metric[metric]
-
-  // Unión ordenada de todas las fechas: es lo que permite que un día que UNA serie no midió
-  // exista como `null` en su arreglo en vez de desaparecer (y que la línea se corte ahí).
-  const dates = useMemo(() => {
+  // Días medidos CRUDOS (pre-agregación): deciden el default de granularidad.
+  const rawMeasuredDays = useMemo(() => {
     const all = new Set<string>()
 
     for (const serie of series) {
@@ -90,8 +152,40 @@ const SeoRankEvolutionChart = ({ series, metric, range, events = [] }: SeoRankEv
       }
     }
 
-    return [...all].sort()
+    return all.size
   }, [series])
+
+  // En rangos largos el punto-por-día es ruido visual (nube de marcadores); la semana
+  // conserva la FORMA. El operador puede volver a diario cuando necesita el detalle.
+  const [granularity, setGranularity] = useState<'daily' | 'weekly'>(() =>
+    rawMeasuredDays > WEEKLY_DEFAULT_THRESHOLD ? 'weekly' : 'daily'
+  )
+
+  const isDark = theme.palette.mode === 'dark'
+  const isPosition = metric === 'position'
+  const metricLabel = GH_GROWTH_SEO_PERFORMANCE.metric[metric]
+
+  const displaySeries = useMemo(
+    () =>
+      granularity === 'weekly'
+        ? series.map(serie => ({ ...serie, points: toWeekly(serie.points, metric) }))
+        : series,
+    [series, metric, granularity]
+  )
+
+  // Unión ordenada de todas las fechas: es lo que permite que un día que UNA serie no midió
+  // exista como `null` en su arreglo en vez de desaparecer (y que la línea se corte ahí).
+  const dates = useMemo(() => {
+    const all = new Set<string>()
+
+    for (const serie of displaySeries) {
+      for (const point of serie.points) {
+        all.add(point.date)
+      }
+    }
+
+    return [...all].sort()
+  }, [displaySeries])
 
   const axisInk = resolveChartColor(theme.palette.text.secondary, '#6B6876')
   const gridInk = resolveChartColor(theme.palette.divider, '#DBDBDB')
@@ -108,17 +202,44 @@ const SeoRankEvolutionChart = ({ series, metric, range, events = [] }: SeoRankEv
    * 1-5 — el rango sigue al dato, no a una forma "reconocible" (hallazgo del operador).
    */
   const positionMax = useMemo(() => {
-    const values = series.flatMap(serie =>
+    const values = displaySeries.flatMap(serie =>
       serie.points.map(point => point.value).filter((value): value is number => value !== null)
     )
 
     const worst = values.length > 0 ? Math.max(...values) : TARGET_POSITION
 
     return Math.ceil(Math.max(TARGET_POSITION + 1, worst + 1))
-  }, [series])
+  }, [displaySeries])
+
+  /**
+   * Días con AI Overview en la SERP de ALGUNA serie comparada. Sólo la serie ◑
+   * (DataForSEO) trae el dato — GSC no reporta features del SERP — así que la ausencia
+   * de marcadores en una serie ● es honestidad, no un hueco del componente.
+   */
+  const aioDates = useMemo(() => {
+    const marked = new Set<string>()
+
+    for (const serie of displaySeries) {
+      for (const point of serie.points) {
+        if (point.aiOverview) marked.add(point.date)
+      }
+    }
+
+    return dates.filter(date => marked.has(date))
+  }, [displaySeries, dates])
+
+  const eventSpans = useMemo(
+    () =>
+      events
+        .map(event => ({ label: event.label, span: resolveEventSpan(dates, event) }))
+        .filter((entry): entry is { label: string; span: { from: string; to: string } } => entry.span !== null),
+    [events, dates]
+  )
 
   const option = useMemo<EChartsOption>(() => {
-    const chartSeries = series.map((serie, index) => {
+    const warningInk = resolveChartColor(theme.palette.warning.main, '#FF6500')
+
+    const chartSeries: Record<string, unknown>[] = displaySeries.map((serie, index) => {
       const style = resolveSeoSeriesStyle(index, isDark)
       const byDate = new Map(serie.points.map(point => [point.date, point.value]))
 
@@ -171,20 +292,53 @@ const SeoRankEvolutionChart = ({ series, metric, range, events = [] }: SeoRankEv
               }
             }
           : {}),
-        ...(index === 0 && events.length > 0
+        ...(index === 0 && eventSpans.length > 0
           ? {
               markArea: {
                 silent: true,
                 itemStyle: { color: resolveChartColor(theme.palette.warning.light, '#FFE0B2'), opacity: 0.25 },
-                data: events.map(event => [
-                  { xAxis: event.from, name: event.label },
-                  { xAxis: event.to }
+                // Vertical dentro de la banda: dos updates cercanos (marzo/mayo) con
+                // etiquetas horizontales se pisan entre sí; en vertical cada una vive
+                // dentro de su propia banda.
+                label: {
+                  color: axisInk,
+                  fontSize: 10,
+                  // Anclada ABAJO y rotada: crece hacia adentro de la banda (anclarla
+                  // arriba la hacía salirse del lienzo y quedaba truncada a "Goo…").
+                  position: 'insideBottom' as const,
+                  rotate: 90,
+                  align: 'left' as const,
+                  distance: 8
+                },
+                // Los límites se recortan a fechas que EXISTEN como categoría del eje —
+                // un markArea con una fecha no medida simplemente no se dibujaría.
+                data: eventSpans.map(entry => [
+                  { xAxis: entry.span.from, name: entry.label },
+                  { xAxis: entry.span.to }
                 ])
               }
             }
           : {})
       }
     })
+
+    // Carril de AI Overview: un rombo por fecha con AIO, anclado al borde inferior del
+    // lienzo (en el eje invertido de posición, `positionMax` ES el borde inferior). Es un
+    // carril de contexto, no una serie de datos: `silent`, sin animación de énfasis, y el
+    // tooltip lo narra sin número (un rombo no tiene "valor").
+    if (aioDates.length > 0 && isPosition) {
+      chartSeries.push({
+        name: GH_GROWTH_SEO_PERFORMANCE.chart.aioMarker,
+        type: 'scatter' as const,
+        data: dates.map(date => (aioDates.includes(date) ? positionMax : null)),
+        symbol: 'diamond',
+        symbolSize: 9,
+        itemStyle: { color: warningInk },
+        silent: true,
+        animation: !prefersReduced,
+        z: 1
+      })
+    }
 
     return {
       // El gráfico deja aire a la derecha para los last-value labels: sin ese margen se
@@ -198,8 +352,36 @@ const SeoRankEvolutionChart = ({ series, metric, range, events = [] }: SeoRankEv
         backgroundColor: paperInk,
         borderColor: gridInk,
         textStyle: { color: resolveChartColor(theme.palette.text.primary, '#2F2B3D'), fontSize: 12 },
-        valueFormatter: (value: unknown) =>
-          value === null || value === undefined ? GH_GROWTH_SEO_PERFORMANCE.table.pending : formatValue(Number(value), metric)
+        // Formatter propio en vez de `valueFormatter`: el carril de AI Overview se narra
+        // SIN número (un rombo de contexto no tiene "valor"; mostrarle el y interno del
+        // carril afirmaría una posición que no existe). Días sin medición se omiten de la
+        // lista — el hueco ya se ve en el lienzo.
+        formatter: (params: unknown) => {
+          const entries = (Array.isArray(params) ? params : [params]) as Array<{
+            seriesName?: string
+            marker?: string
+            value?: unknown
+            axisValueLabel?: string
+          }>
+
+          const header = entries[0]?.axisValueLabel ?? ''
+
+          const lines = entries
+            .map(entry => {
+              if (entry.seriesName === GH_GROWTH_SEO_PERFORMANCE.chart.aioMarker) {
+                return entry.value === null || entry.value === undefined
+                  ? null
+                  : `${entry.marker ?? ''} ${GH_GROWTH_SEO_PERFORMANCE.chart.aioLegend}`
+              }
+
+              if (entry.value === null || entry.value === undefined) return null
+
+              return `${entry.marker ?? ''} ${entry.seriesName}: <b>${formatValue(Number(entry.value), metric)}</b>`
+            })
+            .filter(Boolean)
+
+          return [`<b>${header}</b>`, ...lines].join('<br/>')
+        }
       },
       // SIN leyenda de ECharts: la leyenda de este chart es la de FORMA que se renderiza
       // arriba en HTML, porque es la que nombra el símbolo de cada serie (el contrato
@@ -247,19 +429,21 @@ const SeoRankEvolutionChart = ({ series, metric, range, events = [] }: SeoRankEv
       series: chartSeries
     } as EChartsOption
   }, [
-    series,
+    displaySeries,
     dates,
     metric,
     isDark,
     isPosition,
     positionMax,
-    events,
+    eventSpans,
+    aioDates,
     prefersReduced,
     axisInk,
     gridInk,
     paperInk,
     targetInk,
     theme.palette.text.primary,
+    theme.palette.warning.main,
     theme.palette.warning.light,
     theme.palette.action.hover
   ])
@@ -273,7 +457,7 @@ const SeoRankEvolutionChart = ({ series, metric, range, events = [] }: SeoRankEv
    * posición" sobre una línea de dos puntos se lee como un gráfico roto, no como una serie
    * que recién empieza.
    */
-  const measuredDays = dates.length
+  const measuredDays = rawMeasuredDays
 
   const coverageNote =
     measuredDays <= 1
@@ -317,7 +501,33 @@ const SeoRankEvolutionChart = ({ series, metric, range, events = [] }: SeoRankEv
               </Typography>
             </Stack>
 
-            <Button
+            <Stack direction='row' spacing={2} alignItems='center' flexWrap='wrap' useFlexGap>
+              <ToggleButtonGroup
+                exclusive
+                size='small'
+                value={granularity}
+                onChange={(_event, next: 'daily' | 'weekly' | null) => {
+                  // Exclusive permite des-seleccionar (next=null): se ignora — siempre hay
+                  // una granularidad activa.
+                  if (next) setGranularity(next)
+                }}
+                aria-label={GH_GROWTH_SEO_PERFORMANCE.chart.granularityLabel}
+                // Mismo focus ring explícito que el botón de tabla: el theme no dibuja
+                // outline en focus, y el probe de teclado del GVC enfoca programático
+                // (no dispara focus-visible) — por eso se cubre también `:focus` plano.
+                sx={{
+                  '& .MuiToggleButton-root.Mui-focusVisible, & .MuiToggleButton-root:focus-visible, & .MuiToggleButton-root:focus':
+                    {
+                      outline: theme => `2px solid ${theme.palette.primary.main}`,
+                      outlineOffset: 2
+                    }
+                }}
+              >
+                <ToggleButton value='daily'>{GH_GROWTH_SEO_PERFORMANCE.chart.granularityDaily}</ToggleButton>
+                <ToggleButton value='weekly'>{GH_GROWTH_SEO_PERFORMANCE.chart.granularityWeekly}</ToggleButton>
+              </ToggleButtonGroup>
+
+              <Button
               variant='outlined'
               size='small'
               onClick={() => setShowTable(current => !current)}
@@ -334,7 +544,8 @@ const SeoRankEvolutionChart = ({ series, metric, range, events = [] }: SeoRankEv
               }}
             >
               {showTable ? GH_GROWTH_SEO_PERFORMANCE.chart.hideTable : GH_GROWTH_SEO_PERFORMANCE.chart.showTable}
-            </Button>
+              </Button>
+            </Stack>
           </Stack>
 
           {/* Leyenda de FORMA: el color solo no basta (WCAG 1.4.1). Cada serie se nombra
@@ -359,6 +570,43 @@ const SeoRankEvolutionChart = ({ series, metric, range, events = [] }: SeoRankEv
                 </Stack>
               )
             })}
+
+            {/* El carril AIO y las bandas de update también se nombran en la leyenda:
+                un símbolo sin nombre es un acertijo, no una anotación. */}
+            {aioDates.length > 0 && isPosition ? (
+              <Stack direction='row' spacing={1} alignItems='center'>
+                <Box
+                  aria-hidden='true'
+                  sx={{
+                    inlineSize: 9,
+                    blockSize: 9,
+                    backgroundColor: 'warning.main',
+                    transform: 'rotate(45deg)'
+                  }}
+                />
+                <Typography variant='caption' color='text.secondary'>
+                  {GH_GROWTH_SEO_PERFORMANCE.chart.aioLegend}
+                </Typography>
+              </Stack>
+            ) : null}
+
+            {eventSpans.length > 0 ? (
+              <Stack direction='row' spacing={1} alignItems='center'>
+                <Box
+                  aria-hidden='true'
+                  sx={{
+                    inlineSize: 14,
+                    blockSize: 10,
+                    backgroundColor: 'warning.light',
+                    opacity: 0.45,
+                    borderRadius: 0.5
+                  }}
+                />
+                <Typography variant='caption' color='text.secondary'>
+                  {GH_GROWTH_SEO_PERFORMANCE.chart.updatesLegend}
+                </Typography>
+              </Stack>
+            ) : null}
           </Stack>
 
           <Box role='img' aria-label={ariaLabel}>
@@ -368,7 +616,9 @@ const SeoRankEvolutionChart = ({ series, metric, range, events = [] }: SeoRankEv
           {/* `text.secondary`, no `disabled`: es una instrucción que hay que poder leer
               (el disabled quedó en 2.29:1 contra blanco — hallazgo axe del GVC). */}
           <Typography variant='caption' color='text.secondary'>
-            {GH_GROWTH_SEO_PERFORMANCE.chart.zoomHint}
+            {granularity === 'weekly'
+              ? `${GH_GROWTH_SEO_PERFORMANCE.chart.granularityWeeklyHint} ${GH_GROWTH_SEO_PERFORMANCE.chart.zoomHint}`
+              : GH_GROWTH_SEO_PERFORMANCE.chart.zoomHint}
           </Typography>
 
           {showTable ? (
@@ -386,7 +636,7 @@ const SeoRankEvolutionChart = ({ series, metric, range, events = [] }: SeoRankEv
                 <TableHead>
                   <TableRow>
                     <TableCell>{GH_GROWTH_SEO_PERFORMANCE.chart.tableDateHeader}</TableCell>
-                    {series.map(serie => (
+                    {displaySeries.map(serie => (
                       <TableCell key={serie.item} align='right'>
                         {serie.item}
                       </TableCell>
@@ -397,7 +647,7 @@ const SeoRankEvolutionChart = ({ series, metric, range, events = [] }: SeoRankEv
                   {dates.map(date => (
                     <TableRow key={date}>
                       <TableCell>{date}</TableCell>
-                      {series.map(serie => {
+                      {displaySeries.map(serie => {
                         const value = serie.points.find(point => point.date === date)?.value ?? null
 
                         return (

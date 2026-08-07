@@ -21,13 +21,16 @@ import { GreenhouseBreadcrumbs, GreenhouseChip } from '@/components/greenhouse/p
 import SurfaceRecipe from '@/components/greenhouse/primitives/surface-system/SurfaceRecipe'
 import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
 import { GH_GROWTH_SEO_PERFORMANCE, GH_GROWTH_SEO_OVERVIEW } from '@/lib/copy/growth'
+import { algorithmUpdatesInRange } from '@/lib/growth/seo/algorithm-updates'
 import type {
   SeoPerformanceCatalogItem,
+  SeoPerformanceCatalogSet,
   SeoPerformanceMetric,
   SeoPerformanceMode,
   SeoPerformanceResult,
   SeoRankDevice
 } from '@/lib/growth/seo/contracts'
+import { deriveSeoPerformanceInsight } from '@/lib/growth/seo/performance/derive-insight'
 import type { SeoSpaceOption } from '@/lib/growth/seo/overview/list-seo-spaces'
 import type { SeoConnectionState } from '@/views/greenhouse/admin/growth/seo/overview/SeoOverviewView'
 
@@ -68,6 +71,8 @@ export interface SeoPerformanceViewProps {
   rangeDays: number
   items: string[]
   catalog: SeoPerformanceCatalogItem[]
+  /** Sets nombrados del target (presets de comparación data-driven). */
+  sets?: SeoPerformanceCatalogSet[]
   /** `null` = todavía no se pidió (sin set elegido o sin conexión). */
   performance: SeoPerformanceResult | null
 }
@@ -84,6 +89,7 @@ const SeoPerformanceView = ({
   rangeDays,
   items,
   catalog,
+  sets = [],
   performance
 }: SeoPerformanceViewProps) => {
   const router = useRouter()
@@ -331,7 +337,10 @@ const SeoPerformanceView = ({
         mode={mode}
         items={items}
         catalog={catalog}
+        sets={sets}
         maxItems={MAX_COMPARED_ITEMS}
+        metric={metric}
+        onMetricChange={next => pushQuery({ metric: next })}
         onModeChange={handleModeChange}
         onItemsChange={next => pushQuery({ items: next })}
       />
@@ -390,6 +399,27 @@ const SeoPerformanceView = ({
 
     const sparseItems = performance.series.filter(serie => serie.sparse).map(serie => serie.item)
 
+    /**
+     * Lectura cruzada de los 4 KPIs: la relación entre ellos ES el diagnóstico (¿cayeron
+     * los clics por posición, por demanda o porque el SERP captura el clic?). Derivada
+     * pura del mismo summary — sólo habla cuando el patrón es inequívoco.
+     */
+    const insight = deriveSeoPerformanceInsight(performance.summary)
+
+    const signed = (value: number, decimals: number, unit = ''): string =>
+      `${value > 0 ? '+' : ''}${value.toFixed(decimals)}${unit}`
+
+    const insightText = insight
+      ? copy.insight[insight.kind]
+          .replace('{clicks}', insight.clicksDeltaPercent === null ? '—' : signed(insight.clicksDeltaPercent, 0, '%'))
+          .replace(
+            '{impressions}',
+            insight.impressionsDeltaPercent === null ? '—' : signed(insight.impressionsDeltaPercent, 0, '%')
+          )
+          .replace('{position}', insight.positionDelta === null ? '—' : signed(insight.positionDelta, 1))
+          .replace('{ctr}', insight.ctrDeltaPoints === null ? '—' : Math.abs(insight.ctrDeltaPoints).toFixed(1))
+      : null
+
     return (
       <Stack spacing={6}>
         {selector}
@@ -413,6 +443,18 @@ const SeoPerformanceView = ({
           </Alert>
         ) : null}
 
+        {insightText ? (
+          <Alert
+            severity={insight?.kind === 'rank_gain' ? 'success' : 'warning'}
+            icon={false}
+            data-capture='seo-performance-insight'
+            sx={{ '& .MuiAlert-message': { color: 'text.primary' } }}
+          >
+            <AlertTitle>{copy.insight.title}</AlertTitle>
+            {insightText}
+          </Alert>
+        ) : null}
+
         {sparseItems.length > 0 ? (
           <Alert
             severity='info'
@@ -424,23 +466,14 @@ const SeoPerformanceView = ({
           </Alert>
         ) : null}
 
-        <Box data-capture='seo-performance-metric'>
-          <CustomTextField
-            select
-            label={copy.metric.label}
-            value={metric}
-            onChange={event => pushQuery({ metric: event.target.value as SeoPerformanceMetric })}
-            sx={{ minInlineSize: 180 }}
-          >
-            {(['position', 'clicks', 'impressions', 'ctr'] as const).map(option => (
-              <MenuItem key={option} value={option}>
-                {copy.metric[option]}
-              </MenuItem>
-            ))}
-          </CustomTextField>
-        </Box>
-
-        <SeoRankEvolutionChart series={performance.series} metric={metric} range={performance.range} />
+        <SeoRankEvolutionChart
+          series={performance.series}
+          metric={metric}
+          range={performance.range}
+          // Updates confirmados de Google dentro del rango (registro curado): contexto
+          // para distinguir una caída colectiva de una caída propia del sitio.
+          events={algorithmUpdatesInRange(performance.range.from, performance.range.to)}
+        />
 
         <SeoPerformanceTable
           standings={performance.standings}

@@ -11,13 +11,20 @@ import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { visuallyHidden } from '@mui/utils'
 
+import MenuItem from '@mui/material/MenuItem'
+
 import CustomAutocomplete from '@core/components/mui/Autocomplete'
 import CustomTextField from '@core/components/mui/TextField'
 
 import { GreenhouseChip } from '@/components/greenhouse/primitives'
 import { GH_GROWTH_SEO_PERFORMANCE } from '@/lib/copy/growth'
 import { formatInteger } from '@/lib/format'
-import type { SeoPerformanceCatalogItem, SeoPerformanceMode } from '@/lib/growth/seo/contracts'
+import type {
+  SeoPerformanceCatalogItem,
+  SeoPerformanceCatalogSet,
+  SeoPerformanceMetric,
+  SeoPerformanceMode
+} from '@/lib/growth/seo/contracts'
 
 /**
  * TASK-1307 — el control que define QUÉ se compara.
@@ -39,19 +46,45 @@ export interface SeoSetSelectorProps {
   mode: SeoPerformanceMode
   items: string[]
   catalog: SeoPerformanceCatalogItem[]
+  /** Sets nombrados del target: presets de un click (data-driven, nunca inventados acá). */
+  sets?: SeoPerformanceCatalogSet[]
   maxItems: number
+  /**
+   * La métrica vive DENTRO de la card "Qué comparar": qué se compara y en qué métrica son
+   * la misma decisión, y tenerla suelta a mitad de página la desconectaba del contexto.
+   */
+  metric: SeoPerformanceMetric
+  onMetricChange: (metric: SeoPerformanceMetric) => void
   onModeChange: (mode: SeoPerformanceMode) => void
   onItemsChange: (items: string[]) => void
 }
 
-const SeoSetSelector = ({ mode, items, catalog, maxItems, onModeChange, onItemsChange }: SeoSetSelectorProps) => {
+const SeoSetSelector = ({
+  mode,
+  items,
+  catalog,
+  sets = [],
+  maxItems,
+  metric,
+  onMetricChange,
+  onModeChange,
+  onItemsChange
+}: SeoSetSelectorProps) => {
   const reachedMax = items.length >= maxItems
   const byItem = new Map(catalog.map(entry => [entry.item, entry]))
+  const copy = GH_GROWTH_SEO_PERFORMANCE
+
+  // Un preset activo = el set actual ES exactamente ese grupo (recortado al techo).
+  const isPresetActive = (preset: SeoPerformanceCatalogSet): boolean => {
+    const target = preset.keywords.slice(0, maxItems)
+
+    return target.length === items.length && target.every(keyword => items.includes(keyword))
+  }
 
   return (
     <Card data-capture='seo-performance-set'>
       <CardContent>
-        <Stack spacing={4}>
+        <Stack spacing={3}>
           <Typography variant='h6' component='h2'>
             {GH_GROWTH_SEO_PERFORMANCE.set.title}
           </Typography>
@@ -130,7 +163,62 @@ const SeoSetSelector = ({ mode, items, catalog, maxItems, onModeChange, onItemsC
                 />
               )}
             />
+
+            <CustomTextField
+              select
+              label={copy.metric.label}
+              value={metric}
+              onChange={event => onMetricChange(event.target.value as SeoPerformanceMetric)}
+              sx={{ minInlineSize: 150 }}
+            >
+              {(['position', 'clicks', 'impressions', 'ctr'] as const).map(option => (
+                <MenuItem key={option} value={option}>
+                  {copy.metric[option]}
+                </MenuItem>
+              ))}
+            </CustomTextField>
           </Stack>
+
+          {/* Presets: los grupos que el operador YA configuró en el target (data-driven).
+              Un click arma la comparación completa; el chip activo se marca sólido. */}
+          {mode === 'keyword' && sets.length > 0 ? (
+            <Stack direction='row' spacing={2} alignItems='center' flexWrap='wrap' useFlexGap>
+              <Typography variant='caption' color='text.secondary'>
+                {copy.set.presetsLabel}
+              </Typography>
+              {sets.map(preset => {
+                const truncated = preset.keywords.length > maxItems
+
+                return (
+                  <Tooltip
+                    key={preset.name}
+                    title={
+                      truncated
+                        ? copy.set.presetTruncated
+                            .replace('{total}', String(preset.keywords.length))
+                            .replace('{max}', String(maxItems))
+                        : ''
+                    }
+                    disableHoverListener={!truncated}
+                  >
+                    <span>
+                      <GreenhouseChip
+                        kind='metric'
+                        variant={isPresetActive(preset) ? 'solid' : 'outlined'}
+                        size='small'
+                        label={`${preset.name} (${preset.keywords.length})`}
+                        clickable
+                        aria-label={copy.set.presetAria
+                          .replace('{name}', preset.name)
+                          .replace('{count}', String(Math.min(preset.keywords.length, maxItems)))}
+                        onClick={() => onItemsChange(preset.keywords.slice(0, maxItems))}
+                      />
+                    </span>
+                  </Tooltip>
+                )
+              })}
+            </Stack>
+          ) : null}
 
           {items.length > 0 ? (
             <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap>

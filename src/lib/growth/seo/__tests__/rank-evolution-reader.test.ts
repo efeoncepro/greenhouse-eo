@@ -52,6 +52,12 @@ const pgRow = (keyword: string, date: string, position: number | null, url: stri
   url
 })
 
+// TASK-1307 — el flag AIO viaja en la fila PG como `ai_overview` (serp_features ? 'ai_overview').
+const pgRowWithAio = (keyword: string, date: string, position: number | null) => ({
+  ...pgRow(keyword, date, position),
+  ai_overview: true
+})
+
 beforeEach(() => {
   state.target = { seo_target_id: 'seot-1', organization_id: 'org-1' }
   state.pgRows = [
@@ -108,6 +114,23 @@ describe('readRankEvolution — fuente por ventana', () => {
 
     expect(state.pgSql).toContain('capture_date >= CURRENT_DATE - ($4::int - 1)')
     expect(state.pgSql).not.toContain('EXTRACT')
+  })
+
+  it('aiOverview sólo viaja cuando el SERP lo mostró (aditivo, nunca false explícito)', async () => {
+    state.pgRows = [pgRowWithAio('impermeabilizante', '2026-08-06', 7), pgRow('pintura para techos', '2026-08-06', 3)]
+
+    const result = await readRankEvolution('seot-1', { rangeDays: 90 })
+
+    if (!result.ok) throw new Error('esperaba ok:true')
+
+    expect(result.series[0].points[0]).toEqual({
+      date: '2026-08-06',
+      position: 7,
+      url: null,
+      aiOverview: true
+    })
+    // Sin AIO el campo NO existe: igualdad estructural intacta para consumers legacy.
+    expect(result.series[1].points[0]).toEqual({ date: '2026-08-06', position: 3, url: null })
   })
 })
 

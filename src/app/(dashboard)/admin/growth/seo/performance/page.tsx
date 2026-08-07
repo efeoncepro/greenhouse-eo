@@ -38,7 +38,7 @@ export const dynamic = 'force-dynamic'
 const VIEW_CODE = 'administracion.growth_seo'
 
 /** Ventanas que ofrece el selector. Un valor fuera de la lista cae al default. */
-const ALLOWED_RANGE_DAYS = new Set([28, 90, 180])
+const ALLOWED_RANGE_DAYS = new Set([28, 90, 180, 365])
 const DEFAULT_RANGE_DAYS = 90
 
 /**
@@ -169,6 +169,7 @@ export default async function Page({ searchParams }: PageProps) {
       rangeDays={rangeDays}
       items={items}
       catalog={catalog?.ok ? catalog.items : []}
+      sets={catalog?.ok ? (catalog.sets ?? []) : []}
       performance={performance}
     />
   )
