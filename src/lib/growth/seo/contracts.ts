@@ -627,3 +627,63 @@ export type SeoPerformanceCatalogResult =
       items: SeoPerformanceCatalogItem[]
     }
   | { ok: false; errorCode: 'disabled' | 'no_data' | 'query_failed'; status: null }
+
+/**
+ * ═══ TASK-1308 — Command `trackKeywords` (seguir una keyword) ═══
+ *
+ * Seguir una keyword no es un INSERT: es un **compromiso de gasto diferido**. El rank
+ * capture diario (TASK-1303) paga DataForSEO por cada keyword VIGENTE del set, todos los
+ * días, hasta que alguien la deje de seguir. Por eso el command tiene techo, procedencia
+ * y outcome por keyword — y por eso el resultado NUNCA es un booleano: un caller que sólo
+ * ve `ok: true` no sabe si agregó 1 keyword nueva o rebotó 40 contra el techo.
+ */
+
+/** Procedencia del write (vocabulario cerrado, espejo del CHECK de la migración 1308). */
+export type SeoKeywordTrackSource = 'operator_ui' | 'nexa' | 'mcp' | 'seed' | 'backfill'
+
+/** Qué pasó con UNA keyword del lote. */
+export type SeoKeywordTrackStatus =
+  /** Nueva membresía vigente creada. Entra al rank capture del próximo ciclo. */
+  | 'tracked'
+  /** Ya tenía membresía vigente. Cero writes, cero gasto nuevo — el command es idempotente. */
+  | 'already_tracked'
+  /** Vacía, sólo espacios o más larga que el máximo: no se persiste basura. */
+  | 'invalid'
+  /** El set llegó a su techo gobernado. Se rechaza explícito, NUNCA en silencio. */
+  | 'capacity_exceeded'
+
+export interface SeoKeywordTrackOutcome {
+  /** La keyword normalizada (lo que quedó o habría quedado en la tabla). */
+  keyword: string
+  status: SeoKeywordTrackStatus
+}
+
+export type TrackKeywordsResult =
+  | {
+      ok: true
+      seoTargetId: string
+      organizationId: string
+      keywordSetId: string
+      outcomes: SeoKeywordTrackOutcome[]
+      /** Membresías vigentes del target DESPUÉS del command (lo que se paga por ciclo). */
+      activeKeywordCount: number
+      /** Techo gobernado vigente, para que la UI pueda decir cuánto queda. */
+      capacity: number
+    }
+  | {
+      ok: false
+      errorCode:
+        | 'disabled'
+        | 'target_not_found'
+        | 'target_not_active'
+        | 'no_entitlement'
+        | 'no_keywords'
+        | 'query_failed'
+      status: null
+    }
+
+/**
+ * Evento outbox del command (constante local del dominio, mismo patrón que el de captura:
+ * el seam de extracción §17.3 evita acoplar `src/lib/growth/seo/**` al catálogo central).
+ */
+export const SEO_KEYWORD_SET_UPDATED_EVENT = 'growth.seo.keyword_set.updated'

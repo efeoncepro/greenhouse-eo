@@ -7472,11 +7472,19 @@ export interface GreenhouseGrowthSeoGscDaily {
 
 export interface GreenhouseGrowthSeoKeywordSetMembers {
   created_at: Generated<Timestamp>;
+  /**
+   * TASK-1308 — actor que agregó la keyword al set (identificador de sesión/agente). NULL en las filas de seed previas al command gobernado.
+   */
+  created_by: string | null;
   effective_from: Generated<Timestamp>;
   effective_to: Timestamp | null;
   keyword: string;
   keyword_set_id: string;
   keyword_set_member_id: Generated<string>;
+  /**
+   * TASK-1308 — procedencia del write: operator_ui | nexa | mcp | seed | backfill. Ortogonal a `tags` (clasificación de dominio).
+   */
+  source: string | null;
   tags: Generated<string[]>;
 }
 

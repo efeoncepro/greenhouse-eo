@@ -139,6 +139,12 @@ export type CanonicalErrorCode =
   | 'search_console_token_unhealthy'
   | 'search_console_property_not_accessible'
   | 'search_console_sites_unavailable'
+  // Growth SEO — command `trackKeywords` (TASK-1308).
+  | 'seo_module_disabled'
+  | 'seo_target_not_found'
+  | 'seo_target_not_active'
+  | 'seo_not_entitled'
+  | 'seo_keywords_invalid_input'
   // Proposal Studio F0 (TASK-1392).
   | 'proposal_not_found'
   | 'proposal_invalid_input'
@@ -606,6 +612,34 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   search_console_sites_unavailable: {
     status: 502,
     message: 'No pudimos obtener tus propiedades de Search Console. Intenta de nuevo en unos minutos.',
+    actionable: true
+  },
+  // Growth SEO — command `trackKeywords` (TASK-1308). `actionable: false` en todo lo que es
+  // estructural: reintentar no conecta un módulo ni reactiva un target, y ofrecer el botón
+  // escondería la acción real (hablar con quien administra el módulo).
+  seo_module_disabled: {
+    status: 409,
+    message: 'El módulo SEO no está disponible por ahora.',
+    actionable: false
+  },
+  seo_target_not_found: {
+    status: 404,
+    message: 'No encontramos el sitio SEO de este Space.',
+    actionable: false
+  },
+  seo_target_not_active: {
+    status: 409,
+    message: 'El seguimiento de este sitio está pausado. Reactívalo antes de seguir keywords nuevas.',
+    actionable: false
+  },
+  seo_not_entitled: {
+    status: 403,
+    message: 'Este Space no tiene el módulo SEO activo.',
+    actionable: false
+  },
+  seo_keywords_invalid_input: {
+    status: 400,
+    message: 'Revisa las keywords: llegaron vacías o con un formato que no podemos seguir.',
     actionable: true
   },
   // Proposal Studio F0 (TASK-1392) — errores tipados del aggregate Proposal.
