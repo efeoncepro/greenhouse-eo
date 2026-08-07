@@ -1,5 +1,32 @@
 # TASK-1655 — Growth SEO: Historical Data Platform (backfill GSC→BQ + split OLTP/OLAP + semilla rank)
 
+## Delta 2026-08-07 — ejecución (Slices 1-4 shipped)
+
+- **Slice 1 ✅** Mirror `seo_gsc_history` (tabla creada vía `bq mk`, particionada+clustered)
+  + espejo del batch diario con `bqMirror` reportado en el outcome.
+- **Slice 2 ✅ (en curso el apply completo)** Backfill API→BQ shipped y verificado: smoke
+  31/31 días de Berel (199.294 filas, 0 degradados) + **paridad exacta PG↔BQ** en
+  2026-08-01 (6.582 filas · 450 clics · wpos 6,4601 idénticos). El apply de 16 meses es
+  resumible; quedó interrumpido por un cuelgue de la máquina del operador (~66 días) y
+  se relanzó.
+- **Slice 3 ✅** Split de lectura por COBERTURA en `readSeoPerformance` (no por rango
+  fijo): si el `MIN(capture_date)` de PG no alcanza el inicio de la ventana, la lectura
+  completa va a BQ; con BQ vacío cae a PG. La pantalla ancla ya sirve la historia.
+- **Slice 4 ✅** Semilla rank vía `historical_serps`. **Granularidad verificada en
+  sandbox ANTES de gastar: snapshots dispersos (~mensuales/bimestrales), NO serie
+  diaria** — se persisten con su fecha real y los huecos quedan a la vista.
+  `source_run_id='labs-hist-<fecha>'` como procedencia (columna existente, sin
+  migración). Corrida real Berel: **4 keywords con historia** (5-6 snapshots c/u, hasta
+  2025-08/09) y **27 long-tail sin archivo del proveedor** (`no_history`, hecho
+  declarado). Re-corrida = `already_seeded`, $0 (idempotencia pre-provider). Costo real
+  ~$0.20.
+- **Slice 5 ⏳ out-of-band**: activar el export nativo GSC→BQ en `sc-domain:berel.com`
+  requiere permiso **Owner** en su Search Console (coordinación con el operador/cliente).
+  Efeonce ya exporta desde 2025-12-10. Nota: Efeonce **no tiene conexión OAuth GSC en
+  Greenhouse** (su dato entra por el export nativo), así que el backfill por API hoy solo
+  aplica a Berel; si se quiere el pre-diciembre-2025 de Efeonce, conectar su OAuth
+  primero.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -135,6 +162,60 @@ Reglas obligatorias:
 - El pasado (16 meses API) nunca se trajo para ninguna org.
 - El export nativo no está activado en la propiedad de Berel (`sc-domain:berel.com`).
 - No hay camino de semilla histórica de rank. **[verificar]** granularidad y shape real de `/dataforseo_labs/google/historical_serps/live/` contra sandbox ANTES de diseñar el mapeo (la reference no declara si es mensual).
+
+## Backend/Data Contract
+
+### Backend/data brief
+
+- Backend rigor: `backend-critical`
+- Impacto principal: `sync` (mirror + backfill) con `reader` derivado (split PG/BQ)
+- Source of truth afectado: **BigQuery `greenhouse_growth_analytics.seo_gsc_history` pasa a ser el SoT del histórico GSC**; PG `seo_gsc_daily` queda como ventana caliente operativa. El SoT de rank no cambia (PG caliente + `seo_rank_history` BQ, TASK-1303).
+- Consumidores afectados: `readSeoPerformance` (UI 1307 + lane + MCP), y como candidatos futuros `readSeoOverviewKpis`/`readKeywordOpportunities`.
+- Runtime target: `local|staging|prod` (la base y BQ son compartidos).
+
+### Contract surface
+
+- Contrato existente a respetar: shape de fila GSC (org, site_url, capture_date, query, page, clicks, impressions, ctr, position) idéntico en ambos stores; fórmula de posición ponderada por impresiones idéntica a `read-overview-kpis`.
+- Contrato nuevo: `backfillGscHistory(org,{fromDate,toDate})` + `mirrorGscDailyToBq(org,date)` + `seedRankHistory(targetId)` — commands de operador (runners en `scripts/growth/`); el split de lectura es interno al reader (ningún consumer elige store).
+- Backward compatibility: total — con BQ vacío el reader sirve lo que PG tenga (comportamiento previo).
+- Full API parity: los readers ya exponen su lane/MCP (TASK-1307); los commands de backfill/seed son one-shot de operador — exponerlos como MCP tools queda declarado como follow-up (una corrida de 490 días no cabe en request-response).
+
+### Data model and invariants
+
+- Entidades: `seo_gsc_history` (BQ, nueva), `seo_rank_snapshots` (PG, filas semilla con `source_run_id='labs-hist-*'`), `seo_rank_history` (BQ, espejo existente).
+- Invariantes: MERGE idempotente por la clave del UPSERT de PG; NUNCA `WHEN NOT MATCHED BY SOURCE THEN DELETE`; huecos = ausencia de fila (jamás ceros); semilla NUNCA pisa una medición del cron (`ON CONFLICT DO NOTHING`; triggers append-only vigentes); posición SIEMPRE ponderada por impresiones.
+- Tenant/space boundary: todo keyed por `organization_id`; particiones/filtros por org en toda query BQ.
+- Idempotency/concurrency: backfill resumible (salta días presentes); no correr dos backfills de la misma org en paralelo (cuota QPS por propiedad).
+- Audit/outbox/history: el espejo GSC corre como paso del batch (no outbox — decisión declarada: fetch y espejo comparten el ciclo de vida del día); el de rank sigue en su consumer reactivo.
+
+### Migration, backfill and rollout
+
+- Migration posture: `none` en PG (columna `source_run_id` existía); tabla BQ creada como paso de rollout (`bq mk`, 2026-08-07, documentado en runbook).
+- Default state: aditivo; con BQ vacío nada cambia.
+- Backfill plan: por org con conexión GSC activa (hoy Berel; Efeonce va por export nativo), 16 meses, ejecutado por runner de operador.
+- Rollback path: drop tabla BQ + revert PR (PG intacto); semilla identificable por `source_run_id` (remoción exigiría bypass admin del trigger append-only — documentado, no automatizado).
+- External coordination: export nativo GSC→BQ en la propiedad de Berel (permiso Owner).
+
+### Security and access
+
+- Auth/access gate: commands server-only, runners de operador con ADC; el gasto DataForSEO pasa por `enforceSeoRunEntitlement` + spend fence + ledger del transporte.
+- Sensitive data posture: datos SEO del cliente (no PII).
+- Error contract: degradación honesta por día/keyword (`degraded`/`no_history` con errorCode), nunca días a medias.
+- Abuse/rate-limit posture: throttle 250ms/día contra GSC; batch Labs con gate + fence.
+
+### Runtime evidence
+
+- Paridad PG↔BQ verificada con datos reales (2026-08-01: 6.582 filas / 450 clics / wpos 6,4601 idénticos).
+- Smoke backfill 31/31 días; corrida completa 16 meses en curso (resumible).
+- Sandbox `historical_serps` verificado ANTES de gastar (granularidad dispersa); seed real: 4 keywords con historia, re-corrida idempotente $0.
+- `pnpm worker:runtime-deps-gate` + `worker:build-contract-gate` verdes (el batch es worker-bundled).
+
+### Acceptance criteria additions
+
+- [x] SoT nombrado + contrato de fila idéntico entre stores (test de paridad con datos reales).
+- [x] Invariantes (MERGE sin DELETE, huecos honestos, semilla no pisa cron) explícitos.
+- [x] Migration/rollback posture explícito (aditivo; BQ por rollout step).
+- [ ] Evidencia final del backfill completo (MIN fecha ≈ 16 meses) — corrida en curso.
 
 ## Modular Placement Contract
 

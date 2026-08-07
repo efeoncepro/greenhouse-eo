@@ -154,7 +154,7 @@ acción propia, porque el costo de postergarla lo paga la superficie ya entregad
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `interaction`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1307-growth-seo-rank-url-performance-over-time-ui.md`
 - Flow: `none`
 - Motion: `none`

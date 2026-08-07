@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-08-05 por Claude (TASK-1299 + TASK-1301)
-> **Ultima actualizacion:** 2026-08-06 por Claude (captura de rankings ACTIVA en produccion — scheduler despausado, primera serie real de Berel)
+> **Ultima actualizacion:** 2026-08-07 por Claude (TASK-1307 pantalla ancla Rendimiento + TASK-1655 histórico GSC en BigQuery)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
 
 # Modulo SEO — Search Visibility 360 (Growth)
@@ -193,11 +193,52 @@ Lo siguiente aún no está construido (las series que ya se llenan: Search Conso
 
 | Falta | Task que lo trae |
 |---|---|
-| UI operador `/admin/growth/seo` (overview) | TASK-1306 |
-| Pantalla ancla: Rank & URL performance over time | TASK-1307 |
 | Keyword opportunities (UI) | TASK-1308 |
 | Site audit (UI) | TASK-1309 |
 | Superficie cliente + Report Artifact + quadrant 360 | TASK-1310 |
+| Semilla histórica de posiciones (DataForSEO Labs) + export nativo GSC→BQ por cliente | TASK-1655 (Slices 4-5) |
+
+### La pantalla ancla: Rendimiento en el tiempo (TASK-1307, 2026-08-07)
+
+`/admin/growth/seo/performance` (tab **Rendimiento** de Search Visibility) es la película
+que justifica el módulo: eliges hasta 8 URLs o keywords y ves cómo evolucionan lado a
+lado. El gráfico usa el estándar de los rank trackers — **el eje de posición va invertido
+(1 arriba = mejor)** y lo dice con palabras, no solo con la geometría — con la meta top-3
+dibujada, zoom temporal y el valor final de cada serie pegado a su línea. Cada serie se
+distingue por color **y forma** (tipo de línea + símbolo), para que la comparación
+sobreviva al daltonismo y a una impresión en blanco y negro.
+
+Tres reglas de honestidad que la pantalla no negocia:
+
+- **La cobertura se declara**: "N de M días con medición · desde–hasta" junto al título.
+  Un período pedido de 90 días con 31 medidos se dice, no se disimula.
+- **Los huecos son huecos**: un día sin medición corta la línea; jamás se rellena con un
+  cero (la posición 0 no existe y "0 clics" afirmaría algo que no se midió).
+- **La fuente se nombra**: posición exacta de mercado (◑ DataForSEO) o posición promedio
+  medida (● Search Console). Si la serie exacta es más joven que la medida (la captura de
+  rankings recién empieza), la pantalla sirve la medida y lo declara — nunca las promedia.
+- La selección vive en la URL (`?keywords=`/`?urls=`): el enlace se comparte y la otra
+  persona ve exactamente la misma comparación.
+
+> Detalle tecnico: `SeoPerformanceView` + `readSeoPerformance`/`readSeoPerformanceCatalog`
+> (`src/lib/growth/seo/performance/**`). Mismo reader para UI, Nexa y las MCP tools
+> `get_seo_performance` / `get_seo_performance_catalog` (parity en el mismo PR). El chart
+> es el primer consumer de **ECharts** (lazy por ruta — la decisión de librería del módulo).
+
+### El histórico de verdad: BigQuery como memoria larga (TASK-1655, 2026-08-07)
+
+El módulo nació capturando solo "hoy", y una pantalla de evolución con 5 días no se le
+puede presentar a un cliente. Desde el 2026-08-07 el historial de Search Console vive en
+BigQuery (`seo_gsc_history`): el batch diario espeja cada día capturado, y un backfill
+por API trae hasta 16 meses de pasado por organización (gratis — la API de Google no
+cobra). PostgreSQL conserva solo la ventana operativa reciente: meses de historia en la
+base transaccional la engordarían sin necesidad (5 días ya pesaban 27 MB). Las pantallas
+eligen sola la fuente: si la base operativa no cubre el período pedido, leen el histórico.
+
+> Detalle tecnico: mirror + backfill en `src/lib/growth/seo/gsc-history-bq-mirror.ts` /
+> `gsc-backfill.ts`; runbook del backfill en
+> [`backfill-historico-gsc.md`](../../manual-de-uso/growth/backfill-historico-gsc.md);
+> delta de arquitectura en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §4.
 
 Además: el alta del módulo `seo_v1` a una organización sigue siendo un **paso operativo manual** — ver el manual [Asignar el módulo SEO a una organización](../../manual-de-uso/growth/asignar-modulo-seo-organizacion.md).
 
