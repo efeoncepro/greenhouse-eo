@@ -9,7 +9,7 @@
 
 ## 2026-08-07 — Autenticación local Gcloud con Playwright
 
-Se agregó `pnpm gcloud:auth:playwright` para renovar bajo solicitud los dos carriles de Google Cloud
+Se agregó `pnpm gcloud:auth:playwright` y la skill espejo `greenhouse-gcloud-auth-playwright` para renovar bajo solicitud los dos carriles de Google Cloud
 (`gcloud auth login` y ADC) usando Playwright como navegador visible, con verificación final mediante el
 preflight canónico. La credencial local se configura con `pnpm gcloud:auth:playwright:setup` en `.auth/`
 ignorado por Git y protegido con permisos `0600`; no se habilitó scheduler ni ejecución automática.

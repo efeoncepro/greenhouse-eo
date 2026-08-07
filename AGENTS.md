@@ -85,6 +85,7 @@ Manifest machine-readable y gateado: [`docs/operations/agent-context-router.json
 | Implementación UI Greenhouse/Vuexy                  | `greenhouse-portal-ui-implementer`, `greenhouse-vuexy-ui-expert` | `agent-invariants/UI_FEATURE_AGENT_INVARIANTS.md` + `DESIGN.md`                                                                                                                      |
 | Copy visible / UX content                           | `greenhouse-ux-content-accessibility`, `copywriting`             | `src/lib/copy/*` + nomenclature config + docs de contexto aplicables                                                                                                                 |
 | Browser/URL/captura/diagnóstico visual              | `greenhouse-browser-diagnostics`                                 | `GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md` + manual GVC                                                                                                                              |
+| Gcloud local auth / OAuth CLI + ADC / Playwright    | `greenhouse-gcloud-auth-playwright` + `greenhouse-secret-hygiene` | `docs/manual-de-uso/operations/gcloud-auth-playwright.md` + `scripts/gcloud-auth-preflight.sh`; la credencial local vive ignorada en `.auth/` con `0600` y nunca se expone |
 | Release/promoción develop→main                      | `greenhouse-production-release`                                  | `GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`                                                                                                                                             |
 | Cloud, secrets, deploy, runtime config              | `greenhouse-secret-hygiene`, skill cloud aplicable               | cloud governance + security posture + infra architecture                                                                                                                             |
 | Ops/reliability/crons/Teams/Platform Health         | skill ops aplicable, `teams-bot-platform`                        | `agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md`                                                                                                                               |
@@ -175,6 +176,10 @@ y [`GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md`](docs/ui/GREENHOUSE_PREMIUM_U
 - CLIs autenticados: `az`, `gcloud`, `gh`, `vercel`, `psql` vía `pnpm pg:connect`.
 - GCP interactivo local requiere ambos flujos: `gcloud auth login` y
   `gcloud auth application-default login`.
+- Cuando el operador solicite autenticación o renovación Gcloud, invocar
+  `greenhouse-gcloud-auth-playwright` y ejecutar `pnpm gcloud:auth:playwright -- --force`; el agente debe
+  completar el flujo estándar con Playwright sin pedir pasos manuales. Nunca imprimir la clave, URLs OAuth,
+  códigos, tokens o cookies; mantener `.auth/` ignorado y con permisos `0600`.
 - **GCP multi-proyecto local:** `default` conserva `julio.reyes@efeonce.org` / `efeonce-group` y
   `globe` apunta a la misma cuenta / `efeonce-globe`. Son perfiles locales, no permisos ni runtime.
   Para Globe preferir `gcloud --configuration=globe ... --project=efeonce-globe`; si se activa el

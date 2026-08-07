@@ -2,8 +2,9 @@
 
 ### Autenticación local Gcloud con Playwright (2026-08-07)
 
-Se agregó el proceso manual `pnpm gcloud:auth:playwright` para renovar CLI + ADC cuando el operador lo
-solicite, con `--force` para repetir OAuth y `--check-only` para verificar sin abrir navegador. El setup
+Se agregó el proceso local explícito `pnpm gcloud:auth:playwright`, invocable por Codex o Claude, para
+renovar CLI + ADC cuando el operador lo solicite, con `--force` para repetir OAuth y `--check-only` para
+verificar sin abrir navegador. La skill espejo `greenhouse-gcloud-auth-playwright` fija este recorrido. El setup
 `pnpm gcloud:auth:playwright:setup` guarda la cuenta y la clave en `.auth/gcloud-auth-credentials.json`
 ignorado por Git y con permisos `0600`; el perfil Chrome aislado queda en `.auth/gcloud-auth-profile`.
 El flujo usa Playwright visible, no imprime URLs/códigos/cookies y termina con `gcloud-auth-preflight.sh`.

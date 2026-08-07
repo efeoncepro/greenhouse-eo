@@ -231,6 +231,10 @@ Todo trabajo formal sigue:
   `globe` para `efeonce-globe`; preferir `gcloud --configuration=globe ... --project=efeonce-globe`
   para no mutar el contexto compartido. La configuración no sustituye IAM ni cambia la postura runtime.
   Detalle operativo: [`GLOBE_RUNTIME_HANDOFF.md`](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md#cli-local-multi-proyecto).
+- **Gcloud local para agentes:** ante una solicitud explícita, invocar la skill espejo
+  `greenhouse-gcloud-auth-playwright` y ejecutar `pnpm gcloud:auth:playwright -- --force`; el runner completa
+  CLI + ADC con Playwright y verifica `gcloud-auth-preflight.sh`. La credencial queda en `.auth/` ignorada por
+  Git con `0600`; no hay scheduler, deploy ni cambio de postura runtime.
 - Cambio en task/epic/mini-task: `pnpm ops:lint --changed`.
 - Ejecución Codex de `TASK-###`: goal preflight y luego `pnpm codex:task-hook TASK-###`; aliases aceptados:
   `/implement-task TASK-###`, `/implement-task ###`, `/task TASK-###` y `/task ###`.

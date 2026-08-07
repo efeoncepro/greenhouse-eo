@@ -44,7 +44,7 @@ Verificar sin abrir Playwright:
 pnpm gcloud:auth:playwright -- --check-only
 ```
 
-El navegador se lanza en modo visible con un perfil aislado en `.auth/gcloud-auth-profile`. Si Google solicita una verificación adicional, complétala en esa ventana; el proceso espera el callback sin registrar su URL ni su código.
+El navegador se lanza en modo visible con un perfil aislado en `.auth/gcloud-auth-profile`; el agente completa automáticamente la selección de cuenta, la clave y el consentimiento OAuth. El proceso espera el callback sin registrar su URL ni su código. Si Google presenta un reto de seguridad fuera de ese flujo, termina con un error seguro en lugar de pedir una acción manual o guardar datos sensibles.
 
 ## Guardas
 

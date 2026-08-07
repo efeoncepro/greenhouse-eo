@@ -1,0 +1,4 @@
+interface:
+  display_name: "Gcloud Auth Playwright"
+  short_description: "Renueva Gcloud CLI y ADC con Playwright"
+  default_prompt: "Usa $greenhouse-gcloud-auth-playwright para autenticar o renovar Gcloud CLI y ADC sin intervención del operador."

@@ -34,6 +34,15 @@
       ]
     },
     {
+      "id": "gcloud-local-auth",
+      "triggers": ["gcloud auth", "Gcloud auth", "Google Cloud local auth", "Application Default Credentials", "ADC", "Gcloud Playwright", "OAuth local"],
+      "skills": ["greenhouse-gcloud-auth-playwright", "greenhouse-secret-hygiene"],
+      "sources": [
+        "docs/manual-de-uso/operations/gcloud-auth-playwright.md",
+        "scripts/gcloud-auth-preflight.sh"
+      ]
+    },
+    {
       "id": "release-cloud-secrets",
       "triggers": ["release", "main", "deploy", "secret", "environment", "Cloud Run", "Vercel"],
       "skills": ["greenhouse-production-release", "greenhouse-secret-hygiene"],
