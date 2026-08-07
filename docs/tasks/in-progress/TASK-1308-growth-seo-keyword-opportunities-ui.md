@@ -1,5 +1,70 @@
 # TASK-1308 — Growth SEO: Keyword Opportunities UI
 
+## Delta 2026-08-07 — ejecución: dos supuestos de la spec no resistieron el runtime
+
+### 1. `trackKeywords` NO EXISTÍA (→ `Backend impact: none` pasa a `command`)
+
+La spec y el wireframe lo daban por construido por TASK-1303 ("[verificar]"). No lo había
+construido nadie: `seo_keyword_sets`/`_members` sólo las escribían dos scripts de seed. Se
+construyó acá como Slice 0, con la forma que exige el hallazgo de arquitectura:
+
+🔴 **Seguir una keyword es un COMPROMISO DE GASTO DIFERIDO, no un INSERT.** El write no
+cuesta nada; el rank capture diario (TASK-1303) paga DataForSEO por cada keyword vigente
+del set, todos los días, hasta que alguien la deje de seguir. De ahí las tres defensas que
+un INSERT normal no tendría: **techo gobernado por target** (`capacity_exceeded` explícito,
+nunca silencio ni excepción), **entitlement per-org** (`seo_v1` vigente; no consume
+allowance de site-audit — seguir no gasta hoy, gasta mañana) y **outcome POR keyword**, que
+es lo único que distingue "agregué 3" de "rebotaron 40 contra el techo".
+
+Migración aditiva `created_by`/`source` (nullable, sin backfill): un write gobernado con
+tres consumers necesita rastro de quién comprometió el gasto, y la tabla no lo tenía.
+
+### 2. Los tres ejes del scatter no tienen fuente (→ encoding recalibrado)
+
+El wireframe pedía X = dificultad, Y = volumen, color = intención. `readKeywordOpportunities`
+devuelve `searchVolume: null`, `difficulty: null`, `market: 'unavailable'` (TASK-1300 no
+aterrizó) y el contrato **no tiene campo de intención**. Pintarlos daba un lienzo vacío o
+datos inventados.
+
+Consultada la skill `seo-aeo` (§02, método verificado contra la API real de GSC): *"priorizar
+por volumen estimado de un tercero teniendo el GSC propio, donde la demanda ya está medida"*
+está listado como un **error**. Las impresiones de Search Console son demanda medida de la
+propia SERP del cliente — mejor dato que un volumen promedio de mercado.
+
+**Encoding vigente:** X = posición ponderada (8→20), Y = impresiones (log), tamaño = clics
+incrementales estimados, color+**forma** = acción recomendada. Zona sombreada = primera plana.
+
+🎯 **La decisión que hace esto a prueba de TASK-1300:** el dato de mercado NUNCA será un eje
+— será una **columna y un filtro**. Los ejes medidos son correctos con o sin él, así que
+cuando el enriquecimiento aterrice no se reescribe nada: `searchVolume`/`difficulty` ya son
+`number | null` en el contrato y la tabla los pinta honestos hoy ("Sin dato de mercado",
+nunca `0` ni un guion ambiguo) y reales mañana.
+
+⚠️ **Canibalización quedó como ACCIÓN, no como variante visual** (lo que ya pedía el Delta
+2026-08-05): serie propia, forma propia y verbo propio ("Consolidar" vs "Empujar"), con el
+clasificador en un módulo aparte para que mapa, filtros y tabla no deriven entre sí.
+
+### 3. Tool MCP + federación (criterio de cierre del operador)
+
+`track_seo_keywords` creada en el MCP interno y **federada** al gateway `mcp.efeonce.org`
+(repo `efeonce-mcp`, commit local `cb316cc`) con **scope propio**
+`efeonce.mcp.seo.keywords.track` — no el de lectura, porque escribir cuesta. El lane
+ecosystem sólo la acepta desde bindings de scope `internal`: un binding cliente lee sus
+oportunidades pero no hace crecer su propia factura.
+
+🔴 El guard de paridad del gateway **no habría visto esta tool**: su regex se ató a
+`get_seo_*` cuando todas las tools eran lecturas. Se amplió al dominio.
+
+### Pendiente de rollout
+
+- **Scope en Entra**: `efeonce.mcp.seo.keywords.track` todavía no existe en la app
+  `Efeonce MCP Resource` (`c5363215-b9a6-4bf1-bb1c-e61963b37dac`). Hasta provisionarlo la
+  tool federada responde `insufficient_scope` — fail-closed por diseño.
+- **Push del gateway**: commit local sin push (el repo tiene deploy productivo en push).
+- **GVC**: el scenario `growth-seo-keywords` está escrito pero no se pudo correr — el dev
+  server no levanta en esta máquina (el harness reporta éxito y no spawnea `next`).
+
+
 ## Delta 2026-08-07 — TASK-1306 cerró: la Open Question #1 queda resuelta
 
 **Tu Open Question #1 ("¿el Space picker / viewCode de sección SEO lo establece TASK-1306 o
@@ -64,7 +129,7 @@ una segunda librería sólo para esta pantalla.
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P3`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -75,7 +140,7 @@ una segunda librería sólo para esta pantalla.
 - Wireframe: `docs/ui/wireframes/TASK-1308-growth-seo-keyword-opportunities-ui.md`
 - Flow: `none`
 - Motion: `none`
-- Backend impact: `none`
+- Backend impact: `command`
 - Epic: `EPIC-022`
 - Status real: `Diseno`
 - Rank: `TBD`
@@ -102,6 +167,29 @@ El módulo SEO (EPIC-022) tiene el reader `readKeywordOpportunities` (TASK-1302)
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
      ═══════════════════════════════════════════════════════════ -->
+
+## Hybrid Execution Justification
+
+La task nació declarada `Backend impact: none` — superficie UI pura sobre readers/commands ya
+existentes. En Discovery se verificó que **el command `trackKeywords` que la spec daba por construido
+(TASK-1303, marcado `[verificar]`) no existía**: `seo_keyword_sets`/`_members` sólo las escribían dos
+scripts de seed, y ninguna task del registry lo reclamaba.
+
+**Por qué se resolvió acá y no partiendo la task en dos.** El escape hatch del `## Backend/Data Contract`
+prescribe partir el trabajo, y el invariante que ese hatch protege es *"NO agregar lógica de negocio al
+componente"* — que se respeta por completo: toda la regla (techo de gasto, entitlement, idempotencia,
+normalización, outbox) vive en `src/lib/growth/seo/track-keywords.ts`, y la UI es un cliente más del
+mismo primitive que operan Nexa y el lane MCP. Partirlo habría dejado esta superficie **sin su acción
+central** (uno de sus tres criterios de aceptación) esperando a una task nueva, para un command de un
+archivo. El operador autorizó explícitamente construir lo faltante (2026-08-07).
+
+**Orden interno de ejecución (respetado):** Slice 0 backend (migración + command + route app-lane +
+tests + sanity live) → Slice 0b contrato programático (lane ecosystem + tool MCP + federación) → Slices
+1–4 UI (ruta + mapa + tabla/acción + GVC). Ningún slice de UI se escribió antes de que el command
+estuviera verde contra PG real.
+
+**Riesgo asumido:** la migración es aditiva y nullable (dos columnas de procedencia, sin backfill), y el
+command es append-only sobre una tabla que ya tenía trigger anti-DELETE. Rollback = revert + flag OFF.
 
 ## Architecture Alignment
 

@@ -1,5 +1,36 @@
 # TASK-1308 / `/admin/growth/seo/keywords` — Keyword Opportunities
 
+> ## ⚠️ Recalibración 2026-08-07 (implementación) — los ejes de este wireframe no tienen fuente
+>
+> Este documento especifica el scatter como **X = dificultad, Y = volumen, color = intención**
+> y una tabla con columnas de volumen/dificultad. Al implementar se verificó contra el
+> contrato real: `readKeywordOpportunities` devuelve `searchVolume: null`, `difficulty: null`,
+> `market: 'unavailable'` (TASK-1300 no aterrizó) y **no existe un campo de intención**.
+>
+> **Lo implementado** (consultada la skill `seo-aeo` §02, método verificado contra la API real
+> de GSC, que lista priorizar por volumen estimado teniendo el GSC propio como un *error*):
+>
+> | Wireframe | Implementado | Por qué |
+> |---|---|---|
+> | X = dificultad | **X = posición ponderada** (8→20 fijo) | Medido. Izquierda = más cerca de la primera plana |
+> | Y = volumen (mercado) | **Y = impresiones** (log) | Demanda MEDIDA de la SERP propia, mejor dato que un promedio de mercado |
+> | size = clicks | **size = clics incrementales estimados** (área ∝ ganancia) | El score del reader ya está en clics, no en un índice |
+> | color = intención | **color + FORMA = acción** (Empujar / A un paso / Consolidar) | No hay campo de intención; y lo que decide el trabajo es la ACCIÓN |
+> | facet intención | **facet acción** | ídem |
+> | slider dificultad | **facet posición** (primera/segunda plana) | Sin fuente de dificultad |
+> | col. Volumen / Dificultad | se conservan, con estado **"Sin dato de mercado"** | Ni `0` ni guion ambiguo (Delta 2026-08-05 de la task) |
+>
+> 🎯 **Decisión de fondo:** el dato de mercado, cuando llegue, **NO será un eje — será una
+> columna y un filtro**. Los ejes medidos son correctos con o sin él, así que TASK-1300 no
+> obliga a reescribir esta pantalla.
+>
+> ⚠️ **Canibalización quedó como ACCIÓN con verbo propio ("Consolidar"), no como chip
+> decorativo** — como ya pedía el Delta 2026-08-05 de la task.
+>
+> El resto del wireframe (layout, estados, contrato de a11y, copy ledger, plan GVC) se
+> implementó como está escrito.
+
+
 ## Meta
 
 - Status: `ready-for-implementation`

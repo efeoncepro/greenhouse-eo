@@ -180,7 +180,7 @@ chokepoint como lectura, SIN anti-oracle por diseño — visibilidad operativa).
 
 **Commands (write, capability-gated, audited, outbox):**
 - `configureSeoTarget(orgId, { rootDomain, market }, actor)`
-- `trackKeywords(keywordSetId, keywords[], actor)`
+- `trackKeywords(seoTargetId, keywords[], actor)` — **IMPLEMENTADO (TASK-1308, 2026-08-07)** en `src/lib/growth/seo/track-keywords.ts`. 🔴 **No es un INSERT: es un COMPROMISO DE GASTO DIFERIDO.** El write no cuesta nada; el rank capture diario (TASK-1303) le paga al proveedor por cada keyword vigente del set, en cada ciclo, hasta que alguien la deje de seguir. Por eso lleva **techo gobernado por target** (`GROWTH_SEO_TRACKED_KEYWORDS_PER_TARGET`, default 200 → outcome `capacity_exceeded` explícito, nunca silencio ni excepción), **entitlement per-org** (`seo_v1` vigente; NO consume allowance de site-audit — seguir no gasta hoy, gasta mañana), **outcome POR keyword** (`tracked|already_tracked|capacity_exceeded|invalid`, nunca un booleano), normalización + dedupe, idempotencia (`ON CONFLICT DO NOTHING` sobre el índice único parcial) y `FOR UPDATE OF` contra dos "Seguir" concurrentes. Append-only: sólo inserta — dejar de seguir es cerrar `effective_to` y es OTRO command (follow-up). App-lane `POST /api/admin/growth/seo/keywords/track` (capability `growth.seo.target.configure`) + lane ecosystem `POST /api/platform/ecosystem/growth/seo/keywords/track` (**sólo bindings de scope `internal`**: un binding cliente lee sus oportunidades pero no hace crecer su propia factura) + MCP tool `track_seo_keywords`, federada al gateway con **scope propio** `efeonce.mcp.seo.keywords.track`. Evento `growth.seo.keyword_set.updated` emitido dentro de la transacción.
 - `queueSiteAudit(targetId, actor)` (async OnPage task)
 - `setBacklinkTracking(targetId, competitors[], actor)`
 
@@ -290,6 +290,18 @@ Evolución posición = line multi-serie (Y invertido); clicks/impresiones = area
 > 3. **Series con huecos: formato `{x, y}`, nunca array plano.** Con el array plano, un `null` revienta Apex; con `{x, y}` el `y: null` es un hueco de primera clase — que es justo lo que se necesita: un día sin medición se dibuja como hueco, **NUNCA interpolado**. Y con puntos `{x, y}` **NO** se declara `xaxis.categories`: darle a Apex dos definiciones del eje X en conflicto es la otra mitad de esos 8 pageerrors.
 >
 > El **dual-axis sigue prohibido**: la curva de visibilidad de S1 son **dos charts apilados** que comparten eje X (clics de 0 a miles vs posición 1–20 invertida). Y el fallback tabular ("Ver tabla de datos") no es opcional: un chart nunca puede ser la única forma de leer la serie.
+
+> **Delta 2026-08-07 (TASK-1308) — el scatter de oportunidad NO usa los ejes que este §10.4 describía, y no debe usarlos.**
+>
+> El texto de arriba especifica *"X dificultad, Y volumen, size clicks, color intención"*. **Ninguna de las tres fuentes existe**: `readKeywordOpportunities` devuelve `searchVolume: null`, `difficulty: null` y `market: 'unavailable'` (el enriquecimiento DataForSEO Labs es `TASK-1300`), y el contrato **no tiene campo de intención**. Implementarlo literal habría dado un lienzo vacío o, peor, datos fabricados.
+>
+> La skill `seo-aeo` (§02, método verificado contra la API real de GSC) lista *"priorizar por volumen estimado de un tercero teniendo el GSC propio, donde la demanda ya está medida"* como un **error de método**. Las impresiones de Search Console son demanda medida de la SERP propia del cliente — con su país, su dispositivo y su mezcla real de queries — y son mejor insumo que un volumen promedio de mercado.
+>
+> **Encoding canónico vigente:** X = **posición ponderada** (rango fijo 8→20, izquierda = más cerca de la primera plana) · Y = **impresiones** (log; la distribución es long-tail y en lineal el 90% se apila contra el eje) · tamaño = **clics incrementales estimados** (área ∝ ganancia, no radio) · color **+ forma** = **acción recomendada**. Zona sombreada = primera plana (posición ≤ 10).
+>
+> 🎯 **Y el dato de mercado, cuando `TASK-1300` aterrice, NO será un eje: será una COLUMNA y un FILTRO.** Los ejes medidos son metodológicamente correctos con o sin él, así que el contrato de la superficie no se rompe al llegar — `searchVolume`/`difficulty` ya son `number | null` y la tabla los pinta honestos hoy ("Sin dato de mercado", nunca `0` ni un guion ambiguo) y reales mañana, sin tocar el componente.
+>
+> ⚠️ **Canibalización es una ACCIÓN, no una variante visual de "oportunidad".** Una query con más de una página no se optimiza: se **consolida** (unificar, 301, canonical o diferenciar intención). Tiene serie propia, forma propia y verbo propio en toda la superficie, y su clasificador vive en un módulo compartido para que mapa, filtros y tabla no puedan derivar entre sí.
 
 > **Nota de estado (2026-07-01):** ECharts aún NO está instalado (el repo corre ApexCharts 3.49 + Recharts). Instalar `echarts` + `echarts-for-react` (lazy por ruta) es Slice 0 de la pantalla ancla `TASK-1307` — Greenhouse sería el primer consumer del stack ECharts (alineado con la deprecación oportunista de ApexCharts, TASK-518). La alternativa B (line multi-serie Y-invertido sobre ApexCharts con `yaxis.reversed` + annotations) queda documentada en TASK-1307 por si Discovery la prefiere. `CustomChip`/`CustomAutocomplete` no existen como tal → usar `GreenhouseChip` + `@core/components/mui/Autocomplete`.
 

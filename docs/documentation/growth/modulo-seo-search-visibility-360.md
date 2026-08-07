@@ -244,6 +244,47 @@ Además: el alta del módulo `seo_v1` a una organización sigue siendo un **paso
 
 Sobre el interruptor general `GROWTH_SEO_ENABLED`: está **encendido desde el 2026-08-05** y es **multi-runtime** — lo leen dos procesos distintos con su propia copia de la variable: el trabajador de fondo (`ops-worker`, para la captura diaria de Search Console) y el portal en Vercel (para el lane que sirve las consultas por MCP). Encenderlo en un solo runtime deja el otro camino muerto. Desde el 2026-08-06 está en `true` en Vercel Production. Encenderlo no gasta presupuesto: la captura de Search Console es gratis y las consultas por MCP son de lectura. Las corridas que **sí** cuestan dinero (rankings, site audit, backlinks) siguen exigiendo el assignment `seo_v1` de la organización y pasan por el chokepoint de cupos y presupuesto.
 
+### Oportunidades de keywords: donde crecer en busqueda (TASK-1308, 2026-08-07)
+
+La tercera pantalla del modulo (`Growth > SEO > Keywords`) responde una sola pregunta: **que keyword
+persigo primero**. Muestra las busquedas donde el sitio ya aparece entre las posiciones 8 y 20 — ya
+existe pagina y ya existe relevancia, falta el empujon — y las ordena por los clics adicionales que
+ganaria cada una si subiera.
+
+**Que se ve**
+
+| Elemento | Que dice |
+|---|---|
+| Mapa de oportunidad | Cada burbuja es una keyword. Mas a la izquierda, mas cerca de la primera plana. Mas arriba, mas gente la busca. Mas grande, mas clics ganarias. |
+| Zona sombreada | La primera plana (posicion 10 o mejor): el empujon mas barato. |
+| Forma y color | La accion recomendada, que no es la misma para todas (ver abajo). |
+| Tabla | Los valores exactos de cada keyword, la pagina que rankea hoy y el boton "Seguir". |
+
+**Tres acciones, no tres severidades.** El modulo no clasifica las keywords por "que tan buenas son"
+sino por **que hay que hacer con ellas**, porque son trabajos distintos:
+
+- **Empujar (fruta madura)** — posicion 10 o mejor. Ya estas en la primera plana, falta subir dentro de ella.
+- **Empujar (a un paso)** — posicion 11 a 20. La segunda plana; llegar a la primera es el salto de mayor retorno.
+- **Consolidar** — mas de una pagina tuya compite por esa busqueda y se diluyen entre si. **No se optimiza:
+  se consolida** (unificar, redirigir, canonical o diferenciar la intencion). Es otro trabajo, con otro dueño.
+
+**De donde sale el dato, y que todavia no esta.** Todo lo que se ve esta **medido por Search Console**:
+son las impresiones y posiciones reales de la busqueda del propio cliente. Las columnas de *volumen* y
+*dificultad de mercado* dicen "Sin dato de mercado" porque ese enriquecimiento externo aun no esta
+habilitado — y la pantalla lo dice con esas palabras en vez de mostrar un `0`, que afirmaria que nadie
+busca eso. La priorizacion no lo necesita: la demanda ya esta medida.
+
+**"Seguir" cuesta plata, y la pantalla lo dice antes del clic.** Seguir una keyword la agrega al set
+monitoreado, y desde ahi su posicion se mide **todos los dias** con un proveedor externo que se cobra por
+consulta. Por eso: la accion solo aparece para quien tiene el permiso de configurar el target (ver el mapa
+y hacer crecer la factura son dos permisos distintos), el cupo del set se muestra siempre, y al llegar al
+tope el boton se deshabilita explicando por que en vez de fallar al enviarlo. Si una keyword ya estaba
+seguida, volver a seguirla no hace nada ni cuesta nada.
+
+> Detalle tecnico: `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §7 (command `trackKeywords`)
+> y §10.4 (encoding del mapa). Codigo: `src/lib/growth/seo/track-keywords.ts`,
+> `src/views/greenhouse/admin/growth/seo/keywords/`.
+
 ## Relacion con el AI Visibility Grader (motores hermanos)
 
 SEO y AEO son los dos motores de **Search Visibility 360** y se diseñaron como espejo deliberado:

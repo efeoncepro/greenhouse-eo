@@ -7,12 +7,40 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-07 — Growth SEO: Oportunidades de keywords + command `trackKeywords` (TASK-1308)
+
+Nueva ruta operador `/admin/growth/seo/keywords` (tab **Keywords** de Search Visibility, child del
+viewCode `administracion.growth_seo`): mapa de oportunidad ECharts, filtros y tabla densa con la acción
+gobernada "Seguir". La spec daba por existente el command `trackKeywords` y no lo había construido nadie,
+así que se construyó acá con la forma que exige su naturaleza: seguir una keyword no es un INSERT sino un
+**compromiso de gasto diferido** — el rank capture diario le paga al proveedor por cada keyword vigente del
+set, en cada ciclo — de modo que el command lleva techo gobernado por target, entitlement per-org, outcome
+por keyword (nunca un booleano), idempotencia y outbox dentro de la transacción. Se expuso además como tool
+MCP `track_seo_keywords`, federada al gateway con scope propio (no el de lectura).
+
+El scatter no usa los ejes que pedían el wireframe y la arquitectura: volumen, dificultad e intención de
+mercado no tienen fuente hoy, y priorizar por un volumen estimado teniendo el Search Console propio es un
+error de método. Los ejes son los medidos —posición ponderada × impresiones, tamaño por clics incrementales,
+color y forma por acción recomendada— y el dato de mercado, cuando llegue, será una columna y un filtro,
+nunca un eje: por eso la pantalla no tendrá que reescribirse. La canibalización quedó como una acción con
+verbo propio ("consolidar"), no como una variante visual de oportunidad.
+
+Estado: code complete. Quedan pendientes el scope en Entra (la tool federada responde `insufficient_scope`
+hasta provisionarlo, fail-closed), el push del gateway y la evidencia GVC.
+
 ## 2026-08-07 — Autenticación local Gcloud con Playwright
 
 Se agregó `pnpm gcloud:auth:playwright` y la skill espejo `greenhouse-gcloud-auth-playwright` para renovar bajo solicitud los dos carriles de Google Cloud
 (`gcloud auth login` y ADC) usando Playwright como navegador visible, con verificación final mediante el
 preflight canónico. La credencial local se configura con `pnpm gcloud:auth:playwright:setup` en `.auth/`
 ignorado por Git y protegido con permisos `0600`; no se habilitó scheduler ni ejecución automática.
+
+## 2026-08-07 — Capacitación HubSpot ANAM · deck y material operativo
+
+Se alineó el deck de 25 láminas con la pauta recibida por Outlook y el caso canónico de ANAM: objetos y
+asociaciones, Growth/Renovación, Service/Ticket, dashboards, estados de madurez, Breeze, Meeting Notetaker,
+handoff de los tres intents y ejercicio integrado. Se dejaron el PDF/PNG derivado en `.captures/` y el
+runbook/handout como fuentes operativas; no se modificó la configuración live de HubSpot.
 
 ## 2026-08-06 — Cockpit SEO Overview (TASK-1306)
 
@@ -964,52 +992,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
 
 La continuidad consolidada de esta sesión y el índice histórico mensual quedan reflejados en [`Handoff.md`](Handoff.md)
 y [`docs/changelog/internal/2026-07.md`](docs/changelog/internal/2026-07.md).
-
-## 2026-07-29 — Release Cloud Build: autenticación privada AXIS en workers
-
-- El release orchestrator `30465872005` reveló `ERR_PNPM_FETCH_401` en los builds Cloud Run de `ops-worker`,
-  `commercial-cost-worker` e `ico-batch-worker`: faltaba autorización para `@efeoncepro/axis-tokens`.
-- Los tres deploy scripts ahora usan el secreto read-only existente `axis-packages-read-token` mediante `secretEnv` y
-  `.npmrc` efímero; los Dockerfiles montan BuildKit secret en ambas capas `pnpm install`, sin token en imagen o runtime.
-- La primera corrida autenticada aún respondió `401`: el PAT estaba sano, pero el heredoc no quoted expandía `$$` al
-  PID del shell antes de que Cloud Build pudiera resolver `secretEnv`. Los scripts ahora preservan el doble dólar
-  requerido por Cloud Build y un test de contrato cubre los tres consumidores.
-- `.dockerignore` y `.gcloudignore` excluyen `.npmrc`; el gate de contratos impide que el secreto efímero viaje en el
-  contexto de Docker o en un upload local accidental.
-- `artifact-worker`, cuarto build unit que instala el `package.json` raíz, adoptó el mismo montaje BuildKit; el gate
-  ahora exige AXIS auth en todas las etapas `pnpm install` de los cuatro workers.
-- Se concedió acceso Secret Manager sólo al service account de Cloud Build de Greenhouse. Validaciones locales de
-  contratos de workers, tests focales y los cuatro builds reales pasaron.
-- PR #166 promovió todo `develop` a `main` en `0b4bdd6acb401ef0b108e27f1a8f1d80c469a0ed`. El orquestador oficial
-  `30473069894` terminó verde sin bypass, dejó el manifest
-  `0b4bdd6acb40-2608542b-b1e5-4b3b-b24e-5036501dfef1` en `released`, verificó Vercel Production, Cloud Run y
-  `/api/auth/health`. Azure aplicó sus skips canónicos `no_infra_diff`.
-- El watchdog conserva un falso positivo conocido para `ops-worker`: su diff de rutas runtime desde el SHA
-  desplegado al target es vacío y el orquestador aplicó el change-gate, por lo que no corresponde redeploy label-only.
-
-## 2026-07-29 — Globe: contrato tipográfico del payload cliente + jerarquía del Producer (TASK-1599)
-
-- Tres commits desplegados y verificados en vivo sobre `globe-studio-internal-00100-9kq` (imagen
-  `b9112a80985d`) en `https://globe.efeoncepro.com/producer`, con sesión real a 1440px.
-- **`68a2cbe`** — 13 sitios del payload pedían Geist@700 con sólo Poppins 700 · Geist 400 · Geist 600
-  cargados: el navegador **sintetiza** el corte faltante, deforma el trazo y no falla ningún gate. Dos
-  gates nuevos cierran la clase: uno aparea familia×peso **en el sitio de uso** (la declaración de
-  `@font-face` estaba sana; el defecto era quién pedía qué) y otro rechaza la utilidad de fuente que el
-  theme no puede generar (`font-normal`/`font-medium` no emitían CSS). Más `tabular-nums` en siete
-  números vivos.
-- **`d009871`** — jerarquía del Producer. El panel de créditos **no se rompía por el número**: llevaba
-  `max-w-full`, y sobre un elemento `absolute` esa medida resuelve contra el bloque contenedor —el
-  `<details>`, o sea el ancho del disparador—; los tres síntomas eran un bug. Y `Listo` vs `Completada`
-  eran **dos ejes** del contrato (`coarseProgress` vs `state`), no dos palabras: `stateCompleted` quedó
-  huérfana y se borró.
-- **`b9112a8`** — cierre de una regresión propia: bajar las acciones del prompt al flujo desbordó el
-  cuerpo y un renglón quedó cortado contra el riel translúcido; se resolvió con el token `--rail-scrim`
-  en el SSOT. Más `Math.floor` en el donut, que con `round` decía `100 %` junto a `Gastado 166`.
-- Verificación: build 0 · eslint 0 · `node --test` 129/129 · canario de motor 8/8 · canario del composer
-  163/163 · revisión humana en vivo tras cada despliegue.
-- **Quedan tres puntos abiertos sin dueño**: el preflight de Tailwind no se emite, así que
-  `b, strong { font-weight: bolder }` pide el corte fuerte por herencia y es invisible a un gate que
-  escanea `className`; la fuga del `axis-pilot-canary` deja `pnpm test` sin terminar y un huérfano en el
-  puerto 4326 por corrida; y el H9 del feed, cuyo `…` no es CSS (`DISPLAY_TITLE_MAX_LENGTH = 96` recorta
-  por conteo de caracteres antes de que exista layout, así que ningún ancho lo arregla).
-- Detalle de runtime: `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`.

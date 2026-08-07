@@ -1,5 +1,44 @@
 # Handoff activo
 
+### TASK-1308 — Keyword Opportunities: code complete, 3 pendientes de rollout (2026-08-07)
+
+Ruta `/admin/growth/seo/keywords` (tab **Keywords**, child del viewCode `administracion.growth_seo`)
+entregada con mapa ECharts + filtros + `DataTableShell` + acción "Seguir". Dos supuestos de la spec
+no resistieron el runtime y ambos quedaron cerrados en el mismo PR:
+
+**(a) `trackKeywords` NO existía** — la spec y el wireframe lo daban por construido por TASK-1303;
+las tablas sólo las escribían dos scripts de seed. Se construyó con la forma que exige el hallazgo:
+🔴 **seguir una keyword es un compromiso de gasto diferido** (el rank capture diario le paga al
+proveedor por cada keyword vigente, en cada ciclo), así que lleva techo gobernado por target
+(`GROWTH_SEO_TRACKED_KEYWORDS_PER_TARGET`, default 200), entitlement per-org, outcome POR keyword y
+outbox dentro de la transacción. Migración aditiva `created_by`/`source` **aplicada en dev**.
+
+**(b) Los tres ejes del scatter no tienen fuente** (`searchVolume`/`difficulty` = null,
+`market: 'unavailable'`, y no hay campo de intención). Recalibrado a ejes MEDIDOS: posición ×
+impresiones, tamaño = clics incrementales, color+forma = acción. 🎯 El dato de mercado, cuando
+aterrice TASK-1300, **será columna y filtro, nunca eje** — por eso esta pantalla no se reescribe.
+
+**PENDIENTES DE ROLLOUT (nada de esto es opcional para declarar la task completa):**
+
+1. **Scope de Entra** — `efeonce.mcp.seo.keywords.track` no existe todavía en la app
+   `Efeonce MCP Resource` (`c5363215-b9a6-4bf1-bb1c-e61963b37dac`, 3 scopes hoy). La tool federada
+   responde `insufficient_scope` hasta provisionarlo (fail-closed por diseño). ⚠️ `az ad app update`
+   **reemplaza** el arreglo completo: hay que hacer round-trip (leer → append → escribir → verificar)
+   o borra los 3 scopes vivos de Globe + lecturas. Snapshot del estado previo en el scratchpad de la
+   sesión (`entra-api-before.json`).
+2. **Push del gateway** — `efeonce-mcp` commit local `cb316cc` sin push (el repo tiene deploy
+   productivo en push; último run `success`). Incluye el guard de paridad ampliado: su regex se ató a
+   `get_seo_*` cuando todo era lectura, así que la primera tool que escribe le era **invisible**.
+3. **GVC** — scenario `growth-seo-keywords` escrito (premium, desktop + 390px) pero **no ejecutado**:
+   el dev server no levanta en esta máquina. `preview_start` reporta éxito y no spawnea `next`
+   (cero procesos en `ps`, tres intentos, máquina descargada, `pnpm` resuelve por Volta). Hay dos
+   `dev-harness.mjs` huérfanos del 25-Jul que podrían estar reteniendo el registro del harness.
+   Correr `pnpm fe:capture growth-seo-keywords --env=local` cuando el dev vuelva.
+
+Sin `pnpm test` full ni `pnpm build` por la coordinación con la otra sesión (backfill + build en cola).
+Focales verdes: 294 (MCP + api-platform + growth/seo) + sanity live 12/12 contra PG real.
+
+
 ### Seedance 2.5 — inventario Fal y TASK-1656 (2026-08-07)
 
 Fal Model Search/OpenAPI confirma tres endpoints activos: T2V, I2V y R2V; Globe permanece `provider-supported / gated`.
@@ -174,37 +213,6 @@ fricción. Hasta entonces, la vía operable del 360 por MCP sigue siendo la serv
 el smoke OAuth del script.
 
 
-### TASK-1653 cerrada — las 4 tools SEO federadas al gateway + guard de paridad (2026-08-06)
-
-Ejecutada el mismo día en `efeonce-mcp` (`ff68078`+`2365ef9`, deploy `31112222516`, revisión
-`efeonce-mcp-gateway-00014-fcg` Ready): `get_seo_rank_evolution` federada (provider + registerTool
-espejo del MCP interno) + **guard de paridad CI fail-closed** (lista esperada versionada +
-exclusiones con razón; rojo forzado verificado). Canary 4/4 contra producción: rank-evolution
-sirvió `series=31` — la serie real de Berel capturada hoy — y el budget del entitlement ya refleja
-el gasto (49.86/50). Contrato "cómo agregar una tool" en el AGENTS.md del gateway: las tasks del
-mandato (1304/1311/1313/1314/1317) agregan su tool a la lista esperada EN EL MISMO PR. El smoke
-autenticado vía `mcp.efeonce.org` también quedó VERDE el mismo día (4 tools en 200; rank-evolution
-series=31 por el tramo Entra→gateway; canary extendido en `83cdefc`). Con esto, el
-programa SEO del día queda entero: captura diaria activa + 4 tools E2E + release en prod. Siguiente
-frente: TASK-1307 (UI pantalla ancla) y TASK-1304.
-
-
-### Release `fcee5ab9f7ce` — TASK-1303 en producción (2026-08-06)
-
-PR #178 → manifest **`released`** (`fcee5ab9f7ce-1a85e0aa-cbad-42ab-bad0-2b4851d999cc`, run
-`31105434129`, 10m04s), watchdog `drift_count=0`, health verde. El lane
-`/api/platform/ecosystem/growth/seo/rank-evolution` responde en producción (400 sin auth = ruta
-viva) y la tool interna `get_seo_rank_evolution` quedó en el MCP de prod. Dos hallazgos para el
-próximo release (ya en el timing ledger): (a) pushes docs-only a develop justo antes del release
-cancelan el build de staging (ignore-build) y bloquean el preflight `vercel_environments` —
-pre-empción: `vercel redeploy` del deployment cancelado; (b) el merge canónico `-X ours` intentó
-colar 1 línea regresiva de main (`recordFailure` incondicional pre-auditoría TASK-1300) — con
-verif1 vacío y drift regresivo, `-s ours` (árbol develop exacto) es la resolución. **Siguiente:
-TASK-1653** (federar `get_seo_rank_evolution` al gateway + guard de paridad) quedó DESBLOQUEADA
-por este release. La serie de rankings corre sola desde mañana 05:00 CLT (scheduler ENABLED,
-Berel 31 keywords).
-
-
 ### Efeonce dejó de ser cliente de sí misma — modelado corregido (2026-08-06)
 
 `EO-ORG-0007` (Efeonce, `is_operating_entity=true`) tenía `organization_type='client'`, herencia
@@ -308,21 +316,6 @@ sin `overrideIdentity` para no pisar un valor ajeno; `organization_type` se mant
 conexión GSC de
 `efeoncepro.com` gated por TASK-1282/1283.
 
-### TASK-1647 — Provider Greenhouse-SEO federado: CODE COMPLETE, enable pendiente del release (2026-08-05)
-
-El segundo salto MCP quedó construido y verificado e2e. Gateway (`efeonce-mcp` main `a53b77f`+`4870e90`):
-provider `greenhouse-seo` fail-closed + 3 tools (scope base) + canaries + canary e2e. Greenhouse: consumer
-`EO-SPK-0004`/binding `EO-SPB-0004` activos (script `provision-mcp-gateway-seo-consumer.ts`; token en Secret
-Manager `efeonce-mcp-gateway-greenhouse-token`). Flag `GROWTH_SEO_ENABLED=true` en Vercel **staging** +
-redeploy (autorizado). Berel provisionada Fase 0 (`cpma-berel-seo-contracted` + `seot-berel-fase0`).
-
-**Evidencia e2e (provider real → lane staging HTTPS):** Berel **`domainQuadrant=riesgo`, 50 keywords,
-AEO 44.5** · Efeonce entitlement ok + `no_seo_data` honesto · deny anti-oracle 404. La cadena completa
-del MCP-first funciona; lo ÚNICO entre esto y `mcp.efeonce.org` es que greenhouse PROD aún no tiene el
-lane. **El cutover restante = release develop→main de greenhouse** (control plane, skill
-`greenhouse-production-release`) → flag en Vercel prod → enable del provider en Cloud Run + deploy
-dispatch → smoke por el front door. GSC de efeoncepro.com sigue gated por 1282/1283.
-
 ### Efeonce provisionada como org del 360 (own-brand, dogfooding) — 2026-08-05
 
 Decisión de modelado del operador ejecutada: **Efeonce se modela como su propio cliente** sobre la org
@@ -344,29 +337,6 @@ sincronizadas como ruido). Aplicado con `scripts/growth/provision-efeonce-own-br
 ~~`website_url` de EO-ORG-0007 vacío~~ **CERRADO 2026-08-06** — `https://efeoncepro.com` por la puerta
 canónica `upsertCanonicalOrganization`. (3) Conectar GSC de efeoncepro.com cuando 1282/1283
 destraben su rollout. SKY ya tiene lente AEO ligada; su SEO sigue igual de pendiente que Efeonce.
-
-### TASK-1645 — SEO operable por MCP: CODE COMPLETE, rollout pendiente (2026-08-05)
-
-La milla final del camino MCP-first quedó implementada y verificada a nivel función. **Lane ecosystem**
-(`/api/platform/ecosystem/growth/seo/{keyword-opportunities,visibility-360,entitlement}` vía
-`runEcosystemReadRoute`; builder `ecosystem-growth-seo.ts`: org-por-binding — org-scoped manda con mismatch
-404 anti-oracle, internal exige `organizationId` —, entitlement per-org `seo_v1` → 404 anti-oracle,
-`target_not_configured` honesto, payloads passthrough) + **3 MCP tools read-only** en `src/mcp/greenhouse/**`
-(`get_seo_keyword_opportunities`, `get_seo_visibility_360` — nace con el cruce AEO real —, `get_seo_entitlement`
-— el chokepoint como lectura, decisión del operador de exponer todo reader vivo). Evidencia: 17 tests focales +
-route-contract + smoke live del lane contra PG real (quadrant `riesgo` con 50 keywords, cross-org deny, cero
-residuo); full suite **10168/0** + build prod verdes.
-
-**Por qué NO complete (Runtime Rollout Completion Gate):** (1) falta la invocación MCP e2e por HTTP con un
-binding ecosystem real en staging (no disponible en la sesión; mismo pendiente que TASK-1086 dejó post-deploy);
-(2) `GROWTH_SEO_ENABLED` es multi-runtime — el lane lo lee en **Vercel** y hoy está ON solo en el ops-worker;
-el flip es parte del cutover del módulo; (3) la federación al gateway `mcp.efeonce.org` quedó con dueño:
-**TASK-1647 creada** (adapter delgado, canaries antes de discovery — cumple el acceptance "con dueño").
-Mandato amarrado además en 1303/1304/1311/1312/1313/1314/1317: todo reader futuro expone su MCP tool en el
-mismo PR. Docs: arch SEO §7, API Platform delta, manual MCP §8, doc funcional. Sin push.
-
-**Próximo paso:** TASK-1647 (federación gateway) o el cutover del módulo (flag Vercel + assignment Berel +
-smoke e2e con binding) — decisión del operador.
 
 ### TASK-1305 — Cruce SEO↔AEO (quadrant 360) COMPLETE (2026-08-05)
 
