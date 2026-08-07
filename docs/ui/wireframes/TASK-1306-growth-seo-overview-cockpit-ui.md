@@ -2,7 +2,7 @@
 
 ## Meta
 
-- Status: `ready-for-implementation`
+- Status: `implemented` (TASK-1306, 2026-08-06)
 - Owner task: `TASK-1306`
 - Product Design asset: sin PNG aprobado todavía — dirección aterrizada en el arch doc §10 (IA/superficies) + §10.4 (dataviz) + §10.5 (estados). Se mantiene `UI ready: no` hasta correr `product-design-loop` (3 conceptos) o aprobación explícita del operador. Este wireframe es el contrato de arquitectura de la superficie, no un stub para pasar el gate.
 - Intended consumers: operador Efeonce Growth/Marketing Ops (surface interna densa, multi-Space). Mismo `ReportArtifactModel`/entitlement model del AEO no aplica acá (Overview es cockpit interno, no artefacto cliente).
@@ -74,7 +74,7 @@ Composición: `CompositionShell composition='single'` (una región canvas). Dent
 | `growth.seo.overview.legend.measured` | 0 | `Medido · GSC` | — | `GreenhouseChip` con ● (verde) — verdad de primera parte |
 | `growth.seo.overview.legend.estimated` | 0 | `Estimado · DataForSEO` | — | `GreenhouseChip` con ◑ (neutro) — estimado de mercado |
 | `growth.seo.overview.freshness` | 0 | `GSC: datos hasta {as_of}` | `as_of` (fecha) | latencia explícita; nunca ocultar el lag de 2-3 días |
-| `growth.seo.overview.tabs.overview` | 1 | `Overview` | — | tab activa |
+| `growth.seo.overview.tabs.overview` | 1 | `Resumen` | — | tab activa. **Corrección al implementar:** el ledger decía `Overview`; `greenhouse-ux-writing` prohíbe el spanglish en copy visible es-CL. |
 | `growth.seo.overview.tabs.performance` | 1 | `Rendimiento` | — | → `/admin/growth/seo/performance` (TASK-1307) |
 | `growth.seo.overview.tabs.keywords` | 1 | `Keywords` | — | → `/admin/growth/seo/keywords` (TASK-1308) |
 | `growth.seo.overview.tabs.audit` | 1 | `Auditoría` | — | → `/admin/growth/seo/audit` (TASK-1309) |
@@ -118,7 +118,7 @@ Composición: `CompositionShell composition='single'` (una región canvas). Dent
 
 - Route / surface: `src/app/(dashboard)/admin/growth/seo/page.tsx` (server component: `getTenantContext` + `hasAuthorizedViewCode('administracion.growth_seo')` + `can(tenant,'growth.seo.observation.read','read','tenant')` + `module_assignment` del Space; redirect `/login` sin sesión, `/401` sin acceso, redirect defensivo si `tenantType==='client'`). View runtime: `src/views/greenhouse/admin/growth/seo/overview/SeoOverviewView.tsx` (`'use client'`).
 - Primitives: `CompositionShell` (`composition='single'`), `MetricTrendCard`, `GreenhouseChartCard`, `AppReactApexCharts`, `GreenhouseChip`, `GreenhouseBreadcrumbs`, `GreenhouseLoadingSurface`, `EmptyState`, `GreenhouseButton`, `@core/components/mui/Autocomplete`.
-- Variants / kinds: CompositionShell región singleton (no grid ad-hoc). Chips: leyenda = `variant='label'`; severidad = `kind='signal'`; movers = tono `success`/`error`.
+- Variants / kinds: CompositionShell región singleton (no grid ad-hoc). Chips: leyenda = `variant='label'` + `kind='metric'`; severidad = `kind='status'` + `tone='error'|'warning'`; movers = `kind='status'` + `tone='success'|'error'`. **Corrección al implementar:** este wireframe decía `kind='signal'`, que NO existe en `GreenhouseChipKind` (`status|attribute|input|action|identity|filter|metric|custom`), y el tono va en `tone`, no en `color`.
 - Component candidates: `SeoSearchVisibilityTabs` (wrapper de `CustomTabList` reusable por las 4 páginas — candidato a extraer como shared, decisión en Discovery), `SeoKpiRow`, `SeoVisibilityEvolutionChart`, `SeoSiteHealthGauge`, `SeoMoversList`, `SeoAeoGapCard`.
 - Copy source: `src/lib/copy/growth.ts::GH_GROWTH_SEO_OVERVIEW` + `GH_INTERNAL_NAV.growthSeo`.
 - Data reader / command: `readSearchConsoleAnalytics` (TASK-1282), `readRankEvolution`/`readRankSnapshotLatest` (TASK-1303), `readSiteAuditReport` (TASK-1304), `readKeywordOpportunities` (TASK-1302), `readSeoAeoGap` (TASK-1305, opcional). **Todos read-only** — esta surface no ejecuta commands.
@@ -150,6 +150,16 @@ Composición: `CompositionShell composition='single'` (una región canvas). Dent
 - **Charts — decisión honesta pendiente de Discovery:** el arch doc §10.4 recomienda **ECharts** para alto impacto, pero **ECharts NO está instalado** (el repo tiene ApexCharts + Recharts; política de charts CLAUDE.md permite ECharts para vistas nuevas de alto impacto vía lazy-load). El gauge de salud (radialBar) y la fila de KPIs se resuelven **hoy con ApexCharts/Recharts sin instalar nada**. La curva de evolución es viable en ambos. La decisión ECharts-vs-Apex para el módulo SEO se **coordina con TASK-1307** (donde el chart ancla — line multi-serie Y invertido + dataZoom — es más exigente y sí justifica ECharts). Overview NO debe instalar una segunda librería por su cuenta; hereda la decisión de 1307.
 - Open risks: (1) `readSeoAeoGap` (TASK-1305) puede no estar listo → la card 4c se oculta (no placeholder falso); (2) el Space picker debe respetar `module_assignments` (solo Spaces con SEO activo) — si el operador tiene 0 Spaces asignados, la ruta cae a `denied`/empty institucional.
 - Follow-up: cuando exista PNG aprobado del `product-design-loop`, referenciarlo en Meta y subir `UI ready` a `yes` si el gate task-lint queda limpio.
+
+## Deltas de implementación (TASK-1306, 2026-08-06)
+
+Lo que cambió respecto de este contrato, y por qué:
+
+1. **`readRankSnapshotLatest` no existe.** La spec y este wireframe lo citaban como fuente de los movers; TASK-1303 sólo dejó `readRankEvolution`. Los movers se **derivan** de la serie de evolución (delta contra el punto más cercano a 7 días atrás) en vez de reimplementar una lectura de snapshots.
+2. **El gauge de salud NO usa ApexCharts radialBar.** El radialBar depende de medir su contenedor al montar; en la columna fluida del sidebar medía 0 y no dibujaba nada. Se reemplazó por un **arco SVG determinista** (`strokeDasharray`), que rinde igual en SSR, primer paint y captura.
+3. **Cualquier chart Apex necesita `resolveApexColor`.** Con `cssVariables: true` el theme devuelve `var(--mui-palette-*)` y ApexCharts revienta al parsearlo (8 excepciones de runtime por corrida, invisibles en pantalla). El helper vive en `src/libs/styles/resolveApexColor.ts`.
+4. **Los tabs declaran `role='navigation'`.** Son links a rutas hermanas, no un conmutador de paneles: con el rol `tablist` por defecto, axe exige `aria-controls` a un panel real que acá no existe.
+5. **Sin control de período ni Exportar en V1.** El período se deriva del rango leído (`Últimos {n} días`); un selector de rango y el export CSV quedan como follow-up, no se declararon como implementados.
 
 ## Acceptance Checklist
 

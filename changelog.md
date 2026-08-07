@@ -7,6 +7,23 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-06 — Cockpit SEO Overview (TASK-1306)
+
+Nueva superficie operador `/admin/growth/seo`: la puerta de entrada del módulo SEO y la casa de
+la sección "Search Visibility". Muestra los 4 KPIs medidos de Search Console (con la posición en
+semántica invertida: bajar de número es mejorar), la evolución de visibilidad, la salud técnica
+del sitio, los movimientos de la semana y el cruce honesto con el AEO Grader.
+
+Codifica el contrato de honestidad del módulo: sin Search Console no hay panel (aviso accionable,
+nunca ceros), medido y estimado se marcan distinto y jamás se promedian, cada región del panel
+degrada por separado diciendo "Pendiente: {razón}", y sin ventana anterior comparable no se dibuja
+variación en vez de inventar un 100%.
+
+Se expone la MCP tool `get_seo_overview_kpis` en el mismo cambio, así que Nexa y el lane ecosystem
+consumen exactamente el mismo cálculo que la pantalla.
+
+Code complete; el despliegue y la migración del viewCode en staging/producción quedan pendientes.
+
 ## 2026-08-06 — TASK-1304: site audit OnPage (queue+poll) + backlink snapshot (code complete, schedulers pausados)
 
 - **Ciclo async OnPage en 2 fases**: `queueSiteAudit` (gate de costo que SÍ consume el cupo
@@ -998,12 +1015,3 @@ y [`docs/changelog/internal/2026-07.md`](docs/changelog/internal/2026-07.md).
   estricta ante errores, usa un deadline API de 15 s y un presupuesto de runner de 20 s. El runner reporta el budget
   efectivo de cada check.
 - El cambio está en `develop`; todavía no se ha repetido el orchestrator ni se ha desplegado producción.
-
-## 2026-07-29 — PR #164: promoción completa y release detenido por evidencia de smoke
-
-- PR #164 promovió todo `develop` a `main` en `e711fe2560e3a7c2e7e8639e07a8a394e9582cdb`; no hubo cherry-picks ni
-  release aislado de AXIS.
-- CI/CI Deep, Vercel READY y los gates de governance pasaron. El orchestrator `30452322643` detuvo el proceso en
-  preflight por falta de smoke asociado al SHA de `main`; el smoke manual `30452463889` pasó verde posteriormente.
-- Queda pendiente reintentar el orchestrator sin bypass cuando la API de GitHub Actions responda. No hubo manifest,
-  deploy de workers ni promoción parcial.

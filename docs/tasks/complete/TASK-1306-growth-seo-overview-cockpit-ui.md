@@ -1,6 +1,8 @@
 # TASK-1306 — Growth SEO: Overview Cockpit UI
 
-## Delta 2026-08-06
+## Delta 2026-08-06 — IMPLEMENTADA (5 slices, code complete)
+
+Ver `## Closure Report` al final del archivo.
 
 - TASK-1304 completó los readers de audit/backlinks que este cockpit consume:
   `readSiteAuditReport` + `readBacklinkProfile` (+ lanes ecosystem y MCP tools). Las 4 series
@@ -20,7 +22,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -33,10 +35,10 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-022`
-- Status real: `Diseño`
+- Status real: `Implementado — code complete, pendiente deploy`
 - Rank: `TBD`
 - Domain: `growth|seo|ui`
-- Blocked by: `TASK-1302`
+- Blocked by: `none` (TASK-1302 cerró; el campo estaba stale)
 - Branch: `task/TASK-1306-growth-seo-overview-cockpit-ui`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -432,3 +434,57 @@ Slice 1 → Slice 2 → Slice 3 → Slice 4. No conectar KPIs/charts antes de te
 
 1. ¿La `CustomTabList` "Search Visibility" incluye el AEO Grader como 5.ª tab, o el cross-link basta? Propuesta: cross-link (card 4c) en Overview; las tabs son solo SEO (Overview/Rendimiento/Keywords/Auditoría) para no romper el boundary de dominio.
 2. ¿El Space picker recuerda el último Space seleccionado (persistencia)? Propuesta: `?space=` en la URL (compartible), default al primer Space con `module_assignment`.
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     CLOSURE REPORT — TASK-1306 (2026-08-06)
+     ═══════════════════════════════════════════════════════════ -->
+
+## Closure Report
+
+### Qué se implementó
+
+| Slice | Entrega | Commit |
+|---|---|---|
+| 1 | Ruta + viewCode + nav + tabs Search Visibility + estados base | `ec8f6fedf` |
+| — | Fix: 4 errores React por Tab envuelto en Tooltip | `ed43f3b91` |
+| 2 | KPIs norte + curva de visibilidad (2 charts apilados, Y invertido) | (Slice 2) |
+| 3 | Sidebar salud + movers + cruce AEO, degradación por región | `22a30f33e` |
+| 4 | GVC desktop/mobile, 8 pageerrors de Apex, a11y de tabs | `307f8217d` |
+| 5 | MCP tool `get_seo_overview_kpis` (mandato del dominio) | `36751e053` |
+
+### Hallazgos que cambiaron el diseño
+
+1. **`greenhouse_core.organizations` no tiene columna `name`** (es `organization_name`). Lo atrapó ejercitar el SQL contra PG real; el typecheck no ve SQL embebido.
+2. **`readRankSnapshotLatest` NO EXISTE** — la spec y el wireframe lo citaban. Los movers se derivan de `readRankEvolution`.
+3. **ApexCharts revienta con el theme del repo.** Con `cssVariables: true`, `theme.palette.*` devuelve `var(--mui-palette-*)` y Apex lanza `Cannot read properties of null (reading '1')` — 8 excepciones por corrida, invisibles en pantalla. Helper `resolveApexColor` en `src/libs/styles/`. **Es un bug latente para cualquier chart Apex del repo que tome color del theme.**
+4. **El radialBar de Apex no dibuja en contenedor fluido** (mide 0 al montar). El gauge de salud pasó a arco SVG determinista.
+5. **`MetricTrendCard` derivaba un delta que mentía** cuando el hero es un agregado del período: mostraba "2.596 clics −76" sugiriendo caída del período, cuando era la caída de un día. Se extendió con `deltaOverride` + `deltaSemantics` (opt-in, legacy byte-idéntico). **TASK-1307 las hereda para su Δ30d.**
+6. **Los readers de overview no respetaban el flag del dominio.** Corregido: los 3 chequean `isSeoModuleEnabled` y la page hace `notFound()`.
+
+### Verificación ejecutada
+
+- **Runtime real (Cloud SQL dev, Grupo Berel):** viewCode activo + 2 grants · KPIs 2.596 clics / 136.146 impresiones / posición ponderada 5.78 / CTR 1.91% · `previous: null` con 5 días de serie (sin comparación inventada) · salud 95.4 (0 críticos · 138 avisos · 381 menores) · cruce AEO 47 keywords en `riesgo` · movers `no_data` honesto.
+- **Gates:** `pnpm test` **10.281 passed / 0 failed** · `pnpm build` producción **exit 0** (`/admin/growth/seo` dinámica) · `pnpm local:check` verde · `route-reachability-gate` 0 huérfanos.
+- **GVC:** scenarios `growth-seo-overview` (1440) + `growth-seo-overview-mobile` (390) con `qualityProfile: standard`, ambos `OK capture`, **pageErrors 0**. Frames mirados en loop.
+
+### Warnings del gate conocidos y NO accionables acá
+
+- `layout_element_overflow` (32): es la tabla `sr-only` de `MetricTrendCard`, posicionada fuera del viewport a propósito. Falso positivo del guard.
+- `enterprise_flat_typography`: ratio heading/body del design system, no de esta surface.
+- `layout_target_too_small` (20×20): control del shell heredado, fuera del scope.
+
+### Rollout — CODE COMPLETE, DEPLOY PENDIENTE
+
+⚠️ `GROWTH_SEO_ENABLED` **ya está ON en Vercel Production** (rollout de TASK-1302/1645). La ruta queda **viva apenas se despliegue**; el control de exposición restante es el viewCode (sólo `efeonce_admin` + `ai_tooling_admin`) + el `module_assignment` per-org.
+
+Pendiente para `operationally complete`:
+1. Aplicar la migración del viewCode en **staging y producción** (hoy sólo dev).
+2. Desplegar y verificar la ruta con un operador real.
+3. Correr los scenarios GVC contra staging (`--env=staging`).
+
+### Follow-ups abiertos
+
+- Selector de rango de período y botón **Exportar** (declarados en el wireframe, no implementados en V1).
+- Las pestañas Rendimiento/Keywords/Auditoría quedan deshabilitadas hasta TASK-1307/1308/1309 (quitar `available: false` en `SeoSearchVisibilityTabs`).
+- `resolveApexColor` debería adoptarse en los ~32 consumidores de ApexCharts del repo (bug latente compartido) — candidato a task propia.

@@ -137,6 +137,56 @@ vigila que ningún crawl quede colgado.
 
 > Detalle tecnico: commands y readers en [`src/lib/growth/seo/site-audit/`](../../../src/lib/growth/seo/site-audit/) y [`backlinks/`](../../../src/lib/growth/seo/backlinks/) · handlers y schedulers en `services/ops-worker/` · arquitectura §6–§8 de [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md).
 
+
+## 5. El cockpit Overview: la primera pantalla del modulo (TASK-1306)
+
+`/admin/growth/seo` es la puerta de entrada operador del modulo y la casa de la seccion
+local **Search Visibility** (pestañas Resumen · Rendimiento · Keywords · Auditoria).
+Responde una sola pregunta: **¿como esta la salud de busqueda de este Space y que necesita
+atencion hoy?**
+
+**Que muestra**
+
+| Zona | Que responde |
+|---|---|
+| Selector de Space + chip de frescura | Sobre que cliente miras y hasta que dia llegan los datos medidos |
+| Leyenda medido / estimado | De donde sale cada numero |
+| 4 KPIs norte | Clics, impresiones, posicion promedio y CTR del periodo |
+| Evolucion de visibilidad | Como se movieron los clics y la posicion en el tiempo |
+| Salud del sitio | Puntaje tecnico de la ultima auditoria + hallazgos por severidad |
+| Movimientos de la semana | Keywords que subieron o bajaron 5 posiciones o mas |
+| Rankean pero la IA no las cita | Donde apareces en Google pero no en respuestas de IA |
+
+**Quien la ve.** Hacen falta tres cosas a la vez: un rol con la vista habilitada
+(`efeonce_admin` o `ai_tooling_admin`), el permiso `growth.seo.observation.read`, y que el
+Space tenga el modulo SEO contratado. Si falta lo tercero, el Space no aparece en el
+selector. Con el modulo apagado por flag, la ruta directamente no existe (404).
+
+**Las reglas de honestidad que codifica**
+
+- **La posicion funciona al reves.** Pasar de la posicion 8 a la 3 es mejorar: la flecha
+  hacia abajo se pinta **verde** y el texto lo dice; no se deja al color.
+- **Sin Search Console no hay panel.** Se muestra un aviso accionable, nunca ceros: un
+  cero significa "medimos y dio cero", cuando la verdad es "no medimos".
+- **Medido no es estimado.** Search Console es dato real del sitio; el proveedor externo
+  es estimacion de mercado. Se marcan distinto y **nunca se promedian**.
+- **Si falta un dato, dice que falta y por que.** Cada tarjeta del panel derecho degrada
+  por separado: si la auditoria no responde, esa tarjeta dice "Pendiente: ..." y las
+  otras dos siguen funcionando.
+- **Si no hay con que comparar, no se inventa la comparacion.** Un Space recien conectado
+  no muestra flechas de variacion porque no existe un periodo anterior con datos.
+- **SEO y AEO nunca se funden.** Rankear primero y no ser citado por la IA es una señal de
+  negocio, no un error a reconciliar en un puntaje unico.
+
+**Que NO hace.** No edita keywords ni configuracion, no dispara analisis nuevos (relee lo
+guardado, sin gastar presupuesto de proveedor), no muestra dos Spaces a la vez, y no es la
+pelicula por URL (esa es la pestaña **Rendimiento**, TASK-1307, todavia en construccion —
+las pestañas hermanas aparecen deshabilitadas hasta que existan).
+
+> Detalle tecnico: la surface es consumidora de solo lectura de los readers gobernados de
+> `src/lib/growth/seo/**`. El mismo calculo de KPIs lo consumen Nexa y el lane MCP
+> (`get_seo_overview_kpis`) por construccion — no hay una segunda implementacion.
+
 ## Que NO existe todavia
 
 Lo siguiente aún no está construido (las series que ya se llenan: Search Console live; rankings live desde el 2026-08-06). **Sí existen ya** — además del schema y el modelo de acceso — el cruce SEO ↔ AEO (`readSeoAeoGap` + matriz quadrant 360, TASK-1305) y la **operación por MCP live en producción desde el 2026-08-06**: lane ecosystem + 3 tools read-only (`get_seo_entitlement`, `get_seo_keyword_opportunities`, `get_seo_visibility_360`) en el MCP interno de Greenhouse (TASK-1645, ver el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md) §8) **y federadas al gateway público `mcp.efeonce.org`** (TASK-1647). La lectura funcional completa de esa capacidad está en [Search Visibility 360 por MCP](search-visibility-360-por-mcp.md). Pendiente:

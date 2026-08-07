@@ -1,5 +1,29 @@
 # Handoff activo
 
+### TASK-1306 — cockpit SEO Overview: code complete, deploy pendiente (2026-08-06)
+
+`/admin/growth/seo` en `develop` **local (sin push)**, 5 slices. Suite **10281/0**, build prod
+verde, GVC 1440+390 con `pageErrors 0`. Detalle completo en el `## Closure Report` de
+`docs/tasks/complete/TASK-1306-growth-seo-overview-cockpit-ui.md`.
+
+**Lo que necesita quien siga:**
+
+1. **`resolveApexColor` (`src/libs/styles/`) es un hallazgo compartido.** Con `cssVariables: true`
+   el theme devuelve `var(--mui-palette-*)` y ApexCharts revienta al parsearlo — 8 excepciones por
+   corrida, invisibles (el chart no termina de pintar). **Los ~32 consumidores de Apex del repo
+   tienen el mismo bug latente**; candidato a task propia.
+2. **`MetricTrendCard` ganó `deltaOverride` + `deltaSemantics`** (opt-in, legacy byte-idéntico).
+   **TASK-1307 las necesita** para su Δ30d de posición: no reimplementarlas.
+3. **`readRankSnapshotLatest` NO existe** aunque 1306/1307 lo citen: sólo `readRankEvolution`.
+4. **`GROWTH_SEO_ENABLED` ya está ON en Production** — la ruta queda viva al desplegar; el control
+   de exposición restante es el viewCode + el `module_assignment` per-org.
+
+**Rollout pendiente:** migración del viewCode en staging y prod (hoy sólo dev) → deploy →
+verificar con operador real → GVC contra staging.
+
+**Próximo paso:** TASK-1307, con dirección visual ya aprobada (concepto C "Evidencia narrativa",
+`product-design-loop` 2026-08-06) y Slice 0 (ECharts vs Apex) todavía abierto.
+
 ### Break-glass deploy del gateway MCP — shim DCR LIVE (TASK-1654, 2026-08-06)
 
 GitHub Actions cayó en **major outage** (4 intentos de deploy muertos: 2 cancelados en cola, 1
