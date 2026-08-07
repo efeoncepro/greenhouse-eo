@@ -47,9 +47,15 @@ export interface SearchConsoleActiveOrg {
 /**
  * Disponibilidad de los datos de mercado (volumen/dificultad).
  *
- * Hoy siempre `unavailable`: el family registry de DataForSEO Labs es TASK-1300 y aún
- * no aterrizó. El striking-distance NO depende de esto — se calcula con datos medidos
- * de GSC — así que el reader entrega valor completo igual y el mercado sólo enriquece.
+ * Hoy siempre `unavailable`, y ⚠️ NO porque falte la integración: `TASK-1300` está
+ * `complete` y la familia `labs` es llamable (la usa `rank-history-seed.ts` para SERPs
+ * históricas). Lo que falta es la CAPABILITY encima — nadie construyó el fetch de
+ * volumen/dificultad por keyword, y no hay dónde guardarlo: el schema SEO no tiene
+ * columna de `search_volume` ni `keyword_difficulty`. O sea, la cañería existe y el agua
+ * no. Quien vaya a cerrarlo necesita fetch + columnas + reader, no "esperar a 1300".
+ *
+ * El striking-distance NO depende de esto — se calcula con datos medidos de GSC — así que
+ * el reader entrega valor completo igual y el mercado sólo enriquece.
  */
 export type SeoMarketAvailability = 'available' | 'unavailable'
 
