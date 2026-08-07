@@ -71,6 +71,11 @@ export const GH_INTERNAL_NAV = {
     label: 'Rendimiento',
     subtitle: 'Evolución en el tiempo de un conjunto elegido de URLs o keywords'
   },
+  // TASK-1308 — child de `growthSeo` (tab Keywords), mismo contrato que Rendimiento.
+  growthSeoKeywords: {
+    label: 'Keywords',
+    subtitle: 'Dónde crecer en búsqueda: lo que ya rankea y está a un empujón'
+  },
   growthAeo: { label: 'AEO', subtitle: 'Programa AEO: score y plan por cliente + cross-sell' },
   growthCtas: { label: 'CTAs', subtitle: 'Motor de CTAs/popups: inventario, lifecycle y preview' },
   knowledge: { label: 'Knowledge', subtitle: 'Guías, fuentes y memoria operativa' },

@@ -1861,3 +1861,177 @@ export const GH_GROWTH_SEO_PERFORMANCE = {
     }
   }
 } as const
+
+/**
+ * TASK-1308 — Oportunidades de keywords (`/admin/growth/seo/keywords`).
+ *
+ * ⚠️ EL COPY DICE LA VERDAD SOBRE DE DÓNDE SALE EL DATO. Toda esta pantalla se construye
+ * con lo MEDIDO por Search Console — no hay volumen ni dificultad de mercado (TASK-1300 no
+ * aterrizó), y donde faltan se dice "sin dato de mercado", nunca 0 ni un guion ambiguo.
+ * La demanda que se muestra son impresiones reales de la propia SERP del cliente, que es
+ * un dato MEJOR que un volumen estimado por un tercero para un mercado promedio.
+ *
+ * ⚠️ CANIBALIZACIÓN NO ES UNA VARIANTE DE "OPORTUNIDAD": ES OTRA ACCIÓN. Una query con más
+ * de una página no se optimiza, se CONSOLIDA (unificar, 301, canonical o diferenciar
+ * intención). Por eso tiene su propio verbo en toda la superficie, no un chip decorativo.
+ */
+export const GH_GROWTH_SEO_KEYWORDS = {
+  pageTitle: 'Oportunidades de keywords',
+  pageSubtitle: 'Dónde crecer en búsqueda: lo que ya rankea y está a un empujón de la primera plana.',
+
+  toolbar: {
+    searchPlaceholder: 'Buscar keyword',
+    searchLabel: 'Buscar keyword',
+    windowLabel: 'Ventana',
+    windowOptions: {
+      '28': 'Últimos 28 días',
+      '90': 'Últimos 90 días'
+    },
+    // La ventana no es cosmética: define sobre qué se calculó la posición ponderada.
+    windowHint: 'La posición se pondera por impresiones dentro de la ventana.'
+  },
+
+  source: {
+    measured: 'Medido · Search Console',
+    measuredHint:
+      'Impresiones, clics y posición que Google registró de tu sitio. Es la demanda de TU búsqueda, no un promedio de mercado.',
+    estimated: 'Estimado · mercado',
+    estimatedHint: 'Volumen y dificultad de un proveedor externo. Aún no disponible en este Space.',
+    ariaLabel: 'Origen de los datos de esta pantalla',
+    mixHint: 'Todo lo que ves acá está medido. Nada se promedia con una estimación de mercado.'
+  },
+
+  map: {
+    title: 'Mapa de oportunidad',
+    subtitle: 'Más a la izquierda, más cerca de la primera plana. Más arriba, más gente lo busca.',
+    // La zona sombreada nombra el criterio, no un adjetivo suelto.
+    quickWinLabel: 'Fruta madura',
+    quickWinHint: 'Ya estás en la primera plana (posición 10 o mejor) y hay demanda medida: el empujón más barato.',
+    axisX: 'Posición actual',
+    axisY: 'Impresiones (28 días)',
+    bubbleHint: 'El tamaño de cada punto son los clics que ganarías al llegar a la posición objetivo.',
+    aria:
+      'Dispersión de {count} keywords: el eje horizontal es la posición actual (más a la izquierda es mejor) y el vertical las impresiones medidas. El tamaño indica los clics incrementales estimados y la forma la acción recomendada.',
+    coverage: '{count} keywords entre las posiciones 8 y 20, con al menos {threshold} impresiones en la ventana.',
+    zoomHint: 'Pasa el cursor por un punto para ver su detalle. La tabla de abajo tiene los valores exactos.'
+  },
+
+  /**
+   * La acción recomendada, que es a la vez el color, la forma y el filtro.
+   *
+   * Son ACCIONES, no severidades: "empujar" y "consolidar" son trabajos distintos, con
+   * dueños y criterios de éxito distintos.
+   */
+  action: {
+    label: 'Acción',
+    quickWin: 'Empujar (fruta madura)',
+    quickWinShort: 'Empujar',
+    quickWinHint: 'Posición 10 o mejor: ya estás en la primera plana, falta subir dentro de ella.',
+    striking: 'Empujar (a un paso)',
+    strikingShort: 'A un paso',
+    strikingHint: 'Posición 11 a 20: la segunda plana. Llegar a la primera es el salto de mayor retorno.',
+    cannibalized: 'Consolidar',
+    cannibalizedShort: 'Consolidar',
+    // El invariante del método: no es una oportunidad peor, es otro trabajo.
+    cannibalizedHint:
+      'Más de una página tuya compite por esta búsqueda y se diluyen entre sí. No se optimiza: se consolida (unificar, 301, canonical o diferenciar intención).'
+  },
+
+  table: {
+    title: 'Detalle',
+    ariaLabel: 'Oportunidades de keywords con su posición, demanda medida y acción recomendada',
+    colKeyword: 'Keyword',
+    colAction: 'Acción',
+    colPosition: 'Posición',
+    colPositionHint: 'Posición media ponderada por impresiones en la ventana. Más bajo es mejor.',
+    colImpressions: 'Impresiones',
+    colImpressionsHint: 'Cuántas veces apareciste. Es la demanda medida de tu propia búsqueda.',
+    colClicks: 'Clics',
+    colCtr: 'CTR',
+    colGain: 'Ganancia est.',
+    colGainHint:
+      'Clics adicionales por mes si llegaras a la posición objetivo, según la curva de CTR de tu propio sitio.',
+    colVolume: 'Volumen',
+    colDifficulty: 'Dificultad',
+    // El estado honesto de las columnas de mercado: ni 0 ni un guion ambiguo.
+    marketUnavailable: 'Sin dato de mercado',
+    marketUnavailableHint:
+      'El enriquecimiento de mercado (volumen y dificultad) todavía no está habilitado en este Space. La priorización de arriba no lo necesita: usa tu demanda medida.',
+    page: 'Página',
+    competingPages: '{count} páginas compiten',
+    gainUnit: '+{value} clics/mes est.',
+    noGain: 'Sin ganancia estimada',
+    noGainHint: 'Esta keyword ya convierte mejor que el promedio de la posición objetivo.'
+  },
+
+  follow: {
+    cta: 'Seguir',
+    ctaAria: 'Seguir la keyword {keyword}',
+    following: 'Siguiendo',
+    followingHint: 'Ya está en el set monitoreado: su posición se mide todos los días.',
+    loading: 'Siguiendo…',
+    // El costo se dice ANTES de hacer clic, no después.
+    costHint: 'Al seguirla entra al seguimiento diario de posición, que consume presupuesto del proveedor.',
+    capacity: '{used} de {capacity} keywords seguidas',
+    capacityFullHint: 'El set llegó a su tope. Deja de seguir alguna antes de agregar otra.',
+    feedbackTracked: 'Ahora sigues "{keyword}". Aparecerá en Rendimiento cuando se mida.',
+    feedbackAlready: 'Ya seguías "{keyword}". No se agregó de nuevo.',
+    feedbackCapacity: 'No se pudo seguir "{keyword}": el set llegó a su tope de {capacity} keywords.',
+    feedbackError: 'No pudimos seguir "{keyword}". Intenta de nuevo.'
+  },
+
+  filters: {
+    title: 'Filtros',
+    ariaLabel: 'Filtros de oportunidades',
+    actionAll: 'Todas',
+    positionLabel: 'Posición',
+    positionAll: 'Todas',
+    positionFirstPage: 'Primera plana (8–10)',
+    positionSecondPage: 'Segunda plana (11–20)',
+    clear: 'Limpiar filtros',
+    resultCount: '{count} de {total} keywords'
+  },
+
+  states: {
+    emptyNoOpportunities: {
+      title: 'Todavía no hay oportunidades',
+      description:
+        'Ninguna keyword de {domain} está hoy entre las posiciones 8 y 20 con demanda suficiente. Cuando alguna llegue a ese rango, aparecerá acá.'
+    },
+
+    emptyFiltered: {
+      title: 'Sin resultados para estos filtros',
+      description: 'Ninguna keyword coincide con la acción o la posición que elegiste.',
+      cta: 'Limpiar filtros'
+    },
+
+    emptyNoGsc: {
+      title: 'Falta conectar Search Console',
+      description: 'Sin Search Console no hay demanda medida, y estas oportunidades se calculan con ella.',
+      cta: 'Conectar Search Console'
+    },
+
+    emptyNoSnapshots: {
+      title: 'Todavía no hay días medidos',
+      description: 'La conexión está lista y la primera captura aún no corre. Vuelve en unas horas.'
+    },
+
+    error: {
+      title: 'No pudimos cargar las oportunidades',
+      description: 'Puede ser algo temporal de nuestro lado. Intenta de nuevo en unos minutos.',
+      cta: 'Reintentar'
+    },
+
+    denied: {
+      title: 'No tienes acceso al módulo SEO',
+      description: 'Pídele a un administrador que te habilite el módulo SEO para este Space.'
+    },
+
+    // Degradación honesta del enriquecimiento de mercado: se nombra lo que falta.
+    marketUnavailable: {
+      title: 'Mostramos sólo lo medido',
+      description:
+        'El volumen y la dificultad de mercado no están habilitados en este Space. La priorización usa tu demanda medida en Search Console, que es de tu propia búsqueda.'
+    }
+  }
+} as const

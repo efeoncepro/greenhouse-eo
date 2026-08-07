@@ -46,6 +46,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Tab "Rendimiento" de Search Visibility (TASK-1307, EPIC-022): child del viewCode compartido administracion.growth_seo, alcanzable desde el conmutador de tabs del cockpit SEO. No siembra viewCode ni ítem de nav propios.'
   },
   {
+    route: '/admin/growth/seo/keywords',
+    parent: '/admin/growth/seo',
+    via: 'tab',
+    reason:
+      'Tab "Keywords" de Search Visibility (TASK-1308, EPIC-022): child del mismo viewCode administracion.growth_seo, alcanzable desde el conmutador de tabs del cockpit SEO. No siembra viewCode ni ítem de nav propios.'
+  },
+  {
     route: '/agency/hiring/pipeline',
     parent: '/agency/hiring',
     via: 'tab',

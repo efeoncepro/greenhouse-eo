@@ -99,6 +99,10 @@ const enUS: NavigationCopy = {
       label: 'Performance',
       subtitle: 'How a chosen set of URLs or keywords evolves over time'
     },
+    growthSeoKeywords: {
+      label: 'Keywords',
+      subtitle: 'Where to grow in search: what already ranks and is one push away'
+    },
     growthAeo: { label: 'AEO', subtitle: 'AEO program: per-client score and plan + cross-sell' },
     growthCtas: { label: 'CTAs', subtitle: 'CTA/popup engine: inventory, lifecycle and preview' },
     adminCommercialProposals: { label: 'Proposals', subtitle: 'Commercial proposals: state, artifact versions and downloads' },
