@@ -179,10 +179,13 @@ const KeywordOpportunityMap = ({ opportunities, impressionsThreshold }: KeywordO
                 },
                 label: {
                   show: true,
-                  position: 'insideTop' as const,
+                  // `insideBottom`, no `insideTop`: arriba la etiqueta se solapaba con el
+                  // tick superior del eje Y (hallazgo del GVC, visible en 390px).
+                  position: 'insideBottom' as const,
                   formatter: copy.map.quickWinLabel,
                   color: axisInk,
-                  fontSize: 11
+                  fontSize: 11,
+                  distance: 8
                 },
                 data: [[{ xAxis: AXIS_MIN_POSITION }, { xAxis: FIRST_PAGE_EDGE }]]
               },
@@ -264,7 +267,14 @@ const KeywordOpportunityMap = ({ opportunities, impressionsThreshold }: KeywordO
         nameLocation: 'end' as const,
         nameGap: 12,
         nameTextStyle: { color: axisInk, fontSize: 11, align: 'left' as const },
-        min: 1,
+        // ⚠️ SIN `min` fijo, a propósito. Anclarlo en 1 parecía la contraparte prudente del
+        // piso `Math.max(1, impressions)` de los datos, pero en un eje LOGARÍTMICO fija dos
+        // décadas enteras (1→100) que ninguna oportunidad puede ocupar: el reader ya filtra
+        // por un umbral de impresiones muy superior. El GVC lo mostró crudo — con Berel
+        // (89–1377 impresiones) el 55% del alto del chart quedaba vacío y los 50 puntos
+        // aplastados en una banda. El auto-scale de ECharts sobre datos ya acotados por el
+        // umbral usa el alto completo. El piso se queda en los DATOS, que es donde protege
+        // de un `log(0)`; el eje no necesita repetirlo.
         splitLine: { lineStyle: { color: gridInk, type: 'dashed' } },
         axisLabel: {
           color: axisInk,

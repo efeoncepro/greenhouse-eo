@@ -8,6 +8,8 @@ import Alert from '@mui/material/Alert'
 import AlertTitle from '@mui/material/AlertTitle'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
 import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
@@ -405,7 +407,30 @@ const KeywordOpportunitiesView = ({
           impressionsThreshold={opportunities.impressionsThreshold}
         />
 
-        <Stack spacing={3} data-capture='seo-keywords-filters'>
+        {/* Los filtros viven en su propia superficie, no sueltos sobre el fondo de la
+            página. Dos razones, y la segunda la destapó el GVC: (a) composición — mapa,
+            filtros y tabla son tres superficies hermanas y consistentes; (b) 🔴 el label
+            ENFOCADO de un CustomTextField usa `primary.main`, que sobre el fondo del body
+            (#f8f7fa) da 4.42:1 y FALLA AA — sobre el papel de una Card da 4.61:1 y pasa.
+            El probe de teclado del GVC lo encontró; a simple vista era invisible. */}
+        <Card
+          data-capture='seo-keywords-filters'
+          // Focus ring EXPLÍCITO para todo control del bloque de filtros: el theme no dibuja
+          // outline en focus, y estos controles son el contrato de teclado de la pantalla
+          // (mismo hallazgo y mismo remedio que el toggle del chart en TASK-1307). Se cubre
+          // también `:focus` plano porque un foco programático — como el del probe del GVC —
+          // no dispara la heurística `focus-visible` del navegador.
+          sx={{
+            '& :is(input, button, [role="combobox"], .MuiSelect-select)': {
+              '&.Mui-focusVisible, &:focus-visible, &:focus': {
+                outline: theme => `2px solid ${theme.palette.primary.main}`,
+                outlineOffset: 2
+              }
+            }
+          }}
+        >
+          <CardContent>
+        <Stack spacing={3}>
           <Stack
             direction={{ xs: 'column', md: 'row' }}
             spacing={3}
@@ -477,6 +502,8 @@ const KeywordOpportunitiesView = ({
             </Typography>
           ) : null}
         </Stack>
+          </CardContent>
+        </Card>
 
         {filtered.length === 0 ? (
           <Box data-capture='seo-keywords-empty'>

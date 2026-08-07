@@ -1,0 +1,106 @@
+{
+  "task": "TASK-1308",
+  "surface": "growth.seo.keywords",
+  "surfaceLabel": "Growth SEO — Oportunidades de keywords (/admin/growth/seo/keywords)",
+  "repo": "greenhouse-eo",
+  "reviewedAt": "2026-08-07",
+  "qualityProfile": "premium",
+  "uiRigor": "ui-standard",
+  "directionMode": "repo-native-benchmark",
+  "wireframe": "docs/ui/wireframes/TASK-1308-growth-seo-keyword-opportunities-ui.md",
+  "baseline": {
+    "surfaceId": "growth.seo.keywords",
+    "decision": "new",
+    "note": "Ruta nueva; no existe before. La hermana `growth.seo.performance` (TASK-1307) es el benchmark nativo: misma recipe `analyticsReport`, mismo conmutador de tabs, mismo contrato de leyenda medido/estimado."
+  },
+  "evidence": {
+    "desktop": ".captures/2026-08-07T18-49-57_growth-seo-keywords/01-desktop",
+    "mobile": ".captures/2026-08-07T18-49-57_growth-seo-keywords/02-mobile",
+    "dossier": ".captures/2026-08-07T18-49-57_growth-seo-keywords/review-dossier.md",
+    "data": "Datos REALES de berel.com: 50 oportunidades striking-distance, 31 keywords ya seguidas, umbral de impresiones 10. Cero fixtures.",
+    "reducedMotion": "Ejercitado por el GVC (`reducedMotionCheck: true`), no sólo declarado.",
+    "axe": "@axe-core/playwright scopeado a la surface con `failOnViolations: true` — 0 violations en 1440x900 y 390x844.",
+    "notCovered": "Los estados empty (sin oportunidades), error y denied NO tienen frame: ningún Space de dev los produce hoy (Berel tiene datos, Efeonce no tiene target). Implementados y cubiertos por lectura de código, no por evidencia visual. Declarado, no asumido verde."
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 4.5,
+      "rationale": "El mapa es el momento dominante y no compite con nada: filtros y tabla quedan subordinados debajo. Orden de lectura verificado en el frame: breadcrumb → titular (surfaceHeroTitle, único h1) → tabs → leyenda de origen → banner de degradación → mapa → filtros → tabla.",
+      "evidence": "01-desktop/frames/01-default.png"
+    },
+    "proportions": {
+      "score": 4,
+      "rationale": "El defecto real de la superficie, visto en el frame y no leyendo el código: en el header, Space y Ventana envuelven a dos filas por el helperText largo de Ventana, y eso deja un vacío grande bajo el titular. No rompe nada ni lo bloquea ninguna regla, pero la cabecera se lee desbalanceada en 1440.",
+      "evidence": "01-desktop/frames/01-default.png",
+      "nextAction": "Mover el helperText de Ventana a tooltip del label o acortarlo, para que los dos controles quepan en una fila y el titular no quede con un hueco al lado."
+    },
+    "rhythm": {
+      "score": 4.5,
+      "rationale": "Ritmo consistente y verificado parejo en los seis frames de desktop: spacing 6 entre secciones hermanas, 4 dentro de cada card, 1 en los pares título/subtítulo.",
+      "evidence": "01-desktop/frames/01-default.png, 02-map.png"
+    },
+    "density": {
+      "score": 5,
+      "rationale": "Alta y deliberada: 50 puntos en el scatter y 50 filas por 10 columnas en la tabla. Es un cockpit de operador que responde cuál persigo primero — condensar escondería justo la cola larga donde vive la decisión. DataTableShell resuelve densidad por ancho real y da scroll horizontal interno.",
+      "evidence": "01-desktop/frames/04-table.png"
+    },
+    "depth": {
+      "score": 5,
+      "rationale": "Tres cards hermanas sobre SurfaceRecipe con plane none. Cero card-on-card: la recipe no fabrica un plano contenido debajo de una composición que ya es de cards.",
+      "evidence": "01-desktop/frames/01-default.png"
+    },
+    "surfaceEconomy": {
+      "score": 4.5,
+      "rationale": "Tres superficies contenidas (mapa, filtros, tabla) más un Alert de degradación. La card de filtros no estaba en el primer render: se agregó por el hallazgo de contraste del GVC, y resultó además la decisión compositiva correcta — antes los controles flotaban sueltos entre dos cards.",
+      "evidence": "01-desktop/frames/03-filters.png"
+    },
+    "visualImpact": {
+      "score": 4.5,
+      "rationale": "El scatter con la zona Fruta madura sombreada y la leyenda por forma es un momento visual propio, no un chart de relleno: se lee de un golpe que 42 de 50 keywords son de consolidación y no de optimización. El primer render desperdiciaba el 55% del alto por anclar el eje log en 1; corregido mirando el frame.",
+      "evidence": "01-desktop/frames/02-map.png"
+    },
+    "typography": {
+      "score": 5,
+      "rationale": "surfaceHeroTitle para el titular (único h1), h5 como h2 para mapa y tabla, caption para notas de método. tabular-nums en toda celda numérica, que es lo que permite comparar columnas de un vistazo. Cero fontSize inline en el DOM: los que existen son config de canvas de ECharts, donde una variante de Typography no aplica.",
+      "evidence": "01-desktop/frames/04-table.png"
+    },
+    "color": {
+      "score": 5,
+      "rationale": "axe con failOnViolations en 0 violations sobre ambos viewports. El único hallazgo del ciclo lo destapó este gate y era invisible a ojo: el label ENFOCADO de un CustomTextField usa primary.main, que sobre el fondo del body da 4.42:1 y falla AA; sobre el papel de una card da 4.61:1 y pasa.",
+      "evidence": "01-desktop/frames/06-keyboard-keyword-search-focus.axe.json"
+    },
+    "iconography": {
+      "score": 4,
+      "rationale": "Deliberadamente escasa: iconos Tabler sólo en tabs y empty states. Los marcadores de la leyenda son formas CSS con clip-path que replican el símbolo real del canvas (círculo, triángulo, rombo) para que la leyenda siga siendo legible en monocromo.",
+      "evidence": "01-desktop/frames/02-map.png",
+      "nextAction": "Evaluar un glyph propio para la acción Consolidar en la columna de la tabla: hoy se distingue por texto y color, y un símbolo lo haría escaneable sin leer."
+    },
+    "responsive": {
+      "score": 4.5,
+      "rationale": "390px verificado en la misma corrida. La tabla densa no empuja el ancho de la página: DataTableShell la contiene con scroll interno y el canvas del chart lleva minInlineSize 0 más overflowX clip. Los warnings de layout del gate son del shell del dashboard, no de esta surface.",
+      "evidence": "02-mobile/frames/02-map.png, 02-mobile/frames/04-table.png"
+    },
+    "motion": {
+      "score": 4.5,
+      "rationale": "Entrada del scatter en 400ms y suprimida bajo prefers-reduced-motion (ejercitado, no declarado). El botón Seguir tiene estados idle, loading, success y error con anti doble submit. Cero motion decorativo: nada anima que no comunique un cambio de estado.",
+      "evidence": "01-desktop/manifest.json (keyboard.reducedMotionCheck)"
+    },
+    "fidelity": {
+      "score": 4.5,
+      "rationale": "Fidelidad alta al wireframe vigente y baja al original, a propósito y documentado. Los tres ejes que pedía (dificultad, volumen, intención) no tienen fuente en el contrato del reader, y priorizar por volumen estimado teniendo el Search Console propio está tipificado como error de método. El wireframe se recalibró con la tabla de qué cambió y por qué antes de cerrar, así que fuente e implementación vuelven a coincidir. Layout, estados, contrato de a11y, copy ledger y plan GVC se implementaron tal cual.",
+      "evidence": "docs/ui/wireframes/TASK-1308-growth-seo-keyword-opportunities-ui.md (bloque de recalibración)"
+    },
+    "genericTemplateResistance": {
+      "score": 4.5,
+      "rationale": "Lo que la salva de ser un dashboard genérico es que el encoding dice algo que sólo este dominio puede decir: tres ACCIONES con forma propia en vez de tres severidades de color, la zona de primera plana sombreada y nombrada, y el estado honesto Sin dato donde un template habría puesto 0. El chrome (breadcrumb, tabs, cards) sí es el patrón cockpit del repo, y eso es correcto: es su hermana de tab, no una isla.",
+      "evidence": "01-desktop/frames/02-map.png, 04-table.png"
+    }
+  },
+  "verdict": "PASS",
+  "openRisks": [
+    "Header desbalanceado en desktop: Space y Ventana envuelven a dos filas y dejan un vacío bajo el titular. Follow-up, no bloqueante.",
+    "El eje logarítmico deja aire sobre el dato máximo por saltar en décadas. Aceptado: acotarlo a mano fijaría el rango a la forma de los datos de Berel y mentiría en otro Space.",
+    "Los estados empty, error y denied no tienen frame porque ningún Space de dev los produce. Cubiertos por código, no por evidencia visual.",
+    "ui:code-lint reporta 15 findings (raw-hex e inline-font-size) en el chart: son fallbacks de resolveChartColor y fontSize de canvas de ECharts. La hermana de TASK-1307 tiene las mismas 11 y se cerró con ellas. Fix de causa raíz propuesto: módulo canónico de chart-tokens en la allow-list del linter."
+  ]
+}

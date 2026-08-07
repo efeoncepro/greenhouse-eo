@@ -1954,7 +1954,12 @@ export const GH_GROWTH_SEO_KEYWORDS = {
     colVolume: 'Volumen',
     colDifficulty: 'Dificultad',
     // El estado honesto de las columnas de mercado: ni 0 ni un guion ambiguo.
-    marketUnavailable: 'Sin dato de mercado',
+    //
+    // ⚠️ CORTO A PROPÓSITO (hallazgo del GVC). "Sin dato de mercado" completo se envolvía en
+    // DOS líneas, en DOS columnas, en las 50 filas: 100 repeticiones de un texto largo que
+    // ahogaban los números que la tabla existe para mostrar. La frase completa no se pierde
+    // — vive en el tooltip de cada celda y en el banner de la pantalla, que la dice una vez.
+    marketUnavailable: 'Sin dato',
     marketUnavailableHint:
       'El enriquecimiento de mercado (volumen y dificultad) todavía no está habilitado en este Space. La priorización de arriba no lo necesita: usa tu demanda medida.',
     page: 'Página',
