@@ -17,6 +17,9 @@ export const scenario: CaptureScenario = {
   name: 'growth-seo-overview',
   route: `/admin/growth/seo?space=${BEREL_SPACE_ID}`,
   viewport: { width: 1440, height: 900 },
+  // `standard`: activa los guards de layout (overflow de página, texto cortado,
+  // targets chicos) — el contrato de contención se verifica, no se mira a ojo.
+  qualityProfile: 'standard',
   initialHoldMs: 1500,
   finalHoldMs: 600,
   readiness: {

@@ -149,6 +149,24 @@ const SeoOverviewView = ({
         </Stack>
       </Stack>
 
+      {/* El cambio de Space navega (no re-renderiza en sitio), así que el lector de
+          pantalla necesita que el nuevo contexto se anuncie al llegar. */}
+      <Box
+        aria-live='polite'
+        sx={{
+          position: 'absolute',
+          inlineSize: 1,
+          blockSize: 1,
+          overflow: 'hidden',
+          clip: 'rect(0 0 0 0)',
+          whiteSpace: 'nowrap'
+        }}
+      >
+        {selectedSpace
+          ? GH_GROWTH_SEO_OVERVIEW.states.spaceUpdated.replace('{space}', selectedSpace.organizationName)
+          : ''}
+      </Box>
+
       <Box data-capture='seo-overview-tabs'>
         <SeoSearchVisibilityTabs activeTab='overview' spaceId={selectedSpaceId} />
       </Box>

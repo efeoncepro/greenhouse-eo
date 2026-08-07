@@ -17,6 +17,8 @@ import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
 import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
+import { resolveApexColor } from '@/libs/styles/resolveApexColor'
+import { formatInteger } from '@/lib/format'
 import { GH_GROWTH_SEO_OVERVIEW } from '@/lib/copy/growth'
 import type { SeoOverviewSeriesPoint } from '@/lib/growth/seo/overview/read-overview-kpis'
 
@@ -44,10 +46,18 @@ const SeoVisibilityEvolutionChart = ({ series }: Props) => {
   const theme = useTheme()
   const [showTable, setShowTable] = useState(false)
 
-  const categories = useMemo(() => series.map(point => point.date), [series])
-
+  // Formato `{x, y}` en vez de un array plano de valores: con el array plano ApexCharts
+  // revienta al encontrar un `null` ("Cannot read properties of null (reading '1')",
+  // 8 pageerrors atrapados por el gate de runtime del GVC). Con `{x, y}` el `y: null` es
+  // un hueco de primera clase — que es justo lo que necesitamos: un día sin medición se
+  // dibuja como hueco, NUNCA interpolado.
   const clicksSeries = useMemo(
-    () => [{ name: GH_GROWTH_SEO_OVERVIEW.evolution.clicksSeries, data: series.map(point => point.clicks) }],
+    () => [
+      {
+        name: GH_GROWTH_SEO_OVERVIEW.evolution.clicksSeries,
+        data: series.map(point => ({ x: point.date, y: point.clicks }))
+      }
+    ],
     [series]
   )
 
@@ -55,17 +65,17 @@ const SeoVisibilityEvolutionChart = ({ series }: Props) => {
     () => [
       {
         name: GH_GROWTH_SEO_OVERVIEW.evolution.positionSeries,
-        // `null` viaja tal cual: Apex deja el hueco en vez de unir la línea por encima de
-        // un día sin dato. Interpolar ahí inventaría una posición que nunca se midió.
-        data: series.map(point => point.position)
+        data: series.map(point => ({ x: point.date, y: point.position }))
       }
     ],
     [series]
   )
 
+  // SIN `categories`: los puntos ya viajan como `{x, y}`. Declarar ambos le da a Apex dos
+  // definiciones del eje X en conflicto y revienta al cruzarlas (los 8 pageerrors).
   const sharedAxis = {
-    categories,
-    labels: { style: { colors: theme.palette.text.secondary } },
+    type: 'category' as const,
+    labels: { style: { colors: resolveApexColor(theme.palette.text.secondary, '#6B6876') } },
     axisBorder: { show: false },
     axisTicks: { show: false }
   }
@@ -74,12 +84,22 @@ const SeoVisibilityEvolutionChart = ({ series }: Props) => {
     chart: { type: 'area' as const, toolbar: { show: false }, parentHeightOffset: 0, sparkline: { enabled: false } },
     dataLabels: { enabled: false },
     stroke: { curve: 'smooth' as const, width: 2 },
-    colors: [theme.palette.primary.main],
+    colors: [resolveApexColor(theme.palette.primary.main, '#0375DB')],
     fill: { type: 'gradient', gradient: { shadeIntensity: 0.2, opacityFrom: 0.35, opacityTo: 0.05 } },
-    grid: { borderColor: theme.palette.divider, strokeDashArray: 4, xaxis: { lines: { show: false } } },
+    grid: {
+      borderColor: resolveApexColor(theme.palette.divider, '#DBDBDB'),
+      strokeDashArray: 4,
+      xaxis: { lines: { show: false } }
+    },
     xaxis: sharedAxis,
     // Los clics SÍ arrancan en 0: el área codifica volumen y truncar el eje distorsiona.
-    yaxis: { min: 0, labels: { style: { colors: theme.palette.text.secondary } } },
+    yaxis: {
+      min: 0,
+      labels: {
+        formatter: (value: number) => (Number.isFinite(value) ? formatInteger(Math.round(value)) : ''),
+        style: { colors: resolveApexColor(theme.palette.text.secondary, '#6B6876') }
+      }
+    },
     tooltip: { theme: theme.palette.mode }
   }
 
@@ -87,14 +107,23 @@ const SeoVisibilityEvolutionChart = ({ series }: Props) => {
     chart: { type: 'line' as const, toolbar: { show: false }, parentHeightOffset: 0 },
     dataLabels: { enabled: false },
     stroke: { curve: 'smooth' as const, width: 2, dashArray: 4 },
-    colors: [theme.palette.secondary.main],
+    colors: [resolveApexColor(theme.palette.secondary.main, '#0B726C')],
     markers: { size: 4 },
-    grid: { borderColor: theme.palette.divider, strokeDashArray: 4, xaxis: { lines: { show: false } } },
+    grid: {
+      borderColor: resolveApexColor(theme.palette.divider, '#DBDBDB'),
+      strokeDashArray: 4,
+      xaxis: { lines: { show: false } }
+    },
     xaxis: sharedAxis,
     yaxis: {
       // El invariante de la task: 1 arriba = mejor.
       reversed: true,
-      labels: { style: { colors: theme.palette.text.secondary } }
+      labels: {
+        // Sin formatter, Apex imprime el tick crudo y el ruido de punto flotante queda a
+        // la vista ("5.7999999999999998"). Una posición se lee con un decimal.
+        formatter: (value: number) => (Number.isFinite(value) ? value.toFixed(1) : ''),
+        style: { colors: resolveApexColor(theme.palette.text.secondary, '#6B6876') }
+      }
     },
     tooltip: { theme: theme.palette.mode }
   }
@@ -148,7 +177,9 @@ const SeoVisibilityEvolutionChart = ({ series }: Props) => {
 
           {showTable ? (
             // Fallback tabular: misma serie, legible por lector de pantalla y copiable.
-            <TableContainer sx={{ maxBlockSize: 320 }}>
+            // Scroll INTERNO: la tabla nunca empuja el ancho de la página (el gate de
+            // layout del GVC la detectó desbordando el viewport).
+            <TableContainer sx={{ maxBlockSize: 320, overflowX: 'auto', maxInlineSize: '100%' }}>
               <Table size='small' aria-label={GH_GROWTH_SEO_OVERVIEW.evolution.tableCaption}>
                 <TableHead>
                   <TableRow>

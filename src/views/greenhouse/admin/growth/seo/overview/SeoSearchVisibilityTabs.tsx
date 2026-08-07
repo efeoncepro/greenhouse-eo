@@ -1,13 +1,9 @@
 'use client'
 
-import { forwardRef } from 'react'
-
 import Link from 'next/link'
 
 import TabContext from '@mui/lab/TabContext'
 import Tab from '@mui/material/Tab'
-import type { TabProps } from '@mui/material/Tab'
-import Tooltip from '@mui/material/Tooltip'
 
 import CustomTabList from '@core/components/mui/TabList'
 
@@ -67,32 +63,6 @@ const TABS: readonly SeoSearchVisibilityTab[] = [
   }
 ]
 
-/**
- * Tab no disponible, con el motivo en un tooltip.
- *
- * ⚠️ `Tabs` inyecta props de contexto (`fullWidth`, `indicator`, `selectionFollowsFocus`,
- * `textColor`, `value`…) en sus hijos DIRECTOS. Si el hijo directo fuera el `<Tooltip>`,
- * esos props aterrizarían en el `<span>` del DOM y React tiraría 4 errores de atributo
- * desconocido en consola (pasó: los 4 issues del overlay de dev salían justo de acá).
- *
- * Por eso este wrapper existe: recibe lo inyectado y lo REENVÍA al `Tab`, que sí lo
- * entiende. El `<span>` intermedio sigue siendo necesario porque MUI no dispara eventos
- * de hover sobre un control deshabilitado — sin él, el tooltip nunca aparecería y el
- * usuario no sabría por qué el tab no responde.
- */
-const UnavailableTab = forwardRef<HTMLSpanElement, TabProps & { tooltipTitle: string }>(function UnavailableTab(
-  { tooltipTitle, ...tabProps },
-  ref
-) {
-  return (
-    <Tooltip title={tooltipTitle}>
-      <span ref={ref}>
-        <Tab {...tabProps} disabled />
-      </span>
-    </Tooltip>
-  )
-})
-
 interface Props {
   /** Tab activa. Cada ruta hermana pasa la suya. */
   activeTab: string
@@ -107,8 +77,18 @@ const SeoSearchVisibilityTabs = ({ activeTab, spaceId }: Props) => {
     // `TabList` de @mui/lab lee la tab activa del contexto, no de una prop. Como acá cada
     // tab es una ruta propia, el contexto sólo transporta cuál está activa: no hay
     // `TabPanel` que conmutar — el "panel" es la página que Next monta.
+    //
+    // `role='navigation'`: estos "tabs" son LINKS a rutas hermanas, no un conmutador de
+    // paneles. Con el rol `tablist` por defecto, axe exige que cada hijo sea `role=tab` y
+    // que su `aria-controls` apunte a un panel real — dos contratos que acá no se pueden
+    // cumplir porque el panel es la página siguiente. Declarar navegación es lo honesto.
     <TabContext value={activeTab}>
-      <CustomTabList variant='scrollable' pill='true' aria-label={GH_GROWTH_SEO_OVERVIEW.sectionTitle}>
+      <CustomTabList
+        role='navigation'
+        variant='scrollable'
+        pill='true'
+        aria-label={GH_GROWTH_SEO_OVERVIEW.sectionTitle}
+      >
         {TABS.map(tab =>
           tab.available ? (
             <Tab
@@ -122,13 +102,19 @@ const SeoSearchVisibilityTabs = ({ activeTab, spaceId }: Props) => {
               aria-current={tab.value === activeTab ? 'page' : undefined}
             />
           ) : (
-            <UnavailableTab
+            // `aria-disabled` + `title` en vez de `disabled` envuelto en Tooltip: un
+            // `<span>` intermedio dentro del contenedor de tabs rompía el contrato ARIA
+            // y un control `disabled` no dispara hover, así que el motivo nunca se veía.
+            <Tab
               key={tab.value}
               value={tab.value}
               label={tab.label}
               icon={<i className={tab.icon} />}
               iconPosition='start'
-              tooltipTitle={GH_GROWTH_SEO_OVERVIEW.tabs.unavailableHint}
+              aria-disabled='true'
+              title={GH_GROWTH_SEO_OVERVIEW.tabs.unavailableHint}
+              sx={{ opacity: 0.5, pointerEvents: 'auto', cursor: 'not-allowed' }}
+              onClick={event => event.preventDefault()}
             />
           )
         )}

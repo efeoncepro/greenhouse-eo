@@ -1578,7 +1578,7 @@ export const GH_GROWTH_SEO_OVERVIEW = {
     title: 'Evolución de visibilidad',
     subtitle: 'Clics medidos y posición promedio en el tiempo. En posición, más abajo es mejor.',
     clicksSeries: 'Clics',
-    positionSeries: 'Posición media',
+    positionSeries: 'Posición promedio',
     showTable: 'Ver tabla de datos',
     hideTable: 'Ocultar tabla de datos',
     tableCaption: 'Clics y posición promedio por fecha',
