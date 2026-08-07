@@ -1,7 +1,10 @@
 import 'server-only'
 
+import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+
+import { SEO_GSC_HISTORY_DATASET, SEO_GSC_HISTORY_TABLE } from '../gsc-history-bq-mirror'
 
 import type {
   SeoPerformanceDailyTotal,
@@ -157,7 +160,7 @@ interface GscDailyRow extends Record<string, unknown> {
  * ⚠️ `capture_date` es DATE: la ventana se recorta con intervalos explícitos, nunca con
  * `EXTRACT(EPOCH FROM (date - date))`, que revienta en runtime (invariante SQL date-math).
  */
-const readGscDaily = async (input: {
+const readGscDailyFromPostgres = async (input: {
   organizationId: string
   mode: SeoPerformanceMode
   items: string[]
@@ -184,6 +187,100 @@ const readGscDaily = async (input: {
       ORDER BY ${column}, capture_date`,
     [input.organizationId, input.items, input.anchor, input.rangeDays]
   )
+}
+
+/**
+ * La MISMA agregación contra el histórico BQ (`seo_gsc_history`, TASK-1655) — mismos
+ * alias, misma ponderación por impresiones, mismo shape de fila: los dos stores tienen
+ * que producir el mismo número para el mismo día o el split sería una mentira de dato.
+ */
+const readGscDailyFromBigQuery = async (input: {
+  organizationId: string
+  mode: SeoPerformanceMode
+  items: string[]
+  anchor: string
+  rangeDays: number
+}): Promise<GscDailyRow[]> => {
+  const column = GSC_COLUMN_BY_MODE[input.mode]
+  const projectId = getBigQueryProjectId()
+  const bigQuery = getBigQueryClient()
+
+  const [rows] = await bigQuery.query({
+    query: `SELECT ${column} AS item,
+                   CAST(capture_date AS STRING) AS date,
+                   SUM(clicks) AS clicks,
+                   SUM(impressions) AS impressions,
+                   CASE WHEN SUM(impressions) > 0
+                        THEN SUM(CAST(position AS FLOAT64) * impressions) / SUM(impressions)
+                        ELSE NULL
+                   END AS weighted_position
+              FROM \`${projectId}.${SEO_GSC_HISTORY_DATASET}.${SEO_GSC_HISTORY_TABLE}\`
+             WHERE organization_id = @organization_id
+               AND ${column} IN UNNEST(@items)
+               AND capture_date > DATE_SUB(CAST(@anchor AS DATE), INTERVAL @range_days DAY)
+               AND capture_date <= CAST(@anchor AS DATE)
+             GROUP BY ${column}, capture_date
+             ORDER BY ${column}, capture_date`,
+    params: {
+      organization_id: input.organizationId,
+      items: input.items,
+      anchor: input.anchor,
+      range_days: input.rangeDays
+    },
+    types: { organization_id: 'STRING', items: ['STRING'], anchor: 'STRING', range_days: 'INT64' }
+  })
+
+  return (rows as Array<Record<string, unknown>>).map(row => ({
+    item: String(row.item),
+    date: String(row.date),
+    clicks: typeof row.clicks === 'number' ? row.clicks : Number(row.clicks ?? 0),
+    impressions: typeof row.impressions === 'number' ? row.impressions : Number(row.impressions ?? 0),
+    weighted_position:
+      row.weighted_position === null || row.weighted_position === undefined ? null : Number(row.weighted_position)
+  }))
+}
+
+/**
+ * Split OLTP/OLAP por COBERTURA, no por rango fijo (TASK-1655, patrón de
+ * `readRankEvolution` adaptado): PG es la ventana caliente operativa y BQ el SoT del
+ * histórico. Se decide por lo que PG realmente TIENE — si su primer día llega después
+ * del inicio de la ventana pedida y BQ cubre más atrás, la lectura completa va a BQ.
+ * Un corte por número fijo de días mentiría en las dos direcciones (PG recién nacido
+ * con 5 días, o BQ vacío pre-backfill).
+ */
+const readGscDaily = async (input: {
+  organizationId: string
+  mode: SeoPerformanceMode
+  items: string[]
+  anchor: string
+  rangeDays: number
+  /** Primer día materializado en PG para la org (`null` = PG vacío). */
+  pgMinDate: string | null
+}): Promise<GscDailyRow[]> => {
+  const windowStart = shiftIsoDate(input.anchor, -(input.rangeDays - 1))
+
+  const pgCoversWindow = input.pgMinDate !== null && input.pgMinDate <= windowStart
+
+  if (pgCoversWindow) {
+    return readGscDailyFromPostgres(input)
+  }
+
+  // PG no llega al inicio de la ventana: intentar el histórico. Si BQ tampoco tiene
+  // (pre-backfill), caer a PG — servir lo que hay es el comportamiento honesto previo.
+  try {
+    const bqRows = await readGscDailyFromBigQuery(input)
+
+    if (bqRows.length > 0) {
+      return bqRows
+    }
+  } catch (error) {
+    captureWithDomain(error, 'growth', {
+      tags: { source: 'seo_performance_reader_bq_fallback' },
+      extra: { organizationId: input.organizationId, mode: input.mode, rangeDays: input.rangeDays }
+    })
+  }
+
+  return readGscDailyFromPostgres(input)
 }
 
 /** Serie de un ítem, ya ordenada, agrupada desde las filas planas. */
@@ -321,14 +418,16 @@ export const readSeoPerformance = async (
     // Ancla en el último día MATERIALIZADO, no en CURRENT_DATE: la captura corre con lag,
     // así que anclar en "hoy" terminaría la ventana en días vacíos y haría ver una caída
     // de tráfico que no ocurrió.
-    const anchorRows = await runGreenhousePostgresQuery<{ anchor: string | null }>(
-      `SELECT MAX(capture_date)::text AS anchor
+    const anchorRows = await runGreenhousePostgresQuery<{ anchor: string | null; pg_min: string | null }>(
+      `SELECT MAX(capture_date)::text AS anchor,
+              MIN(capture_date)::text AS pg_min
          FROM greenhouse_growth.seo_gsc_daily
         WHERE organization_id = $1`,
       [organizationId]
     )
 
     const anchor = anchorRows[0]?.anchor ?? null
+    const pgMinDate = anchorRows[0]?.pg_min ?? null
 
     // Sin ningún día materializado no hay verdad medida que servir. `not_connected` lleva
     // al operador a la acción correcta (conectar / esperar la captura), a diferencia de un
@@ -357,8 +456,8 @@ export const readSeoPerformance = async (
     // tienen. La ventana previa es del mismo largo, inmediatamente anterior — es lo que
     // permite un delta real en vez de una card sin comparación.
     const [gscRows, previousRows, rankEvolution] = await Promise.all([
-      readGscDaily({ organizationId, mode, items, anchor, rangeDays }),
-      readGscDaily({ organizationId, mode, items, anchor: shiftIsoDate(anchor, -rangeDays), rangeDays }),
+      readGscDaily({ organizationId, mode, items, anchor, rangeDays, pgMinDate }),
+      readGscDaily({ organizationId, mode, items, anchor: shiftIsoDate(anchor, -rangeDays), rangeDays, pgMinDate }),
       source === 'dataforseo_estimated' && seoTargetId
         ? readRankEvolution(seoTargetId, { keywords: items, rangeDays, device, engine: options.engine })
         : null

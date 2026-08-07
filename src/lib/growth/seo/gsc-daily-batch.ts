@@ -16,6 +16,7 @@ import { listActiveSearchConsoleOrganizations } from '@/lib/growth/search-consol
 import { captureWithDomain } from '@/lib/observability/capture'
 
 import { materializeGscDailySnapshot } from './gsc-daily-materializer'
+import { mirrorGscDailyToBq } from './gsc-history-bq-mirror'
 
 /**
  * Ventana móvil por defecto. 5 días cubre con holgura el lag típico de publicación de
@@ -30,6 +31,12 @@ export interface GscDailyBatchOrgOutcome {
   rowsWritten: number
   truncated: boolean
   errorCode: string | null
+  /**
+   * TASK-1655 — resultado del espejo a BQ del día materializado. `mirror_failed` NO
+   * degrada el batch (PG quedó bien y el mirror es re-ejecutable), pero se REPORTA:
+   * un espejo cayéndose en silencio dejaría el histórico divergiendo del caliente.
+   */
+  bqMirror: 'mirrored' | 'mirror_failed' | 'not_applicable'
 }
 
 export interface GscDailyBatchResult {
@@ -107,13 +114,32 @@ export const runGscDailySnapshotBatch = async (
         const result = await materializeGscDailySnapshot(org.organizationId, captureDate)
 
         if (result.ok) {
+          // TASK-1655 — espejo a BQ del día recién materializado (SoT del histórico).
+          // Falla aparte del batch: PG quedó correcto y el MERGE es re-ejecutable, pero
+          // el estado se reporta para que la divergencia nunca sea silenciosa.
+          let bqMirror: GscDailyBatchOrgOutcome['bqMirror'] = 'not_applicable'
+
+          if (result.rowsWritten > 0) {
+            try {
+              await mirrorGscDailyToBq(org.organizationId, captureDate)
+              bqMirror = 'mirrored'
+            } catch (mirrorError) {
+              captureWithDomain(mirrorError, 'growth', {
+                tags: { source: 'seo_gsc_daily_batch_bq_mirror' },
+                extra: { organizationId: org.organizationId, captureDate }
+              })
+              bqMirror = 'mirror_failed'
+            }
+          }
+
           outcomes.push({
             organizationId: org.organizationId,
             captureDate,
             status: 'materialized',
             rowsWritten: result.rowsWritten,
             truncated: result.truncated,
-            errorCode: null
+            errorCode: null,
+            bqMirror
           })
         } else {
           outcomes.push({
@@ -122,7 +148,8 @@ export const runGscDailySnapshotBatch = async (
             status: 'degraded',
             rowsWritten: 0,
             truncated: false,
-            errorCode: result.errorCode
+            errorCode: result.errorCode,
+            bqMirror: 'not_applicable'
           })
         }
       } catch (error) {
@@ -137,7 +164,8 @@ export const runGscDailySnapshotBatch = async (
           status: 'failed',
           rowsWritten: 0,
           truncated: false,
-          errorCode: 'unexpected_error'
+          errorCode: 'unexpected_error',
+          bqMirror: 'not_applicable'
         })
       }
     }

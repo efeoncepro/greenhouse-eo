@@ -312,7 +312,22 @@ const SeoRankEvolutionChart = ({ series, metric, range, events = [] }: SeoRankEv
               </Typography>
             </Stack>
 
-            <Button variant='outlined' size='small' onClick={() => setShowTable(current => !current)} aria-expanded={showTable}>
+            <Button
+              variant='outlined'
+              size='small'
+              onClick={() => setShowTable(current => !current)}
+              aria-expanded={showTable}
+              // Focus ring EXPLÍCITO: el theme no dibuja outline en focus y este toggle
+              // es parte del contrato de teclado del chart (probe del GVC). Se cubre
+              // también `:focus` plano porque un focus programático (como el del probe)
+              // no dispara la heurística focus-visible del navegador.
+              sx={{
+                '&.Mui-focusVisible, &:focus-visible, &:focus': {
+                  outline: theme => `2px solid ${theme.palette.primary.main}`,
+                  outlineOffset: 2
+                }
+              }}
+            >
               {showTable ? GH_GROWTH_SEO_PERFORMANCE.chart.hideTable : GH_GROWTH_SEO_PERFORMANCE.chart.showTable}
             </Button>
           </Stack>
@@ -354,7 +369,14 @@ const SeoRankEvolutionChart = ({ series, metric, range, events = [] }: SeoRankEv
           {showTable ? (
             // Fallback tabular real: la misma serie, legible por lector de pantalla y
             // copiable. Scroll INTERNO — la tabla nunca empuja el ancho de la página.
-            <TableContainer sx={{ maxBlockSize: 320, overflowX: 'auto', maxInlineSize: '100%' }}>
+            // `tabIndex` + role/label: una región scrolleable sin foco es inalcanzable
+            // por teclado (axe scrollable-region-focusable).
+            <TableContainer
+              tabIndex={0}
+              role='region'
+              aria-label={GH_GROWTH_SEO_PERFORMANCE.chart.tableCaption}
+              sx={{ maxBlockSize: 320, overflowX: 'auto', maxInlineSize: '100%' }}
+            >
               <Table size='small' aria-label={GH_GROWTH_SEO_PERFORMANCE.chart.tableCaption}>
                 <TableHead>
                   <TableRow>

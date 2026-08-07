@@ -97,6 +97,15 @@ Se envuelven en una sola narrativa de producto: **Search Visibility 360** = los 
 
 **SoT split:** PG es SoT de configuración + los últimos N snapshots (ventana caliente ~180d). BQ es SoT de la historia larga (tendencia analítica). El reactive consumer espeja cada snapshot a BQ (`greenhouse_growth_analytics.*`).
 
+> **Delta 2026-08-07 (TASK-1655) — el carril GSC ahora TAMBIÉN tiene su mirror + camino de historial.** El módulo nació forward-only (medido en vivo: 5 días de GSC / 2 de rank teniendo 16 meses en la API) y el carril GSC no tenía espejo BQ — 5 días de `seo_gsc_daily` ya pesaban 27 MB en Cloud SQL, así que el histórico en OLTP no escalaba. Lo vigente:
+>
+> - **`greenhouse_growth_analytics.seo_gsc_history`** (particionada por `capture_date`, clustered por `organization_id, query`) es el SoT del histórico GSC. MERGE idempotente por `(org, capture_date, query, page)` — la misma clave del UPSERT de PG — con UPDATE en match (GSC consolida ~48h tarde y ambos stores deben corregirse igual). Mirror: `src/lib/growth/seo/gsc-history-bq-mirror.ts`.
+> - **El batch diario espeja cada día materializado** (paso del batch, no outbox: el fetch y el espejo comparten el ciclo de vida del día; `bqMirror: 'mirror_failed'` se REPORTA en el outcome y el día se re-espeja al siguiente run — nunca divergencia silenciosa).
+> - **Backfill del pasado por API → BQ directo** (`gsc-backfill.ts` + runner `scripts/growth/backfill-gsc-history.ts`): resumible (salta días ya presentes), honest degradation por día, NUNCA escribe a PG — meter el pasado en la tabla caliente recrearía el problema. Runbook: `docs/manual-de-uso/growth/backfill-historico-gsc.md`.
+> - **Split de lectura por COBERTURA, no por rango fijo** (`readSeoPerformance`): si el primer día de PG llega después del inicio de la ventana pedida, la lectura completa va a BQ; con BQ vacío (pre-backfill) cae a PG. Un corte por N días fijos mentiría en ambas direcciones.
+> - **Export nativo GSC→BQ por propiedad** = destino de largo plazo del continuo (gratis, sin muestreo; ya corre para `efeoncepro.com` en `efeonce-group.searchconsole.*` desde 2025-12-10, forward-only desde su activación). Su `sum_position` se promedia como `SUM(sum_position)/SUM(impressions)` — nunca un AVG plano. Activarlo por cliente requiere permiso Owner en la propiedad (out-of-band).
+> - Retención PG declarada: ventana caliente ~180d; el purge físico es follow-up de TASK-1655.
+
 ### 4.1 Configuración (mutable current + membership versionada)
 
 - `seo_targets` — qué trackea una org. `organization_id` FK, `root_domain`, `location_code`+`language_code`, `status`, `created_by`. UNIQUE(org, root_domain, location, language).

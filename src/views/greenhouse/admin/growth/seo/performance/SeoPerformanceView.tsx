@@ -18,7 +18,7 @@ import CustomTextField from '@core/components/mui/TextField'
 
 import EmptyState from '@/components/greenhouse/EmptyState'
 import { GreenhouseBreadcrumbs, GreenhouseChip } from '@/components/greenhouse/primitives'
-import CompositionShell from '@/components/greenhouse/primitives/composition-shell/CompositionShell'
+import SurfaceRecipe from '@/components/greenhouse/primitives/surface-system/SurfaceRecipe'
 import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
 import { GH_GROWTH_SEO_PERFORMANCE, GH_GROWTH_SEO_OVERVIEW } from '@/lib/copy/growth'
 import type {
@@ -133,12 +133,13 @@ const SeoPerformanceView = ({
 
   const header = (
     <Stack spacing={4}>
-      {/* "Growth" es un grupo de menú, no una ruta: va sin href para no prometer una
-          página que no existe. */}
+      {/* Sin hrefs (misma convención del Overview): "Growth" es un grupo de menú, y la
+          navegación a las hermanas ES la barra de tabs de abajo — un link acá duplicaría
+          el camino y el azul primario del link no alcanza AA sobre el fondo del body. */}
       <GreenhouseBreadcrumbs
         items={[
           { label: GH_INTERNAL_NAV.growth.label },
-          { label: GH_GROWTH_SEO_OVERVIEW.breadcrumbSection, href: '/admin/growth/seo' },
+          { label: GH_GROWTH_SEO_OVERVIEW.breadcrumbSection },
           { label: GH_INTERNAL_NAV.growthSeoPerformance.label }
         ]}
       />
@@ -151,7 +152,14 @@ const SeoPerformanceView = ({
         data-capture='seo-performance-toolbar'
       >
         <Stack spacing={1}>
-          <Typography variant='h4'>{copy.pageTitle}</Typography>
+          {/* `surfaceHeroTitle` (34px, SoT tipográfico): el token reservado para el
+              titular primario de una surface full-page — y ésta es la pantalla ancla del
+              módulo. `component='h1'`: el único h1 (los títulos de chart/tabla son h2).
+              Con h4/h3 (ambos 20px) el titular no dominaba sobre el chrome de 16px y la
+              jerarquía quedaba visualmente plana (rubric enterprise). */}
+          <Typography variant='surfaceHeroTitle' component='h1'>
+            {copy.pageTitle}
+          </Typography>
           <Typography variant='body2' color='text.secondary'>
             {copy.pageSubtitle}
           </Typography>
@@ -391,16 +399,26 @@ const SeoPerformanceView = ({
           periodLabel={copy.toolbar.rangeOptions[String(rangeDays) as keyof typeof copy.toolbar.rangeOptions] ?? ''}
         />
 
-        {/* Degradación honesta: lo que falta se NOMBRA, en vez de dibujarse en cero. */}
+        {/* Degradación honesta: lo que falta se NOMBRA, en vez de dibujarse en cero.
+            El cuerpo va en `text.primary`: el azul tonal default del Alert queda en
+            3.71:1 sobre su fondo (falla AA) y este texto es información, no decoración. */}
         {performance.itemsWithoutData.length > 0 ? (
-          <Alert severity='info' data-capture='seo-performance-degraded'>
+          <Alert
+            severity='info'
+            data-capture='seo-performance-degraded'
+            sx={{ '& .MuiAlert-message': { color: 'text.primary' } }}
+          >
             <AlertTitle>{copy.states.partialMissing.title}</AlertTitle>
             {copy.states.partialMissing.description.replace('{items}', performance.itemsWithoutData.join(', '))}
           </Alert>
         ) : null}
 
         {sparseItems.length > 0 ? (
-          <Alert severity='info' data-capture='seo-performance-degraded'>
+          <Alert
+            severity='info'
+            data-capture='seo-performance-degraded'
+            sx={{ '& .MuiAlert-message': { color: 'text.primary' } }}
+          >
             <AlertTitle>{copy.states.sparseSeries.title}</AlertTitle>
             {copy.states.sparseSeries.description.replace('{items}', sparseItems.join(', '))}
           </Alert>
@@ -436,8 +454,13 @@ const SeoPerformanceView = ({
   }
 
   return (
-    <CompositionShell
-      composition='single'
+    // Recipe canónica `analyticsReport` (composición `single`). `plane='none'`: el
+    // contenido primario ES una composición de cards (banda KPI + chart hero + tabla);
+    // el plane contenido de la recipe fabricaría card-on-card.
+    <SurfaceRecipe
+      kind='analyticsReport'
+      instanceId='seo-performance'
+      plane='none'
       regions={{
         primary: (
           <Stack spacing={6}>

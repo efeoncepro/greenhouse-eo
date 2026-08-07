@@ -2,10 +2,9 @@
 
 import Link from 'next/link'
 
-import TabContext from '@mui/lab/TabContext'
 import Tab from '@mui/material/Tab'
 
-import CustomTabList from '@core/components/mui/TabList'
+import { CustomTabsNav } from '@core/components/mui/TabList'
 
 import { GH_GROWTH_SEO_OVERVIEW } from '@/lib/copy/growth'
 
@@ -75,52 +74,49 @@ const SeoSearchVisibilityTabs = ({ activeTab, spaceId }: Props) => {
   const withSpace = (href: string) => (spaceId ? `${href}?space=${encodeURIComponent(spaceId)}` : href)
 
   return (
-    // `TabList` de @mui/lab lee la tab activa del contexto, no de una prop. Como acá cada
-    // tab es una ruta propia, el contexto sólo transporta cuál está activa: no hay
-    // `TabPanel` que conmutar — el "panel" es la página que Next monta.
-    //
-    // `role='navigation'`: estos "tabs" son LINKS a rutas hermanas, no un conmutador de
-    // paneles. Con el rol `tablist` por defecto, axe exige que cada hijo sea `role=tab` y
-    // que su `aria-controls` apunte a un panel real — dos contratos que acá no se pueden
-    // cumplir porque el panel es la página siguiente. Declarar navegación es lo honesto.
-    <TabContext value={activeTab}>
-      <CustomTabList
-        role='navigation'
-        variant='scrollable'
-        pill='true'
-        aria-label={GH_GROWTH_SEO_OVERVIEW.sectionTitle}
-      >
-        {TABS.map(tab =>
-          tab.available ? (
-            <Tab
-              key={tab.value}
-              value={tab.value}
-              label={tab.label}
-              icon={<i className={tab.icon} />}
-              iconPosition='start'
-              component={Link}
-              href={withSpace(tab.href)}
-              aria-current={tab.value === activeTab ? 'page' : undefined}
-            />
-          ) : (
-            // `aria-disabled` + `title` en vez de `disabled` envuelto en Tooltip: un
-            // `<span>` intermedio dentro del contenedor de tabs rompía el contrato ARIA
-            // y un control `disabled` no dispara hover, así que el motivo nunca se veía.
-            <Tab
-              key={tab.value}
-              value={tab.value}
-              label={tab.label}
-              icon={<i className={tab.icon} />}
-              iconPosition='start'
-              aria-disabled='true'
-              title={GH_GROWTH_SEO_OVERVIEW.tabs.unavailableHint}
-              sx={{ opacity: 0.5, pointerEvents: 'auto', cursor: 'not-allowed' }}
-              onClick={event => event.preventDefault()}
-            />
-          )
-        )}
-      </CustomTabList>
-    </TabContext>
+    // `CustomTabsNav` (Tabs plano, TASK-1307) y NO el TabList de @mui/lab: estos "tabs"
+    // son LINKS a rutas hermanas — el "panel" es la página que Next monta. El TabList
+    // clona cada Tab inyectándole `aria-controls` hacia un TabPanel que acá no existe
+    // (axe: `aria-valid-attr-value` critical) y su clone pisa cualquier override del
+    // consumer. `role='navigation'` declara lo que esto ES; con Tabs plano nadie fabrica
+    // ARIA hacia paneles fantasma y el estilo pill se conserva (mismas clases MuiTabs).
+    <CustomTabsNav
+      role='navigation'
+      value={activeTab}
+      variant='scrollable'
+      pill='true'
+      aria-label={GH_GROWTH_SEO_OVERVIEW.sectionTitle}
+    >
+      {TABS.map(tab =>
+        tab.available ? (
+          <Tab
+            key={tab.value}
+            value={tab.value}
+            label={tab.label}
+            icon={<i className={tab.icon} />}
+            iconPosition='start'
+            component={Link}
+            href={withSpace(tab.href)}
+            aria-current={tab.value === activeTab ? 'page' : undefined}
+          />
+        ) : (
+          // `aria-disabled` + `title` en vez de `disabled` envuelto en Tooltip: un
+          // `<span>` intermedio dentro del contenedor de tabs rompía el contrato ARIA
+          // y un control `disabled` no dispara hover, así que el motivo nunca se veía.
+          <Tab
+            key={tab.value}
+            value={tab.value}
+            label={tab.label}
+            icon={<i className={tab.icon} />}
+            iconPosition='start'
+            aria-disabled='true'
+            title={GH_GROWTH_SEO_OVERVIEW.tabs.unavailableHint}
+            sx={{ opacity: 0.5, pointerEvents: 'auto', cursor: 'not-allowed' }}
+            onClick={event => event.preventDefault()}
+          />
+        )
+      )}
+    </CustomTabsNav>
   )
 }
 

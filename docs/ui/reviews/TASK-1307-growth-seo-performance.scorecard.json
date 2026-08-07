@@ -1,0 +1,85 @@
+{
+  "task": "TASK-1307",
+  "surface": "admin.growth.seo.performance",
+  "verdict": "pass-local",
+  "reviewedAt": "2026-08-07",
+  "reviewer": "claude-opus-5 (frames mirados: desktop 1440 + mobile 390 del capture premium)",
+  "evidence": {
+    "desktop": ".captures/2026-08-07T12-38-34_growth-seo-performance/01-desktop/frames/01-default.png",
+    "mobile": ".captures/2026-08-07T12-38-34_growth-seo-performance/02-mobile/frames/04-chart.png",
+    "dossier": ".captures/2026-08-07T12-38-34_growth-seo-performance/review-dossier.md"
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 4.6,
+      "rationale": "surfaceHeroTitle (34px) domina el chrome de 16px; h1 único → h2 de chart/tabla; la banda KPI da el titular numérico antes del hero. Corregido en loop: el primer heading era un h2 con tamaño de h6 (rubric 1.25) y se subió al token canónico.",
+      "evidence": "01-desktop/frames/01-default.png"
+    },
+    "proportions": {
+      "score": 4.5,
+      "rationale": "Toolbar de 4 controles envuelve con flexWrap en vez de comprimir (el chip de frescura se truncaba y se corrigió); chart hero 380px con margen derecho de 148px reservado a los last-value labels; tabla con anchos por columna y primera columna sticky.",
+      "evidence": "01-desktop/frames/01-default.png"
+    },
+    "rhythm": {
+      "score": 4.5,
+      "rationale": "Stack vertical con spacing 6 constante entre regiones (toolbar → tabs → selector → KPI → chart → tabla) y spacing 4 interno en cards; la cascada de lectura sigue el orden del concepto aprobado.",
+      "evidence": "01-desktop/frames/01-default.png"
+    },
+    "density": {
+      "score": 4.5,
+      "rationale": "Densidad de cockpit sin saturación: 4 KPI con sparkline, chart multi-serie y tabla de 7 columnas respiran; en 390px todo apila y la tabla arrastra dentro del DataTableShell sin empujar la página (scroll-width check verde en ambos viewports).",
+      "evidence": "02-mobile/frames/05-table.png"
+    },
+    "depth": {
+      "score": 4.5,
+      "rationale": "Elevación contenida: cards con borde + hover lift (raised) y tooltips floating; sin plane extra — `plane='none'` en la recipe precisamente para no fabricar card-on-card bajo la composición de cards canónicas.",
+      "evidence": "01-desktop/frames/03-kpi-band.png"
+    },
+    "surfaceEconomy": {
+      "score": 4.5,
+      "rationale": "First fold: selector (el control que define la pantalla) + banda KPI; 5-6 contained en viewport 1440 — al límite del presupuesto pero cada superficie es funcional y ninguna es wrapper decorativo; rubric enterprise pass sin saturation ni nesting findings.",
+      "evidence": "01-desktop/frames/01-default.png"
+    },
+    "visualImpact": {
+      "score": 4.6,
+      "rationale": "El momento dominante existe y es propio del oficio: chart hero con eje invertido (1 arriba), meta top-3, last-value labels y una caída real de una serie dibujada con su hueco — se lee como rank tracker profesional, no como line chart genérico.",
+      "evidence": "02-mobile/frames/04-chart.png"
+    },
+    "typography": {
+      "score": 4.7,
+      "rationale": "Todo del SoT: surfaceHeroTitle para el titular, kpiValue + tabular-nums en números, caption para metadatos; cero fontSize inline. La cobertura ('31 de 90 días con medición') es texto legible (text.secondary tras corregir el disabled a 2.29:1).",
+      "evidence": "01-desktop/frames/04-chart.png"
+    },
+    "color": {
+      "score": 4.6,
+      "rationale": "Paleta categórica AXIS con redundancia de FORMA (línea + símbolo, leyenda con nombre de figura) — colorblind-safe incluso monocromo; semáforo del delta invertido con signo+flecha, nunca color solo; axe color-contrast en cero tras las correcciones.",
+      "evidence": "01-desktop/frames/04-chart.png"
+    },
+    "iconography": {
+      "score": 4.5,
+      "rationale": "Tabler glyphs consistentes en tabs (dashboard/chart-line/key/stethoscope) y empty states; marcadores ◑/● como iconografía semántica de procedencia del dato — sin iconos decorativos sueltos.",
+      "evidence": "01-desktop/frames/01-default.png"
+    },
+    "responsive": {
+      "score": 4.6,
+      "rationale": "390px verificado en el mismo scenario premium: toolbar apila, chart condensa manteniendo dataZoom y labels, tabla con scroll interno; scrollWidth==clientWidth en ambos viewports (guard de layout del GVC).",
+      "evidence": "02-mobile/frames/01-default.png"
+    },
+    "motion": {
+      "score": 4.5,
+      "rationale": "Entrada del chart 400ms + count-up de KPI + hover lift, todo deshabilitado bajo prefers-reduced-motion (evidencia del probe reduced-motion del scenario premium); sin motion decorativo que retrase la lectura.",
+      "evidence": "01-desktop/frames/07-keyboard-chart-table-toggle.png"
+    },
+    "fidelity": {
+      "score": 4.6,
+      "rationale": "Concepto C aprobado ('Evidencia narrativa') respetado: banda KPI → chart hero editorial → tabla comprimida; los deltas de ejecución (cobertura declarada, fallback de fuentes) están documentados en la task, no improvisados.",
+      "evidence": "01-desktop/frames/01-default.png"
+    },
+    "genericTemplateResistance": {
+      "score": 4.6,
+      "rationale": "La pantalla no podría venir de un template: eje Y invertido documentado en palabras, leyenda por forma, nota de cobertura honesta, fuente ●/◑ declarada y huecos sin interpolar son decisiones del dominio rank-tracking, no defaults de librería.",
+      "evidence": "02-mobile/frames/04-chart.png"
+    }
+  },
+  "notes": "Loop real ejecutado: 3 rondas de GVC con correcciones de dato (eje category vs time, techo del eje para la meta, labels apilados), de a11y (aria-controls fantasma del TabList → CustomTabsNav, scrollable-region-focusable, focus ring, contraste de Alert/disabled) y de jerarquía (surfaceHeroTitle). Deuda conocida: el warning portal-wide de targets <24px en chips small y el floating trigger del shell pertenecen a sus primitives, no a esta surface."
+}

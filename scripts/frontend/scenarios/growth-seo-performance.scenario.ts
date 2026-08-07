@@ -20,9 +20,14 @@ export const scenario: CaptureScenario = {
   name: 'growth-seo-performance',
   route: `/admin/growth/seo/performance?space=${BEREL_SPACE_ID}&keywords=${KEYWORDS}&metric=position&device=desktop&range=90`,
   viewport: { width: 1440, height: 900 },
-  // `standard`: activa los guards de layout (overflow de página, texto cortado, targets
-  // chicos) — el contrato de contención se verifica, no se mira a ojo.
-  qualityProfile: 'standard',
+  // `premium`: la pantalla ancla del módulo se cierra con el gate completo — axe
+  // bloqueante scopeado a la surface, rubric enterprise, keyboard probes y evidencia de
+  // reduced-motion, en desktop Y 390px dentro del mismo scenario.
+  qualityProfile: 'premium',
+  viewports: [
+    { name: 'desktop', width: 1440, height: 900 },
+    { name: 'mobile', width: 390, height: 844 }
+  ],
   initialHoldMs: 1800,
   finalHoldMs: 600,
   readiness: {
@@ -33,6 +38,63 @@ export const scenario: CaptureScenario = {
     waitForFonts: true,
     postReadyDelayMs: 1200,
     timeout: 30000
+  },
+  quality: {
+    accessibility: {
+      enabled: true,
+      // Scopeado a la surface propia: el shell del dashboard (nav, floating triggers)
+      // tiene sus hallazgos portal-wide y se audita en su propio dueño.
+      includeSelector: '[data-capture="composition-shell"]',
+      failOnViolations: true
+    },
+    layout: {
+      enabled: true,
+      includeSelector: 'main',
+      failOnViolations: false
+    },
+    runtime: {
+      failOnConsoleError: true,
+      failOnPageError: true,
+      failOnHydrationWarning: true,
+      failOnHttpStatus: true,
+      ignoreUrlPatterns: ['/_next/', 'hot-update']
+    },
+    keyboard: {
+      enabled: true,
+      failOnViolations: true,
+      reducedMotionCheck: true,
+      probes: [
+        {
+          // El toggle del fallback tabular: alcanzable, con focus ring, y NO navega.
+          name: 'chart-table-toggle',
+          startSelector: '[data-capture="seo-performance-chart"] button',
+          keys: ['Enter'],
+          requireVisibleFocusRing: true
+        },
+        {
+          // El selector de set es el primer control del orden de foco (deuda declarada
+          // del concepto C: gana en interacción lo que cede en jerarquía visual).
+          name: 'set-selector-focus',
+          startSelector: '[data-capture="seo-performance-set"] input',
+          keys: ['Tab'],
+          requireVisibleFocusRing: true
+        }
+      ]
+    },
+    performance: {
+      enabled: true,
+      severity: 'warning',
+      maxDomNodes: 3600,
+      maxRequests: 200,
+      maxTransferBytes: 28_000_000,
+      // Dev server sin caché de compilación: el primer paint puede tardar; en prod el
+      // presupuesto real lo gobierna el bundle lazy de ECharts (sólo esta ruta lo paga).
+      maxFcpMs: 15000
+    },
+    enterpriseRubric: {
+      enabled: true,
+      includeSelector: 'main'
+    }
   },
   assertions: [
     { kind: 'noLoginRedirect', reason: 'ruta admin interna: la sesión agente debe sostenerse' },
