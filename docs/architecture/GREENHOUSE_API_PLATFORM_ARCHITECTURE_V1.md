@@ -9,6 +9,25 @@
 
 ---
 
+## Delta 2026-08-07 — verificar una tool del lane sin OAuth (TASK-1306)
+
+Al agregar `get_seo_overview_kpis` quedó documentado el camino corto para responder "¿este
+endpoint del lane responde de verdad o sólo está cableado?", sin montar el canary OAuth:
+
+1. Token del consumer desde Secret Manager (`efeonce-mcp-gateway-greenhouse-token`) como
+   `Authorization: Bearer`.
+2. **`externalScopeType` + `externalScopeId` son obligatorios** y son lo que casi siempre
+   falta la primera vez: sin ellos el lane responde `400 missing_external_scope_type`, que
+   se lee como "el endpoint no existe" cuando en realidad significa que llegó bien y le
+   falta el binding. Para el gateway: `other` / `efeonce-mcp-gateway`.
+3. Contra staging, agregar `x-vercel-protection-bypass` (Deployment Protection).
+
+⚠️ **El lane NO se puede ejercitar en `localhost`**: devuelve `500` por un `ENOENT` de
+`@opentelemetry/instrumentation` en `node_modules`, y falla igual para endpoints que llevan
+meses sanos en producción. Un 500 local **no** es evidencia sobre el endpoint nuevo — antes
+de depurarlo, comparar con un endpoint hermano del mismo lane; si ambos fallan, es el
+entorno. Receta completa: `docs/manual-de-uso/plataforma/operar-provider-greenhouse-seo-mcp.md`.
+
 ## Delta 2026-08-05 — Lane ecosystem de Growth SEO (TASK-1645)
 
 El módulo SEO (EPIC-022) suma su lane ecosystem espejo del de Knowledge (TASK-1086), con una

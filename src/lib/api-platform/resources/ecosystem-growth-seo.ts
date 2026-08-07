@@ -5,6 +5,8 @@ import { ApiPlatformError } from '@/lib/api-platform/core/errors'
 import { readBacklinkProfile } from '@/lib/growth/seo/backlinks/reader'
 import { readSeoAeoGap } from '@/lib/growth/seo/gap/read-seo-aeo-gap'
 import { readKeywordOpportunities } from '@/lib/growth/seo/keyword-opportunities-reader'
+import { readSeoPerformance } from '@/lib/growth/seo/performance/read-performance'
+import { readSeoPerformanceCatalog } from '@/lib/growth/seo/performance/read-performance-catalog'
 import { readRankEvolution } from '@/lib/growth/seo/rank-evolution-reader'
 import { readSeoOverviewKpis } from '@/lib/growth/seo/overview/read-overview-kpis'
 import { readSiteAuditReport } from '@/lib/growth/seo/site-audit/reader'
@@ -13,6 +15,10 @@ import type {
   KeywordOpportunitiesResult,
   RankEvolutionResult,
   SeoAeoGapResult,
+  SeoPerformanceCatalogResult,
+  SeoPerformanceMetric,
+  SeoPerformanceMode,
+  SeoPerformanceResult,
   SeoRankDevice,
   SiteAuditReportResult
 } from '@/lib/growth/seo/contracts'
@@ -350,6 +356,120 @@ export const getEcosystemSeoBacklinkProfilePayload = async ({
   const rangeDays = Number.isFinite(rawRange) && rawRange > 0 ? Math.floor(rawRange) : undefined
 
   const result = await readBacklinkProfile(subject.seoTargetId, rangeDays ? { rangeDays } : {})
+
+  return {
+    data: result,
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId }
+  }
+}
+
+export type EcosystemSeoPerformancePayload = SeoPerformanceResult | SeoTargetNotConfiguredPayload
+
+/**
+ * GET /api/platform/ecosystem/growth/seo/performance — el rendimiento en el tiempo de un
+ * SET elegido de keywords o URLs (TASK-1307, pantalla ancla §10.3).
+ *
+ * Passthrough del reader canónico `readSeoPerformance`: serie del chart + standings de la
+ * tabla en una sola lectura. La fuente (● GSC medido / ◑ DataForSEO estimado) la deriva el
+ * reader de (modo × métrica) y viaja en el payload — NUNCA se promedian entre sí.
+ *
+ * Query params: `mode` (keyword|url), `items` (CSV, requerido), `metric`
+ * (position|clicks|impressions|ctr), `rangeDays`, `device`, `engine`.
+ *
+ * ⚠️ A diferencia de las otras tools del lane, ésta NO exige `seoTargetId`: en modo URL (y
+ * en cualquier métrica de volumen) la lectura es puramente Search Console, anclada a la
+ * organización. Bloquearla por falta de target negaría datos medidos que sí existen.
+ */
+export const getEcosystemSeoPerformancePayload = async ({
+  context,
+  request
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+}): Promise<ApiPlatformSuccessResult<EcosystemSeoPerformancePayload>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  const subject = await resolveSeoLaneSubject(context, request)
+
+  const url = new URL(request.url)
+
+  const rawMode = (url.searchParams.get('mode') ?? '').trim()
+  const mode: SeoPerformanceMode | undefined = rawMode === 'url' || rawMode === 'keyword' ? rawMode : undefined
+
+  const rawMetric = (url.searchParams.get('metric') ?? '').trim()
+
+  const metric: SeoPerformanceMetric | undefined =
+    rawMetric === 'position' || rawMetric === 'clicks' || rawMetric === 'impressions' || rawMetric === 'ctr'
+      ? rawMetric
+      : undefined
+
+  const rawDevice = (url.searchParams.get('device') ?? '').trim()
+
+  const device: SeoRankDevice | undefined =
+    rawDevice === 'desktop' || rawDevice === 'mobile' || rawDevice === 'tablet' ? rawDevice : undefined
+
+  const rawRange = Number(url.searchParams.get('rangeDays'))
+  const rangeDays = Number.isFinite(rawRange) && rawRange > 0 ? Math.floor(rawRange) : undefined
+
+  const rawEngine = (url.searchParams.get('engine') ?? '').trim()
+
+  const items = (url.searchParams.get('items') ?? '')
+    .split(',')
+    .map(item => item.trim())
+    .filter(Boolean)
+
+  const result = await readSeoPerformance(subject.organizationId, {
+    mode,
+    metric,
+    device,
+    rangeDays,
+    engine: rawEngine || undefined,
+    items
+  })
+
+  return {
+    data: result,
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId }
+  }
+}
+
+export type EcosystemSeoPerformanceCatalogPayload = SeoPerformanceCatalogResult
+
+/**
+ * GET /api/platform/ecosystem/growth/seo/performance-catalog — qué keywords/URLs se pueden
+ * elegir para comparar (TASK-1307). En modo keyword la lista es la UNIÓN de lo medido en
+ * GSC y lo trackeado por rank capture: una keyword recién trackeada todavía no tiene
+ * impresiones y aun así debe poder elegirse.
+ *
+ * Query params: `mode` (keyword|url), `windowDays`, `limit`.
+ */
+export const getEcosystemSeoPerformanceCatalogPayload = async ({
+  context,
+  request
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+}): Promise<ApiPlatformSuccessResult<EcosystemSeoPerformanceCatalogPayload>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  const subject = await resolveSeoLaneSubject(context, request)
+
+  const url = new URL(request.url)
+
+  const rawMode = (url.searchParams.get('mode') ?? '').trim()
+  const mode: SeoPerformanceMode | undefined = rawMode === 'url' || rawMode === 'keyword' ? rawMode : undefined
+
+  const rawWindow = Number(url.searchParams.get('windowDays'))
+  const windowDays = Number.isFinite(rawWindow) && rawWindow > 0 ? Math.floor(rawWindow) : undefined
+
+  const rawLimit = Number(url.searchParams.get('limit'))
+  const limit = Number.isFinite(rawLimit) && rawLimit > 0 ? Math.floor(rawLimit) : undefined
+
+  const result = await readSeoPerformanceCatalog(subject.organizationId, { mode, windowDays, limit })
 
   return {
     data: result,

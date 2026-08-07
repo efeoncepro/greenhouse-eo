@@ -109,6 +109,26 @@ For a domain not listed here, use the `AGENTS.md` router. Do not invent an adapt
 5. **Verify.** Run local contract tests, auth-negative tests and provider allow/deny/fault tests. For public exposure,
    also prove DNS, TLS, protected-resource metadata, unauthenticated rejection and an authenticated MCP initialize.
    Use [`verification-matrix.md`](references/verification-matrix.md).
+
+   **A registered tool is not a working tool.** Tests + `registerTool` only prove wiring. Before calling a tool done,
+   exercise its lane endpoint against a real deployment and confirm it returns the SAME numbers the UI shows — that
+   equality IS the parity proof. Shortest path, no OAuth canary needed (TASK-1306):
+
+   ```bash
+   TOK=$(gcloud secrets versions access latest --secret=<consumer-token-secret> --project efeonce-group)
+   curl -s -H "Authorization: Bearer $TOK" -H "x-vercel-protection-bypass: $BYPASS" \
+     "$BASE/api/platform/ecosystem/<lane>?externalScopeType=other&externalScopeId=<consumer-key>&organizationId=<org>"
+   ```
+
+   - **`externalScopeType` + `externalScopeId` are REQUIRED** and are what you will forget first: without them the lane
+     answers `400 missing_external_scope_type`, which reads like "endpoint missing" but actually means it arrived fine
+     and the binding is absent.
+   - ⚠️ **The ecosystem lane cannot be exercised on `localhost`**: it returns `500` from an `ENOENT` of
+     `@opentelemetry/instrumentation` in `node_modules`, and fails identically for endpoints that have been healthy in
+     production for months. A local `500` is NOT evidence about your new endpoint — compare against a sibling lane
+     endpoint first; if both fail, it is the environment. Verify against the staging deployment.
+   - Always also assert the deny path (`404` anti-oracle for an org without the module) and `401` without a token: a
+     lane that only proves the happy path proves half of it.
 6. **Close.** Update the architecture/runbook/task/handoff that own the change, sync both skill bundles, then run the
    proportional QA and documentation gates. State `complete`, `code complete, rollout pendiente` or
    `operativamente bloqueado` without euphemisms.

@@ -11,8 +11,8 @@
 ## Para que sirve
 
 Este manual es para el operador que necesita **verificar, diagnosticar o apagar** el provider `greenhouse-seo`
-del gateway MCP de Efeonce — las tres consultas de Search Visibility 360 (`get_seo_entitlement`,
-`get_seo_keyword_opportunities`, `get_seo_visibility_360`) que un cliente MCP puede hacer contra
+del gateway MCP de Efeonce — las consultas de Search Visibility 360 (`get_seo_entitlement`,
+`get_seo_keyword_opportunities`, `get_seo_visibility_360`, `get_seo_overview_kpis`) que un cliente MCP puede hacer contra
 `mcp.efeonce.org`.
 
 No cubre el uso conversacional (para eso está la doc funcional) ni el gateway completo (para eso está
@@ -97,6 +97,39 @@ Contra un entorno con Vercel Deployment Protection (staging), agrega
 
 Corrida de referencia del 2026-08-06 contra producción: Berel `domainQuadrant=riesgo` con 50 keywords y score AEO
 44.5 · Efeonce `hasModule=true tier=contracted` con `no_seo_data` · deny `404`.
+
+### Probar UNA tool del lane directo con `curl` (sin OAuth, sin gateway)
+
+El canary de arriba prueba la cadena completa, pero necesita login humano. Para verificar
+**una sola tool** — por ejemplo la recién agregada — se llama su endpoint del lane directo.
+Es el camino más corto para responder "¿esto responde de verdad o sólo está cableado?".
+
+```bash
+TOK=$(gcloud secrets versions access latest \
+  --secret=efeonce-mcp-gateway-greenhouse-token --project efeonce-group)
+BYPASS=$(grep -m1 '^VERCEL_AUTOMATION_BYPASS_SECRET' .env.local | cut -d= -f2- | tr -d '"')
+BASE=https://<deployment-de-staging>.vercel.app   # o https://greenhouse.efeoncepro.com en prod
+
+curl -s -H "Authorization: Bearer $TOK" -H "x-vercel-protection-bypass: $BYPASS" \
+  "$BASE/api/platform/ecosystem/growth/seo/overview-kpis\
+?externalScopeType=other&externalScopeId=efeonce-mcp-gateway&organizationId=<org>&rangeDays=28"
+```
+
+Los dos parámetros que casi siempre faltan la primera vez son
+**`externalScopeType` + `externalScopeId`**: sin ellos el lane responde `400
+missing_external_scope_type`, que se lee como si el endpoint no existiera pero en realidad
+significa que llegó bien y le falta el binding. Los valores del gateway son
+`other` / `efeonce-mcp-gateway` (los sembró `scripts/api-platform/provision-mcp-gateway-seo-consumer.ts`).
+
+⚠️ **Esto NO se puede probar en `localhost`.** El lane ecosystem devuelve `500` en local por
+un `ENOENT` de `@opentelemetry/instrumentation` en `node_modules` — falla igual para
+endpoints que llevan meses sanos en producción (verificado contra `rank-evolution`), así que
+un 500 local **no** dice nada de tu endpoint. Prueba contra el deployment de staging.
+
+Verificación de referencia (`get_seo_overview_kpis`, staging, 2026-08-07): Berel devolvió
+`200` con 2.596 clics, 136.146 impresiones, posición ponderada 5.78, `previous: null`
+(sin ventana comparable, NO un cero) y 5 puntos de serie; org sin módulo → `404 not_found`
+(anti-oracle); sin token → `401`; `rangeDays=99999` → clampeado a `365` server-side.
 
 ### Smoke autenticado por el hostname publico
 

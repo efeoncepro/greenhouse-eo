@@ -183,6 +183,8 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   | 'getSeoVisibility360'
   | 'getSeoEntitlement'
   | 'getSeoRankEvolution'
+  | 'getSeoPerformance'
+  | 'getSeoPerformanceCatalog'
   | 'getSeoOverviewKpis'
   | 'getSeoSiteAuditReport'
   | 'getSeoBacklinkProfile'
@@ -469,6 +471,65 @@ export const createGreenhouseMcpHandlers = (client: Pick<
         )}) (${result.requestId}).`
       },
       () => client.getSeoRankEvolution(input)
+    )
+  },
+  // TASK-1307 — rendimiento en el tiempo de un SET elegido (pantalla ancla de EPIC-022).
+  async getSeoPerformance(input: {
+    organizationId?: string
+    mode?: string
+    items?: string[]
+    metric?: string
+    rangeDays?: number
+    device?: string
+    engine?: string
+  }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          source?: string
+          series?: unknown[]
+          standings?: unknown[]
+          itemsWithoutData?: string[]
+        }
+
+        if (data.ok === false) {
+          return `SEO performance unavailable (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        const seriesCount = Array.isArray(data.series) ? data.series.length : 0
+        const missing = Array.isArray(data.itemsWithoutData) ? data.itemsWithoutData.length : 0
+
+        // Los ítems sin dato se NOMBRAN en el resumen: un "cargué 2 series" a secas
+        // escondería que se pidieron 4.
+        return `Loaded ${seriesCount} performance series (source=${String(data.source ?? 'unknown')}, ${String(
+          missing
+        )} requested items without data) (${result.requestId}).`
+      },
+      () => client.getSeoPerformance(input)
+    )
+  },
+  // TASK-1307 — qué keywords/URLs se pueden pedirle a `get_seo_performance`.
+  async getSeoPerformanceCatalog(input: {
+    organizationId?: string
+    mode?: string
+    windowDays?: number
+    limit?: number
+  }) {
+    return callReadTool(
+      result => {
+        const data = result.data as { ok?: boolean; errorCode?: string; items?: unknown[] }
+
+        if (data.ok === false) {
+          return `SEO performance catalog unavailable (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        const count = Array.isArray(data.items) ? data.items.length : 0
+
+        return `Loaded ${count} selectable ${String(input.mode ?? 'keyword')} items (${result.requestId}).`
+      },
+      () => client.getSeoPerformanceCatalog(input)
     )
   },
   // TASK-1306 — KPIs norte del cockpit Overview (Search Console medido).

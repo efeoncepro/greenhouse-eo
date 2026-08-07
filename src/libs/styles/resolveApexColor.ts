@@ -65,3 +65,13 @@ export const resolveApexColor = (value: string, fallback: string): string => {
 
   return resolved
 }
+
+/**
+ * TASK-1307 — el mismo resolvedor, nombrado para cualquier motor de chart.
+ *
+ * ECharts también necesita el color REAL (pinta a canvas y hace matemática de color para
+ * gradientes/opacidades), así que comparte exactamente esta necesidad con Apex. Es un alias
+ * deliberado en vez de una copia: un segundo resolvedor divergiría a la primera variante de
+ * formato que MUI agregue. Los consumidores Apex ya existentes siguen intactos.
+ */
+export const resolveChartColor = resolveApexColor

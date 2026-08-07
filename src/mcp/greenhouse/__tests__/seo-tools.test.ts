@@ -33,6 +33,8 @@ const buildClient = (overrides: Record<string, unknown> = {}) =>
     getSeoOverviewKpis: vi.fn(),
     getSeoSiteAuditReport: vi.fn(),
     getSeoBacklinkProfile: vi.fn(),
+    getSeoPerformance: vi.fn(),
+    getSeoPerformanceCatalog: vi.fn(),
     ...overrides
   }) as never
 

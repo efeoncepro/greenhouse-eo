@@ -117,7 +117,7 @@ acción propia, porque el costo de postergarla lo paga la superficie ya entregad
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Muy alto`
 - Effort: `Alto`
