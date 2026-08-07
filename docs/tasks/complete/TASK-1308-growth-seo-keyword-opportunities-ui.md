@@ -1,5 +1,49 @@
 # TASK-1308 — Growth SEO: Keyword Opportunities UI
 
+## Delta 2026-08-07 (cierre) — lo que la task terminó siendo
+
+Nació como "superficie UI cliente pura" y terminó con **backend, contrato programático,
+federación MCP y tres rondas de rediseño**. El resumen honesto de por qué:
+
+| Declarado al crear | Realidad | Cierre |
+|---|---|---|
+| `Backend impact: none` | `trackKeywords` no existía; nadie lo había construido | `Backend impact: command` + `## Hybrid Execution Justification` |
+| Scatter X=dificultad, Y=volumen, color=intención | Las tres fuentes son `null` (`market: 'unavailable'`) | Ejes medidos: posición × impresiones, tamaño = clics, forma = acción |
+| "Seguir" como única acción | El techo del set era un callejón sin salida | `untrackKeywords` + su lane + su tool federada |
+
+**El command es un compromiso de gasto diferido, no un INSERT.** El rank capture diario paga
+al proveedor por cada keyword vigente, en cada ciclo. De ahí el techo gobernado, el
+entitlement per-org, el outcome por keyword y —sobre todo— el reverso: sin `untrackKeywords`
+el compromiso era permanente.
+
+**Tres rondas de análisis de producto con los cuatro gates en verde desde la primera
+versión.** Todo lo que se corrigió salió de mirar el frame: la pantalla no servía en móvil
+(la tabla mostraba sólo nombres), la selección múltiple sobrevivía al filtro y podía gastar
+sobre keywords fuera de la vista, la zona sombreada del mapa se contradecía con su propia
+leyenda, y la frescura del dato había desaparecido en un rediseño intermedio. Los gates
+miden contraste, overflow, tokens y tamaño de target; no miden si una etiqueta dice la
+verdad ni si la pantalla sirve en un teléfono.
+
+**Dos defectos de plataforma quedaron con parche local y su causa raíz abierta en
+`TASK-1657`**: el mismatch de hidratación por `useId` dentro de surfaces adaptativas (cerrado
+acá con ids declarados en los cinco controles) y los findings inevitables de `ui:code-lint`
+en charts a canvas.
+
+**Un bug que sólo apareció contra PG real** (gate TASK-893): cerrar una membresía con `NOW()`
+produce `effective_to = effective_from` y revienta el CHECK `effective_to > effective_from`,
+porque `NOW()` es el timestamp de inicio de transacción. Corregido con `clock_timestamp()`.
+Los mocks lo daban por bueno.
+
+### Pendiente de rollout (no de código)
+
+- Scope `efeonce.mcp.seo.keywords.track` en la app de Entra `Efeonce MCP Resource`
+  (`c5363215-b9a6-4bf1-bb1c-e61963b37dac`). Las DOS tools federadas lo comparten, así que
+  hasta provisionarlo ambas responden `insufficient_scope` — fail-closed por diseño.
+  ⚠️ `az ad app update` **reemplaza** el arreglo completo de scopes: va con round-trip
+  verificado o borra los tres vivos de Globe.
+- Push del gateway (`efeonce-mcp`, commits `cb316cc` + `41dca07`).
+
+
 ## Delta 2026-08-07 — ejecución: dos supuestos de la spec no resistieron el runtime
 
 ### 1. `trackKeywords` NO EXISTÍA (→ `Backend impact: none` pasa a `command`)
@@ -129,7 +173,7 @@ una segunda librería sólo para esta pantalla.
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P3`
 - Impact: `Alto`
 - Effort: `Medio`

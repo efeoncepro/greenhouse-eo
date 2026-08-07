@@ -435,8 +435,17 @@ export const untrackKeywords = async (
       const valid = requested.filter(entry => entry.valid).map(entry => entry.keyword)
 
       const closed = await client.query<{ keyword: string }>(
+        // 🔴 `clock_timestamp()` y NO `NOW()`.
+        //
+        // `NOW()` devuelve el timestamp de INICIO de la transacción, así que cerrar una
+        // membresía creada en esa misma transacción produce `effective_to = effective_from`
+        // y revienta el CHECK `effective_to > effective_from` (23514) — el `>` es estricto.
+        // `clock_timestamp()` avanza dentro de la transacción y siempre queda posterior.
+        //
+        // Lo encontró el sanity contra PG real; los mocks del TS lo daban por bueno, que es
+        // exactamente para lo que existe el gate TASK-893.
         `UPDATE greenhouse_growth.seo_keyword_set_members m
-            SET effective_to = NOW()
+            SET effective_to = clock_timestamp()
            FROM greenhouse_growth.seo_keyword_sets s
           WHERE s.keyword_set_id = m.keyword_set_id
             AND s.seo_target_id = $1

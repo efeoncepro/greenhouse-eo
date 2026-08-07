@@ -171,6 +171,61 @@ const main = async () => {
 
       checks.push(['emite el evento outbox dentro de la misma transacción', Number(outboxInTx.rows[0]?.n) >= 1])
 
+      // ── 4ª pasada: el REVERSO, con su SQL propio ────────────────────────────────────
+      //
+      // `UPDATE … FROM … WHERE keyword = ANY($2::text[]) RETURNING` es SQL nuevo: el join
+      // en el FROM, el filtro por arreglo y el RETURNING que decide qué se cerró de verdad.
+      // Los mocks del TS lo dan por bueno; PG es quien lo valida.
+      const untracked = await client.query<{ keyword: string }>(
+        `UPDATE greenhouse_growth.seo_keyword_set_members m
+            SET effective_to = clock_timestamp()
+           FROM greenhouse_growth.seo_keyword_sets s
+          WHERE s.keyword_set_id = m.keyword_set_id
+            AND s.seo_target_id = $1
+            AND m.effective_to IS NULL
+            AND m.keyword = ANY($2::text[])
+        RETURNING m.keyword`,
+        [target.seo_target_id, ['sanity-1308 alfa', 'sanity-1308 inexistente']]
+      )
+
+      checks.push([
+        'el UPDATE del reverso corre contra PG real (JOIN en FROM + ANY + RETURNING)',
+        untracked.rows.length === 1 && untracked.rows[0]?.keyword === 'sanity-1308 alfa'
+      ])
+
+      const afterUntrack = await client.query<{ n: string }>(
+        `SELECT COUNT(*)::text AS n
+           FROM greenhouse_growth.seo_keyword_set_members
+          WHERE keyword_set_id = $1 AND effective_to IS NULL`,
+        [first.keywordSetId]
+      )
+
+      checks.push(['tras el reverso queda una membresía vigente menos', afterUntrack.rows[0]?.n === '3'])
+
+      // 🔴 La fila NO desaparece: se cierra. El histórico es lo que permite explicar una
+      // factura pasada, y el trigger de TASK-1299 prohíbe el DELETE de todos modos.
+      const preserved = await client.query<{ n: string }>(
+        `SELECT COUNT(*)::text AS n
+           FROM greenhouse_growth.seo_keyword_set_members
+          WHERE keyword_set_id = $1 AND keyword = 'sanity-1308 alfa' AND effective_to IS NOT NULL`,
+        [first.keywordSetId]
+      )
+
+      checks.push(['la membresía cerrada SIGUE EXISTIENDO (append-only)', preserved.rows[0]?.n === '1'])
+
+      // Y el índice único parcial deja volver a seguirla: la ventana nueva no choca con la
+      // cerrada porque el índice sólo mira `effective_to IS NULL`.
+      const retracked = await applyKeywordTracking(client, {
+        ...base,
+        capacity: 1000,
+        requested: [{ keyword: 'sanity-1308 alfa', valid: true }]
+      })
+
+      checks.push([
+        'se puede volver a seguir tras cerrar (índice único parcial lo permite)',
+        retracked.outcomes[0]?.status === 'tracked'
+      ])
+
       // Aborta SIEMPRE: `seo_keyword_set_members` es append-only y estas filas no se borran.
       throw new Error(ROLLBACK_SENTINEL)
     })

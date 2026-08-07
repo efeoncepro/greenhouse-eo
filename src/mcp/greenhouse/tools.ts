@@ -189,6 +189,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   | 'getSeoSiteAuditReport'
   | 'getSeoBacklinkProfile'
   | 'trackSeoKeywords'
+  | 'untrackSeoKeywords'
 >) => ({
   async getContext() {
     return callReadTool(
@@ -657,6 +658,40 @@ export const createGreenhouseMcpHandlers = (client: Pick<
         } (${result.requestId}).`
       },
       () => client.trackSeoKeywords(input)
+    )
+  },
+  /**
+   * TASK-1308 — el reverso. El resumen dice explícitamente cuántas NO estaban seguidas: un
+   * agente que reporte "listo" cuando la mitad ni se seguía estaría describiendo un cambio
+   * que no ocurrió.
+   */
+  async untrackSeoKeywords(input: { organizationId?: string; keywords: string[] }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          outcomes?: Array<{ keyword: string; status: string }>
+          activeKeywordCount?: number
+          capacity?: number
+        }
+
+        if (data.ok === false) {
+          return `SEO keyword untracking rejected (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        const outcomes = Array.isArray(data.outcomes) ? data.outcomes : []
+        const count = (status: string) => outcomes.filter(outcome => outcome.status === status).length
+
+        return `SEO keyword untracking: ${count('untracked')} stopped, ${count(
+          'not_tracked'
+        )} were not tracked, ${count('invalid')} invalid. The set now has ${String(
+          data.activeKeywordCount ?? '?'
+        )}/${String(data.capacity ?? '?')} tracked keywords. Historical measurements are preserved (${
+          result.requestId
+        }).`
+      },
+      () => client.untrackSeoKeywords(input)
     )
   }
 })

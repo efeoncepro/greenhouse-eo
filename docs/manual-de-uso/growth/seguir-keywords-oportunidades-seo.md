@@ -1,7 +1,7 @@
 > **Tipo de documento:** Manual de uso (operador del portal)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-08-07 por Claude (TASK-1308)
-> **Ultima actualizacion:** 2026-08-07 por Claude (TASK-1308)
+> **Ultima actualizacion:** 2026-08-07 por Claude (TASK-1308 — dejar de seguir, lote, export, frescura)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §7 y §10.4
 
 # Oportunidades de Keywords — Leer el mapa y seguir keywords
@@ -30,7 +30,10 @@ de posicion. La pantalla vive en `Growth > SEO > Keywords` (`/admin/growth/seo/k
    **burbuja mas grande = mas clics ganarias**.
 5. Filtra por accion o por posicion si necesitas acotar. Los filtros son locales: no recargan la pagina.
 6. En la tabla, revisa la keyword, su pagina actual y la ganancia estimada.
-7. Pulsa **Seguir** en las que quieras medir a diario. El resultado se anuncia arriba.
+7. Pulsa **Seguir** en las que quieras medir a diario, o marca varias y usa **Seguir seleccionadas**.
+8. Para sacar una del ciclo, **Dejar de seguir**. Tienes unos segundos para **Deshacer**.
+9. **Exportar CSV** baja lo que estas viendo, con los filtros aplicados.
+10. Un click en la keyword te lleva a **Rendimiento** con su serie aislada.
 
 ## Que significan las señales
 
@@ -44,7 +47,20 @@ de posicion. La pantalla vive en `Growth > SEO > Keywords` (`/admin/growth/seo/k
 | "Sin dato de mercado" | El volumen o la dificultad no existen todavia. **No es 0** — nadie midio eso |
 | "+N clics/mes est." | Clics adicionales si llegara a la posicion objetivo, segun la curva de CTR **del propio sitio** |
 | "X de 200 keywords seguidas" | El cupo del set monitoreado. Cada keyword vigente se cobra en cada ciclo diario |
-| **Siguiendo** | Ya esta en el set. Su posicion se mide todos los dias |
+| **Dejar de seguir** | Ya esta en el set. Pulsalo para sacarla del ciclo diario y liberar cupo |
+| **Paginas** | Cuantas paginas tuyas aparecen para esa busqueda. Mas de una = compiten entre si, y ese numero decide la urgencia de consolidar |
+| "Datos hasta AAAA-MM-DD" | Hasta que dia llega la serie medida. Search Console no publica el dia anterior y ajusta ~48h |
+
+## Dejar de seguir: que pasa exactamente
+
+- **No borra nada.** La medicion historica se conserva; lo que se cierra es la ventana de
+  seguimiento. La keyword deja de consumir presupuesto desde el proximo ciclo.
+- **Se puede volver a seguir.** Empieza una ventana NUEVA: los dias que estuvo fuera **no se
+  recuperan** y quedan como un hueco permanente en su serie.
+- **Por eso no sirve para "pausar".** Si piensas reanudarla pronto, dejarla seguida cuesta
+  menos que perder la continuidad de la medicion.
+- Funciona aunque el sitio este pausado: bloquear la salida congelaria el gasto sin forma de
+  bajarlo.
 
 ## Que NO hacer
 
@@ -65,7 +81,7 @@ de posicion. La pantalla vive en `Growth > SEO > Keywords` (`/admin/growth/seo/k
 | No aparece la columna "Seguir" | Te falta `growth.seo.target.configure` | Pidele a un admin la capability. No es un bug |
 | "Todavia no hay oportunidades" | Ninguna keyword esta hoy entre 8 y 20 con demanda suficiente | Es un estado valido. Revisa mas adelante |
 | "Falta conectar Search Console" | El Space no tiene la propiedad conectada | [conectar-search-console.md](conectar-search-console.md) |
-| El boton "Seguir" esta deshabilitado en todas | El set llego a su tope | Deja de seguir alguna antes de agregar otra (por ahora, via soporte: el command de dejar de seguir es follow-up) |
+| El boton "Seguir" esta deshabilitado en todas | El set llego a su tope | Pulsa **Dejar de seguir** en alguna que ya no necesites medir; el cupo se libera al instante |
 | "No se pudo seguir: el set llego a su tope" | El techo se evaluo al momento del clic | Lo mismo. El rechazo es explicito a proposito |
 | La keyword seguida no aparece en Rendimiento | La primera medicion aun no corrio | El cron de captura corre a las 05:00 CLT. Vuelve al dia siguiente |
 
@@ -78,8 +94,10 @@ keyword agregada. Subirlo requiere revisar el budget del tier de la organizacion
 
 ## Referencias tecnicas
 
-- Command: `src/lib/growth/seo/track-keywords.ts` (techo, entitlement, idempotencia, outbox)
+- Commands: `src/lib/growth/seo/track-keywords.ts` — `trackKeywords` (techo, entitlement,
+  idempotencia, outbox) y `untrackKeywords` (cierre append-only con `clock_timestamp()`)
 - Reader: `src/lib/growth/seo/keyword-opportunities-reader.ts` (striking-distance medido)
-- Contrato programatico: `POST /api/admin/growth/seo/keywords/track` · lane ecosystem
-  `POST /api/platform/ecosystem/growth/seo/keywords/track` · MCP tool `track_seo_keywords`
+- Contrato programatico: `POST /api/admin/growth/seo/keywords/{track,untrack}` · lane
+  ecosystem `POST /api/platform/ecosystem/growth/seo/keywords/{track,untrack}` · MCP tools
+  `track_seo_keywords` y `untrack_seo_keywords` (federadas en `mcp.efeonce.org`)
 - Evento: `growth.seo.keyword_set.updated` ([catalogo](../../architecture/GREENHOUSE_EVENT_CATALOG_V1.md))

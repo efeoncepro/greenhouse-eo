@@ -1,43 +1,42 @@
 # Handoff activo
 
-### TASK-1308 — Keyword Opportunities: code complete, 3 pendientes de rollout (2026-08-07)
+### TASK-1308 — Keyword Opportunities COMPLETE, 2 pendientes de rollout (2026-08-07)
 
-Ruta `/admin/growth/seo/keywords` (tab **Keywords**, child del viewCode `administracion.growth_seo`)
-entregada con mapa ECharts + filtros + `DataTableShell` + acción "Seguir". Dos supuestos de la spec
-no resistieron el runtime y ambos quedaron cerrados en el mismo PR:
+Ruta `/admin/growth/seo/keywords` cerrada y movida a `complete/`. Nació `Backend impact:
+none` y terminó con migración, dos commands, dos rutas app-lane, dos rutas del lane
+ecosystem y **dos tools MCP federadas** — porque `trackKeywords`, que la spec daba por
+construido por TASK-1303, no existía.
 
-**(a) `trackKeywords` NO existía** — la spec y el wireframe lo daban por construido por TASK-1303;
-las tablas sólo las escribían dos scripts de seed. Se construyó con la forma que exige el hallazgo:
-🔴 **seguir una keyword es un compromiso de gasto diferido** (el rank capture diario le paga al
-proveedor por cada keyword vigente, en cada ciclo), así que lleva techo gobernado por target
-(`GROWTH_SEO_TRACKED_KEYWORDS_PER_TARGET`, default 200), entitlement per-org, outcome POR keyword y
-outbox dentro de la transacción. Migración aditiva `created_by`/`source` **aplicada en dev**.
+**La idea que ordenó todo:** seguir una keyword es un **compromiso de gasto diferido** — el
+rank capture diario paga al proveedor por cada keyword vigente, en cada ciclo. De ahí el
+techo gobernado por target, el permiso separado del de leer, el outcome por keyword y
+`untrackKeywords`, sin el cual el compromiso era permanente.
 
-**(b) Los tres ejes del scatter no tienen fuente** (`searchVolume`/`difficulty` = null,
-`market: 'unavailable'`, y no hay campo de intención). Recalibrado a ejes MEDIDOS: posición ×
-impresiones, tamaño = clics incrementales, color+forma = acción. 🎯 El dato de mercado, cuando
-aterrice TASK-1300, **será columna y filtro, nunca eje** — por eso esta pantalla no se reescribe.
+**PENDIENTE DE ROLLOUT (lo único que falta):**
 
-**PENDIENTES DE ROLLOUT (nada de esto es opcional para declarar la task completa):**
+1. **Scope de Entra** — `efeonce.mcp.seo.keywords.track` no existe en la app
+   `Efeonce MCP Resource` (`c5363215-b9a6-4bf1-bb1c-e61963b37dac`, 3 scopes hoy). Las DOS
+   tools lo comparten, así que ambas responden `insufficient_scope` hasta provisionarlo —
+   fail-closed por diseño. ⚠️ `az ad app update` **reemplaza** el arreglo completo de
+   `oauth2PermissionScopes`: round-trip verificado (leer → append → escribir → verificar) o
+   borra los tres vivos de Globe. Snapshot del estado previo en el scratchpad de la sesión.
+2. **Push del gateway** — `efeonce-mcp` commits locales `cb316cc` + `41dca07`, sin push. El
+   repo tiene deploy productivo en push; último run `success`.
 
-1. **Scope de Entra** — `efeonce.mcp.seo.keywords.track` no existe todavía en la app
-   `Efeonce MCP Resource` (`c5363215-b9a6-4bf1-bb1c-e61963b37dac`, 3 scopes hoy). La tool federada
-   responde `insufficient_scope` hasta provisionarlo (fail-closed por diseño). ⚠️ `az ad app update`
-   **reemplaza** el arreglo completo: hay que hacer round-trip (leer → append → escribir → verificar)
-   o borra los 3 scopes vivos de Globe + lecturas. Snapshot del estado previo en el scratchpad de la
-   sesión (`entra-api-before.json`).
-2. **Push del gateway** — `efeonce-mcp` commit local `cb316cc` sin push (el repo tiene deploy
-   productivo en push; último run `success`). Incluye el guard de paridad ampliado: su regex se ató a
-   `get_seo_*` cuando todo era lectura, así que la primera tool que escribe le era **invisible**.
-3. **GVC** — scenario `growth-seo-keywords` escrito (premium, desktop + 390px) pero **no ejecutado**:
-   el dev server no levanta en esta máquina. `preview_start` reporta éxito y no spawnea `next`
-   (cero procesos en `ps`, tres intentos, máquina descargada, `pnpm` resuelve por Volta). Hay dos
-   `dev-harness.mjs` huérfanos del 25-Jul que podrían estar reteniendo el registro del harness.
-   Correr `pnpm fe:capture growth-seo-keywords --env=local` cuando el dev vuelva.
+**Follow-up abierto:** `TASK-1657` — dos defectos de PLATAFORMA que 1308 cerró con parches
+locales: (A) mismatch de hidratación por `useId` en cualquier control MUI dentro de una
+surface recipe (cerrado acá con ids declarados; la causa raíz afecta al portal y no tiene
+detección) y (B) los findings inevitables de `ui:code-lint` en charts a canvas, que hacen
+que ese gate deje de significar algo.
 
-Sin `pnpm test` full ni `pnpm build` por la coordinación con la otra sesión (backfill + build en cola).
-Focales verdes: 294 (MCP + api-platform + growth/seo) + sanity live 12/12 contra PG real.
+**Hallazgo del gate TASK-893 que vale registrar:** cerrar una membresía con `NOW()` produce
+`effective_to = effective_from` y revienta el CHECK `> ` (23514), porque `NOW()` es el
+timestamp de INICIO de transacción. `clock_timestamp()` lo resuelve. Los mocks lo daban por
+bueno; sólo apareció contra PG real.
 
+Verificación: `pnpm test` completo (1 fallo ajeno, del WIP no commiteado de `artifact-composer`
+de otra sesión) · `pnpm build` producción verde · sanity live 16/16 contra PG · GVC 17
+pasadas · ui:quality 4.82/4.5 · visual-gate, design-contract, task:lint en verde.
 
 ### Seedance 2.5 — inventario Fal y TASK-1656 (2026-08-07)
 

@@ -20,6 +20,7 @@ const state = {
   gapResult: { ok: true, quadrants: [] } as unknown,
   trackResult: { ok: true, outcomes: [], activeKeywordCount: 0, capacity: 200 } as unknown,
   trackCalls: [] as unknown[][],
+  untrackCalls: [] as unknown[][],
   entitlementCalls: [] as string[]
 }
 
@@ -73,6 +74,11 @@ vi.mock('@/lib/growth/seo/track-keywords', () => ({
     state.trackCalls.push(args)
 
     return state.trackResult
+  },
+  untrackKeywords: async (...args: unknown[]) => {
+    state.untrackCalls.push(args)
+
+    return state.trackResult
   }
 }))
 
@@ -80,7 +86,8 @@ import {
   getEcosystemSeoEntitlementPayload,
   getEcosystemSeoKeywordOpportunitiesPayload,
   getEcosystemSeoVisibility360Payload,
-  trackEcosystemSeoKeywordsPayload
+  trackEcosystemSeoKeywordsPayload,
+  untrackEcosystemSeoKeywordsPayload
 } from './ecosystem-growth-seo'
 
 type AnyContext = Parameters<typeof getEcosystemSeoKeywordOpportunitiesPayload>[0]['context']
@@ -100,6 +107,7 @@ beforeEach(() => {
   state.targetId = 'seot-1'
   state.entitlementCalls = []
   state.trackCalls = []
+  state.untrackCalls = []
   state.trackResult = { ok: true, outcomes: [], activeKeywordCount: 0, capacity: 200 }
 })
 
@@ -262,5 +270,44 @@ describe('trackEcosystemSeoKeywordsPayload (TASK-1308) — el primer write del l
 
     expect(r.data).toMatchObject({ ok: false, errorCode: 'disabled' })
     expect(state.trackCalls).toEqual([])
+  })
+})
+
+describe('untrackEcosystemSeoKeywordsPayload (TASK-1308) — el reverso en el lane', () => {
+  it('🔴 un binding org-scoped tampoco puede cortar la serie de su propio Space', async () => {
+    await expect(
+      untrackEcosystemSeoKeywordsPayload({
+        context: orgCtx,
+        request: req(),
+        body: { keywords: ['berel'], organizationId: 'org-binding' }
+      })
+    ).rejects.toMatchObject({ statusCode: 403, errorCode: 'scope_not_allowed' })
+
+    expect(state.untrackCalls).toEqual([])
+  })
+
+  it('la procedencia dice que fue un consumer máquina', async () => {
+    await untrackEcosystemSeoKeywordsPayload({
+      context: internalCtx,
+      request: req(),
+      body: { keywords: ['berel'], organizationId: 'org-1' }
+    })
+
+    const [, , actor] = state.untrackCalls[0] as [string, string[], string]
+
+    expect(actor).toMatch(/^mcp:/)
+  })
+
+  it('con el módulo apagado no resuelve sujeto ni escribe', async () => {
+    state.flagOn = false
+
+    const r = await untrackEcosystemSeoKeywordsPayload({
+      context: internalCtx,
+      request: req(),
+      body: { keywords: ['berel'], organizationId: 'org-1' }
+    })
+
+    expect(r.data).toMatchObject({ ok: false, errorCode: 'disabled' })
+    expect(state.untrackCalls).toEqual([])
   })
 })

@@ -281,7 +281,18 @@ y hacer crecer la factura son dos permisos distintos), el cupo del set se muestr
 tope el boton se deshabilita explicando por que en vez de fallar al enviarlo. Si una keyword ya estaba
 seguida, volver a seguirla no hace nada ni cuesta nada.
 
-> Detalle tecnico: `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §7 (command `trackKeywords`)
+**Y se puede deshacer.** Dejar de seguir saca la keyword del ciclo diario y libera cupo al
+instante. No borra nada: la medicion historica se conserva y lo que se cierra es la ventana
+de seguimiento. Se puede volver a seguir despues, pero empieza una ventana NUEVA — los dias
+que estuvo fuera no se recuperan. Por eso no sirve para "pausar" algo que piensas reanudar
+pronto. Tras dejar de seguir hay unos segundos para deshacer.
+
+**Lo que ves se puede sacar del portal.** El export en CSV baja el subconjunto filtrado —
+para el ticket, el SOW o el mail al cliente — y los filtros viajan en la URL, asi que la
+pantalla se puede compartir ya filtrada. Un click en la keyword lleva a Rendimiento con su
+serie aislada.
+
+> Detalle tecnico: `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §7 (commands `trackKeywords` / `untrackKeywords`)
 > y §10.4 (encoding del mapa). Codigo: `src/lib/growth/seo/track-keywords.ts`,
 > `src/views/greenhouse/admin/growth/seo/keywords/`.
 

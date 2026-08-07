@@ -10,7 +10,7 @@ import { readSeoPerformanceCatalog } from '@/lib/growth/seo/performance/read-per
 import { readRankEvolution } from '@/lib/growth/seo/rank-evolution-reader'
 import { readSeoOverviewKpis } from '@/lib/growth/seo/overview/read-overview-kpis'
 import { readSiteAuditReport } from '@/lib/growth/seo/site-audit/reader'
-import { trackKeywords } from '@/lib/growth/seo/track-keywords'
+import { trackKeywords, untrackKeywords } from '@/lib/growth/seo/track-keywords'
 import type {
   BacklinkProfileResult,
   KeywordOpportunitiesResult,
@@ -22,7 +22,8 @@ import type {
   SeoPerformanceResult,
   SeoRankDevice,
   SiteAuditReportResult,
-  TrackKeywordsResult
+  TrackKeywordsResult,
+  UntrackKeywordsResult
 } from '@/lib/growth/seo/contracts'
 import { resolveSeoEntitlement, type SeoTier } from '@/lib/growth/seo/entitlement'
 import { isSeoModuleEnabled } from '@/lib/growth/seo/flags'
@@ -612,6 +613,70 @@ export const trackEcosystemSeoKeywordsPayload = async ({
   const result = await trackKeywords(subject.seoTargetId, keywords, `mcp:${context.consumer.publicId}`, {
     source: 'mcp'
   })
+
+  return {
+    data: result,
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId }
+  }
+}
+
+
+/**
+ * ═══ TASK-1308 — `POST /api/platform/ecosystem/growth/seo/keywords/untrack` ═══
+ *
+ * La contraparte de `track` en el lane, y la que hace REVERSIBLE el compromiso de gasto
+ * también para los consumers máquina: sin ella un agente podía agregar keywords al ciclo de
+ * facturación y no sacarlas.
+ *
+ * Mismo boundary de scope `internal` que el alta. Podría argumentarse que bajar el gasto es
+ * inofensivo y merece una puerta más ancha, pero no: dejar de seguir CORTA una serie de
+ * medición y el histórico queda con un hueco permanente. Que quien pueda subir el gasto sea
+ * el mismo que pueda cortarlo es la simetría correcta.
+ */
+
+export const untrackEcosystemSeoKeywordsPayload = async ({
+  context,
+  request,
+  body
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+  body: EcosystemSeoTrackKeywordsBody | null
+}): Promise<ApiPlatformSuccessResult<UntrackKeywordsResult | SeoTargetNotConfiguredPayload>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  if (context.binding.greenhouseScopeType !== 'internal') {
+    throw new ApiPlatformError('Untracking SEO keywords is not allowed for the resolved binding scope.', {
+      statusCode: 403,
+      errorCode: 'scope_not_allowed'
+    })
+  }
+
+  const requestedOrganizationId = typeof body?.organizationId === 'string' ? body.organizationId : null
+
+  const keywords = Array.isArray(body?.keywords)
+    ? body.keywords.filter((item): item is string => typeof item === 'string')
+    : []
+
+  if (keywords.length === 0) {
+    throw new ApiPlatformError('A non-empty "keywords" array is required.', {
+      statusCode: 400,
+      errorCode: 'bad_request'
+    })
+  }
+
+  const subject = await resolveSeoLaneSubject(context, request, requestedOrganizationId)
+
+  if (!subject.seoTargetId) {
+    return {
+      data: { ok: false, errorCode: 'target_not_configured', organizationId: subject.organizationId },
+      meta: { module: 'growth.seo', tier: subject.tier }
+    }
+  }
+
+  const result = await untrackKeywords(subject.seoTargetId, keywords, `mcp:${context.consumer.publicId}`)
 
   return {
     data: result,

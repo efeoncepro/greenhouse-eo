@@ -310,7 +310,11 @@ describe('untrackKeywords — el reverso del compromiso de gasto', () => {
 
     const update = state.calls.find(call => call.sql.includes('UPDATE greenhouse_growth.seo_keyword_set_members'))
 
-    expect(update?.sql).toContain('SET effective_to = NOW()')
+    // `clock_timestamp()` y no `NOW()`: NOW() devuelve el inicio de la transacción, así que
+    // cerrar una membresía creada en ella daría `effective_to = effective_from` y reventaría
+    // el CHECK `effective_to > effective_from`. Lo encontró el sanity contra PG real.
+    expect(update?.sql).toContain('SET effective_to = clock_timestamp()')
+    expect(update?.sql).not.toContain('SET effective_to = NOW()')
     // Append-only: jamás un DELETE sobre la tabla (el trigger de 1299 lo prohíbe).
     expect(state.calls.some(call => call.sql.includes('DELETE FROM greenhouse_growth.seo_keyword_set_members'))).toBe(
       false

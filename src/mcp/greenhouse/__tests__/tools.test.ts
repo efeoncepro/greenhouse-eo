@@ -42,7 +42,8 @@ describe('createGreenhouseMcpHandlers', () => {
       getSeoBacklinkProfile: vi.fn(),
       getSeoPerformance: vi.fn(),
       getSeoPerformanceCatalog: vi.fn(),
-      trackSeoKeywords: vi.fn()
+      trackSeoKeywords: vi.fn(),
+      untrackSeoKeywords: vi.fn()
     })
 
     const result = await handlers.getContext()
@@ -130,7 +131,8 @@ describe('createGreenhouseMcpHandlers', () => {
       getSeoBacklinkProfile: vi.fn(),
       getSeoPerformance: vi.fn(),
       getSeoPerformanceCatalog: vi.fn(),
-      trackSeoKeywords: vi.fn()
+      trackSeoKeywords: vi.fn(),
+      untrackSeoKeywords: vi.fn()
     })
 
     const forbiddenResult = await handlers.getOrganization({ id: 'org-1' })

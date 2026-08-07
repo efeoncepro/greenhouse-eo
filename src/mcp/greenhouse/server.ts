@@ -413,6 +413,22 @@ export const createGreenhouseMcpServer = (
     async args => handlers.trackSeoKeywords(args)
   )
 
+  // TASK-1308 — el reverso del write: lo que hace reversible el compromiso de gasto.
+  server.registerTool(
+    'untrack_seo_keywords',
+    {
+      title: 'Untrack SEO Keywords',
+      description:
+        'Stop tracking keywords for an organization so they leave daily rank tracking and stop consuming provider budget. THIS WRITES. It does NOT delete history: the measurement window is closed, past measurements are preserved, and the keyword can be tracked again later (a new window starts — the days in between are NOT recovered, so do not untrack to "pause" something you intend to resume soon). Idempotent: a keyword that was not tracked returns not_tracked and changes nothing. Read the per-keyword outcomes array (untracked | not_tracked | invalid), never just data.ok — reporting success when half the list was never tracked describes a change that did not happen. Use this to free capacity when the set is full. When data.ok is false, report the errorCode (disabled, target_not_found, no_entitlement, no_keywords, query_failed) honestly.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        keywords: z.array(z.string().trim().min(1)).min(1).max(50)
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.untrackSeoKeywords(args)
+  )
+
   // Resource addressable: el mismo documento read-only por URI estable.
   server.registerResource(
     'knowledge_document',

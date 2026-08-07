@@ -30,6 +30,37 @@
   en staging (`oauth/start` respondía `not_configured`; clase "flag sin cablear"). Vars en Vercel
   Production + redeploy; verificación del redirect URI al primer consent real.
 
+## 2026-08-07 — Growth SEO: Oportunidades de keywords, completa (TASK-1308)
+
+La ruta `/admin/growth/seo/keywords` quedó cerrada. Nació declarada como superficie de UI
+pura y terminó con backend propio, contrato programático y dos herramientas federadas al
+gateway MCP, porque el command que la especificación daba por construido no existía.
+
+Lo que ordenó todas las decisiones fue entender que **seguir una keyword no es guardar un
+dato: es comprometer gasto que se repite**. La captura diaria de posiciones le paga al
+proveedor por cada keyword vigente, en cada ciclo, hasta que alguien la saque. De ahí un
+techo por sitio con rechazo explícito, el permiso separado del de mirar, el resultado
+detallado keyword por keyword en vez de un "listo", y sobre todo la contraparte para dejar
+de seguir — sin la cual el compromiso era permanente y el tope del set, un callejón sin
+salida. Dejar de seguir no borra: cierra la ventana y conserva la medición histórica, que es
+lo que después permite explicar una factura.
+
+El mapa de oportunidad no usa los ejes que pedían el wireframe y la arquitectura. Volumen,
+dificultad e intención de mercado no tienen fuente hoy, y priorizar por un volumen estimado
+teniendo el Search Console propio es un error de método: la demanda ya está medida en la
+búsqueda del propio cliente. Los ejes son posición y demanda medida, y el dato de mercado —
+cuando llegue— será una columna y un filtro, nunca un eje.
+
+La pantalla pasó por tres rondas de crítica de producto con todos los gates automáticos en
+verde desde la primera versión. Lo que se corrigió salió de mirar el resultado real: no
+servía en un teléfono, la selección múltiple podía gastar sobre keywords que ya no estaban a
+la vista, la zona destacada del mapa se contradecía con su propia leyenda, y la fecha de
+corte de los datos había desaparecido en un rediseño intermedio.
+
+Estado: código completo y verificado. Queda registrar el permiso del gateway en el
+directorio de identidad y publicar su despliegue; hasta entonces las dos herramientas
+responden que falta el permiso, que es el comportamiento seguro.
+
 ## 2026-08-07 — Growth SEO: Oportunidades de keywords + command `trackKeywords` (TASK-1308)
 
 Nueva ruta operador `/admin/growth/seo/keywords` (tab **Keywords** de Search Visibility, child del
@@ -986,9 +1017,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
 - Se aclaró la arquitectura como **híbrida**: el catálogo plano permanece como índice de reconocimiento rápido; las cuatro rutas orientan la conversación y los paquetes/modalidades convierten la ruta en una compra scopeable.
 - Las skills `creative-practice` ahora explican operativamente las tres capas, el orden de calificación y un ejemplo de recorrido desde servicio reconocible hasta ruta, sprint, Managed Capacity y expansión.
 - Se creó [`CREATIVE_SERVICES_OPERATING_MODEL_V1`](docs/services/creative-services/EFEONCE_CREATIVE_SERVICES_OPERATING_MODEL_V1.md), que profundiza oferta, modelo de creación/captura de valor, ICP/JTBD, buying group, delivery/RACI, capacity, pricing/economics, rights, proof, renovación y gates de madurez.
-
-## 2026-07-30 — TASK-1600: ownership de color transferido a AXIS
-
-- AXIS publica la paleta portable completa y Greenhouse consume `@efeoncepro/axis-tokens@0.2.1` mediante adapters; `0.2.0` queda como publicación manual histórica y `v0.2.1` fue regularizada con el pipeline gobernado (`30525304584`, success), incluyendo publish idempotente.
-- GVC staging pasó rampas light en 1440/390, captura dark real en 1440/390 y dos capturas repetidas fueron pixel-identical; queda una diferencia de altura del full-page histórico pendiente de aprobación/re-baseline.
-- Finance PDF y report-artifact comparados contra el parent commit: raster diff 144 dpi = 0 píxeles. Rollback rehearsal sobre `0.1.5` pasó 43 tests.
