@@ -10,8 +10,6 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
-import Tooltip from '@mui/material/Tooltip'
-import Typography from '@mui/material/Typography'
 
 import CustomAutocomplete from '@core/components/mui/Autocomplete'
 import CustomTextField from '@core/components/mui/TextField'
@@ -19,6 +17,7 @@ import CustomTextField from '@core/components/mui/TextField'
 import EmptyState from '@/components/greenhouse/EmptyState'
 import { GreenhouseBreadcrumbs, GreenhouseChip } from '@/components/greenhouse/primitives'
 import SurfaceRecipe from '@/components/greenhouse/primitives/surface-system/SurfaceRecipe'
+import WorkbenchHeader from '@/components/greenhouse/primitives/surface-system/WorkbenchHeader'
 import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
 import { GH_GROWTH_SEO_PERFORMANCE, GH_GROWTH_SEO_OVERVIEW } from '@/lib/copy/growth'
 import { algorithmUpdatesInRange } from '@/lib/growth/seo/algorithm-updates'
@@ -137,11 +136,34 @@ const SeoPerformanceView = ({
   // conjunto que no matchea nada — un vacío que se leería como bug.
   const handleModeChange = (nextMode: SeoPerformanceMode) => pushQuery({ mode: nextMode, items: [] })
 
+  /**
+   * Chrome de la pantalla: va en la región `header` de la recipe, NO dentro de `primary`.
+   *
+   * ⚠️ La versión anterior apilaba título + 3 selects + chip + tabs + leyenda sueltos sobre
+   * el lienzo gris: seis elementos sin superficie que los contuviera. En móvil eso era el
+   * primer scroll COMPLETO sin un solo dato — el control (secundario) ocupando más área que
+   * el contenido (primario). `WorkbenchHeader kind='report'` es la primitive canónica del
+   * surface system para esto: un plano contenido (paper + borde + elevación) que declara el
+   * ALCANCE de la lectura, con el contenido real abajo, sobre el lienzo.
+   *
+   * Reparto deliberado dentro del plano:
+   * - `secondaryActions` = los tres selects (lo que el operador CAMBIA);
+   * - `meta` = frescura + leyenda de origen (hechos SOBRE el dato, no controles);
+   * - `supporting` = los tabs hermanos, bajo su divisor: cabecera con pestañas clásica.
+   */
+  /**
+   * ⚠️ En móvil cada control ocupa la fila COMPLETA. El intento de ponerlos 2-up ahorraba
+   * una fila pero truncaba el valor vigente ("Últimos 90 …"), y un control cuyo valor
+   * actual no se puede leer deja de ser un control: cuesta más que la fila que ahorra.
+   */
+  const scopeControlSx = { flex: { xs: '1 1 100%', md: '0 0 auto' }, minInlineSize: { md: 200 } }
+  const spaceControlSx = scopeControlSx
+
   const header = (
     <Stack spacing={4}>
       {/* Sin hrefs (misma convención del Overview): "Growth" es un grupo de menú, y la
-          navegación a las hermanas ES la barra de tabs de abajo — un link acá duplicaría
-          el camino y el azul primario del link no alcanza AA sobre el fondo del body. */}
+          navegación a las hermanas ES la barra de tabs del propio header — un link acá
+          duplicaría el camino y el azul primario no alcanza AA sobre el fondo del body. */}
       <GreenhouseBreadcrumbs
         items={[
           { label: GH_INTERNAL_NAV.growth.label },
@@ -150,134 +172,89 @@ const SeoPerformanceView = ({
         ]}
       />
 
-      <Stack
-        direction={{ xs: 'column', md: 'row' }}
-        spacing={3}
-        justifyContent='space-between'
-        alignItems={{ xs: 'flex-start', md: 'flex-end' }}
-        data-capture='seo-performance-toolbar'
-      >
-        <Stack spacing={1}>
-          {/* `surfaceHeroTitle` (34px, SoT tipográfico): el token reservado para el
-              titular primario de una surface full-page — y ésta es la pantalla ancla del
-              módulo. `component='h1'`: el único h1 (los títulos de chart/tabla son h2).
-              Con h4/h3 (ambos 20px) el titular no dominaba sobre el chrome de 16px y la
-              jerarquía quedaba visualmente plana (rubric enterprise). */}
-          <Typography variant='surfaceHeroTitle' component='h1'>
-            {copy.pageTitle}
-          </Typography>
-          <Typography variant='body2' color='text.secondary'>
-            {copy.pageSubtitle}
-          </Typography>
-        </Stack>
-
-        {/* `wrap` + useFlexGap: con 4 controles la fila se queda sin ancho en 1440 y el
-            chip de frescura terminaba truncado ("Datos hasta 2026-08…" cortado, hallazgo
-            del GVC) — envolver es honesto, apretar recorta información. */}
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} alignItems={{ sm: 'center' }} flexWrap='wrap' useFlexGap>
-          <CustomAutocomplete
-            options={spaces}
-            value={selectedSpace}
-            disableClearable={false}
-            getOptionLabel={(option: SeoSpaceOption | string) =>
-              typeof option === 'string' ? option : option.organizationName
-            }
-            isOptionEqualToValue={(option: SeoSpaceOption, value: SeoSpaceOption) =>
-              option.organizationId === value.organizationId
-            }
-            // Cambiar de Space limpia el set: las URLs y keywords de un Space no existen
-            // en otro, así que conservarlas daría un vacío inexplicable.
-            onChange={(_, value) =>
-              value ? pushQuery({ space: (value as SeoSpaceOption).organizationId, items: [] }) : undefined
-            }
-            sx={{ minInlineSize: 220 }}
-            renderInput={params => (
-              <CustomTextField
-                {...params}
-                label={GH_GROWTH_SEO_OVERVIEW.toolbar.spaceLabel}
-                placeholder={GH_GROWTH_SEO_OVERVIEW.toolbar.spacePlaceholder}
-              />
-            )}
-          />
-
-          <CustomTextField
-            select
-            label={copy.toolbar.rangeLabel}
-            value={String(rangeDays)}
-            onChange={event => pushQuery({ range: Number(event.target.value) })}
-            sx={{ minInlineSize: 160 }}
-          >
-            {Object.entries(copy.toolbar.rangeOptions).map(([days, label]) => (
-              <MenuItem key={days} value={days}>
-                {label}
-              </MenuItem>
-            ))}
-          </CustomTextField>
-
-          {/* El motivo del selector va como `helperText` y NO como tooltip: un tooltip
-              sobre un control de formulario se esconde justo cuando el usuario lo abre, y
-              acá el dato importa (móvil y escritorio devuelven SERPs distintas). */}
-          <CustomTextField
-            select
-            label={copy.toolbar.deviceLabel}
-            value={device}
-            helperText={copy.toolbar.deviceHint}
-            onChange={event => pushQuery({ device: event.target.value as SeoRankDevice })}
-            sx={{ minInlineSize: 160 }}
-          >
-            {Object.entries(copy.toolbar.deviceOptions).map(([value, label]) => (
-              <MenuItem key={value} value={value}>
-                {label}
-              </MenuItem>
-            ))}
-          </CustomTextField>
-
-          {/* Frescura explícita: hay que poder distinguir "no pasó nada" de "el dato es
-              viejo". Sin fecha se dice que no hay, no se inventa "hoy". */}
+      <WorkbenchHeader
+        kind='report'
+        titleComponent='h1'
+        dataCapture='seo-performance-toolbar'
+        title={copy.pageTitle}
+        description={copy.pageSubtitle}
+        meta={
+          // Sólo la frescura vive en la cabecera: es lo único que aplica a TODA la pantalla.
+          // La leyenda de origen (● / ◑) se mudó a la card del gráfico, junto a las series
+          // que describe — ahí el recordatorio de que nunca se promedian está donde importa.
           <GreenhouseChip
             kind='metric'
             variant='label'
             size='small'
-            label={
-              dataAsOf
-                ? copy.toolbar.freshness.replace('{date}', dataAsOf)
-                : copy.toolbar.freshnessUnknown
-            }
+            label={dataAsOf ? copy.toolbar.freshness.replace('{date}', dataAsOf) : copy.toolbar.freshnessUnknown}
           />
-        </Stack>
-      </Stack>
-
-      <Box data-capture='seo-performance-tabs'>
-        <SeoSearchVisibilityTabs activeTab='performance' spaceId={selectedSpaceId} />
-      </Box>
-
-      {/* Leyenda de origen: la fuente vigente se marca, para que el operador no confunda
-          la posición exacta del proveedor con la posición promedio medida por Google. */}
-      <Stack direction='row' spacing={2} alignItems='center' aria-label={copy.source.ariaLabel} flexWrap='wrap' useFlexGap>
-        <Tooltip title={copy.source.measuredHint}>
-          <span>
-            <GreenhouseChip
-              kind='metric'
-              variant={performance?.ok && performance.source === 'gsc_measured' ? 'solid' : 'label'}
-              size='small'
-              label={`● ${copy.source.measured}`}
+        }
+        secondaryActions={
+          <>
+            <CustomAutocomplete
+              options={spaces}
+              value={selectedSpace}
+              disableClearable={false}
+              getOptionLabel={(option: SeoSpaceOption | string) =>
+                typeof option === 'string' ? option : option.organizationName
+              }
+              isOptionEqualToValue={(option: SeoSpaceOption, value: SeoSpaceOption) =>
+                option.organizationId === value.organizationId
+              }
+              // Cambiar de Space limpia el set: las URLs y keywords de un Space no existen
+              // en otro, así que conservarlas daría un vacío inexplicable.
+              onChange={(_, value) =>
+                value ? pushQuery({ space: (value as SeoSpaceOption).organizationId, items: [] }) : undefined
+              }
+              sx={spaceControlSx}
+              renderInput={params => (
+                <CustomTextField
+                  {...params}
+                  label={GH_GROWTH_SEO_OVERVIEW.toolbar.spaceLabel}
+                  placeholder={GH_GROWTH_SEO_OVERVIEW.toolbar.spacePlaceholder}
+                />
+              )}
             />
-          </span>
-        </Tooltip>
-        <Tooltip title={copy.source.estimatedHint}>
-          <span>
-            <GreenhouseChip
-              kind='metric'
-              variant={performance?.ok && performance.source === 'dataforseo_estimated' ? 'solid' : 'label'}
-              size='small'
-              label={`◑ ${copy.source.estimated}`}
-            />
-          </span>
-        </Tooltip>
-        <Typography variant='caption' color='text.secondary'>
-          {copy.source.mixHint}
-        </Typography>
-      </Stack>
+
+            <CustomTextField
+              select
+              label={copy.toolbar.rangeLabel}
+              value={String(rangeDays)}
+              onChange={event => pushQuery({ range: Number(event.target.value) })}
+              sx={scopeControlSx}
+            >
+              {Object.entries(copy.toolbar.rangeOptions).map(([days, label]) => (
+                <MenuItem key={days} value={days}>
+                  {label}
+                </MenuItem>
+              ))}
+            </CustomTextField>
+
+            {/* El motivo del selector va como `helperText` y NO como tooltip: un tooltip
+                sobre un control de formulario se esconde justo cuando el usuario lo abre, y
+                acá el dato importa (móvil y escritorio devuelven SERPs distintas). */}
+            <CustomTextField
+              select
+              label={copy.toolbar.deviceLabel}
+              value={device}
+              helperText={copy.toolbar.deviceHint}
+              onChange={event => pushQuery({ device: event.target.value as SeoRankDevice })}
+              sx={scopeControlSx}
+            >
+              {Object.entries(copy.toolbar.deviceOptions).map(([value, label]) => (
+                <MenuItem key={value} value={value}>
+                  {label}
+                </MenuItem>
+              ))}
+            </CustomTextField>
+          </>
+        }
+        supporting={
+          <Box data-capture='seo-performance-tabs'>
+            <SeoSearchVisibilityTabs activeTab='performance' spaceId={selectedSpaceId} />
+          </Box>
+        }
+      />
     </Stack>
   )
 
@@ -469,6 +446,7 @@ const SeoPerformanceView = ({
         <SeoRankEvolutionChart
           series={performance.series}
           metric={metric}
+          source={performance.source}
           range={performance.range}
           // Updates confirmados de Google dentro del rango (registro curado): contexto
           // para distinguir una caída colectiva de una caída propia del sitio.
@@ -494,14 +472,11 @@ const SeoPerformanceView = ({
       kind='analyticsReport'
       instanceId='seo-performance'
       plane='none'
-      regions={{
-        primary: (
-          <Stack spacing={6}>
-            {header}
-            {renderBody()}
-          </Stack>
-        )
-      }}
+      // El chrome va en `header` (fuera del shell), el contenido en `primary`: es la
+      // división que la recipe declara. Meter ambos en `primary` era la causa de que los
+      // controles quedaran flotando desnudos sobre el lienzo.
+      header={header}
+      regions={{ primary: renderBody() }}
     />
   )
 }

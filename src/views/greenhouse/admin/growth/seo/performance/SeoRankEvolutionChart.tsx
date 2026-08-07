@@ -15,15 +15,17 @@ import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { useTheme } from '@mui/material/styles'
 
 import type { EChartsOption } from 'echarts'
 
+import { GreenhouseChip } from '@/components/greenhouse/primitives'
 import useReducedMotion from '@/hooks/useReducedMotion'
 import { GH_GROWTH_SEO_PERFORMANCE } from '@/lib/copy/growth'
 import { formatInteger } from '@/lib/format'
-import type { SeoPerformanceMetric, SeoPerformanceSeries } from '@/lib/growth/seo/contracts'
+import type { SeoPerformanceMetric, SeoPerformanceSeries, SeoPerformanceSource } from '@/lib/growth/seo/contracts'
 import AppECharts from '@/libs/styles/AppECharts'
 import { resolveChartColor } from '@/libs/styles/resolveApexColor'
 
@@ -53,6 +55,13 @@ const TARGET_POSITION = 3
 export interface SeoRankEvolutionChartProps {
   series: SeoPerformanceSeries[]
   metric: SeoPerformanceMetric
+  /**
+   * Origen RESUELTO de estas series. Vive acá y no en la cabecera de la pantalla porque
+   * explica ESTE artefacto: un gráfico que carga su propia procedencia sigue siendo honesto
+   * cuando alguien lo recorta y lo pega en una presentación. (La cabecera conserva sólo la
+   * frescura, que sí aplica a toda la pantalla.)
+   */
+  source: SeoPerformanceSource
   range: { from: string; to: string; days: number }
   /**
    * Bandas de contexto: updates CONFIRMADOS del algoritmo de Google dentro del rango
@@ -137,7 +146,7 @@ const resolveEventSpan = (
 /** Umbral de días medidos sobre el cual el default pasa a semanal (el diario es ruido). */
 const WEEKLY_DEFAULT_THRESHOLD = 120
 
-const SeoRankEvolutionChart = ({ series, metric, range, events = [] }: SeoRankEvolutionChartProps) => {
+const SeoRankEvolutionChart = ({ series, metric, range, source, events = [] }: SeoRankEvolutionChartProps) => {
   const theme = useTheme()
   const prefersReduced = useReducedMotion()
   const [showTable, setShowTable] = useState(false)
@@ -499,6 +508,43 @@ const SeoRankEvolutionChart = ({ series, metric, range, events = [] }: SeoRankEv
               <Typography variant='caption' color='text.secondary'>
                 {coverageNote}
               </Typography>
+
+              {/* Procedencia de ESTAS series, junto al gráfico que describe (principio de
+                  proximidad): la fuente vigente va sólida y la otra en label, y el recordatorio
+                  de que NUNCA se promedian entre sí queda pegado al artefacto que lo necesita. */}
+              <Stack
+                direction='row'
+                spacing={2}
+                alignItems='center'
+                aria-label={GH_GROWTH_SEO_PERFORMANCE.source.ariaLabel}
+                flexWrap='wrap'
+                useFlexGap
+                sx={{ pt: 1 }}
+              >
+                <Tooltip title={GH_GROWTH_SEO_PERFORMANCE.source.measuredHint}>
+                  <span>
+                    <GreenhouseChip
+                      kind='metric'
+                      variant={source === 'gsc_measured' ? 'solid' : 'label'}
+                      size='small'
+                      label={`● ${GH_GROWTH_SEO_PERFORMANCE.source.measured}`}
+                    />
+                  </span>
+                </Tooltip>
+                <Tooltip title={GH_GROWTH_SEO_PERFORMANCE.source.estimatedHint}>
+                  <span>
+                    <GreenhouseChip
+                      kind='metric'
+                      variant={source === 'dataforseo_estimated' ? 'solid' : 'label'}
+                      size='small'
+                      label={`◑ ${GH_GROWTH_SEO_PERFORMANCE.source.estimated}`}
+                    />
+                  </span>
+                </Tooltip>
+                <Typography variant='caption' color='text.secondary'>
+                  {GH_GROWTH_SEO_PERFORMANCE.source.mixHint}
+                </Typography>
+              </Stack>
             </Stack>
 
             <Stack direction='row' spacing={2} alignItems='center' flexWrap='wrap' useFlexGap>

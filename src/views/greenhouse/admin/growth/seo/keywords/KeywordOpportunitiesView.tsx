@@ -24,6 +24,7 @@ import EmptyState from '@/components/greenhouse/EmptyState'
 import { GreenhouseBreadcrumbs } from '@/components/greenhouse/primitives'
 import type { GreenhouseAsyncActionState } from '@/components/greenhouse/primitives/GreenhouseAsyncActionButton'
 import SurfaceRecipe from '@/components/greenhouse/primitives/surface-system/SurfaceRecipe'
+import WorkbenchHeader from '@/components/greenhouse/primitives/surface-system/WorkbenchHeader'
 import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
 import { throwIfNotOk } from '@/lib/api/parse-error-response'
 import { GH_GROWTH_SEO_KEYWORDS, GH_GROWTH_SEO_OVERVIEW } from '@/lib/copy/growth'
@@ -282,7 +283,11 @@ const KeywordOpportunitiesView = ({
    * estos controles son el sujeto de esa frase.
    */
   const contextControls = (
-    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} sx={{ inlineSize: { xs: '100%', sm: 'auto' } }}>
+    <Stack
+      direction={{ xs: 'column', sm: 'row' }}
+      spacing={3}
+      sx={{ inlineSize: { xs: '100%', md: 'auto' } }}
+    >
       <CustomAutocomplete
         // El `id` va acá y no en el `renderInput`: Autocomplete deriva el id de su propio
         // input (y el `htmlFor` del label) de este prop, cayendo a `useId` si falta.
@@ -358,22 +363,14 @@ const KeywordOpportunitiesView = ({
   )
 
   /**
-   * Los estados sin datos también llevan los controles: el picker vive en el veredicto, y el
-   * veredicto no se renderiza sin datos. Sin esto, un Space sin Search Console dejaría al
-   * operador sin forma de cambiar de Space — la salida del estado vacío tiene que estar
-   * DENTRO del estado vacío.
+   * Superficie de estado. Ya NO repite los controles: desde que el alcance vive en el plano
+   * de cabecera, está presente en todos los estados por construcción — incluido un Space sin
+   * Search Console, donde antes había que duplicarlos acá para no dejar al operador sin
+   * forma de cambiar de Space.
    */
   const stateSurface = (marker: string, node: ReactNode) => (
     <Card data-capture={marker}>
-      <CardContent>
-        <Stack spacing={6}>
-          <Stack spacing={2}>
-            {contextControls}
-            {contextMeta}
-          </Stack>
-          {node}
-        </Stack>
-      </CardContent>
+      <CardContent>{node}</CardContent>
     </Card>
   )
 
@@ -572,10 +569,23 @@ const KeywordOpportunitiesView = ({
     })
   }
 
+  /**
+   * Chrome de la pantalla, en el patrón CANÓNICO del módulo (coherencia entre las tres
+   * pestañas de Search Visibility): `WorkbenchHeader kind='report'` en la región `header`
+   * de la recipe, con el ALCANCE (Space + ventana + frescura) dentro del mismo plano.
+   *
+   * ⚠️ Antes estos controles vivían DENTRO del veredicto. Resolvía bien el problema que los
+   * originó (sueltos sobre el lienzo se veían sin colocar) pero dejaba dos consecuencias: el
+   * alcance de la pantalla quedaba subordinado a una card de contenido, y las tres pestañas
+   * hermanas —que comparten breadcrumb, título y tabs— presentaban su alcance en tres
+   * lugares distintos. El plano de cabecera lo resuelve para las tres por igual, y además
+   * los controles quedan disponibles SIEMPRE, también en los estados sin datos (que era la
+   * razón por la que antes había que repetirlos dentro de cada superficie de estado).
+   */
   const header = (
     <Stack spacing={4}>
       {/* Sin hrefs (misma convención del Overview y Rendimiento): "Growth" es un grupo de
-          menú, y la navegación a las hermanas ES la barra de tabs de abajo. */}
+          menú, y la navegación a las hermanas ES la barra de tabs del propio header. */}
       <GreenhouseBreadcrumbs
         items={[
           { label: GH_INTERNAL_NAV.growth.label },
@@ -584,25 +594,20 @@ const KeywordOpportunitiesView = ({
         ]}
       />
 
-      {/* El titular ocupa su propia fila, a todo el ancho.
-          Antes compartía fila con los selectores y el resultado era el vacío que el GVC
-          mostró: Space (220px) + Ventana (180px) + gap no caben en los ~390px que sobraban,
-          así que envolvían a dos filas y dejaban un hueco enorme al lado del título. Bajar
-          los controles a la barra de tabs no sólo cierra el hueco — agrupa navegación y
-          contexto en una sola banda, que es lo que son. */}
-      <Stack spacing={1} data-capture='seo-keywords-toolbar'>
-        <Typography variant='surfaceHeroTitle' component='h1'>
-          {copy.pageTitle}
-        </Typography>
-        <Typography variant='body2' color='text.secondary' sx={{ maxInlineSize: '72ch' }}>
-          {copy.pageSubtitle}
-        </Typography>
-      </Stack>
-
-      {/* Los tabs SÍ pueden ir sobre el fondo: son navegación, no cajas con relleno. */}
-      <Box data-capture='seo-keywords-tabs'>
-        <SeoSearchVisibilityTabs activeTab='keywords' spaceId={selectedSpaceId} />
-      </Box>
+      <WorkbenchHeader
+        kind='report'
+        titleComponent='h1'
+        dataCapture='seo-keywords-toolbar'
+        title={copy.pageTitle}
+        description={copy.pageSubtitle}
+        meta={contextMeta}
+        secondaryActions={contextControls}
+        supporting={
+          <Box data-capture='seo-keywords-tabs'>
+            <SeoSearchVisibilityTabs activeTab='keywords' spaceId={selectedSpaceId} />
+          </Box>
+        }
+      />
     </Stack>
   )
 
@@ -709,12 +714,6 @@ const KeywordOpportunitiesView = ({
           filteredCount={filtered.length}
           activeAction={actionFilter}
           onActionChange={setActionFilter}
-          context={
-            <Stack spacing={2} alignItems={{ md: 'flex-end' }}>
-              {contextControls}
-              {contextMeta}
-            </Stack>
-          }
         />
 
         <KeywordOpportunityMap
@@ -873,14 +872,8 @@ const KeywordOpportunitiesView = ({
       kind='analyticsReport'
       instanceId='seo-keywords'
       plane='none'
-      regions={{
-        primary: (
-          <Stack spacing={6}>
-            {header}
-            {renderBody()}
-          </Stack>
-        )
-      }}
+      header={header}
+      regions={{ primary: renderBody() }}
     />
 
     {/* `role=status` + aria-live: el resultado se anuncia, no sólo se pinta. Anclado abajo

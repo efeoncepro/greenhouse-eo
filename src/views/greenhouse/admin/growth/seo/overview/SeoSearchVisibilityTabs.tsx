@@ -85,6 +85,17 @@ const SeoSearchVisibilityTabs = ({ activeTab, spaceId }: Props) => {
       role='navigation'
       value={activeTab}
       variant='scrollable'
+      // ⚠️ SIN `allowScrollButtonsMobile`: en 390px las flechas se comen ~80px y terminan
+      // tapando el tab ACTIVO ("Rendimie…" recortado bajo la flecha — hallazgo del operador).
+      // En táctil el gesto de arrastre ya existe; lo que hace falta es que los cuatro
+      // quepan, y eso se resuelve abajo ocultando el ícono en xs.
+      scrollButtons='auto'
+      sx={{
+        // En móvil el ícono de cada tab cuesta ~28px × 4 = una etiqueta entera. El label
+        // solo identifica el destino igual de bien, y así los cuatro entran sin recorte.
+        '& .MuiTab-iconWrapper': { display: { xs: 'none', sm: 'inline-flex' } },
+        '& .MuiTab-root': { paddingInline: { xs: 3, sm: 5 }, minInlineSize: 0 }
+      }}
       pill='true'
       aria-label={GH_GROWTH_SEO_OVERVIEW.sectionTitle}
     >

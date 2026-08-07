@@ -213,12 +213,12 @@ const KeywordOpportunityVerdict = ({
               ) : null}
             </Stack>
 
-            {/* ⚠️ En columna (mobile) el contexto va PRIMERO. En su orden de DOM quedaba en
-                medio del enunciado: leías el hallazgo, te topabas con dos campos de
-                formulario, y recién después el resto. Adelantado se lee natural — "Grupo
-                Berel, últimos 28 días → esto es lo que encontramos" — y en fila (desktop)
-                vuelve a su sitio arriba a la derecha. */}
-            <Stack sx={{ order: { xs: -1, md: 0 }, inlineSize: { xs: '100%', md: 'auto' } }}>{context}</Stack>
+            {/* Ranura de contexto OPCIONAL. Hoy el alcance (Space + ventana + frescura) vive
+                en el plano de cabecera de la pantalla, así que normalmente llega vacía — y
+                vacía no debe dejar una caja fantasma que altere el ritmo del enunciado. */}
+            {context ? (
+              <Stack sx={{ order: { xs: -1, md: 0 }, inlineSize: { xs: '100%', md: 'auto' } }}>{context}</Stack>
+            ) : null}
           </Stack>
 
           {/* Los segmentos: leyenda del scatter y filtro de la tabla en el mismo objeto. */}
