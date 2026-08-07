@@ -709,6 +709,29 @@ Ese modelo permite:
 - Antes de deprecar, verificar grants activos en `role_entitlement_defaults` y `user_entitlement_overrides`. Si existen, migrar/documentar esos grants primero.
 - El reporter one-shot `scripts/governance/find-deprecated-candidates.ts` lista candidates en CSV; no auto-depreca ni reemplaza revisión de operador.
 
+### View Registry — el seed se AUTO-REVIERTE si el código no está desplegado (TASK-1306, desde 2026-08-06)
+
+`syncViewRegistry` (`src/lib/admin/view-access-store.ts`) reconcilia la tabla contra el catálogo TS: hace upsert de todo `VIEW_REGISTRY` con `active = TRUE` y **después** ejecuta
+
+```sql
+UPDATE greenhouse_core.view_registry SET active = FALSE
+ WHERE view_code <> ALL($catalogoTS)
+```
+
+O sea: **todo viewCode que no esté en el catálogo TS del código EN EJECUCIÓN queda desactivado**, aunque una migración lo haya sembrado con `active = TRUE` minutos antes.
+
+⚠️ Greenhouse tiene **UNA sola instancia Cloud SQL y UNA sola base (`greenhouse_app`) compartida por dev, staging y producción**. Combinado con lo anterior:
+
+> Aplicar la migración de seed de un viewCode nuevo ANTES de desplegar el código que lo declara hace que **cualquier runtime con el catálogo viejo lo apague** en la siguiente corrida del reconciliador — en silencio, sin error y sin log visible. La vista desaparece del menú y el síntoma no se parece a la causa.
+
+**Reglas duras:**
+
+- **NUNCA** aplicar la migración de seed de un viewCode a la base compartida antes de que el código con su entrada en `VIEW_REGISTRY` esté desplegado en **todos** los entornos que comparten la base (incluida producción). Orden seguro: promover el código primero, aplicar la migración después.
+- **SIEMPRE** que un viewCode aparezca `active = false` con `updated_by = 'system'` sin que nadie lo tocara a mano, sospechar de este reconciliador antes que de un fallo de la migración: el seed corrió bien y fue revertido después.
+- Mientras una task de UI con viewCode nuevo viva sólo en `develop`, su viewCode queda **inestable**: producción lo apagará cada vez que corra la sincronización. Se estabiliza al promover a `main`.
+
+**Caso fuente (TASK-1306):** el seed de `administracion.growth_seo` se aplicó 2026-08-07 02:44 y se verificó `active = true`; a las 06:12 un runtime con el catálogo viejo lo dejó en `active = false` (`updated_by = 'system'`). Detectado al auditar el rollout, no por un error.
+
 ### View Registry Governance Pattern (TASK-827, desde 2026-05-13)
 
 Cualquier `viewCode` agregado a `VIEW_REGISTRY` en `src/lib/admin/view-access-catalog.ts` **debe acompañarse en el MISMO PR** de una migration que:

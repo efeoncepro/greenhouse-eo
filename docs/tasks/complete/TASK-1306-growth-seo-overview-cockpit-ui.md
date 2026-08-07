@@ -475,14 +475,31 @@ Slice 1 → Slice 2 → Slice 3 → Slice 4. No conectar KPIs/charts antes de te
 - `enterprise_flat_typography`: ratio heading/body del design system, no de esta surface.
 - `layout_target_too_small` (20×20): control del shell heredado, fuera del scope.
 
-### Rollout — CODE COMPLETE, DEPLOY PENDIENTE
+### Rollout — pusheado a `develop`, promoción a `main` pendiente
 
-⚠️ `GROWTH_SEO_ENABLED` **ya está ON en Vercel Production** (rollout de TASK-1302/1645). La ruta queda **viva apenas se despliegue**; el control de exposición restante es el viewCode (sólo `efeonce_admin` + `ai_tooling_admin`) + el `module_assignment` per-org.
+Corregido respecto del primer cierre: **NO existe una base por entorno.** Hay una sola
+instancia Cloud SQL (`greenhouse-pg-dev`) con una sola base (`greenhouse_app`) compartida
+por dev, staging y producción — verificado con `gcloud sql databases list`. La migración
+del viewCode **ya está aplicada para todos los entornos**; no hay una migración pendiente
+"de staging/prod" como decía el reporte inicial.
 
-Pendiente para `operationally complete`:
-1. Aplicar la migración del viewCode en **staging y producción** (hoy sólo dev).
-2. Desplegar y verificar la ruta con un operador real.
-3. Correr los scenarios GVC contra staging (`--env=staging`).
+`GROWTH_SEO_ENABLED` ya está ON en Vercel Production (rollout de TASK-1302/1645), así que
+el control de exposición es el viewCode (sólo `efeonce_admin` + `ai_tooling_admin`) + el
+`module_assignment` per-org.
+
+⚠️ **Hallazgo del rollout — el seed del viewCode se auto-revirtió.** Al auditar el estado
+real (no `migrate:status`) apareció `active = false`, `updated_by = 'system'`, pese a que
+tras aplicar la migración se había verificado `active = true`. Causa raíz:
+`syncViewRegistry` desactiva **todo viewCode ausente del catálogo TS del código EN
+EJECUCIÓN**, y la base es compartida — un runtime con el catálogo viejo apagó el viewCode
+recién sembrado, en silencio. Se reactivó y quedó documentado como invariante en
+`GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md` (§View Registry — el seed se
+AUTO-REVIERTE si el código no está desplegado).
+
+**Consecuencia operativa:** mientras 1306 viva sólo en `develop`, producción volverá a
+apagar el viewCode cada vez que corra la sincronización. **Se estabiliza al promover a
+`main`** — ese es el paso que falta para `operationally complete`, junto con verificar la
+ruta en staging con un operador real y correr los scenarios GVC con `--env=staging`.
 
 ### Follow-ups abiertos
 

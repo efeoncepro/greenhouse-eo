@@ -105,6 +105,7 @@ La diferencia con otras capas de documentacion:
 
 ### Agencia y Operaciones
 
+- [Autenticar Gcloud con Playwright](operations/gcloud-auth-playwright.md) — configurar una credencial local ignorada por Git y, cuando se solicite, renovar los dos carriles de Google Cloud mediante Playwright y el preflight canónico.
 - [Operar Agency, Delivery y Account 360](agency/operar-agency-delivery-account-360.md) — como leer Account 360, Delivery, ICO, economics, sample sprints y service attribution con degradacion honesta por faceta.
 - [Monitorear Costos Cloud con FinOps](operations/monitorear-costos-cloud-finops.md) — como revisar gasto GCP, interpretar proyecciones y drivers, usar alertas tempranas y ejecutar diagnosticos seguros sin depender solo de la consola de Google Cloud.
 - [Operar Integraciones y Sync](operations/operar-integraciones-y-sync.md) — como revisar health/freshness, disparar sync manual, pausar/reanudar conectores, diagnosticar webhooks y no romper la cadena raw/conformed/projection.
