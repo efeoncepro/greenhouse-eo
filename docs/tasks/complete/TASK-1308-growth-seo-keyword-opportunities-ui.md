@@ -36,7 +36,7 @@ Los mocks lo daban por bueno.
 
 ### Pendiente de rollout (no de código)
 
-- Scope `efeonce.mcp.seo.keywords.track` en la app de Entra `Efeonce MCP Resource`
+- Scope `efeonce.mcp.seo.write` en la app de Entra `Efeonce MCP Resource`
   (`c5363215-b9a6-4bf1-bb1c-e61963b37dac`). Las DOS tools federadas lo comparten, así que
   hasta provisionarlo ambas responden `insufficient_scope` — fail-closed por diseño.
   ⚠️ `az ad app update` **reemplaza** el arreglo completo de scopes: va con round-trip
@@ -92,7 +92,7 @@ clasificador en un módulo aparte para que mapa, filtros y tabla no deriven entr
 
 `track_seo_keywords` creada en el MCP interno y **federada** al gateway `mcp.efeonce.org`
 (repo `efeonce-mcp`, commit local `cb316cc`) con **scope propio**
-`efeonce.mcp.seo.keywords.track` — no el de lectura, porque escribir cuesta. El lane
+`efeonce.mcp.seo.write` — no el de lectura, porque escribir cuesta. El lane
 ecosystem sólo la acepta desde bindings de scope `internal`: un binding cliente lee sus
 oportunidades pero no hace crecer su propia factura.
 
@@ -101,7 +101,7 @@ oportunidades pero no hace crecer su propia factura.
 
 ### Pendiente de rollout
 
-- **Scope en Entra**: `efeonce.mcp.seo.keywords.track` todavía no existe en la app
+- **Scope en Entra**: `efeonce.mcp.seo.write` todavía no existe en la app
   `Efeonce MCP Resource` (`c5363215-b9a6-4bf1-bb1c-e61963b37dac`). Hasta provisionarlo la
   tool federada responde `insufficient_scope` — fail-closed por diseño.
 - **Push del gateway**: commit local sin push (el repo tiene deploy productivo en push).

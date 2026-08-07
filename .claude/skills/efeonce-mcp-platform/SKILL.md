@@ -60,9 +60,17 @@ If a source conflicts with remembered behavior, the verified runtime and its can
 - Before customer access, require B2B/multitenant entitlements that can issue and revoke access per tenant and
   capability. Entra is the internal canary only. Follow the proposed Account 360 binding and customer identity
   gate in `EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md` / `TASK-1631`; do not provision its leading
-  vendor candidate without explicit approval. The gateway declares three scopes, not two: base `efeonce.mcp.read`,
-  Globe reader `efeonce.mcp.globe.read` and the flag-gated internal write
-  `efeonce.mcp.globe.credits.funding.ensure`. The current Entra client receives base + reader even when it requests
+  vendor candidate without explicit approval. The gateway declares four scopes: base `efeonce.mcp.read`,
+  Globe reader `efeonce.mcp.globe.read`, the flag-gated internal write
+  `efeonce.mcp.globe.credits.funding.ensure` and the flag-gated SEO write `efeonce.mcp.seo.write` (TASK-1308).
+  Scope granularity is **one scope per blast-radius class, never one per capability**: a per-capability list turns
+  Entra into a hand-edited mirror of Greenhouse's `capabilities_registry`, the two drift, and a drifted
+  authorization mirror is worse than none — it also makes the gateway an authorization authority, which rule 1
+  forbids. The scope answers "may this client perform this CLASS of action?"; the capability answers "may this
+  actor, on this org?" and is enforced downstream in the canonical lane and command. `globe.credits.funding.ensure`
+  is the rule applied, not an exception: it owns a scope because it MOVES MONEY under a one-shot authorityId.
+  Consequence: federating a domain's N+1 write needs no Entra change and must never be blocked on one.
+  The current Entra client receives base + reader even when it requests
   only the base, so it cannot prove base-only persona denial; retain a dispatch-level deny test and add a real
   base-only client before that rollout. Whether that same client also receives the write scope is not verified and
   follows its own consent/assignment flow.
