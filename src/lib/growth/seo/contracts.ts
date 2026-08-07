@@ -468,3 +468,120 @@ export type RankEvolutionResult =
       errorCode: 'disabled' | 'target_not_found' | 'no_data' | 'query_failed'
       status: null
     }
+
+/**
+ * ═══ TASK-1307 — Rendimiento en el tiempo de un set de URLs/keywords (pantalla ancla §10.3) ═══
+ *
+ * ⚠️ POR QUÉ ESTE READER EXISTE (la spec lo declaraba `Backend impact: none`, y era falso).
+ *
+ * La pantalla ancla necesita DOS cosas que `readRankEvolution` no puede dar:
+ *   1. **El eje URL.** `readRankEvolution` filtra por keyword y nada más — la posición
+ *      exacta de DataForSEO se mide contra una keyword, no contra una página. El único
+ *      eje URL real del dominio es `seo_gsc_daily.page` (dato MEDIDO).
+ *   2. **Clics / impresiones / CTR.** Los snapshots de rank son SOLO posición; el volumen
+ *      vive en Search Console.
+ *
+ * ⚠️ CONTRATO DE HONESTIDAD §5 — las dos fuentes NUNCA se promedian ni se fusionan. La
+ * fuente de una lectura queda determinada por (modo × métrica), con una regla única y
+ * declarada en la UI con la leyenda ●/◑:
+ *
+ *   | modo    | métrica              | fuente                                        |
+ *   |---------|----------------------|-----------------------------------------------|
+ *   | keyword | position             | DataForSEO ◑ (posición exacta de mercado)      |
+ *   | keyword | clicks/impr/ctr      | Search Console ● (grano `query`)               |
+ *   | url     | cualquiera           | Search Console ● (grano `page`)                |
+ *
+ * No hay celda mixta: una serie entera pertenece a una sola fuente. Es lo que permite
+ * decir "◑ estimado" o "● medido" del gráfico completo sin una mentira por serie.
+ */
+
+/** Eje del set elegido: comparar keywords entre sí, o URLs entre sí. Nunca mezclados. */
+export type SeoPerformanceMode = 'keyword' | 'url'
+
+/** Qué mide el eje Y. `position` es la única con eje invertido (1 arriba = mejor). */
+export type SeoPerformanceMetric = 'position' | 'clicks' | 'impressions' | 'ctr'
+
+/** Procedencia de la lectura completa (leyenda ●/◑). Se deriva de (modo × métrica). */
+export type SeoPerformanceSource = 'gsc_measured' | 'dataforseo_estimated'
+
+/** Un punto diario. `value: null` = sin medición ese día (hueco real, NUNCA interpolado). */
+export interface SeoPerformancePoint {
+  date: string
+  value: number | null
+}
+
+export interface SeoPerformanceSeries {
+  /** La keyword o la URL, según el modo. */
+  item: string
+  points: SeoPerformancePoint[]
+  /**
+   * `true` cuando la serie cubre menos de la mitad de la ventana pedida (keyword recién
+   * trackeada o proveedor con lag). La UI lo declara con un banner; el chart la dibuja
+   * hasta donde hay dato y deja el hueco visible.
+   */
+  sparse: boolean
+}
+
+export interface SeoPerformanceStanding {
+  item: string
+  /** Última posición medida en la ventana. `null` = no rankeó / no se midió. */
+  position: number | null
+  /**
+   * Δ de POSICIÓN a ~30 días: `actual − referencia`. **Negativo = mejoró** (pasar de 8 a 3
+   * es −5). El signo NO se falsea para "verse positivo": lo que cambia es la lectura
+   * (`GreenhouseKpiDelta invert`), nunca el número.
+   *
+   * `null` = no hay contra qué comparar (una sola medición en la ventana). NUNCA se
+   * fabrica un delta contra cero.
+   */
+  positionDelta30d: number | null
+  clicks: number
+  impressions: number
+  /** `clicks / impressions` de la ventana. `null` si no hubo impresiones (≠ 0%). */
+  ctr: number | null
+  /** Serie de posición para el sparkline de la fila (mismo orden temporal). */
+  trend: Array<number | null>
+}
+
+export type SeoPerformanceResult =
+  | {
+      ok: true
+      organizationId: string
+      /** `null` cuando el modo no consulta rank (todo GSC): no hay target involucrado. */
+      seoTargetId: string | null
+      mode: SeoPerformanceMode
+      metric: SeoPerformanceMetric
+      device: SeoRankDevice
+      range: { from: string; to: string; days: number }
+      source: SeoPerformanceSource
+      series: SeoPerformanceSeries[]
+      standings: SeoPerformanceStanding[]
+      /**
+       * Ítems pedidos que no tienen NINGÚN dato en la ventana. Se nombran en vez de
+       * omitirse en silencio: "pediste 4 y te muestro 2" tiene que ser visible.
+       */
+      itemsWithoutData: string[]
+    }
+  | {
+      ok: false
+      errorCode: 'disabled' | 'not_connected' | 'no_items' | 'no_data' | 'query_failed'
+      status: null
+    }
+
+/** Una opción del selector de set: el ítem + su volumen medido, para poder priorizarlo. */
+export interface SeoPerformanceCatalogItem {
+  item: string
+  /** Impresiones acumuladas en la ventana. `0` cuando el ítem sólo existe como keyword trackeada. */
+  impressions: number
+  /** `true` si la keyword está trackeada por rank capture (tiene serie de posición exacta). */
+  tracked: boolean
+}
+
+export type SeoPerformanceCatalogResult =
+  | {
+      ok: true
+      organizationId: string
+      mode: SeoPerformanceMode
+      items: SeoPerformanceCatalogItem[]
+    }
+  | { ok: false; errorCode: 'disabled' | 'no_data' | 'query_failed'; status: null }

@@ -200,6 +200,37 @@ export class GreenhouseApiPlatformClient {
     })
   }
 
+  // TASK-1307 — rendimiento en el tiempo de un SET de keywords/URLs (pantalla ancla).
+  async getSeoPerformance(input: {
+    organizationId?: string
+    mode?: string
+    items?: string[]
+    metric?: string
+    rangeDays?: number
+    device?: string
+    engine?: string
+  }) {
+    return this.request('/api/platform/ecosystem/growth/seo/performance', {
+      organizationId: input.organizationId,
+      mode: input.mode,
+      items: input.items && input.items.length > 0 ? input.items.join(',') : undefined,
+      metric: input.metric,
+      rangeDays: input.rangeDays,
+      device: input.device,
+      engine: input.engine
+    })
+  }
+
+  // TASK-1307 — qué keywords/URLs se pueden elegir para comparar.
+  async getSeoPerformanceCatalog(input: { organizationId?: string; mode?: string; windowDays?: number; limit?: number }) {
+    return this.request('/api/platform/ecosystem/growth/seo/performance-catalog', {
+      organizationId: input.organizationId,
+      mode: input.mode,
+      windowDays: input.windowDays,
+      limit: input.limit
+    })
+  }
+
   // TASK-1306 — KPIs norte del cockpit Overview (GSC medido, agregado del período).
   async getSeoOverviewKpis(input: { organizationId?: string; rangeDays?: number }) {
     return this.request('/api/platform/ecosystem/growth/seo/overview-kpis', {

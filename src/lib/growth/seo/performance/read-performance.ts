@@ -1,0 +1,423 @@
+import 'server-only'
+
+import { captureWithDomain } from '@/lib/observability/capture'
+import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+
+import type {
+  SeoPerformanceMetric,
+  SeoPerformanceMode,
+  SeoPerformancePoint,
+  SeoPerformanceResult,
+  SeoPerformanceSeries,
+  SeoPerformanceSource,
+  SeoPerformanceStanding,
+  SeoRankDevice
+} from '../contracts'
+import { isSeoModuleEnabled } from '../flags'
+import { readRankEvolution } from '../rank-evolution-reader'
+
+/**
+ * TASK-1307 — reader canónico de la pantalla ancla `/admin/growth/seo/performance`.
+ *
+ * Responde UNA pregunta ("¿cómo rinde este set de URLs/keywords y cómo evoluciona?") con
+ * UNA lectura: la serie del chart y las filas de la tabla salen del mismo llamado. Partirlo
+ * en dos readers habría duplicado la ventana, el ancla y la derivación del Δ — y abierto la
+ * puerta a que chart y tabla discrepen sobre el mismo dato.
+ *
+ * ⚠️ Fuente por (modo × métrica) — regla única, ver `contracts.ts`. Las series de
+ * DataForSEO y de Search Console NUNCA se promedian (contrato §5): una lectura completa
+ * pertenece a una sola fuente, y la UI la declara con ●/◑.
+ *
+ * ⚠️ Los huecos son de PRIMERA CLASE. Un día sin medición viaja como `value: null` hasta el
+ * chart, que lo dibuja como hueco. Rellenarlo con 0 sería una mentira grave acá: la
+ * posición 0 no existe, y un 0 de clics dice "apareciste y nadie hizo clic" cuando la
+ * verdad es "no se midió".
+ *
+ * Consumer-agnóstico (Full API Parity): lo consumen la UI, el lane ecosystem y la MCP tool
+ * `get_seo_performance` — sin lógica duplicada por consumer.
+ */
+
+const DEFAULT_RANGE_DAYS = 90
+const MIN_RANGE_DAYS = 7
+const MAX_RANGE_DAYS = 365
+
+/**
+ * Techo de ítems por lectura. NO es el límite de legibilidad de la UI (8 series): es un
+ * guard de recurso del reader, que también sirve a Nexa y MCP. La UI aplica el suyo.
+ */
+const MAX_ITEMS = 25
+
+/** Días hacia atrás que definen la referencia del Δ que la tabla promete ("Δ 30 días"). */
+const DELTA_LOOKBACK_DAYS = 30
+
+/** Bajo esta cobertura la serie se declara rala y la UI muestra el banner honesto. */
+const SPARSE_COVERAGE_RATIO = 0.5
+
+/**
+ * Columna de `seo_gsc_daily` que representa el eje. NO es un parámetro SQL (es un
+ * identificador) — por eso sale de un mapa cerrado sobre el union `SeoPerformanceMode`,
+ * nunca de una cadena del request.
+ */
+const GSC_COLUMN_BY_MODE: Record<SeoPerformanceMode, 'query' | 'page'> = {
+  keyword: 'query',
+  url: 'page'
+}
+
+export interface ReadSeoPerformanceOptions {
+  mode?: SeoPerformanceMode
+  /** El set elegido. Vacío ⇒ `no_items` (estado inicial legítimo, no un error). */
+  items: string[]
+  metric?: SeoPerformanceMetric
+  rangeDays?: number
+  device?: SeoRankDevice
+  engine?: string
+}
+
+/**
+ * La fuente de una lectura, derivada de (modo × métrica). Pura y exportada: es la regla de
+ * honestidad del módulo y tiene que poder probarse sin base de datos.
+ */
+export const resolveSeoPerformanceSource = (
+  mode: SeoPerformanceMode,
+  metric: SeoPerformanceMetric
+): SeoPerformanceSource =>
+  mode === 'keyword' && metric === 'position' ? 'dataforseo_estimated' : 'gsc_measured'
+
+interface MeasuredPoint {
+  date: string
+  value: number
+}
+
+/**
+ * Punto de referencia para el Δ: el medido MÁS CERCANO a `lookbackDays` antes del último.
+ *
+ * Tomar simplemente el primero de la ventana compararía contra 90 días cuando el copy
+ * promete 30. Puro y exportado para test.
+ */
+export const resolveDeltaReference = (measured: MeasuredPoint[], lookbackDays: number): MeasuredPoint | null => {
+  if (measured.length < 2) {
+    return null
+  }
+
+  const latestTime = new Date(measured[measured.length - 1].date).getTime()
+
+  const gapFromTarget = (point: MeasuredPoint) =>
+    Math.abs((latestTime - new Date(point.date).getTime()) / (1000 * 60 * 60 * 24) - lookbackDays)
+
+  return measured
+    .slice(0, -1)
+    .reduce<MeasuredPoint | null>(
+      (best, candidate) => (best === null || gapFromTarget(candidate) < gapFromTarget(best) ? candidate : best),
+      null
+    )
+}
+
+const toNumber = (value: string | number | null): number => {
+  if (value === null) return 0
+  const parsed = typeof value === 'number' ? value : Number.parseFloat(value)
+
+  return Number.isFinite(parsed) ? parsed : 0
+}
+
+const toNullableNumber = (value: string | number | null): number | null => {
+  if (value === null) return null
+  const parsed = typeof value === 'number' ? value : Number.parseFloat(value)
+
+  return Number.isFinite(parsed) ? parsed : null
+}
+
+const shiftIsoDate = (isoDate: string, deltaDays: number): string => {
+  const [year, month, day] = isoDate.split('-').map(Number)
+  const date = new Date(Date.UTC(year, month - 1, day))
+
+  date.setUTCDate(date.getUTCDate() + deltaDays)
+
+  return date.toISOString().slice(0, 10)
+}
+
+interface GscDailyRow extends Record<string, unknown> {
+  item: string
+  date: string
+  clicks: string | number | null
+  impressions: string | number | null
+  weighted_position: string | number | null
+}
+
+/**
+ * Serie diaria por ítem desde Search Console.
+ *
+ * ⚠️ La posición se pondera POR IMPRESIONES (`SUM(position*impressions)/SUM(impressions)`),
+ * nunca con un `AVG(position)` plano: GSC ya entrega su `position` ponderada dentro del
+ * período, así que promediar filas planas le daría el mismo peso a una de 2 impresiones
+ * que a una de 500. El error se ve razonable en pantalla, que es lo que lo hace peligroso.
+ *
+ * ⚠️ `capture_date` es DATE: la ventana se recorta con intervalos explícitos, nunca con
+ * `EXTRACT(EPOCH FROM (date - date))`, que revienta en runtime (invariante SQL date-math).
+ */
+const readGscDaily = async (input: {
+  organizationId: string
+  mode: SeoPerformanceMode
+  items: string[]
+  anchor: string
+  rangeDays: number
+}): Promise<GscDailyRow[]> => {
+  const column = GSC_COLUMN_BY_MODE[input.mode]
+
+  return runGreenhousePostgresQuery<GscDailyRow>(
+    `SELECT ${column} AS item,
+            capture_date::text AS date,
+            COALESCE(SUM(clicks), 0)::int AS clicks,
+            COALESCE(SUM(impressions), 0)::bigint AS impressions,
+            CASE WHEN COALESCE(SUM(impressions), 0) > 0
+                 THEN SUM(position * impressions) / SUM(impressions)
+                 ELSE NULL
+            END AS weighted_position
+       FROM greenhouse_growth.seo_gsc_daily
+      WHERE organization_id = $1
+        AND ${column} = ANY($2)
+        AND capture_date > $3::date - ($4::int * INTERVAL '1 day')
+        AND capture_date <= $3::date
+      GROUP BY ${column}, capture_date
+      ORDER BY ${column}, capture_date`,
+    [input.organizationId, input.items, input.anchor, input.rangeDays]
+  )
+}
+
+/** Serie de un ítem, ya ordenada, agrupada desde las filas planas. */
+type DailyByItem = Map<string, Array<{ date: string; clicks: number; impressions: number; position: number | null }>>
+
+const groupGscRows = (rows: GscDailyRow[]): DailyByItem => {
+  const byItem: DailyByItem = new Map()
+
+  for (const row of rows) {
+    const impressions = toNumber(row.impressions)
+
+    // ⚠️ Un día con 0 impresiones para un query/page NO es una medición de cero: Search
+    // Console sencillamente no emite fila cuando el ítem no apareció. Si llega una, es un
+    // artefacto — y dejarla pintaría un punto plano en 0 donde la verdad es un HUECO.
+    // Distinto del agregado de la organización (`read-overview-kpis`), donde 0 clics en el
+    // día sí es un hecho medible del sitio completo.
+    if (impressions <= 0) {
+      continue
+    }
+
+    const bucket = byItem.get(row.item) ?? []
+
+    bucket.push({
+      date: row.date,
+      clicks: toNumber(row.clicks),
+      impressions,
+      position: toNullableNumber(row.weighted_position)
+    })
+    byItem.set(row.item, bucket)
+  }
+
+  return byItem
+}
+
+const buildStanding = (
+  item: string,
+  positionPoints: SeoPerformancePoint[],
+  volume: { clicks: number; impressions: number }
+): SeoPerformanceStanding => {
+  const measured = positionPoints
+    .filter((point): point is { date: string; value: number } => point.value !== null)
+    .map(point => ({ date: point.date, value: point.value }))
+
+  const latest = measured.length > 0 ? measured[measured.length - 1] : null
+  const reference = resolveDeltaReference(measured, DELTA_LOOKBACK_DAYS)
+
+  return {
+    item,
+    position: latest?.value ?? null,
+    // `actual − referencia`: negativo = la posición bajó de número = MEJORÓ.
+    positionDelta30d: latest && reference ? latest.value - reference.value : null,
+    clicks: volume.clicks,
+    impressions: volume.impressions,
+    // Sin impresiones no hay CTR que reportar: `null` (→ "Pendiente"), NUNCA 0%. Un 0% dice
+    // "apareciste y nadie hizo clic"; la verdad es "no apareciste".
+    ctr: volume.impressions > 0 ? volume.clicks / volume.impressions : null,
+    trend: positionPoints.map(point => point.value)
+  }
+}
+
+const markSparse = (points: SeoPerformancePoint[], rangeDays: number): boolean =>
+  points.filter(point => point.value !== null).length < Math.ceil(rangeDays * SPARSE_COVERAGE_RATIO)
+
+export const readSeoPerformance = async (
+  organizationId: string,
+  options: ReadSeoPerformanceOptions
+): Promise<SeoPerformanceResult> => {
+  if (!isSeoModuleEnabled()) {
+    return { ok: false, errorCode: 'disabled', status: null }
+  }
+
+  const mode: SeoPerformanceMode = options.mode ?? 'keyword'
+  const metric: SeoPerformanceMetric = options.metric ?? 'position'
+  const device: SeoRankDevice = options.device ?? 'desktop'
+  const rangeDays = Math.min(MAX_RANGE_DAYS, Math.max(MIN_RANGE_DAYS, Math.floor(options.rangeDays ?? DEFAULT_RANGE_DAYS)))
+
+  const items = [...new Set(options.items.map(item => item.trim()).filter(Boolean))].slice(0, MAX_ITEMS)
+
+  if (items.length === 0) {
+    // "Todavía no elegiste nada" es un estado legítimo del flujo, no una falla: la UI abre
+    // en él y pide elegir. Devolver `no_data` lo confundiría con "elegiste y no hay".
+    return { ok: false, errorCode: 'no_items', status: null }
+  }
+
+  const source = resolveSeoPerformanceSource(mode, metric)
+
+  try {
+    // Ancla en el último día MATERIALIZADO, no en CURRENT_DATE: la captura corre con lag,
+    // así que anclar en "hoy" terminaría la ventana en días vacíos y haría ver una caída
+    // de tráfico que no ocurrió.
+    const anchorRows = await runGreenhousePostgresQuery<{ anchor: string | null }>(
+      `SELECT MAX(capture_date)::text AS anchor
+         FROM greenhouse_growth.seo_gsc_daily
+        WHERE organization_id = $1`,
+      [organizationId]
+    )
+
+    const anchor = anchorRows[0]?.anchor ?? null
+
+    // Sin ningún día materializado no hay verdad medida que servir. `not_connected` lleva
+    // al operador a la acción correcta (conectar / esperar la captura), a diferencia de un
+    // `no_data` que sugeriría que el set elegido es el problema.
+    if (!anchor) {
+      return { ok: false, errorCode: 'not_connected', status: null }
+    }
+
+    const seoTargetId =
+      source === 'dataforseo_estimated'
+        ? (
+            await runGreenhousePostgresQuery<{ seo_target_id: string }>(
+              `SELECT seo_target_id
+                 FROM greenhouse_growth.seo_targets
+                WHERE organization_id = $1
+                  AND status = 'active'
+                ORDER BY created_at DESC
+                LIMIT 1`,
+              [organizationId]
+            )
+          )[0]?.seo_target_id ?? null
+        : null
+
+    // El volumen (clics/impresiones/CTR) SIEMPRE sale de Search Console: la tabla lo
+    // muestra en las dos modalidades, porque los snapshots de rank no lo tienen.
+    const [gscRows, rankEvolution] = await Promise.all([
+      readGscDaily({ organizationId, mode, items, anchor, rangeDays }),
+      source === 'dataforseo_estimated' && seoTargetId
+        ? readRankEvolution(seoTargetId, { keywords: items, rangeDays, device, engine: options.engine })
+        : null
+    ])
+
+    const dailyByItem = groupGscRows(gscRows)
+
+    // La serie del CHART: puntos de la métrica pedida, en la fuente que le corresponde.
+    const series: SeoPerformanceSeries[] = []
+    // La serie de POSICIÓN por ítem, que alimenta la columna Pos. actual, el Δ30d y el
+    // sparkline — independiente de qué métrica esté graficando el chart.
+    const positionByItem = new Map<string, SeoPerformancePoint[]>()
+
+    if (rankEvolution?.ok) {
+      for (const serie of rankEvolution.series) {
+        positionByItem.set(
+          serie.keyword,
+          serie.points.map(point => ({ date: point.date, value: point.position }))
+        )
+      }
+    }
+
+    for (const item of items) {
+      const daily = dailyByItem.get(item) ?? []
+
+      if (source === 'gsc_measured') {
+        const points: SeoPerformancePoint[] = daily.map(day => ({
+          date: day.date,
+          value:
+            metric === 'position'
+              ? day.position
+              : metric === 'clicks'
+                ? day.clicks
+                : metric === 'impressions'
+                  ? day.impressions
+                  : // CTR diario: la razón del día. `null` sin impresiones (≠ 0%).
+                    day.impressions > 0
+                    ? day.clicks / day.impressions
+                    : null
+        }))
+
+        if (points.length > 0) {
+          series.push({ item, points, sparse: markSparse(points, rangeDays) })
+        }
+
+        // En modo URL la posición del standing también es la medida de GSC: DataForSEO no
+        // tiene concepto de "posición de una página".
+        if (!positionByItem.has(item)) {
+          positionByItem.set(
+            item,
+            daily.map(day => ({ date: day.date, value: day.position }))
+          )
+        }
+      } else {
+        const points = positionByItem.get(item) ?? []
+
+        if (points.length > 0) {
+          series.push({ item, points, sparse: markSparse(points, rangeDays) })
+        }
+      }
+    }
+
+    const standings = items
+      .map(item => {
+        const daily = dailyByItem.get(item) ?? []
+
+        return buildStanding(item, positionByItem.get(item) ?? [], {
+          clicks: daily.reduce((total, day) => total + day.clicks, 0),
+          impressions: daily.reduce((total, day) => total + day.impressions, 0)
+        })
+      })
+      // Sin ninguna señal (ni posición ni volumen) la fila no aporta: el ítem se reporta en
+      // `itemsWithoutData` en vez de ocupar una fila de ceros que parecería una medición.
+      .filter(standing => standing.position !== null || standing.impressions > 0 || standing.clicks > 0)
+
+    const withData = new Set(series.map(serie => serie.item))
+
+    for (const standing of standings) {
+      withData.add(standing.item)
+    }
+
+    const itemsWithoutData = items.filter(item => !withData.has(item))
+
+    if (series.length === 0 && standings.length === 0) {
+      return { ok: false, errorCode: 'no_data', status: null }
+    }
+
+    // El rango se reporta desde la fuente que alimenta el chart: decir "90 días de GSC"
+    // cuando el chart pinta la serie de rank sería describir otra ventana.
+    const range = rankEvolution?.ok
+      ? rankEvolution.range
+      : { from: shiftIsoDate(anchor, -(rangeDays - 1)), to: anchor, days: rangeDays }
+
+    return {
+      ok: true,
+      organizationId,
+      seoTargetId,
+      mode,
+      metric,
+      device,
+      range,
+      source,
+      series,
+      standings,
+      itemsWithoutData
+    }
+  } catch (error) {
+    captureWithDomain(error, 'growth', {
+      tags: { source: 'seo_performance_reader' },
+      extra: { organizationId, mode, metric, rangeDays, itemCount: items.length }
+    })
+
+    return { ok: false, errorCode: 'query_failed', status: null }
+  }
+}

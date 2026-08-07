@@ -308,6 +308,45 @@ export const createGreenhouseMcpServer = (
     async args => handlers.getSeoRankEvolution(args)
   )
 
+  // TASK-1307 — rendimiento en el tiempo de un SET elegido (la pantalla ancla, por MCP).
+  server.registerTool(
+    'get_seo_performance',
+    {
+      title: 'Get SEO Performance Over Time',
+      description:
+        'Performance over time of a CHOSEN SET of keywords or URLs for an organization: the daily series for the chart plus the standings for the table (current position, 30-day position delta, clicks, impressions, CTR) in a single read. Pass items as the exact keywords (mode=keyword) or page URLs (mode=url) to compare; use get_seo_performance_catalog to discover valid items. SOURCE RULE (never mixed, never averaged): mode=keyword with metric=position is served from DataForSEO (exact market position, "estimated"); every other combination is served from Google Search Console ("measured"); the resolved source is returned in data.source and MUST be stated when reporting numbers. POSITION IS INVERTED: a lower number is better, so a NEGATIVE positionDelta30d is an IMPROVEMENT (8 to 3 is -5). A point with value=null means no measurement that day — report it as a gap, NEVER as zero (position zero does not exist and zero clicks would claim "you appeared and nobody clicked"). ctr=null means there were no impressions, which is "not measured", not 0%. positionDelta30d=null means there is nothing to compare against — never invent a change. itemsWithoutData lists requested items with no data at all in the window: name them instead of silently dropping them. When data.ok is false, report the errorCode (disabled, not_connected, no_items, no_data, query_failed) honestly.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        mode: z.enum(['keyword', 'url']).optional(),
+        items: z.array(z.string().trim().min(1)).min(1).max(25),
+        metric: z.enum(['position', 'clicks', 'impressions', 'ctr']).optional(),
+        rangeDays: z.number().int().positive().max(365).optional(),
+        device: z.enum(['desktop', 'mobile', 'tablet']).optional(),
+        engine: z.string().trim().min(1).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getSeoPerformance(args)
+  )
+
+  // TASK-1307 — catálogo de ítems elegibles (qué se le puede pedir a get_seo_performance).
+  server.registerTool(
+    'get_seo_performance_catalog',
+    {
+      title: 'Get SEO Performance Catalog',
+      description:
+        'List the keywords (mode=keyword) or page URLs (mode=url) that can be compared with get_seo_performance for an organization, ordered by measured impressions. In keyword mode the list is the UNION of two universes: keywords with measured Search Console volume AND keywords tracked by rank capture. tracked=true means the keyword has an exact DataForSEO position series; impressions=0 on a tracked keyword means "no impressions recorded yet", NOT a measurement of zero. Use this before get_seo_performance instead of guessing item strings — items must match exactly. When data.ok is false, report the errorCode (disabled, no_data, query_failed) honestly.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        mode: z.enum(['keyword', 'url']).optional(),
+        windowDays: z.number().int().positive().max(365).optional(),
+        limit: z.number().int().positive().max(500).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getSeoPerformanceCatalog(args)
+  )
+
   // TASK-1306 — KPIs norte del cockpit Overview (la foto medida del período).
   server.registerTool(
     'get_seo_overview_kpis',
