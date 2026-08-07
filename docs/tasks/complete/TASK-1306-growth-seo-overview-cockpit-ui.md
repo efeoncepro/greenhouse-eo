@@ -466,6 +466,12 @@ Slice 1 → Slice 2 → Slice 3 → Slice 4. No conectar KPIs/charts antes de te
 ### Verificación ejecutada
 
 - **Runtime real (Cloud SQL dev, Grupo Berel):** viewCode activo + 2 grants · KPIs 2.596 clics / 136.146 impresiones / posición ponderada 5.78 / CTR 1.91% · `previous: null` con 5 días de serie (sin comparación inventada) · salud 95.4 (0 críticos · 138 avisos · 381 menores) · cruce AEO 47 keywords en `riesgo` · movers `no_data` honesto.
+- **MCP tool ejercitada contra staging (2026-08-07), no sólo cableada:**
+  `get_seo_overview_kpis` → `200` con los MISMOS números que la UI (2.596 clics, 136.146
+  impresiones, posición ponderada 5.783, `previous: null`, 5 puntos) — la prueba real de
+  parity. Anti-oracle `404` para org sin módulo, `401` sin token, `rangeDays` clampeado
+  server-side. El lane NO se puede probar en localhost (`ENOENT` de OpenTelemetry en
+  `node_modules`, falla igual para endpoints sanos en prod).
 - **Gates:** `pnpm test` **10.281 passed / 0 failed** · `pnpm build` producción **exit 0** (`/admin/growth/seo` dinámica) · `pnpm local:check` verde · `route-reachability-gate` 0 huérfanos.
 - **GVC:** scenarios `growth-seo-overview` (1440) + `growth-seo-overview-mobile` (390) con `qualityProfile: standard`, ambos `OK capture`, **pageErrors 0**. Frames mirados en loop. Los scenarios **no usan `fullPage`**: Playwright redimensiona el viewport al capturarlo y los charts que miden su contenedor quedan en 0, produciendo evidencia con cards vacías que parecen un bug inexistente.
 

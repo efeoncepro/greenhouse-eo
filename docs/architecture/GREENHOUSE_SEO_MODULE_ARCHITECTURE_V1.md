@@ -9,6 +9,23 @@ Documento maestro del módulo SEO. Contrato técnico + de negocio del que deriva
 
 ---
 
+## Delta 2026-08-07 — `get_seo_overview_kpis` verificada end-to-end (TASK-1306)
+
+La tool y su lane (`/api/platform/ecosystem/growth/seo/overview-kpis`) quedaron **ejercitados
+contra staging con datos reales**, no sólo cableados y cubiertos por tests:
+
+- Berel → `200` con 2.596 clics, 136.146 impresiones, posición ponderada 5.783, CTR 1.91%,
+  `previous: null` y 5 puntos de serie. **Coincide exactamente con lo que muestra la UI**,
+  que es la prueba de parity: un solo cálculo, dos consumidores.
+- Org sin `module_assignment` → `404 not_found` (anti-oracle: no revela si la org existe).
+- Sin token → `401`. `rangeDays=99999` → clampeado a `365` server-side.
+
+⚠️ **El lane ecosystem NO se puede probar en `localhost`**: devuelve `500` por un `ENOENT` de
+`@opentelemetry/instrumentation` en `node_modules`, y falla igual para endpoints sanos en
+producción (verificado contra `rank-evolution`). Un 500 local no dice nada del endpoint —
+la verificación válida es contra el deployment de staging. Receta con `curl`:
+`docs/manual-de-uso/plataforma/operar-provider-greenhouse-seo-mcp.md`.
+
 ## 1. Tesis y bounded context
 
 El **AEO Grader** (`growth.ai_visibility`) responde *"¿los motores generativos citan a esta marca?"* — es **episódico** (un `grader_run` = veredicto puntual). El **SEO Module** (`growth.seo`) responde *"¿dónde rankea este dominio en búsqueda orgánica clásica, cómo está técnicamente, y quién lo enlaza?"* — es **serie temporal continua** (el valor es la tendencia entre snapshots diarios/semanales).
