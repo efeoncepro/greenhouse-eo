@@ -52,7 +52,8 @@ componentes MUI/Vuexy a Globe ni conviertas el Lab en una dependencia de runtime
 | Tablas operativas + densidad + TanStack | [TABLES.md](./TABLES.md) |
 | Motion (CSS Tier 1 / framer-motion / GSAP Motion Primitive) | [MOTION.md](./MOTION.md) |
 | i18n (next-intl, locales, RTL-ready) | [I18N.md](./I18N.md) |
-| Error handling & feedback, breadcrumbs, progressive disclosure | [PATTERNS.md](./PATTERNS.md) |
+| Error handling & feedback, breadcrumbs, progressive disclosure, tabs que navegan a rutas hermanas (Route Tabs) | [PATTERNS.md](./PATTERNS.md) |
+| Pasar un color del theme a un chart ApexCharts sin que reviente bajo `cssVariables` (`resolveApexColor`) | [PRIMITIVES.md § ApexCharts Runtime Wrapper](./PRIMITIVES.md#apexcharts-runtime-wrapper) |
 | Implementar mocks de Claude Design (.dc.html) — tabla mock→tokens + checklist | [CLAUDE_DESIGN_TO_GREENHOUSE_BRIDGE.md](./CLAUDE_DESIGN_TO_GREENHOUSE_BRIDGE.md) |
 | Gobernanza de vistas (route groups + authorizedViews + entitlements) | [GOVERNANCE.md](./GOVERNANCE.md) |
 | Historial cronológico (todas las deltas datadas + version log) | [HISTORIAL.md](./HISTORIAL.md) |

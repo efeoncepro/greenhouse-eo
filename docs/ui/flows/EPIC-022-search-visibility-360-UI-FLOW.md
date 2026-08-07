@@ -22,7 +22,8 @@ El módulo SEO se apoya en **una sola fuente de configuración + serie temporal*
 
 | Reader (arch §7) | Qué proyecta | Superficie que lo consume | Task backend |
 |---|---|---|---|
-| `readRankSnapshotLatest(targetId)` | standings + WoW delta | Overview operador (S1) | 1303 |
+| ~~`readRankSnapshotLatest(targetId)`~~ **NO EXISTE** (corrección 2026-08-07, TASK-1306) | ~~standings + WoW delta~~ — los movers WoW de S1 se **derivan** de `readRankEvolution` (último punto medido vs el más cercano a 7 días atrás, umbral ≥5 posiciones) | Overview operador (S1) | — |
+| `listSeoEligibleSpaces()` · `readSeoOverviewConnection(orgId)` · `readSeoOverviewKpis(orgId, rangeDays)` · `readSeoOverviewSidebar(orgId)` | Space picker · estado de la fuente medida (`connected`/`not_connected`/`no_snapshots`) · KPIs norte + serie · sidebar salud/movers/cruce (degradación **por región**) | Overview operador (S1) | 1306 |
 | `readRankEvolution(targetId, {keywords?, range, engine, device})` | series temporales por URL/keyword (Y=posición) | ★ Rank performance (S2), Cliente dashboard (S5) | 1303 |
 | `readKeywordOpportunities(targetId)` | join SEO↔GSC (striking-distance 8–20 × volumen/dificultad) | Keyword opportunities (S3) | 1302 |
 | `readSiteAuditReport(targetId, auditRunId?)` | health + findings por severidad | Site audit (S4) | 1304 |
@@ -55,7 +56,7 @@ La superficie que ve una persona **se deriva de su acceso per-org vía `module_a
 
 | # | Superficie | Ruta / canal | Route group | Actor | Estado | Task |
 |---|---|---|---|---|---|---|
-| S1 | **SEO Overview** (cockpit denso multi-Space) | `/admin/growth/seo` | internal | operador | a crear | 1306 |
+| S1 | **SEO Overview** (cockpit denso multi-Space) | `/admin/growth/seo` | internal | operador | **implementada** (2026-08-06, code complete en `develop`) | 1306 |
 | S2 | **★ Rank & URL performance over time** (pantalla ancla) | `/admin/growth/seo/performance` | internal | operador | a crear | 1307 |
 | S3 | **Keyword opportunities** | `/admin/growth/seo/keywords` | internal | operador | a crear | 1308 |
 | S4 | **Site audit** (+ drill `/[issueGroup]`) | `/admin/growth/seo/audit` | internal | operador | a crear | 1309 |
@@ -66,6 +67,13 @@ La superficie que ve una persona **se deriva de su acceso per-org vía `module_a
 | X2 | **Report Artifact AEO** (mismo `ReportArtifactModel`, mirror) | web/print/pdf | — | ambos | hecho | 1252/1273 |
 
 **Sección local "Search Visibility" (arch §10.1, info-architecture):** `Growth` sigue siendo dominio raíz. Dentro, la sección local **"Search Visibility"** agrupa dos motores hermanos: **SEO** (nuevo) + **AEO Grader** (existente, intacto). Toda `page.tsx` nueva → `route-reachability-manifest.ts` (TASK-982) + key en `GH_INTERNAL_NAV` (`greenhouse-nomenclature.ts`, SoT que consume `VerticalMenu` — lección TASK-1247, la key SOLO en navigation-copy.ts revienta 500 en todo el dashboard).
+
+**S1 es el dueño del shell — vigente desde 2026-08-06 (TASK-1306).** El conmutador de la sección vive en `src/views/greenhouse/admin/growth/seo/overview/SeoSearchVisibilityTabs.tsx` y ya declara las 4 tabs. **S2/S3/S4 no construyen navegación local: la heredan.** Contrato para las tres:
+
+- **Activación = quitar `available: false`** de la entrada correspondiente en `TABS`. Un cambio de una línea, no un refactor. Mientras tanto el tab se ve deshabilitado con el motivo visible (`aria-disabled` + `title`), porque un tab que navega a un 404 es peor que un tab apagado.
+- **Cada tab es una RUTA propia** navegada con `next/link` (no un `TabPanel` en memoria): el "panel" es la página que monta Next. Por eso el deep-link, el back/forward y el enlace compartible funcionan sin código extra. El contenedor declara `role='navigation'` (no `tablist`) porque sus hijos son links, no controles de panel.
+- **Un solo viewCode para las 4 rutas** (`administracion.growth_seo`, ya sembrado) y **un solo ítem de menú** (`/admin/growth/seo`). S2/S3/S4 son child routes: **NO** siembran viewCode ni suman nav, pero **SÍ** van a `route-reachability-manifest.ts` con `parent: '/admin/growth/seo'` + `via: 'tab'` + `reason`.
+- **El `?space=` se propaga solo** entre tabs (`withSpace`), para no perder el contexto de Space al navegar. Ese query param es compartible pero no es autoridad: el server valida el assignment vigente y cae al primer Space elegible si no calza.
 
 ---
 

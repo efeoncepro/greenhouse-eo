@@ -207,6 +207,24 @@ Specimen vivo: `/design-system/nexa-chat`, `data-capture='nexa-conversation-bubb
 - Capture selector: `data-capture='nexa-answer-bubble-action-plan-specimen'`.
 - Evidencia aprobada: `.captures/2026-06-13T00-30-32_design-system-nexa-chat`.
 
+## MetricTrendCard — semántica del delta (TASK-1306)
+
+`MetricTrendCard` (`src/components/greenhouse/primitives/MetricTrendCard.tsx`) deriva su delta de los dos últimos puntos reales de la serie y lo pinta verde cuando sube. Eso es correcto para una métrica mensual donde el hero value **es** el último punto, y miente en dos casos que TASK-1306 encontró en producción. Ambos se cierran con props **opt-in**: sin pasarlas, el card queda byte-idéntico al legacy.
+
+**`deltaSemantics?: 'higher-is-better' | 'lower-is-better'`** (default `'higher-is-better'`)
+
+`'lower-is-better'` invierte **sólo el color y el texto accesible, nunca el signo ni la flecha**: un −1.2 se sigue mostrando como −1.2 con flecha hacia abajo, pero pintado en verde y anunciado por el lector de pantalla como "mejora". Falsear el signo para que "se vea positivo" sería mentir sobre el dato; lo que cambia es la **lectura** (bueno/malo), no el número. Casos: posición promedio de búsqueda (pasar de 8 a 3 es mejorar), latencia, churn, costo. El `aria-label` agrega explícitamente `(mejora)` / `(retrocede)` porque "baja 1.2" a secas suena a empeoramiento.
+
+**`deltaOverride?: number | null`**
+
+Reemplaza al delta derivado de la serie. Existe porque el delta por defecto **miente cuando el hero value es un AGREGADO del período**: el número grande resume N días y la flecha compararía sólo los dos últimos puntos, sugiriendo una caída del período que en realidad fue de un día. El caller pasa el delta que corresponde a la ventana que el hero realmente representa.
+
+`null` **explícito** ≠ `undefined`: significa "hay que comparar pero no hay contra qué" (primer período con datos) → no se dibuja delta, en vez de inventar un `+100%` contra una ventana vacía. Por eso el resolver distingue los dos valores en vez de tratar ambos como "no me pasaron nada".
+
+**Formato `integer`** ahora pasa por `formatInteger` (helper canónico, lint `no-raw-locale-formatting`): a tamaño hero, `136146` es ilegible de un vistazo y `136.146` no.
+
+Reuso previsto: TASK-1307 hereda ambas props para el Δ30d de posición de búsqueda (métrica invertida + hero agregado en la misma card).
+
 ## ApexCharts Runtime Wrapper
 
 `AppReactApexCharts` (`src/libs/styles/AppReactApexCharts.tsx`) es el wrapper canónico para charts Apex legacy/productivos. El wrapper owns la única frontera `next/dynamic(..., { ssr:false })` hacia `react-apexcharts`; los consumers lo importan directo.
@@ -216,11 +234,26 @@ Reglas:
 - NO envolver `AppReactApexCharts` con otro `dynamic(() => import('@/libs/styles/AppReactApexCharts'))`.
 - NO importar `@/libs/ApexCharts`; ese indirection legacy fue retirado.
 - Si un chart necesita SSR-off, se resuelve en el wrapper común, no en cada consumer.
+- **NUNCA** pasar un color del theme crudo a las opciones de Apex — ver la sección siguiente.
 - Guardrail: `greenhouse/no-dynamic-app-react-apexcharts` (`error`).
 
 Motivo: el doble dynamic produjo manifests/chunks huérfanos en Turbopack dev (`react-apexcharts_min_*.js` 404), dejando Fast Refresh en rebuild permanente y el portal local en `Compiling...` (ISSUE-085).
 
 Diagnóstico rápido para casos similares: si local queda en `Compiling...`, revisar CPU/proceso, comparar `curl -I` vs browser real y usar Playwright console/network filtrando `_next/static/chunks`, HMR y 404. Si aparece un chunk huérfano, comparar `.next/dev/**/react-loadable-manifest.json` con `.next/dev/static/chunks` y buscar fronteras `dynamic()`/imports nested en wrappers compartidos. `pnpm clean` solo confirma; el fix vive en el owner canónico del wrapper.
+
+### Color del theme en ApexCharts → `resolveApexColor` (TASK-1306)
+
+**Regla dura: todo color que un chart Apex tome del theme pasa por `resolveApexColor(valor, fallbackHex)`** (`src/libs/styles/resolveApexColor.ts`). Aplica a `options.colors`, `grid.borderColor`, `xaxis/yaxis.labels.style.colors`, `markers`, `fill.gradient`, tooltips — cualquier campo de color.
+
+**Por qué.** Greenhouse corre MUI con `cssVariables: true` (`src/components/theme/index.tsx`), así que `theme.palette.primary.main` **no devuelve `#0375DB`** sino `var(--mui-palette-primary-main)`, y en algunos casos `rgba(var(--mui-palette-x-channel) / 0.87)` con la var **anidada**. Apex parsea colores con su propia clase `Color` (regex sobre hex/rgb) y con una CSS var revienta con `TypeError: Cannot read properties of null (reading '1')`.
+
+**Por qué es peligroso.** El síntoma es una excepción de runtime **por chart** que **no se ve en pantalla**: el gráfico simplemente no termina de pintar, sin banner ni error visible. En TASK-1306 eran **8 `pageerror` por corrida**, detectados sólo por el gate `runtime` del GVC (`gvc-contract-gates`, collectors de `console.error`/`pageerror`) — ni el build, ni el lint, ni una mirada al screenshot los atrapan.
+
+**Por qué el helper delega en el navegador y no parsea.** MUI con `cssVariables` no emite un solo formato, y un parser propio se rompería con la próxima variante que MUI agregue. `resolveApexColor` pinta el color en un `<span>` oculto y lee su `color` computado: el navegador siempre devuelve `rgb(...)`/`rgba(...)`, que es exactamente lo que Apex sabe parsear. Tiene cache (`getComputedStyle` fuerza reflow y los charts piden el mismo color muchas veces) y devuelve el fallback HEX en SSR — el wrapper es `dynamic(ssr:false)`, así que el chart real siempre se pinta ya en cliente.
+
+**Recharts NO lo sufre**: pinta SVG y el navegador resuelve la var por él. Apex sí, porque hace matemática de color (gradientes, sombras, opacidades) y necesita el valor real.
+
+**Alcance:** es un bug **latente compartido**, no de una surface. ~30 archivos del repo montan charts Apex tomando color del theme (`41` referencian `react-apexcharts`/`AppReactApexCharts`); cualquiera de ellos puede estar tirando `pageerror` silenciosos hoy. Al tocar uno de esos archivos, migrarlo. Primer consumer del helper: `SeoVisibilityEvolutionChart` (`src/views/greenhouse/admin/growth/seo/overview/`).
 
 ## Surface system — recipes + composed primitives (TASK-1453)
 

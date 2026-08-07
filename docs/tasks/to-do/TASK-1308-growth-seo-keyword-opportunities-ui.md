@@ -1,5 +1,53 @@
 # TASK-1308 — Growth SEO: Keyword Opportunities UI
 
+## Delta 2026-08-07 — TASK-1306 cerró: la Open Question #1 queda resuelta
+
+**Tu Open Question #1 ("¿el Space picker / viewCode de sección SEO lo establece TASK-1306 o
+lo crea esta task?") está resuelta: lo estableció 1306.** Reusas, no creas.
+
+**Servido — no lo vuelvas a construir:**
+
+1. **Shell y conmutador ya existen.** `SeoSearchVisibilityTabs`
+   (`src/views/greenhouse/admin/growth/seo/overview/`) declara las 4 tabs y propaga el
+   `?space=` entre ellas. **Activar la tab "Keywords" es quitar `available: false` de su
+   entrada en `TABS`** — una línea. No construyas navegación local propia.
+2. **viewCode `administracion.growth_seo` sembrado** (migración `20260806223132770`) + en
+   `view-access-catalog.ts` + grants a `efeonce_admin`/`ai_tooling_admin` + ítem de menú
+   único (`/admin/growth/seo`). Donde tu spec dice "`[verificar]` el viewCode canónico del
+   SEO al implementar" (línea de `Dependencies & Impact`) y "registrar key nav **si
+   TASK-1306 no la dejó**" (Slice 1): **ya está, y la key nav ya está** — esta ruta es
+   **child del MISMO viewCode**, NO siembra uno nuevo y NO agrega ítem de menú. Lo único que
+   sí debes hacer es declararte en `route-reachability-manifest.ts` con
+   `parent: '/admin/growth/seo'`, `via: 'tab'` y `reason`.
+3. **Space picker resuelto server-side.** `listSeoEligibleSpaces()`
+   (`src/lib/growth/seo/overview/list-seo-spaces.ts`) es el reader canónico de los Spaces
+   elegibles: aplica el predicado de vigencia completo del assignment `seo_v1`
+   (`effective_to IS NULL AND status IN ('active','pilot')`) y NO exige `seo_target` creado.
+   Reusa ese reader; no escribas otra query de Spaces.
+4. **Guard de 3 puertas con forma canónica** en
+   `src/app/(dashboard)/admin/growth/seo/page.tsx` (viewCode + capability +
+   `module_assignment`, más `notFound()` con flag apagado y redirect si `client`, más el
+   criterio de que `?space=` es compartible pero **no** autoridad). Cópiala.
+
+**Lo que NO cambia — sigue siendo decisión de TASK-1307:**
+
+⚠️ **`TASK-1306` NO instaló ECharts.** Usó ApexCharts + Recharts, ya presentes. Tu spec
+asume ECharts para el scatter en varios puntos (`Primitive decision`, Slice 2, Design
+Decision Log, matriz de riesgo) declarándose "primer ECharts del repo": **eso sigue siendo
+cierto y sigue sin decidirse acá**. La decisión de librería del módulo es el **Slice 0 de
+TASK-1307**; si 1307 elige ApexCharts, tu scatter debe revalidar la elección antes de meter
+una segunda librería sólo para esta pantalla.
+
+**Si terminas en Apex, dos hallazgos de runtime de 1306:**
+
+- 🔴 **`resolveApexColor` (`src/libs/styles/`) es obligatorio** para cualquier chart Apex que
+  tome color del theme: con `cssVariables: true`, `theme.palette.*` devuelve
+  `var(--mui-palette-*)` y Apex lanza `Cannot read properties of null (reading '1')` — sin
+  pintar nada y **sin error visible** en pantalla.
+- **En el GVC, no uses `fullPage`** para esta ruta: Playwright redimensiona el viewport al
+  capturarlo y los charts que miden su contenedor quedan en 0, produciendo evidencia con
+  cards vacías que parecen un bug inexistente. Usa `clipSelector` sobre `data-capture`.
+
 ## Delta 2026-08-05
 
 - **Desbloqueada por TASK-1302 (complete):** `readKeywordOpportunities(seoTargetId, options?)` ya existe en `src/lib/growth/seo/keyword-opportunities-reader.ts` y retorna el contrato `{ ok } | { ok: false, errorCode, status }`. El wireframe la marcaba como "aún no existe en `src/lib/growth/seo/`" — ese supuesto quedó cerrado.

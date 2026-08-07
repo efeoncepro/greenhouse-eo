@@ -7,6 +7,14 @@
 
 ---
 
+## Delta 2026-08-06 — TASK-1306: color de Apex bajo `cssVariables`, delta semantics de `MetricTrendCard` y tabs que navegan
+
+El cockpit SEO Overview destapó tres hallazgos de plataforma, ninguno local a esa surface:
+
+1. **ApexCharts + `cssVariables: true` = bug latente compartido.** `theme.palette.*` devuelve `var(--mui-palette-*)` y el parser de color de Apex revienta (`Cannot read properties of null (reading '1')`): 8 `pageerror` por corrida, invisibles en pantalla y atrapados sólo por el gate `runtime` del GVC. Helper canónico `resolveApexColor` (delega la resolución al navegador, no parsea). ~30 archivos con el mismo riesgo. Contrato: [`PRIMITIVES.md` § Color del theme en ApexCharts](./PRIMITIVES.md#color-del-theme-en-apexcharts--resolveapexcolor-task-1306) + anti-pattern en [`STACK.md`](./STACK.md#anti-patterns).
+2. **`MetricTrendCard` gana `deltaSemantics` + `deltaOverride`** (opt-in, legacy byte-idéntico): métricas donde menos es mejor invierten sólo color y texto accesible —nunca el signo ni la flecha—, y un hero agregado del período deja de comparar los dos últimos puntos. `null` explícito = "no hay contra qué comparar" en vez de un `+100%` inventado. Contrato: [`PRIMITIVES.md` § MetricTrendCard](./PRIMITIVES.md#metrictrendcard--semántica-del-delta-task-1306).
+3. **Tabs que son links a rutas hermanas no son un `tablist`** (`role='navigation'`; nada de `<Tooltip><span><Tab/></span></Tooltip>`, que inyecta props de contexto de `Tabs` en el `<span>` del DOM y tira 4 errores de React). Contrato: [`PATTERNS.md` § Route Tabs Pattern](./PATTERNS.md#route-tabs-pattern--tabs-que-navegan-no-son-un-tablist-task-1306).
+
 ## Delta 2026-07-18 — Secondary Tidal Teal
 
 El rol `secondary` deja el lime/green y adopta Tidal Teal con ramp `100→900`, alias semánticos mode-aware y contraste AA. El runtime deriva desde `axisRamp.secondary`/`greenhouseSecondaryPalette`; consumers usan `theme.palette.secondary.*`. La decisión, alternativas, rollback y condición de reconciliación con AXIS Figma viven en `GREENHOUSE_SECONDARY_TEAL_COLOR_DECISION_V1.md`; evidencia durable en el scenario/baseline `design-system.colors` desktop/mobile.

@@ -187,6 +187,34 @@ import { GreenhouseBreadcrumbs } from '@/components/greenhouse/primitives'
   `design-system-breadcrumbs`.
 
 
+## Route Tabs Pattern — tabs que navegan NO son un `tablist` (TASK-1306)
+
+Cuando las "tabs" de una superficie son **links a rutas hermanas** (deep-link, back/forward del browser y URL compartible funcionando solos) y no un conmutador de paneles en memoria, el contrato ARIA correcto **no** es el de tabs.
+
+Runtime de referencia: `SeoSearchVisibilityTabs` (`src/views/greenhouse/admin/growth/seo/overview/`), conmutador de `/admin/growth/seo{,/performance,/keywords,/audit}` bajo un mismo viewCode.
+
+**Regla 1 — `role='navigation'` en el TabList.** Con el rol `tablist` por defecto, axe exige `aria-required-children` (cada hijo `role=tab`) y un `aria-controls` apuntando a un panel real. Ninguno de los dos se puede cumplir acá: **el "panel" es la página siguiente**, que Next monta después de navegar. Declarar navegación es lo honesto y elimina el finding sin trucos. El `TabContext` de `@mui/lab` se queda sólo para transportar cuál tab está activa (no hay `TabPanel` que conmutar) y cada `Tab` activo lleva `aria-current='page'`.
+
+```tsx
+<TabContext value={activeTab}>
+  <CustomTabList role='navigation' variant='scrollable' pill='true' aria-label={…}>
+    <Tab component={Link} href={…} aria-current={isActive ? 'page' : undefined} … />
+  </CustomTabList>
+</TabContext>
+```
+
+**Regla 2 — para un tab no disponible, `aria-disabled` + `title` nativo, NUNCA `<Tooltip><span><Tab/></span></Tooltip>`.** Envolver el `Tab` en un `<span>` rompe **dos** cosas a la vez:
+
+1. `Tabs` inyecta props de contexto (`fullWidth`, `indicator`, `selectionFollowsFocus`, `textColor`) en sus **hijos directos**. Con el wrapper, esas props aterrizan en el `<span>` del DOM → **4 errores de React en consola** por atributos desconocidos.
+2. Rompe el contrato ARIA del tablist (el hijo directo deja de ser el tab).
+
+Y aunque no rompiera nada: un control `disabled` no dispara hover, así que el tooltip con el motivo **nunca se vería**. El patrón canónico es `aria-disabled='true'` + `title` + `onClick` que previene + `opacity` bajada con `pointerEvents: 'auto'` para que el `title` sí aparezca.
+
+**Regla 3 — un tab que navega a un 404 es peor que un tab deshabilitado.** Las rutas hermanas todavía no construidas se declaran con un flag (`available: false`) y un hint que dice **por qué** no está; al aterrizar cada hermana se le quita el flag — un cambio de una línea, no un refactor del conmutador.
+
+**Cuándo NO usar este patrón:** si el contenido conmuta en memoria sin cambiar la URL, es un `tablist` de verdad y va con `TabPanel` + `aria-controls` reales.
+
+
 ## Public Anonymous Surface Shell Pattern
 
 Usar este patrón para superficies públicas sin sesión donde una persona externa

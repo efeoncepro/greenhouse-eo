@@ -49,7 +49,7 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1303` — [**complete 2026-08-06**, en producción] rank capture command + `readRankEvolution` + Cloud Scheduler + reactive BQ mirror. Release `fcee5ab9f7ce` (manifest released); scheduler `ops-seo-rank-capture` diario 05:00 CLT ACTIVO; serie día-1 de Berel con 31 keywords; señal `seo.rank.capture_lag` en Growth Health; 4.ª MCP tool `get_seo_rank_evolution` viva en el MCP interno de producción (federación al gateway = TASK-1653).
 - `TASK-1304` — [planificada] site audit (queue+poll OnPage) + backlink snapshot.
 - `TASK-1305` — [planificada] `readSeoAeoGap` derived read cross-módulo (report layer).
-- `TASK-1306` — [planificada, ui-ux] SEO Overview operador `/admin/growth/seo`.
+- `TASK-1306` — [**complete 2026-08-06**, ui-ux] SEO Overview operador `/admin/growth/seo` — **la primera superficie visible del módulo (nodo S1 del master UI flow)**. Guard de 3 puertas (viewCode `administracion.growth_seo` + capability `growth.seo.observation.read` + `module_assignment` per-org), sección local "Search Visibility" con el conmutador a las hermanas, 4 KPIs norte (posición con semántica invertida), curva de visibilidad en 2 charts apilados y sidebar salud/movers/cruce AEO que degrada por región. MCP tool `get_seo_overview_kpis` + lane `/api/platform/ecosystem/growth/seo/overview-kpis` en el mismo PR. **Code complete en `develop`; promoción a `main` pendiente** (mientras viva sólo en `develop`, `syncViewRegistry` de producción vuelve a apagar el viewCode recién sembrado).
 - `TASK-1307` — [planificada, ui-ux] ★ Rank & URL performance over time `/admin/growth/seo/performance`.
 - `TASK-1308` — [planificada, ui-ux] Keyword opportunities `/admin/growth/seo/keywords`.
 - `TASK-1309` — [planificada, ui-ux] Site audit `/admin/growth/seo/audit`.
@@ -265,3 +265,49 @@ producción**, en este orden y con verificación por capa:
 pasa a ser **disponibilidad real en `mcp.efeonce.org`**. El criterio sigue abierto sólo por la pata
 de UI/Nexa (`TASK-1310` y siguientes): el módulo no es UI-only, pero tampoco tiene aún su superficie
 visible. Pendiente operativo: conexión GSC per-org de `efeoncepro.com` (`TASK-1282`/`1283`).
+
+## Delta 2026-08-07 — el módulo deja de ser headless: nace la primera superficie (S1)
+
+`TASK-1306` quedó **complete** y con ella el módulo SEO tiene su **primera cara visible**:
+`/admin/growth/seo`, el nodo **S1** del master UI flow. Hasta ayer el epic era MCP-first
+puro (readers + lane ecosystem + gateway) y la pata "UI/Nexa" del exit criterion de parity
+seguía **completamente** abierta; hoy queda abierta **sólo por el cliente y el report
+artifact** (`TASK-1310`) y por las tres hermanas operador (`1307`/`1308`/`1309`).
+
+**Lo que cambia para las hermanas** (esto es lo importante del delta, porque les ahorra
+trabajo o les corrige un supuesto):
+
+1. **El shell ya existe y es compartido.** `SeoSearchVisibilityTabs`
+   (`src/views/greenhouse/admin/growth/seo/overview/`) es el conmutador de la sección local
+   "Search Visibility". Los tabs **navegan** (`next/link` a rutas hermanas), no conmutan
+   paneles en memoria; las tres pendientes están declaradas con `available: false` y un
+   `title` que dice por qué. **Activar una hermana es quitar esa línea, no refactorizar el
+   conmutador.**
+2. **El viewCode `administracion.growth_seo` es compartido por las 4 rutas.** Ya está
+   sembrado (migración `20260806223132770`), en `view-access-catalog.ts` y con grants a
+   `efeonce_admin` + `ai_tooling_admin`. `1307`/`1308`/`1309` son **child routes del MISMO
+   viewCode**: NO siembran uno nuevo, NO agregan ítem de menú (el único href es
+   `/admin/growth/seo` en `VerticalMenu`), pero **SÍ** deben declararse en
+   `route-reachability-manifest.ts` con `parent: '/admin/growth/seo'`, `via: 'tab'` y
+   `reason` — el gate de alcanzabilidad no perdona una `page.tsx` huérfana.
+3. **`readRankSnapshotLatest` NO EXISTE.** Lo citaban la arquitectura §7, el master UI flow
+   §1 y las specs de `1306`/`1307` como si fuera un reader entregado por `TASK-1303`. Esa
+   task sólo dejó `readRankEvolution`. Los movers WoW del sidebar de 1306 se **derivan** de
+   la serie de evolución. La referencia queda corregida en los docs; no propagarla.
+4. **La decisión ECharts vs ApexCharts SIGUE ABIERTA.** `TASK-1306` **no instaló ninguna
+   librería nueva** (usó ApexCharts + Recharts, ya presentes) y **no prejuzga** el Slice 0
+   de `TASK-1307`, que sigue siendo el dueño de esa decisión para el stack de alto impacto
+   del módulo.
+5. **Bug latente descubierto y ya mitigado:** con `cssVariables: true`, `theme.palette.*`
+   devuelve `var(--mui-palette-*)` y ApexCharts revienta con
+   `Cannot read properties of null (reading '1')` — sin pintar nada y sin error visible.
+   El helper `resolveApexColor` (`src/libs/styles/`) es obligatorio para cualquier chart
+   Apex que tome color del theme. Afecta a `1307`/`1308`/`1309` si usan Apex, y a los ~32
+   consumidores Apex del repo (candidato a task propia).
+
+**Rollout:** `code complete, promoción pendiente`. `GROWTH_SEO_ENABLED` ya está ON en
+Vercel Production (rollout de 1302/1645), así que el control de exposición real es el
+viewCode + el `module_assignment` per-org. ⚠️ Mientras 1306 viva sólo en `develop`,
+producción **vuelve a apagar el viewCode** en cada corrida de `syncViewRegistry` (desactiva
+todo viewCode ausente del catálogo TS del código **en ejecución**, y la base Cloud SQL es
+única y compartida por dev/staging/prod). Se estabiliza al promover a `main`.

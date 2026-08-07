@@ -711,7 +711,7 @@ Ese modelo permite:
 
 ### View Registry — el seed se AUTO-REVIERTE si el código no está desplegado (TASK-1306, desde 2026-08-06)
 
-`syncViewRegistry` (`src/lib/admin/view-access-store.ts`) reconcilia la tabla contra el catálogo TS: hace upsert de todo `VIEW_REGISTRY` con `active = TRUE` y **después** ejecuta
+`syncViewRegistryCatalog` (`src/lib/admin/view-access-store.ts`) reconcilia la tabla contra el catálogo TS: hace upsert de todo `VIEW_REGISTRY` con `active = TRUE` y **después** ejecuta
 
 ```sql
 UPDATE greenhouse_core.view_registry SET active = FALSE
@@ -730,7 +730,7 @@ O sea: **todo viewCode que no esté en el catálogo TS del código EN EJECUCIÓN
 - **SIEMPRE** que un viewCode aparezca `active = false` con `updated_by = 'system'` sin que nadie lo tocara a mano, sospechar de este reconciliador antes que de un fallo de la migración: el seed corrió bien y fue revertido después.
 - Mientras una task de UI con viewCode nuevo viva sólo en `develop`, su viewCode queda **inestable**: producción lo apagará cada vez que corra la sincronización. Se estabiliza al promover a `main`.
 
-**Caso fuente (TASK-1306):** el seed de `administracion.growth_seo` se aplicó 2026-08-07 02:44 y se verificó `active = true`; a las 06:12 un runtime con el catálogo viejo lo dejó en `active = false` (`updated_by = 'system'`). Detectado al auditar el rollout, no por un error.
+**Caso fuente (TASK-1306):** el seed de `administracion.growth_seo` se aplicó 2026-08-07 02:44 y se verificó `active = true`; a las 06:12 un runtime con el catálogo viejo lo dejó en `active = false` (`updated_by = 'system'`, el default de `actorUserId`). Detectado al auditar el rollout, no por un error.
 
 ### View Registry Governance Pattern (TASK-827, desde 2026-05-13)
 

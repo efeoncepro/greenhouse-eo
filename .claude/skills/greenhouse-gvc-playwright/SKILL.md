@@ -1,6 +1,6 @@
 ---
 name: greenhouse-gvc-playwright
-description: Robust Playwright handling for Greenhouse Visual Capture (GVC), ad-hoc Playwright, and public WordPress/Elementor landing verification — how to observe before authoring and avoid fumbling selectors, waits, readiness, computed styles or captures. Invoke whenever you write or debug a `.scenario.ts`, run `pnpm fe:capture`, work on public-site/WordPress landings, drop to ad-hoc Playwright, or a capture comes back wrong (skeleton/login captured, selector timeout, flaky, clipped, "no encuentro el selector", Turbopack Compiling…). Distills the proven techniques from microsoft/webwright's `local_browser.py` (aria-tree observation, user-facing locators, layered timeouts, graceful degrade) + the Greenhouse-specific GVC/public-site gotchas. Triggers: "GVC", "fe:capture", "scenario", "Playwright", "WordPress landing", "public site", "Elementor", "selector", "readiness", "captura", "aria snapshot", "computed style", "no encuentro el selector", "captura sale mal", "skeleton", "clipSelector", "networkidle".
+description: Robust Playwright handling for Greenhouse Visual Capture (GVC), ad-hoc Playwright, and public WordPress/Elementor landing verification — how to observe before authoring and avoid fumbling selectors, waits, readiness, computed styles or captures. Invoke whenever you write or debug a `.scenario.ts`, run `pnpm fe:capture`, work on public-site/WordPress landings, drop to ad-hoc Playwright, or a capture comes back wrong (skeleton/login captured, selector timeout, flaky, clipped, "no encuentro el selector", Turbopack Compiling…). Distills the proven techniques from microsoft/webwright's `local_browser.py` (aria-tree observation, user-facing locators, layered timeouts, graceful degrade) + the Greenhouse-specific GVC/public-site gotchas. Triggers: "GVC", "fe:capture", "scenario", "Playwright", "WordPress landing", "public site", "Elementor", "selector", "readiness", "captura", "aria snapshot", "computed style", "no encuentro el selector", "captura sale mal", "skeleton", "clipSelector", "networkidle", "fullPage", "charts vacíos", "cards vacías en la captura", "qualityProfile", "qualityFindings", "runtimeSummary", "pageErrorCount", "visual_timeout", "layout_element_overflow", "storageState expirado", "grabó login".
 type: reference
 ---
 
@@ -85,6 +85,69 @@ Webwright envuelve cada componente de observación (url/title/aria/screenshot) e
 
 ---
 
+## Regla #2 — `fullPage` ROMPE los charts (TASK-1306)
+
+**Si la superficie tiene gráficos, NO uses `fullPage`.** Para hacer el stitch, Playwright **redimensiona el viewport**; todo chart que mide su contenedor re-mide y queda en **tamaño 0**:
+
+- **Recharts `ResponsiveContainer`** — los sparklines de `MetricTrendCard` (`width='100%'` + `overflowX:'clip'`).
+- **ApexCharts** — las curvas de evolución, mismo mecanismo.
+
+**La evidencia sale con las cards VACÍAS** (marco + título + número presentes, área del gráfico en blanco) mientras el browser muestra la pantalla perfecta. Es la trampa más cara del set porque **no se lee como defecto de captura**: se lee como dato faltante o reader degradado, y te vas a depurar un bug de producto que **no existe**.
+
+Cobertura canónica — frame del viewport real (no toca el viewport) + un clip por región:
+
+```ts
+// desktop
+{ kind: 'mark', label: 'default', note: 'Cockpit poblado en viewport real' },
+{ kind: 'mark', label: 'kpis',    clipSelector: '[data-capture="seo-overview-kpis"]' },
+{ kind: 'mark', label: 'sidebar', clipSelector: '[data-capture="seo-overview-sidebar"]' }
+
+// mobile — scroll + un mark por zona, NUNCA un fullPage del stack
+{ kind: 'mark', label: 'mobile-top' },
+{ kind: 'scroll', selector: '[data-capture="seo-overview-sidebar"]' },
+{ kind: 'sleep', ms: 600 },
+{ kind: 'mark', label: 'mobile-sidebar' }
+```
+
+Plantillas vivas (con el porqué comentado dentro): `scripts/frontend/scenarios/growth-seo-overview.scenario.ts` y `growth-seo-overview-mobile.scenario.ts`.
+
+`fullPage` queda solo para "ver el largo total" de una pantalla **sin charts y sin sidebar fijo**.
+
+---
+
+## Regla #3 — El PNG NO es el gate. Lee el manifest.
+
+Declara `qualityProfile: 'standard'` en el scenario (`resolveCaptureQualityProfile` enciende axe + layout integrity `minTargetSize:24` + runtime collectors + assets + performance + enterprise rubric; warning-first, `failOnPageError:true`; `premium` los vuelve bloqueantes).
+
+En TASK-1306, sobre una pantalla que **a ojo estaba impecable**, destapó: **8 excepciones de runtime por corrida**, violaciones axe reales (`aria-required-children`, `aria-valid-attr-value`), overflow horizontal y targets < 24px.
+
+**Dónde leerlo — en `manifest.json`, NO en el log de consola:**
+
+| Campo | Qué te da |
+|---|---|
+| `qualityFindings[]` | `severity` · `category` · `code` (SSOT `lib/failure-taxonomy.ts`) · **`selector`** · `message`. El `selector` es lo que te lleva al nodo; stdout solo cuenta cuántos hubo. |
+| `runtimeSummary.pageErrorCount` + `pageErrorSamples[]` | Excepciones de página. **`> 0` con la UI renderizando bien = el caso que ningún screenshot revela.** |
+| `runtimeSummary.consoleErrorSamples` / `hydrationWarningSamples` / `httpFailureSamples` | Consola, hidratación, 4xx/5xx (saneados + truncados). |
+
+```bash
+jq '.qualityFindings, .runtimeSummary' .captures/<run>/manifest.json
+```
+
+**Nunca cierres una verificación mirando el PNG cuando el scenario declara `qualityProfile`.**
+
+---
+
+## Falsos positivos conocidos (no los persigas)
+
+- **`layout_element_overflow` sobre la tabla `sr-only` de `MetricTrendCard`** — es el fallback accesible de la serie, renderizado con `visuallyHidden` de MUI, que **posiciona el elemento fuera del viewport a propósito** (`position:absolute` + `width:1px` + `whiteSpace:nowrap`): exactamente la firma que busca el guard. Triage antes de tocar nada:
+  1. ¿El `selector` resuelve a un nodo `visuallyHidden` / `.sr-only` / `clip-path: inset(50%)`? → falso positivo.
+  2. ¿Hay `layout_horizontal_overflow` de página? Si `scrollWidth == clientWidth`, la página no se arrastra.
+  3. ¿Se **ve** algo cortado en el frame? Un overflow real siempre se ve.
+
+  El componente ya se defiende del riesgo verdadero (ancestro `position: relative` para que la tabla no escape y su `nowrap` no empuje el `scrollWidth` — clase TASK-742 / ISSUE-015). Quitar el `sr-only` rompe accesibilidad.
+
+---
+
 ## Gotchas de GVC que repetidamente nos pegan
 
 - **`fullPage` + sidebar `position:fixed` → ilegible** (el sidebar se repite/encima). Para detalle, **scrollea al selector y captura con `clipSelector`** sobre un `data-capture`:
@@ -92,8 +155,20 @@ Webwright envuelve cada componente de observación (url/title/aria/screenshot) e
   { kind: 'scroll', selector: '[data-capture="timeline"]', scrollBlock: 'center' },
   { kind: 'mark', label: 'timeline', clipSelector: '[data-capture="timeline"]' }
   ```
+- **`fullPage` + charts → cards vacías.** Ver Regla #2. Distinto síntoma del anterior (aquel sale *ilegible*, éste sale *vacío*) y peor de diagnosticar.
 - **Capturó skeleton/login en vez de contenido** → faltó `readiness.absentSelectors` (MuiSkeleton-root, login-card, data-loading).
+- **`failureCategory: 'visual_timeout'` en `--env=local` = compilación de Turbopack, no un bug.** `page.goto` corta a 60s; el **primer** hit a una ruta nueva en `pnpm dev` la compila on-demand y puede pasarlo (medido en TASK-1306: **64s la primera vez, 0.1s la segunda**, misma ruta sin cambiar una línea). **Calienta la ruta antes de capturar:**
+  ```bash
+  curl -s -o /dev/null -w '%{http_code} %{time_total}s\n' 'http://localhost:3000/mi/ruta'
+  pnpm fe:capture <scenario> --env=local
+  ```
+  Es complementario a la readiness DSL: la readiness resuelve el *estado de la UI* una vez que llegó el documento; esto resuelve que el documento llegue dentro del techo de navegación. Si el segundo intento tarda igual, ahí sí es real → secuencia Turbopack canónica de CLAUDE.md antes de `pnpm clean`.
 - **Turbopack `Compiling…`** → readiness DSL, no `networkidle`. Si `localhost` queda compilando, sigue la secuencia Turbopack canónica de CLAUDE.md antes de `pnpm clean`.
+- **La sesión del GVC expira.** `.auth/storageState.json` caduca y el síntoma engaña: la captura **"funciona"** pero grabó `/login`; en un script propio de Playwright con ese storageState, el síntoma es que **no encuentra los selectores**. Regenerar:
+  ```bash
+  AGENT_AUTH_EMAIL=agent@greenhouse.efeonce.org node scripts/playwright-auth-setup.mjs
+  ```
+  ⚠️ El script **EXIGE** `AGENT_AUTH_EMAIL` — **no tiene default** (aborta con `ERROR: AGENT_AUTH_EMAIL is required.`). Para que la expiración falle loud en vez de producir evidencia falsa, declara siempre `assertions: [{ kind: 'noLoginRedirect' }]` + `readiness.absentSelectors: ['[data-testid="login-card"]']`.
 - **Auth**: no re-fumbles el setup. GVC resuelve agent-auth en `scripts/frontend/lib/auth.ts`; para ad-hoc, `node scripts/playwright-auth-setup.mjs` genera `.auth/storageState.json` (personas: superadmin / collaborator / client — usa la de menor privilegio que represente el caso).
 - **Staging tras SSO**: `pnpm fe:capture ... --env=staging` ya inyecta el bypass; ad-hoc curl/Playwright a `.vercel.app` requiere header `x-vercel-protection-bypass`.
 - **Steps mutating** (`fill`/`press`/`click` que dispara Server Action): requieren `mutating: true` + `safeForCapture: true`. **⚠️ Crean entidades reales en staging.** Read-only por default.
