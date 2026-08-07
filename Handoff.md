@@ -1,51 +1,74 @@
 # Handoff activo
 
-### TASK-1308 — Keyword Opportunities COMPLETE, 2 pendientes de rollout (2026-08-07)
+### TASK-1308 — Keyword Opportunities COMPLETE + doctrina de scopes MCP (2026-08-07)
 
-⚠️ **Atribución de commits.** El último lote de esta task (tool MCP `untrack_seo_keywords`,
-lane ecosystem, `clock_timestamp()`, sanity 16/16, corrección del manual, cierre documental)
-quedó dentro de **`e39427af7 feat(commercial): add ANAM HubSpot training deck`** — un commit
-de OTRA sesión cuyo mensaje no tiene relación con el contenido. Causa: el índice de git es
-compartido entre sesiones y la otra commiteó mientras esta hacía `git add`. Ya había pasado
-antes en el día (`1a076131e` se llevó el rename de la task a `in-progress`). No se reescribió
-la historia porque hay otra sesión activa sobre `develop`. Si alguien busca el cierre de
-1308 por mensaje de commit, no lo va a encontrar: está ahí.
+⚠️ **Atribución.** El lote de cierre (tool `untrack_seo_keywords`, lane ecosystem,
+`clock_timestamp()`, sanity 16/16, manual) quedó dentro de **`e39427af7 feat(commercial): add
+ANAM HubSpot training deck`**, commit de OTRA sesión: el índice de git es compartido y commiteó
+mientras ésta hacía `git add` (2.ª vez en el día; `1a076131e` se llevó el rename a
+`in-progress`). No se reescribió la historia por la sesión concurrente sobre `develop`.
 
-Ruta `/admin/growth/seo/keywords` cerrada y movida a `complete/`. Nació `Backend impact:
-none` y terminó con migración, dos commands, dos rutas app-lane, dos rutas del lane
-ecosystem y **dos tools MCP federadas** — porque `trackKeywords`, que la spec daba por
-construido por TASK-1303, no existía.
+Ruta `/admin/growth/seo/keywords` cerrada. Nació `Backend impact: none` y terminó con migración,
+dos commands, dos rutas app-lane, dos del lane ecosystem y **dos tools MCP federadas** — porque
+`trackKeywords`, que la spec daba por construido por TASK-1303, no existía.
 
-**La idea que ordenó todo:** seguir una keyword es un **compromiso de gasto diferido** — el
-rank capture diario paga al proveedor por cada keyword vigente, en cada ciclo. De ahí el
-techo gobernado por target, el permiso separado del de leer, el outcome por keyword y
-`untrackKeywords`, sin el cual el compromiso era permanente.
+**La idea que ordenó todo:** seguir una keyword es un **compromiso de gasto diferido** — el rank
+capture diario paga al proveedor por cada keyword vigente, en cada ciclo. De ahí el techo gobernado
+por target, el permiso separado del de leer, el outcome por keyword y `untrackKeywords`.
+
+**Decisión de scopes OAuth (2026-08-07, con `arch-architect`) — aplica a TODO write federado:** el
+scope de escritura es del **DOMINIO** (`efeonce.mcp.seo.write`), NO de la capability. Uno por
+capability convierte la lista de Entra en un **espejo del `capabilities_registry` editado a mano**
+que diverge, y hace del gateway una autoridad de autorización, que su regla 1 prohíbe. Canónico:
+**un scope por CLASE de blast-radius** (`globe.credits.funding.ensure` tiene el suyo porque MUEVE
+DINERO, no por ser una capability). Corolario: **federar la escritura N+1 de un dominio que ya
+tiene scope NO toca Entra** — per-capability, cada tool arrastraba round-trip + consent, que es la
+fricción que hace que la gente deje la tool sin federar.
+
+🔴 **FRONTERA DE GRANT — lo más importante que dejó esta task.** `efeonce.mcp.seo.write` YA EXISTE
+en `Efeonce MCP Resource` (`c5363215-b9a6-4bf1-bb1c-e61963b37dac`, type `Admin`, enabled, id
+`17f923ad-537a-4c2f-ab5b-2a14ed650183`), creado con round-trip verificado: 4 scopes, ninguno
+perdido ni mutado, `requestedAccessTokenVersion: 2` preservado (el PATCH reemplaza el objeto `api`
+completo, así que se manda completo).
+
+Pero **NO se cableó al `requiredResourceAccess` del cliente PKCE compartido**
+`32617b87-e7ef-493a-838f-1ff3f0213b93` (el que el shim DCR entrega a Claude Code / claude.ai), y
+**NUNCA debe cablearse**. Razón, verificada en código: en el lane ecosystem el actor es
+`mcp:<consumer>` — la MÁQUINA, **sin chequeo de capability por humano** (el app-lane sí lo exige;
+el ecosystem no, a propósito) — y el hop gateway→Greenhouse va con token de consumer fijo de
+binding `internal`. Encadenado: **el scope OAuth es la única puerta de toda la cadena que depende
+de quién es la persona.** Cablearlo al cliente público daría poder de comprometer gasto recurrente
+a todo usuario autenticado del tenant, incluido quien no tiene la capability en Greenhouse, y
+**nada fallaría**: simplemente empezaría a funcionar para todos. El write de Globe tampoco está
+cableado ahí. Camino correcto: cliente con grant emitible y revocable por tenant/capability, que es
+el gate B2B ya diferido en `TASK-1631`. Escrito como `NUNCA` en el ADR del gateway porque el modo
+de falla es tentador: alguien ve `insufficient_scope` y lo "arregla" por ahí.
 
 **PENDIENTE DE ROLLOUT (lo único que falta):**
 
-1. **Scope de Entra** — `efeonce.mcp.seo.keywords.track` no existe en la app
-   `Efeonce MCP Resource` (`c5363215-b9a6-4bf1-bb1c-e61963b37dac`, 3 scopes hoy). Las DOS
-   tools lo comparten, así que ambas responden `insufficient_scope` hasta provisionarlo —
-   fail-closed por diseño. ⚠️ `az ad app update` **reemplaza** el arreglo completo de
-   `oauth2PermissionScopes`: round-trip verificado (leer → append → escribir → verificar) o
-   borra los tres vivos de Globe. Snapshot del estado previo en el scratchpad de la sesión.
-2. **Push del gateway** — `efeonce-mcp` commits locales `cb316cc` + `41dca07`, sin push. El
-   repo tiene deploy productivo en push; último run `success`.
+1. **Push del gateway** — `efeonce-mcp` commits locales `cb316cc` + `41dca07` + `bfbdf3a` (rename
+   del scope a dominio), sin push. El repo tiene deploy productivo en push.
 
-**Follow-up abierto:** `TASK-1657` — dos defectos de PLATAFORMA que 1308 cerró con parches
+Las tools quedan **federadas y fail-closed** — registradas, con parity guard y canary, sin ningún
+token que las abra. Es la postura correcta por diseño, no un pendiente disfrazado: idéntica a la
+del único otro write del gateway.
+
+**Follow-ups abiertos:** `TASK-1658` — al sincronizar la doc apareció que 3 tools SEO viven en el
+MCP interno de Greenhouse y no están **ni federadas ni excluidas** en el gateway, y que el guard de
+paridad no puede verlo: compara su lista esperada contra lo registrado EN EL GATEWAY, nunca contra
+Greenhouse, así que el olvido real es invisible y lleva meses sin señal. · `TASK-1657` — dos defectos de PLATAFORMA que 1308 cerró con parches
 locales: (A) mismatch de hidratación por `useId` en cualquier control MUI dentro de una
 surface recipe (cerrado acá con ids declarados; la causa raíz afecta al portal y no tiene
 detección) y (B) los findings inevitables de `ui:code-lint` en charts a canvas, que hacen
 que ese gate deje de significar algo.
 
-**Hallazgo del gate TASK-893 que vale registrar:** cerrar una membresía con `NOW()` produce
-`effective_to = effective_from` y revienta el CHECK `> ` (23514), porque `NOW()` es el
-timestamp de INICIO de transacción. `clock_timestamp()` lo resuelve. Los mocks lo daban por
-bueno; sólo apareció contra PG real.
+**Hallazgo del gate TASK-893:** cerrar una membresía con `NOW()` da `effective_to =
+effective_from` y revienta el CHECK `>` (23514) — `NOW()` es el timestamp de INICIO de transacción.
+`clock_timestamp()` lo resuelve. Los mocks lo daban por bueno; apareció contra PG real.
 
-Verificación: `pnpm test` completo (1 fallo ajeno, del WIP no commiteado de `artifact-composer`
-de otra sesión) · `pnpm build` producción verde · sanity live 16/16 contra PG · GVC 17
-pasadas · ui:quality 4.82/4.5 · visual-gate, design-contract, task:lint en verde.
+Verificación: `pnpm test` completo (1 fallo ajeno, WIP de `artifact-composer` de otra sesión) ·
+`pnpm build` prod verde · sanity live 16/16 contra PG · GVC 17 pasadas · ui:quality 4.82/4.5 ·
+visual-gate, design-contract y task:lint en verde.
 
 ### Seedance 2.5 — inventario Fal y TASK-1656 (2026-08-07)
 

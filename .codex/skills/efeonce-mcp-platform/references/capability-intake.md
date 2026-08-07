@@ -22,6 +22,18 @@ this file is a checklist, not a second registry.
 - `read`: start disabled and allowlist only after scope, tenancy, redaction and provider canary pass.
 - `write`, `approval`, `spend` or `rights-sensitive`: create or extend the owning ADR/task first. Require a preview,
   explicit confirmation/idempotency, audit evidence, rollback and domain-owner approval.
+  - 🔴 **Classify `spend` by downstream effect, not by whether THIS tool bills anything.** `track_seo_keywords`
+    (TASK-1308) calls no paid API and writes no cost ledger row, yet every keyword it adds is billed to the provider
+    on every daily rank-capture cycle until someone untracks it — a **deferred spend commitment**. If the action
+    enlarges a recurring job's workload, it is `spend`. Such a capability ships with a governed ceiling, a **typed
+    per-item outcome** (never a bare boolean, never silence on rejection), a per-tenant entitlement, idempotency, and
+    **its reverse in the same PR** — without the reverse the commitment is permanent.
+  - **Reuse the domain's existing write scope.** Scopes are per blast-radius class, so an N+1 write in a domain that
+    already has one needs no Entra change. If the domain has no write scope yet, adding one is an Entra change and
+    `az ad app update` replaces the whole array — verified round-trip or it wipes the live scopes.
+  - **A write scope is never wired into the shared public PKCE client** (see the SKILL hard rule). Expect the tool to
+    be federated and fail-closed until a revocable per-tenant grant exists (`TASK-1631`); that is the designed state,
+    not a broken deploy.
 - `admin`: do not expose until an entitlement model, named operators, high-signal audit trail and incident runbook exist.
 
 ## Provider boundary

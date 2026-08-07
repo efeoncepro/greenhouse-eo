@@ -1262,7 +1262,7 @@ Spec: `docs/tasks/in-progress/TASK-1175-design-handoff-control-plane-full-api-pa
 
 | Evento | Versión | Aggregate | Emisor | Consumer |
 | --- | --- | --- | --- | --- |
-| `growth.seo.keyword_set.updated` | v1 | `seo_target` (`seot-{uuid}`) | command `trackKeywords` (`src/lib/growth/seo/track-keywords.ts`), **dentro de la misma transacción** que inserta las membresías y sólo si `inserted > 0` | ninguno todavía — es **rastro de auditoría de un compromiso de gasto**, no un disparador de proyección |
+| `growth.seo.keyword_set.updated` | v1 | `seo_target` (`seot-{uuid}`) | commands `trackKeywords` y `untrackKeywords` (`src/lib/growth/seo/track-keywords.ts`), **dentro de la misma transacción** que muta las membresías y sólo si el set REALMENTE cambió (`inserted > 0` en el alta, `closed > 0` en la baja — ver el delta del reverso abajo) | ninguno todavía — es **rastro de auditoría de un compromiso de gasto**, no un disparador de proyección |
 
 **Payload v1**: `{ seoTargetId, organizationId, keywordSetId, trackedCount, activeKeywordCount, source, actor }` — coordenadas del scope, nunca las keywords: cualquier consumer futuro **re-lee PG** por `keywordSetId`.
 

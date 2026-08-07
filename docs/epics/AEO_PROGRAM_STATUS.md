@@ -1,9 +1,9 @@
 # Programa AEO / AI Visibility — Estado y Qué Sigue
 
 > **Tipo de documento:** Estado de programa + roadmap operativo (SSOT de "dónde estamos / qué sigue")
-> **Versión:** 1.2
+> **Versión:** 1.3
 > **Creado:** 2026-07-16 por Claude (auditoría multi-agente del programa AEO)
-> **Última actualización:** 2026-08-05 (fin de día) por Claude (Delta (b) reconciliación + continuación del Delta EPIC-022: 6 tasks ejecutadas en el día, camino MCP-first code-complete)
+> **Última actualización:** 2026-08-07 por Claude (fila EPIC-022 reconciliada contra el registry: 13 childs `complete`, cockpit operador en 3 de 4 tabs tras TASK-1306/1307/1308)
 > **Documentación técnica:** [`../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`](../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 > **Epics que agrupa:** EPIC-020, EPIC-021, EPIC-022, EPIC-023, EPIC-024
 
@@ -76,7 +76,7 @@ Este documento existe para no volver a perder visibilidad de un programa que est
 |---|---|---|---|
 | **EPIC-020** | Public AI Visibility Lead Magnet Program | `to-do` (spec) · ~~12/13~~ → **49 childs reales: 33 `complete`, 16 abiertas** (reconciliado 2026-08-05) | El "12/13" contaba sólo el denominador original. Cara pública **live**; falta el smoke E2E + 16 childs abiertas. Ver Delta (b). |
 | **EPIC-021** | AEO Brand-Aware Prompt Generation Engine | ✅ `complete` (2026-06-30) | Motor brand-aware live. Follow-up: UI de review del operador (no bloquea). |
-| **EPIC-022** | Growth SEO Module (Search Visibility 360) | 🚧 en ejecución (2026-08-05) · **6/22 childs con avance: 5 `complete` + `TASK-1645` code-complete** | Ejecutó 6 tasks el 2026-08-05: `TASK-1299` (schema) + `TASK-1301` (capabilities + entitlement + chokepoint) + `TASK-1300` (DataForSEO family registry) + `TASK-1302` (GSC materializer, **rollout live**) + `TASK-1305` (quadrant SEO↔AEO con primer cruce real) `complete`; `TASK-1645` (lane ecosystem + 3 MCP tools) code-complete con cutover pendiente. `TASK-1647` nueva (federación gateway). Prioridad **MCP-first**. Ver Delta 2026-08-05 (continuación fin de día). |
+| **EPIC-022** | Growth SEO Module (Search Visibility 360) | 🚧 en ejecución · **13 childs `complete`, 12 abiertas** (verificado 2026-08-07 contra el campo `Epic:` de cada archivo) | Backend completo (`1299`–`1305`), camino MCP-first **live en producción** (`1645` + `1647` + `1653`), y el cockpit operador en **3 de 4 tabs**: Resumen (`1306`), Rendimiento (`1307`) y Keywords (`1308`) — falta Auditoría (`1309`) y el cliente + report artifact (`1310`). La decisión de librería de charts quedó tomada (**ECharts**). Ver Delta 2026-08-07 (b) en la spec del epic. |
 | **EPIC-023** | Growth CTA & Popup CRO Engine | `to-do` | Adyacente. Vertical-slice ancla = follow-up CTA del reporte AI Visibility en Think. No arrancado. |
 | **EPIC-024** | HubSpot Portal Grader | `to-do` | Segundo lead magnet (motor en Kortex). No arrancado; childs desde `TASK-1353`. Fase 2 (OAuth) depende del cutover prod de Kortex. |
 

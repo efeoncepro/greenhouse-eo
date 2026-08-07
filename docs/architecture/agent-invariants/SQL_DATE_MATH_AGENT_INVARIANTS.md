@@ -137,6 +137,64 @@ FROM greenhouse_finance.account_balances;
 
 ---
 
+### `NOW()` vs `clock_timestamp()` al cerrar una ventana append-only (TASK-1308, medido 2026-08-07)
+
+Caso hermano del anterior: **mismo patrón** (SQL que los mocks de TS no ejercitan, descubierto sólo
+al correrlo contra PG real), **distinta primitiva temporal**. Allá el error era de *tipo* (`date -
+date` no da interval); acá es de *momento*, y por eso no lo atrapa ningún lint de tipos.
+
+`NOW()`, `CURRENT_TIMESTAMP` y `transaction_timestamp()` son **el mismo valor**: el timestamp de
+**inicio de la transacción**, constante durante toda su vida por más statements que corran. Sólo
+`clock_timestamp()` avanza dentro de la transacción, incluso dentro de un mismo comando
+(`statement_timestamp()` avanza entre statements, pero no dentro de uno).
+
+Eso importa cada vez que se **cierra una ventana de vigencia** (`effective_from`/`effective_to`,
+membership append-only) protegida por un CHECK con `>` estricto:
+
+```sql
+-- ✗ PROHIBIDO — cerrar una ventana con el reloj de la transacción
+UPDATE greenhouse_growth.seo_keyword_set_members
+   SET effective_to = NOW()          -- = transaction_timestamp()
+ WHERE keyword_set_id = $1 AND effective_to IS NULL;
+-- Si la membresía se ABRIÓ en esta misma transacción, effective_from == effective_to
+-- → 23514 check_violation contra CHECK (effective_to > effective_from). El `>` es estricto.
+
+-- ✓ CANÓNICO — reloj que avanza dentro de la transacción
+UPDATE greenhouse_growth.seo_keyword_set_members
+   SET effective_to = clock_timestamp()
+ WHERE keyword_set_id = $1 AND effective_to IS NULL;
+```
+
+🔴 **Por qué es una trampa silenciosa y no un bug obvio.** Sólo revienta cuando la apertura y el
+cierre caen en la **misma transacción**. El camino de usuario real —seguir una keyword hoy, dejar de
+seguirla mañana— nunca lo dispara, así que el defecto queda **latente en producción** y sólo aparece
+donde abrir y cerrar se hacen juntos: el sanity live, un test de integración, un backfill, un
+command que compone alta y baja, o cualquier recovery. Es decir: aparece justo cuando alguien intenta
+**verificar** el comportamiento, o cuando hay que reparar datos — los dos peores momentos.
+
+**Reglas duras**:
+
+- **NUNCA** cerrar una ventana de vigencia con `NOW()` / `CURRENT_TIMESTAMP` /
+  `transaction_timestamp()`. Para `effective_to`, `superseded_at`, `closed_at` y cualquier marca que
+  deba quedar **estrictamente después** de una fila escrita en la misma transacción, es
+  `clock_timestamp()`.
+- **NUNCA** "arreglar" un `23514` de este tipo relajando el CHECK a `>=`. El CHECK está diciendo la
+  verdad: una ventana de duración cero no es un término válido, y admitirla rompe todo reader que
+  determine vigencia por solapamiento (`effective_from <= t AND (effective_to IS NULL OR effective_to
+  > t)`), que dejaría de ver **y** de excluir esa fila.
+- **NUNCA** confiar en que los tests con mocks cubren esto: un mock del cliente `pg` acepta cualquier
+  string SQL y devuelve las filas que le pidan. Este defecto se descubrió con el gate de arriba —
+  ejercitar el SQL contra PostgreSQL real antes de mergear — y no con los unit tests, que estaban
+  verdes.
+- **SIEMPRE** que un command abra y cierre ventanas del mismo aggregate, escribir el sanity que hace
+  **las dos cosas seguidas**. Un sanity que sólo prueba el alta deja el reverso sin ejercitar, y el
+  reverso es exactamente donde vive esta clase de bug.
+
+**Caso fuente**: `untrackKeywords` en `src/lib/growth/seo/track-keywords.ts` (cierra la membresía de
+una keyword seguida; el comentario del `UPDATE` conserva el porqué in situ).
+
+---
+
 ### Aislamiento de los sanity scripts (TASK-1300, medido 2026-08-05)
 
 El gate de arriba exige ejercitar el SQL contra PG real. Eso implica **escribir datos de prueba en la base real**, así que cada `scripts/**/_sanity-*.ts` necesita una estrategia de limpieza — y elegir la equivocada deja residuo o produce falsos negativos.

@@ -38,10 +38,14 @@ pública.
 **Estado vigente:** `public_read_only`, con OAuth obligatorio y dos providers read-only federados:
 
 - Globe, con el reader `globe.producer.fleet.list`, limitado al workspace interno exacto;
-- Greenhouse-SEO, con `get_seo_entitlement`, `get_seo_keyword_opportunities` y `get_seo_visibility_360`,
-  habilitado el 2026-08-06 y acotado por el entitlement per-org del módulo SEO de Greenhouse.
+- Greenhouse-SEO, habilitado el 2026-08-06 y acotado por el entitlement per-org del módulo SEO de Greenhouse.
+  Sus tools de **lectura** están federadas y en producción; sus **dos tools de escritura** (TASK-1308) están
+  federadas **en el repo pero sin desplegar** y, aun desplegadas, nacen fail-closed por falta de un cliente que
+  pueda emitir su scope (ver la sección del provider).
 
-Este estado no habilita clientes externos ni multitenancy.
+Este estado no habilita clientes externos ni multitenancy. El adjetivo `read_only` describe lo que hoy es
+**alcanzable por un token real**, no lo que está cableado: mientras `efeonce.mcp.seo.write` no lo tenga ningún
+cliente, ninguna escritura es ejecutable por el borde público.
 
 ## Preflight
 
@@ -259,13 +263,58 @@ Delega en el lane ecosystem de Greenhouse (`/api/platform/ecosystem/growth/seo/*
 per-org `seo_v1`, el 404 anti-oracle y las degradaciones honestas. Los payloads se pasan tal cual (`data` del
 envelope del lane), así que un cliente MCP ve exactamente los mismos shapes que la UI y Nexa.
 
-Tools publicadas, todas read-only y bajo el **scope base** `efeonce.mcp.read` (no hay un scope `seo` propio):
+Tools publicadas. Las de **lectura** van bajo el **scope base** `efeonce.mcp.read`; las **dos de escritura**
+(TASK-1308) exigen el scope propio del dominio `efeonce.mcp.seo.write` — un token de lectura jamás debe poder
+comprometer gasto DataForSEO recurrente en la cuenta de un cliente. La lista canónica y el guard que impide
+olvidar una tool viven en `src/providers/greenhouse-seo-tool-parity.ts` del repo `efeonce-mcp` (allowlist
+explícito: revisión humana por tool en la frontera pública, NUNCA auto-federación).
 
-| Tool | Recurso del lane |
-| --- | --- |
-| `get_seo_entitlement` | `GET /api/platform/ecosystem/growth/seo/entitlement` |
-| `get_seo_keyword_opportunities` | `GET /api/platform/ecosystem/growth/seo/keyword-opportunities` |
-| `get_seo_visibility_360` | `GET /api/platform/ecosystem/growth/seo/visibility-360` |
+| Tool | Recurso del lane | Scope |
+| --- | --- | --- |
+| `get_seo_entitlement` | `GET .../growth/seo/entitlement` | `efeonce.mcp.read` |
+| `get_seo_keyword_opportunities` | `GET .../growth/seo/keyword-opportunities` | `efeonce.mcp.read` |
+| `get_seo_visibility_360` | `GET .../growth/seo/visibility-360` | `efeonce.mcp.read` |
+| `get_seo_rank_evolution` | `GET .../growth/seo/rank-evolution` | `efeonce.mcp.read` |
+| `get_seo_site_audit_report` | `GET .../growth/seo/site-audit-report` | `efeonce.mcp.read` |
+| `get_seo_backlink_profile` | `GET .../growth/seo/backlink-profile` | `efeonce.mcp.read` |
+| `track_seo_keywords` | `POST .../growth/seo/keywords/track` | `efeonce.mcp.seo.write` |
+| `untrack_seo_keywords` | `POST .../growth/seo/keywords/untrack` | `efeonce.mcp.seo.write` |
+
+**Granularidad del scope: un scope por CLASE DE BLAST-RADIUS, nunca uno por capability.** `efeonce.mcp.seo.write`
+es del DOMINIO (`…seo.write`), no de la capability (`…seo.keywords.track`): un scope por capability convertiría
+la lista de scopes de Entra en un espejo, editado a mano, del `capabilities_registry` de Greenhouse — y un espejo
+de autorización divergido es peor que no tenerlo (el scope dice sí, el registry dice no, y nadie sabe cuál manda).
+El scope responde *"¿este cliente puede hacer esta clase de acción?"*; la capability responde *"¿este actor, sobre
+esta org?"* y ya se enforcea abajo: binding `internal` en el lane + entitlement per-ORG + techo de gasto en el
+command. Corolario operativo: **federar la escritura N+1 de un dominio que ya tiene su scope no requiere tocar
+Entra**, y por lo tanto no puede quedar bloqueada por eso.
+
+Con esto el gateway declara **cuatro** scopes: `efeonce.mcp.read`, `efeonce.mcp.globe.read`,
+`efeonce.mcp.globe.credits.funding.ensure` (sólo con `globeCreditFunding.enabled` ON) y `efeonce.mcp.seo.write`
+(sólo con `greenhouseSeo.enabled` ON).
+
+⚠️ **Estado de rollout de las dos tools de escritura (al 2026-08-07, verificar antes de operar):**
+
+1. Los commits que las federan **siguen sin push** en `efeonce-mcp` (`cb316cc`, `41dca07` y el refactor de
+   nombre del scope `bfbdf3a`), así que la revisión desplegada todavía no las expone. El repo tiene deploy
+   productivo en push: empujar es desplegar.
+2. `efeonce.mcp.seo.write` **existe** en la app de Entra `Efeonce MCP Resource` (`type: Admin`, `isEnabled:
+   true`), pero **deliberadamente NO está cableado al cliente PKCE público compartido**
+   `32617b87-e7ef-493a-838f-1ff3f0213b93` que el shim DCR entrega a Claude Code / claude.ai / Claude Desktop.
+   Misma postura que `efeonce.mcp.globe.credits.funding.ensure`.
+
+🔴 **NUNCA cierres un `insufficient_scope` de una tool de escritura agregando el scope al cliente público
+compartido.** En el lane ecosystem el actor es la máquina (`mcp:<consumer>`), no la persona, así que ahí no hay
+chequeo de capability por humano; y el hop gateway→Greenhouse va con un token de consumer fijo de binding
+`internal`. En toda la cadena, **la única puerta que depende de quién es la persona es el scope OAuth**. Cablearlo
+al cliente público —sin secreto, disponible a todo usuario del tenant— le daría poder de comprometer gasto
+DataForSEO recurrente a cualquiera que se autentique, incluido quien no tiene la capability en Greenhouse, y lo
+haría **en silencio**: nada falla, simplemente empieza a funcionar para todos. El camino correcto es un cliente
+con grant emitible y revocable por tenant y capability — el gate B2B/multitenant de `TASK-1631`. Hasta entonces
+las tools quedan federadas y fail-closed: registradas, verificables y sin token que las abra.
+
+⚠️ `az ad app update` **reemplaza el arreglo completo** de scopes de la app: cualquier cambio va con round-trip
+verificado, o borra los scopes vivos de Globe.
 
 Identidad hacia Greenhouse: consumer sister-platform `EO-SPK-0004` con binding `EO-SPB-0004` (scope `internal`,
 por lo que `organizationId` es un parámetro requerido). El gateway envía `x-greenhouse-sister-platform-key:
@@ -369,6 +418,11 @@ curl -s -i -X POST https://mcp.efeonce.org/mcp -H 'content-type: application/jso
 Esperado el 2026-08-06: `/health` `200`; protected-resource metadata `200` declarando los 3 scopes (desde el
 shim DCR, anunciados cualificados como `https://mcp.efeonce.org/mcp/<scope>`); `POST /mcp` anónimo `401` con
 `WWW-Authenticate: Bearer resource_metadata=… scope="efeonce.mcp.read"`.
+
+El conteo de scopes del metadata **es condicional, no fijo**: cada write gateado aparece sólo con su flag en ON.
+Tras desplegar TASK-1308 con `greenhouseSeo.enabled` en ON serán **4**, sumando `efeonce.mcp.seo.write`. Un
+metadata con 3 scopes después de ese deploy no es "el smoke que falló": significa que el flag del provider está
+apagado — revisar `GREENHOUSE_SEO_PROVIDER_ENABLED` antes de tocar OAuth.
 
 ### Rollback del provider
 

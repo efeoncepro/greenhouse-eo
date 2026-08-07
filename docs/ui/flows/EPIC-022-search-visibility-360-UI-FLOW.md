@@ -57,8 +57,8 @@ La superficie que ve una persona **se deriva de su acceso per-org vía `module_a
 | # | Superficie | Ruta / canal | Route group | Actor | Estado | Task |
 |---|---|---|---|---|---|---|
 | S1 | **SEO Overview** (cockpit denso multi-Space) | `/admin/growth/seo` | internal | operador | **implementada** (2026-08-06, code complete en `develop`) | 1306 |
-| S2 | **★ Rank & URL performance over time** (pantalla ancla) | `/admin/growth/seo/performance` | internal | operador | a crear | 1307 |
-| S3 | **Keyword opportunities** | `/admin/growth/seo/keywords` | internal | operador | a crear | 1308 |
+| S2 | **★ Rank & URL performance over time** (pantalla ancla) | `/admin/growth/seo/performance` | internal | operador | **implementada** (2026-08-07) | 1307 |
+| S3 | **Keyword opportunities** | `/admin/growth/seo/keywords` | internal | operador | **implementada** (2026-08-07, ver Delta al final) | 1308 |
 | S4 | **Site audit** (+ drill `/[issueGroup]`) | `/admin/growth/seo/audit` | internal | operador | a crear | 1309 |
 | S5 | **Cliente SEO dashboard** (self-service mono-Space) | `/growth/seo` | client | cliente contratado | a crear | 1310 |
 | S6 | **Quadrant 360 SEO×AEO** (cruce, en S5 y en report) | `/growth/seo` + report | client | cliente | a crear | 1310 |
@@ -94,7 +94,8 @@ Operador (internal):
 /admin/growth/seo/performance                  ★ Rank & URL performance
 /admin/growth/seo/performance?urls=…&keywords=…&range=90d&engine=google&device=desktop
 /admin/growth/seo/keywords                     Keyword opportunities
-/admin/growth/seo/keywords?intent=comercial&maxDiff=40&pos=8-20
+/admin/growth/seo/keywords?space=…&window=28|90&q=…&action=quickWin|striking|cannibalized&position=firstPage|secondPage
+   (vigente desde 2026-08-07 — `intent`/`maxDiff` no existen: no hay fuente de intención ni de dificultad)
 /admin/growth/seo/audit                        Site audit
 /admin/growth/seo/audit?issueGroup=indexability   drill del grupo (query param, no segmento dinámico extra)
 
@@ -117,7 +118,9 @@ Login interno → nav Growth → Search Visibility → SEO
   → S1 Overview (Space ▾ selecciona target): visibility score + top-3/top-10 + WoW movers + salud + backlinks (soporte)
   → S2 ★ Rank & URL performance: line multi-serie (Y invertido), set seleccionable persistido en ?urls=/?keywords=
         └─ contextual: "Ver keywords de esta URL" → S3
-  → S3 Keyword opportunities: scatter (dificultad×volumen) + faceted filter + tabla → acción gobernada "Seguir" (trackKeywords)
+  → S3 Keyword opportunities: veredicto (leyenda+filtro) + scatter medido (posición×impresiones) + tabla
+        → acciones gobernadas "Seguir" / "Dejar de seguir" (trackKeywords / untrackKeywords)
+        └─ contextual: click en la keyword → S2 con esa serie aislada (?keywords=)
   → S4 Site audit: health KPIs + issues por impacto×esfuerzo → drill /[issueGroup] con URLs afectadas
         └─ acción gobernada "Correr auditoría" (queueSiteAudit, async OnPage)
 ```
@@ -155,6 +158,7 @@ Toda acción visible mapea a un command gobernado server-side (capability-gated,
 |---|---|---|---|
 | Configurar target/keywords/competidores | `configureSeoTarget` / `trackKeywords` / `setBacklinkTracking` | `growth.seo.target.configure` | S1, S3 |
 | "Seguir" keyword (agregar al set monitoreado) | `trackKeywords(keywordSetId, [kw], actor)` | `growth.seo.target.configure` | S3 |
+| "Dejar de seguir" (cerrar la ventana de seguimiento) | `untrackKeywords(seoTargetId, [kw], actor)` — append-only, cierra con `clock_timestamp()`; **nunca borra** | `growth.seo.target.configure` | S3 |
 | "Correr auditoría" | `queueSiteAudit(targetId, actor)` (async OnPage) | `growth.seo.audit.run` | S4 |
 | Leer rank / keywords / audit / gap | readers (§1) | `growth.seo.observation.read` | S1–S6 |
 | Leer report cliente | `readSeoAeoGap` + `readRankEvolution` → `ReportArtifactModel` | `growth.seo.report.read_client` | S5, S7 |
@@ -224,3 +228,40 @@ Visibles en `/admin/operations`: `seo.rank.capture_lag` (steady=0), `seo.audit.s
 - [ ] El contrato medido ● / estimado ◑ y la honest degradation (§8) se respetan en cada superficie.
 - [ ] El cruce SEO↔AEO es derived read + cross-link recíproco, nunca merge de tablas.
 - [ ] Toda `page.tsx` nueva queda en `route-reachability-manifest.ts` + key en `GH_INTERNAL_NAV`/nav cliente.
+
+---
+
+## Delta 2026-08-07 — S3 (Keyword opportunities) implementada: cuatro supuestos del flujo no resistieron el runtime
+
+`/admin/growth/seo/keywords` está viva (TASK-1308). Hereda el shell de S1 sin construir navegación
+local, entra en `route-reachability-manifest.ts` con `parent: '/admin/growth/seo'` + `via: 'tab'`, y
+no siembra viewCode ni ítem de menú. Lo que **cambió** respecto de lo que este doc suponía:
+
+1. **El encoding del scatter no es dificultad × volumen.** Ninguno de los tres canales que pedía el
+   §5 tiene fuente: `readKeywordOpportunities` devuelve `searchVolume: null`, `difficulty: null`,
+   `market: 'unavailable'` (TASK-1300 no aterrizó) y el contrato no tiene campo de intención. El
+   encoding vigente es **medido**: X = posición ponderada (8→20, eje fijo), Y = impresiones (log),
+   tamaño = clics incrementales estimados, color **y forma** = acción recomendada.
+   🎯 Cuando el enriquecimiento de mercado llegue **no será un eje**: será una columna y un filtro —
+   los ejes medidos son correctos con o sin él, así que el contrato de la pantalla no se rompe.
+2. **Canibalización es una tercera ACCIÓN, no una variante de "oportunidad".** Serie propia, forma
+   propia y verbo propio ("Consolidar" vs "Empujar"), con el clasificador en un módulo compartido
+   por mapa, filtros y tabla para que no deriven entre sí. Gana sobre la posición.
+3. **La leyenda y el filtro por acción son el mismo objeto**: la banda de veredicto que abre la
+   pantalla enuncia el hallazgo dominante, sirve de leyenda de formas y filtra. No hay `FilterTile`
+   faceted ni select "Acción": eran dos objetos para una sola idea.
+4. **El contrato ● / ◑ del §8 se cumple a medias en S3, y a propósito.** Sin enriquecimiento de
+   mercado no hay nada estimado que marcar: se declara `● Medido · Search Console` una vez al pie
+   del mapa junto al motivo de la ausencia, y las columnas de volumen/dificultad **no se renderizan**
+   (repetir "sin dato" 100 veces empujaba la acción primaria fuera de la pantalla en 390px). El
+   invariante que protege el §8 —nunca un `0` ni un guion ambiguo, nunca promediar— se respeta entero.
+
+**Lo que sí quedó como el flujo prescribía:** un solo viewCode para las 4 rutas, `?space=` compartible
+pero no autoridad, acciones = commands gobernados (`trackKeywords` / `untrackKeywords`, mismos que
+operan el lane `app`, el `ecosystem` y las tools MCP), tabla como fallback de accesibilidad permanente
+del chart, y el cross-link contextual S3 → S2 (click en la keyword abre Rendimiento con su serie
+aislada) — que este doc pedía sólo en el sentido inverso.
+
+**Pendiente de rollout, no de código:** las tools MCP `track_seo_keywords` / `untrack_seo_keywords`
+responden `insufficient_scope` hasta que `efeonce.mcp.seo.write` quede cableado a un cliente con grant
+controlable, y el commit de federación del gateway siga sin publicar. Es fail-closed por diseño.

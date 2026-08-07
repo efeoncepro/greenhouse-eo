@@ -65,12 +65,21 @@ COMPLETE — TASK-1299 (schema `greenhouse_growth.seo_*` — 8 tablas config + s
 costo), TASK-1302 (materializer GSC + `readKeywordOpportunities` — CON ROLLOUT LIVE) y TASK-1305
 (`readSeoAeoGap` + quadrant SEO×AEO del 360 — **primer quadrant real: Berel #1.75 orgánico × AEO 44.5 →
 `riesgo`**, autoridad sin citabilidad = la señal de cross-sell al AEO). TASK-1645 (lane ecosystem
-`/api/platform/ecosystem/growth/seo/*` + 3 MCP tools read-only: `get_seo_keyword_opportunities`,
+`/api/platform/ecosystem/growth/seo/*` + las primeras 3 MCP tools read-only: `get_seo_keyword_opportunities`,
 `get_seo_visibility_360`, `get_seo_entitlement`) y TASK-1647 (federación al gateway) quedaron **COMPLETE el
 2026-08-06: el motor está VIVO EN PRODUCCIÓN y se opera por `mcp.efeonce.org`** (release `70e912056273` +
 `GROWTH_SEO_ENABLED` en Vercel Production + revisión `efeonce-mcp-gateway-00012-dkj`; canary contra prod:
 Berel `riesgo`/50 keywords/AEO 44.5, deny anti-oracle 404). Ya hay motor operable por MCP de verdad
 y cruce SEO↔AEO real — pero para el cliente el portal sigue mostrando NADA de SEO.**
+
+> **Delta 2026-08-07 — cockpit INTERNO + las 2 primeras escrituras.** TASK-1306/1307/1308 complete: el equipo
+> entra a `/admin/growth/seo` (overview · rank & URL performance · mapa de oportunidades de keyword) y puede
+> **seguir/dejar de seguir keywords** desde la pantalla. Inventario MCP hoy: **9 lecturas + 2 escrituras**
+> (`track_seo_keywords` / `untrack_seo_keywords`). 🔴 Seguir una keyword **compromete gasto recurrente del
+> proveedor** —el rank capture paga por cada keyword vigente en cada ciclo—, así que el command lleva techo por
+> target, entitlement per-ORG, outcome por keyword y su reverso; las tools quedan federadas y **fail-closed**
+> hasta que exista un cliente OAuth con grant revocable (TASK-1631). **Nada de esto es cara de cliente**: la
+> fila de abajo sigue diciendo la verdad para lo que el cliente ve solo.
 
 > 🧭 **Directivas vigentes (2026-08-05, cutover cerrado el 2026-08-06):** **MCP-first** — SV360 se opera por
 > MCP antes que por UI (TASK-1645 + TASK-1647 complete, espejo del TASK-1086 de Knowledge; el provider
@@ -86,7 +95,7 @@ y cruce SEO↔AEO real — pero para el cliente el portal sigue mostrando NADA d
 
 | Lo que se vende | Lo que existe en el portal |
 |---|---|
-| Rank tracking | ⚠️ **Motor LIVE, sin superficie cliente.** *(Delta 2026-08-06 — TASK-1303 complete y EN PRODUCCIÓN, release `fcee5ab9f7ce`: serie diaria de **posiciones exactas** vía DataForSEO — cron Cloud Scheduler `ops-seo-rank-capture` ACTIVO, 05:00 CLT → `captureRankSnapshot` en ops-worker con gate de costo + spend fence; serie día-1: Berel 31 keywords, **con AI Overview presence por keyword — dato vendible para AEO**. Consultable por `readRankEvolution` (PG ≤180d / BQ histórico) y la 4.ª MCP tool `get_seo_rank_evolution` (interna prod; gateway pendiente TASK-1653). El portal cliente sigue mostrando nada)* |
+| Rank tracking | ⚠️ **Motor LIVE, sin superficie cliente.** *(Delta 2026-08-06 — TASK-1303 complete y EN PRODUCCIÓN, release `fcee5ab9f7ce`: serie diaria de **posiciones exactas** vía DataForSEO — cron Cloud Scheduler `ops-seo-rank-capture` ACTIVO, 05:00 CLT → `captureRankSnapshot` en ops-worker con gate de costo + spend fence; serie día-1: Berel 31 keywords, **con AI Overview presence por keyword — dato vendible para AEO**. Consultable por `readRankEvolution` (PG ≤180d / BQ histórico) y la 4.ª MCP tool `get_seo_rank_evolution`. **Delta 2026-08-07:** ya existe la superficie operador (`/admin/growth/seo`, TASK-1307) y el set monitoreado se administra desde la pantalla (TASK-1308). El portal CLIENTE sigue mostrando nada)* |
 | Site audit | 🔴 **Nada** |
 | Backlinks | 🔴 **Nada** |
 | E-E-A-T scoring | 🔴 **Nada** |

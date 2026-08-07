@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-08-05 por Claude (TASK-1299 + TASK-1301)
-> **Ultima actualizacion:** 2026-08-07 por Claude (TASK-1307 pantalla ancla Rendimiento + TASK-1655 histórico GSC en BigQuery)
+> **Ultima actualizacion:** 2026-08-07 por Claude (TASK-1308 pantalla de Oportunidades de keywords: verificada contra la pantalla construida y sacada de la lista de pendientes)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
 
 # Modulo SEO — Search Visibility 360 (Growth)
@@ -84,7 +84,7 @@ TASK-1302 convierte esa consulta en vivo en una **serie propia de Greenhouse**: 
 
 **Estado live (2026-08-05):** la serie está corriendo con datos reales. Primera marca capturada: `sc-domain:berel.com`, con 26.192 filas guardadas cubriendo 4 días y 375 consultas identificadas en distancia corta.
 
-**Todavía no hay pantalla.** La operación de esta serie es hoy por línea de comandos y logs — verificar la corrida, re-materializar un día puntual, revertir. El paso a paso está en el manual [Operar la serie diaria de Search Console](../../manual-de-uso/growth/operar-serie-search-console.md). Las pantallas llegan con TASK-1306 (overview) y TASK-1308 (oportunidades).
+**Cómo se opera y dónde se ve.** La operación de la serie (verificar la corrida, re-materializar un día puntual, revertir) sigue siendo por línea de comandos y logs: el paso a paso está en el manual [Operar la serie diaria de Search Console](../../manual-de-uso/growth/operar-serie-search-console.md). Lo que la serie produce ya tiene pantalla: el cockpit **Resumen** (TASK-1306) y **Oportunidades de keywords** (TASK-1308, más abajo), que es la superficie de este reader.
 
 > Detalle técnico: [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) · materializador y batch en [`src/lib/growth/seo/`](../../../src/lib/growth/seo/) · reader de oportunidades en [`src/lib/growth/seo/keyword-opportunities-reader.ts`](../../../src/lib/growth/seo/keyword-opportunities-reader.ts) · la conexión de origen es la de [Conexion a Google Search Console](conexion-search-console.md).
 
@@ -193,7 +193,6 @@ Lo siguiente aún no está construido (las series que ya se llenan: Search Conso
 
 | Falta | Task que lo trae |
 |---|---|
-| Keyword opportunities (UI) | TASK-1308 |
 | Site audit (UI) | TASK-1309 |
 | Superficie cliente + Report Artifact + quadrant 360 | TASK-1310 |
 | Semilla histórica de posiciones (DataForSEO Labs) + export nativo GSC→BQ por cliente | TASK-1655 (Slices 4-5) |
@@ -255,10 +254,12 @@ ganaria cada una si subiera.
 
 | Elemento | Que dice |
 |---|---|
-| Mapa de oportunidad | Cada burbuja es una keyword. Mas a la izquierda, mas cerca de la primera plana. Mas arriba, mas gente la busca. Mas grande, mas clics ganarias. |
-| Zona sombreada | La primera plana (posicion 10 o mejor): el empujon mas barato. |
-| Forma y color | La accion recomendada, que no es la misma para todas (ver abajo). |
-| Tabla | Los valores exactos de cada keyword, la pagina que rankea hoy y el boton "Seguir". |
+| Banda de veredicto | Lo primero de la pantalla: el hallazgo dominante en una frase redactada desde el reparto real ("42 de 50 keywords compiten contra tu propio sitio") y los clics totales que estan sobre la mesa. Si ningun grupo domina, describe el conjunto en vez de inventar una conclusion. |
+| Los tres segmentos de esa banda | Son la leyenda del mapa **y** el filtro por accion, en un solo objeto. Su ancho es proporcional al conteo, para que un reparto de 42 · 6 · 2 se vea sin leer los numeros. |
+| Mapa de oportunidad | Cada burbuja es una keyword. Mas a la izquierda, mas cerca de la primera plana. Mas arriba, mas gente la busca. Mas grande, mas clics ganarias. Se puede plegar: la primera vez se quiere el mapa, la decima ya se sabe que se busca y se quiere la lista. |
+| Zona sombreada "Primera plana" | Las posiciones 8 a 10. Marca un **hecho posicional, no una accion**: dentro caen tambien keywords canibalizadas, que se consolidan. |
+| Forma y color | La accion recomendada, que no es la misma para todas (ver abajo). La forma existe para que la lectura sobreviva al daltonismo y al monocromo; la misma etiqueta va en texto en la tabla. |
+| Tabla | Los valores exactos de cada keyword, la pagina que rankea hoy (abrible) y la columna **Seguimiento**. Ordenada por ganancia estimada, reordenable por columna y paginada de a 25. |
 
 **Tres acciones, no tres severidades.** El modulo no clasifica las keywords por "que tan buenas son"
 sino por **que hay que hacer con ellas**, porque son trabajos distintos:
@@ -269,10 +270,13 @@ sino por **que hay que hacer con ellas**, porque son trabajos distintos:
   se consolida** (unificar, redirigir, canonical o diferenciar la intencion). Es otro trabajo, con otro dueño.
 
 **De donde sale el dato, y que todavia no esta.** Todo lo que se ve esta **medido por Search Console**:
-son las impresiones y posiciones reales de la busqueda del propio cliente. Las columnas de *volumen* y
-*dificultad de mercado* dicen "Sin dato de mercado" porque ese enriquecimiento externo aun no esta
-habilitado — y la pantalla lo dice con esas palabras en vez de mostrar un `0`, que afirmaria que nadie
-busca eso. La priorizacion no lo necesita: la demanda ya esta medida.
+son las impresiones y posiciones reales de la busqueda del propio cliente. El enriquecimiento externo
+de *volumen* y *dificultad de mercado* aun no esta habilitado, y mientras eso sea cierto esas dos
+columnas **no se muestran**: la ausencia se declara una vez, con palabras, al pie del mapa — una
+columna que no puede traer datos no gana su ancho, y repetir "sin dato" cien veces ahogaba los numeros
+que la tabla existe para mostrar. Lo que **nunca** aparece es un `0`, que afirmaria que nadie busca eso.
+Cuando el enriquecimiento aterrice, las columnas vuelven solas sin reescribir la pantalla. La
+priorizacion no lo necesita: la demanda ya esta medida, y los ejes del mapa jamas dependieron de ese dato.
 
 **"Seguir" cuesta plata, y la pantalla lo dice antes del clic.** Seguir una keyword la agrega al set
 monitoreado, y desde ahi su posicion se mide **todos los dias** con un proveedor externo que se cobra por
@@ -292,9 +296,17 @@ para el ticket, el SOW o el mail al cliente — y los filtros viajan en la URL, 
 pantalla se puede compartir ya filtrada. Un click en la keyword lleva a Rendimiento con su
 serie aislada.
 
+**Quien puede hacer que.** Ver el mapa pide `growth.seo.observation.read`; seguir o dejar de seguir pide
+ademas `growth.seo.target.configure`. Sin la segunda, la columna de seguimiento y las casillas de
+seleccion **no se renderizan** — un analista lee el mapa completo sin poder hacer crecer la factura.
+
+> Paso a paso para operarla: [Oportunidades de Keywords — leer el mapa y seguir keywords](../../manual-de-uso/growth/seguir-keywords-oportunidades-seo.md).
+>
 > Detalle tecnico: `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §7 (commands `trackKeywords` / `untrackKeywords`)
 > y §10.4 (encoding del mapa). Codigo: `src/lib/growth/seo/track-keywords.ts`,
-> `src/views/greenhouse/admin/growth/seo/keywords/`.
+> `src/views/greenhouse/admin/growth/seo/keywords/`. Mismos commands para la UI, el lane `app`,
+> el lane `ecosystem` y las tools MCP `track_seo_keywords` / `untrack_seo_keywords` (estas ultimas
+> fail-closed hasta que el scope `efeonce.mcp.seo.write` quede cableado a un cliente).
 
 ## Relacion con el AI Visibility Grader (motores hermanos)
 

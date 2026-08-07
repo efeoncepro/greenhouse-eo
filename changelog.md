@@ -72,30 +72,28 @@ servía en un teléfono, la selección múltiple podía gastar sobre keywords qu
 la vista, la zona destacada del mapa se contradecía con su propia leyenda, y la fecha de
 corte de los datos había desaparecido en un rediseño intermedio.
 
-Estado: código completo y verificado. Queda registrar el permiso del gateway en el
-directorio de identidad y publicar su despliegue; hasta entonces las dos herramientas
-responden que falta el permiso, que es el comportamiento seguro.
+El permiso del gateway obligó a decidir algo que va más allá de esta pantalla. Se había
+declarado un permiso por cada acción; se cambió a uno por dominio de escritura, porque una
+lista de permisos por acción termina siendo una copia mal mantenida —editada a mano en el
+directorio de identidad— del registro de permisos que ya vive dentro del producto, y las dos
+listas divergen. La regla quedó escrita: un permiso por clase de riesgo, no por acción. Su
+consecuencia práctica es que la próxima escritura de este dominio ya no toca el directorio de
+identidad, que era justo la fricción que hace que una herramienta se quede sin publicar.
 
-## 2026-08-07 — Growth SEO: Oportunidades de keywords + command `trackKeywords` (TASK-1308)
+Al ir a entregarle ese permiso al llavero que usan los asistentes apareció lo que de verdad
+importaba: por ese camino el actor es la máquina, no la persona, así que el permiso del
+directorio de identidad es la **única puerta de toda la cadena que depende de quién eres tú**.
+Entregarlo al llavero compartido —que tiene cualquiera del equipo que se conecte— habría dado
+poder de comprometer gasto a todo el tenant, incluido quien en el portal no puede hacerlo, y
+sin que nada fallara: simplemente habría empezado a funcionar para todos. No se hizo, y quedó
+escrito como prohibición explícita, porque el día que alguien vea el error de permiso la
+tentación va a ser exactamente esa. La única otra herramienta que gasta dinero tampoco está en
+ese llavero.
 
-Nueva ruta operador `/admin/growth/seo/keywords` (tab **Keywords** de Search Visibility, child del
-viewCode `administracion.growth_seo`): mapa de oportunidad ECharts, filtros y tabla densa con la acción
-gobernada "Seguir". La spec daba por existente el command `trackKeywords` y no lo había construido nadie,
-así que se construyó acá con la forma que exige su naturaleza: seguir una keyword no es un INSERT sino un
-**compromiso de gasto diferido** — el rank capture diario le paga al proveedor por cada keyword vigente del
-set, en cada ciclo — de modo que el command lleva techo gobernado por target, entitlement per-org, outcome
-por keyword (nunca un booleano), idempotencia y outbox dentro de la transacción. Se expuso además como tool
-MCP `track_seo_keywords`, federada al gateway con scope propio (no el de lectura).
-
-El scatter no usa los ejes que pedían el wireframe y la arquitectura: volumen, dificultad e intención de
-mercado no tienen fuente hoy, y priorizar por un volumen estimado teniendo el Search Console propio es un
-error de método. Los ejes son los medidos —posición ponderada × impresiones, tamaño por clics incrementales,
-color y forma por acción recomendada— y el dato de mercado, cuando llegue, será una columna y un filtro,
-nunca un eje: por eso la pantalla no tendrá que reescribirse. La canibalización quedó como una acción con
-verbo propio ("consolidar"), no como una variante visual de oportunidad.
-
-Estado: code complete. Quedan pendientes el scope en Entra (la tool federada responde `insufficient_scope`
-hasta provisionarlo, fail-closed), el push del gateway y la evidencia GVC.
+Estado: código completo y verificado, permiso creado en el directorio de identidad con
+verificación de que ningún permiso vecino se perdió. Las dos herramientas quedan publicadas y
+cerradas con llave a propósito: abrirlas necesita un llavero con entrega revocable por persona,
+que es trabajo ya planificado aparte. Queda publicar el despliegue del gateway.
 
 ## 2026-08-07 — Autenticación local Gcloud con Playwright
 

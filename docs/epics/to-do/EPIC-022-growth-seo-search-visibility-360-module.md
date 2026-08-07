@@ -50,8 +50,8 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1304` — [planificada] site audit (queue+poll OnPage) + backlink snapshot.
 - `TASK-1305` — [planificada] `readSeoAeoGap` derived read cross-módulo (report layer).
 - `TASK-1306` — [**complete 2026-08-06**, ui-ux] SEO Overview operador `/admin/growth/seo` — **la primera superficie visible del módulo (nodo S1 del master UI flow)**. Guard de 3 puertas (viewCode `administracion.growth_seo` + capability `growth.seo.observation.read` + `module_assignment` per-org), sección local "Search Visibility" con el conmutador a las hermanas, 4 KPIs norte (posición con semántica invertida), curva de visibilidad en 2 charts apilados y sidebar salud/movers/cruce AEO que degrada por región. MCP tool `get_seo_overview_kpis` + lane `/api/platform/ecosystem/growth/seo/overview-kpis` en el mismo PR. **Code complete en `develop`; promoción a `main` pendiente** (mientras viva sólo en `develop`, `syncViewRegistry` de producción vuelve a apagar el viewCode recién sembrado).
-- `TASK-1307` — [planificada, ui-ux] ★ Rank & URL performance over time `/admin/growth/seo/performance`.
-- `TASK-1308` — [planificada, ui-ux] Keyword opportunities `/admin/growth/seo/keywords`.
+- `TASK-1307` — [**complete 2026-08-07**, ui-ux] ★ Rank & URL performance over time `/admin/growth/seo/performance` — nodo S2, la pantalla ancla. Comparación de hasta 8 URLs o keywords con eje de posición invertido declarado en palabras, cobertura explícita ("N de M días con medición"), huecos que cortan la línea en vez de rellenarse con cero, y la fuente nombrada (◑ exacta de mercado vs ● medida de Search Console, nunca promediadas). Primer consumer de **ECharts** del repo — la decisión de librería del módulo. Su tab quedó habilitada; la spec vive en `docs/tasks/complete/`.
+- `TASK-1308` — [**complete 2026-08-07**, ui-ux + command] Keyword opportunities `/admin/growth/seo/keywords` — **nodo S3 del master UI flow**. Nació declarada `Backend impact: none` y terminó construyendo el command que la spec daba por hecho: **`trackKeywords` no existía** (`seo_keyword_sets`/`_members` sólo las escribían dos scripts de seed), y su reverso `untrackKeywords` tampoco. Seguir una keyword es un **compromiso de gasto diferido** —el rank capture diario paga al proveedor por cada keyword vigente, todos los días— así que el command nace con techo gobernado por target (`capacity_exceeded` explícito, nunca silencio), entitlement per-org y **outcome por keyword**, que es lo único que distingue "agregué 3" de "rebotaron 40 contra el techo". La UI: banda de veredicto que es leyenda y filtro a la vez, mapa **medido** (posición × impresiones; el encoding del wireframe —dificultad × volumen × intención— no tiene fuente y no la tendrá: el dato de mercado será columna y filtro, nunca eje), tabla con `DataTableShell` + transformación a cards en 390px, export CSV del subconjunto filtrado, filtros en la URL y drill a Rendimiento. Lane `app` + lane `ecosystem` + 2 tools MCP (`track_seo_keywords`/`untrack_seo_keywords`) en el mismo PR con **scope propio de escritura** `efeonce.mcp.seo.write` — un binding cliente lee sus oportunidades pero no hace crecer su propia factura. **Pendiente de rollout, no de código:** el scope existe en Entra pero no está cableado a ningún cliente y el commit de federación del gateway sigue sin publicar → las 2 tools responden `insufficient_scope` (fail-closed por diseño).
 - `TASK-1309` — [planificada, ui-ux] Site audit `/admin/growth/seo/audit`.
 - `TASK-1310` — [planificada, ui-ux] Cliente + Report Artifact `/growth/seo` + quadrant 360.
 - `TASK-1311` — [planificada, backend-data] AEO citation attribution URL-level + grounded queries (reader/rollup sobre las citas que el grader YA captura).
@@ -311,3 +311,45 @@ viewCode + el `module_assignment` per-org. ⚠️ Mientras 1306 viva sólo en `d
 producción **vuelve a apagar el viewCode** en cada corrida de `syncViewRegistry` (desactiva
 todo viewCode ausente del catálogo TS del código **en ejecución**, y la base Cloud SQL es
 única y compartida por dev/staging/prod). Se estabiliza al promover a `main`.
+
+## Delta 2026-08-07 (b) — el cockpit operador queda en 3 de 4: S2 y S3 aterrizan
+
+`TASK-1307` (S2, Rendimiento) y `TASK-1308` (S3, Keywords) están **complete**. De las cuatro
+tabs de "Search Visibility" sólo queda `available: false` la de Auditoría (`TASK-1309`). La
+pata UI/Nexa del exit criterion de parity queda abierta ahora sólo por esa tab y por el
+cliente + report artifact (`TASK-1310`).
+
+**Lo que este delta corrige para quien siga (1309 / 1310):**
+
+1. **La decisión de librería del módulo está tomada: ECharts.** `TASK-1307` la resolvió en su
+   Slice 0 (era el dueño de la decisión según el delta anterior) y `TASK-1308` la reusó vía
+   `AppECharts` + `resolveChartColor`. Una hermana nueva **no vuelve a abrir la discusión** ni
+   mete una segunda librería para una sola pantalla.
+2. **Un command que la spec daba por construido no existía.** `TASK-1308` declaró
+   `Backend impact: none` porque su spec citaba `trackKeywords` como entregado por `TASK-1303`,
+   marcado `[verificar]`. **No lo había construido nadie.** El patrón se repite en este epic
+   (ver `readRankSnapshotLatest` en el delta anterior): un `[verificar]` en una spec no es una
+   dependencia satisfecha. Antes de declarar `Backend impact: none`, verificar el símbolo en el
+   código, no en la prosa de otra task.
+3. **El dato de mercado sigue sin aterrizar, y la UI ya está diseñada para que eso no importe.**
+   `readKeywordOpportunities` devuelve `searchVolume: null`, `difficulty: null`,
+   `market: 'unavailable'` (`TASK-1300` amplió el allowlist pero el enriquecimiento Labs no
+   corre). El mapa de S3 usa ejes **medidos** (posición × impresiones de Search Console), que es
+   además lo metodológicamente correcto: priorizar por volumen estimado de un tercero teniendo
+   el GSC propio está listado como error en la skill `seo-aeo`. Cuando el enriquecimiento llegue
+   será **columna y filtro, nunca eje** — no se reescribe la pantalla.
+4. **Escribir por MCP exige scope propio.** Las 2 tools de escritura de S3
+   (`track_seo_keywords` / `untrack_seo_keywords`) van bajo `efeonce.mcp.seo.write`, no bajo el
+   `efeonce.mcp.read` de las lecturas, y el lane ecosystem sólo las acepta desde bindings
+   `internal`: un binding cliente lee sus oportunidades pero no hace crecer su propia factura.
+   🔴 El guard de paridad del gateway **no las habría visto**: su regex se ató a `get_seo_*`
+   cuando todas las tools eran lecturas. Se amplió al dominio. **Toda tool de escritura futura
+   del módulo hereda este patrón.**
+
+**Pendiente de rollout (no de código):** el scope `efeonce.mcp.seo.write` existe en Entra
+(`17f923ad-537a-4c2f-ab5b-2a14ed650183`, round-trip verificado — los 3 scopes de Globe intactos)
+pero **no está cableado a ningún cliente** y no debe cablearse al PKCE compartido; más el commit
+de federación del gateway (`efeonce-mcp`) sin publicar. Hasta entonces las 2 tools responden
+`insufficient_scope`: fail-closed por diseño. Y sigue en pie el bloqueo del delta anterior —
+mientras las pantallas vivan sólo en `develop`, `syncViewRegistry` de producción vuelve a apagar
+el viewCode compartido.
