@@ -73,6 +73,60 @@ describe('checkPendingWithoutJobs', () => {
     expect(result.recommendation).toContain('gh run cancel')
   })
 
+  it('exclusión forense: un run de la lista vigente no bloquea, queda en evidencia y la severidad es ok', async () => {
+    process.env.GITHUB_RELEASE_OBSERVER_TOKEN = 'fake'
+    vi.mocked(listPendingRuns).mockResolvedValue([
+      {
+        // Zombie del outage 2026-08-06 (entrada real de ignored-pending-runs.ts, vigente hasta 2026-08-21).
+        runId: 31126022507,
+        workflowName: 'Ops Worker Deploy',
+        status: 'queued',
+        ageMs: 20 * 60 * 60 * 1000,
+        htmlUrl: 'https://github.com/x/y/actions/runs/31126022507',
+        branch: 'develop',
+        sha: '26005a619'
+      }
+    ])
+
+    const result = await checkPendingWithoutJobs(buildInput())
+
+    expect(result.severity).toBe('ok')
+    expect(result.summary).toContain('lista forense')
+    expect(result.evidence).toMatchObject({
+      count: 0,
+      ignored: [expect.objectContaining({ runId: 31126022507 })]
+    })
+  })
+
+  it('exclusión forense NO tapa runs fuera de la lista: deadlock real sigue bloqueando', async () => {
+    process.env.GITHUB_RELEASE_OBSERVER_TOKEN = 'fake'
+    vi.mocked(listPendingRuns).mockResolvedValue([
+      {
+        runId: 31126022507,
+        workflowName: 'Ops Worker Deploy',
+        status: 'queued',
+        ageMs: 20 * 60 * 60 * 1000,
+        htmlUrl: 'https://github.com/x/y/actions/runs/31126022507',
+        branch: 'develop',
+        sha: '26005a619'
+      },
+      {
+        runId: 999,
+        workflowName: 'Ops Worker Deploy',
+        status: 'queued',
+        ageMs: 10 * 60 * 1000,
+        htmlUrl: 'https://github.com/x/y/actions/runs/999',
+        branch: 'main',
+        sha: 'def'
+      }
+    ])
+
+    const result = await checkPendingWithoutJobs(buildInput())
+
+    expect(result.severity).toBe('error')
+    expect(result.evidence).toMatchObject({ count: 1 })
+  })
+
   it('severity unknown when reader throws', async () => {
     process.env.GITHUB_RELEASE_OBSERVER_TOKEN = 'fake'
     vi.mocked(listPendingRuns).mockRejectedValue(new Error('rate limit'))

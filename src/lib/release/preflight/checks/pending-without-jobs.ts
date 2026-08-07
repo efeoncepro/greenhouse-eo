@@ -16,6 +16,7 @@ import { redactErrorForResponse } from '@/lib/observability/redact'
 import { listPendingRuns } from '@/lib/reliability/queries/release-pending-without-jobs'
 
 import { resolveGithubToken } from '../../github-helpers'
+import { IGNORED_PENDING_RUNS, activeIgnoredRunIds } from '../ignored-pending-runs'
 import type { PreflightCheckResult } from '../types'
 
 // Pending runs are repo-global; the per-run input is not consumed.
@@ -44,7 +45,27 @@ export const checkPendingWithoutJobs = async (
   }
 
   try {
-    const records = await listPendingRuns(token)
+    const allRecords = await listPendingRuns(token)
+
+    // Exclusión forense (SOLO preflight; la reliability signal no la consume): runs que
+    // la infraestructura de GitHub dejó en estado roto e inmanejable, con vencimiento.
+    // Ver reglas duras en `../ignored-pending-runs.ts`.
+    const ignoredIds = activeIgnoredRunIds()
+    const records = allRecords.filter(record => !ignoredIds.has(record.runId))
+    const ignored = allRecords.filter(record => ignoredIds.has(record.runId))
+
+    const ignoredEvidence =
+      ignored.length === 0
+        ? {}
+        : {
+            ignored: ignored.map(record => ({
+              runId: record.runId,
+              workflowName: record.workflowName,
+              reason:
+                IGNORED_PENDING_RUNS.find(entry => entry.runId === record.runId)?.reason ??
+                'sin razón registrada'
+            }))
+          }
 
     if (records.length === 0) {
       return {
@@ -53,9 +74,12 @@ export const checkPendingWithoutJobs = async (
         status: 'ok',
         observedAt,
         durationMs: Date.now() - observedAtStart,
-        summary: 'Sin runs queued/in_progress con jobs vacios',
+        summary:
+          ignored.length === 0
+            ? 'Sin runs queued/in_progress con jobs vacios'
+            : `Sin runs bloqueantes (${ignored.length} residuo(s) de GitHub excluidos por lista forense con vencimiento)`,
         error: null,
-        evidence: { count: 0 },
+        evidence: { count: 0, ...ignoredEvidence },
         recommendation: ''
       }
     }
@@ -77,7 +101,8 @@ export const checkPendingWithoutJobs = async (
           ageMs: r.ageMs,
           branch: r.branch,
           htmlUrl: r.htmlUrl
-        }))
+        })),
+        ...ignoredEvidence
       },
       recommendation:
         'Cancelar runs zombie via `gh run cancel <id>` ANTES de disparar release nuevo. Si persiste, verificar concurrency fix Opcion A en worker workflows.'
