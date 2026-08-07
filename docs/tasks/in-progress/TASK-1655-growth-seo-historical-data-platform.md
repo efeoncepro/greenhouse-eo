@@ -215,7 +215,7 @@ Reglas obligatorias:
 - [x] SoT nombrado + contrato de fila idéntico entre stores (test de paridad con datos reales).
 - [x] Invariantes (MERGE sin DELETE, huecos honestos, semilla no pisa cron) explícitos.
 - [x] Migration/rollback posture explícito (aditivo; BQ por rollout step).
-- [ ] Evidencia final del backfill completo (MIN fecha ≈ 16 meses) — corrida en curso.
+- [x] Evidencia final del backfill completo (2026-08-07): **Berel 487/487 días · 6.668.789 filas · 2025-04-05→2026-08-04 · 0 degradados/fallidos**; **Efeonce 474 días con datos · 34.199 filas · desde 2025-04-18** (13 días empty honestos; OAuth GSC de Efeonce conectado el mismo día). Lectura de 180 días verificada sirviendo 179 días desde BQ con ventana previa comparable.
 
 ## Modular Placement Contract
 
