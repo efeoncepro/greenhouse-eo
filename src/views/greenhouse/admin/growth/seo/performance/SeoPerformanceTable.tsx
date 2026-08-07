@@ -52,6 +52,37 @@ export interface SeoPerformanceTableProps {
   onDrill: (item: string) => void
 }
 
+/**
+ * Sparkline de fila: la serie diaria se agrega a buckets (≤26) ANTES de dibujar — 179
+ * puntos crudos en 96px son ~2 puntos por pixel: un sismógrafo de agujas, no una
+ * tendencia (mismo defecto corregido en la banda KPI; hallazgo del operador). El bucket
+ * es el promedio de los días MEDIDOS; un bucket sin mediciones es `null` (hueco).
+ */
+const MAX_ROW_SPARKLINE_POINTS = 26
+
+const bucketTrend = (trend: Array<number | null>): Array<number | null> => {
+  if (trend.length <= MAX_ROW_SPARKLINE_POINTS) return trend
+
+  const bucketSize = Math.ceil(trend.length / MAX_ROW_SPARKLINE_POINTS)
+  const buckets: Array<number | null> = []
+
+  for (let index = 0; index < trend.length; index += bucketSize) {
+    const measured = trend.slice(index, index + bucketSize).filter((value): value is number => value !== null)
+
+    buckets.push(measured.length > 0 ? measured.reduce((total, value) => total + value, 0) / measured.length : null)
+  }
+
+  return buckets
+}
+
+/**
+ * Umbral neutro del Δ30d de posición: ±0.3. Un promedio ponderado por impresiones oscila
+ * ±0.1–0.2 por puro ruido de mezcla de queries; pintar ese vaivén en rojo ("empeoró")
+ * trata ruido como señal. Bajo el umbral el valor SE MUESTRA igual, en gris neutro — se
+ * suprime el juicio, no el dato.
+ */
+const POSITION_DELTA_NEUTRAL_THRESHOLD = 0.3
+
 /** `null` SIEMPRE al final, ordene como ordene: un "sin dato" no es ni el mejor ni el peor. */
 const compareNullable = (a: number | null, b: number | null, direction: SortDirection): number => {
   if (a === null && b === null) return 0
@@ -166,7 +197,7 @@ const SeoPerformanceTable = ({ standings, mode, onDrill }: SeoPerformanceTablePr
               </TableHead>
               <TableBody>
                 {sorted.map(row => {
-                  const trendPoints = row.trend
+                  const trendPoints = bucketTrend(row.trend)
                     .map((value, index) => ({ index, value }))
                     .filter(point => point.value !== null)
 
@@ -217,7 +248,7 @@ const SeoPerformanceTable = ({ standings, mode, onDrill }: SeoPerformanceTablePr
                             format='number'
                             invert
                             fractionDigits={1}
-                            neutralThreshold={0.05}
+                            neutralThreshold={POSITION_DELTA_NEUTRAL_THRESHOLD}
                           />
                         )}
                       </TableCell>
