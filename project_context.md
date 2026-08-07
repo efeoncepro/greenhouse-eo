@@ -60,6 +60,8 @@ Seedance 2.0/R2V, GPT Image 2, Seedream 5 Pro, Nano Banana 2/Pro y Kling 3.0. �
 según el reader live; Seedream Edit queda `gated` por binding deshabilitado. Seedream Lite, edición de OpenAI/Nano
 Banana y video-to-image de Nano Banana permanecen como superficies no públicas hasta tener ruta, binding, canary y
 readback propios. Un lookup de circuito `not_found` para Nano Banana Pro es blocker operativo explícito.
+Seedance 2.5 queda documentado como tres superficies Fal activas (T2V/I2V/R2V), con route card e inventario exhaustivo
+en Greenhouse y `TASK-1656`; provider-supported no equivale a disponibilidad de Globe, que sigue `gated`.
 Las atestaciones comerciales son inmutables por identidad de modelo + digest de términos: una corrección jurídica
 crea una atestación y policy derivada nuevas, nunca modifica la anterior. La idempotencia de `auto-promote` debe
 incluir esa autoridad legal; ruta/workspace/report por sí solos no distinguen una nueva versión de términos. Un

@@ -1,0 +1,302 @@
+{
+  "schemaVersion": "model-route-card.v1",
+  "cardId": "route-card/seedance-25-video",
+  "snapshot": {
+    "observedAt": "2026-08-07",
+    "maxAgeDays": 7,
+    "revalidateBeforeUse": true
+  },
+  "authority": {
+    "availabilityReader": "efeonce-globe:globe.producer.fleet.list",
+    "humanLedger": "docs/operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md",
+    "providerEvidence": "Fal Model Search + per-endpoint OpenAPI/LLM pages; BytePlus/Volcengine Seedance 2.5 product promotion"
+  },
+  "modelFamily": {
+    "publicName": "Seedance 2.5",
+    "familyKey": "seedance-25-video",
+    "modality": "video",
+    "globeStatus": "gated",
+    "summary": "Fal exposes three active Seedance 2.5 inference endpoints. Globe has no 2.5 route, binding, adapter mapping, commercial rate, exact rights attestation, evaluation, canary or live-reader availability.",
+    "integrationDecision": "Treat T2V, I2V and R2V as separate route identities. Keep product claims and the unverified direct BytePlus API separate from the executable Fal contracts. Do not inherit Seedance 2.0 evidence or fallback silently."
+  },
+  "evidence": [
+    {
+      "id": "fal-model-search",
+      "authority": "provider_primary",
+      "kind": "live-model-search",
+      "observedAt": "2026-08-07",
+      "reference": "https://api.fal.ai/v1/models?q=seedance-2.5&limit=100",
+      "revalidateBeforeUse": true,
+      "ttlDays": 1,
+      "note": "The live response returned exactly three active endpoints: text-to-video, image-to-video and reference-to-video."
+    },
+    {
+      "id": "fal-model-search-docs",
+      "authority": "provider_primary",
+      "kind": "model-search-and-openapi-docs",
+      "observedAt": "2026-08-07",
+      "reference": "https://fal.ai/docs/platform-apis/v1/models",
+      "revalidateBeforeUse": true,
+      "ttlDays": 14,
+      "note": "Fal documents endpoint search and the openapi-3.0 expansion used to retrieve the schemas."
+    },
+    {
+      "id": "fal-t2v-api",
+      "authority": "provider_primary",
+      "kind": "endpoint-openapi-and-model-page",
+      "observedAt": "2026-08-07",
+      "reference": "https://fal.ai/models/bytedance/seedance-2.5/text-to-video",
+      "revalidateBeforeUse": true,
+      "ttlDays": 7,
+      "note": "Prompt required; 480p/720p; auto or 4–30 seconds; seven aspect-ratio values plus auto; generated audio; output video and seed."
+    },
+    {
+      "id": "fal-i2v-api",
+      "authority": "provider_primary",
+      "kind": "endpoint-openapi-and-model-page",
+      "observedAt": "2026-08-07",
+      "reference": "https://fal.ai/models/bytedance/seedance-2.5/image-to-video",
+      "revalidateBeforeUse": true,
+      "ttlDays": 7,
+      "note": "Prompt and image_url required; end_image_url optional; aspect_ratio is constrained to auto; same duration, resolution and generated-audio contract."
+    },
+    {
+      "id": "fal-r2v-api",
+      "authority": "provider_primary",
+      "kind": "endpoint-openapi-and-model-page",
+      "observedAt": "2026-08-07",
+      "reference": "https://fal.ai/models/bytedance/seedance-2.5/reference-to-video",
+      "revalidateBeforeUse": true,
+      "ttlDays": 7,
+      "note": "Separate image_urls, video_urls and audio_urls; up to 30 images, 10 videos, 10 audios and 50 total files; audio requires an image or video."
+    },
+    {
+      "id": "fal-queue",
+      "authority": "provider_primary",
+      "kind": "queue-openapi",
+      "observedAt": "2026-08-07",
+      "reference": "https://fal.ai/docs/documentation/model-apis/inference/queue",
+      "revalidateBeforeUse": true,
+      "ttlDays": 30,
+      "note": "The expanded schemas expose submit, status, result and cancel paths on queue.fal.run; follow-up URLs are returned by submit."
+    },
+    {
+      "id": "fal-pricing",
+      "authority": "provider_primary",
+      "kind": "provider-pricing-and-cost-formula",
+      "observedAt": "2026-08-07",
+      "reference": "https://fal.ai/pricing",
+      "revalidateBeforeUse": true,
+      "ttlDays": 1,
+      "note": "Fal model pages expose a volatile token/output formula and reference-video input modifiers; no Globe commercial rate is inferred here."
+    },
+    {
+      "id": "fal-retention",
+      "authority": "provider_primary",
+      "kind": "media-retention-and-access-policy",
+      "observedAt": "2026-08-07",
+      "reference": "https://fal.ai/docs/documentation/model-apis/media-expiration",
+      "revalidateBeforeUse": true,
+      "ttlDays": 30,
+      "note": "Provider CDN URLs and temporary media retention must be reconciled with Globe private ingest and rights policy."
+    },
+    {
+      "id": "byteplus-product",
+      "authority": "provider_primary",
+      "kind": "product-promotion",
+      "observedAt": "2026-08-07",
+      "reference": "https://ark.volcengine.com/promotion?modelName=seedance-2-5",
+      "revalidateBeforeUse": true,
+      "ttlDays": 14,
+      "note": "Product surface advertises multimodal generation, editing, extension, multi-shot and audiovisual control. It is not a public API schema and does not override Fal route contracts."
+    },
+    {
+      "id": "byteplus-video-api",
+      "authority": "provider_primary",
+      "kind": "direct-api-baseline",
+      "observedAt": "2026-08-07",
+      "reference": "https://docs.byteplus.com/en/docs/modelark/1520757",
+      "revalidateBeforeUse": true,
+      "ttlDays": 14,
+      "note": "The public ModelArk video API documents Seedance 2.0-era model IDs and schemas; no public 2.5 model ID or callable contract was verified."
+    },
+    {
+      "id": "globe-route-card-decision",
+      "authority": "repo_primary",
+      "kind": "route-card-contract",
+      "observedAt": "2026-08-07",
+      "reference": "docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_ROUTE_CARDS_DECISION_V1.md",
+      "revalidateBeforeUse": false,
+      "note": "Cards describe provider-supported candidates without becoming the Globe runtime catalog or availability authority."
+    },
+    {
+      "id": "globe-runtime-seams",
+      "authority": "repo_primary",
+      "kind": "globe-integration-audit",
+      "observedAt": "2026-08-07",
+      "reference": "efeonce-globe:apps/creative-runner/src/fal-adapter.ts; apps/creative-runner/src/governed-provider-runtime.ts; packages/contracts/src/producer-catalog.ts",
+      "revalidateBeforeUse": false,
+      "note": "Existing Fal queue, ingest, webhook, cancel, rights, evaluation, promotion and fleet seams are reusable; multimodal role/limit/rate gaps remain."
+    }
+  ],
+  "routes": [
+    {
+      "routeId": "ref/motion/seedance-25-t2v-v1",
+      "kind": "standard",
+      "capability": "video-generate",
+      "operation": "create",
+      "provider": "fal",
+      "model": "seedance-2.5",
+      "version": "2.5",
+      "identityState": "resolved",
+      "endpointId": "bytedance/seedance-2.5/text-to-video",
+      "region": null,
+      "completionDriver": "webhook+poll",
+      "lifecycle": "gated",
+      "exposure": { "governed": "candidate", "reader": "gated", "producerUi": "not-exposed", "externalRollout": "gated" },
+      "inputs": [
+        { "slot": "prompt", "role": "direction", "mediaType": "text", "required": true, "valueShape": "text" }
+      ],
+      "controls": [
+        { "name": "resolution", "owner": "outputShape", "valueShape": "enum(480p|720p)", "mechanism": "Fal field" },
+        { "name": "duration", "owner": "outputShape", "valueShape": "enum(auto|4..30 seconds)", "mechanism": "Fal field" },
+        { "name": "aspect-ratio", "owner": "outputShape", "valueShape": "enum(auto|21:9|16:9|4:3|1:1|3:4|9:16)", "mechanism": "Fal field" },
+        { "name": "audio-mode", "owner": "outputShape", "valueShape": "enum(with-audio|silent)", "mechanism": "generate_audio" },
+        { "name": "end-user-id", "owner": "governance", "valueShape": "string|null", "mechanism": "end_user_id" }
+      ],
+      "output": { "mediaType": "video", "mimeTypes": ["video/mp4"], "audio": "selectable embedded-or-none", "envelope": "video File + output seed", "durableAuthority": "Globe private content-addressed asset" },
+      "transport": { "kind": "Fal queue", "auth": "server-side provider credential", "providerSlug": "bytedance/seedance-2.5/text-to-video", "followUpReferences": "returned by Fal submit; not_derived", "webhook": "signed and idempotent after payload verification", "pollFallback": true, "browserAccess": "forbidden" },
+      "completion": { "driver": "webhook+poll", "providerOperation": "Fal status and result URLs", "resultAuthority": "Globe downloaded bytes, MIME and hash", "recovery": "readback before retry; no implicit 2.0 fallback" },
+      "cables": {
+        "provider_supported": { "state": "verified", "evidenceRefs": ["fal-model-search", "fal-t2v-api"] },
+        "contract_declared": { "state": "proposed", "evidenceRefs": ["fal-t2v-api", "globe-route-card-decision"] },
+        "adapter_wired": { "state": "not_started", "evidenceRefs": ["globe-runtime-seams"] },
+        "transport_verified": { "state": "not_started", "evidenceRefs": ["fal-queue"] },
+        "output_verified": { "state": "unknown", "evidenceRefs": ["fal-t2v-api"], "note": "No controlled Globe submit or retained 2.5 output yet." },
+        "billing_verified": { "state": "blocked", "evidenceRefs": ["fal-pricing"], "note": "Fal pricing is volatile and Globe has no 2.5 rate/settlement snapshot." },
+        "rights_verified": { "state": "blocked", "evidenceRefs": ["fal-retention", "byteplus-product"], "note": "Exact 2.5 provider/plan terms and Globe attestation are absent." },
+        "evaluated": { "state": "not_started", "evidenceRefs": [] },
+        "canary_passed": { "state": "not_started", "evidenceRefs": [] },
+        "promoted": { "state": "not_promoted", "evidenceRefs": [] },
+        "available": { "state": "gated", "evidenceRefs": ["globe-runtime-seams"], "note": "Availability belongs to the live Globe reader, not Fal model search." }
+      },
+      "evidenceRefs": ["fal-t2v-api", "fal-queue", "globe-runtime-seams"],
+      "blockers": ["Create exact Globe catalog/adapter/binding identity.", "Verify controlled submit, output bytes, duration, MIME, audio and returned follow-up URLs.", "Create rate, rights, evaluation and route-specific canary evidence."]
+    },
+    {
+      "routeId": "ref/video/seedance-25-i2v-v1",
+      "kind": "standard",
+      "capability": "video-frames",
+      "operation": "create",
+      "provider": "fal",
+      "model": "seedance-2.5",
+      "version": "2.5",
+      "identityState": "resolved",
+      "endpointId": "bytedance/seedance-2.5/image-to-video",
+      "region": null,
+      "completionDriver": "webhook+poll",
+      "lifecycle": "gated",
+      "exposure": { "governed": "candidate", "reader": "gated", "producerUi": "not-exposed", "externalRollout": "gated" },
+      "inputs": [
+        { "slot": "first-frame", "role": "first-frame", "mediaType": "image", "required": true, "cardinality": { "min": 1, "max": 1 }, "ordered": false, "mechanism": "native-parameter", "mimeTypes": ["image/jpeg", "image/png", "image/webp"], "maxBytes": 30000000 },
+        { "slot": "last-frame", "role": "last-frame", "mediaType": "image", "required": false, "cardinality": { "min": 0, "max": 1 }, "ordered": false, "mechanism": "native-parameter", "mimeTypes": ["image/jpeg", "image/png", "image/webp"], "maxBytes": 30000000 },
+        { "slot": "prompt", "role": "direction", "mediaType": "text", "required": true, "valueShape": "text" }
+      ],
+      "controls": [
+        { "name": "resolution", "owner": "outputShape", "valueShape": "enum(480p|720p)", "mechanism": "Fal field" },
+        { "name": "duration", "owner": "outputShape", "valueShape": "enum(auto|4..30 seconds)", "mechanism": "Fal field" },
+        { "name": "aspect-ratio", "owner": "outputShape", "valueShape": "const(auto)", "mechanism": "Fal field" },
+        { "name": "audio-mode", "owner": "outputShape", "valueShape": "enum(with-audio|silent)", "mechanism": "generate_audio" },
+        { "name": "end-user-id", "owner": "governance", "valueShape": "string|null", "mechanism": "end_user_id" }
+      ],
+      "output": { "mediaType": "video", "mimeTypes": ["video/mp4"], "audio": "selectable embedded-or-none", "envelope": "video File + output seed", "durableAuthority": "Globe private content-addressed asset" },
+      "transport": { "kind": "Fal queue", "auth": "server-side provider credential", "providerSlug": "bytedance/seedance-2.5/image-to-video", "followUpReferences": "returned by Fal submit; not_derived", "webhook": "signed and idempotent after payload verification", "pollFallback": true, "browserAccess": "forbidden" },
+      "completion": { "driver": "webhook+poll", "providerOperation": "Fal status and result URLs", "resultAuthority": "Globe downloaded bytes, MIME and hash", "recovery": "readback before retry; no implicit 2.0 fallback" },
+      "cables": {
+        "provider_supported": { "state": "verified", "evidenceRefs": ["fal-model-search", "fal-i2v-api"] },
+        "contract_declared": { "state": "proposed", "evidenceRefs": ["fal-i2v-api", "globe-route-card-decision"] },
+        "adapter_wired": { "state": "not_started", "evidenceRefs": ["globe-runtime-seams"] },
+        "transport_verified": { "state": "not_started", "evidenceRefs": ["fal-queue"] },
+        "output_verified": { "state": "unknown", "evidenceRefs": ["fal-i2v-api"], "note": "No controlled Globe submit or retained 2.5 output yet." },
+        "billing_verified": { "state": "blocked", "evidenceRefs": ["fal-pricing"], "note": "Fal pricing is volatile and Globe has no 2.5 rate/settlement snapshot." },
+        "rights_verified": { "state": "blocked", "evidenceRefs": ["fal-retention", "byteplus-product"], "note": "Exact 2.5 provider/plan terms and Globe attestation are absent." },
+        "evaluated": { "state": "not_started", "evidenceRefs": [] },
+        "canary_passed": { "state": "not_started", "evidenceRefs": [] },
+        "promoted": { "state": "not_promoted", "evidenceRefs": [] },
+        "available": { "state": "gated", "evidenceRefs": ["globe-runtime-seams"], "note": "Availability belongs to the live Globe reader, not Fal model search." }
+      },
+      "evidenceRefs": ["fal-i2v-api", "fal-queue", "globe-runtime-seams"],
+      "blockers": ["Extend the Globe route contract for first/last-frame semantics without inferring the last frame from array length.", "Verify controlled submit, output bytes, duration, MIME, audio and returned follow-up URLs.", "Create rate, rights, evaluation and route-specific canary evidence."]
+    },
+    {
+      "routeId": "ref/video/seedance-25-r2v-v1",
+      "kind": "standard",
+      "capability": "video-reference-to-video",
+      "operation": "create",
+      "provider": "fal",
+      "model": "seedance-2.5",
+      "version": "2.5",
+      "identityState": "resolved",
+      "endpointId": "bytedance/seedance-2.5/reference-to-video",
+      "region": null,
+      "completionDriver": "webhook+poll",
+      "lifecycle": "gated",
+      "exposure": { "governed": "candidate", "reader": "gated", "producerUi": "not-exposed", "externalRollout": "gated" },
+      "inputs": [
+        { "slot": "image-references", "role": "reference", "mediaType": "image", "cardinality": { "min": 0, "max": 30 }, "ordered": true, "mechanism": "reference-conditioned", "mimeTypes": ["image/jpeg", "image/png", "image/webp", "image/bmp", "image/tiff", "image/gif", "image/heic", "image/heif"], "maxBytes": 30000000, "promptCitation": "@ImageN" },
+        { "slot": "video-references", "role": "motion-source", "mediaType": "video", "cardinality": { "min": 0, "max": 10 }, "ordered": true, "mechanism": "reference-conditioned", "mimeTypes": ["video/mp4", "video/quicktime"], "maxBytes": 200000000, "durationSeconds": { "min": 1.8, "max": 30.2 }, "combinedDurationSeconds": 30.2, "fps": { "min": 24, "max": 60 }, "dimensionsPx": { "minPerSide": 300, "maxPerSide": 6000 }, "aspectRatio": { "min": 0.4, "max": 2.5 }, "promptCitation": "@VideoN" },
+        { "slot": "audio-references", "role": "source-audio", "mediaType": "audio", "cardinality": { "min": 0, "max": 10 }, "ordered": true, "mechanism": "reference-conditioned", "mimeTypes": ["audio/mpeg", "audio/wav"], "maxBytes": 15000000, "durationSeconds": { "min": 1.8, "max": 30.2 }, "combinedDurationSeconds": 30.2, "requiresAny": ["image-references", "video-references"], "promptCitation": "@AudioN" },
+        { "slot": "prompt", "role": "direction", "mediaType": "text", "required": true, "valueShape": "text" }
+      ],
+      "controls": [
+        { "name": "resolution", "owner": "outputShape", "valueShape": "enum(480p|720p)", "mechanism": "Fal field" },
+        { "name": "duration", "owner": "outputShape", "valueShape": "enum(auto|4..30 seconds)", "mechanism": "Fal field" },
+        { "name": "aspect-ratio", "owner": "outputShape", "valueShape": "enum(auto|21:9|16:9|4:3|1:1|3:4|9:16)", "mechanism": "Fal field" },
+        { "name": "audio-mode", "owner": "outputShape", "valueShape": "enum(with-audio|silent)", "mechanism": "generate_audio" },
+        { "name": "end-user-id", "owner": "governance", "valueShape": "string|null", "mechanism": "end_user_id" },
+        { "name": "prompt-citations", "owner": "inputPlan", "valueShape": "@ImageN|@VideoN|@AudioN", "mechanism": "prompt-semantic; syntax requires controlled verification" }
+      ],
+      "output": { "mediaType": "video", "mimeTypes": ["video/mp4"], "audio": "selectable embedded-or-none", "envelope": "video File + output seed", "durableAuthority": "Globe private content-addressed asset" },
+      "transport": { "kind": "Fal queue", "auth": "server-side provider credential", "providerSlug": "bytedance/seedance-2.5/reference-to-video", "followUpReferences": "returned by Fal submit; not_derived", "webhook": "signed and idempotent after payload verification", "pollFallback": true, "browserAccess": "forbidden", "inputStorage": "Globe private bytes uploaded to short-lived Fal URLs" },
+      "completion": { "driver": "webhook+poll", "providerOperation": "Fal status and result URLs", "resultAuthority": "Globe downloaded bytes, MIME and hash", "recovery": "readback before retry; no implicit 2.0 fallback" },
+      "cables": {
+        "provider_supported": { "state": "verified", "evidenceRefs": ["fal-model-search", "fal-r2v-api"] },
+        "contract_declared": { "state": "proposed", "evidenceRefs": ["fal-r2v-api", "globe-route-card-decision"], "note": "Current Globe contract lacks per-media cardinality and conditional input combinations; capability identity is an ADR decision." },
+        "adapter_wired": { "state": "not_started", "evidenceRefs": ["globe-runtime-seams"] },
+        "transport_verified": { "state": "not_started", "evidenceRefs": ["fal-queue", "fal-retention"] },
+        "output_verified": { "state": "unknown", "evidenceRefs": ["fal-r2v-api"], "note": "No controlled Globe submit or retained 2.5 output yet." },
+        "billing_verified": { "state": "blocked", "evidenceRefs": ["fal-pricing"], "note": "Input-video-dependent pricing requires a Globe usage driver and immutable rate snapshot." },
+        "rights_verified": { "state": "blocked", "evidenceRefs": ["fal-retention", "byteplus-product"], "note": "Exact 2.5 provider/plan terms, multimodal input rights and audio/likeness policy are absent." },
+        "evaluated": { "state": "not_started", "evidenceRefs": [] },
+        "canary_passed": { "state": "not_started", "evidenceRefs": [] },
+        "promoted": { "state": "not_promoted", "evidenceRefs": [] },
+        "available": { "state": "gated", "evidenceRefs": ["globe-runtime-seams"], "note": "Availability belongs to the live Globe reader, not Fal model search." }
+      },
+      "evidenceRefs": ["fal-r2v-api", "fal-queue", "fal-retention", "globe-runtime-seams"],
+      "blockers": ["Decide whether Globe adds a new video-reference-to-video capability or extends video-motion-control without semantic aliasing.", "Extend input policy for per-media limits, 50-file total, conditional audio and media QC before spend.", "Verify citation syntax, controlled submit, output bytes, audio packaging, billing, rights and route-specific canary."
+      ]
+    }
+  ],
+  "providerSurfaces": [
+    {
+      "surfaceId": "byteplus-seedance-25-direct-api",
+      "provider": "byteplus/modelark",
+      "endpointId": "https://ark.ap-southeast.bytepluses.com/api/v3/contents/generations/tasks",
+      "status": "deferred",
+      "modes": ["multimodal-video-generation", "video-editing", "video-extension", "multi-shot", "audiovisual-sync"],
+      "cables": { "provider_supported": { "state": "unknown", "evidenceRefs": ["byteplus-product", "byteplus-video-api"] }, "contract_declared": { "state": "blocked", "evidenceRefs": ["byteplus-video-api"] }, "adapter_wired": { "state": "not_started", "evidenceRefs": [] }, "transport_verified": { "state": "not_started", "evidenceRefs": [] }, "output_verified": { "state": "unknown", "evidenceRefs": [] }, "billing_verified": { "state": "blocked", "evidenceRefs": [] }, "rights_verified": { "state": "blocked", "evidenceRefs": [] }, "evaluated": { "state": "not_started", "evidenceRefs": [] }, "canary_passed": { "state": "not_started", "evidenceRefs": [] }, "promoted": { "state": "not_promoted", "evidenceRefs": [] }, "available": { "state": "gated", "evidenceRefs": [] } },
+      "evidenceRefs": ["byteplus-product", "byteplus-video-api"],
+      "note": "Product promotion exists, but no public 2.5 model ID, request schema, pricing or callable API contract was verified. Do not create a direct adapter from product claims."
+    }
+  ],
+  "implementationChecklist": [
+    { "id": "upstream-contract-refresh", "status": "verified", "ownerBoundary": "Greenhouse research / provider evidence", "evidenceRefs": ["fal-model-search", "fal-t2v-api", "fal-i2v-api", "fal-r2v-api"], "note": "Fal surface is active and the three OpenAPI contracts were captured on 2026-08-07; direct BytePlus 2.5 remains deferred." },
+    { "id": "route-identity-and-capability", "status": "blocked", "ownerBoundary": "ADR + Globe TASK-1633/TASK-1553", "evidenceRefs": ["globe-route-card-decision"], "note": "R2V needs an explicit capability decision; do not alias it to Seedance 2.0 motion-control by accident." },
+    { "id": "multimodal-input-policy", "status": "blocked", "ownerBoundary": "Globe contracts + Model Lab", "evidenceRefs": ["fal-r2v-api", "globe-runtime-seams"], "note": "Add per-media cardinality, conditional combinations, prompt citation ordering and media metadata validation." },
+    { "id": "fal-route-first-adapter", "status": "open", "ownerBoundary": "Globe Fal adapter + governed composition", "evidenceRefs": ["fal-t2v-api", "fal-i2v-api", "fal-r2v-api", "globe-runtime-seams"], "note": "Reuse the existing Fal transport and upload seam; add exact route bindings, end_image_url, audio_urls and role-preserving input plans." },
+    { "id": "pricing-and-settlement", "status": "blocked", "ownerBoundary": "Globe rates/credits/settlement", "evidenceRefs": ["fal-pricing"], "note": "Create an immutable rate policy with output duration/resolution and reference-video usage drivers; never copy Seedance 2.0 credits." },
+    { "id": "rights-retention-and-output", "status": "blocked", "ownerBoundary": "Globe rights + media governance", "evidenceRefs": ["fal-retention", "byteplus-product"], "note": "Verify exact terms, retention, delivery, audio/likeness and private ingestion before promotion." },
+    { "id": "route-evaluation-and-canary", "status": "open", "ownerBoundary": "Globe evaluation + canary/promotion", "evidenceRefs": ["fal-queue", "globe-runtime-seams"], "note": "Evaluate T2V, I2V first/last, R2V image/video/audio combinations, limits, output audio and no-truncation before any binding." },
+    { "id": "producer-consumer-delta", "status": "deferred", "ownerBoundary": "TASK-1552 Producer Composer + TASK-1633 contract", "evidenceRefs": ["globe-runtime-seams"], "note": "UI must consume the governed catalog/contract; do not add provider-specific Fal UI or hard-coded 50-reference caps." }
+  ]
+}

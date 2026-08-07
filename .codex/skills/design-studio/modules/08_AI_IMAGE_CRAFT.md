@@ -72,7 +72,8 @@ Cierra siempre en `templates/image-prompt-sheet.md` — no dejes el prompt suelt
 
 | Modelo | Fuerte en | Débil en | Cuándo usarlo |
 |---|---|---|---|
-| **Seedance 2.0** (ByteDance/Fal) | hasta 9 imágenes + 3 videos + 3 audios, native audio, 4–15 s y reference-to-video | requiere QA de acción, anatomía y continuidad | toma nueva o continuidad controlada por referencias; Seedance 2.5 no está verificado |
+| **Seedance 2.0** (ByteDance/Fal) | hasta 9 imágenes + 3 videos + 3 audios, native audio, 4–15 s y reference-to-video | requiere QA de acción, anatomía y continuidad | toma nueva o continuidad controlada por referencias |
+| **Seedance 2.5** (ByteDance vía Fal) | T2V, I2V y R2V; I2V con frame inicial y final opcional; R2V con imágenes, videos y audio, hasta 50 archivos; audio nativo; 4–30 s; 480p/720p | Fal no declara 4K, máscara, storyboard ni edición regional estructurada; es provider-supported, no ruta Globe disponible | referencia multimodal de alta continuidad; cargar route card y gates antes de usarlo en producción |
 | **Veo 3.1 / Fast** (Google Vertex) | ruta premium/broadcast y ruta de escala GCP | costo/cupo y duración por endpoint | premium y scale; nunca vía Fal |
 | **Kling 3 Pro/4K** (Fal) | first/last frame, elements, multi-shot y 4K | audio/idioma y concurrencia por endpoint | especialista 4K/control |
 | **PixVerse V6** (Fal) | 1080p, audio, camera controls y buen costo/volumen | límites 1080p/duración | variantes social a escala |

@@ -86,7 +86,7 @@ ausencia de lineage/costo, voz sin consentimiento, o modelo preview usado como �
 | `watch` | Gemini Omni Flash Preview | Google Vertex | text/reference-to-video, edición y audio en un mismo contexto; 720p/10 s y preview |
 | `specialist` | LTX 2.3 Reframe | Fal | adaptación/reframe/outpaint de masters aprobados, hasta 60 s según endpoint |
 | `watch` | Wan 2.7 | Fal | generación/reference/edit como challenger; no usar la familia 2.6 obsoleta |
-| `watch` | Seedance 2.5 | — | lifecycle `blocked`: no hay endpoint oficial Fal verificado; no prometer ni diseñar alrededor de él |
+| `watch` | Seedance 2.5 T2V / I2V / R2V | Fal | provider-supported; Globe `gated` hasta contrato, adapter, derechos, pricing, evaluación, canary y readback exactos |
 
 ### Audio, voz y localización
 

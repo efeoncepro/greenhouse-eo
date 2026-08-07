@@ -629,7 +629,7 @@ para OpenAI y Vertex, no un síntoma.** Un agente que lo lea como deuda va a "ar
   analogía. Un guard derivado exige que cada endpoint declare su base o declare que no la tiene.
 - **NUNCA** dejes los fallbacks de modelo de Fal activos: están **por default** y pueden ejecutar un modelo
   distinto del aprobado y tarifado, dejando el `route_snapshot` mintiendo sin ninguna señal. Se apagan con
-  `x-app-fal-disable-fallbacks`.
+  `x-app-fal-disable-fallback` (singular, header oficial de Fal; el plural queda como gap legacy a corregir).
 - **`docs.fal.ai` devuelve 429 a todo fetch programático pero es alcanzable desde el navegador real.** Una doc
   que parece caída puede no estarlo — y en esta sesión eso convirtió dos «no verificados» en hechos.
 

@@ -1,5 +1,14 @@
 # Handoff activo
 
+### Seedance 2.5 — inventario Fal y TASK-1656 (2026-08-07)
+
+Fal Model Search/OpenAPI confirma tres endpoints activos: T2V, I2V y R2V; Globe permanece `provider-supported / gated`.
+Se dejaron el inventario API, route card, registry, fleet ledger y skills espejo actualizados; no se tocó runtime de Globe.
+`TASK-1656` registra la integración backend-data: roles multimodales, audio, frame final, queue/webhook, ingest, rates,
+rights, evaluación, canary, settlement y promotion por ruta. Reutiliza el adapter Fal y el control plane existente;
+la UI queda en `TASK-1552` y el contrato compartido en `TASK-1633`. No habilitar 4K/1080p, tres minutos, edit/masks,
+storyboard, stems, streaming, realtime, seed de entrada ni BytePlus 2.5 sin contrato verificable.
+
 ### Release `30140c662` — TASK-1304 + TASK-1306 en producción (2026-08-07)
 
 PRs #179+#180 → manifest **`released`** (`30140c662a79-b5790565-9b75-41b8-a206-f2cd21a58080`, run 4

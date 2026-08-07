@@ -168,8 +168,8 @@ SLO y costo. El portafolio vigente, estados de promoción y registro machine-rea
 - modelo Google nativo → credencial, IAM, cuota, audit y ejecución directos en GCP;
 - un endpoint `preview` requiere fallback y no puede sostener por sí solo un SLA;
 - `provider completed` sólo crea un candidato; no crea aprobación, entrega ni publicación;
-- `deprecated` y `blocked` son no-ejecutables; Seedance 2.5 permanece bloqueado hasta existir endpoint oficial
-  verificable y superar evals;
+- `deprecated` y `blocked` son no-ejecutables; Seedance 2.5 está provider-supported en Fal, pero permanece
+  `gated` en Globe hasta existir contrato, adapter, derechos, pricing, evaluación, canary y readback exactos;
 - el precio relevante es costo por candidato aprobado y por familia entregada, no por request aislado;
 - la amplitud del marketplace no equivale a allowlist productivo.
 

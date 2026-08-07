@@ -29,7 +29,8 @@ No hay "el mejor modelo" — hay **el mejor modelo para ESTA toma**. Elige por l
 | **Higgsfield Cinema Studio** | Control de cámara nombrado y **repetible** | Presets: dolly, crash zoom, orbit, crane, pan, tilt, tracking + elegir **focal length** + física óptica. El control de cámara más dirigible |
 | **Higgsfield Soul ID** | **Consistencia de personaje** | Subir 3–5 fotos, entrenar ~5–10 min, reusar el mismo rostro en todas las tools. EL diferenciador |
 | **Runway Gen-4.5** | **Cine dirigido** | Entiende beats y coreografía de cámara (pan/truck/handheld). Fuerte para narrativa dirigida |
-| **Seedance 2.0 / 2.5** | Briefs detallados + **muchas refs** | Camera moves + hasta 12–50 refs (fija personaje/producto) + audio ref. Puede usar previs 3D como **video exportado** con keyframe de look si el endpoint expone reference-to-video; no recibe `.blend`. 2.5: 30s / 4K. **Barato (~$0.06/s)** |
+| **Seedance 2.0** | Briefs detallados + refs multimodales | Reference-to-video con hasta 9 imágenes + 3 videos + 3 audios; 4–15 s; native audio. Puede usar previs 3D como **video exportado**; no recibe `.blend`. |
+| **Seedance 2.5 vía Fal** | T2V, I2V y R2V; briefs largos, audio nativo y muchas refs | OpenAPI actual: 480p/720p, 4–30 s; I2V acepta `image_url` y `end_image_url`; R2V admite hasta 30 imágenes, 10 videos, 10 audios y 50 archivos totales, con audio condicionado a imagen/video. No declara 4K, máscara, storyboard, shots ni precio fijo; el costo publicado es una fórmula de Fal y debe refrescarse. |
 | **Kling 3.0** | **Storyboarding multi-shot + Voice Binding** | Voz consistente en 6 cortes / 5 idiomas. Económico |
 | **Veo 3.1** | **Broadcast** | Frame rate de cine, sync audio-visual nativo. ~$0.10/s |
 | **Gemini Omni** | **Edición conversacional multi-turn** | Multimodal, consistencia entre turnos. Vertex (proyecto efeonce-group) |
@@ -103,8 +104,10 @@ ilusión.** Es el error #1 que separa el video IA amateur del pro. Herramientas 
 
 - **Soul ID (Higgsfield):** subes 3–5 fotos, entrena ~5–10 min, y reúsas **el mismo rostro** en todas
   las tools (i2v, Cinema Studio, LipSync). El modo canónico para un personaje recurrente (incl. mascota).
-- **Refs multi-imagen (Seedance 12–50 refs):** cargas muchas referencias del personaje/producto para
-  fijarlo. Fuerte para producto (packaging, logo) que debe verse idéntico entre tomas.
+- **Refs multi-imagen (Seedance 2.5 R2V, hasta 50 archivos):** cargas referencias de imagen, video y audio
+  para orientar personaje, producto, movimiento, ritmo y voz; conserva el orden de las citas del prompt. Fuerte
+  para producto (packaging, logo) que debe verse idéntico entre tomas, pero el límite documentado no es una
+  garantía de consistencia de Globe.
 - **Voice Binding (Kling):** fija la **voz** consistente en múltiples cortes/idiomas — la contraparte
   sonora de Soul ID (ver `modules/07 §8`).
 - **Reference Image (Magnific)** en finishing: mantiene textura/estilo al upscalear.
@@ -204,7 +207,7 @@ dirigir (shot list + prompt sheet)
 |---|---|---|
 | Reveal cinematográfico con personaje consistente | Soul ID + Cinema Studio (Higgsfield) | Rostro fijo + cámara dirigida |
 | Spot broadcast con audio sincronizado | Veo 3.1 | Frame rate de cine + sync nativo |
-| Producto que debe verse idéntico en 6 tomas | Seedance (12–50 refs) | Muchas refs fijan el producto, barato |
+| Producto que debe verse idéntico en 6 tomas | Seedance 2.5 R2V (50 archivos totales) | Muchas refs orientan producto, movimiento y audio; validar continuidad antes del release |
 | Diálogo de personaje multi-idioma | Kling (Voice Binding) + LipSync | Voz consistente 5 idiomas |
 | Iteración conversacional de una escena | Gemini Omni | Edición multi-turn con consistencia |
 | Plate / fondo / partículas | text-to-video (modelo barato del agregador) | Encuadre exacto no importa |

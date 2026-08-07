@@ -21,7 +21,8 @@
 (`active | preview | deprecated | blocked`) tampoco. Toda route candidate de este research parte en `research_verified` y
 es no ejecutable hasta que el runtime del Studio la marque explícitamente `production_approved`. `Canary` no
 puede ser la única ruta de un SLA; `watch` requiere bake-off; `deprecated` y `blocked` no se ejecutan. Seedance
-2.5 está `blocked` hasta que exista ficha oficial Fal verificable.
+2.5 está expuesto por Fal en tres endpoints activos (T2V, I2V y R2V), pero Globe lo mantiene `gated` hasta
+que existan contrato, adapter, derechos, pricing, evaluación, canary y readback exactos.
 
 ## Cómo el agente elige
 

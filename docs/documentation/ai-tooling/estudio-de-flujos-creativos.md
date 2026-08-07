@@ -94,7 +94,9 @@ modelos no-Google allowlisted. Que un modelo sea “core” expresa prioridad, n
 En imagen Google se diseñan tres carriles: Gemini 3.1 Flash Lite para escala, Gemini 3.1 Flash como core y
 Gemini 3 Pro para acabado premium. Seedream, FLUX, Ideogram, Recraft, Bria y Topaz cubren operaciones distintas;
 no se intercambian silenciosamente. Gemini 2.5 queda como fallback temporal hasta su retiro y Imagen 4 no entra
-en trabajo nuevo. Seedance 2.5 permanece bloqueado mientras Fal no publique un endpoint oficial verificable.
+en trabajo nuevo. Seedance 2.5 ya está expuesto por Fal en T2V, I2V y R2V, pero permanece gated en Globe hasta
+completar contrato, adapter, derechos, pricing, evaluación y canary; la API directa BytePlus 2.5 sigue sin
+contrato público verificable.
 
 Un agente puede consultar capabilities, salud y estimate, preparar el plan y pedir aprobación. Para gastar recibe
 un token de un solo uso ligado al plan, inputs, ruta, región, cantidad y costo máximo. Aprobar una ruta, un delivery
