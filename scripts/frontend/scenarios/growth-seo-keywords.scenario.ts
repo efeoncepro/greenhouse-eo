@@ -95,8 +95,13 @@ export const scenario: CaptureScenario = {
     },
     {
       kind: 'visible',
-      // La degradación honesta del enriquecimiento de mercado, dicha con palabras.
-      selector: 'text=Mostramos sólo lo medido',
+      selector: '[data-capture="seo-keywords-verdict"]',
+      reason: 'la banda de veredicto es el primer objeto con peso del fold: dice qué significan los datos antes de dibujarlos'
+    },
+    {
+      kind: 'visible',
+      // La degradación honesta del enriquecimiento, ahora al pie del mapa y no en un banner.
+      selector: '[data-capture="seo-keywords-degraded"]',
       reason: 'volumen/dificultad ausentes se NOMBRAN; nunca se pintan en 0'
     },
     {
@@ -110,6 +115,12 @@ export const scenario: CaptureScenario = {
       kind: 'mark',
       label: 'default',
       note: 'Mapa de oportunidad + filtros + tabla densa con la acción recomendada por fila'
+    },
+    {
+      kind: 'mark',
+      label: 'verdict',
+      clipSelector: '[data-capture="seo-keywords-verdict"]',
+      note: 'Lectura dominante redactada desde el reparto real + segmentos que son leyenda y filtro a la vez'
     },
     {
       kind: 'mark',

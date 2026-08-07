@@ -5,14 +5,12 @@ import { useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 
 import Alert from '@mui/material/Alert'
-import AlertTitle from '@mui/material/AlertTitle'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
-import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
 import CustomAutocomplete from '@core/components/mui/Autocomplete'
@@ -20,7 +18,7 @@ import CustomTextField from '@core/components/mui/TextField'
 
 import DebouncedInput from '@/components/DebouncedInput'
 import EmptyState from '@/components/greenhouse/EmptyState'
-import { GreenhouseBreadcrumbs, GreenhouseChip } from '@/components/greenhouse/primitives'
+import { GreenhouseBreadcrumbs } from '@/components/greenhouse/primitives'
 import type { GreenhouseAsyncActionState } from '@/components/greenhouse/primitives/GreenhouseAsyncActionButton'
 import SurfaceRecipe from '@/components/greenhouse/primitives/surface-system/SurfaceRecipe'
 import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
@@ -33,7 +31,8 @@ import type { SeoConnectionState } from '@/views/greenhouse/admin/growth/seo/ove
 import SeoSearchVisibilityTabs from '../overview/SeoSearchVisibilityTabs'
 import KeywordOpportunityMap from './KeywordOpportunityMap'
 import KeywordOpportunityTable from './KeywordOpportunityTable'
-import { KEYWORD_ACTION_ORDER, resolveKeywordAction, type KeywordAction } from './keyword-opportunity-action'
+import KeywordOpportunityVerdict from './KeywordOpportunityVerdict'
+import { resolveKeywordAction, type KeywordAction } from './keyword-opportunity-action'
 
 /**
  * TASK-1308 — Oportunidades de keywords (nodo S3 del master flow `EPIC-022`).
@@ -210,25 +209,32 @@ const KeywordOpportunitiesView = ({
         ]}
       />
 
-      <Stack
-        direction={{ xs: 'column', md: 'row' }}
-        spacing={3}
-        justifyContent='space-between'
-        alignItems={{ xs: 'flex-start', md: 'flex-end' }}
-        data-capture='seo-keywords-toolbar'
-      >
-        <Stack spacing={1}>
-          {/* `surfaceHeroTitle` (SoT tipográfico): el token del titular primario de una
-              surface full-page. `component='h1'`: el único h1 (mapa y tabla son h2). */}
-          <Typography variant='surfaceHeroTitle' component='h1'>
-            {copy.pageTitle}
-          </Typography>
-          <Typography variant='body2' color='text.secondary'>
-            {copy.pageSubtitle}
-          </Typography>
-        </Stack>
+      {/* El titular ocupa su propia fila, a todo el ancho.
+          Antes compartía fila con los selectores y el resultado era el vacío que el GVC
+          mostró: Space (220px) + Ventana (180px) + gap no caben en los ~390px que sobraban,
+          así que envolvían a dos filas y dejaban un hueco enorme al lado del título. Bajar
+          los controles a la barra de tabs no sólo cierra el hueco — agrupa navegación y
+          contexto en una sola banda, que es lo que son. */}
+      <Stack spacing={1} data-capture='seo-keywords-toolbar'>
+        <Typography variant='surfaceHeroTitle' component='h1'>
+          {copy.pageTitle}
+        </Typography>
+        <Typography variant='body2' color='text.secondary' sx={{ maxInlineSize: '72ch' }}>
+          {copy.pageSubtitle}
+        </Typography>
+      </Stack>
 
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} alignItems={{ sm: 'center' }} flexWrap='wrap' useFlexGap>
+      {/* Una sola banda: navegación entre hermanas + el contexto que decide qué se lee. */}
+      <Stack
+        direction={{ xs: 'column', lg: 'row' }}
+        spacing={4}
+        justifyContent='space-between'
+        alignItems={{ lg: 'center' }}
+        data-capture='seo-keywords-tabs'
+      >
+        <SeoSearchVisibilityTabs activeTab='keywords' spaceId={selectedSpaceId} />
+
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} alignItems={{ sm: 'center' }}>
           <CustomAutocomplete
             options={spaces}
             value={selectedSpace}
@@ -240,7 +246,7 @@ const KeywordOpportunitiesView = ({
               option.organizationId === value.organizationId
             }
             onChange={(_, value) => (value ? pushQuery({ space: (value as SeoSpaceOption).organizationId }) : undefined)}
-            sx={{ minInlineSize: 220 }}
+            sx={{ minInlineSize: 200 }}
             renderInput={params => (
               <CustomTextField
                 {...params}
@@ -250,15 +256,16 @@ const KeywordOpportunitiesView = ({
             )}
           />
 
-          {/* El motivo va como `helperText` y no como tooltip: la ventana define sobre qué
-              se ponderó la posición, y un tooltip se esconde justo al abrirlo. */}
+          {/* El motivo pasó de `helperText` a `title`: la línea de ayuda medía casi lo mismo
+              que el propio control y era la que forzaba el wrap. El dato no se pierde —
+              está en el hover y en la nota de cobertura del mapa. */}
           <CustomTextField
             select
             label={copy.toolbar.windowLabel}
             value={String(windowDays)}
-            helperText={copy.toolbar.windowHint}
+            title={copy.toolbar.windowHint}
             onChange={event => pushQuery({ window: Number(event.target.value) })}
-            sx={{ minInlineSize: 180 }}
+            sx={{ minInlineSize: 170 }}
           >
             {Object.entries(copy.toolbar.windowOptions).map(([days, label]) => (
               <MenuItem key={days} value={days}>
@@ -269,28 +276,6 @@ const KeywordOpportunitiesView = ({
         </Stack>
       </Stack>
 
-      <Box data-capture='seo-keywords-tabs'>
-        <SeoSearchVisibilityTabs activeTab='keywords' spaceId={selectedSpaceId} />
-      </Box>
-
-      {/* Leyenda de origen. Acá el contraste es el punto: TODO lo de esta pantalla está
-          medido, y el chip de "estimado" queda apagado porque ese dato no existe todavía —
-          decirlo es más honesto que ocultar la dimensión entera. */}
-      <Stack direction='row' spacing={2} alignItems='center' aria-label={copy.source.ariaLabel} flexWrap='wrap' useFlexGap>
-        <Tooltip title={copy.source.measuredHint}>
-          <span>
-            <GreenhouseChip kind='metric' variant='solid' size='small' label={`● ${copy.source.measured}`} />
-          </span>
-        </Tooltip>
-        <Tooltip title={copy.source.estimatedHint}>
-          <span>
-            <GreenhouseChip kind='metric' variant='label' size='small' label={`◑ ${copy.source.estimated}`} />
-          </span>
-        </Tooltip>
-        <Typography variant='caption' color='text.secondary'>
-          {copy.source.mixHint}
-        </Typography>
-      </Stack>
     </Stack>
   )
 
@@ -376,19 +361,6 @@ const KeywordOpportunitiesView = ({
 
     return (
       <Stack spacing={6}>
-        {/* Degradación honesta del enriquecimiento: se NOMBRA lo que falta y por qué la
-            priorización no lo necesita, en vez de dejar dos columnas mudas. */}
-        {opportunities.market === 'unavailable' ? (
-          <Alert
-            severity='info'
-            data-capture='seo-keywords-degraded'
-            sx={{ '& .MuiAlert-message': { color: 'text.primary' } }}
-          >
-            <AlertTitle>{copy.states.marketUnavailable.title}</AlertTitle>
-            {copy.states.marketUnavailable.description}
-          </Alert>
-        ) : null}
-
         {feedback ? (
           // `role=status` + aria-live: el resultado de "Seguir" se anuncia, no sólo se pinta.
           <Alert
@@ -402,9 +374,19 @@ const KeywordOpportunitiesView = ({
           </Alert>
         ) : null}
 
+        <KeywordOpportunityVerdict
+          // El veredicto describe el CONJUNTO, no el filtro: sus contadores son la leyenda
+          // y el filtro a la vez, así que tienen que seguir contando el total aunque el
+          // usuario esté viendo un subconjunto.
+          opportunities={rows}
+          activeAction={actionFilter}
+          onActionChange={setActionFilter}
+        />
+
         <KeywordOpportunityMap
           opportunities={filtered}
           impressionsThreshold={opportunities.impressionsThreshold}
+          marketUnavailable={opportunities.market === 'unavailable'}
         />
 
         {/* Los filtros viven en su propia superficie, no sueltos sobre el fondo de la
@@ -445,25 +427,6 @@ const KeywordOpportunitiesView = ({
               label={copy.toolbar.searchLabel}
               sx={{ minInlineSize: 220 }}
             />
-
-            <CustomTextField
-              select
-              label={copy.action.label}
-              value={actionFilter}
-              onChange={event => setActionFilter(event.target.value as KeywordAction | 'all')}
-              sx={{ minInlineSize: 200 }}
-            >
-              <MenuItem value='all'>{copy.filters.actionAll}</MenuItem>
-              {KEYWORD_ACTION_ORDER.map(action => (
-                <MenuItem key={action} value={action}>
-                  {action === 'quickWin'
-                    ? copy.action.quickWin
-                    : action === 'striking'
-                      ? copy.action.striking
-                      : copy.action.cannibalized}
-                </MenuItem>
-              ))}
-            </CustomTextField>
 
             <CustomTextField
               select

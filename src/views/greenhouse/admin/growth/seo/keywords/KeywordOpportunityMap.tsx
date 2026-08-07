@@ -6,7 +6,6 @@ import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Stack from '@mui/material/Stack'
-import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { useTheme } from '@mui/material/styles'
 
@@ -58,14 +57,36 @@ const FIRST_PAGE_EDGE = 10
 const AXIS_MIN_POSITION = 8
 const AXIS_MAX_POSITION = 20
 
-/** Diámetro del punto en px. Área ∝ ganancia, que es como el ojo lee el tamaño. */
-const MIN_SYMBOL = 10
-const MAX_SYMBOL = 42
+/**
+ * Diámetro del punto en px. Área ∝ ganancia, que es como el ojo lee el tamaño.
+ *
+ * ⚠️ RANGO ACOTADO A PROPÓSITO. El primer intento iba de 10 a 42px, y con los datos reales
+ * eso mentía: la ganancia máxima de Berel son 10 clics/mes y la mayoría está en 0–2, así que
+ * casi todos los puntos caían al piso y unos pocos se inflaban cuatro veces por una
+ * diferencia de 8 clics. El tamaño gritaba una precisión que el dato no tiene. Con 9→22px el
+ * canal sigue ordenando sin fingir que la diferencia es dramática — y el orden exacto lo da
+ * la tabla, que es donde se leen valores (regla dura de dataviz: el tooltip nunca puede ser
+ * la única forma de leer un número).
+ */
+const MIN_SYMBOL = 9
+const MAX_SYMBOL = 22
+
+/**
+ * Cuántas keywords se etiquetan directamente sobre el gráfico.
+ *
+ * 🔴 Un scatter de 50 puntos anónimos NO es accionable: sin etiquetas hay que pasar el
+ * cursor punto por punto para saber de qué keyword se habla, y el operador llega con la
+ * pregunta "¿cuál persigo primero?". Las de mayor ganancia se nombran en el propio lienzo;
+ * el resto se lee en la tabla.
+ */
+const DIRECT_LABEL_COUNT = 5
 
 export interface KeywordOpportunityMapProps {
   opportunities: KeywordOpportunity[]
   /** Umbral de impresiones que el reader aplicó (percentil de la propia org). */
   impressionsThreshold: number
+  /** Sin enriquecimiento de mercado: se dice al PIE, no en un banner sobre el fold. */
+  marketUnavailable: boolean
 }
 
 interface MapPoint {
@@ -75,9 +96,15 @@ interface MapPoint {
   clicks: number
   gain: number
   competingPages: number
+  /** `true` = se nombra sobre el lienzo (top por ganancia). */
+  labelled: boolean
 }
 
-const KeywordOpportunityMap = ({ opportunities, impressionsThreshold }: KeywordOpportunityMapProps) => {
+const KeywordOpportunityMap = ({
+  opportunities,
+  impressionsThreshold,
+  marketUnavailable
+}: KeywordOpportunityMapProps) => {
   const theme = useTheme()
   const prefersReduced = useReducedMotion()
   const copy = GH_GROWTH_SEO_KEYWORDS
@@ -125,6 +152,34 @@ const KeywordOpportunityMap = ({ opportunities, impressionsThreshold }: KeywordO
     [opportunities]
   )
 
+  /**
+   * Cota del eje logarítmico, derivada de los datos con un margen del 30%.
+   *
+   * ⚠️ Quitar el `min: 1` no bastó: el auto-scale de ECharts en un eje log redondea a
+   * DÉCADAS, así que con Berel (89–1377 impresiones) elegía 10→10.000 y la banda verde de
+   * "fruta madura" quedaba con un 40% de alto vacío — un bloque de color que no representa
+   * ningún dato. Con cotas explícitas los ticks de década siguen cayendo dentro (100, 1.000)
+   * pero el rango deja de estirarse a la potencia de 10 siguiente.
+   */
+  const impressionsBounds = useMemo(() => {
+    const values = opportunities.map(opportunity => Math.max(1, opportunity.impressions))
+
+    if (values.length === 0) return { min: 1, max: 10 }
+
+    return { min: Math.max(1, Math.min(...values) / 1.3), max: Math.max(...values) * 1.3 }
+  }, [opportunities])
+
+  /** Las N de mayor ganancia: son las que se nombran sobre el lienzo. */
+  const labelledKeywords = useMemo(() => {
+    return new Set(
+      [...opportunities]
+        .sort((a, b) => b.estimatedClickGain - a.estimatedClickGain)
+        .slice(0, DIRECT_LABEL_COUNT)
+        .filter(opportunity => opportunity.estimatedClickGain > 0)
+        .map(opportunity => opportunity.keyword)
+    )
+  }, [opportunities])
+
   const grouped = useMemo(() => {
     const buckets: Record<KeywordAction, MapPoint[]> = { quickWin: [], striking: [], cannibalized: [] }
 
@@ -138,12 +193,13 @@ const KeywordOpportunityMap = ({ opportunities, impressionsThreshold }: KeywordO
         impressions: opportunity.impressions,
         clicks: opportunity.clicks,
         gain: opportunity.estimatedClickGain,
-        competingPages: opportunity.competingPages
+        competingPages: opportunity.competingPages,
+        labelled: labelledKeywords.has(opportunity.keyword)
       })
     }
 
     return buckets
-  }, [opportunities])
+  }, [opportunities, labelledKeywords])
 
   const option = useMemo<EChartsOption>(() => {
     const series = KEYWORD_ACTION_ORDER.filter(action => grouped[action].length > 0).map((action, index) => {
@@ -164,6 +220,17 @@ const KeywordOpportunityMap = ({ opportunities, impressionsThreshold }: KeywordO
         },
         itemStyle: { color: style.color, opacity: 0.78, borderColor: paperInk, borderWidth: 1 },
         emphasis: { focus: 'series' as const, itemStyle: { opacity: 1 } },
+        // Etiqueta directa sólo en las de mayor ganancia: nombrar las 50 sería ilegible y
+        // nombrar ninguna deja un gráfico que no se puede accionar sin el mouse.
+        label: {
+          show: true,
+          formatter: (params: { data?: MapPoint }) => (params.data?.labelled ? params.data.keyword : ''),
+          position: 'right' as const,
+          distance: 8,
+          color: inkPrimary,
+          fontSize: 11
+        },
+        labelLayout: { moveOverlap: 'shiftY' as const, hideOverlap: false },
         // Bajo movimiento reducido el estado final se renderiza directo (WCAG 2.3.3).
         animation: !prefersReduced,
         animationDuration: 400,
@@ -208,7 +275,9 @@ const KeywordOpportunityMap = ({ opportunities, impressionsThreshold }: KeywordO
     })
 
     return {
-      grid: { left: 8, right: 24, top: 24, bottom: 48, containLabel: true },
+      // Aire a la derecha para las etiquetas directas: sin ese margen se recortarían
+      // contra el borde justo en las keywords que más importan.
+      grid: { left: 8, right: 132, top: 24, bottom: 48, containLabel: true },
       tooltip: {
         // `item` y no `axis`: cada punto ES una keyword distinta; un tooltip de eje
         // mostraría juntas keywords que sólo comparten la posición.
@@ -267,6 +336,8 @@ const KeywordOpportunityMap = ({ opportunities, impressionsThreshold }: KeywordO
         nameLocation: 'end' as const,
         nameGap: 12,
         nameTextStyle: { color: axisInk, fontSize: 11, align: 'left' as const },
+        min: impressionsBounds.min,
+        max: impressionsBounds.max,
         // ⚠️ SIN `min` fijo, a propósito. Anclarlo en 1 parecía la contraparte prudente del
         // piso `Math.max(1, impressions)` de los datos, pero en un eje LOGARÍTMICO fija dos
         // décadas enteras (1→100) que ninguna oportunidad puede ocupar: el reader ya filtra
@@ -288,6 +359,7 @@ const KeywordOpportunityMap = ({ opportunities, impressionsThreshold }: KeywordO
     grouped,
     actionStyle,
     maxGain,
+    impressionsBounds,
     prefersReduced,
     axisInk,
     gridInk,
@@ -326,61 +398,24 @@ const KeywordOpportunityMap = ({ opportunities, impressionsThreshold }: KeywordO
             </Typography>
           </Stack>
 
-          {/* Leyenda de FORMA + ACCIÓN: el color solo no sobrevive en monocromo (WCAG
-              1.4.1), y acá lo que distingue no es una severidad sino QUÉ HAY QUE HACER. */}
-          <Stack direction='row' spacing={4} flexWrap='wrap' useFlexGap aria-label={copy.action.label}>
-            {KEYWORD_ACTION_ORDER.filter(action => grouped[action].length > 0).map(action => {
-              const style = actionStyle[action]
-
-              const hint =
-                action === 'quickWin'
-                  ? copy.action.quickWinHint
-                  : action === 'striking'
-                    ? copy.action.strikingHint
-                    : copy.action.cannibalizedHint
-
-              return (
-                <Tooltip key={action} title={hint}>
-                  <Stack direction='row' spacing={1.5} alignItems='center'>
-                    <Box
-                      aria-hidden='true'
-                      sx={{
-                        inlineSize: 12,
-                        blockSize: 12,
-                        backgroundColor: style.color,
-                        // La forma del marcador, replicada en HTML: círculo, triángulo y
-                        // rombo se distinguen sin color.
-                        clipPath:
-                          action === 'striking'
-                            ? 'polygon(50% 0%, 100% 100%, 0% 100%)'
-                            : action === 'cannibalized'
-                              ? 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)'
-                              : undefined,
-                        borderRadius: action === 'quickWin' ? '50%' : 0
-                      }}
-                    />
-                    <Typography variant='caption' color='text.secondary'>
-                      {style.label} · {grouped[action].length}
-                    </Typography>
-                  </Stack>
-                </Tooltip>
-              )
-            })}
-          </Stack>
-
           <Box role='img' aria-label={ariaLabel}>
             <AppECharts option={option} height={380} />
           </Box>
 
-          <Stack spacing={0.5}>
+          <Stack spacing={1} data-capture='seo-keywords-degraded'>
             {/* Qué significa el tamaño: sin decirlo, la burbuja grande se lee como
                 "importante" sin que nadie sepa por qué. */}
             <Typography variant='caption' color='text.secondary'>
-              {copy.map.bubbleHint}
+              {copy.map.bubbleHint} {copy.map.zoomHint}
             </Typography>
-            <Typography variant='caption' color='text.secondary'>
-              {copy.map.zoomHint}
-            </Typography>
+            {/* Degradación honesta AL PIE, no en un banner sobre el fold. El dato sigue
+                dicho — la honestidad se mide por si está, no por el tamaño del recuadro —
+                pero deja de robarle el primer fold al contenido. */}
+            {marketUnavailable ? (
+              <Typography variant='caption' color='text.secondary'>
+                ● {copy.source.measured} · {copy.states.marketUnavailable.description}
+              </Typography>
+            ) : null}
           </Stack>
         </Stack>
       </CardContent>

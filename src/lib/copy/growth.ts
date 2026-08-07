@@ -1901,6 +1901,30 @@ export const GH_GROWTH_SEO_KEYWORDS = {
     mixHint: 'Todo lo que ves acá está medido. Nada se promedia con una estimación de mercado.'
   },
 
+  /**
+   * El veredicto: lo que los datos SIGNIFICAN, antes de dibujarlos.
+   *
+   * ⚠️ Se redacta desde el reparto real, no desde una plantilla fija. Con Berel, 42 de 50
+   * oportunidades son de consolidación — ese hallazgo cambia el trabajo de la semana y en la
+   * primera versión vivía como un número al final de una leyenda. Si el reparto cambia, el
+   * titular dice otra cosa; si no hay nada que destacar, no inventa un titular.
+   */
+  verdict: {
+    ariaLabel: 'Lectura principal y filtro por acción',
+    mostlyCannibalized: '{count} de {total} keywords compiten contra tu propio sitio',
+    mostlyCannibalizedHint:
+      'Más de una página tuya aparece para la misma búsqueda y se diluyen entre sí. Consolidar es un trabajo distinto de optimizar: unificar, redirigir, canonical o diferenciar la intención.',
+    mostlyQuickWin: '{count} de {total} keywords están a un empujón de subir',
+    mostlyQuickWinHint: 'Ya rankean en la primera plana; falta subir dentro de ella. Es el trabajo de mejor retorno.',
+    balanced: '{total} keywords entre las posiciones 8 y 20',
+    balancedHint: 'Ya rankeas para todas: existe página y existe relevancia. Lo que cambia es qué hacer con cada una.',
+    gainTotal: '+{value} clics/mes est. sobre la mesa',
+    gainTotalHint: 'Suma de la ganancia estimada de todas las keywords listadas, si cada una llegara a su posición objetivo.',
+    filterHint: 'Toca una acción para filtrar el mapa y la tabla.',
+    active: 'Filtro activo',
+    clear: 'Ver todas'
+  },
+
   map: {
     title: 'Mapa de oportunidad',
     subtitle: 'Más a la izquierda, más cerca de la primera plana. Más arriba, más gente lo busca.',
