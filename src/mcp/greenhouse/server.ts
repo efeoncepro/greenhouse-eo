@@ -395,6 +395,24 @@ export const createGreenhouseMcpServer = (
     async args => handlers.getSeoBacklinkProfile(args)
   )
 
+  // TASK-1308 — el PRIMER tool SEO que ESCRIBE. Los 9 anteriores son lecturas; éste
+  // compromete gasto recurrente del proveedor, así que el lane lo acepta sólo desde
+  // bindings de scope `internal` y el command aplica techo + entitlement + idempotencia.
+  server.registerTool(
+    'track_seo_keywords',
+    {
+      title: 'Track SEO Keywords',
+      description:
+        'Add keywords to the monitored set of an organization so they enter daily rank tracking. THIS WRITES AND COMMITS RECURRING SPEND: every tracked keyword is billed to the provider on every rank-capture cycle until it is untracked, so propose the exact list to the human and get confirmation BEFORE calling this — never call it speculatively or to "see what happens". Idempotent: a keyword already tracked returns already_tracked and costs nothing. The set has a governed capacity ceiling; keywords beyond it return capacity_exceeded and are NOT tracked — report those back verbatim instead of implying they were added. Read the per-keyword outcomes array (tracked | already_tracked | capacity_exceeded | invalid), never just data.ok. Discover candidates with get_seo_keyword_opportunities first. When data.ok is false, report the errorCode (disabled, target_not_found, target_not_active, no_entitlement, no_keywords, query_failed) honestly.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        keywords: z.array(z.string().trim().min(1)).min(1).max(50)
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.trackSeoKeywords(args)
+  )
+
   // Resource addressable: el mismo documento read-only por URI estable.
   server.registerResource(
     'knowledge_document',

@@ -188,6 +188,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   | 'getSeoOverviewKpis'
   | 'getSeoSiteAuditReport'
   | 'getSeoBacklinkProfile'
+  | 'trackSeoKeywords'
 >) => ({
   async getContext() {
     return callReadTool(
@@ -614,6 +615,48 @@ export const createGreenhouseMcpHandlers = (client: Pick<
         )} days (${result.requestId}).`
       },
       () => client.getSeoBacklinkProfile(input)
+    )
+  },
+  /**
+   * TASK-1308 — el único tool SEO que ESCRIBE.
+   *
+   * El resumen que devuelve enumera el outcome POR keyword a propósito: un agente que sólo
+   * viera "ok" reportaría "listo, las seguí todas" cuando el techo rebotó la mitad. Lo que
+   * se rechazó tiene que llegar al usuario con esas palabras.
+   */
+  async trackSeoKeywords(input: { organizationId?: string; keywords: string[] }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          outcomes?: Array<{ keyword: string; status: string }>
+          activeKeywordCount?: number
+          capacity?: number
+        }
+
+        if (data.ok === false) {
+          return `SEO keyword tracking rejected (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        const outcomes = Array.isArray(data.outcomes) ? data.outcomes : []
+        const count = (status: string) => outcomes.filter(outcome => outcome.status === status).length
+        const rejected = count('capacity_exceeded')
+
+        const parts = [
+          `${count('tracked')} newly tracked`,
+          `${count('already_tracked')} already tracked`,
+          `${rejected} rejected (set at capacity)`,
+          `${count('invalid')} invalid`
+        ]
+
+        return `SEO keyword tracking: ${parts.join(', ')}. The set now has ${String(
+          data.activeKeywordCount ?? '?'
+        )}/${String(data.capacity ?? '?')} tracked keywords, each billed per rank-capture cycle${
+          rejected > 0 ? ' — report the rejected keywords instead of claiming they were tracked' : ''
+        } (${result.requestId}).`
+      },
+      () => client.trackSeoKeywords(input)
     )
   }
 })

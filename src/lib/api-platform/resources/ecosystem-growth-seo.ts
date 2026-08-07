@@ -10,6 +10,7 @@ import { readSeoPerformanceCatalog } from '@/lib/growth/seo/performance/read-per
 import { readRankEvolution } from '@/lib/growth/seo/rank-evolution-reader'
 import { readSeoOverviewKpis } from '@/lib/growth/seo/overview/read-overview-kpis'
 import { readSiteAuditReport } from '@/lib/growth/seo/site-audit/reader'
+import { trackKeywords } from '@/lib/growth/seo/track-keywords'
 import type {
   BacklinkProfileResult,
   KeywordOpportunitiesResult,
@@ -20,7 +21,8 @@ import type {
   SeoPerformanceMode,
   SeoPerformanceResult,
   SeoRankDevice,
-  SiteAuditReportResult
+  SiteAuditReportResult,
+  TrackKeywordsResult
 } from '@/lib/growth/seo/contracts'
 import { resolveSeoEntitlement, type SeoTier } from '@/lib/growth/seo/entitlement'
 import { isSeoModuleEnabled } from '@/lib/growth/seo/flags'
@@ -45,9 +47,18 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
  *   **404 anti-oracle** — un binding sin entitlement no aprende si la org existe.
  */
 
-const resolveOrganizationId = (context: ApiPlatformRequestContext, request: Request): string => {
+const resolveOrganizationId = (
+  context: ApiPlatformRequestContext,
+  request: Request,
+  /**
+   * Org pedida por el cuerpo de un command (los POST no llevan query string). Se resuelve
+   * con las MISMAS reglas de binding que el query param — una segunda vía de resolución
+   * sería una segunda autoridad, y una de las dos terminaría siendo la más laxa.
+   */
+  requestedOverride?: string | null
+): string => {
   const url = new URL(request.url)
-  const requested = (url.searchParams.get('organizationId') ?? '').trim() || null
+  const requested = (requestedOverride ?? url.searchParams.get('organizationId') ?? '').trim() || null
 
   const bindingOrg = context.binding.organizationId
 
@@ -95,9 +106,10 @@ interface SeoLaneSubject {
  */
 const resolveSeoLaneSubject = async (
   context: ApiPlatformRequestContext,
-  request: Request
+  request: Request,
+  requestedOrganizationId?: string | null
 ): Promise<SeoLaneSubject> => {
-  const organizationId = resolveOrganizationId(context, request)
+  const organizationId = resolveOrganizationId(context, request, requestedOrganizationId)
 
   const entitlement = await resolveSeoEntitlement(organizationId)
 
@@ -527,5 +539,82 @@ export const getEcosystemSeoEntitlementPayload = async ({
       blockedReason: entitlement.blockedReason
     },
     meta: { module: 'growth.seo' }
+  }
+}
+
+/**
+ * ═══ TASK-1308 — `POST /api/platform/ecosystem/growth/seo/keywords/track` ═══
+ *
+ * El PRIMER write del lane SEO. Todo lo anterior era lectura, y eso cambia el listón:
+ * seguir una keyword compromete gasto DataForSEO recurrente en la cuenta del cliente.
+ *
+ * 🔴 **Sólo bindings de scope `internal`.** Un binding org-scoped (cliente) puede LEER sus
+ * oportunidades pero NO hacer crecer su propia factura sin una persona de Efeonce en el
+ * medio. Es una decisión de least-privilege deliberada y reversible: abrirla después es
+ * un cambio de una línea con su evidencia; haberla abierto de entrada no se deshace.
+ *
+ * El resto de las defensas NO se reimplementan acá — viven en el command `trackKeywords`
+ * (techo, entitlement per-org, idempotencia, normalización, outbox). Este lane sólo deriva
+ * el sujeto máquina y traduce el contrato.
+ */
+
+export interface EcosystemSeoTrackKeywordsBody {
+  organizationId?: unknown
+  keywords?: unknown
+}
+
+export const trackEcosystemSeoKeywordsPayload = async ({
+  context,
+  request,
+  body
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+  body: EcosystemSeoTrackKeywordsBody | null
+}): Promise<ApiPlatformSuccessResult<TrackKeywordsResult | SeoTargetNotConfiguredPayload>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  if (context.binding.greenhouseScopeType !== 'internal') {
+    throw new ApiPlatformError('Tracking SEO keywords is not allowed for the resolved binding scope.', {
+      statusCode: 403,
+      errorCode: 'scope_not_allowed'
+    })
+  }
+
+  const requestedOrganizationId = typeof body?.organizationId === 'string' ? body.organizationId : null
+
+  const keywords = Array.isArray(body?.keywords)
+    ? body.keywords.filter((item): item is string => typeof item === 'string')
+    : []
+
+  if (keywords.length === 0) {
+    throw new ApiPlatformError('A non-empty "keywords" array is required.', {
+      statusCode: 400,
+      errorCode: 'bad_request'
+    })
+  }
+
+  const subject = await resolveSeoLaneSubject(context, request, requestedOrganizationId)
+
+  if (!subject.seoTargetId) {
+    return {
+      data: { ok: false, errorCode: 'target_not_configured', organizationId: subject.organizationId },
+      meta: { module: 'growth.seo', tier: subject.tier }
+    }
+  }
+
+  // El actor es el CONSUMIDOR máquina, no una persona: la procedencia tiene que decir la
+  // verdad sobre quién comprometió el gasto para poder auditarlo después.
+  // `publicId` y no `consumerId`: la procedencia queda legible para quien audite el gasto
+  // sin tener que resolver un id interno contra otra tabla.
+  const result = await trackKeywords(subject.seoTargetId, keywords, `mcp:${context.consumer.publicId}`, {
+    source: 'mcp'
+  })
+
+  return {
+    data: result,
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId }
   }
 }
