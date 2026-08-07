@@ -384,7 +384,7 @@ Portada **full-bleed** (degradado en toda la slide, NO bipartito). Stack centrad
 ```
 efeonceLogo:   asset (fijo)     // logo-negative.svg, blanco, centrado, GRANDE
 clientLogo:    asset (slot)     // variante on-dark canónica del cliente; el template no recolorea
-proposalKind:  enum             // technical | economic | executive | combined → label formal visible
+proposalKind:  enum             // technical | economic | executive | combined | training → label formal visible
 urlBubble:     asset (fijo)     // Deck/SVG/url.svg (#848484 + mix-blend-mode:luminosity) al pie
 ```
 

@@ -246,7 +246,11 @@
         "comparison"
       ],
       "prototype": "comparison-split.html",
-      "slotsRef": "comparison-split.slots.json"
+      "slotsRef": "comparison-split.slots.json",
+      "variants": [
+        "proposal",
+        "diagnostic"
+      ]
     },
     {
       "name": "QuoteSplit",

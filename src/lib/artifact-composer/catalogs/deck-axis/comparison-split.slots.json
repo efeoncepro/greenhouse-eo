@@ -1,7 +1,7 @@
 {
   "template": "ComparisonSplit",
   "figmaNodeId": "8:13782",
-  "version": "0.2",
+  "version": "0.3",
   "viewport": { "width": 1920, "height": 1080 },
   "slots": {
     "leftTitle": {
@@ -53,6 +53,26 @@
       "type": "fixed-asset",
       "source": "public/branding/logo-negative.svg",
       "agentMayOverridePresentation": false
+    },
+    "presentation": {
+      "selector": "[data-slot='presentation']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "mode": {
+          "type": "enum",
+          "required": true,
+          "values": ["proposal", "diagnostic"],
+          "resolver": "comparison-presentation",
+          "consumer": "resolver-only"
+        }
+      }
+    }
+  },
+  "presentation": {
+    "variants": {
+      "proposal": "panel de propuesta con firma Efeonce",
+      "diagnostic": "panel neutral de errores; oculta wordmark y URL de Efeonce"
     }
   }
 }

@@ -171,6 +171,11 @@ const CLIENT_LOGO: Record<string, { src: string; label: string }> = {
 
 
 export const deckAxisResolvers: ResolverRegistry = {
+  'comparison-presentation': {
+    known: ['proposal', 'diagnostic'],
+    build: value => [{ selector: ':self', attr: 'data-variant', value }]
+  },
+
   'stat-goal-icon': {
     known: Object.keys(STAT_GOAL_ICON),
     build: value => {
