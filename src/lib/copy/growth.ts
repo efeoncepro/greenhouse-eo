@@ -1758,6 +1758,11 @@ export const GH_GROWTH_SEO_PERFORMANCE = {
     ctr: 'CTR'
   },
 
+  kpis: {
+    // El "contra qué" del delta, declarado junto al período (regla dura de dataviz).
+    comparison: 'vs período anterior'
+  },
+
   chart: {
     title: 'Evolución de {metric}',
     // La inversión, visible y en palabras. No se deja al eje ni a la intuición.
@@ -1797,7 +1802,7 @@ export const GH_GROWTH_SEO_PERFORMANCE = {
     colImpressions: 'Impresiones',
     colCtr: 'CTR',
     colTrend: 'Tendencia',
-    colTrendHint: 'Posición a lo largo del período.',
+    colTrendHint: 'Posición a lo largo del período. Arriba es mejor, igual que en el gráfico.',
     // Sin dato NUNCA es un cero: la celda lo dice.
     pending: 'Pendiente',
     noComparison: 'Sin comparación',

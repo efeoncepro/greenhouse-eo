@@ -99,17 +99,22 @@ const SeoRankEvolutionChart = ({ series, metric, range, events = [] }: SeoRankEv
   const targetInk = resolveChartColor(theme.palette.success.dark, '#0B726C')
 
   /**
-   * Techo del eje de posición. Tiene que incluir SIEMPRE la meta top-3: con series muy
-   * buenas (todas en 1) el auto-scale de ECharts cierra el rango en ~1.6 y la línea de meta
-   * queda fuera del gráfico — la referencia comercial desaparecería justo cuando se está
-   * cumpliendo. El piso de 10 le da al chart la forma reconocible de un rank tracker.
+   * Techo ADAPTATIVO del eje de posición: `max(meta+1, peorDato+1)`.
+   *
+   * Dos errores que este cálculo evita, uno por lado: (a) el auto-scale de ECharts con
+   * series muy buenas cierra el rango en ~1.6 y la meta top-3 queda FUERA del gráfico —
+   * la referencia comercial desaparece justo cuando se cumple; (b) un piso fijo de 10
+   * (la versión anterior) dejaba la mitad del lienzo muerto cuando todo el dato vive en
+   * 1-5 — el rango sigue al dato, no a una forma "reconocible" (hallazgo del operador).
    */
   const positionMax = useMemo(() => {
     const values = series.flatMap(serie =>
       serie.points.map(point => point.value).filter((value): value is number => value !== null)
     )
 
-    return Math.max(10, Math.ceil(Math.max(TARGET_POSITION + 2, ...(values.length > 0 ? values : [0]))))
+    const worst = values.length > 0 ? Math.max(...values) : TARGET_POSITION
+
+    return Math.ceil(Math.max(TARGET_POSITION + 1, worst + 1))
   }, [series])
 
   const option = useMemo<EChartsOption>(() => {
