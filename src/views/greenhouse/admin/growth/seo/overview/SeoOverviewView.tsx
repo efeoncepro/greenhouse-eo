@@ -1,5 +1,7 @@
 'use client'
 
+import { useTransition } from 'react'
+
 import { useRouter } from 'next/navigation'
 
 import Box from '@mui/material/Box'
@@ -8,6 +10,8 @@ import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
+
+import MenuItem from '@mui/material/MenuItem'
 
 import CustomAutocomplete from '@core/components/mui/Autocomplete'
 import CustomTextField from '@core/components/mui/TextField'
@@ -56,6 +60,8 @@ interface Props {
   kpis?: SeoOverviewKpis | null
   /** Salud + movers + cruce AEO. Cada región degrada por separado. */
   sidebar?: SeoOverviewSidebarData | null
+  /** Ventana en días vigente (viaja en `?range=`, compartible). */
+  rangeDays?: number
 }
 
 const SeoOverviewView = ({
@@ -65,9 +71,15 @@ const SeoOverviewView = ({
   dataAsOf = null,
   canConnectSearchConsole = false,
   kpis = null,
-  sidebar = null
+  sidebar = null,
+  rangeDays = 28
 }: Props) => {
   const router = useRouter()
+
+  // `useTransition` en vez de un `useState` de "cargando": el re-fetch lo hace el SERVER
+  // (la navegación revalida el module_assignment), así que el pending real es el de la
+  // transición de router — un flag local mentiría sobre cuándo terminó.
+  const [isPending, startTransition] = useTransition()
 
   const selectedSpace = spaces.find(space => space.organizationId === selectedSpaceId) ?? null
 
@@ -75,15 +87,32 @@ const SeoOverviewView = ({
   // menos días que la ventana pedida, decirlo evita prometer una comparación que no hay.
   const periodLabel = kpis
     ? GH_GROWTH_SEO_OVERVIEW.toolbar.periodLabel.replace('{days}', String(kpis.rangeDays))
-    : GH_GROWTH_SEO_OVERVIEW.states.pending
+    : GH_GROWTH_SEO_OVERVIEW.toolbar.periodLabel.replace('{days}', String(rangeDays))
+
+  // Toda la selección vive en la URL: Space y período son compartibles y sobreviven al
+  // back/forward. Un `useState` local rompería ambas cosas y saltearía la revalidación
+  // server-side del `module_assignment`.
+  const pushQuery = (next: { space?: string; range?: number }) => {
+    const params = new URLSearchParams()
+    const space = next.space ?? selectedSpaceId
+
+    if (space) {
+      params.set('space', space)
+    }
+
+    params.set('range', String(next.range ?? rangeDays))
+
+    startTransition(() => {
+      router.push(`/admin/growth/seo?${params.toString()}`)
+    })
+  }
 
   const handleSpaceChange = (next: SeoSpaceOption | null) => {
     if (!next) {
       return
     }
 
-    // Navegación real (no estado local): el servidor revalida el module_assignment.
-    router.push(`/admin/growth/seo?space=${encodeURIComponent(next.organizationId)}`)
+    pushQuery({ space: next.organizationId })
   }
 
   const header = (
@@ -133,6 +162,36 @@ const SeoOverviewView = ({
               />
             )}
           />
+
+          <CustomTextField
+            select
+            label={GH_GROWTH_SEO_OVERVIEW.toolbar.rangeLabel}
+            value={String(rangeDays)}
+            onChange={event => pushQuery({ range: Number(event.target.value) })}
+            sx={{ minInlineSize: 170 }}
+          >
+            {Object.entries(GH_GROWTH_SEO_OVERVIEW.toolbar.rangeOptions).map(([days, label]) => (
+              <MenuItem key={days} value={days}>
+                {label}
+              </MenuItem>
+            ))}
+          </CustomTextField>
+
+          {/* Relee los snapshots ya materializados: NO dispara un crawl ni gasta
+              presupuesto de proveedor. El tooltip lo dice para que nadie lo suponga. */}
+          <Tooltip title={GH_GROWTH_SEO_OVERVIEW.toolbar.refreshHint}>
+            <span>
+              <Button
+                variant='outlined'
+                size='small'
+                startIcon={<i className='tabler-refresh' />}
+                disabled={isPending}
+                onClick={() => startTransition(() => router.refresh())}
+              >
+                {isPending ? GH_GROWTH_SEO_OVERVIEW.toolbar.refreshPending : GH_GROWTH_SEO_OVERVIEW.toolbar.refresh}
+              </Button>
+            </span>
+          </Tooltip>
 
           {/* Freshness explícito: el operador tiene que poder distinguir "no pasó nada"
               de "el dato es viejo". Sin fecha se dice que no hay, no se inventa "hoy". */}

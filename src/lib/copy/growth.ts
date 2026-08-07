@@ -1534,6 +1534,12 @@ export const GH_GROWTH_SEO_OVERVIEW = {
     spacePlaceholder: 'Elige un Space',
     rangeLabel: 'Período',
     periodLabel: 'Últimos {days} días',
+    rangeOptions: {
+      '7': 'Últimos 7 días',
+      '28': 'Últimos 28 días',
+      '90': 'Últimos 90 días',
+      '180': 'Últimos 180 días'
+    },
     refresh: 'Actualizar',
     refreshPending: 'Actualizando…',
     // El botón relee snapshots ya materializados: NO dispara un crawl nuevo.

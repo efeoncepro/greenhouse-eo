@@ -452,6 +452,7 @@ Slice 1 → Slice 2 → Slice 3 → Slice 4. No conectar KPIs/charts antes de te
 | 3 | Sidebar salud + movers + cruce AEO, degradación por región | `22a30f33e` |
 | 4 | GVC desktop/mobile, 8 pageerrors de Apex, a11y de tabs | `307f8217d` |
 | 5 | MCP tool `get_seo_overview_kpis` (mandato del dominio) | `36751e053` |
+| 6 | Selector de período (`?range=` con allowlist server-side) + botón Actualizar | (cierre) |
 
 ### Hallazgos que cambiaron el diseño
 
@@ -466,7 +467,7 @@ Slice 1 → Slice 2 → Slice 3 → Slice 4. No conectar KPIs/charts antes de te
 
 - **Runtime real (Cloud SQL dev, Grupo Berel):** viewCode activo + 2 grants · KPIs 2.596 clics / 136.146 impresiones / posición ponderada 5.78 / CTR 1.91% · `previous: null` con 5 días de serie (sin comparación inventada) · salud 95.4 (0 críticos · 138 avisos · 381 menores) · cruce AEO 47 keywords en `riesgo` · movers `no_data` honesto.
 - **Gates:** `pnpm test` **10.281 passed / 0 failed** · `pnpm build` producción **exit 0** (`/admin/growth/seo` dinámica) · `pnpm local:check` verde · `route-reachability-gate` 0 huérfanos.
-- **GVC:** scenarios `growth-seo-overview` (1440) + `growth-seo-overview-mobile` (390) con `qualityProfile: standard`, ambos `OK capture`, **pageErrors 0**. Frames mirados en loop.
+- **GVC:** scenarios `growth-seo-overview` (1440) + `growth-seo-overview-mobile` (390) con `qualityProfile: standard`, ambos `OK capture`, **pageErrors 0**. Frames mirados en loop. Los scenarios **no usan `fullPage`**: Playwright redimensiona el viewport al capturarlo y los charts que miden su contenedor quedan en 0, produciendo evidencia con cards vacías que parecen un bug inexistente.
 
 ### Warnings del gate conocidos y NO accionables acá
 
@@ -485,6 +486,6 @@ Pendiente para `operationally complete`:
 
 ### Follow-ups abiertos
 
-- Selector de rango de período y botón **Exportar** (declarados en el wireframe, no implementados en V1).
+- **Exportar CSV** (declarado en el wireframe, NO implementado): no es un botón sino una capability nueva — bajo Full API Parity exige endpoint gobernado + contrato programático propio. Merece su task, no un handler acoplado a esta pantalla.
 - Las pestañas Rendimiento/Keywords/Auditoría quedan deshabilitadas hasta TASK-1307/1308/1309 (quitar `available: false` en `SeoSearchVisibilityTabs`).
 - `resolveApexColor` debería adoptarse en los ~32 consumidores de ApexCharts del repo (bug latente compartido) — candidato a task propia.

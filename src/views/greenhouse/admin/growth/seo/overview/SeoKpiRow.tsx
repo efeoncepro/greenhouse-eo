@@ -90,7 +90,9 @@ const SeoKpiRow = ({ kpis, periodLabel }: Props) => {
       <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
         <MetricTrendCard
           title={GH_GROWTH_SEO_OVERVIEW.kpis.position.title}
-          metricName={GH_GROWTH_SEO_OVERVIEW.kpis.position.tooltip}
+          // SIN `metricName`: es el "nombre largo al lado del título", no un lugar para
+          // una explicación — la frase completa desbordaba la card ("Posición promedio p…").
+          // La inversión se explica en el subtítulo del chart y en el aria del delta.
           periodLabel={periodLabel}
           // `null` (no `0`) cuando no hubo impresiones: "posición 0" no existe.
           value={current.position}

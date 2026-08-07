@@ -36,8 +36,12 @@ export const dynamic = 'force-dynamic'
 const VIEW_CODE = 'administracion.growth_seo'
 
 interface PageProps {
-  searchParams: Promise<{ space?: string }>
+  searchParams: Promise<{ space?: string; range?: string }>
 }
+
+/** Ventanas ofrecidas por el selector. Un valor fuera de la lista cae al default. */
+const ALLOWED_RANGE_DAYS = new Set([7, 28, 90, 180])
+const DEFAULT_RANGE_DAYS = 28
 
 export default async function Page({ searchParams }: PageProps) {
   // Puerta 0 — flag del módulo (EPIC-022, default OFF). Con el módulo apagado la ruta
@@ -70,7 +74,12 @@ export default async function Page({ searchParams }: PageProps) {
   }
 
   const spaces = await listSeoEligibleSpaces()
-  const { space: requestedSpaceId } = await searchParams
+  const { space: requestedSpaceId, range: requestedRange } = await searchParams
+
+  // El `?range=` es compartible pero NO es autoridad: un valor arbitrario (o enorme) no
+  // define la ventana de consulta. Sólo se aceptan las opciones que el selector ofrece.
+  const parsedRange = Number.parseInt(requestedRange ?? '', 10)
+  const rangeDays = ALLOWED_RANGE_DAYS.has(parsedRange) ? parsedRange : DEFAULT_RANGE_DAYS
 
   // El `?space=` es compartible, pero NO es autoridad: si apunta a una org sin
   // `module_assignment` vigente NO la abrimos — caemos al primer Space elegible.
@@ -86,7 +95,7 @@ export default async function Page({ searchParams }: PageProps) {
   // KPIs y sidebar en paralelo: son independientes y secuenciarlos duplicaría la latencia
   // del primer paint sin ganar nada.
   const [kpis, sidebar] = await Promise.all([
-    selectedSpace && connection.state === 'connected' ? readSeoOverviewKpis(selectedSpace.organizationId) : null,
+    selectedSpace && connection.state === 'connected' ? readSeoOverviewKpis(selectedSpace.organizationId, rangeDays) : null,
     selectedSpace ? readSeoOverviewSidebar(selectedSpace.organizationId) : null
   ])
 
@@ -99,6 +108,7 @@ export default async function Page({ searchParams }: PageProps) {
       canConnectSearchConsole={can(tenant, 'growth.search_console.connect', 'execute', 'tenant')}
       kpis={kpis}
       sidebar={sidebar}
+      rangeDays={rangeDays}
     />
   )
 }

@@ -159,7 +159,9 @@ Lo que cambió respecto de este contrato, y por qué:
 2. **El gauge de salud NO usa ApexCharts radialBar.** El radialBar depende de medir su contenedor al montar; en la columna fluida del sidebar medía 0 y no dibujaba nada. Se reemplazó por un **arco SVG determinista** (`strokeDasharray`), que rinde igual en SSR, primer paint y captura.
 3. **Cualquier chart Apex necesita `resolveApexColor`.** Con `cssVariables: true` el theme devuelve `var(--mui-palette-*)` y ApexCharts revienta al parsearlo (8 excepciones de runtime por corrida, invisibles en pantalla). El helper vive en `src/libs/styles/resolveApexColor.ts`.
 4. **Los tabs declaran `role='navigation'`.** Son links a rutas hermanas, no un conmutador de paneles: con el rol `tablist` por defecto, axe exige `aria-controls` a un panel real que acá no existe.
-5. **Sin control de período ni Exportar en V1.** El período se deriva del rango leído (`Últimos {n} días`); un selector de rango y el export CSV quedan como follow-up, no se declararon como implementados.
+5. **Selector de período implementado; Exportar NO.** El período es un selector real (7/28/90/180 días) que viaja en `?range=` y es compartible; el valor se valida contra una allowlist server-side (un `?range=` arbitrario cae al default, no define la ventana de consulta). El botón **Actualizar** relee vía `router.refresh()` con pending de `useTransition`, sin gastar presupuesto de proveedor.
+   **Exportar queda como follow-up deliberado:** no es un botón, es una capability nueva — bajo Full API Parity necesita su endpoint gobernado + su contrato programático, y eso merece su propia task en vez de un handler acoplado a esta pantalla.
+6. **Los scenarios GVC NO usan `fullPage`.** Al capturarlo, Playwright redimensiona el viewport y los charts que miden su contenedor (Recharts en los sparklines, Apex en la curva) quedan en tamaño 0: la evidencia salía con las cards vacías y parecía un bug de producto inexistente. Se cubre con el frame del viewport real + clips por región.
 
 ## Acceptance Checklist
 

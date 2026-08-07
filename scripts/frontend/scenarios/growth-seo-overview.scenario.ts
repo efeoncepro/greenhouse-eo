@@ -5,8 +5,10 @@
 // de OTRO Space (Efeonce, sin conexión) — forzarlos en el mismo run obligaría a mutar
 // datos, y un scenario de captura nunca debe escribir.
 //
-// `fullPage` porque el cockpit no cabe en 900px de alto: sin él la evidencia cortaría el
-// sidebar (salud/movers/cruce AEO), que es justo donde vive la degradación honesta.
+// ⚠️ NO se usa `fullPage`: al capturarlo, Playwright redimensiona el viewport y los charts
+// que miden su contenedor (Recharts en los sparklines, Apex en la curva) quedan con tamaño
+// 0 — la evidencia saldría con las cards vacías y parecería un bug de producto que no
+// existe. El cockpit se cubre con el frame del viewport real + clips por región.
 
 import type { CaptureScenario } from '../lib/scenario'
 
@@ -46,9 +48,8 @@ export const scenario: CaptureScenario = {
   steps: [
     {
       kind: 'mark',
-      label: 'default-full',
-      fullPage: true,
-      note: 'Cockpit poblado: KPIs norte + curva de visibilidad + sidebar de salud/movers/AEO'
+      label: 'default',
+      note: 'Cockpit poblado en viewport real: KPIs norte + curva de visibilidad + sidebar'
     },
     {
       kind: 'mark',

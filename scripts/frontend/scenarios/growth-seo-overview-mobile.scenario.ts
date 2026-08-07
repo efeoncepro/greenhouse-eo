@@ -33,9 +33,15 @@ export const scenario: CaptureScenario = {
   steps: [
     {
       kind: 'mark',
-      label: 'mobile-full',
-      fullPage: true,
-      note: 'KPIs, curva y sidebar apilados en 390px sin scroll horizontal de página'
+      label: 'mobile-top',
+      note: 'KPIs apilados en 390px sin scroll horizontal de página'
+    },
+    { kind: 'scroll', selector: '[data-capture="seo-overview-sidebar"]' },
+    { kind: 'sleep', ms: 600 },
+    {
+      kind: 'mark',
+      label: 'mobile-sidebar',
+      note: 'Salud, movers y cruce AEO apilados al final del stack móvil'
     }
   ]
 }
