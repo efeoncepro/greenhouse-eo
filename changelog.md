@@ -18,6 +18,13 @@
   y **fallback de fuentes por cobertura** (◑ exacta ↔ ● medida, nunca promediadas). GVC premium: rubric
   enterprise pass, ui:quality 4.56/4.5. Primitives nuevas: `CustomTabsNav` (@core), `SurfaceRecipe.plane`,
   `AppECharts`.
+- **Ronda de mejoras post-cierre (revisión product-design + seo-aeo, mismo día)** — presets de
+  comparación data-driven desde `seo_keyword_sets`; "Lectura del período" (insight cruzado de los 4 KPIs:
+  demanda vs ranking vs erosión de CTR/AIO, sólo cuando el patrón es inequívoco); marcadores de AI
+  Overview desde `serp_features` (sólo serie ◑, puente SEO↔AEO); rango 365 días; granularidad
+  Diario/Semanal (default semanal >120 días medidos); métrica integrada al selector; affordance visible
+  de drill; bandas de updates confirmados de Google (registro curado `algorithm-updates.ts`). Fix del
+  primitive `MetricTrendCard`: con `invertY` el área se pintaba sobre la línea (`baseValue='dataMax'`).
 - **El módulo SEO dejó de ser forward-only (TASK-1655, Slices 1-4)** — hallazgo de la ejecución: había 5
   días de GSC teniendo 16 meses en la API. Ahora: mirror `seo_gsc_history` en BigQuery (SoT del
   histórico; PG = ventana caliente) espejado por el batch diario, backfill por API ejecutado (**Berel

@@ -1,5 +1,34 @@
 # TASK-1307 — Growth SEO: Rank & URL Performance Over Time UI ★
 
+## Delta 2026-08-07 — ronda de mejoras post-cierre (commit 0d48c283d)
+
+Tras la revisión con las skills de product design y SEO/AEO, el operador aprobó implementar las 8
+mejoras propuestas ("Ok, hazlos todos"). Todas verificadas con GVC premium (desktop+mobile) y
+revisión visual de frames en 90/180/365 días:
+
+1. **Presets de comparación data-driven** — el catálogo expone `sets` (los `seo_keyword_sets`
+   nombrados del target, miembros vigentes) y el selector los ofrece como chips de un click.
+2. **Lectura del período** — `deriveSeoPerformanceInsight` (pura, testeada): `demand_drop` /
+   `ctr_erosion` (patrón AIO) / `rank_gain` / `rank_loss`; callout sólo con patrón inequívoco.
+3. **Marcadores AI Overview** — `serp_features ? 'ai_overview'` viaja PG+BQ →
+   `RankEvolutionPoint.aiOverview` (aditivo) → carril de rombos en el hero (sólo serie ◑; GSC no
+   reporta features del SERP y esa ausencia es honesta).
+4. **Rango 365 días** ("Últimos 12 meses") en la allowlist del page.
+5. **Granularidad Diario/Semanal** en el hero — default semanal con >120 días medidos; volumen se
+   suma, posición/CTR promedian sólo días medidos; semana sin medición = hueco.
+6. **Selector compacto** — la métrica vive dentro de la card "Qué comparar".
+7. **Affordance visible de drill** por fila (chevron decorativo; la fila sigue siendo el único
+   interactive — evita `nested-interactive`).
+8. **Bandas de updates confirmados de Google** — registro curado
+   `src/lib/growth/seo/algorithm-updates.ts` (sólo confirmados por Google, verificados 2026-08-07)
+   → `markArea` con etiqueta vertical anclada abajo. Follow-up declarado: mantenimiento del
+   registro es manual y deliberado; automatizarlo contra un feed sería una task aparte.
+
+Fix de primitive incluido: `MetricTrendCard` con `invertY` pintaba el gradiente del área SOBRE la
+línea (la base del área quedaba en el tope del eje invertido — hallazgo del operador en vivo);
+`baseValue='dataMax'` devuelve el relleno bajo la línea sin tocar los consumers legacy.
+
+
 ## Delta 2026-08-07 (ejecución) — hallazgo de runtime: el módulo era forward-only → TASK-1655
 
 Al ejercitar la pantalla contra la base real emergió que **ninguna superficie del módulo
