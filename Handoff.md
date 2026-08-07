@@ -1,5 +1,21 @@
 # Handoff activo
 
+### Release `30140c662` — TASK-1304 + TASK-1306 en producción (2026-08-07)
+
+PRs #179+#180 → manifest **`released`** (`30140c662a79-b5790565-9b75-41b8-a206-f2cd21a58080`, run 4
+`31180734383`, 8m29s), watchdog `worker_revision_drift: ok`, health prod 200, **lanes 1304 vivos en
+producción** (`site-audit-report` + `backlink-profile` responden 400 `missing_external_scope_type`).
+Con esto el cockpit de 1306 deja de sufrir el apagado cíclico de su viewCode. Costó 4 intentos, dos
+hallazgos nuevos ya en el timing ledger y el catálogo: **(a) el run zombie del outage** (31126022507,
+inmanejable por API — 6 vías 409/403) bloqueaba `pending_without_jobs` → fix de causa raíz = **lista
+forense `src/lib/release/preflight/ignored-pending-runs.ts`** (razón + vencimiento 2026-08-21 +
+evidencia en manifest; la reliability signal NO la consume, por eso el watchdog seguirá mostrando
+`pending_without_jobs: error` A PROPÓSITO hasta que GitHub recolecte el zombie — NO es un incidente
+nuevo); **(b) Cloud Build de ico-batch >600s** (backlog post-outage) abortó el intento 3 — dejar
+terminar el build huérfano cachea la imagen y el retry pasa limpio. **Pendiente que esto desbloquea:
+federar `get_seo_site_audit_report` + `get_seo_backlink_profile` al gateway `efeonce-mcp`** (patrón
+TASK-1653: provider + registerTool + lista de paridad + canary).
+
 ### Autenticación local Gcloud con Playwright (2026-08-07)
 
 Se agregó el proceso local explícito `pnpm gcloud:auth:playwright`, invocable por Codex o Claude, para
@@ -9,6 +25,38 @@ verificar sin abrir navegador. La skill espejo `greenhouse-gcloud-auth-playwrigh
 ignorado por Git y con permisos `0600`; el perfil Chrome aislado queda en `.auth/gcloud-auth-profile`.
 El flujo usa Playwright visible, no imprime URLs/códigos/cookies y termina con `gcloud-auth-preflight.sh`.
 No hay scheduler ni rollout remoto.
+
+### TASK-1307 + TASK-1655 — pantalla ancla SEO + Historical Data Platform (2026-08-07)
+
+**TASK-1307** (`/admin/growth/seo/performance`, in-progress → cierre en curso): pantalla
+ancla implementada completa en `develop` local (3 commits, sin push). ECharts elegido e
+instalado (Slice 0 — 1306/1308/1310 heredan); readers nuevos `readSeoPerformance` +
+`readSeoPerformanceCatalog` con parity completa (lane ecosystem + MCP tools
+`get_seo_performance`/`get_seo_performance_catalog` en el mismo PR); **fallback entre
+fuentes** (keyword×posición intenta DataForSEO ◑ y cae a la posición medida GSC ● cuando
+la serie exacta es más joven — regla del operador, nunca promediadas); cobertura REAL
+declarada en el chart ("N de M días con medición"). GVC **premium** verde: rubric
+enterprise pass, `ui:visual-gate` PASS, `ui:quality` PASS (avg 4.56, floor 4.5). Suite
+growth/seo 151/151. Pendiente de cierre: `pnpm build` prod (corriendo), lifecycle/docs
+finales y la **promoción develop→main heredada de 1306** (checkbox rojo del closing).
+
+**TASK-1655** (in-progress): hallazgo de fondo — el módulo era **forward-only** (5 días
+GSC / 2 de rank teniendo 16 meses en la API). Slices 1-3 SHIPPED: mirror
+`greenhouse_growth_analytics.seo_gsc_history` (tabla creada, MERGE idempotente, el batch
+diario espeja y reporta `bqMirror`), backfill API→BQ resumible (smoke 31/31 días Berel,
+**paridad exacta PG↔BQ** verificada), split de lectura por cobertura. **Backfill de 16
+meses de Berel CORRIENDO en background** (562k+ filas al momento del handoff; resumible —
+si murió, re-correr `scripts/growth/backfill-gsc-history.ts` con las env OAuth del
+runbook `docs/manual-de-uso/growth/backfill-historico-gsc.md`). Pendientes: verificación
+final del backfill, Slice 4 (semilla rank `historical_serps`, verificar granularidad en
+sandbox ANTES), Slice 5 (export nativo en la propiedad de Berel — necesita permiso
+Owner, out-of-band; Efeonce ya lo tiene desde 2025-12-10).
+
+**Hallazgos cross para quien siga:** (1) `CustomTabsNav` (@core) para tabs-que-son-links
+— el TabList de lab inyecta `aria-controls` fantasma (axe critical; 1306 puede migrar
+igual). (2) `SurfaceRecipe.plane='none'` para recipes sobre composiciones de cards. (3)
+El 1 rojo de la suite full es `catalog-extensibility` del artifact-composer, roto por
+WIP sin commitear de OTRO agente en `catalogs/deck-axis/` — no tocar desde acá.
 
 ### TASK-1306 — cockpit SEO Overview: code complete, deploy pendiente (2026-08-06)
 
