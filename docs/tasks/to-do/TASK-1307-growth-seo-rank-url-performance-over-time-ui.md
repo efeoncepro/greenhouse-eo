@@ -65,6 +65,45 @@ el viewport al capturarlo y los charts que miden su contenedor quedan en 0 — p
 evidencia con cards vacías que parecen un bug inexistente. Usa `clipSelector` sobre
 `data-capture`.
 
+## Pendiente heredado de TASK-1306 — promoción a `main` (registrado 2026-08-07)
+
+**Qué:** al cerrar TASK-1307, promover `develop` → `main` con el release control plane
+(skill `greenhouse-production-release`). La promoción cubre 1306 + 1307 juntas.
+
+**Por qué NO se puede dejar indefinidamente:** Greenhouse tiene **una sola instancia Cloud
+SQL con una sola base (`greenhouse_app`) compartida por dev, staging y producción**, y
+`syncViewRegistryCatalog` (`src/lib/admin/view-access-store.ts`) desactiva **todo viewCode
+ausente del catálogo TS del código EN EJECUCIÓN**:
+
+```sql
+UPDATE greenhouse_core.view_registry SET active = FALSE
+ WHERE view_code <> ALL($catalogoTS)
+```
+
+Mientras 1306 viva sólo en `develop`, el runtime de producción corre con un catálogo que
+NO conoce `administracion.growth_seo` ⇒ **lo apaga en cada sincronización, en silencio**
+(sin error, sin log). El síntoma es que la sección SEO desaparece del menú y no se parece
+en nada a la causa. Ya ocurrió una vez el 2026-08-07 (`active=false`,
+`updated_by='system'`); se reactivó a mano, pero **la reactivación manual no es estable**:
+se revierte sola en la siguiente corrida.
+
+**Cómo verificar que quedó resuelto** (después de promover, contra la base real):
+
+```sql
+SELECT view_code, active, updated_by
+  FROM greenhouse_core.view_registry
+ WHERE view_code = 'administracion.growth_seo';
+```
+
+Debe quedar `active = true` **y mantenerse** tras una sincronización posterior. Si vuelve a
+`false` con `updated_by = 'system'`, el código promovido no incluye la entrada del catálogo.
+
+**Contrato completo:** `GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md` §"View
+Registry — el seed se AUTO-REVIERTE si el código no está desplegado".
+
+**Si TASK-1307 se demora o se cancela**, esta promoción NO debe esperarla: sácala como
+acción propia, porque el costo de postergarla lo paga la superficie ya entregada de 1306.
+
 ## Delta 2026-08-06
 
 - **El backend YA existe** — cerrado por TASK-1303: `readRankEvolution(seoTargetId, { keywords?, rangeDays?, engine?, device? })` en `src/lib/growth/seo/rank-evolution-reader.ts` retorna `{ ok:true, seoTargetId, organizationId, engine, device, range: {from,to,days}, source: 'postgres'|'bigquery', series: [{ keyword, points: [{date, position, url}] }] } | { ok:false, errorCode: 'disabled'|'target_not_found'|'no_data'|'query_failed' }`. `position: null` en un punto = "el dominio no rankeó ese día en el top-20" (dato válido a graficar como hueco, no error). También existen el lane ecosystem `/api/platform/ecosystem/growth/seo/rank-evolution` y la MCP tool `get_seo_rank_evolution`.
@@ -495,6 +534,11 @@ Slice 0 (decisión librería) → Slice 1 (ruta + selector + estados) → Slice 
 - [ ] route/nav/reachability actualizados
 - [ ] `FEATURE_FLAG_STATE_LEDGER.md` refleja `GROWTH_SEO_ENABLED` si se toca
 - [ ] decisión de librería de charts documentada (ADR corto o nota en el módulo si se instala ECharts)
+- [ ] **🔴 HEREDADO DE TASK-1306 — promover `develop` → `main` al cerrar esta task.** Ver
+  `## Pendiente heredado` arriba. NO es opcional ni cosmético: hasta que se promueva, cada
+  sincronización desde producción APAGA el viewCode `administracion.growth_seo` y la
+  sección SEO entera desaparece del menú. Usar la skill `greenhouse-production-release`
+  (release control plane), nunca un push directo a `main`.
 
 ## Follow-ups
 

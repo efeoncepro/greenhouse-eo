@@ -28,8 +28,15 @@ verde, GVC 1440+390 con `pageErrors 0`. Detalle completo en el `## Closure Repor
 4. **`GROWTH_SEO_ENABLED` ya está ON en Production** — la ruta queda viva al desplegar; el control
    de exposición restante es el viewCode + el `module_assignment` per-org.
 
-**Rollout pendiente:** migración del viewCode en staging y prod (hoy sólo dev) → deploy →
-verificar con operador real → GVC contra staging.
+**Rollout pendiente — promover `develop` → `main`.** Corregido: NO hay una migración
+pendiente por entorno; hay UNA sola base (`greenhouse_app`) compartida por dev/staging/prod
+y el viewCode ya está sembrado. Lo que falta es la promoción, y **no es cosmética**:
+`syncViewRegistryCatalog` apaga todo viewCode ausente del catálogo TS del código EN
+EJECUCIÓN, así que mientras 1306 viva sólo en `develop`, producción **apaga
+`administracion.growth_seo` en cada sincronización** (ya pasó una vez; se reactivó a mano,
+pero la reactivación manual se revierte sola). Queda registrado como checkbox de cierre en
+`TASK-1307` (§Pendiente heredado) — si 1307 se demora o se cancela, sacar la promoción
+igual, por su cuenta.
 
 **Próximo paso:** TASK-1307, con dirección visual ya aprobada (concepto C "Evidencia narrativa",
 `product-design-loop` 2026-08-06) y Slice 0 (ECharts vs Apex) todavía abierto.
