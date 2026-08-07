@@ -14,9 +14,9 @@
     "note": "Ruta nueva; no existe before. La hermana `growth.seo.performance` (TASK-1307) es el benchmark nativo: misma recipe `analyticsReport`, mismo conmutador de tabs, mismo contrato de leyenda medido/estimado."
   },
   "evidence": {
-    "desktop": ".captures/2026-08-07T20-07-35_growth-seo-keywords/01-desktop",
-    "mobile": ".captures/2026-08-07T20-07-35_growth-seo-keywords/02-mobile",
-    "dossier": ".captures/2026-08-07T20-07-35_growth-seo-keywords/review-dossier.md",
+    "desktop": ".captures/2026-08-07T20-18-40_growth-seo-keywords/01-desktop",
+    "mobile": ".captures/2026-08-07T20-18-40_growth-seo-keywords/02-mobile",
+    "dossier": ".captures/2026-08-07T20-18-40_growth-seo-keywords/review-dossier.md",
     "data": "Datos REALES de berel.com: 50 oportunidades striking-distance, 31 keywords ya seguidas, umbral de impresiones 10. Cero fixtures.",
     "reducedMotion": "Ejercitado por el GVC (`reducedMotionCheck: true`), no sólo declarado.",
     "axe": "@axe-core/playwright scopeado a la surface con `failOnViolations: true` — 0 violations en 1440x900 y 390x844.",
@@ -85,13 +85,13 @@
       "evidence": "02-mobile/frames/02-verdict.png"
     },
     "responsive": {
-      "score": 4.5,
-      "rationale": "390px verificado en la misma corrida. La tabla densa no empuja el ancho de la página: DataTableShell la contiene con scroll interno y el canvas del chart lleva minInlineSize 0 más overflowX clip. Los warnings de layout del gate son del shell del dashboard, no de esta surface. Los dos links de la celda de keyword llevan `minBlockSize: 24`: como texto plano medían 21px y 18.8px y fallaban el target-size de WCAG 2.5.8 en 50 nodos.",
-      "evidence": "02-mobile/frames/02-map.png, 02-mobile/frames/04-table.png"
+      "score": 5,
+      "rationale": "🔴 La transformación a móvil es REAL, no scroll: a 390px la tabla mostraba sólo checkbox y keyword — acción, ganancia, páginas y el botón \"Seguir\" quedaban fuera del scroll horizontal interno, y ningún gate lo marcaba porque DataTableShell contiene el scroll y la página no desborda. Ahora hay una card por keyword con los cuatro datos que deciden y la misma acción (el nodo de acción se comparte, no se reimplementa). El cambio va por CSS y no por useMediaQuery: medir el viewport en cliente produce el mismo mismatch de hidratación que ya costó tres corridas en esta pantalla.",
+      "evidence": "02-mobile/frames/05-table.png"
     },
     "motion": {
       "score": 4.5,
-      "rationale": "Entrada del scatter en 400ms y suprimida bajo prefers-reduced-motion (ejercitado, no declarado). El botón Seguir tiene estados idle, loading, success y error con anti doble submit. Cero motion decorativo: nada anima que no comunique un cambio de estado.",
+      "rationale": "Entrada del scatter en 400ms y suprimida bajo prefers-reduced-motion (ejercitado, no declarado). El botón Seguir tiene estados idle, loading, success y error con anti doble submit. Cero motion decorativo: nada anima que no comunique un cambio de estado. El feedback pasó de Alert fijo arriba a snackbar anclado abajo: la acción ocurría en la fila 20 y la confirmación se pintaba fuera de pantalla. Dejar de seguir lleva \"Deshacer\" — corta una serie y volver a seguirla no recupera los días perdidos.",
       "evidence": "01-desktop/manifest.json (keyboard.reducedMotionCheck)"
     },
     "fidelity": {
@@ -107,6 +107,7 @@
   },
   "verdict": "PASS",
   "openRisks": [
+    "La lista de cards de móvil es larga (25 items). Es el precio de mostrar los cuatro datos por keyword en vez de una lista de nombres; si molesta, la palanca es bajar el default de filas por página en móvil, no recortar datos.",
     "🔴 BUG DE PLATAFORMA SOSPECHADO, no cerrado: los controles MUI dentro del subárbol de la recipe producen mismatch de hidratación por `useId` — el `htmlFor` del label difiere entre servidor y cliente, reproducible SÓLO en 390px. Se cerró declarando ids estables en los cinco controles de esta surface, pero la causa raíz (la recipe adapta el árbol midiendo en cliente) afectaría a cualquier form control en cualquier surface adaptativa. Merece task propia.",
     "El botón flotante de Nexa tapa la acción de dos filas en desktop. Es el FAB portal-wide; afecta a cualquier tabla con acción a la derecha.",
     "El eje log con cotas explícitas rotula sus extremos con valores no-década (68 y 1.790). Es el precio de no desperdiciar el 40% del alto.",

@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react'
 
+import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import Checkbox from '@mui/material/Checkbox'
 import Button from '@mui/material/Button'
@@ -88,7 +89,7 @@ export interface KeywordOpportunityTableProps {
   marketUnavailable: boolean
   hoveredKeyword: string | null
   onHoverKeyword: (keyword: string | null) => void
-  onTrackSelected: () => void
+  onTrackSelected: (keywords: string[]) => void
   onClearSelection: () => void
   bulkState: GreenhouseAsyncActionState
 }
@@ -175,6 +176,18 @@ const KeywordOpportunityTable = ({
     [sorted, safePage, rowsPerPage]
   )
 
+  /**
+   * 🔴 LA SELECCIÓN SE ACOTA AL FILTRO VIGENTE.
+   *
+   * Sin esto: seleccionas 10 en la página 1, filtras a "Empujar", pulsas "Seguir
+   * seleccionadas" y sigues keywords que ya NO ESTÁS VIENDO. En cualquier tabla sería
+   * molesto; acá compromete gasto recurrente del proveedor sobre algo que el operador no
+   * tenía delante. Lo que quedó fuera no se descarta en silencio: se cuenta y se nombra.
+   */
+  const inScopeKeywords = useMemo(() => new Set(opportunities.map(row => row.keyword)), [opportunities])
+  const selectedInScope = useMemo(() => [...selected].filter(keyword => inScopeKeywords.has(keyword)), [selected, inScopeKeywords])
+  const outOfScopeCount = selected.size - selectedInScope.length
+
   /** Lo seguible de la página vigente: ni lo ya seguido ni nada fuera de la página. */
   const selectablePage = useMemo(
     () => visible.filter(row => !trackedKeywords.has(row.keyword)).map(row => row.keyword),
@@ -208,6 +221,53 @@ const KeywordOpportunityTable = ({
     </TableSortLabel>
   )
 
+  /**
+   * La acción de una fila, extraída para que la tabla y las cards de móvil rendericen
+   * EXACTAMENTE la misma: dos implementaciones derivarían y una de las dos terminaría sin
+   * el anti doble submit o sin el motivo del techo.
+   */
+  const rowAction = (row: KeywordOpportunity) => {
+    const isTracked = trackedKeywords.has(row.keyword)
+    const state = trackingState[row.keyword] ?? 'idle'
+
+    if (isTracked) {
+      return (
+        <Tooltip title={copy.follow.untrackHint}>
+          <span>
+            <GreenhouseAsyncActionButton
+              size='small'
+              greenhouseVariant='text'
+              state={state}
+              disabled={state === 'loading'}
+              aria-label={copy.follow.untrackAria.replace('{keyword}', row.keyword)}
+              onClick={() => onUntrack(row.keyword)}
+            >
+              {copy.follow.untrack}
+            </GreenhouseAsyncActionButton>
+          </span>
+        </Tooltip>
+      )
+    }
+
+    return (
+      <Tooltip title={atCapacity ? copy.follow.capacityFullHint : copy.follow.costHint}>
+        <span>
+          <GreenhouseAsyncActionButton
+            size='small'
+            greenhouseVariant='outlined'
+            state={state}
+            disabled={atCapacity || state === 'loading'}
+            loadingLabel={copy.follow.loading}
+            aria-label={copy.follow.ctaAria.replace('{keyword}', row.keyword)}
+            onClick={() => onTrack(row.keyword)}
+          >
+            {copy.follow.cta}
+          </GreenhouseAsyncActionButton>
+        </span>
+      </Tooltip>
+    )
+  }
+
   /** Celda de mercado: el estado honesto de un dato que todavía no existe. */
   const marketCell = (value: number | null) =>
     value === null ? (
@@ -234,7 +294,7 @@ const KeywordOpportunityTable = ({
             </Typography>
           </Stack>
 
-          {canTrack && selected.size > 0 ? (
+          {canTrack && selectedInScope.length > 0 ? (
             // Barra de lote: aparece sólo con selección. Con 42 candidatas de consolidación
             // y 25 por página, seguirlas de a una son decenas de clicks.
             <Stack
@@ -245,14 +305,21 @@ const KeywordOpportunityTable = ({
               data-capture='seo-keywords-bulk'
             >
               <Typography variant='body2' fontWeight={600}>
-                {copy.follow.bulkSelected.replace('{count}', String(selected.size))}
+                {copy.follow.bulkSelected.replace('{count}', String(selectedInScope.length))}
               </Typography>
+              {outOfScopeCount > 0 ? (
+                <Tooltip title={copy.follow.outOfScopeHint}>
+                  <Typography variant='caption' color='text.secondary'>
+                    {copy.follow.outOfScope.replace('{count}', String(outOfScopeCount))}
+                  </Typography>
+                </Tooltip>
+              ) : null}
               <GreenhouseAsyncActionButton
                 size='small'
                 greenhouseVariant='solid'
                 state={bulkState}
                 disabled={atCapacity || bulkState === 'loading'}
-                onClick={onTrackSelected}
+                onClick={() => onTrackSelected(selectedInScope)}
               >
                 {copy.follow.bulkTrack}
               </GreenhouseAsyncActionButton>
@@ -262,6 +329,100 @@ const KeywordOpportunityTable = ({
             </Stack>
           ) : null}
 
+          {/* 🔴 A 390px la tabla mostraba SÓLO checkbox y keyword: acción, ganancia, páginas
+              y el botón "Seguir" quedaban fuera del scroll horizontal interno. El operador
+              veía 25 nombres y ninguna forma de actuar — y ningún gate lo marcaba, porque
+              `DataTableShell` contiene el scroll y la página no desborda. El wireframe decía
+              "la keyword y la acción Seguir nunca desaparecen"; se estaba incumpliendo.
+
+              La transformación va por CSS y no por `useMediaQuery`: medir el viewport en
+              cliente produce exactamente el mismo mismatch de hidratación que costó tres
+              corridas de GVC más arriba en esta misma pantalla. */}
+          <Stack spacing={3} sx={{ display: { xs: 'flex', md: 'none' } }} data-capture='seo-keywords-cards'>
+            {visible.map(row => {
+              const action = resolveKeywordAction(row)
+
+              return (
+                <Stack
+                  key={row.keyword}
+                  spacing={2}
+                  sx={theme => ({
+                    padding: 4,
+                    borderRadius: 1,
+                    border: `1px solid ${theme.palette.divider}`,
+                    backgroundColor: selected.has(row.keyword) ? theme.palette.action.hover : 'transparent'
+                  })}
+                >
+                  <Stack direction='row' spacing={2} alignItems='flex-start'>
+                    {canTrack ? (
+                      <Checkbox
+                        size='small'
+                        sx={{ marginBlockStart: -1, marginInlineStart: -2 }}
+                        checked={selected.has(row.keyword)}
+                        onChange={() => onToggleSelected(row.keyword)}
+                        disabled={trackedKeywords.has(row.keyword)}
+                        inputProps={{ 'aria-label': copy.follow.bulkAria.replace('{keyword}', row.keyword) }}
+                      />
+                    ) : null}
+                    <Stack spacing={0.5} sx={{ minInlineSize: 0, flex: 1 }}>
+                      <Link
+                        component='button'
+                        type='button'
+                        variant='body2'
+                        underline='hover'
+                        onClick={() => onDrill(row.keyword)}
+                        aria-label={copy.table.drillAria.replace('{keyword}', row.keyword)}
+                        sx={{ textAlign: 'start', minBlockSize: 24, display: 'flex', alignItems: 'center' }}
+                      >
+                        {row.keyword}
+                      </Link>
+                      <Link
+                        href={row.page}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        variant='caption'
+                        color='text.secondary'
+                        underline='hover'
+                        noWrap
+                        sx={{ display: 'flex', alignItems: 'center', minBlockSize: 24, maxInlineSize: '100%' }}
+                      >
+                        {row.page}
+                      </Link>
+                    </Stack>
+                  </Stack>
+
+                  {/* Los cuatro datos que deciden, no las diez columnas: qué hacer, cuánto
+                      rinde, cuán cerca está y cuántas páginas compiten. */}
+                  <Stack direction='row' spacing={3} flexWrap='wrap' useFlexGap alignItems='center'>
+                    <Tooltip title={actionHint[action]}>
+                      <span>
+                        <GreenhouseChip kind='status' variant='label' size='small' label={actionLabel[action]} />
+                      </span>
+                    </Tooltip>
+                    <Typography variant='caption' color='text.secondary' sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                      {copy.table.colPosition} {row.position.toFixed(1)}
+                    </Typography>
+                    <Typography variant='caption' color='text.secondary' sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                      {row.competingPages > 1
+                        ? copy.table.competingPages.replace('{count}', String(row.competingPages))
+                        : `${copy.table.colImpressions} ${formatInteger(row.impressions)}`}
+                    </Typography>
+                  </Stack>
+
+                  <Stack direction='row' spacing={3} justifyContent='space-between' alignItems='center'>
+                    <Typography variant='body2' fontWeight={600} sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                      {row.estimatedClickGain > 0
+                        ? copy.table.gainUnit.replace('{value}', formatInteger(row.estimatedClickGain))
+                        : copy.table.noGain}
+                    </Typography>
+                    {canTrack ? rowAction(row) : null}
+                  </Stack>
+                </Stack>
+              )
+            })}
+          </Stack>
+
+          <Box sx={{ display: { xs: 'none', md: 'block' } }}>
           <DataTableShell identifier='seo-keyword-opportunities' ariaLabel={copy.table.ariaLabel} stickyFirstColumn>
             <Table size='small'>
               <TableHead>
@@ -324,8 +485,9 @@ const KeywordOpportunityTable = ({
               <TableBody>
                 {visible.map(row => {
                   const action = resolveKeywordAction(row)
+                  // El estado de la acción lo resuelve `rowAction`, que es el nodo compartido
+                  // con las cards de móvil — acá sólo se necesita para el checkbox.
                   const isTracked = trackedKeywords.has(row.keyword)
-                  const state = trackingState[row.keyword] ?? 'idle'
 
                   return (
                     <TableRow
@@ -458,53 +620,14 @@ const KeywordOpportunityTable = ({
                           </TableCell>
                         </>
                       )}
-                      {canTrack ? (
-                        <TableCell align='right'>
-                          {isTracked ? (
-                            // Dejar de seguir cierra el callejón: el set tiene techo, y sin
-                            // esta acción la única salida era pedirlo por soporte.
-                            <Tooltip title={copy.follow.untrackHint}>
-                              <span>
-                                <GreenhouseAsyncActionButton
-                                  size='small'
-                                  greenhouseVariant='text'
-                                  state={state}
-                                  disabled={state === 'loading'}
-                                  aria-label={copy.follow.untrackAria.replace('{keyword}', row.keyword)}
-                                  onClick={() => onUntrack(row.keyword)}
-                                >
-                                  {copy.follow.untrack}
-                                </GreenhouseAsyncActionButton>
-                              </span>
-                            </Tooltip>
-                          ) : (
-                            <Tooltip title={atCapacity ? copy.follow.capacityFullHint : copy.follow.costHint}>
-                              <span>
-                                <GreenhouseAsyncActionButton
-                                  size='small'
-                                  greenhouseVariant='outlined'
-                                  state={state}
-                                  // Anti doble submit: mientras el command corre el botón
-                                  // no acepta otro click, y el techo lo deshabilita con el
-                                  // motivo visible en vez de dejarlo fallar en el submit.
-                                  disabled={atCapacity || state === 'loading'}
-                                  loadingLabel={copy.follow.loading}
-                                  aria-label={copy.follow.ctaAria.replace('{keyword}', row.keyword)}
-                                  onClick={() => onTrack(row.keyword)}
-                                >
-                                  {copy.follow.cta}
-                                </GreenhouseAsyncActionButton>
-                              </span>
-                            </Tooltip>
-                          )}
-                        </TableCell>
-                      ) : null}
+                      {canTrack ? <TableCell align='right'>{rowAction(row)}</TableCell> : null}
                     </TableRow>
                   )
                 })}
               </TableBody>
             </Table>
           </DataTableShell>
+          </Box>
         </Stack>
       </CardContent>
 
@@ -520,6 +643,11 @@ const KeywordOpportunityTable = ({
         onRowsPerPageChange={event => {
           setRowsPerPage(Number(event.target.value))
           setPage(0)
+        }}
+        // En 390px la barra completa se desbordaba y la flecha de avanzar quedaba fuera.
+        sx={{
+          '& .MuiTablePagination-toolbar': { flexWrap: 'wrap', rowGap: 1, paddingInline: 2 },
+          '& .MuiTablePagination-spacer': { display: { xs: 'none', sm: 'block' } }
         }}
         labelRowsPerPage={copy.table.rowsPerPage}
         // Ids declarados, no `useId`: el select de filas-por-página vive dentro del subárbol

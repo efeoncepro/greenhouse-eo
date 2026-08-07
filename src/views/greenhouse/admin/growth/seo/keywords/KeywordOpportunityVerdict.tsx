@@ -44,6 +44,8 @@ import { KEYWORD_ACTION_ORDER, resolveKeywordAction, type KeywordAction } from '
 export interface KeywordOpportunityVerdictProps {
   /** TODAS las oportunidades del target — el veredicto describe el conjunto, no el filtro. */
   opportunities: KeywordOpportunity[]
+  /** Cuántas quedan tras los filtros: el titular describe el conjunto, no el subconjunto. */
+  filteredCount: number
   activeAction: KeywordAction | 'all'
   onActionChange: (action: KeywordAction | 'all') => void
   /**
@@ -65,6 +67,7 @@ const DOMINANCE_RATIO = 0.6
 
 const KeywordOpportunityVerdict = ({
   opportunities,
+  filteredCount,
   activeAction,
   onActionChange,
   context
@@ -190,6 +193,17 @@ const KeywordOpportunityVerdict = ({
               <Typography variant='body2' color='text.secondary'>
                 {headline.hint}
               </Typography>
+
+              {/* El titular describe SIEMPRE el conjunto ("42 de 50"), así que al filtrar
+                  hay que decir que lo que está debajo es otra cosa — o el número de arriba
+                  contradice a la tabla de abajo sin explicación. */}
+              {filteredCount !== total ? (
+                <Typography variant='caption' color='text.secondary'>
+                  {GH_GROWTH_SEO_KEYWORDS.filters.viewingSubset
+                    .replace('{count}', String(filteredCount))
+                    .replace('{total}', String(total))}
+                </Typography>
+              ) : null}
             </Stack>
 
             {/* ⚠️ En columna (mobile) el contexto va PRIMERO. En su orden de DOM quedaba en

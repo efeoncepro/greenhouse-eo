@@ -2024,6 +2024,10 @@ export const GH_GROWTH_SEO_KEYWORDS = {
     bulkAria: 'Seleccionar {keyword} para seguirla en lote',
     bulkSelectAll: 'Seleccionar todas las de esta página',
     feedbackBulk: 'Seguiste {tracked} de {requested} keywords.',
+    undo: 'Deshacer',
+    outOfScope: '{count} fuera del filtro actual',
+    outOfScopeHint:
+      'Las seleccionaste antes de filtrar y ahora no están a la vista. No entran en el lote: seguir algo que no estás viendo compromete gasto sin que lo hayas revisado.',
     ctaAria: 'Seguir la keyword {keyword}',
     following: 'Siguiendo',
     followingHint: 'Ya está en el set monitoreado: su posición se mide todos los días.',
@@ -2047,7 +2051,8 @@ export const GH_GROWTH_SEO_KEYWORDS = {
     positionFirstPage: 'Primera plana (8–10)',
     positionSecondPage: 'Segunda plana (11–20)',
     clear: 'Limpiar filtros',
-    resultCount: '{count} de {total} keywords'
+    resultCount: '{count} de {total} keywords',
+    viewingSubset: 'Viendo {count} de {total}'
   },
 
   states: {

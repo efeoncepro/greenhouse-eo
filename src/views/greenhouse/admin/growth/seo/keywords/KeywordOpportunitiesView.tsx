@@ -5,6 +5,7 @@ import { useMemo, useState, useTransition, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 
 import Alert from '@mui/material/Alert'
+import Snackbar from '@mui/material/Snackbar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -120,7 +121,21 @@ const KeywordOpportunitiesView = ({
 
   const [tracked, setTracked] = useState<Set<string>>(() => new Set(trackedKeywords))
   const [trackingState, setTrackingState] = useState<Record<string, GreenhouseAsyncActionState>>({})
-  const [feedback, setFeedback] = useState<{ severity: 'success' | 'info' | 'error'; message: string } | null>(null)
+
+  /**
+   * El feedback vive en un snackbar, no en un Alert arriba del mapa.
+   *
+   * Con el Alert, seguir la keyword de la fila 20 pintaba el mensaje FUERA DE PANTALLA: la
+   * acción ocurría abajo y la confirmación aparecía arriba. `undo` lleva la reversa del
+   * write para "dejar de seguir" — no un modal de confirmación (frena a quien sabe lo que
+   * hace), sino la salida para quien se equivocó.
+   */
+  const [feedback, setFeedback] = useState<{
+    severity: 'success' | 'info' | 'error'
+    message: string
+    undo?: () => void
+  } | null>(null)
+
   const [selected, setSelected] = useState<Set<string>>(() => new Set())
   const [bulkState, setBulkState] = useState<GreenhouseAsyncActionState>('idle')
   const [hoveredKeyword, setHoveredKeyword] = useState<string | null>(null)
@@ -358,7 +373,13 @@ const KeywordOpportunitiesView = ({
         return next
       })
       setTrackingState(current => ({ ...current, [keyword]: 'success' }))
-      setFeedback({ severity: 'success', message: copy.follow.feedbackUntracked.replace('{keyword}', keyword) })
+      setFeedback({
+        severity: 'success',
+        message: copy.follow.feedbackUntracked.replace('{keyword}', keyword),
+        // Dejar de seguir corta la serie y volver a seguirla NO recupera los días perdidos:
+        // el histórico queda con un hueco permanente. Por eso hay reversa inmediata.
+        undo: () => handleTrack(keyword)
+      })
     } catch (error) {
       setTrackingState(current => ({ ...current, [keyword]: 'error' }))
       setFeedback({
@@ -376,10 +397,10 @@ const KeywordOpportunitiesView = ({
    * lote que reporte "listo" cuando la mitad rebotó contra el techo sería la misma mentira
    * que el 200 pelado, a mayor escala.
    */
-  const handleTrackSelected = async () => {
-    if (!seoTargetId || selected.size === 0) return
+  const handleTrackSelected = async (inScope: string[]) => {
+    if (!seoTargetId || inScope.length === 0) return
 
-    const keywords = [...selected]
+    const keywords = inScope
 
     setBulkState('loading')
     setFeedback(null)
@@ -584,24 +605,12 @@ const KeywordOpportunitiesView = ({
 
     return (
       <Stack spacing={6}>
-        {feedback ? (
-          // `role=status` + aria-live: el resultado de "Seguir" se anuncia, no sólo se pinta.
-          <Alert
-            severity={feedback.severity}
-            role='status'
-            data-capture='seo-keywords-feedback'
-            onClose={() => setFeedback(null)}
-            sx={{ '& .MuiAlert-message': { color: 'text.primary' } }}
-          >
-            {feedback.message}
-          </Alert>
-        ) : null}
-
         <KeywordOpportunityVerdict
           // El veredicto describe el CONJUNTO, no el filtro: sus contadores son la leyenda
           // y el filtro a la vez, así que tienen que seguir contando el total aunque el
           // usuario esté viendo un subconjunto.
           opportunities={rows}
+          filteredCount={filtered.length}
           activeAction={actionFilter}
           onActionChange={setActionFilter}
           context={
@@ -616,6 +625,13 @@ const KeywordOpportunitiesView = ({
           opportunities={filtered}
           impressionsThreshold={opportunities.impressionsThreshold}
           marketUnavailable={opportunities.market === 'unavailable'}
+          positionRange={
+            positionFilter === 'firstPage'
+              ? { min: 8, max: 10 }
+              : positionFilter === 'secondPage'
+                ? { min: 10, max: 20 }
+                : undefined
+          }
           hoveredKeyword={hoveredKeyword}
           onHoverKeyword={setHoveredKeyword}
         />
@@ -743,6 +759,7 @@ const KeywordOpportunitiesView = ({
     // Recipe canónica `analyticsReport` (composición `single`). `plane='none'`: el contenido
     // primario ES una composición de cards (mapa + filtros + tabla); el plane contenido de
     // la recipe fabricaría card-on-card.
+    <>
     <SurfaceRecipe
       kind='analyticsReport'
       instanceId='seo-keywords'
@@ -756,6 +773,40 @@ const KeywordOpportunitiesView = ({
         )
       }}
     />
+
+    {/* `role=status` + aria-live: el resultado se anuncia, no sólo se pinta. Anclado abajo
+        para que quede junto a la acción que lo produjo, no a 2.000px de scroll. */}
+    <Snackbar
+      open={Boolean(feedback)}
+      autoHideDuration={feedback?.undo ? 8000 : 5000}
+      onClose={() => setFeedback(null)}
+      anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      data-capture='seo-keywords-feedback'
+    >
+      <Alert
+        severity={feedback?.severity ?? 'info'}
+        role='status'
+        variant='filled'
+        onClose={() => setFeedback(null)}
+        action={
+          feedback?.undo ? (
+            <Button
+              color='inherit'
+              size='small'
+              onClick={() => {
+                feedback.undo?.()
+                setFeedback(null)
+              }}
+            >
+              {copy.follow.undo}
+            </Button>
+          ) : undefined
+        }
+      >
+        {feedback?.message}
+      </Alert>
+    </Snackbar>
+    </>
   )
 }
 

@@ -87,6 +87,16 @@ export interface KeywordOpportunityMapProps {
   impressionsThreshold: number
   /** Sin enriquecimiento de mercado: se dice al PIE, no en un banner sobre el fold. */
   marketUnavailable: boolean
+  /**
+   * Rango de posición que el filtro DECLARA, si hay uno activo.
+   *
+   * El eje va fijo en 8→20 a propósito: la frontera de la primera plana no puede moverse de
+   * lugar entre Spaces. Pero cuando el operador filtra a "primera plana", los puntos se
+   * apiñan en el 40% izquierdo y el resto del lienzo queda vacío. La excepción es
+   * principiada: el filtro ya declaró el rango, así que el eje puede honrarlo sin que la
+   * escala se vuelva impredecible.
+   */
+  positionRange?: { min: number; max: number }
   /** Keyword resaltada desde la tabla — el puente inverso de la sincronía mapa↔tabla. */
   hoveredKeyword: string | null
   onHoverKeyword: (keyword: string | null) => void
@@ -107,6 +117,7 @@ const KeywordOpportunityMap = ({
   opportunities,
   impressionsThreshold,
   marketUnavailable,
+  positionRange,
   hoveredKeyword,
   onHoverKeyword
 }: KeywordOpportunityMapProps) => {
@@ -336,8 +347,8 @@ const KeywordOpportunityMap = ({
         // Rango FIJO al striking-distance que el reader acota: un auto-scale haría que la
         // frontera de la primera plana se moviera de lugar entre Spaces, y esa frontera es
         // justo la lectura que la pantalla existe para dar.
-        min: AXIS_MIN_POSITION,
-        max: AXIS_MAX_POSITION,
+        min: positionRange?.min ?? AXIS_MIN_POSITION,
+        max: positionRange?.max ?? AXIS_MAX_POSITION,
         interval: 2,
         axisLine: { lineStyle: { color: gridInk } },
         axisTick: { show: false },
@@ -383,6 +394,7 @@ const KeywordOpportunityMap = ({
     paperInk,
     inkPrimary,
     hoveredKeyword,
+    positionRange,
     theme.palette.success.light,
     copy.map.axisX,
     copy.map.axisY,
