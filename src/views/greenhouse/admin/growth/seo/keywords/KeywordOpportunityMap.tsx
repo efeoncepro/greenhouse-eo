@@ -87,6 +87,9 @@ export interface KeywordOpportunityMapProps {
   impressionsThreshold: number
   /** Sin enriquecimiento de mercado: se dice al PIE, no en un banner sobre el fold. */
   marketUnavailable: boolean
+  /** Keyword resaltada desde la tabla — el puente inverso de la sincronía mapa↔tabla. */
+  hoveredKeyword: string | null
+  onHoverKeyword: (keyword: string | null) => void
 }
 
 interface MapPoint {
@@ -103,7 +106,9 @@ interface MapPoint {
 const KeywordOpportunityMap = ({
   opportunities,
   impressionsThreshold,
-  marketUnavailable
+  marketUnavailable,
+  hoveredKeyword,
+  onHoverKeyword
 }: KeywordOpportunityMapProps) => {
   const theme = useTheme()
   const prefersReduced = useReducedMotion()
@@ -213,18 +218,30 @@ const KeywordOpportunityMap = ({
         // Área ∝ ganancia: el ojo compara áreas, no radios. Con radio lineal una keyword
         // del doble de ganancia se vería cuatro veces más grande.
         symbolSize: (point: unknown) => {
-          const gain = (point as MapPoint | undefined)?.gain ?? 0
+          const data = point as MapPoint | undefined
+          const gain = data?.gain ?? 0
           const ratio = Math.sqrt(Math.max(0, gain) / maxGain)
+          const size = MIN_SYMBOL + ratio * (MAX_SYMBOL - MIN_SYMBOL)
 
-          return MIN_SYMBOL + ratio * (MAX_SYMBOL - MIN_SYMBOL)
+          // El punto señalado desde la tabla crece: es lo que hace que la sincronía se VEA
+          // aunque el punto sea de los chicos.
+          return data?.keyword === hoveredKeyword ? size * 1.8 : size
         },
-        itemStyle: { color: style.color, opacity: 0.78, borderColor: paperInk, borderWidth: 1 },
+        itemStyle: {
+          color: style.color,
+          opacity: 0.78,
+          borderColor: paperInk,
+          borderWidth: 1
+        },
         emphasis: { focus: 'series' as const, itemStyle: { opacity: 1 } },
         // Etiqueta directa sólo en las de mayor ganancia: nombrar las 50 sería ilegible y
         // nombrar ninguna deja un gráfico que no se puede accionar sin el mouse.
         label: {
           show: true,
-          formatter: (params: { data?: MapPoint }) => (params.data?.labelled ? params.data.keyword : ''),
+          // La fila bajo el cursor fuerza su etiqueta aunque no esté en el top de ganancia:
+          // sin esto, señalar una fila de la tabla no producía NADA visible en el mapa.
+          formatter: (params: { data?: MapPoint }) =>
+            params.data?.labelled || params.data?.keyword === hoveredKeyword ? (params.data?.keyword ?? '') : '',
           position: 'right' as const,
           distance: 8,
           color: inkPrimary,
@@ -365,6 +382,7 @@ const KeywordOpportunityMap = ({
     gridInk,
     paperInk,
     inkPrimary,
+    hoveredKeyword,
     theme.palette.success.light,
     copy.map.axisX,
     copy.map.axisY,
@@ -399,7 +417,16 @@ const KeywordOpportunityMap = ({
           </Stack>
 
           <Box role='img' aria-label={ariaLabel}>
-            <AppECharts option={option} height={380} />
+            <AppECharts
+              option={option}
+              height={380}
+              // Sincronía mapa → tabla: pasar el cursor por un punto resalta su fila.
+              onEvents={{
+                mouseover: (params: { data?: { keyword?: string } }) =>
+                  onHoverKeyword(params.data?.keyword ?? null),
+                mouseout: () => onHoverKeyword(null)
+              }}
+            />
           </Box>
 
           <Stack spacing={1} data-capture='seo-keywords-degraded'>

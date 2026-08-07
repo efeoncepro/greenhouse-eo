@@ -14,14 +14,24 @@
     "note": "Ruta nueva; no existe before. La hermana `growth.seo.performance` (TASK-1307) es el benchmark nativo: misma recipe `analyticsReport`, mismo conmutador de tabs, mismo contrato de leyenda medido/estimado."
   },
   "evidence": {
-    "desktop": ".captures/2026-08-07T19-41-01_growth-seo-keywords/01-desktop",
-    "mobile": ".captures/2026-08-07T19-41-01_growth-seo-keywords/02-mobile",
-    "dossier": ".captures/2026-08-07T19-41-01_growth-seo-keywords/review-dossier.md",
+    "desktop": ".captures/2026-08-07T20-07-35_growth-seo-keywords/01-desktop",
+    "mobile": ".captures/2026-08-07T20-07-35_growth-seo-keywords/02-mobile",
+    "dossier": ".captures/2026-08-07T20-07-35_growth-seo-keywords/review-dossier.md",
     "data": "Datos REALES de berel.com: 50 oportunidades striking-distance, 31 keywords ya seguidas, umbral de impresiones 10. Cero fixtures.",
     "reducedMotion": "Ejercitado por el GVC (`reducedMotionCheck: true`), no sólo declarado.",
     "axe": "@axe-core/playwright scopeado a la surface con `failOnViolations: true` — 0 violations en 1440x900 y 390x844.",
     "notCovered": "Los estados empty (sin oportunidades), error y denied NO tienen frame: ningún Space de dev los produce hoy (Berel tiene datos, Efeonce no tiene target). Implementados y cubiertos por lectura de código, no por evidencia visual. Declarado, no asumido verde.",
-    "iterations": "Once pasadas de GVC con revisión del frame entre cada una. La v1 pasaba los cuatro gates y se veía mal; lo que la arregló fue mirar. Dos hallazgos vinieron del operador sobre el frame (selectores flotando sobre el fondo gris, tabla sin paginar) y uno del gate de runtime (mismatch de hidratación por `useId`)."
+    "iterations": "Once pasadas de GVC con revisión del frame entre cada una. La v1 pasaba los cuatro gates y se veía mal; lo que la arregló fue mirar. Dos hallazgos vinieron del operador sobre el frame (selectores flotando sobre el fondo gris, tabla sin paginar) y uno del gate de runtime (mismatch de hidratación por `useId`).",
+    "states": [
+      "ready",
+      "degraded (mercado no disponible)",
+      "filtered",
+      "stale (frescura declarada)",
+      "busy (recarga en curso)",
+      "error retriable",
+      "error estructural",
+      "locked con CTA"
+    ]
   },
   "dimensions": {
     "hierarchy": {
@@ -41,7 +51,7 @@
     },
     "density": {
       "score": 5,
-      "rationale": "Alta y deliberada, y ahora paginada: 25 filas por página sobre un techo de 50 del reader. 25 y no 10 porque la lista está ORDENADA POR GANANCIA — la primera página tiene que contener toda la cabeza accionable, no cortarla en el ítem 10. La página se ACOTA al total en vez de resetearse por efecto: filtrar estando en la página 3 dejaría al operador mirando una tabla vacía que parece un bug.",
+      "rationale": "Alta y deliberada, y ahora paginada: 25 filas por página sobre un techo de 50 del reader. 25 y no 10 porque la lista está ORDENADA POR GANANCIA — la primera página tiene que contener toda la cabeza accionable, no cortarla en el ítem 10. La página se ACOTA al total en vez de resetearse por efecto: filtrar estando en la página 3 dejaría al operador mirando una tabla vacía que parece un bug. Las columnas de mercado NO se renderizan mientras no haya dato: repetían \"Sin dato\" 50 veces y empujaban la acción primaria fuera de la pantalla. La ausencia sigue dicha, una vez, al pie del mapa.",
       "evidence": "01-desktop/frames/05-table.png"
     },
     "depth": {
@@ -66,7 +76,7 @@
     },
     "color": {
       "score": 5,
-      "rationale": "axe con failOnViolations en 0 violations sobre ambos viewports. El único hallazgo del ciclo lo destapó este gate y era invisible a ojo: el label ENFOCADO de un CustomTextField usa primary.main, que sobre el fondo del body da 4.42:1 y falla AA; sobre el papel de una card da 4.61:1 y pasa.",
+      "rationale": "axe con failOnViolations en 0 violations sobre ambos viewports. El único hallazgo del ciclo lo destapó este gate y era invisible a ojo: el label ENFOCADO de un CustomTextField usa primary.main, que sobre el fondo del body da 4.42:1 y falla AA; sobre el papel de una card da 4.61:1 y pasa. Segundo hallazgo del mismo gate al agregar la columna de conflicto: `warning.dark` de este theme resuelve a #eeaa00 — 2.02:1 sobre blanco. El número pasó a peso tipográfico y la semántica la carga el chip de la fila.",
       "evidence": "01-desktop/frames/06-keyboard-keyword-search-focus.axe.json"
     },
     "iconography": {
@@ -76,7 +86,7 @@
     },
     "responsive": {
       "score": 4.5,
-      "rationale": "390px verificado en la misma corrida. La tabla densa no empuja el ancho de la página: DataTableShell la contiene con scroll interno y el canvas del chart lleva minInlineSize 0 más overflowX clip. Los warnings de layout del gate son del shell del dashboard, no de esta surface.",
+      "rationale": "390px verificado en la misma corrida. La tabla densa no empuja el ancho de la página: DataTableShell la contiene con scroll interno y el canvas del chart lleva minInlineSize 0 más overflowX clip. Los warnings de layout del gate son del shell del dashboard, no de esta surface. Los dos links de la celda de keyword llevan `minBlockSize: 24`: como texto plano medían 21px y 18.8px y fallaban el target-size de WCAG 2.5.8 en 50 nodos.",
       "evidence": "02-mobile/frames/02-map.png, 02-mobile/frames/04-table.png"
     },
     "motion": {
@@ -98,6 +108,7 @@
   "verdict": "PASS",
   "openRisks": [
     "🔴 BUG DE PLATAFORMA SOSPECHADO, no cerrado: los controles MUI dentro del subárbol de la recipe producen mismatch de hidratación por `useId` — el `htmlFor` del label difiere entre servidor y cliente, reproducible SÓLO en 390px. Se cerró declarando ids estables en los cinco controles de esta surface, pero la causa raíz (la recipe adapta el árbol midiendo en cliente) afectaría a cualquier form control en cualquier surface adaptativa. Merece task propia.",
+    "El botón flotante de Nexa tapa la acción de dos filas en desktop. Es el FAB portal-wide; afecta a cualquier tabla con acción a la derecha.",
     "El eje log con cotas explícitas rotula sus extremos con valores no-década (68 y 1.790). Es el precio de no desperdiciar el 40% del alto.",
     "La nota al pie del mapa pasa por debajo del botón flotante de Nexa en desktop. Es el FAB portal-wide, no de esta surface.",
     "Los estados empty, error y denied no tienen frame porque ningún Space de dev los produce. Cubiertos por código, no por evidencia visual.",

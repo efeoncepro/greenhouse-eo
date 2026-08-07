@@ -687,3 +687,43 @@ export type TrackKeywordsResult =
  * el seam de extracción §17.3 evita acoplar `src/lib/growth/seo/**` al catálogo central).
  */
 export const SEO_KEYWORD_SET_UPDATED_EVENT = 'growth.seo.keyword_set.updated'
+
+/**
+ * ═══ TASK-1308 — Command `untrackKeywords` (dejar de seguir) ═══
+ *
+ * La contraparte que faltaba, y su ausencia era un callejón sin salida DISEÑADO: el set
+ * tiene techo, la UI decía "deja de seguir alguna" y no existía forma de hacerlo desde el
+ * portal. Cerrar el ciclo también es lo que hace que el gasto sea reversible — sin esto,
+ * seguir una keyword era un compromiso permanente.
+ *
+ * ⚠️ NO BORRA: cierra la ventana con `effective_to`. La tabla es append-only (trigger
+ * anti-DELETE de TASK-1299) y el histórico de qué se midió y cuándo es justamente lo que
+ * permite explicar una factura pasada.
+ */
+export type SeoKeywordUntrackStatus =
+  /** Membresía vigente cerrada. Deja de entrar al rank capture del próximo ciclo. */
+  | 'untracked'
+  /** No había membresía vigente. Cero writes — el command es idempotente en ambos sentidos. */
+  | 'not_tracked'
+  | 'invalid'
+
+export interface SeoKeywordUntrackOutcome {
+  keyword: string
+  status: SeoKeywordUntrackStatus
+}
+
+export type UntrackKeywordsResult =
+  | {
+      ok: true
+      seoTargetId: string
+      organizationId: string
+      outcomes: SeoKeywordUntrackOutcome[]
+      /** Membresías vigentes DESPUÉS del command (lo que se sigue pagando por ciclo). */
+      activeKeywordCount: number
+      capacity: number
+    }
+  | {
+      ok: false
+      errorCode: 'disabled' | 'target_not_found' | 'no_entitlement' | 'no_keywords' | 'query_failed'
+      status: null
+    }

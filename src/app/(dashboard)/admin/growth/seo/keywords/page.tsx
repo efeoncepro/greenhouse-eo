@@ -92,6 +92,7 @@ export default async function Page({ searchParams }: PageProps) {
         selectedSpaceId={null}
         rootDomain={null}
         connectionState='not_connected'
+        dataAsOf={null}
         canConnectSearchConsole={false}
         canTrackKeywords={false}
         windowDays={windowDays}
@@ -113,6 +114,7 @@ export default async function Page({ searchParams }: PageProps) {
         selectedSpaceId={selectedSpace.organizationId}
         rootDomain={null}
         connectionState={connection.state}
+        dataAsOf={connection.dataAsOf}
         canConnectSearchConsole={can(tenant, 'growth.search_console.connect', 'execute', 'tenant')}
         canTrackKeywords={canTrackKeywords}
         windowDays={windowDays}
@@ -142,6 +144,7 @@ export default async function Page({ searchParams }: PageProps) {
         selectedSpaceId={selectedSpace.organizationId}
         rootDomain={null}
         connectionState='no_snapshots'
+        dataAsOf={connection.dataAsOf}
         canConnectSearchConsole={false}
         canTrackKeywords={canTrackKeywords}
         windowDays={windowDays}
@@ -174,6 +177,7 @@ export default async function Page({ searchParams }: PageProps) {
       seoTargetId={target.seo_target_id}
       rootDomain={target.root_domain}
       connectionState={connection.state}
+      dataAsOf={connection.dataAsOf}
       canConnectSearchConsole={false}
       canTrackKeywords={canTrackKeywords}
       windowDays={windowDays}

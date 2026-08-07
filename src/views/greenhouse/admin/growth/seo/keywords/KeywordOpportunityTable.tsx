@@ -3,6 +3,9 @@
 import { useMemo, useState } from 'react'
 
 import Card from '@mui/material/Card'
+import Checkbox from '@mui/material/Checkbox'
+import Button from '@mui/material/Button'
+import Link from '@mui/material/Link'
 import Divider from '@mui/material/Divider'
 import CardContent from '@mui/material/CardContent'
 import Stack from '@mui/material/Stack'
@@ -66,6 +69,28 @@ export interface KeywordOpportunityTableProps {
   atCapacity: boolean
   trackingState: Record<string, GreenhouseAsyncActionState>
   onTrack: (keyword: string) => void
+  onUntrack: (keyword: string) => void
+  /** Drill a Rendimiento con esa keyword aislada — el puente al nodo S2 del flujo. */
+  onDrill: (keyword: string) => void
+  selected: Set<string>
+  onToggleSelected: (keyword: string) => void
+  onSelectPage: (keywords: string[], select: boolean) => void
+  /** Keyword bajo el cursor en el mapa: la fila correspondiente se resalta. */
+  /**
+   * Sin dato de mercado, las columnas de volumen y dificultad NO SE RENDERIZAN.
+   *
+   * ⚠️ No es esconder la degradación: la ausencia ya está dicha al pie del mapa, una vez y
+   * con sus palabras. Lo que hacían era repetir "Sin dato" 50 veces (dos columnas × 25
+   * filas) mientras empujaban la acción primaria fuera de la pantalla — el GVC mostró
+   * "Dejar de segu…" cortado. Una columna que no puede tener datos no gana su ancho.
+   * Cuando TASK-1300 aterrice vuelven solas.
+   */
+  marketUnavailable: boolean
+  hoveredKeyword: string | null
+  onHoverKeyword: (keyword: string | null) => void
+  onTrackSelected: () => void
+  onClearSelection: () => void
+  bulkState: GreenhouseAsyncActionState
 }
 
 const KeywordOpportunityTable = ({
@@ -74,7 +99,18 @@ const KeywordOpportunityTable = ({
   canTrack,
   atCapacity,
   trackingState,
-  onTrack
+  onTrack,
+  onUntrack,
+  onDrill,
+  selected,
+  onToggleSelected,
+  onSelectPage,
+  marketUnavailable,
+  hoveredKeyword,
+  onHoverKeyword,
+  onTrackSelected,
+  onClearSelection,
+  bulkState
 }: KeywordOpportunityTableProps) => {
   const copy = GH_GROWTH_SEO_KEYWORDS
 
@@ -139,6 +175,12 @@ const KeywordOpportunityTable = ({
     [sorted, safePage, rowsPerPage]
   )
 
+  /** Lo seguible de la página vigente: ni lo ya seguido ni nada fuera de la página. */
+  const selectablePage = useMemo(
+    () => visible.filter(row => !trackedKeywords.has(row.keyword)).map(row => row.keyword),
+    [visible, trackedKeywords]
+  )
+
   const toggleSort = (column: SortColumn) => {
     if (column === sortColumn) {
       setSortDirection(current => (current === 'asc' ? 'desc' : 'asc'))
@@ -192,10 +234,54 @@ const KeywordOpportunityTable = ({
             </Typography>
           </Stack>
 
+          {canTrack && selected.size > 0 ? (
+            // Barra de lote: aparece sólo con selección. Con 42 candidatas de consolidación
+            // y 25 por página, seguirlas de a una son decenas de clicks.
+            <Stack
+              direction={{ xs: 'column', sm: 'row' }}
+              spacing={3}
+              alignItems={{ sm: 'center' }}
+              role='status'
+              data-capture='seo-keywords-bulk'
+            >
+              <Typography variant='body2' fontWeight={600}>
+                {copy.follow.bulkSelected.replace('{count}', String(selected.size))}
+              </Typography>
+              <GreenhouseAsyncActionButton
+                size='small'
+                greenhouseVariant='solid'
+                state={bulkState}
+                disabled={atCapacity || bulkState === 'loading'}
+                onClick={onTrackSelected}
+              >
+                {copy.follow.bulkTrack}
+              </GreenhouseAsyncActionButton>
+              <Button size='small' variant='text' onClick={onClearSelection}>
+                {copy.follow.bulkClear}
+              </Button>
+            </Stack>
+          ) : null}
+
           <DataTableShell identifier='seo-keyword-opportunities' ariaLabel={copy.table.ariaLabel} stickyFirstColumn>
             <Table size='small'>
               <TableHead>
                 <TableRow>
+                  {canTrack ? (
+                    <TableCell padding='checkbox'>
+                      <Checkbox
+                        size='small'
+                        inputProps={{ 'aria-label': copy.follow.bulkSelectAll }}
+                        // Sólo cuenta lo SEGUIBLE de la página: marcar "todas" no puede
+                        // prometer incluir las que ya se siguen.
+                        checked={selectablePage.length > 0 && selectablePage.every(k => selected.has(k))}
+                        indeterminate={
+                          selectablePage.some(k => selected.has(k)) && !selectablePage.every(k => selected.has(k))
+                        }
+                        onChange={event => onSelectPage(selectablePage, event.target.checked)}
+                        disabled={selectablePage.length === 0}
+                      />
+                    </TableCell>
+                  ) : null}
                   <TableCell aria-sort={ariaSort('keyword')}>
                     {sortLabel('keyword', copy.table.colKeyword, 'left')}
                   </TableCell>
@@ -221,8 +307,17 @@ const KeywordOpportunityTable = ({
                       <span>{sortLabel('gain', copy.table.colGain)}</span>
                     </Tooltip>
                   </TableCell>
-                  <TableCell align='right'>{copy.table.colVolume}</TableCell>
-                  <TableCell align='right'>{copy.table.colDifficulty}</TableCell>
+                  <TableCell align='right'>
+                    <Tooltip title={copy.table.colConflictHint}>
+                      <span>{copy.table.colConflict}</span>
+                    </Tooltip>
+                  </TableCell>
+                  {marketUnavailable ? null : (
+                    <>
+                      <TableCell align='right'>{copy.table.colVolume}</TableCell>
+                      <TableCell align='right'>{copy.table.colDifficulty}</TableCell>
+                    </>
+                  )}
                   {canTrack ? <TableCell align='right'>{copy.follow.cta}</TableCell> : null}
                 </TableRow>
               </TableHead>
@@ -233,15 +328,67 @@ const KeywordOpportunityTable = ({
                   const state = trackingState[row.keyword] ?? 'idle'
 
                   return (
-                    <TableRow key={row.keyword} hover>
+                    <TableRow
+                      key={row.keyword}
+                      hover
+                      // Sincronía con el mapa: el punto bajo el cursor resalta su fila.
+                      selected={hoveredKeyword === row.keyword}
+                      onMouseEnter={() => onHoverKeyword(row.keyword)}
+                      onMouseLeave={() => onHoverKeyword(null)}
+                    >
+                      {canTrack ? (
+                        <TableCell padding='checkbox'>
+                          <Checkbox
+                            size='small'
+                            checked={selected.has(row.keyword)}
+                            onChange={() => onToggleSelected(row.keyword)}
+                            disabled={isTracked}
+                            inputProps={{ 'aria-label': copy.follow.bulkAria.replace('{keyword}', row.keyword) }}
+                          />
+                        </TableCell>
+                      ) : null}
                       <TableCell sx={{ maxInlineSize: 260 }}>
                         <Stack spacing={0.5}>
-                          <Typography variant='body2' noWrap title={row.keyword}>
+                          {/* La keyword es el puente al nodo S2 del flujo: lleva a Rendimiento
+                              con esa serie aislada. Antes la tabla no llevaba a ningún lado —
+                              seguías una keyword y no había camino para ir a verla. */}
+                          <Link
+                            component='button'
+                            type='button'
+                            variant='body2'
+                            underline='hover'
+                            onClick={() => onDrill(row.keyword)}
+                            aria-label={copy.table.drillAria.replace('{keyword}', row.keyword)}
+                            // 24px de alto mínimo: como texto plano medían 21px y fallaban
+                            // el target-size de WCAG 2.5.8 (hallazgo de axe, 50 nodos).
+                            sx={{
+                              textAlign: 'start',
+                              maxInlineSize: '100%',
+                              minBlockSize: 24,
+                              display: 'flex',
+                              alignItems: 'center',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap'
+                            }}
+                            title={row.keyword}
+                          >
                             {row.keyword}
-                          </Typography>
-                          <Typography variant='caption' color='text.secondary' noWrap title={row.page}>
+                          </Link>
+                          {/* La página que rankea hoy, abrible: para consolidar hay que verla. */}
+                          <Link
+                            href={row.page}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            variant='caption'
+                            color='text.secondary'
+                            underline='hover'
+                            noWrap
+                            title={`${copy.table.openPage} — ${row.page}`}
+                            sx={{ display: 'flex', alignItems: 'center', minBlockSize: 24, maxInlineSize: '100%' }}
+                          >
                             {row.page}
-                          </Typography>
+                          </Link>
                         </Stack>
                       </TableCell>
                       <TableCell>
@@ -282,23 +429,52 @@ const KeywordOpportunityTable = ({
                           </Tooltip>
                         )}
                       </TableCell>
+                      {/* 🔴 EL DATO QUE DECIDE LA URGENCIA. "Consolidar" aparece decenas de
+                          veces y no distingue un conflicto de 2 páginas de uno de 45; este
+                          número sí. Vivía sólo en el tooltip del mapa. */}
                       <TableCell align='right' sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                        {marketCell(row.searchVolume)}
+                        {/* ⚠️ El color NO lleva la señal acá. `warning.dark` de este theme
+                            resuelve a #eeaa00: 2.02:1 sobre blanco, muy por debajo de AA
+                            (hallazgo de axe). El peso distingue el conflicto y la semántica
+                            ya la carga el chip "Consolidar" de la misma fila — que es el
+                            contrato color-independiente correcto de todos modos. */}
+                        {row.competingPages > 1 ? (
+                          <Typography variant='body2' fontWeight={700}>
+                            {row.competingPages}
+                          </Typography>
+                        ) : (
+                          <Typography variant='body2' color='text.secondary'>
+                            1
+                          </Typography>
+                        )}
                       </TableCell>
-                      <TableCell align='right' sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                        {marketCell(row.difficulty)}
-                      </TableCell>
+                      {marketUnavailable ? null : (
+                        <>
+                          <TableCell align='right' sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                            {marketCell(row.searchVolume)}
+                          </TableCell>
+                          <TableCell align='right' sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                            {marketCell(row.difficulty)}
+                          </TableCell>
+                        </>
+                      )}
                       {canTrack ? (
                         <TableCell align='right'>
                           {isTracked ? (
-                            <Tooltip title={copy.follow.followingHint}>
+                            // Dejar de seguir cierra el callejón: el set tiene techo, y sin
+                            // esta acción la única salida era pedirlo por soporte.
+                            <Tooltip title={copy.follow.untrackHint}>
                               <span>
-                                <GreenhouseChip
-                                  kind='status'
-                                  variant='label'
+                                <GreenhouseAsyncActionButton
                                   size='small'
-                                  label={copy.follow.following}
-                                />
+                                  greenhouseVariant='text'
+                                  state={state}
+                                  disabled={state === 'loading'}
+                                  aria-label={copy.follow.untrackAria.replace('{keyword}', row.keyword)}
+                                  onClick={() => onUntrack(row.keyword)}
+                                >
+                                  {copy.follow.untrack}
+                                </GreenhouseAsyncActionButton>
                               </span>
                             </Tooltip>
                           ) : (

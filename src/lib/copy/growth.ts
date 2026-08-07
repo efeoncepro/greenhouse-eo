@@ -1888,7 +1888,17 @@ export const GH_GROWTH_SEO_KEYWORDS = {
       '90': 'Últimos 90 días'
     },
     // La ventana no es cosmética: define sobre qué se calculó la posición ponderada.
-    windowHint: 'La posición se pondera por impresiones dentro de la ventana.'
+    windowHint: 'La posición se pondera por impresiones dentro de la ventana.',
+    /**
+     * ⚠️ La frescura NO es decoración en este dominio. Search Console no publica el día
+     * anterior y consolida sus métricas con ~48h de retraso, así que una pantalla que
+     * muestra 28 días sin decir hasta cuándo llegan los datos se lee como "hasta hoy".
+     */
+    freshness: 'Datos hasta {date}',
+    freshnessUnknown: 'Sin fecha de corte disponible',
+    freshnessHint:
+      'Search Console no publica el día de ayer y ajusta sus números durante unas 48 horas. El borde reciente de la serie todavía se está consolidando.',
+    refreshing: 'Actualizando…'
   },
 
   source: {
@@ -1990,7 +2000,12 @@ export const GH_GROWTH_SEO_KEYWORDS = {
     rowsPerPage: 'Filas por página',
     paginationRange: '{from}–{to} de {count}',
     sortedByGain: 'Ordenadas por ganancia estimada: lo de arriba es lo que más rinde.',
+    colConflict: 'Páginas',
+    colConflictHint:
+      'Cuántas páginas tuyas aparecen para esta búsqueda. Más de una significa que compiten entre sí — y ese número es lo que decide la urgencia de consolidar.',
     competingPages: '{count} páginas compiten',
+    drillAria: 'Ver la evolución de {keyword} en Rendimiento',
+    openPage: 'Abrir la página que rankea hoy',
     gainUnit: '+{value} clics/mes est.',
     noGain: 'Sin ganancia estimada',
     noGainHint: 'Esta keyword ya convierte mejor que el promedio de la posición objetivo.'
@@ -1998,6 +2013,17 @@ export const GH_GROWTH_SEO_KEYWORDS = {
 
   follow: {
     cta: 'Seguir',
+    untrack: 'Dejar de seguir',
+    untrackAria: 'Dejar de seguir la keyword {keyword}',
+    untrackHint: 'Sale del seguimiento diario y deja de consumir presupuesto del proveedor. Su historial se conserva.',
+    feedbackUntracked: 'Dejaste de seguir "{keyword}". Su historial se conserva.',
+    feedbackUntrackError: 'No pudimos dejar de seguir "{keyword}". Intenta de nuevo.',
+    bulkSelected: '{count} seleccionadas',
+    bulkTrack: 'Seguir seleccionadas',
+    bulkClear: 'Limpiar selección',
+    bulkAria: 'Seleccionar {keyword} para seguirla en lote',
+    bulkSelectAll: 'Seleccionar todas las de esta página',
+    feedbackBulk: 'Seguiste {tracked} de {requested} keywords.',
     ctaAria: 'Seguir la keyword {keyword}',
     following: 'Siguiendo',
     followingHint: 'Ya está en el set monitoreado: su posición se mide todos los días.',
@@ -2054,9 +2080,20 @@ export const GH_GROWTH_SEO_KEYWORDS = {
       cta: 'Reintentar'
     },
 
+    /**
+     * Error ESTRUCTURAL: reintentar no lo resuelve, así que no se ofrece el botón.
+     * Ofrecerlo escondería la acción real y haría que el operador reintente en vano.
+     */
+    errorStructural: {
+      title: 'Este Space no tiene un sitio SEO configurado',
+      description: 'Hay que crear el target del sitio antes de que podamos buscar oportunidades. Pídeselo a quien administre el módulo.'
+    },
+
     denied: {
       title: 'No tienes acceso al módulo SEO',
-      description: 'Pídele a un administrador que te habilite el módulo SEO para este Space.'
+      description: 'Pídele a un administrador que te habilite el módulo SEO para este Space.',
+      // Un estado bloqueado lleva CTA, no una instrucción: el camino tiene que ser clicable.
+      cta: 'Ver los Spaces con SEO activo'
     },
 
     // Degradación honesta del enriquecimiento de mercado: se nombra lo que falta.

@@ -55,6 +55,17 @@ vi.mock('@/lib/db', () => ({
           return { rows: state.activeKeywords.map(keyword => ({ keyword })), rowCount: state.activeKeywords.length }
         }
 
+        if (sql.includes('UPDATE greenhouse_growth.seo_keyword_set_members')) {
+          const asked = params[1] as string[]
+          const closed = asked.filter(k => state.activeKeywords.includes(k))
+
+          return { rows: closed.map(keyword => ({ keyword })), rowCount: closed.length }
+        }
+
+        if (sql.includes('SELECT COUNT(*)::text AS n')) {
+          return { rows: [{ n: String(state.activeKeywords.length) }], rowCount: 1 }
+        }
+
         if (sql.includes('INSERT INTO greenhouse_growth.seo_keyword_set_members')) {
           const inserted = (params[3] as string[]).length
 
@@ -84,7 +95,12 @@ vi.mock('@/lib/observability/capture', () => ({
   }
 }))
 
-import { normalizeTrackedKeyword, TRACKED_KEYWORDS_CAPACITY_ENV, trackKeywords } from '../track-keywords'
+import {
+  normalizeTrackedKeyword,
+  TRACKED_KEYWORDS_CAPACITY_ENV,
+  trackKeywords,
+  untrackKeywords
+} from '../track-keywords'
 
 const ENV_ON = { GROWTH_SEO_ENABLED: 'true' } as unknown as NodeJS.ProcessEnv
 
@@ -277,5 +293,66 @@ describe('trackKeywords — persistencia y evento', () => {
 
     expect(result).toEqual({ ok: false, errorCode: 'query_failed', status: null })
     expect(state.captured).toHaveLength(1)
+  })
+})
+
+describe('untrackKeywords — el reverso del compromiso de gasto', () => {
+  it('cierra la ventana de la keyword vigente, no la borra', async () => {
+    state.activeKeywords = ['berel', 'pintura berel']
+
+    const result = await untrackKeywords('seot-1', ['Berel'], 'user-1', { env: ENV_ON })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) return
+
+    expect(result.outcomes).toEqual([{ keyword: 'berel', status: 'untracked' }])
+
+    const update = state.calls.find(call => call.sql.includes('UPDATE greenhouse_growth.seo_keyword_set_members'))
+
+    expect(update?.sql).toContain('SET effective_to = NOW()')
+    // Append-only: jamás un DELETE sobre la tabla (el trigger de 1299 lo prohíbe).
+    expect(state.calls.some(call => call.sql.includes('DELETE FROM greenhouse_growth.seo_keyword_set_members'))).toBe(
+      false
+    )
+  })
+
+  it('una keyword que no se seguía devuelve not_tracked sin escribir ni emitir', async () => {
+    state.activeKeywords = []
+
+    const result = await untrackKeywords('seot-1', ['fantasma'], 'user-1', { env: ENV_ON })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) return
+
+    expect(result.outcomes[0].status).toBe('not_tracked')
+    expect(state.outboxEvents).toHaveLength(0)
+  })
+
+  it('🔴 un target PAUSADO sí puede dejar de seguir: bloquear la salida congelaría el gasto', async () => {
+    state.target = [{ organization_id: 'org-1', status: 'paused' }]
+    state.activeKeywords = ['berel']
+
+    const result = await untrackKeywords('seot-1', ['berel'], 'user-1', { env: ENV_ON })
+
+    expect(result.ok).toBe(true)
+  })
+
+  it('sin entitlement del módulo no opera', async () => {
+    state.hasModule = false
+
+    const result = await untrackKeywords('seot-1', ['berel'], 'user-1', { env: ENV_ON })
+
+    expect(result).toEqual({ ok: false, errorCode: 'no_entitlement', status: null })
+  })
+
+  it('con el módulo apagado no toca la base', async () => {
+    const result = await untrackKeywords('seot-1', ['berel'], 'user-1', {
+      env: {} as unknown as NodeJS.ProcessEnv
+    })
+
+    expect(result).toEqual({ ok: false, errorCode: 'disabled', status: null })
+    expect(state.calls).toHaveLength(0)
   })
 })

@@ -7,7 +7,9 @@ import { useRouter } from 'next/navigation'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
 import Card from '@mui/material/Card'
+import Tooltip from '@mui/material/Tooltip'
 import CardContent from '@mui/material/CardContent'
 import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
@@ -54,6 +56,7 @@ import { resolveKeywordAction, type KeywordAction } from './keyword-opportunity-
  */
 
 const TRACK_ENDPOINT = '/api/admin/growth/seo/keywords/track'
+const UNTRACK_ENDPOINT = '/api/admin/growth/seo/keywords/untrack'
 
 /**
  * Ids ESTABLES para los dos controles de contexto.
@@ -79,6 +82,8 @@ export interface KeywordOpportunitiesViewProps {
   seoTargetId?: string
   rootDomain: string | null
   connectionState: SeoConnectionState
+  /** Hasta qué día llega la serie medida. `null` = no se pudo determinar, y se dice. */
+  dataAsOf: string | null
   canConnectSearchConsole: boolean
   canTrackKeywords: boolean
   windowDays: number
@@ -94,6 +99,7 @@ const KeywordOpportunitiesView = ({
   seoTargetId,
   rootDomain,
   connectionState,
+  dataAsOf,
   canConnectSearchConsole,
   canTrackKeywords,
   windowDays,
@@ -115,6 +121,9 @@ const KeywordOpportunitiesView = ({
   const [tracked, setTracked] = useState<Set<string>>(() => new Set(trackedKeywords))
   const [trackingState, setTrackingState] = useState<Record<string, GreenhouseAsyncActionState>>({})
   const [feedback, setFeedback] = useState<{ severity: 'success' | 'info' | 'error'; message: string } | null>(null)
+  const [selected, setSelected] = useState<Set<string>>(() => new Set())
+  const [bulkState, setBulkState] = useState<GreenhouseAsyncActionState>('idle')
+  const [hoveredKeyword, setHoveredKeyword] = useState<string | null>(null)
 
   const selectedSpace = spaces.find(space => space.organizationId === selectedSpaceId) ?? null
 
@@ -270,6 +279,36 @@ const KeywordOpportunitiesView = ({
   )
 
   /**
+   * Frescura de la serie.
+   *
+   * 🔴 NO ES DECORACIÓN EN ESTE DOMINIO. Search Console no publica el día anterior y ajusta
+   * sus métricas durante ~48h, así que una pantalla que muestra 28 días sin decir hasta
+   * cuándo llegan los datos se lee como "hasta hoy". Sin fecha se dice que no hay; jamás se
+   * infiere una.
+   *
+   * Comparte fila con el indicador de recarga: cuando el operador cambia de Space o de
+   * ventana el servidor vuelve a leer, y sin señal la pantalla se queda con los datos
+   * viejos como si nada estuviera pasando.
+   */
+  const contextMeta = (
+    <Stack direction='row' spacing={2} alignItems='center' flexWrap='wrap' useFlexGap>
+      <Tooltip title={copy.toolbar.freshnessHint}>
+        <Typography variant='caption' color='text.secondary'>
+          {dataAsOf ? copy.toolbar.freshness.replace('{date}', dataAsOf) : copy.toolbar.freshnessUnknown}
+        </Typography>
+      </Tooltip>
+      {isPending ? (
+        <Stack direction='row' spacing={1} alignItems='center' role='status'>
+          <CircularProgress size={12} thickness={6} />
+          <Typography variant='caption' color='text.secondary'>
+            {copy.toolbar.refreshing}
+          </Typography>
+        </Stack>
+      ) : null}
+    </Stack>
+  )
+
+  /**
    * Los estados sin datos también llevan los controles: el picker vive en el veredicto, y el
    * veredicto no se renderiza sin datos. Sin esto, un Space sin Search Console dejaría al
    * operador sin forma de cambiar de Space — la salida del estado vacío tiene que estar
@@ -279,12 +318,142 @@ const KeywordOpportunitiesView = ({
     <Card data-capture={marker}>
       <CardContent>
         <Stack spacing={6}>
-          {contextControls}
+          <Stack spacing={2}>
+            {contextControls}
+            {contextMeta}
+          </Stack>
           {node}
         </Stack>
       </CardContent>
     </Card>
   )
+
+  /**
+   * Deja de seguir: el reverso del compromiso de gasto.
+   *
+   * Actualiza el set local sólo cuando el command confirma, igual que el alta. Un optimista
+   * acá diría "ya no se sigue" sobre algo que el próximo ciclo va a seguir midiendo.
+   */
+  const handleUntrack = async (keyword: string) => {
+    if (!seoTargetId) return
+
+    setTrackingState(current => ({ ...current, [keyword]: 'loading' }))
+    setFeedback(null)
+
+    try {
+      const response = await fetch(UNTRACK_ENDPOINT, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ seoTargetId, keywords: [keyword] })
+      })
+
+      await throwIfNotOk(response, copy.follow.feedbackUntrackError.replace('{keyword}', keyword))
+      await response.json()
+
+      setTracked(current => {
+        const next = new Set(current)
+
+        next.delete(keyword)
+
+        return next
+      })
+      setTrackingState(current => ({ ...current, [keyword]: 'success' }))
+      setFeedback({ severity: 'success', message: copy.follow.feedbackUntracked.replace('{keyword}', keyword) })
+    } catch (error) {
+      setTrackingState(current => ({ ...current, [keyword]: 'error' }))
+      setFeedback({
+        severity: 'error',
+        message: error instanceof Error ? error.message : copy.follow.feedbackUntrackError.replace('{keyword}', keyword)
+      })
+    }
+  }
+
+  /**
+   * Lote: un solo command con todas las seleccionadas.
+   *
+   * El command ya resuelve el techo por keyword y devuelve outcome por cada una, así que el
+   * lote no necesita lógica propia — sólo contar lo que efectivamente entró y decirlo. Un
+   * lote que reporte "listo" cuando la mitad rebotó contra el techo sería la misma mentira
+   * que el 200 pelado, a mayor escala.
+   */
+  const handleTrackSelected = async () => {
+    if (!seoTargetId || selected.size === 0) return
+
+    const keywords = [...selected]
+
+    setBulkState('loading')
+    setFeedback(null)
+
+    try {
+      const response = await fetch(TRACK_ENDPOINT, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ seoTargetId, keywords })
+      })
+
+      await throwIfNotOk(response, copy.follow.feedbackError.replace('{keyword}', keywords[0]))
+
+      const payload = (await response.json()) as { outcomes?: SeoKeywordTrackOutcome[] }
+      const outcomes = payload.outcomes ?? []
+      const landed = outcomes.filter(o => o.status === 'tracked' || o.status === 'already_tracked')
+
+      setTracked(current => {
+        const next = new Set(current)
+
+        for (const outcome of landed) next.add(outcome.keyword)
+
+        return next
+      })
+      setSelected(new Set())
+      setBulkState('success')
+      setFeedback({
+        severity: landed.length === keywords.length ? 'success' : 'info',
+        message: copy.follow.feedbackBulk
+          .replace('{tracked}', String(landed.length))
+          .replace('{requested}', String(keywords.length))
+      })
+    } catch (error) {
+      setBulkState('error')
+      setFeedback({
+        severity: 'error',
+        message: error instanceof Error ? error.message : copy.follow.feedbackError.replace('{keyword}', keywords[0])
+      })
+    }
+  }
+
+  const toggleSelected = (keyword: string) =>
+    setSelected(current => {
+      const next = new Set(current)
+
+      if (next.has(keyword)) next.delete(keyword)
+      else next.add(keyword)
+
+      return next
+    })
+
+  const selectPage = (keywords: string[], select: boolean) =>
+    setSelected(current => {
+      const next = new Set(current)
+
+      for (const keyword of keywords) {
+        if (select) next.add(keyword)
+        else next.delete(keyword)
+      }
+
+      return next
+    })
+
+  /** Puente al nodo S2: la misma keyword, su película en el tiempo. */
+  const drillToPerformance = (keyword: string) => {
+    const params = new URLSearchParams()
+
+    if (selectedSpaceId) params.set('space', selectedSpaceId)
+    params.set('keywords', encodeURIComponent(keyword))
+
+    startTransition(() => {
+      router.push(`/admin/growth/seo/performance?${params.toString()}`)
+    })
+  }
 
   const header = (
     <Stack spacing={4}>
@@ -325,7 +494,17 @@ const KeywordOpportunitiesView = ({
     if (spaces.length === 0 || !selectedSpace) {
       return (
         <Box data-capture='seo-keywords-denied'>
-          <EmptyState icon='tabler-lock' title={copy.states.denied.title} description={copy.states.denied.description} />
+          <EmptyState
+            icon='tabler-lock'
+            title={copy.states.denied.title}
+            description={copy.states.denied.description}
+            // Un estado bloqueado lleva CAMINO, no una instrucción de texto.
+            action={
+              <Button variant='outlined' href='/admin/growth/seo'>
+                {copy.states.denied.cta}
+              </Button>
+            }
+          />
         </Box>
       )
     }
@@ -366,19 +545,26 @@ const KeywordOpportunitiesView = ({
     }
 
     if (!opportunities || !opportunities.ok) {
+      // ⚠️ REINTENTAR NO RESUELVE UN ERROR ESTRUCTURAL. `target_not_found` significa que el
+      // Space no tiene sitio SEO configurado: ofrecer el botón mandaría al operador a
+      // reintentar en vano y le escondería la acción real, que es pedir la configuración.
+      // Es el mismo criterio `actionable` del contrato canónico de errores del repo.
+      const isStructural = Boolean(opportunities && !opportunities.ok && opportunities.errorCode === 'target_not_found')
+
       return stateSurface(
-          'seo-keywords-error',
-          <EmptyState
-            icon='tabler-alert-triangle'
-            title={copy.states.error.title}
-            description={copy.states.error.description}
-            action={
-              // Sólo se ofrece reintentar cuando reintentar puede resolverlo.
+        'seo-keywords-error',
+        <EmptyState
+          icon={isStructural ? 'tabler-settings-off' : 'tabler-alert-triangle'}
+          title={isStructural ? copy.states.errorStructural.title : copy.states.error.title}
+          description={isStructural ? copy.states.errorStructural.description : copy.states.error.description}
+          action={
+            isStructural ? undefined : (
               <Button variant='outlined' disabled={isPending} onClick={() => startTransition(() => router.refresh())}>
                 {copy.states.error.cta}
               </Button>
-            }
-          />
+            )
+          }
+        />
       )
     }
 
@@ -418,13 +604,20 @@ const KeywordOpportunitiesView = ({
           opportunities={rows}
           activeAction={actionFilter}
           onActionChange={setActionFilter}
-          context={contextControls}
+          context={
+            <Stack spacing={2} alignItems={{ md: 'flex-end' }}>
+              {contextControls}
+              {contextMeta}
+            </Stack>
+          }
         />
 
         <KeywordOpportunityMap
           opportunities={filtered}
           impressionsThreshold={opportunities.impressionsThreshold}
           marketUnavailable={opportunities.market === 'unavailable'}
+          hoveredKeyword={hoveredKeyword}
+          onHoverKeyword={setHoveredKeyword}
         />
 
         {/* Los filtros viven en su propia superficie, no sueltos sobre el fondo de la
@@ -529,6 +722,17 @@ const KeywordOpportunitiesView = ({
             atCapacity={atCapacity}
             trackingState={trackingState}
             onTrack={handleTrack}
+            onUntrack={handleUntrack}
+            onDrill={drillToPerformance}
+            selected={selected}
+            onToggleSelected={toggleSelected}
+            onSelectPage={selectPage}
+            marketUnavailable={opportunities.market === 'unavailable'}
+            hoveredKeyword={hoveredKeyword}
+            onHoverKeyword={setHoveredKeyword}
+            onTrackSelected={handleTrackSelected}
+            onClearSelection={() => setSelected(new Set())}
+            bulkState={bulkState}
           />
         )}
       </Stack>

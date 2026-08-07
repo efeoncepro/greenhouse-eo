@@ -45,6 +45,11 @@ export interface AppEChartsProps {
   notMerge?: boolean
   boxProps?: BoxProps
   className?: string
+  /**
+   * Eventos del chart (`mouseover`, `click`, …) para coordinar el canvas con el DOM de
+   * alrededor — por ejemplo resaltar la fila de tabla del punto bajo el cursor.
+   */
+  onEvents?: Record<string, (params: never) => void>
 }
 
 /**
@@ -53,7 +58,7 @@ export interface AppEChartsProps {
  * re-mide, el canvas queda con un ancho stale mayor y empujaría el `scrollWidth` de la
  * página (clase TASK-742 / ISSUE-015, que el gate de layout del GVC detecta como overflow).
  */
-const AppECharts = ({ option, height, notMerge = true, boxProps, className }: AppEChartsProps) => (
+const AppECharts = ({ option, height, notMerge = true, boxProps, className, onEvents }: AppEChartsProps) => (
   <Box {...boxProps} sx={{ inlineSize: '100%', minInlineSize: 0, overflowX: 'clip', ...boxProps?.sx }}>
     <ReactECharts
       className={className}
@@ -61,6 +66,7 @@ const AppECharts = ({ option, height, notMerge = true, boxProps, className }: Ap
       notMerge={notMerge}
       style={{ height, width: '100%' }}
       opts={{ renderer: 'canvas' }}
+      {...(onEvents ? { onEvents } : {})}
     />
   </Box>
 )

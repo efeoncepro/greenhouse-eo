@@ -48,7 +48,9 @@ import {
   SEO_RANK_SNAPSHOT_AGGREGATE_TYPE,
   type SeoKeywordTrackOutcome,
   type SeoKeywordTrackSource,
-  type TrackKeywordsResult
+  type SeoKeywordUntrackOutcome,
+  type TrackKeywordsResult,
+  type UntrackKeywordsResult
 } from './contracts'
 import { resolveSeoEntitlement } from './entitlement'
 import { isSeoModuleEnabled } from './flags'
@@ -351,6 +353,152 @@ export const trackKeywords = async (
   } catch (error) {
     captureWithDomain(error, 'growth', {
       tags: { source: 'seo_track_keywords_command' },
+      extra: { seoTargetId, actor, requested: requested.length }
+    })
+
+    return { ok: false, errorCode: 'query_failed', status: null }
+  }
+}
+
+
+/**
+ * Deja de seguir keywords: cierra su ventana de membresía.
+ *
+ * ═══ POR QUÉ ESTE COMMAND EXISTE ═══
+ *
+ * Sin él, `trackKeywords` era una puerta de una sola dirección: el set tiene techo, la UI
+ * decía "deja de seguir alguna" y no había forma de hacerlo desde el portal — un callejón
+ * sin salida diseñado. Y algo más importante: **es lo que hace reversible el gasto**. Seguir
+ * una keyword compromete al proveedor en cada ciclo del rank capture; sin la contraparte,
+ * ese compromiso era permanente.
+ *
+ * ⚠️ NO BORRA NADA. `seo_keyword_set_members` es append-only con trigger anti-DELETE
+ * (TASK-1299): dejar de seguir es cerrar `effective_to`, no eliminar la fila. El histórico
+ * de qué se midió y cuándo es justamente lo que permite explicar una factura pasada — y el
+ * índice único parcial (`WHERE effective_to IS NULL`) deja volver a seguir la misma keyword
+ * después, creando una membresía nueva sin chocar con la cerrada.
+ */
+export const untrackKeywords = async (
+  seoTargetId: string,
+  keywords: string[],
+  actor: string,
+  options: { env?: NodeJS.ProcessEnv } = {}
+): Promise<UntrackKeywordsResult> => {
+  const env = options.env ?? process.env
+
+  if (!isSeoModuleEnabled(env)) {
+    return { ok: false, errorCode: 'disabled', status: null }
+  }
+
+  const capacity = resolveTrackedKeywordCapacity(env)
+  const seen = new Set<string>()
+  const requested: Array<{ keyword: string; valid: boolean }> = []
+
+  for (const raw of keywords.slice(0, MAX_KEYWORDS_PER_CALL)) {
+    const keyword = normalizeTrackedKeyword(typeof raw === 'string' ? raw : '')
+    const valid = keyword.length > 0 && keyword.length <= MAX_KEYWORD_LENGTH
+
+    if (seen.has(keyword)) continue
+
+    seen.add(keyword)
+    requested.push({ keyword, valid })
+  }
+
+  if (!requested.some(entry => entry.valid)) {
+    return { ok: false, errorCode: 'no_keywords', status: null }
+  }
+
+  try {
+    const targets = await runGreenhousePostgresQuery<TargetRow>(
+      `SELECT organization_id, status
+         FROM greenhouse_growth.seo_targets
+        WHERE seo_target_id = $1`,
+      [seoTargetId]
+    )
+
+    const target = targets[0]
+
+    if (!target) {
+      return { ok: false, errorCode: 'target_not_found', status: null }
+    }
+
+    // ⚠️ A diferencia de `trackKeywords`, acá NO se exige `status = 'active'`. Dejar de
+    // seguir siempre tiene que poder hacerse: si el target se pausó con el set lleno,
+    // bloquear la salida dejaría el gasto congelado sin forma de bajarlo.
+    const entitlement = await resolveSeoEntitlement(target.organization_id, env)
+
+    if (!entitlement.hasModule) {
+      return { ok: false, errorCode: 'no_entitlement', status: null }
+    }
+
+    const result = await withTransaction(async client => {
+      const valid = requested.filter(entry => entry.valid).map(entry => entry.keyword)
+
+      const closed = await client.query<{ keyword: string }>(
+        `UPDATE greenhouse_growth.seo_keyword_set_members m
+            SET effective_to = NOW()
+           FROM greenhouse_growth.seo_keyword_sets s
+          WHERE s.keyword_set_id = m.keyword_set_id
+            AND s.seo_target_id = $1
+            AND m.effective_to IS NULL
+            AND m.keyword = ANY($2::text[])
+        RETURNING m.keyword`,
+        [seoTargetId, valid]
+      )
+
+      const closedSet = new Set(closed.rows.map(row => row.keyword))
+
+      const outcomes: SeoKeywordUntrackOutcome[] = requested.map(entry => ({
+        keyword: entry.keyword,
+        status: !entry.valid ? 'invalid' : closedSet.has(entry.keyword) ? 'untracked' : 'not_tracked'
+      }))
+
+      const remaining = await client.query<{ n: string }>(
+        `SELECT COUNT(*)::text AS n
+           FROM greenhouse_growth.seo_keyword_set_members m
+           JOIN greenhouse_growth.seo_keyword_sets s ON s.keyword_set_id = m.keyword_set_id
+          WHERE s.seo_target_id = $1
+            AND m.effective_to IS NULL`,
+        [seoTargetId]
+      )
+
+      const activeKeywordCount = Number(remaining.rows[0]?.n ?? 0)
+
+      // Mismo evento que el alta: lo que downstream necesita saber es que el set CAMBIÓ y
+      // cuántas keywords se están midiendo ahora. Un tipo de evento aparte obligaría a cada
+      // consumer a manejar dos formas de la misma noticia.
+      if (closedSet.size > 0) {
+        await publishOutboxEvent(
+          {
+            aggregateType: SEO_RANK_SNAPSHOT_AGGREGATE_TYPE,
+            aggregateId: seoTargetId,
+            eventType: SEO_KEYWORD_SET_UPDATED_EVENT,
+            payload: {
+              seoTargetId,
+              organizationId: target.organization_id,
+              untrackedCount: closedSet.size,
+              activeKeywordCount,
+              actor
+            }
+          },
+          client as never
+        )
+      }
+
+      return { outcomes, activeKeywordCount }
+    })
+
+    return {
+      ok: true,
+      seoTargetId,
+      organizationId: target.organization_id,
+      outcomes: result.outcomes,
+      activeKeywordCount: result.activeKeywordCount,
+      capacity
+    }
+  } catch (error) {
+    captureWithDomain(error, 'growth', {
+      tags: { source: 'seo_untrack_keywords_command' },
       extra: { seoTargetId, actor, requested: requested.length }
     })
 
