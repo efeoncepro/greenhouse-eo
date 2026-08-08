@@ -373,3 +373,56 @@ su [wireframe](../wireframes/TASK-1665-growth-seo-keyword-discovery-workbench.md
 este delta sólo fija la conectividad y las decisiones que todos los consumers deben compartir. `TASK-1665`
 permanece `UI ready: no` hasta que exista implementación, first-fold checkpoint, GVC premium 1440/390,
 scorecard y gates de calidad; este documento no constituye evidencia de runtime.
+
+## Delta 2026-08-08 — del candidate a la ejecución editorial, medición e IA advisory
+
+La lente `Descubrir` no termina en el listado de candidates. El flujo diario completo que deben
+compartir UI, Nexa, ecosystem y MCP queda definido así:
+
+```text
+S3 Descubrir
+  seed → preview de costo → confirmación → corrida async → candidate
+  → decisión humana
+      ├─ objetivo/oportunidad → tracking gobernado
+      ├─ grounded query → draft AEO para review
+      └─ trabajo editorial → SEO Editorial Work Item (1667)
+             → ContentFactoryBrief.v1
+             → draft/private
+             → QA determinista + revisión humana (1668)
+             → aprobación → publicación observada
+             → QA live/readback
+             → outcome por ventana
+             → siguiente iteración
+```
+
+### Contratos de continuidad
+
+- `TASK-1667` es el command/reader dueño de `candidate → work item → brief → draft_private`. S3 sólo
+  manda la decisión y muestra el estado devuelto; no construye briefs ni llama WordPress.
+- `TASK-1668` es dueño de `qa_pending`, `published_unverified`, `published_verified`,
+  `insufficient_data` e `iteration_open`. Un HTTP 200 no prueba indexación; cada evidencia tiene
+  source, as-of, coverage y estado.
+- `TASK-1669` agrega una capa advisory sobre los mismos readers. `seo_researcher` prioriza
+  candidates/seeds, `editorial_planner` recomienda create/refresh/fix y `qa_measurement` recomienda
+  revisar/esperar/iterar. Ninguno escribe, publica, trackea, activa AEO o marca QA.
+- La IA puede devolver `commandKey`, pero siempre `requiresHumanApproval=true`; la ejecución vuelve a
+  validar capability, estado, costo, idempotencia y freshness mediante `propose → confirm → execute`.
+
+### Wayfinding y estados UI que se deberán implementar en el consumer
+
+Cuando las tasks backend estén disponibles, `TASK-1665` podrá sumar en el drawer/timeline:
+
+- CTA `Crear trabajo editorial` después de una decisión válida;
+- estado `brief_ready → draft_requested → draft_private`;
+- link a QA y aprobación humana, no un botón de publish autónomo;
+- estado `published_unverified` con CTA de verificación y rollback según runbook;
+- outcome por fuente (`● medido`, `◑ estimado`, `unavailable`) y ventana;
+- panel `Plan diario` con mode `ai|baseline_fallback|partial|unavailable`, evidencia, costo potencial,
+  expiración y confirmación requerida.
+
+Si cualquiera de esos contracts está deshabilitado, la UI debe mostrar el CTA como `disabled` con
+razón accionable y mantener operativo el núcleo de discovery. No se crean rutas nuevas, menús paralelos
+ni un segundo estado editorial en el browser.
+
+Este delta actualiza el master flow; no constituye evidencia de runtime ni cambia el estado `UI ready:
+no` de `TASK-1665`.

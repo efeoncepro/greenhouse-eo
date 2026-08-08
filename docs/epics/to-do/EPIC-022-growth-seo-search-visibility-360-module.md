@@ -110,6 +110,23 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
   `Declarar objetivo`, `Seguir oportunidad`, `Preparar grounded queries`, `Descartar` y `Ver
   trayectoria`, con confirmación, outcome por candidato y sin provider logic en UI. Blocked by
   `TASK-1664` y `TASK-1666`.
+- `TASK-1667` — [creada, backend-data/integration, backend-critical] **SEO Editorial Work Item y
+  handoff a Content Factory**. Convierte una decisión explícita sobre candidate/oportunidad en un
+  aggregate editorial con provenance, evidence refs, `ContentFactoryBrief.v1`, idempotencia y
+  lifecycle `brief_ready → draft_requested → draft_private`. Reutiliza planners/validators/bridge
+  existentes, no escribe WordPress desde SEO, no publica, no auto-trackea y no crea FK SEO↔AEO.
+  Blocked by `TASK-1664`; la grounded query de `TASK-1666` es referencia opcional.
+- `TASK-1668` — [creada, backend-data/integration, backend-critical] **QA editorial, publicación
+  observada, outcomes e iteración**. Conecta draft privado con QA determinista/humano, approval packet,
+  `published_unverified`, readback/QA live, ventanas de GSC/rank/AEO/GA4/HubSpot y
+  `insufficient_data` honesto. Registra evidencia/outcomes append-only y abre la siguiente acción sin
+  auto-publish ni atribución causal inventada. Blocked by `TASK-1667`.
+- `TASK-1669` — [creada, backend-data/integration, backend-critical] **agentes e IA para el plan
+  diario SEO**. Orquesta `seo_researcher`, `editorial_planner` y `qa_measurement` sobre los readers
+  canónicos; devuelve recomendaciones estructuradas con refs, freshness, costo, fallback y
+  `requiresHumanApproval=true`; expone el mismo primitive a Nexa/app/ecosystem/MCP. No llama
+  DataForSEO/WordPress/AEO directamente ni ejecuta writes. Blocked by `TASK-1664`, `TASK-1667` y
+  `TASK-1668`.
 
 ### Plataforma del módulo
 
@@ -159,6 +176,15 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
   prompt store/lifecycle AEO existente, con provenance `run/candidate/context`, vocabulario cerrado,
   protección contra prompt injection y revisión obligatoria antes de `active`; no existe un segundo
   prompt store ni un JOIN SQL SEO↔AEO.
+- [ ] Una decisión SEO seleccionada puede convertirse en un `SEO Editorial Work Item` con provenance,
+  brief válido y handoff a draft/private de Content Factory; el camino no publica ni modifica una
+  fuente pública directamente.
+- [ ] El work item puede pasar por QA, aprobación humana, publicación observada, verificación live,
+  outcome por ventana e iteración; la evidencia es append-only y distingue `measured`, `estimated`,
+  `declared`, `derived` y `unavailable`.
+- [ ] El módulo ofrece un plan diario advisory con los roles `seo_researcher`, `editorial_planner` y
+  `qa_measurement`, fallback determinista, límites de costo/llamadas, telemetry redactada y
+  recomendaciones siempre sujetas a `propose → confirm → execute`.
 - [ ] **Full API Parity + MCP verificados como consumers reales (mandato del operador 2026-08-05):** los readers canónicos sirven UI + Nexa + lane ecosystem (`api/platform/ecosystem/growth/seo/*`) + MCP tools (`TASK-1645`) sin lógica duplicada; el epic NO cierra con el módulo UI-only aunque todos los demás criterios pasen. La superficie MCP incluye disponibilidad vía el gateway `mcp.efeonce.org` (provider federado en TASK-1626) o task dedicada de federación creada con dueño. Writes de agente declarados vía governed action loop (follow-up explícito, no deuda oculta).
 
 ## Non-goals
@@ -464,3 +490,45 @@ El orden contractual es `1664 → 1666 → 1665`: el workbench puede diseñarse 
 ejecución de `1666`, pero no se considera integrado hasta que el command de grounded draft y sus
 pruebas de paridad existan. Este carril no duplica `TASK-1662` (gap competitivo), `TASK-1651`
 (`ai_optimization`/LLM Mentions), `TASK-1311` (atribución de citas) ni `TASK-1308` (oportunidades GSC).
+
+## Delta 2026-08-08 — se cierra la costura editorial y se agrega IA advisory
+
+La auditoría del flujo cotidiano confirmó que `1664 → 1666 → 1665` resolvía discovery y decisión,
+pero todavía dejaba la acción editorial, el aprendizaje posterior y la coordinación diaria fuera del
+producto. Se agregan tres tasks sin duplicar la lane de keywords:
+
+```text
+1664 discovery/candidates
+   ├─ 1666 grounded-query draft opcional
+   └─ 1665 workbench S3 y decisión humana
+          ↓
+       1667 SEO Editorial Work Item
+          ↓
+       Content Factory draft/private
+          ↓
+       1668 QA → aprobación humana → publicación observada → outcome → iteración
+          ↓
+       1669 plan diario advisory (researcher → planner → QA/measurement)
+```
+
+- `TASK-1667` es el dueño de la identidad de continuidad `candidate → brief → draft privado`. No
+  extiende SEO hacia WordPress con SQL ni convierte `ContentFactoryBrief.v1` en un contrato paralelo.
+- `TASK-1668` es el dueño de la evidencia editorial/post-publication. Cada fuente (`GSC`, `rank`,
+  `Labs`, `AEO`, `GA4`, `HubSpot`) conserva su realidad, as-of y cobertura; `no_data` no es cero y
+  `HTTP 200` no prueba indexación.
+- `TASK-1669` es el dueño del plan de agentes e IA. Los tres roles sólo leen primitives, devuelven
+  recomendaciones estructuradas y usan fallback cuando no hay datos/modelo; todos los writes siguen
+  `propose → confirm → execute`.
+
+El orden de implementación queda:
+
+1. `TASK-1664` → `TASK-1666` → núcleo `TASK-1665`.
+2. `TASK-1667` para el handoff editorial.
+3. `TASK-1668` para QA/outcome/iteración.
+4. `TASK-1669` para coordinación advisory sobre los readers anteriores.
+5. Extensión de `TASK-1665` para mostrar work items, outcomes y plan diario cuando cada contract esté
+   disponible; la UI no puede inventar esos estados ni bloquear el núcleo de discovery.
+
+El epic no se considera “crear y optimizar” completo por tener candidates o drafts: debe poder
+explicar qué se decidió, qué se produjo, qué se verificó, qué resultado se observó y cuál es el
+siguiente paso permitido.

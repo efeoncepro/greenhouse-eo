@@ -559,3 +559,27 @@ El master flow fija la conectividad que esta task debe respetar:
 
 Este delta no cambia el estado `UI ready: no`: la implementación aún necesita first-fold checkpoint,
 GVC premium 1440/390, scorecard y gates de calidad definidos arriba.
+
+## Delta 2026-08-08 — extensión del workbench hacia editorial, outcomes y plan agéntico
+
+El núcleo de `Descubrir` conserva el contrato anterior y sigue dependiendo sólo de `TASK-1664` y
+`TASK-1666`. Las costuras posteriores se registran como consumers condicionados, no como lógica que la
+UI deba inventar:
+
+- `Crear trabajo editorial` sólo aparece cuando existe `TASK-1667`, el candidate tiene decisión
+  explícita y el actor puede crear un `SEO Editorial Work Item`. La UI llama el command canónico; no
+  construye `ContentFactoryBrief`, no llama WordPress y no convierte `consolidate` en `refresh`.
+- El drawer/timeline puede mostrar `brief_ready`, `draft_requested`, `draft_private`, `qa_pending`,
+  `published_unverified`, `published_verified`, `insufficient_data` e `iteration_open` cuando los
+  readers de `TASK-1667`/`TASK-1668` estén disponibles. Si la dependencia está OFF o ausente, la
+  acción queda disabled con razón explícita; no se simula una integración completa.
+- `Plan diario`/`Recomendación` es un consumer read-only de `TASK-1669`. Muestra modo `ai`,
+  `baseline_fallback`, `partial` o `unavailable`, source refs, freshness, costo potencial y
+  `requiresHumanApproval`; nunca ejecuta la recomendación desde JSX.
+- El orden visible del flujo queda: `candidate → decisión → work item → brief → draft privado → QA
+  humano → publicación observada → outcome → siguiente iteración`. La UI puede enlazar al siguiente
+  paso, pero cada estado lo gobierna su command/reader propio.
+
+Esta extensión no cambia `UI ready: no`. Requiere actualizar wireframe/flow/direction, mapping de
+primitives, copy, GVC y scorecard cuando se implemente cualquiera de estas superficies; este delta es
+contrato de integración, no evidencia de runtime.
