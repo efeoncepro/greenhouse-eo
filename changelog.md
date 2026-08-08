@@ -7,6 +7,23 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-08 — El batch policy del release preflight dejó de mentir (ISSUE-114)
+
+`release_batch_policy` computaba el diff con base three-dot (`origin/main...target`). Como el flujo de
+promoción es por squash-merge, la merge-base queda congelada antes del último squash y el check
+resucitaba archivos byte-idénticos a producción como cambios del release, fabricando dominios
+irreversibles falsos (`cloud_release`) y empujando releases normales a `requires_break_glass`. Ahora
+usa two-dot, y tanto el diff de archivos como los commit bodies resuelven su rango por una única
+función `buildReleaseDiffRange`, de modo que no puedan volver a divergir sobre bases distintas.
+
+El hueco de cobertura estaba en que `checks/release-batch-policy.ts` no tenía archivo de tests (el
+classifier puro sí lo tenía); el guardrail nuevo fija el rango en el argv de git, verificado rojo antes
+del fix y verde después. Sobre el batch en curso: 332→322 archivos y desaparece el `cloud_release`
+fantasma. Documentado además, sin corregir, que el batch policy del orquestador es vacuo post-merge
+(rango vacío ⇒ siempre `ship`), por lo que sólo tiene dientes en la corrida local pre-merge. Se abrió
+`ISSUE-144` por la confusión entre build cancelado a propósito y build fallido en `vercel_readiness`, y
+se corrigió el drift `vercel ls --target=` → `--environment=` en runbook y manual.
+
 ## 2026-08-07 — Autenticación local Gcloud con Playwright
 
 Se agregó `pnpm gcloud:auth:playwright` y la skill espejo `greenhouse-gcloud-auth-playwright` para renovar bajo solicitud los dos carriles de Google Cloud
@@ -986,30 +1003,3 @@ y [`docs/changelog/internal/2026-07.md`](docs/changelog/internal/2026-07.md).
   `/api/auth/health`. Azure aplicó sus skips canónicos `no_infra_diff`.
 - El watchdog conserva un falso positivo conocido para `ops-worker`: su diff de rutas runtime desde el SHA
   desplegado al target es vacío y el orquestador aplicó el change-gate, por lo que no corresponde redeploy label-only.
-
-## 2026-07-29 — Globe: contrato tipográfico del payload cliente + jerarquía del Producer (TASK-1599)
-
-- Tres commits desplegados y verificados en vivo sobre `globe-studio-internal-00100-9kq` (imagen
-  `b9112a80985d`) en `https://globe.efeoncepro.com/producer`, con sesión real a 1440px.
-- **`68a2cbe`** — 13 sitios del payload pedían Geist@700 con sólo Poppins 700 · Geist 400 · Geist 600
-  cargados: el navegador **sintetiza** el corte faltante, deforma el trazo y no falla ningún gate. Dos
-  gates nuevos cierran la clase: uno aparea familia×peso **en el sitio de uso** (la declaración de
-  `@font-face` estaba sana; el defecto era quién pedía qué) y otro rechaza la utilidad de fuente que el
-  theme no puede generar (`font-normal`/`font-medium` no emitían CSS). Más `tabular-nums` en siete
-  números vivos.
-- **`d009871`** — jerarquía del Producer. El panel de créditos **no se rompía por el número**: llevaba
-  `max-w-full`, y sobre un elemento `absolute` esa medida resuelve contra el bloque contenedor —el
-  `<details>`, o sea el ancho del disparador—; los tres síntomas eran un bug. Y `Listo` vs `Completada`
-  eran **dos ejes** del contrato (`coarseProgress` vs `state`), no dos palabras: `stateCompleted` quedó
-  huérfana y se borró.
-- **`b9112a8`** — cierre de una regresión propia: bajar las acciones del prompt al flujo desbordó el
-  cuerpo y un renglón quedó cortado contra el riel translúcido; se resolvió con el token `--rail-scrim`
-  en el SSOT. Más `Math.floor` en el donut, que con `round` decía `100 %` junto a `Gastado 166`.
-- Verificación: build 0 · eslint 0 · `node --test` 129/129 · canario de motor 8/8 · canario del composer
-  163/163 · revisión humana en vivo tras cada despliegue.
-- **Quedan tres puntos abiertos sin dueño**: el preflight de Tailwind no se emite, así que
-  `b, strong { font-weight: bolder }` pide el corte fuerte por herencia y es invisible a un gate que
-  escanea `className`; la fuga del `axis-pilot-canary` deja `pnpm test` sin terminar y un huérfano en el
-  puerto 4326 por corrida; y el H9 del feed, cuyo `…` no es CSS (`DISPLAY_TITLE_MAX_LENGTH = 96` recorta
-  por conteo de caracteres antes de que exista layout, así que ningún ancho lo arregla).
-- Detalle de runtime: `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`.

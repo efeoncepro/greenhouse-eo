@@ -3,7 +3,7 @@
 > **Tipo:** Incidente de tooling (release control plane)
 > **Ambiente:** CI/local — `pnpm release:preflight` (check `release_batch_policy`)
 > **Detectado:** 2026-07-03, durante el release develop→main (v2) de TASK-1324 (PR #139)
-> **Estado:** open (mitigado en cada release con `bypass_preflight_reason`; fix de raíz pendiente)
+> **Estado:** **resolved 2026-08-08** — fix de raíz aplicado (two-dot + guardrail); ver §Resolución
 > **Severidad:** media (no rompe prod; genera fricción + erosiona la señal del gate)
 
 ## Síntoma
@@ -87,3 +87,54 @@ cloud_release **ya presente en `origin/main`** (diff two-dot = 0) **NO** dispara
 - El preflight de un release normal post-squash retorna `release_batch_policy=safe` sin bypass.
 - El test de squash-divergence pasa (rojo antes del fix, verde después).
 - El runbook/skill documentan el sync post-release (o el cambio de estrategia de merge).
+
+---
+
+## Resolución — 2026-08-08
+
+**Aplicado el fix de raíz propuesto (capa 1).** `collectChangedFiles` pasó de three-dot a two-dot, y
+ambos consumidores del rango (archivos **y** commit bodies) ahora lo resuelven por una única función
+exportada `buildReleaseDiffRange`, de modo que no puedan volver a divergir sobre bases distintas —
+que es exactamente la deriva que produjo esta issue (`collectCommitBodies` ya usaba `..` mientras
+`collectChangedFiles` usaba `...`).
+
+**Dónde estaba realmente el hueco de cobertura.** El classifier puro (`batch-policy/classifier.test.ts`)
+sí tenía tests; el defecto vivía en *cómo el check recolectaba la lista de archivos*, y
+`checks/release-batch-policy.ts` **no tenía archivo de tests**. Por eso el three-dot sobrevivió cinco
+semanas. El guardrail nuevo (`checks/release-batch-policy.test.ts`, 7 casos) fija el rango en el argv
+de git — verificado rojo antes del fix (4 casos fallando) y verde después.
+
+**Evidencia sobre el release en curso (batch SEO 2026-08-08):**
+
+| | three-dot (antes) | two-dot (después) |
+|---|---|---|
+| archivos clasificados | 332 | 322 |
+| dominios irreversibles | `db_migrations` + **`cloud_release`** | `db_migrations` |
+
+Los 3 archivos `src/lib/release/preflight/**` que el classifier marcaba como `cloud_release` tenían
+diff two-dot **vacío**: se desplegaron el día anterior en el release `30140c662`. Eran fantasmas al
+100%.
+
+**Por qué importaba.** Los **4 releases consecutivos** previos de `main` llevan marker
+`[release-coupled: …]`, y tres dicen literalmente *"NO son un acoplamiento de diseño"*. El marker
+había dejado de declarar acoplamiento para convertirse en el ritual con que se callaba un classifier
+roto — la normalización de la desviación que esta misma issue anticipó en §Impacto.
+
+### Hallazgo adicional (no corregido acá): el batch policy del orquestador es estructuralmente vacuo
+
+El orquestador corre el preflight con `target_sha` **ya mergeado en `main`**, de modo que el rango
+`origin/main..target_sha` es **vacío** y el check siempre devuelve `ship` ("Diff vacio"). Es decir:
+**el batch policy sólo tiene dientes pre-merge, en la corrida local del operador.** Eso explica por
+qué el release `70e912056` pasó `ship` con 14 migraciones.
+
+Consecuencia práctica: este fix mejora exactamente la corrida donde se toma la decisión humana. Darle
+dientes al gate post-merge exigiría comparar contra el `target_sha` del **release anterior**
+(`release_manifests`) en vez de contra `origin/main` — es un cambio de diseño mayor, con su propia
+task, y deliberadamente **no** se hizo acá.
+
+### Archivos tocados
+
+- `src/lib/release/preflight/checks/release-batch-policy.ts` — `buildReleaseDiffRange` + ambos consumidores
+- `src/lib/release/preflight/checks/release-batch-policy.test.ts` — **nuevo** (guardrail anti-regresión)
+- `docs/operations/runbooks/production-release.md` — §2.3 gotcha 2 + §2.4 Paso B
+- `.claude/skills/greenhouse-production-release/SKILL.md` + `.codex/…` — gotcha 2 (paridad obligatoria)

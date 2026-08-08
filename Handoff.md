@@ -1,5 +1,35 @@
 # Handoff activo
 
+### ISSUE-114 resuelta — el batch policy del preflight dejó de mentir (2026-08-08)
+
+Release `cloud_release`-only desde `main`, previo al batch SEO de `develop`. El classifier del
+preflight computaba el diff con base **three-dot**, que parte de la merge-base que el flujo de
+squash-merge deja congelada, y resucitaba archivos **byte-idénticos a producción** como cambios del
+release, fabricando dominios irreversibles falsos. Ahora usa **two-dot**, y ambos consumidores del
+rango (archivos **y** commit bodies) lo resuelven por una única función `buildReleaseDiffRange`, para
+que no puedan volver a divergir — que es exactamente la deriva que produjo la issue.
+
+**Lo que necesita quien siga:**
+
+1. **Si el classifier reporta un dominio irreversible, ahora es REAL.** No lo descartes como el
+   fantasma "conocido" ni le pongas `[release-coupled: …]` por costumbre. Los 4 releases previos de
+   `main` llevan ese marker y tres dicen literalmente *"NO son un acoplamiento de diseño"*: el marker
+   se había convertido en el ritual para callar un gate roto. Runbook §2.3-2 y skills actualizadas.
+2. **El hueco de cobertura no estaba donde parecía.** El classifier puro sí tenía tests; el defecto
+   vivía en cómo el check *recolectaba* los archivos, y `checks/release-batch-policy.ts` **no tenía
+   archivo de tests**. El guardrail nuevo fija el rango en el argv de git (rojo antes, verde después).
+3. **Hallazgo no corregido: el batch policy del orquestador es estructuralmente vacuo.** Corre con el
+   `target_sha` ya mergeado, así que `origin/main..target_sha` es vacío y siempre da `ship`. **El gate
+   sólo tiene dientes en la corrida local pre-merge.** Darle dientes post-merge exige comparar contra
+   el `target_sha` del release anterior (`release_manifests`): diseño mayor, sin task aún.
+4. **`ISSUE-144` (nueva) queda abierta:** `vercel_readiness` confunde un build cancelado a propósito
+   por el `ignoreCommand` con uno fallido. Diseño acordado en la issue; bloqueada por una decisión de
+   frontera (el `ignoreCommand` corre antes de `pnpm install`, así que el SSOT no puede ser TS).
+   Mitigación por ahora: `vercel redeploy` del deployment cancelado, nunca bypass.
+5. **Drift de CLI corregido de paso:** `vercel ls --target=` ya no existe en Vercel CLI 50.x (es
+   `--environment=`). Runbook y manual del orquestador actualizados; el preflight no se veía afectado
+   porque consulta la API, no el CLI.
+
 ### Autenticación local Gcloud con Playwright (2026-08-07)
 
 Se agregó el proceso local explícito `pnpm gcloud:auth:playwright`, invocable por Codex o Claude, para
