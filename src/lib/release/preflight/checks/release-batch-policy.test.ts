@@ -1,0 +1,182 @@
+import type * as ChildProcess from 'node:child_process'
+
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+/**
+ * ISSUE-114 — anti-regression suite for the batch-policy diff base.
+ *
+ * The pure classifier (`batch-policy/classifier.test.ts`) was already covered;
+ * the defect lived in *how this check collected the file list*, and this file
+ * did not exist. That gap is why a three-dot diff survived five weeks and four
+ * consecutive releases shipped a `[release-coupled: ...]` marker describing a
+ * coupling that did not exist.
+ */
+
+const childProcessMock = vi.hoisted(() => ({
+  execFile: vi.fn()
+}))
+
+// git responses are injected per-test through these buffers so no test ever
+// depends on the real repository state (merge-base, branch layout, or which
+// release last squashed into main).
+//
+// The mock is deliberately **range-sensitive**: it answers a three-dot range with
+// a different file list than a two-dot one, reproducing squash divergence. A
+// range-blind mock would return the same buffer either way, and the scenario
+// tests below would keep passing with the bug restored — a guardrail that only
+// looks like one.
+const gitState = vi.hoisted(() => ({
+  invocations: [] as string[][],
+  twoDotDiff: '',
+  threeDotDiff: '',
+  logStdout: ''
+}))
+
+vi.mock('node:child_process', async () => {
+  const actual = await vi.importActual<typeof ChildProcess>('node:child_process')
+
+  return {
+    ...actual,
+    execFile: childProcessMock.execFile.mockImplementation((_cmd, args, opts, callback) => {
+      const cb = typeof opts === 'function' ? opts : callback
+      const argv = args as string[]
+
+      gitState.invocations.push(argv)
+
+      const isThreeDot = argv.some(arg => arg.includes('...'))
+
+      const stdout =
+        argv[0] === 'diff'
+          ? isThreeDot
+            ? gitState.threeDotDiff
+            : gitState.twoDotDiff
+          : gitState.logStdout
+
+      // promisify() without the util.promisify.custom symbol resolves with the
+      // first callback value, so the object shape must match the destructuring
+      // in the module under test (`const { stdout } = await execFileAsync(...)`).
+      if (cb) cb(null, { stdout, stderr: '' })
+    })
+  }
+})
+
+import type { PreflightInput } from '../runner'
+
+import { buildReleaseDiffRange, checkReleaseBatchPolicy } from './release-batch-policy'
+
+const buildInput = (overrides: Partial<PreflightInput> = {}): PreflightInput => ({
+  targetSha: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+  targetBranch: 'main',
+  githubRepo: { owner: 'efeoncepro', repo: 'greenhouse-eo' },
+  triggeredBy: 'test',
+  overrideBatchPolicy: false,
+  ...overrides
+})
+
+const runCheck = async () => checkReleaseBatchPolicy(buildInput())
+
+const gitArgsFor = (subcommand: string): string[] =>
+  gitState.invocations.find(args => args[0] === subcommand) ?? []
+
+beforeEach(() => {
+  gitState.invocations = []
+  gitState.twoDotDiff = ''
+  gitState.threeDotDiff = ''
+  gitState.logStdout = ''
+})
+
+describe('buildReleaseDiffRange', () => {
+  it('builds a two-dot range', () => {
+    expect(buildReleaseDiffRange('origin/main', 'abc123')).toBe('origin/main..abc123')
+  })
+
+  it('is NEVER three-dot — three-dot starts at the merge-base, which the squash-merge release flow freezes before the last squash (ISSUE-114)', () => {
+    const range = buildReleaseDiffRange('origin/main', 'abc123')
+
+    expect(range).not.toContain('...')
+  })
+})
+
+describe('checkReleaseBatchPolicy — diff base', () => {
+  it('collects changed files with the two-dot range', async () => {
+    await runCheck()
+
+    const diffArgs = gitArgsFor('diff')
+
+    expect(diffArgs).toContain('origin/main..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+    expect(diffArgs.some(arg => arg.includes('...'))).toBe(false)
+  })
+
+  it('resolves commit bodies from the SAME range as the file diff (the two must never drift onto different bases)', async () => {
+    await runCheck()
+
+    const diffRange = gitArgsFor('diff').find(arg => arg.includes('..'))
+    const logRange = gitArgsFor('log').find(arg => arg.includes('..'))
+
+    expect(logRange).toBe(diffRange)
+  })
+
+  it('honours the target branch when composing the base ref', async () => {
+    await checkReleaseBatchPolicy(buildInput({ targetSha: 'bbbbbbbb', targetBranch: 'develop' }))
+
+    expect(gitArgsFor('diff')).toContain('origin/develop..bbbbbbbb')
+  })
+})
+
+describe('checkReleaseBatchPolicy — squash-divergence scenario (ISSUE-114)', () => {
+  // Reproduces the live 2026-08-08 release: a growth/SEO batch whose only
+  // irreversible domain is its own migrations, plus preflight files that are
+  // byte-identical to production because the previous release already shipped
+  // them. Two-dot excludes those; three-dot would resurrect them.
+  const REAL_TWO_DOT_DIFF = [
+    'src/lib/growth/seo/keyword-sets.ts',
+    'src/views/greenhouse/growth/SeoCockpitView.tsx',
+    'migrations/20260808131441444_task-1310-seo-client-view-codes.sql',
+    'src/types/db.d.ts'
+  ]
+
+  // Solo estos dos clasifican `cloud_release`; un tercer fantasma visto en vivo
+  // (`pending-without-jobs.test.ts`) cae en `tests` por DOMAIN_PATTERNS.
+  const PHANTOM_FILES_ALREADY_IN_PRODUCTION = [
+    'src/lib/release/preflight/checks/pending-without-jobs.ts',
+    'src/lib/release/preflight/ignored-pending-runs.ts'
+  ]
+
+  it('does not fabricate a cloud_release domain from files already deployed to production', async () => {
+    // El buffer three-dot lleva los fantasmas, tal como una merge-base congelada
+    // los resucitaria. Si el check regresa a three-dot, el mock sirve ESA lista
+    // y la asercion de abajo falla: ese es el punto del guardrail.
+    gitState.twoDotDiff = `${REAL_TWO_DOT_DIFF.join('\n')}\n`
+    gitState.threeDotDiff = `${[...REAL_TWO_DOT_DIFF, ...PHANTOM_FILES_ALREADY_IN_PRODUCTION].join('\n')}\n`
+    gitState.logStdout = 'feat(seo): TASK-1310 client view codes'
+
+    const result = await runCheck()
+    const evidence = result.evidence as { domains: Record<string, number>; decision: string }
+
+    expect(evidence.domains.cloud_release ?? 0).toBe(0)
+    expect(evidence.domains.db_migrations).toBe(2)
+  })
+
+  it('DOES flag cloud_release when those files are genuinely part of the batch — the fix must not blind the gate', async () => {
+    // Genuinamente en el batch => presentes en AMBOS rangos.
+    const withRelease = `${[...REAL_TWO_DOT_DIFF, ...PHANTOM_FILES_ALREADY_IN_PRODUCTION].join('\n')}\n`
+
+    gitState.twoDotDiff = withRelease
+    gitState.threeDotDiff = withRelease
+    gitState.logStdout = 'fix(release): preflight'
+
+    const result = await runCheck()
+    const evidence = result.evidence as { domains: Record<string, number> }
+
+    expect(evidence.domains.cloud_release).toBe(2)
+  })
+
+  it('devuelve ship con diff vacio: el caso post-merge del orquestador, que ISSUE-145 documenta como estructuralmente vacuo', async () => {
+    const result = await runCheck()
+    const evidence = result.evidence as { decision: string; filesChanged: number }
+
+    expect(evidence.filesChanged).toBe(0)
+    expect(evidence.decision).toBe('ship')
+    expect(result.severity).toBe('ok')
+  })
+})

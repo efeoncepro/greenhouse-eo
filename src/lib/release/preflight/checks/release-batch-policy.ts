@@ -1,7 +1,7 @@
 /**
  * TASK-850 — Preflight check #4: release_batch_policy.
  *
- * Computes the diff `origin/main...target_sha` (forward-only) via git
+ * Computes the diff `origin/main..target_sha` (two-dot) via git
  * subprocess, classifies changed files by domain, and returns a decision:
  *   - ship: ok severity
  *   - split_batch: error severity
@@ -27,6 +27,45 @@ import type { PreflightInput } from '../runner'
 const execFileAsync = promisify(execFile)
 const GIT_TIMEOUT_MS = 8_000
 
+/**
+ * ISSUE-114 — Canonical diff base for release batch classification.
+ *
+ * MUST be **two-dot** (`base..target`), NEVER three-dot (`base...target`).
+ *
+ * Two-dot answers the only question the batch policy cares about: *"what will
+ * production have that it does not have today?"* — a direct tree comparison
+ * between what is deployed (`origin/main`) and what we are about to promote.
+ *
+ * Three-dot starts from the **merge-base**, and the release flow promotes by
+ * **squash-merge**: every release creates on `main` a squash commit whose
+ * parent is the previous `main`, never an ancestor of `develop`. The merge-base
+ * therefore stays frozen *before* the last squash, and three-dot resurrects
+ * files that are byte-identical to production as if they were changes of this
+ * release. Those phantoms fabricate irreversible domains (typically
+ * `cloud_release`) and push an otherwise normal release into
+ * `requires_break_glass` — eroding the signal until break-glass means nothing.
+ *
+ * Two-dot is also strictly *safer*, not laxer: it additionally surfaces files
+ * that exist on `main` but not on the target — i.e. a production hotfix this
+ * promotion would silently revert. Three-dot hides those by construction.
+ *
+ * Both consumers (changed files AND commit bodies) resolve their **base** through
+ * this single function, so the two can no longer be anchored to different refs —
+ * the drift that produced ISSUE-114 in the first place.
+ *
+ * ⚠️ Sharing the range string does NOT make the two consumers equivalent, and it
+ * would be a mistake to read it that way: `git diff A..B` compares **trees**,
+ * while `git log A..B` walks **ancestry**. Under squash-merge they diverge by
+ * construction — commits that already reached production through a previous
+ * squash stay reachable from `develop` but never from `main`, so the commit-body
+ * window still spans several already-deployed releases even when the file diff is
+ * exact. That asymmetry is real and is NOT fixed here: it is tracked in
+ * ISSUE-145, together with the fact that the resulting window makes the
+ * `[release-coupled: …]` marker satisfiable by unrelated prose.
+ */
+export const buildReleaseDiffRange = (baseRef: string, targetSha: string): string =>
+  `${baseRef}..${targetSha}`
+
 const runGit = async (args: readonly string[]): Promise<string> => {
   const { stdout } = await execFileAsync('git', [...args], {
     timeout: GIT_TIMEOUT_MS,
@@ -40,7 +79,7 @@ const collectChangedFiles = async (
   baseRef: string,
   targetSha: string
 ): Promise<readonly string[]> => {
-  const stdout = await runGit(['diff', '--name-only', `${baseRef}...${targetSha}`])
+  const stdout = await runGit(['diff', '--name-only', buildReleaseDiffRange(baseRef, targetSha)])
 
   return stdout
     .split('\n')
@@ -53,7 +92,8 @@ const collectCommitBodies = async (
   targetSha: string
 ): Promise<string> => {
   // Format: %B = full commit message (subject + body) per commit, NUL separated.
-  const stdout = await runGit(['log', '--format=%B%x00', `${baseRef}..${targetSha}`])
+  // Same canonical base as the file diff — see buildReleaseDiffRange (ISSUE-114).
+  const stdout = await runGit(['log', '--format=%B%x00', buildReleaseDiffRange(baseRef, targetSha)])
 
   return stdout
 }

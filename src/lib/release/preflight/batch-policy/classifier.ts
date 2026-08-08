@@ -28,7 +28,7 @@ import {
 } from './domains'
 
 interface ClassifyInput {
-  /** Files changed in `origin/main...target_sha` (forward-only). */
+  /** Files changed in `origin/main..target_sha` (two-dot; ver ISSUE-114). */
   readonly changedFiles: readonly string[]
   /** Concatenated commit body of all commits in the diff. Single string is fine. */
   readonly commitBodyText: string

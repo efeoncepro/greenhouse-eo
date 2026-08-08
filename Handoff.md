@@ -1,5 +1,45 @@
 # Handoff activo
 
+### ISSUE-114 resuelta — el batch policy del preflight dejó de mentir (2026-08-08)
+
+Release `cloud_release`-only desde `main`, previo al batch SEO de `develop`. El classifier del
+preflight computaba el diff con base **three-dot**, que parte de la merge-base que el flujo de
+squash-merge deja congelada, y resucitaba archivos **byte-idénticos a producción** como cambios del
+release, fabricando dominios irreversibles falsos. Ahora usa **two-dot**, y ambos consumidores del
+rango (archivos **y** commit bodies) lo resuelven por una única función `buildReleaseDiffRange`, para
+que no puedan volver a divergir — que es exactamente la deriva que produjo la issue.
+
+**Lo que necesita quien siga:**
+
+1. **Si el classifier reporta un dominio irreversible, ahora es REAL.** No lo descartes como el
+   fantasma "conocido" ni le pongas `[release-coupled: …]` por costumbre. Los 4 releases previos de
+   `main` llevan ese marker y tres dicen literalmente *"NO son un acoplamiento de diseño"*: el marker
+   se había convertido en el ritual para callar un gate roto. Runbook §2.3-2 y skills actualizadas.
+2. **El hueco de cobertura no estaba donde parecía.** El classifier puro sí tenía tests; el defecto
+   vivía en cómo el check *recolectaba* los archivos, y `checks/release-batch-policy.ts` **no tenía
+   archivo de tests**. El guardrail nuevo fija el rango en el argv de git (rojo antes, verde después).
+3. **`ISSUE-145` (nueva, severidad alta) — lee esto antes del próximo release.** El batch policy del
+   orquestador es **decorativo**: corre con el `target_sha` ya mergeado, así que el rango es vacío y
+   aprueba sin mirar nada (verificado en los artefactos `preflight-result.json` de los 3 últimos
+   releases; `70e912056` reportó `filesChanged=0` con 1045 archivos y 14 migraciones). Y el marker
+   `[release-coupled: …]` **nunca se lee donde el runbook dice** — el squash queda fuera del rango en
+   ambos caminos — **pero se dispara solo con prosa**: hoy una cita en `aea35a678` (docs de growth/MCP)
+   neutraliza `split_batch` para todo el batch SEO. Raíz común: el ancla debería ser el `target_sha`
+   del release anterior, no `origin/main`. Los helpers ya existen (`listRecentReleases`) y el job de
+   preflight ya tiene credenciales PG.
+4. **La verificación adversarial encontró cuatro defectos en mi propio fix, ya corregidos:** el
+   docstring sobre-prometía (compartir el rango NO iguala `git diff` con `git log`); dos docstrings del
+   contrato seguían en three-dot; dos tests eran teatro porque el mock era ciego al rango (ahora es
+   sensible al rango: con three-dot restaurado fallan 5 en vez de 4); y se había colado un byte NUL
+   invisible en un fixture. Detalle en el §Verificación adversarial de `ISSUE-114`.
+5. **`ISSUE-144` (nueva) queda abierta:** `vercel_readiness` confunde un build cancelado a propósito
+   por el `ignoreCommand` con uno fallido. Diseño acordado en la issue; bloqueada por una decisión de
+   frontera (el `ignoreCommand` corre antes de `pnpm install`, así que el SSOT no puede ser TS).
+   Mitigación por ahora: `vercel redeploy` del deployment cancelado, nunca bypass.
+6. **Drift de CLI corregido de paso:** `vercel ls --target=` ya no existe en Vercel CLI 50.x (es
+   `--environment=`). Runbook y manual del orquestador actualizados; el preflight no se veía afectado
+   porque consulta la API, no el CLI.
+
 ### Autenticación local Gcloud con Playwright (2026-08-07)
 
 Se agregó el proceso local explícito `pnpm gcloud:auth:playwright`, invocable por Codex o Claude, para

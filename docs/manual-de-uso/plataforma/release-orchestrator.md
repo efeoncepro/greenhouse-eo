@@ -138,7 +138,7 @@ Codex **no usa archivos de slash command** `.md`. Sus alias slash (`/implement-t
 | `transition-released` queda queued/stale después de runtime verde | GitHub Actions runner/concurrency quedó atascado al final, no necesariamente el runtime | No usar SQL. Si health/smoke/watchdog aplicable están verificados y el operador aprueba, cerrar con `pnpm release:orchestrator-transition-state --release-id=<id> --to-state=released --reason=<razon>` y documentar run/release/evidencia |
 | `record-started` falla con "release ya activo en main" | Otro release en `preflight|ready|deploying|verifying` | Esperar terminación o abortar manualmente via `pnpm release:orchestrator-transition-state --to-state=aborted` |
 | Worker deploy falla con "GIT_SHA mismatch" | Cloud Build cache stale, tag drift, deploy aborted mid-flight | Re-run el workflow; si persiste investigar Cloud Build console |
-| `wait-vercel` timeout 900s | Vercel deploy lento o no triggered | Verificar `vercel ls greenhouse-eo --target=production`; si no hay deployment, push manual a main |
+| `wait-vercel` timeout 900s | Vercel deploy lento o no triggered | Verificar `vercel ls greenhouse-eo --environment=production`; si no hay deployment, push manual a main |
 | `post-release-health` soft-fail (release `degraded`) | `/api/auth/health` no devolvió 200 en 3 attempts | Inspeccionar `/admin/operations` dashboard; decidir rollback (`pnpm release:rollback`) o forward-fix |
 | `transition-released` falla con "race con otro actor" | Otro proceso ya transicionó el state | Investigar `release_state_transitions` audit log para ver qué pasó |
 | Worker directo aparece esperando approval | Break-glass/manual o drift de control plane | No aprobar como release normal; validar si pertenece al orchestrator activo |
