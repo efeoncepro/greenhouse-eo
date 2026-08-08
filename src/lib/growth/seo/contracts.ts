@@ -369,6 +369,25 @@ export interface SeoSiteAuditRunView {
   finishedAt: string | null
 }
 
+/**
+ * Resumen del crawl ANTERIOR, para leer el reporte como movimiento y no como foto.
+ *
+ * El módulo entero se vende como serie de tiempo ("la visibilidad no es una foto"), y el
+ * site audit era la única superficie que mostraba un punto. Va acá, dentro del reader
+ * canónico, y NO como reader aparte: el lane ecosystem y la tool MCP son passthrough, así
+ * que la comparación le llega a todos los consumers por construcción (Full API Parity) sin
+ * inventar un contrato paralelo.
+ *
+ * Sólo compara contra runs que TERMINARON (`succeeded`/`degraded`): comparar contra uno
+ * fallido o en vuelo daría un delta inventado.
+ */
+export interface SeoSiteAuditPreviousRunView {
+  auditRunId: string
+  captureDate: string
+  healthScore: number | null
+  totals: Record<SeoSiteAuditFindingSeverity, number>
+}
+
 export type SiteAuditReportResult =
   | {
       ok: true
@@ -378,6 +397,8 @@ export type SiteAuditReportResult =
       /** Findings agrupados por severidad (orden: critical → warning → notice). */
       findings: Record<SeoSiteAuditFindingSeverity, SeoSiteAuditFindingView[]>
       totals: Record<SeoSiteAuditFindingSeverity, number>
+      /** Crawl anterior comparable, o `null` si éste es el primero. */
+      previous: SeoSiteAuditPreviousRunView | null
     }
   | {
       ok: false

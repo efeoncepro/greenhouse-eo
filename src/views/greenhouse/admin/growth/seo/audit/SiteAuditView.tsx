@@ -392,6 +392,23 @@ const SiteAuditView = ({
     // adapta a su propio ancho: al condensar, el arco se achica y las cifras suben.
     const compact = healthDensity !== 'full'
 
+    const previous = report.previous
+    const currentIssues = report.totals.critical + report.totals.warning + report.totals.notice
+
+    const healthTrend = !previous
+      ? GH_GROWTH_SEO_AUDIT.kpi.trendFirstRun
+      : previous.healthScore === null || report.run.healthScore === null
+        ? GH_GROWTH_SEO_AUDIT.kpi.trendHealthUnknown(previous.captureDate)
+        : Math.abs(report.run.healthScore - previous.healthScore) < 0.05
+          ? GH_GROWTH_SEO_AUDIT.kpi.trendHealthFlat(previous.captureDate)
+          : GH_GROWTH_SEO_AUDIT.kpi.trendHealth(report.run.healthScore - previous.healthScore, previous.captureDate)
+
+    const issuesTrend = previous
+      ? GH_GROWTH_SEO_AUDIT.kpi.trendIssues(
+          currentIssues - (previous.totals.critical + previous.totals.warning + previous.totals.notice)
+        )
+      : null
+
     return (
       <Card ref={healthRef} data-capture='seo-audit-health' data-card-density={healthDensity} sx={{ containerType: healthContainerType }}>
         <CardContent>
@@ -419,6 +436,12 @@ const SiteAuditView = ({
               )}
               <Typography variant='caption' color='text.secondary'>
                 {GH_GROWTH_SEO_AUDIT.kpi.health}
+              </Typography>
+
+              {/* Movimiento, no foto. Sin crawl anterior se DICE que es el primero: dejar
+                  el hueco vacío sería ambiguo (¿no cambió, o no hay con qué comparar?). */}
+              <Typography variant='caption' color='text.secondary' textAlign='center'>
+                {healthTrend}
               </Typography>
             </Stack>
 
@@ -492,6 +515,23 @@ const SiteAuditView = ({
               />
             </Box>
           </Stack>
+
+          {/* Reconcilia las dos cifras que el fold pone juntas: el puntaje (del proveedor,
+              ponderado hacia lo que rompe indexación) y el conteo (de nuestro catálogo).
+              Sin esta línea, "95" al lado de "519 issues" se lee como contradicción. */}
+          {report.run.healthScore !== null && currentIssues > 0 ? (
+            <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 3 }}>
+              {report.totals.critical === 0
+                ? GH_GROWTH_SEO_AUDIT.kpi.healthScopeNoCritical
+                : GH_GROWTH_SEO_AUDIT.kpi.healthScopeWithCritical}
+            </Typography>
+          ) : null}
+
+          {issuesTrend ? (
+            <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 3 }}>
+              {issuesTrend}
+            </Typography>
+          ) : null}
 
           {report.run.crawledPages === crawlPageCap ? (
             <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 3 }}>

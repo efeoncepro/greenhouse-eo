@@ -47,6 +47,15 @@ type FindingRow = {
   detail: Record<string, unknown> | null
 }
 
+type PreviousRunRow = {
+  audit_run_id: string
+  capture_date: string
+  health_score: string | null
+  critical_count: number
+  warning_count: number
+  notice_count: number
+}
+
 const SEVERITIES: SeoSiteAuditFindingSeverity[] = ['critical', 'warning', 'notice']
 
 const toRunView = (row: RunRow): SeoSiteAuditRunView => ({
@@ -140,6 +149,31 @@ export const readSiteAuditReport = async (
       })
     }
 
+    // Crawl anterior comparable, para que el reporte se lea como movimiento y no como foto
+    // (el módulo se vende como serie de tiempo). Sólo runs TERMINADOS: comparar contra uno
+    // fallido o en vuelo daría un delta inventado. Los totales se agregan en la misma
+    // consulta para no traer sus findings enteros — del anterior sólo importa el conteo.
+    const previousRows = await runGreenhousePostgresQuery<PreviousRunRow>(
+      `SELECT r.audit_run_id,
+              r.capture_date::text AS capture_date,
+              r.health_score::text AS health_score,
+              COUNT(f.*) FILTER (WHERE f.severity = 'critical')::int AS critical_count,
+              COUNT(f.*) FILTER (WHERE f.severity = 'warning')::int  AS warning_count,
+              COUNT(f.*) FILTER (WHERE f.severity = 'notice')::int   AS notice_count
+         FROM greenhouse_growth.seo_site_audit_runs r
+         LEFT JOIN greenhouse_growth.seo_site_audit_findings f ON f.audit_run_id = r.audit_run_id
+        WHERE r.seo_target_id = $1
+          AND r.audit_run_id <> $2
+          AND r.capture_date <= $3::date
+          AND r.status IN ('succeeded', 'degraded')
+        GROUP BY r.audit_run_id, r.capture_date, r.health_score, r.created_at
+        ORDER BY r.capture_date DESC, r.created_at DESC
+        LIMIT 1`,
+      [seoTargetId, run.audit_run_id, run.capture_date]
+    )
+
+    const previousRow = previousRows[0]
+
     return {
       ok: true,
       seoTargetId,
@@ -149,7 +183,19 @@ export const readSiteAuditReport = async (
       totals: Object.fromEntries(SEVERITIES.map(severity => [severity, findings[severity].length])) as Record<
         SeoSiteAuditFindingSeverity,
         number
-      >
+      >,
+      previous: previousRow
+        ? {
+            auditRunId: previousRow.audit_run_id,
+            captureDate: previousRow.capture_date,
+            healthScore: previousRow.health_score !== null ? Number.parseFloat(previousRow.health_score) : null,
+            totals: {
+              critical: previousRow.critical_count,
+              warning: previousRow.warning_count,
+              notice: previousRow.notice_count
+            }
+          }
+        : null
     }
   } catch (error) {
     captureWithDomain(error, 'growth', {

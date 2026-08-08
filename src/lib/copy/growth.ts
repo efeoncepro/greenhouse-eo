@@ -2390,6 +2390,15 @@ export const GH_GROWTH_SEO_AUDIT = {
     healthAria: (score: number) => `Salud del sitio: ${score} de 100`,
     healthPending: 'Pendiente',
     healthPendingHint: 'El crawl no calculó un puntaje de salud.',
+    // 🔴 El puntaje y el conteo de issues NO miden lo mismo, y ponerlos juntos sin decirlo
+    // invita a leerlos como contradicción ("¿95 con 519 issues?"). El puntaje lo calcula el
+    // proveedor con su propia ponderación —pesa sobre todo lo que rompe indexación— y el
+    // conteo sale de nuestro catálogo curado de checks. Un sitio sin críticos puede tener
+    // muchos issues menores y seguir puntuando alto: no es un error, es qué mide cada uno.
+    healthScopeNoCritical:
+      'El puntaje pesa sobre todo lo que rompe la indexación. Sin issues críticos se mantiene alto aunque haya muchos menores.',
+    healthScopeWithCritical:
+      'El puntaje pesa sobre todo lo que rompe la indexación, así que los issues críticos son los que más lo bajan.',
     critical: 'Críticos',
     warnings: 'Atención',
     notices: 'Menores',
@@ -2403,7 +2412,21 @@ export const GH_GROWTH_SEO_AUDIT = {
     // banda de veredicto de Keywords: leyenda y control en un solo objeto).
     filterAria: (severity: string) => `Filtrar la lista por ${severity}`,
     filterClear: 'Ver todos',
-    filterClearAria: 'Quitar el filtro de severidad y ver todos los issues'
+    filterClearAria: 'Quitar el filtro de severidad y ver todos los issues',
+
+    // Movimiento entre crawls. El módulo se vende como serie de tiempo, así que "95" solo
+    // es media respuesta; "95, +2 desde el crawl anterior" es la otra mitad.
+    trendFirstRun: 'Primer crawl: todavía no hay con qué comparar',
+    trendHealth: (delta: number, date: string) =>
+      `${delta > 0 ? '+' : ''}${delta.toFixed(1)} desde el crawl del ${date}`,
+    trendHealthFlat: (date: string) => `Sin cambio desde el crawl del ${date}`,
+    trendHealthUnknown: (date: string) => `El crawl del ${date} no calculó puntaje`,
+    trendIssues: (delta: number) =>
+      delta === 0
+        ? 'Mismo número de issues'
+        : delta > 0
+          ? `${delta} ${delta === 1 ? 'issue nuevo' : 'issues nuevos'}`
+          : `${Math.abs(delta)} ${Math.abs(delta) === 1 ? 'issue menos' : 'issues menos'}`
   },
 
   issues: {
