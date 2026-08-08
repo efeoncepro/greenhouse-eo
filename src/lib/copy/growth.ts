@@ -2393,7 +2393,17 @@ export const GH_GROWTH_SEO_AUDIT = {
     critical: 'Críticos',
     warnings: 'Atención',
     notices: 'Menores',
-    pages: 'Páginas revisadas'
+    pages: 'Páginas revisadas',
+    // El crawl tiene techo. Cuando lo choca, el conteo deja de ser "el sitio" y pasa a ser
+    // "lo que alcanzamos a mirar" — decirlo evita que una muestra se lea como un censo.
+    pagesCapped: 'Tope del crawl',
+    pagesCappedHint: (cap: number) =>
+      `El crawl revisa hasta ${cap} páginas. Si el sitio tiene más, esto es una muestra y la salud describe esa muestra, no el sitio entero.`,
+    // Los conteos por severidad son también el filtro de la lista (mismo recurso que la
+    // banda de veredicto de Keywords: leyenda y control en un solo objeto).
+    filterAria: (severity: string) => `Filtrar la lista por ${severity}`,
+    filterClear: 'Ver todos',
+    filterClearAria: 'Quitar el filtro de severidad y ver todos los issues'
   },
 
   issues: {
@@ -2409,7 +2419,9 @@ export const GH_GROWTH_SEO_AUDIT = {
     // como estimación para que nadie lo lea como una medición del crawl.
     effortHint: 'El esfuerzo es una estimación nuestra, no un dato del crawl.',
     unknownIssue: (issueType: string) => `Check sin catalogar (${issueType})`,
-    unknownIssueHint: 'Este check es nuevo en el proveedor y aún no tiene ficha en español.'
+    unknownIssueHint: 'Este check es nuevo en el proveedor y aún no tiene ficha en español.',
+    filteredEmpty: (severity: string) => `Sin issues de ${severity.toLowerCase()} en este crawl.`,
+    filteredCount: (shown: number, total: number) => `Mostrando ${shown} de ${total} issues`
   },
 
   severity: {

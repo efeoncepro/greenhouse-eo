@@ -28,6 +28,7 @@ import {
   GreenhouseBreadcrumbs,
   GreenhouseChip
 } from '@/components/greenhouse/primitives'
+import { useContainerDensity } from '@/components/greenhouse/primitives/card-density'
 import { throwIfNotOk } from '@/lib/api/parse-error-response'
 import DataTableShell from '@/components/greenhouse/data-table/DataTableShell'
 import SurfaceRecipe from '@/components/greenhouse/primitives/surface-system/SurfaceRecipe'
@@ -80,24 +81,83 @@ interface Props {
   seoTargetId: string | null
   report: SiteAuditReportResult | null
   openIssueGroup: string | null
+  /** Severidad seleccionada desde los conteos de la banda de salud (`?severity=`). */
+  severityFilter: SeoSiteAuditFindingSeverity | null
   canRunAudit: boolean
+  /** Techo de páginas del crawl: si el conteo lo iguala, el número es el límite, no el sitio. */
+  crawlPageCap: number
 }
 
-const StatBlock = ({ label, value, hint }: { label: string; value: string; hint?: string }) => (
-  <Stack spacing={0.5} sx={{ minInlineSize: 0, py: { xs: 1, md: 0 } }}>
-    <Typography variant='caption' color='text.secondary'>
-      {label}
-    </Typography>
-    <Typography variant='h4' sx={{ fontVariantNumeric: 'tabular-nums', lineHeight: 1.1 }}>
-      {value}
-    </Typography>
-    {hint ? (
+interface StatBlockProps {
+  label: string
+  value: string
+  hint?: string
+  /** Presente = la cifra es también el control que filtra la lista. */
+  onSelect?: () => void
+  selected?: boolean
+  selectAria?: string
+}
+
+/**
+ * Cifra de la banda de salud. Cuando recibe `onSelect` deja de ser un número y pasa a ser
+ * **leyenda y filtro a la vez** — mismo recurso que la banda de veredicto de Keywords
+ * (TASK-1308): el objeto que ya explica el reparto es el que lo acota, en vez de sumar una
+ * fila de filtros que compita con él.
+ */
+const StatBlock = ({ label, value, hint, onSelect, selected, selectAria }: StatBlockProps) => {
+  const body = (
+    <>
       <Typography variant='caption' color='text.secondary'>
-        {hint}
+        {label}
       </Typography>
-    ) : null}
-  </Stack>
-)
+      <Typography variant='h4' sx={{ fontVariantNumeric: 'tabular-nums', lineHeight: 1.1 }}>
+        {value}
+      </Typography>
+      {hint ? (
+        <Typography variant='caption' color='text.secondary'>
+          {hint}
+        </Typography>
+      ) : null}
+    </>
+  )
+
+  if (!onSelect) {
+    return (
+      <Stack spacing={0.5} sx={{ minInlineSize: 0, py: { xs: 1, md: 0 } }}>
+        {body}
+      </Stack>
+    )
+  }
+
+  return (
+    <Stack
+      component='button'
+      type='button'
+      onClick={onSelect}
+      aria-pressed={selected}
+      aria-label={selectAria}
+      spacing={0.5}
+      sx={theme => ({
+        minInlineSize: 0,
+        py: { xs: 1, md: 0 },
+        // El control hereda la caja de la cifra: sin chrome de botón, porque el objeto
+        // sigue siendo el dato. Lo que cambia al seleccionar es el fondo, no la forma.
+        appearance: 'none',
+        border: 'none',
+        textAlign: 'start',
+        cursor: 'pointer',
+        borderRadius: `${theme.shape.customBorderRadius.md}px`,
+        bgcolor: selected ? 'action.selected' : 'transparent',
+        px: 2,
+        mx: -2,
+        transition: 'background-color 150ms cubic-bezier(0.2, 0, 0, 1)',
+        '&:hover': { bgcolor: selected ? 'action.selected' : 'action.hover' }
+      })}
+    >
+      {body}
+    </Stack>
+  )
+}
 
 const SiteAuditView = ({
   spaces,
@@ -106,10 +166,13 @@ const SiteAuditView = ({
   seoTargetId,
   report,
   openIssueGroup,
-  canRunAudit
+  severityFilter,
+  canRunAudit,
+  crawlPageCap
 }: Props) => {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
+  const { ref: healthRef, density: healthDensity, containerType: healthContainerType } = useContainerDensity('auto')
 
   const selectedSpace = useMemo(
     () => spaces.find(space => space.organizationId === selectedSpaceId) ?? null,
@@ -117,7 +180,7 @@ const SiteAuditView = ({
   )
 
   const pushQuery = useCallback(
-    (next: { space?: string; issueGroup?: string | null }) => {
+    (next: { space?: string; issueGroup?: string | null; severity?: SeoSiteAuditFindingSeverity | null }) => {
       const params = new URLSearchParams()
       const space = next.space ?? selectedSpaceId
 
@@ -132,21 +195,33 @@ const SiteAuditView = ({
         params.set('issueGroup', group)
       }
 
+      const severity = next.severity === undefined ? severityFilter : next.severity
+
+      if (severity) {
+        params.set('severity', severity)
+      }
+
       const query = params.toString()
 
       startTransition(() => router.push(query ? `/admin/growth/seo/audit?${query}` : '/admin/growth/seo/audit'))
     },
-    [router, selectedSpaceId, openIssueGroup]
+    [router, selectedSpaceId, openIssueGroup, severityFilter]
   )
 
+  const allGroups = useMemo(() => (report?.ok ? groupAuditIssues(report.findings) : []), [report])
+
+  // El filtro acota lo que se LISTA, nunca lo que se cuenta: la banda de salud sigue
+  // diciendo el total del crawl. Si acotara ambos, filtrar parecería que el sitio mejoró.
   const groups = useMemo(
-    () => (report?.ok ? groupAuditIssues(report.findings) : []),
-    [report]
+    () => (severityFilter ? allGroups.filter(group => group.severity === severityFilter) : allGroups),
+    [allGroups, severityFilter]
   )
 
+  // El drill se resuelve contra TODOS los grupos: un enlace compartido con `?issueGroup=`
+  // de otra severidad debe abrir igual en vez de morir en silencio por el filtro vigente.
   const openGroup = useMemo(
-    () => groups.find(group => group.issueType === openIssueGroup) ?? null,
-    [groups, openIssueGroup]
+    () => allGroups.find(group => group.issueType === openIssueGroup) ?? null,
+    [allGroups, openIssueGroup]
   )
 
   // Contrato de foco del wireframe: al abrir un grupo el foco va a su encabezado; al
@@ -312,8 +387,13 @@ const SiteAuditView = ({
       return null
     }
 
+    // A 390px el gauge a tamaño completo (180px + su etiqueta + las 4 cifras) llenaba la
+    // pantalla entera y empujaba la LISTA —la parte accionable— abajo del fold. La card se
+    // adapta a su propio ancho: al condensar, el arco se achica y las cifras suben.
+    const compact = healthDensity !== 'full'
+
     return (
-      <Card data-capture='seo-audit-health'>
+      <Card ref={healthRef} data-capture='seo-audit-health' data-card-density={healthDensity} sx={{ containerType: healthContainerType }}>
         <CardContent>
           <Stack
             direction={{ xs: 'column', sm: 'row' }}
@@ -333,7 +413,7 @@ const SiteAuditView = ({
               ) : (
                 <SeoHealthGauge
                   score={report.run.healthScore}
-                  size={180}
+                  size={compact ? 116 : 180}
                   ariaLabel={GH_GROWTH_SEO_AUDIT.kpi.healthAria(Math.round(report.run.healthScore))}
                 />
               )}
@@ -371,15 +451,53 @@ const SiteAuditView = ({
                 }
               }}
             >
-              <StatBlock label={GH_GROWTH_SEO_AUDIT.kpi.critical} value={String(report.totals.critical)} />
-              <StatBlock label={GH_GROWTH_SEO_AUDIT.kpi.warnings} value={String(report.totals.warning)} />
-              <StatBlock label={GH_GROWTH_SEO_AUDIT.kpi.notices} value={String(report.totals.notice)} />
+              {(['critical', 'warning', 'notice'] as const).map(severity => {
+                const label =
+                  severity === 'critical'
+                    ? GH_GROWTH_SEO_AUDIT.kpi.critical
+                    : severity === 'warning'
+                      ? GH_GROWTH_SEO_AUDIT.kpi.warnings
+                      : GH_GROWTH_SEO_AUDIT.kpi.notices
+
+                const count = report.totals[severity]
+
+                return (
+                  <StatBlock
+                    key={severity}
+                    label={label}
+                    value={String(count)}
+                    // Una severidad sin issues no filtra: dejar el control vivo prometería
+                    // una lista que no existe.
+                    onSelect={
+                      count === 0
+                        ? undefined
+                        : () =>
+                            pushQuery({
+                              severity: severityFilter === severity ? null : severity,
+                              issueGroup: null
+                            })
+                    }
+                    selected={severityFilter === severity}
+                    selectAria={GH_GROWTH_SEO_AUDIT.kpi.filterAria(label)}
+                  />
+                )
+              })}
               <StatBlock
                 label={GH_GROWTH_SEO_AUDIT.kpi.pages}
                 value={report.run.crawledPages === null ? '—' : String(report.run.crawledPages)}
+                // El conteo que IGUALA el techo del crawl casi nunca es el sitio entero: es
+                // donde el crawl se detuvo. Decirlo evita que la salud de una muestra se
+                // presente (y se venda) como la salud del sitio.
+                hint={report.run.crawledPages === crawlPageCap ? GH_GROWTH_SEO_AUDIT.kpi.pagesCapped : undefined}
               />
             </Box>
           </Stack>
+
+          {report.run.crawledPages === crawlPageCap ? (
+            <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 3 }}>
+              {GH_GROWTH_SEO_AUDIT.kpi.pagesCappedHint(crawlPageCap)}
+            </Typography>
+          ) : null}
         </CardContent>
       </Card>
     )
@@ -562,6 +680,25 @@ const SiteAuditView = ({
             {GH_GROWTH_SEO_AUDIT.issues.effortHint}
           </Typography>
         </Stack>
+
+        {severityFilter ? (
+          <Stack direction='row' spacing={2} alignItems='center' sx={{ mb: 2 }}>
+            <Typography variant='body2' color='text.secondary'>
+              {GH_GROWTH_SEO_AUDIT.issues.filteredCount(groups.length, allGroups.length)}
+            </Typography>
+            {/* La salida del filtro vive junto al conteo que lo declara, no arriba en la
+                banda: quien se pregunta "¿por qué veo tan poco?" está mirando acá. */}
+            <GreenhouseButton
+              kind='secondaryAction'
+              variant='text'
+              size='small'
+              aria-label={GH_GROWTH_SEO_AUDIT.kpi.filterClearAria}
+              onClick={() => pushQuery({ severity: null, issueGroup: null })}
+            >
+              {GH_GROWTH_SEO_AUDIT.kpi.filterClear}
+            </GreenhouseButton>
+          </Stack>
+        ) : null}
 
         <Box component='ul' sx={{ m: 0, p: 0 }} aria-busy={isPending}>
           {groups.map((group, index) => issueRow(group, index))}

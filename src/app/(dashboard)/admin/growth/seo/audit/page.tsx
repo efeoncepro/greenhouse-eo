@@ -6,6 +6,7 @@ import { can } from '@/lib/entitlements/runtime'
 import { isSeoModuleEnabled } from '@/lib/growth/seo/flags'
 import { listSeoEligibleSpaces } from '@/lib/growth/seo/overview/list-seo-spaces'
 import { resolveActiveSeoTarget } from '@/lib/growth/seo/overview/read-overview-sidebar'
+import { SITE_AUDIT_MAX_CRAWL_PAGES } from '@/lib/growth/seo/site-audit/queue-audit'
 import { readSiteAuditReport } from '@/lib/growth/seo/site-audit/reader'
 import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
@@ -27,8 +28,9 @@ import SiteAuditView from '@/views/greenhouse/admin/growth/seo/audit/SiteAuditVi
  * `succeeded` con cero findings es el reporte "sitio limpio", no un error (arch §6).
  *
  * ⚠️ `?space=` es COMPARTIBLE pero no autoridad: un Space sin `module_assignment` vigente
- * cae al primer elegible. `?issueGroup=` sí se pasa tal cual — es un filtro dentro de los
- * datos de la propia org y la view sólo abre el grupo si existe en el reporte.
+ * cae al primer elegible. `?issueGroup=` y `?severity=` sí se pasan tal cual — son filtros
+ * dentro de los datos de la propia org; la view sólo abre el grupo si existe en el reporte
+ * y `severity` se acota contra la allowlist del CHECK de TASK-1299.
  */
 
 export const metadata: Metadata = { title: 'Auditoría — SEO | Admin Center | Greenhouse' }
@@ -37,7 +39,7 @@ export const dynamic = 'force-dynamic'
 const VIEW_CODE = 'administracion.growth_seo'
 
 interface PageProps {
-  searchParams: Promise<{ space?: string; issueGroup?: string }>
+  searchParams: Promise<{ space?: string; issueGroup?: string; severity?: string }>
 }
 
 export default async function Page({ searchParams }: PageProps) {
@@ -88,7 +90,9 @@ export default async function Page({ searchParams }: PageProps) {
         seoTargetId={null}
         report={null}
         openIssueGroup={null}
+        severityFilter={null}
         canRunAudit={false}
+        crawlPageCap={SITE_AUDIT_MAX_CRAWL_PAGES}
       />
     )
   }
@@ -106,7 +110,9 @@ export default async function Page({ searchParams }: PageProps) {
         seoTargetId={null}
         report={null}
         openIssueGroup={null}
+        severityFilter={null}
         canRunAudit={canRunAudit}
+        crawlPageCap={SITE_AUDIT_MAX_CRAWL_PAGES}
       />
     )
   }
@@ -121,7 +127,16 @@ export default async function Page({ searchParams }: PageProps) {
       seoTargetId={target.seoTargetId}
       report={report}
       openIssueGroup={params.issueGroup?.trim() || null}
+      severityFilter={
+        params.severity === 'critical' || params.severity === 'warning' || params.severity === 'notice'
+          ? params.severity
+          : null
+      }
       canRunAudit={canRunAudit}
+      // El techo del crawl viaja a la view para que pueda decir cuándo el conteo de
+      // páginas es el LÍMITE y no el tamaño del sitio — un `100` redondo casi nunca es
+      // el sitio entero, y presentarlo pelado convierte una muestra en un censo.
+      crawlPageCap={SITE_AUDIT_MAX_CRAWL_PAGES}
     />
   )
 }
