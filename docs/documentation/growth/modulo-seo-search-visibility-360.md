@@ -14,6 +14,10 @@ La idea central es que la visibilidad no es una foto: es una **serie de tiempo**
 
 Este documento describe el estado real al 2026-08-05: están construidas las tres primeras capas (modelo de datos, modelo de acceso y la primera captura automática — la serie diaria de Google Search Console). Las capturas pagadas (rankings, site audit, backlinks) y toda la UI llegan en las tasks siguientes de `EPIC-022`.
 
+> Estado de catálogo 2026-08-08: el runtime desplegado aún usa `seo_v1`. TASK-1310 deja en
+> `develop` una migración pendiente que lo supersede por `seo_v2` para publicar el dashboard e
+> informe SEO como módulos cliente; no cambia tiers, cupos ni autorización per-org.
+
 ## Que existe hoy
 
 ### 1. El modelo de datos de serie temporal (TASK-1299)

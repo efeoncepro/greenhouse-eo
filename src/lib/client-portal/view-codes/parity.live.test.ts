@@ -15,10 +15,8 @@ import { __clearModuleViewCodesCache, checkViewCodesParity } from './parity'
  *    CI red (DRIFT BLOQUEANTE: o el seed agregó un viewCode nuevo sin
  *    registrarlo en VIEW_REGISTRY, o el registry se contrajo sin retirar
  *    el value del seed).
- *  - **NO bloquea** cuando VIEW_REGISTRY tiene `cliente.*` viewCodes que no
- *    aparecen en ningún seed activo (transversales como `cliente.configuracion`,
- *    `cliente.notificaciones`, `cliente.modulos` — siempre accesibles para
- *    client tenants sin estar gateados por module).
+ *  - Registry declara una surface module-gated sin seed activo → DRIFT
+ *    BLOQUEANTE. Solo transversales allowlisted pueden omitir el seed.
  *
  * Resolution si falla:
  *   1. Si el viewCode del seed es legítimo → agregar entry a VIEW_REGISTRY
@@ -38,7 +36,7 @@ const hasPgConfig =
   Boolean(process.env.GREENHOUSE_POSTGRES_HOST)
 
 describe.skipIf(!hasPgConfig)('TASK-827 — client portal view_codes live parity (PG)', () => {
-  it('seed DB cliente.* ⊆ VIEW_REGISTRY cliente.* (no DRIFT BLOQUEANTE)', async () => {
+  it('seed DB y registry module-gated cliente.* permanecen en paridad', async () => {
     __clearModuleViewCodesCache()
 
     const report = await checkViewCodesParity()
@@ -46,6 +44,10 @@ describe.skipIf(!hasPgConfig)('TASK-827 — client portal view_codes live parity
     expect(
       report.inSeedNotInRegistry,
       `view_codes en seed DB pero NO en VIEW_REGISTRY — agregar entry al registry o corregir seed via supersede. Drift: ${JSON.stringify(report.inSeedNotInRegistry)}`
+    ).toEqual([])
+    expect(
+      report.unseededModuleViewCodes,
+      `VIEW_REGISTRY declara surfaces module-gated sin seed DB. Agrega el view_code al módulo o allowlist solo si es transversal: ${JSON.stringify(report.unseededModuleViewCodes)}`
     ).toEqual([])
     expect(report.inSync).toBe(true)
   })

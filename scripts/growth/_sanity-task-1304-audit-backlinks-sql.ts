@@ -301,7 +301,7 @@ const main = async () => {
                  AND ma.status IN ('active', 'pilot')
             )
           ORDER BY t.seo_target_id`,
-        ['seo_v1']
+        ['seo_v2']
       )
       check('predicado de elegibilidad del batch tipa', true)
 

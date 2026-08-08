@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 /**
  * TASK-1303 Slice 4 — signal `seo.rank.capture_lag`: severity matrix (ok ≤1d /
  * warning 2–3d o sin captura inicial / error ≥4d), scope solo targets con assignment
- * `seo_v1` vigente, date-math canónico y degradación `unknown` observada en fallo.
+ * `seo_v2` vigente, date-math canónico y degradación `unknown` observada en fallo.
  */
 
 vi.mock('server-only', () => ({}))
@@ -75,10 +75,10 @@ describe('getSeoRankCaptureLagSignal', () => {
     expect(signal.summary).toContain('Sin targets SEO elegibles')
   })
 
-  it('SQL: scope por assignment seo_v1 vigente + date-math canónico (sin EXTRACT EPOCH)', async () => {
+  it('SQL: scope por assignment seo_v2 vigente + date-math canónico (sin EXTRACT EPOCH)', async () => {
     await getSeoRankCaptureLagSignal()
 
-    expect(state.sql).toContain("ma.module_key = 'seo_v1'")
+    expect(state.sql).toContain("ma.module_key = 'seo_v2'")
     expect(state.sql).toContain('(CURRENT_DATE - MAX(s.capture_date))::int')
     expect(state.sql).not.toContain('EXTRACT')
   })

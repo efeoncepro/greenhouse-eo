@@ -63,7 +63,13 @@ const CLIENT_VIEW_CODES_V1_4_FORWARD_LOOKING = [
  */
 const CLIENT_VIEW_CODES_TASK_1248 = ['cliente.ai_visibility_report'].sort()
 
-/** All client viewCodes en el registry (V1.0 legacy + V1.4 forward-looking + TASK-1248 = 23 total). */
+/** TASK-1310: ambas surfaces SEO son module-gated por `seo_v2`, nunca por rol. */
+const CLIENT_VIEW_CODES_TASK_1310 = [
+  'cliente.growth_seo_dashboard',
+  'cliente.growth_seo_report'
+].sort()
+
+/** All client viewCodes en el registry. */
 const CLIENT_VIEW_CODES = VIEW_REGISTRY
   .filter(v => v.section === 'cliente')
   .map(v => v.viewCode)
@@ -138,17 +144,23 @@ const CLIENT_VISIBILITY_MATRIX: Record<string, Record<string, boolean>> = {
     ...TASK_285_LEGACY_MATRIX_V1_0.client_executive,
     ...TASK_827_FORWARD_LOOKING_MATRIX_V1_4.client_executive,
     // TASK-1277: AEO module-gated (no role-wide) → grant=false en la matriz role-wide.
-    'cliente.ai_visibility_report': false
+    'cliente.ai_visibility_report': false,
+    'cliente.growth_seo_dashboard': false,
+    'cliente.growth_seo_report': false
   },
   client_manager: {
     ...TASK_285_LEGACY_MATRIX_V1_0.client_manager,
     ...TASK_827_FORWARD_LOOKING_MATRIX_V1_4.client_manager,
-    'cliente.ai_visibility_report': false
+    'cliente.ai_visibility_report': false,
+    'cliente.growth_seo_dashboard': false,
+    'cliente.growth_seo_report': false
   },
   client_specialist: {
     ...TASK_285_LEGACY_MATRIX_V1_0.client_specialist,
     ...TASK_827_FORWARD_LOOKING_MATRIX_V1_4.client_specialist,
-    'cliente.ai_visibility_report': false
+    'cliente.ai_visibility_report': false,
+    'cliente.growth_seo_dashboard': false,
+    'cliente.growth_seo_report': false
   }
 }
 
@@ -173,11 +185,12 @@ describe('Client role visibility matrix (TASK-285 V1.0 + TASK-827 V1.4)', () => 
     const expectedUnion = [
       ...CLIENT_VIEW_CODES_V1_0_LEGACY,
       ...CLIENT_VIEW_CODES_V1_4_FORWARD_LOOKING,
-      ...CLIENT_VIEW_CODES_TASK_1248
+      ...CLIENT_VIEW_CODES_TASK_1248,
+      ...CLIENT_VIEW_CODES_TASK_1310
     ].sort()
 
     expect(CLIENT_VIEW_CODES).toEqual(expectedUnion)
-    expect(CLIENT_VIEW_CODES).toHaveLength(23)
+    expect(CLIENT_VIEW_CODES).toHaveLength(25)
   })
 
   it('matrix covers every client view for every client role', () => {
@@ -200,7 +213,7 @@ describe('Client role visibility matrix (TASK-285 V1.0 + TASK-827 V1.4)', () => 
     expect(specGroups).toEqual(['client'])
   })
 
-  it('client_executive sees 22 views role-wide; AEO is module-gated, not role-wide (TASK-1277)', () => {
+  it('client_executive sees 22 views role-wide; AEO and SEO are module-gated', () => {
     const granted = Object.entries(CLIENT_VISIBILITY_MATRIX.client_executive)
       .filter(([, v]) => v)
       .map(([k]) => k)
@@ -209,12 +222,16 @@ describe('Client role visibility matrix (TASK-285 V1.0 + TASK-827 V1.4)', () => 
       .filter(([, v]) => !v)
       .map(([k]) => k)
 
-    // 23 registry views - 1 module-gated (AEO) = 22 granted role-wide
+    // 25 registry views - 3 module-gated (AEO + 2 SEO) = 22 granted role-wide
     expect(granted).toHaveLength(22)
-    expect(denied).toEqual(['cliente.ai_visibility_report'])
+    expect(denied).toEqual([
+      'cliente.ai_visibility_report',
+      'cliente.growth_seo_dashboard',
+      'cliente.growth_seo_report'
+    ])
   })
 
-  it('client_manager sees 22 views role-wide; AEO is module-gated, not role-wide (TASK-1277)', () => {
+  it('client_manager sees 22 views role-wide; AEO and SEO are module-gated', () => {
     const granted = Object.entries(CLIENT_VISIBILITY_MATRIX.client_manager)
       .filter(([, v]) => v)
       .map(([k]) => k)
@@ -224,10 +241,14 @@ describe('Client role visibility matrix (TASK-285 V1.0 + TASK-827 V1.4)', () => 
       .map(([k]) => k)
 
     expect(granted).toHaveLength(22)
-    expect(denied).toEqual(['cliente.ai_visibility_report'])
+    expect(denied).toEqual([
+      'cliente.ai_visibility_report',
+      'cliente.growth_seo_dashboard',
+      'cliente.growth_seo_report'
+    ])
   })
 
-  it('client_specialist sees 19 views and is denied 4 (3 V1.0 legacy + AEO module-gated, TASK-1277)', () => {
+  it('client_specialist sees 19 views and is denied 6 (3 legacy + AEO + SEO module-gated)', () => {
     const granted = Object.entries(CLIENT_VISIBILITY_MATRIX.client_specialist)
       .filter(([, v]) => v)
       .map(([k]) => k)
@@ -236,13 +257,15 @@ describe('Client role visibility matrix (TASK-285 V1.0 + TASK-827 V1.4)', () => 
       .filter(([, v]) => !v)
       .map(([k]) => k)
 
-    // 23 total - 3 V1.0 legacy denials (analytics, campanas, equipo) - 1 AEO module-gated = 19 granted
+    // 25 total - 3 legacy denials - 3 module-gated (AEO + 2 SEO) = 19 granted
     expect(granted).toHaveLength(19)
-    expect(denied).toHaveLength(4)
+    expect(denied).toHaveLength(6)
     expect(denied).toContain('cliente.analytics')
     expect(denied).toContain('cliente.campanas')
     expect(denied).toContain('cliente.equipo')
     expect(denied).toContain('cliente.ai_visibility_report')
+    expect(denied).toContain('cliente.growth_seo_dashboard')
+    expect(denied).toContain('cliente.growth_seo_report')
   })
 
   it('specialist retains access to core navigation views (TASK-285 AC #5)', () => {

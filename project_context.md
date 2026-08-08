@@ -91,7 +91,9 @@ Cobertura parcial o stale nunca se representa como cero. Los IDs mutables del ro
 
 El módulo Growth SEO (`growth.seo`, EPIC-022) autoriza todo run por un único chokepoint, `enforceSeoRunEntitlement`
 (`src/lib/growth/seo/entitlement.ts`), con entitlement per-org vía el módulo `seo_v1` de
-`greenhouse_client_portal.modules`; contrato en
+`greenhouse_client_portal.modules` en el runtime desplegado. La migración local de TASK-1310 crea
+`seo_v2` para publicar los viewCodes cliente y supersede assignments sin cambiar el modelo per-org;
+hasta aplicarla, `seo_v1` sigue siendo la verdad live. Contrato en
 [`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §9 (§17
 contrata el seam de extracción hacia Wave). Los reads del módulo son readers canónicos consumer-agnósticos —
 `readKeywordOpportunities` y `readSeoAeoGap` (este último cruza SEO↔AEO respetando el boundary de §1.1) —

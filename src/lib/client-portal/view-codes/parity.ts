@@ -19,13 +19,9 @@ import { VIEW_REGISTRY } from '@/lib/admin/view-access-catalog'
  *     está en `VIEW_REGISTRY` → DRIFT BLOQUEANTE (el seed declara surface no
  *     registrada; TASK-827 Slice 0 materializó los 11 forward-looking que
  *     spec V1.4 §5.5 declaró, así que el steady esperado es seed ⊆ registry).
- *   - VIEW_REGISTRY declara un `cliente.*` que NO aparece en ningún seed
- *     activo → soft warning informativo. Hay entries legacy `cliente.ciclos`,
- *     `cliente.configuracion`, `cliente.analytics`, `cliente.actualizaciones`,
- *     `cliente.modulos`, `cliente.notificaciones`, `cliente.revisiones` que
- *     NO están en ningún seed module porque son surfaces transversales (Mi
- *     Cuenta) o legacy duplicates (revisiones↔reviews) — coexisten
- *     deliberadamente.
+ *   - VIEW_REGISTRY declara una surface module-gated que NO aparece en ningún
+ *     seed activo → DRIFT BLOQUEANTE. Solo las superficies transversales
+ *     allowlisted pueden existir fuera de un módulo.
  *
  * Patrón fuente: `src/lib/client-portal/data-sources/parity.ts` (TASK-824
  * Slice 2) + `src/lib/capabilities-registry/parity.ts` (TASK-611).
@@ -75,20 +71,37 @@ export const __clearModuleViewCodesCache = () => {
 }
 
 export type ViewCodesParityReport = {
-  /** `true` si DB seed `cliente.*` ⊆ VIEW_REGISTRY `cliente.*` (la única condición strict V1.0). */
+  /** `true` si DB seed y registry module-gated están alineados. */
   inSync: boolean
 
   /** ViewCodes que aparecen en seed DB pero NO en VIEW_REGISTRY — DRIFT BLOQUEANTE. */
   inSeedNotInRegistry: string[]
 
-  /** ViewCodes del registry que NO aparecen en ningún seed activo — soft warning informativo. */
+  /** ViewCodes del registry que NO aparecen en ningún seed activo. */
   inRegistryNotInSeed: string[]
+
+  /** Registry entries que requieren seed de módulo y no lo tienen — drift bloqueante. */
+  unseededModuleViewCodes: string[]
 
   /** Cardinalidad: cuántos seed modules y cuántos values únicos en seed. */
   seedModuleCount: number
   uniqueSeedViewCodeCount: number
   registryViewCodeCount: number
 }
+
+/**
+ * Surfaces de cuenta/legacy que viven en el route group cliente sin pertenecer
+ * a un módulo vendible. Toda surface nueva debe entrar al seed del módulo.
+ */
+export const CLIENT_PORTAL_TRANSVERSAL_VIEW_CODES = new Set([
+  'cliente.actualizaciones',
+  'cliente.analytics',
+  'cliente.ciclos',
+  'cliente.configuracion',
+  'cliente.modulos',
+  'cliente.notificaciones',
+  'cliente.revisiones'
+])
 
 /**
  * Lista canónica de `cliente.*` viewCodes en el TS `VIEW_REGISTRY`.
@@ -110,11 +123,9 @@ export const getClientPortalViewCodesFromRegistry = (): readonly string[] =>
  * declarar otros prefixes (futuros), pero el parity strict V1.0 cubre
  * únicamente client-facing.
  *
- * `inSync = true` significa: cada `cliente.*` viewCode en algún seed module
- * activo está en VIEW_REGISTRY con `routeGroup='client'`. `inRegistryNotInSeed`
- * es un set informativo — viewCodes de surfaces transversales (Mi Cuenta) o
- * coexistencia legacy (revisiones↔reviews) que NO necesitan estar en ningún
- * módulo.
+ * `inSync = true` significa: cada `cliente.*` seeded existe en el registry y
+ * cada registry entry module-gated está seeded. Las excepciones están
+ * centralizadas en `CLIENT_PORTAL_TRANSVERSAL_VIEW_CODES`.
  */
 export const compareViewCodesParity = (
   seedRows: readonly ModuleViewCodesRow[],
@@ -133,6 +144,7 @@ export const compareViewCodesParity = (
 
   const inSeedNotInRegistry: string[] = []
   const inRegistryNotInSeed: string[] = []
+  const unseededModuleViewCodes: string[] = []
 
   for (const viewCode of seedClientViewCodes) {
     if (!registrySet.has(viewCode)) {
@@ -143,13 +155,18 @@ export const compareViewCodesParity = (
   for (const viewCode of registrySet) {
     if (!seedClientViewCodes.has(viewCode)) {
       inRegistryNotInSeed.push(viewCode)
+
+      if (!CLIENT_PORTAL_TRANSVERSAL_VIEW_CODES.has(viewCode)) {
+        unseededModuleViewCodes.push(viewCode)
+      }
     }
   }
 
   return {
-    inSync: inSeedNotInRegistry.length === 0,
+    inSync: inSeedNotInRegistry.length === 0 && unseededModuleViewCodes.length === 0,
     inSeedNotInRegistry: inSeedNotInRegistry.sort(),
     inRegistryNotInSeed: inRegistryNotInSeed.sort(),
+    unseededModuleViewCodes: unseededModuleViewCodes.sort(),
     seedModuleCount: seedRows.length,
     uniqueSeedViewCodeCount: seedClientViewCodes.size,
     registryViewCodeCount: registrySet.size

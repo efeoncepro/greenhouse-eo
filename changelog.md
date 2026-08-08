@@ -7,6 +7,17 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-08 — TASK-1310: contrato de navegación SEO cliente corregido (rollout pendiente)
+
+- Se corrigió el drift entre los viewCodes TS de `/growth/seo` y `/growth/seo/report` y el catálogo
+  de módulos: la migración crea `seo_v2`, supersede los assignments activos de `seo_v1` preservando
+  tier/metadata y registra los dos viewCodes en `view_registry`.
+- SEO permanece module-gated por organización; los tres roles cliente reciben denials explícitos y
+  las rutas conservan `growth.seo.report.read_client` scope `own`. La paridad ahora falla también si
+  se agrega una surface module-gated al registry sin seed DB.
+- Validación local: 53 tests focales y migration marker gate verdes. No se aplicó la migración, no se
+  hizo push/deploy y no se ejecutó build completo por el límite de recursos del equipo.
+
 ## 2026-08-08 — TASK-1309: Auditoría del sitio, y con eso el conmutador SEO queda completo
 
 - **`/admin/growth/seo/audit` (tab Auditoría) COMPLETA** — cuarta y última tab de Search Visibility:
@@ -1076,24 +1087,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
 - La skill no autoriza claims legales ni venta automática: cláusulas, indemnidad y jurisdicciones requieren `legal-privacy-ip-operator`/Legal.
 - Se añadió la decisión propuesta [`GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1`](docs/architecture/GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md): no-training, retention, zero-retention, no human access, residency, isolation, subprocesadores, deletion y AI Data Protection Pack quedan separados y sujetos a evidencia por ruta.
 - Se sincronizaron Creative Services, Creative Studio/Globe, el manual de pilotos AI, Legal/IP y los routers para no prometer “no se procesan” cuando el compromiso real es procesamiento por provider/endpoint/plan aprobado.
-
-## 2026-07-30 — Globe: Nano Banana Pro promovido en el carril gobernado
-
-- Se firmó la revisión humana desde el Producer autenticado y se propuso `ref/still/nanobanana-pro-v1` al operador.
-- Se promovió el readiness y se creó/activó el binding de producción mediante los comandos canónicos; el selector live lo muestra como `Disponible`.
-- El resto de la flota conserva sus gates honestos: no se forzaron rutas sin evaluación exacta, driver gobernado o dependencia externa resuelta.
-
-## 2026-07-30 — Globe: Nano Banana 2 promovido y probado desde Producer
-
-- Vertex habilitó de hecho `gemini-3.1-flash-image`: el probe oficial devolvió HTTP 200 y se retiró
-  el bloqueo histórico de allowlist.
-- Se añadieron rates, driver gobernado, endpoint exacto, derechos comerciales, evaluación 5/5,
-  revisión humana y promoción de readiness/binding/circuito.
-- La generación real desde la UI autenticada es
-  `ce06f8b4-ebe9-43b6-9d47-8e4cc901f49a`, 10 créditos.
-- El smoke detectó y corrigió en Globe `1fb57285` un off-by-one en la reconstrucción del hash
-  durable de Vertex; CI `30565123529` y worker `30565166238` quedaron verdes. El mismo run terminó
-  `completed/retained`, la UI mostró `Listo` y el output fue
-  `sha256:b8a0eb45289558a2cb99e9989fa401aa794035c709505b10c58fba34e0768c1e`.
-- El Producer ofrece simultáneamente cinco modelos de imagen. TASK-1553 permanece `in-progress`
-  por los receipts pendientes de TASK-1468/TASK-1578.

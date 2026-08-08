@@ -7,7 +7,7 @@ import type { ReliabilitySignal } from '@/types/reliability'
 /**
  * TASK-1303 — Rank capture lag detector.
  *
- * Para cada target SEO activo de una org con assignment `seo_v1` vigente, computa el lag
+ * Para cada target SEO activo de una org con assignment `seo_v2` vigente, computa el lag
  * = días desde el último `capture_date` (`(CURRENT_DATE - MAX(capture_date))::int` —
  * patrón canónico TASK-893, NUNCA `EXTRACT(EPOCH FROM ...)`: date - date es integer).
  * Un target sin captura reciente significa que la serie diaria de la pantalla ancla
@@ -41,7 +41,7 @@ const QUERY_SQL = `
       SELECT 1
         FROM greenhouse_client_portal.module_assignments ma
        WHERE ma.organization_id = t.organization_id
-         AND ma.module_key = 'seo_v1'
+         AND ma.module_key = 'seo_v2'
          AND ma.effective_to IS NULL
          AND ma.status IN ('active', 'pilot')
     )
@@ -96,7 +96,7 @@ export const getSeoRankCaptureLagSignal = async (): Promise<ReliabilitySignal> =
         {
           kind: 'sql',
           label: 'Query',
-          value: 'seo_targets activos con assignment seo_v1 — (CURRENT_DATE - MAX(capture_date))::int'
+          value: 'seo_targets activos con assignment seo_v2 — (CURRENT_DATE - MAX(capture_date))::int'
         },
         { kind: 'metric', label: 'targets', value: String(total) },
         { kind: 'metric', label: 'warnLagged', value: String(warnLagged) },

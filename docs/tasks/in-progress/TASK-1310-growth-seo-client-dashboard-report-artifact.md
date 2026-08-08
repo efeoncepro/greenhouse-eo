@@ -22,10 +22,12 @@ nunca `tabler-sparkles`, en las superficies de esta task.
 - Implementación cliente disponible en local, pendiente de la ronda premium: `/growth/seo` (dashboard `single` + tabs), `/growth/seo/report`
   (web + `?print=1`) y el cruce recíproco SEO↔AEO. Se construyeron las tres direcciones aprobadas como
   una familia: Evidence Narrative, Visibility Map y Trust Report Artifact.
-- Acceso verificado para Grupo Berel: el módulo `seo_v1` y la asignación SEO contratada están activos
-  para su organización; las rutas usan `growth.seo.report.read_client` con scope `own` y tenant client.
-  Se generó una sesión de revisión client-scoped dedicada para aprobar las surfaces, sin abrir acceso
-  interno ni cambiar el gate por rol.
+- **Acceso/catálogo (corrección 2026-08-08):** la UI había agregado los viewCodes al catálogo TS, pero
+  `seo_v1` seguía con `view_codes=[]`; la navegación por módulos no era construible. La migración
+  `20260808131441444_task-1310-seo-client-view-codes.sql` crea `seo_v2`, supersede asignaciones
+  activas —incluida Grupo Berel— y registra denials explícitos por rol. El acceso efectivo permanece
+  `growth.seo.report.read_client` + tenant client + assignment per-org. **Pendiente:** aplicar la
+  migración y validar la navegación con sesión client-scoped; no se abre acceso interno ni role-wide.
 - Evidencia GVC local con datos reales de Berel, desktop + 390px: dashboard
   `.captures/2026-08-08T09-15-23_growth-seo-client`, report web
   `.captures/2026-08-08T09-16-33_growth-seo-report` y attachment
@@ -59,7 +61,7 @@ nunca `tabler-sparkles`, en las superficies de esta task.
 - Wireframe: `docs/ui/wireframes/TASK-1310-growth-seo-client-dashboard-report-artifact.md`
 - Flow: `docs/ui/flows/TASK-1310-growth-seo-client-dashboard-report-artifact-flow.md`
 - Motion: `none`
-- Backend impact: `none`
+- Backend impact: `access catalog migration`
 - Epic: `EPIC-022`
 - Status real: `Avanzada, premium rework en progreso` — baseline funcional local; rollout bloqueado por auditoría visual/GVC
 - Rank: `TBD`
@@ -68,6 +70,14 @@ nunca `tabler-sparkles`, en las superficies de esta task.
 - Branch: `develop`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Hybrid Execution Justification
+
+La task sigue siendo principalmente `ui-ux`, pero la navegación cliente depende de un catálogo
+append-only de módulos. El viewCode y su `module_assignment` son un único contrato de acceso: sin la
+migración `seo_v1 → seo_v2`, la UI queda alcanzable por deep-link pero no compuesta por el portal.
+El slice de datos se limita a registrar/superseder ese catálogo y a su paridad; no agrega reader,
+API, dato de negocio ni superficie interna nuevos.
 
 ## Summary
 
@@ -299,7 +309,8 @@ Reglas obligatorias:
 
 ### Migration, backfill and rollout
 
-- Migration posture: `none`
+- Migration posture: `pending` — `20260808131441444_task-1310-seo-client-view-codes.sql` debe crear
+  `seo_v2`, superseder assignments `seo_v1` y registrar los dos viewCodes antes del rollout.
 - Default state: `GROWTH_SEO_ENABLED` OFF + sin `module_assignment` → Locked/teaser.
 - Backfill plan: none.
 - Rollback path: revert rutas/nav + flag OFF; revocar `module_assignment` (arch §13 reversibilidad).
@@ -444,7 +455,7 @@ Slice 1 (shell+gate+estados) → Slice 2 (Resumen+Evolución) → Slice 3 (Quadr
 ## Acceptance Criteria
 
 - [x] Se declaró `Execution profile: ui-ux`, `UI impact: flow`, `Flow` apuntando al contrato existente.
-- [x] Rutas cliente `/growth/seo` + `/growth/seo/report` (routeGroup `client`) alcanzables por nav cliente + en `route-reachability-manifest.ts`; gate **per-org via `module_assignment`** (NUNCA por rol); redirect defensivo sin módulo.
+- [ ] Rutas cliente `/growth/seo` + `/growth/seo/report` (routeGroup `client`) alcanzables por nav cliente + en `route-reachability-manifest.ts`; gate **per-org via `module_assignment`** (NUNCA por rol); redirect defensivo sin módulo. Código y migración de catálogo listos; falta aplicar migración y probar con sesión cliente.
 - [x] Dashboard `masterDetail` (Resumen/Evolución/Quadrant), curado, honesto, mono-Space; sin datos crudos de operador.
 - [x] Evolución = line ECharts multi-serie con **Y invertido documentado** (1=arriba=mejor); `role=img` + aria.
 - [x] Quadrant 2×2 SEO×AEO (X citabilidad IA, Y posición SEO), 4 cuadrantes con **label textual**, `readSeoAeoGap` (derived read, NUNCA merge); cross-link recíproco a `/aeo`.

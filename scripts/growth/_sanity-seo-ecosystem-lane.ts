@@ -2,7 +2,7 @@
  * TASK-1645 — Sanity live del lane ecosystem SEO contra PG real (gate TASK-893).
  *
  * Ejercita los 3 payload builders con un context de binding sintético (org-scoped e
- * internal) y datos reales: asigna seo_v1 temporal a la org con ambas lentes (patrón
+ * internal) y datos reales: asigna seo_v2 temporal a la org con ambas lentes (patrón
  * commit + try/finally — hallazgo TASK-1300), verifica anti-oracle sin entitlement,
  * target_not_configured, passthrough con quadrant real y el payload de entitlement.
  *
@@ -72,7 +72,7 @@ const main = async () => {
   await runGreenhousePostgresQuery(
     `INSERT INTO greenhouse_client_portal.module_assignments
        (assignment_id, organization_id, module_key, status, source, effective_from, metadata_json)
-     VALUES ($1, $2, 'seo_v1', 'active', 'manual_admin', CURRENT_DATE, '{"seo_tier":"contracted"}'::jsonb)`,
+     VALUES ($1, $2, 'seo_v2', 'active', 'manual_admin', CURRENT_DATE, '{"seo_tier":"contracted"}'::jsonb)`,
     [id, org]
   )
 

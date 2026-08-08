@@ -3,7 +3,7 @@
  *   1. Liga los perfiles del grader "Efeonce*" reales (no-smoke, org NULL) a la org
  *      canónica EO-ORG-0007 (Efeonce Group SpA) — cierre parcial del gap §2.A del
  *      programa AEO para la marca propia.
- *   2. Crea el assignment `seo_v1` (tier contracted, nota own_brand) — patrón dogfooding:
+ *   2. Crea el assignment `seo_v2` (tier contracted, nota own_brand) — patrón dogfooding:
  *      Efeonce es su propio cliente y su gasto DataForSEO queda bajo el mismo chokepoint.
  *
  * Idempotente: re-ejecutarlo no duplica nada. Verifica al final con el chokepoint real.
@@ -42,26 +42,26 @@ const main = async () => {
 
   console.log('1. perfiles ligados a EO-ORG-0007:', bound.length ? bound.map(r => r.public_id).join(', ') : '(ya estaban ligados)')
 
-  // 2. Assignment seo_v1 own-brand (idempotente).
+  // 2. Assignment seo_v2 own-brand (idempotente).
   const existing = await runGreenhousePostgresQuery<{ assignment_id: string }>(
     `SELECT assignment_id FROM greenhouse_client_portal.module_assignments
-      WHERE organization_id = $1 AND module_key = 'seo_v1'
+      WHERE organization_id = $1 AND module_key = 'seo_v2'
         AND effective_to IS NULL AND status IN ('active','pilot')`,
     [EFEONCE_ORG_ID]
   )
 
   if (existing.length) {
-    console.log('2. assignment seo_v1 ya existe:', existing[0].assignment_id)
+    console.log('2. assignment seo_v2 ya existe:', existing[0].assignment_id)
   } else {
     await runGreenhousePostgresQuery(
       `INSERT INTO greenhouse_client_portal.module_assignments
          (assignment_id, organization_id, module_key, status, source, source_ref_json, effective_from, metadata_json)
-       VALUES ('cpma-efeonce-seo-own-brand', $1, 'seo_v1', 'active', 'manual_admin',
+       VALUES ('cpma-efeonce-seo-own-brand', $1, 'seo_v2', 'active', 'manual_admin',
                '{"note":"Efeonce own brand (dogfooding) — aprobado por operador 2026-08-05"}'::jsonb,
                CURRENT_DATE, '{"seo_tier":"contracted","note":"own_brand"}'::jsonb)`,
       [EFEONCE_ORG_ID]
     )
-    console.log('2. assignment seo_v1 creado: cpma-efeonce-seo-own-brand (contracted, own_brand)')
+    console.log('2. assignment seo_v2 creado: cpma-efeonce-seo-own-brand (contracted, own_brand)')
   }
 
   // 2b. Target SEO own-brand (config; idempotente por UNIQUE org+dominio+mercado).

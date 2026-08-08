@@ -5,7 +5,7 @@
  * Uso (proxy en 127.0.0.1:15432):
  *   npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/_sanity-seo-entitlement.ts
  *
- * Inserta un assignment `seo_v1` de prueba, verifica habilitación/bloqueos del
+ * Inserta un assignment `seo_v2` de prueba, verifica habilitación/bloqueos del
  * chokepoint y lo borra (cero residuo).
  */
 import { config } from 'dotenv'
@@ -44,7 +44,7 @@ const main = async () => {
   await runGreenhousePostgresQuery(
     `INSERT INTO greenhouse_client_portal.module_assignments
        (assignment_id, organization_id, module_key, status, source, effective_from, metadata_json)
-     VALUES ($1, $2, 'seo_v1', 'active', $3, CURRENT_DATE, '{"seo_tier":"contracted"}'::jsonb)`,
+     VALUES ($1, $2, 'seo_v2', 'active', $3, CURRENT_DATE, '{"seo_tier":"contracted"}'::jsonb)`,
     [id, org, source]
   )
 
@@ -74,10 +74,10 @@ const main = async () => {
   if (e.blockedReason !== 'no_entitlement') process.exitCode = 1
 
   const left = await runGreenhousePostgresQuery<{ n: number }>(
-    `SELECT COUNT(*)::int AS n FROM greenhouse_client_portal.module_assignments WHERE module_key='seo_v1'`
+    `SELECT COUNT(*)::int AS n FROM greenhouse_client_portal.module_assignments WHERE module_key='seo_v2'`
   )
 
-  console.log('filas seo_v1 residuales:', left[0].n, '(esperado 0)')
+  console.log('filas seo_v2 residuales:', left[0].n, '(esperado 0)')
   console.log(process.exitCode === 1 ? '✗ SMOKE FALLÓ' : '✓ smoke E2E completo')
   process.exit(process.exitCode ?? 0)
 }
