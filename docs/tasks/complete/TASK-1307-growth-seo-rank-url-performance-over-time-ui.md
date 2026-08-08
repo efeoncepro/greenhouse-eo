@@ -680,3 +680,7 @@ Slice 0 (decisión librería) → Slice 1 (ruta + selector + estados) → Slice 
 1. ¿`readRankEvolution` soporta filtro por **URL** además de keyword? Si no, coordinar con TASK-1303 (delta backend, no re-implementar acá).
 2. ¿La librería de charts es ECharts (opción A, recomendada) o ApexCharts (opción B)? Se decide en Slice 0; fija el stack de dataviz de alto impacto del módulo.
 3. ¿El drill `?url=X` filtra la serie en la misma vista o abre una vista dedicada? Propuesta: filtra en la misma vista ahora; vista dedicada = follow-up.
+
+## Delta 2026-08-08 — enlace al master flow de EPIC-022
+
+La superficie ya cerrada por esta task continúa siendo el nodo **S2 Rendimiento** dentro del flujo Search Visibility 360. La entrada a Keywords y sus carriles `Oportunidades`, `Objetivos` y `Descubrir` se mantiene en el mismo shell y queda gobernada por [`docs/ui/flows/EPIC-022-search-visibility-360-UI-FLOW.md`](../../ui/flows/EPIC-022-search-visibility-360-UI-FLOW.md). Este delta solo hace explícita la referencia de continuidad; no reabre el lifecycle ni modifica el runtime de TASK-1307.

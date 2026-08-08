@@ -512,3 +512,7 @@ ruta en staging con un operador real y correr los scenarios GVC con `--env=stagi
 - **Exportar CSV** (declarado en el wireframe, NO implementado): no es un botón sino una capability nueva — bajo Full API Parity exige endpoint gobernado + contrato programático propio. Merece su task, no un handler acoplado a esta pantalla.
 - Las pestañas Rendimiento/Keywords/Auditoría quedan deshabilitadas hasta TASK-1307/1308/1309 (quitar `available: false` en `SeoSearchVisibilityTabs`).
 - `resolveApexColor` debería adoptarse en los ~32 consumidores de ApexCharts del repo (bug latente compartido) — candidato a task propia.
+
+## Delta 2026-08-08 — enlace al master flow de EPIC-022
+
+La superficie ya cerrada por esta task continúa siendo el nodo **S1 Overview/Cockpit** y el shell de entrada del módulo. Su relación con Keywords —incluidos los carriles `Oportunidades`, `Objetivos` y `Descubrir`— queda gobernada por [`docs/ui/flows/EPIC-022-search-visibility-360-UI-FLOW.md`](../../ui/flows/EPIC-022-search-visibility-360-UI-FLOW.md). Este delta solo hace explícita la referencia de continuidad; no reabre el lifecycle ni modifica el runtime de TASK-1306.

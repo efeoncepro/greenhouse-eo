@@ -339,6 +339,11 @@ vigentes tal cual. Lo único que vale la pena no cerrarse: que la columna de aut
 declaró, sin asumir en el copy que siempre es del lado Efeonce. Es una decisión de redacción, no
 arquitectura, y no cuesta nada hoy.
 
+El master flow [EPIC-022 Search Visibility 360](../../ui/flows/EPIC-022-search-visibility-360-UI-FLOW.md)
+reconoce esta task como la lente `Objetivos` de S3, hermana de `Oportunidades` (`TASK-1308`) y
+`Descubrir` (`TASK-1665`). Las tres comparten ruta, shell, Space/target y viewCode; `Objetivos` no
+crea una tab de módulo ni una ruta paralela.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
      No llenar al crear la task.

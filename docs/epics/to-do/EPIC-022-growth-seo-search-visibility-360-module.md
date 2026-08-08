@@ -86,6 +86,31 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1661` — [planificada, backend-data] volumen y dificultad por keyword. ⚠️ **No es esperar a `TASK-1300`**, que está complete: falta el fetch, las columnas y el reader. Alcance V1 acotado al set monitoreado.
 - `TASK-1662` — [planificada, backend-data] **keyword gap**: qué gana la competencia donde el cliente es invisible. La superficie va aparte. Bloqueada por `TASK-1661`.
 
+### Carril de discovery y acción diaria (creado 2026-08-08)
+
+> Este carril cierra el loop operativo que faltaba entre una hipótesis humana y una medición AEO. No
+> reemplaza el carril de objetivos ni convierte una sugerencia en gasto recurrente automáticamente.
+> Cada etapa conserva procedencia, mercado, costo, estado y autoría de la decisión.
+
+- `TASK-1664` — [creada, backend-data/integration, backend-critical] **keyword discovery, seed
+  expansion y enrichment de mercado**. Recibe hasta 10 seeds manuales o derivadas de GSC/set/dominio,
+  ejecuta sólo endpoints Labs permitidos (`keyword_suggestions`, `related_keywords`, `keyword_ideas`,
+  `keywords_for_site`, `keyword_overview`), muestra preview de costo antes de gastar, materializa una
+  corrida bounded en `ops-worker`, deduplica y expone candidates con volumen/dificultad/intent,
+  procedencia y as-of. No crea `seo_keyword_set_members`, no hace keyword gap (`1662`) y no llama
+  `ai_optimization` (`1651`). Blocked by `TASK-1661`.
+- `TASK-1666` — [creada, backend-data/integration, backend-critical] **puente SEO → grounded queries
+  AEO**. Toma hasta 20 candidates seleccionados, valida ownership y contexto, y crea un draft en el
+  `grader_prompt_sets` existente mediante el authoring AEO canónico. Conserva source refs de corrida y
+  candidate, trata keywords como datos no confiables, respeta no-leading/vocabulario cerrado y nunca
+  aprueba, activa ni ejecuta el grader en la misma operación. Blocked by `TASK-1664`.
+- `TASK-1665` — [creada, ui-ux] **workbench diario Descubrir** dentro de la ruta existente
+  `/admin/growth/seo/keywords`. Es la tercera lente de S3: builder de seeds/métodos/mercado, preview y
+  confirmación de costo, estados async, tabla responsive y drawer de decisión. Expone explícitamente
+  `Declarar objetivo`, `Seguir oportunidad`, `Preparar grounded queries`, `Descartar` y `Ver
+  trayectoria`, con confirmación, outcome por candidato y sin provider logic en UI. Blocked by
+  `TASK-1664` y `TASK-1666`.
+
 ### Plataforma del módulo
 
 - `TASK-1655` — [en curso] Historical Data Platform del módulo SEO (semilla histórica de rank vía `historical_serps`).
@@ -124,6 +149,16 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - [ ] La pantalla estrella (evolución de URLs/keywords en el tiempo) entrega valor con datos reales de Berel, con honestidad medido (GSC) vs estimado (DataForSEO).
 - [ ] Gate de costo DataForSEO per-org operativo (quota cap + signal `seo.provider.cost_over_budget`).
 - [ ] Documentación triple (técnica/funcional/manual) del módulo + flag `GROWTH_SEO_ENABLED` en el Feature Flag Ledger.
+- [ ] El discovery diario permite expandir seeds y enriquecer candidates mediante corridas Live de
+  DataForSEO Labs con preview de costo, límite por corrida, `ops-worker`, ledger atribuido a la org,
+  estados parciales y degradación honesta; una corrida no puede crear tracking automáticamente.
+- [ ] La superficie S3 `Descubrir` permite revisar y decidir candidates sin ruta ni menú paralelo,
+  distingue GSC medido (`●`) de Labs estimado (`◑`) y mantiene las acciones de objetivo, tracking,
+  descarte y grounded query explícitas y auditables.
+- [ ] SEO puede preparar un draft de grounded queries desde candidates seleccionados reutilizando el
+  prompt store/lifecycle AEO existente, con provenance `run/candidate/context`, vocabulario cerrado,
+  protección contra prompt injection y revisión obligatoria antes de `active`; no existe un segundo
+  prompt store ni un JOIN SQL SEO↔AEO.
 - [ ] **Full API Parity + MCP verificados como consumers reales (mandato del operador 2026-08-05):** los readers canónicos sirven UI + Nexa + lane ecosystem (`api/platform/ecosystem/growth/seo/*`) + MCP tools (`TASK-1645`) sin lógica duplicada; el epic NO cierra con el módulo UI-only aunque todos los demás criterios pasen. La superficie MCP incluye disponibilidad vía el gateway `mcp.efeonce.org` (provider federado en TASK-1626) o task dedicada de federación creada con dueño. Writes de agente declarados vía governed action loop (follow-up explícito, no deuda oculta).
 
 ## Non-goals
@@ -221,6 +256,10 @@ revenue, ni publicar pricing. Mantiene las reglas del modelo canónico y del [Cu
 - **Ola B — SEO mínimo valuable:** `TASK-1299 → TASK-1300 → TASK-1301 → TASK-1302 → TASK-1306 → TASK-1307`, empezando por GSC para minimizar costo DataForSEO.
 - **Ola C — 360 operativo:** `TASK-1303 → TASK-1304 → TASK-1305 → TASK-1311 → TASK-1313`.
 - **Ola D — authority/enterprise:** `TASK-1312 → TASK-1314 → TASK-1315 → TASK-1316 → TASK-1317 → TASK-1426`, más los contratos de delivery, contenido, revenue y procurement correspondientes.
+- **Ola E — discovery/action diario:** `TASK-1664 → TASK-1666 → TASK-1665`; después, `TASK-1662`
+  puede reutilizar la forma de candidate sin mezclar su análisis competitivo. `TASK-1311` consume la
+  provenance AEO una vez que existan drafts/runs aprobados; `TASK-1310` sólo consume candidates que
+  tengan una decisión explícita.
 
 La definición de cierre del epic debe incluir evidencia técnica **y** evidencia de cliente, delivery, economics,
 adopción y renovación. La fuente transversal para esa evaluación es `efeonce-customer-model-operator`; GTM,
@@ -396,3 +435,32 @@ de federación del gateway (`efeonce-mcp`) sin publicar. Hasta entonces las 2 to
 `insufficient_scope`: fail-closed por diseño. Y sigue en pie el bloqueo del delta anterior —
 mientras las pantallas vivan sólo en `develop`, `syncViewRegistry` de producción vuelve a apagar
 el viewCode compartido.
+
+## Delta 2026-08-08 — nace el carril diario discovery → decisión → grounded query
+
+La revisión del uso cotidiano del módulo mostró un hueco distinto al de los dashboards: el operador
+necesita partir de una seed, encontrar términos vecinos, consultar tamaño/dificultad/intención de
+mercado, descartar ruido y decidir qué merece tracking o una pregunta AEO. Ese trabajo no debe vivir
+en una planilla ni en un render que pague DataForSEO sin control. Se crean tres tasks encadenadas:
+
+1. **`TASK-1664` — primitive server-side de discovery.** La corrida acepta seeds manuales, queries de
+   GSC, keywords monitoreadas, dominio propio o combinación; permite únicamente los endpoints Labs
+   declarados en la task; calcula un costo conservador antes de la confirmación; ejecuta en
+   `ops-worker`; persiste runs/candidates/actions append-only; aplica límites de seeds, métodos,
+   candidates, enriquecimientos y llamadas; registra spend por org; expone reader/app/Nexa/ecosystem/
+   MCP; y queda separada de `trackKeywords`. El mercado estimado nunca reemplaza la señal GSC medida.
+2. **`TASK-1666` — bridge SEO↔AEO.** Una selección de candidates se transforma en un draft del prompt
+   store AEO existente, no en una nueva entidad SEO. La entrada de keywords se inyecta como contexto
+   de datos no confiable; el authoring canónico decide el texto natural y los tags cerrados. Cada draft
+   guarda refs de `run`, `candidate` y hash de contexto; la aprobación y activación permanecen en el
+   lifecycle AEO.
+3. **`TASK-1665` — workbench S3.** La UI vive en `/admin/growth/seo/keywords`, reutiliza el shell y
+   añade la lente `Descubrir`. Hace visible preview → confirmación → async → resultados → decisión;
+   ofrece `Declarar objetivo`, `Seguir oportunidad`, `Preparar grounded queries`, `Descartar` y
+   `Ver trayectoria`; transforma tabla a lista/card en 390 px; y confirma cada acción con outcome por
+   candidate. No incluye llamadas provider-facing ni crea una ruta paralela.
+
+El orden contractual es `1664 → 1666 → 1665`: el workbench puede diseñarse y maquetarse durante la
+ejecución de `1666`, pero no se considera integrado hasta que el command de grounded draft y sus
+pruebas de paridad existan. Este carril no duplica `TASK-1662` (gap competitivo), `TASK-1651`
+(`ai_optimization`/LLM Mentions), `TASK-1311` (atribución de citas) ni `TASK-1308` (oportunidades GSC).

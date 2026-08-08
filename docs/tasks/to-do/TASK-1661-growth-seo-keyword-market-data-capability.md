@@ -335,3 +335,29 @@ vivo con `--update-env-vars`; hacer sólo lo segundo lo borra en el próximo dep
 
 - Extender el alcance a las oportunidades detectadas, con el costo por keyword ya medido.
 - Intención de búsqueda como dimensión propia, si aparece una fuente que la mida en vez de inferirla.
+
+## Delta 2026-08-08 — discovery es un segundo consumidor acotado
+
+`TASK-1664` extiende el uso del primitive de mercado más allá del set monitoreado, pero no cambia la
+decisión de alcance de esta task ni autoriza un backfill abierto. La implementación de `1661` debe
+aceptar un **conjunto explícito y bounded de candidatos** entregado por el discovery runner, además
+del set monitoreado ya previsto, sin duplicar columnas, snapshots, transporte ni registro de gasto.
+
+Contrato de integración obligatorio:
+
+- `readKeywordMarketData` recibe una selección identificable por `organization_id`, mercado, idioma y
+  candidate IDs; no recibe una consulta libre que permita traer todas las keywords de una org.
+- Las métricas conservan el mismo grano append-only, `captured_at`, `provider_last_updated_at`,
+  `search_volume`, `keyword_difficulty`, `intent` y estado honesto de disponibilidad.
+- El runner de `1664` sigue siendo dueño de la lista, deduplicación, preview de costo, límites de
+  candidatos y número máximo de llamadas. `1661` sólo ejecuta el enriquecimiento del conjunto que le
+  fue entregado y devuelve resultados por elemento.
+- El alcance inicial de `1661` continúa siendo el set monitoreado; la extensión a candidatos sólo se
+  habilita mediante el contrato explícito de `1664`, con flag y gate de gasto propios de discovery.
+- No se agregan columnas de `keyword_discovery_*` a las tablas de mercado ni se crea un segundo
+  `postDataForSeoTask`; el reader existente debe poder proyectar ambos orígenes sin que la UI los
+  distinga por tablas.
+
+El criterio de aceptación de esta task queda ampliado: una prueba de contrato debe demostrar que un
+lote bounded de candidates puede enriquecerse y quedar atribuido a la org correcta sin activar un
+fetch por descubrimiento implícito o sin límite.
