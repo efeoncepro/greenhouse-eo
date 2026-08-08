@@ -397,7 +397,7 @@ const SiteAuditView = ({
           direction={{ xs: 'column', sm: 'row' }}
           spacing={{ xs: 2, sm: 4 }}
           alignItems={{ xs: 'flex-start', sm: 'center' }}
-          sx={{ py: 3.5, px: { xs: 0, sm: 1 } }}
+          sx={{ py: 3, px: { xs: 0, sm: 1 } }}
         >
           {/* Severidad: icono + palabra + color. El chip lleva el texto adentro, así que
               quien no distingue el color sigue leyendo "Crítico". */}
@@ -411,7 +411,7 @@ const SiteAuditView = ({
             />
           </Box>
 
-          <Stack spacing={0.25} sx={{ flex: 1, minInlineSize: 0 }}>
+          <Stack spacing={0.5} sx={{ flex: 1, minInlineSize: 0 }}>
             <Typography variant='body1' fontWeight={600}>
               {group.label}
             </Typography>

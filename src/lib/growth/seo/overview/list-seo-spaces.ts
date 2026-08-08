@@ -2,7 +2,7 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
-import { SEO_MODULE_KEY } from '../entitlement'
+import { SEO_MODULE_KEYS_READ } from '../entitlement'
 import { isSeoModuleEnabled } from '../flags'
 
 /**
@@ -55,12 +55,12 @@ export const listSeoEligibleSpaces = async (): Promise<SeoSpaceOption[]> => {
               SELECT 1
                 FROM greenhouse_client_portal.module_assignments ma
                WHERE ma.organization_id = o.organization_id
-                 AND ma.module_key = $1
+                 AND ma.module_key = ANY($1::text[])
                  AND ma.effective_to IS NULL
                  AND ma.status IN ('active', 'pilot')
             )
       ORDER BY o.organization_name NULLS LAST, o.organization_id`,
-    [SEO_MODULE_KEY]
+    [[...SEO_MODULE_KEYS_READ]]
   )
 
   return rows.map(row => ({

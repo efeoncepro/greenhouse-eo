@@ -3,7 +3,7 @@ import 'server-only'
 /**
  * TASK-1301 Slice 2 — Chokepoint de entitlement/allowance/budget del módulo SEO per-org.
  *
- * El SEO es un servicio con entitlement POR ORGANIZACIÓN (módulo `seo_v1` en
+ * El SEO es un servicio con entitlement POR ORGANIZACIÓN (módulo `seo_v2` en
  * `greenhouse_client_portal.module_assignments`), NO un viewCode role-wide (lección
  * TASK-1248, espejo del AEO `resolveAeoEntitlement`). Este resolver responde, para una
  * org: tier (`contracted` | `trial` | `pilot`), allowance de site-audits del período
@@ -29,7 +29,33 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import { buildSeoProviderSpendMonthlySumSql } from './provider-spend'
 
-export const SEO_MODULE_KEY = 'seo_v1' as const
+/**
+ * Clave canónica del módulo. **Es la de ESCRITURA**: toda asignación nueva nace `seo_v2`.
+ */
+export const SEO_MODULE_KEY = 'seo_v2' as const
+
+/**
+ * Claves que las LECTURAS aceptan durante el cutover `seo_v1 → seo_v2` (TASK-1310).
+ *
+ * 🔴 Renombrar la clave en el código y en la base a la vez es un cambio breaking, y los
+ * DOS órdenes de despliegue dejan una ventana de oscuridad:
+ *   - migración primero → el código vivo sigue pidiendo `seo_v1`, ya superseded → 0 orgs;
+ *   - código primero    → pide `seo_v2`, que la base todavía no tiene → 0 orgs.
+ *
+ * Y "0 orgs" no es una pantalla vacía nada más: este mismo predicado gatea los tres
+ * batches que le pagan al proveedor (rankings, site audit, backlinks). En esa ventana
+ * saltarían con `no_entitlement` **en silencio**, que es justo lo que el dominio prohíbe
+ * (un run que ve data elegible y materializa 0 nunca es `succeeded`).
+ *
+ * Por eso el lado de lectura acepta ambas: se despliega ESTO primero, después se aplica la
+ * migración, y la fase de contracción —dejar sólo `seo_v2`— es un cambio posterior y
+ * deliberado, cuando ya no queden assignments `seo_v1` vigentes. Doctrina expand/contract:
+ * `arch-architect` → `data/schema-evolution.md` ("rename in place is forbidden").
+ *
+ * ⚠️ Es TEMPORAL y tiene dueño: `TASK-1310`. El test de `entitlement` fija su contenido
+ * para que quitar `seo_v1` sea una decisión explícita y no un descuido.
+ */
+export const SEO_MODULE_KEYS_READ: readonly string[] = ['seo_v2', 'seo_v1']
 
 export type SeoTier = 'contracted' | 'trial' | 'pilot'
 
@@ -211,12 +237,12 @@ export const resolveSeoEntitlement = async (
     `SELECT assignment_id, status, metadata_json, expires_at
        FROM greenhouse_client_portal.module_assignments
       WHERE organization_id = $1
-        AND module_key = $2
+        AND module_key = ANY($2::text[])
         AND effective_to IS NULL
         AND status IN ('active', 'pilot')
       ORDER BY created_at DESC
       LIMIT 1`,
-    [organizationId, SEO_MODULE_KEY]
+    [organizationId, [...SEO_MODULE_KEYS_READ]]
   )
 
   const assignment = assignmentRows[0]

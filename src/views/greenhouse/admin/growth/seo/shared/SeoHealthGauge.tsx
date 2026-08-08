@@ -36,6 +36,14 @@ interface Props {
 
 /** Arco de 270° (de -135° a 135°). El hueco inferior evita que un score bajo se lea como un círculo casi completo. */
 const RADIUS = 54
+
+/**
+ * Tamaño del número dentro del arco, en unidades del `viewBox` — NO es tipografía de
+ * documento y por eso no sale de una variante: escala con el `size` del gauge junto al
+ * resto del dibujo, igual que `RADIUS`. Tokenizarlo como `h4` lo desacoplaría del arco y
+ * el número dejaría de crecer con él.
+ */
+const SCORE_FONT_SIZE = '2rem'
 const ARC_LENGTH = 2 * Math.PI * RADIUS * 0.75
 const FULL_CIRCLE = 2 * Math.PI * RADIUS
 
@@ -77,7 +85,7 @@ const SeoHealthGauge = ({ score, size = 160, ariaLabel }: Props) => {
           y='78'
           textAnchor='middle'
           fill={theme.palette.text.primary}
-          style={{ fontSize: '2rem', fontWeight: 600 }}
+          style={{ fontSize: SCORE_FONT_SIZE, fontWeight: 600 }}
         >
           {rounded}
         </text>

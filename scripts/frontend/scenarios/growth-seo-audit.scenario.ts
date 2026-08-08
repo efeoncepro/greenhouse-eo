@@ -125,7 +125,7 @@ export const scenario: CaptureScenario = {
       kind: 'click',
       selector: '[data-capture="seo-audit-issues"] button'
     },
-    { kind: 'sleep', ms: 900 },
+    { kind: 'sleep', ms: 3000 },
     {
       kind: 'mark',
       label: 'drill',

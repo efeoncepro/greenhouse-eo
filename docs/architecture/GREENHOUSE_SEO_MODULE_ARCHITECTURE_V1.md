@@ -9,6 +9,21 @@ Documento maestro del módulo SEO. Contrato técnico + de negocio del que deriva
 
 ---
 
+## Delta 2026-08-08 — catálogo cliente TASK-1310: `seo_v2` pendiente de aplicar
+
+`seo_v1` se creó con `view_codes=[]`. TASK-1310 necesita exponer dashboard e informe en el menú
+compuesto del portal, pero `greenhouse_client_portal.modules` prohíbe mutar esos campos in-place.
+La migración `20260808131441444_task-1310-seo-client-view-codes.sql` crea **`seo_v2`**, conserva
+status/tier/metadata de cada assignment vigente, cierra `seo_v1` y registra
+`cliente.growth_seo_dashboard` + `cliente.growth_seo_report` con denials explícitos por rol. El
+acceso sigue siendo per-org (`module_assignment` + capability), nunca role-wide.
+
+**Estado:** código y migración listos en `develop`; hasta aplicar la migración, el runtime desplegado
+sigue usando `seo_v1`. No afirmar navegación SEO cliente operativa antes de verificar la sesión de
+Grupo Berel después del deploy.
+
+---
+
 ## Delta 2026-08-07 — `get_seo_overview_kpis` verificada end-to-end (TASK-1306)
 
 La tool y su lane (`/api/platform/ecosystem/growth/seo/overview-kpis`) quedaron **ejercitados
@@ -453,6 +468,58 @@ salud, no fabrica snapshots y no toca DataForSEO en el render.
 > 8. **`resolveActiveSeoTargetId` se amplió a `resolveActiveSeoTarget`** (id + `rootDomain`): toda
 >    superficie que nombra el sitio necesita ambos, y resolverlos por separado invita a que cada
 >    consumer escriba su propio `SELECT` — que es lo que ya pasó en la ruta de keywords.
+>
+> **Delta 2026-08-08 (auditoría `seo-aeo` sobre la superficie).** El orden de la lista tiene TRES
+> ejes, no dos: severidad (corte absoluto) ▸ **alcance × valor de búsqueda ÷ esfuerzo**. El eje
+> `value` existe porque **la severidad NO encodea valor SEO**: dentro de `notice` conviven higiene
+> cosmética y señales reales, y con sólo alcance÷esfuerzo un favicon ausente en 91 páginas encabezaba
+> su tier por encima de imágenes sin `alt` en 50. `value: 'low'` pesa 0.5 y no 0 — la higiene se
+> hunde pero se sigue listando; esconderla sería la otra forma de mentir sobre el diagnóstico.
+> **Y los 4 checks de performance declaran su procedencia de LABORATORIO** (`findings-map.ts` ya lo
+> sabía; la capa de presentación lo había perdido): Google rankea con datos de campo (CrUX), así que
+> una ficha que prometa ranking sobre el número del crawl promete sobre la métrica equivocada.
+>
+> 🔴 **Cobertura declarada que el audit NO tiene** (es del allowlist y del proveedor, no de la
+> superficie): no revisa **acceso de crawlers de IA** en `robots.txt`
+> (`OAI-SearchBot`/`PerplexityBot`/`ClaudeBot`), **ausencia** de JSON-LD (sólo detecta errores en
+> marcado existente), conflicto `noindex` + bloqueo robots, ni salud de sitemap. Para un módulo que
+> se vende como Search Visibility 360 —SEO **y** AEO— el primero es el punto ciego más caro: bloquear
+> retrieval saca al cliente de las respuestas de IA (−23.1% de tráfico medido, Rutgers/Wharton
+> dic-2025) y hoy esta pantalla lo declararía sano con 95/100. Sin dueño asignado todavía.
+
+### 10.7 Cutover `seo_v1 → seo_v2` — expand/contract (TASK-1310)
+
+`TASK-1310` renombra la clave del módulo porque `modules.*` es append-only y `seo_v1` nació con
+`view_codes=[]`: no se puede editar in-place, hay que superseder. La migración crea `seo_v2`,
+supersede los assignments vigentes preservando status/tier/expiración/metadata, y deja la cadena en
+`source_ref_json`.
+
+🔴 **Renombrar la clave en el código y en la base a la vez es breaking, y los DOS órdenes de
+despliegue dejan ventana de oscuridad** — no es un problema de secuenciar, es de forma:
+
+| Orden | Qué pasa en la ventana |
+|---|---|
+| Migración primero (el orden canónico del repo) | El código vivo sigue pidiendo `seo_v1`, ya superseded → 0 orgs |
+| Código primero | Pide `seo_v2`, que la base todavía no tiene → 0 orgs |
+
+Y "0 orgs" no es sólo una pantalla vacía: el mismo predicado gatea `enforceSeoRunEntitlement`, o sea
+**los tres batches que le pagan al proveedor** (rank capture, site audit, backlinks). En la ventana
+saltarían con `no_entitlement` **en silencio**, que es justo lo que §6 prohíbe.
+
+**Forma canónica aplicada** (doctrina `arch-architect` → `data/schema-evolution.md`: *"rename in
+place is forbidden"*):
+
+1. **Expand** — `SEO_MODULE_KEY` queda como la clave de **escritura** (`seo_v2`) y las **lecturas**
+   pasan a `SEO_MODULE_KEYS_READ = ['seo_v2', 'seo_v1']` con `module_key = ANY($n::text[])` en los
+   **5** consumidores (`entitlement`, `list-seo-spaces`, `rank-capture-batch`,
+   `site-audit/enqueue-batch`, `backlinks/capture`). Se despliega ESTO primero.
+2. **Migrate** — se aplica la migración. Sin ventana: las lecturas aceptan ambas.
+3. **Contract** — se deja sólo `seo_v2`, cuando no queden assignments `seo_v1` vigentes. Es un cambio
+   posterior y deliberado, con dueño `TASK-1310`.
+
+El contenido de `SEO_MODULE_KEYS_READ` está fijado por test para que la contracción sea una decisión
+explícita y no un descuido que apague el módulo. Verificado contra PG real con la base todavía en
+`seo_v1`: ambas orgs resuelven `hasModule=true`, `tier=contracted`, sin bloqueo.
 
 ---
 

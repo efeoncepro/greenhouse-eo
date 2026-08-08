@@ -4,14 +4,14 @@
   "reviewedAt": "2026-08-08",
   "reviewer": "claude (frames GVC desktop 1440 + mobile 390 inspeccionados en loop)",
   "evidence": {
-    "desktop": ".captures/2026-08-08T12-59-33_growth-seo-audit/01-desktop/frames/01-default.png",
-    "mobile": ".captures/2026-08-08T12-59-33_growth-seo-audit/02-mobile/frames/01-default.png",
-    "dossier": ".captures/2026-08-08T12-59-33_growth-seo-audit/review-dossier.md"
+    "desktop": ".captures/2026-08-08T13-48-58_growth-seo-audit/01-desktop/frames/01-default.png",
+    "mobile": ".captures/2026-08-08T13-48-58_growth-seo-audit/02-mobile/frames/01-default.png",
+    "dossier": ".captures/2026-08-08T13-48-58_growth-seo-audit/review-dossier.md"
   },
   "dimensions": {
     "hierarchy": {
-      "score": 4.6,
-      "rationale": "Un solo momento dominante: el gauge de salud con el número a 2rem. Debajo, la lista responde la pregunta siguiente ('qué ataco primero') sin competir con él. El freshness va en la cabecera porque condiciona la lectura de todo lo demás, no de una card.",
+      "score": 4.7,
+      "rationale": "Un solo momento dominante: el gauge con el número a tamaño de display. Debajo, la lista responde la pregunta siguiente sin competir con él, y su ORDEN es la respuesta — la auditoría seo-aeo corrigió que el alcance solo ascendiera trivia de sitio, así que lo que encabeza cada tier ahora es lo que de verdad conviene atacar.",
       "evidence": "desktop 01-default, 02-health",
       "nextAction": ""
     },
@@ -88,8 +88,8 @@
       "nextAction": ""
     },
     "genericTemplateResistance": {
-      "score": 4.6,
-      "rationale": "Nada de esto sale de un template: lista priorizada en vez de tabla ordenable, catálogo es-CL curado de los 34 checks con su tier de esfuerzo, el esfuerzo declarado como estimación nuestra, salud null que dice 'Pendiente' en vez de 0/100, y un check sin ficha que se nombra en vez de esconderse.",
+      "score": 4.7,
+      "rationale": "Nada de esto sale de un template: lista priorizada en vez de tabla ordenable, catálogo es-CL curado de los 34 checks con esfuerzo Y valor de búsqueda como ejes separados, la performance declarada como medición de laboratorio para que nadie prometa ranking sobre la métrica equivocada, salud null que dice 'Pendiente' en vez de 0/100, y un check sin ficha que se nombra en vez de esconderse.",
       "evidence": "desktop 03-issues, 04-drill",
       "nextAction": ""
     }
@@ -98,6 +98,8 @@
   "notes": [
     "Tres hallazgos salieron de MIRAR los frames, no de los gates: el drill volcaba 91 URLs en un muro de ~5000px sin scroll interno (expulsaba de pantalla la lista que el operador venía recorriendo), el encabezado del drill quedaba en 3.25:1 sobre el fondo de costura, y las cifras de salud flotaban sin ritmo sobre el ancho completo.",
     "Warning conocido y ajeno: `div.MuiTabs-list` sobresale del viewport a 390px. Es la tira de tabs scrollable de TASK-1306, compartida por las cuatro rutas, y desbordar es su comportamiento correcto (se auto-desplaza para mostrar la tab activa). No se toca desde acá.",
-    "El botón `[data-capture=\"seo-audit-run\"]` NUNCA se clickea en el scenario: encola un crawl OnPage real y le gasta presupuesto al cliente. Una captura no puede ser el motivo de un cargo al proveedor."
+    "El botón `[data-capture=\"seo-audit-run\"]` NUNCA se clickea en el scenario: encola un crawl OnPage real y le gasta presupuesto al cliente. Una captura no puede ser el motivo de un cargo al proveedor.",
+    "Auditoría con la skill `seo-aeo` (2026-08-08) contra la doctrina técnica 2026: dos hallazgos de esta capa corregidos —el orden ascendía higiene sin valor de búsqueda, y el copy borraba que la performance es dato de laboratorio— y uno levantado como cobertura del módulo, no de esta superficie: el audit no revisa acceso de crawlers de IA (`OAI-SearchBot`/`PerplexityBot`/`ClaudeBot`), ausencia de JSON-LD, conflicto noindex+robots ni salud de sitemap.",
+    "Revisión con `greenhouse-ui-review`: se corrigieron dos valores de spacing fuera de escala (`py: 3.5` → 3, `spacing 0.25` → 0.5) y se nombró la constante geométrica del gauge. Dos hallazgos NO se tocaron por ser de sección o plataforma: ninguna de las 3 vistas hermanas usa `CardHeader` (cambiar sólo ésta rompería la consistencia), y los targets de 20×20 son los indicadores del `Autocomplete` de MUI — la hermana Keywords tiene 7, ésta 1."
   ]
 }

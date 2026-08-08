@@ -13,7 +13,7 @@ import 'server-only'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
-import { SEO_MODULE_KEY } from '../entitlement'
+import { SEO_MODULE_KEYS_READ } from '../entitlement'
 import { queueSiteAudit } from './queue-audit'
 
 /** Actor de sistema con el que el cron ejecuta el command gobernado. */
@@ -68,12 +68,12 @@ const listEligibleTargets = async (maxTargets?: number): Promise<EligibleTargetR
           SELECT 1
             FROM greenhouse_client_portal.module_assignments ma
            WHERE ma.organization_id = t.organization_id
-             AND ma.module_key = $1
+             AND ma.module_key = ANY($1::text[])
              AND ma.effective_to IS NULL
              AND ma.status IN ('active', 'pilot')
         )
       ORDER BY t.seo_target_id`,
-    [SEO_MODULE_KEY]
+    [[...SEO_MODULE_KEYS_READ]]
   )
 
   return typeof maxTargets === 'number' && maxTargets > 0 ? rows.slice(0, maxTargets) : rows

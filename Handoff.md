@@ -1,82 +1,50 @@
 # Handoff activo
 
-### TASK-1309 — Auditoría del sitio construida; su cierre lo bloquea un gap de TASK-1310 (2026-08-08)
+### TASK-1309 — Auditoría del sitio (2026-08-08)
 
-`TASK-1309` queda **`in-progress` con código completo** en `develop`. La cuarta tab de Search
-Visibility (`/admin/growth/seo/audit`) está construida, verificada contra datos reales de Grupo Berel
-(salud 95 · 0 críticos · 138 avisos · 381 menores · 100 páginas) y con sus cuatro gates de UI en
-verde (`ui:quality` 4.58, piso 4.5). Con ella el conmutador SEO queda completo: las 4 tabs navegan.
+`TASK-1309` está `in-progress` con código completo: cuarta tab `/admin/growth/seo/audit`, datos reales
+de Berel (95 · 0 críticos · 138 avisos · 381 menores · 100 páginas) y UI quality 4.59. El bloqueo
+heredado de TASK-1310 ya tiene fix local, pero faltan migración y staging (ver cutover más abajo).
+No repetir build ni suite global sin autorización (~30 GB).
+Evidencia: `.captures/2026-08-08T13-48-58_growth-seo-audit`.
 
-**Por qué no está `complete`:** el gate de cierre exige `pnpm test` completo en verde y hay **2 tests
-rojos que no son de esta task**. `src/lib/admin/client-role-visibility.test.ts` falla porque
-`TASK-1310` registró `cliente.growth_seo_dashboard` y `cliente.growth_seo_report` en
-`view-access-catalog.ts` (y en el menu-builder) **sin matriz de visibilidad por rol y sin migración
-que siembre `role_view_assignments`** — lo segundo es una regla dura del repo. El test de paridad
-TS↔seed está haciendo exactamente su trabajo. **No lo arreglé a propósito:** decidir cuál de los tres
-roles cliente ve el dashboard y el informe SEO es una decisión de permisos client-facing que le
-corresponde al dueño de 1310. En runtime, hoy, esos dos viewCodes caerían al fallback
-(`role_view_fallback_used`).
+Auditada con `seo-aeo` y `greenhouse-ui-review`: el orden de la lista ganó un tercer eje —**valor de
+búsqueda**, ortogonal a la severidad— porque sin él la higiene de sitio ascendía por puro alcance
+(favicon en 91 páginas por encima de `alt` en 50), y los checks de performance ahora declaran que son
+medición de **laboratorio** (Google rankea con datos de campo). Queda declarada, sin dueño, una
+cobertura que el audit NO tiene: acceso de crawlers de IA en `robots.txt`, ausencia de JSON-LD,
+conflicto noindex+robots y salud de sitemap.
 
-Contexto de cómo llegó ahí: el trabajo de 1310 estaba **sin commitear** y compartía tres archivos con
-1309 (`src/lib/copy/growth.ts`, `docs/tasks/README.md`, el registry), así que ningún commit de 1309
-podía aislarse. Con autorización del operador se commiteó como checkpoint (`5f622386d`), cerrando de
-paso 10 errores de typecheck que dejaban el árbol rojo. Ese checkpoint **no** declara 1310 cerrada.
-El gap de viewCodes se verificó con lint + tsc, que no lo detectan; sólo la suite completa lo ve.
+### Cutover `seo_v1 → seo_v2` — expand aplicado, falta migrar y contraer (2026-08-08)
 
-Pendiente de 1309: nada de código. Falta el veredicto del gap de arriba y, cuando el operador lo
-autorice, push + verificación en staging. `pnpm build` de producción corrió verde localmente el
-2026-08-08 — **no repetirlo sin pedirlo**: cuelga el equipo del operador (~30GB).
+El rename de la clave del módulo era **breaking en los dos sentidos**: migración primero deja al
+código vivo pidiendo `seo_v1` ya superseded; código primero pide `seo_v2` que la base no tiene. Y no
+es sólo UI — el mismo predicado gatea los tres batches que le pagan al proveedor, que en la ventana
+saltarían con `no_entitlement` **en silencio**.
 
-Evidencia GVC: `.captures/2026-08-08T12-59-33_growth-seo-audit` (desktop 1440 + 390px, dossier y
-scorecard incluidos).
+Se aplicó la fase **expand**: `SEO_MODULE_KEY` queda para escritura y las lecturas usan
+`SEO_MODULE_KEYS_READ = ['seo_v2','seo_v1']` con `ANY($n::text[])` en los 5 consumidores. Verificado
+contra PG real con la base todavía en `seo_v1`: ambas orgs resuelven `hasModule=true` sin bloqueo.
+El contenido de la lista está fijado por test para que la contracción sea deliberada.
+
+**Pendiente, en este orden:** desplegar el expand → aplicar
+`migrations/20260808131441444_task-1310-seo-client-view-codes.sql` → verificar en staging con Berel →
+**recién ahí** contraer a `seo_v2` sola (dueño `TASK-1310`). Detalle: `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §10.7.
 
 ### TASK-1310 — surfaces cliente SEO implementadas (2026-08-08)
 
-`TASK-1310` permanece `in-progress` en `develop`, con código completo local y rollout pendiente.
-Las tres direcciones aprobadas quedaron construidas como una familia: dashboard Evidence Narrative
-(`/growth/seo`), quadrant Visibility Map SEO×AEO y Trust Report Artifact (`/growth/seo/report` +
-`?print=1`). El report usa `modelFromSeoReport` sobre el mismo `ReportArtifactModel` del AEO y el
-gate cliente quedó en `module_assignment=active` + `growth.seo.report.read_client`, scope `own`.
+`TASK-1310` sigue `in-progress`: dashboard `/growth/seo`, quadrant y report `/growth/seo/report`
+reusan `ReportArtifactModel`; guard = assignment per-org + `growth.seo.report.read_client` `own`.
+La migración pendiente crea `seo_v2`, supersede el assignment `seo_v1` de Berel preservando tier/metadata
+y publica los viewCodes; sin aplicarla no hay navegación compuesta. Próximo paso: staging, sesión Berel,
+menú/rutas/denial sin módulo, baseline diff y revisión mobile. Sin push/deploy autorizado.
 
-Grupo Berel ya tiene `seo_v1` y assignment SEO activo. Se renovaron/verificaron GCloud/ADC y el
-proxy PostgreSQL; una identidad client-scoped dedicada permitió revisar las superficies con datos
-reales sin abrir el cockpit interno. GVC local desktop + 390px quedó capturado en:
-`.captures/2026-08-08T09-15-23_growth-seo-client`,
-`.captures/2026-08-08T09-16-33_growth-seo-report` y
-`.captures/2026-08-08T09-17-46_growth-seo-report-print`. Lint focal, 28 tests focales,
-`task:lint` y route reachability pasan; no se ejecutó un build completo para proteger recursos.
+### Search Visibility — header canónico (2026-08-07)
 
-No crear `readRankSnapshotLatest` paralelo: el resumen deriva la última observación desde
-`readRankEvolution`. Siguiente paso ejecutable: captura en staging, baseline diff, revisión final
-del shell mobile y promoción develop→main. No hay push/deploy autorizado.
-
-### Search Visibility — header canónico único en las tres pestañas (2026-08-07, ciclo documental cerrado)
-
-Segunda ronda post-cierre de `TASK-1307` (commits `0d48c283d`, `f17822544`, `67c2d1218`, `2e9cf9311`,
-todos en `origin/develop`). **Ni 1307 ni 1308 se reabren: lifecycle `complete`, esto es delta.**
-
-**Causa raíz común a Resumen · Rendimiento · Keywords:** ninguna usaba la región `header` de
-`SurfaceRecipe` — el chrome (título, selectores de alcance, chip de frescura, tabs, leyenda) iba
-dentro de `regions.primary` y quedaba flotando sobre el lienzo gris. En 390px era un scroll completo
-de chrome antes del primer dato, y cada pestaña lo había resuelto distinto.
-
-**Corregido:** las tres usan `SurfaceRecipe kind='analyticsReport' plane='none'` + `header={…}` con
-`WorkbenchHeader kind='report'`, reparto idéntico (`secondaryActions` = alcance · `meta` = frescura ·
-`supporting` = tabs bajo divisor). Rendimiento bajó la leyenda ●/◑ a la card del gráfico (prop
-`source` nuevo en `SeoRankEvolutionChart`). **Keywords ganó contrato:** sus controles dejaron de vivir
-dentro del veredicto y de repetirse en cada superficie de estado — desde la cabecera ya **no pueden
-desaparecer en un estado vacío**, incluido el Space sin Search Console que forzaba la duplicación
-(`context` de `KeywordOpportunityVerdict` quedó opcional). Dos defectos de 390px cerrados de paso: el
-tab activo recortado bajo las flechas de scroll y el período truncando su valor vigente al ir 2-up.
-
-**Verificado:** 579 tests focales verdes, `typecheck` + `lint` limpios (hook de pre-push en verde), los
-**5 scenarios GVC del módulo en OK** (incluidos `growth-seo-overview-mobile` y
-`growth-seo-performance-mobile`) y revisión visual de frames 1440 + 390px de las tres pantallas y del
-rango de 365 días.
-
-**Pendiente:** la promoción `develop → main`, **batcheada con TASK-1308 y TASK-1655**, por el release
-control plane. Y para `TASK-1655` sigue abierto el **export nativo de GSC en la propiedad de Berel**:
-necesita permiso de Owner, es out-of-band y no se destraba desde el repo.
+TASK-1307/1308 siguen `complete`: Resumen, Rendimiento y Keywords comparten `SurfaceRecipe` +
+`WorkbenchHeader` (alcance/meta/tabs), sin chrome sobre canvas ni duplicación en estados vacíos. 579
+tests focales, typecheck/lint y 5 GVC OK (1440/390). Pendiente: promoción `develop → main` batcheada
+con 1308/1655; el export GSC nativo de Berel requiere Owner fuera del repo.
 
 ### Carril de keywords OBJETIVO — TASK-1659…1662 (2026-08-07)
 
