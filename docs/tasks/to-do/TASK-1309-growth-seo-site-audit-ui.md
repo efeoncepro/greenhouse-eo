@@ -86,7 +86,7 @@ TASK-1307**; `TASK-1306` **no instaló ninguna librería nueva** ni prejuzgó es
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|ui|data`
-- Blocked by: `TASK-1306, TASK-1304`
+- Blocked by: `none`
 - Branch: `task/TASK-1309-growth-seo-site-audit-ui`
 - Legacy ID: `none`
 - GitHub Issue: `none`

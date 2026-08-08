@@ -22,7 +22,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|data`
-- Blocked by: `TASK-1299`
+- Blocked by: `none`
 - Branch: `task/TASK-1312-growth-seo-topic-cluster-entity-rollup`
 - Legacy ID: `none`
 - GitHub Issue: `none`

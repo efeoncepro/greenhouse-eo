@@ -32,7 +32,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|ai|data`
-- Blocked by: `TASK-1312, TASK-1313, TASK-1304`
+- Blocked by: `TASK-1312, TASK-1313`
 - Branch: `task/TASK-1314-growth-seo-pillar-cluster-health-topical-authority`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -84,10 +84,10 @@ Reglas obligatorias (§1.1 + §15.1 — **boundary duro, load-bearing**):
 
 - `docs/tasks/to-do/TASK-1313-growth-seo-unified-page-cluster-visibility-360-read.md` — **task hermana directa**: `readClusterVisibility360`. Esta task copia su estructura y su patrón de "dos+ reads separados unidos en memoria por `org + cluster/url`" + boundary §1.1; se apoya en su cruce SEO×AEO por cluster para las señales de rendimiento y autoridad-AEO, y agrega la capa de estructura pillar/supporting + cobertura + el score compuesto. [verificar el shape final de `readClusterVisibility360` al tomar la task].
 - `docs/tasks/to-do/TASK-1312-growth-seo-topic-cluster-entity-rollup.md` — provee `seo_topic_clusters` + `seo_topic_cluster_members` con `role` (`pillar`/`supporting`, un solo pillar activo por cluster) + `readTopicClusterRollup(clusterId)`. Resuelve `clusterId → { pillarUrl, supportingUrls[], keywordSets }` — es el **input de estructura** (quién es la pillar, quiénes las supporting) de esta task. [verificar shape del rollup + del `role`].
-- `docs/tasks/to-do/TASK-1304-growth-seo-site-audit-backlink-snapshot.md` — provee `readSiteAuditReport(targetId, auditRunId?)` sobre `seo_site_audit_runs` + `seo_site_audit_findings` (OnPage audit). Es la fuente del **grafo de enlaces internos** (¿las supporting enlazan a la pillar?) y del **keyword gap / huecos** de cobertura. [verificar que el OnPage audit exponga el grafo de enlaces internos / internal linking por-URL en el reader; si no, declarar el gap].
-- `docs/tasks/to-do/TASK-1303-growth-seo-rank-capture-evolution-reader.md` — provee `readRankEvolution(targetId, {keywords?, range, engine, device})` sobre `seo_rank_snapshots` (con `url`) + mirror BQ. Fuente del **rendimiento** (¿la pillar rankea el head term, las supporting el long-tail?). [verificar filtro por URL].
+- `docs/tasks/complete/TASK-1304-growth-seo-site-audit-backlink-snapshot.md` — provee `readSiteAuditReport(targetId, auditRunId?)` sobre `seo_site_audit_runs` + `seo_site_audit_findings` (OnPage audit). Es la fuente del **grafo de enlaces internos** (¿las supporting enlazan a la pillar?) y del **keyword gap / huecos** de cobertura. [verificar que el OnPage audit exponga el grafo de enlaces internos / internal linking por-URL en el reader; si no, declarar el gap].
+- `docs/tasks/complete/TASK-1303-growth-seo-rank-capture-evolution-reader.md` — provee `readRankEvolution(targetId, {keywords?, range, engine, device})` sobre `seo_rank_snapshots` (con `url`) + mirror BQ. Fuente del **rendimiento** (¿la pillar rankea el head term, las supporting el long-tail?). [verificar filtro por URL].
 - `docs/tasks/to-do/TASK-1311-growth-seo-aeo-citation-attribution-url-grounded-queries.md` — provee `readUrlCitationAttribution` (citas atribuidas por URL + grounded queries + engine + citation share). Fuente de la **autoridad-AEO** (¿la IA cita a la pillar, a una supporting, o a un competidor?). [verificar shape final del reader].
-- `docs/tasks/to-do/TASK-1305-growth-seo-aeo-gap-derived-read.md` — `readSeoAeoGap` (nivel marca) + su clasificador quadrant ortogonal. Patrón de referencia de "dos ejes ortogonales, cero promedio"; el score compuesto de esta task hereda esa disciplina (nombrar los ejes, no fusionarlos). [verificar dónde vive el clasificador].
+- `docs/tasks/complete/TASK-1305-growth-seo-aeo-gap-derived-read.md` — `readSeoAeoGap` (nivel marca) + su clasificador quadrant ortogonal. Patrón de referencia de "dos ejes ortogonales, cero promedio"; el score compuesto de esta task hereda esa disciplina (nombrar los ejes, no fusionarlos). [verificar dónde vive el clasificador].
 - `src/lib/growth/search-console/contracts.ts` — patrón result shape `{ ok: true, ... } | { ok: false, errorCode }` a espejar (`SearchConsoleAnalyticsResult`).
 - `src/lib/growth/ai-visibility/store.ts` (`listOperatorCrossOrgAeoScores`) — patrón canónico de degradación honesta AEO (`null`, NUNCA `0`) reusado por la señal de autoridad-AEO.
 

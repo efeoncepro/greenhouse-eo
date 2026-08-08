@@ -42,6 +42,21 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 
 ## Child Tasks
 
+> **Barrido de `Blocked by` — 2026-08-08.** Los siete blockers que las hijas citaban (`TASK-1299`,
+> `1303`, `1304`, `1305`, `1306`, `1307`, `1267`) **están todos completos**, pero nadie actualizó los
+> campos al cerrarlos. El backlog se leía como bloqueado sin estarlo: cualquiera que lo mirara
+> concluía que había que esperar algo. Corregidos en `1309`, `1311`, `1312`, `1313`, `1314`, `1315`
+> y `1651`, más cuatro rutas que apuntaban a `to-do/`/`in-progress/` de tasks ya movidas a
+> `complete/` (un link roto en Normative Docs deja al agente sin poder leer su referencia).
+>
+> Estado real: **de las 15 abiertas, 11 se pueden tomar ya**; las 4 restantes esperan sólo a otras
+> abiertas (`1313`←1311+1312 · `1314`←1312+1313 · `1316`←1315 · `1317`←1315+1316), más `1660`←1659
+> y `1662`←1661 del carril de objetivos. `TASK-1310` (dashboard cliente) ya está **in-progress**.
+>
+> ⚠️ Al cerrar una task, revisar quién la citaba como blocker. Un `Blocked by` obsoleto es fricción
+> inventada, y no hay gate que lo detecte.
+
+
 - `TASK-1299` — schema `growth.seo` (targets, keyword_sets, competitors, snapshots append-only) — bloqueador fundacional.
 - `TASK-1300` — DataForSEO family registry (ampliar allowlist + breaker + cost por familia) — bloquea todo lo provider-facing.
 - `TASK-1301` — capabilities `growth.seo.*` + entitlement per-org + chokepoint `enforceSeoRunEntitlement`.

@@ -22,7 +22,7 @@
 - Status real: `Definida`
 - Rank: `TBD`
 - Domain: `growth`
-- Blocked by: `TASK-1303 (patrón spend fence + primer cableado register-provider-spend en ops-worker)`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -93,7 +93,7 @@ Reglas obligatorias:
 ## Normative Docs
 
 - `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` (el flag nuevo se registra en el mismo PR)
-- `docs/tasks/in-progress/TASK-1303-growth-seo-rank-capture-evolution-reader.md` (patrón de captura
+- `docs/tasks/complete/TASK-1303-growth-seo-rank-capture-evolution-reader.md` (patrón de captura
   batch + spend fence que esta task reutiliza)
 
 ## Dependencies & Impact
@@ -102,7 +102,7 @@ Reglas obligatorias:
 
 - `TASK-1300` (complete) — family registry + breaker + spend ledger.
 - `TASK-1301` (complete) — `enforceSeoRunEntitlement` + capabilities `growth.seo.*`.
-- `TASK-1303` (in-progress) — primer cableado de `register-provider-spend` en ops-worker + patrón de
+- `TASK-1303` (**complete**) — primer cableado de `register-provider-spend` en ops-worker + patrón de
   batch/spend fence. Esta task NO re-implementa ese cableado: lo reutiliza.
 - `TASK-1645` (complete) — lane ecosystem `/api/platform/ecosystem/growth/seo/*` + patrón MCP tools.
 - Tabla `greenhouse_growth.seo_provider_spend_daily` (migración `20260805194114467_task-1300-*`).
