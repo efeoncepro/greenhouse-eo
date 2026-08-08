@@ -17,10 +17,11 @@ pantallas del operador (`/admin/growth/seo/*`): mismo motor, distinta profundida
 Este manual cubre: como habilitarlo para una organizacion, que ve el cliente, como verificar que
 quedo bien, y que hacer cuando no aparece.
 
-> ⚠️ **Estado al 2026-08-08: construido, pendiente de rollout.** El codigo esta en `develop` pero la
-> migracion de catalogo **no esta aplicada**. Hasta que se aplique, las rutas responden si las abres
-> directo, pero el portal **no las compone en el menu**. La seccion "Rollout" de abajo tiene el orden
-> exacto; no la saltes.
+> ⚠️ **Estado al 2026-08-08: catalogo aplicado; falta verificar con sesion de cliente.** El codigo
+> esta publicado y desplegado a staging, y la migracion de catalogo ya corrio: `seo_v2` existe con
+> sus dos viewCodes y las dos organizaciones habilitadas. La seccion "Rollout" de abajo queda como
+> runbook para el proximo entorno — y con una adicion que costo una caida de produccion, lee la nota
+> del paso 2.
 
 ## Antes de empezar
 
@@ -63,22 +64,44 @@ El orden importa: la migracion siembra filas de catalogo que el codigo desplegad
    ```
 
    Crea el modulo `seo_v2` con los dos `view_codes` de cliente
-   (`cliente.growth_seo_dashboard`, `cliente.growth_seo_report`), supersede las asignaciones activas de
-   `seo_v1` y registra denials explicitos por rol.
+   (`cliente.growth_seo_dashboard`, `cliente.growth_seo_report`), asigna las organizaciones
+   preservando tier/metadata y registra denials explicitos por rol. La migracion que le sigue
+   (`…-reopen-seo-module-cutover-window`) deja **ambas claves vigentes** durante la ventana: eso es
+   deliberado y es lo que evita la caida descrita abajo.
 
    > `pnpm pg:connect:status` **no aplica nada** — es dry-run, aunque imprima "Migrations complete!".
+
+   > 🔴 **Antes de aplicar una migracion de cutover, mira que clave lee el codigo de CADA runtime.**
+   > El 2026-08-08 esta migracion tumbo SEO en produccion durante ~25 minutos: supersede `seo_v1` en
+   > el mismo paso en que crea `seo_v2`, y Vercel produccion todavia corria `main`, que pide `seo_v1`.
+   > Hay **cinco runtimes con despliegues independientes** (Vercel produccion, Vercel staging y tres
+   > Cloud Run); "lo desplegue a develop" no es "lo desplegue". Detalle: `ISSUE-143`.
 
 3. **Verifica que el modulo quedo sembrado:**
 
    ```sql
    SELECT module_key, view_codes
-   FROM greenhouse_core.modules
-   WHERE module_key = 'seo_v2';
+   FROM greenhouse_client_portal.modules
+   WHERE module_key LIKE 'seo_v%';
    ```
 
-   Debe devolver los dos view codes. Si devuelve cero filas, la migracion no corrio.
+   `seo_v2` debe traer los dos view codes. Si devuelve cero filas, la migracion no corrio.
 
-4. **Verifica con una sesion de cliente real** (ver abajo). No lo des por hecho con la sesion de
+   Y revisa que la ventana este **simetrica** — ambas claves cubriendo las mismas organizaciones:
+
+   ```sql
+   SELECT module_key, COUNT(*)
+   FROM greenhouse_client_portal.module_assignments
+   WHERE module_key LIKE 'seo_v%' AND effective_to IS NULL AND status IN ('active','pilot')
+   GROUP BY module_key;
+   ```
+
+4. **Verifica con el consumidor real, no con un `SELECT`.** La base es la mitad del contrato; la
+   otra mitad es que version de codigo la esta leyendo cada runtime. Para este modulo el consumidor
+   real es el canary del provider contra el host de produccion. Un `SELECT` te va a decir exactamente
+   lo que el SQL prometia, aunque produccion este caida.
+
+5. **Verifica con una sesion de cliente real** (ver abajo). No lo des por hecho con la sesion de
    operador: el operador ve otras rutas y otro menu.
 
 ## Como verificar que quedo bien
@@ -123,13 +146,14 @@ Con esa sesion, revisa tres cosas:
 ## Problemas comunes
 
 **La ruta responde pero no aparece en el menu.**
-El catalogo no tiene las filas. Verifica el paso 2 del rollout con el SELECT sobre
-`greenhouse_core.modules`.
+El catalogo no tiene las filas. Verifica el paso 3 del rollout con el SELECT sobre
+`greenhouse_client_portal.modules`.
 
 **El cliente ve "SEO no esta activo en tu plan" y si lo contrato.**
-Su organizacion tiene el assignment sobre `seo_v1` pero la migracion no lo supersedio a `seo_v2`, o el
-assignment quedo revocado. Revisa `greenhouse_core.module_assignments` filtrando por su
-`organization_id`.
+Casi siempre es la ventana del cutover: su organizacion tiene assignment en una clave y el runtime que
+la atiende lee la otra. Revisa `greenhouse_client_portal.module_assignments` filtrando por su
+`organization_id` y compara contra `SEO_MODULE_KEYS_READ` en `src/lib/growth/seo/entitlement.ts` —
+**de la version desplegada en ESE runtime**, no de tu working tree.
 
 **El dashboard carga vacio en todas las secciones.**
 No es la superficie: es que esa org no tiene datos. Confirma en `/admin/growth/seo` con la misma org
@@ -145,5 +169,8 @@ lo borre.
 - Artefacto del informe: `src/components/growth/seo/report-artifact/` (render adapter del
   `ReportArtifactModel` compartido con AEO — no lo forkea)
 - Gate de entitlement: `src/lib/growth/seo/entitlement.ts`
-- Migracion de catalogo: `migrations/20260808131441444_task-1310-seo-client-view-codes.sql`
+- Migracion de catalogo: `migrations/20260808131441444_task-1310-seo-client-view-codes.sql` +
+  `migrations/20260808184512073_task-1310-reopen-seo-module-cutover-window.sql` (reabre la ventana y
+  hornea el invariante de simetria)
+- Incidente del cutover: [`ISSUE-143`](../../issues/resolved/ISSUE-143-seo-module-cutover-expand-contract-collapsed.md)
 - Arquitectura: [`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §10.7

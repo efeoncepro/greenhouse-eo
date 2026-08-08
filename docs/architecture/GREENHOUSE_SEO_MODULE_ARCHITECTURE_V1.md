@@ -521,6 +521,42 @@ El contenido de `SEO_MODULE_KEYS_READ` está fijado por test para que la contrac
 explícita y no un descuido que apague el módulo. Verificado contra PG real con la base todavía en
 `seo_v1`: ambas orgs resuelven `hasModule=true`, `tier=contracted`, sin bloqueo.
 
+#### 🔴 Delta 2026-08-08 — la migración colapsó las tres fases en una (ISSUE-143)
+
+El diseño de arriba es correcto y **aun así producción se cayó**, porque la migración
+`20260808131441444_task-1310-seo-client-view-codes` metió el **contract dentro del paso 2**: crea
+`seo_v2`, le asigna las orgs y en el mismo statement supersede los assignments `seo_v1`. Con eso el
+dual-read del paso 1 deja de servir para nada — su valor entero era que hubiera un período con las
+dos claves vigentes, y la migración lo borró en el mismo commit en que lo creaba.
+
+Medido contra `https://greenhouse.efeoncepro.com` con el canary del provider: Grupo Berel pasó de
+`domainQuadrant=riesgo keywords=50` a `hasModule=false` + `greenhouse_seo_lane_404` en los cinco
+lanes. Vercel producción corre `main`, que pide `seo_v1` literal. El **ops-worker no se vio afectado**
+porque su deploy ya tenía el dual-read, así que los tres batches que le pagan al proveedor siguieron
+sanos — el daño fue de lectura, no de gasto.
+
+Restaurado reabriendo la ventana (`effective_to = NULL` en los assignments `seo_v1`), hecho durable
+por `20260808184512073_task-1310-reopen-seo-module-cutover-window`, que además hornea el invariante:
+**mientras el cutover esté abierto, ambas claves cubren exactamente las mismas organizaciones**; una
+ventana asimétrica aborta la migración. No hay doble conteo de cuota ni presupuesto porque el
+resolver hace `ORDER BY created_at DESC LIMIT 1` sobre el `ANY(...)`.
+
+**Reglas duras que salen de esto:**
+
+- **NUNCA** una sola migración contiene el **expand** y el **contract** del mismo cutover. Son dos
+  archivos, y el segundo se escribe cuando el primero ya está desplegado **en todos los runtimes**.
+  El repo tiene cinco runtimes con despliegues independientes (Vercel producción, Vercel staging y
+  tres Cloud Run); "desplegué a develop" no es "desplegué".
+- **NUNCA** superseder una clave que el código vigente todavía lee. Antes de escribir un supersede,
+  `grep` la clave en `src/` y `services/`: si aparece en un array de lectura, el contract **no toca
+  todavía**.
+- **NUNCA** dar por buena una migración de cutover porque la base quedó como el SQL decía. La base es
+  la mitad del contrato; la otra mitad es qué versión de código la está leyendo en cada runtime.
+  **SIEMPRE** verificar con el consumidor real (para este módulo, el canary del provider contra el
+  host de producción), no con un `SELECT`.
+- **SIEMPRE** que una ventana expand esté abierta, tratar la **simetría de cobertura** como
+  invariante verificable, no como consecuencia esperada.
+
 ---
 
 ## 11. Estrategia comercial

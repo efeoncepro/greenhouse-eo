@@ -7,6 +7,39 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-08 — ISSUE-143: la migración del cutover SEO colapsó expand y contract, y tumbó producción
+
+- **Resuelto el mismo día (~25 min de caída).** La migración de viewCodes de TASK-1310 hace expand y
+  contract en el mismo archivo: crea `seo_v2` y en el mismo statement supersede `seo_v1`. Eso anula el
+  dual-read `SEO_MODULE_KEYS_READ` aplicado a los 5 consumidores, cuyo valor entero era que existiera
+  un período con ambas claves vigentes. Vercel producción corre `main`, que pide `seo_v1` literal:
+  Grupo Berel pasó de `domainQuadrant=riesgo keywords=50` a `hasModule=false` + 404 en los cinco lanes.
+- **El ops-worker no se vio afectado** (su deploy ya tenía el dual-read): los tres batches que le pagan
+  al proveedor siguieron sanos. El daño fue de lectura, no de gasto ni de datos.
+- Restaurado reabriendo la ventana y hecho durable por
+  `20260808184512073_task-1310-reopen-seo-module-cutover-window`, que hornea el invariante de simetría
+  (ambas claves cubren las mismas orgs; una ventana asimétrica aborta la migración con `RAISE`).
+- **El guardrail es lo que faltaba:** la regla ya estaba escrita en §10.7 de la arquitectura y no
+  impidió nada, porque nadie revisa una migración contra un párrafo. Ahora hay un test que escanea la
+  sección `Up` de `migrations/` y falla si una migración nueva supersede una clave que
+  `SEO_MODULE_KEYS_READ` todavía acepta. Probado por mutación contra la migración culpable.
+- Segunda causa, de método: verificar una migración de cutover con un `SELECT` es verificar la mitad
+  del contrato. La otra mitad es qué versión de código la lee en cada uno de los **cinco runtimes con
+  despliegues independientes**.
+- **Hallazgo colateral, arreglado de raíz: `docs:context-rotate` estaba ciego y reventaba.** Rotando el
+  Handoff para registrar este incidente, el rotador murió con `TypeError: Cannot read properties of
+  undefined (reading 'index')`. Su patrón buscaba secciones `##` con fecha y el archivo hace rato usa
+  `###`: 0 de 23. Es la **segunda** vez que la herramienta se queda ciega por la misma causa —el
+  propio código documenta la primera (`^## Sesi[oó]n…` matcheaba 1 de 40)—, y esta vez además crasheó
+  en vez de degradar. Una herramienta que el gate te MANDA a correr y muere sin explicar empuja a
+  rotar a mano, que es exactamente como se corrompen los marcadores de integridad de los shards.
+  El fix no es ampliar el patrón: el nivel de heading ahora se **descubre** (gana el que más secciones
+  fechadas produce), porque el ancla estable es la fecha, no el nivel. Sin secciones fechadas degrada
+  con un mensaje accionable en vez de tirar un stack. El script pasó a ser importable (guard de
+  entrypoint) y estrenó suite —5 tests, uno de ellos contra el `Handoff.md` real, que es el que se
+  romperá la próxima vez que la convención derive. Verificado: rotó `keep 20; archive 3` + `keep 60;
+  remove 1` donde antes decía "manual compaction required".
+
 ## 2026-08-08 — TASK-1310: contrato de navegación SEO cliente corregido (rollout pendiente)
 
 - Se corrigió el drift entre los viewCodes TS de `/growth/seo` y `/growth/seo/report` y el catálogo
@@ -1097,12 +1130,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   admite esa combinación sólo para la salida SVG esperada, verifica los bytes y añade CSP sandbox.
 - Worker, API y Studio se desplegaron con éxito. La flota de imagen queda en seis rutas ejercitadas;
   TASK-1553 sigue `in-progress` sólo por los receipts transversales TASK-1468/TASK-1578.
-
-## 2026-07-30 — AI Creative Rights & Enterprise Governance
-
-- Se creó la skill canónica `.codex/skills/greenhouse-ai-creative-rights-governance/` con companion Claude y referencias para enterprise rights framework, provider vetting y contrato/consentimiento.
-- Se incorporaron gates para inputs, planes comerciales, provenance, voz/likeness, música, disclosure, indemnidad, rights pack y estados de release.
-- Se sincronizaron `AGENTS.md`, `CLAUDE.md`, `project_context.md`, `Handoff.md` y `docs/operations/agent-context-router.json`.
-- La skill no autoriza claims legales ni venta automática: cláusulas, indemnidad y jurisdicciones requieren `legal-privacy-ip-operator`/Legal.
-- Se añadió la decisión propuesta [`GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1`](docs/architecture/GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md): no-training, retention, zero-retention, no human access, residency, isolation, subprocesadores, deletion y AI Data Protection Pack quedan separados y sujetos a evidencia por ruta.
-- Se sincronizaron Creative Services, Creative Studio/Globe, el manual de pilotos AI, Legal/IP y los routers para no prometer “no se procesan” cuando el compromiso real es procesamiento por provider/endpoint/plan aprobado.

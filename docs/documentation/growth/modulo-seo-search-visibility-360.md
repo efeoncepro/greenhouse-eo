@@ -414,11 +414,11 @@ tiene el módulo asignado, y sólo alcanza su propia lectura. Si no lo tiene, la
 palabras ("SEO no está activo en tu plan") y ofrece hablar con su equipo de Efeonce — nunca un
 tablero vacío que se lea como "no tienes visibilidad".
 
-> ⚠️ **Estado al 2026-08-08: construida, pendiente de rollout.** El código está en `develop` y
-> verificado con datos reales de Grupo Berel, pero su migración de catálogo **no está aplicada**.
-> Hasta que se aplique, las rutas existen como enlace directo pero el portal no las compone en el
-> menú. El orden de rollout es: publicar el código → desplegar → aplicar la migración → verificar
-> con una sesión de cliente real.
+> ⚠️ **Estado al 2026-08-08: construida y con su catálogo aplicado; falta la verificación con
+> sesión de cliente.** El código está publicado en `develop` y desplegado a staging, y la migración
+> de catálogo **ya se aplicó**: el módulo `seo_v2` existe con los dos viewCodes de cliente y las dos
+> organizaciones habilitadas. Falta entrar con una sesión de cliente real y confirmar que el menú
+> compone SEO. La ronda premium de la auditoría visual sigue abierta.
 >
 > Paso a paso para operarla: [Habilitar y verificar el portal SEO del cliente](../../manual-de-uso/growth/habilitar-portal-seo-cliente.md).
 >

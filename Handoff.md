@@ -69,6 +69,55 @@ Lo que **no** hice y sigue abierto: los 7 lotes de la auditoría premium (trabaj
 `/growth/seo/mockup`), el push de los commits locales y la migración —bloqueada porque `main` no
 tiene todavía el catálogo TS y `syncViewRegistryCatalog` desactivaría las filas.
 
+### 🔴 ISSUE-143 — rompí SEO en producción aplicando la migración de TASK-1310 (2026-08-08)
+
+**Resuelto el mismo día, ~25 min de caída.** Apliqué la migración de catálogo tras el push+deploy y el
+canary del provider contra `greenhouse.efeoncepro.com` pasó de `domainQuadrant=riesgo keywords=50` a
+`hasModule=false` + `greenhouse_seo_lane_404` en los cinco lanes.
+
+**La causa no fue el orden del rollout: fue la forma de la migración.** El archivo de viewCodes hace
+expand **y contract en el mismo paso** — crea `seo_v2`, le asigna las orgs y en el mismo statement
+supersede `seo_v1`. Eso anula el dual-read `SEO_MODULE_KEYS_READ` que habíamos aplicado a los 5
+consumidores: su valor entero era que existiera un período con ambas claves vigentes, y la migración
+lo borró en el mismo commit en que lo creaba. Vercel producción corre `main`, que pide `seo_v1`
+literal.
+
+**El ops-worker NO se vio afectado** — su deploy ya tenía el dual-read, así que los tres batches que le
+pagan a DataForSEO siguieron sanos. El daño fue de lectura, no de gasto ni de datos.
+
+Restaurado reabriendo la ventana (`effective_to = NULL` en los `seo_v1`), verificado con el canary
+real, y hecho durable por `20260808184512073_…-reopen-seo-module-cutover-window`, que hornea el
+invariante: mientras el cutover esté abierto, ambas claves cubren exactamente las mismas orgs; una
+ventana asimétrica aborta la migración. Sin doble conteo de cuota: el resolver hace `LIMIT 1` sobre el
+`ANY(...)`.
+
+**Dos lecciones, y la segunda es la que importa:**
+
+1. Una migración nunca contiene el expand y el contract del mismo cutover. Hay **cinco runtimes con
+   despliegues independientes**; "lo desplegué a develop" no es "lo desplegué".
+2. **El diseño era correcto y aun así se cayó.** §10.7 de la arquitectura describía bien el patrón y
+   el dual-read estaba fijado por test — pero nada impedía escribir el contract en el mismo archivo,
+   porque la regla vivía en prosa. Ahora vive en un test que escanea `migrations/` y falla si una
+   migración nueva supersede una clave que `SEO_MODULE_KEYS_READ` todavía acepta. **Probado por
+   mutación**: sacando la migración culpable de su allowlist, el test la nombra.
+
+Contribuyó una causa de método: verifiqué la migración con un `SELECT`, que es la mitad del contrato.
+La otra mitad es qué versión de código la lee en cada runtime. La verificación correcta es el
+consumidor real contra el host real.
+
+**Pendiente:** el contract (superseder `seo_v1`) sigue sin ejecutar y así debe quedar hasta que `main`
+tenga el dual-read. Sin dueño: una señal de fiabilidad que vigile la simetría de la ventana en runtime
+— hoy el invariante sólo se verifica al migrar.
+
+**Colateral arreglado de raíz:** rotando este mismo Handoff descubrí que `docs:context-rotate` estaba
+ciego y **reventaba** (`TypeError` sobre `matches[0]`): su patrón buscaba secciones `##` con fecha y el
+archivo usa `###` hace rato — 0 de 23. Segunda vez que se queda ciego por la misma causa (el propio
+código documenta la primera). El nivel de heading ahora **se descubre** en vez de asumirse, porque el
+ancla estable es la fecha; sin secciones fechadas degrada con un mensaje accionable en lugar de un
+stack. El script quedó importable y con suite (5 tests, uno contra el `Handoff.md` real). Si vuelve a
+fallar, la respuesta es extender `DATED_SECTION_LEVELS`, no rotar a mano: rotar a mano es como se
+corrompen los marcadores de integridad de los shards.
+
 ### Search Visibility — header canónico (2026-08-07)
 
 TASK-1307/1308 siguen `complete`: Resumen, Rendimiento y Keywords comparten `SurfaceRecipe` +
@@ -116,7 +165,6 @@ comprometer gasto. El entregable más importante de 1663 es el **test que lo pru
 `TASK-1663` en `P3` con condición de activación = un segundo consumidor real. Hoy hay **cero
 asignaciones declaradas**, así que sería infraestructura de un problema que no tenemos. `1659`/`1660`
 se construyen **como están especificadas**, sin esperar y sin conciencia de modo "por si acaso".
-
 
 ### TASK-1308 — Keyword Opportunities COMPLETE + doctrina de scopes MCP (2026-08-07)
 
@@ -469,120 +517,3 @@ de esa carpeta (cambio vigente → temático; cronología → HISTORIAL; nada al
 corrigieron inventarios stale de la auditoría 2026-04-23: vigente 2026-08-05 = **46 scheduler jobs**
 (`services/ops-worker/deploy.sh`), **8 crons Vercel** (`vercel.json`), **7 workflows de deploy**;
 descartes anotados `⚠️ Superseded`. Re-auditoría live GCP sigue siendo TASK-127.
-
-### TASK-1301 — Capabilities + entitlement per-org SEO COMPLETE (2026-08-05) · compactado 2026-08-07
-
-Segundo eslabón de la Ola B MCP-first de EPIC-022. 5 capabilities `growth.seo.*` (seed
-`capabilities_registry` migración `20260805162304440` + grants en `runtime.ts`; `entitlement.manage`
-SOLO ADMIN+ACCOUNT; `report.read_client` client_* scope own) — coverage verde. Módulo **`seo_v1`**
-seedeado en `greenhouse_client_portal.modules` (migración `20260805163024516`; hallazgo del smoke:
-`module_assignments.module_key` tiene FK al catálogo, la spec no lo declaraba). **Chokepoint único
-`enforceSeoRunEntitlement`** (`src/lib/growth/seo/entitlement.ts`), consumer-agnóstico por mandato
-parity+MCP: tier `metadata_json.seo_tier`, `expired` explícito, allowance + budget USD/mes por tier
-(env-knobs `GROWTH_SEO_*` = config, NO flags `*_ENABLED`), gasto = `SUM(provider_cost)` de 1299.
-Evidencia: 12 tests + smoke live con cero residuo (`scripts/growth/_sanity-seo-entitlement.ts`), suite
-**10076/0**, migraciones aplicadas en `greenhouse-pg-dev`. Commits `de94363df` + `100ee9fec`.
-
-### TASK-1299 — Schema SEO fundacional aplicado + contrato parity/MCP de EPIC-022 (2026-08-05)
-
-TASK-1299 (schema `growth.seo`, bloqueador fundacional de EPIC-022) quedó implementada y verificada en vivo:
-migración `20260805134439202_task-1299-growth-seo-schema.sql` **aplicada en `greenhouse-pg-dev`** (dev/staging
-comparten instancia) — 8 tablas `seo_*` (4 config + 4 serie temporal append-only por `capture_date`), UNIQUEs
-de idempotencia, triggers `block_seo_row_mutation` (genérico via TG_TABLE_NAME), GRANTs least-privilege
-(mediciones sin UPDATE/DELETE para runtime), `db.d.ts` regenerado. Smoke live contra PG real (con rollback):
-UNIQUE de captura duplicada ✓, anti-mutation en rank/findings/backlinks ✓, cierre de término por UPDATE de
-`effective_to` permitido ✓, state machine de `seo_site_audit_runs` mutable ✓, `capture_date`=DATE /
-`captured_at`=TIMESTAMPTZ ✓. Commits `ff399497c` (schema) + `db949d85f` (contrato).
-
-**Directiva del operador (misma sesión): el módulo SEO nace Full API Parity y usable por MCP.** Materializada
-como contrato con dueño: `TASK-1645` nueva (lane ecosystem `/api/platform/ecosystem/growth/seo/*` + 3 MCP
-tools read-only, espejo TASK-1086 de Knowledge; blocked by 1301/1302/1303), exit criterion nuevo en EPIC-022
-(el epic NO cierra UI-only), DoD reforzado en TASK-1301 (chokepoint consumer-agnóstico) y deltas de impacto
-cruzado en 1302/1303/1304 (el schema ya existe; readers nacen consumer-agnósticos).
-
-**Delta misma sesión — destino Wave declarado.** El operador comunicó que SV360 nace en Greenhouse pero
-eventualmente se habilita como producto en `wave.efeonce.org` (consistente con EPIC-037). Materializado como
-contrato, no como código: `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` **§17** (inventario del seam de extracción,
-FK org = único acople deliberado que se intercambia en la extracción, reglas duras extraction-ready para TODA
-child task de EPIC-022), deltas en EPIC-022/EPIC-037/TASK-1299/TASK-1645. El schema aplicado NO cambió — ya era
-extraction-ready. La extracción física NO queda autorizada (programa posterior de Wave; EPIC-027 manda hoy).
-
-**Rollout:** schema inerte por diseño (cero consumers hasta 1302+); prod recibe la migración vía release
-control plane cuando el módulo se secuencie. Próximo paso del epic: `TASK-1300` (DataForSEO families, paralela)
-y `TASK-1301` (capabilities). Nota de sesión: hubo commits concurrentes de otro agente (`aa00683bb` absorbió
-el scaffold vacío de la migración + el rename de la task; sin pérdida — verificado).
-
-### TASK-1631 — Slice 0: comparación build-vs-buy y memo de privacidad entregados (2026-08-05)
-
-TASK-1631 (Efeonce Customer Identity + MCP Federation) está `in-progress` en `develop`. Intake verificó contra
-runtime que la spec no tiene drift (gateway single-issuer, `clientId = azp ?? sub`, fusión `scp∪scope∪roles`).
-Con aprobación del operador se ejecutaron **S0.2 y S0.3** del Slice 0:
-
-- **S0.2 (costos):** ADR §`Slice 0 measurement — build vs buy vs hybrid`. Native medido contra el código real =
-  7–10.5 semanas senior + operación permanente (el broker sister-platform NO autentica personas; depende de la
-  sesión NextAuth del portal). WorkOS = USD 99/mes planos + SSO USD 125/conexión/mes, **revisita a ≥5 conexiones
-  enterprise**. **Recomendación: WorkOS** con binding provider-neutral.
-- **S0.3 (privacidad):** memo `docs/operations/EFEONCE_CUSTOMER_IDENTITY_PRIVACY_REVIEW_V1.md` (Efeonce
-  controller / IDP encargado, minimización, checklist DPA/subprocesadores/región/retención/ARCO; CL 21.719
-  plena el 1-dic-2026 + CO/MX/PE). **Gate abierto:** falta DPA firmado + abogado habilitado.
-
-**Delta mismo día — composición APROBADA con staging de gasto cero.** El operador no quiere pagar WorkOS ahora;
-la recomendación se ajustó y aprobó: (1) hoy USD 0, nada provisionado, solo diseño; (2) primer cliente
-interesado → WorkOS **free tier sin dominio propio** (AuthKit hosteado, dominio default); (3) USD 99/mes por
-`auth.efeonce.org` sólo con clientes pagando. Requisito duro derivado: el binding se llavea por
-`(environment, subject)` vía registry `external_identity_environments`, NUNCA por el issuer string crudo — el
-cutover de dominio futuro es un UPDATE auditado + re-login, no re-onboarding. **S0.4 y S0.5 entregados** en el
-ADR: binding de persona reutiliza `identity_profile_source_links` (sin tabla de identidad nueva); tablas nuevas
-sólo para organización/grants/invitaciones; `AuthContext` de 6 campos sin fallback + tools con
-`allowedIssuers` + clase de autoridad + 3 tests de regresión obligatorios. La task `ui-ux` dependiente se
-reduce a branding config y su creación se difiere (AuthKit hosteado elimina el login custom del primer corte).
-
-**Restante para Slices 1-3:** cierre legal (DPA + abogado), checklist pre-provisión (CIMD live,
-`subject_types_supported`, términos free tier) y aceptación formal del ADR completo. Pendiente del Slice 0:
-S0.1 (matriz de tokens live + base-only de TASK-1626 — **requiere sesión interactiva del operador** para los
-logins OAuth) y el contrato de convergencia del login Greenhouse. Nada externo se provisionó.
-
-### Registro de partnerships — fuente operativa creada (2026-08-05)
-
-Se creó [`EFEONCE_PARTNERSHIP_REGISTRY_V1.md`](docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md) como registro
-central de partnerships, providers y postulaciones (Google Cloud, Claude, OpenAI, BytePlus, Runway, ElevenLabs, FLUX,
-AWS, Salesforce, HubSpot, Lovable, HeyGen…), separando partnership activo · cuenta registrada · postulación · provider
-en uso · bloqueo · target. Google Cloud está `Partner registrado` con debida diligencia `En curso` (sin nivel
-Select/Premier/Diamond ni capacidad de crear oportunidades). ⚠️ **Google envió el 2026-08-06 la due diligence
-anti-soborno con fecha límite 2026-08-13**: responder el formulario y actualizar el registro sólo con evidencia
-primaria. La auditoría de postulaciones de IA del 2026-07-26 queda como fotografía histórica.
-
-### Nexa — retiro del modo "Compacto" + diagnóstico del lane que se abría solo (2026-08-05)
-
-**Origen.** El operador reportó que al iniciar sesión el chat de Nexa aparecía abierto a la derecha. Causa
-verificada en runtime (no deducida): su fila en `greenhouse_core.client_users` tenía
-`nexa_interaction_mode='lane'`, y el provider abre el sidecar en cada carga fresca
-(`useState(initialMode === 'lane')` en `nexa-interaction-mode-context.tsx`), sin persistir el colapso. Se
-reprodujo con su propia sesión vía agent-auth y se contrastó con otra persona en modo `expandible` (no monta
-el lane). **Preferencia revertida a NULL**; no hubo cambio de código para eso.
-
-**Cambio ejecutado.** Se retiró el modo `dock` ("Compacto"): era el panel efímero pre-TASK-1078 (runtime
-local, sin historial) que sobrevivió como opción del selector tras el cutover al panel ampliable. Salieron
-con él su código muerto en `NexaFloatingButton` y el flag `NEXA_FLOATING_EXPANDABLE_ENABLED` + mirror
-`NEXT_PUBLIC_*` (su único fallback era ese modo). Modos vigentes: `expandible` (piso incondicional) y `lane`.
-
-**Estado: cerrado.** Code complete, migración aplicada, **pusheado a `develop`** (`8dbd11e5e`) y las 3 env
-vars huérfanas del flag retirado borradas de Vercel el 2026-08-05
-(`NEXT_PUBLIC_NEXA_FLOATING_EXPANDABLE_ENABLED` en Production, staging y Preview develop; la var server
-nunca existió, solo el mirror). Verificado con `vercel env ls` post-borrado: cero restos del flag retirado,
-`NEXA_INTERACTION_LANE_ENABLED` intacto.
-
-**Verificación:** `pnpm local:check`, `pnpm test` (10.064 pass), `pnpm build`, `pnpm flags:audit --strict`
-verdes. Menú verificado con Playwright contra localhost: solo Panel/Lateral, switch a Lateral y vuelta con
-`PATCH /api/home/preferences` 200, cero errores de consola. CHECK de DB leído post-migración:
-`('expandible','lane')`, 0 filas en `dock`.
-
-**Deuda descubierta → devuelta a su dueña, no a una task nueva.** El `focusRef` + pregunta semilla vivía
-**solo** en el panel legacy, nunca en `NexaFloatingPanel`. Como el default en producción era `expandible`,
-el CTA "Pregúntale a Nexa" ya no anclaba el insight ni auto-enviaba la semilla **antes** de este cambio. El
-barrido por dominio mostró que **TASK-1182 sigue `in-progress`** y es la dueña del `focusRef`: se le agregó
-`## Delta 2026-08-05` con el estado real de sus criterios y el trabajo restante redefinido (portar el ancla
-a `useNexaPersistentRuntime`, que cubre Panel y Lateral por construcción). De paso se cerraron dos huecos
-preexistentes de su Status que la hacían no-tomable: `UI ready: no` + wireframe registrado
-(`docs/ui/wireframes/TASK-1182-nexa-insight-surface-aware-conversation.md`, con las 3 decisiones de
-comportamiento abiertas que bloquean `UI ready: yes`). `task:lint` y `ops:lint --changed` en 0/0.
