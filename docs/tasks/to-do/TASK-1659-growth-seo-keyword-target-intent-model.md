@@ -201,42 +201,31 @@ Reglas obligatorias:
 - Production verification sequence: ver Zone 3
 
 
-## Delta 2026-08-07 — el supuesto "V1 interno" queda superado por el operating mode
+## Delta 2026-08-07 — construye esto COMO ESTÁ ESPECIFICADO; el operating mode no te bloquea
 
-El operador señaló que este módulo tiene los **mismos tres modelos de servicio que Globe**:
-`efeonce-managed`, `co-operated` y `client-operated` (más "el cliente contrata la herramienta", que
-NO es un cuarto modo sino `client-operated` cruzado con un delivery model de plataforma).
+El operador señaló que el módulo tiene los mismos tres modelos de servicio que Globe
+(`efeonce-managed` | `co-operated` | `client-operated`). Se escribió la doctrina en
+`GREENHOUSE_OPERATING_RESPONSIBILITY_DECISION_V1.md` (**`Proposed`, no `Accepted`**) y `TASK-1663`
+(**`P3`, con condición de activación**) para que nadie invente una forma paralela el día que haga
+falta.
 
-Verificado: el vocabulario **ya es canónico** en `EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md` y
-Globe ya lo materializó (`OperatingResponsibilityAssignmentV1`, SPEC-008, desplegado). Greenhouse
-tenía el vocabulario pero **no el primitive**. Se creó como `TASK-1663` + su ADR
-`GREENHOUSE_OPERATING_RESPONSIBILITY_DECISION_V1.md`.
+🔴 **Nada de eso cambia esta task.** Hoy el producto opera de hecho en un solo modo y hay **cero
+asignaciones declaradas**:
 
-**Qué cambia para esta task:**
+- **NO esperes a `TASK-1663`.** No es dependencia ni blanda ni dura: es doctrina para después.
+- **NO agregues conciencia de modo "por si acaso".** Un branch por modo que nadie ejercita es código
+  muerto que se pudre y estorba cuando llegue el caso real.
+- **Construye V1 interno** tal como estaba especificado.
 
-- Donde decía *"V1 interno; el carril cliente es follow-up"*, ahora dice: **el modo decide qué
-  superficie DEBE existir**. En `client-operated` la superficie del portal del cliente es requisito
-  del producto, no un extra; en `efeonce-managed` puede legítimamente no existir.
-- 🔴 **Lo que NO cambia, y es lo importante:** el modo **nunca** decide quién puede declarar. Eso
-  sigue siendo `can(subject, capability, action, scope)`. Si el modo otorgara acceso, cambiar una
-  etiqueta comercial cambiaría en silencio quién puede comprometer gasto — el peor acoplamiento
-  posible. Regla copiada verbatim del contrato de Globe.
-- **Sin default por modo.** Decidido con el operador: cada engagement declara sus responsabilidades
-  explícitamente, y la ausencia **falla cerrada**. Así que mientras no haya asignación declarada,
-  esta task se comporta exactamente como estaba especificada — el fail-closed es lo que la
-  desbloquea sin esperar a `TASK-1663`.
-- **Tres ejes ortogonales que no se mezclan:** quién puede actuar (capability) · quién responde
-  (operating mode) · quién paga (comercial). El tercero importa acá porque seguir keywords
-  compromete gasto recurrente del proveedor, y en `client-operated` quién lo asume es una pregunta
-  contractual, no de producto.
-
-**No bloquea.** `TASK-1663` es dependencia **blanda**: sin asignaciones declaradas el reader es
-fail-closed y esta task opera igual. Cuando el primitive exista, consumirlo en vez de asumir.
+**Lo único que aplica desde hoy, y cuesta cero escribirlo:** un modo, plan o etiqueta comercial
+**nunca** otorga permisos. Quién puede declarar sigue siendo `can(subject, capability, action,
+scope)`. Si alguna vez te encuentras escribiendo `if (mode === …) return true` en un guard, eso es el
+error que la doctrina existe para prevenir — y es una línea que simplemente no se escribe.
 
 **Nota específica de 1659:** la **intención** de una keyword (objetivo vs oportunidad) y el
-**operating mode** son dimensiones distintas y no se colapsan. La intención dice *por qué está en el
-set*; el modo dice *quién responde por esa decisión*. Un objetivo declarado por el cliente y uno
-declarado por Efeonce son ambos objetivos.
+operating mode son dimensiones distintas. La intención dice *por qué está en el set*; el modo dice
+*quién responde*. No metas el modo en la columna de intención — un objetivo declarado por el cliente
+y uno declarado por Efeonce son ambos objetivos.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE

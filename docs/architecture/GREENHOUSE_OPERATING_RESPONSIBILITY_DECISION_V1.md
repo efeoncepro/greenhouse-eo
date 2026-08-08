@@ -1,13 +1,30 @@
 # Greenhouse Operating Responsibility Decision V1
 
-- **Status:** Accepted
+- **Status:** Proposed — **doctrina, no plan de construcción**
 - **Date:** 2026-08-07
 - **Owner:** Greenhouse Platform + Efeonce Business Model
 - **Scope:** cómo se representa en runtime el operating mode (`efeonce-managed` | `co-operated` | `client-operated`) por organización y módulo, y cómo lo consumen los módulos de producto
 - **Reversibility:** two-way para el cableado por módulo; el historial de asignaciones es append-only y no se borra
 - **Confidence:** high para la forma y el boundary — replica un contrato ya `Accepted` y desplegado en Globe (SPEC-008)
-- **Implementation owner:** [`TASK-1663`](../tasks/to-do/TASK-1663-greenhouse-operating-responsibility-primitive.md)
+- **Implementation owner (cuando se necesite, NO ahora):** [`TASK-1663`](../tasks/to-do/TASK-1663-greenhouse-operating-responsibility-primitive.md)
 - **Primeros consumidores:** [`TASK-1659`](../tasks/to-do/TASK-1659-growth-seo-keyword-target-intent-model.md) · [`TASK-1660`](../tasks/to-do/TASK-1660-growth-seo-keyword-targets-surface.md)
+
+## Antes de leer: esto NO se construye ahora
+
+🔴 **Este ADR es doctrina, no backlog.** Existe para que el día que alguien necesite modelar el
+operating mode **no invente una forma propia** — no para que alguien lo construya esta semana.
+
+Hoy el producto opera de hecho en un solo modo y hay **cero asignaciones declaradas**. Construir el
+primitive ahora sería infraestructura para un problema que todavía no tenemos, y este repo prefiere
+lo aburrido: el primitive se construye cuando exista el **segundo consumidor real** — un cliente que
+de verdad opere en otro modo, o un módulo que de verdad necesite la distinción.
+
+**Lo único que aplica desde hoy, y cuesta cero:** la regla de que un modo, etiqueta comercial o
+plan **nunca** otorga permisos. Eso no es un candado, es una línea que no se escribe.
+
+**Qué NO hay que hacer mientras tanto:** no bloquear ninguna task esperando esto, no agregar
+conciencia de modo "por si acaso" a una superficie, y no declarar asignaciones sin un caso real. Un
+campo que nadie llena con intención se llena al azar y contamina el dato.
 
 ## Decisión
 

@@ -7,7 +7,7 @@
 ## Status
 
 - Lifecycle: `to-do`
-- Priority: `P1`
+- Priority: `P3`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
@@ -20,6 +20,7 @@
 - Backend impact: `migration`
 - Epic: `none`
 - Status real: `Diseno`
+- Blocked by (condición de activación): `no tomar hasta que exista un SEGUNDO consumidor real — un cliente operando en otro modo, o un módulo que de verdad necesite la distinción`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -28,6 +29,12 @@
 - GitHub Issue: `none`
 
 ## Summary
+
+⚠️ **NO tomar esta task todavía.** Su ADR está `Proposed` a propósito: es doctrina para que nadie
+invente una forma paralela, no un plan de construcción. Hoy el producto opera de hecho en un solo
+modo y hay **cero asignaciones declaradas**; construir esto ahora es infraestructura para un problema
+que aún no existe. **Condición de activación:** un segundo consumidor real.
+
 
 Materializa el operating mode (`efeonce-managed` | `co-operated` | `client-operated`) como snapshot
 de accountability append-only versionado, con alcance **organización × módulo**. Replica el contrato

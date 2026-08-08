@@ -36,9 +36,10 @@ decide quién PUEDE declarar (eso es `can(...)`), decide qué superficie DEBE ex
 Si el modo otorgara acceso, cambiar una etiqueta comercial cambiaría en silencio quién puede
 comprometer gasto. El entregable más importante de 1663 es el **test que lo prueba**.
 
-**Tres ejes ortogonales:** quién puede actuar (capability) · quién responde (modo) · quién paga
-(comercial). Sin default por modo (decisión del operador): cada engagement declara y la ausencia
-**falla cerrada**, por eso `1663` es dependencia **blanda** de `1659`/`1660`.
+**Tres ejes ortogonales:** quién puede (capability) · quién responde (modo) · quién paga (comercial). ⚠️ **Y NO se construye ahora** (el operador lo acotó el mismo día): el ADR quedó `Proposed` y
+`TASK-1663` en `P3` con condición de activación = un segundo consumidor real. Hoy hay **cero
+asignaciones declaradas**, así que sería infraestructura de un problema que no tenemos. `1659`/`1660`
+se construyen **como están especificadas**, sin esperar y sin conciencia de modo "por si acaso".
 
 
 ### TASK-1308 — Keyword Opportunities COMPLETE + doctrina de scopes MCP (2026-08-07)
