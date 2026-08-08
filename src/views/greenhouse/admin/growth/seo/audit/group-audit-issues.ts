@@ -9,12 +9,15 @@ import type { SeoSiteAuditFindingSeverity, SeoSiteAuditFindingView } from '@/lib
  * (una fila por URL × check); acá se agrupan por `issueType` y se ordenan.
  *
  * El orden NO es un ranking suave: la severidad manda de forma absoluta y recién dentro
- * de cada nivel compiten volumen y esfuerzo. Mezclarlo en un score único dejaría que
- * 400 imágenes sin `alt` enterraran un 5xx, que es exactamente el error que la lista
- * existe para evitar.
+ * de cada nivel compiten alcance, valor de búsqueda y esfuerzo. Mezclarlo en un score
+ * único dejaría que 400 imágenes sin `alt` enterraran un 5xx, que es exactamente el error
+ * que la lista existe para evitar.
  */
 
 export type SeoAuditIssueEffort = 'low' | 'medium' | 'high'
+
+/** Cuánto mueve la aguja en búsqueda. Ortogonal a la severidad (qué tan roto está). */
+export type SeoAuditIssueValue = 'low' | 'medium' | 'high'
 
 export interface SeoAuditIssueGroup {
   /** Id de máquina del proveedor — es también el valor de `?issueGroup=`. */
@@ -24,6 +27,7 @@ export interface SeoAuditIssueGroup {
   hint: string | null
   severity: SeoSiteAuditFindingSeverity
   effort: SeoAuditIssueEffort
+  value: SeoAuditIssueValue
   /** URLs distintas afectadas por este check. */
   affectedPages: number
   findings: readonly SeoSiteAuditFindingView[]
@@ -39,11 +43,33 @@ const SEVERITY_RANK: Record<SeoSiteAuditFindingSeverity, number> = { critical: 0
  */
 const EFFORT_WEIGHT: Record<SeoAuditIssueEffort, number> = { low: 1, medium: 2, high: 3 }
 
+/**
+ * Peso de valor de búsqueda. Existe porque la severidad NO lo encodea: dentro de `notice`
+ * conviven higiene cosmética y señales reales, y sin este eje el alcance solo premiaba a
+ * lo que toca todo el sitio — un favicon ausente en 91 páginas encabezaba su tier por
+ * encima de imágenes sin `alt` en 50 (auditoría `seo-aeo`, 2026-08-08).
+ *
+ * `low` no es 0: un issue de higiene sigue siendo un issue y se sigue listando. Se hunde,
+ * no desaparece — esconderlo sería la otra forma de mentir sobre el diagnóstico.
+ */
+const VALUE_WEIGHT: Record<SeoAuditIssueValue, number> = { low: 0.5, medium: 2, high: 3 }
+
 /** Esfuerzo por defecto de un check todavía sin ficha: ni optimista ni alarmista. */
 const DEFAULT_EFFORT: SeoAuditIssueEffort = 'medium'
 
+/** Ídem para el valor: un check sin catalogar no se asume trivial ni decisivo. */
+const DEFAULT_VALUE: SeoAuditIssueValue = 'medium'
+
 /**
- * Agrupa los findings por `issueType` y los ordena por severidad ▸ (páginas ÷ esfuerzo).
+ * Alcance × valor de búsqueda ÷ esfuerzo. Los tres ejes son necesarios: sin alcance no se
+ * distingue un problema aislado de uno sistémico, sin valor la trivia de sitio gana por
+ * volumen, y sin esfuerzo se recomienda primero lo más caro de arreglar.
+ */
+const priorityScore = (group: SeoAuditIssueGroup): number =>
+  (group.affectedPages * VALUE_WEIGHT[group.value]) / EFFORT_WEIGHT[group.effort]
+
+/**
+ * Agrupa los findings por `issueType` y los ordena por severidad ▸ (páginas × valor ÷ esfuerzo).
  *
  * Recibe el mapa por severidad tal cual lo entrega `readSiteAuditReport`.
  */
@@ -77,6 +103,7 @@ export const groupAuditIssues = (
       // copy: si algún día difieren, gana el dato persistido, no el texto.
       severity: items[0].severity,
       effort: entry?.effort ?? DEFAULT_EFFORT,
+      value: entry?.value ?? DEFAULT_VALUE,
       // URLs DISTINTAS: el mismo check puede venir repetido por página y contar filas
       // inflaría el volumen respecto de lo que el operador va a tener que abrir.
       affectedPages: new Set(items.map(item => item.url)).size,
@@ -92,8 +119,7 @@ export const groupAuditIssues = (
       return bySeverity
     }
 
-    const byPriority =
-      right.affectedPages / EFFORT_WEIGHT[right.effort] - left.affectedPages / EFFORT_WEIGHT[left.effort]
+    const byPriority = priorityScore(right) - priorityScore(left)
 
     if (byPriority !== 0) {
       return byPriority

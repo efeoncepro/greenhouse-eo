@@ -32,6 +32,29 @@ describe('groupAuditIssues', () => {
     expect(groups[1].issueType).toBe('no_image_alt')
   })
 
+  it('no deja que la higiene sin valor de búsqueda encabece su tier por alcance', () => {
+    // El caso que destapó la auditoría seo-aeo: un favicon ausente (91 páginas, rápido de
+    // arreglar, sin efecto de búsqueda medible) le ganaba a imágenes sin `alt` (50 páginas,
+    // igual de rápido, pero con efecto real en búsqueda de imágenes y accesibilidad).
+    const groups = groupAuditIssues(
+      bucket([
+        ...Array.from({ length: 91 }, (_, i) => finding('no_favicon', 'notice', `https://x.cl/a${i}`)),
+        ...Array.from({ length: 50 }, (_, i) => finding('no_image_alt', 'notice', `https://x.cl/b${i}`))
+      ])
+    )
+
+    expect(groups.map(group => group.issueType)).toEqual(['no_image_alt', 'no_favicon'])
+  })
+
+  it('lista la higiene igual, sólo la hunde', () => {
+    // `low` pesa 0.5, no 0: esconder un issue sería la otra forma de mentir sobre el
+    // diagnóstico. Tiene que seguir apareciendo y ser drilleable.
+    const groups = groupAuditIssues(bucket([finding('no_favicon', 'notice', 'https://x.cl/a')]))
+
+    expect(groups).toHaveLength(1)
+    expect(groups[0].value).toBe('low')
+  })
+
   it('dentro de la misma severidad prioriza más páginas por menos esfuerzo', () => {
     // `no_h1_tag` (low) con 10 páginas vs `is_http` (high) con 12: 10/1 > 12/3.
     const groups = groupAuditIssues(

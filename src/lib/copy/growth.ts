@@ -2400,7 +2400,7 @@ export const GH_GROWTH_SEO_AUDIT = {
     title: 'Issues priorizados',
     // Se nombra EXACTAMENTE lo que ordena la lista. Prometer un criterio que los datos no
     // sostienen es la misma clase de mentira que pintar un cero donde no hubo medición.
-    subtitle: 'Primero lo crítico; dentro de cada nivel, lo que toca más páginas y cuesta menos resolver',
+    subtitle: 'Primero lo crítico; dentro de cada nivel, lo que más mueve la aguja en búsqueda por lo que menos cuesta resolver',
     affected: (pages: number) => (pages === 1 ? '1 página afectada' : `${pages} páginas afectadas`),
     view: 'Ver',
     viewAria: (issueName: string) => `Ver las páginas afectadas por ${issueName}`,
@@ -2499,59 +2499,80 @@ export const GH_GROWTH_SEO_AUDIT = {
  *   low    → cambio de plantilla o contenido, se resuelve en lote
  *   medium → requiere criterio por página o tocar reglas del sitio
  *   high   → infraestructura, arquitectura o trabajo editorial de fondo
+ *
+ * ⚠️ `value` es cuánto mueve la aguja EN BÚSQUEDA, y NO es redundante con la severidad.
+ * La severidad mide qué tan roto está algo; `value` mide cuánto importa arreglarlo. Dentro
+ * de `notice` conviven higiene cosmética y señales reales: un favicon ausente afecta la
+ * presentación de marca en el SERP, un `alt` ausente afecta búsqueda de imágenes y
+ * accesibilidad. Sin este eje, el orden por alcance ascendía la trivia que toca todo el
+ * sitio por encima de lo que de verdad conviene atacar (hallazgo de la auditoría `seo-aeo`
+ * 2026-08-08: "Sin favicon · 91 páginas" encabezaba el tier por sobre "Imágenes sin texto
+ * alternativo · 50 páginas").
+ *   high   → rastreo, indexación, canonicalización, contenido, datos estructurados
+ *   medium → CTR, experiencia de página, búsqueda de imágenes
+ *   low    → higiene sin efecto de búsqueda medible
  */
 export const GH_GROWTH_SEO_AUDIT_ISSUES: Readonly<
-  Record<string, { readonly label: string; readonly effort: 'low' | 'medium' | 'high'; readonly hint: string }>
+  Record<
+    string,
+    {
+      readonly label: string
+      readonly effort: 'low' | 'medium' | 'high'
+      /** Cuánto mueve la aguja en búsqueda. NO es lo mismo que la severidad. */
+      readonly value: 'low' | 'medium' | 'high'
+      readonly hint: string
+    }
+  >
 > = {
   // Estado HTTP / disponibilidad.
-  is_broken: { label: 'Página rota', effort: 'high', hint: 'La página no responde correctamente y no puede indexarse.' },
-  is_4xx_code: { label: 'Error 4xx', effort: 'medium', hint: 'La página responde "no encontrada" o "sin acceso" a quien la visita.' },
-  is_5xx_code: { label: 'Error 5xx del servidor', effort: 'high', hint: 'El servidor falla al entregar la página. Es un problema de infraestructura.' },
+  is_broken: { label: 'Página rota', effort: 'high', value: 'high', hint: 'La página no responde correctamente y no puede indexarse.' },
+  is_4xx_code: { label: 'Error 4xx', effort: 'medium', value: 'high', hint: 'La página responde "no encontrada" o "sin acceso" a quien la visita.' },
+  is_5xx_code: { label: 'Error 5xx del servidor', effort: 'high', value: 'high', hint: 'El servidor falla al entregar la página. Es un problema de infraestructura.' },
 
   // Canonicalización.
-  canonical_to_broken: { label: 'Canonical apunta a una página rota', effort: 'medium', hint: 'La página declara como versión oficial una URL que no funciona.' },
-  recursive_canonical: { label: 'Canonical recursivo', effort: 'medium', hint: 'Las etiquetas canonical se apuntan entre sí en círculo y anulan la señal.' },
-  canonical_to_redirect: { label: 'Canonical apunta a una redirección', effort: 'medium', hint: 'La versión oficial declarada redirige a otra parte: la señal se diluye.' },
-  canonical_chain: { label: 'Cadena de canonicals', effort: 'medium', hint: 'Varias canonical encadenadas antes de llegar a la URL final.' },
-  is_link_relation_conflict: { label: 'Conflicto entre relaciones de enlace', effort: 'medium', hint: 'Las etiquetas de relación se contradicen sobre cuál es la versión buena.' },
+  canonical_to_broken: { label: 'Canonical apunta a una página rota', effort: 'medium', value: 'high', hint: 'La página declara como versión oficial una URL que no funciona.' },
+  recursive_canonical: { label: 'Canonical recursivo', effort: 'medium', value: 'high', hint: 'Las etiquetas canonical se apuntan entre sí en círculo y anulan la señal.' },
+  canonical_to_redirect: { label: 'Canonical apunta a una redirección', effort: 'medium', value: 'medium', hint: 'La versión oficial declarada redirige a otra parte: la señal se diluye.' },
+  canonical_chain: { label: 'Cadena de canonicals', effort: 'medium', value: 'medium', hint: 'Varias canonical encadenadas antes de llegar a la URL final.' },
+  is_link_relation_conflict: { label: 'Conflicto entre relaciones de enlace', effort: 'medium', value: 'medium', hint: 'Las etiquetas de relación se contradicen sobre cuál es la versión buena.' },
 
   // Meta esencial.
-  no_title: { label: 'Sin etiqueta de título', effort: 'low', hint: 'La página no declara título: el buscador inventa uno.' },
-  no_description: { label: 'Sin meta descripción', effort: 'low', hint: 'Sin descripción propia, el resumen del resultado lo arma el buscador.' },
-  duplicate_title_tag: { label: 'Título duplicado', effort: 'medium', hint: 'Varias páginas comparten el mismo título y compiten entre sí.' },
-  duplicate_meta_tags: { label: 'Meta tags duplicados', effort: 'medium', hint: 'Metadatos repetidos entre páginas distintas.' },
-  no_h1_tag: { label: 'Sin encabezado H1', effort: 'low', hint: 'La página no declara de qué trata en su encabezado principal.' },
-  title_too_long: { label: 'Título demasiado largo', effort: 'low', hint: 'El buscador lo va a recortar en el resultado.' },
-  title_too_short: { label: 'Título demasiado corto', effort: 'low', hint: 'El título no alcanza a describir la página.' },
+  no_title: { label: 'Sin etiqueta de título', effort: 'low', value: 'high', hint: 'La página no declara título: el buscador inventa uno.' },
+  no_description: { label: 'Sin meta descripción', effort: 'low', value: 'medium', hint: 'Sin descripción propia, el resumen del resultado lo arma el buscador.' },
+  duplicate_title_tag: { label: 'Título duplicado', effort: 'medium', value: 'high', hint: 'Varias páginas comparten el mismo título y compiten entre sí.' },
+  duplicate_meta_tags: { label: 'Meta tags duplicados', effort: 'medium', value: 'medium', hint: 'Metadatos repetidos entre páginas distintas.' },
+  no_h1_tag: { label: 'Sin encabezado H1', effort: 'low', value: 'medium', hint: 'La página no declara de qué trata en su encabezado principal.' },
+  title_too_long: { label: 'Título demasiado largo', effort: 'low', value: 'medium', hint: 'El buscador lo va a recortar en el resultado.' },
+  title_too_short: { label: 'Título demasiado corto', effort: 'low', value: 'medium', hint: 'El título no alcanza a describir la página.' },
 
   // Redirects y protocolo.
-  redirect_chain: { label: 'Cadena de redirecciones', effort: 'medium', hint: 'La URL pasa por varios saltos antes de llegar a destino.' },
-  has_meta_refresh_redirect: { label: 'Redirección por meta refresh', effort: 'low', hint: 'Redirección hecha con una técnica que el buscador no interpreta bien.' },
-  https_to_http_links: { label: 'Enlaces de HTTPS a HTTP', effort: 'medium', hint: 'Una página segura enlaza a contenido sin cifrar.' },
-  is_http: { label: 'Página servida por HTTP', effort: 'high', hint: 'La página no usa conexión segura.' },
+  redirect_chain: { label: 'Cadena de redirecciones', effort: 'medium', value: 'medium', hint: 'La URL pasa por varios saltos antes de llegar a destino.' },
+  has_meta_refresh_redirect: { label: 'Redirección por meta refresh', effort: 'low', value: 'medium', hint: 'Redirección hecha con una técnica que el buscador no interpreta bien.' },
+  https_to_http_links: { label: 'Enlaces de HTTPS a HTTP', effort: 'medium', value: 'medium', hint: 'Una página segura enlaza a contenido sin cifrar.' },
+  is_http: { label: 'Página servida por HTTP', effort: 'high', value: 'high', hint: 'La página no usa conexión segura.' },
 
   // Contenido.
-  low_content_rate: { label: 'Poco contenido respecto al código', effort: 'high', hint: 'La página tiene mucho más marcado que texto útil.' },
-  low_character_count: { label: 'Muy poco texto', effort: 'high', hint: 'El contenido es demasiado breve para responder una búsqueda.' },
-  low_readability_rate: { label: 'Lectura difícil', effort: 'high', hint: 'El texto exige más esfuerzo de lectura del recomendable.' },
-  lorem_ipsum: { label: 'Contenido de relleno', effort: 'low', hint: 'Quedó texto de maqueta publicado.' },
+  low_content_rate: { label: 'Poco contenido respecto al código', effort: 'high', value: 'high', hint: 'La página tiene mucho más marcado que texto útil.' },
+  low_character_count: { label: 'Muy poco texto', effort: 'high', value: 'high', hint: 'El contenido es demasiado breve para responder una búsqueda.' },
+  low_readability_rate: { label: 'Lectura difícil', effort: 'high', value: 'medium', hint: 'El texto exige más esfuerzo de lectura del recomendable.' },
+  lorem_ipsum: { label: 'Contenido de relleno', effort: 'low', value: 'high', hint: 'Quedó texto de maqueta publicado.' },
 
   // Estructura y descubrimiento.
-  is_orphan_page: { label: 'Página huérfana', effort: 'medium', hint: 'Ninguna otra página del sitio la enlaza: es difícil de descubrir.' },
+  is_orphan_page: { label: 'Página huérfana', effort: 'medium', value: 'high', hint: 'Ninguna otra página del sitio la enlaza: es difícil de descubrir.' },
 
   // Datos estructurados (insumo AEO).
-  has_micromarkup_errors: { label: 'Errores en los datos estructurados', effort: 'medium', hint: 'El marcado que alimenta resultados enriquecidos y respuestas de IA tiene errores.' },
+  has_micromarkup_errors: { label: 'Errores en los datos estructurados', effort: 'medium', value: 'high', hint: 'El marcado que alimenta resultados enriquecidos y respuestas de IA tiene errores.' },
 
   // Performance y tamaño (lab, diagnóstico).
-  high_loading_time: { label: 'Tiempo de carga alto', effort: 'high', hint: 'La página tarda más de lo razonable en responder.' },
-  large_page_size: { label: 'Página muy pesada', effort: 'medium', hint: 'El peso de la página castiga a quien la abre con conexión lenta.' },
-  has_render_blocking_resources: { label: 'Recursos que bloquean el dibujado', effort: 'medium', hint: 'Scripts o estilos que retrasan lo primero que se ve.' },
-  no_content_encoding: { label: 'Sin compresión de contenido', effort: 'low', hint: 'El servidor entrega la página sin comprimir.' },
+  high_loading_time: { label: 'Tiempo de carga alto', effort: 'high', value: 'medium', hint: 'La página tarda más de lo razonable en responder. Es una medición de laboratorio: la señal que Google usa para rankear viene de datos de campo en Search Console.' },
+  large_page_size: { label: 'Página muy pesada', effort: 'medium', value: 'medium', hint: 'El peso de la página castiga a quien la abre con conexión lenta. Es una medición de laboratorio: la señal que Google usa para rankear viene de datos de campo en Search Console.' },
+  has_render_blocking_resources: { label: 'Recursos que bloquean el dibujado', effort: 'medium', value: 'medium', hint: 'Scripts o estilos que retrasan lo primero que se ve. Es una medición de laboratorio: la señal que Google usa para rankear viene de datos de campo en Search Console.' },
+  no_content_encoding: { label: 'Sin compresión de contenido', effort: 'low', value: 'low', hint: 'El servidor entrega la página sin comprimir. Es una medición de laboratorio: la señal que Google usa para rankear viene de datos de campo en Search Console.' },
 
   // Higiene HTML.
-  no_image_alt: { label: 'Imágenes sin texto alternativo', effort: 'low', hint: 'Las imágenes no describen su contenido: afecta accesibilidad y búsqueda de imágenes.' },
-  no_favicon: { label: 'Sin favicon', effort: 'low', hint: 'El sitio no declara su ícono de pestaña.' },
-  no_doctype: { label: 'Sin doctype', effort: 'low', hint: 'El documento no declara su tipo y el navegador adivina cómo interpretarlo.' },
-  no_encoding_meta_tag: { label: 'Sin meta de codificación', effort: 'low', hint: 'La página no declara su codificación de caracteres.' },
-  deprecated_html_tags: { label: 'Etiquetas HTML obsoletas', effort: 'medium', hint: 'El marcado usa etiquetas que el estándar ya retiró.' }
+  no_image_alt: { label: 'Imágenes sin texto alternativo', effort: 'low', value: 'medium', hint: 'Las imágenes no describen su contenido: afecta accesibilidad y búsqueda de imágenes.' },
+  no_favicon: { label: 'Sin favicon', effort: 'low', value: 'low', hint: 'El sitio no declara su ícono de pestaña.' },
+  no_doctype: { label: 'Sin doctype', effort: 'low', value: 'low', hint: 'El documento no declara su tipo y el navegador adivina cómo interpretarlo.' },
+  no_encoding_meta_tag: { label: 'Sin meta de codificación', effort: 'low', value: 'low', hint: 'La página no declara su codificación de caracteres.' },
+  deprecated_html_tags: { label: 'Etiquetas HTML obsoletas', effort: 'medium', value: 'low', hint: 'El marcado usa etiquetas que el estándar ya retiró.' }
 }
