@@ -1,5 +1,47 @@
 # TASK-1307 — Growth SEO: Rank & URL Performance Over Time UI ★
 
+## Delta 2026-08-07 — segunda ronda post-cierre: un solo header canónico para las tres pestañas (commit 67c2d1218)
+
+El operador reportó que la zona de controles se veía **suelta sobre el lienzo gris**, y que
+Rendimiento (esta task) y Keywords (`TASK-1308`) lo habían resuelto de formas distintas. Esto es un
+delta posterior al cierre: **el lifecycle sigue `complete`**, no reabre la task ni cambia su alcance.
+
+**Causa raíz —común a las tres pestañas de Search Visibility—:** ninguna usaba la región `header` de
+`SurfaceRecipe`. Todo el chrome (título, selectores de alcance, chip de frescura, tabs, leyenda) iba
+dentro de `regions.primary`, así que quedaba flotando sin superficie contenedora. En 390px eso
+obligaba a recorrer un scroll completo de chrome antes del primer dato.
+
+**Corrección.** Resumen, Rendimiento y Keywords usan ahora el mismo shell: `SurfaceRecipe
+kind='analyticsReport' plane='none'` con `header={…}` y `WorkbenchHeader kind='report'` —la primitive
+del surface system diseñada para esto—, con reparto idéntico en las tres:
+
+- `secondaryActions` → los controles de alcance que el operador cambia;
+- `meta` → la frescura del dato (y la leyenda cuando aplica a la página completa);
+- `supporting` → los tabs hermanos bajo su divisor.
+
+**Consecuencia propia de esta pantalla:** la leyenda ●/◑ bajó a la card del gráfico, junto a las
+series que describe (prop `source` nuevo en `SeoRankEvolutionChart`). El gráfico carga su propia
+procedencia y la cabecera queda sólo con lo que aplica a toda la pantalla. La consecuencia sobre
+Keywords quedó registrada en el delta equivalente de `TASK-1308`.
+
+**Dos defectos de 390px corregidos en el mismo paso:**
+
+1. El tab **activo** se recortaba bajo las flechas de scroll de los tabs — se quitó
+   `allowScrollButtonsMobile` y en `xs` se oculta el ícono de cada tab para que los cuatro quepan.
+2. El selector de período truncaba su valor vigente ("Últimos 90 …") al ponerlo 2-up: en móvil cada
+   control vuelve a ocupar su fila completa.
+
+**Evidencia.** 579 tests focales verdes (`src/views/greenhouse/admin/growth`, `src/lib/growth/seo`,
+`src/components/greenhouse/primitives`); `pnpm typecheck` y `pnpm lint` limpios, con el hook de
+pre-push (lint + typecheck sobre todo el repo) en verde; los **5 scenarios GVC del módulo en OK**,
+incluidos los dos móviles (`growth-seo-performance`, `growth-seo-keywords`, `growth-seo-overview`,
+`growth-seo-overview-mobile`, `growth-seo-performance-mobile`); revisión visual de frames en desktop
+1440 y 390px de las tres pantallas y del rango de 365 días.
+
+**Rollout: `code complete` en `develop` (pusheado a `origin/develop`), promoción a producción
+pendiente.** La promoción `develop → main` va batcheada con `TASK-1308` y `TASK-1655`, por el release
+control plane — sigue siendo el checkbox de §`Pendiente heredado de TASK-1306`.
+
 ## Delta 2026-08-07 — ronda de mejoras post-cierre (commit 0d48c283d)
 
 Tras la revisión con las skills de product design y SEO/AEO, el operador aprobó implementar las 8

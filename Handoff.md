@@ -1,5 +1,43 @@
 # Handoff activo
 
+### TASK-1310 — visual cliente SEO tomada (2026-08-08)
+
+`TASK-1310` pasó a `in-progress` en `develop` tras verificar que `TASK-1305` y `TASK-1307`
+están completos y que existen `readSeoAeoGap`, `classifyQuadrant`, `readRankEvolution` y el
+stack ECharts lazy que esta surface hereda. La task declara `Blocked by: none`; el hook pasó.
+El siguiente paso es completar la dirección visual repo-native y obtener el checkpoint de plan
+por esfuerzo Alto antes de implementar `/growth/seo`, `/growth/seo/report` y el quadrant 360.
+No crear `readRankSnapshotLatest` paralelo: el resumen debe derivar la última observación desde
+el reader vigente o un contrato existente. No hay push/deploy autorizado.
+
+### Search Visibility — header canónico único en las tres pestañas (2026-08-07, ciclo documental cerrado)
+
+Segunda ronda post-cierre de `TASK-1307` (commits `0d48c283d`, `f17822544`, `67c2d1218`, `2e9cf9311`,
+todos en `origin/develop`). **Ni 1307 ni 1308 se reabren: lifecycle `complete`, esto es delta.**
+
+**Causa raíz común a Resumen · Rendimiento · Keywords:** ninguna usaba la región `header` de
+`SurfaceRecipe` — el chrome (título, selectores de alcance, chip de frescura, tabs, leyenda) iba
+dentro de `regions.primary` y quedaba flotando sobre el lienzo gris. En 390px era un scroll completo
+de chrome antes del primer dato, y cada pestaña lo había resuelto distinto.
+
+**Corregido:** las tres usan `SurfaceRecipe kind='analyticsReport' plane='none'` + `header={…}` con
+`WorkbenchHeader kind='report'`, reparto idéntico (`secondaryActions` = alcance · `meta` = frescura ·
+`supporting` = tabs bajo divisor). Rendimiento bajó la leyenda ●/◑ a la card del gráfico (prop
+`source` nuevo en `SeoRankEvolutionChart`). **Keywords ganó contrato:** sus controles dejaron de vivir
+dentro del veredicto y de repetirse en cada superficie de estado — desde la cabecera ya **no pueden
+desaparecer en un estado vacío**, incluido el Space sin Search Console que forzaba la duplicación
+(`context` de `KeywordOpportunityVerdict` quedó opcional). Dos defectos de 390px cerrados de paso: el
+tab activo recortado bajo las flechas de scroll y el período truncando su valor vigente al ir 2-up.
+
+**Verificado:** 579 tests focales verdes, `typecheck` + `lint` limpios (hook de pre-push en verde), los
+**5 scenarios GVC del módulo en OK** (incluidos `growth-seo-overview-mobile` y
+`growth-seo-performance-mobile`) y revisión visual de frames 1440 + 390px de las tres pantallas y del
+rango de 365 días.
+
+**Pendiente:** la promoción `develop → main`, **batcheada con TASK-1308 y TASK-1655**, por el release
+control plane. Y para `TASK-1655` sigue abierto el **export nativo de GSC en la propiedad de Berel**:
+necesita permiso de Owner, es out-of-band y no se destraba desde el repo.
+
 ### Carril de keywords OBJETIVO — TASK-1659…1662 (2026-08-07)
 
 Salió de que el operador cuestionara por qué TASK-1308 no usó los ejes especificados. La respuesta
@@ -98,13 +136,12 @@ Berel y Efeonce. TASK-1304 operativamente completa de punta a punta; cero pendie
 
 ### Autenticación local Gcloud con Playwright (2026-08-07)
 
-Se agregó el proceso local explícito `pnpm gcloud:auth:playwright`, invocable por Codex o Claude, para
-renovar CLI + ADC cuando el operador lo solicite, con `--force` para repetir OAuth y `--check-only` para
-verificar sin abrir navegador. La skill espejo `greenhouse-gcloud-auth-playwright` fija este recorrido. El setup
-`pnpm gcloud:auth:playwright:setup` guarda la cuenta y la clave en `.auth/gcloud-auth-credentials.json`
-ignorado por Git y con permisos `0600`; el perfil Chrome aislado queda en `.auth/gcloud-auth-profile`.
-El flujo usa Playwright visible, no imprime URLs/códigos/cookies y termina con `gcloud-auth-preflight.sh`.
-No hay scheduler ni rollout remoto.
+Proceso local explícito `pnpm gcloud:auth:playwright` (invocable por Codex o Claude) para renovar CLI +
+ADC a pedido del operador: `--force` repite OAuth, `--check-only` verifica sin abrir navegador; skill
+espejo `greenhouse-gcloud-auth-playwright`. El setup `…:setup` guarda cuenta y clave en
+`.auth/gcloud-auth-credentials.json` (gitignored, `0600`) y el perfil Chrome aislado en
+`.auth/gcloud-auth-profile`. Playwright visible, no imprime URLs/códigos/cookies, cierra con
+`gcloud-auth-preflight.sh`. Sin scheduler ni rollout remoto.
 
 ### TASK-1307 + TASK-1655 — pantalla ancla SEO + Historical Data Platform (2026-08-07)
 
@@ -117,8 +154,8 @@ fuentes** (keyword×posición intenta DataForSEO ◑ y cae a la posición medida
 la serie exacta es más joven — regla del operador, nunca promediadas); cobertura REAL
 declarada en el chart ("N de M días con medición"). GVC **premium** verde: rubric
 enterprise pass, `ui:visual-gate` PASS, `ui:quality` PASS (avg 4.56, floor 4.5). Suite
-growth/seo 151/151. Pendiente de cierre: `pnpm build` prod (corriendo), lifecycle/docs
-finales y la **promoción develop→main heredada de 1306** (checkbox rojo del closing).
+growth/seo 151/151. **Cerrada y documentada** (ver la entrada del header canónico, arriba);
+lo único vivo es la **promoción develop→main heredada de 1306**, batcheada con 1308/1655.
 
 **TASK-1655** (in-progress): hallazgo de fondo — el módulo era **forward-only** (5 días
 GSC / 2 de rank teniendo 16 meses en la API). Slices 1-3 SHIPPED: mirror
@@ -233,16 +270,10 @@ deploya el mismo SHA — converge inofensivo. Runbook:
 
 ### Hallazgo MCP gateway — clientes Claude no conectan por falta de DCR (2026-08-06)
 
-Al intentar conectar Claude Code al gateway (`claude mcp add` + `/mcp` → Authenticate) falla con
-`Incompatible auth server: does not support dynamic client registration`. Causa: el cliente MCP de
-Claude (Code y claude.ai custom connectors) exige DCR (RFC 7591) para auto-registrarse, y **Entra no
-soporta DCR**. El canary OAuth funciona porque usa la app Entra PRE-registrada (client `32617b87-…`).
-**Fix propuesto (task nueva en `efeonce-mcp`)**: shim de DCR en el gateway — endpoint `/register` que
-devuelve el client_id público pre-registrado + metadata del authorization server; patrón conocido para
-gateways MCP respaldados por Entra (~50-80 líneas). Con eso Claude Code/claude.ai/Desktop conectan sin
-fricción. Hasta entonces, la vía operable del 360 por MCP sigue siendo la service identity (canary) y
-el smoke OAuth del script.
-
+⚠️ **Superseded el mismo día** por el break-glass del shim DCR (entrada TASK-1654, arriba: LIVE y
+verificado con el cliente real). Se conserva sólo la causa: el cliente MCP de Claude exige DCR
+(RFC 7591) para auto-registrarse y **Entra no lo soporta**, así que sin el shim `/register` del
+gateway falla con `Incompatible auth server: does not support dynamic client registration`.
 
 ### Efeonce dejó de ser cliente de sí misma — modelado corregido (2026-08-06)
 
@@ -363,11 +394,9 @@ sincronizadas como ruido). Aplicado con `scripts/growth/provision-efeonce-own-br
   sin GSC aún) · visibility-360 → **`no_seo_data` honesto** (lente SEO llega al conectar la GSC de
   efeoncepro.com — OAuth de TASK-1282/1283, rollout pendiente — o con TASK-1303/DataForSEO).
 
-**Pendientes operativos:** (1) merge en HubSpot de las auto-companies `efeonce.org` (56011409567) y
-`efeonce` (57099835819) hacia la company canónica — el sync propaga; NUNCA borrarlas por SQL. (2)
-~~`website_url` de EO-ORG-0007 vacío~~ **CERRADO 2026-08-06** — `https://efeoncepro.com` por la puerta
-canónica `upsertCanonicalOrganization`. (3) Conectar GSC de efeoncepro.com cuando 1282/1283
-destraben su rollout. SKY ya tiene lente AEO ligada; su SEO sigue igual de pendiente que Efeonce.
+**Pendiente vivo:** conectar la GSC de efeoncepro.com cuando 1282/1283 destraben su rollout. SKY ya
+tiene lente AEO ligada; su SEO sigue igual de pendiente. Los otros dos pendientes de esta entrada
+(auto-companies HubSpot · `website_url`) están resueltos o repetidos en las entradas de 2026-08-06.
 
 ### TASK-1305 — Cruce SEO↔AEO (quadrant 360) COMPLETE (2026-08-05)
 
@@ -393,48 +422,28 @@ el reader lo consumirán TASK-1645/1310 — cada consumer valida el flag en su r
 del camino MCP-first: `TASK-1645`** (lane ecosystem + MCP tools — get_seo_visibility_360 nace con este
 cruce). Sin push aún.
 
-### TASK-1646 — Cloud Infrastructure doc particionado: temáticos + HISTORIAL + stub (2026-08-05)
+### TASK-1646 — Cloud Infrastructure doc particionado (2026-08-05) · compactado 2026-08-07
 
-**Complete.** El monolito `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` (1340 líneas / 24 deltas, finding
-`architecture_doc_monolith`) quedó dividido según el precedente ui-platform:
-`docs/architecture/cloud-infrastructure/` (11 temáticos de estado vigente + `HISTORIAL.md` con los
-25 deltas verbatim) + router stub en el path original + ADR
-`GREENHOUSE_CLOUD_INFRASTRUCTURE_RESTRUCTURE_DECISION_V1.md`.
+**Complete.** El monolito `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` quedó dividido según el precedente
+ui-platform: `docs/architecture/cloud-infrastructure/` (11 temáticos + `HISTORIAL.md`) + router stub +
+ADR `GREENHOUSE_CLOUD_INFRASTRUCTURE_RESTRUCTURE_DECISION_V1.md`. **Entrada canónica:** el `README.md`
+de esa carpeta (cambio vigente → temático; cronología → HISTORIAL; nada al stub). Al separar se
+corrigieron inventarios stale de la auditoría 2026-04-23: vigente 2026-08-05 = **46 scheduler jobs**
+(`services/ops-worker/deploy.sh`), **8 crons Vercel** (`vercel.json`), **7 workflows de deploy**;
+descartes anotados `⚠️ Superseded`. Re-auditoría live GCP sigue siendo TASK-127.
 
-**Para el próximo agente que toque infra cloud:**
+### TASK-1301 — Capabilities + entitlement per-org SEO COMPLETE (2026-08-05) · compactado 2026-08-07
 
-- Entrada canónica: `docs/architecture/cloud-infrastructure/README.md` (mapa "dónde vive X").
-  Cambio vigente → doc temático; cronología → HISTORIAL. No agregar contenido al stub.
-- Al separar se resolvieron contradicciones contra runtime: los inventarios del monolito eran de la
-  auditoría 2026-04-23. Vigente verificado 2026-08-05: **46 scheduler jobs** del ops-worker (SoT
-  `services/ops-worker/deploy.sh`), **8 crons Vercel** (SoT `vercel.json`), **7 workflows de deploy**.
-  El detalle de qué se descartó y por qué está en el ADR + anotaciones `⚠️ Superseded` del HISTORIAL.
-- Gates verdes: `docs:closure-check` sin `architecture_doc_monolith`, `docs:context-check:strict`
-  0/0, `task:lint` template=1/0/0. Re-auditoría live GCP sigue siendo TASK-127.
-
-### TASK-1301 — Capabilities + entitlement per-org SEO COMPLETE (2026-08-05)
-
-Segundo eslabón de la Ola B MCP-first de EPIC-022, cerrado el mismo día que TASK-1299. Entregado:
-5 capabilities `growth.seo.*` (catálogo + seed `capabilities_registry` migración `20260805162304440` +
-grants en `runtime.ts`: `observation.read` set interno base; `target.configure`/`audit.run` set operador;
-`entitlement.manage` SOLO ADMIN+ACCOUNT; `report.read_client` client_* scope own) — coverage verde.
-Módulo **`seo_v1`** seedeado en `greenhouse_client_portal.modules` (migración `20260805163024516`;
-descubierto en smoke live que `module_assignments.module_key` tiene FK al catálogo — la spec no lo
-declaraba) con `data_sources=['growth.seo']` + union `ClientPortalDataSource` (parity verde).
-**Chokepoint único `enforceSeoRunEntitlement`** (`src/lib/growth/seo/entitlement.ts`): consumer-agnóstico
-(mandato parity+MCP), tier `metadata_json.seo_tier`, `expired` explícito, allowance audits/mes + budget
-USD/mes por tier (env-knobs `GROWTH_SEO_*` con defaults — son config, no flags `*_ENABLED`), gasto =
-`SUM(provider_cost)` de los snapshots de 1299 con hook declarado a `seo_provider_spend_daily` (TASK-1300).
-
-Evidencia: 12 tests focales + coverage + parity; smoke E2E live contra PG real
-(`scripts/growth/_sanity-seo-entitlement.ts`: no_entitlement → allowed contracted → budget_exhausted
-con costo estimado → revocado; cero residuo). Full suite **10076/0** + build prod verdes. Migraciones
-aplicadas en `greenhouse-pg-dev`. Commits `de94363df` (Slice 1) + `100ee9fec` (Slice 2). Sin push aún.
-
-**Rollout:** ninguna org tiene assignment `seo_v1` (primer assignment = paso operativo, Berel Fase 0,
-vía `entitlement.manage`). Prod recibe migraciones+código vía release control plane. **Próximo paso:**
-`TASK-1302` (GSC materializer + `readKeywordOpportunities` — OJO: requiere rollout real de la conexión
-GSC de TASK-1282/1283) y luego `TASK-1645` (lane ecosystem + MCP tools). `TASK-1300` puede ir en paralelo.
+Segundo eslabón de la Ola B MCP-first de EPIC-022. 5 capabilities `growth.seo.*` (seed
+`capabilities_registry` migración `20260805162304440` + grants en `runtime.ts`; `entitlement.manage`
+SOLO ADMIN+ACCOUNT; `report.read_client` client_* scope own) — coverage verde. Módulo **`seo_v1`**
+seedeado en `greenhouse_client_portal.modules` (migración `20260805163024516`; hallazgo del smoke:
+`module_assignments.module_key` tiene FK al catálogo, la spec no lo declaraba). **Chokepoint único
+`enforceSeoRunEntitlement`** (`src/lib/growth/seo/entitlement.ts`), consumer-agnóstico por mandato
+parity+MCP: tier `metadata_json.seo_tier`, `expired` explícito, allowance + budget USD/mes por tier
+(env-knobs `GROWTH_SEO_*` = config, NO flags `*_ENABLED`), gasto = `SUM(provider_cost)` de 1299.
+Evidencia: 12 tests + smoke live con cero residuo (`scripts/growth/_sanity-seo-entitlement.ts`), suite
+**10076/0**, migraciones aplicadas en `greenhouse-pg-dev`. Commits `de94363df` + `100ee9fec`.
 
 ### TASK-1299 — Schema SEO fundacional aplicado + contrato parity/MCP de EPIC-022 (2026-08-05)
 
@@ -471,15 +480,13 @@ TASK-1631 (Efeonce Customer Identity + MCP Federation) está `in-progress` en `d
 runtime que la spec no tiene drift (gateway single-issuer, `clientId = azp ?? sub`, fusión `scp∪scope∪roles`).
 Con aprobación del operador se ejecutaron **S0.2 y S0.3** del Slice 0:
 
-- **S0.2 (costos):** ADR §`Slice 0 measurement — build vs buy vs hybrid (2026-08-05)`. Native medido contra el
-  código real = 7–10.5 semanas senior + operación permanente (el broker sister-platform NO tiene capa propia de
-  autenticación de personas; depende de la sesión NextAuth del portal). WorkOS = USD 99/mes planos; curva SSO
-  USD 125/conexión/mes con **trigger de revisita a ≥5 conexiones enterprise**; exit re-enlazable por diseño.
-  **Recomendación Slice 0: WorkOS** con binding provider-neutral — pendiente de aprobación del operador.
-- **S0.3 (privacidad):** memo `docs/operations/EFEONCE_CUSTOMER_IDENTITY_PRIVACY_REVIEW_V1.md` — Efeonce
-  controller / IDP encargado, minimización (qué se envía vs qué queda), checklist DPA/subprocesadores/región/
-  retención/ARCO/notificación contractual (CL 21.719 plena el 1-dic-2026 + CO/MX/PE). **El gate sigue abierto**:
-  falta DPA firmado + validación con abogado habilitado.
+- **S0.2 (costos):** ADR §`Slice 0 measurement — build vs buy vs hybrid`. Native medido contra el código real =
+  7–10.5 semanas senior + operación permanente (el broker sister-platform NO autentica personas; depende de la
+  sesión NextAuth del portal). WorkOS = USD 99/mes planos + SSO USD 125/conexión/mes, **revisita a ≥5 conexiones
+  enterprise**. **Recomendación: WorkOS** con binding provider-neutral.
+- **S0.3 (privacidad):** memo `docs/operations/EFEONCE_CUSTOMER_IDENTITY_PRIVACY_REVIEW_V1.md` (Efeonce
+  controller / IDP encargado, minimización, checklist DPA/subprocesadores/región/retención/ARCO; CL 21.719
+  plena el 1-dic-2026 + CO/MX/PE). **Gate abierto:** falta DPA firmado + abogado habilitado.
 
 **Delta mismo día — composición APROBADA con staging de gasto cero.** El operador no quiere pagar WorkOS ahora;
 la recomendación se ajustó y aprobó: (1) hoy USD 0, nada provisionado, solo diseño; (2) primer cliente
@@ -500,15 +507,12 @@ logins OAuth) y el contrato de convergencia del login Greenhouse. Nada externo s
 ### Registro de partnerships — fuente operativa creada (2026-08-05)
 
 Se creó [`EFEONCE_PARTNERSHIP_REGISTRY_V1.md`](docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md) como registro
-central de partnerships, providers y postulaciones de Efeonce. El primer refresh documenta Google Cloud con evidencia
-del Partner Network Hub: la cuenta está `Partner registrado`, las rutas aparecen como `Registrado`, y la debida
-diligencia está `En curso`; todavía no hay nivel Select/Premier/Diamond activo ni capacidad para crear oportunidades.
-
-El registro también consolida Claude, OpenAI, BytePlus, Runway, ElevenLabs, FLUX, AWS, Salesforce, HubSpot, Lovable,
-HeyGen y otras relaciones, separando partnership activo, cuenta registrada, postulación, provider en uso, bloqueo y
-target. Google envió el 2026-08-06 la solicitud formal de due diligence anti-soborno, con fecha límite 2026-08-13; el
-próximo paso operativo es responder las decisiones del formulario antes de esa fecha y actualizar el registro sólo con
-evidencia primaria. La auditoría de postulaciones de IA del 2026-07-26 queda como fotografía histórica.
+central de partnerships, providers y postulaciones (Google Cloud, Claude, OpenAI, BytePlus, Runway, ElevenLabs, FLUX,
+AWS, Salesforce, HubSpot, Lovable, HeyGen…), separando partnership activo · cuenta registrada · postulación · provider
+en uso · bloqueo · target. Google Cloud está `Partner registrado` con debida diligencia `En curso` (sin nivel
+Select/Premier/Diamond ni capacidad de crear oportunidades). ⚠️ **Google envió el 2026-08-06 la due diligence
+anti-soborno con fecha límite 2026-08-13**: responder el formulario y actualizar el registro sólo con evidencia
+primaria. La auditoría de postulaciones de IA del 2026-07-26 queda como fotografía histórica.
 
 ### Nexa — retiro del modo "Compacto" + diagnóstico del lane que se abría solo (2026-08-05)
 
@@ -551,13 +555,9 @@ comportamiento abiertas que bloquean `UI ready: yes`). `task:lint` y `ops:lint -
 decisión es un solo shell del Producer con tres estudios adaptativos —Image, Video y Audio— gobernados por
 `RouteCreativeContract`, con feed/muro y asset workspace compartidos.
 
-**Artefactos creados:** dirección visual, wireframes, flujo de usuario, contrato de motion y plan operativo:
-
-- [`EPIC-028-producer-v3-unified-studios.md`](docs/ui/visual-directions/EPIC-028-producer-v3-unified-studios.md)
-- [`EPIC-028-producer-v3-unified-studios.md`](docs/ui/wireframes/EPIC-028-producer-v3-unified-studios.md)
-- [`EPIC-028-producer-v3-unified-studios-flow.md`](docs/ui/flows/EPIC-028-producer-v3-unified-studios-flow.md)
-- [`EPIC-028-producer-v3-unified-studios-motion.md`](docs/ui/motion/EPIC-028-producer-v3-unified-studios-motion.md)
-- [`EPIC_028_PRODUCER_V3_EXECUTION_PLAN_V1.md`](docs/operations/creative-studio/EPIC_028_PRODUCER_V3_EXECUTION_PLAN_V1.md)
+**Artefactos creados:** `EPIC-028-producer-v3-unified-studios[-flow|-motion].md` en
+`docs/ui/{visual-directions,wireframes,flows,motion}/` + plan operativo
+`docs/operations/creative-studio/EPIC_028_PRODUCER_V3_EXECUTION_PLAN_V1.md`.
 
 **Owners actualizados:** TASK-1523, TASK-1633, TASK-1552 y TASK-1643 contienen ahora los criterios de
 aceptación y límites de ownership. TASK-1641 permanece restringida al lane backend/API de promoción; no se le

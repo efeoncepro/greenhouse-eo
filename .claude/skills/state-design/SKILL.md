@@ -65,6 +65,10 @@ Greenhouse is desktop-first internal portal. No service worker, no offline mode.
 
 For cached data (TanStack Query, RSC cache with `'use cache'`), show timestamp helper. `formatDistanceToNow(date, { addSuffix: true, locale: es })` from `date-fns` → "hace 5 minutos".
 
+### 11. Scope controls belong to the header, not to each state surface (TASK-1307)
+
+When a screen has scope/filter controls AND empty / degraded / denied surfaces, the controls go in the recipe `header` (`SurfaceRecipe header={…}` renders outside the region plane), not inside the body. Otherwise every state surface has to re-render the controls so the user can leave the state — that duplication is the smell, and it is what the header placement removes. The header stays put; only the body swaps between data, `<EmptyState>` and `<ErrorState>`.
+
 ## Compose with (Greenhouse skills)
 
 - `greenhouse-ux-writing` — owns copy for loading / empty / error / degraded.
@@ -74,4 +78,5 @@ For cached data (TanStack Query, RSC cache with `'use cache'`), show timestamp h
 
 ## Version
 
+- **v1.1** — 2026-08-07 — TASK-1307: pinned decision 11 (scope controls live in the recipe header, so state surfaces stop duplicating them).
 - **v1.0** — 2026-05-11 — Initial overlay.

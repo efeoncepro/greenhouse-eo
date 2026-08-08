@@ -187,20 +187,94 @@ import { GreenhouseBreadcrumbs } from '@/components/greenhouse/primitives'
   `design-system-breadcrumbs`.
 
 
+## Surface Chrome Pattern — el chrome va en la región `header`, nunca en `primary` (TASK-1307)
+
+El **chrome** de una superficie es todo lo que la orienta pero no es el dato: breadcrumbs, título, subtítulo, controles de alcance (Space, período, dispositivo, preset), chip de frescura, leyenda de origen y la barra de tabs hermanas. Tiene un lugar declarado en la plataforma: la región **`header`** de `SurfaceRecipe`, que se renderiza **arriba** del `CompositionShell`, fuera del plano de las regiones. `regions.primary` es para el contenido.
+
+Runtime de referencia: las tres pestañas de Search Visibility — `SeoOverviewView`, `SeoPerformanceView` y `KeywordOpportunitiesView` (`src/views/greenhouse/admin/growth/seo/{overview,performance,keywords}/`).
+
+### El modo de falla que este patrón cierra
+
+Las tres pantallas metían **todo** el chrome dentro de `regions.primary` sin usar nunca la región `header` que la propia primitive expone. Con `plane='none'` eso deja los controles como cajas de formulario **flotando sobre el lienzo gris**, sin superficie que los contenga. En 390 px es un scroll completo de chrome antes del primer dato: el control (secundario) ocupando más área que el contenido (primario).
+
+Es un defecto que **pasa los gates**: tokens correctos, primitives correctas, lint y build verdes. Se ve mirando el frame — y se ve mal.
+
+### Forma canónica
+
+```tsx
+<SurfaceRecipe
+  kind='analyticsReport'
+  plane='none'
+  header={
+    <Stack spacing={4}>
+      <GreenhouseBreadcrumbs items={…} />
+      <WorkbenchHeader
+        kind='report'
+        titleComponent='h1'
+        title={…}
+        description={…}
+        meta={/* frescura; leyenda de origen sólo si aplica a TODA la pantalla */}
+        secondaryActions={/* los controles de ALCANCE */}
+        supporting={/* los tabs hermanos, bajo su divisor */}
+      />
+    </Stack>
+  }
+  regions={{ primary: renderBody() }}
+/>
+```
+
+`WorkbenchHeader kind='report'` es la primitive del surface system diseñada exactamente para esto: resuelve a la variant `report`, un plano contenido editorial (`background.paper` + borde + radius `xl` + elevación `raised`). El chrome queda **contenido**, el contenido real queda abajo sobre el lienzo, y la jerarquía se lee sin esfuerzo.
+
+### Reparto de las ranuras
+
+| Ranura | Qué va | Criterio |
+|---|---|---|
+| `secondaryActions` | Controles de **alcance**: Space, período, dispositivo, granularidad, presets. | Es lo que el operador **cambia**. |
+| `meta` | **Hechos sobre el dato**: frescura (`Datos al …`), leyenda de origen. | Se lee, no se toca. |
+| `supporting` | Los **tabs hermanos**. La primitive los baja bajo su propio divisor. | Cabecera con pestañas clásica. |
+| `primaryAction` | A lo más una. | Un header tiene una sola primaria. |
+
+Una leyenda que describe **una** card (p. ej. las series de un gráfico) no es chrome de la pantalla: vive **junto al gráfico que describe**, no en `meta`. En Search Visibility, el Overview conserva la leyenda ●/◑ en `meta` porque aplica a toda la superficie; Rendimiento la mudó a la card del gráfico.
+
+### Consecuencia estructural: los controles sobreviven a los estados del cuerpo
+
+La cabecera se renderiza **siempre**, fuera del cuerpo y de sus estados. Por lo tanto los controles de alcance quedan disponibles **también en los estados vacíos, degradados o denegados**.
+
+Antes había que **duplicarlos dentro de cada superficie de estado** para que un Space sin conexión no dejara al operador sin forma de cambiar de Space. Esa duplicación desapareció al mover el chrome a `header`: un solo lugar declara el alcance y el cuerpo sólo responde a él. Si te encuentras copiando un selector dentro de un `EmptyState`, el chrome está en la región equivocada.
+
+### Coherencia entre pantallas hermanas
+
+Cuando varias pantallas son pestañas de una misma superficie (comparten breadcrumb, título y barra de tabs), su cabecera debe ser **la misma composición**: mismo `kind`, mismo reparto de ranuras, mismo orden. **Dos pantallas hermanas resolviendo su chrome de dos formas distintas es un defecto aunque cada una se vea bien por separado** — el operador cruza entre ellas y la superficie se le mueve bajo los pies.
+
+### Controles de formulario en móvil
+
+En `xs` un control de alcance ocupa la **fila completa** (`flex: { xs: '1 1 100%', md: '0 0 auto' }`). Ponerlos 2-up ahorra una fila pero trunca el valor vigente (`Últimos 90 …`), y **un control cuyo valor actual no se puede leer deja de ser un control**: cuesta más que la fila que ahorra.
+
+Corolario del mismo criterio: el motivo de un control va como `helperText`, no como tooltip — un tooltip sobre un control de formulario se esconde justo cuando el usuario lo abre.
+
+### Reglas
+
+- ✗ **NUNCA** pongas el chrome de la pantalla dentro de `regions.primary`. Va en `header`.
+- ✗ **NUNCA** dejes un control de alcance sobre el lienzo desnudo. Es un defecto de composición, no una preferencia estética.
+- ✗ **NUNCA** dupliques un control de alcance dentro de una superficie de estado; sube el chrome al header.
+- ✓ Con `plane='none'` (contenido que ya es una composición de cards), el header contenido es **la** superficie que sostiene el chrome; sin él, no queda ninguna.
+- ✓ Pantallas hermanas = misma composición de cabecera, verificada en el mismo frame desktop + 390 px.
+
+
 ## Route Tabs Pattern — tabs que navegan NO son un `tablist` (TASK-1306)
 
 Cuando las "tabs" de una superficie son **links a rutas hermanas** (deep-link, back/forward del browser y URL compartible funcionando solos) y no un conmutador de paneles en memoria, el contrato ARIA correcto **no** es el de tabs.
 
 Runtime de referencia: `SeoSearchVisibilityTabs` (`src/views/greenhouse/admin/growth/seo/overview/`), conmutador de `/admin/growth/seo{,/performance,/keywords,/audit}` bajo un mismo viewCode.
 
-**Regla 1 — `role='navigation'` en el TabList.** Con el rol `tablist` por defecto, axe exige `aria-required-children` (cada hijo `role=tab`) y un `aria-controls` apuntando a un panel real. Ninguno de los dos se puede cumplir acá: **el "panel" es la página siguiente**, que Next monta después de navegar. Declarar navegación es lo honesto y elimina el finding sin trucos. El `TabContext` de `@mui/lab` se queda sólo para transportar cuál tab está activa (no hay `TabPanel` que conmutar) y cada `Tab` activo lleva `aria-current='page'`.
+**Regla 1 — `CustomTabsNav` (Tabs plano) + `role='navigation'`, NO el `TabList` de `@mui/lab`.** Con el rol `tablist` por defecto, axe exige `aria-required-children` (cada hijo `role=tab`) y un `aria-controls` apuntando a un panel real. Ninguno de los dos se puede cumplir acá: **el "panel" es la página siguiente**, que Next monta después de navegar.
+
+Y el problema no se arregla sólo declarando el rol: el `TabList` de `@mui/lab` **clona cada `Tab` inyectándole un `aria-controls`** hacia un `TabPanel` que no existe (axe lo marca `aria-valid-attr-value` critical) y ese clone **pisa cualquier override del consumer**. Por eso existe `CustomTabsNav` (`src/@core/components/mui/TabList.tsx`, TASK-1307): un `MuiTabs` plano con el mismo styling pill. Emite las **mismas clases** (`.MuiTabs-*` / `.MuiTab-root`), así que el estilo se comparte por CSS sin duplicarlo; lo único que cambia es que nadie fabrica ARIA hacia paneles fantasma. Cada `Tab` activo lleva `aria-current='page'`.
 
 ```tsx
-<TabContext value={activeTab}>
-  <CustomTabList role='navigation' variant='scrollable' pill='true' aria-label={…}>
-    <Tab component={Link} href={…} aria-current={isActive ? 'page' : undefined} … />
-  </CustomTabList>
-</TabContext>
+<CustomTabsNav role='navigation' value={activeTab} variant='scrollable' pill='true' aria-label={…}>
+  <Tab component={Link} href={…} aria-current={isActive ? 'page' : undefined} … />
+</CustomTabsNav>
 ```
 
 **Regla 2 — para un tab no disponible, `aria-disabled` + `title` nativo, NUNCA `<Tooltip><span><Tab/></span></Tooltip>`.** Envolver el `Tab` en un `<span>` rompe **dos** cosas a la vez:
@@ -211,6 +285,23 @@ Runtime de referencia: `SeoSearchVisibilityTabs` (`src/views/greenhouse/admin/gr
 Y aunque no rompiera nada: un control `disabled` no dispara hover, así que el tooltip con el motivo **nunca se vería**. El patrón canónico es `aria-disabled='true'` + `title` + `onClick` que previene + `opacity` bajada con `pointerEvents: 'auto'` para que el `title` sí aparezca.
 
 **Regla 3 — un tab que navega a un 404 es peor que un tab deshabilitado.** Las rutas hermanas todavía no construidas se declaran con un flag (`available: false`) y un hint que dice **por qué** no está; al aterrizar cada hermana se le quita el flag — un cambio de una línea, no un refactor del conmutador.
+
+**Regla 4 — en móvil, que los tabs QUEPAN; nada de `allowScrollButtonsMobile` (TASK-1307).** Con `variant='scrollable'`, `allowScrollButtonsMobile` parece la respuesta obvia al desborde y es la equivocada: en 390 px las dos flechas se comen ~80 px y terminan **tapando el tab ACTIVO** (se leía `Rendimie…` recortado bajo la flecha). El gesto de arrastre ya existe en táctil, así que las flechas no agregan una forma de navegar — sólo restan ancho al contenido que estorban.
+
+La salida es hacer que los tabs entren. En `xs` se oculta el ícono de cada tab y se aprieta el padding; el label identifica el destino igual de bien y los cuatro caben sin recorte:
+
+```tsx
+<CustomTabsNav
+  variant='scrollable'
+  scrollButtons='auto'   // sin allowScrollButtonsMobile
+  sx={{
+    '& .MuiTab-iconWrapper': { display: { xs: 'none', sm: 'inline-flex' } },
+    '& .MuiTab-root': { paddingInline: { xs: 3, sm: 5 }, minInlineSize: 0 }
+  }}
+>
+```
+
+Generalizable: **un affordance de scroll que tapa el elemento activo es peor que el desborde que iba a resolver.** Antes de agregar flechas, reduce el contenido a lo que identifica (label sin ícono, padding menor).
 
 **Cuándo NO usar este patrón:** si el contenido conmuta en memoria sin cambiar la URL, es un `tablist` de verdad y va con `TabPanel` + `aria-controls` reales.
 

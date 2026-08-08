@@ -7,6 +7,16 @@
 
 ---
 
+## Delta 2026-08-07/08 — TASK-1307: la cabecera de una superficie es una región, no una pila de controles
+
+Las tres pestañas de Search Visibility metían todo el chrome (título, selectores de alcance, frescura, tabs, leyenda) dentro de `regions.primary` sin usar nunca la región `header` que `SurfaceRecipe` expone. Con `plane='none'` eso deja los controles flotando sobre el lienzo gris, y en 390 px es un scroll entero de chrome antes del primer dato. Pasaba todos los gates. Cinco contratos, ninguno específico de SEO:
+
+1. **El chrome va en `header`, el dato en `primary`** — `SurfaceRecipe header={…}` se renderiza fuera del plano de las regiones; `WorkbenchHeader kind='report'` es el plano contenido editorial que lo sostiene, con reparto fijo `secondaryActions`/`meta`/`supporting`. Contrato: [`PATTERNS.md` § Surface Chrome Pattern](./PATTERNS.md#surface-chrome-pattern--el-chrome-va-en-la-región-header-nunca-en-primary-task-1307) + [`PRIMITIVES.md` § Surface system](./PRIMITIVES.md#surface-system--recipes--composed-primitives-task-1453) (`header`, `plane`, variant `report`).
+2. **Consecuencia estructural:** como la cabecera se renderiza siempre, los controles de alcance sobreviven a los estados vacíos/denegados — desapareció la duplicación de selectores dentro de cada superficie de estado.
+3. **Bug real de primitive:** un `<Area>` sobre un eje invertido (`invertY`) pintaba el gradiente SOBRE la línea, porque la base default del eje queda arriba con `reversed`. Fix `baseValue='dataMax'`; regla generalizada + adelgazamiento de ticks y anclaje adaptativo de los extremos en [`PRIMITIVES.md` § MetricTrendCard eje invertido](./PRIMITIVES.md#metrictrendcard--eje-invertido-y-legibilidad-del-eje-x-task-1307).
+4. **Tabs-como-links en móvil:** `CustomTabsNav` (Tabs plano) reemplaza al `TabList` de `@mui/lab`, que clonaba `aria-controls` fantasma; y **sin `allowScrollButtonsMobile`** — las flechas tapaban el tab activo. La salida es que quepan (ícono oculto en `xs`). Contrato: [`PATTERNS.md` § Route Tabs Pattern](./PATTERNS.md#route-tabs-pattern--tabs-que-navegan-no-son-un-tablist-task-1306) reglas 1 y 4.
+5. **Coherencia entre hermanas + controles a fila completa en `xs`:** pantallas que son pestañas de una misma superficie comparten composición de cabecera; un control 2-up que trunca su valor vigente deja de ser un control. Ambos en el mismo patrón; el modo de falla "chrome sobre el lienzo desnudo" quedó como criterio en [`GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md`](../../ui/GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md#chrome-budget-and-spatial-composition).
+
 ## Delta 2026-08-06 — TASK-1306: color de Apex bajo `cssVariables`, delta semantics de `MetricTrendCard` y tabs que navegan
 
 El cockpit SEO Overview destapó tres hallazgos de plataforma, ninguno local a esa surface:

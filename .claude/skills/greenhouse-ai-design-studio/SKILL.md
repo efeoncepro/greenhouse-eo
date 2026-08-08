@@ -37,13 +37,22 @@ Hard requirements:
 
 1. Persist external source or a repo-native direction.
 2. Compare 2–3 directions and select one before JSX.
-3. Map to surface recipe, Composition Shell, primitives and tokens.
+3. Map to surface recipe, Composition Shell, primitives and tokens. Screen
+   chrome (title, scope controls, freshness, sibling tabs, legend) goes in the
+   recipe `header` region with `WorkbenchHeader kind='report'`, never inside
+   `regions.primary`; sibling screens of one surface share that same header
+   composition, and the controls it holds are not duplicated inside the
+   empty/degraded/denied surfaces.
 4. Pass substantive readiness.
 5. Review desktop/mobile first fold.
 6. Capture/review GVC with `qualityProfile: 'premium'`.
 7. Score fourteen dimensions; average ≥4.5, none <4; hierarchy, surface
    economy, visual impact, fidelity and template resistance each ≥4.5.
 8. Treat enterprise `BLOCK` as blocking.
+
+Two stop conditions from the canonical file worth repeating here: sibling
+screens of one surface resolving their chrome differently, and a control whose
+current value truncates (or an active tab that is clipped) at 390px.
 
 Greenhouse product typography is Geist + theme-applied Poppins display, never
 DM Sans for new product UI.

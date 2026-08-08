@@ -1,5 +1,45 @@
 # TASK-1308 — Growth SEO: Keyword Opportunities UI
 
+## Delta 2026-08-07 — la cabecera de esta pantalla cambió de patrón por el trabajo de TASK-1307 (commit 67c2d1218)
+
+Delta informativo posterior al cierre: **el lifecycle sigue `complete`**, no reabre la task y **no
+cambia su alcance funcional** —ni una capability, ni un command, ni un eje del mapa—. Cambia dónde
+viven los controles de alcance de `/admin/growth/seo/keywords`.
+
+**Qué pasó.** El operador reportó que la zona de controles se veía suelta sobre el lienzo gris y que
+Rendimiento (`TASK-1307`) y Keywords lo habían resuelto distinto. La causa raíz era común a las tres
+pestañas de Search Visibility: ninguna usaba la región `header` de `SurfaceRecipe`, así que el chrome
+iba dentro de `regions.primary` y quedaba flotando sin superficie contenedora. Las tres usan ahora
+`SurfaceRecipe kind='analyticsReport' plane='none'` con `header={…}` y `WorkbenchHeader kind='report'`,
+con el mismo reparto: `secondaryActions` = controles de alcance, `meta` = frescura, `supporting` =
+tabs hermanos bajo divisor.
+
+**Qué se movió en esta pantalla:**
+
+- Los controles de alcance dejaron de vivir **dentro de la card del veredicto**.
+- Y dejaron de **repetirse dentro de cada superficie de estado** (vacío, sin conexión, error).
+- El prop `context` de `KeywordOpportunityVerdict` quedó **opcional**: se renderiza sólo si llega.
+
+**Por qué esto mejora el contrato de esta task, no sólo su estética.** La duplicación no era un
+descuido: existía porque el alcance tenía que seguir siendo alcanzable en los estados donde el
+veredicto no se pinta —en particular un Space **sin Search Console conectada**, que era justamente el
+caso que la forzaba—. Con los controles en la cabecera del surface, el alcance está disponible
+**siempre, por construcción**: ya no puede desaparecer en un estado vacío ni depender de que cada
+superficie de estado se acuerde de re-renderizarlo. Un estado nuevo de esta pantalla hereda los
+controles sin trabajo extra.
+
+**Evidencia** (compartida con `TASK-1307`, mismo commit): 579 tests focales verdes
+(`src/views/greenhouse/admin/growth`, `src/lib/growth/seo`, `src/components/greenhouse/primitives`);
+`pnpm typecheck` y `pnpm lint` limpios más el hook de pre-push en verde; los 5 scenarios GVC del
+módulo en OK, incluidos `growth-seo-keywords` y los dos móviles; revisión visual de frames en desktop
+1440 y 390px. En el mismo paso se corrigieron dos defectos de 390px que afectan a las tres pestañas:
+el tab activo recortado bajo las flechas de scroll y el selector de período truncando su valor
+vigente al ponerlo 2-up.
+
+**Rollout:** `code complete` en `develop` (pusheado a `origin/develop`); la promoción a producción
+sigue pendiente y va batcheada con `TASK-1307` y `TASK-1655` por el release control plane. Los
+pendientes propios de esta task declarados en su delta de cierre no cambian.
+
 ## Delta 2026-08-07 (cierre) — lo que la task terminó siendo
 
 Nació como "superficie UI cliente pura" y terminó con **backend, contrato programático,

@@ -61,6 +61,8 @@ Bars: `min: 0`. Lines: optional 0 (use scale that shows the change).
 
 Time format: `dd MMM` (es-CL). For multi-year: `dd MMM yyyy`. NEVER `M/D/YY` American format.
 
+**Inverted axis (lower = better, e.g. rank position): an area MUST declare its `baseValue`.** An area's base defaults to the axis zero; with the axis inverted that zero sits at the TOP, so the gradient paints OVER the line as a floating blob instead of filling under it. In Recharts (`<Area>` + `<YAxis reversed>`) the fix is `baseValue='dataMax'` — see `MetricTrendCard` (`invertY`). Runtime-only defect: lint, types and tests all pass while the chart is wrong, so it is only caught by looking at the frame.
+
 ### 6. Tooltip — multi-series ✓ but cap to 5 lines
 
 ECharts default tooltip is rich. Override formatter when >5 series to scroll or summarize. Honor reduced motion (instant show/hide).
@@ -90,6 +92,10 @@ Numbers use `fontVariantNumeric: 'tabular-nums'` on Geist Sans / DM Sans, NEVER 
 - Finance cash-out — area + brush selector
 - Payroll period summary — stacked bar by régimen (chile_dependent / honorarios / international_deel / international_internal) — uses `RECEIPT_REGIME_BADGES` tokens (TASK-758)
 
+### 11. Annotating a chart with external facts — curated registry only
+
+When a chart is annotated with real-world events (algorithm updates, regulatory changes, campaigns), the registry admits **only facts confirmed by the authoritative source**, each carrying its verification source, with a dated verification per batch and deliberate manual maintenance. Painting a third-party rumour as a band on a client's chart is fabricating context, and the client cannot tell the difference. Reference implementation: `src/lib/growth/seo/algorithm-updates.ts` (`CONFIRMED_ALGORITHM_UPDATES` + `algorithmUpdatesInRange`, rendered as ECharts `markArea`). Automating it against a third-party feed is a declared follow-up, never an implicit TODO.
+
 ## Compose with (Greenhouse skills)
 
 - `web-perf-design-greenhouse-overlay` — lazy load + bundle budgets.
@@ -99,4 +105,5 @@ Numbers use `fontVariantNumeric: 'tabular-nums'` on Geist Sans / DM Sans, NEVER 
 
 ## Version
 
+- **v1.1** — 2026-08-07 — TASK-1307: `baseValue` rule for areas over an inverted axis (§5); pinned decision 11 (curated registry of confirmed external facts for chart annotation).
 - **v1.0** — 2026-05-11 — Initial overlay.

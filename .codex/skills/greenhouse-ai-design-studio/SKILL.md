@@ -130,6 +130,18 @@ In this order:
 5. Decide `reuse|extend|new-primitive|one-off`.
 6. Map every visual cue to theme/AXIS/spacing/radius/motion tokens.
 
+Screen chrome — title, scope controls, freshness, sibling tabs, legend — goes in
+the recipe `header` region: `SurfaceRecipe` renders `header` above
+`CompositionShell`, outside the region plane. Never inside `regions.primary`,
+where `plane='none'` leaves the controls floating on the grey canvas and 390px
+gets a full screen of chrome before the first datum. Compose it with
+`WorkbenchHeader kind='report'`: `secondaryActions` for the scope the operator
+changes, `meta` for facts about the data, `supporting` for sibling tabs under
+their divider. Because the header lives outside the body, those controls stay
+available in the empty/degraded/denied surfaces — do not duplicate them there.
+Sibling screens of one surface (same breadcrumb, title and tab bar) share one
+header composition.
+
 External design is intent, never literal HEX/px/font/ms.
 
 ### 4. Contract the first fold
@@ -225,6 +237,8 @@ Stop implementation/closure when:
 - visual source/direction is missing;
 - first fold was not reviewed;
 - mobile is compressed desktop;
+- sibling screens of one surface resolve their chrome differently;
+- at 390px a control's current value truncates or the active tab is clipped;
 - primary action is ambiguous;
 - partial data looks authoritative;
 - motion lacks reduced-motion equivalence;
@@ -247,5 +261,8 @@ Report:
 
 ## Version
 
+- v2.1 — 2026-08-07 — TASK-1307: screen chrome maps to the recipe `header`
+  region (`WorkbenchHeader kind='report'`), sibling screens share one header,
+  and truncated controls / clipped active tab at 390px are stop conditions.
 - v2.0 — 2026-07-18 — TASK-1453: single orchestrator, real skills only,
   versioned visual direction, first-fold checkpoint, GVC premium and score gate.

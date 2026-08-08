@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-08-05 por Claude (TASK-1299 + TASK-1301)
-> **Ultima actualizacion:** 2026-08-07 por Claude (TASK-1308 pantalla de Oportunidades de keywords: verificada contra la pantalla construida y sacada de la lista de pendientes)
+> **Ultima actualizacion:** 2026-08-07 por Claude (TASK-1307 mejoras de la pantalla Rendimiento: grupos configurados, lectura cruzada del período, granularidad diaria/semanal, marcadores de AI Overview y bandas de updates confirmados de Google — verificado contra la pantalla construida)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
 
 # Modulo SEO — Search Visibility 360 (Growth)
@@ -219,10 +219,47 @@ Tres reglas de honestidad que la pantalla no negocia:
 - La selección vive en la URL (`?keywords=`/`?urls=`): el enlace se comparte y la otra
   persona ve exactamente la misma comparación.
 
+**El alcance vive en la cabecera** — Space, período (28, 90, 180 días o 12 meses) y
+dispositivo — y aplica a todo lo que se ve debajo. El dispositivo no es un filtro de
+presentación: la búsqueda en móvil y en escritorio devuelve resultados distintos, así que
+cambiarlo cambia **qué se consultó**, no cómo se dibuja.
+
+Sobre esa base, la pantalla agrega cuatro ayudas de lectura:
+
+- **Tus grupos.** Si el equipo ya configuró grupos de keywords en el seguimiento de ese
+  Space, aparecen como botones al comparar por keyword: un clic arma la comparación
+  completa. No son grupos inferidos por el sistema — son los que alguien configuró, y si
+  el grupo excede el tope de 8 el botón lo advierte.
+- **Lectura del período.** Un recuadro que interpreta los cuatro indicadores **juntos** y
+  nombra qué explica el movimiento: cayó la demanda de esas búsquedas (y no el ranking);
+  el resultado de búsqueda está capturando el clic aunque la posición se mantenga (el
+  patrón típico de las respuestas con IA); o la ganancia/pérdida de posición explica el
+  cambio de clics. Aparece **sólo cuando el patrón es inequívoco**: con señales mezcladas,
+  o sin período anterior comparable, no dice nada — un diagnóstico ambiguo es peor que
+  ninguno.
+- **Granularidad diaria o semanal.** En rangos largos la serie arranca en semanal porque
+  un punto por día se vuelve una nube ilegible; el operador vuelve a diario cuando
+  necesita el detalle fino. En semanal los volúmenes se suman, y posición y CTR promedian
+  **sólo los días medidos**.
+- **Contexto sobre el gráfico.** Rombos que marcan los días con AI Overview en la búsqueda,
+  y bandas de color que marcan actualizaciones **confirmadas** del algoritmo de Google —
+  para distinguir "se movió todo el mercado" de "se movió mi sitio". El registro de
+  actualizaciones es curado y manual: sólo entra lo confirmado por Google, nunca un rumor
+  de terceros.
+
+Los marcadores de AI Overview tienen su propia regla de honestidad, y es la más fácil de
+leer de más: **sólo existen en la serie ◑ (la medición del proveedor externo, que observa
+la página de resultados)**. Search Console no informa ese dato, así que la **ausencia de
+rombos no significa ausencia de IA — significa que esa fuente no lo mide**. La leyenda
+● Medido / ◑ Estimado vive junto al gráfico, al lado de las series que describe.
+
 > Detalle tecnico: `SeoPerformanceView` + `readSeoPerformance`/`readSeoPerformanceCatalog`
 > (`src/lib/growth/seo/performance/**`). Mismo reader para UI, Nexa y las MCP tools
 > `get_seo_performance` / `get_seo_performance_catalog` (parity en el mismo PR). El chart
 > es el primer consumer de **ECharts** (lazy por ruta — la decisión de librería del módulo).
+> Lectura cruzada en `performance/derive-insight.ts` (pura y testeada) y registro curado de
+> updates en `algorithm-updates.ts`. Manual del operador:
+> [`usar-pantalla-rendimiento-seo.md`](../../manual-de-uso/growth/usar-pantalla-rendimiento-seo.md).
 
 ### El histórico de verdad: BigQuery como memoria larga (TASK-1655, 2026-08-07)
 
