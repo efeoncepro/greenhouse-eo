@@ -10,6 +10,10 @@ import type { CaptureScenario } from '../lib/scenario'
 export const scenario: CaptureScenario = {
   name: 'growth-seo-client',
   route: '/growth/seo',
+  // Superficie CLIENTE: con la sesión de operador interno la página renderiza su card
+  // de bloqueo, la captura muere por `selector_timeout` y el gate reporta BLOCK como si
+  // fuera defecto de producto. Declarar la identidad evita ese diagnóstico falso.
+  requiresStorageState: '.auth/storageState.local-berel-client.json',
   // Sólo navega tabs con teclado/click dentro del cliente; no escribe backend ni dispara commands.
   mutating: true,
   safeForCapture: true,

@@ -302,6 +302,21 @@ export interface CaptureScenario {
    */
   qualityProfile?: CaptureQualityProfile
 
+  /**
+   * Identidad con la que DEBE correr el scenario, cuando la superficie está gateada por una
+   * distinta de la del agente interno por defecto.
+   *
+   * 🔴 Existe porque una superficie CLIENTE capturada con la sesión de operador interno no
+   * falla con un error claro: renderiza su card de bloqueo, la captura muere por
+   * `selector_timeout` y el gate reporta BLOCK — pareciendo un defecto de producto cuando el
+   * problema era la persona. Pasó de verdad con `growth-seo-client` (TASK-1310).
+   *
+   * El valor es un path a un `storageState` bajo `.auth/`. Si el archivo no existe, la captura
+   * falla ANTES de navegar, con un mensaje que dice cómo generarlo — en vez de producir
+   * evidencia engañosa.
+   */
+  requiresStorageState?: string
+
   /** Metadata + contrato de visual diff para flujo mockup aprobado -> runtime. */
   baseline?: CaptureBaselineMeta
 
