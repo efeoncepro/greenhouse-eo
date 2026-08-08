@@ -189,6 +189,30 @@ Effort     = persona-semanas (dev + contenido + PR)
 - **Bajo impacto (cuestionar):** `llms.txt` (Google no lo usa; ROI marginal —
   ver `04_AEO_GEO.md`), microajustes de keyword density, meta keywords (muertas).
 
+### Ordenar hallazgos que ya vienen de un crawler (≠ ordenar iniciativas)
+
+RICE ordena **iniciativas**. Una auditoría técnica entrega **hallazgos**, y ahí el
+orden necesita tres ejes y un corte (verificado 2026-08-08 sobre la auditoría de
+Grupo Berel):
+
+1. **La severidad es un corte ABSOLUTO, no un sumando.** Un 5xx y 400 imágenes sin
+   `alt` no compiten en el mismo score: fundidos en un número, el volumen entierra
+   lo que rompe indexación. Ordena *dentro* de cada nivel, nunca entre niveles.
+2. **Dentro del nivel: (páginas afectadas × valor de búsqueda) ÷ esfuerzo.**
+3. **El valor de búsqueda es un eje propio, ortogonal a la severidad.** La severidad
+   mide qué tan roto está algo; el valor mide cuánto importa arreglarlo. Dentro de
+   `notice` conviven higiene cosmética y señales reales, y sin este eje el alcance
+   premia a lo que toca todo el sitio: un favicon ausente en 91 páginas encabezaba
+   su tier por encima de `alt` ausente en 50 — y el segundo sí mueve tráfico
+   (búsqueda de imágenes + accesibilidad). Escala: `high` rastreo, indexación,
+   canonical, contenido, datos estructurados · `medium` CTR, experiencia de página,
+   búsqueda de imágenes · `low` higiene sin efecto de búsqueda medible.
+4. **Valor `low` no es 0.** Se hunde, no desaparece. Esconder un issue de higiene es
+   la otra forma de mentir sobre el diagnóstico.
+5. **El esfuerzo es tuyo, no del crawler.** Ningún proveedor reporta costo de arreglo.
+   Etiqueta el tier como estimación propia en el entregable; si el cliente lo lee
+   como medición, le vendiste una precisión que no tienes.
+
 ---
 
 ## 5. Herramientas (esta skill ejecuta, no solo asesora)

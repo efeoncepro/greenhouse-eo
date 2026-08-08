@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.9
+> **Version:** 1.10
 > **Creado:** 2026-08-05 por Claude (TASK-1299 + TASK-1301)
-> **Ultima actualizacion:** 2026-08-08 por Claude (TASK-1310 — la superficie del cliente: navegador de 3 secciones + informe imprimible, con su estado de rollout declarado; y se retiran de "Que NO existe todavia" las dos filas que ya existen)
+> **Ultima actualizacion:** 2026-08-08 por Claude (TASK-1309 — la Auditoría del sitio al día con la pantalla construida: el orden mira tres cosas y no dos (se suma el valor de búsqueda), las tres aclaraciones que evitan una conclusión falsa (tope del crawl, velocidad de laboratorio, alcance del puntaje), el movimiento contra el crawl anterior, el filtro por gravedad, la exportación del grupo, y lo que la auditoría todavía NO revisa)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
 
 # Modulo SEO — Search Visibility 360 (Growth)
@@ -357,13 +357,37 @@ conviene atacarlos. Es donde el equipo diagnostica el sitio antes de proponer tr
 
 | Elemento | Que dice |
 |---|---|
-| Salud del sitio | Un puntaje de 0 a 100 en un arco, con el numero siempre escrito. Verde sobre 80, ambar sobre 50, rojo abajo. Si el crawl no alcanzo a calcularlo dice **"Pendiente"** — un 0 se leeria como "sitio pesimo", que es otra cosa. |
+| Salud del sitio | Un puntaje de 0 a 100 en un arco, con el número siempre escrito. Verde sobre 80, ámbar sobre 50, rojo abajo. Si el crawl no alcanzó a calcularlo dice **"Pendiente"** — un 0 se leería como "sitio pésimo", que es otra cosa. Debajo, **qué mide ese puntaje** (ver "Las tres cosas que la pantalla aclara"). |
+| Movimiento desde el crawl anterior | Al lado de la salud y de los issues: "+2,4 desde el crawl del 3 de agosto", "12 issues menos". El módulo entero se vende como serie de tiempo, y esta pantalla mostraba un punto. Si es el primer crawl **lo dice** — dejar el hueco vacío sería ambiguo entre "no cambió" y "no hay con qué comparar". Sólo compara contra crawls **terminados**: contra uno fallido o en vuelo el número sería inventado. |
 | Ultimo crawl | En la cabecera, en palabras ("hace 3 dias"). Dice cuanto confiar en todo lo demas. Pasadas dos semanas aparece un aviso: el diagnostico ya no es reciente. |
-| Criticos · Atencion · Menores · Paginas revisadas | El volumen por gravedad y el tamaño del crawl. Son cifras neutras: el color no las pinta, porque un semaforo aplicado a la identidad de una metrica deja de ser una ayuda puntual de estado. |
+| Criticos · Atencion · Menores | El volumen por gravedad, en una **banda cuyo ancho es el reparto**: son partes de un mismo total, y para eso la respuesta es longitud, no tres números sueltos que pesan visualmente igual. Cada segmento **filtra la lista** al apretarlo. El segmento en cero no se atenúa: "0 críticos" es la mejor noticia de la pantalla. |
+| Paginas revisadas | Cuántas páginas alcanzó a mirar el crawl. **Sale de la banda a propósito** — no es una severidad, y mezclarla ahí invitaba a compararla con lo que no es comparable. Cuando choca el techo del crawl, la cifra lo dice (ver abajo). |
 | Issues priorizados | Una **lista**, no una tabla ordenable. El orden ES la respuesta a "que ataco primero", asi que no se esconde detras de un control que haya que descubrir. Cada fila: gravedad (icono + palabra + color), nombre del problema en español, cuantas paginas afecta y cuanto esfuerzo estimamos. |
-| El orden de la lista | Primero **todo lo critico**, sin excepcion. Dentro de cada nivel, lo que toca mas paginas y cuesta menos resolver. Asi 400 imagenes sin texto alternativo nunca entierran un error de servidor. |
+| El orden de la lista | Primero **todo lo crítico**, sin excepción. Dentro de cada nivel compiten **tres** cosas: cuántas páginas toca, **cuánto mueve la aguja en búsqueda** y cuánto cuesta resolverlo. Así 400 imágenes sin texto alternativo nunca entierran un error de servidor — y la higiene que toca todo el sitio tampoco encabeza su nivel sólo por ser ancha (ver abajo). |
 | Esfuerzo | Rapido / Medio / Alto. Es **juicio nuestro, no un dato del crawl**, y la pantalla lo dice con esas palabras. Existe porque la gravedad sola no responde la pregunta: 300 imagenes sin `alt` y una caida de servidor no se atacan igual aunque compartan volumen. |
 | Ver → | Abre el grupo en la misma pantalla y lista las URLs afectadas. Se puede compartir el enlace y el boton "atras" del navegador funciona. |
+| Copiar | En el grupo abierto. Se lleva **todas** las URLs del grupo —no sólo las que la tabla alcanza a mostrar— como texto que pega igual de bien en un documento que en una planilla. El diagnóstico es material de conversación de propuesta y hasta acá terminaba en copiar noventa URLs a mano. Si el navegador bloquea el portapapeles, lo dice: fallar en silencio dejaría a la persona creyendo que copió. |
+
+**Las tres cosas que la pantalla aclara, porque callarlas produce una conclusión falsa**
+
+Las tres salieron de mirar la pantalla con datos reales, y son la misma clase de problema: dos cifras
+verdaderas puestas juntas sin decir qué mide cada una llevan a creer algo que no es.
+
+| Lo que se aclara | Por qué |
+|---|---|
+| **"Páginas revisadas" dice cuándo es el tope del crawl y no el sitio** | El crawl revisa hasta 100 páginas. Grupo Berel devolvió exactamente 100 — ese número redondo no era el tamaño del sitio, era el crawl chocando su límite. Si el sitio tuviera 3.000 páginas estaríamos diagnosticando el 3% y titulándolo "Salud del sitio: 95". Cuando el conteo iguala el tope, la cifra lo dice y la pantalla explica que la salud describe **esa muestra**, no el sitio entero. |
+| **Los checks de velocidad declaran que son de laboratorio** | "Tiempo de carga alto" y sus tres hermanos se miden en un banco de pruebas. Google **no rankea con eso**: rankea con datos de campo, de visitas reales, los que llegan por Search Console. Sin decirlo, alguien podría leer esa fila y prometerle a un cliente una mejora de posiciones sobre la métrica equivocada. Es la misma separación que el resto del módulo hace entre ● medido y ◑ estimado. |
+| **El puntaje explica su alcance** | "95 de salud" al lado de "519 issues" se lee como contradicción — fue la primera pregunta al ver la pantalla, y un cliente va a preguntar lo mismo. No miden lo mismo: **el puntaje lo calcula el proveedor** con su propia ponderación y sus ~65 verificaciones, y **el conteo sale de nuestro catálogo curado de 34**. Un sitio sin críticos puede acumular muchos issues menores y seguir puntuando alto, porque el puntaje pesa sobre todo lo que rompe la indexación. No es un error: es que cada cifra responde otra pregunta, y reconciliarlo es obligación de la pantalla, no del que la lee. |
+
+**Por qué el orden mira el valor de búsqueda y no sólo el volumen**
+
+La gravedad dice **qué tan roto** está algo; el valor de búsqueda dice **cuánto importa arreglarlo**.
+No son lo mismo, y dentro de un mismo nivel de gravedad conviven higiene cosmética y señales reales.
+Con sólo volumen y esfuerzo, en Berel el primer aviso menor era "Sin favicon · 91 páginas" por encima
+de "Imágenes sin texto alternativo · 50 páginas": la trivia que toca todo el sitio ganaba por ancho.
+Un favicon afecta cómo se ve la marca en el resultado; un texto alternativo ausente afecta la búsqueda
+de imágenes y la accesibilidad. Lo de bajo valor **se hunde pero se sigue listando** — esconderlo
+sería la otra forma de mentir sobre el diagnóstico.
 
 **Los estados, que no se mezclan**
 
@@ -381,12 +405,21 @@ de un permiso propio: quien puede *leer* el diagnostico no necesariamente puede 
 dos frenos automaticos: si ya hay un crawl en vuelo o ya se corrio uno hoy para ese sitio, el sistema
 lo dice en vez de gastar dos veces por lo mismo.
 
+**Lo que esta auditoría todavía NO revisa** (y por eso no alcanza para declarar un sitio listo para
+la IA): si el `robots.txt` **bloquea a los rastreadores de IA**, si al sitio le **falta** el marcado
+de datos estructurados (hoy sólo detecta errores en el marcado que ya existe), si hay conflicto entre
+`noindex` y el bloqueo de robots, y la salud del mapa del sitio. Es el punto ciego más caro del módulo:
+un sitio que le cierra la puerta a los rastreadores de IA queda fuera de las respuestas de ChatGPT,
+Perplexity y compañía, y hoy esta pantalla lo declararía sano con 95 de 100. Lo cierra **TASK-1670**,
+que reutiliza las verificaciones ya probadas del motor AEO en vez de escribirlas de nuevo.
+
 > Paso a paso para operarla: [Auditoria del sitio — leer la salud tecnica y priorizar](../../manual-de-uso/growth/usar-auditoria-sitio-seo.md).
 >
 > Detalle tecnico: `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §6/§7 (reader
-> `readSiteAuditReport`, command `queueSiteAudit`). Codigo:
+> `readSiteAuditReport`, command `queueSiteAudit`) y §10.6 (los contratos de esta superficie). Codigo:
 > `src/views/greenhouse/admin/growth/seo/audit/`, `src/app/api/admin/growth/seo/audit/run/`.
-> El mismo command lo operan la UI, Nexa y el lane MCP.
+> El mismo command lo operan la UI, Nexa y el lane MCP — y la comparación contra el crawl anterior se
+> calcula **dentro del reader canónico**, así que le llega a los tres sin inventar un contrato aparte.
 
 ### La superficie del cliente: su propia lectura de búsqueda (TASK-1310, 2026-08-08)
 

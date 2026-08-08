@@ -1,5 +1,21 @@
 # TASK-1309 — Growth SEO: Site Audit UI
 
+## Delta 2026-08-08 (tarde) — desbloqueada: la suite completa quedó verde
+
+El bloqueo declarado abajo (2 rojos ajenos en `src/lib/admin/client-role-visibility.test.ts`) **ya no
+existe**. La causa era que TASK-1310 había registrado `cliente.growth_seo_dashboard` y
+`cliente.growth_seo_report` en el catálogo TS sin la migración que siembra `role_view_assignments` —
+regla dura del repo. Esa migración se aplicó el 2026-08-08 como parte del rollout de 1310
+(`20260808131441444_task-1310-seo-client-view-codes.sql`, que siembra los grants por rol con
+`granted=FALSE`, coherente con "acceso per-org, nunca por rol").
+
+Verificado: `pnpm vitest run src/lib/admin/client-role-visibility.test.ts` → 11/11 verde, y
+**`pnpm test` completo → 1429 archivos, 10377 tests, 0 rojos**.
+
+Queda pendiente para el cierre formal: `pnpm build` de producción sobre el último commit (el gate de
+cierre lo exige y el build consume ~30 GB, así que se corre con autorización del operador).
+
+
 ## Delta 2026-08-08 — construida y verificada; el cierre lo bloquea un gap ajeno
 
 **Estado: code complete, cierre bloqueado.** Los 4 slices están implementados y los 4 gates de UI en

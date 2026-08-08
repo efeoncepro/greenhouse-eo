@@ -53,6 +53,12 @@ Score 1-5:
 - Primary action is unclear or duplicated across competing regions.
 - Mobile is a squeezed desktop or has clipped controls/text.
 - Partial/degraded data appears complete.
+- A finished job with zero results is rendered as a failure or as "never ran", or a
+  scope-capped result (page cap, row limit, date window) is presented as the total.
+- A number whose provenance differs from its neighbours — an in-house estimate, a third
+  party's own weighting, a sample instead of a census, a lab measurement instead of field
+  data — carries no on-surface declaration of that difference, so adjacent figures read as
+  a contradiction or as precision the product does not have.
 - Important state is color-only.
 - UI is generic template composition rather than task-native.
 - The first fold is card wallpaper: repeated contained surfaces, card-on-card

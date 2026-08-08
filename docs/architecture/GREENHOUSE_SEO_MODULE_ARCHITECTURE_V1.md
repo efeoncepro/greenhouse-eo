@@ -442,9 +442,11 @@ salud, no fabrica snapshots y no toca DataForSEO en el render.
 > 3. **Los issues van como LISTA priorizada, no como tabla ordenable.** El orden ES la respuesta a
 >    "qué ataco primero"; una tabla la esconde detrás de un control que hay que descubrir. El
 >    `DataTableShell` aparece UNA vez, en el drill, donde sí hay una lista homogénea (las URLs).
-> 4. **El orden es severidad ▸ (páginas ÷ esfuerzo), con la severidad como corte absoluto.** Un score
->    único dejaría que 400 imágenes sin `alt` enterraran un 5xx. Fijado en
->    `views/.../audit/group-audit-issues.ts` con test dedicado.
+> 4. **El orden es severidad ▸ (alcance × valor de búsqueda ÷ esfuerzo), con la severidad como corte
+>    absoluto.** Un score único dejaría que 400 imágenes sin `alt` enterraran un 5xx. Fijado en
+>    `views/.../audit/group-audit-issues.ts` con test dedicado. El tercer eje (`value`) se agregó el
+>    mismo día por la auditoría `seo-aeo`; el detalle de por qué NO es redundante con la severidad
+>    está en el delta al pie de esta sección.
 > 5. **El `issueType` del reader es un id de máquina** (`is_broken`), así que la superficie necesita
 >    ficha es-CL. `GH_GROWTH_SEO_AUDIT_ISSUES` (`src/lib/copy/growth.ts`) cubre los 34 checks del
 >    allowlist de `findings-map.ts` con label + **tier de esfuerzo curado** (juicio editorial de
@@ -479,13 +481,60 @@ salud, no fabrica snapshots y no toca DataForSEO en el render.
 > sabía; la capa de presentación lo había perdido): Google rankea con datos de campo (CrUX), así que
 > una ficha que prometa ranking sobre el número del crawl promete sobre la métrica equivocada.
 >
+> **Delta 2026-08-08 (revisión de producto sobre los frames reales).** Cuatro contratos más, tres de
+> ellos de la MISMA clase: dos cifras verdaderas puestas juntas sin decir qué mide cada una producen
+> una conclusión falsa. La superficie ya había cerrado ese hueco en `healthScore === null` y en la
+> performance de laboratorio; estas son la tercera y la cuarta instancia.
+>
+> 9. 🔴 **"Páginas revisadas" declara cuándo es el TECHO DEL CRAWL y no el sitio.**
+>    `SITE_AUDIT_MAX_CRAWL_PAGES` es 100 y Berel devolvió exactamente 100: ese número redondo es el
+>    crawl chocando su límite, no el tamaño del sitio. Sin declararlo, un sitio de 3.000 páginas se
+>    diagnosticaba al 3% y se titulaba "Salud del sitio: 95". Cuando el conteo iguala el techo, la
+>    cifra lo dice y la card explica que la salud describe **esa muestra**, no el sitio entero.
+> 10. 🔴 **El puntaje declara su alcance, porque no mide lo mismo que el conteo de issues.** "95 de
+>    salud" junto a "519 issues" se lee como contradicción — el operador lo preguntó apenas lo vio.
+>    No son la misma medición: el puntaje es el `onpage_score` **del proveedor** (su ponderación,
+>    sus ~65 checks) y el conteo sale de **nuestro catálogo curado de 34**. Es consistente —sin
+>    críticos, el score del proveedor se mantiene alto porque pesa sobre lo que rompe indexación—
+>    pero reconciliarlo es obligación de la superficie, no del lector. El texto cambia según haya
+>    críticos o no.
+> 11. **Los conteos por severidad SON el filtro** (`?severity=`, compartible y con back), en una
+>    banda cuyo ancho es el reparto — longitud, no texto suelto, para una relación parte-todo. Dos
+>    guardas: una severidad con 0 issues **no ofrece filtro** (prometería una lista vacía), y filtrar
+>    acota lo que se **lista**, nunca lo que se **cuenta** — si acotara ambos, filtrar parecería que
+>    el sitio mejoró. El drill se resuelve contra todos los grupos, así que un `?issueGroup=` de otra
+>    severidad abre igual en vez de morir en silencio.
+> 12. **La comparación contra el crawl anterior vive DENTRO de `readSiteAuditReport`**, no en un
+>    reader aparte: el lane `ecosystem` y la tool MCP son passthrough, así que el delta le llega a
+>    todos los consumers por construcción (Full API Parity) sin contrato paralelo. Sólo compara
+>    contra runs **terminados** (`succeeded`/`degraded`) — contra uno fallido o en vuelo el delta
+>    sería inventado — y sin crawl anterior **lo dice**: el hueco vacío sería ambiguo entre "no
+>    cambió" y "no hay con qué comparar". El módulo entero se vende como serie de tiempo y ésta era
+>    la única superficie que mostraba un punto.
+>
+> Además: el drill exporta el grupo completo como TSV (el site audit es material de conversación de
+> SOW y hasta acá terminaba en copiar 91 URLs a mano) — copia **todas** las URLs del grupo, no sólo
+> las que la tabla alcanza a renderizar, porque el techo del render es de lectura y no del dato; el
+> fallo del portapapeles se dice, porque fallar en silencio deja al operador creyendo que copió. La
+> card de salud adopta densidad adaptativa (`useContainerDensity`): a 390px el arco a tamaño completo
+> empujaba la lista —la parte accionable— bajo el fold. Y el wrapper de scroll del drill conserva
+> `tabIndex=0` pero **cede el nombre** a la región de `DataTableShell`: llevaba `role='region'` con la
+> misma etiqueta y el árbol exponía dos landmarks anidados homónimos.
+>
 > 🔴 **Cobertura declarada que el audit NO tiene** (es del allowlist y del proveedor, no de la
 > superficie): no revisa **acceso de crawlers de IA** en `robots.txt`
 > (`OAI-SearchBot`/`PerplexityBot`/`ClaudeBot`), **ausencia** de JSON-LD (sólo detecta errores en
-> marcado existente), conflicto `noindex` + bloqueo robots, ni salud de sitemap. Para un módulo que
-> se vende como Search Visibility 360 —SEO **y** AEO— el primero es el punto ciego más caro: bloquear
-> retrieval saca al cliente de las respuestas de IA (−23.1% de tráfico medido, Rutgers/Wharton
-> dic-2025) y hoy esta pantalla lo declararía sano con 95/100. Sin dueño asignado todavía.
+> marcado existente, y a propósito: la regla del módulo prohíbe invertir checks positivos del
+> proveedor por passthrough), conflicto `noindex` + bloqueo robots, ni salud de sitemap. Para un
+> módulo que se vende como Search Visibility 360 —SEO **y** AEO— el primero es el punto ciego más
+> caro: bloquear retrieval saca al cliente de las respuestas de IA (−23,1% de tráfico medido,
+> Rutgers/Wharton dic-2025) y hoy esta pantalla lo declararía sano con 95/100. **Dueño: `TASK-1670`**
+> (`to-do`, `backend-data`), que expone los tres probes ya probados del grader AEO como superficie
+> pública aditiva y los consume como hallazgos **de sitio** detrás de flag. El flag existe porque un
+> hallazgo de sitio en esta lista mostraría "1 página afectada", que es falso: la UI necesita
+> tratamiento propio (`TASK-1671`, por crear). Y el entregable descargable de la auditoría **no debe
+> nacer sin esta cobertura** — un artefacto con nuestro nombre que declara sano un sitio invisible
+> para la IA es peor que no tener artefacto.
 
 ### 10.7 Cutover `seo_v1 → seo_v2` — expand/contract (TASK-1310)
 

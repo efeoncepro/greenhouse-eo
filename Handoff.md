@@ -69,6 +69,35 @@ Lo que **no** hice y sigue abierto: los 7 lotes de la auditoría premium (trabaj
 `/growth/seo/mockup`), el push de los commits locales y la migración —bloqueada porque `main` no
 tiene todavía el catálogo TS y `syncViewRegistryCatalog` desactivaría las filas.
 
+### TASK-1309 — desbloqueada, y su ciclo documental cerrado con subagentes (2026-08-08)
+
+**El bloqueo desapareció solo.** 1309 estaba `code complete` frenada por 2 rojos ajenos en
+`client-role-visibility.test.ts`, causados por 1310 al registrar viewCodes sin migración de
+`role_view_assignments`. Esa migración se aplicó hoy en el rollout de 1310 y los cerró:
+**`pnpm test` completo en 1429 archivos / 10377 tests / 0 rojos**, `ui:quality` PASS 4.63,
+reachability 232 rutas / 0 huérfanas. Falta sólo `pnpm build` de producción sobre el último commit
+para moverla a `complete` (no se corrió: ~30 GB, va con autorización del operador).
+
+**Dos subagentes cerraron el ciclo documental**, con dominios de archivos disjuntos para no chocar.
+Lo que encontraron vale más que el trabajo mecánico:
+
+- 🔴 **§10.6 de la arquitectura SEO se auto-contradecía**, y fue culpa mía: el delta que agregué esta
+  mañana cambiaba el orden a tres ejes, pero el contrato 4 de arriba seguía declarando la regla vieja
+  de dos. Un agente que leyera el ítem sin bajar al delta implementaba lo equivocado.
+- **Cinco commits de feature aterrizaron DESPUÉS del pase documental** (`4c81306d5`), así que las tres
+  capas describían una pantalla anterior a la construida. El pase documental "ya hecho" no era
+  garantía de nada: lo que garantiza es mirar el delta.
+- Los hallazgos se **generalizaron más allá de SEO**, que es donde está el valor: `dataviz-design`
+  ahora advierte que **cualquier** chart que derive su tamaño del contenedor es sospechoso (tabs
+  ocultas, acordeones, y el `fullPage` de Playwright que produce cards vacías que parecen bug y no lo
+  son); `state-design` fija que el resultado de un job async tiene **seis** estados y no dos (nunca
+  corrió · corriendo · limpio · parcial · con techo · fallido); y los dos gates de UI review suman
+  como blocker el número cuya procedencia difiere de sus vecinos sin declararlo.
+
+**Deuda detectada de paso:** `greenhouse-ui-enterprise-review` existe en `.claude/` y `.codex/` pero
+**no está en el manifiesto de espejos** y ya divergía. Se le aplicó el mismo bloque a las dos copias
+para que el gate sea idéntico entre agentes, sin reconciliar la divergencia previa. Alguien debería.
+
 ### TASK-1310 — verificado con sesión de cliente: funciona, pero NO es alcanzable (2026-08-08)
 
 Cerré el paso 5 del rollout con sesión real de Grupo Berel. Dos resultados, y el segundo es el que
@@ -526,37 +555,3 @@ sincronizadas como ruido). Aplicado con `scripts/growth/provision-efeonce-own-br
 **Pendiente vivo:** conectar la GSC de efeoncepro.com cuando 1282/1283 destraben su rollout. SKY ya
 tiene lente AEO ligada; su SEO sigue igual de pendiente. Los otros dos pendientes de esta entrada
 (auto-companies HubSpot · `website_url`) están resueltos o repetidos en las entradas de 2026-08-06.
-
-### TASK-1305 — Cruce SEO↔AEO (quadrant 360) COMPLETE (2026-08-05)
-
-La sinergia directa con AEO que exigió el operador quedó implementada el mismo día: `readSeoAeoGap`
-(`src/lib/growth/seo/gap/read-seo-aeo-gap.ts`) cruza `seo_gsc_daily` (posición medida, ponderada por
-impresiones) × `grader_scores` (último run reportable del org) EN MEMORIA por `organization_id` — cero
-JOIN/VIEW/FK cross-motor (boundary §1.1, verificado por test dedicado que inspecciona las queries
-emitidas). Clasificador puro `classifyQuadrant` (página 1 × score ≥ 50, overridables, jamás promediados)
-+ contrato `SeoAeoGapResult` con `aeoAxisGranularity='domain'` (TASK-1311 refina a URL sin romperlo).
-
-**Primera señal 360 real (smoke live):** Berel rankea #1.75 orgánico para su marca con citabilidad AEO
-44.5 → quadrant **`riesgo`** = autoridad orgánica sin citabilidad = el CTA cruzado al AEO, funcionando.
-
-Evidencia: 12 tests (incl. boundary + tenant binding) + smoke live con cero residuo
-(`scripts/growth/_sanity-seo-aeo-gap.ts`, patrón commit+try/finally post hallazgo TASK-1300 — el
-BEGIN/ROLLBACK cross-pool NO es seguro; `_sanity-seo-entitlement.ts` endurecido igual). Full suite
-**10142/0** + build prod verdes. Commits `6ff948e2d`+`3bac9df0a` (Slice 1) + `ed88f7d16` (Slice 2).
-Nota de proceso: el primer commit de Slice 1 capturó solo el rename (git add abortó por ruta
-inexistente — gotcha conocido); `3bac9df0a` es el fixup con el código.
-
-**Rollout:** reader detrás de `GROWTH_SEO_ENABLED` (hoy ON solo en el ops-worker para el materializer;
-el reader lo consumirán TASK-1645/1310 — cada consumer valida el flag en su runtime). **Próximo paso
-del camino MCP-first: `TASK-1645`** (lane ecosystem + MCP tools — get_seo_visibility_360 nace con este
-cruce). Sin push aún.
-
-### TASK-1646 — Cloud Infrastructure doc particionado (2026-08-05) · compactado 2026-08-07
-
-**Complete.** El monolito `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` quedó dividido según el precedente
-ui-platform: `docs/architecture/cloud-infrastructure/` (11 temáticos + `HISTORIAL.md`) + router stub +
-ADR `GREENHOUSE_CLOUD_INFRASTRUCTURE_RESTRUCTURE_DECISION_V1.md`. **Entrada canónica:** el `README.md`
-de esa carpeta (cambio vigente → temático; cronología → HISTORIAL; nada al stub). Al separar se
-corrigieron inventarios stale de la auditoría 2026-04-23: vigente 2026-08-05 = **46 scheduler jobs**
-(`services/ops-worker/deploy.sh`), **8 crons Vercel** (`vercel.json`), **7 workflows de deploy**;
-descartes anotados `⚠️ Superseded`. Re-auditoría live GCP sigue siendo TASK-127.

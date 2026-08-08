@@ -142,13 +142,18 @@ Every finding is one of:
 - [ ] Error messages use `role='alert'` for screen reader announcement
 - [ ] State never conveyed by color alone (pair with icon + label)
 
-### §12 — Empty / loading / error states
+### §12 — Empty / loading / error states + honestidad del dato
 
 - [ ] Empty state uses `EmptyState` primitive, not plain `<Typography>`
 - [ ] Empty state has icon + title + description + action slot
 - [ ] Empty state CTAs are 1 `primary contained` + N `tonal secondary` — NOT multi-color
 - [ ] Loading states use `<Skeleton>` to preserve layout (not spinners for structured content)
 - [ ] Error states have clear recovery action
+- [ ] Un valor no calculado (`null`) renderiza "Pendiente" + razón — NUNCA `0`, `$0` ni un `—` mudo. Un puntaje ausente y un puntaje pésimo son estados distintos.
+- [ ] Un job que terminó con 0 resultados usa copy de éxito ("sin hallazgos"), NO `<ErrorState>` ni el empty de "nunca corrió"
+- [ ] Un resultado parcial o con techo de alcance (cap de páginas, límite de filas, ventana de fecha) declara ese alcance en la superficie: es una muestra, no el total
+- [ ] Todo número que sea estimación nuestra o ponderación de un tercero lo declara junto al dato (hint/caption), no en la documentación
+- [ ] Dos cifras vecinas con instrumento distinto (puntaje del proveedor vs conteo de nuestro catálogo; laboratorio vs campo) explican la diferencia en pantalla — si no, se leen como contradicción
 
 ### §13 — Anti-pattern sweep
 
@@ -206,6 +211,9 @@ When invoked, produce:
 
 ## Version
 
+- **v1.2** — 2026-08-08 — TASK-1309: §12 gana honestidad del dato (no calculado ≠ 0,
+  job limpio ≠ fallido, alcance con techo ≠ total, estimación declarada, cifras
+  vecinas con instrumento distinto explicadas en pantalla).
 - **v1.1** — 2026-08-08 — TASK-1310 anti-AI-slop sweep: grey-canvas floating
   content, colored rails, traffic-light palettes, card soup, sparse charts and
   flat tables.

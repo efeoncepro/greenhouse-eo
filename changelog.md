@@ -7,6 +7,35 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-08 — TASK-1309 desbloqueada + ciclo documental y de skills cerrado con subagentes
+
+- **El bloqueo de 1309 lo cerró la migración de 1310.** Estaba `code complete` frenada por 2 rojos
+  ajenos en `client-role-visibility.test.ts` (viewCodes en el catálogo TS sin migración de
+  `role_view_assignments`). Aplicada esa migración: **`pnpm test` en 1429 archivos / 10377 tests / 0
+  rojos**, `ui:quality` PASS 4.63, reachability 0 huérfanas. Falta el build de producción para el
+  cierre formal.
+- 🔴 **§10.6 de la arquitectura SEO se auto-contradecía por un delta mío**: el bloque nuevo cambiaba el
+  orden de hallazgos a tres ejes mientras el contrato 4 seguía declarando la regla vieja de dos. Un
+  agente que leyera el contrato sin bajar al delta implementaba lo equivocado. Corregido: el contrato
+  ahora enuncia la regla vigente y apunta al delta en vez de contradecirlo.
+- **Cinco commits de feature habían aterrizado después del pase documental**, así que las tres capas
+  (arquitectura, funcional, manual) describían una pantalla anterior a la construida. Actualizadas:
+  doc funcional a v1.10, manual a v1.1, más los dos índices que seguían diciendo "tres pantallas de
+  operador" y listando la Auditoría en "qué falta".
+- **Los aprendizajes se generalizaron fuera de SEO**, que es donde valen: `dataviz-design` v1.2 fija
+  que el `radialBar` de Apex mide 0 en contenedor fluido y **no dibuja** —con build y tests verdes— y
+  extiende la sospecha a cualquier chart que derive tamaño del contenedor (tabs ocultas, acordeones,
+  el `fullPage` de Playwright que produce cards vacías que parecen bug); `state-design` v1.2 fija los
+  **seis** estados de un job async (nunca corrió · corriendo · limpio · parcial · con techo ·
+  fallido); `greenhouse-ui-review` v1.2 y `greenhouse-ui-enterprise-review` suman como blocker el
+  número cuya procedencia difiere de sus vecinos sin declararlo en pantalla.
+- `seo-aeo` gana §8 en su módulo técnico (leer un site audit sin mentir el diagnóstico) y la regla de
+  que **ordenar hallazgos de un crawler no es ordenar iniciativas con RICE**; `dataforseo-operator`
+  aterriza los cuatro huecos de cobertura a campos concretos del proveedor.
+- Deuda detectada: `greenhouse-ui-enterprise-review` vive en los dos árboles de skills pero **no está
+  en el manifiesto de espejos** y ya divergía. Se aplicó el mismo bloque a ambas copias para que el
+  gate sea idéntico; la divergencia previa sigue sin reconciliar.
+
 ## 2026-08-08 — ISSUE-143: la migración del cutover SEO colapsó expand y contract, y tumbó producción
 
 - **Resuelto el mismo día (~25 min de caída).** La migración de viewCodes de TASK-1310 hace expand y
@@ -1119,14 +1148,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
 - El caso Recraft queda como regla reusable: `application/octet-stream` sólo se admite para una salida SVG esperada
   después de validar bytes; el asset se sirve con CSP sandbox. No se amplió la allowlist MIME global.
 - No hubo mutaciones de runtime. `TASK-1553` sigue abierta sólo por receipts cross-task de `TASK-1468`/`TASK-1578`.
-
-## 2026-07-30 — Globe: Recraft v4.1 promovido y probado desde Producer
-
-- `ref/still/vector-v1` quedó disponible con evaluación, revisión humana, derechos, rate de 4 créditos,
-  binding, readiness y circuito gobernados.
-- La generación real desde la UI autenticada es `b5631c86-707a-41d9-8ecc-ef61caa8200c`; terminó
-  `completed/retained` y el Producer muestra el SVG, `Listo`, `Guardada` y descarga habilitada.
-- El smoke detectó que Fal transporta el SVG como `application/octet-stream`. Globe `84d6a8e`
-  admite esa combinación sólo para la salida SVG esperada, verifica los bytes y añade CSP sandbox.
-- Worker, API y Studio se desplegaron con éxito. La flota de imagen queda en seis rutas ejercitadas;
-  TASK-1553 sigue `in-progress` sólo por los receipts transversales TASK-1468/TASK-1578.
