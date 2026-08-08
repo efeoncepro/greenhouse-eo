@@ -20,6 +20,7 @@ const taskFixture = ({
   flow = 'none',
   motion = 'none',
   uiUxContract = '',
+  blockedBy = null,
   backendImpact = 'none',
   backendDataContract = '',
   hybridExecutionJustification = ''
@@ -45,9 +46,9 @@ const taskFixture = ({
 - Status real: \`Diseno\`
 - Rank: \`TBD\`
 - Domain: \`${domain}\`
-- Blocked by: \`TASK-100\`
+- Blocked by: ${blockedBy ? `\`${blockedBy}\`` : `\`TASK-100\`
   reason continues on a second line with \`inline code\`
-  and a third line that should stay attached to Blocked by
+  and a third line that should stay attached to Blocked by`}
 - Branch: \`task/${id.toLowerCase()}-fixture\`
 - Legacy ID: \`none\`
 - GitHub Issue: \`none\`
@@ -1620,6 +1621,70 @@ const cases = [
         result.errors.some(item => item.rule === 'ui-premium-readiness' && item.message.includes('denied')),
         true
       )
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'stale-blocker: cerrar una task obliga a desbloquear a quien la citaba',
+    run: () => {
+      const root = createRepo()
+
+      // TASK-800 ya está cerrada; TASK-999 sigue declarándola como blocker.
+      write(
+        join(root, 'docs', 'tasks', 'complete', 'TASK-800-blocker.md'),
+        withModularPlacementContract(taskFixture({ id: 'TASK-800', lifecycle: 'complete', blockedBy: 'none' }))
+      )
+      write(
+        join(root, 'docs', 'tasks', 'to-do', 'TASK-999-fixture.md'),
+        withModularPlacementContract(taskFixture({ blockedBy: 'TASK-800' }))
+      )
+
+      // Reversa: al lintear la COMPLETA, ERROR — es el momento del cierre, cuando el agente tiene
+      // el contexto para arreglarlo. Éste es el "sí o sí" que pidió el operador.
+      const closing = lintTasks({ repoRoot: root, options: { task: 'TASK-800' } })
+      const reverse = closing.errors.filter(item => item.rule === 'stale-blocker')
+
+      assert.equal(reverse.length, 1)
+      assert.match(reverse[0].message, /TASK-999 todavía la declara/)
+
+      // Directa: al lintear la ACTIVA, sólo warning — esta task no se rompe porque otro cerró mal
+      // la suya.
+      const dependent = lintTasks({ repoRoot: root, options: { task: 'TASK-999' } })
+
+      assert.equal(dependent.errors.filter(item => item.rule === 'stale-blocker').length, 0)
+      assert.equal(dependent.warnings.filter(item => item.rule === 'stale-blocker').length, 1)
+
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'stale-blocker: no dispara con el blocker abierto ni con `none`',
+    run: () => {
+      const root = createRepo()
+
+      write(
+        join(root, 'docs', 'tasks', 'to-do', 'TASK-800-blocker.md'),
+        withModularPlacementContract(taskFixture({ id: 'TASK-800', blockedBy: 'none' }))
+      )
+      write(
+        join(root, 'docs', 'tasks', 'to-do', 'TASK-999-fixture.md'),
+        withModularPlacementContract(taskFixture({ blockedBy: 'TASK-800' }))
+      )
+
+      const openBlocker = lintTasks({ repoRoot: root, options: { task: 'TASK-999' } })
+
+      assert.equal(
+        [...openBlocker.errors, ...openBlocker.warnings].filter(item => item.rule === 'stale-blocker').length,
+        0
+      )
+
+      const noneField = lintTasks({ repoRoot: root, options: { task: 'TASK-800' } })
+
+      assert.equal(
+        [...noneField.errors, ...noneField.warnings].filter(item => item.rule === 'stale-blocker').length,
+        0
+      )
+
       rmSync(root, { recursive: true, force: true })
     }
   }

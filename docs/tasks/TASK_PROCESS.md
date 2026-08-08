@@ -515,8 +515,33 @@ Cuando el checkpoint es auto-aprobable:
   4. actualizar `Handoff.md`
   5. actualizar `changelog.md` si hubo cambio real de comportamiento, estructura o protocolo
   6. ejecutar el chequeo de impacto cruzado
+  7. **desbloquear a quien te citaba** — ver abajo; lo verifica `task:lint`
 - Si el trabajo implementado quedo listo pero falta alguno de los puntos anteriores, el estado correcto sigue siendo `in-progress`
 - El agente no debe responder "listo", "cerrado" o equivalente mientras la task siga viva en `docs/tasks/in-progress/`
+
+### Desbloquear a quien te citaba (regla `stale-blocker`, desde 2026-08-08)
+
+🔴 **Cerrar una task incluye quitarla del `Blocked by` de quienes la declaraban.** No es cortesía: un
+blocker obsoleto no rompe nada, sólo hace que **nadie tome trabajo que ya se puede tomar**.
+
+Caso fuente: al revisar EPIC-022 el 2026-08-08 aparecieron **siete** blockers citados que estaban
+todos completos. El backlog llevaba semanas leyéndose como bloqueado sin estarlo — de 15 abiertas,
+11 se podían tomar ya. Un barrido posterior encontró **45 referencias obsoletas en 28 tasks activas**
+a lo largo de todo el repo. Nadie lo vio porque el lint validaba la FORMA del campo, no si el blocker
+seguía vivo.
+
+Ahora lo verifica `task:lint` con la regla `stale-blocker`, en dos direcciones:
+
+| Dirección | Cuándo | Severidad | Por qué |
+|---|---|---|---|
+| **Reversa** | linteas una task en `complete/` y alguien activo aún la cita | **error** | es el momento del cierre: tienes el contexto y la obligación |
+| **Directa** | linteas una task activa que cita un blocker ya completo | warning | tu task no debe romperse porque otro cerró mal la suya |
+
+O sea: `pnpm task:lint --task TASK-###` sobre la que acabas de cerrar **falla** hasta que limpies los
+campos de sus dependientes. Si era el único blocker, el campo queda en `none`.
+
+⚠️ La verdad del lifecycle se lee de la **carpeta**, no del registry ni del campo `Lifecycle`: la
+carpeta es lo que el humano ve, y `docs:closure-check` ya exige que coincidan.
 
 ---
 
