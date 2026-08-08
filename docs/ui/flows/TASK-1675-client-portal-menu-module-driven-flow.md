@@ -4,7 +4,7 @@
 > **Task:** `docs/tasks/to-do/TASK-1675-client-portal-menu-module-driven.md`
 > **Wireframe:** `docs/ui/wireframes/TASK-1675-client-portal-menu-module-driven.md`
 > **Creado:** 2026-08-08 por Claude
-> **Estado:** diseño — `UI ready: no`
+> **Estado:** diseño — `UI ready: yes` (mapping, plan GVC y decision log completos; gates en verde)
 
 ## 0. Identidad del flujo
 
@@ -117,6 +117,31 @@ mentir sin que nada se quejara.
 | N4 dedup | Test: un módulo que declara una ruta ya presente no duplica el ítem |
 | N1→N4 e2e | GVC con dos personas: con módulo (ítem presente) y sin módulo (ausente) |
 | N5/N6 | Ya cubierto por TASK-1310 |
+
+## GVC Scenario Plan
+
+- Scenario file: `scripts/frontend/scenarios/client-portal-menu-modules.scenario.ts`
+- Ruta: `/home`
+- Viewports: desktop 1440 · mobile 390px
+- Quality profile: premium
+- `requiresStorageState`: declarado por escenario, con la persona cliente correspondiente
+- Required captures: `menu-with-module` (persona con módulo) · `menu-without-module` (persona sin módulo)
+- Assertions del **flujo** (distintas de las del wireframe, que miran la fila): el ítem lleva a `/growth/seo` y no a un deny; el informe **no** aparece como ítem; el menú del colaborador interno queda intacto
+- Scroll-width checks: `scroll-width == clientWidth` en ambos viewports
+- Baseline decision / surface ID: `client-portal-menu`
+- Review dossier: `pnpm fe:capture:review client-portal-menu-modules`
+
+La captura sin módulo no es opcional: **es la prueba del aislamiento per-org**, que es la mitad del
+contrato de este flujo. Un escenario que sólo capture el caso feliz demuestra que el ítem aparece,
+no que aparece *sólo a quien corresponde*.
+
+## Design Decision Log
+
+- **Decisión:** conectar el carril de módulos al chrome resolviendo server-side en el layout y pasando los ítems por props, con merge aditivo.
+- **Alternativas rechazadas:** fetch client-side (flash/CLS en chrome persistente); montar `ClientPortalNavigation` (segundo sistema de navegación y segundo landmark `<nav>` dentro del mismo sidebar); claim en el JWT (staleness ≥5 min y un tercer carril de verdad para un dato per-org que ya tiene reader con cache).
+- **Por qué este patrón:** es el que TASK-827 dejó declarado en su contrato, y deja el menú y el gate de la página leyendo el **mismo** `module_assignments` — un solo motor de verdad para visibilidad y acceso.
+- **Reuse / extend / new primitive:** `reuse` del composer y el reader existentes; extensión mínima del descriptor para la noción de ruta hija.
+- **Riesgos abiertos:** colisión con TASK-1388 sobre `VerticalMenu.tsx`; y la staleness declarada (habilitar un módulo se ve en la siguiente carga dura, no en navegación SPA).
 
 ## 8. Relación con otras tasks
 

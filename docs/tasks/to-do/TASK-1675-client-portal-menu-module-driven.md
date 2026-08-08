@@ -13,7 +13,7 @@
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1675-client-portal-menu-module-driven.md`
 - Flow: `docs/ui/flows/TASK-1675-client-portal-menu-module-driven-flow.md`
 - Motion: `none`
