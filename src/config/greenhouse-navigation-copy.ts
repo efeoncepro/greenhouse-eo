@@ -103,6 +103,10 @@ const enUS: NavigationCopy = {
       label: 'Keywords',
       subtitle: 'Where to grow in search: what already ranks and is one push away'
     },
+    growthSeoAudit: {
+      label: 'Audit',
+      subtitle: 'Technical site health: what is broken and what to fix first'
+    },
     growthAeo: { label: 'AEO', subtitle: 'AEO program: per-client score and plan + cross-sell' },
     growthCtas: { label: 'CTAs', subtitle: 'CTA/popup engine: inventory, lifecycle and preview' },
     adminCommercialProposals: { label: 'Proposals', subtitle: 'Commercial proposals: state, artifact versions and downloads' },

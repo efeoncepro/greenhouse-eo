@@ -53,6 +53,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Tab "Keywords" de Search Visibility (TASK-1308, EPIC-022): child del mismo viewCode administracion.growth_seo, alcanzable desde el conmutador de tabs del cockpit SEO. No siembra viewCode ni ítem de nav propios.'
   },
   {
+    route: '/admin/growth/seo/audit',
+    parent: '/admin/growth/seo',
+    via: 'tab',
+    reason:
+      'Tab "Auditoría" de Search Visibility (TASK-1309, EPIC-022): child del mismo viewCode administracion.growth_seo, alcanzable desde el conmutador de tabs del cockpit SEO. El drill del grupo de issues vive en la MISMA ruta vía ?issueGroup=, así que no suma una ruta hija propia. No siembra viewCode ni ítem de nav propios.'
+  },
+  {
     route: '/agency/hiring/pipeline',
     parent: '/agency/hiring',
     via: 'tab',

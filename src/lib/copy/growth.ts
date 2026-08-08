@@ -1696,7 +1696,7 @@ export const GH_GROWTH_SEO_CLIENT = {
     breadcrumbLeaf: 'SEO',
     eyebrow: 'Search Visibility 360',
     title: 'SEO — Visibilidad en búsqueda',
-    description: 'Tu lectura de búsqueda combina posición medida, cobertura observada y citabilidad en IA sin mezclar fuentes.',
+    description: 'Tu lectura de búsqueda combina posición medida, cobertura observada y visibilidad IA sin mezclar fuentes.',
     asOf: (date: string) => `Search Console · corte ${date}`,
     asOfUnknown: 'Search Console · sin fecha de corte',
     measured: 'Search Console · medido',
@@ -1739,7 +1739,7 @@ export const GH_GROWTH_SEO_CLIENT = {
     nextBestAction: 'Qué revisar ahora',
     actionPosition: 'Mantener keywords fuertes y detectar caídas tempranas.',
     actionCoverage: 'Ampliar la muestra para leer tendencia con más confianza.',
-    actionAeo: 'Cruzar las keywords con riesgo de no ser citadas por IA.'
+    actionAeo: 'Cruzar las keywords con la visibilidad IA vigente del dominio.'
   },
   evolution: {
     title: 'Cobertura de seguimiento',
@@ -1829,7 +1829,7 @@ export const GH_GROWTH_SEO_CLIENT = {
   report: {
     eyebrow: 'Lectura ejecutiva',
     title: 'Informe de visibilidad en búsqueda',
-    summary: 'Una lectura presentable de tu presencia orgánica y su relación con la visibilidad en IA.',
+    summary: 'Una lectura presentable de tu presencia orgánica y su relación con la visibilidad IA del dominio.',
     methodology: 'Proveniencia y metodología',
     methodologyBody: 'Los datos SEO provienen de Search Console y seguimiento de posición. El eje AEO usa el último score reportable del dominio; se muestra separado del SEO y no se promedia.',
     summaryAria: 'Resumen de métricas SEO',
@@ -2357,3 +2357,201 @@ export const GH_GROWTH_SEO_KEYWORDS = {
     }
   }
 } as const
+
+/**
+ * TASK-1309 — Auditoría del sitio (tab "Auditoría" de Search Visibility, nodo S4).
+ *
+ * Copy es-CL (tuteo) de la superficie operador que diagnostica salud técnica de un
+ * dominio. Los estados NO colapsan: un crawl que terminó sin issues es una buena
+ * noticia, no un error, y "sin auditoría" no se pinta con ceros.
+ */
+export const GH_GROWTH_SEO_AUDIT = {
+  header: {
+    title: 'Auditoría del sitio',
+    subtitle: (domain: string) => `Salud técnica de ${domain} para búsqueda`,
+    subtitleNoDomain: 'Salud técnica del sitio para búsqueda',
+    breadcrumbLeaf: 'Auditoría',
+    freshness: (days: number) =>
+      days === 0 ? 'Último crawl: hoy' : days === 1 ? 'Último crawl: ayer' : `Último crawl: hace ${days} días`,
+    freshnessNever: 'Sin crawl reciente',
+    // El freshness es la señal de cuánto confiar en el diagnóstico: pasado cierto punto
+    // deja de ser un dato de contexto y pasa a ser una advertencia.
+    freshnessStale: 'Este diagnóstico ya no es reciente. Corre una auditoría para confirmarlo.'
+  },
+
+  action: {
+    run: 'Correr auditoría',
+    running: 'Encolando…',
+    queued: 'Auditoría encolada. El crawl corre en segundo plano y la pantalla se actualiza al terminar.'
+  },
+
+  kpi: {
+    health: 'Salud',
+    healthAria: (score: number) => `Salud del sitio: ${score} de 100`,
+    healthPending: 'Pendiente',
+    healthPendingHint: 'El crawl no calculó un puntaje de salud.',
+    critical: 'Críticos',
+    warnings: 'Atención',
+    notices: 'Menores',
+    pages: 'Páginas revisadas'
+  },
+
+  issues: {
+    title: 'Issues priorizados',
+    // Se nombra EXACTAMENTE lo que ordena la lista. Prometer un criterio que los datos no
+    // sostienen es la misma clase de mentira que pintar un cero donde no hubo medición.
+    subtitle: 'Primero lo crítico; dentro de cada nivel, lo que toca más páginas y cuesta menos resolver',
+    affected: (pages: number) => (pages === 1 ? '1 página afectada' : `${pages} páginas afectadas`),
+    view: 'Ver',
+    viewAria: (issueName: string) => `Ver las páginas afectadas por ${issueName}`,
+    effortLabel: 'Esfuerzo',
+    // El esfuerzo es un juicio editorial de Efeonce, no un dato del proveedor: se declara
+    // como estimación para que nadie lo lea como una medición del crawl.
+    effortHint: 'El esfuerzo es una estimación nuestra, no un dato del crawl.',
+    unknownIssue: (issueType: string) => `Check sin catalogar (${issueType})`,
+    unknownIssueHint: 'Este check es nuevo en el proveedor y aún no tiene ficha en español.'
+  },
+
+  severity: {
+    critical: 'Crítico',
+    warning: 'Atención',
+    notice: 'Info'
+  },
+
+  effort: {
+    low: 'Rápido',
+    medium: 'Medio',
+    high: 'Alto'
+  },
+
+  drill: {
+    title: (issueName: string, pages: number) => `${issueName} — ${pages === 1 ? '1 página' : `${pages} páginas`}`,
+    close: 'Cerrar',
+    closeAria: 'Cerrar el detalle del issue y volver a la lista',
+    colUrl: 'URL',
+    colDetail: 'Detalle',
+    detailEmpty: 'Sin detalle adicional',
+    httpStatus: (code: number) => `HTTP ${code}`,
+    onpageScore: (score: number) => `Puntaje de página ${score}`,
+    truncated: (shown: number, total: number) => `Mostramos ${shown} de ${total} páginas de este grupo.`
+  },
+
+  states: {
+    emptyTitle: 'Sin auditoría reciente',
+    emptyDescription: (domain: string) =>
+      `Aún no corrimos un crawl para ${domain}. Corre una auditoría para ver la salud técnica.`,
+    emptyDescriptionNoDomain: 'Aún no corrimos un crawl para este sitio. Corre una auditoría para ver la salud técnica.',
+
+    runningTitle: 'Auditoría en curso',
+    runningDescription: (domain: string) => `Estamos revisando ${domain}. Esto puede tardar unos minutos.`,
+    runningDescriptionNoDomain: 'Estamos revisando el sitio. Esto puede tardar unos minutos.',
+
+    cleanTitle: 'Sin issues detectados',
+    cleanDescription: 'El crawl terminó y no encontró problemas de los que revisamos.',
+
+    degradedTitle: 'El crawl terminó parcialmente',
+    degradedDescription:
+      'Algunas páginas no se pudieron revisar. Lo que ves es real, pero incompleto: no lo leas como el sitio entero.',
+
+    failedTitle: 'La auditoría falló',
+    failedDescription: 'No pudimos completar el crawl.',
+    failedCta: 'Reintentar',
+
+    readerErrorTitle: 'No pudimos cargar la auditoría',
+    readerErrorDescription: 'Hubo un problema al leer el reporte.',
+    readerErrorCta: 'Reintentar',
+
+    deniedTitle: 'Sin acceso',
+    deniedDescription: 'No tienes permiso para ver la auditoría de este Space.',
+
+    noTargetTitle: 'Este Space no tiene un sitio configurado',
+    noTargetDescription:
+      'Hay que crear el target del sitio antes de poder auditarlo. Pídeselo a quien administre el módulo.',
+
+    noSpacesTitle: 'Sin Spaces con SEO activo',
+    noSpacesDescription: 'Ningún Space que puedas ver tiene el módulo SEO habilitado.'
+  },
+
+  runErrors: {
+    alreadyRunning: 'Ya hay una auditoría corriendo para este sitio. Espera a que termine.',
+    alreadyToday: 'Ya corrimos una auditoría para este sitio hoy.',
+    quotaExhausted: 'Este Space agotó su cupo de auditorías del mes.',
+    budgetExhausted: 'Este Space agotó su presupuesto de proveedor del mes.',
+    notEntitled: 'Este Space no tiene el módulo SEO habilitado para correr auditorías.',
+    generic: 'No pudimos encolar la auditoría. Intenta de nuevo.'
+  }
+} as const
+
+/**
+ * TASK-1309 — Ficha es-CL de cada check OnPage que Greenhouse materializa.
+ *
+ * El reader entrega el `issueType` como id de MÁQUINA del proveedor (`is_broken`,
+ * `no_h1_tag`): sin esta ficha la lista priorizada sería una columna de identificadores
+ * en inglés. Las claves espejan el allowlist curado de
+ * `src/lib/growth/seo/site-audit/findings-map.ts` — cuando allá entre un check nuevo,
+ * acá entra su ficha. Mientras no la tenga, la UI degrada nombrando el id crudo en vez
+ * de esconder el issue: un problema sin traducir sigue siendo un problema.
+ *
+ * ⚠️ `effort` es un juicio editorial de Efeonce, NO un dato del crawl — DataForSEO no
+ * reporta costo de arreglo. Existe porque la pregunta del operador es "¿qué ataco
+ * primero?", y severidad sola no la responde: 300 imágenes sin `alt` y un 5xx no se
+ * atacan igual aunque compartan volumen. Se muestra siempre etiquetado como estimación.
+ *   low    → cambio de plantilla o contenido, se resuelve en lote
+ *   medium → requiere criterio por página o tocar reglas del sitio
+ *   high   → infraestructura, arquitectura o trabajo editorial de fondo
+ */
+export const GH_GROWTH_SEO_AUDIT_ISSUES: Readonly<
+  Record<string, { readonly label: string; readonly effort: 'low' | 'medium' | 'high'; readonly hint: string }>
+> = {
+  // Estado HTTP / disponibilidad.
+  is_broken: { label: 'Página rota', effort: 'high', hint: 'La página no responde correctamente y no puede indexarse.' },
+  is_4xx_code: { label: 'Error 4xx', effort: 'medium', hint: 'La página responde "no encontrada" o "sin acceso" a quien la visita.' },
+  is_5xx_code: { label: 'Error 5xx del servidor', effort: 'high', hint: 'El servidor falla al entregar la página. Es un problema de infraestructura.' },
+
+  // Canonicalización.
+  canonical_to_broken: { label: 'Canonical apunta a una página rota', effort: 'medium', hint: 'La página declara como versión oficial una URL que no funciona.' },
+  recursive_canonical: { label: 'Canonical recursivo', effort: 'medium', hint: 'Las etiquetas canonical se apuntan entre sí en círculo y anulan la señal.' },
+  canonical_to_redirect: { label: 'Canonical apunta a una redirección', effort: 'medium', hint: 'La versión oficial declarada redirige a otra parte: la señal se diluye.' },
+  canonical_chain: { label: 'Cadena de canonicals', effort: 'medium', hint: 'Varias canonical encadenadas antes de llegar a la URL final.' },
+  is_link_relation_conflict: { label: 'Conflicto entre relaciones de enlace', effort: 'medium', hint: 'Las etiquetas de relación se contradicen sobre cuál es la versión buena.' },
+
+  // Meta esencial.
+  no_title: { label: 'Sin etiqueta de título', effort: 'low', hint: 'La página no declara título: el buscador inventa uno.' },
+  no_description: { label: 'Sin meta descripción', effort: 'low', hint: 'Sin descripción propia, el resumen del resultado lo arma el buscador.' },
+  duplicate_title_tag: { label: 'Título duplicado', effort: 'medium', hint: 'Varias páginas comparten el mismo título y compiten entre sí.' },
+  duplicate_meta_tags: { label: 'Meta tags duplicados', effort: 'medium', hint: 'Metadatos repetidos entre páginas distintas.' },
+  no_h1_tag: { label: 'Sin encabezado H1', effort: 'low', hint: 'La página no declara de qué trata en su encabezado principal.' },
+  title_too_long: { label: 'Título demasiado largo', effort: 'low', hint: 'El buscador lo va a recortar en el resultado.' },
+  title_too_short: { label: 'Título demasiado corto', effort: 'low', hint: 'El título no alcanza a describir la página.' },
+
+  // Redirects y protocolo.
+  redirect_chain: { label: 'Cadena de redirecciones', effort: 'medium', hint: 'La URL pasa por varios saltos antes de llegar a destino.' },
+  has_meta_refresh_redirect: { label: 'Redirección por meta refresh', effort: 'low', hint: 'Redirección hecha con una técnica que el buscador no interpreta bien.' },
+  https_to_http_links: { label: 'Enlaces de HTTPS a HTTP', effort: 'medium', hint: 'Una página segura enlaza a contenido sin cifrar.' },
+  is_http: { label: 'Página servida por HTTP', effort: 'high', hint: 'La página no usa conexión segura.' },
+
+  // Contenido.
+  low_content_rate: { label: 'Poco contenido respecto al código', effort: 'high', hint: 'La página tiene mucho más marcado que texto útil.' },
+  low_character_count: { label: 'Muy poco texto', effort: 'high', hint: 'El contenido es demasiado breve para responder una búsqueda.' },
+  low_readability_rate: { label: 'Lectura difícil', effort: 'high', hint: 'El texto exige más esfuerzo de lectura del recomendable.' },
+  lorem_ipsum: { label: 'Contenido de relleno', effort: 'low', hint: 'Quedó texto de maqueta publicado.' },
+
+  // Estructura y descubrimiento.
+  is_orphan_page: { label: 'Página huérfana', effort: 'medium', hint: 'Ninguna otra página del sitio la enlaza: es difícil de descubrir.' },
+
+  // Datos estructurados (insumo AEO).
+  has_micromarkup_errors: { label: 'Errores en los datos estructurados', effort: 'medium', hint: 'El marcado que alimenta resultados enriquecidos y respuestas de IA tiene errores.' },
+
+  // Performance y tamaño (lab, diagnóstico).
+  high_loading_time: { label: 'Tiempo de carga alto', effort: 'high', hint: 'La página tarda más de lo razonable en responder.' },
+  large_page_size: { label: 'Página muy pesada', effort: 'medium', hint: 'El peso de la página castiga a quien la abre con conexión lenta.' },
+  has_render_blocking_resources: { label: 'Recursos que bloquean el dibujado', effort: 'medium', hint: 'Scripts o estilos que retrasan lo primero que se ve.' },
+  no_content_encoding: { label: 'Sin compresión de contenido', effort: 'low', hint: 'El servidor entrega la página sin comprimir.' },
+
+  // Higiene HTML.
+  no_image_alt: { label: 'Imágenes sin texto alternativo', effort: 'low', hint: 'Las imágenes no describen su contenido: afecta accesibilidad y búsqueda de imágenes.' },
+  no_favicon: { label: 'Sin favicon', effort: 'low', hint: 'El sitio no declara su ícono de pestaña.' },
+  no_doctype: { label: 'Sin doctype', effort: 'low', hint: 'El documento no declara su tipo y el navegador adivina cómo interpretarlo.' },
+  no_encoding_meta_tag: { label: 'Sin meta de codificación', effort: 'low', hint: 'La página no declara su codificación de caracteres.' },
+  deprecated_html_tags: { label: 'Etiquetas HTML obsoletas', effort: 'medium', hint: 'El marcado usa etiquetas que el estándar ya retiró.' }
+}

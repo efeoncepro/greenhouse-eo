@@ -60,7 +60,8 @@ const TABS: readonly SeoSearchVisibilityTab[] = [
     label: GH_GROWTH_SEO_OVERVIEW.tabs.audit,
     href: '/admin/growth/seo/audit',
     icon: 'tabler-stethoscope',
-    available: false
+    // TASK-1309 — la hermana aterrizó: el tab navega de verdad.
+    available: true
   }
 ]
 

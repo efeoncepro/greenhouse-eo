@@ -76,6 +76,11 @@ export const GH_INTERNAL_NAV = {
     label: 'Keywords',
     subtitle: 'Dónde crecer en búsqueda: lo que ya rankea y está a un empujón'
   },
+  // TASK-1309 — child de `growthSeo` (tab Auditoría), mismo contrato que las anteriores.
+  growthSeoAudit: {
+    label: 'Auditoría',
+    subtitle: 'Salud técnica del sitio: qué está roto y qué conviene atacar primero'
+  },
   growthAeo: { label: 'AEO', subtitle: 'Programa AEO: score y plan por cliente + cross-sell' },
   growthCtas: { label: 'CTAs', subtitle: 'Motor de CTAs/popups: inventario, lifecycle y preview' },
   knowledge: { label: 'Knowledge', subtitle: 'Guías, fuentes y memoria operativa' },

@@ -67,16 +67,25 @@ const MOVER_WINDOW_DAYS = 14
 /** Días hacia atrás que definen "la semana anterior" para el delta WoW. */
 const MOVER_LOOKBACK_DAYS = 7
 
+export interface ActiveSeoTarget {
+  seoTargetId: string
+  rootDomain: string
+}
+
 /**
  * Target SEO activo de la organización.
  *
  * Una org puede tener más de un target (dominios distintos); V1 toma el más reciente y
  * lo declara. NO se inventa un merge entre targets: mezclar dominios en un mismo gauge
  * daría una "salud" que no corresponde a ningún sitio real.
+ *
+ * Devuelve también el dominio porque toda superficie que nombra el sitio lo necesita
+ * junto al id, y resolverlos por separado invita a que cada consumer escriba su propio
+ * SELECT — que es justo lo que pasó en la ruta de keywords.
  */
-export const resolveActiveSeoTargetId = async (organizationId: string): Promise<string | null> => {
-  const rows = await runGreenhousePostgresQuery<{ seo_target_id: string }>(
-    `SELECT seo_target_id
+export const resolveActiveSeoTarget = async (organizationId: string): Promise<ActiveSeoTarget | null> => {
+  const rows = await runGreenhousePostgresQuery<{ seo_target_id: string; root_domain: string }>(
+    `SELECT seo_target_id, root_domain
        FROM greenhouse_growth.seo_targets
       WHERE organization_id = $1
         AND status = 'active'
@@ -85,8 +94,14 @@ export const resolveActiveSeoTargetId = async (organizationId: string): Promise<
     [organizationId]
   )
 
-  return rows[0]?.seo_target_id ?? null
+  const row = rows[0]
+
+  return row ? { seoTargetId: row.seo_target_id, rootDomain: row.root_domain } : null
 }
+
+/** Azúcar para los consumers que sólo necesitan el id. */
+export const resolveActiveSeoTargetId = async (organizationId: string): Promise<string | null> =>
+  (await resolveActiveSeoTarget(organizationId))?.seoTargetId ?? null
 
 const toRegionReason = (errorCode: string): SeoSidebarRegionReason => {
   switch (errorCode) {

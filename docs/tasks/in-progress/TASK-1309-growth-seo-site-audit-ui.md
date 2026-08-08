@@ -70,7 +70,7 @@ TASK-1307**; `TASK-1306` **no instaló ninguna librería nueva** ni prejuzgó es
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P3`
 - Impact: `Medio`
 - Effort: `Medio`
