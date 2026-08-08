@@ -306,7 +306,7 @@ El conmutador es `SeoSearchVisibilityTabs`: cada tab es una **ruta propia** nave
 
 ### 10.2 Superficies por rol
 
-- **Operador Efeonce:** cockpit denso, multi-Space, datos crudos, acciones. **Overview (S1) IMPLEMENTADO** (TASK-1306, code complete en `develop`): Space picker + selector de período (`?range=` con allowlist server-side) + 4 KPIs norte + curva de visibilidad + sidebar salud/movers/cruce AEO. **Pantalla ancla (S2) IMPLEMENTADA** (TASK-1307, `complete`): set comparable con presets data-driven, chart ECharts de evolución con procedencia propia, granularidad diario/semanal, marcadores AI Overview, bandas de updates de Google y tabla de standings con Δ30d (§10.3).
+- **Operador Efeonce:** cockpit denso, multi-Space, datos crudos, acciones. **Overview (S1) IMPLEMENTADO** (TASK-1306, code complete en `develop`): Space picker + selector de período (`?range=` con allowlist server-side) + 4 KPIs norte + curva de visibilidad + sidebar salud/movers/cruce AEO. **Pantalla ancla (S2) IMPLEMENTADA** (TASK-1307, `complete`): set comparable con presets data-driven, chart ECharts de evolución con procedencia propia, granularidad diario/semanal, marcadores AI Overview, bandas de updates de Google y tabla de standings con Δ30d (§10.3). **Site audit (S4) IMPLEMENTADO** (TASK-1309): salud + freshness explícito + issues como lista priorizada + drill `?issueGroup=` + enqueue gobernado (§10.6). Con S4 el conmutador de "Search Visibility" queda **completo: las 4 tabs navegan**.
 - **Cliente:** dashboard self-service de SU Space, curado, honesto, mono-Space.
 - **Report Artifact:** snapshot narrativo imprimible/PDF (3.er render adapter del mismo model, mirror del AEO report artifact).
 - **Público (diferido):** "SEO quick check" de 1 dominio sobre el chokepoint gobernado.
@@ -407,6 +407,52 @@ permanente.
 ### 10.5 Estados y honestidad (state-design)
 
 Sin conexión GSC → `EmptyState` accionable + CTA OAuth (nunca ceros fantasma). Medido (●, GSC) vs estimado (◑, DataForSEO) con leyenda persistente. Latencia explícita ("GSC: datos hasta hace 2 días"). Cuota agotada → banner honesto + degrada a GSC medido. Fallo parcial → mostrar lo que llegó, marcar el resto "Pendiente" con razón (`observeAndDegrade`).
+
+### 10.6 Site audit (S4) — superficie operador
+
+Ruta `/admin/growth/seo/audit` (TASK-1309), child del viewCode `administracion.growth_seo` con el
+guard de 3 puertas de §10.1. Cliente PURO de `readSiteAuditReport` + `queueSiteAudit`: no deriva
+salud, no fabrica snapshots y no toca DataForSEO en el render.
+
+> **Delta 2026-08-08 (TASK-1309) — contratos que fija esta superficie.**
+>
+> 1. 🔴 **El gauge de salud es un arco SVG determinista, NO un radialBar de ApexCharts** — pese a lo
+>    que §10.4 especificaba. Un radialBar mide su contenedor al montar y dentro de una columna fluida
+>    mide 0: no dibuja, sin error visible (hallazgo de TASK-1306 en GVC). El arco vive en
+>    `src/views/greenhouse/admin/growth/seo/shared/SeoHealthGauge.tsx` y lo comparten el sidebar del
+>    Overview y esta pantalla: es la MISMA métrica, y duplicar el dibujo dejaría que los umbrales
+>    diverjan y el mismo sitio se viera "sano" en una pantalla y "en riesgo" en la otra.
+> 2. **`healthScore === null` NO es 0** y el componente no lo renderiza: null (no calculado) y 0
+>    (sitio pésimo) llevan a conclusiones opuestas. El consumer dice "Pendiente" con palabras.
+> 3. **Los issues van como LISTA priorizada, no como tabla ordenable.** El orden ES la respuesta a
+>    "qué ataco primero"; una tabla la esconde detrás de un control que hay que descubrir. El
+>    `DataTableShell` aparece UNA vez, en el drill, donde sí hay una lista homogénea (las URLs).
+> 4. **El orden es severidad ▸ (páginas ÷ esfuerzo), con la severidad como corte absoluto.** Un score
+>    único dejaría que 400 imágenes sin `alt` enterraran un 5xx. Fijado en
+>    `views/.../audit/group-audit-issues.ts` con test dedicado.
+> 5. **El `issueType` del reader es un id de máquina** (`is_broken`), así que la superficie necesita
+>    ficha es-CL. `GH_GROWTH_SEO_AUDIT_ISSUES` (`src/lib/copy/growth.ts`) cubre los 34 checks del
+>    allowlist de `findings-map.ts` con label + **tier de esfuerzo curado** (juicio editorial de
+>    Efeonce, declarado como estimación en la UI — DataForSEO no reporta costo de arreglo). **Un check
+>    nuevo en el allowlist obliga a escribir su ficha**: hay test de drift en ambos sentidos, y
+>    mientras no la tenga la UI NOMBRA el id crudo en vez de esconder el issue.
+> 6. **El drill vive en la misma ruta vía `?issueGroup=`**, no en un segmento dinámico paralelo: back
+>    y enlace compartible salen gratis y hay un solo page guard. Su tabla lleva **scroll interno
+>    acotado** — un grupo real trae 91 URLs y sin techo el drill mide ~5000px, expulsando de pantalla
+>    la lista que el operador venía recorriendo (hallazgo del GVC). El contenedor es focusable
+>    (`tabIndex=0` + `role=region`): una zona con scroll inalcanzable por teclado deja su contenido
+>    fuera del alcance de quien no usa mouse.
+> 7. **`POST /api/admin/growth/seo/audit/run`** — transporte puro sobre `queueSiteAudit`, gateado por
+>    **`growth.seo.audit.run`** (execute), distinta de `observation.read`: diagnosticar y gastarle al
+>    proveedor son permisos distintos. Responde **202**, no 200 — el crawl quedó encolado, no listo.
+>    6 códigos canónicos nuevos con `actionable` deliberado: `seo_audit_already_running` y
+>    `seo_audit_already_captured_today` van **`actionable: false`** porque son el guard de
+>    idempotencia haciendo su trabajo (reintentar es justo lo que NO corresponde); `seo_quota_exhausted`
+>    y `seo_budget_exhausted` son techos del mes; sólo `seo_provider_unavailable` (breaker abierto o
+>    falla del proveedor) es transitorio de verdad y ofrece reintento.
+> 8. **`resolveActiveSeoTargetId` se amplió a `resolveActiveSeoTarget`** (id + `rootDomain`): toda
+>    superficie que nombra el sitio necesita ambos, y resolverlos por separado invita a que cada
+>    consumer escriba su propio `SELECT` — que es lo que ya pasó en la ruta de keywords.
 
 ---
 

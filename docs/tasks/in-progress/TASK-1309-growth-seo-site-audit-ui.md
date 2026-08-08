@@ -1,5 +1,47 @@
 # TASK-1309 — Growth SEO: Site Audit UI
 
+## Delta 2026-08-08 — construida y verificada; el cierre lo bloquea un gap ajeno
+
+**Estado: code complete, cierre bloqueado.** Los 4 slices están implementados y los 4 gates de UI en
+verde (`design-contract:lint` PASS · `ui:code-lint` PASS · `ui:visual-gate` PASS · `ui:quality` PASS
+avg 4.58 / piso 4.5). `pnpm local:check` limpio, `task:lint` sin findings, `route-reachability-gate`
+232 rutas / 0 huérfanas, `pnpm build` de producción verde.
+
+**Por qué no pasa a `complete`:** `pnpm test` completo deja **2 rojos ajenos** —
+`src/lib/admin/client-role-visibility.test.ts`. `TASK-1310` registró `cliente.growth_seo_dashboard` y
+`cliente.growth_seo_report` en `view-access-catalog.ts` sin matriz de visibilidad por rol y **sin
+migración que siembre `role_view_assignments`** (regla dura del repo). Decidir qué roles cliente ven
+esas vistas es de 1310, no de acá. Detalle en `Handoff.md`.
+
+**Desviaciones deliberadas respecto de la spec y el wireframe:**
+
+1. **NO se usa radialBar de ApexCharts** (lo pedían §10.4, el Design Decision Log y el wireframe). El
+   Delta 2026-08-07 de esta misma task ya advertía que mide 0 en contenedor fluido. Se extrajo el
+   arco SVG que TASK-1306 validó a `views/.../seo/shared/SeoHealthGauge.tsx` y ahora lo comparten las
+   dos pantallas: misma métrica, mismos umbrales, un solo lugar donde puedan cambiar.
+2. **El copy `issues.subtitle` no promete "impacto y esfuerzo" a secas.** El contrato de datos no
+   trae ninguna señal de esfuerzo, así que la promesa original habría sido vacía. Se curó un tier de
+   esfuerzo por check junto a su label es-CL —declarado en pantalla como estimación nuestra— y el
+   orden quedó **severidad ▸ páginas ÷ esfuerzo**, con la severidad como corte absoluto.
+3. **`Backend impact` dejó de ser estrictamente `none`:** hicieron falta el route handler
+   `POST /api/admin/growth/seo/audit/run` (transporte puro sobre `queueSiteAudit`) y 6 códigos de
+   error canónicos. No es contrato de negocio nuevo — la regla sigue viviendo en el primitive — pero
+   se declara para no fingir que la task no tocó server-side.
+
+**Trabajo que la spec no anticipaba:** los 34 `issueType` del allowlist llegan como ids de máquina
+(`is_broken`), así que la superficie necesitaba un catálogo es-CL completo con label, esfuerzo y
+explicación, más un test de drift bidireccional contra `findings-map.ts`.
+
+**Tres hallazgos salieron de MIRAR los frames, no de los gates:** el drill volcaba 91 URLs en ~5000px
+sin scroll interno (expulsaba de pantalla la lista priorizada), su encabezado quedaba en 3.25:1 sobre
+el fondo de costura, y las cifras de salud flotaban sin ritmo sobre el ancho completo.
+
+**Open Question 1 resuelta:** el drill es expand in-flow en la MISMA page vía `?issueGroup=` (apilado
+en mobile), no una sub-vista. Back y enlace compartible salen gratis y hay un solo page guard.
+
+Evidencia: `.captures/2026-08-08T12-59-33_growth-seo-audit` ·
+`docs/ui/reviews/TASK-1309-growth-seo-site-audit-ui.scorecard.json`.
+
 ## Delta 2026-08-07 — TASK-1306 cerró: shell servido y el gauge de salud necesita replanteo
 
 **Servido — no lo vuelvas a construir:**
@@ -77,7 +119,7 @@ TASK-1307**; `TASK-1306` **no instaló ninguna librería nueva** ni prejuzgó es
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `layout`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1309-growth-seo-site-audit-ui.md`
 - Flow: `none`
 - Motion: `none`

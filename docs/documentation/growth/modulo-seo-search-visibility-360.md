@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.7
+> **Version:** 1.8
 > **Creado:** 2026-08-05 por Claude (TASK-1299 + TASK-1301)
-> **Ultima actualizacion:** 2026-08-07 por Claude (TASK-1307 mejoras de la pantalla Rendimiento: grupos configurados, lectura cruzada del período, granularidad diaria/semanal, marcadores de AI Overview y bandas de updates confirmados de Google — verificado contra la pantalla construida)
+> **Ultima actualizacion:** 2026-08-08 por Claude (TASK-1309 — cuarta pantalla: Auditoria del sitio, con salud, frescura explicita del crawl y los issues como lista priorizada por gravedad e impacto/esfuerzo; verificado contra los frames reales del GVC)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
 
 # Modulo SEO — Search Visibility 360 (Growth)
@@ -344,6 +344,47 @@ seleccion **no se renderizan** — un analista lee el mapa completo sin poder ha
 > `src/views/greenhouse/admin/growth/seo/keywords/`. Mismos commands para la UI, el lane `app`,
 > el lane `ecosystem` y las tools MCP `track_seo_keywords` / `untrack_seo_keywords` (estas ultimas
 > fail-closed hasta que el scope `efeonce.mcp.seo.write` quede cableado a un cliente).
+
+### Auditoria del sitio: que esta roto y que conviene arreglar primero (TASK-1309, 2026-08-08)
+
+La cuarta y ultima pantalla del modulo (`Growth > SEO > Auditoria`) muestra la **salud tecnica** del
+sitio de un cliente: cuantos problemas encontro el ultimo crawl, de que gravedad, y en que orden
+conviene atacarlos. Es donde el equipo diagnostica el sitio antes de proponer trabajo.
+
+**Que se ve**
+
+| Elemento | Que dice |
+|---|---|
+| Salud del sitio | Un puntaje de 0 a 100 en un arco, con el numero siempre escrito. Verde sobre 80, ambar sobre 50, rojo abajo. Si el crawl no alcanzo a calcularlo dice **"Pendiente"** — un 0 se leeria como "sitio pesimo", que es otra cosa. |
+| Ultimo crawl | En la cabecera, en palabras ("hace 3 dias"). Dice cuanto confiar en todo lo demas. Pasadas dos semanas aparece un aviso: el diagnostico ya no es reciente. |
+| Criticos · Atencion · Menores · Paginas revisadas | El volumen por gravedad y el tamaño del crawl. Son cifras neutras: el color no las pinta, porque un semaforo aplicado a la identidad de una metrica deja de ser una ayuda puntual de estado. |
+| Issues priorizados | Una **lista**, no una tabla ordenable. El orden ES la respuesta a "que ataco primero", asi que no se esconde detras de un control que haya que descubrir. Cada fila: gravedad (icono + palabra + color), nombre del problema en español, cuantas paginas afecta y cuanto esfuerzo estimamos. |
+| El orden de la lista | Primero **todo lo critico**, sin excepcion. Dentro de cada nivel, lo que toca mas paginas y cuesta menos resolver. Asi 400 imagenes sin texto alternativo nunca entierran un error de servidor. |
+| Esfuerzo | Rapido / Medio / Alto. Es **juicio nuestro, no un dato del crawl**, y la pantalla lo dice con esas palabras. Existe porque la gravedad sola no responde la pregunta: 300 imagenes sin `alt` y una caida de servidor no se atacan igual aunque compartan volumen. |
+| Ver → | Abre el grupo en la misma pantalla y lista las URLs afectadas. Se puede compartir el enlace y el boton "atras" del navegador funciona. |
+
+**Los estados, que no se mezclan**
+
+| Situacion | Que muestra |
+|---|---|
+| Nunca se audito | "Sin auditoria reciente" + el boton para correrla. Nunca ceros. |
+| Crawl en curso | "Auditoria en curso". Todavia no hay hallazgos, y eso se dice — no se pinta una lista vacia. |
+| Termino sin problemas | "Sin issues detectados". Es una **buena noticia**, no un error, y se ve distinto de un crawl fallido. |
+| Termino a medias | Aviso de que el crawl quedo incompleto. Lo que se ve es real, pero no es el sitio entero. |
+| Fallo | "La auditoria fallo", con la opcion de reintentar. |
+| Sin sitio configurado | Explica que primero hay que crear el sitio del Space. Es otro camino, no el mismo vacio. |
+
+**Correr una auditoria** cuesta dinero (le pagamos al proveedor por cada crawl), asi que esta detras
+de un permiso propio: quien puede *leer* el diagnostico no necesariamente puede *correrlo*. Ademas hay
+dos frenos automaticos: si ya hay un crawl en vuelo o ya se corrio uno hoy para ese sitio, el sistema
+lo dice en vez de gastar dos veces por lo mismo.
+
+> Paso a paso para operarla: [Auditoria del sitio — leer la salud tecnica y priorizar](../../manual-de-uso/growth/usar-auditoria-sitio-seo.md).
+>
+> Detalle tecnico: `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §6/§7 (reader
+> `readSiteAuditReport`, command `queueSiteAudit`). Codigo:
+> `src/views/greenhouse/admin/growth/seo/audit/`, `src/app/api/admin/growth/seo/audit/run/`.
+> El mismo command lo operan la UI, Nexa y el lane MCP.
 
 ## Relacion con el AI Visibility Grader (motores hermanos)
 

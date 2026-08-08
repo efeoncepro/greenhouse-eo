@@ -84,7 +84,7 @@ interface Props {
 }
 
 const StatBlock = ({ label, value, hint }: { label: string; value: string; hint?: string }) => (
-  <Stack spacing={0.5} sx={{ minInlineSize: 0 }}>
+  <Stack spacing={0.5} sx={{ minInlineSize: 0, py: { xs: 1, md: 0 } }}>
     <Typography variant='caption' color='text.secondary'>
       {label}
     </Typography>
@@ -348,9 +348,27 @@ const SiteAuditView = ({
               sx={{
                 display: 'grid',
                 gridTemplateColumns: { xs: 'repeat(2, minmax(0, 1fr))', md: 'repeat(4, minmax(0, 1fr))' },
-                gap: 4,
+                gap: 0,
                 flex: 1,
-                minInlineSize: 0
+                minInlineSize: 0,
+                alignContent: 'center',
+                // Separadores entre cifras: repartidas sobre ~1600px sin ritmo, la banda
+                // se leía como cuatro números flotando. El filete las agrupa como una
+                // unidad de lectura y hace que el ancho se gane en vez de sobrar — mismo
+                // recurso que ya separa el gauge. Se ve en la captura, no en el DOM.
+                '& > * + *': {
+                  borderInlineStart: theme => `1px solid ${theme.palette.divider}`,
+                  paddingInlineStart: 4
+                },
+                // A 390px la grilla es 2×2: la 3.ª celda abre fila, así que su filete
+                // cortaría en el aire. Se suprime junto con su sangría — dejar la sangría
+                // sola desalinea "Menores" respecto de "Críticos", que es la columna con
+                // la que el ojo lo compara.
+                '& > *:nth-of-type(3)': {
+                  borderInlineStart: { xs: 'none', md: '1px solid' },
+                  borderColor: { md: 'divider' },
+                  paddingInlineStart: { xs: 0, md: 4 }
+                }
               }}
             >
               <StatBlock label={GH_GROWTH_SEO_AUDIT.kpi.critical} value={String(report.totals.critical)} />
@@ -446,6 +464,10 @@ const SiteAuditView = ({
               tabIndex={-1}
               variant='subtitle1'
               component='h3'
+              // `subtitle1` hereda un gris que sobre el fondo de la costura queda en
+              // 3.25:1 — bajo el piso AA. El encabezado del drill es contenido primario,
+              // no metadato, así que va en tinta primaria (axe lo cazó en el GVC).
+              color='text.primary'
               sx={{ outline: 'none' }}
             >
               {GH_GROWTH_SEO_AUDIT.drill.title(group.label, group.affectedPages)}
@@ -461,6 +483,21 @@ const SiteAuditView = ({
             )}
           </Stack>
 
+          {/* Scroll INTERNO, no crecimiento vertical libre. Un grupo real trae 91 URLs
+              (Berel) y sin este techo el drill mide ~5000px: expulsa de la pantalla la
+              lista priorizada que el operador estaba recorriendo, y abrir un issue pasa a
+              costar perder el contexto. Lo vio la captura del GVC, no el lint.
+
+              El contenedor lleva `tabIndex=0` + `role='region'`: una zona con scroll a la
+              que no se puede llegar por teclado deja su contenido inalcanzable para quien
+              no usa mouse (axe `scrollable-region-focusable`). El scroll vertical vive
+              acá y el horizontal dentro del shell, así que no compiten. */}
+          <Box
+            tabIndex={0}
+            role='region'
+            aria-label={GH_GROWTH_SEO_AUDIT.drill.title(group.label, group.affectedPages)}
+            sx={{ maxBlockSize: 360, overflowY: 'auto' }}
+          >
           <DataTableShell
             identifier={`seo-audit-drill-${group.issueType}`}
             ariaLabel={GH_GROWTH_SEO_AUDIT.drill.title(group.label, group.affectedPages)}
@@ -497,6 +534,7 @@ const SiteAuditView = ({
               </TableBody>
             </Table>
           </DataTableShell>
+          </Box>
 
           {group.findings.length > urls.length ? (
             <Typography variant='caption' color='text.secondary'>

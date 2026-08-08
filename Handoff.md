@@ -1,5 +1,35 @@
 # Handoff activo
 
+### TASK-1309 — Auditoría del sitio construida; su cierre lo bloquea un gap de TASK-1310 (2026-08-08)
+
+`TASK-1309` queda **`in-progress` con código completo** en `develop`. La cuarta tab de Search
+Visibility (`/admin/growth/seo/audit`) está construida, verificada contra datos reales de Grupo Berel
+(salud 95 · 0 críticos · 138 avisos · 381 menores · 100 páginas) y con sus cuatro gates de UI en
+verde (`ui:quality` 4.58, piso 4.5). Con ella el conmutador SEO queda completo: las 4 tabs navegan.
+
+**Por qué no está `complete`:** el gate de cierre exige `pnpm test` completo en verde y hay **2 tests
+rojos que no son de esta task**. `src/lib/admin/client-role-visibility.test.ts` falla porque
+`TASK-1310` registró `cliente.growth_seo_dashboard` y `cliente.growth_seo_report` en
+`view-access-catalog.ts` (y en el menu-builder) **sin matriz de visibilidad por rol y sin migración
+que siembre `role_view_assignments`** — lo segundo es una regla dura del repo. El test de paridad
+TS↔seed está haciendo exactamente su trabajo. **No lo arreglé a propósito:** decidir cuál de los tres
+roles cliente ve el dashboard y el informe SEO es una decisión de permisos client-facing que le
+corresponde al dueño de 1310. En runtime, hoy, esos dos viewCodes caerían al fallback
+(`role_view_fallback_used`).
+
+Contexto de cómo llegó ahí: el trabajo de 1310 estaba **sin commitear** y compartía tres archivos con
+1309 (`src/lib/copy/growth.ts`, `docs/tasks/README.md`, el registry), así que ningún commit de 1309
+podía aislarse. Con autorización del operador se commiteó como checkpoint (`5f622386d`), cerrando de
+paso 10 errores de typecheck que dejaban el árbol rojo. Ese checkpoint **no** declara 1310 cerrada.
+El gap de viewCodes se verificó con lint + tsc, que no lo detectan; sólo la suite completa lo ve.
+
+Pendiente de 1309: nada de código. Falta el veredicto del gap de arriba y, cuando el operador lo
+autorice, push + verificación en staging. `pnpm build` de producción corrió verde localmente el
+2026-08-08 — **no repetirlo sin pedirlo**: cuelga el equipo del operador (~30GB).
+
+Evidencia GVC: `.captures/2026-08-08T12-59-33_growth-seo-audit` (desktop 1440 + 390px, dossier y
+scorecard incluidos).
+
 ### TASK-1310 — surfaces cliente SEO implementadas (2026-08-08)
 
 `TASK-1310` permanece `in-progress` en `develop`, con código completo local y rollout pendiente.

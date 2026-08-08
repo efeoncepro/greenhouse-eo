@@ -1,0 +1,103 @@
+{
+  "taskId": "TASK-1309",
+  "scenario": "growth-seo-audit",
+  "reviewedAt": "2026-08-08",
+  "reviewer": "claude (frames GVC desktop 1440 + mobile 390 inspeccionados en loop)",
+  "evidence": {
+    "desktop": ".captures/2026-08-08T12-59-33_growth-seo-audit/01-desktop/frames/01-default.png",
+    "mobile": ".captures/2026-08-08T12-59-33_growth-seo-audit/02-mobile/frames/01-default.png",
+    "dossier": ".captures/2026-08-08T12-59-33_growth-seo-audit/review-dossier.md"
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 4.6,
+      "rationale": "Un solo momento dominante: el gauge de salud con el número a 2rem. Debajo, la lista responde la pregunta siguiente ('qué ataco primero') sin competir con él. El freshness va en la cabecera porque condiciona la lectura de todo lo demás, no de una card.",
+      "evidence": "desktop 01-default, 02-health",
+      "nextAction": ""
+    },
+    "proportions": {
+      "score": 4.5,
+      "rationale": "El gauge ocupa una columna fija y las cuatro cifras reparten el resto. La primera captura mostró los números flotando sobre ~1600px sin ritmo; los filetes verticales los agrupan como una unidad y hacen que el ancho se gane.",
+      "evidence": "desktop 02-health (antes/después dentro de la misma sesión de captura)",
+      "nextAction": ""
+    },
+    "rhythm": {
+      "score": 4.6,
+      "rationale": "Tres superficies con separación constante y, dentro de la lista, filas con divisor y respiración uniforme. El drill se abre como costura dentro de su fila, sin romper la cadencia de la lista.",
+      "evidence": "desktop 01-default, 03-issues",
+      "nextAction": ""
+    },
+    "density": {
+      "score": 4.5,
+      "rationale": "La lista es holgada en desktop y condensa a 390px sin recortar texto; la tabla del drill usa densidad compacta con scroll interno acotado a 360px.",
+      "evidence": "mobile 03-issues, desktop 04-drill",
+      "nextAction": ""
+    },
+    "depth": {
+      "score": 4.6,
+      "rationale": "El drill usa fondo de costura (action.hover) y NO una card anidada: es un detalle dentro de su fila, así que no hay card-on-card. La elevación se queda en el plano de las tres cards.",
+      "evidence": "desktop 04-drill",
+      "nextAction": ""
+    },
+    "surfaceEconomy": {
+      "score": 4.7,
+      "rationale": "Exactamente tres superficies contenidas en el fold (cabecera, salud, issues), dentro del presupuesto. El drill no suma una cuarta: es una costura interna, y la recipe va con plane='none' para no fabricar un plano extra.",
+      "evidence": "desktop 01-default",
+      "nextAction": ""
+    },
+    "visualImpact": {
+      "score": 4.5,
+      "rationale": "El arco de salud es el objeto con peso de la pantalla y se lee de un golpe a cualquier distancia. Es sobriedad deliberada: la superficie es un diagnóstico técnico, y el impacto lo aporta el dato, no ornamento.",
+      "evidence": "desktop 02-health, mobile 02-health",
+      "nextAction": "Si más adelante se suma tendencia de salud entre crawls, el gauge puede ganar una micro-serie histórica al lado sin cambiar la jerarquía."
+    },
+    "typography": {
+      "score": 4.6,
+      "rationale": "Todo sale de variantes; cifras con tabular-nums y sin fontSize inline. Orden de encabezados h1 → h2 (salud/issues) → h3 (grupo del drill) verificado en el árbol aria.",
+      "evidence": "desktop 01-default.aria.txt",
+      "nextAction": ""
+    },
+    "color": {
+      "score": 4.6,
+      "rationale": "El color semántico aparece sólo como ayuda de estado en los chips de severidad, siempre junto a la palabra. Las cifras del KPI se quedan en tinta primaria: no hay semáforo aplicado a la identidad de una métrica.",
+      "evidence": "desktop 03-issues",
+      "nextAction": ""
+    },
+    "iconography": {
+      "score": 4.5,
+      "rationale": "Un ícono por severidad (octágono / triángulo / círculo), siempre acompañado del texto, y chevron que refleja el estado abierto/cerrado del drill.",
+      "evidence": "desktop 03-issues, 04-drill",
+      "nextAction": ""
+    },
+    "responsive": {
+      "score": 4.6,
+      "rationale": "1440 y 390 capturados y mirados. En móvil los KPI pasan a 2×2, la lista condensa y el drill conserva su scroll interno. El primer intento dejó 'Menores' sangrado sin filete; se corrigió suprimiendo también la sangría en la celda que abre fila.",
+      "evidence": "mobile 02-health, 03-issues",
+      "nextAction": ""
+    },
+    "motion": {
+      "score": 4.5,
+      "rationale": "Ausencia deliberada: el gauge es un arco SVG determinista sin animación de entrada (un radialBar animado ni siquiera dibujaba en contenedor fluido) y el drill no exige transición. El chequeo de reduced-motion del GVC pasa sin fallback porque no hay movimiento que degradar.",
+      "evidence": "quality.keyboard.reducedMotionCheck en ambos manifests",
+      "nextAction": ""
+    },
+    "fidelity": {
+      "score": 4.7,
+      "rationale": "Las cuatro regiones del wireframe, el ledger de copy completo, los estados del inventario y el contrato de foco (al encabezado del grupo, y de vuelta al disparador) están implementados. Las dos desviaciones —arco SVG en vez de radialBar Apex, y orden declarado según lo que los datos sostienen— quedan documentadas con su motivo.",
+      "evidence": "docs/ui/wireframes/TASK-1309-growth-seo-site-audit-ui.md vs desktop 01-default",
+      "nextAction": ""
+    },
+    "genericTemplateResistance": {
+      "score": 4.6,
+      "rationale": "Nada de esto sale de un template: lista priorizada en vez de tabla ordenable, catálogo es-CL curado de los 34 checks con su tier de esfuerzo, el esfuerzo declarado como estimación nuestra, salud null que dice 'Pendiente' en vez de 0/100, y un check sin ficha que se nombra en vez de esconderse.",
+      "evidence": "desktop 03-issues, 04-drill",
+      "nextAction": ""
+    }
+  },
+  "blockers": [],
+  "notes": [
+    "Tres hallazgos salieron de MIRAR los frames, no de los gates: el drill volcaba 91 URLs en un muro de ~5000px sin scroll interno (expulsaba de pantalla la lista que el operador venía recorriendo), el encabezado del drill quedaba en 3.25:1 sobre el fondo de costura, y las cifras de salud flotaban sin ritmo sobre el ancho completo.",
+    "Warning conocido y ajeno: `div.MuiTabs-list` sobresale del viewport a 390px. Es la tira de tabs scrollable de TASK-1306, compartida por las cuatro rutas, y desbordar es su comportamiento correcto (se auto-desplaza para mostrar la tab activa). No se toca desde acá.",
+    "El botón `[data-capture=\"seo-audit-run\"]` NUNCA se clickea en el scenario: encola un crawl OnPage real y le gasta presupuesto al cliente. Una captura no puede ser el motivo de un cargo al proveedor."
+  ]
+}
