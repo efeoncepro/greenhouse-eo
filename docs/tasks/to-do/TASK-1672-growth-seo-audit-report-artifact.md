@@ -102,14 +102,16 @@ Reglas obligatorias:
 ### Blocks / Impacts
 
 - `TASK-1673` `[por crear]` — compartir y enviar. Sin documento no hay nada que mandar.
-- Coordinación con `TASK-1310`: la entrada del cliente vive en su portal, y `/growth/seo` es
-  superficie de esa task.
+- **La 4.ª sección del portal cliente** `[task por crear]` — el cliente ya tiene navegador de
+  3 secciones (`Resumen · Evolución · Quadrant`, TASK-1310) y la auditoría entra ahí como cuarta,
+  espejando las 4 tabs del operador. **NO** se agrega a TASK-1310: esa task está en su última
+  milla de rollout (migración + staging) y meterle una sección nueva le reinicia la verificación.
 
 ### Files owned
 
 - `src/components/growth/seo/audit-report/**` — modelo + `web/` + `print/`
 - `src/app/(dashboard)/admin/growth/seo/audit/report/page.tsx` — ruta operador
-- entrada cliente `[coordinar con TASK-1310]`
+- ruta cliente del artefacto `[definir junto con la task de la 4.ª sección]`
 - `src/lib/copy/growth.ts` (`GH_GROWTH_SEO_AUDIT_REPORT`)
 - `route-reachability-manifest.ts` (registro de alcanzabilidad de rutas, TASK-982)
 - `scripts/frontend/scenarios/growth-seo-audit-report*.scenario.ts`
@@ -156,7 +158,7 @@ Reglas obligatorias:
 
 ### Surface & system decision
 
-- Surface: `/admin/growth/seo/audit/report` (+ `?print=1`) y la entrada cliente por coordinar.
+- Surface: `/admin/growth/seo/audit/report` (+ `?print=1`). La entrada del cliente NO es una ruta paralela: el cliente ya tiene su portal SEO (TASK-1310, con navegador de 3 secciones) y la auditoría entra ahí como **cuarta sección**, en task aparte.
 - Composition Shell: `aplica` — composición `single`, documento lineal.
 - Primitive decision: `reuse` (`ReportArtifactModel`, `web/`+`print/`, `SeoHealthGauge`,
   `GreenhouseChip`) + `new` acotado (`modelFromSeoAuditReport`, portada, hallazgos de sitio).
@@ -304,7 +306,8 @@ sitio cerrado a los motores de respuesta.
 
 ### Out-of-band coordination required
 
-- Con `TASK-1310`: dónde entra el cliente al artefacto (ruta hermana vs acceso desde su dashboard).
+- Ninguna que bloquee. La entrada del cliente se resuelve en su propia task (4.ª sección del
+  navegador de TASK-1310), después de que este documento exista y su forma esté decidida.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -356,9 +359,7 @@ sitio cerrado a los motores de respuesta.
 
 ## Open Questions
 
-1. **Dónde entra el cliente**: ¿ruta hermana `/growth/seo/audit-report` o acceso desde el
-   dashboard que 1310 ya construye? Es coordinación con esa task, no decisión unilateral.
-2. **Techo de URLs del documento.** En pantalla son 200 con scroll interno; impreso, 200 × varios
+1. **Techo de URLs del documento.** **Techo de URLs del documento.** En pantalla son 200 con scroll interno; impreso, 200 × varios
    grupos es un PDF enorme. Propuesta: 25 por grupo con el resto declarado, y el detalle completo
    sólo en la superficie web.
 3. ¿La portada muestra el delta contra el crawl anterior (`previous`, ya disponible)? Suma
