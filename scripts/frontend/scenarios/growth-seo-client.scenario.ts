@@ -10,6 +10,9 @@ import type { CaptureScenario } from '../lib/scenario'
 export const scenario: CaptureScenario = {
   name: 'growth-seo-client',
   route: '/growth/seo',
+  // Sólo navega tabs con teclado/click dentro del cliente; no escribe backend ni dispara commands.
+  mutating: true,
+  safeForCapture: true,
   viewport: { width: 1440, height: 900 },
   viewports: [
     { name: 'desktop', width: 1440, height: 900 },
@@ -84,7 +87,7 @@ export const scenario: CaptureScenario = {
     { kind: 'sleep', ms: 400 },
     { kind: 'scroll', selector: '[data-capture="seo-client-summary"]', scrollBlock: 'start' },
     { kind: 'mark', label: 'summary', timeout: 15000, clipSelector: '[data-capture="seo-client-summary"]', note: 'Evidence Narrative + KPI evidence del estado Resumen' },
-    { kind: 'click', selector: '[role="tab"]:has-text("Evolución"), [role="button"]:has-text("Evolución")' },
+    { kind: 'press', selector: '#seo-client-tab-evolution', key: 'Enter' },
     { kind: 'sleep', ms: 400 },
     { kind: 'wait', selector: '[data-capture="seo-client-evolution"]', timeout: 15000 },
     { kind: 'scroll', selector: '[data-capture="seo-client-evolution"]', scrollBlock: 'start' },
@@ -93,13 +96,13 @@ export const scenario: CaptureScenario = {
     { kind: 'sleep', ms: 500 },
     { kind: 'scroll', selector: '[data-capture="seo-client-evolution"]', scrollBlock: 'start' },
     { kind: 'mark', label: 'evolution-table', timeout: 15000, clipSelector: '[data-capture="seo-client-evolution"]', note: 'Tabla de fallback con keywords destacadas, estados de medición y scroll controlado' },
-    { kind: 'click', selector: '[role="tab"]:has-text("SEO × AEO"), [role="button"]:has-text("SEO × AEO")' },
+    { kind: 'press', selector: '#seo-client-tab-quadrant', key: 'Enter' },
     { kind: 'sleep', ms: 400 },
     { kind: 'wait', selector: '[data-capture="seo-client-quadrant"]', timeout: 15000 },
     { kind: 'scroll', selector: '[data-capture="seo-client-quadrant"]', scrollBlock: 'start' },
     { kind: 'wait', selector: '[data-capture="seo-client-quadrant"] canvas', timeout: 12000 },
     { kind: 'sleep', ms: 500 },
-    { kind: 'mark', label: 'quadrant', timeout: 15000, clipSelector: '[data-capture="seo-client-quadrant"]', note: 'Cruce SEO × AEO como dos ejes ortogonales, sin score fusionado' }
+    { kind: 'mark', label: 'quadrant', timeout: 15000, clipSelector: '[data-capture="seo-client-quadrant"]', note: 'Cruce SEO × AEO: visibilidad IA del dominio × posición SEO, sin score fusionado' }
   ]
 }
 
