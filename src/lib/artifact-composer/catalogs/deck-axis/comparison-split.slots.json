@@ -1,7 +1,7 @@
 {
   "template": "ComparisonSplit",
   "figmaNodeId": "8:13782",
-  "version": "0.3",
+  "version": "0.4",
   "viewport": { "width": 1920, "height": 1080 },
   "slots": {
     "leftTitle": {
@@ -57,7 +57,8 @@
     "presentation": {
       "selector": "[data-slot='presentation']",
       "type": "object",
-      "required": true,
+      "required": false,
+      "notes": "Opcional por compatibilidad con decks existentes. Si se omite, la plantilla conserva la presentación proposal; diagnostic debe declararse explícitamente.",
       "shape": {
         "mode": {
           "type": "enum",
@@ -70,6 +71,7 @@
     }
   },
   "presentation": {
+    "defaultVariant": "proposal",
     "variants": {
       "proposal": "panel de propuesta con firma Efeonce",
       "diagnostic": "panel neutral de errores; oculta wordmark y URL de Efeonce"
