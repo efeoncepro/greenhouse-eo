@@ -69,9 +69,15 @@ Lo que **no** hice y sigue abierto: los 7 lotes de la auditoría premium (trabaj
 `/growth/seo/mockup`), el push de los commits locales y la migración —bloqueada porque `main` no
 tiene todavía el catálogo TS y `syncViewRegistryCatalog` desactivaría las filas.
 
-### TASK-1309 — desbloqueada, y su ciclo documental cerrado con subagentes (2026-08-08)
+### TASK-1309 — CERRADA (2026-08-08)
 
-**El bloqueo desapareció solo.** 1309 estaba `code complete` frenada por 2 rojos ajenos en
+**Cerrada.** El build de producción salió verde con autorización del operador (exit 0, árbol completo
+de rutas), que era el último gate: `pnpm test` full + `pnpm build` prod + los 4 gates de UI +
+reachability. Lifecycle `complete`, archivo movido, registry/README/EPIC-022 sincronizados, y delta de
+impacto cruzado en las tres tasks que la citan como base (1670, 1672, 1673). **Con ella el conmutador
+de Search Visibility queda completo: las 4 tabs del operador navegan.**
+
+**El bloqueo había desaparecido solo.** 1309 estaba `code complete` frenada por 2 rojos ajenos en
 `client-role-visibility.test.ts`, causados por 1310 al registrar viewCodes sin migración de
 `role_view_assignments`. Esa migración se aplicó hoy en el rollout de 1310 y los cerró:
 **`pnpm test` completo en 1429 archivos / 10377 tests / 0 rojos**, `ui:quality` PASS 4.63,

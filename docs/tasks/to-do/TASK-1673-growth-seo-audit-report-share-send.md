@@ -1,5 +1,13 @@
 # TASK-1673 — Growth SEO: compartir y enviar el informe de auditoría
 
+## Delta 2026-08-08 — TASK-1309 cerrada
+
+`TASK-1309` (Auditoría del sitio, `/admin/growth/seo/audit`) pasó a `complete`: suite completa en
+10377/0, `pnpm build` de producción verde, `ui:quality` PASS 4.63. Lo que esta task da por existente
+de 1309 —`groupAuditIssues`, las fichas es-CL de los checks con su drift test, `readSiteAuditReport`
+con `run`/`findings`/`totals`/`previous`— **ya está en `develop` y verificado con datos reales de
+Grupo Berel**, no es supuesto.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

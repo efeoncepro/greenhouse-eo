@@ -7,9 +7,13 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
-## 2026-08-08 — TASK-1309 desbloqueada + ciclo documental y de skills cerrado con subagentes
+## 2026-08-08 — TASK-1309 CERRADA: el conmutador de Search Visibility queda completo
 
-- **El bloqueo de 1309 lo cerró la migración de 1310.** Estaba `code complete` frenada por 2 rojos
+- **`TASK-1309` pasa a `complete`.** Build de producción verde (exit 0) con autorización del operador
+  — era el último gate. Con ella **las 4 tabs de Search Visibility navegan** y el conmutador del
+  operador queda cerrado; la pata UI del exit criterion de EPIC-022 queda abierta sólo por el cliente
+  (`TASK-1310`) y su alcanzabilidad por nav (`TASK-1675`).
+- **El bloqueo previo lo había cerrado la migración de 1310.** Estaba `code complete` frenada por 2 rojos
   ajenos en `client-role-visibility.test.ts` (viewCodes en el catálogo TS sin migración de
   `role_view_assignments`). Aplicada esa migración: **`pnpm test` en 1429 archivos / 10377 tests / 0
   rojos**, `ui:quality` PASS 4.63, reachability 0 huérfanas. Falta el build de producción para el

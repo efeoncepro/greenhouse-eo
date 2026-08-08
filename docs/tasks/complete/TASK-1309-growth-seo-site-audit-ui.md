@@ -12,8 +12,11 @@ regla dura del repo. Esa migración se aplicó el 2026-08-08 como parte del roll
 Verificado: `pnpm vitest run src/lib/admin/client-role-visibility.test.ts` → 11/11 verde, y
 **`pnpm test` completo → 1429 archivos, 10377 tests, 0 rojos**.
 
-Queda pendiente para el cierre formal: `pnpm build` de producción sobre el último commit (el gate de
-cierre lo exige y el build consume ~30 GB, así que se corre con autorización del operador).
+**`pnpm build` de producción: verde** (exit 0, árbol completo de rutas emitido), corrido con
+autorización del operador sobre el último commit. Con eso el gate de cierre queda completo:
+`pnpm test` full + `pnpm build` prod + los 4 gates de UI + `route-reachability-gate`.
+
+**Lifecycle → `complete`.**
 
 
 ## Delta 2026-08-08 — construida y verificada; el cierre lo bloquea un gap ajeno
@@ -128,7 +131,7 @@ TASK-1307**; `TASK-1306` **no instaló ninguna librería nueva** ni prejuzgó es
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P3`
 - Impact: `Medio`
 - Effort: `Medio`
