@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.8
+> **Version:** 1.9
 > **Creado:** 2026-08-05 por Claude (TASK-1299 + TASK-1301)
-> **Ultima actualizacion:** 2026-08-08 por Claude (TASK-1309 — cuarta pantalla: Auditoria del sitio, con salud, frescura explicita del crawl y los issues como lista priorizada por gravedad e impacto/esfuerzo; verificado contra los frames reales del GVC)
+> **Ultima actualizacion:** 2026-08-08 por Claude (TASK-1310 — la superficie del cliente: navegador de 3 secciones + informe imprimible, con su estado de rollout declarado; y se retiran de "Que NO existe todavia" las dos filas que ya existen)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
 
 # Modulo SEO — Search Visibility 360 (Growth)
@@ -12,7 +12,7 @@ El modulo SEO es la mitad "buscadores clasicos" de **Search Visibility 360**: mi
 
 La idea central es que la visibilidad no es una foto: es una **serie de tiempo**. El valor del módulo no está en saber "hoy estás en la posición 7", sino en poder mostrar "hace tres meses estabas en la 15, hoy estás en la 7, y este competidor te está alcanzando". Por eso todo el modelo de datos está construido como mediciones append-only: cada captura se guarda y **nunca** se edita ni se borra.
 
-Este documento describe el estado real al 2026-08-05: están construidas las tres primeras capas (modelo de datos, modelo de acceso y la primera captura automática — la serie diaria de Google Search Console). Las capturas pagadas (rankings, site audit, backlinks) y toda la UI llegan en las tasks siguientes de `EPIC-022`.
+Este documento describe el estado real al 2026-08-08: están construidas las capas de datos y acceso, las capturas automáticas (Search Console diaria, rankings, site audit y backlinks) y **las cuatro pantallas del operador** — Resumen, Rendimiento, Keywords y Auditoría. La superficie del cliente está construida y **pendiente de rollout**: su migración de catálogo no está aplicada todavía (ver el recuadro de abajo).
 
 > Estado de catálogo 2026-08-08: el runtime desplegado aún usa `seo_v1`. TASK-1310 deja en
 > `develop` una migración pendiente que lo supersede por `seo_v2` para publicar el dashboard e
@@ -197,8 +197,6 @@ Lo siguiente aún no está construido (las series que ya se llenan: Search Conso
 
 | Falta | Task que lo trae |
 |---|---|
-| Site audit (UI) | TASK-1309 |
-| Superficie cliente + Report Artifact + quadrant 360 | TASK-1310 |
 | Semilla histórica de posiciones (DataForSEO Labs) + export nativo GSC→BQ por cliente | TASK-1655 (Slices 4-5) |
 
 ### La pantalla ancla: Rendimiento en el tiempo (TASK-1307, 2026-08-07)
@@ -389,6 +387,44 @@ lo dice en vez de gastar dos veces por lo mismo.
 > `readSiteAuditReport`, command `queueSiteAudit`). Codigo:
 > `src/views/greenhouse/admin/growth/seo/audit/`, `src/app/api/admin/growth/seo/audit/run/`.
 > El mismo command lo operan la UI, Nexa y el lane MCP.
+
+### La superficie del cliente: su propia lectura de búsqueda (TASK-1310, 2026-08-08)
+
+Las cuatro pantallas anteriores son del equipo de Efeonce. Ésta es **del cliente**: entra a su
+portal y ve su propia lectura de visibilidad, sin datos de nadie más y sin la densidad del
+cockpit interno.
+
+**Qué ve** (`Inicio > SEO`, ruta `/growth/seo`), en un navegador de tres secciones:
+
+| Sección | Qué responde |
+|---|---|
+| **Resumen** | Cómo le va en búsqueda hoy: la lectura dominante en una frase, la métrica principal y las señales que la acompañan. |
+| **Evolución** | Cómo se movió en el tiempo, con la **cobertura declarada** — cuántos días del período tienen medición de verdad. Un hueco corta la línea; nunca se rellena con cero. |
+| **Quadrant** | El cruce con AEO: dónde está su marca en el eje de búsqueda clásica contra el de motores de respuesta. |
+
+Y un **informe** (`/growth/seo/report`) que puede imprimir o guardar como PDF.
+
+**Lo que NO ve, por construcción:** costos de proveedor, cupos, tier comercial ni datos de otras
+organizaciones. El informe se arma sobre el mismo contrato compartido de reportes que el AEO, con
+una variante que distingue "portal del cliente" de "adjunto", y hay un test que falla si algo
+interno se filtra.
+
+**Cómo se habilita.** No es por rol: es **por organización**. Un cliente ve SEO cuando su Space
+tiene el módulo asignado, y sólo alcanza su propia lectura. Si no lo tiene, la pantalla lo dice con
+palabras ("SEO no está activo en tu plan") y ofrece hablar con su equipo de Efeonce — nunca un
+tablero vacío que se lea como "no tienes visibilidad".
+
+> ⚠️ **Estado al 2026-08-08: construida, pendiente de rollout.** El código está en `develop` y
+> verificado con datos reales de Grupo Berel, pero su migración de catálogo **no está aplicada**.
+> Hasta que se aplique, las rutas existen como enlace directo pero el portal no las compone en el
+> menú. El orden de rollout es: publicar el código → desplegar → aplicar la migración → verificar
+> con una sesión de cliente real.
+>
+> Paso a paso para operarla: [Habilitar y verificar el portal SEO del cliente](../../manual-de-uso/growth/habilitar-portal-seo-cliente.md).
+>
+> Detalle técnico: `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §10.7 (cutover del
+> catálogo). Código: `src/views/greenhouse/growth/seo/client/`,
+> `src/components/growth/seo/report-artifact/`.
 
 ## Relacion con el AI Visibility Grader (motores hermanos)
 

@@ -17,6 +17,25 @@
   se agrega una surface module-gated al registry sin seed DB.
 - Validación local: 53 tests focales y migration marker gate verdes. No se aplicó la migración, no se
   hizo push/deploy y no se ejecutó build completo por el límite de recursos del equipo.
+- **Verificación cruzada de la task (2026-08-08, tarde).** El barrido encontró que el código estaba
+  adelante de sus documentos y de sus gates, y que **dos gates estaban verdes de mentira**:
+  - la señal `seo.rank_capture_lag` tenía `module_key = 'seo_v2'` hardcodeado, así que veía 0 orgs y
+    reportaba `ok` — falsa-sana. Con el expand aplicado reporta `warning` con un hallazgo real; su
+    test pinneaba el bug (asertaba el literal SQL) y ahora aserta el contrato;
+  - los tres scenarios GVC de cliente capturaban con sesión de **operador** contra superficies
+    client-gated, así que el frame decía "SEO no está activo en tu plan" y el visual-gate daba BLOCK
+    por una razón que no era la UI. Se agregó `requiresStorageState` al contrato de scenario, exigido
+    antes de lanzar el browser: `ui:visual-gate --task TASK-1310` pasó de BLOCK a PASS.
+- **El scorecard se regeneró desde la auditoría premium.** El anterior daba PASS 4.61 y afirmaba "axe
+  sin violaciones" mientras la auditoría de las 10:25 registra 2 violaciones de contraste y economía
+  de superficies en 1.8. Ahora `ui:quality --task TASK-1310` da **BLOCK `average=2.29 floor=1.8`**,
+  que es el estado correcto para una task con `UI ready: no` y release gate bloqueado.
+- **Drift documental cerrado:** wireframe y flow describían un `masterDetail` con rail lateral que la
+  implementación descartó — la ruta exacta por la que el siguiente cambio lo reintroduce. Corregidos a
+  `composition='single'` + tabs, con el "por qué no" escrito. La superficie cliente salió de "Que NO
+  existe todavía" del doc funcional, ganó su sección con el estado de rollout declarado y su manual
+  (`docs/manual-de-uso/growth/habilitar-portal-seo-cliente.md`); README, EPIC-022 y el ledger de flags
+  quedaron sincronizados.
 
 ## 2026-08-08 — TASK-1309: Auditoría del sitio, y con eso el conmutador SEO queda completo
 

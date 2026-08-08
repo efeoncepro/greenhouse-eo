@@ -456,7 +456,7 @@ Slice 1 (shell+gate+estados) → Slice 2 (Resumen+Evolución) → Slice 3 (Quadr
 
 - [x] Se declaró `Execution profile: ui-ux`, `UI impact: flow`, `Flow` apuntando al contrato existente.
 - [ ] Rutas cliente `/growth/seo` + `/growth/seo/report` (routeGroup `client`) alcanzables por nav cliente + en `route-reachability-manifest.ts`; gate **per-org via `module_assignment`** (NUNCA por rol); redirect defensivo sin módulo. Código y migración de catálogo listos; falta aplicar migración y probar con sesión cliente.
-- [x] Dashboard `masterDetail` (Resumen/Evolución/Quadrant), curado, honesto, mono-Space; sin datos crudos de operador.
+- [x] Dashboard `CompositionShell composition='single'` + tabs SEO horizontales (Resumen/Evolución/Quadrant), curado, honesto, mono-Space; sin datos crudos de operador. **Corrección 2026-08-08:** el criterio original decía `masterDetail`; la decisión vigente (Delta de esta task) descarta el rail lateral porque el menú vertical principal ya tiene ese ownership.
 - [x] Evolución = line ECharts multi-serie con **Y invertido documentado** (1=arriba=mejor); `role=img` + aria.
 - [x] Quadrant 2×2 SEO×AEO (X citabilidad IA, Y posición SEO), 4 cuadrantes con **label textual**, `readSeoAeoGap` (derived read, NUNCA merge); cross-link recíproco a `/aeo`.
 - [x] Report artifact SEO = **3.er render adapter del MISMO `ReportArtifactModel`** (adapter `modelFromSeoReport`, NO forkea scoring/ECharts del AEO); web `clientPortal` + print `attachment`; no-leak test verde.
@@ -466,7 +466,7 @@ Slice 1 (shell+gate+estados) → Slice 2 (Resumen+Evolución) → Slice 3 (Quadr
 - [ ] GVC desktop+mobile capturado y mirado **en loop** (dashboard + report); `scrollWidth==clientWidth`; gate axe verde. Código y capturas locales están completas; staging y los warnings del shell global siguen pendientes.
 - [ ] Focus/keyboard validados; navigator active state; charts sin entrada bajo movimiento reducido (WCAG 2.3.3). El contrato y atributos están implementados; falta la pasada manual/final en staging.
 - [x] El flow doc referencia el master `EPIC-022-search-visibility-360-UI-FLOW.md` y declara sus nodos (S5/S6/S7).
-- [x] `UI ready` pasa a `yes` solo cuando `pnpm task:lint --task TASK-1310` queda sin findings.
+- [ ] `UI ready` pasa a `yes` solo cuando `pnpm task:lint --task TASK-1310` queda sin findings. Hoy sigue en `no` por la auditoría premium abierta — este criterio no puede marcarse antes que los criterios 2/10/11.
 
 ## Verification
 
@@ -487,7 +487,12 @@ Slice 1 (shell+gate+estados) → Slice 2 (Resumen+Evolución) → Slice 3 (Quadr
 - [x] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
 - [x] `Handoff.md` + `changelog.md` actualizados
 - [x] route/nav/reachability actualizados
-- [x] `FEATURE_FLAG_STATE_LEDGER.md` refleja `GROWTH_SEO_ENABLED` si la task lo toca
+- [x] `FEATURE_FLAG_STATE_LEDGER.md` refleja `GROWTH_SEO_ENABLED` si la task lo toca (delta cliente agregado 2026-08-08)
+
+> **Nota de honestidad (2026-08-08):** el Closing Protocol está completo porque son ítems de higiene
+> documental que sí ocurrieron. **No implica cierre de la task**: los criterios 2, 10, 11 y 13 siguen
+> abiertos y el `Lifecycle` correcto es `in-progress`. Cerrar esta task exige la ronda premium + el
+> rollout (aplicar la migración de catálogo y verificar con sesión cliente real).
 
 ## Follow-ups
 
