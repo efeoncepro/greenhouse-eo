@@ -115,12 +115,15 @@ AGENT_AUTH_EMAIL=agent-client@greenhouse.efeoncepro.org AGENT_AUTH_SECRET=<secre
 
 Con esa sesion, revisa tres cosas:
 
-1. **El menu compone SEO.** ⚠️ **Hoy NO lo hace, y no es tu catalogo.** Verificado el 2026-08-08 con
-   sesion de Grupo Berel: la ruta responde y muestra datos reales, pero el menu del portal cliente es
-   una lista hardcodeada de 7 items donde SEO no esta, y su unico bloque dinamico se alimenta de
-   `businessLines`/`serviceModules`, no de `module_assignments`. El resolver canonico existe pero solo
-   lo usa un mockup. Mientras eso no se cablee, el cliente llega **por enlace directo** o desde el
-   cross-link de su informe AEO. No pierdas tiempo revisando el seed: no es ahi.
+1. **El menu NO compone SEO — y es el diseno vigente, no un error tuyo.** Verificado el 2026-08-08
+   con sesion de Grupo Berel: la ruta responde y muestra datos reales, pero el menu del portal cliente
+   es una lista hardcodeada donde SEO no esta. **El modulo AEO esta exactamente igual** y lleva meses
+   en produccion: se alcanza por enlace directo, declarado a proposito en el manifest de
+   alcanzabilidad. El nav que si compondria modulos (`ClientPortalNavigation`) esta completo pero con
+   cero consumidores en runtime; montarlo es una task derivada de TASK-827 pendiente.
+
+   Hoy el cliente llega **por enlace directo** o desde el cross-link de su informe AEO. **No pierdas
+   tiempo revisando el seed ni los grants: no es ahi.**
 2. **El dashboard carga con datos de esa organizacion y de ninguna otra.** Compara el numero principal
    contra el cockpit interno de la misma org.
 3. **El informe imprime.** Abre `/growth/seo/report?print=1` y confirma que el layout cambia a la
@@ -150,15 +153,16 @@ Con esa sesion, revisa tres cosas:
 ## Problemas comunes
 
 **La ruta responde pero no aparece en el menu.**
-Primero descarta lo barato: el catalogo (paso 3 del rollout). Pero si el catalogo esta bien, **el
-menu del portal cliente no compone modulos**: es una lista hardcodeada en `VerticalMenu.tsx` filtrada
-por `canSeeView('cliente.*')`, y su bloque dinamico se alimenta de otro sistema. Cablear el resolver
-canonico module-based es una task derivada de TASK-827 pendiente. Hasta entonces, el acceso es por
-enlace directo.
+Es el comportamiento esperado hoy, igual que AEO. **El menu del portal cliente no compone modulos**:
+es una lista hardcodeada en `VerticalMenu.tsx` filtrada por `canSeeView('cliente.*')`, y esa
+resolucion sale de `role_view_assignments` + fallback, **nunca de `module_assignments`**. Cablear el
+resolver canonico module-based es una task derivada de TASK-827 pendiente. Hasta entonces, el acceso
+es por enlace directo y el gate real vive server-side en la page.
 
 **El cliente ve "SEO no esta activo en tu plan" y si lo contrato.**
-Casi siempre es la ventana del cutover: su organizacion tiene assignment en una clave y el runtime que
-la atiende lee la otra. Revisa `greenhouse_client_portal.module_assignments` filtrando por su
+Ojo: esto NO se arregla tocando `role_view_assignments` — la page se gatea por `module_assignment`,
+no por viewCode. Casi siempre es la ventana del cutover: su organizacion tiene assignment en una clave
+y el runtime que la atiende lee la otra. Revisa `greenhouse_client_portal.module_assignments` filtrando por su
 `organization_id` y compara contra `SEO_MODULE_KEYS_READ` en `src/lib/growth/seo/entitlement.ts` —
 **de la version desplegada en ESE runtime**, no de tu working tree.
 

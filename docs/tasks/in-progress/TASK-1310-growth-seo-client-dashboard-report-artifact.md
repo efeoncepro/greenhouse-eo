@@ -469,9 +469,26 @@ Slice 1 (shell+gate+estados) → Slice 2 (Resumen+Evolución) → Slice 3 (Quadr
   3. El resolver canónico module-based (`composeNavItemsFromModules` / `<ClientPortalNavigation>`)
      existe pero **sólo lo consume el mockup** `/mockup/cliente-portal-legacy`. Cablearlo al menú real
      es la task derivada de TASK-827 que quedó pendiente ("V1.0 acepta path híbrido").
-  4. Bloqueo doble: aunque el ítem estuviera en la lista, esta migración registra denials por rol
-     (`granted=FALSE` para los 3 roles cliente, correcto según "per-org nunca por rol") y `canSeeView`
-     resuelve justamente por rol.
+  4. Los denials por rol de esta migración (`granted=FALSE`) sacan los dos viewCodes de
+     `authorizedViews`, pero **no son la causa**: aunque no existieran, el ítem seguiría sin aparecer
+     porque no está en la lista.
+
+  **Confirmado con subagentes (traza de código + dato en PG), y corrige una atribución errónea:**
+  `session.user.authorizedViews` se deriva **sólo** de `role_view_assignments` + un fallback
+  heurístico por `routeGroup` + permission sets + overrides — **nunca de `module_assignments`**
+  (`view-access-store.ts:1024-1077`). Los `view_codes[]` de los módulos viven en un carril paralelo
+  (`module-resolver.ts:142`) que consumen `requireViewCodeAccess` y `composeNavItemsFromModules`, no
+  la sesión.
+
+  **El hermano AEO está exactamente igual y eso es la referencia:** `cliente.ai_visibility_report`
+  tampoco aparece en el menú lateral; su migración borró las filas de rol (por eso cae al fallback y
+  sí figura en `authorizedViews`, emitiendo `role_view_fallback_used`), y su alcanzabilidad está
+  declarada como deep-link a propósito en el manifest: *"no como item de nav principal hasta que
+  exista el monitor recurrente"*. O sea: **el estado de SEO no es una regresión, es el diseño vigente
+  del portal cliente** — lo que falta es la task derivada de TASK-827 que monta el nav module-driven.
+
+  Descartado con dato: no es sesión desactualizada. Los claims se auto-refrescan cada ≤5 min
+  (`auth.ts:70` + `:787-802`) y una sesión emitida después de la migración tampoco los trae.
 
   **Y el manifest declara un enlace que no existe:** `/growth/seo` figura con `parent: '/home'` y
   `via: 'inline-link'`, pero no hay ningún enlace desde `/home`. El gate pasa (`0 orphans`) porque

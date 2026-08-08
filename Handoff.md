@@ -93,9 +93,24 @@ declarada (medido ● / estimado ◑). Evidencia `.captures/2026-08-08T19-29-36_
 porque comprueba que la ruta esté **declarada**, no que el enlace declarado **exista**. Hoy el único
 camino real es el cross-link desde el informe AEO, que sólo sirve a clientes que además tengan AEO.
 
+**Confirmado con subagentes, y corrige una atribución errónea que hice en el camino:**
+`authorizedViews` se deriva **sólo** de `role_view_assignments` + fallback heurístico + permission
+sets + overrides — **nunca de `module_assignments`**. Llegué a decir que "el módulo concede y el
+denial vetea"; es falso. AEO figura en las 23 views de Berel porque **no tiene fila de rol y cae al
+fallback**, no porque su módulo la conceda.
+
+**Y AEO tampoco aparece en el menú lateral.** Se alcanza por deep-link, declarado a propósito en el
+manifest. Así que el estado de SEO **no es una regresión: es el diseño vigente del portal cliente.**
+Lo que falta es la task derivada de TASK-827 que monta el nav module-driven
+(`ClientPortalNavigation` + `/api/client-portal/modules`, ambos completos y con **cero consumidores**
+en runtime).
+
+Descartado con dato: no era sesión desactualizada — los claims se auto-refrescan cada ≤5 min y una
+sesión recién emitida tampoco los trae.
+
 **No lo parché.** Empujar SEO a la lista hardcodeada haría desaparecer el síntoma y consolidaría el
 diseño equivocado: el portal cliente debe componer su menú desde `module_assignments`, que es lo que
-el resolver canónico ya sabe hacer. Es una decisión de alcance, no un fix de una línea.
+el resolver canónico ya sabe hacer y nadie cableó.
 
 ### 🔴 ISSUE-143 — rompí SEO en producción aplicando la migración de TASK-1310 (2026-08-08)
 
