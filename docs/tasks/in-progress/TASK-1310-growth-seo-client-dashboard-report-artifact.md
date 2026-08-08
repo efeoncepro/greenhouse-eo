@@ -455,7 +455,31 @@ Slice 1 (shell+gate+estados) → Slice 2 (Resumen+Evolución) → Slice 3 (Quadr
 ## Acceptance Criteria
 
 - [x] Se declaró `Execution profile: ui-ux`, `UI impact: flow`, `Flow` apuntando al contrato existente.
-- [ ] Rutas cliente `/growth/seo` + `/growth/seo/report` (routeGroup `client`) alcanzables por nav cliente + en `route-reachability-manifest.ts`; gate **per-org via `module_assignment`** (NUNCA por rol); redirect defensivo sin módulo. Código y migración de catálogo listos; falta aplicar migración y probar con sesión cliente.
+- [ ] Rutas cliente `/growth/seo` + `/growth/seo/report` (routeGroup `client`) alcanzables por nav cliente + en `route-reachability-manifest.ts`; gate **per-org via `module_assignment`** (NUNCA por rol); redirect defensivo sin módulo.
+
+  **Verificado 2026-08-08 con sesión de cliente real (Grupo Berel) — el gate per-org PASA, la
+  alcanzabilidad NO.** La migración está aplicada y la superficie renderiza con datos medidos
+  (posición media 1.5, 31 keywords, cobertura 61%, procedencia declarada). Pero el **menú del portal
+  cliente no compone SEO**, y no es un problema de catálogo:
+
+  1. El menú vertical del cliente (`VerticalMenu.tsx`) es una **lista hardcodeada de 7 ítems**
+     filtrada por `canSeeView('cliente.*')`. SEO no está en esa lista, así que ningún seed la agrega.
+  2. Su único bloque dinámico (`capabilityModules`) se alimenta de `businessLines`/`serviceModules`
+     de la sesión — **otro sistema**, no `module_assignments`.
+  3. El resolver canónico module-based (`composeNavItemsFromModules` / `<ClientPortalNavigation>`)
+     existe pero **sólo lo consume el mockup** `/mockup/cliente-portal-legacy`. Cablearlo al menú real
+     es la task derivada de TASK-827 que quedó pendiente ("V1.0 acepta path híbrido").
+  4. Bloqueo doble: aunque el ítem estuviera en la lista, esta migración registra denials por rol
+     (`granted=FALSE` para los 3 roles cliente, correcto según "per-org nunca por rol") y `canSeeView`
+     resuelve justamente por rol.
+
+  **Y el manifest declara un enlace que no existe:** `/growth/seo` figura con `parent: '/home'` y
+  `via: 'inline-link'`, pero no hay ningún enlace desde `/home`. El gate pasa (`0 orphans`) porque
+  verifica que la ruta esté declarada, **no que el enlace declarado exista**. El único camino real hoy
+  es el cross-link desde el informe AEO, que sólo sirve a clientes que además tengan AEO.
+
+  Evidencia: `.captures/2026-08-08T19-29-36_growth-seo-client` (superficie) y
+  `.captures/2026-08-08T19-30-53_inline-growth-seo` (shell completo, donde se ve el menú sin SEO).
 - [x] Dashboard `CompositionShell composition='single'` + tabs SEO horizontales (Resumen/Evolución/Quadrant), curado, honesto, mono-Space; sin datos crudos de operador. **Corrección 2026-08-08:** el criterio original decía `masterDetail`; la decisión vigente (Delta de esta task) descarta el rail lateral porque el menú vertical principal ya tiene ese ownership.
 - [x] Evolución = line ECharts multi-serie con **Y invertido documentado** (1=arriba=mejor); `role=img` + aria.
 - [x] Quadrant 2×2 SEO×AEO (X citabilidad IA, Y posición SEO), 4 cuadrantes con **label textual**, `readSeoAeoGap` (derived read, NUNCA merge); cross-link recíproco a `/aeo`.

@@ -69,6 +69,34 @@ Lo que **no** hice y sigue abierto: los 7 lotes de la auditoría premium (trabaj
 `/growth/seo/mockup`), el push de los commits locales y la migración —bloqueada porque `main` no
 tiene todavía el catálogo TS y `syncViewRegistryCatalog` desactivaría las filas.
 
+### TASK-1310 — verificado con sesión de cliente: funciona, pero NO es alcanzable (2026-08-08)
+
+Cerré el paso 5 del rollout con sesión real de Grupo Berel. Dos resultados, y el segundo es el que
+importa:
+
+✅ **El gate per-org pasa y la superficie es real.** Migración aplicada, `/growth/seo` renderiza con
+datos medidos: posición media 1.5, 31 keywords, 19 en primera página, cobertura 61%, procedencia
+declarada (medido ● / estimado ◑). Evidencia `.captures/2026-08-08T19-29-36_growth-seo-client`.
+
+🔴 **El menú del portal cliente NO compone SEO** — y no es el catálogo:
+
+1. `VerticalMenu.tsx` arma el menú cliente con una **lista hardcodeada de 7 ítems** filtrada por
+   `canSeeView('cliente.*')`. SEO no está en la lista, así que ningún seed lo agrega.
+2. Su único bloque dinámico (`capabilityModules`) sale de `businessLines`/`serviceModules` de la
+   sesión — **otro sistema**, no `module_assignments`.
+3. El resolver canónico module-based (`composeNavItemsFromModules` / `<ClientPortalNavigation>`)
+   existe y **sólo lo consume el mockup** `/mockup/cliente-portal-legacy`. Cablearlo es la task
+   derivada de TASK-827 que quedó como "V1.0 acepta path híbrido".
+
+**Además, el manifest de alcanzabilidad declara un enlace que no existe:** `/growth/seo` figura con
+`parent: '/home'`, `via: 'inline-link'`, y no hay ningún enlace desde `/home`. El gate da `0 orphans`
+porque comprueba que la ruta esté **declarada**, no que el enlace declarado **exista**. Hoy el único
+camino real es el cross-link desde el informe AEO, que sólo sirve a clientes que además tengan AEO.
+
+**No lo parché.** Empujar SEO a la lista hardcodeada haría desaparecer el síntoma y consolidaría el
+diseño equivocado: el portal cliente debe componer su menú desde `module_assignments`, que es lo que
+el resolver canónico ya sabe hacer. Es una decisión de alcance, no un fix de una línea.
+
 ### 🔴 ISSUE-143 — rompí SEO en producción aplicando la migración de TASK-1310 (2026-08-08)
 
 **Resuelto el mismo día, ~25 min de caída.** Apliqué la migración de catálogo tras el push+deploy y el
