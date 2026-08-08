@@ -49,9 +49,19 @@ const GIT_TIMEOUT_MS = 8_000
  * that exist on `main` but not on the target — i.e. a production hotfix this
  * promotion would silently revert. Three-dot hides those by construction.
  *
- * Both consumers (changed files AND commit bodies) resolve their range through
- * this single function so the two can never drift onto different bases again —
+ * Both consumers (changed files AND commit bodies) resolve their **base** through
+ * this single function, so the two can no longer be anchored to different refs —
  * the drift that produced ISSUE-114 in the first place.
+ *
+ * ⚠️ Sharing the range string does NOT make the two consumers equivalent, and it
+ * would be a mistake to read it that way: `git diff A..B` compares **trees**,
+ * while `git log A..B` walks **ancestry**. Under squash-merge they diverge by
+ * construction — commits that already reached production through a previous
+ * squash stay reachable from `develop` but never from `main`, so the commit-body
+ * window still spans several already-deployed releases even when the file diff is
+ * exact. That asymmetry is real and is NOT fixed here: it is tracked in
+ * ISSUE-145, together with the fact that the resulting window makes the
+ * `[release-coupled: …]` marker satisfiable by unrelated prose.
  */
 export const buildReleaseDiffRange = (baseRef: string, targetSha: string): string =>
   `${baseRef}..${targetSha}`

@@ -111,14 +111,37 @@ de git — verificado rojo antes del fix (4 casos fallando) y verde después.
 | archivos clasificados | 332 | 322 |
 | dominios irreversibles | `db_migrations` + **`cloud_release`** | `db_migrations` |
 
-Los 3 archivos `src/lib/release/preflight/**` que el classifier marcaba como `cloud_release` tenían
-diff two-dot **vacío**: se desplegaron el día anterior en el release `30140c662`. Eran fantasmas al
-100%.
+Los archivos `src/lib/release/preflight/**` que el three-dot resucitaba tenían diff two-dot
+**vacío**: se desplegaron el día anterior en el release `30140c662`. Eran fantasmas al 100%. De los
+3, **2 clasifican `cloud_release`**; el tercero (`pending-without-jobs.test.ts`) cae en `tests` por
+`DOMAIN_PATTERNS` — de ahí que el classifier reportara `cloud_release: 2`.
 
 **Por qué importaba.** Los **4 releases consecutivos** previos de `main` llevan marker
 `[release-coupled: …]`, y tres dicen literalmente *"NO son un acoplamiento de diseño"*. El marker
 había dejado de declarar acoplamiento para convertirse en el ritual con que se callaba un classifier
 roto — la normalización de la desviación que esta misma issue anticipó en §Impacto.
+
+### Verificación adversarial (2026-08-08)
+
+El fix se sometió a una revisión cuyo encargo explícito era **refutarlo**, no confirmarlo. Encontró
+cuatro defectos reales, todos corregidos en este mismo change set:
+
+1. **El docstring sobre-prometía.** Afirmaba que compartir el rango impedía que los consumidores
+   "volvieran a divergir". Falso como garantía semántica: `git diff` compara árboles y `git log`
+   recorre ancestría, y bajo squash-merge divergen por construcción. El docstring ahora nombra la
+   asimetría y remite a `ISSUE-145`, en vez de declarar sana la máquina entera.
+2. **Dos docstrings del contrato seguían en three-dot** (`batch-policy/classifier.ts`,
+   `preflight/types.ts`) — justo los dos sitios que un futuro lector consulta para entender qué
+   recibe el classifier. Corregidos.
+3. **Dos de los siete tests eran teatro.** El mock era ciego al rango, así que los dos casos que
+   llevaban el nombre de la issue pasaban igual con el bug presente. El mock ahora es
+   **sensible al rango** (sirve una lista distinta para `..` que para `...`), de modo que simula la
+   divergencia por squash de verdad. Comprobado: con three-dot restaurado ahora fallan **5** tests
+   en vez de 4, y el que se sumó es exactamente el de escenario.
+4. **Un byte NUL literal e invisible** se había colado en un fixture del archivo de tests. Eliminado.
+
+Se rechazó, argumentado, un quinto hallazgo: que two-dot "regresa" en el caso de un target atrasado
+respecto de la base. Ver `ISSUE-145` §Fix propuesto punto 4.
 
 ### Hallazgo adicional (no corregido acá): el batch policy del orquestador es estructuralmente vacuo
 

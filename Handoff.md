@@ -18,15 +18,25 @@ que no puedan volver a divergir — que es exactamente la deriva que produjo la 
 2. **El hueco de cobertura no estaba donde parecía.** El classifier puro sí tenía tests; el defecto
    vivía en cómo el check *recolectaba* los archivos, y `checks/release-batch-policy.ts` **no tenía
    archivo de tests**. El guardrail nuevo fija el rango en el argv de git (rojo antes, verde después).
-3. **Hallazgo no corregido: el batch policy del orquestador es estructuralmente vacuo.** Corre con el
-   `target_sha` ya mergeado, así que `origin/main..target_sha` es vacío y siempre da `ship`. **El gate
-   sólo tiene dientes en la corrida local pre-merge.** Darle dientes post-merge exige comparar contra
-   el `target_sha` del release anterior (`release_manifests`): diseño mayor, sin task aún.
-4. **`ISSUE-144` (nueva) queda abierta:** `vercel_readiness` confunde un build cancelado a propósito
+3. **`ISSUE-145` (nueva, severidad alta) — lee esto antes del próximo release.** El batch policy del
+   orquestador es **decorativo**: corre con el `target_sha` ya mergeado, así que el rango es vacío y
+   aprueba sin mirar nada (verificado en los artefactos `preflight-result.json` de los 3 últimos
+   releases; `70e912056` reportó `filesChanged=0` con 1045 archivos y 14 migraciones). Y el marker
+   `[release-coupled: …]` **nunca se lee donde el runbook dice** — el squash queda fuera del rango en
+   ambos caminos — **pero se dispara solo con prosa**: hoy una cita en `aea35a678` (docs de growth/MCP)
+   neutraliza `split_batch` para todo el batch SEO. Raíz común: el ancla debería ser el `target_sha`
+   del release anterior, no `origin/main`. Los helpers ya existen (`listRecentReleases`) y el job de
+   preflight ya tiene credenciales PG.
+4. **La verificación adversarial encontró cuatro defectos en mi propio fix, ya corregidos:** el
+   docstring sobre-prometía (compartir el rango NO iguala `git diff` con `git log`); dos docstrings del
+   contrato seguían en three-dot; dos tests eran teatro porque el mock era ciego al rango (ahora es
+   sensible al rango: con three-dot restaurado fallan 5 en vez de 4); y se había colado un byte NUL
+   invisible en un fixture. Detalle en el §Verificación adversarial de `ISSUE-114`.
+5. **`ISSUE-144` (nueva) queda abierta:** `vercel_readiness` confunde un build cancelado a propósito
    por el `ignoreCommand` con uno fallido. Diseño acordado en la issue; bloqueada por una decisión de
    frontera (el `ignoreCommand` corre antes de `pnpm install`, así que el SSOT no puede ser TS).
    Mitigación por ahora: `vercel redeploy` del deployment cancelado, nunca bypass.
-5. **Drift de CLI corregido de paso:** `vercel ls --target=` ya no existe en Vercel CLI 50.x (es
+6. **Drift de CLI corregido de paso:** `vercel ls --target=` ya no existe en Vercel CLI 50.x (es
    `--environment=`). Runbook y manual del orquestador actualizados; el preflight no se veía afectado
    porque consulta la API, no el CLI.
 

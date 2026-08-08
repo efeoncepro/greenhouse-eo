@@ -105,7 +105,7 @@ export type ReleaseBatchPolicyDomain =
 
 export interface ReleaseBatchPolicyEvidence {
   /**
-   * Files included in the diff `origin/main...target_sha` classified by
+   * Files included in the diff `origin/main..target_sha` (two-dot) classified by
    * domain. Counts only — full file list lives in `details` for admin
    * audience to avoid blowing up payload size for ecosystem consumers.
    */
