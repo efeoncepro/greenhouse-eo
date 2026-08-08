@@ -1,13 +1,14 @@
 import 'server-only'
 
 import { query } from '@/lib/db'
+import { SEO_MODULE_KEYS_READ } from '@/lib/growth/seo/entitlement'
 import { captureWithDomain } from '@/lib/observability/capture'
 import type { ReliabilitySignal } from '@/types/reliability'
 
 /**
  * TASK-1303 — Rank capture lag detector.
  *
- * Para cada target SEO activo de una org con assignment `seo_v2` vigente, computa el lag
+ * Para cada target SEO activo de una org con assignment SEO vigente, computa el lag
  * = días desde el último `capture_date` (`(CURRENT_DATE - MAX(capture_date))::int` —
  * patrón canónico TASK-893, NUNCA `EXTRACT(EPOCH FROM ...)`: date - date es integer).
  * Un target sin captura reciente significa que la serie diaria de la pantalla ancla
@@ -41,7 +42,7 @@ const QUERY_SQL = `
       SELECT 1
         FROM greenhouse_client_portal.module_assignments ma
        WHERE ma.organization_id = t.organization_id
-         AND ma.module_key = 'seo_v2'
+         AND ma.module_key = ANY($1::text[])
          AND ma.effective_to IS NULL
          AND ma.status IN ('active', 'pilot')
     )
@@ -57,7 +58,10 @@ export const getSeoRankCaptureLagSignal = async (): Promise<ReliabilitySignal> =
   const observedAt = new Date().toISOString()
 
   try {
-    const rows = await query<LagRow>(QUERY_SQL)
+    // Dual-read del cutover `seo_v1 → seo_v2` (TASK-1310). Este reader tenía la clave
+    // NUEVA hardcodeada mientras la base sigue en la vieja: veía 0 orgs y reportaba
+    // `ok` — un falso sano, que es justo lo que un detector de lag no puede hacer.
+    const rows = await query<LagRow>(QUERY_SQL, [[...SEO_MODULE_KEYS_READ]])
 
     const total = rows.length
     const neverCaptured = rows.filter(row => row.lag_days === null).length

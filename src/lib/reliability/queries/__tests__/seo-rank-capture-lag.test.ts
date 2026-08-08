@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 /**
  * TASK-1303 Slice 4 — signal `seo.rank.capture_lag`: severity matrix (ok ≤1d /
  * warning 2–3d o sin captura inicial / error ≥4d), scope solo targets con assignment
- * `seo_v2` vigente, date-math canónico y degradación `unknown` observada en fallo.
+ * SEO vigente (dual-read del cutover), date-math canónico y degradación `unknown` observada en fallo.
  */
 
 vi.mock('server-only', () => ({}))
@@ -75,10 +75,15 @@ describe('getSeoRankCaptureLagSignal', () => {
     expect(signal.summary).toContain('Sin targets SEO elegibles')
   })
 
-  it('SQL: scope por assignment seo_v2 vigente + date-math canónico (sin EXTRACT EPOCH)', async () => {
+  it('SQL: scope por assignment SEO vigente (dual-read) + date-math canónico (sin EXTRACT EPOCH)', async () => {
     await getSeoRankCaptureLagSignal()
 
-    expect(state.sql).toContain("ma.module_key = 'seo_v2'")
+    // Dual-read del cutover `seo_v1 → seo_v2` (TASK-1310): NO se fija la clave nueva
+    // hardcodeada. Tenerla sola hacía que el detector viera 0 orgs mientras la base sigue
+    // en la vieja, y reportara `ok` — un falso sano, que es lo único que un detector de
+    // lag no puede hacer. El assert cuida que el scope siga existiendo, no su literal.
+    expect(state.sql).toContain('ma.module_key = ANY($1::text[])')
+    expect(state.sql).not.toContain("'seo_v2'")
     expect(state.sql).toContain('(CURRENT_DATE - MAX(s.capture_date))::int')
     expect(state.sql).not.toContain('EXTRACT')
   })
