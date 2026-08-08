@@ -45,6 +45,30 @@
   en staging (`oauth/start` respondía `not_configured`; clase "flag sin cablear"). Vars en Vercel
   Production + redeploy; verificación del redirect URI al primer consent real.
 
+## 2026-08-07 — Los tres modelos de servicio dejan de ser vocabulario y pasan a ser contrato (TASK-1663)
+
+Al revisar quién debería declarar los objetivos de un cliente, el operador señaló que el módulo de
+búsqueda tiene los mismos tres modelos de servicio que el estudio creativo: operado por nosotros,
+co-operado, u operado por el cliente. Y que "el cliente contrata la herramienta" no es un cuarto
+modelo, sino el tercero cruzado con una forma de entrega distinta.
+
+Resultó que el vocabulario ya era canónico desde el modelo de negocio, y que el estudio creativo ya
+lo había convertido en un contrato de datos real y desplegado. Lo que faltaba era que Greenhouse
+tuviera el suyo: lo que había con nombre parecido pertenece a cotización, no a esto, y ningún módulo
+de producto conocía el concepto.
+
+La regla que hace que esto funcione, copiada tal cual del contrato existente: **el modo dice quién
+responde, nunca quién puede.** Si otorgara permisos, cambiar una etiqueta comercial en una tabla
+cambiaría en silencio quién puede comprometer gasto con un proveedor. Por eso el entregable más
+importante de la tarea no es la tabla: es la prueba automatizada de que cambiar el modo no altera lo
+que nadie puede hacer.
+
+Quedan tres preguntas separadas que antes se confundían: quién puede actuar, quién responde, y quién
+paga. Y una decisión deliberada: no hay valores por defecto por modelo. Cada acuerdo con un cliente
+declara explícitamente sus responsabilidades, y la ausencia de declaración es un estado cerrado, no
+una suposición. Un default parece cómodo y es justamente lo que hace que nadie revise el reparto
+real — que en el modelo co-operado es distinto para cada cliente.
+
 ## 2026-08-07 — Growth SEO: el módulo responde tres preguntas, no una (TASK-1659…1662)
 
 Cuestionar por qué la pantalla de keywords no se construyó como estaba especificada destapó algo
@@ -1051,13 +1075,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
 - Se incorporó `Fully Managed Creative Capacity`: fee mensual integral donde Efeonce absorbe equipo, infraestructura,
   licencias, costos laborales, provisionales, reemplazos y soporte. El modelo aplica globalmente, con parametrización
   legal, laboral, fiscal, monetaria y de procurement por jurisdicción.
-
-## 2026-07-30 — Creative Services: benchmark de mercado y arquitectura Creative Operations
-
-- Se documentó el benchmark fechado [`CREATIVE_SERVICES_MARKET_BENCHMARK_2026-07-30`](docs/audits/commercial/CREATIVE_SERVICES_MARKET_BENCHMARK_2026-07-30.md), con referentes globales, digitales/productizados, Chile/LatAm, fuentes de compradores, confidence, límites y patrones adoptables.
-- Se aceptó [`EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_DECISION_V1`](docs/architecture/EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_DECISION_V1.md): Creative Operations organiza la oferta en Creative Velocity, Brand & Campaign Systems, Content Production System y AI Creative Operations.
-- Se creó [`EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_V2`](docs/services/creative-services/EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_V2.md), con escalera diagnóstico/proyecto exploratorio → sprint → Managed Creative Capacity → lane especializado → Studio/portfolio expansion, paquetes, ICP, proof system, rights, economics y gates.
-- Se sincronizaron `README`, `project_context`, `DECISIONS_INDEX`, Creative Studio Business Model y las copias `.codex`/`.claude` de `creative-practice`. Estado honesto: `Approved for validation`; no habilita pricing público, checkout, venta self-serve ni claims no verificados.
-- Se aclaró la arquitectura como **híbrida**: el catálogo plano permanece como índice de reconocimiento rápido; las cuatro rutas orientan la conversación y los paquetes/modalidades convierten la ruta en una compra scopeable.
-- Las skills `creative-practice` ahora explican operativamente las tres capas, el orden de calificación y un ejemplo de recorrido desde servicio reconocible hasta ruta, sprint, Managed Capacity y expansión.
-- Se creó [`CREATIVE_SERVICES_OPERATING_MODEL_V1`](docs/services/creative-services/EFEONCE_CREATIVE_SERVICES_OPERATING_MODEL_V1.md), que profundiza oferta, modelo de creación/captura de valor, ICP/JTBD, buying group, delivery/RACI, capacity, pricing/economics, rights, proof, renovación y gates de madurez.

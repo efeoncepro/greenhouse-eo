@@ -15,22 +15,30 @@ mercado es enriquecimiento y los ejes medidos mandan. Para una donde NO rankea, 
 volumen+dificultad son la ÚNICA forma de contestar "¿vale la pena?" y "¿cuánto cuesta?". Ahí son
 **dependencia dura**, no opcional.
 
-⚠️ **Y `TASK-1300` SÍ está complete** — yo venía repitiendo lo contrario desde un comentario
-obsoleto de `contracts.ts`. Entregó el registry de familias (`labs` es llamable, `rank-history-seed`
-la usa) pero es *infra de cliente, no capability*: falta el fetch, las columnas (no existe
-`search_volume` en el schema) y el reader. Corregido en la fuente y en el doc, que se contradecía a
-sí mismo.
-
-**Lo que ya existía sin superficie:** `trackKeywords` acepta strings arbitrarios y no valida contra
-oportunidades. Seguir una keyword no rankeada YA funciona por contrato; sólo falta el botón. Full
-API Parity al revés.
+⚠️ **`TASK-1300` SÍ está complete** — yo repetía lo contrario desde un comentario obsoleto de
+`contracts.ts`. Entregó el registry (`labs` es llamable) pero es *infra de cliente, no capability*:
+falta fetch, columnas (`search_volume` no existe) y reader. Corregido en la fuente y en el doc, que
+se contradecía. **Y `trackKeywords` acepta strings arbitrarios**: seguir una keyword no rankeada ya
+funciona por contrato, sólo falta el botón — Full API Parity al revés.
 
 Orden de dependencia: `1659` (modelo de intención, migración) → `1660` (lente Objetivos, UI) →
 `1661` (datos de mercado) → `1662` (keyword gap). Las 4 con `task:lint` en 0/0.
 
-**Decisión asumida, no confirmada:** V1 es **interno** (declara el equipo Efeonce). El carril
-cliente-declara-desde-su-portal queda como follow-up explícito en las 4 tasks — necesita su propio
-modelo de permisos y una decisión sobre quién asume el gasto que el cliente compromete.
+**Superado el mismo día: el operating mode.** El operador señaló que el módulo tiene los **mismos
+tres modelos de servicio que Globe** (`efeonce-managed` | `co-operated` | `client-operated`; "que el
+cliente contrate la herramienta" NO es un cuarto modo sino `client-operated` × delivery model de
+plataforma). El vocabulario YA era canónico y Globe YA lo materializó (SPEC-008, desplegado) — pero
+vive en SU Postgres, y en Greenhouse `delivery-model.ts` es de cotización, no de esto. Creado como
+`TASK-1663` + ADR `GREENHOUSE_OPERATING_RESPONSIBILITY_DECISION_V1.md`.
+
+🔴 **La regla que sostiene todo, verbatim de Globe: el modo NUNCA es input de autorización.** No
+decide quién PUEDE declarar (eso es `can(...)`), decide qué superficie DEBE existir y quién responde.
+Si el modo otorgara acceso, cambiar una etiqueta comercial cambiaría en silencio quién puede
+comprometer gasto. El entregable más importante de 1663 es el **test que lo prueba**.
+
+**Tres ejes ortogonales:** quién puede actuar (capability) · quién responde (modo) · quién paga
+(comercial). Sin default por modo (decisión del operador): cada engagement declara y la ausencia
+**falla cerrada**, por eso `1663` es dependencia **blanda** de `1659`/`1660`.
 
 
 ### TASK-1308 — Keyword Opportunities COMPLETE + doctrina de scopes MCP (2026-08-07)
@@ -41,21 +49,18 @@ commands, dos rutas app-lane, dos del lane ecosystem y **dos tools MCP federadas
 seguir una keyword es un **compromiso de gasto diferido**. Detalle completo en la task, el ADR del
 gateway y `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`; acá sólo lo que un agente siguiente necesita.
 
-**Doctrina de scopes OAuth (con `arch-architect`) — aplica a TODO write federado.** El scope de
-escritura es del **DOMINIO** (`efeonce.mcp.seo.write`), no de la capability: uno por capability
-convierte la lista de Entra en un espejo del `capabilities_registry` editado a mano que diverge, y
-hace del gateway una autoridad de autorización, que su regla 1 prohíbe. Canónico: **un scope por
-CLASE de blast-radius**. Corolario: **federar la escritura N+1 de un dominio que ya tiene scope NO
-toca Entra**.
+**Doctrina de scopes OAuth (con `arch-architect`):** un scope por **CLASE de blast-radius**, nunca
+uno por capability. Corolario: la escritura N+1 de un dominio con scope **no toca Entra**. Completa
+en el ADR del gateway y en ambos bundles de `efeonce-mcp-platform`.
 
 🔴 **FRONTERA DE GRANT — lo más importante que dejó esta task.** El scope existe en `Efeonce MCP
-Resource` (type `Admin`, id `17f923ad-537a-4c2f-ab5b-2a14ed650183`, creado con round-trip verificado:
-4 scopes, ninguno perdido, `requestedAccessTokenVersion: 2` intacto). Pero **NO se cableó al cliente
-PKCE compartido** `32617b87-e7ef-493a-838f-1ff3f0213b93` y **NUNCA debe cablearse**: en el lane
-ecosystem el actor es `mcp:<consumer>` —la MÁQUINA, sin chequeo de capability por humano— y el hop a
-Greenhouse va con token de consumer fijo, así que **el scope OAuth es la única puerta de toda la
-cadena que depende de quién es la persona**. Cablearlo daría poder de gasto a todo el tenant y
-**nada fallaría**. El write de Globe tampoco está ahí. Camino correcto: `TASK-1631`.
+Resource` (type `Admin`, id `17f923ad-537a-4c2f-ab5b-2a14ed650183`; round-trip verificado: 4 scopes,
+ninguno perdido, `requestedAccessTokenVersion: 2` intacto). Pero **NO se cableó al cliente PKCE
+compartido** `32617b87-e7ef-493a-838f-1ff3f0213b93` y **NUNCA debe cablearse**: en el lane ecosystem
+el actor es `mcp:<consumer>` —la MÁQUINA, sin chequeo de capability por humano— y el hop va con token
+de consumer fijo, así que **ese scope es la única puerta de la cadena que depende de la persona**.
+Cablearlo daría poder de gasto a todo el tenant y **nada fallaría**. El write de Globe tampoco está
+ahí. Camino correcto: `TASK-1631`.
 
 **PENDIENTE:** push del gateway `efeonce-mcp` — commits `cb316cc`, `41dca07`, `bfbdf3a`, `1d0ebcc`.
 Deploy productivo en push. Las tools quedan federadas y **fail-closed a propósito**, igual que el
