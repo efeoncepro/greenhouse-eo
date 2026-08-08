@@ -127,7 +127,7 @@ Si por algun motivo el CLI no esta disponible (e.g. local sin checkout, o auth e
 | 2 | Playwright smoke verde | `gh run list --branch develop --workflow="Playwright E2E smoke" --limit 1` | Sí |
 | 3 | Sin runs production "stale waiting" | `gh run list --status waiting` y verificar que ninguno > 24h en allowlist | Sí |
 | 4 | Sin runs "pending sin jobs" | `gh run list --status queued` + inspect cada uno con `gh run view <id>` | Sí |
-| 5 | Vercel staging Ready | `vercel ls greenhouse-eo --target=staging --limit 1` ✓ Ready | Sí |
+| 5 | Vercel staging Ready | `vercel ls greenhouse-eo --environment=staging` ✓ Ready | Sí |
 | 6 | Postgres health | `pnpm pg:doctor` | Sí |
 | 7 | Outbox sin dead-letter pendiente | `psql -c "SELECT count(*) FROM greenhouse_sync.outbox_events WHERE status='dead_letter'"` debe ser 0 | Recomendado |
 | 8 | Sentry sin incidents critical 24h | Vercel/Sentry UI o `/admin/operations` Cloud subsystem | Sí |
@@ -214,7 +214,7 @@ El flujo de promoción por **squash-merge** hace que `main` (commits squash de r
 
 1. **El PR `develop→main` conflicta ("merge commit cannot be cleanly created").** Conflictos en docs (Handoff/changelog/README/registry) y a veces código, porque ambos lados editaron desde una merge-base vieja. **Resolución robusta:** en `develop`, `git merge origin/main -X ours --no-edit` (`develop` es autoritativo: contiene todo `main` por construcción, ya que los squash de `main` son DE commits de `develop`). Verifica `git log origin/main --not develop` vacío **y** `git diff HEAD@{1} HEAD -- src/ scripts/` sin cambios de código → push `develop` → el PR queda MERGEABLE. Bonus: **avanza la merge-base** y reduce la divergencia del próximo release. **NUNCA** cherry-pick a `main` (duplica SHAs).
 
-2. **Preflight `release_batch_policy=requires_break_glass` como falso positivo.** El classifier usa diff *three-dot* (`origin/main...target`, merge-base) → resucita archivos ya desplegados en un release previo (típicamente `services/ops-worker/deploy.sh`) como `cloud_release` irreversible. Confirma el fantasma: `git diff origin/main..target -- <archivo>` = **0 líneas** (idéntico a prod). Post-merge, con `target` = HEAD de `main`, el batch-policy del orchestrator ve diff vacío y pasa. Fix de raíz pendiente = **ISSUE-114** (three-dot → two-dot).
+2. **~~Preflight `release_batch_policy=requires_break_glass` como falso positivo.~~ RESUELTO 2026-08-08 (ISSUE-114).** El classifier usaba diff *three-dot* (`origin/main...target`, merge-base) y resucitaba archivos ya desplegados en un release previo como `cloud_release` irreversible. **Ya no**: `collectChangedFiles` usa **two-dot** y ambos consumidores del rango (archivos + commit bodies) lo resuelven por `buildReleaseDiffRange`, con guardrail anti-regresión en `checks/release-batch-policy.test.ts`. **Consecuencia operativa: si hoy ves `cloud_release` en el classifier, es REAL — no lo descartes como fantasma ni le pongas marker.** Verifícalo igual con `git diff origin/main..target -- <archivo>`; si devuelve líneas, el dominio está de verdad en el batch. Nota aparte: post-merge, con `target` = HEAD de `main`, el rango queda vacío y el batch-policy del orchestrator pasa siempre — **el gate sólo tiene dientes en la corrida local pre-merge**, que es donde se toma la decisión humana.
 
 3. **`playwright_smoke` (0 runs) + evidencia aún corriendo en el commit fresco de `main`.** El smoke corre en `develop` (ya verde); el commit squash de `main` no tiene su propio smoke. Esperar `CI`, `CI Deep Verification` y Vercel Production `READY` para el SHA exacto **antes del primer dispatch**. Solo entonces `bypass_preflight_reason` (≥20 chars) puede cubrir la ausencia inevitable del smoke en el squash; nunca checks pendientes o fallidos. Documentar el motivo real, no uno generico.
 
@@ -280,17 +280,26 @@ git push origin develop     # → el PR develop→main queda MERGEABLE
 Bonus: avanza la merge-base y reduce la divergencia del próximo release.
 **NUNCA** cherry-pick a `main` para evitar el conflicto (duplica SHAs).
 
-#### Paso B — Gotcha #2: marker `[release-coupled: …]` en el cuerpo del squash
+#### Paso B — Gotcha #2: marker `[release-coupled: …]` sólo si el acoplamiento es REAL
 
-El preflight **local** corre con diff *three-dot* y sobre un batch periódico
-grande va a decir `release_batch_policy=split_batch` (o
-`requires_break_glass`) aunque no exista acoplamiento real. El 2026-08-06 dio
-`split_batch` por "payroll + auth_access mezclados" sobre **1051 archivos**
-inflados; los archivos de código reales eran 221.
+> **Delta 2026-08-08 (ISSUE-114 resuelta).** Este paso nació cuando el classifier
+> inflaba el batch con diff *three-dot*. Ya usa **two-dot**, así que **los dominios
+> que reporta ahora son reales**. El marker volvió a significar lo que decía:
+> *"estos dominios conviven a propósito"*. **No lo pongas para silenciar al gate** —
+> si no puedes nombrar el acoplamiento en una frase, el batch se parte (§2.2).
+>
+> Antes de escribirlo, corre el preflight local y mira qué dominios quedan:
+>
+> ```bash
+> pnpm release:preflight --target-sha=$(git rev-parse develop) --target-branch=main
+> ```
+>
+> Un solo dominio irreversible (típico: `db_migrations` acopladas a su consumer
+> directo) **no** es un acoplamiento que declarar — es un release de migración
+> normal, que el operador reconoce conscientemente.
 
-La respuesta canónica **no** es `bypass_preflight_reason`: es declarar la razón
-en el **cuerpo del commit de squash**, que es lo que el classifier del
-orquestador lee.
+Cuando el acoplamiento sí existe, se declara en el **cuerpo del commit de squash**,
+que es lo que el classifier del orquestador lee — nunca con `bypass_preflight_reason`.
 
 ```bash
 pnpm release:preflight --target-sha=$(git rev-parse develop) --target-branch=main
@@ -339,7 +348,7 @@ Todos verdes **para el SHA de `main`**, no para el de `develop`:
 SHA=$(git rev-parse origin/main)
 gh run list --branch main --commit "$SHA" --limit 10 \
   --json name,status,conclusion --jq '.[] | "\(.name)\t\(.status)/\(.conclusion)"'
-vercel ls greenhouse-eo --target=production --limit 1 --scope efeonce-7670142f
+vercel ls greenhouse-eo --environment=production --scope efeonce-7670142f
 ```
 
 **Piso duro: no dispatchar antes de 8 min desde el push a `main`** (Vercel
@@ -418,7 +427,7 @@ Reason: el concurrency fix Opcion A (TASK-848 Slice 3) cancela pending nuevos cu
 
 | # | Check | Cómo verificar |
 |---|---|---|
-| 1 | Vercel production Ready | `vercel ls greenhouse-eo --target=production --limit 1` |
+| 1 | Vercel production Ready | `vercel ls greenhouse-eo --environment=production` |
 | 2 | Cloud Run workers Ready | `gcloud run services list --project=efeonce-group --region=us-east4` — todos Ready=True |
 | 3 | Sentry sin nuevos errors | Sentry UI filter `release:<sha>` últimos 30min |
 | 4 | Smoke flows críticos | Browser real: login, `/finance/cash-out`, `/agency/operations`, `/admin/operations` |
