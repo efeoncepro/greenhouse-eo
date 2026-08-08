@@ -74,6 +74,19 @@ const DRILL_URL_LIMIT = 200
 /** Id estable del disparador de un grupo — el ancla del retorno de foco al cerrar el drill. */
 const triggerId = (issueType: string) => `seo-audit-trigger-${issueType}`
 
+/** Detalle diagnóstico de un finding, en la misma forma que muestra la tabla. */
+const findingDetail = (detail: Record<string, unknown>): string => {
+  const status = detail?.httpStatusCode
+  const score = detail?.onpageScore
+
+  return [
+    typeof status === 'number' ? GH_GROWTH_SEO_AUDIT.drill.httpStatus(status) : null,
+    typeof score === 'number' ? GH_GROWTH_SEO_AUDIT.drill.onpageScore(Math.round(score)) : null
+  ]
+    .filter(Boolean)
+    .join(' · ')
+}
+
 interface Props {
   spaces: readonly SeoSpaceOption[]
   selectedSpaceId: string | null
@@ -255,6 +268,26 @@ const SiteAuditView = ({
   // Feedback del enqueue. `actionable` viaja desde el contrato canónico: el guard de
   // idempotencia y el cupo agotado NO llevan reintento (reintentar es exactamente lo que
   // no corresponde), mientras que una caída del proveedor sí.
+  // Copia del drill: `null` = sin intento; el `issueType` recuerda CUÁL grupo se copió
+  // para que el feedback no aparezca en el grupo equivocado al cambiar de uno a otro.
+  const [copied, setCopied] = useState<{ issueType: string; ok: boolean } | null>(null)
+
+  const copyGroup = useCallback(async (group: SeoAuditIssueGroup) => {
+    // TSV con encabezado: pega como texto en un doc y como columnas en una planilla, sin
+    // pedirle al operador que elija formato. Se copian TODAS las URLs del grupo, no sólo
+    // las que la tabla alcanza a mostrar — el techo del render es de lectura, no del dato.
+    const body = group.findings.map(finding => `${finding.url}\t${findingDetail(finding.detail)}`).join('\n')
+
+    try {
+      await navigator.clipboard.writeText(`${GH_GROWTH_SEO_AUDIT.drill.copyHeader}\n${body}`)
+      setCopied({ issueType: group.issueType, ok: true })
+    } catch {
+      // El portapapeles puede estar denegado por permisos o por contexto no seguro. Se
+      // dice; fallar en silencio dejaría al operador creyendo que copió.
+      setCopied({ issueType: group.issueType, ok: false })
+    }
+  }, [])
+
   const [runState, setRunState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [runMessage, setRunMessage] = useState<{ text: string; severity: 'success' | 'warning' | 'error' } | null>(null)
 
@@ -641,21 +674,41 @@ const SiteAuditView = ({
             )}
           </Stack>
 
+          <Stack direction='row' spacing={2} alignItems='center'>
+            <GreenhouseButton
+              kind='secondaryAction'
+              variant='outlined'
+              size='small'
+              leadingIconClassName='tabler-copy'
+              aria-label={GH_GROWTH_SEO_AUDIT.drill.copyAria(group.label)}
+              onClick={() => void copyGroup(group)}
+            >
+              {GH_GROWTH_SEO_AUDIT.drill.copy}
+            </GreenhouseButton>
+
+            {/* `role='status'` y no un toast: el resultado pertenece a este grupo y tiene
+                que anunciarse donde ocurrió, no en una esquina que el lector de pantalla
+                lee fuera de contexto. */}
+            {copied?.issueType === group.issueType ? (
+              <Typography variant='caption' color={copied.ok ? 'success.main' : 'error.main'} role='status'>
+                {copied.ok ? GH_GROWTH_SEO_AUDIT.drill.copied : GH_GROWTH_SEO_AUDIT.drill.copyFailed}
+              </Typography>
+            ) : null}
+          </Stack>
+
           {/* Scroll INTERNO, no crecimiento vertical libre. Un grupo real trae 91 URLs
               (Berel) y sin este techo el drill mide ~5000px: expulsa de la pantalla la
               lista priorizada que el operador estaba recorriendo, y abrir un issue pasa a
               costar perder el contexto. Lo vio la captura del GVC, no el lint.
 
-              El contenedor lleva `tabIndex=0` + `role='region'`: una zona con scroll a la
-              que no se puede llegar por teclado deja su contenido inalcanzable para quien
-              no usa mouse (axe `scrollable-region-focusable`). El scroll vertical vive
-              acá y el horizontal dentro del shell, así que no compiten. */}
-          <Box
-            tabIndex={0}
-            role='region'
-            aria-label={GH_GROWTH_SEO_AUDIT.drill.title(group.label, group.affectedPages)}
-            sx={{ maxBlockSize: 360, overflowY: 'auto' }}
-          >
+              El contenedor lleva `tabIndex=0` porque una zona con scroll a la que no se
+              puede llegar por teclado deja su contenido inalcanzable para quien no usa
+              mouse (axe `scrollable-region-focusable`). Pero NO lleva `role='region'` con
+              el mismo nombre: `DataTableShell` ya expone su propia región nombrada, y
+              anidar dos con la misma etiqueta hacía que un lector de pantalla anunciara el
+              mismo landmark dos veces. El scroll vertical vive acá y el horizontal dentro
+              del shell, así que no compiten. */}
+          <Box tabIndex={0} sx={{ maxBlockSize: 360, overflowY: 'auto' }}>
           <DataTableShell
             identifier={`seo-audit-drill-${group.issueType}`}
             ariaLabel={GH_GROWTH_SEO_AUDIT.drill.title(group.label, group.affectedPages)}
@@ -670,15 +723,7 @@ const SiteAuditView = ({
               </TableHead>
               <TableBody>
                 {urls.map((finding, index) => {
-                  const status = finding.detail?.httpStatusCode
-                  const score = finding.detail?.onpageScore
-
-                  const detail = [
-                    typeof status === 'number' ? GH_GROWTH_SEO_AUDIT.drill.httpStatus(status) : null,
-                    typeof score === 'number' ? GH_GROWTH_SEO_AUDIT.drill.onpageScore(Math.round(score)) : null
-                  ]
-                    .filter(Boolean)
-                    .join(' · ')
+                  const detail = findingDetail(finding.detail)
 
                   return (
                     <TableRow key={`${finding.url}-${index}`}>

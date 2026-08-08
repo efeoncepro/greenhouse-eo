@@ -2468,7 +2468,16 @@ export const GH_GROWTH_SEO_AUDIT = {
     detailEmpty: 'Sin detalle adicional',
     httpStatus: (code: number) => `HTTP ${code}`,
     onpageScore: (score: number) => `Puntaje de página ${score}`,
-    truncated: (shown: number, total: number) => `Mostramos ${shown} de ${total} páginas de este grupo.`
+    truncated: (shown: number, total: number) => `Mostramos ${shown} de ${total} páginas de este grupo.`,
+    // El diagnóstico tiene que poder salir de la pantalla: el site audit es material de
+    // conversación de SOW, y hasta acá terminaba en copiar a mano.
+    copy: 'Copiar',
+    copyAria: (issueName: string) => `Copiar las páginas afectadas por ${issueName}`,
+    copied: 'Copiado',
+    copyFailed: 'No pudimos copiar. Selecciona el texto a mano.',
+    // TSV: pega como texto en un doc y como columnas en una planilla, sin pedirle al
+    // operador que elija formato.
+    copyHeader: 'URL\tDetalle'
   },
 
   states: {
