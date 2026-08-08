@@ -30,7 +30,7 @@
 
 ## Flow Map
 
-1. Entry: cliente entra a `/growth/seo` (guard: `module_assignment=active` + `growth.seo.observation.read`; sin assignment → Locked/teaser).
+1. Entry: cliente entra a `/growth/seo` (guard: `module_assignment=active` + `growth.seo.report.read_client`, scope `own`; sin assignment → Locked/teaser).
 2. Primary action: navega el navigator masterDetail — Resumen → Evolución → Quadrant 360.
 3. Transition: en Quadrant 360, click cross-link "¿Te cita la IA? Ver AEO" → navega a `/aeo` (X1); back restaura el dashboard en la sección Quadrant.
 4. User decision: `[Ver informe]` (header) → navega a `/growth/seo/report`.
@@ -83,9 +83,11 @@
 
 ## Data & Command Boundaries
 
-- Readers: `readRankSnapshotLatest` (Resumen curado), `readRankEvolution(targetId, {range})` (Evolución, TASK-1303 `[verificar]`), `readSeoAeoGap(targetId)` (Quadrant, TASK-1305 `[verificar]`). Todos retornan `{ ok, ... } | { ok:false, errorCode, status }`.
+- Readers: el Resumen deriva su última observación desde `readRankEvolution` o un reader vigente; no existe `readRankSnapshotLatest`. `readRankEvolution(targetId, {range})` alimenta Evolución y `readSeoAeoGap(targetId)` alimenta Quadrant. Todos retornan `{ ok, ... } | { ok:false, errorCode, status }`.
 - Commands: ninguno (cliente read-only).
-- API routes: readers vía route handlers cliente gateados por `module_assignment` + `growth.seo.observation.read`/`report.read_client`.
+- API routes: readers vía route handlers cliente gateados por `module_assignment` +
+  `growth.seo.report.read_client` (scope `own`); `growth.seo.observation.read` queda reservado al cockpit
+  operador.
 - Optimistic updates: N/A (read-only).
 - Cache / invalidation: snapshots materializados (no live-per-view, arch §1.1/§8); el report deriva del mismo model.
 - Audit / signals: reads no auditan writes; freshness/degradación enlaza a signals `seo.rank.capture_lag` (arch §8) sin computar salud en cliente.

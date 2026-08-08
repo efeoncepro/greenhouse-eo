@@ -4,6 +4,7 @@ import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { MOTION_DURATION_S } from '@/components/greenhouse/motion/core/tokens'
 import useReducedMotion from '@/hooks/useReducedMotion'
 import { motion } from '@/libs/FramerMotion'
 
@@ -21,8 +22,13 @@ export interface SignalStripProps {
   ariaLabel: string
 }
 
-const toneColor = (tone: SurfaceSignal['tone']) =>
-  tone === 'primary' ? 'primary.dark' : tone && tone !== 'default' ? `${tone}.main` : 'text.primary'
+// `tone` deliberadamente NO pinta el valor ni el ícono: un semáforo aplicado a la
+// identidad de un KPI convierte success/warning/error en lenguaje de sección en vez de
+// una ayuda puntual de estado. El tono sigue viviendo en el tipo para que un consumer lo
+// exprese donde sí corresponde (un chip, una nota), no en el número.
+const toneValueColor = () => 'text.primary'
+
+const toneIconColor = () => 'text.secondary'
 
 const SignalStrip = ({ signals, variant, kind = 'health', density = 'auto', dataCapture, ariaLabel }: SignalStripProps) => {
   const reduced = useReducedMotion()
@@ -64,7 +70,7 @@ const SignalStrip = ({ signals, variant, kind = 'health', density = 'auto', data
         sx={{
           display: 'grid',
           gridTemplateColumns: {
-            xs: integrated ? `repeat(${Math.min(signals.length, 3)}, minmax(0, 1fr))` : 'minmax(0, 1fr)',
+            xs: 'minmax(0, 1fr)',
             sm: `repeat(${Math.min(signals.length, 3)}, minmax(0, 1fr))`
           },
           gap: 0,
@@ -75,16 +81,18 @@ const SignalStrip = ({ signals, variant, kind = 'health', density = 'auto', data
           <Stack
             key={signal.id}
             component={motion.div}
-            initial={false}
+            initial={reduced ? false : { opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: reduced ? 0 : 0.22, delay: reduced ? 0 : index * 0.04 }}
-            direction={integrated ? { xs: 'column', sm: 'row' } : 'row'}
-            spacing={2}
-            alignItems='flex-start'
+            transition={{ duration: reduced ? 0 : MOTION_DURATION_S.standard, delay: reduced ? 0 : index * MOTION_DURATION_S.instant }}
+            direction='row'
+            spacing={integrated ? 1.25 : 2}
+            alignItems='center'
             sx={theme => ({
               minWidth: 0,
-              px: integrated ? { xs: 0.5, sm: 4 } : { xs: 0, sm: 4 },
-              py: { xs: 2, sm: 0 },
+              px: integrated ? { xs: 0, sm: 2.5 } : { xs: 0, sm: 4 },
+              py: integrated ? { xs: 1, sm: 0 } : { xs: 2, sm: 0 },
+              borderBlockStart: !integrated && signal.tone && signal.tone !== 'default' ? `3px solid var(--mui-palette-${signal.tone}-main)` : 'none',
+              borderBlockEnd: { xs: integrated && index < Math.min(signals.length, 3) - 1 ? `1px solid ${theme.palette.divider}` : 'none', sm: 'none' },
               borderInlineStart: { xs: 'none', sm: index === 0 ? 'none' : `1px solid ${theme.palette.divider}` }
             })}
           >
@@ -93,28 +101,28 @@ const SignalStrip = ({ signals, variant, kind = 'health', density = 'auto', data
                 sx={theme => ({
                   display: 'grid',
                   placeItems: 'center',
-                  inlineSize: integrated ? { xs: 26, sm: 34 } : 34,
-                  blockSize: integrated ? { xs: 26, sm: 34 } : 34,
+                  inlineSize: integrated ? { xs: 30, sm: 34 } : 34,
+                  blockSize: integrated ? { xs: 30, sm: 34 } : 34,
                   flexShrink: 0,
                   borderRadius: `${theme.shape.customBorderRadius.md}px`,
-                  bgcolor: `${signal.tone ?? 'primary'}.lightOpacity`,
-                  color: integrated ? 'inherit' : toneColor(signal.tone)
+                  bgcolor: 'action.hover',
+                  color: toneIconColor()
                 })}
               >
                 <i className={signal.iconClassName} aria-hidden='true' />
               </Box>
             ) : null}
-            <Stack spacing={0.5} sx={{ minWidth: 0 }}>
+            <Stack spacing={0.2} sx={{ minWidth: 0, flex: 1 }}>
               <Typography
                 variant='caption'
-                color={integrated ? 'inherit' : 'text.primary'}
-                sx={{ opacity: integrated ? 0.78 : 1, lineHeight: 1.25 }}
+                color='text.primary'
+                sx={{ opacity: 1, lineHeight: 1.25, fontWeight: integrated ? 600 : 400 }}
               >
                 {signal.label}
               </Typography>
               <Typography
-                variant='h5'
-                sx={{ color: integrated ? 'inherit' : toneColor(signal.tone), fontVariantNumeric: 'tabular-nums' }}
+                variant={integrated ? 'subtitle1' : 'h5'}
+                sx={{ color: toneValueColor(), fontVariantNumeric: 'tabular-nums' }}
               >
                 {signal.value}
               </Typography>

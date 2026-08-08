@@ -144,6 +144,29 @@ header composition.
 
 External design is intent, never literal HEX/px/font/ms.
 
+### Enterprise anti-AI-slop baseline
+
+For premium enterprise dashboards, reports and client review spaces, prefer an
+enterprise analysis sheet before inventing another widget grid:
+
+- one dominant paper/surface per section; no text, KPI, filters, chart controls
+  or status summaries floating directly on the grey/default canvas;
+- no card soup: repeated KPI cards, chart cards, table cards and nested
+  contained panels must each earn a grouping, comparison, state or interaction
+  role;
+- no colored left rails, side accents or stripe cards as the primary status
+  device unless a documented primitive owns that pattern;
+- no traffic-light palette as the visual system. Semantic color is a small state
+  aid, not a background, row language or KPI identity;
+- sparse data gets an evidence, timeline, coverage or confidence treatment
+  before a large empty chart;
+- tables are work queues or rankings with density, sort/filter/action model and
+  mobile list strategy, not flat exports.
+
+If a premium UI loop fails twice on the same visual critique, stop editing JSX
+and bring in independent UI/research review or current design-system sources
+before the next iteration.
+
 ### 4. Contract the first fold
 
 The wireframe must contain substantive:
@@ -237,6 +260,10 @@ Stop implementation/closure when:
 - visual source/direction is missing;
 - first fold was not reviewed;
 - mobile is compressed desktop;
+- content, KPI, filters or chart/table controls float on the grey/default canvas
+  without a deliberate surface model;
+- colored side rails, traffic-light colors or card soup are doing the primary
+  visual work;
 - sibling screens of one surface resolve their chrome differently;
 - at 390px a control's current value truncates or the active tab is clipped;
 - primary action is ambiguous;

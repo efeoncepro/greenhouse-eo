@@ -43,6 +43,12 @@ Hard requirements:
    `regions.primary`; sibling screens of one surface share that same header
    composition, and the controls it holds are not duplicated inside the
    empty/degraded/denied surfaces.
+   Premium dashboards/reports use an enterprise analysis-sheet model: one
+   deliberate surface per section, no KPI/text/controls floating on grey canvas,
+   no card soup, no colored side rails/stripe cards as primary status language,
+   no traffic-light palette as the visual system, sparse data reframed as
+   evidence/timeline/coverage before empty charts, and tables as work
+   queues/rankings rather than flat exports.
 4. Pass substantive readiness.
 5. Review desktop/mobile first fold.
 6. Capture/review GVC with `qualityProfile: 'premium'`.
@@ -52,7 +58,9 @@ Hard requirements:
 
 Two stop conditions from the canonical file worth repeating here: sibling
 screens of one surface resolving their chrome differently, and a control whose
-current value truncates (or an active tab that is clipped) at 390px.
+current value truncates (or an active tab that is clipped) at 390px. Also stop
+when the surface depends on grey-canvas floating content, card soup, colored side
+rails or a traffic-light palette for its main visual hierarchy.
 
 Greenhouse product typography is Geist + theme-applied Poppins display, never
 DM Sans for new product UI.

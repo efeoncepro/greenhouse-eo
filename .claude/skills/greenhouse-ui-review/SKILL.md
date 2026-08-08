@@ -159,6 +159,16 @@ Every finding is one of:
 - [ ] NO icon sizes off-scale
 - [ ] NO `<Box>` layouts where Vuexy Card/CardHeader/CardContent fit
 - [ ] NO bespoke animation wrappers when `useReducedMotion` + MUI transitions suffice
+- [ ] NO premium dashboard/report with content, KPI, filters or chart/table
+      controls floating on the grey/default canvas
+- [ ] NO colored left rails, stripe cards or traffic-light palettes doing the
+      primary visual hierarchy
+- [ ] NO card soup: every contained surface earns a grouping, comparison, state
+      or interaction role
+- [ ] NO sparse data stretched into a large empty chart; use evidence, timeline,
+      coverage or confidence
+- [ ] NO flat export table when the product needs a queue/ranking with
+      sort/filter/action model and responsive list strategy
 
 ## Output format
 
@@ -196,6 +206,9 @@ When invoked, produce:
 
 ## Version
 
+- **v1.1** — 2026-08-08 — TASK-1310 anti-AI-slop sweep: grey-canvas floating
+  content, colored rails, traffic-light palettes, card soup, sparse charts and
+  flat tables.
 - **v1.0** — 2026-04-19 — Initial gate (TASK-488). 13 sections, 3 severity levels, hard-stop on blockers.
 
 ## Figma Implementation Contract (gate)

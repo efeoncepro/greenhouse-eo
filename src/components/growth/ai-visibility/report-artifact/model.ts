@@ -53,6 +53,7 @@ import {
   buildPublicReportViewFacts,
   type PublicReportViewFactOptions
 } from '@/lib/growth/ai-visibility/report/view-facts'
+import type { SeoReportArtifactPayload } from '@/components/growth/seo/report-artifact/contracts'
 
 // ── Variants + audiences ──────────────────────────────────────────────────────
 
@@ -262,6 +263,15 @@ export interface ReportArtifactModel {
   engineSnapshot?: ProviderPresence[]
   /** Facts render-ready public-safe; Greenhouse los deriva, consumers sólo pintan. */
   viewFacts: PublicReportViewFacts
+  /**
+   * Extensión aditiva para un dominio que comparte el contrato de artifact pero no sus métricas
+   * AEO. El adapter SEO mantiene el mismo model envelope y entrega su payload client-safe a su
+   * render web/print; los adapters AEO existentes no leen este campo.
+   */
+  surface?: {
+    kind: 'seo'
+    seo: SeoReportArtifactPayload
+  }
 }
 
 // ── Derivations ───────────────────────────────────────────────────────────────

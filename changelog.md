@@ -7,6 +7,19 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-08 — TASK-1310: surfaces cliente SEO para Grupo Berel (code complete local)
+
+- Se construyeron las tres direcciones aprobadas como una familia: dashboard `masterDetail`
+  `/growth/seo`, quadrant 360 SEO×AEO y report artifact `/growth/seo/report` con render web + print.
+- El report agrega `modelFromSeoReport` sobre el mismo `ReportArtifactModel` del AEO; no duplica scoring,
+  no expone costos/provider snapshot y mantiene `clientPortal`/`attachment` público-safe.
+- Grupo Berel quedó verificable con assignment SEO activo y gate `growth.seo.report.read_client` scope `own`.
+  GVC local desktop + mobile pasó sin errores de consola, página, hidratación ni HTTP; el desktop no tiene
+  findings axe. Los warnings mobile del shell global y el rollout staging/prod quedan declarados en
+  `docs/tasks/in-progress/TASK-1310-growth-seo-client-dashboard-report-artifact.md`.
+- GCloud/ADC y proxy PostgreSQL renovados/verificados. Lint, 28 tests focales, task lint y reachability
+  pasan. No se ejecutó build completo para proteger recursos; no hubo push/deploy.
+
 ## 2026-08-07 — Growth SEO: pantalla ancla Rendimiento + Historical Data Platform (TASK-1307 + TASK-1655)
 
 - **`/admin/growth/seo/performance` (tab Rendimiento) COMPLETA** — la feature ancla de EPIC-022: chart
@@ -1055,23 +1068,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   `sha256:b8a0eb45289558a2cb99e9989fa401aa794035c709505b10c58fba34e0768c1e`.
 - El Producer ofrece simultáneamente cinco modelos de imagen. TASK-1553 permanece `in-progress`
   por los receipts pendientes de TASK-1468/TASK-1578.
-
-## 2026-07-30 — Creative Velocity y producción modular
-
-- Se profundizó el benchmark de Creative Velocity contra Superside, Publicis, WPP, VML, Monks, DEPT, Dentsu,
-  Accenture Song y referentes de Chile/LatAm.
-- Se creó [`EFEONCE_CREATIVE_VELOCITY_MODULAR_PRODUCTION_ADDENDUM_V1`](docs/services/creative-services/EFEONCE_CREATIVE_VELOCITY_MODULAR_PRODUCTION_ADDENDUM_V1.md).
-- Se documentaron lanes Social/Campaign/Performance Creative/Content Operations Velocity, Dedicated Creative Pod,
-  primer valor, dos velocidades y el roadmap de Modular Production.
-- Se registró la implementación observada en SKY con Adobe Express, SharePoint y assets reutilizables como capability
-  de delivery probada, separada de un producto futuro.
-- Se actualizaron Creative Practice en `.codex` y `.claude`, además de las skills de business model, customer model
-  y pricing. Estado: `Approved for validation`; no se habilita venta self-service ni pricing público.
-- Se creó la simulación sintética [`Creative Velocity Buying Simulation — Banco BICE V1`](docs/audits/commercial/EFEONCE_CREATIVE_VELOCITY_BUYING_SIMULATION_BANCO_BICE_V1.md), con artefactos, objeciones, respuestas y criterios de validación.
-- Se actualizó el estado de SKY: el operador autoriza nombrarlo como caso de éxito; claims, métricas, assets,
-  screenshots, nombres, URLs y pricing siguen sujetos a evidencia y alcance específico.
-- Se documentó `Embedded Managed Pod / Embedded Creative Capacity` como modalidad integrada culturalmente al equipo
-  interno, con frontera explícita frente a Staff Augmentation, cost-to-serve de integración y métricas de fit/adoption.
-- Se incorporó `Fully Managed Creative Capacity`: fee mensual integral donde Efeonce absorbe equipo, infraestructura,
-  licencias, costos laborales, provisionales, reemplazos y soporte. El modelo aplica globalmente, con parametrización
-  legal, laboral, fiscal, monetaria y de procurement por jurisdicción.

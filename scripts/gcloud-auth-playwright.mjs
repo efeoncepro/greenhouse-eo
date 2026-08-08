@@ -65,7 +65,9 @@ const main = async () => {
 
   if (options.force || !statusAfterCli.adc) {
     await runGcloudBrowserFlow({
-      args: ['auth', 'application-default', 'login', credentials.email, '--no-launch-browser'],
+      // ADC rejects the account positional argument when credentials already exist and exits
+      // before emitting an OAuth URL. Omitting it is the documented force-refresh path.
+      args: ['auth', 'application-default', 'login', '--no-launch-browser'],
       label: 'Application Default Credentials',
       credentials,
       profilePath

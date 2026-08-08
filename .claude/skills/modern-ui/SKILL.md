@@ -147,6 +147,11 @@ Do not repeat these. Full list in `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1
 8. **Medium button in dense contexts** → `size='small'`
 9. **`allowScrollButtonsMobile` on scrollable tabs** → at 390px the arrows eat ~80px and end up covering the ACTIVE tab. The fix is not more arrows: make the tabs fit (hide each tab's icon at `xs` via `'& .MuiTab-iconWrapper': { display: { xs: 'none', sm: 'inline-flex' } }`, tighten `paddingInline`). Touch already has the drag gesture.
 10. **Scope/period selectors 2-up at `xs`** → a control whose current value truncates ("Últimos 90 …") stops being a control. On mobile each one takes its own full row; the saved row costs less than the lost value.
+11. **Grey canvas as content plane** → text, KPI, filters, chart controls and table controls floating directly on the default canvas read unfinished. Use an intentional analysis-sheet/paper surface per section.
+12. **Card soup** → repeated KPI cards, chart cards, table cards and nested panels only count as premium when every boundary has a grouping, comparison, state or interaction role.
+13. **Colored left rails / stripe cards** → not a premium status language unless a documented primitive owns the pattern; otherwise it reads generated.
+14. **Traffic-light dashboard palette** → success/warning/error are small state aids, not KPI identities, table row language or section backgrounds.
+15. **Sparse chart/table filler** → sparse data needs evidence/timeline/coverage/confidence; tables need queue/ranking behavior, not flat export rows.
 
 ## Pre-code checklist (HARD GATE — do not skip)
 
@@ -161,6 +166,9 @@ Before writing a single line of UI code, agents MUST answer:
 - [ ] Did I choose borderRadius from `theme.shape.customBorderRadius.*` and emit it as a CSS px string inside `sx`?
 - [ ] Am I using `color='success|warning|error|info'` only for semantic states?
 - [ ] Am I using `fontVariantNumeric: 'tabular-nums'` (NOT monospace) for numbers?
+- [ ] Is this dashboard/report using an analysis-sheet surface model instead of
+      grey-canvas floating content, card soup, colored rails or a traffic-light
+      palette?
 
 If any answer is no or unclear, STOP and resolve before writing code.
 
@@ -211,6 +219,7 @@ GVC de una vista nueva declara `quality.layout` + `quality.runtime` + `quality.e
 
 ## Version
 
+- **v1.4** — 2026-08-08 — TASK-1310: anti-AI-slop enterprise baseline for analysis-sheet surfaces, grey-canvas floating content, card soup, colored rails, traffic-light palettes, sparse charts and flat tables.
 - **v1.3** — 2026-08-07 — TASK-1307: `CustomTabsNav` row in the wrapper table; anti-patterns 9-10 (mobile tab scroll buttons, 2-up scope selectors that truncate their current value).
 - **v1.2** — 2026-07-18 — Added Claude Design → Greenhouse bridge gate (TASK-1430 post-mortem: mock rico ≠ resultado rico si se transcribe en vez de componer; bridge doc + rubric obligatorio en scenarios de vistas nuevas).
 - **v1.1** — 2026-05-12 — Corrected font canon: Geist (body+UI) + Poppins (display h1-h4). DM Sans flagged as deprecated. Added "How to detect canonical drift" section.

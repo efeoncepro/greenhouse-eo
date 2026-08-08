@@ -417,6 +417,20 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
     via: 'inline-link',
     reason:
       'AI Visibility client report (TASK-1248) — surface client-scoped (routeGroup client, viewCode cliente.ai_visibility_report). Deep-link primero (OQ resuelta): se alcanza desde Account 360 / el handoff del Report Packet Delivery (TASK-1250), no como item de nav principal hasta que exista el monitor recurrente. Gateada server-side por client tenant + capability growth.ai_visibility.report.read_client.'
+  },
+  {
+    route: '/growth/seo',
+    parent: '/home',
+    via: 'inline-link',
+    reason:
+      'SEO client dashboard (TASK-1310) — surface client-scoped (routeGroup client, viewCode cliente.growth_seo_dashboard). Deep-link desde el portal; gateada server-side por tenant client, module_assignment SEO y capability growth.seo.report.read_client.'
+  },
+  {
+    route: '/growth/seo/report',
+    parent: '/growth/seo',
+    via: 'header-cta',
+    reason:
+      'SEO report artifact (TASK-1310) — child del dashboard, alcanzable mediante "Ver informe"; no duplica el ítem de navegación y requiere growth.seo.report.read_client.'
   }
 ]
 

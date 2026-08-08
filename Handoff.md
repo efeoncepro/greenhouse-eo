@@ -1,14 +1,24 @@
 # Handoff activo
 
-### TASK-1310 — visual cliente SEO tomada (2026-08-08)
+### TASK-1310 — surfaces cliente SEO implementadas (2026-08-08)
 
-`TASK-1310` pasó a `in-progress` en `develop` tras verificar que `TASK-1305` y `TASK-1307`
-están completos y que existen `readSeoAeoGap`, `classifyQuadrant`, `readRankEvolution` y el
-stack ECharts lazy que esta surface hereda. La task declara `Blocked by: none`; el hook pasó.
-El siguiente paso es completar la dirección visual repo-native y obtener el checkpoint de plan
-por esfuerzo Alto antes de implementar `/growth/seo`, `/growth/seo/report` y el quadrant 360.
-No crear `readRankSnapshotLatest` paralelo: el resumen debe derivar la última observación desde
-el reader vigente o un contrato existente. No hay push/deploy autorizado.
+`TASK-1310` permanece `in-progress` en `develop`, con código completo local y rollout pendiente.
+Las tres direcciones aprobadas quedaron construidas como una familia: dashboard Evidence Narrative
+(`/growth/seo`), quadrant Visibility Map SEO×AEO y Trust Report Artifact (`/growth/seo/report` +
+`?print=1`). El report usa `modelFromSeoReport` sobre el mismo `ReportArtifactModel` del AEO y el
+gate cliente quedó en `module_assignment=active` + `growth.seo.report.read_client`, scope `own`.
+
+Grupo Berel ya tiene `seo_v1` y assignment SEO activo. Se renovaron/verificaron GCloud/ADC y el
+proxy PostgreSQL; una identidad client-scoped dedicada permitió revisar las superficies con datos
+reales sin abrir el cockpit interno. GVC local desktop + 390px quedó capturado en:
+`.captures/2026-08-08T09-15-23_growth-seo-client`,
+`.captures/2026-08-08T09-16-33_growth-seo-report` y
+`.captures/2026-08-08T09-17-46_growth-seo-report-print`. Lint focal, 28 tests focales,
+`task:lint` y route reachability pasan; no se ejecutó un build completo para proteger recursos.
+
+No crear `readRankSnapshotLatest` paralelo: el resumen deriva la última observación desde
+`readRankEvolution`. Siguiente paso ejecutable: captura en staging, baseline diff, revisión final
+del shell mobile y promoción develop→main. No hay push/deploy autorizado.
 
 ### Search Visibility — header canónico único en las tres pestañas (2026-08-07, ciclo documental cerrado)
 

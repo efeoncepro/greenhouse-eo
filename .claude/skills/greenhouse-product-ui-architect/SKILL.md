@@ -19,6 +19,16 @@ Every NEW Greenhouse surface/screen/view MUST **start from the Composition Shell
 
 **Screen chrome lives in the recipe `header` region, NEVER in `regions.primary` (TASK-1307):** `SurfaceRecipe` renders its `header` prop ABOVE the `CompositionShell`, outside the region plane — so page title, scope selectors, freshness chip, sibling tabs and legend belong there. Put them inside `primary` and, with `plane='none'`, they read as loose form boxes floating on the grey canvas; at 390px they become a whole screen of chrome before the first datum. Canonical shape: `header={<Stack>{breadcrumbs}<WorkbenchHeader kind='report' …/></Stack>}`. `WorkbenchHeader kind='report'` resolves to the contained editorial plane (paper + divider border + `customBorderRadius.xl` + raised elevation) and offers the slots to divide the chrome: `secondaryActions` = the scope the operator CHANGES; `meta` = facts about the data (freshness); `supporting` = sibling tabs under their divider. Valuable side effect: because the header sits outside the body, those controls remain available in the empty/degraded/denied surfaces — do NOT re-render them inside each state surface. **Sibling screens are ONE header:** when several routes are tabs of the same surface (same breadcrumb, title and tab bar), they MUST share the same header composition; two siblings solving chrome in two different ways is a defect even when each one looks fine in isolation. Reference: the three Search Visibility tabs (`SeoOverviewView` / `SeoPerformanceView` / `KeywordOpportunitiesView`).
 
+**Enterprise analysis-sheet rule (TASK-1310):** for premium dashboard/report/client
+approval spaces, architect one deliberate paper/surface per task section before
+adding widgets. Content, KPI, filters, chart controls and table controls must not
+float directly on the grey/default canvas. Colored left rails, stripe cards and
+traffic-light palettes are not a status architecture unless a documented
+primitive owns them. Sparse analytics data should become evidence, timeline,
+coverage or confidence before a large empty chart. Tables should be queues or
+rankings with density, sort/filter/action model and responsive list strategy,
+not flat exports.
+
 ## Required Reads
 
 - `DESIGN.md`
@@ -93,6 +103,9 @@ Canonical shape:
 - Do not implement a desktop Adaptive Sidecar as a boxed drawer/card overlay. It must be an in-flow, full-height work-canvas lane with non-modal semantics.
 - Do not leave high-friction error surfaces with only generic template copy when the product voice can safely improve recovery and brand perception.
 - Do not ship screenshots-free UI changes when the request is about visual quality.
+- Do not solve premium dashboards/reports with card soup, grey-canvas floating
+  content, colored side rails, traffic-light palettes, sparse empty charts or
+  flat export tables.
 - Do not create `FooDrawer`, `FooInspector`, and `FooAssistant` as separate components when one primitive plus functional variants covers the family.
 - Do not add a variant that only changes color, radius, shadow, or icon.
 

@@ -7,7 +7,7 @@
 - Product Design asset: sin PNG dedicado — dirección derivada del **report artifact aprobado del AEO** (`src/components/growth/ai-visibility/report-artifact/**`, TASK-1252, baseline GVC `ai-visibility-report-artifact-approved-v1`) que este surface **mirror-ea (mismo model, 3.er render adapter)** + master flow EPIC-022 (S5/S6/S7) + matriz mental 360 (arch §2.1/§10.4 quadrant 2×2).
 - Intended consumers: cliente contratado (Grupo Berel) en el portal; el report artifact es imprimible/PDF (adjunto). Nexa como consumer del mismo model.
 - Copy source: `src/lib/copy/growth.ts` (namespace nuevo `GH_GROWTH_SEO_CLIENT`, es-CL, tono cliente) — el report artifact reusa el copy del model compartido donde aplica.
-- Primitive decision: `reuse` — CompositionShell `masterDetail` (ya existe, TASK-1248), `report-artifact/model.ts` + adapters (TASK-1252, **NO forkear**), `GreenhouseBreadcrumbs`, `EmptyState`, `GreenhouseChip`; `new` acotado: quadrant scatter 2×2 (ECharts) + un **3.er render adapter** `report-artifact/*` para SEO (mirror del web/print del AEO, mismo `ReportArtifactModel`).
+- Primitive decision vigente: `reuse` — CompositionShell `single` + `Tabs`/`tabpanel`, `report-artifact/model.ts` + adapters (TASK-1252, **NO forkear**), `GreenhouseBreadcrumbs`, `EmptyState`, `DataTableShell`; `new` acotado: quadrant scatter 2×2 (ECharts) + un **3.er render adapter** `report-artifact/*` para SEO (mirror del web/print del AEO, mismo `ReportArtifactModel`). No se introduce un rail SEO lateral.
 - UI ready target: `no`
 
 ## Brief
@@ -20,13 +20,13 @@
 
 ## Layout Skeleton
 
-### Superficie A — Dashboard `/growth/seo` (CompositionShell `masterDetail`)
+### Superficie A — Dashboard `/growth/seo` (CompositionShell `single` + tabs horizontales)
 
 | Region | Slot | Purpose | Component candidate | Data source |
 |---|---|---|---|---|
 | 0 | Header | Breadcrumb `Inicio / SEO` + título "SEO — Visibilidad en búsqueda" + leyenda medido ●/estimado ◑ + `[Ver informe]` (→ `/growth/seo/report`) | `GreenhouseBreadcrumbs` | org del portal (mono-Space) |
-| 1 | Navigator (aside, IZQ angosto) | Secciones: **Resumen** · **Evolución** · **Quadrant 360** — active state | `masterDetail` navigator | — |
-| 2 | Detail — Resumen | Visibility score + top-3/top-10 + top URLs (curado) | KPI cards + `DataTableShell` (URLs) | `readRankSnapshotLatest` (curado) |
+| 1 | Section navigator (banda horizontal) | Secciones: **Resumen** · **Evolución** · **Quadrant 360** — active state | MUI `Tabs` + `tabpanel` | — |
+| 2 | Detail — Resumen | Veredicto de visibilidad + posición media + top-3/top-10 + top URLs (curado) | Evidence Narrative + KPI evidence + `DataTableShell` (URLs) | Derivado de `readRankEvolution` o reader existente; no existe `readRankSnapshotLatest` |
 | 2 | Detail — Evolución | Line multi-serie (Y invertido = posición) de URLs clave + Δ30d | ECharts line (lazy) | `readRankEvolution(targetId, {range})` |
 | 2 | Detail — Quadrant 360 | Quadrant scatter 2×2 SEO×AEO + cross-link a AEO | ECharts scatter (lazy) | `readSeoAeoGap(targetId)` |
 
@@ -79,20 +79,20 @@
 
 ## Accessibility Contract
 
-- Heading order: `h1` "SEO — Visibilidad en búsqueda" → `h2` por sección del navigator; en report, `h1` masthead → `h2` por sección del model.
+- Heading order: `h1` "SEO — Visibilidad en búsqueda" → `h2` por sección de tabs; en report, `h1` masthead → `h2` por sección del model.
 - Chart/table alternatives: line de evolución con `role="img"` + aria (`evolution.aria`) + **posición invertida documentada** ("Posición 1 = arriba = mejor", flecha abajo verde = mejora); quadrant con `role="img"` + aria; ambos con tabla/texto alternativo (URLs con Δ; cuadrante con label textual del cuadrante donde cae la marca).
 - Aria labels: cross-link a AEO como `<a>` con nombre accesible; `[Descargar PDF]` con `aria-label`.
-- Focus notes: navegar secciones del navigator mantiene foco; cross-link a `/aeo` = navegación normal (back restaura).
+- Focus notes: cambiar tabs mantiene foco en la tab activa y expone el `tabpanel`; cross-link a `/aeo` = navegación normal.
 - Color-independent state labels: cuadrantes = color + **label textual** (Dominante/En riesgo/Oportunidad/Invisible); medido ● / estimado ◑ con texto; nunca color solo.
 
 ## Implementation Mapping
 
 - Route / surface: `src/app/(dashboard)/growth/seo/page.tsx` (dashboard) + `src/app/(dashboard)/growth/seo/report/page.tsx` (report). **routeGroup `client`** — server guard: `module_assignment` activo per-org + capability `growth.seo.report.read_client` (report) / `growth.seo.observation.read` (dashboard); redirect defensivo si el tenant no tiene el módulo. [verificar viewCode cliente canónico].
-- Primitives: CompositionShell `masterDetail` (TASK-1248, ya existe), `report-artifact/model.ts` + adapters (TASK-1252, reuse — **no forkea scoring ni ECharts del AEO**), `GreenhouseBreadcrumbs`, `EmptyState`, `GreenhouseChip`, `DataTableShell` (top URLs).
-- Variants / kinds: `masterDetail` (navigator IZQ + detail DER; drawer del detail en compact). Report artifact SEO = **3.er render adapter** que consume el MISMO `ReportArtifactModel` vía un nuevo `modelFromSeoReport(...)` que mapea el DTO SEO (arch §7 `readSeoAeoGap`/`readRankEvolution`) a la shape del model — **el boundary es: reusa el model, no lo forkea** (mirror de `modelFromClientReport`).
+- Primitives: CompositionShell `single`, `Tabs`/`tabpanel`, `report-artifact/model.ts` + adapters (TASK-1252, reuse — **no forkea scoring ni ECharts del AEO**), `GreenhouseBreadcrumbs`, `EmptyState`, `DataTableShell`.
+- Variants / kinds: `single` (tabs horizontales + detail full-width). Report artifact SEO = **3.er render adapter** que consume el MISMO `ReportArtifactModel` vía un nuevo `modelFromSeoReport(...)` que mapea el DTO SEO (arch §7 `readSeoAeoGap`/`readRankEvolution`) a la shape del model — **el boundary es: reusa el model, no lo forkea** (mirror de `modelFromClientReport`).
 - Component candidates: `src/views/greenhouse/growth/seo/client/SeoClientDashboardView.tsx` + `SeoRankEvolutionChart.tsx` + `SeoAeoQuadrant.tsx`; report: `src/components/growth/seo/report-artifact/**` (web + print adapters) espejo de `ai-visibility/report-artifact/**`.
 - Copy source: `src/lib/copy/growth.ts` → `GH_GROWTH_SEO_CLIENT` (nuevo, es-CL, tono cliente); report reusa el copy del model compartido.
-- Data reader / command: `readSeoAeoGap(targetId)` (TASK-1305 `[verificar]`) + `readRankEvolution(targetId, {range})` (TASK-1303 `[verificar]`) + `readRankSnapshotLatest` (curado). Sin commands (read-only cliente).
+- Data reader / command: `readSeoAeoGap(targetId)` (TASK-1305) + `readRankEvolution(targetId, {range})` (TASK-1303/1307). El resumen deriva la última observación desde la evolución o un reader existente; no se crea `readRankSnapshotLatest`. Sin commands (read-only cliente).
 - API parity: la UI es cliente de readers gobernados; el report deriva del MISMO model que el AEO (Full API Parity → Nexa por construcción). El quadrant NO reconcilia SEO×AEO en un número — los muestra ortogonales (arch §1.1).
 - Access / capability: `growth.seo.observation.read` (dashboard) + `growth.seo.report.read_client` (report); Locked/teaser sin `module_assignment=active`.
 - Runtime consumers: view runtime (dashboard) + report artifact (web + print/PDF).
@@ -107,9 +107,9 @@
 - Required steps: cargar `/growth/seo` (agent auth **client** persona) → navegar Resumen → Evolución → Quadrant 360 → click cross-link AEO (verificar navegación) → volver → `[Ver informe]` → mirar report → estado print.
 - Required captures: dashboard resumen, evolución (line Y invertido), quadrant 360, report web, locked (persona sin assignment), empty (sin GSC).
 - Required `data-capture` markers: `seo-client-dashboard`, `seo-client-evolution`, `seo-client-quadrant`, `seo-client-report`, `seo-client-locked`.
-- Assertions: `noLoginRedirect`, `noErrorBoundary`, charts `role=img`, cuadrante con label textual, masterDetail navigator con active state.
-- Scroll-width checks: `scrollWidth==clientWidth` desktop + 390px (masterDetail colapsa a drawer en compact; report A4 no desborda).
-- Accessibility/focus checks: navigator active state, Y invertido documentado, cross-link accesible, cuadrante label textual.
+- Assertions: `noLoginRedirect`, `noErrorBoundary`, charts `role=img`, cuadrante con label textual, tabs con active state y `aria-controls`.
+- Scroll-width checks: `scrollWidth==clientWidth` desktop + 390px (tabs con scroll contenido; report A4 no desborda).
+- Accessibility/focus checks: tab active state, Y invertido documentado, cross-link accesible, cuadrante label textual.
 - Reduced-motion evidence: charts sin animación de entrada con `prefers-reduced-motion`; report estático.
 
 ## Design Decision Log

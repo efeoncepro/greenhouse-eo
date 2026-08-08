@@ -102,7 +102,9 @@ const getItemSx = (isCurrent: boolean, hitArea: GreenhouseBreadcrumbsHitArea): S
   minBlockSize: hitArea === 'comfortable' ? 40 : undefined,
   px: hitArea === 'comfortable' ? 1.5 : undefined,
   py: hitArea === 'comfortable' ? 1 : undefined,
-  color: isCurrent ? theme.palette.text.primary : theme.palette.primary.main,
+  // `primary.main` is 4.3:1 against the portal surface in light mode; breadcrumb links are
+  // body-sized text, so use the semantic dark ramp to keep the shared primitive WCAG AA-safe.
+  color: isCurrent ? theme.palette.text.primary : theme.palette.primary.dark,
   textDecoration: 'none',
   borderRadius: `${hitArea === 'comfortable'
     ? (theme.shape.customBorderRadius?.md ?? theme.shape.borderRadius)

@@ -1,0 +1,98 @@
+{
+  "taskId": "TASK-1310",
+  "scenario": "growth-seo-client, growth-seo-report, growth-seo-report-print",
+  "reviewedAt": "2026-08-08",
+  "reviewer": "codex (frames GVC desktop/mobile inspeccionados)",
+  "evidence": {
+    "desktop": ".captures/2026-08-08T10-03-36_growth-seo-client/01-desktop/frames/01-summary.png",
+    "mobile": ".captures/2026-08-08T10-03-36_growth-seo-client/02-mobile/frames/01-summary.png",
+    "dossier": ".captures/2026-08-08T10-03-36_growth-seo-client/review-dossier.md"
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 4.7,
+      "rationale": "El h1 y la lectura ejecutiva preceden a una única métrica primaria; el valor de posición domina sin competir con el CTA del informe.",
+      "evidence": "dashboard desktop summary y report web desktop",
+      "nextAction": ""
+    },
+    "proportions": {
+      "score": 4.6,
+      "rationale": "La métrica primaria usa una composición horizontal en desktop y vuelve a flujo vertical en móvil; la franja de señales conserva columnas sin comprimir texto.",
+      "evidence": "dashboard desktop/mobile summary",
+      "nextAction": ""
+    },
+    "rhythm": {
+      "score": 4.6,
+      "rationale": "La separación entre lectura, KPI, señales y contexto crea pausas claras; el menú SEO ya no consume una columna paralela del shell.",
+      "evidence": "dashboard desktop keyboard-section-switch",
+      "nextAction": ""
+    },
+    "density": {
+      "score": 4.5,
+      "rationale": "La franja de señales tiene aire y se apila de forma legible a 390px; la versión print reduce ornamentación y mantiene tablas navegables.",
+      "evidence": "dashboard mobile summary y report print mobile",
+      "nextAction": ""
+    },
+    "depth": {
+      "score": 4.5,
+      "rationale": "La profundidad proviene de un único plano contenido, railes semánticos y hover lift controlado; se retiró el sombreado verde que convertía el KPI en una tarjeta pesada.",
+      "evidence": "dashboard desktop summary y report web desktop",
+      "nextAction": ""
+    },
+    "surfaceEconomy": {
+      "score": 4.7,
+      "rationale": "La navegación secundaria es una sola banda horizontal y el resumen no fabrica una segunda columna; las superficies contenidas tienen responsabilidad visible.",
+      "evidence": "dashboard desktop keyboard-section-switch y enterprise rubric pass",
+      "nextAction": ""
+    },
+    "visualImpact": {
+      "score": 4.6,
+      "rationale": "El momento dominante es la lectura de visibilidad: posición media, cobertura y señales SEO×AEO se leen como una narrativa de evidencia, no como cuatro widgets equivalentes.",
+      "evidence": "dashboard desktop summary y report web desktop",
+      "nextAction": ""
+    },
+    "typography": {
+      "score": 4.6,
+      "rationale": "La jerarquía usa los tokens tipográficos del producto, numerales tabulares para KPI y texto auxiliar con medida controlada; print conserva la legibilidad en una columna estrecha.",
+      "evidence": "dashboard mobile summary y report print desktop",
+      "nextAction": ""
+    },
+    "color": {
+      "score": 4.7,
+      "rationale": "Base medida, cobertura y atención tienen rails, iconos y valores diferenciados; warning usa texto oscuro accesible y el color nunca es la única señal del estado.",
+      "evidence": "dashboard desktop/mobile summary; axe sin violaciones",
+      "nextAction": ""
+    },
+    "iconography": {
+      "score": 4.6,
+      "rationale": "Los glyphs Tabler refuerzan rendimiento, base medida, cobertura y atención con una gramática consistente; los tabs también tienen icono y etiqueta textual.",
+      "evidence": "dashboard desktop keyboard-section-switch y report web mobile",
+      "nextAction": ""
+    },
+    "responsive": {
+      "score": 4.6,
+      "rationale": "El dashboard recompone el KPI y la franja a 390px, convierte la navegación en scroll horizontal accesible y mantiene scrollWidth sin overflow; report y print pasan en ambos viewports.",
+      "evidence": "dashboard mobile summary; report mobile; print mobile",
+      "nextAction": ""
+    },
+    "motion": {
+      "score": 4.5,
+      "rationale": "Las señales entran con stagger tokenizado, el KPI tiene reveal de progreso y el cambio de panel conserva transición vertical; reduced-motion elimina desplazamientos y delays.",
+      "evidence": "scenario premium con reduced-motion check y keyboard frames",
+      "nextAction": ""
+    },
+    "fidelity": {
+      "score": 4.7,
+      "rationale": "La dirección Evidence Narrative se conserva: evidencia medida primero, señales semánticas después, Quadrant 360 y evolución como lentes independientes, con informe client-safe.",
+      "evidence": "dashboard/report/print capture runs 10-03-36, 10-04-22 y 10-04-59",
+      "nextAction": ""
+    },
+    "genericTemplateResistance": {
+      "score": 4.7,
+      "rationale": "La superficie tiene firma de oficio: posición invertida, cobertura explícita, señales SEO×AEO, procedencia medida/estimada y huecos honestos; no parece un dashboard de KPIs genérico.",
+      "evidence": "dashboard evolution/quadrant frames y report web desktop",
+      "nextAction": ""
+    }
+  },
+  "verdict": "pass"
+}

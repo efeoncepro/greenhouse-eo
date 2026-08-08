@@ -492,7 +492,8 @@ export const GH_GROWTH_AI_VISIBILITY_CLIENT_REPORT = {
     title: 'AEO — Snapshot de visibilidad',
     orgChipAria: 'Organización del informe',
     asOfLabel: 'Datos al',
-    samplingNote: 'Medición sobre una muestra de respuestas de IA, no un monitoreo continuo.'
+    samplingNote: 'Medición sobre una muestra de respuestas de IA, no un monitoreo continuo.',
+    viewSeo: 'Ver SEO'
   },
   summary: {
     scoreLabel: 'Puntaje de visibilidad',
@@ -1679,6 +1680,201 @@ export const GH_GROWTH_SEO_OVERVIEW = {
     },
 
     spaceUpdated: 'Panel de {space} actualizado'
+  }
+} as const
+
+/**
+ * TASK-1310 — Portal cliente · SEO + Search Visibility 360.
+ *
+ * Copy es-CL (tuteo) para las tres direcciones visuales de la familia: dashboard narrativo,
+ * quadrant ortogonal e informe editorial. Los estados no convierten ausencia de evidencia en
+ * un cero y el lenguaje mantiene SEO/AEO como lentes separadas.
+ */
+export const GH_GROWTH_SEO_CLIENT = {
+  page: {
+    breadcrumbRoot: 'Inicio',
+    breadcrumbLeaf: 'SEO',
+    eyebrow: 'Search Visibility 360',
+    title: 'SEO — Visibilidad en búsqueda',
+    description: 'Tu lectura de búsqueda combina posición medida, cobertura observada y citabilidad en IA sin mezclar fuentes.',
+    asOf: (date: string) => `Search Console · corte ${date}`,
+    asOfUnknown: 'Search Console · sin fecha de corte',
+    measured: 'Search Console · medido',
+    estimated: 'Seguimiento de posición · estimado',
+    viewReport: 'Ver informe',
+    viewAeo: 'Ver detalle de AEO',
+    reportTitle: 'Informe de visibilidad en búsqueda',
+    reportDownload: 'Imprimir / guardar PDF',
+    reportDate: (date: string) => `Fecha de corte: ${date}`
+  },
+  navigator: {
+    ariaLabel: 'Navegador de visibilidad SEO',
+    summary: 'Resumen',
+    evolution: 'Evolución',
+    quadrant: 'SEO × AEO',
+    reportHint: 'Informe presentable'
+  },
+  summary: {
+    eyebrow: 'Lectura ejecutiva',
+    leadTitle: 'Aún no hay una posición media para leer',
+    title: 'Tu visibilidad orgánica tiene una historia que leer',
+    titleWithPosition: (position: string) => `Posición media ${position} con señales SEO × AEO por revisar`,
+    helper: 'Primero mostramos la señal medida. Luego separamos cobertura, tendencia y citabilidad para decidir qué mover sin fabricar un score único.',
+    positionLabel: 'Posición media',
+    keywordsLabel: 'Keywords medidas',
+    pageOneLabel: 'En primera página',
+    opportunityLabel: 'Señales de oportunidad',
+    positionSignal: 'Rendimiento medido',
+    keywordsSignal: 'Keywords medidas',
+    pageOneSignal: 'Primera página',
+    opportunitySignal: 'Señales a revisar',
+    noData: 'Sin dato',
+    positionHint: 'Más bajo es mejor: pasar de 8 a 3 es una mejora.',
+    pageOneHint: 'Keywords con posición 10 o mejor en la ventana medida.',
+    opportunityHint: 'Datos del mapa de visibilidad; no se mezclan con Search Console.',
+    measuredHint: 'Search Console · datos medidos; los huecos quedan visibles.',
+    coverageLabel: 'Cobertura de primera página',
+    coverage: (shown: number, total: number) => `${shown} de ${total} keywords están en posición 10 o mejor.`,
+    ariaSignals: 'Señales principales de visibilidad SEO',
+    nextBestAction: 'Qué revisar ahora',
+    actionPosition: 'Mantener keywords fuertes y detectar caídas tempranas.',
+    actionCoverage: 'Ampliar la muestra para leer tendencia con más confianza.',
+    actionAeo: 'Cruzar las keywords con riesgo de no ser citadas por IA.'
+  },
+  evolution: {
+    title: 'Cobertura de seguimiento',
+    subtitle: 'La posición 1 aparece arriba. Si la muestra es escasa, mostramos cortes observados antes de sugerir una tendencia.',
+    coverage: (measured: number, requested: number) => `${measured} de ${requested} días con medición`,
+    observedScope: (chartDays: number, measured: number, requested: number) =>
+      `${chartDays} días visibles en la línea; ${measured} de ${requested} días tienen alguna medición. Los huecos quedan visibles.`,
+    source: 'Fuente: seguimiento de posición · los huecos quedan visibles.',
+    chartStageLabel: 'Cortes observados',
+    latestLabel: 'Última medición',
+    bestPositionLabel: 'Mejor posición observada',
+    bestPosition: (keyword: string, position: string) => `${keyword} · posición ${position}`,
+    coverageProgress: (measured: number, requested: number) => `${measured} de ${requested} días`,
+    emptyTitle: 'Aún no hay evolución para mostrar',
+    emptyDescription: 'Cuando se capture más de una posición, aquí podrás leer la tendencia sin interpolaciones.',
+    aria: 'Evolución de posiciones SEO. La posición 1 es la mejor y está arriba.',
+    ariaKeywords: 'Keywords comparadas en la evolución SEO',
+    ariaTable: 'Datos de evolución de posiciones',
+    tableDateHeader: 'Fecha',
+    tableScrollHint: 'Desliza horizontalmente para revisar todas las keywords.',
+    tableLabel: 'Ver datos de la evolución',
+    hideTableLabel: 'Ocultar datos de la evolución',
+    printMeasurementsHeader: 'Mediciones por keyword',
+    noMeasurement: 'Sin medición en este día.',
+    sparseTitle: 'Evidencia inicial, no tendencia final',
+    sparseNote: (measured: number, requested: number) =>
+      `Muestra corta: ${measured} de ${requested} días tienen medición. Úsalo como evidencia inicial, no como tendencia final.`,
+    featuredNote: (shown: number, total: number) =>
+      total > shown
+        ? `Mostrando ${shown} keywords destacadas de ${total}. Abre los datos para revisar la serie completa.`
+        : `Mostrando las ${total} keywords medidas.`
+  },
+  quadrant: {
+    eyebrow: 'Mapa SEO × AEO',
+    title: 'Prioridad de visibilidad',
+    subtitle: 'Dónde ya rankeas y cómo se cruza cada keyword con la visibilidad IA vigente del dominio.',
+    xAxis: 'AEO · visibilidad IA del dominio',
+    yAxis: 'SEO · posición orgánica',
+    xHigh: 'Mayor visibilidad IA',
+    xLow: 'Menor visibilidad IA',
+    yHigh: 'Mejor posición SEO',
+    yLow: 'Menor posición SEO',
+    domain: 'Lectura del dominio',
+    domainQuadrant: (label: string) => `Lectura dominante: ${label}`,
+    pointCount: (count: number) => `${count} keywords medidas`,
+    measured: 'Cada punto representa una keyword SEO cruzada con el score AEO vigente del dominio.',
+    orthogonal: 'SEO y AEO son ejes distintos; en esta versión el eje AEO es del dominio, no de cada keyword.',
+    granularityLabel: 'AEO por dominio',
+    granularityHint: 'Las keywords aún no tienen citabilidad propia medida; se cruzan contra el último score AEO reportable del dominio.',
+    distributionTitle: 'Distribución de señales',
+    dominantInsight: (label: string, count: number, total: number) => `${count} de ${total} señales caen en ${label}.`,
+    dominantAction: {
+      dominante: 'Defiende esta posición con frescura, enlaces internos y pruebas actualizadas.',
+      riesgo: 'Prioriza contenido citable: rankeas, pero el dominio todavía no muestra una señal AEO fuerte.',
+      oportunidad: 'Convierte visibilidad IA del dominio en posición orgánica con contenido y enlaces internos.',
+      invisible: 'Construye la base: intención, entidad, contenido recuperable y medición.'
+    } as const,
+    chartStageLabel: 'Mapa de oportunidad por keyword',
+    tableScrollHint: 'Desliza horizontalmente para revisar el detalle completo.',
+    tableExcerpt: (shown: number, total: number) =>
+      total > shown ? `Mostrando ${shown} señales prioritarias de ${total}.` : `Mostrando las ${total} señales medidas.`,
+    tableShowAll: (total: number) => `Ver las ${total} keywords`,
+    tableHideAll: 'Mostrar solo señales prioritarias',
+    tableKeyword: 'Keyword',
+    tableSeo: 'SEO',
+    tableAeo: 'AEO dominio',
+    tableReading: 'Lectura',
+    ariaLegend: 'Leyenda del mapa SEO por estado',
+    ariaTable: 'Detalle de keywords del mapa SEO por visibilidad IA del dominio',
+    states: {
+      noAeoTitle: 'Falta la mitad IA de esta lectura',
+      noAeoDescription: 'Tu SEO medido está disponible. Cuando exista un score AEO reportable del dominio, el mapa mostrará ambos ejes.',
+      noSeoTitle: 'Aún no hay SEO medido para cruzar',
+      noSeoDescription: 'Conecta Search Console y deja que la captura construya la primera mitad del mapa.',
+      emptyTitle: 'Aún no hay puntos para el mapa',
+      emptyDescription: 'El mapa aparece cuando existan datos medidos en SEO y un score AEO reportable del dominio.',
+      errorTitle: 'No pudimos cargar el mapa',
+      errorDescription: 'Intenta de nuevo en unos minutos.'
+    },
+    labels: {
+      dominante: 'Dominante',
+      riesgo: 'Riesgo',
+      oportunidad: 'Oportunidad',
+      invisible: 'Invisible'
+    } as const
+  },
+  report: {
+    eyebrow: 'Lectura ejecutiva',
+    title: 'Informe de visibilidad en búsqueda',
+    summary: 'Una lectura presentable de tu presencia orgánica y su relación con la visibilidad en IA.',
+    methodology: 'Proveniencia y metodología',
+    methodologyBody: 'Los datos SEO provienen de Search Console y seguimiento de posición. El eje AEO usa el último score reportable del dominio; se muestra separado del SEO y no se promedia.',
+    summaryAria: 'Resumen de métricas SEO',
+    quadrantTitle: 'SEO × AEO — posicionamiento estratégico',
+    evolutionTitle: 'Evolución de posiciones',
+    reportStatusReady: 'Lectura completa',
+    reportStatusPartial: 'Lectura parcial',
+    metricPosition: 'Posición media',
+    metricKeywords: 'Keywords medidas',
+    metricPageOne: 'En primera página',
+    metricSignals: 'Señales a revisar',
+    metricPositionSignal: 'Rendimiento',
+    metricKeywordsSignal: 'Base medida',
+    metricPageOneSignal: 'Cobertura',
+    metricSignalsSignal: 'Atención',
+    metricPositionHint: 'Más bajo es mejor.',
+    metricKeywordsHint: 'Search Console y seguimiento declarado.',
+    metricPageOneHint: 'Posición 10 o mejor.',
+    metricSignalsHint: 'SEO × AEO, sin score fusionado.',
+    reportMasthead: 'Informe client-safe',
+    reportReadout: 'La posición orgánica y la citabilidad en IA se leen como fuentes distintas, sin fabricar un score único.',
+    reportFeaturedSignals: (shown: number, total: number) =>
+      total > shown ? `Se muestran ${shown} señales destacadas de ${total}.` : `Se muestran las ${total} señales medidas.`,
+    reportFullDetail: 'El detalle completo permanece disponible en el dashboard para exploración.',
+    coverage: 'Cobertura client-safe, sin datos crudos de proveedor.',
+    emptyTitle: 'Tu informe todavía está tomando forma',
+    emptyDescription: 'Cuando exista una medición suficiente, aquí aparecerá una lectura completa y presentable.',
+    errorTitle: 'No pudimos preparar tu informe',
+    errorDescription: 'Intenta de nuevo en unos minutos.'
+  },
+  states: {
+    lockedTitle: 'SEO no está activo en tu plan',
+    lockedDescription: 'Tu equipo de Efeonce puede mostrarte cómo activar esta lectura de visibilidad.',
+    lockedCta: 'Hablar con tu equipo',
+    noOrganizationTitle: 'No encontramos una organización para esta vista',
+    noOrganizationDescription: 'Tu cuenta aún no tiene un Space client-scoped asociado.',
+    noGscTitle: 'Conecta Search Console para ver tu visibilidad',
+    noGscDescription: 'La lectura SEO comienza con datos medidos por Google. Sin la conexión, no mostramos ceros ni estimaciones disfrazadas.',
+    noGscCta: 'Conectar Search Console',
+    noSnapshotsTitle: 'Aún no hay datos históricos',
+    noSnapshotsDescription: 'La conexión está activa, pero la captura diaria todavía no guardó un día para tu organización.',
+    errorTitle: 'No pudimos cargar tu SEO',
+    errorDescription: 'Puede ser algo temporal. Intenta de nuevo en unos minutos.',
+    retry: 'Reintentar',
+    loading: 'Cargando tu visibilidad SEO…'
   }
 } as const
 
