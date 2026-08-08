@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import Alert from '@mui/material/Alert'
 import AlertTitle from '@mui/material/AlertTitle'
 import Box from '@mui/material/Box'
+import ButtonBase from '@mui/material/ButtonBase'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Divider from '@mui/material/Divider'
@@ -16,11 +17,14 @@ import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
+import { alpha } from '@mui/material/styles'
 
 import CustomAutocomplete from '@core/components/mui/Autocomplete'
 import CustomTextField from '@core/components/mui/TextField'
 
+import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
 import EmptyState from '@/components/greenhouse/EmptyState'
 import {
   GreenhouseAsyncActionButton,
@@ -29,7 +33,10 @@ import {
   GreenhouseChip
 } from '@/components/greenhouse/primitives'
 import { useContainerDensity } from '@/components/greenhouse/primitives/card-density'
+import useReducedMotion from '@/hooks/useReducedMotion'
 import { throwIfNotOk } from '@/lib/api/parse-error-response'
+import { AnimatePresence, motion } from '@/libs/FramerMotion'
+import { MOTION_DURATION_S, MOTION_EASE } from '@/components/greenhouse/motion/core/tokens'
 import DataTableShell from '@/components/greenhouse/data-table/DataTableShell'
 import SurfaceRecipe from '@/components/greenhouse/primitives/surface-system/SurfaceRecipe'
 import WorkbenchHeader from '@/components/greenhouse/primitives/surface-system/WorkbenchHeader'
@@ -68,6 +75,9 @@ const SEVERITY_PRESENTATION: Record<
   notice: { icon: 'tabler-info-circle', label: GH_GROWTH_SEO_AUDIT.severity.notice, tone: 'info' }
 }
 
+/** Curva de entrada del design system, en la tupla mutable que espera Framer. */
+const EASE_EMPHASIZED = [...(MOTION_EASE.emphasized.cubicBezier ?? [0.2, 0, 0, 1])] as [number, number, number, number]
+
 /** Techo de URLs por drill: una lista de miles no ayuda a decidir y castiga el render. */
 const DRILL_URL_LIMIT = 200
 
@@ -101,77 +111,6 @@ interface Props {
   crawlPageCap: number
 }
 
-interface StatBlockProps {
-  label: string
-  value: string
-  hint?: string
-  /** Presente = la cifra es también el control que filtra la lista. */
-  onSelect?: () => void
-  selected?: boolean
-  selectAria?: string
-}
-
-/**
- * Cifra de la banda de salud. Cuando recibe `onSelect` deja de ser un número y pasa a ser
- * **leyenda y filtro a la vez** — mismo recurso que la banda de veredicto de Keywords
- * (TASK-1308): el objeto que ya explica el reparto es el que lo acota, en vez de sumar una
- * fila de filtros que compita con él.
- */
-const StatBlock = ({ label, value, hint, onSelect, selected, selectAria }: StatBlockProps) => {
-  const body = (
-    <>
-      <Typography variant='caption' color='text.secondary'>
-        {label}
-      </Typography>
-      <Typography variant='h4' sx={{ fontVariantNumeric: 'tabular-nums', lineHeight: 1.1 }}>
-        {value}
-      </Typography>
-      {hint ? (
-        <Typography variant='caption' color='text.secondary'>
-          {hint}
-        </Typography>
-      ) : null}
-    </>
-  )
-
-  if (!onSelect) {
-    return (
-      <Stack spacing={0.5} sx={{ minInlineSize: 0, py: { xs: 1, md: 0 } }}>
-        {body}
-      </Stack>
-    )
-  }
-
-  return (
-    <Stack
-      component='button'
-      type='button'
-      onClick={onSelect}
-      aria-pressed={selected}
-      aria-label={selectAria}
-      spacing={0.5}
-      sx={theme => ({
-        minInlineSize: 0,
-        py: { xs: 1, md: 0 },
-        // El control hereda la caja de la cifra: sin chrome de botón, porque el objeto
-        // sigue siendo el dato. Lo que cambia al seleccionar es el fondo, no la forma.
-        appearance: 'none',
-        border: 'none',
-        textAlign: 'start',
-        cursor: 'pointer',
-        borderRadius: `${theme.shape.customBorderRadius.md}px`,
-        bgcolor: selected ? 'action.selected' : 'transparent',
-        px: 2,
-        mx: -2,
-        transition: 'background-color 150ms cubic-bezier(0.2, 0, 0, 1)',
-        '&:hover': { bgcolor: selected ? 'action.selected' : 'action.hover' }
-      })}
-    >
-      {body}
-    </Stack>
-  )
-}
-
 const SiteAuditView = ({
   spaces,
   selectedSpaceId,
@@ -185,6 +124,7 @@ const SiteAuditView = ({
 }: Props) => {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
+  const reducedMotion = useReducedMotion()
   const { ref: healthRef, density: healthDensity, containerType: healthContainerType } = useContainerDensity('auto')
 
   const selectedSpace = useMemo(
@@ -377,8 +317,14 @@ const SiteAuditView = ({
             label={staleDays === null ? GH_GROWTH_SEO_AUDIT.header.freshnessNever : GH_GROWTH_SEO_AUDIT.header.freshness(staleDays)}
           />
         }
-        primaryAction={runAuditButton}
+        // Picker y acción viajan JUNTOS en un solo slot, dentro de un Stack propio con
+        // `flex-end`. El slot del header alinea por arriba (correcto entre campos con
+        // label), y un botón sin label quedaba 21px sobre la línea del input. Alinearlo
+        // con `alignSelf` no sirve: el grupo de acciones se estira al alto de la columna
+        // del título, así que el botón caía al fondo del header. Este Stack mide lo que
+        // mide el campo, y ahí `flex-end` SÍ los deja compartiendo la misma línea base.
         secondaryActions={
+          <Stack direction='row' spacing={2} alignItems='flex-end' flexWrap='wrap' useFlexGap>
           <CustomAutocomplete
             options={spaces}
             value={selectedSpace}
@@ -405,6 +351,8 @@ const SiteAuditView = ({
               />
             )}
           />
+            {runAuditButton}
+          </Stack>
         }
         supporting={
           <Box data-capture='seo-audit-tabs'>
@@ -480,73 +428,122 @@ const SiteAuditView = ({
 
             <Divider orientation='vertical' flexItem sx={{ display: { xs: 'none', sm: 'block' } }} />
 
-            <Box
-              sx={{
-                display: 'grid',
-                gridTemplateColumns: { xs: 'repeat(2, minmax(0, 1fr))', md: 'repeat(4, minmax(0, 1fr))' },
-                gap: 0,
-                flex: 1,
-                minInlineSize: 0,
-                alignContent: 'center',
-                // Separadores entre cifras: repartidas sobre ~1600px sin ritmo, la banda
-                // se leía como cuatro números flotando. El filete las agrupa como una
-                // unidad de lectura y hace que el ancho se gane en vez de sobrar — mismo
-                // recurso que ya separa el gauge. Se ve en la captura, no en el DOM.
-                '& > * + *': {
-                  borderInlineStart: theme => `1px solid ${theme.palette.divider}`,
-                  paddingInlineStart: 4
-                },
-                // A 390px la grilla es 2×2: la 3.ª celda abre fila, así que su filete
-                // cortaría en el aire. Se suprime junto con su sangría — dejar la sangría
-                // sola desalinea "Menores" respecto de "Críticos", que es la columna con
-                // la que el ojo lo compara.
-                '& > *:nth-of-type(3)': {
-                  borderInlineStart: { xs: 'none', md: '1px solid' },
-                  borderColor: { md: 'divider' },
-                  paddingInlineStart: { xs: 0, md: 4 }
-                }
-              }}
-            >
-              {(['critical', 'warning', 'notice'] as const).map(severity => {
-                const label =
-                  severity === 'critical'
-                    ? GH_GROWTH_SEO_AUDIT.kpi.critical
-                    : severity === 'warning'
-                      ? GH_GROWTH_SEO_AUDIT.kpi.warnings
-                      : GH_GROWTH_SEO_AUDIT.kpi.notices
+            <Stack spacing={3} sx={{ flex: 1, minInlineSize: 0 }}>
+              {/* Contexto del crawl: NO es una severidad, así que sale de la banda. Mezclar
+                  "100 páginas" con "138 avisos" en la misma fila de cifras invitaba a
+                  compararlos, y no son comparables. */}
+              <Typography variant='body2' color='text.secondary'>
+                <Box component='span' sx={{ fontVariantNumeric: 'tabular-nums', fontWeight: 600, color: 'text.primary' }}>
+                  {report.run.crawledPages === null ? '—' : report.run.crawledPages}
+                </Box>{' '}
+                {GH_GROWTH_SEO_AUDIT.kpi.pages.toLowerCase()}
+                {report.run.crawledPages === crawlPageCap ? ` · ${GH_GROWTH_SEO_AUDIT.kpi.pagesCapped.toLowerCase()}` : ''}
+              </Typography>
 
-                const count = report.totals[severity]
+              {/* 🔴 Banda proporcional, no cuatro números planos. Los conteos por severidad
+                  son PARTES DE UN TODO (519 findings repartidos 0/138/381) y como texto
+                  suelto tenían encoding CERO: 0, 138 y 381 pesaban visualmente lo mismo y
+                  el reparto sólo se veía leyendo. El ancho lo hace evidente de un vistazo
+                  —longitud, rank 3 de Cleveland & McGill, contra el rank último que es "no
+                  encodear nada"— y de paso el objeto que explica el reparto es el que lo
+                  filtra. Mismo patrón que la banda de veredicto de Keywords (TASK-1308),
+                  con sus lecciones ya aprendidas: piso de ancho para que la etiqueta quepa,
+                  y activo por fondo + borde, nunca sólo por tinte. */}
+              <Stack
+                direction={{ xs: 'column', sm: 'row' }}
+                spacing={2}
+                useFlexGap
+                flexWrap='wrap'
+                role='group'
+                aria-label={GH_GROWTH_SEO_AUDIT.kpi.bandAria}
+              >
+                {(['critical', 'warning', 'notice'] as const).map(severity => {
+                  const presentation = SEVERITY_PRESENTATION[severity]
 
-                return (
-                  <StatBlock
-                    key={severity}
-                    label={label}
-                    value={String(count)}
-                    // Una severidad sin issues no filtra: dejar el control vivo prometería
-                    // una lista que no existe.
-                    onSelect={
-                      count === 0
-                        ? undefined
-                        : () =>
-                            pushQuery({
-                              severity: severityFilter === severity ? null : severity,
-                              issueGroup: null
-                            })
-                    }
-                    selected={severityFilter === severity}
-                    selectAria={GH_GROWTH_SEO_AUDIT.kpi.filterAria(label)}
-                  />
-                )
-              })}
-              <StatBlock
-                label={GH_GROWTH_SEO_AUDIT.kpi.pages}
-                value={report.run.crawledPages === null ? '—' : String(report.run.crawledPages)}
-                // El conteo que IGUALA el techo del crawl casi nunca es el sitio entero: es
-                // donde el crawl se detuvo. Decirlo evita que la salud de una muestra se
-                // presente (y se venda) como la salud del sitio.
-                hint={report.run.crawledPages === crawlPageCap ? GH_GROWTH_SEO_AUDIT.kpi.pagesCapped : undefined}
-              />
-            </Box>
+                  const label =
+                    severity === 'critical'
+                      ? GH_GROWTH_SEO_AUDIT.kpi.critical
+                      : severity === 'warning'
+                        ? GH_GROWTH_SEO_AUDIT.kpi.warnings
+                        : GH_GROWTH_SEO_AUDIT.kpi.notices
+
+                  const count = report.totals[severity]
+                  const isActive = severityFilter === severity
+                  // Una severidad sin issues no filtra —prometería una lista vacía— pero
+                  // TAMPOCO se esconde: "0 críticos" es un hallazgo, y su ausencia sería
+                  // ambigua. Se muestra al tamaño de su contenido, fuera del reparto.
+                  const interactive = count > 0
+
+                  return (
+                    <Tooltip key={severity} title={interactive ? GH_GROWTH_SEO_AUDIT.kpi.filterAria(label) : ''}>
+                      <Box
+                        component={interactive ? ButtonBase : 'div'}
+                        onClick={
+                          interactive
+                            ? () =>
+                                pushQuery({
+                                  severity: isActive ? null : severity,
+                                  issueGroup: null
+                                })
+                            : undefined
+                        }
+                        aria-pressed={interactive ? isActive : undefined}
+                        aria-label={interactive ? GH_GROWTH_SEO_AUDIT.kpi.filterAria(label) : undefined}
+                        sx={theme => ({
+                          // El ancho ES el dato: proporcional al conteo. El piso evita que
+                          // el grupo chico quede sin espacio para su etiqueta.
+                          flex: { sm: interactive ? count : '0 0 auto' },
+                          minInlineSize: { sm: 148 },
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'flex-start',
+                          gap: 2.5,
+                          py: 2.5,
+                          px: 3,
+                          textAlign: 'start',
+                          borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                          border: '1px solid',
+                          borderColor: isActive ? `${presentation.tone}.main` : 'divider',
+                          bgcolor: isActive ? alpha(theme.palette[presentation.tone].main, 0.08) : 'transparent',
+                          // SIN atenuar el segmento sin issues. Dos razones: `opacity`
+                          // multiplica contra el fondo y tiraba su etiqueta a 2.98:1 (axe),
+                          // y de producto estaba al revés — "0 críticos" es la mejor
+                          // noticia de la pantalla, no un dato de segunda.
+                          transition: theme.transitions.create(['background-color', 'border-color']),
+                          ...(interactive
+                            ? { '&:hover': { bgcolor: alpha(theme.palette[presentation.tone].main, 0.06) } }
+                            : {}),
+                          '&.Mui-focusVisible, &:focus-visible': {
+                            outline: `2px solid ${theme.palette.primary.main}`,
+                            outlineOffset: 2
+                          }
+                        })}
+                      >
+                        <Box
+                          component='i'
+                          className={presentation.icon}
+                          aria-hidden='true'
+                          sx={{ color: `${presentation.tone}.main`, fontSize: 20, flexShrink: 0 }}
+                        />
+                        {/* Número y etiqueta en la MISMA línea de base: son un dato, no dos. */}
+                        <Stack direction='row' spacing={2} alignItems='baseline' sx={{ minInlineSize: 0 }}>
+                          <Typography variant='h5' component='span' sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                            {/* El conteo se ARMA en vez de aparecer: confirma que la cifra
+                                se recalculó tras un crawl nuevo o un cambio de Space, que
+                                es justo cuando el operador duda de si está viendo lo
+                                anterior. `AnimatedCounter` ya respeta reduced-motion. */}
+                            <AnimatedCounter value={count} animateFrom={0} />
+                          </Typography>
+                          <Typography variant='body2' color='text.secondary' noWrap>
+                            {label}
+                          </Typography>
+                        </Stack>
+                      </Box>
+                    </Tooltip>
+                  )
+                })}
+              </Stack>
+            </Stack>
           </Stack>
 
           {/* Reconcilia las dos cifras que el fold pone juntas: el puntaje (del proveedor,
@@ -581,7 +578,26 @@ const SiteAuditView = ({
     const isOpen = openGroup?.issueType === group.issueType
 
     return (
-      <Box key={group.issueType} component='li' sx={{ listStyle: 'none' }}>
+      <Box
+        key={group.issueType}
+        component={reducedMotion ? 'li' : motion.li}
+        // Entrada escalonada: al filtrar por severidad la lista se reescribe entera, y sin
+        // señal el cambio es indistinguible de "no pasó nada". El stagger dice QUÉ quedó.
+        // Se corta a los 6 ítems: más allá el escalonado deja de informar y se vuelve
+        // espera. `layout` no se usa — reordenar filas al filtrar distraería del contenido.
+        {...(reducedMotion
+          ? {}
+          : {
+              initial: { opacity: 0, y: 6 },
+              animate: { opacity: 1, y: 0 },
+              transition: {
+                duration: MOTION_DURATION_S.standard,
+                ease: EASE_EMPHASIZED,
+                delay: Math.min(index, 6) * 0.03
+              }
+            })}
+        sx={{ listStyle: 'none' }}
+      >
         {index > 0 ? <Divider /> : null}
 
         <Stack
@@ -628,7 +644,27 @@ const SiteAuditView = ({
           </GreenhouseButton>
         </Stack>
 
-        {isOpen && openGroup ? drill(openGroup) : null}
+        {/* La apertura se anima en ALTURA para que el vínculo fila → detalle sea visible:
+            aparecer de golpe deja al operador buscando qué cambió. Con reduced-motion el
+            panel simplemente está o no está. */}
+        <AnimatePresence initial={false}>
+          {isOpen && openGroup ? (
+            reducedMotion ? (
+              drill(openGroup)
+            ) : (
+              <motion.div
+                key='drill'
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: MOTION_DURATION_S.standard, ease: EASE_EMPHASIZED }}
+                style={{ overflow: 'hidden' }}
+              >
+                {drill(openGroup)}
+              </motion.div>
+            )
+          ) : null}
+        </AnimatePresence>
       </Box>
     )
   }

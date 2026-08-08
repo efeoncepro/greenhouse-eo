@@ -155,6 +155,12 @@ const WorkbenchHeader = ({
           <Stack
             direction='row'
             spacing={{ xs: 1, sm: 2 }}
+            // `flex-start` alinea los LABELS de los campos de alcance, que es lo correcto
+            // cuando todos los hijos son campos. Un hijo sin label (un botón) queda 21px
+            // por encima de la línea del input, y ahí el consumer declara
+            // `alignSelf: 'flex-end'` en ese hijo — no se cambia la alineación del grupo,
+            // porque `flex-end` rompe a los headers con `helperText` (el campo con ayuda
+            // sube su input al alinear por abajo; caso real: la tab Rendimiento).
             alignItems='flex-start'
             flexWrap='wrap'
             useFlexGap

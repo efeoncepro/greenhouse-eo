@@ -2412,6 +2412,7 @@ export const GH_GROWTH_SEO_AUDIT = {
     // banda de veredicto de Keywords: leyenda y control en un solo objeto).
     filterAria: (severity: string) => `Filtrar la lista por ${severity}`,
     filterClear: 'Ver todos',
+    bandAria: 'Reparto de issues por severidad; cada segmento filtra la lista',
     filterClearAria: 'Quitar el filtro de severidad y ver todos los issues',
 
     // Movimiento entre crawls. El módulo se vende como serie de tiempo, así que "95" solo

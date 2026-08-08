@@ -4,9 +4,9 @@
   "reviewedAt": "2026-08-08",
   "reviewer": "claude (frames GVC desktop 1440 + mobile 390 inspeccionados en loop)",
   "evidence": {
-    "desktop": ".captures/2026-08-08T13-48-58_growth-seo-audit/01-desktop/frames/01-default.png",
-    "mobile": ".captures/2026-08-08T13-48-58_growth-seo-audit/02-mobile/frames/01-default.png",
-    "dossier": ".captures/2026-08-08T13-48-58_growth-seo-audit/review-dossier.md"
+    "desktop": ".captures/2026-08-08T15-02-39_growth-seo-audit/01-desktop/frames/01-default.png",
+    "mobile": ".captures/2026-08-08T15-02-39_growth-seo-audit/02-mobile/frames/01-default.png",
+    "dossier": ".captures/2026-08-08T15-02-39_growth-seo-audit/review-dossier.md"
   },
   "dimensions": {
     "hierarchy": {
@@ -16,8 +16,8 @@
       "nextAction": ""
     },
     "proportions": {
-      "score": 4.5,
-      "rationale": "El gauge ocupa una columna fija y las cuatro cifras reparten el resto. La primera captura mostró los números flotando sobre ~1600px sin ritmo; los filetes verticales los agrupan como una unidad y hacen que el ancho se gane.",
+      "score": 4.7,
+      "rationale": "El ancho de cada segmento es proporcional a su conteo (longitud, rank 3 de Cleveland & McGill), con piso para que la etiqueta quepa. 'Páginas revisadas' salió de la banda: no es una severidad y ponerla ahí invitaba a compararla con lo que no es comparable.",
       "evidence": "desktop 02-health (antes/después dentro de la misma sesión de captura)",
       "nextAction": ""
     },
@@ -46,10 +46,10 @@
       "nextAction": ""
     },
     "visualImpact": {
-      "score": 4.5,
-      "rationale": "El arco de salud es el objeto con peso de la pantalla y se lee de un golpe a cualquier distancia. Es sobriedad deliberada: la superficie es un diagnóstico técnico, y el impacto lo aporta el dato, no ornamento.",
+      "score": 4.7,
+      "rationale": "El fold tiene DOS objetos con peso que se turnan: el arco de salud y la banda proporcional de severidades, cuyo ancho ES el reparto. Antes eran cuatro números planos de igual peso visual (0 · 138 · 381 · 100) con encoding cero — el operador lo llamó 'plano' y tenía razón.",
       "evidence": "desktop 02-health, mobile 02-health",
-      "nextAction": "Si más adelante se suma tendencia de salud entre crawls, el gauge puede ganar una micro-serie histórica al lado sin cambiar la jerarquía."
+      "nextAction": ""
     },
     "typography": {
       "score": 4.6,
@@ -76,8 +76,8 @@
       "nextAction": ""
     },
     "motion": {
-      "score": 4.5,
-      "rationale": "Ausencia deliberada: el gauge es un arco SVG determinista sin animación de entrada (un radialBar animado ni siquiera dibujaba en contenedor fluido) y el drill no exige transición. El chequeo de reduced-motion del GVC pasa sin fallback porque no hay movimiento que degradar.",
+      "score": 4.6,
+      "rationale": "Motion con trabajo asignado, no decorativo: los conteos se ARMAN (confirman que la cifra se recalculó tras cambiar de Space o crawl), la lista entra escalonada y cortada a 6 ítems (al filtrar por severidad dice QUÉ quedó, en vez de un cambio indistinguible de 'no pasó nada') y el drill anima su altura (hace visible el vínculo fila → detalle). Todo detrás de `useReducedMotion`, con tokens de duración y curva del design system.",
       "evidence": "quality.keyboard.reducedMotionCheck en ambos manifests",
       "nextAction": ""
     },
@@ -100,6 +100,8 @@
     "Warning conocido y ajeno: `div.MuiTabs-list` sobresale del viewport a 390px. Es la tira de tabs scrollable de TASK-1306, compartida por las cuatro rutas, y desbordar es su comportamiento correcto (se auto-desplaza para mostrar la tab activa). No se toca desde acá.",
     "El botón `[data-capture=\"seo-audit-run\"]` NUNCA se clickea en el scenario: encola un crawl OnPage real y le gasta presupuesto al cliente. Una captura no puede ser el motivo de un cargo al proveedor.",
     "Auditoría con la skill `seo-aeo` (2026-08-08) contra la doctrina técnica 2026: dos hallazgos de esta capa corregidos —el orden ascendía higiene sin valor de búsqueda, y el copy borraba que la performance es dato de laboratorio— y uno levantado como cobertura del módulo, no de esta superficie: el audit no revisa acceso de crawlers de IA (`OAI-SearchBot`/`PerplexityBot`/`ClaudeBot`), ausencia de JSON-LD, conflicto noindex+robots ni salud de sitemap.",
-    "Revisión con `greenhouse-ui-review`: se corrigieron dos valores de spacing fuera de escala (`py: 3.5` → 3, `spacing 0.25` → 0.5) y se nombró la constante geométrica del gauge. Dos hallazgos NO se tocaron por ser de sección o plataforma: ninguna de las 3 vistas hermanas usa `CardHeader` (cambiar sólo ésta rompería la consistencia), y los targets de 20×20 son los indicadores del `Autocomplete` de MUI — la hermana Keywords tiene 7, ésta 1."
+    "Revisión con `greenhouse-ui-review`: se corrigieron dos valores de spacing fuera de escala (`py: 3.5` → 3, `spacing 0.25` → 0.5) y se nombró la constante geométrica del gauge. Dos hallazgos NO se tocaron por ser de sección o plataforma: ninguna de las 3 vistas hermanas usa `CardHeader` (cambiar sólo ésta rompería la consistencia), y los targets de 20×20 son los indicadores del `Autocomplete` de MUI — la hermana Keywords tiene 7, ésta 1.",
+    "Rediseño de la banda de KPIs con `dataviz-design` + `greenhouse-product-ui-architect` (2026-08-08): eran cuatro números planos con encoding CERO. Pasaron a banda proporcional —parte-de-un-todo por longitud— reusando el patrón de la banda de veredicto de Keywords con sus lecciones ya aprendidas (piso de ancho, activo por fondo+borde y no sólo tinte, número y label en la misma línea de base). El segmento sin issues NO se atenúa: `opacity: 0.72` tiró su etiqueta a 2.98:1 en axe, y de producto estaba al revés — '0 críticos' es la mejor noticia de la pantalla.",
+    "Microinteracciones con `greenhouse-microinteractions-auditor` (2026-08-08). Cada una hace un trabajo del contrato de la skill: contador que se arma = confirma recálculo; stagger de la lista = confirma qué quedó tras filtrar; altura del drill = causalidad fila→detalle. Nada de motion decorativo, y el desfase de 21px entre el picker de Space y 'Correr auditoría' —que el operador cazó a ojo— se resolvió agrupándolos en un Stack propio en vez de cambiar la alineación del primitive, que rompía a la tab Rendimiento por su campo con `helperText`."
   ]
 }
