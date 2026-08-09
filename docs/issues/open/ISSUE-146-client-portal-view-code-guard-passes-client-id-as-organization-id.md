@@ -46,6 +46,29 @@ comercial.
 
 ## Impacto
 
+> **Corrección 2026-08-09 (inventario del carril):** esta issue subestimaba el alcance en **las dos
+> direcciones**, y conviene leer la corrección antes que el fix propuesto.
+>
+> **Hacia abajo:** el fix que propone —cambiar la llave de `clientId` a `organizationId`— desbloquea
+> sólo **3** de las 9 páginas: `/proyectos`, `/campanas` y `/equipo`. Son las únicas cuyo viewCode está
+> declarado en algún módulo.
+>
+> **Hacia arriba:** las otras **6** fallan por una causa independiente y siguen cerradas después del
+> fix. `hasViewCodeAccess` resuelve con `modules.some(m => m.viewCodes.includes(viewCode))` y no hay
+> allowlist transversal, así que un viewCode que ningún módulo declara deniega siempre. Es el caso de
+> `/sprints` (`cliente.ciclos`), `/analytics`, `/updates`, `/notifications`, `/settings` y `/reviews`
+> —éste último por un desencuentro de strings: el guard pide `cliente.revisiones` y el catálogo de
+> módulos gobierna `cliente.reviews`—.
+>
+> Las dos más caras no son las que uno esperaría: `/notifications` cuelga de la campanita del header
+> (la ruta con más click accidental del portal) y `/settings` significa que un cliente no puede entrar
+> a su propia configuración de cuenta.
+>
+> Y hay un orden que importa: **el fail-open del menú está hoy contenido por este fail-closed**.
+> Arreglar la llave sin arreglar antes la derivación permisiva del claim abre una ventana en la que el
+> cliente ve el ítem *y* entra. Medición completa y orden propuesto en
+> `docs/operations/CLIENT_PORTAL_ACCESS_RAIL_INVENTORY_V1.md`.
+
 - Las páginas cliente que TASK-827 migró a este guard (9 rutas) deniegan a **todo** cliente,
   tenga o no el módulo.
 - **NO** hay exposición de datos: el fallo es fail-closed. El riesgo es de disponibilidad y de
