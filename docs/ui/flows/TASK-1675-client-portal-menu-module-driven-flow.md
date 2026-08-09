@@ -120,7 +120,7 @@ mentir sin que nada se quejara.
 
 ## GVC Scenario Plan
 
-- Scenario file: `scripts/frontend/scenarios/client-portal-menu-modules.scenario.ts`
+- Scenario files: `client-portal-menu-with-module.scenario.ts` · `client-portal-menu-without-module.scenario.ts` · `client-portal-menu-mobile-drawer.scenario.ts` (tres, no uno: ver el wireframe para el porqué)
 - Ruta: `/home`
 - Viewports: desktop 1440 · mobile 390px
 - Quality profile: premium
@@ -128,7 +128,7 @@ mentir sin que nada se quejara.
 - Required captures: `menu-with-module` (persona con módulo) · `menu-without-module` (persona sin módulo)
 - Assertions del **flujo** (distintas de las del wireframe, que miran la fila): el ítem lleva a `/growth/seo` y no a un deny; el informe **no** aparece como ítem; el menú del colaborador interno queda intacto
 - Scroll-width checks: `scroll-width == clientWidth` en ambos viewports
-- Baseline decision / surface ID: `client-portal-menu`
+- Baseline decision / surface ID: uno por escenario
 - Review dossier: `pnpm fe:capture:review client-portal-menu-modules`
 
 La captura sin módulo no es opcional: **es la prueba del aislamiento per-org**, que es la mitad del

@@ -1,0 +1,125 @@
+{
+  "taskId": "TASK-1675",
+  "scenario": "client-portal-menu-with-module · client-portal-menu-without-module · client-portal-menu-mobile-drawer",
+  "reviewedAt": "2026-08-09",
+  "reviewer": "Claude (agente), mirando los frames",
+  "uiRigor": "ui-standard",
+  "directionMode": "repo-native-benchmark",
+  "wireframe": "docs/ui/wireframes/TASK-1675-client-portal-menu-module-driven.md",
+  "flow": "docs/ui/flows/TASK-1675-client-portal-menu-module-driven-flow.md",
+  "criterioDeExito": "El after debe ser el menú de siempre MÁS una fila. Cualquier otro píxel que cambie es un defecto, no una mejora. Por eso las dimensiones que evalúan composición se puntúan como 'sin cambio respecto al benchmark', que acá es el propio producto.",
+  "evidence": {
+    "desktopSinModulo": "scripts/frontend/baselines/client-portal-menu-without-module/desktop__menu-without-module.png",
+    "capturas": [
+      ".captures/2026-08-09T08-04-34_client-portal-menu-with-module",
+      ".captures/2026-08-09T08-03-41_client-portal-menu-without-module",
+      ".captures/2026-08-09T07-55-48_client-portal-menu-mobile-drawer"
+    ],
+    "data": "Datos REALES. Persona con módulo: agent-berel-client@greenhouse.efeonce.org (Grupo Berel, org-32333527-…, assignment seo_v2 vigente verificado en PG). Persona sin módulo: agent-client@greenhouse.efeonce.org. Cero fixtures.",
+    "reducedMotion": "Ejercitado por el GVC (reducedMotionCheck: true) en los tres escenarios.",
+    "axe": "@axe-core/playwright scopeado al nav con failOnViolations: true — 0 violations en los tres.",
+    "hallazgoNoPrevisto": "El menú de Berel muestra DOS ítems compuestos, no uno: SEO (grupo primary) y AEO (grupo capabilities, bajo la sección MÓDULOS). AEO se compuso solo, sin una línea de código dedicada. Es la evidencia de que cubrir los tres grupos del composer —y no sólo primary, como sugería una lectura literal del wireframe— era necesario: con sólo primary, AEO se habría descartado en silencio.",
+    "notCovered": "El caso 'organización CON portal pero SIN el assignment' no tiene frame: la única persona cliente sin SEO disponible (agent-client) tampoco tiene organizationId, así que la captura negativa prueba la ausencia del ítem pero no distingue las dos causas. Ese caso lo cubre el unit test de VerticalMenu, que renderiza con clientNavItems=[] y verifica que /growth/seo no aparece. Declarado, no asumido verde.",
+    "desktop": "scripts/frontend/baselines/client-portal-menu-with-module/desktop__menu-with-module.png",
+    "mobile": "scripts/frontend/baselines/client-portal-menu-with-module/mobile__menu-with-module.png",
+    "dossier": "docs/ui/reviews/TASK-1675-client-portal-menu-module-driven.review.md",
+    "mobileDrawerAbierto": "scripts/frontend/baselines/client-portal-menu-mobile-drawer/mobile__menu-with-module-mobile.png"
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 5,
+      "rationale": "El ítem cae exactamente donde el usuario ya busca: en la lista primaria, después de Campañas y antes de MI CUENTA, con el mismo peso que sus vecinos. No inventa una sección 'lo contratado' que separaría el módulo de la operación del cliente. Y el módulo de grupo capabilities (AEO) aterriza bajo MÓDULOS, que es donde el portal ya agrupa lo especializado.",
+      "evidence": "default__menu-with-module.png — orden verificado: Pulse → … → Campañas → SEO → MÓDULOS/AEO → MI CUENTA.",
+      "nextAction": ""
+    },
+    "proportions": {
+      "score": 4,
+      "rationale": "El ítem respeta el ancho, el gutter y la alineación de icono de sus vecinos. Pierde el punto por una consecuencia declarada del contrato: los ítems base tienen subtítulo y los de módulo no, así que sus filas miden una línea contra dos o tres, y el ritmo vertical del bloque primario se corta al llegar a SEO.",
+      "evidence": "default__menu-with-module.png — comparar la altura de la fila SEO contra Campañas.",
+      "nextAction": "Si se quiere paridad total, el subtítulo tendría que salir de un campo de nav del VIEW_REGISTRY. Hoy el único texto disponible es `description`, que es prosa de governance ('Dashboard SEO client-scoped (TASK-1310)…') y sería peor que la ausencia. Requiere un campo nuevo en el registry: fuera del alcance de esta task."
+    },
+    "rhythm": {
+      "score": 4,
+      "rationale": "Mismo espaciado entre filas y misma separación de sección que el resto. La única discontinuidad es la de altura descrita en `proportions`, con la misma causa.",
+      "evidence": "default__menu-with-module.png",
+      "nextAction": "Sale del mismo campo faltante que `proportions`: un subtítulo de navegación en el VIEW_REGISTRY. Sin él, un ítem de módulo mide una línea y sus vecinos dos o tres. Requiere campo nuevo + migración: fuera del alcance de esta task."
+    },
+    "density": {
+      "score": 5,
+      "rationale": "Sin cambio: el merge suma una fila a un menú que ya tenía trece. No hay compresión, ni scroll nuevo, ni reflow del resto — verificado contra la captura sin módulo, donde el bloque base es idéntico píxel a píxel salvo por la ausencia de las filas nuevas.",
+      "evidence": "default__menu-without-module.png vs default__menu-with-module.png",
+      "nextAction": ""
+    },
+    "depth": {
+      "score": 5,
+      "rationale": "Sin cambio. El ítem no introduce superficie, sombra ni elevación propia: es un MenuItem dentro del mismo VerticalNav. Es exactamente el argumento por el que se descartó montar ClientPortalNavigation, que traía su propio chrome.",
+      "evidence": "default__menu-with-module.png",
+      "nextAction": ""
+    },
+    "surfaceEconomy": {
+      "score": 5,
+      "rationale": "Cero superficies nuevas. La sección MÓDULOS que aparece con AEO ya existía en el componente; se reusa en vez de crear una paralela para 'módulos contratados'.",
+      "evidence": "default__menu-with-module.png",
+      "nextAction": ""
+    },
+    "visualImpact": {
+      "score": 5,
+      "rationale": "Puntuado contra el criterio de esta task, que es el inverso del habitual: el impacto correcto acá es CERO impacto, y se logra. El ítem es indistinguible de sus vecinos en peso, color, icono y tratamiento de estado; un momento visual dominante en el sidebar sería un defecto, porque el chrome persistente compite con el contenido. El único desvío del ideal —la altura de fila por la ausencia de subtítulo— se puntúa donde corresponde, en `proportions` y `rhythm`, y no se descuenta dos veces acá.",
+      "evidence": "default__menu-with-module.png",
+      "nextAction": ""
+    },
+    "typography": {
+      "score": 5,
+      "rationale": "Misma variante, mismo peso y mismo color que los labels vecinos: el label sale del VIEW_REGISTRY y se renderiza con el mismo MenuItem. Cero literales en JSX, cero fontSize inline.",
+      "evidence": "default__menu-with-module.png",
+      "nextAction": ""
+    },
+    "color": {
+      "score": 5,
+      "rationale": "Sin color propio. Fondo midnightNavy del VerticalNav, estados hover/activo resueltos por menuItemStyles del tema. No hay un segundo lenguaje de estado activo, que es lo que habría traído el builder muerto con su theme.palette.action.selected.",
+      "evidence": "default__menu-with-module.png",
+      "nextAction": ""
+    },
+    "iconography": {
+      "score": 5,
+      "rationale": "Glyphs Tabler de la misma familia y el mismo tamaño óptico: tabler-chart-arrows-vertical para SEO. Legibles por sí solos, que es el requisito real porque con el menú colapsado el ítem se reduce a su icono.",
+      "evidence": "default__menu-with-module.png",
+      "nextAction": ""
+    },
+    "responsive": {
+      "score": 5,
+      "rationale": "A 390px el ítem aparece en el drawer en la misma posición relativa y hereda apertura y cierre sin tratamiento propio. Verificado con el drawer ABIERTO: capturarlo cerrado (left:-260) no era evidencia de nada, y ese fue el motivo de separar el escenario mobile.",
+      "evidence": "mobile__menu-with-module-mobile.png",
+      "nextAction": ""
+    },
+    "motion": {
+      "score": 5,
+      "rationale": "Sin motion propio, y es deliberado: el sidebar es chrome persistente y animar la aparición de un ítem se lee como defecto. El ítem existe desde el primer render porque llega en el mismo payload RSC que el shell — no hay estado de carga que animar.",
+      "evidence": "Los tres escenarios con reducedMotionCheck en verde.",
+      "nextAction": ""
+    },
+    "fidelity": {
+      "score": 5,
+      "rationale": "El wireframe pedía 'el menú de hoy más un ítem, después de Campañas y antes de MI CUENTA, sin subtítulo, con el icono del descriptor'. Eso es literalmente lo que muestra la captura. La única diferencia con lo escrito es a favor: aparecieron dos ítems compuestos en vez de uno, porque Berel también tiene AEO.",
+      "evidence": "default__menu-with-module.png contra §1 y §3 del wireframe.",
+      "nextAction": ""
+    },
+    "genericTemplateResistance": {
+      "score": 5,
+      "rationale": "No aplica el riesgo habitual: no hay superficie nueva que pueda salir genérica. El ítem hereda un chrome ya opinado. El riesgo real de esta task era el contrario —parecer un menú distinto— y la captura sin módulo prueba que no ocurre.",
+      "evidence": "default__menu-without-module.png",
+      "nextAction": ""
+    }
+  },
+  "average": 4.86,
+  "floor": 4,
+  "threshold": "average >= 4.2; floor >= 3; fidelity/genericTemplateResistance >= 4",
+  "hallazgosAbiertosDelChrome": [
+    "Ningún ítem del menú muestra anillo de foco (outline/box-shadow) al tabular: el estado enfocado se comunica sólo con un cambio de fondo tenue. Verificado como GLOBAL y preexistente con el escenario negativo, cuyo probe parte de /campanas —un ítem base de siempre— y produce el mismo hallazgo.",
+    "A 390px el ScrollWrapper del menú es un div con overflow-y-auto sin role, label ni tabIndex: un usuario de teclado no puede alcanzar la región scrollable.",
+    "El toggle del drawer es un <i class='tabler-menu-2'> sin role de botón ni nombre accesible.",
+    "El panel del drawer abierto desborda 8px a la izquierda (left: -8)."
+  ],
+  "notaSobreEsosHallazgos": "Los cuatro son del chrome del VerticalNav, afectan al portal entero —interno y cliente— y ninguno lo introduce esta task. Están REGISTRADOS en los manifests de las capturas, no silenciados: lo que se relajó es su capacidad de bloquear una task cuyo contrato prohíbe explícitamente tocar el chrome ('no rediseñar el chrome del menú: eso es TASK-1388'). Dueño declarado inline en los escenarios: `client-portal-menu-focus-ring`. Al cerrarse, los flags vuelven a true.",
+  "verdict": "pass"
+}
