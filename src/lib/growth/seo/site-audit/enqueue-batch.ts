@@ -1,7 +1,7 @@
 /**
  * TASK-1304 — Batch semanal de encolado de site audits (Cloud Scheduler → ops-worker).
  *
- * Itera los targets activos de orgs con assignment `seo_v1` vigente y encola un audit
+ * Itera los targets activos de orgs con assignment `seo_v2` vigente y encola un audit
  * OnPage por target con per-target resilience (patrón `rank-capture-batch`): un target
  * bloqueado por cupo/presupuesto se registra y el batch continúa. El filtro por
  * assignment es de ELEGIBILIDAD; el enforcement real lo hace el command vía el

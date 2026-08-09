@@ -19,7 +19,7 @@
  * 1. **Techo gobernado por target** (`resolveTrackedKeywordCapacity`). El exceso se rechaza
  *    con un outcome tipado, NUNCA en silencio y NUNCA con una excepción — el operador tiene
  *    que poder leer "el set está lleno" y decidir qué sacar.
- * 2. **Entitlement per-org**: sin `module_assignment` `seo_v1` vigente el target "no existe"
+ * 2. **Entitlement per-org**: sin `module_assignment` `seo_v2` vigente el target "no existe"
  *    para este command. Es el mismo chokepoint conceptual que `enforceSeoRunEntitlement`,
  *    pero acá NO se consume allowance ni budget: seguir no gasta hoy, gasta mañana. Cobrar
  *    allowance de site-audit por seguir una keyword sería cobrar dos veces por cosas

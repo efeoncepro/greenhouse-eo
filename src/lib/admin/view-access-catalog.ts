@@ -601,7 +601,7 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     // Sembrado SOLO a efeonce_admin + ai_tooling_admin (los roles con la capability
     // growth.seo.observation.read de TASK-1301). NUNCA client_*: el acceso cliente al módulo
     // va por growth.seo.report.read_client scope 'own' y su propia surface.
-    // El acceso a una ORG concreta lo gobierna el chokepoint per-org (module_assignments seo_v1).
+    // El acceso a una ORG concreta lo gobierna el chokepoint per-org (module_assignments seo_v2).
     viewCode: 'administracion.growth_seo',
     section: 'administracion',
     label: 'SEO',

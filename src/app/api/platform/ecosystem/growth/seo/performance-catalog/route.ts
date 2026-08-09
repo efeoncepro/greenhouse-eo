@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic'
 /**
  * TASK-1307 — catálogo de keywords/URLs elegibles para comparar (alimenta el selector de
  * set y le dice a un agente qué puede pedirle a `/performance`). Mismo gate del lane:
- * entitlement per-org `seo_v1` con 404 anti-oracle.
+ * entitlement per-org `seo_v2` con 404 anti-oracle.
  */
 export async function GET(request: Request) {
   return runEcosystemReadRoute({

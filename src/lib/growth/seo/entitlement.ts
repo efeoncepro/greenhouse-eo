@@ -35,27 +35,42 @@ import { buildSeoProviderSpendMonthlySumSql } from './provider-spend'
 export const SEO_MODULE_KEY = 'seo_v2' as const
 
 /**
- * Claves que las LECTURAS aceptan durante el cutover `seo_v1 → seo_v2` (TASK-1310).
+ * Claves que las LECTURAS aceptan. **La ventana expand/contract del cutover
+ * `seo_v1 → seo_v2` está CERRADA en código desde `TASK-1677` (2026-08-09).**
  *
- * 🔴 Renombrar la clave en el código y en la base a la vez es un cambio breaking, y los
- * DOS órdenes de despliegue dejan una ventana de oscuridad:
+ * ## Por qué existió la ventana
+ *
+ * Renombrar la clave en el código y en la base a la vez es un cambio breaking, y los DOS
+ * órdenes de despliegue dejan una ventana de oscuridad:
+ *
  *   - migración primero → el código vivo sigue pidiendo `seo_v1`, ya superseded → 0 orgs;
  *   - código primero    → pide `seo_v2`, que la base todavía no tiene → 0 orgs.
  *
- * Y "0 orgs" no es una pantalla vacía nada más: este mismo predicado gatea los tres
- * batches que le pagan al proveedor (rankings, site audit, backlinks). En esa ventana
- * saltarían con `no_entitlement` **en silencio**, que es justo lo que el dominio prohíbe
- * (un run que ve data elegible y materializa 0 nunca es `succeeded`).
+ * Y "0 orgs" no es una pantalla vacía nada más: este mismo predicado gatea los tres batches
+ * que le pagan al proveedor (rankings, site audit, backlinks). En esa ventana saltarían con
+ * `no_entitlement` **en silencio**, que es justo lo que el dominio prohíbe (un run que ve
+ * data elegible y materializa 0 nunca es `succeeded`).
  *
- * Por eso el lado de lectura acepta ambas: se despliega ESTO primero, después se aplica la
- * migración, y la fase de contracción —dejar sólo `seo_v2`— es un cambio posterior y
- * deliberado, cuando ya no queden assignments `seo_v1` vigentes. Doctrina expand/contract:
- * `arch-architect` → `data/schema-evolution.md` ("rename in place is forbidden").
+ * ## Por qué se puede cerrar ahora, y en este orden
  *
- * ⚠️ Es TEMPORAL y tiene dueño: `TASK-1310`. El test de `entitlement` fija su contenido
- * para que quitar `seo_v1` sea una decisión explícita y no un descuido.
+ * La fase contract va **código primero, datos después**, y eso sólo es seguro porque la
+ * cobertura ya la da `seo_v2`: verificado contra PG el 2026-08-09, las dos organizaciones
+ * con SEO tienen AMBAS claves vigentes, así que ninguna depende sólo de `seo_v1` y dejar de
+ * leerla no le quita el módulo a nadie. El orden inverso —superseder los datos con el código
+ * todavía leyendo `seo_v1`— es el que el dominio prohíbe.
+ *
+ * La contracción de los datos (supersede de los assignments `seo_v1`) es un paso posterior
+ * y deliberado, que se aplica **después** de que este código esté desplegado y el canary del
+ * provider contra producción esté verde. Nunca en la misma migración que el expand.
+ *
+ * Doctrina expand/contract: `arch-architect` → `data/schema-evolution.md`
+ * ("rename in place is forbidden"). Historia del incidente: `ISSUE-143`.
+ *
+ * ⚠️ `seo_v1` **sigue existiendo** como fila en `modules` (append-only); lo que se retira son
+ * sus assignments vigentes. Volver a agregarla acá sería reabrir una ventana cerrada: si un
+ * runtime futuro necesitara leerla, eso es un expand nuevo con su propia task.
  */
-export const SEO_MODULE_KEYS_READ: readonly string[] = ['seo_v2', 'seo_v1']
+export const SEO_MODULE_KEYS_READ: readonly string[] = ['seo_v2']
 
 export type SeoTier = 'contracted' | 'trial' | 'pilot'
 

@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic'
 /**
  * TASK-1307 — rendimiento en el tiempo de un SET de keywords o URLs (pantalla ancla).
  * Lane machine-authed del ecosystem: org por binding (org-scoped manda, internal exige
- * `organizationId`), entitlement per-org `seo_v1` con 404 anti-oracle. Passthrough del
+ * `organizationId`), entitlement per-org `seo_v2` con 404 anti-oracle. Passthrough del
  * reader canónico `readSeoPerformance` — la MISMA lectura que consume la UI.
  */
 export async function GET(request: Request) {
