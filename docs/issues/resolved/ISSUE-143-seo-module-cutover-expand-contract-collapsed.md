@@ -81,8 +81,15 @@ a un único assignment — el más nuevo que su runtime sepa nombrar.
 
 ## Pendiente
 
-El **contract** sigue sin ejecutar, y así debe quedar: se escribe en su propia migración cuando `main`
-tenga el dual-read desplegado y el canary lo confirme. Dueño: `TASK-1310`.
+El **contract** sigue sin ejecutar, y así debía quedar hasta que `main` tuviera el dual-read desplegado
+y el canary lo confirmara.
+
+**Delta 2026-08-09 — la precondición se cumplió.** El release llevó a producción el dual-read y los
+viewCodes del catálogo. Verificado runtime por runtime: `main` con `SEO_MODULE_KEYS_READ`, canary del
+provider **100% verde** (con `track`/`untrack` devolviendo ya `400` en vez de `404`, o sea que esas
+rutas existen), y el ops-worker en una revisión que es ancestro de `main`. El contract pasa a tener
+dueño propio: **`TASK-1677`**, separada de `TASK-1310` porque es `backend-data` de bajo riesgo y no
+debe quedar atada a un ciclo de diseño abierto.
 
 Follow-up declarado sin dueño: una señal de fiabilidad que vigile la simetría de la ventana en
 runtime. Hoy el invariante sólo se verifica en el momento de migrar; una ventana que se desbalancee

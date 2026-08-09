@@ -30,6 +30,21 @@ confunde build saltado a propósito con fallido). Se desplegó además el batch 
 (TASK-1308/1309/1310, 322 archivos, 3 migraciones) y se corrigieron dos comandos documentados que las
 herramientas dejaron de aceptar.
 
+## 2026-08-09 — El release desbloquea el contract del cutover SEO; queda TASK-1677
+
+- **Verificado, no supuesto.** Tras el release: `main` trae `SEO_MODULE_KEYS_READ`, el canary del
+  provider contra producción da **100% verde** —con `track`/`untrack` devolviendo `400` en vez de
+  `404`, o sea que esas rutas ya existen— y el `ops-worker` corre una revisión que es **ancestro de
+  `main`**. Los otros dos Cloud Run no consumen SEO. Con eso caen las dos condiciones que mantenían
+  abierta la ventana de `ISSUE-143`.
+- **`TASK-1677` creada** para la fase contract, separada de `TASK-1310`: es `backend-data` de bajo
+  riesgo y no debe quedar atada a un ciclo de diseño abierto. 🔴 **El código va antes que la
+  migración, y no es preferencia**: lo impone el guardrail que se escribió tras el incidente —
+  primero dejas de leer la clave, después la apagas.
+- Falsos positivos de `task:lint` detectados al escribirla, ambos anotados como deuda de tooling: la
+  regla de placeholder lee la palabra española **"todo"** como el marcador inglés `TODO`, y lee unos
+  corchetes de tipo TS como placeholder (éste ya estaba en `TASK-1675`).
+
 ## 2026-08-08 — TASK-1309 CERRADA: el conmutador de Search Visibility queda completo
 
 - **`TASK-1309` pasa a `complete`.** Build de producción verde (exit 0) con autorización del operador
@@ -1145,23 +1160,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   el oscuro no tiene. Quedan 14 textos que fallan en **ambos** modos (`--faint` a 40% de alpha) — deuda
   preexistente, no de este cambio.
 - `@efeoncepro/axis-tokens@0.2.3` publicada y el pin de Globe subido. PR en `efeonce-globe`: [#8](https://github.com/efeoncepro/efeonce-globe/pull/8), pendiente de revisión humana.
-
-## 2026-07-31 — Globe: el `:root` del payload cliente proyecta sobre el `@theme` (TASK-1612)
-
-- El payload emitía sus custom properties desde dos mecanismos con nombres distintos (`--canvas` en el
-  `:root` del shell, `--color-canvas` en el `@theme` del bundle), así que no podía re-tematizarse: mover
-  uno no movía al otro y un tema alternativo habría exigido cada override dos veces. Hoy cada hoja
-  renombrada se emite como `--canvas: var(--color-canvas, #25293c)` y un solo override mueve la utilidad
-  y el CSS plano a la vez. Es el paso previo que ADR-017 fijaba para cualquier modo claro; **no decide
-  ningún valor** y su criterio de éxito era cero cambio visual.
-- **Cero cambio visual, medido contra control.** El diff por bytes resultó inválido —el arnés de captura
-  no es determinista—; por píxeles, toda diferencia aparece igual o mayor en un control de dos corridas
-  del mismo código, y `globe-theme.generated.css` quedó byte-identical.
-- No se proyectan los namespaces passthrough ni las que ya derivan, y las dos exclusiones salen de medición:
-  proyectar `--text-xs` emite `var(--text-xs, …)` —referencia circular— y reprodujo el incidente de ADR-016
-  con los mismos números **con los tests unitarios en verde**; sólo el canario de browser lo vio.
-- Instrumentos nuevos, los dos verificados poniéndolos rojo: `gates/root-theme-equivalence.test.ts`
-  (compara por clave; su primera versión comparaba valores y dejaba pasar una utilidad borrada) y
-  `scripts/legacy-fallback-canary.mjs` (renderiza el `:root` sin Tailwind, la condición de las superficies
-  legacy, y mide el payoff del override único).
-- ADR-016 y ADR-017 quedaron reescritos en el cuerpo: la consecuencia que declaraban aceptada está cerrada.

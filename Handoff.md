@@ -226,9 +226,12 @@ Contribuyó una causa de método: verifiqué la migración con un `SELECT`, que 
 La otra mitad es qué versión de código la lee en cada runtime. La verificación correcta es el
 consumidor real contra el host real.
 
-**Pendiente:** el contract (superseder `seo_v1`) sigue sin ejecutar y así debe quedar hasta que `main`
-tenga el dual-read. Sin dueño: una señal de fiabilidad que vigile la simetría de la ventana en runtime
-— hoy el invariante sólo se verifica al migrar.
+**Delta 2026-08-09 — el release cumplió la precondición.** Verificado runtime por runtime: `main` con
+el dual-read, canary del provider contra producción **100% verde** (con `track`/`untrack` ya en `400`
+en vez de `404`, o sea que esas rutas existen), y el ops-worker en una revisión ancestro de `main`. El
+contract pasa a **`TASK-1677`**, separado de `TASK-1310` para no atar una operación de datos de 20
+minutos a un ciclo de diseño abierto. La señal de simetría de la ventana sigue sin dueño, pero deja de
+ser urgente cuando la ventana se cierre.
 
 **Colateral arreglado de raíz:** rotando este mismo Handoff descubrí que `docs:context-rotate` estaba
 ciego y **reventaba** (`TypeError` sobre `matches[0]`): su patrón buscaba secciones `##` con fecha y el
