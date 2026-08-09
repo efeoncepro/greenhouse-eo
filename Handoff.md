@@ -6,7 +6,12 @@ Cerrada en `develop`. El menú del cliente leía `authorizedViews` mientras el g
 `module_assignments`: un módulo contratado funcionaba y era inalcanzable salvo escribiendo la URL.
 Ahora el layout resuelve per-org server-side y `VerticalMenu` hace merge **aditivo**.
 
-**Lo que necesita quien siga:**
+Auditada con `seo-aeo` y `greenhouse-ui-review`: el orden de la lista ganó un tercer eje —**valor de
+búsqueda**, ortogonal a la severidad— porque sin él la higiene de sitio ascendía por puro alcance
+(favicon en 91 páginas por encima de `alt` en 50), y los checks de performance ahora declaran que son
+medición de **laboratorio** (Google rankea con datos de campo). Queda declarada, sin dueño, una
+cobertura que el audit NO tiene: acceso de crawlers de IA en `robots.txt`, ausencia de JSON-LD,
+conflicto noindex+robots y salud de sitemap.
 
 1. **El rollout NO está cerrado: espera la promoción `develop → main`.** Mientras el catálogo TS viva
    sólo en `develop`, `syncViewRegistryCatalog` apaga esos viewCodes desde cualquier runtime con
