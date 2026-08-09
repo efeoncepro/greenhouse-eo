@@ -243,6 +243,12 @@ El flujo de promoción por **squash-merge** hace que `main` (commits squash de r
 
    Y vale saber por qué el check se queja de algo que no está roto: `vercel_readiness` mira el deploy de staging **más reciente sin importar su estado**, así que un skip deliberado de nuestro propio ignore-build se lee igual que un build fallado. El staging anterior `Ready` puede contener todo el código del release; lo único que le falta son docs. Es una tensión entre dos mecanismos propios, no una falla de staging — pero el check igual sale con exit 1, así que hay que producirle el deploy.
 
+9. **El context gate tiene que ser lo ÚLTIMO que corres antes de commitear, y `docs:closure-check` NO lo incluye (verificado 2026-08-09, run `31340366010` rojo en `develop`).** Secuencia que falla y se siente correcta: corres `docs:context-check:strict` → 0/0 → después agregas una entrada al changelog o al Handoff → corres `docs:closure-check` → 0 warnings → commiteas. El commit sale con `changelog.md` en 61 entradas y el CI lo rechaza.
+
+   Los dos gates miran cosas distintas: `docs:closure-check` audita si la documentación acompaña al cambio (arquitectura, funcional, manuales, flags), y **no** verifica techos de contexto. `docs:context-check:strict` es el que cuenta entradas, líneas y tokens — y cualquier edición posterior a `Handoff.md`/`changelog.md` invalida su resultado.
+
+   **Regla:** si tocas `Handoff.md` o `changelog.md` después de correr el context gate, **vuelve a correrlo**. Y como en el cierre de un release se tocan los dos casi siempre, el orden seguro es: todas las ediciones documentales → `docs:closure-check` → `docs:context-rotate --apply` si hace falta → `docs:context-check:strict` → commit.
+
 > El ops-worker que queda con GIT_SHA rezagado tras el release **no es drift** — ver §4.1 (change-gate `deploy_needed=false` cuando el código de worker no cambió).
 
 ### 2.4. Camino recomendado: pre-emptar los 3 gotchas ANTES del PR (verificado 2026-08-06)
