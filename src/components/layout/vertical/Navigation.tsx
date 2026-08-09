@@ -11,6 +11,7 @@ import { styled, useColorScheme, useTheme } from '@mui/material/styles'
 
 // Type Imports
 import type { Mode } from '@core/types'
+import type { ClientNavItem } from '@/lib/client-portal/composition/menu-builder-shape'
 
 // Component Imports
 import VerticalNav, { NavHeader, NavCollapseIcons } from '@menu/vertical-menu'
@@ -30,6 +31,14 @@ import { getMicrocopy } from '@/lib/copy'
 
 type Props = {
   mode: Mode
+
+  /**
+   * TASK-1675 — ítems de los módulos contratados por la organización, resueltos
+   * en `(dashboard)/layout.tsx` (server). Passthrough puro: este componente no
+   * los interpreta. JSON plano y serializable — el resolver es `server-only` y
+   * no puede cruzar la frontera.
+   */
+  clientNavItems?: readonly ClientNavItem[]
 }
 
 const microcopy = getMicrocopy()
@@ -52,7 +61,7 @@ const StyledBoxForShadow = styled('div')(({ theme }) => ({
 
 const Navigation = (props: Props) => {
   // Props
-  const { mode } = props
+  const { mode, clientNavItems } = props
 
   // Hooks
   const verticalNavOptions = useVerticalNav()
@@ -139,7 +148,7 @@ const Navigation = (props: Props) => {
         )}
       </NavHeader>
       <StyledBoxForShadow ref={shadowRef} />
-      <VerticalMenu scrollMenu={scrollMenu} />
+      <VerticalMenu scrollMenu={scrollMenu} clientNavItems={clientNavItems} />
     </VerticalNav>
   )
 }
