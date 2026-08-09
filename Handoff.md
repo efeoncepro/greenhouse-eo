@@ -4,9 +4,10 @@
 
 `code complete, rollout pendiente`. Slice 1 hecho: `SEO_MODULE_KEYS_READ = ['seo_v2']`.
 
-**Lo que necesita quien siga — la secuencia importa y no es negociable:**
+**El Slice 1 ya está en producción** (release `49f86c98cda6`, 2026-08-09). Lo que sigue es la
+migración, y la secuencia importa y no es negociable:
 
-1. **La migración NO puede ir en el mismo release que el código**, por dos razones independientes:
+1. **La migración NO podía ir en el mismo release que el código**, por dos razones independientes:
    el ordering exige desplegar y verificar entre pasos, y el check `postgres_migrations` del preflight
    es estricto (un archivo commiteado sin aplicar es `pending` ⇒ error ⇒ release bloqueado). Aplicarla
    antes del deploy es justo lo que el ordering prohíbe.
@@ -30,19 +31,25 @@ del último manifest `released`.
 
 **Lo que necesita quien siga:**
 
-1. 🔴 **El próximo release va a pedir break-glass, y no es un bug.** Con el gate arreglado, el
-   preflight del batch actual reporta `requires_break_glass` por `cloud_release: 6` — y los 6 archivos
-   son el propio fix del gate. El gate está detectando que el batch mezcla trabajo funcional del portal
-   cliente (TASK-1675) con un cambio del control plane (TASK-1676), que es exactamente lo que la spec
-   de 1676 declaraba: *"va en su propio release, no mezclado con trabajo funcional"*. **Lo limpio son
-   dos releases: primero 1676 sola, después el funcional.**
+1. ✅ **Promovido el 2026-08-09** en el release `49f86c98cda6` (run `31316320616`), manifest
+   `released`. **Y el criterio de aceptación quedó verificado en producción, no en local:** el
+   `preflight-result.json` de ese run pasó de `filesChanged=0, domains={}` a **47 archivos** con
+   `diffBase=0791a89cd01f`, `diffBaseSource=last_released_manifest` y `diffBaseReleaseId`. El gate
+   evaluó de verdad el release que lo contiene.
+   Se promovió en DOS releases separados a propósito: `--override-batch-policy` degrada el check
+   ENTERO a warning, así que el bypass debía caer sobre el batch más chico. R1 (portal cliente) pasó
+   **sin bypass**; sólo R2 lo necesitó.
 2. **Un `filesChanged=0` ya no es aprobación: es `unknown`.** Si lo ves, o el target coincide con el
    último release desplegado, o la base no se pudo resolver. El summary dice contra qué base comparó y
    de qué release id salió — el artefacto por fin es auditable.
 3. **El marker `[release-coupled: …]` cambió de formato y ahora es estricto.** Tiene que ABRIR una
    línea del cuerpo del squash, y se lee SÓLO de ese commit. Un marker a mitad de línea ya no cuenta.
    Antes bastaba mencionarlo en cualquier commit del rango — y una cita en prosa neutralizaba
-   `split_batch` para un batch entero.
+   `split_batch` para un batch entero. **Estrenado en su propio release** (`49f86c98cda6`) y funcionó:
+   neutralizó el `split_batch` de `auth_access + cloud_release`. Dato útil para la próxima vez: ese
+   `auth_access` eran CINCO COMENTARIOS renombrando `seo_v1`→`seo_v2` — **el classifier clasifica por
+   path, no por contenido del diff**, así que antes de partir un batch conviene mirar si el dominio
+   "sensible" sólo cambió prosa.
 4. **Open Question viva, y es de proceso, no de código:** el classifier marca `requires_break_glass`
    ante UN SOLO dominio irreversible, sin mezcla. La matriz del runbook §2.2 considera legítimo un
    release de migración acoplado a su consumer. Con el gate arreglado eso deja de ser teórico: todo
@@ -55,7 +62,7 @@ del último manifest `released`.
    API como `cancelled`.
 
 
-### TASK-1675 — el menú del portal cliente ya compone sus módulos (code complete, rollout pendiente)
+### TASK-1675 — el menú del portal cliente ya compone sus módulos (EN PRODUCCIÓN)
 
 Cerrada en `develop`. El menú del cliente leía `authorizedViews` mientras el gate de cada page leía
 `module_assignments`: un módulo contratado funcionaba y era inalcanzable salvo escribiendo la URL.
@@ -63,11 +70,12 @@ Ahora el layout resuelve per-org server-side y `VerticalMenu` hace merge **aditi
 
 **Lo que necesita quien siga:**
 
-1. **El rollout NO está cerrado: espera la promoción `develop → main`.** Mientras el catálogo TS viva
-   sólo en `develop`, `syncViewRegistryCatalog` apaga esos viewCodes desde cualquier runtime con
-   código viejo. Después de promover, verificar con tres sesiones: cliente de Berel (ve `SEO`),
-   cliente sin el módulo (no lo ve, menú intacto) y colaborador interno (menú intacto); y confirmar
-   que no hay filas `view_registry.active=false, updated_by='system'` para los viewCodes SEO.
+1. ✅ **Promovido el 2026-08-09** en el release `0791a89cd01f` (run `31313368159`), manifest
+   `released`, watchdog `drift_count=0`. **Queda una verificación que NO se pudo automatizar:** las
+   tres sesiones en producción —cliente de Berel (debe ver `SEO`), cliente sin el módulo (no debe
+   verlo, menú intacto) y colaborador interno (menú intacto)—. El endpoint de agent-session devuelve
+   403 en producción por diseño, así que esto es manual. Confirmar también que no haya filas
+   `view_registry.active=false, updated_by='system'` para los viewCodes SEO.
 2. **Si tocas `VerticalMenu.tsx`, el merge aditivo es load-bearing.** La rama `!isInternalPortalUser`
    es la rama **no-interno**: los colaboradores puros caen ahí, así que reemplazar la lista base los
    deja sin menú. Hay un test de identidad que lo fija (`VerticalMenu.test.tsx`, el primer test que
