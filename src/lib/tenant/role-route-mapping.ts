@@ -12,6 +12,20 @@ export type RouteGroup =
   | 'ai_tooling'
 
 /**
+ * El routeGroup del portal cliente. TASK-1678 lo nombra porque dejó de ser un
+ * routeGroup más: es el único cuyo carril de autorización **falla hacia cerrado**.
+ *
+ * En las superficies internas "tu routeGroup te da acceso" es una regla de negocio
+ * razonable —el acceso lo define la pertenencia organizacional—. En el portal cliente
+ * el acceso lo define un contrato comercial, así que la pertenencia al routeGroup no
+ * otorga nada por sí sola: el gate es el módulo contratado (resolver canónico).
+ *
+ * Se importa como constante en vez de repetir el literal `'client'` para que el
+ * carril fail-closed sea rastreable con un solo grep.
+ */
+export const CLIENT_ROUTE_GROUP = 'client' as const
+
+/**
  * Canonical role → route group mapping. Single source of truth.
  *
  * Both `access.ts` (login-time derivation) and `view-access-store.ts`

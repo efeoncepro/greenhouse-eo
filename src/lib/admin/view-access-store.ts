@@ -101,6 +101,21 @@ import { captureMessageWithDomain } from '@/lib/observability/capture'
  *
  * La telemetría emite WARNING via `captureMessageWithDomain('identity', ...)` para que
  * Reliability Control Plane pueda detectarlo como signal `role_view_fallback_invocations`.
+ *
+ * TASK-1678 Slice 2 — el default se invierte para el routeGroup `client`.
+ *
+ * "Tu routeGroup te da acceso" es una regla razonable para las superficies internas:
+ * el acceso ahí lo define la pertenencia organizacional, y sin ese default el portal
+ * interno exigiría seedear cientos de filas. Para el portal **cliente** no lo es,
+ * porque ahí el acceso lo define un contrato comercial. Un rol `client_*` y una vista
+ * `cliente.*` comparten routeGroup `client`, así que el default permisivo auto-otorgaba
+ * TODA vista cliente nueva — incluidas las 18 gobernadas por módulo contratado, cuyo
+ * default canónico es el opuesto: nada existe hasta que se contrata.
+ *
+ * Medido antes de invertirlo (`scripts/identity/client-view-fallback-audit.ts`,
+ * 2026-08-09): el cambio apaga UN viewCode por rol cliente, `cliente.ai_visibility_report`,
+ * y es module-gated → apagado intencional, su carril correcto es el resolver de módulos.
+ * Las otras 72 filas de assignment ya eran explícitas.
  */
 const computeRoleCanAccessViewFallback = (
   role: {
@@ -111,6 +126,13 @@ const computeRoleCanAccessViewFallback = (
   },
   view: GovernanceViewRegistryEntry
 ): boolean => {
+  // TASK-1678 Slice 2 — fail-closed para el carril cliente. Sin fila explícita en
+  // `role_view_assignments` no hay acceso: el gate de una superficie cliente es el
+  // módulo contratado (resolver canónico), nunca la pertenencia al routeGroup.
+  if (view.routeGroup === CLIENT_ROUTE_GROUP) {
+    return false
+  }
+
   if (role.routeGroups.includes(view.routeGroup)) {
     return true
   }
@@ -162,7 +184,7 @@ const roleCanAccessViewFallback = (
   return granted
 }
 
-import { deriveRouteGroupsForSingleRole } from '@/lib/tenant/role-route-mapping'
+import { CLIENT_ROUTE_GROUP, deriveRouteGroupsForSingleRole } from '@/lib/tenant/role-route-mapping'
 
 const toRegistryRows = (persistedRegistryRows: ViewRegistryRow[]) => {
   if (persistedRegistryRows.length === 0) return VIEW_REGISTRY
@@ -179,7 +201,25 @@ const toRegistryRows = (persistedRegistryRows: ViewRegistryRow[]) => {
   // Merge hardcoded entries not yet synced to DB so new views are visible immediately
   const persistedCodes = new Set(persisted.map(v => v.viewCode))
 
-  const missing = VIEW_REGISTRY.filter(v => !persistedCodes.has(v.viewCode))
+  // TASK-1678 Slice 3 — el merge es la vigencia de este carril, y sólo aplica al lado
+  // interno.
+  //
+  // `getPersistedViewRegistry` ya filtra `active = TRUE`, así que una vista desactivada
+  // en DB no viene en `persisted`… y caía justo en `missing`, o sea que el merge la
+  // **reponía desde el TS**. Resultado: desactivar una vista en DB no tenía efecto
+  // ninguno sobre el claim mientras siguiera declarada en `VIEW_REGISTRY`.
+  //
+  // Para las superficies internas el merge tiene una razón legítima —hace visible una
+  // vista nueva antes de que su seed corra— y ahí se conserva. Para el carril cliente
+  // no: desactivar una vista cliente tiene que apagarla de verdad, igual que el resto
+  // del carril falla hacia cerrado (Slice 2).
+  //
+  // Nota: el bootstrap total (`persistedRegistryRows.length === 0`) sigue devolviendo
+  // el registry completo arriba, y es seguro porque sin registry tampoco hay
+  // assignments — sin fila explícita ninguna vista cliente se otorga.
+  const missing = VIEW_REGISTRY.filter(
+    v => !persistedCodes.has(v.viewCode) && v.routeGroup !== CLIENT_ROUTE_GROUP
+  )
 
   return missing.length > 0 ? [...persisted, ...missing] : persisted
 }
