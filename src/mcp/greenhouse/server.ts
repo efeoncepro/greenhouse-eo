@@ -243,7 +243,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1645 — Growth SEO (read-only, mandato MCP-first del operador 2026-08-05).
-  // Los tres tools delegan en el lane ecosystem: entitlement per-org `seo_v1` +
+  // Los tres tools delegan en el lane ecosystem: entitlement per-org `seo_v2` +
   // anti-oracle + resolución de org por binding se aplican SERVER-SIDE. Para bindings
   // internos, `organizationId` es requerido; para bindings org-scoped se omite.
   server.registerTool(
@@ -251,7 +251,7 @@ export const createGreenhouseMcpServer = (
     {
       title: 'Get SEO Keyword Opportunities',
       description:
-        'List measured striking-distance SEO keyword opportunities for an organization (Google Search Console data: weighted position, impressions, estimated click gain, quick wins, cannibalization). Requires the organization to have the SEO module (seo_v1) assigned. When data.ok is false, report the errorCode (disabled, target_not_configured, no_data) honestly instead of inventing results.',
+        'List measured striking-distance SEO keyword opportunities for an organization (Google Search Console data: weighted position, impressions, estimated click gain, quick wins, cannibalization). Requires the organization to have the SEO module (seo_v2) assigned. When data.ok is false, report the errorCode (disabled, target_not_configured, no_data) honestly instead of inventing results.',
       inputSchema: {
         organizationId: z.string().trim().min(1).optional(),
         limit: z.number().int().positive().max(50).optional()
@@ -280,7 +280,7 @@ export const createGreenhouseMcpServer = (
     {
       title: 'Get SEO Entitlement',
       description:
-        'Read the SEO module entitlement state for an organization: whether seo_v1 is assigned, tier (contracted/trial/pilot), remaining monthly site-audit allowance and remaining provider budget (USD). Use this BEFORE proposing SEO operations to know if the organization is enabled and has quota. hasModule=false means the module is not assigned — do not infer anything else about the organization.',
+        'Read the SEO module entitlement state for an organization: whether seo_v2 is assigned, tier (contracted/trial/pilot), remaining monthly site-audit allowance and remaining provider budget (USD). Use this BEFORE proposing SEO operations to know if the organization is enabled and has quota. hasModule=false means the module is not assigned — do not infer anything else about the organization.',
       inputSchema: {
         organizationId: z.string().trim().min(1).optional()
       },

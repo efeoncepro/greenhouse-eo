@@ -1,7 +1,7 @@
 /**
  * TASK-1303 — Batch diario de captura de rankings (Cloud Scheduler → ops-worker).
  *
- * Itera los targets activos de orgs con assignment `seo_v1` vigente y corre el command
+ * Itera los targets activos de orgs con assignment `seo_v2` vigente y corre el command
  * `captureRankSnapshot` por target con per-target resilience (patrón `gsc-daily-batch`):
  * un target que falla se registra y el batch continúa — el gate de costo del org que
  * agotó su presupuesto NUNCA puede impedir capturar la serie de los demás.
@@ -55,7 +55,7 @@ type EligibleTargetRow = {
 }
 
 /**
- * Targets activos de orgs con assignment `seo_v1` vigente (mismo predicado de vigencia
+ * Targets activos de orgs con assignment `seo_v2` vigente (mismo predicado de vigencia
  * que el resolver de entitlement: `effective_to IS NULL AND status IN (active, pilot)`).
  * La expiración NO se filtra acá: el gate la clasifica honesto (`expired`) por target.
  */

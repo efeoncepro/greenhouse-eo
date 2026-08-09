@@ -133,6 +133,32 @@ export interface ReleaseBatchPolicyEvidence {
    * before re-running preflight.
    */
   readonly reasons: readonly string[]
+  /**
+   * TASK-1676 / ISSUE-145 — git ref used as the LEFT side of the diff.
+   *
+   * Optional and additive: existing consumers keep working, so
+   * `contractVersion` does not bump (see the versioning policy at the top of
+   * this file).
+   *
+   * It exists because the check used to be un-auditable after the fact: three
+   * consecutive releases reported `filesChanged=0` and nobody could tell from
+   * the artifact whether the release was genuinely empty or the base was wrong.
+   * With the base in the payload, a surprising result is a diagnosis instead of
+   * an investigation.
+   */
+  readonly diffBase?: string
+  /**
+   * Where `diffBase` came from:
+   *   - `last_released_manifest`: the canonical anchor — target_sha of the last
+   *     `released` manifest for the branch.
+   *   - `branch_head_fallback`: no released manifest for that branch (or the
+   *     reader failed), so the legacy `origin/<branch>` base was used. Post-merge
+   *     this base is structurally empty, which the check refuses to read as
+   *     approval.
+   */
+  readonly diffBaseSource?: 'last_released_manifest' | 'branch_head_fallback'
+  /** Release id backing `diffBase`, when it came from a manifest. */
+  readonly diffBaseReleaseId?: string
 }
 
 /**

@@ -2185,7 +2185,7 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   // TASK-1301 — Growth SEO (dominio growth.seo, EPIC-022 "Search Visibility 360"). 5 capabilities
   // gobernadas (Full API Parity + MCP-first: mismas caps para UI/Nexa/lane app/lane ecosystem —
   // NUNCA un gate paralelo por consumer). El ACCESO efectivo es per-org vía module_assignments
-  // (module_key `seo_v1`, lección TASK-1248); el rol es solo el plano fino. El gate de costo
+  // (module_key `seo_v2`, lección TASK-1248); el rol es solo el plano fino. El gate de costo
   // DataForSEO vive en el chokepoint único `enforceSeoRunEntitlement` (src/lib/growth/seo/
   // entitlement.ts). Grants en runtime.ts mismo PR:
   //  - target.configure / audit.run: set operador (internal ∪ EFEONCE_ADMIN ∪ EFEONCE_ACCOUNT ∪

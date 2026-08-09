@@ -21,6 +21,7 @@ import { captureWithDomain } from '@/lib/observability/capture'
 import { redactErrorForResponse } from '@/lib/observability/redact'
 
 import { classifyReleaseBatch, decisionToSeverity } from '../batch-policy/classifier'
+import { readLastReleasedRelease } from '../last-released-reader'
 import type { PreflightCheckResult } from '../types'
 import type { PreflightInput } from '../runner'
 
@@ -87,15 +88,81 @@ const collectChangedFiles = async (
     .filter(line => line.length > 0)
 }
 
-const collectCommitBodies = async (
-  baseRef: string,
-  targetSha: string
-): Promise<string> => {
-  // Format: %B = full commit message (subject + body) per commit, NUL separated.
-  // Same canonical base as the file diff — see buildReleaseDiffRange (ISSUE-114).
-  const stdout = await runGit(['log', '--format=%B%x00', buildReleaseDiffRange(baseRef, targetSha)])
+/**
+ * TASK-1676 / ISSUE-145 — El marker se lee SÓLO del commit objetivo.
+ *
+ * El runbook §2.4 siempre dijo que el `[release-coupled: …]` va «en el cuerpo del
+ * commit de squash, que es lo que el classifier del orquestador lee». Era falso en
+ * los dos caminos: post-merge `git log origin/main..target` era vacío y excluía el
+ * squash justamente por ser el extremo izquierdo; pre-merge el squash todavía no
+ * existía. Cuatro releases consecutivos escribieron ese marker convencidos de que
+ * hacía algo.
+ *
+ * Re-anclar la base (Slice 2) mete el squash en el rango, pero mete también los
+ * ~509 commits que lo preceden: 442 KB de prosa donde una cita accidental del
+ * literal desactiva la detección entera. Leer el marker únicamente del cuerpo de
+ * `target_sha` —que en el orquestador ES el commit de squash— cierra el vector y
+ * hace verdad lo que el runbook documenta.
+ *
+ * Consecuencia deliberada: en la corrida local pre-merge el marker no puede
+ * existir todavía, así que un `split_batch` local no es neutralizable ahí. Es el
+ * flujo correcto y ya documentado — el operador ve el `split_batch` en local,
+ * escribe el marker en el squash, y el orquestador lo lee.
+ */
+const collectMarkerSourceText = async (targetSha: string): Promise<string> => {
+  // %B = mensaje completo (subject + body) del commit objetivo, y sólo de él.
+  const stdout = await runGit(['show', '-s', '--format=%B', targetSha])
 
   return stdout
+}
+
+/**
+ * TASK-1676 / ISSUE-145 — Resolve the LEFT side of the release diff.
+ *
+ * The question the batch policy exists to answer is *"what does this release add
+ * on top of what production already has?"*. `origin/<branch>` only approximates
+ * that answer pre-merge, and degrades into a tautology post-merge: the
+ * orchestrator runs with `target_sha` **already merged into `main`**, so the range
+ * is empty and the gate approves without having looked at anything. Three
+ * consecutive releases reported `filesChanged=0, decision=ship`, one of them
+ * carrying 1045 files and 14 migrations.
+ *
+ * The target_sha of the last `released` manifest answers the question in both
+ * moments, and has a second effect that matters just as much: post-merge the range
+ * finally CONTAINS the squash commit, so the `[release-coupled: …]` marker can be
+ * read where the runbook has always claimed it is read.
+ *
+ * Falls back to the legacy base when the branch has no released manifest (today,
+ * anything other than `main`) or when the reader fails. The fallback is not a hole:
+ * the caller refuses to treat an empty diff as approval regardless of which base
+ * produced it.
+ */
+const resolveDiffBase = async (
+  targetBranch: string
+): Promise<{
+  readonly baseRef: string
+  readonly source: 'last_released_manifest' | 'branch_head_fallback'
+  readonly releaseId?: string
+}> => {
+  try {
+    const lastReleased = await readLastReleasedRelease({ targetBranch })
+
+    if (lastReleased) {
+      return {
+        baseRef: lastReleased.targetSha,
+        source: 'last_released_manifest',
+        releaseId: lastReleased.releaseId
+      }
+    }
+  } catch (error) {
+    // A reader failure must not silently become an approval. Degrade to the
+    // legacy base and let the empty-diff rule below do the gating.
+    captureWithDomain(error, 'cloud', {
+      tags: { source: 'preflight', stage: 'release_batch_policy_base' }
+    })
+  }
+
+  return { baseRef: `origin/${targetBranch}`, source: 'branch_head_fallback' }
 }
 
 export const checkReleaseBatchPolicy = async (
@@ -104,17 +171,58 @@ export const checkReleaseBatchPolicy = async (
   const observedAtStart = Date.now()
   const observedAt = new Date().toISOString()
 
-  // Resolve base ref. Default origin/main; targetBranch may differ during
-  // pre-merge inspection (e.g. promoting feature/x → develop).
-  const baseRef = `origin/${input.targetBranch}`
+  const base = await resolveDiffBase(input.targetBranch)
+  const baseRef = base.baseRef
 
   try {
     const [changedFiles, commitBodyText] = await Promise.all([
       collectChangedFiles(baseRef, input.targetSha),
-      collectCommitBodies(baseRef, input.targetSha)
+      collectMarkerSourceText(input.targetSha)
     ])
 
-    const evidence = classifyReleaseBatch({ changedFiles, commitBodyText })
+    const baseLabel =
+      base.source === 'last_released_manifest'
+        ? `${baseRef} (release ${base.releaseId})`
+        : `${baseRef} (fallback: la rama no tiene releases registrados)`
+
+    // ── TASK-1676 / ISSUE-145 — un diff vacío NUNCA es aprobación ──
+    //
+    // El invariante correcto es sobre el RESULTADO, no sobre la base: da igual de
+    // dónde salga el ancla, si el rango no contiene nada el check no miró nada, y
+    // reportar `ship` ahí es entregar una seguridad que no existe. Es exactamente
+    // el defecto que ISSUE-145 documenta, y ponerlo acá lo cierra también para el
+    // caso que la formulación original dejaba abierto: base nueva presente pero
+    // target idéntico al release anterior.
+    //
+    // `unknown` en vez de `error` a propósito: no se sabe que el batch esté mal, se
+    // sabe que no se pudo evaluar. La diferencia importa porque el operador tiene
+    // que poder distinguir "el gate me está frenando" de "el gate no pudo mirar".
+    if (changedFiles.length === 0) {
+      return {
+        checkId: 'release_batch_policy',
+        severity: 'unknown',
+        status: 'ok',
+        observedAt,
+        durationMs: Date.now() - observedAtStart,
+        summary: `Diff vacio contra ${baseLabel} — el batch no pudo evaluarse`,
+        error: null,
+        evidence: null,
+        recommendation:
+          base.source === 'last_released_manifest'
+            ? 'El target coincide con el ultimo release desplegado: no hay nada que promover. Verificar que el target_sha sea el correcto.'
+            : 'Sin release previo registrado para esta rama, la base cae a la HEAD de la rama y post-merge queda vacia. Verificar `release_manifests` y que `git fetch origin` este al dia.'
+      }
+    }
+
+    const classified = classifyReleaseBatch({ changedFiles, commitBodyText })
+
+    const evidence = {
+      ...classified,
+      diffBase: baseRef,
+      diffBaseSource: base.source,
+      ...(base.releaseId ? { diffBaseReleaseId: base.releaseId } : {})
+    }
+
     const severity = decisionToSeverity(evidence.decision, input.overrideBatchPolicy)
 
     let recommendation = ''
@@ -128,8 +236,8 @@ export const checkReleaseBatchPolicy = async (
 
     const summary =
       evidence.decision === 'ship'
-        ? `${evidence.filesChanged} archivo(s) clasificados; decision=ship`
-        : `${evidence.filesChanged} archivo(s) clasificados; decision=${evidence.decision} (${evidence.reasons[0] ?? 'sin razones'})`
+        ? `${evidence.filesChanged} archivo(s) clasificados vs ${baseLabel}; decision=ship`
+        : `${evidence.filesChanged} archivo(s) clasificados vs ${baseLabel}; decision=${evidence.decision} (${evidence.reasons[0] ?? 'sin razones'})`
 
     return {
       checkId: 'release_batch_policy',
@@ -153,11 +261,13 @@ export const checkReleaseBatchPolicy = async (
       status: 'error',
       observedAt,
       durationMs: Date.now() - observedAtStart,
-      summary: 'No se pudo computar diff git (verificar que origin/main esta sync)',
+      summary: `No se pudo computar diff git contra ${baseRef}`,
       error: redactErrorForResponse(error),
       evidence: null,
       recommendation:
-        'Correr `git fetch origin` antes de re-ejecutar preflight. Si persiste, verificar checkout local.'
+        base.source === 'last_released_manifest'
+          ? `Correr \`git fetch origin\` — el SHA del ultimo release (${baseRef}) tiene que existir en el checkout. Si persiste, verificar que el checkout traiga historia completa (fetch-depth: 0).`
+          : 'Correr `git fetch origin` antes de re-ejecutar preflight. Si persiste, verificar checkout local.'
     }
   }
 }

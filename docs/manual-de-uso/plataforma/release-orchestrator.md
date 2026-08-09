@@ -62,6 +62,22 @@ Production de workers no se despliega automaticamente por `push:main`. Los
 pushes de worker siguen sirviendo staging (`develop`); production normal vive
 en este orquestador y `workflow_dispatch` queda solo como break-glass auditado.
 
+Para mirar los 4 workers de un vistazo, sin recordar regiones ni flags de `gcloud`:
+
+```bash
+pnpm release:workers --expected-sha=<target_sha>
+```
+
+Imprime una línea por servicio con `Ready` y `GIT_SHA`, y marca los que difieren del
+SHA esperado. Un SHA distinto **no es drift por sí solo**: `ops-worker` es
+change-gated y conserva el SHA del último deploy que sí tocó código de worker cuando
+las rutas runtime no cambiaron (runbook §4.1).
+
+> **Si el comando falla por flags de `gcloud`, cambió la herramienta, no el sistema.**
+> Se corrige el wrapper una vez y todos los usos quedan arreglados. Esa es la razón de
+> que exista: en el release del 2026-08-08/09 fallaron tres comandos crudos copiados
+> de la documentación y ninguno de los envueltos en `pnpm` (TASK-1676).
+
 ### 5) Health check post-release
 
 `post-release-health` pinga `https://greenhouse.efeoncepro.com/api/auth/health`. Si devuelve 200 → release `released`. Si soft-fails (exit 78) → release `degraded`. **Degraded NO aborta** — quedó deployado pero requiere inspección operativa antes de marcar verde.
@@ -112,6 +128,7 @@ Desde 2026-06-30 existe el slash command **`/release`** ([.claude/commands/relea
 | `/release <sha>` | Release apuntando a un SHA específico |
 | `/release rollback` | Modo rollback (decision tree severidad → `pnpm release:rollback` con dry-run primero) |
 | `/release watchdog` | Corre `pnpm release:watchdog --json` y reporta drift |
+| `/release workers` | Corre `pnpm release:workers` — estado + `GIT_SHA` de los 4 Cloud Run |
 | `/release drift` | Diagnóstico de `worker_revision_drift` + re-intento del orquestador |
 | `/release break-glass <razón>` | Modo incidente (requiere tu aprobación explícita + razón + plan documentado) |
 

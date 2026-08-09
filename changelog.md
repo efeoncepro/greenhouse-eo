@@ -7,6 +7,39 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-09 — El gate que aprobaba sin mirar (TASK-1676, cierra ISSUE-145)
+
+El `release_batch_policy` del preflight comparaba contra `origin/main`. Pero el orquestador lo corre
+con el `target_sha` ya mergeado en `main`, así que el rango quedaba vacío y el check devolvía `ship`
+sin haber mirado un solo archivo. No era una hipótesis: los `preflight-result.json` de tres releases
+consecutivos reportan `filesChanged=0, decision=ship`, y uno de ellos llevaba 1045 archivos y 14
+migraciones. Un gate que grita de más hace perder tiempo; uno que nunca grita entrega una seguridad
+que no existe.
+
+La base pasa a ser el `target_sha` del último manifest en estado `released` para la rama. El filtro
+por estado no es cosmético: en este repo conviven dos manifests con el mismo `target_sha`, uno
+`aborted` y uno `released`, y el helper que ya existía no filtraba. De paso, `rolled_back` queda
+excluido solo, así que el ancla nunca apunta a código que se sacó de producción.
+
+El invariante quedó formulado sobre el resultado y no sobre la base, que es más fuerte de lo que pedía
+la issue: **un diff vacío nunca es aprobación**, venga de donde venga el ancla. Eso permite conservar
+el fallback a la HEAD de la rama sin reabrir el agujero — y hace falta, porque los 75 manifests son de
+`main` y un preflight sobre otra rama habría quedado mudo para siempre.
+
+El marker `[release-coupled: …]` tenía el problema simétrico: nunca se leía donde el runbook decía, y
+al mismo tiempo lo disparaba cualquier mención en prosa dentro de los ~509 commits del rango — 442 KB
+donde una cita basta, y donde el marker desactiva de una sola vez TODA la detección de mezcla de
+dominios. Se cerró con dos candados: la regex exige que el marker abra la línea, y el texto donde se
+busca es sólo el cuerpo del commit objetivo. El caso de regresión más elocuente resultó ser el commit
+que creó la task para arreglar el defecto: al describirlo, lo disparaba.
+
+Aparte, `pnpm release:workers`. En el release del 2026-08-08/09 fallaron tres comandos copiados de la
+documentación y ninguno de los envueltos en `pnpm`. Un wrapper se arregla una vez y el uso diario lo
+ejercita; un snippet en markdown es un fósil que nadie corre hasta el incidente, y ahí el operador no
+puede distinguir "comando viejo" de "sistema roto".
+
+Verificado contra el batch real: el check pasó de no ver nada a clasificar 65 archivos citando su base.
+
 ## 2026-08-09 — El menú del portal cliente ya puede mostrar un módulo contratado (TASK-1675)
 
 El portal cliente tenía dos carriles de verdad que nunca se tocaban: el gate de cada page leía
@@ -1160,20 +1193,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
 - **Queda abierto para diseño:** si coral y magenta merecen rol (coral está a **14°** del rojo de
   `danger`), y si scrim/escenario se canoniza en AXIS como grupo **sin variante por modo** — que la firma
   del token impida el error, en vez de un comentario que pida no cometerlo.
-
-## 2026-07-31 — Globe: modo claro promovido (entrada previa del mismo día)
-
-- **El modo claro está en producción.** PR #8 mergeado (`f3357d2`) y desplegado en `globe-studio-internal`
-  rev `00118-cfh`; el guardrail del propio workflow confirma que la imagen se construyó desde ese SHA.
-  Falta sólo la verificación visual del operador — la superficie está tras SSO.
-- **El lecho de las piezas** (PR #25) retira el último sobreviviente de la paleta jubilada: una función
-  que derivaba un tono del id de cada pieza, con su ventana anclada al cian `#4db8ff` que ADR-017 v2.0
-  retiró. Ningún guard podía verlo — no hay azul *escrito*, hay una receta que lo fabrica en runtime.
-  Ahora es un token, con familia **magenta** elegida por medición: orchid no está libre (es el acento) y
-  coral está a 14° del rojo de error.
-- **Todo paquete que compila, compila antes de testear** (PR #15). Ocho de diez tenían el agujero, y el
-  `test` raíz construía al consumidor antes que a sus dependencias — desde un `dist` limpio nunca
-  funcionó. Gate nuevo para que el paquete once no pueda olvidarlo.
-- 🔴 **Drift encontrado:** AXIS declara **tres** familias de acento para Globe (Coral, Magenta, Orchid) y
-  **sólo orchid llegó al código**. `TASK-1615` lo cierra; mientras tanto la rampa magenta vive local en
-  Globe como deuda declarada, no como drift silencioso.

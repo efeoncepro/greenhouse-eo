@@ -44,7 +44,7 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
  *   `organizationId` del request se valida contra el binding — NUNCA lo sobreescribe.
  * - Binding `internal` (operador máquina — gateway, Nexa interna): `organizationId`
  *   viene como query param requerido.
- * - En AMBOS casos: entitlement per-org (`module_assignments` `seo_v1` vigente) o
+ * - En AMBOS casos: entitlement per-org (`module_assignments` `seo_v2` vigente) o
  *   **404 anti-oracle** — un binding sin entitlement no aprende si la org existe.
  */
 
@@ -115,7 +115,7 @@ const resolveSeoLaneSubject = async (
   const entitlement = await resolveSeoEntitlement(organizationId)
 
   if (!entitlement.hasModule) {
-    // Anti-oracle: sin módulo `seo_v1` vigente, el recurso "no existe" para este binding.
+    // Anti-oracle: sin módulo `seo_v2` vigente, el recurso "no existe" para este binding.
     throw new ApiPlatformError('SEO resource not found for the resolved scope.', {
       statusCode: 404,
       errorCode: 'not_found'

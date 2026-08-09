@@ -382,7 +382,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     )
   },
   // TASK-1645 — Growth SEO (read-only, MCP-first). Los tres tools delegan en el lane
-  // ecosystem (entitlement per-org seo_v1 + anti-oracle server-side); cero lógica de
+  // ecosystem (entitlement per-org seo_v2 + anti-oracle server-side); cero lógica de
   // dominio acá. Las degradaciones honestas del reader (disabled / target_not_configured /
   // no_seo_data / no_aeo_data) llegan en data.ok=false — el agente NO debe inventar datos.
   async getSeoKeywordOpportunities(input: { organizationId?: string; limit?: number }) {

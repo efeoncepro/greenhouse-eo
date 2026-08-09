@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Bajo`
@@ -269,3 +269,118 @@ Sin flag. El cutover es el propio orden de los slices.
 ## Open Questions
 
 1. ¿Se retira `seo_v1` del catálogo `modules`? Propuesta: **no**. La tabla es append-only y la fila es historia legítima; lo que se cierra son los assignments, no el registro de que esa clave existió.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 5 — DELTA DE EJECUCIÓN (2026-08-09)
+     ═══════════════════════════════════════════════════════════ -->
+
+## Delta de ejecución 2026-08-09 — Slice 1 hecho, Slices 2 y 3 son post-deploy
+
+**Estado: `code complete, rollout pendiente`.** No es una task a medias por falta de tiempo: es lo que
+el propio Slice ordering impone — *"entre Slice 1 y Slice 2 hay que desplegar y verificar"*.
+
+### Slice 1 — hecho
+
+`SEO_MODULE_KEYS_READ` pasa a `['seo_v2']`. Lectura y escritura vuelven a ser la misma clave.
+
+**Precondición verificada contra PG antes de tocar el código** (no asumida): las dos organizaciones con
+SEO —`org-2df565fb…` (Efeonce) y `org-32333527…` (Grupo Berel)— tienen **ambas** claves vigentes en
+estado `active`. Ninguna depende sólo de `seo_v1`, así que dejar de leerla no le quita el módulo a
+nadie.
+
+El assert del test no se borró: cambió de significado. Era el guardián de la ventana; ahora declara
+que cerró. Y el guardrail que escanea migraciones nuevas —el que impide superseder una clave que el
+código todavía lee— **se auto-habilitó con este commit**: recién ahora deja pasar la migración del
+contract. La secuencia no depende de que alguien se acuerde.
+
+Barrido adicional no previsto: 17 comentarios y descripciones seguían nombrando `seo_v1` como la clave
+del entitlement, **incluida la descripción de una tool MCP que un LLM consumidor lee** para decidir si
+la organización tiene el módulo. Eso ya no era documentación desactualizada: era una afirmación falsa
+sobre el sistema, servida a un agente.
+
+### Por qué el Slice 2 NO se hizo hoy — dos razones independientes
+
+1. **El ordering lo prohíbe.** Aplicar la migración contra un runtime que todavía corre el array viejo
+   funcionaría (aceptaría ambas claves), pero verificar entre pasos es lo que convierte esto en un
+   cutover y no en una apuesta.
+2. **El preflight lo bloquearía.** El check `postgres_migrations` es estricto: una migración commiteada
+   y no aplicada es `pending` ⇒ error ⇒ release bloqueado. Y aplicarla antes del deploy es justo lo que
+   el punto 1 prohíbe. O sea: la migración **no puede viajar en el mismo release que el código**.
+
+### Secuencia exacta para quien retome
+
+1. Promover el release que lleva el Slice 1 y esperar que quede `released`.
+2. Verificar con el canary del provider contra el host de producción — **no con un `SELECT`**. Esa fue
+   la causa de método del incidente original.
+3. Recién entonces: `pnpm migrate:create task-1677-seo-module-cutover-contract`, pegar el SQL de abajo,
+   `pnpm migrate:up`, y commitear archivo + tipos juntos.
+4. Canary de nuevo. Después, Slice 3 (cerrar `ISSUE-143`, retirar el pendiente de `TASK-1310`,
+   actualizar §10.7 de la arquitectura).
+
+### SQL del Slice 2, redactado y con su verificación
+
+Se deja escrito para que no se re-derive bajo presión. **No está aplicado.** El `DO` no es decorativo:
+si alguna organización quedara sin cobertura, aborta la transacción entera.
+
+```sql
+-- Up Migration
+
+-- Fase CONTRACT del cutover `seo_v1 → seo_v2` (TASK-1677, cierra ISSUE-143).
+--
+-- Escribe fuera del command canónico a propósito: no es una decisión comercial sobre
+-- una organización —que es lo que los commands gobiernan— sino el cierre de una ventana
+-- de migración técnica que el propio sistema abrió. El command no tiene una operación
+-- para "supersedé la clave vieja de todos".
+--
+-- NUNCA DELETE: el contract es `effective_to`, que preserva la historia.
+UPDATE greenhouse_client_portal.module_assignments
+   SET effective_to = CURRENT_DATE,
+       updated_at = now()
+ WHERE module_key = 'seo_v1'
+   AND effective_to IS NULL;
+
+DO $$
+DECLARE
+  v1_vigentes int;
+  sin_cobertura int;
+BEGIN
+  SELECT count(*) INTO v1_vigentes
+    FROM greenhouse_client_portal.module_assignments
+   WHERE module_key = 'seo_v1' AND effective_to IS NULL;
+
+  IF v1_vigentes > 0 THEN
+    RAISE EXCEPTION 'TASK-1677: quedan % assignments seo_v1 vigentes tras el contract', v1_vigentes;
+  END IF;
+
+  -- La verificación que importa: nadie perdió el módulo. Toda organización que tenía SEO
+  -- por la clave vieja tiene que conservarlo por la nueva.
+  SELECT count(DISTINCT a1.organization_id) INTO sin_cobertura
+    FROM greenhouse_client_portal.module_assignments a1
+   WHERE a1.module_key = 'seo_v1'
+     AND a1.effective_to = CURRENT_DATE
+     AND NOT EXISTS (
+       SELECT 1 FROM greenhouse_client_portal.module_assignments a2
+        WHERE a2.organization_id = a1.organization_id
+          AND a2.module_key = 'seo_v2'
+          AND a2.effective_to IS NULL
+          AND a2.status IN ('active', 'pilot'));
+
+  IF sin_cobertura > 0 THEN
+    RAISE EXCEPTION 'TASK-1677: % organizacion(es) quedarian sin SEO tras el contract', sin_cobertura;
+  END IF;
+END
+$$;
+
+-- Down Migration
+
+-- Reabre la ventana. `effective_to = CURRENT_DATE` es la firma de este contract; acotar
+-- por fecha evita resucitar assignments que se cerraron por otra razón.
+UPDATE greenhouse_client_portal.module_assignments
+   SET effective_to = NULL,
+       updated_at = now()
+ WHERE module_key = 'seo_v1'
+   AND effective_to = CURRENT_DATE;
+```
+
+Estado medido al 2026-08-09: **2 assignments `seo_v1` vigentes**, ambos con su `seo_v2` hermano
+`active`. La migración debería afectar 2 filas y el `DO` pasar sin excepción.

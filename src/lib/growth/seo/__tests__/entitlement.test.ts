@@ -304,22 +304,22 @@ describe('enforceSeoRunEntitlement', () => {
   })
 })
 
-describe('cutover seo_v1 → seo_v2 (expand/contract, TASK-1310)', () => {
-  it('las LECTURAS aceptan ambas claves y la de ESCRITURA es sólo v2', async () => {
+describe('cutover seo_v1 → seo_v2 (expand/contract — CERRADO en código por TASK-1677)', () => {
+  it('la ventana está cerrada: lectura y escritura son la misma clave', async () => {
     const { SEO_MODULE_KEY, SEO_MODULE_KEYS_READ } = await import('../entitlement')
 
     // La escritura nace en la clave nueva: una asignación creada hoy es `seo_v2`.
     expect(SEO_MODULE_KEY).toBe('seo_v2')
 
-    // La lectura acepta ambas mientras dure el cutover. Este assert NO es decorativo:
-    // existe para que sacar `seo_v1` sea una decisión explícita —la fase de contracción,
-    // cuando ya no queden assignments v1 vigentes— y no un descuido que apague el módulo
-    // y, con él, los tres batches que le pagan al proveedor.
-    expect([...SEO_MODULE_KEYS_READ]).toEqual(['seo_v2', 'seo_v1'])
+    // Este assert dejó de ser el guardián de la ventana y pasó a declarar que cerró.
+    // Mientras duró el cutover fijaba `['seo_v2', 'seo_v1']` para que sacar la clave vieja
+    // fuera una decisión explícita y no un descuido que apagara el módulo y, con él, los
+    // tres batches que le pagan al proveedor. Ahora fija lo contrario: volver a agregar
+    // `seo_v1` sería reabrir una ventana cerrada, y eso es un expand nuevo con su task.
+    expect([...SEO_MODULE_KEYS_READ]).toEqual(['seo_v2'])
 
-    // El orden importa: `resolveSeoEntitlement` ordena por `created_at DESC` y toma 1, así
-    // que si una org tuviera ambas vigentes gana la más reciente; la lista sólo declara
-    // qué se acepta, no cuál prevalece.
+    // Lectura y escritura convergieron, que es la definición de que el cutover terminó.
+    expect(SEO_MODULE_KEYS_READ).toHaveLength(1)
     expect(SEO_MODULE_KEYS_READ[0]).toBe(SEO_MODULE_KEY)
   })
 

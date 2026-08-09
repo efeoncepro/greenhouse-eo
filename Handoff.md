@@ -1,17 +1,67 @@
 # Handoff activo
 
+### TASK-1677 — el cutover SEO cerró en código; la migración es post-deploy
+
+`code complete, rollout pendiente`. Slice 1 hecho: `SEO_MODULE_KEYS_READ = ['seo_v2']`.
+
+**Lo que necesita quien siga — la secuencia importa y no es negociable:**
+
+1. **La migración NO puede ir en el mismo release que el código**, por dos razones independientes:
+   el ordering exige desplegar y verificar entre pasos, y el check `postgres_migrations` del preflight
+   es estricto (un archivo commiteado sin aplicar es `pending` ⇒ error ⇒ release bloqueado). Aplicarla
+   antes del deploy es justo lo que el ordering prohíbe.
+2. Secuencia: promover → **canary del provider contra producción, NO un `SELECT`** (esa fue la causa
+   de método del incidente original) → `pnpm migrate:create` con el SQL ya redactado en la task →
+   `migrate:up` → canary otra vez → Slice 3 (cerrar `ISSUE-143`, retirar el pendiente de `TASK-1310`,
+   §10.7 de la arquitectura).
+3. El SQL del Slice 2 **ya está escrito y verificado** en el §Delta de la task, con su bloque `DO` que
+   aborta si alguna organización quedara sin cobertura. Estado medido: 2 assignments `seo_v1` vigentes,
+   ambos con su `seo_v2` hermano `active`.
+4. El guardrail de `entitlement.test.ts` que impide superseder una clave que el código todavía lee
+   **se auto-habilitó** con el Slice 1: recién ahora deja pasar esta migración. La secuencia no depende
+   de que alguien se acuerde.
+
+
+### TASK-1676 — el gate de release dejó de aprobar sin mirar (cierra ISSUE-145)
+
+Cerrada en `develop`. El `release_batch_policy` comparaba contra `origin/main` y el orquestador lo
+corre con el `target_sha` ya mergeado: rango vacío, `ship` silencioso. Ahora ancla al `target_sha`
+del último manifest `released`.
+
+**Lo que necesita quien siga:**
+
+1. 🔴 **El próximo release va a pedir break-glass, y no es un bug.** Con el gate arreglado, el
+   preflight del batch actual reporta `requires_break_glass` por `cloud_release: 6` — y los 6 archivos
+   son el propio fix del gate. El gate está detectando que el batch mezcla trabajo funcional del portal
+   cliente (TASK-1675) con un cambio del control plane (TASK-1676), que es exactamente lo que la spec
+   de 1676 declaraba: *"va en su propio release, no mezclado con trabajo funcional"*. **Lo limpio son
+   dos releases: primero 1676 sola, después el funcional.**
+2. **Un `filesChanged=0` ya no es aprobación: es `unknown`.** Si lo ves, o el target coincide con el
+   último release desplegado, o la base no se pudo resolver. El summary dice contra qué base comparó y
+   de qué release id salió — el artefacto por fin es auditable.
+3. **El marker `[release-coupled: …]` cambió de formato y ahora es estricto.** Tiene que ABRIR una
+   línea del cuerpo del squash, y se lee SÓLO de ese commit. Un marker a mitad de línea ya no cuenta.
+   Antes bastaba mencionarlo en cualquier commit del rango — y una cita en prosa neutralizaba
+   `split_batch` para un batch entero.
+4. **Open Question viva, y es de proceso, no de código:** el classifier marca `requires_break_glass`
+   ante UN SOLO dominio irreversible, sin mezcla. La matriz del runbook §2.2 considera legítimo un
+   release de migración acoplado a su consumer. Con el gate arreglado eso deja de ser teórico: todo
+   release que toque `src/lib/release/**`, `migrations/` o `.github/workflows/` va a pedir break-glass.
+   O se relaja la severidad, o se endurece la matriz.
+5. **`pnpm release:workers`** reemplaza el `gcloud run services describe` crudo del runbook §4.1 (el
+   que crasheaba con `TransformFilter()`). Si falla por flags, cambió la herramienta: se corrige el
+   wrapper, no cada bloque de doc.
+6. La lista forense de `ignored-pending-runs.ts` quedó **vacía**: el run 31126022507 se verificó por
+   API como `cancelled`.
+
+
 ### TASK-1675 — el menú del portal cliente ya compone sus módulos (code complete, rollout pendiente)
 
 Cerrada en `develop`. El menú del cliente leía `authorizedViews` mientras el gate de cada page leía
 `module_assignments`: un módulo contratado funcionaba y era inalcanzable salvo escribiendo la URL.
 Ahora el layout resuelve per-org server-side y `VerticalMenu` hace merge **aditivo**.
 
-Auditada con `seo-aeo` y `greenhouse-ui-review`: el orden de la lista ganó un tercer eje —**valor de
-búsqueda**, ortogonal a la severidad— porque sin él la higiene de sitio ascendía por puro alcance
-(favicon en 91 páginas por encima de `alt` en 50), y los checks de performance ahora declaran que son
-medición de **laboratorio** (Google rankea con datos de campo). Queda declarada, sin dueño, una
-cobertura que el audit NO tiene: acceso de crawlers de IA en `robots.txt`, ausencia de JSON-LD,
-conflicto noindex+robots y salud de sitemap.
+**Lo que necesita quien siga:**
 
 1. **El rollout NO está cerrado: espera la promoción `develop → main`.** Mientras el catálogo TS viva
    sólo en `develop`, `syncViewRegistryCatalog` apaga esos viewCodes desde cualquier runtime con
@@ -519,50 +569,3 @@ deploya el mismo SHA — converge inofensivo. Runbook:
 verificado con el cliente real). Se conserva sólo la causa: el cliente MCP de Claude exige DCR
 (RFC 7591) para auto-registrarse y **Entra no lo soporta**, así que sin el shim `/register` del
 gateway falla con `Incompatible auth server: does not support dynamic client registration`.
-
-### Efeonce dejó de ser cliente de sí misma — modelado corregido (2026-08-06)
-
-`EO-ORG-0007` (Efeonce, `is_operating_entity=true`) tenía `organization_type='client'`, herencia
-del space de cliente de **marzo 2026** — de cuando aún no se había decidido que la operadora no
-es cliente. No lo causó el dogfooding SEO: el script de provisión no escribe en `organizations`,
-y la única transición registrada es `null → inactive` del 2026-04-21 (backfill TASK-535).
-
-**Qué exponía.** 5 readers filtran `organization_type IN ('client','both')` **sin consultar el
-flag**: lista y detalle de `/finance/clients`, `finance/canonical.ts`, el backfill de
-`client_profiles` y el picker del wizard de onboarding. Efeonce salía **primera** de 17 clientes
-(orden por `updated_at DESC`). Y `resolveFinanceClientContext` la aceptaba como cliente
-facturable, siendo la misma org el emisor fiscal — autofacturación posible. Daño consumado
-verificado: **0 income, 0 contratos, 0 usuarios de portal**. Puerta abierta, no incendio.
-
-**Corregido** con `scripts/commercial/reset-organization-commercial-role.ts` (nuevo): baja el rol
-a `'other'` por el writer canónico. Hizo falta una puerta dedicada porque
-**`deriveOrganizationType` es monótona** — nunca degrada un rol adquirido, así que un
-`upsertCanonicalOrganization` normal lo perpetúa (mi escritura de `website_url` de ese mismo día
-lo hizo). El script declara `currentType='other'` explícitamente, con guardas: aborta si el
-lifecycle implica rol real o si hay income.
-
-**Verificado tras el cambio:** `organization_type='other'`, `is_operating_entity=true` intacto,
-2 `module_assignments` intactos, y el canary SEO contra producción sigue devolviendo
-`hasModule=true tier=contracted 8 audits $50`.
-
-**El modelo ya soportaba esto — no había que inventar nada.** Tres ejes ortogonales: identidad
-legal (`is_operating_entity`), rol comercial (`organization_type`) y capabilities
-(`module_assignments`). La operadora monitorea su propio SEO/AEO/GA4 por el tercer eje;
-`enforceSeoRunEntitlement` resuelve sólo por `organization_id` + `module_key`, cero dependencia
-del tipo. `'other'` no significa "sin clasificar": significa **sin rol comercial**, que es lo
-que la operadora es. Contrato semántico escrito en `GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md`
-§Organization Types, junto con el **NUNCA** de agregar un valor de identidad al enum (ya se
-intentó: quedó una rama muerta contra `'efeonce_internal'`, que es un `tenant_type` de usuarios,
-no un tipo de organización).
-
-**Follow-ups con dueño:** `TASK-1648` (guard por flag en los 5 readers — cierra la causa),
-`TASK-1649` (el `space` y `client_profile` de marzo, con inventario antes de tocar),
-`TASK-1650` (el emisor legal de cotizaciones compartidas: query a columnas inexistentes +
-`catch` mudo ⇒ todo quote imprime un hardcode; incluye la discrepancia `of 05` vs `Of 1105`).
-
-**Pendiente de decisión tuya:** el merge/borrado en HubSpot de las auto-companies `efeonce.org`
-(56011409567) y `efeonce` (57099835819). La canónica **nunca estuvo en HubSpot**
-(`hubspot_company_id` es `null`); esas dos son auto-companies creadas desde el dominio del correo
-de formularios de prueba. Mergear exigiría *crear* una company canónica de Efeonce, que es
-justo lo que no debe existir — corresponde borrarlas, y primero en HubSpot (si se borran sólo en
-Greenhouse, el sync las repone). Sin exclusión de dominios internos en el inbound, vuelven.

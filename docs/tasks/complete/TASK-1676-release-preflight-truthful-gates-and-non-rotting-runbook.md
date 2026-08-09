@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -340,16 +340,16 @@ Ninguna. Sin secretos, sin env vars, sin redeploy de workers, sin cambios de inf
 
 ## Acceptance Criteria
 
-- [ ] El `preflight-result.json` de un release real reporta `filesChanged > 0` y dominios reales, en vez de `Diff vacio respecto a origin/main`
-- [ ] Sin release previo en `release_manifests`, el check devuelve `unknown` y **no** `ship`
-- [ ] El reader sólo considera manifests en estado `released` para la rama objetivo
-- [ ] El evidence declara explícitamente qué base se usó para el diff
-- [ ] Un marker `[release-coupled: …]` en el cuerpo del commit de squash neutraliza `split_batch`
-- [ ] El literal `[release-coupled: ...]` citado en prosa dentro de `aea35a678` **no** lo neutraliza (test de regresión)
-- [ ] `pnpm release:workers` imprime estado + `GIT_SHA` de los 4 workers y funciona con la versión actual de `gcloud`
-- [ ] Runbook y manual del orquestador citan el wrapper antes que el CLI crudo
-- [ ] La entrada del run `31126022507` ya no está en `ignored-pending-runs.ts`
-- [ ] El SQL del reader se ejercitó al menos una vez contra PG real, no sólo con mocks
+- [x] El `preflight-result.json` de un release real reporta `filesChanged > 0` y dominios reales, en vez de `Diff vacio respecto a origin/main`
+- [x] Sin release previo en `release_manifests`, el check devuelve `unknown` y **no** `ship`
+- [x] El reader sólo considera manifests en estado `released` para la rama objetivo
+- [x] El evidence declara explícitamente qué base se usó para el diff
+- [x] Un marker `[release-coupled: …]` en el cuerpo del commit de squash neutraliza `split_batch`
+- [x] El literal `[release-coupled: ...]` citado en prosa dentro de `aea35a678` **no** lo neutraliza (test de regresión)
+- [x] `pnpm release:workers` imprime estado + `GIT_SHA` de los 4 workers y funciona con la versión actual de `gcloud`
+- [x] Runbook y manual del orquestador citan el wrapper antes que el CLI crudo
+- [x] La entrada del run `31126022507` ya no está en `ignored-pending-runs.ts`
+- [x] El SQL del reader se ejercitó al menos una vez contra PG real, no sólo con mocks
 
 ## Verification
 
@@ -362,14 +362,14 @@ Ninguna. Sin secretos, sin env vars, sin redeploy de workers, sin cambios de inf
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] `ISSUE-145` movida a `docs/issues/resolved/` con su §Resolución y fila del índice actualizada
-- [ ] Ambas skills (`.claude` + `.codex`) actualizadas y **byte-idénticas** entre sí
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `ISSUE-145` movida a `docs/issues/resolved/` con su §Resolución y fila del índice actualizada
+- [x] Ambas skills (`.claude` + `.codex`) actualizadas y **byte-idénticas** entre sí
 - [ ] Verificado que `Handoff.md` y `changelog.md` conservan su entrada **después** del merge `main`→`develop` (el `-X ours` los descarta; las dos verificaciones del gotcha #1 no lo detectan porque sólo miran carpetas de código)
 
 ## Follow-ups
@@ -382,3 +382,80 @@ Ninguna. Sin secretos, sin env vars, sin redeploy de workers, sin cambios de inf
 
 - ¿El gate debe **bloquear** desde el primer release con la base nueva, o correr una vez en modo observación para medir cuántos releases históricos habría frenado? Recomendación: observar uno, luego bloquear.
 - ¿La severidad ante un único dominio irreversible se relaja a `warning` para alinearse con la matriz del runbook, o la matriz se endurece para alinearse con el código? Es una decisión del operador, no del implementador.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 5 — DELTA DE EJECUCIÓN (2026-08-09)
+     ═══════════════════════════════════════════════════════════ -->
+
+## Delta de ejecución 2026-08-09
+
+### Lo que la ejecución cambió respecto de la spec
+
+**1. El invariante se reformuló sobre el RESULTADO, no sobre la base.** La spec pedía "sin release
+previo ⇒ `unknown`". Se implementó algo más fuerte: **un diff vacío nunca es aprobación**, venga de
+donde venga el ancla. Dos razones. Cubre un caso que la formulación original dejaba abierto —base
+nueva presente pero target idéntico al release anterior—; y permite conservar el fallback a
+`origin/<branch>` sin reabrir el agujero, cosa que importa porque **los 75 manifests son de `main`**
+(medido) y un preflight exploratorio sobre otra rama habría quedado `unknown` para siempre.
+
+**2. El marker se cerró con DOS candados, no uno.** La spec proponía "inicio de línea y/o sólo desde
+el commit de merge". Hacen falta los dos: re-anclar la base mete el squash en rango, pero mete con él
+los ~509 commits que lo preceden —442 KB de prosa medidos— donde una cita basta. Anclar la regex
+reduce el vector; leer sólo el cuerpo del `target_sha` lo cierra, y de paso hace verdad lo que el
+runbook §2.4 afirma desde siempre.
+
+**3. El caso de regresión más elocuente no estaba en la issue.** Además de `aea35a678`, la ventana
+contenía `6f3c833ed` — **el commit que creó esta task** — que al describir el defecto lo volvía a
+disparar. Los tres literales reales quedaron fijados como tests.
+
+**4. Defecto 4 de la issue (dirección del cambio) NO se implementó.** El `--name-status` para
+distinguir "agrega" de "revierte" queda como follow-up. El objetivo de fondo —que el artefacto sea
+auditable— sí se cubrió con `diffBase`/`diffBaseSource`/`diffBaseReleaseId`.
+
+### Un test que probaba un dato, no un mecanismo
+
+Retirar la entrada muerta de `ignored-pending-runs.ts` puso rojos dos tests **sin que el código
+cambiara**: usaban el `runId` real de la única entrada operativa. Eran el test de regresión de un dato
+caducable, no del mecanismo de exclusión. Ahora la lista se inyecta como fixture. Vale registrarlo
+porque es una clase de bug, no un caso: un gate o un test que se rompe cuando caduca un dato operativo
+está midiendo la cosa equivocada.
+
+### Verificación contra el batch real
+
+| Antes | Después |
+|---|---|
+| `filesChanged=0, decision=ship` (post-merge, tres releases seguidos) | **65 archivos clasificados**, citando base y release id en el summary |
+| El artefacto no permitía distinguir "release vacío" de "base mal" | `diffBase` + `diffBaseSource` + `diffBaseReleaseId` en el evidence |
+
+La primera corrida real reportó `requires_break_glass` por `cloud_release: 6`, **y los 6 archivos son
+el propio fix del gate**. O sea: el gate detectó que el batch mezclaba trabajo funcional del portal
+cliente con un cambio del control plane — que es exactamente lo que §Architecture Alignment de esta
+task ya declaraba ("va en su propio release, no mezclado con trabajo funcional"). El gate no está
+fallando: está diciendo la verdad por primera vez.
+
+### Gates ejecutados
+
+| Gate | Resultado |
+|---|---|
+| `pnpm local:check` | verde |
+| `pnpm vitest run src/lib/release/` | 227 passed · 0 failed |
+| `pnpm test` (suite completa) | ver cierre |
+| `pnpm build` (producción) | ver cierre |
+| SQL del reader contra PG real | verde — `e048ef3a47e9…` para `main` saltando el manifest abortado; `null` para `develop` |
+| `pnpm release:workers` contra Cloud Run real | los 4 workers `Ready=True` sirviendo `e048ef3a47e9` |
+| `pnpm release:preflight` contra el batch real | 65 archivos clasificados con base declarada |
+
+### Estado de rollout
+
+`code complete`. El fix es de un gate de solo lectura y no toca runtime de producto, pero su
+verificación productiva sólo existe cuando el orquestador corre con él: leer el
+`preflight-result.json` del siguiente release y confirmar `filesChanged > 0` con la base declarada.
+
+### Open Question que queda viva y es del operador
+
+El classifier marca `requires_break_glass` ante **un único** dominio irreversible, sin que haya mezcla
+de dominios. La matriz del runbook §2.2 considera legítimo un release de migración acoplado a su
+consumer directo. Con el gate arreglado esa diferencia deja de ser teórica: **todo release que toque
+`src/lib/release/**`, `migrations/` o `.github/workflows/` va a pedir break-glass**. O se relaja la
+severidad para un único dominio, o se endurece la matriz del runbook. Es decisión de proceso, y la
+spec la dejó Out of Scope a propósito.

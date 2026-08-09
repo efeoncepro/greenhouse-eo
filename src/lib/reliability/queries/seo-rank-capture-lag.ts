@@ -58,9 +58,11 @@ export const getSeoRankCaptureLagSignal = async (): Promise<ReliabilitySignal> =
   const observedAt = new Date().toISOString()
 
   try {
-    // Dual-read del cutover `seo_v1 → seo_v2` (TASK-1310). Este reader tenía la clave
-    // NUEVA hardcodeada mientras la base sigue en la vieja: veía 0 orgs y reportaba
-    // `ok` — un falso sano, que es justo lo que un detector de lag no puede hacer.
+    // Consume la constante y no una clave hardcodeada — que es la lección de TASK-1310:
+    // este reader tenía la clave NUEVA fija mientras la base seguía en la vieja, veía 0
+    // orgs y reportaba `ok`. Un falso sano, que es justo lo que un detector de lag no
+    // puede hacer. Al cerrarse el cutover en código (TASK-1677) la lista se contrajo a
+    // `['seo_v2']` sola, sin tocar este archivo: ésa es la propiedad que se quería.
     const rows = await query<LagRow>(QUERY_SQL, [[...SEO_MODULE_KEYS_READ]])
 
     const total = rows.length

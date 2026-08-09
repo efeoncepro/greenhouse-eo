@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic'
  * por impresiones y CTR del período + ventana previa comparable + serie diaria).
  *
  * Lane machine-authed del ecosystem: org por binding (org-scoped manda, internal exige
- * `organizationId`), entitlement per-org `seo_v1` con 404 anti-oracle. Passthrough del
+ * `organizationId`), entitlement per-org `seo_v2` con 404 anti-oracle. Passthrough del
  * reader canónico `readSeoOverviewKpis` — la UI y Nexa/MCP consumen EL MISMO cálculo,
  * así que la posición ponderada nunca se re-implementa por consumer (Full API Parity).
  */

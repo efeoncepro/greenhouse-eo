@@ -452,22 +452,30 @@ Checklist concreto cuando el operador pregunta si un worker "se skippeo":
 ```bash
 GITHUB_RELEASE_OBSERVER_TOKEN="$(gh auth token)" pnpm release:watchdog --json
 
-gcloud run services describe ico-batch-worker \
-  --project=efeonce-group --region=us-east4 \
-  --format=json | python3 -c "
-import sys,json
-d=json.load(sys.stdin)
-ready=[c.get('status') for c in d.get('status',{}).get('conditions',[]) if c.get('type')=='Ready']
-env=d.get('spec',{}).get('template',{}).get('spec',{}).get('containers',[{}])[0].get('env',[])
-sha=[e.get('value') for e in env if e.get('name')=='GIT_SHA']
-print('Ready=' + (ready[0] if ready else '?') + '  GIT_SHA=' + (sha[0][:12] if sha else 'ausente'))
-"
+# Estado + GIT_SHA de los 4 workers, uno por línea. Con --expected-sha marca los que
+# difieren (que NO es lo mismo que drift: ver la tabla de arriba).
+pnpm release:workers --expected-sha=<target_sha>
+```
 
-# NOTA (2026-08-09): la forma antigua con
-# --format="value(status.conditions.filter('type','Ready')...)" CRASHEA en el gcloud
-# actual ("TransformFilter() takes 2 positional arguments but 3 were given"). Usar el
-# JSON de arriba. Mismo bug class que `vercel ls --target=` -> `--environment=`:
-# comandos documentados que la herramienta dejó de aceptar.
+**Por qué acá va un wrapper y no `gcloud` crudo (TASK-1676).** En el release del
+2026-08-08/09 fallaron **tres** comandos copiados de esta documentación:
+`vercel ls --target=` (el flag pasó a `--environment` en el CLI 50.x), un
+`gcloud run services describe --format="value(...filter(...))"` que empezó a crashear
+(`TransformFilter() takes 2 positional arguments but 3 were given`), y un
+`vercel redeploy` que no hace lo que la doc prometía. **Ninguno de los comandos
+envueltos en `pnpm` falló.** Un wrapper es un lugar donde el cambio de una herramienta
+se arregla una vez y el uso diario lo ejercita; un snippet en markdown es un fósil que
+nadie corre hasta que hay un incidente — y ahí el operador no puede distinguir
+"comando viejo" de "sistema roto".
+
+Regla: **si `pnpm release:workers` falla por flags, la herramienta cambió — se corrige
+el wrapper, no cada bloque de la doc.** El `gcloud` crudo queda como último recurso
+cuando hay que inspeccionar algo que el wrapper no proyecta:
+
+```bash
+# Último recurso — inspección ad hoc de un servicio puntual.
+gcloud run services describe ico-batch-worker \
+  --project=efeonce-group --region=us-east4 --format=json
 ```
 
 Interpretacion:

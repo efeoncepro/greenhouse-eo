@@ -10,7 +10,7 @@ import { isSeoModuleEnabled } from '../flags'
  *
  * Plumbing de SUPERFICIE, no contrato de negocio: resuelve qué organizaciones puede
  * elegir el operador en el Space picker. La autoridad fina sigue siendo la misma que
- * usa el resto del dominio — un `module_assignment` de `seo_v1` vigente
+ * usa el resto del dominio — un `module_assignment` de `seo_v2` vigente
  * (`effective_to IS NULL AND status IN ('active','pilot')`), idéntico predicado al de
  * `listEligibleTargets` en `rank-capture-batch.ts` y al de `resolveSeoEntitlement`.
  *

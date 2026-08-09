@@ -3,7 +3,7 @@
 > **Tipo:** Incidente de tooling (release control plane)
 > **Ambiente:** CI (`production-release.yml` job de preflight) + local
 > **Detectado:** 2026-08-08, verificando el fix de `ISSUE-114`
-> **Estado:** open — causa raíz identificada y con seam localizado; fix no aplicado
+> **Estado:** resolved 2026-08-09 por `TASK-1676` — los tres defectos cerrados y verificados contra el batch real
 > **Severidad:** **alta** — un gate que siempre aprueba es peor que uno que molesta: entrega seguridad que no existe
 
 ## Resumen
@@ -148,3 +148,65 @@ commit de squash, de modo que el marker por fin se lee donde el runbook dice que
 - Un marker escrito en el cuerpo del squash **sí** neutraliza `split_batch`; el literal de
   `aea35a678` **no**.
 - Sin release previo en `release_manifests`, el check devuelve `unknown` y no `ship`.
+
+---
+
+## Resolución (2026-08-09, `TASK-1676`)
+
+Los tres defectos tenían una sola raíz y se cerraron juntos.
+
+**Defecto 1 — el check era decorativo en CI.** La base pasa a ser el `target_sha` del último manifest
+en estado `released` para la rama, vía un reader delgado (`src/lib/release/preflight/last-released-reader.ts`).
+El filtro por estado no es cosmético: en este repo conviven dos manifests con el `target_sha`
+`30140c662a79…`, uno `aborted` y uno `released`, y `listRecentReleases` no filtra. Como efecto lateral,
+`rolled_back` queda excluido solo — un release revertido deja de estar en `released`, así que el ancla
+nunca apunta a código que se sacó de producción.
+
+**El invariante quedó formulado sobre el resultado, no sobre la base.** La issue proponía "sin release
+previo ⇒ `unknown`". Se implementó algo más fuerte: **un diff vacío nunca es aprobación**, venga de
+donde venga el ancla. Cubre además el caso que la formulación original dejaba abierto (base nueva
+presente pero target idéntico al release anterior) y permite conservar el fallback a la HEAD de la rama
+sin reabrir el agujero — cosa que importa, porque los 75 manifests son de `main` y un preflight
+exploratorio sobre otra rama habría quedado mudo para siempre. Es `unknown` y no `error` a propósito:
+no se sabe que el batch esté mal, se sabe que no se pudo evaluar.
+
+**Defectos 2 y 3 — el marker.** Se cerraron con dos candados, porque uno solo no alcanzaba:
+
+1. La regex exige que el marker **abra la línea** (`/^\[release-coupled:[^\]]+\]/im`): una declaración,
+   no una mención.
+2. El texto donde se busca pasa a ser **el cuerpo del commit objetivo únicamente** (`git show -s`), en
+   vez de la ventana entera del rango.
+
+Re-anclar la base mete el squash en rango —que es lo que arregla el defecto 2— pero mete con él los ~509
+commits que lo preceden, o sea 442 KB de prosa donde una cita basta. Sólo el segundo candado cierra eso.
+Y hace verdad lo que el runbook §2.4 afirma desde siempre.
+
+El caso de regresión más elocuente no es el que documenta esta issue: además de `aea35a678`, la ventana
+contenía `6f3c833ed` — **el commit que creó `TASK-1676` para arreglar este defecto**, que al describirlo
+lo volvía a disparar. Los tres literales reales están fijados como tests.
+
+**Defecto 4 (dirección del cambio) — NO se implementó.** Lo que la issue pedía era `--name-status` para
+distinguir "el target agrega este archivo" de "el target lo revierte". El evidence sí gana ahora
+`diffBase`, `diffBaseSource` y `diffBaseReleaseId`, que era el objetivo real —que el artefacto sea
+auditable— pero la dirección por archivo queda pendiente. Se registra como follow-up en `TASK-1676`.
+
+## Verificación
+
+Contra el batch real del 2026-08-09, con la base nueva:
+
+- el check pasó de `filesChanged=0, decision=ship` a **65 archivos clasificados** citando su base y su
+  release id en el summary;
+- la primera corrida real reportó `requires_break_glass` por `cloud_release: 6`, y los 6 archivos son
+  **el propio fix del gate** — o sea, el gate detectó que el batch mezclaba trabajo funcional con un
+  cambio del control plane, que es exactamente lo que la spec de `TASK-1676` ya declaraba
+  ("va en su propio release, no mezclado con trabajo funcional");
+- el SQL del reader se ejercitó contra PG real: devolvió `e048ef3a47e9…` para `main` saltando el
+  manifest abortado, y `null` para `develop`.
+
+## Deuda adyacente: qué se llevó y qué quedó
+
+- **Se cerró:** la entrada muerta del run `31126022507` en `ignored-pending-runs.ts`, verificada por API
+  como `completed/cancelled`.
+- **Queda abierto:** `azure_wif_subject` sigue fallando abierto ante `Insufficient privileges`, y el
+  classifier sigue marcando `requires_break_glass` ante un único dominio irreversible, más estricto que
+  la matriz del runbook §2.2. Ambos quedan como follow-ups declarados en `TASK-1676`.

@@ -4,6 +4,30 @@ vi.mock('@/lib/reliability/queries/release-pending-without-jobs', () => ({
   listPendingRuns: vi.fn()
 }))
 
+/**
+ * TASK-1676 — la lista forense se inyecta como FIXTURE, no se lee la real.
+ *
+ * Antes, estos tests usaban el `runId` de la única entrada operativa vigente. Eso
+ * los volvía el test de regresión de un DATO caducable en vez del test del
+ * MECANISMO de exclusión: al retirar esa entrada —correctamente, porque el run ya
+ * estaba `cancelled`— dos tests se pusieron rojos sin que el código cambiara. Un
+ * test que se rompe cuando caduca un dato operativo está probando la cosa
+ * equivocada.
+ */
+const IGNORED_FIXTURE_RUN_ID = 8_888_888_888
+
+vi.mock('../ignored-pending-runs', () => ({
+  IGNORED_PENDING_RUNS: [
+    {
+      runId: 8_888_888_888,
+      reason: 'Fixture de test: run inmanejable con todas las vías de la API agotadas.',
+      addedAt: '2026-01-01',
+      expiresAt: '2999-01-01'
+    }
+  ],
+  activeIgnoredRunIds: () => new Set([8_888_888_888])
+}))
+
 import { listPendingRuns } from '@/lib/reliability/queries/release-pending-without-jobs'
 
 import { checkPendingWithoutJobs } from './pending-without-jobs'
@@ -77,12 +101,11 @@ describe('checkPendingWithoutJobs', () => {
     process.env.GITHUB_RELEASE_OBSERVER_TOKEN = 'fake'
     vi.mocked(listPendingRuns).mockResolvedValue([
       {
-        // Zombie del outage 2026-08-06 (entrada real de ignored-pending-runs.ts, vigente hasta 2026-08-21).
-        runId: 31126022507,
+        runId: IGNORED_FIXTURE_RUN_ID,
         workflowName: 'Ops Worker Deploy',
         status: 'queued',
         ageMs: 20 * 60 * 60 * 1000,
-        htmlUrl: 'https://github.com/x/y/actions/runs/31126022507',
+        htmlUrl: `https://github.com/x/y/actions/runs/${IGNORED_FIXTURE_RUN_ID}`,
         branch: 'develop',
         sha: '26005a619'
       }
@@ -94,7 +117,7 @@ describe('checkPendingWithoutJobs', () => {
     expect(result.summary).toContain('lista forense')
     expect(result.evidence).toMatchObject({
       count: 0,
-      ignored: [expect.objectContaining({ runId: 31126022507 })]
+      ignored: [expect.objectContaining({ runId: IGNORED_FIXTURE_RUN_ID })]
     })
   })
 
@@ -102,11 +125,11 @@ describe('checkPendingWithoutJobs', () => {
     process.env.GITHUB_RELEASE_OBSERVER_TOKEN = 'fake'
     vi.mocked(listPendingRuns).mockResolvedValue([
       {
-        runId: 31126022507,
+        runId: IGNORED_FIXTURE_RUN_ID,
         workflowName: 'Ops Worker Deploy',
         status: 'queued',
         ageMs: 20 * 60 * 60 * 1000,
-        htmlUrl: 'https://github.com/x/y/actions/runs/31126022507',
+        htmlUrl: `https://github.com/x/y/actions/runs/${IGNORED_FIXTURE_RUN_ID}`,
         branch: 'develop',
         sha: '26005a619'
       },

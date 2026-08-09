@@ -32,15 +32,17 @@ export interface IgnoredPendingRun {
   expiresAt: string
 }
 
-export const IGNORED_PENDING_RUNS: readonly IgnoredPendingRun[] = [
-  {
-    runId: 31126022507,
-    reason:
-      'Zombie del major outage de GitHub Actions 2026-08-06: re-run de ops-worker-deploy quedó en estado interno contradictorio ("Cannot cancel a workflow re-run that has not yet queued" + "This workflow is already running"). Agotados: cancel/force-cancel (409), DELETE (403), rerun (rechazado), desalojo por concurrency (run nuevo success, zombie intacto), workflow disable/enable (sin efecto). El worker ya sirve el SHA del run (26005a619) desde el break-glass documentado en Handoff 2026-08-06.',
-    addedAt: '2026-08-07',
-    expiresAt: '2026-08-21'
-  }
-]
+/**
+ * Vacía a propósito. La única entrada que tuvo esta lista fue el run `31126022507`
+ * (zombie del outage de GitHub Actions del 2026-08-06), y se retiró el 2026-08-09
+ * tras verificar por API que quedó `status=completed, conclusion=cancelled`: la
+ * exclusión ya no excluía nada.
+ *
+ * Se retira en vez de dejarla vencer sola porque una entrada inerte que igual se
+ * lee en cada preflight es ruido que el próximo operador tiene que descartar a
+ * mano, justo cuando está mirando por qué un release no pasa.
+ */
+export const IGNORED_PENDING_RUNS: readonly IgnoredPendingRun[] = []
 
 /** Ids vigentes (no vencidos) a excluir; `now` inyectable para tests. */
 export const activeIgnoredRunIds = (now: Date = new Date()): Set<number> => {
