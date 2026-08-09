@@ -157,7 +157,31 @@ export const INDEPENDENT_DOMAIN_PAIRS: ReadonlyArray<
  * two otherwise-independent sensitive domains. Required to bypass
  * `split_batch` decision when the mix is intentional.
  */
-export const RELEASE_COUPLED_MARKER_REGEX = /\[release-coupled:[^\]]+\]/i
+/**
+ * TASK-1676 / ISSUE-145 — Anclado a inicio de línea.
+ *
+ * La regex previa (`/\[release-coupled:[^\]]+\]/i`, sin ancla) se satisfacía con
+ * cualquier **mención** del literal en cualquier commit del rango, y el marker
+ * desactiva de una sola vez TODA la detección de mezcla de dominios sensibles
+ * (`classifier.ts` lo evalúa global, no por par). O sea: un fail-open silencioso
+ * disparable por prosa.
+ *
+ * No es hipotético. Medido sobre el batch en curso (2026-08-09), la ventana de
+ * commit bodies son 509 commits / 442 KB de prosa acumulada, y contiene tres
+ * commits que citan el literal — ninguno declarando un acoplamiento:
+ *
+ *   - `aea35a678` — «marker `[release-coupled: ...]` en el squash» (doc de growth/MCP);
+ *   - `6f3c833ed` — el commit que CREÓ esta misma task, describiendo el defecto;
+ *   - `4e07432a3` — `[release-coupled:]`, que no matchea por el `+` y sólo por eso.
+ *
+ * Es decir: la protección `split_batch` estuvo neutralizada por una cita, y la
+ * propia task que viene a arreglarlo la neutralizaba de nuevo al ser creada.
+ *
+ * El ancla exige que la línea EMPIECE con el marker: una declaración, no una
+ * mención. Es la mitad del cierre — la otra mitad es de dónde se lee el texto
+ * (sólo el cuerpo del commit de squash, ver `release-batch-policy.ts`).
+ */
+export const RELEASE_COUPLED_MARKER_REGEX = /^\[release-coupled:[^\]]+\]/im
 
 /**
  * Classify a single changed file. Returns first matched domain, or

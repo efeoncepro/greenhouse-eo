@@ -88,13 +88,30 @@ const collectChangedFiles = async (
     .filter(line => line.length > 0)
 }
 
-const collectCommitBodies = async (
-  baseRef: string,
-  targetSha: string
-): Promise<string> => {
-  // Format: %B = full commit message (subject + body) per commit, NUL separated.
-  // Same canonical base as the file diff — see buildReleaseDiffRange (ISSUE-114).
-  const stdout = await runGit(['log', '--format=%B%x00', buildReleaseDiffRange(baseRef, targetSha)])
+/**
+ * TASK-1676 / ISSUE-145 — El marker se lee SÓLO del commit objetivo.
+ *
+ * El runbook §2.4 siempre dijo que el `[release-coupled: …]` va «en el cuerpo del
+ * commit de squash, que es lo que el classifier del orquestador lee». Era falso en
+ * los dos caminos: post-merge `git log origin/main..target` era vacío y excluía el
+ * squash justamente por ser el extremo izquierdo; pre-merge el squash todavía no
+ * existía. Cuatro releases consecutivos escribieron ese marker convencidos de que
+ * hacía algo.
+ *
+ * Re-anclar la base (Slice 2) mete el squash en el rango, pero mete también los
+ * ~509 commits que lo preceden: 442 KB de prosa donde una cita accidental del
+ * literal desactiva la detección entera. Leer el marker únicamente del cuerpo de
+ * `target_sha` —que en el orquestador ES el commit de squash— cierra el vector y
+ * hace verdad lo que el runbook documenta.
+ *
+ * Consecuencia deliberada: en la corrida local pre-merge el marker no puede
+ * existir todavía, así que un `split_batch` local no es neutralizable ahí. Es el
+ * flujo correcto y ya documentado — el operador ve el `split_batch` en local,
+ * escribe el marker en el squash, y el orquestador lo lee.
+ */
+const collectMarkerSourceText = async (targetSha: string): Promise<string> => {
+  // %B = mensaje completo (subject + body) del commit objetivo, y sólo de él.
+  const stdout = await runGit(['show', '-s', '--format=%B', targetSha])
 
   return stdout
 }
@@ -160,7 +177,7 @@ export const checkReleaseBatchPolicy = async (
   try {
     const [changedFiles, commitBodyText] = await Promise.all([
       collectChangedFiles(baseRef, input.targetSha),
-      collectCommitBodies(baseRef, input.targetSha)
+      collectMarkerSourceText(input.targetSha)
     ])
 
     const baseLabel =

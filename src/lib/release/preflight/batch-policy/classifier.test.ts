@@ -63,13 +63,52 @@ describe('classifyReleaseBatch', () => {
         'src/lib/payroll/store.ts',
         'src/lib/finance/expense-payments-reader.ts'
       ],
+      // Formato canónico del runbook §2.4: el cuerpo del squash EMPIEZA con el
+      // marker (`gh pr merge --squash --body "[release-coupled: …]"`).
       commitBodyText:
-        'feat: payroll + finance coupled [release-coupled: nuevo flow finiquito requiere ambos]'
+        '[release-coupled: nuevo flow finiquito requiere payroll y finance juntos]\n\nfeat: payroll + finance coupled'
     })
 
     // Coupling marker bypasses split_batch; payroll+finance both irreversible
     // → requires_break_glass.
     expect(result.decision).toBe('requires_break_glass')
+  })
+
+  describe('el marker es una declaración, no una mención (TASK-1676 / ISSUE-145)', () => {
+    const coupledPair = ['src/lib/payroll/store.ts', 'src/lib/finance/expense-payments-reader.ts']
+
+    // El marker desactiva de una sola vez TODA la detección de mezcla de dominios
+    // sensibles, así que un falso positivo acá es un fail-open silencioso. Los tres
+    // textos son literales REALES de commits que estuvieron en la ventana del batch
+    // del 2026-08-09, ninguno declarando un acoplamiento.
+    it.each([
+      [
+        'aea35a678 — doc de growth/MCP citando la plantilla',
+        'del PR, marker `[release-coupled: ...]` en el squash, y `playwright.yml`'
+      ],
+      [
+        '6f3c833ed — el commit que creó TASK-1676 describiendo este mismo defecto',
+        'unknown en vez de ship. Endurece el marker [release-coupled: ...], que hoy nunca se'
+      ],
+      [
+        'prosa arbitraria con el literal a mitad de línea',
+        'Ver el runbook: se escribe [release-coupled: razon] en el cuerpo del squash.'
+      ]
+    ])('NO acepta %s', (_label, commitBodyText) => {
+      const result = classifyReleaseBatch({ changedFiles: coupledPair, commitBodyText })
+
+      expect(result.decision).toBe('split_batch')
+    })
+
+    it('sí acepta el marker cuando abre su propia línea, aunque tenga texto después', () => {
+      const result = classifyReleaseBatch({
+        changedFiles: coupledPair,
+        commitBodyText:
+          'release: develop → main\n\n[release-coupled: acumulacion de una semana ya verde]\n\nDetalle...'
+      })
+
+      expect(result.decision).toBe('requires_break_glass')
+    })
   })
 
   it('returns split_batch for auth_access + cloud_release without coupling', () => {

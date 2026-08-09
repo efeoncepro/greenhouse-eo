@@ -131,15 +131,19 @@ describe('checkReleaseBatchPolicy — diff base', () => {
     expect(diffArgs.some(arg => arg.includes('...'))).toBe(false)
   })
 
-  it('resolves commit bodies from the SAME range as the file diff (the two must never drift onto different bases)', async () => {
+  it('lee el marker SOLO del commit objetivo, no de la ventana de commits del rango', async () => {
     gitState.twoDotDiff = 'src/app/page.tsx\n'
 
     await runCheck()
 
-    const diffRange = gitArgsFor('diff').find(arg => arg.includes('..'))
-    const logRange = gitArgsFor('log').find(arg => arg.includes('..'))
+    // El runbook siempre dijo que el marker va en el cuerpo del squash. Con la base
+    // re-anclada el squash entra en el rango, pero entran también los ~509 commits
+    // que lo preceden: 442 KB de prosa donde una cita accidental desactiva la
+    // deteccion entera. `git show -s` sobre el target cierra ese vector.
+    const showArgs = gitArgsFor('show')
 
-    expect(logRange).toBe(diffRange)
+    expect(showArgs).toEqual(['show', '-s', '--format=%B', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'])
+    expect(gitArgsFor('log')).toEqual([])
   })
 
   it('declares the base it used in the evidence, so a surprising result is a diagnosis and not an investigation', async () => {
