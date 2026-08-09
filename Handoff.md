@@ -1,26 +1,19 @@
 # Handoff activo
 
-### TASK-1677 — el cutover SEO cerró en código; la migración es post-deploy
+### TASK-1677 — el cutover SEO está CERRADO (código y datos)
 
-`code complete, rollout pendiente`. Slice 1 hecho: `SEO_MODULE_KEYS_READ = ['seo_v2']`.
+Completa y verificada en producción el 2026-08-09. `ISSUE-143` cerrada del todo.
 
-**El Slice 1 ya está en producción** (release `49f86c98cda6`, 2026-08-09). Lo que sigue es la
-migración, y la secuencia importa y no es negociable:
-
-1. **La migración NO podía ir en el mismo release que el código**, por dos razones independientes:
-   el ordering exige desplegar y verificar entre pasos, y el check `postgres_migrations` del preflight
-   es estricto (un archivo commiteado sin aplicar es `pending` ⇒ error ⇒ release bloqueado). Aplicarla
-   antes del deploy es justo lo que el ordering prohíbe.
-2. Secuencia: promover → **canary del provider contra producción, NO un `SELECT`** (esa fue la causa
-   de método del incidente original) → `pnpm migrate:create` con el SQL ya redactado en la task →
-   `migrate:up` → canary otra vez → Slice 3 (cerrar `ISSUE-143`, retirar el pendiente de `TASK-1310`,
-   §10.7 de la arquitectura).
-3. El SQL del Slice 2 **ya está escrito y verificado** en el §Delta de la task, con su bloque `DO` que
-   aborta si alguna organización quedara sin cobertura. Estado medido: 2 assignments `seo_v1` vigentes,
-   ambos con su `seo_v2` hermano `active`.
-4. El guardrail de `entitlement.test.ts` que impide superseder una clave que el código todavía lee
-   **se auto-habilitó** con el Slice 1: recién ahora deja pasar esta migración. La secuencia no depende
-   de que alguien se acuerde.
+- El Slice 1 (código, `SEO_MODULE_KEYS_READ = ['seo_v2']`) viajó en el release `49f86c98cda6`; la
+  migración `20260809163352129` se aplicó **después**, con canary del provider verde antes y después.
+- Estado final: 0 assignments `seo_v1` vigentes, 2 superseded por `effective_to` con su historia
+  intacta, 2 `seo_v2` `active` — nadie perdió cobertura. La fila `seo_v1` sigue en `modules`
+  (append-only).
+- La verificación fue con el canary contra producción, **no con un `SELECT`** — ése fue el método que
+  falló en el incidente original.
+- **Aprendizaje para el próximo expand/contract:** no cabe en un solo release por construcción. El
+  check `postgres_migrations` bloquea una migración pendiente, y aplicarla antes del deploy es lo que
+  el ordering prohíbe. Dos ciclos no es burocracia: es el punto de verificación entre código y datos.
 
 
 ### TASK-1676 — el gate de release dejó de aprobar sin mirar (cierra ISSUE-145)

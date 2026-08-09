@@ -29,17 +29,22 @@
 
 ## Summary
 
-**Nueve páginas del portal cliente no abren hoy.** Fallan por dos causas independientes: el guard usa
-`session.user.clientId` donde el resolver espera un `organizationId` (`ISSUE-146`, afecta 3), y seis
-viewCodes de rutas vivas no están declarados en ningún módulo, lo que en un resolver sin allowlist
-transversal significa denegar siempre. Esta task cierra las dos.
+**Nueve páginas del portal cliente no abren hoy.** Fallan por tres causas independientes, las tres en
+el mismo guard: el `redirect()` del camino `denied` está dentro del `try`, así que su propio `catch` lo
+intercepta; el guard usa `session.user.clientId` donde el resolver espera un `organizationId`
+(`ISSUE-146`, afecta 3); y seis viewCodes de rutas vivas no están declarados en ningún módulo, lo que
+en un resolver sin allowlist transversal significa denegar siempre. Esta task cierra las tres.
 
 ## Why This Task Exists
 
-El síntoma es lo que lo mantuvo invisible: ninguna de las nueve produce un error. Todas redirigen a
-`/home?denied=<slug>` con el empty state `ModuleNotAssignedEmpty`, una pantalla honesta y bien escrita
-que dice que la organización no tiene ese módulo. **Un fallo de plataforma se ve exactamente igual que
-una decisión comercial**, y nadie escala eso.
+El síntoma es lo que lo mantuvo invisible. Verificado en producción el 2026-08-09 con la sesión real de
+Grupo Berel: las nueve redirigen a `/home?error=resolver_unavailable`, o sea el banner de degradación
+—"el servicio no está disponible"—, que es algo que un usuario reintenta en vez de reportar.
+
+Y ese síntoma es en sí mismo un tercer defecto: el camino `denied` es **inalcanzable**, porque
+`redirect()` de Next.js señaliza lanzando y la llamada está dentro del `try`. El empty state
+`ModuleNotAssignedEmpty` que `TASK-827` diseñó con su anatomía de cinco elementos está muerto en
+runtime, y **cada denegación legítima se reporta a Sentry como error del resolver**.
 
 Dos de las nueve son especialmente caras. `/notifications` cuelga de la campanita del header, o sea la
 ruta con más probabilidad de click accidental de todo el portal. Y `/settings` significa que un cliente
@@ -214,7 +219,19 @@ Reglas obligatorias:
 - Va primero a propósito: el Slice 2 cambia el modo de fallo de "deniega a todos" a "deniega a los que
   no tienen la columna poblada". Sin la señal, ese segundo modo también es silencioso.
 
-### Slice 2 — La llave correcta
+### Slice 2 — El `redirect()` fuera del `try`
+
+- `redirect()` de Next.js señaliza lanzando `NEXT_REDIRECT`, y en `requireViewCodeAccess` la llamada
+  del camino `denied` está **dentro** del `try`, así que el propio `catch` la intercepta. Verificado en
+  producción el 2026-08-09: las páginas rebotan con `?error=resolver_unavailable`, nunca con `?denied=`.
+- Consecuencias que este slice cierra: el empty state `ModuleNotAssignedEmpty` está muerto en runtime,
+  y **cada denegación legítima se reporta a Sentry como error del resolver**.
+- Va antes que el cambio de llave: mientras el `catch` se coma los redirects, no se puede distinguir
+  "denegó" de "falló", que es justo lo que hay que observar al cambiar la llave.
+- Revisar de paso el volumen acumulado en el dominio `client_portal` de Sentry — si hay ruido, ésta es
+  la fuente.
+
+### Slice 3 — La llave correcta
 
 - `requireViewCodeAccess` usa `session.user.organizationId`.
 - Sin `organizationId`: redirect con estado honesto **y** la señal del Slice 1 lo registra.
@@ -222,7 +239,7 @@ Reglas obligatorias:
   resolver empieza con el prefijo del espacio correcto, o tipar los identificadores como branded types
   (ver §Follow-ups).
 
-### Slice 3 — Allowlist transversal de vistas base
+### Slice 4 — Allowlist transversal de vistas base
 
 - Las cinco vistas que el operador declaró portal base —`cliente.ciclos`, `cliente.analytics`,
   `cliente.actualizaciones`, `cliente.notificaciones`, `cliente.configuracion`— pasan a resolverse por
@@ -230,14 +247,14 @@ Reglas obligatorias:
 - La allowlist es dato declarativo y auditable, no un `if` esparcido por las páginas.
 - Test: un cliente sin ningún módulo contratado abre las cinco.
 
-### Slice 4 — El desencuentro `revisiones` / `reviews`
+### Slice 5 — El desencuentro `revisiones` / `reviews`
 
 - `/reviews` falla porque el guard pide `cliente.revisiones` y los módulos declaran `cliente.reviews`.
 - Decidir cuál es el canónico y unificar, sin borrar el viewCode retirado del registry (append-only:
   se marca, no se elimina).
 - Test que fije que la ruta y el viewCode que la gatea coinciden con lo que declara el módulo.
 
-### Slice 5 — Verificación de las nueve
+### Slice 6 — Verificación de las nueve
 
 - Recorrer las 9 rutas con la persona de Berel y con una persona cliente sin módulos.
 - Evidencia GVC o smoke, con el resultado esperado por ruta declarado antes de correr.

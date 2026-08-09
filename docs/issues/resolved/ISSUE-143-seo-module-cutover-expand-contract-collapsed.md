@@ -1,9 +1,9 @@
 # ISSUE-143 — La migración del cutover `seo_v1 → seo_v2` colapsó expand y contract en un paso
 
-> **Estado:** resuelto (el incidente) · **cierre del cutover: EN CURSO** — ver "Pendiente"
+> **Estado:** **resuelto y cerrado del todo (2026-08-09)** — incidente y cutover
 > **Detectado:** 2026-08-08 (Claude, durante el rollout de TASK-1310)
 > **Resuelto:** 2026-08-08 (caida restaurada + fix durable)
-> **Cierre definitivo:** pendiente — `TASK-1677` Slices 2 y 3 (la ventana de datos sigue abierta)
+> **Cierre definitivo:** 2026-08-09 por `TASK-1677` — migración `20260809163352129` aplicada y verificada con canary
 > **Ambiente:** Producción (`greenhouse.efeoncepro.com`) — Cloud SQL `greenhouse-pg-dev` es única y compartida
 > **Severidad:** alta — módulo SEO inaccesible en producción durante ~25 minutos
 > **Dominio:** Growth / SEO · entitlements per-org · evolución de schema
@@ -112,7 +112,14 @@ issue está **a mitad de camino**, no cerrado:
   en la base y **no existe para el runtime** — `hasModule=false` y 404 anti-oracle, en silencio. Toda
   alta se escribe con `seo_v2`.
 
-**Este issue se cierra en el Slice 3 de `TASK-1677`**, después de aplicar la migración y volver a
+**Cerrado el 2026-08-09.** La migración `20260809163352129_task-1677-seo-module-cutover-contract`
+superseded los 2 assignments `seo_v1` vigentes por `effective_to = CURRENT_DATE`, con su bloque `DO`
+verificando que ambas organizaciones conservaran su `seo_v2` `active`. El canary del provider contra
+producción quedó verde antes y después: la superficie de Grupo Berel abre con datos medidos. La fila
+`seo_v1` sigue en `modules` como historia append-only.
+
+Texto original del pendiente, conservado como registro: este issue se cerraba en el Slice 3 de
+`TASK-1677`, después de aplicar la migración y volver a
 pasar el canary del provider contra el host de producción — no antes, y no con un `SELECT`.
 
 Follow-up declarado sin dueño: una señal de fiabilidad que vigile la simetría de la ventana en

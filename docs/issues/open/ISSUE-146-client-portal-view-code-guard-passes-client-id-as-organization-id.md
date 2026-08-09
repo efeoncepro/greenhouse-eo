@@ -34,6 +34,41 @@ comparación nunca puede ser verdadera.
 Los `organization_id` vigentes en `module_assignments` son todos del espacio `org-*`. Ni el prefijo
 `cli-*`, ni `greenhouse-demo-client`, ni `hubspot-company-*` pueden matchear.
 
+## Tercer defecto en la misma función, verificado en producción (2026-08-09)
+
+Al verificar `TASK-1675` con la sesión real de Grupo Berel contra producción, las páginas no rebotan
+con `?denied=<slug>` como esta issue asumía: rebotan con **`?error=resolver_unavailable`**. La causa
+es independiente de la llave y vive en el mismo bloque:
+
+```ts
+try {
+  const allowed = await hasViewCodeAccess(organizationId, viewCode)
+  if (!allowed) {
+    redirect(`/home?denied=${slug}`)   // ← dentro del try
+  }
+} catch (error) {
+  captureWithDomain(error, 'client_portal', { ... })
+  redirect('/home?error=resolver_unavailable')
+}
+```
+
+**`redirect()` de Next.js señaliza lanzando `NEXT_REDIRECT`.** Como la llamada está dentro del `try`,
+el propio `catch` la intercepta. Tres consecuencias, todas verificadas en producción:
+
+1. **El camino `denied` es inalcanzable.** Ninguna denegación legítima llega al usuario como tal.
+2. **`ModuleNotAssignedEmpty` nunca se muestra.** El empty state que `TASK-827` diseñó con su anatomía
+   de cinco elementos está muerto en runtime; el usuario ve el banner de degradación.
+3. **Cada denegación legítima se reporta a Sentry como error del resolver.** Vale revisar el volumen:
+   si hay ruido acumulado en el dominio `client_portal`, ésta es la fuente.
+
+Corrige también lo que esta issue afirmaba en §`Por qué nadie lo vio`: el síntoma no es "parece una
+decisión comercial" sino "parece un servicio caído". Sigue siendo un diagnóstico equivocado para quien
+lo mire desde afuera, pero por el motivo opuesto — y explica por qué tampoco generó tickets: un
+"servicio no disponible" intermitente se reintenta, no se reporta.
+
+**Fix:** sacar el `redirect()` del `try`. El patrón canónico en App Router es computar la decisión
+dentro del `try/catch` y ejecutar el `redirect()` después, fuera. Va en `TASK-1679`.
+
 ## Por qué nadie lo vio
 
 Es la parte que vale registrar. El fallo **no produce un error**: produce exactamente el mismo

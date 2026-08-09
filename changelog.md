@@ -7,6 +7,28 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-09 — El cutover SEO cerró del todo, en dos releases (TASK-1677, cierra ISSUE-143)
+
+La ventana expand/contract que `ISSUE-143` había dejado abierta a propósito quedó cerrada: el código
+dejó de leer `seo_v1` y los assignments quedaron superseded. Lo que vale registrar no es el cierre
+sino su forma.
+
+**Fueron dos releases, y no por prudencia: por construcción.** El check `postgres_migrations` del
+preflight es estricto, así que una migración commiteada y sin aplicar bloquea el release. Y aplicarla
+antes de desplegar el código es exactamente lo que el ordering del cutover prohíbe. Las dos reglas
+juntas hacen que un expand/contract no quepa en un solo ciclo — y eso, lejos de ser fricción, es lo
+que garantiza que exista un punto de verificación entre el código y los datos.
+
+La verificación fue con el canary del provider contra producción, antes y después de tocar los datos:
+la superficie de Grupo Berel abre con datos medidos, sin estado de "sin entitlement" y sin errores de
+consola. **No con un `SELECT`** — ése fue el método que falló en el incidente original y por eso la
+task lo prohíbe explícitamente.
+
+El bloque `DO` de la migración verificó que ninguna organización quedara sin cobertura antes de dejar
+pasar el cambio. Estado final: cero `seo_v1` vigentes, dos superseded con su historia intacta, dos
+`seo_v2` activos. La fila `seo_v1` sigue en el catálogo: el contract es `effective_to`, nunca un
+`DELETE`.
+
 ## 2026-08-09 — El gate que aprobaba sin mirar (TASK-1676, cierra ISSUE-145)
 
 El `release_batch_policy` del preflight comparaba contra `origin/main`. Pero el orquestador lo corre
@@ -1164,32 +1186,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
 - Se consolidó el flujo reusable `intake/evidencia → narrativa → deck-plan → assets/mockups → composición → auditoría visual → validación`.
 - Se reforzaron las skills de licitaciones, deck-studio, SEO/AEO, diseño e imagen con las lecciones de Grader/X-Ray/Greenhouse, mockups honestos, assets extraíbles y protección de decks previos.
 - La salida client-facing queda separada de investigación, métricas ilustrativas, manifiestos vacíos y archivos `-INTERNO`.
-
-## 2026-07-31 — Globe: modo claro en producción, y dos defectos que sólo aparecieron mirando
-
-- **Cuatro PRs mergeados y desplegados** en `efeonce-globe`: #8 (modo claro + consolidación del `:root`),
-  #15 (todo paquete compila antes de testear + gate), #25 (el lecho de las piezas deja el azul del
-  prototipo) y #27 (scrims y escenario). Revisión activa `00122-lwd`. Verificado visualmente por el operador.
-- 🔴 **Dos defectos llegaron a producción y ni la suite ni el barrido de contraste los vieron**, y los dos
-  venían de lo mismo: **tratar como superficie algo que no lo es**.
-  - Los **scrims** voltearon con el modo y en claro pasaron a `#eceaf1`. Un scrim claro deja de ser un
-    scrim: existe para que el texto blanco se lea sobre un medio **arbitrario**, y el medio es arbitrario
-    en los dos modos. El título de la pieza destacada quedó blanco sobre casi blanco. El barrido declara
-    los gradientes «no medibles» a propósito —para no inventar fallos— y el defecto cayó en ese hueco.
-  - El **escenario** de la pieza tampoco es superficie. Hoy es el mismo magenta en ambos modos, lo que
-    además le deja al producto una sola identidad.
-- **Lección que se repitió tres veces en el día:** se declaró «presencia equivalente» midiendo el PASO de
-  la rampa contra el canvas. Esa medición era del **token, no de lo que renderiza** — ignoraba la
-  composición por alfa. *Un número sobre el token no describe el píxel.* Los tres defectos aparecieron
-  **mirando**, no testeando.
-- **ADR-017 v2.1** canoniza los dos invariantes nuevos (§6 «Lo que NO voltea con el modo» y §7 «La familia
-  del escenario es magenta») y generaliza el hallazgo: **una receta que fabrica color en runtime es un
-  literal con disfraz** que ningún drift guard de literales puede ver.
-- ✅ **Drift cerrado el mismo día.** `axis-tokens@0.2.4` porta las **tres** familias de acento, leídas del
-  archivo de Figma en alta resolución (en baja, `#f1d1dd` se lee como `#f101dd`). Globe consume
-  `axisAccentRamp.magenta` y borró su copia; el valor servido quedó **byte-identical**. `TASK-1615`
-  cerrada. Los nueve pasos de orchid ya en el paquete coincidían **exactamente** con el archivo — cero
-  drift ahí, lo que valida el método de lectura.
-- **Queda abierto para diseño:** si coral y magenta merecen rol (coral está a **14°** del rojo de
-  `danger`), y si scrim/escenario se canoniza en AXIS como grupo **sin variante por modo** — que la firma
-  del token impida el error, en vez de un comentario que pida no cometerlo.

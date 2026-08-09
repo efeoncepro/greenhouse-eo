@@ -20,10 +20,12 @@ acceso sigue siendo per-org (`module_assignment` + capability), nunca role-wide.
 
 **Estado (actualizado 2026-08-09):** migración aplicada y código en producción. `seo_v2` existe con
 sus dos viewCodes y las dos organizaciones asignadas, y desde el release `49f86c98cda6` el runtime
-**lee y escribe sólo `seo_v2`** (`TASK-1677` Slice 1 — ver §10.7). Lo que queda abierto del cutover
-son los **datos**: los assignments `seo_v1` siguen vigentes hasta la migración del contract. Sobre la
-navegación cliente: verificada con sesión de Grupo Berel el 2026-08-08 — la ruta responde con datos
-reales, pero el menú del portal cliente no compone SEO (igual que AEO; se llega por enlace directo).
+**lee y escribe sólo `seo_v2`** (`TASK-1677` — ver §10.7). **El cutover está CERRADO desde el
+2026-08-09**: código y datos. Los assignments `seo_v1` quedaron superseded por `effective_to`
+(migración `20260809163352129`), y la fila `seo_v1` sigue en el catálogo como historia append-only.
+Sobre la navegación cliente: `TASK-1675` cableó el menú module-driven y se verificó con sesión de
+Grupo Berel contra producción el 2026-08-09 — el ítem `SEO` aparece compuesto desde
+`module_assignments` y la ruta abre con datos medidos.
 
 ---
 
@@ -541,12 +543,16 @@ salud, no fabrica snapshots y no toca DataForSEO en el render.
 
 ### 10.7 Cutover `seo_v1 → seo_v2` — expand/contract (TASK-1310 · contract: TASK-1677)
 
-> **Estado al 2026-08-09: EN CURSO, fase contract a medio camino.** El **código** ya contrajo y está
-> en producción (`SEO_MODULE_KEYS_READ = ['seo_v2']`, release `49f86c98cda6`); los **datos** todavía
-> no (los assignments `seo_v1` siguen vigentes). Es un estado intermedio deliberado, con dueño
-> (`TASK-1677`) y secuencia — **no un cutover terminado**. Antes de aplicar la migración del contract,
-> leer el delta 2026-08-09 al final de esta sección: aplicarla sin desplegar y verificar entre pasos
-> rompe el contrato aunque el SQL corra sin error.
+> **Estado al 2026-08-09: CERRADO.** Código y datos contrajeron. El código dejó de leer `seo_v1` en
+> el release `49f86c98cda6` y la migración `20260809163352129_task-1677-seo-module-cutover-contract`
+> superseded los assignments vigentes, con su bloque `DO` verificando que ninguna organización quedara
+> sin cobertura. Verificado con el canary del provider contra producción antes y después: la superficie
+> de Grupo Berel abre con datos medidos, sin estado de "sin entitlement" y sin `console.error`.
+>
+> **El orden fue código primero, datos después, en releases separados**, y conviene no perderlo: el
+> check `postgres_migrations` del preflight es estricto, así que una migración commiteada y sin aplicar
+> bloquea el release — y aplicarla antes del deploy es lo que el ordering prohíbe. Un cutover
+> expand/contract no cabe en un solo release por construcción.
 
 `TASK-1310` renombra la clave del módulo porque `modules.*` es append-only y `seo_v1` nació con
 `view_codes=[]`: no se puede editar in-place, hay que superseder. La migración crea `seo_v2`,
