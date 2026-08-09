@@ -1,12 +1,35 @@
 # Diagnosticar un modulo contratado que no aparece en el menu del cliente
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-08-09 por Claude (TASK-1675)
-> **Ultima actualizacion:** 2026-08-09 por Claude
+> **Ultima actualizacion:** 2026-08-09 por Claude (TASK-1678/1679/1680 — la pagina ya dice por que deniega)
 > **Modulo:** Client Portal
 > **Rutas en portal:** `/admin/client-portal/organizations/[organizationId]/modules`, `/admin/client-portal/catalog`
 > **Documentacion relacionada:** [Menu del Portal Cliente — modulos contratados](../../documentation/client-portal/menu-portal-cliente-modulos.md), [Menu dinamico y empty states — operacion](menu-dinamico-y-empty-states.md), [GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md](../../architecture/GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md) §12.1
+
+## Delta 2026-08-09 — ahora la pagina te dice cual de los cuatro casos es
+
+Hasta este dia el diagnostico era ciego: las nueve paginas guardadas del portal cliente rebotaban con
+el mismo mensaje de error ("el servicio no esta disponible") para situaciones distintas, asi que el
+reporte del cliente no te daba informacion. Ahora **la URL a la que rebota dice el caso**, y eso
+acorta el diagnostico a un paso:
+
+| A donde rebota | Que significa | Que hacer |
+|---|---|---|
+| La pagina abre | Es vista base (Notificaciones, Configuracion, Novedades) o su organizacion tiene el modulo | nada |
+| `/home?denied=<algo>` | El fail-closed correcto: no tiene el modulo que gobierna esa pagina | seguir el paso a paso de abajo; puede ser decision comercial |
+| `/home?error=organization_unresolved` | Su usuario no tiene organizacion resuelta | **no es un problema de modulos**: es el onboarding de ese cliente. Escalar con la senal `identity.client_portal.client_without_organization` de `/admin/operations` |
+| `/home?error=resolver_unavailable` | El resolver fallo de verdad | escalar: revisar `/admin/operations` |
+
+**Como ver a donde rebota sin pedirle nada al cliente:** en el navegador, la barra de direcciones
+muestra la URL final despues del rebote. Si el cliente te manda una captura, el parametro despues del
+`?` es el que importa.
+
+> Ojo con un caso conocido **de operador interno, no de cliente**: si abres `/proyectos` con tu propia
+> sesion interna y recibe la pagina de no-autorizado, es un defecto conocido, arreglado y pendiente de
+> promover a produccion — no es un problema del cliente ni de su modulo. Las otras ocho paginas
+> cliente abren normal con sesion interna.
 
 ## Para que sirve
 

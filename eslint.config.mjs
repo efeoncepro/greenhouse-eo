@@ -351,10 +351,13 @@ export default [
       // Mode `error` desde commit-1 (TASK-1051 migró los 4 callsites previos;
       // cero violaciones en src/components/greenhouse/primitives/** hoy).
       'greenhouse/no-direct-mui-elevation-in-primitives': 'error',
-      // TASK-827 Slice 7 — modo warn durante migración V1.0. Promote a `error`
-      // vive en TASK derivada V1.1 client-portal-legacy-branching-sweep
-      // (trigger: zero drift ≥30 días post TASK-829 cierre).
-      'greenhouse/no-untokenized-business-line-branching': 'warn',
+      // TASK-1680 — promovida a `error` el 2026-08-09, cerrando la deuda
+      // `client-portal-legacy-branching-sweep` que TASK-827 Slice 7 dejó en `warn`.
+      // Medición previa: con la regla en `error` y el override vacío quedaban 2
+      // violaciones, ambas en VerticalMenu.tsx (el bloque de capability modules, deuda
+      // declarada con dueño en el override block más abajo). El resto del barrido lo
+      // cerraron TASK-1675/1678/1679.
+      'greenhouse/no-untokenized-business-line-branching': 'error',
       // TASK-890 Slice 3 — modo warn durante V1.0 (gate legacy en postgres-store.ts
       // grandfathered behind flag PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED=false).
       // Promote a `error` post 30d steady o cuando flag default flip a true.
@@ -661,31 +664,36 @@ export default [
     }
   },
 
-  // TASK-827 Slice 7 — no-untokenized-business-line-branching override block.
-  // El rule warn-ea cualquier branching legacy session.user.{tenantType,businessLines,
-  // serviceModules}/tenant_capabilities.* en UI surfaces. Exime:
+  // TASK-1680 — override block de `no-untokenized-business-line-branching`, depurado.
   //
-  //   - src/components/layout/vertical/VerticalMenu.tsx — TASK-1675 cerró la deuda
-  //     `client-portal-vertical-menu-resolver-migration`: los ítems de MÓDULO ya
-  //     salen del resolver canónico (compuestos server-side en el layout y
-  //     mergeados de forma aditiva). Lo que queda exento es la lista base con
-  //     `canSeeView` y el bloque `resolveCapabilityModules`, cuya migración vive
-  //     en el follow-up `capability-modules-resolver-migration`.
-  //   - src/lib/auth/** — legítimamente lee session.user.tenantType para session
-  //     routing decisions ANTES de cualquier UI render.
-  //   - src/app/api/auth/** — endpoints auth que validan tenant.
-  //   - Foundation _layout.tsx files si emergen casos.
-  //   - El rule mismo + tests.
+  // La regla pasó a `error` (arriba). Este bloque quedó con UNA sola exención, y eso es
+  // deliberado: un override es deuda declarada con dueño, no una lista de paths por si acaso.
+  //
+  // Medido el 2026-08-09 corriendo la regla en `error` con el override vacío: 2 violaciones,
+  // ambas en `VerticalMenu.tsx`. Las otras cinco entradas que este bloque tenía se retiraron
+  // por dos razones distintas:
+  //
+  //   - `src/lib/auth/**`, `src/app/api/auth/**`, los archivos de la propia regla y sus tests
+  //     eran **redundantes por construcción**: `isUiFile` en la regla excluye `src/app/api/**`
+  //     y sólo evalúa `src/(components|views|app)/**`, así que la regla nunca los miró. Eximir
+  //     un path fuera del alcance de la regla no protege nada — sólo hace ver la gobernanza
+  //     más estricta de lo que es y esconde cuál exención es real.
+  //   - `src/app/**/_layout.tsx` era **especulativo** ("si emergen casos"). Nunca emergieron.
+  //     Una exención para un caso que no existe es una puerta abierta sin dueño.
+  //   - `VerticalMenu (1).tsx` era un **archivo muerto** (duplicado accidental del commit
+  //     `eec326410`, "duplicate working files"). Borrado junto a sus cinco hermanos.
+  //
+  // La exención que queda:
+  //
+  //   `src/components/layout/vertical/VerticalMenu.tsx` — 2 violaciones, líneas 128-129: el
+  //   bloque `resolveCapabilityModules({ businessLines, serviceModules })`. Los ítems de
+  //   MÓDULO ya salen del resolver canónico desde `TASK-1675`; lo que sigue leyendo la sesión
+  //   legacy es este bloque de capability modules.
+  //   **Dueño de retirarla:** el follow-up `capability-modules-resolver-migration` (sin ID
+  //   desde mayo de 2026). Cuando ese trabajo migre el bloque al resolver, esta exención se
+  //   va y el override block desaparece completo.
   {
-    files: [
-      'src/components/layout/vertical/VerticalMenu.tsx',
-      'src/components/layout/vertical/VerticalMenu (1).tsx',
-      'src/lib/auth/**',
-      'src/app/api/auth/**',
-      'src/app/**/_layout.tsx',
-      'eslint-plugins/greenhouse/rules/no-untokenized-business-line-branching.mjs',
-      'eslint-plugins/greenhouse/rules/__tests__/no-untokenized-business-line-branching.test.mjs'
-    ],
+    files: ['src/components/layout/vertical/VerticalMenu.tsx'],
     rules: {
       'greenhouse/no-untokenized-business-line-branching': 'off'
     }

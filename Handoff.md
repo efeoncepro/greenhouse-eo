@@ -1,5 +1,103 @@
 # Handoff activo
 
+### Verificación en staging del portal cliente, y dos defectos que salieron de ella (2026-08-09)
+
+Recorrí las 9 rutas × 3 personas con sesión de agente real contra **staging** (producción no acepta
+agent-session por diseño). El fix de `TASK-1679` quedó confirmado en runtime desplegado: las 3 base
+sirven `200`, las 6 module-gated redirigen a `/home?denied=<slug>` con el slug user-facing correcto, y
+**cero** `?error=resolver_unavailable` — que era el síntoma de las nueve.
+
+**Lo que necesita quien siga:**
+
+1. ⚠️ **PRODUCCIÓN HOY: `/proyectos` devuelve `/401` al operador interno.** Arreglado en `develop`,
+   **no promovido**. Si soporte reporta que no puede abrir Proyectos de un cliente, es esto y está
+   conocido. Clasificado `MENOR` por el árbol §7 del runbook: es fail-closed **de más** (niega acceso
+   que debería conceder), no expone dato de nadie, y las otras 8 páginas cliente abren normal. Va en
+   el próximo release — que incluya este commit no es opcional.
+2. **La causa era un gate legacy por route group ENCIMA del guard canónico**, y `/proyectos` era la
+   única de las 9 que lo conservaba, con el comentario de al lado diciendo que el canónico ya lo
+   reemplazaba. Corría primero, así que ganaba, y el `route_group_scope` del operador interno
+   (`admin, commercial, internal, my`) no incluye `client`. Migración incompleta de `TASK-827`,
+   invisible en review porque las dos líneas se leen como defensa en profundidad. Fijado por
+   `src/lib/client-portal/guards/no-route-group-gate-above-view-code-guard.test.ts`, que barre las 9
+   páginas.
+3. 🔴 **El override de organización usaba `NODE_ENV` y por eso era solo-local.** Vercel compila
+   **todos** los deployments con `NODE_ENV=production`, así que mi bloqueo apagaba el flag también en
+   staging. El discriminador canónico del repo es **`VERCEL_ENV`** — mismo que
+   `src/app/api/auth/agent-session/route.ts` y `src/proxy.ts`; staging reporta `preview`, verificado
+   contra el runtime. Corregido. **Regla:** para distinguir staging de producción en este repo,
+   `VERCEL_ENV`, nunca `NODE_ENV`.
+4. **El override NO tiene válvula de escape de producción, y la divergencia con `agent-session` es
+   deliberada.** Ese endpoint admite `AGENT_AUTH_ALLOW_PRODUCTION`; éste no, porque concede lectura
+   **cross-tenant** del portal de cualquier organización con una credencial documentada en
+   `CLAUDE.md`. Hay un test que detiene a quien agregue una.
+5. **Sigue sin verificar en navegador: las 4 páginas Creative de SKY.** No hay persona cliente de SKY
+   y sus usuarios son personas reales. Con el fix de `VERCEL_ENV` ya se puede hacer prendiendo el flag
+   en staging (`vercel env add` + redeploy, porque Vercel congela las env vars al build). El resolver
+   sí está verificado contra la base que lee producción: 36 combinaciones, 0 desvíos.
+
+### Cierre del carril de acceso del portal cliente — las 3 piezas post-release (2026-08-09)
+
+**Lo que necesita quien siga:**
+
+1. **Sky Airlines ya tiene `creative_hub_globe_v1`** (assignment
+   `cpma-ec0041f7-e416-442f-acab-73f645c06f56`, vía `enableClientPortalModule`, audit row `enabled`).
+   Sus 3 usuarios activos ahora ven `/proyectos`, `/campanas`, `/equipo`, `/reviews`, más
+   `cliente.pulse`, `cliente.creative_hub` y 4 capabilities de lectura — el bundle otorga más que las
+   4 páginas y eso quedó escrito en `scripts/client-portal/assign-creative-hub-to-sky.ts`. **Si hay
+   que revertirlo, es `pause`/`expire`, nunca DELETE.**
+2. 🔴 **Un gate cuya expectativa está hardcodeada no prueba el motor: prueba que el primer consumidor
+   sigue igual.** `client-portal-page-access-check.ts` fijaba "3 abren y 6 empty state" y al asignarle
+   el módulo a SKY reportó 4 desvíos por hacer lo correcto — la salida fácil habría sido editar los
+   esperados. Ahora deriva la expectativa de los datos (base ∪ módulos vigentes de esa org) y
+   sobrevive a cualquier assignment. Vale el patrón para cualquier gate nuevo.
+3. **`TASK-1680` cerrada, y su hallazgo transferible:** el override block del lint tenía 6 entradas y
+   **4 eximían paths que la regla nunca miró** (`isUiFile` excluye `src/app/api/**` y sólo evalúa
+   `src/(components|views|app)/**`). Antes de agregar un path a un override, comprobá que la regla
+   realmente lo mire — si no, la exención no protege nada y esconde cuál es la real.
+4. **Queda UNA exención viva:** `VerticalMenu.tsx` (2 violaciones, el bloque
+   `resolveCapabilityModules`). Su dueño de retiro es el follow-up
+   `capability-modules-resolver-migration`, todavía **sin ID** desde mayo de 2026. Cuando ese trabajo
+   migre el bloque al resolver, el override block desaparece completo.
+5. **`cliente.ciclos` y `cliente.analytics` siguen sin módulo que las declare** — deuda rastreada en
+   `PENDING_MODULE_DECLARATION_VIEW_CODES` (`view-codes/parity.ts`), no allowlisteada en silencio.
+   Decidir en qué módulo van es lo único que las hace alcanzables.
+6. **Sigue pendiente el smoke con sesión cliente REAL en producción**, de este release y del de
+   `TASK-1675`. El endpoint de agent-session da 403 en prod por diseño, así que es manual. Dos
+   releases con la misma casilla sin marcar.
+
+### Release 2026-08-09 — el carril de acceso del portal cliente está EN PRODUCCIÓN
+
+`TASK-1678` + `TASK-1679` cerradas y promovidas. Manifest
+`2c87d71e2eca-f444748c-92aa-484c-b118-02713ee63e06` en `released`, run `31335921151`, target
+`2c87d71e2ecab15441a87bd35b6d42753f0aaef7`, PR #185. Watchdog `drift_count=0`.
+
+**Lo que necesita quien siga:**
+
+1. 🔴 **El marker `[release-coupled:]` NO resuelve `requires_break_glass`.** Leído el classifier: el
+   marker sólo limpia `split_batch` (`findUncoupledIndependentSensitiveDomains`);
+   `requires_break_glass` lo dispara `hasIrreversibleDomain()` y su única salida es
+   `bypass_preflight_reason`. Ningún runbook lo decía, y el instinto de "pongo el marker como la vez
+   pasada" te hace perder un run. Si el classifier dice `requires_break_glass`, el marker es
+   cargo-cult.
+2. **Hay UNA sola instancia Cloud SQL (`greenhouse-pg-dev`).** Producción, staging y local leen la
+   misma base — verificado con `gcloud sql instances list`. Consecuencia práctica: una migración
+   aplicada en "dev" YA está aplicada para producción. Las 2 de este release lo estaban antes del
+   deploy, así que su dominio `db_migrations` era reconciliación de archivos, no cambio pendiente. Eso
+   se puede citar en la razón del bypass porque es verificable en `pgmigrations`.
+3. **Pendiente comercial, no técnico:** asignar `creative_hub_globe_v1` a **Sky Airlines** es lo único
+   que abre las 4 páginas Creative del portal (`/proyectos`, `/campanas`, `/equipo`, `/reviews`). El
+   operador declaró que Creative es de SKY y de nadie más. Hoy esas 4 muestran el empty state correcto.
+   `cliente.ciclos` y `cliente.analytics` están en la misma situación, rastreadas en
+   `PENDING_MODULE_DECLARATION_VIEW_CODES`.
+4. **`platform.release.bypass_preflight` está en el catálogo sin grant en `runtime.ts`** — el workflow
+   sólo valida los ≥20 caracteres, así que la capability es hoy gobernanza sobre el humano, no un gate
+   mecánico. Candidato a task.
+5. **Bug de tooling:** `pnpm docs:context-rotate --apply` archivó la sección que contenía
+   `> Historial rotado: [Handoff.archive.md]` y el gate estricto la exige — la rotación dejó su propio
+   gate rojo. Restaurada a mano; el script debería preservar esa línea.
+
+
 ### TASK-1679 — las 9 páginas del portal cliente dejaron de mentir (cierra ISSUE-146)
 
 Code complete en `develop`, **rollout pendiente**. Va DESPUÉS de `TASK-1678` en la promoción.
@@ -491,102 +589,3 @@ Se dejaron el inventario API, route card, registry, fleet ledger y skills espejo
 rights, evaluación, canary, settlement y promotion por ruta. Reutiliza el adapter Fal y el control plane existente;
 la UI queda en `TASK-1552` y el contrato compartido en `TASK-1633`. No habilitar 4K/1080p, tres minutos, edit/masks,
 storyboard, stems, streaming, realtime, seed de entrada ni BytePlus 2.5 sin contrato verificable.
-
-### Release `30140c662` — TASK-1304 + TASK-1306 en producción (2026-08-07)
-
-PRs #179+#180 → manifest **`released`** (`30140c662a79-b5790565-9b75-41b8-a206-f2cd21a58080`, run 4
-`31180734383`, 8m29s), watchdog `worker_revision_drift: ok`, health prod 200, **lanes 1304 vivos en
-producción** (`site-audit-report` + `backlink-profile` responden 400 `missing_external_scope_type`).
-Con esto el cockpit de 1306 deja de sufrir el apagado cíclico de su viewCode. Costó 4 intentos, dos
-hallazgos nuevos ya en el timing ledger y el catálogo: **(a) el run zombie del outage** (31126022507,
-inmanejable por API — 6 vías 409/403) bloqueaba `pending_without_jobs` → fix de causa raíz = **lista
-forense `src/lib/release/preflight/ignored-pending-runs.ts`** (razón + vencimiento 2026-08-21 +
-evidencia en manifest; la reliability signal NO la consume, por eso el watchdog seguirá mostrando
-`pending_without_jobs: error` A PROPÓSITO hasta que GitHub recolecte el zombie — NO es un incidente
-nuevo); **(b) Cloud Build de ico-batch >600s** (backlog post-outage) abortó el intento 3 — dejar
-terminar el build huérfano cachea la imagen y el retry pasa limpio. **Federación EJECUTADA el mismo día**
-(`efeonce-mcp` `bfb3832`, deploy `31182267290` success): provider + registerTool + lista de paridad
-(6 tools SEO) + canary extendido — **canary 11/11 verde contra producción** con los datos reales de
-Berel y Efeonce. TASK-1304 operativamente completa de punta a punta; cero pendientes.
-
-### Autenticación local Gcloud con Playwright (2026-08-07)
-
-Proceso local explícito `pnpm gcloud:auth:playwright` (invocable por Codex o Claude) para renovar CLI +
-ADC a pedido del operador: `--force` repite OAuth, `--check-only` verifica sin abrir navegador; skill
-espejo `greenhouse-gcloud-auth-playwright`. El setup `…:setup` guarda cuenta y clave en
-`.auth/gcloud-auth-credentials.json` (gitignored, `0600`) y el perfil Chrome aislado en
-`.auth/gcloud-auth-profile`. Playwright visible, no imprime URLs/códigos/cookies, cierra con
-`gcloud-auth-preflight.sh`. Sin scheduler ni rollout remoto.
-
-### TASK-1307 + TASK-1655 — pantalla ancla SEO + Historical Data Platform (2026-08-07)
-
-**TASK-1307** (`/admin/growth/seo/performance`, in-progress → cierre en curso): pantalla
-ancla implementada completa en `develop` local (3 commits, sin push). ECharts elegido e
-instalado (Slice 0 — 1306/1308/1310 heredan); readers nuevos `readSeoPerformance` +
-`readSeoPerformanceCatalog` con parity completa (lane ecosystem + MCP tools
-`get_seo_performance`/`get_seo_performance_catalog` en el mismo PR); **fallback entre
-fuentes** (keyword×posición intenta DataForSEO ◑ y cae a la posición medida GSC ● cuando
-la serie exacta es más joven — regla del operador, nunca promediadas); cobertura REAL
-declarada en el chart ("N de M días con medición"). GVC **premium** verde: rubric
-enterprise pass, `ui:visual-gate` PASS, `ui:quality` PASS (avg 4.56, floor 4.5). Suite
-growth/seo 151/151. **Cerrada y documentada** (ver la entrada del header canónico, arriba);
-lo único vivo es la **promoción develop→main heredada de 1306**, batcheada con 1308/1655.
-
-**TASK-1655** (in-progress): hallazgo de fondo — el módulo era **forward-only** (5 días
-GSC / 2 de rank teniendo 16 meses en la API). Slices 1-3 SHIPPED: mirror
-`greenhouse_growth_analytics.seo_gsc_history` (tabla creada, MERGE idempotente, el batch
-diario espeja y reporta `bqMirror`), backfill API→BQ resumible (smoke 31/31 días Berel,
-**paridad exacta PG↔BQ** verificada), split de lectura por cobertura. **Backfill de 16
-meses de Berel CORRIENDO en background** (562k+ filas al momento del handoff; resumible —
-si murió, re-correr `scripts/growth/backfill-gsc-history.ts` con las env OAuth del
-runbook `docs/manual-de-uso/growth/backfill-historico-gsc.md`). Pendientes: verificación
-final del backfill, Slice 4 (semilla rank `historical_serps`, verificar granularidad en
-sandbox ANTES), Slice 5 (export nativo en la propiedad de Berel — necesita permiso
-Owner, out-of-band; Efeonce ya lo tiene desde 2025-12-10).
-
-**Hallazgos cross para quien siga:** (1) `CustomTabsNav` (@core) para tabs-que-son-links
-— el TabList de lab inyecta `aria-controls` fantasma (axe critical; 1306 puede migrar
-igual). (2) `SurfaceRecipe.plane='none'` para recipes sobre composiciones de cards. (3)
-El 1 rojo de la suite full es `catalog-extensibility` del artifact-composer, roto por
-WIP sin commitear de OTRO agente en `catalogs/deck-axis/` — no tocar desde acá.
-
-### TASK-1306 — cockpit SEO Overview: code complete, deploy pendiente (2026-08-06)
-
-`/admin/growth/seo` en `develop` **local (sin push)**, 5 slices. Suite **10281/0**, build prod
-verde, GVC 1440+390 con `pageErrors 0`. Detalle completo en el `## Closure Report` de
-`docs/tasks/complete/TASK-1306-growth-seo-overview-cockpit-ui.md`.
-
-**Lo que necesita quien siga:**
-
-1. **`resolveApexColor` (`src/libs/styles/`) es un hallazgo compartido.** Con `cssVariables: true`
-   el theme devuelve `var(--mui-palette-*)` y ApexCharts revienta al parsearlo — 8 excepciones por
-   corrida, invisibles (el chart no termina de pintar). **Los ~32 consumidores de Apex del repo
-   tienen el mismo bug latente**; candidato a task propia.
-2. **`MetricTrendCard` ganó `deltaOverride` + `deltaSemantics`** (opt-in, legacy byte-idéntico).
-   **TASK-1307 las necesita** para su Δ30d de posición: no reimplementarlas.
-3. **`readRankSnapshotLatest` NO existe** aunque 1306/1307 lo citen: sólo `readRankEvolution`.
-4. **`GROWTH_SEO_ENABLED` ya está ON en Production** — la ruta queda viva al desplegar; el control
-   de exposición restante es el viewCode + el `module_assignment` per-org.
-
-**Rollout pendiente — promover `develop` → `main`.** Corregido: NO hay una migración
-pendiente por entorno; hay UNA sola base (`greenhouse_app`) compartida por dev/staging/prod
-y el viewCode ya está sembrado. Lo que falta es la promoción, y **no es cosmética**:
-`syncViewRegistryCatalog` apaga todo viewCode ausente del catálogo TS del código EN
-EJECUCIÓN, así que mientras 1306 viva sólo en `develop`, producción **apaga
-`administracion.growth_seo` en cada sincronización** (ya pasó una vez; se reactivó a mano,
-pero la reactivación manual se revierte sola). Queda registrado como checkbox de cierre en
-`TASK-1307` (§Pendiente heredado) — si 1307 se demora o se cancela, sacar la promoción
-igual, por su cuenta.
-
-**Próximo paso:** TASK-1307, con dirección visual ya aprobada (concepto C "Evidencia narrativa",
-`product-design-loop` 2026-08-06) y Slice 0 (ECharts vs Apex) todavía abierto.
-
-### Hallazgo MCP gateway — clientes Claude no conectan por falta de DCR (2026-08-06)
-
-⚠️ **Superseded el mismo día** por el break-glass del shim DCR (entrada TASK-1654, arriba: LIVE y
-verificado con el cliente real). Se conserva sólo la causa: el cliente MCP de Claude exige DCR
-(RFC 7591) para auto-registrarse y **Entra no lo soporta**, así que sin el shim `/register` del
-gateway falla con `Incompatible auth server: does not support dynamic client registration`.
-
-
-> Historial rotado: [Handoff.archive.md](Handoff.archive.md).

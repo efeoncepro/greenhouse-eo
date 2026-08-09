@@ -33,7 +33,7 @@ import { captureMessageWithDomain } from '@/lib/observability/capture'
  * tienen que cumplirse:
  *
  *   1. `CLIENT_PORTAL_AGENT_ORG_OVERRIDE_ENABLED === 'true'` — flag default-OFF.
- *   2. `NODE_ENV !== 'production'` — bloqueo duro, sin variable de escape. Esto NO es
+ *   2. `VERCEL_ENV !== 'production'` — bloqueo duro, **sin variable de escape**. Esto NO es
  *      configurable a propósito: un override de tenant en producción no tiene caso de uso
  *      legítimo, y dejar una puerta "por si acaso" es cómo estas cosas terminan encendidas.
  *   3. El `userId` de la sesión está en la allowlist de personas agente. No alcanza con ser
@@ -68,8 +68,22 @@ interface OrganizationResolutionSubject {
 const isOverrideAllowed = (userId: string | null | undefined): boolean => {
   if (process.env.CLIENT_PORTAL_AGENT_ORG_OVERRIDE_ENABLED !== 'true') return false
 
-  // Bloqueo duro. Sin variable de escape, por diseño.
-  if (process.env.NODE_ENV === 'production') return false
+  // Bloqueo duro de producción, sin variable de escape.
+  //
+  // El discriminador es `VERCEL_ENV`, que es el canónico del repo para esto — mismo que
+  // `src/app/api/auth/agent-session/route.ts` y `src/proxy.ts`. La primera versión de este
+  // guard usaba `NODE_ENV`, y estaba mal por una razón que sólo se ve midiendo: Vercel
+  // compila **todos** los deployments con `NODE_ENV=production`, así que el bloqueo también
+  // apagaba el override en staging y lo dejaba efectivamente solo-local. Verificado contra
+  // el runtime desplegado el 2026-08-09: staging reporta `VERCEL_ENV=preview`.
+  //
+  // **NUNCA** agregar acá una válvula de escape del estilo `..._ALLOW_PRODUCTION`. El
+  // precedente de `agent-session` tiene una, y esa divergencia es deliberada: agent-session
+  // concede una sesión como persona fixture, mientras este override concede **lectura
+  // cross-tenant del portal de cualquier organización cliente**, con una credencial que vive
+  // documentada en `CLAUDE.md`. No es el mismo orden de riesgo, y no hay caso de uso legítimo
+  // para eso en producción.
+  if (process.env.VERCEL_ENV === 'production') return false
 
   if (!userId) return false
 

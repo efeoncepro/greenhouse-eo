@@ -7,6 +7,61 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-09 — La verificación en staging del portal cliente encontró dos defectos más
+
+Recorrí las 9 rutas × 3 personas con sesión real contra staging. El fix quedó confirmado en runtime
+desplegado —3 base sirven `200`, las 6 module-gated redirigen a `/home?denied=<slug>`, **cero**
+`?error=resolver_unavailable`— y de paso salieron dos cosas que sólo se ven ejerciendo el flujo:
+
+- **`/proyectos` devolvía `/401` al operador interno**, y era la única de las 9 que conservaba un gate
+  legacy por route group **encima** del canónico, con el comentario de al lado diciendo que el
+  canónico lo reemplazaba. Corría primero, así que ganaba, y el scope del operador interno no incluye
+  `client`. Arreglado, con una guarda de source que barre las 9 páginas. **Producción sigue con el
+  síntoma hasta el próximo release** — clasificado `MENOR`: es fail-closed de más, no expone nada.
+- **El override de organización era solo-local por usar `NODE_ENV`.** Vercel compila todos los
+  deployments con `NODE_ENV=production`, así que el bloqueo apagaba el flag también en staging. El
+  discriminador canónico del repo es `VERCEL_ENV` (mismo que `agent-session` y `proxy.ts`). Corregido,
+  y **sin** válvula de escape de producción: la divergencia con `agent-session` es deliberada porque
+  este override concede lectura cross-tenant.
+
+## 2026-08-09 — El carril de acceso del portal cliente queda cerrado del todo (TASK-1680 + Creative a SKY)
+
+Las tres piezas que quedaban después del release: el módulo Creative asignado, el lint cerrado y los
+dos hallazgos de tooling con ID.
+
+- **Creative Hub Globe asignado a Sky Airlines** vía el command canónico `enableClientPortalModule`
+  (no SQL: es el único camino con audit + outbox + invalidación de cache en una transacción). Las 4
+  páginas Creative del portal abren para SKY y siguen en empty state para el resto — que es el
+  producto funcionando.
+- **`TASK-1680`**: el lint `no-untokenized-business-line-branching` pasa a `error`. La medición dio
+  **0 violaciones** con el override intacto, y reveló que **4 de sus 6 entradas eximían paths que la
+  regla nunca miró** — hacían ver la gobernanza más estricta de lo que era. Quedó una exención, medida
+  y con dueño. 6 archivos muertos borrados de paso.
+- **El gate de verificación pasa a derivar su expectativa de los datos.** Hardcodeaba "3 abren y 6
+  empty state" y al asignarle el módulo a SKY reportó cuatro desvíos **por hacer lo correcto**. Un
+  gate que se edita por organización no prueba el carril: prueba que la primera organización sigue
+  igual.
+- `TASK-1682` (la capability del bypass de release sin verificador ni grant) y `TASK-1683` (la
+  rotación de contexto que borra el puntero al archive) quedan registradas con su medición.
+
+## 2026-08-09 — El carril de acceso del portal cliente, EN PRODUCCIÓN (release `2c87d71e2eca`)
+
+`TASK-1678` + `TASK-1679` promovidas juntas a propósito: la contención del fail-open se retira en el
+mismo instante en que el fail-open se cierra, así que no hubo ventana de exposición. Manifest
+`2c87d71e2eca-f444748c-92aa-484c-b118-02713ee63e06` en `released`, run `31335921151`, watchdog
+`drift_count=0`, `/api/auth/health` 200 con los 3 providers `ready`.
+
+- Pasó a la primera con un solo bypass previsto: los dos hallazgos del preflight se pre-emptaron antes
+  de tocar `main` (el staging `CANCELED` se resolvió con el propio push de código; el smoke sobre `main`
+  se **produjo** en vez de bypassearse).
+- 🔴 **Aprendizaje que no estaba en ningún runbook:** el marker `[release-coupled:]` **no** sirve para
+  `requires_break_glass` — sólo limpia `split_batch`. Ponerle marker a un `requires_break_glass` es
+  cargo-cult; su única salida es el bypass.
+- **Hay una sola instancia Cloud SQL:** producción, staging y local leen la misma base, así que las 2
+  migraciones del batch ya estaban aplicadas antes del deploy. Eso cambia cómo se evalúa el riesgo de un
+  release con `db_migrations`.
+- `TASK-1680` quedó desbloqueada (su `Blocked by` apuntaba a `TASK-1679`).
+
 ## 2026-08-09 — Las 9 páginas del portal cliente dejaron de mentir (TASK-1679, cierra ISSUE-146)
 
 Las nueve rutas guardadas redirigían con `?error=resolver_unavailable` —el banner de "el servicio no
@@ -1182,39 +1237,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   gateway hasta sus gates propios. El gateway no importa lógica, DB, storage ni credenciales de Globe.
 - Se incorporó la skill espejo `efeonce-mcp-platform` para Codex y Claude: enruta gateway, OAuth, edge e
   integración de providers hacia las skills dueñas, y mantiene una verificación mecánica de paridad.
-
-## 2026-08-01 — Globe: recuperación del source of truth OAuth/PKCE y evaluación durable
-
-- Se reconstruyó sobre `develop` el código preservado del Admin CLI OAuth público + PKCE, las rutas API Platform,
-  la procedencia autenticada y la recuperación idempotente de fondeo, sin repetir ninguna mutación de runtime.
-- El trabajo administrativo que usó históricamente `TASK-1616` se renumeró a `TASK-1629` para no colisionar con
-  MiniMax H3. Las migraciones ya aplicadas conservan sus nombres históricos `task-1616-*`.
-- Se reconciliaron los checkpoints de TASK-1614 sobre evaluación durable, lineage/rights, recuperación sistémica
-  y el requisito de un canary nuevo desde Producer; el candidato retenido no sustituye esa prueba.
-- Actualización 2026-08-02: 16 créditos dieron `allowed=true`, 800 efectivos y cero blockers, sin fondeo ni cambio
-  de policy. La saga expirada se recuperó fail-closed y `promotion_557d4df1-994e-45ac-92f7-7ef885aa967e` quedó
-  activada con binding/circuit revision 5.
-- El canary no se disparó: el Studio live oculta referencias posteriores a la octava. Globe `main` `595f0cb`
-  elimina el recorte y prueba la décima referencia con rights/lineage e idempotencia; tests y CI
-  `30733665167` verdes, deploy manual no ejecutado. Reader `30733996145` confirmó saga rev 7 activa hasta
-  `2026-08-02T10:54:43.570Z` y Chrome volvió a medir ocho referencias live, sin generar. TASK-1614 sigue
-  `in-progress`, rollout pendiente.
-
-## 2026-08-01 — AXIS Lab: Astro 7 con foundation documental y testing
-
-- `axis-design-system/apps/lab` dejó Vite vanilla y ahora usa Astro `7.1.6` con salida estática para Vercel,
-  Content Loader, rutas por pattern, MDX, sitemap/SEO, Vitest y Playwright desktop/mobile.
-- La referencia se genera desde tokens/registry publicados; conserva HTML/CSS y un script vanilla mínimo,
-  sin adapters de Greenhouse/Globe, Actions ni SSR.
-- Se actualizaron la task `TASK-1590`, las skills AXIS, la arquitectura, el runbook y el handoff. Fixtures
-  visuales completos por contrato siguen pendientes.
-- Rollout público completado en `axis-design-system-lab.vercel.app`; el primer slice Greenhouse `colors`
-  ya tiene referencia token-backed en `/references/colors/` y su inventario de migración quedó documentado.
-
-## 2026-08-01 — Globe Producer: pie de la aplicación, paginación del feed y seis defectos de superficie
-
-- El **pie de la aplicación volvió al Producer**: el port a React había perdido el `.producer-footer` del payload legacy y con él el wordmark de Efeonce. Se trajo `efeonce-positive.svg` desde `public/branding/logo-full.svg` como par exacto del negativo (mismo `viewBox` y trazados, sólo cambia la tinta) y se registró en el allowlist de `assets.ts` y en `PROVENANCE.md`; el logo cambia de tinta con el tema, que es tematizable desde TASK-1613.
-- El **feed puede volver hacia atrás**. El backend paginaba por cursor keyset desde TASK-1525 y el cliente ignoraba el `nextCursor`, así que el histórico era inalcanzable. Verificado en vivo: 25 → 50 piezas. Se descartó scroll infinito (vuelve inalcanzable el pie y mueve el contenido bajo el cursor con piezas generándose) y páginas numeradas (offset es incorrecto cuando entran items por arriba).
-- El **anillo de créditos mide el ciclo y no el stock**: con 500.836 de 501.110 el arco de consumo medía 0,197° de 360 — invisible por física. El glifo pasó de `sparkles` (el genérico de IA) a `flame`. Mientras el período no tenga tope asignado el aro queda **neutro** en vez de inventar un denominador.
-- Además: barra del documento tokenizada y `scroll-behavior: smooth`, barra del composer que se revela en hover, `⌘K` como una unidad, y los controles de selección de las cards centrados y apagados honestamente hasta que el compare se porte desde el legacy.
-- Lecciones registradas en la skill `greenhouse-globe` y en el `Delta 2026-08-01` de TASK-1559: el `padding` que el UA da a todo `<button>` sin preflight (rompe sólo bajo 29 px de caja), `margin:auto` + `flex-wrap`, que `space-between` reparte hijos, y que un velo por alfa no es un hueco.

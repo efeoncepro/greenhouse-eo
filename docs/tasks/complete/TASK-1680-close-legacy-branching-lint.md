@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Bajo`
@@ -22,10 +22,68 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `platform`
-- Blocked by: `TASK-1679`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `client-portal-legacy-branching-sweep`
 - GitHub Issue: `none`
+
+## Estado real 2026-08-09 — ✅ `complete`
+
+Los 3 slices ejecutados. La regla `greenhouse/no-untokenized-business-line-branching` está en
+`error` y `pnpm lint` queda verde, con **una sola exención** en el override.
+
+### Slice 1 — la medición, y salió mejor de lo esperado
+
+Con la regla en `error` y el override intacto: **0 violaciones**. El barrido que `TASK-827` dejó
+abierto en mayo lo cerraron `TASK-1675`, `TASK-1678` y `TASK-1679` sin que nadie lo declarara
+terminado. Con el override **vacío**: 2 violaciones, ambas en `VerticalMenu.tsx` (líneas 128-129,
+el bloque `resolveCapabilityModules`).
+
+### Slice 2 — el override tenía 6 entradas y sólo 1 era real
+
+Ésta es la parte que valía medir en vez de asumir. De las 6 entradas:
+
+| Entrada | Por qué se retiró |
+|---|---|
+| `src/lib/auth/**` | **Redundante por construcción**: `isUiFile` sólo evalúa `src/(components / views / app)/**` |
+| `src/app/api/auth/**` | **Redundante por construcción**: `isUiFile` excluye `src/app/api/**` explícitamente |
+| el archivo de la regla | Redundante: no está bajo `src/` |
+| sus tests | Redundante: `isUiFile` excluye `__tests__/` y `*.test.*` |
+| `src/app/**/_layout.tsx` | **Especulativa** ("si emergen casos"). Nunca emergieron |
+| `VerticalMenu (1).tsx` | **Archivo muerto**, borrado (ver abajo) |
+
+**Cuatro de las seis eximían paths que la regla nunca miró.** Eso no es inofensivo: hace ver la
+gobernanza más estricta de lo que es y esconde cuál exención es la real. Queda una, medida y con
+dueño declarado: `VerticalMenu.tsx`, cuyo retiro pertenece al follow-up
+`capability-modules-resolver-migration`.
+
+**Seis archivos muertos borrados, no uno.** La task nombraba `VerticalMenu (1).tsx`; resultó ser
+una familia de duplicados accidentales del commit `eec326410` ("chore: add local docs and
+**duplicate working files**", 2026-03-13), muertos cinco meses: `src/types/capabilities (1).ts`,
+`src/config/capability-registry (1).ts`, `src/lib/capabilities/resolve-capabilities (1).ts`,
+`src/components/layout/vertical/VerticalMenu (1).tsx`,
+`src/app/(dashboard)/capabilities/[moduleId]/layout (1).tsx` y
+`src/app/api/capabilities/[moduleId]/data/route (1).ts`. Los seis verificados sin un solo import
+antes de borrarlos. Los dos bajo `src/app/` eran inertes para el router (Next sólo reconoce
+`layout.tsx`/`route.ts` exactos), pero igual pesaban en lint, tsc y gobernanza.
+
+### Slice 3 — promovida a `error`, y verificada mordiendo
+
+No alcanza con que `pnpm lint` pase: eso también pasaría si la regla estuviera apagada. Se
+verificó con un archivo UI de prueba que lee `session.user.businessLines` → la regla reporta
+`error` y bloquea. El archivo de prueba se borró (0 residuos).
+
+### Gates
+
+`pnpm lint` 0 · `pnpm typecheck` 0 · `pnpm test` 10437/0 · `pnpm build` producción exit 0.
+
+## Delta 2026-08-09
+
+- **Desbloqueada.** `TASK-1678` y `TASK-1679` se promovieron a producción el 2026-08-09 en el
+  release `2c87d71e2eca` (manifest `2c87d71e2eca-f444748c-92aa-484c-b118-02713ee63e06`,
+  watchdog `drift_count=0`). El carril viejo ya falla hacia cerrado para el routeGroup
+  `client`, así que promover el lint a `error` ya no puede dejar el portal cliente sin
+  alternativa. `Blocked by` pasa de `TASK-1679` a `none`.
 
 ## Summary
 

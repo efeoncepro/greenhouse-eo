@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -27,9 +27,20 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
-## Estado real 2026-08-09 — `code complete, rollout pendiente`
+## Estado real 2026-08-09 — ✅ `complete`, EN PRODUCCIÓN
+**Promovida a producción el 2026-08-09** en el mismo release que `TASK-1678`
+(`2c87d71e2eca`, manifest `2c87d71e2eca-f444748c-92aa-484c-b118-02713ee63e06`, run
+`31335921151`, `released`, watchdog `drift_count=0`) — van juntas a propósito, así que la
+contención del fail-open se retiró en el mismo instante en que el fail-open se cerró y no
+hubo ventana de exposición. Verificado post-release contra la base que lee producción:
+`scripts/identity/client-portal-page-access-check.ts` → 4 orgs × 9 rutas, **0 desvíos**,
+3 abren y 6 empty state.
 
-Los 7 slices están implementados y verificados en local. **No se mueve a `complete/`** porque el
+**Lo que sigue abierto y NO es código:** asignar `creative_hub_globe_v1` a Sky Airlines es lo
+único que abre las 4 páginas Creative. Decisión comercial.
+
+
+Los 7 slices están implementados y verificados en local. ~~No se mueve a `complete/`~~ (cerrada tras la promoción) porque el
 criterio de aceptación exige verificación de runtime antes de promover, y esto no está en `main`.
 Además va **después de `TASK-1678`** en la promoción, por el orden de contención.
 

@@ -3,8 +3,44 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.1
 > **Creado:** 2026-05-13 por Claude (TASK-827)
-> **Ultima actualizacion:** 2026-08-09 por Claude (TASK-1675 — el menu vertical ya consume el resolver)
+> **Ultima actualizacion:** 2026-08-09 por Claude (TASK-1678/1679/1680 — las paginas vuelven a responder y hay vistas base)
 > **Documentacion tecnica:** [GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md](../../architecture/GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md), [GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md)
+
+---
+
+## Delta 2026-08-09 — las paginas del portal volvieron a responder
+
+Hasta este dia, **nueve paginas del portal cliente devolvian el mismo mensaje de error**
+("el servicio no esta disponible") para seis situaciones distintas, y ninguna de las seis era una
+falla del servicio. Ahora cada situacion dice lo que realmente pasa. Tres cambios que conviene
+conocer si operas el portal:
+
+**1. Hay tres paginas que abren siempre, sin contratar nada.** Notificaciones, Configuracion y
+Novedades son parte del portal, no un producto: un cliente no contrata "poder ver sus
+notificaciones". Se llaman **vistas base** y estan disponibles para cualquier organizacion.
+
+**2. El resto sigue dependiendo del modulo contratado, y ahora lo dice bien.** Cuando una
+organizacion no tiene el modulo que gobierna una pagina, ve el empty state que explica que ese
+modulo no esta activado y a quien pedirlo — antes veia el banner de degradacion, que invita a
+reintentar algo que nunca iba a funcionar.
+
+**3. Si un usuario cliente no tiene organizacion resuelta, el mensaje es distinto.** No es lo mismo
+"no tienes este modulo" que "no puedo saber que modulos tienes". El segundo caso es un problema de
+datos del onboarding, no del contrato comercial, y tiene su propia senal en `/admin/operations`
+(`identity.client_portal.client_without_organization`, que en estado sano marca cero).
+
+### Que significa esto cuando un cliente reporta que no ve algo
+
+| Lo que ve el cliente | Que significa | Que hacer |
+|---|---|---|
+| La pagina abre | Es vista base, o su organizacion tiene el modulo | nada |
+| "Este modulo no esta activado para tu cuenta" | El fail-closed correcto: no tiene el modulo | decision comercial: asignar el modulo si corresponde |
+| Banner de degradacion | El resolver fallo de verdad | revisar `/admin/operations` |
+| Vuelve a `/home` sin mensaje claro | Su organizacion no esta resuelta | revisar el onboarding de ese cliente (`spaces` → `organizations`) |
+
+> Detalle tecnico: `docs/architecture/GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md` §12.2 documenta el guard
+> real y las tres vistas base; `docs/tasks/complete/TASK-1679-client-portal-guard-key-and-base-views.md`
+> tiene la medicion contra las organizaciones reales.
 
 ---
 
