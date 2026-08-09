@@ -7,6 +7,29 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-09 — Las 9 páginas del portal cliente dejaron de mentir (TASK-1679, cierra ISSUE-146)
+
+Las nueve rutas guardadas redirigían con `?error=resolver_unavailable` —el banner de "el servicio no
+está disponible"— por tres defectos que vivían en la misma función y se tapaban entre sí: el
+`redirect()` del camino `denied` estaba **dentro** del `try`, así que su propio `catch` lo interceptaba;
+el guard pasaba un `clientId` donde el resolver espera un `organizationId`; y seis viewCodes de rutas
+vivas no los declaraba ningún módulo. Ahora cada resultado tiene su destino: empty state para
+module-gated sin módulo, `organization_unresolved` para sesión sin organización, y
+`resolver_unavailable` sólo cuando el resolver falla de verdad.
+
+- `ModuleNotAssignedEmpty` volvió a existir en runtime, y una denegación legítima dejó de reportarse a
+  Sentry como error del resolver — el dominio `client_portal` acumulaba incidentes por funcionamiento
+  normal.
+- Tres vistas pasaron a allowlist base (`notificaciones`, `configuracion`, `actualizaciones`): no son
+  producto vendible. Ciclos y Analytics quedaron module-gated por decisión del operador.
+- `/reviews` se unificó en `cliente.reviews`; `cliente.revisiones` queda marcado como retirado
+  (append-only).
+- **Medido, no supuesto:** corregir el guard NO abre las 9. Los módulos que declaran 4 de esas vistas
+  no están asignados a ninguna organización, así que 3 abren y 6 muestran el empty state. Abrirlas es
+  un assignment, no código.
+- Persona de verificación con organización configurable, con 4 condiciones fail-closed y auditoría.
+  **Rollout pendiente:** no está en `main`.
+
 ## 2026-08-09 — El carril rol→vista del portal cliente falla hacia cerrado (TASK-1678, cierra ISSUE-147)
 
 `resolveAuthorizedViewsForUser` otorgaba por defecto: un rol `client_*` y una vista `cliente.*`
@@ -1195,7 +1218,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
 - El **anillo de créditos mide el ciclo y no el stock**: con 500.836 de 501.110 el arco de consumo medía 0,197° de 360 — invisible por física. El glifo pasó de `sparkles` (el genérico de IA) a `flame`. Mientras el período no tenga tope asignado el aro queda **neutro** en vez de inventar un denominador.
 - Además: barra del documento tokenizada y `scroll-behavior: smooth`, barra del composer que se revela en hover, `⌘K` como una unidad, y los controles de selección de las cards centrados y apagados honestamente hasta que el compare se porte desde el legacy.
 - Lecciones registradas en la skill `greenhouse-globe` y en el `Delta 2026-08-01` de TASK-1559: el `padding` que el UA da a todo `<button>` sin preflight (rompe sólo bajo 29 px de caja), `margin:auto` + `flex-wrap`, que `space-between` reparte hijos, y que un velo por alfa no es un hueco.
-
-## 2026-07-31 — GitHub Actions: presupuesto mensual de la organización actualizado
-
-- Con confirmación humana y método de pago verificado, el presupuesto externo de Actions de `efeoncepro` pasó de USD 0 a **USD 20 mensuales**; `Stop usage when budget limit is reached` y las alertas permanecen activados. La evidencia y el procedimiento están en [`cloud-cost-intelligence-finops.md`](docs/documentation/operations/cloud-cost-intelligence-finops.md) y [`github-actions-budget.md`](docs/manual-de-uso/operations/github-actions-budget.md).

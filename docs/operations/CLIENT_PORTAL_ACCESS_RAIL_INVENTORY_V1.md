@@ -18,8 +18,8 @@ Los defectos reales son **tres**, y dos de ellos son una función y una línea:
 | # | Defecto | Tamaño | Consecuencia | Estado |
 |---|---|---|---|---|
 | 1 | La derivación de `authorizedViews` otorga por defecto y no conoce módulos | 1 función + 1 fallback | fail-**open**: un cliente puede recibir en sesión los 18 viewCodes module-gated | ✅ **cerrado 2026-08-09** por `TASK-1678` (`ISSUE-147` resuelta) |
-| 2 | El guard de acceso usa `clientId` donde el resolver espera `organizationId` | 1 línea | fail-**closed**: 3 páginas cliente deniegan siempre | abierto — `TASK-1679` |
-| 3 | Seis viewCodes de rutas cliente vivas no están declarados en ningún módulo | dato, no código | fail-**closed**: otras 6 páginas deniegan siempre, y el fix de #2 **no** las arregla | abierto — `TASK-1679` |
+| 2 | El guard de acceso usa `clientId` donde el resolver espera `organizationId` | 1 línea | fail-**closed**: 3 páginas cliente deniegan siempre | ✅ **cerrado 2026-08-09** por `TASK-1679` (`ISSUE-146` resuelta) |
+| 3 | Seis viewCodes de rutas cliente vivas no están declarados en ningún módulo | dato, no código | fail-**closed**: otras 6 páginas deniegan siempre, y el fix de #2 **no** las arregla | ✅ **cerrado en código 2026-08-09**: 3 pasaron a allowlist base; las otras 3 (+ las Creative) son **assignment de módulo pendiente**, no código |
 
 > **Corrección de la medición (2026-08-09, al implementar `TASK-1678`).** Dos números y un
 > diagnóstico de este inventario estaban mal, y conviene no heredarlos:
@@ -29,13 +29,28 @@ Los defectos reales son **tres**, y dos de ellos son una función y una línea:
 > - **El "SELECT sin predicado de vigencia" no era un defecto:** `role_view_assignments` no tiene
 >   columnas de vigencia. El hueco real era el merge de `toRegistryRows`, que reponía desde el
 >   registry TS las vistas que la DB había desactivado.
+> - 🔴 **El defecto 2 desbloquea 0 páginas, no 3.** Este inventario estimaba que corregir la llave
+>   abriría las 3 «cuyo viewCode está declarado en algún módulo». Cierto a nivel de catálogo, falso a
+>   nivel de datos: los módulos que las declaran (`creative_hub_globe_v1`, `equipo_asignado`) **no
+>   están asignados a ninguna organización**. `module_assignments` tiene 7 filas en toda su historia,
+>   todas de SEO / AI Visibility / Proposal Studio. Es la lección más transferible de esta medición:
+>   **contar lo que el catálogo declara no es contar lo que los datos permiten.**
+> - **Y por lo tanto los defectos 2 y 3 eran, sobre todo, un bug de mensaje.** Antes las 9 rutas
+>   decían "el servicio no está disponible" cuando el servicio estaba bien, y ensuciaban Sentry con el
+>   funcionamiento normal. Después dicen la verdad: 3 abren y 6 dicen "no tienes este módulo".
 > - **El fail-open costaba mucho menos de lo que parecía.** Medido con
 >   `scripts/identity/client-view-fallback-audit.ts`: invertir el default apaga **un** viewCode por
 >   rol cliente, y es module-gated. Las 72 filas de assignment ya eran explícitas — el default
 >   permisivo casi no cargaba peso. Lo que sí era grave es el camino degradado, no el happy path.
 
-**Nueve de las páginas del portal cliente no abren hoy.** Ese es el titular, y no estaba en ningún
-issue antes de esta medición.
+**Nueve de las páginas del portal cliente no abren hoy.** Ese era el titular al medir, y no estaba en
+ningún issue antes de esta medición.
+
+> **Estado al 2026-08-09, después de `TASK-1678` + `TASK-1679`:** las nueve **dejaron de mentir**, que
+> es una cosa distinta de abrir. Tres abren (las vistas base) y seis muestran el empty state honesto
+> porque su módulo no está asignado a ninguna organización. La parte que queda no es código: es
+> decidir y asignar módulos. El titular corregido sería *"nueve páginas reportaban una falla de
+> servicio para decir seis cosas distintas, y ninguna de las seis era una falla"*.
 
 ## Lo que se midió
 
@@ -97,6 +112,11 @@ Ese orden importa y es la razón principal de que este inventario exista.
 
 ## Defecto 2 — el guard usa la llave equivocada (fail-closed)
 
+> ✅ **CERRADO 2026-08-09** por `TASK-1679` (`ISSUE-146`). La llave pasa por el helper único
+> `resolveClientPortalOrganizationId`, con test de contrato. Y de paso se cerró un tercer defecto que
+> esta sección descubrió al verificar en producción: el `redirect()` del camino `denied` estaba dentro
+> del `try`, así que su propio `catch` lo interceptaba.
+
 `requireViewCodeAccess` asigna `session.user.clientId` a una variable llamada `organizationId` y la pasa
 a un filtro sobre `module_assignments.organization_id`. Los espacios de ID no se solapan: `cli-*`,
 `hubspot-company-*` y `greenhouse-demo-client` contra `org-*`. Detalle completo en `ISSUE-146`.
@@ -105,6 +125,13 @@ Alcance real: **3** de las 9 páginas (`/proyectos`, `/campanas`, `/equipo`). La
 causa.
 
 ## Defecto 3 — seis viewCodes que ningún módulo declara (fail-closed)
+
+> ✅ **CERRADO EN CÓDIGO 2026-08-09** por `TASK-1679`, con una decisión de producto de por medio:
+> sólo **3** de las 6 son portal base (`notificaciones`, `configuracion`, `actualizaciones`) y pasaron
+> a una allowlist transversal. `cliente.ciclos` y `cliente.analytics` quedaron module-gated —son
+> superficies de delivery y Creative pertenece a un solo cliente— y `/reviews` se unificó en
+> `cliente.reviews`. Las que siguen cerradas lo están por **assignment de módulo pendiente**, que es
+> una decisión comercial, no un bug.
 
 `hasViewCodeAccess` resuelve con `modules.some(m => m.viewCodes.includes(viewCode))`. No hay allowlist
 transversal: **un viewCode que ningún módulo declara deniega siempre**, con o sin el fix del defecto 2.

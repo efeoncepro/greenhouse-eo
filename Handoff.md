@@ -1,5 +1,44 @@
 # Handoff activo
 
+### TASK-1679 — las 9 páginas del portal cliente dejaron de mentir (cierra ISSUE-146)
+
+Code complete en `develop`, **rollout pendiente**. Va DESPUÉS de `TASK-1678` en la promoción.
+
+**Lo que necesita quien siga:**
+
+1. 🔴 **Corregir el guard NO abre las 9, y la spec decía que sí.** Los módulos que declaran
+   `cliente.proyectos`/`campanas`/`equipo`/`reviews` son `creative_hub_globe_v1` y `equipo_asignado`, y
+   **ninguna organización los tiene asignados** — `module_assignments` tiene 7 filas en toda su
+   historia. Estado medido contra las 4 orgs reales: **3 abren** (las base) y **6 empty state**.
+   Abrirlas es un assignment de módulo, o sea decisión comercial. El operador declaró que **Creative es
+   de Sky Airlines y de nadie más**, así que el candidato es asignarle `creative_hub_globe_v1` a SKY.
+2. **La lección transferible: contar lo que el catálogo declara no es contar lo que los datos
+   permiten.** El inventario estimó "3 páginas" leyendo `modules.view_codes` sin cruzar contra
+   `module_assignments`. Vale para cualquier medición futura sobre este carril.
+3. **`redirect()` de Next señaliza lanzando.** Si tocas `requireViewCodeAccess`, el `redirect()` del
+   camino `denied` tiene que quedar FUERA del `try`; adentro, el `catch` se lo come y toda denegación
+   sale como falla del resolver. Hay un test que lo fija con un throw etiquetado igual que Next.
+4. **La llave se resuelve en UN lugar:** `resolveClientPortalOrganizationId`. No leer
+   `session.user.organizationId` directo en un callsite nuevo — el override de la persona de
+   verificación se aplica ahí, y si el menú y el guard resolvieran distinto, el operador vería un menú
+   que no corresponde a lo que puede entrar.
+5. **Flag `CLIENT_PORTAL_AGENT_ORG_OVERRIDE_ENABLED`, default-OFF, inerte en producción por diseño**
+   (el helper bloquea con `NODE_ENV === 'production'`, sin variable de escape). Para cambiar de
+   organización en local/staging: prender el flag + cookie `gh_agent_org_override` o env
+   `CLIENT_PORTAL_AGENT_ORG_OVERRIDE`. Riesgo declarado y aceptado por el operador: con el flag ON, la
+   credencial documentada de la persona agente lee el portal de cualquier organización.
+6. **`agent-client@greenhouse.efeonce.org` ya sirve:** tenía `organization_id` NULL y ahora resuelve a
+   Greenhouse Demo (0 módulos), o sea es la persona canónica del caso empty state. Berel se verifica
+   con `agent-berel-client`.
+7. **Verificación reproducible:** `scripts/identity/client-portal-page-access-check.ts` declara el
+   resultado esperado por ruta ANTES de correr y sale con exit 1 si algo difiere. 4 orgs × 9 rutas,
+   0 desvíos. Repetir contra producción antes de cerrar.
+8. **Deuda rastreada, no allowlisteada en silencio:** `cliente.ciclos` y `cliente.analytics` siguen
+   sin módulo que las declare y viven en `PENDING_MODULE_DECLARATION_VIEW_CODES`
+   (`view-codes/parity.ts`). Están exentas del parity test sólo para no dejarlo rojo por deuda
+   preexistente; la salida correcta es declararlas en su módulo y sacarlas de ahí.
+
+
 ### TASK-1678 — el carril rol→vista del portal cliente ya falla hacia cerrado (cierra ISSUE-147)
 
 Code complete en `develop`, **rollout pendiente** (no está en `main`). Invierte el fail-open de
@@ -542,33 +581,12 @@ igual, por su cuenta.
 **Próximo paso:** TASK-1307, con dirección visual ya aprobada (concepto C "Evidencia narrativa",
 `product-design-loop` 2026-08-06) y Slice 0 (ECharts vs Apex) todavía abierto.
 
-### Break-glass deploy del gateway MCP — shim DCR LIVE (TASK-1654, 2026-08-06)
-
-GitHub Actions cayó en **major outage** (4 intentos de deploy muertos: 2 cancelados en cola, 1
-flake WIF, 1 sin poder descargar actions). Con autorización explícita del operador se desplegó
-por **break-glass gcloud directo**: Cloud Build local→imagen `gateway:ae8f2f7` (38s) + `gcloud
-run deploy --update-env-vars OAUTH_PUBLIC_CLIENT_ID=…` (aditivo, hereda el resto de la revisión;
-el workflow declara la var así que el próximo deploy normal converge). Revisión
-`efeonce-mcp-gateway-00015-4st` sirviendo 100%. Verificado live: AS metadata con
-`registration_endpoint` + authorize/token reales de Entra, protected-resource apuntando al
-gateway, `/register` devolviendo el client fijo, `/mcp` anónimo 401, y canary 4/4 (rank-evolution
-series=31). Rollback: snapshot de la revisión previa en scratchpad + `gcloud run services
-update-traffic` a `00014`. **VERIFICADO CON EL CLIENTE REAL (2026-08-06 ~17:50Z): Claude Code
-autenticó exitosamente contra el gateway** ("Authentication successful / Connected") tras el
-segundo fix — scopes CUALIFICADOS en el protected-resource metadata (`56e46f7`, revisión
-`00016-6zh`): Entra v2 resuelve scopes pelados contra Graph (AADSTS650053); el valor requestable
-es `https://mcp.efeonce.org/mcp/<scope>` y el `scp` del token vuelve pelado (verifier intacto,
-validado con arch-architect). Pendientes: (1) formalizar TASK-1654 retroactiva (shim DCR + scope
-fix, ambos break-glass documentados); (2) cuando GitHub Actions se recupere del major outage,
-correr el deploy normal del workflow para converger el carril canónico (declara la env var; el
-código ya está en main `56e46f7`).
-
-
-> Historial rotado: [Handoff.archive.md](Handoff.archive.md).
-
 ### Hallazgo MCP gateway — clientes Claude no conectan por falta de DCR (2026-08-06)
 
 ⚠️ **Superseded el mismo día** por el break-glass del shim DCR (entrada TASK-1654, arriba: LIVE y
 verificado con el cliente real). Se conserva sólo la causa: el cliente MCP de Claude exige DCR
 (RFC 7591) para auto-registrarse y **Entra no lo soporta**, así que sin el shim `/register` del
 gateway falla con `Incompatible auth server: does not support dynamic client registration`.
+
+
+> Historial rotado: [Handoff.archive.md](Handoff.archive.md).

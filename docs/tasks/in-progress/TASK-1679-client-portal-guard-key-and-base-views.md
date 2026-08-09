@@ -27,6 +27,23 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Estado real 2026-08-09 — `code complete, rollout pendiente`
+
+Los 7 slices están implementados y verificados en local. **No se mueve a `complete/`** porque el
+criterio de aceptación exige verificación de runtime antes de promover, y esto no está en `main`.
+Además va **después de `TASK-1678`** en la promoción, por el orden de contención.
+
+- Verificación local: `scripts/identity/client-portal-page-access-check.ts` — resultado esperado por
+  ruta declarado ANTES de correr, 4 organizaciones × 9 rutas, **0 desvíos**: 3 abren, 6 empty state.
+- Migración `20260809192408303` aplicada en dev: la persona `agent-client` pasó de `organization_id`
+  NULL a Greenhouse Demo, y la señal del Slice 1 quedó en **0**.
+- Gates: `pnpm test` 10437/0 · `pnpm lint` 0 · `pnpm typecheck` 0 · `route-reachability-gate` 0
+  huérfanas · parity TS↔DB de viewCodes verde **contra PG real** · `flags:audit --strict` 0 sin registrar.
+- **Falta para cerrar:** promover (después de 1678), aplicar la migración en staging/producción y
+  repetir el page-access-check contra producción.
+- **Fuera de alcance, y es la parte que abre las 6 restantes:** asignar `creative_hub_globe_v1` a Sky
+  Airlines. Decisión comercial sobre datos productivos.
+
 ## Recalibración 2026-08-09 — medido contra PG antes de implementar
 
 Discovery contra PG invalidó tres premisas. Se corrigen acá antes de escribir código.

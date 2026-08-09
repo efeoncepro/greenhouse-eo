@@ -3,7 +3,7 @@
 > **Tipo:** Incidente de runtime (portal cliente / autorización)
 > **Ambiente:** Producción + staging + local
 > **Detectado:** 2026-08-09, documentando `TASK-1675`
-> **Estado:** open — causa raíz identificada con evidencia en datos; fix no aplicado
+> **Estado:** ✅ **resolved 2026-08-09** por `TASK-1679` — ver §Resolución al final
 > **Severidad:** **alta** — no abre datos ajenos, pero deja inalcanzables las páginas cliente que dependen del guard, y lo hace de la forma más difícil de detectar: pareciendo el comportamiento correcto
 
 ## Resumen
@@ -146,6 +146,57 @@ el guard lo dejara pasar. Lo primero ya está; lo segundo no.
   no se toca.
 - La señal nueva debe reportar cero para el estado esperado, y >0 si aparece un cliente activo sin
   `organization_id` resuelto.
+
+## Resolución — 2026-08-09, `TASK-1679`
+
+Los tres defectos quedaron cerrados. Y el diagnóstico de esta issue era **correcto en la causa y
+optimista en el efecto**: vale dejar escrito por qué.
+
+### Los tres, cerrados
+
+- **La llave.** El guard resuelve la organización con `resolveClientPortalOrganizationId`, un helper
+  único. Se concentró en un solo lugar a propósito: el bug era un `string` pasado a un `string`, así
+  que TS no lo podía atrapar, y repartir la resolución por callsite es cómo vuelve. Hay un test de
+  contrato que falla si el valor pasado al resolver no es del espacio `org-*`.
+- **El `redirect()` dentro del `try`.** El `try` ahora envuelve sólo la llamada que puede fallar. El
+  camino `denied` es alcanzable, `ModuleNotAssignedEmpty` vuelve a renderizarse, y una denegación
+  legítima dejó de reportarse a Sentry como error del resolver.
+- **La columna nullable.** Señal `identity.client_portal.client_without_organization`, steady 0. Y el
+  camino "sin organización" ahora redirige con `?error=organization_unresolved`, distinto del empty
+  state: son dos estados distintos y el usuario merece saber cuál le tocó.
+
+### Lo que el diagnóstico no vio: el fix de la llave desbloquea 0 páginas, no 3
+
+Esta issue estimaba que corregir la llave abriría las 3 páginas «cuyo viewCode está declarado en algún
+módulo». Eso es cierto **a nivel de catálogo** y falso **a nivel de datos**: los módulos que declaran
+`cliente.proyectos` / `cliente.campanas` / `cliente.equipo` / `cliente.reviews` son
+`creative_hub_globe_v1` y `equipo_asignado`, y **ninguna organización los tiene asignados**.
+`module_assignments` tiene 7 filas en toda su historia, todas de SEO / AI Visibility / Proposal Studio.
+
+Medido contra las 4 organizaciones cliente reales, el estado después del fix es: **3 abren** (las
+vistas base, vía la allowlist transversal de `TASK-1679`) y **6 muestran el empty state**. Esas 6 se
+abren asignando su módulo — decisión comercial sobre datos productivos, fuera del alcance de un fix
+de código.
+
+O sea: esta issue era, en efecto, un bug de **observabilidad y de mensaje**, más que de acceso. Antes
+del fix las 9 rutas mentían dos veces (decían "el servicio no está disponible" cuando el servicio
+estaba bien) y ensuciaban Sentry. Después dicen la verdad. Que 6 de ellas digan "no tienes este
+módulo" es el producto funcionando.
+
+### Sobre el test de contrato
+
+La issue proponía dos caminos y decía que tipar los identificadores «cierra la clase entera». Se tomó
+el barato (test de contrato) y el otro quedó como follow-up de `TASK-1679`, con esta issue como su
+evidencia de necesidad.
+
+### Verificación
+
+- `scripts/identity/client-portal-page-access-check.ts` — resultado esperado por ruta declarado
+  **antes** de correr, 4 organizaciones × 9 rutas, 0 desvíos.
+- `scripts/identity/client-view-rail-persona-check.ts` — las tres personas agente.
+- 15 tests nuevos entre el guard y el resolver de organización.
+- La persona `agent-client` tenía `organization_id` NULL y no servía para verificar nada; ahora
+  resuelve a Greenhouse Demo (0 módulos) y es la persona canónica del caso empty state.
 
 ## Relacionado
 
