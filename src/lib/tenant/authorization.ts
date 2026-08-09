@@ -27,6 +27,28 @@ export type DerivedTenantAccessContext = {
   supervisorScope: SupervisorScopeRecord | null
 }
 
+/**
+ * TASK-1678 Slice 4 — el `fallback` de lista vacía no aplica a sesiones cliente.
+ *
+ * `hasAuthorizedViewCode` y `hasAnyAuthorizedViewCode` tratan "lista vacía" como
+ * "todavía no sé, usa el default del caller". Los layouts del portal cliente pasan
+ * `fallback: tenant.routeGroups.includes('client')`, que para todo cliente es `true`.
+ *
+ * Eso convertía el estado degradado en **mostrar todo**: el `catch` de
+ * `resolveTenantRuntimeAccess` deja la sesión viva con `authorizedViews: []`, y desde
+ * ahí cada layout cliente abría. Es el amplificador que hacía que degradar la
+ * derivación hacia cerrado (arriba, en `view-access-store`) no sirviera de nada.
+ *
+ * La discriminación es por **tenant**, no por el prefijo del viewCode: la pregunta
+ * honesta es "¿esta sesión es de cliente?", no "¿esta vista parece de cliente?".
+ * Ramificar sobre el string `cliente.` sería lógica stringly-typed sobre un
+ * identificador que el schema declara libre, y un viewCode renombrado la rompería en
+ * silencio. Además deja bien el caso del operador interno visitando una superficie
+ * cliente: conserva su baseline, igual que el bypass D1 del page guard.
+ */
+const resolveEmptyClaimFallback = (tenant: TenantContext, fallback: boolean) =>
+  tenant.tenantType === 'client' ? false : fallback
+
 export const hasAuthorizedViewCode = ({
   tenant,
   viewCode,
@@ -37,7 +59,7 @@ export const hasAuthorizedViewCode = ({
   fallback: boolean
 }) => {
   if (tenant.authorizedViews.length === 0) {
-    return fallback
+    return resolveEmptyClaimFallback(tenant, fallback)
   }
 
   return tenant.authorizedViews.includes(viewCode)
@@ -53,7 +75,7 @@ export const hasAnyAuthorizedViewCode = ({
   fallback: boolean
 }) => {
   if (tenant.authorizedViews.length === 0) {
-    return fallback
+    return resolveEmptyClaimFallback(tenant, fallback)
   }
 
   return viewCodes.some(viewCode => tenant.authorizedViews.includes(viewCode))

@@ -1117,8 +1117,26 @@ export const resolveAuthorizedViewsForUser = async ({
     }
   } catch (error) {
     if (error instanceof ViewAccessStoreError && error.code === 'SCHEMA_NOT_READY') {
+      // TASK-1678 Slice 4 — un camino degradado nunca devuelve más permisos que el
+      // camino feliz.
+      //
+      // Este fallback devolvía el `VIEW_REGISTRY` entero del routeGroup del usuario.
+      // Para un tenant `client` eso eran las 25 vistas `cliente.*` —incluidas las 18
+      // gobernadas por módulo contratado y las que tienen denial explícito—, o sea el
+      // opuesto exacto del default canónico. Y como la lista salía NO vacía, ningún
+      // guard de "lista vacía" de los consumidores se activaba: el estado degradado
+      // era indistinguible del normal.
+      //
+      // Para tenants `client` degrada a lista vacía y deja que la superficie lo trate
+      // como degradación honesta. Para el lado interno se conserva el baseline: sin él
+      // un esquema no provisionado dejaría a los operadores sin portal.
+      const degradedViews =
+        tenantType === 'client'
+          ? []
+          : VIEW_REGISTRY.filter(view => fallbackRouteGroups.includes(view.routeGroup)).map(view => view.viewCode)
+
       return {
-        authorizedViews: VIEW_REGISTRY.filter(view => fallbackRouteGroups.includes(view.routeGroup)).map(view => view.viewCode),
+        authorizedViews: degradedViews,
         routeGroups: fallbackRouteGroups
       }
     }

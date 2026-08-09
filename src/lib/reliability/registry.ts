@@ -370,7 +370,15 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       'src/app/api/organizations/**/brand-assets/**',
       'src/lib/account-360/organization-brand-assets*',
       'src/lib/contractor-engagements/**',
-      'src/app/api/hr/contractors/**'
+      'src/app/api/hr/contractors/**',
+
+      // TASK-1678 — el carril rol->vista y la derivacion del claim de sesion. Estaban
+      // sin owner declarado pese a ser el gate de acceso de toda sesion autenticada.
+      'src/lib/admin/view-access-store.ts',
+      'src/lib/admin/view-access-catalog.ts',
+      'src/lib/tenant/access.ts',
+      'src/lib/tenant/authorization.ts',
+      'src/lib/tenant/role-route-mapping.ts'
     ],
     expectedSignalKinds: ['incident', 'drift', 'data_quality'],
     incidentDomainTag: 'identity'

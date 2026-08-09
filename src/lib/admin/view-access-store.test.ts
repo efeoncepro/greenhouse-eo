@@ -215,6 +215,37 @@ describe('client rail fails closed (TASK-1678)', () => {
     expect(access.authorizedViews).not.toContain(inactiveClientViewCode)
   })
 
+  it('degrades a client tenant to an EMPTY claim when the schema is not ready', async () => {
+    // Antes devolvía el VIEW_REGISTRY completo del routeGroup: las 25 vistas cliente,
+    // incluidas las 18 module-gated y las que tienen denial. Y como la lista salía no
+    // vacía, ningún guard de "lista vacía" de los consumidores se activaba.
+    mockedRunGreenhousePostgresQuery.mockRejectedValue(Object.assign(new Error('relation missing'), { code: '42P01' }))
+
+    const access = await resolveAuthorizedViewsForUser({
+      userId: 'user-client',
+      roleCodes: ['client_manager'],
+      tenantType: 'client',
+      fallbackRouteGroups: ['client']
+    })
+
+    expect(access.authorizedViews).toEqual([])
+    expect(access.routeGroups).toEqual(['client'])
+  })
+
+  it('keeps the internal degraded baseline when the schema is not ready', async () => {
+    mockedRunGreenhousePostgresQuery.mockRejectedValue(Object.assign(new Error('relation missing'), { code: '42P01' }))
+
+    const access = await resolveAuthorizedViewsForUser({
+      userId: 'user-hr',
+      roleCodes: ['hr_payroll'],
+      tenantType: 'efeonce_internal',
+      fallbackRouteGroups: ['internal', 'hr', 'people']
+    })
+
+    expect(access.authorizedViews.length).toBeGreaterThan(0)
+    expect(access.authorizedViews.some(viewCode => viewCode.startsWith('cliente.'))).toBe(false)
+  })
+
   it('keeps role-level denials NON-overriding: the union across roles wins (Slice 5 decision)', async () => {
     // Decisión arch 2026-08-09: `granted=FALSE` a nivel de rol significa "este rol no
     // otorga esto", NO "este usuario no debe tenerlo". El veto per-usuario vive en

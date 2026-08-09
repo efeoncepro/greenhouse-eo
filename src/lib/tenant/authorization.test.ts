@@ -12,6 +12,8 @@ vi.mock('@/lib/reporting-hierarchy/access', () => ({
 }))
 
 import {
+  hasAnyAuthorizedViewCode,
+  hasAuthorizedViewCode,
   requirePeopleTenantContext,
   requireTalentReviewTenantContext,
   resolveHrOrgChartAccessContext
@@ -263,5 +265,64 @@ describe('requireTalentReviewTenantContext', () => {
 
     expect(result.tenant).toBeNull()
     expect(result.errorResponse?.status).toBe(403)
+  })
+})
+
+/**
+ * TASK-1678 Slice 4 — el `fallback` de lista vacía no aplica a sesiones cliente.
+ *
+ * Sin esto, degradar la derivación hacia cerrado (devolver `[]` para un tenant `client`)
+ * terminaba ABRIENDO todo: los layouts cliente pasan
+ * `fallback: tenant.routeGroups.includes('client')`, que para todo cliente es `true`.
+ * Es el amplificador que hacía inútil el resto del Slice 4.
+ */
+describe('empty-claim fallback (TASK-1678)', () => {
+  const buildTenant = (overrides: Record<string, unknown>) => ({
+    userId: 'user-x',
+    clientId: 'cli-1',
+    clientName: 'Cliente',
+    tenantType: 'client',
+    roleCodes: ['client_manager'],
+    primaryRoleCode: 'client_manager',
+    routeGroups: ['client'],
+    authorizedViews: [] as string[],
+    projectScopes: [],
+    campaignScopes: [],
+    businessLines: [],
+    serviceModules: [],
+    role: 'Client Manager',
+    projectIds: [],
+    featureFlags: [],
+    timezone: 'America/Santiago',
+    portalHomePath: '/home',
+    authMode: 'sso',
+    ...overrides
+  })
+
+  it('denies a client session with an empty claim even when the caller passes fallback=true', () => {
+    const tenant = buildTenant({}) as never
+
+    expect(hasAuthorizedViewCode({ tenant, viewCode: 'cliente.campanas', fallback: true })).toBe(false)
+    expect(hasAnyAuthorizedViewCode({ tenant, viewCodes: ['cliente.campanas'], fallback: true })).toBe(false)
+  })
+
+  it('preserves the permissive baseline for an internal session with an empty claim', () => {
+    // Sin esto, un fallo de la derivación dejaría a los operadores internos sin portal:
+    // se cambia un fail-open del portal cliente por una caída de disponibilidad interna.
+    const tenant = buildTenant({
+      tenantType: 'efeonce_internal',
+      roleCodes: ['hr_payroll'],
+      routeGroups: ['internal', 'hr']
+    }) as never
+
+    expect(hasAuthorizedViewCode({ tenant, viewCode: 'equipo.nomina', fallback: true })).toBe(true)
+    expect(hasAnyAuthorizedViewCode({ tenant, viewCodes: ['equipo.nomina'], fallback: true })).toBe(true)
+  })
+
+  it('still honors a non-empty client claim (the fallback is not the decision path)', () => {
+    const tenant = buildTenant({ authorizedViews: ['cliente.campanas'] }) as never
+
+    expect(hasAuthorizedViewCode({ tenant, viewCode: 'cliente.campanas', fallback: false })).toBe(true)
+    expect(hasAuthorizedViewCode({ tenant, viewCode: 'cliente.equipo', fallback: true })).toBe(false)
   })
 })
