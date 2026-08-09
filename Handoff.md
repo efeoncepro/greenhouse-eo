@@ -1,5 +1,45 @@
 # Handoff activo
 
+### TASK-1678 — el carril rol→vista del portal cliente ya falla hacia cerrado (cierra ISSUE-147)
+
+Code complete en `develop`, **rollout pendiente** (no está en `main`). Invierte el fail-open de
+`resolveAuthorizedViewsForUser` para el routeGroup `client`.
+
+**Lo que necesita quien siga:**
+
+1. 🔴 **`TASK-1679` va después de ésta, y ahora el orden es verificable:** hoy el fail-open estaba
+   contenido por el fail-closed del guard de cada página. Esta task quitó el fail-open; la 1679 quita
+   la contención. Antes de promover 1679, confirmar que el manifest de release con 1678 ya está en
+   `main`.
+2. **Sin esto, degradar hacia cerrado abría todo.** `hasAuthorizedViewCode` hace
+   `if (authorizedViews.length === 0) return fallback`, y los layouts cliente pasan
+   `fallback: routeGroups.includes('client')` = `true`. Devolver `[]` para un cliente degradado
+   —que es lo que la spec pedía— **crea** el estado que ese fallback traduce a "mostrar todo". Si
+   alguien toca `src/lib/tenant/authorization.ts`, `resolveEmptyClaimFallback` es load-bearing y
+   discrimina por `tenantType`, no por el prefijo `cliente.` del viewCode.
+3. **El portal interno conserva su default permisivo a propósito**, en las tres capas (fallback de
+   rol, degradación de `SCHEMA_NOT_READY`, amplificador). Cambiarlo convierte un fail-open del portal
+   cliente en una caída de disponibilidad interna. Hay tests de no-regresión que lo fijan.
+4. **Dos supuestos de `ISSUE-147` eran falsos y conviene no heredarlos:** `role_view_assignments` no
+   tiene columnas de vigencia (el predicado se extrapoló de `user_role_assignments`), y el "punto 5"
+   del fix era requisito, no limpieza. El hueco de vigencia real era el merge de `toRegistryRows`.
+5. **Los denials de rol NO vencen sobre grants de otro rol, y es decisión medida.** Los 9 denials
+   cliente no protegen nada que la unión no proteja ya. El veto per-usuario es
+   `user_view_overrides` con `override_type='revoke'`. Rationale en
+   `GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md` §8.2 → Delta TASK-1678. Hay un test que
+   detiene a quien lo invierta.
+6. **Verificación de runtime ya hecha en local, no en prod:**
+   `pnpm tsx scripts/identity/client-view-rail-persona-check.ts` (contra PG vía proxy) da verde para
+   las tres personas agente — cliente 22 viewCodes todos con grant explícito, interno 15 y 117 sin
+   regresión. Repetirlo en staging/prod antes de promover.
+7. **El SQL de la señal se corrigió DOS veces por ejercitarlo contra PG antes de cablearlo:**
+   `greenhouse_core.roles` no tiene columna `active`, y `'client' = ANY(route_group_scope)` arrastra
+   roles internos con scope de soporte. El discriminador correcto es `tenant_type = 'client'`.
+8. **Drift TS↔DB detectado de paso, sin cerrar:** `greenhouse_core.roles` tiene `employee` y
+   `finance_manager`, que no existen en los 14 `ROLE_CODES` canónicos de `src/config/role-codes.ts`.
+   No lo toqué porque está fuera de alcance, pero contradice el snapshot de roles de `CLAUDE.md`.
+
+
 ### TASK-1677 — el cutover SEO está CERRADO (código y datos)
 
 Completa y verificada en producción el 2026-08-09. `ISSUE-143` cerrada del todo.
@@ -525,44 +565,6 @@ código ya está en main `56e46f7`).
 
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md).
-
-### TASK-1304 — site audit + backlinks: code complete + smoke E2E real, rollout pendiente (2026-08-06)
-
-Los fundamentos técnicos + off-page de EPIC-022 quedaron completos en `develop` **local (sin push)**:
-`queueSiteAudit` (OnPage async, gate consume cupo de audits, guard anti doble-encolado),
-`collectSiteAuditRuns` (claim `FOR UPDATE SKIP LOCKED`; UPDATE + findings + outbox en la MISMA tx =
-exactly-once; gave_up a las 24h), `captureBacklinkSnapshot` (pre-check + `ON CONFLICT DO NOTHING`;
-`partial` honesto si el delta falla), readers `readSiteAuditReport`/`readBacklinkProfile`, signal
-`seo.audit.stuck_tasks` (6h warn / 30h error), 3 handlers ops-worker + 3 Cloud Scheduler **PAUSADOS**
-en `deploy.sh`, mirrors BQ `seo_site_audit_history`/`seo_backlink_history` (tablas creadas con
-`bq mk`) y — mandato parity — 2 lanes ecosystem + MCP tools `get_seo_site_audit_report` /
-`get_seo_backlink_profile` en el mismo PR.
-
-**Smoke REAL ejecutado** (~USD 0.05, efeoncepro.com dogfooding): enqueue task OnPage real (10 págs,
-USD 0.0015) → collect materializó exactly-once (`succeeded`, health 93.41, 60 findings 0c/32w/28n) →
-re-collect no-op → backlinks USD 0.048 (15 ref domains, 455 backlinks, rank 44/100, new/lost 5/0) →
-re-run `already_captured` USD 0 → mirrors BQ 1 fila c/u (manuales — el worker desplegado aún no tiene
-las projections) → signal ok → ledger del transporte correcto. **Gotcha cazado en vivo:** el poll
-`summary` de OnPage es POST con id en el BODY (`[{id}]`) — la variante POST-por-path responde 200
-sin tasks y el collect quedaba ciego (fix + guard de regresión + reference del skill corregida).
-Gates: suite full verde, build prod, worker gates, sanity SQL 17 checks, docs:closure-check.
-
-**ROLLOUT EJECUTADO (2026-08-06 tarde, autorización "termina todo lo que falte"):** push develop
-hecho; Actions en outage mayor mató 2 runs del worker en cola → **break-glass local** del
-ops-worker (mismo patrón que el gateway ese día): revisión **`ops-worker-00528-zgr`** con
-`GIT_SHA=26005a619`. **Los 3 schedulers ACTIVOS** (deploy-contract test ahora protege el estado
-ENABLED) y handlers ejercitados por el camino real Scheduler→OIDC: **primer audit de Berel
-encolado** (USD 0.015, 100 págs) + **primer backlink snapshot de Berel** (USD 0.048: 315 ref
-domains, 53.684 backlinks, rank 50/100); efeonce skip por idempotencia. Lanes staging vivos
-(400 `missing_external_scope_type`). **Ciclo autónomo COMPLETO verificado el mismo día:** el
-collect PROGRAMADO (tick del cron, cero intervención) materializó el audit de Berel —
-`succeeded`, 100 páginas, health 95.40, 519 findings (0 críticos) — y la lane reactiva espejó el
-backlink snapshot de Berel a BQ orgánicamente (2 filas en `seo_backlink_history`). **Pendiente restante — bloqueado por el outage de Actions:**
-release develop→main (los lanes/MCP tools a Vercel Production; NUNCA dispatchar el orquestador en
-outage: `main` quedaría sin manifest) y DESPUÉS federar las 2 tools al gateway (patrón TASK-1653 —
-antes del release el gateway vería 404). Si el run varado de Actions (31126022507) despierta,
-deploya el mismo SHA — converge inofensivo. Runbook:
-`docs/manual-de-uso/growth/operar-site-audit-backlinks-seo.md`.
 
 ### Hallazgo MCP gateway — clientes Claude no conectan por falta de DCR (2026-08-06)
 

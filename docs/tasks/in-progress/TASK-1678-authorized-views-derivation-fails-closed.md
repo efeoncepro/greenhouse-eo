@@ -27,6 +27,21 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Estado real 2026-08-09 — `code complete, rollout pendiente`
+
+Los 5 slices están implementados y verificados en local. **No se mueve a `complete/`** porque el
+criterio de aceptación exige verificación de runtime con las tres personas agente *antes de promover*,
+y esto todavía no está en `main`.
+
+- Verificación local de runtime: `scripts/identity/client-view-rail-persona-check.ts` contra PG real
+  (vía proxy) — verde para las tres personas. Cliente: 22 viewCodes, todos con grant explícito.
+  Internos: 15 y 117 sin regresión.
+- Señal `identity.view_access.client_role_without_grants` ejercitada contra PG: `severity=ok`, `count=0`.
+- Gates: `pnpm test` 10417/0 · `pnpm lint` 0 · `pnpm typecheck` 0 · `pnpm route-reachability-gate`
+  0 huérfanas · `pnpm docs:closure-check` 0 errores · `pnpm pg:doctor` healthy.
+- **Falta para cerrar:** promover a `main` y repetir la verificación de las tres personas contra
+  producción (§Rollout). `TASK-1679` va después de esa promoción.
+
 ## Summary
 
 `resolveAuthorizedViewsForUser` falla hacia **abrir** en tres puntos encadenados: sin fila en

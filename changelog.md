@@ -7,6 +7,26 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-09 — El carril rol→vista del portal cliente falla hacia cerrado (TASK-1678, cierra ISSUE-147)
+
+`resolveAuthorizedViewsForUser` otorgaba por defecto: un rol `client_*` y una vista `cliente.*`
+comparten routeGroup `client`, así que toda vista cliente nueva se auto-otorgaba pese a que 18 de las
+25 están gobernadas por módulo contratado. Ahora el default se invierte sólo para ese routeGroup, el
+camino degradado devuelve lista vacía para tenants `client` en vez del `VIEW_REGISTRY` completo, y el
+`fallback` de lista vacía de `hasAuthorizedViewCode` deja de aplicar a sesiones cliente — sin eso
+último, degradar hacia cerrado habría abierto todo. El portal interno no se mueve: su default
+permisivo es lo que lo hace usable sin seedear cientos de filas.
+
+- Medido antes de apagar nada (`scripts/identity/client-view-fallback-audit.ts`): el cambio apaga
+  **un** viewCode por rol cliente y es module-gated → cero seed necesario.
+- Dos supuestos de `ISSUE-147` eran falsos: `role_view_assignments` no tiene columnas de vigencia, y
+  su punto 5 ("revisar el fallback de los callsites") no era limpieza sino requisito.
+- Los denials de rol siguen siendo unión, por decisión medida y no por omisión — el veto per-usuario
+  vive en `user_view_overrides`. Rationale en `GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md` §8.2.
+- Señal `identity.view_access.client_role_without_grants`, steady 0 verificado contra PG.
+- Verificado con las tres personas agente (`scripts/identity/client-view-rail-persona-check.ts`).
+  **Rollout pendiente:** no está en `main`, y `TASK-1679` va después por el orden de contención.
+
 ## 2026-08-09 — El cutover SEO cerró del todo, en dos releases (TASK-1677, cierra ISSUE-143)
 
 La ventana expand/contract que `ISSUE-143` había dejado abierta a propósito quedó cerrada: el código
@@ -1179,10 +1199,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
 ## 2026-07-31 — GitHub Actions: presupuesto mensual de la organización actualizado
 
 - Con confirmación humana y método de pago verificado, el presupuesto externo de Actions de `efeoncepro` pasó de USD 0 a **USD 20 mensuales**; `Stop usage when budget limit is reached` y las alertas permanecen activados. La evidencia y el procedimiento están en [`cloud-cost-intelligence-finops.md`](docs/documentation/operations/cloud-cost-intelligence-finops.md) y [`github-actions-budget.md`](docs/manual-de-uso/operations/github-actions-budget.md).
-
-## 2026-07-31 — Brightcell: segunda licitación con Artifact Composer y método reusable
-
-- Se documentó Brightcell como el segundo caso de licitación armado con Artifact Composer y catálogo de plantillas, después de SKY.
-- Se consolidó el flujo reusable `intake/evidencia → narrativa → deck-plan → assets/mockups → composición → auditoría visual → validación`.
-- Se reforzaron las skills de licitaciones, deck-studio, SEO/AEO, diseño e imagen con las lecciones de Grader/X-Ray/Greenhouse, mockups honestos, assets extraíbles y protección de decks previos.
-- La salida client-facing queda separada de investigación, métricas ilustrativas, manifiestos vacíos y archivos `-INTERNO`.

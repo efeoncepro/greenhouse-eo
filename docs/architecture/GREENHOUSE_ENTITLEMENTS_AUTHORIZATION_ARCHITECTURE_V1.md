@@ -555,6 +555,49 @@ Delta TASK-813/TASK-555:
 - `commercial.service_engagement.resolve_orphan` usa action `approve`, scope `tenant`, module `commercial`, permitido a `finance_admin` y `efeonce_admin`.
 - `commercial.service_engagement.archive_legacy` usa action `delete`, scope `tenant`, module `commercial`, reservado a `efeonce_admin`.
 
+#### Delta TASK-1678 — el carril `client` falla hacia cerrado, y qué significan realmente los denials
+
+La derivación de `authorizedViews` tiene **dos defaults distintos**, y la diferencia es de
+modelo de negocio, no de implementación:
+
+| routeGroup de la vista | Sin fila en `role_view_assignments` | Por qué |
+|---|---|---|
+| interno (`internal`, `hr`, `finance`, `people`, `admin`, `ai_tooling`, `my`, `commercial`) | **otorga** por pertenencia al routeGroup | el acceso lo define la pertenencia organizacional; sin este default el portal interno exigiría seedear cientos de filas |
+| `client` | **no otorga** | el acceso lo define un contrato comercial: el gate es el módulo contratado (resolver canónico), nunca la pertenencia |
+
+El mismo asimetría gobierna los caminos degradados: ante `SCHEMA_NOT_READY` un tenant
+`client` recibe lista vacía y un tenant interno conserva su baseline; y el `fallback` de
+lista vacía de `hasAuthorizedViewCode` / `hasAnyAuthorizedViewCode` **no aplica a sesiones
+cliente**. Ese fallback existía para "todavía no sé, usa el default del caller", pero los
+layouts cliente pasan `routeGroups.includes('client')` —`true` para todo cliente—, o sea
+que convertía cualquier claim vacío en "mostrar todo".
+
+**Qué significa un `granted=FALSE` a nivel de rol.** Significa *"este rol no otorga esta
+vista"*. **No** significa *"este usuario no debe verla"*. La derivación es una **unión**
+sobre los roles del usuario (`roleCodes.some(...)`), así que un usuario con dos roles
+recibe la vista si alguno la otorga, incluso si el otro la niega.
+
+Eso es deliberado desde TASK-1678, no un descuido:
+
+- El modelo es aditivo de punta a punta — `deriveRouteGroupsFromRoles` hace unión y los
+  permission sets son aditivos por diseño (TASK-263). Invertir el operador sólo en esta
+  capa haría que **ganar un rol quite acceso**, que es la interacción más difícil de
+  diagnosticar que un modelo de permisos puede tener, y rompería la composabilidad: dejarías
+  de poder razonar sobre un rol en aislamiento.
+- Es RBAC clásico: en el core el permiso es la unión sobre los roles asignados y el deny no
+  es parte del modelo. Donde el deny-overrides existe (XACML, IAM) vive en una capa de
+  **política**, no de pertenencia.
+- La capa de veto ya existe y es la correcta: **`greenhouse_core.user_view_overrides` con
+  `override_type='revoke'`** — per-usuario, con `reason`, con `expires_at`, y aplicada al
+  final de la derivación.
+
+**SIEMPRE** que necesites "esta persona no debe ver esto", usa un override `revoke`, no un
+denial de rol. **NUNCA** tomes un `granted=FALSE` de rol como garantía de que nadie con ese
+rol ve la vista: si tiene otro rol que la otorga, la ve.
+
+Riesgo residual aceptado: para las 18 vistas cliente gobernadas por módulo, el gate
+efectivo es el resolver de módulos, así que la unión en el carril rol→vista no las expone.
+
 ---
 
 ## 9. Relación con `/home` y `TASK-402`

@@ -15,11 +15,24 @@ rol→vista gobierna correctamente las superficies internas, que es para lo que 
 
 Los defectos reales son **tres**, y dos de ellos son una función y una línea:
 
-| # | Defecto | Tamaño | Consecuencia |
-|---|---|---|---|
-| 1 | La derivación de `authorizedViews` otorga por defecto y no conoce módulos | 1 función + 1 fallback | fail-**open**: un cliente puede recibir en sesión los 18 viewCodes module-gated |
-| 2 | El guard de acceso usa `clientId` donde el resolver espera `organizationId` | 1 línea | fail-**closed**: 3 páginas cliente deniegan siempre |
-| 3 | Seis viewCodes de rutas cliente vivas no están declarados en ningún módulo | dato, no código | fail-**closed**: otras 6 páginas deniegan siempre, y el fix de #2 **no** las arregla |
+| # | Defecto | Tamaño | Consecuencia | Estado |
+|---|---|---|---|---|
+| 1 | La derivación de `authorizedViews` otorga por defecto y no conoce módulos | 1 función + 1 fallback | fail-**open**: un cliente puede recibir en sesión los 18 viewCodes module-gated | ✅ **cerrado 2026-08-09** por `TASK-1678` (`ISSUE-147` resuelta) |
+| 2 | El guard de acceso usa `clientId` donde el resolver espera `organizationId` | 1 línea | fail-**closed**: 3 páginas cliente deniegan siempre | abierto — `TASK-1679` |
+| 3 | Seis viewCodes de rutas cliente vivas no están declarados en ningún módulo | dato, no código | fail-**closed**: otras 6 páginas deniegan siempre, y el fix de #2 **no** las arregla | abierto — `TASK-1679` |
+
+> **Corrección de la medición (2026-08-09, al implementar `TASK-1678`).** Dos números y un
+> diagnóstico de este inventario estaban mal, y conviene no heredarlos:
+>
+> - **Los denials cliente son 9, no 5.** `TASK-1310` agregó 6 sobre `cliente.growth_seo_dashboard` y
+>   `cliente.growth_seo_report` para los tres roles.
+> - **El "SELECT sin predicado de vigencia" no era un defecto:** `role_view_assignments` no tiene
+>   columnas de vigencia. El hueco real era el merge de `toRegistryRows`, que reponía desde el
+>   registry TS las vistas que la DB había desactivado.
+> - **El fail-open costaba mucho menos de lo que parecía.** Medido con
+>   `scripts/identity/client-view-fallback-audit.ts`: invertir el default apaga **un** viewCode por
+>   rol cliente, y es module-gated. Las 72 filas de assignment ya eran explícitas — el default
+>   permisivo casi no cargaba peso. Lo que sí era grave es el camino degradado, no el happy path.
 
 **Nueve de las páginas del portal cliente no abren hoy.** Ese es el titular, y no estaba en ningún
 issue antes de esta medición.
@@ -44,7 +57,13 @@ carriles.
 De los 25 viewCodes `cliente.*` del registry, 18 son module-gated: el **72%** del portal cliente
 debería decidirse por módulo contratado.
 
-## Defecto 1 — la derivación otorga por defecto (fail-open)
+## Defecto 1 — la derivación otorga por defecto (fail-open) — ✅ CERRADO 2026-08-09
+
+> Cerrado por `TASK-1678`. El default se invirtió para el routeGroup `client`, el camino degradado
+> pasó a devolver lista vacía para tenants `client`, el amplificador de lista vacía dejó de aplicar a
+> sesiones cliente, el `console.warn` pasó a `captureWithDomain` y quedó la señal
+> `identity.view_access.client_role_without_grants` en steady 0. La sección de abajo se conserva
+> como el diagnóstico original; leerla junto a la corrección de medición de más arriba.
 
 `resolveAuthorizedViewsForUser` (`src/lib/admin/view-access-store.ts`) construye el claim desde
 `role_view_assignments` ∪ permission sets, menos overrides. Un `grep module_assignments` sobre todo ese
