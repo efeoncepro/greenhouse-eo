@@ -7,6 +7,77 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-09 — El menú del portal cliente ya puede mostrar un módulo contratado (TASK-1675)
+
+El portal cliente tenía dos carriles de verdad que nunca se tocaban: el gate de cada page leía
+`module_assignments`, y el menú leía `authorizedViews`, que se deriva de `role_view_assignments` y
+nunca de módulos. La consecuencia era estructural, no de un módulo puntual: Grupo Berel tenía SEO
+contratado, la pantalla renderizaba con sus datos reales, y no había forma de llegar salvo escribiendo
+la URL. Cualquier módulo per-org que se contratara heredaba lo mismo, y la única salida era hardcodear
+otro ítem — justo lo que la spec del dominio prohíbe desde TASK-827.
+
+`(dashboard)/layout.tsx` resuelve los módulos de la organización y pasa `clientNavItems` por props;
+`VerticalMenu` los suma a la lista base. Server-side y no fetch desde el cliente porque el sidebar es
+chrome persistente y un ítem que aparece tarde es CLS en el peor lugar posible. Dos cosas son
+load-bearing y no defensivas: el `try/catch` del layout, que es la raíz de todo el dashboard e
+internos incluidos —sin él, un resolver caído deja de ser "un cliente no ve un ítem" y pasa a ser
+"nadie entra al portal"—, y que el merge sea aditivo, porque la rama "cliente" del componente es en
+realidad la rama no-interno y los colaboradores puros caen ahí.
+
+Se mergean los tres grupos del composer y no sólo el primario. La captura lo justificó de inmediato:
+junto a SEO apareció **AEO**, un módulo del grupo `capabilities`, compuesto sin una línea de código
+dedicada. Con un merge sólo-primary se habría descartado en silencio.
+
+De paso, el `route-reachability-manifest` dejó de mentir: `/growth/seo` declaraba
+`parent:'/home', via:'inline-link'` para un enlace que nunca existió, y el gate no lo notaba porque
+verifica que la ruta esté declarada, no que el enlace declarado exista. Ahora vive en
+`MODULE_COMPOSED_NAV_ROUTES`, la categoría de rutas que sí son ítem de menú pero cuyo `href` se compone
+en runtime.
+
+Cierra la deuda `client-portal-vertical-menu-resolver-migration`, que TASK-827 dejó nombrada en cuatro
+lugares del repo y nunca registró como task. Llevaba meses sin tomarse en parte por eso.
+
+**Rollout gated por la promoción `develop → main`**: mientras el catálogo TS viva sólo en `develop`,
+`syncViewRegistryCatalog` apaga esos viewCodes desde cualquier runtime con código viejo.
+
+## 2026-08-09 — El batch policy del release preflight dejó de mentir (ISSUE-114)
+
+`release_batch_policy` computaba el diff con base three-dot (`origin/main...target`). Como la
+promoción es por squash-merge, la merge-base queda congelada antes del último squash y el check
+resucitaba archivos byte-idénticos a producción como cambios del release, fabricando dominios
+irreversibles falsos y empujando releases normales a `requires_break_glass`. Los 4 releases previos
+lo habían tapado con marker `[release-coupled: …]`, tres declarando explícitamente que la mezcla no
+era real. Ahora usa two-dot, y tanto el diff de archivos como los commit bodies resuelven su base por
+`buildReleaseDiffRange`. El hueco de cobertura estaba en que `checks/release-batch-policy.ts` no tenía
+archivo de tests; el guardrail nuevo fija el rango en el argv de git, verificado rojo antes y verde
+después.
+
+Una verificación adversarial del propio fix encontró cuatro defectos, todos corregidos: un docstring
+que sobre-prometía (compartir el rango no iguala `git diff` con `git log`), dos docstrings del
+contrato aún en three-dot, dos tests que eran teatro por un mock ciego al rango, y un byte NUL
+invisible en un fixture.
+
+Se abrieron `ISSUE-145` (alta: el batch policy del orquestador es decorativo post-merge, y el marker
+nunca se lee donde el runbook dice pero se dispara con prosa) e `ISSUE-144` (`vercel_readiness`
+confunde build saltado a propósito con fallido). Se desplegó además el batch SEO EPIC-022
+(TASK-1308/1309/1310, 322 archivos, 3 migraciones) y se corrigieron dos comandos documentados que las
+herramientas dejaron de aceptar.
+
+## 2026-08-09 — El release desbloquea el contract del cutover SEO; queda TASK-1677
+
+- **Verificado, no supuesto.** Tras el release: `main` trae `SEO_MODULE_KEYS_READ`, el canary del
+  provider contra producción da **100% verde** —con `track`/`untrack` devolviendo `400` en vez de
+  `404`, o sea que esas rutas ya existen— y el `ops-worker` corre una revisión que es **ancestro de
+  `main`**. Los otros dos Cloud Run no consumen SEO. Con eso caen las dos condiciones que mantenían
+  abierta la ventana de `ISSUE-143`.
+- **`TASK-1677` creada** para la fase contract, separada de `TASK-1310`: es `backend-data` de bajo
+  riesgo y no debe quedar atada a un ciclo de diseño abierto. 🔴 **El código va antes que la
+  migración, y no es preferencia**: lo impone el guardrail que se escribió tras el incidente —
+  primero dejas de leer la clave, después la apagas.
+- Falsos positivos de `task:lint` detectados al escribirla, ambos anotados como deuda de tooling: la
+  regla de placeholder lee la palabra española **"todo"** como el marcador inglés `TODO`, y lee unos
+  corchetes de tipo TS como placeholder (éste ya estaba en `TASK-1675`).
+
 ## 2026-08-08 — TASK-1309 CERRADA: el conmutador de Search Visibility queda completo
 
 - **`TASK-1309` pasa a `complete`.** Build de producción verde (exit 0) con autorización del operador
@@ -1106,49 +1177,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
 - 🔴 **Drift encontrado:** AXIS declara **tres** familias de acento para Globe (Coral, Magenta, Orchid) y
   **sólo orchid llegó al código**. `TASK-1615` lo cierra; mientras tanto la rampa magenta vive local en
   Globe como deuda declarada, no como drift silencioso.
-
-## 2026-07-31 — Globe: modo claro con interruptor de apariencia (TASK-1613)
-
-- Interruptor en el menú de cuenta del Producer. El tema es **un bloque de override** sobre las claves
-  del `@theme` (31 de 198 tokens), habilitado por `TASK-1612`. El modo oscuro no se movió ni un hex.
-- 🔴 **El tematizado es opt-in por superficie** (`ShellOptions.themable`, default `false`). El share
-  board —donde el cliente ve la pieza— heredaba el modo del `localStorage` sin tener interruptor propio.
-  No se veía mal: se veía bien en claro, y por eso ningún barrido de contraste lo habría encontrado.
-- Cerró 2 regresiones de contraste medidas **contra control**: `--success` usado como texto (2,54:1) y
-  el interruptor propio (4,2:1). AXIS 0.2.3 separa fill de tinta (`axisBrandSemanticInk`).
-- El isotipo pasa a servirse como máscara: el SVG es monocromo, así que su color no es la marca sino una
-  decisión de render; en negativo sobre canvas claro era blanco sobre blanco.
-- Barrido de contraste nuevo, con veredicto comparativo: falla sólo si el claro introduce un fallo que
-  el oscuro no tiene. Quedan 14 textos que fallan en **ambos** modos (`--faint` a 40% de alpha) — deuda
-  preexistente, no de este cambio.
-- `@efeoncepro/axis-tokens@0.2.3` publicada y el pin de Globe subido. PR en `efeonce-globe`: [#8](https://github.com/efeoncepro/efeonce-globe/pull/8), pendiente de revisión humana.
-
-## 2026-07-31 — Globe: el `:root` del payload cliente proyecta sobre el `@theme` (TASK-1612)
-
-- El payload emitía sus custom properties desde dos mecanismos con nombres distintos (`--canvas` en el
-  `:root` del shell, `--color-canvas` en el `@theme` del bundle), así que no podía re-tematizarse: mover
-  uno no movía al otro y un tema alternativo habría exigido cada override dos veces. Hoy cada hoja
-  renombrada se emite como `--canvas: var(--color-canvas, #25293c)` y un solo override mueve la utilidad
-  y el CSS plano a la vez. Es el paso previo que ADR-017 fijaba para cualquier modo claro; **no decide
-  ningún valor** y su criterio de éxito era cero cambio visual.
-- **Cero cambio visual, medido contra control.** El diff por bytes resultó inválido —el arnés de captura
-  no es determinista—; por píxeles, toda diferencia aparece igual o mayor en un control de dos corridas
-  del mismo código, y `globe-theme.generated.css` quedó byte-identical.
-- No se proyectan los namespaces passthrough ni las que ya derivan, y las dos exclusiones salen de medición:
-  proyectar `--text-xs` emite `var(--text-xs, …)` —referencia circular— y reprodujo el incidente de ADR-016
-  con los mismos números **con los tests unitarios en verde**; sólo el canario de browser lo vio.
-- Instrumentos nuevos, los dos verificados poniéndolos rojo: `gates/root-theme-equivalence.test.ts`
-  (compara por clave; su primera versión comparaba valores y dejaba pasar una utilidad borrada) y
-  `scripts/legacy-fallback-canary.mjs` (renderiza el `:root` sin Tailwind, la condición de las superficies
-  legacy, y mide el payoff del override único).
-- ADR-016 y ADR-017 quedaron reescritos en el cuerpo: la consecuencia que declaraban aceptada está cerrada.
-
-## 2026-07-30 — Globe: documentación y skills sincronizadas con seis rutas de imagen
-
-- Se reconciliaron ADR-013, EPIC-028, el barrido WIP, task activa, documentación funcional, manuales, ledger,
-  runtime handoff y evidencia con las promociones reales de Seedream, Nano Banana Pro/2, GPT Image 2/1.5 y Recraft.
-- Las skills gemelas `greenhouse-globe` y `greenhouse-ai-creative-rights-governance` incorporan identidad exacta,
-  atestación/política inmutable, promoción distinta de delivery, diagnósticos seguros y canary real desde UI.
-- El caso Recraft queda como regla reusable: `application/octet-stream` sólo se admite para una salida SVG esperada
-  después de validar bytes; el asset se sirve con CSP sandbox. No se amplió la allowlist MIME global.
-- No hubo mutaciones de runtime. `TASK-1553` sigue abierta sólo por receipts cross-task de `TASK-1468`/`TASK-1578`.

@@ -18,7 +18,7 @@ EPIC-015 child 6/8 cerrado. Materializa el resolver canónico (TASK-825) en UI c
 - **Slice 0 — Parity TS↔DB pattern para view_codes**: 11 viewCodes nuevos en `VIEW_REGISTRY` TS + migration acompañante seed `role_view_assignments` (mirror TASK-750/749). Parity test live `src/lib/client-portal/view-codes/parity.{ts,test.ts,live.test.ts}` con `skipIf(!hasPgConfig)`.
 - **Slice 4 — `requireViewCodeAccess` page guard canonical**: D1 bypass para `isInternalPortalUser=true` (tenantType==='efeonce_internal') + redirect canonical a `/home?denied=<slug>` con slug mapping (`mapViewCodeToPublicSlug`) + degradación honesta `?error=resolver_unavailable` via `captureWithDomain('client_portal', ...)`.
 - **Slice 5 — Anatomía 5-elementos canonical empty state**: icon + title + body + primary CTA + secondary CTA. 3 components nuevos (`ModuleNotAssignedEmpty`, `ClientPortalZeroStateEmpty`, `ClientPortalDegradedBanner`). Consume canonical `<EmptyState>` primitive + microcopy dictionary `GH_CLIENT_PORTAL_COMPOSITION`.
-- **Slice 6 — Refactor light + audit grep documented**: VerticalMenu cliente section preservada (D2 + canSeeView legacy) con inline comments + override marker `// client-portal-allowed:` para lint rule Slice 7. TASK derivada V1.1 `client-portal-vertical-menu-resolver-migration` para refactor full.
+- **Slice 6 — Refactor light + audit grep documented**: VerticalMenu cliente section preservada (D2 + canSeeView legacy) con inline comments + override marker `// client-portal-allowed:` para lint rule Slice 7. TASK derivada V1.1 `client-portal-vertical-menu-resolver-migration` para refactor full — **cerrada por `TASK-1675` (2026-08-09)**: los ítems de módulo ya salen del resolver; lo que queda de `canSeeView` legacy es la lista base.
 - **Slice 8 — Reliability signal scaffold V1.0**: `client_portal.composition.resolver_failure_rate` returns 'unknown' con shape canonical. V1.1 TASK-829 implementa telemetry adapter (Sentry events query domain=client_portal). Shape canonical preservado — V1.1 NO requiere caller-side change.
 
 **Incident hardening (commit `2fd8a60c`)**: causa raíz `role_view_fallback_used` Sentry alerts = 11 viewCodes Slice 0 sin seed acompañante en `role_view_assignments`. Resuelto canónicamente via migration seed 44 filas (4 roles × 11 viewCodes). Regla canonizada en CLAUDE.md "View Registry Governance Pattern (TASK-827)" — cualquier viewCode futuro en VIEW_REGISTRY requiere migration acompañante.
@@ -26,7 +26,7 @@ EPIC-015 child 6/8 cerrado. Materializa el resolver canónico (TASK-825) en UI c
 **TASK derivadas V1.1 registradas** (5 follow-ups + 1 telemetry adapter para TASK-829):
 - `client-portal-legacy-branching-sweep` — promote lint rule warn→error
 - `capability-modules-resolver-migration` (D2)
-- `client-portal-vertical-menu-resolver-migration` (Slice 6 deferred)
+- ~~`client-portal-vertical-menu-resolver-migration` (Slice 6 deferred)~~ — **cerrada por `TASK-1675` (2026-08-09)**. Estuvo meses sin tomarse en parte porque nunca tuvo ID ni archivo: se nombraba en esta spec, en `docs/tasks/README.md`, en `eslint.config.mjs` y en un comentario de `VerticalMenu.tsx`, pero no existía como task. Registrarla fue parte del arreglo. Ver §12.1.
 - `client-portal-pages-placeholder-materialization` (10 pages placeholder)
 - `account-manager-email-canonical-resolver` (D4 V1.1 canonical 360 lookup)
 - `client-portal-resolver-failure-rate-telemetry-adapter` (TASK-829)
@@ -699,13 +699,55 @@ registerProjection({
 
 ### 12.1 Menú dinámico cliente
 
-`ClientPortalNavigation` component lee resolver y compone menú con view_codes activos. NUNCA hardcodea menu items per business_line.
+El menú del portal cliente compone sus ítems desde `module_assignments`, per-organización. **NUNCA se
+hardcodea un ítem de menú per business_line ni per módulo.**
 
-```ts
-const modules = await resolveClientPortalModulesForOrganization(session.user.organizationId)
-const navItems = modules.flatMap(m => m.viewCodes.map(vc => buildNavItemFromViewCode(vc)))
-// Dedup, sort, group
+**Estado desde TASK-1675 (2026-08-09): cableado y vigente en runtime.** Entre TASK-827 y TASK-1675 esta
+sección describía el destino y no el estado: el composer existía, estaba testeado y tenía cero
+consumidores en runtime, mientras el menú real seguía siendo una lista fija filtrada por
+`canSeeView('cliente.*')` — que se deriva de `role_view_assignments` y **nunca** de módulos. La
+consecuencia era estructural, no de un módulo concreto: cualquier módulo per-org que se contratara era
+invisible en la navegación, y la única salida era hardcodear otro ítem.
+
+El camino canónico es:
+
 ```
+(dashboard)/layout.tsx  (server, único punto con sesión sobre el menú)
+  └─ tenantType === 'client' && organizationId          ← guard: sin él, cada carga
+                                                          interna consulta PG en vano
+       └─ resolveClientPortalModulesForOrganization()    ← server-only, cache 60 s
+            └─ composeNavItemsFromModules()              ← puro, determinístico
+                 └─ prop `clientNavItems: ClientNavItem[]`  ← JSON plano
+                      └─ Navigation → VerticalMenu (client): merge ADITIVO por `route`
+```
+
+Invariantes:
+
+- **El merge es aditivo, nunca reemplazo.** La rama "cliente" de `VerticalMenu` es en realidad la rama
+  **no-interno**: los colaboradores puros (routeGroup `my`) caen ahí. Reemplazar la lista base los deja
+  sin menú.
+- **Se mergean los tres grupos del composer** (`primary`, `capabilities`, `account`). Cubrir sólo el
+  primario descarta en silencio cualquier módulo futuro cuyo viewCode caiga en otro grupo, que es el
+  agujero que esta sección existe para cerrar.
+- **Fail-open obligatorio.** El `try/catch` del layout no es defensivo: ese layout es la raíz de todo el
+  dashboard, internos incluidos. Un fallo del resolver degrada al menú de siempre — nunca a un menú
+  vacío, nunca a un portal caído.
+- **Frontera server/client.** `module-resolver`, `menu-builder` y `ClientPortalNavigation` son
+  `server-only`; importarlos desde un componente cliente rompe el build. Del lado cliente sólo viajan
+  los tipos y helpers puros de `menu-builder-shape` y la lista como JSON.
+- **Rutas hijas.** Un viewCode con `childOf` en el descriptor no produce ítem propio: se alcanza desde
+  su padre. Es el caso de `cliente.growth_seo_report`, hijo de `cliente.growth_seo_dashboard`.
+- **Read-only.** El menú lee `module_assignments`; escribirlos es de los commands de
+  `src/lib/client-portal/commands/`. Y `role_view_assignments` no se toca: es append-only y gobierna
+  otra cosa.
+
+**`<ClientPortalNavigation>` se descartó como componente de render** y hoy sólo lo consume el mockup
+`/mockup/cliente-portal-legacy`: trae su propio chrome (MUI `List`, section headers, active state
+propio), lo que dejaría dos sistemas de navegación y dos landmarks `<nav>` dentro del mismo sidebar.
+Lo que se reutiliza es su lógica —resolver + composer—, no su presentación.
+
+**Deuda restante:** el bloque `capabilityModules` (`businessLines`/`serviceModules`) sigue sin migrar al
+resolver — follow-up `capability-modules-resolver-migration`.
 
 ### 12.2 Page guards
 

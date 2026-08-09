@@ -224,6 +224,59 @@ describe('composeNavItemsFromModules — pipeline canonical', () => {
   })
 })
 
+describe('composeNavItemsFromModules — rutas hijas (TASK-1675)', () => {
+  it('fixture SEO real: el módulo con dashboard + informe produce UN ítem, no dos', () => {
+    // Los `viewCodes` exactos que siembra `seo_v2`
+    // (migrations/20260808131441444_task-1310-seo-client-view-codes.sql).
+    const modules = [
+      buildModule({
+        moduleKey: 'seo_v2',
+        displayLabel: 'SEO (Search Visibility 360)',
+        displayLabelClient: 'SEO',
+        applicabilityScope: 'cross',
+        tier: 'addon',
+        viewCodes: ['cliente.growth_seo_dashboard', 'cliente.growth_seo_report'],
+        dataSources: ['growth.seo']
+      })
+    ]
+
+    const items = composeNavItemsFromModules(modules)
+
+    expect(items).toHaveLength(1)
+    expect(items[0]).toMatchObject({
+      viewCode: 'cliente.growth_seo_dashboard',
+      label: 'SEO',
+      route: '/growth/seo',
+      group: 'primary'
+    })
+  })
+
+  it('la ruta hija se descarta aunque venga sola: un artefacto derivado no es ítem de menú', () => {
+    const modules = [
+      buildModule({
+        moduleKey: 'seo_report_only',
+        tier: 'addon',
+        viewCodes: ['cliente.growth_seo_report']
+      })
+    ]
+
+    expect(composeNavItemsFromModules(modules)).toEqual([])
+  })
+
+  it('el descarte es del hijo, no del padre: el resto del módulo se compone igual', () => {
+    const modules = [
+      buildModule({
+        moduleKey: 'mixto',
+        viewCodes: ['cliente.growth_seo_report', 'cliente.pulse', 'cliente.growth_seo_dashboard']
+      })
+    ]
+
+    const items = composeNavItemsFromModules(modules)
+
+    expect(items.map(item => item.viewCode)).toEqual(['cliente.pulse', 'cliente.growth_seo_dashboard'])
+  })
+})
+
 describe('groupNavItems — helper para sectioning', () => {
   it('agrupa items por group con orden canonical', () => {
     const items: readonly ClientNavItem[] = [

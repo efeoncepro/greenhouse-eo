@@ -31,6 +31,10 @@ import { getMode, getSystemMode } from '@core/utils/serverHelpers'
 
 // Lib Imports
 import { requireServerSession } from '@/lib/auth/require-server-session'
+import { composeNavItemsFromModules } from '@/lib/client-portal/composition/menu-builder'
+import type { ClientNavItem } from '@/lib/client-portal/composition/menu-builder-shape'
+import { resolveClientPortalModulesForOrganization } from '@/lib/client-portal/readers/native/module-resolver'
+import { captureWithDomain } from '@/lib/observability/capture'
 
 // El layout depende de cookies/headers via NextAuth — siempre dynamic.
 // Evita que Next intente prerender bajo (dashboard) y emita warnings
@@ -57,6 +61,38 @@ const Layout = async (props: ChildrenType) => {
   // server-side con degradación honesta (default = comportamiento vigente del flotante).
   const nexaInteractionMode = await resolveNexaInteractionModeForUser(session.user.userId)
 
+  // TASK-1675 — ítems de menú de los módulos que la organización tiene contratados.
+  //
+  // Éste es el único punto server con sesión que gobierna el menú, y el resolver
+  // (`server-only`, PG) no puede cruzar al cliente: al `VerticalMenu` viaja sólo
+  // esta lista como JSON plano.
+  //
+  // El guard no es una optimización: sin él, cada carga dura de un usuario interno
+  // pega a PG por un dato que no va a usar. Y el `try/catch` es estructural, no
+  // defensivo — este layout es la raíz de TODO el dashboard, así que un fallo del
+  // resolver sin capturar sería la diferencia entre "un cliente no ve un ítem" y
+  // "nadie entra al portal". Degrada al menú de siempre, nunca a un menú vacío.
+  let clientNavItems: readonly ClientNavItem[] = []
+
+  if (
+    // client-portal-allowed: el `tenantType` acá no decide visibilidad — decide si
+    // vale la pena consultar al resolver. La visibilidad la resuelve el resolver
+    // canónico (TASK-825), que es exactamente lo que este bloque invoca abajo.
+    session.user.tenantType === 'client' &&
+    session.user.organizationId
+  ) {
+    try {
+      const modules = await resolveClientPortalModulesForOrganization(session.user.organizationId)
+
+      clientNavItems = composeNavItemsFromModules(modules)
+    } catch (error) {
+      captureWithDomain(error, 'client_portal', {
+        tags: { source: 'vertical_menu', stage: 'resolver' },
+        extra: { organizationId: session.user.organizationId }
+      })
+    }
+  }
+
   return (
     <Providers direction={direction} session={session}>
       {/* NexaContextProvider envuelve las páginas (que declaran su entidad vía
@@ -68,7 +104,11 @@ const Layout = async (props: ChildrenType) => {
           <LayoutWrapper
             systemMode={systemMode}
             verticalLayout={
-              <VerticalLayout navigation={<Navigation mode={mode} />} navbar={<Navbar />} footer={<VerticalFooter />}>
+              <VerticalLayout
+                navigation={<Navigation mode={mode} clientNavItems={clientNavItems} />}
+                navbar={<Navbar />}
+                footer={<VerticalFooter />}
+              >
                 {/* TASK-1079 — host del modo lane: passthrough byte-idéntico salvo modo lane. */}
                 <NexaLaneContentHost>{children}</NexaLaneContentHost>
               </VerticalLayout>

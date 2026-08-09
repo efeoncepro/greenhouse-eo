@@ -176,7 +176,7 @@ decisión, no un olvido — un cartel en el sidebar es permanente y se lee como 
 - `data-capture` sobre el contenedor del nav lateral.
 - Capturas requeridas: `menu-with-module` (persona con módulo) y `menu-without-module` (persona sin módulo).
 - La segunda captura no es opcional: **es la prueba del aislamiento per-org**, que es la mitad del contrato.
-- Baseline `client-portal-menu` para que cualquier cambio no intencional del chrome salte como diff.
+- Un baseline por escenario para que cualquier cambio no intencional del chrome salte como diff.
 
 ## Implementation Mapping
 
@@ -196,17 +196,19 @@ JSON plano.
 
 ## GVC Scenario Plan
 
-- Scenario file: `scripts/frontend/scenarios/client-portal-menu-modules.scenario.ts`
+- Scenario file: `scripts/frontend/scenarios/client-portal-menu-with-module.scenario.ts`
+- Escenarios hermanos: `client-portal-menu-without-module.scenario.ts` (par negativo) y `client-portal-menu-mobile-drawer.scenario.ts` (drawer abierto a 390px)
+- **Por qué son tres archivos y no uno** (delta 2026-08-09, al implementar): `requiresStorageState` se resuelve **antes** de crear el `BrowserContext`, así que una corrida tiene una sola identidad — dos personas son dos archivos. Y a 390px el sidebar es un drawer **cerrado** (`left: -260`): verificarlo exige un paso de apertura, y los `steps` son compartidos entre variantes, así que el caso abierto necesita su propio archivo
 - Ruta: `/home`
 - Viewports: desktop 1440 · mobile 390px
 - Quality profile: premium
 - `requiresStorageState`: declarado por escenario (contrato de TASK-1310 — sin el la captura corre con otra identidad y produce evidencia enganosa)
 - Required steps: cargar con persona **con** modulo; cargar con persona **sin** modulo
-- Required captures: `menu-with-module`, `menu-without-module`
+- Required captures: `menu-with-module`, `menu-without-module`, `menu-with-module-mobile`
 - Required `data-capture` markers: contenedor del nav lateral
 - Assertions: item presente con modulo · **ausente** sin modulo · lista base intacta en ambos · sin `console.error` · `noLoginRedirect`
 - Scroll-width checks: `scroll-width == clientWidth` en 1440 y 390px
-- Baseline decision / surface ID: `client-portal-menu`, con `maxDiffRatio` estricto. El baseline es la defensa real aca: el criterio de exito es *"el menu de hoy mas un item"*, asi que **cualquier otro pixel que cambie es un defecto**, y un diff es lo unico que lo detecta sin depender de que alguien mire con atencion
+- Baseline decision / surface ID: un `surfaceId` por escenario (`client-portal-menu-with-module`, `client-portal-menu-without-module`, `client-portal-menu-mobile-drawer`), con `maxDiffRatio` estricto (0.002). El baseline es la defensa real aca: el criterio de exito es *"el menu de hoy mas un item"*, asi que **cualquier otro pixel que cambie es un defecto**, y un diff es lo unico que lo detecta sin depender de que alguien mire con atencion
 - Review dossier: `pnpm fe:capture:review client-portal-menu-modules`
 - Reduced-motion / focus evidence: tabular hasta el item nuevo y capturar el anillo de foco
 

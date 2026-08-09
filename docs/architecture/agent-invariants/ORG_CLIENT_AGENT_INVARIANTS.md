@@ -112,6 +112,37 @@ Cada archivo bajo `readers/{curated,native}/` exporta un `*Meta: ClientPortalRea
 
 **Spec canónica**: `docs/architecture/GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md` V1.1 §3.1 + §3.2 + §10 patrón aplicable. Module README: `src/lib/client-portal/README.md`. Doctrine source pattern: TASK-611 (organization workspace projection — domain boundary lint rule canonical sibling).
 
+### Menú module-driven del portal cliente (TASK-1675, desde 2026-08-09)
+
+El menú del portal cliente compone sus ítems desde `module_assignments`, per-organización, resolviendo
+server-side en `(dashboard)/layout.tsx` y pasando `clientNavItems` por props a `VerticalMenu`.
+
+- **NUNCA** hardcodear un ítem de menú per business_line ni per módulo. Si un módulo nuevo necesita
+  ser visible, se declara su viewCode en el módulo y su descriptor en `menu-builder.ts` — no se agrega
+  una fila al componente.
+- **NUNCA** reemplazar la lista base del bloque no-interno de `VerticalMenu`: el merge es **aditivo**.
+  Esa rama es la rama **no-interno**, así que los colaboradores puros caen ahí y un reemplazo los deja
+  sin menú. Hay un test de identidad que lo fija.
+- **NUNCA** mergear sólo el grupo `primary`. Los tres grupos del composer (`primary`, `capabilities`,
+  `account`) tienen que aterrizar en alguna parte, o un módulo futuro se descarta en silencio.
+- **NUNCA** dejar la resolución sin `try/catch`. `(dashboard)/layout.tsx` es la raíz de todo el
+  dashboard: un resolver caído sin capturar tumba el portal para todos, internos incluidos. El fallback
+  es `[]` (menú de siempre), nunca un menú vacío.
+- **NUNCA** invocar el resolver sin el guard `tenantType === 'client' && organizationId`: sin él, cada
+  carga dura de un usuario interno consulta PG por un dato que no va a usar.
+- **NUNCA** importar `module-resolver`, `menu-builder` ni `ClientPortalNavigation` (los tres
+  `server-only`) desde `VerticalMenu` ni desde ningún componente cliente — rompe el build de producción.
+  Del lado cliente sólo `menu-builder-shape` (tipos + `groupNavItems`) y la lista como JSON plano.
+- **NUNCA** convertir en ítem de menú una vista marcada con `childOf` en el descriptor: es una ruta hija
+  y se alcanza desde su padre.
+- **NUNCA** escribir `module_assignments` ni `role_view_assignments` desde este camino: es read-only.
+- **SIEMPRE** que una ruta sea un ítem de menú compuesto en runtime (sin `href` literal en el código),
+  declararla en `MODULE_COMPOSED_NAV_ROUTES` de `route-reachability-manifest.ts` — no como child route,
+  que la obligaría a inventarse un padre y un `via` inexistentes.
+
+**Spec canónica**: `GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md` §12.1. Task: `TASK-1675` (cierra la deuda sin
+ID `client-portal-vertical-menu-resolver-migration` de TASK-827).
+
 ### Organization-by-facets — receta canónica para extender (TASK-613)
 
 Patrón canónico cuando emerja la necesidad de un **facet nuevo** (e.g. `marketing`, `legal`, `compliance`) o un **entrypoint nuevo** que renderee el Organization Workspace shell desde su propia ruta (e.g. `/legal/organizations/[id]`, `/marketing/accounts/[id]`):

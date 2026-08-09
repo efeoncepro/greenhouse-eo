@@ -22,6 +22,7 @@ import { GenerateVerticalMenu } from '@/components/GenerateMenu'
 import { getGreenhouseNavigationCopy } from '@/config/greenhouse-navigation-copy'
 import { ROLE_CODES } from '@/config/role-codes'
 import { resolveCapabilityModules } from '@/lib/capabilities/resolve-capabilities'
+import { groupNavItems, type ClientNavItem } from '@/lib/client-portal/composition/menu-builder-shape'
 
 type RenderExpandIconProps = {
   open?: boolean
@@ -30,6 +31,14 @@ type RenderExpandIconProps = {
 
 type Props = {
   scrollMenu: (container: any, isPerfectScrollbar: boolean) => void
+
+  /**
+   * TASK-1675 — ítems de los módulos que la organización tiene contratados,
+   * compuestos server-side en `(dashboard)/layout.tsx` desde
+   * `module_assignments`. El merge es **aditivo**: nunca reemplaza la lista
+   * base. Ver el bloque no-interno más abajo para el porqué.
+   */
+  clientNavItems?: readonly ClientNavItem[]
 }
 
 const RenderExpandIcon = ({ open, transitionDuration }: RenderExpandIconProps) => (
@@ -51,7 +60,7 @@ const NavLabel = ({ label, subtitle, show }: { label: string; subtitle: string; 
   </Box>
 )
 
-const VerticalMenu = ({ scrollMenu }: Props) => {
+const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
   const theme = useTheme()
   const verticalNavOptions = useVerticalNav()
   const locale = useLocale()
@@ -721,27 +730,27 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   // CLIENT USERS (external portal)
   // ═══════════════════════════════════════════════════════════════════════
   //
-  // TASK-827 D2 + Slice 6 — Refactor branching legacy.
+  // TASK-827 D2 + TASK-1675 — dos carriles, uno de ellos ya migrado.
   //
-  // ESTE BLOQUE (líneas ~603-665) usa `canSeeView('cliente.*', true)` legacy
-  // basado en `session.user.authorizedViews[]` (TASK-136). El resolver
-  // canónico (TASK-825) ya está disponible vía
-  // `<ClientPortalNavigation>` server component (`src/views/greenhouse/client-portal/navigation/`).
+  // La LISTA BASE de este bloque sigue saliendo de `canSeeView('cliente.*')`,
+  // que se deriva de `session.user.authorizedViews[]` (TASK-136) y por tanto de
+  // `role_view_assignments`: rol → vista, nunca módulos.
   //
-  // Migración FULL al resolver requiere refactor client→server o fetch SWR
-  // del endpoint `/api/client-portal/modules`. V1.0 acepta path híbrido:
-  //   - Server-side: page guards (TASK-827 Slice 4 `requireViewCodeAccess`)
-  //     enforced en CADA page con `cliente.*` viewCode. Resolver canónico
-  //     gateando access real.
-  //   - Client-side (este menú): legacy `canSeeView` muestra/oculta items.
-  //     Si un cliente NO tiene el módulo asignado, click → redirect a
-  //     `/home?denied=<slug>` con `<ModuleNotAssignedEmpty>` (Slice 5).
+  // Los ÍTEMS DE MÓDULO ya no. TASK-1675 cerró la deuda sin ID
+  // `client-portal-vertical-menu-resolver-migration` que TASK-827 dejó nombrada:
+  // llegan por la prop `clientNavItems`, compuestos server-side en
+  // `(dashboard)/layout.tsx` desde el resolver canónico (TASK-825) contra
+  // `module_assignments` — el mismo origen que gatea cada page. El merge está
+  // más abajo y es aditivo.
   //
-  // TASK derivada V1.1 `client-portal-vertical-menu-resolver-migration`
-  // (ver docs/tasks/in-progress/TASK-827 §Follow-ups) hace el switch full
-  // a `<ClientPortalNavigation>`.
+  // Se descartó montar `<ClientPortalNavigation>` acá: trae su propio chrome
+  // (MUI `List`, section headers, active state propio) y dejaría dos sistemas de
+  // navegación y dos landmarks `<nav>` dentro del mismo sidebar.
   //
-  // client-portal-allowed: legacy canSeeView pattern pre TASK-827 V1.1 migration
+  // Lo que queda de deuda es el bloque `capabilityModules`
+  // (`businessLines`/`serviceModules`), follow-up `capability-modules-resolver-migration`.
+  //
+  // client-portal-allowed: legacy canSeeView pattern en la lista base (los ítems de módulo ya salen del resolver)
 
   if (!isInternalPortalUser) {
     // Pure collaborator home
@@ -754,38 +763,85 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
     }
 
     // Primary client nav
-    menuData.push(
-      ...[
-        { label: nl(GH_CLIENT_NAV.dashboard), href: dashboardHref, icon: 'tabler-smart-home' },
-        { label: nl(GH_CLIENT_NAV.projects), href: '/proyectos', icon: 'tabler-folders' },
-        { label: nl(GH_CLIENT_NAV.sprints), href: '/sprints', icon: 'tabler-bolt' },
-        { label: nl(GH_CLIENT_NAV.team), href: '/equipo', icon: 'tabler-users' },
-        { label: nl(GH_CLIENT_NAV.reviews), href: '/reviews', icon: 'tabler-git-pull-request' },
-        { label: nl(GH_CLIENT_NAV.analytics), href: '/analytics', icon: 'tabler-chart-dots' },
-        { label: nl(GH_CLIENT_NAV.campaigns), href: '/campanas', icon: 'tabler-speakerphone' }
-      ].filter(item => {
-        if (item.href === dashboardHref) return canSeeView('cliente.pulse', true)
-        if (item.href === '/proyectos') return canSeeView('cliente.proyectos', true)
-        if (item.href === '/sprints') return canSeeView('cliente.ciclos', true)
-        if (item.href === '/equipo') return canSeeView('cliente.equipo', true)
-        if (item.href === '/reviews') return canSeeView('cliente.revisiones', true)
-        if (item.href === '/analytics') return canSeeView('cliente.analytics', true)
-        if (item.href === '/campanas') return canSeeView('cliente.campanas', true)
+    const clientPrimaryItems = [
+      { label: nl(GH_CLIENT_NAV.dashboard), href: dashboardHref, icon: 'tabler-smart-home' },
+      { label: nl(GH_CLIENT_NAV.projects), href: '/proyectos', icon: 'tabler-folders' },
+      { label: nl(GH_CLIENT_NAV.sprints), href: '/sprints', icon: 'tabler-bolt' },
+      { label: nl(GH_CLIENT_NAV.team), href: '/equipo', icon: 'tabler-users' },
+      { label: nl(GH_CLIENT_NAV.reviews), href: '/reviews', icon: 'tabler-git-pull-request' },
+      { label: nl(GH_CLIENT_NAV.analytics), href: '/analytics', icon: 'tabler-chart-dots' },
+      { label: nl(GH_CLIENT_NAV.campaigns), href: '/campanas', icon: 'tabler-speakerphone' }
+    ].filter(item => {
+      if (item.href === dashboardHref) return canSeeView('cliente.pulse', true)
+      if (item.href === '/proyectos') return canSeeView('cliente.proyectos', true)
+      if (item.href === '/sprints') return canSeeView('cliente.ciclos', true)
+      if (item.href === '/equipo') return canSeeView('cliente.equipo', true)
+      if (item.href === '/reviews') return canSeeView('cliente.revisiones', true)
+      if (item.href === '/analytics') return canSeeView('cliente.analytics', true)
+      if (item.href === '/campanas') return canSeeView('cliente.campanas', true)
 
-        return true
-      })
-    )
+      return true
+    })
 
-    // Capability modules
-    if (capabilityModules.length > 0 && canSeeView('cliente.modulos', true)) {
+    // Capability modules (legacy `businessLines`/`serviceModules` — deuda hermana
+    // `capability-modules-resolver-migration`, todavía sin migrar al resolver).
+    const capabilityModuleItems =
+      capabilityModules.length > 0 && canSeeView('cliente.modulos', true)
+        ? capabilityModules.map(module => ({
+            label: module.label,
+            href: module.route,
+            icon: module.icon
+          }))
+        : []
+
+    const clientAccountItems = [
+      { label: nl(GH_CLIENT_NAV.updates), href: '/updates', icon: 'tabler-bell' },
+      { label: nl(GH_CLIENT_NAV.notifications), href: '/notifications', icon: 'tabler-notification' },
+      { label: nl(GH_CLIENT_NAV.settings), href: '/settings', icon: 'tabler-settings' }
+    ].filter(item => {
+      if (item.href === '/updates') return canSeeView('cliente.actualizaciones', true)
+      if (item.href === '/notifications') return canSeeView('cliente.notificaciones', true)
+      if (item.href === '/settings') return canSeeView('cliente.configuracion', true)
+
+      return true
+    })
+
+    // ── TASK-1675 — ítems de los módulos contratados (merge ADITIVO) ──
+    //
+    // Cierra el corte de fuente de verdad del portal cliente: la lista base sale
+    // de `authorizedViews` (derivado de `role_view_assignments`), mientras que el
+    // gate real de cada page lee `module_assignments`. Un módulo contratado
+    // funcionaba y no era alcanzable salvo escribiendo la URL. Estos ítems llegan
+    // compuestos desde el layout server, del MISMO `module_assignments` que gatea
+    // la page — un solo motor de verdad para visibilidad y acceso.
+    //
+    // ⚠️ El merge es aditivo y eso es load-bearing, no estilístico: esta rama es
+    // la rama **no-interno**, así que los colaboradores puros (routeGroup `my`)
+    // caen acá. Reemplazar la lista base los dejaría sin menú.
+    //
+    // Se cubren los tres grupos del composer, no sólo `primary`: si sólo se
+    // mergeara el primario, un módulo futuro cuyo viewCode caiga en
+    // `capabilities` se descartaría en silencio y volvería el mismo agujero que
+    // esta task cierra.
+    const takenRoutes = new Set<string>([
+      ...clientPrimaryItems.map(item => item.href),
+      ...capabilityModuleItems.map(item => item.href),
+      ...clientAccountItems.map(item => item.href)
+    ])
+
+    const moduleItems = groupNavItems(clientNavItems.filter(item => !takenRoutes.has(item.route)))
+
+    const toMenuItem = (item: ClientNavItem) => ({ label: item.label, href: item.route, icon: item.icon })
+
+    menuData.push(...clientPrimaryItems, ...moduleItems.primary.map(toMenuItem))
+
+    const capabilitySectionChildren = [...capabilityModuleItems, ...moduleItems.capabilities.map(toMenuItem)]
+
+    if (capabilitySectionChildren.length > 0) {
       menuData.push({
         isSection: true,
         label: 'Módulos',
-        children: capabilityModules.map(module => ({
-          label: module.label,
-          href: module.route,
-          icon: module.icon
-        }))
+        children: capabilitySectionChildren
       })
     }
 
@@ -793,17 +849,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
     menuData.push({
       isSection: true,
       label: 'Mi Cuenta',
-      children: [
-        { label: nl(GH_CLIENT_NAV.updates), href: '/updates', icon: 'tabler-bell' },
-        { label: nl(GH_CLIENT_NAV.notifications), href: '/notifications', icon: 'tabler-notification' },
-        { label: nl(GH_CLIENT_NAV.settings), href: '/settings', icon: 'tabler-settings' }
-      ].filter(item => {
-        if (item.href === '/updates') return canSeeView('cliente.actualizaciones', true)
-        if (item.href === '/notifications') return canSeeView('cliente.notificaciones', true)
-        if (item.href === '/settings') return canSeeView('cliente.configuracion', true)
-
-        return true
-      })
+      children: [...clientAccountItems, ...moduleItems.account.map(toMenuItem)]
     })
 
     // Mi Ficha for collaborators with my routeGroup

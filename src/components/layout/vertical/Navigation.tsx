@@ -11,6 +11,7 @@ import { styled, useColorScheme, useTheme } from '@mui/material/styles'
 
 // Type Imports
 import type { Mode } from '@core/types'
+import type { ClientNavItem } from '@/lib/client-portal/composition/menu-builder-shape'
 
 // Component Imports
 import VerticalNav, { NavHeader, NavCollapseIcons } from '@menu/vertical-menu'
@@ -30,6 +31,14 @@ import { getMicrocopy } from '@/lib/copy'
 
 type Props = {
   mode: Mode
+
+  /**
+   * TASK-1675 — ítems de los módulos contratados por la organización, resueltos
+   * en `(dashboard)/layout.tsx` (server). Passthrough puro: este componente no
+   * los interpreta. JSON plano y serializable — el resolver es `server-only` y
+   * no puede cruzar la frontera.
+   */
+  clientNavItems?: readonly ClientNavItem[]
 }
 
 const microcopy = getMicrocopy()
@@ -52,7 +61,7 @@ const StyledBoxForShadow = styled('div')(({ theme }) => ({
 
 const Navigation = (props: Props) => {
   // Props
-  const { mode } = props
+  const { mode, clientNavItems } = props
 
   // Hooks
   const verticalNavOptions = useVerticalNav()
@@ -114,6 +123,11 @@ const Navigation = (props: Props) => {
       customStyles={navigationCustomStyles(verticalNavOptions, theme)}
       collapsedWidth={71}
       backgroundColor={GH_COLORS.brand.midnightNavy}
+      // TASK-1675 — marcador de captura del nav lateral. La evidencia GVC del menú
+      // module-driven recorta esta región: comparar el sidebar contra su baseline es
+      // lo único que detecta un corrimiento del chrome sin depender de que alguien
+      // mire la captura con atención.
+      data-capture='portal-vertical-nav'
        
       // The following condition adds the data-dark attribute to the VerticalNav component
       // when semiDark is enabled and the mode or systemMode is light
@@ -139,7 +153,7 @@ const Navigation = (props: Props) => {
         )}
       </NavHeader>
       <StyledBoxForShadow ref={shadowRef} />
-      <VerticalMenu scrollMenu={scrollMenu} />
+      <VerticalMenu scrollMenu={scrollMenu} clientNavItems={clientNavItems} />
     </VerticalNav>
   )
 }

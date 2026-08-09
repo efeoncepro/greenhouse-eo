@@ -27,7 +27,8 @@ export type { ClientNavItem, NavItemGroup, NavItemTier }
  *   4. Filter defensive: ocultar viewCodes que NO están en VIEW_REGISTRY
  *      (drift latente — el parity test live lo detecta en CI, pero defense
  *      in depth en runtime)
- *   5. Lookup en VIEW_CODE_NAV_DESCRIPTOR para icon + group ordering
+ *   5. Lookup en VIEW_CODE_NAV_DESCRIPTOR para icon + group ordering, y
+ *      descarte de rutas hijas (`childOf`) — no producen ítem propio
  *   6. Sort canonical: groupOrder ASC → tier priority ASC → label ASC
  *
  * Server-only enforced por `import 'server-only'`. NO debe importarse desde
@@ -42,17 +43,43 @@ export type { ClientNavItem, NavItemGroup, NavItemTier }
 // vive en el shape file (client-safe).
 
 /**
- * Mapping declarativo `viewCode → { icon, group }`. Cuando emerge un viewCode
- * nuevo en VIEW_REGISTRY + seed modules, agregar entry aquí. Sin entry, el
- * fallback es `tabler-app-window` + `'capabilities'` (degradación honesta —
- * el menu item se renderiza pero sin icono distintivo, NO se rompe).
+ * Descriptor de un viewCode en el menú: icono, grupo y —cuando corresponde—
+ * su condición de ruta hija.
+ */
+interface ViewCodeNavDescriptor {
+  readonly icon: string
+  readonly group: NavItemGroup
+
+  /**
+   * TASK-1675 — ViewCode del PADRE cuando esta vista es una **ruta hija**.
+   *
+   * Una ruta hija se alcanza desde su padre (CTA del header, fila de tabla,
+   * tab) y **NUNCA produce ítem de menú propio**, aunque el módulo la declare
+   * en sus `viewCodes`. Sin esta noción, un módulo que declara padre + hijo
+   * (como `seo_v2`, que trae dashboard + informe) produce DOS ítems en grupos
+   * distintos y rompe la relación padre-hijo en la navegación.
+   *
+   * El descarte es incondicional: no depende de que el padre esté presente. Un
+   * artefacto derivado no se convierte en entrada de menú por el hecho de que
+   * su dashboard no esté contratado — en ese caso simplemente no hay nada que
+   * mostrar. Esta es también la razón de que el contrato viva acá y no en el
+   * consumer: es una propiedad de la vista, no de quién la renderiza.
+   */
+  readonly childOf?: string
+}
+
+/**
+ * Mapping declarativo `viewCode → { icon, group, childOf? }`. Cuando emerge un
+ * viewCode nuevo en VIEW_REGISTRY + seed modules, agregar entry aquí. Sin
+ * entry, el fallback es `tabler-app-window` + `'capabilities'` (degradación
+ * honesta — el menu item se renderiza pero sin icono distintivo, NO se rompe).
  *
  * El grupo determina dónde aparece el item en el menú:
  *   - `'primary'`: items principales (Pulse, Proyectos, Ciclos, Equipo, Reviews)
  *   - `'capabilities'`: addons + módulos especializados (Creative Hub, Brand Intelligence, etc.)
  *   - `'account'`: Mi Cuenta (Notificaciones, Settings, Updates)
  */
-const VIEW_CODE_NAV_DESCRIPTOR: Record<string, { icon: string; group: NavItemGroup }> = {
+const VIEW_CODE_NAV_DESCRIPTOR: Record<string, ViewCodeNavDescriptor> = {
   // Primary nav (canonical client surfaces)
   'cliente.pulse': { icon: 'tabler-smart-home', group: 'primary' },
   'cliente.home': { icon: 'tabler-home', group: 'primary' },
@@ -64,7 +91,14 @@ const VIEW_CODE_NAV_DESCRIPTOR: Record<string, { icon: string; group: NavItemGro
   'cliente.analytics': { icon: 'tabler-chart-dots', group: 'primary' },
   'cliente.campanas': { icon: 'tabler-speakerphone', group: 'primary' },
   'cliente.growth_seo_dashboard': { icon: 'tabler-chart-arrows-vertical', group: 'primary' },
-  'cliente.growth_seo_report': { icon: 'tabler-file-analytics', group: 'capabilities' },
+
+  // Ruta hija: el informe se alcanza por el CTA "Ver informe" del header del
+  // dashboard (TASK-1310). No es un ítem de menú.
+  'cliente.growth_seo_report': {
+    icon: 'tabler-file-analytics',
+    group: 'capabilities',
+    childOf: 'cliente.growth_seo_dashboard'
+  },
 
   // Capabilities (modules forward-looking — addons + bundles)
   'cliente.creative_hub': { icon: 'tabler-palette', group: 'capabilities' },
@@ -84,7 +118,7 @@ const VIEW_CODE_NAV_DESCRIPTOR: Record<string, { icon: string; group: NavItemGro
   'cliente.configuracion': { icon: 'tabler-settings', group: 'account' }
 }
 
-const FALLBACK_NAV_DESCRIPTOR = { icon: 'tabler-app-window', group: 'capabilities' as const }
+const FALLBACK_NAV_DESCRIPTOR: ViewCodeNavDescriptor = { icon: 'tabler-app-window', group: 'capabilities' }
 
 /**
  * Tier priority para dedup: menor número gana cuando un viewCode aparece en
@@ -167,6 +201,9 @@ export const composeNavItemsFromModules = (
     if (!registryEntry) continue // Defensive: viewCode no registrado, skip
 
     const descriptor = VIEW_CODE_NAV_DESCRIPTOR[candidate.viewCode] ?? FALLBACK_NAV_DESCRIPTOR
+
+    // TASK-1675 — una ruta hija nunca produce ítem propio (ver `childOf`).
+    if (descriptor.childOf) continue
 
     // Map module tier (catalog values) → NavItemTier enum
     const navTier: NavItemTier =

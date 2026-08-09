@@ -16,7 +16,10 @@
  * `src/app/(dashboard)/**​/page.tsx` route MUST be reachable by ONE of:
  *   (a) a `href` in `VerticalMenu.tsx`, or
  *   (b) a declared child route here (with parent + via), or
- *   (c) a dynamic detail route (contains a `[segment]`, reached by row click).
+ *   (c) a dynamic detail route (contains a `[segment]`, reached by row click), or
+ *   (d) a module-composed nav route declared in `MODULE_COMPOSED_NAV_ROUTES`
+ *       below — a real menu item whose `href` is composed at runtime from
+ *       `module_assignments`, so no literal exists for the gate to find.
  * Mockup routes (`**​/mockup/**`) are excluded.
  */
 
@@ -426,13 +429,6 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'AI Visibility client report (TASK-1248) — surface client-scoped (routeGroup client, viewCode cliente.ai_visibility_report). Deep-link primero (OQ resuelta): se alcanza desde Account 360 / el handoff del Report Packet Delivery (TASK-1250), no como item de nav principal hasta que exista el monitor recurrente. Gateada server-side por client tenant + capability growth.ai_visibility.report.read_client.'
   },
   {
-    route: '/growth/seo',
-    parent: '/home',
-    via: 'inline-link',
-    reason:
-      'SEO client dashboard (TASK-1310) — surface client-scoped (routeGroup client, viewCode cliente.growth_seo_dashboard). Deep-link desde el portal; gateada server-side por tenant client, module_assignment SEO y capability growth.seo.report.read_client.'
-  },
-  {
     route: '/growth/seo/report',
     parent: '/growth/seo',
     via: 'header-cta',
@@ -442,3 +438,47 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
 ]
 
 export const DECLARED_CHILD_ROUTE_PATHS: readonly string[] = DECLARED_CHILD_ROUTES.map(d => d.route)
+
+/**
+ * TASK-1675 — rutas que SÍ son ítems de menú, pero cuyo `href` no existe como
+ * literal en el código.
+ *
+ * Son las superficies de un módulo per-organización: el ítem se compone en
+ * runtime desde `module_assignments` y su ruta sale del `routePath` del
+ * `VIEW_REGISTRY`, así que el gate —que busca literales de navegación— no puede
+ * verlas por más que estén perfectamente alcanzables.
+ *
+ * No son rutas hijas y por eso no viven en `DECLARED_CHILD_ROUTES`: declararlas
+ * ahí obligaría a inventarles un padre y un `via` que no existen. Es exactamente
+ * lo que pasaba con `/growth/seo`, que declaraba `parent: '/home', via:
+ * 'inline-link'` para un enlace que nunca existió; el gate lo aceptaba porque
+ * verifica que la ruta esté *declarada*, no que el enlace declarado *exista*.
+ *
+ * El gate cuenta estas entradas porque parsea los literales `route: '...'` de
+ * este archivo completo.
+ */
+export interface ModuleComposedNavRoute {
+  /** Ruta cuyo ítem de menú se compone en runtime. */
+  route: string
+
+  /** ViewCode del `VIEW_REGISTRY` que aporta label y `routePath`. */
+  viewCode: string
+
+  /** `module_key` del módulo que declara el viewCode. */
+  moduleKey: string
+
+  /** Por qué el ítem no puede existir como literal. */
+  reason: string
+}
+
+export const MODULE_COMPOSED_NAV_ROUTES: readonly ModuleComposedNavRoute[] = [
+  {
+    route: '/growth/seo',
+    viewCode: 'cliente.growth_seo_dashboard',
+    moduleKey: 'seo_v2',
+    reason:
+      'Dashboard SEO del portal cliente (TASK-1310). El ítem lo compone `composeNavItemsFromModules` desde los `module_assignments` de la organización y lo mergea `VerticalMenu` (TASK-1675): sólo lo ve quien tiene el módulo contratado, así que no puede existir un `href` literal en el menú. El acceso lo gatea la page server-side contra el mismo `module_assignments`.'
+  }
+]
+
+export const MODULE_COMPOSED_NAV_ROUTE_PATHS: readonly string[] = MODULE_COMPOSED_NAV_ROUTES.map(m => m.route)
