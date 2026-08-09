@@ -1496,6 +1496,8 @@ Reglas de lectura:
 
 ## To Do
 
+
+- **Programa del carril de acceso del portal cliente (creado 2026-08-09).** Sale de medir en vez de seguir arreglando por instancia: `docs/operations/CLIENT_PORTAL_ACCESS_RAIL_INVENTORY_V1.md`. De las 82 ocurrencias de `authorizedViews`, 63 son transporte y ~86 puntos de decisión son legítimos — **no hay que migrar 82 llamadas**. Los defectos reales son tres, y dos son una función y una línea. El orden **no es negociable**: `TASK-1678` (la derivación fail-open) → `TASK-1679` (el guard + las 9 páginas rotas) → `TASK-1680` (el lint a `error`). Invertir los dos primeros abre una ventana donde el cliente ve el ítem y además entra. Siguiente ID libre: `TASK-1681`.
 ### Criterio operativo
 
 - `Prioridad`: `P0` desbloquea arquitectura o runtime compartido; `P1` cierra módulos visibles o muy cercanos al usuario; `P2` expande capacidades; `P3` pule UX o follow-ons.
