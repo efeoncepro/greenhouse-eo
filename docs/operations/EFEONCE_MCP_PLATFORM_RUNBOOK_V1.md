@@ -260,7 +260,7 @@ el scope básico de un tenant único en una autorización comercial o multi-tena
 
 El provider `greenhouse-seo` es un **adapter delgado**: transporte, auth y routing. No tiene lógica de dominio.
 Delega en el lane ecosystem de Greenhouse (`/api/platform/ecosystem/growth/seo/*`), que ya aplica el entitlement
-per-org `seo_v1`, el 404 anti-oracle y las degradaciones honestas. Los payloads se pasan tal cual (`data` del
+per-org `seo_v2`, el 404 anti-oracle y las degradaciones honestas. Los payloads se pasan tal cual (`data` del
 envelope del lane), así que un cliente MCP ve exactamente los mismos shapes que la UI y Nexa.
 
 Tools publicadas. Las de **lectura** van bajo el **scope base** `efeonce.mcp.read`; las **dos de escritura**
@@ -431,7 +431,7 @@ del gateway sigue operando. No retires el gateway ni el front door por una falla
 
 Segundo nivel, del lado de Greenhouse: `GROWTH_SEO_ENABLED=false`. Recuerda que es multi-runtime — apagarlo en
 Vercel deja el lane muerto pero **no** detiene el materializador del `ops-worker`, y viceversa. Tercer nivel, por
-organización: revocar el assignment `seo_v1` (con `effective_to`/`status`, nunca `DELETE` de historia) apaga a esa
+organización: revocar el assignment `seo_v2` (con `effective_to`/`status`, nunca `DELETE` de historia) apaga a esa
 org sin tocar runtime.
 
 Nunca resuelvas un problema del provider ampliando el scope, quitando el entitlement per-org ni convirtiendo el

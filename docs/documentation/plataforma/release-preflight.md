@@ -1,8 +1,8 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-05-10 por Claude
-> **Ultima actualizacion:** 2026-05-11 por Codex
-> **Documentacion tecnica:** [TASK-850](../../tasks/in-progress/TASK-850-production-preflight-cli-complete.md), [CLAUDE.md §Production Preflight CLI invariants](../../../CLAUDE.md), [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md)
+> **Ultima actualizacion:** 2026-08-09 por Claude
+> **Documentacion tecnica:** [TASK-850](../../tasks/complete/TASK-850-production-preflight-cli-complete.md), [CLAUDE.md §Production Preflight CLI invariants](../../../CLAUDE.md), [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md)
 
 # Preflight de Release a Produccion
 
@@ -25,7 +25,7 @@ El preflight cierra ese gap. Es la respuesta a "como se que es seguro deployar p
 | 1 | target_sha_exists | El commit que vas a deployar existe en el repo (no typo, no force-push borrada) |
 | 2 | ci_green | Todos los workflows CI corrieron y pasaron success en ese commit |
 | 3 | playwright_smoke | Los smoke tests E2E corrieron y pasaron |
-| 4 | release_batch_policy | El diff develop vs main no mezcla dominios independientes ni toca cosas irreversibles sin documentar |
+| 4 | release_batch_policy | Lo que este release agrega sobre el ultimo ya desplegado no mezcla dominios independientes ni toca cosas irreversibles sin documentar |
 | 5 | stale_approvals | No hay workflows production esperando approval > 24h (sintoma del incidente) |
 | 6 | pending_without_jobs | No hay workflows zombie queued con jobs vacios > 5min (sintoma deadlock) |
 | 7 | vercel_readiness | El ultimo deploy production en Vercel esta READY |
@@ -34,6 +34,16 @@ El preflight cierra ese gap. Es la respuesta a "como se que es seguro deployar p
 | 10 | gcp_wif_subject | El WIF provider GCP tiene attribute mapping correcto + state ACTIVE |
 | 11 | azure_wif_subject | El Azure App tiene federated credential subject production |
 | 12 | sentry_critical_issues | No hay >=10 issues criticos sin resolver en las ultimas 24h |
+
+### Contra que compara el check #4 (delta 2026-08-09, TASK-1676)
+
+El `release_batch_policy` comparaba contra la punta de `main`. Pero el orquestador lo corre con el codigo **ya mergeado**, asi que la comparacion era del codigo consigo mismo: rango vacio y aprobacion automatica. Tres releases seguidos reportaron "0 archivos", uno de ellos con 1045 archivos y 14 migraciones adentro.
+
+Desde TASK-1676 la base es el commit del **ultimo release que quedo desplegado** — el ultimo manifest en estado `released` para esa rama, leido desde Postgres. Eso hace que el check mire lo mismo antes y despues del merge. Cuando la rama no tiene releases registrados, la base cae a la punta de la rama y el resultado lo declara explicitamente.
+
+**Un diff vacio ya no es una aprobacion.** Si el rango no contiene archivos, el check reporta `unknown` en vez de `ship`: no se sabe que el batch este mal, se sabe que no se pudo evaluar, y esa distincion le importa al operador. La regla aplica venga la base de donde venga.
+
+El resultado JSON ahora declara `diffBase`, `diffBaseSource` (`last_released_manifest` o `branch_head_fallback`) y `diffBaseReleaseId`. Son campos aditivos: no cambian la version del contrato.
 
 ## Como se decide
 
@@ -64,7 +74,7 @@ Operador / TASK-851 orchestrator
         +-- target_sha_exists  -> GitHub API
         +-- ci_green           -> GitHub API
         +-- playwright_smoke   -> GitHub API
-        +-- release_batch_policy -> git diff local
+        +-- release_batch_policy -> git diff local (base: Postgres release_manifests)
         +-- stale_approvals    -> reusa TASK-848 reader
         +-- pending_without_jobs -> reusa TASK-848 reader
         +-- vercel_readiness   -> Vercel API

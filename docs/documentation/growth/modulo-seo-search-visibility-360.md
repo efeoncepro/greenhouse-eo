@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.10
+> **Version:** 1.11
 > **Creado:** 2026-08-05 por Claude (TASK-1299 + TASK-1301)
-> **Ultima actualizacion:** 2026-08-08 por Claude (TASK-1309 — la Auditoría del sitio al día con la pantalla construida: el orden mira tres cosas y no dos (se suma el valor de búsqueda), las tres aclaraciones que evitan una conclusión falsa (tope del crawl, velocidad de laboratorio, alcance del puntaje), el movimiento contra el crawl anterior, el filtro por gravedad, la exportación del grupo, y lo que la auditoría todavía NO revisa)
+> **Ultima actualizacion:** 2026-08-09 por Claude (TASK-1677 Slice 1: la clave del módulo es `seo_v2` y es la única que el runtime lee; delta previo 2026-08-08 TASK-1309 — la Auditoría del sitio al día con la pantalla construida: el orden mira tres cosas y no dos (se suma el valor de búsqueda), las tres aclaraciones que evitan una conclusión falsa (tope del crawl, velocidad de laboratorio, alcance del puntaje), el movimiento contra el crawl anterior, el filtro por gravedad, la exportación del grupo, y lo que la auditoría todavía NO revisa)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
 
 # Modulo SEO — Search Visibility 360 (Growth)
@@ -12,11 +12,13 @@ El modulo SEO es la mitad "buscadores clasicos" de **Search Visibility 360**: mi
 
 La idea central es que la visibilidad no es una foto: es una **serie de tiempo**. El valor del módulo no está en saber "hoy estás en la posición 7", sino en poder mostrar "hace tres meses estabas en la 15, hoy estás en la 7, y este competidor te está alcanzando". Por eso todo el modelo de datos está construido como mediciones append-only: cada captura se guarda y **nunca** se edita ni se borra.
 
-Este documento describe el estado real al 2026-08-08: están construidas las capas de datos y acceso, las capturas automáticas (Search Console diaria, rankings, site audit y backlinks) y **las cuatro pantallas del operador** — Resumen, Rendimiento, Keywords y Auditoría. La superficie del cliente está construida y **pendiente de rollout**: su migración de catálogo no está aplicada todavía (ver el recuadro de abajo).
+Este documento describe el estado real al 2026-08-09: están construidas las capas de datos y acceso, las capturas automáticas (Search Console diaria, rankings, site audit y backlinks), **las cuatro pantallas del operador** — Resumen, Rendimiento, Keywords y Auditoría — y la superficie del cliente, ya desplegada.
 
-> Estado de catálogo 2026-08-08: el runtime desplegado aún usa `seo_v1`. TASK-1310 deja en
-> `develop` una migración pendiente que lo supersede por `seo_v2` para publicar el dashboard e
-> informe SEO como módulos cliente; no cambia tiers, cupos ni autorización per-org.
+> Estado de catálogo 2026-08-09: la clave del módulo es **`seo_v2`** y es la única que el runtime lee.
+> La migración de TASK-1310 la creó (con los dos viewCodes de cliente, sin cambiar tiers, cupos ni
+> autorización per-org) y el release del 2026-08-09 llevó a producción el código que lee sólo esa
+> clave. La clave anterior `seo_v1` sigue existiendo como historia en el catálogo, pero **un
+> assignment nuevo bajo `seo_v1` sería invisible para el sistema**: toda alta va con `seo_v2`.
 
 ## Que existe hoy
 
@@ -51,7 +53,7 @@ La separación importa porque el negocio de cada familia es distinto: la configu
 El SEO se habilita **por organización, no por rol** (misma lección del AEO: un rol no se factura; un módulo asignado a una org sí). Tiene tres piezas:
 
 - **Capabilities `growth.seo.*`** — 5 permisos finos: configurar targets (`target.configure`), disparar audits (`audit.run`), leer observaciones (`observation.read`), leer el reporte cliente (`report.read_client`, scope `own`) y administrar el entitlement (`entitlement.manage`, solo `EFEONCE_ADMIN` + `EFEONCE_ACCOUNT`).
-- **Módulo per-org `seo_v1`** — vive en el catálogo `greenhouse_client_portal.modules`; una org tiene SEO cuando existe un assignment activo en `module_assignments`. El **tier comercial** va en `metadata_json.seo_tier`: `contracted`, `trial` o `pilot`.
+- **Módulo per-org `seo_v2`** — vive en el catálogo `greenhouse_client_portal.modules`; una org tiene SEO cuando existe un assignment activo en `module_assignments`. El **tier comercial** va en `metadata_json.seo_tier`: `contracted`, `trial` o `pilot`.
 - **Chokepoint único `enforceSeoRunEntitlement`** — la única puerta por la que pasa cualquier corrida que gasta dinero (DataForSEO cobra por llamada). Evalúa en cadena: ¿hay assignment? → ¿no está vencido? → ¿queda cupo de site-audits del mes? → ¿queda presupuesto USD del mes? Si algo falla, devuelve un `blockedReason` explícito (`no_entitlement` / `expired` / `quota_exhausted` / `budget_exhausted`). Es consumer-agnóstico: la misma puerta sirve para UI, Nexa, la lane `app` y la lane `ecosystem`/MCP.
 
 Los cupos por tier salen de env-knobs con defaults sanos:
@@ -94,7 +96,7 @@ TASK-1302 convierte esa consulta en vivo en una **serie propia de Greenhouse**: 
 
 ### 4. La captura diaria de rankings y su serie de evolucion (TASK-1303 — ACTIVA en produccion)
 
-La segunda captura automatica del modulo: cada madrugada (05:00 Chile), para cada organizacion con el modulo `seo_v1` asignado, el sistema le pregunta a Google (via el proveedor DataForSEO) **en que posicion exacta aparece el dominio para cada keyword trackeada** — incluyendo si el resultado trae AI Overview u otras features del buscador. Cada medicion se guarda como una fila inmutable en `seo_rank_snapshots` y se espeja automaticamente a BigQuery (`greenhouse_growth_analytics.seo_rank_history`) para conservar la historia larga.
+La segunda captura automatica del modulo: cada madrugada (05:00 Chile), para cada organizacion con el modulo `seo_v2` asignado, el sistema le pregunta a Google (via el proveedor DataForSEO) **en que posicion exacta aparece el dominio para cada keyword trackeada** — incluyendo si el resultado trae AI Overview u otras features del buscador. Cada medicion se guarda como una fila inmutable en `seo_rank_snapshots` y se espeja automaticamente a BigQuery (`greenhouse_growth_analytics.seo_rank_history`) para conservar la historia larga.
 
 Piezas clave, en lenguaje simple:
 
@@ -278,9 +280,9 @@ eligen sola la fuente: si la base operativa no cubre el período pedido, leen el
 > [`backfill-historico-gsc.md`](../../manual-de-uso/growth/backfill-historico-gsc.md);
 > delta de arquitectura en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §4.
 
-Además: el alta del módulo `seo_v1` a una organización sigue siendo un **paso operativo manual** — ver el manual [Asignar el módulo SEO a una organización](../../manual-de-uso/growth/asignar-modulo-seo-organizacion.md).
+Además: el alta del módulo `seo_v2` a una organización sigue siendo un **paso operativo manual** — ver el manual [Asignar el módulo SEO a una organización](../../manual-de-uso/growth/asignar-modulo-seo-organizacion.md).
 
-Sobre el interruptor general `GROWTH_SEO_ENABLED`: está **encendido desde el 2026-08-05** y es **multi-runtime** — lo leen dos procesos distintos con su propia copia de la variable: el trabajador de fondo (`ops-worker`, para la captura diaria de Search Console) y el portal en Vercel (para el lane que sirve las consultas por MCP). Encenderlo en un solo runtime deja el otro camino muerto. Desde el 2026-08-06 está en `true` en Vercel Production. Encenderlo no gasta presupuesto: la captura de Search Console es gratis y las consultas por MCP son de lectura. Las corridas que **sí** cuestan dinero (rankings, site audit, backlinks) siguen exigiendo el assignment `seo_v1` de la organización y pasan por el chokepoint de cupos y presupuesto.
+Sobre el interruptor general `GROWTH_SEO_ENABLED`: está **encendido desde el 2026-08-05** y es **multi-runtime** — lo leen dos procesos distintos con su propia copia de la variable: el trabajador de fondo (`ops-worker`, para la captura diaria de Search Console) y el portal en Vercel (para el lane que sirve las consultas por MCP). Encenderlo en un solo runtime deja el otro camino muerto. Desde el 2026-08-06 está en `true` en Vercel Production. Encenderlo no gasta presupuesto: la captura de Search Console es gratis y las consultas por MCP son de lectura. Las corridas que **sí** cuestan dinero (rankings, site audit, backlinks) siguen exigiendo el assignment `seo_v2` de la organización y pasan por el chokepoint de cupos y presupuesto.
 
 ### Oportunidades de keywords: donde crecer en busqueda (TASK-1308, 2026-08-07)
 
@@ -463,7 +465,7 @@ tablero vacío que se lea como "no tienes visibilidad".
 
 SEO y AEO son los dos motores de **Search Visibility 360** y se diseñaron como espejo deliberado:
 
-- **Mismo patrón de acceso:** módulo per-org (`seo_v1` / `ai_visibility_v1`) + capabilities con el mismo grano + `entitlement.manage` restringido a los mismos roles.
+- **Mismo patrón de acceso:** módulo per-org (`seo_v2` / `ai_visibility_v1`) + capabilities con el mismo grano + `entitlement.manage` restringido a los mismos roles.
 - **Mismo proveedor compartido:** DataForSEO, con familias de endpoints aisladas por circuit breaker para que un problema en el carril SEO no hunda el carril AEO (ni viceversa).
 - **Métricas espejo:** el SoV orgánico del SEO (share of visibility en Google) es el reflejo del SoV IA del grader (share of voice en answer engines). La lectura conjunta — "¿dónde te ve Google y dónde te ven las IA?" — es el derived read `readSeoAeoGap` (TASK-1305).
 

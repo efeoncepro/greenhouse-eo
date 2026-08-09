@@ -50,7 +50,7 @@ La superficie que ve una persona **se deriva de su acceso per-org vía `module_a
 | **Cliente sin SEO / trial** | portal | sin assignment / `trial` (quota cap) | Locked/teaser → upsell (reusa patrón EPIC-020 S6; diferido a follow-up de este epic) |
 | **Público** (diferido) | sitio | quick-check rate-limited de 1 dominio (patrón `public-submission` + `grader_leads`) | "SEO quick check" (foto puntual, sin histórico) — **diferido**, fuera del scope de las tasks 1306–1310 |
 
-En S3, leer oportunidades y discovery requiere `growth.seo.observation.read` + `seo_v1`; declarar
+En S3, leer oportunidades y discovery requiere `growth.seo.observation.read` + `seo_v2`; declarar
 objetivos, iniciar discovery o ejecutar una acción sobre un candidate requiere además
 `growth.seo.target.configure`, presupuesto/cupo vigente y confirmación explícita. Un operador con sólo
 lectura puede revisar runs ya materializados, pero nunca iniciar una llamada Labs ni convertir un

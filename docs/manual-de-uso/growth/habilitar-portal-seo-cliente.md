@@ -1,9 +1,9 @@
 # Manual — Habilitar y verificar el portal SEO del cliente
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-08-08 por Claude (TASK-1310)
-> **Ultima actualizacion:** 2026-08-08 por Claude (TASK-1310)
+> **Ultima actualizacion:** 2026-08-09 por Claude (TASK-1677 Slice 1: el codigo lee solo `seo_v2`)
 > **Modulo:** Growth / SEO (Search Visibility 360) — superficie **cliente**
 > **Rutas en portal:** `/growth/seo` (dashboard) · `/growth/seo/report` (informe, con `?print=1` para imprimir)
 > **Documentacion relacionada:** [doc funcional del modulo](../../documentation/growth/modulo-seo-search-visibility-360.md) · [asignar el modulo SEO a una organizacion](asignar-modulo-seo-organizacion.md) · [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
@@ -17,11 +17,20 @@ pantallas del operador (`/admin/growth/seo/*`): mismo motor, distinta profundida
 Este manual cubre: como habilitarlo para una organizacion, que ve el cliente, como verificar que
 quedo bien, y que hacer cuando no aparece.
 
-> ⚠️ **Estado al 2026-08-08: catalogo aplicado; falta verificar con sesion de cliente.** El codigo
-> esta publicado y desplegado a staging, y la migracion de catalogo ya corrio: `seo_v2` existe con
-> sus dos viewCodes y las dos organizaciones habilitadas. La seccion "Rollout" de abajo queda como
-> runbook para el proximo entorno — y con una adicion que costo una caida de produccion, lee la nota
-> del paso 2.
+> ⚠️ **Estado al 2026-08-09: catalogo aplicado y codigo en produccion.** `seo_v2` existe con sus dos
+> viewCodes y las dos organizaciones habilitadas, y desde el release `49f86c98cda6` el runtime **lee y
+> escribe solo `seo_v2`** (TASK-1677 Slice 1: `SEO_MODULE_KEYS_READ = ['seo_v2']`, la ventana de
+> dual-read ya no existe en codigo). La superficie cliente quedo verificada con sesion de Grupo Berel
+> el 2026-08-08 — ver "Como verificar que quedo bien".
+>
+> 🔴 **El cutover NO esta terminado: los datos siguen abiertos.** Los assignments `seo_v1` siguen
+> vigentes en la base; la migracion que los supersede tiene dueño (`TASK-1677` Slice 2) y todavia no
+> se aplico. Consecuencia practica para este manual: **toda alta nueva se escribe con `seo_v2`**. Un
+> assignment creado bajo `seo_v1` hoy queda en la base y **no existe para el runtime** — la
+> organizacion veria "SEO no esta activo en tu plan" sin ningun error visible.
+>
+> La seccion "Rollout" de abajo queda como runbook para el proximo entorno — y con una adicion que
+> costo una caida de produccion, lee la nota del paso 2.
 
 ## Antes de empezar
 
@@ -69,6 +78,11 @@ El orden importa: la migracion siembra filas de catalogo que el codigo desplegad
    (`…-reopen-seo-module-cutover-window`) deja **ambas claves vigentes** durante la ventana: eso es
    deliberado y es lo que evita la caida descrita abajo.
 
+   > **Al 2026-08-09 esa ventana esta cerrada del lado del codigo** (lee solo `seo_v2`) y abierta del
+   > lado de los datos. En un entorno nuevo, esto se traduce en una sola regla: la migracion de
+   > catalogo tiene que haber corrido **antes** de que el runtime atienda trafico, porque ya no hay
+   > clave vieja de respaldo.
+
    > `pnpm pg:connect:status` **no aplica nada** — es dry-run, aunque imprima "Migrations complete!".
 
    > 🔴 **Antes de aplicar una migracion de cutover, mira que clave lee el codigo de CADA runtime.**
@@ -87,7 +101,7 @@ El orden importa: la migracion siembra filas de catalogo que el codigo desplegad
 
    `seo_v2` debe traer los dos view codes. Si devuelve cero filas, la migracion no corrio.
 
-   Y revisa que la ventana este **simetrica** — ambas claves cubriendo las mismas organizaciones:
+   Y revisa la cobertura por clave:
 
    ```sql
    SELECT module_key, COUNT(*)
@@ -95,6 +109,12 @@ El orden importa: la migracion siembra filas de catalogo que el codigo desplegad
    WHERE module_key LIKE 'seo_v%' AND effective_to IS NULL AND status IN ('active','pilot')
    GROUP BY module_key;
    ```
+
+   Que esperar segun la fase: mientras el codigo tenia dual-read, la ventana debia estar
+   **simetrica** (ambas claves cubriendo las mismas organizaciones). Desde 2026-08-09 el codigo lee
+   solo `seo_v2`, asi que lo que hay que verificar es mas simple y mas duro: **`seo_v2` cubre a todas
+   las organizaciones que deben tener SEO**. Una fila `seo_v1` de mas ya no rompe nada; una `seo_v2`
+   de menos apaga el modulo para esa organizacion.
 
 4. **Verifica con el consumidor real, no con un `SELECT`.** La base es la mitad del contrato; la
    otra mitad es que version de codigo la esta leyendo cada runtime. Para este modulo el consumidor
@@ -145,6 +165,9 @@ Con esa sesion, revisa tres cosas:
   contrataron.
 - **No edites `view_codes` de `seo_v1` in-place.** `modules.*` es append-only y el CHECK lo rechaza;
   por eso existe `seo_v2`.
+- **No crees assignments nuevos bajo `seo_v1`.** El codigo dejo de leer esa clave el 2026-08-09; la
+  fila quedaria en la base sin efecto en runtime, y el sintoma seria un cliente que "contrato SEO" y
+  ve el estado de no contratado. La clave de escritura es `seo_v2` (`SEO_MODULE_KEY`).
 - **No uses la persona agente superadmin para validar el gate.** Atraviesa por otras razones y te
   daria un falso verde.
 - **No agregues secciones nuevas al navegador cliente dentro de esta task.** La cuarta seccion
@@ -161,10 +184,13 @@ es por enlace directo y el gate real vive server-side en la page.
 
 **El cliente ve "SEO no esta activo en tu plan" y si lo contrato.**
 Ojo: esto NO se arregla tocando `role_view_assignments` — la page se gatea por `module_assignment`,
-no por viewCode. Casi siempre es la ventana del cutover: su organizacion tiene assignment en una clave
-y el runtime que la atiende lee la otra. Revisa `greenhouse_client_portal.module_assignments` filtrando por su
-`organization_id` y compara contra `SEO_MODULE_KEYS_READ` en `src/lib/growth/seo/entitlement.ts` —
-**de la version desplegada en ESE runtime**, no de tu working tree.
+no por viewCode. La causa mas comun es de clave: **la organizacion tiene assignment bajo `seo_v1` y
+no bajo `seo_v2`**, que es la unica que el codigo lee desde 2026-08-09. Revisa
+`greenhouse_client_portal.module_assignments` filtrando por su `organization_id`; si solo aparece
+`seo_v1`, el arreglo es crear el assignment `seo_v2` (manual de asignacion), **nunca** reabrir la
+lectura de la clave vieja. Y compara siempre contra `SEO_MODULE_KEYS_READ` en
+`src/lib/growth/seo/entitlement.ts` **de la version desplegada en ESE runtime**, no de tu working
+tree: hay cinco runtimes con despliegues independientes.
 
 **El dashboard carga vacio en todas las secciones.**
 No es la superficie: es que esa org no tiene datos. Confirma en `/admin/growth/seo` con la misma org

@@ -18,9 +18,12 @@ status/tier/metadata de cada assignment vigente, cierra `seo_v1` y registra
 `cliente.growth_seo_dashboard` + `cliente.growth_seo_report` con denials explícitos por rol. El
 acceso sigue siendo per-org (`module_assignment` + capability), nunca role-wide.
 
-**Estado:** código y migración listos en `develop`; hasta aplicar la migración, el runtime desplegado
-sigue usando `seo_v1`. No afirmar navegación SEO cliente operativa antes de verificar la sesión de
-Grupo Berel después del deploy.
+**Estado (actualizado 2026-08-09):** migración aplicada y código en producción. `seo_v2` existe con
+sus dos viewCodes y las dos organizaciones asignadas, y desde el release `49f86c98cda6` el runtime
+**lee y escribe sólo `seo_v2`** (`TASK-1677` Slice 1 — ver §10.7). Lo que queda abierto del cutover
+son los **datos**: los assignments `seo_v1` siguen vigentes hasta la migración del contract. Sobre la
+navegación cliente: verificada con sesión de Grupo Berel el 2026-08-08 — la ruta responde con datos
+reales, pero el menú del portal cliente no compone SEO (igual que AEO; se llega por enlace directo).
 
 ---
 
@@ -195,7 +198,7 @@ Cada capacidad = primitive gobernado `src/lib/growth/seo/**`, reusable por UI + 
 `/api/platform/ecosystem/growth/seo/{keyword-opportunities,visibility-360,entitlement}` (vía
 `runEcosystemReadRoute`; resource builder `src/lib/api-platform/resources/ecosystem-growth-seo.ts`:
 org por binding — org-scoped manda con mismatch 404 anti-oracle, internal exige `organizationId` —,
-entitlement per-org `seo_v1` → 404 anti-oracle, `target_not_configured` honesto, payloads passthrough
+entitlement per-org `seo_v2` → 404 anti-oracle, `target_not_configured` honesto, payloads passthrough
 de los readers) + **3 MCP tools read-only** en `src/mcp/greenhouse/**`: `get_seo_keyword_opportunities`,
 `get_seo_visibility_360` (nace con el cruce AEO real de TASK-1305) y `get_seo_entitlement` (el
 chokepoint como lectura, SIN anti-oracle por diseño — visibilidad operativa). Regla vigente
@@ -221,7 +224,7 @@ cablea al cliente público compartido"; el camino correcto es `TASK-1631`).
 
 **Commands (write, capability-gated, audited, outbox):**
 - `configureSeoTarget(orgId, { rootDomain, market }, actor)`
-- `trackKeywords(seoTargetId, keywords[], actor)` — **IMPLEMENTADO (TASK-1308, 2026-08-07)** en `src/lib/growth/seo/track-keywords.ts`. 🔴 **No es un INSERT: es un COMPROMISO DE GASTO DIFERIDO.** El write no cuesta nada; el rank capture diario (TASK-1303) le paga al proveedor por cada keyword vigente del set, en cada ciclo, hasta que alguien la deje de seguir. Por eso lleva **techo gobernado por target** (`GROWTH_SEO_TRACKED_KEYWORDS_PER_TARGET`, default 200 → outcome `capacity_exceeded` explícito, nunca silencio ni excepción), **entitlement per-org** (`seo_v1` vigente; NO consume allowance de site-audit — seguir no gasta hoy, gasta mañana), **outcome POR keyword** (`tracked|already_tracked|capacity_exceeded|invalid`, nunca un booleano), normalización + dedupe, idempotencia (`ON CONFLICT DO NOTHING` sobre el índice único parcial) y `FOR UPDATE OF` contra dos "Seguir" concurrentes. Append-only: sólo inserta — dejar de seguir es cerrar `effective_to` y es OTRO command, `untrackKeywords`, entregado en la misma task (abajo). App-lane `POST /api/admin/growth/seo/keywords/track` (capability `growth.seo.target.configure`) + lane ecosystem `POST /api/platform/ecosystem/growth/seo/keywords/track` (**sólo bindings de scope `internal`**: un binding cliente lee sus oportunidades pero no hace crecer su propia factura) + MCP tool `track_seo_keywords`, federada al gateway con el **scope de escritura del dominio** `efeonce.mcp.seo.write` — del DOMINIO y no de la capability: un scope por capability convertiría la lista de scopes de Entra en un espejo del `capabilities_registry`, editado a mano, que diverge; y el gateway NUNCA es autoridad de autorización. La regla es **un scope por clase de blast-radius** (`globe.credits.funding.ensure` tiene el suyo porque mueve dinero, no porque sea una capability). Lo fino ya se enforcea abajo: binding `internal` + entitlement per-ORG + techo. Evento `growth.seo.keyword_set.updated` emitido dentro de la transacción.
+- `trackKeywords(seoTargetId, keywords[], actor)` — **IMPLEMENTADO (TASK-1308, 2026-08-07)** en `src/lib/growth/seo/track-keywords.ts`. 🔴 **No es un INSERT: es un COMPROMISO DE GASTO DIFERIDO.** El write no cuesta nada; el rank capture diario (TASK-1303) le paga al proveedor por cada keyword vigente del set, en cada ciclo, hasta que alguien la deje de seguir. Por eso lleva **techo gobernado por target** (`GROWTH_SEO_TRACKED_KEYWORDS_PER_TARGET`, default 200 → outcome `capacity_exceeded` explícito, nunca silencio ni excepción), **entitlement per-org** (`seo_v2` vigente; NO consume allowance de site-audit — seguir no gasta hoy, gasta mañana), **outcome POR keyword** (`tracked|already_tracked|capacity_exceeded|invalid`, nunca un booleano), normalización + dedupe, idempotencia (`ON CONFLICT DO NOTHING` sobre el índice único parcial) y `FOR UPDATE OF` contra dos "Seguir" concurrentes. Append-only: sólo inserta — dejar de seguir es cerrar `effective_to` y es OTRO command, `untrackKeywords`, entregado en la misma task (abajo). App-lane `POST /api/admin/growth/seo/keywords/track` (capability `growth.seo.target.configure`) + lane ecosystem `POST /api/platform/ecosystem/growth/seo/keywords/track` (**sólo bindings de scope `internal`**: un binding cliente lee sus oportunidades pero no hace crecer su propia factura) + MCP tool `track_seo_keywords`, federada al gateway con el **scope de escritura del dominio** `efeonce.mcp.seo.write` — del DOMINIO y no de la capability: un scope por capability convertiría la lista de scopes de Entra en un espejo del `capabilities_registry`, editado a mano, que diverge; y el gateway NUNCA es autoridad de autorización. La regla es **un scope por clase de blast-radius** (`globe.credits.funding.ensure` tiene el suyo porque mueve dinero, no porque sea una capability). Lo fino ya se enforcea abajo: binding `internal` + entitlement per-ORG + techo. Evento `growth.seo.keyword_set.updated` emitido dentro de la transacción.
 - `untrackKeywords(seoTargetId, keywords[], actor)` — **IMPLEMENTADO (TASK-1308)**, el reverso que hace REVERSIBLE el compromiso de gasto: sin él, seguir una keyword la dejaba en el ciclo de facturación del proveedor para siempre y el techo del set era un callejón sin salida. **NO borra**: cierra `effective_to` (append-only, trigger anti-DELETE de TASK-1299), así que el histórico sigue explicando facturas pasadas y el índice único parcial permite volver a seguirla después. 🔴 Usa `clock_timestamp()` y NO `NOW()`: `NOW()` devuelve el inicio de la transacción y cerrar una membresía creada en ella produce `effective_to = effective_from`, que revienta el CHECK `effective_to > effective_from` (23514) — lo encontró el sanity contra PG real, los mocks lo daban por bueno. A diferencia del alta **NO exige target activo**: si el target se pausó con el set lleno, bloquear la salida congelaría el gasto. App-lane `POST /api/admin/growth/seo/keywords/untrack` + lane ecosystem (sólo bindings `internal`) + MCP tool `untrack_seo_keywords` federada, compartiendo el scope del alta — quien puede subir la factura puede bajarla.
 - `queueSiteAudit(targetId, actor)` (async OnPage task)
 - `setBacklinkTracking(targetId, competitors[], actor)`
@@ -248,7 +251,7 @@ cablea al cliente público compartido"; el camino correcto es `TASK-1631`).
 
 **Readers de superficie del cockpit Overview (TASK-1306, 2026-08-06)** — `src/lib/growth/seo/overview/`. Son plumbing de SUPERFICIE, no contratos de negocio nuevos: proyectan lo ya materializado para el nodo S1 y **los cuatro respetan `isSeoModuleEnabled`** (con el módulo apagado un reader no puede devolver datos aunque la page fallara en 404-ear).
 
-- `listSeoEligibleSpaces()` → Spaces del Space picker. Aplica el **mismo predicado de vigencia** que `listEligibleTargets`/`resolveSeoEntitlement` (`module_key='seo_v1' AND effective_to IS NULL AND status IN ('active','pilot')`) — un assignment cerrado NUNCA ofrece el Space. A diferencia del batch, NO exige `seo_target` creado: un Space recién asignado debe poder abrirse para ver su estado honesto. ⚠️ `greenhouse_core.organizations` no tiene columna `name`, es `organization_name`.
+- `listSeoEligibleSpaces()` → Spaces del Space picker. Aplica el **mismo predicado de vigencia** que `listEligibleTargets`/`resolveSeoEntitlement` (`module_key = ANY(SEO_MODULE_KEYS_READ) AND effective_to IS NULL AND status IN ('active','pilot')` — hoy el array es `['seo_v2']`) — un assignment cerrado NUNCA ofrece el Space. A diferencia del batch, NO exige `seo_target` creado: un Space recién asignado debe poder abrirse para ver su estado honesto. ⚠️ `greenhouse_core.organizations` no tiene columna `name`, es `organization_name`.
 - `readSeoOverviewConnection(orgId)` → `connected | not_connected | no_snapshots` + `dataAsOf`. **Tres condiciones que la UI no puede colapsar**, porque llevan a acciones distintas (conectar OAuth vs esperar al scheduler vs rendir). La frescura sale de `seo_gsc_daily` (lo materializado), NO de un read-through a Google: preguntarle a Google daría una fecha más nueva que la que el panel puede graficar.
 - `readSeoOverviewKpis(orgId, rangeDays)` → totales + ventana previa + serie diaria. **Posición media = `SUM(position × impressions)/SUM(impressions)`** y **CTR = `SUM(clicks)/SUM(impressions)`** del período — un `AVG(position)` plano o un promedio de CTR diarios dan un número que no corresponde a ninguna realidad medible y se ve "razonable" en pantalla, que es lo que lo hace peligroso. Ancla en `MAX(capture_date)`, **nunca en `CURRENT_DATE`** (la captura corre con lag: anclar en hoy pintaría una caída de tráfico que no ocurrió). Sin impresiones → `position`/`ctr` en `null` (→ "Pendiente"), nunca `0`; ventana previa sin volumen → `previous: null`, nunca un `+100%` contra cero.
 - `readSeoOverviewSidebar(orgId)` → tres regiones (salud del sitio · movers WoW · cruce AEO) que **degradan de forma INDEPENDIENTE** (`Promise.allSettled` + `{ ok } | { ok:false, reason }` por región): que no exista auditoría no puede tumbar los movers ni el cruce. Compone `readSiteAuditReport` + `readRankEvolution` + `readSeoAeoGap`; no consulta las tablas por su cuenta.
@@ -263,7 +266,7 @@ Todo reader retorna `{ ok: true, ... } | { ok: false, errorCode, status }` (espe
 
 Cloud Scheduler + ops-worker (async-critical), nunca Vercel cron.
 
-- **Rank diario (TASK-1303, LIVE desde 2026-08-06 — scheduler ACTIVO `0 5 * * *`):** Cloud Scheduler `ops-seo-rank-capture` (`0 5 * * *` CLT; despausado 2026-08-06 tras verificar el gate de costo con smoke E2E real de Berel + release `fcee5ab9f7ce` en prod) → `POST /seo/rank/capture-batch` en ops-worker → `runRankCaptureBatch` (targets activos con assignment `seo_v1` vigente, per-target resilience) → `captureRankSnapshot(targetId, actor)` por target → outbox `growth.seo.rank_snapshot.captured` → consumer reactivo `seo_rank_history_bq_sync` (lane `ops-reactive-growth`) → MERGE a BQ `greenhouse_growth_analytics.seo_rank_history` (dataset creado 2026-08-06; partition por `capture_date`, cluster `seo_target_id, keyword`).
+- **Rank diario (TASK-1303, LIVE desde 2026-08-06 — scheduler ACTIVO `0 5 * * *`):** Cloud Scheduler `ops-seo-rank-capture` (`0 5 * * *` CLT; despausado 2026-08-06 tras verificar el gate de costo con smoke E2E real de Berel + release `fcee5ab9f7ce` en prod) → `POST /seo/rank/capture-batch` en ops-worker → `runRankCaptureBatch` (targets activos con assignment `seo_v2` vigente, per-target resilience) → `captureRankSnapshot(targetId, actor)` por target → outbox `growth.seo.rank_snapshot.captured` → consumer reactivo `seo_rank_history_bq_sync` (lane `ops-reactive-growth`) → MERGE a BQ `greenhouse_growth_analytics.seo_rank_history` (dataset creado 2026-08-06; partition por `capture_date`, cluster `seo_target_id, keyword`).
   - 🔴 **La idempotencia diaria NO es `ON CONFLICT DO UPDATE`.** El anti-mutation trigger de TASK-1299 bloquea UPDATE **incondicionalmente** sobre `seo_rank_snapshots` (y el runtime no tiene GRANT UPDATE): el contrato real es **pre-check de combos ya capturados ANTES de pegar el provider** (el re-run del mismo día no gasta) + `INSERT … ON CONFLICT DO NOTHING` como guardia de carrera. Medición inmutable, a diferencia deliberada de `seo_gsc_daily` (que sí corrige por consolidación tardía).
   - **Gate de costo + spend fence:** `enforceSeoRunEntitlement(orgId, { estimatedCostUsd: batch completo, consumesAuditAllowance: false })` ANTES de la primera llamada + re-consulta cada 10 llamadas cobradas (cierra la deuda declarada por TASK-1300: el gate una-vez sobregiró 3× un budget trial). `consumesAuditAllowance: false` existe porque el rank capture no crea `seo_site_audit_runs` — su único freno es presupuesto/expiración, nunca el cupo de audits.
   - **Parámetros de captura (oficio `dataforseo-operator`):** familia `serp`, `organic/live/advanced`, **1 task por call** (el `cost` del provider es por batch — 1/call es la única atribución exacta de `provider_cost` por fila), `depth: 20` (el striking distance 8–20 y la historia "de 8 a 3" viven ahí; default 10 = ciego), `load_async_ai_overview: true` (sin él, "AI Overview presente/no" tiene falso negativo silencioso; duplica el costo — ~USD 0.008/call, estimador del gate 0.01). Follow-up de escala: SERP task-based standard (~3.3× más barato) exige ampliar el transporte POST-only.
@@ -295,7 +298,7 @@ growth.seo.report.read_client   (read, own)        gate del report cliente (clie
 growth.seo.entitlement.manage   (execute, tenant)  SOLO EFEONCE_ADMIN + EFEONCE_ACCOUNT (espejo AEO)
 ```
 
-**Acceso per-org vía `module_assignments`** (no por rol — lección TASK-1248), con `module_key='seo_v1'` seedeado en `greenhouse_client_portal.modules` (la FK del catálogo lo exige; tier=addon, `data_sources=['growth.seo']` con parity al union `ClientPortalDataSource`; `view_codes=[]` hasta TASK-1310). El tier vive en `metadata_json.seo_tier` (`contracted|trial|pilot`; override de cupo pilot vía `metadata_json.seo_audit_runs_per_month`). Las **4 puertas**: operador (`entitlement.manage`, interno, todas las orgs), contratado (assignment activo → observación + report), trial/PLG (assignment con quota cap + expiry), público (quick-check rate-limited de 1 dominio, diferida — reusa el patrón `public-submission` + `grader_leads`).
+**Acceso per-org vía `module_assignments`** (no por rol — lección TASK-1248), con `module_key='seo_v2'` seedeado en `greenhouse_client_portal.modules` (la FK del catálogo lo exige; tier=addon, `data_sources=['growth.seo']` con parity al union `ClientPortalDataSource`; con los dos `view_codes` de cliente desde TASK-1310 — la fila `seo_v1` original nació con `view_codes=[]` y sigue en el catálogo como historia append-only, ver §10.7). El tier vive en `metadata_json.seo_tier` (`contracted|trial|pilot`; override de cupo pilot vía `metadata_json.seo_audit_runs_per_month`). Las **4 puertas**: operador (`entitlement.manage`, interno, todas las orgs), contratado (assignment activo → observación + report), trial/PLG (assignment con quota cap + expiry), público (quick-check rate-limited de 1 dominio, diferida — reusa el patrón `public-submission` + `grader_leads`).
 
 **Chokepoint único `enforceSeoRunEntitlement`** (`src/lib/growth/seo/entitlement.ts`) con **quota cap por-org** (gate de costo DataForSEO): entitlement → expiración (`expired` explícito) → allowance (site-audits/mes por tier) → budget (USD/mes por tier; gasto = `SUM(provider_cost)` mensual de los snapshots TASK-1299 — **hook TASK-1300**: al existir `seo_provider_spend_daily`, el resolver cambia de fuente). Acepta `estimatedCostUsd` y no deja pasar un run que exceda el budget restante. Consumer-agnóstico por diseño (mandato parity+MCP 2026-08-05): el plano fino de capability (`can()`) vive en el consumer; el MISMO gate sirve UI, Nexa, lane `app` y lane `ecosystem`/MCP. Knobs por env con default: `GROWTH_SEO_{CONTRACTED|TRIAL|PILOT}_{AUDIT_RUNS_PER_MONTH|MONTHLY_BUDGET_USD}`. Sanity live: `scripts/growth/_sanity-seo-entitlement.ts`.
 
@@ -536,7 +539,14 @@ salud, no fabrica snapshots y no toca DataForSEO en el render.
 > nacer sin esta cobertura** — un artefacto con nuestro nombre que declara sano un sitio invisible
 > para la IA es peor que no tener artefacto.
 
-### 10.7 Cutover `seo_v1 → seo_v2` — expand/contract (TASK-1310)
+### 10.7 Cutover `seo_v1 → seo_v2` — expand/contract (TASK-1310 · contract: TASK-1677)
+
+> **Estado al 2026-08-09: EN CURSO, fase contract a medio camino.** El **código** ya contrajo y está
+> en producción (`SEO_MODULE_KEYS_READ = ['seo_v2']`, release `49f86c98cda6`); los **datos** todavía
+> no (los assignments `seo_v1` siguen vigentes). Es un estado intermedio deliberado, con dueño
+> (`TASK-1677`) y secuencia — **no un cutover terminado**. Antes de aplicar la migración del contract,
+> leer el delta 2026-08-09 al final de esta sección: aplicarla sin desplegar y verificar entre pasos
+> rompe el contrato aunque el SQL corra sin error.
 
 `TASK-1310` renombra la clave del módulo porque `modules.*` es append-only y `seo_v1` nació con
 `view_codes=[]`: no se puede editar in-place, hay que superseder. La migración crea `seo_v2`,
@@ -563,8 +573,14 @@ place is forbidden"*):
    **5** consumidores (`entitlement`, `list-seo-spaces`, `rank-capture-batch`,
    `site-audit/enqueue-batch`, `backlinks/capture`). Se despliega ESTO primero.
 2. **Migrate** — se aplica la migración. Sin ventana: las lecturas aceptan ambas.
-3. **Contract** — se deja sólo `seo_v2`, cuando no queden assignments `seo_v1` vigentes. Es un cambio
-   posterior y deliberado, con dueño `TASK-1310`.
+3. **Contract** — se deja sólo `seo_v2`. Es un cambio posterior y deliberado, con **dueño propio
+   (`TASK-1677`**, separada de `TASK-1310` porque es `backend-data` de bajo riesgo y no debe quedar
+   atada a un ciclo de diseño abierto). El contract **también tiene dos fases, y no viajan en el
+   mismo release**: primero el código deja de leer `seo_v1`, se despliega y se verifica; recién
+   después la migración supersede los assignments. Delta 2026-08-09 abajo.
+   La condición que autoriza contraer el código **no** es "que no queden assignments `seo_v1`", sino
+   la más débil y verificable: que **toda organización con `seo_v1` vigente tenga su `seo_v2` hermano
+   vigente**. Si eso se cumple, dejar de leer la clave vieja no le quita el módulo a nadie.
 
 El contenido de `SEO_MODULE_KEYS_READ` está fijado por test para que la contracción sea una decisión
 explícita y no un descuido que apague el módulo. Verificado contra PG real con la base todavía en
@@ -605,6 +621,50 @@ resolver hace `ORDER BY created_at DESC LIMIT 1` sobre el `ANY(...)`.
   host de producción), no con un `SELECT`.
 - **SIEMPRE** que una ventana expand esté abierta, tratar la **simetría de cobertura** como
   invariante verificable, no como consecuencia esperada.
+
+#### Delta 2026-08-09 — el contract arrancó por el código; los datos siguen abiertos (TASK-1677)
+
+**Estado intermedio, con dueño y secuencia.** Lo que cambió y lo que no:
+
+| Lado | Estado al 2026-08-09 |
+|---|---|
+| **Código** | **CONTRAÍDO y en producción.** `SEO_MODULE_KEYS_READ = ['seo_v2']` en los 5 consumidores, desplegado con el release `49f86c98cda6`. Lectura y escritura vuelven a ser la misma clave. |
+| **Datos** | **Ventana todavía abierta.** Los 2 assignments `seo_v1` siguen vigentes (`effective_to IS NULL`). La migración que los supersede está **redactada y verificada, sin aplicar** — vive en el §Delta de ejecución de `TASK-1677`, con un bloque `DO` que aborta si alguna organización quedara sin cobertura. |
+
+**Precondición verificada contra PG antes de tocar el código** (medida, no asumida): las dos
+organizaciones con SEO —Efeonce y Grupo Berel— tienen **ambas** claves vigentes en estado `active`.
+Ninguna depende sólo de `seo_v1`, así que dejar de leerla no le quita el módulo a nadie. Es
+exactamente la condición del paso 3 de arriba.
+
+**Por qué la migración NO puede viajar en el mismo release que el código** — dos razones
+independientes, y basta cualquiera de las dos:
+
+1. **El ordering lo exige.** Entre el código y los datos hay que **desplegar y verificar**. Aplicar la
+   migración contra un runtime que todavía corre el array viejo funcionaría —acepta ambas claves—,
+   pero es justo el checkpoint intermedio lo que convierte esto en un cutover y no en una apuesta:
+   sin él, si algo sale mal no se sabe cuál de los dos cambios lo causó, y es la causa de método del
+   incidente de ISSUE-143 (verificar con un `SELECT` en vez del consumidor real).
+2. **El preflight lo bloquea.** El check `postgres_migrations` es estricto: una migración commiteada y
+   no aplicada es `pending` ⇒ error ⇒ release bloqueado. Y aplicarla **antes** del deploy es lo que la
+   razón 1 prohíbe. Las dos juntas no dejan alternativa: **la migración va en un release posterior.**
+
+**Qué se rompe mientras dure el estado intermedio** (la asimetría real es código-vs-datos, no
+cobertura: a nivel de datos ambas claves siguen cubriendo las mismas orgs, así que el invariante de
+simetría horneado por `20260808184512073` sigue intacto):
+
+- **NUNCA** crear un assignment nuevo bajo `seo_v1`. El código ya no lee esa clave: la organización
+  quedaría con el módulo en la base y sin módulo en runtime — `hasModule=false` y 404 anti-oracle,
+  **en silencio**. Toda alta se escribe con `SEO_MODULE_KEY` (`seo_v2`).
+- **NUNCA** aplicar la migración del contract sin haber verificado antes el release del código con el
+  **canary del provider contra el host de producción**. Un `SELECT` va a decir exactamente lo que el
+  SQL prometía, aunque producción esté caída.
+- La secuencia que falta: aplicar la migración → canary de nuevo → `TASK-1677` Slice 3 (cerrar
+  `ISSUE-143` y marcar este cutover como terminado acá).
+
+El guardrail que escanea migraciones nuevas —el que impide superseder una clave que el código todavía
+lee— **se auto-habilitó con este cambio**: mientras `seo_v1` estuvo en el array de lectura, bloqueaba
+la migración del contract; recién ahora la deja pasar. La secuencia no depende de que alguien se
+acuerde.
 
 ---
 

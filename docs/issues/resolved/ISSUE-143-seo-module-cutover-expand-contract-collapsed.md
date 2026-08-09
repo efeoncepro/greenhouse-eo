@@ -1,8 +1,9 @@
 # ISSUE-143 — La migración del cutover `seo_v1 → seo_v2` colapsó expand y contract en un paso
 
-> **Estado:** resuelto
+> **Estado:** resuelto (el incidente) · **cierre del cutover: EN CURSO** — ver "Pendiente"
 > **Detectado:** 2026-08-08 (Claude, durante el rollout de TASK-1310)
-> **Resuelto:** 2026-08-08
+> **Resuelto:** 2026-08-08 (caida restaurada + fix durable)
+> **Cierre definitivo:** pendiente — `TASK-1677` Slices 2 y 3 (la ventana de datos sigue abierta)
 > **Ambiente:** Producción (`greenhouse.efeoncepro.com`) — Cloud SQL `greenhouse-pg-dev` es única y compartida
 > **Severidad:** alta — módulo SEO inaccesible en producción durante ~25 minutos
 > **Dominio:** Growth / SEO · entitlements per-org · evolución de schema
@@ -91,9 +92,34 @@ rutas existen), y el ops-worker en una revisión que es ancestro de `main`. El c
 dueño propio: **`TASK-1677`**, separada de `TASK-1310` porque es `backend-data` de bajo riesgo y no
 debe quedar atada a un ciclo de diseño abierto.
 
+**Delta 2026-08-09 (segundo) — el contract arrancó por el código; falta la mitad de datos.** Este
+issue está **a mitad de camino**, no cerrado:
+
+- ✅ **Hecho y en producción:** `SEO_MODULE_KEYS_READ` pasó de `['seo_v2','seo_v1']` a `['seo_v2']`
+  (release `49f86c98cda6`, 2026-08-09, `TASK-1677` Slice 1). Lectura y escritura vuelven a ser la
+  misma clave en los 5 consumidores. Precondición verificada contra PG **antes** de tocar el código:
+  las dos organizaciones con SEO tienen ambas claves vigentes en `active`, así que dejar de leer
+  `seo_v1` no le quitó el módulo a nadie.
+- ⏳ **Falta:** la migración que supersede los 2 assignments `seo_v1` vigentes. Está **redactada y
+  verificada, sin aplicar** (con bloque `DO` que aborta si alguna organización quedara sin
+  cobertura); vive en el §Delta de ejecución de `TASK-1677`.
+- **Por qué no viajó junto al código, y esto es la lección de este issue aplicada:** entre el código
+  y los datos hay que **desplegar y verificar**. Y además el check `postgres_migrations` del preflight
+  trata una migración commiteada y no aplicada como `pending` ⇒ error ⇒ release bloqueado, mientras
+  que aplicarla antes del deploy es justo lo que el ordering prohíbe. **La migración no puede ir en
+  el mismo release que el código.**
+- **Riesgo vivo mientras dure el estado intermedio:** un assignment nuevo creado bajo `seo_v1` queda
+  en la base y **no existe para el runtime** — `hasModule=false` y 404 anti-oracle, en silencio. Toda
+  alta se escribe con `seo_v2`.
+
+**Este issue se cierra en el Slice 3 de `TASK-1677`**, después de aplicar la migración y volver a
+pasar el canary del provider contra el host de producción — no antes, y no con un `SELECT`.
+
 Follow-up declarado sin dueño: una señal de fiabilidad que vigile la simetría de la ventana en
 runtime. Hoy el invariante sólo se verifica en el momento de migrar; una ventana que se desbalancee
 después (por una revocación, por un assignment nuevo creado sólo en una clave) no tiene detector.
+Con el código ya contraído, la forma vigente de ese hueco es más concreta: **nadie detecta un
+assignment vivo bajo una clave que ningún runtime lee.**
 
 ## Reglas que salen de este incidente
 

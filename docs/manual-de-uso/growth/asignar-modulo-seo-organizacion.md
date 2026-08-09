@@ -1,16 +1,16 @@
 # Manual — Asignar el modulo SEO a una organizacion
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-08-05 por Claude (TASK-1301)
-> **Ultima actualizacion:** 2026-08-06 por Claude (delta: el modulo no requiere organization_type='client')
+> **Ultima actualizacion:** 2026-08-09 por Claude (TASK-1677: la clave vigente es `seo_v2`)
 > **Modulo:** Growth / SEO (Search Visibility 360)
 > **Ruta en portal:** sin UI todavia (paso manual SQL; UI llega con TASK-1306+)
 > **Documentacion relacionada:** [doc funcional del modulo](../../documentation/growth/modulo-seo-search-visibility-360.md) · [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
 
 ## Para que sirve
 
-Habilitar el módulo SEO (`seo_v1`) a una organización concreta, elegir su tier comercial (`contracted` / `trial` / `pilot`), verificar que el chokepoint de entitlement la reconoce, y revocar el acceso cuando corresponda. Sin este assignment, **ninguna** corrida SEO (captura de rankings, site audit, backlinks) puede ejecutarse para esa org: el chokepoint la bloquea con `no_entitlement`.
+Habilitar el módulo SEO (`seo_v2`) a una organización concreta, elegir su tier comercial (`contracted` / `trial` / `pilot`), verificar que el chokepoint de entitlement la reconoce, y revocar el acceso cuando corresponda. Sin este assignment, **ninguna** corrida SEO (captura de rankings, site audit, backlinks) puede ejecutarse para esa org: el chokepoint la bloquea con `no_entitlement`.
 
 ⚠️ **Hoy este es un paso manual por SQL.** El command gobernado detrás de `growth.seo.entitlement.manage` (con audit + outbox) es un follow-up declarado en TASK-1301. Mientras no exista, el alta/baja se hace con el SQL canónico de este manual — no inventes variantes.
 
@@ -36,6 +36,14 @@ Habilitar el módulo SEO (`seo_v1`) a una organización concreta, elegir su tier
 
   Los defaults salen de env-knobs `GROWTH_SEO_*`; no los cambies por org — para un pilot con más cupo usa el override `metadata_json.seo_audit_runs_per_month`.
 
+### 🔴 Delta 2026-08-09 — la clave del módulo es `seo_v2`, y `seo_v1` ya no la lee nadie
+
+`TASK-1310` renombró la clave (`modules.*` es append-only: `seo_v1` nació con `view_codes=[]` y no se puede editar in-place, hay que superseder). Desde el release `49f86c98cda6` del 2026-08-09, `TASK-1677` Slice 1 cerró la ventana de dual-read **del lado del código**: `SEO_MODULE_KEYS_READ = ['seo_v2']`.
+
+Consecuencia dura para este manual: **un `INSERT` con `'seo_v1'` no falla — y ese es el problema.** La FK lo acepta porque la fila sigue en el catálogo como historia, pero ningún runtime la lee: la organización queda con el módulo en la base y sin módulo en runtime (`hasModule=false`, 404 anti-oracle en los lanes, "SEO no está activo en tu plan" en el portal cliente), sin ningún error visible que te avise. Usa `seo_v2` en el alta, en la verificación y en la revocación.
+
+Del lado de los **datos** el cutover sigue abierto: los assignments `seo_v1` de las dos orgs existentes siguen vigentes hasta que se aplique la migración del contract (`TASK-1677` Slice 2). Eso no molesta a nadie —el resolver ni los mira— pero explica por qué un `SELECT` sobre la tabla todavía devuelve filas de la clave vieja.
+
 ## Paso a paso
 
 ### 1. Crear el assignment
@@ -48,7 +56,7 @@ INSERT INTO greenhouse_client_portal.module_assignments
 VALUES
   ('<assignment_id>',       -- id único legible, ej. 'cpma-seo-grupo-berel-2026-08'
    '<organization_id>',     -- el ID verificado en greenhouse_core.organizations
-   'seo_v1',                -- literal: el module_key del catálogo (no inventar otro)
+   'seo_v2',                -- literal: el module_key VIGENTE del catálogo (ver el delta 2026-08-09)
    'active',
    'operator_grant',        -- source: alta manual del operador
    CURRENT_DATE,
@@ -71,14 +79,14 @@ Con el proxy corriendo en `127.0.0.1:15432`:
 npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/_sanity-seo-entitlement.ts
 ```
 
-El script ejercita el chokepoint contra PG real (resuelve entitlement, valida cupos y presupuesto, prueba un costo que excede el budget) usando un assignment de prueba propio que borra al terminar. Debe cerrar con `✓ smoke E2E completo` y `filas seo_v1 residuales: 0` **antes** de tu alta — si corres el smoke después del alta, la última línea contará tu fila real (1), lo cual es esperado.
+El script ejercita el chokepoint contra PG real (resuelve entitlement, valida cupos y presupuesto, prueba un costo que excede el budget) usando un assignment de prueba propio que borra al terminar. Debe cerrar con `✓ smoke E2E completo` y `filas seo_v2 residuales: 0` **antes** de tu alta — si corres el smoke después del alta, la última línea contará tu fila real (1), lo cual es esperado.
 
 Para verificar **tu assignment concreto**, consulta directo:
 
 ```sql
 SELECT assignment_id, organization_id, status, effective_from, effective_to, metadata_json
 FROM greenhouse_client_portal.module_assignments
-WHERE module_key = 'seo_v1' AND organization_id = '<organization_id>';
+WHERE module_key = 'seo_v2' AND organization_id = '<organization_id>';
 ```
 
 Debe existir exactamente una fila `active` con el tier esperado y `effective_to` nulo.
@@ -89,7 +97,7 @@ Hoy no hay crons ni readers (llegan en TASK-1302+), así que el alta no produce 
 
 ## Caso ejecutado: Efeonce own-brand (2026-08-05)
 
-El primer alta real del módulo fue la propia agencia, como dogfooding: **Efeonce se trackea a sí misma con el mismo rigor que a un cliente** dentro del 360 (sin ser cliente — ver el delta 2026-08-06 más abajo). La decisión de modelado fue no inventar una org especial — se usó la org canónica ya existente `EO-ORG-0007` (Efeonce Group SpA, `is_operating_entity=true`) y sobre ella quedaron: el assignment `cpma-efeonce-seo-own-brand` (`seo_v1`, tier `contracted`, con nota `own_brand` en `metadata_json`), el target `seot-efeonce-own-brand` (`efeoncepro.com`, CL/es) y los 4 perfiles del grader ligados a la org.
+El primer alta real del módulo fue la propia agencia, como dogfooding: **Efeonce se trackea a sí misma con el mismo rigor que a un cliente** dentro del 360 (sin ser cliente — ver el delta 2026-08-06 más abajo). La decisión de modelado fue no inventar una org especial — se usó la org canónica ya existente `EO-ORG-0007` (Efeonce Group SpA, `is_operating_entity=true`) y sobre ella quedaron: el assignment `cpma-efeonce-seo-own-brand` (creado entonces bajo `seo_v1`, tier `contracted`, con nota `own_brand` en `metadata_json`; la migración de TASK-1310 le creó su hermano `seo_v2` preservando tier y metadata, y el script de provisión ya escribe `seo_v2`), el target `seot-efeonce-own-brand` (`efeoncepro.com`, CL/es) y los 4 perfiles del grader ligados a la org.
 
 Todo el alta se hizo con un **script idempotente committeado**: [`scripts/growth/provision-efeonce-own-brand-seo.ts`](../../../scripts/growth/provision-efeonce-own-brand-seo.ts). Ese script sirve de **plantilla reutilizable** para provisionar cualquier otra org: sigue el patrón commit + verificación con el chokepoint (`enforceSeoRunEntitlement`), y en esencia solo hay que cambiar el `organization_id` y el dominio del target (más el tier/tags que correspondan al acuerdo). Preferirlo por sobre SQL suelto: deja evidencia versionada y se puede re-correr sin duplicar filas.
 
@@ -110,7 +118,7 @@ Por qué no se ve afectado: **el módulo se resuelve por `module_assignments`, n
 | Rol comercial | ¿qué soy frente al mercado? | `organization_type` |
 | Capabilities | ¿qué hace la plataforma por mí? | `module_assignments` ← **acá vive el módulo SEO** |
 
-Consecuencia práctica: **puedes asignar `seo_v1` a cualquier organización del backbone canónico** — cliente, prospecto, la propia operadora — sin tocar su `organization_type`. En particular, `'other'` significa *sin rol comercial*, no *sin clasificar*: la operadora lo lleva a propósito porque Efeonce no se vende a sí misma.
+Consecuencia práctica: **puedes asignar `seo_v2` a cualquier organización del backbone canónico** — cliente, prospecto, la propia operadora — sin tocar su `organization_type`. En particular, `'other'` significa *sin rol comercial*, no *sin clasificar*: la operadora lo lleva a propósito porque Efeonce no se vende a sí misma.
 
 > Contrato: [`GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md` §Organization Types](../../architecture/GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md) · invariantes para agentes: [`ORG_CLIENT_AGENT_INVARIANTS.md`](../../architecture/agent-invariants/ORG_CLIENT_AGENT_INVARIANTS.md).
 
@@ -122,7 +130,7 @@ Cierra el assignment con fecha; **no borres la fila** si la org ya tiene snapsho
 UPDATE greenhouse_client_portal.module_assignments
 SET status = 'inactive',
     effective_to = CURRENT_DATE
-WHERE module_key = 'seo_v1'
+WHERE module_key = 'seo_v2'
   AND organization_id = '<organization_id>'
   AND status = 'active';
 ```
@@ -137,7 +145,7 @@ Cuando el chokepoint `enforceSeoRunEntitlement` bloquea una corrida, devuelve un
 
 | `blockedReason` | Qué significa | Qué hacer |
 |---|---|---|
-| `no_entitlement` | La org no tiene assignment `seo_v1` activo | Si corresponde comercialmente, crear el assignment (paso 1) |
+| `no_entitlement` | La org no tiene assignment `seo_v2` activo | Si corresponde comercialmente, crear el assignment (paso 1) |
 | `expired` | Hay assignment pero su vigencia terminó (`effective_to` en el pasado) | Renovar: cerrar el vencido y crear uno nuevo con el tier vigente |
 | `quota_exhausted` | Se agotó el cupo de site-audits del mes para su tier | Esperar al mes siguiente, o (pilot) subir el override `seo_audit_runs_per_month` si el acuerdo lo respalda |
 | `budget_exhausted` | El gasto USD del mes (suma de `provider_cost` de los snapshots) más el costo estimado de la corrida excede el presupuesto del tier | Esperar al mes siguiente o escalar el tier; no "resetear" el gasto — es la serie real |
@@ -149,14 +157,14 @@ Cuando el chokepoint `enforceSeoRunEntitlement` bloquea una corrida, devuelve un
 - **No borres historia.** Nunca `DELETE` de un assignment con snapshots asociados, y nunca `UPDATE`/`DELETE` sobre las tablas de mediciones `seo_rank_snapshots` / `seo_backlink_snapshots` / `seo_site_audit_*` (los triggers anti-mutation lo rechazan, y está bien que así sea).
 - **No asignes SEO por rol ni por capability suelta.** El acceso es per-org vía `module_assignments`; darle a un rol interno un "acceso SEO" paralelo rompe el modelo (lección TASK-1248 del AEO).
 - **No promuevas una org a `organization_type='client'` para "que le llegue el módulo".** No hace falta (el chokepoint no lee esa columna) y, si la org es la entidad legal operadora, la mete en los listados de clientes facturables — con riesgo de autofacturación. El alta del módulo es el `INSERT` en `module_assignments` y nada más.
-- **No uses otro `module_key`.** Es `seo_v1` literal, seedeado en el catálogo `greenhouse_client_portal.modules`; un key inventado falla por FK.
+- **No uses otro `module_key`.** Es `seo_v2` literal, seedeado en el catálogo `greenhouse_client_portal.modules`; un key inventado falla por FK. Y `seo_v1` ya no cuenta como "otro key válido": el runtime dejó de leerla (delta 2026-08-09).
 - **No edites los env-knobs `GROWTH_SEO_*` para favorecer a una org.** Los knobs son globales por tier; el único ajuste por org es el override pilot en `metadata_json`.
 - **No repliques la lógica del gate en otro lado.** Cualquier consumer nuevo (UI, Nexa, MCP, cron) pasa por `enforceSeoRunEntitlement` — es el chokepoint único por diseño.
 - **No trates este manual como permanente.** Cuando llegue el command gobernado de `entitlement.manage`, el SQL manual queda obsoleto y este manual debe actualizarse.
 
 ## Problemas comunes
 
-- **El INSERT falla por FK en `module_key`** → el módulo `seo_v1` no está seedeado en esa instancia; aplica las migraciones pendientes (`pnpm pg:connect:migrate`) antes de asignar. Ojo: `pnpm pg:connect:status` es dry-run, no aplica nada.
+- **El INSERT falla por FK en `module_key`** → el módulo `seo_v2` no está seedeado en esa instancia; aplica las migraciones pendientes (`pnpm pg:connect:migrate`) antes de asignar. Ojo: `pnpm pg:connect:status` es dry-run, no aplica nada.
 - **El sanity script no conecta** → el proxy no está corriendo en `127.0.0.1:15432`; levántalo con `pnpm pg:connect` y deja esa terminal abierta.
 - **La org quedó con dos assignments activos** → cierra el duplicado con `status='inactive'` + `effective_to` conservando el más antiguo válido; no borres.
 - **`quota_exhausted` en un pilot que debería tener más cupo** → falta el override `seo_audit_runs_per_month` en `metadata_json`; agrégalo con `UPDATE ... SET metadata_json = metadata_json || '{"seo_audit_runs_per_month": <n>}'::jsonb`.

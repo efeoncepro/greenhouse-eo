@@ -160,7 +160,7 @@ la barra de direcciones, estás corriendo una versión vieja del script: actuali
 | `no_aeo_data` | Falta el eje de IA del cruce. | Correr el AI Visibility Grader para esa marca. |
 | `target_not_configured` | La org tiene el módulo pero nadie configuró qué dominio medir. | Paso de setup pendiente. |
 | `disabled` | El módulo SEO está apagado a nivel plataforma. | Revisar `GROWTH_SEO_ENABLED` (ver más abajo). |
-| `greenhouse_seo_lane_404` | La org no tiene el módulo `seo_v1`. | Asignar el módulo si corresponde comercialmente. |
+| `greenhouse_seo_lane_404` | La org no tiene el módulo `seo_v2`. | Asignar el módulo si corresponde comercialmente. |
 | `greenhouse_seo_policy_blocked` (503) | El provider está apagado o mal configurado en el gateway. | Nivel 2 de verificación. |
 
 Ninguno de estos estados se reporta como cero. Si alguien te muestra un tablero con "0 keywords" donde la
@@ -186,7 +186,7 @@ consentimiento de la aplicación en Entra antes de tocar el gateway.
 organización. Es un problema de configuración del consumer en Greenhouse (`EO-SPK-0004` / `EO-SPB-0004`), no del
 gateway.
 
-**404 donde esperabas datos.** Casi siempre es el deny anti-oracle: esa organización no tiene `seo_v1` asignado.
+**404 donde esperabas datos.** Casi siempre es el deny anti-oracle: esa organización no tiene `seo_v2` asignado (la clave vigente desde el cutover de TASK-1310/1677; `seo_v1` ya no la lee ningún runtime).
 Confírmalo con `get_seo_entitlement`, que sí responde honestamente `hasModule=false`. No lo trates como un bug del
 transporte.
 
@@ -208,7 +208,7 @@ que corre en el `ops-worker` y lee su propia copia de la variable. Si quieres de
 en los dos runtimes — y en Cloud Run el archivo `deploy.sh` es la fuente de verdad, porque un cambio hecho solo
 con `--update-env-vars` se borra en el próximo deploy.
 
-**3. Apagar una organización puntual.** Revoca su assignment `seo_v1` con `effective_to` / `status`. **Nunca**
+**3. Apagar una organización puntual.** Revoca su assignment `seo_v2` con `effective_to` / `status`. **Nunca**
 con `DELETE`: la historia de snapshots quedaría huérfana. Ver
 [Asignar el módulo SEO a una organización](../growth/asignar-modulo-seo-organizacion.md).
 

@@ -1,9 +1,9 @@
 # Menu dinamico y acceso a modulos del Portal Cliente
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-05-13 por Claude (TASK-827)
-> **Ultima actualizacion:** 2026-05-13 por Claude
+> **Ultima actualizacion:** 2026-08-09 por Claude (TASK-1675 — el menu vertical ya consume el resolver)
 > **Documentacion tecnica:** [GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md](../../architecture/GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md), [GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md)
 
 ---
@@ -153,7 +153,7 @@ Cuando comercial activa un nuevo modulo via Admin Center, el cache se invalida a
 ## Limites conocidos V1.0
 
 - **Algunas paginas son placeholder forward-looking**: la base de datos declara modulos como `creative_hub_globe_v1` con superficies como `/creative-hub`, `/brand-intelligence`, etc. — pero las paginas reales todavia no existen como views. Si comercial activa esos modulos hoy, el cliente vera el menu item pero al hacer click obtendra una pagina vacia. La task derivada `client-portal-pages-placeholder-materialization` (V1.1) crea las views.
-- **El menu vertical legacy coexiste**: el componente `VerticalMenu` que renderiza el menu izquierdo todavia usa el sistema viejo (`canSeeView('cliente.*', true)`). Las paginas SI usan el resolver nuevo, asi que el gating real esta vivo. La refactor full del menu para consumir el resolver vive en task derivada V1.1.
+- ~~**El menu vertical legacy coexiste**~~ — **cerrado por TASK-1675 (2026-08-09)**. El menu izquierdo ya suma los enlaces de los modulos contratados, resueltos en el servidor desde la misma fuente que gatea cada pagina. Lo que queda es un bloque menor que arma unos pocos enlaces desde la linea de negocio y los servicios de la cuenta, pendiente de migrar. Detalle funcional: [Menu del Portal Cliente — modulos contratados](menu-portal-cliente-modulos.md).
 - **El email del account manager es generico**: los botones "Solicitar acceso" usan `support@efeoncepro.com` como destino por ahora. La resolucion canonical (leer del campo `organizations.account_manager_user_id`) vive en task derivada V1.1.
 - **Sin self-service del cliente**: el cliente no puede solicitar un modulo desde su portal todavia. Si quiere uno, escribe al account manager via el mailto. El flow self-service con aprobacion operativa vive en V1.1.
 
