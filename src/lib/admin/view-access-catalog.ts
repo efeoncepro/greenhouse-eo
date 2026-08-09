@@ -881,8 +881,9 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
   {
     viewCode: 'cliente.revisiones',
     section: 'cliente',
-    label: 'Revisiones',
-    description: 'Queue de revisiones y seguimiento de feedback en curso.',
+    label: 'Revisiones (retirado)',
+    description:
+      'RETIRADO TASK-1679 — superseded por `cliente.reviews`, que es el viewCode que declara el módulo `creative_hub_globe_v1`. Eran dos strings para /reviews: el guard pedía éste y el módulo declaraba el otro, así que la página no podía abrir. La entrada se conserva porque el registry es append-only; ninguna ruta la gatea. NO usar en código nuevo.',
     routePath: '/reviews',
     routeGroup: 'client'
   },

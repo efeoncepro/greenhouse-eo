@@ -34,9 +34,11 @@ vi.mock('@/lib/observability/capture', () => ({
 
 const {
   __clearClientPortalResolverCache,
+  CLIENT_PORTAL_BASE_VIEW_CODES,
   hasCapabilityViaModule,
   hasModuleAccess,
   hasViewCodeAccess,
+  isClientPortalBaseViewCode,
   resolveClientPortalModulesForOrganization
 } = await import('./module-resolver')
 
@@ -307,5 +309,61 @@ describe('helpers derivados', () => {
     await resolveClientPortalModulesForOrganization('org-warm')
 
     expect(mockQuery).toHaveBeenCalledTimes(1)
+  })
+})
+
+/**
+ * TASK-1679 Slice 5 — Vistas base del portal: alcanzables sin módulo contratado.
+ *
+ * `hasViewCodeAccess` no tenía allowlist transversal, así que un viewCode que ningún módulo
+ * declara denegaba siempre — y el fix de la llave de organización (ISSUE-146) no lo tocaba.
+ */
+describe('vistas base del portal (TASK-1679)', () => {
+  beforeEach(() => {
+    __clearClientPortalResolverCache()
+    mockQuery.mockReset()
+    mockCaptureWithDomain.mockReset()
+  })
+
+  it('grants a base view to an organization with ZERO modules assigned', async () => {
+    mockQuery.mockResolvedValue([])
+
+    for (const viewCode of CLIENT_PORTAL_BASE_VIEW_CODES) {
+      await expect(hasViewCodeAccess('org-sin-modulos', viewCode)).resolves.toBe(true)
+    }
+  })
+
+  it('resolves a base view WITHOUT touching the database', async () => {
+    mockQuery.mockResolvedValue([])
+
+    await hasViewCodeAccess('org-sin-modulos', 'cliente.notificaciones')
+
+    // Las base no dependen de assignments, así que consultarlos seria trabajo inutil en el
+    // hot path de cada page load.
+    expect(mockQuery).not.toHaveBeenCalled()
+  })
+
+  it('keeps a module-gated view denied for an organization with zero modules', async () => {
+    mockQuery.mockResolvedValue([])
+
+    await expect(hasViewCodeAccess('org-sin-modulos', 'cliente.campanas')).resolves.toBe(false)
+  })
+
+  it('does not include delivery surfaces in the base allowlist', async () => {
+    // Decision del operador 2026-08-09: Creative pertenece a un solo cliente, asi que dejar
+    // Ciclos y Analytics como base le daria a los demas paginas permanentemente vacias.
+    expect(isClientPortalBaseViewCode('cliente.ciclos')).toBe(false)
+    expect(isClientPortalBaseViewCode('cliente.analytics')).toBe(false)
+    expect(isClientPortalBaseViewCode('cliente.proyectos')).toBe(false)
+    expect(isClientPortalBaseViewCode('cliente.reviews')).toBe(false)
+  })
+
+  it('keeps the base allowlist small and explicit', async () => {
+    // Un cambio de tamaño obliga a leer el rationale del Slice 5 antes de crecerla.
+    expect([...CLIENT_PORTAL_BASE_VIEW_CODES].sort()).toEqual([
+      'cliente.actualizaciones',
+      'cliente.configuracion',
+      'cliente.notificaciones'
+    ])
   })
 })

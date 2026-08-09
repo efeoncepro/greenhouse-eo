@@ -237,10 +237,49 @@ export const hasModuleAccess = async (orgId: string, moduleKey: string): Promise
 }
 
 /**
- * Devuelve `true` si algún módulo asignado al cliente expone el view_code.
- * Usado por page guards client-facing (TASK-827).
+ * TASK-1679 Slice 5 — Vistas base del portal cliente: alcanzables sin módulo contratado.
+ *
+ * `hasViewCodeAccess` pregunta si **algún módulo declara** el viewCode, y no tenía allowlist
+ * transversal: un viewCode que ningún módulo declara denegaba siempre. Seis rutas cliente
+ * vivas estaban en esa situación, y el fix de la llave (`ISSUE-146`) no las tocaba.
+ *
+ * Pero no todas eran el mismo problema. Un cliente **no contrata** "poder ver sus
+ * notificaciones" ni "entrar a la configuración de su cuenta": modelar eso como módulo
+ * obliga a asignárselo a cada organización nueva y a que alguien se acuerde — y el día que
+ * alguien no se acuerde, el cliente pierde su configuración. Una allowlist declara lo que es
+ * cierto: hay superficies del portal que no son un producto vendible.
+ *
+ * **Alcance deliberadamente chico.** Decisión del operador 2026-08-09: sólo estas tres. Las
+ * candidatas que quedaron fuera lo hicieron por una razón — `cliente.ciclos` y
+ * `cliente.analytics` son superficies de delivery, y como Creative pertenece a un solo
+ * cliente, dejarlas base le daría a los demás páginas permanentemente vacías. Siguen
+ * module-gated, y abrirlas es declararlas en el módulo que corresponda.
+ *
+ * **NUNCA** agregar acá una vista que dependa de un servicio contratado: la allowlist es la
+ * excepción al carril de módulos, no un atajo para destrabar una página.
+ * **NUNCA** resolver esta allowlist leyendo `role_view_assignments`: sería reintroducir el
+ * carril viejo por la puerta que esta familia de tasks vino a cerrar.
+ */
+export const CLIENT_PORTAL_BASE_VIEW_CODES: readonly string[] = [
+  'cliente.notificaciones',
+  'cliente.configuracion',
+  'cliente.actualizaciones'
+]
+
+const BASE_VIEW_CODES = new Set(CLIENT_PORTAL_BASE_VIEW_CODES)
+
+/** Declarativo y testeable sin DB: no depende de assignments. */
+export const isClientPortalBaseViewCode = (viewCode: string): boolean => BASE_VIEW_CODES.has(viewCode)
+
+/**
+ * Devuelve `true` si el viewCode es una vista base del portal, o si algún módulo asignado al
+ * cliente lo expone. Usado por page guards client-facing (TASK-827 + TASK-1679).
  */
 export const hasViewCodeAccess = async (orgId: string, viewCode: string): Promise<boolean> => {
+  // Las vistas base se resuelven ANTES de tocar la DB: no dependen de assignments, así que
+  // consultarlos sería trabajo inútil en el hot path de cada page load.
+  if (isClientPortalBaseViewCode(viewCode)) return true
+
   const modules = await resolveClientPortalModulesForOrganization(orgId)
 
   return modules.some(m => m.viewCodes.includes(viewCode))
