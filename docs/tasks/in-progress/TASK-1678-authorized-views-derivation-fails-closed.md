@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -218,38 +218,92 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Medir qué se apaga antes de apagarlo
+### Slice 1 — Medir qué se apaga antes de apagarlo — ✅ EJECUTADO
 
-- Script de medición (read-only, contra PG) que, para cada rol `client_*`, compare el claim actual
-  contra el que produciría el default invertido.
-- Salida esperada: la lista de viewCodes `cliente.*` que hoy llegan **sólo** por el fallback permisivo.
-- Si la lista no está vacía, decidir por cada una: seed explícito `granted=TRUE`, o apagado
-  intencional. Esa decisión se documenta en la task antes del Slice 2.
+- Script de medición (read-only, contra PG): `scripts/identity/client-view-fallback-audit.ts`.
+- **Resultado (2026-08-09, contra PG dev):** 25 vistas `routeGroup=client`, 18 module-gated, 72 filas
+  de assignment para roles cliente. Invertir el default cuesta **un** viewCode por rol —
+  `cliente.ai_visibility_report`— y **es module-gated**, o sea apagado intencional: su carril correcto
+  es el resolver de módulos.
+- **Decisión: no hace falta ningún seed.** El default permisivo casi no está cargando peso porque las
+  72 filas explícitas ya cubren el resto. Cierra la Open Question 2.
 
 ### Slice 2 — Invertir el default para el routeGroup `client`
 
-- `computeRoleCanAccessViewFallback` deja de otorgar por routeGroup cuando `view.routeGroup === 'client'`.
+- `roleCanAccessViewFallback` deja de otorgar por routeGroup cuando `view.routeGroup === 'client'`.
 - El comportamiento interno queda intacto.
 - Tests: una vista `cliente.*` sin fila no se otorga; una vista interna sin fila sigue otorgándose.
 
-### Slice 3 — Vigencia en el `SELECT`
+### Slice 3 — Drift guard de vigencia (premisa original corregida)
 
-- Agregar el predicado canónico de ciclo de vida al `SELECT` de `role_view_assignments`.
-- Test con una fila no vigente que hoy cuenta y después no.
+> **Recalibración 2026-08-09.** El Slice 3 original decía "agregar el predicado canónico de ciclo de
+> vida al `SELECT` de `role_view_assignments`". **No es implementable: esa tabla no tiene columnas de
+> vigencia.** Verificado contra `information_schema.columns`: sus 7 columnas son `role_code`,
+> `view_code`, `granted`, `granted_by`, `granted_at`, `updated_at`, `updated_by`. No hay `active` ni
+> `effective_to`, así que no existe "una fila no vigente que hoy cuenta". `ISSUE-147` §Defecto 2
+> extrapoló el predicado de `user_role_assignments`, donde sí aplica.
 
-### Slice 4 — Degradar hacia cerrado, con señal
+- El hueco de vigencia **real** de este carril está en `toRegistryRows`: completa desde el registry TS
+  lo que falta en la DB, así que una vista con `active=FALSE` reaparece si sigue declarada en
+  `VIEW_REGISTRY`. Hoy está **latente, no vivo** — las 4 desactivadas
+  (`administracion.design_system`, `administracion.workforce_intake_queue`, `finanzas.perfiles_pago`,
+  `plataforma.roadmap`) ya no están en el TS.
+- Drift guard: test que falle si una vista desactivada en DB vuelve a entrar al claim por ese merge.
+
+### Slice 4 — Degradar hacia cerrado, con señal, **y cerrar el amplificador**
+
+> **Recalibración 2026-08-09.** El slice tal como estaba escrito **se anulaba a sí mismo**. Devolver
+> `[]` para un tenant `client` degradado alimenta `hasAuthorizedViewCode`, que hace
+> `if (authorizedViews.length === 0) return fallback`, y los layouts cliente pasan
+> `fallback: tenant.routeGroups.includes('client')`, o sea `true`. Sin cerrar ese amplificador,
+> "degradar hacia cerrado" **abre todo** — que es exactamente lo que la regla dura de esta task
+> prohíbe. El amplificador (punto 5 del fix de `ISSUE-147`) es load-bearing, no opcional.
 
 - El fallback de `SCHEMA_NOT_READY` deja de devolver el `VIEW_REGISTRY` para tenants `client`.
 - El `catch` de `src/lib/tenant/access.ts` emite `captureWithDomain` en vez de `console.warn`.
-- Signal nueva de claim degradado (patrón `identity.workforce.unlinked_internal_user`), steady = 0.
-- Test: en modo degradado, un tenant `client` no recibe viewCodes module-gated.
+- `hasAuthorizedViewCode` / `hasAnyAuthorizedViewCode` dejan de otorgar con lista vacía **cuando la
+  sesión es de tenant `client`**. Se discrimina por `tenantType`, **no** por el prefijo `cliente.` del
+  viewCode: la pregunta honesta es "¿esta sesión es de cliente?", y evita lógica stringly-typed sobre
+  un identificador que el schema declara libre. El tenant interno conserva su baseline permisivo.
+- **Señal — corrección de forma:** no puede ser "claim degradado". El claim se deriva en login y no se
+  persiste, así que ninguna query DB lo puede contar; una señal de eso mentiría. Se reparten los dos
+  concerns: el **evento runtime** va a `captureWithDomain` (Sentry, dominio `identity`), y la **señal
+  DB** mide la precondición estructural — `identity.view_access.client_role_without_grants`: roles
+  cliente sin ninguna fila `granted=TRUE`. Accionable, `steady=0`, y hoy está en 0 (22/22/19 grants).
+  Cubre el caso catastrófico real: alguien agrega un cuarto rol cliente, olvida el seed, y sus
+  usuarios quedan con claim vacío. Misma postura que `client_portal.composition.resolver_failure_rate`,
+  que ya declara que la tasa runtime vive en un adapter de telemetría.
+- Test: en modo degradado, un tenant `client` no recibe viewCodes module-gated **y** el amplificador
+  no los repone.
 
-### Slice 5 — Los denials anulables
+### Slice 5 — Los denials anulables — decisión tomada
 
-- Decidir y documentar: ¿un `granted=FALSE` de un rol debe vencer sobre el `granted=TRUE` de otro rol
-  del mismo usuario?
-- Si la respuesta es sí, implementarlo. Si es no, dejar escrito en la spec del dominio qué significan
-  realmente los denials, para que nadie los vuelva a tomar como garantía.
+**Decisión: el denial de rol NO vence. La unión se queda.** `granted=FALSE` a nivel de rol significa
+*"este rol no otorga esto"*, no *"este usuario no debe tenerlo"*.
+
+Lo que decidió el caso fue medir los 9 denials cliente en vez de razonarlos en abstracto:
+
+| Denial | Roles que lo niegan | module-gated | Qué cambiaría con deny-wins |
+|---|---|---|---|
+| `cliente.growth_seo_dashboard` | los 3 | sí | nada — unión ≡ intersección |
+| `cliente.growth_seo_report` | los 3 | sí | nada — ídem |
+| `cliente.campanas` | solo specialist | sí | nada útil: el resolver de módulos es el gate real |
+| `cliente.equipo` | solo specialist | sí | nada útil: ídem |
+| `cliente.analytics` | solo specialist | no | la quitaría… y `TASK-1679` la declara vista base |
+
+**Deny-wins compra cero y cuesta sorpresa.** No queda un solo caso donde la intersección proteja algo
+que la unión no proteja ya. Contra eso, invertir el operador haría que **ganar un rol te quite
+acceso** —el ticket de soporte más difícil de diagnosticar— y rompería la composabilidad de los roles.
+Además desalinea esta capa del resto del modelo, que es aditivo de punta a punta
+(`deriveRouteGroupsFromRoles` hace unión, los permission sets son aditivos por TASK-263), y donde la
+semántica de veto ya existe es `user_view_overrides`: per-usuario, con `reason`, con `expires_at`,
+aplicado al final. Es RBAC clásico — en el core el permiso es la unión sobre los roles asignados;
+donde el deny-overrides existe (XACML, IAM) vive en una capa de política, no de pertenencia.
+
+- Queda escrito en la spec del dominio qué significan realmente los denials.
+- El caso de uso "este usuario no debe ver esto" se apunta a `override_type='revoke'`.
+- Riesgo residual nombrado: un cliente multi-rol sigue recibiendo una vista negada por uno de sus
+  roles. Aceptado, porque para las 18 que importan el gate pasa a ser el carril de módulos.
 
 ## Out of Scope
 
@@ -365,5 +419,12 @@ Ninguna: sin secretos, sin env vars, sin redeploy de workers.
 
 ## Open Questions
 
-1. ¿Un `granted=FALSE` de un rol debe vencer sobre el `granted=TRUE` de otro rol del mismo usuario? Hoy no vence. Afecta qué significan los 5 denials sembrados. Propuesta: que venza, porque un denial explícito es una declaración más fuerte que un default heredado — pero es decisión del operador.
-2. Si el Slice 1 encuentra vistas que dependen del fallback permisivo, ¿se seedean con `granted=TRUE` o se apagan? Depende de caso por caso y de si alguien las está usando hoy.
+1. ~~¿Un `granted=FALSE` de un rol debe vencer sobre el `granted=TRUE` de otro rol del mismo usuario?~~
+   **RESUELTA 2026-08-09 (arch-architect): no vence, la unión se queda.** Los 9 denials cliente medidos
+   contra PG muestran que la intersección no protegería nada que la unión no proteja ya. Rationale
+   completo y riesgo residual en §Scope → Slice 5.
+2. ~~Si el Slice 1 encuentra vistas que dependen del fallback permisivo, ¿se seedean o se apagan?~~
+   **RESUELTA 2026-08-09 por la medición: no hace falta seed.** La única que se apaga es
+   `cliente.ai_visibility_report`, y es module-gated → apagado intencional. Ver §Scope → Slice 1.
+3. **Nueva, no bloqueante:** los denials cliente pasaron de 5 a 9 (TASK-1310 agregó 6 sobre
+   `growth_seo_*`). El inventario dice 5. Corregir el inventario al cerrar.
