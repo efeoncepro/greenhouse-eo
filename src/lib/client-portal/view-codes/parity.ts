@@ -2,6 +2,7 @@ import 'server-only'
 
 import { query } from '@/lib/db'
 import { VIEW_REGISTRY } from '@/lib/admin/view-access-catalog'
+import { CLIENT_PORTAL_BASE_VIEW_CODES } from '@/lib/client-portal/readers/native/module-resolver'
 
 /**
  * TASK-827 Slice 0 — Client Portal `view_codes[]` parity helpers (TS ↔ DB).
@@ -90,17 +91,55 @@ export type ViewCodesParityReport = {
 }
 
 /**
- * Surfaces de cuenta/legacy que viven en el route group cliente sin pertenecer
- * a un módulo vendible. Toda surface nueva debe entrar al seed del módulo.
+ * Surfaces del route group cliente que el parity test exime de pertenecer a un módulo
+ * vendible. Toda surface nueva debe entrar al seed del módulo.
+ *
+ * TASK-1679 — el set era plano y eso escondía tres situaciones muy distintas bajo la misma
+ * exención. Un viewCode acá adentro no es "está bien": es "el parity test no lo va a
+ * marcar". Separarlas hace legible qué es diseño y qué es deuda.
  */
+
+/**
+ * **Base del portal**: alcanzables sin módulo, por diseño. Un cliente no contrata ver sus
+ * notificaciones ni entrar a su propia configuración.
+ *
+ * Es el mismo set que `CLIENT_PORTAL_BASE_VIEW_CODES` del resolver, importado en vez de
+ * duplicado: si se desincronizaran, la allowlist de runtime y la de governance dirían cosas
+ * distintas sobre la misma vista.
+ */
+const BASE_VIEW_CODES = CLIENT_PORTAL_BASE_VIEW_CODES
+
+/**
+ * 🔴 **Deuda, no diseño.** Son superficies de delivery que **deberían** estar gobernadas por
+ * módulo y hoy ningún módulo las declara, así que están **inalcanzables**: el guard pregunta
+ * si algún módulo las expone y nadie lo hace.
+ *
+ * Están exentas del parity test sólo para no dejar el gate rojo por deuda preexistente. La
+ * salida correcta es declararlas en el módulo que corresponda —`creative_hub_globe_v1` es el
+ * candidato natural— y sacarlas de acá. Decisión del operador 2026-08-09: NO son base,
+ * porque Creative pertenece a un solo cliente y dejarlas base le daría a los demás páginas
+ * permanentemente vacías.
+ */
+const PENDING_MODULE_DECLARATION_VIEW_CODES = ['cliente.ciclos', 'cliente.analytics']
+
+/**
+ * **Retirados**: superseded por otro viewCode. El registry es append-only, así que la entrada
+ * se marca y no se borra — pero ya no la gatea ninguna ruta.
+ *
+ * `cliente.revisiones` quedó superseded por `cliente.reviews`, que es el que declara
+ * `creative_hub_globe_v1`. Eran dos strings distintos para `/reviews`: el guard pedía el
+ * primero y el módulo declaraba el segundo, así que la página no podía abrir ni con la llave
+ * correcta.
+ */
+const RETIRED_VIEW_CODES = ['cliente.revisiones']
+
 export const CLIENT_PORTAL_TRANSVERSAL_VIEW_CODES = new Set([
-  'cliente.actualizaciones',
-  'cliente.analytics',
-  'cliente.ciclos',
-  'cliente.configuracion',
-  'cliente.modulos',
-  'cliente.notificaciones',
-  'cliente.revisiones'
+  ...BASE_VIEW_CODES,
+  ...PENDING_MODULE_DECLARATION_VIEW_CODES,
+  ...RETIRED_VIEW_CODES,
+
+  // El listado de módulos del propio cliente: es meta-superficie del portal, no un producto.
+  'cliente.modulos'
 ])
 
 /**

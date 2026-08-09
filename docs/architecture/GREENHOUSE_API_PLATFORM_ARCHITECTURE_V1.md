@@ -37,7 +37,7 @@ Detalles del contrato que un lane de write nuevo debe copiar:
   scope **no** se cablea al cliente público compartido. Ver
   `EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md` §"El scope de escritura NO se cablea al cliente
   público compartido".
-- **La autorización de dominio sigue abajo, no en el lane**: entitlement per-org `seo_v1` vigente +
+- **La autorización de dominio sigue abajo, no en el lane**: entitlement per-org `seo_v2` vigente +
   techo gobernado por target + outcome POR keyword. El lane hace passthrough del resultado del
   command; **NUNCA** colapsa ese outcome a un booleano — un caller que sólo ve `ok: true` no puede
   distinguir "agregué 3" de "rebotaron 40 contra el techo".
@@ -67,7 +67,7 @@ El módulo SEO (EPIC-022) suma su lane ecosystem espejo del de Knowledge (TASK-1
 diferencia deliberada: la autorización no es scope-only sino **entitlement per-org** —
 `/api/platform/ecosystem/growth/seo/{keyword-opportunities,visibility-360,entitlement}` resuelve la
 organización desde el binding (org-scoped manda; `internal` exige `organizationId` como query param)
-y exige el módulo `seo_v1` vigente en `module_assignments` o responde **404 anti-oracle**. Payloads =
+y exige el módulo `seo_v2` vigente en `module_assignments` o responde **404 anti-oracle**. Payloads =
 passthrough de los readers canónicos (`readKeywordOpportunities`, `readSeoAeoGap`,
 `resolveSeoEntitlement` como lectura) — cero lógica de dominio en el lane. Consumido por 3 MCP tools
 read-only del server greenhouse (`get_seo_keyword_opportunities`, `get_seo_visibility_360`,

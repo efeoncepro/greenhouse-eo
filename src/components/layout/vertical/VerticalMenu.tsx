@@ -776,7 +776,11 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
       if (item.href === '/proyectos') return canSeeView('cliente.proyectos', true)
       if (item.href === '/sprints') return canSeeView('cliente.ciclos', true)
       if (item.href === '/equipo') return canSeeView('cliente.equipo', true)
-      if (item.href === '/reviews') return canSeeView('cliente.revisiones', true)
+      // TASK-1679 Slice 6 — `cliente.reviews` es el canónico (el que declara el módulo).
+      // Ambos viewCodes tienen grant para los 3 roles cliente, así que el cambio es neutro
+      // para el menú; lo que se alinea es que el ítem y el guard de la página pregunten por
+      // lo MISMO. Antes el menú ofrecía la ruta con un viewCode y el guard pedía otro.
+      if (item.href === '/reviews') return canSeeView('cliente.reviews', true)
       if (item.href === '/analytics') return canSeeView('cliente.analytics', true)
       if (item.href === '/campanas') return canSeeView('cliente.campanas', true)
 

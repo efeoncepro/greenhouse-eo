@@ -91,7 +91,8 @@ Identifica:
 | `target_sha_exists` | SHA no existe en `main` o no fue pusheado | `git push origin main` |
 | `ci_green` | CI rojo en el SHA target | Investigar workflow run de CI, fix → push → wait CI verde |
 | `playwright_smoke` | 0 workflows smoke runs para el SHA | `gh workflow run playwright.yml --ref main` esperar a verde |
-| `release_batch_policy` | Mix de dominios irreversibles sin marker `[release-coupled: ...]` | Agregar marker al commit body OR usar `--override-batch-policy` (requiere capability + reason ≥20 chars) |
+| `release_batch_policy` | Mix de dominios irreversibles sin marker `[release-coupled: ...]` | Agregar el marker **abriendo una línea** del cuerpo del commit de squash (se lee sólo de ese commit, TASK-1676) OR usar `--override-batch-policy` (requiere capability + reason ≥20 chars) |
+| `release_batch_policy` **`unknown`, "Diff vacío"** | El rango no contiene archivos: el `target_sha` coincide con el último release `released`, o falta `git fetch`/historia completa en el checkout | **NO es una aprobación** — verificar el `target_sha` y la base que declara el evidence (`diffBase`/`diffBaseSource`). Nunca bypassear esto como si fuera un `ship` |
 | `stale_approvals` | Run waiting > umbral en Production environment | Aprobar el run pendiente OR cancelar `gh run cancel` |
 | `pending_without_jobs` | Run queued/in_progress con `jobs.length === 0` (deadlock por concurrency) | Verificar `concurrency` setting per TASK-848; cancel el run trapped |
 | `vercel_readiness` | `VERCEL_TOKEN` unset OR Vercel API down | Set token en workflow env OR esperar Vercel recovery |
@@ -282,8 +283,18 @@ que es lo que este playbook debe enseñar:
 | Gotcha | Lo que se venía haciendo (reactivo) | Lo que se hizo (pre-emptivo) |
 |---|---|---|
 | #1 PR conflictivo | Descubrir el conflicto al crear el PR y pelearlo contra el reloj | `git merge origin/main -X ours --no-edit` en `develop` **antes** de crear el PR → PR MERGEABLE de entrada |
-| #2 batch policy | Aceptar `requires_break_glass` y pedir `bypass_preflight_reason` | Marker `[release-coupled: <razón>]` en el **cuerpo del commit de squash** → preflight del orquestador pasa `ship` sin bypass |
+| #2 batch policy | Aceptar `requires_break_glass` y pedir `bypass_preflight_reason` | Marker `[release-coupled: <razón>]` **abriendo una línea** del cuerpo del commit de squash → preflight del orquestador pasa `ship` sin bypass |
 | #3 `playwright_smoke` ausente | Bypassear el check que no existe para el SHA de squash | `gh workflow run playwright.yml --ref main` y esperar verde (3m10s, run `31057847351`) → el check **existe de verdad** |
+
+> **Corrección posterior sobre el #2 (TASK-1676 / ISSUE-145, 2026-08-09).** Ese
+> `ship` no lo produjo el marker: en esa fecha el orquestador computaba el diff
+> contra `origin/main` con el `target_sha` ya mergeado, así que el rango era vacío
+> y el check aprobaba por vacuidad — 3 releases seguidos, uno con 1045 archivos y
+> 14 migraciones. El marker se escribió cuatro veces creyendo que hacía algo. Hoy
+> la base es el `target_sha` del último manifest `released`, un diff vacío devuelve
+> `unknown` en vez de `ship`, y el marker recién ahora se lee donde este playbook
+> dice que se lee. La técnica del #2 sigue siendo la correcta; lo que cambió es que
+> pasó a ser cierta.
 
 Detalle del #1 que conviene no perder: hubo un conflicto **modify/delete** real
 (`TASK-1590` borrada en `develop` porque migró a `in-progress/`, modificada en

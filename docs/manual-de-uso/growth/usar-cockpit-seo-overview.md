@@ -17,7 +17,7 @@ Necesitas las tres puertas abiertas:
 
 1. **Rol con la vista habilitada** — hoy `efeonce_admin` o `ai_tooling_admin`.
 2. **Permiso** `growth.seo.observation.read`.
-3. **El Space con el modulo SEO contratado** (`module_assignment` de `seo_v1` vigente).
+3. **El Space con el modulo SEO contratado** (`module_assignment` de `seo_v2` vigente).
    Si falta, el Space no aparece en el selector. Como asignarlo:
    [asignar-modulo-seo-organizacion.md](asignar-modulo-seo-organizacion.md).
 

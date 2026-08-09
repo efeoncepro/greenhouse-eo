@@ -8,14 +8,14 @@
 
 ## Para que sirve
 
-La captura diaria de rankings mide, una vez al dia, en que posicion exacta aparece el dominio de cada organizacion (con modulo `seo_v1` asignado) para sus keywords trackeadas — la serie que alimenta la pantalla ancla "Rank & URL performance over time". **Esta captura gasta dinero real** (DataForSEO, ~USD 0.01 por keyword al dia con los parametros actuales), asi que toda la operacion gira alrededor del control de costo.
+La captura diaria de rankings mide, una vez al dia, en que posicion exacta aparece el dominio de cada organizacion (con modulo `seo_v2` asignado) para sus keywords trackeadas — la serie que alimenta la pantalla ancla "Rank & URL performance over time". **Esta captura gasta dinero real** (DataForSEO, ~USD 0.01 por keyword al dia con los parametros actuales), asi que toda la operacion gira alrededor del control de costo.
 
 ## Antes de empezar
 
 - El cron `ops-seo-rank-capture` (Cloud Scheduler, `0 5 * * *` America/Santiago) esta **ACTIVO desde el 2026-08-06** (despausado tras el smoke E2E real de este manual). Nacio pausado por diseño; el estado declarado vive en `deploy.sh` (ver "Pausar/despausar" abajo).
 - El flag `GROWTH_SEO_ENABLED` ya esta ON en el ops-worker y en Vercel (ver `FEATURE_FLAG_STATE_LEDGER.md`).
 - La cuenta DataForSEO debe tener saldo (recargada el 2026-08-06 — verificar el saldo vigente con `/v3/appendix/user_data` antes de expandir a mas organizaciones).
-- El blast radius real lo controla el **assignment per-org**: el batch solo itera organizaciones con `module_assignments.seo_v1` vigente. Berel primero (Fase 0).
+- El blast radius real lo controla el **assignment per-org**: el batch solo itera organizaciones con `module_assignments.seo_v2` vigente. Berel primero (Fase 0).
 
 ## Paso a paso
 

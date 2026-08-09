@@ -35,6 +35,8 @@ import {
   getExpenseDistributionUnresolvedSignal
 } from './queries/expense-distribution'
 import { getClientPortalResolverFailureRateSignal } from './queries/client-portal-resolver-failure-rate'
+import { getClientRoleWithoutViewGrantsSignal } from './queries/client-role-without-view-grants'
+import { getClientUserWithoutOrganizationSignal } from './queries/client-user-without-organization'
 import { getEntraWebhookSubscriptionHealthSignal } from './queries/entra-webhook-subscription-health'
 import { getExpensePaymentsClpDriftSignal } from './queries/expense-payments-clp-drift'
 import { getLedgerUnresolvedDriftItemsSignal } from './queries/ledger-unresolved-drift-items'
@@ -885,6 +887,8 @@ interface ReliabilityOverviewSources {
    * a moduleKey 'client_portal' cuando cree el subsystem dedicado.
    */
   clientPortalResolverFailureRate?: ReliabilitySignal | null
+  clientRoleWithoutViewGrants?: ReliabilitySignal | null
+  clientUserWithoutOrganization?: ReliabilitySignal | null
 
   /**
    * TASK-613 Slice 3 — Finance Clients ↔ Organization canonical link signal:
@@ -1250,6 +1254,8 @@ export const buildReliabilityOverview = (
     ...(sources.entraWebhookSubscriptionHealth ? [sources.entraWebhookSubscriptionHealth] : []),
     // TASK-827 Slice 8 — Client portal resolver failure rate (V1.0 scaffold).
     ...(sources.clientPortalResolverFailureRate ? [sources.clientPortalResolverFailureRate] : []),
+    ...(sources.clientRoleWithoutViewGrants ? [sources.clientRoleWithoutViewGrants] : []),
+    ...(sources.clientUserWithoutOrganization ? [sources.clientUserWithoutOrganization] : []),
     // TASK-613 Slice 3 — Finance Clients ↔ Organization canonical link signal.
     ...(sources.financeClientProfileUnlinked ? [sources.financeClientProfileUnlinked] : []),
     // TASK-841 — Nubox raw/conformed/projection freshness.
@@ -2191,6 +2197,22 @@ export const getReliabilityOverview = async (
       ? preloadedSources.clientPortalResolverFailureRate
       : await getClientPortalResolverFailureRateSignal().catch(() => null)
 
+  // TASK-1678 Slice 4 — Roles cliente sin ninguna vista otorgada. Desde que el carril
+  // rol->vista falla hacia cerrado para `client`, el seed es load-bearing: un rol sin
+  // grants deja a sus usuarios en un portal vacio sin error visible. Steady = 0.
+  const clientRoleWithoutViewGrants =
+    preloadedSources.clientRoleWithoutViewGrants !== undefined
+      ? preloadedSources.clientRoleWithoutViewGrants
+      : await getClientRoleWithoutViewGrantsSignal().catch(() => null)
+
+  // TASK-1679 Slice 1 — Usuarios cliente activos sin organizacion resuelta. Un usuario en
+  // ese estado se loguea bien y no puede abrir NINGUNA pagina del portal cliente, porque no
+  // hay organizacion contra la que evaluar modulos contratados. Steady = 0.
+  const clientUserWithoutOrganization =
+    preloadedSources.clientUserWithoutOrganization !== undefined
+      ? preloadedSources.clientUserWithoutOrganization
+      : await getClientUserWithoutOrganizationSignal().catch(() => null)
+
   // TASK-613 Slice 3 — Finance Clients ↔ Organization canonical link signal.
   // Single reader; degrada honestamente a `unknown` si la query falla.
   const financeClientProfileUnlinked =
@@ -2649,6 +2671,8 @@ export const getReliabilityOverview = async (
     scimWorkforce,
     entraWebhookSubscriptionHealth,
     clientPortalResolverFailureRate,
+    clientRoleWithoutViewGrants,
+    clientUserWithoutOrganization,
     financeClientProfileUnlinked,
     nuboxSourceFreshness,
     notionConformedDrainFreshness,

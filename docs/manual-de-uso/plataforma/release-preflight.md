@@ -1,8 +1,8 @@
 > **Tipo de documento:** Manual de uso (operador)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-05-10 por Claude
-> **Ultima actualizacion:** 2026-05-11 por Codex
-> **Documentacion tecnica:** [CLAUDE.md §Production Preflight CLI invariants (TASK-850)](../../../CLAUDE.md), [Spec TASK-850](../../tasks/in-progress/TASK-850-production-preflight-cli-complete.md), [Runbook production-release.md §11](../../operations/runbooks/production-release.md)
+> **Ultima actualizacion:** 2026-08-09 por Claude
+> **Documentacion tecnica:** [CLAUDE.md §Production Preflight CLI invariants (TASK-850)](../../../CLAUDE.md), [Spec TASK-850](../../tasks/complete/TASK-850-production-preflight-cli-complete.md), [Runbook production-release.md §11](../../operations/runbooks/production-release.md)
 
 # Production Preflight CLI
 
@@ -61,7 +61,7 @@ pnpm release:preflight --json --fail-on-error
 pnpm release:preflight --target-sha=<sha> --target-branch=main
 ```
 
-Por default toma git HEAD vs main. Util para validar un SHA puntual antes de mergear.
+Por default el target es git HEAD. La base del diff NO es la punta de la rama: es el ultimo release desplegado en ella (ver mas abajo). Util para validar un SHA puntual antes de mergear.
 
 ### 4) Override batch policy (break-glass)
 
@@ -92,13 +92,32 @@ Solo cuando el check `release_batch_policy` reporta `requires_break_glass` (e.g.
 ### Decisions del check release_batch_policy
 
 - `ship` → diff seguro, deploy ok
-- `split_batch` → mezcla dominios sensibles independientes (e.g. payroll + finance) sin documentar acoplamiento. Dividir en 2 releases separados, o agregar marker `[release-coupled: <razon>]` en el commit body.
+- `split_batch` → mezcla dominios sensibles independientes (e.g. payroll + finance) sin documentar acoplamiento. Dividir en 2 releases separados, o agregar marker `[release-coupled: <razon>]` en el cuerpo del commit de squash.
 - `requires_break_glass` → tocas dominio irreversible (db_migrations, auth_access, payroll, finance, cloud_release). Necesitas capability + audit + `--override-batch-policy` flag.
+- **`severity=unknown` con "Diff vacio"** → el check no encontro archivos que comparar, asi que no evaluo nada. NO es un `ship`. Desde TASK-1676 un rango vacio nunca aprueba: verifica que el `--target-sha` sea el correcto (si coincide con el ultimo release desplegado, no hay nada que promover) y que `git fetch origin` este al dia.
+
+### Contra que se compara (delta 2026-08-09, TASK-1676)
+
+La base del diff dejo de ser `origin/main` y pasa a ser el **`target_sha` del ultimo release en estado `released`** para la rama, leido desde `release_manifests`. El motivo: el orquestador corre con el SHA ya mergeado, asi que comparar contra `main` daba rango vacio y el gate aprobaba sin mirar nada — 3 releases seguidos con `filesChanged=0`, uno con 1045 archivos y 14 migraciones.
+
+El summary del check te dice contra que comparo, y el JSON trae `diffBase`, `diffBaseSource` (`last_released_manifest` o `branch_head_fallback`) y `diffBaseReleaseId`. Si un batch sale mas grande de lo esperado, eso es lo primero que hay que mirar: un release anterior que quedo `degraded` no cuenta como base, asi que su contenido reaparece en el rango.
+
+### Como se escribe el marker `[release-coupled: ...]`
+
+Dos condiciones estrictas desde TASK-1676:
+
+1. **Abre una linea propia** en el cuerpo del commit. Mencionarlo a mitad de una frase no cuenta.
+2. Se lee **solo del commit que estas promoviendo** (el squash), no de los commits del rango.
+
+Antes bastaba con que el literal apareciera citado en cualquier commit — incluso dentro de un doc — y eso apagaba la deteccion de mezcla de dominios por completo. El caso mas claro: el commit que creo la task para arreglar este defecto la disparaba, porque explicaba el problema citando el literal.
+
+Consecuencia esperada: **en la corrida local, antes de mergear, el marker no puede existir todavia** (el squash no existe). El flujo correcto es ver el `split_batch` en local, escribir el marker en el body del squash, y dejar que el orquestador lo lea. No intentes "arreglar" el `split_batch` local con el marker.
 
 ## Que NO hacer
 
 - **NUNCA** ignorar un check `error` y avanzar igual. Es exactamente lo que el incidente 2026-04-26 → 2026-05-09 hubiese evitado si hubiera existido.
 - **NUNCA** correr con `--override-batch-policy` sin capability + audit. La idea es que solo el operador EFEONCE_ADMIN con justificacion documentada lo use.
+- **NUNCA** leer un `release_batch_policy` con diff vacio como luz verde. El check no miro nada; por eso reporta `unknown` y no `ship`.
 - **NUNCA** asumir que `unknown` es seguro. Si Sentry esta down (`severity=unknown`), NO podemos verificar que production no este on fire. Conservador: trata unknown como "necesito mas info".
 - **NUNCA** modificar `--target-branch` a algo que no sea `main` para ejecutar el release real. Otras branches son solo para exploratory testing.
 
@@ -109,7 +128,8 @@ Solo cuando el check `release_batch_policy` reporta `requires_break_glass` (e.g.
 | `7 checks unknown` | Sin GitHub App + Vercel + Sentry + Azure tokens en local | Setup tokens en `.env.local` o usar GH App canonico |
 | `target_sha_exists error` | SHA no existe o pull request aun no mergeado | `git fetch origin && git log <sha>` para verificar |
 | `ci_green warning "aun corriendo"` | CI todavia en progreso | Esperar 5-10 min y re-run |
-| `release_batch_policy split_batch` | Diff mezcla payroll + finance independientes | Dividir en 2 PRs separados, o agregar `[release-coupled: <razon>]` en commit body |
+| `release_batch_policy split_batch` | Diff mezcla payroll + finance independientes | Dividir en 2 PRs separados, o agregar `[release-coupled: <razon>]` abriendo una linea del body del squash |
+| `release_batch_policy unknown "Diff vacio"` | El target coincide con el ultimo release desplegado, o falta `git fetch` | Verificar `--target-sha`; NO tratarlo como aprobacion |
 | `release_batch_policy requires_break_glass` | Tocas migrations, auth, payroll, finance, o cloud_release | Si es legitimo: `--override-batch-policy` con capability + audit |
 | `pending_without_jobs error` | Hay zombie runs queued (sintoma deadlock TASK-848) | `gh run cancel <id>` para los runs zombie ANTES de re-run |
 | `stale_approvals error >=7d` | Run waiting Production approval > 7 dias | `gh run cancel <id>` o aprobar |
@@ -123,7 +143,7 @@ Solo cuando el check `release_batch_policy` reporta `requires_break_glass` (e.g.
 
 ## Referencias tecnicas
 
-- Spec: [TASK-850](../../tasks/in-progress/TASK-850-production-preflight-cli-complete.md)
+- Spec: [TASK-850](../../tasks/complete/TASK-850-production-preflight-cli-complete.md)
 - Source code:
   - CLI: [scripts/release/production-preflight.ts](../../../scripts/release/production-preflight.ts)
   - Composer: [src/lib/release/preflight/composer.ts](../../../src/lib/release/preflight/composer.ts)

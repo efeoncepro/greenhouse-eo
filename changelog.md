@@ -7,6 +7,71 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-09 — Las 9 páginas del portal cliente dejaron de mentir (TASK-1679, cierra ISSUE-146)
+
+Las nueve rutas guardadas redirigían con `?error=resolver_unavailable` —el banner de "el servicio no
+está disponible"— por tres defectos que vivían en la misma función y se tapaban entre sí: el
+`redirect()` del camino `denied` estaba **dentro** del `try`, así que su propio `catch` lo interceptaba;
+el guard pasaba un `clientId` donde el resolver espera un `organizationId`; y seis viewCodes de rutas
+vivas no los declaraba ningún módulo. Ahora cada resultado tiene su destino: empty state para
+module-gated sin módulo, `organization_unresolved` para sesión sin organización, y
+`resolver_unavailable` sólo cuando el resolver falla de verdad.
+
+- `ModuleNotAssignedEmpty` volvió a existir en runtime, y una denegación legítima dejó de reportarse a
+  Sentry como error del resolver — el dominio `client_portal` acumulaba incidentes por funcionamiento
+  normal.
+- Tres vistas pasaron a allowlist base (`notificaciones`, `configuracion`, `actualizaciones`): no son
+  producto vendible. Ciclos y Analytics quedaron module-gated por decisión del operador.
+- `/reviews` se unificó en `cliente.reviews`; `cliente.revisiones` queda marcado como retirado
+  (append-only).
+- **Medido, no supuesto:** corregir el guard NO abre las 9. Los módulos que declaran 4 de esas vistas
+  no están asignados a ninguna organización, así que 3 abren y 6 muestran el empty state. Abrirlas es
+  un assignment, no código.
+- Persona de verificación con organización configurable, con 4 condiciones fail-closed y auditoría.
+  **Rollout pendiente:** no está en `main`.
+
+## 2026-08-09 — El carril rol→vista del portal cliente falla hacia cerrado (TASK-1678, cierra ISSUE-147)
+
+`resolveAuthorizedViewsForUser` otorgaba por defecto: un rol `client_*` y una vista `cliente.*`
+comparten routeGroup `client`, así que toda vista cliente nueva se auto-otorgaba pese a que 18 de las
+25 están gobernadas por módulo contratado. Ahora el default se invierte sólo para ese routeGroup, el
+camino degradado devuelve lista vacía para tenants `client` en vez del `VIEW_REGISTRY` completo, y el
+`fallback` de lista vacía de `hasAuthorizedViewCode` deja de aplicar a sesiones cliente — sin eso
+último, degradar hacia cerrado habría abierto todo. El portal interno no se mueve: su default
+permisivo es lo que lo hace usable sin seedear cientos de filas.
+
+- Medido antes de apagar nada (`scripts/identity/client-view-fallback-audit.ts`): el cambio apaga
+  **un** viewCode por rol cliente y es module-gated → cero seed necesario.
+- Dos supuestos de `ISSUE-147` eran falsos: `role_view_assignments` no tiene columnas de vigencia, y
+  su punto 5 ("revisar el fallback de los callsites") no era limpieza sino requisito.
+- Los denials de rol siguen siendo unión, por decisión medida y no por omisión — el veto per-usuario
+  vive en `user_view_overrides`. Rationale en `GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md` §8.2.
+- Señal `identity.view_access.client_role_without_grants`, steady 0 verificado contra PG.
+- Verificado con las tres personas agente (`scripts/identity/client-view-rail-persona-check.ts`).
+  **Rollout pendiente:** no está en `main`, y `TASK-1679` va después por el orden de contención.
+
+## 2026-08-09 — El cutover SEO cerró del todo, en dos releases (TASK-1677, cierra ISSUE-143)
+
+La ventana expand/contract que `ISSUE-143` había dejado abierta a propósito quedó cerrada: el código
+dejó de leer `seo_v1` y los assignments quedaron superseded. Lo que vale registrar no es el cierre
+sino su forma.
+
+**Fueron dos releases, y no por prudencia: por construcción.** El check `postgres_migrations` del
+preflight es estricto, así que una migración commiteada y sin aplicar bloquea el release. Y aplicarla
+antes de desplegar el código es exactamente lo que el ordering del cutover prohíbe. Las dos reglas
+juntas hacen que un expand/contract no quepa en un solo ciclo — y eso, lejos de ser fricción, es lo
+que garantiza que exista un punto de verificación entre el código y los datos.
+
+La verificación fue con el canary del provider contra producción, antes y después de tocar los datos:
+la superficie de Grupo Berel abre con datos medidos, sin estado de "sin entitlement" y sin errores de
+consola. **No con un `SELECT`** — ése fue el método que falló en el incidente original y por eso la
+task lo prohíbe explícitamente.
+
+El bloque `DO` de la migración verificó que ninguna organización quedara sin cobertura antes de dejar
+pasar el cambio. Estado final: cero `seo_v1` vigentes, dos superseded con su historia intacta, dos
+`seo_v2` activos. La fila `seo_v1` sigue en el catálogo: el contract es `effective_to`, nunca un
+`DELETE`.
+
 ## 2026-08-09 — El gate que aprobaba sin mirar (TASK-1676, cierra ISSUE-145)
 
 El `release_batch_policy` del preflight comparaba contra `origin/main`. Pero el orquestador lo corre
@@ -1153,43 +1218,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
 - El **anillo de créditos mide el ciclo y no el stock**: con 500.836 de 501.110 el arco de consumo medía 0,197° de 360 — invisible por física. El glifo pasó de `sparkles` (el genérico de IA) a `flame`. Mientras el período no tenga tope asignado el aro queda **neutro** en vez de inventar un denominador.
 - Además: barra del documento tokenizada y `scroll-behavior: smooth`, barra del composer que se revela en hover, `⌘K` como una unidad, y los controles de selección de las cards centrados y apagados honestamente hasta que el compare se porte desde el legacy.
 - Lecciones registradas en la skill `greenhouse-globe` y en el `Delta 2026-08-01` de TASK-1559: el `padding` que el UA da a todo `<button>` sin preflight (rompe sólo bajo 29 px de caja), `margin:auto` + `flex-wrap`, que `space-between` reparte hijos, y que un velo por alfa no es un hueco.
-
-## 2026-07-31 — GitHub Actions: presupuesto mensual de la organización actualizado
-
-- Con confirmación humana y método de pago verificado, el presupuesto externo de Actions de `efeoncepro` pasó de USD 0 a **USD 20 mensuales**; `Stop usage when budget limit is reached` y las alertas permanecen activados. La evidencia y el procedimiento están en [`cloud-cost-intelligence-finops.md`](docs/documentation/operations/cloud-cost-intelligence-finops.md) y [`github-actions-budget.md`](docs/manual-de-uso/operations/github-actions-budget.md).
-
-## 2026-07-31 — Brightcell: segunda licitación con Artifact Composer y método reusable
-
-- Se documentó Brightcell como el segundo caso de licitación armado con Artifact Composer y catálogo de plantillas, después de SKY.
-- Se consolidó el flujo reusable `intake/evidencia → narrativa → deck-plan → assets/mockups → composición → auditoría visual → validación`.
-- Se reforzaron las skills de licitaciones, deck-studio, SEO/AEO, diseño e imagen con las lecciones de Grader/X-Ray/Greenhouse, mockups honestos, assets extraíbles y protección de decks previos.
-- La salida client-facing queda separada de investigación, métricas ilustrativas, manifiestos vacíos y archivos `-INTERNO`.
-
-## 2026-07-31 — Globe: modo claro en producción, y dos defectos que sólo aparecieron mirando
-
-- **Cuatro PRs mergeados y desplegados** en `efeonce-globe`: #8 (modo claro + consolidación del `:root`),
-  #15 (todo paquete compila antes de testear + gate), #25 (el lecho de las piezas deja el azul del
-  prototipo) y #27 (scrims y escenario). Revisión activa `00122-lwd`. Verificado visualmente por el operador.
-- 🔴 **Dos defectos llegaron a producción y ni la suite ni el barrido de contraste los vieron**, y los dos
-  venían de lo mismo: **tratar como superficie algo que no lo es**.
-  - Los **scrims** voltearon con el modo y en claro pasaron a `#eceaf1`. Un scrim claro deja de ser un
-    scrim: existe para que el texto blanco se lea sobre un medio **arbitrario**, y el medio es arbitrario
-    en los dos modos. El título de la pieza destacada quedó blanco sobre casi blanco. El barrido declara
-    los gradientes «no medibles» a propósito —para no inventar fallos— y el defecto cayó en ese hueco.
-  - El **escenario** de la pieza tampoco es superficie. Hoy es el mismo magenta en ambos modos, lo que
-    además le deja al producto una sola identidad.
-- **Lección que se repitió tres veces en el día:** se declaró «presencia equivalente» midiendo el PASO de
-  la rampa contra el canvas. Esa medición era del **token, no de lo que renderiza** — ignoraba la
-  composición por alfa. *Un número sobre el token no describe el píxel.* Los tres defectos aparecieron
-  **mirando**, no testeando.
-- **ADR-017 v2.1** canoniza los dos invariantes nuevos (§6 «Lo que NO voltea con el modo» y §7 «La familia
-  del escenario es magenta») y generaliza el hallazgo: **una receta que fabrica color en runtime es un
-  literal con disfraz** que ningún drift guard de literales puede ver.
-- ✅ **Drift cerrado el mismo día.** `axis-tokens@0.2.4` porta las **tres** familias de acento, leídas del
-  archivo de Figma en alta resolución (en baja, `#f1d1dd` se lee como `#f101dd`). Globe consume
-  `axisAccentRamp.magenta` y borró su copia; el valor servido quedó **byte-identical**. `TASK-1615`
-  cerrada. Los nueve pasos de orchid ya en el paquete coincidían **exactamente** con el archivo — cero
-  drift ahí, lo que valida el método de lectura.
-- **Queda abierto para diseño:** si coral y magenta merecen rol (coral está a **14°** del rojo de
-  `danger`), y si scrim/escenario se canoniza en AXIS como grupo **sin variante por modo** — que la firma
-  del token impida el error, en vez de un comentario que pida no cometerlo.

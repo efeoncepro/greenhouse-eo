@@ -380,6 +380,15 @@ Ninguna. Sin secretos, sin env vars, sin redeploy de workers, sin cambios de inf
 
 ## Open Questions
 
+> **Cerrada la segunda (2026-08-09), con datos y en contra de las dos alternativas que planteaba.**
+> Se midió el classifier sobre los 8 releases del historial: 6 pidieron break-glass y **sólo 1 fue
+> ruido** — los otros tenían migraciones reales o payroll. Relajar la severidad a "2+ dominios" habría
+> bajado la tasa de 75% a 50%, pero dejando pasar sin fricción un release con **3 migraciones**: quita
+> el freno justo donde más se necesita. El ruido no venía de la severidad sino de la granularidad —el
+> classifier clasifica por path y no por contenido, así que cinco comentarios en `entitlements/`
+> cuentan igual que otorgar un permiso—. Dueño del fix real: `TASK-1681`.
+
+
 - ¿El gate debe **bloquear** desde el primer release con la base nueva, o correr una vez en modo observación para medir cuántos releases históricos habría frenado? Recomendación: observar uno, luego bloquear.
 - ¿La severidad ante un único dominio irreversible se relaja a `warning` para alinearse con la matriz del runbook, o la matriz se endurece para alinearse con el código? Es una decisión del operador, no del implementador.
 

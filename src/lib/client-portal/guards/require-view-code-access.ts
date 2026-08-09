@@ -8,6 +8,8 @@ import { captureWithDomain } from '@/lib/observability/capture'
 
 import { mapViewCodeToPublicSlug } from '../composition/view-code-public-slug'
 
+import { resolveClientPortalOrganizationId } from './resolve-client-portal-organization-id'
+
 /**
  * TASK-827 Slice 4 — Page guard canonical para rutas client-facing.
  *
@@ -60,21 +62,48 @@ export const requireViewCodeAccess = async (viewCode: string): Promise<void> => 
   // acá: tenantType === 'efeonce_internal' es equivalente para D1 boundary).
   if (session.user.tenantType === 'efeonce_internal') return
 
-  const organizationId = session.user.clientId
+  // TASK-1679 Slice 4 — la llave es la ORGANIZACIÓN, no el cliente (`ISSUE-146`).
+  //
+  // Acá vivía `session.user.clientId` asignado a una variable llamada `organizationId`
+  // y pasado a un filtro sobre `module_assignments.organization_id`. Los dos espacios de
+  // identificadores no se solapan —`cli-*`, `hubspot-company-*` y
+  // `greenhouse-demo-client` contra `org-*`—, así que la comparación NUNCA podía ser
+  // verdadera: el guard denegaba a todo cliente, en todas las páginas.
+  //
+  // La resolución vive en un helper único para que este error no pueda volver por otro
+  // callsite, y para que el override de la persona de verificación se aplique en un solo
+  // punto (si no, el menú resolvería una organización y las páginas otra).
+  const organizationId = await resolveClientPortalOrganizationId({
+    userId: session.user.userId,
+    organizationId: session.user.organizationId
+  })
 
   if (!organizationId) {
-    // Client tenant sin clientId asignado — estado inválido. Terminator garantizado.
-    redirect('/home')
+    // Sesión cliente sin organización resuelta. NO es lo mismo que "no tiene el módulo":
+    // acá no hay contra qué evaluar módulos contratados, así que no se puede decir por qué
+    // se deniega. La señal `identity.client_portal.client_without_organization` cuenta a los
+    // usuarios en este estado; sin ella este camino sería mudo.
+    redirect('/home?error=organization_unresolved')
   }
 
+  let allowed = false
+
+  // TASK-1679 Slice 3 — el `redirect()` va FUERA del `try`.
+  //
+  // `redirect()` de Next.js señaliza **lanzando** `NEXT_REDIRECT`. Con la llamada dentro
+  // del `try`, el propio `catch` la interceptaba, y las tres consecuencias se verificaron
+  // en producción el 2026-08-09:
+  //
+  //   1. el camino `denied` era inalcanzable — ninguna denegación legítima llegaba como tal;
+  //   2. `ModuleNotAssignedEmpty` (TASK-827, anatomía de cinco elementos) estaba muerto en
+  //      runtime: el usuario veía el banner de degradación, que invita a reintentar algo que
+  //      nunca va a funcionar;
+  //   3. **cada denegación legítima se reportaba a Sentry como error del resolver**, o sea
+  //      el dominio `client_portal` acumulaba incidentes por el funcionamiento normal.
+  //
+  // El `try` ahora envuelve SÓLO la llamada que puede fallar de verdad.
   try {
-    const allowed = await hasViewCodeAccess(organizationId, viewCode)
-
-    if (!allowed) {
-      const slug = mapViewCodeToPublicSlug(viewCode)
-
-      redirect(`/home?denied=${encodeURIComponent(slug)}`)
-    }
+    allowed = await hasViewCodeAccess(organizationId, viewCode)
   } catch (error) {
     // Resolver throw → degradación honesta. Page consumer renderiza
     // <ClientPortalDegradedBanner mode='fallback'> via ?error= param.
@@ -84,5 +113,9 @@ export const requireViewCodeAccess = async (viewCode: string): Promise<void> => 
     })
 
     redirect('/home?error=resolver_unavailable')
+  }
+
+  if (!allowed) {
+    redirect(`/home?denied=${encodeURIComponent(mapViewCodeToPublicSlug(viewCode))}`)
   }
 }

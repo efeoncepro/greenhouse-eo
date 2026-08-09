@@ -148,4 +148,4 @@ no que aparece *sólo a quien corresponde*.
 - **TASK-1310** — su criterio de alcanzabilidad por nav cliente depende de esta task. Mientras tanto, su manifest declara un enlace inexistente.
 - **TASK-1388** — nav interno; declara el cliente como follow-up. Toca el mismo archivo: quien entre segundo rebasa.
 - **TASK-1674** (reservada) — la 4.ª sección del portal cliente SEO hereda este cableado sin trabajo extra.
-- **ISSUE-143** — la ventana `seo_v1`/`seo_v2` sigue abierta a propósito; el contract es de TASK-1310, no de ésta.
+- **ISSUE-143** — la ventana `seo_v1`/`seo_v2`: desde 2026-08-09 está cerrada en código (`SEO_MODULE_KEYS_READ = ['seo_v2']`, TASK-1677 Slice 1) y abierta en datos hasta la migración del contract. El contract es de TASK-1677, no de ésta.

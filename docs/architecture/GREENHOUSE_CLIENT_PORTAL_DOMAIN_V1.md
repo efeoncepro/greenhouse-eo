@@ -751,12 +751,72 @@ resolver — follow-up `capability-modules-resolver-migration`.
 
 ### 12.2 Page guards
 
-Cada page client-facing valida:
+Cada page client-facing valida con el guard canónico `requireViewCodeAccess`, **nunca llamando al
+resolver a mano**:
 
 ```ts
-const allowed = await hasViewCodeAccess(session.user.organizationId, 'cliente.brand_intelligence')
-if (!allowed) redirect('/home') // o renderiza empty state honesto
+// src/app/(dashboard)/campanas/page.tsx
+await requireViewCodeAccess('cliente.campanas')
 ```
+
+#### Delta TASK-1679 — la forma real del guard, y por qué importa cada pieza
+
+El pseudocódigo que estaba acá describía la intención correcta, y el código divergía en tres puntos que
+convivieron nueve meses. Los tres estaban en la misma función y se tapaban entre sí. Esto es lo vigente:
+
+**1. La llave es la ORGANIZACIÓN, y se resuelve en un solo lugar.** El guard llama a
+`resolveClientPortalOrganizationId` (`src/lib/client-portal/guards/`), no lee la sesión directo.
+`ISSUE-146`: el guard pasaba `session.user.clientId` a un filtro sobre
+`module_assignments.organization_id`, y los espacios no se solapan (`cli-*`, `hubspot-company-*`,
+`greenhouse-demo-client` contra `org-*`), así que denegaba a **todo** cliente en **todas** las páginas.
+Es un `string` pasado a un `string`: TS no lo puede atrapar. Concentrar la resolución es lo que evita
+que vuelva por otro callsite — y es el único punto donde se aplica el override de la persona de
+verificación, porque si viviera sólo en el guard el menú resolvería una organización y las páginas
+abrirían otra.
+
+**2. `redirect()` va FUERA del `try`.** `redirect()` de Next.js señaliza **lanzando** `NEXT_REDIRECT`.
+Con la llamada del camino `denied` dentro del `try`, el propio `catch` la interceptaba, y las tres
+consecuencias se verificaron en producción: el camino `denied` era inalcanzable, el empty state
+`ModuleNotAssignedEmpty` de §12.3 estaba **muerto en runtime**, y cada denegación legítima se reportaba
+a Sentry como error del resolver. El `try` envuelve sólo la llamada que puede fallar de verdad.
+
+**3. Tres resultados distintos, tres destinos distintos.** Antes los tres salían como
+`?error=resolver_unavailable`, que invita al usuario a reintentar algo que nunca va a funcionar:
+
+| Resultado | Destino | Qué renderiza |
+|---|---|---|
+| tiene acceso | — | la página |
+| module-gated sin el módulo | `/home?denied=<slug>` | `ModuleNotAssignedEmpty` (§12.3) |
+| sesión sin organización resuelta | `/home?error=organization_unresolved` | degradación honesta; señal `identity.client_portal.client_without_organization` |
+| el resolver falló de verdad | `/home?error=resolver_unavailable` | `ClientPortalDegradedBanner` + `captureWithDomain` |
+
+**4. Vistas base: la excepción acotada al carril de módulos.** `hasViewCodeAccess` resolvía sólo por
+`modules.some(m => m.viewCodes.includes(viewCode))`, sin allowlist transversal, así que un viewCode que
+ningún módulo declara **denegaba siempre**. Pero un cliente no contrata "ver sus notificaciones" ni
+"entrar a la configuración de su cuenta": modelarlo como módulo obliga a asignárselo a cada
+organización nueva y a que alguien se acuerde.
+
+`CLIENT_PORTAL_BASE_VIEW_CODES` (en el resolver) declara las tres que no son producto vendible:
+`cliente.notificaciones`, `cliente.configuracion`, `cliente.actualizaciones`. Se resuelven **antes** de
+tocar la DB, porque no dependen de assignments.
+
+- **NUNCA** agregar a esa allowlist una vista que dependa de un servicio contratado. Es la excepción al
+  carril de módulos, no un atajo para destrabar una página.
+- **NUNCA** resolver la allowlist leyendo `role_view_assignments`: sería reintroducir el carril viejo.
+- `cliente.ciclos` y `cliente.analytics` quedaron **fuera** por decisión del operador: son superficies
+  de delivery, y como Creative pertenece a un solo cliente, dejarlas base le daría a los demás páginas
+  permanentemente vacías. Siguen module-gated y hoy ningún módulo las declara — deuda rastreada en
+  `PENDING_MODULE_DECLARATION_VIEW_CODES` (`view-codes/parity.ts`), no un allowlist silencioso.
+
+**5. Un viewCode por ruta.** `/reviews` pedía `cliente.revisiones` mientras `creative_hub_globe_v1`
+declaraba `cliente.reviews`: dos strings para la misma ruta, así que no podía abrir ni con la llave
+correcta. El canónico es `cliente.reviews`; `cliente.revisiones` quedó marcado como retirado en el
+`VIEW_REGISTRY` (append-only: se marca, no se borra).
+
+> **Nota de estado, medida el 2026-08-09.** Corregir el guard hace que las 9 rutas guardadas **digan la
+> verdad**, no que las 9 abran: 3 abren (las base) y 6 muestran el empty state, porque ninguna
+> organización tiene asignados los módulos que declaran esas vistas (`creative_hub_globe_v1`,
+> `equipo_asignado`). Abrirlas es un assignment, no un cambio de código.
 
 ### 12.3 Empty states honestos
 

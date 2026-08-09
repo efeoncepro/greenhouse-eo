@@ -211,7 +211,7 @@ Reglas que el agente debe respetar:
 
 Qué entregan:
 
-- `get_seo_entitlement` dice si una organización tiene el módulo SEO (`seo_v1`) asignado, su tier (`contracted`/`trial`/`pilot`), cuántos site-audits le quedan en el mes y cuánto presupuesto de proveedor (USD) le queda. **Úsala PRIMERO**, antes de proponer cualquier operación SEO.
+- `get_seo_entitlement` dice si una organización tiene el módulo SEO (`seo_v2`) asignado, su tier (`contracted`/`trial`/`pilot`), cuántos site-audits le quedan en el mes y cuánto presupuesto de proveedor (USD) le queda. **Úsala PRIMERO**, antes de proponer cualquier operación SEO.
 - `get_seo_keyword_opportunities` lista las oportunidades striking-distance **medidas** (Google Search Console): posición ponderada, impresiones, clics incrementales estimados, quick wins y canibalización.
 - `get_seo_visibility_360` cruza los dos internets de búsqueda: posición orgánica medida (GSC) × citabilidad IA (score del AEO grader). Devuelve la **matriz quadrant** por keyword y del dominio: `dominante` (rankea y la IA lo cita), `riesgo` (rankea pero la IA NO lo cita — autoridad sin citabilidad, la señal de venta cruzada al AEO), `oportunidad` (citado sin rankear) e `invisible`.
 - `get_seo_rank_evolution` devuelve la serie temporal de **posiciones exactas por keyword** (fuente DataForSEO SERP; la captura diaria ya corrió sola — la tool solo lee). Parámetros opcionales: `organizationId` (obligatorio para binding `internal`), `rangeDays` (ventana en días, máx 1825), `engine`, `device` (`desktop`/`mobile`/`tablet`) y `keywords` (subset, máx 100). Ejemplo: `get_seo_rank_evolution {"organizationId": "…", "rangeDays": 30, "device": "desktop", "keywords": ["pintura para piscinas"]}` → `{ series: [{ keyword, points: [{ date, position, url }] }] }`.
@@ -221,7 +221,7 @@ Qué entregan:
 Reglas que el agente debe respetar:
 
 - **La organización se resuelve por el binding.** Un binding ligado a una organización solo ve la suya (pedir otra da `404`). Un binding `internal` debe pasar `organizationId`.
-- **Sin módulo `seo_v1` asignado, el recurso "no existe"** (`404`). No se puede inferir nada más de la organización desde ese 404.
+- **Sin módulo `seo_v2` asignado, el recurso "no existe"** (`404`). No se puede inferir nada más de la organización desde ese 404.
 - **Una lente faltante es un estado, no un cero.** `no_seo_data` / `no_aeo_data` / `target_not_configured` / `disabled` se reportan tal cual; NUNCA inventes un quadrant ni rellenes con ceros.
 - **Los dos ejes del 360 nunca se promedian**: rankeo y citabilidad son verdades ortogonales de motores distintos.
 - **En `get_seo_rank_evolution`, `position: null` en una fecha significa que el dominio no rankeó ese día.** Es una medición válida, no un error ni un hueco a rellenar. Y esa serie (DataForSEO) **nunca se promedia** con la serie de GSC — son fuentes distintas.

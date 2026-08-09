@@ -1,8 +1,8 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-05-10 por Claude
-> **Ultima actualizacion:** 2026-07-09 por Codex
-> **Documentacion tecnica:** [TASK-851](../../tasks/in-progress/TASK-851-production-release-orchestrator-workflow.md), [CLAUDE.md §Production Release Orchestrator invariants](../../../CLAUDE.md), [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md)
+> **Ultima actualizacion:** 2026-08-09 por Claude
+> **Documentacion tecnica:** [TASK-851](../../tasks/complete/TASK-851-production-release-orchestrator-workflow.md), [CLAUDE.md §Production Release Orchestrator invariants](../../../CLAUDE.md), [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md)
 
 # Orquestador de Release a Producción
 
@@ -68,10 +68,33 @@ El orquestador toma decisiones binarias claras en cada job:
 - **Vercel timeout 900s** → abortar
 - **Health soft-fail (exit 78)** → release `degraded` (operador decide rollback o forward-fix), NO aborta el orquestador
 
+Para verificar a mano en qué SHA quedaron los 4 workers Cloud Run existe `pnpm release:workers` (con `--expected-sha=<sha>` compara contra el target). Reemplaza el comando `gcloud` crudo que el runbook documentaba, que dejó de funcionar sin que nadie lo notara hasta que un release lo ejecutó.
+
 Desde el hardening 2026-05-11, los workers Cloud Run no hacen production deploy
 automatico por `push:main`. `push:develop` sigue actualizando staging; production
 normal se ejecuta via `workflow_call` dentro de `production-release.yml`.
 `workflow_dispatch` queda reservado para break-glass auditado.
+
+## Que mira el gate del batch (y que pasa cuando no mira nada)
+
+Uno de los 12 checks del preflight, `release_batch_policy`, es el que responde "¿que agrega este release sobre lo que produccion ya tiene?". Clasifica los archivos que cambian por dominio (payroll, finance, migraciones, auth, cloud) y avisa cuando el batch mezcla dominios independientes o toca algo irreversible sin dejarlo documentado.
+
+Hasta el 2026-08-09 ese check comparaba contra la punta de `main`. El problema es cuando corre: el orquestador se dispara con el codigo **ya mergeado**, asi que comparar contra `main` era compararlo consigo mismo. El resultado era un diff vacio y una aprobacion automatica. Paso en tres releases seguidos, y uno de ellos llevaba 1045 archivos y 14 migraciones que el gate reporto como "0 archivos".
+
+Desde TASK-1676 el punto de comparacion es el **ultimo release que efectivamente quedo en produccion** (el que el sistema tiene registrado como `released`), no la punta de la rama. Eso hace que el check mire lo mismo antes y despues del merge, y que la comparacion sea la que el operador cree que es.
+
+Dos consecuencias practicas para quien lee el resultado:
+
+- **Un diff vacio ya no aprueba nada.** Cuando el check no encuentra archivos que comparar, ya no dice "todo bien": reporta que **no pudo evaluar** el batch. Es deliberado que no diga "error" — no se sabe que el release este mal, se sabe que el gate no vio nada, y el operador tiene que poder distinguir "me estan frenando" de "no pudieron mirar". En la practica frena igual, porque el preflight solo deja avanzar con todo en verde.
+- **El resultado declara contra que compare.** El JSON del preflight ahora dice cual fue la base, de donde salio (el manifest del release anterior, o la punta de la rama cuando la rama no tiene releases registrados) y el ID de ese release. Sirve para diagnosticar de un vistazo por que un batch salio mas grande o mas chico de lo esperado, en vez de tener que investigarlo.
+
+### El marker `[release-coupled: ...]`
+
+Cuando un release mezcla a proposito dos dominios sensibles (porque la dependencia es real), la forma de declararlo es escribir `[release-coupled: <razon>]` en el cuerpo del commit de squash. Eso neutraliza la alerta de "esto deberian ser dos releases".
+
+Desde TASK-1676 ese marker tiene dos condiciones estrictas: **abre una linea propia** y se lee **solo del commit que se esta promoviendo**. Antes bastaba con que la frase apareciera mencionada de pasada en cualquier commit del rango — incluso citada dentro de un documento —, y eso apagaba la deteccion completa. El caso mas elocuente: el commit que creo la tarea para arreglar este defecto la disparaba, porque explicaba el problema citando el literal.
+
+Consecuencia esperada: en la corrida local, antes de mergear, el commit de squash todavia no existe, asi que el marker no puede leerse ahi. El flujo correcto es ver la alerta en local, escribir el marker en el squash, y dejar que el orquestador lo lea. No es una falla.
 
 ## Como integra con el ecosystem
 
@@ -102,7 +125,7 @@ El orquestador es un workflow GitHub Actions, pero el operador casi nunca lo dis
 
 Ninguna interfaz es un motor de release nuevo: las dos terminan corriendo `production-release.yml` y escribiendo en `release_manifests`. La diferencia con disparar el workflow crudo es que el harness **fuerza el orden seguro** (preflight → promoción → orquestador → approval → workers/Vercel/Azure → health → manifest → watchdog → flags del ledger) y exige aprobación humana explícita por cada mutación externa (push, dispatch, approval gate, deploy, flags, rollback). El agente lee y propone; la persona autoriza cada paso.
 
-> **Condiciones esperadas del flujo por squash (no son fallas).** Como cada release se promueve con *squash-merge*, `main` y `develop` divergen. Eso produce señales que parecen errores pero son conocidas: el PR develop→main puede requerir un merge de sincronización, un check de política puede marcar un archivo que **ya está en producción**, y los avisos de smoke/CI del commit fresco de `main` se resuelven con una razón de bypass documentada. El runbook (§2.3) y la skill `greenhouse-production-release` explican cómo reconocerlas y resolverlas paso a paso; el fondo (que el clasificador de política deje de marcar archivos ya desplegados) está registrado en **ISSUE-114**.
+> **Condiciones esperadas del flujo por squash (no son fallas).** Como cada release se promueve con *squash-merge*, `main` y `develop` divergen. Eso produce señales que parecen errores pero son conocidas: el PR develop→main puede requerir un merge de sincronización, un check de política puede marcar un archivo que **ya está en producción**, y los avisos de smoke/CI del commit fresco de `main` se resuelven con una razón de bypass documentada. El runbook (§2.3) y la skill `greenhouse-production-release` explican cómo reconocerlas y resolverlas paso a paso. El caso del archivo ya desplegado se cerró de raíz en **ISSUE-114** (2026-08-08): el clasificador dejó de resucitar archivos byte-idénticos a producción.
 
 > **Leccion operativa 2026-07-09.** Un agente no debe tratar condiciones comunes
 > del release como descubrimiento nuevo. Approvals, workers lentos, Azure

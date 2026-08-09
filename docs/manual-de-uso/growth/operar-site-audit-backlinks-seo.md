@@ -19,7 +19,7 @@ Dos capturas del módulo SEO (EPIC-022) que responden "¿qué está roto técnic
 
 ## Antes de empezar
 
-- La org debe tener el módulo `seo_v1` asignado (`docs/manual-de-uso/growth/asignar-modulo-seo-organizacion.md`)
+- La org debe tener el módulo `seo_v2` asignado (`docs/manual-de-uso/growth/asignar-modulo-seo-organizacion.md`)
   y un `seo_target` activo.
 - `GROWTH_SEO_ENABLED=true` en el ops-worker (ya ON desde TASK-1302).
 - El audit **consume el cupo mensual de site-audits del tier** (contracted 8/mes,

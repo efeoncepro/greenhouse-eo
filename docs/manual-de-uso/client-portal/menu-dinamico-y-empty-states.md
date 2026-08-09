@@ -67,6 +67,8 @@ Si un cliente reporta "no veo X" o "veo cosas que no compre":
 3. Si sigue sin verlo: revisa que la pagina especifica que el cliente quiere ver tenga su `view_code` en algun modulo activo del cliente. El mapping `module → view_codes[]` lo ves en el catalogo (`/admin/client-portal/catalog`).
 4. Verifica que el `view_code` este en `greenhouse_core.role_view_assignments` para el role del cliente. Si NO esta, hay un gap de gobernanza (ver Caso 5 abajo).
 
+> **Delta 2026-08-09 (TASK-1675):** el paso 4 aplica a las vistas cliente *legacy*. Los items de modulo del menu ya NO dependen de `role_view_assignments` — se componen desde `module_assignments`, igual que el gate de cada page. Para las vistas module-gated (por ejemplo `cliente.growth_seo_dashboard`) la fila esta sembrada a proposito con `granted = FALSE`: ponerla en `TRUE` convierte el acceso en visibilidad role-wide para todos los clientes con ese rol. Diagnostico especifico del menu: [Diagnosticar un modulo contratado que no aparece en el menu](diagnosticar-modulo-no-visible-en-menu.md).
+
 **Atajo SQL para diagnosticar (read-only):**
 
 ```sql

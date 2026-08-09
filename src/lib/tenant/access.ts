@@ -9,6 +9,7 @@ import {
   isLikelyEfeonceProfileMatch
 } from '@/lib/tenant/internal-email-aliases'
 import { resolveAuthorizedViewsForUser } from '@/lib/admin/view-access-store'
+import { captureWithDomain } from '@/lib/observability/capture'
 import { updateTenantLastLogin as updateClientTenantLastLogin } from '@/lib/tenant/clients'
 import { dispatchWelcomeNotification } from '@/lib/notifications/welcome'
 import {
@@ -257,7 +258,25 @@ const resolveTenantRuntimeAccess = async (record: TenantAccessRecord): Promise<T
       authorizedViews: resolvedAccess.authorizedViews
     }
   } catch (error) {
-    console.warn('Unable to resolve persisted authorized views. Falling back to route-group baseline.', error)
+    // TASK-1678 Slice 4 — un claim de autorización que se vacía no puede ser sólo un log.
+    //
+    // Este catch deja la sesión VIVA con `authorizedViews: []`, que es la decisión
+    // correcta (no romper el login por un fallo de la derivación) pero era invisible:
+    // un `console.warn` sin Sentry ni señal. Y combinado con el `fallback` de lista
+    // vacía de `hasAuthorizedViewCode`, ese estado se traducía en "mostrar todo" para
+    // las sesiones cliente. Lo segundo lo cierra `resolveEmptyClaimFallback`; lo
+    // primero, esta emisión.
+    captureWithDomain(error, 'identity', {
+      tags: {
+        source: 'resolve_tenant_runtime_access',
+        tenantType: record.tenantType
+      },
+      extra: {
+        userId: record.userId,
+        roleCodes: record.roleCodes,
+        routeGroups: record.routeGroups
+      }
+    })
 
     return {
       ...record,

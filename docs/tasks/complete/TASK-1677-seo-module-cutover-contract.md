@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Bajo`
@@ -384,3 +384,38 @@ UPDATE greenhouse_client_portal.module_assignments
 
 Estado medido al 2026-08-09: **2 assignments `seo_v1` vigentes**, ambos con su `seo_v2` hermano
 `active`. La migración debería afectar 2 filas y el `DO` pasar sin excepción.
+
+
+## Delta de cierre 2026-08-09 — completa, verificada en producción
+
+Los Slices 2 y 3 se ejecutaron el mismo día que el Slice 1, pero **después** del release que desplegó
+el código, que es lo que el ordering exige.
+
+**Canary antes de tocar datos.** La superficie `/growth/seo` de Grupo Berel contra producción, con
+sesión real: abre, muestra datos medidos (`Search Console · corte 2026-08-06`), sin estado de "sin
+entitlement" y sin `console.error`. Eso prueba que el código desplegado —que lee sólo `seo_v2`—
+resuelve el entitlement, que era la precondición.
+
+**Slice 2 aplicado**: migración `20260809163352129_task-1677-seo-module-cutover-contract`. Superseded
+los 2 assignments `seo_v1` vigentes por `effective_to = CURRENT_DATE`. El bloque `DO` verificó que
+ninguna organización quedara sin cobertura y no abortó. Estado medido después:
+
+| Verificación | Resultado |
+|---|---|
+| `seo_v1` vigentes | 0 |
+| `seo_v1` superseded hoy | 2 (`org-2df565fb…` y `org-32333527…`) — historia preservada |
+| `seo_v2` vigentes | 2, ambos `active` — nadie perdió cobertura |
+| Fila `seo_v1` en `modules` | sigue existiendo (append-only) |
+
+**Canary después**: verde otra vez, mismo resultado. La verificación se hizo con el canary y **no con
+un `SELECT`**, que fue la causa de método del incidente original.
+
+**Slice 3**: `ISSUE-143` cerrada del todo, §10.7 de la arquitectura pasa de "EN CURSO" a "CERRADO", y
+el encabezado del doc deja de decir que los datos siguen abiertos.
+
+### Lo que conviene no perder de este cutover
+
+Un expand/contract **no cabe en un solo release por construcción**. El check `postgres_migrations` del
+preflight es estricto: una migración commiteada y sin aplicar bloquea el release. Y aplicarla antes del
+deploy del código es lo que el ordering prohíbe. Las dos reglas juntas obligan a dos ciclos, y eso no
+es burocracia: es la única forma de tener un punto de verificación entre el código y los datos.

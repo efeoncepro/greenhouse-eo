@@ -34,7 +34,7 @@
 
 | Actor | Puede ver | Puede ejecutar | Gate |
 |---|---|---|---|
-| Operador con read + configure | resultados, builder, actions | discovery y tracking | capability + `seo_v1` assignment |
+| Operador con read + configure | resultados, builder, actions | discovery y tracking | capability + `seo_v2` assignment |
 | Operador sólo read | resultados y estado | no provider, no tracking | CTA/actions de gasto no se renderizan |
 | Nexa interno | reader y propone command | sólo tras confirmación humana | binding interno + action loop |
 | MCP read client | reader client-safe si assignment | no discovery write | `efeonce.mcp.read` |

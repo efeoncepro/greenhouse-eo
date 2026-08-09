@@ -37,7 +37,7 @@ Responde si una organización tiene Search Visibility 360 habilitado y en qué c
 
 | Campo | Qué significa |
 |---|---|
-| Tiene módulo | Si existe la asignación `seo_v1` vigente para esa organización. |
+| Tiene módulo | Si existe la asignación `seo_v2` vigente para esa organización. |
 | Tier | El plano comercial: `contracted`, `trial` o `pilot`. |
 | Auditorías restantes | Cuántos análisis técnicos del sitio quedan este mes. |
 | Presupuesto restante | Cuántos dólares de proveedor quedan este mes. |
@@ -107,7 +107,7 @@ Un caso real del día de la habilitación: la propia organización Efeonce respo
 Dos capas gobiernan el acceso, y ninguna se relaja por venir de un asistente:
 
 - **Identidad.** El punto de acceso exige cuenta corporativa. Hoy está limitado al tenant interno de Efeonce; no hay acceso self-service de clientes.
-- **Módulo por organización.** El SEO se habilita **por organización, no por rol**. Una organización tiene Search Visibility 360 cuando alguien le asignó el módulo `seo_v1` con un tier comercial.
+- **Módulo por organización.** El SEO se habilita **por organización, no por rol**. Una organización tiene Search Visibility 360 cuando alguien le asignó el módulo `seo_v2` con un tier comercial.
 
 Sobre una organización **sin** el módulo, las dos consultas de datos responden **"no existe"** en vez de "no tienes permiso". Es deliberado: un "no tienes permiso" confirmaría que la organización existe y que se llama así. Quien no tiene acceso tampoco aprende nada preguntando. Es la misma disciplina que ya usa el resto de la plataforma.
 
