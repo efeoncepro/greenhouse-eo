@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -26,6 +26,69 @@
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Recalibración 2026-08-09 — medido contra PG antes de implementar
+
+Discovery contra PG invalidó tres premisas. Se corrigen acá antes de escribir código.
+
+### 1. El Goal no era alcanzable con código. Hoy NINGUNA organización abre NINGUNA de las 9.
+
+La spec decía que arreglar la llave «desbloquea 3 de las 9: las únicas cuyo viewCode está declarado
+en algún módulo». Eso es cierto **a nivel de catálogo** y falso **a nivel de datos**: los módulos que
+declaran `cliente.proyectos` / `cliente.campanas` / `cliente.equipo` / `cliente.reviews` son
+`creative_hub_globe_v1` y `equipo_asignado`, y **nadie los tiene asignados**.
+
+`module_assignments` tiene 7 filas en toda su historia, 5 vigentes:
+
+| Organización | Módulos vigentes | De las 9 alcanza |
+|---|---|---|
+| Grupo Berel | `ai_visibility_v1`, `seo_v2` | ninguna |
+| Sky Airlines | `ai_visibility_v1` | ninguna |
+| Efeonce (su propia org) | `proposal_studio_v1`, `seo_v2` | ninguna |
+| Greenhouse Demo | — | ninguna |
+| ANAM | — | ninguna |
+
+Arreglar la llave desbloquea **0** páginas con los datos de hoy, no 3.
+
+**Goal corregido:** las 3 vistas base abren para todo cliente con `organizationId` resuelto; las 6
+module-gated muestran el empty state correcto hasta que su módulo se asigne. Abrir las Creative es
+**asignar `creative_hub_globe_v1` a Sky Airlines** — decisión comercial sobre datos productivos, y
+queda fuera de esta task por eso. Decisión del operador 2026-08-09: Creative es de SKY y de nadie más.
+
+### 2. La allowlist base baja de 5 a 3 vistas
+
+Decisión del operador 2026-08-09, a la luz de que Creative es sólo de SKY: un cliente sin Creative no
+tiene ciclos ni analytics que mostrar, así que dejarlos base sería darle páginas permanentemente
+vacías.
+
+| Vista | Antes | Ahora | Por qué |
+|---|---|---|---|
+| `cliente.notificaciones` | base | **base** | nadie contrata ver sus notificaciones |
+| `cliente.configuracion` | base | **base** | configuración de la propia cuenta |
+| `cliente.actualizaciones` | base | **base** | comunicación transversal, no producto |
+| `cliente.ciclos` | base | **module-gated** | un ciclo de entrega es superficie de delivery |
+| `cliente.analytics` | base | **module-gated** | reporting depende del servicio contratado |
+
+Consecuencia: `cliente.ciclos` y `cliente.analytics` quedan sin módulo que las declare. Es el mismo
+estado que las Creative — empty state honesto — y se resuelve declarándolas en el módulo que
+corresponda, no en código.
+
+### 3. La persona `agent-client` no servía, y ahora se construye para servir
+
+`agent-client@greenhouse.efeonce.org` tiene `organization_id = NULL`: su `client_id`
+(`agent-client-sandbox`) no tiene fila en `spaces`, y `session_360` deriva la organización por
+`client_users.client_id → spaces (active) → organizations (active)`. Después del fix seguiría sin
+entrar, pero por el camino "sin organización" — un tercer resultado distinto del empty state.
+
+Decisión del operador 2026-08-09: que la persona pueda tomar la organización de cualquier cliente.
+Se implementa con **cuatro condiciones independientes fail-closed** (flag env default-OFF · bloqueo
+duro si `NODE_ENV=production` · allowlist de `user_id` de personas agente · `captureWithDomain` en
+cada uso), y con un `space` propio que la resuelve por defecto a **Greenhouse Demo** (0 módulos), que
+es la organización correcta para el caso empty state.
+
+Riesgo aceptado y declarado: la credencial de esta persona está documentada en `CLAUDE.md`, así que
+con el flag encendido esa credencial lee el portal de cualquier organización. Por eso el flag es
+default-OFF, nunca producción, y cada uso queda en Sentry.
 
 ## Summary
 
@@ -55,9 +118,18 @@ fail-closed. Arreglar el guard primero abre una ventana en la que el cliente ve 
 
 ## Goal
 
-- Las 9 páginas abren para un cliente cuya organización corresponde.
-- Una organización sin el módulo sigue viendo el empty state — el fail-closed legítimo no se toca.
+> Corregido 2026-08-09 — ver §Recalibración. El goal original («las 9 abren») no era alcanzable con
+> código: 6 de las 9 dependen de módulos que ninguna organización tiene asignados.
+
+- Las **3 vistas base** (`notificaciones`, `configuracion`, `actualizaciones`) abren para todo cliente
+  con `organizationId` resuelto.
+- Las **6 module-gated** muestran el empty state correcto en vez de el banner de degradación. Abrirlas
+  es asignar su módulo, no cambiar código.
+- El camino `denied` deja de ser inalcanzable, y una denegación legítima deja de reportarse a Sentry
+  como falla del resolver.
 - El guard deja de poder confundir espacios de identificadores, y eso queda fijado por un test.
+- Existe una persona de verificación que puede recorrer el portal de cualquier organización, con el
+  acceso gated por flag default-OFF, bloqueado en producción y auditado.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -340,10 +412,15 @@ Ninguna.
 
 ## Acceptance Criteria
 
-- [ ] Las 9 páginas abren para un cliente cuya organización corresponde, verificado en runtime.
-- [ ] Una organización sin el módulo sigue viendo el empty state en las module-gated.
-- [ ] Las 5 vistas base abren para un cliente sin ningún módulo contratado.
-- [ ] `/reviews` abre, y el viewCode que la gatea coincide con el que declara su módulo.
+> Corregidos 2026-08-09 — ver §Recalibración.
+
+- [ ] Las **3** vistas base abren para un cliente sin ningún módulo contratado, verificado en runtime.
+- [ ] Las **6** module-gated muestran el empty state (`ModuleNotAssignedEmpty`), no el banner de
+      degradación, y no emiten incidente a Sentry al denegar.
+- [ ] El viewCode que gatea `/reviews` coincide con el que declara su módulo (`cliente.reviews`).
+      Que la página **abra** depende de asignar `creative_hub_globe_v1`, fuera de alcance.
+- [ ] La persona de verificación puede tomar la organización de cualquier cliente, y ese acceso está
+      gated por flag default-OFF + bloqueo en producción + allowlist de persona + auditoría.
 - [ ] El guard usa `organizationId`, y existe un test que falla si alguien vuelve a pasar un `clientId`.
 - [ ] Un cliente sin `organizationId` resuelto no obtiene acceso por omisión, y la señal lo registra.
 - [ ] La allowlist de vistas base no consulta `role_view_assignments`.
