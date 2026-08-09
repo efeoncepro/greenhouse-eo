@@ -1,22 +1,26 @@
 /**
- * TASK-1679 Slice 7 — Verificación de las 9 páginas del portal cliente.
+ * TASK-1679 Slice 7 — Verificación de las 9 páginas guardadas del portal cliente.
  *
- * Declara el resultado ESPERADO por ruta antes de correr, y lo compara contra lo que el
- * resolver canónico responde para cada organización real. El orden importa: si el esperado
- * se escribe después de ver el resultado, el check no prueba nada.
+ * Compara, para cada organización cliente real, lo que responde el resolver canónico contra
+ * lo que los **datos** dicen que debería responder. No es un snapshot de resultados
+ * esperados: la expectativa se deriva en cada corrida (ver el comentario de
+ * `GUARDED_PAGES`), así que el check sobrevive a cualquier assignment de módulo nuevo.
  *
- * Los tres resultados posibles del guard, que antes de TASK-1679 eran indistinguibles porque
- * los tres salían como `?error=resolver_unavailable`:
+ * Los tres resultados que el guard puede producir, y que antes de TASK-1679 eran
+ * indistinguibles porque los tres salían como `?error=resolver_unavailable`:
  *
- *   - `abre`         — vista base, o módulo contratado que la declara
- *   - `empty_state`  — module-gated y la organización no tiene ese módulo (fail-closed correcto)
- *   - `sin_org`      — la sesión no tiene organización resuelta (no hay contra qué evaluar)
+ *   - abre         — vista base, o módulo contratado que declara el viewCode
+ *   - empty_state  — module-gated y la organización no tiene ese módulo (fail-closed correcto)
+ *   - sin_org      — la sesión no tiene organización resuelta; no hay contra qué evaluar
+ *                    módulos. Este script sólo recorre organizaciones resueltas, así que ese
+ *                    tercer camino lo cubre la señal
+ *                    `identity.client_portal.client_without_organization`.
  *
  * Usage:
  *   npx tsx --require ./scripts/lib/server-only-shim.cjs \
  *     scripts/identity/client-portal-page-access-check.ts
  *
- * Exit 1 si algún resultado real difiere del esperado.
+ * Exit 1 si el resolver y los datos discrepan en alguna combinación.
  */
 
 import { applyGreenhousePostgresProfile, loadGreenhouseToolEnv } from '../lib/load-greenhouse-tool-env'
@@ -28,22 +32,31 @@ import { query } from '@/lib/db'
 
 type Expectation = 'abre' | 'empty_state'
 
-/** Las 9 rutas guardadas, con el viewCode que cada page pide hoy. */
-const GUARDED_PAGES: readonly { route: string; viewCode: string; expected: Expectation }[] = [
-  // Las 3 base: abren para toda organización resuelta, sin módulo.
-  { route: '/notifications', viewCode: 'cliente.notificaciones', expected: 'abre' },
-  { route: '/settings', viewCode: 'cliente.configuracion', expected: 'abre' },
-  { route: '/updates', viewCode: 'cliente.actualizaciones', expected: 'abre' },
-
-  // Las 6 module-gated. Ninguna organización tiene hoy `creative_hub_globe_v1` ni
-  // `equipo_asignado`, y `cliente.ciclos`/`cliente.analytics` no las declara ningún módulo,
-  // así que el esperado para TODAS es el empty state. Abrirlas es asignar su módulo.
-  { route: '/proyectos', viewCode: 'cliente.proyectos', expected: 'empty_state' },
-  { route: '/campanas', viewCode: 'cliente.campanas', expected: 'empty_state' },
-  { route: '/equipo', viewCode: 'cliente.equipo', expected: 'empty_state' },
-  { route: '/reviews', viewCode: 'cliente.reviews', expected: 'empty_state' },
-  { route: '/sprints', viewCode: 'cliente.ciclos', expected: 'empty_state' },
-  { route: '/analytics', viewCode: 'cliente.analytics', expected: 'empty_state' }
+/**
+ * Las 9 rutas guardadas, con el viewCode que cada page pide hoy.
+ *
+ * 🔴 **El resultado esperado se DERIVA de los datos, no se hardcodea.** La primera versión
+ * de este script fijaba "3 abren y 6 empty state", que era el estado del día que se
+ * escribió. En el momento en que a Sky Airlines se le asignó `creative_hub_globe_v1`, el
+ * gate reportó cuatro desvíos **por hacer lo correcto** — y la salida fácil habría sido
+ * editar los esperados uno por uno.
+ *
+ * Un gate que se edita por organización no prueba que el carril funcione: prueba que la
+ * primera organización sigue igual. Así que la expectativa se computa de la misma fuente
+ * que el producto: una ruta abre si su viewCode es vista base **o** si algún módulo vigente
+ * de esa organización lo declara. Lo que el check verifica entonces es el invariante real —
+ * que el resolver coincide con los datos — y sobrevive a cualquier assignment futuro.
+ */
+const GUARDED_PAGES: readonly { route: string; viewCode: string }[] = [
+  { route: '/notifications', viewCode: 'cliente.notificaciones' },
+  { route: '/settings', viewCode: 'cliente.configuracion' },
+  { route: '/updates', viewCode: 'cliente.actualizaciones' },
+  { route: '/proyectos', viewCode: 'cliente.proyectos' },
+  { route: '/campanas', viewCode: 'cliente.campanas' },
+  { route: '/equipo', viewCode: 'cliente.equipo' },
+  { route: '/reviews', viewCode: 'cliente.reviews' },
+  { route: '/sprints', viewCode: 'cliente.ciclos' },
+  { route: '/analytics', viewCode: 'cliente.analytics' }
 ]
 
 const main = async () => {
@@ -62,23 +75,61 @@ const main = async () => {
     `
   )
 
+  // La expectativa sale de los datos: qué viewCodes declara algún módulo VIGENTE de cada
+  // organización. Misma fuente que el producto, distinto camino de lectura (SQL directo vs
+  // el resolver con su cache), así que el check sigue siendo una comparación real.
+  const declaredRows = await query<{ organization_id: string; view_code: string }>(
+    `
+      SELECT DISTINCT a.organization_id, vc AS view_code
+      FROM greenhouse_client_portal.module_assignments a
+      JOIN greenhouse_client_portal.modules m
+        ON m.module_key = a.module_key AND m.effective_to IS NULL
+      CROSS JOIN LATERAL unnest(m.view_codes) AS vc
+      WHERE a.effective_to IS NULL
+        AND a.status IN ('active', 'pilot')
+        AND (a.expires_at IS NULL OR a.expires_at > now())
+    `
+  )
+
+  const declaredByOrg = new Map<string, Set<string>>()
+
+  for (const row of declaredRows) {
+    const current = declaredByOrg.get(row.organization_id) ?? new Set<string>()
+
+    current.add(row.view_code)
+    declaredByOrg.set(row.organization_id, current)
+  }
+
   console.log(`[TASK-1679 Slice 7] ${organizations.length} organizaciones cliente con sesión activa\n`)
 
   const failures: string[] = []
+  let opens = 0
+  let empties = 0
 
   for (const org of organizations) {
+    const declared = declaredByOrg.get(org.organization_id) ?? new Set<string>()
+
     console.log(`── ${org.organization_name} (${org.organization_id})`)
 
     for (const page of GUARDED_PAGES) {
+      const base = isClientPortalBaseViewCode(page.viewCode)
+      const expected: Expectation = base || declared.has(page.viewCode) ? 'abre' : 'empty_state'
+
       const allowed = await hasViewCodeAccess(org.organization_id, page.viewCode)
       const actual: Expectation = allowed ? 'abre' : 'empty_state'
-      const ok = actual === page.expected
-      const base = isClientPortalBaseViewCode(page.viewCode) ? ' [base]' : ''
+      const ok = actual === expected
 
-      console.log(`   ${ok ? '✓' : '✗'} ${page.route.padEnd(16)} ${actual.padEnd(12)}${base}`)
+      if (actual === 'abre') opens++
+      else empties++
+
+      const why = base ? '[base]' : declared.has(page.viewCode) ? '[módulo contratado]' : ''
+
+      console.log(`   ${ok ? '✓' : '✗'} ${page.route.padEnd(16)} ${actual.padEnd(12)}${why}`)
 
       if (!ok) {
-        failures.push(`${org.organization_name} ${page.route}: esperado ${page.expected}, real ${actual}`)
+        failures.push(
+          `${org.organization_name} ${page.route}: los datos dicen ${expected}, el resolver dice ${actual}`
+        )
       }
     }
 
@@ -88,15 +139,14 @@ const main = async () => {
   console.log('─'.repeat(72))
 
   if (failures.length > 0) {
-    console.error(`❌ ${failures.length} resultado(s) distinto(s) del esperado:`)
+    console.error(`❌ ${failures.length} desvío(s) entre el resolver y los datos:`)
     for (const failure of failures) console.error(`  - ${failure}`)
     process.exit(1)
   }
 
-  const opens = GUARDED_PAGES.filter(p => p.expected === 'abre').length
-
-  console.log(`✅ Las 9 rutas se comportan como se declaró: ${opens} abren y ${9 - opens} muestran el empty state.`)
-  console.log('   Las 6 del empty state se abren asignando su módulo, no cambiando código.')
+  console.log(`✅ El resolver coincide con los datos en las ${organizations.length * GUARDED_PAGES.length} combinaciones.`)
+  console.log(`   ${opens} abren · ${empties} muestran el empty state.`)
+  console.log('   Las del empty state se abren asignando su módulo, no cambiando código.')
 }
 
 main()
