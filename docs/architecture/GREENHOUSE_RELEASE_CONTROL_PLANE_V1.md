@@ -909,11 +909,38 @@ CLI `pnpm release:preflight` que ejecuta los **12 checks fail-fast** ANTES de pr
 | 11 | azure_wif_subject | degraded (warning; bloquea production normal via `readyToDeploy=false`) | az CLI |
 | 12 | sentry_critical_issues | strict (>=10 → error, 1-9 → warning, API down → unknown bloquea) | Sentry API |
 
-**Check #4 release_batch_policy** (mas novel): clasifica diff `origin/main...target_sha` por dominio (`payroll`, `finance`, `auth_access`, `cloud_release`, `db_migrations`, `ui`, `docs`, `tests`, `config`, `unclassified`), detecta sensitive paths, computa irreversibility flags. Decision tree:
-- Empty → `ship`
-- INDEPENDENT sensitive mix sin marker `[release-coupled: <razon>]` en commit body → `split_batch` (error)
+**Check #4 release_batch_policy** (mas novel): clasifica el diff del release por dominio (`payroll`, `finance`, `auth_access`, `cloud_release`, `db_migrations`, `ui`, `docs`, `tests`, `config`, `unclassified`), detecta sensitive paths, computa irreversibility flags. Decision tree:
+- **Diff vacío → `severity: unknown`** (NUNCA `ship` — ver abajo)
+- INDEPENDENT sensitive mix sin marker `[release-coupled: <razon>]` → `split_batch` (error)
 - Cualquier IRREVERSIBLE domain (db_migrations, auth_access, payroll, finance, cloud_release) → `requires_break_glass` (error a menos que `--override-batch-policy` flag con capability)
 - Solo dominios reversibles → `ship`
+
+##### Base del diff y lectura del marker (TASK-1676, cierra ISSUE-145)
+
+La base **no** es `origin/<targetBranch>`. La pregunta que este check existe para responder es *"¿qué
+agrega este release sobre lo que producción ya tiene?"*, y `origin/main` sólo la aproxima antes del
+merge: el orquestador corre el preflight con el `target_sha` **ya mergeado**, así que el rango quedaba
+vacío y el gate aprobaba sin mirar nada. Tres releases consecutivos reportaron `filesChanged=0,
+decision=ship`, uno de ellos con 1045 archivos y 14 migraciones.
+
+- **Ancla canónica:** `target_sha` del último manifest en estado `released` para esa rama, vía
+  `src/lib/release/preflight/last-released-reader.ts`. El filtro por estado es obligatorio:
+  `listRecentReleases` no filtra, y conviven manifests `aborted` con el mismo `target_sha` que uno
+  `released`. `rolled_back` queda excluido por el mismo filtro, así que el ancla nunca apunta a código
+  que se sacó de producción.
+- **Fallback:** sin manifest `released` para la rama (o si el reader falla), la base cae a
+  `origin/<branch>` y el evidence lo declara con `diffBaseSource: 'branch_head_fallback'`.
+- **Regla dura — un diff vacío nunca es aprobación.** El invariante está formulado sobre el
+  *resultado*, no sobre la base: da igual de dónde salga el ancla, si el rango no contiene nada el
+  check no miró nada. Es `unknown` y no `error` porque no se sabe que el batch esté mal, se sabe que
+  no se pudo evaluar — y el operador tiene que poder distinguir "el gate me frena" de "el gate no
+  pudo mirar".
+- **El marker se lee SÓLO del cuerpo del `target_sha`** (`git show -s`), y la regex exige que abra la
+  línea. Antes bastaba una mención en cualquier commit del rango, y el marker desactiva de una sola
+  vez TODA la detección de mezcla: una cita en prosa neutralizaba `split_batch` para un batch entero.
+- **Auditabilidad:** el evidence gana `diffBase`, `diffBaseSource` y `diffBaseReleaseId` (opcionales,
+  aditivos — el `contractVersion` no bumpea). Sin eso, tres releases dijeron `filesChanged=0` y no
+  había forma de saber desde el artefacto si el release estaba vacío o la base estaba mal.
 
 **3 capabilities granulares least-privilege** (migration `20260510144012098_task-850-preflight-capabilities.sql`):
 

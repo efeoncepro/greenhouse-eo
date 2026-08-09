@@ -1,5 +1,38 @@
 # Handoff activo
 
+### TASK-1676 — el gate de release dejó de aprobar sin mirar (cierra ISSUE-145)
+
+Cerrada en `develop`. El `release_batch_policy` comparaba contra `origin/main` y el orquestador lo
+corre con el `target_sha` ya mergeado: rango vacío, `ship` silencioso. Ahora ancla al `target_sha`
+del último manifest `released`.
+
+**Lo que necesita quien siga:**
+
+1. 🔴 **El próximo release va a pedir break-glass, y no es un bug.** Con el gate arreglado, el
+   preflight del batch actual reporta `requires_break_glass` por `cloud_release: 6` — y los 6 archivos
+   son el propio fix del gate. El gate está detectando que el batch mezcla trabajo funcional del portal
+   cliente (TASK-1675) con un cambio del control plane (TASK-1676), que es exactamente lo que la spec
+   de 1676 declaraba: *"va en su propio release, no mezclado con trabajo funcional"*. **Lo limpio son
+   dos releases: primero 1676 sola, después el funcional.**
+2. **Un `filesChanged=0` ya no es aprobación: es `unknown`.** Si lo ves, o el target coincide con el
+   último release desplegado, o la base no se pudo resolver. El summary dice contra qué base comparó y
+   de qué release id salió — el artefacto por fin es auditable.
+3. **El marker `[release-coupled: …]` cambió de formato y ahora es estricto.** Tiene que ABRIR una
+   línea del cuerpo del squash, y se lee SÓLO de ese commit. Un marker a mitad de línea ya no cuenta.
+   Antes bastaba mencionarlo en cualquier commit del rango — y una cita en prosa neutralizaba
+   `split_batch` para un batch entero.
+4. **Open Question viva, y es de proceso, no de código:** el classifier marca `requires_break_glass`
+   ante UN SOLO dominio irreversible, sin mezcla. La matriz del runbook §2.2 considera legítimo un
+   release de migración acoplado a su consumer. Con el gate arreglado eso deja de ser teórico: todo
+   release que toque `src/lib/release/**`, `migrations/` o `.github/workflows/` va a pedir break-glass.
+   O se relaja la severidad, o se endurece la matriz.
+5. **`pnpm release:workers`** reemplaza el `gcloud run services describe` crudo del runbook §4.1 (el
+   que crasheaba con `TransformFilter()`). Si falla por flags, cambió la herramienta: se corrige el
+   wrapper, no cada bloque de doc.
+6. La lista forense de `ignored-pending-runs.ts` quedó **vacía**: el run 31126022507 se verificó por
+   API como `cancelled`.
+
+
 ### TASK-1675 — el menú del portal cliente ya compone sus módulos (code complete, rollout pendiente)
 
 Cerrada en `develop`. El menú del cliente leía `authorizedViews` mientras el gate de cada page leía

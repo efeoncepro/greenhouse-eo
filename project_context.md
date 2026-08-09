@@ -162,6 +162,13 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 - Greenhouse: desarrollo normal local-first sobre `develop`. Globe: trabajo directo sobre su rama única `main`.
   Ninguna de las dos ramas autoriza push, deploy, release o promoción automática sin instrucción humana explícita.
 - Producción: `main` y `https://greenhouse.efeoncepro.com`; promoción mediante el release control plane.
+  Desde `TASK-1676` (2026-08-09) el `release_batch_policy` del preflight ancla su diff al `target_sha`
+  del último manifest `released` y no a `origin/main` — antes, post-merge el rango quedaba vacío y el
+  gate aprobaba sin mirar. Dos consecuencias operativas: **un `filesChanged=0` ya no es aprobación
+  sino `unknown`**, y el marker `[release-coupled: …]` sólo cuenta si **abre una línea** del cuerpo del
+  commit de squash. Estado de workers: `pnpm release:workers`. Contrato en
+  `GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md` §check #4 + skill `greenhouse-production-release` (espejada
+  `.claude`/`.codex`).
 - Staging/preview y producción tienen configuración separada. Flags, secrets y migraciones deben verificarse
   en cada runtime consumidor, no solo en Vercel.
 - El checkout compartido actual es el único entorno de ejecución autorizado. Nunca crear, usar ni tocar

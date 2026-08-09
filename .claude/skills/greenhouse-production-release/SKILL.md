@@ -181,7 +181,16 @@ gh workflow run production-release.yml \
 GITHUB_RELEASE_OBSERVER_TOKEN="$(gh auth token)" pnpm release:watchdog --json
 ```
 
-9. Verify Cloud Run `GIT_SHA` for mapped services when needed:
+9. Verify Cloud Run `GIT_SHA` for mapped services when needed. El comando canónico es
+   el wrapper — `gcloud` crudo sólo como último recurso, porque los snippets de CLI en
+   markdown se pudren en silencio (TASK-1676: tres comandos documentados fallaron en un
+   solo release, ninguno de los envueltos en `pnpm`):
+
+```bash
+pnpm release:workers --expected-sha=<target_sha>
+```
+
+   Servicios mapeados (el wrapper los lee de `RELEASE_DEPLOY_WORKFLOWS`, no los hardcodea):
    - `ops-worker` in `us-east4`
    - `commercial-cost-worker` in `us-east4`
    - `ico-batch-worker` in `us-east4`
@@ -235,6 +244,11 @@ git push origin develop     # → el PR queda MERGEABLE
 #     el classifier ya usa two-dot, así que los dominios que reporta son REALES).
 #     Un solo dominio irreversible (p.ej. db_migrations con su consumer directo) NO es
 #     un acoplamiento que declarar. Si no lo nombras en una frase, parte el batch.
+#
+#     ⚠️ FORMATO ESTRICTO desde TASK-1676: el marker tiene que ABRIR UNA LÍNEA del
+#     cuerpo del squash, y se lee SÓLO de ese commit (antes bastaba mencionarlo en
+#     cualquier commit del rango, y una cita en prosa neutralizaba `split_batch` para
+#     un batch entero). Un marker a mitad de línea ya NO cuenta.
 gh pr merge <pr> --squash --body "[release-coupled: <por qué conviven los dominios>]"
 
 # C — Gotcha #3: producir el smoke sobre main en vez de bypassearlo (~3 min)
@@ -257,7 +271,10 @@ El flujo de **squash-merge** produce condiciones recurrentes que NO son fallas r
 1. **El PR `develop→main` conflicta ("merge commit cannot be cleanly created").** `main` (squashes de releases previos) no es ancestro de `develop` → conflictos (docs Handoff/changelog/README/registry y a veces código). **Resolución robusta:** en `develop`, `git merge origin/main -X ours --no-edit` (`develop` es autoritativo — contiene todo `main` por construcción: los squash de `main` son DE commits de `develop`). Verifica: `git log origin/main --not HEAD` vacío **y** `git diff HEAD@{1} HEAD -- src/ scripts/ services/ migrations/` sin cambios de código. Push `develop` → el PR queda MERGEABLE. Bonus: **avanza la merge-base** y reduce la divergencia del próximo release. **NUNCA** cherry-pick a `main` (duplica SHAs).
    **Resolución verificada 2026-08-06:** `-X ours` resuelve los conflictos de **contenido**, pero **no** los `modify/delete` — ésos quedan detenidos y se deciden a mano. Caso real: `TASK-1590` estaba **borrada** en `develop` (migró de `to-do/` a `in-progress/`) y **modificada** en `main`; se resolvió conservando el estado de `develop` (`git rm` de la copia en `to-do/`). Las dos verificaciones salieron vacías y el PR quedó MERGEABLE de entrada. La segunda verificación es la que prueba que el merge fue documental y que `-X ours` no se comió código de producción — no la omitas.
 
-2. **~~Preflight `release_batch_policy` falso positivo.~~ RESUELTO 2026-08-08 (ISSUE-114).** El classifier usaba diff *three-dot* (`origin/main...target`, merge-base) y resucitaba archivos ya desplegados en un release previo como `cloud_release` irreversible, inflando el conteo. **Ya no:** `collectChangedFiles` usa **two-dot** y ambos consumidores del rango (archivos + commit bodies) lo resuelven por la función única `buildReleaseDiffRange`, con guardrail anti-regresión en `src/lib/release/preflight/checks/release-batch-policy.test.ts` (fija el rango en el argv de git). **Consecuencia dura: si hoy el classifier reporta un dominio irreversible, es REAL — NUNCA lo descartes como fantasma "conocido" ni le pongas un marker por costumbre.** Verifícalo igual con `git diff origin/main..target -- <archivo>`. Y ojo con lo que este gotcha nunca dijo: post-merge (target = HEAD de `main`) el rango queda **vacío**, así que el batch-policy del orquestador pasa SIEMPRE — **el gate sólo tiene dientes en la corrida local pre-merge**, que es justo donde el operador decide. Darle dientes post-merge exigiría comparar contra el `target_sha` del release anterior (`release_manifests`): decisión de diseño mayor, aún no tomada.
+2. **~~Preflight `release_batch_policy` falso positivo.~~ RESUELTO 2026-08-08 (ISSUE-114).** El classifier usaba diff *three-dot* (`origin/main...target`, merge-base) y resucitaba archivos ya desplegados en un release previo como `cloud_release` irreversible, inflando el conteo. **Ya no:** `collectChangedFiles` usa **two-dot** y ambos consumidores del rango (archivos + commit bodies) lo resuelven por la función única `buildReleaseDiffRange`, con guardrail anti-regresión en `src/lib/release/preflight/checks/release-batch-policy.test.ts` (fija el rango en el argv de git). **Consecuencia dura: si hoy el classifier reporta un dominio irreversible, es REAL — NUNCA lo descartes como fantasma "conocido" ni le pongas un marker por costumbre.** Verifícalo igual con `git diff origin/main..target -- <archivo>`. **Delta 2026-08-09 (`TASK-1676`, cierra `ISSUE-145`): el gate ya tiene dientes post-merge.** Hasta esta fecha, post-merge (target = HEAD de `main`) el rango quedaba **vacío** y el batch-policy del orquestador pasaba SIEMPRE — tres releases consecutivos reportaron `filesChanged=0, decision=ship`, uno con 1045 archivos y 14 migraciones. Ahora la base es el `target_sha` del último manifest en estado `released` para la rama, así que el check clasifica el diff real en los dos momentos. Dos consecuencias operativas:
+
+- **Un `filesChanged=0` ya no es aprobación: es `severity: unknown`.** Si lo ves, el target coincide con el último release desplegado o la base no se pudo resolver — en ninguno de los dos casos el gate miró nada. El summary dice contra qué base comparó y de qué release salió.
+- **El marker `[release-coupled: …]` por fin se lee donde el runbook dice**, porque el rango post-merge contiene el commit de squash. Ver el paso B de la pre-empción para el formato exacto, que ahora es estricto.
 
    **Resolución verificada 2026-08-06:** el preflight **local** dio `split_batch` por "payroll + auth_access mezclados" sobre **1051 archivos** inflados (los de código reales eran 221). La respuesta canónica **no fue** `bypass_preflight_reason`, sino el marker `[release-coupled: <razón>]` en el **cuerpo del commit de squash** — que es lo que lee el classifier del orquestador —, explicando que los dominios mezclados son acumulación de una semana de trabajo independiente y ya verde, no un acoplamiento de diseño. Con eso el preflight del orquestador pasó `ship` **sin bypass**. Si la razón honesta fuera "son cambios acoplados de verdad y no sé explicar el rollback en una frase", el batch hay que **partirlo**, no marcarlo.
 
