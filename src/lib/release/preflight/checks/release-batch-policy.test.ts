@@ -25,6 +25,10 @@ const childProcessMock = vi.hoisted(() => ({
 // range-blind mock would return the same buffer either way, and the scenario
 // tests below would keep passing with the bug restored — a guardrail that only
 // looks like one.
+const releaseState = vi.hoisted(() => ({
+  readLastReleasedRelease: vi.fn()
+}))
+
 const gitState = vi.hoisted(() => ({
   invocations: [] as string[][],
   twoDotDiff: '',
@@ -62,6 +66,13 @@ vi.mock('node:child_process', async () => {
 
 import type { PreflightInput } from '../runner'
 
+// TASK-1676 — el check resuelve su base contra `release_manifests`. Sin este mock
+// los tests harían I/O real contra PG y sólo pasarían por el catch del fallback,
+// que es justamente el camino que NO se quiere ejercitar por accidente.
+vi.mock('../last-released-reader', () => ({
+  readLastReleasedRelease: releaseState.readLastReleasedRelease
+}))
+
 import { buildReleaseDiffRange, checkReleaseBatchPolicy } from './release-batch-policy'
 
 const buildInput = (overrides: Partial<PreflightInput> = {}): PreflightInput => ({
@@ -78,11 +89,19 @@ const runCheck = async () => checkReleaseBatchPolicy(buildInput())
 const gitArgsFor = (subcommand: string): string[] =>
   gitState.invocations.find(args => args[0] === subcommand) ?? []
 
+const PREV_RELEASE_SHA = 'e048ef3a47e98aac1048ec36dc3c300d1042f146'
+
 beforeEach(() => {
   gitState.invocations = []
   gitState.twoDotDiff = ''
   gitState.threeDotDiff = ''
   gitState.logStdout = ''
+  releaseState.readLastReleasedRelease.mockReset()
+  releaseState.readLastReleasedRelease.mockResolvedValue({
+    targetSha: PREV_RELEASE_SHA,
+    releaseId: 'e048ef3a47e9-678ee642',
+    startedAt: '2026-08-09T01:00:32.526Z'
+  })
 })
 
 describe('buildReleaseDiffRange', () => {
@@ -98,16 +117,23 @@ describe('buildReleaseDiffRange', () => {
 })
 
 describe('checkReleaseBatchPolicy — diff base', () => {
-  it('collects changed files with the two-dot range', async () => {
+  it('anchors the diff to the last RELEASED manifest, not to the branch head (ISSUE-145)', async () => {
+    gitState.twoDotDiff = 'src/app/page.tsx\n'
+
     await runCheck()
 
     const diffArgs = gitArgsFor('diff')
 
-    expect(diffArgs).toContain('origin/main..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+    // Ésta es la corrección de raíz: `origin/main` post-merge ES el target, así que
+    // el rango quedaba vacío y el gate aprobaba sin mirar nada.
+    expect(diffArgs).toContain(`${PREV_RELEASE_SHA}..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`)
+    expect(diffArgs).not.toContain('origin/main..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
     expect(diffArgs.some(arg => arg.includes('...'))).toBe(false)
   })
 
   it('resolves commit bodies from the SAME range as the file diff (the two must never drift onto different bases)', async () => {
+    gitState.twoDotDiff = 'src/app/page.tsx\n'
+
     await runCheck()
 
     const diffRange = gitArgsFor('diff').find(arg => arg.includes('..'))
@@ -116,10 +142,57 @@ describe('checkReleaseBatchPolicy — diff base', () => {
     expect(logRange).toBe(diffRange)
   })
 
-  it('honours the target branch when composing the base ref', async () => {
-    await checkReleaseBatchPolicy(buildInput({ targetSha: 'bbbbbbbb', targetBranch: 'develop' }))
+  it('declares the base it used in the evidence, so a surprising result is a diagnosis and not an investigation', async () => {
+    gitState.twoDotDiff = 'src/app/page.tsx\n'
+
+    const result = await runCheck()
+
+    const evidence = result.evidence as {
+      diffBase: string
+      diffBaseSource: string
+      diffBaseReleaseId?: string
+    }
+
+    expect(evidence.diffBase).toBe(PREV_RELEASE_SHA)
+    expect(evidence.diffBaseSource).toBe('last_released_manifest')
+    expect(evidence.diffBaseReleaseId).toBe('e048ef3a47e9-678ee642')
+  })
+
+  it('falls back to the branch head when the branch has no released manifest', async () => {
+    // Hoy los 75 manifests son de `main`: un preflight exploratorio sobre otra rama
+    // cae acá, y tiene que seguir sirviendo en vez de quedar mudo.
+    releaseState.readLastReleasedRelease.mockResolvedValue(null)
+    gitState.twoDotDiff = 'src/app/page.tsx\n'
+
+    const result = await checkReleaseBatchPolicy(buildInput({ targetSha: 'bbbbbbbb', targetBranch: 'develop' }))
+    const evidence = result.evidence as { diffBase: string; diffBaseSource: string }
 
     expect(gitArgsFor('diff')).toContain('origin/develop..bbbbbbbb')
+    expect(evidence.diffBaseSource).toBe('branch_head_fallback')
+    expect(evidence.diffBase).toBe('origin/develop')
+  })
+
+  it('un fallo del reader degrada a la base legacy, nunca a una aprobacion', async () => {
+    // Si PG está caído, lo peligroso sería que el check aprobara igual. Degrada a la
+    // base legacy y deja que la regla del diff vacío haga de gate.
+    releaseState.readLastReleasedRelease.mockRejectedValue(new Error('PG unreachable'))
+    gitState.twoDotDiff = 'migrations/20260809_x.sql\n'
+
+    const result = await runCheck()
+    const evidence = result.evidence as { diffBaseSource: string }
+
+    expect(evidence.diffBaseSource).toBe('branch_head_fallback')
+    expect(result.severity).not.toBe('ok')
+  })
+
+  it('sin release previo Y con diff vacio no aprueba: es el caso que la formulacion original dejaba abierto', async () => {
+    releaseState.readLastReleasedRelease.mockResolvedValue(null)
+    gitState.twoDotDiff = ''
+
+    const result = await runCheck()
+
+    expect(result.severity).toBe('unknown')
+    expect(result.evidence).toBeNull()
   })
 })
 
@@ -171,12 +244,15 @@ describe('checkReleaseBatchPolicy — squash-divergence scenario (ISSUE-114)', (
     expect(evidence.domains.cloud_release).toBe(2)
   })
 
-  it('devuelve ship con diff vacio: el caso post-merge del orquestador, que ISSUE-145 documenta como estructuralmente vacuo', async () => {
+  it('un diff vacio NO aprueba: el caso post-merge del orquestador que ISSUE-145 documenta como estructuralmente vacuo', async () => {
     const result = await runCheck()
-    const evidence = result.evidence as { decision: string; filesChanged: number }
 
-    expect(evidence.filesChanged).toBe(0)
-    expect(evidence.decision).toBe('ship')
-    expect(result.severity).toBe('ok')
+    // TASK-1676 — este test fijaba el defecto que ISSUE-145 documenta. Ahora fija
+    // el invariante que lo cierra: un diff vacío NUNCA es aprobación, venga de donde
+    // venga la base. `unknown` y no `error` porque no se sabe que el batch esté mal:
+    // se sabe que no se pudo evaluar, y el operador tiene que poder distinguirlo.
+    expect(result.evidence).toBeNull()
+    expect(result.severity).toBe('unknown')
+    expect(result.summary).toContain('Diff vacio')
   })
 })
