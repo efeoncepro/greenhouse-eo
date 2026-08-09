@@ -373,6 +373,25 @@ El flujo de **squash-merge** produce condiciones recurrentes que NO son fallas r
     es **reconciliación de archivos con un estado ya realizado**, no un cambio de schema pendiente — y
     el rollback no necesita undo ni backfill. Es un hecho citable y auditable, no una opinión.
 
+11. **`vercel redeploy` NO arregla un staging `Canceled` si el commit más nuevo es docs-only.** El
+    gotcha #7 recomienda el redeploy, y eso sirve cuando la cancelación tuvo otra causa. Si la produjo
+    el Ignored Build Step sobre un diff docs-only, el redeploy **reevalúa el mismo diff y cancela otra
+    vez** (verificado 2026-08-09: `The deployment has been canceled.` en segundos).
+
+    Salidas, en orden: **(1)** pre-emptar, secuenciando los pushes docs-only después del release;
+    **(2)** tocar un doc del set `deployControlDocs` de `scripts/ci/vercel-ignore-build.mjs`
+    —control plane spec, ledger de flags, playbook, runbooks de release/watchdog, manuales de
+    orchestrator/preflight/watchdog—, que **no** cuenta como docs-only y fuerza el build: si de todos
+    modos debes documentar algo del release, ese commit produce la evidencia como efecto;
+    **(3)** un cambio de código real que ya estuviera pendiente. **NUNCA** inventar un cambio de
+    código para forzar el build.
+
+    Por qué el check se queja de algo que no está roto: `vercel_readiness` mira el deploy de staging
+    **más reciente sin importar su estado**, así que un skip deliberado de nuestro propio ignore-build
+    se lee igual que un build fallado — el staging anterior `Ready` puede tener todo el código del
+    release y faltarle sólo docs. Es una tensión entre dos mecanismos propios; el check igual sale con
+    exit 1, así que hay que producirle el deploy.
+
 ## What The Orchestrator Owns
 
 `production-release.yml` owns the production release lifecycle:

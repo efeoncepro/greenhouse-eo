@@ -233,6 +233,16 @@ El flujo de promoción por **squash-merge** hace que `main` (commits squash de r
 
 7. **Una sola instancia Cloud SQL: `greenhouse-pg-dev` sirve a producción, staging y local** (verificado 2026-08-09). Una migración aplicada "en dev" **ya está aplicada para producción**. Antes de redactar la razón de un bypass con `db_migrations`, comprobá `SELECT name, run_on FROM public.pgmigrations WHERE name LIKE '%<task-id>%'`: si ya están aplicadas, ese dominio es reconciliación de archivos con un estado ya realizado y el rollback no necesita undo ni backfill — un hecho auditable, no una opinión.
 
+8. **`vercel redeploy` NO resuelve un staging `Canceled` cuando el commit más nuevo es docs-only (verificado 2026-08-09, release del cierre del carril cliente).** El gotcha #7 recomienda `vercel redeploy <url-cancelado>`, y eso funciona cuando el build se canceló por otra causa. Si la cancelación la produjo el **Ignored Build Step** sobre un commit docs-only, el redeploy **reevalúa el mismo diff y se vuelve a cancelar** — verificado: el redeploy de `greenhouse-278mab620` salió `The deployment has been canceled.` en segundos.
+
+   Las salidas reales, en orden de preferencia:
+
+   1. **Pre-empción (la única gratis):** secuenciar los pushes docs-only **después** del release. Es lo que ya dice el gotcha #7 y la razón por la que existe.
+   2. **Tocar un doc de control de release.** `scripts/ci/vercel-ignore-build.mjs` mantiene un set `deployControlDocs` que **NO** cuenta como docs-only: `GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`, `FEATURE_FLAG_STATE_LEDGER.md`, `PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md`, los runbooks de release/watchdog y los manuales de orchestrator/preflight/watchdog. Un cambio ahí fuerza `action: 'build'`. Si igual debes documentar algo del release —y casi siempre lo debes—, ese commit **produce la evidencia como efecto**, sin inventar un cambio de código.
+   3. Un cambio de código real, si existe uno pendiente y legítimo. **NUNCA** inventar uno para forzar el build.
+
+   Y vale saber por qué el check se queja de algo que no está roto: `vercel_readiness` mira el deploy de staging **más reciente sin importar su estado**, así que un skip deliberado de nuestro propio ignore-build se lee igual que un build fallado. El staging anterior `Ready` puede contener todo el código del release; lo único que le falta son docs. Es una tensión entre dos mecanismos propios, no una falla de staging — pero el check igual sale con exit 1, así que hay que producirle el deploy.
+
 > El ops-worker que queda con GIT_SHA rezagado tras el release **no es drift** — ver §4.1 (change-gate `deploy_needed=false` cuando el código de worker no cambió).
 
 ### 2.4. Camino recomendado: pre-emptar los 3 gotchas ANTES del PR (verificado 2026-08-06)
