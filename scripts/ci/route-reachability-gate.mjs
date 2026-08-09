@@ -178,7 +178,9 @@ console.error(
   '\nFix one of:\n' +
     '  1. add a nav link (VerticalMenu item, header CTA, or inline <Link>),\n' +
     '  2. declare it as a child route in src/lib/navigation/route-reachability-manifest.ts (parent + via),\n' +
-    '  3. confirm it is a dynamic [id] detail route.\n'
+    '  3. confirm it is a dynamic [id] detail route,\n' +
+    '  4. if it IS a menu item but composed at runtime from module_assignments (no literal href),\n' +
+    '     declare it in MODULE_COMPOSED_NAV_ROUTES in the same manifest.\n'
 )
 
 process.exit(STRICT ? 1 : 0)

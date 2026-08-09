@@ -123,6 +123,11 @@ const Navigation = (props: Props) => {
       customStyles={navigationCustomStyles(verticalNavOptions, theme)}
       collapsedWidth={71}
       backgroundColor={GH_COLORS.brand.midnightNavy}
+      // TASK-1675 — marcador de captura del nav lateral. La evidencia GVC del menú
+      // module-driven recorta esta región: comparar el sidebar contra su baseline es
+      // lo único que detecta un corrimiento del chrome sin depender de que alguien
+      // mire la captura con atención.
+      data-capture='portal-vertical-nav'
        
       // The following condition adds the data-dark attribute to the VerticalNav component
       // when semiDark is enabled and the mode or systemMode is light

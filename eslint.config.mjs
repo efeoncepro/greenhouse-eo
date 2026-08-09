@@ -665,11 +665,12 @@ export default [
   // El rule warn-ea cualquier branching legacy session.user.{tenantType,businessLines,
   // serviceModules}/tenant_capabilities.* en UI surfaces. Exime:
   //
-  //   - src/components/layout/vertical/VerticalMenu.tsx — D2 + Slice 6 preserva
-  //     legacy canSeeView + resolveCapabilityModules. Migration full a
-  //     <ClientPortalNavigation> vive en TASK derivada V1.1
-  //     `client-portal-vertical-menu-resolver-migration` (declarada en spec
-  //     TASK-827 Follow-ups).
+  //   - src/components/layout/vertical/VerticalMenu.tsx — TASK-1675 cerró la deuda
+  //     `client-portal-vertical-menu-resolver-migration`: los ítems de MÓDULO ya
+  //     salen del resolver canónico (compuestos server-side en el layout y
+  //     mergeados de forma aditiva). Lo que queda exento es la lista base con
+  //     `canSeeView` y el bloque `resolveCapabilityModules`, cuya migración vive
+  //     en el follow-up `capability-modules-resolver-migration`.
   //   - src/lib/auth/** — legítimamente lee session.user.tenantType para session
   //     routing decisions ANTES de cualquier UI render.
   //   - src/app/api/auth/** — endpoints auth que validan tenant.
