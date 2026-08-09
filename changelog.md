@@ -7,6 +7,26 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-09 — El carril de acceso del portal cliente queda cerrado del todo (TASK-1680 + Creative a SKY)
+
+Las tres piezas que quedaban después del release: el módulo Creative asignado, el lint cerrado y los
+dos hallazgos de tooling con ID.
+
+- **Creative Hub Globe asignado a Sky Airlines** vía el command canónico `enableClientPortalModule`
+  (no SQL: es el único camino con audit + outbox + invalidación de cache en una transacción). Las 4
+  páginas Creative del portal abren para SKY y siguen en empty state para el resto — que es el
+  producto funcionando.
+- **`TASK-1680`**: el lint `no-untokenized-business-line-branching` pasa a `error`. La medición dio
+  **0 violaciones** con el override intacto, y reveló que **4 de sus 6 entradas eximían paths que la
+  regla nunca miró** — hacían ver la gobernanza más estricta de lo que era. Quedó una exención, medida
+  y con dueño. 6 archivos muertos borrados de paso.
+- **El gate de verificación pasa a derivar su expectativa de los datos.** Hardcodeaba "3 abren y 6
+  empty state" y al asignarle el módulo a SKY reportó cuatro desvíos **por hacer lo correcto**. Un
+  gate que se edita por organización no prueba el carril: prueba que la primera organización sigue
+  igual.
+- `TASK-1682` (la capability del bypass de release sin verificador ni grant) y `TASK-1683` (la
+  rotación de contexto que borra el puntero al archive) quedan registradas con su medición.
+
 ## 2026-08-09 — El carril de acceso del portal cliente, EN PRODUCCIÓN (release `2c87d71e2eca`)
 
 `TASK-1678` + `TASK-1679` promovidas juntas a propósito: la contención del fail-open se retira en el
@@ -1217,14 +1237,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   `30733665167` verdes, deploy manual no ejecutado. Reader `30733996145` confirmó saga rev 7 activa hasta
   `2026-08-02T10:54:43.570Z` y Chrome volvió a medir ocho referencias live, sin generar. TASK-1614 sigue
   `in-progress`, rollout pendiente.
-
-## 2026-08-01 — AXIS Lab: Astro 7 con foundation documental y testing
-
-- `axis-design-system/apps/lab` dejó Vite vanilla y ahora usa Astro `7.1.6` con salida estática para Vercel,
-  Content Loader, rutas por pattern, MDX, sitemap/SEO, Vitest y Playwright desktop/mobile.
-- La referencia se genera desde tokens/registry publicados; conserva HTML/CSS y un script vanilla mínimo,
-  sin adapters de Greenhouse/Globe, Actions ni SSR.
-- Se actualizaron la task `TASK-1590`, las skills AXIS, la arquitectura, el runbook y el handoff. Fixtures
-  visuales completos por contrato siguen pendientes.
-- Rollout público completado en `axis-design-system-lab.vercel.app`; el primer slice Greenhouse `colors`
-  ya tiene referencia token-backed en `/references/colors/` y su inventario de migración quedó documentado.

@@ -699,6 +699,20 @@ registerProjection({
 
 ### 12.1 Menú dinámico cliente
 
+> **Delta TASK-1680 (2026-08-09) — el lint del carril viejo ya bloquea.**
+> `greenhouse/no-untokenized-business-line-branching` pasó de `warn` a **`error`**: escribir
+> branching legacy nuevo (`session.user.{tenantType,businessLines,serviceModules}`,
+> `tenant_capabilities.*`) en una superficie UI **falla el CI**. Medición previa: 0 violaciones con el
+> override intacto — el barrido lo cerraron `TASK-1675/1678/1679`.
+>
+> El override block quedó con **una sola exención**, y es deuda declarada con dueño:
+> `VerticalMenu.tsx` líneas 128-129, el bloque `resolveCapabilityModules({ businessLines,
+> serviceModules })`, cuyo retiro pertenece al follow-up `capability-modules-resolver-migration`.
+> Las otras cinco entradas se retiraron: cuatro eximían paths que la regla **nunca miró** (`isUiFile`
+> excluye `src/app/api/**` y sólo evalúa `src/(components|views|app)/**`), una era especulativa, y una
+> era un archivo muerto. **NUNCA** agregar un path al override sin comprobar que la regla lo evalúa —
+> una exención fuera del alcance de la regla no protege nada y esconde cuál es la real.
+
 El menú del portal cliente compone sus ítems desde `module_assignments`, per-organización. **NUNCA se
 hardcodea un ítem de menú per business_line ni per módulo.**
 

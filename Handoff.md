@@ -1,5 +1,35 @@
 # Handoff activo
 
+### Cierre del carril de acceso del portal cliente — las 3 piezas post-release (2026-08-09)
+
+**Lo que necesita quien siga:**
+
+1. **Sky Airlines ya tiene `creative_hub_globe_v1`** (assignment
+   `cpma-ec0041f7-e416-442f-acab-73f645c06f56`, vía `enableClientPortalModule`, audit row `enabled`).
+   Sus 3 usuarios activos ahora ven `/proyectos`, `/campanas`, `/equipo`, `/reviews`, más
+   `cliente.pulse`, `cliente.creative_hub` y 4 capabilities de lectura — el bundle otorga más que las
+   4 páginas y eso quedó escrito en `scripts/client-portal/assign-creative-hub-to-sky.ts`. **Si hay
+   que revertirlo, es `pause`/`expire`, nunca DELETE.**
+2. 🔴 **Un gate cuya expectativa está hardcodeada no prueba el motor: prueba que el primer consumidor
+   sigue igual.** `client-portal-page-access-check.ts` fijaba "3 abren y 6 empty state" y al asignarle
+   el módulo a SKY reportó 4 desvíos por hacer lo correcto — la salida fácil habría sido editar los
+   esperados. Ahora deriva la expectativa de los datos (base ∪ módulos vigentes de esa org) y
+   sobrevive a cualquier assignment. Vale el patrón para cualquier gate nuevo.
+3. **`TASK-1680` cerrada, y su hallazgo transferible:** el override block del lint tenía 6 entradas y
+   **4 eximían paths que la regla nunca miró** (`isUiFile` excluye `src/app/api/**` y sólo evalúa
+   `src/(components|views|app)/**`). Antes de agregar un path a un override, comprobá que la regla
+   realmente lo mire — si no, la exención no protege nada y esconde cuál es la real.
+4. **Queda UNA exención viva:** `VerticalMenu.tsx` (2 violaciones, el bloque
+   `resolveCapabilityModules`). Su dueño de retiro es el follow-up
+   `capability-modules-resolver-migration`, todavía **sin ID** desde mayo de 2026. Cuando ese trabajo
+   migre el bloque al resolver, el override block desaparece completo.
+5. **`cliente.ciclos` y `cliente.analytics` siguen sin módulo que las declare** — deuda rastreada en
+   `PENDING_MODULE_DECLARATION_VIEW_CODES` (`view-codes/parity.ts`), no allowlisteada en silencio.
+   Decidir en qué módulo van es lo único que las hace alcanzables.
+6. **Sigue pendiente el smoke con sesión cliente REAL en producción**, de este release y del de
+   `TASK-1675`. El endpoint de agent-session da 403 en prod por diseño, así que es manual. Dos
+   releases con la misma casilla sin marcar.
+
 ### Release 2026-08-09 — el carril de acceso del portal cliente está EN PRODUCCIÓN
 
 `TASK-1678` + `TASK-1679` cerradas y promovidas. Manifest
@@ -549,38 +579,6 @@ espejo `greenhouse-gcloud-auth-playwright`. El setup `…:setup` guarda cuenta y
 `.auth/gcloud-auth-credentials.json` (gitignored, `0600`) y el perfil Chrome aislado en
 `.auth/gcloud-auth-profile`. Playwright visible, no imprime URLs/códigos/cookies, cierra con
 `gcloud-auth-preflight.sh`. Sin scheduler ni rollout remoto.
-
-### TASK-1307 + TASK-1655 — pantalla ancla SEO + Historical Data Platform (2026-08-07)
-
-**TASK-1307** (`/admin/growth/seo/performance`, in-progress → cierre en curso): pantalla
-ancla implementada completa en `develop` local (3 commits, sin push). ECharts elegido e
-instalado (Slice 0 — 1306/1308/1310 heredan); readers nuevos `readSeoPerformance` +
-`readSeoPerformanceCatalog` con parity completa (lane ecosystem + MCP tools
-`get_seo_performance`/`get_seo_performance_catalog` en el mismo PR); **fallback entre
-fuentes** (keyword×posición intenta DataForSEO ◑ y cae a la posición medida GSC ● cuando
-la serie exacta es más joven — regla del operador, nunca promediadas); cobertura REAL
-declarada en el chart ("N de M días con medición"). GVC **premium** verde: rubric
-enterprise pass, `ui:visual-gate` PASS, `ui:quality` PASS (avg 4.56, floor 4.5). Suite
-growth/seo 151/151. **Cerrada y documentada** (ver la entrada del header canónico, arriba);
-lo único vivo es la **promoción develop→main heredada de 1306**, batcheada con 1308/1655.
-
-**TASK-1655** (in-progress): hallazgo de fondo — el módulo era **forward-only** (5 días
-GSC / 2 de rank teniendo 16 meses en la API). Slices 1-3 SHIPPED: mirror
-`greenhouse_growth_analytics.seo_gsc_history` (tabla creada, MERGE idempotente, el batch
-diario espeja y reporta `bqMirror`), backfill API→BQ resumible (smoke 31/31 días Berel,
-**paridad exacta PG↔BQ** verificada), split de lectura por cobertura. **Backfill de 16
-meses de Berel CORRIENDO en background** (562k+ filas al momento del handoff; resumible —
-si murió, re-correr `scripts/growth/backfill-gsc-history.ts` con las env OAuth del
-runbook `docs/manual-de-uso/growth/backfill-historico-gsc.md`). Pendientes: verificación
-final del backfill, Slice 4 (semilla rank `historical_serps`, verificar granularidad en
-sandbox ANTES), Slice 5 (export nativo en la propiedad de Berel — necesita permiso
-Owner, out-of-band; Efeonce ya lo tiene desde 2025-12-10).
-
-**Hallazgos cross para quien siga:** (1) `CustomTabsNav` (@core) para tabs-que-son-links
-— el TabList de lab inyecta `aria-controls` fantasma (axe critical; 1306 puede migrar
-igual). (2) `SurfaceRecipe.plane='none'` para recipes sobre composiciones de cards. (3)
-El 1 rojo de la suite full es `catalog-extensibility` del artifact-composer, roto por
-WIP sin commitear de OTRO agente en `catalogs/deck-axis/` — no tocar desde acá.
 
 ### Hallazgo MCP gateway — clientes Claude no conectan por falta de DCR (2026-08-06)
 
