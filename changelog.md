@@ -7,6 +7,39 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-09 — El menú del portal cliente ya puede mostrar un módulo contratado (TASK-1675)
+
+El portal cliente tenía dos carriles de verdad que nunca se tocaban: el gate de cada page leía
+`module_assignments`, y el menú leía `authorizedViews`, que se deriva de `role_view_assignments` y
+nunca de módulos. La consecuencia era estructural, no de un módulo puntual: Grupo Berel tenía SEO
+contratado, la pantalla renderizaba con sus datos reales, y no había forma de llegar salvo escribiendo
+la URL. Cualquier módulo per-org que se contratara heredaba lo mismo, y la única salida era hardcodear
+otro ítem — justo lo que la spec del dominio prohíbe desde TASK-827.
+
+`(dashboard)/layout.tsx` resuelve los módulos de la organización y pasa `clientNavItems` por props;
+`VerticalMenu` los suma a la lista base. Server-side y no fetch desde el cliente porque el sidebar es
+chrome persistente y un ítem que aparece tarde es CLS en el peor lugar posible. Dos cosas son
+load-bearing y no defensivas: el `try/catch` del layout, que es la raíz de todo el dashboard e
+internos incluidos —sin él, un resolver caído deja de ser "un cliente no ve un ítem" y pasa a ser
+"nadie entra al portal"—, y que el merge sea aditivo, porque la rama "cliente" del componente es en
+realidad la rama no-interno y los colaboradores puros caen ahí.
+
+Se mergean los tres grupos del composer y no sólo el primario. La captura lo justificó de inmediato:
+junto a SEO apareció **AEO**, un módulo del grupo `capabilities`, compuesto sin una línea de código
+dedicada. Con un merge sólo-primary se habría descartado en silencio.
+
+De paso, el `route-reachability-manifest` dejó de mentir: `/growth/seo` declaraba
+`parent:'/home', via:'inline-link'` para un enlace que nunca existió, y el gate no lo notaba porque
+verifica que la ruta esté declarada, no que el enlace declarado exista. Ahora vive en
+`MODULE_COMPOSED_NAV_ROUTES`, la categoría de rutas que sí son ítem de menú pero cuyo `href` se compone
+en runtime.
+
+Cierra la deuda `client-portal-vertical-menu-resolver-migration`, que TASK-827 dejó nombrada en cuatro
+lugares del repo y nunca registró como task. Llevaba meses sin tomarse en parte por eso.
+
+**Rollout gated por la promoción `develop → main`**: mientras el catálogo TS viva sólo en `develop`,
+`syncViewRegistryCatalog` apaga esos viewCodes desde cualquier runtime con código viejo.
+
 ## 2026-08-09 — El batch policy del release preflight dejó de mentir (ISSUE-114)
 
 `release_batch_policy` computaba el diff con base three-dot (`origin/main...target`). Como la
@@ -1144,19 +1177,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
 - 🔴 **Drift encontrado:** AXIS declara **tres** familias de acento para Globe (Coral, Magenta, Orchid) y
   **sólo orchid llegó al código**. `TASK-1615` lo cierra; mientras tanto la rampa magenta vive local en
   Globe como deuda declarada, no como drift silencioso.
-
-## 2026-07-31 — Globe: modo claro con interruptor de apariencia (TASK-1613)
-
-- Interruptor en el menú de cuenta del Producer. El tema es **un bloque de override** sobre las claves
-  del `@theme` (31 de 198 tokens), habilitado por `TASK-1612`. El modo oscuro no se movió ni un hex.
-- 🔴 **El tematizado es opt-in por superficie** (`ShellOptions.themable`, default `false`). El share
-  board —donde el cliente ve la pieza— heredaba el modo del `localStorage` sin tener interruptor propio.
-  No se veía mal: se veía bien en claro, y por eso ningún barrido de contraste lo habría encontrado.
-- Cerró 2 regresiones de contraste medidas **contra control**: `--success` usado como texto (2,54:1) y
-  el interruptor propio (4,2:1). AXIS 0.2.3 separa fill de tinta (`axisBrandSemanticInk`).
-- El isotipo pasa a servirse como máscara: el SVG es monocromo, así que su color no es la marca sino una
-  decisión de render; en negativo sobre canvas claro era blanco sobre blanco.
-- Barrido de contraste nuevo, con veredicto comparativo: falla sólo si el claro introduce un fallo que
-  el oscuro no tiene. Quedan 14 textos que fallan en **ambos** modos (`--faint` a 40% de alpha) — deuda
-  preexistente, no de este cambio.
-- `@efeoncepro/axis-tokens@0.2.3` publicada y el pin de Globe subido. PR en `efeonce-globe`: [#8](https://github.com/efeoncepro/efeonce-globe/pull/8), pendiente de revisión humana.

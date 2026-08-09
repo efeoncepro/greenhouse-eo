@@ -1,5 +1,35 @@
 # Handoff activo
 
+### TASK-1675 — el menú del portal cliente ya compone sus módulos (code complete, rollout pendiente)
+
+Cerrada en `develop`. El menú del cliente leía `authorizedViews` mientras el gate de cada page leía
+`module_assignments`: un módulo contratado funcionaba y era inalcanzable salvo escribiendo la URL.
+Ahora el layout resuelve per-org server-side y `VerticalMenu` hace merge **aditivo**.
+
+**Lo que necesita quien siga:**
+
+1. **El rollout NO está cerrado: espera la promoción `develop → main`.** Mientras el catálogo TS viva
+   sólo en `develop`, `syncViewRegistryCatalog` apaga esos viewCodes desde cualquier runtime con
+   código viejo. Después de promover, verificar con tres sesiones: cliente de Berel (ve `SEO`),
+   cliente sin el módulo (no lo ve, menú intacto) y colaborador interno (menú intacto); y confirmar
+   que no hay filas `view_registry.active=false, updated_by='system'` para los viewCodes SEO.
+2. **Si tocas `VerticalMenu.tsx`, el merge aditivo es load-bearing.** La rama `!isInternalPortalUser`
+   es la rama **no-interno**: los colaboradores puros caen ahí, así que reemplazar la lista base los
+   deja sin menú. Hay un test de identidad que lo fija (`VerticalMenu.test.tsx`, el primer test que
+   ese componente tiene). `TASK-1388` toca el mismo archivo y rebasa sobre esto.
+3. **Cuatro hallazgos de accesibilidad del chrome quedaron medidos y sin arreglar**, a propósito:
+   ningún ítem del menú muestra anillo de foco al tabular, la región scrollable del drawer no es
+   alcanzable por teclado, el toggle es un `<i>` sin role, y el panel desborda 8px. Son globales y
+   preexistentes — el escenario GVC negativo es el control que lo prueba, porque su probe parte de un
+   ítem base de siempre y da el mismo resultado. Están registrados en los manifests, con los flags
+   relajados y el motivo escrito inline. Dueño: `client-portal-menu-focus-ring` (chip abierto).
+4. **Trampas de herramienta que cuestan una hora si no las sabes:** `pnpm fe:capture:review` corre
+   contra **staging** por default, produce 0 frames aun con `--env=local`, y su
+   `ensureStorageStateFresh` **pisa el storageState de la persona declarada** con el del agente
+   interno — la assertion falla después con un diagnóstico engañoso. Usar `pnpm fe:capture` directo y
+   regenerar la persona antes. Y promover baselines de un escenario multi-variante exige promover
+   **cada subdirectorio de variante por separado**.
+
 ### Releases del 2026-08-08/09 — `ISSUE-114` cerrada y batch SEO en producción
 
 `main` = `e048ef3a4` (batch SEO). Antes, `b99b7ad97` (fix de `ISSUE-114`). Ambos manifiestos
@@ -531,59 +561,3 @@ no un tipo de organización).
 de formularios de prueba. Mergear exigiría *crear* una company canónica de Efeonce, que es
 justo lo que no debe existir — corresponde borrarlas, y primero en HubSpot (si se borran sólo en
 Greenhouse, el sync las repone). Sin exclusión de dominios internos en el inbound, vuelven.
-
-### Cutover MCP-first de Search Visibility 360 — COMPLETO en producción (2026-08-06)
-
-Las 4 capas quedaron vivas y verificadas, en este orden. **TASK-1645 y TASK-1647 pasan a `complete`.**
-
-**1. Release `develop→main`** — PR #177, SHA `70e912056273d0a30e2aa8dacc2f4e62076e3b44`,
-`release_id=70e912056273-03c36b47-eb75-469c-886f-51c691cd7c34`, run `31058032196`, manifest `released`,
-workflow 10m51s. Batch grande (355 commits, 221 archivos de código, 14 migraciones: EPIC-022 SEO
-completo, EPIC-028 Globe, identity 1616/1631, payroll 1630, Nexa 1182, EPIC-040). **Pasó a la primera,
-sin bypass y sin retry** porque los 3 gotchas conocidos se pre-emptaron: merge canónico
-`origin/main -X ours` antes del PR (conflicto modify/delete de TASK-1590 resuelto conservando develop),
-marker `[release-coupled: …]` en el cuerpo del squash (batch policy → `ship`), y
-`gh workflow run playwright.yml --ref main` antes del dispatch (3m10s) en vez de bypassear el
-`playwright_smoke` ausente del squash. Watchdog `drift_count=0`; el residual change-gated de
-`ops-worker` (`558558263e80`, diff runtime vacío) ya lo clasifica bien el fix que entró en `6f7e246ea`.
-
-**2. `GROWTH_SEO_ENABLED=true` en Vercel Production** + redeploy `dpl_GyGkdEQQTk65qkCs1S3TEH6Jquy9`
-(Vercel congela env vars al crear el build). Multi-runtime: el mismo flag ya estaba ON en el
-`ops-worker` para el materializer GSC. Ledger actualizado.
-
-**3. Canary del provider contra producción** (`greenhouse.efeoncepro.com`, service identity del
-gateway): **Berel `domainQuadrant=riesgo`, 50 keywords, AEO 44.5** · Efeonce `hasModule=true
-tier=contracted` + `no_seo_data` honesto · deny anti-oracle `404 greenhouse_seo_lane_404`.
-
-**4. Provider habilitado en el gateway** — `efeonce-mcp` `76cb121`, workflow `31059346243`, revisión
-`efeonce-mcp-gateway-00012-dkj` `Ready=True` con `GREENHOUSE_ECOSYSTEM_TOKEN` como **secret ref** de
-Cloud Run. Hallazgo: el secreto `efeonce-mcp-gateway-greenhouse-token` se había creado **sin ninguna
-binding IAM** — sin el `secretAccessor` scoped al SA del gateway el deploy habría fallado. Front door
-verificado: health `200`, protected-resource metadata `200` (3 scopes), `POST /mcp` anónimo `401` con
-`WWW-Authenticate` correcto.
-
-**5. Smoke MCP autenticado por `mcp.efeonce.org` — VERDE.** `scripts/oauth-canary.mjs` quedó
-**extendido en este cierre** con las tools SEO. Flujo Entra authorization-code + PKCE real (login
-humano), token con `aud=c5363215-…` y `scp` incluyendo `efeonce.mcp.read`:
-
-```bash
-MCP_CANARY_SEO_ORGANIZATION_ID=org-32333527-02a8-487b-819e-6f76a761777d \
-MCP_CANARY_SEO_DENY_ORGANIZATION_ID=org-00000000-0000-0000-0000-000000000000 \
-node scripts/oauth-canary.mjs
-```
-
-→ `initialize 200` · `seoEntitlementStatus 200` · `seoVisibility360Status 200` ·
-**`seoDomainQuadrant: "riesgo"`** · `seoDenyFailedClosed: true` (+ Globe capabilities/fleet 200).
-
-**Ese `riesgo` es el quadrant real de Berel devuelto por el front door público**: la cadena
-Entra → gateway → provider → lane → readers → PG está cerrada end-to-end. El objetivo de la sesión
-—preguntar por MCP por la visibilidad 360 de Berel y recibir el quadrant real— está cumplido.
-El smoke exige login interactivo, así que es asistido por humano, no automatizable en CI.
-
-**Pendientes menores heredados (sin tocar):** merge en HubSpot de las auto-companies `efeonce.org`
-(56011409567) y `efeonce` (57099835819) hacia la company canónica — el sync propaga, NUNCA borrar por
-SQL; ~~`website_url` en EO-ORG-0007~~ **HECHO 2026-08-06**: `https://efeoncepro.com` poblada por
-`upsertCanonicalOrganization` (script `scripts/growth/_sanity-efeonce-website-url.ts`, idempotente,
-sin `overrideIdentity` para no pisar un valor ajeno; `organization_type` se mantuvo `client`);
-conexión GSC de
-`efeoncepro.com` gated por TASK-1282/1283.

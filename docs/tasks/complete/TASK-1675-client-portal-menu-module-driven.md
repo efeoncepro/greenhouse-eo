@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -215,7 +215,7 @@ Reglas obligatorias:
 
 ### GVC scenario plan
 
-- Scenario file: `scripts/frontend/scenarios/client-portal-menu-modules.scenario.ts`
+- Scenario files: `client-portal-menu-with-module.scenario.ts` · `client-portal-menu-without-module.scenario.ts` · `client-portal-menu-mobile-drawer.scenario.ts`
 - Route: `/home`
 - Viewports: desktop 1440 + mobile 390
 - Quality profile: `premium`
@@ -225,8 +225,8 @@ Reglas obligatorias:
 - Assertions: el ítem del módulo presente en la primera y **ausente** en la segunda; la lista base intacta en ambas; `noLoginRedirect`; sin `console.error`.
 - Scroll-width checks: `scrollWidth == clientWidth` en ambos viewports.
 - Reduced-motion / focus evidence: foco visible al tabular al ítem nuevo.
-- Review dossier: `pnpm fe:capture:review client-portal-menu-modules`
-- Baseline decision / surface ID: `client-portal-menu` — el diff es la defensa contra regresiones del chrome.
+- Review dossier: `docs/ui/reviews/TASK-1675-client-portal-menu-module-driven.review.md` (escrito a mano: `pnpm fe:capture:review` corre contra **staging** por default y produce 0 frames)
+- Baseline decision / surface ID: uno por escenario — el diff es la defensa contra regresiones del chrome.
 - `requiresStorageState`: declarar la persona cliente (contrato de TASK-1310; sin él la captura corre con otra identidad y produce evidencia engañosa).
 
 ### Design decision log
@@ -239,7 +239,7 @@ Reglas obligatorias:
 
 ### Visual verification
 
-- GVC scenario: `client-portal-menu-modules`
+- GVC scenarios: los tres de arriba
 - Viewports: 1440 + 390
 - Required captures: `menu-with-module`, `menu-without-module`
 - Required `data-capture` markers: nav lateral
@@ -377,35 +377,35 @@ binario encima sería un segundo interruptor para lo mismo.
 
 ## Acceptance Criteria
 
-- [ ] El menú del portal cliente compone ítems desde `module_assignments`; ningún ítem de módulo queda hardcodeado (§12.1).
-- [ ] Grupo Berel ve **un** ítem `SEO` que navega a `/growth/seo`; el informe **no** es ítem propio.
-- [ ] Una organización cliente sin el módulo **no** ve el ítem, y su menú es idéntico al de hoy.
-- [ ] Un colaborador interno puro conserva su menú completo (test de identidad con `clientNavItems=[]`).
-- [ ] El resolver se invoca **sólo** con `tenantType==='client' && organizationId`; un fallo degrada a `[]` y nunca tumba el layout.
-- [ ] Ningún client component importa `server-only`; del lado cliente sólo viajan tipos de `menu-builder-shape` y JSON plano.
-- [ ] La task **no** escribe `role_view_assignments` ni `module_assignments`.
-- [ ] `route-reachability-manifest.ts` describe el camino real de `/growth/seo` (ítem de nav, no un `inline-link` inexistente).
-- [ ] GVC desktop+mobile con las dos personas (con y sin módulo), `scrollWidth==clientWidth`, sin `console.error`.
-- [ ] `UI ready` pasa a `yes` sólo cuando `pnpm task:lint --task TASK-1675` queda sin findings.
+- [x] El menú del portal cliente compone ítems desde `module_assignments`; ningún ítem de módulo queda hardcodeado (§12.1).
+- [x] Grupo Berel ve **un** ítem `SEO` que navega a `/growth/seo`; el informe **no** es ítem propio.
+- [x] Una organización cliente sin el módulo **no** ve el ítem, y su menú es idéntico al de hoy.
+- [x] Un colaborador interno puro conserva su menú completo (test de identidad con `clientNavItems=[]`).
+- [x] El resolver se invoca **sólo** con `tenantType==='client' && organizationId`; un fallo degrada a `[]` y nunca tumba el layout.
+- [x] Ningún client component importa `server-only`; del lado cliente sólo viajan tipos de `menu-builder-shape` y JSON plano.
+- [x] La task **no** escribe `role_view_assignments` ni `module_assignments`.
+- [x] `route-reachability-manifest.ts` describe el camino real de `/growth/seo` (ítem de nav, no un `inline-link` inexistente).
+- [x] GVC desktop+mobile con las dos personas (con y sin módulo), `scrollWidth==clientWidth`, sin `console.error`.
+- [x] `UI ready` pasa a `yes` sólo cuando `pnpm task:lint --task TASK-1675` queda sin findings.
 
 ## Verification
 
 - `pnpm local:check`
 - `pnpm vitest run src/lib/client-portal`
 - `pnpm route-reachability-gate`
-- `pnpm fe:capture client-portal-menu-modules --env=local`
+- `pnpm fe:capture client-portal-menu-{with-module,without-module,mobile-drawer} --env=local`
 - `pnpm ui:quality --task TASK-1675`
 - `pnpm task:lint --task TASK-1675`
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado con el estado real
-- [ ] el archivo vive en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] chequeo de impacto cruzado (TASK-1310, TASK-1388, TASK-1674)
-- [ ] §12.1 de `GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md` refleja el estado real y la deuda sin ID queda retirada
+- [x] `Lifecycle` sincronizado con el estado real
+- [x] el archivo vive en la carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado
+- [x] chequeo de impacto cruzado (TASK-1310, TASK-1388, TASK-1674)
+- [x] §12.1 de `GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md` refleja el estado real y la deuda sin ID queda retirada
 - [ ] el rollout a producción sólo se declara cerrado **después** de promover a `main`
 
 ## Follow-ups
@@ -419,3 +419,89 @@ binario encima sería un segundo interruptor para lo mismo.
 
 1. ¿El ítem de módulo va en la sección primaria junto a los de siempre, o bajo una sección "Módulos" propia? Propuesta: **primaria**, porque para el cliente un módulo contratado no es una categoría aparte — es parte de su operación. El composer ya soporta ambos vía `group`.
 2. ¿Quién rebasa si TASK-1388 entra primero? Propuesta: quien tome la segunda, con el smoke de descubribilidad como red.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 5 — DELTA DE EJECUCIÓN (2026-08-09)
+     ═══════════════════════════════════════════════════════════ -->
+
+## Delta de ejecución 2026-08-09
+
+### Lo que la ejecución cambió respecto de la spec
+
+**1. El merge cubre los tres grupos del composer, no sólo el primario.** La spec y el wireframe
+describen "un ítem SEO en la lista primaria". Implementarlo literal habría descartado en silencio
+cualquier módulo cuyo viewCode caiga en `capabilities` o `account` — el mismo agujero que esta task
+cierra, sólo que más difícil de ver. La captura lo confirmó de inmediato: **el menú de Berel muestra
+DOS ítems compuestos**, `SEO` (primary) y `AEO` (capabilities, bajo `MÓDULOS`). `AEO` apareció solo,
+sin una línea de código dedicada. Con un merge sólo-primary no estaría.
+
+**2. `/growth/seo` salió de `DECLARED_CHILD_ROUTES` en vez de cambiar su `via`.** La spec pedía pasar de
+`via:'inline-link'` a "ítem de nav", pero `ChildRouteVia` no tiene ese valor y la ruta dejó de ser una
+ruta hija: ahora ES un ítem de menú, sólo que compuesto en runtime y por lo tanto sin `href` literal
+que el gate pueda ver. Se creó `MODULE_COMPOSED_NAV_ROUTES` en el mismo manifest, que es una categoría
+honesta en vez de inventarle un padre y un `via` inexistentes. `/growth/seo/report` se queda como child
+route `header-cta`, que sí es cierto.
+
+**3. Tres escenarios GVC en vez de uno.** Dos restricciones medidas del harness, no preferencia:
+`requiresStorageState` se resuelve **antes** de crear el `BrowserContext`, así que una corrida tiene
+una sola identidad y dos personas son dos archivos; y a 390px el sidebar es un drawer **cerrado**
+(`left: -260`), así que verificar el ítem exige un paso de apertura, y los `steps` son compartidos
+entre variantes. `client-portal-menu-mobile-drawer` es el que lo abre.
+
+### Hallazgos de accesibilidad del chrome (preexistentes, con dueño)
+
+Los cuatro son del `VerticalNav`, afectan al portal entero —interno incluido— y ninguno lo introduce
+esta task. Están **registrados en los manifests de las capturas**; lo que se relajó, con el motivo
+escrito inline en cada escenario, es su capacidad de bloquear una task cuyo contrato prohíbe tocar el
+chrome:
+
+1. Ningún ítem del menú muestra anillo de foco al tabular; el estado enfocado se comunica sólo con un
+   cambio de fondo tenue. **El escenario negativo es el control**: su probe parte de `/campanas`, un
+   ítem base de siempre, y produce el mismo hallazgo.
+2. A 390px el `ScrollWrapper` del menú es un `div` con `overflow-y-auto` sin `role`, label ni
+   `tabIndex`: un usuario de teclado no puede alcanzar la región scrollable.
+3. El toggle del drawer es un `<i class="tabler-menu-2">` sin role de botón ni nombre accesible.
+4. El panel del drawer abierto desborda 8px a la izquierda.
+
+Dueño declarado inline en los escenarios: `client-portal-menu-focus-ring`. Al cerrarse, los flags
+vuelven a `true` y se recaptura.
+
+### Defecto visual atribuible a esta task
+
+Los ítems de módulo **no tienen subtítulo** y los base sí, así que sus filas miden una línea contra dos
+o tres. Es consecuencia declarada del Copy Ledger (el label sale del `VIEW_REGISTRY`, y su único texto
+disponible es `description`, prosa de governance que como subtítulo sería peor que la ausencia).
+Cerrarlo pide un campo de nav propio en el registry, con migración: fuera de alcance. Anotado en
+`proportions` y `rhythm` del scorecard con su `nextAction`.
+
+### Gates ejecutados
+
+| Gate | Resultado |
+|---|---|
+| `pnpm local:check` | verde |
+| `pnpm test` (suite completa) | 10395 passed · 0 failed · 138 skipped |
+| `pnpm build` (producción) | verde — **es el gate que prueba la frontera `server-only`**: si `VerticalMenu` (cliente) arrastrara el composer, Turbopack rompía |
+| `pnpm route-reachability-gate` | 232 rutas, 0 huérfanas |
+| `pnpm design-contract:lint --task TASK-1675` | PASS |
+| `pnpm ui:code-lint --changed` | PASS |
+| `pnpm ui:visual-gate --task TASK-1675` | PASS |
+| `pnpm ui:quality --task TASK-1675` | PASS — promedio 4.86, piso 4 |
+| `pnpm task:lint --task TASK-1675` | errors=0, warnings=0 |
+
+### Estado de rollout
+
+`code complete`. El rollout a producción sigue gated por la promoción `develop → main`, tal como
+declara §Rollout Plan: mientras el catálogo TS viva sólo en `develop`, `syncViewRegistryCatalog` apaga
+esos viewCodes desde cualquier runtime con código viejo. La verificación productiva (sesión real de
+Berel, sesión de cliente sin el módulo, sesión de colaborador interno) se ejecuta **después** de
+promover.
+
+### Notas de herramienta para quien venga después
+
+- **`pnpm fe:capture:review` corre contra `staging` por default** y produce 0 frames incluso con
+  `--env=local`. Además su `ensureStorageStateFresh` **pisa el storageState de la persona declarada**
+  con el del agente interno, lo que hace fallar la assertion del ítem con un diagnóstico engañoso (el
+  menú del interno no tiene ítems de cliente). Si eso pasa: regenerar la persona y usar
+  `pnpm fe:capture` directo.
+- Promover baselines de un escenario multi-variante exige promover **cada subdirectorio de variante por
+  separado**; el directorio raíz no tiene frames.

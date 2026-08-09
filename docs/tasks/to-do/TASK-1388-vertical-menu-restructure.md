@@ -1,5 +1,25 @@
 # TASK-1388 — Reequilibrio de la navegación interna (sidebar · avatar · ⌘K)
 
+## Delta 2026-08-09
+
+- **El follow-up del portal cliente ya no está entero pendiente.** `TASK-1675` cableó el menú
+  module-driven del bloque no-interno de `VerticalMenu.tsx`: los ítems de módulo se resuelven per-org
+  en `(dashboard)/layout.tsx` y llegan por la prop `clientNavItems`, con merge **aditivo**.
+- **Esta task rebasa sobre eso** (era el acuerdo declarado: quien entre segundo rebasa). Al tocar
+  `VerticalMenu.tsx`, conservar intactos: el guard `tenantType==='client' && organizationId` del
+  layout, el merge aditivo por `route` que cubre los tres grupos del composer, y el hecho de que la
+  rama `!isInternalPortalUser` es la rama **no-interno** — los colaboradores puros caen ahí, así que
+  reemplazar la lista base los deja sin menú. Hay un test de identidad que lo fija
+  (`src/components/layout/vertical/VerticalMenu.test.tsx`).
+- **Lo que sigue siendo de esta task:** cuatro hallazgos de accesibilidad del chrome que TASK-1675
+  midió pero tenía prohibido tocar — ningún ítem del menú muestra anillo de foco al tabular; a 390px el
+  `ScrollWrapper` es un `div` sin `role`/label/`tabIndex` (región scrollable inalcanzable por teclado);
+  el toggle del drawer es un `<i class="tabler-menu-2">` sin role ni nombre accesible; y el panel del
+  drawer abierto desborda 8px. Están registrados en los manifests de
+  `.captures/2026-08-09T08-04-34_client-portal-menu-with-module` y su hermano negativo, que es el
+  control que prueba que son globales y preexistentes.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

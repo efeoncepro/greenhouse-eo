@@ -1,5 +1,19 @@
 # TASK-1310 — Growth SEO: Client Dashboard + Report Artifact + 360 Quadrant
 
+## Delta 2026-08-09
+
+- **El criterio de alcanzabilidad por nav cliente quedó cerrado** por `TASK-1675`, que cableó el menú
+  module-driven del portal. Verificado con la sesión real de Grupo Berel: `/growth/seo` aparece como
+  ítem en su menú lateral, y `/growth/seo/report` **no** aparece como ítem propio (es ruta hija, se
+  alcanza por el CTA "Ver informe" del header, como esta task declara). Evidencia:
+  `scripts/frontend/baselines/client-portal-menu-with-module/desktop__menu-with-module.png`.
+- Consecuencia en el manifest: `/growth/seo` **salió** de `DECLARED_CHILD_ROUTES` — declaraba
+  `parent:'/home', via:'inline-link'` para un enlace que nunca existió — y pasó a
+  `MODULE_COMPOSED_NAV_ROUTES`, la categoría de rutas que SÍ son ítem de menú pero cuyo `href` se
+  compone en runtime. `/growth/seo/report` se queda como child route `header-cta`, que sí es correcto.
+- El rollout productivo de ambas sigue gated por la misma promoción `develop → main`.
+
+
 ## Delta 2026-08-08
 
 ### Auditoría vigente — reset de implementación
@@ -455,7 +469,7 @@ Slice 1 (shell+gate+estados) → Slice 2 (Resumen+Evolución) → Slice 3 (Quadr
 ## Acceptance Criteria
 
 - [x] Se declaró `Execution profile: ui-ux`, `UI impact: flow`, `Flow` apuntando al contrato existente.
-- [ ] Rutas cliente `/growth/seo` + `/growth/seo/report` (routeGroup `client`) alcanzables por nav cliente + en `route-reachability-manifest.ts`; gate **per-org via `module_assignment`** (NUNCA por rol); redirect defensivo sin módulo.
+- [x] Rutas cliente `/growth/seo` + `/growth/seo/report` (routeGroup `client`) alcanzables por nav cliente + en `route-reachability-manifest.ts`; gate **per-org via `module_assignment`** (NUNCA por rol); redirect defensivo sin módulo.
 
   **Verificado 2026-08-08 con sesión de cliente real (Grupo Berel) — el gate per-org PASA, la
   alcanzabilidad NO.** La migración está aplicada y la superficie renderiza con datos medidos
