@@ -338,6 +338,41 @@ El flujo de **squash-merge** produce condiciones recurrentes que NO son fallas r
    vacío. Regla: `-s ours` solo es legítimo cuando la verificación 1 está vacía (`main` no tiene
    commits únicos); si no lo está, esos commits se perderían — ahí el merge se resuelve a mano.
 
+9. 🔴 **El marker `[release-coupled: …]` NO resuelve `requires_break_glass` — sólo `split_batch`
+   (verificado leyendo el classifier, release `2c87d71e2eca` del 2026-08-09).** El paso B de la
+   pre-empción y el gotcha #2 hablan del marker, y es fácil leerlos como "ante un batch policy rojo,
+   marker". No es así, y confundirlos cuesta un run:
+
+   | Decisión del classifier | Qué la dispara | Única salida |
+   |---|---|---|
+   | `split_batch` | `findUncoupledIndependentSensitiveDomains` — pares de dominios sensibles independientes mezclados | **marker** `[release-coupled: <razón>]` en el cuerpo del squash, **o** partir el batch |
+   | `requires_break_glass` | `hasIrreversibleDomain(domains)` — **cualquier** dominio irreversible, con o sin mezcla | **`bypass_preflight_reason`** (≥20 chars) |
+
+   El orden en `classifier.ts` es: primero `split_batch`, después `requires_break_glass`. O sea que si
+   el preflight te dio `requires_break_glass`, el par de dominios **no** estaba en la lista de
+   independientes y **ponerle un marker es cargo-cult**: no cambia la decisión. Consecuencia práctica:
+   **todo release que toque `migrations/`, `src/lib/release/**` o `.github/workflows/` va a pedir
+   bypass**, porque esos dominios son irreversibles por definición. `TASK-1681` ya evaluó relajar la
+   severidad y lo descartó con datos (6 de 8 releases pidieron break-glass y sólo 1 era ruido).
+
+   La razón del bypass se redacta con **hechos verificables**, no con adjetivos. Ejemplo real que pasó
+   a la primera: *"db_migrations ya aplicadas en la unica instancia Cloud SQL (verificado en
+   pgmigrations); auth_access es la causa raiz unica del release; rollback = revert del PR sin undo de
+   schema"*.
+
+10. **Hay UNA sola instancia Cloud SQL (`greenhouse-pg-dev`): producción, staging y local leen la misma
+    base** (verificado con `gcloud sql instances list --project efeonce-group`, 2026-08-09). Eso cambia
+    cómo se evalúa el riesgo de un release con migraciones: **una migración aplicada "en dev" YA está
+    aplicada para producción.** Antes de redactar la razón del bypass, comprobalo:
+
+    ```sql
+    SELECT name, run_on FROM public.pgmigrations WHERE name LIKE '%<task-id>%';
+    ```
+
+    Si las migraciones del batch ya están en `pgmigrations`, el dominio `db_migrations` de ese release
+    es **reconciliación de archivos con un estado ya realizado**, no un cambio de schema pendiente — y
+    el rollback no necesita undo ni backfill. Es un hecho citable y auditable, no una opinión.
+
 ## What The Orchestrator Owns
 
 `production-release.yml` owns the production release lifecycle:

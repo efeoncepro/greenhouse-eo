@@ -222,6 +222,17 @@ El flujo de promoción por **squash-merge** hace que `main` (commits squash de r
 
 5. **El merge canónico `-X ours` puede colar contenido de `main` que `develop` corrigió DESPUÉS del último release (gotcha #8 de la skill; verificado 2026-08-06, release `fcee5ab9f7ce`).** `-X ours` solo decide los hunks en conflicto; los hunks de `main` que aplican limpio **entran** — y si `develop` había eliminado esa línea después del release anterior, el merge la resucita como regresión real. Caso real: `git merge origin/main -X ours` trajo a `develop` 1 línea de `src/lib/ai/dataforseo.ts` (`dataForSeoBreaker.recordFailure(family)` incondicional) que la auditoría de TASK-1300 había eliminado en `develop` después del release anterior — habría contado 4xx de caller y abierto el breaker. La verificación 2 del gotcha #1 (`git diff HEAD@{1} HEAD -- src/ scripts/ services/ migrations/` vacío) es exactamente la que lo detecta — por eso no se omite. **Resolución verificada 2026-08-06:** cuando la verificación 1 (`git log origin/main --not HEAD`) está vacía y la 2 muestra drift regresivo main→develop: `git reset --hard HEAD@{1}` y `git merge origin/main -s ours --no-edit` (estrategia `ours` COMPLETA: árbol de `develop` EXACTO, ancestría avanzada, PR MERGEABLE). Verificar que `git diff HEAD@{1} HEAD` salga **totalmente** vacío. Regla: `-s ours` solo es legítimo cuando la verificación 1 está vacía (`main` no tiene commits únicos); si no lo está, esos commits se perderían — ahí el merge se resuelve a mano.
 
+6. 🔴 **`split_batch` y `requires_break_glass` NO se resuelven igual, y el marker sólo sirve para el primero** (verificado leyendo `batch-policy/classifier.ts`, release `2c87d71e2eca` del 2026-08-09). El gotcha #2 y el paso B de §2.4 hablan del marker `[release-coupled: …]`, y es fácil leerlos como "batch policy rojo ⇒ marker". No:
+
+   | Decisión | Qué la dispara | Única salida |
+   |---|---|---|
+   | `split_batch` | `findUncoupledIndependentSensitiveDomains` — pares de dominios sensibles independientes mezclados | marker en el cuerpo del squash, **o** partir el batch |
+   | `requires_break_glass` | `hasIrreversibleDomain(domains)` — **cualquier** dominio irreversible, con o sin mezcla | `bypass_preflight_reason` (≥20 chars) |
+
+   El classifier evalúa `split_batch` **antes**, así que un `requires_break_glass` significa que el par no estaba en la lista de independientes: **ponerle marker no cambia nada**. Consecuencia: todo release que toque `migrations/`, `src/lib/release/**` o `.github/workflows/` va a pedir bypass. `TASK-1681` evaluó relajar la severidad y lo descartó con datos.
+
+7. **Una sola instancia Cloud SQL: `greenhouse-pg-dev` sirve a producción, staging y local** (verificado 2026-08-09). Una migración aplicada "en dev" **ya está aplicada para producción**. Antes de redactar la razón de un bypass con `db_migrations`, comprobá `SELECT name, run_on FROM public.pgmigrations WHERE name LIKE '%<task-id>%'`: si ya están aplicadas, ese dominio es reconciliación de archivos con un estado ya realizado y el rollback no necesita undo ni backfill — un hecho auditable, no una opinión.
+
 > El ops-worker que queda con GIT_SHA rezagado tras el release **no es drift** — ver §4.1 (change-gate `deploy_needed=false` cuando el código de worker no cambió).
 
 ### 2.4. Camino recomendado: pre-emptar los 3 gotchas ANTES del PR (verificado 2026-08-06)
