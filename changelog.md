@@ -7,6 +7,24 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-09 — El carril de acceso del portal cliente, EN PRODUCCIÓN (release `2c87d71e2eca`)
+
+`TASK-1678` + `TASK-1679` promovidas juntas a propósito: la contención del fail-open se retira en el
+mismo instante en que el fail-open se cierra, así que no hubo ventana de exposición. Manifest
+`2c87d71e2eca-f444748c-92aa-484c-b118-02713ee63e06` en `released`, run `31335921151`, watchdog
+`drift_count=0`, `/api/auth/health` 200 con los 3 providers `ready`.
+
+- Pasó a la primera con un solo bypass previsto: los dos hallazgos del preflight se pre-emptaron antes
+  de tocar `main` (el staging `CANCELED` se resolvió con el propio push de código; el smoke sobre `main`
+  se **produjo** en vez de bypassearse).
+- 🔴 **Aprendizaje que no estaba en ningún runbook:** el marker `[release-coupled:]` **no** sirve para
+  `requires_break_glass` — sólo limpia `split_batch`. Ponerle marker a un `requires_break_glass` es
+  cargo-cult; su única salida es el bypass.
+- **Hay una sola instancia Cloud SQL:** producción, staging y local leen la misma base, así que las 2
+  migraciones del batch ya estaban aplicadas antes del deploy. Eso cambia cómo se evalúa el riesgo de un
+  release con `db_migrations`.
+- `TASK-1680` quedó desbloqueada (su `Blocked by` apuntaba a `TASK-1679`).
+
 ## 2026-08-09 — Las 9 páginas del portal cliente dejaron de mentir (TASK-1679, cierra ISSUE-146)
 
 Las nueve rutas guardadas redirigían con `?error=resolver_unavailable` —el banner de "el servicio no
@@ -1210,11 +1228,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   visuales completos por contrato siguen pendientes.
 - Rollout público completado en `axis-design-system-lab.vercel.app`; el primer slice Greenhouse `colors`
   ya tiene referencia token-backed en `/references/colors/` y su inventario de migración quedó documentado.
-
-## 2026-08-01 — Globe Producer: pie de la aplicación, paginación del feed y seis defectos de superficie
-
-- El **pie de la aplicación volvió al Producer**: el port a React había perdido el `.producer-footer` del payload legacy y con él el wordmark de Efeonce. Se trajo `efeonce-positive.svg` desde `public/branding/logo-full.svg` como par exacto del negativo (mismo `viewBox` y trazados, sólo cambia la tinta) y se registró en el allowlist de `assets.ts` y en `PROVENANCE.md`; el logo cambia de tinta con el tema, que es tematizable desde TASK-1613.
-- El **feed puede volver hacia atrás**. El backend paginaba por cursor keyset desde TASK-1525 y el cliente ignoraba el `nextCursor`, así que el histórico era inalcanzable. Verificado en vivo: 25 → 50 piezas. Se descartó scroll infinito (vuelve inalcanzable el pie y mueve el contenido bajo el cursor con piezas generándose) y páginas numeradas (offset es incorrecto cuando entran items por arriba).
-- El **anillo de créditos mide el ciclo y no el stock**: con 500.836 de 501.110 el arco de consumo medía 0,197° de 360 — invisible por física. El glifo pasó de `sparkles` (el genérico de IA) a `flame`. Mientras el período no tenga tope asignado el aro queda **neutro** en vez de inventar un denominador.
-- Además: barra del documento tokenizada y `scroll-behavior: smooth`, barra del composer que se revela en hover, `⌘K` como una unidad, y los controles de selección de las cards centrados y apagados honestamente hasta que el compare se porte desde el legacy.
-- Lecciones registradas en la skill `greenhouse-globe` y en el `Delta 2026-08-01` de TASK-1559: el `padding` que el UA da a todo `<button>` sin preflight (rompe sólo bajo 29 px de caja), `margin:auto` + `flex-wrap`, que `space-between` reparte hijos, y que un velo por alfa no es un hueco.

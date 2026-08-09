@@ -22,10 +22,18 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `platform`
-- Blocked by: `TASK-1679`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `client-portal-legacy-branching-sweep`
 - GitHub Issue: `none`
+
+## Delta 2026-08-09
+
+- **Desbloqueada.** `TASK-1678` y `TASK-1679` se promovieron a producción el 2026-08-09 en el
+  release `2c87d71e2eca` (manifest `2c87d71e2eca-f444748c-92aa-484c-b118-02713ee63e06`,
+  watchdog `drift_count=0`). El carril viejo ya falla hacia cerrado para el routeGroup
+  `client`, así que promover el lint a `error` ya no puede dejar el portal cliente sin
+  alternativa. `Blocked by` pasa de `TASK-1679` a `none`.
 
 ## Summary
 

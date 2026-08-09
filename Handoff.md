@@ -1,5 +1,37 @@
 # Handoff activo
 
+### Release 2026-08-09 — el carril de acceso del portal cliente está EN PRODUCCIÓN
+
+`TASK-1678` + `TASK-1679` cerradas y promovidas. Manifest
+`2c87d71e2eca-f444748c-92aa-484c-b118-02713ee63e06` en `released`, run `31335921151`, target
+`2c87d71e2ecab15441a87bd35b6d42753f0aaef7`, PR #185. Watchdog `drift_count=0`.
+
+**Lo que necesita quien siga:**
+
+1. 🔴 **El marker `[release-coupled:]` NO resuelve `requires_break_glass`.** Leído el classifier: el
+   marker sólo limpia `split_batch` (`findUncoupledIndependentSensitiveDomains`);
+   `requires_break_glass` lo dispara `hasIrreversibleDomain()` y su única salida es
+   `bypass_preflight_reason`. Ningún runbook lo decía, y el instinto de "pongo el marker como la vez
+   pasada" te hace perder un run. Si el classifier dice `requires_break_glass`, el marker es
+   cargo-cult.
+2. **Hay UNA sola instancia Cloud SQL (`greenhouse-pg-dev`).** Producción, staging y local leen la
+   misma base — verificado con `gcloud sql instances list`. Consecuencia práctica: una migración
+   aplicada en "dev" YA está aplicada para producción. Las 2 de este release lo estaban antes del
+   deploy, así que su dominio `db_migrations` era reconciliación de archivos, no cambio pendiente. Eso
+   se puede citar en la razón del bypass porque es verificable en `pgmigrations`.
+3. **Pendiente comercial, no técnico:** asignar `creative_hub_globe_v1` a **Sky Airlines** es lo único
+   que abre las 4 páginas Creative del portal (`/proyectos`, `/campanas`, `/equipo`, `/reviews`). El
+   operador declaró que Creative es de SKY y de nadie más. Hoy esas 4 muestran el empty state correcto.
+   `cliente.ciclos` y `cliente.analytics` están en la misma situación, rastreadas en
+   `PENDING_MODULE_DECLARATION_VIEW_CODES`.
+4. **`platform.release.bypass_preflight` está en el catálogo sin grant en `runtime.ts`** — el workflow
+   sólo valida los ≥20 caracteres, así que la capability es hoy gobernanza sobre el humano, no un gate
+   mecánico. Candidato a task.
+5. **Bug de tooling:** `pnpm docs:context-rotate --apply` archivó la sección que contenía
+   `> Historial rotado: [Handoff.archive.md]` y el gate estricto la exige — la rotación dejó su propio
+   gate rojo. Restaurada a mano; el script debería preservar esa línea.
+
+
 ### TASK-1679 — las 9 páginas del portal cliente dejaron de mentir (cierra ISSUE-146)
 
 Code complete en `develop`, **rollout pendiente**. Va DESPUÉS de `TASK-1678` en la promoción.
@@ -549,37 +581,6 @@ Owner, out-of-band; Efeonce ya lo tiene desde 2025-12-10).
 igual). (2) `SurfaceRecipe.plane='none'` para recipes sobre composiciones de cards. (3)
 El 1 rojo de la suite full es `catalog-extensibility` del artifact-composer, roto por
 WIP sin commitear de OTRO agente en `catalogs/deck-axis/` — no tocar desde acá.
-
-### TASK-1306 — cockpit SEO Overview: code complete, deploy pendiente (2026-08-06)
-
-`/admin/growth/seo` en `develop` **local (sin push)**, 5 slices. Suite **10281/0**, build prod
-verde, GVC 1440+390 con `pageErrors 0`. Detalle completo en el `## Closure Report` de
-`docs/tasks/complete/TASK-1306-growth-seo-overview-cockpit-ui.md`.
-
-**Lo que necesita quien siga:**
-
-1. **`resolveApexColor` (`src/libs/styles/`) es un hallazgo compartido.** Con `cssVariables: true`
-   el theme devuelve `var(--mui-palette-*)` y ApexCharts revienta al parsearlo — 8 excepciones por
-   corrida, invisibles (el chart no termina de pintar). **Los ~32 consumidores de Apex del repo
-   tienen el mismo bug latente**; candidato a task propia.
-2. **`MetricTrendCard` ganó `deltaOverride` + `deltaSemantics`** (opt-in, legacy byte-idéntico).
-   **TASK-1307 las necesita** para su Δ30d de posición: no reimplementarlas.
-3. **`readRankSnapshotLatest` NO existe** aunque 1306/1307 lo citen: sólo `readRankEvolution`.
-4. **`GROWTH_SEO_ENABLED` ya está ON en Production** — la ruta queda viva al desplegar; el control
-   de exposición restante es el viewCode + el `module_assignment` per-org.
-
-**Rollout pendiente — promover `develop` → `main`.** Corregido: NO hay una migración
-pendiente por entorno; hay UNA sola base (`greenhouse_app`) compartida por dev/staging/prod
-y el viewCode ya está sembrado. Lo que falta es la promoción, y **no es cosmética**:
-`syncViewRegistryCatalog` apaga todo viewCode ausente del catálogo TS del código EN
-EJECUCIÓN, así que mientras 1306 viva sólo en `develop`, producción **apaga
-`administracion.growth_seo` en cada sincronización** (ya pasó una vez; se reactivó a mano,
-pero la reactivación manual se revierte sola). Queda registrado como checkbox de cierre en
-`TASK-1307` (§Pendiente heredado) — si 1307 se demora o se cancela, sacar la promoción
-igual, por su cuenta.
-
-**Próximo paso:** TASK-1307, con dirección visual ya aprobada (concepto C "Evidencia narrativa",
-`product-design-loop` 2026-08-06) y Slice 0 (ECharts vs Apex) todavía abierto.
 
 ### Hallazgo MCP gateway — clientes Claude no conectan por falta de DCR (2026-08-06)
 

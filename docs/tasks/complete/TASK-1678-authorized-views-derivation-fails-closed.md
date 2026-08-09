@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -27,9 +27,15 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
-## Estado real 2026-08-09 — `code complete, rollout pendiente`
+## Estado real 2026-08-09 — ✅ `complete`, EN PRODUCCIÓN
+**Promovida a producción el 2026-08-09** en el release `2c87d71e2eca` (manifest
+`2c87d71e2eca-f444748c-92aa-484c-b118-02713ee63e06`, run `31335921151`, estado `released`,
+watchdog `drift_count=0`). `/api/auth/health` 200 con los 3 providers `ready`. Los invariantes
+verificados post-release contra la base que lee producción con las tres personas agente
+(`scripts/identity/client-view-rail-persona-check.ts`).
 
-Los 5 slices están implementados y verificados en local. **No se mueve a `complete/`** porque el
+
+Los 5 slices están implementados y verificados en local. ~~No se mueve a `complete/`~~ (cerrada tras la promoción) porque el
 criterio de aceptación exige verificación de runtime con las tres personas agente *antes de promover*,
 y esto todavía no está en `main`.
 

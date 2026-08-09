@@ -12,6 +12,8 @@
 - [2026-07](2026-07.md)
 - [Rotación 2026-07-17](2026-07-17-rotation.md)
 
+- [2026-08](2026-08.md)
+
 No volver a pegar historia completa en este índice.
 
 ## Streams de plataformas hermanas
