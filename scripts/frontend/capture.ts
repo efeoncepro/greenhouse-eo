@@ -409,7 +409,7 @@ const main = async (): Promise<void> => {
     throw new Error('Provide either a <scenario-name> positional OR --route=<path>')
   }
 
-  const envConfig = resolveEnvConfig(env)
+  let envConfig = resolveEnvConfig(env)
 
   PRINT(`▶ Capture canónica`)
   PRINT(`  env:      ${env}`)
@@ -429,6 +429,27 @@ const main = async (): Promise<void> => {
   const scenario = scenarioName
     ? await loadScenarioByName(scenarioName)
     : buildInlineScenario(values.route as string, Number(values.hold), values.ready as string | undefined)
+
+  // Persona declarada por el scenario. Se aplica ANTES de tocar el browser: capturar una
+  // superficie cliente con la sesión de operador no falla claro — renderiza el card de
+  // bloqueo y el gate reporta BLOCK como si fuera defecto de producto (caso real:
+  // `growth-seo-client`, TASK-1310). Un override explícito por env var sigue ganando, para
+  // no quitarle la salida de emergencia a quien depura.
+  if (scenario.requiresStorageState && !process.env.GVC_STORAGE_STATE_PATH) {
+    const declared = scenario.requiresStorageState
+
+    if (!existsSync(resolve(REPO_ROOT, declared))) {
+      throw new Error(
+        `El scenario "${scenario.name}" declara requiresStorageState="${declared}" y ese archivo no existe.\n` +
+          `Genéralo con:\n` +
+          `  AGENT_AUTH_SECRET=<secret> AGENT_AUTH_EMAIL=<email de esa identidad> node scripts/playwright-auth-setup.mjs\n` +
+          `y muévelo a ${declared}. Sin él la captura correría con otra identidad y produciría evidencia engañosa.`
+      )
+    }
+
+    envConfig = { ...envConfig, storageStatePath: declared }
+    PRINT(`  persona:  ${declared} (declarada por el scenario)`)
+  }
 
   const cliDevice = values.device as string | undefined
   const scenarioVariants = !cliDevice && scenario.viewports?.length ? scenario.viewports : undefined

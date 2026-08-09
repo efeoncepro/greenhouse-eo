@@ -2,8 +2,6 @@
 
 import Link from 'next/link'
 
-import { useTheme } from '@mui/material/styles'
-import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
@@ -19,6 +17,7 @@ import type {
   SeoOverviewSidebar as SeoOverviewSidebarData,
   SeoSidebarRegion
 } from '@/lib/growth/seo/overview/read-overview-sidebar'
+import SeoHealthGauge from '../shared/SeoHealthGauge'
 
 /**
  * TASK-1306 — sidebar del cockpit: salud (4a) · movers (4b) · cruce AEO (4c).
@@ -73,74 +72,6 @@ const SidebarCard = ({
   </Card>
 )
 
-/**
- * Gauge de salud — arco SVG determinista, NO una librería de charts.
- *
- * Un radialBar de ApexCharts depende de medir su contenedor al montar; dentro de una
- * columna fluida medía 0 y el arco no se dibujaba (hueco en blanco, verificado en GVC).
- * Un solo número entre 0 y 100 no justifica esa fragilidad: el arco se calcula con
- * `strokeDasharray` sobre un path fijo, así que rinde igual en SSR, en el primer paint y
- * en la captura, sin depender del ancho disponible ni de un import dinámico.
- *
- * El color sigue el umbral de salud y va acompañado SIEMPRE del número — nunca es la
- * única señal (a11y).
- */
-const SeoHealthGauge = ({ score }: { score: number }) => {
-  const theme = useTheme()
-  const rounded = Math.round(score)
-
-  // Arco de 270° (de -135° a 135°): el hueco inferior evita que un score bajo se lea
-  // como un círculo casi completo.
-  const RADIUS = 54
-  const ARC_LENGTH = 2 * Math.PI * RADIUS * 0.75
-  const progress = (Math.min(100, Math.max(0, rounded)) / 100) * ARC_LENGTH
-
-  const tone =
-    rounded >= 80 ? theme.palette.success.main : rounded >= 50 ? theme.palette.warning.main : theme.palette.error.main
-
-  return (
-    <Box
-      role='img'
-      aria-label={GH_GROWTH_SEO_OVERVIEW.health.scoreAria.replace('{score}', String(rounded))}
-      sx={{ display: 'flex', justifyContent: 'center' }}
-    >
-      <Box component='svg' viewBox='0 0 140 140' sx={{ inlineSize: 160, blockSize: 160 }} aria-hidden='true'>
-        <circle
-          cx='70'
-          cy='70'
-          r={RADIUS}
-          fill='none'
-          stroke={theme.palette.divider}
-          strokeWidth='12'
-          strokeLinecap='round'
-          strokeDasharray={`${ARC_LENGTH} ${2 * Math.PI * RADIUS}`}
-          transform='rotate(135 70 70)'
-        />
-        <circle
-          cx='70'
-          cy='70'
-          r={RADIUS}
-          fill='none'
-          stroke={tone}
-          strokeWidth='12'
-          strokeLinecap='round'
-          strokeDasharray={`${progress} ${2 * Math.PI * RADIUS}`}
-          transform='rotate(135 70 70)'
-        />
-        <text
-          x='70'
-          y='78'
-          textAnchor='middle'
-          fill={theme.palette.text.primary}
-          style={{ fontSize: '2rem', fontWeight: 600 }}
-        >
-          {rounded}
-        </text>
-      </Box>
-    </Box>
-  )
-}
-
 const HealthCard = ({ health }: { health: SeoSidebarRegion<SeoHealthSummary> }) => {
   return (
     <SidebarCard
@@ -156,7 +87,10 @@ const HealthCard = ({ health }: { health: SeoSidebarRegion<SeoHealthSummary> }) 
             // Puntaje no calculado ≠ puntaje cero. Un 0/100 leería como "sitio roto".
             <PendingSlot reason='no_data' />
           ) : (
-            <SeoHealthGauge score={health.data.healthScore} />
+            <SeoHealthGauge
+              score={health.data.healthScore}
+              ariaLabel={GH_GROWTH_SEO_OVERVIEW.health.scoreAria.replace('{score}', String(Math.round(health.data.healthScore)))}
+            />
           )}
 
           {/* Severidad con etiqueta + número: nunca sólo un color (a11y). */}

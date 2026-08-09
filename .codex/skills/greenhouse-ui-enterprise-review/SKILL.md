@@ -53,10 +53,24 @@ Score 1-5:
 - Primary action is unclear or duplicated across competing regions.
 - Mobile is a squeezed desktop or has clipped controls/text.
 - Partial/degraded data appears complete.
+- A finished job with zero results is rendered as a failure or as "never ran", or a
+  scope-capped result (page cap, row limit, date window) is presented as the total.
+- A number whose provenance differs from its neighbours — an in-house estimate, a third
+  party's own weighting, a sample instead of a census, a lab measurement instead of field
+  data — carries no on-surface declaration of that difference, so adjacent figures read as
+  a contradiction or as precision the product does not have.
 - Important state is color-only.
 - UI is generic template composition rather than task-native.
 - The first fold is card wallpaper: repeated contained surfaces, card-on-card
   nesting, or identical rounded panels without a spatial hierarchy.
+- Content, KPI, filters, chart controls or table controls float directly on the
+  grey/default canvas instead of living inside a deliberate surface model.
+- Colored left rails, side accents, stripe cards, traffic-light rows or
+  success/warning/error floods are the primary visual language.
+- Sparse charts occupy large empty space instead of being reframed as evidence,
+  timeline, coverage or confidence.
+- Data tables are flat exports rather than ranking/work queue surfaces with
+  density, sort/filter/action model and responsive strategy.
 - The surface has no task-relevant dominant visual moment; polish is distributed
   uniformly instead of producing a clear editorial/operational focal point.
 - Copy is vague or reusable copy is hardcoded in JSX.
@@ -66,6 +80,13 @@ Score 1-5:
 - A `variant` only changes color/radius/shadow/icon instead of behavior, density, state model, action placement, or microinteraction contract.
 - A desktop contextual sidecar is implemented as a custom drawer/card overlay instead of `AdaptiveSidecarLayout` + `ContextualSidecar`.
 - A dirty/replacing sidecar has no idempotent close/replacement guard.
+
+## Anti-AI-slop review check
+
+Treat "AI slop" as a `BLOCK` when the UI relies on card soup, colored side
+rails, traffic-light palette, generic MUI table/chart defaults, sparse data
+stretched into large empty charts, verbose template copy, or desktop-stacked
+mobile. Automated PASS cannot override screenshot review.
 
 ## Verdict Rules
 

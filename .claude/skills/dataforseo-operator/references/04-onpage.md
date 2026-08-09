@@ -218,7 +218,24 @@ Checks sitewide (en `summary.domain_info.checks`): `sitemap`, `robots_txt`, `ssl
 
 ---
 
-## 11. Fuentes
+## 11. Cómo NO leer un reporte OnPage (verificado en UI, TASK-1309)
+
+El reporte es un **passthrough**: dice lo que su catálogo encontró, con su ponderación. Cuatro lecturas que lo convierten en un diagnóstico falso — todas salieron de mirar la pantalla con datos reales de Grupo Berel (health 95.4 · 0 críticos · 138 avisos · 381 menores).
+
+1. **Los checks de performance son LABORATORIO.** `high_loading_time`, `high_waiting_time`, `large_page_size`, `has_render_blocking_resources`, `no_content_encoding`, los CWV de `enable_browser_rendering` y todo Lighthouse miden una corrida sintética desde la red y la CPU del crawler. Google rankea con **CrUX (campo)**. Al exponerlos a un operador o cliente hay que decirlo **en el dato mismo**: usa el lab para diagnosticar la causa (qué recurso bloquea, qué pesa), el campo (GSC/CrUX) para decidir si hay problema. Sin la etiqueta, el cliente optimiza lo que no se mide.
+2. **`onpage_score` y tu conteo de issues NO miden lo mismo.** El score es la ponderación del proveedor (pesa sobre todo lo que rompe indexación); el conteo sale de tu allowlist curado (`site-audit/findings-map.ts`). "95 de salud" con "519 issues" no es una contradicción ni un bug de la pantalla: es un sitio sin críticos con mucha higiene pendiente. Presentar ambos sin explicar cuál mide qué invita a leerlos como error.
+3. **Un crawl que chocó `max_crawl_pages` describe la MUESTRA, no el sitio.** `crawl_status.pages_crawled` + `crawl_stop_reason` son parte del dato, no metadata: si el tope se alcanzó, "páginas revisadas" y la salud describen lo que se alcanzó a mirar. Distinto de un crawl abortado por bloqueo — eso lo diagnostica `extended_crawl_status` (§9.2) y sí es una falla.
+4. **El catálogo no cubre AEO, y su silencio se lee como aprobación.** Un sitio puede puntuar 95/100 y estar bloqueando a todos los answer engines. Cuatro cosas que OnPage **no** te dice y hay que resolver aparte:
+   - **Acceso de crawlers IA en `robots.txt`.** El check sitewide `robots_txt` es booleano de *existencia*; no hay check de `OAI-SearchBot` / `PerplexityBot` / `ClaudeBot` bloqueados. Es el hallazgo más caro y el único que no degrada ninguna métrica del reporte. Se resuelve leyendo el `robots.txt` (o `raw_html` del propio crawl).
+   - **Ausencia total de JSON-LD.** `microdata` valida *lo que existe*; una página sin schema no genera error, genera silencio. La señal de ausencia es `checks.has_micromarkup = false` en `pages`, que hay que consultar explícitamente — no aparece en el rollup de issues.
+   - **Salud del sitemap.** `domain_info.checks.sitemap` es presencia, no calidad: no dice si trae URLs `noindex`, 404s, no-canónicas o `lastmod` mentido. Cruzarlo con `non_indexable` + `pages.checks.from_sitemap`.
+   - **Conflicto `noindex` + bloqueo en robots.** Google nunca ve el `noindex` porque no puede rastrear. Cada señal se reporta por separado y la contradicción no salta sola.
+
+**Corolario de producto:** el *esfuerzo* de arreglo tampoco es un dato de DataForSEO — el proveedor no lo reporta. Si tu UI ordena por esfuerzo (Greenhouse lo hace, `GH_GROWTH_SEO_AUDIT_ISSUES`), ese tier es un juicio editorial y se declara como estimación en pantalla.
+
+---
+
+## 12. Fuentes
 
 | Sección | URL | Estado |
 |---|---|---|

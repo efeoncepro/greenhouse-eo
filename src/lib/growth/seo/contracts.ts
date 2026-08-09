@@ -47,9 +47,15 @@ export interface SearchConsoleActiveOrg {
 /**
  * Disponibilidad de los datos de mercado (volumen/dificultad).
  *
- * Hoy siempre `unavailable`: el family registry de DataForSEO Labs es TASK-1300 y aún
- * no aterrizó. El striking-distance NO depende de esto — se calcula con datos medidos
- * de GSC — así que el reader entrega valor completo igual y el mercado sólo enriquece.
+ * Hoy siempre `unavailable`, y ⚠️ NO porque falte la integración: `TASK-1300` está
+ * `complete` y la familia `labs` es llamable (la usa `rank-history-seed.ts` para SERPs
+ * históricas). Lo que falta es la CAPABILITY encima — nadie construyó el fetch de
+ * volumen/dificultad por keyword, y no hay dónde guardarlo: el schema SEO no tiene
+ * columna de `search_volume` ni `keyword_difficulty`. O sea, la cañería existe y el agua
+ * no. Quien vaya a cerrarlo necesita fetch + columnas + reader, no "esperar a 1300".
+ *
+ * El striking-distance NO depende de esto — se calcula con datos medidos de GSC — así que
+ * el reader entrega valor completo igual y el mercado sólo enriquece.
  */
 export type SeoMarketAvailability = 'available' | 'unavailable'
 
@@ -363,6 +369,25 @@ export interface SeoSiteAuditRunView {
   finishedAt: string | null
 }
 
+/**
+ * Resumen del crawl ANTERIOR, para leer el reporte como movimiento y no como foto.
+ *
+ * El módulo entero se vende como serie de tiempo ("la visibilidad no es una foto"), y el
+ * site audit era la única superficie que mostraba un punto. Va acá, dentro del reader
+ * canónico, y NO como reader aparte: el lane ecosystem y la tool MCP son passthrough, así
+ * que la comparación le llega a todos los consumers por construcción (Full API Parity) sin
+ * inventar un contrato paralelo.
+ *
+ * Sólo compara contra runs que TERMINARON (`succeeded`/`degraded`): comparar contra uno
+ * fallido o en vuelo daría un delta inventado.
+ */
+export interface SeoSiteAuditPreviousRunView {
+  auditRunId: string
+  captureDate: string
+  healthScore: number | null
+  totals: Record<SeoSiteAuditFindingSeverity, number>
+}
+
 export type SiteAuditReportResult =
   | {
       ok: true
@@ -372,6 +397,8 @@ export type SiteAuditReportResult =
       /** Findings agrupados por severidad (orden: critical → warning → notice). */
       findings: Record<SeoSiteAuditFindingSeverity, SeoSiteAuditFindingView[]>
       totals: Record<SeoSiteAuditFindingSeverity, number>
+      /** Crawl anterior comparable, o `null` si éste es el primero. */
+      previous: SeoSiteAuditPreviousRunView | null
     }
   | {
       ok: false
@@ -441,6 +468,12 @@ export interface RankEvolutionPoint {
   /** Posición orgánica medida; null = trackeada pero el dominio no rankeó ese día. */
   position: number | null
   url: string | null
+  /**
+   * TASK-1307 — el SERP de ese día mostró AI Overview (`serp_features ? 'ai_overview'`).
+   * Aditivo: los consumers que no lo leen no cambian. Es el puente SEO↔AEO de la
+   * pantalla ancla: una caída de CTR sin caída de posición suele explicarse acá.
+   */
+  aiOverview?: boolean
 }
 
 export interface RankEvolutionSeries {
@@ -493,6 +526,12 @@ export type RankEvolutionResult =
  *
  * No hay celda mixta: una serie entera pertenece a una sola fuente. Es lo que permite
  * decir "◑ estimado" o "● medido" del gráfico completo sin una mentira por serie.
+ *
+ * ⚠️ FALLBACK entre fuentes (2026-08-07): la celda keyword×position es una INTENCIÓN, no
+ * una promesa ciega. GSC también mide posición por keyword (promedio ponderado), así que
+ * cuando la serie exacta de DataForSEO es más joven que la medida (rank capture recién
+ * arrancado vs. historial GSC), el reader sirve la de GSC y lo DECLARA en `source`.
+ * "Si no vienen de uno, vienen del otro" — pero jamás promediadas.
  */
 
 /** Eje del set elegido: comparar keywords entre sí, o URLs entre sí. Nunca mezclados. */
@@ -508,6 +547,8 @@ export type SeoPerformanceSource = 'gsc_measured' | 'dataforseo_estimated'
 export interface SeoPerformancePoint {
   date: string
   value: number | null
+  /** El SERP de ese día mostró AI Overview. Sólo presente en la serie ◑ (DataForSEO). */
+  aiOverview?: boolean
 }
 
 export interface SeoPerformanceSeries {
@@ -543,6 +584,40 @@ export interface SeoPerformanceStanding {
   trend: Array<number | null>
 }
 
+/** Agregado MEDIDO del conjunto en un día (Search Console, siempre — nunca DataForSEO). */
+export interface SeoPerformanceDailyTotal {
+  date: string
+  clicks: number
+  impressions: number
+  /**
+   * Posición del conjunto PONDERADA POR IMPRESIONES: `Σ(posición×impresiones)/Σ(impresiones)`.
+   * Un promedio plano le daría el mismo peso a un ítem de 2 impresiones que a uno de 500.
+   * `null` sin impresiones ese día.
+   */
+  position: number | null
+  ctr: number | null
+}
+
+export interface SeoPerformanceTotals {
+  clicks: number
+  impressions: number
+  position: number | null
+  ctr: number | null
+}
+
+/**
+ * Titular del conjunto: el agregado del período, la ventana previa comparable y la serie
+ * diaria que alimenta el sparkline de cada KPI.
+ *
+ * `previous: null` = no hay ventana anterior con datos. La UI NO dibuja delta en ese caso:
+ * comparar contra una ventana vacía fabricaría un +100% inventado.
+ */
+export interface SeoPerformanceSummary {
+  current: SeoPerformanceTotals
+  previous: SeoPerformanceTotals | null
+  series: SeoPerformanceDailyTotal[]
+}
+
 export type SeoPerformanceResult =
   | {
       ok: true
@@ -556,6 +631,8 @@ export type SeoPerformanceResult =
       source: SeoPerformanceSource
       series: SeoPerformanceSeries[]
       standings: SeoPerformanceStanding[]
+      /** Titular medido del conjunto (banda de KPI). Siempre GSC, sea cual sea la métrica. */
+      summary: SeoPerformanceSummary
       /**
        * Ítems pedidos que no tienen NINGÚN dato en la ventana. Se nombran en vez de
        * omitirse en silencio: "pediste 4 y te muestro 2" tiene que ser visible.
@@ -577,11 +654,123 @@ export interface SeoPerformanceCatalogItem {
   tracked: boolean
 }
 
+/** Un set nombrado de keywords (config del target) ofrecido como preset de comparación. */
+export interface SeoPerformanceCatalogSet {
+  name: string
+  keywords: string[]
+}
+
 export type SeoPerformanceCatalogResult =
   | {
       ok: true
       organizationId: string
       mode: SeoPerformanceMode
       items: SeoPerformanceCatalogItem[]
+      /**
+       * Presets: los `seo_keyword_sets` nombrados del target activo (sólo modo keyword).
+       * Data-driven — la UI ofrece EXACTAMENTE los grupos que el operador configuró
+       * ("Marca", "Categoría"); no inventa agrupaciones.
+       */
+      sets?: SeoPerformanceCatalogSet[]
     }
   | { ok: false; errorCode: 'disabled' | 'no_data' | 'query_failed'; status: null }
+
+/**
+ * ═══ TASK-1308 — Command `trackKeywords` (seguir una keyword) ═══
+ *
+ * Seguir una keyword no es un INSERT: es un **compromiso de gasto diferido**. El rank
+ * capture diario (TASK-1303) paga DataForSEO por cada keyword VIGENTE del set, todos los
+ * días, hasta que alguien la deje de seguir. Por eso el command tiene techo, procedencia
+ * y outcome por keyword — y por eso el resultado NUNCA es un booleano: un caller que sólo
+ * ve `ok: true` no sabe si agregó 1 keyword nueva o rebotó 40 contra el techo.
+ */
+
+/** Procedencia del write (vocabulario cerrado, espejo del CHECK de la migración 1308). */
+export type SeoKeywordTrackSource = 'operator_ui' | 'nexa' | 'mcp' | 'seed' | 'backfill'
+
+/** Qué pasó con UNA keyword del lote. */
+export type SeoKeywordTrackStatus =
+  /** Nueva membresía vigente creada. Entra al rank capture del próximo ciclo. */
+  | 'tracked'
+  /** Ya tenía membresía vigente. Cero writes, cero gasto nuevo — el command es idempotente. */
+  | 'already_tracked'
+  /** Vacía, sólo espacios o más larga que el máximo: no se persiste basura. */
+  | 'invalid'
+  /** El set llegó a su techo gobernado. Se rechaza explícito, NUNCA en silencio. */
+  | 'capacity_exceeded'
+
+export interface SeoKeywordTrackOutcome {
+  /** La keyword normalizada (lo que quedó o habría quedado en la tabla). */
+  keyword: string
+  status: SeoKeywordTrackStatus
+}
+
+export type TrackKeywordsResult =
+  | {
+      ok: true
+      seoTargetId: string
+      organizationId: string
+      keywordSetId: string
+      outcomes: SeoKeywordTrackOutcome[]
+      /** Membresías vigentes del target DESPUÉS del command (lo que se paga por ciclo). */
+      activeKeywordCount: number
+      /** Techo gobernado vigente, para que la UI pueda decir cuánto queda. */
+      capacity: number
+    }
+  | {
+      ok: false
+      errorCode:
+        | 'disabled'
+        | 'target_not_found'
+        | 'target_not_active'
+        | 'no_entitlement'
+        | 'no_keywords'
+        | 'query_failed'
+      status: null
+    }
+
+/**
+ * Evento outbox del command (constante local del dominio, mismo patrón que el de captura:
+ * el seam de extracción §17.3 evita acoplar `src/lib/growth/seo/**` al catálogo central).
+ */
+export const SEO_KEYWORD_SET_UPDATED_EVENT = 'growth.seo.keyword_set.updated'
+
+/**
+ * ═══ TASK-1308 — Command `untrackKeywords` (dejar de seguir) ═══
+ *
+ * La contraparte que faltaba, y su ausencia era un callejón sin salida DISEÑADO: el set
+ * tiene techo, la UI decía "deja de seguir alguna" y no existía forma de hacerlo desde el
+ * portal. Cerrar el ciclo también es lo que hace que el gasto sea reversible — sin esto,
+ * seguir una keyword era un compromiso permanente.
+ *
+ * ⚠️ NO BORRA: cierra la ventana con `effective_to`. La tabla es append-only (trigger
+ * anti-DELETE de TASK-1299) y el histórico de qué se midió y cuándo es justamente lo que
+ * permite explicar una factura pasada.
+ */
+export type SeoKeywordUntrackStatus =
+  /** Membresía vigente cerrada. Deja de entrar al rank capture del próximo ciclo. */
+  | 'untracked'
+  /** No había membresía vigente. Cero writes — el command es idempotente en ambos sentidos. */
+  | 'not_tracked'
+  | 'invalid'
+
+export interface SeoKeywordUntrackOutcome {
+  keyword: string
+  status: SeoKeywordUntrackStatus
+}
+
+export type UntrackKeywordsResult =
+  | {
+      ok: true
+      seoTargetId: string
+      organizationId: string
+      outcomes: SeoKeywordUntrackOutcome[]
+      /** Membresías vigentes DESPUÉS del command (lo que se sigue pagando por ciclo). */
+      activeKeywordCount: number
+      capacity: number
+    }
+  | {
+      ok: false
+      errorCode: 'disabled' | 'target_not_found' | 'no_entitlement' | 'no_keywords' | 'query_failed'
+      status: null
+    }

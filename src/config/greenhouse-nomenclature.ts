@@ -65,6 +65,22 @@ export const GH_INTERNAL_NAV = {
   growthForms: { label: 'Forms', subtitle: 'Formularios públicos, submissions y destinos' },
   growthAiVisibility: { label: 'AEO Grader', subtitle: 'Revisión de reportes de visibilidad en IA' },
   growthSeo: { label: 'SEO', subtitle: 'Salud de búsqueda por Space: posiciones, visibilidad y sitio' },
+  // TASK-1307 — child de `growthSeo` (tab Rendimiento), NO un ítem de menú propio: las 4
+  // rutas de "Search Visibility" comparten un solo viewCode y una sola entrada de nav.
+  growthSeoPerformance: {
+    label: 'Rendimiento',
+    subtitle: 'Evolución en el tiempo de un conjunto elegido de URLs o keywords'
+  },
+  // TASK-1308 — child de `growthSeo` (tab Keywords), mismo contrato que Rendimiento.
+  growthSeoKeywords: {
+    label: 'Keywords',
+    subtitle: 'Dónde crecer en búsqueda: lo que ya rankea y está a un empujón'
+  },
+  // TASK-1309 — child de `growthSeo` (tab Auditoría), mismo contrato que las anteriores.
+  growthSeoAudit: {
+    label: 'Auditoría',
+    subtitle: 'Salud técnica del sitio: qué está roto y qué conviene atacar primero'
+  },
   growthAeo: { label: 'AEO', subtitle: 'Programa AEO: score y plan por cliente + cross-sell' },
   growthCtas: { label: 'CTAs', subtitle: 'Motor de CTAs/popups: inventario, lifecycle y preview' },
   knowledge: { label: 'Knowledge', subtitle: 'Guías, fuentes y memoria operativa' },

@@ -34,7 +34,8 @@
         "technical": "Propuesta Técnica",
         "economic": "Propuesta Económica",
         "executive": "Propuesta Ejecutiva",
-        "combined": "Propuesta Técnica y Económica"
+        "combined": "Propuesta Técnica y Económica",
+        "training": "Capacitación HubSpot"
       },
       "constraints": {
         "maxCharacters": 34,

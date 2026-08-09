@@ -1,0 +1,434 @@
+{
+  "_readme": [
+    "Deck completo de capacitación práctica HubSpot® para ANAM · miércoles 12 de agosto de 2026 · 09:00–13:00.",
+    "Fuente narrativa: correo de Outlook de María Paz con estructura ampliada y respuesta de coordinación del 31-07-2026.",
+    "La secuencia sigue: problema y contrato de trabajo → objetos ANAM → Sales Workspace → Growth y Renovación → Service/Ticket → dashboards → IA → intents y handoff → ejercicio.",
+    "Todos los números dentro de mockups son ilustrativos. No representan métricas actuales, revenue ni estado live del portal de ANAM.",
+    "Los estados operativo/documentado, piloto y validación live son parte explícita del guion para no prometer capacidades sin licencia, permisos o prueba live.",
+    "La portada usa la plantilla aprobada CoverFull de los decks: Efeonce + ANAM + etiqueta de capacitación sobre el degradado institucional. HubSpot® queda como plataforma, no como marca dominante.",
+    "Componer: pnpm deck:compose docs/commercial/trainings/anam-hubspot-2026-08-12/deck-plan.json --out .captures/anam-hubspot-training-full"
+  ],
+  "tenderId": "ANAM-HUBSPOT-TRAINING-2026-08-12",
+  "slides": [
+    {
+      "slideId": "portada",
+      "contentType": "cover",
+      "template": "CoverFull",
+      "slots": {
+        "clientLogo": { "src": "assets/clients/anam-figma-dark.svg" },
+        "proposalKind": "training"
+      }
+    },
+    {
+      "slideId": "agenda",
+      "contentType": "agenda",
+      "template": "AgendaFull",
+      "slots": {
+        "sectionLabel": "ANAM · CAPACITACIÓN HUBSPOT",
+        "title": "Agenda",
+        "deckMeta": "<b>6</b> capítulos · práctica guiada · 4 horas",
+        "chapters": [
+          { "number": "01", "title": "Orientarse en el flujo", "description": "Objetos, asociaciones y búsqueda", "targetSlideId": "section-01" },
+          { "number": "02", "title": "Trabajar oportunidades", "description": "Workspace, etapa y próximo paso", "targetSlideId": "section-02" },
+          { "number": "03", "title": "Gestionar clientes", "description": "Servicios, riesgos y handoff", "targetSlideId": "section-03" },
+          { "number": "04", "title": "Decidir con datos", "description": "Dashboards, estados y lectura responsable", "targetSlideId": "section-04" },
+          { "number": "05", "title": "Acelerar con IA", "description": "Breeze, reuniones y revisión humana", "targetSlideId": "section-05" },
+          { "number": "06", "title": "Integrar y cerrar", "description": "Ejercicio integrado y compromisos", "targetSlideId": "section-06" }
+        ],
+        "footerLabel": "Capacitación · HubSpot® para ANAM"
+      }
+    },
+    {
+      "slideId": "objetivos",
+      "contentType": "dual-list",
+      "template": "DualListSplit",
+      "slots": {
+        "leftEyebrow": "AL FINAL DE LA SESIÓN",
+        "leftTitle": "Cada participante podrá trabajar una cuenta con trazabilidad",
+        "leftItems": [
+          { "lead": "Entender el modelo ANAM", "body": "Distinguir Contacto, Lead, Empresa, Negocio/Deal, Service y Ticket." },
+          { "lead": "Separar los pipelines", "body": "Leer Growth y Fidelización/Renovación con sus propias evidencias." },
+          { "lead": "Trabajar con continuidad", "body": "Usar Workspace, backlog y Paso siguiente para priorizar." },
+          { "lead": "Dejar un registro usable", "body": "Guardar owner, fecha, fuente y próximo paso para quien continúa." }
+        ],
+        "rightEyebrow": "Y PODRÁ DECIDIR MEJOR",
+        "rightTitle": "La información queda lista para la siguiente persona",
+        "rightItems": [
+          { "lead": "Leer lo que está vigente", "body": "Distinguir operativo, piloto, validación live y no publicado." },
+          { "lead": "Usar IA con control", "body": "Resumir, redactar y proponer; revisar antes de ejecutar." },
+          { "lead": "Derivar correctamente", "body": "Separar cotización, seguimiento de servicio y calidad." },
+          { "lead": "Cerrar un caso completo", "body": "Conectar cuenta, oportunidad, dashboard, handoff y compromiso." }
+        ]
+      }
+    },
+    {
+      "slideId": "section-01",
+      "contentType": "section-divider",
+      "template": "SectionDividerSplit",
+      "slots": {
+        "kicker": "CAPÍTULO 01",
+        "sectionNumber": "01",
+        "title": "Orientarse en el flujo",
+        "lead": "Antes de avanzar una oportunidad, hay que reconocer qué hecho estamos registrando.",
+        "agendaLabel": "CRM FUNDAMENTALS",
+        "sectionItems": [
+          { "number": "01", "title": "Objetos y asociaciones", "description": "Qué representa cada registro" },
+          { "number": "02", "title": "Calificación y oportunidad", "description": "Lead, Company y Deal sin mezclarlos" },
+          { "number": "03", "title": "Ejercicio de clasificación", "description": "Encontrar la cuenta y el objeto correcto" }
+        ]
+      }
+    },
+    {
+      "slideId": "flujo-crm",
+      "contentType": "process-sequential",
+      "template": "ProcessStepsFull",
+      "slots": {
+        "sectionLabel": "CRM FUNDAMENTALS",
+        "title": "El flujo de ANAM separa calificación, oportunidad, servicio y soporte",
+        "steps": [
+          { "title": "Identificar persona y cuenta", "description": "Contacto es la persona; Empresa es la cuenta y la asociación que debe revisarse.", "deliverable": "Contacto + Company" },
+          { "title": "Calificar el interés", "description": "Lead captura la pre-calificación antes de convertir el interés en un Deal.", "deliverable": "Lead calificado" },
+          { "title": "Gestionar la oportunidad", "description": "Deal conserva oportunidad, cotización y line items; la etapa exige evidencia.", "deliverable": "Deal trazable" },
+          { "title": "Continuar la entrega", "description": "Service conserva contrato y renovación; Ticket registra soporte, calidad, billing o administración.", "deliverable": "Service o Ticket correcto" }
+        ]
+      }
+    },
+    {
+      "slideId": "objetos",
+      "contentType": "comparison",
+      "template": "ComparisonSplit",
+      "slots": {
+        "leftTitle": "Cada registro representa un hecho distinto",
+        "rightTitle": "Errores que rompen la continuidad",
+        "presentation": { "mode": "diagnostic" },
+        "rows": [
+          { "left": { "lead": "Contacto + Empresa", "body": "Persona y cuenta son registros distintos; revisa su asociación." }, "right": { "lead": "Mezclarlos", "body": "Contacto no reemplaza Empresa ni sus asociaciones." } },
+          { "left": { "lead": "Lead", "body": "Pre-calificación del interés antes de abrir la oportunidad." }, "right": { "lead": "Abrir un Deal demasiado pronto", "body": "No usar el pipeline para suplir la calificación." } },
+          { "left": { "lead": "Negocio / Deal", "body": "Oportunidad, cotización, adjudicación y line items." }, "right": { "lead": "Avanzar sin evidencia", "body": "Etapa, owner, monto o Paso siguiente deben sostenerse." } },
+          { "left": { "lead": "Service", "body": "Servicio contratado, término, recurrencia y renovación." }, "right": { "lead": "Usarlo como factura", "body": "No crear un Service por cada fila de billing." } },
+          { "left": { "lead": "Ticket", "body": "Caso de soporte, calidad, billing o administración con SLA." }, "right": { "lead": "Mandarlo todo a ventas", "body": "La intención y el contexto determinan el routing." } }
+        ]
+      }
+    },
+    {
+      "slideId": "sales-workspace",
+      "contentType": "artifact-showcase",
+      "template": "ArtifactShowcaseFull",
+      "slots": {
+        "sectionLabel": "TRABAJO DIARIO EN HUBSPOT",
+        "title": "La oportunidad avanza cuando cada etapa deja un <em>próximo paso</em>",
+        "lead": "Esta vista conceptual muestra cómo revisar una cuenta, actualizar la etapa y dejar una acción con responsable y fecha.",
+        "artifact": { "src": "assets/anam/hubspot-sales-workspace-mockup.svg" },
+        "caption": "Vista conceptual de entrenamiento · datos ilustrativos · no es captura del portal de ANAM",
+        "note": "Referencia: Sales Workspace · HubSpot®"
+      }
+    },
+    {
+      "slideId": "proximo-paso",
+      "contentType": "process-sequential",
+      "template": "ProcessStepsFull",
+      "slots": {
+        "sectionLabel": "EJERCICIO · SALES WORKSPACE",
+        "title": "Un <em>Paso siguiente</em> convierte una etapa en trabajo verificable",
+        "steps": [
+          { "title": "Describe la acción", "description": "Empieza con verbo y objeto: confirmar reunión, validar alcance o enviar resumen.", "deliverable": "Paso siguiente concreto" },
+          { "title": "Asigna responsable", "description": "La tarea debe tener owner visible; sin owner nadie responde por el avance.", "deliverable": "Owner definido" },
+          { "title": "Fija una fecha", "description": "El vencimiento hace visible cuándo revisar y evita que el negocio se estanque.", "deliverable": "Fecha de revisión" },
+          { "title": "Sustenta la etapa", "description": "Verifica monto, países, variación o motivo de cierre cuando la etapa lo exige; luego registra el resultado.", "deliverable": "Evidencia trazable" }
+        ]
+      }
+    },
+    {
+      "slideId": "section-02",
+      "contentType": "section-divider",
+      "template": "SectionDividerSplit",
+      "slots": {
+        "kicker": "CAPÍTULO 02",
+        "sectionNumber": "02",
+        "title": "Trabajar oportunidades",
+        "lead": "La venta nueva y la renovación necesitan etapas claras, criterios y una acción siguiente.",
+        "agendaLabel": "SALES WORKSPACE",
+        "sectionItems": [
+          { "number": "01", "title": "Growth / nuevo negocio", "description": "Lead, Deal y evidencia de etapa" },
+          { "number": "02", "title": "Fidelización / renovación", "description": "Separar continuidad de venta nueva" },
+          { "number": "03", "title": "Ejercicio con una cuenta", "description": "Renovación y expansión en pipelines distintos" }
+        ]
+      }
+    },
+    {
+      "slideId": "pipelines",
+      "contentType": "artifact-showcase",
+      "template": "ArtifactShowcaseFull",
+      "slots": {
+        "sectionLabel": "PIPELINES · COMERCIAL Y FIDELIZACIÓN",
+        "title": "El pipeline hace visible dónde está cada oportunidad",
+        "lead": "La vista conceptual separa nuevo negocio y fidelización para que la etapa responda una pregunta concreta: ¿qué debe pasar ahora?",
+        "artifact": { "src": "assets/anam/hubspot-pipeline-mockup.svg" },
+        "caption": "Vista conceptual de pipeline · etapas y datos ilustrativos",
+        "note": "Growth + fidelización · referencia de entrenamiento"
+      }
+    },
+    {
+      "slideId": "growth-renovacion",
+      "contentType": "dual-text",
+      "template": "DualTextSplit",
+      "slots": {
+        "title": "Growth y Renovación: una cuenta, dos evidencias",
+        "leftConcept": {
+          "label": "NUEVO NEGOCIO",
+          "title": "Abrir una relación con potencial",
+          "paragraphs": [
+            "<strong>Growth</strong> parte de una necesidad nueva, una oportunidad o una expansión. Lead mantiene la pre-calificación; Deal empieza en <strong>Potencial 10%</strong> y exige evidencia a medida que avanza.",
+            "No mezcle Radar 0% —que pertenece a Lead— con la creación ordinaria del pipeline Growth."
+          ],
+          "icon": "target"
+        },
+        "rightConcept": {
+          "label": "FIDELIZACIÓN",
+          "title": "Proteger y expandir una relación",
+          "paragraphs": [
+            "<strong>Renovación</strong> parte de una cuenta existente, su Service y la fecha o condición que debe cuidarse.",
+            "Sus etapas son Por revisar → Elegibilidad confirmada → Contacto iniciado → Propuesta en negociación → Renovado, con salidas negativas controladas."
+          ],
+          "icon": "users"
+        },
+        "outcome": {
+          "label": "BOWTIE",
+          "text": "<strong>Una cuenta</strong> pasa por Lead/Deal y Service; la siguiente oportunidad no es Service ni Ticket."
+        }
+      }
+    },
+    {
+      "slideId": "section-03",
+      "contentType": "section-divider",
+      "template": "SectionDividerSplit",
+      "slots": {
+        "kicker": "CAPÍTULO 03",
+        "sectionNumber": "03",
+        "title": "Gestionar clientes",
+        "lead": "La cuenta no termina en la venta: el servicio y el riesgo deben conservar el mismo contexto.",
+        "agendaLabel": "CUSTOMER SUCCESS",
+        "sectionItems": [
+          { "number": "01", "title": "Cuenta, Service y Ticket", "description": "Conectar sin confundir sus granos" },
+          { "number": "02", "title": "Riesgo y renovación", "description": "Identificar la próxima señal" },
+          { "number": "03", "title": "Routing", "description": "Derivar con contexto suficiente" }
+        ]
+      }
+    },
+    {
+      "slideId": "customer-success",
+      "contentType": "artifact-showcase",
+      "template": "ArtifactShowcaseFull",
+      "slots": {
+        "sectionLabel": "CUSTOMER SUCCESS · VISTA CONCEPTUAL",
+        "title": "La cuenta conecta Service, Ticket y <em>continuidad</em>",
+        "lead": "El mockup separa Empresa, Service, Ticket, negocio y señales de renovación. Customer Success depende de licencia y configuración; no es un health score oficial.",
+        "artifact": { "src": "assets/anam/hubspot-customer-success-mockup.svg" },
+        "caption": "Vista conceptual · datos ilustrativos · Customer Success sujeto a validación live",
+        "note": "Service Hub / configuración pendiente"
+      }
+    },
+    {
+      "slideId": "routing",
+      "contentType": "comparison",
+      "template": "ComparisonSplit",
+      "slots": {
+        "leftTitle": "Clasifica el hecho y el intent",
+        "rightTitle": "Deriva al equipo con contexto",
+        "presentation": { "mode": "proposal" },
+        "rows": [
+          { "left": { "lead": "Cotizar", "body": "Necesidad, alcance, servicio o decisión de compra." }, "right": { "lead": "Comercial", "body": "Cuenta, negocio, etapa y próximo paso esperado." } },
+          { "left": { "lead": "Seguimiento de servicio", "body": "Uso, entrega, continuidad o solicitud sobre un Service." }, "right": { "lead": "Servicios", "body": "Service, fecha, solicitud y respuesta pendiente." } },
+          { "left": { "lead": "Requerimiento de calidad", "body": "Incidencia, reclamo, corrección o solicitud de revisión." }, "right": { "lead": "Calidad", "body": "Ticket/caso, evidencia, impacto y prioridad solicitada." } },
+          { "left": { "lead": "Soporte / contrato", "body": "Acceso, condiciones, documentación o ticket formal." }, "right": { "lead": "Equipo correspondiente", "body": "Cuenta, número de caso, contexto y SLA por confirmar." } }
+        ]
+      }
+    },
+    {
+      "slideId": "section-04",
+      "contentType": "section-divider",
+      "template": "SectionDividerSplit",
+      "slots": {
+        "kicker": "CAPÍTULO 04",
+        "sectionNumber": "04",
+        "title": "Decidir con datos",
+        "lead": "Un dashboard sirve cuando la organización conoce qué mide, de cuándo es y cuánto puede confiar.",
+        "agendaLabel": "KPIs Y DASHBOARDS",
+        "sectionItems": [
+          { "number": "01", "title": "Backlog y Growth", "description": "Leer oportunidades abiertas" },
+          { "number": "02", "title": "Metas y calidad", "description": "Relacionar Goals y excepciones" },
+          { "number": "03", "title": "Estados visibles", "description": "Operativo, piloto, live o no publicado" }
+        ]
+      }
+    },
+    {
+      "slideId": "dashboard",
+      "contentType": "artifact-showcase",
+      "template": "ArtifactShowcaseFull",
+      "slots": {
+        "sectionLabel": "KPIs Y DASHBOARDS",
+        "title": "Backlog, metas y calidad: cada panel declara su universo",
+        "lead": "La vista conceptual conecta Backlog Comercial, Goals y calidad de datos. Todo indicador necesita periodo, fuente, denominador, estado y acción responsable.",
+        "artifact": { "src": "assets/anam/hubspot-dashboard-mockup.svg" },
+        "caption": "PILOTO · datos ilustrativos · no es dashboard oficial de ANAM",
+        "note": "Deals + Goals · ejemplo · no revenue"
+      }
+    },
+    {
+      "slideId": "lectura-dato",
+      "contentType": "dual-list",
+      "template": "DualListSplit",
+      "slots": {
+        "leftEyebrow": "ANTES DE LEER",
+        "leftTitle": "Un indicador necesita una ficha técnica",
+        "leftItems": [
+          { "lead": "Periodo", "body": "¿De qué fechas proviene el dato?" },
+          { "lead": "Universo", "body": "¿Incluye Growth, Renewal, cerrados o solo abiertos?" },
+          { "lead": "Definición", "body": "¿Qué significa exactamente la etiqueta y la moneda?" },
+          { "lead": "Fuente + acción", "body": "¿Qué objeto lo alimenta y quién trabaja la excepción?" }
+        ],
+        "rightEyebrow": "ESTADOS DE LA CAPACIDAD",
+        "rightTitle": "Lo visible debe decir cuánto confiar",
+        "rightItems": [
+          { "lead": "Operativo / documentado", "body": "Fuente y definición disponibles para el uso acordado." },
+          { "lead": "Piloto", "body": "Sirve para probar el flujo, no para cerrar una conclusión." },
+          { "lead": "Validación live", "body": "Requiere licencia, permisos, configuración y fecha." },
+          { "lead": "No publicado", "body": "Está diseñado, pero no es una capacidad activa para el equipo." }
+        ]
+      }
+    },
+    {
+      "slideId": "section-05",
+      "contentType": "section-divider",
+      "template": "SectionDividerSplit",
+      "slots": {
+        "kicker": "CAPÍTULO 05",
+        "sectionNumber": "05",
+        "title": "Acelerar con IA",
+        "lead": "Breeze, las notas y las sugerencias pueden ahorrar trabajo; la autoridad sigue siendo humana.",
+        "agendaLabel": "BREEZE Y AUTOMATIZACIÓN",
+        "sectionItems": [
+          { "number": "01", "title": "Breeze", "description": "Resumir y preparar seguimiento" },
+          { "number": "02", "title": "Meeting Notetaker", "description": "Convertir acuerdos en tareas" },
+          { "number": "03", "title": "Revisión humana", "description": "Confirmar antes de ejecutar" }
+        ]
+      }
+    },
+    {
+      "slideId": "breeze",
+      "contentType": "artifact-showcase",
+      "template": "ArtifactShowcaseFull",
+      "slots": {
+        "sectionLabel": "BREEZE · IA ASISTIDA",
+        "title": "Breeze: resumen y <em>seguimiento revisable</em>",
+        "lead": "El caso de ANAM pide un resumen de renovación, un borrador de seguimiento y un próximo paso; la persona revisa fuente, destinatario, permisos y etapa antes de ejecutar.",
+        "artifact": { "src": "assets/anam/hubspot-breeze-mockup.svg" },
+        "caption": "Vista conceptual · IA exploratoria · revisión humana obligatoria",
+        "note": "No ejecuta acciones en ANAM"
+      }
+    },
+    {
+      "slideId": "ai-guardrails",
+      "contentType": "process-sequential",
+      "template": "ProcessStepsFull",
+      "slots": {
+        "sectionLabel": "IA · GUARDRAILS",
+        "title": "La IA propone; la persona <em>revisa, edita y confirma</em>",
+        "steps": [
+          { "title": "Preguntar con contexto", "description": "Formula resumen y borrador de seguimiento sin exponer datos sensibles innecesarios.", "deliverable": "Prompt seguro" },
+          { "title": "Leer la fuente", "description": "Comprueba que el resumen use el registro, negocio o ticket correcto.", "deliverable": "Contexto comprobado" },
+          { "title": "Editar la propuesta", "description": "Corrige lenguaje, destinatario, fecha, etapa y siguiente acción.", "deliverable": "Borrador revisado" },
+          { "title": "Confirmar o descartar", "description": "Solo ejecuta, envía o cambia cuando la persona tiene autoridad.", "deliverable": "Decisión humana" }
+        ]
+      }
+    },
+    {
+      "slideId": "meeting-ai",
+      "contentType": "artifact-showcase",
+      "template": "ArtifactShowcaseFull",
+      "slots": {
+        "sectionLabel": "MEETING NOTETAKER · PROGRESIÓN",
+        "title": "Una reunión deja acuerdos <em>trabajables</em>",
+        "lead": "Notas, tareas y progresión sugerida ayudan a no perder continuidad. Calendario, grabación, transcripción, permisos y licencia son dependencias explícitas.",
+        "artifact": { "src": "assets/anam/hubspot-meeting-ai-mockup.svg" },
+        "caption": "Vista conceptual · sugerencias de IA · revisión humana y dependencias pendientes",
+        "note": "No es una captura de ANAM"
+      }
+    },
+    {
+      "slideId": "agent-handoff",
+      "contentType": "artifact-showcase",
+      "template": "ArtifactShowcaseFull",
+      "slots": {
+        "sectionLabel": "AGENTE VIRTUAL · SERVICIO Y HANDOFF",
+        "title": "El agente resuelve o deriva con <em>contexto completo</em>",
+        "lead": "Tres intents ANAM —cotizar, seguimiento de servicio y requerimiento de calidad— con contexto mínimo y derivación humana.",
+        "artifact": { "src": "assets/anam/hubspot-agent-handoff-mockup.svg" },
+        "caption": "Vista conceptual · alcance y handoff sujetos a configuración y validación live",
+        "note": "Owner/SLA por confirmar · validación live pendiente"
+      }
+    },
+    {
+      "slideId": "section-06",
+      "contentType": "section-divider",
+      "template": "SectionDividerSplit",
+      "slots": {
+        "kicker": "CAPÍTULO 06",
+        "sectionNumber": "06",
+        "title": "Integrar y cerrar",
+        "lead": "La capacitación termina cuando cada participante recorre el caso y deja la siguiente acción.",
+        "agendaLabel": "EJERCICIO INTEGRADO",
+        "sectionItems": [
+          { "number": "01", "title": "Cuenta y negocio", "description": "Revisar, actualizar y dejar evidencia" },
+          { "number": "02", "title": "Dashboard e IA", "description": "Interpretar y revisar propuestas" },
+          { "number": "03", "title": "Handoff y compromiso", "description": "Derivar y cerrar con owner" }
+        ]
+      }
+    },
+    {
+      "slideId": "ejercicio-integrado",
+      "contentType": "process-sequential",
+      "template": "ProcessStepsFull",
+      "slots": {
+        "sectionLabel": "EJERCICIO INTEGRADO · 25 MIN ACUMULADOS",
+        "title": "De la cuenta al handoff <em>sin perder contexto</em>",
+        "steps": [
+          { "title": "Revisar la cuenta", "description": "Identifica Contacto, Lead, Empresa, Deal, Service y/o Ticket; anota el dato que falta.", "deliverable": "Mapa de cuenta" },
+          { "title": "Actualizar negocio", "description": "Elige Growth o Renovación, mueve etapa solo con evidencia y escribe Paso siguiente con owner y fecha.", "deliverable": "Deal trazable" },
+          { "title": "Leer dashboard", "description": "Explica qué panel sirve, cuál es su universo y qué estado todavía requiere validación.", "deliverable": "Interpretación responsable" },
+          { "title": "Consultar Breeze", "description": "Pide resumen y borrador de seguimiento; revisa la propuesta y decide qué no debe ejecutarse.", "deliverable": "Borrador y decisión revisada" },
+          { "title": "Derivar solicitud", "description": "Clasifica cotización, servicio o calidad y arma el handoff con contexto, owner y próxima revisión.", "deliverable": "Ruta y escalamiento" }
+        ]
+      }
+    },
+    {
+      "slideId": "compromisos",
+      "contentType": "dual-list",
+      "template": "DualListSplit",
+      "slots": {
+        "leftEyebrow": "COMPROMISO DEL PARTICIPANTE",
+        "leftTitle": "Después de la capacitación",
+        "leftItems": [
+          { "lead": "Una cuenta priorizada", "body": "Dejar un caso real o de práctica con datos completos y asociaciones correctas." },
+          { "lead": "Un próximo paso", "body": "Definir acción, owner, fecha y evidencia de etapa." },
+          { "lead": "Una ruta correcta", "body": "Saber cuándo pasar a comercial, servicio, calidad o soporte/contrato." },
+          { "lead": "Una duda visible", "body": "Registrar acceso, permiso, licencia o función pendiente." }
+        ],
+        "rightEyebrow": "CHECKLIST DEL EQUIPO",
+        "rightTitle": "Lo que queda por cerrar",
+        "rightItems": [
+          { "lead": "Validar accesos", "body": "Usuarios, permisos, licencias y calendarios conectados." },
+          { "lead": "Separar Growth y Renovación", "body": "Usar las etapas y requisitos del pipeline correcto." },
+          { "lead": "Validar dashboards y Goals", "body": "Confirmar fuente, periodo, universo y estado del dato." },
+          { "lead": "Confirmar IA y automatizaciones", "body": "Distinguir validación live, piloto y funciones no publicadas." }
+        ]
+      }
+    },
+    {
+      "slideId": "contraportada",
+      "contentType": "back-cover",
+      "template": "BackCoverFull",
+      "slots": {}
+    }
+  ]
+}

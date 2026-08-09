@@ -63,6 +63,8 @@ const VIEW_CODE_NAV_DESCRIPTOR: Record<string, { icon: string; group: NavItemGro
   'cliente.reviews': { icon: 'tabler-git-pull-request', group: 'primary' },
   'cliente.analytics': { icon: 'tabler-chart-dots', group: 'primary' },
   'cliente.campanas': { icon: 'tabler-speakerphone', group: 'primary' },
+  'cliente.growth_seo_dashboard': { icon: 'tabler-chart-arrows-vertical', group: 'primary' },
+  'cliente.growth_seo_report': { icon: 'tabler-file-analytics', group: 'capabilities' },
 
   // Capabilities (modules forward-looking — addons + bundles)
   'cliente.creative_hub': { icon: 'tabler-palette', group: 'capabilities' },

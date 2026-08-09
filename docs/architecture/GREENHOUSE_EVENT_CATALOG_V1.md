@@ -1257,3 +1257,19 @@ Spec: `docs/tasks/in-progress/TASK-1175-design-handoff-control-plane-full-api-pa
 | `growth.seo.rank_snapshot.captured` | v1 | `seo_target` (`seot-{uuid}`) | command `captureRankSnapshot` (`src/lib/growth/seo/rank-capture.ts`), tras insertar los snapshots del día (solo si `captured > 0`) | `seo_rank_history_bq_sync` (ProjectionDefinition, domain `growth`, lane `ops-reactive-growth`) → MERGE PG → BQ `greenhouse_growth_analytics.seo_rank_history` |
 
 **Payload v1**: `{ seoTargetId, organizationId, captureDate, snapshotCount, sourceRunId, actor }` — coordenadas del scope, nunca los datos: el consumer **re-lee PG** por `(seoTargetId, captureDate)` y MERGEa por `rank_snapshot_id` (idempotente; timestamps STRING + cast en SQL — ISSUE-082). La constante del event type vive en el dominio (`src/lib/growth/seo/contracts.ts`, patrón growth-forms) y no en el catálogo TS central: el seam de extracción a Wave (arch SEO §17.3) prohíbe acoplar `src/lib/growth/seo/**` a módulos de otros dominios. Un replay del evento tras un prune de la ventana caliente PG es no-op declarado (0 filas → no fabrica historia).
+
+## Delta 2026-08-07 — TASK-1308: `growth.seo.keyword_set.updated` (set monitoreado crece)
+
+| Evento | Versión | Aggregate | Emisor | Consumer |
+| --- | --- | --- | --- | --- |
+| `growth.seo.keyword_set.updated` | v1 | `seo_target` (`seot-{uuid}`) | commands `trackKeywords` y `untrackKeywords` (`src/lib/growth/seo/track-keywords.ts`), **dentro de la misma transacción** que muta las membresías y sólo si el set REALMENTE cambió (`inserted > 0` en el alta, `closed > 0` en la baja — ver el delta del reverso abajo) | ninguno todavía — es **rastro de auditoría de un compromiso de gasto**, no un disparador de proyección |
+
+**Payload v1**: `{ seoTargetId, organizationId, keywordSetId, trackedCount, activeKeywordCount, source, actor }` — coordenadas del scope, nunca las keywords: cualquier consumer futuro **re-lee PG** por `keywordSetId`.
+
+**Por qué existe un evento sin consumer.** Seguir una keyword es un **compromiso de gasto diferido**: el rank capture diario (TASK-1303) le paga al proveedor por cada keyword vigente del set, en cada ciclo, hasta que alguien la deje de seguir. La pregunta que llega cuando el gasto sube es *"¿quién agregó esto y cuándo?"*, y la fila de membresía sola no la responde con el contexto del lote. El evento la responde, y es append-only por construcción.
+
+**Por qué va DENTRO de la transacción.** Ése es el punto del patrón outbox: el evento y el cambio de estado se confirman o se pierden juntos. Publicarlo después dejaría la ventana en que el INSERT commitea y el proceso muere antes de emitir — un set que creció sin rastro. Y sólo se emite cuando el set REALMENTE cambió: el command es idempotente, y un evento por cada click sobre una keyword ya seguida llenaría la tabla de ruido que nadie procesa.
+
+La constante del event type vive en el dominio (`src/lib/growth/seo/contracts.ts`), no en el catálogo TS central — mismo seam de extracción §17.3 que el evento de captura.
+
+**Delta TASK-1308 (reverso):** `untrackKeywords` emite **el MISMO event type** con payload `{ seoTargetId, organizationId, untrackedCount, activeKeywordCount, actor }`. Un tipo de evento aparte obligaría a cada consumer a manejar dos formas de la misma noticia — lo que downstream necesita saber es que el set CAMBIÓ y cuántas keywords se están midiendo ahora, no en qué dirección se movió. `trackedCount` y `untrackedCount` son mutuamente excluyentes en un mismo evento: cada emisión viene de un command, y ningún command hace las dos cosas.

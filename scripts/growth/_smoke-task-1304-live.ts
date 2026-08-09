@@ -59,7 +59,7 @@ const main = async () => {
         AND EXISTS (
           SELECT 1 FROM greenhouse_client_portal.module_assignments ma
            WHERE ma.organization_id = t.organization_id
-             AND ma.module_key = 'seo_v1'
+             AND ma.module_key = 'seo_v2'
              AND ma.effective_to IS NULL
              AND ma.status IN ('active', 'pilot')
         )

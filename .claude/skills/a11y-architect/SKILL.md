@@ -102,6 +102,10 @@ WCAG 3.3.8 is hard-passed via `next-auth` Microsoft SSO (passkey-equivalent unde
 - Currency: `Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' })` — NEVER `$X.XXX` hardcoded.
 - Date: `Intl.DateTimeFormat('es-CL')` — `"12 mar 2026"`, NEVER American `3/12/2026`.
 
+### 11. Tabs that navigate → `CustomTabsNav`, never `<TabList>` (TASK-1307)
+
+When the "tabs" are links to sibling routes (the panel is the page Next mounts, not a `TabPanel` in memory), use `CustomTabsNav` from `@core/components/mui/TabList` with `role='navigation'`. `<TabList>` from `@mui/lab` clones every `<Tab>` injecting an `aria-controls` that points at a `TabPanel` which does not exist → axe `aria-valid-attr-value` **critical**; the clone also overrides consumer props. Reference: `SeoSearchVisibilityTabs`.
+
 ## Canonical sources of truth
 
 - **Tokens / contrast**: `mergedTheme.ts` (runtime authority) + `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md`
@@ -127,4 +131,5 @@ WCAG 3.3.8 is hard-passed via `next-auth` Microsoft SSO (passkey-equivalent unde
 
 ## Version
 
+- **v1.1** — 2026-08-07 — TASK-1307: pinned decision 11 (`CustomTabsNav` for tabs that navigate; `<TabList>` injects a phantom `aria-controls`).
 - **v1.0** — 2026-05-11 — Initial overlay. Pins 10 Greenhouse-specific a11y decisions over the global skill.

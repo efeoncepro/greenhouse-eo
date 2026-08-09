@@ -492,7 +492,8 @@ export const GH_GROWTH_AI_VISIBILITY_CLIENT_REPORT = {
     title: 'AEO — Snapshot de visibilidad',
     orgChipAria: 'Organización del informe',
     asOfLabel: 'Datos al',
-    samplingNote: 'Medición sobre una muestra de respuestas de IA, no un monitoreo continuo.'
+    samplingNote: 'Medición sobre una muestra de respuestas de IA, no un monitoreo continuo.',
+    viewSeo: 'Ver SEO'
   },
   summary: {
     scoreLabel: 'Puntaje de visibilidad',
@@ -1538,7 +1539,8 @@ export const GH_GROWTH_SEO_OVERVIEW = {
       '7': 'Últimos 7 días',
       '28': 'Últimos 28 días',
       '90': 'Últimos 90 días',
-      '180': 'Últimos 180 días'
+      '180': 'Últimos 180 días',
+      '365': 'Últimos 12 meses'
     },
     refresh: 'Actualizar',
     refreshPending: 'Actualizando…',
@@ -1680,3 +1682,942 @@ export const GH_GROWTH_SEO_OVERVIEW = {
     spaceUpdated: 'Panel de {space} actualizado'
   }
 } as const
+
+/**
+ * TASK-1310 — Portal cliente · SEO + Search Visibility 360.
+ *
+ * Copy es-CL (tuteo) para las tres direcciones visuales de la familia: dashboard narrativo,
+ * quadrant ortogonal e informe editorial. Los estados no convierten ausencia de evidencia en
+ * un cero y el lenguaje mantiene SEO/AEO como lentes separadas.
+ */
+export const GH_GROWTH_SEO_CLIENT = {
+  page: {
+    breadcrumbRoot: 'Inicio',
+    breadcrumbLeaf: 'SEO',
+    eyebrow: 'Search Visibility 360',
+    title: 'SEO — Visibilidad en búsqueda',
+    description: 'Tu lectura de búsqueda combina posición medida, cobertura observada y visibilidad IA sin mezclar fuentes.',
+    asOf: (date: string) => `Search Console · corte ${date}`,
+    asOfUnknown: 'Search Console · sin fecha de corte',
+    measured: 'Search Console · medido',
+    estimated: 'Seguimiento de posición · estimado',
+    viewReport: 'Ver informe',
+    viewAeo: 'Ver detalle de AEO',
+    reportTitle: 'Informe de visibilidad en búsqueda',
+    reportDownload: 'Imprimir / guardar PDF',
+    reportDate: (date: string) => `Fecha de corte: ${date}`
+  },
+  navigator: {
+    ariaLabel: 'Navegador de visibilidad SEO',
+    summary: 'Resumen',
+    evolution: 'Evolución',
+    quadrant: 'SEO × AEO',
+    reportHint: 'Informe presentable'
+  },
+  summary: {
+    eyebrow: 'Lectura ejecutiva',
+    leadTitle: 'Aún no hay una posición media para leer',
+    title: 'Tu visibilidad orgánica tiene una historia que leer',
+    titleWithPosition: (position: string) => `Posición media ${position} con señales SEO × AEO por revisar`,
+    helper: 'Primero mostramos la señal medida. Luego separamos cobertura, tendencia y citabilidad para decidir qué mover sin fabricar un score único.',
+    positionLabel: 'Posición media',
+    keywordsLabel: 'Keywords medidas',
+    pageOneLabel: 'En primera página',
+    opportunityLabel: 'Señales de oportunidad',
+    positionSignal: 'Rendimiento medido',
+    keywordsSignal: 'Keywords medidas',
+    pageOneSignal: 'Primera página',
+    opportunitySignal: 'Señales a revisar',
+    noData: 'Sin dato',
+    positionHint: 'Más bajo es mejor: pasar de 8 a 3 es una mejora.',
+    pageOneHint: 'Keywords con posición 10 o mejor en la ventana medida.',
+    opportunityHint: 'Datos del mapa de visibilidad; no se mezclan con Search Console.',
+    measuredHint: 'Search Console · datos medidos; los huecos quedan visibles.',
+    coverageLabel: 'Cobertura de primera página',
+    coverage: (shown: number, total: number) => `${shown} de ${total} keywords están en posición 10 o mejor.`,
+    ariaSignals: 'Señales principales de visibilidad SEO',
+    nextBestAction: 'Qué revisar ahora',
+    actionPosition: 'Mantener keywords fuertes y detectar caídas tempranas.',
+    actionCoverage: 'Ampliar la muestra para leer tendencia con más confianza.',
+    actionAeo: 'Cruzar las keywords con la visibilidad IA vigente del dominio.'
+  },
+  evolution: {
+    title: 'Cobertura de seguimiento',
+    subtitle: 'La posición 1 aparece arriba. Si la muestra es escasa, mostramos cortes observados antes de sugerir una tendencia.',
+    coverage: (measured: number, requested: number) => `${measured} de ${requested} días con medición`,
+    observedScope: (chartDays: number, measured: number, requested: number) =>
+      `${chartDays} días visibles en la línea; ${measured} de ${requested} días tienen alguna medición. Los huecos quedan visibles.`,
+    source: 'Fuente: seguimiento de posición · los huecos quedan visibles.',
+    chartStageLabel: 'Cortes observados',
+    latestLabel: 'Última medición',
+    bestPositionLabel: 'Mejor posición observada',
+    bestPosition: (keyword: string, position: string) => `${keyword} · posición ${position}`,
+    coverageProgress: (measured: number, requested: number) => `${measured} de ${requested} días`,
+    emptyTitle: 'Aún no hay evolución para mostrar',
+    emptyDescription: 'Cuando se capture más de una posición, aquí podrás leer la tendencia sin interpolaciones.',
+    aria: 'Evolución de posiciones SEO. La posición 1 es la mejor y está arriba.',
+    ariaKeywords: 'Keywords comparadas en la evolución SEO',
+    ariaTable: 'Datos de evolución de posiciones',
+    tableDateHeader: 'Fecha',
+    tableScrollHint: 'Desliza horizontalmente para revisar todas las keywords.',
+    tableLabel: 'Ver datos de la evolución',
+    hideTableLabel: 'Ocultar datos de la evolución',
+    printMeasurementsHeader: 'Mediciones por keyword',
+    noMeasurement: 'Sin medición en este día.',
+    sparseTitle: 'Evidencia inicial, no tendencia final',
+    sparseNote: (measured: number, requested: number) =>
+      `Muestra corta: ${measured} de ${requested} días tienen medición. Úsalo como evidencia inicial, no como tendencia final.`,
+    featuredNote: (shown: number, total: number) =>
+      total > shown
+        ? `Mostrando ${shown} keywords destacadas de ${total}. Abre los datos para revisar la serie completa.`
+        : `Mostrando las ${total} keywords medidas.`
+  },
+  quadrant: {
+    eyebrow: 'Mapa SEO × AEO',
+    title: 'Prioridad de visibilidad',
+    subtitle: 'Dónde ya rankeas y cómo se cruza cada keyword con la visibilidad IA vigente del dominio.',
+    xAxis: 'AEO · visibilidad IA del dominio',
+    yAxis: 'SEO · posición orgánica',
+    xHigh: 'Mayor visibilidad IA',
+    xLow: 'Menor visibilidad IA',
+    yHigh: 'Mejor posición SEO',
+    yLow: 'Menor posición SEO',
+    domain: 'Lectura del dominio',
+    domainQuadrant: (label: string) => `Lectura dominante: ${label}`,
+    pointCount: (count: number) => `${count} keywords medidas`,
+    measured: 'Cada punto representa una keyword SEO cruzada con el score AEO vigente del dominio.',
+    orthogonal: 'SEO y AEO son ejes distintos; en esta versión el eje AEO es del dominio, no de cada keyword.',
+    granularityLabel: 'AEO por dominio',
+    granularityHint: 'Las keywords aún no tienen citabilidad propia medida; se cruzan contra el último score AEO reportable del dominio.',
+    distributionTitle: 'Distribución de señales',
+    dominantInsight: (label: string, count: number, total: number) => `${count} de ${total} señales caen en ${label}.`,
+    dominantAction: {
+      dominante: 'Defiende esta posición con frescura, enlaces internos y pruebas actualizadas.',
+      riesgo: 'Prioriza contenido citable: rankeas, pero el dominio todavía no muestra una señal AEO fuerte.',
+      oportunidad: 'Convierte visibilidad IA del dominio en posición orgánica con contenido y enlaces internos.',
+      invisible: 'Construye la base: intención, entidad, contenido recuperable y medición.'
+    } as const,
+    chartStageLabel: 'Mapa de oportunidad por keyword',
+    tableScrollHint: 'Desliza horizontalmente para revisar el detalle completo.',
+    tableExcerpt: (shown: number, total: number) =>
+      total > shown ? `Mostrando ${shown} señales prioritarias de ${total}.` : `Mostrando las ${total} señales medidas.`,
+    tableShowAll: (total: number) => `Ver las ${total} keywords`,
+    tableHideAll: 'Mostrar solo señales prioritarias',
+    tableKeyword: 'Keyword',
+    tableSeo: 'SEO',
+    tableAeo: 'AEO dominio',
+    tableReading: 'Lectura',
+    ariaLegend: 'Leyenda del mapa SEO por estado',
+    ariaTable: 'Detalle de keywords del mapa SEO por visibilidad IA del dominio',
+    states: {
+      noAeoTitle: 'Falta la mitad IA de esta lectura',
+      noAeoDescription: 'Tu SEO medido está disponible. Cuando exista un score AEO reportable del dominio, el mapa mostrará ambos ejes.',
+      noSeoTitle: 'Aún no hay SEO medido para cruzar',
+      noSeoDescription: 'Conecta Search Console y deja que la captura construya la primera mitad del mapa.',
+      emptyTitle: 'Aún no hay puntos para el mapa',
+      emptyDescription: 'El mapa aparece cuando existan datos medidos en SEO y un score AEO reportable del dominio.',
+      errorTitle: 'No pudimos cargar el mapa',
+      errorDescription: 'Intenta de nuevo en unos minutos.'
+    },
+    labels: {
+      dominante: 'Dominante',
+      riesgo: 'Riesgo',
+      oportunidad: 'Oportunidad',
+      invisible: 'Invisible'
+    } as const
+  },
+  report: {
+    eyebrow: 'Lectura ejecutiva',
+    title: 'Informe de visibilidad en búsqueda',
+    summary: 'Una lectura presentable de tu presencia orgánica y su relación con la visibilidad IA del dominio.',
+    methodology: 'Proveniencia y metodología',
+    methodologyBody: 'Los datos SEO provienen de Search Console y seguimiento de posición. El eje AEO usa el último score reportable del dominio; se muestra separado del SEO y no se promedia.',
+    summaryAria: 'Resumen de métricas SEO',
+    quadrantTitle: 'SEO × AEO — posicionamiento estratégico',
+    evolutionTitle: 'Evolución de posiciones',
+    reportStatusReady: 'Lectura completa',
+    reportStatusPartial: 'Lectura parcial',
+    metricPosition: 'Posición media',
+    metricKeywords: 'Keywords medidas',
+    metricPageOne: 'En primera página',
+    metricSignals: 'Señales a revisar',
+    metricPositionSignal: 'Rendimiento',
+    metricKeywordsSignal: 'Base medida',
+    metricPageOneSignal: 'Cobertura',
+    metricSignalsSignal: 'Atención',
+    metricPositionHint: 'Más bajo es mejor.',
+    metricKeywordsHint: 'Search Console y seguimiento declarado.',
+    metricPageOneHint: 'Posición 10 o mejor.',
+    metricSignalsHint: 'SEO × AEO, sin score fusionado.',
+    reportMasthead: 'Informe client-safe',
+    reportReadout: 'La posición orgánica y la citabilidad en IA se leen como fuentes distintas, sin fabricar un score único.',
+    reportFeaturedSignals: (shown: number, total: number) =>
+      total > shown ? `Se muestran ${shown} señales destacadas de ${total}.` : `Se muestran las ${total} señales medidas.`,
+    reportFullDetail: 'El detalle completo permanece disponible en el dashboard para exploración.',
+    coverage: 'Cobertura client-safe, sin datos crudos de proveedor.',
+    emptyTitle: 'Tu informe todavía está tomando forma',
+    emptyDescription: 'Cuando exista una medición suficiente, aquí aparecerá una lectura completa y presentable.',
+    errorTitle: 'No pudimos preparar tu informe',
+    errorDescription: 'Intenta de nuevo en unos minutos.'
+  },
+  states: {
+    lockedTitle: 'SEO no está activo en tu plan',
+    lockedDescription: 'Tu equipo de Efeonce puede mostrarte cómo activar esta lectura de visibilidad.',
+    lockedCta: 'Hablar con tu equipo',
+    noOrganizationTitle: 'No encontramos una organización para esta vista',
+    noOrganizationDescription: 'Tu cuenta aún no tiene un Space client-scoped asociado.',
+    noGscTitle: 'Conecta Search Console para ver tu visibilidad',
+    noGscDescription: 'La lectura SEO comienza con datos medidos por Google. Sin la conexión, no mostramos ceros ni estimaciones disfrazadas.',
+    noGscCta: 'Conectar Search Console',
+    noSnapshotsTitle: 'Aún no hay datos históricos',
+    noSnapshotsDescription: 'La conexión está activa, pero la captura diaria todavía no guardó un día para tu organización.',
+    errorTitle: 'No pudimos cargar tu SEO',
+    errorDescription: 'Puede ser algo temporal. Intenta de nuevo en unos minutos.',
+    retry: 'Reintentar',
+    loading: 'Cargando tu visibilidad SEO…'
+  }
+} as const
+
+/**
+ * TASK-1307 — copy de la pantalla ancla `/admin/growth/seo/performance` (tab Rendimiento).
+ *
+ * Tres decisiones de contenido que atraviesan todo el bloque:
+ *
+ * 1. **La inversión de posición se dice con PALABRAS**, no sólo con el eje ni con el color
+ *    de una flecha. "Más abajo es mejor" aparece en el subtítulo visible del chart, en el
+ *    tooltip de la columna y en el `aria-label`. Un operador que llega de Semrush lo da por
+ *    hecho; uno que llega de un reporte de tráfico, no.
+ * 2. **La fuente se nombra en cada lectura** (● medido / ◑ estimado). No es decoración
+ *    legal: la posición exacta de DataForSEO y la posición promedio de Search Console son
+ *    números distintos que responden preguntas distintas, y el módulo tiene prohibido
+ *    promediarlos. Si la pantalla no dice cuál está mostrando, el operador los mezcla.
+ * 3. **Un hueco se llama "Pendiente", nunca 0.** Posición 0 no existe y "0 clics" afirma
+ *    que apareciste y nadie hizo clic. Todo el copy de vacío evita el cero fantasma.
+ */
+export const GH_GROWTH_SEO_PERFORMANCE = {
+  pageTitle: 'Rendimiento',
+  pageSubtitle: 'Cómo evoluciona en el tiempo el conjunto de URLs o keywords que elijas.',
+
+  toolbar: {
+    rangeLabel: 'Período',
+    rangeOptions: {
+      '28': 'Últimos 28 días',
+      '90': 'Últimos 90 días',
+      '180': 'Últimos 180 días',
+      '365': 'Últimos 12 meses'
+    },
+    deviceLabel: 'Dispositivo',
+    deviceOptions: {
+      desktop: 'Escritorio',
+      mobile: 'Móvil',
+      tablet: 'Tablet'
+    },
+    // El device no es un filtro de presentación: cambia la SERP que se consultó.
+    deviceHint: 'La búsqueda en móvil y en escritorio devuelve resultados distintos.',
+    freshness: 'Datos hasta {date}',
+    freshnessUnknown: 'Sin fecha de corte disponible'
+  },
+
+  source: {
+    measured: 'Medido · Search Console',
+    measuredHint: 'Lo que Google registró de tu sitio: posición promedio, clics e impresiones.',
+    estimated: 'Estimado · DataForSEO',
+    estimatedHint: 'Posición exacta observada en la búsqueda por un proveedor externo.',
+    // Se explica POR QUÉ no se mezclan, no sólo que son distintas.
+    ariaLabel: 'Origen de los datos de este gráfico',
+    mixHint: 'Son dos mediciones distintas de la misma realidad. Nunca se promedian entre sí.'
+  },
+
+  set: {
+    title: 'Qué comparar',
+    modeLabel: 'Comparar por',
+    modeByUrl: 'URL',
+    modeByKeyword: 'Keyword',
+    picker: 'Elegir qué comparar',
+    pickerPlaceholder: 'Busca y agrega…',
+    pickerHelperKeyword: 'Keywords con datos medidos o con seguimiento de posición activo.',
+    pickerHelperUrl: 'Páginas con impresiones registradas en el período.',
+    trackedBadge: 'Con seguimiento',
+    trackedHint: 'Esta keyword tiene serie de posición exacta.',
+    impressionsHint: '{impressions} impresiones en el período',
+    noImpressionsHint: 'Todavía sin impresiones registradas',
+    removeAria: 'Quitar {item} de la comparación',
+    max: 'Puedes comparar hasta {max} a la vez.',
+    maxReached: 'Llegaste al máximo de {max}. Quita uno para agregar otro.',
+    liveRegion: '{count} en comparación',
+    clear: 'Limpiar selección',
+    // Presets data-driven: los sets nombrados que el operador configuró en el target.
+    presetsLabel: 'Tus grupos',
+    presetAria: 'Comparar el grupo {name} ({count} keywords)',
+    presetTruncated: 'El grupo tiene {total} keywords; se comparan las primeras {max}.'
+  },
+
+  metric: {
+    label: 'Métrica',
+    position: 'Posición',
+    clicks: 'Clics',
+    impressions: 'Impresiones',
+    ctr: 'CTR'
+  },
+
+  kpis: {
+    // El "contra qué" del delta, declarado junto al período (regla dura de dataviz).
+    comparison: 'vs período anterior'
+  },
+
+  // Lectura cruzada de los 4 KPIs (deriveSeoPerformanceInsight). Sólo aparece cuando el
+  // patrón es inequívoco; jamás especula. La variante ctr_erosion NOMBRA la hipótesis AIO
+  // sin afirmarla como hecho: el dato dice "CTR cae con posición estable", no "fue la IA".
+  insight: {
+    title: 'Lectura del período',
+    demand_drop:
+      'Los clics ({clicks}) y las impresiones ({impressions}) caen juntos con la posición estable: la demanda de estas búsquedas bajó, no tu ranking.',
+    ctr_erosion:
+      'La posición se mantiene y las impresiones también, pero el CTR cae {ctr} puntos: el SERP está capturando el clic (AI Overviews u otros elementos) antes de llegar a tu resultado.',
+    rank_gain: 'La mejora de posición ({position}) explica el alza de clics ({clicks}).',
+    rank_loss: 'La pérdida de posición ({position}) explica la caída de clics ({clicks}).'
+  },
+
+  chart: {
+    title: 'Evolución de {metric}',
+    // La inversión, visible y en palabras. No se deja al eje ni a la intuición.
+    subtitlePosition: 'Más abajo en el número es mejor: pasar de 8 a 3 es una mejora, y en el gráfico se ve subiendo.',
+    subtitleVolume: 'Volumen medido por Search Console en el período.',
+    // ⚠️ Cobertura EXPLÍCITA: el período pedido y los días realmente medidos casi nunca
+    // coinciden (una keyword recién trackeada tiene 2 días dentro de una ventana de 90).
+    // Sin decirlo, el gráfico promete una película que el dato todavía no puede contar.
+    coverage: '{measured} de {requested} días con medición · {from} a {to}',
+    coverageSingle: 'Una sola medición ({from}). Todavía no hay evolución que mostrar: la serie empieza a formarse con el próximo día capturado.',
+    coverageShort: 'Serie recién iniciada: {measured} días medidos. La tendencia se vuelve legible con más días capturados.',
+    targetLabel: 'Meta: top 3',
+    targetHint: 'Referencia comercial del módulo: estar entre los tres primeros resultados.',
+    showTable: 'Ver tabla de datos',
+    hideTable: 'Ocultar tabla de datos',
+    tableCaption: 'Valores por fecha de cada serie en comparación',
+    tableDateHeader: 'Fecha',
+    zoomHint: 'Arrastra bajo el gráfico para acercarte a un tramo.',
+    // Granularidad: en rangos largos el día a día es ruido; la semana muestra la forma.
+    granularityLabel: 'Granularidad',
+    granularityDaily: 'Diario',
+    granularityWeekly: 'Semanal',
+    granularityWeeklyHint: 'Cada punto agrega una semana de mediciones.',
+    // AI Overview: marcador honesto — sólo existe en la serie ◑ (DataForSEO captura la SERP).
+    aioLegend: 'AI Overview presente en la búsqueda',
+    aioMarker: 'Con AI Overview',
+    // Updates confirmados de Google: contexto, no excusa. Registro curado en algorithm-updates.ts.
+    updatesLegend: 'Update confirmado de Google',
+    ariaPosition:
+      'Gráfico de evolución de posición de {count} series entre {from} y {to}. El eje está invertido: la posición 1 es la mejor y está arriba. Un día sin medición se dibuja como hueco, no como cero.',
+    ariaVolume:
+      'Gráfico de evolución de {metric} de {count} series entre {from} y {to}. Un día sin medición se dibuja como hueco, no como cero.'
+  },
+
+  table: {
+    title: 'Detalle por {axis}',
+    axisUrl: 'URL',
+    axisKeyword: 'keyword',
+    ariaLabel: 'Detalle de rendimiento por elemento en comparación',
+    colItemUrl: 'URL',
+    colItemKeyword: 'Keyword',
+    colPosition: 'Posición',
+    colPositionHint: 'Última posición medida en el período. Más abajo es mejor.',
+    colDelta: 'Δ 30 días',
+    colDeltaHint: 'Cambio de posición frente a hace 30 días. Bajar de número es mejorar.',
+    colClicks: 'Clics',
+    colImpressions: 'Impresiones',
+    colCtr: 'CTR',
+    colTrend: 'Tendencia',
+    colTrendHint: 'Posición a lo largo del período. Arriba es mejor, igual que en el gráfico.',
+    // Sin dato NUNCA es un cero: la celda lo dice.
+    pending: 'Pendiente',
+    noComparison: 'Sin comparación',
+    noComparisonHint: 'Todavía no hay una medición de hace 30 días con la cual comparar.',
+    trendUnavailable: 'Sin histórico suficiente',
+    drillAria: 'Ver el detalle de {item}',
+    sortAria: 'Ordenar por {column}'
+  },
+
+  states: {
+    loading: 'Cargando el rendimiento del conjunto…',
+
+    emptyNoGsc: {
+      title: 'Conecta Search Console para ver el rendimiento',
+      description:
+        'La evolución se reconstruye con datos medidos por Google. Sin la conexión no hay historia que mostrar todavía.',
+      cta: 'Conectar Search Console'
+    },
+
+    emptyNoSnapshots: {
+      title: 'Aún no hay días guardados',
+      description:
+        'La conexión está activa, pero la captura diaria todavía no guardó ningún día. La película empieza en cuanto lo haga.'
+    },
+
+    // Estado inicial legítimo del flujo, no un error: por eso no habla de "problema".
+    emptyNoSet: {
+      title: 'Elige qué comparar',
+      description: 'Agrega hasta {max} URLs o keywords y verás cómo evolucionan lado a lado.',
+      cta: 'Elegir URLs o keywords'
+    },
+
+    emptyNoData: {
+      title: 'Sin datos para esta selección en {range}',
+      description: 'Prueba un período más amplio, cambia el dispositivo o elige otros elementos.',
+      cta: 'Ampliar el período'
+    },
+
+    error: {
+      title: 'No pudimos cargar la evolución',
+      description: 'Puede ser algo temporal de nuestro lado. Intenta de nuevo en unos minutos.',
+      cta: 'Reintentar'
+    },
+
+    denied: {
+      title: 'No tienes acceso al módulo SEO',
+      // Sin CTA de reintentar: la causa es estructural y reintentar no la resuelve.
+      description: 'Pídele a un administrador que te habilite el módulo SEO para este Space.'
+    },
+
+    // Degradación honesta: se nombra lo que falta en vez de dibujarlo en cero.
+    partialMissing: {
+      title: 'Mostramos lo que sí está medido',
+      description: 'Sin datos en el período: {items}. Quedan fuera del gráfico en vez de aparecer en cero.'
+    },
+
+    sparseSeries: {
+      title: 'Algunas series tienen pocos días medidos',
+      description:
+        'Series con seguimiento reciente: {items}. Se dibujan hasta donde hay dato, con el hueco a la vista — no se rellenan.'
+    }
+  }
+} as const
+
+/**
+ * TASK-1308 — Oportunidades de keywords (`/admin/growth/seo/keywords`).
+ *
+ * ⚠️ EL COPY DICE LA VERDAD SOBRE DE DÓNDE SALE EL DATO. Toda esta pantalla se construye
+ * con lo MEDIDO por Search Console — no hay volumen ni dificultad de mercado (TASK-1300 no
+ * aterrizó), y donde faltan se dice "sin dato de mercado", nunca 0 ni un guion ambiguo.
+ * La demanda que se muestra son impresiones reales de la propia SERP del cliente, que es
+ * un dato MEJOR que un volumen estimado por un tercero para un mercado promedio.
+ *
+ * ⚠️ CANIBALIZACIÓN NO ES UNA VARIANTE DE "OPORTUNIDAD": ES OTRA ACCIÓN. Una query con más
+ * de una página no se optimiza, se CONSOLIDA (unificar, 301, canonical o diferenciar
+ * intención). Por eso tiene su propio verbo en toda la superficie, no un chip decorativo.
+ */
+export const GH_GROWTH_SEO_KEYWORDS = {
+  pageTitle: 'Oportunidades de keywords',
+  pageSubtitle: 'Dónde crecer en búsqueda: lo que ya rankea y está a un empujón de la primera plana.',
+  loadingAria: 'Cargando oportunidades de keywords',
+
+  toolbar: {
+    searchPlaceholder: 'Buscar keyword',
+    searchLabel: 'Buscar keyword',
+    windowLabel: 'Ventana',
+    windowOptions: {
+      '28': 'Últimos 28 días',
+      '90': 'Últimos 90 días'
+    },
+    // La ventana no es cosmética: define sobre qué se calculó la posición ponderada.
+    windowHint: 'La posición se pondera por impresiones dentro de la ventana.',
+    /**
+     * ⚠️ La frescura NO es decoración en este dominio. Search Console no publica el día
+     * anterior y consolida sus métricas con ~48h de retraso, así que una pantalla que
+     * muestra 28 días sin decir hasta cuándo llegan los datos se lee como "hasta hoy".
+     */
+    freshness: 'Datos hasta {date}',
+    freshnessUnknown: 'Sin fecha de corte disponible',
+    freshnessHint:
+      'Search Console no publica el día de ayer y ajusta sus números durante unas 48 horas. El borde reciente de la serie todavía se está consolidando.',
+    refreshing: 'Actualizando…'
+  },
+
+  source: {
+    measured: 'Medido · Search Console',
+    measuredHint:
+      'Impresiones, clics y posición que Google registró de tu sitio. Es la demanda de TU búsqueda, no un promedio de mercado.',
+    estimated: 'Estimado · mercado',
+    estimatedHint: 'Volumen y dificultad de un proveedor externo. Aún no disponible en este Space.',
+    ariaLabel: 'Origen de los datos de esta pantalla',
+    mixHint: 'Todo lo que ves acá está medido. Nada se promedia con una estimación de mercado.'
+  },
+
+  /**
+   * El veredicto: lo que los datos SIGNIFICAN, antes de dibujarlos.
+   *
+   * ⚠️ Se redacta desde el reparto real, no desde una plantilla fija. Con Berel, 42 de 50
+   * oportunidades son de consolidación — ese hallazgo cambia el trabajo de la semana y en la
+   * primera versión vivía como un número al final de una leyenda. Si el reparto cambia, el
+   * titular dice otra cosa; si no hay nada que destacar, no inventa un titular.
+   */
+  verdict: {
+    ariaLabel: 'Lectura principal y filtro por acción',
+    mostlyCannibalized: '{count} de {total} keywords compiten contra tu propio sitio',
+    mostlyCannibalizedHint:
+      'Más de una página tuya aparece para la misma búsqueda y se diluyen entre sí. Consolidar es un trabajo distinto de optimizar: unificar, redirigir, canonical o diferenciar la intención.',
+    mostlyQuickWin: '{count} de {total} keywords están a un empujón de subir',
+    mostlyQuickWinHint: 'Ya rankean en la primera plana; falta subir dentro de ella. Es el trabajo de mejor retorno.',
+    balanced: '{total} keywords entre las posiciones 8 y 20',
+    balancedHint: 'Ya rankeas para todas: existe página y existe relevancia. Lo que cambia es qué hacer con cada una.',
+    gainTotal: '+{value} clics/mes est. sobre la mesa',
+    gainTotalHint: 'Suma de la ganancia estimada de todas las keywords listadas, si cada una llegara a su posición objetivo.',
+    filterHint: 'Toca una acción para filtrar el mapa y la tabla.',
+    active: 'Filtro activo',
+    clear: 'Ver todas'
+  },
+
+  map: {
+    title: 'Mapa de oportunidad',
+    subtitle: 'Más a la izquierda, más cerca de la primera plana. Más arriba, más gente lo busca.',
+    /**
+     * 🔴 LA ZONA MARCA UN HECHO, NO UNA ACCIÓN.
+     *
+     * Decía "Fruta madura" — que es el nombre de UNA de las tres acciones. Pero la zona
+     * abarca las posiciones 8–10, y dentro caen también las canibalizadas: una keyword en
+     * posición 9 con 13 páginas compitiendo está en primera plana Y NO es fruta madura, es
+     * consolidación. Etiquetar una región posicional con un nombre de acción hacía que el
+     * mapa se contradijera con su propia leyenda.
+     */
+    quickWinLabel: 'Primera plana',
+    quickWinHint: 'Posición 10 o mejor. Estar acá no dice qué hacer — eso lo dice la forma de cada punto.',
+    axisX: 'Posición actual',
+    axisY: 'Impresiones (28 días)',
+    bubbleHint: 'El tamaño de cada punto son los clics que ganarías al llegar a la posición objetivo.',
+    aria:
+      'Dispersión de {count} keywords: el eje horizontal es la posición actual (más a la izquierda es mejor) y el vertical las impresiones medidas. El tamaño indica los clics incrementales estimados y la forma la acción recomendada.',
+    coverage: '{count} keywords entre las posiciones 8 y 20, con al menos {threshold} impresiones en la ventana.',
+    zoomHint: 'Pasa el cursor por un punto para ver su detalle. La tabla de abajo tiene los valores exactos.',
+    collapse: 'Ocultar mapa',
+    expand: 'Ver mapa'
+  },
+
+  /**
+   * La acción recomendada, que es a la vez el color, la forma y el filtro.
+   *
+   * Son ACCIONES, no severidades: "empujar" y "consolidar" son trabajos distintos, con
+   * dueños y criterios de éxito distintos.
+   */
+  action: {
+    label: 'Acción',
+    quickWin: 'Empujar (fruta madura)',
+    quickWinShort: 'Empujar',
+    quickWinHint: 'Posición 10 o mejor: ya estás en la primera plana, falta subir dentro de ella.',
+    striking: 'Empujar (a un paso)',
+    strikingShort: 'A un paso',
+    strikingHint: 'Posición 11 a 20: la segunda plana. Llegar a la primera es el salto de mayor retorno.',
+    cannibalized: 'Consolidar',
+    cannibalizedShort: 'Consolidar',
+    // El invariante del método: no es una oportunidad peor, es otro trabajo.
+    cannibalizedHint:
+      'Más de una página tuya compite por esta búsqueda y se diluyen entre sí. No se optimiza: se consolida (unificar, 301, canonical o diferenciar intención).'
+  },
+
+  table: {
+    title: 'Detalle',
+    ariaLabel: 'Oportunidades de keywords con su posición, demanda medida y acción recomendada',
+    colKeyword: 'Keyword',
+    // La columna contiene "Seguir" Y "Dejar de seguir": nombrarla con una de las dos
+    // acciones describía mal la mitad de su contenido.
+    colTracking: 'Seguimiento',
+    export: 'Exportar CSV',
+    exportHint: 'Descarga lo que estás viendo, con los filtros aplicados. Para el ticket, el SOW o el mail al cliente.',
+    exportFilename: 'oportunidades-keywords',
+    colAction: 'Acción',
+    colPosition: 'Posición',
+    colPositionHint: 'Posición media ponderada por impresiones en la ventana. Más bajo es mejor.',
+    colImpressions: 'Impresiones',
+    colImpressionsHint: 'Cuántas veces apareciste. Es la demanda medida de tu propia búsqueda.',
+    colClicks: 'Clics',
+    colCtr: 'CTR',
+    colGain: 'Ganancia est.',
+    colGainHint:
+      'Clics adicionales por mes si llegaras a la posición objetivo, según la curva de CTR de tu propio sitio.',
+    colVolume: 'Volumen',
+    colDifficulty: 'Dificultad',
+    // El estado honesto de las columnas de mercado: ni 0 ni un guion ambiguo.
+    //
+    // ⚠️ CORTO A PROPÓSITO (hallazgo del GVC). "Sin dato de mercado" completo se envolvía en
+    // DOS líneas, en DOS columnas, en las 50 filas: 100 repeticiones de un texto largo que
+    // ahogaban los números que la tabla existe para mostrar. La frase completa no se pierde
+    // — vive en el tooltip de cada celda y en el banner de la pantalla, que la dice una vez.
+    marketUnavailable: 'Sin dato',
+    marketUnavailableHint:
+      'El enriquecimiento de mercado (volumen y dificultad) todavía no está habilitado en este Space. La priorización de arriba no lo necesita: usa tu demanda medida.',
+    page: 'Página',
+    rowsPerPage: 'Filas por página',
+    paginationRange: '{from}–{to} de {count}',
+    sortedByGain: 'Ordenadas por ganancia estimada: lo de arriba es lo que más rinde.',
+    colConflict: 'Páginas',
+    colConflictHint:
+      'Cuántas páginas tuyas aparecen para esta búsqueda. Más de una significa que compiten entre sí — y ese número es lo que decide la urgencia de consolidar.',
+    competingPages: '{count} páginas compiten',
+    drillAria: 'Ver la evolución de {keyword} en Rendimiento',
+    openPage: 'Abrir la página que rankea hoy',
+    gainUnit: '+{value} clics/mes est.',
+    noGain: 'Sin ganancia estimada',
+    noGainHint: 'Esta keyword ya convierte mejor que el promedio de la posición objetivo.'
+  },
+
+  follow: {
+    cta: 'Seguir',
+    untrack: 'Dejar de seguir',
+    untrackAria: 'Dejar de seguir la keyword {keyword}',
+    untrackHint: 'Sale del seguimiento diario y deja de consumir presupuesto del proveedor. Su historial se conserva.',
+    feedbackUntracked: 'Dejaste de seguir "{keyword}". Su historial se conserva.',
+    feedbackUntrackError: 'No pudimos dejar de seguir "{keyword}". Intenta de nuevo.',
+    bulkSelected: '{count} seleccionadas',
+    bulkTrack: 'Seguir seleccionadas',
+    bulkClear: 'Limpiar selección',
+    bulkAria: 'Seleccionar {keyword} para seguirla en lote',
+    bulkSelectAll: 'Seleccionar todas las de esta página',
+    feedbackBulk: 'Seguiste {tracked} de {requested} keywords.',
+    undo: 'Deshacer',
+    outOfScope: '{count} fuera del filtro actual',
+    outOfScopeHint:
+      'Las seleccionaste antes de filtrar y ahora no están a la vista. No entran en el lote: seguir algo que no estás viendo compromete gasto sin que lo hayas revisado.',
+    ctaAria: 'Seguir la keyword {keyword}',
+    following: 'Siguiendo',
+    followingHint: 'Ya está en el set monitoreado: su posición se mide todos los días.',
+    loading: 'Siguiendo…',
+    // El costo se dice ANTES de hacer clic, no después.
+    costHint: 'Al seguirla entra al seguimiento diario de posición, que consume presupuesto del proveedor.',
+    capacity: '{used} de {capacity} keywords seguidas',
+    capacityFullHint: 'El set llegó a su tope. Deja de seguir alguna antes de agregar otra.',
+    feedbackTracked: 'Ahora sigues "{keyword}". Aparecerá en Rendimiento cuando se mida.',
+    feedbackAlready: 'Ya seguías "{keyword}". No se agregó de nuevo.',
+    feedbackCapacity: 'No se pudo seguir "{keyword}": el set llegó a su tope de {capacity} keywords.',
+    feedbackError: 'No pudimos seguir "{keyword}". Intenta de nuevo.'
+  },
+
+  filters: {
+    title: 'Filtros',
+    ariaLabel: 'Filtros de oportunidades',
+    actionAll: 'Todas',
+    positionLabel: 'Posición',
+    positionAll: 'Todas',
+    positionFirstPage: 'Primera plana (8–10)',
+    positionSecondPage: 'Segunda plana (11–20)',
+    clear: 'Limpiar filtros',
+    resultCount: '{count} de {total} keywords',
+    resultAnnounce: '{count} keywords tras aplicar los filtros',
+    viewingSubset: 'Viendo {count} de {total}'
+  },
+
+  states: {
+    emptyNoOpportunities: {
+      title: 'Todavía no hay oportunidades',
+      description:
+        'Ninguna keyword de {domain} está hoy entre las posiciones 8 y 20 con demanda suficiente. Cuando alguna llegue a ese rango, aparecerá acá.'
+    },
+
+    emptyFiltered: {
+      title: 'Sin resultados para estos filtros',
+      description: 'Ninguna keyword coincide con la acción o la posición que elegiste.',
+      cta: 'Limpiar filtros'
+    },
+
+    emptyNoGsc: {
+      title: 'Falta conectar Search Console',
+      description: 'Sin Search Console no hay demanda medida, y estas oportunidades se calculan con ella.',
+      cta: 'Conectar Search Console'
+    },
+
+    emptyNoSnapshots: {
+      title: 'Todavía no hay días medidos',
+      description: 'La conexión está lista y la primera captura aún no corre. Vuelve en unas horas.'
+    },
+
+    error: {
+      title: 'No pudimos cargar las oportunidades',
+      description: 'Puede ser algo temporal de nuestro lado. Intenta de nuevo en unos minutos.',
+      cta: 'Reintentar'
+    },
+
+    /**
+     * Error ESTRUCTURAL: reintentar no lo resuelve, así que no se ofrece el botón.
+     * Ofrecerlo escondería la acción real y haría que el operador reintente en vano.
+     */
+    errorStructural: {
+      title: 'Este Space no tiene un sitio SEO configurado',
+      description: 'Hay que crear el target del sitio antes de que podamos buscar oportunidades. Pídeselo a quien administre el módulo.'
+    },
+
+    denied: {
+      title: 'No tienes acceso al módulo SEO',
+      description: 'Pídele a un administrador que te habilite el módulo SEO para este Space.',
+      // Un estado bloqueado lleva CTA, no una instrucción: el camino tiene que ser clicable.
+      cta: 'Ver los Spaces con SEO activo'
+    },
+
+    // Degradación honesta del enriquecimiento de mercado: se nombra lo que falta.
+    marketUnavailable: {
+      title: 'Mostramos sólo lo medido',
+      description:
+        'El volumen y la dificultad de mercado no están habilitados en este Space. La priorización usa tu demanda medida en Search Console, que es de tu propia búsqueda.'
+    }
+  }
+} as const
+
+/**
+ * TASK-1309 — Auditoría del sitio (tab "Auditoría" de Search Visibility, nodo S4).
+ *
+ * Copy es-CL (tuteo) de la superficie operador que diagnostica salud técnica de un
+ * dominio. Los estados NO colapsan: un crawl que terminó sin issues es una buena
+ * noticia, no un error, y "sin auditoría" no se pinta con ceros.
+ */
+export const GH_GROWTH_SEO_AUDIT = {
+  header: {
+    title: 'Auditoría del sitio',
+    subtitle: (domain: string) => `Salud técnica de ${domain} para búsqueda`,
+    subtitleNoDomain: 'Salud técnica del sitio para búsqueda',
+    breadcrumbLeaf: 'Auditoría',
+    freshness: (days: number) =>
+      days === 0 ? 'Último crawl: hoy' : days === 1 ? 'Último crawl: ayer' : `Último crawl: hace ${days} días`,
+    freshnessNever: 'Sin crawl reciente',
+    // El freshness es la señal de cuánto confiar en el diagnóstico: pasado cierto punto
+    // deja de ser un dato de contexto y pasa a ser una advertencia.
+    freshnessStale: 'Este diagnóstico ya no es reciente. Corre una auditoría para confirmarlo.'
+  },
+
+  action: {
+    run: 'Correr auditoría',
+    running: 'Encolando…',
+    queued: 'Auditoría encolada. El crawl corre en segundo plano y la pantalla se actualiza al terminar.'
+  },
+
+  kpi: {
+    health: 'Salud',
+    healthAria: (score: number) => `Salud del sitio: ${score} de 100`,
+    healthPending: 'Pendiente',
+    healthPendingHint: 'El crawl no calculó un puntaje de salud.',
+    // 🔴 El puntaje y el conteo de issues NO miden lo mismo, y ponerlos juntos sin decirlo
+    // invita a leerlos como contradicción ("¿95 con 519 issues?"). El puntaje lo calcula el
+    // proveedor con su propia ponderación —pesa sobre todo lo que rompe indexación— y el
+    // conteo sale de nuestro catálogo curado de checks. Un sitio sin críticos puede tener
+    // muchos issues menores y seguir puntuando alto: no es un error, es qué mide cada uno.
+    healthScopeNoCritical:
+      'El puntaje pesa sobre todo lo que rompe la indexación. Sin issues críticos se mantiene alto aunque haya muchos menores.',
+    healthScopeWithCritical:
+      'El puntaje pesa sobre todo lo que rompe la indexación, así que los issues críticos son los que más lo bajan.',
+    critical: 'Críticos',
+    warnings: 'Atención',
+    notices: 'Menores',
+    pages: 'Páginas revisadas',
+    // El crawl tiene techo. Cuando lo choca, el conteo deja de ser "el sitio" y pasa a ser
+    // "lo que alcanzamos a mirar" — decirlo evita que una muestra se lea como un censo.
+    pagesCapped: 'Tope del crawl',
+    pagesCappedHint: (cap: number) =>
+      `El crawl revisa hasta ${cap} páginas. Si el sitio tiene más, esto es una muestra y la salud describe esa muestra, no el sitio entero.`,
+    // Los conteos por severidad son también el filtro de la lista (mismo recurso que la
+    // banda de veredicto de Keywords: leyenda y control en un solo objeto).
+    filterAria: (severity: string) => `Filtrar la lista por ${severity}`,
+    filterClear: 'Ver todos',
+    bandAria: 'Reparto de issues por severidad; cada segmento filtra la lista',
+    filterClearAria: 'Quitar el filtro de severidad y ver todos los issues',
+
+    // Movimiento entre crawls. El módulo se vende como serie de tiempo, así que "95" solo
+    // es media respuesta; "95, +2 desde el crawl anterior" es la otra mitad.
+    trendFirstRun: 'Primer crawl: todavía no hay con qué comparar',
+    trendHealth: (delta: number, date: string) =>
+      `${delta > 0 ? '+' : ''}${delta.toFixed(1)} desde el crawl del ${date}`,
+    trendHealthFlat: (date: string) => `Sin cambio desde el crawl del ${date}`,
+    trendHealthUnknown: (date: string) => `El crawl del ${date} no calculó puntaje`,
+    trendIssues: (delta: number) =>
+      delta === 0
+        ? 'Mismo número de issues'
+        : delta > 0
+          ? `${delta} ${delta === 1 ? 'issue nuevo' : 'issues nuevos'}`
+          : `${Math.abs(delta)} ${Math.abs(delta) === 1 ? 'issue menos' : 'issues menos'}`
+  },
+
+  issues: {
+    title: 'Issues priorizados',
+    // Se nombra EXACTAMENTE lo que ordena la lista. Prometer un criterio que los datos no
+    // sostienen es la misma clase de mentira que pintar un cero donde no hubo medición.
+    subtitle: 'Primero lo crítico; dentro de cada nivel, lo que más mueve la aguja en búsqueda por lo que menos cuesta resolver',
+    affected: (pages: number) => (pages === 1 ? '1 página afectada' : `${pages} páginas afectadas`),
+    view: 'Ver',
+    viewAria: (issueName: string) => `Ver las páginas afectadas por ${issueName}`,
+    effortLabel: 'Esfuerzo',
+    // El esfuerzo es un juicio editorial de Efeonce, no un dato del proveedor: se declara
+    // como estimación para que nadie lo lea como una medición del crawl.
+    effortHint: 'El esfuerzo es una estimación nuestra, no un dato del crawl.',
+    unknownIssue: (issueType: string) => `Check sin catalogar (${issueType})`,
+    unknownIssueHint: 'Este check es nuevo en el proveedor y aún no tiene ficha en español.',
+    filteredEmpty: (severity: string) => `Sin issues de ${severity.toLowerCase()} en este crawl.`,
+    filteredCount: (shown: number, total: number) => `Mostrando ${shown} de ${total} issues`
+  },
+
+  severity: {
+    critical: 'Crítico',
+    warning: 'Atención',
+    notice: 'Info'
+  },
+
+  effort: {
+    low: 'Rápido',
+    medium: 'Medio',
+    high: 'Alto'
+  },
+
+  drill: {
+    title: (issueName: string, pages: number) => `${issueName} — ${pages === 1 ? '1 página' : `${pages} páginas`}`,
+    close: 'Cerrar',
+    closeAria: 'Cerrar el detalle del issue y volver a la lista',
+    colUrl: 'URL',
+    colDetail: 'Detalle',
+    detailEmpty: 'Sin detalle adicional',
+    httpStatus: (code: number) => `HTTP ${code}`,
+    onpageScore: (score: number) => `Puntaje de página ${score}`,
+    truncated: (shown: number, total: number) => `Mostramos ${shown} de ${total} páginas de este grupo.`,
+    // El diagnóstico tiene que poder salir de la pantalla: el site audit es material de
+    // conversación de SOW, y hasta acá terminaba en copiar a mano.
+    copy: 'Copiar',
+    copyAria: (issueName: string) => `Copiar las páginas afectadas por ${issueName}`,
+    copied: 'Copiado',
+    copyFailed: 'No pudimos copiar. Selecciona el texto a mano.',
+    // TSV: pega como texto en un doc y como columnas en una planilla, sin pedirle al
+    // operador que elija formato.
+    copyHeader: 'URL\tDetalle'
+  },
+
+  states: {
+    emptyTitle: 'Sin auditoría reciente',
+    emptyDescription: (domain: string) =>
+      `Aún no corrimos un crawl para ${domain}. Corre una auditoría para ver la salud técnica.`,
+    emptyDescriptionNoDomain: 'Aún no corrimos un crawl para este sitio. Corre una auditoría para ver la salud técnica.',
+
+    runningTitle: 'Auditoría en curso',
+    runningDescription: (domain: string) => `Estamos revisando ${domain}. Esto puede tardar unos minutos.`,
+    runningDescriptionNoDomain: 'Estamos revisando el sitio. Esto puede tardar unos minutos.',
+
+    cleanTitle: 'Sin issues detectados',
+    cleanDescription: 'El crawl terminó y no encontró problemas de los que revisamos.',
+
+    degradedTitle: 'El crawl terminó parcialmente',
+    degradedDescription:
+      'Algunas páginas no se pudieron revisar. Lo que ves es real, pero incompleto: no lo leas como el sitio entero.',
+
+    failedTitle: 'La auditoría falló',
+    failedDescription: 'No pudimos completar el crawl.',
+    failedCta: 'Reintentar',
+
+    readerErrorTitle: 'No pudimos cargar la auditoría',
+    readerErrorDescription: 'Hubo un problema al leer el reporte.',
+    readerErrorCta: 'Reintentar',
+
+    deniedTitle: 'Sin acceso',
+    deniedDescription: 'No tienes permiso para ver la auditoría de este Space.',
+
+    noTargetTitle: 'Este Space no tiene un sitio configurado',
+    noTargetDescription:
+      'Hay que crear el target del sitio antes de poder auditarlo. Pídeselo a quien administre el módulo.',
+
+    noSpacesTitle: 'Sin Spaces con SEO activo',
+    noSpacesDescription: 'Ningún Space que puedas ver tiene el módulo SEO habilitado.'
+  },
+
+  runErrors: {
+    alreadyRunning: 'Ya hay una auditoría corriendo para este sitio. Espera a que termine.',
+    alreadyToday: 'Ya corrimos una auditoría para este sitio hoy.',
+    quotaExhausted: 'Este Space agotó su cupo de auditorías del mes.',
+    budgetExhausted: 'Este Space agotó su presupuesto de proveedor del mes.',
+    notEntitled: 'Este Space no tiene el módulo SEO habilitado para correr auditorías.',
+    generic: 'No pudimos encolar la auditoría. Intenta de nuevo.'
+  }
+} as const
+
+/**
+ * TASK-1309 — Ficha es-CL de cada check OnPage que Greenhouse materializa.
+ *
+ * El reader entrega el `issueType` como id de MÁQUINA del proveedor (`is_broken`,
+ * `no_h1_tag`): sin esta ficha la lista priorizada sería una columna de identificadores
+ * en inglés. Las claves espejan el allowlist curado de
+ * `src/lib/growth/seo/site-audit/findings-map.ts` — cuando allá entre un check nuevo,
+ * acá entra su ficha. Mientras no la tenga, la UI degrada nombrando el id crudo en vez
+ * de esconder el issue: un problema sin traducir sigue siendo un problema.
+ *
+ * ⚠️ `effort` es un juicio editorial de Efeonce, NO un dato del crawl — DataForSEO no
+ * reporta costo de arreglo. Existe porque la pregunta del operador es "¿qué ataco
+ * primero?", y severidad sola no la responde: 300 imágenes sin `alt` y un 5xx no se
+ * atacan igual aunque compartan volumen. Se muestra siempre etiquetado como estimación.
+ *   low    → cambio de plantilla o contenido, se resuelve en lote
+ *   medium → requiere criterio por página o tocar reglas del sitio
+ *   high   → infraestructura, arquitectura o trabajo editorial de fondo
+ *
+ * ⚠️ `value` es cuánto mueve la aguja EN BÚSQUEDA, y NO es redundante con la severidad.
+ * La severidad mide qué tan roto está algo; `value` mide cuánto importa arreglarlo. Dentro
+ * de `notice` conviven higiene cosmética y señales reales: un favicon ausente afecta la
+ * presentación de marca en el SERP, un `alt` ausente afecta búsqueda de imágenes y
+ * accesibilidad. Sin este eje, el orden por alcance ascendía la trivia que toca todo el
+ * sitio por encima de lo que de verdad conviene atacar (hallazgo de la auditoría `seo-aeo`
+ * 2026-08-08: "Sin favicon · 91 páginas" encabezaba el tier por sobre "Imágenes sin texto
+ * alternativo · 50 páginas").
+ *   high   → rastreo, indexación, canonicalización, contenido, datos estructurados
+ *   medium → CTR, experiencia de página, búsqueda de imágenes
+ *   low    → higiene sin efecto de búsqueda medible
+ */
+export const GH_GROWTH_SEO_AUDIT_ISSUES: Readonly<
+  Record<
+    string,
+    {
+      readonly label: string
+      readonly effort: 'low' | 'medium' | 'high'
+      /** Cuánto mueve la aguja en búsqueda. NO es lo mismo que la severidad. */
+      readonly value: 'low' | 'medium' | 'high'
+      readonly hint: string
+    }
+  >
+> = {
+  // Estado HTTP / disponibilidad.
+  is_broken: { label: 'Página rota', effort: 'high', value: 'high', hint: 'La página no responde correctamente y no puede indexarse.' },
+  is_4xx_code: { label: 'Error 4xx', effort: 'medium', value: 'high', hint: 'La página responde "no encontrada" o "sin acceso" a quien la visita.' },
+  is_5xx_code: { label: 'Error 5xx del servidor', effort: 'high', value: 'high', hint: 'El servidor falla al entregar la página. Es un problema de infraestructura.' },
+
+  // Canonicalización.
+  canonical_to_broken: { label: 'Canonical apunta a una página rota', effort: 'medium', value: 'high', hint: 'La página declara como versión oficial una URL que no funciona.' },
+  recursive_canonical: { label: 'Canonical recursivo', effort: 'medium', value: 'high', hint: 'Las etiquetas canonical se apuntan entre sí en círculo y anulan la señal.' },
+  canonical_to_redirect: { label: 'Canonical apunta a una redirección', effort: 'medium', value: 'medium', hint: 'La versión oficial declarada redirige a otra parte: la señal se diluye.' },
+  canonical_chain: { label: 'Cadena de canonicals', effort: 'medium', value: 'medium', hint: 'Varias canonical encadenadas antes de llegar a la URL final.' },
+  is_link_relation_conflict: { label: 'Conflicto entre relaciones de enlace', effort: 'medium', value: 'medium', hint: 'Las etiquetas de relación se contradicen sobre cuál es la versión buena.' },
+
+  // Meta esencial.
+  no_title: { label: 'Sin etiqueta de título', effort: 'low', value: 'high', hint: 'La página no declara título: el buscador inventa uno.' },
+  no_description: { label: 'Sin meta descripción', effort: 'low', value: 'medium', hint: 'Sin descripción propia, el resumen del resultado lo arma el buscador.' },
+  duplicate_title_tag: { label: 'Título duplicado', effort: 'medium', value: 'high', hint: 'Varias páginas comparten el mismo título y compiten entre sí.' },
+  duplicate_meta_tags: { label: 'Meta tags duplicados', effort: 'medium', value: 'medium', hint: 'Metadatos repetidos entre páginas distintas.' },
+  no_h1_tag: { label: 'Sin encabezado H1', effort: 'low', value: 'medium', hint: 'La página no declara de qué trata en su encabezado principal.' },
+  title_too_long: { label: 'Título demasiado largo', effort: 'low', value: 'medium', hint: 'El buscador lo va a recortar en el resultado.' },
+  title_too_short: { label: 'Título demasiado corto', effort: 'low', value: 'medium', hint: 'El título no alcanza a describir la página.' },
+
+  // Redirects y protocolo.
+  redirect_chain: { label: 'Cadena de redirecciones', effort: 'medium', value: 'medium', hint: 'La URL pasa por varios saltos antes de llegar a destino.' },
+  has_meta_refresh_redirect: { label: 'Redirección por meta refresh', effort: 'low', value: 'medium', hint: 'Redirección hecha con una técnica que el buscador no interpreta bien.' },
+  https_to_http_links: { label: 'Enlaces de HTTPS a HTTP', effort: 'medium', value: 'medium', hint: 'Una página segura enlaza a contenido sin cifrar.' },
+  is_http: { label: 'Página servida por HTTP', effort: 'high', value: 'high', hint: 'La página no usa conexión segura.' },
+
+  // Contenido.
+  low_content_rate: { label: 'Poco contenido respecto al código', effort: 'high', value: 'high', hint: 'La página tiene mucho más marcado que texto útil.' },
+  low_character_count: { label: 'Muy poco texto', effort: 'high', value: 'high', hint: 'El contenido es demasiado breve para responder una búsqueda.' },
+  low_readability_rate: { label: 'Lectura difícil', effort: 'high', value: 'medium', hint: 'El texto exige más esfuerzo de lectura del recomendable.' },
+  lorem_ipsum: { label: 'Contenido de relleno', effort: 'low', value: 'high', hint: 'Quedó texto de maqueta publicado.' },
+
+  // Estructura y descubrimiento.
+  is_orphan_page: { label: 'Página huérfana', effort: 'medium', value: 'high', hint: 'Ninguna otra página del sitio la enlaza: es difícil de descubrir.' },
+
+  // Datos estructurados (insumo AEO).
+  has_micromarkup_errors: { label: 'Errores en los datos estructurados', effort: 'medium', value: 'high', hint: 'El marcado que alimenta resultados enriquecidos y respuestas de IA tiene errores.' },
+
+  // Performance y tamaño (lab, diagnóstico).
+  high_loading_time: { label: 'Tiempo de carga alto', effort: 'high', value: 'medium', hint: 'La página tarda más de lo razonable en responder. Es una medición de laboratorio: la señal que Google usa para rankear viene de datos de campo en Search Console.' },
+  large_page_size: { label: 'Página muy pesada', effort: 'medium', value: 'medium', hint: 'El peso de la página castiga a quien la abre con conexión lenta. Es una medición de laboratorio: la señal que Google usa para rankear viene de datos de campo en Search Console.' },
+  has_render_blocking_resources: { label: 'Recursos que bloquean el dibujado', effort: 'medium', value: 'medium', hint: 'Scripts o estilos que retrasan lo primero que se ve. Es una medición de laboratorio: la señal que Google usa para rankear viene de datos de campo en Search Console.' },
+  no_content_encoding: { label: 'Sin compresión de contenido', effort: 'low', value: 'low', hint: 'El servidor entrega la página sin comprimir. Es una medición de laboratorio: la señal que Google usa para rankear viene de datos de campo en Search Console.' },
+
+  // Higiene HTML.
+  no_image_alt: { label: 'Imágenes sin texto alternativo', effort: 'low', value: 'medium', hint: 'Las imágenes no describen su contenido: afecta accesibilidad y búsqueda de imágenes.' },
+  no_favicon: { label: 'Sin favicon', effort: 'low', value: 'low', hint: 'El sitio no declara su ícono de pestaña.' },
+  no_doctype: { label: 'Sin doctype', effort: 'low', value: 'low', hint: 'El documento no declara su tipo y el navegador adivina cómo interpretarlo.' },
+  no_encoding_meta_tag: { label: 'Sin meta de codificación', effort: 'low', value: 'low', hint: 'La página no declara su codificación de caracteres.' },
+  deprecated_html_tags: { label: 'Etiquetas HTML obsoletas', effort: 'medium', value: 'low', hint: 'El marcado usa etiquetas que el estándar ya retiró.' }
+}

@@ -5,6 +5,12 @@
 > priorizada (SKILL.md §4).
 
 ## A. Técnico (`01`)
+
+> ⚠️ Esta sección **no se tilda desde el reporte de un crawler**. Cuatro filas
+> (robots IA · JSON-LD ausente · sitemap limpio · CWV de campo) no las cubre el
+> catálogo de checks de un site audit passthrough: su silencio no es aprobación.
+> Ver `modules/01_SEO_TECHNICAL.md` §8.
+
 - [ ] Indexación sana (GSC Pages: sin "crawled not indexed" masivo)
 - [ ] Contenido crítico en HTML inicial (no depende de JS client-side)
 - [ ] CWV de campo OK (CrUX): LCP ≤2.5s · INP ≤200ms · CLS ≤0.1

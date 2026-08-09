@@ -40,6 +40,11 @@ A microinteraction must **reduce uncertainty**, **confirm state**, **guide the n
 
 If it does not do one of those jobs, keep it static.
 
+For premium dashboard/report surfaces, microinteraction cannot compensate for a
+weak surface model. Fix grey-canvas floating content, card soup, colored rails,
+traffic-light palettes, sparse charts and flat tables first; then add motion to
+clarify causality, selection, refresh, ranking, drilldown or state change.
+
 ## Audit dimensions
 
 Review the surface in this order:
@@ -196,6 +201,10 @@ Return:
 - Premature field validation while the user is still typing
 - Animating error states or destructive confirmations
 - Building a drawer-like desktop sidecar instead of the Adaptive Sidecar primitive when the main work context must remain visible
+- Using motion, glow, counters or decorative hover effects to make card soup,
+  colored rails or traffic-light dashboards feel premium
+- Animating sparse charts or flat tables instead of reframing the information
+  as evidence, timeline, coverage, confidence, queue or ranking
 
 ## Complements
 

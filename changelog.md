@@ -7,22 +7,286 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
-## 2026-08-08 — El batch policy del release preflight dejó de mentir (ISSUE-114)
+## 2026-08-08 — TASK-1309 CERRADA: el conmutador de Search Visibility queda completo
 
-`release_batch_policy` computaba el diff con base three-dot (`origin/main...target`). Como el flujo de
-promoción es por squash-merge, la merge-base queda congelada antes del último squash y el check
-resucitaba archivos byte-idénticos a producción como cambios del release, fabricando dominios
-irreversibles falsos (`cloud_release`) y empujando releases normales a `requires_break_glass`. Ahora
-usa two-dot, y tanto el diff de archivos como los commit bodies resuelven su rango por una única
-función `buildReleaseDiffRange`, de modo que no puedan volver a divergir sobre bases distintas.
+- **`TASK-1309` pasa a `complete`.** Build de producción verde (exit 0) con autorización del operador
+  — era el último gate. Con ella **las 4 tabs de Search Visibility navegan** y el conmutador del
+  operador queda cerrado; la pata UI del exit criterion de EPIC-022 queda abierta sólo por el cliente
+  (`TASK-1310`) y su alcanzabilidad por nav (`TASK-1675`).
+- **El bloqueo previo lo había cerrado la migración de 1310.** Estaba `code complete` frenada por 2 rojos
+  ajenos en `client-role-visibility.test.ts` (viewCodes en el catálogo TS sin migración de
+  `role_view_assignments`). Aplicada esa migración: **`pnpm test` en 1429 archivos / 10377 tests / 0
+  rojos**, `ui:quality` PASS 4.63, reachability 0 huérfanas. Falta el build de producción para el
+  cierre formal.
+- 🔴 **§10.6 de la arquitectura SEO se auto-contradecía por un delta mío**: el bloque nuevo cambiaba el
+  orden de hallazgos a tres ejes mientras el contrato 4 seguía declarando la regla vieja de dos. Un
+  agente que leyera el contrato sin bajar al delta implementaba lo equivocado. Corregido: el contrato
+  ahora enuncia la regla vigente y apunta al delta en vez de contradecirlo.
+- **Cinco commits de feature habían aterrizado después del pase documental**, así que las tres capas
+  (arquitectura, funcional, manual) describían una pantalla anterior a la construida. Actualizadas:
+  doc funcional a v1.10, manual a v1.1, más los dos índices que seguían diciendo "tres pantallas de
+  operador" y listando la Auditoría en "qué falta".
+- **Los aprendizajes se generalizaron fuera de SEO**, que es donde valen: `dataviz-design` v1.2 fija
+  que el `radialBar` de Apex mide 0 en contenedor fluido y **no dibuja** —con build y tests verdes— y
+  extiende la sospecha a cualquier chart que derive tamaño del contenedor (tabs ocultas, acordeones,
+  el `fullPage` de Playwright que produce cards vacías que parecen bug); `state-design` v1.2 fija los
+  **seis** estados de un job async (nunca corrió · corriendo · limpio · parcial · con techo ·
+  fallido); `greenhouse-ui-review` v1.2 y `greenhouse-ui-enterprise-review` suman como blocker el
+  número cuya procedencia difiere de sus vecinos sin declararlo en pantalla.
+- `seo-aeo` gana §8 en su módulo técnico (leer un site audit sin mentir el diagnóstico) y la regla de
+  que **ordenar hallazgos de un crawler no es ordenar iniciativas con RICE**; `dataforseo-operator`
+  aterriza los cuatro huecos de cobertura a campos concretos del proveedor.
+- Deuda detectada: `greenhouse-ui-enterprise-review` vive en los dos árboles de skills pero **no está
+  en el manifiesto de espejos** y ya divergía. Se aplicó el mismo bloque a ambas copias para que el
+  gate sea idéntico; la divergencia previa sigue sin reconciliar.
 
-El hueco de cobertura estaba en que `checks/release-batch-policy.ts` no tenía archivo de tests (el
-classifier puro sí lo tenía); el guardrail nuevo fija el rango en el argv de git, verificado rojo antes
-del fix y verde después. Sobre el batch en curso: 332→322 archivos y desaparece el `cloud_release`
-fantasma. Documentado además, sin corregir, que el batch policy del orquestador es vacuo post-merge
-(rango vacío ⇒ siempre `ship`), por lo que sólo tiene dientes en la corrida local pre-merge. Se abrió
-`ISSUE-144` por la confusión entre build cancelado a propósito y build fallido en `vercel_readiness`, y
-se corrigió el drift `vercel ls --target=` → `--environment=` en runbook y manual.
+## 2026-08-08 — ISSUE-143: la migración del cutover SEO colapsó expand y contract, y tumbó producción
+
+- **Resuelto el mismo día (~25 min de caída).** La migración de viewCodes de TASK-1310 hace expand y
+  contract en el mismo archivo: crea `seo_v2` y en el mismo statement supersede `seo_v1`. Eso anula el
+  dual-read `SEO_MODULE_KEYS_READ` aplicado a los 5 consumidores, cuyo valor entero era que existiera
+  un período con ambas claves vigentes. Vercel producción corre `main`, que pide `seo_v1` literal:
+  Grupo Berel pasó de `domainQuadrant=riesgo keywords=50` a `hasModule=false` + 404 en los cinco lanes.
+- **El ops-worker no se vio afectado** (su deploy ya tenía el dual-read): los tres batches que le pagan
+  al proveedor siguieron sanos. El daño fue de lectura, no de gasto ni de datos.
+- Restaurado reabriendo la ventana y hecho durable por
+  `20260808184512073_task-1310-reopen-seo-module-cutover-window`, que hornea el invariante de simetría
+  (ambas claves cubren las mismas orgs; una ventana asimétrica aborta la migración con `RAISE`).
+- **El guardrail es lo que faltaba:** la regla ya estaba escrita en §10.7 de la arquitectura y no
+  impidió nada, porque nadie revisa una migración contra un párrafo. Ahora hay un test que escanea la
+  sección `Up` de `migrations/` y falla si una migración nueva supersede una clave que
+  `SEO_MODULE_KEYS_READ` todavía acepta. Probado por mutación contra la migración culpable.
+- Segunda causa, de método: verificar una migración de cutover con un `SELECT` es verificar la mitad
+  del contrato. La otra mitad es qué versión de código la lee en cada uno de los **cinco runtimes con
+  despliegues independientes**.
+- **Hallazgo colateral, arreglado de raíz: `docs:context-rotate` estaba ciego y reventaba.** Rotando el
+  Handoff para registrar este incidente, el rotador murió con `TypeError: Cannot read properties of
+  undefined (reading 'index')`. Su patrón buscaba secciones `##` con fecha y el archivo hace rato usa
+  `###`: 0 de 23. Es la **segunda** vez que la herramienta se queda ciega por la misma causa —el
+  propio código documenta la primera (`^## Sesi[oó]n…` matcheaba 1 de 40)—, y esta vez además crasheó
+  en vez de degradar. Una herramienta que el gate te MANDA a correr y muere sin explicar empuja a
+  rotar a mano, que es exactamente como se corrompen los marcadores de integridad de los shards.
+  El fix no es ampliar el patrón: el nivel de heading ahora se **descubre** (gana el que más secciones
+  fechadas produce), porque el ancla estable es la fecha, no el nivel. Sin secciones fechadas degrada
+  con un mensaje accionable en vez de tirar un stack. El script pasó a ser importable (guard de
+  entrypoint) y estrenó suite —5 tests, uno de ellos contra el `Handoff.md` real, que es el que se
+  romperá la próxima vez que la convención derive. Verificado: rotó `keep 20; archive 3` + `keep 60;
+  remove 1` donde antes decía "manual compaction required".
+
+## 2026-08-08 — TASK-1310: contrato de navegación SEO cliente corregido (rollout pendiente)
+
+- Se corrigió el drift entre los viewCodes TS de `/growth/seo` y `/growth/seo/report` y el catálogo
+  de módulos: la migración crea `seo_v2`, supersede los assignments activos de `seo_v1` preservando
+  tier/metadata y registra los dos viewCodes en `view_registry`.
+- SEO permanece module-gated por organización; los tres roles cliente reciben denials explícitos y
+  las rutas conservan `growth.seo.report.read_client` scope `own`. La paridad ahora falla también si
+  se agrega una surface module-gated al registry sin seed DB.
+- Validación local: 53 tests focales y migration marker gate verdes. No se aplicó la migración, no se
+  hizo push/deploy y no se ejecutó build completo por el límite de recursos del equipo.
+- **Verificación cruzada de la task (2026-08-08, tarde).** El barrido encontró que el código estaba
+  adelante de sus documentos y de sus gates, y que **dos gates estaban verdes de mentira**:
+  - la señal `seo.rank_capture_lag` tenía `module_key = 'seo_v2'` hardcodeado, así que veía 0 orgs y
+    reportaba `ok` — falsa-sana. Con el expand aplicado reporta `warning` con un hallazgo real; su
+    test pinneaba el bug (asertaba el literal SQL) y ahora aserta el contrato;
+  - los tres scenarios GVC de cliente capturaban con sesión de **operador** contra superficies
+    client-gated, así que el frame decía "SEO no está activo en tu plan" y el visual-gate daba BLOCK
+    por una razón que no era la UI. Se agregó `requiresStorageState` al contrato de scenario, exigido
+    antes de lanzar el browser: `ui:visual-gate --task TASK-1310` pasó de BLOCK a PASS.
+- **El scorecard se regeneró desde la auditoría premium.** El anterior daba PASS 4.61 y afirmaba "axe
+  sin violaciones" mientras la auditoría de las 10:25 registra 2 violaciones de contraste y economía
+  de superficies en 1.8. Ahora `ui:quality --task TASK-1310` da **BLOCK `average=2.29 floor=1.8`**,
+  que es el estado correcto para una task con `UI ready: no` y release gate bloqueado.
+- **Drift documental cerrado:** wireframe y flow describían un `masterDetail` con rail lateral que la
+  implementación descartó — la ruta exacta por la que el siguiente cambio lo reintroduce. Corregidos a
+  `composition='single'` + tabs, con el "por qué no" escrito. La superficie cliente salió de "Que NO
+  existe todavía" del doc funcional, ganó su sección con el estado de rollout declarado y su manual
+  (`docs/manual-de-uso/growth/habilitar-portal-seo-cliente.md`); README, EPIC-022 y el ledger de flags
+  quedaron sincronizados.
+
+## 2026-08-08 — TASK-1309: Auditoría del sitio, y con eso el conmutador SEO queda completo
+
+- **`/admin/growth/seo/audit` (tab Auditoría) COMPLETA** — cuarta y última tab de Search Visibility:
+  con ella las 4 rutas del conmutador navegan. Cliente puro de `readSiteAuditReport` +
+  `queueSiteAudit`. Salud con freshness explícito, issues como **lista priorizada** (no tabla plana),
+  drill `?issueGroup=` con las URLs afectadas, y estados que no se mezclan: un crawl que terminó sin
+  hallazgos es buena noticia, no un error, y `healthScore` null dice "Pendiente", nunca 0/100.
+- **Dos desviaciones deliberadas de la spec, ambas por evidencia.** (a) El wireframe pedía radialBar
+  de ApexCharts; se descartó porque TASK-1306 ya había probado en GVC que mide 0 en contenedor fluido
+  y no dibuja — se extrajo su arco SVG a `shared/SeoHealthGauge` y ahora lo comparten las dos
+  pantallas hermanas, que era el riesgo real de duplicarlo. (b) El copy prometía orden "por impacto y
+  esfuerzo", pero el contrato de datos no trae señal de esfuerzo: se curó un tier por check junto al
+  label es-CL —declarado como estimación nuestra en la UI— y el orden quedó severidad ▸ páginas ÷
+  esfuerzo, con la severidad como corte absoluto para que 400 imágenes sin `alt` no entierren un 5xx.
+- **Catálogo es-CL de los 34 checks del allowlist** (`GH_GROWTH_SEO_AUDIT_ISSUES`): el reader entrega
+  ids de máquina. Un check sin ficha se NOMBRA en vez de esconderse, y hay test de drift en ambos
+  sentidos que obliga a escribirla cuando el backend sume uno.
+- **`POST /api/admin/growth/seo/audit/run`** gateado por `growth.seo.audit.run` (distinta de
+  `observation.read`: diagnosticar y gastarle al proveedor son permisos distintos). 202, no 200. 6
+  códigos canónicos nuevos con `actionable` deliberado — el guard de idempotencia y el cupo agotado
+  NO ofrecen reintento; sólo la caída del proveedor sí.
+- **Tres hallazgos salieron de mirar los frames, no de los gates:** el drill volcaba 91 URLs en un
+  muro de ~5000px sin scroll interno (expulsaba de pantalla la lista que el operador venía
+  recorriendo), su encabezado quedaba en 3.25:1 sobre el fondo de costura, y las cifras de salud
+  flotaban sin ritmo sobre el ancho completo. Los cuatro gates de UI pasan (`ui:quality` 4.58/4.5).
+- Se commiteó además un checkpoint de TASK-1310 (trabajo de Codex que estaba sin commitear) cerrando
+  10 errores de typecheck que dejaban el árbol rojo y bloqueaban el gate de cualquier trabajo
+  paralelo. Esa task **sigue `in-progress`**: el checkpoint no la declara cerrada.
+
+## 2026-08-08 — TASK-1310: surfaces cliente SEO para Grupo Berel (code complete local)
+
+- Se construyeron las tres direcciones aprobadas como una familia: dashboard `masterDetail`
+  `/growth/seo`, quadrant 360 SEO×AEO y report artifact `/growth/seo/report` con render web + print.
+- El report agrega `modelFromSeoReport` sobre el mismo `ReportArtifactModel` del AEO; no duplica scoring,
+  no expone costos/provider snapshot y mantiene `clientPortal`/`attachment` público-safe.
+- Grupo Berel quedó verificable con assignment SEO activo y gate `growth.seo.report.read_client` scope `own`.
+  GVC local desktop + mobile pasó sin errores de consola, página, hidratación ni HTTP; el desktop no tiene
+  findings axe. Los warnings mobile del shell global y el rollout staging/prod quedan declarados en
+  `docs/tasks/in-progress/TASK-1310-growth-seo-client-dashboard-report-artifact.md`.
+- GCloud/ADC y proxy PostgreSQL renovados/verificados. Lint, 28 tests focales, task lint y reachability
+  pasan. No se ejecutó build completo para proteger recursos; no hubo push/deploy.
+
+## 2026-08-07 — Growth SEO: pantalla ancla Rendimiento + Historical Data Platform (TASK-1307 + TASK-1655)
+
+- **`/admin/growth/seo/performance` (tab Rendimiento) COMPLETA** — la feature ancla de EPIC-022: chart
+  hero ECharts (primer consumer del stack; decisión de librería tomada acá y heredada por el módulo) con
+  eje de posición invertido declarado en palabras, meta top-3, dataZoom, colorblind-safe por forma,
+  cobertura real declarada ("N de M días con medición"); banda KPI `MetricTrendCard`; tabla
+  `DataTableShell` con Δ30d invertido + sparkline + drill; set compartible en `?urls=`/`?keywords=`.
+  Readers nuevos `readSeoPerformance`/`readSeoPerformanceCatalog` con parity (lane + MCP tools mismo PR)
+  y **fallback de fuentes por cobertura** (◑ exacta ↔ ● medida, nunca promediadas). GVC premium: rubric
+  enterprise pass, ui:quality 4.56/4.5. Primitives nuevas: `CustomTabsNav` (@core), `SurfaceRecipe.plane`,
+  `AppECharts`.
+- **Ronda de mejoras post-cierre (revisión product-design + seo-aeo, mismo día)** — presets de
+  comparación data-driven desde `seo_keyword_sets`; "Lectura del período" (insight cruzado de los 4 KPIs:
+  demanda vs ranking vs erosión de CTR/AIO, sólo cuando el patrón es inequívoco); marcadores de AI
+  Overview desde `serp_features` (sólo serie ◑, puente SEO↔AEO); rango 365 días; granularidad
+  Diario/Semanal (default semanal >120 días medidos); métrica integrada al selector; affordance visible
+  de drill; bandas de updates confirmados de Google (registro curado `algorithm-updates.ts`). Fix del
+  primitive `MetricTrendCard`: con `invertY` el área se pintaba sobre la línea (`baseValue='dataMax'`).
+- **Un solo header canónico para las tres pestañas de Search Visibility** — Resumen, Rendimiento y
+  Keywords resolvían su chrome de tres formas distintas (y ninguna usaba la región `header` de la
+  recipe, así que los controles flotaban sobre el lienzo gris). Ahora las tres usan
+  `SurfaceRecipe header={<WorkbenchHeader kind='report'>}` con el mismo reparto: alcance en
+  `secondaryActions`, frescura en `meta`, tabs en `supporting`. Keywords deja de duplicar los
+  controles dentro del veredicto y de cada superficie de estado; Rendimiento baja la leyenda ●/◑ a
+  la card del gráfico. Dos defectos de 390px corregidos: el tab activo recortado bajo las flechas de
+  scroll y el período truncando su valor vigente.
+- **El módulo SEO dejó de ser forward-only (TASK-1655, Slices 1-4)** — hallazgo de la ejecución: había 5
+  días de GSC teniendo 16 meses en la API. Ahora: mirror `seo_gsc_history` en BigQuery (SoT del
+  histórico; PG = ventana caliente) espejado por el batch diario, backfill por API ejecutado (**Berel
+  487/487 días · 6,67M filas · 0 fallos; Efeonce 474 días** — su OAuth GSC conectado hoy), split de
+  lectura por cobertura (180 días servidos desde BQ con ventana previa comparable, verificado), y semilla
+  histórica de rank vía `historical_serps` (granularidad dispersa verificada en sandbox ANTES de gastar;
+  4 keywords con historia real hasta 2025-08). Pendiente de 1655: export nativo GSC en la propiedad de
+  Berel (permiso Owner, out-of-band) y promoción para que el espejo diario corra en el ops-worker real.
+- **OAuth Search Console cableado en producción** — el flag llevaba ON pero el cliente OAuth existía solo
+  en staging (`oauth/start` respondía `not_configured`; clase "flag sin cablear"). Vars en Vercel
+  Production + redeploy; verificación del redirect URI al primer consent real.
+
+## 2026-08-07 — Los tres modelos de servicio dejan de ser vocabulario y pasan a ser contrato (TASK-1663)
+
+Al revisar quién debería declarar los objetivos de un cliente, el operador señaló que el módulo de
+búsqueda tiene los mismos tres modelos de servicio que el estudio creativo: operado por nosotros,
+co-operado, u operado por el cliente. Y que "el cliente contrata la herramienta" no es un cuarto
+modelo, sino el tercero cruzado con una forma de entrega distinta.
+
+Resultó que el vocabulario ya era canónico desde el modelo de negocio, y que el estudio creativo ya
+lo había convertido en un contrato de datos real y desplegado. Lo que faltaba era que Greenhouse
+tuviera el suyo: lo que había con nombre parecido pertenece a cotización, no a esto, y ningún módulo
+de producto conocía el concepto.
+
+La regla que hace que esto funcione, copiada tal cual del contrato existente: **el modo dice quién
+responde, nunca quién puede.** Si otorgara permisos, cambiar una etiqueta comercial en una tabla
+cambiaría en silencio quién puede comprometer gasto con un proveedor. Por eso el entregable más
+importante de la tarea no es la tabla: es la prueba automatizada de que cambiar el modo no altera lo
+que nadie puede hacer.
+
+Quedan tres preguntas separadas que antes se confundían: quién puede actuar, quién responde, y quién
+paga. Y una decisión deliberada: no hay valores por defecto por modelo. Cada acuerdo con un cliente
+declara explícitamente sus responsabilidades, y la ausencia de declaración es un estado cerrado, no
+una suposición. Un default parece cómodo y es justamente lo que hace que nadie revise el reparto
+real — que en el modelo co-operado es distinto para cada cliente.
+
+## 2026-08-07 — Growth SEO: el módulo responde tres preguntas, no una (TASK-1659…1662)
+
+Cuestionar por qué la pantalla de keywords no se construyó como estaba especificada destapó algo
+más grande que un desacuerdo de diseño: el módulo tiene **tres preguntas distintas** y sólo una
+tenía superficie.
+
+La construida contesta "de lo que ya tengo, ¿qué empujo?". Faltaban "¿dónde quiere estar el
+cliente?" y "¿qué me estoy perdiendo entero?". Y no es que estuvieran postergadas: de las doce
+tareas abiertas del programa SEO, ninguna las cubría.
+
+La razón de fondo es que **Search Console es ciego por construcción a las dos últimas**. Si el
+cliente no aparece en las primeras cien posiciones no hay impresiones, así que esa búsqueda
+sencillamente no existe en sus datos. Ninguna pantalla construida sobre esa fuente va a poder
+contestarlas nunca, por buena que sea.
+
+Eso corrige algo que veníamos diciendo mal. Para una búsqueda donde el cliente ya aparece, el
+volumen de mercado es un complemento y la medición propia es mejor insumo. Pero para una donde no
+aparece, la medición propia no entrega nada, y el volumen y la dificultad pasan a ser la única
+forma de contestar si vale la pena perseguirla y cuánto va a costar. Dejan de ser opcionales.
+
+También apareció que media capacidad ya existía sin que nadie lo notara: el comando acepta
+cualquier búsqueda, incluidas las que el cliente no rankea, y la captura diaria las mide igual. Lo
+que faltaba era dónde declararlas. La capacidad estaba disponible desde un asistente y no desde la
+pantalla — justo al revés del error habitual, y justo donde nadie ve el cupo ni el gasto que
+compromete.
+
+Cuatro tareas nuevas, en orden de dependencia: distinguir un objetivo declarado de una oportunidad
+detectada, la pantalla para declararlos y seguir su avance, los datos de mercado, y finalmente qué
+gana la competencia donde el cliente es invisible. Esta última es la de más valor comercial: es lo
+que se le muestra a un prospecto en la primera reunión.
+
+## 2026-08-07 — Growth SEO: Oportunidades de keywords, completa (TASK-1308)
+
+La ruta `/admin/growth/seo/keywords` quedó cerrada. Nació declarada como superficie de UI
+pura y terminó con backend propio, contrato programático y dos herramientas federadas al
+gateway MCP, porque el command que la especificación daba por construido no existía.
+
+Lo que ordenó todas las decisiones fue entender que **seguir una keyword no es guardar un
+dato: es comprometer gasto que se repite**. La captura diaria de posiciones le paga al
+proveedor por cada keyword vigente, en cada ciclo, hasta que alguien la saque. De ahí un
+techo por sitio con rechazo explícito, el permiso separado del de mirar, el resultado
+detallado keyword por keyword en vez de un "listo", y sobre todo la contraparte para dejar
+de seguir — sin la cual el compromiso era permanente y el tope del set, un callejón sin
+salida. Dejar de seguir no borra: cierra la ventana y conserva la medición histórica, que es
+lo que después permite explicar una factura.
+
+El mapa de oportunidad no usa los ejes que pedían el wireframe y la arquitectura. Volumen,
+dificultad e intención de mercado no tienen fuente hoy, y priorizar por un volumen estimado
+teniendo el Search Console propio es un error de método: la demanda ya está medida en la
+búsqueda del propio cliente. Los ejes son posición y demanda medida, y el dato de mercado —
+cuando llegue— será una columna y un filtro, nunca un eje.
+
+La pantalla pasó por tres rondas de crítica de producto con todos los gates automáticos en
+verde desde la primera versión. Lo que se corrigió salió de mirar el resultado real: no
+servía en un teléfono, la selección múltiple podía gastar sobre keywords que ya no estaban a
+la vista, la zona destacada del mapa se contradecía con su propia leyenda, y la fecha de
+corte de los datos había desaparecido en un rediseño intermedio.
+
+El permiso del gateway obligó a decidir algo que va más allá de esta pantalla. Se había
+declarado un permiso por cada acción; se cambió a uno por dominio de escritura, porque una
+lista de permisos por acción termina siendo una copia mal mantenida —editada a mano en el
+directorio de identidad— del registro de permisos que ya vive dentro del producto, y las dos
+listas divergen. La regla quedó escrita: un permiso por clase de riesgo, no por acción. Su
+consecuencia práctica es que la próxima escritura de este dominio ya no toca el directorio de
+identidad, que era justo la fricción que hace que una herramienta se quede sin publicar.
+
+Al ir a entregarle ese permiso al llavero que usan los asistentes apareció lo que de verdad
+importaba: por ese camino el actor es la máquina, no la persona, así que el permiso del
+directorio de identidad es la **única puerta de toda la cadena que depende de quién eres tú**.
+Entregarlo al llavero compartido —que tiene cualquiera del equipo que se conecte— habría dado
+poder de comprometer gasto a todo el tenant, incluido quien en el portal no puede hacerlo, y
+sin que nada fallara: simplemente habría empezado a funcionar para todos. No se hizo, y quedó
+escrito como prohibición explícita, porque el día que alguien vea el error de permiso la
+tentación va a ser exactamente esa. La única otra herramienta que gasta dinero tampoco está en
+ese llavero.
+
+Estado: código completo y verificado, permiso creado en el directorio de identidad con
+verificación de que ningún permiso vecino se perdió. Las dos herramientas quedan publicadas y
+cerradas con llave a propósito: abrirlas necesita un llavero con entrega revocable por persona,
+que es trabajo ya planificado aparte. Queda publicar el despliegue del gateway.
 
 ## 2026-08-07 — Autenticación local Gcloud con Playwright
 
@@ -30,6 +294,13 @@ Se agregó `pnpm gcloud:auth:playwright` y la skill espejo `greenhouse-gcloud-au
 (`gcloud auth login` y ADC) usando Playwright como navegador visible, con verificación final mediante el
 preflight canónico. La credencial local se configura con `pnpm gcloud:auth:playwright:setup` en `.auth/`
 ignorado por Git y protegido con permisos `0600`; no se habilitó scheduler ni ejecución automática.
+
+## 2026-08-07 — Capacitación HubSpot ANAM · deck y material operativo
+
+Se alineó el deck de 26 láminas con la pauta recibida por Outlook y el caso canónico de ANAM: objetos y
+asociaciones, Growth/Renovación, Service/Ticket, dashboards, estados de madurez, Breeze, Meeting Notetaker,
+handoff de los tres intents y ejercicio integrado. Se dejaron el PDF/PNG derivado en `.captures/` y el
+runbook/handout como fuentes operativas; no se modificó la configuración live de HubSpot.
 
 ## 2026-08-06 — Cockpit SEO Overview (TASK-1306)
 
@@ -881,125 +1152,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
 - El caso Recraft queda como regla reusable: `application/octet-stream` sólo se admite para una salida SVG esperada
   después de validar bytes; el asset se sirve con CSP sandbox. No se amplió la allowlist MIME global.
 - No hubo mutaciones de runtime. `TASK-1553` sigue abierta sólo por receipts cross-task de `TASK-1468`/`TASK-1578`.
-
-## 2026-07-30 — Globe: Recraft v4.1 promovido y probado desde Producer
-
-- `ref/still/vector-v1` quedó disponible con evaluación, revisión humana, derechos, rate de 4 créditos,
-  binding, readiness y circuito gobernados.
-- La generación real desde la UI autenticada es `b5631c86-707a-41d9-8ecc-ef61caa8200c`; terminó
-  `completed/retained` y el Producer muestra el SVG, `Listo`, `Guardada` y descarga habilitada.
-- El smoke detectó que Fal transporta el SVG como `application/octet-stream`. Globe `84d6a8e`
-  admite esa combinación sólo para la salida SVG esperada, verifica los bytes y añade CSP sandbox.
-- Worker, API y Studio se desplegaron con éxito. La flota de imagen queda en seis rutas ejercitadas;
-  TASK-1553 sigue `in-progress` sólo por los receipts transversales TASK-1468/TASK-1578.
-
-## 2026-07-30 — AI Creative Rights & Enterprise Governance
-
-- Se creó la skill canónica `.codex/skills/greenhouse-ai-creative-rights-governance/` con companion Claude y referencias para enterprise rights framework, provider vetting y contrato/consentimiento.
-- Se incorporaron gates para inputs, planes comerciales, provenance, voz/likeness, música, disclosure, indemnidad, rights pack y estados de release.
-- Se sincronizaron `AGENTS.md`, `CLAUDE.md`, `project_context.md`, `Handoff.md` y `docs/operations/agent-context-router.json`.
-- La skill no autoriza claims legales ni venta automática: cláusulas, indemnidad y jurisdicciones requieren `legal-privacy-ip-operator`/Legal.
-- Se añadió la decisión propuesta [`GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1`](docs/architecture/GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md): no-training, retention, zero-retention, no human access, residency, isolation, subprocesadores, deletion y AI Data Protection Pack quedan separados y sujetos a evidencia por ruta.
-- Se sincronizaron Creative Services, Creative Studio/Globe, el manual de pilotos AI, Legal/IP y los routers para no prometer “no se procesan” cuando el compromiso real es procesamiento por provider/endpoint/plan aprobado.
-
-## 2026-07-30 — Globe: Nano Banana Pro promovido en el carril gobernado
-
-- Se firmó la revisión humana desde el Producer autenticado y se propuso `ref/still/nanobanana-pro-v1` al operador.
-- Se promovió el readiness y se creó/activó el binding de producción mediante los comandos canónicos; el selector live lo muestra como `Disponible`.
-- El resto de la flota conserva sus gates honestos: no se forzaron rutas sin evaluación exacta, driver gobernado o dependencia externa resuelta.
-
-## 2026-07-30 — Globe: Nano Banana 2 promovido y probado desde Producer
-
-- Vertex habilitó de hecho `gemini-3.1-flash-image`: el probe oficial devolvió HTTP 200 y se retiró
-  el bloqueo histórico de allowlist.
-- Se añadieron rates, driver gobernado, endpoint exacto, derechos comerciales, evaluación 5/5,
-  revisión humana y promoción de readiness/binding/circuito.
-- La generación real desde la UI autenticada es
-  `ce06f8b4-ebe9-43b6-9d47-8e4cc901f49a`, 10 créditos.
-- El smoke detectó y corrigió en Globe `1fb57285` un off-by-one en la reconstrucción del hash
-  durable de Vertex; CI `30565123529` y worker `30565166238` quedaron verdes. El mismo run terminó
-  `completed/retained`, la UI mostró `Listo` y el output fue
-  `sha256:b8a0eb45289558a2cb99e9989fa401aa794035c709505b10c58fba34e0768c1e`.
-- El Producer ofrece simultáneamente cinco modelos de imagen. TASK-1553 permanece `in-progress`
-  por los receipts pendientes de TASK-1468/TASK-1578.
-
-## 2026-07-30 — Creative Velocity y producción modular
-
-- Se profundizó el benchmark de Creative Velocity contra Superside, Publicis, WPP, VML, Monks, DEPT, Dentsu,
-  Accenture Song y referentes de Chile/LatAm.
-- Se creó [`EFEONCE_CREATIVE_VELOCITY_MODULAR_PRODUCTION_ADDENDUM_V1`](docs/services/creative-services/EFEONCE_CREATIVE_VELOCITY_MODULAR_PRODUCTION_ADDENDUM_V1.md).
-- Se documentaron lanes Social/Campaign/Performance Creative/Content Operations Velocity, Dedicated Creative Pod,
-  primer valor, dos velocidades y el roadmap de Modular Production.
-- Se registró la implementación observada en SKY con Adobe Express, SharePoint y assets reutilizables como capability
-  de delivery probada, separada de un producto futuro.
-- Se actualizaron Creative Practice en `.codex` y `.claude`, además de las skills de business model, customer model
-  y pricing. Estado: `Approved for validation`; no se habilita venta self-service ni pricing público.
-- Se creó la simulación sintética [`Creative Velocity Buying Simulation — Banco BICE V1`](docs/audits/commercial/EFEONCE_CREATIVE_VELOCITY_BUYING_SIMULATION_BANCO_BICE_V1.md), con artefactos, objeciones, respuestas y criterios de validación.
-- Se actualizó el estado de SKY: el operador autoriza nombrarlo como caso de éxito; claims, métricas, assets,
-  screenshots, nombres, URLs y pricing siguen sujetos a evidencia y alcance específico.
-- Se documentó `Embedded Managed Pod / Embedded Creative Capacity` como modalidad integrada culturalmente al equipo
-  interno, con frontera explícita frente a Staff Augmentation, cost-to-serve de integración y métricas de fit/adoption.
-- Se incorporó `Fully Managed Creative Capacity`: fee mensual integral donde Efeonce absorbe equipo, infraestructura,
-  licencias, costos laborales, provisionales, reemplazos y soporte. El modelo aplica globalmente, con parametrización
-  legal, laboral, fiscal, monetaria y de procurement por jurisdicción.
-
-## 2026-07-30 — Creative Services: benchmark de mercado y arquitectura Creative Operations
-
-- Se documentó el benchmark fechado [`CREATIVE_SERVICES_MARKET_BENCHMARK_2026-07-30`](docs/audits/commercial/CREATIVE_SERVICES_MARKET_BENCHMARK_2026-07-30.md), con referentes globales, digitales/productizados, Chile/LatAm, fuentes de compradores, confidence, límites y patrones adoptables.
-- Se aceptó [`EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_DECISION_V1`](docs/architecture/EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_DECISION_V1.md): Creative Operations organiza la oferta en Creative Velocity, Brand & Campaign Systems, Content Production System y AI Creative Operations.
-- Se creó [`EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_V2`](docs/services/creative-services/EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_V2.md), con escalera diagnóstico/proyecto exploratorio → sprint → Managed Creative Capacity → lane especializado → Studio/portfolio expansion, paquetes, ICP, proof system, rights, economics y gates.
-- Se sincronizaron `README`, `project_context`, `DECISIONS_INDEX`, Creative Studio Business Model y las copias `.codex`/`.claude` de `creative-practice`. Estado honesto: `Approved for validation`; no habilita pricing público, checkout, venta self-serve ni claims no verificados.
-- Se aclaró la arquitectura como **híbrida**: el catálogo plano permanece como índice de reconocimiento rápido; las cuatro rutas orientan la conversación y los paquetes/modalidades convierten la ruta en una compra scopeable.
-- Las skills `creative-practice` ahora explican operativamente las tres capas, el orden de calificación y un ejemplo de recorrido desde servicio reconocible hasta ruta, sprint, Managed Capacity y expansión.
-- Se creó [`CREATIVE_SERVICES_OPERATING_MODEL_V1`](docs/services/creative-services/EFEONCE_CREATIVE_SERVICES_OPERATING_MODEL_V1.md), que profundiza oferta, modelo de creación/captura de valor, ICP/JTBD, buying group, delivery/RACI, capacity, pricing/economics, rights, proof, renovación y gates de madurez.
-
-## 2026-07-30 — TASK-1600: ownership de color transferido a AXIS
-
-- AXIS publica la paleta portable completa y Greenhouse consume `@efeoncepro/axis-tokens@0.2.1` mediante adapters; `0.2.0` queda como publicación manual histórica y `v0.2.1` fue regularizada con el pipeline gobernado (`30525304584`, success), incluyendo publish idempotente.
-- GVC staging pasó rampas light en 1440/390, captura dark real en 1440/390 y dos capturas repetidas fueron pixel-identical; queda una diferencia de altura del full-page histórico pendiente de aprobación/re-baseline.
-- Finance PDF y report-artifact comparados contra el parent commit: raster diff 144 dpi = 0 píxeles. Rollback rehearsal sobre `0.1.5` pasó 43 tests.
-
-## 2026-07-29 — Social Media: modelo de negocio y Product Service V1
-
-- Se documentó Social Media como servicio recurrente humano y gestionado por personas, con estrategia, contenido,
-  publicación, community management, escucha, reporting y aprendizaje.
-- Se añadieron el Product Service Contract, Business Model y Pricing Integrity Pack con packaging por capacidad,
-  hipótesis de bandas, economics, guardrails y gates de validación.
-- Se añadió el benchmark comercial [`Social Media Service Market Research`](docs/audits/commercial/SOCIAL_MEDIA_SERVICE_MARKET_RESEARCH_2026-07-29.md), con agencias globales, Chile/LATAM, tendencias, patrones de venta, pricing público y confidence/limitaciones.
-- Se añadió el [`Social Media Subservices Catalog V1`](docs/services/creative-services/EFEONCE_SOCIAL_MEDIA_SUBSERVICES_CATALOG_V1.md), que detalla dirección, editorial, contenido, publishing, community, listening, trendjacking, social search, measurement, activaciones y fronteras con otras líneas.
-- Se documentó [`Search + Social Visibility Composition V1`](docs/business-models/search-visibility-360/SEARCH_SOCIAL_VISIBILITY_COMPOSITION_V1.md) como composición propuesta entre Search Visibility 360 y Social Media, con workflow compartido, RACI, wedges, economics separados y gates para evaluar un futuro Product Service compuesto.
-- Se añadió el [`Social Media Operating Model`](docs/services/creative-services/EFEONCE_SOCIAL_MEDIA_OPERATING_MODEL_V1.md), con squad, capacidad, onboarding, cadence, SLA, community/care, crisis y fallbacks.
-- Se añadió el [`Social Media Customer Model Integrity Pack`](docs/business-models/creative-services/EFEONCE_SOCIAL_MEDIA_CUSTOMER_MODEL_INTEGRITY_PACK_V1.md), con beachhead B2B experto, buying group, anti-ICP, triggers y motion de validación.
-- Se añadió el [`Search + Social Measurement Contract`](docs/business-models/search-visibility-360/SEARCH_SOCIAL_MEASUREMENT_CONTRACT_V1.md), con Social Search, ownership, instrumentación, confidence y gates contra claims causales.
-- Se añadió un [`Pricing Validation Addendum`](docs/business-models/creative-services/EFEONCE_SOCIAL_MEDIA_PRICING_VALIDATION_ADDENDUM_2026-07-29.md) con ladder revisada, escenarios de economics y condiciones comerciales de prueba; sigue sujeto a Finance.
-- Se documentó el [`Differentiation & Positioning V1`](docs/business-models/creative-services/EFEONCE_SOCIAL_MEDIA_DIFFERENTIATION_POSITIONING_V1.md): autoridad y demanda, Social + Search, squad gobernado, transparencia, enemigo commodity, proof system y claims permitidos.
-- Se incorporó **Efeonce Run & Gun Studio** como ventaja real de delivery de Social Media: equipos profesionales, captura en terreno y producción social-first componible con SOW, derechos y economics propios.
-- Se creó [`Efeonce Run & Gun Production — Offer V1`](docs/services/creative-services/EFEONCE_RUN_AND_GUN_PRODUCTION_OFFER_V1.md) con Content Capture Day, Executive/Interview Capture, Social-First Production Sprint y Brand Story/Campaign Capture; la capability se normalizó como Efeonce Run & Gun Studio.
-- Globe / Creative Studio quedó explícitamente fuera de la promesa y pricing base actual; Paid Social, Creator/UGC
-  y Producción Especial quedaron como módulos separados.
-- Estado honesto: `Approved for validation`; no habilita precios públicos ni venta self-serve.
-
-La continuidad consolidada de esta sesión y el índice histórico mensual quedan reflejados en [`Handoff.md`](Handoff.md)
-y [`docs/changelog/internal/2026-07.md`](docs/changelog/internal/2026-07.md).
-
-## 2026-07-29 — Release Cloud Build: autenticación privada AXIS en workers
-
-- El release orchestrator `30465872005` reveló `ERR_PNPM_FETCH_401` en los builds Cloud Run de `ops-worker`,
-  `commercial-cost-worker` e `ico-batch-worker`: faltaba autorización para `@efeoncepro/axis-tokens`.
-- Los tres deploy scripts ahora usan el secreto read-only existente `axis-packages-read-token` mediante `secretEnv` y
-  `.npmrc` efímero; los Dockerfiles montan BuildKit secret en ambas capas `pnpm install`, sin token en imagen o runtime.
-- La primera corrida autenticada aún respondió `401`: el PAT estaba sano, pero el heredoc no quoted expandía `$$` al
-  PID del shell antes de que Cloud Build pudiera resolver `secretEnv`. Los scripts ahora preservan el doble dólar
-  requerido por Cloud Build y un test de contrato cubre los tres consumidores.
-- `.dockerignore` y `.gcloudignore` excluyen `.npmrc`; el gate de contratos impide que el secreto efímero viaje en el
-  contexto de Docker o en un upload local accidental.
-- `artifact-worker`, cuarto build unit que instala el `package.json` raíz, adoptó el mismo montaje BuildKit; el gate
-  ahora exige AXIS auth en todas las etapas `pnpm install` de los cuatro workers.
-- Se concedió acceso Secret Manager sólo al service account de Cloud Build de Greenhouse. Validaciones locales de
-  contratos de workers, tests focales y los cuatro builds reales pasaron.
-- PR #166 promovió todo `develop` a `main` en `0b4bdd6acb401ef0b108e27f1a8f1d80c469a0ed`. El orquestador oficial
-  `30473069894` terminó verde sin bypass, dejó el manifest
-  `0b4bdd6acb40-2608542b-b1e5-4b3b-b24e-5036501dfef1` en `released`, verificó Vercel Production, Cloud Run y
-  `/api/auth/health`. Azure aplicó sus skips canónicos `no_infra_diff`.
-- El watchdog conserva un falso positivo conocido para `ops-worker`: su diff de rutas runtime desde el SHA
-  desplegado al target es vacío y el orquestador aplicó el change-gate, por lo que no corresponde redeploy label-only.

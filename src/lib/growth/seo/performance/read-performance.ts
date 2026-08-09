@@ -1,9 +1,13 @@
 import 'server-only'
 
+import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
+import { SEO_GSC_HISTORY_DATASET, SEO_GSC_HISTORY_TABLE } from '../gsc-history-bq-mirror'
+
 import type {
+  SeoPerformanceDailyTotal,
   SeoPerformanceMetric,
   SeoPerformanceMode,
   SeoPerformancePoint,
@@ -11,6 +15,8 @@ import type {
   SeoPerformanceSeries,
   SeoPerformanceSource,
   SeoPerformanceStanding,
+  SeoPerformanceSummary,
+  SeoPerformanceTotals,
   SeoRankDevice
 } from '../contracts'
 import { isSeoModuleEnabled } from '../flags'
@@ -154,7 +160,7 @@ interface GscDailyRow extends Record<string, unknown> {
  * ⚠️ `capture_date` es DATE: la ventana se recorta con intervalos explícitos, nunca con
  * `EXTRACT(EPOCH FROM (date - date))`, que revienta en runtime (invariante SQL date-math).
  */
-const readGscDaily = async (input: {
+const readGscDailyFromPostgres = async (input: {
   organizationId: string
   mode: SeoPerformanceMode
   items: string[]
@@ -181,6 +187,100 @@ const readGscDaily = async (input: {
       ORDER BY ${column}, capture_date`,
     [input.organizationId, input.items, input.anchor, input.rangeDays]
   )
+}
+
+/**
+ * La MISMA agregación contra el histórico BQ (`seo_gsc_history`, TASK-1655) — mismos
+ * alias, misma ponderación por impresiones, mismo shape de fila: los dos stores tienen
+ * que producir el mismo número para el mismo día o el split sería una mentira de dato.
+ */
+const readGscDailyFromBigQuery = async (input: {
+  organizationId: string
+  mode: SeoPerformanceMode
+  items: string[]
+  anchor: string
+  rangeDays: number
+}): Promise<GscDailyRow[]> => {
+  const column = GSC_COLUMN_BY_MODE[input.mode]
+  const projectId = getBigQueryProjectId()
+  const bigQuery = getBigQueryClient()
+
+  const [rows] = await bigQuery.query({
+    query: `SELECT ${column} AS item,
+                   CAST(capture_date AS STRING) AS date,
+                   SUM(clicks) AS clicks,
+                   SUM(impressions) AS impressions,
+                   CASE WHEN SUM(impressions) > 0
+                        THEN SUM(CAST(position AS FLOAT64) * impressions) / SUM(impressions)
+                        ELSE NULL
+                   END AS weighted_position
+              FROM \`${projectId}.${SEO_GSC_HISTORY_DATASET}.${SEO_GSC_HISTORY_TABLE}\`
+             WHERE organization_id = @organization_id
+               AND ${column} IN UNNEST(@items)
+               AND capture_date > DATE_SUB(CAST(@anchor AS DATE), INTERVAL @range_days DAY)
+               AND capture_date <= CAST(@anchor AS DATE)
+             GROUP BY ${column}, capture_date
+             ORDER BY ${column}, capture_date`,
+    params: {
+      organization_id: input.organizationId,
+      items: input.items,
+      anchor: input.anchor,
+      range_days: input.rangeDays
+    },
+    types: { organization_id: 'STRING', items: ['STRING'], anchor: 'STRING', range_days: 'INT64' }
+  })
+
+  return (rows as Array<Record<string, unknown>>).map(row => ({
+    item: String(row.item),
+    date: String(row.date),
+    clicks: typeof row.clicks === 'number' ? row.clicks : Number(row.clicks ?? 0),
+    impressions: typeof row.impressions === 'number' ? row.impressions : Number(row.impressions ?? 0),
+    weighted_position:
+      row.weighted_position === null || row.weighted_position === undefined ? null : Number(row.weighted_position)
+  }))
+}
+
+/**
+ * Split OLTP/OLAP por COBERTURA, no por rango fijo (TASK-1655, patrón de
+ * `readRankEvolution` adaptado): PG es la ventana caliente operativa y BQ el SoT del
+ * histórico. Se decide por lo que PG realmente TIENE — si su primer día llega después
+ * del inicio de la ventana pedida y BQ cubre más atrás, la lectura completa va a BQ.
+ * Un corte por número fijo de días mentiría en las dos direcciones (PG recién nacido
+ * con 5 días, o BQ vacío pre-backfill).
+ */
+const readGscDaily = async (input: {
+  organizationId: string
+  mode: SeoPerformanceMode
+  items: string[]
+  anchor: string
+  rangeDays: number
+  /** Primer día materializado en PG para la org (`null` = PG vacío). */
+  pgMinDate: string | null
+}): Promise<GscDailyRow[]> => {
+  const windowStart = shiftIsoDate(input.anchor, -(input.rangeDays - 1))
+
+  const pgCoversWindow = input.pgMinDate !== null && input.pgMinDate <= windowStart
+
+  if (pgCoversWindow) {
+    return readGscDailyFromPostgres(input)
+  }
+
+  // PG no llega al inicio de la ventana: intentar el histórico. Si BQ tampoco tiene
+  // (pre-backfill), caer a PG — servir lo que hay es el comportamiento honesto previo.
+  try {
+    const bqRows = await readGscDailyFromBigQuery(input)
+
+    if (bqRows.length > 0) {
+      return bqRows
+    }
+  } catch (error) {
+    captureWithDomain(error, 'growth', {
+      tags: { source: 'seo_performance_reader_bq_fallback' },
+      extra: { organizationId: input.organizationId, mode: input.mode, rangeDays: input.rangeDays }
+    })
+  }
+
+  return readGscDailyFromPostgres(input)
 }
 
 /** Serie de un ítem, ya ordenada, agrupada desde las filas planas. */
@@ -241,6 +341,53 @@ const buildStanding = (
   }
 }
 
+/**
+ * Agregado diario del CONJUNTO desde las filas por-ítem ya leídas (sin query extra).
+ *
+ * ⚠️ La posición del conjunto se pondera POR IMPRESIONES, igual que en el resto del módulo:
+ * `Σ(posición×impresiones)/Σ(impresiones)`. Un promedio plano de las posiciones de los
+ * ítems le daría el mismo peso a uno con 2 impresiones que a uno con 500, y el número
+ * resultante "se ve razonable" — que es justo lo que lo hace peligroso.
+ */
+const buildDailyTotals = (dailyByItem: DailyByItem): SeoPerformanceDailyTotal[] => {
+  const byDate = new Map<string, { clicks: number; impressions: number; weighted: number }>()
+
+  for (const days of dailyByItem.values()) {
+    for (const day of days) {
+      const bucket = byDate.get(day.date) ?? { clicks: 0, impressions: 0, weighted: 0 }
+
+      bucket.clicks += day.clicks
+      bucket.impressions += day.impressions
+      bucket.weighted += (day.position ?? 0) * day.impressions
+      byDate.set(day.date, bucket)
+    }
+  }
+
+  return [...byDate.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([date, bucket]) => ({
+      date,
+      clicks: bucket.clicks,
+      impressions: bucket.impressions,
+      // Sin impresiones no hay posición ni CTR que reportar: `null` (→ "Pendiente"), no 0.
+      position: bucket.impressions > 0 ? bucket.weighted / bucket.impressions : null,
+      ctr: bucket.impressions > 0 ? bucket.clicks / bucket.impressions : null
+    }))
+}
+
+const totalsFromDaily = (days: SeoPerformanceDailyTotal[]): SeoPerformanceTotals => {
+  const clicks = days.reduce((total, day) => total + day.clicks, 0)
+  const impressions = days.reduce((total, day) => total + day.impressions, 0)
+  const weighted = days.reduce((total, day) => total + (day.position ?? 0) * day.impressions, 0)
+
+  return {
+    clicks,
+    impressions,
+    position: impressions > 0 ? weighted / impressions : null,
+    ctr: impressions > 0 ? clicks / impressions : null
+  }
+}
+
 const markSparse = (points: SeoPerformancePoint[], rangeDays: number): boolean =>
   points.filter(point => point.value !== null).length < Math.ceil(rangeDays * SPARSE_COVERAGE_RATIO)
 
@@ -271,14 +418,16 @@ export const readSeoPerformance = async (
     // Ancla en el último día MATERIALIZADO, no en CURRENT_DATE: la captura corre con lag,
     // así que anclar en "hoy" terminaría la ventana en días vacíos y haría ver una caída
     // de tráfico que no ocurrió.
-    const anchorRows = await runGreenhousePostgresQuery<{ anchor: string | null }>(
-      `SELECT MAX(capture_date)::text AS anchor
+    const anchorRows = await runGreenhousePostgresQuery<{ anchor: string | null; pg_min: string | null }>(
+      `SELECT MAX(capture_date)::text AS anchor,
+              MIN(capture_date)::text AS pg_min
          FROM greenhouse_growth.seo_gsc_daily
         WHERE organization_id = $1`,
       [organizationId]
     )
 
     const anchor = anchorRows[0]?.anchor ?? null
+    const pgMinDate = anchorRows[0]?.pg_min ?? null
 
     // Sin ningún día materializado no hay verdad medida que servir. `not_connected` lleva
     // al operador a la acción correcta (conectar / esperar la captura), a diferencia de un
@@ -302,16 +451,69 @@ export const readSeoPerformance = async (
           )[0]?.seo_target_id ?? null
         : null
 
-    // El volumen (clics/impresiones/CTR) SIEMPRE sale de Search Console: la tabla lo
-    // muestra en las dos modalidades, porque los snapshots de rank no lo tienen.
-    const [gscRows, rankEvolution] = await Promise.all([
-      readGscDaily({ organizationId, mode, items, anchor, rangeDays }),
+    // El volumen (clics/impresiones/CTR) SIEMPRE sale de Search Console: la tabla y la
+    // banda de KPI lo muestran en las dos modalidades, porque los snapshots de rank no lo
+    // tienen. La ventana previa es del mismo largo, inmediatamente anterior — es lo que
+    // permite un delta real en vez de una card sin comparación.
+    const [gscRows, previousRows, rankEvolution] = await Promise.all([
+      readGscDaily({ organizationId, mode, items, anchor, rangeDays, pgMinDate }),
+      readGscDaily({ organizationId, mode, items, anchor: shiftIsoDate(anchor, -rangeDays), rangeDays, pgMinDate }),
       source === 'dataforseo_estimated' && seoTargetId
         ? readRankEvolution(seoTargetId, { keywords: items, rangeDays, device, engine: options.engine })
         : null
     ])
 
     const dailyByItem = groupGscRows(gscRows)
+    const dailyTotals = buildDailyTotals(dailyByItem)
+    const previousTotals = totalsFromDaily(buildDailyTotals(groupGscRows(previousRows)))
+
+    /**
+     * ⚠️ Fallback entre fuentes (regla del operador 2026-08-07: "si no vienen de uno,
+     * vienen del otro"). GSC TAMBIÉN mide posición por keyword (promedio ponderado), así
+     * que cuando la serie exacta de DataForSEO es más JOVEN que la medida — el caso real
+     * hoy: rank capture arrancó ayer, GSC tiene días/meses — servir la serie corta sería
+     * esconder historia que el módulo sí tiene. Se sirve GSC (●) y se DECLARA en `source`.
+     *
+     * La regla del contrato §5 se mantiene intacta: la lectura completa pertenece a UNA
+     * fuente; acá se ELIGE la más profunda, jamás se mezclan ni promedian.
+     */
+    const rankMeasuredDates = new Set<string>()
+
+    if (rankEvolution?.ok) {
+      for (const serie of rankEvolution.series) {
+        for (const point of serie.points) {
+          if (point.position !== null) {
+            rankMeasuredDates.add(point.date)
+          }
+        }
+      }
+    }
+
+    const gscMeasuredDates = new Set<string>()
+
+    for (const days of dailyByItem.values()) {
+      for (const day of days) {
+        gscMeasuredDates.add(day.date)
+      }
+    }
+
+    const useRankSeries =
+      source === 'dataforseo_estimated' &&
+      rankEvolution?.ok === true &&
+      rankMeasuredDates.size > 0 &&
+      // La serie exacta gana cuando cubre al menos la mitad de lo que cubre la medida;
+      // más joven que eso, la película la cuenta mejor GSC.
+      rankMeasuredDates.size * 2 >= gscMeasuredDates.size
+
+    const effectiveSource: SeoPerformanceSource =
+      source === 'dataforseo_estimated' && !useRankSeries ? 'gsc_measured' : source
+
+    const summary: SeoPerformanceSummary = {
+      current: totalsFromDaily(dailyTotals),
+      // Una ventana previa sin volumen NO es "cero tráfico": es "no hay con qué comparar".
+      previous: previousTotals.impressions > 0 || previousTotals.clicks > 0 ? previousTotals : null,
+      series: dailyTotals
+    }
 
     // La serie del CHART: puntos de la métrica pedida, en la fuente que le corresponde.
     const series: SeoPerformanceSeries[] = []
@@ -319,11 +521,19 @@ export const readSeoPerformance = async (
     // sparkline — independiente de qué métrica esté graficando el chart.
     const positionByItem = new Map<string, SeoPerformancePoint[]>()
 
-    if (rankEvolution?.ok) {
+    // La posición por ítem sigue a la fuente EFECTIVA: si el chart cae a GSC por el
+    // fallback, la tabla y el Δ30d también — chart y tabla jamás cuentan fuentes distintas.
+    if (useRankSeries && rankEvolution?.ok) {
       for (const serie of rankEvolution.series) {
         positionByItem.set(
           serie.keyword,
-          serie.points.map(point => ({ date: point.date, value: point.position }))
+          serie.points.map(point => ({
+            date: point.date,
+            value: point.position,
+            // AIO sólo viaja en la serie ◑ (DataForSEO): es un hecho del SERP capturado.
+            // La serie ● (GSC) no lo trae — Search Console no reporta features del SERP.
+            ...(point.aiOverview ? { aiOverview: true } : {})
+          }))
         )
       }
     }
@@ -331,7 +541,7 @@ export const readSeoPerformance = async (
     for (const item of items) {
       const daily = dailyByItem.get(item) ?? []
 
-      if (source === 'gsc_measured') {
+      if (effectiveSource === 'gsc_measured') {
         const points: SeoPerformancePoint[] = daily.map(day => ({
           date: day.date,
           value:
@@ -395,9 +605,10 @@ export const readSeoPerformance = async (
 
     // El rango se reporta desde la fuente que alimenta el chart: decir "90 días de GSC"
     // cuando el chart pinta la serie de rank sería describir otra ventana.
-    const range = rankEvolution?.ok
-      ? rankEvolution.range
-      : { from: shiftIsoDate(anchor, -(rangeDays - 1)), to: anchor, days: rangeDays }
+    const range =
+      useRankSeries && rankEvolution?.ok
+        ? rankEvolution.range
+        : { from: shiftIsoDate(anchor, -(rangeDays - 1)), to: anchor, days: rangeDays }
 
     return {
       ok: true,
@@ -407,9 +618,10 @@ export const readSeoPerformance = async (
       metric,
       device,
       range,
-      source,
+      source: effectiveSource,
       series,
       standings,
+      summary,
       itemsWithoutData
     }
   } catch (error) {

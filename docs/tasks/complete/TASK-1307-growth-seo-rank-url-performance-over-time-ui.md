@@ -1,5 +1,106 @@
 # TASK-1307 — Growth SEO: Rank & URL Performance Over Time UI ★
 
+## Delta 2026-08-07 — segunda ronda post-cierre: un solo header canónico para las tres pestañas (commit 67c2d1218)
+
+El operador reportó que la zona de controles se veía **suelta sobre el lienzo gris**, y que
+Rendimiento (esta task) y Keywords (`TASK-1308`) lo habían resuelto de formas distintas. Esto es un
+delta posterior al cierre: **el lifecycle sigue `complete`**, no reabre la task ni cambia su alcance.
+
+**Causa raíz —común a las tres pestañas de Search Visibility—:** ninguna usaba la región `header` de
+`SurfaceRecipe`. Todo el chrome (título, selectores de alcance, chip de frescura, tabs, leyenda) iba
+dentro de `regions.primary`, así que quedaba flotando sin superficie contenedora. En 390px eso
+obligaba a recorrer un scroll completo de chrome antes del primer dato.
+
+**Corrección.** Resumen, Rendimiento y Keywords usan ahora el mismo shell: `SurfaceRecipe
+kind='analyticsReport' plane='none'` con `header={…}` y `WorkbenchHeader kind='report'` —la primitive
+del surface system diseñada para esto—, con reparto idéntico en las tres:
+
+- `secondaryActions` → los controles de alcance que el operador cambia;
+- `meta` → la frescura del dato (y la leyenda cuando aplica a la página completa);
+- `supporting` → los tabs hermanos bajo su divisor.
+
+**Consecuencia propia de esta pantalla:** la leyenda ●/◑ bajó a la card del gráfico, junto a las
+series que describe (prop `source` nuevo en `SeoRankEvolutionChart`). El gráfico carga su propia
+procedencia y la cabecera queda sólo con lo que aplica a toda la pantalla. La consecuencia sobre
+Keywords quedó registrada en el delta equivalente de `TASK-1308`.
+
+**Dos defectos de 390px corregidos en el mismo paso:**
+
+1. El tab **activo** se recortaba bajo las flechas de scroll de los tabs — se quitó
+   `allowScrollButtonsMobile` y en `xs` se oculta el ícono de cada tab para que los cuatro quepan.
+2. El selector de período truncaba su valor vigente ("Últimos 90 …") al ponerlo 2-up: en móvil cada
+   control vuelve a ocupar su fila completa.
+
+**Evidencia.** 579 tests focales verdes (`src/views/greenhouse/admin/growth`, `src/lib/growth/seo`,
+`src/components/greenhouse/primitives`); `pnpm typecheck` y `pnpm lint` limpios, con el hook de
+pre-push (lint + typecheck sobre todo el repo) en verde; los **5 scenarios GVC del módulo en OK**,
+incluidos los dos móviles (`growth-seo-performance`, `growth-seo-keywords`, `growth-seo-overview`,
+`growth-seo-overview-mobile`, `growth-seo-performance-mobile`); revisión visual de frames en desktop
+1440 y 390px de las tres pantallas y del rango de 365 días.
+
+**Rollout: `code complete` en `develop` (pusheado a `origin/develop`), promoción a producción
+pendiente.** La promoción `develop → main` va batcheada con `TASK-1308` y `TASK-1655`, por el release
+control plane — sigue siendo el checkbox de §`Pendiente heredado de TASK-1306`.
+
+## Delta 2026-08-07 — ronda de mejoras post-cierre (commit 0d48c283d)
+
+Tras la revisión con las skills de product design y SEO/AEO, el operador aprobó implementar las 8
+mejoras propuestas ("Ok, hazlos todos"). Todas verificadas con GVC premium (desktop+mobile) y
+revisión visual de frames en 90/180/365 días:
+
+1. **Presets de comparación data-driven** — el catálogo expone `sets` (los `seo_keyword_sets`
+   nombrados del target, miembros vigentes) y el selector los ofrece como chips de un click.
+2. **Lectura del período** — `deriveSeoPerformanceInsight` (pura, testeada): `demand_drop` /
+   `ctr_erosion` (patrón AIO) / `rank_gain` / `rank_loss`; callout sólo con patrón inequívoco.
+3. **Marcadores AI Overview** — `serp_features ? 'ai_overview'` viaja PG+BQ →
+   `RankEvolutionPoint.aiOverview` (aditivo) → carril de rombos en el hero (sólo serie ◑; GSC no
+   reporta features del SERP y esa ausencia es honesta).
+4. **Rango 365 días** ("Últimos 12 meses") en la allowlist del page.
+5. **Granularidad Diario/Semanal** en el hero — default semanal con >120 días medidos; volumen se
+   suma, posición/CTR promedian sólo días medidos; semana sin medición = hueco.
+6. **Selector compacto** — la métrica vive dentro de la card "Qué comparar".
+7. **Affordance visible de drill** por fila (chevron decorativo; la fila sigue siendo el único
+   interactive — evita `nested-interactive`).
+8. **Bandas de updates confirmados de Google** — registro curado
+   `src/lib/growth/seo/algorithm-updates.ts` (sólo confirmados por Google, verificados 2026-08-07)
+   → `markArea` con etiqueta vertical anclada abajo. Follow-up declarado: mantenimiento del
+   registro es manual y deliberado; automatizarlo contra un feed sería una task aparte.
+
+Fix de primitive incluido: `MetricTrendCard` con `invertY` pintaba el gradiente del área SOBRE la
+línea (la base del área quedaba en el tope del eje invertido — hallazgo del operador en vivo);
+`baseValue='dataMax'` devuelve el relleno bajo la línea sin tocar los consumers legacy.
+
+
+## Delta 2026-08-07 (ejecución) — hallazgo de runtime: el módulo era forward-only → TASK-1655
+
+Al ejercitar la pantalla contra la base real emergió que **ninguna superficie del módulo
+puede mostrar "la película"**: `seo_gsc_daily` tenía 5 días y `seo_rank_snapshots` 2,
+porque los dos pipelines solo capturan hacia adelante y el historial (16 meses en la API
+GSC; `historical_serps` en DataForSEO Labs) nunca se trajo. Además el destino estaba mal
+dimensionado (5 días = 27 MB en Cloud SQL; 180 días ≈ ~1 GB OLTP). Se registró
+**`TASK-1655` (Historical Data Platform)**: mirror GSC→BQ + split PG/BQ en los readers +
+backfill 16 meses por org + export nativo por propiedad + semilla rank. Esta UI no cambia
+cuando 1655 aterrice — el reader es el que crece.
+
+**Deltas de diseño tomados en ejecución (vigentes):**
+
+1. **`readSeoPerformance` + `readSeoPerformanceCatalog` nuevos** (spec decía `Backend
+   impact: none` — era falso: el eje URL y clics/impr/CTR viven en `seo_gsc_daily`, no en
+   el reader de rank). Parity completa: lane ecosystem + MCP tools en el mismo PR.
+2. **Fallback entre fuentes (regla del operador):** keyword×posición INTENTA DataForSEO
+   (◑ exacta), pero si esa serie es más joven que la medida, el reader sirve la posición
+   ponderada de GSC (●) y lo declara en `source`. Nunca promediadas.
+3. **Cobertura declarada en el chart:** "N de M días con medición · desde–hasta" pegado
+   al título — el período pedido y el medido casi nunca coinciden y callarlo hacía el
+   gráfico ilegible.
+4. **ECharts elegido e instalado** (echarts 6.1.0 + echarts-for-react 3.0.6, lazy vía
+   `AppECharts` `ssr:false`). Eje X `category` sobre la unión de fechas (no `time`: con
+   pocos días repartía ticks por hora); Y de posición con `max ≥ 10` para que la meta
+   top-3 nunca quede fuera; `labelLayout shiftY` para last-value labels empatados.
+5. **KPI band = `MetricTrendCard`** (mismo tier que 1306) alimentada por `summary` del
+   reader (agregado diario del conjunto, ponderado por impresiones, ventana previa
+   comparable). Las cards planas iniciales se descartaron por regresión de tier.
+
 ## Delta 2026-08-07 — TASK-1306 cerró: el blocker cayó y te dejó cuatro cosas servidas
 
 El bloqueador declarado (`Blocked by: TASK-1306`) está **cerrado** (code complete en `develop`).
@@ -117,14 +218,14 @@ acción propia, porque el costo de postergarla lo paga la superficie ya entregad
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `interaction`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1307-growth-seo-rank-url-performance-over-time-ui.md`
 - Flow: `none`
 - Motion: `none`
@@ -527,18 +628,45 @@ Slice 0 (decisión librería) → Slice 1 (ruta + selector + estados) → Slice 
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado (`in-progress`/`complete`)
+- [x] `Lifecycle` sincronizado (`in-progress`/`complete`)
 - [ ] archivo en la carpeta correcta
 - [ ] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
 - [ ] `Handoff.md` + `changelog.md` actualizados
 - [ ] route/nav/reachability actualizados
 - [ ] `FEATURE_FLAG_STATE_LEDGER.md` refleja `GROWTH_SEO_ENABLED` si se toca
 - [ ] decisión de librería de charts documentada (ADR corto o nota en el módulo si se instala ECharts)
-- [ ] **🔴 HEREDADO DE TASK-1306 — promover `develop` → `main` al cerrar esta task.** Ver
-  `## Pendiente heredado` arriba. NO es opcional ni cosmético: hasta que se promueva, cada
-  sincronización desde producción APAGA el viewCode `administracion.growth_seo` y la
-  sección SEO entera desaparece del menú. Usar la skill `greenhouse-production-release`
-  (release control plane), nunca un push directo a `main`.
+- [x] **🔴 HEREDADO DE TASK-1306 — promover `develop` → `main`.** **RESUELTO fuera de esta
+  task (2026-08-07):** el release `30140c662` (PRs #179+#180, manifest `released`) llevó
+  1306+1304 a producción y el viewCode `administracion.growth_seo` dejó de apagarse — la
+  urgencia que este checkbox protegía ya no existe. **La promoción de 1307/1308/1655 es
+  cadencia normal del próximo release window** (coordinada con el cierre de TASK-1308,
+  que al momento de este cierre sigue in-flight en otra sesión), vía
+  `greenhouse-production-release` como siempre.
+
+## Closure Report (2026-08-07)
+
+- **5 slices + 6 commits en `develop`** (los 2 primeros pusheados; el resto local al cierre).
+  ECharts instalado (Slice 0, decisión heredada por 1306/1308/1310); readers
+  `readSeoPerformance`/`readSeoPerformanceCatalog` con parity (lane + MCP tools mismo PR);
+  fallback de fuentes ●/◑ por cobertura; cobertura declarada en el chart; KPI band
+  MetricTrendCard; tabla DataTableShell 7 cols + drill; estados completos.
+- **Gates:** design-contract:lint PASS · ui:code-lint PASS · **ui:visual-gate PASS
+  (premium: rubric enterprise pass, axe bloqueante scopeado, keyboard probes,
+  reduced-motion, desktop+390)** · **ui:quality PASS (avg 4.56, floor 4.5)** · suite
+  growth/seo 151/151 · full suite 10300 pass con 1 rojo AJENO (catalog-extensibility roto
+  por WIP sin commitear de otro agente en `catalogs/deck-axis/`) · **`pnpm build` prod
+  exit 0** · docs:closure-check exit 0.
+- **Primitives paridas por el loop premium:** `CustomTabsNav` (@core — tabs-que-son-links
+  sin aria-controls fantasma) · `SurfaceRecipe.plane='none'` · `AppECharts` +
+  `resolveChartColor`.
+- **La película es real:** TASK-1655 (hermana parida por el hallazgo forward-only de esta
+  ejecución) dejó 16 meses de GSC en BigQuery (Berel 487/487 días · 6,67M filas; Efeonce
+  474 días) + semilla histórica de rank; verificado que un rango de 180 días sirve 179
+  días con dato desde BQ con ventana previa comparable.
+- **Rollout:** flag `GROWTH_SEO_ENABLED` ya ON en prod; la ruta queda viva al promover
+  (control de exposición = viewCode + module_assignment). OAuth GSC cableado en Vercel
+  Production durante esta ejecución (ledger actualizado; verificación del redirect URI de
+  prod pendiente del primer consent real del operador).
 
 ## Follow-ups
 
@@ -552,3 +680,7 @@ Slice 0 (decisión librería) → Slice 1 (ruta + selector + estados) → Slice 
 1. ¿`readRankEvolution` soporta filtro por **URL** además de keyword? Si no, coordinar con TASK-1303 (delta backend, no re-implementar acá).
 2. ¿La librería de charts es ECharts (opción A, recomendada) o ApexCharts (opción B)? Se decide en Slice 0; fija el stack de dataviz de alto impacto del módulo.
 3. ¿El drill `?url=X` filtra la serie en la misma vista o abre una vista dedicada? Propuesta: filtra en la misma vista ahora; vista dedicada = follow-up.
+
+## Delta 2026-08-08 — enlace al master flow de EPIC-022
+
+La superficie ya cerrada por esta task continúa siendo el nodo **S2 Rendimiento** dentro del flujo Search Visibility 360. La entrada a Keywords y sus carriles `Oportunidades`, `Objetivos` y `Descubrir` se mantiene en el mismo shell y queda gobernada por [`docs/ui/flows/EPIC-022-search-visibility-360-UI-FLOW.md`](../../ui/flows/EPIC-022-search-visibility-360-UI-FLOW.md). Este delta solo hace explícita la referencia de continuidad; no reabre el lifecycle ni modifica el runtime de TASK-1307.

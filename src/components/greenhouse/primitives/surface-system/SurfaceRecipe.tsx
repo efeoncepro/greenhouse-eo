@@ -21,6 +21,15 @@ export interface SurfaceRecipeProps {
   leadLabel?: string
   dataCapture?: string
   telemetrySource?: string
+  /**
+   * TASK-1307 — plano de trabajo por región. Default `'contained'` (legacy byte-idéntico:
+   * cada región se envuelve en el paper contenido). `'none'` para superficies cuyo
+   * contenido primario ES una composición de cards canónicas (banda de KPI + chart card +
+   * tabla card): envolverlas en un plane contenido fabricaría card-on-card — justo lo que
+   * el estándar premium bloquea. La recipe sigue declarándose (`data-surface-recipe`);
+   * lo que cambia es que el lienzo es el body, no un paper.
+   */
+  plane?: 'contained' | 'none'
   children?: ReactNode
 }
 
@@ -37,13 +46,14 @@ const SurfaceRecipe = ({
   leadLabel,
   dataCapture,
   telemetrySource,
+  plane = 'contained',
   children
 }: SurfaceRecipeProps) => {
   const composition = SURFACE_RECIPE_COMPOSITIONS[kind]
 
   const resolvedRegions = Object.fromEntries(
     Object.entries(regions).map(([region, content]) => {
-      if (!content || !shouldUseWorkPlane(region as CompositionShellRegion)) return [region, content]
+      if (!content || plane === 'none' || !shouldUseWorkPlane(region as CompositionShellRegion)) return [region, content]
 
       return [
         region,

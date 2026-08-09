@@ -19,7 +19,7 @@ import SeoOverviewView from '@/views/greenhouse/admin/growth/seo/overview/SeoOve
  * a otra:
  *   1. viewCode `administracion.growth_seo` — ¿esta surface le es visible al rol?
  *   2. capability `growth.seo.observation.read` — ¿tiene autoridad fina de lectura?
- *   3. `module_assignment` (`seo_v1`) por org — ¿el Space contrató el módulo?
+ *   3. `module_assignment` (`seo_v2`) por org — ¿el Space contrató el módulo?
  *
  * Las 2 primeras se resuelven acá; la 3.ª la resuelve la lista de Spaces elegibles:
  * si el operador pasa el gate pero NINGÚN Space tiene el módulo, no es un error —

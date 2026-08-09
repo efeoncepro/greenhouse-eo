@@ -3,8 +3,12 @@
 import { createHash } from 'node:crypto'
 import { existsSync, mkdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const DATED_SECTION_LEVELS = [2, 3, 4]
 
 const root = process.cwd()
+const isEntrypoint = process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])
 const apply = process.argv.includes('--apply')
 const bootstrapChangelog = process.argv.includes('--bootstrap-changelog')
 const maxSessions = positiveIntegerArg('--max-sessions=', 20)
@@ -12,28 +16,30 @@ const maxHandoffLines = positiveIntegerArg('--max-handoff-lines=', 600)
 const maxChangelogEntries = positiveIntegerArg('--max-changelog-entries=', 60)
 const maxChangelogLines = positiveIntegerArg('--max-changelog-lines=', 2_000)
 
-const handoffPlan = planHandoffRotation()
-const changelogPlan = planChangelogRotation()
+if (isEntrypoint) {
+  const handoffPlan = planHandoffRotation()
+  const changelogPlan = planChangelogRotation()
 
-printPlan(handoffPlan)
-printPlan(changelogPlan)
+  printPlan(handoffPlan)
+  printPlan(changelogPlan)
 
-if (!handoffPlan.required && !changelogPlan.required && !bootstrapChangelog) {
-  console.log('Nothing to rotate.')
-  process.exit(0)
+  if (!handoffPlan.required && !changelogPlan.required && !bootstrapChangelog) {
+    console.log('Nothing to rotate.')
+    process.exit(0)
+  }
+
+  if (!apply) {
+    console.log('Dry run only. Re-run with --apply to rotate.')
+    if (bootstrapChangelog) console.log('Bootstrap requested; no snapshot was written in dry-run mode.')
+    process.exit(0)
+  }
+
+  if (bootstrapChangelog) createInitialChangelogSnapshot(changelogPlan.originalContents)
+  if (handoffPlan.required) applyHandoffRotation(handoffPlan)
+  if (changelogPlan.required) applyChangelogRotation(changelogPlan, { archiveRemovedEntries: !bootstrapChangelog })
+
+  console.log('Rotation applied. Run pnpm docs:context-check:strict.')
 }
-
-if (!apply) {
-  console.log('Dry run only. Re-run with --apply to rotate.')
-  if (bootstrapChangelog) console.log('Bootstrap requested; no snapshot was written in dry-run mode.')
-  process.exit(0)
-}
-
-if (bootstrapChangelog) createInitialChangelogSnapshot(changelogPlan.originalContents)
-if (handoffPlan.required) applyHandoffRotation(handoffPlan)
-if (changelogPlan.required) applyChangelogRotation(changelogPlan, { archiveRemovedEntries: !bootstrapChangelog })
-
-console.log('Rotation applied. Run pnpm docs:context-check:strict.')
 
 function positiveIntegerArg(prefix, fallback) {
   const raw = process.argv.find(arg => arg.startsWith(prefix))?.slice(prefix.length)
@@ -50,6 +56,33 @@ function lineCount(contents) {
 
 function hash(contents) {
   return createHash('sha256').update(contents).digest('hex')
+}
+
+/**
+ * Detecta las secciones fechadas del Handoff y el NIVEL de heading que las titula.
+ *
+ * El nivel no se hardcodea porque la convención del archivo ya derivó DOS veces y cada deriva dejó
+ * la herramienta ciega:
+ *
+ * 1. `^## Sesi[oó]n…` matcheaba 1 de 40 secciones cuando los títulos pasaron a ser temáticos;
+ * 2. `^## …fecha…` matcheaba 0 de 23 cuando las entradas bajaron a `###` — y esa vez no degradó,
+ *    reventó con un TypeError.
+ *
+ * El ancla estable no es el nivel: es la FECHA (que además es el criterio de ranking). Así que se
+ * cuenta cuántas secciones fechadas produce cada nivel y gana el dominante. Empate → el nivel más
+ * alto (número menor), porque una sección de nivel superior CONTIENE a las de nivel inferior y
+ * partir por el hijo separaría un subtítulo de su entrada.
+ */
+function detectDatedSections(contents) {
+  const candidates = DATED_SECTION_LEVELS.map(level => ({
+    level,
+    matches: [...contents.matchAll(new RegExp(`^#{${level}} [^\\n]*\\d{4}-\\d{2}-\\d{2}[^\\n]*$`, 'gm'))]
+  }))
+
+  return candidates.reduce(
+    (winner, candidate) => (candidate.matches.length > winner.matches.length ? candidate : winner),
+    { level: null, matches: [] }
+  )
 }
 
 function planHandoffRotation() {
@@ -70,13 +103,29 @@ function planHandoffRotation() {
    * caería a `0000-00-00` y se archivaría primero, así que se exige explícitamente en el patrón en vez
    * de aceptarlo y degradar en silencio.
    */
-  const matches = [...originalContents.matchAll(/^## [^\n]*\d{4}-\d{2}-\d{2}[^\n]*$/gm)]
+  const { level, matches } = detectDatedSections(originalContents)
 
   if (matches.length <= maxSessions && lineCount(originalContents) <= maxHandoffLines) {
     return {
       kind: 'Handoff',
       required: false,
-      summary: `${matches.length}/${maxSessions} active sessions and ${lineCount(originalContents)}/${maxHandoffLines} lines; nothing to archive.`
+      summary: `${matches.length}/${maxSessions} active sessions (nivel h${level}) and ${lineCount(originalContents)}/${maxHandoffLines} lines; nothing to archive.`
+    }
+  }
+
+  // Degradación honesta: sin secciones fechadas no hay unidad archivable. Antes esto reventaba con
+  // `TypeError: Cannot read properties of undefined (reading 'index')` en la línea de abajo — un
+  // crash es la peor respuesta posible para una herramienta que el gate te MANDA a correr: no dice
+  // qué pasa, no dice qué hacer, y empuja a rotar a mano (que es como se corrompen los marcadores
+  // de integridad de los shards).
+  if (matches.length === 0) {
+    return {
+      kind: 'Handoff',
+      required: false,
+      summary:
+        `${lineCount(originalContents)}/${maxHandoffLines} lines pero NINGUNA sección fechada archivable. ` +
+        'Las entradas deben titularse con una fecha ISO (`### <título> (YYYY-MM-DD)`); sin ella no hay ' +
+        'unidad que archivar y la rotación no puede decidir qué es más viejo.'
     }
   }
 
@@ -113,7 +162,7 @@ function planHandoffRotation() {
     required: archived.length > 0,
     summary:
       archived.length > 0
-        ? `keep ${active.length}; archive ${archived.length}.`
+        ? `keep ${active.length}; archive ${archived.length} (secciones de nivel h${level}).`
         : `${active.length}/${maxSessions} active sessions still exceed ${maxHandoffLines} lines; manual compaction required.`,
     filePath,
     originalContents,
@@ -432,3 +481,5 @@ function atomicWrite(filePath, contents) {
     if (existsSync(temporaryPath)) unlinkSync(temporaryPath)
   }
 }
+
+export { detectDatedSections, DATED_SECTION_LEVELS }

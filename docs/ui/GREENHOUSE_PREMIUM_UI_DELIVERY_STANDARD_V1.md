@@ -3,7 +3,7 @@
 Status: accepted
 Owner: Platform / Product Design
 Adoption: `TASK-1453` and every later new `ui-standard`/`ui-platform` task
-Last updated: 2026-07-18
+Last updated: 2026-08-08
 
 ## Purpose
 
@@ -188,6 +188,21 @@ by themselves.
   serialize every desktop panel into a long card stack.
 - Composed primitives declare `data-ui-surface` so GVC can audit actual platform
   surfaces instead of only `.MuiCard/.MuiPaper` classes.
+- **Chrome on a bare canvas is a composition defect, not a taste preference.**
+  Surface chrome — title, scope controls, freshness, legend, sibling tabs — goes
+  in the recipe's `header` region, never inside `regions.primary`. Left on the
+  bare canvas it reads as unplaced form boxes, and at 390px it becomes a full
+  screen of chrome before the first datum: the secondary control occupying more
+  area than the primary content. This failure passes every token, primitive and
+  lint gate; only the reviewed frame catches it. It scores against surface
+  economy (nothing contains the controls), visual impact (the fold has no
+  dominant moment) and generic-template resistance.
+- Sibling screens under one surface (tabs sharing breadcrumb, title and tab bar)
+  must resolve their chrome with the same composition. Two siblings solving it
+  differently is a defect even when each looks fine on its own.
+- Scope controls take the full row at `xs`. A two-up row saves one line but
+  truncates the current value; a control whose current value cannot be read has
+  stopped being a control.
 
 ## Stop conditions
 

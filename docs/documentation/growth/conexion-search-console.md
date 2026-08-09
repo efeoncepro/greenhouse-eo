@@ -66,6 +66,6 @@ Fuente oficial: [Google Search Console Platform Properties](https://support.goog
 ## Estado del rollout (2026-06-29)
 
 - **staging:** conexion **ON y verificada end-to-end** (Grupo Berel conectado, reader trajo datos reales). App OAuth de Google en modo **External / En produccion** (sin verificacion de Google todavia → el cliente ve un aviso de "app no verificada" al consentir, normal en onboarding guiado).
-- **produccion:** pendiente (via release control plane + opcionalmente verificacion de Google para quitar el aviso).
+- **produccion:** OAuth client cableado el 2026-08-07 (vars `GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID` + `_SECRET_REF` en Vercel Production + redeploy; TASK-1655). Pendiente: confirmar el redirect URI de prod en el OAuth client de Google al primer consent real (si Google responde `redirect_uri_mismatch`, agregar `https://greenhouse.efeoncepro.com/api/admin/growth/search-console/oauth/callback` en GCP Console) + opcionalmente verificacion de Google para quitar el aviso.
 
 > Detalle tecnico: flag `GROWTH_SEARCH_CONSOLE_ENABLED`. Manual de operacion: [conectar-search-console.md](../../manual-de-uso/growth/conectar-search-console.md).

@@ -35,6 +35,31 @@ export interface ChildRouteDeclaration {
 
 export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
   {
+    // TASK-1307 — pantalla ancla del módulo SEO. Las 4 rutas de "Search Visibility"
+    // comparten el viewCode `administracion.growth_seo` y UN solo ítem de menú
+    // (`/admin/growth/seo`); las hermanas son child routes navegadas desde su conmutador
+    // de tabs. Sumarla al menú duplicaría la sección para el mismo permiso.
+    route: '/admin/growth/seo/performance',
+    parent: '/admin/growth/seo',
+    via: 'tab',
+    reason:
+      'Tab "Rendimiento" de Search Visibility (TASK-1307, EPIC-022): child del viewCode compartido administracion.growth_seo, alcanzable desde el conmutador de tabs del cockpit SEO. No siembra viewCode ni ítem de nav propios.'
+  },
+  {
+    route: '/admin/growth/seo/keywords',
+    parent: '/admin/growth/seo',
+    via: 'tab',
+    reason:
+      'Tab "Keywords" de Search Visibility (TASK-1308, EPIC-022): child del mismo viewCode administracion.growth_seo, alcanzable desde el conmutador de tabs del cockpit SEO. No siembra viewCode ni ítem de nav propios.'
+  },
+  {
+    route: '/admin/growth/seo/audit',
+    parent: '/admin/growth/seo',
+    via: 'tab',
+    reason:
+      'Tab "Auditoría" de Search Visibility (TASK-1309, EPIC-022): child del mismo viewCode administracion.growth_seo, alcanzable desde el conmutador de tabs del cockpit SEO. El drill del grupo de issues vive en la MISMA ruta vía ?issueGroup=, así que no suma una ruta hija propia. No siembra viewCode ni ítem de nav propios.'
+  },
+  {
     route: '/agency/hiring/pipeline',
     parent: '/agency/hiring',
     via: 'tab',
@@ -399,6 +424,20 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
     via: 'inline-link',
     reason:
       'AI Visibility client report (TASK-1248) — surface client-scoped (routeGroup client, viewCode cliente.ai_visibility_report). Deep-link primero (OQ resuelta): se alcanza desde Account 360 / el handoff del Report Packet Delivery (TASK-1250), no como item de nav principal hasta que exista el monitor recurrente. Gateada server-side por client tenant + capability growth.ai_visibility.report.read_client.'
+  },
+  {
+    route: '/growth/seo',
+    parent: '/home',
+    via: 'inline-link',
+    reason:
+      'SEO client dashboard (TASK-1310) — surface client-scoped (routeGroup client, viewCode cliente.growth_seo_dashboard). Deep-link desde el portal; gateada server-side por tenant client, module_assignment SEO y capability growth.seo.report.read_client.'
+  },
+  {
+    route: '/growth/seo/report',
+    parent: '/growth/seo',
+    via: 'header-cta',
+    reason:
+      'SEO report artifact (TASK-1310) — child del dashboard, alcanzable mediante "Ver informe"; no duplica el ítem de navegación y requiere growth.seo.report.read_client.'
   }
 ]
 

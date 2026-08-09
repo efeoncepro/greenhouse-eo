@@ -225,6 +225,20 @@ Reemplaza al delta derivado de la serie. Existe porque el delta por defecto **mi
 
 Reuso previsto: TASK-1307 hereda ambas props para el Δ30d de posición de búsqueda (métrica invertida + hero agregado en la misma card).
 
+## MetricTrendCard — eje invertido y legibilidad del eje X (TASK-1307)
+
+Tres capacidades más de la misma primitive, todas opt-in y todas byte-idénticas al legacy si no se pasan.
+
+**`invertY?: boolean`** (default `false`) — invierte el eje Y del sparkline (`<YAxis reversed>`). Es para métricas donde MENOS es mejor y la pantalla ya fijó la lectura "arriba = mejor" en su chart principal (posición de búsqueda). Sin esto, el card y el chart de al lado se contradicen: la misma mejora sube en uno y baja en el otro, y el operador no puede saber si "la línea cayó" es bueno o malo. La inversión es **sólo geométrica**: valores, delta, flecha y `aria` no cambian — eso lo gobierna `deltaSemantics`.
+
+**Regla dura — un `<Area>` sobre un eje invertido DEBE declarar su `baseValue`.** Recharts rellena el área entre la línea y la base **por defecto del eje** (su 0). Con `reversed`, ese 0 queda **arriba**, así que el gradiente se pintaba SOBRE la línea, como una mancha flotante desprendida del dato. El card resuelve con `baseValue={invertY ? 'dataMax' : undefined}`: con el eje invertido, `dataMax` es el borde **inferior** del lienzo, y el relleno vuelve a caer bajo la línea.
+
+Por qué importa fuera de este card: es un **defecto sólo visible en runtime**. El tipo compila, el test pasa, el lint no tiene nada que decir y el gate de tokens tampoco — se detecta mirando el frame. Cualquier `<Area>`/`<AreaChart>` nuevo sobre un eje invertido cae en la misma trampa.
+
+**Adelgazamiento de ticks del eje X.** El card dibuja todos sus ticks (`interval={0}`) porque su cadencia de diseño es mensual (~6-12 labels). Con una serie densa (26 buckets semanales) los 26 labels se pisan en una papilla ilegible. Ahora se muestran ~6 equiespaciados **incluyendo siempre el último** (el presente es el punto que más importa); si el stride dejó un tick pegado al último, ese cede el lugar. Con ≤6 puntos el resultado es idéntico al legacy.
+
+**Anclaje adaptativo de los labels de los extremos.** Con anclaje central, el primer y el último label quedaban pegados o cortados contra los márgenes de la card. El renderer propio (`renderTick`) ancla `start` bajo el 12 % inicial y `end` sobre el 88 % final; el resto queda `middle`.
+
 ## ApexCharts Runtime Wrapper
 
 `AppReactApexCharts` (`src/libs/styles/AppReactApexCharts.tsx`) es el wrapper canónico para charts Apex legacy/productivos. El wrapper owns la única frontera `next/dynamic(..., { ssr:false })` hacia `react-apexcharts`; los consumers lo importan directo.
@@ -262,7 +276,11 @@ El `surface-system` reduce el salto entre una primitive atómica y una pantalla 
 Primitives oficiales:
 
 - `SurfaceRecipe`: ejecuta los seis recipes oficiales sobre `CompositionShell`, resuelve `kind` a composición y entrega planos de lectura explícitos para las regiones sostenidas. El canvas `background.default` queda como gutter; inventarios, detalle, decisiones y metadata viven en los work planes del recipe. Kinds `operationalWorkbench`, `listDetail`, `commandCenter`, `reviewStudio`, `analyticsReport`, `settingsFlow`.
+  - **`header` es una región propia, fuera del plano de las demás (TASK-1307).** El nodo que se pasa por `header` se renderiza **arriba** del `CompositionShell`, no dentro de `regions`. Ahí va el chrome de la pantalla —breadcrumbs, título, controles de alcance, frescura, tabs hermanos—; `regions.primary` es para el **contenido**. Ver [PATTERNS.md § Surface Chrome Pattern](./PATTERNS.md#surface-chrome-pattern--el-chrome-va-en-la-región-header-nunca-en-primary-task-1307).
+  - **`plane?: 'contained' | 'none'`** (default `'contained'`, legacy byte-idéntico). `'contained'` envuelve cada región sostenida en un paper (borde + radius `xl` + elevación `raised`). `'none'` lo desactiva: es para superficies cuyo contenido primario **ya es** una composición de cards canónicas (banda de KPI + chart card + tabla card) — envolverlas en otro plano fabricaría card-on-card, justo lo que el estándar premium bloquea. La recipe se sigue declarando (`data-surface-recipe`); lo que cambia es que el lienzo es el body y no un paper.
 - `WorkbenchHeader`: orientación, tesis, estado, una acción primaria y `supporting` integrado cuando la señal pertenece al mismo plano. Kinds `workbench`, `commandCenter`, `report`, `settings`.
+  - `kind='report'` resuelve a la variant `report` = **plano contenido editorial**: `background.paper`, borde `divider`, radius `theme.shape.customBorderRadius.xl`, sombra `theme.greenhouseElevation.raised` y padding `{ xs: 3, md: 5 }`. Es la variant que contiene el chrome de una pantalla de lectura analítica. `kind='workbench'` (variant `operational`) es el plano inmersivo navy, otro trabajo.
+  - Reparto canónico de sus ranuras cuando el header lleva el chrome de la superficie: `secondaryActions` = los controles de **alcance** (lo que el operador cambia) · `meta` = **hechos sobre el dato** (frescura, leyenda de origen cuando aplica a toda la pantalla) · `supporting` = los **tabs hermanos**, que la primitive baja bajo su propio divisor (cabecera con pestañas clásica) · `primaryAction` = a lo más una.
 - `SignalStrip`: hasta tres señales explicadas; variants `operational`, `narrative`, `exception`, `integrated`. `integrated` elimina la KPI card separada y condensa honestamente en mobile.
 - `InventoryList` + `SelectionRow`: navegación/selección con estado, foco y densidad adaptativa. `InventoryList variant='rail'` crea navegación abierta sin card exterior; sólo la selección activa puede elevarse.
 - `DetailHero`: identidad y estado del objeto activo; variants `entity`, `evidence`, `report`.

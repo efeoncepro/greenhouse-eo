@@ -139,6 +139,18 @@ export type CanonicalErrorCode =
   | 'search_console_token_unhealthy'
   | 'search_console_property_not_accessible'
   | 'search_console_sites_unavailable'
+  // Growth SEO — command `trackKeywords` (TASK-1308).
+  | 'seo_module_disabled'
+  | 'seo_target_not_found'
+  | 'seo_target_not_active'
+  | 'seo_not_entitled'
+  | 'seo_keywords_invalid_input'
+  | 'seo_audit_already_running'
+  | 'seo_audit_already_captured_today'
+  | 'seo_quota_exhausted'
+  | 'seo_budget_exhausted'
+  | 'seo_audit_invalid_input'
+  | 'seo_provider_unavailable'
   // Proposal Studio F0 (TASK-1392).
   | 'proposal_not_found'
   | 'proposal_invalid_input'
@@ -606,6 +618,70 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   search_console_sites_unavailable: {
     status: 502,
     message: 'No pudimos obtener tus propiedades de Search Console. Intenta de nuevo en unos minutos.',
+    actionable: true
+  },
+  // Growth SEO — command `trackKeywords` (TASK-1308). `actionable: false` en todo lo que es
+  // estructural: reintentar no conecta un módulo ni reactiva un target, y ofrecer el botón
+  // escondería la acción real (hablar con quien administra el módulo).
+  seo_module_disabled: {
+    status: 409,
+    message: 'El módulo SEO no está disponible por ahora.',
+    actionable: false
+  },
+  seo_target_not_found: {
+    status: 404,
+    message: 'No encontramos el sitio SEO de este Space.',
+    actionable: false
+  },
+  seo_target_not_active: {
+    status: 409,
+    message: 'El seguimiento de este sitio está pausado. Reactívalo antes de seguir keywords nuevas.',
+    actionable: false
+  },
+  seo_not_entitled: {
+    status: 403,
+    message: 'Este Space no tiene el módulo SEO activo.',
+    actionable: false
+  },
+  seo_keywords_invalid_input: {
+    status: 400,
+    message: 'Revisa las keywords: llegaron vacías o con un formato que no podemos seguir.',
+    actionable: true
+  },
+  // Growth SEO — command `queueSiteAudit` (TASK-1309). Los dos primeros NO son fallas: el
+  // guard de idempotencia hizo su trabajo y evitó gastarle al proveedor dos veces por lo
+  // mismo. Van `actionable: false` porque reintentar es justo lo que no hay que hacer.
+  seo_audit_already_running: {
+    status: 409,
+    message: 'Ya hay una auditoría corriendo para este sitio. Espera a que termine.',
+    actionable: false
+  },
+  seo_audit_already_captured_today: {
+    status: 409,
+    message: 'Ya corrimos una auditoría para este sitio hoy.',
+    actionable: false
+  },
+  // Cupo y presupuesto son techos del mes: reintentar no los mueve.
+  seo_quota_exhausted: {
+    status: 429,
+    message: 'Este Space agotó su cupo de auditorías del mes.',
+    actionable: false
+  },
+  seo_budget_exhausted: {
+    status: 429,
+    message: 'Este Space agotó su presupuesto de proveedor del mes.',
+    actionable: false
+  },
+  seo_audit_invalid_input: {
+    status: 400,
+    message: 'Revisa la solicitud: no llegó el sitio que hay que auditar.',
+    actionable: true
+  },
+  // Breaker abierto o falla del proveedor: transitorio de verdad, así que acá el reintento
+  // SÍ es la acción correcta — al revés que el cupo o el guard de idempotencia.
+  seo_provider_unavailable: {
+    status: 503,
+    message: 'El proveedor de datos no está respondiendo. Intenta de nuevo en unos minutos.',
     actionable: true
   },
   // Proposal Studio F0 (TASK-1392) — errores tipados del aggregate Proposal.

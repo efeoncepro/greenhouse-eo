@@ -18,6 +18,9 @@ const state = {
   targetId: 'seot-1' as string | null,
   opportunitiesResult: { ok: true, opportunities: [] } as unknown,
   gapResult: { ok: true, quadrants: [] } as unknown,
+  trackResult: { ok: true, outcomes: [], activeKeywordCount: 0, capacity: 200 } as unknown,
+  trackCalls: [] as unknown[][],
+  untrackCalls: [] as unknown[][],
   entitlementCalls: [] as string[]
 }
 
@@ -56,13 +59,35 @@ vi.mock('@/lib/growth/seo/gap/read-seo-aeo-gap', () => ({
 }))
 
 vi.mock('@/lib/postgres/client', () => ({
-  runGreenhousePostgresQuery: async () => (state.targetId ? [{ seo_target_id: state.targetId }] : [])
+  runGreenhousePostgresQuery: async () => (state.targetId ? [{ seo_target_id: state.targetId }] : []),
+  // TASK-1308 — el lane ahora importa el command, que arrastra `withTransaction` vía
+  // `@/lib/db`. Sin este export el mock rompe la carga del módulo entero.
+  withGreenhousePostgresTransaction: async () => {
+    throw new Error('la transacción no debe alcanzarse en estos tests')
+  }
+}))
+
+// El command se mockea entero: acá se prueba el LANE (scope, resolución de org, validación),
+// no la lógica del command — que tiene su propia suite y su sanity contra PG real.
+vi.mock('@/lib/growth/seo/track-keywords', () => ({
+  trackKeywords: async (...args: unknown[]) => {
+    state.trackCalls.push(args)
+
+    return state.trackResult
+  },
+  untrackKeywords: async (...args: unknown[]) => {
+    state.untrackCalls.push(args)
+
+    return state.trackResult
+  }
 }))
 
 import {
   getEcosystemSeoEntitlementPayload,
   getEcosystemSeoKeywordOpportunitiesPayload,
-  getEcosystemSeoVisibility360Payload
+  getEcosystemSeoVisibility360Payload,
+  trackEcosystemSeoKeywordsPayload,
+  untrackEcosystemSeoKeywordsPayload
 } from './ecosystem-growth-seo'
 
 type AnyContext = Parameters<typeof getEcosystemSeoKeywordOpportunitiesPayload>[0]['context']
@@ -81,6 +106,9 @@ beforeEach(() => {
   state.tier = 'contracted'
   state.targetId = 'seot-1'
   state.entitlementCalls = []
+  state.trackCalls = []
+  state.untrackCalls = []
+  state.trackResult = { ok: true, outcomes: [], activeKeywordCount: 0, capacity: 200 }
 })
 
 describe('resolución de organización por binding', () => {
@@ -167,5 +195,119 @@ describe('payload de entitlement (chokepoint como lectura)', () => {
     expect(r.data.tier).toBe('contracted')
     expect(r.data.allowanceRemaining).toBe(6)
     expect(r.data.budgetRemainingUsd).toBe(45)
+  })
+})
+
+describe('trackEcosystemSeoKeywordsPayload (TASK-1308) — el primer write del lane', () => {
+  const body = (extra: Record<string, unknown> = {}) => ({ keywords: ['berel'], ...extra })
+
+  it('🔴 un binding org-scoped NO puede hacer crecer su propia factura', async () => {
+    await expect(
+      trackEcosystemSeoKeywordsPayload({
+        context: orgCtx,
+        request: req(),
+        body: body({ organizationId: 'org-binding' })
+      })
+    ).rejects.toMatchObject({ statusCode: 403, errorCode: 'scope_not_allowed' })
+
+    // Ni siquiera se resolvió el entitlement: la puerta de scope cierra ANTES.
+    expect(state.entitlementCalls).toEqual([])
+    expect(state.trackCalls).toEqual([])
+  })
+
+  it('lote vacío → 400 sin tocar el dominio', async () => {
+    await expect(
+      trackEcosystemSeoKeywordsPayload({ context: internalCtx, request: req(), body: { keywords: [] } })
+    ).rejects.toMatchObject({ statusCode: 400 })
+
+    expect(state.trackCalls).toEqual([])
+  })
+
+  it('el organizationId del BODY se resuelve con las mismas reglas de binding que el query param', async () => {
+    await trackEcosystemSeoKeywordsPayload({
+      context: internalCtx,
+      request: req(),
+      body: body({ organizationId: 'org-desde-body' })
+    })
+
+    expect(state.entitlementCalls).toEqual(['org-desde-body'])
+  })
+
+  it('org entitled sin target configurado degrada honesto, no escribe', async () => {
+    state.targetId = null
+
+    const r = await trackEcosystemSeoKeywordsPayload({
+      context: internalCtx,
+      request: req(),
+      body: body({ organizationId: 'org-1' })
+    })
+
+    expect(r.data).toMatchObject({ ok: false, errorCode: 'target_not_configured' })
+    expect(state.trackCalls).toEqual([])
+  })
+
+  it('la procedencia dice que fue un consumer máquina, no una persona', async () => {
+    await trackEcosystemSeoKeywordsPayload({
+      context: internalCtx,
+      request: req(),
+      body: body({ organizationId: 'org-1' })
+    })
+
+    const [, , actor, options] = state.trackCalls[0] as [string, string[], string, { source: string }]
+
+    expect(actor).toMatch(/^mcp:/)
+    expect(options.source).toBe('mcp')
+  })
+
+  it('con el módulo apagado no resuelve sujeto ni escribe', async () => {
+    state.flagOn = false
+
+    const r = await trackEcosystemSeoKeywordsPayload({
+      context: internalCtx,
+      request: req(),
+      body: body({ organizationId: 'org-1' })
+    })
+
+    expect(r.data).toMatchObject({ ok: false, errorCode: 'disabled' })
+    expect(state.trackCalls).toEqual([])
+  })
+})
+
+describe('untrackEcosystemSeoKeywordsPayload (TASK-1308) — el reverso en el lane', () => {
+  it('🔴 un binding org-scoped tampoco puede cortar la serie de su propio Space', async () => {
+    await expect(
+      untrackEcosystemSeoKeywordsPayload({
+        context: orgCtx,
+        request: req(),
+        body: { keywords: ['berel'], organizationId: 'org-binding' }
+      })
+    ).rejects.toMatchObject({ statusCode: 403, errorCode: 'scope_not_allowed' })
+
+    expect(state.untrackCalls).toEqual([])
+  })
+
+  it('la procedencia dice que fue un consumer máquina', async () => {
+    await untrackEcosystemSeoKeywordsPayload({
+      context: internalCtx,
+      request: req(),
+      body: { keywords: ['berel'], organizationId: 'org-1' }
+    })
+
+    const [, , actor] = state.untrackCalls[0] as [string, string[], string]
+
+    expect(actor).toMatch(/^mcp:/)
+  })
+
+  it('con el módulo apagado no resuelve sujeto ni escribe', async () => {
+    state.flagOn = false
+
+    const r = await untrackEcosystemSeoKeywordsPayload({
+      context: internalCtx,
+      request: req(),
+      body: { keywords: ['berel'], organizationId: 'org-1' }
+    })
+
+    expect(r.data).toMatchObject({ ok: false, errorCode: 'disabled' })
+    expect(state.untrackCalls).toEqual([])
   })
 })

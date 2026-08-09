@@ -33,7 +33,7 @@ import {
   SEO_RANK_SNAPSHOT_AGGREGATE_TYPE,
   type SeoBacklinkCaptureResult
 } from '../contracts'
-import { SEO_MODULE_KEY, enforceSeoRunEntitlement } from '../entitlement'
+import { SEO_MODULE_KEYS_READ, enforceSeoRunEntitlement } from '../entitlement'
 import { isSeoModuleEnabled } from '../flags'
 import { resolveSantiagoCaptureDate } from '../rank-capture'
 
@@ -371,12 +371,12 @@ export const runBacklinkCaptureBatch = async (
           SELECT 1
             FROM greenhouse_client_portal.module_assignments ma
            WHERE ma.organization_id = t.organization_id
-             AND ma.module_key = $1
+             AND ma.module_key = ANY($1::text[])
              AND ma.effective_to IS NULL
              AND ma.status IN ('active', 'pilot')
         )
       ORDER BY t.seo_target_id`,
-    [SEO_MODULE_KEY]
+    [[...SEO_MODULE_KEYS_READ]]
   )
 
   const targets =

@@ -1,0 +1,110 @@
+{
+  "taskId": "TASK-1310",
+  "scenario": "growth-seo-client, growth-seo-report, growth-seo-report-print",
+  "reviewedAt": "2026-08-08",
+  "reviewer": "claude (auditoría premium 10:25–10:26; supersede el scorecard de las 10:03)",
+  "supersedes": {
+    "reviewedAt": "2026-08-08",
+    "verdict": "pass",
+    "average": 4.61,
+    "why": "Se generó sobre la corrida de las 10:03, antes de la última ronda de cambios. La auditoría de las 10:25 lo contradice de forma directa: afirmaba 'axe sin violaciones' cuando el dashboard falla axe por contraste en tabs, y afirmaba economía de superficies 4.7 cuando la gramática real es card + strip + mini superficies + contenedores de chart/table. Un scorecard verde sobre una task con auditoría BLOCK abierta es el peor artefacto posible: da por acabado lo que está congelado."
+  },
+  "evidence": {
+    "desktop": ".captures/2026-08-08T10-25-07_growth-seo-client/01-desktop/frames/01-summary.png",
+    "mobile": ".captures/2026-08-08T10-25-07_growth-seo-client/02-mobile/frames/01-summary.png",
+    "dossier": "docs/ui/reviews/TASK-1310-growth-seo-client-dashboard-report-artifact-audit-2026-08-08.md"
+  },
+  "technicalBaseline": {
+    "dashboard": "exitCode 1 — 2 violaciones axe de contraste en tabs + 15 warnings de targets de 23 px",
+    "reportWeb": "exitCode 0 — 10 warnings de targets de 23 px; runtime limpio",
+    "reportPrint": "exitCode 0 — qualityFindings vacío; es la superficie más sobria de las tres"
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 2.8,
+      "rationale": "El h1 y el KPI primario existen y se leen, pero los bloques posteriores vuelven a competir por atención en vez de subordinarse a la lectura dominante.",
+      "evidence": "dashboard desktop 01-summary; auditoría §3",
+      "nextAction": "Subordinar señales, evolución y quadrant a la lectura ejecutiva: una sola pieza gana el fold y el resto entra como apoyo, no como pares."
+    },
+    "proportions": {
+      "score": 2.4,
+      "rationale": "La proporción no expresa importancia: bloques de peso visual similar cargan información de rango muy distinto, y la evolución ocupa un área grande con 8 de 90 días medidos.",
+      "evidence": "dashboard desktop 02-evolution; auditoría §3 (Charts 2.1)",
+      "nextAction": "Dimensionar cada bloque por su carga informativa real y reducir el área de evolución mientras la cobertura sea parcial."
+    },
+    "rhythm": {
+      "score": 2.2,
+      "rationale": "Las pausas entre bloques son uniformes, así que no hay respiración que marque cambio de nivel; quadrant y report serializan demasiada información seguida.",
+      "evidence": "dashboard desktop 04-quadrant; report web desktop; auditoría §3 (Densidad y ritmo 2.2)",
+      "nextAction": "Diferenciar el espaciado entre secciones y dentro de sección para que el salto de nivel se lea sin bordes."
+    },
+    "density": {
+      "score": 2.2,
+      "rationale": "Coexisten zonas vacías (evolución con datos escasos) y muros densos (tabla de 50 filas con zebra y chips) en la misma superficie.",
+      "evidence": "dashboard 03-evolution-table; auditoría §3",
+      "nextAction": "Convertir la tabla en ranking/cola con densidad declarada y resolver la escasez de la serie como cobertura, no como gráfico grande y vacío."
+    },
+    "depth": {
+      "score": 2.0,
+      "rationale": "Cada bloque intenta demostrar importancia con borde, fondo, rail, icono, color o elevación al mismo tiempo; la profundidad deja de significar algo cuando todos los niveles la usan.",
+      "evidence": "dashboard desktop 01-summary; report web desktop; auditoría §3",
+      "nextAction": "Reservar elevación y contorno para un solo nivel jerárquico y resolver el resto con espaciado y tipografía."
+    },
+    "surfaceEconomy": {
+      "score": 1.8,
+      "rationale": "Card principal + strip contenido + mini superficies + contenedores de chart y table: cuatro planos anidados donde la tarea necesita uno.",
+      "evidence": "dashboard desktop 01-summary; auditoría §3 (peor dimensión del diagnóstico)",
+      "nextAction": "Colapsar a una hoja de análisis por sección: un plano contenido por tarea, sin card dentro de card."
+    },
+    "visualImpact": {
+      "score": 2.0,
+      "rationale": "La evidencia es correcta pero no hay un momento visual dominante; la superficie se lee como un conjunto de módulos equivalentes.",
+      "evidence": "dashboard desktop 01-summary; auditoría §3 (veredicto)",
+      "nextAction": "Elegir y construir el momento dominante de la pantalla (la lectura de visibilidad) y bajar deliberadamente el peso de todo lo demás."
+    },
+    "typography": {
+      "score": 2.6,
+      "rationale": "Exceso de overline/versalitas y textos auxiliares repetidos; en móvil la lectura se comprime y pierde la escala de niveles.",
+      "evidence": "dashboard mobile 01-summary; auditoría §3",
+      "nextAction": "Reducir el uso de overline a un solo nivel, eliminar auxiliares duplicados y verificar la escala a 390px."
+    },
+    "color": {
+      "score": 2.7,
+      "rationale": "Los estados están diferenciados, pero el color aparece en todos los niveles a la vez y deja de jerarquizar; además el dashboard falla axe por contraste en las tabs.",
+      "evidence": "dashboard 05-keyboard-report-cta-focus.axe.json (2 violaciones); auditoría §3",
+      "nextAction": "Corregir el contraste de tabs a AA y limitar el color semántico a la capa de estado, no a la de contenedor."
+    },
+    "iconography": {
+      "score": 2.5,
+      "rationale": "Los glyphs son consistentes en familia, pero se usan como recurso de énfasis en bloques que no lo necesitan, sumando ruido a la gramática modular.",
+      "evidence": "dashboard desktop 01-summary; auditoría §3",
+      "nextAction": "Quitar iconos de los bloques que ya tienen etiqueta y contexto; conservarlos donde distinguen categoría."
+    },
+    "responsive": {
+      "score": 2.2,
+      "rationale": "En móvil el chrome fijo del portal tapa el inicio de Evolución, y el report es demasiado largo para escanear en una columna.",
+      "evidence": "dashboard mobile 02-evolution; report mobile; auditoría §3 y §4.1",
+      "nextAction": "Compensar el offset del chrome fijo en el scroll a sección y acortar el report móvil con una estructura de dos densidades."
+    },
+    "motion": {
+      "score": 1.9,
+      "rationale": "Hay animación técnica (stagger, reveal) pero no feedback de decisión; el hover lift agrega ruido sin confirmar nada al usuario.",
+      "evidence": "scenario premium con reduced-motion check; auditoría §3",
+      "nextAction": "Retirar el lift decorativo y dejar motion solo donde confirma cambio de estado, selección o llegada de datos."
+    },
+    "fidelity": {
+      "score": 2.8,
+      "rationale": "La dirección Evidence Narrative se reconoce, pero el report hereda la densidad del dashboard en vez de convertirse en artifact, y el wireframe todavía describe un masterDetail que la implementación descartó.",
+      "evidence": "report web desktop; auditoría §4.1 hallazgo 2 (drift documental)",
+      "nextAction": "Corregir el drift del wireframe a composition single + tabs y diferenciar el report como documento, no como copia del tablero."
+    },
+    "genericTemplateResistance": {
+      "score": 2.0,
+      "rationale": "Las tres superficies repiten la misma gramática de card + strip + módulos coloreados, que es exactamente la firma de un tablero generado automáticamente.",
+      "evidence": "dashboard, report web y print — auditoría §2 (columna 'Lectura visual')",
+      "nextAction": "Darle a cada superficie una forma propia derivada de su tarea, en vez de reinstanciar la misma plantilla de bloques tres veces."
+    }
+  },
+  "verdict": "blocked",
+  "gateNote": "Este scorecard hace fallar `pnpm ui:quality --task TASK-1310` a propósito. Es el estado correcto: la task tiene `UI ready: no` y una auditoría premium abierta con release gate bloqueado. El gate se desbloquea con evidencia GVC nueva (captura limpia, axe limpio, targets correctos, sin overflow) y una revisión visual que confirme la dirección — no con la sola ausencia de errores."
+}

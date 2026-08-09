@@ -8,7 +8,6 @@ import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
-import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 
 import MenuItem from '@mui/material/MenuItem'
@@ -18,7 +17,8 @@ import CustomTextField from '@core/components/mui/TextField'
 
 import EmptyState from '@/components/greenhouse/EmptyState'
 import { GreenhouseBreadcrumbs, GreenhouseChip } from '@/components/greenhouse/primitives'
-import CompositionShell from '@/components/greenhouse/primitives/composition-shell/CompositionShell'
+import SurfaceRecipe from '@/components/greenhouse/primitives/surface-system/SurfaceRecipe'
+import WorkbenchHeader from '@/components/greenhouse/primitives/surface-system/WorkbenchHeader'
 import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
 import { GH_GROWTH_SEO_OVERVIEW } from '@/lib/copy/growth'
 import type { SeoSpaceOption } from '@/lib/growth/seo/overview/list-seo-spaces'
@@ -115,6 +115,17 @@ const SeoOverviewView = ({
     pushQuery({ space: next.organizationId })
   }
 
+  /**
+   * Chrome de la pantalla, en el patrón CANÓNICO del módulo (TASK-1307, coherencia entre las
+   * tres pestañas de Search Visibility): `WorkbenchHeader kind='report'` dentro de la región
+   * `header` de la recipe.
+   *
+   * ⚠️ Antes el título, los dos controles, el botón de recarga, el chip de frescura, los tabs
+   * y la leyenda flotaban sueltos sobre el lienzo gris — seis bloques sin superficie que los
+   * contuviera, que en 390px era el primer scroll entero sin un solo dato. El plano contenido
+   * declara el ALCANCE ("qué Space, qué ventana, hasta qué fecha") y el contenido queda abajo,
+   * sobre el lienzo, donde se lee como contenido.
+   */
   const header = (
     <Stack spacing={4}>
       {/* "Growth" es un grupo de menú, no una ruta: va sin href para no prometer
@@ -127,86 +138,114 @@ const SeoOverviewView = ({
         ]}
       />
 
-      <Stack
-        direction={{ xs: 'column', md: 'row' }}
-        spacing={3}
-        justifyContent='space-between'
-        alignItems={{ xs: 'flex-start', md: 'flex-end' }}
-        data-capture='seo-overview-toolbar'
-      >
-        <Stack spacing={1}>
-          <Typography variant='h4'>{GH_GROWTH_SEO_OVERVIEW.pageTitle}</Typography>
-          <Typography variant='body2' color='text.secondary'>
-            {GH_GROWTH_SEO_OVERVIEW.pageSubtitle}
-          </Typography>
-        </Stack>
+      <WorkbenchHeader
+        kind='report'
+        titleComponent='h1'
+        dataCapture='seo-overview-toolbar'
+        title={GH_GROWTH_SEO_OVERVIEW.pageTitle}
+        description={GH_GROWTH_SEO_OVERVIEW.pageSubtitle}
+        meta={
+          <Stack direction='row' spacing={2} alignItems='center' flexWrap='wrap' useFlexGap>
+            {/* Freshness explícito: el operador tiene que poder distinguir "no pasó nada"
+                de "el dato es viejo". Sin fecha se dice que no hay, no se inventa "hoy". */}
+            <GreenhouseChip
+              kind='metric'
+              variant='label'
+              size='small'
+              label={
+                dataAsOf
+                  ? GH_GROWTH_SEO_OVERVIEW.toolbar.freshness.replace('{date}', dataAsOf)
+                  : GH_GROWTH_SEO_OVERVIEW.toolbar.freshnessUnknown
+              }
+            />
 
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} alignItems={{ sm: 'center' }}>
-          <CustomAutocomplete
-            options={spaces}
-            value={selectedSpace}
-            disableClearable={false}
-            getOptionLabel={(option: SeoSpaceOption | string) =>
-              typeof option === 'string' ? option : option.organizationName
-            }
-            isOptionEqualToValue={(option: SeoSpaceOption, value: SeoSpaceOption) =>
-              option.organizationId === value.organizationId
-            }
-            onChange={(_, value) => handleSpaceChange((value as SeoSpaceOption | null) ?? null)}
-            sx={{ minInlineSize: 240 }}
-            renderInput={params => (
-              <CustomTextField
-                {...params}
-                label={GH_GROWTH_SEO_OVERVIEW.toolbar.spaceLabel}
-                placeholder={GH_GROWTH_SEO_OVERVIEW.toolbar.spacePlaceholder}
-              />
-            )}
-          />
+            {/* Leyenda persistente: medido y estimado NO se promedian ni se pintan igual. */}
+            <Stack direction='row' spacing={2} aria-label={GH_GROWTH_SEO_OVERVIEW.legend.ariaLabel}>
+              <Tooltip title={GH_GROWTH_SEO_OVERVIEW.legend.measuredHint}>
+                <span>
+                  <GreenhouseChip
+                    kind='metric'
+                    variant='label'
+                    size='small'
+                    label={`● ${GH_GROWTH_SEO_OVERVIEW.legend.measured}`}
+                  />
+                </span>
+              </Tooltip>
+              <Tooltip title={GH_GROWTH_SEO_OVERVIEW.legend.estimatedHint}>
+                <span>
+                  <GreenhouseChip
+                    kind='metric'
+                    variant='label'
+                    size='small'
+                    label={`◑ ${GH_GROWTH_SEO_OVERVIEW.legend.estimated}`}
+                  />
+                </span>
+              </Tooltip>
+            </Stack>
+          </Stack>
+        }
+        secondaryActions={
+          <>
+            <CustomAutocomplete
+              options={spaces}
+              value={selectedSpace}
+              disableClearable={false}
+              getOptionLabel={(option: SeoSpaceOption | string) =>
+                typeof option === 'string' ? option : option.organizationName
+              }
+              isOptionEqualToValue={(option: SeoSpaceOption, value: SeoSpaceOption) =>
+                option.organizationId === value.organizationId
+              }
+              onChange={(_, value) => handleSpaceChange((value as SeoSpaceOption | null) ?? null)}
+              // En móvil cada control ocupa su fila completa: 2-up truncaba el valor
+              // vigente, y un control cuyo valor no se puede leer deja de ser un control.
+              sx={{ flex: { xs: '1 1 100%', md: '0 0 auto' }, minInlineSize: { md: 240 } }}
+              renderInput={params => (
+                <CustomTextField
+                  {...params}
+                  label={GH_GROWTH_SEO_OVERVIEW.toolbar.spaceLabel}
+                  placeholder={GH_GROWTH_SEO_OVERVIEW.toolbar.spacePlaceholder}
+                />
+              )}
+            />
 
-          <CustomTextField
-            select
-            label={GH_GROWTH_SEO_OVERVIEW.toolbar.rangeLabel}
-            value={String(rangeDays)}
-            onChange={event => pushQuery({ range: Number(event.target.value) })}
-            sx={{ minInlineSize: 170 }}
-          >
-            {Object.entries(GH_GROWTH_SEO_OVERVIEW.toolbar.rangeOptions).map(([days, label]) => (
-              <MenuItem key={days} value={days}>
-                {label}
-              </MenuItem>
-            ))}
-          </CustomTextField>
+            <CustomTextField
+              select
+              label={GH_GROWTH_SEO_OVERVIEW.toolbar.rangeLabel}
+              value={String(rangeDays)}
+              onChange={event => pushQuery({ range: Number(event.target.value) })}
+              sx={{ flex: { xs: '1 1 100%', md: '0 0 auto' }, minInlineSize: { md: 170 } }}
+            >
+              {Object.entries(GH_GROWTH_SEO_OVERVIEW.toolbar.rangeOptions).map(([days, label]) => (
+                <MenuItem key={days} value={days}>
+                  {label}
+                </MenuItem>
+              ))}
+            </CustomTextField>
 
-          {/* Relee los snapshots ya materializados: NO dispara un crawl ni gasta
-              presupuesto de proveedor. El tooltip lo dice para que nadie lo suponga. */}
-          <Tooltip title={GH_GROWTH_SEO_OVERVIEW.toolbar.refreshHint}>
-            <span>
-              <Button
-                variant='outlined'
-                size='small'
-                startIcon={<i className='tabler-refresh' />}
-                disabled={isPending}
-                onClick={() => startTransition(() => router.refresh())}
-              >
-                {isPending ? GH_GROWTH_SEO_OVERVIEW.toolbar.refreshPending : GH_GROWTH_SEO_OVERVIEW.toolbar.refresh}
-              </Button>
-            </span>
-          </Tooltip>
-
-          {/* Freshness explícito: el operador tiene que poder distinguir "no pasó nada"
-              de "el dato es viejo". Sin fecha se dice que no hay, no se inventa "hoy". */}
-          <GreenhouseChip
-            kind='metric'
-            variant='label'
-            size='small'
-            label={
-              dataAsOf
-                ? GH_GROWTH_SEO_OVERVIEW.toolbar.freshness.replace('{date}', dataAsOf)
-                : GH_GROWTH_SEO_OVERVIEW.toolbar.freshnessUnknown
-            }
-          />
-        </Stack>
-      </Stack>
+            {/* Relee los snapshots ya materializados: NO dispara un crawl ni gasta
+                presupuesto de proveedor. El tooltip lo dice para que nadie lo suponga. */}
+            <Tooltip title={GH_GROWTH_SEO_OVERVIEW.toolbar.refreshHint}>
+              <span>
+                <Button
+                  variant='outlined'
+                  size='small'
+                  startIcon={<i className='tabler-refresh' />}
+                  disabled={isPending}
+                  onClick={() => startTransition(() => router.refresh())}
+                >
+                  {isPending ? GH_GROWTH_SEO_OVERVIEW.toolbar.refreshPending : GH_GROWTH_SEO_OVERVIEW.toolbar.refresh}
+                </Button>
+              </span>
+            </Tooltip>
+          </>
+        }
+        supporting={
+          <Box data-capture='seo-overview-tabs'>
+            <SeoSearchVisibilityTabs activeTab='overview' spaceId={selectedSpaceId} />
+          </Box>
+        }
+      />
 
       {/* El cambio de Space navega (no re-renderiza en sitio), así que el lector de
           pantalla necesita que el nuevo contexto se anuncie al llegar. */}
@@ -225,34 +264,6 @@ const SeoOverviewView = ({
           ? GH_GROWTH_SEO_OVERVIEW.states.spaceUpdated.replace('{space}', selectedSpace.organizationName)
           : ''}
       </Box>
-
-      <Box data-capture='seo-overview-tabs'>
-        <SeoSearchVisibilityTabs activeTab='overview' spaceId={selectedSpaceId} />
-      </Box>
-
-      {/* Leyenda persistente: medido y estimado NO se promedian ni se pintan igual. */}
-      <Stack direction='row' spacing={2} aria-label={GH_GROWTH_SEO_OVERVIEW.legend.ariaLabel}>
-        <Tooltip title={GH_GROWTH_SEO_OVERVIEW.legend.measuredHint}>
-          <span>
-            <GreenhouseChip
-              kind='metric'
-              variant='label'
-              size='small'
-              label={`● ${GH_GROWTH_SEO_OVERVIEW.legend.measured}`}
-            />
-          </span>
-        </Tooltip>
-        <Tooltip title={GH_GROWTH_SEO_OVERVIEW.legend.estimatedHint}>
-          <span>
-            <GreenhouseChip
-              kind='metric'
-              variant='label'
-              size='small'
-              label={`◑ ${GH_GROWTH_SEO_OVERVIEW.legend.estimated}`}
-            />
-          </span>
-        </Tooltip>
-      </Stack>
     </Stack>
   )
 
@@ -346,16 +357,15 @@ const SeoOverviewView = ({
   }
 
   return (
-    <CompositionShell
-      composition='single'
-      regions={{
-        primary: (
-          <Stack spacing={6}>
-            {header}
-            {renderBody()}
-          </Stack>
-        )
-      }}
+    // Recipe canónica `analyticsReport` (composición `single`), igual que Rendimiento y
+    // Keywords. `plane='none'`: el contenido primario ES una composición de cards, y el
+    // plane contenido de la recipe fabricaría card-on-card. El chrome va en `header`.
+    <SurfaceRecipe
+      kind='analyticsReport'
+      instanceId='seo-overview'
+      plane='none'
+      header={header}
+      regions={{ primary: renderBody() }}
     />
   )
 }

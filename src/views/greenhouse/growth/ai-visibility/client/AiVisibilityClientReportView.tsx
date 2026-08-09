@@ -934,14 +934,19 @@ const SummaryStrip = ({
             aria-label={C.page.orgChipAria}
           />
         </Stack>
-        {asOfLabel ? (
-          <Stack direction='row' spacing={1} alignItems='center' sx={{ color: 'text.secondary' }}>
-            <i className='tabler-calendar' aria-hidden='true' />
-            <Typography variant='body2' color='text.secondary'>
-              {C.page.asOfLabel} {asOfLabel}
-            </Typography>
-          </Stack>
-        ) : null}
+        <Stack direction='row' spacing={2} alignItems='center' flexWrap='wrap' useFlexGap>
+          {asOfLabel ? (
+            <Stack direction='row' spacing={1} alignItems='center' sx={{ color: 'text.secondary' }}>
+              <i className='tabler-calendar' aria-hidden='true' />
+              <Typography variant='body2' color='text.secondary'>
+                {C.page.asOfLabel} {asOfLabel}
+              </Typography>
+            </Stack>
+          ) : null}
+          <Button href='/growth/seo' variant='outlined' size='small' startIcon={<i className='tabler-chart-line' aria-hidden='true' />}>
+            {C.page.viewSeo}
+          </Button>
+        </Stack>
       </Stack>
 
       <Card variant='outlined' sx={theme => ({ borderRadius: `${theme.shape.customBorderRadius.lg}px` })}>

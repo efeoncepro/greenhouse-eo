@@ -64,7 +64,9 @@ actual.
 
 Para Fal, resuelve el endpoint desde catálogo/OpenAPI y un submit controlado. Conserva las URLs `status_url`,
 `response_url` y `cancel_url` que Fal devuelva por request; nunca derives una URL de seguimiento desde el slug.
-Mantén `x-app-fal-disable-fallbacks` y la key únicamente en Globe server-side. Para BFL, trata Early Access,
+Mantén `x-app-fal-disable-fallback` (singular, nombre oficial de Fal) y la key únicamente en Globe server-side. Si
+el runtime o sus tests aún usan `x-app-fal-disable-fallbacks`, regístralo como gap de integración y corrígelo antes
+de la verificación 2.5. Para BFL, trata Early Access,
 `latest`, límites de escala, términos y derechos como gates explícitos, no como disponibilidad comercial.
 
 ### 3. Completar el mapa de cables

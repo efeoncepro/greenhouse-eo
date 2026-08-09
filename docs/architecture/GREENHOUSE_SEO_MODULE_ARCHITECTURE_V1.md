@@ -9,6 +9,21 @@ Documento maestro del módulo SEO. Contrato técnico + de negocio del que deriva
 
 ---
 
+## Delta 2026-08-08 — catálogo cliente TASK-1310: `seo_v2` pendiente de aplicar
+
+`seo_v1` se creó con `view_codes=[]`. TASK-1310 necesita exponer dashboard e informe en el menú
+compuesto del portal, pero `greenhouse_client_portal.modules` prohíbe mutar esos campos in-place.
+La migración `20260808131441444_task-1310-seo-client-view-codes.sql` crea **`seo_v2`**, conserva
+status/tier/metadata de cada assignment vigente, cierra `seo_v1` y registra
+`cliente.growth_seo_dashboard` + `cliente.growth_seo_report` con denials explícitos por rol. El
+acceso sigue siendo per-org (`module_assignment` + capability), nunca role-wide.
+
+**Estado:** código y migración listos en `develop`; hasta aplicar la migración, el runtime desplegado
+sigue usando `seo_v1`. No afirmar navegación SEO cliente operativa antes de verificar la sesión de
+Grupo Berel después del deploy.
+
+---
+
 ## Delta 2026-08-07 — `get_seo_overview_kpis` verificada end-to-end (TASK-1306)
 
 La tool y su lane (`/api/platform/ecosystem/growth/seo/overview-kpis`) quedaron **ejercitados
@@ -97,11 +112,20 @@ Se envuelven en una sola narrativa de producto: **Search Visibility 360** = los 
 
 **SoT split:** PG es SoT de configuración + los últimos N snapshots (ventana caliente ~180d). BQ es SoT de la historia larga (tendencia analítica). El reactive consumer espeja cada snapshot a BQ (`greenhouse_growth_analytics.*`).
 
+> **Delta 2026-08-07 (TASK-1655) — el carril GSC ahora TAMBIÉN tiene su mirror + camino de historial.** El módulo nació forward-only (medido en vivo: 5 días de GSC / 2 de rank teniendo 16 meses en la API) y el carril GSC no tenía espejo BQ — 5 días de `seo_gsc_daily` ya pesaban 27 MB en Cloud SQL, así que el histórico en OLTP no escalaba. Lo vigente:
+>
+> - **`greenhouse_growth_analytics.seo_gsc_history`** (particionada por `capture_date`, clustered por `organization_id, query`) es el SoT del histórico GSC. MERGE idempotente por `(org, capture_date, query, page)` — la misma clave del UPSERT de PG — con UPDATE en match (GSC consolida ~48h tarde y ambos stores deben corregirse igual). Mirror: `src/lib/growth/seo/gsc-history-bq-mirror.ts`.
+> - **El batch diario espeja cada día materializado** (paso del batch, no outbox: el fetch y el espejo comparten el ciclo de vida del día; `bqMirror: 'mirror_failed'` se REPORTA en el outcome y el día se re-espeja al siguiente run — nunca divergencia silenciosa).
+> - **Backfill del pasado por API → BQ directo** (`gsc-backfill.ts` + runner `scripts/growth/backfill-gsc-history.ts`): resumible (salta días ya presentes), honest degradation por día, NUNCA escribe a PG — meter el pasado en la tabla caliente recrearía el problema. Runbook: `docs/manual-de-uso/growth/backfill-historico-gsc.md`.
+> - **Split de lectura por COBERTURA, no por rango fijo** (`readSeoPerformance`): si el primer día de PG llega después del inicio de la ventana pedida, la lectura completa va a BQ; con BQ vacío (pre-backfill) cae a PG. Un corte por N días fijos mentiría en ambas direcciones.
+> - **Export nativo GSC→BQ por propiedad** = destino de largo plazo del continuo (gratis, sin muestreo; ya corre para `efeoncepro.com` en `efeonce-group.searchconsole.*` desde 2025-12-10, forward-only desde su activación). Su `sum_position` se promedia como `SUM(sum_position)/SUM(impressions)` — nunca un AVG plano. Activarlo por cliente requiere permiso Owner en la propiedad (out-of-band).
+> - Retención PG declarada: ventana caliente ~180d; el purge físico es follow-up de TASK-1655.
+
 ### 4.1 Configuración (mutable current + membership versionada)
 
 - `seo_targets` — qué trackea una org. `organization_id` FK, `root_domain`, `location_code`+`language_code`, `status`, `created_by`. UNIQUE(org, root_domain, location, language).
 - `seo_keyword_sets` — bundle nombrado por target.
-- `seo_keyword_set_members` — keyword + tags[] + `effective_from`/`effective_to` (membership append-only; NUNCA DELETE de una keyword).
+- `seo_keyword_set_members` — keyword + tags[] + `effective_from`/`effective_to` (membership append-only; NUNCA DELETE de una keyword) + **procedencia `created_by` / `source`** (TASK-1308, migración `20260807173706557`). La tabla nació escrita sólo por scripts de seed, así que no registraba quién agregó cada keyword; con `trackKeywords` gobernado y tres consumers (UI operador, Nexa, MCP) sobre un efecto diferido caro, *"¿por qué estamos pagando por esta keyword?"* necesita respuesta auditable — que es justo la pregunta que llega cuando el gasto sube. Ambas columnas son **nullable y sin backfill**: las filas de seed conservan `NULL` honesto (no se sabe quién) en vez de un valor inventado. `source` lleva **CHECK de vocabulario cerrado** (`operator_ui | nexa | mcp | seed | backfill`) — si el motor sólo entiende N valores, que el schema los enumere: un `source` nuevo debe romper el INSERT, no colarse invisible en toda lectura que agrupe por procedencia. 🔴 `source` y `tags` son dimensiones **ortogonales** y por eso son dos columnas: `tags` es clasificación de dominio que elige el operador; `source` es procedencia técnica del write. Meterla dentro de `tags` rompería cualquier filtro de dominio que lea ese arreglo.
 - `seo_competitors` — dominios competidores por target (append-only con effective_from/to).
 
 ### 4.2 Serie temporal (append-only, inmutable — el corazón)
@@ -127,6 +151,16 @@ Se envuelven en una sola narrativa de producto: **Search Visibility 360** = los 
 - **SoV orgánico** = visibility_propio / (propio + Σcompetidores) — espejo del SoV IA del AEO.
 - **Movers** = Δposición vs snapshot anterior (umbral ≥3), ponderado por volumen.
 - **Cannibalization** = misma query con >1 URL propia rotando entre snapshots (solo detectable con la serie GSC real).
+
+> **Delta 2026-08-07 (TASK-1307) — el AI Overview viaja DENTRO de la serie de rank, y sólo dentro de la ◑.**
+>
+> `RankEvolutionPoint` y `SeoPerformancePoint` (`contracts.ts`) ganaron un campo **aditivo** `aiOverview?: boolean`. Origen: `(serp_features ? 'ai_overview')` en PG y `'ai_overview' IN UNNEST(IFNULL(JSON_VALUE_ARRAY(serp_features), []))` en BigQuery (`rank-evolution-reader.ts`) — es decir, un atributo del **propio snapshot SEO** ya capturado con `load_async_ai_overview: true` (§8), no un dato nuevo ni un cruce.
+>
+> 🔴 **El campo sólo viaja cuando es `true`.** `...(row.ai_overview === true ? { aiOverview: true } : {})`: los consumers legacy comparan puntos por igualdad estructural, y emitir `aiOverview: false` en cada punto les cambiaría el shape sin cambiar el significado. La ausencia del campo es "no hubo AIO **o** esta fuente no lo reporta" — y ambas cosas se leen igual: no se marca.
+>
+> 🔴 **Sólo existe en la serie ◑ (DataForSEO). Search Console NO reporta features del SERP**, así que una serie ● jamás lleva marcadores. Esa ausencia es **honestidad, no un hueco del lector**: marcar AIO sobre una serie GSC sería afirmar una observación que nadie hizo.
+>
+> **Por qué está acá y no en el AEO.** Es el puente SEO↔AEO de la pantalla ancla: una **caída de CTR con posición estable** casi siempre se explica en la SERP, no en el sitio (señal 4 de §2, ahora medible en la misma serie). ⚠️ **NO cruza el boundary §1.1**: no hay JOIN, VIEW ni FK entre `seo_*` y `grader_*` — es una columna del snapshot SEO leída por el mismo reader que ya la capturaba.
 
 ---
 
@@ -169,9 +203,26 @@ chokepoint como lectura, SIN anti-oracle por diseño — visibilidad operativa).
 (criterio de aceptación en TASK-1303/1304/1311/1312/1313/1314/1317). La federación al gateway
 `mcp.efeonce.org` es `TASK-1647` (adapter delgado del provider; canaries antes de discovery).
 
+**Delta 2026-08-07 (TASK-1308) — el lane SEO deja de ser sólo lectura.** `keywords/track` y
+`keywords/untrack` son sus **dos primeros commands**: van por `runEcosystemCommandRoute`, no por el
+helper de lectura, porque un write necesita idempotencia por `Idempotency-Key` + auditoría de
+ejecución — un reintento del gateway sobre un timeout de red no puede volver a comprometer gasto. El
+actor que llega al command es `mcp:<consumer.publicId>`: en este lane el sujeto es la MÁQUINA, no una
+persona. 🔴 **Sólo bindings de scope `internal`** (`403 scope_not_allowed`): un binding cliente lee sus
+oportunidades pero **no hace crecer su propia factura**; y el mismo boundary aplica a la baja, aunque
+bajar el gasto suene inofensivo — quien no decide qué se mide tampoco decide qué se deja de medir. En
+el MCP interno son `track_seo_keywords` / `untrack_seo_keywords` (`src/mcp/greenhouse/server.ts`),
+federadas al gateway bajo `efeonce.mcp.seo.write`. ⚠️ **Fail-closed hasta que exista un cliente con
+grant controlable**: el scope está creado en Entra pero deliberadamente NO cableado al cliente PKCE
+público compartido — en esta cadena es la única puerta que depende de QUIÉN es la persona, y abrirla a
+todo el tenant daría poder de comprometer gasto DataForSEO recurrente a cualquiera que se autentique
+(razonamiento completo en `EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md` §"El scope de escritura NO se
+cablea al cliente público compartido"; el camino correcto es `TASK-1631`).
+
 **Commands (write, capability-gated, audited, outbox):**
 - `configureSeoTarget(orgId, { rootDomain, market }, actor)`
-- `trackKeywords(keywordSetId, keywords[], actor)`
+- `trackKeywords(seoTargetId, keywords[], actor)` — **IMPLEMENTADO (TASK-1308, 2026-08-07)** en `src/lib/growth/seo/track-keywords.ts`. 🔴 **No es un INSERT: es un COMPROMISO DE GASTO DIFERIDO.** El write no cuesta nada; el rank capture diario (TASK-1303) le paga al proveedor por cada keyword vigente del set, en cada ciclo, hasta que alguien la deje de seguir. Por eso lleva **techo gobernado por target** (`GROWTH_SEO_TRACKED_KEYWORDS_PER_TARGET`, default 200 → outcome `capacity_exceeded` explícito, nunca silencio ni excepción), **entitlement per-org** (`seo_v1` vigente; NO consume allowance de site-audit — seguir no gasta hoy, gasta mañana), **outcome POR keyword** (`tracked|already_tracked|capacity_exceeded|invalid`, nunca un booleano), normalización + dedupe, idempotencia (`ON CONFLICT DO NOTHING` sobre el índice único parcial) y `FOR UPDATE OF` contra dos "Seguir" concurrentes. Append-only: sólo inserta — dejar de seguir es cerrar `effective_to` y es OTRO command, `untrackKeywords`, entregado en la misma task (abajo). App-lane `POST /api/admin/growth/seo/keywords/track` (capability `growth.seo.target.configure`) + lane ecosystem `POST /api/platform/ecosystem/growth/seo/keywords/track` (**sólo bindings de scope `internal`**: un binding cliente lee sus oportunidades pero no hace crecer su propia factura) + MCP tool `track_seo_keywords`, federada al gateway con el **scope de escritura del dominio** `efeonce.mcp.seo.write` — del DOMINIO y no de la capability: un scope por capability convertiría la lista de scopes de Entra en un espejo del `capabilities_registry`, editado a mano, que diverge; y el gateway NUNCA es autoridad de autorización. La regla es **un scope por clase de blast-radius** (`globe.credits.funding.ensure` tiene el suyo porque mueve dinero, no porque sea una capability). Lo fino ya se enforcea abajo: binding `internal` + entitlement per-ORG + techo. Evento `growth.seo.keyword_set.updated` emitido dentro de la transacción.
+- `untrackKeywords(seoTargetId, keywords[], actor)` — **IMPLEMENTADO (TASK-1308)**, el reverso que hace REVERSIBLE el compromiso de gasto: sin él, seguir una keyword la dejaba en el ciclo de facturación del proveedor para siempre y el techo del set era un callejón sin salida. **NO borra**: cierra `effective_to` (append-only, trigger anti-DELETE de TASK-1299), así que el histórico sigue explicando facturas pasadas y el índice único parcial permite volver a seguirla después. 🔴 Usa `clock_timestamp()` y NO `NOW()`: `NOW()` devuelve el inicio de la transacción y cerrar una membresía creada en ella produce `effective_to = effective_from`, que revienta el CHECK `effective_to > effective_from` (23514) — lo encontró el sanity contra PG real, los mocks lo daban por bueno. A diferencia del alta **NO exige target activo**: si el target se pausó con el set lleno, bloquear la salida congelaría el gasto. App-lane `POST /api/admin/growth/seo/keywords/untrack` + lane ecosystem (sólo bindings `internal`) + MCP tool `untrack_seo_keywords` federada, compartiendo el scope del alta — quien puede subir la factura puede bajarla.
 - `queueSiteAudit(targetId, actor)` (async OnPage task)
 - `setBacklinkTracking(targetId, competitors[], actor)`
 
@@ -185,8 +236,15 @@ chokepoint como lectura, SIN anti-oracle por diseño — visibilidad operativa).
   - **"Alta impresión" es un percentil de la propia organización** (default P75), no un número absoluto: un sitio de 100 impresiones/día y uno de 1M no comparten umbral. Con piso estadístico (bajo ~10 impresiones la posición media no es interpretable).
   - **Score = clics incrementales estimados**: `impresiones × max(0, CTR_objetivo − CTR_actual)`. Las impresiones de GSC **ya son demanda medida** — y de la propia SERP, mejor que un volumen estimado por un tercero. La curva de CTR por posición se **deriva de los datos de la propia org**, de modo que absorbe sola el efecto de los AI Overviews en ese sitio; hay una curva pública de fallback sólo para posiciones sin datos propios.
   - **Canibalización se marca, no se descarta** (`cannibalized` + `competingPages`): una query con >1 página es una oportunidad de **consolidación**, no de optimización.
-  - Volumen/dificultad de DataForSEO Labs (TASK-1300) es **enriquecimiento**, no el corazón: mientras no aterrice, el reader responde `market: 'unavailable'` con el striking-distance completo.
+  - Volumen/dificultad de DataForSEO Labs es **enriquecimiento**, no el corazón: mientras no exista la capability que los trae y los persiste (el registry de `TASK-1300` ya está, falta fetch + columnas + reader), el reader responde `market: 'unavailable'` con el striking-distance completo.
 - `readSeoAeoGap(targetId)` → **derived read cross-módulo — IMPLEMENTADO (TASK-1305, 2026-08-05)** en `src/lib/growth/seo/gap/read-seo-aeo-gap.ts`. V1: lente SEO = `seo_gsc_daily` (posición medida ponderada por impresiones, ventana 28d) × lente AEO = `grader_scores` del último run reportable del org (granularidad `domain`; TASK-1311 la refina a URL). Cruce EN MEMORIA por `organization_id` (boundary §1.1: cero JOIN/VIEW/FK cross-motor, verificado por test dedicado); clasificador puro `classifyQuadrant` (página 1 × score ≥ 50, umbrales overridables, jamás promediados); degradación honesta `no_seo_data`/`no_aeo_data`. Cuando TASK-1303 aterrice, `seo_rank_snapshots` se suma como lente de mercado sin cambiar el contrato. Primer resultado live: Berel #1.75 orgánico × AEO 44.5 → `riesgo` (autoridad sin citabilidad — el CTA cruzado al AEO funcionando).
+
+**Readers de la pantalla ancla (TASK-1307, 2026-08-06/07)** — `src/lib/growth/seo/performance/`. Lane `/api/platform/ecosystem/growth/seo/{performance,performance-catalog}` + MCP tools `get_seo_performance` / `get_seo_performance_catalog` en el mismo PR (mandato parity+MCP).
+
+- `readSeoPerformance(orgId, { mode, metric, items, rangeDays, device })` → `{ series, standings, summary, source, itemsWithoutData }`. **Una pregunta, una lectura**: el chart y la tabla salen del MISMO llamado, porque partirlo habría duplicado ventana, ancla y derivación del Δ — y abierto la puerta a que chart y tabla discrepen sobre el mismo dato. La **fuente se deriva de (modo × métrica)** por la función pura y exportada `resolveSeoPerformanceSource` — es la regla de honestidad del módulo y tiene que poder probarse sin base de datos — y se declara en `source` (`gsc_measured` | `dataforseo_estimated`): no hay celda mixta, una serie completa pertenece a una sola fuente. `items` vacío da `no_items`, que es un **estado inicial legítimo, no un error**. `value: null` es hueco de primera clase (§10.3). Techo de 25 ítems por lectura (guard de recurso del reader, distinto del límite de legibilidad de la UI). Split PG/BQ **por cobertura** (mismo criterio que §4): si el primer día de PG llega después del inicio de la ventana, la lectura completa va a BQ; con BQ vacío cae a PG y sirve lo que hay.
+- `readSeoPerformanceCatalog(orgId, { mode, windowDays, limit })` → `{ items, sets? }`. `items` es la **unión** de dos universos que no coinciden (keywords con volumen medido en `seo_gsc_daily` + keywords trackeadas en `seo_rank_snapshots`), con `tracked` para que la UI distinga ●/◑ e `impressions: 0` que significa "todavía sin impresiones", nunca una medición de cero.
+  - **Delta 2026-08-07 — presets de comparación DATA-DRIVEN (`sets`).** Devuelve además los `seo_keyword_sets` **nombrados** del target **activo**, con sus miembros **vigentes** (`effective_to IS NULL` — la tabla es append-only, el "borrado" es cierre de vigencia, §4.1). Sólo en **modo keyword**: en modo URL el eje de páginas sólo existe en Search Console y no hay set configurable que agrupar. Contrato en `SeoPerformanceCatalogSet` / `SeoPerformanceCatalogResult`; el campo es **opcional y sólo viaja cuando hay sets**, así que ningún consumer previo cambia. 🎯 **Por qué data-driven y no una lista de grupos en el código**: la agrupación que le importa al operador ("Marca", "Categoría") ya la declaró al configurar el target — inventar agrupaciones propias en la UI crearía una segunda taxonomía que diverge de la que gobierna el gasto de rank capture. La description de `get_seo_performance_catalog` documenta `data.sets` y le pide al agente **preferir estos grupos curados antes que inventar comparaciones**.
+- `deriveSeoPerformanceInsight(summary)` (`performance/derive-insight.ts`) — **no es un reader: es una derivación PURA** sobre el mismo `SeoPerformanceSummary` que alimenta la banda de KPIs. No re-consulta nada. Existe porque la pantalla muestra 4 KPIs pero el **diagnóstico vive en la relación entre ellos**: ¿cayeron los clics por posición, por demanda, o porque el SERP se queda con el clic? Cuatro patrones con umbrales explícitos — `demand_drop` (clics e impresiones caen juntos con posición estable), `ctr_erosion` (posición e impresiones estables + CTR cae: el patrón compatible con AI Overviews, que se lee junto a los marcadores `aiOverview` de §5), `rank_gain`, `rank_loss`. Umbrales: posición estable `|Δ| < 0.3`; movimiento de volumen relevante `|Δ%| ≥ 15`; movimiento de CTR relevante `|Δ| ≥ 0.5` puntos porcentuales. 🔴 **Devuelve `null` sin ventana previa comparable o con señales mezcladas, y la UI entonces no dice nada**: un insight ambiguo es peor que ninguno — un diagnóstico equivocado se repite en una reunión con el cliente y cuesta más que el silencio. Orden de evaluación deliberado: primero los patrones que **excluyen** al sitio como causa (demanda, SERP), después los atribuibles a posición; el primero inequívoco gana. Tests: `performance/__tests__/derive-insight.test.ts`.
 
 **Readers de superficie del cockpit Overview (TASK-1306, 2026-08-06)** — `src/lib/growth/seo/overview/`. Son plumbing de SUPERFICIE, no contratos de negocio nuevos: proyectan lo ya materializado para el nodo S1 y **los cuatro respetan `isSeoModuleEnabled`** (con el módulo apagado un reader no puede devolver datos aunque la page fallara en 404-ear).
 
@@ -249,11 +307,13 @@ growth.seo.entitlement.manage   (execute, tenant)  SOLO EFEONCE_ADMIN + EFEONCE_
 
 `Growth` sigue siendo dominio raíz. Dentro, sección local **"Search Visibility"** que agrupa dos motores hermanos: **SEO** (nuevo) + **AEO Grader** (existente, intacto).
 
-Rutas operador (`internal`): `/admin/growth/seo` (Overview — **IMPLEMENTADA**, TASK-1306), `/admin/growth/seo/performance` (★ evolución URLs), `/admin/growth/seo/keywords`, `/admin/growth/seo/audit` (+ `/[issueGroup]`).
+Rutas operador (`internal`): `/admin/growth/seo` (Overview — **IMPLEMENTADA**, TASK-1306), `/admin/growth/seo/performance` (★ evolución URLs — **IMPLEMENTADA**, TASK-1307), `/admin/growth/seo/keywords` (**IMPLEMENTADA**, TASK-1308), `/admin/growth/seo/audit` (+ `/[issueGroup]`).
 Rutas cliente (`client`): `/growth/seo`, `/growth/seo/performance`, `/growth/seo/report`.
 Toda `page.tsx` nueva → `route-reachability-manifest.ts` + key en `GH_INTERNAL_NAV`.
 
 **Contrato de la sección local, vigente desde TASK-1306 (2026-08-06).** Las 4 rutas operador comparten **un solo viewCode**, `administracion.growth_seo` (sembrado por `20260806223132770`, presente en `view-access-catalog.ts`, grants a `efeonce_admin` + `ai_tooling_admin`), y **un solo ítem de menú** (`/admin/growth/seo` en `VerticalMenu`, key `GH_INTERNAL_NAV.growthSeo`). Las tres hermanas son **child routes**: NO siembran viewCode nuevo, NO suman ítem de nav, pero **SÍ** se declaran en `route-reachability-manifest.ts` con `parent: '/admin/growth/seo'` + `via: 'tab'` + `reason`.
+
+**Delta 2026-08-07 (`67c2d1218`) — UN header canónico para las tres pestañas.** Resumen · Rendimiento · Keywords montan el **mismo shell**: `SurfaceRecipe kind='analyticsReport'` con la región `header` = `WorkbenchHeader kind='report'`, y el **mismo reparto de regiones** en las tres: `secondaryActions` = el alcance que el operador cambia (Space, período, device); `meta` = frescura del dato; `supporting` = los tabs hermanos bajo su divisor. La causa raíz que corrige: ninguna usaba la región `header` de la recipe — el chrome vivía dentro de `primary`, así que título, selects, chip de frescura y tabs quedaban flotando sobre el lienzo sin superficie que los contuviera, y **cada pantalla lo había resuelto distinto**. 🎯 **Regla para la pestaña que falte** (`/audit`, TASK-1309): entra por este shell, no inventa su propio chrome — tres soluciones distintas al mismo problema es exactamente lo que produjo el defecto. Corolario del reparto: **lo que aplica a toda la pantalla va al header; lo que describe un artefacto va con el artefacto** (por eso la leyenda ●/◑ bajó a la card del chart, §10.3).
 
 El conmutador es `SeoSearchVisibilityTabs`: cada tab es una **ruta propia** navegada con `next/link` (no un `TabPanel` en memoria), para que deep-link, back/forward y enlace compartible funcionen solos. Las hermanas aún inexistentes se declaran `available: false` con el motivo visible — **un tab que navega a un 404 es peor que un tab deshabilitado**. Activar una hermana = quitar esa línea. El contenedor declara `role='navigation'`, NO `tablist`: son links a rutas, y con el rol por defecto axe exigiría un `aria-controls` apuntando a un panel real que acá no existe.
 
@@ -261,14 +321,39 @@ El conmutador es `SeoSearchVisibilityTabs`: cada tab es una **ruta propia** nave
 
 ### 10.2 Superficies por rol
 
-- **Operador Efeonce:** cockpit denso, multi-Space, datos crudos, acciones. **Overview (S1) IMPLEMENTADO** (TASK-1306, code complete en `develop`): Space picker + selector de período (`?range=` con allowlist server-side) + 4 KPIs norte + curva de visibilidad + sidebar salud/movers/cruce AEO.
+- **Operador Efeonce:** cockpit denso, multi-Space, datos crudos, acciones. **Overview (S1) IMPLEMENTADO** (TASK-1306, code complete en `develop`): Space picker + selector de período (`?range=` con allowlist server-side) + 4 KPIs norte + curva de visibilidad + sidebar salud/movers/cruce AEO. **Pantalla ancla (S2) IMPLEMENTADA** (TASK-1307, `complete`): set comparable con presets data-driven, chart ECharts de evolución con procedencia propia, granularidad diario/semanal, marcadores AI Overview, bandas de updates de Google y tabla de standings con Δ30d (§10.3). **Site audit (S4) IMPLEMENTADO** (TASK-1309): salud + freshness explícito + issues como lista priorizada + drill `?issueGroup=` + enqueue gobernado (§10.6). Con S4 el conmutador de "Search Visibility" queda **completo: las 4 tabs navegan**.
 - **Cliente:** dashboard self-service de SU Space, curado, honesto, mono-Space.
 - **Report Artifact:** snapshot narrativo imprimible/PDF (3.er render adapter del mismo model, mirror del AEO report artifact).
 - **Público (diferido):** "SEO quick check" de 1 dominio sobre el chokepoint gobernado.
 
 ### 10.3 Pantalla ancla — Rank & URL performance over time
 
-Line chart multi-serie (**eje Y de posición invertido**, 1=arriba=mejor), 1 línea por URL/keyword con line-style+marker distintos (colorblind-safe), target line "top-3", band highlight de eventos de algoritmo, `dataZoom` temporal, tabla TanStack debajo con Δ30d + sparkline por fila. Set seleccionable (multi-select + chips) persistido en `?urls=`/`?keywords=`.
+Line chart multi-serie (**eje Y de posición invertido**, 1=arriba=mejor), 1 línea por URL/keyword con line-style+marker distintos (colorblind-safe), target line "top-3", band highlight de eventos de algoritmo, `dataZoom` temporal, tabla debajo con Δ30d + sparkline por fila (sobre `DataTableShell`, obligatorio por columnas + orden + sparkline embebido). Set seleccionable (multi-select + chips) persistido en `?urls=`/`?keywords=`.
+
+> **Delta 2026-08-07 (TASK-1307) — lo que la pantalla ancla ganó, y los contratos que eso fija.** Todo en `src/views/greenhouse/admin/growth/seo/performance/` + la page `/admin/growth/seo/performance`.
+>
+> 1. **Presets de comparación como chips**, alimentados por `catalog.sets` (§7). El operador compara "Marca" de un click en vez de tipear keywords una por una. La UI ofrece **exactamente** los sets configurados en el target; si no hay ninguno, no hay chips — nunca un grupo inventado.
+> 2. **Lectura cruzada de los 4 KPIs** como callout (`deriveSeoPerformanceInsight`, §7). Aparece **sólo** cuando el patrón es inequívoco.
+> 3. **Carril de AI Overview**: un rombo por fecha con AIO (`aiOverview`, §5), anclado al borde inferior del lienzo y **sólo en la métrica de posición**. Es un carril de **contexto, no una serie de datos** — `silent`, sin énfasis, y el tooltip lo narra **sin número** (un rombo no tiene "valor"). Junto al patrón `ctr_erosion` es la conversación completa: "no perdiste posición, el SERP se quedó con el clic".
+> 4. **Rango de 365 días** (`ALLOWED_RANGE_DAYS = {28, 90, 180, 365}` en la page). Un valor fuera de la allowlist cae al default: el `?range=` es **compartible pero no autoridad** (§10.1). A 365 días la ventana pedida excede la ventana caliente de PG, así que el split por cobertura de `readSeoPerformance` sirve la lectura desde BigQuery (`seo_gsc_history`) — y si BQ aún está vacío (pre-backfill), cae a PG y sirve lo que hay, declarándolo como serie rala en vez de fingir 12 meses.
+> 5. **Granularidad Diario / Semanal** en el hero (`toWeekly`), con default **semanal sobre 120 días medidos**: en rangos largos el punto-por-día es una nube de marcadores que esconde la forma. 🔴 **Las reglas de agregación son las del módulo, no promedios ingenuos**: clics e impresiones se **suman**; posición y CTR **promedian sólo sobre los días MEDIDOS** de la semana (un `null` no diluye, porque **un hueco no es un cero**); una semana **sin ninguna** medición da `null` y se dibuja como hueco; `aiOverview` semanal es "hubo AI Overview en **algún** día de la semana". Un `AVG` plano sobre los 7 días metería ceros fantasma justo donde no hubo medición.
+> 6. **Bandas de updates confirmados de Google** (`events`, §"Registro de updates" abajo), recortadas a las fechas que existen como categoría del eje: si ninguna cae dentro, **la banda no se dibuja** — nunca se inventa una categoría para poder pintarla.
+> 7. **La procedencia ●/◑ vive DENTRO de la card del chart** (`source: SeoPerformanceSource`), no en la cabecera de la pantalla (movida en `67c2d1218`). Razón de contrato, no cosmética: **un gráfico que carga su propia procedencia sigue siendo honesto cuando alguien lo recorta y lo pega en una presentación**. La cabecera conserva sólo la frescura del dato, que sí aplica a toda la pantalla.
+>
+> **Invariantes de la pantalla ancla (NUNCA — son lo que protege la honestidad de la lectura):**
+>
+> - **NUNCA promediar la serie ● (medida, GSC) con la ◑ (estimada, DataForSEO).** El fallback por cobertura elige **UNA** y la declara en `source`; "si no vienen de una, vienen de la otra", jamás mezcladas (contrato §5 + §1.1).
+> - **NUNCA renderizar un hueco como `0`** — ni en la serie diaria ni en la agregación semanal. Posición 0 no existe, y 0 clics afirma "apareciste y nadie hizo clic" cuando la verdad es "no se midió". El `null` viaja hasta el chart y `connectNulls: false` corta la línea; omitir el punto haría que ECharts uniera los extremos e **interpolara una medición que nunca existió**.
+> - **NUNCA marcar AI Overview sobre una serie GSC**: el dato no existe ahí. La ausencia de marcadores en una serie ● es honestidad, no un hueco del componente.
+> - **NUNCA agregar una banda de update al registro sin verificación web y confirmación de Google.**
+> - **El insight cruzado se CALLA ante señales mezcladas**; jamás especula ni rellena con la explicación más plausible.
+>
+> **Registro curado de updates de Google** (`src/lib/growth/seo/algorithm-updates.ts`: `CONFIRMED_ALGORITHM_UPDATES` + `algorithmUpdatesInRange(from, to)`). Existe porque una caída **colectiva** de posiciones dentro de una ventana de update tiene una explicación distinta a una caída propia del sitio, y esa distinción **es** la conversación con el cliente. Reglas del registro:
+>
+> - **SÓLO updates confirmados por Google** (Search Status Dashboard / anuncios oficiales). Jamás "algo se movió" de terceros: 🔴 **pintar un rumor como banda en el gráfico de un cliente es fabricar contexto** — y el cliente lo va a citar como si fuera un hecho de Google.
+> - **Mantenimiento MANUAL y deliberado**, con verificación web en cada tanda y su as-of. Automatizarlo contra un feed de terceros es **follow-up declarado** en TASK-1307, no un TODO implícito: un feed automatizado es exactamente el vector por el que entraría un rumor sin que nadie lo revise.
+> - **Sólo updates de búsqueda ORGÁNICA** (core/spam). Los específicos de Discover no entran: este chart mide rank orgánico, y una banda que no puede explicar la serie sólo agrega ruido con apariencia de causa.
+> - Entradas vigentes, **verificadas 2026-08-07**: spam update mar 2026 (24–25 mar), core update mar 2026 (27 mar–8 abr), core update may 2026 (21 may–2 jun).
 
 ### 10.4 Dataviz (política ECharts para alto impacto)
 
@@ -282,11 +367,244 @@ Evolución posición = line multi-serie (Y invertido); clicks/impresiones = area
 >
 > El **dual-axis sigue prohibido**: la curva de visibilidad de S1 son **dos charts apilados** que comparten eje X (clics de 0 a miles vs posición 1–20 invertida). Y el fallback tabular ("Ver tabla de datos") no es opcional: un chart nunca puede ser la única forma de leer la serie.
 
-> **Nota de estado (2026-07-01):** ECharts aún NO está instalado (el repo corre ApexCharts 3.49 + Recharts). Instalar `echarts` + `echarts-for-react` (lazy por ruta) es Slice 0 de la pantalla ancla `TASK-1307` — Greenhouse sería el primer consumer del stack ECharts (alineado con la deprecación oportunista de ApexCharts, TASK-518). La alternativa B (line multi-serie Y-invertido sobre ApexCharts con `yaxis.reversed` + annotations) queda documentada en TASK-1307 por si Discovery la prefiere. `CustomChip`/`CustomAutocomplete` no existen como tal → usar `GreenhouseChip` + `@core/components/mui/Autocomplete`.
+> **Delta 2026-08-07 (TASK-1308) — el scatter de oportunidad NO usa los ejes que este §10.4 describía, y no debe usarlos.**
+>
+> El texto de arriba especifica *"X dificultad, Y volumen, size clicks, color intención"*. **Ninguna de las tres fuentes existe**: `readKeywordOpportunities` devuelve `searchVolume: null`, `difficulty: null` y `market: 'unavailable'` — ⚠️ **no porque falte `TASK-1300`, que está `complete`**: esa task entregó el registry de familias (la `labs` es llamable, y `rank-history-seed.ts` ya la usa), pero es *infra de cliente, no capability*. Falta el fetch de volumen/dificultad por keyword Y las columnas donde guardarlo — el schema SEO no tiene `search_volume` ni `keyword_difficulty`, y el contrato **no tiene campo de intención**. Implementarlo literal habría dado un lienzo vacío o, peor, datos fabricados.
+>
+> La skill `seo-aeo` (§02, método verificado contra la API real de GSC) lista *"priorizar por volumen estimado de un tercero teniendo el GSC propio, donde la demanda ya está medida"* como un **error de método**. Las impresiones de Search Console son demanda medida de la SERP propia del cliente — con su país, su dispositivo y su mezcla real de queries — y son mejor insumo que un volumen promedio de mercado.
+>
+> **Encoding canónico vigente:** X = **posición ponderada** (rango fijo 8→20, izquierda = más cerca de la primera plana) · Y = **impresiones** (log; la distribución es long-tail y en lineal el 90% se apila contra el eje) · tamaño = **clics incrementales estimados** (área ∝ ganancia, no radio) · color **+ forma** = **acción recomendada**. Zona sombreada = primera plana (posición ≤ 10).
+>
+> 🎯 **Y el dato de mercado, cuando exista, NO será un eje: será una COLUMNA y un FILTRO.** («Cuando exista» = cuando alguien construya la capability sobre el registry ya entregado; no es esperar a `TASK-1300`.) Los ejes medidos son metodológicamente correctos con o sin él, así que el contrato de la superficie no se rompe al llegar — `searchVolume`/`difficulty` ya son `number | null` y la tabla los pinta honestos hoy ("Sin dato de mercado", nunca `0` ni un guion ambiguo) y reales mañana, sin tocar el componente.
+>
+> ⚠️ **Canibalización es una ACCIÓN, no una variante visual de "oportunidad".** Una query con más de una página no se optimiza: se **consolida** (unificar, 301, canonical o diferenciar intención). Tiene serie propia, forma propia y verbo propio en toda la superficie, y su clasificador vive en un módulo compartido para que mapa, filtros y tabla no puedan derivar entre sí.
+
+### Delta 2026-08-07 — el módulo responde TRES preguntas, y sólo una tenía superficie
+
+Cuestionando el encoding del scatter apareció que el módulo tiene **tres preguntas distintas**, con
+fuentes distintas, y que hasta ahora sólo la primera existía como producto:
+
+| Pregunta | Fuente | Estado |
+|---|---|---|
+| ¿Qué empujo de lo que ya tengo? | GSC **medido** | construida (`TASK-1308`) |
+| ¿Dónde quiere estar el cliente? | **declarado por un humano** | `TASK-1659` (modelo) + `TASK-1660` (superficie) |
+| ¿Qué me pierdo entero? | competencia + Labs | `TASK-1661` (mercado) + `TASK-1662` (gap) |
+
+🔴 **Search Console es estructuralmente ciego a las dos últimas.** Si el cliente no está en el top
+~100 no hay impresiones, así que esa búsqueda **no existe** en sus datos. No es una limitación del
+reader: es una propiedad de la fuente. Por lo tanto ninguna superficie construida sobre GSC podrá
+nunca contestar «¿qué me estoy perdiendo?».
+
+**Consecuencia sobre el dato de mercado, que corrige lo dicho más arriba.** Para una keyword donde
+el cliente **sí** rankea, el volumen de mercado es enriquecimiento y los ejes medidos siguen siendo
+lo correcto. Pero para una keyword donde **no** rankea, GSC no entrega nada, y volumen y dificultad
+pasan a ser la **única** forma de contestar *¿vale la pena?* y *¿cuánto cuesta?*. Ahí dejan de ser
+opcionales: son **dependencia dura** del carril aspiracional, y sin ellos se aceptan objetivos a
+ciegas.
+
+**Lo que ya existía sin que nadie lo notara.** `trackKeywords` **acepta strings arbitrarios** — no
+valida contra la lista de oportunidades (verificado 2026-08-07). O sea que seguir una keyword que el
+cliente no rankea **ya funciona por contrato** desde `TASK-1308`: el rank capture la mide igual. Lo
+que falta es la superficie. Es Full API Parity **al revés** — el pecado habitual es "la UI lo hace y
+no hay contrato"; acá el contrato existe y no hay botón, así que la capacidad sólo es alcanzable por
+MCP o `curl`, justo donde no hay confirmación visual del cupo ni del gasto comprometido.
+
+**Y lo que falta modelar.** El set monitoreado no sabe **por qué** una keyword está ahí: `source`
+(`TASK-1308`) es procedencia —quién la metió—, no intención. Sin esa distinción, "estoy en la 12 y
+quiero la 5" y "el cliente quiere rankear acá y estoy en la 60" son la misma fila, no hay avance
+contra objetivo, y un objetivo lejano contamina cualquier KPI agregado leyéndose como fracaso
+permanente.
+
+> **RESUELTO 2026-08-06/07 (TASK-1307 Slice 0) — ECharts entró, y el chart ancla es su primer consumer.** `echarts` + `echarts-for-react` están instalados y el seam canónico es **`src/libs/styles/AppECharts.tsx`** (`dynamic(ssr: false)`, wrapper obligatorio). Se eligió por dos razones que la alternativa Apex no cubría: (a) los seis requisitos del chart ancla — eje Y invertido, `dataZoom`, tooltip de eje multi-serie, target line, band highlight de updates y last-value labels — son **primitivas de primera clase** en ECharts (`yAxis.inverse`, `dataZoom`, `tooltip.trigger:'axis'`, `markLine`, `markArea`, `endLabel`), mientras en Apex serían annotations manuales + un segundo chart de brush para el zoom; (b) **robustez**: ECharts pinta a canvas y recibe colores **ya resueltos** (`resolveChartColor`), así que no puede repetir el hallazgo 🔴 de TASK-1306 (Apex parsea CSS vars de MUI y lanza 8 excepciones invisibles por corrida). El `ssr: false` **no es cosmético**: ECharts mide su contenedor al montar, y renderizarlo en servidor daría un chart de tamaño cero + mismatch de hidratación. El lazy-load por ruta mantiene los ~250-400 KB fuera del bundle compartido — sólo los paga quien abre la ruta. Los hallazgos 1–3 del delta TASK-1306 **siguen vigentes para los ~32 consumidores Apex del repo**; lo que cierra este Slice 0 es la elección del stack de alto impacto del módulo, no la deuda de Apex.
+>
+> **Nota de estado (2026-07-01, superada por el párrafo anterior — se conserva por trazabilidad):** ECharts aún NO está instalado (el repo corre ApexCharts 3.49 + Recharts). Instalar `echarts` + `echarts-for-react` (lazy por ruta) es Slice 0 de la pantalla ancla `TASK-1307` — Greenhouse sería el primer consumer del stack ECharts (alineado con la deprecación oportunista de ApexCharts, TASK-518). La alternativa B (line multi-serie Y-invertido sobre ApexCharts con `yaxis.reversed` + annotations) queda documentada en TASK-1307 por si Discovery la prefiere. `CustomChip`/`CustomAutocomplete` no existen como tal → usar `GreenhouseChip` + `@core/components/mui/Autocomplete`.
 
 ### 10.5 Estados y honestidad (state-design)
 
 Sin conexión GSC → `EmptyState` accionable + CTA OAuth (nunca ceros fantasma). Medido (●, GSC) vs estimado (◑, DataForSEO) con leyenda persistente. Latencia explícita ("GSC: datos hasta hace 2 días"). Cuota agotada → banner honesto + degrada a GSC medido. Fallo parcial → mostrar lo que llegó, marcar el resto "Pendiente" con razón (`observeAndDegrade`).
+
+### 10.6 Site audit (S4) — superficie operador
+
+Ruta `/admin/growth/seo/audit` (TASK-1309), child del viewCode `administracion.growth_seo` con el
+guard de 3 puertas de §10.1. Cliente PURO de `readSiteAuditReport` + `queueSiteAudit`: no deriva
+salud, no fabrica snapshots y no toca DataForSEO en el render.
+
+> **Delta 2026-08-08 (TASK-1309) — contratos que fija esta superficie.**
+>
+> 1. 🔴 **El gauge de salud es un arco SVG determinista, NO un radialBar de ApexCharts** — pese a lo
+>    que §10.4 especificaba. Un radialBar mide su contenedor al montar y dentro de una columna fluida
+>    mide 0: no dibuja, sin error visible (hallazgo de TASK-1306 en GVC). El arco vive en
+>    `src/views/greenhouse/admin/growth/seo/shared/SeoHealthGauge.tsx` y lo comparten el sidebar del
+>    Overview y esta pantalla: es la MISMA métrica, y duplicar el dibujo dejaría que los umbrales
+>    diverjan y el mismo sitio se viera "sano" en una pantalla y "en riesgo" en la otra.
+> 2. **`healthScore === null` NO es 0** y el componente no lo renderiza: null (no calculado) y 0
+>    (sitio pésimo) llevan a conclusiones opuestas. El consumer dice "Pendiente" con palabras.
+> 3. **Los issues van como LISTA priorizada, no como tabla ordenable.** El orden ES la respuesta a
+>    "qué ataco primero"; una tabla la esconde detrás de un control que hay que descubrir. El
+>    `DataTableShell` aparece UNA vez, en el drill, donde sí hay una lista homogénea (las URLs).
+> 4. **El orden es severidad ▸ (alcance × valor de búsqueda ÷ esfuerzo), con la severidad como corte
+>    absoluto.** Un score único dejaría que 400 imágenes sin `alt` enterraran un 5xx. Fijado en
+>    `views/.../audit/group-audit-issues.ts` con test dedicado. El tercer eje (`value`) se agregó el
+>    mismo día por la auditoría `seo-aeo`; el detalle de por qué NO es redundante con la severidad
+>    está en el delta al pie de esta sección.
+> 5. **El `issueType` del reader es un id de máquina** (`is_broken`), así que la superficie necesita
+>    ficha es-CL. `GH_GROWTH_SEO_AUDIT_ISSUES` (`src/lib/copy/growth.ts`) cubre los 34 checks del
+>    allowlist de `findings-map.ts` con label + **tier de esfuerzo curado** (juicio editorial de
+>    Efeonce, declarado como estimación en la UI — DataForSEO no reporta costo de arreglo). **Un check
+>    nuevo en el allowlist obliga a escribir su ficha**: hay test de drift en ambos sentidos, y
+>    mientras no la tenga la UI NOMBRA el id crudo en vez de esconder el issue.
+> 6. **El drill vive en la misma ruta vía `?issueGroup=`**, no en un segmento dinámico paralelo: back
+>    y enlace compartible salen gratis y hay un solo page guard. Su tabla lleva **scroll interno
+>    acotado** — un grupo real trae 91 URLs y sin techo el drill mide ~5000px, expulsando de pantalla
+>    la lista que el operador venía recorriendo (hallazgo del GVC). El contenedor es focusable
+>    (`tabIndex=0` + `role=region`): una zona con scroll inalcanzable por teclado deja su contenido
+>    fuera del alcance de quien no usa mouse.
+> 7. **`POST /api/admin/growth/seo/audit/run`** — transporte puro sobre `queueSiteAudit`, gateado por
+>    **`growth.seo.audit.run`** (execute), distinta de `observation.read`: diagnosticar y gastarle al
+>    proveedor son permisos distintos. Responde **202**, no 200 — el crawl quedó encolado, no listo.
+>    6 códigos canónicos nuevos con `actionable` deliberado: `seo_audit_already_running` y
+>    `seo_audit_already_captured_today` van **`actionable: false`** porque son el guard de
+>    idempotencia haciendo su trabajo (reintentar es justo lo que NO corresponde); `seo_quota_exhausted`
+>    y `seo_budget_exhausted` son techos del mes; sólo `seo_provider_unavailable` (breaker abierto o
+>    falla del proveedor) es transitorio de verdad y ofrece reintento.
+> 8. **`resolveActiveSeoTargetId` se amplió a `resolveActiveSeoTarget`** (id + `rootDomain`): toda
+>    superficie que nombra el sitio necesita ambos, y resolverlos por separado invita a que cada
+>    consumer escriba su propio `SELECT` — que es lo que ya pasó en la ruta de keywords.
+>
+> **Delta 2026-08-08 (auditoría `seo-aeo` sobre la superficie).** El orden de la lista tiene TRES
+> ejes, no dos: severidad (corte absoluto) ▸ **alcance × valor de búsqueda ÷ esfuerzo**. El eje
+> `value` existe porque **la severidad NO encodea valor SEO**: dentro de `notice` conviven higiene
+> cosmética y señales reales, y con sólo alcance÷esfuerzo un favicon ausente en 91 páginas encabezaba
+> su tier por encima de imágenes sin `alt` en 50. `value: 'low'` pesa 0.5 y no 0 — la higiene se
+> hunde pero se sigue listando; esconderla sería la otra forma de mentir sobre el diagnóstico.
+> **Y los 4 checks de performance declaran su procedencia de LABORATORIO** (`findings-map.ts` ya lo
+> sabía; la capa de presentación lo había perdido): Google rankea con datos de campo (CrUX), así que
+> una ficha que prometa ranking sobre el número del crawl promete sobre la métrica equivocada.
+>
+> **Delta 2026-08-08 (revisión de producto sobre los frames reales).** Cuatro contratos más, tres de
+> ellos de la MISMA clase: dos cifras verdaderas puestas juntas sin decir qué mide cada una producen
+> una conclusión falsa. La superficie ya había cerrado ese hueco en `healthScore === null` y en la
+> performance de laboratorio; estas son la tercera y la cuarta instancia.
+>
+> 9. 🔴 **"Páginas revisadas" declara cuándo es el TECHO DEL CRAWL y no el sitio.**
+>    `SITE_AUDIT_MAX_CRAWL_PAGES` es 100 y Berel devolvió exactamente 100: ese número redondo es el
+>    crawl chocando su límite, no el tamaño del sitio. Sin declararlo, un sitio de 3.000 páginas se
+>    diagnosticaba al 3% y se titulaba "Salud del sitio: 95". Cuando el conteo iguala el techo, la
+>    cifra lo dice y la card explica que la salud describe **esa muestra**, no el sitio entero.
+> 10. 🔴 **El puntaje declara su alcance, porque no mide lo mismo que el conteo de issues.** "95 de
+>    salud" junto a "519 issues" se lee como contradicción — el operador lo preguntó apenas lo vio.
+>    No son la misma medición: el puntaje es el `onpage_score` **del proveedor** (su ponderación,
+>    sus ~65 checks) y el conteo sale de **nuestro catálogo curado de 34**. Es consistente —sin
+>    críticos, el score del proveedor se mantiene alto porque pesa sobre lo que rompe indexación—
+>    pero reconciliarlo es obligación de la superficie, no del lector. El texto cambia según haya
+>    críticos o no.
+> 11. **Los conteos por severidad SON el filtro** (`?severity=`, compartible y con back), en una
+>    banda cuyo ancho es el reparto — longitud, no texto suelto, para una relación parte-todo. Dos
+>    guardas: una severidad con 0 issues **no ofrece filtro** (prometería una lista vacía), y filtrar
+>    acota lo que se **lista**, nunca lo que se **cuenta** — si acotara ambos, filtrar parecería que
+>    el sitio mejoró. El drill se resuelve contra todos los grupos, así que un `?issueGroup=` de otra
+>    severidad abre igual en vez de morir en silencio.
+> 12. **La comparación contra el crawl anterior vive DENTRO de `readSiteAuditReport`**, no en un
+>    reader aparte: el lane `ecosystem` y la tool MCP son passthrough, así que el delta le llega a
+>    todos los consumers por construcción (Full API Parity) sin contrato paralelo. Sólo compara
+>    contra runs **terminados** (`succeeded`/`degraded`) — contra uno fallido o en vuelo el delta
+>    sería inventado — y sin crawl anterior **lo dice**: el hueco vacío sería ambiguo entre "no
+>    cambió" y "no hay con qué comparar". El módulo entero se vende como serie de tiempo y ésta era
+>    la única superficie que mostraba un punto.
+>
+> Además: el drill exporta el grupo completo como TSV (el site audit es material de conversación de
+> SOW y hasta acá terminaba en copiar 91 URLs a mano) — copia **todas** las URLs del grupo, no sólo
+> las que la tabla alcanza a renderizar, porque el techo del render es de lectura y no del dato; el
+> fallo del portapapeles se dice, porque fallar en silencio deja al operador creyendo que copió. La
+> card de salud adopta densidad adaptativa (`useContainerDensity`): a 390px el arco a tamaño completo
+> empujaba la lista —la parte accionable— bajo el fold. Y el wrapper de scroll del drill conserva
+> `tabIndex=0` pero **cede el nombre** a la región de `DataTableShell`: llevaba `role='region'` con la
+> misma etiqueta y el árbol exponía dos landmarks anidados homónimos.
+>
+> 🔴 **Cobertura declarada que el audit NO tiene** (es del allowlist y del proveedor, no de la
+> superficie): no revisa **acceso de crawlers de IA** en `robots.txt`
+> (`OAI-SearchBot`/`PerplexityBot`/`ClaudeBot`), **ausencia** de JSON-LD (sólo detecta errores en
+> marcado existente, y a propósito: la regla del módulo prohíbe invertir checks positivos del
+> proveedor por passthrough), conflicto `noindex` + bloqueo robots, ni salud de sitemap. Para un
+> módulo que se vende como Search Visibility 360 —SEO **y** AEO— el primero es el punto ciego más
+> caro: bloquear retrieval saca al cliente de las respuestas de IA (−23,1% de tráfico medido,
+> Rutgers/Wharton dic-2025) y hoy esta pantalla lo declararía sano con 95/100. **Dueño: `TASK-1670`**
+> (`to-do`, `backend-data`), que expone los tres probes ya probados del grader AEO como superficie
+> pública aditiva y los consume como hallazgos **de sitio** detrás de flag. El flag existe porque un
+> hallazgo de sitio en esta lista mostraría "1 página afectada", que es falso: la UI necesita
+> tratamiento propio (`TASK-1671`, por crear). Y el entregable descargable de la auditoría **no debe
+> nacer sin esta cobertura** — un artefacto con nuestro nombre que declara sano un sitio invisible
+> para la IA es peor que no tener artefacto.
+
+### 10.7 Cutover `seo_v1 → seo_v2` — expand/contract (TASK-1310)
+
+`TASK-1310` renombra la clave del módulo porque `modules.*` es append-only y `seo_v1` nació con
+`view_codes=[]`: no se puede editar in-place, hay que superseder. La migración crea `seo_v2`,
+supersede los assignments vigentes preservando status/tier/expiración/metadata, y deja la cadena en
+`source_ref_json`.
+
+🔴 **Renombrar la clave en el código y en la base a la vez es breaking, y los DOS órdenes de
+despliegue dejan ventana de oscuridad** — no es un problema de secuenciar, es de forma:
+
+| Orden | Qué pasa en la ventana |
+|---|---|
+| Migración primero (el orden canónico del repo) | El código vivo sigue pidiendo `seo_v1`, ya superseded → 0 orgs |
+| Código primero | Pide `seo_v2`, que la base todavía no tiene → 0 orgs |
+
+Y "0 orgs" no es sólo una pantalla vacía: el mismo predicado gatea `enforceSeoRunEntitlement`, o sea
+**los tres batches que le pagan al proveedor** (rank capture, site audit, backlinks). En la ventana
+saltarían con `no_entitlement` **en silencio**, que es justo lo que §6 prohíbe.
+
+**Forma canónica aplicada** (doctrina `arch-architect` → `data/schema-evolution.md`: *"rename in
+place is forbidden"*):
+
+1. **Expand** — `SEO_MODULE_KEY` queda como la clave de **escritura** (`seo_v2`) y las **lecturas**
+   pasan a `SEO_MODULE_KEYS_READ = ['seo_v2', 'seo_v1']` con `module_key = ANY($n::text[])` en los
+   **5** consumidores (`entitlement`, `list-seo-spaces`, `rank-capture-batch`,
+   `site-audit/enqueue-batch`, `backlinks/capture`). Se despliega ESTO primero.
+2. **Migrate** — se aplica la migración. Sin ventana: las lecturas aceptan ambas.
+3. **Contract** — se deja sólo `seo_v2`, cuando no queden assignments `seo_v1` vigentes. Es un cambio
+   posterior y deliberado, con dueño `TASK-1310`.
+
+El contenido de `SEO_MODULE_KEYS_READ` está fijado por test para que la contracción sea una decisión
+explícita y no un descuido que apague el módulo. Verificado contra PG real con la base todavía en
+`seo_v1`: ambas orgs resuelven `hasModule=true`, `tier=contracted`, sin bloqueo.
+
+#### 🔴 Delta 2026-08-08 — la migración colapsó las tres fases en una (ISSUE-143)
+
+El diseño de arriba es correcto y **aun así producción se cayó**, porque la migración
+`20260808131441444_task-1310-seo-client-view-codes` metió el **contract dentro del paso 2**: crea
+`seo_v2`, le asigna las orgs y en el mismo statement supersede los assignments `seo_v1`. Con eso el
+dual-read del paso 1 deja de servir para nada — su valor entero era que hubiera un período con las
+dos claves vigentes, y la migración lo borró en el mismo commit en que lo creaba.
+
+Medido contra `https://greenhouse.efeoncepro.com` con el canary del provider: Grupo Berel pasó de
+`domainQuadrant=riesgo keywords=50` a `hasModule=false` + `greenhouse_seo_lane_404` en los cinco
+lanes. Vercel producción corre `main`, que pide `seo_v1` literal. El **ops-worker no se vio afectado**
+porque su deploy ya tenía el dual-read, así que los tres batches que le pagan al proveedor siguieron
+sanos — el daño fue de lectura, no de gasto.
+
+Restaurado reabriendo la ventana (`effective_to = NULL` en los assignments `seo_v1`), hecho durable
+por `20260808184512073_task-1310-reopen-seo-module-cutover-window`, que además hornea el invariante:
+**mientras el cutover esté abierto, ambas claves cubren exactamente las mismas organizaciones**; una
+ventana asimétrica aborta la migración. No hay doble conteo de cuota ni presupuesto porque el
+resolver hace `ORDER BY created_at DESC LIMIT 1` sobre el `ANY(...)`.
+
+**Reglas duras que salen de esto:**
+
+- **NUNCA** una sola migración contiene el **expand** y el **contract** del mismo cutover. Son dos
+  archivos, y el segundo se escribe cuando el primero ya está desplegado **en todos los runtimes**.
+  El repo tiene cinco runtimes con despliegues independientes (Vercel producción, Vercel staging y
+  tres Cloud Run); "desplegué a develop" no es "desplegué".
+- **NUNCA** superseder una clave que el código vigente todavía lee. Antes de escribir un supersede,
+  `grep` la clave en `src/` y `services/`: si aparece en un array de lectura, el contract **no toca
+  todavía**.
+- **NUNCA** dar por buena una migración de cutover porque la base quedó como el SQL decía. La base es
+  la mitad del contrato; la otra mitad es qué versión de código la está leyendo en cada runtime.
+  **SIEMPRE** verificar con el consumidor real (para este módulo, el canary del provider contra el
+  host de producción), no con un `SELECT`.
+- **SIEMPRE** que una ventana expand esté abierta, tratar la **simetría de cobertura** como
+  invariante verificable, no como consecuencia esperada.
 
 ---
 

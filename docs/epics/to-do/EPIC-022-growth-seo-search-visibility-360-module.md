@@ -42,18 +42,107 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 
 ## Child Tasks
 
+> **Barrido de `Blocked by` — 2026-08-08.** Los siete blockers que las hijas citaban (`TASK-1299`,
+> `1303`, `1304`, `1305`, `1306`, `1307`, `1267`) **están todos completos**, pero nadie actualizó los
+> campos al cerrarlos. El backlog se leía como bloqueado sin estarlo: cualquiera que lo mirara
+> concluía que había que esperar algo. Corregidos en `1309`, `1311`, `1312`, `1313`, `1314`, `1315`
+> y `1651`, más cuatro rutas que apuntaban a `to-do/`/`in-progress/` de tasks ya movidas a
+> `complete/` (un link roto en Normative Docs deja al agente sin poder leer su referencia).
+>
+> Estado real: **de las 15 abiertas, 11 se pueden tomar ya**; las 4 restantes esperan sólo a otras
+> abiertas (`1313`←1311+1312 · `1314`←1312+1313 · `1316`←1315 · `1317`←1315+1316), más `1660`←1659
+> y `1662`←1661 del carril de objetivos. `TASK-1310` (dashboard cliente) ya está **in-progress**.
+>
+> ⚠️ Al cerrar una task, revisar quién la citaba como blocker. Un `Blocked by` obsoleto es fricción
+> inventada, y no hay gate que lo detecte.
+
+
 - `TASK-1299` — schema `growth.seo` (targets, keyword_sets, competitors, snapshots append-only) — bloqueador fundacional.
 - `TASK-1300` — DataForSEO family registry (ampliar allowlist + breaker + cost por familia) — bloquea todo lo provider-facing.
 - `TASK-1301` — capabilities `growth.seo.*` + entitlement per-org + chokepoint `enforceSeoRunEntitlement`.
 - `TASK-1302` — [planificada] GSC daily snapshot materializer + `readKeywordOpportunities` (quick win, reusa TASK-1282).
 - `TASK-1303` — [**complete 2026-08-06**, en producción] rank capture command + `readRankEvolution` + Cloud Scheduler + reactive BQ mirror. Release `fcee5ab9f7ce` (manifest released); scheduler `ops-seo-rank-capture` diario 05:00 CLT ACTIVO; serie día-1 de Berel con 31 keywords; señal `seo.rank.capture_lag` en Growth Health; 4.ª MCP tool `get_seo_rank_evolution` viva en el MCP interno de producción (federación al gateway = TASK-1653).
 - `TASK-1304` — [planificada] site audit (queue+poll OnPage) + backlink snapshot.
+
+### Carril de keywords OBJETIVO (creado 2026-08-07 al cuestionar TASK-1308)
+
+> 🔴 **El módulo responde TRES preguntas, no una.** Hasta ahora sólo tenía superficie la primera.
+>
+> | Pregunta | Fuente | Estado |
+> |---|---|---|
+> | ¿Qué empujo de lo que ya tengo? | GSC medido | **construida** (TASK-1308) |
+> | ¿Dónde quiere estar el cliente? | **declarado por humano** | `TASK-1659` + `TASK-1660` |
+> | ¿Qué me pierdo entero? | competencia + Labs | `TASK-1661` + `TASK-1662` |
+>
+> La segunda es la que ancla comercialmente a las otras dos, porque es el compromiso con el cliente
+> y el material del QBR. Y **Search Console es estructuralmente ciego** a las dos últimas: sin top
+> ~100 no hay impresiones, así que esas búsquedas no existen en los datos del cliente. Por eso el
+> dato de mercado deja de ser "enriquecimiento" y pasa a ser dependencia dura del carril
+> aspiracional: es la única forma de contestar *¿vale la pena?* y *¿cuánto cuesta?* antes de
+> aceptar un objetivo.
+
+- `TASK-1659` — [planificada, backend-data] modelo de **intención** en el set monitoreado: objetivo declarado vs oportunidad detectada, con autoría. `source` (TASK-1308) es procedencia, no intención. Append-only: cambiar la intención cierra y abre, nunca `UPDATE`.
+- `TASK-1660` — [planificada, ui-ux] lente **Objetivos** sobre `/admin/growth/seo/keywords` — extiende el **nodo S3** del master UI flow. Full API Parity al revés: `trackKeywords` **ya** acepta keywords que el cliente no rankea y no tiene botón. Bloqueada por `TASK-1659`.
+- `TASK-1661` — [planificada, backend-data] volumen y dificultad por keyword. ⚠️ **No es esperar a `TASK-1300`**, que está complete: falta el fetch, las columnas y el reader. Alcance V1 acotado al set monitoreado.
+- `TASK-1662` — [planificada, backend-data] **keyword gap**: qué gana la competencia donde el cliente es invisible. La superficie va aparte. Bloqueada por `TASK-1661`.
+
+### Carril de discovery y acción diaria (creado 2026-08-08)
+
+> Este carril cierra el loop operativo que faltaba entre una hipótesis humana y una medición AEO. No
+> reemplaza el carril de objetivos ni convierte una sugerencia en gasto recurrente automáticamente.
+> Cada etapa conserva procedencia, mercado, costo, estado y autoría de la decisión.
+
+- `TASK-1664` — [creada, backend-data/integration, backend-critical] **keyword discovery, seed
+  expansion y enrichment de mercado**. Recibe hasta 10 seeds manuales o derivadas de GSC/set/dominio,
+  ejecuta sólo endpoints Labs permitidos (`keyword_suggestions`, `related_keywords`, `keyword_ideas`,
+  `keywords_for_site`, `keyword_overview`), muestra preview de costo antes de gastar, materializa una
+  corrida bounded en `ops-worker`, deduplica y expone candidates con volumen/dificultad/intent,
+  procedencia y as-of. No crea `seo_keyword_set_members`, no hace keyword gap (`1662`) y no llama
+  `ai_optimization` (`1651`). Blocked by `TASK-1661`.
+- `TASK-1666` — [creada, backend-data/integration, backend-critical] **puente SEO → grounded queries
+  AEO**. Toma hasta 20 candidates seleccionados, valida ownership y contexto, y crea un draft en el
+  `grader_prompt_sets` existente mediante el authoring AEO canónico. Conserva source refs de corrida y
+  candidate, trata keywords como datos no confiables, respeta no-leading/vocabulario cerrado y nunca
+  aprueba, activa ni ejecuta el grader en la misma operación. Blocked by `TASK-1664`.
+- `TASK-1665` — [creada, ui-ux] **workbench diario Descubrir** dentro de la ruta existente
+  `/admin/growth/seo/keywords`. Es la tercera lente de S3: builder de seeds/métodos/mercado, preview y
+  confirmación de costo, estados async, tabla responsive y drawer de decisión. Expone explícitamente
+  `Declarar objetivo`, `Seguir oportunidad`, `Preparar grounded queries`, `Descartar` y `Ver
+  trayectoria`, con confirmación, outcome por candidato y sin provider logic en UI. Blocked by
+  `TASK-1664` y `TASK-1666`.
+- `TASK-1667` — [creada, backend-data/integration, backend-critical] **SEO Editorial Work Item y
+  handoff a Content Factory**. Convierte una decisión explícita sobre candidate/oportunidad en un
+  aggregate editorial con provenance, evidence refs, `ContentFactoryBrief.v1`, idempotencia y
+  lifecycle `brief_ready → draft_requested → draft_private`. Reutiliza planners/validators/bridge
+  existentes, no escribe WordPress desde SEO, no publica, no auto-trackea y no crea FK SEO↔AEO.
+  Blocked by `TASK-1664`; la grounded query de `TASK-1666` es referencia opcional.
+- `TASK-1668` — [creada, backend-data/integration, backend-critical] **QA editorial, publicación
+  observada, outcomes e iteración**. Conecta draft privado con QA determinista/humano, approval packet,
+  `published_unverified`, readback/QA live, ventanas de GSC/rank/AEO/GA4/HubSpot y
+  `insufficient_data` honesto. Registra evidencia/outcomes append-only y abre la siguiente acción sin
+  auto-publish ni atribución causal inventada. Blocked by `TASK-1667`.
+- `TASK-1669` — [creada, backend-data/integration, backend-critical] **agentes e IA para el plan
+  diario SEO**. Orquesta `seo_researcher`, `editorial_planner` y `qa_measurement` sobre los readers
+  canónicos; devuelve recomendaciones estructuradas con refs, freshness, costo, fallback y
+  `requiresHumanApproval=true`; expone el mismo primitive a Nexa/app/ecosystem/MCP. No llama
+  DataForSEO/WordPress/AEO directamente ni ejecuta writes. Blocked by `TASK-1664`, `TASK-1667` y
+  `TASK-1668`.
+
+### Plataforma del módulo
+
+- `TASK-1655` — [en curso] Historical Data Platform del módulo SEO (semilla histórica de rank vía `historical_serps`).
+- `TASK-1658` — [planificada, backend-data] drift de federación MCP + punto ciego del guard de paridad: 3 tools SEO viven en el MCP interno de Greenhouse y no están ni federadas ni excluidas en el gateway, y el guard no puede verlo porque compara contra lo registrado EN EL GATEWAY, nunca contra Greenhouse.
+
 - `TASK-1305` — [planificada] `readSeoAeoGap` derived read cross-módulo (report layer).
 - `TASK-1306` — [**complete 2026-08-06**, ui-ux] SEO Overview operador `/admin/growth/seo` — **la primera superficie visible del módulo (nodo S1 del master UI flow)**. Guard de 3 puertas (viewCode `administracion.growth_seo` + capability `growth.seo.observation.read` + `module_assignment` per-org), sección local "Search Visibility" con el conmutador a las hermanas, 4 KPIs norte (posición con semántica invertida), curva de visibilidad en 2 charts apilados y sidebar salud/movers/cruce AEO que degrada por región. MCP tool `get_seo_overview_kpis` + lane `/api/platform/ecosystem/growth/seo/overview-kpis` en el mismo PR. **Code complete en `develop`; promoción a `main` pendiente** (mientras viva sólo en `develop`, `syncViewRegistry` de producción vuelve a apagar el viewCode recién sembrado).
-- `TASK-1307` — [planificada, ui-ux] ★ Rank & URL performance over time `/admin/growth/seo/performance`.
-- `TASK-1308` — [planificada, ui-ux] Keyword opportunities `/admin/growth/seo/keywords`.
-- `TASK-1309` — [planificada, ui-ux] Site audit `/admin/growth/seo/audit`.
-- `TASK-1310` — [planificada, ui-ux] Cliente + Report Artifact `/growth/seo` + quadrant 360.
+- `TASK-1307` — [**complete 2026-08-07**, ui-ux] ★ Rank & URL performance over time `/admin/growth/seo/performance` — nodo S2, la pantalla ancla. Comparación de hasta 8 URLs o keywords con eje de posición invertido declarado en palabras, cobertura explícita ("N de M días con medición"), huecos que cortan la línea en vez de rellenarse con cero, y la fuente nombrada (◑ exacta de mercado vs ● medida de Search Console, nunca promediadas). Primer consumer de **ECharts** del repo — la decisión de librería del módulo. Su tab quedó habilitada; la spec vive en `docs/tasks/complete/`.
+- `TASK-1308` — [**complete 2026-08-07**, ui-ux + command] Keyword opportunities `/admin/growth/seo/keywords` — **nodo S3 del master UI flow**. Nació declarada `Backend impact: none` y terminó construyendo el command que la spec daba por hecho: **`trackKeywords` no existía** (`seo_keyword_sets`/`_members` sólo las escribían dos scripts de seed), y su reverso `untrackKeywords` tampoco. Seguir una keyword es un **compromiso de gasto diferido** —el rank capture diario paga al proveedor por cada keyword vigente, todos los días— así que el command nace con techo gobernado por target (`capacity_exceeded` explícito, nunca silencio), entitlement per-org y **outcome por keyword**, que es lo único que distingue "agregué 3" de "rebotaron 40 contra el techo". La UI: banda de veredicto que es leyenda y filtro a la vez, mapa **medido** (posición × impresiones; el encoding del wireframe —dificultad × volumen × intención— no tiene fuente y no la tendrá: el dato de mercado será columna y filtro, nunca eje), tabla con `DataTableShell` + transformación a cards en 390px, export CSV del subconjunto filtrado, filtros en la URL y drill a Rendimiento. Lane `app` + lane `ecosystem` + 2 tools MCP (`track_seo_keywords`/`untrack_seo_keywords`) en el mismo PR con **scope propio de escritura** `efeonce.mcp.seo.write` — un binding cliente lee sus oportunidades pero no hace crecer su propia factura. **Pendiente de rollout, no de código:** el scope existe en Entra pero no está cableado a ningún cliente y el commit de federación del gateway sigue sin publicar → las 2 tools responden `insufficient_scope` (fail-closed por diseño).
+- `TASK-1309` — [**COMPLETE 2026-08-08**, ui-ux] Site audit `/admin/growth/seo/audit` — **nodo S4**, la cuarta tab: con ella el conmutador de "Search Visibility" queda completo. Salud con frescura explícita, issues como **lista priorizada** (no tabla plana) ordenada por severidad ▸ alcance × valor de búsqueda ÷ esfuerzo, drill `?issueGroup=` con las URLs, y "Correr auditoría" gobernada. Tres correcciones de honestidad que salieron de mirar la pantalla: el conteo de páginas declara cuándo es **el techo del crawl** y no el sitio; los checks de performance declaran que son **laboratorio** (Google rankea con campo); y el puntaje explica su alcance, porque "95 de salud" junto a "519 issues" se lee como contradicción cuando en realidad no miden lo mismo (el puntaje es del proveedor, el conteo es de nuestro catálogo). **Cerrada 2026-08-08**: el gap de viewCodes de TASK-1310 lo cerró su migración de catálogo, y el gate completo quedó verde — `pnpm test` 10377/0, `pnpm build` de producción, `ui:quality` PASS 4.63, reachability 0 huérfanas. **Con ella el conmutador de Search Visibility queda completo: las 4 tabs del operador navegan.**
+- `TASK-1670` — [creada 2026-08-08, backend-data/integration] **Hallazgos de sitio en el audit: crawlers de IA, JSON-LD y sitemap.** El audit es passthrough de OnPage y no ve tres cosas de Capa 1. Los tres probes ya existen probados en el grader (`TASK-1266`), pero **no se mueven**: la primera versión de la task proponía extraer el sustrato y la medición la desmintió — `contracts`/`safe-fetch`/`html` los consumen **23 archivos** del probe layer, así que mover era re-apuntar la fundación de un motor con 643 tests a cambio de ubicación. En su lugar AEO declara una **superficie pública** (un archivo nuevo, cero ediciones) y el collect la consume como hallazgos de **sitio**, detrás de flag. Cierra el punto ciego más caro: hoy un sitio que bloquea `OAI-SearchBot`/`PerplexityBot`/`ClaudeBot` puntúa 95/100 y se presenta como sano (−23,1% de tráfico medido, Rutgers/Wharton dic-2025). Prerequisito del entregable descargable de la auditoría: un artefacto con nuestro nombre no debe declarar sano un sitio invisible para la IA. Fuera de alcance `core_web_vitals` (Lighthouse = laboratorio) y `llms-txt` (ROI marginal). Follow-up sin fecha y sin task: si algún día se reorganiza, el hogar del sustrato compartido es el paraguas **`search-visibility/`** —SEO y AEO como sus dos motores— no un genérico; merece su propio ADR.
+- `TASK-1672` — [creada 2026-08-08, ui-ux/layout] **Artefacto de la auditoría técnica (web + print).** El diagnóstico deja de morir en la pantalla. El escenario real no es que el cliente arregle: **reenvía a una agencia**, seamos nosotros u otra — y eso define dos lectores, quien DECIDE (magnitud y urgencia) y quien EJECUTA (la lista y el orden). Se resuelve con **un documento de dos densidades**, no con dos documentos que se desincronizan: portada ejecutiva de una plana + detalle completo, reusando `ReportArtifactModel` de TASK-1310 con su `variant`. Los hallazgos de SITIO van antes que la lista porque la invalidan. Y la procedencia viaja CON el dato: en pantalla es contexto, en un PDF reenviado es lo único que impide que atribuyan a nuestro juicio lo que mide el proveedor. Client-safe por construcción. Blocked by `TASK-1670`.
+- `TASK-1673` — [creada 2026-08-08, backend-data/command] **Compartir y enviar el informe.** Enlace con código corto, caducidad, **revocación** y tracking de apertura, más envío por correo del operador. **Enlace por defecto, adjunto como opción declarada**: el repo ya divide adjunto para registros inmutables (cotización, comprobante) y enlace para diagnósticos vivos (informe AEO), y el audit tiene contrato de frescura que un PDF congela — queda vigente para siempre en un inbox ajeno. 🔴 El cliente NO envía desde nuestro dominio: genera y reenvía desde su inbox, que llega mejor a su agencia y no arriesga la reputación de envío con la que mandamos facturas. Enviar ≠ ver. Blocked by `TASK-1672`.
+- **`TASK-1674` [RESERVADA, sin escribir] — la 4.ª sección del portal cliente.** El cliente ya tiene su navegador de 3 secciones (`Resumen · Evolución · Quadrant`, TASK-1310) y la auditoría entra ahí como **cuarta**, espejando las 4 tabs del operador: la misma estructura mental de los dos lados, con distinta profundidad. Se descartó una ruta cliente paralela (`/growth/seo/audit-report`) — sería fragmentar su portal para reflejar nuestro organigrama. Y se descartó **fusionar** la auditoría dentro del informe de 1310, por dos costos concretos: las frescuras no coinciden (el audit corre semanal, la serie de Search Console diaria, y un documento con dos as-of deshace justo lo que 1309 corrigió) y reenviar la lista técnica a una agencia obligaría a compartir de paso la posición competitiva del cliente, que ese trabajo no necesita. **NO se agrega a TASK-1310**: a esa task le queda rollout (migración + staging), no construcción, y una sección nueva le reinicia la verificación en la última milla. Se escribe cuando `TASK-1672` esté en ejecución y la forma del documento esté decidida.
+- `TASK-1310` — [**in-progress 2026-08-08**, ui-ux] Cliente + Report Artifact `/growth/seo` + quadrant 360 — **nodos S5/S6/S7**. Construida y verificada con datos reales de Berel: navegador cliente de 3 secciones (`Resumen · Evolución · Quadrant`), informe web + `?print=1` sobre el `ReportArtifactModel` compartido, y el cruce recíproco SEO↔AEO. Le quedan la ronda premium de la auditoría visual y el rollout (la migración de catálogo `seo_v2` **no está aplicada**, así que el portal todavía no compone las rutas en el menú). `UI ready: no`.
 - `TASK-1311` — [planificada, backend-data] AEO citation attribution URL-level + grounded queries (reader/rollup sobre las citas que el grader YA captura).
 - `TASK-1312` — [planificada, backend-data] Topic Cluster como entidad de primera clase (`seo_topic_clusters`) + rollup SEO+AEO.
 - `TASK-1313` — [planificada, backend-data] Unified Page/Cluster Visibility 360 read (`readPageVisibility360`/`readClusterVisibility360`).
@@ -81,6 +170,25 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - [ ] La pantalla estrella (evolución de URLs/keywords en el tiempo) entrega valor con datos reales de Berel, con honestidad medido (GSC) vs estimado (DataForSEO).
 - [ ] Gate de costo DataForSEO per-org operativo (quota cap + signal `seo.provider.cost_over_budget`).
 - [ ] Documentación triple (técnica/funcional/manual) del módulo + flag `GROWTH_SEO_ENABLED` en el Feature Flag Ledger.
+- [ ] El discovery diario permite expandir seeds y enriquecer candidates mediante corridas Live de
+  DataForSEO Labs con preview de costo, límite por corrida, `ops-worker`, ledger atribuido a la org,
+  estados parciales y degradación honesta; una corrida no puede crear tracking automáticamente.
+- [ ] La superficie S3 `Descubrir` permite revisar y decidir candidates sin ruta ni menú paralelo,
+  distingue GSC medido (`●`) de Labs estimado (`◑`) y mantiene las acciones de objetivo, tracking,
+  descarte y grounded query explícitas y auditables.
+- [ ] SEO puede preparar un draft de grounded queries desde candidates seleccionados reutilizando el
+  prompt store/lifecycle AEO existente, con provenance `run/candidate/context`, vocabulario cerrado,
+  protección contra prompt injection y revisión obligatoria antes de `active`; no existe un segundo
+  prompt store ni un JOIN SQL SEO↔AEO.
+- [ ] Una decisión SEO seleccionada puede convertirse en un `SEO Editorial Work Item` con provenance,
+  brief válido y handoff a draft/private de Content Factory; el camino no publica ni modifica una
+  fuente pública directamente.
+- [ ] El work item puede pasar por QA, aprobación humana, publicación observada, verificación live,
+  outcome por ventana e iteración; la evidencia es append-only y distingue `measured`, `estimated`,
+  `declared`, `derived` y `unavailable`.
+- [ ] El módulo ofrece un plan diario advisory con los roles `seo_researcher`, `editorial_planner` y
+  `qa_measurement`, fallback determinista, límites de costo/llamadas, telemetry redactada y
+  recomendaciones siempre sujetas a `propose → confirm → execute`.
 - [ ] **Full API Parity + MCP verificados como consumers reales (mandato del operador 2026-08-05):** los readers canónicos sirven UI + Nexa + lane ecosystem (`api/platform/ecosystem/growth/seo/*`) + MCP tools (`TASK-1645`) sin lógica duplicada; el epic NO cierra con el módulo UI-only aunque todos los demás criterios pasen. La superficie MCP incluye disponibilidad vía el gateway `mcp.efeonce.org` (provider federado en TASK-1626) o task dedicada de federación creada con dueño. Writes de agente declarados vía governed action loop (follow-up explícito, no deuda oculta).
 
 ## Non-goals
@@ -178,6 +286,10 @@ revenue, ni publicar pricing. Mantiene las reglas del modelo canónico y del [Cu
 - **Ola B — SEO mínimo valuable:** `TASK-1299 → TASK-1300 → TASK-1301 → TASK-1302 → TASK-1306 → TASK-1307`, empezando por GSC para minimizar costo DataForSEO.
 - **Ola C — 360 operativo:** `TASK-1303 → TASK-1304 → TASK-1305 → TASK-1311 → TASK-1313`.
 - **Ola D — authority/enterprise:** `TASK-1312 → TASK-1314 → TASK-1315 → TASK-1316 → TASK-1317 → TASK-1426`, más los contratos de delivery, contenido, revenue y procurement correspondientes.
+- **Ola E — discovery/action diario:** `TASK-1664 → TASK-1666 → TASK-1665`; después, `TASK-1662`
+  puede reutilizar la forma de candidate sin mezclar su análisis competitivo. `TASK-1311` consume la
+  provenance AEO una vez que existan drafts/runs aprobados; `TASK-1310` sólo consume candidates que
+  tengan una decisión explícita.
 
 La definición de cierre del epic debe incluir evidencia técnica **y** evidencia de cliente, delivery, economics,
 adopción y renovación. La fuente transversal para esa evaluación es `efeonce-customer-model-operator`; GTM,
@@ -311,3 +423,117 @@ viewCode + el `module_assignment` per-org. ⚠️ Mientras 1306 viva sólo en `d
 producción **vuelve a apagar el viewCode** en cada corrida de `syncViewRegistry` (desactiva
 todo viewCode ausente del catálogo TS del código **en ejecución**, y la base Cloud SQL es
 única y compartida por dev/staging/prod). Se estabiliza al promover a `main`.
+
+## Delta 2026-08-07 (b) — el cockpit operador queda en 3 de 4: S2 y S3 aterrizan
+
+**Delta 2026-08-08:** `TASK-1307` (S2), `TASK-1308` (S3) y `TASK-1309` (S4) están **complete**, así
+que las **cuatro** tabs de "Search Visibility" navegan y el conmutador del operador queda cerrado. La
+pata UI/Nexa del exit criterion de parity queda abierta ahora sólo por el cliente + report artifact
+(`TASK-1310`), que está construido y pendiente de la ronda premium y de que su ítem sea alcanzable por
+nav (`TASK-1675`).
+
+**Lo que este delta corrige para quien siga (1309 / 1310):**
+
+1. **La decisión de librería del módulo está tomada: ECharts.** `TASK-1307` la resolvió en su
+   Slice 0 (era el dueño de la decisión según el delta anterior) y `TASK-1308` la reusó vía
+   `AppECharts` + `resolveChartColor`. Una hermana nueva **no vuelve a abrir la discusión** ni
+   mete una segunda librería para una sola pantalla.
+2. **Un command que la spec daba por construido no existía.** `TASK-1308` declaró
+   `Backend impact: none` porque su spec citaba `trackKeywords` como entregado por `TASK-1303`,
+   marcado `[verificar]`. **No lo había construido nadie.** El patrón se repite en este epic
+   (ver `readRankSnapshotLatest` en el delta anterior): un `[verificar]` en una spec no es una
+   dependencia satisfecha. Antes de declarar `Backend impact: none`, verificar el símbolo en el
+   código, no en la prosa de otra task.
+3. **El dato de mercado sigue sin aterrizar, y la UI ya está diseñada para que eso no importe.**
+   `readKeywordOpportunities` devuelve `searchVolume: null`, `difficulty: null`,
+   `market: 'unavailable'` (`TASK-1300` amplió el allowlist pero el enriquecimiento Labs no
+   corre). El mapa de S3 usa ejes **medidos** (posición × impresiones de Search Console), que es
+   además lo metodológicamente correcto: priorizar por volumen estimado de un tercero teniendo
+   el GSC propio está listado como error en la skill `seo-aeo`. Cuando el enriquecimiento llegue
+   será **columna y filtro, nunca eje** — no se reescribe la pantalla.
+4. **Escribir por MCP exige scope propio.** Las 2 tools de escritura de S3
+   (`track_seo_keywords` / `untrack_seo_keywords`) van bajo `efeonce.mcp.seo.write`, no bajo el
+   `efeonce.mcp.read` de las lecturas, y el lane ecosystem sólo las acepta desde bindings
+   `internal`: un binding cliente lee sus oportunidades pero no hace crecer su propia factura.
+   🔴 El guard de paridad del gateway **no las habría visto**: su regex se ató a `get_seo_*`
+   cuando todas las tools eran lecturas. Se amplió al dominio. **Toda tool de escritura futura
+   del módulo hereda este patrón.**
+
+**Pendiente de rollout (no de código):** el scope `efeonce.mcp.seo.write` existe en Entra
+(`17f923ad-537a-4c2f-ab5b-2a14ed650183`, round-trip verificado — los 3 scopes de Globe intactos)
+pero **no está cableado a ningún cliente** y no debe cablearse al PKCE compartido; más el commit
+de federación del gateway (`efeonce-mcp`) sin publicar. Hasta entonces las 2 tools responden
+`insufficient_scope`: fail-closed por diseño. Y sigue en pie el bloqueo del delta anterior —
+mientras las pantallas vivan sólo en `develop`, `syncViewRegistry` de producción vuelve a apagar
+el viewCode compartido.
+
+## Delta 2026-08-08 — nace el carril diario discovery → decisión → grounded query
+
+La revisión del uso cotidiano del módulo mostró un hueco distinto al de los dashboards: el operador
+necesita partir de una seed, encontrar términos vecinos, consultar tamaño/dificultad/intención de
+mercado, descartar ruido y decidir qué merece tracking o una pregunta AEO. Ese trabajo no debe vivir
+en una planilla ni en un render que pague DataForSEO sin control. Se crean tres tasks encadenadas:
+
+1. **`TASK-1664` — primitive server-side de discovery.** La corrida acepta seeds manuales, queries de
+   GSC, keywords monitoreadas, dominio propio o combinación; permite únicamente los endpoints Labs
+   declarados en la task; calcula un costo conservador antes de la confirmación; ejecuta en
+   `ops-worker`; persiste runs/candidates/actions append-only; aplica límites de seeds, métodos,
+   candidates, enriquecimientos y llamadas; registra spend por org; expone reader/app/Nexa/ecosystem/
+   MCP; y queda separada de `trackKeywords`. El mercado estimado nunca reemplaza la señal GSC medida.
+2. **`TASK-1666` — bridge SEO↔AEO.** Una selección de candidates se transforma en un draft del prompt
+   store AEO existente, no en una nueva entidad SEO. La entrada de keywords se inyecta como contexto
+   de datos no confiable; el authoring canónico decide el texto natural y los tags cerrados. Cada draft
+   guarda refs de `run`, `candidate` y hash de contexto; la aprobación y activación permanecen en el
+   lifecycle AEO.
+3. **`TASK-1665` — workbench S3.** La UI vive en `/admin/growth/seo/keywords`, reutiliza el shell y
+   añade la lente `Descubrir`. Hace visible preview → confirmación → async → resultados → decisión;
+   ofrece `Declarar objetivo`, `Seguir oportunidad`, `Preparar grounded queries`, `Descartar` y
+   `Ver trayectoria`; transforma tabla a lista/card en 390 px; y confirma cada acción con outcome por
+   candidate. No incluye llamadas provider-facing ni crea una ruta paralela.
+
+El orden contractual es `1664 → 1666 → 1665`: el workbench puede diseñarse y maquetarse durante la
+ejecución de `1666`, pero no se considera integrado hasta que el command de grounded draft y sus
+pruebas de paridad existan. Este carril no duplica `TASK-1662` (gap competitivo), `TASK-1651`
+(`ai_optimization`/LLM Mentions), `TASK-1311` (atribución de citas) ni `TASK-1308` (oportunidades GSC).
+
+## Delta 2026-08-08 — se cierra la costura editorial y se agrega IA advisory
+
+La auditoría del flujo cotidiano confirmó que `1664 → 1666 → 1665` resolvía discovery y decisión,
+pero todavía dejaba la acción editorial, el aprendizaje posterior y la coordinación diaria fuera del
+producto. Se agregan tres tasks sin duplicar la lane de keywords:
+
+```text
+1664 discovery/candidates
+   ├─ 1666 grounded-query draft opcional
+   └─ 1665 workbench S3 y decisión humana
+          ↓
+       1667 SEO Editorial Work Item
+          ↓
+       Content Factory draft/private
+          ↓
+       1668 QA → aprobación humana → publicación observada → outcome → iteración
+          ↓
+       1669 plan diario advisory (researcher → planner → QA/measurement)
+```
+
+- `TASK-1667` es el dueño de la identidad de continuidad `candidate → brief → draft privado`. No
+  extiende SEO hacia WordPress con SQL ni convierte `ContentFactoryBrief.v1` en un contrato paralelo.
+- `TASK-1668` es el dueño de la evidencia editorial/post-publication. Cada fuente (`GSC`, `rank`,
+  `Labs`, `AEO`, `GA4`, `HubSpot`) conserva su realidad, as-of y cobertura; `no_data` no es cero y
+  `HTTP 200` no prueba indexación.
+- `TASK-1669` es el dueño del plan de agentes e IA. Los tres roles sólo leen primitives, devuelven
+  recomendaciones estructuradas y usan fallback cuando no hay datos/modelo; todos los writes siguen
+  `propose → confirm → execute`.
+
+El orden de implementación queda:
+
+1. `TASK-1664` → `TASK-1666` → núcleo `TASK-1665`.
+2. `TASK-1667` para el handoff editorial.
+3. `TASK-1668` para QA/outcome/iteración.
+4. `TASK-1669` para coordinación advisory sobre los readers anteriores.
+5. Extensión de `TASK-1665` para mostrar work items, outcomes y plan diario cuando cada contract esté
+   disponible; la UI no puede inventar esos estados ni bloquear el núcleo de discovery.
+
+El epic no se considera “crear y optimizar” completo por tener candidates o drafts: debe poder
+explicar qué se decidió, qué se produjo, qué se verificó, qué resultado se observó y cuál es el
+siguiente paso permitido.

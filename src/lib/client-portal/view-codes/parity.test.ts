@@ -25,7 +25,7 @@ describe('TASK-827 — compareViewCodesParity', () => {
     expect(report.uniqueSeedViewCodeCount).toBe(3)
   })
 
-  it('inSync=true con registry extra values (soft warning informativo)', () => {
+  it('inSync=true con registry transversal allowlisted fuera del seed', () => {
     const seedRows: ModuleViewCodesRow[] = [
       { module_key: 'pulse', view_codes: ['cliente.pulse'] }
     ]
@@ -38,7 +38,18 @@ describe('TASK-827 — compareViewCodesParity', () => {
 
     expect(report.inSync).toBe(true)
     expect(report.inSeedNotInRegistry).toEqual([])
+    expect(report.unseededModuleViewCodes).toEqual([])
     expect(report.inRegistryNotInSeed).toEqual(['cliente.configuracion', 'cliente.notificaciones'])
+  })
+
+  it('inSync=false cuando registry declara una surface module-gated sin seed', () => {
+    const report = compareViewCodesParity(
+      [{ module_key: 'pulse', view_codes: ['cliente.pulse'] }],
+      ['cliente.pulse', 'cliente.growth_seo_dashboard']
+    )
+
+    expect(report.inSync).toBe(false)
+    expect(report.unseededModuleViewCodes).toEqual(['cliente.growth_seo_dashboard'])
   })
 
   it('inSync=false (DRIFT BLOQUEANTE) cuando seed tiene viewCode NO en registry', () => {
@@ -77,13 +88,14 @@ describe('TASK-827 — compareViewCodesParity', () => {
     expect(report.inSync).toBe(true)
   })
 
-  it('seedRows vacío → inSync=true con cardinalidad 0', () => {
+  it('seedRows vacío → inSync=false si el registry declara una surface module-gated', () => {
     const report = compareViewCodesParity([], ['cliente.pulse'])
 
-    expect(report.inSync).toBe(true)
+    expect(report.inSync).toBe(false)
     expect(report.seedModuleCount).toBe(0)
     expect(report.uniqueSeedViewCodeCount).toBe(0)
     expect(report.inRegistryNotInSeed).toEqual(['cliente.pulse'])
+    expect(report.unseededModuleViewCodes).toEqual(['cliente.pulse'])
   })
 
   it('registry vacío + seed con cliente.* → inSync=false (DRIFT)', () => {

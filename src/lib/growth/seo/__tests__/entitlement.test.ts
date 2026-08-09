@@ -303,3 +303,78 @@ describe('enforceSeoRunEntitlement', () => {
     expect(e.blockedReason).toBeNull()
   })
 })
+
+describe('cutover seo_v1 → seo_v2 (expand/contract, TASK-1310)', () => {
+  it('las LECTURAS aceptan ambas claves y la de ESCRITURA es sólo v2', async () => {
+    const { SEO_MODULE_KEY, SEO_MODULE_KEYS_READ } = await import('../entitlement')
+
+    // La escritura nace en la clave nueva: una asignación creada hoy es `seo_v2`.
+    expect(SEO_MODULE_KEY).toBe('seo_v2')
+
+    // La lectura acepta ambas mientras dure el cutover. Este assert NO es decorativo:
+    // existe para que sacar `seo_v1` sea una decisión explícita —la fase de contracción,
+    // cuando ya no queden assignments v1 vigentes— y no un descuido que apague el módulo
+    // y, con él, los tres batches que le pagan al proveedor.
+    expect([...SEO_MODULE_KEYS_READ]).toEqual(['seo_v2', 'seo_v1'])
+
+    // El orden importa: `resolveSeoEntitlement` ordena por `created_at DESC` y toma 1, así
+    // que si una org tuviera ambas vigentes gana la más reciente; la lista sólo declara
+    // qué se acepta, no cuál prevalece.
+    expect(SEO_MODULE_KEYS_READ[0]).toBe(SEO_MODULE_KEY)
+  })
+
+  // ISSUE-143 — el guardrail que faltaba.
+  //
+  // El assert de arriba fija el array, pero no impide lo que efectivamente tumbó producción:
+  // una MIGRACIÓN que supersede una clave que el código vigente todavía lee. La regla vivía en
+  // prosa (§10.7: "el contract es un cambio posterior y deliberado") y una migración la violó sin
+  // que nada se quejara, porque nadie revisa una migración contra un párrafo.
+  //
+  // Escanea sólo la sección `Up` a propósito: el `Down` de una migración de reapertura cierra la
+  // ventana legítimamente, y ese es su trabajo.
+  it('ninguna migración nueva supersede una clave que el código todavía lee', async () => {
+    const { readdirSync, readFileSync } = await import('node:fs')
+    const { resolve } = await import('node:path')
+    const { SEO_MODULE_KEYS_READ } = await import('../entitlement')
+
+    // La migración de viewCodes de TASK-1310 ES el incidente. Ya está aplicada y las migraciones
+    // aplicadas no se editan (forward fix, nunca retroactivo): queda declarada acá para que el
+    // guardrail proteja de aquí en adelante sin reescribir la historia.
+    const HISTORICAL = new Set(['20260808131441444_task-1310-seo-client-view-codes.sql'])
+
+    const migrationsDir = resolve(process.cwd(), 'migrations')
+    const offenders: string[] = []
+
+    for (const fileName of readdirSync(migrationsDir).filter(name => name.endsWith('.sql'))) {
+      if (HISTORICAL.has(fileName)) continue
+
+      const sql = readFileSync(resolve(migrationsDir, fileName), 'utf8')
+      const downIndex = sql.indexOf('-- Down Migration')
+      // Los bloques `DO $$ … $$` se retiran antes de partir por `;`: llevan `;` internos que
+      // desalinean el split y mezclan una verificación con el statement de al lado.
+      const upSection = (downIndex >= 0 ? sql.slice(0, downIndex) : sql).replace(/DO \$\$[\s\S]*?\$\$/g, '')
+
+      for (const statement of upSection.split(';')) {
+        if (!/\bUPDATE\b[\s\S]*module_assignments/i.test(statement)) continue
+
+        // Reabrir la ventana (`effective_to = NULL`) es lo CONTRARIO de superseder. Sólo cuenta
+        // como supersede asignarle un valor: una fecha, CURRENT_DATE, NOW().
+        const assignments = [...statement.matchAll(/effective_to\s*=\s*([A-Za-z_'(]+)/gi)]
+        const supersedes = assignments.some(match => !/^null$/i.test(match[1]))
+
+        if (!supersedes) continue
+
+        for (const key of SEO_MODULE_KEYS_READ) {
+          if (statement.includes(`'${key}'`)) offenders.push(`${fileName} → ${key}`)
+        }
+      }
+    }
+
+    expect(
+      offenders,
+      `Estas migraciones superseden una clave de módulo que ${'`SEO_MODULE_KEYS_READ`'} todavía acepta, ` +
+        'lo que apaga el módulo en cualquier runtime que aún no tenga el dual-read desplegado ' +
+        '(ISSUE-143). El contract va en su propia migración, DESPUÉS de que la clave salga del array de lectura.'
+    ).toEqual([])
+  })
+})

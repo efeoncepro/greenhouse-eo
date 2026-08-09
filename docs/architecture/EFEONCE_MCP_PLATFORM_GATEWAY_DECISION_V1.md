@@ -39,10 +39,23 @@ duplica lógica de negocio.
    audience, expiración y scopes, y responde con challenges estándar. Microsoft Entra ID del tenant Efeonce
    es el authorization server inicial. El resource parameter canónico es `https://mcp.efeonce.org/mcp`; Entra
    v2 representa ese recurso en el claim `aud` mediante el App ID exacto de la aplicación recurso. Si la
-   configuración falta o no pasa el canary, `/mcp` falla cerrado. El gateway declara **tres** scopes, no dos: el
-   base `efeonce.mcp.read`, el reader Globe `efeonce.mcp.globe.read` y el write interno
+   configuración falta o no pasa el canary, `/mcp` falla cerrado. El gateway declara **cuatro** scopes: el
+   base `efeonce.mcp.read`, el reader Globe `efeonce.mcp.globe.read`, el write interno
    `efeonce.mcp.globe.credits.funding.ensure` del punto 12, que sólo aparece en `scopes_supported` cuando su flag
-   `globeCreditFunding.enabled` está en ON.
+   `globeCreditFunding.enabled` está en ON, y el write SEO `efeonce.mcp.seo.write` (TASK-1308), que sólo aparece
+   cuando `greenhouseSeo.enabled` está en ON.
+
+   🔴 **Granularidad canónica: un scope por CLASE DE BLAST-RADIUS, nunca uno por capability.** Un scope por
+   capability convierte esta lista en un **espejo del `capabilities_registry` de Greenhouse** — un registry
+   gobernado en una tabla contra una copia editada a mano en una app registration de Entra. Divergen, y un
+   espejo de autorización divergido es peor que no tenerlo: el scope dice sí, el registry dice no, y nadie sabe
+   cuál manda. Contradice además la regla 1: el gateway NUNCA es autoridad de autorización. El scope responde
+   *«¿este cliente puede hacer esta CLASE de acción?»* (consentimiento, transporte); la capability responde
+   *«¿este actor, sobre esta org?»* (dominio) y se enforcea downstream en el lane y el command canónicos.
+   `globe.credits.funding.ensure` no es la excepción sino la regla aplicada: tiene scope propio porque **mueve
+   dinero** con un `authorityId` de un solo uso, que es su propia clase — no porque sea una capability.
+   Corolario operativo: federar la escritura N+1 de un dominio que ya tiene su scope **no requiere tocar Entra**,
+   y por lo tanto no puede quedar bloqueada por eso.
 8. La identidad humana OAuth y la identidad workload hacia providers son planos distintos. El gateway llama a
    Globe con su service account dedicada, ID token con audience exacta y allowlist del runtime de Globe.
 9. Globe es el primer provider, pero conserva ownership de sus tools/resources en `efeonce-globe` mediante
@@ -266,3 +279,29 @@ Rollback: quitar tráfico a la revisión defectuosa o deshabilitar el provider/s
 - [Serverless network endpoint groups](https://docs.cloud.google.com/load-balancing/docs/negs/serverless-neg-concepts)
 - [`GREENHOUSE_MCP_ARCHITECTURE_V1.md`](GREENHOUSE_MCP_ARCHITECTURE_V1.md)
 - [`EFEONCE_MCP_AGENT_SKILL_ROUTER_V1.md`](EFEONCE_MCP_AGENT_SKILL_ROUTER_V1.md)
+
+### 🔴 El scope de escritura NO se cablea al cliente público compartido (TASK-1308, 2026-08-07)
+
+`efeonce.mcp.seo.write` **existe** en la app de Entra `Efeonce MCP Resource` (`type: Admin`,
+`isEnabled: true`), pero **deliberadamente NO está en el `requiredResourceAccess` del cliente
+PKCE compartido** `32617b87-e7ef-493a-838f-1ff3f0213b93` ("Efeonce MCP Local Canary Client"),
+que es el que el shim DCR entrega a Claude Code / claude.ai / Claude Desktop. Misma postura
+que `efeonce.mcp.globe.credits.funding.ensure`, que tampoco está.
+
+**Por qué, y por qué es load-bearing:** en el lane ecosystem el actor es `mcp:<consumer>` — la
+MÁQUINA, no la persona — así que ahí **no hay chequeo de capability por humano** (el app-lane
+sí exige `growth.seo.target.configure`; el ecosystem no, a propósito, porque su sujeto es un
+consumidor). Y el hop gateway→Greenhouse va con un token de consumer fijo de binding
+`internal`. Resultado: **en toda la cadena, la única puerta que depende de QUIÉN es la persona
+es el scope OAuth.** Cablearlo al cliente público (sin secreto, disponible a todo usuario del
+tenant) le daría poder de comprometer gasto DataForSEO recurrente a cualquiera que se
+autentique, incluido quien no tiene la capability en Greenhouse.
+
+**NUNCA** cierres un `insufficient_scope` de una tool de escritura agregando el scope al
+cliente público compartido: eso no arregla un permiso, abre una puerta de gasto a todo el
+tenant y lo hace en silencio (nada falla, simplemente empieza a funcionar para todos).
+
+**El camino correcto** es un cliente con grant controlable —emitible y revocable por tenant y
+capability— que es exactamente el gate B2B/multitenant diferido en
+`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md` / `TASK-1631`. Hasta entonces las
+tools quedan federadas y **fail-closed**: registradas, verificables y sin token que las abra.

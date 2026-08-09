@@ -1,5 +1,44 @@
 # TASK-1310 — Growth SEO: Client Dashboard + Report Artifact + 360 Quadrant
 
+## Delta 2026-08-08
+
+### Auditoría vigente — reset de implementación
+
+La afirmación anterior de “implementación completa” y las capturas de las 09:15–09:17 quedan supersedidas
+por la auditoría visual de las 10:25–10:26. La UI funciona, pero no cumple el estándar premium: el dashboard
+falló axe por contraste, la leyenda tiene targets de 23 px y la composición todavía presenta card soup,
+charts con lectura débil y provenance de fechas inconsistente. El estado real vuelve a **in-progress / UI
+ready: no** hasta completar los lotes definidos en la
+[`auditoría premium de TASK-1310`](../../ui/reviews/TASK-1310-growth-seo-client-dashboard-report-artifact-audit-2026-08-08.md).
+
+La decisión vigente del dashboard es `CompositionShell composition='single'` con tabs SEO horizontales. No
+se reintroduce un `masterDetail` ni un rail lateral SEO: el menú vertical principal mantiene su ownership.
+La dirección es **Editorial Evidence Canvas** y AEO usa una estrella única (`tabler-star`/`tabler-star-off`),
+nunca `tabler-sparkles`, en las superficies de esta task.
+
+- Preflight reconciled: `TASK-1305` and `TASK-1307` are complete and their runtime contracts are
+  present in `src/lib/growth/seo/**`; this task is executable. The dependency notes below remain as
+  implementation context, not active blockers.
+- Implementación cliente disponible en local, pendiente de la ronda premium: `/growth/seo` (dashboard `single` + tabs), `/growth/seo/report`
+  (web + `?print=1`) y el cruce recíproco SEO↔AEO. Se construyeron las tres direcciones aprobadas como
+  una familia: Evidence Narrative, Visibility Map y Trust Report Artifact.
+- **Acceso/catálogo (corrección 2026-08-08):** la UI había agregado los viewCodes al catálogo TS, pero
+  `seo_v1` seguía con `view_codes=[]`; la navegación por módulos no era construible. La migración
+  `20260808131441444_task-1310-seo-client-view-codes.sql` crea `seo_v2`, supersede asignaciones
+  activas —incluida Grupo Berel— y registra denials explícitos por rol. El acceso efectivo permanece
+  `growth.seo.report.read_client` + tenant client + assignment per-org. **Pendiente:** aplicar la
+  migración y validar la navegación con sesión client-scoped; no se abre acceso interno ni role-wide.
+- Evidencia GVC local con datos reales de Berel, desktop + 390px: dashboard
+  `.captures/2026-08-08T09-15-23_growth-seo-client`, report web
+  `.captures/2026-08-08T09-16-33_growth-seo-report` y attachment
+  `.captures/2026-08-08T09-17-46_growth-seo-report-print`. Las capturas no registran errores de
+  consola, página, hidratación ni HTTP; el desktop queda sin findings axe. Mobile conserva únicamente
+  warnings del shell global oculto fuera de viewport, no del contenido SEO. Se corrigieron en código
+  los contrastes de breadcrumbs/navigator, roles ARIA de tablas/leyendas y el overflow de la tabla 360.
+- GCloud/ADC se renovaron y el proxy de conexión PostgreSQL se verificó durante la comprobación de
+  entitlement/runtime. No se ejecutó un build completo: se mantuvo el límite de recursos solicitado y
+  se usaron lint, tests, gates focales y capturas canónicas acotadas.
+
 ## Delta 2026-08-05
 
 - `readSeoAeoGap` YA existe (TASK-1305 complete): contrato `SeoAeoGapResult` en `src/lib/growth/seo/contracts.ts` + reader en `src/lib/growth/seo/gap/read-seo-aeo-gap.ts` + clasificador `classifyQuadrant` importable por la UI (leyendas). El quadrant 360 de esta task CONSUME ese contrato — no re-implementa el cruce. V1 con `aeoAxisGranularity='domain'`; degradaciones `no_seo_data`/`no_aeo_data` requieren empty states accionables.
@@ -11,7 +50,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P3`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -22,15 +61,23 @@
 - Wireframe: `docs/ui/wireframes/TASK-1310-growth-seo-client-dashboard-report-artifact.md`
 - Flow: `docs/ui/flows/TASK-1310-growth-seo-client-dashboard-report-artifact-flow.md`
 - Motion: `none`
-- Backend impact: `none`
+- Backend impact: `access catalog migration`
 - Epic: `EPIC-022`
-- Status real: `Diseno`
+- Status real: `Avanzada, premium rework en progreso` — baseline funcional local; rollout bloqueado por auditoría visual/GVC
 - Rank: `TBD`
 - Domain: `growth|ui|ai`
-- Blocked by: `TASK-1305, TASK-1307`
-- Branch: `task/TASK-1310-growth-seo-client-dashboard-report-artifact`
+- Blocked by: `none`
+- Branch: `develop`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Hybrid Execution Justification
+
+La task sigue siendo principalmente `ui-ux`, pero la navegación cliente depende de un catálogo
+append-only de módulos. El viewCode y su `module_assignment` son un único contrato de acceso: sin la
+migración `seo_v1 → seo_v2`, la UI queda alcanzable por deep-link pero no compuesta por el portal.
+El slice de datos se limita a registrar/superseder ese catálogo y a su paridad; no agrega reader,
+API, dato de negocio ni superficie interna nuevos.
 
 ## Summary
 
@@ -114,13 +161,24 @@ Reglas obligatorias:
 - `report-artifact/model.ts` (`ReportArtifactModel`, `modelFromClientReport`, disclosure matrix) + web/print/pdf adapters (`src/components/growth/ai-visibility/report-artifact/**`, TASK-1252/1273).
 - CompositionShell variant `masterDetail` (TASK-1248), `GreenhouseBreadcrumbs`, `EmptyState`, `GreenhouseChip`, `DataTableShell`.
 - `/aeo` cliente (cross-link target, EPIC-020).
+- `readSeoAeoGap` + `classifyQuadrant` (TASK-1305) y `readRankEvolution` (TASK-1303/1307), además del stack ECharts lazy de la pantalla ancla de TASK-1307.
 
 ### Gap
 
-- No existe `src/lib/growth/seo/**` (readers — dependencia TASK-1305/1307).
+- No existe `readRankSnapshotLatest`; el resumen debe derivar la última observación honesta desde `readRankEvolution` o un reader existente, sin inventar un reader paralelo.
 - No existe un adapter SEO del `ReportArtifactModel` (`modelFromSeoReport`) ni `src/components/growth/seo/report-artifact/**`.
 - No existen las rutas cliente `/growth/seo` + `/growth/seo/report` ni el quadrant SEO×AEO.
-- No existe uso de ECharts en el repo (quadrant + line lo introducen, lazy-loaded — arch §10.4).
+- No existe aún el copy `GH_GROWTH_SEO_CLIENT`, los escenarios GVC ni la dirección visual dedicada de esta surface.
+
+## Modular Placement Contract
+
+- Topology impact: `portal`
+- Current home: `src/app/(dashboard)/**`, `src/views/greenhouse/growth/**` y `src/components/growth/**` del portal Greenhouse.
+- Future candidate home: `portal` (la superficie es client-facing; los primitives compartidos permanecen en Greenhouse hasta evidencia de extracción).
+- Boundary: `readSeoAeoGap`/`readRankEvolution` + `ReportArtifactModel`; las rutas y views son adapters de lectura y render, sin recalcular SEO×AEO ni duplicar scoring.
+- Server/browser split: readers, entitlement/capability guards y resolución de tenant permanecen server-side; charts y render adapters reciben DTOs browser-safe sin DB, secretos ni SDKs de provider.
+- Build impact: ECharts se reutiliza desde la instalación lazy existente de TASK-1307; el report agrega adapters y no crea un segundo runtime de PDF.
+- Extraction blocker: `none`.
 
 ## UI/UX Contract
 
@@ -141,7 +199,7 @@ Reglas obligatorias:
 - Adaptive density / The Seam: `aplica` — masterDetail colapsa a drawer en compact; report A4 no desborda; top URLs condensan.
 - Floating/Sidecar/Dialog decision: masterDetail detail = drawer en compact (no-modal); sin dialog (read-only).
 - Copy source: `src/lib/copy/growth.ts` (`GH_GROWTH_SEO_CLIENT`) + copy del model compartido en el report.
-- Access impact: `views|entitlements` — routeGroup `client`, `module_assignment=active` + capabilities `growth.seo.observation.read` (dashboard) / `growth.seo.report.read_client` (report). **NUNCA** `client_*` gate por rol (lección TASK-1248).
+- Access impact: `views|entitlements` — routeGroup `client`, `module_assignment=active` + capability `growth.seo.report.read_client` (dashboard + report, scope `own`). `growth.seo.observation.read` queda reservado al cockpit operador. **NUNCA** `client_*` gate por rol (lección TASK-1248).
 
 ### State inventory
 
@@ -184,9 +242,9 @@ Reglas obligatorias:
 - Primitive / variant / kind: CompositionShell `masterDetail`; `report-artifact/model.ts` + nuevo adapter `modelFromSeoReport`; web (`clientPortal`) + print (`attachment`) adapters SEO; quadrant + line = ECharts config (lazy `ssr:false`).
 - Component candidates: `SeoClientDashboardView.tsx` + `SeoRankEvolutionChart.tsx` + `SeoAeoQuadrant.tsx` + `src/components/growth/seo/report-artifact/**`.
 - Copy source: `src/lib/copy/growth.ts` → `GH_GROWTH_SEO_CLIENT`; report reusa copy del model.
-- Data reader / command: `readSeoAeoGap(targetId)` (TASK-1305 [verificar]) + `readRankEvolution(targetId, {range})` (TASK-1303/1307 [verificar]) + `readRankSnapshotLatest` (curado). Sin commands (read-only cliente).
+- Data reader / command: `readSeoAeoGap(targetId)` (TASK-1305) + `readRankEvolution(targetId, {range})` (TASK-1307). El resumen deriva la última observación desde la evolución; no se crea un reader paralelo. Sin commands (read-only cliente).
 - API parity: UI cliente de readers gobernados; el report deriva del MISMO model que el AEO (Nexa por construcción). El quadrant NO reconcilia SEO×AEO en un número.
-- Access / capability: `growth.seo.observation.read` (dashboard) + `growth.seo.report.read_client` (report); Locked/teaser sin `module_assignment=active`.
+- Access / capability: `growth.seo.report.read_client` (dashboard + report); Locked/teaser sin `module_assignment=active`.
 - States to implement: default, loading, empty, sin-GSC, quadrant-sin-AEO, error, degraded, locked, mobile.
 
 ### GVC scenario plan
@@ -251,7 +309,8 @@ Reglas obligatorias:
 
 ### Migration, backfill and rollout
 
-- Migration posture: `none`
+- Migration posture: `pending` — `20260808131441444_task-1310-seo-client-view-codes.sql` debe crear
+  `seo_v2`, superseder assignments `seo_v1` y registrar los dos viewCodes antes del rollout.
 - Default state: `GROWTH_SEO_ENABLED` OFF + sin `module_assignment` → Locked/teaser.
 - Backfill plan: none.
 - Rollback path: revert rutas/nav + flag OFF; revocar `module_assignment` (arch §13 reversibilidad).
@@ -266,19 +325,34 @@ Reglas obligatorias:
 
 ### Runtime evidence
 
-- Local checks: UI tests / focal tests del adapter `modelFromSeoReport` + no-leak test (espejo del `report-artifact-no-leak.test.tsx`).
-- DB/runtime checks: staging con un target SEO enlazado a una org con grader_run (para poblar `readSeoAeoGap` ambos lados).
-- Integration checks: report render (web + print) sin leak; quadrant con ambos lados; cross-link a `/aeo` navega.
-- Reliability signals/logs: freshness enlaza a `seo.rank.capture_lag` (arch §8) sin computar salud en cliente.
-- Production verification sequence: staging primero (con `module_assignment` de prueba); prod via rollout EPIC-022 + grant a Berel.
+- Hook y gates estructurales: `pnpm codex:task-hook TASK-1310 --json`, `pnpm task:lint --task TASK-1310`
+  y `pnpm route-reachability-gate` pasan; el catálogo client, menú y reachability registran ambas rutas.
+- Tests focales: 3 archivos, 28 tests verdes, incluyendo `modelFromSeoReport`, no-leak y boundary de
+  `readSeoAeoGap`; ESLint focal de las superficies y primitives modificadas pasa.
+- Runtime client-scoped: `/growth/seo` responde con Grupo Berel, 31 keywords y corte 2026-08-05;
+  `/growth/seo/report` renderiza web y attachment con disclosure público-safe. El report no expone
+  `providerCostUsd`, engine snapshot crudo ni razón interna.
+- GVC local con datos reales de Berel, desktop + 390px: dashboard
+  `.captures/2026-08-08T09-15-23_growth-seo-client`, report web
+  `.captures/2026-08-08T09-16-33_growth-seo-report` y attachment
+  `.captures/2026-08-08T09-17-46_growth-seo-report-print`. Las capturas canónicas terminaron sin
+  errores de consola, página, hidratación ni HTTP; el contenido SEO desktop queda sin findings axe.
+  Mobile report conserva warnings de layout del nav global cerrado y el print trigger puede activar un
+  control global sin nombre; quedan como deuda de shell, no como fallo del artefacto SEO.
+- GCloud/ADC renovados con `pnpm gcloud:auth:playwright -- --force`; proxy PostgreSQL verificado en
+  la misma sesión de consulta. No se ejecutó el build completo por el guard de recursos; el typecheck
+  global tampoco se repite porque su baseline ya agotó memoria en este checkout.
+- Pendiente de rollout: captura canónica en staging con el deployment vigente, baseline diff contra el
+  artifact AEO aprobado y promoción develop→main. La frescura continúa enlazada a
+  `seo.rank.capture_lag`; el cliente no calcula salud.
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths (`readSeoAeoGap`, `readRankEvolution`, `ReportArtifactModel`, `modelFromSeoReport`).
-- [ ] Data invariants explicit: NO forkear el model; leak boundary preservado; quadrant no fusiona SEO×AEO.
-- [ ] Migration/backfill/rollback posture explicit (none; flag OFF + revoke assignment).
-- [ ] Runtime evidence listed (no-leak test del adapter SEO + staging con ambos lados del gap).
-- [ ] Sensitive posture: report `clientPortal`/`attachment` público-safe, sin raw provider / razón interna / costo.
+- [x] Source of truth, contract surface and consumers are named with real paths (`readSeoAeoGap`, `readRankEvolution`, `ReportArtifactModel`, `modelFromSeoReport`).
+- [x] Data invariants explicit: NO forkear el model; leak boundary preservado; quadrant no fusiona SEO×AEO.
+- [x] Migration/backfill/rollback posture explicit (none; flag OFF + revoke assignment).
+- [x] Runtime evidence listed (no-leak test del adapter SEO + staging pendiente explícitamente).
+- [x] Sensitive posture: report `clientPortal`/`attachment` público-safe, sin raw provider / razón interna / costo.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE (no llenar al crear)
@@ -292,14 +366,14 @@ Reglas obligatorias:
 
 ### Slice 1 — Dashboard shell (`/growth/seo`) + gate + estados
 
-- Crear `/growth/seo` (routeGroup `client`) con gate `module_assignment=active` + `observation.read`; redirect defensivo si el tenant no tiene el módulo.
+- Crear `/growth/seo` (routeGroup `client`) con gate `module_assignment=active` + `report.read_client`; redirect defensivo si el tenant no tiene el módulo.
 - CompositionShell `masterDetail` (navigator Resumen/Evolución/Quadrant + detail canvas); breadcrumb + leyenda ●/◑.
 - Estados loading/empty/sin-GSC/error/degraded/locked honestos.
 - Registrar en `route-reachability-manifest.ts` + nav cliente.
 
 ### Slice 2 — Resumen + Evolución (line Y invertido)
 
-- Detail Resumen: visibility + top-3/top-10 + top URLs curadas (`readRankSnapshotLatest`).
+- Detail Resumen: visibilidad + posición media + top-3/top-10 derivados de la última observación disponible en `readRankEvolution`.
 - Detail Evolución: line multi-serie ECharts (Y invertido documentado) de URLs clave + Δ30d (`readRankEvolution`, reuse del patrón TASK-1307 curado).
 
 ### Slice 3 — Quadrant 360 (`readSeoAeoGap`) + cross-link
@@ -380,19 +454,60 @@ Slice 1 (shell+gate+estados) → Slice 2 (Resumen+Evolución) → Slice 3 (Quadr
 
 ## Acceptance Criteria
 
-- [ ] Se declaró `Execution profile: ui-ux`, `UI impact: flow`, `Flow` apuntando al contrato existente.
+- [x] Se declaró `Execution profile: ui-ux`, `UI impact: flow`, `Flow` apuntando al contrato existente.
 - [ ] Rutas cliente `/growth/seo` + `/growth/seo/report` (routeGroup `client`) alcanzables por nav cliente + en `route-reachability-manifest.ts`; gate **per-org via `module_assignment`** (NUNCA por rol); redirect defensivo sin módulo.
-- [ ] Dashboard `masterDetail` (Resumen/Evolución/Quadrant), curado, honesto, mono-Space; sin datos crudos de operador.
-- [ ] Evolución = line ECharts multi-serie con **Y invertido documentado** (1=arriba=mejor); `role=img` + aria.
-- [ ] Quadrant 2×2 SEO×AEO (X citabilidad IA, Y posición SEO), 4 cuadrantes con **label textual**, `readSeoAeoGap` (derived read, NUNCA merge); cross-link recíproco a `/aeo`.
-- [ ] Report artifact SEO = **3.er render adapter del MISMO `ReportArtifactModel`** (adapter `modelFromSeoReport`, NO forkea scoring/ECharts del AEO); web `clientPortal` + print `attachment`; no-leak test verde.
-- [ ] Honest degradation: sin GSC → empty accionable (nunca ceros); quadrant sin AEO → "falta la mitad IA" (`sin_dato` ≠ 0); cuota → degrada a medido; medido ● / estimado ◑ con leyenda.
-- [ ] Disclosure `clientPortal`/`attachment` (público-safe): sin engine snapshot crudo, sin razón interna, sin costo.
-- [ ] Copy reusable en `src/lib/copy/growth.ts` (`GH_GROWTH_SEO_CLIENT`, es-CL tono cliente, `greenhouse-ux-writing`).
-- [ ] GVC desktop+mobile capturado y mirado **en loop** (dashboard + report); `scrollWidth==clientWidth`; gate axe verde.
-- [ ] Focus/keyboard validados; navigator active state; charts sin entrada bajo movimiento reducido (WCAG 2.3.3).
-- [ ] El flow doc referencia el master `EPIC-022-search-visibility-360-UI-FLOW.md` y declara sus nodos (S5/S6/S7).
-- [ ] `UI ready` pasa a `yes` solo cuando `pnpm task:lint --task TASK-1310` queda sin findings.
+
+  **Verificado 2026-08-08 con sesión de cliente real (Grupo Berel) — el gate per-org PASA, la
+  alcanzabilidad NO.** La migración está aplicada y la superficie renderiza con datos medidos
+  (posición media 1.5, 31 keywords, cobertura 61%, procedencia declarada). Pero el **menú del portal
+  cliente no compone SEO**, y no es un problema de catálogo:
+
+  1. El menú vertical del cliente (`VerticalMenu.tsx`) es una **lista hardcodeada de 7 ítems**
+     filtrada por `canSeeView('cliente.*')`. SEO no está en esa lista, así que ningún seed la agrega.
+  2. Su único bloque dinámico (`capabilityModules`) se alimenta de `businessLines`/`serviceModules`
+     de la sesión — **otro sistema**, no `module_assignments`.
+  3. El resolver canónico module-based (`composeNavItemsFromModules` / `<ClientPortalNavigation>`)
+     existe pero **sólo lo consume el mockup** `/mockup/cliente-portal-legacy`. Cablearlo al menú real
+     es la task derivada de TASK-827 que quedó pendiente ("V1.0 acepta path híbrido").
+  4. Los denials por rol de esta migración (`granted=FALSE`) sacan los dos viewCodes de
+     `authorizedViews`, pero **no son la causa**: aunque no existieran, el ítem seguiría sin aparecer
+     porque no está en la lista.
+
+  **Confirmado con subagentes (traza de código + dato en PG), y corrige una atribución errónea:**
+  `session.user.authorizedViews` se deriva **sólo** de `role_view_assignments` + un fallback
+  heurístico por `routeGroup` + permission sets + overrides — **nunca de `module_assignments`**
+  (`view-access-store.ts:1024-1077`). Los `view_codes[]` de los módulos viven en un carril paralelo
+  (`module-resolver.ts:142`) que consumen `requireViewCodeAccess` y `composeNavItemsFromModules`, no
+  la sesión.
+
+  **El hermano AEO está exactamente igual y eso es la referencia:** `cliente.ai_visibility_report`
+  tampoco aparece en el menú lateral; su migración borró las filas de rol (por eso cae al fallback y
+  sí figura en `authorizedViews`, emitiendo `role_view_fallback_used`), y su alcanzabilidad está
+  declarada como deep-link a propósito en el manifest: *"no como item de nav principal hasta que
+  exista el monitor recurrente"*. O sea: **el estado de SEO no es una regresión, es el diseño vigente
+  del portal cliente** — lo que falta es la task derivada de TASK-827 que monta el nav module-driven.
+
+  Descartado con dato: no es sesión desactualizada. Los claims se auto-refrescan cada ≤5 min
+  (`auth.ts:70` + `:787-802`) y una sesión emitida después de la migración tampoco los trae.
+
+  **Y el manifest declara un enlace que no existe:** `/growth/seo` figura con `parent: '/home'` y
+  `via: 'inline-link'`, pero no hay ningún enlace desde `/home`. El gate pasa (`0 orphans`) porque
+  verifica que la ruta esté declarada, **no que el enlace declarado exista**. El único camino real hoy
+  es el cross-link desde el informe AEO, que sólo sirve a clientes que además tengan AEO.
+
+  Evidencia: `.captures/2026-08-08T19-29-36_growth-seo-client` (superficie) y
+  `.captures/2026-08-08T19-30-53_inline-growth-seo` (shell completo, donde se ve el menú sin SEO).
+- [x] Dashboard `CompositionShell composition='single'` + tabs SEO horizontales (Resumen/Evolución/Quadrant), curado, honesto, mono-Space; sin datos crudos de operador. **Corrección 2026-08-08:** el criterio original decía `masterDetail`; la decisión vigente (Delta de esta task) descarta el rail lateral porque el menú vertical principal ya tiene ese ownership.
+- [x] Evolución = line ECharts multi-serie con **Y invertido documentado** (1=arriba=mejor); `role=img` + aria.
+- [x] Quadrant 2×2 SEO×AEO (X citabilidad IA, Y posición SEO), 4 cuadrantes con **label textual**, `readSeoAeoGap` (derived read, NUNCA merge); cross-link recíproco a `/aeo`.
+- [x] Report artifact SEO = **3.er render adapter del MISMO `ReportArtifactModel`** (adapter `modelFromSeoReport`, NO forkea scoring/ECharts del AEO); web `clientPortal` + print `attachment`; no-leak test verde.
+- [x] Honest degradation: sin GSC → empty accionable (nunca ceros); quadrant sin AEO → "falta la mitad IA" (`sin_dato` ≠ 0); cuota → degrada a medido; medido ● / estimado ◑ con leyenda.
+- [x] Disclosure `clientPortal`/`attachment` (público-safe): sin engine snapshot crudo, sin razón interna, sin costo.
+- [x] Copy reusable en `src/lib/copy/growth.ts` (`GH_GROWTH_SEO_CLIENT`, es-CL tono cliente, `greenhouse-ux-writing`).
+- [ ] GVC desktop+mobile capturado y mirado **en loop** (dashboard + report); `scrollWidth==clientWidth`; gate axe verde. Código y capturas locales están completas; staging y los warnings del shell global siguen pendientes.
+- [ ] Focus/keyboard validados; navigator active state; charts sin entrada bajo movimiento reducido (WCAG 2.3.3). El contrato y atributos están implementados; falta la pasada manual/final en staging.
+- [x] El flow doc referencia el master `EPIC-022-search-visibility-360-UI-FLOW.md` y declara sus nodos (S5/S6/S7).
+- [ ] `UI ready` pasa a `yes` solo cuando `pnpm task:lint --task TASK-1310` queda sin findings. Hoy sigue en `no` por la auditoría premium abierta — este criterio no puede marcarse antes que los criterios 2/10/11.
 
 ## Verification
 
@@ -408,18 +523,25 @@ Slice 1 (shell+gate+estados) → Slice 2 (Resumen+Evolución) → Slice 3 (Quadr
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado (`in-progress`/`complete`)
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
-- [ ] `Handoff.md` + `changelog.md` actualizados
-- [ ] route/nav/reachability actualizados
-- [ ] `FEATURE_FLAG_STATE_LEDGER.md` refleja `GROWTH_SEO_ENABLED` si la task lo toca
+- [x] `Lifecycle` sincronizado (`in-progress`/`complete`)
+- [x] archivo en la carpeta correcta
+- [x] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
+- [x] `Handoff.md` + `changelog.md` actualizados
+- [x] route/nav/reachability actualizados
+- [x] `FEATURE_FLAG_STATE_LEDGER.md` refleja `GROWTH_SEO_ENABLED` si la task lo toca (delta cliente agregado 2026-08-08)
+
+> **Nota de honestidad (2026-08-08):** el Closing Protocol está completo porque son ítems de higiene
+> documental que sí ocurrieron. **No implica cierre de la task**: los criterios 2, 10, 11 y 13 siguen
+> abiertos y el `Lifecycle` correcto es `in-progress`. Cerrar esta task exige la ronda premium + el
+> rollout (aplicar la migración de catálogo y verificar con sesión cliente real).
 
 ## Follow-ups
 
 - PDF `renderSeoReportPdf` (espejo TASK-1273) si se difiere del V1.
 - Flujo trial/PLG completo (teaser/Locked → trial run → upsell, patrón EPIC-020 S6).
 - Público "SEO quick check" de 1 dominio (arch §10.2, diferido).
+- Rollout staging → producción, baseline diff con el artifact AEO aprobado y revisión final de shell
+  mobile (warnings del nav colapsado/print trigger).
 
 ## Delta 2026-07-01 — conectada al Master UI Flow del programa Search Visibility 360
 

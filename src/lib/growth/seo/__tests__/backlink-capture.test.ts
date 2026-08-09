@@ -57,7 +57,9 @@ vi.mock('@/lib/postgres/client', () => ({
 const gateMock = vi.fn()
 
 vi.mock('../entitlement', () => ({
-  SEO_MODULE_KEY: 'seo_v1',
+  SEO_MODULE_KEY: 'seo_v2',
+  // Cutover expand/contract (TASK-1310): las lecturas aceptan ambas claves.
+  SEO_MODULE_KEYS_READ: ['seo_v2', 'seo_v1'],
   enforceSeoRunEntitlement: (...args: unknown[]) => gateMock(...args)
 }))
 

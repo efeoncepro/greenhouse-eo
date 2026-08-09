@@ -56,8 +56,13 @@ NO invade:
   2026-08-05 fin de día: COMPLETE TASK-1299 schema `greenhouse_growth.seo_*` + TASK-1301 entitlement per-org
   `seo_v1` con chokepoint `enforceSeoRunEntitlement` en `src/lib/growth/seo/entitlement.ts` + TASK-1300 registry
   DataForSEO/ledger + TASK-1302 materializer GSC LIVE (`readKeywordOpportunities`) + TASK-1305
-  `readSeoAeoGap`/quadrant SEO×AEO (primer quadrant real: Berel → `riesgo`); TASK-1645 lane ecosystem + 3 MCP
-  tools code-complete (federación gateway = TASK-1647); regla: todo reader SEO/E-E-A-T futuro expone su MCP tool
-  en el mismo PR; destino Wave `wave.efeonce.org` §17/EPIC-037; aún sin superficie cliente)
+  `readSeoAeoGap`/quadrant SEO×AEO (primer quadrant real: Berel → `riesgo`); TASK-1645 lane ecosystem + las
+  primeras 3 MCP tools, federadas al gateway por TASK-1647 y **live en producción desde 2026-08-06**. Delta
+  2026-08-07: inventario MCP **9 lecturas + 2 escrituras** y cockpit operador en `/admin/growth/seo`
+  (TASK-1306/1307/1308) — `track_seo_keywords`/`untrack_seo_keywords` son las primeras escrituras del dominio y
+  **comprometen gasto recurrente del proveedor**, por eso van con techo por target, entitlement per-ORG, outcome
+  por keyword y reverso append-only, federadas y fail-closed hasta TASK-1631. Regla: todo reader SEO/E-E-A-T
+  futuro expone su MCP tool en el mismo PR, y si ESCRIBE, además scope de dominio + la frontera de grant de
+  `.claude/rules/growth-seo.md`; destino Wave `wave.efeonce.org` §17/EPIC-037; **aún sin superficie cliente**)
 - `docs/architecture/GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md` (funnel comercial)
 - Código: `src/lib/growth/**`

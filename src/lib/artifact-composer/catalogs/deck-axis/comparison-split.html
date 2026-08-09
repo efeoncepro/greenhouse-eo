@@ -42,6 +42,28 @@
     .proposal-head { position:relative; z-index:1; margin-top:58px; }
     .proposal-logo { display:block; width:354px; height:92px; object-fit:contain; object-position:left center; }
     .proposal-title { max-width:630px; margin-top:34px; font-family:var(--axis-deck-type-display); font-size:44px; font-weight:600; line-height:1.08; letter-spacing:-.015em; }
+    .diagnostic-label { display:none; color:var(--axis-ppt-blue-200); font-size:17px; font-weight:700; letter-spacing:.12em; line-height:1.1; text-transform:uppercase; }
+    .slide:has(.presentation-meta[data-variant='diagnostic']) .proposal-logo,
+    .slide:has(.presentation-meta[data-variant='diagnostic']) .deck-url-bubble { display:none; }
+    .slide:has(.presentation-meta[data-variant='diagnostic']) .diagnostic-label { display:block; }
+    /* La variante diagnóstica cambia la semántica, no la receta cromática del panel. */
+    .slide:has(.presentation-meta[data-variant='diagnostic']) .proposal-head { margin-top:104px; }
+    .slide:has(.presentation-meta[data-variant='diagnostic']) .proposal-title { margin-top:22px; }
+    .slide:has(.presentation-meta[data-variant='diagnostic']) .rows { margin-top:30px; }
+    .slide:has(.presentation-meta[data-variant='diagnostic']) .row { min-height:95px; }
+    .slide:has(.presentation-meta[data-variant='diagnostic']) .row-copy { font-size:18px; line-height:1.2; }
+    .slide:has(.presentation-meta[data-variant='diagnostic']) .row-lead { margin-bottom:4px; font-size:22px; line-height:1.08; }
+    .slide:has(.presentation-meta[data-variant='diagnostic']) .contrast-icon,
+    .slide:has(.presentation-meta[data-variant='diagnostic']) .proposal-icon { width:44px; height:44px; font-size:28px; }
+    .slide:has(.presentation-meta[data-variant='diagnostic']) .proposal-icon {
+      color:var(--axis-ppt-neutral-900);
+      font-size:0;
+    }
+    .slide:has(.presentation-meta[data-variant='diagnostic']) .proposal-icon::before {
+      content:'!';
+      font-size:34px;
+      line-height:1;
+    }
 
     .rows { flex:1; display:flex; flex-direction:column; justify-content:center; margin-top:46px; }
     .row { min-height:128px; display:grid; align-items:center; border-bottom:1.5px solid currentColor; }
@@ -60,6 +82,7 @@
 </head>
 <body>
   <main class="slide" data-template="ComparisonSplit">
+    <div class="presentation-meta" data-slot="presentation" aria-hidden="true"></div>
     <section class="column contrast" aria-label="Enfoque de contraste">
       <h1 data-slot="leftTitle" data-slot-type="string" data-slot-required="true">Modelo editorial<br>por piezas</h1>
       <div class="rows" data-slot="rows" data-slot-type="paired-array" data-slot-required="true" data-slot-items="left">
@@ -70,9 +93,10 @@
       </div>
     </section>
 
-    <section class="column proposal" data-url-bubble-backdrop aria-label="Propuesta Efeonce">
+    <section class="column proposal" data-url-bubble-backdrop aria-label="Panel de comparación">
       <header class="proposal-head">
         <img class="proposal-logo" src="assets/brand/logo-negative.svg" alt="efeonce" data-slot="proposalBrand" data-slot-type="fixed-asset">
+        <span class="diagnostic-label" aria-hidden="true">Revisión de calidad · antes de avanzar</span>
         <h2 class="proposal-title" data-slot="rightTitle" data-slot-type="string" data-slot-required="true">Un ecosistema editorial que crea descubrimiento.</h2>
       </header>
       <div class="rows" data-slot-items="right">

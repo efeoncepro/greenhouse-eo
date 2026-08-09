@@ -42,6 +42,12 @@ DISABLE_TELEMETRY=1 npx -y modern-web-guidance@latest update
 4. **Mapear a Greenhouse**: primitives `src/components/greenhouse/*` / wrappers Vuexy `Custom*` / MUI base + tokens AXIS + escala tipográfica SoT + spacing 4n + motion tokens.
 5. **GVC en loop** para verificar el render real.
 
+Cuando esta skill se use para producto UI, "moderno" no significa cards
+decorativas, glow, rails de color o semáforo cromático. La guidance informa
+interacción/plataforma; Greenhouse la traduce a un análisis enterprise: surfaces
+deliberadas, canvas estructural, paleta neutral, motion funcional y fallback
+honesto para datos escasos.
+
 ## Caveat Greenhouse (crítico) — intención, no literal
 
 La guidance es **plataforma-web-nativa**: CSS moderno (`appearance: base-select`, `::picker(select)`, `::checkmark`, `popover`, `@starting-style`, `view-transition`, scroll-driven timelines), HTML/DOM y JS APIs nativas. Greenhouse renderiza con **MUI v7 + Vuexy + tokens AXIS**, con lint gates que bloquean hardcode.

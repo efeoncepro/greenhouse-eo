@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.4
+> **Version:** 1.10
 > **Creado:** 2026-08-05 por Claude (TASK-1299 + TASK-1301)
-> **Ultima actualizacion:** 2026-08-06 por Claude (captura de rankings ACTIVA en produccion — scheduler despausado, primera serie real de Berel)
+> **Ultima actualizacion:** 2026-08-08 por Claude (TASK-1309 — la Auditoría del sitio al día con la pantalla construida: el orden mira tres cosas y no dos (se suma el valor de búsqueda), las tres aclaraciones que evitan una conclusión falsa (tope del crawl, velocidad de laboratorio, alcance del puntaje), el movimiento contra el crawl anterior, el filtro por gravedad, la exportación del grupo, y lo que la auditoría todavía NO revisa)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
 
 # Modulo SEO — Search Visibility 360 (Growth)
@@ -12,7 +12,11 @@ El modulo SEO es la mitad "buscadores clasicos" de **Search Visibility 360**: mi
 
 La idea central es que la visibilidad no es una foto: es una **serie de tiempo**. El valor del módulo no está en saber "hoy estás en la posición 7", sino en poder mostrar "hace tres meses estabas en la 15, hoy estás en la 7, y este competidor te está alcanzando". Por eso todo el modelo de datos está construido como mediciones append-only: cada captura se guarda y **nunca** se edita ni se borra.
 
-Este documento describe el estado real al 2026-08-05: están construidas las tres primeras capas (modelo de datos, modelo de acceso y la primera captura automática — la serie diaria de Google Search Console). Las capturas pagadas (rankings, site audit, backlinks) y toda la UI llegan en las tasks siguientes de `EPIC-022`.
+Este documento describe el estado real al 2026-08-08: están construidas las capas de datos y acceso, las capturas automáticas (Search Console diaria, rankings, site audit y backlinks) y **las cuatro pantallas del operador** — Resumen, Rendimiento, Keywords y Auditoría. La superficie del cliente está construida y **pendiente de rollout**: su migración de catálogo no está aplicada todavía (ver el recuadro de abajo).
+
+> Estado de catálogo 2026-08-08: el runtime desplegado aún usa `seo_v1`. TASK-1310 deja en
+> `develop` una migración pendiente que lo supersede por `seo_v2` para publicar el dashboard e
+> informe SEO como módulos cliente; no cambia tiers, cupos ni autorización per-org.
 
 ## Que existe hoy
 
@@ -84,7 +88,7 @@ TASK-1302 convierte esa consulta en vivo en una **serie propia de Greenhouse**: 
 
 **Estado live (2026-08-05):** la serie está corriendo con datos reales. Primera marca capturada: `sc-domain:berel.com`, con 26.192 filas guardadas cubriendo 4 días y 375 consultas identificadas en distancia corta.
 
-**Todavía no hay pantalla.** La operación de esta serie es hoy por línea de comandos y logs — verificar la corrida, re-materializar un día puntual, revertir. El paso a paso está en el manual [Operar la serie diaria de Search Console](../../manual-de-uso/growth/operar-serie-search-console.md). Las pantallas llegan con TASK-1306 (overview) y TASK-1308 (oportunidades).
+**Cómo se opera y dónde se ve.** La operación de la serie (verificar la corrida, re-materializar un día puntual, revertir) sigue siendo por línea de comandos y logs: el paso a paso está en el manual [Operar la serie diaria de Search Console](../../manual-de-uso/growth/operar-serie-search-console.md). Lo que la serie produce ya tiene pantalla: el cockpit **Resumen** (TASK-1306) y **Oportunidades de keywords** (TASK-1308, más abajo), que es la superficie de este reader.
 
 > Detalle técnico: [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) · materializador y batch en [`src/lib/growth/seo/`](../../../src/lib/growth/seo/) · reader de oportunidades en [`src/lib/growth/seo/keyword-opportunities-reader.ts`](../../../src/lib/growth/seo/keyword-opportunities-reader.ts) · la conexión de origen es la de [Conexion a Google Search Console](conexion-search-console.md).
 
@@ -193,15 +197,267 @@ Lo siguiente aún no está construido (las series que ya se llenan: Search Conso
 
 | Falta | Task que lo trae |
 |---|---|
-| UI operador `/admin/growth/seo` (overview) | TASK-1306 |
-| Pantalla ancla: Rank & URL performance over time | TASK-1307 |
-| Keyword opportunities (UI) | TASK-1308 |
-| Site audit (UI) | TASK-1309 |
-| Superficie cliente + Report Artifact + quadrant 360 | TASK-1310 |
+| Semilla histórica de posiciones (DataForSEO Labs) + export nativo GSC→BQ por cliente | TASK-1655 (Slices 4-5) |
+
+### La pantalla ancla: Rendimiento en el tiempo (TASK-1307, 2026-08-07)
+
+`/admin/growth/seo/performance` (tab **Rendimiento** de Search Visibility) es la película
+que justifica el módulo: eliges hasta 8 URLs o keywords y ves cómo evolucionan lado a
+lado. El gráfico usa el estándar de los rank trackers — **el eje de posición va invertido
+(1 arriba = mejor)** y lo dice con palabras, no solo con la geometría — con la meta top-3
+dibujada, zoom temporal y el valor final de cada serie pegado a su línea. Cada serie se
+distingue por color **y forma** (tipo de línea + símbolo), para que la comparación
+sobreviva al daltonismo y a una impresión en blanco y negro.
+
+Tres reglas de honestidad que la pantalla no negocia:
+
+- **La cobertura se declara**: "N de M días con medición · desde–hasta" junto al título.
+  Un período pedido de 90 días con 31 medidos se dice, no se disimula.
+- **Los huecos son huecos**: un día sin medición corta la línea; jamás se rellena con un
+  cero (la posición 0 no existe y "0 clics" afirmaría algo que no se midió).
+- **La fuente se nombra**: posición exacta de mercado (◑ DataForSEO) o posición promedio
+  medida (● Search Console). Si la serie exacta es más joven que la medida (la captura de
+  rankings recién empieza), la pantalla sirve la medida y lo declara — nunca las promedia.
+- La selección vive en la URL (`?keywords=`/`?urls=`): el enlace se comparte y la otra
+  persona ve exactamente la misma comparación.
+
+**El alcance vive en la cabecera** — Space, período (28, 90, 180 días o 12 meses) y
+dispositivo — y aplica a todo lo que se ve debajo. El dispositivo no es un filtro de
+presentación: la búsqueda en móvil y en escritorio devuelve resultados distintos, así que
+cambiarlo cambia **qué se consultó**, no cómo se dibuja.
+
+Sobre esa base, la pantalla agrega cuatro ayudas de lectura:
+
+- **Tus grupos.** Si el equipo ya configuró grupos de keywords en el seguimiento de ese
+  Space, aparecen como botones al comparar por keyword: un clic arma la comparación
+  completa. No son grupos inferidos por el sistema — son los que alguien configuró, y si
+  el grupo excede el tope de 8 el botón lo advierte.
+- **Lectura del período.** Un recuadro que interpreta los cuatro indicadores **juntos** y
+  nombra qué explica el movimiento: cayó la demanda de esas búsquedas (y no el ranking);
+  el resultado de búsqueda está capturando el clic aunque la posición se mantenga (el
+  patrón típico de las respuestas con IA); o la ganancia/pérdida de posición explica el
+  cambio de clics. Aparece **sólo cuando el patrón es inequívoco**: con señales mezcladas,
+  o sin período anterior comparable, no dice nada — un diagnóstico ambiguo es peor que
+  ninguno.
+- **Granularidad diaria o semanal.** En rangos largos la serie arranca en semanal porque
+  un punto por día se vuelve una nube ilegible; el operador vuelve a diario cuando
+  necesita el detalle fino. En semanal los volúmenes se suman, y posición y CTR promedian
+  **sólo los días medidos**.
+- **Contexto sobre el gráfico.** Rombos que marcan los días con AI Overview en la búsqueda,
+  y bandas de color que marcan actualizaciones **confirmadas** del algoritmo de Google —
+  para distinguir "se movió todo el mercado" de "se movió mi sitio". El registro de
+  actualizaciones es curado y manual: sólo entra lo confirmado por Google, nunca un rumor
+  de terceros.
+
+Los marcadores de AI Overview tienen su propia regla de honestidad, y es la más fácil de
+leer de más: **sólo existen en la serie ◑ (la medición del proveedor externo, que observa
+la página de resultados)**. Search Console no informa ese dato, así que la **ausencia de
+rombos no significa ausencia de IA — significa que esa fuente no lo mide**. La leyenda
+● Medido / ◑ Estimado vive junto al gráfico, al lado de las series que describe.
+
+> Detalle tecnico: `SeoPerformanceView` + `readSeoPerformance`/`readSeoPerformanceCatalog`
+> (`src/lib/growth/seo/performance/**`). Mismo reader para UI, Nexa y las MCP tools
+> `get_seo_performance` / `get_seo_performance_catalog` (parity en el mismo PR). El chart
+> es el primer consumer de **ECharts** (lazy por ruta — la decisión de librería del módulo).
+> Lectura cruzada en `performance/derive-insight.ts` (pura y testeada) y registro curado de
+> updates en `algorithm-updates.ts`. Manual del operador:
+> [`usar-pantalla-rendimiento-seo.md`](../../manual-de-uso/growth/usar-pantalla-rendimiento-seo.md).
+
+### El histórico de verdad: BigQuery como memoria larga (TASK-1655, 2026-08-07)
+
+El módulo nació capturando solo "hoy", y una pantalla de evolución con 5 días no se le
+puede presentar a un cliente. Desde el 2026-08-07 el historial de Search Console vive en
+BigQuery (`seo_gsc_history`): el batch diario espeja cada día capturado, y un backfill
+por API trae hasta 16 meses de pasado por organización (gratis — la API de Google no
+cobra). PostgreSQL conserva solo la ventana operativa reciente: meses de historia en la
+base transaccional la engordarían sin necesidad (5 días ya pesaban 27 MB). Las pantallas
+eligen sola la fuente: si la base operativa no cubre el período pedido, leen el histórico.
+
+> Detalle tecnico: mirror + backfill en `src/lib/growth/seo/gsc-history-bq-mirror.ts` /
+> `gsc-backfill.ts`; runbook del backfill en
+> [`backfill-historico-gsc.md`](../../manual-de-uso/growth/backfill-historico-gsc.md);
+> delta de arquitectura en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §4.
 
 Además: el alta del módulo `seo_v1` a una organización sigue siendo un **paso operativo manual** — ver el manual [Asignar el módulo SEO a una organización](../../manual-de-uso/growth/asignar-modulo-seo-organizacion.md).
 
 Sobre el interruptor general `GROWTH_SEO_ENABLED`: está **encendido desde el 2026-08-05** y es **multi-runtime** — lo leen dos procesos distintos con su propia copia de la variable: el trabajador de fondo (`ops-worker`, para la captura diaria de Search Console) y el portal en Vercel (para el lane que sirve las consultas por MCP). Encenderlo en un solo runtime deja el otro camino muerto. Desde el 2026-08-06 está en `true` en Vercel Production. Encenderlo no gasta presupuesto: la captura de Search Console es gratis y las consultas por MCP son de lectura. Las corridas que **sí** cuestan dinero (rankings, site audit, backlinks) siguen exigiendo el assignment `seo_v1` de la organización y pasan por el chokepoint de cupos y presupuesto.
+
+### Oportunidades de keywords: donde crecer en busqueda (TASK-1308, 2026-08-07)
+
+La tercera pantalla del modulo (`Growth > SEO > Keywords`) responde una sola pregunta: **que keyword
+persigo primero**. Muestra las busquedas donde el sitio ya aparece entre las posiciones 8 y 20 — ya
+existe pagina y ya existe relevancia, falta el empujon — y las ordena por los clics adicionales que
+ganaria cada una si subiera.
+
+**Que se ve**
+
+| Elemento | Que dice |
+|---|---|
+| Banda de veredicto | Lo primero de la pantalla: el hallazgo dominante en una frase redactada desde el reparto real ("42 de 50 keywords compiten contra tu propio sitio") y los clics totales que estan sobre la mesa. Si ningun grupo domina, describe el conjunto en vez de inventar una conclusion. |
+| Los tres segmentos de esa banda | Son la leyenda del mapa **y** el filtro por accion, en un solo objeto. Su ancho es proporcional al conteo, para que un reparto de 42 · 6 · 2 se vea sin leer los numeros. |
+| Mapa de oportunidad | Cada burbuja es una keyword. Mas a la izquierda, mas cerca de la primera plana. Mas arriba, mas gente la busca. Mas grande, mas clics ganarias. Se puede plegar: la primera vez se quiere el mapa, la decima ya se sabe que se busca y se quiere la lista. |
+| Zona sombreada "Primera plana" | Las posiciones 8 a 10. Marca un **hecho posicional, no una accion**: dentro caen tambien keywords canibalizadas, que se consolidan. |
+| Forma y color | La accion recomendada, que no es la misma para todas (ver abajo). La forma existe para que la lectura sobreviva al daltonismo y al monocromo; la misma etiqueta va en texto en la tabla. |
+| Tabla | Los valores exactos de cada keyword, la pagina que rankea hoy (abrible) y la columna **Seguimiento**. Ordenada por ganancia estimada, reordenable por columna y paginada de a 25. |
+
+**Tres acciones, no tres severidades.** El modulo no clasifica las keywords por "que tan buenas son"
+sino por **que hay que hacer con ellas**, porque son trabajos distintos:
+
+- **Empujar (fruta madura)** — posicion 10 o mejor. Ya estas en la primera plana, falta subir dentro de ella.
+- **Empujar (a un paso)** — posicion 11 a 20. La segunda plana; llegar a la primera es el salto de mayor retorno.
+- **Consolidar** — mas de una pagina tuya compite por esa busqueda y se diluyen entre si. **No se optimiza:
+  se consolida** (unificar, redirigir, canonical o diferenciar la intencion). Es otro trabajo, con otro dueño.
+
+**De donde sale el dato, y que todavia no esta.** Todo lo que se ve esta **medido por Search Console**:
+son las impresiones y posiciones reales de la busqueda del propio cliente. El enriquecimiento externo
+de *volumen* y *dificultad de mercado* aun no esta habilitado, y mientras eso sea cierto esas dos
+columnas **no se muestran**: la ausencia se declara una vez, con palabras, al pie del mapa — una
+columna que no puede traer datos no gana su ancho, y repetir "sin dato" cien veces ahogaba los numeros
+que la tabla existe para mostrar. Lo que **nunca** aparece es un `0`, que afirmaria que nadie busca eso.
+Cuando el enriquecimiento aterrice, las columnas vuelven solas sin reescribir la pantalla. La
+priorizacion no lo necesita: la demanda ya esta medida, y los ejes del mapa jamas dependieron de ese dato.
+
+**"Seguir" cuesta plata, y la pantalla lo dice antes del clic.** Seguir una keyword la agrega al set
+monitoreado, y desde ahi su posicion se mide **todos los dias** con un proveedor externo que se cobra por
+consulta. Por eso: la accion solo aparece para quien tiene el permiso de configurar el target (ver el mapa
+y hacer crecer la factura son dos permisos distintos), el cupo del set se muestra siempre, y al llegar al
+tope el boton se deshabilita explicando por que en vez de fallar al enviarlo. Si una keyword ya estaba
+seguida, volver a seguirla no hace nada ni cuesta nada.
+
+**Y se puede deshacer.** Dejar de seguir saca la keyword del ciclo diario y libera cupo al
+instante. No borra nada: la medicion historica se conserva y lo que se cierra es la ventana
+de seguimiento. Se puede volver a seguir despues, pero empieza una ventana NUEVA — los dias
+que estuvo fuera no se recuperan. Por eso no sirve para "pausar" algo que piensas reanudar
+pronto. Tras dejar de seguir hay unos segundos para deshacer.
+
+**Lo que ves se puede sacar del portal.** El export en CSV baja el subconjunto filtrado —
+para el ticket, el SOW o el mail al cliente — y los filtros viajan en la URL, asi que la
+pantalla se puede compartir ya filtrada. Un click en la keyword lleva a Rendimiento con su
+serie aislada.
+
+**Quien puede hacer que.** Ver el mapa pide `growth.seo.observation.read`; seguir o dejar de seguir pide
+ademas `growth.seo.target.configure`. Sin la segunda, la columna de seguimiento y las casillas de
+seleccion **no se renderizan** — un analista lee el mapa completo sin poder hacer crecer la factura.
+
+> Paso a paso para operarla: [Oportunidades de Keywords — leer el mapa y seguir keywords](../../manual-de-uso/growth/seguir-keywords-oportunidades-seo.md).
+>
+> Detalle tecnico: `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §7 (commands `trackKeywords` / `untrackKeywords`)
+> y §10.4 (encoding del mapa). Codigo: `src/lib/growth/seo/track-keywords.ts`,
+> `src/views/greenhouse/admin/growth/seo/keywords/`. Mismos commands para la UI, el lane `app`,
+> el lane `ecosystem` y las tools MCP `track_seo_keywords` / `untrack_seo_keywords` (estas ultimas
+> fail-closed hasta que el scope `efeonce.mcp.seo.write` quede cableado a un cliente).
+
+### Auditoria del sitio: que esta roto y que conviene arreglar primero (TASK-1309, 2026-08-08)
+
+La cuarta y ultima pantalla del modulo (`Growth > SEO > Auditoria`) muestra la **salud tecnica** del
+sitio de un cliente: cuantos problemas encontro el ultimo crawl, de que gravedad, y en que orden
+conviene atacarlos. Es donde el equipo diagnostica el sitio antes de proponer trabajo.
+
+**Que se ve**
+
+| Elemento | Que dice |
+|---|---|
+| Salud del sitio | Un puntaje de 0 a 100 en un arco, con el número siempre escrito. Verde sobre 80, ámbar sobre 50, rojo abajo. Si el crawl no alcanzó a calcularlo dice **"Pendiente"** — un 0 se leería como "sitio pésimo", que es otra cosa. Debajo, **qué mide ese puntaje** (ver "Las tres cosas que la pantalla aclara"). |
+| Movimiento desde el crawl anterior | Al lado de la salud y de los issues: "+2,4 desde el crawl del 3 de agosto", "12 issues menos". El módulo entero se vende como serie de tiempo, y esta pantalla mostraba un punto. Si es el primer crawl **lo dice** — dejar el hueco vacío sería ambiguo entre "no cambió" y "no hay con qué comparar". Sólo compara contra crawls **terminados**: contra uno fallido o en vuelo el número sería inventado. |
+| Ultimo crawl | En la cabecera, en palabras ("hace 3 dias"). Dice cuanto confiar en todo lo demas. Pasadas dos semanas aparece un aviso: el diagnostico ya no es reciente. |
+| Criticos · Atencion · Menores | El volumen por gravedad, en una **banda cuyo ancho es el reparto**: son partes de un mismo total, y para eso la respuesta es longitud, no tres números sueltos que pesan visualmente igual. Cada segmento **filtra la lista** al apretarlo. El segmento en cero no se atenúa: "0 críticos" es la mejor noticia de la pantalla. |
+| Paginas revisadas | Cuántas páginas alcanzó a mirar el crawl. **Sale de la banda a propósito** — no es una severidad, y mezclarla ahí invitaba a compararla con lo que no es comparable. Cuando choca el techo del crawl, la cifra lo dice (ver abajo). |
+| Issues priorizados | Una **lista**, no una tabla ordenable. El orden ES la respuesta a "que ataco primero", asi que no se esconde detras de un control que haya que descubrir. Cada fila: gravedad (icono + palabra + color), nombre del problema en español, cuantas paginas afecta y cuanto esfuerzo estimamos. |
+| El orden de la lista | Primero **todo lo crítico**, sin excepción. Dentro de cada nivel compiten **tres** cosas: cuántas páginas toca, **cuánto mueve la aguja en búsqueda** y cuánto cuesta resolverlo. Así 400 imágenes sin texto alternativo nunca entierran un error de servidor — y la higiene que toca todo el sitio tampoco encabeza su nivel sólo por ser ancha (ver abajo). |
+| Esfuerzo | Rapido / Medio / Alto. Es **juicio nuestro, no un dato del crawl**, y la pantalla lo dice con esas palabras. Existe porque la gravedad sola no responde la pregunta: 300 imagenes sin `alt` y una caida de servidor no se atacan igual aunque compartan volumen. |
+| Ver → | Abre el grupo en la misma pantalla y lista las URLs afectadas. Se puede compartir el enlace y el boton "atras" del navegador funciona. |
+| Copiar | En el grupo abierto. Se lleva **todas** las URLs del grupo —no sólo las que la tabla alcanza a mostrar— como texto que pega igual de bien en un documento que en una planilla. El diagnóstico es material de conversación de propuesta y hasta acá terminaba en copiar noventa URLs a mano. Si el navegador bloquea el portapapeles, lo dice: fallar en silencio dejaría a la persona creyendo que copió. |
+
+**Las tres cosas que la pantalla aclara, porque callarlas produce una conclusión falsa**
+
+Las tres salieron de mirar la pantalla con datos reales, y son la misma clase de problema: dos cifras
+verdaderas puestas juntas sin decir qué mide cada una llevan a creer algo que no es.
+
+| Lo que se aclara | Por qué |
+|---|---|
+| **"Páginas revisadas" dice cuándo es el tope del crawl y no el sitio** | El crawl revisa hasta 100 páginas. Grupo Berel devolvió exactamente 100 — ese número redondo no era el tamaño del sitio, era el crawl chocando su límite. Si el sitio tuviera 3.000 páginas estaríamos diagnosticando el 3% y titulándolo "Salud del sitio: 95". Cuando el conteo iguala el tope, la cifra lo dice y la pantalla explica que la salud describe **esa muestra**, no el sitio entero. |
+| **Los checks de velocidad declaran que son de laboratorio** | "Tiempo de carga alto" y sus tres hermanos se miden en un banco de pruebas. Google **no rankea con eso**: rankea con datos de campo, de visitas reales, los que llegan por Search Console. Sin decirlo, alguien podría leer esa fila y prometerle a un cliente una mejora de posiciones sobre la métrica equivocada. Es la misma separación que el resto del módulo hace entre ● medido y ◑ estimado. |
+| **El puntaje explica su alcance** | "95 de salud" al lado de "519 issues" se lee como contradicción — fue la primera pregunta al ver la pantalla, y un cliente va a preguntar lo mismo. No miden lo mismo: **el puntaje lo calcula el proveedor** con su propia ponderación y sus ~65 verificaciones, y **el conteo sale de nuestro catálogo curado de 34**. Un sitio sin críticos puede acumular muchos issues menores y seguir puntuando alto, porque el puntaje pesa sobre todo lo que rompe la indexación. No es un error: es que cada cifra responde otra pregunta, y reconciliarlo es obligación de la pantalla, no del que la lee. |
+
+**Por qué el orden mira el valor de búsqueda y no sólo el volumen**
+
+La gravedad dice **qué tan roto** está algo; el valor de búsqueda dice **cuánto importa arreglarlo**.
+No son lo mismo, y dentro de un mismo nivel de gravedad conviven higiene cosmética y señales reales.
+Con sólo volumen y esfuerzo, en Berel el primer aviso menor era "Sin favicon · 91 páginas" por encima
+de "Imágenes sin texto alternativo · 50 páginas": la trivia que toca todo el sitio ganaba por ancho.
+Un favicon afecta cómo se ve la marca en el resultado; un texto alternativo ausente afecta la búsqueda
+de imágenes y la accesibilidad. Lo de bajo valor **se hunde pero se sigue listando** — esconderlo
+sería la otra forma de mentir sobre el diagnóstico.
+
+**Los estados, que no se mezclan**
+
+| Situacion | Que muestra |
+|---|---|
+| Nunca se audito | "Sin auditoria reciente" + el boton para correrla. Nunca ceros. |
+| Crawl en curso | "Auditoria en curso". Todavia no hay hallazgos, y eso se dice — no se pinta una lista vacia. |
+| Termino sin problemas | "Sin issues detectados". Es una **buena noticia**, no un error, y se ve distinto de un crawl fallido. |
+| Termino a medias | Aviso de que el crawl quedo incompleto. Lo que se ve es real, pero no es el sitio entero. |
+| Fallo | "La auditoria fallo", con la opcion de reintentar. |
+| Sin sitio configurado | Explica que primero hay que crear el sitio del Space. Es otro camino, no el mismo vacio. |
+
+**Correr una auditoria** cuesta dinero (le pagamos al proveedor por cada crawl), asi que esta detras
+de un permiso propio: quien puede *leer* el diagnostico no necesariamente puede *correrlo*. Ademas hay
+dos frenos automaticos: si ya hay un crawl en vuelo o ya se corrio uno hoy para ese sitio, el sistema
+lo dice en vez de gastar dos veces por lo mismo.
+
+**Lo que esta auditoría todavía NO revisa** (y por eso no alcanza para declarar un sitio listo para
+la IA): si el `robots.txt` **bloquea a los rastreadores de IA**, si al sitio le **falta** el marcado
+de datos estructurados (hoy sólo detecta errores en el marcado que ya existe), si hay conflicto entre
+`noindex` y el bloqueo de robots, y la salud del mapa del sitio. Es el punto ciego más caro del módulo:
+un sitio que le cierra la puerta a los rastreadores de IA queda fuera de las respuestas de ChatGPT,
+Perplexity y compañía, y hoy esta pantalla lo declararía sano con 95 de 100. Lo cierra **TASK-1670**,
+que reutiliza las verificaciones ya probadas del motor AEO en vez de escribirlas de nuevo.
+
+> Paso a paso para operarla: [Auditoria del sitio — leer la salud tecnica y priorizar](../../manual-de-uso/growth/usar-auditoria-sitio-seo.md).
+>
+> Detalle tecnico: `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §6/§7 (reader
+> `readSiteAuditReport`, command `queueSiteAudit`) y §10.6 (los contratos de esta superficie). Codigo:
+> `src/views/greenhouse/admin/growth/seo/audit/`, `src/app/api/admin/growth/seo/audit/run/`.
+> El mismo command lo operan la UI, Nexa y el lane MCP — y la comparación contra el crawl anterior se
+> calcula **dentro del reader canónico**, así que le llega a los tres sin inventar un contrato aparte.
+
+### La superficie del cliente: su propia lectura de búsqueda (TASK-1310, 2026-08-08)
+
+Las cuatro pantallas anteriores son del equipo de Efeonce. Ésta es **del cliente**: entra a su
+portal y ve su propia lectura de visibilidad, sin datos de nadie más y sin la densidad del
+cockpit interno.
+
+**Qué ve** (`Inicio > SEO`, ruta `/growth/seo`), en un navegador de tres secciones:
+
+| Sección | Qué responde |
+|---|---|
+| **Resumen** | Cómo le va en búsqueda hoy: la lectura dominante en una frase, la métrica principal y las señales que la acompañan. |
+| **Evolución** | Cómo se movió en el tiempo, con la **cobertura declarada** — cuántos días del período tienen medición de verdad. Un hueco corta la línea; nunca se rellena con cero. |
+| **Quadrant** | El cruce con AEO: dónde está su marca en el eje de búsqueda clásica contra el de motores de respuesta. |
+
+Y un **informe** (`/growth/seo/report`) que puede imprimir o guardar como PDF.
+
+**Lo que NO ve, por construcción:** costos de proveedor, cupos, tier comercial ni datos de otras
+organizaciones. El informe se arma sobre el mismo contrato compartido de reportes que el AEO, con
+una variante que distingue "portal del cliente" de "adjunto", y hay un test que falla si algo
+interno se filtra.
+
+**Cómo se habilita.** No es por rol: es **por organización**. Un cliente ve SEO cuando su Space
+tiene el módulo asignado, y sólo alcanza su propia lectura. Si no lo tiene, la pantalla lo dice con
+palabras ("SEO no está activo en tu plan") y ofrece hablar con su equipo de Efeonce — nunca un
+tablero vacío que se lea como "no tienes visibilidad".
+
+> ⚠️ **Estado al 2026-08-08: construida y con su catálogo aplicado; falta la verificación con
+> sesión de cliente.** El código está publicado en `develop` y desplegado a staging, y la migración
+> de catálogo **ya se aplicó**: el módulo `seo_v2` existe con los dos viewCodes de cliente y las dos
+> organizaciones habilitadas. Falta entrar con una sesión de cliente real y confirmar que el menú
+> compone SEO. La ronda premium de la auditoría visual sigue abierta.
+>
+> Paso a paso para operarla: [Habilitar y verificar el portal SEO del cliente](../../manual-de-uso/growth/habilitar-portal-seo-cliente.md).
+>
+> Detalle técnico: `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §10.7 (cutover del
+> catálogo). Código: `src/views/greenhouse/growth/seo/client/`,
+> `src/components/growth/seo/report-artifact/`.
 
 ## Relacion con el AI Visibility Grader (motores hermanos)
 

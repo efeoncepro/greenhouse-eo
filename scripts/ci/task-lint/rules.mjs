@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 const REQUIRED_SECTIONS = [
@@ -1104,7 +1104,179 @@ const checkHybridProfileJustification = task => {
   ]
 }
 
+
+/**
+ * TASK-1664 — `stale-blocker`
+ *
+ * 🔴 Cierra una fricción que se acumula sola y que NINGÚN gate detectaba: al completar una task,
+ * las que la citaban en `Blocked by` se quedan diciendo que están bloqueadas para siempre.
+ *
+ * Caso fuente (2026-08-08, EPIC-022): SIETE blockers citados por las hijas del epic estaban todos
+ * completos. El backlog llevaba semanas leyéndose como bloqueado sin estarlo — de 15 abiertas, 11
+ * se podían tomar ya. Nadie lo vio porque `task:lint` valida la FORMA del campo, no si el blocker
+ * sigue vivo, y un `Blocked by` obsoleto no rompe nada: sólo hace que la gente no tome trabajo.
+ *
+ * Dos direcciones, y la primera es la que importa:
+ *
+ * 1. **Reversa (error).** Al lintear una task `complete`, busca en TODO el corpus activo quién la
+ *    sigue citando. Dispara justo en el momento del cierre — que es el único momento en que el
+ *    agente tiene el contexto para arreglarlo y la obligación de hacerlo. Ese es el "sí o sí".
+ * 2. **Directa (warning).** Al lintear una task activa, avisa si cita un blocker ya completo. Es
+ *    informativa a propósito: no puede romper el trabajo de alguien por una task ajena que otro
+ *    cerró mal.
+ *
+ * La verdad del lifecycle se lee de la CARPETA, no del registry ni del campo `Lifecycle`: la
+ * carpeta es lo que el humano ve y lo que `docs:closure-check` ya exige que coincida.
+ */
+const TASK_REF_RE = /TASK-(\d{3,4})/g
+
+const parseBlockedByIds = task => {
+  const raw = task.status?.fields?.['Blocked by'] ?? task.status?.fields?.['blocked by'] ?? ''
+
+  if (!raw) return []
+  if (/^`?none`?$/i.test(raw.trim())) return []
+
+  const ids = new Set()
+
+  for (const match of raw.matchAll(TASK_REF_RE)) ids.add(`TASK-${match[1]}`)
+
+  return [...ids]
+}
+
+/**
+ * ⚠️ Caché a nivel de MÓDULO, no en `context`: `runRules` recibe un objeto nuevo por task
+ * (`{ ...context, repoRoot, ... }`), así que memoizar ahí no persiste y el índice se reconstruiría
+ * una vez por task — O(n²) sobre un corpus de ~1.600 tasks. Se cachea por `repoRoot` porque los
+ * tests crean un repo temporal distinto en cada caso.
+ */
+const lifecycleIndexCache = new Map()
+const activeBlockedByCache = new Map()
+
+const loadTaskLifecycleIndex = context => {
+  const cached = lifecycleIndexCache.get(context.repoRoot)
+
+  if (cached) return cached
+
+  const index = new Map()
+
+  for (const lifecycle of ['to-do', 'in-progress', 'complete']) {
+    const dir = join(context.repoRoot, 'docs', 'tasks', lifecycle)
+
+    if (!existsSync(dir)) continue
+
+    for (const entry of readdirSync(dir)) {
+      if (!entry.endsWith('.md')) continue
+      const id = entry.match(/^(TASK-\d{3,4})-/)?.[1]
+
+      if (!id) continue
+      index.set(id, { lifecycle, file: `docs/tasks/${lifecycle}/${entry}`, dir })
+    }
+  }
+
+  lifecycleIndexCache.set(context.repoRoot, index)
+
+  return index
+}
+
+const loadActiveBlockedBy = context => {
+  const cached = activeBlockedByCache.get(context.repoRoot)
+
+  if (cached) return cached
+
+  const index = loadTaskLifecycleIndex(context)
+  const dependents = new Map()
+
+  for (const [id, entry] of index) {
+    if (!ACTIVE_TASK_LIFECYCLES.has(entry.lifecycle)) continue
+
+    let source
+
+    try {
+      source = readFileSync(join(context.repoRoot, entry.file), 'utf8')
+    } catch {
+      continue
+    }
+
+    const line = source.split(/\r?\n/).find(item => /^-\s*Blocked by:/i.test(item))
+
+    if (!line) continue
+    if (/`?none`?\s*$/i.test(line.replace(/^-\s*Blocked by:\s*/i, ''))) continue
+
+    for (const match of line.matchAll(TASK_REF_RE)) {
+      const blockerId = `TASK-${match[1]}`
+
+      if (blockerId === id) continue
+      if (!dependents.has(blockerId)) dependents.set(blockerId, [])
+      dependents.get(blockerId).push({ id, file: entry.file })
+    }
+  }
+
+  activeBlockedByCache.set(context.repoRoot, dependents)
+
+  return dependents
+}
+
+const checkStaleBlocker = (task, context) => {
+  if (!task.id) return []
+
+  const findings = []
+
+  // Reversa: esta task está cerrada y alguien todavía la declara como blocker.
+  if (task.folderLifecycle === 'complete') {
+    const dependents = loadActiveBlockedBy(context).get(task.id) ?? []
+
+    for (const dependent of dependents) {
+      findings.push(
+        finding({
+          task,
+          rule: 'stale-blocker',
+          severity: blockingSeverity(context),
+          message:
+            `${task.id} está en complete/ pero ${dependent.id} todavía la declara en "Blocked by" ` +
+            `(${dependent.file}). Cerrar una task incluye DESBLOQUEAR a quienes la citaban: quita ` +
+            `${task.id} de ese campo (y déjalo en \`none\` si era el único). Un blocker obsoleto no ` +
+            'rompe nada — sólo hace que nadie tome trabajo que ya se puede tomar.'
+        })
+      )
+    }
+
+    return findings
+  }
+
+  // Directa: esta task activa cita un blocker que ya se cerró.
+  if (!ACTIVE_TASK_LIFECYCLES.has(task.folderLifecycle)) return findings
+
+  const index = loadTaskLifecycleIndex(context)
+  const line = task.status?.fieldLines?.['Blocked by'] ?? task.status?.fieldLines?.['blocked by']
+
+  for (const blockerId of parseBlockedByIds(task)) {
+    const entry = index.get(blockerId)
+
+    if (!entry || entry.lifecycle !== 'complete') continue
+
+    findings.push(
+      finding({
+        task,
+        rule: 'stale-blocker',
+        severity: 'warning',
+        ...(line ? { line } : {}),
+        message:
+          `${task.id} declara "Blocked by: ${blockerId}" pero ${blockerId} ya está en complete/. ` +
+          'Quítalo del campo; si era el único, déjalo en `none`. Warning y no error a propósito: ' +
+          'esta task no debe romperse porque otro cerró mal la suya.'
+      })
+    )
+  }
+
+  return findings
+}
+
 export const RULES = [
+  {
+    id: 'stale-blocker',
+    appliesTo: task => task.kind === 'template',
+    check: checkStaleBlocker
+  },
   {
     id: 'required-sections',
     appliesTo: task => task.kind === 'template',

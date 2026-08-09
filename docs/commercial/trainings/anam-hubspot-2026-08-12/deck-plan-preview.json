@@ -1,0 +1,22 @@
+{
+  "_readme": [
+    "Preview de una sola lámina conservado como evidencia de exploración inicial.",
+    "El entregable completo vigente es deck-plan.json + ANAM-HUBSPOT-TRAINING-2026-08-12.pdf."
+  ],
+  "tenderId": "ANAM-HUBSPOT-TRAINING-2026-08-12-PREVIEW",
+  "slides": [
+    {
+      "slideId": "sales-workspace",
+      "contentType": "artifact-showcase",
+      "template": "ArtifactShowcaseFull",
+      "slots": {
+        "sectionLabel": "TRABAJO DIARIO EN HUBSPOT",
+        "title": "La oportunidad avanza cuando cada etapa deja un <em>próximo paso</em>",
+        "lead": "Esta vista conceptual muestra cómo revisar una cuenta, actualizar la etapa y dejar una acción con responsable y fecha.",
+        "artifact": { "src": "assets/anam/hubspot-sales-workspace-mockup.svg" },
+        "caption": "Vista conceptual de entrenamiento · datos ilustrativos · no es captura del portal de ANAM",
+        "note": "Referencia: Sales Workspace · HubSpot"
+      }
+    }
+  ]
+}

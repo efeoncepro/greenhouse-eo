@@ -22,7 +22,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|ai|data`
-- Blocked by: `TASK-1267`
+- Blocked by: `none`
 - Branch: `task/TASK-1315-growth-eeat-signal-extraction-entity-author-trust`
 - Legacy ID: `none`
 - GitHub Issue: `none`

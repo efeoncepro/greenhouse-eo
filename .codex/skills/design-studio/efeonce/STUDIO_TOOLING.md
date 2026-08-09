@@ -32,7 +32,7 @@
   allowlisted hasta completar términos, schemas y evals. Si una campaña requiere varias
   fortalezas, cargar `../modules/12_HYBRID_IMAGE_CAMPAIGN_PRODUCTION.md` y diseñar una secuencia
   de manos con anchor/handoff, no un torneo de modelos.
-- **¿Es video/motion?** → Seedance 2.0 (control por referencias, Fal) / Veo 3.1 (premium, Vertex) /
+- **¿Es video/motion?** → Seedance 2.5 (Fal: T2V/I2V/R2V, audio y referencias multimodales) o Seedance 2.0 (control por referencias, Fal) / Veo 3.1 (premium, Vertex) /
   PixVerse V6 (escala, Fal) / Kling 3 (4K/specialist, Fal) / Gemini Omni (canary, Vertex);
   producción y formato social →
   `social-media-studio`. Un clip de duración mínima sólo valida el endpoint: el release profesional exige
@@ -63,8 +63,9 @@ fuera del router hasta registrar endpoint/modelo exacto, términos, residencia/r
 - **Post/composición exacta → runtime determinístico/humano.**
 
 Antes de elegir, cargar `../modules/14_ENTERPRISE_CREATIVE_MODEL_ROUTING.md` y leer el registry
-`docs/architecture/EFEONCE_CREATIVE_STUDIO_CAPABILITY_REGISTRY_V1.json`. Imagen 4 está deprecado;
-Seedance 2.5 permanece bloqueado/no verificado. `canary` nunca sostiene solo un SLA.
+`docs/architecture/EFEONCE_CREATIVE_STUDIO_CAPABILITY_REGISTRY_V1.json`. Imagen 4 está deprecado.
+Seedance 2.5 está expuesto por Fal, pero permanece gated en Globe: no ofrecerlo como ruta comercial hasta
+que exista contrato, adapter, derechos, pricing, evaluación y canary exactos. `canary` nunca sostiene solo un SLA.
 
 ## Gasto gobernado
 

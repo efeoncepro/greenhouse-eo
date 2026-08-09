@@ -1,54 +1,343 @@
 # Handoff activo
 
-### ISSUE-114 resuelta — el batch policy del preflight dejó de mentir (2026-08-08)
+### TASK-1309 — Auditoría del sitio (2026-08-08)
 
-Release `cloud_release`-only desde `main`, previo al batch SEO de `develop`. El classifier del
-preflight computaba el diff con base **three-dot**, que parte de la merge-base que el flujo de
-squash-merge deja congelada, y resucitaba archivos **byte-idénticos a producción** como cambios del
-release, fabricando dominios irreversibles falsos. Ahora usa **two-dot**, y ambos consumidores del
-rango (archivos **y** commit bodies) lo resuelven por una única función `buildReleaseDiffRange`, para
-que no puedan volver a divergir — que es exactamente la deriva que produjo la issue.
+`TASK-1309` está `in-progress` con código completo: cuarta tab `/admin/growth/seo/audit`, datos reales
+de Berel (95 · 0 críticos · 138 avisos · 381 menores · 100 páginas) y UI quality 4.59. El bloqueo
+heredado de TASK-1310 ya tiene fix local, pero faltan migración y staging (ver cutover más abajo).
+No repetir build ni suite global sin autorización (~30 GB).
+Evidencia: `.captures/2026-08-08T13-48-58_growth-seo-audit`.
 
-**Lo que necesita quien siga:**
+Auditada con `seo-aeo` y `greenhouse-ui-review`: el orden de la lista ganó un tercer eje —**valor de
+búsqueda**, ortogonal a la severidad— porque sin él la higiene de sitio ascendía por puro alcance
+(favicon en 91 páginas por encima de `alt` en 50), y los checks de performance ahora declaran que son
+medición de **laboratorio** (Google rankea con datos de campo). Queda declarada, sin dueño, una
+cobertura que el audit NO tiene: acceso de crawlers de IA en `robots.txt`, ausencia de JSON-LD,
+conflicto noindex+robots y salud de sitemap.
 
-1. **Si el classifier reporta un dominio irreversible, ahora es REAL.** No lo descartes como el
-   fantasma "conocido" ni le pongas `[release-coupled: …]` por costumbre. Los 4 releases previos de
-   `main` llevan ese marker y tres dicen literalmente *"NO son un acoplamiento de diseño"*: el marker
-   se había convertido en el ritual para callar un gate roto. Runbook §2.3-2 y skills actualizadas.
-2. **El hueco de cobertura no estaba donde parecía.** El classifier puro sí tenía tests; el defecto
-   vivía en cómo el check *recolectaba* los archivos, y `checks/release-batch-policy.ts` **no tenía
-   archivo de tests**. El guardrail nuevo fija el rango en el argv de git (rojo antes, verde después).
-3. **`ISSUE-145` (nueva, severidad alta) — lee esto antes del próximo release.** El batch policy del
-   orquestador es **decorativo**: corre con el `target_sha` ya mergeado, así que el rango es vacío y
-   aprueba sin mirar nada (verificado en los artefactos `preflight-result.json` de los 3 últimos
-   releases; `70e912056` reportó `filesChanged=0` con 1045 archivos y 14 migraciones). Y el marker
-   `[release-coupled: …]` **nunca se lee donde el runbook dice** — el squash queda fuera del rango en
-   ambos caminos — **pero se dispara solo con prosa**: hoy una cita en `aea35a678` (docs de growth/MCP)
-   neutraliza `split_batch` para todo el batch SEO. Raíz común: el ancla debería ser el `target_sha`
-   del release anterior, no `origin/main`. Los helpers ya existen (`listRecentReleases`) y el job de
-   preflight ya tiene credenciales PG.
-4. **La verificación adversarial encontró cuatro defectos en mi propio fix, ya corregidos:** el
-   docstring sobre-prometía (compartir el rango NO iguala `git diff` con `git log`); dos docstrings del
-   contrato seguían en three-dot; dos tests eran teatro porque el mock era ciego al rango (ahora es
-   sensible al rango: con three-dot restaurado fallan 5 en vez de 4); y se había colado un byte NUL
-   invisible en un fixture. Detalle en el §Verificación adversarial de `ISSUE-114`.
-5. **`ISSUE-144` (nueva) queda abierta:** `vercel_readiness` confunde un build cancelado a propósito
-   por el `ignoreCommand` con uno fallido. Diseño acordado en la issue; bloqueada por una decisión de
-   frontera (el `ignoreCommand` corre antes de `pnpm install`, así que el SSOT no puede ser TS).
-   Mitigación por ahora: `vercel redeploy` del deployment cancelado, nunca bypass.
-6. **Drift de CLI corregido de paso:** `vercel ls --target=` ya no existe en Vercel CLI 50.x (es
-   `--environment=`). Runbook y manual del orquestador actualizados; el preflight no se veía afectado
-   porque consulta la API, no el CLI.
+### Cutover `seo_v1 → seo_v2` — expand aplicado, falta migrar y contraer (2026-08-08)
+
+El rename de la clave del módulo era **breaking en los dos sentidos**: migración primero deja al
+código vivo pidiendo `seo_v1` ya superseded; código primero pide `seo_v2` que la base no tiene. Y no
+es sólo UI — el mismo predicado gatea los tres batches que le pagan al proveedor, que en la ventana
+saltarían con `no_entitlement` **en silencio**.
+
+Se aplicó la fase **expand**: `SEO_MODULE_KEY` queda para escritura y las lecturas usan
+`SEO_MODULE_KEYS_READ = ['seo_v2','seo_v1']` con `ANY($n::text[])` en los 5 consumidores. Verificado
+contra PG real con la base todavía en `seo_v1`: ambas orgs resuelven `hasModule=true` sin bloqueo.
+El contenido de la lista está fijado por test para que la contracción sea deliberada.
+
+**Pendiente, en este orden:** desplegar el expand → aplicar
+`migrations/20260808131441444_task-1310-seo-client-view-codes.sql` → verificar en staging con Berel →
+**recién ahí** contraer a `seo_v2` sola (dueño `TASK-1310`). Detalle: `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §10.7.
+
+### TASK-1310 — surfaces cliente SEO implementadas (2026-08-08)
+
+`TASK-1310` sigue `in-progress`: dashboard `/growth/seo`, quadrant y report `/growth/seo/report`
+reusan `ReportArtifactModel`; guard = assignment per-org + `growth.seo.report.read_client` `own`.
+La migración pendiente crea `seo_v2`, supersede el assignment `seo_v1` de Berel preservando tier/metadata
+y publica los viewCodes; sin aplicarla no hay navegación compuesta. Próximo paso: staging, sesión Berel,
+menú/rutas/denial sin módulo, baseline diff y revisión mobile. Sin push/deploy autorizado.
+
+**Verificación 2026-08-08 (deuda cerrada por Claude).** El barrido con subagentes encontró que el
+código estaba adelante de sus documentos y de sus gates, así que se corrigió lo documental y **se
+hizo fallar a propósito lo que estaba verde de mentira**:
+
+- **Señal de fiabilidad falsa-sana.** `seo-rank-capture-lag.ts` tenía `module_key = 'seo_v2'`
+  hardcodeado: veía 0 orgs y reportaba `ok`. Con el expand aplicado reporta `warning` con un hallazgo
+  real. Su test pinneaba el bug (asertaba el literal); ahora aserta el contrato. Commit `2f21dd46e`.
+- **GVC corría con la persona equivocada.** Los tres scenarios cliente capturaban con sesión de
+  operador contra una superficie client-gated, así que el frame decía "SEO no está activo en tu plan"
+  y el visual-gate daba BLOCK por una razón que no era la UI. Se agregó `requiresStorageState` al
+  contrato de scenario, exigido **antes** de lanzar el browser. `ui:visual-gate --task TASK-1310`
+  pasó de BLOCK a PASS. Commit `ec3fa82c6`.
+- **El scorecard estaba verde y la auditoría en BLOCK.** El scorecard de las 10:03 daba PASS 4.61 y
+  afirmaba "axe sin violaciones" cuando la auditoría de las 10:25 tiene 2 violaciones de contraste y
+  economía de superficies en 1.8. Se regeneró desde la auditoría: **`ui:quality --task TASK-1310`
+  ahora da BLOCK con `average=2.29 floor=1.8`**, que es el estado correcto para una task con
+  `UI ready: no`. El scorecard viejo queda declarado en el campo `supersedes`.
+- **Drift documental del `masterDetail`.** El wireframe y el flow todavía describían un navigator
+  lateral que la implementación descartó; era la ruta por la que el siguiente cambio reintroducía la
+  composición equivocada. Corregidos a `composition='single'` + tabs, con el "por qué no" escrito.
+- **Doc funcional + manual.** La superficie cliente salió de "Que NO existe todavía" y ganó su
+  sección con el estado de rollout declarado; se escribió el manual que faltaba
+  (`docs/manual-de-uso/growth/habilitar-portal-seo-cliente.md`) con el orden exacto del rollout y por
+  qué **no** se valida con la persona agente superadmin. README, EPIC-022 y el ledger de flags
+  quedaron sincronizados.
+
+Lo que **no** hice y sigue abierto: los 7 lotes de la auditoría premium (trabajo de Codex, vive en
+`/growth/seo/mockup`), el push de los commits locales y la migración —bloqueada porque `main` no
+tiene todavía el catálogo TS y `syncViewRegistryCatalog` desactivaría las filas.
+
+### TASK-1309 — CERRADA (2026-08-08)
+
+**Cerrada.** El build de producción salió verde con autorización del operador (exit 0, árbol completo
+de rutas), que era el último gate: `pnpm test` full + `pnpm build` prod + los 4 gates de UI +
+reachability. Lifecycle `complete`, archivo movido, registry/README/EPIC-022 sincronizados, y delta de
+impacto cruzado en las tres tasks que la citan como base (1670, 1672, 1673). **Con ella el conmutador
+de Search Visibility queda completo: las 4 tabs del operador navegan.**
+
+**El bloqueo había desaparecido solo.** 1309 estaba `code complete` frenada por 2 rojos ajenos en
+`client-role-visibility.test.ts`, causados por 1310 al registrar viewCodes sin migración de
+`role_view_assignments`. Esa migración se aplicó hoy en el rollout de 1310 y los cerró:
+**`pnpm test` completo en 1429 archivos / 10377 tests / 0 rojos**, `ui:quality` PASS 4.63,
+reachability 232 rutas / 0 huérfanas. Falta sólo `pnpm build` de producción sobre el último commit
+para moverla a `complete` (no se corrió: ~30 GB, va con autorización del operador).
+
+**Dos subagentes cerraron el ciclo documental**, con dominios de archivos disjuntos para no chocar.
+Lo que encontraron vale más que el trabajo mecánico:
+
+- 🔴 **§10.6 de la arquitectura SEO se auto-contradecía**, y fue culpa mía: el delta que agregué esta
+  mañana cambiaba el orden a tres ejes, pero el contrato 4 de arriba seguía declarando la regla vieja
+  de dos. Un agente que leyera el ítem sin bajar al delta implementaba lo equivocado.
+- **Cinco commits de feature aterrizaron DESPUÉS del pase documental** (`4c81306d5`), así que las tres
+  capas describían una pantalla anterior a la construida. El pase documental "ya hecho" no era
+  garantía de nada: lo que garantiza es mirar el delta.
+- Los hallazgos se **generalizaron más allá de SEO**, que es donde está el valor: `dataviz-design`
+  ahora advierte que **cualquier** chart que derive su tamaño del contenedor es sospechoso (tabs
+  ocultas, acordeones, y el `fullPage` de Playwright que produce cards vacías que parecen bug y no lo
+  son); `state-design` fija que el resultado de un job async tiene **seis** estados y no dos (nunca
+  corrió · corriendo · limpio · parcial · con techo · fallido); y los dos gates de UI review suman
+  como blocker el número cuya procedencia difiere de sus vecinos sin declararlo.
+
+**Deuda detectada de paso:** `greenhouse-ui-enterprise-review` existe en `.claude/` y `.codex/` pero
+**no está en el manifiesto de espejos** y ya divergía. Se le aplicó el mismo bloque a las dos copias
+para que el gate sea idéntico entre agentes, sin reconciliar la divergencia previa. Alguien debería.
+
+### TASK-1310 — verificado con sesión de cliente: funciona, pero NO es alcanzable (2026-08-08)
+
+Cerré el paso 5 del rollout con sesión real de Grupo Berel. Dos resultados, y el segundo es el que
+importa:
+
+✅ **El gate per-org pasa y la superficie es real.** Migración aplicada, `/growth/seo` renderiza con
+datos medidos: posición media 1.5, 31 keywords, 19 en primera página, cobertura 61%, procedencia
+declarada (medido ● / estimado ◑). Evidencia `.captures/2026-08-08T19-29-36_growth-seo-client`.
+
+🔴 **El menú del portal cliente NO compone SEO** — y no es el catálogo:
+
+1. `VerticalMenu.tsx` arma el menú cliente con una **lista hardcodeada de 7 ítems** filtrada por
+   `canSeeView('cliente.*')`. SEO no está en la lista, así que ningún seed lo agrega.
+2. Su único bloque dinámico (`capabilityModules`) sale de `businessLines`/`serviceModules` de la
+   sesión — **otro sistema**, no `module_assignments`.
+3. El resolver canónico module-based (`composeNavItemsFromModules` / `<ClientPortalNavigation>`)
+   existe y **sólo lo consume el mockup** `/mockup/cliente-portal-legacy`. Cablearlo es la task
+   derivada de TASK-827 que quedó como "V1.0 acepta path híbrido".
+
+**Además, el manifest de alcanzabilidad declara un enlace que no existe:** `/growth/seo` figura con
+`parent: '/home'`, `via: 'inline-link'`, y no hay ningún enlace desde `/home`. El gate da `0 orphans`
+porque comprueba que la ruta esté **declarada**, no que el enlace declarado **exista**. Hoy el único
+camino real es el cross-link desde el informe AEO, que sólo sirve a clientes que además tengan AEO.
+
+**Confirmado con subagentes, y corrige una atribución errónea que hice en el camino:**
+`authorizedViews` se deriva **sólo** de `role_view_assignments` + fallback heurístico + permission
+sets + overrides — **nunca de `module_assignments`**. Llegué a decir que "el módulo concede y el
+denial vetea"; es falso. AEO figura en las 23 views de Berel porque **no tiene fila de rol y cae al
+fallback**, no porque su módulo la conceda.
+
+**Y AEO tampoco aparece en el menú lateral.** Se alcanza por deep-link, declarado a propósito en el
+manifest. Así que el estado de SEO **no es una regresión: es el diseño vigente del portal cliente.**
+Lo que falta es la task derivada de TASK-827 que monta el nav module-driven
+(`ClientPortalNavigation` + `/api/client-portal/modules`, ambos completos y con **cero consumidores**
+en runtime).
+
+Descartado con dato: no era sesión desactualizada — los claims se auto-refrescan cada ≤5 min y una
+sesión recién emitida tampoco los trae.
+
+**No lo parché.** Empujar SEO a la lista hardcodeada haría desaparecer el síntoma y consolidaría el
+diseño equivocado: el portal cliente debe componer su menú desde `module_assignments`, que es lo que
+el resolver canónico ya sabe hacer y nadie cableó.
+
+### 🔴 ISSUE-143 — rompí SEO en producción aplicando la migración de TASK-1310 (2026-08-08)
+
+**Resuelto el mismo día, ~25 min de caída.** Apliqué la migración de catálogo tras el push+deploy y el
+canary del provider contra `greenhouse.efeoncepro.com` pasó de `domainQuadrant=riesgo keywords=50` a
+`hasModule=false` + `greenhouse_seo_lane_404` en los cinco lanes.
+
+**La causa no fue el orden del rollout: fue la forma de la migración.** El archivo de viewCodes hace
+expand **y contract en el mismo paso** — crea `seo_v2`, le asigna las orgs y en el mismo statement
+supersede `seo_v1`. Eso anula el dual-read `SEO_MODULE_KEYS_READ` que habíamos aplicado a los 5
+consumidores: su valor entero era que existiera un período con ambas claves vigentes, y la migración
+lo borró en el mismo commit en que lo creaba. Vercel producción corre `main`, que pide `seo_v1`
+literal.
+
+**El ops-worker NO se vio afectado** — su deploy ya tenía el dual-read, así que los tres batches que le
+pagan a DataForSEO siguieron sanos. El daño fue de lectura, no de gasto ni de datos.
+
+Restaurado reabriendo la ventana (`effective_to = NULL` en los `seo_v1`), verificado con el canary
+real, y hecho durable por `20260808184512073_…-reopen-seo-module-cutover-window`, que hornea el
+invariante: mientras el cutover esté abierto, ambas claves cubren exactamente las mismas orgs; una
+ventana asimétrica aborta la migración. Sin doble conteo de cuota: el resolver hace `LIMIT 1` sobre el
+`ANY(...)`.
+
+**Dos lecciones, y la segunda es la que importa:**
+
+1. Una migración nunca contiene el expand y el contract del mismo cutover. Hay **cinco runtimes con
+   despliegues independientes**; "lo desplegué a develop" no es "lo desplegué".
+2. **El diseño era correcto y aun así se cayó.** §10.7 de la arquitectura describía bien el patrón y
+   el dual-read estaba fijado por test — pero nada impedía escribir el contract en el mismo archivo,
+   porque la regla vivía en prosa. Ahora vive en un test que escanea `migrations/` y falla si una
+   migración nueva supersede una clave que `SEO_MODULE_KEYS_READ` todavía acepta. **Probado por
+   mutación**: sacando la migración culpable de su allowlist, el test la nombra.
+
+Contribuyó una causa de método: verifiqué la migración con un `SELECT`, que es la mitad del contrato.
+La otra mitad es qué versión de código la lee en cada runtime. La verificación correcta es el
+consumidor real contra el host real.
+
+**Pendiente:** el contract (superseder `seo_v1`) sigue sin ejecutar y así debe quedar hasta que `main`
+tenga el dual-read. Sin dueño: una señal de fiabilidad que vigile la simetría de la ventana en runtime
+— hoy el invariante sólo se verifica al migrar.
+
+**Colateral arreglado de raíz:** rotando este mismo Handoff descubrí que `docs:context-rotate` estaba
+ciego y **reventaba** (`TypeError` sobre `matches[0]`): su patrón buscaba secciones `##` con fecha y el
+archivo usa `###` hace rato — 0 de 23. Segunda vez que se queda ciego por la misma causa (el propio
+código documenta la primera). El nivel de heading ahora **se descubre** en vez de asumirse, porque el
+ancla estable es la fecha; sin secciones fechadas degrada con un mensaje accionable en lugar de un
+stack. El script quedó importable y con suite (5 tests, uno contra el `Handoff.md` real). Si vuelve a
+fallar, la respuesta es extender `DATED_SECTION_LEVELS`, no rotar a mano: rotar a mano es como se
+corrompen los marcadores de integridad de los shards.
+
+### Search Visibility — header canónico (2026-08-07)
+
+TASK-1307/1308 siguen `complete`: Resumen, Rendimiento y Keywords comparten `SurfaceRecipe` +
+`WorkbenchHeader` (alcance/meta/tabs), sin chrome sobre canvas ni duplicación en estados vacíos. 579
+tests focales, typecheck/lint y 5 GVC OK (1440/390). Pendiente: promoción `develop → main` batcheada
+con 1308/1655; el export GSC nativo de Berel requiere Owner fuera del repo.
+
+### Carril de keywords OBJETIVO — TASK-1659…1662 (2026-08-07)
+
+Salió de que el operador cuestionara por qué TASK-1308 no usó los ejes especificados. La respuesta
+corta era correcta; la larga destapó que **el módulo tiene TRES preguntas y sólo una tenía
+superficie**: (1) qué empujo de lo que ya tengo — construida; (2) dónde quiere estar el cliente;
+(3) qué me pierdo entero. Ninguna de las 12 tasks abiertas de EPIC-022 cubría 2 ni 3.
+
+🔴 **GSC es ciego por construcción a 2 y 3**: sin top ~100 no hay impresiones, así que esas
+búsquedas NO EXISTEN en los datos. Ninguna superficie sobre esa fuente va a contestarlas.
+
+⚠️ **Corrección al criterio anterior:** para una keyword donde el cliente SÍ rankea, el dato de
+mercado es enriquecimiento y los ejes medidos mandan. Para una donde NO rankea, GSC no da nada y
+volumen+dificultad son la ÚNICA forma de contestar "¿vale la pena?" y "¿cuánto cuesta?". Ahí son
+**dependencia dura**, no opcional.
+
+⚠️ **`TASK-1300` SÍ está complete** — yo repetía lo contrario desde un comentario obsoleto de
+`contracts.ts`. Entregó el registry (`labs` es llamable) pero es *infra de cliente, no capability*:
+falta fetch, columnas (`search_volume` no existe) y reader. Corregido en la fuente y en el doc, que
+se contradecía. **Y `trackKeywords` acepta strings arbitrarios**: seguir una keyword no rankeada ya
+funciona por contrato, sólo falta el botón — Full API Parity al revés.
+
+Orden de dependencia: `1659` (modelo de intención, migración) → `1660` (lente Objetivos, UI) →
+`1661` (datos de mercado) → `1662` (keyword gap). Las 4 con `task:lint` en 0/0.
+
+**Superado el mismo día: el operating mode.** El operador señaló que el módulo tiene los **mismos
+tres modelos de servicio que Globe** (`efeonce-managed` | `co-operated` | `client-operated`; "que el
+cliente contrate la herramienta" NO es un cuarto modo sino `client-operated` × delivery model de
+plataforma). El vocabulario YA era canónico y Globe YA lo materializó (SPEC-008, desplegado) — pero
+vive en SU Postgres, y en Greenhouse `delivery-model.ts` es de cotización, no de esto. Creado como
+`TASK-1663` + ADR `GREENHOUSE_OPERATING_RESPONSIBILITY_DECISION_V1.md`.
+
+🔴 **La regla que sostiene todo, verbatim de Globe: el modo NUNCA es input de autorización.** No
+decide quién PUEDE declarar (eso es `can(...)`), decide qué superficie DEBE existir y quién responde.
+Si el modo otorgara acceso, cambiar una etiqueta comercial cambiaría en silencio quién puede
+comprometer gasto. El entregable más importante de 1663 es el **test que lo prueba**.
+
+**Tres ejes ortogonales:** quién puede (capability) · quién responde (modo) · quién paga (comercial). ⚠️ **Y NO se construye ahora** (el operador lo acotó el mismo día): el ADR quedó `Proposed` y
+`TASK-1663` en `P3` con condición de activación = un segundo consumidor real. Hoy hay **cero
+asignaciones declaradas**, así que sería infraestructura de un problema que no tenemos. `1659`/`1660`
+se construyen **como están especificadas**, sin esperar y sin conciencia de modo "por si acaso".
+
+### TASK-1308 — Keyword Opportunities COMPLETE + doctrina de scopes MCP (2026-08-07)
+
+Ruta `/admin/growth/seo/keywords` cerrada. Nació `Backend impact: none` y terminó con migración, dos
+commands, dos rutas app-lane, dos del lane ecosystem y **dos tools MCP federadas** — porque
+`trackKeywords`, que la spec daba por construido por TASK-1303, no existía. La idea que ordenó todo:
+seguir una keyword es un **compromiso de gasto diferido**. Detalle completo en la task, el ADR del
+gateway y `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`; acá sólo lo que un agente siguiente necesita.
+
+**Doctrina de scopes OAuth (con `arch-architect`):** un scope por **CLASE de blast-radius**, nunca
+uno por capability. Corolario: la escritura N+1 de un dominio con scope **no toca Entra**. Completa
+en el ADR del gateway y en ambos bundles de `efeonce-mcp-platform`.
+
+🔴 **FRONTERA DE GRANT — lo más importante que dejó esta task.** El scope existe en `Efeonce MCP
+Resource` (type `Admin`, id `17f923ad-537a-4c2f-ab5b-2a14ed650183`; round-trip verificado: 4 scopes,
+ninguno perdido, `requestedAccessTokenVersion: 2` intacto). Pero **NO se cableó al cliente PKCE
+compartido** `32617b87-e7ef-493a-838f-1ff3f0213b93` y **NUNCA debe cablearse**: en el lane ecosystem
+el actor es `mcp:<consumer>` —la MÁQUINA, sin chequeo de capability por humano— y el hop va con token
+de consumer fijo, así que **ese scope es la única puerta de la cadena que depende de la persona**.
+Cablearlo daría poder de gasto a todo el tenant y **nada fallaría**. El write de Globe tampoco está
+ahí. Camino correcto: `TASK-1631`.
+
+**PENDIENTE:** push del gateway `efeonce-mcp` — commits `cb316cc`, `41dca07`, `bfbdf3a`, `1d0ebcc`.
+Deploy productivo en push. Las tools quedan federadas y **fail-closed a propósito**, igual que el
+único otro write del gateway.
+
+**Follow-ups:** `TASK-1658` (drift de federación + punto ciego del guard) · `TASK-1657` (hidratación
+`useId` + tokens de canvas).
+
+### Seedance 2.5 — inventario Fal y TASK-1656 (2026-08-07)
+
+Fal Model Search/OpenAPI confirma tres endpoints activos: T2V, I2V y R2V; Globe permanece `provider-supported / gated`.
+Se dejaron el inventario API, route card, registry, fleet ledger y skills espejo actualizados; no se tocó runtime de Globe.
+`TASK-1656` registra la integración backend-data: roles multimodales, audio, frame final, queue/webhook, ingest, rates,
+rights, evaluación, canary, settlement y promotion por ruta. Reutiliza el adapter Fal y el control plane existente;
+la UI queda en `TASK-1552` y el contrato compartido en `TASK-1633`. No habilitar 4K/1080p, tres minutos, edit/masks,
+storyboard, stems, streaming, realtime, seed de entrada ni BytePlus 2.5 sin contrato verificable.
+
+### Release `30140c662` — TASK-1304 + TASK-1306 en producción (2026-08-07)
+
+PRs #179+#180 → manifest **`released`** (`30140c662a79-b5790565-9b75-41b8-a206-f2cd21a58080`, run 4
+`31180734383`, 8m29s), watchdog `worker_revision_drift: ok`, health prod 200, **lanes 1304 vivos en
+producción** (`site-audit-report` + `backlink-profile` responden 400 `missing_external_scope_type`).
+Con esto el cockpit de 1306 deja de sufrir el apagado cíclico de su viewCode. Costó 4 intentos, dos
+hallazgos nuevos ya en el timing ledger y el catálogo: **(a) el run zombie del outage** (31126022507,
+inmanejable por API — 6 vías 409/403) bloqueaba `pending_without_jobs` → fix de causa raíz = **lista
+forense `src/lib/release/preflight/ignored-pending-runs.ts`** (razón + vencimiento 2026-08-21 +
+evidencia en manifest; la reliability signal NO la consume, por eso el watchdog seguirá mostrando
+`pending_without_jobs: error` A PROPÓSITO hasta que GitHub recolecte el zombie — NO es un incidente
+nuevo); **(b) Cloud Build de ico-batch >600s** (backlog post-outage) abortó el intento 3 — dejar
+terminar el build huérfano cachea la imagen y el retry pasa limpio. **Federación EJECUTADA el mismo día**
+(`efeonce-mcp` `bfb3832`, deploy `31182267290` success): provider + registerTool + lista de paridad
+(6 tools SEO) + canary extendido — **canary 11/11 verde contra producción** con los datos reales de
+Berel y Efeonce. TASK-1304 operativamente completa de punta a punta; cero pendientes.
 
 ### Autenticación local Gcloud con Playwright (2026-08-07)
 
-Se agregó el proceso local explícito `pnpm gcloud:auth:playwright`, invocable por Codex o Claude, para
-renovar CLI + ADC cuando el operador lo solicite, con `--force` para repetir OAuth y `--check-only` para
-verificar sin abrir navegador. La skill espejo `greenhouse-gcloud-auth-playwright` fija este recorrido. El setup
-`pnpm gcloud:auth:playwright:setup` guarda la cuenta y la clave en `.auth/gcloud-auth-credentials.json`
-ignorado por Git y con permisos `0600`; el perfil Chrome aislado queda en `.auth/gcloud-auth-profile`.
-El flujo usa Playwright visible, no imprime URLs/códigos/cookies y termina con `gcloud-auth-preflight.sh`.
-No hay scheduler ni rollout remoto.
+Proceso local explícito `pnpm gcloud:auth:playwright` (invocable por Codex o Claude) para renovar CLI +
+ADC a pedido del operador: `--force` repite OAuth, `--check-only` verifica sin abrir navegador; skill
+espejo `greenhouse-gcloud-auth-playwright`. El setup `…:setup` guarda cuenta y clave en
+`.auth/gcloud-auth-credentials.json` (gitignored, `0600`) y el perfil Chrome aislado en
+`.auth/gcloud-auth-profile`. Playwright visible, no imprime URLs/códigos/cookies, cierra con
+`gcloud-auth-preflight.sh`. Sin scheduler ni rollout remoto.
+
+### TASK-1307 + TASK-1655 — pantalla ancla SEO + Historical Data Platform (2026-08-07)
+
+**TASK-1307** (`/admin/growth/seo/performance`, in-progress → cierre en curso): pantalla
+ancla implementada completa en `develop` local (3 commits, sin push). ECharts elegido e
+instalado (Slice 0 — 1306/1308/1310 heredan); readers nuevos `readSeoPerformance` +
+`readSeoPerformanceCatalog` con parity completa (lane ecosystem + MCP tools
+`get_seo_performance`/`get_seo_performance_catalog` en el mismo PR); **fallback entre
+fuentes** (keyword×posición intenta DataForSEO ◑ y cae a la posición medida GSC ● cuando
+la serie exacta es más joven — regla del operador, nunca promediadas); cobertura REAL
+declarada en el chart ("N de M días con medición"). GVC **premium** verde: rubric
+enterprise pass, `ui:visual-gate` PASS, `ui:quality` PASS (avg 4.56, floor 4.5). Suite
+growth/seo 151/151. **Cerrada y documentada** (ver la entrada del header canónico, arriba);
+lo único vivo es la **promoción develop→main heredada de 1306**, batcheada con 1308/1655.
+
+**TASK-1655** (in-progress): hallazgo de fondo — el módulo era **forward-only** (5 días
+GSC / 2 de rank teniendo 16 meses en la API). Slices 1-3 SHIPPED: mirror
+`greenhouse_growth_analytics.seo_gsc_history` (tabla creada, MERGE idempotente, el batch
+diario espeja y reporta `bqMirror`), backfill API→BQ resumible (smoke 31/31 días Berel,
+**paridad exacta PG↔BQ** verificada), split de lectura por cobertura. **Backfill de 16
+meses de Berel CORRIENDO en background** (562k+ filas al momento del handoff; resumible —
+si murió, re-correr `scripts/growth/backfill-gsc-history.ts` con las env OAuth del
+runbook `docs/manual-de-uso/growth/backfill-historico-gsc.md`). Pendientes: verificación
+final del backfill, Slice 4 (semilla rank `historical_serps`, verificar granularidad en
+sandbox ANTES), Slice 5 (export nativo en la propiedad de Berel — necesita permiso
+Owner, out-of-band; Efeonce ya lo tiene desde 2025-12-10).
+
+**Hallazgos cross para quien siga:** (1) `CustomTabsNav` (@core) para tabs-que-son-links
+— el TabList de lab inyecta `aria-controls` fantasma (axe critical; 1306 puede migrar
+igual). (2) `SurfaceRecipe.plane='none'` para recipes sobre composiciones de cards. (3)
+El 1 rojo de la suite full es `catalog-extensibility` del artifact-composer, roto por
+WIP sin commitear de OTRO agente en `catalogs/deck-axis/` — no tocar desde acá.
 
 ### TASK-1306 — cockpit SEO Overview: code complete, deploy pendiente (2026-08-06)
 
@@ -145,47 +434,10 @@ deploya el mismo SHA — converge inofensivo. Runbook:
 
 ### Hallazgo MCP gateway — clientes Claude no conectan por falta de DCR (2026-08-06)
 
-Al intentar conectar Claude Code al gateway (`claude mcp add` + `/mcp` → Authenticate) falla con
-`Incompatible auth server: does not support dynamic client registration`. Causa: el cliente MCP de
-Claude (Code y claude.ai custom connectors) exige DCR (RFC 7591) para auto-registrarse, y **Entra no
-soporta DCR**. El canary OAuth funciona porque usa la app Entra PRE-registrada (client `32617b87-…`).
-**Fix propuesto (task nueva en `efeonce-mcp`)**: shim de DCR en el gateway — endpoint `/register` que
-devuelve el client_id público pre-registrado + metadata del authorization server; patrón conocido para
-gateways MCP respaldados por Entra (~50-80 líneas). Con eso Claude Code/claude.ai/Desktop conectan sin
-fricción. Hasta entonces, la vía operable del 360 por MCP sigue siendo la service identity (canary) y
-el smoke OAuth del script.
-
-
-### TASK-1653 cerrada — las 4 tools SEO federadas al gateway + guard de paridad (2026-08-06)
-
-Ejecutada el mismo día en `efeonce-mcp` (`ff68078`+`2365ef9`, deploy `31112222516`, revisión
-`efeonce-mcp-gateway-00014-fcg` Ready): `get_seo_rank_evolution` federada (provider + registerTool
-espejo del MCP interno) + **guard de paridad CI fail-closed** (lista esperada versionada +
-exclusiones con razón; rojo forzado verificado). Canary 4/4 contra producción: rank-evolution
-sirvió `series=31` — la serie real de Berel capturada hoy — y el budget del entitlement ya refleja
-el gasto (49.86/50). Contrato "cómo agregar una tool" en el AGENTS.md del gateway: las tasks del
-mandato (1304/1311/1313/1314/1317) agregan su tool a la lista esperada EN EL MISMO PR. El smoke
-autenticado vía `mcp.efeonce.org` también quedó VERDE el mismo día (4 tools en 200; rank-evolution
-series=31 por el tramo Entra→gateway; canary extendido en `83cdefc`). Con esto, el
-programa SEO del día queda entero: captura diaria activa + 4 tools E2E + release en prod. Siguiente
-frente: TASK-1307 (UI pantalla ancla) y TASK-1304.
-
-
-### Release `fcee5ab9f7ce` — TASK-1303 en producción (2026-08-06)
-
-PR #178 → manifest **`released`** (`fcee5ab9f7ce-1a85e0aa-cbad-42ab-bad0-2b4851d999cc`, run
-`31105434129`, 10m04s), watchdog `drift_count=0`, health verde. El lane
-`/api/platform/ecosystem/growth/seo/rank-evolution` responde en producción (400 sin auth = ruta
-viva) y la tool interna `get_seo_rank_evolution` quedó en el MCP de prod. Dos hallazgos para el
-próximo release (ya en el timing ledger): (a) pushes docs-only a develop justo antes del release
-cancelan el build de staging (ignore-build) y bloquean el preflight `vercel_environments` —
-pre-empción: `vercel redeploy` del deployment cancelado; (b) el merge canónico `-X ours` intentó
-colar 1 línea regresiva de main (`recordFailure` incondicional pre-auditoría TASK-1300) — con
-verif1 vacío y drift regresivo, `-s ours` (árbol develop exacto) es la resolución. **Siguiente:
-TASK-1653** (federar `get_seo_rank_evolution` al gateway + guard de paridad) quedó DESBLOQUEADA
-por este release. La serie de rankings corre sola desde mañana 05:00 CLT (scheduler ENABLED,
-Berel 31 keywords).
-
+⚠️ **Superseded el mismo día** por el break-glass del shim DCR (entrada TASK-1654, arriba: LIVE y
+verificado con el cliente real). Se conserva sólo la causa: el cliente MCP de Claude exige DCR
+(RFC 7591) para auto-registrarse y **Entra no lo soporta**, así que sin el shim `/register` del
+gateway falla con `Incompatible auth server: does not support dynamic client registration`.
 
 ### Efeonce dejó de ser cliente de sí misma — modelado corregido (2026-08-06)
 
@@ -290,21 +542,6 @@ sin `overrideIdentity` para no pisar un valor ajeno; `organization_type` se mant
 conexión GSC de
 `efeoncepro.com` gated por TASK-1282/1283.
 
-### TASK-1647 — Provider Greenhouse-SEO federado: CODE COMPLETE, enable pendiente del release (2026-08-05)
-
-El segundo salto MCP quedó construido y verificado e2e. Gateway (`efeonce-mcp` main `a53b77f`+`4870e90`):
-provider `greenhouse-seo` fail-closed + 3 tools (scope base) + canaries + canary e2e. Greenhouse: consumer
-`EO-SPK-0004`/binding `EO-SPB-0004` activos (script `provision-mcp-gateway-seo-consumer.ts`; token en Secret
-Manager `efeonce-mcp-gateway-greenhouse-token`). Flag `GROWTH_SEO_ENABLED=true` en Vercel **staging** +
-redeploy (autorizado). Berel provisionada Fase 0 (`cpma-berel-seo-contracted` + `seot-berel-fase0`).
-
-**Evidencia e2e (provider real → lane staging HTTPS):** Berel **`domainQuadrant=riesgo`, 50 keywords,
-AEO 44.5** · Efeonce entitlement ok + `no_seo_data` honesto · deny anti-oracle 404. La cadena completa
-del MCP-first funciona; lo ÚNICO entre esto y `mcp.efeonce.org` es que greenhouse PROD aún no tiene el
-lane. **El cutover restante = release develop→main de greenhouse** (control plane, skill
-`greenhouse-production-release`) → flag en Vercel prod → enable del provider en Cloud Run + deploy
-dispatch → smoke por el front door. GSC de efeoncepro.com sigue gated por 1282/1283.
-
 ### Efeonce provisionada como org del 360 (own-brand, dogfooding) — 2026-08-05
 
 Decisión de modelado del operador ejecutada: **Efeonce se modela como su propio cliente** sobre la org
@@ -321,260 +558,6 @@ sincronizadas como ruido). Aplicado con `scripts/growth/provision-efeonce-own-br
   sin GSC aún) · visibility-360 → **`no_seo_data` honesto** (lente SEO llega al conectar la GSC de
   efeoncepro.com — OAuth de TASK-1282/1283, rollout pendiente — o con TASK-1303/DataForSEO).
 
-**Pendientes operativos:** (1) merge en HubSpot de las auto-companies `efeonce.org` (56011409567) y
-`efeonce` (57099835819) hacia la company canónica — el sync propaga; NUNCA borrarlas por SQL. (2)
-~~`website_url` de EO-ORG-0007 vacío~~ **CERRADO 2026-08-06** — `https://efeoncepro.com` por la puerta
-canónica `upsertCanonicalOrganization`. (3) Conectar GSC de efeoncepro.com cuando 1282/1283
-destraben su rollout. SKY ya tiene lente AEO ligada; su SEO sigue igual de pendiente que Efeonce.
-
-### TASK-1645 — SEO operable por MCP: CODE COMPLETE, rollout pendiente (2026-08-05)
-
-La milla final del camino MCP-first quedó implementada y verificada a nivel función. **Lane ecosystem**
-(`/api/platform/ecosystem/growth/seo/{keyword-opportunities,visibility-360,entitlement}` vía
-`runEcosystemReadRoute`; builder `ecosystem-growth-seo.ts`: org-por-binding — org-scoped manda con mismatch
-404 anti-oracle, internal exige `organizationId` —, entitlement per-org `seo_v1` → 404 anti-oracle,
-`target_not_configured` honesto, payloads passthrough) + **3 MCP tools read-only** en `src/mcp/greenhouse/**`
-(`get_seo_keyword_opportunities`, `get_seo_visibility_360` — nace con el cruce AEO real —, `get_seo_entitlement`
-— el chokepoint como lectura, decisión del operador de exponer todo reader vivo). Evidencia: 17 tests focales +
-route-contract + smoke live del lane contra PG real (quadrant `riesgo` con 50 keywords, cross-org deny, cero
-residuo); full suite **10168/0** + build prod verdes.
-
-**Por qué NO complete (Runtime Rollout Completion Gate):** (1) falta la invocación MCP e2e por HTTP con un
-binding ecosystem real en staging (no disponible en la sesión; mismo pendiente que TASK-1086 dejó post-deploy);
-(2) `GROWTH_SEO_ENABLED` es multi-runtime — el lane lo lee en **Vercel** y hoy está ON solo en el ops-worker;
-el flip es parte del cutover del módulo; (3) la federación al gateway `mcp.efeonce.org` quedó con dueño:
-**TASK-1647 creada** (adapter delgado, canaries antes de discovery — cumple el acceptance "con dueño").
-Mandato amarrado además en 1303/1304/1311/1312/1313/1314/1317: todo reader futuro expone su MCP tool en el
-mismo PR. Docs: arch SEO §7, API Platform delta, manual MCP §8, doc funcional. Sin push.
-
-**Próximo paso:** TASK-1647 (federación gateway) o el cutover del módulo (flag Vercel + assignment Berel +
-smoke e2e con binding) — decisión del operador.
-
-### TASK-1305 — Cruce SEO↔AEO (quadrant 360) COMPLETE (2026-08-05)
-
-La sinergia directa con AEO que exigió el operador quedó implementada el mismo día: `readSeoAeoGap`
-(`src/lib/growth/seo/gap/read-seo-aeo-gap.ts`) cruza `seo_gsc_daily` (posición medida, ponderada por
-impresiones) × `grader_scores` (último run reportable del org) EN MEMORIA por `organization_id` — cero
-JOIN/VIEW/FK cross-motor (boundary §1.1, verificado por test dedicado que inspecciona las queries
-emitidas). Clasificador puro `classifyQuadrant` (página 1 × score ≥ 50, overridables, jamás promediados)
-+ contrato `SeoAeoGapResult` con `aeoAxisGranularity='domain'` (TASK-1311 refina a URL sin romperlo).
-
-**Primera señal 360 real (smoke live):** Berel rankea #1.75 orgánico para su marca con citabilidad AEO
-44.5 → quadrant **`riesgo`** = autoridad orgánica sin citabilidad = el CTA cruzado al AEO, funcionando.
-
-Evidencia: 12 tests (incl. boundary + tenant binding) + smoke live con cero residuo
-(`scripts/growth/_sanity-seo-aeo-gap.ts`, patrón commit+try/finally post hallazgo TASK-1300 — el
-BEGIN/ROLLBACK cross-pool NO es seguro; `_sanity-seo-entitlement.ts` endurecido igual). Full suite
-**10142/0** + build prod verdes. Commits `6ff948e2d`+`3bac9df0a` (Slice 1) + `ed88f7d16` (Slice 2).
-Nota de proceso: el primer commit de Slice 1 capturó solo el rename (git add abortó por ruta
-inexistente — gotcha conocido); `3bac9df0a` es el fixup con el código.
-
-**Rollout:** reader detrás de `GROWTH_SEO_ENABLED` (hoy ON solo en el ops-worker para el materializer;
-el reader lo consumirán TASK-1645/1310 — cada consumer valida el flag en su runtime). **Próximo paso
-del camino MCP-first: `TASK-1645`** (lane ecosystem + MCP tools — get_seo_visibility_360 nace con este
-cruce). Sin push aún.
-
-### TASK-1646 — Cloud Infrastructure doc particionado: temáticos + HISTORIAL + stub (2026-08-05)
-
-**Complete.** El monolito `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` (1340 líneas / 24 deltas, finding
-`architecture_doc_monolith`) quedó dividido según el precedente ui-platform:
-`docs/architecture/cloud-infrastructure/` (11 temáticos de estado vigente + `HISTORIAL.md` con los
-25 deltas verbatim) + router stub en el path original + ADR
-`GREENHOUSE_CLOUD_INFRASTRUCTURE_RESTRUCTURE_DECISION_V1.md`.
-
-**Para el próximo agente que toque infra cloud:**
-
-- Entrada canónica: `docs/architecture/cloud-infrastructure/README.md` (mapa "dónde vive X").
-  Cambio vigente → doc temático; cronología → HISTORIAL. No agregar contenido al stub.
-- Al separar se resolvieron contradicciones contra runtime: los inventarios del monolito eran de la
-  auditoría 2026-04-23. Vigente verificado 2026-08-05: **46 scheduler jobs** del ops-worker (SoT
-  `services/ops-worker/deploy.sh`), **8 crons Vercel** (SoT `vercel.json`), **7 workflows de deploy**.
-  El detalle de qué se descartó y por qué está en el ADR + anotaciones `⚠️ Superseded` del HISTORIAL.
-- Gates verdes: `docs:closure-check` sin `architecture_doc_monolith`, `docs:context-check:strict`
-  0/0, `task:lint` template=1/0/0. Re-auditoría live GCP sigue siendo TASK-127.
-
-### TASK-1301 — Capabilities + entitlement per-org SEO COMPLETE (2026-08-05)
-
-Segundo eslabón de la Ola B MCP-first de EPIC-022, cerrado el mismo día que TASK-1299. Entregado:
-5 capabilities `growth.seo.*` (catálogo + seed `capabilities_registry` migración `20260805162304440` +
-grants en `runtime.ts`: `observation.read` set interno base; `target.configure`/`audit.run` set operador;
-`entitlement.manage` SOLO ADMIN+ACCOUNT; `report.read_client` client_* scope own) — coverage verde.
-Módulo **`seo_v1`** seedeado en `greenhouse_client_portal.modules` (migración `20260805163024516`;
-descubierto en smoke live que `module_assignments.module_key` tiene FK al catálogo — la spec no lo
-declaraba) con `data_sources=['growth.seo']` + union `ClientPortalDataSource` (parity verde).
-**Chokepoint único `enforceSeoRunEntitlement`** (`src/lib/growth/seo/entitlement.ts`): consumer-agnóstico
-(mandato parity+MCP), tier `metadata_json.seo_tier`, `expired` explícito, allowance audits/mes + budget
-USD/mes por tier (env-knobs `GROWTH_SEO_*` con defaults — son config, no flags `*_ENABLED`), gasto =
-`SUM(provider_cost)` de los snapshots de 1299 con hook declarado a `seo_provider_spend_daily` (TASK-1300).
-
-Evidencia: 12 tests focales + coverage + parity; smoke E2E live contra PG real
-(`scripts/growth/_sanity-seo-entitlement.ts`: no_entitlement → allowed contracted → budget_exhausted
-con costo estimado → revocado; cero residuo). Full suite **10076/0** + build prod verdes. Migraciones
-aplicadas en `greenhouse-pg-dev`. Commits `de94363df` (Slice 1) + `100ee9fec` (Slice 2). Sin push aún.
-
-**Rollout:** ninguna org tiene assignment `seo_v1` (primer assignment = paso operativo, Berel Fase 0,
-vía `entitlement.manage`). Prod recibe migraciones+código vía release control plane. **Próximo paso:**
-`TASK-1302` (GSC materializer + `readKeywordOpportunities` — OJO: requiere rollout real de la conexión
-GSC de TASK-1282/1283) y luego `TASK-1645` (lane ecosystem + MCP tools). `TASK-1300` puede ir en paralelo.
-
-### TASK-1299 — Schema SEO fundacional aplicado + contrato parity/MCP de EPIC-022 (2026-08-05)
-
-TASK-1299 (schema `growth.seo`, bloqueador fundacional de EPIC-022) quedó implementada y verificada en vivo:
-migración `20260805134439202_task-1299-growth-seo-schema.sql` **aplicada en `greenhouse-pg-dev`** (dev/staging
-comparten instancia) — 8 tablas `seo_*` (4 config + 4 serie temporal append-only por `capture_date`), UNIQUEs
-de idempotencia, triggers `block_seo_row_mutation` (genérico via TG_TABLE_NAME), GRANTs least-privilege
-(mediciones sin UPDATE/DELETE para runtime), `db.d.ts` regenerado. Smoke live contra PG real (con rollback):
-UNIQUE de captura duplicada ✓, anti-mutation en rank/findings/backlinks ✓, cierre de término por UPDATE de
-`effective_to` permitido ✓, state machine de `seo_site_audit_runs` mutable ✓, `capture_date`=DATE /
-`captured_at`=TIMESTAMPTZ ✓. Commits `ff399497c` (schema) + `db949d85f` (contrato).
-
-**Directiva del operador (misma sesión): el módulo SEO nace Full API Parity y usable por MCP.** Materializada
-como contrato con dueño: `TASK-1645` nueva (lane ecosystem `/api/platform/ecosystem/growth/seo/*` + 3 MCP
-tools read-only, espejo TASK-1086 de Knowledge; blocked by 1301/1302/1303), exit criterion nuevo en EPIC-022
-(el epic NO cierra UI-only), DoD reforzado en TASK-1301 (chokepoint consumer-agnóstico) y deltas de impacto
-cruzado en 1302/1303/1304 (el schema ya existe; readers nacen consumer-agnósticos).
-
-**Delta misma sesión — destino Wave declarado.** El operador comunicó que SV360 nace en Greenhouse pero
-eventualmente se habilita como producto en `wave.efeonce.org` (consistente con EPIC-037). Materializado como
-contrato, no como código: `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` **§17** (inventario del seam de extracción,
-FK org = único acople deliberado que se intercambia en la extracción, reglas duras extraction-ready para TODA
-child task de EPIC-022), deltas en EPIC-022/EPIC-037/TASK-1299/TASK-1645. El schema aplicado NO cambió — ya era
-extraction-ready. La extracción física NO queda autorizada (programa posterior de Wave; EPIC-027 manda hoy).
-
-**Rollout:** schema inerte por diseño (cero consumers hasta 1302+); prod recibe la migración vía release
-control plane cuando el módulo se secuencie. Próximo paso del epic: `TASK-1300` (DataForSEO families, paralela)
-y `TASK-1301` (capabilities). Nota de sesión: hubo commits concurrentes de otro agente (`aa00683bb` absorbió
-el scaffold vacío de la migración + el rename de la task; sin pérdida — verificado).
-
-### TASK-1631 — Slice 0: comparación build-vs-buy y memo de privacidad entregados (2026-08-05)
-
-TASK-1631 (Efeonce Customer Identity + MCP Federation) está `in-progress` en `develop`. Intake verificó contra
-runtime que la spec no tiene drift (gateway single-issuer, `clientId = azp ?? sub`, fusión `scp∪scope∪roles`).
-Con aprobación del operador se ejecutaron **S0.2 y S0.3** del Slice 0:
-
-- **S0.2 (costos):** ADR §`Slice 0 measurement — build vs buy vs hybrid (2026-08-05)`. Native medido contra el
-  código real = 7–10.5 semanas senior + operación permanente (el broker sister-platform NO tiene capa propia de
-  autenticación de personas; depende de la sesión NextAuth del portal). WorkOS = USD 99/mes planos; curva SSO
-  USD 125/conexión/mes con **trigger de revisita a ≥5 conexiones enterprise**; exit re-enlazable por diseño.
-  **Recomendación Slice 0: WorkOS** con binding provider-neutral — pendiente de aprobación del operador.
-- **S0.3 (privacidad):** memo `docs/operations/EFEONCE_CUSTOMER_IDENTITY_PRIVACY_REVIEW_V1.md` — Efeonce
-  controller / IDP encargado, minimización (qué se envía vs qué queda), checklist DPA/subprocesadores/región/
-  retención/ARCO/notificación contractual (CL 21.719 plena el 1-dic-2026 + CO/MX/PE). **El gate sigue abierto**:
-  falta DPA firmado + validación con abogado habilitado.
-
-**Delta mismo día — composición APROBADA con staging de gasto cero.** El operador no quiere pagar WorkOS ahora;
-la recomendación se ajustó y aprobó: (1) hoy USD 0, nada provisionado, solo diseño; (2) primer cliente
-interesado → WorkOS **free tier sin dominio propio** (AuthKit hosteado, dominio default); (3) USD 99/mes por
-`auth.efeonce.org` sólo con clientes pagando. Requisito duro derivado: el binding se llavea por
-`(environment, subject)` vía registry `external_identity_environments`, NUNCA por el issuer string crudo — el
-cutover de dominio futuro es un UPDATE auditado + re-login, no re-onboarding. **S0.4 y S0.5 entregados** en el
-ADR: binding de persona reutiliza `identity_profile_source_links` (sin tabla de identidad nueva); tablas nuevas
-sólo para organización/grants/invitaciones; `AuthContext` de 6 campos sin fallback + tools con
-`allowedIssuers` + clase de autoridad + 3 tests de regresión obligatorios. La task `ui-ux` dependiente se
-reduce a branding config y su creación se difiere (AuthKit hosteado elimina el login custom del primer corte).
-
-**Restante para Slices 1-3:** cierre legal (DPA + abogado), checklist pre-provisión (CIMD live,
-`subject_types_supported`, términos free tier) y aceptación formal del ADR completo. Pendiente del Slice 0:
-S0.1 (matriz de tokens live + base-only de TASK-1626 — **requiere sesión interactiva del operador** para los
-logins OAuth) y el contrato de convergencia del login Greenhouse. Nada externo se provisionó.
-
-### Registro de partnerships — fuente operativa creada (2026-08-05)
-
-Se creó [`EFEONCE_PARTNERSHIP_REGISTRY_V1.md`](docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md) como registro
-central de partnerships, providers y postulaciones de Efeonce. El primer refresh documenta Google Cloud con evidencia
-del Partner Network Hub: la cuenta está `Partner registrado`, las rutas aparecen como `Registrado`, y la debida
-diligencia está `En curso`; todavía no hay nivel Select/Premier/Diamond activo ni capacidad para crear oportunidades.
-
-El registro también consolida Claude, OpenAI, BytePlus, Runway, ElevenLabs, FLUX, AWS, Salesforce, HubSpot, Lovable,
-HeyGen y otras relaciones, separando partnership activo, cuenta registrada, postulación, provider en uso, bloqueo y
-target. Google envió el 2026-08-06 la solicitud formal de due diligence anti-soborno, con fecha límite 2026-08-13; el
-próximo paso operativo es responder las decisiones del formulario antes de esa fecha y actualizar el registro sólo con
-evidencia primaria. La auditoría de postulaciones de IA del 2026-07-26 queda como fotografía histórica.
-
-### Nexa — retiro del modo "Compacto" + diagnóstico del lane que se abría solo (2026-08-05)
-
-**Origen.** El operador reportó que al iniciar sesión el chat de Nexa aparecía abierto a la derecha. Causa
-verificada en runtime (no deducida): su fila en `greenhouse_core.client_users` tenía
-`nexa_interaction_mode='lane'`, y el provider abre el sidecar en cada carga fresca
-(`useState(initialMode === 'lane')` en `nexa-interaction-mode-context.tsx`), sin persistir el colapso. Se
-reprodujo con su propia sesión vía agent-auth y se contrastó con otra persona en modo `expandible` (no monta
-el lane). **Preferencia revertida a NULL**; no hubo cambio de código para eso.
-
-**Cambio ejecutado.** Se retiró el modo `dock` ("Compacto"): era el panel efímero pre-TASK-1078 (runtime
-local, sin historial) que sobrevivió como opción del selector tras el cutover al panel ampliable. Salieron
-con él su código muerto en `NexaFloatingButton` y el flag `NEXA_FLOATING_EXPANDABLE_ENABLED` + mirror
-`NEXT_PUBLIC_*` (su único fallback era ese modo). Modos vigentes: `expandible` (piso incondicional) y `lane`.
-
-**Estado: cerrado.** Code complete, migración aplicada, **pusheado a `develop`** (`8dbd11e5e`) y las 3 env
-vars huérfanas del flag retirado borradas de Vercel el 2026-08-05
-(`NEXT_PUBLIC_NEXA_FLOATING_EXPANDABLE_ENABLED` en Production, staging y Preview develop; la var server
-nunca existió, solo el mirror). Verificado con `vercel env ls` post-borrado: cero restos del flag retirado,
-`NEXA_INTERACTION_LANE_ENABLED` intacto.
-
-**Verificación:** `pnpm local:check`, `pnpm test` (10.064 pass), `pnpm build`, `pnpm flags:audit --strict`
-verdes. Menú verificado con Playwright contra localhost: solo Panel/Lateral, switch a Lateral y vuelta con
-`PATCH /api/home/preferences` 200, cero errores de consola. CHECK de DB leído post-migración:
-`('expandible','lane')`, 0 filas en `dock`.
-
-**Deuda descubierta → devuelta a su dueña, no a una task nueva.** El `focusRef` + pregunta semilla vivía
-**solo** en el panel legacy, nunca en `NexaFloatingPanel`. Como el default en producción era `expandible`,
-el CTA "Pregúntale a Nexa" ya no anclaba el insight ni auto-enviaba la semilla **antes** de este cambio. El
-barrido por dominio mostró que **TASK-1182 sigue `in-progress`** y es la dueña del `focusRef`: se le agregó
-`## Delta 2026-08-05` con el estado real de sus criterios y el trabajo restante redefinido (portar el ancla
-a `useNexaPersistentRuntime`, que cubre Panel y Lateral por construcción). De paso se cerraron dos huecos
-preexistentes de su Status que la hacían no-tomable: `UI ready: no` + wireframe registrado
-(`docs/ui/wireframes/TASK-1182-nexa-insight-surface-aware-conversation.md`, con las 3 decisiones de
-comportamiento abiertas que bloquean `UI ready: yes`). `task:lint` y `ops:lint --changed` en 0/0.
-
-### EPIC-028 — Producer V3: contratos de diseño y plan de ejecución (2026-08-05)
-
-**Estado:** contratos de diseño `design-ready`; no se modificó runtime ni se creó una task paraguas. La
-decisión es un solo shell del Producer con tres estudios adaptativos —Image, Video y Audio— gobernados por
-`RouteCreativeContract`, con feed/muro y asset workspace compartidos.
-
-**Artefactos creados:** dirección visual, wireframes, flujo de usuario, contrato de motion y plan operativo:
-
-- [`EPIC-028-producer-v3-unified-studios.md`](docs/ui/visual-directions/EPIC-028-producer-v3-unified-studios.md)
-- [`EPIC-028-producer-v3-unified-studios.md`](docs/ui/wireframes/EPIC-028-producer-v3-unified-studios.md)
-- [`EPIC-028-producer-v3-unified-studios-flow.md`](docs/ui/flows/EPIC-028-producer-v3-unified-studios-flow.md)
-- [`EPIC-028-producer-v3-unified-studios-motion.md`](docs/ui/motion/EPIC-028-producer-v3-unified-studios-motion.md)
-- [`EPIC_028_PRODUCER_V3_EXECUTION_PLAN_V1.md`](docs/operations/creative-studio/EPIC_028_PRODUCER_V3_EXECUTION_PLAN_V1.md)
-
-**Owners actualizados:** TASK-1523, TASK-1633, TASK-1552 y TASK-1643 contienen ahora los criterios de
-aceptación y límites de ownership. TASK-1641 permanece restringida al lane backend/API de promoción; no se le
-añadió UI. No se detectó un hueco que justificara una task nueva.
-
-**Validación:** `git diff --check`, `pnpm task:lint --changed`, `pnpm ops:lint --changed` y el chequeo de enlaces
-Markdown pasan. La implementación sigue condicionada a que cada task dueña cierre su mapeo UI, evidencia GVC,
-dossier y decision log; estos documentos no habilitan por sí solos `UI ready` ni rollout.
-
-## Globe — cierre de sesión 2026-08-05: 4 gates nuevos, y dos decisiones de NO hacer
-
-**Hecho y desplegado.** `TASK-1641` **complete** (los 8 criterios verificados en runtime, promoción end-to-end
-de `ref/still/reference-v1` con 10 = 10 créditos). Globe `main@2cdd4d8`, Greenhouse `develop`.
-
-**Cuatro gates nuevos, todos probados EN ROJO** — porque la disciplina humana no escala y el build sí:
-
-| Gate | Qué impide | Dónde corre |
-|---|---|---|
-| `dead-affordance` | un control que se ve accionable y no hace nada | `pnpm check` de Globe |
-| `producer-item-actions` | que agregar una acción sea cablear en 4 sitios | idem |
-| `creative-studio-doc-index` | un doc que existe y nadie encuentra | `docs:closure-check` |
-| `skills:mirrors` | drift silencioso Claude/Codex | `local:check` (pre-push) |
-
-**El despachador canónico de acciones del feed** (`data/producer-item-actions.ts`): una **tabla**, no cuatro
-callbacks. Favorite y Download resueltos a nivel contrato; Reference y Recreate **declarados con dueño y
-razón** en vez de cableados a la fuerza.
-
-### 🔴 Dos cosas que decidí NO hacer, y por qué
-
-1. **No cablear Reference/Recreate.** Necesitan `ProducerComposer.tsx`, que es de `TASK-1552`. Y «Recrear
-   zero-spend» **contradice el único contrato que existe** (`relaunch` gasta): elegir si el botón gasta o
-   precarga es decisión de producto. Corregido en `TASK-1643`, Delta 2026-08-05 (b).
-2. **No correr el rollout del scope `pause`.** El CLI de Greenhouse **no puede despacharlo** —viaja con ID
-   token de service account y Globe exige `human` en su propio dominio—, así que el rollout entregaría **cero
-   capacidad** arriesgando el SSO de todos. **Superficie primero, grant después.** Procedimiento completo con
-   riesgos y rollback en `TASK-1463`, Delta 2026-08-05 (b).
-
-**Siguiente paso ejecutable:** coordinar `TASK-1552` ↔ `TASK-1643` para el canal feed → composer, y decidir la
-semántica de «Recrear». Nada de eso lo puedo resolver implementando.
+**Pendiente vivo:** conectar la GSC de efeoncepro.com cuando 1282/1283 destraben su rollout. SKY ya
+tiene lente AEO ligada; su SEO sigue igual de pendiente. Los otros dos pendientes de esta entrada
+(auto-companies HubSpot · `website_url`) están resueltos o repetidos en las entradas de 2026-08-06.

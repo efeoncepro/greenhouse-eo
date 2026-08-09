@@ -65,6 +65,25 @@ Greenhouse is desktop-first internal portal. No service worker, no offline mode.
 
 For cached data (TanStack Query, RSC cache with `'use cache'`), show timestamp helper. `formatDistanceToNow(date, { addSuffix: true, locale: es })` from `date-fns` → "hace 5 minutos".
 
+### 11. Scope controls belong to the header, not to each state surface (TASK-1307)
+
+When a screen has scope/filter controls AND empty / degraded / denied surfaces, the controls go in the recipe `header` (`SurfaceRecipe header={…}` renders outside the region plane), not inside the body. Otherwise every state surface has to re-render the controls so the user can leave the state — that duplication is the smell, and it is what the header placement removes. The header stays put; only the body swaps between data, `<EmptyState>` and `<ErrorState>`.
+
+### 12. A finished job has more states than loading / empty / error (TASK-1309)
+
+When a surface renders the **result of an async job** (crawl, import, batch, reconciliation, materializer run), the state model is six, not three — and collapsing any two of them lies to the operator:
+
+| State | Render as | Why it is NOT the neighbour |
+|---|---|---|
+| **never ran** | `<EmptyState>` + CTA to run it | Nothing is broken; there is simply no result yet. |
+| **running** | a fact, with whatever is already known | A job in flight is not an error and not an empty result. |
+| **finished, zero findings** | success copy ("sin hallazgos") | `succeeded` with 0 rows ≠ failed. Rendering it as an error teaches the operator to distrust good zeros. |
+| **finished, partial** | real but incomplete, stated up front | Something did fail; the reader must not take the total at face value. |
+| **hit its ceiling** (page cap, row limit, date window) | the count describes the sample, not the universe | Nothing failed here — that is what separates it from partial. |
+| **failed** | `<ErrorState>` with cause + retry | Only this one. |
+
+Corollary of §1 in the same domain: **an uncomputed score and a bad score are different states.** `null → "Pendiente"` + the reason; `0 → 0`. Collapsing them turns an absence of measurement into a verdict — a health score rendered as `0/100` reads as "terrible site" when the truth is "the crawl produced no score".
+
 ## Compose with (Greenhouse skills)
 
 - `greenhouse-ux-writing` — owns copy for loading / empty / error / degraded.
@@ -74,4 +93,6 @@ For cached data (TanStack Query, RSC cache with `'use cache'`), show timestamp h
 
 ## Version
 
+- **v1.2** — 2026-08-08 — TASK-1309: pinned decision 12 (six-state model for async job results; uncomputed ≠ zero, clean ≠ failed, capped ≠ total).
+- **v1.1** — 2026-08-07 — TASK-1307: pinned decision 11 (scope controls live in the recipe header, so state surfaces stop duplicating them).
 - **v1.0** — 2026-05-11 — Initial overlay.

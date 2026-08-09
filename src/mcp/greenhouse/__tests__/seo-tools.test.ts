@@ -35,6 +35,8 @@ const buildClient = (overrides: Record<string, unknown> = {}) =>
     getSeoBacklinkProfile: vi.fn(),
     getSeoPerformance: vi.fn(),
     getSeoPerformanceCatalog: vi.fn(),
+    trackSeoKeywords: vi.fn(),
+    untrackSeoKeywords: vi.fn(),
     ...overrides
   }) as never
 
@@ -406,5 +408,143 @@ describe('get_seo_overview_kpis handler (TASK-1306)', () => {
 
     expect(result.isError).toBe(false)
     expect(result.content[0].text).toContain('unavailable (disabled)')
+  })
+})
+
+describe('track_seo_keywords handler (TASK-1308) — el único tool SEO que escribe', () => {
+  it('enumera el outcome POR keyword y nombra el techo, no sólo "ok"', async () => {
+    const payload = {
+      ok: true,
+      seoTargetId: 'seot-1',
+      keywordSetId: 'seoks-1',
+      outcomes: [
+        { keyword: 'a', status: 'tracked' },
+        { keyword: 'b', status: 'already_tracked' },
+        { keyword: 'c', status: 'capacity_exceeded' }
+      ],
+      activeKeywordCount: 200,
+      capacity: 200
+    }
+
+    const handlers = createGreenhouseMcpHandlers(
+      buildClient({ trackSeoKeywords: vi.fn().mockResolvedValue(okEnvelope(payload)) })
+    )
+
+    const result = await handlers.trackSeoKeywords({ organizationId: 'org-1', keywords: ['a', 'b', 'c'] })
+
+    expect(result.isError).toBe(false)
+    expect(result.content[0].text).toContain('1 newly tracked')
+    expect(result.content[0].text).toContain('1 already tracked')
+    expect(result.content[0].text).toContain('1 rejected (set at capacity)')
+    expect(result.content[0].text).toContain('200/200')
+    // Lo rebotado tiene que llegar al usuario, no quedarse en el structuredContent.
+    expect(result.content[0].text).toContain('report the rejected keywords')
+  })
+
+  it('sin rechazos no agrega la advertencia de keywords rebotadas', async () => {
+    const handlers = createGreenhouseMcpHandlers(
+      buildClient({
+        trackSeoKeywords: vi.fn().mockResolvedValue(
+          okEnvelope({
+            ok: true,
+            outcomes: [{ keyword: 'a', status: 'tracked' }],
+            activeKeywordCount: 1,
+            capacity: 200
+          })
+        )
+      })
+    )
+
+    const result = await handlers.trackSeoKeywords({ organizationId: 'org-1', keywords: ['a'] })
+
+    expect(result.content[0].text).not.toContain('report the rejected keywords')
+  })
+
+  it('degradación honesta: el rechazo del command se reporta con su errorCode', async () => {
+    const handlers = createGreenhouseMcpHandlers(
+      buildClient({
+        trackSeoKeywords: vi
+          .fn()
+          .mockResolvedValue(okEnvelope({ ok: false, errorCode: 'no_entitlement', status: null }))
+      })
+    )
+
+    const result = await handlers.trackSeoKeywords({ organizationId: 'org-1', keywords: ['a'] })
+
+    expect(result.content[0].text).toContain('rejected (no_entitlement)')
+  })
+
+  it('propaga el deny del lane (scope no interno) sin fabricar un éxito', async () => {
+    const handlers = createGreenhouseMcpHandlers(
+      buildClient({
+        trackSeoKeywords: vi.fn().mockRejectedValue(
+          new GreenhouseMcpApiError('scope not allowed', { status: 403, code: 'scope_not_allowed' })
+        )
+      })
+    )
+
+    const result = await handlers.trackSeoKeywords({ organizationId: 'org-1', keywords: ['a'] })
+
+    expect(result.isError).toBe(true)
+    expect(result.content[0].text).toContain('403')
+    expect(result.content[0].text).toContain('scope_not_allowed')
+  })
+})
+
+describe('untrack_seo_keywords handler (TASK-1308) — el reverso del gasto', () => {
+  it('dice cuántas NO estaban seguidas y que el histórico se conserva', async () => {
+    const handlers = createGreenhouseMcpHandlers(
+      buildClient({
+        untrackSeoKeywords: vi.fn().mockResolvedValue(
+          okEnvelope({
+            ok: true,
+            outcomes: [
+              { keyword: 'a', status: 'untracked' },
+              { keyword: 'b', status: 'not_tracked' }
+            ],
+            activeKeywordCount: 30,
+            capacity: 200
+          })
+        )
+      })
+    )
+
+    const result = await handlers.untrackSeoKeywords({ organizationId: 'org-1', keywords: ['a', 'b'] })
+
+    expect(result.isError).toBe(false)
+    expect(result.content[0].text).toContain('1 stopped')
+    // Un agente que reporte "listo" cuando la mitad ni se seguía describe un cambio que no ocurrió.
+    expect(result.content[0].text).toContain('1 were not tracked')
+    expect(result.content[0].text).toContain('30/200')
+    expect(result.content[0].text).toContain('Historical measurements are preserved')
+  })
+
+  it('degradación honesta: el rechazo del command se reporta con su errorCode', async () => {
+    const handlers = createGreenhouseMcpHandlers(
+      buildClient({
+        untrackSeoKeywords: vi
+          .fn()
+          .mockResolvedValue(okEnvelope({ ok: false, errorCode: 'target_not_found', status: null }))
+      })
+    )
+
+    const result = await handlers.untrackSeoKeywords({ organizationId: 'org-1', keywords: ['a'] })
+
+    expect(result.content[0].text).toContain('rejected (target_not_found)')
+  })
+
+  it('propaga el deny del lane (scope no interno) sin fabricar un éxito', async () => {
+    const handlers = createGreenhouseMcpHandlers(
+      buildClient({
+        untrackSeoKeywords: vi.fn().mockRejectedValue(
+          new GreenhouseMcpApiError('scope not allowed', { status: 403, code: 'scope_not_allowed' })
+        )
+      })
+    )
+
+    const result = await handlers.untrackSeoKeywords({ organizationId: 'org-1', keywords: ['a'] })
+
+    expect(result.isError).toBe(true)
+    expect(result.content[0].text).toContain('scope_not_allowed')
   })
 })

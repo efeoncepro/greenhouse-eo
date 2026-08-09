@@ -54,7 +54,9 @@
 - **Recraft**: **vectores editables reales** (logos/iconos/packaging).
 - **Ideogram**: texto-en-imagen (posters/thumbnails).
 - **FLUX.2**: realismo + params de cámara.
-- **Seedance 2.0**: video ByteDance con control por referencias. **2.5** permanece bloqueado/no verificado en Fal.
+- **Seedance 2.0**: video ByteDance con control por referencias. **Seedance 2.5**: familia expuesta por Fal en
+  T2V/I2V/R2V, con audio nativo y referencias multimodales; Fal es la superficie provider-supported y Globe la
+  mantiene gated hasta completar su integración y promoción exactas.
 - **Veo 3.1**: video broadcast/cine (Google). **Kling 3.0**: video económico. **Gemini Omni**:
   video multimodal con edición conversacional. **Sora 2**: deprecado (no usar).
 

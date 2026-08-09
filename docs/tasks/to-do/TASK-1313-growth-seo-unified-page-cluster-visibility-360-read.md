@@ -22,7 +22,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|ai|data`
-- Blocked by: `TASK-1311, TASK-1312, TASK-1303`
+- Blocked by: `TASK-1311, TASK-1312`
 - Branch: `task/TASK-1313-growth-seo-unified-page-cluster-visibility-360-read`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -67,10 +67,10 @@ Reglas obligatorias (§1.1 + §15 — **boundary duro, load-bearing**):
 
 ## Normative Docs
 
-- `docs/tasks/to-do/TASK-1305-growth-seo-aeo-gap-derived-read.md` — **task hermana directa**: `readSeoAeoGap` (nivel marca). Esta task copia su estructura y reusa su clasificador quadrant ortogonal + su patrón de "dos reads separados unidos en memoria"; solo cambia la granularidad de `organization_id` → `organization_id + url` (o cluster).
+- `docs/tasks/complete/TASK-1305-growth-seo-aeo-gap-derived-read.md` — **task hermana directa**: `readSeoAeoGap` (nivel marca). Esta task copia su estructura y reusa su clasificador quadrant ortogonal + su patrón de "dos reads separados unidos en memoria"; solo cambia la granularidad de `organization_id` → `organization_id + url` (o cluster).
 - `docs/tasks/to-do/TASK-1311-growth-seo-aeo-citation-attribution-url-grounded-queries.md` — provee `readUrlCitationAttribution` (citas atribuidas a la URL + grounded queries + engine + citation share). Es el **lado AEO** del cruce granular. [verificar shape final del reader al tomar la task].
 - `docs/tasks/to-do/TASK-1312-growth-seo-topic-cluster-entity-rollup.md` — provee `seo_topic_clusters` (URLs + keyword sets por tema) + rollup reader. Resuelve `clusterId → { urls[], keywordSets }` para `readClusterVisibility360`. [verificar shape del rollup reader].
-- `docs/tasks/to-do/TASK-1303-growth-seo-rank-capture-evolution-reader.md` — provee `readRankEvolution(targetId, {keywords, range, engine, device})` sobre `seo_rank_snapshots` (con `url`) + el mirror BQ. Es el **lado SEO** del cruce granular (rank por URL). [verificar filtro por URL].
+- `docs/tasks/complete/TASK-1303-growth-seo-rank-capture-evolution-reader.md` — provee `readRankEvolution(targetId, {keywords, range, engine, device})` sobre `seo_rank_snapshots` (con `url`) + el mirror BQ. Es el **lado SEO** del cruce granular (rank por URL). [verificar filtro por URL].
 - `docs/tasks/to-do/TASK-1302-growth-seo-gsc-daily-snapshot-materializer.md` — provee `seo_gsc_daily` (`query × page`, append-only por `capture_date`), fuente de clicks/impresiones/posición por URL. [verificar campo `page`/`url`].
 - `src/lib/growth/search-console/contracts.ts` — patrón result shape `{ ok: true, ... } | { ok: false, errorCode }` a espejar. [verificar path exacto].
 - `src/lib/growth/ai-visibility/store.ts` (`listOperatorCrossOrgAeoScores`) — patrón canónico de degradación honesta AEO (`null`, NUNCA `0`) reusado por el lado AEO.

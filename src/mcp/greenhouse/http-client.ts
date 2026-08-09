@@ -255,6 +255,40 @@ export class GreenhouseApiPlatformClient {
     })
   }
 
+  /**
+   * TASK-1308 — el PRIMER write del lane SEO (los 9 anteriores son lecturas).
+   *
+   * POST porque persiste: agrega keywords al set monitoreado, y eso compromete gasto
+   * DataForSEO recurrente. El lane sólo lo acepta desde bindings de scope `internal`.
+   */
+  async trackSeoKeywords(input: { organizationId?: string; keywords: string[] }) {
+    return this.request(
+      '/api/platform/ecosystem/growth/seo/keywords/track',
+      {},
+      {
+        method: 'POST',
+        body: { organizationId: input.organizationId, keywords: input.keywords }
+      }
+    )
+  }
+
+  /**
+   * TASK-1308 — la contraparte de `trackSeoKeywords`: saca keywords del ciclo de gasto.
+   *
+   * Que exista es lo que hace REVERSIBLE el compromiso desde un agente. Sin ella, una tool
+   * podía subir la factura del cliente y ninguna podía bajarla.
+   */
+  async untrackSeoKeywords(input: { organizationId?: string; keywords: string[] }) {
+    return this.request(
+      '/api/platform/ecosystem/growth/seo/keywords/untrack',
+      {},
+      {
+        method: 'POST',
+        body: { organizationId: input.organizationId, keywords: input.keywords }
+      }
+    )
+  }
+
   // TASK-1211 — Cotizador (read-only). Resolver de servicios + simulación de precio
   // (estimado referencial NO vinculante). Lane ecosystem; scope por binding.
   async searchServices(input: { query?: string; limit?: number }) {

@@ -1,0 +1,970 @@
+'use client'
+
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react'
+
+import { useRouter } from 'next/navigation'
+
+import Alert from '@mui/material/Alert'
+import AlertTitle from '@mui/material/AlertTitle'
+import Box from '@mui/material/Box'
+import ButtonBase from '@mui/material/ButtonBase'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import Divider from '@mui/material/Divider'
+import Stack from '@mui/material/Stack'
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableHead from '@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
+import Tooltip from '@mui/material/Tooltip'
+import Typography from '@mui/material/Typography'
+import { alpha } from '@mui/material/styles'
+
+import CustomAutocomplete from '@core/components/mui/Autocomplete'
+import CustomTextField from '@core/components/mui/TextField'
+
+import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
+import EmptyState from '@/components/greenhouse/EmptyState'
+import {
+  GreenhouseAsyncActionButton,
+  GreenhouseButton,
+  GreenhouseBreadcrumbs,
+  GreenhouseChip
+} from '@/components/greenhouse/primitives'
+import { useContainerDensity } from '@/components/greenhouse/primitives/card-density'
+import useReducedMotion from '@/hooks/useReducedMotion'
+import { throwIfNotOk } from '@/lib/api/parse-error-response'
+import { AnimatePresence, motion } from '@/libs/FramerMotion'
+import { MOTION_DURATION_S, MOTION_EASE } from '@/components/greenhouse/motion/core/tokens'
+import DataTableShell from '@/components/greenhouse/data-table/DataTableShell'
+import SurfaceRecipe from '@/components/greenhouse/primitives/surface-system/SurfaceRecipe'
+import WorkbenchHeader from '@/components/greenhouse/primitives/surface-system/WorkbenchHeader'
+import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_GROWTH_SEO_AUDIT, GH_GROWTH_SEO_OVERVIEW } from '@/lib/copy/growth'
+import type { SeoSiteAuditFindingSeverity, SiteAuditReportResult } from '@/lib/growth/seo/contracts'
+import type { SeoSpaceOption } from '@/lib/growth/seo/overview/list-seo-spaces'
+
+import SeoHealthGauge from '../shared/SeoHealthGauge'
+import SeoSearchVisibilityTabs from '../overview/SeoSearchVisibilityTabs'
+import { STALE_CRAWL_DAYS, daysSinceCrawl, groupAuditIssues } from './group-audit-issues'
+import type { SeoAuditIssueGroup } from './group-audit-issues'
+
+/**
+ * TASK-1309 — Auditoría del sitio (nodo S4 de EPIC-022).
+ *
+ * Cliente PURO: no calcula salud, no decide acceso y no deriva el estado del crawl. Todo
+ * eso llega resuelto del servidor; acá sólo se presenta. La única regla que vive de este
+ * lado es la PRIORIZACIÓN de la lista, y por eso está extraída y testeada aparte
+ * (`group-audit-issues.ts`), no enterrada en el JSX.
+ *
+ * La decisión de producto que gobierna la pantalla: los issues van como LISTA
+ * priorizada, no como tabla plana. Una tabla ordenable invita a leer por columna; acá la
+ * pregunta es "¿qué ataco primero?" y la respuesta tiene que estar en el orden, no en un
+ * control que el operador deba descubrir. La tabla aparece UNA vez, dentro del drill,
+ * donde sí hay una lista homogénea (las URLs de un grupo).
+ */
+
+/** Severidad = icono + label + color. Nunca color solo (8% de daltonismo). */
+const SEVERITY_PRESENTATION: Record<
+  SeoSiteAuditFindingSeverity,
+  { icon: string; label: string; tone: 'error' | 'warning' | 'info' }
+> = {
+  critical: { icon: 'tabler-alert-octagon', label: GH_GROWTH_SEO_AUDIT.severity.critical, tone: 'error' },
+  warning: { icon: 'tabler-alert-triangle', label: GH_GROWTH_SEO_AUDIT.severity.warning, tone: 'warning' },
+  notice: { icon: 'tabler-info-circle', label: GH_GROWTH_SEO_AUDIT.severity.notice, tone: 'info' }
+}
+
+/** Curva de entrada del design system, en la tupla mutable que espera Framer. */
+const EASE_EMPHASIZED = [...(MOTION_EASE.emphasized.cubicBezier ?? [0.2, 0, 0, 1])] as [number, number, number, number]
+
+/** Techo de URLs por drill: una lista de miles no ayuda a decidir y castiga el render. */
+const DRILL_URL_LIMIT = 200
+
+/** Id estable del disparador de un grupo — el ancla del retorno de foco al cerrar el drill. */
+const triggerId = (issueType: string) => `seo-audit-trigger-${issueType}`
+
+/** Detalle diagnóstico de un finding, en la misma forma que muestra la tabla. */
+const findingDetail = (detail: Record<string, unknown>): string => {
+  const status = detail?.httpStatusCode
+  const score = detail?.onpageScore
+
+  return [
+    typeof status === 'number' ? GH_GROWTH_SEO_AUDIT.drill.httpStatus(status) : null,
+    typeof score === 'number' ? GH_GROWTH_SEO_AUDIT.drill.onpageScore(Math.round(score)) : null
+  ]
+    .filter(Boolean)
+    .join(' · ')
+}
+
+interface Props {
+  spaces: readonly SeoSpaceOption[]
+  selectedSpaceId: string | null
+  rootDomain: string | null
+  seoTargetId: string | null
+  report: SiteAuditReportResult | null
+  openIssueGroup: string | null
+  /** Severidad seleccionada desde los conteos de la banda de salud (`?severity=`). */
+  severityFilter: SeoSiteAuditFindingSeverity | null
+  canRunAudit: boolean
+  /** Techo de páginas del crawl: si el conteo lo iguala, el número es el límite, no el sitio. */
+  crawlPageCap: number
+}
+
+const SiteAuditView = ({
+  spaces,
+  selectedSpaceId,
+  rootDomain,
+  seoTargetId,
+  report,
+  openIssueGroup,
+  severityFilter,
+  canRunAudit,
+  crawlPageCap
+}: Props) => {
+  const router = useRouter()
+  const [isPending, startTransition] = useTransition()
+  const reducedMotion = useReducedMotion()
+  const { ref: healthRef, density: healthDensity, containerType: healthContainerType } = useContainerDensity('auto')
+
+  const selectedSpace = useMemo(
+    () => spaces.find(space => space.organizationId === selectedSpaceId) ?? null,
+    [spaces, selectedSpaceId]
+  )
+
+  const pushQuery = useCallback(
+    (next: { space?: string; issueGroup?: string | null; severity?: SeoSiteAuditFindingSeverity | null }) => {
+      const params = new URLSearchParams()
+      const space = next.space ?? selectedSpaceId
+
+      if (space) {
+        params.set('space', space)
+      }
+
+      // `issueGroup` ausente en `next` = conservar; `null` = cerrar el drill.
+      const group = next.issueGroup === undefined ? openIssueGroup : next.issueGroup
+
+      if (group) {
+        params.set('issueGroup', group)
+      }
+
+      const severity = next.severity === undefined ? severityFilter : next.severity
+
+      if (severity) {
+        params.set('severity', severity)
+      }
+
+      const query = params.toString()
+
+      startTransition(() => router.push(query ? `/admin/growth/seo/audit?${query}` : '/admin/growth/seo/audit'))
+    },
+    [router, selectedSpaceId, openIssueGroup, severityFilter]
+  )
+
+  const allGroups = useMemo(() => (report?.ok ? groupAuditIssues(report.findings) : []), [report])
+
+  // El filtro acota lo que se LISTA, nunca lo que se cuenta: la banda de salud sigue
+  // diciendo el total del crawl. Si acotara ambos, filtrar parecería que el sitio mejoró.
+  const groups = useMemo(
+    () => (severityFilter ? allGroups.filter(group => group.severity === severityFilter) : allGroups),
+    [allGroups, severityFilter]
+  )
+
+  // El drill se resuelve contra TODOS los grupos: un enlace compartido con `?issueGroup=`
+  // de otra severidad debe abrir igual en vez de morir en silencio por el filtro vigente.
+  const openGroup = useMemo(
+    () => allGroups.find(group => group.issueType === openIssueGroup) ?? null,
+    [allGroups, openIssueGroup]
+  )
+
+  // Contrato de foco del wireframe: al abrir un grupo el foco va a su encabezado; al
+  // cerrarlo vuelve a la fila que lo abrió. Sin esto, quien navega por teclado queda
+  // arriba de todo tras cada drill y tiene que recorrer la lista completa de nuevo.
+  //
+  // El disparador se busca por `id` y no por ref: abrir el drill es una navegación
+  // (`?issueGroup=`), y un ref capturado antes de ella puede apuntar a un nodo que React
+  // ya reemplazó. El `id` es estable porque lo deriva el propio `issueType`.
+  const drillHeadingRef = useRef<HTMLHeadingElement | null>(null)
+  const lastOpenedRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    if (openGroup && lastOpenedRef.current !== openGroup.issueType) {
+      lastOpenedRef.current = openGroup.issueType
+      drillHeadingRef.current?.focus()
+
+      return
+    }
+
+    if (!openGroup && lastOpenedRef.current) {
+      document.getElementById(triggerId(lastOpenedRef.current))?.focus()
+      lastOpenedRef.current = null
+    }
+  }, [openGroup])
+
+  const run = report?.ok ? report.run : null
+  const staleDays = daysSinceCrawl(run?.finishedAt ?? run?.startedAt ?? null)
+  const isRunning = run?.status === 'running'
+
+  // Feedback del enqueue. `actionable` viaja desde el contrato canónico: el guard de
+  // idempotencia y el cupo agotado NO llevan reintento (reintentar es exactamente lo que
+  // no corresponde), mientras que una caída del proveedor sí.
+  // Copia del drill: `null` = sin intento; el `issueType` recuerda CUÁL grupo se copió
+  // para que el feedback no aparezca en el grupo equivocado al cambiar de uno a otro.
+  const [copied, setCopied] = useState<{ issueType: string; ok: boolean } | null>(null)
+
+  const copyGroup = useCallback(async (group: SeoAuditIssueGroup) => {
+    // TSV con encabezado: pega como texto en un doc y como columnas en una planilla, sin
+    // pedirle al operador que elija formato. Se copian TODAS las URLs del grupo, no sólo
+    // las que la tabla alcanza a mostrar — el techo del render es de lectura, no del dato.
+    const body = group.findings.map(finding => `${finding.url}\t${findingDetail(finding.detail)}`).join('\n')
+
+    try {
+      await navigator.clipboard.writeText(`${GH_GROWTH_SEO_AUDIT.drill.copyHeader}\n${body}`)
+      setCopied({ issueType: group.issueType, ok: true })
+    } catch {
+      // El portapapeles puede estar denegado por permisos o por contexto no seguro. Se
+      // dice; fallar en silencio dejaría al operador creyendo que copió.
+      setCopied({ issueType: group.issueType, ok: false })
+    }
+  }, [])
+
+  const [runState, setRunState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [runMessage, setRunMessage] = useState<{ text: string; severity: 'success' | 'warning' | 'error' } | null>(null)
+
+  const handleRunAudit = useCallback(async () => {
+    if (!seoTargetId) {
+      return
+    }
+
+    setRunState('loading')
+    setRunMessage(null)
+
+    try {
+      const response = await fetch('/api/admin/growth/seo/audit/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ seoTargetId })
+      })
+
+      await throwIfNotOk(response, GH_GROWTH_SEO_AUDIT.runErrors.generic)
+
+      setRunState('success')
+      setRunMessage({ text: GH_GROWTH_SEO_AUDIT.action.queued, severity: 'success' })
+
+      // El servidor ya persistió el run en `running`: revalidar es lo que hace que la
+      // pantalla lo muestre, sin inventar el estado en el cliente.
+      startTransition(() => router.refresh())
+    } catch (error) {
+      setRunState('error')
+      setRunMessage({
+        text: error instanceof Error ? error.message : GH_GROWTH_SEO_AUDIT.runErrors.generic,
+        // Que ya hubiera una auditoría del día no es una falla del operador: se informa,
+        // no se le grita en rojo.
+        severity: error instanceof Error && 'code' in error && String(error.code).startsWith('seo_audit_already')
+          ? 'warning'
+          : 'error'
+      })
+    }
+  }, [seoTargetId, router])
+
+  const runAuditButton =
+    canRunAudit && seoTargetId ? (
+      <GreenhouseAsyncActionButton
+        kind='primaryAction'
+        state={runState}
+        // Con un crawl en vuelo el botón no tiene nada que hacer: el propio command lo
+        // rebotaría con `audit_already_running`, así que se declara antes de gastar el clic.
+        disabled={isRunning}
+        loadingLabel={GH_GROWTH_SEO_AUDIT.action.running}
+        onClick={handleRunAudit}
+        dataCapture='seo-audit-run'
+        startIcon={<i className='tabler-radar' />}
+      >
+        {GH_GROWTH_SEO_AUDIT.action.run}
+      </GreenhouseAsyncActionButton>
+    ) : null
+
+  const header = (
+    <Stack spacing={4}>
+      {/* Sin hrefs, misma convención que Overview y Rendimiento: "Growth" es un grupo de
+          menú y la navegación entre hermanas ES la barra de tabs de este mismo header. */}
+      <GreenhouseBreadcrumbs
+        items={[
+          { label: GH_INTERNAL_NAV.growth.label },
+          { label: GH_GROWTH_SEO_OVERVIEW.breadcrumbSection },
+          { label: GH_GROWTH_SEO_AUDIT.header.breadcrumbLeaf }
+        ]}
+      />
+
+      <WorkbenchHeader
+        kind='report'
+        titleComponent='h1'
+        dataCapture='seo-audit-toolbar'
+        title={GH_GROWTH_SEO_AUDIT.header.title}
+        description={
+          rootDomain
+            ? GH_GROWTH_SEO_AUDIT.header.subtitle(rootDomain)
+            : GH_GROWTH_SEO_AUDIT.header.subtitleNoDomain
+        }
+        meta={
+          // El freshness es la señal de cuánto confiar en TODO lo de abajo, así que vive
+          // en la cabecera y no dentro de una card. Sin crawl se dice con palabras; nunca
+          // se omite dejando que un diagnóstico viejo pase por actual.
+          <GreenhouseChip
+            kind='metric'
+            variant='label'
+            size='small'
+            label={staleDays === null ? GH_GROWTH_SEO_AUDIT.header.freshnessNever : GH_GROWTH_SEO_AUDIT.header.freshness(staleDays)}
+          />
+        }
+        // Picker y acción viajan JUNTOS en un solo slot, dentro de un Stack propio con
+        // `flex-end`. El slot del header alinea por arriba (correcto entre campos con
+        // label), y un botón sin label quedaba 21px sobre la línea del input. Alinearlo
+        // con `alignSelf` no sirve: el grupo de acciones se estira al alto de la columna
+        // del título, así que el botón caía al fondo del header. Este Stack mide lo que
+        // mide el campo, y ahí `flex-end` SÍ los deja compartiendo la misma línea base.
+        secondaryActions={
+          <Stack direction='row' spacing={2} alignItems='flex-end' flexWrap='wrap' useFlexGap>
+          <CustomAutocomplete
+            options={spaces}
+            value={selectedSpace}
+            disableClearable={false}
+            getOptionLabel={(option: SeoSpaceOption | string) =>
+              typeof option === 'string' ? option : option.organizationName
+            }
+            isOptionEqualToValue={(option: SeoSpaceOption, value: SeoSpaceOption) =>
+              option.organizationId === value.organizationId
+            }
+            // Cambiar de Space cierra el drill: un `issueGroup` de otro sitio no existe acá
+            // y dejaría la pantalla pidiendo un grupo fantasma.
+            onChange={(_, value) =>
+              value
+                ? pushQuery({ space: (value as SeoSpaceOption).organizationId, issueGroup: null })
+                : undefined
+            }
+            sx={{ flex: { xs: '1 1 100%', md: '0 0 auto' }, minInlineSize: { md: 220 } }}
+            renderInput={params => (
+              <CustomTextField
+                {...params}
+                label={GH_GROWTH_SEO_OVERVIEW.toolbar.spaceLabel}
+                placeholder={GH_GROWTH_SEO_OVERVIEW.toolbar.spacePlaceholder}
+              />
+            )}
+          />
+            {runAuditButton}
+          </Stack>
+        }
+        supporting={
+          <Box data-capture='seo-audit-tabs'>
+            <SeoSearchVisibilityTabs activeTab='audit' spaceId={selectedSpaceId} />
+          </Box>
+        }
+      />
+    </Stack>
+  )
+
+  const healthStrip = () => {
+    if (!report?.ok) {
+      return null
+    }
+
+    // A 390px el gauge a tamaño completo (180px + su etiqueta + las 4 cifras) llenaba la
+    // pantalla entera y empujaba la LISTA —la parte accionable— abajo del fold. La card se
+    // adapta a su propio ancho: al condensar, el arco se achica y las cifras suben.
+    const compact = healthDensity !== 'full'
+
+    const previous = report.previous
+    const currentIssues = report.totals.critical + report.totals.warning + report.totals.notice
+
+    const healthTrend = !previous
+      ? GH_GROWTH_SEO_AUDIT.kpi.trendFirstRun
+      : previous.healthScore === null || report.run.healthScore === null
+        ? GH_GROWTH_SEO_AUDIT.kpi.trendHealthUnknown(previous.captureDate)
+        : Math.abs(report.run.healthScore - previous.healthScore) < 0.05
+          ? GH_GROWTH_SEO_AUDIT.kpi.trendHealthFlat(previous.captureDate)
+          : GH_GROWTH_SEO_AUDIT.kpi.trendHealth(report.run.healthScore - previous.healthScore, previous.captureDate)
+
+    const issuesTrend = previous
+      ? GH_GROWTH_SEO_AUDIT.kpi.trendIssues(
+          currentIssues - (previous.totals.critical + previous.totals.warning + previous.totals.notice)
+        )
+      : null
+
+    return (
+      <Card ref={healthRef} data-capture='seo-audit-health' data-card-density={healthDensity} sx={{ containerType: healthContainerType }}>
+        <CardContent>
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={{ xs: 4, sm: 6 }}
+            alignItems={{ xs: 'stretch', sm: 'center' }}
+          >
+            <Stack spacing={1} alignItems='center' sx={{ flexShrink: 0 }}>
+              {report.run.healthScore === null ? (
+                // Puntaje no calculado ≠ puntaje cero. Un 0/100 leería "sitio pésimo"
+                // cuando en realidad el crawl no llegó a calcularlo.
+                <Stack spacing={0.5} alignItems='center' sx={{ py: 4 }}>
+                  <Typography variant='h5'>{GH_GROWTH_SEO_AUDIT.kpi.healthPending}</Typography>
+                  <Typography variant='caption' color='text.secondary' textAlign='center'>
+                    {GH_GROWTH_SEO_AUDIT.kpi.healthPendingHint}
+                  </Typography>
+                </Stack>
+              ) : (
+                <SeoHealthGauge
+                  score={report.run.healthScore}
+                  size={compact ? 116 : 180}
+                  ariaLabel={GH_GROWTH_SEO_AUDIT.kpi.healthAria(Math.round(report.run.healthScore))}
+                />
+              )}
+              <Typography variant='caption' color='text.secondary'>
+                {GH_GROWTH_SEO_AUDIT.kpi.health}
+              </Typography>
+
+              {/* Movimiento, no foto. Sin crawl anterior se DICE que es el primero: dejar
+                  el hueco vacío sería ambiguo (¿no cambió, o no hay con qué comparar?). */}
+              <Typography variant='caption' color='text.secondary' textAlign='center'>
+                {healthTrend}
+              </Typography>
+            </Stack>
+
+            <Divider orientation='vertical' flexItem sx={{ display: { xs: 'none', sm: 'block' } }} />
+
+            <Stack spacing={3} sx={{ flex: 1, minInlineSize: 0 }}>
+              {/* Contexto del crawl: NO es una severidad, así que sale de la banda. Mezclar
+                  "100 páginas" con "138 avisos" en la misma fila de cifras invitaba a
+                  compararlos, y no son comparables. */}
+              <Typography variant='body2' color='text.secondary'>
+                <Box component='span' sx={{ fontVariantNumeric: 'tabular-nums', fontWeight: 600, color: 'text.primary' }}>
+                  {report.run.crawledPages === null ? '—' : report.run.crawledPages}
+                </Box>{' '}
+                {GH_GROWTH_SEO_AUDIT.kpi.pages.toLowerCase()}
+                {report.run.crawledPages === crawlPageCap ? ` · ${GH_GROWTH_SEO_AUDIT.kpi.pagesCapped.toLowerCase()}` : ''}
+              </Typography>
+
+              {/* 🔴 Banda proporcional, no cuatro números planos. Los conteos por severidad
+                  son PARTES DE UN TODO (519 findings repartidos 0/138/381) y como texto
+                  suelto tenían encoding CERO: 0, 138 y 381 pesaban visualmente lo mismo y
+                  el reparto sólo se veía leyendo. El ancho lo hace evidente de un vistazo
+                  —longitud, rank 3 de Cleveland & McGill, contra el rank último que es "no
+                  encodear nada"— y de paso el objeto que explica el reparto es el que lo
+                  filtra. Mismo patrón que la banda de veredicto de Keywords (TASK-1308),
+                  con sus lecciones ya aprendidas: piso de ancho para que la etiqueta quepa,
+                  y activo por fondo + borde, nunca sólo por tinte. */}
+              <Stack
+                direction={{ xs: 'column', sm: 'row' }}
+                spacing={2}
+                useFlexGap
+                flexWrap='wrap'
+                role='group'
+                aria-label={GH_GROWTH_SEO_AUDIT.kpi.bandAria}
+              >
+                {(['critical', 'warning', 'notice'] as const).map(severity => {
+                  const presentation = SEVERITY_PRESENTATION[severity]
+
+                  const label =
+                    severity === 'critical'
+                      ? GH_GROWTH_SEO_AUDIT.kpi.critical
+                      : severity === 'warning'
+                        ? GH_GROWTH_SEO_AUDIT.kpi.warnings
+                        : GH_GROWTH_SEO_AUDIT.kpi.notices
+
+                  const count = report.totals[severity]
+                  const isActive = severityFilter === severity
+                  // Una severidad sin issues no filtra —prometería una lista vacía— pero
+                  // TAMPOCO se esconde: "0 críticos" es un hallazgo, y su ausencia sería
+                  // ambigua. Se muestra al tamaño de su contenido, fuera del reparto.
+                  const interactive = count > 0
+
+                  return (
+                    <Tooltip key={severity} title={interactive ? GH_GROWTH_SEO_AUDIT.kpi.filterAria(label) : ''}>
+                      <Box
+                        component={interactive ? ButtonBase : 'div'}
+                        onClick={
+                          interactive
+                            ? () =>
+                                pushQuery({
+                                  severity: isActive ? null : severity,
+                                  issueGroup: null
+                                })
+                            : undefined
+                        }
+                        aria-pressed={interactive ? isActive : undefined}
+                        aria-label={interactive ? GH_GROWTH_SEO_AUDIT.kpi.filterAria(label) : undefined}
+                        sx={theme => ({
+                          // El ancho ES el dato: proporcional al conteo. El piso evita que
+                          // el grupo chico quede sin espacio para su etiqueta.
+                          flex: { sm: interactive ? count : '0 0 auto' },
+                          minInlineSize: { sm: 148 },
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'flex-start',
+                          gap: 2.5,
+                          py: 2.5,
+                          px: 3,
+                          textAlign: 'start',
+                          borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                          border: '1px solid',
+                          borderColor: isActive ? `${presentation.tone}.main` : 'divider',
+                          bgcolor: isActive ? alpha(theme.palette[presentation.tone].main, 0.08) : 'transparent',
+                          // SIN atenuar el segmento sin issues. Dos razones: `opacity`
+                          // multiplica contra el fondo y tiraba su etiqueta a 2.98:1 (axe),
+                          // y de producto estaba al revés — "0 críticos" es la mejor
+                          // noticia de la pantalla, no un dato de segunda.
+                          transition: theme.transitions.create(['background-color', 'border-color']),
+                          ...(interactive
+                            ? { '&:hover': { bgcolor: alpha(theme.palette[presentation.tone].main, 0.06) } }
+                            : {}),
+                          '&.Mui-focusVisible, &:focus-visible': {
+                            outline: `2px solid ${theme.palette.primary.main}`,
+                            outlineOffset: 2
+                          }
+                        })}
+                      >
+                        <Box
+                          component='i'
+                          className={presentation.icon}
+                          aria-hidden='true'
+                          sx={{ color: `${presentation.tone}.main`, fontSize: 20, flexShrink: 0 }}
+                        />
+                        {/* Número y etiqueta en la MISMA línea de base: son un dato, no dos. */}
+                        <Stack direction='row' spacing={2} alignItems='baseline' sx={{ minInlineSize: 0 }}>
+                          <Typography variant='h5' component='span' sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                            {/* El conteo se ARMA en vez de aparecer: confirma que la cifra
+                                se recalculó tras un crawl nuevo o un cambio de Space, que
+                                es justo cuando el operador duda de si está viendo lo
+                                anterior. `AnimatedCounter` ya respeta reduced-motion. */}
+                            <AnimatedCounter value={count} animateFrom={0} />
+                          </Typography>
+                          <Typography variant='body2' color='text.secondary' noWrap>
+                            {label}
+                          </Typography>
+                        </Stack>
+                      </Box>
+                    </Tooltip>
+                  )
+                })}
+              </Stack>
+            </Stack>
+          </Stack>
+
+          {/* Reconcilia las dos cifras que el fold pone juntas: el puntaje (del proveedor,
+              ponderado hacia lo que rompe indexación) y el conteo (de nuestro catálogo).
+              Sin esta línea, "95" al lado de "519 issues" se lee como contradicción. */}
+          {report.run.healthScore !== null && currentIssues > 0 ? (
+            <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 3 }}>
+              {report.totals.critical === 0
+                ? GH_GROWTH_SEO_AUDIT.kpi.healthScopeNoCritical
+                : GH_GROWTH_SEO_AUDIT.kpi.healthScopeWithCritical}
+            </Typography>
+          ) : null}
+
+          {issuesTrend ? (
+            <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 3 }}>
+              {issuesTrend}
+            </Typography>
+          ) : null}
+
+          {report.run.crawledPages === crawlPageCap ? (
+            <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 3 }}>
+              {GH_GROWTH_SEO_AUDIT.kpi.pagesCappedHint(crawlPageCap)}
+            </Typography>
+          ) : null}
+        </CardContent>
+      </Card>
+    )
+  }
+
+  const issueRow = (group: SeoAuditIssueGroup, index: number) => {
+    const severity = SEVERITY_PRESENTATION[group.severity]
+    const isOpen = openGroup?.issueType === group.issueType
+
+    return (
+      <Box
+        key={group.issueType}
+        component={reducedMotion ? 'li' : motion.li}
+        // Entrada escalonada: al filtrar por severidad la lista se reescribe entera, y sin
+        // señal el cambio es indistinguible de "no pasó nada". El stagger dice QUÉ quedó.
+        // Se corta a los 6 ítems: más allá el escalonado deja de informar y se vuelve
+        // espera. `layout` no se usa — reordenar filas al filtrar distraería del contenido.
+        {...(reducedMotion
+          ? {}
+          : {
+              initial: { opacity: 0, y: 6 },
+              animate: { opacity: 1, y: 0 },
+              transition: {
+                duration: MOTION_DURATION_S.standard,
+                ease: EASE_EMPHASIZED,
+                delay: Math.min(index, 6) * 0.03
+              }
+            })}
+        sx={{ listStyle: 'none' }}
+      >
+        {index > 0 ? <Divider /> : null}
+
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={{ xs: 2, sm: 4 }}
+          alignItems={{ xs: 'flex-start', sm: 'center' }}
+          sx={{ py: 3, px: { xs: 0, sm: 1 } }}
+        >
+          {/* Severidad: icono + palabra + color. El chip lleva el texto adentro, así que
+              quien no distingue el color sigue leyendo "Crítico". */}
+          <Box sx={{ flexShrink: 0, minInlineSize: { sm: 116 } }}>
+            <GreenhouseChip
+              kind='status'
+              size='small'
+              tone={severity.tone}
+              iconClassName={severity.icon}
+              label={severity.label}
+            />
+          </Box>
+
+          <Stack spacing={0.5} sx={{ flex: 1, minInlineSize: 0 }}>
+            <Typography variant='body1' fontWeight={600}>
+              {group.label}
+            </Typography>
+            <Typography variant='caption' color='text.secondary'>
+              {GH_GROWTH_SEO_AUDIT.issues.affected(group.affectedPages)}
+              {' · '}
+              {GH_GROWTH_SEO_AUDIT.issues.effortLabel}: {GH_GROWTH_SEO_AUDIT.effort[group.effort]}
+            </Typography>
+          </Stack>
+
+          <GreenhouseButton
+            id={triggerId(group.issueType)}
+            kind='secondaryAction'
+            variant='text'
+            size='small'
+            aria-expanded={isOpen}
+            aria-label={GH_GROWTH_SEO_AUDIT.issues.viewAria(group.label)}
+            trailingIconClassName={isOpen ? 'tabler-chevron-up' : 'tabler-chevron-right'}
+            onClick={() => pushQuery({ issueGroup: isOpen ? null : group.issueType })}
+            sx={{ flexShrink: 0, alignSelf: { xs: 'flex-start', sm: 'center' } }}
+          >
+            {isOpen ? GH_GROWTH_SEO_AUDIT.drill.close : GH_GROWTH_SEO_AUDIT.issues.view}
+          </GreenhouseButton>
+        </Stack>
+
+        {/* La apertura se anima en ALTURA para que el vínculo fila → detalle sea visible:
+            aparecer de golpe deja al operador buscando qué cambió. Con reduced-motion el
+            panel simplemente está o no está. */}
+        <AnimatePresence initial={false}>
+          {isOpen && openGroup ? (
+            reducedMotion ? (
+              drill(openGroup)
+            ) : (
+              <motion.div
+                key='drill'
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: MOTION_DURATION_S.standard, ease: EASE_EMPHASIZED }}
+                style={{ overflow: 'hidden' }}
+              >
+                {drill(openGroup)}
+              </motion.div>
+            )
+          ) : null}
+        </AnimatePresence>
+      </Box>
+    )
+  }
+
+  const drill = (group: SeoAuditIssueGroup) => {
+    const urls = group.findings.slice(0, DRILL_URL_LIMIT)
+
+    return (
+      <Box
+        data-capture='seo-audit-drill'
+        sx={theme => ({
+          // Costura, no card: el drill es un detalle ANIDADO en su fila, y darle borde
+          // propio dentro de la card de issues sería card-on-card sin frontera semántica.
+          bgcolor: 'action.hover',
+          borderRadius: `${theme.shape.customBorderRadius.md}px`,
+          p: { xs: 3, sm: 4 },
+          mb: 3
+        })}
+      >
+        <Stack spacing={3}>
+          <Stack spacing={0.5}>
+            <Typography
+              ref={drillHeadingRef}
+              tabIndex={-1}
+              variant='subtitle1'
+              component='h3'
+              // `subtitle1` hereda un gris que sobre el fondo de la costura queda en
+              // 3.25:1 — bajo el piso AA. El encabezado del drill es contenido primario,
+              // no metadato, así que va en tinta primaria (axe lo cazó en el GVC).
+              color='text.primary'
+              sx={{ outline: 'none' }}
+            >
+              {GH_GROWTH_SEO_AUDIT.drill.title(group.label, group.affectedPages)}
+            </Typography>
+            {group.hint ? (
+              <Typography variant='body2' color='text.secondary'>
+                {group.hint}
+              </Typography>
+            ) : (
+              <Typography variant='body2' color='text.secondary'>
+                {GH_GROWTH_SEO_AUDIT.issues.unknownIssueHint}
+              </Typography>
+            )}
+          </Stack>
+
+          <Stack direction='row' spacing={2} alignItems='center'>
+            <GreenhouseButton
+              kind='secondaryAction'
+              variant='outlined'
+              size='small'
+              leadingIconClassName='tabler-copy'
+              aria-label={GH_GROWTH_SEO_AUDIT.drill.copyAria(group.label)}
+              onClick={() => void copyGroup(group)}
+            >
+              {GH_GROWTH_SEO_AUDIT.drill.copy}
+            </GreenhouseButton>
+
+            {/* `role='status'` y no un toast: el resultado pertenece a este grupo y tiene
+                que anunciarse donde ocurrió, no en una esquina que el lector de pantalla
+                lee fuera de contexto. */}
+            {copied?.issueType === group.issueType ? (
+              <Typography variant='caption' color={copied.ok ? 'success.main' : 'error.main'} role='status'>
+                {copied.ok ? GH_GROWTH_SEO_AUDIT.drill.copied : GH_GROWTH_SEO_AUDIT.drill.copyFailed}
+              </Typography>
+            ) : null}
+          </Stack>
+
+          {/* Scroll INTERNO, no crecimiento vertical libre. Un grupo real trae 91 URLs
+              (Berel) y sin este techo el drill mide ~5000px: expulsa de la pantalla la
+              lista priorizada que el operador estaba recorriendo, y abrir un issue pasa a
+              costar perder el contexto. Lo vio la captura del GVC, no el lint.
+
+              El contenedor lleva `tabIndex=0` porque una zona con scroll a la que no se
+              puede llegar por teclado deja su contenido inalcanzable para quien no usa
+              mouse (axe `scrollable-region-focusable`). Pero NO lleva `role='region'` con
+              el mismo nombre: `DataTableShell` ya expone su propia región nombrada, y
+              anidar dos con la misma etiqueta hacía que un lector de pantalla anunciara el
+              mismo landmark dos veces. El scroll vertical vive acá y el horizontal dentro
+              del shell, así que no compiten. */}
+          <Box tabIndex={0} sx={{ maxBlockSize: 360, overflowY: 'auto' }}>
+          <DataTableShell
+            identifier={`seo-audit-drill-${group.issueType}`}
+            ariaLabel={GH_GROWTH_SEO_AUDIT.drill.title(group.label, group.affectedPages)}
+            density='compact'
+          >
+            <Table size='small'>
+              <TableHead>
+                <TableRow>
+                  <TableCell scope='col'>{GH_GROWTH_SEO_AUDIT.drill.colUrl}</TableCell>
+                  <TableCell scope='col'>{GH_GROWTH_SEO_AUDIT.drill.colDetail}</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {urls.map((finding, index) => {
+                  const detail = findingDetail(finding.detail)
+
+                  return (
+                    <TableRow key={`${finding.url}-${index}`}>
+                      <TableCell sx={{ maxInlineSize: 520, wordBreak: 'break-all' }}>{finding.url}</TableCell>
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                        {detail || GH_GROWTH_SEO_AUDIT.drill.detailEmpty}
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            </Table>
+          </DataTableShell>
+          </Box>
+
+          {group.findings.length > urls.length ? (
+            <Typography variant='caption' color='text.secondary'>
+              {GH_GROWTH_SEO_AUDIT.drill.truncated(urls.length, group.findings.length)}
+            </Typography>
+          ) : null}
+        </Stack>
+      </Box>
+    )
+  }
+
+  const issuesList = () => (
+    <Card data-capture='seo-audit-issues'>
+      <CardContent>
+        <Stack spacing={0.5} sx={{ mb: 2 }}>
+          <Typography variant='h5' component='h2'>
+            {GH_GROWTH_SEO_AUDIT.issues.title}
+          </Typography>
+          <Typography variant='body2' color='text.secondary'>
+            {GH_GROWTH_SEO_AUDIT.issues.subtitle}
+          </Typography>
+          {/* El esfuerzo es juicio nuestro, no medición del crawl: se declara una vez,
+              acá, en lugar de repetirlo como tooltip en cada fila. */}
+          <Typography variant='caption' color='text.secondary'>
+            {GH_GROWTH_SEO_AUDIT.issues.effortHint}
+          </Typography>
+        </Stack>
+
+        {severityFilter ? (
+          <Stack direction='row' spacing={2} alignItems='center' sx={{ mb: 2 }}>
+            <Typography variant='body2' color='text.secondary'>
+              {GH_GROWTH_SEO_AUDIT.issues.filteredCount(groups.length, allGroups.length)}
+            </Typography>
+            {/* La salida del filtro vive junto al conteo que lo declara, no arriba en la
+                banda: quien se pregunta "¿por qué veo tan poco?" está mirando acá. */}
+            <GreenhouseButton
+              kind='secondaryAction'
+              variant='text'
+              size='small'
+              aria-label={GH_GROWTH_SEO_AUDIT.kpi.filterClearAria}
+              onClick={() => pushQuery({ severity: null, issueGroup: null })}
+            >
+              {GH_GROWTH_SEO_AUDIT.kpi.filterClear}
+            </GreenhouseButton>
+          </Stack>
+        ) : null}
+
+        <Box component='ul' sx={{ m: 0, p: 0 }} aria-busy={isPending}>
+          {groups.map((group, index) => issueRow(group, index))}
+        </Box>
+      </CardContent>
+    </Card>
+  )
+
+  const renderBody = () => {
+    // Sin ningún Space con el módulo contratado: condición de negocio, no error.
+    if (spaces.length === 0 || !selectedSpaceId) {
+      return (
+        <Box data-capture='seo-audit-empty'>
+          <EmptyState
+            icon='tabler-lock'
+            title={GH_GROWTH_SEO_AUDIT.states.noSpacesTitle}
+            description={GH_GROWTH_SEO_AUDIT.states.noSpacesDescription}
+          />
+        </Box>
+      )
+    }
+
+    // Space elegible pero sin sitio configurado: el camino es configurar, no auditar.
+    if (!seoTargetId) {
+      return (
+        <Box data-capture='seo-audit-empty'>
+          <EmptyState
+            icon='tabler-world-off'
+            title={GH_GROWTH_SEO_AUDIT.states.noTargetTitle}
+            description={GH_GROWTH_SEO_AUDIT.states.noTargetDescription}
+          />
+        </Box>
+      )
+    }
+
+    if (!report || !report.ok) {
+      // `no_data` es "nunca se auditó" — un vacío accionable, no una falla. El resto de
+      // los códigos SÍ son falla de lectura y llevan reintento.
+      const isNeverAudited = report?.errorCode === 'no_data'
+
+      return (
+        <Box data-capture='seo-audit-empty'>
+          <EmptyState
+            icon={isNeverAudited ? 'tabler-radar' : 'tabler-alert-triangle'}
+            title={isNeverAudited ? GH_GROWTH_SEO_AUDIT.states.emptyTitle : GH_GROWTH_SEO_AUDIT.states.readerErrorTitle}
+            description={
+              isNeverAudited
+                ? rootDomain
+                  ? GH_GROWTH_SEO_AUDIT.states.emptyDescription(rootDomain)
+                  : GH_GROWTH_SEO_AUDIT.states.emptyDescriptionNoDomain
+                : GH_GROWTH_SEO_AUDIT.states.readerErrorDescription
+            }
+            action={
+              isNeverAudited ? (
+                // Un vacío accionable lleva el camino adentro: sin la capability el CTA no
+                // existe y el estado se queda en la explicación, que sigue siendo honesta.
+                (runAuditButton ?? undefined)
+              ) : (
+                <GreenhouseButton kind='primaryAction' onClick={() => router.refresh()}>
+                  {GH_GROWTH_SEO_AUDIT.states.readerErrorCta}
+                </GreenhouseButton>
+              )
+            }
+          />
+          {runMessage ? (
+            <Alert severity={runMessage.severity} sx={{ mt: 4 }} data-capture='seo-audit-run-feedback'>
+              {runMessage.text}
+            </Alert>
+          ) : null}
+        </Box>
+      )
+    }
+
+    const status = report.run.status
+    const hasFindings = groups.length > 0
+
+    return (
+      <Stack spacing={6}>
+        {runMessage ? (
+          <Alert severity={runMessage.severity} data-capture='seo-audit-run-feedback'>
+            {runMessage.text}
+          </Alert>
+        ) : null}
+
+        {/* Un crawl en curso no tiene findings todavía: se dice, y no se pinta una lista
+            vacía que se leería como "sitio limpio". Son hechos distintos. */}
+        {status === 'running' ? (
+          <Alert severity='info' icon={<i className='tabler-loader' />} data-capture='seo-audit-running'>
+            <AlertTitle>{GH_GROWTH_SEO_AUDIT.states.runningTitle}</AlertTitle>
+            {rootDomain
+              ? GH_GROWTH_SEO_AUDIT.states.runningDescription(rootDomain)
+              : GH_GROWTH_SEO_AUDIT.states.runningDescriptionNoDomain}
+          </Alert>
+        ) : null}
+
+        {status === 'degraded' ? (
+          <Alert severity='warning' data-capture='seo-audit-degraded'>
+            <AlertTitle>{GH_GROWTH_SEO_AUDIT.states.degradedTitle}</AlertTitle>
+            {GH_GROWTH_SEO_AUDIT.states.degradedDescription}
+          </Alert>
+        ) : null}
+
+        {status === 'failed' ? (
+          <Alert severity='error' data-capture='seo-audit-failed'>
+            <AlertTitle>{GH_GROWTH_SEO_AUDIT.states.failedTitle}</AlertTitle>
+            {GH_GROWTH_SEO_AUDIT.states.failedDescription}
+          </Alert>
+        ) : null}
+
+        {/* Pasado el umbral, el freshness deja de ser contexto y pasa a ser advertencia. */}
+        {staleDays !== null && staleDays > STALE_CRAWL_DAYS && status !== 'running' ? (
+          <Alert severity='warning' data-capture='seo-audit-stale'>
+            {GH_GROWTH_SEO_AUDIT.header.freshnessStale}
+          </Alert>
+        ) : null}
+
+        {healthStrip()}
+
+        {hasFindings ? (
+          issuesList()
+        ) : status === 'running' ? null : (
+          <Box data-capture='seo-audit-issues'>
+            <EmptyState
+              icon='tabler-circle-check'
+              title={GH_GROWTH_SEO_AUDIT.states.cleanTitle}
+              description={GH_GROWTH_SEO_AUDIT.states.cleanDescription}
+            />
+          </Box>
+        )}
+      </Stack>
+    )
+  }
+
+  return (
+    // Recipe `analyticsReport` (composición `single`), igual que Rendimiento.
+    // `plane='none'`: el contenido primario YA es una composición de cards; el plane
+    // contenido de la recipe fabricaría card-on-card.
+    <SurfaceRecipe
+      kind='analyticsReport'
+      instanceId='seo-audit'
+      plane='none'
+      header={header}
+      regions={{ primary: renderBody() }}
+    />
+  )
+}
+
+export default SiteAuditView

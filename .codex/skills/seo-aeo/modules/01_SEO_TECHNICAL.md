@@ -184,6 +184,52 @@ Sitemap: https://EXAMPLE.com/sitemap_index.xml
   canonical autorreferente por página, o vista "ver todo" canónica.
 - **Internacional (hreflang)** — ver `06_LOCAL_INTERNATIONAL.md`.
 
+## 8. Leer un site audit de crawler sin mentir el diagnóstico
+
+Un site audit de crawler (DataForSEO OnPage, Semrush Site Audit, Screaming Frog) es un
+**passthrough**: reporta lo que encontró su propio catálogo de checks, con su propia
+ponderación. Cuatro confusiones convierten su salida en un diagnóstico falso.
+
+**(a) Sus checks de rendimiento son de LABORATORIO, no de campo.** `high_loading_time`,
+`large_page_size`, `has_render_blocking_resources`, `no_content_encoding` y todo Lighthouse
+miden una corrida sintética desde la red y la CPU del crawler. Google rankea con **CrUX
+(campo)** — §4 de este módulo. Los dos números discrepan en ambos sentidos: un sitio que el
+crawler declara lento puede pasar CWV en campo, y uno que el crawler aprueba puede fallar INP
+en móviles reales. Reglas: (1) declara la fuente **en el entregable mismo**, no en una nota al
+pie — presentarlos sin decirlo induce a optimizar lo que no se mide; (2) usa el lab para
+*diagnosticar la causa* (qué recurso bloquea, qué pesa) y el campo para *decidir si hay
+problema*; (3) si tienes GSC/CrUX, nunca priorices por el lab.
+
+**(b) El puntaje del proveedor y tu conteo de issues no miden lo mismo.** "Salud 95" junto a
+"519 issues" se lee como contradicción y no lo es: el puntaje lo calcula el proveedor con su
+ponderación (pesa sobre todo lo que rompe indexación) y el conteo sale de tu catálogo curado
+de checks. Un sitio sin críticos puede acumular cientos de menores y seguir puntuando alto. Si
+presentas ambos, explica cuál mide qué; si no lo explicas, el cliente asume que uno de los dos
+está mal.
+
+**(c) Un crawl con techo describe la muestra, no el sitio.** `max_crawl_pages` es un tope
+facturable: cuando lo choca, "páginas revisadas" deja de ser el sitio y pasa a ser lo que se
+alcanzó a mirar, y la salud describe esa muestra. Declararlo es la diferencia entre una
+muestra y un censo. Distinto de un crawl parcial por bloqueo (`extended_crawl_status`), donde
+sí falló algo.
+
+**(d) Su catálogo NO cubre AEO — y el silencio se lee como aprobación.** Un sitio puede
+puntuar 95/100 y estar bloqueando a todos los answer engines. Lo que un passthrough típico
+**no** te dice y hay que verificar a mano en cada auditoría:
+
+- **Acceso de crawlers IA en `robots.txt`** — ningún check te avisa si `OAI-SearchBot`,
+  `PerplexityBot` o `ClaudeBot` están bloqueados (§6). Es el hallazgo más caro y el más
+  invisible: no degrada ninguna métrica del reporte.
+- **Ausencia total de JSON-LD** — los validadores de microdata validan *lo que existe*; una
+  página sin schema no genera error, genera silencio. Auditar la ausencia, no solo la validez.
+- **Salud del sitemap** — el check sitewide suele ser booleano de *presencia* (existe / no
+  existe). No te dice si trae URLs `noindex`, 404s, no-canónicas o `lastmod` mentido.
+- **Conflicto `noindex` + bloqueo en robots** — Google nunca ve el `noindex` porque no puede
+  rastrear la página. Cada señal se reporta por separado y la contradicción no salta sola.
+
+Corolario: la checklist §A de `templates/audit-checklists.md` **no se puede tildar desde el
+reporte del crawler**. Cuatro de sus filas exigen verificación manual.
+
 ## Checklist técnico rápido (orden de prioridad)
 1. ¿Indexación rota? (GSC Pages) → arreglar primero, bloquea todo lo demás.
 2. ¿Contenido crítico requiere JS? → SSR/SSG.

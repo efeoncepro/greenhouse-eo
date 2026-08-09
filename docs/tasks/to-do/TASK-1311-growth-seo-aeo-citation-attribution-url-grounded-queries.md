@@ -22,7 +22,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|ai|data`
-- Blocked by: `TASK-1299`
+- Blocked by: `none`
 - Branch: `task/TASK-1311-growth-seo-aeo-citation-attribution-url-grounded-queries`
 - Legacy ID: `none`
 - GitHub Issue: `none`

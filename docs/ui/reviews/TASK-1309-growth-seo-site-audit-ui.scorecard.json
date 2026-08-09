@@ -1,0 +1,107 @@
+{
+  "taskId": "TASK-1309",
+  "scenario": "growth-seo-audit",
+  "reviewedAt": "2026-08-08",
+  "reviewer": "claude (frames GVC desktop 1440 + mobile 390 inspeccionados en loop)",
+  "evidence": {
+    "desktop": ".captures/2026-08-08T15-02-39_growth-seo-audit/01-desktop/frames/01-default.png",
+    "mobile": ".captures/2026-08-08T15-02-39_growth-seo-audit/02-mobile/frames/01-default.png",
+    "dossier": ".captures/2026-08-08T15-02-39_growth-seo-audit/review-dossier.md"
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 4.7,
+      "rationale": "Un solo momento dominante: el gauge con el número a tamaño de display. Debajo, la lista responde la pregunta siguiente sin competir con él, y su ORDEN es la respuesta — la auditoría seo-aeo corrigió que el alcance solo ascendiera trivia de sitio, así que lo que encabeza cada tier ahora es lo que de verdad conviene atacar.",
+      "evidence": "desktop 01-default, 02-health",
+      "nextAction": ""
+    },
+    "proportions": {
+      "score": 4.7,
+      "rationale": "El ancho de cada segmento es proporcional a su conteo (longitud, rank 3 de Cleveland & McGill), con piso para que la etiqueta quepa. 'Páginas revisadas' salió de la banda: no es una severidad y ponerla ahí invitaba a compararla con lo que no es comparable.",
+      "evidence": "desktop 02-health (antes/después dentro de la misma sesión de captura)",
+      "nextAction": ""
+    },
+    "rhythm": {
+      "score": 4.6,
+      "rationale": "Tres superficies con separación constante y, dentro de la lista, filas con divisor y respiración uniforme. El drill se abre como costura dentro de su fila, sin romper la cadencia de la lista.",
+      "evidence": "desktop 01-default, 03-issues",
+      "nextAction": ""
+    },
+    "density": {
+      "score": 4.5,
+      "rationale": "La lista es holgada en desktop y condensa a 390px sin recortar texto; la tabla del drill usa densidad compacta con scroll interno acotado a 360px.",
+      "evidence": "mobile 03-issues, desktop 04-drill",
+      "nextAction": ""
+    },
+    "depth": {
+      "score": 4.6,
+      "rationale": "El drill usa fondo de costura (action.hover) y NO una card anidada: es un detalle dentro de su fila, así que no hay card-on-card. La elevación se queda en el plano de las tres cards.",
+      "evidence": "desktop 04-drill",
+      "nextAction": ""
+    },
+    "surfaceEconomy": {
+      "score": 4.7,
+      "rationale": "Exactamente tres superficies contenidas en el fold (cabecera, salud, issues), dentro del presupuesto. El drill no suma una cuarta: es una costura interna, y la recipe va con plane='none' para no fabricar un plano extra.",
+      "evidence": "desktop 01-default",
+      "nextAction": ""
+    },
+    "visualImpact": {
+      "score": 4.7,
+      "rationale": "El fold tiene DOS objetos con peso que se turnan: el arco de salud y la banda proporcional de severidades, cuyo ancho ES el reparto. Antes eran cuatro números planos de igual peso visual (0 · 138 · 381 · 100) con encoding cero — el operador lo llamó 'plano' y tenía razón.",
+      "evidence": "desktop 02-health, mobile 02-health",
+      "nextAction": ""
+    },
+    "typography": {
+      "score": 4.6,
+      "rationale": "Todo sale de variantes; cifras con tabular-nums y sin fontSize inline. Orden de encabezados h1 → h2 (salud/issues) → h3 (grupo del drill) verificado en el árbol aria.",
+      "evidence": "desktop 01-default.aria.txt",
+      "nextAction": ""
+    },
+    "color": {
+      "score": 4.6,
+      "rationale": "El color semántico aparece sólo como ayuda de estado en los chips de severidad, siempre junto a la palabra. Las cifras del KPI se quedan en tinta primaria: no hay semáforo aplicado a la identidad de una métrica.",
+      "evidence": "desktop 03-issues",
+      "nextAction": ""
+    },
+    "iconography": {
+      "score": 4.5,
+      "rationale": "Un ícono por severidad (octágono / triángulo / círculo), siempre acompañado del texto, y chevron que refleja el estado abierto/cerrado del drill.",
+      "evidence": "desktop 03-issues, 04-drill",
+      "nextAction": ""
+    },
+    "responsive": {
+      "score": 4.6,
+      "rationale": "1440 y 390 capturados y mirados. En móvil los KPI pasan a 2×2, la lista condensa y el drill conserva su scroll interno. El primer intento dejó 'Menores' sangrado sin filete; se corrigió suprimiendo también la sangría en la celda que abre fila.",
+      "evidence": "mobile 02-health, 03-issues",
+      "nextAction": ""
+    },
+    "motion": {
+      "score": 4.6,
+      "rationale": "Motion con trabajo asignado, no decorativo: los conteos se ARMAN (confirman que la cifra se recalculó tras cambiar de Space o crawl), la lista entra escalonada y cortada a 6 ítems (al filtrar por severidad dice QUÉ quedó, en vez de un cambio indistinguible de 'no pasó nada') y el drill anima su altura (hace visible el vínculo fila → detalle). Todo detrás de `useReducedMotion`, con tokens de duración y curva del design system.",
+      "evidence": "quality.keyboard.reducedMotionCheck en ambos manifests",
+      "nextAction": ""
+    },
+    "fidelity": {
+      "score": 4.7,
+      "rationale": "Las cuatro regiones del wireframe, el ledger de copy completo, los estados del inventario y el contrato de foco (al encabezado del grupo, y de vuelta al disparador) están implementados. Las dos desviaciones —arco SVG en vez de radialBar Apex, y orden declarado según lo que los datos sostienen— quedan documentadas con su motivo.",
+      "evidence": "docs/ui/wireframes/TASK-1309-growth-seo-site-audit-ui.md vs desktop 01-default",
+      "nextAction": ""
+    },
+    "genericTemplateResistance": {
+      "score": 4.7,
+      "rationale": "Nada de esto sale de un template: lista priorizada en vez de tabla ordenable, catálogo es-CL curado de los 34 checks con esfuerzo Y valor de búsqueda como ejes separados, la performance declarada como medición de laboratorio para que nadie prometa ranking sobre la métrica equivocada, salud null que dice 'Pendiente' en vez de 0/100, y un check sin ficha que se nombra en vez de esconderse.",
+      "evidence": "desktop 03-issues, 04-drill",
+      "nextAction": ""
+    }
+  },
+  "blockers": [],
+  "notes": [
+    "Tres hallazgos salieron de MIRAR los frames, no de los gates: el drill volcaba 91 URLs en un muro de ~5000px sin scroll interno (expulsaba de pantalla la lista que el operador venía recorriendo), el encabezado del drill quedaba en 3.25:1 sobre el fondo de costura, y las cifras de salud flotaban sin ritmo sobre el ancho completo.",
+    "Warning conocido y ajeno: `div.MuiTabs-list` sobresale del viewport a 390px. Es la tira de tabs scrollable de TASK-1306, compartida por las cuatro rutas, y desbordar es su comportamiento correcto (se auto-desplaza para mostrar la tab activa). No se toca desde acá.",
+    "El botón `[data-capture=\"seo-audit-run\"]` NUNCA se clickea en el scenario: encola un crawl OnPage real y le gasta presupuesto al cliente. Una captura no puede ser el motivo de un cargo al proveedor.",
+    "Auditoría con la skill `seo-aeo` (2026-08-08) contra la doctrina técnica 2026: dos hallazgos de esta capa corregidos —el orden ascendía higiene sin valor de búsqueda, y el copy borraba que la performance es dato de laboratorio— y uno levantado como cobertura del módulo, no de esta superficie: el audit no revisa acceso de crawlers de IA (`OAI-SearchBot`/`PerplexityBot`/`ClaudeBot`), ausencia de JSON-LD, conflicto noindex+robots ni salud de sitemap.",
+    "Revisión con `greenhouse-ui-review`: se corrigieron dos valores de spacing fuera de escala (`py: 3.5` → 3, `spacing 0.25` → 0.5) y se nombró la constante geométrica del gauge. Dos hallazgos NO se tocaron por ser de sección o plataforma: ninguna de las 3 vistas hermanas usa `CardHeader` (cambiar sólo ésta rompería la consistencia), y los targets de 20×20 son los indicadores del `Autocomplete` de MUI — la hermana Keywords tiene 7, ésta 1.",
+    "Rediseño de la banda de KPIs con `dataviz-design` + `greenhouse-product-ui-architect` (2026-08-08): eran cuatro números planos con encoding CERO. Pasaron a banda proporcional —parte-de-un-todo por longitud— reusando el patrón de la banda de veredicto de Keywords con sus lecciones ya aprendidas (piso de ancho, activo por fondo+borde y no sólo tinte, número y label en la misma línea de base). El segmento sin issues NO se atenúa: `opacity: 0.72` tiró su etiqueta a 2.98:1 en axe, y de producto estaba al revés — '0 críticos' es la mejor noticia de la pantalla.",
+    "Microinteracciones con `greenhouse-microinteractions-auditor` (2026-08-08). Cada una hace un trabajo del contrato de la skill: contador que se arma = confirma recálculo; stagger de la lista = confirma qué quedó tras filtrar; altura del drill = causalidad fila→detalle. Nada de motion decorativo, y el desfase de 21px entre el picker de Space y 'Correr auditoría' —que el operador cazó a ojo— se resolvió agrupándolos en un Stack propio en vez de cambiar la alineación del primitive, que rompía a la tab Rendimiento por su campo con `helperText`."
+  ]
+}

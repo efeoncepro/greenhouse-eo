@@ -130,7 +130,42 @@ In this order:
 5. Decide `reuse|extend|new-primitive|one-off`.
 6. Map every visual cue to theme/AXIS/spacing/radius/motion tokens.
 
+Screen chrome — title, scope controls, freshness, sibling tabs, legend — goes in
+the recipe `header` region: `SurfaceRecipe` renders `header` above
+`CompositionShell`, outside the region plane. Never inside `regions.primary`,
+where `plane='none'` leaves the controls floating on the grey canvas and 390px
+gets a full screen of chrome before the first datum. Compose it with
+`WorkbenchHeader kind='report'`: `secondaryActions` for the scope the operator
+changes, `meta` for facts about the data, `supporting` for sibling tabs under
+their divider. Because the header lives outside the body, those controls stay
+available in the empty/degraded/denied surfaces — do not duplicate them there.
+Sibling screens of one surface (same breadcrumb, title and tab bar) share one
+header composition.
+
 External design is intent, never literal HEX/px/font/ms.
+
+### Enterprise anti-AI-slop baseline
+
+For premium enterprise dashboards, reports and client review spaces, prefer an
+enterprise analysis sheet before inventing another widget grid:
+
+- one dominant paper/surface per section; no text, KPI, filters, chart controls
+  or status summaries floating directly on the grey/default canvas;
+- no card soup: repeated KPI cards, chart cards, table cards and nested
+  contained panels must each earn a grouping, comparison, state or interaction
+  role;
+- no colored left rails, side accents or stripe cards as the primary status
+  device unless a documented primitive owns that pattern;
+- no traffic-light palette as the visual system. Semantic color is a small state
+  aid, not a background, row language or KPI identity;
+- sparse data gets an evidence, timeline, coverage or confidence treatment
+  before a large empty chart;
+- tables are work queues or rankings with density, sort/filter/action model and
+  mobile list strategy, not flat exports.
+
+If a premium UI loop fails twice on the same visual critique, stop editing JSX
+and bring in independent UI/research review or current design-system sources
+before the next iteration.
 
 ### 4. Contract the first fold
 
@@ -225,6 +260,12 @@ Stop implementation/closure when:
 - visual source/direction is missing;
 - first fold was not reviewed;
 - mobile is compressed desktop;
+- content, KPI, filters or chart/table controls float on the grey/default canvas
+  without a deliberate surface model;
+- colored side rails, traffic-light colors or card soup are doing the primary
+  visual work;
+- sibling screens of one surface resolve their chrome differently;
+- at 390px a control's current value truncates or the active tab is clipped;
 - primary action is ambiguous;
 - partial data looks authoritative;
 - motion lacks reduced-motion equivalence;
@@ -247,5 +288,8 @@ Report:
 
 ## Version
 
+- v2.1 — 2026-08-07 — TASK-1307: screen chrome maps to the recipe `header`
+  region (`WorkbenchHeader kind='report'`), sibling screens share one header,
+  and truncated controls / clipped active tab at 390px are stop conditions.
 - v2.0 — 2026-07-18 — TASK-1453: single orchestrator, real skills only,
   versioned visual direction, first-fold checkpoint, GVC premium and score gate.

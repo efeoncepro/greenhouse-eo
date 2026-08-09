@@ -89,7 +89,7 @@ const main = async () => {
              AND ma.status IN ('active', 'pilot')
         )
       ORDER BY t.seo_target_id`,
-    ['seo_v1']
+    ['seo_v2']
   )
 
   console.log('[5] targets elegibles batch:', eligible.map(r => r.seo_target_id))
@@ -107,7 +107,7 @@ const main = async () => {
          SELECT 1
            FROM greenhouse_client_portal.module_assignments ma
           WHERE ma.organization_id = t.organization_id
-            AND ma.module_key = 'seo_v1'
+            AND ma.module_key = 'seo_v2'
             AND ma.effective_to IS NULL
             AND ma.status IN ('active', 'pilot')
        )

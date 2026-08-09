@@ -46,7 +46,9 @@ export const resolveEnvConfig = (env: CaptureEnv): EnvConfig => {
     case 'local':
       return {
         baseUrl: process.env.AGENT_AUTH_BASE_URL ?? 'http://localhost:3000',
-        storageStatePath: '.auth/storageState.local-agent.json',
+        // Visual approval may need a separate, explicitly scoped client state (for example Berel).
+        // Keep the internal agent state as the default and require an opt-in path for overrides.
+        storageStatePath: process.env.GVC_STORAGE_STATE_PATH ?? '.auth/storageState.local-agent.json',
         agentEmail,
         isProduction: false
       }

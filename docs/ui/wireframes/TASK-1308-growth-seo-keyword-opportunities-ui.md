@@ -1,5 +1,60 @@
 # TASK-1308 / `/admin/growth/seo/keywords` — Keyword Opportunities
 
+> ## Rediseño 2026-08-07 (post-GVC) — "el veredicto primero"
+>
+> La primera implementación pasó los cuatro gates **y aun así se veía mal**. El diagnóstico
+> salió de mirar el frame, no el código: la pantalla **dibujaba los datos sin decir lo que
+> significan**, y gastaba seis bandas de chrome antes del primer dato.
+>
+> Dirección versionada:
+> [`docs/ui/visual-directions/TASK-1308-…-direction.md`](../visual-directions/TASK-1308-growth-seo-keyword-opportunities-direction.md).
+>
+> **Cambios sobre el layout de este wireframe:**
+>
+> | Antes | Ahora | Por qué |
+> |---|---|---|
+> | Header con título + selectores en la misma fila | Título a todo el ancho + **una barra** con tabs y selectores | Space (220px) + Ventana (180px) no cabían en los ~390px sobrantes: envolvían y dejaban un vacío enorme al lado del título |
+> | `Alert` full-width "mercado no disponible" sobre el fold | **Nota al pie del mapa** | La honestidad se mide por si el dato está dicho, no por el tamaño del recuadro |
+> | Fila de chips ● Medido / ◑ Estimado | Integrada en esa misma nota | Una banda entera para un metadato |
+> | Leyenda de formas dentro del chart + select "Acción" en filtros | **Banda de veredicto**: los tres segmentos son leyenda y filtro a la vez | Eran dos objetos para una sola idea |
+> | (no existía) | **Titular del hallazgo** redactado desde el reparto real | 42 de 50 son de consolidación: eso cambia el trabajo de la semana y vivía como un número al final de una leyenda |
+> | Scatter sin etiquetas, tamaño 10→42px | **5 keywords etiquetadas** en el lienzo, tamaño 9→22px | Un scatter de 50 puntos anónimos no es accionable (regla dura de dataviz: el tooltip nunca es la única forma de leer un valor). Y con ganancias de 0–10 clics, el rango grande fingía una precisión que el dato no tiene |
+> | Eje log auto-escalado | **Cotas explícitas** derivadas de los datos ±30% | El auto-scale del eje log redondea a DÉCADAS: con 89–1377 elegía 10→10.000 y el 40% del alto quedaba vacío |
+>
+> De seis bandas de chrome antes del primer dato, a tres.
+
+
+> ## ⚠️ Recalibración 2026-08-07 (implementación) — los ejes de este wireframe no tienen fuente
+>
+> Este documento especifica el scatter como **X = dificultad, Y = volumen, color = intención**
+> y una tabla con columnas de volumen/dificultad. Al implementar se verificó contra el
+> contrato real: `readKeywordOpportunities` devuelve `searchVolume: null`, `difficulty: null`,
+> `market: 'unavailable'` (TASK-1300 no aterrizó) y **no existe un campo de intención**.
+>
+> **Lo implementado** (consultada la skill `seo-aeo` §02, método verificado contra la API real
+> de GSC, que lista priorizar por volumen estimado teniendo el GSC propio como un *error*):
+>
+> | Wireframe | Implementado | Por qué |
+> |---|---|---|
+> | X = dificultad | **X = posición ponderada** (8→20 fijo) | Medido. Izquierda = más cerca de la primera plana |
+> | Y = volumen (mercado) | **Y = impresiones** (log) | Demanda MEDIDA de la SERP propia, mejor dato que un promedio de mercado |
+> | size = clicks | **size = clics incrementales estimados** (área ∝ ganancia) | El score del reader ya está en clics, no en un índice |
+> | color = intención | **color + FORMA = acción** (Empujar / A un paso / Consolidar) | No hay campo de intención; y lo que decide el trabajo es la ACCIÓN |
+> | facet intención | **facet acción** | ídem |
+> | slider dificultad | **facet posición** (primera/segunda plana) | Sin fuente de dificultad |
+> | col. Volumen / Dificultad | se conservan, con estado **"Sin dato de mercado"** | Ni `0` ni guion ambiguo (Delta 2026-08-05 de la task) |
+>
+> 🎯 **Decisión de fondo:** el dato de mercado, cuando llegue, **NO será un eje — será una
+> columna y un filtro**. Los ejes medidos son correctos con o sin él, así que TASK-1300 no
+> obliga a reescribir esta pantalla.
+>
+> ⚠️ **Canibalización quedó como ACCIÓN con verbo propio ("Consolidar"), no como chip
+> decorativo** — como ya pedía el Delta 2026-08-05 de la task.
+>
+> El resto del wireframe (layout, estados, contrato de a11y, copy ledger, plan GVC) se
+> implementó como está escrito.
+
+
 ## Meta
 
 - Status: `ready-for-implementation`

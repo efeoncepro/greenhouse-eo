@@ -384,7 +384,7 @@ Portada **full-bleed** (degradado en toda la slide, NO bipartito). Stack centrad
 ```
 efeonceLogo:   asset (fijo)     // logo-negative.svg, blanco, centrado, GRANDE
 clientLogo:    asset (slot)     // variante on-dark canónica del cliente; el template no recolorea
-proposalKind:  enum             // technical | economic | executive | combined → label formal visible
+proposalKind:  enum             // technical | economic | executive | combined | training → label formal visible
 urlBubble:     asset (fijo)     // Deck/SVG/url.svg (#848484 + mix-blend-mode:luminosity) al pie
 ```
 
@@ -801,9 +801,10 @@ rows:          Array<{                         // 3..5 pares exactos; cada lado 
                  evidenceRef?: string          // referencia para validar afirmaciones comparativas
                }>
 proposalBrand: asset (fijo)                   // logo-negative.svg; el agente no lo reemplaza
+presentation?: { mode: "proposal" | "diagnostic" } // resolver-only; omitido = proposal (compatibilidad)
 ```
 
-El agente aporta los pares con evidencia; el compositor fija iconografía, el orden (contraste → propuesta), la cantidad pareja, la escala y el estado destacado de la propuesta. El lado de contraste usa marcador neutral (no una señal de éxito) y el lado de propuesta usa check. Si una afirmación compara a competidores, cada fila debe traer evidencia verificable; el prototipo usa una comparación metodológica, no métricas de SKY inventadas. Contrato: `tender-deck-composer-prototypes/comparison-split.slots.json`. Prototipo: `comparison-split.html`.
+El agente aporta los pares con evidencia; el compositor fija iconografía, el orden (contraste → propuesta), la cantidad pareja, la escala y el estado destacado de la propuesta. El lado de contraste usa marcador neutral (no una señal de éxito) y el lado de propuesta usa check. `presentation` es un selector resolver-only: los decks existentes que lo omiten mantienen la variante `proposal`; `diagnostic` se declara solo cuando el panel debe ocultar la firma Efeonce y mostrar una revisión neutral. Si una afirmación compara a competidores, cada fila debe traer evidencia verificable; el prototipo usa una comparación metodológica, no métricas de SKY inventadas. Contrato: `tender-deck-composer-prototypes/comparison-split.slots.json`. Prototipo: `comparison-split.html`.
 
 ## Prueba de referencia
 

@@ -7,7 +7,7 @@
 > sustenta en `globe.production-routing` + `globe.model-readiness.*`. Este documento es el mapa
 > legible que reconcilia ambas autoridades.
 >
-> **Creado:** 2026-07-24 (TASK-1553). **Última actualización:** 2026-08-05.
+> **Creado:** 2026-07-24 (TASK-1553). **Última actualización:** 2026-08-07.
 > **Contrato técnico:** `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md`,
 > `EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md`, `EFEONCE_GLOBE_ROUTE_BASED_MODEL_RESOLUTION_DECISION_V1.md` (ADR-013).
 
@@ -42,6 +42,9 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 | `ref/still/openai-v2` | GPT Image · 2 | OpenAI (`gpt-image-2`) | image-generate | ✅ 07-24 | ✅ driver + promoción + canary real 07-30 | run UI `a81c8049-7772-4933-82f2-1e2e59e5121c`; 14 créditos |
 | `ref/still/openai-v1-5` | GPT Image · 1.5 | OpenAI (`gpt-image-1.5`) | image-generate | ✅ 07-24 | ✅ driver + promoción + canary real gobernado 07-30 | run UI `bf8cd62b-e2d7-4e83-981a-7631a14a5d3a`; 10 créditos |
 | `ref/motion/loop-v1` | Seedance · 2.0 | Fal | video-generate | ✅ 07-19 | ✅ driver Fal | — |
+| `ref/motion/seedance-25-t2v-v1` | Seedance · 2.5 | Fal | video-generate | ⏳ provider-supported | 🔒 no Globe route | Fal endpoint active; contract, adapter, rate, rights, eval, canary and binding pending |
+| `ref/video/seedance-25-i2v-v1` | Seedance · 2.5 | Fal | video-frames candidate | ⏳ provider-supported | 🔒 no Globe route | Fal endpoint active; first/last-frame contract and all Globe gates pending |
+| `ref/video/seedance-25-r2v-v1` | Seedance · 2.5 | Fal | multimodal reference-to-video candidate | ⏳ provider-supported | 🔒 no Globe route | Fal endpoint active; per-media contract, pricing, rights, eval, canary and binding pending |
 | `ref/motion/reference-v1` | Gemini Omni Flash · Preview | Vertex (Omni, `vertex.omni.reference-to-video`, `global`) | video-generate | ✅ evaluación retenida (40cr) | 🟢 canary sellado 08-04 | `promotion_1a5d117e…` `canary_passed` rev. 9; run `74ea0dec…`, governance `eligible` |
 | `ref/video/frames-v1` | Veo · 3.1 | Vertex (`veo-3.1-generate-001`, `vertex.veo.frames`, `us-central1`) | video-frames | ✅ 07-20 (MP4 real, 32cr) | 🟢 canary sellado 08-04 | `promotion_ddd0977c…` `canary_passed` rev. 9 (terminal); run `d2788195…`, 32cr = 32cr, governance `eligible`; **canary por carril gobernado, no desde la UI** |
 | `ref/video/motion-v1` | Seedance · 2.0 | Fal | video-motion-control | ✅ evaluación/report 08-01 | 🟢 canary real gobernado 08-02 | TASK-1614 cerrada: run `bbe6dfff…`, output MP4 retenido, 16 créditos, `canary_passed` |

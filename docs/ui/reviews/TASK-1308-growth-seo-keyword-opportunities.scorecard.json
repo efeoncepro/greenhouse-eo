@@ -1,0 +1,125 @@
+{
+  "task": "TASK-1308",
+  "surface": "growth.seo.keywords",
+  "surfaceLabel": "Growth SEO — Oportunidades de keywords (/admin/growth/seo/keywords)",
+  "repo": "greenhouse-eo",
+  "reviewedAt": "2026-08-07",
+  "qualityProfile": "premium",
+  "uiRigor": "ui-standard",
+  "directionMode": "repo-native-benchmark",
+  "wireframe": "docs/ui/wireframes/TASK-1308-growth-seo-keyword-opportunities-ui.md",
+  "baseline": {
+    "surfaceId": "growth.seo.keywords",
+    "decision": "new",
+    "note": "Ruta nueva; no existe before. La hermana `growth.seo.performance` (TASK-1307) es el benchmark nativo: misma recipe `analyticsReport`, mismo conmutador de tabs, mismo contrato de leyenda medido/estimado."
+  },
+  "evidence": {
+    "desktop": ".captures/2026-08-07T20-55-09_growth-seo-keywords/01-desktop",
+    "mobile": ".captures/2026-08-07T20-55-09_growth-seo-keywords/02-mobile",
+    "dossier": ".captures/2026-08-07T20-55-09_growth-seo-keywords/review-dossier.md",
+    "data": "Datos REALES de berel.com: 50 oportunidades striking-distance, 31 keywords ya seguidas, umbral de impresiones 10. Cero fixtures.",
+    "reducedMotion": "Ejercitado por el GVC (`reducedMotionCheck: true`), no sólo declarado.",
+    "axe": "@axe-core/playwright scopeado a la surface con `failOnViolations: true` — 0 violations en 1440x900 y 390x844.",
+    "notCovered": "Los estados empty (sin oportunidades), error y denied NO tienen frame: ningún Space de dev los produce hoy (Berel tiene datos, Efeonce no tiene target). Implementados y cubiertos por lectura de código, no por evidencia visual. Declarado, no asumido verde.",
+    "iterations": "Diecisiete pasadas de GVC y tres rondas de análisis de producto, mirando el frame entre cada una. Los cuatro gates estuvieron en verde desde la primera versión: todo lo que se corrigió salió de mirar, no de medir.",
+    "states": [
+      "ready",
+      "degraded (mercado no disponible)",
+      "filtered",
+      "stale (frescura declarada)",
+      "busy (recarga en curso)",
+      "error retriable",
+      "error estructural",
+      "locked con CTA"
+    ]
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 5,
+      "rationale": "El fold ahora ABRE con el significado: \"42 de 50 keywords compiten contra tu propio sitio\" en h4, con la ganancia total a la derecha, y recién después el mapa. En la v1 ese hallazgo era un número al final de una leyenda, detrás de seis bandas de chrome. Orden verificado en el frame: titular → barra (tabs + contexto) → veredicto → mapa → filtros → tabla. El mapa es plegable: en 1440x900 el fold llegaba al borde del canvas y la tabla —donde se actúa— quedaba a dos scrolls.",
+      "evidence": "01-desktop/frames/01-default.png, 02-verdict.png"
+    },
+    "proportions": {
+      "score": 4.5,
+      "rationale": "El vacío del header quedó cerrado: el titular ocupa su propia fila a todo el ancho y los selectores bajaron a la barra de tabs, donde el ancho alcanza. La causa medida era aritmética — 220 + 180 + gap no caben en 390px — y el helperText de Ventana, que era lo que forzaba el wrap, pasó a tooltip.",
+      "evidence": "01-desktop/frames/01-default.png"
+    },
+    "rhythm": {
+      "score": 4.5,
+      "rationale": "Ritmo consistente y verificado parejo en los seis frames de desktop: spacing 6 entre secciones hermanas, 4 dentro de cada card, 1 en los pares título/subtítulo.",
+      "evidence": "01-desktop/frames/01-default.png, 02-map.png"
+    },
+    "density": {
+      "score": 5,
+      "rationale": "Alta y deliberada, y ahora paginada: 25 filas por página sobre un techo de 50 del reader. 25 y no 10 porque la lista está ORDENADA POR GANANCIA — la primera página tiene que contener toda la cabeza accionable, no cortarla en el ítem 10. La página se ACOTA al total en vez de resetearse por efecto: filtrar estando en la página 3 dejaría al operador mirando una tabla vacía que parece un bug. Las columnas de mercado NO se renderizan mientras no haya dato: repetían \"Sin dato\" 50 veces y empujaban la acción primaria fuera de la pantalla. La ausencia sigue dicha, una vez, al pie del mapa. Los segmentos del veredicto llevan ancho proporcional al conteo con piso para la etiqueta: con flex igual, una razón de 7:1 sólo se veía leyendo los números; con proporcional puro se truncaban dos de las tres etiquetas.",
+      "evidence": "01-desktop/frames/05-table.png"
+    },
+    "depth": {
+      "score": 5,
+      "rationale": "Tres cards hermanas sobre SurfaceRecipe con plane none. Cero card-on-card: la recipe no fabrica un plano contenido debajo de una composición que ya es de cards.",
+      "evidence": "01-desktop/frames/01-default.png"
+    },
+    "surfaceEconomy": {
+      "score": 5,
+      "rationale": "De seis bandas de chrome antes del primer dato a tres. Se eliminaron el Alert full-width de mercado (ahora nota al pie del mapa), la fila de chips de origen y la leyenda de formas del chart: los tres colapsaron en una sola banda de veredicto que además es el filtro. Cuatro superficies hermanas, cero card-on-card. Los selectores de contexto viven DENTRO de la card del veredicto: sueltos sobre el fondo gris eran dos cajas con relleno propio flotando sin superficie, y darles card propia habría dejado cinco cards apiladas.",
+      "evidence": "01-desktop/frames/01-default.png"
+    },
+    "visualImpact": {
+      "score": 5,
+      "rationale": "Tres cambios que sólo se ven mirando el frame: el titular del hallazgo, las cinco keywords de mayor ganancia ETIQUETADAS sobre el lienzo (un scatter de 50 puntos anónimos no es accionable) y el eje log acotado a los datos ±30% — el auto-scale redondeaba a décadas y dejaba el 40% del alto vacío, con la banda verde de fruta madura pintando un bloque de color sin datos. Y la zona sombreada dejó de mentir: decía \"Fruta madura\", que es el nombre de UNA de las tres acciones, sobre una región que abarca las posiciones 8-10 e incluye canibalizadas. Ahora dice \"Primera plana\" — un hecho posicional, no un juicio de acción.",
+      "evidence": "01-desktop/frames/03-map.png"
+    },
+    "typography": {
+      "score": 5,
+      "rationale": "surfaceHeroTitle para el titular (único h1), h5 como h2 para mapa y tabla, caption para notas de método. tabular-nums en toda celda numérica, que es lo que permite comparar columnas de un vistazo. Cero fontSize inline en el DOM: los que existen son config de canvas de ECharts, donde una variante de Typography no aplica.",
+      "evidence": "01-desktop/frames/04-table.png"
+    },
+    "color": {
+      "score": 5,
+      "rationale": "axe con failOnViolations en 0 violations sobre ambos viewports. El único hallazgo del ciclo lo destapó este gate y era invisible a ojo: el label ENFOCADO de un CustomTextField usa primary.main, que sobre el fondo del body da 4.42:1 y falla AA; sobre el papel de una card da 4.61:1 y pasa. Segundo hallazgo del mismo gate al agregar la columna de conflicto: `warning.dark` de este theme resuelve a #eeaa00 — 2.02:1 sobre blanco. El número pasó a peso tipográfico y la semántica la carga el chip de la fila.",
+      "evidence": "01-desktop/frames/06-keyboard-keyword-search-focus.axe.json"
+    },
+    "iconography": {
+      "score": 4.5,
+      "rationale": "Los glyphs dejaron de ser decoración y pasaron a hacer trabajo: el círculo, el triángulo y el rombo de los segmentos son EL MISMO símbolo que el marcador del canvas, así que la leyenda del chart y el filtro de la tabla son un solo objeto. Eso es lo que sostiene el contrato color-independiente sin una banda extra.",
+      "evidence": "02-mobile/frames/02-verdict.png"
+    },
+    "responsive": {
+      "score": 5,
+      "rationale": "🔴 La transformación a móvil es REAL, no scroll: a 390px la tabla mostraba sólo checkbox y keyword — acción, ganancia, páginas y el botón \"Seguir\" quedaban fuera del scroll horizontal interno, y ningún gate lo marcaba porque DataTableShell contiene el scroll y la página no desborda. Ahora hay una card por keyword con los cuatro datos que deciden y la misma acción (el nodo de acción se comparte, no se reimplementa). El cambio va por CSS y no por useMediaQuery: medir el viewport en cliente produce el mismo mismatch de hidratación que ya costó tres corridas en esta pantalla.",
+      "evidence": "02-mobile/frames/05-table.png"
+    },
+    "motion": {
+      "score": 4.5,
+      "rationale": "Entrada del scatter en 400ms y suprimida bajo prefers-reduced-motion (ejercitado, no declarado). El botón Seguir tiene estados idle, loading, success y error con anti doble submit. Cero motion decorativo: nada anima que no comunique un cambio de estado. El feedback pasó de Alert fijo arriba a snackbar anclado abajo: la acción ocurría en la fila 20 y la confirmación se pintaba fuera de pantalla. Dejar de seguir lleva \"Deshacer\" — corta una serie y volver a seguirla no recupera los días perdidos.",
+      "evidence": "01-desktop/manifest.json (keyboard.reducedMotionCheck)"
+    },
+    "fidelity": {
+      "score": 4.5,
+      "rationale": "La dirección visual está versionada en docs/ui/visual-directions/ con las dos alternativas rechazadas y su motivo, y el wireframe lleva la tabla de qué cambió respecto de su propio layout y por qué. Fuente e implementación coinciden. La desviación original — los tres ejes sin fuente en el contrato del reader — sigue documentada en su bloque de recalibración.",
+      "evidence": "docs/ui/visual-directions/TASK-1308-growth-seo-keyword-opportunities-direction.md"
+    },
+    "genericTemplateResistance": {
+      "score": 5,
+      "rationale": "El veredicto se REDACTA desde el reparto real con un umbral de dominancia: si la mayoría no está canibalizada dice otra cosa, y si no hay nada que destacar describe el conjunto en vez de inventar un hallazgo. Un KPI card de plantilla habría puesto \"50 keywords\" y ya. Sumado a los segmentos que son leyenda-y-filtro y al estado honesto \"Sin dato\", nada de esto sale de un catálogo de dashboards.",
+      "evidence": "01-desktop/frames/02-verdict.png"
+    }
+  },
+  "verdict": "PASS",
+  "openRisks": [
+    "La lista de cards de móvil es larga (25 items). Es el precio de mostrar los cuatro datos por keyword en vez de una lista de nombres; si molesta, la palanca es bajar el default de filas por página en móvil, no recortar datos.",
+    "🔴 BUG DE PLATAFORMA SOSPECHADO, no cerrado: los controles MUI dentro del subárbol de la recipe producen mismatch de hidratación por `useId` — el `htmlFor` del label difiere entre servidor y cliente, reproducible SÓLO en 390px. Se cerró declarando ids estables en los cinco controles de esta surface, pero la causa raíz (la recipe adapta el árbol midiendo en cliente) afectaría a cualquier form control en cualquier surface adaptativa. Merece task propia.",
+    "El botón flotante de Nexa tapa la acción de dos filas en desktop. Es el FAB portal-wide; afecta a cualquier tabla con acción a la derecha.",
+    "El eje log con cotas explícitas rotula sus extremos con valores no-década (68 y 1.790). Es el precio de no desperdiciar el 40% del alto.",
+    "La nota al pie del mapa pasa por debajo del botón flotante de Nexa en desktop. Es el FAB portal-wide, no de esta surface.",
+    "Los estados empty, error y denied no tienen frame porque ningún Space de dev los produce. Cubiertos por código, no por evidencia visual.",
+    "ui:code-lint reporta findings (raw-hex e inline-font-size) en el chart: fallbacks de resolveChartColor y fontSize de canvas de ECharts. La hermana de TASK-1307 arrastra los mismos. Fix de causa raíz propuesto: módulo canónico de chart-tokens en la allow-list del linter.",
+    "El export de CSV arma el archivo en cliente sobre el subconjunto filtrado. Si el reader sube su techo muy por encima de 50, conviene moverlo a un endpoint."
+  ],
+  "direction": "docs/ui/visual-directions/TASK-1308-growth-seo-keyword-opportunities-direction.md",
+  "computed": {
+    "average": 4.79,
+    "minimum": 4.5,
+    "gatedPass": true
+  }
+}

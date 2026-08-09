@@ -9,6 +9,39 @@
 
 ---
 
+## Delta 2026-08-07 — los dos primeros COMMANDS del lane SEO (TASK-1308)
+
+El lane ecosystem de Growth SEO nació read-only (delta TASK-1645, abajo). TASK-1308 le suma sus
+**dos primeros writes**: `POST /api/platform/ecosystem/growth/seo/keywords/track` y
+`.../keywords/untrack`, sobre `runEcosystemCommandRoute` (nunca el helper de lectura: sin
+idempotencia por `Idempotency-Key` ni command audit, un reintento del gateway sobre un timeout de
+red volvería a comprometer gasto). Handlers en el mismo builder del lane,
+`src/lib/api-platform/resources/ecosystem-growth-seo.ts`; el dominio vive entero en el command
+canónico `src/lib/growth/seo/track-keywords.ts` — el lane no decide nada.
+
+🔴 **Boundary duro: sólo bindings de `greenhouseScopeType === 'internal'`** (`403
+scope_not_allowed`). Es la diferencia deliberada con los readers del mismo lane, donde un binding
+org-scoped SÍ resuelve su propia organización: **seguir una keyword es un compromiso de gasto
+diferido** — el rank capture diario le paga al proveedor por cada keyword vigente, en cada ciclo —
+así que un binding cliente puede **leer** sus oportunidades pero no **hacer crecer su propia
+factura**. El mismo boundary aplica a `untrack` aunque bajar el gasto suene inofensivo: quien no
+decide qué se mide tampoco decide qué se deja de medir, y un boundary asimétrico sería una excepción
+que hay que explicar cada vez que alguien lea el builder.
+
+Detalles del contrato que un lane de write nuevo debe copiar:
+
+- **El actor es la máquina**: `mcp:<consumer.publicId>`. En este lane **no hay chequeo de capability
+  por humano** (el app-lane sí exige `growth.seo.target.configure`) — a propósito, porque su sujeto
+  es un consumer. La consecuencia de seguridad es que la única puerta que depende de la persona
+  queda fuera de Greenhouse, en el scope OAuth del gateway (`efeonce.mcp.seo.write`); por eso ese
+  scope **no** se cablea al cliente público compartido. Ver
+  `EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md` §"El scope de escritura NO se cablea al cliente
+  público compartido".
+- **La autorización de dominio sigue abajo, no en el lane**: entitlement per-org `seo_v1` vigente +
+  techo gobernado por target + outcome POR keyword. El lane hace passthrough del resultado del
+  command; **NUNCA** colapsa ese outcome a un booleano — un caller que sólo ve `ok: true` no puede
+  distinguir "agregué 3" de "rebotaron 40 contra el techo".
+
 ## Delta 2026-08-07 — verificar una tool del lane sin OAuth (TASK-1306)
 
 Al agregar `get_seo_overview_kpis` quedó documentado el camino corto para responder "¿este
@@ -39,7 +72,9 @@ passthrough de los readers canónicos (`readKeywordOpportunities`, `readSeoAeoGa
 `resolveSeoEntitlement` como lectura) — cero lógica de dominio en el lane. Consumido por 3 MCP tools
 read-only del server greenhouse (`get_seo_keyword_opportunities`, `get_seo_visibility_360`,
 `get_seo_entitlement`). Federación al gateway `mcp.efeonce.org` = `TASK-1647`. Builder:
-`src/lib/api-platform/resources/ecosystem-growth-seo.ts`.
+`src/lib/api-platform/resources/ecosystem-growth-seo.ts`. ⚠️ **El lane dejó de ser read-only el
+2026-08-07** (TASK-1308, delta arriba): sus dos primeros commands corren por
+`runEcosystemCommandRoute` y sólo aceptan bindings `internal`.
 
 ## Delta 2026-06-15 — Command & Idempotency Foundation (TASK-655)
 

@@ -60,6 +60,8 @@ Seedance 2.0/R2V, GPT Image 2, Seedream 5 Pro, Nano Banana 2/Pro y Kling 3.0. �
 según el reader live; Seedream Edit queda `gated` por binding deshabilitado. Seedream Lite, edición de OpenAI/Nano
 Banana y video-to-image de Nano Banana permanecen como superficies no públicas hasta tener ruta, binding, canary y
 readback propios. Un lookup de circuito `not_found` para Nano Banana Pro es blocker operativo explícito.
+Seedance 2.5 queda documentado como tres superficies Fal activas (T2V/I2V/R2V), con route card e inventario exhaustivo
+en Greenhouse y `TASK-1656`; provider-supported no equivale a disponibilidad de Globe, que sigue `gated`.
 Las atestaciones comerciales son inmutables por identidad de modelo + digest de términos: una corrección jurídica
 crea una atestación y policy derivada nuevas, nunca modifica la anterior. La idempotencia de `auto-promote` debe
 incluir esa autoridad legal; ruta/workspace/report por sí solos no distinguen una nueva versión de términos. Un
@@ -89,7 +91,9 @@ Cobertura parcial o stale nunca se representa como cero. Los IDs mutables del ro
 
 El módulo Growth SEO (`growth.seo`, EPIC-022) autoriza todo run por un único chokepoint, `enforceSeoRunEntitlement`
 (`src/lib/growth/seo/entitlement.ts`), con entitlement per-org vía el módulo `seo_v1` de
-`greenhouse_client_portal.modules`; contrato en
+`greenhouse_client_portal.modules` en el runtime desplegado. La migración local de TASK-1310 crea
+`seo_v2` para publicar los viewCodes cliente y supersede assignments sin cambiar el modelo per-org;
+hasta aplicarla, `seo_v1` sigue siendo la verdad live. Contrato en
 [`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §9 (§17
 contrata el seam de extracción hacia Wave). Los reads del módulo son readers canónicos consumer-agnósticos —
 `readKeywordOpportunities` y `readSeoAeoGap` (este último cruza SEO↔AEO respetando el boundary de §1.1) —
@@ -185,6 +189,7 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 | Cómo crea y captura valor Creative Studio, cómo funcionan sus créditos y qué skills lo adoptan | `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md` + `EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md` + `EFEONCE_CREATIVE_STUDIO_SKILL_ADOPTION_V1.md` |
 | Cómo producir posts sociales visuales con reportes, dashboards o evidencia de producto | `docs/operations/GREENHOUSE_SOCIAL_VISUAL_REPORT_PRODUCTION_V1.md` + capas funcional/manual + skills `design-studio` y `social-media-studio` |
 | Cómo modelar Efeonce Group, Media & Distribution, Growth Platform, AEO y Search Visibility 360 | `docs/business-models/README.md` + `.codex/skills/efeonce-business-model-operator/SKILL.md` + modelos vigentes |
+| Cómo leer un site audit de crawler sin mentir el diagnóstico (orden de hallazgos, laboratorio vs campo, techo del crawl, huecos de cobertura AEO) | `.codex/skills/seo-aeo/modules/01_SEO_TECHNICAL.md` §8 + `.claude/skills/dataforseo-operator/references/04-onpage.md` §11 + `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §10.6 |
 | Cómo reconciliar el costo del AI Visibility Grader | `docs/audits/cloud-cost/AI_VISIBILITY_GRADER_COST_RECONCILIATION_2026-07-27.md` + documentación funcional/runbook del grader |
 | Cómo evaluar el portafolio de partners/providers de IA | `.codex/skills/efeonce-business-model-operator/SKILL.md` + `.codex/skills/efeonce-customer-model-operator/SKILL.md` + audit comercial fechado; economics y routing directo/Fal en `design-studio` y `motion-design-studio` |
 | Qué es un Product Service y cómo separar oferta, productización, delivery, operación y engagement | `docs/business-models/EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md` |

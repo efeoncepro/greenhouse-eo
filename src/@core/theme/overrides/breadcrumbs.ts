@@ -10,7 +10,8 @@ const breadcrumbs: Theme['components'] = {
         },
         '& a': {
           textDecoration: 'none',
-          color: 'var(--mui-palette-primary-main)'
+          // Link-sized breadcrumb text needs the dark semantic ramp for WCAG AA in light mode.
+          color: 'var(--mui-palette-primary-dark)'
         }
       },
       li: ({ theme }) => ({

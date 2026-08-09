@@ -115,6 +115,16 @@ export type MetricTrendCardProps = {
    */
   density?: CardDensityRequest
   /**
+   * TASK-1307 — eje Y del sparkline INVERTIDO (opt-in; default `false`, legacy byte-idéntico).
+   *
+   * Para métricas donde MENOS es mejor y la pantalla ya estableció "arriba = mejor" en su
+   * chart principal (posición de búsqueda): sin esto, el card y el chart de al lado se
+   * contradicen — la misma mejora sube en uno y baja en el otro, y el operador no puede
+   * saber si "la línea cayó" es bueno o malo. La inversión es SOLO geométrica: los
+   * valores, el delta y el aria no cambian (eso lo gobierna `deltaSemantics`).
+   */
+  invertY?: boolean
+  /**
    * TASK-1110 — entrada "al armarse" (opt-in). `'none'` (default) = sin entrada, legacy byte-idéntico.
    * `'assemble'` = el dato se construye frente al usuario: el número cuenta 0 → valor y el chart se dibuja solo
    * al montar (para respuestas de Nexa moments que materializan en vivo). reduced-motion → valor final + chart
@@ -251,6 +261,7 @@ const MetricTrendCard = ({
   deltaUnit,
   deltaSemantics = 'higher-is-better',
   deltaOverride,
+  invertY = false,
   menuOptions,
   menuTooltip,
   dataCapture,
@@ -370,7 +381,34 @@ const MetricTrendCard = ({
     return [{ x: 0, value: firstValue, edge: true }, ...points, { x: 1, value: lastValue, edge: true }]
   }, [trimmed])
 
-  const tickXs = useMemo(() => trimmed.map((_, i) => realX(i, trimmed.length)), [trimmed])
+  /**
+   * Ticks del eje X, ADELGAZADOS a un máximo legible (TASK-1307). El card dibuja todos
+   * los ticks (`interval={0}`) porque su cadencia de diseño es mensual (~6-12 labels);
+   * con una serie densa (26 buckets semanales) los 26 labels se pisan en una papilla
+   * ilegible. Se muestran ~6 equiespaciados incluyendo SIEMPRE el último (el presente es
+   * el punto que más importa). Con ≤6 puntos el resultado es idéntico al legacy.
+   */
+  const tickXs = useMemo(() => {
+    const all = trimmed.map((_, i) => realX(i, trimmed.length))
+    const MAX_TICKS = 6
+
+    if (all.length <= MAX_TICKS) return all
+
+    const stride = Math.ceil(all.length / MAX_TICKS)
+    const thinned = all.filter((_, index) => index % stride === 0)
+    const last = all[all.length - 1]
+
+    // El último tick entra siempre; si el stride dejó uno pegado a él, se cede el lugar.
+    if (thinned[thinned.length - 1] !== last) {
+      if (last - thinned[thinned.length - 1] < (1 - 2 * 0.05) / MAX_TICKS / 2) {
+        thinned.pop()
+      }
+
+      thinned.push(last)
+    }
+
+    return thinned
+  }, [trimmed])
 
   const tickFormatter = (x: number): string => {
     let bestLabel = ''
@@ -386,6 +424,23 @@ const MetricTrendCard = ({
     })
 
     return bestLabel
+  }
+
+  /**
+   * Tick con ANCLAJE ADAPTATIVO (TASK-1307): el primero se ancla al inicio y el último al
+   * final — con anclaje central los labels de los extremos quedaban pegados/cortados
+   * contra los márgenes de la card (hallazgo del operador con la serie densa).
+   */
+  const renderTick = (props: { x?: number; y?: number; payload?: { value?: number } }) => {
+    const { x, y, payload } = props
+    const value = payload?.value ?? 0.5
+    const anchor = value < 0.12 ? 'start' : value > 0.88 ? 'end' : 'middle'
+
+    return (
+      <text x={x} y={(y ?? 0) + 10} textAnchor={anchor} fontSize={12} fill='var(--mui-palette-text-disabled)'>
+        {tickFormatter(value)}
+      </text>
+    )
   }
 
   // Explicit y-domain with headroom so the line uses the vertical space instead
@@ -428,7 +483,9 @@ const MetricTrendCard = ({
     value !== null ? formatValue(value, format) : 'sin dato'
   }${
     delta !== null
-      ? `, ${delta > 0 ? 'sube' : 'baja'} ${Math.abs(delta).toFixed(1)} ${deltaUnit ?? ''}${
+      ? `, ${delta > 0 ? 'sube' : 'baja'} ${
+          format === 'integer' ? formatInteger(Math.round(Math.abs(delta))) : Math.abs(delta).toFixed(1)
+        } ${deltaUnit ?? ''}${
           // En una métrica invertida el lector de pantalla necesita el juicio explícito:
           // "baja 1.2" a secas suena a empeoramiento cuando en realidad mejoró.
           deltaSemantics === 'lower-is-better' ? ` (${deltaIsImprovement ? 'mejora' : 'retrocede'})` : ''
@@ -559,7 +616,12 @@ const MetricTrendCard = ({
                 aria-hidden='true'
               />
               <Typography variant='caption' component='span' sx={{ fontWeight: 600, color: 'inherit' }}>
-                {`${delta > 0 ? '+' : '−'}${Math.abs(delta).toFixed(1)}${deltaUnit ? ` ${deltaUnit}` : ''}`}
+                {/* El delta se formatea con el MISMO formato del valor: un delta entero
+                    grande crudo ("−12779.0") viola el formato locale-aware y no se puede
+                    leer — la clase de defecto que la skill de dataviz prohíbe. */}
+                {`${delta > 0 ? '+' : '−'}${
+                  format === 'integer' ? formatInteger(Math.round(Math.abs(delta))) : Math.abs(delta).toFixed(1)
+                }${deltaUnit ? (deltaUnit === '%' ? deltaUnit : ` ${deltaUnit}`) : ''}`}
               </Typography>
             </Stack>
           ) : null}
@@ -600,10 +662,13 @@ const MetricTrendCard = ({
                       interval={0}
                       tickLine={false}
                       axisLine={false}
-                      tick={{ fontSize: 12, fill: 'var(--mui-palette-text-disabled)' }}
-                      dy={10}
+                      // Renderer propio: anclaje adaptativo en los extremos para que los
+                      // labels no queden pegados/cortados contra los márgenes de la card.
+                      tick={renderTick}
                     />
-                    <YAxis hide domain={yDomain ?? ['auto', 'auto']} />
+                    {/* `reversed` con `invertY`: mantiene "arriba = mejor" cuando la
+                        pantalla ya fijó esa lectura en su chart principal (posición). */}
+                    <YAxis hide reversed={invertY} domain={yDomain ?? ['auto', 'auto']} />
                     <RTooltip
                       cursor={{ stroke: alpha(lineColor, 0.4), strokeWidth: 1, strokeDasharray: '4 4' }}
                       wrapperStyle={{ outline: 'none', zIndex: 10 }}
@@ -616,6 +681,11 @@ const MetricTrendCard = ({
                       strokeWidth={2.5}
                       strokeLinecap='round'
                       fill={`url(#${gradientId})`}
+                      // Con el eje invertido la base default del área (el "0" del eje)
+                      // queda ARRIBA y el gradiente se pinta sobre la línea como una
+                      // mancha flotante. `dataMax` es el borde inferior del lienzo cuando
+                      // `reversed`, así el relleno vuelve a caer BAJO la línea.
+                      baseValue={invertY ? 'dataMax' : undefined}
                       dot={renderDot}
                       activeDot={renderActiveDot}
                       isAnimationActive={!prefersReduced}

@@ -52,6 +52,7 @@ type SeriesRow = {
   date: string
   position: number | null
   url: string | null
+  ai_overview?: boolean | null
 }
 
 const groupSeries = (rows: SeriesRow[]): RankEvolutionSeries[] => {
@@ -60,7 +61,14 @@ const groupSeries = (rows: SeriesRow[]): RankEvolutionSeries[] => {
   for (const row of rows) {
     const points = byKeyword.get(row.keyword) ?? []
 
-    points.push({ date: row.date, position: row.position, url: row.url })
+    points.push({
+      date: row.date,
+      position: row.position,
+      url: row.url,
+      // Sólo viaja cuando ES true: el campo es aditivo y los consumers legacy comparan
+      // puntos por igualdad estructural.
+      ...(row.ai_overview === true ? { aiOverview: true } : {})
+    })
     byKeyword.set(row.keyword, points)
   }
 
@@ -89,7 +97,8 @@ const readSeriesFromPostgres = async (input: {
     `SELECT keyword,
             capture_date::text AS date,
             position,
-            url
+            url,
+            (serp_features ? 'ai_overview') AS ai_overview
        FROM greenhouse_growth.seo_rank_snapshots
       WHERE seo_target_id = $1
         AND engine = $2
@@ -117,7 +126,8 @@ const readSeriesFromBigQuery = async (input: {
     query: `SELECT keyword,
                    CAST(capture_date AS STRING) AS date,
                    position,
-                   url
+                   url,
+                   ('ai_overview' IN UNNEST(IFNULL(JSON_VALUE_ARRAY(serp_features), []))) AS ai_overview
               FROM \`${projectId}.${SEO_RANK_HISTORY_DATASET}.${SEO_RANK_HISTORY_TABLE}\`
              WHERE seo_target_id = @seo_target_id
                AND engine = @engine
@@ -145,7 +155,8 @@ const readSeriesFromBigQuery = async (input: {
     keyword: String(row.keyword),
     date: String(row.date),
     position: typeof row.position === 'number' ? row.position : null,
-    url: typeof row.url === 'string' ? row.url : null
+    url: typeof row.url === 'string' ? row.url : null,
+    ai_overview: row.ai_overview === true
   }))
 }
 

@@ -157,6 +157,86 @@ describe('readSeoPerformance', () => {
     expect(result.standings[0].impressions).toBe(400)
   })
 
+  it('cae a la posición medida de GSC cuando la serie exacta es más joven que la medida', async () => {
+    // El caso real del 2026-08-07: rank capture con 2 días vs GSC con 5. Servir la serie
+    // de 2 días escondería historia que el módulo SÍ tiene ("si no vienen de uno, vienen
+    // del otro"). La lectura completa cambia de fuente y lo declara — nunca se promedian.
+    rankEvolutionMock.mockResolvedValue({
+      ok: true,
+      seoTargetId: 'seot-1',
+      organizationId: 'org-1',
+      engine: 'google',
+      device: 'desktop',
+      range: { from: '2026-08-05', to: '2026-08-06', days: 90 },
+      source: 'postgres',
+      series: [
+        {
+          keyword: 'pintura',
+          points: [
+            { date: '2026-08-05', position: 1, url: null },
+            { date: '2026-08-06', position: 1, url: null }
+          ]
+        }
+      ]
+    })
+
+    state.gscRows = [
+      gscRow('pintura', '2026-08-01', 3, 100, 5),
+      gscRow('pintura', '2026-08-02', 4, 120, 4.6),
+      gscRow('pintura', '2026-08-03', 2, 90, 4.9),
+      gscRow('pintura', '2026-08-04', 5, 140, 4.2),
+      gscRow('pintura', '2026-08-06', 6, 160, 3.8)
+    ]
+
+    const result = await readSeoPerformance('org-1', { mode: 'keyword', metric: 'position', items: ['pintura'] })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) return
+
+    // La fuente efectiva es la medida, y chart + tabla la comparten.
+    expect(result.source).toBe('gsc_measured')
+    expect(result.series[0].points).toHaveLength(5)
+    expect(result.standings[0].position).toBe(3.8)
+  })
+
+  it('mantiene DataForSEO cuando la serie exacta ya cubre al menos la mitad de la medida', async () => {
+    rankEvolutionMock.mockResolvedValue({
+      ok: true,
+      seoTargetId: 'seot-1',
+      organizationId: 'org-1',
+      engine: 'google',
+      device: 'desktop',
+      range: { from: '2026-08-03', to: '2026-08-06', days: 90 },
+      source: 'postgres',
+      series: [
+        {
+          keyword: 'pintura',
+          points: [
+            { date: '2026-08-03', position: 2, url: null },
+            { date: '2026-08-05', position: 2, url: null },
+            { date: '2026-08-06', position: 1, url: null }
+          ]
+        }
+      ]
+    })
+
+    state.gscRows = [
+      gscRow('pintura', '2026-08-02', 4, 120, 4.6),
+      gscRow('pintura', '2026-08-04', 5, 140, 4.2),
+      gscRow('pintura', '2026-08-06', 6, 160, 3.8)
+    ]
+
+    const result = await readSeoPerformance('org-1', { mode: 'keyword', metric: 'position', items: ['pintura'] })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) return
+
+    expect(result.source).toBe('dataforseo_estimated')
+    expect(result.standings[0].position).toBe(1)
+  })
+
   it('modo url consulta la columna page y nunca la de keyword', async () => {
     state.gscRows = [
       gscRow('/latex', '2026-07-07', 5, 100, 8),

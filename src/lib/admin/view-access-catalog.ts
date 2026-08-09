@@ -1029,6 +1029,24 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
       'Informe AEO client-scoped (TASK-1248): cómo te ve la IA — puntaje, dimensiones, plan AEO y tendencia. Deep-link, sin evidencia cruda.',
     routePath: '/aeo',
     routeGroup: 'client'
+  },
+  {
+    viewCode: 'cliente.growth_seo_dashboard',
+    section: 'cliente',
+    label: 'SEO',
+    description:
+      'Dashboard SEO client-scoped (TASK-1310): lectura orgánica, evolución y Search Visibility 360. Deep-link, solo datos propios y client-safe.',
+    routePath: '/growth/seo',
+    routeGroup: 'client'
+  },
+  {
+    viewCode: 'cliente.growth_seo_report',
+    section: 'cliente',
+    label: 'Informe SEO',
+    description:
+      'Report artifact SEO client-scoped (TASK-1310): informe web/printable derivado del contrato compartido de reportes.',
+    routePath: '/growth/seo/report',
+    routeGroup: 'client'
   }
 ]
 
