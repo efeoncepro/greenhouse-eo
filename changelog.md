@@ -7,6 +7,29 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-09 — El batch policy del release preflight dejó de mentir (ISSUE-114)
+
+`release_batch_policy` computaba el diff con base three-dot (`origin/main...target`). Como la
+promoción es por squash-merge, la merge-base queda congelada antes del último squash y el check
+resucitaba archivos byte-idénticos a producción como cambios del release, fabricando dominios
+irreversibles falsos y empujando releases normales a `requires_break_glass`. Los 4 releases previos
+lo habían tapado con marker `[release-coupled: …]`, tres declarando explícitamente que la mezcla no
+era real. Ahora usa two-dot, y tanto el diff de archivos como los commit bodies resuelven su base por
+`buildReleaseDiffRange`. El hueco de cobertura estaba en que `checks/release-batch-policy.ts` no tenía
+archivo de tests; el guardrail nuevo fija el rango en el argv de git, verificado rojo antes y verde
+después.
+
+Una verificación adversarial del propio fix encontró cuatro defectos, todos corregidos: un docstring
+que sobre-prometía (compartir el rango no iguala `git diff` con `git log`), dos docstrings del
+contrato aún en three-dot, dos tests que eran teatro por un mock ciego al rango, y un byte NUL
+invisible en un fixture.
+
+Se abrieron `ISSUE-145` (alta: el batch policy del orquestador es decorativo post-merge, y el marker
+nunca se lee donde el runbook dice pero se dispara con prosa) e `ISSUE-144` (`vercel_readiness`
+confunde build saltado a propósito con fallido). Se desplegó además el batch SEO EPIC-022
+(TASK-1308/1309/1310, 322 archivos, 3 migraciones) y se corrigieron dos comandos documentados que las
+herramientas dejaron de aceptar.
+
 ## 2026-08-08 — TASK-1309 CERRADA: el conmutador de Search Visibility queda completo
 
 - **`TASK-1309` pasa a `complete`.** Build de producción verde (exit 0) con autorización del operador
@@ -1142,13 +1165,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   `scripts/legacy-fallback-canary.mjs` (renderiza el `:root` sin Tailwind, la condición de las superficies
   legacy, y mide el payoff del override único).
 - ADR-016 y ADR-017 quedaron reescritos en el cuerpo: la consecuencia que declaraban aceptada está cerrada.
-
-## 2026-07-30 — Globe: documentación y skills sincronizadas con seis rutas de imagen
-
-- Se reconciliaron ADR-013, EPIC-028, el barrido WIP, task activa, documentación funcional, manuales, ledger,
-  runtime handoff y evidencia con las promociones reales de Seedream, Nano Banana Pro/2, GPT Image 2/1.5 y Recraft.
-- Las skills gemelas `greenhouse-globe` y `greenhouse-ai-creative-rights-governance` incorporan identidad exacta,
-  atestación/política inmutable, promoción distinta de delivery, diagnósticos seguros y canary real desde UI.
-- El caso Recraft queda como regla reusable: `application/octet-stream` sólo se admite para una salida SVG esperada
-  después de validar bytes; el asset se sirve con CSP sandbox. No se amplió la allowlist MIME global.
-- No hubo mutaciones de runtime. `TASK-1553` sigue abierta sólo por receipts cross-task de `TASK-1468`/`TASK-1578`.

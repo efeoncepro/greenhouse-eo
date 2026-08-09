@@ -1,5 +1,48 @@
 # Handoff activo
 
+### Releases del 2026-08-08/09 — `ISSUE-114` cerrada y batch SEO en producción
+
+`main` = `e048ef3a4` (batch SEO). Antes, `b99b7ad97` (fix de `ISSUE-114`). Ambos manifiestos
+`released`; **watchdog `aggregateSeverity: ok`**, tres señales en cero, y los 4 workers de Cloud Run
+en `Ready=True` sirviendo `e048ef3a47e9` — ni siquiera el residual change-gated habitual del
+`ops-worker`.
+
+**Lo que necesita quien siga:**
+
+1. **`ISSUE-114` resuelta: el batch policy computaba el diff sobre una base congelada.** Usaba
+   three-dot (`origin/main...target`), que parte de la merge-base que el squash-merge deja vieja, y
+   resucitaba archivos byte-idénticos a producción como cambios del release. Ahora es two-dot vía
+   `buildReleaseDiffRange`. **Si el classifier reporta un dominio irreversible, ahora es REAL** — no
+   lo tapes con `[release-coupled: …]` por costumbre, como venía pasando en los 4 releases previos.
+2. **`ISSUE-145` (ALTA) — léela antes del próximo release.** El batch policy del **orquestador** es
+   decorativo: corre con el `target_sha` ya mergeado, ve un rango vacío y aprueba sin mirar nada
+   (verificado en los `preflight-result.json` de 3 releases; uno con 1045 archivos y 14 migraciones
+   reportó `filesChanged=0`). Y el marker `[release-coupled: …]` nunca se lee donde el runbook dice,
+   **pero se dispara solo con prosa**: una cita en un commit de docs de growth/MCP neutralizó
+   `split_batch` para todo un batch. El ancla correcta es el `target_sha` del release anterior.
+3. **`ISSUE-144`** — `vercel_readiness` confunde un build cancelado a propósito por el `ignoreCommand`
+   con uno fallido. **Y `vercel redeploy` NO lo resuelve**: vuelve a correr el ignore-step y cancela
+   igual. Lo que sí funciona es un push con código a `develop` (el merge canónico `main`→`develop`
+   sirve doble).
+4. **Se canceló el run zombie `31126022507`** (`Ops Worker Deploy`, 56h en `queued` con 0 jobs). Era
+   lo único que dejaba el watchdog en `error`, y su entrada en la lista forense expiraba el
+   **2026-08-21**, o sea habría vuelto a bloquear el preflight ese día. La entrada en
+   `src/lib/release/preflight/ignored-pending-runs.ts` ya es letra muerta: quitarla en el próximo
+   cambio que toque ese archivo.
+5. **⚠️ El merge canónico `-X ours` se come el `Handoff.md` y el `changelog.md` del release.** Pasó
+   en este mismo release: la sección y la entrada escritas en la rama de fix llegaron a `main` en el
+   squash, y el merge `main`→`develop` las descartó porque `develop` había editado esos mismos
+   archivos en paralelo — que es lo habitual. Todo lo demás (código, issues, índice, runbook, ambas
+   skills) sobrevivió intacto. **Al cerrar un release, verificar explícitamente que Handoff y
+   changelog conservan su entrada después del merge**; las dos verificaciones del gotcha #1 no lo
+   detectan porque sólo miran `src/`, `scripts/`, `services/` y `migrations/`.
+6. **Dos comandos documentados que ya no funcionan** (corregidos): `vercel ls --target=` →
+   `--environment=` (CLI 50.x) y el `gcloud run services describe --format="value(...filter(...))"`
+   del runbook §4.1, que crashea con `TransformFilter() takes 2 positional arguments`. Sospecha de
+   todo comando copiado de la doc antes de concluir que el sistema está roto.
+7. **`data_missing` del watchdog casi siempre es tu sesión `gcloud`, no deriva.** `pnpm
+   gcloud:auth:playwright -- --force` renueva CLI **y** ADC. Antes: `data_missing_count=4`; después: `0`.
+
 ### TASK-1309 — Auditoría del sitio (2026-08-08)
 
 `TASK-1309` está `in-progress` con código completo: cuarta tab `/admin/growth/seo/audit`, datos reales
@@ -541,23 +584,3 @@ SQL; ~~`website_url` en EO-ORG-0007~~ **HECHO 2026-08-06**: `https://efeoncepro.
 sin `overrideIdentity` para no pisar un valor ajeno; `organization_type` se mantuvo `client`);
 conexión GSC de
 `efeoncepro.com` gated por TASK-1282/1283.
-
-### Efeonce provisionada como org del 360 (own-brand, dogfooding) — 2026-08-05
-
-Decisión de modelado del operador ejecutada: **Efeonce se modela como su propio cliente** sobre la org
-canónica **EO-ORG-0007** (`Efeonce`, Efeonce Group SpA, RUT 77.357.182-1, `is_operating_entity=true` —
-canónica verificada contra la base; las otras dos orgs "efeonce" son auto-companies de HubSpot
-sincronizadas como ruido). Aplicado con `scripts/growth/provision-efeonce-own-brand-seo.ts` (idempotente):
-
-- 4 perfiles del grader ligados (`EO-GAVP-0002/0017/0018/0020`) → **lente AEO disponible** (cierra §2.A
-  del programa AEO para la marca propia).
-- Assignment `cpma-efeonce-seo-own-brand` (`seo_v1`, contracted, `metadata.note=own_brand`) → chokepoint
-  responde `hasModule=true`, 8 audits, $50 budget.
-- Target `seot-efeonce-own-brand` (efeoncepro.com, CL/es).
-- Verificado vía payloads del lane (TASK-1645): entitlement ✓ · keyword-opportunities `ok:true` (vacío,
-  sin GSC aún) · visibility-360 → **`no_seo_data` honesto** (lente SEO llega al conectar la GSC de
-  efeoncepro.com — OAuth de TASK-1282/1283, rollout pendiente — o con TASK-1303/DataForSEO).
-
-**Pendiente vivo:** conectar la GSC de efeoncepro.com cuando 1282/1283 destraben su rollout. SKY ya
-tiene lente AEO ligada; su SEO sigue igual de pendiente. Los otros dos pendientes de esta entrada
-(auto-companies HubSpot · `website_url`) están resueltos o repetidos en las entradas de 2026-08-06.

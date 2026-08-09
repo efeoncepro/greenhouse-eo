@@ -454,7 +454,20 @@ GITHUB_RELEASE_OBSERVER_TOKEN="$(gh auth token)" pnpm release:watchdog --json
 
 gcloud run services describe ico-batch-worker \
   --project=efeonce-group --region=us-east4 \
-  --format="value(status.conditions.filter('type','Ready').extract('status'),spec.template.spec.containers[0].env.filter('name','GIT_SHA').extract('value'))"
+  --format=json | python3 -c "
+import sys,json
+d=json.load(sys.stdin)
+ready=[c.get('status') for c in d.get('status',{}).get('conditions',[]) if c.get('type')=='Ready']
+env=d.get('spec',{}).get('template',{}).get('spec',{}).get('containers',[{}])[0].get('env',[])
+sha=[e.get('value') for e in env if e.get('name')=='GIT_SHA']
+print('Ready=' + (ready[0] if ready else '?') + '  GIT_SHA=' + (sha[0][:12] if sha else 'ausente'))
+"
+
+# NOTA (2026-08-09): la forma antigua con
+# --format="value(status.conditions.filter('type','Ready')...)" CRASHEA en el gcloud
+# actual ("TransformFilter() takes 2 positional arguments but 3 were given"). Usar el
+# JSON de arriba. Mismo bug class que `vercel ls --target=` -> `--environment=`:
+# comandos documentados que la herramienta dejó de aceptar.
 ```
 
 Interpretacion:
