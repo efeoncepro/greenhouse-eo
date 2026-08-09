@@ -7,6 +7,23 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-09 — La verificación en staging del portal cliente encontró dos defectos más
+
+Recorrí las 9 rutas × 3 personas con sesión real contra staging. El fix quedó confirmado en runtime
+desplegado —3 base sirven `200`, las 6 module-gated redirigen a `/home?denied=<slug>`, **cero**
+`?error=resolver_unavailable`— y de paso salieron dos cosas que sólo se ven ejerciendo el flujo:
+
+- **`/proyectos` devolvía `/401` al operador interno**, y era la única de las 9 que conservaba un gate
+  legacy por route group **encima** del canónico, con el comentario de al lado diciendo que el
+  canónico lo reemplazaba. Corría primero, así que ganaba, y el scope del operador interno no incluye
+  `client`. Arreglado, con una guarda de source que barre las 9 páginas. **Producción sigue con el
+  síntoma hasta el próximo release** — clasificado `MENOR`: es fail-closed de más, no expone nada.
+- **El override de organización era solo-local por usar `NODE_ENV`.** Vercel compila todos los
+  deployments con `NODE_ENV=production`, así que el bloqueo apagaba el flag también en staging. El
+  discriminador canónico del repo es `VERCEL_ENV` (mismo que `agent-session` y `proxy.ts`). Corregido,
+  y **sin** válvula de escape de producción: la divergencia con `agent-session` es deliberada porque
+  este override concede lectura cross-tenant.
+
 ## 2026-08-09 — El carril de acceso del portal cliente queda cerrado del todo (TASK-1680 + Creative a SKY)
 
 Las tres piezas que quedaban después del release: el módulo Creative asignado, el lint cerrado y los

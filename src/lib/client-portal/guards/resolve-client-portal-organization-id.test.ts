@@ -33,7 +33,7 @@ describe('resolveClientPortalOrganizationId (TASK-1679)', () => {
     mockCookieGet.mockReturnValue(undefined)
     delete process.env.CLIENT_PORTAL_AGENT_ORG_OVERRIDE
     process.env.CLIENT_PORTAL_AGENT_ORG_OVERRIDE_ENABLED = 'true'
-    vi.stubEnv('NODE_ENV', 'development')
+    vi.stubEnv('VERCEL_ENV', 'preview')
   })
 
   afterEach(() => {
@@ -79,11 +79,37 @@ describe('resolveClientPortalOrganizationId (TASK-1679)', () => {
   })
 
   it('condition 2 — ignores the override in production even with the flag ON', async () => {
-    vi.stubEnv('NODE_ENV', 'production')
+    vi.stubEnv('VERCEL_ENV', 'production')
     mockCookieGet.mockReturnValue({ value: 'org-sky' })
 
     await expect(resolveClientPortalOrganizationId(AGENT)).resolves.toBe('org-demo')
     expect(mockCaptureMessageWithDomain).not.toHaveBeenCalled()
+  })
+
+  it('condition 2 — works on staging, where Vercel still builds with NODE_ENV=production', async () => {
+    // La primera versión del guard discriminaba por `NODE_ENV`, y Vercel compila TODOS los
+    // deployments con `NODE_ENV=production` — así que el bloqueo apagaba el override en
+    // staging también y lo dejaba solo-local, que no es lo que se pidió. El discriminador
+    // canónico del repo es `VERCEL_ENV` (mismo que agent-session y proxy.ts); staging
+    // reporta `preview`, verificado contra el runtime desplegado el 2026-08-09.
+    vi.stubEnv('VERCEL_ENV', 'preview')
+    vi.stubEnv('NODE_ENV', 'production')
+    mockCookieGet.mockReturnValue({ value: 'org-sky' })
+
+    await expect(resolveClientPortalOrganizationId(AGENT)).resolves.toBe('org-sky')
+  })
+
+  it('has NO production escape hatch, unlike agent-session (deliberate divergence)', async () => {
+    // agent-session admite `AGENT_AUTH_ALLOW_PRODUCTION`; este override NO, porque concede
+    // lectura cross-tenant del portal de cualquier organización con una credencial
+    // documentada. Si alguien agrega una válvula, este test lo detiene.
+    vi.stubEnv('VERCEL_ENV', 'production')
+    process.env.CLIENT_PORTAL_AGENT_ORG_OVERRIDE_ALLOW_PRODUCTION = 'true'
+    mockCookieGet.mockReturnValue({ value: 'org-sky' })
+
+    await expect(resolveClientPortalOrganizationId(AGENT)).resolves.toBe('org-demo')
+
+    delete process.env.CLIENT_PORTAL_AGENT_ORG_OVERRIDE_ALLOW_PRODUCTION
   })
 
   it('condition 3 — ignores the override for a real client user, not just any client tenant', async () => {

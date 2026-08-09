@@ -1,5 +1,41 @@
 # Handoff activo
 
+### Verificación en staging del portal cliente, y dos defectos que salieron de ella (2026-08-09)
+
+Recorrí las 9 rutas × 3 personas con sesión de agente real contra **staging** (producción no acepta
+agent-session por diseño). El fix de `TASK-1679` quedó confirmado en runtime desplegado: las 3 base
+sirven `200`, las 6 module-gated redirigen a `/home?denied=<slug>` con el slug user-facing correcto, y
+**cero** `?error=resolver_unavailable` — que era el síntoma de las nueve.
+
+**Lo que necesita quien siga:**
+
+1. ⚠️ **PRODUCCIÓN HOY: `/proyectos` devuelve `/401` al operador interno.** Arreglado en `develop`,
+   **no promovido**. Si soporte reporta que no puede abrir Proyectos de un cliente, es esto y está
+   conocido. Clasificado `MENOR` por el árbol §7 del runbook: es fail-closed **de más** (niega acceso
+   que debería conceder), no expone dato de nadie, y las otras 8 páginas cliente abren normal. Va en
+   el próximo release — que incluya este commit no es opcional.
+2. **La causa era un gate legacy por route group ENCIMA del guard canónico**, y `/proyectos` era la
+   única de las 9 que lo conservaba, con el comentario de al lado diciendo que el canónico ya lo
+   reemplazaba. Corría primero, así que ganaba, y el `route_group_scope` del operador interno
+   (`admin, commercial, internal, my`) no incluye `client`. Migración incompleta de `TASK-827`,
+   invisible en review porque las dos líneas se leen como defensa en profundidad. Fijado por
+   `src/lib/client-portal/guards/no-route-group-gate-above-view-code-guard.test.ts`, que barre las 9
+   páginas.
+3. 🔴 **El override de organización usaba `NODE_ENV` y por eso era solo-local.** Vercel compila
+   **todos** los deployments con `NODE_ENV=production`, así que mi bloqueo apagaba el flag también en
+   staging. El discriminador canónico del repo es **`VERCEL_ENV`** — mismo que
+   `src/app/api/auth/agent-session/route.ts` y `src/proxy.ts`; staging reporta `preview`, verificado
+   contra el runtime. Corregido. **Regla:** para distinguir staging de producción en este repo,
+   `VERCEL_ENV`, nunca `NODE_ENV`.
+4. **El override NO tiene válvula de escape de producción, y la divergencia con `agent-session` es
+   deliberada.** Ese endpoint admite `AGENT_AUTH_ALLOW_PRODUCTION`; éste no, porque concede lectura
+   **cross-tenant** del portal de cualquier organización con una credencial documentada en
+   `CLAUDE.md`. Hay un test que detiene a quien agregue una.
+5. **Sigue sin verificar en navegador: las 4 páginas Creative de SKY.** No hay persona cliente de SKY
+   y sus usuarios son personas reales. Con el fix de `VERCEL_ENV` ya se puede hacer prendiendo el flag
+   en staging (`vercel env add` + redeploy, porque Vercel congela las env vars al build). El resolver
+   sí está verificado contra la base que lee producción: 36 combinaciones, 0 desvíos.
+
 ### Cierre del carril de acceso del portal cliente — las 3 piezas post-release (2026-08-09)
 
 **Lo que necesita quien siga:**
@@ -553,39 +589,3 @@ Se dejaron el inventario API, route card, registry, fleet ledger y skills espejo
 rights, evaluación, canary, settlement y promotion por ruta. Reutiliza el adapter Fal y el control plane existente;
 la UI queda en `TASK-1552` y el contrato compartido en `TASK-1633`. No habilitar 4K/1080p, tres minutos, edit/masks,
 storyboard, stems, streaming, realtime, seed de entrada ni BytePlus 2.5 sin contrato verificable.
-
-### Release `30140c662` — TASK-1304 + TASK-1306 en producción (2026-08-07)
-
-PRs #179+#180 → manifest **`released`** (`30140c662a79-b5790565-9b75-41b8-a206-f2cd21a58080`, run 4
-`31180734383`, 8m29s), watchdog `worker_revision_drift: ok`, health prod 200, **lanes 1304 vivos en
-producción** (`site-audit-report` + `backlink-profile` responden 400 `missing_external_scope_type`).
-Con esto el cockpit de 1306 deja de sufrir el apagado cíclico de su viewCode. Costó 4 intentos, dos
-hallazgos nuevos ya en el timing ledger y el catálogo: **(a) el run zombie del outage** (31126022507,
-inmanejable por API — 6 vías 409/403) bloqueaba `pending_without_jobs` → fix de causa raíz = **lista
-forense `src/lib/release/preflight/ignored-pending-runs.ts`** (razón + vencimiento 2026-08-21 +
-evidencia en manifest; la reliability signal NO la consume, por eso el watchdog seguirá mostrando
-`pending_without_jobs: error` A PROPÓSITO hasta que GitHub recolecte el zombie — NO es un incidente
-nuevo); **(b) Cloud Build de ico-batch >600s** (backlog post-outage) abortó el intento 3 — dejar
-terminar el build huérfano cachea la imagen y el retry pasa limpio. **Federación EJECUTADA el mismo día**
-(`efeonce-mcp` `bfb3832`, deploy `31182267290` success): provider + registerTool + lista de paridad
-(6 tools SEO) + canary extendido — **canary 11/11 verde contra producción** con los datos reales de
-Berel y Efeonce. TASK-1304 operativamente completa de punta a punta; cero pendientes.
-
-### Autenticación local Gcloud con Playwright (2026-08-07)
-
-Proceso local explícito `pnpm gcloud:auth:playwright` (invocable por Codex o Claude) para renovar CLI +
-ADC a pedido del operador: `--force` repite OAuth, `--check-only` verifica sin abrir navegador; skill
-espejo `greenhouse-gcloud-auth-playwright`. El setup `…:setup` guarda cuenta y clave en
-`.auth/gcloud-auth-credentials.json` (gitignored, `0600`) y el perfil Chrome aislado en
-`.auth/gcloud-auth-profile`. Playwright visible, no imprime URLs/códigos/cookies, cierra con
-`gcloud-auth-preflight.sh`. Sin scheduler ni rollout remoto.
-
-### Hallazgo MCP gateway — clientes Claude no conectan por falta de DCR (2026-08-06)
-
-⚠️ **Superseded el mismo día** por el break-glass del shim DCR (entrada TASK-1654, arriba: LIVE y
-verificado con el cliente real). Se conserva sólo la causa: el cliente MCP de Claude exige DCR
-(RFC 7591) para auto-registrarse y **Entra no lo soporta**, así que sin el shim `/register` del
-gateway falla con `Incompatible auth server: does not support dynamic client registration`.
-
-
-> Historial rotado: [Handoff.archive.md](Handoff.archive.md).
