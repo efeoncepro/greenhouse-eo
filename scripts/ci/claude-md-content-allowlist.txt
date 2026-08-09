@@ -101,3 +101,15 @@
 # (`agregalo` -> `agregalo` acentuado, `dejalo` -> `dejalo` acentuado, etc.).
 # Solo cambia la forma verbal; la regla SIEMPRE y su contenido son identicos.
 - **SIEMPRE** que un eslabón nuevo del pipeline emerja (otra capa, otra tabla), agregalo como check del composer + su rama en el evaluador puro + test, no inline en consumers.
+
+# 2026-08-09 (TASK-1676, cierra ISSUE-145): las tres lineas describian el
+# comportamiento VIEJO del check #4, que esta task eliminó. `Empty → ship` era
+# literalmente el defecto: post-merge el rango quedaba vacio y el gate aprobaba
+# sin mirar nada (tres releases seguidos con filesChanged=0, uno con 1045
+# archivos). Ahora un diff vacio es `severity: unknown`. La base tampoco es
+# `origin/main...target_sha` sino el target_sha del ultimo manifest `released`, y
+# el marker se lee solo del cuerpo del squash. Conservar el texto viejo seria
+# conservar la descripcion de un bug corregido. Reword legitimo y obligatorio.
+**Check #4 release_batch_policy** (mas novel): clasifica diff `origin/main...target_sha` por dominio (`payroll`, `finance`, `auth_access`, `cloud_release`, `db_migrations`, `ui`, `docs`, `tests`, `config`, `unclassified`), detecta sensitive paths, computa irreversibility flags. Decision tree:
+- Empty → `ship`
+- INDEPENDENT sensitive mix sin marker `[release-coupled: <razon>]` en commit body → `split_batch` (error)
