@@ -1237,20 +1237,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   gateway hasta sus gates propios. El gateway no importa lógica, DB, storage ni credenciales de Globe.
 - Se incorporó la skill espejo `efeonce-mcp-platform` para Codex y Claude: enruta gateway, OAuth, edge e
   integración de providers hacia las skills dueñas, y mantiene una verificación mecánica de paridad.
-
-## 2026-08-01 — Globe: recuperación del source of truth OAuth/PKCE y evaluación durable
-
-- Se reconstruyó sobre `develop` el código preservado del Admin CLI OAuth público + PKCE, las rutas API Platform,
-  la procedencia autenticada y la recuperación idempotente de fondeo, sin repetir ninguna mutación de runtime.
-- El trabajo administrativo que usó históricamente `TASK-1616` se renumeró a `TASK-1629` para no colisionar con
-  MiniMax H3. Las migraciones ya aplicadas conservan sus nombres históricos `task-1616-*`.
-- Se reconciliaron los checkpoints de TASK-1614 sobre evaluación durable, lineage/rights, recuperación sistémica
-  y el requisito de un canary nuevo desde Producer; el candidato retenido no sustituye esa prueba.
-- Actualización 2026-08-02: 16 créditos dieron `allowed=true`, 800 efectivos y cero blockers, sin fondeo ni cambio
-  de policy. La saga expirada se recuperó fail-closed y `promotion_557d4df1-994e-45ac-92f7-7ef885aa967e` quedó
-  activada con binding/circuit revision 5.
-- El canary no se disparó: el Studio live oculta referencias posteriores a la octava. Globe `main` `595f0cb`
-  elimina el recorte y prueba la décima referencia con rights/lineage e idempotencia; tests y CI
-  `30733665167` verdes, deploy manual no ejecutado. Reader `30733996145` confirmó saga rev 7 activa hasta
-  `2026-08-02T10:54:43.570Z` y Chrome volvió a medir ocho referencias live, sin generar. TASK-1614 sigue
-  `in-progress`, rollout pendiente.
