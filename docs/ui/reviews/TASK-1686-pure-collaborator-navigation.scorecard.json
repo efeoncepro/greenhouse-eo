@@ -1,0 +1,122 @@
+{
+  "taskId": "TASK-1686",
+  "scenario": "task-1686-pure-collaborator-navigation · task-1686-pure-collaborator-mobile-drawer",
+  "reviewedAt": "2026-08-10",
+  "reviewer": "Claude (agente), mirando los frames",
+  "uiRigor": "ui-standard",
+  "directionMode": "repo-native-benchmark",
+  "wireframe": "docs/ui/wireframes/TASK-1686-pure-collaborator-navigation.md",
+  "flow": "docs/ui/flows/TASK-1686-pure-collaborator-navigation-flow.md",
+  "motion": "docs/ui/motion/TASK-1686-pure-collaborator-navigation-motion.md",
+  "criterioDeExito": "Separación de PROYECCIÓN por audiencia con cero cambio de chrome, rutas o autorización: el rail del colaborador puro es su índice personal (/my + Mi Ficha + plataforma concedida), el avatar es identidad + Mi Perfil + salir, y ninguna superficie le muestra destinos cliente — mientras cliente, interno e híbrido my+client conservan su salida vigente byte-a-byte (fijado por tests de control, no solo por inspección).",
+  "evidence": {
+    "desktop": ".captures/2026-08-10T19-15-57_task-1686-pure-collaborator-navigation/01-desktop/frames/01-collaborator-rail.png",
+    "mobile": ".captures/2026-08-10T19-15-57_task-1686-pure-collaborator-navigation/02-mobile/frames/01-collaborator-rail.png",
+    "dossier": ".captures/2026-08-10T19-15-57_task-1686-pure-collaborator-navigation/review-dossier.md",
+    "capturas": [
+      ".captures/2026-08-10T19-15-57_task-1686-pure-collaborator-navigation",
+      ".captures/2026-08-10T19-16-25_task-1686-pure-collaborator-mobile-drawer"
+    ],
+    "data": "Sesión REAL de agent-collaborator@greenhouse.efeonce.org (routeGroups=['my'], rol collaborator — 27 vistas, 0 cliente.*, verificado en role_view_assignments) contra el runtime local con PG real. Nunca el superadmin. Cero fixtures.",
+    "framesMirados": "collaborator-rail (desktop y mobile), collaborator-avatar (identidad + Mi Perfil + Salir, sin shortcuts cliente), collaborator-cmdk (solo grupos Acciones + Mi Ficha), drawer-open a 390px (índice personal contenido al borde), frames de probes de teclado.",
+    "identidad": "Tests de contrato en VerticalMenu.test.tsx (19) + UserDropdown.test.tsx (7, nuevo): control de client/internal/my+client sobre conducta VIGENTE + contrato negativo del colaborador (9 rutas y 2 secciones cliente ausentes incluso con claims vacíos) + semántica del trigger.",
+    "reducedMotion": "reducedMotionCheck: true en ambos scenarios, verde.",
+    "axe": "@axe-core/playwright scopeado al nav con failOnViolations: true — 0 violations en ambos scenarios.",
+    "gatesDeCalidad": "Probes de teclado con requireVisibleFocusRing: true en rail, trigger del avatar y toggle del drawer — verdes. El 422 de /api/my/dashboard es el canónico member_identity_not_linked de la persona agente (sin fila en team_members POR DISEÑO): ignorado con scope y rationale inline en los scenarios, no silenciado globalmente.",
+    "notCovered": "El caso híbrido my+client no tiene frame GVC (no existe persona agente con esa combinación); su conducta queda fijada por unit tests de control en ambos componentes. El chrome @menu sigue sin aria-expanded en triggers de submenú (deuda declarada de TASK-1388, fuera de scope acá)."
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 5,
+      "rationale": "El rail del colaborador responde '¿dónde está mi trabajo?' sin ruido ajeno: home Mi Greenhouse activo + heading MI FICHA + hojas personales. Desapareció la mezcla con destinos cliente que no podía abrir y el heading 'Mi Cuenta' vacío. El avatar queda con una jerarquía de tres gestos: identidad, Mi Perfil, salir.",
+      "evidence": "01-collaborator-rail.png · 02-collaborator-avatar.png",
+      "nextAction": ""
+    },
+    "proportions": {
+      "score": 5,
+      "rationale": "Cero superficies nuevas: mismas filas, mismos gutters y misma iconografía del chrome. El dropdown del colaborador es deliberadamente compacto (3 bloques) y no fuerza scroll.",
+      "evidence": "02-collaborator-avatar.png",
+      "nextAction": ""
+    },
+    "rhythm": {
+      "score": 5,
+      "rationale": "El rail personal hereda el espaciado del patrón isSection existente; al eliminar la sección vacía 'Mi Cuenta' el ritmo ya no se corta con un heading sin contenido.",
+      "evidence": "01-collaborator-rail.png",
+      "nextAction": ""
+    },
+    "density": {
+      "score": 5,
+      "rationale": "El colaborador pasa de un rail con promesas rotas (rutas cliente + heading vacío en el borde de claims) a exactamente su contenido: 1 home + N hojas gated + recursos concedidos.",
+      "evidence": "01-collaborator-rail.png vs runtime previo (documentado en el Delta de la spec).",
+      "nextAction": ""
+    },
+    "depth": {
+      "score": 5,
+      "rationale": "Sin elevaciones ni superficies nuevas: mismo VerticalNav, mismo Popper del avatar, misma palette.",
+      "evidence": "frames de las 3 superficies.",
+      "nextAction": ""
+    },
+    "surfaceEconomy": {
+      "score": 5,
+      "rationale": "Cero superficies nuevas y DOS colecciones eliminadas para esta audiencia (shortcuts cliente del avatar sin gating + secciones cliente del rail). El trigger consolidó dos elementos clickeables duplicados en un botón único.",
+      "evidence": "02-collaborator-avatar.png · diff de UserDropdown.",
+      "nextAction": ""
+    },
+    "visualImpact": {
+      "score": 5,
+      "rationale": "Criterio inverso del chrome persistente: cero ruido nuevo, y se logra. El impacto correcto acá es la ausencia — nada en el rail o el avatar del colaborador apunta a un portal que no es el suyo.",
+      "evidence": "01-collaborator-rail.png · 02-collaborator-avatar.png",
+      "nextAction": ""
+    },
+    "typography": {
+      "score": 5,
+      "rationale": "Todas las strings salen de nomenclatura (GH_MY_NAV.dashboard/fichaSection/profile, GH_MESSAGES.logout_button, microcopy.aria.userMenu); el literal 'Mi Ficha' del JSX quedó tokenizado con espejo en-US. Cero fontSize inline.",
+      "evidence": "design-contract:lint PASS · diff de nomenclatura.",
+      "nextAction": ""
+    },
+    "color": {
+      "score": 5,
+      "rationale": "Sin color propio: estados del theme, badge de presencia intacto, logout con el error-contained vigente.",
+      "evidence": "02-collaborator-avatar.png",
+      "nextAction": ""
+    },
+    "iconography": {
+      "score": 5,
+      "rationale": "Glyphs Tabler existentes (user-circle para Mi Perfil, los de las hojas del builder). Nada nuevo que curar.",
+      "evidence": "frames del rail y avatar.",
+      "nextAction": ""
+    },
+    "responsive": {
+      "score": 5,
+      "rationale": "A 390px el drawer muestra el mismo índice personal contenido al borde (0 layout_element_overflow en drawer-open) y el dropdown hereda su comportamiento MUI. El toggle accesible y la región scrollable de TASK-1388 verificados también para esta audiencia.",
+      "evidence": "drawer-open.png + manifest mobile sin findings de overflow.",
+      "nextAction": ""
+    },
+    "motion": {
+      "score": 5,
+      "rationale": "Cero motion nuevo, como declara el motion contract: Fade/Popper/drawer existentes; reduced-motion verificado en ambos scenarios.",
+      "evidence": "reducedMotionCheck verde x2.",
+      "nextAction": ""
+    },
+    "fidelity": {
+      "score": 5,
+      "rationale": "La matriz de salida de la spec se implementó literal: collaborator = /my + builder + plataforma; avatar = identidad + Mi Perfil + salir; client/internal/my+client byte-equivalentes (tests de control). El trigger semántico cumple el contrato a11y del wireframe (name, haspopup, expanded, controls, Esc + restore).",
+      "evidence": "Frames vs §Matriz de la spec · UserDropdown.test.tsx.",
+      "nextAction": ""
+    },
+    "genericTemplateResistance": {
+      "score": 5,
+      "rationale": "No hay superficie nueva que pueda salir genérica: todo hereda el chrome opinado. El riesgo real era el contrario — que el colaborador siguiera viendo un portal ajeno — y el contrato negativo lo fija por test.",
+      "evidence": "Tests de ausencia + frames.",
+      "nextAction": ""
+    }
+  },
+  "average": 5.0,
+  "floor": 5,
+  "threshold": "average >= 4.5; floor >= 4; hierarchy/surface economy/visual impact/fidelity/template resistance >= 4.5",
+  "hallazgosAbiertosDelChrome": [
+    "Los triggers de submenú del chrome @menu siguen sin aria-expanded/aria-controls (deuda declarada desde TASK-1388; @menu es intocable). No aplica al trigger del avatar, que esta task SÍ dejó semántico."
+  ],
+  "notaSobreEsosHallazgos": "El único hallazgo abierto es herencia del chrome Vuexy y tiene dueño declarado en el scorecard de TASK-1388. Los hallazgos propios de esta audiencia (shortcuts sin gating, heading vacío, trigger sin semántica, borde de claims vacíos) quedaron TODOS cerrados y fijados por test.",
+  "verdict": "pass"
+}
