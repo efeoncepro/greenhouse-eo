@@ -187,6 +187,13 @@ describe('VerticalMenu — merge aditivo de módulos contratados (TASK-1675)', (
     expect(collectHrefs(menuData)).toContain('/creative-hub')
   })
 
+  it('la rama no-interna nunca renderiza zonas internas (Operación/Administración)', () => {
+    const sections = collectSectionLabels(renderMenu([]))
+
+    expect(sections).not.toContain('Operación')
+    expect(sections).not.toContain('Administración')
+  })
+
   it('un módulo del grupo account cuelga de "Mi Cuenta", no de la lista primaria', () => {
     const accountItem: ClientNavItem = {
       viewCode: 'cliente.exports',
@@ -204,5 +211,172 @@ describe('VerticalMenu — merge aditivo de módulos contratados (TASK-1675)', (
     ) as { children: VerticalMenuDataType[] } | undefined
 
     expect(collectHrefs(accountSection?.children ?? [])).toContain('/exports')
+  })
+})
+
+/**
+ * TASK-1388 — identidad de la rama INTERNA tras el reequilibrio.
+ *
+ * El contrato: mismas hojas que antes (cero cambios de URL ni de gating),
+ * reubicadas en 3 zonas `isSection` (Operación · Administración · Recursos),
+ * SIN las hojas personales `/my/*` (rehomed al dropdown del avatar) y sin
+ * duplicados (Sample Sprints y Herramientas IA con hogar único).
+ */
+describe('VerticalMenu — rama interna en 3 zonas (TASK-1388)', () => {
+  const INTERNAL_ADMIN_SESSION = {
+    data: {
+      user: {
+        routeGroups: ['internal', 'admin', 'commercial', 'finance', 'hr', 'people', 'ai_tooling', 'my'],
+        roleCodes: ['efeonce_admin'],
+        authorizedViews: [],
+        portalHomePath: '/home',
+        memberId: 'member-admin-001'
+      }
+    }
+  }
+
+  beforeEach(() => {
+    useSessionMock.mockReturnValue(INTERNAL_ADMIN_SESSION)
+  })
+
+  it('el set de hojas del admin interno es exactamente el vigente: sin /my/*, sin duplicados, cero URLs nuevas', () => {
+    const hrefs = collectHrefs(renderMenu([]))
+
+    const expected = [
+      '/home',
+      // Operación → Agencia
+      '/agency',
+      '/agency/spaces',
+      '/agency/economics',
+      '/agency/team',
+      '/agency/talent-discovery',
+      '/agency/staff-augmentation',
+      '/agency/delivery',
+      '/agency/campaigns',
+      '/agency/organizations',
+      '/agency/services',
+      '/agency/operations',
+      // Operación → Comercial (hogar único de Sample Sprints + sección Growth)
+      '/finance/intelligence/pipeline',
+      '/finance/quotes',
+      '/finance/contracts',
+      '/finance/master-agreements',
+      '/agency/sample-sprints',
+      '/finance/products',
+      '/growth/aeo',
+      '/growth/ctas',
+      '/admin/growth/forms',
+      '/admin/growth/ai-visibility',
+      '/admin/growth/seo',
+      // Operación → Finanzas
+      '/finance',
+      '/finance/income',
+      '/finance/expenses',
+      '/finance/clients',
+      '/finance/suppliers',
+      '/finance/cash-in',
+      '/finance/cash-out',
+      '/finance/payment-orders',
+      '/finance/payment-profiles',
+      '/finance/bank',
+      '/finance/shareholder-account',
+      '/finance/cash-position',
+      '/finance/purchase-orders',
+      '/finance/hes',
+      '/finance/reconciliation',
+      '/finance/intelligence',
+      '/finance/cost-allocations',
+      // Operación → Personas
+      '/people',
+      '/hr/workforce/activation',
+      '/hr/payroll',
+      '/hr/payroll/projected',
+      '/finance/contractor-payments',
+      '/hr/team',
+      '/hr/approvals',
+      '/hr/departments',
+      '/hr/contractors',
+      '/hr/workforce/contracts',
+      '/hr/offboarding',
+      '/hr/hierarchy',
+      '/hr/org-chart',
+      '/hr/leave',
+      '/hr/attendance',
+      '/hr/goals',
+      '/hr/evaluations',
+      // Administración → Admin Center
+      '/admin',
+      '/admin/users',
+      '/admin/roles',
+      '/admin/views',
+      '/admin/accounts',
+      '/admin/tenants',
+      '/admin/team',
+      '/admin/talent-review',
+      '/admin/talent-ops',
+      '/admin/business-lines',
+      '/admin/commercial/parties',
+      '/admin/commercial/proposals',
+      '/admin/pricing-catalog',
+      '/admin/service-slas',
+      '/admin/payment-instruments',
+      '/admin/operational-calendar',
+      '/admin/email-delivery',
+      '/admin/emails/preview',
+      '/admin/notifications',
+      '/admin/ai-tools',
+      '/admin/cloud-integrations',
+      '/admin/globe/credits',
+      '/admin/ops-health',
+      '/admin/data-quality/notion-titles',
+      '/admin/data-quality/organization-logos'
+    ]
+
+    expect([...hrefs].sort()).toEqual([...expected].sort())
+  })
+
+  it('las hojas personales /my/* NO viven en el rail interno (rehomed al avatar)', () => {
+    const hrefs = collectHrefs(renderMenu([]))
+
+    expect(hrefs.filter(href => href.startsWith('/my'))).toEqual([])
+  })
+
+  it('el rail interno se enmarca en zonas: Operación y Administración presentes, sin las secciones legacy', () => {
+    const sections = collectSectionLabels(renderMenu([]))
+
+    expect(sections).toContain('Operación')
+    expect(sections).toContain('Administración')
+    expect(sections).not.toContain('Gestión')
+    expect(sections).not.toContain('Personas y HR')
+    expect(sections).not.toContain('Mi Ficha')
+  })
+
+  it('los duplicados quedaron con hogar único: Sample Sprints y Herramientas IA aparecen una sola vez', () => {
+    const hrefs = collectHrefs(renderMenu([]))
+
+    expect(hrefs.filter(href => href === '/agency/sample-sprints')).toHaveLength(1)
+    expect(hrefs.filter(href => href === '/admin/ai-tools')).toHaveLength(1)
+  })
+
+  it('la zona Recursos aparece cuando el rol tiene los grants de plataforma', () => {
+    useSessionMock.mockReturnValue({
+      data: {
+        user: {
+          ...INTERNAL_ADMIN_SESSION.data.user,
+          authorizedViews: ['plataforma.knowledge', 'plataforma.design_system']
+        }
+      }
+    })
+
+    const menuData = renderMenu([])
+    const sections = collectSectionLabels(menuData)
+    const hrefs = collectHrefs(menuData)
+
+    expect(sections).toContain('Recursos')
+    expect(hrefs).toContain('/knowledge')
+    expect(hrefs).toContain('/design-system')
+
+    // Y una sola vez: el bloque standalone es exclusivo de la rama no-interna.
+    expect(hrefs.filter(href => href === '/knowledge')).toHaveLength(1)
   })
 })

@@ -180,15 +180,33 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
       icon: 'tabler-smart-home'
     })
 
-    // ── GESTIÓN (section: 3 flat + 2 collapsibles) ──
+    // ═══ ZONA OPERACIÓN (TASK-1388) ═══
+    // Dominios colapsables uniformes bajo una zona `isSection`. El orden es el
+    // del wireframe: Agencia · Comercial · Finanzas · Personas.
+    const operacionChildren: VerticalMenuDataType[] = []
+
+    // ── Dominio Agencia (antes sección "Gestión") ──
     if (isAgencyUser) {
-      menuData.push({
-        isSection: true,
-        label: 'Gestión',
+      operacionChildren.push({
+        label: nl(GH_INTERNAL_NAV.domainAgencia),
+        icon: 'tabler-building',
         children: [
-          { label: nl(GH_AGENCY_NAV.workspace), href: '/agency', icon: 'tabler-building' },
-          { label: nl(GH_AGENCY_NAV.spaces), href: '/agency/spaces', icon: 'tabler-grid-4x4' },
-          { label: nl(GH_AGENCY_NAV.economics), href: '/agency/economics', icon: 'tabler-chart-line' },
+          // Sección "Resumen" — agrupa las 3 hojas antes sueltas (elimina altitud mezclada)
+          {
+            label: nl(GH_INTERNAL_NAV.sectionAgenciaResumen),
+            icon: 'tabler-layout-dashboard',
+            children: [
+              { label: nl(GH_AGENCY_NAV.workspace), href: '/agency', icon: 'tabler-building' },
+              { label: nl(GH_AGENCY_NAV.spaces), href: '/agency/spaces', icon: 'tabler-grid-4x4' },
+              { label: nl(GH_AGENCY_NAV.economics), href: '/agency/economics', icon: 'tabler-chart-line' }
+            ].filter(item => {
+              if (item.href === '/agency') return canSeeView('gestion.agencia', true)
+              if (item.href === '/agency/spaces') return canSeeView('gestion.spaces', true)
+              if (item.href === '/agency/economics') return canSeeView('gestion.economia', true)
+
+              return true
+            })
+          },
 
           // Collapsible "Equipo y talento"
           {
@@ -209,7 +227,8 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
             })
           },
 
-          // Collapsible "Operaciones"
+          // Collapsible "Operaciones" — Sample Sprints ya NO vive acá: su hogar
+          // único es el dominio Comercial (dedup TASK-1388).
           {
             label: nl(GH_AGENCY_NAV.operationsGroup),
             icon: 'tabler-cpu',
@@ -219,7 +238,6 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
               { label: nl(GH_AGENCY_NAV.organizations), href: '/agency/organizations' },
               { label: nl(GH_AGENCY_NAV.newClient), href: '/agency/clients/onboarding', icon: 'tabler-user-plus' },
               { label: nl(GH_AGENCY_NAV.services), href: '/agency/services' },
-              { label: nl(GH_AGENCY_NAV.sampleSprints), href: '/agency/sample-sprints', icon: 'tabler-rocket' },
               { label: nl(GH_AGENCY_NAV.operations), href: '/agency/operations' }
             ].filter(item => {
               if (item.href === '/agency/delivery') return canSeeView('gestion.delivery', true)
@@ -240,19 +258,12 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
               }
 
               if (item.href === '/agency/services') return canSeeView('gestion.servicios', true)
-              if (item.href === '/agency/sample-sprints') return canSeeView('gestion.sample_sprints', true)
               if (item.href === '/agency/operations') return canSeeView('gestion.operaciones', true)
 
               return true
             })
           }
-        ].filter(item => {
-          if (item.href === '/agency') return canSeeView('gestion.agencia', true)
-          if (item.href === '/agency/spaces') return canSeeView('gestion.spaces', true)
-          if (item.href === '/agency/economics') return canSeeView('gestion.economia', true)
-
-          return true
-        })
+        ]
       })
     }
 
@@ -270,53 +281,94 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
     // del MISMO viewCode, así que no suman ítems de menú.
     const canSeeGrowthSeo = canSeeView('administracion.growth_seo', isAdminUser)
 
-    if (canSeeGrowthForms || canSeeGrowthAiVisibility || canSeeGrowthAeo || canSeeGrowthCtas || canSeeGrowthSeo) {
-      menuData.push({
-        label: nl(GH_INTERNAL_NAV.growth),
-        icon: 'tabler-trending-up',
+    // Growth ya no es un micro-grupo top-level: es una sección del dominio
+    // Comercial (TASK-1388). Mismos flags, mismas hojas.
+    const growthChildren: VerticalMenuDataType[] = [
+      ...(canSeeGrowthAeo
+        ? [
+            {
+              label: nl(GH_INTERNAL_NAV.growthAeo),
+              href: '/growth/aeo',
+              icon: 'tabler-radar-2'
+            }
+          ]
+        : []),
+      ...(canSeeGrowthCtas
+        ? [
+            {
+              label: nl(GH_INTERNAL_NAV.growthCtas),
+              href: '/growth/ctas',
+              icon: 'tabler-hand-click'
+            }
+          ]
+        : []),
+      ...(canSeeGrowthForms
+        ? [
+            {
+              label: nl(GH_INTERNAL_NAV.growthForms),
+              href: '/admin/growth/forms',
+              icon: 'tabler-forms'
+            }
+          ]
+        : []),
+      ...(canSeeGrowthAiVisibility
+        ? [
+            {
+              label: nl(GH_INTERNAL_NAV.growthAiVisibility),
+              href: '/admin/growth/ai-visibility',
+              icon: 'tabler-robot'
+            }
+          ]
+        : []),
+      ...(canSeeGrowthSeo
+        ? [
+            {
+              label: nl(GH_INTERNAL_NAV.growthSeo),
+              href: '/admin/growth/seo',
+              icon: 'tabler-chart-arrows-vertical'
+            }
+          ]
+        : [])
+    ]
+
+    // ── Dominio Comercial (incluye la sección Growth y el hogar único de
+    // Sample Sprints). Renderiza también para quien sólo ve Growth, para no
+    // dejar esas hojas sin superficie.
+    if (isCommercialUser || isFinanceUser || isAdminUser || growthChildren.length > 0) {
+      operacionChildren.push({
+        label: nl(GH_COMMERCIAL_NAV.root),
+        icon: 'tabler-briefcase',
         children: [
-          ...(canSeeGrowthAeo
+          ...[
+            { label: nl(GH_COMMERCIAL_NAV.pipeline), href: '/finance/intelligence/pipeline', icon: 'tabler-stack-2' },
+            { label: nl(GH_COMMERCIAL_NAV.quotes), href: '/finance/quotes', icon: 'tabler-file-dollar' },
+            { label: nl(GH_COMMERCIAL_NAV.contracts), href: '/finance/contracts', icon: 'tabler-file-description' },
+            {
+              label: nl(GH_COMMERCIAL_NAV.masterAgreements),
+              href: '/finance/master-agreements',
+              icon: 'tabler-file-certificate'
+            },
+            { label: nl(GH_COMMERCIAL_NAV.sampleSprints), href: '/agency/sample-sprints', icon: 'tabler-rocket' },
+            { label: nl(GH_COMMERCIAL_NAV.products), href: '/finance/products', icon: 'tabler-packages' }
+          ].filter(item => {
+            if (item.href === '/finance/intelligence/pipeline') {
+              return canSeeAnyView(['comercial.pipeline', 'finanzas.inteligencia'], false) || isCommercialUser || isFinanceUser || isAdminUser
+            }
+
+            if (item.href === '/finance/quotes') return canSeeAnyView(['comercial.cotizaciones', 'finanzas.cotizaciones'], true)
+            if (item.href === '/finance/contracts') return canSeeAnyView(['comercial.contratos', 'comercial.sow'], true)
+            if (item.href === '/finance/master-agreements') return canSeeView('comercial.acuerdos_marco', true)
+            if (item.href === '/agency/sample-sprints') return canSeeView('gestion.sample_sprints', isCommercialUser || isAdminUser)
+            if (item.href === '/finance/products') return canSeeView('comercial.productos', true)
+
+            return true
+          }),
+          ...(growthChildren.length > 0
             ? [
                 {
-                  label: nl(GH_INTERNAL_NAV.growthAeo),
-                  href: '/growth/aeo',
-                  icon: 'tabler-radar-2'
-                }
-              ]
-            : []),
-          ...(canSeeGrowthCtas
-            ? [
-                {
-                  label: nl(GH_INTERNAL_NAV.growthCtas),
-                  href: '/growth/ctas',
-                  icon: 'tabler-hand-click'
-                }
-              ]
-            : []),
-          ...(canSeeGrowthForms
-            ? [
-                {
-                  label: nl(GH_INTERNAL_NAV.growthForms),
-                  href: '/admin/growth/forms',
-                  icon: 'tabler-forms'
-                }
-              ]
-            : []),
-          ...(canSeeGrowthAiVisibility
-            ? [
-                {
-                  label: nl(GH_INTERNAL_NAV.growthAiVisibility),
-                  href: '/admin/growth/ai-visibility',
-                  icon: 'tabler-robot'
-                }
-              ]
-            : []),
-          ...(canSeeGrowthSeo
-            ? [
-                {
-                  label: nl(GH_INTERNAL_NAV.growthSeo),
-                  href: '/admin/growth/seo',
-                  icon: 'tabler-chart-arrows-vertical'
+                  label: nl(GH_INTERNAL_NAV.growth),
+                  icon: 'tabler-trending-up',
+                  children: growthChildren
                 }
               ]
             : [])
@@ -324,7 +376,7 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
       })
     }
 
-    // ── PERSONAS Y HR (section: 1 flat + 3 collapsibles, conditional) ──
+    // ── Dominio Personas (antes sección "Personas y HR") ──
     const hasHrAccess = isHrUser || isAdminUser
 
     // TASK-727 — `canSeeHrTeamWorkspace` ahora consume `supervisorAccess` canónico desde el JWT
@@ -336,7 +388,7 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
       ? [
           // Collapsible "Nómina"
           {
-            label: <NavLabel label='Nómina' subtitle='Liquidación y proyección' show={showSub} />,
+            label: nl(GH_INTERNAL_NAV.sectionNomina),
             icon: 'tabler-receipt',
             children: [
               { label: nl(GH_HR_NAV.payroll), href: '/hr/payroll' },
@@ -358,7 +410,7 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
 
           // Collapsible "Supervisión"
           {
-            label: <NavLabel label='Supervisión' subtitle='Equipo, aprobaciones y departamentos' show={showSub} />,
+            label: nl(GH_INTERNAL_NAV.sectionSupervision),
             icon: 'tabler-users-group',
             children: [
               { label: nl(GH_HR_NAV.team), href: '/hr/team' },
@@ -381,7 +433,7 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
 
           // Collapsible "Organización"
           {
-            label: <NavLabel label='Organización' subtitle='Jerarquía, permisos y asistencia' show={showSub} />,
+            label: nl(GH_INTERNAL_NAV.sectionOrganizacion),
             icon: 'tabler-sitemap',
             children: [
               { label: nl(GH_HR_NAV.hierarchy), href: '/hr/hierarchy' },
@@ -397,11 +449,23 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
               return true
             })
           },
-          ...(canSeeView('equipo.objetivos', true)
-            ? [{ label: nl(GH_HR_NAV.goals), href: '/hr/goals', icon: 'tabler-target' }]
-            : []),
-          ...(canSeeView('equipo.evaluaciones', true)
-            ? [{ label: nl(GH_HR_NAV.evaluations), href: '/hr/evaluations', icon: 'tabler-clipboard-check' }]
+          // Sección "Desarrollo" — agrupa las hojas antes sueltas (objetivos +
+          // evaluaciones) para que el dominio no mezcle altitudes.
+          ...(canSeeView('equipo.objetivos', true) || canSeeView('equipo.evaluaciones', true)
+            ? [
+                {
+                  label: nl(GH_INTERNAL_NAV.sectionDesarrollo),
+                  icon: 'tabler-target',
+                  children: [
+                    ...(canSeeView('equipo.objetivos', true)
+                      ? [{ label: nl(GH_HR_NAV.goals), href: '/hr/goals', icon: 'tabler-target' }]
+                      : []),
+                    ...(canSeeView('equipo.evaluaciones', true)
+                      ? [{ label: nl(GH_HR_NAV.evaluations), href: '/hr/evaluations', icon: 'tabler-clipboard-check' }]
+                      : [])
+                  ]
+                }
+              ]
             : [])
         ]
       : []
@@ -414,10 +478,15 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
         ]
       : []
 
+    // El dominio Personas se resuelve acá pero se agrega DESPUÉS de Finanzas,
+    // para respetar el orden del wireframe (Agencia · Comercial · Finanzas ·
+    // Personas) sin duplicar la lógica de visibilidad.
+    let personasEntry: VerticalMenuDataType | null = null
+
     if (canSeePeople && hasHrAccess) {
-      menuData.push({
-        isSection: true,
-        label: 'Personas y HR',
+      personasEntry = {
+        label: nl(GH_INTERNAL_NAV.domainPersonas),
+        icon: 'tabler-users-group',
         children: [
           { label: nl(GH_PEOPLE_NAV.people), href: '/people', icon: 'tabler-address-book' },
           ...(canSeeWorkforceActivation
@@ -425,72 +494,41 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
             : []),
           ...hrItems
         ]
-      })
+      }
     } else if (canSeePeople && supervisorScopeItems.length > 0) {
-      menuData.push({
-        isSection: true,
-        label: 'Personas y HR',
+      personasEntry = {
+        label: nl(GH_INTERNAL_NAV.domainPersonas),
+        icon: 'tabler-users-group',
         children: [
           { label: nl(GH_PEOPLE_NAV.people), href: '/people', icon: 'tabler-address-book' },
           ...supervisorScopeItems
         ]
-      })
+      }
     } else if (canSeePeople) {
-      menuData.push({
+      // Rol con directorio solamente: hoja directa, sin dominio de un solo ítem.
+      personasEntry = {
         label: nl(GH_PEOPLE_NAV.people),
         href: '/people',
         icon: 'tabler-address-book'
-      })
+      }
     } else if (supervisorScopeItems.length > 0) {
-      menuData.push({
-        isSection: true,
-        label: 'Personas y HR',
+      personasEntry = {
+        label: nl(GH_INTERNAL_NAV.domainPersonas),
+        icon: 'tabler-users-group',
         children: supervisorScopeItems
-      })
+      }
     } else if (hasHrAccess) {
-      menuData.push({
-        isSection: true,
-        label: 'Personas y HR',
+      personasEntry = {
+        label: nl(GH_INTERNAL_NAV.domainPersonas),
+        icon: 'tabler-users-group',
         children: hrItems
-      })
+      }
     }
 
-    // ── COMERCIAL (top-level commercial domain over legacy /finance paths) ──
-    if (isCommercialUser || isFinanceUser || isAdminUser) {
-      menuData.push({
-        label: nl(GH_COMMERCIAL_NAV.root),
-        icon: 'tabler-briefcase',
-        children: [
-          { label: nl(GH_COMMERCIAL_NAV.pipeline), href: '/finance/intelligence/pipeline', icon: 'tabler-stack-2' },
-          { label: nl(GH_COMMERCIAL_NAV.quotes), href: '/finance/quotes', icon: 'tabler-file-dollar' },
-          { label: nl(GH_COMMERCIAL_NAV.contracts), href: '/finance/contracts', icon: 'tabler-file-description' },
-          {
-            label: nl(GH_COMMERCIAL_NAV.masterAgreements),
-            href: '/finance/master-agreements',
-            icon: 'tabler-file-certificate'
-          },
-          { label: nl(GH_COMMERCIAL_NAV.sampleSprints), href: '/agency/sample-sprints', icon: 'tabler-rocket' },
-          { label: nl(GH_COMMERCIAL_NAV.products), href: '/finance/products', icon: 'tabler-packages' }
-        ].filter(item => {
-          if (item.href === '/finance/intelligence/pipeline') {
-            return canSeeAnyView(['comercial.pipeline', 'finanzas.inteligencia'], false) || isCommercialUser || isFinanceUser || isAdminUser
-          }
-
-          if (item.href === '/finance/quotes') return canSeeAnyView(['comercial.cotizaciones', 'finanzas.cotizaciones'], true)
-          if (item.href === '/finance/contracts') return canSeeAnyView(['comercial.contratos', 'comercial.sow'], true)
-          if (item.href === '/finance/master-agreements') return canSeeView('comercial.acuerdos_marco', true)
-          if (item.href === '/agency/sample-sprints') return canSeeView('gestion.sample_sprints', isCommercialUser || isAdminUser)
-          if (item.href === '/finance/products') return canSeeView('comercial.productos', true)
-
-          return true
-        })
-      })
-    }
-
-    // ── FINANZAS (collapsible top-level with nested submenus) ──
+    // ── Dominio Finanzas ──
     if (isFinanceUser || isAdminUser) {
-      menuData.push({
-        label: 'Finanzas',
+      operacionChildren.push({
+        label: nl(GH_INTERNAL_NAV.domainFinanzas),
         icon: 'tabler-report-money',
         children: [
           // Flujo operativo submenu (business operations: sales, purchases, masters)
@@ -574,10 +612,27 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
       })
     }
 
-    // ── Herramientas IA (standalone for non-admin ai_tooling users) ──
+    // El dominio Personas cierra la zona Operación (orden del wireframe).
+    if (personasEntry) {
+      operacionChildren.push(personasEntry)
+    }
+
+    if (operacionChildren.length > 0) {
+      menuData.push({
+        isSection: true,
+        label: GH_INTERNAL_NAV.zoneOperacion.label,
+        children: operacionChildren
+      })
+    }
+
+    // ═══ ZONA ADMINISTRACIÓN (TASK-1388) ═══
+    const administracionChildren: VerticalMenuDataType[] = []
+
+    // ── Herramientas IA (standalone for non-admin ai_tooling users; para
+    // admins vive UNA sola vez dentro de Admin Center → Plataforma) ──
     if (isAiToolingUser && !isAdminUser) {
       if (canSeeView('ia.herramientas', true)) {
-        menuData.push({
+        administracionChildren.push({
           label: nl(GH_INTERNAL_NAV.adminAiTools),
           href: '/admin/ai-tools',
           icon: 'tabler-robot'
@@ -585,10 +640,10 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
       }
     }
 
-    // ── ADMIN CENTER (collapsible top-level with nested submenus) ──
+    // ── ADMIN CENTER (collapsible domain with nested submenus) ──
     if (isAdminUser) {
-      menuData.push({
-        label: GH_INTERNAL_NAV.adminCenter.label,
+      administracionChildren.push({
+        label: nl(GH_INTERNAL_NAV.adminCenter),
         icon: 'tabler-shield-lock',
         children: [
           // Identidad y acceso submenu
@@ -601,7 +656,8 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
               { label: nl(GH_INTERNAL_NAV.adminRoles), href: '/admin/roles' },
               { label: nl(GH_INTERNAL_NAV.adminViews), href: '/admin/views' },
               { label: nl(GH_INTERNAL_NAV.adminAccounts), href: '/admin/accounts' },
-              { label: nl(GH_INTERNAL_NAV.adminTenants), href: '/admin/tenants' }
+              // TASK-1388 — desambiguado de Agencia→Spaces (clientes vs tenants).
+              { label: nl(GH_INTERNAL_NAV.adminTenantsDisambiguated), href: '/admin/tenants' }
             ].filter(item => {
               if (item.href === '/admin') return canSeeView('administracion.admin_center', true)
               if (item.href === '/admin/users') return canSeeView('administracion.usuarios', true)
@@ -653,7 +709,7 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
 
           // Platform submenu
           {
-            label: <NavLabel label='Platform' subtitle='Infraestructura y observabilidad' show={showSub} />,
+            label: nl(GH_INTERNAL_NAV.adminPlatform),
             icon: 'tabler-server',
             children: [
               { label: nl(GH_INTERNAL_NAV.adminOperationalCalendar), href: '/admin/operational-calendar' },
@@ -682,6 +738,47 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
             })
           }
         ]
+      })
+    }
+
+    if (administracionChildren.length > 0) {
+      menuData.push({
+        isSection: true,
+        label: GH_INTERNAL_NAV.zoneAdministracion.label,
+        children: administracionChildren
+      })
+    }
+
+    // ═══ ZONA RECURSOS (TASK-1388) ═══
+    // Absorbe los micro-grupos transversales (Knowledge + Design System) para
+    // el portal interno. La rama no-interna los conserva standalone más abajo
+    // (los colaboradores llegan por ahí).
+    const recursosChildren: VerticalMenuDataType[] = []
+
+    if (canSeeView('plataforma.knowledge', false)) {
+      recursosChildren.push({
+        label: nl(GH_INTERNAL_NAV.knowledge),
+        href: '/knowledge',
+        icon: 'tabler-books'
+      })
+    }
+
+    if (canSeeView('plataforma.design_system', false)) {
+      recursosChildren.push({
+        label: nl(GH_INTERNAL_NAV.adminDesignSystem),
+        icon: 'tabler-palette',
+        children: [
+          { label: nl(GH_INTERNAL_NAV.adminDesignCatalog), href: '/design-system', icon: 'tabler-layout-list' },
+          { label: nl(GH_INTERNAL_NAV.adminDesignHandoff), href: '/design-system/handoff', icon: 'tabler-layout-kanban' }
+        ]
+      })
+    }
+
+    if (recursosChildren.length > 0) {
+      menuData.push({
+        isSection: true,
+        label: GH_INTERNAL_NAV.zoneRecursos.label,
+        children: recursosChildren
       })
     }
 
@@ -849,30 +946,30 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
     }
   }
 
-  // ── Knowledge (standalone — cross-cutting INTERNAL resource) ──
-  if (canSeeView('plataforma.knowledge', false)) {
-    menuData.push({
-      label: nl(GH_INTERNAL_NAV.knowledge),
-      href: '/knowledge',
-      icon: 'tabler-books'
-    })
-  }
+  // ── Knowledge + Design System (standalone — SOLO rama no-interna) ──
+  // Para el portal interno estos recursos viven en la zona "Recursos" del rail
+  // (TASK-1388). Acá quedan para el staff que NO es `isInternalPortalUser`
+  // (p.ej. `collaborator` con el grant `plataforma.*`) — y NUNCA clientes (el
+  // viewCode no se otorga a roles `client_*`).
+  if (!isInternalPortalUser) {
+    if (canSeeView('plataforma.knowledge', false)) {
+      menuData.push({
+        label: nl(GH_INTERNAL_NAV.knowledge),
+        href: '/knowledge',
+        icon: 'tabler-books'
+      })
+    }
 
-  // ── Design System (standalone — cross-cutting INTERNAL resource) ──
-  // Out of Admin Center (it is not an admin domain). Rendered for ANY staff with
-  // the `plataforma.design_system` grant — all internal roles incl. `collaborator`
-  // (who are not `isInternalPortalUser`) — and NEVER clients (the viewCode is never
-  // granted to client_* roles). Placed after both portal branches so collaborators
-  // (route group `my`) reach it too.
-  if (canSeeView('plataforma.design_system', false)) {
-    menuData.push({
-      label: nl(GH_INTERNAL_NAV.adminDesignSystem),
-      icon: 'tabler-palette',
-      children: [
-        { label: nl(GH_INTERNAL_NAV.adminDesignCatalog), href: '/design-system', icon: 'tabler-layout-list' },
-        { label: nl(GH_INTERNAL_NAV.adminDesignHandoff), href: '/design-system/handoff', icon: 'tabler-layout-kanban' }
-      ]
-    })
+    if (canSeeView('plataforma.design_system', false)) {
+      menuData.push({
+        label: nl(GH_INTERNAL_NAV.adminDesignSystem),
+        icon: 'tabler-palette',
+        children: [
+          { label: nl(GH_INTERNAL_NAV.adminDesignCatalog), href: '/design-system', icon: 'tabler-layout-list' },
+          { label: nl(GH_INTERNAL_NAV.adminDesignHandoff), href: '/design-system/handoff', icon: 'tabler-layout-kanban' }
+        ]
+      })
+    }
   }
 
   return (
