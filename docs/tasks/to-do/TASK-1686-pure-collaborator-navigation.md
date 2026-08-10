@@ -1,5 +1,31 @@
 # TASK-1686 — Navegación del colaborador puro: rail personal preservado y avatar coherente
 
+## Delta 2026-08-10 — revisión post-cierre de TASK-1388: la task SIGUE teniendo cabida, con el gap re-dimensionado
+
+Verificado contra el runtime que TASK-1388 dejó en `develop` (commits `814b8b088`…`7f21e3d14`) + la DB:
+
+- **La exposición REAL del rail es menor que la que describe el "Why #1".** Medido en
+  `role_view_assignments`: el rol `collaborator` tiene **27 vistas y CERO `cliente.*`** — con claims
+  reales, `canSeeView('cliente.*', true)` filtra TODAS las hojas cliente del rail. El caso "claims
+  vacíos hace visibles rutas cliente" existe pero es un borde (sesiones degradadas / personas agente),
+  no la experiencia del colaborador real.
+- **El gap user-visible que la spec NO menciona: la sección "Mi Cuenta" se pushea INCONDICIONAL** en
+  la rama no-interna — para el colaborador real (sin `cliente.*`) sus children quedan vacíos y el rail
+  muestra un heading "Mi Cuenta" sin contenido. Evidencia directa a favor del Slice 2.
+- **El agujero principal vigente es el avatar, tal como dice el "Why #2", y es SIN gating:** la rama
+  no-interna del `UserDropdown` renderiza Proyectos/Ciclos/Configuración/Novedades **incondicionalmente**
+  (sin `canSeeView`), así que el colaborador real los ve aunque no puede abrirlos. TASK-1388 le dejó de
+  regalo el header clickeable → Mi Perfil (ya funciona para collaborator), pero los shortcuts cliente
+  siguen.
+- **El "Why #3" y "#4" siguen exactos:** los tests de identidad de TASK-1388 fijan presencia/superset,
+  no la AUSENCIA de rutas cliente para collaborator; y no existe GVC con `agent-collaborator`.
+- **El trigger del avatar sigue sin semántica** (Avatar/Badge con onClick, sin role/aria-haspopup):
+  TASK-1388 cerró los 4 hallazgos a11y heredados de TASK-1675 pero este no estaba en esa lista. Vigente.
+- **Cero conflictos con lo shippeado:** la matriz de audiencias de esta spec coincide con el estado
+  real (internal = zonas TASK-1388 sin `/my/*`; client = TASK-1675 byte-equivalente; builder
+  `buildMyNavItems` como SSOT ya existe y el avatar interno ya lo consume). Las fronteras declaradas
+  con TASK-1685 (policy) y TASK-1389 (budget interno) siguen correctas.
+
 ## Status
 
 - Lifecycle: `to-do`
