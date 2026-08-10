@@ -5,6 +5,7 @@ export const aria: AriaCopy = {
   closeDrawer: 'Close panel',
   closeMenu: 'Close menu',
   openMenu: 'Open menu',
+  mainNavigation: 'Main navigation',
   openSettings: 'Open settings',
   toggleSidebar: 'Toggle sidebar',
   navigateBack: 'Go back',

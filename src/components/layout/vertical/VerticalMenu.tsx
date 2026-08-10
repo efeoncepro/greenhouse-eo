@@ -19,11 +19,14 @@ import menuItemStyles from '@core/styles/vertical/menuItemStyles'
 import menuSectionStyles from '@core/styles/vertical/menuSectionStyles'
 
 import { GenerateVerticalMenu } from '@/components/GenerateMenu'
+import { getMicrocopy } from '@/lib/copy'
 import { getGreenhouseNavigationCopy } from '@/config/greenhouse-navigation-copy'
 import { ROLE_CODES } from '@/config/role-codes'
 import { resolveCapabilityModules } from '@/lib/capabilities/resolve-capabilities'
 import { groupNavItems, type ClientNavItem } from '@/lib/client-portal/composition/menu-builder-shape'
 import { buildMyNavItems } from '@/lib/navigation/my-nav-items'
+
+const microcopy = getMicrocopy()
 
 type RenderExpandIconProps = {
   open?: boolean
@@ -972,11 +975,33 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
     }
   }
 
+  // TASK-1388 (a11y) — anillo de foco visible al tabular por el rail: los
+  // estilos base de Vuexy solo comunican el foco con un fondo tenue.
+  const baseMenuItemStyles = menuItemStyles(verticalNavOptions, theme)
+
+  const accessibleMenuItemStyles: typeof baseMenuItemStyles = {
+    ...baseMenuItemStyles,
+    button: params => ({
+      ...(typeof baseMenuItemStyles.button === 'function'
+        ? baseMenuItemStyles.button(params)
+        : baseMenuItemStyles.button),
+      '&:focus-visible': {
+        outline: '2px solid var(--mui-palette-primary-main)',
+        outlineOffset: '-2px'
+      }
+    })
+  }
+
   return (
     <ScrollWrapper
       {...(isBreakpointReached
         ? {
+            // TASK-1388 (a11y) — región scrollable alcanzable por teclado:
+            // sin role/label/tabIndex, un usuario de teclado no podía llegar.
             className: 'bs-full overflow-y-auto overflow-x-hidden',
+            role: 'region',
+            tabIndex: 0,
+            'aria-label': microcopy.aria.mainNavigation,
             onScroll: container => scrollMenu(container, false)
           }
         : {
@@ -986,7 +1011,7 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
     >
       <Menu
         popoutMenuOffset={{ mainAxis: 23 }}
-        menuItemStyles={menuItemStyles(verticalNavOptions, theme)}
+        menuItemStyles={accessibleMenuItemStyles}
         renderExpandIcon={({ open }) => <RenderExpandIcon open={open} transitionDuration={transitionDuration} />}
         renderExpandedMenuItemIcon={{ icon: <i className='tabler-circle text-xs' /> }}
         menuSectionStyles={menuSectionStyles(verticalNavOptions, theme)}

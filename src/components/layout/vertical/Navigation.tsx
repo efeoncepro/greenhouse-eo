@@ -45,12 +45,14 @@ const microcopy = getMicrocopy()
 
 const StyledBoxForShadow = styled('div')(({ theme }) => ({
   top: 60,
-  left: -8,
+  // TASK-1388 (a11y/layout) — contenido dentro del panel: el offset -8 +
+  // width 100%+15px hacía desbordar 8px el drawer abierto a 390px.
+  left: 0,
   zIndex: 2,
   opacity: 0,
   position: 'absolute',
   pointerEvents: 'none',
-  width: 'calc(100% + 15px)',
+  width: '100%',
   height: theme.mixins.toolbar.minHeight,
   transition: 'opacity .15s ease-in-out',
   background: `linear-gradient(#022A4E ${theme.direction === 'rtl' ? '95%' : '5%'}, rgba(2, 42, 78, 0.92) 30%, rgba(2, 42, 78, 0.58) 65%, rgba(2, 42, 78, 0.28) 75%, transparent)`,
