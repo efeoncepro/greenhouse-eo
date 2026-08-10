@@ -18,6 +18,14 @@ conocido del chrome: `@menu` no expone `aria-expanded` en triggers de submenú (
 canónico = clase `ts-open`, documentado en el scorecard) — decidir como deuda de chrome aparte;
 (4) la rama no-interna del menú quedó con punto de extensión limpio para `TASK-1685` (Delta escrito).
 
+### TASK-1686 — navegación de colaborador puro creada (2026-08-10)
+
+Quedó registrada la follow-up de TASK-1388 para separar colaborador puro de cliente en rail y avatar:
+preserva `/my` + `Mi Ficha` como índice personal, limita el avatar a identidad/`Mi Perfil`/salir,
+y no toca autorización ni deep links (frontera explícita de TASK-1685). Incluye contrato UX, dirección,
+wireframe, flow, matriz de 5 audiencias y GVC premium con `agent-collaborator`; `task:lint`,
+wireframe/flow checks y documentación quedaron verdes.
+
 ### ⛔ PARAR ACÁ — decisión pendiente del portal cliente, y una advertencia sobre esta sesión (2026-08-09)
 
 **Lo primero:** el operador detuvo el trabajo deliberadamente para decidir en sesión fresca, **porque
@@ -552,46 +560,3 @@ Lo que encontraron vale más que el trabajo mecánico:
 **Deuda detectada de paso:** `greenhouse-ui-enterprise-review` existe en `.claude/` y `.codex/` pero
 **no está en el manifiesto de espejos** y ya divergía. Se le aplicó el mismo bloque a las dos copias
 para que el gate sea idéntico entre agentes, sin reconciliar la divergencia previa. Alguien debería.
-
-### TASK-1310 — verificado con sesión de cliente: funciona, pero NO es alcanzable (2026-08-08)
-
-Cerré el paso 5 del rollout con sesión real de Grupo Berel. Dos resultados, y el segundo es el que
-importa:
-
-✅ **El gate per-org pasa y la superficie es real.** Migración aplicada, `/growth/seo` renderiza con
-datos medidos: posición media 1.5, 31 keywords, 19 en primera página, cobertura 61%, procedencia
-declarada (medido ● / estimado ◑). Evidencia `.captures/2026-08-08T19-29-36_growth-seo-client`.
-
-🔴 **El menú del portal cliente NO compone SEO** — y no es el catálogo:
-
-1. `VerticalMenu.tsx` arma el menú cliente con una **lista hardcodeada de 7 ítems** filtrada por
-   `canSeeView('cliente.*')`. SEO no está en la lista, así que ningún seed lo agrega.
-2. Su único bloque dinámico (`capabilityModules`) sale de `businessLines`/`serviceModules` de la
-   sesión — **otro sistema**, no `module_assignments`.
-3. El resolver canónico module-based (`composeNavItemsFromModules` / `<ClientPortalNavigation>`)
-   existe y **sólo lo consume el mockup** `/mockup/cliente-portal-legacy`. Cablearlo es la task
-   derivada de TASK-827 que quedó como "V1.0 acepta path híbrido".
-
-**Además, el manifest de alcanzabilidad declara un enlace que no existe:** `/growth/seo` figura con
-`parent: '/home'`, `via: 'inline-link'`, y no hay ningún enlace desde `/home`. El gate da `0 orphans`
-porque comprueba que la ruta esté **declarada**, no que el enlace declarado **exista**. Hoy el único
-camino real es el cross-link desde el informe AEO, que sólo sirve a clientes que además tengan AEO.
-
-**Confirmado con subagentes, y corrige una atribución errónea que hice en el camino:**
-`authorizedViews` se deriva **sólo** de `role_view_assignments` + fallback heurístico + permission
-sets + overrides — **nunca de `module_assignments`**. Llegué a decir que "el módulo concede y el
-denial vetea"; es falso. AEO figura en las 23 views de Berel porque **no tiene fila de rol y cae al
-fallback**, no porque su módulo la conceda.
-
-**Y AEO tampoco aparece en el menú lateral.** Se alcanza por deep-link, declarado a propósito en el
-manifest. Así que el estado de SEO **no es una regresión: es el diseño vigente del portal cliente.**
-Lo que falta es la task derivada de TASK-827 que monta el nav module-driven
-(`ClientPortalNavigation` + `/api/client-portal/modules`, ambos completos y con **cero consumidores**
-en runtime).
-
-Descartado con dato: no era sesión desactualizada — los claims se auto-refrescan cada ≤5 min y una
-sesión recién emitida tampoco los trae.
-
-**No lo parché.** Empujar SEO a la lista hardcodeada haría desaparecer el síntoma y consolidaría el
-diseño equivocado: el portal cliente debe componer su menú desde `module_assignments`, que es lo que
-el resolver canónico ya sabe hacer y nadie cableó.
