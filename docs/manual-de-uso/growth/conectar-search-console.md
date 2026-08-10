@@ -13,7 +13,7 @@
 
 ## Paso a paso
 
-1. Entra al recorrido del cliente: **Agencia → Spaces → (cliente) → ciclo de vida**, o directo a `/agency/clients/<organizationId>/lifecycle`.
+1. Entra al recorrido del cliente: **Agencia → Resumen → Spaces → (cliente) → ciclo de vida**, o directo a `/agency/clients/<organizationId>/lifecycle`.
 2. Ubica el panel **Google Search Console**. Si dice "No conectado", haz clic en **"Conectar con Google"**.
 3. Google te lleva a la pantalla de consentimiento. **Inicia sesion con la cuenta de operador** que tiene acceso a la propiedad del cliente.
    - Como la app esta en modo External sin verificar todavia, Google muestra un aviso **"Google no verifico esta app"**. Es esperado: haz clic en **"Configuracion avanzada" → "Ir a Greenhouse Search Console"** para continuar.

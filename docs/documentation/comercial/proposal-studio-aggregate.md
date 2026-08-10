@@ -1,9 +1,9 @@
 # Proposal Studio — el aggregate `Proposal` y su gobernanza (F0)
 
 > **Tipo de documento:** Documentación funcional (lenguaje simple)
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-07-12 por Claude (TASK-1392)
-> **Última actualización:** 2026-07-12 por Claude
+> **Última actualización:** 2026-08-10 por Claude (TASK-1388 — Propuestas vive dentro de Admin Center → Equipo y operaciones)
 > **Documentación técnica:** [GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md) (§0) · [COMMERCIAL_TENDERS_AGENT_INVARIANTS.md](../../architecture/agent-invariants/COMMERCIAL_TENDERS_AGENT_INVARIANTS.md)
 
 ## Para qué sirve
@@ -32,8 +32,8 @@ Antes de esta capacidad, una licitación o propuesta comercial vivía repartida 
 
 Cada artefacto de una propuesta (deck, oferta técnica, oferta económica…) ahora **versiona solo**: al
 adjuntar un archivo nuevo del mismo tipo, el sistema deriva la próxima versión (v1, v2, v3…) — nadie la
-declara a mano y no puede haber duplicados. La página **Administración → Propuestas**
-(`/admin/commercial/proposals`, roles `efeonce_admin`/`efeonce_account`) muestra la lista con estados y
+declara a mano y no puede haber duplicados. La página **Admin Center → Equipo y operaciones → Propuestas**
+(zona Administración del menú, `/admin/commercial/proposals`, roles `efeonce_admin`/`efeonce_account`) muestra la lista con estados y
 deadlines, y un panel lateral con el historial de versiones por tipo y **descarga del archivo real**.
 Los documentos marcados **Interno** nunca cruzan a un usuario cliente (la página completa es invisible
 para tenants client, y el endpoint devuelve 403). Manual: [Propuestas en el portal](../../manual-de-uso/comercial/descargar-propuestas-portal.md).

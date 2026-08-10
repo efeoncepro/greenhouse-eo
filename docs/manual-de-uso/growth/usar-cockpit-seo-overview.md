@@ -1,6 +1,7 @@
 > **Tipo de documento:** Manual de uso (operador del portal)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-08-06 por Claude (TASK-1306)
+> **Ultima actualizacion:** 2026-08-10 por Claude (TASK-1388 — Growth vive como seccion del dominio Comercial)
 > **Documentacion funcional:** [modulo-seo-search-visibility-360.md](../../documentation/growth/modulo-seo-search-visibility-360.md)
 
 # Usar el cockpit SEO (Search Visibility)
@@ -26,7 +27,7 @@ Ademas, para que haya numeros el Space debe tener **Search Console conectado**
 
 ## Paso a paso
 
-1. Entra por **Growth → SEO** en el menu lateral.
+1. En el menu lateral, zona **Operacion**, abre el dominio **Comercial → Growth → SEO**.
 2. Elige el Space en el selector de arriba a la derecha. La eleccion queda en la URL
    (`?space=...`), asi que **puedes compartir el enlace** y quien lo abra vera el mismo
    Space (si tiene acceso).

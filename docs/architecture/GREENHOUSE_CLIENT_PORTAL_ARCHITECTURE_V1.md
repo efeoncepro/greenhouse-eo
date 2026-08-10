@@ -260,7 +260,9 @@ Se renderizan si `capabilityModules.length > 0` y `canSeeView('cliente.modulos')
 
 ### Gap: seccion "Mi Ficha"
 
-Existe una seccion "Mi Ficha" con 7 items (assignments, performance, delivery, perfil, payroll, permisos, organizacion) que solo se muestra si el usuario tiene route group `my`. Hoy ningun rol de cliente incluye `my`, pero la infraestructura esta lista si se quisiera habilitar una experiencia de colaborador para usuarios que son a la vez cliente y colaborador.
+Existe una seccion "Mi Ficha" que solo se muestra si el usuario tiene route group `my`. Hoy ningun rol de cliente incluye `my`, pero la infraestructura esta lista si se quisiera habilitar una experiencia de colaborador para usuarios que son a la vez cliente y colaborador.
+
+Desde TASK-1388/TASK-1686 las hojas de esa seccion salen del builder canonico `src/lib/navigation/my-nav-items.ts` (`buildMyNavItems`), el mismo que sirve el dropdown del avatar de los usuarios internos. El **colaborador puro** (`my` sin `internal` ni `client`) ya no cae en el menu cliente: tiene su propio predicado en `VerticalMenu.tsx` con rail = `/my` + seccion "Mi Ficha" + plataforma concedida, sin destinos cliente. Para usuarios my+client el menu cliente conserva su salida vigente sin cambios.
 
 ---
 

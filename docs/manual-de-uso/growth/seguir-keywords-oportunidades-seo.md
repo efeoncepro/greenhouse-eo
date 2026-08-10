@@ -1,7 +1,7 @@
 > **Tipo de documento:** Manual de uso (operador del portal)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-08-07 por Claude (TASK-1308)
-> **Ultima actualizacion:** 2026-08-07 por Claude (TASK-1308 — verificacion contra la pantalla construida: banda de veredicto, orden y paginado, columnas de mercado ocultas, nombre real de la columna de seguimiento)
+> **Ultima actualizacion:** 2026-08-10 por Claude (TASK-1388 — Growth vive como seccion del dominio Comercial)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §7 y §10.4
 
 # Oportunidades de Keywords — Leer el mapa y seguir keywords
@@ -22,7 +22,7 @@ de posicion. La pantalla vive en `Growth > SEO > Keywords` (`/admin/growth/seo/k
 
 ## Paso a paso
 
-1. Entra a `Growth > SEO` y abre la tab **Keywords**.
+1. Entra a `Comercial > Growth > SEO` (zona Operacion del menu lateral) y abre la tab **Keywords**.
 2. Elige el Space en el selector de arriba. El `?space=` de la URL es compartible, pero si el Space no
    tiene el modulo vigente el portal cae al primero elegible — no es un atajo para saltarse el permiso.
 3. Elige la **ventana** (28 o 90 dias). Define sobre que periodo se pondero la posicion.

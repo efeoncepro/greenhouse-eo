@@ -1,11 +1,21 @@
 # Greenhouse Sidebar Architecture
 
 > **Tipo de documento:** Spec de arquitectura (documento vivo)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-04-11 por Claude (auditoria completa del sidebar)
-> **Ultima actualizacion:** 2026-05-07 — TASK-555 agrega `routeGroup: commercial` y view codes `comercial.*` sobre paths legacy `/finance/...`.
+> **Ultima actualizacion:** 2026-08-10 — TASK-1388 + TASK-1686 supersede el inventario de secciones internas de este doc (ver nota de status).
 > **Archivo fuente:** `src/components/layout/vertical/VerticalMenu.tsx`
-> **Documentacion tecnica:** `GREENHOUSE_IDENTITY_ACCESS_V2.md`, `GREENHOUSE_UI_PLATFORM_V1.md`
+> **Documentacion tecnica:** `GREENHOUSE_IDENTITY_ACCESS_V2.md`, `docs/architecture/ui-platform/README.md`
+
+> ⚠️ **Status (2026-08-10):** el inventario de secciones/items INTERNAS de este documento (§2.2, §3.1, §4.1–4.6, §5, §7, §9) describe la estructura previa a `TASK-1388` y quedó **superseded**. El runtime vigente es:
+>
+> - **Sidebar interno = 3 zonas `isSection`** — `Operación` (dominios acordeón `Agencia · Comercial · Finanzas · Personas`), `Administración` (Admin Center) y `Recursos` (Knowledge + Design System) — con acordeón nativo Vuexy (un dominio abierto a la vez). "Spaces (admin)" desambiguado, Sample Sprints con hogar único en Comercial, Growth como sección de Comercial.
+> - **Las hojas personales `/my/*` ya NO viven en el sidebar interno**: viven en el dropdown del avatar (`UserDropdown`), servidas por el builder canónico `src/lib/navigation/my-nav-items.ts` (`buildMyNavItems`, 13 hojas + `MY_NAV_HOME` + gates dinámicos). Declaradas alcanzables vía `via: 'avatar-dropdown'` en `route-reachability-manifest.ts`.
+> - **Colaborador puro** (`isMyUser && !isInternalPortalUser && !isClientUser`, `TASK-1686`): rail = `/my` + sección `Mi Ficha` (builder) + plataforma concedida; avatar = identidad + Mi Perfil + salir. Los perfiles my+client/client/internal conservan su salida vigente.
+> - **`NavSearch` fue eliminada** (`src/components/layout/shared/search/` borrada; `src/data/navigation/verticalMenuData.tsx` borrado). La única palette ⌘K es la `CommandPalette` de TASK-696 (`src/components/greenhouse/CommandPalette/`), montada globalmente vía `src/components/layout/shared/GlobalCommandPalette.tsx` (filtro de audiencia routeGroup+authorizedViews, recientes client-side, acción de salir).
+> - Labels de zonas/dominios/secciones tokenizados en `GH_INTERNAL_NAV` (`src/config/greenhouse-nomenclature.ts`) + espejo en-US.
+>
+> El menú **cliente** (§3.2, §4.7) no cambió con TASK-1388. Las reglas de permisos (§2.3), reglas de extensión (§10) y archivos clave (§11) siguen vigentes en lo conceptual; ante cualquier duda, la fuente de verdad es `VerticalMenu.tsx` + `my-nav-items.ts` + las specs `docs/tasks/complete/TASK-1388-vertical-menu-restructure.md` y `docs/tasks/complete/TASK-1686-pure-collaborator-navigation.md`.
 
 ---
 
@@ -425,3 +435,4 @@ Submenus    → Agrupar por dominio/workflow, no por tipo de dato
 | Fecha | Version | Cambio |
 |-------|---------|--------|
 | 2026-04-11 | 1.0 | Documento inicial. Inventario completo de 67 rutas, 54 view codes, 5 variantes por rol. Hallazgos de densidad, iconos duplicados, labels hardcodeados documentados. |
+| 2026-08-10 | 1.1 | TASK-1388 + TASK-1686 supersede el inventario interno: 3 zonas `isSection` con acordeón de dominios, `/my/*` al dropdown del avatar (`buildMyNavItems`), `NavSearch` eliminada (⌘K único = `CommandPalette` vía `GlobalCommandPalette`), predicado colaborador puro. Nota de status agregada al encabezado; el detalle vive en las task-specs. |

@@ -1,7 +1,7 @@
 # Alta de una surface Growth Form (checklist end-to-end)
 
 > **Tipo:** Manual de uso / runbook operativo
-> **Version:** 1.1 — 2026-07-05 (Codex, TASK-1327 production lessons)
+> **Version:** 1.2 — 2026-08-10 (Claude, TASK-1388 — Growth vive como seccion del dominio Comercial)
 > **Doc funcional:** [docs/documentation/growth/motor-formularios-publicos.md](../../documentation/growth/motor-formularios-publicos.md)
 > **Contrato runtime:** [docs/architecture/growth-public-forms-runtime-contract.md](../../architecture/growth-public-forms-runtime-contract.md)
 > **Runbook hermano:** [Operar el Motor de Formularios de Growth](operar-motor-formularios.md) · [Incrustar el formulario (WordPress/Astro)](incrustar-formulario-wordpress-astro.md)
@@ -29,7 +29,7 @@ Regla: si tu form es Tier 1, **no deberías escribir código**. Si te encuentras
 
 ### A. Publicar el form
 
-1. **Growth → Forms** (`/admin/growth/forms`) → **Nuevo formulario** (o versionar uno existente).
+1. **Comercial → Growth → Forms** (zona Operación del menú lateral, `/admin/growth/forms`) → **Nuevo formulario** (o versionar uno existente).
 2. Declarar campos, consentimiento, retención y **success behavior**.
 3. **Publicar.** El motor no publica si falta consentimiento/retención/behavior; si falta algo, lo dice.
 4. Anotar el **`form_key`** (UUID estable, público/opaco) — es lo que va en el embed. **No** es el HubSpot `formGuid`.

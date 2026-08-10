@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-06-25 por Claude (TASK-1229)
-> **Ultima actualizacion:** 2026-07-07 por Codex (SEO Growth Form premium select overlay + WordPress host pattern)
+> **Ultima actualizacion:** 2026-08-10 por Claude (TASK-1388 — Growth vive como seccion del dominio Comercial en el menu)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md)
 
 # Motor de Formularios Publicos de Growth
@@ -114,7 +114,7 @@ El mismo formulario se ve igual en WordPress, en Astro y en la vista interna de 
 
 ## Cockpit operativo — TASK-1232
 
-Greenhouse ya tiene un cockpit interno para operar el motor sin SQL ni portal externo: **Growth → Forms** (`/admin/growth/forms`, viewCode `administracion.growth_forms`).
+Greenhouse ya tiene un cockpit interno para operar el motor sin SQL ni portal externo: **Comercial → Growth → Forms** (zona Operación del menú lateral, `/admin/growth/forms`, viewCode `administracion.growth_forms`).
 
 El cockpit es un command center operativo, no un builder visual completo. Permite:
 
@@ -123,7 +123,7 @@ El cockpit es un command center operativo, no un builder visual completo. Permit
 - enviar a review, publicar, deprecar, archivar y ejecutar dispatch;
 - inspeccionar consent snapshot, delivery attempts, retry queue y dead letters con degradacion honesta.
 
-La UI consume readers/APIs del motor (`src/lib/growth/forms/**`, `/api/admin/growth/forms/**`) y usa primitives canónicas de Greenhouse (`CompositionShell`, `AdaptiveSidecarLayout`, breadcrumbs, buttons, chips, motion y tokens tipográficos). La navegación top-level es **Growth → Forms**.
+La UI consume readers/APIs del motor (`src/lib/growth/forms/**`, `/api/admin/growth/forms/**`) y usa primitives canónicas de Greenhouse (`CompositionShell`, `AdaptiveSidecarLayout`, breadcrumbs, buttons, chips, motion y tokens tipográficos). En el menú, Growth ya no es un grupo top-level: la ruta de navegación es **Comercial → Growth → Forms** (zona Operación).
 
 Primeros forms reales observados: **AI Visibility Grader** (`fdef-ai-visibility-grader`) como anchor interno del motor, y **AEO Diagnostic** (`fdef-efeonce-aeo-diagnostic`) como primer submit productivo publico en WordPress. El AEO prueba el motor publico + HubSpot destination + CORS + Turnstile + renderer `<greenhouse-form>` live con variante `diagnostic_premium`.
 

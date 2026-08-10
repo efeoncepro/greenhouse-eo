@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-05-05 por agente (TASK-753)
-> **Ultima actualizacion:** 2026-05-05 por agente (TASK-753)
+> **Ultima actualizacion:** 2026-08-10 por Claude (TASK-1388/TASK-1686 — acceso via menu del avatar para usuarios internos)
 > **Documentacion tecnica:** `docs/tasks/complete/TASK-753-payment-profiles-self-service.md`, `docs/architecture/GREENHOUSE_PAYMENT_ORDERS_ARCHITECTURE_V1.md`
 
 # Mi Cuenta de Pago — Self-service del colaborador
@@ -21,7 +21,8 @@ Finance sigue siendo quien aprueba — el colaborador NUNCA puede aprobar su pro
 
 ## Donde se ve
 
-- **Menu lateral** → "Mi Ficha" → **Mi Cuenta de Pago** (icon `tabler-credit-card`).
+- **Usuarios internos**: **menu del avatar** (esquina superior derecha) → **Mi Cuenta de Pago** (icon `tabler-credit-card`). Las paginas personales ya no viven en el menu lateral interno.
+- **Colaborador puro** (solo rol Colaborador): menu lateral → seccion **Mi Ficha** → **Mi Cuenta de Pago**.
 - **Tab dentro de Mi Perfil** (`/my/profile`) → **Cuenta de pago**.
 - Ambas surfaces muestran lo mismo y son intercambiables (single source of truth en codigo).
 

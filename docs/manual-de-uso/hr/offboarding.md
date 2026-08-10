@@ -1,9 +1,9 @@
 # Offboarding
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-05-04 por Codex
-> **Ultima actualizacion:** 2026-05-15 por Claude Opus (TASK-892 — closure completeness 4 capas + capas pendientes UI)
+> **Ultima actualizacion:** 2026-08-10 por Claude (TASK-1388 — ruta de menu: dominio Personas en la zona Operacion)
 > **Modulo:** HR / Workforce
 > **Ruta en portal:** `/hr/offboarding`
 > **Documentacion relacionada:** [Offboarding laboral y contractual](../../documentation/hr/offboarding.md), [GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md)
@@ -20,7 +20,7 @@ La vista `Offboarding` permite abrir y operar casos de salida laboral o contract
 
 ## Crear un caso manual
 
-1. Entra a `Personas y HR > Supervision > Offboarding`.
+1. En el menu lateral, zona **Operacion**, abre el dominio `Personas > Supervision > Offboarding`.
 2. Haz clic en `Nuevo caso`.
 3. En el drawer, selecciona el colaborador.
 4. Elige la causal.

@@ -35,6 +35,8 @@ Greenhouse modules (CLAUDE.md authoritative):
 
 NEVER invent a parallel module. NEVER deep-link a feature outside its module without a strong reason. Extensions go inside the module that owns the domain.
 
+**Internal sidebar structure (TASK-1388/1686, 2026-08-10):** the internal rail has 3 `isSection` zones — **Operación** (dominios Agencia / Comercial / Finanzas / Personas), **Administración** (Admin Center), **Recursos** (Knowledge + Design System) — with Vuexy default accordion. **`/my/*` leaves for internal users do NOT live in the sidebar**: they live in the avatar `UserDropdown` (reachability `via: 'avatar-dropdown'` in `route-reachability-manifest.ts`). The canonical builder for personal nav is `buildMyNavItems` in `src/lib/navigation/my-nav-items.ts` — consumed by `UserDropdown` (internal users) and by the pure-collaborator rail. Pure collaborator (`routeGroups=['my']`) gets its own projection (predicate `isPureCollaborator` in `VerticalMenu.tsx` / `UserDropdown.tsx`). Nav labels SoT: `GH_INTERNAL_NAV` in `greenhouse-nomenclature.ts`. `src/data/navigation/verticalMenuData.tsx` was deleted — never reference it.
+
 ### 2. URL design — REST hierarchy + es-CL slugs
 
 ```
@@ -94,13 +96,13 @@ NEVER rename a module / surface / KPI without updating nomenclature.ts. Validate
 - Spaces, NOT "Workspaces"
 - Ciclos, NOT "Iterations"
 
-### 7. Command palette ⌘K — eventually, not V1
+### 7. Command palette ⌘K — SHIPPED (TASK-1388/1686)
 
-Greenhouse does NOT ship ⌘K today. When it lands, follow the global skill's pattern + use Vuexy modal primitive + es-CL copy via `getMicrocopy('aria.commandPalette*')`.
+Greenhouse SHIPS ⌘K today. The only palette is `CommandPalette` (`src/components/greenhouse/CommandPalette/`), mounted globally via `GlobalCommandPalette` (`src/components/layout/shared/GlobalCommandPalette.tsx`): audience filter by routeGroup + authorizedViews, recents in localStorage, salir action. GVC marker: `cmdk-open`. NEVER build a second palette or a parallel global search — the old `NavSearch` (`src/components/layout/shared/search/`) was DELETED; never resurrect it.
 
 ### 8. Search — module-scoped, NOT global
 
-Each module has its own list filter + search (e.g., `/finance/clients?q=foo`). NO global cross-module search V1 — Greenhouse is operational, not exploratory.
+Each module has its own list filter + search (e.g., `/finance/clients?q=foo`). NO global cross-module DATA search — Greenhouse is operational, not exploratory. (The ⌘K `CommandPalette` of §7 is navigation/commands, not a data search — do not grow it into one.)
 
 ### 9. Mega menu — NO
 
@@ -125,4 +127,5 @@ Every page MUST show:
 
 ## Version
 
+- **v1.1** — 2026-08-10 — TASK-1388/1686 sync: 3-zone internal sidebar + `/my/*` re-homed to avatar dropdown (`buildMyNavItems`); ⌘K `CommandPalette` shipped (NavSearch deleted).
 - **v1.0** — 2026-05-11 — Initial overlay.

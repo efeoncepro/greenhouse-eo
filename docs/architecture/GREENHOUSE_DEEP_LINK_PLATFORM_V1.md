@@ -388,12 +388,10 @@ El menu debe converger gradualmente desde `href` inline a referencias canonicas 
 
 ### 8.2 Command palette / search
 
-Search no debe depender de `src/data/searchData.ts` como lista estatica. Debe derivar destinos de:
+Estado 2026-08-10 (TASK-1388): la unica palette ⌘K del portal es la `CommandPalette` de TASK-696 (`src/components/greenhouse/CommandPalette/`), montada globalmente via `src/components/layout/shared/GlobalCommandPalette.tsx`. Ya deriva sus rutas de `VIEW_REGISTRY` filtrado por audiencia (routeGroup + authorizedViews) + recientes client-side; la `NavSearch` legacy (que exponia `searchData.ts` estatico) fue eliminada. Convergencia pendiente:
 
-- `VIEW_REGISTRY`
-- `DeepLinkRegistry`
-- permisos efectivos del usuario
-- entidades recientes o buscadas si aplica
+- `DeepLinkRegistry` como fuente adicional de destinos
+- entidades recientes o buscadas server-aware si aplica
 
 ### 8.3 Notificaciones
 
@@ -518,7 +516,7 @@ Reglas:
 
 ### Slice 3 — Search y menu
 
-- Generar command palette desde registry + permissions.
+- ~~Generar command palette desde registry + permissions.~~ Hecho por TASK-1388 (2026-08-10): `GlobalCommandPalette` deriva de `VIEW_REGISTRY` + permisos de audiencia (ver §8.2). Falta la integracion con `DeepLinkRegistry`.
 - Reconciliar `VIEW_REGISTRY.routePath` con `DeepLinkRegistry`.
 - Marcar rutas legacy sin definition.
 

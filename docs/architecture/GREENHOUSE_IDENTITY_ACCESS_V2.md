@@ -1030,37 +1030,29 @@ Los valores legacy persistidos se reescriben por compatibilidad antes de produci
 
 ## Sidebar Composition
 
-The sidebar is built dynamically from the session's `routeGroups`.
+The sidebar is built dynamically from the session's `routeGroups` (plus `authorizedViews` via `canSeeView`); source of truth is `src/components/layout/vertical/VerticalMenu.tsx`.
 
 TASK-555 detail: the internal portal shell is selected for operational route groups (`commercial`, `finance`, `hr`, `people`, `ai_tooling`, `admin`, `internal`) so a pure domain role is not rendered as a client portal user. `startup policy` remains unchanged; `commercial` does not introduce a new home policy in this cut.
 
-### Sidebar sections
+### Internal sidebar zones (TASK-1388)
 
-Each route group maps to a sidebar section with its own navigation items. Sections only render if the user has the corresponding route group.
+Since TASK-1388 the internal sidebar is organized in **3 `isSection` zones**, with a native Vuexy accordion inside `Operación` (one domain open at a time). Domains and sections only render if the user has the corresponding route groups / views.
 
-| Section           | Route Group  | Nav Items                                                                       |
-| ----------------- | ------------ | ------------------------------------------------------------------------------- |
-| **Mi Greenhouse** | `my`         | Mi Perfil, Mis Permisos, Mi Asistencia, Mis Gastos, Mis Herramientas, Mi Nómina |
-| **Pulse**         | `client`     | Dashboard, Proyectos, Ciclos, Equipo, Campañas                                  |
-| **Agencia**       | `internal`   | Pulse Global, Clientes, Capacidad, Riesgos, KPIs                                |
-| **Personas**      | `people`     | Directorio, Detalle                                                             |
-| **HR**            | `hr`         | Permisos, Asistencia, Organización, Nómina, Aprobaciones                        |
-| **Finanzas**      | `finance`    | Dashboard, Ingresos, Egresos, Proveedores, Clientes, Conciliación               |
-| **AI & Tools**    | `ai_tooling` | Catálogo, Licencias, Wallets, Consumos                                          |
-| **Admin**         | `admin`      | Spaces, Usuarios, Roles, Scopes, Feature Flags                                  |
+| Zone               | Contents                                                                                     | Gate                          |
+| ------------------ | -------------------------------------------------------------------------------------------- | ----------------------------- |
+| **Operación**      | Domain accordions `Agencia · Comercial · Finanzas · Personas` (Growth is a Comercial section) | Per-domain route groups/views |
+| **Administración** | Admin Center                                                                                  | `admin`                       |
+| **Recursos**       | Knowledge + Design System                                                                     | Per-item views                |
 
-### Section ordering in sidebar
+The personal `/my/*` leaves do **not** live in the internal sidebar anymore: they live in the avatar dropdown (`UserDropdown`), served by the canonical builder `src/lib/navigation/my-nav-items.ts` (`buildMyNavItems`, 13 leaves + `MY_NAV_HOME` + dynamic gates), declared reachable via `via: 'avatar-dropdown'` in `route-reachability-manifest.ts`.
 
-Fixed order:
+### Pure collaborator (TASK-1686)
 
-1. Mi Greenhouse (personal, always first if present)
-2. Pulse (client context)
-3. Agencia (cross-tenant)
-4. Personas
-5. HR
-6. Finanzas
-7. AI & Tools
-8. Admin (always last if present)
+A **pure collaborator** (`isMyUser && !isInternalPortalUser && !isClientUser`) gets: rail = `/my` + `Mi Ficha` section (same builder) + any granted platform items; avatar dropdown = identity + Mi Perfil + sign out. No client destinations render for this profile. Users with my+client, client-only or internal profiles keep their existing menus unchanged.
+
+### Client sidebar
+
+The client menu (Pulse, Proyectos, Ciclos, Módulos, Mi Cuenta, Mi Ficha for my+client users) was not restructured by TASK-1388; see `GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md`.
 
 ## Audit Model
 

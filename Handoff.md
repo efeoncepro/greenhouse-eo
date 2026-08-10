@@ -12,6 +12,16 @@ reachability 0 orphans); GVC con `agent-collaborator` + baselines durables promo
 TASK-1685 hereda TRES consumers del predicado de visibilidad (Delta escrito allá); la deuda
 `aria-expanded` del chrome @menu sigue siendo la única abierta (dueña: scorecard TASK-1388).
 
+**Barrido documental post-cierre (3 subagentes, mismo día):** 29 docs/skills sincronizados con la
+navegación nueva — 7 de arquitectura (status de `GREENHOUSE_SIDEBAR_ARCHITECTURE_V1` superseded,
+Identity Access §Sidebar Composition reescrita, deep-link §palette, invariantes de shortcuts), 21
+funcionales/manuales (todas las rutas de menú "Growth top-level"/"Personas y HR"/"Mi Ficha en
+sidebar" → estructura vigente, con version bump), la skill `info-architecture`, manual NUEVO
+`docs/manual-de-uso/plataforma/navegar-el-portal.md` (las 3 superficies — el ⌘K no tenía doc en
+ninguna parte) y `src/data/searchData.ts` borrado (huérfano sin consumers tras retirar NavSearch;
+typecheck verde). Pendiente decidible: `roadmap-cockpit.md` internamente inconsistente (pre-existente
+a estas tasks — su ítem de menú se retiró el 2026-07-15 y el paso a paso aún lo cita).
+
 ### TASK-1388 CERRADA — la navegación interna repartida en sus 3 superficies (2026-08-10)
 
 Implementación completa en `develop`, autorizada a cierre total por el operador ("termina todo lo que

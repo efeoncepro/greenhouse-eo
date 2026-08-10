@@ -1,7 +1,7 @@
 > **Tipo de documento:** Manual de uso (runbook operador)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-07-17 por Claude (TASK-1276)
-> **Ultima actualizacion:** 2026-07-17 por Claude (TASK-1276)
+> **Ultima actualizacion:** 2026-08-10 por Claude (TASK-1388 — Growth vive como seccion del dominio Comercial)
 > **Documentacion tecnica:** [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 
 # Vista operador AEO — cockpit, plan y cross-sell
@@ -16,7 +16,7 @@ informe abriendo una oportunidad comercial (Lead de HubSpot).
 
 - Necesitas un rol interno del set operador (admin, account, operations o ai tooling). Los roles de
   portal cliente no ven estas rutas.
-- La sección vive en el menú **Growth → AEO** (`/growth/aeo`). No está en Admin Center.
+- La sección vive en el menú lateral, zona **Operación**, dominio **Comercial → Growth → AEO** (`/growth/aeo`). No está en Admin Center.
 - Para enviar informes se necesita además: un informe **publicado** del cliente y el flag de envío
   encendido en el ambiente (si está apagado, el botón lo indica).
 
