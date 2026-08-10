@@ -56,6 +56,12 @@ export interface CommandPaletteProps {
   triggerLabel?: string
   showTrigger?: boolean
   enableGlobalShortcut?: boolean
+
+  /** TASK-1388 — trigger icon-only (mobile / layout horizontal). */
+  compactTrigger?: boolean
+
+  /** TASK-1388 — notifica cada navegación elegida (el caller registra recientes). */
+  onNavigate?: (route: PaletteRoute) => void
 }
 
 const DEFAULT_ICON_FOR_SECTION: Record<GovernanceSection, string> = {
@@ -148,7 +154,9 @@ export const CommandPalette = ({
   recentItems,
   triggerLabel = 'Buscar ⌘K',
   showTrigger = true,
-  enableGlobalShortcut = true
+  enableGlobalShortcut = true,
+  compactTrigger = false,
+  onNavigate
 }: CommandPaletteProps) => {
   const router = useRouter()
   const currentPath = usePathname() ?? '/'
@@ -183,9 +191,10 @@ export const CommandPalette = ({
     if (!open && search) setSearch('')
   }, [open, search])
 
-  const handleNavigate = (routePath: string) => {
+  const handleNavigate = (route: PaletteRoute) => {
     setOpen(false)
-    router.push(routePath)
+    onNavigate?.(route)
+    router.push(route.routePath)
   }
 
   const handleAction = (action: PaletteAction) => {
@@ -198,12 +207,12 @@ export const CommandPalette = ({
       {showTrigger ? (
         <button
           type='button'
-          className='gh-cmdk-trigger'
+          className={compactTrigger ? 'gh-cmdk-trigger gh-cmdk-trigger--compact' : 'gh-cmdk-trigger'}
           onClick={() => setOpen(true)}
           aria-label={TASK407_ARIA_ABRIR_BUSCADOR_RAPIDO}
         >
           <i className='tabler-search' />
-          <span>{triggerLabel}</span>
+          {compactTrigger ? null : <span>{triggerLabel}</span>}
         </button>
       ) : null}
       <Dialog open={open} onOpenChange={setOpen}>
@@ -234,7 +243,7 @@ export const CommandPalette = ({
                         value={`${item.label} ${item.viewCode} reciente`}
                         routePath={item.routePath}
                         currentPath={currentPath}
-                        onSelect={() => handleNavigate(item.routePath)}
+                        onSelect={() => handleNavigate(item)}
                       >
                         <i className={item.icon ?? DEFAULT_ICON_FOR_SECTION[item.section]} />
                         <span>{item.label}</span>
@@ -268,7 +277,7 @@ export const CommandPalette = ({
                         routePath={item.routePath}
                         currentPath={currentPath}
                         shortcut={item.shortcut}
-                        onSelect={() => handleNavigate(item.routePath)}
+                        onSelect={() => handleNavigate(item)}
                       >
                         <i className={item.icon ?? DEFAULT_ICON_FOR_SECTION[group.section]} />
                         <span>{item.label}</span>

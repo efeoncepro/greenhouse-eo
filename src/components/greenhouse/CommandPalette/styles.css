@@ -204,3 +204,15 @@
 .gh-cmdk-trigger i {
   font-size: 16px;
 }
+
+/* TASK-1388 — trigger icon-only (mobile / layout horizontal): sin borde ni label,
+   se comporta como los IconButton vecinos de la topbar. */
+.gh-cmdk-trigger--compact {
+  border: 0;
+  background: transparent;
+  padding: 8px;
+}
+
+.gh-cmdk-trigger--compact i {
+  font-size: 22px;
+}

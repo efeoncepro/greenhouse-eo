@@ -6,7 +6,7 @@ import classnames from 'classnames'
 // Component Imports
 import NavToggle from './NavToggle'
 import Logo from '@components/layout/shared/Logo'
-import NavSearch from '@components/layout/shared/search'
+import GlobalCommandPalette from '@components/layout/shared/GlobalCommandPalette'
 import ModeDropdown from '@components/layout/shared/ModeDropdown'
 import ShortcutsDropdown from '@components/layout/shared/ShortcutsDropdown'
 import NotificationDropdown from '@components/layout/shared/NotificationsDropdown'
@@ -38,7 +38,7 @@ const NavbarContent = ({ avatarUrl = null }: Props) => {
       <div className='flex items-center gap-4'>
         <NavToggle />
         {!isBreakpointReached && <Logo />}
-        <NavSearch />
+        <GlobalCommandPalette />
       </div>
       <div className='flex items-center gap-1'>
         <ModeDropdown />
