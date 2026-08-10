@@ -34,7 +34,7 @@ Verificado contra el runtime que TASK-1388 dejó en `develop` (commits `814b8b08
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
