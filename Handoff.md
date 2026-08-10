@@ -1,5 +1,17 @@
 # Handoff activo
 
+### TASK-1686 CERRADA — el colaborador puro tiene su propia proyección (2026-08-10)
+
+Implementada el mismo día que su antecesora TASK-1388, en `develop` (4 slices, local): predicado
+`isPureCollaborator` en rail y avatar — el colaborador ve SOLO su portal (rail `/my` + Mi Ficha +
+plataforma concedida; avatar identidad + Mi Perfil + salir), se cerraron los shortcuts cliente sin
+gating, el heading "Mi Cuenta" vacío y el borde de claims vacíos; el trigger del avatar es un botón
+semántico cross-audiencia. my+client/client/internal byte-equivalentes fijado por tests de control
+(19+7). Gates TODOS verdes (suite full 10.460, build prod, 4 gates UI con scorecard 5.0,
+reachability 0 orphans); GVC con `agent-collaborator` + baselines durables promovidos. Continuidad:
+TASK-1685 hereda TRES consumers del predicado de visibilidad (Delta escrito allá); la deuda
+`aria-expanded` del chrome @menu sigue siendo la única abierta (dueña: scorecard TASK-1388).
+
 ### TASK-1388 CERRADA — la navegación interna repartida en sus 3 superficies (2026-08-10)
 
 Implementación completa en `develop`, autorizada a cierre total por el operador ("termina todo lo que
@@ -17,14 +29,6 @@ zonas queda como validación posterior NO bloqueante (rename = 1 línea en `GH_I
 conocido del chrome: `@menu` no expone `aria-expanded` en triggers de submenú (intocable; estado
 canónico = clase `ts-open`, documentado en el scorecard) — decidir como deuda de chrome aparte;
 (4) la rama no-interna del menú quedó con punto de extensión limpio para `TASK-1685` (Delta escrito).
-
-### TASK-1686 — navegación de colaborador puro creada (2026-08-10)
-
-Quedó registrada la follow-up de TASK-1388 para separar colaborador puro de cliente en rail y avatar:
-preserva `/my` + `Mi Ficha` como índice personal, limita el avatar a identidad/`Mi Perfil`/salir,
-y no toca autorización ni deep links (frontera explícita de TASK-1685). Incluye contrato UX, dirección,
-wireframe, flow, matriz de 5 audiencias y GVC premium con `agent-collaborator`; `task:lint`,
-wireframe/flow checks y documentación quedaron verdes.
 
 ### ⛔ PARAR ACÁ — decisión pendiente del portal cliente, y una advertencia sobre esta sesión (2026-08-09)
 

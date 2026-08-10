@@ -84,6 +84,8 @@ No new hardcoded client copy is introduced.
 
 ## GVC Scenario Plan
 
+- Scenario file: `scripts/frontend/scenarios/task-1686-pure-collaborator-navigation.scenario.ts` (primario, dual-viewport) + `scripts/frontend/scenarios/task-1686-pure-collaborator-mobile-drawer.scenario.ts` (drawer 390px).
+
 - Quality profile: `premium`.
 - Identity and route: `agent-collaborator@greenhouse.efeonce.org` storage state, `/my`; no superadmin substitution.
 - Viewports: desktop 1440×900 and mobile 390×844.

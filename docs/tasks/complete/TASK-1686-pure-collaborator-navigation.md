@@ -6,6 +6,30 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-10 (cierre) — implementada y verificada en local
+
+**Los 4 slices ejecutados en `develop`** (commits `68c45261e` Slice 1 · `81fe0712a` Slice 2 · Slice 3 ·
+Slice 4 con GVC/baselines/scorecard). Resultado por superficie:
+
+- **Rail collaborator**: predicado `isPureCollaborator` (my && !internal && !client) con proyección
+  propia — home `/my` + sección Mi Ficha (builder canónico) + plataforma concedida. Cierra el borde de
+  claims vacíos Y el heading "Mi Cuenta" vacío. `my+client` conserva su salida vigente byte-a-byte
+  (test de control). Copy: key nueva `GH_MY_NAV.fichaSection` + home tokenizado.
+- **Avatar collaborator**: identidad + Mi Perfil (si hay grant) + salir; cero shortcuts cliente (antes
+  SIN gating), cero espejo de hojas. **Trigger semántico cross-audiencia**: ButtonBase único con
+  aria-label/haspopup/expanded/controls, teclado nativo, Esc + restore de foco (consolida el doble
+  anchorRef y el onClick del BadgeContentSpan).
+- **Tests**: 19 en `VerticalMenu.test.tsx` (control 5 audiencias + contrato negativo) + 7 en
+  `UserDropdown.test.tsx` (nuevo). Suite full 10.460 verde.
+- **GVC**: 2 scenarios con `agent-collaborator` (13 frames mirados), probes de focus ring verdes en
+  rail/trigger/toggle, baselines durables promovidos, scorecard 5.0 (pass). Gotchas documentados en
+  los scenarios: la palette abierta se traga el Tab de los probes (se cierra con Esc antes), y el 422
+  de `/api/my/dashboard` es el canónico `member_identity_not_linked` de la persona agente (ignorado
+  con scope + rationale, no silenciado global).
+- **Gates**: design-contract:lint · ui:code-lint · ui:visual-gate · ui:quality (5.0/5.0) ·
+  route-reachability (0 orphans, manifest sin cambios — sus razones siguen describiendo runtime) ·
+  task:lint 0/0.
+
 ## Delta 2026-08-10 — revisión post-cierre de TASK-1388: la task SIGUE teniendo cabida, con el gap re-dimensionado
 
 Verificado contra el runtime que TASK-1388 dejó en `develop` (commits `814b8b088`…`7f21e3d14`) + la DB:
@@ -34,7 +58,7 @@ Verificado contra el runtime que TASK-1388 dejó en `develop` (commits `814b8b08
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -47,7 +71,7 @@ Verificado contra el runtime que TASK-1388 dejó en `develop` (commits `814b8b08
 - Motion: `docs/ui/motion/TASK-1686-pure-collaborator-navigation-motion.md`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Diseño y contrato de implementación completos; no iniciada`
+- Status real: `Implementada y verificada (tests + GVC + gates)`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none`
@@ -391,16 +415,16 @@ N/A — repo-only. Si collaborator no autentica, bloquear evidencia y usar Agent
 
 ## Acceptance Criteria
 
-- [ ] UI profile/flow, wireframe, flow y UI ready yes pasan pnpm task:lint --task TASK-1686.
-- [ ] Rail collaborator = /my + builder + recursos plataforma permitidos; cero rutas/secciones/módulos/copys cliente incluso claim vacío.
-- [ ] Avatar collaborator = identidad + CTA visible/gateada Mi Perfil + salida; cero shortcut cliente/espejo 13 hojas.
-- [ ] Trigger avatar es semántico, nombrado y teclado-accesible; expone relación/estado menú y restore foco.
-- [ ] Gates personales no cambian; client/internal/hybrid/my+client preservan salida.
-- [ ] Ningún guard, registry, assignment ni ruta cambia; test prueba deep-link policy inalterada.
-- [ ] Tests focales cubren positivos/negativos cinco audiencias.
-- [ ] Reachability pasa; manifest sólo cambia si describe superficie real.
-- [ ] GVC collaborator premium verifica rail/avatar/cmdk/drawer, axe/runtime/layout/focus/reduced motion/scroll-width.
-- [ ] Baseline, dossier y scorecard pasan umbral; no BLOCK enterprise.
+- [x] UI profile/flow, wireframe, flow y UI ready yes pasan pnpm task:lint --task TASK-1686.
+- [x] Rail collaborator = /my + builder + recursos plataforma permitidos; cero rutas/secciones/módulos/copys cliente incluso claim vacío.
+- [x] Avatar collaborator = identidad + CTA visible/gateada Mi Perfil + salida; cero shortcut cliente/espejo 13 hojas.
+- [x] Trigger avatar es semántico, nombrado y teclado-accesible; expone relación/estado menú y restore foco.
+- [x] Gates personales no cambian; client/internal/hybrid/my+client preservan salida.
+- [x] Ningún guard, registry, assignment ni ruta cambia; test prueba deep-link policy inalterada.
+- [x] Tests focales cubren positivos/negativos cinco audiencias.
+- [x] Reachability pasa; manifest sólo cambia si describe superficie real.
+- [x] GVC collaborator premium verifica rail/avatar/cmdk/drawer, axe/runtime/layout/focus/reduced motion/scroll-width.
+- [x] Baseline, dossier y scorecard pasan umbral; no BLOCK enterprise.
 
 ## Verification
 

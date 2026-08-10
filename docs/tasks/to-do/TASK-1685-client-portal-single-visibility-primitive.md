@@ -10,6 +10,11 @@
   reemplaza `canSeeView`, el builder recibe el predicado por parámetro en un solo lugar.
 - El ⌘K consolidado (`GlobalCommandPalette`) filtra por `routeGroup + authorizedViews` client-side —
   consumidor natural del primitive cuando exista.
+- **TASK-1686 ejecutada (2026-08-10, mismo día):** la rama no-interna ahora bifurca con
+  `isPureCollaborator` (my && !internal && !client) — el colaborador puro tiene proyección propia
+  (rail personal + avatar de 3 gestos) y el carril client quedó byte-equivalente (tests de control en
+  `VerticalMenu.test.tsx` + `UserDropdown.test.tsx`). El Slice 2 de esta task hereda TRES consumers
+  del predicado de visibilidad: la rama client, la rama collaborator (vía `buildMyNavItems`) y el ⌘K.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE

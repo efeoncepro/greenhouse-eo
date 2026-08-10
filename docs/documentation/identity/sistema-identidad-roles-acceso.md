@@ -1,9 +1,9 @@
 # Sistema de Identidad, Roles y Acceso
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.7
+> **Version:** 1.8
 > **Creado:** 2026-04-05 por Claude (TASK-248)
-> **Ultima actualizacion:** 2026-08-10 por Claude (TASK-1388: la navegacion interna se reparte en 3 superficies — sidebar por zonas, Mi Ficha en el avatar, un solo ⌘K)
+> **Ultima actualizacion:** 2026-08-10 por Claude (TASK-1388 + TASK-1686: navegacion interna en 3 superficies y proyeccion propia del colaborador puro)
 > **Documentacion tecnica:** [GREENHOUSE_IDENTITY_ACCESS_V2.md](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md), [GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md](../../architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md), [GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md)
 
 ---
@@ -115,6 +115,13 @@ Cada scope (organizacion, space, proyecto, departamento) puede tener un responsa
 >
 > Las filas de la tabla siguiente describen el CONJUNTO visible por rol, que sigue vigente; leer
 > "Mi Ficha" como "en el menú del avatar" cuando la persona es interna.
+>
+> **Delta 2026-08-10 (TASK-1686) — el colaborador puro tiene su propia proyección.** Quien solo tiene
+> el rol Colaborador (sin roles internos ni cliente) ve un portal SOLO personal: su sidebar es
+> Mi Greenhouse + "Mi Ficha" (sus hojas personales) + los recursos de plataforma que tenga concedidos,
+> y su menú del avatar es identidad + Mi Perfil + cerrar sesión. Ya no ve enlaces del portal cliente
+> (Proyectos, Ciclos, etc.) que antes aparecían aunque no pudiera abrirlos. Quien combina Colaborador
+> con un rol cliente conserva la vista cliente de siempre más su bloque personal.
 
 Cuando alguien inicia sesion, el sistema calcula que secciones del menu mostrar basandose en sus roles:
 

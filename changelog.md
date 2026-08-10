@@ -7,6 +7,25 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-10 — Task planner: un resultado `legacy=1` deja de ser registrable
+
+Se corrigió TASK-1686 para preservar los cinco marcadores HTML `ZONE` del template y se endurecieron los
+planners `.codex` y `.claude`: antes de tocar registry/README o commitear, toda task nueva debe pasar
+`pnpm task:lint --task TASK-###` con `template=1 legacy=0 errors=0 warnings=0`. La salida `legacy=1`,
+aunque tenga cero errores, es un fallo bloqueante. La reparación también completó los contratos
+wireframe/flow/motion/readiness de TASK-1686; no cambió runtime, rutas, acceso ni la implementación de
+la task.
+
+## 2026-08-10 — TASK-1686 cerrada: el colaborador puro deja de ver un portal ajeno
+
+Continuación directa de TASK-1388, mismo día: la rama no-interna del menú bifurca con
+`isPureCollaborator` y el colaborador (solo rol Colaborador) ve exclusivamente su portal — rail =
+Mi Greenhouse + Mi Ficha + recursos concedidos; avatar = identidad + Mi Perfil + salir. Se cierran
+los shortcuts cliente sin gating del avatar, el heading "Mi Cuenta" vacío y el borde de claims
+vacíos. El trigger del avatar pasa a botón semántico (aria + teclado + Esc/restore) para TODAS las
+audiencias. Cliente, interno e híbrido my+client conservan su salida byte-a-byte (tests de control
+19+7). Evidencia GVC con la persona collaborator real, baselines durables y scorecard 5.0.
+
 ## 2026-08-10 — TASK-1388 cerrada: la navegación interna se reparte entre sus 3 superficies
 
 Reequilibrio del portal interno en develop (5 commits, sin push): el rail pasa de 12 grupos top-level
@@ -1196,29 +1215,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
 - El worker de expiry quedó promovido desde Globe `main` con scheduler minutely, flag y observabilidad activos.
   El digest `sha256:d8295862…bae9` pasó deploy exacto, canary y OpenTofu sin drift. Dos holds históricos
   `submission_unknown` se reconcilian/difieren con `failed=0`; no se liberan a ciegas.
-
-## 2026-08-01 — Studio Credits: workbench y self-view desplegados
-
-- TASK-1483 agrega proyecciones fail-closed de pools, grants, budgets, forecast, alertas y ledger, contexto de
-  audience/período/freshness, preview antes del ensure y evidencia navegable sin duplicar lógica económica.
-- TASK-1628 endurece el self-status con coverage/freshness, aislamiento del daily fence, loading/retry/last-good
-  stale, ARIA/foco/click-away y cifra efectiva visible en mobile.
-- Pasaron GVC premium desktop/mobile para el workbench, su drawer mobile y Producer (14 frames), además de
-  teclado, reduced motion, accesibilidad, overflow y runtime. Greenhouse `f899d951b` quedó Ready en staging y
-  Globe `e31518b430b8` desplegó API/Studio con SHA exacto y tráfico 100 %.
-- El smoke Chrome autenticado confirmó ambas superficies, readback 800/800/1500/0/0, daily fence 500/120/380 y
-  cero errores de consola. Fue sólo lectura: no hubo nuevo fondeo, release completo de Greenhouse ni worktree.
-
-## 2026-08-01 — Operación multiagente: checkout compartido único
-
-- Se retiraron dos worktrees temporales de MCP creados incorrectamente y se prohibieron los worktrees, checkouts
-  aislados y carpetas clonadas como workaround operativo. Ante WIP, conflictos o divergencias, los agentes deben
-  preservar el checkout compartido y pedir dirección al operador.
-- El contrato se canonizó en `REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md`, con routers, prompts, skills y la
-  memoria global de Claude alineados; el modelo histórico de worktrees quedó explícitamente superseded.
-- Globe ADR-018 queda actualizado como dirección **continuity-first y native-first para Android/iOS**: React Native +
-  Expo development builds/CNG para la companion, web/PWA como fallback, desktop para composición profunda y Globe
-  cloud como autoridad. El vertical slice debe validar PKCE, deep links, captura, upload interrumpible, push
-  reconciliable, handoff y compatibilidad binary/API; la skill existente `greenhouse-globe`, los docs
-  funcional/manual y Handoff contienen las invariantes. No hay app publicada ni cambios de runtime, flags, auth,
-  push, billing, créditos, providers, distribución ni rollout externo.
