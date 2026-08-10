@@ -78,7 +78,12 @@ const UserDropdown = ({ avatarUrl = null }: Props) => {
 
   const profileHref = myNavItems.find(item => item.href === '/my/profile')?.href ?? null
   const userName = session?.user?.name || ''
-  const userInitials = userName ? getInitials(userName) : null
+
+  // Solo letras/números para las iniciales: un nombre como "Agente (E2E)"
+  // no debe rendir "A(" en el avatar.
+  const userInitials = userName
+    ? getInitials(userName.replace(/[^\p{L}\p{N}\s]/gu, ' ').trim()).slice(0, 2).toUpperCase() || null
+    : null
 
   const handleDropdownOpen = () => {
     setOpen(previous => !previous)
@@ -129,6 +134,7 @@ const UserDropdown = ({ avatarUrl = null }: Props) => {
           src={avatarUrl ?? undefined}
           onClick={handleDropdownOpen}
           className='cursor-pointer bs-[38px] is-[38px]'
+          data-capture='avatar-trigger'
         >
           {userInitials}
         </Avatar>
@@ -150,7 +156,14 @@ const UserDropdown = ({ avatarUrl = null }: Props) => {
           >
             <Paper className={settings.skin === 'bordered' ? 'border shadow-none' : 'shadow-lg'}>
               <ClickAwayListener onClickAway={e => handleDropdownClose(e as MouseEvent | TouchEvent)}>
-                <MenuList className='max-bs-[70vh] overflow-y-auto'>
+                <MenuList
+                  className='max-bs-[70vh] overflow-y-auto'
+                  data-capture='avatar-dropdown'
+                  onKeyDown={event => {
+                    // Flow contract TASK-1388: Esc cierra el dropdown.
+                    if (event.key === 'Escape') setOpen(false)
+                  }}
+                >
                   {/* TASK-1388 — header de perfil clickeable: es la puerta a Mi Perfil. */}
                   {profileHref ? (
                     <MenuItem className='p-0' onClick={e => handleDropdownClose(e, profileHref)}>

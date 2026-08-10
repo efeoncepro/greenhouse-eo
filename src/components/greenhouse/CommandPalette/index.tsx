@@ -218,7 +218,7 @@ export const CommandPalette = ({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogPortal>
           <DialogOverlay className='gh-cmdk-overlay' />
-          <DialogContent className='gh-cmdk-dialog' aria-describedby='gh-cmdk-description'>
+          <DialogContent className='gh-cmdk-dialog' aria-describedby='gh-cmdk-description' data-capture='cmdk-open'>
             <DialogTitle hidden>Greenhouse Command Palette</DialogTitle>
             <DialogDescription id='gh-cmdk-description' hidden>
               Buscar vistas, acciones y atajos en Greenhouse. ⌘K para abrir, esc para cerrar.
