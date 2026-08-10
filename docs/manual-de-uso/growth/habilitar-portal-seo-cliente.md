@@ -1,9 +1,9 @@
 # Manual — Habilitar y verificar el portal SEO del cliente
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-08-08 por Claude (TASK-1310)
-> **Ultima actualizacion:** 2026-08-09 por Claude (TASK-1677 Slice 1: el codigo lee solo `seo_v2`)
+> **Ultima actualizacion:** 2026-08-09 por Claude (el menu del portal cliente ya compone modulos: SEO aparece solo)
 > **Modulo:** Growth / SEO (Search Visibility 360) — superficie **cliente**
 > **Rutas en portal:** `/growth/seo` (dashboard) · `/growth/seo/report` (informe, con `?print=1` para imprimir)
 > **Documentacion relacionada:** [doc funcional del modulo](../../documentation/growth/modulo-seo-search-visibility-360.md) · [asignar el modulo SEO a una organizacion](asignar-modulo-seo-organizacion.md) · [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
@@ -135,15 +135,22 @@ AGENT_AUTH_EMAIL=agent-client@greenhouse.efeoncepro.org AGENT_AUTH_SECRET=<secre
 
 Con esa sesion, revisa tres cosas:
 
-1. **El menu NO compone SEO — y es el diseno vigente, no un error tuyo.** Verificado el 2026-08-08
-   con sesion de Grupo Berel: la ruta responde y muestra datos reales, pero el menu del portal cliente
-   es una lista hardcodeada donde SEO no esta. **El modulo AEO esta exactamente igual** y lleva meses
-   en produccion: se alcanza por enlace directo, declarado a proposito en el manifest de
-   alcanzabilidad. El nav que si compondria modulos (`ClientPortalNavigation`) esta completo pero con
-   cero consumidores en runtime; montarlo es una task derivada de TASK-827 pendiente.
+1. **El enlace de SEO aparece solo en el menu del cliente** — desde el 2026-08-09 no hay que cablear
+   nada. El menu del portal cliente ya compone los enlaces de los modulos contratados desde la misma
+   fuente que gatea cada pantalla, asi que una organizacion con `seo_v2` vigente ve su enlace de SEO en
+   la zona de arriba del menu. Se ve en la **siguiente carga completa** del portal (recargar la pagina
+   o volver a entrar; moverse entre pantallas no recalcula el menu) y puede tardar hasta cerca de un
+   minuto.
 
-   Hoy el cliente llega **por enlace directo** o desde el cross-link de su informe AEO. **No pierdas
-   tiempo revisando el seed ni los grants: no es ahi.**
+   > Antes de esa fecha el menu era una lista fija donde SEO no estaba, y el cliente llegaba solo por
+   > enlace directo. Si encuentras ese texto en otro documento, esta desactualizado.
+
+   **El informe (`/growth/seo/report`) no tiene enlace propio y eso es correcto:** es una pantalla hija
+   que se abre con el boton "Ver informe" del encabezado del panel SEO.
+
+   Si el enlace no aparece con el modulo vigente, no revises el seed ni los grants por rol —
+   [Diagnosticar un modulo que no aparece en el menu](../client-portal/diagnosticar-modulo-no-visible-en-menu.md)
+   tiene el paso a paso.
 2. **El dashboard carga con datos de esa organizacion y de ninguna otra.** Compara el numero principal
    contra el cockpit interno de la misma org.
 3. **El informe imprime.** Abre `/growth/seo/report?print=1` y confirma que el layout cambia a la
@@ -176,11 +183,18 @@ Con esa sesion, revisa tres cosas:
 ## Problemas comunes
 
 **La ruta responde pero no aparece en el menu.**
-Es el comportamiento esperado hoy, igual que AEO. **El menu del portal cliente no compone modulos**:
-es una lista hardcodeada en `VerticalMenu.tsx` filtrada por `canSeeView('cliente.*')`, y esa
-resolucion sale de `role_view_assignments` + fallback, **nunca de `module_assignments`**. Cablear el
-resolver canonico module-based es una task derivada de TASK-827 pendiente. Hasta entonces, el acceso
-es por enlace directo y el gate real vive server-side en la page.
+Desde el 2026-08-09 esto ya **no** es lo esperado: el menu compone los enlaces de los modulos
+contratados desde la misma fuente que gatea la pantalla. Las dos causas probables, en orden:
+
+1. **El cliente no ha hecho una carga completa.** El menu se calcula al entrar al portal; moverse entre
+   pantallas no lo recalcula. Pidele que recargue o vuelva a entrar, y dale hasta cerca de un minuto si
+   acabas de asignar el modulo.
+2. **La asignacion no esta vigente para el runtime.** Revisa que exista bajo `seo_v2` (no `seo_v1`), sin
+   fecha de fin de vigencia y sin vencimiento pasado.
+
+Si con las dos descartadas el enlace sigue sin aparecer, es un caso de plataforma:
+[Diagnosticar un modulo que no aparece en el menu](../client-portal/diagnosticar-modulo-no-visible-en-menu.md).
+El informe SEO es la excepcion legitima: es pantalla hija y por diseno no tiene enlace propio.
 
 **El cliente ve "SEO no esta activo en tu plan" y si lo contrato.**
 Ojo: esto NO se arregla tocando `role_view_assignments` — la page se gatea por `module_assignment`,

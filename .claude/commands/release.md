@@ -70,7 +70,7 @@ Solo si post-deploy falla. Capability `platform.release.rollback` (EFEONCE_ADMIN
 
 ## Modo D — Break-glass
 
-Solo con incidente productivo activo y orquestación normal bloqueada. Requiere: aprobación explícita mía + razón en lenguaje claro + target SHA + servicio(s) afectado(s) + plan de rollback/forward-fix + plan de verificación + nota en `Handoff.md`. Aun en break-glass, reusá workflows y CLIs existentes antes de comandos cloud directos.
+Solo con incidente productivo activo y orquestación normal bloqueada. Requiere: aprobación explícita mía + razón en lenguaje claro + target SHA + servicio(s) afectado(s) + plan de rollback/forward-fix + plan de verificación + nota en `Handoff.md`. Aun en break-glass, reusa workflows y CLIs existentes antes de comandos cloud directos.
 
 ---
 
@@ -78,10 +78,10 @@ Solo con incidente productivo activo y orquestación normal bloqueada. Requiere:
 
 Reporta siempre (contrato de la skill): target SHA · estado de rama/remote · si se corrió el orquestador · workflow run id(s) · `release_id` + estado final del manifest · URL/dominio del deployment Vercel production · `GIT_SHA` de los servicios Cloud Run mapeados · resultado del watchdog · **qué NO se validó** · flags prendidos + fila del ledger actualizada · cualquier doc/skill actualizada.
 
-**Documentación** (governor): si el flujo crítico cambió (workflow YAML, contrato `workflow_call`, state machine, mapeo Vercel/Cloud Run, semántica del watchdog, gating Azure/WIF), actualiza en el mismo change set todas las fuentes del **Skill Maintenance Contract** (ambas skills Codex+Claude, control plane spec, runbook, manuales, `workflow-allowlist.ts`, `AGENTS.md`, `CLAUDE.md`, `project_context.md`, `Handoff.md`, `changelog.md`).
+**Documentación** (governor): si el flujo crítico cambió (workflow YAML, contrato `workflow_call`, state machine, mapeo Vercel/Cloud Run, semántica del watchdog, gating Azure/WIF), actualiza en el mismo change set todas las fuentes del **Skill Maintenance Contract** (ambas skills Codex+Claude, control plane spec, runbook, manuales, `workflow-allowlist.ts`, `AGENTS.md`, `CLAUDE.md`, `project_context.md`, `Handoff.md`, `changelog.md`). En un cierre de release siempre se tocan `Handoff.md` y `changelog.md`, así que `pnpm docs:context-check:strict` va **último, después de esas ediciones**: `docs:closure-check` no lo incluye y un strict corrido antes queda inválido (CI rojo en `develop` el 2026-08-09 por `changelog.md has 61 entries`). Runbook §gotcha 9.
 
 ---
 
 ## Auto-mantenimiento de este command
 
-Si durante el release notás que este harness referencia un comando/gate/path/CLI **desactualizado** respecto a la skill / `CLAUDE.md` / runbook / `package.json`, **flaggéalo al final** y propené el edit a `.claude/commands/release.md`. La skill `greenhouse-production-release` es la autoridad; este command la sirve, no la sustituye.
+Si durante el release notas que este harness referencia un comando/gate/path/CLI **desactualizado** respecto a la skill / `CLAUDE.md` / runbook / `package.json`, **márcalo al final** y propón el edit a `.claude/commands/release.md`. La skill `greenhouse-production-release` es la autoridad; este command la sirve, no la sustituye.

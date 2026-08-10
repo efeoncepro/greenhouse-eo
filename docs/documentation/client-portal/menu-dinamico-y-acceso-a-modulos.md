@@ -1,9 +1,9 @@
 # Menu dinamico y acceso a modulos del Portal Cliente
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-05-13 por Claude (TASK-827)
-> **Ultima actualizacion:** 2026-08-09 por Claude (TASK-1678/1679/1680 — las paginas vuelven a responder y hay vistas base)
+> **Ultima actualizacion:** 2026-08-09 por Claude (mapa pagina por pagina despues de los dos releases del dia)
 > **Documentacion tecnica:** [GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md](../../architecture/GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md), [GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md)
 
 ---
@@ -42,6 +42,63 @@ datos del onboarding, no del contrato comercial, y tiene su propia senal en `/ad
 > real y las tres vistas base; `docs/tasks/complete/TASK-1679-client-portal-guard-key-and-base-views.md`
 > tiene la medicion contra las organizaciones reales.
 
+### Las nueve paginas, una por una (estado al 2026-08-09)
+
+Esta tabla es la respuesta corta a "por que este cliente ve esto y aquel no". Verificada contra la
+base que lee produccion despues de los dos releases del dia.
+
+| Pagina | Direccion | Que la gobierna | Quien la abre hoy |
+|---|---|---|---|
+| Notificaciones | `/notifications` | vista base | cualquier organizacion |
+| Configuracion | `/settings` | vista base | cualquier organizacion |
+| Novedades | `/updates` | vista base | cualquier organizacion |
+| Proyectos | `/proyectos` | modulo Creative Hub Globe | solo Sky Airlines |
+| Campanas | `/campanas` | modulo Creative Hub Globe | solo Sky Airlines |
+| Equipo | `/equipo` | Creative Hub Globe **o** Equipo Asignado | solo Sky Airlines (nadie tiene Equipo Asignado) |
+| Revisiones | `/reviews` | modulo Creative Hub Globe | solo Sky Airlines |
+| Ciclos | `/sprints` | ningun modulo del catalogo la declara | nadie: empty state para todos |
+| Analytics | `/analytics` | ningun modulo del catalogo la declara | nadie: empty state para todos |
+
+Tres lecturas que conviene tener claras:
+
+**Ciclos y Analytics estan asi a proposito, y es deuda declarada.** Son superficies de entrega y de
+reporting: dependen del servicio contratado, no del portal. Se dejaron dependiendo de un modulo y hoy
+ningun modulo las declara, asi que muestran el empty state honesto para todo el mundo. Abrirlas es
+declararlas en el modulo que corresponda —una decision de catalogo, no un cambio de codigo—, no
+moverlas a vista base.
+
+**Creative es de Sky Airlines y de nadie mas.** El 2026-08-09 se le asigno el modulo Creative Hub
+Globe a Sky Airlines, y con eso sus usuarios abren Proyectos, Campanas, Equipo y Revisiones. El bundle
+otorga dos superficies mas: Pulse y Creative Hub. Ninguna otra organizacion lo tiene, asi que para el
+resto esas cuatro paginas siguen mostrando el empty state — que es lo correcto, no una falla.
+
+**Cuidado con Creative Hub: el enlace existe, la pagina todavia no.** El modulo declara la superficie
+`Creative Hub`, asi que aparece en el menu de Sky Airlines, pero esa direccion aun no existe en el
+portal. Es la deuda de paginas placeholder que ya estaba anotada mas abajo; con el modulo asignado
+dejo de ser hipotetica. Si un usuario de Sky reporta que ese enlace no lleva a ninguna parte, tiene
+razon y no es un problema de contratacion.
+
+### Por que un cliente puede ver un enlace y recibir el empty state
+
+Pasa, es esperado hoy y es la confusion de soporte mas probable.
+
+El menu del cliente se arma de **dos** partes que todavia no comparten origen:
+
+- **Los enlaces de modulo** se componen desde lo contratado (esto es lo que cerro TASK-1675). Si el
+  enlace esta, la pagina abre.
+- **Una lista base heredada** de seis enlaces de cliente —Proyectos, Ciclos, Equipo, Revisiones,
+  Analytics, Campanas— todavia se muestra segun el rol de la persona, no segun el modulo. Por eso una
+  organizacion sin Creative Hub Globe puede ver esos enlaces y, al entrar, recibir "este modulo no
+  esta activado para tu cuenta".
+
+Eso **no** es un agujero de seguridad: la puerta de cada pagina sigue decidiendo por modulo
+contratado, y el menu nunca otorga acceso. Es un enlace que promete de mas. Migrar esa lista base al
+mismo origen es la deuda hermana pendiente.
+
+> Que NO hacer con esto: no "arreglarlo" quitandole permisos de vista al rol cliente, porque ese
+> mismo permiso alimenta enlaces legitimos, y no ponerlo en "si" para las pantallas que dependen de
+> un modulo, porque convertiria el acceso en visibilidad por rol para todos los clientes con ese rol.
+
 ---
 
 ## La idea central
@@ -78,15 +135,15 @@ Tambien se puede activar automaticamente via **cascade desde el ciclo de vida de
 
 ---
 
-## Las 5 situaciones que el cliente puede ver
+## Las 6 situaciones que el cliente puede ver
 
-Cuando un cliente entra al portal, el sistema verifica que modulos tiene activos y decide que mostrarle. Hay cinco situaciones canonicas:
+Cuando un cliente entra al portal, el sistema verifica que modulos tiene activos y decide que mostrarle. Hay seis situaciones canonicas: las cinco de siempre, mas la sexta que desde el 2026-08-09 dejo de disfrazarse de falla de servicio.
 
 ### 1. Funcionamiento normal
 
 El cliente tiene sus modulos activos. El menu izquierdo muestra solo los items correspondientes a sus modulos. Cada click lleva a la pagina real.
 
-Ejemplo Globe full bundle: el cliente ve **Pulse, Proyectos, Ciclos, Equipo, Revisiones, Campanas** + el grupo "Modulos" con sus addons + "Mi Cuenta" con Notificaciones y Settings.
+Ejemplo Globe full bundle (el caso real es Sky Airlines): el cliente ve **Pulse, Proyectos, Campanas, Equipo, Revisiones y Creative Hub** + el grupo "Modulos" con sus addons + "Mi Cuenta" con Novedades, Notificaciones y Configuracion.
 
 Ejemplo Wave standard: el cliente ve solo **Pulse + Web Delivery** + "Mi Cuenta". Nada mas.
 
@@ -130,6 +187,19 @@ Si el resolver no responde por completo, el portal redirige al Home con un mensa
 
 El equipo de operaciones se entera del problema automaticamente porque el sistema emite un alerta a Sentry con el tag `domain=client_portal`.
 
+### 6. El usuario cliente no tiene organizacion resuelta
+
+El portal necesita saber a que organizacion pertenece la persona para poder preguntar por sus modulos.
+Cuando ese vinculo no existe, no hay contra que evaluar nada: el portal no puede decir "no tienes este
+modulo" porque tampoco sabe cuales tiene. Devuelve al inicio declarando ese caso aparte.
+
+**No es un problema de contratacion y no se arregla activando modulos.** Es el onboarding del cliente:
+la cuenta de la persona tiene que llegar hasta su organizacion pasando por un espacio activo. Hasta que
+eso se reconcilie, ningun modulo se va a ver, se active lo que se active.
+
+Se mide con la senal `identity.client_portal.client_without_organization` en `/admin/operations`, que en
+estado sano marca cero. Cualquier valor distinto de cero es una persona que hoy no puede usar su portal.
+
 ---
 
 ## Por que las paginas tienen guardia (page guards)
@@ -138,13 +208,19 @@ Antes de TASK-827, algunas paginas como `/notifications` y `/campanas` no tenian
 
 Ahora cada pagina cliente tiene una **guardia canonica** (`requireViewCodeAccess`) que valida acceso server-side antes de renderizar:
 
-1. Si el usuario es admin interno de Efeonce, pasa sin restriccion (acceso de soporte legitimo)
-2. Si el usuario es cliente, el sistema consulta el resolver con su `organizationId`
-3. Si el cliente tiene el modulo que provee esa pagina, entra normalmente
-4. Si NO lo tiene, redirige al Home con el mensaje contextual (situacion #3 arriba)
-5. Si el resolver falla, redirige al Home con el modo error (situacion #5 arriba)
+1. Si el usuario es un operador interno de Efeonce, pasa sin restriccion (acceso de soporte legitimo, las 9 paginas)
+2. Si la pagina es una de las tres vistas base, abre sin consultar modulos
+3. Si el usuario es cliente, el sistema resuelve su organizacion; si no tiene ninguna, devuelve al inicio declarando ese caso (situacion #6 arriba)
+4. Si el cliente tiene el modulo que provee esa pagina, entra normalmente
+5. Si NO lo tiene, devuelve al inicio con el empty state del modulo no activado (situacion #3 arriba)
+6. Si el resolver falla de verdad, devuelve al inicio con el modo error (situacion #5 arriba)
 
 Las 9 paginas con guardia canonica hoy son: `/proyectos`, `/sprints`, `/equipo`, `/campanas`, `/reviews`, `/analytics`, `/updates`, `/notifications`, `/settings`.
+
+Los pasos 2 a 6 son el orden real, y ese orden es lo que hace que cada resultado tenga su propio
+destino en vez de un unico mensaje de error. Un operador interno abre las nueve por el paso 1: si a un
+interno alguna le devuelve la pagina de no autorizado, eso es un defecto del portal, no un problema del
+cliente ni de su modulo.
 
 > Detalle tecnico: [src/lib/client-portal/guards/require-view-code-access.ts](../../../src/lib/client-portal/guards/require-view-code-access.ts) — helper canonico. Spec: [TASK-827 spec](../../tasks/complete/TASK-827-client-portal-composition-layer-ui.md) seccion Slice 4.
 
@@ -188,7 +264,9 @@ Cuando comercial activa un nuevo modulo via Admin Center, el cache se invalida a
 
 ## Limites conocidos V1.0
 
-- **Algunas paginas son placeholder forward-looking**: la base de datos declara modulos como `creative_hub_globe_v1` con superficies como `/creative-hub`, `/brand-intelligence`, etc. — pero las paginas reales todavia no existen como views. Si comercial activa esos modulos hoy, el cliente vera el menu item pero al hacer click obtendra una pagina vacia. La task derivada `client-portal-pages-placeholder-materialization` (V1.1) crea las views.
+- **Algunas paginas son placeholder forward-looking, y desde el 2026-08-09 esto ya no es hipotetico**: la base de datos declara modulos como `creative_hub_globe_v1` con superficies como `/creative-hub`, `/brand-intelligence`, etc., pero esas direcciones todavia no existen en el portal. Con el modulo asignado a Sky Airlines, sus usuarios ven el enlace de Creative Hub y ese enlace no lleva a ninguna parte. La task derivada `client-portal-pages-placeholder-materialization` (V1.1) crea las paginas. Mientras tanto: si un cliente reporta ese enlace, tiene razon y no hay nada que activar.
+- **Dos de las nueve paginas no tienen modulo que las declare**: Ciclos (`/sprints`) y Analytics (`/analytics`) quedaron dependiendo de un modulo y hoy ninguno las declara, asi que muestran el empty state para todas las organizaciones. Es deuda declarada, no un bug: se cierra declarandolas en el modulo que corresponda.
+- **La lista base heredada de seis enlaces cliente todavia se muestra por rol**, no por modulo. Un cliente puede ver el enlace y recibir el empty state al entrar (explicado arriba). Migrarla al mismo origen que los enlaces de modulo es la deuda hermana pendiente.
 - ~~**El menu vertical legacy coexiste**~~ — **cerrado por TASK-1675 (2026-08-09)**. El menu izquierdo ya suma los enlaces de los modulos contratados, resueltos en el servidor desde la misma fuente que gatea cada pagina. Lo que queda es un bloque menor que arma unos pocos enlaces desde la linea de negocio y los servicios de la cuenta, pendiente de migrar. Detalle funcional: [Menu del Portal Cliente — modulos contratados](menu-portal-cliente-modulos.md).
 - **El email del account manager es generico**: los botones "Solicitar acceso" usan `support@efeoncepro.com` como destino por ahora. La resolucion canonical (leer del campo `organizations.account_manager_user_id`) vive en task derivada V1.1.
 - **Sin self-service del cliente**: el cliente no puede solicitar un modulo desde su portal todavia. Si quiere uno, escribe al account manager via el mailto. El flow self-service con aprobacion operativa vive en V1.1.
@@ -207,7 +285,15 @@ Cuando comercial activa un nuevo modulo via Admin Center, el cache se invalida a
 
 ## Para equipo de operaciones: como saber si esto esta funcionando
 
-En `/admin/operations` el subsystem **Identity & Access** ahora incluye un signal nuevo: `client_portal.composition.resolver_failure_rate`. Hoy emite estado `unknown` (V1.0 scaffold); cuando TASK-829 cierre, va a reportar el porcentaje real de fallas del resolver y va a alertar si pasa del 1%.
+En `/admin/operations`, el subsystem **Identity & Access** tiene tres senales que juntas cubren este carril. Las dos ultimas se agregaron el 2026-08-09 y ambas deben marcar **cero** en estado sano:
+
+| Senal | Que cuenta | Que hacer si no es cero |
+|---|---|---|
+| `client_portal.composition.resolver_failure_rate` | fallas reales del resolver | hoy emite `unknown` (scaffold V1.0); cuando TASK-829 cierre reportara el porcentaje y alertara sobre 1% |
+| `identity.client_portal.client_without_organization` | usuarios cliente sin organizacion resuelta | reconciliar el onboarding de esa cuenta: sin organizacion, ningun modulo se va a ver |
+| `identity.view_access.client_role_without_grants` | roles cliente que quedaron sin ningun permiso de vista | revisar los grants sembrados; con la lista vacia el carril cliente ahora cierra en vez de abrir |
+
+La ultima existe por un cambio de criterio: hasta el 2026-08-09, si un rol cliente no tenia fila para una vista, el sistema **la otorgaba**. Ahora no. El default del carril de rol quedo alineado con el de modulos: nada se otorga hasta que este declarado.
 
 Si emerge el warning `role_view_fallback_used` en Sentry (`domain=identity`), significa que alguien agrego un view code nuevo sin sembrar los grants correspondientes en `role_view_assignments`. Esto NO es un bug — es la senal de gobernanza funcionando. La solucion es una migracion de seed (ver regla canonica en `CLAUDE.md` seccion "View Registry Governance Pattern").
 
@@ -223,6 +309,8 @@ Si emerge el warning `role_view_fallback_used` en Sentry (`domain=identity`), si
 | **Assignment** | Asignacion entre una organization y un modulo, con fechas efectivas. Vive en `greenhouse_client_portal.module_assignments` |
 | **Resolver** | Funcion server-side que devuelve la lista de modulos activos de una organization. Unica fuente de verdad para "que ve un cliente" |
 | **View code** | Identificador estable de una superficie del portal (ej. `cliente.proyectos`, `cliente.brand_intelligence`). Vive en `VIEW_REGISTRY` |
+| **Vista base** | Superficie del portal que no es un producto vendible y por eso abre para cualquier organizacion, sin modulo: hoy Notificaciones, Configuracion y Novedades. Son tres a proposito; agregar una cuarta es una decision, no un atajo para destrabar una pagina |
+| **Module-gated** | Pagina que solo abre si algun modulo vigente de la organizacion la declara. Son las otras seis de las nueve |
 | **Page guard** | Helper server-side `requireViewCodeAccess` que valida acceso ANTES de renderizar la pagina |
 | **Empty state honesto** | Pantalla con mensaje claro cuando el cliente intenta ver algo que no tiene, en vez de error 404 o pantalla blanca |
 | **Cascade desde lifecycle** | Mecanismo automatico (TASK-828, pendiente) que materializa modulos cuando se completa el onboarding del cliente |

@@ -1,9 +1,9 @@
 # Diagnosticar un modulo contratado que no aparece en el menu del cliente
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-08-09 por Claude (TASK-1675)
-> **Ultima actualizacion:** 2026-08-09 por Claude (TASK-1678/1679/1680 — la pagina ya dice por que deniega)
+> **Ultima actualizacion:** 2026-08-09 por Claude (los dos releases del dia ya estan en produccion, con Creative asignado a Sky Airlines)
 > **Modulo:** Client Portal
 > **Rutas en portal:** `/admin/client-portal/organizations/[organizationId]/modules`, `/admin/client-portal/catalog`
 > **Documentacion relacionada:** [Menu del Portal Cliente — modulos contratados](../../documentation/client-portal/menu-portal-cliente-modulos.md), [Menu dinamico y empty states — operacion](menu-dinamico-y-empty-states.md), [GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md](../../architecture/GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md) §12.1
@@ -26,10 +26,18 @@ acorta el diagnostico a un paso:
 muestra la URL final despues del rebote. Si el cliente te manda una captura, el parametro despues del
 `?` es el que importa.
 
-> Ojo con un caso conocido **de operador interno, no de cliente**: si abres `/proyectos` con tu propia
-> sesion interna y recibe la pagina de no-autorizado, es un defecto conocido, arreglado y pendiente de
-> promover a produccion — no es un problema del cliente ni de su modulo. Las otras ocho paginas
-> cliente abren normal con sesion interna.
+**Con tu propia sesion interna abres las nueve paginas cliente.** Es el bypass de soporte y no
+necesitas ningun modulo. Si alguna te devuelve la pagina de no autorizado, eso es un defecto del portal
+—no un problema del cliente ni de su modulo— y va a plataforma. Ocurrio con `/proyectos`, que era la
+unica de las nueve que conservaba un candado viejo por grupo de rutas encima del canonico; quedo
+corregido y verificado en produccion el 2026-08-09.
+
+**Antes de diagnosticar, ten presente que dos paginas no abren para nadie hoy.** Ciclos (`/sprints`) y
+Analytics (`/analytics`) quedaron dependiendo de un modulo y ningun modulo del catalogo las declara, asi
+que muestran el empty state para todas las organizaciones. Si el reporte es sobre una de esas dos, no
+hay nada que activar desde la pantalla de modulos: es deuda conocida y se cierra declarandolas en el
+modulo que corresponda. Y las cuatro paginas Creative —Proyectos, Campanas, Equipo, Revisiones— hoy solo
+abren para **Sky Airlines**, que es la unica organizacion con el modulo Creative Hub Globe.
 
 ## Para que sirve
 
@@ -142,6 +150,8 @@ Ademas de estos estados, dos fechas apagan el enlace aunque el estado se vea bie
 | Un usuario interno de Efeonce no ve el modulo del cliente | Es lo esperado: los internos no arman su menu desde modulos contratados | Para dar soporte, los internos entran a las pantallas de cliente por direccion directa |
 | La pantalla existe y funciona, pero nunca tuvo linea propia en el menu | Es una pantalla hija | Explica desde donde se alcanza (paso 6) |
 | Se ve un enlace de un modulo que no aparece en la tabla de asignaciones | Viene del bloque antiguo que arma unos pocos enlaces desde la linea de negocio y los servicios de la cuenta | Deuda conocida, pendiente de migrar; no la "arregles" borrando asignaciones |
+| El cliente ve el enlace (Proyectos, Ciclos, Equipo, Revisiones, Analytics o Campanas) pero al entrar le dice que el modulo no esta activado | Esos seis enlaces todavia se muestran por rol, no por lo contratado. El enlace promete de mas; la puerta esta bien | Explicale que la pantalla depende del modulo y confirma en el paso 2 si corresponde activarlo. **No** le quites permisos de vista al rol para ocultar el enlace: apagarias enlaces legitimos de otros clientes con ese rol. Deuda conocida, pendiente de migrar |
+| Un cliente con Creative Hub Globe reporta que el enlace "Creative Hub" no lleva a ninguna parte | Tiene razon: el modulo declara esa superficie y la direccion todavia no existe en el portal | No hay nada que activar. Es la deuda de paginas placeholder; registra el reporte y sigue |
 
 ## Referencias tecnicas
 

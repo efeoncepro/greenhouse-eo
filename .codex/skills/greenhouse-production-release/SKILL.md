@@ -363,7 +363,7 @@ El flujo de **squash-merge** produce condiciones recurrentes que NO son fallas r
 10. **Hay UNA sola instancia Cloud SQL (`greenhouse-pg-dev`): producción, staging y local leen la misma
     base** (verificado con `gcloud sql instances list --project efeonce-group`, 2026-08-09). Eso cambia
     cómo se evalúa el riesgo de un release con migraciones: **una migración aplicada "en dev" YA está
-    aplicada para producción.** Antes de redactar la razón del bypass, comprobalo:
+    aplicada para producción.** Antes de redactar la razón del bypass, compruébalo:
 
     ```sql
     SELECT name, run_on FROM public.pgmigrations WHERE name LIKE '%<task-id>%';

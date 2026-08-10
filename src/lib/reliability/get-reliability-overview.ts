@@ -36,6 +36,7 @@ import {
 } from './queries/expense-distribution'
 import { getClientPortalResolverFailureRateSignal } from './queries/client-portal-resolver-failure-rate'
 import { getClientRoleWithoutViewGrantsSignal } from './queries/client-role-without-view-grants'
+import { getClientPortalAssignedViewWithoutRouteSignal } from './queries/client-portal-assigned-view-without-route'
 import { getClientUserWithoutOrganizationSignal } from './queries/client-user-without-organization'
 import { getEntraWebhookSubscriptionHealthSignal } from './queries/entra-webhook-subscription-health'
 import { getExpensePaymentsClpDriftSignal } from './queries/expense-payments-clp-drift'
@@ -889,6 +890,7 @@ interface ReliabilityOverviewSources {
   clientPortalResolverFailureRate?: ReliabilitySignal | null
   clientRoleWithoutViewGrants?: ReliabilitySignal | null
   clientUserWithoutOrganization?: ReliabilitySignal | null
+  clientPortalAssignedViewWithoutRoute?: ReliabilitySignal | null
 
   /**
    * TASK-613 Slice 3 — Finance Clients ↔ Organization canonical link signal:
@@ -1256,6 +1258,7 @@ export const buildReliabilityOverview = (
     ...(sources.clientPortalResolverFailureRate ? [sources.clientPortalResolverFailureRate] : []),
     ...(sources.clientRoleWithoutViewGrants ? [sources.clientRoleWithoutViewGrants] : []),
     ...(sources.clientUserWithoutOrganization ? [sources.clientUserWithoutOrganization] : []),
+    ...(sources.clientPortalAssignedViewWithoutRoute ? [sources.clientPortalAssignedViewWithoutRoute] : []),
     // TASK-613 Slice 3 — Finance Clients ↔ Organization canonical link signal.
     ...(sources.financeClientProfileUnlinked ? [sources.financeClientProfileUnlinked] : []),
     // TASK-841 — Nubox raw/conformed/projection freshness.
@@ -2213,6 +2216,14 @@ export const getReliabilityOverview = async (
       ? preloadedSources.clientUserWithoutOrganization
       : await getClientUserWithoutOrganizationSignal().catch(() => null)
 
+  // TASK-1679 follow-up — viewCodes que un cliente PUEDE alcanzar y cuya pagina no existe.
+  // La condicion la crea un ASSIGNMENT (cambio de dato), no un deploy, asi que ningun gate de
+  // codigo la ve. Complementa a route-reachability-gate, que cubre la direccion contraria.
+  const clientPortalAssignedViewWithoutRoute =
+    preloadedSources.clientPortalAssignedViewWithoutRoute !== undefined
+      ? preloadedSources.clientPortalAssignedViewWithoutRoute
+      : await getClientPortalAssignedViewWithoutRouteSignal().catch(() => null)
+
   // TASK-613 Slice 3 — Finance Clients ↔ Organization canonical link signal.
   // Single reader; degrada honestamente a `unknown` si la query falla.
   const financeClientProfileUnlinked =
@@ -2673,6 +2684,7 @@ export const getReliabilityOverview = async (
     clientPortalResolverFailureRate,
     clientRoleWithoutViewGrants,
     clientUserWithoutOrganization,
+    clientPortalAssignedViewWithoutRoute,
     financeClientProfileUnlinked,
     nuboxSourceFreshness,
     notionConformedDrainFreshness,

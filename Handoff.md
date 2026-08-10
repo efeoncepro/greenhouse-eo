@@ -1,5 +1,43 @@
 # Handoff activo
 
+### Barrido documental post-release: tres auditorías paralelas y dos defectos vivos (2026-08-09)
+
+Tres subagentes auditaron arquitectura, docs funcionales/manuales y skills. Encontraron cosas que el
+trabajo de código no había visto.
+
+**Lo que necesita quien siga:**
+
+1. 🔴 **El §0 Status del doc de contrato del portal cliente estaba INVERTIDO** y lo estuvo tres meses:
+   decía "NO existe `src/lib/client-portal/`", "NO existe `/api/client-portal/`", "NO existe schema
+   `greenhouse_client_portal`" y "NO existe modelo de módulos on-demand". Las cuatro se implementaron
+   entre `TASK-824` y `TASK-828`. Es lo primero que lee un agente que abre ese doc, así que lo mandaba
+   a construir de cero lo que ya existía — el carril paralelo que el spec vino a evitar. Corregido y
+   verificado contra filesystem y PG. **Lección:** un bloque "estado actual del repo" escrito cuando un
+   spec era propuesta se vuelve activamente peligroso si nadie lo da vuelta al implementarlo.
+2. ⚠️ **`/creative-hub` NO EXISTE y Sky Airlines ve el enlace.** Lo causé hoy: el bundle
+   `creative_hub_globe_v1` declara `cliente.creative_hub` → `/creative-hub`, y esa página nunca se
+   materializó. El defecto era latente desde el seed de `TASK-824`; **lo activó el assignment**, no un
+   deploy. Señal nueva `identity.client_portal.assigned_view_without_route` (warning, hoy en **1**).
+   Decidir: materializar la página o retirar el viewCode del bundle — **NUNCA** quitarle el módulo a
+   SKY, eso le saca superficies que sí funcionan.
+3. **`route-reachability-gate` sólo cubre una dirección.** Verifica página → enlace ("0 huérfanas") y
+   NO enlace → página, así que el enlace muerto pasa. Y no lo podría atrapar de todos modos: la
+   condición la crea un **assignment**, o sea un cambio de dato. Por eso el complemento es una señal y
+   no un test. Además hay **10 viewCodes cliente** apuntando a rutas no materializadas, y eso es
+   legítimo por diseño (regla vigente: declarar el `routePath` canónico aunque la página sea
+   forward-looking) — el riesgo aparece al asignarlos.
+4. **El menú del cliente puede prometer de más.** La lista base de 6 enlaces (Proyectos, Ciclos,
+   Equipo, Revisiones, Analytics, Campañas) se sigue mostrando **por rol**, no por módulo. No es fuga
+   de acceso —la puerta decide por módulo— pero ahora que las páginas dicen la verdad, es la confusión
+   de soporte más probable: enlace visible + empty state al entrar. Quitar el permiso al rol apagaría
+   enlaces legítimos de otros clientes, así que no es el fix.
+5. **`pnpm skills:mirrors` sólo valida 3 skills del manifest** (`efeonce-mcp-platform`,
+   `greenhouse-globe`, `greenhouse-globe-model-fleet`). NO cubre `qa-release-auditor` ni
+   `documentation-governor`: su paridad Claude↔Codex se verificó a mano. Si agregas una skill espejada,
+   no asumas que el gate la cuida.
+6. **`CLAUDE.md` está en 34.903/35.000 tokens — 97 de headroom.** Los cinco aprendizajes de proceso de
+   hoy se escribieron en su skill dueña y en `AGENTS.md`, no ahí, a propósito.
+
 ### Release 2026-08-09 (2.º del día) — el carril del portal cliente cerrado y VERIFICADO EN PRODUCCIÓN
 
 Manifest `ee0d568b8614-1ff03476-6a82-4e03-8dfc-2d49e3c30ce3` en `released`, run `31343569815`, target
@@ -542,47 +580,6 @@ TASK-1307/1308 siguen `complete`: Resumen, Rendimiento y Keywords comparten `Sur
 `WorkbenchHeader` (alcance/meta/tabs), sin chrome sobre canvas ni duplicación en estados vacíos. 579
 tests focales, typecheck/lint y 5 GVC OK (1440/390). Pendiente: promoción `develop → main` batcheada
 con 1308/1655; el export GSC nativo de Berel requiere Owner fuera del repo.
-
-### Carril de keywords OBJETIVO — TASK-1659…1662 (2026-08-07)
-
-Salió de que el operador cuestionara por qué TASK-1308 no usó los ejes especificados. La respuesta
-corta era correcta; la larga destapó que **el módulo tiene TRES preguntas y sólo una tenía
-superficie**: (1) qué empujo de lo que ya tengo — construida; (2) dónde quiere estar el cliente;
-(3) qué me pierdo entero. Ninguna de las 12 tasks abiertas de EPIC-022 cubría 2 ni 3.
-
-🔴 **GSC es ciego por construcción a 2 y 3**: sin top ~100 no hay impresiones, así que esas
-búsquedas NO EXISTEN en los datos. Ninguna superficie sobre esa fuente va a contestarlas.
-
-⚠️ **Corrección al criterio anterior:** para una keyword donde el cliente SÍ rankea, el dato de
-mercado es enriquecimiento y los ejes medidos mandan. Para una donde NO rankea, GSC no da nada y
-volumen+dificultad son la ÚNICA forma de contestar "¿vale la pena?" y "¿cuánto cuesta?". Ahí son
-**dependencia dura**, no opcional.
-
-⚠️ **`TASK-1300` SÍ está complete** — yo repetía lo contrario desde un comentario obsoleto de
-`contracts.ts`. Entregó el registry (`labs` es llamable) pero es *infra de cliente, no capability*:
-falta fetch, columnas (`search_volume` no existe) y reader. Corregido en la fuente y en el doc, que
-se contradecía. **Y `trackKeywords` acepta strings arbitrarios**: seguir una keyword no rankeada ya
-funciona por contrato, sólo falta el botón — Full API Parity al revés.
-
-Orden de dependencia: `1659` (modelo de intención, migración) → `1660` (lente Objetivos, UI) →
-`1661` (datos de mercado) → `1662` (keyword gap). Las 4 con `task:lint` en 0/0.
-
-**Superado el mismo día: el operating mode.** El operador señaló que el módulo tiene los **mismos
-tres modelos de servicio que Globe** (`efeonce-managed` | `co-operated` | `client-operated`; "que el
-cliente contrate la herramienta" NO es un cuarto modo sino `client-operated` × delivery model de
-plataforma). El vocabulario YA era canónico y Globe YA lo materializó (SPEC-008, desplegado) — pero
-vive en SU Postgres, y en Greenhouse `delivery-model.ts` es de cotización, no de esto. Creado como
-`TASK-1663` + ADR `GREENHOUSE_OPERATING_RESPONSIBILITY_DECISION_V1.md`.
-
-🔴 **La regla que sostiene todo, verbatim de Globe: el modo NUNCA es input de autorización.** No
-decide quién PUEDE declarar (eso es `can(...)`), decide qué superficie DEBE existir y quién responde.
-Si el modo otorgara acceso, cambiar una etiqueta comercial cambiaría en silencio quién puede
-comprometer gasto. El entregable más importante de 1663 es el **test que lo prueba**.
-
-**Tres ejes ortogonales:** quién puede (capability) · quién responde (modo) · quién paga (comercial). ⚠️ **Y NO se construye ahora** (el operador lo acotó el mismo día): el ADR quedó `Proposed` y
-`TASK-1663` en `P3` con condición de activación = un segundo consumidor real. Hoy hay **cero
-asignaciones declaradas**, así que sería infraestructura de un problema que no tenemos. `1659`/`1660`
-se construyen **como están especificadas**, sin esperar y sin conciencia de modo "por si acaso".
 
 ### Seedance 2.5 — inventario Fal y TASK-1656 (2026-08-07)
 

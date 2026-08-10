@@ -134,6 +134,18 @@ Las rutas de la tabla son relativas a `docs/architecture/` cuando comienzan por 
   paralelo independiente y con ownership claro cuando estén autorizados.
 - **Runtime completeness:** código no equivale a operativo. Flags, env, deploy, migrations, backfills, crons,
   webhooks, workers, secrets, data recovery y verificación live forman parte del cierre.
+- **Entorno ≠ `NODE_ENV`:** para distinguir staging de producción se lee `VERCEL_ENV`. Vercel compila TODO
+  deployment (Preview, staging, Production) con `NODE_ENV=production`, así que un guard por `NODE_ENV` queda
+  **solo-local** y la afordancia sigue expuesta en los dos entornos desplegados, con los tests en verde.
+  Patrón vigente: `src/app/api/auth/agent-session/route.ts`, `src/proxy.ts`. En Cloud Run el discriminante es
+  la env var que declare el `deploy.sh` del servicio. Detalle:
+  `greenhouse-qa-release-auditor/references/runtime-rollout.md`.
+- **Evidencia sobre runtime:** una afirmación sobre runtime se verifica contra el runtime (`curl`,
+  `vercel env ls`, `gcloud run services describe`, el reader, la consulta a PG), nunca contra `Handoff.md`, un
+  doc, un runbook o la memoria de la sesión: **un doc describe el día en que se escribió.** Si no se puede
+  verificar, se reporta como *no verificada* — no como hecho ni como "pendiente del operador" cuando el agente
+  tiene el CLI a mano. Caso fuente y las otras dos formas de evidencia falsa:
+  `greenhouse-qa-release-auditor` §Integridad de la evidencia.
 
 ### Registro del español (voseo → tuteo neutro)
 
@@ -206,7 +218,10 @@ y [`GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md`](docs/ui/GREENHOUSE_PREMIUM_U
 - Cierre documental: `greenhouse-documentation-governor` + `pnpm docs:closure-check`.
 - Contexto/handoff: `pnpm docs:context-check:strict` antes de cerrar cambios a estos contratos. Si recomienda
   rotar, ejecutar `pnpm docs:context-rotate --apply` y repetir strict; no basta cumplir sesiones/entradas si
-  lineas o tokens siguen fuera de presupuesto.
+  lineas o tokens siguen fuera de presupuesto. **Es el ÚLTIMO gate del cierre: `docs:closure-check` NO lo
+  incluye**, y cualquier edición posterior a `Handoff.md`/`changelog.md` invalida su resultado. Orden seguro:
+  ediciones documentales → `docs:closure-check` → `docs:context-rotate --apply` si hace falta →
+  `docs:context-check:strict` → commit.
 - Estado honesto: `complete | code complete, rollout pendiente | operativamente bloqueado`.
 
 ## Documentación viva

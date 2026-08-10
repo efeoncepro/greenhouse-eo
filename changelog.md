@@ -7,6 +7,23 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-09 — Barrido documental del carril cliente: el doc de contrato estaba invertido
+
+Tres auditorías paralelas (arquitectura, docs funcionales/manuales, skills) tras los dos releases.
+
+- 🔴 **El §0 Status de `GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1` afirmaba que no existían cuatro piezas que
+  se implementaron entre `TASK-824` y `TASK-828`** — carpeta, namespace de API, schema y modelo de
+  módulos. Tres meses así, y es lo primero que lee un agente que abre el doc de contrato del dominio.
+- ⚠️ **Defecto vivo que causó el assignment de hoy:** `/creative-hub` no existe y Sky Airlines ve el
+  enlace. Señal nueva `identity.client_portal.assigned_view_without_route` (hoy en 1). La condición la
+  crea un cambio de DATO, no un deploy, así que ningún gate de código la veía — y
+  `route-reachability-gate` sólo cubre la dirección contraria.
+- Los dos companions de invariantes no tenían nada del page guard ni de la derivación invertida, que es
+  justo lo que un agente carga al tocar el dominio. Agregados.
+- Cinco aprendizajes de proceso a sus skills dueñas: el context gate va último, un gate con expectativa
+  hardcodeada no prueba el motor, un override de lint fuera del alcance de la regla no protege nada,
+  `VERCEL_ENV` nunca `NODE_ENV`, y una nota del Handoff no es evidencia.
+
 ## 2026-08-09 — El carril del portal cliente, cerrado y verificado EN PRODUCCIÓN (release `ee0d568b8614`)
 
 Segundo release del día. Manifest `released`, watchdog `drift_count=0`, **sin bypass del batch policy**
@@ -1210,31 +1227,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
 - La documentación funcional y el manual quedaron reconciliados con el sistema live: UI recomendada, paridad
   API/CLI/MCP sobre un solo ledger, autoridad CEO one-shot, `ensure` readback-first y saldo posterior a Seedance
   `800 → 784` bajo cap 1500. Studio Credits no se presentan como dinero, revenue ni tokens de proveedor.
-
-## 2026-08-01 — Efeonce MCP: Globe fleet reader end-to-end
-
-- Se habilitó únicamente `globe.producer.fleet.list`: el gateway llama el reader canónico `POST /v1/readers`,
-  sin importar base de datos, storage ni SDKs de proveedor. La respuesta conserva rutas de disponibilidad pero no
-  house, provider slug, costo de vendor ni margen.
-- Studio Credits reutiliza este mismo gateway mediante el write interno one-shot `globe.credits.funding.ensure`;
-  no se creó otro MCP. El acceso de clientes externos continúa gated por identidad B2B/multitenant.
-- Globe `#84` (`001ce1b`) quedó desplegado como `globe-api-internal-00179-qcz`; el gateway `ce593f2` como
-  `efeonce-mcp-gateway-00009-9c6`, ambos con tráfico 100%. El canary Entra PKCE real pasó initialize, discovery
-  y la tool de fleet por `https://mcp.efeonce.org/mcp`.
-- El principal downstream tiene exclusivamente `globe.producer.catalog.read` y el binding
-  `greenhouse-org:efeonce`. No se habilitaron writes, runs, assets, review, delivery, créditos ni reveal-house.
-- El gateway limita inicialmente Cloud Run a `concurrency=80` y `maxScale=5` efectivo. Clientes externos siguen
-  bloqueados: el cliente interno Entra emite ambos scopes incluso cuando solicita el base, por lo que falta
-  separar asignación/consentimiento de entitlements y repetir el deny con identidad base-only.
-- La skill espejo `efeonce-mcp-platform` y sus matrices de verificación ahora codifican esa excepción internal-only
-  y exigen evidencia real de entitlement/revocación base-only antes de cualquier rollout B2B.
-- La decisión de identidad cliente y `TASK-1631` aclaran la relación con el login Greenhouse: los runtimes,
-  cookies, sesiones y audiencias permanecen separados, pero un cliente existente se enlaza al mismo
-  `identity_profile` y Account 360. La coexistencia inicial debe converger después al mismo plano externo de
-  autenticación; no se permite una segunda identidad o contraseña permanente. La revisión ahora documenta que
-  Greenhouse ya tiene NextAuth + broker OAuth sister-platform reutilizable, pero todavía no un authorization server
-  MCP público: TASK-1631 compara WorkOS, broker extraído independientemente a `auth.efeonce.org` y hybrid, sin
-  compartir cookie/`NEXTAUTH_SECRET` ni hacer que un release Greenhouse sea el rollback de OAuth externo.
-- Las skills de arquitectura globales y locales (`arch-architect` de Claude y `software-architect-2026` de Codex)
-  ahora cargan el router MCP, el provider dueño y este mismo gate antes de proponer otra tool, OAuth surface o
-  binding cross-runtime.

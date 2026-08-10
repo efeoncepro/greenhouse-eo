@@ -9,6 +9,7 @@ Run before first production exposure or a material change. Evaluate every applic
 - [ ] Artifact provenance, dependency/vulnerability/license policy, approvals, and deployment identity meet the assurance target.
 - [ ] Migration/backfill is compatible with old/new versions; expand/contract and reconciliation evidence are present.
 - [ ] Rollout stages, health signals, abort thresholds, approver, and rollback/roll-forward procedure are rehearsed.
+- [ ] Every verification gate derives its expected values from the state the engine reads; no gate asserts a hardcoded count, id, or literal that a legitimate change would have to edit. A gate that must be edited per valid data state or per consumer only proves the first snapshot still holds. Case: `greenhouse-qa-release-auditor` §Integridad de la evidencia.
 
 ## 2. Security, privacy, and tenancy — blocking
 

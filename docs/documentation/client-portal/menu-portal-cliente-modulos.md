@@ -1,9 +1,9 @@
 # Menu del Portal Cliente — Modulos Contratados
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-08-09 por Claude (TASK-1675)
-> **Ultima actualizacion:** 2026-08-09 por Claude
+> **Ultima actualizacion:** 2026-08-09 por Claude (alcance de la regla frente a las vistas base y a la lista heredada)
 > **Documentacion tecnica:** [GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md](../../architecture/GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md) §12.1, [ORG_CLIENT_AGENT_INVARIANTS.md](../../architecture/agent-invariants/ORG_CLIENT_AGENT_INVARIANTS.md)
 
 ---
@@ -19,6 +19,11 @@ El documento hermano [Menu dinamico y acceso a modulos](menu-dinamico-y-acceso-a
 ## La regla en una linea
 
 **Un cliente ve en su menu los enlaces de los modulos que su organizacion tiene contratados y vigentes.** El cargo de la persona, su rol en el portal y la linea de negocio de la cuenta no agregan ni quitan enlaces de modulo.
+
+Con dos precisiones que evitan malentendidos, y que valen para todo lo que sigue:
+
+- **Hay tres pantallas que no son un modulo** y por eso abren para cualquier organizacion: Notificaciones, Configuracion y Novedades. Viven en "Mi Cuenta" y nadie las contrata. Se llaman **vistas base**.
+- **Queda una lista heredada de seis enlaces cliente** —Proyectos, Ciclos, Equipo, Revisiones, Analytics, Campanas— que todavia se muestra segun el rol de la persona y no segun lo contratado. Es la deuda que aparece al final de este documento, y es la razon por la que un cliente puede ver uno de esos seis enlaces y, al entrar, recibir "este modulo no esta activado para tu cuenta".
 
 ---
 
@@ -60,7 +65,9 @@ Hasta agosto de 2026 el portal tenia **dos verdades que nunca se tocaban**:
 
 El resultado no era el error de un modulo puntual: era estructural. Un cliente podia tener un modulo contratado, la pantalla renderizaba con sus datos reales, y **no habia forma de llegar salvo escribiendo la direccion a mano**. Se midio con un cliente que tenia el modulo SEO contratado y su pantalla funcionando, invisible en la navegacion.
 
-Desde entonces el menu y la puerta leen **el mismo origen**. Si la pantalla se abre, el enlace esta; si el enlace no esta, la pantalla tampoco se abre.
+Desde entonces los **enlaces de modulo** y la puerta leen **el mismo origen**: si el enlace de modulo esta, la pantalla se abre.
+
+La vuelta no es cierta todavia, y conviene decirlo: que un enlace este no prueba que su modulo este contratado, porque los seis enlaces heredados se siguen mostrando por rol. Lo que si es cierto siempre es que **la puerta no depende del menu**: cada pantalla vuelve a preguntar por su cuenta.
 
 ---
 
@@ -122,7 +129,7 @@ El calculo del menu de cliente ocurre en la raiz del portal, la misma que sostie
 - **No cobra ni factura nada.** Que un modulo aparezca en el menu no significa que este facturado; eso vive en el acuerdo comercial.
 - **No escribe nada.** El menu solo lee las asignaciones. Activarlas, pausarlas o darlas de baja es trabajo de las acciones de administracion, que dejan auditoria.
 - **No distingue visualmente un complemento de un modulo base.** Hoy el menu del portal muestra todos los enlaces igual; la diferencia entre modulo base, complemento y piloto se ve en la vista de administracion, no en el menu del cliente.
-- **Queda una deuda conocida:** un bloque antiguo del menu todavia arma unos pocos enlaces a partir de la linea de negocio y los servicios de la cuenta, en vez de los modulos. Convive sin romper nada y esta pendiente de migrar.
+- **Quedan dos deudas conocidas, las dos del mismo tipo:** enlaces que no salen de lo contratado. Una es la lista heredada de seis enlaces cliente, que se muestra por rol. La otra es un bloque antiguo que arma unos pocos enlaces a partir de la linea de negocio y los servicios de la cuenta. Ninguna de las dos abre puertas —la pantalla sigue preguntando por su cuenta—, pero ambas pueden prometer de mas en el menu. Estan pendientes de migrar al mismo origen.
 
 ---
 

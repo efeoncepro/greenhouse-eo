@@ -1,11 +1,40 @@
 # Portal Cliente y Customer Experience end-to-end
 
 > **Tipo de documento:** Documentacion funcional
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-06-15 por Codex
+> **Ultima actualizacion:** 2026-08-09 por Claude (los cuatro resultados de la puerta, vistas base y la senal de organizacion sin resolver)
 > **Modulo:** Portal Cliente / Customer Experience
-> **Rutas principales:** `/home`, `/analytics`, `/campaigns`, `/updates`, `/notifications`, `/settings`, `/knowledge`, `/api/client-portal/*`, `/api/admin/client-portal/*`
+> **Rutas principales:** `/home`, `/proyectos`, `/sprints`, `/equipo`, `/reviews`, `/analytics`, `/campanas`, `/updates`, `/notifications`, `/settings`, `/knowledge`, `/api/client-portal/*`, `/api/admin/client-portal/*`
 > **Arquitectura relacionada:** `docs/architecture/GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md`, `docs/architecture/GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md`, `docs/architecture/GREENHOUSE_CLIENT_ONBOARDING_PROVISIONING_V1.md`, `docs/architecture/MULTITENANT_ARCHITECTURE.md`
+
+## Delta 2026-08-09 — cada resultado de la puerta tiene su propio destino
+
+Este documento se escribio cuando las nueve paginas guardadas del portal cliente devolvian el **mismo**
+mensaje de error para seis situaciones distintas, y ninguna de las seis era una falla de servicio. Eso
+se cerro. Lo que cambia respecto de lo que este documento describia:
+
+- **Tres pantallas no son un producto y abren siempre:** Notificaciones, Configuracion y Novedades. Se
+  llaman vistas base y no dependen de ningun modulo. Un cliente no contrata poder ver sus
+  notificaciones.
+- **La puerta ahora distingue cuatro resultados**, no dos: la pagina abre; la organizacion no tiene el
+  modulo (empty state honesto); la sesion no tiene organizacion resuelta (problema de onboarding, no de
+  contrato); el resolver fallo de verdad (falla operativa).
+- **"No tiene organizacion resuelta" es un estado propio**, distinto de "not assigned". Sin organizacion
+  no hay contra que evaluar modulos, asi que activar cualquier cosa no cambia nada. Se mide con la senal
+  `identity.client_portal.client_without_organization` en `/admin/operations`, steady cero.
+- **Para las pantallas que dependen de un modulo, `role_view_assignments` no es el carril.** La puerta
+  decide por modulo contratado. Diagnosticar una de esas pantallas revisando grants por rol lleva al
+  lugar equivocado — y ponerlos en otorgado convierte el acceso en visibilidad por rol para todos los
+  clientes con ese rol.
+- **El carril de rol dejo de otorgar por defecto para el portal cliente.** Antes, si un rol cliente no
+  tenia fila para una vista, el sistema la otorgaba. Ahora nada se otorga hasta estar declarado, y el
+  camino degradado cierra en vez de abrir. Senal: `identity.view_access.client_role_without_grants`.
+
+El mapa pagina por pagina (que abre para quien hoy) vive en
+[Menu dinamico y acceso a modulos](menu-dinamico-y-acceso-a-modulos.md), que es donde se mantiene
+actualizado. El paso a paso para atender un reporte esta en
+[Diagnosticar un modulo que no aparece en el menu](../../manual-de-uso/client-portal/diagnosticar-modulo-no-visible-en-menu.md).
 
 ## Estado de verificacion
 
@@ -41,7 +70,8 @@ La regla central es: un cliente ve una experiencia adaptada por rol, vistas asig
 - Construye el menu cliente desde vistas y modulos disponibles, no desde una lista estatica por business line.
 - Aplica page guards resolver-based en las rutas cliente para evitar que una URL directa salte el contrato de acceso.
 - Cachea resoluciones del portal por proceso cuando aplica, y las invalida al cambiar asignaciones.
-- Distingue estados visuales: normal, zero-state recien activado, not assigned, degraded parcial y error completo.
+- Distingue estados visuales: normal, zero-state recien activado, not assigned, sin organizacion resuelta, degraded parcial y error completo.
+- Abre sin consultar modulos las tres pantallas que no son un producto vendible (Notificaciones, Configuracion, Novedades).
 - Registra eventos cuando se habilita, pausa o deshabilita un modulo desde Admin Center.
 - En `enable-module`, valida si el `applicability_scope` del modulo calza con las business lines de la organizacion. Si no calza, exige override con razon.
 - Usa Sentry/domain capture `client_portal` para fallas de APIs del dominio.
@@ -67,11 +97,17 @@ La regla central es: un cliente ve una experiencia adaptada por rol, vistas asig
 
 ## Estados del contrato visual
 
-- **Normal:** el modulo esta asignado, la vista existe, el usuario tiene acceso y hay datos o una pantalla operable.
+- **Normal:** la pantalla es vista base o su modulo esta asignado; el usuario tiene acceso y hay datos o una pantalla operable.
 - **Zero-state:** el modulo fue activado pero aun no hay datos. Se debe explicar proximo paso, no ocultar el modulo.
 - **Not assigned:** el cliente no compro o no tiene asignado el modulo. El portal debe mostrar limite claro, no error tecnico.
+- **Sin organizacion resuelta:** la sesion cliente no llega a ninguna organizacion, asi que no hay contra que evaluar modulos. Es onboarding, no contrato: no se arregla activando nada.
 - **Degraded:** parte de la data source falla o esta atrasada; se muestra lo disponible y la faceta degradada.
 - **Error completo:** el portal no puede resolver el modulo o la data minima; se muestra estado de falla y se captura en observabilidad.
+
+Regla dura de honestidad: **ninguno de los cuatro ultimos puede presentarse como los otros.** Mostrar
+"no esta disponible el servicio" cuando la causa es un modulo no contratado invita al cliente a
+reintentar algo que nunca va a funcionar, y ademas ensucia las alertas del dominio con funcionamiento
+normal.
 
 ## Flujo: habilitar un modulo cliente
 
@@ -87,12 +123,14 @@ La regla central es: un cliente ve una experiencia adaptada por rol, vistas asig
 ## Flujo: el cliente entra a una ruta directa
 
 1. La sesion resuelve tenant, usuario, organizacion y route group cliente.
-2. El guard de la ruta pregunta al resolver de Portal Cliente si la vista/modulo esta disponible.
-3. Si el usuario tiene acceso, se renderiza la pantalla con datos del scope permitido.
-4. Si falta asignacion, se muestra not assigned.
-5. Si la fuente esta vacia o inicial, se muestra zero-state.
-6. Si la fuente falla parcialmente, se muestra degraded.
-7. Si hay error real de autorizacion, no se filtra data ni se degrada como si fuera vacio.
+2. Si quien entra es un operador interno de Efeonce, pasa por el bypass de soporte: abre las nueve paginas cliente.
+3. Si la pantalla es una de las tres vistas base, abre sin consultar modulos.
+4. Si no hay organizacion resuelta, vuelve al inicio declarando ese caso — no se presenta como falta de modulo ni como falla de servicio.
+5. El guard pregunta al resolver de Portal Cliente si algun modulo vigente de esa organizacion declara la pantalla.
+6. Si lo declara, se renderiza con datos del scope permitido.
+7. Si no lo declara, vuelve al inicio con el empty state de modulo no activado.
+8. Si el resolver falla de verdad, vuelve al inicio con el estado de falla y queda capturado en observabilidad.
+9. Si la fuente esta vacia o inicial, se muestra zero-state; si falla parcialmente, degraded. Nunca se degrada un error de autorizacion como si fuera vacio.
 
 ## Fronteras importantes
 
@@ -113,6 +151,10 @@ La regla central es: un cliente ve una experiencia adaptada por rol, vistas asig
 - "Un zero-state es un error?"
 - "Puede un cliente cambiar sus propios modulos?"
 - "Cual es la diferencia entre vista, modulo y capability?"
+- "Que pantallas del portal cliente abren sin contratar nada?"
+- "Que significa que un usuario cliente no tenga organizacion resuelta, y por que activar un modulo no lo arregla?"
+- "Por que Ciclos y Analytics no abren para ninguna organizacion hoy?"
+- "Por que un cliente puede ver un enlace en el menu y recibir el empty state al entrar?"
 
 ## Referencias de codigo y DB
 

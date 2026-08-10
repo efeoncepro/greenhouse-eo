@@ -77,6 +77,18 @@ or operational doc for that domain.
    - If strict recommends `pnpm docs:context-rotate --apply`, run it and then re-run strict. Rotation must satisfy
      every active budget, not only the primary count: `Handoff.md` uses sessions + lines + tokens, and
      `changelog.md` uses entries + lines + tokens.
+   - 🔴 **El context gate va ÚLTIMO, después de closure-check y después de la última edición documental.
+     `docs:closure-check` NO incluye `docs:context-check:strict`** — son gates de cosas distintas:
+     closure-check audita si la documentación acompaña al cambio (arquitectura, funcional, manuales, flags)
+     y no mira techos de contexto; context-check:strict es el único que cuenta entradas, líneas y tokens.
+     Secuencia que falla y se siente correcta (verificado 2026-08-09, run `31340366010` rojo en `develop`):
+     corres `docs:context-check:strict` → 0/0 → **después** agregas la entrada al `changelog.md`/`Handoff.md`
+     → corres `docs:closure-check` → 0 warnings → commiteas → el CI rechaza `changelog.md has 61 entries`.
+     Cualquier edición a `Handoff.md` o `changelog.md` **invalida el resultado previo del context gate**, y
+     en un cierre se tocan los dos casi siempre.
+     **Orden seguro: todas las ediciones documentales → `docs:closure-check` → `docs:context-rotate --apply`
+     si hace falta → `docs:context-check:strict` → commit.** Si vuelves a tocar la bitácora después, vuelve
+     a correr el strict.
    - Task docs: run `pnpm task:lint --changed` or the focal task command.
    - UI docs with visible runtime: include GVC evidence or state the exact
      blocker.
@@ -160,6 +172,9 @@ Use this matrix to choose the smallest complete update set.
   full session history in the root handoff/archive index.
 - Never let `changelog.md` become an append-only archive. Keep complete recent entries in root, rotate older
   entries to integrity-marked monthly shards, and preserve the initial cut byte-for-byte.
+- Never commit a closure whose last documentary edit happened AFTER the last `pnpm docs:context-check:strict`
+  run. `docs:closure-check` does not cover context budgets, so a green closure-check plus a stale context-check
+  is exactly how a red CI reaches `develop`. Re-run the strict gate as the final step.
 - Never close context governance with warnings. If the checker says rotation is required but the rotator says
   nothing can be archived, treat that as a rotator bug or a documented exception; fix the cause and re-run
   `pnpm docs:context-check:strict`.
