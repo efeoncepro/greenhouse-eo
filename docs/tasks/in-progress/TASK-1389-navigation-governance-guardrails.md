@@ -38,7 +38,7 @@ Causado por `TASK-1675` / `TASK-1680` (complete, en producción).
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
