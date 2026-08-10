@@ -12,6 +12,7 @@ import { styled } from '@mui/material/styles'
 import Avatar from '@mui/material/Avatar'
 import Badge from '@mui/material/Badge'
 import Button from '@mui/material/Button'
+import ButtonBase from '@mui/material/ButtonBase'
 import ClickAwayListener from '@mui/material/ClickAwayListener'
 import Divider from '@mui/material/Divider'
 import Fade from '@mui/material/Fade'
@@ -23,9 +24,14 @@ import Typography from '@mui/material/Typography'
 
 import { useSettings } from '@core/hooks/useSettings'
 import { getGreenhouseNavigationCopy } from '@/config/greenhouse-navigation-copy'
+import { getMicrocopy } from '@/lib/copy'
 import { GH_MESSAGES } from '@/lib/copy/client-portal'
 import { buildMyNavItems } from '@/lib/navigation/my-nav-items'
 import { getInitials } from '@/utils/getInitials'
+
+const microcopy = getMicrocopy()
+
+const USER_MENU_ID = 'gh-user-dropdown-menu'
 
 const BadgeContentSpan = styled('span')({
   width: 8,
@@ -47,7 +53,7 @@ type Props = {
 
 const UserDropdown = ({ avatarUrl = null }: Props) => {
   const [open, setOpen] = useState(false)
-  const anchorRef = useRef<HTMLDivElement>(null)
+  const anchorRef = useRef<HTMLButtonElement>(null)
   const router = useRouter()
   const { settings } = useSettings()
   const { data: session } = useSession()
@@ -62,6 +68,12 @@ const UserDropdown = ({ avatarUrl = null }: Props) => {
   )
 
   const isMyUser = routeGroups.includes('my')
+  const isClientUser = routeGroups.includes('client')
+
+  // TASK-1686 — mismo predicado que VerticalMenu: solo decide si se aplica la
+  // proyección collaborator-pura; my+client conserva la salida cliente vigente.
+  const isPureCollaborator = isMyUser && !isInternalPortalUser && !isClientUser
+
   const authorizedViews = session?.user?.authorizedViews ?? []
   const { client: GH_CLIENT_NAV, my: GH_MY_NAV } = getGreenhouseNavigationCopy(locale)
 
@@ -121,23 +133,29 @@ const UserDropdown = ({ avatarUrl = null }: Props) => {
 
   return (
     <>
+      {/* TASK-1686 (a11y) — el trigger es un control semántico único: botón real
+          con nombre, teclado (Enter/Espacio nativos), aria-haspopup/expanded/
+          controls. Antes eran un Badge y un Avatar con onClick duplicado. */}
       <Badge
-        ref={anchorRef}
         overlap='circular'
-        badgeContent={<BadgeContentSpan onClick={handleDropdownOpen} />}
+        badgeContent={<BadgeContentSpan />}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         className='mis-2'
       >
-        <Avatar
+        <ButtonBase
           ref={anchorRef}
-          alt={userName || 'Greenhouse'}
-          src={avatarUrl ?? undefined}
           onClick={handleDropdownOpen}
-          className='cursor-pointer bs-[38px] is-[38px]'
+          aria-label={microcopy.aria.userMenu}
+          aria-haspopup='menu'
+          aria-expanded={open || undefined}
+          aria-controls={open ? USER_MENU_ID : undefined}
+          className='rounded-full'
           data-capture='avatar-trigger'
         >
-          {userInitials}
-        </Avatar>
+          <Avatar alt={userName || 'Greenhouse'} src={avatarUrl ?? undefined} className='bs-[38px] is-[38px]'>
+            {userInitials}
+          </Avatar>
+        </ButtonBase>
       </Badge>
       <Popper
         open={open}
@@ -157,11 +175,15 @@ const UserDropdown = ({ avatarUrl = null }: Props) => {
             <Paper className={settings.skin === 'bordered' ? 'border shadow-none' : 'shadow-lg'}>
               <ClickAwayListener onClickAway={e => handleDropdownClose(e as MouseEvent | TouchEvent)}>
                 <MenuList
+                  id={USER_MENU_ID}
                   className='max-bs-[70vh] overflow-y-auto'
                   data-capture='avatar-dropdown'
                   onKeyDown={event => {
-                    // Flow contract TASK-1388: Esc cierra el dropdown.
-                    if (event.key === 'Escape') setOpen(false)
+                    // Flow contract TASK-1388/1686: Esc cierra y restaura el foco al trigger.
+                    if (event.key === 'Escape') {
+                      setOpen(false)
+                      anchorRef.current?.focus()
+                    }
                   }}
                 >
                   {/* TASK-1388 — header de perfil clickeable: es la puerta a Mi Perfil. */}
@@ -183,6 +205,16 @@ const UserDropdown = ({ avatarUrl = null }: Props) => {
                         <Typography color='text.primary'>{GH_MY_NAV[item.copyKey].label}</Typography>
                       </MenuItem>
                     ))
+                  ) : isPureCollaborator ? (
+                    // TASK-1686 — colaborador puro: identidad + Mi Perfil + salir.
+                    // Su rail ES el índice de Mi Ficha (guardrail TASK-1388): acá
+                    // NO se espejan las 13 hojas ni se muestran shortcuts cliente.
+                    profileHref ? (
+                      <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, profileHref)}>
+                        <i className='tabler-user-circle' />
+                        <Typography color='text.primary'>{GH_MY_NAV.profile.label}</Typography>
+                      </MenuItem>
+                    ) : null
                   ) : (
                     <>
                       <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, dashboardHref)}>
