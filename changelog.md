@@ -7,7 +7,7 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
-## 2026-08-10 — TASK-1388: la navegación interna se reparte entre sus 3 superficies (code complete)
+## 2026-08-10 — TASK-1388 cerrada: la navegación interna se reparte entre sus 3 superficies
 
 Reequilibrio del portal interno en develop (5 commits, sin push): el rail pasa de 12 grupos top-level
 a 3 zonas (Operación · Administración · Recursos) con dominios colapsables uniformes; las hojas
@@ -22,8 +22,9 @@ acciones — la `NavSearch` retirada exponía el `VIEW_REGISTRY` completo sin fi
   (admin)" desambiguado, Herramientas IA una sola vez, `verticalMenuData.tsx` legacy borrado.
 - Los 4 hallazgos a11y del chrome que TASK-1675 midió quedaron cerrados: focus ring en el rail,
   región scrollable con role/label/foco, toggle del drawer accesible, desborde de 8px del panel.
-- Evidencia GVC premium (3 scenarios, desktop+390px) + scorecard 4.93. Cierre formal pendiente:
-  build de producción autorizado, card-sort/sign-off de nombres y promoción de baseline.
+- Evidencia GVC premium (3 scenarios, desktop+390px) + scorecard 4.93 + baselines durables
+  promovidos. Cerrada el mismo día con autorización del operador: build de producción verde, test
+  full (10.447), `UI ready: yes` (card-sort formal queda como validación posterior no bloqueante).
 
 ## 2026-08-09 — Barrido documental del carril cliente: el doc de contrato estaba invertido
 

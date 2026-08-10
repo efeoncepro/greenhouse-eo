@@ -1,9 +1,9 @@
 # Sistema de Identidad, Roles y Acceso
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-04-05 por Claude (TASK-248)
-> **Ultima actualizacion:** 2026-08-09 por Claude (el carril cliente se gobierna por modulo contratado y falla hacia cerrado)
+> **Ultima actualizacion:** 2026-08-10 por Claude (TASK-1388: la navegacion interna se reparte en 3 superficies — sidebar por zonas, Mi Ficha en el avatar, un solo ⌘K)
 > **Documentacion tecnica:** [GREENHOUSE_IDENTITY_ACCESS_V2.md](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md), [GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md](../../architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md), [GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md)
 
 ---
@@ -99,6 +99,22 @@ Cada scope (organizacion, space, proyecto, departamento) puede tener un responsa
 ---
 
 ## El menu: que ve cada persona al entrar
+
+> **Delta 2026-08-10 (TASK-1388) — la navegación interna se reparte entre 3 superficies.** El QUÉ ve
+> cada persona no cambió (mismos roles, mismas vistas, mismas rutas); cambió el DÓNDE:
+>
+> - **Sidebar interno**: ahora son 3 zonas — **Operación** (dominios Agencia · Comercial · Finanzas ·
+>   Personas), **Administración** (Admin Center; "Spaces (admin)" desambiguado) y **Recursos**
+>   (Knowledge · Design System). Un dominio abierto a la vez (acordeón).
+> - **"Mi Ficha" (rutas personales `/my/*`)**: para usuarios internos ya **no** vive en el sidebar —
+>   está en el **menú del avatar** (esquina superior derecha), con el header de perfil clickeable
+>   hacia Mi Perfil. El colaborador puro (solo `my`) la conserva en su sidebar, porque ahí es su
+>   contenido principal.
+> - **Buscador ⌘K**: una sola superficie (Cmd/Ctrl+K o el botón de búsqueda), con resultados
+>   filtrados por lo que tu rol puede ver, recientes y la acción de cerrar sesión.
+>
+> Las filas de la tabla siguiente describen el CONJUNTO visible por rol, que sigue vigente; leer
+> "Mi Ficha" como "en el menú del avatar" cuando la persona es interna.
 
 Cuando alguien inicia sesion, el sistema calcula que secciones del menu mostrar basandose en sus roles:
 

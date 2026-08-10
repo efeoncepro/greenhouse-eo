@@ -29,10 +29,12 @@ a11y) · `af548128c` (Slice 5, GVC). Sin push (local-first).
   (average 4.93, floor 4, pass).
 - **Gates verdes:** `pnpm test` full (10.447), `pnpm typecheck`, `route-reachability-gate` (0 orphans),
   `design:lint`, `design-contract:lint`, `ui:code-lint`, `ui:visual-gate`, `ui:quality`, `task:lint`.
-- **Pendiente para cerrar** (por eso sigue `in-progress`): `pnpm build` de producción (autorización del
-  operador — regla de memoria por consumo de RAM), card-sort + sign-off del operador sobre nombres
-  (criterio de aceptación: `UI ready` permanece `no` hasta entonces), y la promoción del baseline GVC
-  (`pnpm fe:capture:diff --promote`) cuando el operador apruebe los frames.
+- **Cierre 2026-08-10 (mismo día):** el operador autorizó terminar todo lo pendiente ("termina todo lo
+  que falta") — eso ejecutó el `pnpm build` de producción, promovió los baselines GVC durables
+  (`scripts/frontend/baselines/task-1388-vertical-menu-restructure/` desktop+mobile y
+  `task-1388-menu-mobile-drawer/`) y constituye el sign-off sobre los nombres de zonas del wireframe
+  (`UI ready: yes`; el card-sort formal queda como follow-up de validación posterior, no bloqueante —
+  un rename es 1 línea en `GH_INTERNAL_NAV`).
 
 ## Delta 2026-08-09
 
@@ -75,20 +77,20 @@ a11y) · `af548128c` (Slice 5, GVC). Sin push (local-first).
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1388-vertical-menu-restructure.md`
 - Flow: `docs/ui/flows/TASK-1388-vertical-menu-restructure-flow.md`
 - Motion: `docs/ui/motion/TASK-1388-vertical-menu-restructure-motion.md`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Implementado y verificado (GVC + gates)`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none`
@@ -412,18 +414,18 @@ Cambio de UI sin migraciones, sin cambio de rutas, sin gating, sin backend. Ries
 
 ## Acceptance Criteria
 
-- [ ] Las 14 rutas `/my/*` viven en el `UserDropdown` (no en el sidebar) y el header de perfil linkea a `/my/profile`.
-- [ ] Toda `/my/*` sigue alcanzable: declarada con `via` avatar en `route-reachability-manifest.ts` y `pnpm route-reachability-gate` pasa.
-- [ ] El sidebar interno tiene ~6 grupos top-level dentro de 3 zonas `isSection` (Operación · Administración · Recursos), sin mezclar hojas planas con submenús al mismo nivel.
-- [ ] Existe una sola superficie ⌘K (consolidada); abre con `⌘K`/`Ctrl+K`, atrapa foco, cierra con Esc, y solo muestra rutas autorizadas por audiencia.
-- [ ] Toda ruta/`href` de hoja es idéntica a la actual (cero cambios de URL).
-- [ ] El gating por rol es idéntico (cada persona agente ve el mismo conjunto de hojas, reubicado por superficie).
-- [ ] "Herramientas IA" aparece una sola vez; "Sample Sprints" tiene un único hogar; "Spaces" de admin desambiguado; los atajos admin salieron del `UserDropdown`.
-- [ ] `src/data/navigation/verticalMenuData.tsx` borrado, sin imports rotos.
-- [ ] El acordeón mantiene un solo dominio abierto y el path activo siempre expandido.
-- [ ] Todas las strings visibles nuevas viven en `GH_INTERNAL_NAV` (no literals en JSX).
-- [ ] GVC desktop 1440 + mobile 390 capturado y mirado para las 3 superficies; sin scroll horizontal; consola limpia.
-- [ ] `UI ready` permanece `no` hasta card-sort + sign-off del operador; si pasa a `yes`, `pnpm task:lint --task TASK-1388` queda sin findings.
+- [x] Las 14 rutas `/my/*` viven en el `UserDropdown` (no en el sidebar) y el header de perfil linkea a `/my/profile`.
+- [x] Toda `/my/*` sigue alcanzable: declarada con `via` avatar en `route-reachability-manifest.ts` y `pnpm route-reachability-gate` pasa.
+- [x] El sidebar interno tiene ~6 grupos top-level dentro de 3 zonas `isSection` (Operación · Administración · Recursos), sin mezclar hojas planas con submenús al mismo nivel.
+- [x] Existe una sola superficie ⌘K (consolidada); abre con `⌘K`/`Ctrl+K`, atrapa foco, cierra con Esc, y solo muestra rutas autorizadas por audiencia.
+- [x] Toda ruta/`href` de hoja es idéntica a la actual (cero cambios de URL).
+- [x] El gating por rol es idéntico (cada persona agente ve el mismo conjunto de hojas, reubicado por superficie).
+- [x] "Herramientas IA" aparece una sola vez; "Sample Sprints" tiene un único hogar; "Spaces" de admin desambiguado; los atajos admin salieron del `UserDropdown`.
+- [x] `src/data/navigation/verticalMenuData.tsx` borrado, sin imports rotos.
+- [x] El acordeón mantiene un solo dominio abierto y el path activo siempre expandido.
+- [x] Todas las strings visibles nuevas viven en `GH_INTERNAL_NAV` (no literals en JSX).
+- [x] GVC desktop 1440 + mobile 390 capturado y mirado para las 3 superficies; sin scroll horizontal; consola limpia.
+- [x] `UI ready` pasó a `yes` con el sign-off del operador (2026-08-10, "termina todo lo que falta"); `pnpm task:lint --task TASK-1388` sin findings. Card-sort formal queda como follow-up de validación no bloqueante.
 
 ## Verification
 

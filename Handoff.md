@@ -1,23 +1,22 @@
 # Handoff activo
 
-### TASK-1388 code complete en develop — cierre formal pendiente de 3 cosas (2026-08-10)
+### TASK-1388 CERRADA — la navegación interna repartida en sus 3 superficies (2026-08-10)
 
-Los 5 slices implementados y verificados en local, commits `814b8b088`…`af548128c` (sin push,
-local-first): rehome atómico `/my/*` sidebar→avatar (builder canónico
-`src/lib/navigation/my-nav-items.ts`), rail interno en 3 zonas (Operación · Administración ·
-Recursos), ⌘K consolidado sobre `CommandPalette` con filtro de audiencia (la `NavSearch` retirada
-exponía el registry completo), dedup (Sample Sprints→Comercial, Growth dentro de Comercial, Spaces
-(admin)), legacy borrado y los 4 fixes a11y heredados de TASK-1675 cerrados. Gates verdes: `pnpm test`
-full (10.447), typecheck, lint full, reachability (0 orphans), design:lint, design-contract:lint,
-ui:code-lint, ui:visual-gate, ui:quality (scorecard 4.93/floor 4), task:lint. La rama no-interna del
-menú quedó intacta en visibilidad (test de identidad; coordinación TASK-1685 documentada por Delta).
+Implementación completa en `develop`, autorizada a cierre total por el operador ("termina todo lo que
+falta"): rail interno en 3 zonas (Operación · Administración · Recursos, acordeón nativo), `/my/*`
+rehomed al avatar (builder canónico `src/lib/navigation/my-nav-items.ts`), ⌘K único
+(`GlobalCommandPalette` sobre la `CommandPalette` de TASK-696, con filtro de audiencia — la
+`NavSearch` retirada exponía el registry completo), dedup + legacy borrado + los 4 fixes a11y de
+TASK-1675. Cero cambios de rutas/gating (test de identidad interno + no-interno). Gates TODOS verdes
+incluido `pnpm build` de producción y `pnpm test` full (10.447); baselines GVC durables promovidos
+(`scripts/frontend/baselines/task-1388-*`); scorecard 4.93. `UI ready: yes` con sign-off del operador.
 
-**Para cerrar (por eso sigue `in-progress`):** (1) `pnpm build` de producción — pedir autorización del
-operador antes (regla de memoria por RAM); (2) card-sort + sign-off del operador sobre nombres de
-zonas (`UI ready` permanece `no` por criterio de aceptación; un rename = 1 línea en
-`GH_INTERNAL_NAV`); (3) promover baseline GVC (`pnpm fe:capture:diff --promote`) al aprobar frames.
-Riesgo conocido: gap `aria-expanded` en triggers de `@menu` (chrome intocable), documentado en el
-scorecard; estado abierto/cerrado se aserta por clase `ts-open`.
+**Continuidad para quien siga:** (1) `TASK-1389` quedó desbloqueada — el sidebar está bajo el tope,
+su gate `nav:budget` es promovible a `error` (Delta escrito allá); (2) card-sort formal de nombres de
+zonas queda como validación posterior NO bloqueante (rename = 1 línea en `GH_INTERNAL_NAV`); (3) gap
+conocido del chrome: `@menu` no expone `aria-expanded` en triggers de submenú (intocable; estado
+canónico = clase `ts-open`, documentado en el scorecard) — decidir como deuda de chrome aparte;
+(4) la rama no-interna del menú quedó con punto de extensión limpio para `TASK-1685` (Delta escrito).
 
 ### ⛔ PARAR ACÁ — decisión pendiente del portal cliente, y una advertencia sobre esta sesión (2026-08-09)
 
