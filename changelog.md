@@ -16,6 +16,15 @@ aunque tenga cero errores, es un fallo bloqueante. La reparación también compl
 wireframe/flow/motion/readiness de TASK-1686; no cambió runtime, rutas, acceso ni la implementación de
 la task.
 
+## 2026-08-10 — TASK-1389 cerrada: la navegación quedó con candado anti-regresión
+
+Cierra el programa de navegación del día (1388 → 1686 → 1389): Contrato de Asignación de Superficies
+canónico (qué destino va a qué superficie, sin duplicar, nada nuevo colgado del primer nivel fuera de
+zonas) + campo `Nav placement` obligatorio en tasks con destino visible + gate `pnpm nav:budget` que
+mide el árbol real del rail interno contra el presupuesto (8 slots top-level · profundidad 2 · cero
+`/my/*`) y el manifest. Nació directo en `error` con 0 violaciones medidas; doble cobertura CI (suite
++ job en design-contract.yml). Lo que infló el sidebar a 96 hojas ya no puede repetirse en silencio.
+
 ## 2026-08-10 — TASK-1686 cerrada: el colaborador puro deja de ver un portal ajeno
 
 Continuación directa de TASK-1388, mismo día: la rama no-interna del menú bifurca con
@@ -1198,20 +1207,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
 - Polpaico LIC-6533 quedó clasificada como discovery interno en HOLD/NO-BID provisional. Se retiró el stub
   económico renderizable de monto cero, se corrigieron referencias a decks inexistentes y se minimizaron enlaces
   profundos/identificadores personales; no se emitió ni envió una oferta.
-
-## 2026-08-01 — Studio Credits operativo por UI y OAuth PKCE
-
-- Greenhouse `develop` y Globe `main` quedaron desplegados con migraciones y OAuth activos. La operación live
-  `23db5b0e-89dd-4661-9b8d-c12f9be4ad7a` aseguró 800 créditos efectivos sobre cap 1500 mediante un único acto
-  atribuido, sin segundo confirmante obligatorio ni break-glass.
-- `ensure-funded` crea o reutiliza el pool mensual determinístico dentro de la misma transacción económica. La UI
-  Greenhouse, el CLI OAuth PKCE y Producer devolvieron 800 efectivos, funding 800, cap/remaining 1500 y cero
-  blockers. ISSUE-124 pasó a resolved.
-- Globe conserva `main` como rama predeterminada/integración/release; Greenhouse permanece en `develop`. No se
-  creó ningún worktree ni se ejecutó un release completo de Greenhouse. El contrato quedó endurecido en el
-  `AGENTS.md` y CI de Globe, el proceso/template/planners de tasks y las 97 tasks activas de EPIC-028; el helper
-  histórico de sincronización de worktrees quedó retirado fail-closed, pre-commit dejó de crear stashes temporales
-  y el harness Codex ahora detecta regresiones.
-- El worker de expiry quedó promovido desde Globe `main` con scheduler minutely, flag y observabilidad activos.
-  El digest `sha256:d8295862…bae9` pasó deploy exacto, canary y OpenTofu sin drift. Dos holds históricos
-  `submission_unknown` se reconcilian/difieren con `failed=0`; no se liberan a ciegas.

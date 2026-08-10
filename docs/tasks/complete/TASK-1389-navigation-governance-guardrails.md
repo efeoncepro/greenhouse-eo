@@ -1,5 +1,32 @@
 # TASK-1389 — Gobernanza de navegación: contrato de superficies + gate de presupuesto del sidebar
 
+## Delta 2026-08-10 (cierre) — implementada; el gate nació directo en severidad final
+
+**Los 3 slices ejecutados en `develop`.** Decisiones de implementación (resuelven las Open Questions):
+
+- **El gate NO parsea fuente ni `GH_INTERNAL_NAV`** (que es solo copy): un evaluador puro
+  (`src/lib/navigation/nav-budget.ts`) mide el `menuData` REAL que `VerticalMenu` construye con la
+  sesión superadmin (claims vacíos = proyección máxima), grabado por el harness de tests. Cero drift
+  de parser frente al constructor imperativo — el riesgo "falsos positivos" de la matriz desaparece
+  de raíz. `scripts/ci/nav-budget-gate.mjs` corre ese test + cross-check del manifest.
+- **Tope medido, no estimado**: `MAX_TOP_LEVEL_SLOTS = 8` (Home pineado + 7 grupos — la medición
+  exacta post-TASK-1388; cero aire, deliberado) y `MAX_INTERACTIVE_DEPTH = 2`. Reglas estructurales:
+  zonas solo en raíz, raíz solo para el Home, cero `/my/*` en el rail (set derivado de
+  `buildMyNavItems`, nunca hardcodeado).
+- **Severidad: nació en `error`, no en `warn`.** La spec condicionaba la promoción a "TASK-1388 verde
+  y sidebar bajo el tope": ambas cumplidas y MEDIDAS al implementar (0 violaciones — precedente
+  TASK-1680 de medir primero). `--warn` existe como escape de emergencia documentado. El supuesto
+  "el sidebar actual tiene 12 grupos" del Goal quedó obsoleto el mismo día por TASK-1388/1686.
+- **Doble cobertura CI**: el test `VerticalMenu.budget.test.tsx` corre en `pnpm test` (workflow CI) y
+  el job `nav-budget` de `design-contract.yml` corre el gate completo en PRs/pushes que tocan
+  `src/components/layout/**`, `src/lib/navigation/**` o el propio gate.
+- **Slice 3**: `NavSurface` + campo opcional `surface` en el manifest; las 13 `/my/*` declaran
+  `surface: 'avatar'`; el gate bloquea `/my/*` con `surface: 'sidebar'`.
+- **CLAUDE.md**: pointer mínimo anexado a la sección de reachability (budget 34.955/35.000, no-loss
+  0 orphans). Contrato: `docs/architecture/agent-invariants/NAVIGATION_SURFACE_ALLOCATION_CONTRACT.md`.
+- Gates: suite full 10.467 ✓ (incluye los 7 del budget test) · nav:budget ✓ · reachability 0
+  orphans ✓ · claude-md check ✓ · YAML válido ✓.
+
 ## Delta 2026-08-10
 
 - **TASK-1388 quedó code complete en develop** (commits `814b8b088`…`af548128c`): el sidebar interno ya
@@ -38,7 +65,7 @@ Causado por `TASK-1675` / `TASK-1680` (complete, en producción).
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -51,7 +78,7 @@ Causado por `TASK-1675` / `TASK-1680` (complete, en producción).
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Implementada; gate en error con 0 violaciones medidas`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -232,13 +259,13 @@ Cambio aditivo de tooling + docs, sin runtime de producción, sin migraciones, s
 
 ## Acceptance Criteria
 
-- [ ] Existe `NAVIGATION_SURFACE_ALLOCATION_CONTRACT.md` con la regla de superficies + el tope explícito, y `CLAUDE.md` tiene el pointer.
-- [ ] `TASK_UI_UX_ADDENDUM.md` incluye el campo declarativo **Nav placement** para tasks con destino visible.
-- [ ] `pnpm nav:budget` existe, deriva el árbol de la SoT (no hardcodea items), y reporta violaciones de top-level, profundidad, patrón mezclado y rutas `/my/*` en el sidebar.
-- [ ] El gate arranca en `warn` y NO rompe CI con el sidebar actual (12 grupos).
-- [ ] La condición de promoción a `error` está documentada y ligada a TASK-1388 verde.
-- [ ] El tope vive como constante explícita documentada, no como número mágico.
-- [ ] (Slice 3) el manifest de reachability declara `surface` por ruta y el gate cruza que ninguna `/my/*` tenga `surface: sidebar`.
+- [x] Existe `NAVIGATION_SURFACE_ALLOCATION_CONTRACT.md` con la regla de superficies + el tope explícito, y `CLAUDE.md` tiene el pointer.
+- [x] `TASK_UI_UX_ADDENDUM.md` incluye el campo declarativo **Nav placement** para tasks con destino visible.
+- [x] `pnpm nav:budget` existe, deriva el árbol de la SoT (no hardcodea items), y reporta violaciones de top-level, profundidad, patrón mezclado y rutas `/my/*` en el sidebar.
+- [x] Severidad: la spec pedía `warn`-first porque el sidebar tenía 12 grupos; al implementar, TASK-1388/1686 ya lo habían bajado y la medición dio 0 violaciones → el gate nació directo en `error` (la condición de promoción estaba cumplida; `--warn` queda como escape documentado). CI no rompe: verde con el árbol real.
+- [x] La condición de promoción quedó documentada y CUMPLIDA (TASK-1388 verde + medición 0 violaciones el mismo día).
+- [x] El tope vive como constante explícita documentada, no como número mágico.
+- [x] (Slice 3) el manifest de reachability declara `surface` por ruta y el gate cruza que ninguna `/my/*` tenga `surface: sidebar`.
 
 ## Verification
 

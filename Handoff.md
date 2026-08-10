@@ -1,5 +1,18 @@
 # Handoff activo
 
+### TASK-1389 CERRADA — el candado anti-regresión de la navegación quedó armado (2026-08-10)
+
+Tercera task del programa de navegación cerrada el mismo día: Contrato de Asignación de Superficies
+(`agent-invariants/NAVIGATION_SURFACE_ALLOCATION_CONTRACT.md` + pointer en CLAUDE.md al límite del
+budget — quedan ~45 tokens de headroom — + campo `Nav placement` en el addendum UI) y gate
+`pnpm nav:budget` que mide el árbol REAL (evaluador puro + harness superadmin, cero drift de parser)
+contra el presupuesto medido (8 slots · profundidad 2 · zonas-solo-raíz · cero `/my/*` derivado del
+builder) + cross-check `surface` del manifest. **Nació directo en `error` con 0 violaciones**
+(la condición warn→error de la spec quedó cumplida por TASK-1388/1686 el mismo día; `--warn` es el
+escape documentado). Doble cobertura CI: test en la suite + job `nav-budget` en design-contract.yml.
+Continuidad: el tope del carril cliente/collaborator se calibra en su follow-up (module-driven — el
+insumo sería el resolver, no este evaluador); considerar extender el contrato a la topbar.
+
 ### TASK-1686 CERRADA — el colaborador puro tiene su propia proyección (2026-08-10)
 
 Implementada el mismo día que su antecesora TASK-1388, en `develop` (4 slices, local): predicado
