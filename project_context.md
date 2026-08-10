@@ -234,6 +234,7 @@ Todo trabajo formal sigue:
 
 - Modelo: [`GREENHOUSE_OPERATING_LOOP_V1.md`](docs/operations/GREENHOUSE_OPERATING_LOOP_V1.md).
 - Tasks: [`docs/tasks/TASK_PROCESS.md`](docs/tasks/TASK_PROCESS.md).
+- Creación de tasks nuevas: la skill `greenhouse-task-planner` debe copiar los cinco marcadores HTML `ZONE` del template y, antes de registrar ID/README, exigir `pnpm task:lint --task TASK-###` con `template=1 legacy=0 errors=0 warnings=0`; una clasificación `legacy=1` bloquea el registro.
 - Calidad de solución: [`SOLUTION_QUALITY_OPERATING_MODEL_V1.md`](docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md).
 - QA: skill `greenhouse-qa-release-auditor` + `pnpm qa:gates --changed`.
 - Cierre documental: skill `greenhouse-documentation-governor` + `pnpm docs:closure-check`.

@@ -92,6 +92,16 @@ Prefer questions like:
 
 Write the complete markdown file following `docs/tasks/TASK_TEMPLATE.md`.
 
+#### Canonical-template gate — mandatory for every new task
+
+Start by copying the template file's structure; do not reconstruct its headings or comments from memory. The task linter distinguishes a canonical task from a legacy task by the literal HTML comments that delimit Zones 0–4, not by headings with equivalent names.
+
+- preserve the five full `<!-- ... ZONE N ... -->` blocks verbatim, including the deliberately empty Zone 2 block
+- populate Zones 0, 1, 3, and 4 only; do not write a plan inside Zone 2
+- run `pnpm task:lint --task TASK-###` immediately after writing the task file and before changing the registry, README, Handoff, or committing
+- registration is permitted only when the summary reports `scanned=1 template=1 legacy=0` and `errors=0 warnings=0`
+- `legacy=1` is a blocking template failure even if `errors=0`: restore the literal Zone markers from `docs/tasks/TASK_TEMPLATE.md` and rerun the command; never describe this as a harmless lint result
+
 Rules:
 
 - fill Zones 0, 1, 3, and 4
@@ -141,9 +151,10 @@ Wait for confirmation before registering the task in the repo.
 After confirmation:
 
 1. write the task file to `docs/tasks/to-do/TASK-###-short-slug.md`
-2. add the ID to `docs/tasks/TASK_ID_REGISTRY.md`
-3. update `docs/tasks/README.md`
-4. leave the repo documentation consistent with the new task
+2. pass the canonical-template gate (`template=1`, `legacy=0`, zero errors and warnings)
+3. add the ID to `docs/tasks/TASK_ID_REGISTRY.md`
+4. update `docs/tasks/README.md`
+5. leave the repo documentation consistent with the new task
 
 ## Quality Rules
 
