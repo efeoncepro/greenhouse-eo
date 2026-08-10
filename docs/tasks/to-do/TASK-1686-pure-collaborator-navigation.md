@@ -1,5 +1,11 @@
 # TASK-1686 — Navegación del colaborador puro: rail personal preservado y avatar coherente
 
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 0 — IDENTITY & TRIAGE
+     "Que task es y puedo tomarla?"
+     Un agente lee esto primero. Si Lifecycle = complete, STOP.
+     ═══════════════════════════════════════════════════════════ -->
+
 ## Delta 2026-08-10 — revisión post-cierre de TASK-1388: la task SIGUE teniendo cabida, con el gap re-dimensionado
 
 Verificado contra el runtime que TASK-1388 dejó en `develop` (commits `814b8b088`…`7f21e3d14`) + la DB:
@@ -13,7 +19,7 @@ Verificado contra el runtime que TASK-1388 dejó en `develop` (commits `814b8b08
   la rama no-interna — para el colaborador real (sin `cliente.*`) sus children quedan vacíos y el rail
   muestra un heading "Mi Cuenta" sin contenido. Evidencia directa a favor del Slice 2.
 - **El agujero principal vigente es el avatar, tal como dice el "Why #2", y es SIN gating:** la rama
-  no-interna del `UserDropdown` renderiza Proyectos/Ciclos/Configuración/Novedades **incondicionalmente**
+  no-interna del `UserDropdown` renderiza Proyectos/Ciclos/'Mi Greenhouse' (label de `GH_CLIENT_NAV.settings` → `/settings`)/Novedades **incondicionalmente**
   (sin `canSeeView`), así que el colaborador real los ve aunque no puede abrirlos. TASK-1388 le dejó de
   regalo el header clickeable → Mi Perfil (ya funciona para collaborator), pero los shortcuts cliente
   siguen.
@@ -38,7 +44,7 @@ Verificado contra el runtime que TASK-1388 dejó en `develop` (commits `814b8b08
 - UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1686-pure-collaborator-navigation.md`
 - Flow: `docs/ui/flows/TASK-1686-pure-collaborator-navigation-flow.md`
-- Motion: `none`
+- Motion: `docs/ui/motion/TASK-1686-pure-collaborator-navigation-motion.md`
 - Backend impact: `none`
 - Epic: `none`
 - Status real: `Diseño y contrato de implementación completos; no iniciada`
@@ -71,6 +77,13 @@ Ocultar menú no cambia guards. Un deep-link cliente interno puede seguir pasand
 - Cliente, interno e híbrido conservan exactamente la conducta vigente; no cambia URL, viewCode, grant, claim, guard o módulo.
 - Tests de identidad y GVC premium collaborator verifican desktop, 390 px, cmdk y a11y.
 
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 1 — CONTEXT & CONSTRAINTS
+     "Que necesito entender antes de planificar?"
+     El agente lee cada doc referenciado aqui. Si un doc no
+     existe en el repo, reporta antes de continuar.
+     ═══════════════════════════════════════════════════════════ -->
+
 ## Architecture Alignment
 
 Revisar y respetar:
@@ -92,6 +105,13 @@ Reglas obligatorias:
 - **NUNCA** mantener Avatar/badge clickeables sin semántica: trigger debe tener nombre, teclado, aria-haspopup, aria-expanded y aria-controls.
 - **SIEMPRE** preservar gates contractor/documento y demostrar que deep-link policy no cambió.
 - Si aparece cambio de authorization, **detener** y derivar a TASK-1685/ADR.
+
+## Normative Docs
+
+- `docs/tasks/TASK_TEMPLATE.md` — estructura y Zonas canónicas.
+- `docs/tasks/TASK_UI_UX_ADDENDUM.md` — contrato `ui-standard` y evidencia GVC.
+- `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md` — placement metadata; no autoriza extracción.
+- `docs/architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md` — escenarios, capturas y dossier GVC.
 
 ## Dependencies & Impact
 
@@ -117,6 +137,7 @@ Reglas obligatorias:
 - `src/components/layout/vertical/VerticalMenu.test.tsx`
 - `src/components/layout/shared/UserDropdown.tsx`
 - `src/components/layout/shared/UserDropdown.test.tsx` (nuevo)
+- `src/config/greenhouse-nomenclature.ts` + `src/config/greenhouse-navigation-copy.ts` (tokenizar los section labels literales 'Mi Ficha'/'Mi Cuenta'/'Módulos' que el Slice 2 toca; espejo en-US obligatorio)
 - `src/lib/navigation/route-reachability-manifest.ts` (sólo si su razón deja de describir runtime)
 - `scripts/frontend/scenarios/task-1686-pure-collaborator-navigation.scenario.ts` (nuevo)
 - `scripts/frontend/scenarios/task-1686-pure-collaborator-mobile-drawer.scenario.ts` (nuevo)
@@ -251,6 +272,19 @@ Reglas obligatorias:
 - Visual scorecard: `docs/ui/reviews/TASK-1686-pure-collaborator-navigation.scorecard.json`.
 - Quality threshold: `average >= 4.5; floor >= 4; hierarchy/surface economy/visual impact/fidelity/template resistance >= 4.5`.
 
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 2 — PLAN MODE
+     El agente que toma esta task ejecuta Discovery y produce
+     plan.md segun TASK_PROCESS.md. No llenar al crear la task.
+     ═══════════════════════════════════════════════════════════ -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 3 — EXECUTION SPEC
+     "Que construyo exactamente, slice por slice?"
+     El agente solo lee esta zona DESPUES de que el plan este
+     aprobado. Ejecuta un slice, verifica, commitea, y avanza.
+     ═══════════════════════════════════════════════════════════ -->
+
 ## Scope
 
 ### Slice 1 — Contrato negativo de audiencia
@@ -261,7 +295,7 @@ Reglas obligatorias:
 
 ### Slice 2 — Rail personal aislado
 
-- Predicado explícito: isMyUser && !isInternalPortalUser && !routeGroups.includes('client'); my+client sigue client hasta decisión de dominio.
+- Predicado explícito: isMyUser && !isInternalPortalUser && !routeGroups.includes('client'); my+client conserva su salida VIGENTE byte-a-byte (rail cliente + bloques `isMyUser` actuales) — el predicado sólo decide si se aplica la proyección collaborator-pura, nunca recorta a un híbrido (resolución del conflicto matriz↔Goal, auditoría 2026-08-10).
 - Collaborator: home + Mi Ficha builder + recursos plataforma; no colecciones cliente.
 - Client: branch actual base/account/módulos TASK-1675 byte-equivalente.
 - Eliminar copy personal literal residual y reusar nomenclatura.
@@ -295,7 +329,7 @@ Reglas obligatorias:
 | client | base/módulos/Mi Cuenta actual | actual | TASK-1675 equivalente |
 | internal | zonas TASK-1388 | bloque personal actual | sin /my/* rail interno |
 | hybrid my+internal | internal | internal | grupo operativo prevalece |
-| my+client | client | client | no inferir collaborator |
+| my+client | client VIGENTE (incluye los bloques `isMyUser` actuales: home `/my` + sección Mi Ficha) | client VIGENTE (header clickeable si `profileHref`) | no APLICAR la proyección collaborator-pura; conservar byte-a-byte la salida actual |
 
 ### Invariantes de regresión
 
@@ -347,6 +381,13 @@ Sin flag: ajuste local reversible, sin persistencia ni contrato runtime nuevo. R
 ### Out-of-band coordination required
 
 N/A — repo-only. Si collaborator no autentica, bloquear evidencia y usar Agent Auth sin exponer secretos.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 4 — VERIFICATION & CLOSING
+     "Como compruebo que termine y que actualizo?"
+     El agente ejecuta estos checks al cerrar cada slice y
+     al cerrar la task completa.
+     ═══════════════════════════════════════════════════════════ -->
 
 ## Acceptance Criteria
 
