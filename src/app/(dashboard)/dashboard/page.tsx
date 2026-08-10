@@ -14,6 +14,12 @@ export default async function Page() {
     redirect('/login')
   }
 
+  // client-portal-visibility-allowed: `cliente.pulse` es el HOME del portal cliente, y el home
+  // es el terminator del guard — es adonde `requireViewCodeAccess` redirige cuando deniega.
+  // Gatearlo con el primitive lo haría depender de que algún módulo declare `cliente.pulse`, y
+  // una organización sin ese módulo quedaría sin entrada Y sin destino de denegación: un
+  // cliente encerrado. Por eso `cliente.pulse` está marcado `guarded: false` en el catálogo de
+  // navegación y queda en el carril de rol a propósito.
   const hasAccess = hasAuthorizedViewCode({
     tenant,
     viewCode: 'cliente.pulse',

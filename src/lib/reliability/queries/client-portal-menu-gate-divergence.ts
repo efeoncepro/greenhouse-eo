@@ -1,11 +1,14 @@
 import 'server-only'
 
-import { resolveAuthorizedViewsForUser } from '@/lib/admin/view-access-store'
-import {
-  isClientPortalBaseViewCode,
-  resolveClientPortalModulesForOrganization
-} from '@/lib/client-portal/readers/native/module-resolver'
 import { CLIENT_PORTAL_NAV_CATALOG } from '@/lib/client-portal/visibility/client-portal-nav-catalog'
+import {
+  canSeeClientPortalView,
+  isClientPortalBaseViewCode
+} from '@/lib/client-portal/visibility/client-portal-view-visibility'
+import {
+  canOpenClientPortalView,
+  resolveClientPortalVisibilityInputs
+} from '@/lib/client-portal/visibility/resolve-client-portal-visibility'
 import { query } from '@/lib/db'
 import { captureWithDomain } from '@/lib/observability/capture'
 import type { ReliabilitySignal } from '@/types/reliability'
@@ -26,50 +29,52 @@ import type { ReliabilitySignal } from '@/types/reliability'
  * 8 de 8 usuarios cliente**, todos en la dirección "el menú promete y la puerta niega" —
  * incluidos los 3 usuarios reales de Sky Airlines, que veían "Ciclos" y "Analytics" muertos.
  *
- * ## Qué mide, y qué NO — leer antes de confiar en el cero
+ * ## La pregunta que responde: ¿el menú declara superficies inalcanzables?
  *
- * La señal **no replica** la lógica de ninguno de los dos lados: invoca las primitives reales.
- * El lado puerta llama a los mismos helpers que el guard (`isClientPortalBaseViewCode` +
- * `resolveClientPortalModulesForOrganization`); el lado menú llama a la derivación real del
- * claim (`resolveAuthorizedViewsForUser`) más el merge aditivo de ítems de módulo. Replicar
- * las reglas acá habría creado la tercera fuente de verdad justo en el detector de que hay
- * dos.
+ * Hay dos formas de que la respuesta sea "sí", y ambas las crea un cambio de **dato**, no de
+ * código — por eso ningún gate de CI las puede ver y por eso esto es una señal:
  *
- * **Después del Slice 2 el cero es estructural para la DECISIÓN**, y conviene decirlo en vez
- * de dejar creer que el cero prueba más de lo que prueba: menú y puerta pasan a consumir el
- * mismo predicado, así que no pueden discrepar sobre los mismos insumos. Lo que esta señal
- * sigue detectando después:
+ * **(1) Por organización.** Una superficie del catálogo que el menú ofrece a una persona
+ * concreta y que su page guard niega. Es lo que `ISSUE-148` midió en 36 pares. Desde el
+ * Slice 2 el menú y la puerta consumen el mismo predicado, así que este conteo es 0 **por
+ * construcción**, y conviene decirlo en vez de dejar creer que el cero prueba más de lo que
+ * prueba. Se sigue evaluando porque es barato y porque es la aserción explícita del
+ * invariante: si alguien reintroduce una segunda fuente en el camino del menú, sube.
  *
- *   - **drift de insumos** — el menú resuelve sus módulos en `(dashboard)/layout.tsx` y la
- *     página los resuelve en su propio render, cada uno contra un cache de 60s por instancia.
- *     Un assignment recién cambiado puede dejarlos desalineados de forma transitoria;
- *   - **una segunda fuente reintroducida** — si alguien vuelve a derivar visibilidad desde el
- *     claim de rol en cualquiera de los dos lados, los conjuntos se separan y la señal sube;
- *   - **claim degradado** — cuando la derivación falla, el menú cae a su fallback permisivo y
- *     ofrece superficies que la organización no contrató.
+ * **(2) Por catálogo — la que sí puede romperse sola.** Una superficie que el menú declara y
+ * que **ningún módulo del catálogo comercial vende**. No es que a esta organización le falte
+ * el assignment: es que **ninguna organización puede alcanzarla jamás**, porque no existe
+ * producto que la conceda. El menú declara una puerta para la que nadie fabricó llave.
+ *
+ * Al 2026-08-10 el conteo (2) es **2**: `cliente.ciclos` y `cliente.analytics` están en el
+ * catálogo de navegación y ningún módulo las declara. Eso es honesto y es el estado real —
+ * misma postura que `assigned_view_without_route`, que nació en 1 en vez de esconder su caso
+ * en un allowlist. Antes del Slice 2 esas dos rutas eran enlaces muertos (el rol las mostraba,
+ * la puerta las negaba); ahora simplemente no se muestran. **No se perdió acceso**: nadie
+ * podía abrirlas antes tampoco.
  *
  * Lo que esta señal **no** puede ver es una regresión a nivel JSX (alguien agrega un `&&`
- * extra dentro del componente). Eso lo cubren el test de `VerticalMenu` y el lint del carril.
- * Defensa en capas, no una capa pretendiendo ser todas.
+ * extra dentro del componente). Eso lo cubren el test de `VerticalMenu` y el lint
+ * `greenhouse/no-client-portal-view-visibility-bypass`. Defensa en capas, no una capa
+ * pretendiendo ser todas.
  *
- * **Steady state: 0.** Cualquier valor > 0 es un enlace que el usuario puede clickear y que no
- * lo lleva a ninguna parte.
+ * **Steady state: 0.**
  *
  * **Kind**: `data_quality`. **Severidad**: 0 → `ok`; ≥1 → `warning`. Es `warning` y no `error`
- * por la misma razón que `assigned_view_without_route`: el daño es de experiencia, no de
- * acceso — la puerta sigue decidiendo bien y no se expone nada de más. La dirección contraria
- * (la puerta abre algo que el menú oculta) sí sería `error`, y por eso se cuenta aparte.
+ * por la misma razón que `assigned_view_without_route`: el daño es de experiencia y de
+ * gobernanza, no de acceso — la puerta sigue decidiendo bien y no se expone nada de más.
  *
  * **Subsystem rollup**: `identity`.
  *
  * **Acción de remediación**:
- *   1. Leer la evidencia: cada par viene como `email · viewCode · dirección`.
- *   2. Si es "el menú promete": o la organización debe tener un módulo que declare ese
- *      viewCode —y entonces falta el assignment—, o no debe, y entonces el ítem no debería
- *      renderizarse. **NUNCA** resolverlo agregando el viewCode al catálogo de navegación:
- *      eso no concede acceso, sólo mueve el enlace muerto de lugar.
- *   3. Si es "sólo por URL": la puerta abre algo que el menú no ofrece. Revisar que el
- *      viewCode tenga entrada en `VIEW_CODE_NAV_DESCRIPTOR` del composer.
+ *   1. Para (1): o la organización debe tener un módulo que declare ese viewCode —y entonces
+ *      falta el assignment—, o no debe, y entonces hay una segunda fuente en el menú.
+ *      **NUNCA** resolverlo agregando el viewCode al catálogo de navegación: eso no concede
+ *      acceso, sólo mueve el problema de lugar.
+ *   2. Para (2) hay exactamente dos salidas honestas: **declarar la vista en el módulo que la
+ *      vende** (si es una superficie que Efeonce ofrece), o **retirarla del catálogo de
+ *      navegación y de sus rutas** (si no lo es). Dejarla declarada sin producto que la
+ *      conceda es prometer algo que el sistema no puede cumplir.
  */
 export const CLIENT_PORTAL_MENU_GATE_DIVERGENCE_SIGNAL_ID = 'identity.client_portal.menu_gate_divergence'
 
@@ -101,6 +106,13 @@ const CLIENT_USERS_SQL = `
   LIMIT ${MAX_USERS_PER_RUN + 1}
 `
 
+/** ViewCodes que ALGÚN módulo vigente del catálogo declara — o sea, que existe producto que los concede. */
+const SOLD_VIEW_CODES_SQL = `
+  SELECT DISTINCT unnest(view_codes) AS view_code
+  FROM greenhouse_client_portal.modules
+  WHERE effective_to IS NULL
+`
+
 type DivergenceDirection = 'menu_promises_gate_denies' | 'reachable_by_url_only'
 
 interface DivergentPair {
@@ -109,29 +121,44 @@ interface DivergentPair {
   readonly direction: DivergenceDirection
 }
 
-const resolveSummary = (pairs: readonly DivergentPair[], truncated: boolean): string => {
+const resolveSummary = (
+  pairs: readonly DivergentPair[],
+  unsellableViewCodes: readonly string[],
+  truncated: boolean
+): string => {
   const truncatedNote = truncated
-    ? ` Evaluación PARCIAL: se alcanzó el techo de ${MAX_USERS_PER_RUN} usuarios, así que el conteo es un piso, no un total.`
+    ? ` Evaluación PARCIAL: se alcanzó el techo de ${MAX_USERS_PER_RUN} usuarios, así que el conteo por organización es un piso, no un total.`
     : ''
 
-  if (pairs.length === 0) {
-    return `El menú del portal cliente y la puerta coinciden para todos los usuarios cliente activos.${truncatedNote}`
+  if (pairs.length === 0 && unsellableViewCodes.length === 0) {
+    return `El menú del portal cliente no declara ninguna superficie inalcanzable.${truncatedNote}`
   }
 
+  const parts: string[] = []
   const dead = pairs.filter(pair => pair.direction === 'menu_promises_gate_denies').length
   const urlOnly = pairs.length - dead
-  const affected = new Set(pairs.map(pair => pair.email)).size
-  const parts: string[] = []
 
   if (dead > 0) {
-    parts.push(`${dead} ${dead === 1 ? 'enlace que el menú ofrece y la puerta niega' : 'enlaces que el menú ofrece y la puerta niega'}`)
+    const affected = new Set(
+      pairs.filter(pair => pair.direction === 'menu_promises_gate_denies').map(pair => pair.email)
+    ).size
+
+    parts.push(
+      `${dead} ${dead === 1 ? 'enlace que el menú ofrece y la puerta niega' : 'enlaces que el menú ofrece y la puerta niega'} sobre ${affected} ${affected === 1 ? 'usuario' : 'usuarios'}`
+    )
   }
 
   if (urlOnly > 0) {
     parts.push(`${urlOnly} ${urlOnly === 1 ? 'superficie alcanzable sólo por URL' : 'superficies alcanzables sólo por URL'}`)
   }
 
-  return `${parts.join(' y ')}, sobre ${affected} ${affected === 1 ? 'usuario cliente' : 'usuarios cliente'}. Un enlace que la puerta niega termina en \`/home?denied=…\`.${truncatedNote}`
+  if (unsellableViewCodes.length > 0) {
+    parts.push(
+      `${unsellableViewCodes.length} ${unsellableViewCodes.length === 1 ? 'superficie que ningún módulo vende' : 'superficies que ningún módulo vende'} (${unsellableViewCodes.join(', ')}): ninguna organización puede alcanzarlas, porque no existe producto que las conceda`
+    )
+  }
+
+  return `${parts.join('; ')}.${truncatedNote}`
 }
 
 export const getClientPortalMenuGateDivergenceSignal = async (): Promise<ReliabilitySignal> => {
@@ -149,30 +176,26 @@ export const getClientPortalMenuGateDivergenceSignal = async (): Promise<Reliabi
 
       if (!organizationId) continue
 
-      // Los dos lados salen de las primitives reales, no de una réplica de sus reglas.
-      const [claim, modules] = await Promise.all([
-        resolveAuthorizedViewsForUser({
-          userId: user.user_id,
-          roleCodes: user.role_codes ?? [],
-          tenantType: 'client',
-          fallbackRouteGroups: user.route_groups ?? []
-        }),
-        resolveClientPortalModulesForOrganization(organizationId)
-      ])
-
-      const moduleViewCodes = new Set(modules.flatMap(module => module.viewCodes))
-      const claimViewCodes = new Set(claim.authorizedViews)
+      // El lado MENÚ sale del primitive con los insumos que resuelve `(dashboard)/layout.tsx`.
+      // El lado PUERTA sale de `canOpenClientPortalView`, el camino real del page guard, que
+      // vuelve a resolver contra PG por su cuenta.
+      const menuInputs = await resolveClientPortalVisibilityInputs({
+        userId: user.user_id,
+        organizationId,
+        isInternalSession: false
+      })
 
       for (const entry of CLIENT_PORTAL_NAV_CATALOG) {
         // `/home` es el terminator del portal: no está guardada, así que no puede divergir.
         if (!entry.guarded) continue
 
-        // Lado MENÚ: la lista base sale del claim; el merge de TASK-1675 repone, aditivo,
-        // todo ítem que declare un módulo contratado.
-        const menuOffers = claimViewCodes.has(entry.viewCode) || moduleViewCodes.has(entry.viewCode)
+        const menuOffers = canSeeClientPortalView(entry.viewCode, menuInputs)
 
-        // Lado PUERTA: exactamente lo que evalúa `hasViewCodeAccess`.
-        const gateOpens = isClientPortalBaseViewCode(entry.viewCode) || moduleViewCodes.has(entry.viewCode)
+        const gateOpens = await canOpenClientPortalView(entry.viewCode, {
+          userId: user.user_id,
+          organizationId,
+          isInternalSession: false
+        })
 
         if (menuOffers === gateOpens) continue
 
@@ -184,12 +207,24 @@ export const getClientPortalMenuGateDivergenceSignal = async (): Promise<Reliabi
       }
     }
 
+    // (2) Coherencia de catálogo: superficies que el menú declara y que ningún módulo vende.
+    // Se evalúa contra el catálogo COMPLETO de módulos, no contra los assignments: la
+    // pregunta no es "¿a esta organización le falta?" sino "¿existe producto que la conceda?".
+    const soldViewCodes = new Set(
+      (await query<{ view_code: string } & Record<string, unknown>>(SOLD_VIEW_CODES_SQL)).map(row => row.view_code)
+    )
+
+    const unsellableViewCodes = CLIENT_PORTAL_NAV_CATALOG.filter(
+      entry => entry.guarded && !isClientPortalBaseViewCode(entry.viewCode) && !soldViewCodes.has(entry.viewCode)
+    ).map(entry => entry.viewCode)
+
     const deadLinks = pairs.filter(pair => pair.direction === 'menu_promises_gate_denies')
     const urlOnly = pairs.filter(pair => pair.direction === 'reachable_by_url_only')
+    const total = pairs.length + unsellableViewCodes.length
 
     // Una superficie alcanzable que el menú esconde es un problema de acceso, no de
-    // experiencia: sube a `error`. Un enlace muerto se queda en `warning`.
-    const severity = urlOnly.length > 0 ? 'error' : deadLinks.length > 0 ? 'warning' : 'ok'
+    // experiencia: sube a `error`. Lo demás se queda en `warning`.
+    const severity = urlOnly.length > 0 ? 'error' : total > 0 ? 'warning' : 'ok'
 
     return {
       signalId: CLIENT_PORTAL_MENU_GATE_DIVERGENCE_SIGNAL_ID,
@@ -198,12 +233,17 @@ export const getClientPortalMenuGateDivergenceSignal = async (): Promise<Reliabi
       source: 'getClientPortalMenuGateDivergenceSignal',
       label: 'Divergencia menú ↔ puerta del portal cliente',
       severity,
-      summary: resolveSummary(pairs, truncated),
+      summary: resolveSummary(pairs, unsellableViewCodes, truncated),
       observedAt,
       evidence: [
-        { kind: 'metric', label: 'count', value: String(pairs.length) },
+        { kind: 'metric', label: 'count', value: String(total) },
         { kind: 'metric', label: 'enlaces que la puerta niega', value: String(deadLinks.length) },
         { kind: 'metric', label: 'alcanzables sólo por URL', value: String(urlOnly.length) },
+        {
+          kind: 'metric',
+          label: 'superficies que ningún módulo vende',
+          value: unsellableViewCodes.length === 0 ? '0' : `${unsellableViewCodes.length} (${unsellableViewCodes.join(', ')})`
+        },
         { kind: 'metric', label: 'usuarios evaluados', value: `${users.length}${truncated ? ' (techo alcanzado)' : ''}` },
         {
           kind: 'metric',

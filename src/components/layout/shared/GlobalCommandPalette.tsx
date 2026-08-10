@@ -13,6 +13,14 @@
  * no está vacío, membresía del viewCode. El ⌘K solo NAVEGA — la puerta real
  * de cada página sigue siendo su guard server-side.
  *
+ * TASK-1685 Slice 2 — las entradas del routeGroup `client` son la EXCEPCIÓN a
+ * ese filtro: no salen del claim de rol sino del primitive de visibilidad, el
+ * mismo que consumen el menú y el page guard. El claim de rol no gobierna
+ * vistas `cliente.*` (decisión (a′)), así que filtrar por él acá dejaba al ⌘K
+ * ofreciendo superficies que la organización no contrató — el mismo defecto
+ * que el menú tenía, en la otra superficie de navegación. El resto de los
+ * routeGroups (`my`, `internal`, …) conserva el filtro por claim intacto.
+ *
  * Recientes: client-side (localStorage), como declara el flow contract de
  * TASK-1388. Se rehidratan mapeando contra la lista YA filtrada, así un
  * viewCode que el rol perdió jamás reaparece por historial.
@@ -27,6 +35,7 @@ import useVerticalNav from '@menu/hooks/useVerticalNav'
 import { useSettings } from '@core/hooks/useSettings'
 import CommandPalette, { type PaletteAction, type PaletteRoute } from '@/components/greenhouse/CommandPalette'
 import { VIEW_REGISTRY } from '@/lib/admin/view-access-catalog'
+import { useClientPortalViewVisibility } from '@/lib/client-portal/visibility/client-portal-visibility-context'
 import { GH_MESSAGES } from '@/lib/copy/client-portal'
 
 const RECENTS_STORAGE_KEY = 'gh-cmdk-recents-v1'
@@ -66,11 +75,16 @@ const GlobalCommandPalette = () => {
 
   const routeGroups = session?.user?.routeGroups ?? []
   const authorizedViews = session?.user?.authorizedViews ?? []
+  const canSeeClientView = useClientPortalViewVisibility()
 
   const routes = useMemo<PaletteRoute[]>(
     () =>
       VIEW_REGISTRY.filter(entry => {
         if (!routeGroups.includes(entry.routeGroup)) return false
+
+        // El portal cliente tiene su propio primitive; el claim de rol no lo gobierna.
+        if (entry.routeGroup === 'client') return canSeeClientView(entry.viewCode)
+
         if (authorizedViews.length === 0) return true
 
         return authorizedViews.includes(entry.viewCode)
@@ -82,8 +96,10 @@ const GlobalCommandPalette = () => {
         section: entry.section
       })),
     // routeGroups/authorizedViews salen de la sesión; su identidad cambia con ella.
+    // `canSeeClientView` viene memoizado sobre los insumos del provider, así que su identidad
+    // sólo cambia cuando cambian los módulos o las revocaciones — es una dep estable.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [session?.user?.routeGroups, session?.user?.authorizedViews]
+    [session?.user?.routeGroups, session?.user?.authorizedViews, canSeeClientView]
   )
 
   const recentItems = useMemo<PaletteRoute[]>(

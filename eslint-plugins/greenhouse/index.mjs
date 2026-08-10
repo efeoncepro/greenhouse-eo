@@ -13,6 +13,7 @@
 //   - cloud-run-services-must-init-sentry           (TASK-844) — Cloud Run Node service entrypoints must invoke initSentryForService
 //   - no-cross-domain-import-from-client-portal     (TASK-822) — client_portal is a leaf of the DAG; producer domains MUST NOT import it
 //   - no-untokenized-business-line-branching        (TASK-827) — UI components must NOT branch by session.user.tenantType/businessLines/serviceModules/tenant_capabilities — use resolver canonical (TASK-825)
+//   - no-client-portal-view-visibility-bypass       (TASK-1685) — la visibilidad de una vista `cliente.*` NO se decide por el carril de rol; usar el primitive canonico
 //   - no-inline-payroll-scope-gate                  (TASK-890) — consumers MUST NOT recompose the offboarding × payroll scope gate inline; use canonical resolver
 //   - no-extract-epoch-from-date-subtraction        (TASK-893 hotfix #3) — bloquea EXTRACT(EPOCH FROM (X - Y)) cuando X o Y es DATE (rompe runtime PG)
 //   - no-inline-ftr-calculation                     (TASK-909) — prohibe recomputar el veredicto FTR inline; usar helper canonical calculateFtr
@@ -29,6 +30,7 @@ import noInlineFacetVisibilityCheck from './rules/no-inline-facet-visibility-che
 import cloudRunServicesMustInitSentry from './rules/cloud-run-services-must-init-sentry.mjs'
 import noCrossDomainImportFromClientPortal from './rules/no-cross-domain-import-from-client-portal.mjs'
 import noUntokenizedBusinessLineBranching from './rules/no-untokenized-business-line-branching.mjs'
+import noClientPortalViewVisibilityBypass from './rules/no-client-portal-view-visibility-bypass.mjs'
 import noInlinePayrollScopeGate from './rules/no-inline-payroll-scope-gate.mjs'
 import noExtractEpochFromDateSubtraction from './rules/no-extract-epoch-from-date-subtraction.mjs'
 import noInlineFtrCalculation from './rules/no-inline-ftr-calculation.mjs'
@@ -59,6 +61,7 @@ const plugin = {
     'cloud-run-services-must-init-sentry': cloudRunServicesMustInitSentry,
     'no-cross-domain-import-from-client-portal': noCrossDomainImportFromClientPortal,
     'no-untokenized-business-line-branching': noUntokenizedBusinessLineBranching,
+    'no-client-portal-view-visibility-bypass': noClientPortalViewVisibilityBypass,
     'no-inline-payroll-scope-gate': noInlinePayrollScopeGate,
     'no-extract-epoch-from-date-subtraction': noExtractEpochFromDateSubtraction,
     'no-inline-ftr-calculation': noInlineFtrCalculation,

@@ -24,6 +24,7 @@ import { getGreenhouseNavigationCopy } from '@/config/greenhouse-navigation-copy
 import { ROLE_CODES } from '@/config/role-codes'
 import { resolveCapabilityModules } from '@/lib/capabilities/resolve-capabilities'
 import { groupNavItems, type ClientNavItem } from '@/lib/client-portal/composition/menu-builder-shape'
+import { useClientPortalViewVisibility } from '@/lib/client-portal/visibility/client-portal-visibility-context'
 import { buildMyNavItems } from '@/lib/navigation/my-nav-items'
 
 const microcopy = getMicrocopy()
@@ -144,6 +145,24 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
 
     return authorizedViews.includes(viewCode)
   }
+
+  /**
+   * TASK-1685 Slice 2 — el predicado ÚNICO de visibilidad del portal cliente.
+   *
+   * Reemplaza a `canSeeView('cliente.*', true)` en la lista base. La diferencia no es de
+   * estilo: `canSeeView` pregunta por el ROL (`authorizedViews`, derivado de
+   * `role_view_assignments`) y el page guard pregunta por el MÓDULO contratado. Las dos
+   * mitades nunca se conocieron, y el resultado medido el 2026-08-10 eran **36 enlaces que
+   * este menú ofrecía y la puerta negaba**, sobre 8 de 8 usuarios cliente.
+   *
+   * Ahora los dos lados evalúan el mismo predicado sobre los mismos insumos, resueltos una
+   * sola vez en `(dashboard)/layout.tsx`.
+   *
+   * **NUNCA** volver a filtrar un ítem `cliente.*` con `canSeeView`: reintroduce la segunda
+   * fuente de verdad. El lint `greenhouse/no-client-portal-view-visibility-bypass` lo
+   * enforcea, y la señal `identity.client_portal.menu_gate_divergence` lo mide.
+   */
+  const canSeeClientView = useClientPortalViewVisibility()
 
   const canSeeAnyView = (viewCodes: string[], fallback: boolean) => {
     if (authorizedViews.length === 0) return fallback
@@ -870,23 +889,29 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
       { label: nl(GH_CLIENT_NAV.analytics), href: '/analytics', icon: 'tabler-chart-dots' },
       { label: nl(GH_CLIENT_NAV.campaigns), href: '/campanas', icon: 'tabler-speakerphone' }
     ].filter(item => {
-      if (item.href === dashboardHref) return canSeeView('cliente.pulse', true)
-      if (item.href === '/proyectos') return canSeeView('cliente.proyectos', true)
-      if (item.href === '/sprints') return canSeeView('cliente.ciclos', true)
-      if (item.href === '/equipo') return canSeeView('cliente.equipo', true)
+      // `/home` es el terminator del portal: es adonde el guard redirige cuando deniega, así
+      // que no está guardada y no se filtra. Ocultarla dejaría al cliente sin salida.
+      if (item.href === dashboardHref) return true
+      if (item.href === '/proyectos') return canSeeClientView('cliente.proyectos')
+      if (item.href === '/sprints') return canSeeClientView('cliente.ciclos')
+      if (item.href === '/equipo') return canSeeClientView('cliente.equipo')
       // TASK-1679 Slice 6 — `cliente.reviews` es el canónico (el que declara el módulo).
-      // Ambos viewCodes tienen grant para los 3 roles cliente, así que el cambio es neutro
-      // para el menú; lo que se alinea es que el ítem y el guard de la página pregunten por
-      // lo MISMO. Antes el menú ofrecía la ruta con un viewCode y el guard pedía otro.
-      if (item.href === '/reviews') return canSeeView('cliente.reviews', true)
-      if (item.href === '/analytics') return canSeeView('cliente.analytics', true)
-      if (item.href === '/campanas') return canSeeView('cliente.campanas', true)
+      if (item.href === '/reviews') return canSeeClientView('cliente.reviews')
+      if (item.href === '/analytics') return canSeeClientView('cliente.analytics')
+      if (item.href === '/campanas') return canSeeClientView('cliente.campanas')
 
       return true
     })
 
     // Capability modules (legacy `businessLines`/`serviceModules` — deuda hermana
     // `capability-modules-resolver-migration`, todavía sin migrar al resolver).
+    //
+    // client-portal-visibility-allowed: `cliente.modulos` no gatea una superficie vendida —
+    // gatea este bloque legacy, cuyos ítems salen de `resolveCapabilityModules` sobre
+    // `session.user.businessLines`/`serviceModules`, NO de `module_assignments`. Pasarlo al
+    // primitive lo apagaría entero (ningún módulo declara `cliente.modulos`) sin que exista
+    // todavía el carril de reemplazo. Dueño: `capability-modules-resolver-migration`; su
+    // layout (`capabilities/[moduleId]`) lleva el mismo marker.
     const capabilityModuleItems =
       capabilityModules.length > 0 && canSeeView('cliente.modulos', true)
         ? capabilityModules.map(module => ({
@@ -901,9 +926,11 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
       { label: nl(GH_CLIENT_NAV.notifications), href: '/notifications', icon: 'tabler-notification' },
       { label: nl(GH_CLIENT_NAV.settings), href: '/settings', icon: 'tabler-settings' }
     ].filter(item => {
-      if (item.href === '/updates') return canSeeView('cliente.actualizaciones', true)
-      if (item.href === '/notifications') return canSeeView('cliente.notificaciones', true)
-      if (item.href === '/settings') return canSeeView('cliente.configuracion', true)
+      // Las tres son vistas base del portal: el primitive las abre sin módulo contratado, y
+      // sólo un `revoke` per-persona las cierra.
+      if (item.href === '/updates') return canSeeClientView('cliente.actualizaciones')
+      if (item.href === '/notifications') return canSeeClientView('cliente.notificaciones')
+      if (item.href === '/settings') return canSeeClientView('cliente.configuracion')
 
       return true
     })
@@ -931,7 +958,12 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
       ...clientAccountItems.map(item => item.href)
     ])
 
-    const moduleItems = groupNavItems(clientNavItems.filter(item => !takenRoutes.has(item.route)))
+    // Los ítems de módulo también pasan por el primitive: si no, un `revoke` per-persona
+    // ocultaría el ítem de la lista base y dejaría visible el mismo destino cuando llega por
+    // el merge — la revocación cerraría la puerta y no el enlace.
+    const moduleItems = groupNavItems(
+      clientNavItems.filter(item => !takenRoutes.has(item.route) && canSeeClientView(item.viewCode))
+    )
 
     const toMenuItem = (item: ClientNavItem) => ({ label: item.label, href: item.route, icon: item.icon })
 

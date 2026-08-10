@@ -1,26 +1,19 @@
 import type { ReactNode } from 'react'
 
-import { redirect } from 'next/navigation'
+import { requireViewCodeAccess } from '@/lib/client-portal/guards/require-view-code-access'
 
-import { getTenantContext } from '@/lib/tenant/get-tenant-context'
-import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
-
+/**
+ * TASK-1685 Slice 2 — el layout gatea por el MISMO carril que la página.
+ *
+ * Acá vivía un `hasAuthorizedViewCode({ viewCode: 'cliente.ciclos', … })` — el carril de ROL —
+ * mientras `page.tsx` gateaba por el MÓDULO contratado. **`/sprints/[id]` no tiene guard
+ * propio**, así que este layout era su única puerta: un cliente cuyo rol concedía la vista
+ * pero cuya organización no tenía el módulo alcanzaba el detalle por URL.
+ *
+ * Ver `proyectos/layout.tsx` para el rationale completo.
+ */
 export default async function SprintsLayout({ children }: { children: ReactNode }) {
-  const tenant = await getTenantContext()
-
-  if (!tenant) {
-    redirect('/login')
-  }
-
-  const hasAccess = hasAuthorizedViewCode({
-    tenant,
-    viewCode: 'cliente.ciclos',
-    fallback: tenant.routeGroups.includes('client')
-  })
-
-  if (!hasAccess) {
-    redirect('/401')
-  }
+  await requireViewCodeAccess('cliente.ciclos')
 
   return children
 }

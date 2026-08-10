@@ -4,18 +4,13 @@ vi.mock('server-only', () => ({}))
 vi.mock('@/lib/observability/capture', () => ({ captureWithDomain: vi.fn() }))
 
 const queryMock = vi.fn()
-const resolveAuthorizedViewsForUserMock = vi.fn()
-const resolveModulesMock = vi.fn()
+const resolveVisibilityInputsMock = vi.fn()
+const canOpenMock = vi.fn()
 
 vi.mock('@/lib/db', () => ({ query: (...args: unknown[]) => queryMock(...args) }))
-vi.mock('@/lib/admin/view-access-store', () => ({
-  resolveAuthorizedViewsForUser: (...args: unknown[]) => resolveAuthorizedViewsForUserMock(...args)
-}))
-vi.mock('@/lib/client-portal/readers/native/module-resolver', () => ({
-  resolveClientPortalModulesForOrganization: (...args: unknown[]) => resolveModulesMock(...args),
-  // La allowlist real, no un stub: si cambia, este test tiene que enterarse.
-  isClientPortalBaseViewCode: (viewCode: string) =>
-    ['cliente.notificaciones', 'cliente.configuracion', 'cliente.actualizaciones'].includes(viewCode)
+vi.mock('@/lib/client-portal/visibility/resolve-client-portal-visibility', () => ({
+  resolveClientPortalVisibilityInputs: (...args: unknown[]) => resolveVisibilityInputsMock(...args),
+  canOpenClientPortalView: (...args: unknown[]) => canOpenMock(...args)
 }))
 
 const { getClientPortalMenuGateDivergenceSignal, CLIENT_PORTAL_MENU_GATE_DIVERGENCE_SIGNAL_ID } = await import(
@@ -30,34 +25,44 @@ const user = (email: string) => ({
   route_groups: ['client']
 })
 
-/**
- * Las 3 vistas base están otorgadas a los tres roles cliente en producción (verificado contra
- * PG el 2026-08-10), así que el claim realista SIEMPRE las trae. Omitirlas produciría
- * divergencia en la dirección "alcanzable sólo por URL" y haría fallar los casos por un
- * fixture irreal, no por el código.
- */
-const BASE_VIEWS = ['cliente.notificaciones', 'cliente.configuracion', 'cliente.actualizaciones']
+/** Todas las superficies guardadas del catálogo, para que el eje (2) no aporte ruido. */
+const ALL_SOLD = [
+  'cliente.proyectos',
+  'cliente.ciclos',
+  'cliente.equipo',
+  'cliente.reviews',
+  'cliente.analytics',
+  'cliente.campanas'
+]
 
-const withClaim = (viewCodes: string[]) => ({
-  authorizedViews: [...BASE_VIEWS, ...viewCodes],
-  routeGroups: ['client']
+/** El mock de `query` sirve dos consultas distintas: los usuarios y el catálogo de módulos. */
+const mockQueries = ({ users, sold }: { users: unknown[]; sold: string[] }) => {
+  queryMock.mockImplementation((sql: string) => {
+    if (sql.includes('greenhouse_client_portal.modules')) {
+      return Promise.resolve(sold.map(view_code => ({ view_code })))
+    }
+
+    return Promise.resolve(users)
+  })
+}
+
+const inputs = (moduleViewCodes: string[], revokedViewCodes: string[] = []) => ({
+  isInternalSession: false,
+  moduleViewCodes,
+  revokedViewCodes
 })
-
-/** Claim crudo, sin las base — para ejercitar el camino degradado a propósito. */
-const withRawClaim = (viewCodes: string[]) => ({ authorizedViews: viewCodes, routeGroups: ['client'] })
-const withModules = (viewCodes: string[]) => [{ moduleKey: 'm1', viewCodes }]
 
 beforeEach(() => {
   queryMock.mockReset()
-  resolveAuthorizedViewsForUserMock.mockReset()
-  resolveModulesMock.mockReset()
+  resolveVisibilityInputsMock.mockReset()
+  canOpenMock.mockReset()
 })
 
-describe('TASK-1685 Slice 3 — señal de divergencia menú ↔ puerta', () => {
-  it('steady 0: cuando el claim y los módulos declaran lo mismo, no hay divergencia', async () => {
-    queryMock.mockResolvedValue([user('ok@cliente.com')])
-    resolveAuthorizedViewsForUserMock.mockResolvedValue(withClaim(['cliente.proyectos']))
-    resolveModulesMock.mockResolvedValue(withModules(['cliente.proyectos']))
+describe('TASK-1685 — señal: ¿el menú declara superficies inalcanzables?', () => {
+  it('steady 0: menú y puerta coinciden y todo el catálogo lo vende algún módulo', async () => {
+    mockQueries({ users: [user('ok@cliente.com')], sold: ALL_SOLD })
+    resolveVisibilityInputsMock.mockResolvedValue(inputs(ALL_SOLD))
+    canOpenMock.mockResolvedValue(true)
 
     const signal = await getClientPortalMenuGateDivergenceSignal()
 
@@ -67,39 +72,53 @@ describe('TASK-1685 Slice 3 — señal de divergencia menú ↔ puerta', () => {
     expect(signal.evidence?.find(e => e.label === 'count')?.value).toBe('0')
   })
 
-  it('cuenta el enlace muerto: el claim de rol ofrece una vista que ningún módulo declara', async () => {
-    // Es el defecto exacto de ISSUE-148: el rol concede `cliente.proyectos`, la organización
-    // no tiene módulo que la declare, y el guard redirige a /home?denied=.
-    queryMock.mockResolvedValue([user('anam@cliente.com')])
-    resolveAuthorizedViewsForUserMock.mockResolvedValue(withClaim(['cliente.proyectos', 'cliente.analytics']))
-    resolveModulesMock.mockResolvedValue(withModules([]))
+  it('eje (2): una superficie del catálogo que ningún módulo vende es inalcanzable para TODOS', async () => {
+    // Estado real al 2026-08-10: `cliente.ciclos` y `cliente.analytics` están en el menú y
+    // ningún módulo las declara, así que ninguna organización puede alcanzarlas jamás.
+    mockQueries({
+      users: [user('sky@cliente.com')],
+      sold: ALL_SOLD.filter(view => view !== 'cliente.ciclos' && view !== 'cliente.analytics')
+    })
+    resolveVisibilityInputsMock.mockResolvedValue(inputs(ALL_SOLD))
+    canOpenMock.mockResolvedValue(true)
 
     const signal = await getClientPortalMenuGateDivergenceSignal()
 
     expect(signal.severity).toBe('warning')
-    expect(signal.evidence?.find(e => e.label === 'count')?.value).toBe('2')
-    expect(signal.evidence?.find(e => e.label === 'enlaces que la puerta niega')?.value).toBe('2')
-    expect(signal.evidence?.find(e => e.label === 'alcanzables sólo por URL')?.value).toBe('0')
-    expect(signal.summary).toMatch(/2 enlaces que el menú ofrece y la puerta niega/)
+    expect(signal.evidence?.find(e => e.label === 'superficies que ningún módulo vende')?.value).toMatch(
+      /2 \(cliente\.ciclos, cliente\.analytics\)/
+    )
+    expect(signal.summary).toMatch(/ninguna organización puede alcanzarlas/)
   })
 
-  it('las 3 vistas base nunca divergen aunque el claim no las tenga: la puerta las abre siempre', async () => {
-    queryMock.mockResolvedValue([user('base@cliente.com')])
-    resolveAuthorizedViewsForUserMock.mockResolvedValue(withRawClaim([]))
-    resolveModulesMock.mockResolvedValue(withModules([]))
+  it('eje (1): el menú ofrece y la puerta niega — el defecto de ISSUE-148', async () => {
+    mockQueries({ users: [user('anam@cliente.com')], sold: ALL_SOLD })
+    // El menú cree que la organización tiene la superficie; la puerta dice que no.
+    resolveVisibilityInputsMock.mockResolvedValue(inputs(ALL_SOLD))
+    canOpenMock.mockImplementation((viewCode: string) => Promise.resolve(viewCode !== 'cliente.campanas'))
 
     const signal = await getClientPortalMenuGateDivergenceSignal()
 
-    // Con claim vacío, el menú no ofrece nada del catálogo, pero la puerta SÍ abre las 3 base
-    // → esas 3 caen en "alcanzable sólo por URL", que es la dirección grave.
-    expect(signal.severity).toBe('error')
-    expect(signal.evidence?.find(e => e.label === 'alcanzables sólo por URL')?.value).toBe('3')
+    expect(signal.severity).toBe('warning')
+    expect(signal.evidence?.find(e => e.label === 'enlaces que la puerta niega')?.value).toBe('1')
+    expect(signal.summary).toMatch(/1 enlace que el menú ofrece y la puerta niega/)
   })
 
-  it('`/home` queda fuera de la medición: es el terminator del guard, no puede divergir', async () => {
-    queryMock.mockResolvedValue([user('home@cliente.com')])
-    resolveAuthorizedViewsForUserMock.mockResolvedValue(withClaim(['cliente.pulse']))
-    resolveModulesMock.mockResolvedValue(withModules([]))
+  it('la dirección "sólo por URL" escala a `error`: es acceso, no experiencia', async () => {
+    mockQueries({ users: [user('url@cliente.com')], sold: ALL_SOLD })
+    resolveVisibilityInputsMock.mockResolvedValue(inputs([]))
+    canOpenMock.mockImplementation((viewCode: string) => Promise.resolve(viewCode === 'cliente.campanas'))
+
+    const signal = await getClientPortalMenuGateDivergenceSignal()
+
+    expect(signal.severity).toBe('error')
+    expect(signal.evidence?.find(e => e.label === 'alcanzables sólo por URL')?.value).toBe('1')
+  })
+
+  it('`/home` queda fuera: es el terminator del guard, no puede divergir', async () => {
+    mockQueries({ users: [user('home@cliente.com')], sold: ALL_SOLD })
+    resolveVisibilityInputsMock.mockResolvedValue(inputs(ALL_SOLD))
+    canOpenMock.mockResolvedValue(true)
 
     const signal = await getClientPortalMenuGateDivergenceSignal()
 
@@ -116,12 +135,9 @@ describe('TASK-1685 Slice 3 — señal de divergencia menú ↔ puerta', () => {
   })
 
   it('un techo alcanzado se declara en el summary — nunca se reporta un parcial como total', async () => {
-    // 501 usuarios: uno más que el techo. El conteo que reporte es un piso.
-    const many = Array.from({ length: 501 }, (_, i) => user(`u${i}@cliente.com`))
-
-    queryMock.mockResolvedValue(many)
-    resolveAuthorizedViewsForUserMock.mockResolvedValue(withClaim([]))
-    resolveModulesMock.mockResolvedValue(withModules([]))
+    mockQueries({ users: Array.from({ length: 501 }, (_, i) => user(`u${i}@cliente.com`)), sold: ALL_SOLD })
+    resolveVisibilityInputsMock.mockResolvedValue(inputs(ALL_SOLD))
+    canOpenMock.mockResolvedValue(true)
 
     const signal = await getClientPortalMenuGateDivergenceSignal()
 

@@ -4,6 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithTheme } from '@/test/render'
 import type { ClientNavItem } from '@/lib/client-portal/composition/menu-builder-shape'
+import { ClientPortalVisibilityProvider } from '@/lib/client-portal/visibility/client-portal-visibility-context'
+import type { ClientPortalViewVisibilityInputs } from '@/lib/client-portal/visibility/client-portal-view-visibility'
 import type { VerticalMenuDataType } from '@/types/menuTypes'
 
 /**
@@ -70,9 +72,65 @@ const collectSectionLabels = (menuData: VerticalMenuDataType[]): string[] =>
     .filter(entry => (entry as { isSection?: boolean }).isSection)
     .map(entry => String((entry as { label?: unknown }).label))
 
-const renderMenu = (clientNavItems?: readonly ClientNavItem[]): VerticalMenuDataType[] => {
+/**
+ * TASK-1685 — la visibilidad del portal cliente ya no sale del claim de rol.
+ *
+ * La lista base se filtra con el primitive (`canSeeClientPortalView`), alimentado por los
+ * insumos que `(dashboard)/layout.tsx` resuelve contra PG y transporta por contexto. Por eso
+ * los tests tienen que declarar **qué contrató la organización**: sin provider, el fallback
+ * cerrado del contexto deja sólo las vistas base, que es la degradación correcta pero no el
+ * caso que estos tests ejercitan.
+ *
+ * La fixture por defecto representa una organización que contrató las superficies primarias
+ * —el caso de Sky Airlines— para que el contrato de merge aditivo de `TASK-1675` se siga
+ * midiendo sobre un menú poblado.
+ */
+const CONTRACTED_PRIMARY_VIEWS = [
+  'cliente.proyectos',
+  'cliente.ciclos',
+  'cliente.equipo',
+  'cliente.reviews',
+  'cliente.analytics',
+  'cliente.campanas'
+]
+
+const visibility = (
+  overrides: Partial<ClientPortalViewVisibilityInputs> = {}
+): ClientPortalViewVisibilityInputs => ({
+  isInternalSession: false,
+  moduleViewCodes: CONTRACTED_PRIMARY_VIEWS,
+  revokedViewCodes: [],
+  ...overrides
+})
+
+/**
+ * En runtime, `clientNavItems` y `moduleViewCodes` salen del MISMO resolver de módulos, así
+ * que un ítem de módulo siempre tiene su viewCode entre los contratados. La fixture por
+ * defecto reproduce esa consistencia; los tests que quieren romperla la declaran explícita.
+ */
+const renderMenu = (
+  clientNavItems?: readonly ClientNavItem[],
+  visibilityInputs?: ClientPortalViewVisibilityInputs
+): VerticalMenuDataType[] => {
+  const inputs =
+    visibilityInputs ??
+    visibility({
+      moduleViewCodes: [...CONTRACTED_PRIMARY_VIEWS, ...(clientNavItems ?? []).map(item => item.viewCode)]
+    })
+
+  return renderWithInputs(clientNavItems, inputs)
+}
+
+const renderWithInputs = (
+  clientNavItems: readonly ClientNavItem[] | undefined,
+  visibilityInputs: ClientPortalViewVisibilityInputs
+): VerticalMenuDataType[] => {
   recordedMenuData.length = 0
-  renderWithTheme(<VerticalMenu scrollMenu={() => {}} clientNavItems={clientNavItems} />)
+  renderWithTheme(
+    <ClientPortalVisibilityProvider inputs={visibilityInputs}>
+      <VerticalMenu scrollMenu={() => {}} clientNavItems={clientNavItems} />
+    </ClientPortalVisibilityProvider>
+  )
 
   return recordedMenuData.at(-1) ?? []
 }
@@ -223,6 +281,61 @@ describe('VerticalMenu — merge aditivo de módulos contratados (TASK-1675)', (
  * `isMyUser` actuales (home `/my` + sección Mi Ficha). El predicado
  * collaborator-puro nunca recorta a un híbrido.
  */
+describe('VerticalMenu — el primitive único de visibilidad (TASK-1685)', () => {
+  it('una organización SIN módulos no recibe enlaces muertos: el menú deja de prometer lo que la puerta niega', () => {
+    // El defecto exacto de ISSUE-148, medido el 2026-08-10: ANAM y Greenhouse Demo no tienen
+    // ningún módulo y sus usuarios veían 6 enlaces cada uno que terminaban en
+    // `/home?denied=…`. El claim de rol los concedía; la puerta, que lee el módulo, no.
+    const hrefs = collectHrefs(renderMenu([], visibility({ moduleViewCodes: [] })))
+
+    for (const dead of ['/proyectos', '/sprints', '/equipo', '/reviews', '/analytics', '/campanas']) {
+      expect(hrefs).not.toContain(dead)
+    }
+  })
+
+  it('sin módulos el cliente conserva su salida y su cuenta: nunca queda sin menú', () => {
+    // El modo de fallo inaceptable es el contrario: dejar al cliente encerrado. `/home` es el
+    // terminator del guard y las tres vistas base no dependen de nada contratado.
+    const hrefs = collectHrefs(renderMenu([], visibility({ moduleViewCodes: [] })))
+
+    expect(hrefs).toContain('/home')
+    expect(hrefs).toContain('/updates')
+    expect(hrefs).toContain('/notifications')
+    expect(hrefs).toContain('/settings')
+  })
+
+  it('un `revoke` per-persona cierra el enlace aunque la organización tenga el módulo', () => {
+    // La dimensión persona: la organización contrató la superficie, esta persona no la ve.
+    const hrefs = collectHrefs(renderMenu([], visibility({ revokedViewCodes: ['cliente.campanas'] })))
+
+    expect(hrefs).not.toContain('/campanas')
+    expect(hrefs).toContain('/proyectos')
+  })
+
+  it('un `revoke` también cierra el ítem cuando el destino llega por el merge de módulos', () => {
+    // Sin esto, revocar ocultaría el ítem de la lista base y dejaría el MISMO destino visible
+    // por el merge aditivo: la revocación cerraría la puerta y no el enlace.
+    const hrefs = collectHrefs(
+      renderMenu([seoNavItem], visibility({
+        moduleViewCodes: [...CONTRACTED_PRIMARY_VIEWS, 'cliente.growth_seo_dashboard'],
+        revokedViewCodes: ['cliente.growth_seo_dashboard']
+      }))
+    )
+
+    expect(hrefs).not.toContain('/growth/seo')
+  })
+
+  it('un `revoke` NO cierra nada para una sesión interna: el bypass D1 se conserva', () => {
+    // Un operador interno alcanza cualquier superficie cliente para soporte legítimo. El
+    // override es un instrumento del portal cliente, no una sanción global.
+    const hrefs = collectHrefs(
+      renderMenu([], { isInternalSession: true, moduleViewCodes: [], revokedViewCodes: ['cliente.campanas'] })
+    )
+
+    expect(hrefs).toContain('/campanas')
+  })
+})
+
 describe('VerticalMenu — contrato de audiencias no-internas (TASK-1686)', () => {
   const MY_CLIENT_SESSION = {
     data: {

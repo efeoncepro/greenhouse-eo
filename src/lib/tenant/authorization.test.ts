@@ -1,3 +1,11 @@
+/* eslint-disable greenhouse/no-client-portal-view-visibility-bypass --
+ * TASK-1685: el sujeto bajo prueba de este archivo ES `hasAuthorizedViewCode`, o sea el carril
+ * de rol. Sus fixtures usan viewCodes `cliente.*` a propósito, porque el contrato que verifica
+ * —el fail-closed de TASK-1678 para sesiones cliente con claim vacío— sólo se puede expresar
+ * con una vista cliente. La regla prohíbe DECIDIR visibilidad de una vista cliente por el rol;
+ * acá no se decide nada, se prueba el helper. Sigue vigente: el carril de rol existe y gobierna
+ * el portal interno.
+ */
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 
 const mockGetTenantContext = vi.fn()

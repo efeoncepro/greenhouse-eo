@@ -3,7 +3,7 @@ import 'server-only'
 import { redirect } from 'next/navigation'
 
 import { requireServerSession } from '@/lib/auth/require-server-session'
-import { hasViewCodeAccess } from '@/lib/client-portal/readers/native/module-resolver'
+import { canOpenClientPortalView } from '@/lib/client-portal/visibility/resolve-client-portal-visibility'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 import { mapViewCodeToPublicSlug } from '../composition/view-code-public-slug'
@@ -103,7 +103,22 @@ export const requireViewCodeAccess = async (viewCode: string): Promise<void> => 
   //
   // El `try` ahora envuelve SÓLO la llamada que puede fallar de verdad.
   try {
-    allowed = await hasViewCodeAccess(organizationId, viewCode)
+    // TASK-1685 Slice 2 — la puerta consume EL primitive, no la mitad organización.
+    //
+    // Acá vivía `hasViewCodeAccess(organizationId, viewCode)`, que responde sólo "¿algún
+    // módulo de la organización declara esta vista?". Faltaba la dimensión persona: un
+    // `user_view_overrides` con `override_type='revoke'` se aplicaba dentro de
+    // `resolveAuthorizedViewsForUser` —o sea sobre el claim— y este guard nunca leía el
+    // claim. El repo tenía el instrumento canónico para decir "esta persona no debe ver
+    // esto" y no cerraba nada (`ISSUE-148`).
+    //
+    // El bypass interno (D1) ya cortó arriba, así que acá el sujeto siempre es cliente; se
+    // pasa `isInternalSession: false` explícito en vez de re-derivarlo.
+    allowed = await canOpenClientPortalView(viewCode, {
+      userId: session.user.userId,
+      organizationId,
+      isInternalSession: false
+    })
   } catch (error) {
     // Resolver throw → degradación honesta. Page consumer renderiza
     // <ClientPortalDegradedBanner mode='fallback'> via ?error= param.
