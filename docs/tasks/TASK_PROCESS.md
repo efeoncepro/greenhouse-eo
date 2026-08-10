@@ -370,6 +370,7 @@ El agente DEBE hacer estas acciones antes de producir un plan:
    - correr `pnpm ui:flow-check --task TASK-###` si `UI impact: flow` o hay sidecar/drawer/modal/popover/navegacion;
    - correr `pnpm ui:motion-check --task TASK-###` si `UI impact: motion` o hay motion/microinteracciones no triviales;
    - decidir reuse / extend / new primitive + variant/kind;
+   - declarar `Nav placement` (`sidebar|avatar|command-palette|shortcuts|none`) si la task agrega un destino de navegación visible — regla y presupuesto en `docs/architecture/agent-invariants/NAVIGATION_SURFACE_ALLOCATION_CONTRACT.md` (TASK-1389, gate `pnpm nav:budget`);
    - resolver Composition Shell, Adaptive Card density, Floating Surface/Sidecar/Dialog si aplica;
    - declarar estados visuales obligatorios;
    - declarar copy source;

@@ -37,6 +37,8 @@ NEVER invent a parallel module. NEVER deep-link a feature outside its module wit
 
 **Internal sidebar structure (TASK-1388/1686, 2026-08-10):** the internal rail has 3 `isSection` zones — **Operación** (dominios Agencia / Comercial / Finanzas / Personas), **Administración** (Admin Center), **Recursos** (Knowledge + Design System) — with Vuexy default accordion. **`/my/*` leaves for internal users do NOT live in the sidebar**: they live in the avatar `UserDropdown` (reachability `via: 'avatar-dropdown'` in `route-reachability-manifest.ts`). The canonical builder for personal nav is `buildMyNavItems` in `src/lib/navigation/my-nav-items.ts` — consumed by `UserDropdown` (internal users) and by the pure-collaborator rail. Pure collaborator (`routeGroups=['my']`) gets its own projection (predicate `isPureCollaborator` in `VerticalMenu.tsx` / `UserDropdown.tsx`). Nav labels SoT: `GH_INTERNAL_NAV` in `greenhouse-nomenclature.ts`. `src/data/navigation/verticalMenuData.tsx` was deleted — never reference it.
 
+**Navigation surface allocation — contract + budget gate (TASK-1389, 2026-08-10):** every NEW navigation destination declares its surface — operativo → sidebar dentro de una zona · personal → avatar `UserDropdown` · cola larga → ⌘K `CommandPalette` · frecuente → shortcuts. NEVER duplicate one destination across two surfaces; NEVER hang a first-level rail item outside a zone (only the pinned Home). The budget is a REAL constraint when designing Greenhouse nav IA, enforced against the real tree: `MAX_TOP_LEVEL_SLOTS=8` / `MAX_INTERACTIVE_DEPTH=2`, gate `pnpm nav:budget` at `error` severity (runs in the test suite and in `design-contract.yml`) — an item that breaks the budget BREAKS the build; adding a top-level slot means removing another or justifying the increase in the contract. Tasks that add a visible destination must declare `Nav placement: sidebar|avatar|command-palette|shortcuts|none` in their `## UI/UX Contract` (TASK_UI_UX_ADDENDUM §Surface & system decision). Contract: `docs/architecture/agent-invariants/NAVIGATION_SURFACE_ALLOCATION_CONTRACT.md`.
+
 ### 2. URL design — REST hierarchy + es-CL slugs
 
 ```
@@ -127,5 +129,6 @@ Every page MUST show:
 
 ## Version
 
+- **v1.2** — 2026-08-10 — TASK-1389 sync: navigation surface allocation contract + `pnpm nav:budget` gate (8 top-level slots / depth 2, severity `error`) as a real IA constraint; `Nav placement` field in the UI/UX addendum.
 - **v1.1** — 2026-08-10 — TASK-1388/1686 sync: 3-zone internal sidebar + `/my/*` re-homed to avatar dropdown (`buildMyNavItems`); ⌘K `CommandPalette` shipped (NavSearch deleted).
 - **v1.0** — 2026-05-11 — Initial overlay.

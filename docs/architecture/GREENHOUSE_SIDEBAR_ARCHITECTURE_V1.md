@@ -3,7 +3,7 @@
 > **Tipo de documento:** Spec de arquitectura (documento vivo)
 > **Version:** 1.1
 > **Creado:** 2026-04-11 por Claude (auditoria completa del sidebar)
-> **Ultima actualizacion:** 2026-08-10 — TASK-1388 + TASK-1686 supersede el inventario de secciones internas de este doc (ver nota de status).
+> **Ultima actualizacion:** 2026-08-10 — TASK-1388 + TASK-1686 supersede el inventario de secciones internas de este doc (ver nota de status); TASK-1389 instala el contrato de superficies + gate `pnpm nav:budget`.
 > **Archivo fuente:** `src/components/layout/vertical/VerticalMenu.tsx`
 > **Documentacion tecnica:** `GREENHOUSE_IDENTITY_ACCESS_V2.md`, `docs/architecture/ui-platform/README.md`
 
@@ -14,6 +14,7 @@
 > - **Colaborador puro** (`isMyUser && !isInternalPortalUser && !isClientUser`, `TASK-1686`): rail = `/my` + sección `Mi Ficha` (builder) + plataforma concedida; avatar = identidad + Mi Perfil + salir. Los perfiles my+client/client/internal conservan su salida vigente.
 > - **`NavSearch` fue eliminada** (`src/components/layout/shared/search/` borrada; `src/data/navigation/verticalMenuData.tsx` borrado). La única palette ⌘K es la `CommandPalette` de TASK-696 (`src/components/greenhouse/CommandPalette/`), montada globalmente vía `src/components/layout/shared/GlobalCommandPalette.tsx` (filtro de audiencia routeGroup+authorizedViews, recientes client-side, acción de salir).
 > - Labels de zonas/dominios/secciones tokenizados en `GH_INTERNAL_NAV` (`src/config/greenhouse-nomenclature.ts`) + espejo en-US.
+> - **El rail interno ahora opera con contrato + presupuesto mecánico (`TASK-1389`)**: cada tipo de destino tiene UNA superficie (operativo→sidebar en zonas · personal→avatar · cola larga→⌘K · frecuente→shortcuts), prohibido duplicar destinos o colgar ítems de primer nivel fuera de zonas, y el gate `pnpm nav:budget` (`scripts/ci/nav-budget-gate.mjs`, severidad `error`; corre en `pnpm test` y en el job `nav-budget` de `design-contract.yml`) mide el árbol real contra `MAX_TOP_LEVEL_SLOTS=8` + `MAX_INTERACTIVE_DEPTH=2` y cross-checkea el manifest (`/my/*` con `surface: 'sidebar'` = violación). Contrato canónico: `docs/architecture/agent-invariants/NAVIGATION_SURFACE_ALLOCATION_CONTRACT.md`.
 >
 > El menú **cliente** (§3.2, §4.7) no cambió con TASK-1388. Las reglas de permisos (§2.3), reglas de extensión (§10) y archivos clave (§11) siguen vigentes en lo conceptual; ante cualquier duda, la fuente de verdad es `VerticalMenu.tsx` + `my-nav-items.ts` + las specs `docs/tasks/complete/TASK-1388-vertical-menu-restructure.md` y `docs/tasks/complete/TASK-1686-pure-collaborator-navigation.md`.
 
@@ -388,6 +389,8 @@ Un `efeonce_admin` ve hasta **64 items** en el sidebar. Aun con Finanzas y Admin
 ---
 
 ## 10. Reglas de extension
+
+> **Precondición (TASK-1389):** antes de agregar cualquier destino de navegación, decidir su superficie según el Contrato de Asignación de Superficies (`docs/architecture/agent-invariants/NAVIGATION_SURFACE_ALLOCATION_CONTRACT.md`): operativo→sidebar dentro de una zona, personal `/my/*`→avatar, cola larga→⌘K, frecuente→shortcuts. El rail interno tiene presupuesto (`MAX_TOP_LEVEL_SLOTS=8`, `MAX_INTERACTIVE_DEPTH=2`) verificado por `pnpm nav:budget` en severidad `error`; duplicar un destino en dos superficies o colgar un ítem de primer nivel fuera de una zona es violación. La task que agrega el destino declara `Nav placement` en su `## UI/UX Contract`.
 
 ### 10.1 Como agregar un nuevo modulo al sidebar
 

@@ -1044,7 +1044,7 @@ Since TASK-1388 the internal sidebar is organized in **3 `isSection` zones**, wi
 | **Administración** | Admin Center                                                                                  | `admin`                       |
 | **Recursos**       | Knowledge + Design System                                                                     | Per-item views                |
 
-The personal `/my/*` leaves do **not** live in the internal sidebar anymore: they live in the avatar dropdown (`UserDropdown`), served by the canonical builder `src/lib/navigation/my-nav-items.ts` (`buildMyNavItems`, 13 leaves + `MY_NAV_HOME` + dynamic gates), declared reachable via `via: 'avatar-dropdown'` in `route-reachability-manifest.ts`.
+The personal `/my/*` leaves do **not** live in the internal sidebar anymore: they live in the avatar dropdown (`UserDropdown`), served by the canonical builder `src/lib/navigation/my-nav-items.ts` (`buildMyNavItems`, 13 leaves + `MY_NAV_HOME` + dynamic gates), declared reachable via `via: 'avatar-dropdown'` + `surface: 'avatar'` in `route-reachability-manifest.ts`. Surface allocation is contract-enforced since TASK-1389: a `/my/*` declaration with `surface: 'sidebar'` is a `pnpm nav:budget` gate violation (see `docs/architecture/agent-invariants/NAVIGATION_SURFACE_ALLOCATION_CONTRACT.md`).
 
 ### Pure collaborator (TASK-1686)
 

@@ -5,6 +5,8 @@
 ## Invariantes operativos para agentes — UI/feature platforms (TASK-553…1059)
 
 > **Relocados de `CLAUDE.md` por TASK-1160 (2026-06-16), verbatim.** UI/feature platforms + metodología de verificación visual. Contrato por sub-área en sus specs/task-specs (citadas en cada bloque). Dedup = Slice 4.
+>
+> **Navegación (TASK-1389):** la asignación de superficies de navegación (operativo→sidebar en zonas · personal→avatar · cola larga→⌘K · frecuente→shortcuts) y el presupuesto del rail interno (`MAX_TOP_LEVEL_SLOTS=8`, `MAX_INTERACTIVE_DEPTH=2`; gate `pnpm nav:budget` en severidad `error`) se gobiernan en el companion [`NAVIGATION_SURFACE_ALLOCATION_CONTRACT.md`](NAVIGATION_SURFACE_ALLOCATION_CONTRACT.md) — cargar ese contrato antes de agregar cualquier destino de navegación visible.
 
 ### Home Rollout Flag Platform (TASK-780)
 
