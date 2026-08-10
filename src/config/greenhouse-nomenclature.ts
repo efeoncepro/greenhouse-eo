@@ -189,6 +189,9 @@ export const GH_HR_NAV = {
 
 export const GH_MY_NAV = {
   dashboard: { label: 'Mi Greenhouse', subtitle: 'Tu operación personal' },
+
+  // TASK-1686 — heading de la sección personal del rail (antes literal en JSX).
+  fichaSection: { label: 'Mi Ficha', subtitle: 'Tu espacio personal' },
   assignments: { label: 'Mis Asignaciones', subtitle: 'Clientes, FTE y capacidad' },
   performance: { label: 'Mi Desempeño', subtitle: 'ICO, OTD y métricas' },
   delivery: { label: 'Mi Delivery', subtitle: 'Tareas, proyectos y CRM' },

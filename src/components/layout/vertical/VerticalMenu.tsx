@@ -80,6 +80,7 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
   const isPeopleRouteGroup = session?.user?.routeGroups?.includes('people') ?? false
   const isAiToolingUser = session?.user?.routeGroups?.includes('ai_tooling') ?? false
   const isMyUser = session?.user?.routeGroups?.includes('my') ?? false
+  const isClientUser = session?.user?.routeGroups?.includes('client') ?? false
 
   const isInternalPortalUser =
     isInternalUser ||
@@ -89,6 +90,11 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
     isHrUser ||
     isPeopleRouteGroup ||
     isAiToolingUser
+
+  // TASK-1686 — colaborador puro: SOLO routeGroup `my`. El predicado decide si
+  // se aplica la proyección personal aislada; nunca recorta a un híbrido
+  // (my+client conserva la salida cliente vigente, decisión pineada en la spec).
+  const isPureCollaborator = isMyUser && !isInternalPortalUser && !isClientUser
 
   const isAgencyUser = isInternalUser || isAdminUser
   const roleCodes = session?.user?.roleCodes ?? []
@@ -818,11 +824,37 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
   //
   // client-portal-allowed: legacy canSeeView pattern en la lista base (los ítems de módulo ya salen del resolver)
 
-  if (!isInternalPortalUser) {
-    // Pure collaborator home
+  if (!isInternalPortalUser && isPureCollaborator) {
+    // ── TASK-1686 — proyección del colaborador puro ──
+    //
+    // El rail ES su contenido: home `/my` + sección "Mi Ficha" servida por el
+    // builder canónico. NUNCA construye las colecciones cliente: eso elimina
+    // tanto las rutas cliente que con claims vacíos aparecían por fallback
+    // permisivo como el heading "Mi Cuenta" vacío que veía el colaborador real.
+    // Los recursos plataforma (Knowledge/Design System) llegan por el bloque
+    // no-interno de más abajo, gated con fallback cerrado.
+    menuData.push({
+      label: nl(GH_MY_NAV.dashboard),
+      href: '/my',
+      icon: 'tabler-smart-home'
+    })
+
+    menuData.push({
+      isSection: true,
+      label: GH_MY_NAV.fichaSection.label,
+      children: buildMyNavItems({
+        authorizedViews,
+        hasActiveContractorEngagement,
+        hasWorkforceContractingDocument
+      }).map(item => ({ label: nl(GH_MY_NAV[item.copyKey]), href: item.href, icon: item.icon }))
+    })
+  }
+
+  if (!isInternalPortalUser && !isPureCollaborator) {
+    // Home personal del híbrido my+client — conducta vigente byte-a-byte.
     if (isMyUser) {
       menuData.splice(0, 0, {
-        label: <NavLabel label='Mi Greenhouse' subtitle='Tu operación personal' show={showSub} />,
+        label: nl(GH_MY_NAV.dashboard),
         href: '/my',
         icon: 'tabler-smart-home'
       })
@@ -922,13 +954,13 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
       children: [...clientAccountItems, ...moduleItems.account.map(toMenuItem)]
     })
 
-    // Mi Ficha for collaborators with my routeGroup — para el colaborador puro
-    // el rail ES su contenido (guardrail TASK-1388): se conserva acá, servido
-    // por el mismo builder canónico que alimenta el dropdown del avatar.
+    // Mi Ficha del híbrido my+client — conducta vigente byte-a-byte (el
+    // colaborador PURO ya no pasa por acá: tiene su proyección propia arriba,
+    // TASK-1686). Mismo builder canónico que alimenta el dropdown del avatar.
     if (isMyUser) {
       menuData.push({
         isSection: true,
-        label: 'Mi Ficha',
+        label: GH_MY_NAV.fichaSection.label,
         children: buildMyNavItems({
           authorizedViews,
           hasActiveContractorEngagement,

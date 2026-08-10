@@ -263,6 +263,89 @@ describe('VerticalMenu — contrato de audiencias no-internas (TASK-1686)', () =
     expect(hrefs).not.toContain('/my')
     expect(collectSectionLabels(menuData)).not.toContain('Mi Ficha')
   })
+
+  const CLIENT_ROUTES = [
+    '/proyectos',
+    '/sprints',
+    '/equipo',
+    '/reviews',
+    '/analytics',
+    '/campanas',
+    '/updates',
+    '/notifications',
+    '/settings'
+  ]
+
+  it('colaborador puro con claims VACÍOS: cero rutas y cero secciones cliente (el borde que filtraba por fallback)', () => {
+    useSessionMock.mockReturnValue(COLLABORATOR_SESSION)
+
+    const menuData = renderMenu([])
+    const hrefs = collectHrefs(menuData)
+    const sections = collectSectionLabels(menuData)
+
+    for (const route of CLIENT_ROUTES) expect(hrefs).not.toContain(route)
+    expect(sections).not.toContain('Mi Cuenta')
+    expect(sections).not.toContain('Módulos')
+
+    // Y conserva su rail personal completo (claims vacíos → fallback permisivo del builder).
+    expect(hrefs).toContain('/my')
+    expect(hrefs).toContain('/my/assignments')
+    expect(hrefs).toContain('/my/payment-profile')
+    expect(sections).toContain('Mi Ficha')
+  })
+
+  it('colaborador puro con claims reales: solo las hojas personales concedidas, sin heading "Mi Cuenta" vacío', () => {
+    useSessionMock.mockReturnValue({
+      data: {
+        user: {
+          routeGroups: ['my'],
+          roleCodes: ['collaborator'],
+          authorizedViews: ['mi_ficha.mi_inicio', 'mi_ficha.mi_perfil', 'mi_ficha.mi_nomina', 'mi_ficha.mis_permisos'],
+          portalHomePath: '/my'
+        }
+      }
+    })
+
+    const menuData = renderMenu([])
+    const hrefs = collectHrefs(menuData)
+    const sections = collectSectionLabels(menuData)
+
+    expect(hrefs).toContain('/my')
+    expect(hrefs).toContain('/my/profile')
+    expect(hrefs).toContain('/my/payroll')
+    expect(hrefs).toContain('/my/leave')
+    expect(hrefs).not.toContain('/my/assignments')
+
+    expect(sections).toContain('Mi Ficha')
+    expect(sections).not.toContain('Mi Cuenta')
+    expect(sections).not.toContain('Módulos')
+  })
+
+  it('colaborador puro ignora módulos cliente inyectados (invariante 3: clientNavItems es del carril client)', () => {
+    useSessionMock.mockReturnValue(COLLABORATOR_SESSION)
+
+    const hrefs = collectHrefs(renderMenu([seoNavItem]))
+
+    expect(hrefs).not.toContain('/growth/seo')
+  })
+
+  it('colaborador puro con grant de plataforma conserva Knowledge/Design System (fallback cerrado)', () => {
+    useSessionMock.mockReturnValue({
+      data: {
+        user: {
+          routeGroups: ['my'],
+          roleCodes: ['collaborator'],
+          authorizedViews: ['mi_ficha.mi_inicio', 'plataforma.knowledge', 'plataforma.design_system'],
+          portalHomePath: '/my'
+        }
+      }
+    })
+
+    const hrefs = collectHrefs(renderMenu([]))
+
+    expect(hrefs).toContain('/knowledge')
+    expect(hrefs).toContain('/design-system')
+  })
 })
 
 /**

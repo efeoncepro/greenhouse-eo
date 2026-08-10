@@ -202,6 +202,7 @@ const enUS: NavigationCopy = {
   },
   my: {
     dashboard: { label: 'My Greenhouse', subtitle: 'Your personal operation' },
+    fichaSection: { label: 'My Space', subtitle: 'Your personal space' },
     assignments: { label: 'My Assignments', subtitle: 'Clients, FTE and capacity' },
     performance: { label: 'My Performance', subtitle: 'ICO, OTD and metrics' },
     delivery: { label: 'My Delivery', subtitle: 'Tasks, projects and CRM' },
