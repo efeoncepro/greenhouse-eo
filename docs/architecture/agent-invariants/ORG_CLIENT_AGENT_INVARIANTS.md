@@ -143,6 +143,65 @@ server-side en `(dashboard)/layout.tsx` y pasando `clientNavItems` por props a `
 **Spec canónica**: `GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md` §12.1. Task: `TASK-1675` (cierra la deuda sin
 ID `client-portal-vertical-menu-resolver-migration` de TASK-827).
 
+Desde `TASK-1680` (2026-08-09) el lint `greenhouse/no-untokenized-business-line-branching` corre en
+**`error`**: branching legacy nuevo por `session.user.{tenantType,businessLines,serviceModules}` o
+`tenant_capabilities.*` en una superficie UI falla el CI. El override quedó con **una sola exención**
+(`VerticalMenu.tsx`, bloque `resolveCapabilityModules`, dueño = follow-up
+`capability-modules-resolver-migration`).
+
+- **NUNCA** agregar un path al override sin comprobar que la regla lo evalúa. `isUiFile` excluye
+  `src/app/api/**` y sólo mira `src/(components|views|app)/**`: una exención fuera del alcance de la
+  regla no protege nada y esconde cuál es la real. Cuatro de las seis entradas originales eran eso.
+
+### Page guards del portal cliente (TASK-1679 / ISSUE-146, desde 2026-08-09)
+
+Toda page client-facing valida con `requireViewCodeAccess(viewCode)`
+(`src/lib/client-portal/guards/require-view-code-access.ts`), **nunca** llamando al resolver a mano.
+Tres defectos convivieron nueve meses dentro de esa misma función, tapándose entre sí; los invariantes
+que quedan son los que impiden que vuelva cualquiera de ellos.
+
+- **NUNCA** pasar `session.user.clientId` (ni ningún id de `clients`) a un filtro sobre
+  `module_assignments.organization_id`. Los espacios no se solapan (`cli-*`, `hubspot-company-*`,
+  `greenhouse-demo-client` contra `org-*`) y es un `string` contra un `string`: TS no lo atrapa, y el
+  síntoma —"no tienes este módulo"— parece correcto. La llave se resuelve en **un solo lugar**:
+  `resolveClientPortalOrganizationId` (mismo directorio), que además es el único punto donde se aplica
+  el override de la persona de verificación — si viviera sólo en el guard, el menú resolvería una
+  organización y las páginas abrirían otra.
+- **NUNCA** dejar el `redirect()` del camino `denied` dentro del `try`. `redirect()` de Next.js
+  señaliza **lanzando** `NEXT_REDIRECT`, así que el propio `catch` lo intercepta: el camino `denied`
+  se vuelve inalcanzable, el empty state `ModuleNotAssignedEmpty` queda muerto en runtime y cada
+  denegación legítima se reporta a Sentry como error del resolver. El `try` envuelve sólo la llamada
+  que puede fallar de verdad.
+- **NUNCA** colapsar los tres resultados en un mismo destino. Sin acceso al módulo →
+  `/home?denied=<slug>`; sesión sin organización resuelta → `/home?error=organization_unresolved`
+  (señal `identity.client_portal.client_without_organization`, steady 0); resolver caído →
+  `/home?error=resolver_unavailable` + `captureWithDomain`. `?error=resolver_unavailable` para todo
+  invita a reintentar algo que nunca va a funcionar.
+- **NUNCA** agregar a `CLIENT_PORTAL_BASE_VIEW_CODES` (en
+  `src/lib/client-portal/readers/native/module-resolver.ts`) una vista que dependa de un servicio
+  contratado. Las tres base son las que **no son producto vendible**: `cliente.notificaciones`,
+  `cliente.configuracion`, `cliente.actualizaciones`. Es la excepción acotada al carril de módulos,
+  no un atajo para destrabar una página.
+- **NUNCA** resolver esa allowlist leyendo `role_view_assignments`: sería reintroducir el carril viejo.
+- **NUNCA** gatear una ruta con un viewCode distinto del que declara su módulo. `/reviews` pedía
+  `cliente.revisiones` mientras `creative_hub_globe_v1` declaraba `cliente.reviews`: dos strings para
+  la misma ruta, así que no abría ni con la llave correcta. El canónico es **`cliente.reviews`**;
+  `cliente.revisiones` quedó marcado como retirado en el `VIEW_REGISTRY` (append-only: se marca, no
+  se borra).
+- **NUNCA** poner un gate por route group **encima** de `requireViewCodeAccess`. El guard ya cubre los
+  dos tenant types (interno por bypass, cliente por módulo o vista base) y el gate de arriba corre
+  primero, así que gana: el scope de route groups del operador interno no incluye el del portal
+  cliente y la página rebota antes del bypass. Fijado por
+  `src/lib/client-portal/guards/no-route-group-gate-above-view-code-guard.test.ts`. Caso fuente:
+  `/proyectos` era la única de las 9 páginas con ese resto de una migración incompleta.
+- **SIEMPRE** distinguir "el guard dice la verdad" de "la página abre". Medido el 2026-08-09 contra
+  las 4 organizaciones reales: 3 rutas abren (las base) y 6 muestran el empty state porque ningún
+  módulo asignado declara esas vistas. Abrirlas es un assignment, no un cambio de código.
+
+**Spec canónica**: `GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md` §12.2 + §16. Issue: `ISSUE-146`. El carril
+rol→vista que corre **antes** de este guard (default cerrado para `client`, claim vacío, denials) vive
+en `IDENTITY_WORKFORCE_AGENT_INVARIANTS.md` → §`Derivación de authorizedViews`.
+
 ### Organization-by-facets — receta canónica para extender (TASK-613)
 
 Patrón canónico cuando emerja la necesidad de un **facet nuevo** (e.g. `marketing`, `legal`, `compliance`) o un **entrypoint nuevo** que renderee el Organization Workspace shell desde su propia ruta (e.g. `/legal/organizations/[id]`, `/marketing/accounts/[id]`):

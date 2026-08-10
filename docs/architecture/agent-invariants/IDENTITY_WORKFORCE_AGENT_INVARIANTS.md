@@ -195,7 +195,7 @@ Cuando se migra un bridge identity / lookup table de una store legacy (BQ direct
 
 ---
 
-## Invariantes operativos para agentes — Session access lifecycle (TASK-987/ISSUE-083)
+## Invariantes operativos para agentes — Session access lifecycle + derivación rol→vista (TASK-987/ISSUE-083, TASK-1678/ISSUE-147)
 
 > **Relocados de `CLAUDE.md` por TASK-1160 (2026-06-16), verbatim — cero cambio semántico.** Espejo operativo (NUNCA/SIEMPRE) que un agente carga al tocar este dominio; el contrato técnico vive en su spec. Dedup = TASK-1160 Slice 4.
 
@@ -217,6 +217,62 @@ Toda derivación de **acceso de sesión** desde `user_role_assignments` (route_g
 **Open question (gobernanza, no resuelta en TASK-987)**: el mapa TS `ROLE_ROUTE_GROUPS` (`src/lib/tenant/role-route-mapping.ts`) y el DB `greenhouse_core.roles.route_group_scope` difieren en `people` para `efeonce_operations`/`hr_payroll`. El runtime usa el DB (via el view); el TS es fallback. Reconciliar los VALORES del mapping es decisión de gobernanza del operador — NO cambiar unilateralmente.
 
 **Spec canónica**: `docs/tasks/complete/TASK-987-session-route-groups-lifecycle-fix.md` + `docs/issues/resolved/ISSUE-083-session-route-groups-leak-from-revoked-roles.md`. Migración: `migrations/20260601194051024_task-987-session-route-groups-lifecycle-fix.sql`.
+
+> **Ojo con el alcance del predicado (medido 2026-08-09, TASK-1678):** esto aplica a
+> `user_role_assignments`. **`greenhouse_core.role_view_assignments` NO tiene columnas de vigencia** —
+> 7 columnas, ninguna `active` ni `effective_to`, verificado contra `information_schema`. El predicado
+> de lifecycle **no se extrapola** ahí: `ISSUE-147` lo dio por hecho y su defecto #2 partía de una
+> premisa falsa. La vigencia de ese carril vive en otro lado (el merge del registry, abajo).
+
+### Derivación de `authorizedViews` — el carril `client` falla hacia cerrado (TASK-1678 / ISSUE-147, desde 2026-08-09)
+
+`resolveAuthorizedViewsForUser` (`src/lib/admin/view-access-store.ts`) tiene **dos defaults**, y la
+diferencia es de modelo de negocio: en las superficies internas el acceso lo define la pertenencia
+organizacional (sin ese default habría que seedear cientos de filas); en el portal cliente lo define un
+contrato comercial, y el gate es el módulo contratado. Los cuatro puntos de abajo se cerraron **juntos**
+porque cada uno por separado anulaba a los otros.
+
+- **NUNCA** otorgar por pertenencia al routeGroup cuando `view.routeGroup === CLIENT_ROUTE_GROUP`
+  (constante en `src/lib/tenant/role-route-mapping.ts`). Sin fila explícita en `role_view_assignments`,
+  una vista `cliente.*` **no se otorga**.
+- **NUNCA** degradar el camino `SCHEMA_NOT_READY` entregando el registry completo. Un tenant `client`
+  recibe **lista vacía**; un tenant interno conserva su baseline, y esa asimetría es deliberada.
+- **NUNCA** dejar que `hasAuthorizedViewCode` / `hasAnyAuthorizedViewCode`
+  (`src/lib/tenant/authorization.ts`) otorguen con claim vacío en una sesión cliente. El helper
+  `resolveEmptyClaimFallback` discrimina por `tenant.tenantType === 'client'`, **no** por el prefijo del
+  viewCode. Ese fallback existía para "todavía no sé, usa el default del caller", pero los layouts
+  cliente pasan `routeGroups.includes('client')` —`true` para todo cliente—: **sin cerrarlo, degradar
+  hacia cerrado ABRÍA todo**. Es el amplificador que volvía inútil el resto del fix.
+- **NUNCA** reponer una vista cliente desde el TS en el merge del registry. `getPersistedViewRegistry`
+  filtra `active = TRUE`, así que una vista desactivada en DB caía en "falta" y `toRegistryRows` la
+  resucitaba desde `VIEW_REGISTRY`. Desde TASK-1678 el merge **excluye** `routeGroup === 'client'`: ahí
+  está la vigencia real de este carril. Para lo interno el merge se conserva (hace visible una vista
+  nueva antes de que corra su seed).
+- **NUNCA** tomar un `granted=FALSE` de rol como garantía de que nadie con ese rol ve la vista. La
+  derivación es una **unión** sobre `roleCodes` (`roleCodes.some(...)`): con dos roles, uno que otorga
+  gana. Se decidió mantenerlo así —invertir el operador sólo en esta capa haría que **ganar un rol quite
+  acceso**, y rompería la composabilidad de razonar sobre un rol en aislamiento— y el modelo es aditivo
+  de punta a punta (`deriveRouteGroupsFromRoles` también une).
+- **SIEMPRE** que necesites "esta persona no debe ver esto", usar `greenhouse_core.user_view_overrides`
+  con `override_type='revoke'` (per-usuario, con `reason`, con `expires_at`, aplicado al final de la
+  derivación). Ese es el carril de veto; el denial de rol no lo es.
+- **NUNCA** loggear una degradación de este path con `console.warn`. Va por
+  `captureWithDomain(err, 'identity', …)` — en `src/lib/tenant/access.ts` el `catch` silencioso era lo
+  que mantenía el bug class invisible.
+- **SIEMPRE** acompañar un viewCode `cliente.*` nuevo con su seed en `role_view_assignments` **en el
+  mismo PR**. En este carril la telemetría `role_view_fallback_used` **no avisa** (sólo emite cuando el
+  fallback otorga): el síntoma es una vista muerta. El detector es la señal
+  `identity.view_access.client_role_without_grants` (kind `data_quality`, `moduleKey='identity'`, steady
+  0, `>0 → error`; reader `src/lib/reliability/queries/client-role-without-view-grants.ts`), que cuenta
+  roles `client_*` sin ninguna vista otorgada. Los roles cliente salen de `greenhouse_core.roles` por
+  `tenant_type='client'`, **no** de una lista literal ni de `route_group_scope` (un admin interno puede
+  legítimamente incluir `client` en su scope).
+
+**Spec canónica**: `GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md` §8.2 → `Delta TASK-1678`.
+Issue: `ISSUE-147`. El guard de página que corre **después** de este carril (llave por organización,
+vistas base, `redirect()` fuera del `try`) vive en `ORG_CLIENT_AGENT_INVARIANTS.md` → §`Page guards del
+portal cliente`. Los 5 archivos de este carril quedaron declarados en `filesOwned` del módulo `identity`
+del `RELIABILITY_REGISTRY` — antes no tenían owner pese a ser el gate de acceso de toda sesión.
 
 ---
 

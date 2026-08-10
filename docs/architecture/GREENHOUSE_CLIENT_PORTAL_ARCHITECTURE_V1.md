@@ -4,6 +4,28 @@
 > **Creado:** 2026-04-08 por Claude (asistido)
 > **Ultima actualizacion:** 2026-04-09
 > **Status:** Spec completa — baseline + propuesta + readiness assessment. Lista para derivar tasks
+> **⚠️ Vigencia:** documento **descriptivo/predecesor**. El contrato vigente del dominio es
+> `GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md`; ante conflicto, gana ése. Ver §Corrección 2026-08-09.
+
+---
+
+## Corrección 2026-08-09 — el viewCode canónico de `/reviews` es `cliente.reviews`
+
+Este documento cita **`cliente.revisiones`** para `/reviews` en seis lugares (las tablas de grants, el
+catálogo de viewCodes y las tres tablas de propuesta/priorización). **Ese viewCode quedó retirado.**
+
+`TASK-1679` unificó la ruta en **`cliente.reviews`**, que es el que declara el módulo
+`creative_hub_globe_v1` en `greenhouse_client_portal.modules.view_codes`. Eran dos strings distintos
+para la misma ruta —el guard pedía uno y el módulo declaraba el otro—, así que la página no podía abrir
+ni con la llave de organización correcta. `cliente.revisiones` se conserva en el `VIEW_REGISTRY` porque
+el registry es append-only, marcado como retirado, y **ninguna ruta lo gatea**.
+
+Las citas de abajo se dejan sin reescribir a propósito: pertenecen al baseline y a las tablas de
+propuesta de abril, y reescribirlas volvería irrastreable qué se decidió cuándo. Al leer cualquiera de
+ellas, sustituir mentalmente por `cliente.reviews`.
+
+> **NUNCA** usar `cliente.revisiones` en código nuevo. El canónico vigente y el guard real están en
+> `GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md` §12.2, que es el documento de contrato de este dominio.
 
 ---
 

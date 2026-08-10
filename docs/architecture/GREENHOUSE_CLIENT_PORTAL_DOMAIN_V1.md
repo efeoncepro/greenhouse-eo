@@ -1,7 +1,8 @@
 # Greenhouse Client Portal Domain Architecture V1
 
-> **Version:** 1.5
+> **Version:** 1.6
 > **Created:** 2026-05-07 por Claude (Opus 4.7)
+> **Updated:** 2026-08-09 por Claude (Opus 5) — V1.6: el carril de acceso queda cableado y descrito como es. §12.1 menú module-driven en runtime + lint `no-untokenized-business-line-branching` en `error` (TASK-1675/1680), §12.2 la forma real del guard (llave = organización, `redirect()` fuera del `try`, 3 vistas base, un viewCode por ruta — TASK-1679 / ISSUE-146), §6 allowlist de vistas base en `hasViewCodeAccess`, §13 las 2 señales del carril de acceso, §16 tres reglas anti-regresión nuevas.
 > **Updated:** 2026-05-13 por Claude (Opus 4.7) — V1.5 (§11 cascade contract canonizado post arch-architect review TASK-828: G-1 instantiate inline, G-2 audit+signal inmediato, G-3 filter upstream, G-5 sourceRefJson canónico, +2 reliability signals, +listActiveAssignmentsForOrganization reader). V1.4 (§5.5 seed contract, 2026-05-12). V1.3 (§5.2 + §5.3 type/FK drift). V1.2 (§5.1 TASK-824). V1.1 (§3.1 + §3.2 TASK-822).
 > **Audience:** Backend engineers, frontend engineers, product owners, comerciales que vendan módulos del portal cliente, agentes que toquen rutas `/api/client-portal/*`, owners de Globe/Wave/CRM Solutions
 > **Related:** `GREENHOUSE_360_OBJECT_MODEL_V1.md`, `GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md` (V3.0, descriptivo — predecesor), `GREENHOUSE_CLIENT_LIFECYCLE_V1.md`, `GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`, `GREENHOUSE_AGENCY_LAYER_V2.md`, `GREENHOUSE_ASSIGNED_TEAM_ARCHITECTURE_V1.md`, `GREENHOUSE_FEATURE_FLAGS_ROLLOUT_PLATFORM_V1.md`
@@ -24,7 +25,7 @@ EPIC-015 child 6/8 cerrado. Materializa el resolver canónico (TASK-825) en UI c
 **Incident hardening (commit `2fd8a60c`)**: causa raíz `role_view_fallback_used` Sentry alerts = 11 viewCodes Slice 0 sin seed acompañante en `role_view_assignments`. Resuelto canónicamente via migration seed 44 filas (4 roles × 11 viewCodes). Regla canonizada en CLAUDE.md "View Registry Governance Pattern (TASK-827)" — cualquier viewCode futuro en VIEW_REGISTRY requiere migration acompañante.
 
 **TASK derivadas V1.1 registradas** (5 follow-ups + 1 telemetry adapter para TASK-829):
-- `client-portal-legacy-branching-sweep` — promote lint rule warn→error
+- ~~`client-portal-legacy-branching-sweep` — promote lint rule warn→error~~ — **cerrada por `TASK-1680` (2026-08-09)**: `greenhouse/no-untokenized-business-line-branching` corre en `error` y el override quedó con una sola exención declarada. Ver §12.1.
 - `capability-modules-resolver-migration` (D2)
 - ~~`client-portal-vertical-menu-resolver-migration` (Slice 6 deferred)~~ — **cerrada por `TASK-1675` (2026-08-09)**. Estuvo meses sin tomarse en parte porque nunca tuvo ID ni archivo: se nombraba en esta spec, en `docs/tasks/README.md`, en `eslint.config.mjs` y en un comentario de `VerticalMenu.tsx`, pero no existía como task. Registrarla fue parte del arreglo. Ver §12.1.
 - `client-portal-pages-placeholder-materialization` (10 pages placeholder)
@@ -37,19 +38,26 @@ EPIC-015 child 6/8 cerrado. Materializa el resolver canónico (TASK-825) en UI c
 
 ## 0. Status
 
-Contrato arquitectónico nuevo desde 2026-05-07.
+Contrato arquitectónico vigente. Creado 2026-05-07; **implementado**.
 
-Estado actual del repo:
+Este spec canoniza **dominio compositivo de primer nivel** + **catálogo declarativo de módulos** +
+**assignment per-cliente time-versioned** + **resolver canónico** + **cascade desde Client Lifecycle V1**.
 
-- `client` existe como `RouteGroup` canónico desde TASK-535 + roles dedicados (`CLIENT_EXECUTIVE/MANAGER/SPECIALIST`)
-- Spec funcional `GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md` V3.0 describe Creative Hub Globe (16 cards), CRM Solutions (transición a Kortex), Wave (baja madurez)
-- Lógica del portal cliente vive distribuida: `src/lib/agency/`, `src/lib/account-360/`, `src/lib/ico-engine/`, etc.
-- NO existe `src/lib/client-portal/` carpeta canónica
-- NO existe `/api/client-portal/` namespace
-- NO existe schema `greenhouse_client_portal`
-- NO existe modelo de módulos on-demand (la diferenciación per-cliente hoy es vía `tenant_capabilities.businessLines/serviceModules` que viene de HubSpot, hardcoded en componentes)
+### Estado real del repo (verificado 2026-08-09)
 
-Este spec canoniza **dominio compositivo de primer nivel** + **catálogo declarativo de módulos** + **assignment per-cliente time-versioned** + **resolver canónico** + **cascade desde Client Lifecycle V1**.
+- `client` es `RouteGroup` canónico desde TASK-535, con los 3 roles dedicados (`client_executive`, `client_manager`, `client_specialist`).
+- ✅ **`src/lib/client-portal/` existe** — con `readers/native/module-resolver.ts` (el resolver canónico), `guards/`, `commands/`, `composition/`, `view-codes/`.
+- ✅ **`/api/client-portal/` existe** — más el lane admin `/api/admin/client-portal/**`.
+- ✅ **El schema `greenhouse_client_portal` existe** — 3 tablas: `modules` (catálogo), `module_assignments` (time-versioned) y `module_assignment_events` (audit append-only).
+- ✅ **El modelo de módulos on-demand existe y está en producción.** La diferenciación per-cliente se resuelve por `module_assignments` vía el resolver canónico; el carril legacy `businessLines`/`serviceModules` quedó cerrado por lint en `error` (`TASK-1680`), con una sola exención declarada.
+- Lo que **sigue** distribuido es el dato primario, y es por diseño (§1): el portal compone sobre `src/lib/agency/`, `src/lib/account-360/`, `src/lib/ico-engine/`, y nunca los duplica.
+
+> **Por qué este bloque estaba invertido hasta hoy.** Hasta el 2026-08-09 esta sección decía "NO existe"
+> de las cuatro piezas, describiendo el repo de mayo cuando el spec se escribió como propuesta. Las
+> cuatro se implementaron entre `TASK-824` y `TASK-828`, y el bloque nunca se dio vuelta. Es la primera
+> cosa que lee un agente que abre el documento de contrato de este dominio, así que lo mandaba a
+> construir de cero lo que ya existía — o sea, exactamente a crear el carril paralelo que este spec
+> vino a evitar. Corregido al cerrar `TASK-1678`/`1679`/`1680`.
 
 ---
 
@@ -482,6 +490,11 @@ hasViewCodeAccess(orgId, viewCode): Promise<boolean>
 hasCapabilityViaModule(orgId, capability): Promise<boolean>
 ```
 
+`hasViewCodeAccess` resuelve **primero** la allowlist `CLIENT_PORTAL_BASE_VIEW_CODES` (las 3 vistas que no
+son producto vendible — ver §12.2), antes de tocar la DB: no dependen de assignments. Para todo el resto
+la respuesta sale de `modules.some(m => m.viewCodes.includes(viewCode))`, así que un viewCode que ningún
+módulo declara **deniega siempre** — eso es el default correcto del carril, no un bug.
+
 ---
 
 ## 7. Canonical Commands
@@ -858,6 +871,14 @@ Subsystem nuevo: `Client Portal Health` (registrado en `RELIABILITY_REGISTRY`).
 | `client_portal.assignment.pilot_expired_not_actioned` | drift | warning | 0 | pilots con `expires_at < now()` y `status='pilot'` (no transitioned a active/churned) |
 | `client_portal.assignment.churned_with_active_session` | drift | error | 0 | client_users con session activa cuya org tiene `lifecycle_stage='inactive'/'churned'` y assignments con `status != 'churned'` |
 
+El **carril de acceso** del portal (sesión → vista → módulo) se vigila con dos señales que viven bajo
+`moduleKey='identity'`, no en este subsystem, porque su sujeto es la sesión y no el assignment:
+
+| Signal | Kind | Steady | Detecta |
+|---|---|---|---|
+| `identity.view_access.client_role_without_grants` | data_quality | 0 | roles `client_*` sin ninguna vista otorgada en `role_view_assignments`. Desde TASK-1678 el seed es load-bearing: sin grants el portal queda vacío sin error visible |
+| `identity.client_portal.client_without_organization` | data_quality | 0 | `client_users` activos sin organización resuelta — se loguean bien y no pueden abrir NINGUNA página del portal, porque no hay organización contra la que evaluar módulos |
+
 ---
 
 ## 14. Defense in Depth (7 layers)
@@ -918,6 +939,9 @@ Subsystem nuevo: `Client Portal Health` (registrado en `RELIABILITY_REGISTRY`).
 - **NUNCA** invocar `enableClientPortalModule` directo desde UI client-facing. Solo desde admin endpoint o reactive consumer.
 - **NUNCA** omitir `outbox event v1` en una transición de assignment. Consumers downstream dependen.
 - **NUNCA** `Sentry.captureException` directo en code paths client_portal. Usar `captureWithDomain(err, 'client_portal', ...)`.
+- **NUNCA** agregar un gate por route group **encima** de `requireViewCodeAccess` en una page. El guard ya cubre los dos tenant types (interno por bypass, cliente por módulo o vista base) y un segundo gate que corre antes sólo puede contradecirlo: el scope de route groups del operador interno no incluye el del portal cliente, así que la página rebota antes de llegar al bypass. Fijado por `src/lib/client-portal/guards/no-route-group-gate-above-view-code-guard.test.ts`. Caso fuente: `/proyectos` era la única de las 9 páginas con ese resto y devolvía `/401` al operador interno (removido 2026-08-09, post-release).
+- **NUNCA** mover el `redirect()` del camino `denied` dentro del `try` del guard. `redirect()` señaliza **lanzando** `NEXT_REDIRECT`: el catch lo intercepta, el camino `denied` se vuelve inalcanzable y cada denegación legítima se reporta a Sentry como fallo del resolver (§12.2).
+- **NUNCA** pasar `session.user.clientId` a un filtro sobre `module_assignments.organization_id`. La llave del resolver es la organización y se resuelve en un solo lugar: `resolveClientPortalOrganizationId` (§12.2). Los dos espacios de id no se solapan y TS no lo puede atrapar — es `string` contra `string`.
 - **NUNCA** ejecutar `migrateClientPortalAssignmentsFromLegacy` en producción sin `dryRun=true` previo + revisión humana del proposedAssignments[].
 - **NUNCA** declarar un módulo con `data_sources[]` referenciando un dominio que no existe. Lint rule + tests.
 - **SIEMPRE** declarar `data_sources[]` en cada módulo — sirve como contrato downstream + protect contra acoplamientos no declarados.

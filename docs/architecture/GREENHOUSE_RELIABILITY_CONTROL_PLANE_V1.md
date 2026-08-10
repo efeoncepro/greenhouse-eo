@@ -2,10 +2,39 @@
 
 > Spec canónica del `Reliability Control Plane` de Greenhouse EO. Define el registry por módulo, el modelo unificado de señales, el contrato de evidencia y cómo `Admin Center`, `Ops Health` y `Cloud & Integrations` consumen la lectura consolidada sin duplicar fuentes.
 >
-> Versión: `1.11`
+> Versión: `1.12`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-07-12` por TASK-1391 (signals de la cola de render de artefactos)
+> Última actualización: `2026-08-09` por TASK-1678/1679 (signals del carril de acceso del portal cliente)
+
+## Delta 2026-08-09 — TASK-1678/1679: 2 signals del carril de acceso del portal cliente
+
+Dos señales nuevas bajo `moduleKey='identity'` (rollup `Identity & Access`, `kind='data_quality'`), que
+hacen observable el **carril de acceso** del portal cliente: sesión → vista otorgada → organización →
+módulo contratado. Las dos existen porque el carril pasó a **fallar hacia cerrado** (`TASK-1678`): antes
+un hueco de seed o de datos se compensaba con un default permisivo, y ahora produce un portal vacío
+**sin error visible**. Readers separados, ambos compuestos en `get-reliability-overview.ts` con
+`.catch(() => null)`.
+
+| `signalId` | Qué mide | Severidad | Steady |
+| --- | --- | --- | --- |
+| `identity.view_access.client_role_without_grants` | Roles cliente (`greenhouse_core.roles` con `tenant_type='client'`) sin **ninguna** vista otorgada en `role_view_assignments`. Desde que el default por routeGroup no aplica al carril `client`, el seed es load-bearing: un rol sin grants deja a sus usuarios en un portal vacío. Reader: [`client-role-without-view-grants.ts`](../../src/lib/reliability/queries/client-role-without-view-grants.ts) | `0 → ok`, `>0 → error` | **0** |
+| `identity.client_portal.client_without_organization` | `client_users` activos **sin organización resuelta**. Se loguean bien y no pueden abrir NINGUNA página del portal, porque no hay organización contra la que evaluar módulos contratados. Es la señal detrás de `/home?error=organization_unresolved`. Reader: [`client-user-without-organization.ts`](../../src/lib/reliability/queries/client-user-without-organization.ts) | `0 → ok`, `>0 → error` | **0** |
+
+Notas de contrato que valen para cualquier señal futura de este dominio:
+
+- **Los roles cliente NO se enumeran literalmente**: salen por `tenant_type='client'`, así que un rol
+  `client_*` nuevo entra a la señal sin tocar el reader. Y **no** por
+  `'client' = ANY(route_group_scope)`: el scope es un conjunto y un admin interno que da soporte puede
+  incluir `client` legítimamente, lo que arrastraría roles internos a una señal que no habla de ellos.
+- `greenhouse_core.roles` **no tiene columna `active`** (verificado contra `information_schema`): no
+  agregar un predicado de vigencia sin comprobar primero que la columna exista.
+- Los 5 archivos del carril rol→vista (`view-access-store.ts`, `view-access-catalog.ts`,
+  `tenant/access.ts`, `tenant/authorization.ts`, `tenant/role-route-mapping.ts`) quedaron declarados en
+  `filesOwned` del módulo `identity` del registry — antes no tenían owner pese a ser el gate de acceso
+  de toda sesión autenticada, así que sus incidents Sentry no correlacionaban a ningún módulo.
+
+Contrato: [`GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`](GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md) §8.2 (`Delta TASK-1678`) + [`GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md`](GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md) §12.2 y §13.
 
 ## Delta 2026-07-12 — TASK-1391: 2 signals de la cola de render de artefactos
 

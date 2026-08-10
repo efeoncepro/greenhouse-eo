@@ -203,7 +203,7 @@ TASK-554 crea `Comercial` como dominio top-level de navegación. TASK-555 agrega
 | Proyectos | `GH_CLIENT_NAV.projects` | `tabler-folders` | `/proyectos` | `cliente.proyectos` |
 | Ciclos | `GH_CLIENT_NAV.sprints` | `tabler-bolt` | `/sprints` | `cliente.ciclos` |
 | Equipo | `GH_CLIENT_NAV.team` | `tabler-users-group` | `/equipo` | `cliente.equipo` |
-| Revisiones | `GH_CLIENT_NAV.reviews` | `tabler-git-pull-request` | `/reviews` | `cliente.revisiones` |
+| Revisiones | `GH_CLIENT_NAV.reviews` | `tabler-git-pull-request` | `/reviews` | `cliente.reviews` |
 | Analytics | `GH_CLIENT_NAV.analytics` | `tabler-chart-dots` | `/analytics` | `cliente.analytics` |
 | Campanas | `GH_CLIENT_NAV.campaigns` | `tabler-speakerphone` | `/campanas` | `cliente.campanas` |
 | Novedades | `GH_CLIENT_NAV.updates` | `tabler-bell` | `/updates` | `cliente.actualizaciones` |
