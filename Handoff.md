@@ -1,5 +1,44 @@
 # Handoff activo
 
+### TASK-1685 CERRADA — un solo primitive de visibilidad del portal cliente; `ISSUE-148` resuelta (2026-08-10)
+
+Cuarta task de navegación del mismo día, en `develop`, local-first, **sin push**. Decisión del Slice 1
+delegada por el operador a `arch-architect` + overlay del repo: **(a′)** — el módulo autoriza, un
+`revoke` per-persona cierra, y **el menú consume el mismo predicado que la puerta**
+(`src/lib/client-portal/visibility/`, puro + adaptador server + contexto). Cuatro consumers, no dos:
+page guard, lista base del menú, ⌘K y layouts de ruta.
+
+**Medir cambió el diagnóstico dos veces, y por eso (a) literal no alcanzaba.** (1) La divergencia viva
+eran **36 enlaces muertos** en la dirección *el menú promete y la puerta niega*, sobre **8 de 8**
+usuarios cliente —incluidos los 3 reales de Sky Airlines— y **0** en la dirección que `ISSUE-148`
+enfatizaba (el merge aditivo de TASK-1675 repone todo ítem de módulo). (2) La intención de los 9 denials
+**estaba escrita** en sus migraciones: 6 son plomería anti-fallback que TASK-1678 dejó vestigial, 3 son
+diferenciación per-rol que hoy no afecta a nadie. No hizo falta preguntarle a nadie.
+
+**Hallazgo de ACCESO que la spec no tenía, y lo encontró el lint nuevo:** los layouts de `/proyectos`,
+`/campanas`, `/sprints` y `/notifications` gateaban por el carril de rol, y sus rutas de detalle
+(`[id]`, `[campaignId]`, `preferences`) **no tienen guard propio** — un cliente cuyo rol concedía la
+vista pero cuya organización no tenía el módulo entraba al detalle por URL. Los cuatro pasan al guard
+canónico.
+
+Verificado contra PG: **24 pares contratados intactos** (nadie perdió nada), enlaces muertos **36 → 0**,
+`revoke` cierra la puerta. Gates: `local:check`, `test:lint-rules` (21), suites focales 867. Sin
+migraciones, sin flags — `user_view_overrides` está vacía, así que el delta de acceso es cero exacto.
+
+**Continuidad:**
+- **Rollout pendiente**: falta ejercitar las 9 rutas con las personas agente contra staging/producción
+  (pasos 2-5 de §Production verification sequence). El código está completo y medido en local.
+- La señal `identity.client_portal.menu_gate_divergence` queda en **warning con 2**, y es honesto:
+  `cliente.ciclos` y `cliente.analytics` no las vende **ningún** módulo del catálogo, así que ninguna
+  organización puede alcanzarlas. Antes eran enlaces muertos; no se perdió acceso. Decisión pendiente:
+  venderlas en un módulo o retirarlas del catálogo y sus rutas.
+- **`TASK-1687` creada**: `/creative-hub` no existe y el bundle de SKY lo declara. Separada a propósito
+  (catálogo comercial ≠ semántica de autorización). **Nunca** quitarle el módulo a SKY.
+- **`TASK-286` desbloqueada con premisa nueva**: sembrar grants por rol para una vista `cliente.*` ya
+  no produce acceso; el carril es declararla en el módulo que la vende. Delta escrito allá.
+- Sigue abierto el bloque legacy de capability modules (`capability-modules-resolver-migration`, sin
+  ID): sus dos callsites quedaron con marker y dueño declarado.
+
 ### TASK-1389 CERRADA — el candado anti-regresión de la navegación quedó armado (2026-08-10)
 
 Tercera task del programa de navegación cerrada el mismo día: Contrato de Asignación de Superficies
@@ -53,42 +92,20 @@ conocido del chrome: `@menu` no expone `aria-expanded` en triggers de submenú (
 canónico = clase `ts-open`, documentado en el scorecard) — decidir como deuda de chrome aparte;
 (4) la rama no-interna del menú quedó con punto de extensión limpio para `TASK-1685` (Delta escrito).
 
-### ⛔ PARAR ACÁ — decisión pendiente del portal cliente, y una advertencia sobre esta sesión (2026-08-09)
+### Cerrada — la decisión pendiente del portal cliente y las lecciones de la sesión del 2026-08-09
 
-**Lo primero:** el operador detuvo el trabajo deliberadamente para decidir en sesión fresca, **porque
-esta sesión acumuló demasiados errores míos**. No retomes la implementación sin su decisión.
+**La decisión ya se tomó** (`TASK-1685`, entrada de arriba): opción (a′). La parada de esa sesión
+cumplió su propósito — decidir con cabeza fresca y midiendo — y el "no lo resuelvas con un `AND` en la
+puerta" se confirmó correcto: habría cerrado 6 pares contratados sin arreglar ninguno de los 36 enlaces
+muertos que eran el defecto real.
 
-**Lo que hay que decidir:** `TASK-1685` (cierra `ISSUE-148`). Rol y módulo **no son excluyentes** — son
-dimensiones ortogonales, organización vs. persona — y **cada una se aplica en un solo lugar**: el menú
-aplica el rol para 6 enlaces base, la puerta aplica el módulo, y ninguna de punta a punta. La puerta lee
-**uno de los tres** insumos, así que un denial de rol **y** un `revoke` per-persona son decorativos ahí.
+**Lo que sigue siendo continuidad activa de esa sesión:**
 
-🔴 **NO lo resuelvas poniendo un `AND` en la puerta.** Está medido: cerraría 6 pares usuario×vista,
-incluidas superficies que **Sky Airlines y Grupo Berel contrataron**. El análisis completo, los 24 pares
-y las tres opciones están en `ISSUE-148` y en el Slice 1 de `TASK-1685`.
-
-**Verificá lo que yo afirmé antes de construir sobre ello.** Mis errores de esta sesión tuvieron una
-sola causa —afirmar sin verificar, y construir variantes sin buscar el patrón existente— y tres llegaron
-al operador como hechos:
-
-1. Dije que `agent-session` daba **403 en producción "por diseño"**, repetidamente. Es **falso**:
-   `AGENT_AUTH_ALLOW_PRODUCTION` está seteada desde ~90 días. Lo tomé de una nota de este mismo Handoff.
-   Postura abierta en `TASK-1684`. **Corolario para vos: una nota de este archivo no es evidencia.**
-2. Usé `NODE_ENV` donde el repo ya tenía `VERCEL_ENV` en dos archivos, y el guard quedó solo-local con
-   los tests verdes. Corregido.
-3. Asigné `creative_hub_globe_v1` a SKY verificando qué otorgaba el bundle pero **no si esas páginas
-   existían**: `/creative-hub` no existe y 3 usuarios reales ven un enlace muerto. Señal
-   `identity.client_portal.assigned_view_without_route`, hoy en **1**. Decisión pendiente.
-
-Y el framing con que cerré `TASK-1678`/`1679`/`1680` —"la puerta es el módulo",
-"`role_view_assignments` no es el carril de una vista `cliente.*`"— **es demasiado fuerte y desorienta**.
-`project_context.md` ya está corregido; los otros 5 docs se corrigen en el Slice 4 de `TASK-1685`, a
-propósito en el mismo cambio que la decisión, para que la doc nunca describa un estado que no existe.
-
-**Lo que SÍ quedó cerrado y verificado en producción, y no hay que rehacer:** los dos releases del día
-(`2c87d71e2eca` y `ee0d568b8614`, ambos `released`, watchdog `drift_count=0`), `TASK-1678`/`1679`/`1680`
-en `complete/`, `ISSUE-146` e `ISSUE-147` resueltas, y las 9 rutas × 3 personas verificadas contra
-producción con sesión real.
+- `TASK-1684` — la postura de `AGENT_AUTH_ALLOW_PRODUCTION`, seteada desde ~90 días. Sigue abierta.
+- `TASK-1687` — `/creative-hub` no existe y el bundle de SKY lo declara; señal en 1.
+- **Una nota de este archivo no es evidencia.** Es la lección que produjo los tres errores de esa
+  sesión (afirmar sin verificar): el 403 "por diseño" de `agent-session` salió de una nota de acá y era
+  falso. Verificar contra runtime o PG antes de construir encima.
 
 ### Barrido documental post-release: tres auditorías paralelas y dos defectos vivos (2026-08-09)
 
@@ -552,38 +569,3 @@ hizo fallar a propósito lo que estaba verde de mentira**:
 Lo que **no** hice y sigue abierto: los 7 lotes de la auditoría premium (trabajo de Codex, vive en
 `/growth/seo/mockup`), el push de los commits locales y la migración —bloqueada porque `main` no
 tiene todavía el catálogo TS y `syncViewRegistryCatalog` desactivaría las filas.
-
-### TASK-1309 — CERRADA (2026-08-08)
-
-**Cerrada.** El build de producción salió verde con autorización del operador (exit 0, árbol completo
-de rutas), que era el último gate: `pnpm test` full + `pnpm build` prod + los 4 gates de UI +
-reachability. Lifecycle `complete`, archivo movido, registry/README/EPIC-022 sincronizados, y delta de
-impacto cruzado en las tres tasks que la citan como base (1670, 1672, 1673). **Con ella el conmutador
-de Search Visibility queda completo: las 4 tabs del operador navegan.**
-
-**El bloqueo había desaparecido solo.** 1309 estaba `code complete` frenada por 2 rojos ajenos en
-`client-role-visibility.test.ts`, causados por 1310 al registrar viewCodes sin migración de
-`role_view_assignments`. Esa migración se aplicó hoy en el rollout de 1310 y los cerró:
-**`pnpm test` completo en 1429 archivos / 10377 tests / 0 rojos**, `ui:quality` PASS 4.63,
-reachability 232 rutas / 0 huérfanas. Falta sólo `pnpm build` de producción sobre el último commit
-para moverla a `complete` (no se corrió: ~30 GB, va con autorización del operador).
-
-**Dos subagentes cerraron el ciclo documental**, con dominios de archivos disjuntos para no chocar.
-Lo que encontraron vale más que el trabajo mecánico:
-
-- 🔴 **§10.6 de la arquitectura SEO se auto-contradecía**, y fue culpa mía: el delta que agregué esta
-  mañana cambiaba el orden a tres ejes, pero el contrato 4 de arriba seguía declarando la regla vieja
-  de dos. Un agente que leyera el ítem sin bajar al delta implementaba lo equivocado.
-- **Cinco commits de feature aterrizaron DESPUÉS del pase documental** (`4c81306d5`), así que las tres
-  capas describían una pantalla anterior a la construida. El pase documental "ya hecho" no era
-  garantía de nada: lo que garantiza es mirar el delta.
-- Los hallazgos se **generalizaron más allá de SEO**, que es donde está el valor: `dataviz-design`
-  ahora advierte que **cualquier** chart que derive su tamaño del contenedor es sospechoso (tabs
-  ocultas, acordeones, y el `fullPage` de Playwright que produce cards vacías que parecen bug y no lo
-  son); `state-design` fija que el resultado de un job async tiene **seis** estados y no dos (nunca
-  corrió · corriendo · limpio · parcial · con techo · fallido); y los dos gates de UI review suman
-  como blocker el número cuya procedencia difiere de sus vecinos sin declararlo.
-
-**Deuda detectada de paso:** `greenhouse-ui-enterprise-review` existe en `.claude/` y `.codex/` pero
-**no está en el manifiesto de espejos** y ya divergía. Se le aplicó el mismo bloque a las dos copias
-para que el gate sea idéntico entre agentes, sin reconciliar la divergencia previa. Alguien debería.

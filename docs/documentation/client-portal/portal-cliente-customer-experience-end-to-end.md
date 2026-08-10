@@ -23,10 +23,18 @@ se cerro. Lo que cambia respecto de lo que este documento describia:
 - **"No tiene organizacion resuelta" es un estado propio**, distinto de "not assigned". Sin organizacion
   no hay contra que evaluar modulos, asi que activar cualquier cosa no cambia nada. Se mide con la senal
   `identity.client_portal.client_without_organization` en `/admin/operations`, steady cero.
-- **Para las pantallas que dependen de un modulo, `role_view_assignments` no es el carril.** La puerta
-  decide por modulo contratado. Diagnosticar una de esas pantallas revisando grants por rol lleva al
-  lugar equivocado — y ponerlos en otorgado convierte el acceso en visibilidad por rol para todos los
-  clientes con ese rol.
+- **Para las pantallas del portal cliente, los grants por rol no son el carril.** Desde el 2026-08-10
+  quien decide es el modulo que la organizacion contrato, y una sola respuesta gobierna a la vez el
+  menu, el buscador rapido y la pagina: si el modulo no la incluye, la pantalla no aparece **y** no
+  abre. Diagnosticar revisando grants por rol lleva al lugar equivocado, y ponerlos en otorgado no
+  habilita nada.
+- **Antes, el menu prometia pantallas que la puerta negaba.** El menu se armaba por rol y la puerta
+  decidia por modulo, asi que un cliente veia enlaces que terminaban devolviendolo al inicio: medidos
+  el 2026-08-10, eran 36 enlaces sobre los 8 usuarios cliente activos. Hoy el menu muestra exactamente
+  lo que se puede abrir. Nadie perdio acceso: esos enlaces ya no abrian.
+- **Para quitarle una pantalla a una persona concreta** (sin tocarle el contrato a su organizacion) el
+  instrumento es un `revoke` per-persona, que desde esta version **si cierra la pagina**, no solo
+  esconde el enlace.
 - **El carril de rol dejo de otorgar por defecto para el portal cliente.** Antes, si un rol cliente no
   tenia fila para una vista, el sistema la otorgaba. Ahora nada se otorga hasta estar declarado, y el
   camino degradado cierra en vez de abrir. Senal: `identity.view_access.client_role_without_grants`.

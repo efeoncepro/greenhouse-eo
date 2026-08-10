@@ -143,6 +143,49 @@ server-side en `(dashboard)/layout.tsx` y pasando `clientNavItems` por props a `
 **Spec canónica**: `GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md` §12.1. Task: `TASK-1675` (cierra la deuda sin
 ID `client-portal-vertical-menu-resolver-migration` de TASK-827).
 
+### Un solo primitive de visibilidad del portal cliente (TASK-1685, desde 2026-08-10)
+
+Existe **un** helper que responde *"¿esta persona puede ver esta vista?"*, y menú, ⌘K, page guards y
+layouts de ruta son todos consumers suyos:
+
+```
+acceso = interna ∨ ( ¬revocadaParaLaPersona ∧ ( vistaBase ∨ móduloDeLaOrgLaDeclara ) )
+```
+
+`src/lib/client-portal/visibility/`: `canSeeClientPortalView` (puro, client-safe) +
+`canOpenClientPortalView` / `resolveClientPortalVisibilityInputs` (adaptador server) +
+`person-view-revocations` (reader cacheado 60s).
+
+- **NUNCA** decidir la visibilidad de una vista `cliente.*` fuera del primitive. En el servidor,
+  `canOpenClientPortalView`; en el cliente, el hook `useClientPortalViewVisibility`. El lint
+  `greenhouse/no-client-portal-view-visibility-bypass` está en `error` y su escape hatch es
+  `// client-portal-visibility-allowed: <razón>`, reservado a código que audita el carril de rol.
+- **NUNCA** usar `role_view_assignments` / `authorizedViews` como carril de una vista `cliente.*`. No la
+  otorga ni la niega. Sembrar `granted=TRUE` para una vista cliente nueva **no la hace alcanzable**: el
+  carril es declararla en el módulo que la vende. (Para el portal **interno** ese carril sigue siendo el
+  canónico.)
+- **NUNCA** convertir la dimensión persona en un *grant*. Sólo puede **restar**
+  (`user_view_overrides.override_type='revoke'`). Un grant per-persona abriría una superficie que la
+  organización no contrató, y exigir un grant convierte cada assignment comercial en un cambio de dos
+  tablas — carga operativa que deriva, y con la puerta fail-closed deriva hacia *"el cliente pagó y no
+  entra, en silencio"*.
+- **NUNCA** una restricción per-**rol** sobre una vista que el módulo concede: el rol es un conjunto que
+  se acumula, así que reintroduce la paradoja de que *ganar un rol te quita acceso*. `user_view_overrides`
+  es per-persona y no la tiene.
+- **NUNCA** gatear una ruta `cliente.*` desde un `layout.tsx` con `hasAuthorizedViewCode`. Y al agregar
+  una ruta **hija** bajo un layout guardado, verificar que ese layout esté en el carril correcto: cuatro
+  detalles del portal (`/proyectos/[id]`, `/campanas/[campaignId]`, `/sprints/[id]`,
+  `/notifications/preferences`) no tienen guard propio y su única puerta es el layout.
+- **NUNCA** agregar una entrada al catálogo de navegación (`client-portal-nav-catalog.ts`) para
+  destrabar un ítem: no concede acceso. Si ningún módulo declara ese viewCode, el resultado es un enlace
+  que la puerta niega.
+- **SIEMPRE** que agregues una superficie al catálogo de navegación, declararla en el módulo que la
+  vende. La señal `identity.client_portal.menu_gate_divergence` cuenta las que no lo están: son
+  inalcanzables para **toda** organización, no sólo para una.
+
+**Spec canónica**: `GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md` §12.1 y §12.2 (Deltas TASK-1685) +
+`GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md` §8.2. Hallazgo: `ISSUE-148`.
+
 Desde `TASK-1680` (2026-08-09) el lint `greenhouse/no-untokenized-business-line-branching` corre en
 **`error`**: branching legacy nuevo por `session.user.{tenantType,businessLines,serviceModules}` o
 `tenant_capabilities.*` en una superficie UI falla el CI. El override quedó con **una sola exención**

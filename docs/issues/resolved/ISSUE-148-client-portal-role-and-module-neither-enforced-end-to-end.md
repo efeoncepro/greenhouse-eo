@@ -3,7 +3,7 @@
 > **Tipo:** Hallazgo de arquitectura / autorización (portal cliente)
 > **Ambiente:** Producción + staging + local
 > **Detectado:** 2026-08-09, al cerrar `TASK-1678`/`1679`/`1680` — surgió de una pregunta del operador: *"¿rol y módulo no son excluyentes? ¿por qué tienen que serlo?"*
-> **Estado:** open — medido y verificado; **decisión de diseño pendiente**, no implementar sin ella
+> **Estado:** **resuelta 2026-08-10** por `TASK-1685` (decisión (a′)). Ver §Resolución al final.
 > **Severidad:** **media** — no hay pérdida de datos ni exposición cross-tenant; lo que hay son controles decorativos y una divergencia menú↔puerta
 
 ## Resumen
@@ -160,6 +160,57 @@ de `TASK-1685`, para que quede en el mismo cambio que la decisión y no antes.
 - Un `user_view_overrides` con `override_type='revoke'` cierra la puerta, no sólo oculta el enlace.
 - Ningún cliente pierde una superficie que su organización contrató.
 - Los 9 denials de rol quedaron retirados o convertidos, con la intención escrita.
+
+## Resolución (2026-08-10, `TASK-1685`)
+
+**Decisión: (a′).** Un solo primitive puro responde la pregunta, y lo consumen los cuatro caminos que
+antes decidían por su cuenta — el page guard, la lista base del menú, el ⌘K y los layouts de ruta:
+
+```
+acceso = interna ∨ ( ¬revocadaParaLaPersona ∧ ( vistaBase ∨ móduloDeLaOrgLaDeclara ) )
+```
+
+`src/lib/client-portal/visibility/`. Es puro porque el guard corre en el servidor pero el menú y el ⌘K
+son Client Components; los insumos se resuelven **una vez** en `(dashboard)/layout.tsx`, así que menú y
+puerta no sólo comparten función: comparten insumos.
+
+**Lo que la medición cambió respecto de lo escrito arriba** (los dos Deltas del 2026-08-10 lo detallan):
+la divergencia viva eran **36 enlaces muertos** en la dirección "el menú promete y la puerta niega", con
+**0** en la dirección que este hallazgo enfatizaba; y la intención de los 9 denials **estaba registrada**
+en sus migraciones. Consecuencia de diseño: la opción (a) tal como se planteó no alcanzaba, porque
+arreglaba la puerta —que ya coincidía— y dejaba los 36 intactos.
+
+**Un hueco que este hallazgo no vio.** Los layouts de `/proyectos`, `/campanas`, `/sprints` y
+`/notifications` gateaban por el carril de rol, y **`/proyectos/[id]`, `/campanas/[campaignId]`,
+`/sprints/[id]` y `/notifications/preferences` no tienen guard propio**: ese layout era su única puerta.
+Un cliente cuyo rol concedía la vista pero cuya organización no tenía el módulo alcanzaba el detalle por
+URL, aunque el listado le estuviera negado. Lo encontró el lint nuevo, no la lectura manual.
+
+### Verificación (contra PG real, antes y después)
+
+| | Antes | Después |
+|---|---|---|
+| Pares usuario × vista contratados | 24 | **24** — ningún cliente perdió una superficie |
+| Enlaces que el menú ofrece y la puerta niega | **36** (8 de 8 usuarios) | **0** |
+| Alcanzables sólo por URL | 0 | 0 |
+| Un `revoke` per-persona cierra la puerta | no | **sí** |
+| Superficies que ningún módulo vende | no medido | **2** (`cliente.ciclos`, `cliente.analytics`) |
+
+Las 2 últimas no son una regresión: antes eran enlaces muertos y ahora simplemente no se muestran.
+Nadie podía abrirlas en ninguno de los dos estados. La señal las nombra en vez de esconderlas, y su
+remediación es declararlas en el módulo que las venda o retirarlas del catálogo de navegación.
+
+Script repetible: `scripts/identity/client-portal-visibility-baseline.ts` (deriva los conteos del mismo
+estado que lee el motor; no fija ningún literal esperado).
+
+### Contra la lista de "Verificación al resolver"
+
+- ✅ Existe **un** primitive y tanto el menú como la puerta lo consumen — más el ⌘K y los layouts.
+- ✅ Menú y puerta coinciden, con señal `identity.client_portal.menu_gate_divergence`.
+- ✅ Un `revoke` cierra la puerta, no sólo oculta el enlace.
+- ✅ Ningún cliente perdió una superficie contratada (24 pares intactos).
+- ✅ Los 9 denials quedaron retirados en efecto —el carril de rol ya no gobierna `cliente.*`— con la
+  intención escrita. Las filas **no** se borran: la tabla es append-only.
 
 ## Relacionado
 

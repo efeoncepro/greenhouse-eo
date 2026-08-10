@@ -1,3 +1,23 @@
+## Delta 2026-08-10 — la decisión se tomó, y desbloquea esta task con una premisa distinta
+
+`TASK-1685` cerró la decisión (opción **(a′)**) e `ISSUE-148` quedó resuelta. Lo que eso significa para
+esta task, concretamente:
+
+- 🟢 **Desbloqueada.** Ya no hay que coordinar: la semántica está fija.
+- 🔴 **Pero su premisa central cambió.** El carril `role_view_assignments` **no gobierna vistas
+  `cliente.*`** — ni las otorga ni las niega. Registrar 10 viewCodes nuevos y sembrarles grants por rol
+  **no produce acceso a nada**. El carril para que una superficie cliente sea alcanzable es
+  **declararla en el `view_codes[]` del módulo que la vende** (`greenhouse_client_portal.modules`, que
+  es append-only: se supersede con una versión nueva del módulo, no se edita in-place).
+- El modelo de "capabilities finas sobre el carril de views" que esta task proponía queda sin sustrato
+  del lado cliente. Si la intención sigue siendo diferenciar acceso **dentro** de una organización, el
+  instrumento canónico es `user_view_overrides` per-persona (deny), **nunca** un grant o deny per-rol —
+  el rol es un conjunto que se acumula y reintroduce la paradoja de que *ganar un rol te quita acceso*.
+- Antes de escribir migración, re-leer `TASK-1685` §Slice 1 (D1/D2) y
+  `GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md` §12.1/§12.2. El lint
+  `greenhouse/no-client-portal-view-visibility-bypass` está en `error` y bloquea el patrón que esta
+  task asumía.
+
 ## Delta 2026-08-09 — el carril que esta task iba a usar cambió de default, y la decisión de diseño está abierta
 
 Causado por `TASK-1678` / `TASK-1679` / `TASK-1680` (complete, en producción) + `ISSUE-148` / `TASK-1685` (nuevas).

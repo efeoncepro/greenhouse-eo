@@ -88,7 +88,13 @@ Revisa data source del modulo. Si depende de integraciones, mira `/admin/integra
 
 ### El usuario tiene rol correcto pero no ve la vista
 
-Rol no basta, y para las pantallas que dependen de un modulo el rol no es el carril: revisa primero el modulo asignado a la organizacion. `view_registry`, grants por rol y overrides solo aplican a las vistas cliente que no dependen de un modulo.
+El rol no es el carril del portal cliente: revisa el **modulo asignado a la organizacion**. Desde el 2026-08-10 una sola respuesta gobierna el menu, el buscador rapido y la pagina, asi que si la pantalla no aparece en el menu tampoco va a abrir por URL — y al reves, si el modulo la incluye, aparece. Cambiar grants por rol para una vista cliente **no habilita nada**; lo que habilita es que el modulo contratado la declare.
+
+Si lo que quieres es lo contrario —que una persona concreta **no** vea una pantalla que su organizacion si contrato— el instrumento es un override `revoke` para esa persona, que cierra la pagina y no solo esconde el enlace.
+
+### El menu no muestra una pantalla que el cliente tenia antes
+
+Antes del 2026-08-10 el menu se armaba por rol y la puerta decidia por modulo, asi que habia enlaces que se veian y no abrian (36 medidos, sobre los 8 usuarios cliente activos). Al alinearlos, esos enlaces dejaron de mostrarse. **Nadie perdio acceso**: no abrian antes tampoco. Si la pantalla deberia estar disponible, lo que falta es el modulo — revisa `/admin/...` la asignacion de la organizacion, no los grants por rol.
 
 ### El cliente no ve ningun enlace de modulo y alguna pantalla lo devuelve al inicio
 

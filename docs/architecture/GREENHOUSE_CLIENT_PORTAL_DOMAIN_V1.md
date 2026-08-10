@@ -765,8 +765,35 @@ Invariantes:
 - **Rutas hijas.** Un viewCode con `childOf` en el descriptor no produce ítem propio: se alcanza desde
   su padre. Es el caso de `cliente.growth_seo_report`, hijo de `cliente.growth_seo_dashboard`.
 - **Read-only.** El menú lee `module_assignments`; escribirlos es de los commands de
-  `src/lib/client-portal/commands/`. Y `role_view_assignments` no se toca: es append-only y gobierna
-  otra cosa.
+  `src/lib/client-portal/commands/`. Y `role_view_assignments` no se toca: es append-only.
+
+#### Delta TASK-1685 (2026-08-10) — la lista base también consume el primitive
+
+Lo de arriba describía el merge de ítems de módulo, y era correcto. Lo que quedaba sin decir es que **la
+lista base seguía filtrándose por `canSeeView('cliente.*')`**, o sea por el ROL, mientras cada page
+guard decidía por el MÓDULO. Dos mitades que nunca se conocieron, y el resultado medido contra PG el
+2026-08-10 fueron **36 enlaces que el menú ofrecía y la puerta negaba**, sobre **8 de 8** usuarios
+cliente — ANAM y Greenhouse Demo con 6 cada uno, y los tres usuarios reales de Sky Airlines viendo
+"Ciclos" y "Analytics" muertos. Todos terminaban en `/home?denied=…`.
+
+Vigente desde `TASK-1685`: la lista base conserva su presentación (label con subtítulo, icono, href) y
+**su visibilidad la decide el primitive** `canSeeClientPortalView`
+(`src/lib/client-portal/visibility/`), el mismo que consume el page guard. Los insumos —módulos de la
+organización + revocaciones per-persona— se resuelven **una vez** en `(dashboard)/layout.tsx` y viajan
+por contexto, así que menú y puerta no sólo comparten función: comparten insumos.
+
+Los ítems de módulo también pasan por el primitive. Sin eso, un `revoke` per-persona ocultaría el ítem
+de la lista base y dejaría el mismo destino visible por el merge aditivo: la revocación cerraría la
+puerta y no el enlace.
+
+**El carril de rol dejó de gobernar vistas `cliente.*`.** Verificado que ningún API route ni reader las
+gatea por `authorizedViews`. Sus filas quedan inertes, no se borran (append-only), y su intención está
+registrada en `TASK-1685` §D2. Lint que lo enforcea:
+`greenhouse/no-client-portal-view-visibility-bypass`.
+
+**NUNCA** volver a filtrar un ítem `cliente.*` con `canSeeView`. **NUNCA** agregar una entrada al
+catálogo de navegación para "destrabar" un ítem: agregarla no concede acceso — si ningún módulo declara
+ese viewCode, el resultado es otro enlace muerto.
 
 **`<ClientPortalNavigation>` se descartó como componente de render** y hoy sólo lo consume el mockup
 `/mockup/cliente-portal-legacy`: trae su propio chrome (MUI `List`, section headers, active state
@@ -839,6 +866,46 @@ tocar la DB, porque no dependen de assignments.
 declaraba `cliente.reviews`: dos strings para la misma ruta, así que no podía abrir ni con la llave
 correcta. El canónico es `cliente.reviews`; `cliente.revisiones` quedó marcado como retirado en el
 `VIEW_REGISTRY` (append-only: se marca, no se borra).
+
+#### Delta TASK-1685 (2026-08-10) — la puerta consume EL primitive, no la mitad organización
+
+Lo de arriba describe cómo el guard resolvía la dimensión ORGANIZACIÓN, y sigue vigente. Lo que faltaba
+es la dimensión PERSONA: `hasViewCodeAccess(organizationId, viewCode)` responde *"¿algún módulo de la
+organización declara esta vista?"*, y nada más. Un `user_view_overrides` con `override_type='revoke'`
+se aplicaba dentro de `resolveAuthorizedViewsForUser` —o sea sobre el claim de la sesión— y **este
+guard nunca leía el claim**. El repo tenía el instrumento canónico para decir *"esta persona no debe ver
+esto"* y no cerraba nada (`ISSUE-148`).
+
+Vigente: el guard llama a `canOpenClientPortalView`
+(`src/lib/client-portal/visibility/resolve-client-portal-visibility.ts`), que evalúa el primitive
+completo:
+
+```
+acceso = interna ∨ ( ¬revocadaParaLaPersona ∧ ( vistaBase ∨ móduloDeLaOrgLaDeclara ) )
+```
+
+Los cuatro destinos de la tabla de arriba **no cambian**. El bypass interno (D1) sigue cortando antes de
+tocar PG, y un `revoke` no aplica a una sesión interna: el override es un instrumento del portal
+cliente, no una sanción global.
+
+**Los layouts de ruta también.** `/proyectos`, `/campanas`, `/sprints` y `/notifications` tenían un
+layout que gateaba con `hasAuthorizedViewCode` — el carril de ROL — mientras su `page.tsx` gateaba por
+el módulo. No era redundancia inofensiva: **`/proyectos/[id]`, `/campanas/[campaignId]`,
+`/sprints/[id]` y `/notifications/preferences` no tienen guard propio**, así que ese layout era su
+única puerta, y un cliente cuyo rol concedía la vista pero cuya organización no tenía el módulo
+alcanzaba el detalle escribiendo la URL, aunque el listado le estuviera negado. Los cuatro layouts
+llaman ahora a `requireViewCodeAccess`.
+
+**NUNCA** gatear una ruta `cliente.*` con `hasAuthorizedViewCode`. **NUNCA** agregar una ruta hija bajo
+un layout guardado asumiendo que hereda la puerta sin verificar que ese layout esté en el carril
+correcto. Lint: `greenhouse/no-client-portal-view-visibility-bypass`.
+
+**Asimetría grant/deny — el corazón del diseño.** El carril positivo es el módulo y sólo el módulo. La
+persona sólo puede **restar**. Exigir un *grant* per-persona o per-rol para abrir convierte cada
+assignment comercial en un cambio de dos tablas, y esa carga deriva: el default permisivo de
+`role_view_assignments` existía precisamente porque la gente olvida sembrar. Con la puerta fail-closed,
+ese olvido deja de ser ruido de gobernanza y pasa a ser **un cliente que pagó y no entra, en silencio**.
+**NUNCA** convertir `revokedViewCodes` en `grantedViewCodes`.
 
 > **Nota de estado, medida el 2026-08-09.** Corregir el guard hace que las 9 rutas guardadas **digan la
 > verdad**, no que las 9 abran: 3 abren (las base) y 6 muestran el empty state, porque ninguna

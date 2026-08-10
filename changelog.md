@@ -7,6 +7,29 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-10 — TASK-1685 cerrada: el portal cliente tiene un solo primitive de visibilidad
+
+El menú del portal cliente y la puerta de cada página dejaron de decidir por su cuenta. Existe un solo
+predicado —`acceso = interna ∨ (¬revocada ∧ (vistaBase ∨ móduloDeLaOrgLaDeclara))`— y lo consumen los
+cuatro caminos: page guard, lista base del menú, ⌘K y layouts de ruta. Antes el menú preguntaba por el
+ROL y la puerta por el MÓDULO contratado, y ninguna de las dos mitades podía observar a la otra:
+medidos contra PG, eran **36 enlaces que el menú ofrecía y la puerta negaba**, sobre los 8 usuarios
+cliente activos, incluidos los 3 reales de Sky Airlines. Hoy el menú muestra exactamente lo que se
+puede abrir. Un `user_view_overrides` con `override_type='revoke'` pasó de decorativo a cerrar la
+puerta de verdad.
+
+Cambio de acceso, no sólo de experiencia: cuatro rutas de detalle del portal (`/proyectos/[id]`,
+`/campanas/[campaignId]`, `/sprints/[id]`, `/notifications/preferences`) no tienen guard propio y su
+única puerta era un layout que gateaba por el carril de rol — un cliente cuyo rol concedía la vista
+pero cuya organización no tenía el módulo entraba al detalle por URL. Los cuatro pasan al guard
+canónico.
+
+Verificado contra PG antes y después: los 24 pares usuario×vista contratados quedaron intactos —ningún
+cliente perdió una superficie que su organización pagó— y los enlaces muertos bajaron de 36 a 0. Sin
+migraciones y sin feature flag: la tabla de overrides estaba vacía, así que el delta de acceso es cero.
+`role_view_assignments` deja de gobernar vistas `cliente.*` (para el portal interno sigue siendo el
+carril canónico) y un lint en `error` impide reintroducir la segunda fuente. Cierra `ISSUE-148`.
+
 ## 2026-08-10 — Task planner: un resultado `legacy=1` deja de ser registrable
 
 Se corrigió TASK-1686 para preservar los cinco marcadores HTML `ZONE` del template y se endurecieron los
@@ -1195,15 +1218,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
 - TASK-1614 quedó `complete` tras un canary único de Seedance R2V: run `bbe6dfff…`, output MP4
   `sha256:93adbf46…`, 16 créditos, playback/governance verificados y saga `promotion_557d…` en `canary_passed` rev. 9
   (`30742268557`).
-
-## 2026-08-01 — Cierre de WIP documental y comercial
-
-- Se registraron ADR-019 (evaluación asíncrona durable de Globe, Accepted e implementada) y ADR-020 (export a
-  Salesforce Marketing Cloud Content Builder, Proposed y sin autorización runtime), ambos enlazados desde los
-  índices canónicos.
-- Brightcell LIC-95 quedó consistente: implementación única + tres paquetes mensuales, propuesta/deck económico
-  separados, IVA explícito, HubSpot Free acotado y gate de Finance. El Composer produjo 9 láminas y todas fueron
-  revisadas visualmente sin recortes antes del cierre.
-- Polpaico LIC-6533 quedó clasificada como discovery interno en HOLD/NO-BID provisional. Se retiró el stub
-  económico renderizable de monto cero, se corrigieron referencias a decks inexistentes y se minimizaron enlaces
-  profundos/identificadores personales; no se emitió ni envió una oferta.

@@ -22,7 +22,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -411,12 +411,25 @@ Salidas obligatorias del slice, además de la opción elegida — **las tres cer
 
 ## Out of Scope
 
-- Rediseñar el modelo de capabilities del portal cliente — es `TASK-286`, y hay que coordinar.
-- `/creative-hub`, que no existe y el bundle de SKY declara — es su propia decisión (señal
-  `identity.client_portal.assigned_view_without_route`).
-- La lista base de 6 enlaces del menú y su migración al resolver — es
-  `capability-modules-resolver-migration`, todavía sin ID.
+- Rediseñar el modelo de capabilities del portal cliente — es `TASK-286`. Coordinada: ver su Delta.
+- `/creative-hub`, que no existe y el bundle de SKY declara — **`TASK-1687`**, creada al cerrar ésta.
+- El bloque **legacy de capability modules** (`cliente.modulos`, que deriva de
+  `session.user.businessLines`/`serviceModules` y **no** de `module_assignments`) — sigue siendo
+  `capability-modules-resolver-migration`, todavía sin ID. Sus dos callsites quedaron con el marker
+  `// client-portal-visibility-allowed:` y dueño declarado.
+- `/dashboard` (`cliente.pulse`) — es el **terminator** del guard: gatearlo con el primitive dejaría a
+  una organización sin módulo sin entrada Y sin destino de denegación. Marcado con el mismo escape.
 - La postura de `AGENT_AUTH_ALLOW_PRODUCTION` — es `TASK-1684`.
+
+> **Corrección de alcance (2026-08-10).** La versión original de esta sección decía que "la lista base
+> de 6 enlaces del menú y su migración al resolver" quedaba fuera, en
+> `capability-modules-resolver-migration`. Eso contradecía el §Goal y los criterios de aceptación de
+> esta misma task ("el guard **y la composición del menú** lo consumen"; "lo que el menú muestra y lo
+> que la puerta abre coinciden"), y el propio §Follow-ups lo admitía: *"mientras la lista base salga por
+> rol, el menú puede prometer lo que la puerta niega, **incluso con este primitive en su lugar**"*.
+> Medido, la lista base **era** el defecto: 36 de los 36 enlaces muertos salían de ahí. Se incluyó, y lo
+> que queda fuera es el bloque legacy de capability modules, que es otra cosa: deriva de otra fuente de
+> datos.
 
 ## Detailed Spec
 
@@ -495,16 +508,41 @@ quien los sembró.
 
 ## Acceptance Criteria
 
-- [ ] Existe decisión escrita entre (a), (b) y (c), con rationale y con la intención de los 9 denials resuelta.
-- [ ] Existe **un** primitive que responde "¿esta persona puede ver esta vista?", y el guard y la
-      composición del menú lo consumen — ninguno resuelve por su cuenta.
-- [ ] Existe señal de divergencia menú↔puerta con steady 0 y reader propio.
-- [ ] Un `user_view_overrides` con `override_type='revoke'` cierra la puerta, si la decisión lo incluye.
-- [ ] **Ningún cliente perdió una superficie que su organización contrató**, verificado contra los 24 pares.
-- [ ] El bypass interno se conserva (test de no-regresión).
-- [ ] `project_context.md` y los 5 docs con el framing de "un carril gana" quedaron corregidos en el
-      mismo cambio.
-- [ ] La relación con `TASK-286` quedó resuelta por escrito.
+- [x] Existe decisión escrita entre (a), (b) y (c), con rationale y con la intención de los 9 denials resuelta. → **(a′)**, §Slice 1; la intención salió del registro escrito en las migraciones, no de inferencia.
+- [x] Existe **un** primitive que responde "¿esta persona puede ver esta vista?", y el guard y la
+      composición del menú lo consumen — ninguno resuelve por su cuenta. → más el ⌘K y **cuatro layouts de ruta** que el hallazgo no había visto.
+- [x] Existe señal de divergencia menú↔puerta con steady 0 y reader propio. → `identity.client_portal.menu_gate_divergence`; **36 → 0** en el eje por organización.
+- [x] Un `user_view_overrides` con `override_type='revoke'` cierra la puerta.
+- [x] **Ningún cliente perdió una superficie que su organización contrató** → 24 pares medidos antes y después, **intactos**.
+- [x] El bypass interno se conserva (test de no-regresión en el guard y en `VerticalMenu`).
+- [x] `project_context.md` y los docs con el framing de "un carril gana" quedaron corregidos en el mismo cambio.
+- [x] La relación con `TASK-286` quedó resuelta por escrito (su `## Delta 2026-08-10`).
+
+### Estado de rollout
+
+**Code complete + verificado contra PG real de desarrollo.** Sin migraciones, sin flags, sin env vars:
+el cambio es de read path puro y su rollout es el deploy. Lo que **no** está verificado todavía es el
+runtime desplegado (staging/producción) con las personas agente sobre las 9 rutas, porque este trabajo
+se hizo local-first y sin push. Esa verificación es el paso 2-5 de §Production verification sequence y
+queda para cuando el operador autorice el push.
+
+### Hallazgo no previsto por la spec, cerrado en el Slice 2
+
+Los layouts de `/proyectos`, `/campanas`, `/sprints` y `/notifications` gateaban por el carril de ROL, y
+**`/proyectos/[id]`, `/campanas/[campaignId]`, `/sprints/[id]` y `/notifications/preferences` no tienen
+guard propio**: ese layout era su única puerta. Un cliente cuyo rol concedía la vista pero cuya
+organización no tenía el módulo alcanzaba el detalle escribiendo la URL, aunque el listado le estuviera
+negado. Era un hueco de **acceso**, no cosmético, y lo encontró el lint nuevo — no la lectura manual.
+
+### Lo que la señal reporta al cerrar, y por qué no es una regresión
+
+`identity.client_portal.menu_gate_divergence` queda en **warning con 2**: `cliente.ciclos` y
+`cliente.analytics` están en el catálogo de navegación y **ningún módulo del catálogo comercial las
+vende**, así que ninguna organización puede alcanzarlas. Antes eran enlaces muertos (el rol las mostraba,
+la puerta las negaba); ahora simplemente no se muestran. **No se perdió acceso**: nadie podía abrirlas en
+ninguno de los dos estados. Es la misma postura de `assigned_view_without_route`, que nació en 1 en vez
+de esconder su caso en un allowlist. Remediación: declararlas en el módulo que las venda, o retirarlas
+del catálogo y de sus rutas.
 
 ## Verification
 

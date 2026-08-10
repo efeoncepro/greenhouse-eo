@@ -595,8 +595,33 @@ Eso es deliberado desde TASK-1678, no un descuido:
 denial de rol. **NUNCA** tomes un `granted=FALSE` de rol como garantía de que nadie con ese
 rol ve la vista: si tiene otro rol que la otorga, la ve.
 
-Riesgo residual aceptado: para las 18 vistas cliente gobernadas por módulo, el gate
-efectivo es el resolver de módulos, así que la unión en el carril rol→vista no las expone.
+#### Delta TASK-1685 (2026-08-10) — el `revoke` ahora sí cierra, y el rol dejó de gobernar `cliente.*`
+
+El párrafo de arriba recomendaba `user_view_overrides` como "la capa de veto que ya existe y es la
+correcta". Era la recomendación correcta sobre un instrumento que **no cerraba nada**: los overrides se
+aplican dentro de `resolveAuthorizedViewsForUser`, o sea sobre el claim, y el page guard del portal
+cliente nunca leía el claim (`ISSUE-148`). Desde `TASK-1685` la puerta lo honra.
+
+También queda retirado el "riesgo residual aceptado" que decía que *para las 18 vistas cliente
+gobernadas por módulo el gate efectivo es el resolver*. Era cierto para el gate y **falso para la
+navegación**: la lista base del menú se filtraba por el carril de rol, y medido contra PG el 2026-08-10
+producía **36 enlaces que el menú ofrecía y la puerta negaba**, sobre 8 de 8 usuarios cliente.
+
+Vigente para vistas `cliente.*`:
+
+```
+acceso = interna ∨ ( ¬revocadaParaLaPersona ∧ ( vistaBase ∨ móduloDeLaOrgLaDeclara ) )
+```
+
+**El carril `role_view_assignments` NO gobierna vistas `cliente.*`.** Ni las otorga ni las niega:
+menú, ⌘K y page guards consumen el primitive `canSeeClientPortalView`
+(`src/lib/client-portal/visibility/`). Sus filas cliente quedan inertes —no se borran, la tabla es
+append-only— y la intención con que se sembraron está registrada en `TASK-1685` §D2. Para el portal
+**interno** este carril sigue siendo el canónico y nada de esto le aplica.
+
+Consecuencia para quien diseñe una vista cliente nueva: **sembrar `granted=TRUE` no la hace
+alcanzable**. El carril es declararla en el módulo que la vende. Lint que lo enforcea:
+`greenhouse/no-client-portal-view-visibility-bypass`.
 
 ---
 
