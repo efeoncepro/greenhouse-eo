@@ -1,5 +1,42 @@
 # Handoff activo
 
+### ⛔ PARAR ACÁ — decisión pendiente del portal cliente, y una advertencia sobre esta sesión (2026-08-09)
+
+**Lo primero:** el operador detuvo el trabajo deliberadamente para decidir en sesión fresca, **porque
+esta sesión acumuló demasiados errores míos**. No retomes la implementación sin su decisión.
+
+**Lo que hay que decidir:** `TASK-1685` (cierra `ISSUE-148`). Rol y módulo **no son excluyentes** — son
+dimensiones ortogonales, organización vs. persona — y **cada una se aplica en un solo lugar**: el menú
+aplica el rol para 6 enlaces base, la puerta aplica el módulo, y ninguna de punta a punta. La puerta lee
+**uno de los tres** insumos, así que un denial de rol **y** un `revoke` per-persona son decorativos ahí.
+
+🔴 **NO lo resuelvas poniendo un `AND` en la puerta.** Está medido: cerraría 6 pares usuario×vista,
+incluidas superficies que **Sky Airlines y Grupo Berel contrataron**. El análisis completo, los 24 pares
+y las tres opciones están en `ISSUE-148` y en el Slice 1 de `TASK-1685`.
+
+**Verificá lo que yo afirmé antes de construir sobre ello.** Mis errores de esta sesión tuvieron una
+sola causa —afirmar sin verificar, y construir variantes sin buscar el patrón existente— y tres llegaron
+al operador como hechos:
+
+1. Dije que `agent-session` daba **403 en producción "por diseño"**, repetidamente. Es **falso**:
+   `AGENT_AUTH_ALLOW_PRODUCTION` está seteada desde ~90 días. Lo tomé de una nota de este mismo Handoff.
+   Postura abierta en `TASK-1684`. **Corolario para vos: una nota de este archivo no es evidencia.**
+2. Usé `NODE_ENV` donde el repo ya tenía `VERCEL_ENV` en dos archivos, y el guard quedó solo-local con
+   los tests verdes. Corregido.
+3. Asigné `creative_hub_globe_v1` a SKY verificando qué otorgaba el bundle pero **no si esas páginas
+   existían**: `/creative-hub` no existe y 3 usuarios reales ven un enlace muerto. Señal
+   `identity.client_portal.assigned_view_without_route`, hoy en **1**. Decisión pendiente.
+
+Y el framing con que cerré `TASK-1678`/`1679`/`1680` —"la puerta es el módulo",
+"`role_view_assignments` no es el carril de una vista `cliente.*`"— **es demasiado fuerte y desorienta**.
+`project_context.md` ya está corregido; los otros 5 docs se corrigen en el Slice 4 de `TASK-1685`, a
+propósito en el mismo cambio que la decisión, para que la doc nunca describa un estado que no existe.
+
+**Lo que SÍ quedó cerrado y verificado en producción, y no hay que rehacer:** los dos releases del día
+(`2c87d71e2eca` y `ee0d568b8614`, ambos `released`, watchdog `drift_count=0`), `TASK-1678`/`1679`/`1680`
+en `complete/`, `ISSUE-146` e `ISSUE-147` resueltas, y las 9 rutas × 3 personas verificadas contra
+producción con sesión real.
+
 ### Barrido documental post-release: tres auditorías paralelas y dos defectos vivos (2026-08-09)
 
 Tres subagentes auditaron arquitectura, docs funcionales/manuales y skills. Encontraron cosas que el
@@ -521,58 +558,6 @@ sesión recién emitida tampoco los trae.
 **No lo parché.** Empujar SEO a la lista hardcodeada haría desaparecer el síntoma y consolidaría el
 diseño equivocado: el portal cliente debe componer su menú desde `module_assignments`, que es lo que
 el resolver canónico ya sabe hacer y nadie cableó.
-
-### 🔴 ISSUE-143 — rompí SEO en producción aplicando la migración de TASK-1310 (2026-08-08)
-
-**Resuelto el mismo día, ~25 min de caída.** Apliqué la migración de catálogo tras el push+deploy y el
-canary del provider contra `greenhouse.efeoncepro.com` pasó de `domainQuadrant=riesgo keywords=50` a
-`hasModule=false` + `greenhouse_seo_lane_404` en los cinco lanes.
-
-**La causa no fue el orden del rollout: fue la forma de la migración.** El archivo de viewCodes hace
-expand **y contract en el mismo paso** — crea `seo_v2`, le asigna las orgs y en el mismo statement
-supersede `seo_v1`. Eso anula el dual-read `SEO_MODULE_KEYS_READ` que habíamos aplicado a los 5
-consumidores: su valor entero era que existiera un período con ambas claves vigentes, y la migración
-lo borró en el mismo commit en que lo creaba. Vercel producción corre `main`, que pide `seo_v1`
-literal.
-
-**El ops-worker NO se vio afectado** — su deploy ya tenía el dual-read, así que los tres batches que le
-pagan a DataForSEO siguieron sanos. El daño fue de lectura, no de gasto ni de datos.
-
-Restaurado reabriendo la ventana (`effective_to = NULL` en los `seo_v1`), verificado con el canary
-real, y hecho durable por `20260808184512073_…-reopen-seo-module-cutover-window`, que hornea el
-invariante: mientras el cutover esté abierto, ambas claves cubren exactamente las mismas orgs; una
-ventana asimétrica aborta la migración. Sin doble conteo de cuota: el resolver hace `LIMIT 1` sobre el
-`ANY(...)`.
-
-**Dos lecciones, y la segunda es la que importa:**
-
-1. Una migración nunca contiene el expand y el contract del mismo cutover. Hay **cinco runtimes con
-   despliegues independientes**; "lo desplegué a develop" no es "lo desplegué".
-2. **El diseño era correcto y aun así se cayó.** §10.7 de la arquitectura describía bien el patrón y
-   el dual-read estaba fijado por test — pero nada impedía escribir el contract en el mismo archivo,
-   porque la regla vivía en prosa. Ahora vive en un test que escanea `migrations/` y falla si una
-   migración nueva supersede una clave que `SEO_MODULE_KEYS_READ` todavía acepta. **Probado por
-   mutación**: sacando la migración culpable de su allowlist, el test la nombra.
-
-Contribuyó una causa de método: verifiqué la migración con un `SELECT`, que es la mitad del contrato.
-La otra mitad es qué versión de código la lee en cada runtime. La verificación correcta es el
-consumidor real contra el host real.
-
-**Delta 2026-08-09 — el release cumplió la precondición.** Verificado runtime por runtime: `main` con
-el dual-read, canary del provider contra producción **100% verde** (con `track`/`untrack` ya en `400`
-en vez de `404`, o sea que esas rutas existen), y el ops-worker en una revisión ancestro de `main`. El
-contract pasa a **`TASK-1677`**, separado de `TASK-1310` para no atar una operación de datos de 20
-minutos a un ciclo de diseño abierto. La señal de simetría de la ventana sigue sin dueño, pero deja de
-ser urgente cuando la ventana se cierre.
-
-**Colateral arreglado de raíz:** rotando este mismo Handoff descubrí que `docs:context-rotate` estaba
-ciego y **reventaba** (`TypeError` sobre `matches[0]`): su patrón buscaba secciones `##` con fecha y el
-archivo usa `###` hace rato — 0 de 23. Segunda vez que se queda ciego por la misma causa (el propio
-código documenta la primera). El nivel de heading ahora **se descubre** en vez de asumirse, porque el
-ancla estable es la fecha; sin secciones fechadas degrada con un mensaje accionable en lugar de un
-stack. El script quedó importable y con suite (5 tests, uno contra el `Handoff.md` real). Si vuelve a
-fallar, la respuesta es extender `DATED_SECTION_LEVELS`, no rotar a mano: rotar a mano es como se
-corrompen los marcadores de integridad de los shards.
 
 ### Search Visibility — header canónico (2026-08-07)
 
