@@ -1,5 +1,36 @@
 # Handoff activo
 
+### Release 2026-08-09 (2.º del día) — el carril del portal cliente cerrado y VERIFICADO EN PRODUCCIÓN
+
+Manifest `ee0d568b8614-1ff03476-6a82-4e03-8dfc-2d49e3c30ce3` en `released`, run `31343569815`, target
+`ee0d568b86140d92224f9fdcad75cd6e1a6dcae4`, PR #186. Watchdog `drift_count=0`. **Sin bypass**: el batch
+policy dio `ship` (cero migraciones).
+
+**Lo que necesita quien siga:**
+
+1. ✅ **La verificación que dos releases dejaron pendiente está HECHA, en producción.** 9 rutas × 3
+   personas con sesión real contra `greenhouse.efeoncepro.com`: las 3 base sirven `200`, las 6
+   module-gated redirigen a `/home?denied=<slug>`, cero `?error=resolver_unavailable`, y `/proyectos`
+   sirve `200` al operador interno donde antes daba `/401`.
+2. 🔴 **`agent-session` SÍ funciona en producción — y yo dije lo contrario toda la sesión.**
+   `AGENT_AUTH_ALLOW_PRODUCTION` está seteada en Production desde hace ~90 días. Lo repetí tomándolo de
+   una nota de este mismo Handoff, sin verificarlo, y por eso declaré como "pendiente del operador" una
+   verificación que podía hacer yo. **La regla: una afirmación sobre runtime se verifica contra el
+   runtime.** Postura de seguridad abierta en `TASK-1684` (P2): la credencial de las personas agente
+   vive escrita en `CLAUDE.md`, así que endpoint + credencial documentada alcanzan para operar
+   producción como superadmin.
+3. **`vercel redeploy` NO arregla un staging `Canceled` por docs-only** — el gotcha #7 lo recomienda y
+   es un consejo incompleto: el redeploy reevalúa el mismo diff y cancela otra vez. La salida es tocar
+   un doc del set `deployControlDocs` de `vercel-ignore-build.mjs` (no cuenta como docs-only y fuerza
+   el build); si de todos modos hay que documentar el release, ese commit produce la evidencia como
+   efecto. Documentado en runbook + ambas skills como gotcha #11.
+4. **El context gate va ÚLTIMO y `docs:closure-check` NO lo reemplaza.** Dejé un run rojo en `develop`
+   (`31340366010`) por correr context-check, después agregar una entrada al changelog, y commitear con
+   closure-check verde. Orden seguro: ediciones documentales → closure-check → context-rotate si hace
+   falta → context-check:strict → commit.
+5. **Contraste útil entre los dos releases de hoy:** el de la mañana necesitó bypass del batch policy y
+   el de la tarde no. La diferencia fue **cero migraciones**, no el tamaño del batch.
+
 ### Verificación en staging del portal cliente, y dos defectos que salieron de ella (2026-08-09)
 
 Recorrí las 9 rutas × 3 personas con sesión de agente real contra **staging** (producción no acepta
@@ -552,34 +583,6 @@ comprometer gasto. El entregable más importante de 1663 es el **test que lo pru
 `TASK-1663` en `P3` con condición de activación = un segundo consumidor real. Hoy hay **cero
 asignaciones declaradas**, así que sería infraestructura de un problema que no tenemos. `1659`/`1660`
 se construyen **como están especificadas**, sin esperar y sin conciencia de modo "por si acaso".
-
-### TASK-1308 — Keyword Opportunities COMPLETE + doctrina de scopes MCP (2026-08-07)
-
-Ruta `/admin/growth/seo/keywords` cerrada. Nació `Backend impact: none` y terminó con migración, dos
-commands, dos rutas app-lane, dos del lane ecosystem y **dos tools MCP federadas** — porque
-`trackKeywords`, que la spec daba por construido por TASK-1303, no existía. La idea que ordenó todo:
-seguir una keyword es un **compromiso de gasto diferido**. Detalle completo en la task, el ADR del
-gateway y `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`; acá sólo lo que un agente siguiente necesita.
-
-**Doctrina de scopes OAuth (con `arch-architect`):** un scope por **CLASE de blast-radius**, nunca
-uno por capability. Corolario: la escritura N+1 de un dominio con scope **no toca Entra**. Completa
-en el ADR del gateway y en ambos bundles de `efeonce-mcp-platform`.
-
-🔴 **FRONTERA DE GRANT — lo más importante que dejó esta task.** El scope existe en `Efeonce MCP
-Resource` (type `Admin`, id `17f923ad-537a-4c2f-ab5b-2a14ed650183`; round-trip verificado: 4 scopes,
-ninguno perdido, `requestedAccessTokenVersion: 2` intacto). Pero **NO se cableó al cliente PKCE
-compartido** `32617b87-e7ef-493a-838f-1ff3f0213b93` y **NUNCA debe cablearse**: en el lane ecosystem
-el actor es `mcp:<consumer>` —la MÁQUINA, sin chequeo de capability por humano— y el hop va con token
-de consumer fijo, así que **ese scope es la única puerta de la cadena que depende de la persona**.
-Cablearlo daría poder de gasto a todo el tenant y **nada fallaría**. El write de Globe tampoco está
-ahí. Camino correcto: `TASK-1631`.
-
-**PENDIENTE:** push del gateway `efeonce-mcp` — commits `cb316cc`, `41dca07`, `bfbdf3a`, `1d0ebcc`.
-Deploy productivo en push. Las tools quedan federadas y **fail-closed a propósito**, igual que el
-único otro write del gateway.
-
-**Follow-ups:** `TASK-1658` (drift de federación + punto ciego del guard) · `TASK-1657` (hidratación
-`useId` + tokens de canvas).
 
 ### Seedance 2.5 — inventario Fal y TASK-1656 (2026-08-07)
 

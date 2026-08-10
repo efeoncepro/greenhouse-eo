@@ -7,6 +7,22 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-09 — El carril del portal cliente, cerrado y verificado EN PRODUCCIÓN (release `ee0d568b8614`)
+
+Segundo release del día. Manifest `released`, watchdog `drift_count=0`, **sin bypass del batch policy**
+(cero migraciones — el contraste con el release de la mañana, que sí lo necesitó, muestra que la
+diferencia es la presencia de migraciones y no el tamaño del batch).
+
+- **Verificación completa en producción:** 9 rutas × 3 personas con sesión real. Las 3 vistas base
+  sirven `200`, las 6 module-gated redirigen a `/home?denied=<slug>`, cero `resolver_unavailable`, y
+  `/proyectos` sirve `200` al operador interno donde antes devolvía `/401`.
+- 🔴 **Corrección de un supuesto propio:** `agent-session` **sí** funciona en producción
+  (`AGENT_AUTH_ALLOW_PRODUCTION` seteada desde ~90 días). Lo negué toda la sesión tomándolo de una nota
+  del Handoff sin verificarlo. Postura abierta en `TASK-1684`.
+- Dos aprendizajes de release documentados en runbook + ambas skills: `vercel redeploy` no arregla un
+  staging cancelado por docs-only, y el context gate va último porque `docs:closure-check` no lo
+  reemplaza.
+
 ## 2026-08-09 — La verificación en staging del portal cliente encontró dos defectos más
 
 Recorrí las 9 rutas × 3 personas con sesión real contra staging. El fix quedó confirmado en runtime
@@ -1222,18 +1238,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
 - Las skills de arquitectura globales y locales (`arch-architect` de Claude y `software-architect-2026` de Codex)
   ahora cargan el router MCP, el provider dueño y este mismo gate antes de proponer otra tool, OAuth surface o
   binding cross-runtime.
-
-## 2026-08-01 — Efeonce MCP: gateway independiente, OAuth Entra y front door
-
-- Se creó `efeoncepro/efeonce-mcp` como repo privado independiente con Node 24, TypeScript, Fastify, SDK MCP
-  v2, CI, container no-root, OpenTofu y delivery keyless por GitHub WIF. El PR `#2` quedó fusionado a `main`
-  en `d9c0c69` con CI verde.
-- El gateway corre en Cloud Run `efeonce-group/southamerica-west1`; un canary Entra authorization code + PKCE
-  validó resource, issuer, audience y scope reales: initialize `200` y Globe sin scope `403`.
-- Se promovió el Global External ALB sobre `34.111.78.237`; Cloud Run acepta sólo tráfico del load balancer y
-  `mcp.efeonce.org` ya resuelve desde HostGator y resolvers públicos. El certificado administrado quedó `ACTIVE`;
-  health/discovery OAuth respondieron `200` y `/mcp` anónimo rechazó `401` como corresponde.
-- Globe ya tiene su primer reader operativo; el resto de capabilities y cualquier write permanece fuera del
-  gateway hasta sus gates propios. El gateway no importa lógica, DB, storage ni credenciales de Globe.
-- Se incorporó la skill espejo `efeonce-mcp-platform` para Codex y Claude: enruta gateway, OAuth, edge e
-  integración de providers hacia las skills dueñas, y mantiene una verificación mecánica de paridad.
