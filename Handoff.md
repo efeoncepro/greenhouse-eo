@@ -1,5 +1,12 @@
 # Handoff activo
 
+### TASK-1388 en ejecución — reequilibrio de la navegación interna (2026-08-10)
+
+En curso sobre `develop` (local-first, sin push). Alcance: rehome `/my/*` sidebar→avatar, sidebar
+interno en 3 zonas, ⌘K consolidado, dedup/limpieza + 4 fixes a11y del chrome heredados de TASK-1675.
+No toca la semántica de acceso de `TASK-1685` (la rama no-interna del menú se conserva intacta; hay
+test de identidad que lo fija). Spec: `docs/tasks/in-progress/TASK-1388-vertical-menu-restructure.md`.
+
 ### ⛔ PARAR ACÁ — decisión pendiente del portal cliente, y una advertencia sobre esta sesión (2026-08-09)
 
 **Lo primero:** el operador detuvo el trabajo deliberadamente para decidir en sesión fresca, **porque

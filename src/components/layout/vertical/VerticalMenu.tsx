@@ -23,6 +23,7 @@ import { getGreenhouseNavigationCopy } from '@/config/greenhouse-navigation-copy
 import { ROLE_CODES } from '@/config/role-codes'
 import { resolveCapabilityModules } from '@/lib/capabilities/resolve-capabilities'
 import { groupNavItems, type ClientNavItem } from '@/lib/client-portal/composition/menu-builder-shape'
+import { buildMyNavItems } from '@/lib/navigation/my-nav-items'
 
 type RenderExpandIconProps = {
   open?: boolean
@@ -684,46 +685,11 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
       })
     }
 
-    // ── MI FICHA (section with children, conditional) ──
-    if (isMyUser) {
-      menuData.push({
-        isSection: true,
-        label: 'Mi Ficha',
-        children: [
-          { label: nl(GH_MY_NAV.assignments), href: '/my/assignments', icon: 'tabler-users' },
-          { label: nl(GH_MY_NAV.performance), href: '/my/performance', icon: 'tabler-chart-bar' },
-          { label: nl(GH_MY_NAV.delivery), href: '/my/delivery', icon: 'tabler-list-check' },
-          { label: nl(GH_MY_NAV.profile), href: '/my/profile', icon: 'tabler-user-circle' },
-          { label: nl(GH_MY_NAV.payroll), href: '/my/payroll', icon: 'tabler-receipt' },
-          { label: nl(GH_MY_NAV.contractor), href: '/my/contractor', icon: 'tabler-briefcase' },
-          { label: nl(GH_MY_NAV.offers), href: '/my/offers', icon: 'tabler-file-text' },
-          { label: nl(GH_MY_NAV.contracts), href: '/my/contracts', icon: 'tabler-file-certificate' },
-          { label: nl(GH_MY_NAV.paymentProfile), href: '/my/payment-profile', icon: 'tabler-credit-card' },
-          { label: nl(GH_MY_NAV.leave), href: '/my/leave', icon: 'tabler-calendar-event' },
-          { label: nl(GH_MY_NAV.goals), href: '/my/goals', icon: 'tabler-target' },
-          { label: nl(GH_MY_NAV.evaluations), href: '/my/evaluations', icon: 'tabler-clipboard-check' },
-          { label: nl(GH_MY_NAV.organization), href: '/my/organization', icon: 'tabler-building' }
-        ].filter(item => {
-          if (item.href === '/my/assignments') return canSeeView('mi_ficha.mis_asignaciones', true)
-          if (item.href === '/my/performance') return canSeeView('mi_ficha.mi_desempeno', true)
-          if (item.href === '/my/delivery') return canSeeView('mi_ficha.mi_delivery', true)
-          if (item.href === '/my/profile') return canSeeView('mi_ficha.mi_perfil', true)
-          if (item.href === '/my/payroll') return canSeeView('mi_ficha.mi_nomina', true)
-          // TASK-796 — dynamic: only show when the member has a live contractor engagement.
-          if (item.href === '/my/contractor') return hasActiveContractorEngagement && canSeeView('mi_ficha.mi_contratacion', true)
-          // TASK-1022 — dynamic: only show when the collaborator has a contracting document.
-          if (item.href === '/my/offers') return hasWorkforceContractingDocument && canSeeView('mi_ficha.mis_contratos', true)
-          if (item.href === '/my/contracts') return hasWorkforceContractingDocument && canSeeView('mi_ficha.mis_contratos', true)
-          if (item.href === '/my/payment-profile') return canSeeView('mi_ficha.mi_cuenta_pago', true)
-          if (item.href === '/my/leave') return canSeeView('mi_ficha.mis_permisos', true)
-          if (item.href === '/my/goals') return canSeeView('mi_ficha.mis_objetivos', true)
-          if (item.href === '/my/evaluations') return canSeeView('mi_ficha.mis_evaluaciones', true)
-          if (item.href === '/my/organization') return canSeeView('mi_ficha.mi_organizacion', true)
-
-          return true
-        })
-      })
-    }
+    // ── MI FICHA — rehomed (TASK-1388) ──
+    // Lo personal ya no vive en el rail interno: las hojas `/my/*` se sirven
+    // desde el dropdown del avatar (`UserDropdown`, mismo builder canónico
+    // `buildMyNavItems`, mismo gating). El colaborador puro conserva su
+    // sección en la rama no-interna de más abajo.
   }
 
   // ═══════════════════════════════════════════════════════════════════════
@@ -856,44 +822,18 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
       children: [...clientAccountItems, ...moduleItems.account.map(toMenuItem)]
     })
 
-    // Mi Ficha for collaborators with my routeGroup
+    // Mi Ficha for collaborators with my routeGroup — para el colaborador puro
+    // el rail ES su contenido (guardrail TASK-1388): se conserva acá, servido
+    // por el mismo builder canónico que alimenta el dropdown del avatar.
     if (isMyUser) {
       menuData.push({
         isSection: true,
         label: 'Mi Ficha',
-        children: [
-          { label: nl(GH_MY_NAV.assignments), href: '/my/assignments', icon: 'tabler-users' },
-          { label: nl(GH_MY_NAV.performance), href: '/my/performance', icon: 'tabler-chart-bar' },
-          { label: nl(GH_MY_NAV.delivery), href: '/my/delivery', icon: 'tabler-list-check' },
-          { label: nl(GH_MY_NAV.profile), href: '/my/profile', icon: 'tabler-user-circle' },
-          { label: nl(GH_MY_NAV.payroll), href: '/my/payroll', icon: 'tabler-receipt' },
-          { label: nl(GH_MY_NAV.contractor), href: '/my/contractor', icon: 'tabler-briefcase' },
-          { label: nl(GH_MY_NAV.offers), href: '/my/offers', icon: 'tabler-file-text' },
-          { label: nl(GH_MY_NAV.contracts), href: '/my/contracts', icon: 'tabler-file-certificate' },
-          { label: nl(GH_MY_NAV.paymentProfile), href: '/my/payment-profile', icon: 'tabler-credit-card' },
-          { label: nl(GH_MY_NAV.leave), href: '/my/leave', icon: 'tabler-calendar-event' },
-          { label: nl(GH_MY_NAV.goals), href: '/my/goals', icon: 'tabler-target' },
-          { label: nl(GH_MY_NAV.evaluations), href: '/my/evaluations', icon: 'tabler-clipboard-check' },
-          { label: nl(GH_MY_NAV.organization), href: '/my/organization', icon: 'tabler-building' }
-        ].filter(item => {
-          if (item.href === '/my/assignments') return canSeeView('mi_ficha.mis_asignaciones', true)
-          if (item.href === '/my/performance') return canSeeView('mi_ficha.mi_desempeno', true)
-          if (item.href === '/my/delivery') return canSeeView('mi_ficha.mi_delivery', true)
-          if (item.href === '/my/profile') return canSeeView('mi_ficha.mi_perfil', true)
-          if (item.href === '/my/payroll') return canSeeView('mi_ficha.mi_nomina', true)
-          // TASK-796 — dynamic: only show when the member has a live contractor engagement.
-          if (item.href === '/my/contractor') return hasActiveContractorEngagement && canSeeView('mi_ficha.mi_contratacion', true)
-          // TASK-1022 — dynamic: only show when the collaborator has a contracting document.
-          if (item.href === '/my/offers') return hasWorkforceContractingDocument && canSeeView('mi_ficha.mis_contratos', true)
-          if (item.href === '/my/contracts') return hasWorkforceContractingDocument && canSeeView('mi_ficha.mis_contratos', true)
-          if (item.href === '/my/payment-profile') return canSeeView('mi_ficha.mi_cuenta_pago', true)
-          if (item.href === '/my/leave') return canSeeView('mi_ficha.mis_permisos', true)
-          if (item.href === '/my/goals') return canSeeView('mi_ficha.mis_objetivos', true)
-          if (item.href === '/my/evaluations') return canSeeView('mi_ficha.mis_evaluaciones', true)
-          if (item.href === '/my/organization') return canSeeView('mi_ficha.mi_organizacion', true)
-
-          return true
-        })
+        children: buildMyNavItems({
+          authorizedViews,
+          hasActiveContractorEngagement,
+          hasWorkforceContractingDocument
+        }).map(item => ({ label: nl(GH_MY_NAV[item.copyKey]), href: item.href, icon: item.icon }))
       })
     }
 

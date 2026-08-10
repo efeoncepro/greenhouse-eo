@@ -9,7 +9,12 @@ import LayoutHeader from '@layouts/components/horizontal/Header'
 // Hook Imports
 import useHorizontalNav from '@menu/hooks/useHorizontalNav'
 
-const Header = () => {
+type Props = {
+  /** TASK-1388 — avatar del chrome resuelto server-side en `(dashboard)/layout.tsx`. */
+  avatarUrl?: string | null
+}
+
+const Header = ({ avatarUrl = null }: Props) => {
   // Hooks
   const { isBreakpointReached } = useHorizontalNav()
 
@@ -17,7 +22,7 @@ const Header = () => {
     <>
       <LayoutHeader>
         <Navbar>
-          <NavbarContent />
+          <NavbarContent avatarUrl={avatarUrl} />
         </Navbar>
         {!isBreakpointReached && <Navigation />}
       </LayoutHeader>

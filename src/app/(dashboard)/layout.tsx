@@ -31,6 +31,7 @@ import { getMode, getSystemMode } from '@core/utils/serverHelpers'
 
 // Lib Imports
 import { requireServerSession } from '@/lib/auth/require-server-session'
+import { resolveAvatarUrl } from '@/lib/person-360/resolve-avatar'
 import { composeNavItemsFromModules } from '@/lib/client-portal/composition/menu-builder'
 import type { ClientNavItem } from '@/lib/client-portal/composition/menu-builder-shape'
 import { resolveClientPortalModulesForOrganization } from '@/lib/client-portal/readers/native/module-resolver'
@@ -60,6 +61,11 @@ const Layout = async (props: ChildrenType) => {
   // TASK-1079 — modo de interacción con Nexa (dock A / expandible B / lane C). Resuelto
   // server-side con degradación honesta (default = comportamiento vigente del flotante).
   const nexaInteractionMode = await resolveNexaInteractionModeForUser(session.user.userId)
+
+  // TASK-1388 — el avatar del chrome se resuelve acá (server) con el helper
+  // canónico `resolveAvatarUrl` (server-only) y viaja como prop: el cliente
+  // nunca compone la URL del proxy de media.
+  const chromeAvatarUrl = resolveAvatarUrl(session.user.avatarUrl ?? null, session.user.userId ?? null)
 
   // TASK-1675 — ítems de menú de los módulos que la organización tiene contratados.
   //
@@ -106,7 +112,7 @@ const Layout = async (props: ChildrenType) => {
             verticalLayout={
               <VerticalLayout
                 navigation={<Navigation mode={mode} clientNavItems={clientNavItems} />}
-                navbar={<Navbar />}
+                navbar={<Navbar avatarUrl={chromeAvatarUrl} />}
                 footer={<VerticalFooter />}
               >
                 {/* TASK-1079 — host del modo lane: passthrough byte-idéntico salvo modo lane. */}
@@ -114,7 +120,7 @@ const Layout = async (props: ChildrenType) => {
               </VerticalLayout>
             }
             horizontalLayout={
-              <HorizontalLayout header={<Header />} footer={<HorizontalFooter />}>
+              <HorizontalLayout header={<Header avatarUrl={chromeAvatarUrl} />} footer={<HorizontalFooter />}>
                 <NexaLaneContentHost>{children}</NexaLaneContentHost>
               </HorizontalLayout>
             }

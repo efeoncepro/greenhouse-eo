@@ -22,7 +22,12 @@ import { horizontalLayoutClasses } from '@layouts/utils/layoutClasses'
 // is self-contained: it reads /api/me/shortcuts (canonical resolver +
 // per-user pins). To register a new shortcut, extend src/lib/shortcuts/catalog.ts.
 
-const NavbarContent = () => {
+type Props = {
+  /** TASK-1388 — avatar del chrome resuelto server-side en `(dashboard)/layout.tsx`. */
+  avatarUrl?: string | null
+}
+
+const NavbarContent = ({ avatarUrl = null }: Props) => {
   // Hooks
   const { isBreakpointReached } = useHorizontalNav()
 
@@ -39,7 +44,7 @@ const NavbarContent = () => {
         <ModeDropdown />
         <ShortcutsDropdown />
         <NotificationDropdown />
-        <UserDropdown />
+        <UserDropdown avatarUrl={avatarUrl} />
       </div>
     </div>
   )

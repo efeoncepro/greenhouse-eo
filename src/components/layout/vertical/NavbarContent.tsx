@@ -18,7 +18,12 @@ import { verticalLayoutClasses } from '@layouts/utils/layoutClasses'
 // is self-contained: it reads /api/me/shortcuts (canonical resolver +
 // per-user pins). To register a new shortcut, extend src/lib/shortcuts/catalog.ts.
 
-const NavbarContent = () => {
+type Props = {
+  /** TASK-1388 — avatar del chrome resuelto server-side en `(dashboard)/layout.tsx`. */
+  avatarUrl?: string | null
+}
+
+const NavbarContent = ({ avatarUrl = null }: Props) => {
   return (
     <div className={classnames(verticalLayoutClasses.navbarContent, 'flex items-center justify-between gap-4 is-full')}>
       <div className='flex items-center gap-4'>
@@ -29,7 +34,7 @@ const NavbarContent = () => {
         <ModeDropdown />
         <ShortcutsDropdown />
         <NotificationDropdown />
-        <UserDropdown />
+        <UserDropdown avatarUrl={avatarUrl} />
       </div>
     </div>
   )
