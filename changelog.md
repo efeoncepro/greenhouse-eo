@@ -7,6 +7,24 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-10 — TASK-1388: la navegación interna se reparte entre sus 3 superficies (code complete)
+
+Reequilibrio del portal interno en develop (5 commits, sin push): el rail pasa de 12 grupos top-level
+a 3 zonas (Operación · Administración · Recursos) con dominios colapsables uniformes; las hojas
+personales `/my/*` viven ahora en el dropdown del avatar (header de perfil clickeable, sin atajos
+admin duplicados) servidas por el builder canónico `src/lib/navigation/my-nav-items.ts`; y hay UNA
+sola palette ⌘K (la `CommandPalette` de TASK-696, ahora con filtro de audiencia + recientes +
+acciones — la `NavSearch` retirada exponía el `VIEW_REGISTRY` completo sin filtrar).
+
+- Cero cambios de ruta/URL ni de gating: el set de hojas por rol quedó fijado por test de identidad
+  (`VerticalMenu.test.tsx`, interno + no-interno).
+- Dedup: Sample Sprints con hogar único en Comercial, Growth como sección de Comercial, "Spaces
+  (admin)" desambiguado, Herramientas IA una sola vez, `verticalMenuData.tsx` legacy borrado.
+- Los 4 hallazgos a11y del chrome que TASK-1675 midió quedaron cerrados: focus ring en el rail,
+  región scrollable con role/label/foco, toggle del drawer accesible, desborde de 8px del panel.
+- Evidencia GVC premium (3 scenarios, desktop+390px) + scorecard 4.93. Cierre formal pendiente:
+  build de producción autorizado, card-sort/sign-off de nombres y promoción de baseline.
+
 ## 2026-08-09 — Barrido documental del carril cliente: el doc de contrato estaba invertido
 
 Tres auditorías paralelas (arquitectura, docs funcionales/manuales, skills) tras los dos releases.
@@ -1203,27 +1221,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   reconciliable, handoff y compatibilidad binary/API; la skill existente `greenhouse-globe`, los docs
   funcional/manual y Handoff contienen las invariantes. No hay app publicada ni cambios de runtime, flags, auth,
   push, billing, créditos, providers, distribución ni rollout externo.
-
-## 2026-08-01 — TASK-1630: convergencia del control plane de créditos de Globe
-
-- Se registró `TASK-1630` como umbrella P0 y se rebaselinaron TASK-1468/1482/1483/1586/1628/1629 contra el runtime
-  observado: ledger histórico, funding vigente, caps/holds y operaciones de fondeo dejan de tratarse como una sola
-  cifra implícita.
-- La secuencia queda fijada como truth/ensure-funded → holds/expiry/settlement → lifecycle/status/recovery →
-  autoridad one-shot + adapters one-command → workbench Greenhouse → self-view Producer → paridad
-  MCP/comercial. Globe conserva la máquina de estados económica; Greenhouse sólo proyecta/adapta.
-- ADR-015 ahora aprueba que una instrucción atribuida del CEO pueda autorizar una operación acotada y que el
-  mismo agente autenticado puede proponer y confirmar end-to-end cuando la política del workspace no exige segundo
-  confirmante. La autoridad one-shot y sus carriles `oauth|browser` están desplegados y verificados live para el
-  workspace interno; clientes externos y fondeo comercial siguen gated.
-- La primera corrección ejecutable ya cierra el aislamiento de workspace: API Platform conserva los bindings
-  emitidos por OAuth y tanto el bearer como las rutas admin rechazan un `globeWorkspaceId` no vinculado antes de
-  invocar el broker. No hubo fondeo, deploy, migración, release ni promoción a `main`.
-- El workbench Greenhouse conecta `Asegurar capacidad` a la misma state machine one-shot y agrega recovery
-  readback-first para `outcome_unknown`; TASK-1483 y TASK-1628 cerraron rollout y smoke live.
-- TASK-1630 cerró live: MCP `globe.credits.funding.ensure` pasó OAuth/Entra + WIF + RFC 8693 + Greenhouse command;
-  los dos outcomes antiguos liberaron 14+16 mediante decisions Finance gobernadas; los 500.000 se conservaron
-  append-only y se retiraron de toda proyección operativa UI/API/CLI/MCP.
-- La documentación funcional y el manual quedaron reconciliados con el sistema live: UI recomendada, paridad
-  API/CLI/MCP sobre un solo ledger, autoridad CEO one-shot, `ensure` readback-first y saldo posterior a Seedance
-  `800 → 784` bajo cap 1500. Studio Credits no se presentan como dinero, revenue ni tokens de proveedor.

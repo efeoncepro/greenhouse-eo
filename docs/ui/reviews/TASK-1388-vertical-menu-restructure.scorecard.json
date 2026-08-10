@@ -1,0 +1,124 @@
+{
+  "taskId": "TASK-1388",
+  "scenario": "task-1388-vertical-menu-restructure · task-1388-menu-mobile-drawer",
+  "reviewedAt": "2026-08-10",
+  "reviewer": "Claude (agente), mirando los frames",
+  "uiRigor": "ui-standard",
+  "directionMode": "repo-native-benchmark",
+  "wireframe": "docs/ui/wireframes/TASK-1388-vertical-menu-restructure.md",
+  "flow": "docs/ui/flows/TASK-1388-vertical-menu-restructure-flow.md",
+  "motion": "docs/ui/motion/TASK-1388-vertical-menu-restructure-motion.md",
+  "criterioDeExito": "Reparto entre superficies con CERO cambio de chrome visual, rutas o gating: el rail interno pasa de 12 grupos top-level a 3 zonas con dominios uniformes, lo personal (/my/*) vive en el avatar y hay UNA sola palette ⌘K. El set de hojas por rol debe ser idéntico al vigente (menos /my/* en el rail interno, sin duplicados) — fijado por test de identidad, no solo por inspección.",
+  "evidence": {
+    "desktop": ".captures/2026-08-10T14-03-14_task-1388-vertical-menu-restructure/01-desktop/frames/01-sidebar-default.png",
+    "mobile": ".captures/2026-08-10T14-03-14_task-1388-vertical-menu-restructure/02-mobile/frames/01-sidebar-default.png",
+    "dossier": ".captures/2026-08-10T14-03-14_task-1388-vertical-menu-restructure/review-dossier.md",
+    "capturas": [
+      ".captures/2026-08-10T14-03-14_task-1388-vertical-menu-restructure",
+      ".captures/2026-08-10T14-03-35_task-1388-menu-surfaces-flow",
+      ".captures/2026-08-10T13-49-01_task-1388-vertical-menu-restructure",
+      ".captures/2026-08-10T13-54-45_task-1388-menu-mobile-drawer"
+    ],
+    "data": "Sesión real del agente superadmin (agent@greenhouse.efeonce.org) contra el runtime local con PG real — es la persona que ve el árbol completo, que es lo que este rediseño reparte. Cero fixtures.",
+    "framesMirados": "sidebar-default (3 zonas), domain-open (Finanzas), accordion-swap (Comercial abierto + Finanzas colapsado), avatar-dropdown (bloque /my/* + Salir), cmdk-open (query 'nómina' filtrada por audiencia), keyboard-rail-item-focus-ring (anillo visible), mobile-default, drawer-open (390px contenido).",
+    "identidad": "VerticalMenu.test.tsx fija el set EXACTO de hojas del admin interno (cero URLs nuevas, sin /my/*, sin duplicados) y la identidad de la rama no-interna (TASK-1675 intacta). 13/13 verdes.",
+    "reducedMotion": "reducedMotionCheck: true en ambos scenarios, verde.",
+    "axe": "@axe-core/playwright scopeado al nav con failOnViolations: true — 0 violations en ambos scenarios.",
+    "a11yCerrado": "Los 4 hallazgos heredados de TASK-1675 quedaron cerrados y evidenciados: focus ring exigido por probe (requireVisibleFocusRing: true), región scrollable con role/label/tabIndex (0 layout_scroll_region_unlabeled en el manifest mobile), toggle del drawer como IconButton con aria-label (assertion verde), y 0 layout_element_overflow en el frame drawer-open (fix del -8px).",
+    "notCovered": "El ⌘K abierto con la persona collaborator/client no tiene frame en esta pasada; el filtro de audiencia es el mismo predicado unitario (routeGroup + authorizedViews) y la verificación por rol quedó declarada en la secuencia de verificación de la task para staging. El chrome @menu no expone aria-expanded en los triggers (intocable, deuda del chrome): el estado abierto/cerrado se aserta por la clase ts-open."
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 5,
+      "rationale": "El rail responde '¿en qué zona vive lo que busco?' en un escaneo: 3 zonas heading (OPERACIÓN · ADMINISTRACIÓN · RECURSOS) con dominios colapsables uniformes del mismo tier — desapareció la mezcla de secciones, submenús y hojas sueltas al mismo nivel. Lo personal dejó de competir con lo operativo: vive en el avatar, que es su superficie natural.",
+      "evidence": "01-sidebar-default.png — Home pineado + 3 zonas, 4+1+2 dominios.",
+      "nextAction": ""
+    },
+    "proportions": {
+      "score": 4,
+      "rationale": "Dominios con label+subtítulo respetan el ancho, gutter e iconografía del chrome. Pierde el punto por el ritmo heredado del chrome: filas de dominio de 2-3 líneas según el largo del subtítulo (Comercial/Finanzas 3, Agencia/Personas 2), una variación que ya existía en el rail viejo y que no es de esta task corregir.",
+      "evidence": "01-sidebar-default.png — comparar altura Agencia vs Comercial.",
+      "nextAction": "Si molesta, es un ajuste de copy (subtítulos más cortos en GH_INTERNAL_NAV), no de estructura."
+    },
+    "rhythm": {
+      "score": 5,
+      "rationale": "Espaciado uniforme entre dominios y separación de zona consistente con el patrón isSection existente. El acordeón (un dominio abierto) evita el rail infinito que rompía el ritmo en el árbol viejo.",
+      "evidence": "01-sidebar-default.png · 03-accordion-swap.png",
+      "nextAction": ""
+    },
+    "density": {
+      "score": 5,
+      "rationale": "De ~96 hojas visibles en 12 grupos a 7 dominios colapsados en 3 zonas: el rail default cabe SIN scroll en 900px, algo imposible antes. La cola larga queda a un ⌘K de distancia y lo personal a un click del avatar.",
+      "evidence": "01-sidebar-default.png (rail completo visible en un viewport).",
+      "nextAction": ""
+    },
+    "depth": {
+      "score": 5,
+      "rationale": "Máx 2 niveles colapsables dentro de cada zona (dominio → sección → hoja), como declara el wireframe. Sin superficies ni elevaciones nuevas: mismo VerticalNav, mismo MenuSection/SubMenu/MenuItem.",
+      "evidence": "02-domain-open.png (Finanzas → Tesorería).",
+      "nextAction": ""
+    },
+    "surfaceEconomy": {
+      "score": 5,
+      "rationale": "CERO superficies nuevas: se reusan las tres que ya existían (rail, UserDropdown, CommandPalette dormida) y se RETIRA una redundante (NavSearch). El dropdown además perdió los 4 atajos admin duplicados.",
+      "evidence": "04-avatar-dropdown.png (sin atajos admin) · 05-cmdk-open.png (una sola palette).",
+      "nextAction": ""
+    },
+    "visualImpact": {
+      "score": 5,
+      "rationale": "Puntuado contra el criterio de esta task, que es el inverso del habitual: es chrome persistente y el impacto correcto es cero ruido nuevo — se logra. El 'momento' es estructural: el rail corto con zonas legibles cambia la primera impresión del portal sin introducir un solo color, sombra o tratamiento nuevo.",
+      "evidence": "01-sidebar-default.png vs el rail de 12 grupos del before (registro en la spec).",
+      "nextAction": ""
+    },
+    "typography": {
+      "score": 5,
+      "rationale": "Zonas con el estilo heading de isSection existente; dominios/secciones con NavLabel (label + caption) del chrome. Todas las strings nuevas viven en GH_INTERNAL_NAV con espejo en-US; cero literales en JSX, cero fontSize inline; 'Platform' se corrigió a 'Plataforma' (es-CL).",
+      "evidence": "01-sidebar-default.png · design-contract:lint PASS.",
+      "nextAction": ""
+    },
+    "color": {
+      "score": 5,
+      "rationale": "Sin color propio: fondo midnightNavy del VerticalNav y estados del menuItemStyles del tema. El focus ring nuevo usa var(--mui-palette-primary-main), no un HEX. El ⌘K ya estaba tokenizado con vars MUI (incluye dark).",
+      "evidence": "06-keyboard-rail-item-focus-ring.png · CommandPalette/styles.css.",
+      "nextAction": ""
+    },
+    "iconography": {
+      "score": 5,
+      "rationale": "Glyphs Tabler consistentes por dominio (building/briefcase/report-money/users-group/shield-lock) y por hoja en el dropdown del avatar. Con el rail colapsado cada dominio se reduce a su icono y siguen siendo distinguibles.",
+      "evidence": "01-sidebar-default.png · 04-avatar-dropdown.png.",
+      "nextAction": ""
+    },
+    "responsive": {
+      "score": 5,
+      "rationale": "A 390px el drawer abre con el toggle accesible, muestra las mismas zonas y queda CONTENIDO al borde (el desborde de 8px del chrome quedó cerrado — 0 layout_element_overflow en el frame). El dropdown del avatar y el ⌘K heredan su comportamiento mobile de MUI/Radix.",
+      "evidence": "drawer-open.png + manifest mobile sin findings de overflow.",
+      "nextAction": ""
+    },
+    "motion": {
+      "score": 5,
+      "rationale": "Cero motion nuevo, como manda el motion contract: el acordeón ES el collapse Vuexy default (subMenuOpenBehavior='accordion', evidenciado con el swap Finanzas→Comercial) y el ⌘K trae la transición Radix con prefers-reduced-motion nativo.",
+      "evidence": "03-accordion-swap.png · reducedMotionCheck verde en ambos scenarios.",
+      "nextAction": ""
+    },
+    "fidelity": {
+      "score": 5,
+      "rationale": "El árbol implementado es el del wireframe (zonas, dominios, secciones Resumen/Desarrollo, dedup, Spaces (admin), avatar como mi cuenta, ⌘K sobre CommandPalette). Dos desviaciones documentadas y a favor: 'Roadmap' del ledger no existe como ruta (drift del wireframe, recalibrado) y la entrada zombie 'miEspacio' del ledger contradecía el propio rehome (corregida).",
+      "evidence": "Frames vs §Layout Skeleton del wireframe; delta registrado en la task.",
+      "nextAction": ""
+    },
+    "genericTemplateResistance": {
+      "score": 5,
+      "rationale": "No hay superficie nueva que pueda salir genérica: todo hereda el chrome opinado del portal. El riesgo real era parecer OTRO portal — y el test de identidad prueba que el set de destinos es exactamente el vigente, reubicado.",
+      "evidence": "VerticalMenu.test.tsx (identidad interna + no-interna, 13/13).",
+      "nextAction": ""
+    }
+  },
+  "average": 4.93,
+  "floor": 4,
+  "threshold": "average >= 4.5; floor >= 4; hierarchy/surfaceEconomy/visualImpact/fidelity/genericTemplateResistance >= 4.5",
+  "hallazgosAbiertosDelChrome": [
+    "Los triggers de submenú del chrome @menu no exponen aria-expanded/aria-controls (el estado vive en la clase ts-open). El wireframe lo pedía; @menu es intocable por contrato del repo. El estado abierto/cerrado se comunica por chevron + layout y axe no lo reporta como violation, pero es la brecha honesta que queda del chrome."
+  ],
+  "notaSobreEsosHallazgos": "Los 4 hallazgos a11y heredados de TASK-1675 (focus ring, scroll region, toggle, desborde 8px) quedaron CERRADOS en esta task y sus flags de scenario volvieron a exigirse (requireVisibleFocusRing: true). Lo único que queda abierto es aria-expanded, que exige tocar @menu (fork Vuexy) y debe decidirse como deuda de chrome aparte.",
+  "verdict": "pass"
+}

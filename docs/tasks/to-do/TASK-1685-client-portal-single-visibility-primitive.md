@@ -1,5 +1,16 @@
 # TASK-1685 — Un solo primitive para "¿esta persona puede ver esta vista?"
 
+## Delta 2026-08-10
+
+- **TASK-1388 entró primero** (code complete en develop): reestructuró la rama INTERNA de
+  `VerticalMenu.tsx` en 3 zonas y consolidó el ⌘K. La rama no-interna quedó **intacta en visibilidad**
+  (test de identidad verde); su único cambio es de forma: la sección "Mi Ficha" del colaborador ahora se
+  construye con el builder compartido `src/lib/navigation/my-nav-items.ts` (mismos viewCodes, mismos
+  fallbacks). Punto de extensión limpio para el Slice 2 de esta task: si el primitive de visibilidad
+  reemplaza `canSeeView`, el builder recibe el predicado por parámetro en un solo lugar.
+- El ⌘K consolidado (`GlobalCommandPalette`) filtra por `routeGroup + authorizedViews` client-side —
+  consumidor natural del primitive cuando exista.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

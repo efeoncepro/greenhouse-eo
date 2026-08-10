@@ -1,5 +1,16 @@
 # TASK-1389 — Gobernanza de navegación: contrato de superficies + gate de presupuesto del sidebar
 
+## Delta 2026-08-10
+
+- **TASK-1388 quedó code complete en develop** (commits `814b8b088`…`af548128c`): el sidebar interno ya
+  está bajo el tope (3 zonas `isSection` — Operación con 4 dominios · Administración · Recursos —, sin
+  `/my/*` en el rail, sin duplicados; fijado por test de identidad en `VerticalMenu.test.tsx`). La
+  condición de promoción `warn` → `error` del gate `pnpm nav:budget` queda habilitable en cuanto
+  TASK-1388 cierre formalmente (pendiente: build autorizado + card-sort/sign-off).
+- Insumo nuevo para el gate: el set canónico de lo personal vive en
+  `src/lib/navigation/my-nav-items.ts` (builder compartido avatar/rail-colaborador) — "sin `/my/*` en el
+  sidebar interno" puede derivarse de ahí en vez de hardcodear la lista.
+
 ## Delta 2026-08-09
 
 Causado por `TASK-1675` / `TASK-1680` (complete, en producción).

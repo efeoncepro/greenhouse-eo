@@ -105,7 +105,7 @@ Dos máquinas independientes: el **acordeón del rail** y el **overlay ⌘K**.
 ## GVC Scenario Plan
 
 - Scenario: reestructura del rail interno + ⌘K.
-- Scenario file: `scripts/frontend/scenarios/task-1388-vertical-menu-restructure.ts`.
+- Scenario file: `scripts/frontend/scenarios/task-1388-vertical-menu-restructure.scenario.ts`.
 - Route: `/home` (o `portalHomePath`) con `agent@greenhouse.efeonce.org` (ve el árbol completo).
 - Viewports: desktop 1440 + mobile 390.
 - Required steps: rail default → expandir cada zona/dominio (acordeón) → navegar a ruta profunda y verificar active path → abrir ⌘K y buscar → captura reduced-motion.

@@ -1,11 +1,23 @@
 # Handoff activo
 
-### TASK-1388 en ejecución — reequilibrio de la navegación interna (2026-08-10)
+### TASK-1388 code complete en develop — cierre formal pendiente de 3 cosas (2026-08-10)
 
-En curso sobre `develop` (local-first, sin push). Alcance: rehome `/my/*` sidebar→avatar, sidebar
-interno en 3 zonas, ⌘K consolidado, dedup/limpieza + 4 fixes a11y del chrome heredados de TASK-1675.
-No toca la semántica de acceso de `TASK-1685` (la rama no-interna del menú se conserva intacta; hay
-test de identidad que lo fija). Spec: `docs/tasks/in-progress/TASK-1388-vertical-menu-restructure.md`.
+Los 5 slices implementados y verificados en local, commits `814b8b088`…`af548128c` (sin push,
+local-first): rehome atómico `/my/*` sidebar→avatar (builder canónico
+`src/lib/navigation/my-nav-items.ts`), rail interno en 3 zonas (Operación · Administración ·
+Recursos), ⌘K consolidado sobre `CommandPalette` con filtro de audiencia (la `NavSearch` retirada
+exponía el registry completo), dedup (Sample Sprints→Comercial, Growth dentro de Comercial, Spaces
+(admin)), legacy borrado y los 4 fixes a11y heredados de TASK-1675 cerrados. Gates verdes: `pnpm test`
+full (10.447), typecheck, lint full, reachability (0 orphans), design:lint, design-contract:lint,
+ui:code-lint, ui:visual-gate, ui:quality (scorecard 4.93/floor 4), task:lint. La rama no-interna del
+menú quedó intacta en visibilidad (test de identidad; coordinación TASK-1685 documentada por Delta).
+
+**Para cerrar (por eso sigue `in-progress`):** (1) `pnpm build` de producción — pedir autorización del
+operador antes (regla de memoria por RAM); (2) card-sort + sign-off del operador sobre nombres de
+zonas (`UI ready` permanece `no` por criterio de aceptación; un rename = 1 línea en
+`GH_INTERNAL_NAV`); (3) promover baseline GVC (`pnpm fe:capture:diff --promote`) al aprobar frames.
+Riesgo conocido: gap `aria-expanded` en triggers de `@menu` (chrome intocable), documentado en el
+scorecard; estado abierto/cerrado se aserta por clase `ts-open`.
 
 ### ⛔ PARAR ACÁ — decisión pendiente del portal cliente, y una advertencia sobre esta sesión (2026-08-09)
 
@@ -584,19 +596,3 @@ sesión recién emitida tampoco los trae.
 **No lo parché.** Empujar SEO a la lista hardcodeada haría desaparecer el síntoma y consolidaría el
 diseño equivocado: el portal cliente debe componer su menú desde `module_assignments`, que es lo que
 el resolver canónico ya sabe hacer y nadie cableó.
-
-### Search Visibility — header canónico (2026-08-07)
-
-TASK-1307/1308 siguen `complete`: Resumen, Rendimiento y Keywords comparten `SurfaceRecipe` +
-`WorkbenchHeader` (alcance/meta/tabs), sin chrome sobre canvas ni duplicación en estados vacíos. 579
-tests focales, typecheck/lint y 5 GVC OK (1440/390). Pendiente: promoción `develop → main` batcheada
-con 1308/1655; el export GSC nativo de Berel requiere Owner fuera del repo.
-
-### Seedance 2.5 — inventario Fal y TASK-1656 (2026-08-07)
-
-Fal Model Search/OpenAPI confirma tres endpoints activos: T2V, I2V y R2V; Globe permanece `provider-supported / gated`.
-Se dejaron el inventario API, route card, registry, fleet ledger y skills espejo actualizados; no se tocó runtime de Globe.
-`TASK-1656` registra la integración backend-data: roles multimodales, audio, frame final, queue/webhook, ingest, rates,
-rights, evaluación, canary, settlement y promotion por ruta. Reutiliza el adapter Fal y el control plane existente;
-la UI queda en `TASK-1552` y el contrato compartido en `TASK-1633`. No habilitar 4K/1080p, tres minutos, edit/masks,
-storyboard, stems, streaming, realtime, seed de entrada ni BytePlus 2.5 sin contrato verificable.

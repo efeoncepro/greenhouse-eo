@@ -35,7 +35,7 @@ Rail vertical, top→bottom. `[zona]` = heading no colapsable (`isSection`); `�
 | 3 | `[Administración]` (zona, solo admins) | Enmarca la configuración de plataforma | `VerticalSectionDataType` | `GH_INTERNAL_NAV.zones.administracion` |
 | 3a | ▸Administración → ▾Identidad y acceso · ▾Comercial y operaciones · ▾Plataforma | Admin Center consolidado (23 hojas en 3 secciones; Herramientas IA vive aquí, dedup) | `VerticalSubMenuDataType` | rama `isAdminUser` |
 | 4 | `[Recursos]` (zona, footer) | Utilidades de plataforma (absorbe micro-grupos) | `VerticalSectionDataType` | `GH_INTERNAL_NAV.zones.recursos` |
-| 4a | ▸Recursos → ·Knowledge · ·Roadmap · ·Design System | Utilidades | `VerticalSubMenuDataType` | `plataforma.*` viewCodes |
+| 4a | ▸Recursos → ·Knowledge · ·Design System | Utilidades | `VerticalSubMenuDataType` | `plataforma.*` viewCodes. *(Delta 2026-08-10: "Roadmap" salió del árbol — no existe ruta `/roadmap` ni viewCode `plataforma.roadmap`; solo hay copy huérfano y `/api/roadmap`.)* |
 
 > **Lo personal (`/my/*`) sale del sidebar.** La zona "Mi Ficha" del sidebar se elimina; sus 14 hojas se reubican en el dropdown del avatar (superficie B, abajo).
 
@@ -66,7 +66,7 @@ Todas las strings visibles salen de `GH_INTERNAL_NAV` (en `greenhouse-nomenclatu
 |---|---|---|---|---|
 | `internalNav.zones.operacion` | 2 | `Operación` | — | Zona nueva (heading) |
 | `internalNav.zones.administracion` | 3 | `Administración` | — | Zona nueva (heading), reemplaza el grupo "Admin Center" top-level |
-| `internalNav.zones.miEspacio` | 4 | `Mi espacio` | — | Zona nueva (heading) que agrupa Mi Ficha + Recursos |
+| `internalNav.zones.recursos` | 4 | `Recursos` | — | Zona nueva (heading). *(Delta 2026-08-10: la entrada previa `miEspacio` era drift de un borrador — contradecía el rehome de Mi Ficha al avatar; implementado como `zoneRecursos`.)* |
 | `internalNav.domains.agencia` | 2a | `Agencia` | — | Renombra la sección "Gestión" → dominio "Agencia" |
 | `internalNav.sections.agencia.resumen` | 2a | `Resumen` | — | Agrupa las 3 hojas hoy sueltas (Agencia/Spaces/Economía) |
 | `internalNav.sections.comercial.growth` | 2b | `Growth` | — | Absorbe el micro-grupo Growth (Forms + AEO Grader) |
@@ -111,7 +111,7 @@ El menú es navegación persistente; sus "estados" son de gating y de expansión
 
 ## GVC Scenario Plan
 
-- Scenario file: `scripts/frontend/scenarios/task-1388-vertical-menu-restructure.ts` (nuevo).
+- Scenario file: `scripts/frontend/scenarios/task-1388-vertical-menu-restructure.scenario.ts` (nuevo).
 - Route: home del portal interno (`/home` o `portalHomePath`) con sesión `agent@greenhouse.efeonce.org` (superadmin, ve el árbol completo).
 - Viewports: desktop 1440 + mobile 390.
 - Required steps: (1) capturar rail colapsado por defecto; (2) expandir cada zona/dominio y capturar el acordeón (abrir uno colapsa los otros); (3) navegar a una ruta profunda (p.ej. Finanzas→Tesorería→Cobros) y verificar active state + path expandido; (4) abrir ⌘K con `⌘K`, escribir una query, capturar resultados; (5) captura con reduced-motion.
@@ -140,5 +140,5 @@ El menú es navegación persistente; sus "estados" son de gating y de expansión
 - [ ] Charts have table/text alternatives. (N/A — navegación)
 - [ ] State and aria copy is ready for implementation. (active state con `aria-current`; dominios con `aria-expanded`)
 - [ ] Implementation mapping names primitive, copy source, data contract and route/surface. (sí — reuse, sin backend)
-- [ ] GVC scenario plan is specific enough for `pnpm fe:capture` or a new scenario file. (sí — `task-1388-vertical-menu-restructure.ts`)
+- [ ] GVC scenario plan is specific enough for `pnpm fe:capture` or a new scenario file. (sí — `task-1388-vertical-menu-restructure.scenario.ts` (+ `task-1388-menu-mobile-drawer.scenario.ts`))
 - [ ] Design decision log explains reuse/extend/new before JSX starts. (sí — reuse en todo)

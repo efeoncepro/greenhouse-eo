@@ -1,5 +1,39 @@
 # TASK-1388 — Reequilibrio de la navegación interna (sidebar · avatar · ⌘K)
 
+## Delta 2026-08-10 — implementación completa en develop (code complete; cierre formal pendiente)
+
+**Los 5 slices están implementados y verificados en local**, commits `814b8b088` (Slice 1, rehome
+atómico) · `ea6004421` (Slice 2, 3 zonas) · `6d7050d22` (Slice 3, ⌘K) · `335f92563` (Slice 4, legacy +
+a11y) · `af548128c` (Slice 5, GVC). Sin push (local-first).
+
+- **Re-scope declarado:** los movimientos de árbol del Slice 4 (Growth dentro de Comercial, Sample
+  Sprints hogar único en Comercial, Spaces desambiguado) se ejecutaron dentro del Slice 2 para no
+  reescribir `VerticalMenu` dos veces; el Slice 4 quedó para legacy + los 4 fixes a11y.
+- **Identidad fijada por test:** `VerticalMenu.test.tsx` ahora fija el set EXACTO de hojas del admin
+  interno (cero URLs nuevas, sin `/my/*`, sin duplicados) además de la identidad no-interna de
+  TASK-1675. El builder canónico compartido es `src/lib/navigation/my-nav-items.ts` (avatar interno +
+  rail del colaborador, mismo gating).
+- **Open Questions resueltas** (documentado en sesión): ModeDropdown queda aparte (no-goal de chrome);
+  se retiran TODOS los atajos admin del avatar; la base del ⌘K es `CommandPalette` (TASK-696) — además
+  corrige que `NavSearch` exponía el `VIEW_REGISTRY` completo sin filtrar por audiencia; los nombres de
+  zonas son los del wireframe vía `GH_INTERNAL_NAV` (un rename post card-sort = 1 línea de copy).
+- **Drift del wireframe recalibrado:** "Roadmap" no existe como ruta/viewCode (fuera del árbol);
+  la entrada `miEspacio` del copy ledger era zombie (contradecía el rehome) → `zoneRecursos`.
+- **Gap del chrome documentado:** los triggers de submenú de `@menu` no exponen
+  `aria-expanded`/`aria-controls` ( `@menu` es intocable); el estado canónico es la clase `ts-open` y
+  así lo asertan los scenarios. Los 4 hallazgos a11y heredados de TASK-1675 quedaron CERRADOS
+  (focus ring exigido por probe, scroll region con role/label/foco, toggle accesible, desborde 8px).
+- **Scenarios GVC** (3): `task-1388-vertical-menu-restructure` (primario, dual-viewport, gate) ·
+  `task-1388-menu-surfaces-flow` (acordeón + avatar + ⌘K, desktop) · `task-1388-menu-mobile-drawer`
+  (drawer + evidencia a11y, 390px). Scorecard: `docs/ui/reviews/TASK-1388-*.scorecard.json`
+  (average 4.93, floor 4, pass).
+- **Gates verdes:** `pnpm test` full (10.447), `pnpm typecheck`, `route-reachability-gate` (0 orphans),
+  `design:lint`, `design-contract:lint`, `ui:code-lint`, `ui:visual-gate`, `ui:quality`, `task:lint`.
+- **Pendiente para cerrar** (por eso sigue `in-progress`): `pnpm build` de producción (autorización del
+  operador — regla de memoria por consumo de RAM), card-sort + sign-off del operador sobre nombres
+  (criterio de aceptación: `UI ready` permanece `no` hasta entonces), y la promoción del baseline GVC
+  (`pnpm fe:capture:diff --promote`) cuando el operador apruebe los frames.
+
 ## Delta 2026-08-09
 
 - **El follow-up del portal cliente ya no está entero pendiente.** `TASK-1675` cableó el menú
@@ -139,7 +173,7 @@ Reglas obligatorias:
 - `src/config/greenhouse-nomenclature.ts` (bloque `GH_INTERNAL_NAV`)
 - `src/config/greenhouse-navigation-copy.ts` (reexport de keys nuevas)
 - `src/lib/navigation/route-reachability-manifest.ts` (via/parent de hojas reubicadas)
-- `scripts/frontend/scenarios/task-1388-vertical-menu-restructure.ts` (nuevo scenario GVC)
+- `scripts/frontend/scenarios/task-1388-vertical-menu-restructure.scenario.ts` (nuevo scenario GVC)
 - `docs/ui/wireframes/TASK-1388-vertical-menu-restructure.md`
 - `docs/ui/flows/TASK-1388-vertical-menu-restructure-flow.md`
 - `docs/ui/motion/TASK-1388-vertical-menu-restructure-motion.md`
@@ -242,7 +276,7 @@ Reglas obligatorias:
 
 ### GVC scenario plan
 
-- Scenario file: `scripts/frontend/scenarios/task-1388-vertical-menu-restructure.ts`.
+- Scenario file: `scripts/frontend/scenarios/task-1388-vertical-menu-restructure.scenario.ts`.
 - Route: `/home` (o `portalHomePath`) con `agent@greenhouse.efeonce.org` (ve todo).
 - Viewports: desktop 1440 + mobile 390.
 - Required steps: (1) sidebar default → expandir zonas/dominios (acordeón); (2) navegar a ruta profunda (active path); (3) abrir el avatar dropdown y capturar el bloque `/my/*` + perfil; (4) abrir ⌘K y buscar; (5) captura reduced-motion.
@@ -311,7 +345,7 @@ Reglas obligatorias:
 ### Slice 5 — Acordeón + GVC
 
 - Acordeón en el sidebar (un dominio abierto; path activo siempre expandido) reusando el collapse Vuexy.
-- Crear el scenario GVC `task-1388-vertical-menu-restructure.ts`; capturar las 3 superficies desktop + mobile; iterar hasta "Apto para implementar".
+- Crear el scenario GVC `task-1388-vertical-menu-restructure.scenario.ts` (+ `task-1388-menu-mobile-drawer.scenario.ts`); capturar las 3 superficies desktop + mobile; iterar hasta "Apto para implementar".
 
 ## Out of Scope
 
