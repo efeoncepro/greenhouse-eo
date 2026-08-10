@@ -1,5 +1,26 @@
 # TASK-1389 — Gobernanza de navegación: contrato de superficies + gate de presupuesto del sidebar
 
+## Delta 2026-08-09
+
+Causado por `TASK-1675` / `TASK-1680` (complete, en producción).
+
+- **Precedente directo para el flip `warn` → `error` de esta task.** `TASK-1680` promovió el lint
+  `greenhouse/no-untokenized-business-line-branching` a `error` **midiendo primero** (corrió la regla en
+  `error` con el override vacío: 2 violaciones, ambas en `VerticalMenu.tsx`) y dejó **una sola** exención,
+  con dueño de retiro nombrado (`capability-modules-resolver-migration`). Ese es el patrón que conviene
+  copiar acá: el override es deuda declarada con dueño, no una lista de paths por si acaso. Registrado en
+  `eslint.config.mjs`.
+- **Se borró la copia muerta `src/components/layout/vertical/VerticalMenu (1).tsx`** (junto a otras 5 con el
+  patrón ` (1).`, commit `d81447fd1`). Relevante para la §Open question de esta task sobre qué parsea el
+  gate: un parser que globee `src/components/layout/vertical/**` ya no encuentra dos árboles.
+- **El árbol dejó de ser enteramente estático, y eso decide la Open question.** `TASK-1675` cableó el menú
+  module-driven de la rama **no-interna**: los ítems se resuelven per-org en `(dashboard)/layout.tsx` y
+  llegan a `VerticalMenu.tsx` por la prop `clientNavItems`, con merge **aditivo**. Un parser estático del
+  archivo **no puede ver** el menú cliente completo — su forma depende de `module_assignments`. El §Out of
+  scope de esta task ya excluye el portal cliente; conviene dejarlo explícito como límite **técnico** del
+  gate y no sólo de alcance: si algún día el tope aplica al carril cliente, el insumo es el resolver, no
+  el archivo.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

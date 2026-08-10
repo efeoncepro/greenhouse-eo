@@ -46,11 +46,18 @@ Los defectos reales son **tres**, y dos de ellos son una función y una línea:
 **Nueve de las páginas del portal cliente no abren hoy.** Ese era el titular al medir, y no estaba en
 ningún issue antes de esta medición.
 
-> **Estado al 2026-08-09, después de `TASK-1678` + `TASK-1679`:** las nueve **dejaron de mentir**, que
-> es una cosa distinta de abrir. Tres abren (las vistas base) y seis muestran el empty state honesto
-> porque su módulo no está asignado a ninguna organización. La parte que queda no es código: es
-> decidir y asignar módulos. El titular corregido sería *"nueve páginas reportaban una falla de
-> servicio para decir seis cosas distintas, y ninguna de las seis era una falla"*.
+> **Estado al 2026-08-09, después de `TASK-1678` + `TASK-1679` + `TASK-1680`:** las nueve **dejaron de
+> mentir**, que es una cosa distinta de abrir. El titular corregido sería *"nueve páginas reportaban una
+> falla de servicio para decir seis cosas distintas, y ninguna de las seis era una falla"*.
+>
+> ⚠️ **Cuántas abren depende de los assignments y cambia sin que cambie el código.** El mismo día:
+> antes de asignarle `creative_hub_globe_v1` a Sky Airlines, las 4 organizaciones abrían 3 (las base);
+> después, SKY abre 7 y las demás siguen en 3. **NUNCA** heredes un conteo de este doc como expectativa
+> — derivalo de los datos, que es lo que hace `scripts/identity/client-portal-page-access-check.ts`
+> (su primera versión fijaba "3 y 6" y reportó desvíos por hacer lo correcto). Patrón canónico §7 de
+> `GREENHOUSE_CANONICAL_PATTERNS_V1.md`.
+>
+> Y la parte que queda no es código: es decidir y asignar módulos.
 
 ## Lo que se midió
 
@@ -161,9 +168,14 @@ cliente no puede entrar a su propia configuración de cuenta.**
    declare) o son module-gated (y entonces falta el módulo)? Nadie puede escribir ese fix sin la
    decisión.
 3. **El defecto 2 es una línea**, pero va después de la decisión anterior para no desplegar dos veces.
-4. **Cerrar la canilla**: el lint `no-untokenized-business-line-branching` está en `warn` desde mayo.
-   Mientras siga así, el carril viejo puede crecer mientras se limpia. Nota: su override block exime 7
-   paths, uno de ellos `VerticalMenu (1).tsx`, un archivo muerto.
+4. ~~**Cerrar la canilla**: el lint `no-untokenized-business-line-branching` está en `warn` desde mayo.~~
+   ✅ **CERRADO 2026-08-09 por `TASK-1680`.** El lint está en **`error`**, así que escribir branching
+   legacy nuevo falla el CI. Y la medición corrigió el diagnóstico de este punto: el override no exime
+   7 paths útiles sino **1** — de las 6 entradas que tenía, **cuatro eximían paths que la regla nunca
+   miró** (`isUiFile` excluye `src/app/api/**` y sólo evalúa `src/(components|views|app)/**`), una era
+   especulativa y otra era `VerticalMenu (1).tsx`, que además resultó ser una familia de **6** archivos
+   muertos del commit `eec326410`, todos borrados. Queda una exención medida y con dueño declarado
+   (`VerticalMenu.tsx` → follow-up `capability-modules-resolver-migration`).
 
 ## Lo que NO hay que hacer
 

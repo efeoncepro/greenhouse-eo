@@ -75,6 +75,25 @@ trabajo de código no había visto.
 6. **`CLAUDE.md` está en 34.903/35.000 tokens — 97 de headroom.** Los cinco aprendizajes de proceso de
    hoy se escribieron en su skill dueña y en `AGENTS.md`, no ahí, a propósito.
 
+### Barrido final de docs (2026-08-09) — tres cosas que necesitan tu decisión
+
+Un barrido de cierre corrigió lo que el trabajo del día dejó stale, **incluidas dos contradicciones en
+docs que yo mismo edité hoy** (el inventario del carril seguía diciendo que el lint estaba en `warn`, y
+el ledger de flags listaba `NODE_ENV` en la columna de runtime mientras su descripción decía
+`VERCEL_ENV`). Ambas corregidas. Y el conteo "3 abren, 6 empty state" **dejó de ser un dato del doc**:
+cambió el mismo día al asignarle Creative a SKY, así que ahora el inventario declara la regla —
+derivarlo de los datos, nunca heredarlo de un doc.
+
+Lo que **NO** decidí por ti:
+
+1. **`TASK-286` (client view catalog expansion) tiene la premisa vencida**: dice "11 view codes" y hoy
+   hay 25, y su alcance se solapa con `TASK-1685`. Reescribirla o cerrarla es tu llamada.
+2. **`TASK-1675`/`1678`/`1679`/`1680`/`1685` declaran `Epic: none`** aunque son el carril de
+   `EPIC-015`. Consecuencia mecánica: `epic-child-parity` las excluye del denominador, así que el
+   avance del epic se ve más chico de lo que es. Reasignarlas es trivial pero cambia métricas.
+3. **`/api/client-portal/*` no está en `GREENHOUSE_API_REFERENCE_V1.md`.** Documentarlo ahí depende de
+   si esa referencia pretende ser exhaustiva o sólo cubrir las lanes de plataforma.
+
 ### Release 2026-08-09 (2.º del día) — el carril del portal cliente cerrado y VERIFICADO EN PRODUCCIÓN
 
 Manifest `ee0d568b8614-1ff03476-6a82-4e03-8dfc-2d49e3c30ce3` en `released`, run `31343569815`, target

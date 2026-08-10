@@ -1,6 +1,6 @@
 # Greenhouse Canonical Patterns V1 (TASK-1160 Slice 4)
 
-> **Tipo:** catálogo de los 6 patrones de implementación canónicos que se repiten
+> **Tipo:** catálogo de los 7 patrones de implementación canónicos que se repiten
 > a través de los dominios. Es el **único lugar** que describe cada patrón "de
 > fondo"; las specs/companions de cada dominio aplican el patrón con sus
 > particularidades y citan las tasks-fuente, pero la **forma canónica** vive acá.
@@ -146,9 +146,73 @@ Las **dependencias de flag** son explícitas (flag B requiere flag A en el mismo
 
 ---
 
+## 7. Detector a la altura del defecto: señal si la condición la crea un DATO, gate con expectativa DERIVADA si la crea un commit
+
+**Cuándo:** emergió un defecto y hay que elegir **con qué instrumento** se impide que vuelva.
+Es la pregunta **anterior** a escribir el test/lint/gate/señal, y no es la misma que "¿qué patrón
+uso?": acá se decide *dónde vive el detector* y *de dónde saca su expectativa*. Elegir mal produce
+un instrumento que se ve como cobertura y no cubre nada.
+
+**Forma canónica — dos preguntas en orden:**
+
+1. **¿Quién puede crear la condición defectuosa: un commit o un `INSERT`?**
+   - **Un commit** (una import prohibida, una capability `can()`-checked sin grant, una `page.tsx`
+     sin nav, un `*_ENABLED` sin fila en el ledger, un `-- Up Migration` ausente) → **instrumento de
+     CI**: test, lint rule o gate. Corre en el mismo lugar donde nace la condición.
+   - **Un cambio de dato** (un assignment de módulo, una fila nueva que trae una integración, un
+     usuario provisionado por SCIM, un backfill, un pago registrado) → **reliability signal**
+     (`steady=0`, severidad proporcional al daño, remediación nombrada en el reader). Ningún gate de
+     código la puede ver: **el deploy que la activa no existe**.
+2. **La expectativa del instrumento se DERIVA de la misma fuente que el producto** — nunca se
+   congela como lista de resultados esperados. Mismo origen, **camino de lectura distinto** (SQL
+   directo contra el reader con su cache; filesystem contra el manifest; parseo del código contra el
+   catálogo). Así el instrumento verifica el invariante y sobrevive a cualquier consumer,
+   organización o assignment nuevo.
+
+**Reglas duras:**
+
+- **NUNCA** escribir un test para una condición que sólo un cambio de dato puede crear. Los dos
+  finales posibles son malos: o su premisa es falsa y se vuelve una lista de exenciones legítimas
+  que se podre, o pasa verde para siempre mientras el defecto se ve en producción. Caso fuente: un
+  test que exigiera página materializada por cada viewCode del `VIEW_REGISTRY` habría nacido con
+  **10 exenciones legítimas** (el registry declara superficies forward-looking a propósito); se
+  escribió y se descartó. El instrumento correcto fue la señal
+  `identity.client_portal.assigned_view_without_route`: el riesgo no está en **declarar** la
+  superficie, está en **asignarla**.
+- **NUNCA** dejar sin detector una condición data-authored porque "el gate de código está verde".
+  Los gates de CI son ciegos por construcción a lo que crea un `INSERT`, y el par
+  `route-reachability-gate` (página→enlace) / `assigned_view_without_route` (enlace→página) es el
+  ejemplo de cómo un lado puede reportar cero huérfanas mientras el otro renderiza un enlace muerto
+  a usuarios reales.
+- **NUNCA** hardcodear la expectativa de un gate como snapshot de resultados. El síntoma es que el
+  gate se pone **rojo por comportamiento correcto** y la salida fácil es editar los esperados uno por
+  uno; después de la primera edición ya no prueba que el motor funcione — prueba que el primer
+  consumer sigue igual. Caso fuente: `scripts/identity/client-portal-page-access-check.ts` fijaba
+  "3 rutas abren y 6 muestran empty state"; al asignarle un módulo a una organización reportó **4
+  desvíos por hacer lo correcto**. Se corrigió derivando la expectativa de los mismos datos que lee
+  el producto (vista base **o** viewCode declarado por un módulo vigente de esa organización).
+- **NUNCA** generalizar la regla anterior a los baselines visuales. Un gate de píxeles (`ui:visual-gate`,
+  `composer:visual-gate`) **sí** es legítimamente un snapshot, porque no hay fuente de la cual derivar
+  el render esperado; ahí la disciplina equivalente es que un **rebaseline se declara** (`BASELINE_DELTAS.md`),
+  nunca se edita en silencio.
+- **SIEMPRE** que el detector sea una señal, que reporte el estado **honesto** al nacer. Si al crearse
+  cuenta 1, ése es el valor correcto: hay un defecto vivo en producción, y nombrarlo es el punto
+  (patrón 4 — degradación honesta). Meterlo en un allowlist para que nazca en verde es volver al
+  snapshot.
+
+**Fuente:** señal → TASK-1679 follow-up (`client-portal-assigned-view-without-route`), TASK-877
+follow-up (`identity-notion-bridge-coverage`), TASK-878/CLAUDE.md (`workforce-unlinked-internal-users`),
+TASK-991 (`commercial-organization-type-lifecycle-drift`), TASK-929 (ledger drift).
+Expectativa derivada → TASK-1679 Slice 7 (client portal page access check), TASK-935
+(`capability-grant-coverage.test.ts` parsea los `can()` reales en vez de listar capabilities),
+TASK-982 (`route-reachability-gate` deriva del filesystem, no de una lista de rutas),
+feature-flags-audit (deriva de los `*_ENABLED` en código contra el ledger).
+
+---
+
 ## Cómo extender este catálogo
 
-Si emerge un **7º patrón** genuinamente transversal (se repite ≥3 dominios), agregarlo
+Si emerge un **8º patrón** genuinamente transversal (se repite ≥3 dominios), agregarlo
 acá con la misma estructura (cuándo / forma canónica / reglas duras / fuente) y
 registrarlo en `DECISIONS_INDEX.md`. Si es específico de un dominio, vive en su spec,
 no acá.

@@ -329,6 +329,15 @@ detecta senales probables. El agente sigue decidiendo si un documento es
 requerido, intencionalmente no requerido, o si el cierre debe quedar como
 `code complete, rollout pendiente` / `operativamente bloqueado`.
 
+Tampoco reemplaza el gate de contexto. `docs:closure-check` audita si la
+documentacion acompaña al cambio; **no** verifica los techos de entradas, lineas
+ni tokens de `Handoff.md` y `changelog.md`. Eso lo hace
+`pnpm docs:context-check:strict`, y como este comando suele **pedir** que agregues
+una entrada al changelog o al Handoff, el context gate tiene que correr **despues**.
+Orden seguro y caso fuente (CI rojo el 2026-08-09 por 61 entradas de changelog):
+`docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md` → seccion
+"Orden de los gates".
+
 ## Regla para skills locales de agentes
 
 - La convención canónica para skills de Codex en este repo es:

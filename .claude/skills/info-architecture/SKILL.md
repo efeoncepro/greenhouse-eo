@@ -27,7 +27,11 @@ Greenhouse modules (CLAUDE.md authoritative):
 - `/delivery` — projects, tasks, ICO
 - `/ai-tooling` — licencias, créditos
 - `/admin` — governance, users, tenants, releases, operations
-- `/client-portal` — for Globe / external clients
+- **Portal cliente (Globe / clientes externos): NO tiene prefijo de módulo.** Sus rutas son
+  **top-level** con slug es-CL: `/proyectos`, `/campanas`, `/equipo`, `/reviews`, `/sprints`,
+  `/analytics`, `/notifications`, `/settings`, `/updates`. `client-portal` es un prefijo de **API**
+  (`/api/client-portal/**`) y un directorio de librería (`src/lib/client-portal/**`), **no** una
+  URL visible. Verificado contra el filesystem 2026-08-09.
 
 NEVER invent a parallel module. NEVER deep-link a feature outside its module without a strong reason. Extensions go inside the module that owns the domain.
 
@@ -47,25 +51,27 @@ NEVER invent a parallel module. NEVER deep-link a feature outside its module wit
 - Query params for filters / sort / page / tab (URL state).
 - Stable IDs for entities; slugs for SEO-friendly public pages (rare in product UI).
 
-### 3. Route groups — `(dashboard)` / `(auth)` / `(client-portal)`
+### 3. Route groups — `(dashboard)` es el único grupo de app
 
-Canonical structure:
+Estructura real (verificada contra `src/app/` el 2026-08-09):
 
 ```
 app/
-├── (dashboard)/         # protected app
-│   ├── layout.tsx       # sidebar + header
-│   ├── home/
-│   ├── agency/
-│   ├── finance/
-│   ├── hr/
-│   ├── admin/
-│   └── ...
-├── (auth)/              # login / signup
-│   ├── login/
-│   └── signin/
-└── (client-portal)/     # external Globe clients
+├── (dashboard)/            # TODA la app protegida: interna Y portal cliente
+│   ├── layout.tsx          # sidebar + header
+│   ├── home/ agency/ finance/ hr/ admin/ …          ← interno
+│   └── proyectos/ campanas/ equipo/ reviews/ …      ← portal cliente (top-level)
+├── (blank-layout-pages)/   # pantallas sin chrome
+├── auth/                   # login / signin (SIN paréntesis: es un segmento real)
+├── public/  q/  assessment/  api/
 ```
+
+⚠️ **NUNCA crear un route group `(client-portal)`.** No existe y no debe existir: el portal cliente
+vive dentro de `(dashboard)` y se diferencia por **guard**, no por topología —
+`requireViewCodeAccess(viewCode)` en cada page (`src/lib/client-portal/guards/`). Un grupo paralelo
+traería su propio `layout.tsx`, duplicaría el shell y sacaría esas páginas del alcance de
+`pnpm route-reachability-gate`, que barre `(dashboard)/**`. Es exactamente el carril paralelo que
+`GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md` existe para evitar.
 
 ### 4. Active state — Vuexy sidebar handles it
 

@@ -1,5 +1,5 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-05-10 por Claude
 > **Ultima actualizacion:** 2026-08-09 por Claude
 > **Documentacion tecnica:** [TASK-851](../../tasks/complete/TASK-851-production-release-orchestrator-workflow.md), [CLAUDE.md §Production Release Orchestrator invariants](../../../CLAUDE.md), [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md)
@@ -91,6 +91,8 @@ Dos consecuencias practicas para quien lee el resultado:
 ### El marker `[release-coupled: ...]`
 
 Cuando un release mezcla a proposito dos dominios sensibles (porque la dependencia es real), la forma de declararlo es escribir `[release-coupled: <razon>]` en el cuerpo del commit de squash. Eso neutraliza la alerta de "esto deberian ser dos releases".
+
+**El marker resuelve esa alerta y solo esa.** El check tiene dos veredictos distintos y es facil leerlos como uno: "esto deberian ser dos releases" (mezcla de dominios independientes) y "esto toca algo irreversible" (migraciones, auth, payroll, finance, cloud). El marker desactiva el primero; el segundo se dispara por el dominio en si, mezclado o no, y su unica salida es la razon de break-glass documentada. Ponerle marker a un release irreversible no cambia nada — y como la mezcla se evalua antes, un veredicto de "irreversible" ya prueba que el marker no era lo que faltaba.
 
 Desde TASK-1676 ese marker tiene dos condiciones estrictas: **abre una linea propia** y se lee **solo del commit que se esta promoviendo**. Antes bastaba con que la frase apareciera mencionada de pasada en cualquier commit del rango — incluso citada dentro de un documento —, y eso apagaba la deteccion completa. El caso mas elocuente: el commit que creo la tarea para arreglar este defecto la disparaba, porque explicaba el problema citando el literal.
 

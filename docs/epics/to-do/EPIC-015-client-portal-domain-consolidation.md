@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Diseño`
+- Status real: `En producción con 6/8 hijas complete (TASK-822…827): schema + 10 módulos seed + resolver canónico + menú y guards module-driven. Abiertas TASK-828 (cascade desde lifecycle) y TASK-829 (subsystem Client Portal Health + backfill). Lo que bloquea el valor comercial no es código: son los assignments de módulo y la decisión de forma de ISSUE-148/TASK-1685 — ver Delta 2026-08-09`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `unassigned`
@@ -19,7 +19,8 @@ Eleva `Client Portal` de "route group + lente de visibilidad" a **dominio compos
 
 ## Why This Epic Exists
 
-Hoy el portal cliente tiene 3 problemas estructurales:
+Diagnóstico al fundar el epic (2026-05-07). Los tres problemas siguen explicando **por qué** existe el
+epic, pero el 1 y el 2 ya no describen el runtime — ver `## Delta 2026-08-09`:
 
 1. **Sin ownership de dominio**: lógica dispersa en `agency/`, `account-360/`, `ico-engine/`. Cualquier cambio cross-cutting toca 5+ archivos en 3 dominios.
 2. **Sin módulos on-demand**: diferenciación per-cliente es binaria (`tenant_type='client'`) o vía `tenant_capabilities.businessLines/serviceModules` hardcoded. Imposible vender addon sin deploy. Imposible pilots/trials. Cliente Globe enterprise vs SMB son idénticos.
@@ -111,6 +112,53 @@ Consecuencias:
 - **Robustness**: idempotency via UNIQUE partial; atomic via withTransaction; race protection SELECT FOR UPDATE; 6 CHECK constraints + 4 FK + 2 anti-mutation triggers
 - **Resilience**: cascade vía outbox + reactive consumer con dead_letter; recovery script idempotent; legacy backfill re-runable; resolver tolera huérfanos
 - **Scalability**: O(log n) hot path; cardinalidad ~10K assignments + ~20K events/year (trivial); cache TTL 60s reduce DB load 10x
+
+## Delta 2026-08-09 — el carril de acceso quedó cerrado en código; lo que falta es assignment y una decisión de forma
+
+Seis de las ocho hijas están `complete` (`TASK-822`…`TASK-827`); siguen abiertas `TASK-828` (cascade
+desde lifecycle) y `TASK-829` (subsystem `Client Portal Health` + backfill). El `Status real: Diseño` de
+arriba ya no describe el estado: el dominio corre en producción.
+
+Exit criteria que este delta cierra o corrige:
+
+- **Schema aplicado en staging y producción** — cerrado. Ojo con el enunciado: hay **una sola instancia
+  Cloud SQL** (`greenhouse-pg-dev`) sirviendo producción, staging y local, así que "aplicado en staging
+  y producción" es un solo hecho, no dos.
+- **10 módulos seed insertados** — cerrado (`migrations/20260512184739712_task-824-client-portal-ddl.sql`).
+- **Resolver canónico** — cerrado: `resolveClientPortalModulesForOrganization`
+  (`src/lib/client-portal/readers/native/module-resolver.ts`) es la fuente única, y desde `TASK-1675` el
+  menú también sale de ahí.
+- **Empty states honestos por módulo no asignado** — declarado cerrado por `TASK-827`, pero
+  `ModuleNotAssignedEmpty` estaba **muerto en runtime** hasta el 2026-08-09: el `redirect()` del camino
+  `denied` vivía dentro de un `try`, y como `redirect()` de Next señaliza lanzando, el propio `catch` lo
+  interceptaba. Toda denegación legítima se veía como degradación del servicio **y** se reportaba a Sentry
+  como error del resolver. Cerrado de verdad por `TASK-1679`.
+- **Subsystem `Client Portal Health` visible en `/admin/operations`** — sigue **abierto** (`TASK-829`). Las
+  tres señales que nacieron el 2026-08-09 (`identity.view_access.client_role_without_grants`,
+  `identity.client_portal.client_without_organization`,
+  `identity.client_portal.assigned_view_without_route`) viven bajo `moduleKey='identity'`, no bajo un
+  subsystem propio. No confundir "hay señales del portal cliente" con "existe el rollup".
+
+Estado del acceso hoy, para no volver a estimarlo desde el catálogo: la puerta tiene **cuatro** destinos
+—abre (`200`), `/home?denied=<slug>`, `/home?error=organization_unresolved` y `?error=resolver_unavailable`
+sólo cuando el resolver falla de verdad—. Tres vistas son **portal base** y abren sin contratar nada
+(`cliente.notificaciones`, `cliente.configuracion`, `cliente.actualizaciones`, allowlist en el
+resolver). `/reviews` se unificó en `cliente.reviews`; `cliente.revisiones` quedó marcado como retirado en
+el registry append-only y no gatea ninguna ruta.
+
+Lo que queda **no es código**:
+
+1. **Assignment de módulos.** `module_assignments` tenía 7 filas en toda su historia, todas de SEO / AI
+   Visibility / Proposal Studio. Sky Airlines recibió `creative_hub_globe_v1` el 2026-08-09 y es la única
+   organización con Creative. Es la lección más transferible de este carril: **contar lo que el catálogo
+   declara no es contar lo que los datos permiten** — medición completa en
+   `docs/operations/CLIENT_PORTAL_ACCESS_RAIL_INVENTORY_V1.md`.
+2. **Una decisión de forma, aún abierta.** Rol y módulo son dimensiones ortogonales y hoy ninguna se
+   aplica de punta a punta: `ISSUE-148` + `TASK-1685`. No tratar el carril como resuelto por esta razón.
+
+Deuda de datos que ya se está midiendo: al 2026-08-09 la señal `assigned_view_without_route` reporta **1**
+— el bundle de Sky declara `cliente.creative_hub` → `/creative-hub`, y esa página no existe. Es un dato
+vivo: consultar la señal antes de citar el número.
 
 ## Open Questions (post-V1.0)
 

@@ -26,6 +26,14 @@
 
 - Branch: `Greenhouse develop; sin worktrees`
 
+## Delta 2026-08-09
+
+- **`seo_v1` → `seo_v2`.** Esta task citaba `seo_v1` como assignment vigente de Efeonce en dos lugares.
+  `TASK-1677` cerró la fase contract del cutover el 2026-08-09: `seo_v1` quedó superseded por
+  `effective_to` (su fila sigue en `modules`, append-only) y el assignment vigente es `seo_v2`.
+  Verificado contra `greenhouse_client_portal.module_assignments`. Corregido in-situ para que nadie
+  actúe sobre el módulo equivocado.
+
 ## Summary
 
 Decidir y ejecutar qué hacer con el `space` de tipo `client_space` y la fila de
@@ -200,7 +208,7 @@ equipo, ICO ni ninguna métrica que hoy dependa de esas filas.
 
 - Cambiar `organization_type` (ya corregido el 2026-08-06).
 - Agregar el guard por flag a los readers → `TASK-1648`.
-- Retirar las capabilities de Efeonce: los `module_assignments` (`seo_v1`, `proposal_studio_v1`)
+- Retirar las capabilities de Efeonce: los `module_assignments` (`seo_v2`, `proposal_studio_v1`)
   se conservan; la operadora sigue monitoreando sus propias métricas.
 - Crear un `space_type` nuevo si la decisión no lo exige.
 
@@ -265,7 +273,7 @@ Sign-off explícito del operador entre Slice 2 y Slice 3.
 - [ ] Si se ejecutó mutación, fue por script idempotente con dry-run y verificación antes/después.
 - [ ] Ninguna fila fue borrada (sólo desactivada o reclasificada).
 - [ ] Asignaciones de equipo e ICO sin regresión verificada.
-- [ ] `module_assignments` de Efeonce intactos (`seo_v1`, `proposal_studio_v1`).
+- [ ] `module_assignments` de Efeonce intactos (`seo_v2`, `proposal_studio_v1`).
 
 ## Verification
 

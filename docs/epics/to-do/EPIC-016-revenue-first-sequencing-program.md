@@ -24,7 +24,7 @@ A 2026-05-11, la inversión histórica del portal se concentró en módulos inte
 Lo que sí facturaría hoy está disperso, sin prioridad explícita ni secuenciamiento cross-EPIC:
 
 1. **Cierres legales bloqueados** — TASK-619 (firma electrónica ZapSign) sigue to-do; sin firma criptográfica defendible no se cierran contratos enterprise LATAM (banca, aerolínea, gobierno) y queda revenue acordado verbalmente sin trail auditable.
-2. **Portal sin SKUs vendibles** — Hoy el Client Portal es binario (`tenant_type='client'` ↔ ve-todo / ve-nada). EPIC-015 introduce módulos on-demand, pero ninguna task ha entrado a `in-progress`. Sin esto: cero venta de addon, cero pilots, cero diferenciación enterprise vs SMB.
+2. **Portal sin SKUs vendibles** — Al 2026-05-11 el Client Portal era binario (`tenant_type='client'` ↔ ve-todo / ve-nada). EPIC-015 introduce módulos on-demand, pero ninguna task había entrado a `in-progress`. Sin esto: cero venta de addon, cero pilots, cero diferenciación enterprise vs SMB. **Superado en parte — ver `## Delta 2026-08-09`: la máquina de módulos existe y corre; lo que falta es venderlos y asignarlos.**
 3. **Valor invisible al cliente** — Revenue Enabled (TASK-287), Nexa Pulse client-facing (TASK-432), QBR auto-generado (TASK-298), Reports Center (TASK-288), Brand Health (TASK-296) están specificados pero no buildeados. Sin estas surfaces, el VP Marketing del cliente no tiene argumento ante su CFO en el renewal.
 4. **Sin medición de retención/expansion** — Bow-tie (TASK-832/833/834) no implementado: NRR/GRR/Expansion Rate no computables. Forecast revenue ciego.
 5. **Streams nuevos parados** — Mercado Público (TASK-675..689) y Partnership programs (TASK-307..312) representan ticket promedio alto y revenue passive respectivamente; ninguno arrancó.
@@ -74,6 +74,8 @@ Salida T1: el equipo comercial puede emitir, firmar, registrar y sincronizar cot
 Convertir el Portal en SKU con SKUs adentro. Habilita addon, trial, pilot pagados y diferenciación enterprise vs SMB sin deploy.
 
 Carril completo: **EPIC-015 Client Portal Domain Consolidation** — `TASK-822 → TASK-823 → TASK-824 → TASK-825 → TASK-826 → TASK-827 → TASK-828 → TASK-829`.
+
+> **Estado al 2026-08-09:** `TASK-822`…`TASK-827` están `complete` y corriendo en producción; quedan `TASK-828` y `TASK-829`. El bloqueador del T2 pasó a ser comercial (decidir y asignar módulos), no de plataforma — ver `## Delta 2026-08-09`.
 
 Salida T2:
 - 10 módulos del portal cliente vendibles per-organization desde Admin Center.
@@ -199,3 +201,29 @@ Revenue cobrado atribuible a capacidades habilitadas por este orden, computado v
 - Bridge HubSpot ↔ Greenhouse (TASK-706/813/836/837) — deals cerrados con firma electrónica TASK-619 vs cerrados sin firma.
 
 Target inicial Q3 2026: NRR ≥ 100%, al menos 1 addon vendido vía portal cliente, 1 licitación pública convertida a deal.
+
+## Delta 2026-08-09 — el Tier 2 dejó de ser un problema de build
+
+El cuello de botella del T2 cambió de naturaleza y conviene no seguir priorizándolo como si fuera
+trabajo de plataforma.
+
+**Lo que ya existe y corre en producción** (`EPIC-015`, hijas `TASK-822`…`TASK-827` complete): schema
+`greenhouse_client_portal` con los 10 módulos seed, resolver canónico
+`resolveClientPortalModulesForOrganization`, menú del portal derivado de módulos (`TASK-1675`) y
+guard de página por módulo con empty state honesto y alcanzable (`TASK-1679`). El "Portal binario" del
+diagnóstico de mayo ya no es la realidad del runtime.
+
+**Lo que sigue abierto del carril T2**: `TASK-828` (cascade `engagement_commercial_terms.bundled_modules`
+→ assignments, que es exactamente el mecanismo anti revenue-leak que este epic reclama) y `TASK-829`
+(subsystem `Client Portal Health` + backfill legacy).
+
+**El bloqueador real del T2 ahora es comercial, no técnico.** `module_assignments` tenía 7 filas en toda
+su historia —todas de SEO / AI Visibility / Proposal Studio— y la primera asignación de Creative Hub
+ocurrió el 2026-08-09, a Sky Airlines, que es la única organización con Creative. La máquina de vender
+por módulo existe; nadie ha decidido el catálogo comercial ni asignado casi nada. Ese es el paso que
+mueve la métrica "al menos 1 addon vendido vía portal cliente", y no lo desbloquea otra task de
+plataforma.
+
+Un cabo suelto de forma que sí puede afectar el T2: rol y módulo son dimensiones ortogonales y hoy
+ninguna se aplica de punta a punta (`ISSUE-148` + `TASK-1685`). Antes de empaquetar SKUs finos conviene
+que esa decisión esté tomada, o el mismo módulo puede leerse distinto según por dónde entre el cliente.

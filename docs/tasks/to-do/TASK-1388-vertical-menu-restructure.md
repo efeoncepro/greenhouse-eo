@@ -18,6 +18,21 @@
   drawer abierto desborda 8px. Están registrados en los manifests de
   `.captures/2026-08-09T08-04-34_client-portal-menu-with-module` y su hermano negativo, que es el
   control que prueba que son globales y preexistentes.
+- **`VerticalMenu.tsx` es ahora la ÚNICA exención viva del lint `greenhouse/no-untokenized-business-line-branching`,
+  que `TASK-1680` promovió de `warn` a `error`.** El override block del final de `eslint.config.mjs` quedó
+  con ese solo path, deliberadamente: es deuda declarada con dueño, no una lista por si acaso. Al tocar el
+  archivo la exención te cubre, pero **no agregues branching de business line nuevo** fuera del bloque
+  `capabilityModules` ya declarado. El dueño de retirarla es el follow-up sin ID
+  `capability-modules-resolver-migration`; cuando ese trabajo migre el bloque al resolver, el override
+  desaparece completo — y si esta task lo toca antes, conviene no dejarlo más grande de lo que está.
+- **Se borró la copia muerta `src/components/layout/vertical/VerticalMenu (1).tsx`** (junto a otras 5 con el
+  mismo patrón ` (1).`, commit `d81447fd1`). El SoT del árbol es un único archivo; si algún inventario de
+  esta task listaba las dos, corregirlo.
+- **Coordinar con `TASK-1685`** (nueva, `to-do`): su Slice 2 hace que la composición del menú y el page
+  guard consuman **un mismo primitive** de visibilidad, y declara esta task en su §Impacta a por tocar
+  `VerticalMenu.tsx`. Si `TASK-1388` entra primero, conservar puntos de extensión limpios en la rama
+  no-interna; si entra `TASK-1685` primero, esa rama ya no resuelve visibilidad por su cuenta y este
+  rediseño hereda el primitive. La decisión de semántica de acceso **no** es de esta task.
 
 
 <!-- ═══════════════════════════════════════════════════════════

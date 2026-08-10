@@ -1,9 +1,9 @@
 # Production Release Incident Playbook V1
 
 > **Tipo de documento:** Playbook operativo canónico
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-05-12 por Claude Opus 4.7 (post incidente TASK-870)
-> **Ultima actualizacion:** 2026-08-06 por Claude Opus 5 (caso positivo release `70e912056273`)
+> **Ultima actualizacion:** 2026-08-09 por Claude Opus 5 (dos releases el mismo día: `2c87d71e2eca` + `ee0d568b8614`)
 > **Audience:** Cualquier agente AI (Claude, Codex, Cursor) y operadores humanos que enfrenten un `Production Release Orchestrator` fallando
 
 ---
@@ -91,7 +91,8 @@ Identifica:
 | `target_sha_exists` | SHA no existe en `main` o no fue pusheado | `git push origin main` |
 | `ci_green` | CI rojo en el SHA target | Investigar workflow run de CI, fix → push → wait CI verde |
 | `playwright_smoke` | 0 workflows smoke runs para el SHA | `gh workflow run playwright.yml --ref main` esperar a verde |
-| `release_batch_policy` | Mix de dominios irreversibles sin marker `[release-coupled: ...]` | Agregar el marker **abriendo una línea** del cuerpo del commit de squash (se lee sólo de ese commit, TASK-1676) OR usar `--override-batch-policy` (requiere capability + reason ≥20 chars) |
+| `release_batch_policy` **`split_batch`** | Dos dominios sensibles **independientes** mezclados sin documentar acoplamiento | Agregar el marker `[release-coupled: <razón>]` **abriendo una línea** del cuerpo del commit de squash (se lee sólo de ese commit, TASK-1676) OR partir en batches separados |
+| `release_batch_policy` **`requires_break_glass`** | El diff toca al menos un dominio **irreversible** (migraciones, schema, runtime de workers) | `--override-batch-policy` con reason ≥20 chars; la razón queda en `release_state_transitions.metadata_json`. ⚠️ **El marker `[release-coupled: …]` NO resuelve este caso** — ver la nota bajo la tabla |
 | `release_batch_policy` **`unknown`, "Diff vacío"** | El rango no contiene archivos: el `target_sha` coincide con el último release `released`, o falta `git fetch`/historia completa en el checkout | **NO es una aprobación** — verificar el `target_sha` y la base que declara el evidence (`diffBase`/`diffBaseSource`). Nunca bypassear esto como si fuera un `ship` |
 | `stale_approvals` | Run waiting > umbral en Production environment | Aprobar el run pendiente OR cancelar `gh run cancel` |
 | `pending_without_jobs` | Run queued/in_progress con `jobs.length === 0` (deadlock por concurrency) | Verificar `concurrency` setting per TASK-848; cancel el run trapped |
@@ -101,6 +102,19 @@ Identifica:
 | `gcp_wif_subject` | WIF federated credential desconfigurada | Verificar `az ad app federated-credential list` o `gcloud iam workload-identity-pools providers describe` |
 | `azure_wif_subject` | Mismo, pero Azure | `az ad app federated-credential list --id <client-id>` |
 | `sentry_critical_issues` | **El crítico — ver paso 3** | Investigar runtime, NO el gate |
+
+> ⚠️ **El marker `[release-coupled: …]` cubre `split_batch`, no `requires_break_glass`** (verificado en
+> `src/lib/release/preflight/batch-policy/classifier.ts` el 2026-08-09). El clasificador evalúa en orden:
+> primero busca dominios sensibles independientes mezclados **sin** marker → `split_batch`; después, si el
+> diff toca cualquier dominio irreversible → `requires_break_glass`, **con marker o sin él**. O sea: un
+> release con migraciones nunca llega a `ship` por escribir el marker. Hay un test que fija exactamente
+> esta precedencia (`classifier.test.ts`, "irreversibility wins over split").
+>
+> Corolario práctico, con los dos releases del 2026-08-09 como contraste limpio: el de la mañana
+> (`2c87d71e2eca`, con migraciones) pidió break-glass; el de la tarde (`ee0d568b8614`, **cero
+> migraciones**, 33 archivos) dio `ship` sin bypass. **Lo que decide es la presencia de un dominio
+> irreversible, no el tamaño del batch ni el marker.** Si vas a promover con migraciones, planifica el
+> break-glass desde el principio en vez de descubrirlo con el gate rojo.
 
 ### Paso 3 — Si la falla es `sentry_critical_issues`
 
@@ -152,7 +166,20 @@ gh workflow run production-release.yml --ref main \
   -f bypass_preflight_reason="<≥20 chars describiendo QUÉ se arregló, NO why se bypassa>"
 ```
 
-Bypass reason **no es** "bypass the gate". Es audit log para forensics futuros. Ejemplo bueno:
+> ⚠️ **La capability del bypass NO es un gate mecánico hoy** (verificado 2026-08-09).
+> `platform.release.bypass_preflight` y `platform.release.preflight.override_batch_policy` existen en el
+> catálogo de entitlements y se citan como requisito en el YAML del orquestador y en varios docs del control
+> plane, pero **no tienen grant en `runtime.ts` ni un solo `can()` que las verifique**: lo único que valida
+> el workflow es que la razón tenga ≥20 caracteres. O sea, la autorización del break-glass es hoy una
+> expectativa de gobernanza sobre el humano que dispara, no un control. Convertirlas en gate real (o
+> retirarlas del catálogo) es `TASK-1682`.
+>
+> Consecuencia práctica: **el peso del bypass lo carga la razón que escribes**, porque es lo único que queda.
+> Por eso la regla de abajo no es estética.
+
+Bypass reason **no es** "bypass the gate". Es audit log para forensics futuros. Y debe citar **hechos
+verificables por quien audite el manifest** (una fila de `pgmigrations`, un SHA de Cloud Run, un run de
+smoke), no adjetivos sobre el riesgo. Ejemplo bueno:
 - `"TASK-870: env GH App key fixed via vercel env update; AZURE_AD_CLIENT_ID added a ops-worker; smoke 5/5 verde"`
 
 Ejemplo malo:
@@ -256,6 +283,56 @@ del camino de producción.
   formal, registrar `no medido formalmente` + estimacion del operador si existe,
   y corregir el proceso para el siguiente release.
 
+### 9. Redactar la razón del bypass de `db_migrations` asumiendo que "dev" y producción son bases distintas
+
+**Caso real (2026-08-09, release `2c87d71e2eca`)**: hay **una sola instancia Cloud SQL**,
+`greenhouse-pg-dev`, y sirve a producción, staging y local. Una migración aplicada "en dev"
+**ya está aplicada para producción**: no queda undo pendiente ni backfill por correr, y el
+dominio irreversible del batch es reconciliación de archivos con un estado ya realizado.
+
+**Regla**: antes de escribir la razón de un break-glass que involucre `db_migrations`,
+comprobar el hecho en vez de opinarlo:
+
+```sql
+SELECT name, run_on FROM public.pgmigrations WHERE name LIKE '%<task-id>%';
+```
+
+Si ya están aplicadas, decirlo así en la razón auditada. Un bypass justificado con un hecho
+verificable vale para forensics; uno justificado con una suposición sobre la topología de la
+base, no. Comandos y contexto: `docs/operations/runbooks/production-release.md`, ítem "Una sola
+instancia Cloud SQL" de su lista de gotchas (no confundir con el gotcha #7 de la skill, que es el
+del staging `Canceled` — las dos numeraciones son distintas).
+
+### 10. Tratar `vercel redeploy` como el fix universal de un staging `Canceled`
+
+**Caso real (2026-08-09, release `ee0d568b8614`)**: el check `vercel_environments` exige que el
+deploy más reciente de staging esté `READY`. Cuando la cancelación la produjo el **Ignored Build
+Step** sobre un commit docs-only, `vercel redeploy` **reevalúa el mismo diff y vuelve a cancelar**
+— en segundos, con `The deployment has been canceled.`. El consejo del gotcha #7 sólo aplica
+cuando la cancelación tuvo otra causa.
+
+**Regla**: la salida es **producir un commit que el Ignored Build Step no clasifique como
+docs-only** (tocar un doc del set `deployControlDocs` sirve, y el hallazgo mismo suele necesitar
+documentarse de todos modos), no reintentar el build del mismo diff. Y la pre-empción real es de
+orden: **secuenciar los pushes docs-only para después del release**.
+
+**Lección de segundo orden, que es la más transferible**: un comando documentado como remedio
+puede ser correcto para la causa que lo originó y falso para la causa que tienes enfrente. Antes
+de repetir un remedio del catálogo, verificar que **la causa** coincide, no sólo el síntoma.
+
+### 11. Correr el context gate antes de terminar de editar la documentación
+
+**Caso real (2026-08-09, run `31340366010` rojo en `develop`)**: secuencia que falla y se siente
+correcta — `docs:context-check:strict` → 0/0 → agregar una entrada al changelog →
+`docs:closure-check` → 0 warnings → commit. El commit salió con `changelog.md` en 61 entradas y el
+CI lo rechazó. Los dos gates miran cosas distintas: `closure-check` audita si la documentación
+acompaña al cambio; **no** verifica techos de contexto.
+
+**Regla**: el context gate es lo **último** antes de commitear, y cualquier edición posterior a
+`Handoff.md` o `changelog.md` invalida su resultado. Orden seguro: todas las ediciones documentales
+→ `docs:closure-check` → `docs:context-rotate --apply` si hace falta → `docs:context-check:strict`
+→ commit. Fuente canónica del contrato: `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md`.
+
 ---
 
 ## Caso positivo 2026-08-06 — el release que no generó incidente
@@ -283,7 +360,7 @@ que es lo que este playbook debe enseñar:
 | Gotcha | Lo que se venía haciendo (reactivo) | Lo que se hizo (pre-emptivo) |
 |---|---|---|
 | #1 PR conflictivo | Descubrir el conflicto al crear el PR y pelearlo contra el reloj | `git merge origin/main -X ours --no-edit` en `develop` **antes** de crear el PR → PR MERGEABLE de entrada |
-| #2 batch policy | Aceptar `requires_break_glass` y pedir `bypass_preflight_reason` | Marker `[release-coupled: <razón>]` **abriendo una línea** del cuerpo del commit de squash → preflight del orquestador pasa `ship` sin bypass |
+| #2 batch policy | Aceptar `requires_break_glass` y pedir `bypass_preflight_reason` | Marker `[release-coupled: <razón>]` **abriendo una línea** del cuerpo del commit de squash → el check dejó de reportar `split_batch` (ver las dos correcciones de abajo: en su momento el `ship` no lo produjo el marker, y el marker nunca podía haber resuelto el `requires_break_glass` de un batch con 14 migraciones) |
 | #3 `playwright_smoke` ausente | Bypassear el check que no existe para el SHA de squash | `gh workflow run playwright.yml --ref main` y esperar verde (3m10s, run `31057847351`) → el check **existe de verdad** |
 
 > **Corrección posterior sobre el #2 (TASK-1676 / ISSUE-145, 2026-08-09).** Ese
@@ -295,6 +372,13 @@ que es lo que este playbook debe enseñar:
 > `unknown` en vez de `ship`, y el marker recién ahora se lee donde este playbook
 > dice que se lee. La técnica del #2 sigue siendo la correcta; lo que cambió es que
 > pasó a ser cierta.
+>
+> **Segunda corrección sobre el #2 (2026-08-09).** Aun con el diff bien computado, el
+> marker **no** habría producido `ship` en este release: 14 migraciones lo ponen en
+> `requires_break_glass`, y esa decisión ignora el marker por precedencia del
+> clasificador. La técnica del #2 sirve para el caso `split_batch` (mezcla de dominios
+> sensibles independientes) y para **nada más**. Detalle en la nota bajo la tabla del
+> Paso 2.
 
 Detalle del #1 que conviene no perder: hubo un conflicto **modify/delete** real
 (`TASK-1590` borrada en `develop` porque migró a `in-progress/`, modificada en
@@ -348,6 +432,29 @@ que falta?"**, no "¿cómo justifico saltármela?".
 
 Registro completo de tiempos y desglose por fase:
 `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md`, fila 2026-08-06.
+
+---
+
+## Los dos releases del 2026-08-09 — el par que aísla la variable
+
+El mismo día se promovieron dos releases (`2c87d71e2eca` y `ee0d568b8614`, ~1h20m de agente cada uno) y
+juntos forman el experimento controlado que este playbook no tenía:
+
+| | `2c87d71e2eca` (mañana) | `ee0d568b8614` (tarde) |
+|---|---|---|
+| Alcance | 74 archivos / 25 de código / **2 migraciones** | 33 archivos / **0 migraciones** |
+| `release_batch_policy` | `requires_break_glass` → bypass autorizado | **`ship` sin bypass** |
+
+**Lo que aísla el par: lo que dispara el break-glass es la presencia de un dominio irreversible, no el
+tamaño del batch ni el marker.** Comparado con el release de 355 commits y 14 migraciones del 2026-08-06,
+que también pedía break-glass, el patrón queda claro: el batch grande sin migraciones pasa limpio y el
+batch chico con migraciones no. Si vas a promover con migraciones, el break-glass es parte del plan desde
+el principio, no una sorpresa del gate.
+
+Los tres aprendizajes nuevos de esa jornada están como anti-patterns **#9** (la topología real de la base:
+una sola instancia Cloud SQL), **#10** (`vercel redeploy` no es universal) y **#11** (orden de los gates
+documentales). Detalle de tiempos, fases y hallazgos laterales: `PRODUCTION_RELEASE_TIMING_LEDGER.md`,
+las dos filas de 2026-08-09.
 
 ---
 

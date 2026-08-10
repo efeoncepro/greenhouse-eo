@@ -1,5 +1,25 @@
 # TASK-116 — Sidebar Navigation Audit & Remediation
 
+## Delta 2026-08-09
+
+Causado por `TASK-1675` / `TASK-1680` (complete, en producción) + solapamiento con `TASK-1388`.
+
+- **`VerticalMenu.tsx` ya no es sólo el árbol interno.** `TASK-1675` cableó el menú module-driven de la rama
+  **no-interna**: los ítems se resuelven per-org en `(dashboard)/layout.tsx` y llegan por la prop
+  `clientNavItems` con merge **aditivo**, y hay un test de identidad que lo fija
+  (`src/components/layout/vertical/VerticalMenu.test.tsx`). Los 20 hallazgos de esta auditoría son del árbol
+  **interno**; al mover labels a nomenclature no tocar la rama no-interna — un colaborador puro cae ahí y
+  reemplazar su lista base lo deja sin menú.
+- **El lint `greenhouse/no-untokenized-business-line-branching` está en `error` y `VerticalMenu.tsx` es su
+  única exención viva** (`eslint.config.mjs`, `TASK-1680`). La exención te cubre al editar el archivo, pero
+  no agregues branching de business line nuevo; su dueño de retiro es el follow-up
+  `capability-modules-resolver-migration`.
+- **Solapamiento con `TASK-1388`, que hoy es la task dueña de la superficie.** `TASK-1388` rediseña el mismo
+  sidebar (3 zonas, movimiento de `/my/*` al avatar, consolidación ⌘K) y ya rebasó sobre `TASK-1675`.
+  Decidir el orden antes de tomar cualquiera: los hallazgos de copy/IA de esta auditoría son **insumo** de
+  `TASK-1388`, no un segundo refactor del mismo archivo. Si `TASK-1388` entra primero, varios hallazgos de
+  acá se cierran de paso y hay que re-verificar cuáles quedan.
+
 ## Status
 
 - Lifecycle: `to-do`

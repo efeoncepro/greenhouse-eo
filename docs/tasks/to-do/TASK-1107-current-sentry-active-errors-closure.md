@@ -1,5 +1,25 @@
 # TASK-1107 — Current Sentry active errors closure
 
+## Delta 2026-08-09
+
+Causado por `TASK-1678` (complete, en producción). Afecta el Slice de `role_view_fallback_used`.
+
+- **Un emisor conocido de `role_view_fallback_used` se apagó, y ninguna vista cliente puede volver a
+  emitirlo.** `TASK-1678` invirtió el default del fallback para `view.routeGroup === 'client'`:
+  `computeRoleCanAccessViewFallback` ([src/lib/admin/view-access-store.ts](../../../src/lib/admin/view-access-store.ts))
+  retorna `false` antes de llegar al `captureMessageWithDomain`. El caso medido antes del cambio era
+  `cliente.ai_visibility_report` × los 3 roles cliente.
+- **Consecuencia para la remediación:** el volumen posterior al 2026-08-09 es carril **interno** (el caso
+  `roleCode=designer` que esta task ya identificó). No atribuir eventos nuevos a vistas cliente, y
+  **re-medir el conteo** antes de dimensionar la migración de grants: el baseline de este archivo es
+  anterior al cambio.
+- **Una vista `cliente.*` sin grant ya no se manifiesta como ruido de fallback sino como acceso ausente**,
+  y su detector propio no es Sentry: es la señal de reliability
+  `identity.view_access.client_role_without_grants`
+  (`src/lib/reliability/queries/client-role-without-view-grants.ts`). Si el discovery de esta task
+  encuentra un `cliente.*` sin fila, la remediación es un grant real, no una decisión de política de
+  fallback.
+
 ## Delta 2026-06-15
 
 - `rpa_median` / `JAVASCRIPT-NEXTJS-7H` (Slice 5) — la causa raíz quedó **code-complete** en `TASK-1106` (ahora `in-progress`, spec en `docs/tasks/in-progress/TASK-1106-…`). Migración de parity + reader canónico aplicados; runtime staging verificado sin `facetErrors` ni captura `account360.delivery.ico_serving`. Sigue asignado a `TASK-1106` / `ISSUE-087`; el quiet period de Sentry para esa familia se cierra junto con `TASK-1106`. No duplicar.

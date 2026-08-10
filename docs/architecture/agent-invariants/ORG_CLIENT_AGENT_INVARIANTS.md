@@ -194,9 +194,15 @@ que quedan son los que impiden que vuelva cualquiera de ellos.
   cliente y la página rebota antes del bypass. Fijado por
   `src/lib/client-portal/guards/no-route-group-gate-above-view-code-guard.test.ts`. Caso fuente:
   `/proyectos` era la única de las 9 páginas con ese resto de una migración incompleta.
-- **SIEMPRE** distinguir "el guard dice la verdad" de "la página abre". Medido el 2026-08-09 contra
-  las 4 organizaciones reales: 3 rutas abren (las base) y 6 muestran el empty state porque ningún
-  módulo asignado declara esas vistas. Abrirlas es un assignment, no un cambio de código.
+- **SIEMPRE** distinguir "el guard dice la verdad" de "la página abre". Cuántas abren **depende de los
+  assignments de cada organización, y cambia sin que cambie el código**: el mismo 2026-08-09, antes de
+  asignarle Creative a Sky Airlines las 4 organizaciones abrían 3 (las base) y mostraban el empty state
+  en 6; después, SKY abre 7 y las demás siguen en 3. Abrirlas es un assignment, no un cambio de código.
+- 🔴 **NUNCA** tomes un conteo de "cuántas abren" como expectativa fija. Derivalo de los datos (vista
+  base ∪ viewCodes que declaran los módulos vigentes de esa organización), que es lo que hace
+  `scripts/identity/client-portal-page-access-check.ts`. Su primera versión fijaba "3 y 6" y al
+  asignarle el módulo a SKY reportó cuatro desvíos **por hacer lo correcto**. Patrón canónico §7 de
+  `GREENHOUSE_CANONICAL_PATTERNS_V1.md`.
 
 **Spec canónica**: `GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md` §12.2 + §16. Issue: `ISSUE-146`. El carril
 rol→vista que corre **antes** de este guard (default cerrado para `client`, claim vacío, denials) vive

@@ -1,5 +1,30 @@
 # TASK-829 — Client Portal Reliability Signals + Legacy Backfill Idempotente
 
+## Delta 2026-08-09
+
+Causado por `TASK-1678` / `TASK-1679` (complete, en producción).
+
+- **El gap «No existen reliability queries para client_portal» quedó parcialmente cerrado: ya hay 3
+  readers vivos.** Revisarlos antes de escribir los 6 de esta task, para no duplicar ni contradecir:
+  - `identity.view_access.client_role_without_grants` — `src/lib/reliability/queries/client-role-without-view-grants.ts`
+  - `identity.client_portal.client_without_organization` — `src/lib/reliability/queries/client-user-without-organization.ts`
+  - `identity.client_portal.assigned_view_without_route` — `src/lib/reliability/queries/client-portal-assigned-view-without-route.ts`
+  Los tres están cableados en `src/lib/reliability/get-reliability-overview.ts` en el mismo bloque que el
+  scaffold `client_portal.composition.resolver_failure_rate` de `TASK-827`, **sin subsystem dedicado**.
+- **El Slice 2 (`Client Portal Health`) crece: pasa de crear un subsystem a crear + ADOPTAR.** El comentario
+  en `get-reliability-overview.ts` ya nombra a esta task como dueña de migrar
+  `clientPortalResolverFailureRate` a `moduleKey: 'client_portal'`; los 3 signals nuevos entran en la misma
+  migración. Nombres: los 3 vivos usan prefijo `identity.*` mientras esta task propone `client_portal.*` —
+  decidir si se renombran al adoptar (y si sí, tratarlo como cambio de identificador de señal, no como
+  refactor cosmético).
+- **La señal #2 propuesta acá (`lifecycle_module_drift`: org `active_client` con cero assignments activos)
+  subió de severidad práctica.** Post `TASK-1678`/`TASK-1679`, un cliente sin assignments no ve nada: el
+  page guard resuelve por módulo contratado —llaveado por `organizationId`— y el carril de rol dejó de
+  otorgar por default para vistas `cliente.*`. Ya no hay fallback permisivo que enmascare el drift, así que
+  esa señal pasó de «higiene» a detector de cliente ciego.
+- **El backfill del cohorte histórico hereda eso mismo:** cada organización legacy sin assignment
+  materializado es una organización sin portal, hoy, en producción.
+
 ## Status
 
 - Lifecycle: `to-do`

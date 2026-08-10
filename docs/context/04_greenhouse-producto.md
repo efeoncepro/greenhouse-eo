@@ -44,6 +44,8 @@ Es **multi-tenant**: cada organización cliente tiene su workspace aislado (mét
 
 Cada módulo es accesible por ruta y controlado por **capability flags por tenant** (un tenant puede tener módulos habilitados/deshabilitados).
 
+> **Para el lado cliente, la unidad de habilitación es el módulo contratado por organización, no el rol de la persona** (desde 2026-08). Lo que un cliente ve y puede abrir en su portal se decide por lo que su organización contrató; el rol de la persona modula qué tan lejos llega adentro. Consecuencia práctica al diseñar features client-facing: si el módulo no está asignado a esa organización, la superficie no aparece —y cuando alguien llega por link directo, la respuesta correcta es *"tu organización no tiene este módulo"*, no un error de servicio. Tres superficies son **portal base** y no se contratan: notificaciones, configuración de la cuenta y novedades del portal. El mecanismo exacto vive en el contrato técnico, no acá.
+
 ### 1. Dashboard del Cliente
 Resumen ejecutivo en tiempo real. KPIs: **RpA**, tareas completadas (30d), **OTD%**, presión de feedback. Visualizaciones: donut de estados de activos, cadencia semanal (12 sem), RpA por proyecto, tendencia OTD mensual, heatmap de capacidad del equipo, wallet de créditos AI, proyectos que requieren atención, salud del portafolio.
 
