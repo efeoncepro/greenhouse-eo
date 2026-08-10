@@ -22,7 +22,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -50,9 +50,9 @@ repartida entre el menú (que aplica el rol para 6 enlaces) y el page guard (que
 puerta lee **uno de los tres** insumos disponibles, así que un denial de rol y un `revoke` per-persona
 son ambos decorativos ahí. Esta task decide la semántica y la materializa en un solo lugar.
 
-> 🔴 **DECISIÓN DE DISEÑO PENDIENTE.** El Slice 1 es la decisión, y va **antes** de cualquier código.
-> No implementar la conjunción sin ella: con la puerta ya fail-closed, un `AND` naïve cierra **6 pares
-> medidos**, incluidas superficies que dos clientes contrataron. Medición completa en `ISSUE-148`.
+> ✅ **DECISIÓN TOMADA 2026-08-10** (operador, delegada a `arch-architect` + overlay del repo). Semántica
+> **(a′)**: el módulo autoriza, el `revoke` per-persona cierra, y **el menú consume el mismo predicado que
+> la puerta**. Rationale completo, medición y alternativas rechazadas en §Slice 1 más abajo.
 
 ## Why This Task Exists
 
@@ -234,9 +234,129 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — La decisión, y va primero
+### Slice 1 — La decisión (TOMADA 2026-08-10)
 
-Elegir la semántica. Las tres opciones, con su análisis ya hecho:
+> Lo que sigue es el registro de la decisión. El análisis previo de las tres opciones se conserva
+> más abajo porque es la evidencia sobre la que se decidió, no historia muerta.
+
+#### Medición de baseline (contra PG real, 2026-08-10)
+
+Reproduce ISSUE-148 y agrega tres hechos que el hallazgo no tenía:
+
+| Hecho | Valor | Consecuencia |
+|---|---|---|
+| Pares usuario × vista por módulo | 24 | idéntico a ISSUE-148 |
+| Pares sin grant de rol | 6 | idéntico a ISSUE-148 |
+| **Divergencia menú → puerta** (menú promete, puerta niega) | **36 pares, 8 de 8 usuarios** | el daño vivo |
+| **Divergencia puerta → menú** (alcanzable sólo por URL) | **0** | el merge aditivo de `TASK-1675` repone todo ítem de módulo |
+| Filas en `user_view_overrides` | **0** | el instrumento per-persona nunca se usó |
+| Usuarios `client_specialist`-only | **0** | los 3 denials de `TASK-285` no afectan a nadie hoy |
+
+Los 36 son la **lista base del menú**, que se gatea por rol e ignora el módulo: ANAM y Greenhouse Demo
+no tienen ningún módulo y sus 4 usuarios ven 6 enlaces muertos cada uno; los 3 usuarios reales de Sky
+Airlines ven "Ciclos" y "Analytics" muertos. Ninguno de los 36 es alcanzable: todos terminan en
+`/home?denied=…`.
+
+**Corrección a ISSUE-148:** el hallazgo dice que el hueco "va en las dos direcciones". Medido, la
+segunda dirección es **0**. La dirección que existe y duele es la contraria a la que el hallazgo
+enfatiza.
+
+#### D1 — Semántica elegida: **(a′)** — (a) extendida al menú
+
+```
+acceso(persona, vista) =
+    esSesiónInterna                                        → true          (bypass D1, se conserva)
+  ∨ ( ¬revocadaParaLaPersona(vista)
+      ∧ ( esVistaBase(vista) ∨ laOrgTieneUnMóduloQueLaDeclara(vista) ) )
+```
+
+Un solo predicado puro. El page guard, la lista base del menú y el ⌘K pasan a ser **consumers**;
+ninguno vuelve a resolver por su cuenta.
+
+**Por qué (a′) y no (a) literal.** (a) tal como estaba redactada arregla la puerta, pero la puerta ya
+coincide con el menú en los 24 pares del módulo. Lo que diverge son los 36 de la lista base, que (a)
+no toca. Implementar (a) literal dejaría la señal del Slice 3 naciendo en 36 y el criterio de
+aceptación *"lo que el menú muestra y lo que la puerta abre coinciden"* incumplido. Extender el
+predicado al menú **no es scope creep**: es textualmente el criterio de aceptación de esta task
+(*"el guard y la composición del menú lo consumen"*).
+
+**Rechazadas.** **(b) conjunción con grant per-rol** — cerraría los 6 pares medidos (superficies que
+Sky y Berel contrataron), convierte cada assignment comercial en un cambio de dos tablas, y su modo
+de fallo es *"el cliente pagó y no entra, en silencio"*; además no arregla ninguno de los 36.
+**(c) statu quo** — deja 36 enlaces muertos vivos y conserva la ambigüedad que originó el hallazgo.
+
+**Sin feature flag, y es decisión deliberada.** El patrón canónico *flag default-OFF + shadow + flip*
+existe para cambios que pueden quitar acceso. Acá está medido que no lo hacen: el lado puerta sólo
+agrega la condición de `revoke` sobre una tabla **vacía** (delta de acceso = 0 exacto), y el lado menú
+sólo deja de mostrar enlaces que **ya no abrían**. Un flag agregaría un segundo camino de código y un
+paso de rollout para un delta medido de cero. Rollback = `revert PR + redeploy`, <5 min.
+
+**La lista base conserva su presentación.** Cambia **quién decide su visibilidad**, no cómo se ve:
+label con subtítulo, icono y href siguen donde están. Reemplazarla por ítems del composer habría
+perdido los subtítulos y habría dependido de que `VIEW_CODE_NAV_DESCRIPTOR` cubriera cada viewCode —
+riesgo de que Sky **pierda** ítems, que es exactamente lo prohibido.
+
+**Ubicación del primitive:** `src/lib/client-portal/visibility/` (no `composition/`, que es
+presentación). El split puro/server replica el precedente canonizado
+`menu-builder-shape.ts` ↔ `menu-builder.ts`: el menú y el ⌘K son Client Components y no pueden
+importar `server-only`.
+
+#### D2 — Los 9 denials de rol: retirados en efecto, ninguna fila borrada
+
+**La intención estaba escrita**; no hizo falta inferirla ni preguntarla. Está en las propias
+migraciones, y dice **dos cosas distintas** — conflatarlas es lo que hacía la pregunta difícil:
+
+- **6 denials** (`migration:TASK-1310`, 2026-08-08, `growth_seo_dashboard` + `growth_seo_report` × 3
+  roles) — la migración lo declara literalmente: *"Estos códigos son module-gated. Persistir denials
+  explícitos evita que **el fallback del route group** los convierta en visibilidad por rol."* No son
+  negación de acceso: son **plomería defensiva contra el default permisivo**. Ese default ya no
+  existe — `TASK-1678` lo invirtió para el routeGroup `client`. Quedaron vestigiales por
+  construcción: bajo el default invertido, `granted=FALSE` y *"sin fila"* son **semánticamente
+  idénticos** para una vista `cliente.*`.
+- **3 denials** (`migration:TASK-285`, 2026-04-16, `client_specialist` pierde `analytics`, `campanas`,
+  `equipo`) — *"Differentiates client_specialist from client_executive / client_manager"*, con
+  `revoke_role` en `view_access_log` y referencia a §12.5 de la arquitectura. Eso **sí** era intención
+  de producto per-rol.
+
+**Decisión:** bajo (a′) el carril de rol deja de gobernar `cliente.*` por completo. Verificado que
+**ningún** API route ni reader gatea vistas cliente por `authorizedViews`, así que apagarlo no tiene
+más consecuencias que el menú y el ⌘K, que pasan al primitive. Las 9 filas **no se borran**
+(`role_view_assignments` es append-only por invariante de esta task); quedan inertes, y la intención
+recuperada se escribe en `view_access_log` vía migración.
+
+**Lo que Efeonce renuncia, dicho explícitamente para que no se pierda en silencio:** la
+diferenciación per-rol del portal cliente (el intento de `TASK-285`) queda sin carril. Hoy no afecta a
+nadie — no existe ningún usuario `client_specialist`-only. Cuando exista un caso real, el instrumento
+es **`user_view_overrides` per-persona** (ya existe, con `reason` y `expires_at`, y la puerta lo honra
+desde esta task), **NUNCA** un deny per-rol: un deny per-rol sobre una vista que el módulo concede
+reintroduce la paradoja de que *ganar un rol te quita acceso*, porque el rol es un conjunto que se
+acumula. El seam para agregarlo está nombrado en el primitive; no se implementa ahora porque no hay
+un solo consumidor que lo ejercite y un input que nadie ejerce deriva.
+
+#### D3 — `/creative-hub`: retirar el viewCode del bundle, en task hermana
+
+No entra en esta task. `greenhouse_client_portal.modules` es append-only
+(`modules_append_only_check`), así que retirar `cliente.creative_hub` exige un `creative_hub_globe_v2`
++ supersede de la asignación de SKY: es un cambio de **catálogo comercial**, no de semántica de
+autorización. Mezclarlos haría que un revert de esta task tocara el bundle de un cliente. SKY conserva
+`creative_hub_globe_v1` íntegro y sus otras 5 vistas — **nunca** se le quita el módulo. La señal
+`identity.client_portal.assigned_view_without_route` lo sigue nombrando en 1 mientras tanto, que es el
+comportamiento honesto que esa señal fue diseñada para dar.
+
+#### Relación con `TASK-286` — resuelta, sin trabajo pendiente
+
+Ya está coordinada: `TASK-286` tiene su `## Delta 2026-08-09` que la bloquea explícitamente hasta esta
+decisión. Con (a′) tomada, la respuesta para esa task es: **el carril de views por rol no gobierna
+vistas `cliente.*`**, así que registrar 10 viewCodes nuevos + sembrar grants per-rol no produce acceso.
+Si esas 10 superficies deben ser alcanzables, el carril es **declararlas en el módulo que las vende**.
+La decisión queda escrita en su Delta al cerrar esta task.
+
+---
+
+<details>
+<summary>Análisis previo de las tres opciones (evidencia sobre la que se decidió)</summary>
+
+Las tres opciones, con su análisis original:
 
 **(a) El rol NO gatea la puerta; la dimensión persona se expresa con `revoke`.**
 
@@ -262,11 +382,13 @@ decorativo" a "cliente pagó y no entra, en silencio".
 Sólo corregir el framing y dejar los carriles como están. Barato; conserva la ambigüedad que originó
 este hallazgo y deja 9 controles inertes en la base.
 
-Salidas obligatorias del slice, además de la opción elegida:
+Salidas obligatorias del slice, además de la opción elegida — **las tres cerradas arriba**:
 
-- **la intención de los 9 denials de rol**, preguntada a quien pueda saberla, no inferida;
-- si la respuesta es "curación de menú", el instrumento correcto para eso (¿el rol? ¿otra cosa?);
-- la relación con `TASK-286`, que propone capabilities finas sobre el mismo carril.
+- la intención de los 9 denials de rol → recuperada del registro escrito en sus migraciones (D2);
+- el instrumento correcto para la dimensión persona → `user_view_overrides`, per-persona (D2);
+- la relación con `TASK-286` → resuelta, sin trabajo pendiente.
+
+</details>
 
 ### Slice 2 — El primitive único
 
@@ -336,9 +458,13 @@ singular no la tiene, y `user_view_overrides` ya es per-persona, con `reason` y 
 
 ### Feature flags / cutover
 
-Un flag default-OFF **sí** es defendible acá, al contrario que en `TASK-1678`: ese cambio sólo podía
-cerrar de más en un carril que ya estaba contenido, mientras éste puede **quitar acceso a un cliente
-real**. Un shadow mode que mida la divergencia sin cerrar nada es el camino seguro si se elige (b).
+**Decidido 2026-08-10: sin flag.** El razonamiento de abajo (*"un flag default-OFF sí es defendible
+acá… porque éste puede quitar acceso a un cliente real"*) era correcto **para la opción (b)**, que fue
+descartada. Con (a′) el delta de acceso está medido en **cero**: el lado puerta agrega la condición de
+`revoke` sobre una tabla vacía, y el lado menú sólo deja de mostrar enlaces que ya no abrían. Un flag
+agregaría un segundo camino de código y un paso de rollout para un cambio que no puede quitar acceso.
+El shadow mode que el flag habría dado ya lo entrega el **Slice 3, que va primero**: la señal mide 36
+antes y 0 después.
 
 ### Rollback plan per slice
 
@@ -408,10 +534,17 @@ quien los sembró.
 
 ## Open Questions
 
-1. **¿Qué intención tenían los 9 denials de rol sobre vistas cliente?** Es la pregunta que decide entre
-   (a) y (b). La evidencia sugiere curación de menú, pero es inferencia — ver `ISSUE-148`.
-2. **¿Efeonce necesita restringir vistas por persona dentro de una organización cliente?** Si la
-   respuesta es no, (a) es claramente correcta y los denials se retiran. Si es sí, hay que decidir si el
-   instrumento es `user_view_overrides` (per-persona, ya existe) o algo per-rol.
-3. **¿Cómo se relaciona esto con `TASK-286`?** Esa task propone capabilities finas sobre el carril de
-   views; si se toma, puede sustituir parte de esta decisión. Coordinar antes de codificar.
+**Las tres cerradas el 2026-08-10 en el Slice 1.**
+
+1. ~~¿Qué intención tenían los 9 denials de rol?~~ → **Resuelta con registro escrito, no inferencia.**
+   Son dos grupos con intenciones opuestas: 6 son plomería anti-fallback ya vestigial
+   (`migration:TASK-1310`), 3 son diferenciación de producto per-rol (`migration:TASK-285`). Ver D2.
+2. ~~¿Efeonce necesita restringir vistas por persona dentro de una organización cliente?~~ → **Hoy no**
+   (0 filas en `user_view_overrides`, 0 usuarios `client_specialist`-only). El instrumento queda
+   habilitado y enforceable para cuando haga falta: `user_view_overrides` per-persona. Ver D2.
+3. ~~¿Cómo se relaciona con `TASK-286`?~~ → **Resuelta, sin trabajo pendiente.** Ver §"Relación con
+   `TASK-286`" en el Slice 1.
+
+Lo que **deliberadamente NO se decidió**: si la diferenciación per-rol del portal cliente debe volver
+algún día, y con qué instrumento concreto más allá de "per-persona". Se declara el seam, no se
+construye. La renuncia está escrita en D2 para que sea una decisión visible y no una omisión.

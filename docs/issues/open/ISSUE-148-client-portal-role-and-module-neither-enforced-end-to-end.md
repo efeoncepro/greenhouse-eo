@@ -62,6 +62,45 @@ El hueco va en **las dos direcciones**:
 - un **denial de rol no cierra la puerta** sobre una vista que el módulo concede;
 - un **grant de módulo hace visible** lo que el rol niega, vía el merge aditivo del menú.
 
+### Delta 2026-08-10 — medido: sólo una de las dos direcciones existe, y no es la que este hallazgo enfatiza
+
+Al tomar `TASK-1685` se midió la divergencia menú↔puerta completa, no sólo los pares del módulo:
+
+| Dirección | Pares | Usuarios |
+|---|---|---|
+| menú **promete** y puerta **niega** (enlace muerto) | **36** | **8 de 8** |
+| puerta **abre** y menú **oculta** (alcanzable sólo por URL) | **0** | — |
+
+La segunda dirección es **0** en la práctica: el merge aditivo de `TASK-1675` repone todo ítem de
+módulo, así que un denial de rol nunca llega a ocultar lo que el módulo concede. Lo que sí existe es
+lo contrario, y es más grande de lo que este hallazgo describe: la **lista base del menú** se gatea
+por rol e **ignora el módulo**, así que promete páginas que la puerta niega. ANAM y Greenhouse Demo no
+tienen ningún módulo y sus 4 usuarios ven 6 enlaces muertos cada uno; los 3 usuarios reales de Sky
+Airlines ven "Ciclos" y "Analytics" muertos. Los 36 terminan en `/home?denied=…`.
+
+Consecuencia para el diseño: arreglar sólo la puerta (la opción (a) tal como estaba redactada) **no**
+alcanza el criterio *"lo que el menú muestra y lo que la puerta abre coinciden"*. El primitive tiene
+que gobernar también la lista base. Decisión completa en `TASK-1685` §Slice 1.
+
+### Delta 2026-08-10 — la intención de los 9 denials SÍ estaba registrada
+
+La §"Qué intención tenían los 9 denials de rol" de más abajo dice que es inferencia y que hay que
+preguntarle a quien los sembró. No hace falta: **está escrita en las propias migraciones**, y son
+**dos grupos con intenciones opuestas**. Conflatarlos es lo que hacía la pregunta difícil.
+
+- **6** (`migration:TASK-1310`, `growth_seo_*` × 3 roles) — *"Estos códigos son module-gated.
+  Persistir denials explícitos evita que **el fallback del route group** los convierta en visibilidad
+  por rol."* No son negación de acceso: son plomería defensiva contra el default permisivo, y ese
+  default ya no existe (`TASK-1678` lo invirtió). Bajo el default invertido, `granted=FALSE` y "sin
+  fila" son **semánticamente idénticos** para una vista `cliente.*`.
+- **3** (`migration:TASK-285`, `client_specialist` pierde `analytics`/`campanas`/`equipo`) —
+  *"Differentiates client_specialist from client_executive / client_manager"*, con `revoke_role` en
+  `view_access_log`. Eso **sí** era intención de producto per-rol. Hoy no afecta a nadie: no existe
+  ningún usuario `client_specialist`-only.
+
+También medido: `user_view_overrides` tiene **0 filas**. El instrumento per-persona nunca se usó, así
+que hacer que el `revoke` cierre la puerta es hoy un no-op con delta de acceso exactamente cero.
+
 ### El caso que NO es explotable hoy, y por qué conviene saberlo
 
 `cliente.campanas` y `cliente.equipo` están negadas a `client_specialist`, y el bundle
