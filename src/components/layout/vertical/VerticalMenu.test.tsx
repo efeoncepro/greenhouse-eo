@@ -215,6 +215,57 @@ describe('VerticalMenu — merge aditivo de módulos contratados (TASK-1675)', (
 })
 
 /**
+ * TASK-1686 — contrato de audiencias de la rama no-interna.
+ *
+ * Control de NO-regresión para las audiencias que esta task tiene PROHIBIDO
+ * cambiar. La decisión pineada en la spec (auditoría 2026-08-10): my+client
+ * conserva su salida VIGENTE byte-a-byte — rail cliente MÁS los bloques
+ * `isMyUser` actuales (home `/my` + sección Mi Ficha). El predicado
+ * collaborator-puro nunca recorta a un híbrido.
+ */
+describe('VerticalMenu — contrato de audiencias no-internas (TASK-1686)', () => {
+  const MY_CLIENT_SESSION = {
+    data: {
+      user: {
+        routeGroups: ['my', 'client'],
+        roleCodes: ['collaborator', 'client_executive'],
+        authorizedViews: [],
+        portalHomePath: '/home',
+        organizationId: 'org-hibrida'
+      }
+    }
+  }
+
+  it('my+client conserva la salida vigente: rail cliente MÁS home /my y sección Mi Ficha', () => {
+    useSessionMock.mockReturnValue(MY_CLIENT_SESSION)
+
+    const menuData = renderMenu([])
+    const hrefs = collectHrefs(menuData)
+    const sections = collectSectionLabels(menuData)
+
+    // Lado cliente (conducta vigente con claims vacíos → fallbacks permisivos)
+    expect(hrefs).toContain('/proyectos')
+    expect(hrefs).toContain('/campanas')
+    expect(sections).toContain('Mi Cuenta')
+
+    // Lado personal (bloques isMyUser actuales)
+    expect(hrefs).toContain('/my')
+    expect(hrefs).toContain('/my/assignments')
+    expect(sections).toContain('Mi Ficha')
+  })
+
+  it('client puro (sin routeGroup my) no recibe home /my ni sección Mi Ficha', () => {
+    useSessionMock.mockReturnValue(CLIENT_SESSION)
+
+    const menuData = renderMenu([])
+    const hrefs = collectHrefs(menuData)
+
+    expect(hrefs).not.toContain('/my')
+    expect(collectSectionLabels(menuData)).not.toContain('Mi Ficha')
+  })
+})
+
+/**
  * TASK-1388 — identidad de la rama INTERNA tras el reequilibrio.
  *
  * El contrato: mismas hojas que antes (cero cambios de URL ni de gating),
