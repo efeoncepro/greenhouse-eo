@@ -39,23 +39,34 @@ test.describe('TASK-753 discoverability — menu + tab cross-link', () => {
     expect(content).toMatch(/paymentProfile:\s*\{\s*label:\s*'Mi Cuenta de Pago'/)
   })
 
-  test('VerticalMenu wires Mi Cuenta de Pago in both expanded + collapsed blocks', async () => {
+  test('the personal nav builder wires Mi Cuenta de Pago for both surfaces', async () => {
+    // TASK-1388 — el SoT de las hojas /my/* dejó de ser dos bloques duplicados
+    // dentro de VerticalMenu: es el builder canónico `buildMyNavItems`,
+    // consumido por las DOS superficies (dropdown del avatar para internos +
+    // rail del colaborador puro). La discoverability que TASK-753 protege se
+    // verifica ahora contra ese contrato.
     const fs = await import('node:fs/promises')
     const path = await import('node:path')
-    const menuPath = path.resolve(process.cwd(), 'src/components/layout/vertical/VerticalMenu.tsx')
-    const content = await fs.readFile(menuPath, 'utf8')
 
-    // Should have 2 occurrences of the href (full menu + collapsed)
-    const hrefMatches = content.match(/href:\s*'\/my\/payment-profile'/g)
+    const builder = await fs.readFile(path.resolve(process.cwd(), 'src/lib/navigation/my-nav-items.ts'), 'utf8')
 
-    expect(hrefMatches).not.toBeNull()
-    expect(hrefMatches!.length).toBeGreaterThanOrEqual(2)
+    expect(builder).toMatch(/href:\s*'\/my\/payment-profile'/)
+    expect(builder).toMatch(/viewCode:\s*'mi_ficha\.mi_cuenta_pago'/)
 
-    // Should have 2 occurrences of the canSeeView gate
-    const gateMatches = content.match(/canSeeView\('mi_ficha\.mi_cuenta_pago'/g)
+    // Ambas superficies consumen el builder — sin esto, una de las dos pierde
+    // la hoja en silencio.
+    const verticalMenu = await fs.readFile(
+      path.resolve(process.cwd(), 'src/components/layout/vertical/VerticalMenu.tsx'),
+      'utf8'
+    )
 
-    expect(gateMatches).not.toBeNull()
-    expect(gateMatches!.length).toBeGreaterThanOrEqual(2)
+    const userDropdown = await fs.readFile(
+      path.resolve(process.cwd(), 'src/components/layout/shared/UserDropdown.tsx'),
+      'utf8'
+    )
+
+    expect(verticalMenu).toContain('buildMyNavItems')
+    expect(userDropdown).toContain('buildMyNavItems')
   })
 
   test('MyProfileView includes "Cuenta de pago" tab', async () => {
