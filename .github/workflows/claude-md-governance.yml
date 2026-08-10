@@ -19,6 +19,7 @@ on:
       - 'CLAUDE.md'
       - 'docs/architecture/**'
       - 'scripts/ci/claude-md*.mjs'
+      - 'scripts/ci/claude-md-content-allowlist.txt'
       - '.github/workflows/claude-md-governance.yml'
   push:
     branches:
@@ -28,6 +29,7 @@ on:
       - 'CLAUDE.md'
       - 'docs/architecture/**'
       - 'scripts/ci/claude-md*.mjs'
+      - 'scripts/ci/claude-md-content-allowlist.txt'
       - '.github/workflows/claude-md-governance.yml'
 
 permissions:
