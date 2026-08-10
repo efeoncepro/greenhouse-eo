@@ -37,6 +37,7 @@ import {
 import { getClientPortalResolverFailureRateSignal } from './queries/client-portal-resolver-failure-rate'
 import { getClientRoleWithoutViewGrantsSignal } from './queries/client-role-without-view-grants'
 import { getClientPortalAssignedViewWithoutRouteSignal } from './queries/client-portal-assigned-view-without-route'
+import { getClientPortalMenuGateDivergenceSignal } from './queries/client-portal-menu-gate-divergence'
 import { getClientUserWithoutOrganizationSignal } from './queries/client-user-without-organization'
 import { getEntraWebhookSubscriptionHealthSignal } from './queries/entra-webhook-subscription-health'
 import { getExpensePaymentsClpDriftSignal } from './queries/expense-payments-clp-drift'
@@ -891,6 +892,7 @@ interface ReliabilityOverviewSources {
   clientRoleWithoutViewGrants?: ReliabilitySignal | null
   clientUserWithoutOrganization?: ReliabilitySignal | null
   clientPortalAssignedViewWithoutRoute?: ReliabilitySignal | null
+  clientPortalMenuGateDivergence?: ReliabilitySignal | null
 
   /**
    * TASK-613 Slice 3 — Finance Clients ↔ Organization canonical link signal:
@@ -1259,6 +1261,8 @@ export const buildReliabilityOverview = (
     ...(sources.clientRoleWithoutViewGrants ? [sources.clientRoleWithoutViewGrants] : []),
     ...(sources.clientUserWithoutOrganization ? [sources.clientUserWithoutOrganization] : []),
     ...(sources.clientPortalAssignedViewWithoutRoute ? [sources.clientPortalAssignedViewWithoutRoute] : []),
+    // TASK-1685 Slice 3 — el menú ofrece algo que la puerta niega (o al revés). Steady = 0.
+    ...(sources.clientPortalMenuGateDivergence ? [sources.clientPortalMenuGateDivergence] : []),
     // TASK-613 Slice 3 — Finance Clients ↔ Organization canonical link signal.
     ...(sources.financeClientProfileUnlinked ? [sources.financeClientProfileUnlinked] : []),
     // TASK-841 — Nubox raw/conformed/projection freshness.
@@ -2224,6 +2228,14 @@ export const getReliabilityOverview = async (
       ? preloadedSources.clientPortalAssignedViewWithoutRoute
       : await getClientPortalAssignedViewWithoutRouteSignal().catch(() => null)
 
+  // TASK-1685 Slice 3 — divergencia entre lo que el menu del portal cliente OFRECE y lo que la
+  // puerta ABRE. Es el invariante que ISSUE-148 encontro roto (36 pares medidos, 8 de 8
+  // usuarios) y que ninguna de las dos mitades podia observar desde la otra. Steady = 0.
+  const clientPortalMenuGateDivergence =
+    preloadedSources.clientPortalMenuGateDivergence !== undefined
+      ? preloadedSources.clientPortalMenuGateDivergence
+      : await getClientPortalMenuGateDivergenceSignal().catch(() => null)
+
   // TASK-613 Slice 3 — Finance Clients ↔ Organization canonical link signal.
   // Single reader; degrada honestamente a `unknown` si la query falla.
   const financeClientProfileUnlinked =
@@ -2685,6 +2697,7 @@ export const getReliabilityOverview = async (
     clientRoleWithoutViewGrants,
     clientUserWithoutOrganization,
     clientPortalAssignedViewWithoutRoute,
+    clientPortalMenuGateDivergence,
     financeClientProfileUnlinked,
     nuboxSourceFreshness,
     notionConformedDrainFreshness,
