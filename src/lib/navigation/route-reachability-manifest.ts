@@ -23,6 +23,15 @@
  * Mockup routes (`**​/mockup/**`) are excluded.
  */
 
+/**
+ * TASK-1389 — superficie de navegación donde vive el destino (Contrato de
+ * Asignación de Superficies). Opcional: las rutas que son ítems literales del
+ * rail no la declaran (su superficie ES el sidebar); se usa para rutas cuya
+ * superficie no es obvia desde el `via` (p.ej. las `/my/*` del avatar).
+ * El gate `pnpm nav:budget` cross-checkea que ninguna `/my/*` declare 'sidebar'.
+ */
+export type NavSurface = 'sidebar' | 'avatar' | 'command-palette' | 'shortcuts'
+
 export type ChildRouteVia =
   | 'header-cta'
   | 'row-action'
@@ -41,6 +50,9 @@ export interface ChildRouteDeclaration {
   via: ChildRouteVia
   /** Why it's a sub-action and not its own menu item. */
   reason: string
+
+  /** TASK-1389 — superficie donde vive el destino (ver NavSurface). */
+  surface?: NavSurface
 }
 
 /**
@@ -461,19 +473,19 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
   // de VerticalMenu (el colaborador puro conserva su sección "Mi Ficha"), así
   // que el gate no las marcaría huérfanas — estas declaraciones documentan la
   // superficie interna vigente, que es el contrato que el gate protege.
-  { route: '/my/assignments', parent: '/home', via: 'avatar-dropdown', reason: AVATAR_REHOME_REASON },
-  { route: '/my/performance', parent: '/home', via: 'avatar-dropdown', reason: AVATAR_REHOME_REASON },
-  { route: '/my/delivery', parent: '/home', via: 'avatar-dropdown', reason: AVATAR_REHOME_REASON },
-  { route: '/my/profile', parent: '/home', via: 'avatar-dropdown', reason: AVATAR_REHOME_REASON },
-  { route: '/my/payroll', parent: '/home', via: 'avatar-dropdown', reason: AVATAR_REHOME_REASON },
-  { route: '/my/contractor', parent: '/home', via: 'avatar-dropdown', reason: AVATAR_REHOME_REASON },
-  { route: '/my/offers', parent: '/home', via: 'avatar-dropdown', reason: AVATAR_REHOME_REASON },
-  { route: '/my/contracts', parent: '/home', via: 'avatar-dropdown', reason: AVATAR_REHOME_REASON },
-  { route: '/my/payment-profile', parent: '/home', via: 'avatar-dropdown', reason: AVATAR_REHOME_REASON },
-  { route: '/my/leave', parent: '/home', via: 'avatar-dropdown', reason: AVATAR_REHOME_REASON },
-  { route: '/my/goals', parent: '/home', via: 'avatar-dropdown', reason: AVATAR_REHOME_REASON },
-  { route: '/my/evaluations', parent: '/home', via: 'avatar-dropdown', reason: AVATAR_REHOME_REASON },
-  { route: '/my/organization', parent: '/home', via: 'avatar-dropdown', reason: AVATAR_REHOME_REASON }
+  { route: '/my/assignments', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
+  { route: '/my/performance', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
+  { route: '/my/delivery', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
+  { route: '/my/profile', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
+  { route: '/my/payroll', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
+  { route: '/my/contractor', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
+  { route: '/my/offers', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
+  { route: '/my/contracts', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
+  { route: '/my/payment-profile', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
+  { route: '/my/leave', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
+  { route: '/my/goals', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
+  { route: '/my/evaluations', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
+  { route: '/my/organization', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON }
 ]
 
 export const DECLARED_CHILD_ROUTE_PATHS: readonly string[] = DECLARED_CHILD_ROUTES.map(d => d.route)
