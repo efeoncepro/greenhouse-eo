@@ -139,9 +139,31 @@ Tres roles definidos en `src/config/role-codes.ts`:
 - Los tres roles mapean al **mismo route group**: `['client']` (`src/lib/tenant/role-route-mapping.ts`).
 - Los roles cliente tienen la prioridad mas baja en `ROLE_PRIORITY`, despues de todos los roles internos.
 
-### Diferenciacion de roles (TASK-285, 2026-04-16)
+### Diferenciacion de roles (TASK-285, 2026-04-16) — ⛔ RETIRADA el 2026-08-10
 
-La diferenciacion se implementa via `role_view_assignments` en `greenhouse_core`, NO via route groups separados. Los tres roles comparten route group `['client']` pero tienen asignaciones de view codes distintas:
+> **Esta subsección describe un mecanismo que ya no existe.** Se conserva porque explica de dónde salen
+> las filas que siguen en la tabla, **no** como contrato. `TASK-1685` (decisión (a′), cierra `ISSUE-148`)
+> retiró `role_view_assignments` como carril de las vistas `cliente.*`: ni las otorga ni las niega.
+>
+> **Lo vigente:**
+> ```
+> acceso = interna ∨ ( ¬revocadaParaLaPersona ∧ ( vistaBase ∨ móduloDeLaOrgLaDeclara ) )
+> ```
+> Un solo primitive (`src/lib/client-portal/visibility/`) consumido por el page guard, la lista base del
+> menú, el ⌘K y los layouts de ruta. **Dentro de una misma organización, los tres roles cliente ven lo
+> mismo.** Contrato: `GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md` §12.1 y §12.2.
+>
+> **La "Cadena de enforcement" de más abajo es la parte que más desorienta**, y su paso 3 nunca fue del
+> todo cierto: `requireViewCodeAccess` —el page guard canónico desde `TASK-827`— nunca leyó
+> `authorizedViews`. De las 3 vistas negadas al specialist, sólo `/campanas` tenía además un layout que
+> gateaba por rol; `/equipo` y `/analytics` no. Hoy los cuatro layouts del portal consumen el primitive.
+>
+> **NUNCA** sembrar `granted=TRUE` en `role_view_assignments` esperando habilitar una vista cliente: no
+> la hace alcanzable. El carril es declararla en el `view_codes[]` del módulo que la vende. El lint
+> `greenhouse/no-client-portal-view-visibility-bypass` está en `error`. Para el portal **interno** este
+> carril sigue siendo el canónico y nada de esto le aplica.
+
+La diferenciacion se implementaba via `role_view_assignments` en `greenhouse_core`, NO via route groups separados. Los tres roles comparten route group `['client']` y tenian asignaciones de view codes distintas — las filas siguen en la tabla (append-only) y hoy son inertes:
 
 | View Code | client_executive | client_manager | client_specialist |
 |-----------|:---:|:---:|:---:|
@@ -157,17 +179,29 @@ La diferenciacion se implementa via `role_view_assignments` en `greenhouse_core`
 | cliente.configuracion | granted | granted | granted |
 | cliente.notificaciones | granted | granted | granted |
 
-**Cadena de enforcement:**
-1. Login → `resolveAuthorizedViewsForUser()` lee `role_view_assignments` → JWT.authorizedViews
-2. Menu → `canSeeView()` en VerticalMenu.tsx filtra items por `authorizedViews`
-3. Page guard → `hasAuthorizedViewCode()` en cada page bloquea acceso directo y redirige a portalHomePath
+**Cadena de enforcement (histórica — ⛔ ninguno de los 3 pasos gobierna hoy una vista `cliente.*`):**
+1. ~~Login → `resolveAuthorizedViewsForUser()` lee `role_view_assignments` → JWT.authorizedViews~~ — el
+   claim se sigue derivando, pero ya no gobierna vistas cliente.
+2. ~~Menu → `canSeeView()` en VerticalMenu.tsx filtra items por `authorizedViews`~~ — reemplazado por el
+   primitive (`TASK-1685`). Antes de eso ocultaba las 3 vistas, y por eso el hueco del paso 3 pasó
+   desapercibido cuatro meses.
+3. ~~Page guard → `hasAuthorizedViewCode()` en cada page bloquea acceso directo~~ — **nunca fue cierto
+   para las 3 vistas**: sólo `/campanas` tenía un layout en ese carril. Hoy los layouts y el guard
+   consumen el primitive.
 
-**Governance runtime:** la matriz es editable desde Admin Center (`/admin/views`) sin deploy.
+**Governance runtime:** la matriz sigue editable desde Admin Center (`/admin/views`) sin deploy, y sigue
+gobernando el **portal interno**. Editar ahí una fila `cliente.*` no cambia nada — es el instrumento
+decorativo que `ISSUE-148` encontró.
 
 **Migration:** `20260416095444700_seed-client-role-view-assignments.sql`
 **Test:** `src/lib/admin/client-role-visibility.test.ts`
 
-> Nota: executive y manager son identicos para las 11 vistas actuales. Su diferenciacion se activara cuando se registren los view codes nuevos de §12.5 (TASK-286+).
+> Nota: executive y manager son identicos para las 11 vistas actuales. ~~Su diferenciacion se activara
+> cuando se registren los view codes nuevos de §12.5 (TASK-286+).~~ **No se va a activar por esa vía**:
+> `TASK-286` quedó con su premisa invalidada por `TASK-1685` (ver su `## Delta 2026-08-10`). Registrar
+> view codes y sembrarles grants por rol no produce acceso en el portal cliente. Si la diferenciación
+> entre roles vuelve a hacer falta, el instrumento es `user_view_overrides` per-persona (deny), y si es
+> una diferencia **comercial**, el carril es el módulo: dos productos, no dos permisos.
 
 ---
 

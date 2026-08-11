@@ -3,7 +3,22 @@
 > **Tipo de documento:** Inventario de deuda (medición puntual, no contrato)
 > **Medido:** 2026-08-09 por Claude, con cuatro análisis paralelos sobre el código y contra PG
 > **Motivo:** responder con números a *"llevamos task tras task sobre esto y no termina — ¿qué tanto falta?"*
-> **Estado:** los hallazgos están verificados en código y en datos; el plan es propuesta
+> **Estado:** los hallazgos están verificados en código y en datos; **el plan se ejecutó completo** (ver
+> delta abajo)
+
+> **Delta 2026-08-10 — el programa cerró, y esta medición tenía un punto ciego.**
+> `TASK-1678`/`1679`/`1680` y después `TASK-1685` (cierra `ISSUE-148`) están todas en `complete/`.
+> Resultado: el carril de rol **ya no gobierna vistas `cliente.*`** — un solo primitive lo decide todo
+> (`acceso = interna ∨ (¬revocadaParaLaPersona ∧ (vistaBase ∨ móduloDeLaOrgLaDeclara))`,
+> `src/lib/client-portal/visibility/`), consumido por el page guard, la lista base del menú, el ⌘K y los
+> layouts de ruta.
+>
+> **El punto ciego:** este inventario midió el carril *hacia adentro* —quién lee `authorizedViews`— y
+> nunca comparó **lo que el menú ofrece contra lo que la puerta abre**. Esa dirección tenía 36 enlaces
+> muertos sobre 8 de 8 usuarios cliente, y ninguno de los "~86 puntos de decisión legítimos" lo
+> mostraba: cada lado era internamente correcto. Es la lección portable de este inventario —
+> **contar callsites no mide coherencia entre superficies**. Hoy esa dirección la vigila la señal
+> `identity.client_portal.menu_gate_divergence`.
 
 ## La respuesta corta
 
