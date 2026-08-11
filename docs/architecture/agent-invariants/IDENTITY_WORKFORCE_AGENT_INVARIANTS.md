@@ -268,6 +268,18 @@ porque cada uno por separado anulaba a los otros.
   `tenant_type='client'`, **no** de una lista literal ni de `route_group_scope` (un admin interno puede
   legítimamente incluir `client` en su scope).
 
+> **Delta TASK-1685 (2026-08-10) — alcance de este carril para vistas `cliente.*`:** la visibilidad y
+> el acceso de una vista `cliente.*` los responde el **primitive único del portal cliente**
+> (`src/lib/client-portal/visibility/`): módulos contratados de la organización + revocaciones
+> per-persona (`user_view_overrides` `revoke`, ahora enforceadas también en la puerta). El carril
+> rol→vista de esta sección **no gobierna vistas `cliente.*`** — sembrar `granted=TRUE` para una vista
+> cliente nueva NO la hace alcanzable; el carril es declararla en el módulo que la vende. El SIEMPRE de
+> arriba ("acompañar un viewCode `cliente.*` nuevo con su seed") queda **superseded** para visibilidad:
+> las filas de rol de vistas cliente son inertes (append-only, no se borran). Todo lo demás de esta
+> sección sigue vigente para el portal **interno**, y el fail-closed de TASK-1678 sigue siendo la
+> defensa del claim en sesión cliente. Canon: `ORG_CLIENT_AGENT_INVARIANTS.md` → §`Un solo primitive de
+> visibilidad del portal cliente`; señal `identity.client_portal.menu_gate_divergence` (steady 0).
+
 **Spec canónica**: `GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md` §8.2 → `Delta TASK-1678`.
 Issue: `ISSUE-147`. El guard de página que corre **después** de este carril (llave por organización,
 vistas base, `redirect()` fuera del `try`) vive en `ORG_CLIENT_AGENT_INVARIANTS.md` → §`Page guards del

@@ -2,10 +2,40 @@
 
 > Spec canónica del `Reliability Control Plane` de Greenhouse EO. Define el registry por módulo, el modelo unificado de señales, el contrato de evidencia y cómo `Admin Center`, `Ops Health` y `Cloud & Integrations` consumen la lectura consolidada sin duplicar fuentes.
 >
-> Versión: `1.12`
+> Versión: `1.13`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-08-09` por TASK-1678/1679 (signals del carril de acceso del portal cliente)
+> Última actualización: `2026-08-11` por TASK-1685 (signal de divergencia menú ↔ puerta del portal cliente)
+
+## Delta 2026-08-11 — TASK-1685: signal de divergencia menú ↔ puerta del portal cliente
+
+Una señal nueva bajo `moduleKey='identity'` (`kind='data_quality'`), hermana de las dos de
+TASK-1678/1679. Existe porque `ISSUE-148` demostró que menú y page guard pueden divergir por **dato**
+(no por código): antes del primitive único de visibilidad, el menú aplicaba el rol sobre su lista base
+y la puerta aplicaba el módulo contratado — 36 pares divergentes en 8 de 8 usuarios cliente, todos
+enlaces muertos. Desde TASK-1685 ambos lados consumen `resolve-client-portal-visibility.ts`, y esta
+señal es la aserción explícita de que siguen coincidiendo. Compuesta en `get-reliability-overview.ts`
+con `.catch(() => null)`, como sus hermanas.
+
+| `signalId` | Qué mide | Severidad | Steady |
+| --- | --- | --- | --- |
+| `identity.client_portal.menu_gate_divergence` | Divergencia entre lo que el **menú** del portal cliente ofrece y lo que la **puerta** (`requireViewCodeAccess`) abre, evaluada por usuario cliente activo × superficie guardada del catálogo de navegación. Cuenta tres cosas: enlaces que el menú promete y la puerta niega, superficies alcanzables sólo por URL (el menú las esconde pero la puerta abre — problema de acceso, no de UX), y superficies del catálogo de navegación que **ningún módulo del catálogo comercial vende** (nadie puede alcanzarlas jamás). Reader: [`client-portal-menu-gate-divergence.ts`](../../src/lib/reliability/queries/client-portal-menu-gate-divergence.ts) | `0 → ok`, `>0 → warning`; sube a `error` si hay superficies alcanzables sólo por URL | **0** |
+
+Notas de contrato:
+
+- La rama "menú promete, puerta niega" es 0 **por construcción** desde que ambos lados consumen el
+  mismo primitive; se sigue evaluando porque es barata y porque detecta la reintroducción de una
+  segunda fuente en el camino del menú. Lo que la señal **no** ve es una regresión a nivel JSX — eso
+  lo cubren el test de `VerticalMenu` y el lint `greenhouse/no-client-portal-view-visibility-bypass`.
+- Techo de 500 usuarios por corrida; si se alcanza, el summary declara la evaluación como **parcial**
+  en vez de reportar un piso como si fuera un total.
+- Remediación: **NUNCA** resolver una divergencia agregando el viewCode al catálogo de navegación
+  (mueve el problema de lugar). Para superficies que ningún módulo vende hay dos salidas honestas:
+  declararlas en el módulo que las vende, o retirarlas del catálogo de navegación y de sus rutas.
+
+Contrato: [`GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md`](GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md) §12 +
+[`GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`](GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md) §8.2.
+Task dueña: `TASK-1685`.
 
 ## Delta 2026-08-09 — TASK-1678/1679: 2 signals del carril de acceso del portal cliente
 

@@ -48,6 +48,47 @@ pertinentes, y cita qué campo o documento sostiene la conclusión. Clasifica co
 `condicionada`, `no-bid` o `sin evidencia suficiente`. Un fit alto aún no es GO: valida admisibilidad,
 capacidad de entrega y margen sobre loaded cost.
 
+### Descripción y preguntas: evidencia obligatoria
+
+Antes de clasificar una ficha o dimensionar su presupuesto, lee la **descripción/comentarios generales
+completa**. El presupuesto, su periodicidad, pago, alcance real, exclusiones y condiciones comerciales pueden
+vivir ahí y no en un campo estructurado de la plataforma.
+
+Abre también el **Centro de mensajes → Preguntas** y revisa todas las preguntas y respuestas disponibles. Las
+respuestas del comprador pueden acotar el máximo presupuestario, confirmar modalidad de pago, facturación,
+inicio, cobertura geográfica, entregables incluidos o exclusiones; no se sustituyen por una inferencia desde el
+brief. Distingue una respuesta del comprador de una pregunta de un proveedor, registra fecha y fuente, y resume
+sólo el hecho operativo que cambie el bid/no-bid o el alcance.
+
+El reporte automático conserva el texto que la ficha expone al abrirla, pero no se debe asumir que contiene un
+Centro de mensajes que la interfaz muestra de forma diferida. Si no hay evidencia de preguntas en el reporte,
+revísalas en la UI autenticada antes de cerrar el dictamen. Esta lectura sigue siendo read-only: no pulses
+`Nueva pregunta`, no respondas ni envíes mensajes sin instrucción explícita y confirmación humana.
+
+## De propuesta preparada a postulación en Wherex
+
+Esta etapa empieza sólo cuando el operador instruye explícitamente preparar o presentar una oferta. La interfaz y
+los requisitos varían por licitación: verifica los campos y adjuntos de la ficha vigente, no reutilices una lista
+de otro proceso como si fuera una condición contractual.
+
+1. En **Servicio licitado**, abre cada ítem con `Ofertar` y completa cantidad, precio unitario y moneda sólo desde
+   la cotización aprobada. Revisa el total y su base fiscal; Wherex puede declarar que los valores no consideran
+   IVA. Nunca uses el máximo presupuestario como precio automático ni confundas un valor mensual con el total del
+   contrato.
+2. En **Condiciones y archivos adjuntos**, confirma entrega, plazo de pago, vigencia y comentario general. No
+   aceptes ni sustituyas una condición comercial sin aprobación de Comercial/Finance. Carga cada documento
+   obligatorio exactamente en su campo y respeta el límite de tamaño/formato; una cotización y una presentación
+   no sustituyen anexos administrativos o técnicos cuando el comprador los exige.
+3. En **Resumen y enviar oferta**, comprueba todos los ítems, condiciones, archivos obligatorios, totales, moneda,
+   impuestos y warnings. Reconcílialos con la cotización aprobada y el expediente interno.
+4. La aceptación de bases/términos y el botón `Enviar Propuesta` constituyen el acto de presentación. Requieren
+   confirmación humana final y explícita en ese momento. Una instrucción de "preparar" o "subir borradores" no
+   autoriza aceptar ni enviar.
+
+Registra en el workspace interno los requisitos de la pantalla de cada bid y qué quedó preparado. Si falta
+facturación transfronteriza, representación local, documento obligatorio, aprobación de precio o margen, el estado
+correcto es `operativamente bloqueado` y no se fuerza un envío.
+
 ## De candidata a expediente y pipeline CRM
 
 Cuando el operador identifique una o más candidatas, el radar no termina con el dictamen. Ejecuta esta

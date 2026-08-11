@@ -5,13 +5,30 @@
 Quedó canonizado para futuras solicitudes en la skill `greenhouse-public-private-tenders` y el manual
 `docs/manual-de-uso/comercial/revisar-licitaciones-wherex-con-chrome.md`. `pnpm wherex:radar:setup` guarda
 correo y clave sólo en `.auth/` con `0600`; `pnpm wherex:radar` usa un perfil Chrome aislado, revisa **Nueva** y
-**Editando**, lee fichas y adjuntos, y genera el reporte protegido local. No participa, responde, carga,
+**Editando**, lee fichas y adjuntos, y genera el reporte protegido local. El dictamen exige además leer la
+descripción/comentarios generales y el Centro de mensajes → Preguntas: presupuesto, alcance o condiciones pueden
+vivir allí; no se infieren desde el título ni el brief. No participa, responde, carga,
 presenta ni firma. Pendiente operativo: correr el setup una vez en una terminal interactiva y calibrar selectores
 si Wherex cambió su interfaz. La continuidad de candidatas también quedó canonizada: los originales se archivan
 en OneDrive `Alineación/4. Comercial/Licitaciones/<Comprador>/` sin URLs firmadas; empresa, deal y asociación se
 verifican por MCP HubSpot y toda escritura requiere propuesta/confirmación, con la asociación confirmada una vez
 que la empresa tiene ID. Caso real del 2026-08-11: Ajinomoto y CINTERMEX creados/verificados; Polpaico ya existía
 y no se duplicó. Si el visor bloquea un guardado soportado, no se elude: se requiere una copia local verificable.
+Para Ajinomoto LIC-962, el expediente `docs/commercial/tenders/ajinomoto-lic-962/research/` conserva la evidencia
+de descripción, preguntas y mecanismo de postulación: servicio de 12 meses, cotización y presentación obligatorias
+(20 MB), condiciones y aceptación final. Aún no se ingresó precio, adjuntó archivo, aceptó término ni envió oferta.
+La mecánica reutilizable de postulación quedó además en la skill, el manual y la documentación funcional: servicio
+→ condiciones/adjuntos → resumen/reconciliación → aceptación y envío sólo con confirmación humana final.
+
+La oferta de Ajinomoto quedó redactada y renderizada en el mismo expediente: `oferta-tecnica.md`,
+`oferta-economica.md`, `economica.json`, `deck-plan.json` y
+`propuesta-economica-ajinomoto-lic-962.xlsx`. La presentación técnica de 11 láminas se validó y renderizó
+localmente en `.captures/ajinomoto-lic-962/AJINOMOTO-LIC-962-TECHNICAL.pdf` (2,2 MB); no se cargó a Wherex.
+La propuesta oferta S/ 7.000 mensuales sin IGV peruano (S/ 84.000 referenciales por 12 meses), cubre operación
+remota de comunidad y deja audiovisual, diseño de alto volumen, presencialidad, pauta, premios y creadores
+externos como adicionales. Antes de presentar, quedan cuatro gates concretos: validar identificador de marca,
+asignar squad/capacidad y costeo cargado con Finanzas, confirmar documentación tributaria Chile–Perú y revisar la
+definición de embajador activo/corte FY 2026. No suplir esos gates con una aceptación de términos ni con un envío.
 
 ### TASK-1685 CERRADA — un solo primitive de visibilidad del portal cliente; `ISSUE-148` resuelta (2026-08-10)
 
@@ -544,41 +561,3 @@ El contenido de la lista está fijado por test para que la contracción sea deli
 **Pendiente, en este orden:** desplegar el expand → aplicar
 `migrations/20260808131441444_task-1310-seo-client-view-codes.sql` → verificar en staging con Berel →
 **recién ahí** contraer a `seo_v2` sola (dueño `TASK-1310`). Detalle: `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §10.7.
-
-### TASK-1310 — surfaces cliente SEO implementadas (2026-08-08)
-
-`TASK-1310` sigue `in-progress`: dashboard `/growth/seo`, quadrant y report `/growth/seo/report`
-reusan `ReportArtifactModel`; guard = assignment per-org + `growth.seo.report.read_client` `own`.
-La migración pendiente crea `seo_v2`, supersede el assignment `seo_v1` de Berel preservando tier/metadata
-y publica los viewCodes; sin aplicarla no hay navegación compuesta. Próximo paso: staging, sesión Berel,
-menú/rutas/denial sin módulo, baseline diff y revisión mobile. Sin push/deploy autorizado.
-
-**Verificación 2026-08-08 (deuda cerrada por Claude).** El barrido con subagentes encontró que el
-código estaba adelante de sus documentos y de sus gates, así que se corrigió lo documental y **se
-hizo fallar a propósito lo que estaba verde de mentira**:
-
-- **Señal de fiabilidad falsa-sana.** `seo-rank-capture-lag.ts` tenía `module_key = 'seo_v2'`
-  hardcodeado: veía 0 orgs y reportaba `ok`. Con el expand aplicado reporta `warning` con un hallazgo
-  real. Su test pinneaba el bug (asertaba el literal); ahora aserta el contrato. Commit `2f21dd46e`.
-- **GVC corría con la persona equivocada.** Los tres scenarios cliente capturaban con sesión de
-  operador contra una superficie client-gated, así que el frame decía "SEO no está activo en tu plan"
-  y el visual-gate daba BLOCK por una razón que no era la UI. Se agregó `requiresStorageState` al
-  contrato de scenario, exigido **antes** de lanzar el browser. `ui:visual-gate --task TASK-1310`
-  pasó de BLOCK a PASS. Commit `ec3fa82c6`.
-- **El scorecard estaba verde y la auditoría en BLOCK.** El scorecard de las 10:03 daba PASS 4.61 y
-  afirmaba "axe sin violaciones" cuando la auditoría de las 10:25 tiene 2 violaciones de contraste y
-  economía de superficies en 1.8. Se regeneró desde la auditoría: **`ui:quality --task TASK-1310`
-  ahora da BLOCK con `average=2.29 floor=1.8`**, que es el estado correcto para una task con
-  `UI ready: no`. El scorecard viejo queda declarado en el campo `supersedes`.
-- **Drift documental del `masterDetail`.** El wireframe y el flow todavía describían un navigator
-  lateral que la implementación descartó; era la ruta por la que el siguiente cambio reintroducía la
-  composición equivocada. Corregidos a `composition='single'` + tabs, con el "por qué no" escrito.
-- **Doc funcional + manual.** La superficie cliente salió de "Que NO existe todavía" y ganó su
-  sección con el estado de rollout declarado; se escribió el manual que faltaba
-  (`docs/manual-de-uso/growth/habilitar-portal-seo-cliente.md`) con el orden exacto del rollout y por
-  qué **no** se valida con la persona agente superadmin. README, EPIC-022 y el ledger de flags
-  quedaron sincronizados.
-
-Lo que **no** hice y sigue abierto: los 7 lotes de la auditoría premium (trabajo de Codex, vive en
-`/growth/seo/mockup`), el push de los commits locales y la migración —bloqueada porque `main` no
-tiene todavía el catálogo TS y `syncViewRegistryCatalog` desactivaría las filas.

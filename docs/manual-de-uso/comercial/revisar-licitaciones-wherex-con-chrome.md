@@ -34,10 +34,11 @@ El runner abre Chrome visible con su perfil aislado. Puedes comprobar la configu
 1. El runner entra a Wherex y navega por Sourcing → Licitaciones.
 2. Revisa los estados **Nueva** y **Editando**, página por página. Una oportunidad ya abierta puede pasar a Editando aunque siga vigente; consultar sólo Nueva deja oportunidades fuera del radar.
 3. De cada fila anota comprador, ID, título, estado, fecha y hora de cierre, categoría y una señal inicial del alcance.
-4. Abre la ficha de toda oportunidad que parezca pertinente o ambigua. Lee descripción completa, alcance, entregables, requisitos, presupuesto o modalidad de pago, plazos, comentarios/preguntas y documentos exigidos.
-5. Lee las bases, brief, RFP, TDR y anexos técnicos cuando puedan cambiar el dictamen. El runner extrae temporalmente PDF, DOCX, XLSX y PPTX, elimina el temporal y marca un archivo no interpretable como `unreadable`. El listado y el título son screening, no evidencia suficiente para decidir el fit.
-6. Contrasta el alcance con los servicios canónicos de Efeonce. Distingue lo que Efeonce puede entregar directamente de lo que requeriría partner, certificaciones, cobertura local, hardware, personal presencial u otra capacidad externa.
-7. Entrega una recomendación y evidencia; no selecciones participar/no me interesa, no envíes consultas ni propuestas y no firmes ni subas documentos.
+4. Abre la ficha de toda oportunidad que parezca pertinente o ambigua. Lee la **descripción o comentarios generales completa**: no supongas que presupuesto, periodicidad, pago, exclusiones o alcance viven en un campo estructurado. El listado y el título son sólo screening.
+5. Abre **Centro de mensajes → Preguntas** y revisa todas las preguntas y respuestas disponibles. Distingue lo que consultó un proveedor de lo que confirmó el comprador; registra la fecha y el hecho operativo que modifique presupuesto, pago, facturación, inicio, cobertura geográfica, entregables o exclusiones. Si el reporte del runner no trae esa evidencia, la revisión en la UI autenticada es obligatoria antes del dictamen. No pulses `Nueva pregunta`, no respondas ni envíes nada.
+6. Lee las bases, brief, RFP, TDR y anexos técnicos cuando puedan cambiar el dictamen. El runner extrae temporalmente PDF, DOCX, XLSX y PPTX, elimina el temporal y marca un archivo no interpretable como `unreadable`. La ficha, sus aclaraciones y los adjuntos deben concordar; ante una diferencia, registra la fuente y fecha, y resuélvela antes de ofertar.
+7. Contrasta el alcance con los servicios canónicos de Efeonce. Distingue lo que Efeonce puede entregar directamente de lo que requeriría partner, certificaciones, cobertura local, hardware, personal presencial u otra capacidad externa.
+8. Entrega una recomendación y evidencia; no selecciones participar/no me interesa, no envíes consultas ni propuestas y no firmes ni subas documentos.
 
 ## Cómo clasificar el fit
 
@@ -95,10 +96,35 @@ HubSpot exige esta confirmación por cada escritura, incluso cuando el objetivo 
 Polpaico ilustra la rama de reutilización: si el deal vigente y su empresa ya existen y están asociados, se reportan
 como verificados y no se duplican.
 
+## Preparar y presentar una oferta en Wherex
+
+Esta sección aplica sólo cuando el operador instruye explícitamente preparar o presentar una oferta. La lectura del
+radar no autoriza por sí misma completar formularios, aceptar bases ni enviar.
+
+1. Confirma que existe una cotización aprobada, con moneda, impuestos, cantidad/unidad, vigencia y margen
+   proyectado. Un presupuesto publicado es un tope o referencia, no un precio que se pueda ingresar sin revisión.
+2. En **Servicio licitado**, selecciona `Ofertar` para cada servicio y completa cantidad, precio unitario y moneda
+   desde esa cotización. Revisa que el total de Wherex coincida y verifica si la plataforma declara valores con o
+   sin IVA.
+3. En **Condiciones y archivos adjuntos**, completa entrega, pago, vigencia y comentario general según la
+   propuesta aprobada. Carga cada archivo obligatorio en su campo; revisa tipo y peso máximo. No confundas los
+   adjuntos opcionales administrativos, técnicos o económicos con los documentos exigidos.
+4. En **Resumen y enviar oferta**, compara servicio por servicio, moneda, total, impuestos, condiciones y número
+   de adjuntos contra el expediente interno. Corrige warnings antes de continuar.
+5. Pide confirmación humana final que identifique la licitación, total, moneda, archivos, términos a aceptar y el
+   destinatario. Sólo con esa confirmación acepta bases/términos y pulsa `Enviar Propuesta`.
+6. Conserva el comprobante o estado final que Wherex muestre y actualiza el expediente y el deal. Si la plataforma
+   deja la propuesta en borrador, informa ese estado; no la declares enviada.
+
+Si falta una vía de facturación válida para el país del comprador, un documento obligatorio, aprobación de precio,
+margen o capacidad, detén el flujo como `operativamente bloqueado`. No se fuerza el envío para cumplir un plazo.
+
 ### 3. Leer y devolver los adjuntos
 
 Para cada archivo normativo o brief leído, entrega una síntesis operable: objeto/alcance, situación actual,
 requisitos, metas o criterios de evaluación, calendario y pago cuando exista, riesgos/bloqueos y siguiente gate.
+Incluye por separado las aclaraciones relevantes que el comprador haya respondido en el Centro de mensajes; no
+las confundas con una pregunta ni las dejes implícitas en la interpretación del brief.
 No declares fit por el título ni transcribas íntegramente material confidencial. Si el archivo no es interpretable,
 decláralo y pide revisión visual; no reemplaces su contenido con una conjetura.
 

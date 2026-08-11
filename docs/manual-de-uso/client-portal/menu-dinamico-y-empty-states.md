@@ -1,9 +1,9 @@
 # Menu dinamico y empty states del Portal Cliente — operacion
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-05-13 por Claude (TASK-827)
-> **Ultima actualizacion:** 2026-08-09 por Claude (los seis resultados posibles, la ruta real del mockup y el bypass de soporte)
+> **Ultima actualizacion:** 2026-08-11 por Claude (TASK-1685: la visibilidad cliente ya no depende del rol; revocaciones por persona; senal de divergencia menu ↔ puerta)
 > **Modulo:** Client Portal
 > **Rutas en portal:** `/admin/client-portal/catalog`, `/admin/client-portal/organizations/[orgId]/modules`, `/admin/operations`, `/mockup/cliente-portal-legacy`
 > **Documentacion relacionada:** [Menu dinamico y acceso a modulos](../../documentation/client-portal/menu-dinamico-y-acceso-a-modulos.md), [Diagnosticar un modulo que no aparece en el menu](diagnosticar-modulo-no-visible-en-menu.md), [GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md](../../architecture/GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md)
@@ -72,9 +72,9 @@ Si un cliente reporta "no veo X" o "veo cosas que no compre":
 1. Entra a `/admin/client-portal/organizations/[orgId]/modules` y verifica que modulos tiene activos. Si la lista no matchea su contrato, falta activar / sobra dar de baja.
 2. Si la lista esta correcta pero el cliente sigue reportando: verifica que no este logueado con otra organization (algunos clientes son contacto de varias). Pidele que cierre sesion y vuelva a entrar.
 3. Si sigue sin verlo: revisa que la pagina especifica que el cliente quiere ver tenga su `view_code` en algun modulo activo del cliente. El mapping `module → view_codes[]` lo ves en el catalogo (`/admin/client-portal/catalog`).
-4. Verifica que el `view_code` este en `greenhouse_core.role_view_assignments` para el role del cliente. Si NO esta, hay un gap de gobernanza (ver Caso 5 abajo).
+4. ~~Verifica que el `view_code` este en `greenhouse_core.role_view_assignments` para el role del cliente.~~ **Ya no aplica (TASK-1685, 2026-08-10):** esa tabla no gobierna ninguna vista `cliente.*` — ni menu, ni puerta, ni ⌘K. Si el modulo esta activo y declara el `view_code`, revisa en cambio si la persona tiene una **revocacion individual** (`greenhouse_core.user_view_overrides` con `override_type='revoke'`), que cierra menu, puerta y buscador a la vez.
 
-> **Delta 2026-08-09 (TASK-1675):** el paso 4 aplica a las vistas cliente *legacy*. Los items de modulo del menu ya NO dependen de `role_view_assignments` — se componen desde `module_assignments`, igual que el gate de cada page. Para las vistas module-gated (por ejemplo `cliente.growth_seo_dashboard`) la fila esta sembrada a proposito con `granted = FALSE`: ponerla en `TRUE` convierte el acceso en visibilidad role-wide para todos los clientes con ese rol. Diagnostico especifico del menu: [Diagnosticar un modulo contratado que no aparece en el menu](diagnosticar-modulo-no-visible-en-menu.md).
+> **Delta 2026-08-09 (TASK-1675) + 2026-08-11 (TASK-1685):** los items de modulo del menu se componen desde `module_assignments`, igual que el gate de cada page (TASK-1675). Y desde TASK-1685 tambien la lista base heredada consume esa misma regla: **la visibilidad de una vista cliente ya no depende del rol en ningun punto**. Sembrar `granted = TRUE` en `role_view_assignments` para una vista cliente no la hace visible ni alcanzable; sus filas quedaron inertes (append-only, no se borran). La senal `identity.client_portal.menu_gate_divergence` en `/admin/operations` (estado sano cero) detecta si menu y puerta vuelven a divergir. Diagnostico especifico del menu: [Diagnosticar un modulo contratado que no aparece en el menu](diagnosticar-modulo-no-visible-en-menu.md).
 
 **Atajo SQL para diagnosticar (read-only):**
 
@@ -112,6 +112,8 @@ Si emerge un warning en Sentry con el mensaje `role_view_fallback_used` y tag `d
 **Que significa:** alguien agrego un `view_code` nuevo al `VIEW_REGISTRY` (en codigo TS) sin sembrar los grants correspondientes en `role_view_assignments` (en base de datos). El fallback heuristico del sistema esta resolviendo el acceso correctamente (no es un bug funcional), pero la telemetria avisa porque la gobernanza esta incompleta.
 
 > **Delta 2026-08-09 — para vistas `cliente.*` el fallback ya no otorga.** Antes, una vista cliente sin fila se auto-otorgaba a los tres roles cliente; ahora no se otorga hasta estar declarada, y el camino degradado cierra en vez de abrir. Consecuencia practica: si agregas una vista cliente nueva sin migracion de seed, el sintoma ya no es "se ve de mas" sino "no se ve". La senal a mirar en `/admin/operations` es `identity.view_access.client_role_without_grants`, steady cero. Para el portal **interno** el comportamiento no cambio.
+>
+> **Delta 2026-08-11 (TASK-1685) — mas fuerte todavia: para vistas `cliente.*` el carril de rol dejo de existir.** La visibilidad y el acceso de una vista cliente los decide unicamente el par modulos contratados + revocaciones por persona. Sembrar grants de rol para una vista cliente nueva **no la hace visible ni alcanzable**: lo que la hace alcanzable es que un modulo del catalogo la declare y la organizacion lo tenga. El ejemplo de seed de abajo sigue valiendo como mecanica de migracion para vistas **internas**; para una vista cliente nueva, el paso que importa es declararla en su modulo.
 
 **Que NO hacer:** no desactivar el warning, no parchear el fallback. La telemetria ES el detector y debe quedar viva.
 
@@ -170,8 +172,8 @@ Si alguna te devuelve la pagina de no autorizado, **no es un problema del client
 |---|---|---|
 | Cliente reporta menu vacio post-onboarding | No se activaron los modulos del contrato | Caso 1 arriba |
 | Cliente ve item pero al click no llega a ninguna parte | Modulo declara un view_code cuya pagina todavia no esta materializada (forward-looking). Vivo hoy: el enlace "Creative Hub" de Sky Airlines | Es esperado V1.0 y no hay nada que activar. Task derivada V1.1 `client-portal-pages-placeholder-materialization` crea las pages reales |
-| Cliente ve Proyectos / Ciclos / Equipo / Revisiones / Analytics / Campanas y al entrar le dice que el modulo no esta activado | Esos seis enlaces todavia se muestran por rol, no por lo contratado: el enlace promete de mas, la puerta esta bien | Confirma si corresponde activar el modulo (Caso 1). **No** quites permisos de vista al rol para ocultar el enlace: apaga enlaces legitimos de otros clientes con ese rol |
-| Ninguna organizacion abre Ciclos ni Analytics | Ningun modulo del catalogo declara esas dos pantallas | Deuda declarada, no un bug. Se cierra declarandolas en el modulo que corresponda, no activando nada desde la pantalla de modulos |
+| Cliente ve un enlace y al entrar le dice que el modulo no esta activado | **Desde TASK-1685 (2026-08-10) esto NO deberia pasar**: menu y puerta comparten la misma regla (modulos contratados menos revocaciones por persona). Si pasa, menu y puerta divergieron | Revisa la senal `identity.client_portal.menu_gate_divergence` en `/admin/operations` (steady cero) y los modulos de la organizacion. **No** toques los permisos de vista por rol: esa tabla ya no gobierna vistas cliente |
+| Ninguna organizacion ve Ciclos ni Analytics en el menu | Ningun modulo del catalogo declara esas dos pantallas; desde TASK-1685 el menu ya no muestra superficies que ningun modulo vende | Deuda declarada, no un bug. Se cierra declarandolas en el modulo que corresponda, no activando nada desde la pantalla de modulos |
 | Sentry burst de `role_view_fallback_used` post deploy | Alguien agrego view_codes nuevos sin migration de seed | Caso 5 arriba |
 | Boton "Solicitar acceso" envia a `support@efeoncepro.com` en vez del account manager del cliente | V1.0 usa fallback hardcoded. Task derivada V1.1 `account-manager-email-canonical-resolver` lo arregla | Funcional: el support team rutea el email al AM correcto manualmente |
 | Cliente reporta que NO ve un addon que compro recien | Cache resolver hasta 60s | Pidele refresh; si persiste, verifica que el assignment se creo (Caso 3) |

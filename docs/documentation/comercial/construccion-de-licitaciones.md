@@ -30,9 +30,12 @@ Construir una licitación pasa por diez momentos encadenados. Cada uno produce a
 ## Desde un radar privado hasta una oportunidad operable
 
 Una licitación privada pasa por una etapa anterior a la propuesta: el radar lee las fichas de Wherex y sus adjuntos
-en los estados Nueva y Editando, para que el equipo no descarte ni priorice sólo por el título. El resultado no es
-un "sí" automático, sino una clasificación explicable y un conjunto de gates: admisibilidad, capacidad efectiva y
-margen.
+en los estados Nueva y Editando, para que el equipo no descarte ni priorice sólo por el título. La ficha se lee
+completa, incluida su descripción o comentarios generales: ahí pueden estar el presupuesto mensual, forma de pago,
+alcance o exclusiones. Antes de clasificar, también se revisa el Centro de mensajes y sus preguntas respondidas por
+el comprador, porque pueden precisar el tope de presupuesto, facturación, inicio, cobertura y qué entregables se
+esperan. El resultado no es un "sí" automático, sino una clasificación explicable y un conjunto de gates:
+admisibilidad, capacidad efectiva y margen.
 
 Cuando el operador elige una candidata, el sistema conserva tres verdades complementarias. El expediente interno
 versionado guarda bases e investigación; OneDrive conserva los adjuntos originales en
@@ -51,6 +54,18 @@ una persona; nunca se elude la protección del navegador. El contenido se resume
 riesgos y próximos gates, no como una transcripción de información confidencial.
 
 Antes de dar la propuesta por lista, se hace una **revisión crítica con tres miradas**: comercial (¿convence al comité y baja el miedo a decidir?), equipo (¿el equipo es real y tiene capacidad?) y finanzas (¿el precio cubre el costo real y no se erosiona con el tiempo?). Si las tres no pasan, la propuesta no está lista aunque el texto se lea bien.
+
+## Cómo se materializa una postulación privada en Wherex
+
+Wherex separa la propuesta en tres planos: los servicios a ofertar (cantidad, precio unitario, moneda y total),
+las condiciones y documentos, y un resumen final. Esa separación evita que una buena presentación o una planilla
+correcta escondan un precio incorrecto, un impuesto mal declarado o un requisito obligatorio omitido.
+
+La propuesta se prepara desde la cotización aprobada: la plataforma recibe sus valores, pero no decide precio,
+margen, vigencia ni condiciones por Efeonce. Al final, el resumen exige verificar que lo cargado coincide con el
+expediente y la cotización. La aceptación de bases y términos, seguida de `Enviar Propuesta`, es el acto
+contractual-operativo de presentación y siempre queda bajo confirmación humana final. La plataforma puede tener
+campos, adjuntos y topes distintos en cada proceso; por eso la ficha vigente gobierna el checklist concreto.
 
 ## El diagnóstico y la demostración AEO (cuando el servicio es de contenido/SEO)
 

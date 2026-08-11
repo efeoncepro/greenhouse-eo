@@ -1,9 +1,9 @@
 # Sistema de Identidad, Roles y Acceso
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.8
+> **Version:** 1.9
 > **Creado:** 2026-04-05 por Claude (TASK-248)
-> **Ultima actualizacion:** 2026-08-10 por Claude (TASK-1388 + TASK-1686: navegacion interna en 3 superficies y proyeccion propia del colaborador puro)
+> **Ultima actualizacion:** 2026-08-11 por Claude (TASK-1685: la visibilidad del portal cliente la decide una sola regla — modulos contratados menos revocaciones por persona)
 > **Documentacion tecnica:** [GREENHOUSE_IDENTITY_ACCESS_V2.md](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md), [GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md](../../architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md), [GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md)
 
 ---
@@ -140,14 +140,18 @@ Cada vista individual del portal esta registrada en un catalogo. Si tu rol no te
 > (`client_executive`, `client_manager`, `client_specialist`) se diferencian en que puede hacer una
 > persona dentro de una pantalla, no en que compro la empresa. Solo tres pantallas abren para cualquier
 > organizacion sin contratar nada —Notificaciones, Configuracion y Novedades—; el resto depende del
-> modulo. Y desde el 2026-08-09 el carril de rol **falla hacia cerrado** para el portal cliente: una
-> vista `cliente.*` sin permiso explicito ya no se otorga por defecto, y el camino degradado entrega
-> lista vacia en vez del catalogo completo. Senal en `/admin/operations`:
-> `identity.view_access.client_role_without_grants`, steady cero.
+> modulo. Desde el 2026-08-10 (TASK-1685) esto es literal de punta a punta: **una sola regla** decide a
+> la vez el menu, el buscador ⌘K y la puerta de cada pagina cliente — modulos contratados de la
+> organizacion, menos las pantallas **revocadas individualmente** a una persona (una revocacion cierra
+> menu, puerta y buscador juntos). Los permisos de vista por rol no gobiernan ninguna pantalla del
+> portal cliente: sus filas quedaron inertes. Senales en `/admin/operations`:
+> `identity.view_access.client_role_without_grants` y `identity.client_portal.menu_gate_divergence`,
+> ambas steady cero.
 >
 > Consecuencia para diagnostico: **nunca resuelvas "el cliente no ve X" tocando los permisos de vista
-> por rol.** Para las pantallas que dependen de un modulo, ponerlos en otorgado le abre la pantalla a
-> todos los clientes con ese rol, hayan contratado o no. El carril correcto es la asignacion de modulo:
+> por rol.** Ponerlos en otorgado no agrega el enlace ni abre la puerta — no hace nada. El carril
+> correcto es la asignacion de modulo (y, si un solo usuario de la organizacion no ve algo que sus
+> companeros si, revisar si tiene una revocacion individual):
 > [Menu dinamico y acceso a modulos](../client-portal/menu-dinamico-y-acceso-a-modulos.md).
 
 **Mi Perfil** muestra la informacion completa del colaborador: nombre, email, avatar (sincronizado desde Microsoft Entra), cargo, departamento, nivel, tipo de empleo, fecha de ingreso, telefono, y los sistemas vinculados (Entra, Notion, HubSpot, etc.). Esta informacion se sincroniza automaticamente desde Microsoft Entra ID mediante un cron diario que actualiza fotos, cargos y datos profesionales. Si un usuario recien creado aun no tiene todos los datos sincronizados, se muestra la informacion disponible de la sesion sin mostrar un error.

@@ -100,7 +100,7 @@ NEVER rename a module / surface / KPI without updating nomenclature.ts. Validate
 
 ### 7. Command palette ⌘K — SHIPPED (TASK-1388/1686)
 
-Greenhouse SHIPS ⌘K today. The only palette is `CommandPalette` (`src/components/greenhouse/CommandPalette/`), mounted globally via `GlobalCommandPalette` (`src/components/layout/shared/GlobalCommandPalette.tsx`): audience filter by routeGroup + authorizedViews, recents in localStorage, salir action. GVC marker: `cmdk-open`. NEVER build a second palette or a parallel global search — the old `NavSearch` (`src/components/layout/shared/search/`) was DELETED; never resurrect it.
+Greenhouse SHIPS ⌘K today. The only palette is `CommandPalette` (`src/components/greenhouse/CommandPalette/`), mounted globally via `GlobalCommandPalette` (`src/components/layout/shared/GlobalCommandPalette.tsx`): audience filter by routeGroup + authorizedViews, recents in localStorage, salir action. **TASK-1685 nuance:** entries with `routeGroup === 'client'` are NOT filtered by `authorizedViews` — they go through `canSeeClientView(viewCode)` from the client-portal visibility primitive (`useClientPortalViewVisibility`, backed by `src/lib/client-portal/visibility/resolve-client-portal-visibility.ts`: contracted modules + per-person `user_view_overrides` revocations; the role claim does NOT govern `cliente.*`). All other routeGroups keep the claim-based `authorizedViews` filter. GVC marker: `cmdk-open`. NEVER build a second palette or a parallel global search — the old `NavSearch` (`src/components/layout/shared/search/`) was DELETED; never resurrect it.
 
 ### 8. Search — module-scoped, NOT global
 
@@ -129,6 +129,7 @@ Every page MUST show:
 
 ## Version
 
+- **v1.3** — 2026-08-11 — TASK-1685 sync: ⌘K client entries (`routeGroup === 'client'`) filter via the client-portal visibility primitive (`canSeeClientView`), not `authorizedViews`; role claim no longer governs `cliente.*`.
 - **v1.2** — 2026-08-10 — TASK-1389 sync: navigation surface allocation contract + `pnpm nav:budget` gate (8 top-level slots / depth 2, severity `error`) as a real IA constraint; `Nav placement` field in the UI/UX addendum.
 - **v1.1** — 2026-08-10 — TASK-1388/1686 sync: 3-zone internal sidebar + `/my/*` re-homed to avatar dropdown (`buildMyNavItems`); ⌘K `CommandPalette` shipped (NavSearch deleted).
 - **v1.0** — 2026-05-11 — Initial overlay.

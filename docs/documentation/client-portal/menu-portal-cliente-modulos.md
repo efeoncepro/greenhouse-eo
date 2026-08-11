@@ -1,9 +1,9 @@
 # Menu del Portal Cliente — Modulos Contratados
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-08-09 por Claude (TASK-1675)
-> **Ultima actualizacion:** 2026-08-09 por Claude (alcance de la regla frente a las vistas base y a la lista heredada)
+> **Ultima actualizacion:** 2026-08-11 por Claude (TASK-1685: la lista heredada dejo de mostrarse por rol; visibilidad unica por modulos contratados menos revocaciones)
 > **Documentacion tecnica:** [GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md](../../architecture/GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md) §12.1, [ORG_CLIENT_AGENT_INVARIANTS.md](../../architecture/agent-invariants/ORG_CLIENT_AGENT_INVARIANTS.md)
 
 ---
@@ -23,7 +23,8 @@ El documento hermano [Menu dinamico y acceso a modulos](menu-dinamico-y-acceso-a
 Con dos precisiones que evitan malentendidos, y que valen para todo lo que sigue:
 
 - **Hay tres pantallas que no son un modulo** y por eso abren para cualquier organizacion: Notificaciones, Configuracion y Novedades. Viven en "Mi Cuenta" y nadie las contrata. Se llaman **vistas base**.
-- **Queda una lista heredada de seis enlaces cliente** —Proyectos, Ciclos, Equipo, Revisiones, Analytics, Campanas— que todavia se muestra segun el rol de la persona y no segun lo contratado. Es la deuda que aparece al final de este documento, y es la razon por la que un cliente puede ver uno de esos seis enlaces y, al entrar, recibir "este modulo no esta activado para tu cuenta".
+- **La lista heredada de seis enlaces cliente** —Proyectos, Ciclos, Equipo, Revisiones, Analytics, Campanas— **ya no se muestra por rol** (cerrado el 2026-08-10, TASK-1685). Hoy esos enlaces se muestran con la misma regla que todo lo demas: aparecen solo si un modulo contratado y vigente los declara. Por eso ya no pasa que un cliente vea uno de esos enlaces y, al entrar, reciba "este modulo no esta activado para tu cuenta": si el enlace esta, la puerta abre.
+- **Existe una excepcion por persona, no por rol:** a una persona concreta se le puede **revocar** una pantalla especifica (por ejemplo, durante una verificacion o un caso de soporte). Esa revocacion cierra a la vez el enlace del menu, la puerta de la pagina y el buscador ⌘K. No es configurable por rol ni por organizacion completa.
 
 ---
 
@@ -50,7 +51,7 @@ Esto es lo que suele confundirse en soporte:
 | No sirve para agregar un enlace de modulo | Por que |
 |---|---|
 | Cambiarle el rol al usuario del cliente | Los tres roles de cliente se diferencian en que puede hacer una persona dentro de una pantalla, no en que modulos compro la empresa |
-| Darle permisos de vista al rol en la tabla de gobernanza de vistas | Esa tabla gobierna otra cosa. Para las pantallas que dependen de un modulo, ademas, esta escrita a proposito con el permiso en "no": si se cambia a "si", el enlace deja de depender de lo contratado y pasa a verse por rol —para todos los clientes con ese rol, hayan comprado o no |
+| Darle permisos de vista al rol en la tabla de gobernanza de vistas | Desde el 2026-08-10 (TASK-1685) esa tabla **no gobierna ninguna pantalla del portal cliente**: ponerle "si" a una vista cliente no agrega el enlace ni abre la puerta. Sus filas de vistas cliente quedaron inertes (la tabla solo se agrega, nunca se borra) |
 | Cambiar la linea de negocio de la cuenta | La linea de negocio describe que tipo de cliente es, no que compro |
 | Agregar el enlace a mano en el codigo del menu | Deja de reflejar lo contratado y hay que repetirlo por cada cliente nuevo. Es exactamente lo que este diseno vino a eliminar |
 
@@ -67,7 +68,7 @@ El resultado no era el error de un modulo puntual: era estructural. Un cliente p
 
 Desde entonces los **enlaces de modulo** y la puerta leen **el mismo origen**: si el enlace de modulo esta, la pantalla se abre.
 
-La vuelta no es cierta todavia, y conviene decirlo: que un enlace este no prueba que su modulo este contratado, porque los seis enlaces heredados se siguen mostrando por rol. Lo que si es cierto siempre es que **la puerta no depende del menu**: cada pantalla vuelve a preguntar por su cuenta.
+El cierre completo llego el 2026-08-10 (TASK-1685): tambien los seis enlaces heredados dejaron de mostrarse por rol y hoy **todo el menu cliente y todas las puertas responden la misma pregunta con la misma regla** —modulos contratados de la organizacion, menos las revocaciones por persona. Antes de ese cierre se midieron 36 enlaces que el menu ofrecia y la puerta negaba, sobre 8 de 8 usuarios cliente. Lo que sigue siendo cierto es que **la puerta no depende del menu**: cada pantalla vuelve a preguntar por su cuenta, y una senal en `/admin/operations` (`identity.client_portal.menu_gate_divergence`, estado sano cero) vigila que menu y puerta no vuelvan a divergir.
 
 ---
 
@@ -129,7 +130,7 @@ El calculo del menu de cliente ocurre en la raiz del portal, la misma que sostie
 - **No cobra ni factura nada.** Que un modulo aparezca en el menu no significa que este facturado; eso vive en el acuerdo comercial.
 - **No escribe nada.** El menu solo lee las asignaciones. Activarlas, pausarlas o darlas de baja es trabajo de las acciones de administracion, que dejan auditoria.
 - **No distingue visualmente un complemento de un modulo base.** Hoy el menu del portal muestra todos los enlaces igual; la diferencia entre modulo base, complemento y piloto se ve en la vista de administracion, no en el menu del cliente.
-- **Quedan dos deudas conocidas, las dos del mismo tipo:** enlaces que no salen de lo contratado. Una es la lista heredada de seis enlaces cliente, que se muestra por rol. La otra es un bloque antiguo que arma unos pocos enlaces a partir de la linea de negocio y los servicios de la cuenta. Ninguna de las dos abre puertas —la pantalla sigue preguntando por su cuenta—, pero ambas pueden prometer de mas en el menu. Estan pendientes de migrar al mismo origen.
+- **Queda una deuda conocida:** un bloque antiguo que arma unos pocos enlaces a partir de la linea de negocio y los servicios de la cuenta, pendiente de migrar al mismo origen. No abre puertas —la pantalla sigue preguntando por su cuenta—, pero puede prometer de mas en el menu. (La otra deuda del mismo tipo, la lista heredada de seis enlaces mostrada por rol, se cerro el 2026-08-10 con TASK-1685.)
 
 ---
 

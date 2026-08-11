@@ -821,18 +821,20 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
   // CLIENT USERS (external portal)
   // ═══════════════════════════════════════════════════════════════════════
   //
-  // TASK-827 D2 + TASK-1675 — dos carriles, uno de ellos ya migrado.
+  // TASK-827 D2 + TASK-1675 + TASK-1685 — un solo predicado de visibilidad.
   //
-  // La LISTA BASE de este bloque sigue saliendo de `canSeeView('cliente.*')`,
-  // que se deriva de `session.user.authorizedViews[]` (TASK-136) y por tanto de
-  // `role_view_assignments`: rol → vista, nunca módulos.
+  // La LISTA BASE de este bloque se filtra con `canSeeClientView('cliente.*')`,
+  // el primitive único del portal cliente (módulos contratados de la organización
+  // + revocaciones per-persona) — el MISMO predicado que consumen los page guards
+  // y ⌘K. Ya NO sale de `canSeeView`/`authorizedViews` (rol): TASK-1685 retiró
+  // ese carril para vistas `cliente.*` (ISSUE-148: 36 enlaces que el menú
+  // ofrecía y la puerta negaba).
   //
-  // Los ÍTEMS DE MÓDULO ya no. TASK-1675 cerró la deuda sin ID
-  // `client-portal-vertical-menu-resolver-migration` que TASK-827 dejó nombrada:
-  // llegan por la prop `clientNavItems`, compuestos server-side en
-  // `(dashboard)/layout.tsx` desde el resolver canónico (TASK-825) contra
-  // `module_assignments` — el mismo origen que gatea cada page. El merge está
-  // más abajo y es aditivo.
+  // Los ÍTEMS DE MÓDULO llegan por la prop `clientNavItems` (TASK-1675),
+  // compuestos server-side en `(dashboard)/layout.tsx` desde el resolver
+  // canónico (TASK-825) contra `module_assignments` — el mismo origen que gatea
+  // cada page — y también pasan por el primitive (un `revoke` per-persona debe
+  // cerrar el enlace, no sólo la puerta). El merge está más abajo y es aditivo.
   //
   // Se descartó montar `<ClientPortalNavigation>` acá: trae su propio chrome
   // (MUI `List`, section headers, active state propio) y dejaría dos sistemas de
@@ -841,7 +843,7 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
   // Lo que queda de deuda es el bloque `capabilityModules`
   // (`businessLines`/`serviceModules`), follow-up `capability-modules-resolver-migration`.
   //
-  // client-portal-allowed: legacy canSeeView pattern en la lista base (los ítems de módulo ya salen del resolver)
+  // client-portal-allowed: bloque legacy `capabilityModules` (businessLines/serviceModules) todavía sin migrar al resolver
 
   if (!isInternalPortalUser && isPureCollaborator) {
     // ── TASK-1686 — proyección del colaborador puro ──

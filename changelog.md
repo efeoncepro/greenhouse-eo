@@ -15,7 +15,21 @@ usa un perfil Chrome separado, revisa **Nueva** y **Editando**, lee fichas y adj
 un reporte local protegido. Su salida es read-only y evidence-first; participar, responder, cargar o firmar sigue
 bajo control humano explícito. El flujo documentado continúa con el archivo de originales en OneDrive y con la
 verificación/alta por MCP HubSpot de empresa, deal y asociación en dos confirmaciones; no se eluden visores
-protegidos ni se guardan URLs firmadas.
+protegidos ni se guardan URLs firmadas. El dictamen exige leer la descripción completa y el Centro de mensajes →
+Preguntas, porque ahí pueden estar el máximo de presupuesto, pago, alcance, inicio, facturación y exclusiones; si
+el reporte no contiene esas aclaraciones, se revisan en la UI autenticada antes de clasificar. La misma fuente ahora
+documenta el cierre de una postulación: precio desde cotización aprobada → condiciones/adjuntos → reconciliación
+en resumen → aceptación y envío únicamente con confirmación humana final.
+
+## 2026-08-11 — Oferta completa para Ajinomoto LIC-962
+
+Se redactó la propuesta técnica y económica para el programa influen-SER Team de Ajinomoto del Perú, con ledger
+trazable al brief y a las respuestas de Wherex, matriz de cumplimiento, límites de alcance y condiciones de
+facturación Chile–Perú. La oferta fija S/ 7.000 mensuales sin IGV peruano y S/ 84.000 referenciales para los 12
+meses de la ficha; no promete resultados de plataforma ni producción ilimitada. Se emitió la cotización XLSX y
+se compuso una presentación técnica de 11 láminas, validada por el composer. Ningún precio, adjunto, término o
+envío fue ingresado en Wherex. El blueprint interno conserva el gate de Finanzas por costo cargado/squad y la
+revisión tributaria previa a adjudicación.
 
 ## 2026-08-10 — TASK-1685 cerrada: el portal cliente tiene un solo primitive de visibilidad
 
@@ -1194,25 +1208,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   fuentes, comentarios, estados, QA, aprobaciones y ciclo de vida. Se recompusieron los decks, se regeneró el
   Excel desde su JSON fuente y la síntesis quedó en HubSpot como nota `114121518673` sobre el deal `62535094842`;
   no se alteraron la etapa ni el monto del deal. El cierre sigue `workshop_only`.
-
-## 2026-08-02 — Gemini Omni: evidencia legal corregida y checkpoint durable
-
-- Globe `62337b483` quedó en `main` con driver gobernado y simetría de configuración/secret/IAM entre API y
-  Producer worker para `ref/motion/reference-v1 / vertex-omni / gemini-omni-flash-preview / preview`; CI
-  `30743786928` terminó verde.
-- Globe `fa286dbd` corrigió la idempotencia de `auto-promote` para incorporar la atestación/policy sin duplicar la
-  route revision; CI `30744034457` terminó verde. API `30744857697` y worker `30744857698` quedaron desplegados;
-  OpenTofu aplicó `1 add, 2 change, 0 destroy`, sin deploy de Studio.
-- `auto-promote` `30745031010`, policy reader `30745219391` y la saga
-  `promotion_922157fa-b708-45cc-8bbf-b08d761afb21` terminaron correctamente. La policy
-  `arp_8090d31ae570c016f84cad0f7aee09ba84578f1dbd3622074a38cfa03a839ff5` conserva la atestación corregida,
-  `no-sublicense` y el digest de términos exacto; los readbacks finales reconciliaron saga `activated` rev. 7,
-  readiness promovido, route rev. 7, binding habilitado y circuito cerrado.
-- El candidato de evaluación retenido no se reutilizó como canary productivo.
-- La atestación anterior declaraba sublicencia y términos genéricos incorrectos. El Producer autenticado firmó
-  una nueva atestación inmutable con uso comercial/entrega permitidos, sublicencia denegada y digest exacto
-  `sha256:04e949c5…e53d4b`. El Producer sigue mostrando 784 créditos y el modelo exacto, pero `Elementos` está
-  deshabilitado en dos pestañas con `Todavía no hay un modelo publicado para este modo`; no se ejecutó gasto,
-  run, output ni `canary-confirm`. Queda pendiente una única ejecución cuando la superficie gobernada lo exponga.
-- TASK-1632 permanece separada y `to-do`: formaliza dentro de Globe el wake event-driven desde completion del
-  proveedor hasta Asset Governance; no es un handoff Greenhouse ni reabre TASK-1614.

@@ -5,6 +5,8 @@ import type { ReactNode } from 'react'
 
 import { useRouter, usePathname } from 'next/navigation'
 
+import IconButton from '@mui/material/IconButton'
+
 import { Command } from 'cmdk'
 import { Dialog, DialogPortal, DialogOverlay, DialogContent, DialogTitle, DialogDescription } from '@radix-ui/react-dialog'
 
@@ -205,15 +207,20 @@ export const CommandPalette = ({
   return (
     <>
       {showTrigger ? (
-        <button
-          type='button'
-          className={compactTrigger ? 'gh-cmdk-trigger gh-cmdk-trigger--compact' : 'gh-cmdk-trigger'}
+        // TASK-1388 follow-up visual: el trigger replica el lenguaje de las
+        // utilidades de la topbar (IconButton borderless + label muted), que es
+        // exactamente el tratamiento que tenía el NavSearch retirado — no un
+        // chip bordeado ajeno al chrome. `.gh-cmdk-trigger` se conserva como
+        // hook semántico de los scenarios GVC.
+        <div
+          className={compactTrigger ? 'gh-cmdk-trigger flex items-center' : 'gh-cmdk-trigger flex items-center gap-2 cursor-pointer'}
           onClick={() => setOpen(true)}
-          aria-label={TASK407_ARIA_ABRIR_BUSCADOR_RAPIDO}
         >
-          <i className='tabler-search' />
-          {compactTrigger ? null : <span>{triggerLabel}</span>}
-        </button>
+          <IconButton aria-label={TASK407_ARIA_ABRIR_BUSCADOR_RAPIDO} className='text-textPrimary'>
+            <i className='tabler-search text-2xl' />
+          </IconButton>
+          {compactTrigger ? null : <div className='whitespace-nowrap select-none text-textDisabled'>{triggerLabel}</div>}
+        </div>
       ) : null}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogPortal>

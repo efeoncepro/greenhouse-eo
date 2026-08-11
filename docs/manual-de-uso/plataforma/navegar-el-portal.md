@@ -1,14 +1,14 @@
 # Navegar el portal — sidebar, menú del avatar y buscador ⌘K
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-08-10 por Claude (TASK-1388 + TASK-1686)
-> **Ultima actualizacion:** 2026-08-10 por Claude
+> **Ultima actualizacion:** 2026-08-11 por Claude (TASK-1685: qué ve un cliente en el buscador ⌘K)
 > **Documentacion tecnica:** [TASK-1388](../../tasks/complete/TASK-1388-vertical-menu-restructure.md) · [TASK-1686](../../tasks/complete/TASK-1686-pure-collaborator-navigation.md) · [Sistema de identidad, roles y acceso](../../documentation/identity/sistema-identidad-roles-acceso.md)
 
 ## Para qué sirve
 
-Greenhouse reparte la navegación en **tres superficies**, cada una con un trabajo distinto. Este manual explica cuál usar para cada cosa. Lo que ves depende de tu rol; las tres superficies muestran siempre el mismo conjunto de destinos que tienes permitido.
+Greenhouse reparte la navegación en **tres superficies**, cada una con un trabajo distinto. Este manual explica cuál usar para cada cosa. Lo que ves depende de quién eres —para usuarios internos lo define tu rol; para clientes, lo que su organización tiene contratado—; las tres superficies muestran siempre el mismo conjunto de destinos que tienes permitido.
 
 ## Las tres superficies
 
@@ -38,7 +38,7 @@ El menú se abre también con teclado (Enter o Espacio sobre el avatar) y se cie
 
 Presiona **Cmd+K** (Mac) o **Ctrl+K** (Windows), o haz clic en el botón **Buscar** de la barra superior. Escribe el nombre de cualquier pantalla y salta directo. El buscador:
 
-- muestra **solo lo que tu rol puede ver**, agrupado por sección;
+- muestra **solo lo que puedes ver**, agrupado por sección. Para usuarios internos, eso lo define tu rol; para clientes, **lo que su organización tiene contratado** (menos alguna pantalla revocada individualmente) — el buscador, el menú y las páginas responden con la misma regla;
 - recuerda tus **destinos recientes**;
 - incluye la acción **Salir del Greenhouse**;
 - se navega con ↑/↓, se abre con Enter y se cierra con Esc.
@@ -48,7 +48,7 @@ Presiona **Cmd+K** (Mac) o **Ctrl+K** (Windows), o haz clic en el botón **Busca
 ## Qué significan los estados
 
 - **Un dominio abierto a la vez** en el sidebar es el comportamiento normal (acordeón), no un error.
-- Si una pantalla **no aparece** en ninguna superficie, tu rol no la tiene concedida — no está "escondida" en otro menú.
+- Si una pantalla **no aparece** en ninguna superficie, no la tienes concedida — no está "escondida" en otro menú. (Interno: la concede tu rol. Cliente: la concede un módulo contratado de su organización.)
 - En pantallas angostas el sidebar vive en un **drawer**: se abre con el botón de menú (☰) y se cierra tocando fuera.
 
 ## Qué no hacer
@@ -61,7 +61,8 @@ Presiona **Cmd+K** (Mac) o **Ctrl+K** (Windows), o haz clic en el botón **Busca
 | Síntoma | Causa probable | Qué hacer |
 | --- | --- | --- |
 | "No encuentro Mi Nómina" (interno) | Buscabas en el sidebar | Ábrela desde el menú del avatar, o escribe "nómina" en ⌘K |
-| Una pantalla no sale en ⌘K | Tu rol no la tiene concedida | Pídela a quien administra accesos (Admin Center → Usuarios/Roles) |
+| Una pantalla no sale en ⌘K (interno) | Tu rol no la tiene concedida | Pídela a quien administra accesos (Admin Center → Usuarios/Roles) |
+| Una pantalla no sale en ⌘K (cliente) | Su organización no tiene el módulo que la incluye, o la pantalla fue revocada para esa persona | Revisar los módulos de la organización en Admin Center → Client Portal |
 | El sidebar "perdió" secciones | Cambio de rol o de organización | Verifica tu rol con el administrador |
 
 ## Referencias técnicas

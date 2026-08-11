@@ -1,10 +1,32 @@
 # Menu dinamico y acceso a modulos del Portal Cliente
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-05-13 por Claude (TASK-827)
-> **Ultima actualizacion:** 2026-08-09 por Claude (mapa pagina por pagina despues de los dos releases del dia)
+> **Ultima actualizacion:** 2026-08-11 por Claude (TASK-1685: menu y puerta comparten una sola regla; la lista base dejo de mostrarse por rol)
 > **Documentacion tecnica:** [GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md](../../architecture/GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md), [GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md)
+
+---
+
+## Delta 2026-08-11 — menu y puerta responden con una sola regla (TASK-1685)
+
+Desde el 2026-08-10, **todo** el menu del cliente —incluida la lista base heredada que hasta entonces
+se mostraba por rol— decide su visibilidad con la misma regla que la puerta de cada pagina: **modulos
+contratados de la organizacion, menos revocaciones por persona**. Consecuencias practicas:
+
+- **Ya no existe el caso "veo el enlace y al entrar me dice que el modulo no esta activado".** Antes
+  del cierre se midieron 36 enlaces asi, sobre 8 de 8 usuarios cliente. Si el enlace esta, la pagina abre.
+- **Ciclos y Analytics ya no aparecen en el menu de nadie**, porque ningun modulo del catalogo las
+  declara. Nadie perdio acceso: tampoco podian abrirlas antes — eran enlaces muertos.
+- **El rol del usuario cliente no agrega ni quita enlaces.** Los tres roles de cliente se diferencian
+  en que puede hacer una persona dentro de una pantalla, no en que pantallas ve.
+- **A una persona concreta se le puede revocar una pantalla especifica** (caso de soporte o
+  verificacion); la revocacion cierra a la vez menu, puerta y buscador ⌘K.
+- Una senal nueva en `/admin/operations` (`identity.client_portal.menu_gate_divergence`, estado sano
+  cero) vigila que menu y puerta no vuelvan a divergir.
+
+Las secciones historicas de este documento que describen la lista base "mostrada por rol" quedaron
+marcadas abajo como cerradas.
 
 ---
 
@@ -56,16 +78,17 @@ base que lee produccion despues de los dos releases del dia.
 | Campanas | `/campanas` | modulo Creative Hub Globe | solo Sky Airlines |
 | Equipo | `/equipo` | Creative Hub Globe **o** Equipo Asignado | solo Sky Airlines (nadie tiene Equipo Asignado) |
 | Revisiones | `/reviews` | modulo Creative Hub Globe | solo Sky Airlines |
-| Ciclos | `/sprints` | ningun modulo del catalogo la declara | nadie: empty state para todos |
-| Analytics | `/analytics` | ningun modulo del catalogo la declara | nadie: empty state para todos |
+| Ciclos | `/sprints` | ningun modulo del catalogo la declara | nadie; desde TASK-1685 el menu tampoco la muestra (por URL directa: empty state) |
+| Analytics | `/analytics` | ningun modulo del catalogo la declara | nadie; desde TASK-1685 el menu tampoco la muestra (por URL directa: empty state) |
 
 Tres lecturas que conviene tener claras:
 
 **Ciclos y Analytics estan asi a proposito, y es deuda declarada.** Son superficies de entrega y de
 reporting: dependen del servicio contratado, no del portal. Se dejaron dependiendo de un modulo y hoy
-ningun modulo las declara, asi que muestran el empty state honesto para todo el mundo. Abrirlas es
-declararlas en el modulo que corresponda —una decision de catalogo, no un cambio de codigo—, no
-moverlas a vista base.
+ningun modulo las declara. Desde TASK-1685 (2026-08-10) el menu ya no las muestra a nadie —antes eran
+enlaces muertos que el rol mostraba y la puerta negaba—; quien llegue por URL directa recibe el empty
+state honesto. Abrirlas es declararlas en el modulo que corresponda —una decision de catalogo, no un
+cambio de codigo—, no moverlas a vista base.
 
 **Creative es de Sky Airlines y de nadie mas.** El 2026-08-09 se le asigno el modulo Creative Hub
 Globe a Sky Airlines, y con eso sus usuarios abren Proyectos, Campanas, Equipo y Revisiones. El bundle
@@ -78,26 +101,28 @@ portal. Es la deuda de paginas placeholder que ya estaba anotada mas abajo; con 
 dejo de ser hipotetica. Si un usuario de Sky reporta que ese enlace no lleva a ninguna parte, tiene
 razon y no es un problema de contratacion.
 
-### Por que un cliente puede ver un enlace y recibir el empty state
+### Por que un cliente podia ver un enlace y recibir el empty state (cerrado el 2026-08-10)
 
-Pasa, es esperado hoy y es la confusion de soporte mas probable.
+Era la confusion de soporte mas probable, y **desde TASK-1685 ya no pasa**.
 
-El menu del cliente se arma de **dos** partes que todavia no comparten origen:
+El menu del cliente se armaba de **dos** partes que no compartian origen:
 
-- **Los enlaces de modulo** se componen desde lo contratado (esto es lo que cerro TASK-1675). Si el
-  enlace esta, la pagina abre.
+- **Los enlaces de modulo** se componian desde lo contratado (esto es lo que cerro TASK-1675). Si el
+  enlace estaba, la pagina abria.
 - **Una lista base heredada** de seis enlaces de cliente —Proyectos, Ciclos, Equipo, Revisiones,
-  Analytics, Campanas— todavia se muestra segun el rol de la persona, no segun el modulo. Por eso una
-  organizacion sin Creative Hub Globe puede ver esos enlaces y, al entrar, recibir "este modulo no
+  Analytics, Campanas— se mostraba segun el rol de la persona, no segun el modulo. Por eso una
+  organizacion sin Creative Hub Globe podia ver esos enlaces y, al entrar, recibir "este modulo no
   esta activado para tu cuenta".
 
-Eso **no** es un agujero de seguridad: la puerta de cada pagina sigue decidiendo por modulo
-contratado, y el menu nunca otorga acceso. Es un enlace que promete de mas. Migrar esa lista base al
-mismo origen es la deuda hermana pendiente.
+Nunca fue un agujero de seguridad: la puerta de cada pagina siempre decidio por modulo contratado, y
+el menu nunca otorgo acceso. Eran enlaces que prometian de mas — 36 medidos, sobre 8 de 8 usuarios
+cliente. Hoy la lista base decide su visibilidad con la misma regla que la puerta (modulos contratados
+menos revocaciones por persona), asi que **si un enlace esta en el menu, la pagina abre**.
 
-> Que NO hacer con esto: no "arreglarlo" quitandole permisos de vista al rol cliente, porque ese
-> mismo permiso alimenta enlaces legitimos, y no ponerlo en "si" para las pantallas que dependen de
-> un modulo, porque convertiria el acceso en visibilidad por rol para todos los clientes con ese rol.
+> Que NO hacer si algo parecido reaparece: no tocar los permisos de vista por rol — desde TASK-1685
+> esa tabla no gobierna ninguna pantalla del portal cliente. Si un cliente reporta un enlace que no
+> abre, revisa la senal `identity.client_portal.menu_gate_divergence` en `/admin/operations` y los
+> modulos de su organizacion.
 
 ---
 
@@ -266,7 +291,7 @@ Cuando comercial activa un nuevo modulo via Admin Center, el cache se invalida a
 
 - **Algunas paginas son placeholder forward-looking, y desde el 2026-08-09 esto ya no es hipotetico**: la base de datos declara modulos como `creative_hub_globe_v1` con superficies como `/creative-hub`, `/brand-intelligence`, etc., pero esas direcciones todavia no existen en el portal. Con el modulo asignado a Sky Airlines, sus usuarios ven el enlace de Creative Hub y ese enlace no lleva a ninguna parte. La task derivada `client-portal-pages-placeholder-materialization` (V1.1) crea las paginas. Mientras tanto: si un cliente reporta ese enlace, tiene razon y no hay nada que activar.
 - **Dos de las nueve paginas no tienen modulo que las declare**: Ciclos (`/sprints`) y Analytics (`/analytics`) quedaron dependiendo de un modulo y hoy ninguno las declara, asi que muestran el empty state para todas las organizaciones. Es deuda declarada, no un bug: se cierra declarandolas en el modulo que corresponda.
-- **La lista base heredada de seis enlaces cliente todavia se muestra por rol**, no por modulo. Un cliente puede ver el enlace y recibir el empty state al entrar (explicado arriba). Migrarla al mismo origen que los enlaces de modulo es la deuda hermana pendiente.
+- ~~**La lista base heredada de seis enlaces cliente todavia se muestra por rol**~~ — **cerrado por TASK-1685 (2026-08-10)**. La lista base decide su visibilidad con el mismo origen que los enlaces de modulo y que la puerta de cada pagina (modulos contratados menos revocaciones por persona). Queda pendiente el bloque menor de linea de negocio/servicios de la cuenta (ver punto anterior).
 - ~~**El menu vertical legacy coexiste**~~ — **cerrado por TASK-1675 (2026-08-09)**. El menu izquierdo ya suma los enlaces de los modulos contratados, resueltos en el servidor desde la misma fuente que gatea cada pagina. Lo que queda es un bloque menor que arma unos pocos enlaces desde la linea de negocio y los servicios de la cuenta, pendiente de migrar. Detalle funcional: [Menu del Portal Cliente — modulos contratados](menu-portal-cliente-modulos.md).
 - **El email del account manager es generico**: los botones "Solicitar acceso" usan `support@efeoncepro.com` como destino por ahora. La resolucion canonical (leer del campo `organizations.account_manager_user_id`) vive en task derivada V1.1.
 - **Sin self-service del cliente**: el cliente no puede solicitar un modulo desde su portal todavia. Si quiere uno, escribe al account manager via el mailto. El flow self-service con aprobacion operativa vive en V1.1.
@@ -285,13 +310,14 @@ Cuando comercial activa un nuevo modulo via Admin Center, el cache se invalida a
 
 ## Para equipo de operaciones: como saber si esto esta funcionando
 
-En `/admin/operations`, el subsystem **Identity & Access** tiene tres senales que juntas cubren este carril. Las dos ultimas se agregaron el 2026-08-09 y ambas deben marcar **cero** en estado sano:
+En `/admin/operations`, el subsystem **Identity & Access** tiene cuatro senales que juntas cubren este carril. Las tres ultimas deben marcar **cero** en estado sano:
 
 | Senal | Que cuenta | Que hacer si no es cero |
 |---|---|---|
 | `client_portal.composition.resolver_failure_rate` | fallas reales del resolver | hoy emite `unknown` (scaffold V1.0); cuando TASK-829 cierre reportara el porcentaje y alertara sobre 1% |
 | `identity.client_portal.client_without_organization` | usuarios cliente sin organizacion resuelta | reconciliar el onboarding de esa cuenta: sin organizacion, ningun modulo se va a ver |
 | `identity.view_access.client_role_without_grants` | roles cliente que quedaron sin ningun permiso de vista | revisar los grants sembrados; con la lista vacia el carril cliente ahora cierra en vez de abrir |
+| `identity.client_portal.menu_gate_divergence` (desde TASK-1685, 2026-08-11) | enlaces que el menu ofrece y la puerta niega, superficies alcanzables solo por URL, y superficies que ningun modulo del catalogo vende | menu y puerta divergieron: revisar los modulos de la organizacion afectada o el catalogo de navegacion; NUNCA "arreglarlo" agregando la vista al catalogo de navegacion |
 
 La ultima existe por un cambio de criterio: hasta el 2026-08-09, si un rol cliente no tenia fila para una vista, el sistema **la otorgaba**. Ahora no. El default del carril de rol quedo alineado con el de modulos: nada se otorga hasta que este declarado.
 
