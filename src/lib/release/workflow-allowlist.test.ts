@@ -7,12 +7,13 @@ import {
   findWorkflow
 } from './workflow-allowlist'
 
-describe('workflow-allowlist — canonical 8 workflows (6 deploy workers + orchestrator + watchdog)', () => {
-  it('contains exactly the 8 production release workflows', () => {
+describe('workflow-allowlist — canonical 9 workflows (7 deploy workers + orchestrator + watchdog)', () => {
+  it('contains exactly the 9 production release workflows', () => {
     expect(RELEASE_DEPLOY_WORKFLOWS.map((w) => w.workflowName).sort()).toEqual(
       [
         'Azure Teams Bot Deploy',
         'Azure Teams Deploy',
+        'ClamAV Scanner Deploy',
         'Commercial Cost Worker Deploy',
         'HubSpot Greenhouse Integration Deploy',
         'ICO Batch Worker Deploy',
@@ -29,7 +30,7 @@ describe('workflow-allowlist — canonical 8 workflows (6 deploy workers + orche
   })
 
   it('Set is read-only (preserve canonical immutability)', () => {
-    expect(RELEASE_DEPLOY_WORKFLOW_NAMES.size).toBe(8)
+    expect(RELEASE_DEPLOY_WORKFLOW_NAMES.size).toBe(9)
   })
 
   // Anti-regression: el orchestrator DEBE estar en el allowlist para que
@@ -69,8 +70,18 @@ describe('workflow-allowlist — canonical 8 workflows (6 deploy workers + orche
 })
 
 describe('workflow-allowlist — Cloud Run drift detection mapping', () => {
-  it('maps 4 workflows to Cloud Run services', () => {
-    expect(WORKFLOWS_WITH_CLOUD_RUN_DRIFT_DETECTION).toHaveLength(4)
+  it('maps 5 workflows to Cloud Run services', () => {
+    expect(WORKFLOWS_WITH_CLOUD_RUN_DRIFT_DETECTION).toHaveLength(5)
+  })
+
+  // TASK-1378 — El scanner participa en drift detection porque su veredicto
+  // gatea el upload público con semántica fail-closed: una revisión caída o
+  // desalineada bloquea postulaciones, no es un detalle de infraestructura.
+  it('maps ClamAV Scanner Deploy to clamav us-east4', () => {
+    const w = findWorkflow('ClamAV Scanner Deploy')
+
+    expect(w?.cloudRunService).toBe('clamav')
+    expect(w?.cloudRunRegion).toBe('us-east4')
   })
 
   it('maps Ops Worker Deploy to ops-worker us-east4', () => {

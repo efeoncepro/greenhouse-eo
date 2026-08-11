@@ -27,7 +27,25 @@ type ClamAvResponse = {
 const parseSignature = (payload: ClamAvResponse) =>
   typeof payload.signature === 'string' && payload.signature.trim() ? payload.signature.trim() : 'unknown_signature'
 
-const buildScanner = ({ endpoint, timeoutMs }: { endpoint: string; timeoutMs: number }): AssetScanner => ({
+const buildScanner = ({
+  endpoint,
+  timeoutMs,
+  getAuthToken,
+}: {
+  endpoint: string
+  timeoutMs: number
+  /**
+   * TASK-1378 — Proveedor del ID token OIDC.
+   *
+   * El servicio corre en Cloud Run con `--no-allow-unauthenticated`: sin este
+   * header devuelve 403 y el veredicto es `error` bloqueante. Se inyecta en vez
+   * de resolverse acá adentro para que el adapter siga siendo un traductor puro
+   * del contrato HTTP y sus tests no necesiten credenciales de Google.
+   *
+   * Ausente ⇒ no se manda header (servicio local sin IAM, o tests).
+   */
+  getAuthToken?: () => Promise<string | null>
+}): AssetScanner => ({
   name: 'clamav-http',
   version: VERSION,
   scan: async ({ bytes, fileName }: AssetScanInput): Promise<Omit<AssetScanResult, 'durationMs'>> => {
@@ -36,6 +54,29 @@ const buildScanner = ({ endpoint, timeoutMs }: { endpoint: string; timeoutMs: nu
       scannerVersion: VERSION,
       detectedMimeType: null,
     } as const
+
+    let authToken: string | null = null
+
+    if (getAuthToken) {
+      try {
+        authToken = await getAuthToken()
+      } catch {
+        // Fail-closed, igual que el resto del adapter: sin token no se puede
+        // escanear, y no escanear NUNCA puede degradar a `clean`. El detalle
+        // técnico se queda acá; nada del error de credenciales llega al cliente.
+        return {
+          ...base,
+          verdict: 'error',
+          findings: [
+            {
+              code: 'scanner_auth_failed',
+              severity: 'blocking',
+              detail: 'No se pudo obtener credencial para contactar el servicio de scan.',
+            },
+          ],
+        }
+      }
+    }
 
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), timeoutMs)
@@ -48,6 +89,7 @@ const buildScanner = ({ endpoint, timeoutMs }: { endpoint: string; timeoutMs: nu
           // El nombre viaja como header para no forzar multipart; el servicio lo
           // usa sólo para logging. NUNCA se confía en él para decidir tipo.
           'x-file-name': encodeURIComponent(fileName),
+          ...(authToken ? { authorization: `Bearer ${authToken}` } : {}),
         },
         body: new Uint8Array(bytes),
         signal: controller.signal,

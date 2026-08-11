@@ -1,7 +1,10 @@
 import 'server-only'
 
+import { fetchGoogleIdTokenForAudience } from '@/lib/google-credentials'
+
 import { createClamAvHttpScanner } from './clamav-http'
 import {
+  getAssetMalwareScanAudience,
   getAssetMalwareScanEndpoint,
   getAssetMalwareScanTimeoutMs,
   isAssetMalwareScanEnabled,
@@ -57,7 +60,16 @@ export const scanAssetBytes = async (input: AssetScanInput): Promise<AssetScanRe
         detail: 'ASSET_MALWARE_SCAN_ENABLED está prendido pero falta ASSET_MALWARE_SCAN_ENDPOINT.',
       })
     } else {
-      const clamav = await createClamAvHttpScanner({ endpoint, timeoutMs: getAssetMalwareScanTimeoutMs() }).scan(input)
+      // TASK-1378 — El servicio vive en Cloud Run detrás de IAM. La audiencia se
+      // deriva del propio endpoint; si no es https (dev local sin IAM) no se
+      // pide token y el adapter llama sin header.
+      const audience = getAssetMalwareScanAudience()
+
+      const clamav = await createClamAvHttpScanner({
+        endpoint,
+        timeoutMs: getAssetMalwareScanTimeoutMs(),
+        ...(audience ? { getAuthToken: () => fetchGoogleIdTokenForAudience(audience) } : {}),
+      }).scan(input)
 
       verdict = worstVerdict(verdict, clamav.verdict)
       findings.push(...clamav.findings)

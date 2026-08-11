@@ -51,6 +51,17 @@ export const RELEASE_DEPLOY_WORKFLOWS: readonly ReleaseDeployWorkflow[] = [
     cloudRunRegion: 'us-central1'
   },
   {
+    // TASK-1378 — Scanner de firmas de assets de candidato. Registrado ANTES
+    // del primer deploy production, como exige la regla dura del control plane.
+    //
+    // SÍ participa en revision drift detection: su veredicto gatea el upload
+    // público de CV con semántica fail-closed, así que una revisión desalineada
+    // o caída no es un detalle de infraestructura — bloquea postulaciones.
+    workflowName: 'ClamAV Scanner Deploy',
+    cloudRunService: 'clamav',
+    cloudRunRegion: 'us-east4'
+  },
+  {
     workflowName: 'Azure Teams Deploy'
     // Azure deploys: no Cloud Run revision para drift detection
   },

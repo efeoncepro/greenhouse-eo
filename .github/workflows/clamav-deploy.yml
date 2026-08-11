@@ -1,0 +1,170 @@
+name: ClamAV Scanner Deploy
+
+# TASK-1378 — Servicio de escaneo de firmas para assets de candidato.
+#
+# A diferencia de los otros workers, este servicio NO comparte código con el
+# portal: el contrato entre ambos es HTTP y lo define
+# `src/lib/storage/asset-scan/clamav-http.ts`. Por eso los paths de trigger son
+# sólo `services/clamav/**` — un cambio en `src/lib` no obliga a redeployarlo.
+#
+# El build hornea la base de firmas en la imagen (varios minutos): sin eso, la
+# primera instancia arranca descargando ~250 MB y el startup probe expira.
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - '.github/workflows/clamav-deploy.yml'
+      - 'services/clamav/**'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        type: choice
+        required: true
+        default: staging
+        options:
+          - staging
+          - production
+      expected_sha:
+        description: 'Expected git SHA (default: github.sha). TASK-851 — orchestrator passes target_sha.'
+        type: string
+        required: false
+        default: ''
+  # TASK-851 — workflow_call interface para production-release.yml.
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Target environment (staging | production)'
+        type: string
+        required: true
+      expected_sha:
+        description: 'Target git SHA the orchestrator wants deployed'
+        type: string
+        required: true
+    secrets:
+      GCP_WORKLOAD_IDENTITY_PROVIDER:
+        required: true
+
+# TASK-848 Slice 3 — concurrency canónica. `cancel-in-progress` dinámico:
+# NUNCA `false` literal (reintroduce el deadlock determinista del incidente
+# 2026-04-26→05-09). Ver GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md §2.7.
+concurrency:
+  group: clamav-deploy-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref == 'refs/heads/develop' || (github.event_name == 'workflow_call' && inputs.environment == 'production') || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production') }}
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    name: Deploy clamav scanner to Cloud Run
+    runs-on: ubuntu-latest
+    # El build hornea la base de firmas; más lento que un worker Node.
+    timeout-minutes: 45
+
+    environment: >-
+      ${{
+        github.event_name == 'workflow_call'
+          && inputs.environment
+          || (github.event_name == 'workflow_dispatch'
+              && github.event.inputs.environment
+              || 'staging')
+      }}
+
+    env:
+      ENV: >-
+        ${{
+          github.event_name == 'workflow_call'
+            && inputs.environment
+            || (github.event_name == 'workflow_dispatch'
+                && github.event.inputs.environment
+                || 'staging')
+        }}
+      EXPECTED_SHA: >-
+        ${{
+          github.event_name == 'workflow_call'
+            && inputs.expected_sha
+            || (github.event_name == 'workflow_dispatch'
+                && github.event.inputs.expected_sha
+                || github.sha)
+        }}
+      GCP_PROJECT_ID: efeonce-group
+      GCP_REGION: us-east4
+      DEPLOYER_SERVICE_ACCOUNT: github-actions-deployer@efeonce-group.iam.gserviceaccount.com
+      RUNTIME_SERVICE_ACCOUNT: greenhouse-portal@efeonce-group.iam.gserviceaccount.com
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.DEPLOYER_SERVICE_ACCOUNT }}
+
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v3
+        with:
+          project_id: ${{ env.GCP_PROJECT_ID }}
+
+      - name: Resolve service name
+        id: service
+        run: |
+          if [ "${ENV}" = "production" ]; then
+            echo "name=clamav" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=clamav-staging" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Deploy clamav
+        run: |
+          bash services/clamav/deploy.sh
+        env:
+          ENV: ${{ env.ENV }}
+          EXPECTED_SHA: ${{ env.EXPECTED_SHA }}
+
+      # TASK-851 — poll acotado de Ready=True para el gate del orquestador.
+      # clamd carga la base de firmas al arrancar: 600 s, no 300 s.
+      - name: Poll Ready=True bounded
+        run: |
+          SERVICE="${{ steps.service.outputs.name }}"
+          DEADLINE=$((SECONDS + 600))
+          while [ ${SECONDS} -lt ${DEADLINE} ]; do
+            READY="$(gcloud run services describe "${SERVICE}" \
+              --project=${GCP_PROJECT_ID} \
+              --region=${GCP_REGION} \
+              --format='value(status.conditions[0].status)')"
+            if [ "${READY}" = "True" ]; then
+              echo "✓ Service Ready=True at $((SECONDS))s"
+              exit 0
+            fi
+            sleep 15
+          done
+          echo "ERROR: Service did not reach Ready=True within 600s"
+          exit 1
+
+      # Guardrail duro: el scanner recibe el CV de una persona real. Si alguna
+      # vez queda público, los bytes de cualquiera llegan al servicio.
+      - name: Assert service is not publicly invokable
+        run: |
+          SERVICE="${{ steps.service.outputs.name }}"
+          if gcloud run services get-iam-policy "${SERVICE}" \
+            --project=${GCP_PROJECT_ID} \
+            --region=${GCP_REGION} \
+            --format=json | grep -q '"allUsers"'; then
+            echo "::error::${SERVICE} es invocable públicamente. El scanner NUNCA debe serlo."
+            exit 1
+          fi
+          echo "✓ ${SERVICE} sólo es invocable por IAM"
+
+      - name: Record deployment commit
+        run: |
+          echo "Deployed commit: ${{ env.EXPECTED_SHA }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Environment: ${{ env.ENV }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Service: ${{ steps.service.outputs.name }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Triggered by: ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"
