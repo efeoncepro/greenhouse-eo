@@ -201,6 +201,7 @@ import { getSeoRankCaptureLagSignal } from './queries/seo-rank-capture-lag'
 // TASK-1082 — Knowledge Platform ingestion signals (moduleKey 'knowledge').
 import { getKnowledgeNotionIngestDeadLetterSignal } from './queries/knowledge-notion-ingest-dead-letter'
 import { getAssetScanOpenQuarantineSignal } from './queries/asset-scan-open-quarantine'
+import { getAssetScanSignatureFreshnessSignal } from './queries/asset-scan-signature-freshness'
 import { getHiringCandidateRetentionOverdueSignal } from './queries/hiring-candidate-retention-overdue'
 // TASK-356 — Hiring handoff workflow signals (moduleKey 'hiring').
 import { getHiringHandoffBlockedStaleSignal } from './queries/hiring-handoff-blocked-stale'
@@ -693,6 +694,7 @@ interface ReliabilityOverviewSources {
   /** TASK-1082 — Knowledge ingestion signals (quarantine count + failed sync source). */
   knowledgeQuarantineCount?: ReliabilitySignal | null
   assetScanOpenQuarantine?: ReliabilitySignal | null
+  assetScanSignatureFreshness?: ReliabilitySignal | null
   hiringCandidateRetentionOverdue?: ReliabilitySignal | null
   hiringHandoffBlockedStale?: ReliabilitySignal | null
   hiringInternalHireAwaitingOnboarding?: ReliabilitySignal | null
@@ -1178,6 +1180,7 @@ export const buildReliabilityOverview = (
     // TASK-1082 — Knowledge ingestion: quarantine count + failed sync source.
     ...(sources.knowledgeQuarantineCount ? [sources.knowledgeQuarantineCount] : []),
     ...(sources.assetScanOpenQuarantine ? [sources.assetScanOpenQuarantine] : []),
+    ...(sources.assetScanSignatureFreshness ? [sources.assetScanSignatureFreshness] : []),
     ...(sources.hiringCandidateRetentionOverdue ? [sources.hiringCandidateRetentionOverdue] : []),
     ...(sources.hiringHandoffBlockedStale ? [sources.hiringHandoffBlockedStale] : []),
     ...(sources.hiringInternalHireAwaitingOnboarding ? [sources.hiringInternalHireAwaitingOnboarding] : []),
@@ -1786,6 +1789,14 @@ export const getReliabilityOverview = async (
     preloadedSources.assetScanOpenQuarantine !== undefined
       ? preloadedSources.assetScanOpenQuarantine
       : await getAssetScanOpenQuarantineSignal().catch(() => null)
+
+  // TASK-1378 — Firmas envejecidas: el scanner responde pero ya no reconoce nada
+  // nuevo. Falla silenciosa por definición; `open_quarantine` no la ve porque no
+  // produce veredictos `error`.
+  const assetScanSignatureFreshness =
+    preloadedSources.assetScanSignatureFreshness !== undefined
+      ? preloadedSources.assetScanSignatureFreshness
+      : await getAssetScanSignatureFreshnessSignal().catch(() => null)
 
   // TASK-1362 — PII de candidatos no contratados fuera de la ventana de retención (Ley 21.719).
   const hiringCandidateRetentionOverdue =
@@ -2639,6 +2650,7 @@ export const getReliabilityOverview = async (
     globeCreditFundingStaleProposals,
     knowledgeQuarantineCount,
     assetScanOpenQuarantine,
+    assetScanSignatureFreshness,
     hiringCandidateRetentionOverdue,
     hiringHandoffBlockedStale,
     hiringInternalHireAwaitingOnboarding,
