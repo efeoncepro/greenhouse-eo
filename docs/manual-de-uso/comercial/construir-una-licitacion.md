@@ -13,7 +13,10 @@ Guía operativa para **armar una propuesta de licitación** (pública o privada 
 
 ## Antes de empezar
 
-- Ubica la carpeta de la licitación (por ejemplo, en OneDrive `Comercial/Licitaciones/<Cliente>/`).
+- Si la oportunidad se descubrió en Wherex, primero ejecuta el [radar con Playwright](revisar-licitaciones-wherex-con-chrome.md): revisa Nueva y Editando, y lee ficha y adjuntos antes de decidir si vale la pena construir una propuesta.
+- Ubica la carpeta de la licitación (por ejemplo, en OneDrive `Alineación/4. Comercial/Licitaciones/<Cliente>/`). Si
+  surgió de Wherex, deja allí los originales descargados y conserva el workspace técnico creado por `pnpm tender:new`
+  como fuente versionada; el detalle está en el manual del radar.
 - Ten a mano las **bases** (documento del cliente) y, si existe, la planilla económica exigida.
 - Define quién es el operador humano que **presentará** la oferta (el agente no la sube).
 

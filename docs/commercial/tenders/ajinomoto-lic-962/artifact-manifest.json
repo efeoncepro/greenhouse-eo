@@ -1,0 +1,17 @@
+{
+  "$schema": "../ARTIFACT_MANIFEST_SCHEMA.md",
+  "deal": "ajinomoto-lic-962",
+  "artifacts": [
+    {
+      "id": "ejemplo-radiografia",
+      "type": "aeo_xray",
+      "url": "https://think.efeoncepro.com/muestras/<slug>-<token>",
+      "as_of": "2026-08",
+      "audience": "client_facing",
+      "render": "by_link",
+      "backs_evidence": [],
+      "used_in": [],
+      "note": "BORRAR este ejemplo. render:by_link SIEMPRE — la pieza viva se enlaza, nunca se captura."
+    }
+  ]
+}

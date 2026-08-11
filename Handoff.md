@@ -1,5 +1,18 @@
 # Handoff activo
 
+### Proceso reusable — radar Wherex con CLI Playwright (2026-08-11)
+
+Quedó canonizado para futuras solicitudes en la skill `greenhouse-public-private-tenders` y el manual
+`docs/manual-de-uso/comercial/revisar-licitaciones-wherex-con-chrome.md`. `pnpm wherex:radar:setup` guarda
+correo y clave sólo en `.auth/` con `0600`; `pnpm wherex:radar` usa un perfil Chrome aislado, revisa **Nueva** y
+**Editando**, lee fichas y adjuntos, y genera el reporte protegido local. No participa, responde, carga,
+presenta ni firma. Pendiente operativo: correr el setup una vez en una terminal interactiva y calibrar selectores
+si Wherex cambió su interfaz. La continuidad de candidatas también quedó canonizada: los originales se archivan
+en OneDrive `Alineación/4. Comercial/Licitaciones/<Comprador>/` sin URLs firmadas; empresa, deal y asociación se
+verifican por MCP HubSpot y toda escritura requiere propuesta/confirmación, con la asociación confirmada una vez
+que la empresa tiene ID. Caso real del 2026-08-11: Ajinomoto y CINTERMEX creados/verificados; Polpaico ya existía
+y no se duplicó. Si el visor bloquea un guardado soportado, no se elude: se requiere una copia local verificable.
+
 ### TASK-1685 CERRADA — un solo primitive de visibilidad del portal cliente; `ISSUE-148` resuelta (2026-08-10)
 
 Cuarta task de navegación del mismo día, en `develop`, local-first, **sin push**. Decisión del Slice 1

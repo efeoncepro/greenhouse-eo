@@ -109,6 +109,8 @@
     "gcloud:auth:preflight": "bash scripts/gcloud-auth-preflight.sh",
     "gcloud:auth:playwright": "node scripts/gcloud-auth-playwright.mjs",
     "gcloud:auth:playwright:setup": "node scripts/gcloud-auth-playwright-secret-setup.mjs",
+    "wherex:radar": "node scripts/wherex-radar-playwright.mjs",
+    "wherex:radar:setup": "node scripts/wherex-radar-playwright-secret-setup.mjs",
     "catalog:resync": "tsx scripts/catalog/resync-from-manifest.ts",
     "catalog:check": "tsx scripts/catalog/check-drift.ts",
     "finance:e2e-gate": "node scripts/ci/finance-e2e-gate.mjs",

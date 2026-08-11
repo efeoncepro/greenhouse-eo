@@ -27,6 +27,29 @@ Construir una licitación pasa por diez momentos encadenados. Cada uno produce a
 9. **Armar la oferta económica y el paquete.** La planilla de precios en el formato pedido, revisar que todo lo obligatorio esté, y exportar a PDF.
 10. **Presentar (lo hace una persona).** La oferta la sube un humano a la plataforma; el sistema solo la prepara. Nunca se envía ni se firma solo.
 
+## Desde un radar privado hasta una oportunidad operable
+
+Una licitación privada pasa por una etapa anterior a la propuesta: el radar lee las fichas de Wherex y sus adjuntos
+en los estados Nueva y Editando, para que el equipo no descarte ni priorice sólo por el título. El resultado no es
+un "sí" automático, sino una clasificación explicable y un conjunto de gates: admisibilidad, capacidad efectiva y
+margen.
+
+Cuando el operador elige una candidata, el sistema conserva tres verdades complementarias. El expediente interno
+versionado guarda bases e investigación; OneDrive conserva los adjuntos originales en
+`Alineación/4. Comercial/Licitaciones/<Comprador>/`; y HubSpot mantiene empresa, deal y asociación comercial. No
+son sustitutos: una carpeta no prueba una asociación CRM, y un deal no reemplaza las bases normativas.
+
+El CRM se revisa y, si hace falta, se crea por MCP con confirmaciones humanas. Primero se verifica la empresa, el
+deal vigente y su asociación; los deals históricos o cerrados no cubren una nueva licitación. Si faltan registros,
+el operador aprueba las propiedades concretas de la empresa. Con su ID ya verificado, aprueba en una segunda etapa
+el deal y su asociación. La lectura posterior confirma que el vínculo realmente quedó creado. Este diseño evita
+duplicados y asociaciones contra una organización equivocada.
+
+Los adjuntos se conservan con nombre de origen, sin URLs firmadas ni secretos. Si la automatización autorizada no
+puede guardar un documento desde el visor, se declara el bloqueo y se usa una copia local entregada o guardada por
+una persona; nunca se elude la protección del navegador. El contenido se resume como alcance, requisitos, metas,
+riesgos y próximos gates, no como una transcripción de información confidencial.
+
 Antes de dar la propuesta por lista, se hace una **revisión crítica con tres miradas**: comercial (¿convence al comité y baja el miedo a decidir?), equipo (¿el equipo es real y tiene capacidad?) y finanzas (¿el precio cubre el costo real y no se erosiona con el tiempo?). Si las tres no pasan, la propuesta no está lista aunque el texto se lea bien.
 
 ## El diagnóstico y la demostración AEO (cuando el servicio es de contenido/SEO)
@@ -65,7 +88,8 @@ Este método es **vivo**: cada vez que armamos o mejoramos una licitación, se a
 |---|---|---|
 | **Método canónico** (fuente de verdad) | skill `greenhouse-public-private-tenders` (`bid-construction-playbook.md`) | agentes y quien construye la propuesta |
 | **Documentación funcional** (este documento) | `docs/documentation/comercial/` | entender cómo funciona, en simple |
-| **Manual de uso** (paso a paso) | `docs/manual-de-uso/comercial/construir-una-licitacion.md` | operar el proceso paso a paso |
+| **Manual de uso** (paso a paso) | `docs/manual-de-uso/comercial/construir-una-licitacion.md` | operar el proceso de propuesta paso a paso |
+| **Radar Wherex** (descubrimiento) | `docs/manual-de-uso/comercial/revisar-licitaciones-wherex-con-chrome.md` | ejecutar `pnpm wherex:radar`, revisar Nueva + Editando y fundar el fit en ficha y bases |
 
 ## Primer caso de referencia
 
@@ -77,4 +101,4 @@ Este caso dejó dos aprendizajes que ya son parte del método: **medir antes de 
 
 Este método manual es el **precursor de una plataforma agéntica de licitaciones**: cada fase (leer bases, admisibilidad, diagnóstico, squad, precio, redacción, deck y económica) está pensada para volverse una **capacidad con contrato programático gobernado** que la interfaz, el agente Nexa y las integraciones puedan operar —la misma doctrina de "todo tiene contrato programático" que rige a Greenhouse—. Los layouts de esa plataforma ya existen en Figma. Documentar bien el método hoy es construir el plano de ese producto: cuando se implemente, parte de aquí, no de cero.
 
-> **Detalle técnico:** el método canónico, las 10 fases (+ Fase 4-bis) y qué skill entra en cada una están en la skill `greenhouse-public-private-tenders` → `bid-construction-playbook.md`. El manual operativo paso a paso está en `docs/manual-de-uso/comercial/construir-una-licitacion.md`.
+> **Detalle técnico:** el método canónico, las 10 fases (+ Fase 4-bis) y qué skill entra en cada una están en la skill `greenhouse-public-private-tenders` → `bid-construction-playbook.md`. El manual operativo paso a paso está en `docs/manual-de-uso/comercial/construir-una-licitacion.md`; para el descubrimiento en Wherex, usa `docs/manual-de-uso/comercial/revisar-licitaciones-wherex-con-chrome.md`.

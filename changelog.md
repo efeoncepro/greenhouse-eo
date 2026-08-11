@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-11 — Radar Wherex reutilizable y documentado
+
+La skill de licitaciones incorpora el companion `wherex-radar-chrome-playwright.md`, el manual comercial y la
+CLI `pnpm wherex:radar`. Su setup aislado guarda la cuenta sólo en `.auth/` con `0600` y Git ignore; el runner
+usa un perfil Chrome separado, revisa **Nueva** y **Editando**, lee fichas y adjuntos técnicos temporales, y deja
+un reporte local protegido. Su salida es read-only y evidence-first; participar, responder, cargar o firmar sigue
+bajo control humano explícito. El flujo documentado continúa con el archivo de originales en OneDrive y con la
+verificación/alta por MCP HubSpot de empresa, deal y asociación en dos confirmaciones; no se eluden visores
+protegidos ni se guardan URLs firmadas.
+
 ## 2026-08-10 — TASK-1685 cerrada: el portal cliente tiene un solo primitive de visibilidad
 
 El menú del portal cliente y la puerta de cada página dejaron de decidir por su cuenta. Existe un solo
@@ -1206,15 +1216,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   run, output ni `canary-confirm`. Queda pendiente una única ejecución cuando la superficie gobernada lo exponga.
 - TASK-1632 permanece separada y `to-do`: formaliza dentro de Globe el wake event-driven desde completion del
   proveedor hasta Asset Governance; no es un handoff Greenhouse ni reabre TASK-1614.
-
-## 2026-08-02 — Cierres canónicos: TASK-1614 y Proposal Studio
-
-- Se agregó `proposal-studio.json` al workspace scaffoldeado y `pnpm tender:canonical-gate <slug>` como gate
-  fail-closed: `deck:compose`/`.captures` se reconocen como taller, no como cierre productivo.
-- El gate exige Proposal registrada con actor humano, `ResolvedCompositionManifest` usado por un render job,
-  PDF/previews versionados en el asset store, vínculo `proposal_assets` y verificación autenticada en Portal/API.
-- `pnpm qa:gates --changed` detecta el workspace modificado y reporta `BLOCK` si la cadena no está completa.
-  Brightcell quedó registrada honestamente como `workshop_only`; no se mutó runtime ni se creó una Proposal.
-- TASK-1614 quedó `complete` tras un canary único de Seedance R2V: run `bbe6dfff…`, output MP4
-  `sha256:93adbf46…`, 16 créditos, playback/governance verificados y saga `promotion_557d…` en `canary_passed` rev. 9
-  (`30742268557`).
