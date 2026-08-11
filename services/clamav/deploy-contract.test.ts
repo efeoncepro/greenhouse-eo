@@ -69,16 +69,38 @@ describe('clamav deploy — un solo servicio para ambos entornos', () => {
     expect(script).toContain('--no-traffic')
     expect(script).toContain('--tag canary')
   })
+
+  // `minScale` es por REVISIÓN, no por servicio: un canary con min=1 mantiene una
+  // instancia de 2 GiB caliente aunque sirva 0% del tráfico, y vuelve a costar
+  // los ≈USD 19/mes que se eliminaron al dejar de duplicar el servicio.
+  // Detectado live 2026-08-11: `clamav-00002-jet` facturaba sin servir a nadie.
+  it('el canary va con min=0 para no facturar sin servir', () => {
+    const script = deployScript()
+
+    expect(script).toContain('CANARY_MIN_INSTANCES="${CANARY_MIN_INSTANCES:-0}"')
+    expect(script).toContain('MIN_INSTANCES="${MIN_INSTANCES:-${CANARY_MIN_INSTANCES:-1}}"')
+  })
+
+  // El workflow resolvía el nombre por su cuenta y quedó apuntando a un servicio
+  // borrado cuando el script pasó a servicio único (run 31505239881: "Cannot find
+  // service [clamav-staging]"). Los dos tienen que decir lo mismo.
+  it('el workflow no resuelve un nombre de servicio distinto al del script', () => {
+    const workflow = readFileSync(resolve(process.cwd(), '.github/workflows/clamav-deploy.yml'), 'utf8')
+
+    expect(workflow).toContain('echo "name=clamav" >> "$GITHUB_OUTPUT"')
+    expect(workflow).not.toContain('clamav-staging')
+  })
 })
 
 describe('clamav deploy — capacidad', () => {
-  it('default min-instances=1: clamd tarda 20-40 s en cargar las firmas', () => {
+  it('default min-instances=1 en la revisión que sirve tráfico', () => {
     const script = deployScript()
 
-    // Escalar a cero haría que el primer CV pague el cold start y el submit
-    // público expire. Es el costo deliberado que el operador aprobó. El override
-    // existe sólo para dejar staging frío después del gate de EICAR.
-    expect(script).toContain('MIN_INSTANCES="${MIN_INSTANCES:-1}"')
+    // Escalar a cero en el runtime que atiende subidas reales haría que el primer
+    // CV pague el cold start (30-60 s cargando firmas) y el submit expire: el
+    // adapter corta a los 10 s. Es el costo deliberado que el operador aprobó.
+    // El default sólo cae a 0 en el camino canary, que no sirve tráfico.
+    expect(script).toContain('MIN_INSTANCES="${MIN_INSTANCES:-${CANARY_MIN_INSTANCES:-1}}"')
   })
 
   // Sin este probe el servicio queda inservible pero Ready=True: clamd carga

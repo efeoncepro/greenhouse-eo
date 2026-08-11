@@ -48,10 +48,21 @@ if [ "${ENV}" = "production" ]; then
   TRAFFIC_ARGS=()
   echo "=== PRODUCTION deployment (revisión servida) ==="
 else
-  # Canary: despliega la revisión SIN tráfico y la expone en una URL etiquetada.
-  # Staging apunta ahí para ejercitar una imagen nueva sin tocar a los candidatos.
+  # Canary: despliega la revisión SIN tráfico y la expone en una URL etiquetada,
+  # para ejercitar una imagen nueva antes de promoverla a los candidatos.
   TRAFFIC_ARGS=(--no-traffic --tag canary)
-  echo "=== STAGING deployment (revisión canary, sin tráfico) ==="
+
+  # min=0 en el canary, y NO es un detalle. `minScale` es por REVISIÓN, no por
+  # servicio: una revisión canary con min=1 mantiene una instancia de 2 GiB
+  # caliente aunque reciba 0% del tráfico, y vuelve a costar los ≈USD 19/mes que
+  # justamente se eliminaron al dejar de duplicar el servicio (verificado live
+  # 2026-08-11: `clamav-00002-jet` quedó con minScale=1 facturando sin servir).
+  #
+  # Consecuencia a tener presente al probar el canary: arranca frío y cargar las
+  # firmas toma 30-60 s, mientras el adapter corta a los 10 s. Hay que calentarlo
+  # con un request previo antes de apuntarle un flujo real.
+  CANARY_MIN_INSTANCES="${CANARY_MIN_INSTANCES:-0}"
+  echo "=== STAGING deployment (revisión canary, sin tráfico, min=${CANARY_MIN_INSTANCES}) ==="
 fi
 
 # Cloud Run — por qué estos números:
@@ -64,12 +75,14 @@ fi
 #   concurrency  clamd serializa por instancia; 4 alcanza y evita contención.
 #   timeout=120  muy por encima del timeout del adapter (10 s por defecto).
 #
-# Costo: ≈USD 19/mes por el único servicio. El canary de staging NO agrega costo
-# fijo: es una revisión del mismo servicio y sólo consume mientras se la ejercita.
+# Costo: ≈USD 19/mes por la revisión que sirve tráfico. El canary NO agrega costo
+# fijo porque va con min=0 — pero OJO: eso hay que forzarlo. `minScale` es por
+# revisión, así que un canary desplegado con min=1 factura igual que un servicio
+# duplicado aunque no sirva a nadie.
 # NUNCA bajar min a 0 en el runtime que atiende subidas reales — el primer scan
 # pagaría 30-60 s de carga de firmas y el adapter corta a los 10 s
 # (`scanner_timeout`, que es bloqueante).
-MIN_INSTANCES="${MIN_INSTANCES:-1}"
+MIN_INSTANCES="${MIN_INSTANCES:-${CANARY_MIN_INSTANCES:-1}}"
 MAX_INSTANCES="3"
 MEMORY="2Gi"
 CPU="1"

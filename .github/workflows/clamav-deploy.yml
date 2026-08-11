@@ -112,14 +112,11 @@ jobs:
         with:
           project_id: ${{ env.GCP_PROJECT_ID }}
 
+      # UN solo servicio para ambos entornos: staging despliega una revisión
+      # canary sin tráfico sobre el mismo `clamav`. Ver services/clamav/deploy.sh.
       - name: Resolve service name
         id: service
-        run: |
-          if [ "${ENV}" = "production" ]; then
-            echo "name=clamav" >> "$GITHUB_OUTPUT"
-          else
-            echo "name=clamav-staging" >> "$GITHUB_OUTPUT"
-          fi
+        run: echo "name=clamav" >> "$GITHUB_OUTPUT"
 
       - name: Deploy clamav
         run: |
@@ -130,7 +127,12 @@ jobs:
 
       # TASK-851 — poll acotado de Ready=True para el gate del orquestador.
       # clamd carga la base de firmas al arrancar: 600 s, no 300 s.
+      #
+      # Sólo en production: un deploy de staging crea una revisión canary con
+      # min=0 y sin tráfico, que no tiene por qué estar Ready — arranca recién
+      # cuando alguien la ejercita por su URL etiquetada.
       - name: Poll Ready=True bounded
+        if: env.ENV == 'production'
         run: |
           SERVICE="${{ steps.service.outputs.name }}"
           DEADLINE=$((SECONDS + 600))
