@@ -149,3 +149,31 @@ describe('scanAssetBytes', () => {
     })
   })
 })
+
+/**
+ * TASK-1378 — El SDK de auth no puede volver al grafo estático.
+ *
+ * Regresión real: importar `@/lib/google-credentials` de forma estática acá metía
+ * `google-auth-library` en el grafo de TODO archivo que toca el path de uploads.
+ * En CI eso empujó la memoria del runner hasta matarlo en un render de react-pdf
+ * (run 31492463069) — con el step Test muriendo sin imprimir resumen, que es el
+ * peor síntoma posible: no dice qué falló.
+ *
+ * Con el flag OFF (default en todos los runtimes) no hay razón para pagar ese
+ * costo, así que la resolución del token vive detrás de un `import()` diferido.
+ */
+describe('presupuesto del grafo de módulos', () => {
+  it('no importa el SDK de credenciales de forma estática', async () => {
+    const { readFileSync } = await import('node:fs')
+    const { resolve } = await import('node:path')
+
+    const source = readFileSync(resolve(process.cwd(), 'src/lib/storage/asset-scan/index.ts'), 'utf8')
+
+    // El needle se compone en runtime a propósito: escribir el patrón perseguido
+    // como literal haría que este archivo se delate a sí mismo ante un grep.
+    const staticImport = new RegExp(`^\\s*import\\s[^\\n]*from\\s+['"]@/lib/${'google'}-credentials['"]`, 'm')
+
+    expect(source).not.toMatch(staticImport)
+    expect(source).toContain('await import(')
+  })
+})

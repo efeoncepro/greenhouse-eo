@@ -1,7 +1,5 @@
 import 'server-only'
 
-import { fetchGoogleIdTokenForAudience } from '@/lib/google-credentials'
-
 import { createClamAvHttpScanner } from './clamav-http'
 import {
   getAssetMalwareScanAudience,
@@ -65,10 +63,23 @@ export const scanAssetBytes = async (input: AssetScanInput): Promise<AssetScanRe
       // pide token y el adapter llama sin header.
       const audience = getAssetMalwareScanAudience()
 
+      // `import()` diferido y no import estático: `google-auth-library` es pesado
+      // y este módulo está en el path de TODA subida. Con el flag OFF —el default
+      // en todos los runtimes— no hay razón para que el SDK de auth entre siquiera
+      // al grafo. Estático, se cargaba en cada archivo que toca uploads y empujaba
+      // la memoria del runner de CI hasta matarlo en un render de react-pdf.
+      const getAuthToken = audience
+        ? async () => {
+            const { fetchGoogleIdTokenForAudience } = await import('@/lib/google-credentials')
+
+            return fetchGoogleIdTokenForAudience(audience)
+          }
+        : undefined
+
       const clamav = await createClamAvHttpScanner({
         endpoint,
         timeoutMs: getAssetMalwareScanTimeoutMs(),
-        ...(audience ? { getAuthToken: () => fetchGoogleIdTokenForAudience(audience) } : {}),
+        ...(getAuthToken ? { getAuthToken } : {}),
       }).scan(input)
 
       verdict = worstVerdict(verdict, clamav.verdict)
