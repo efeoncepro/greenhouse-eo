@@ -37,7 +37,7 @@ RUN apk add --no-cache clamav clamav-daemon freshclam clamav-libunrar nodejs ca-
 COPY --from=signatures --chown=clamav:clamav /var/lib/clamav/ /var/lib/clamav/
 COPY clamd.conf /etc/clamav/clamd.conf
 COPY freshclam.conf /etc/clamav/freshclam.conf
-COPY server.mjs /app/server.mjs
+COPY server.mjs clamd-protocol.mjs /app/
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
 RUN chmod +x /usr/local/bin/entrypoint.sh

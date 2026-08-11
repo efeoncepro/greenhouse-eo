@@ -19,7 +19,11 @@ chown -R clamav:clamav /run/clamav "${CLAMAV_DB_DIR}" 2>/dev/null || true
 
 # La imagen ya trae una base horneada en build. Si por lo que sea faltara,
 # bajarla ahora en primer plano es preferible a arrancar clamd sin firmas.
-if ! ls "${CLAMAV_DB_DIR}"/*.cvd "${CLAMAV_DB_DIR}"/*.cld >/dev/null 2>&1; then
+#
+# `find` y no `ls *.cvd *.cld`: con dos globs, ls falla si CUALQUIERA no matchea.
+# La base horneada trae sólo .cvd, así que el chequeo daba siempre negativo y
+# re-descargaba 112 MB en cada arranque (detectado live 2026-08-11).
+if ! find "${CLAMAV_DB_DIR}" -maxdepth 1 \( -name '*.cvd' -o -name '*.cld' \) -print -quit | grep -q .; then
   echo '{"event":"freshclam_bootstrap","reason":"no_signature_db_in_image"}'
   freshclam --quiet || echo '{"event":"freshclam_bootstrap_failed"}'
 fi

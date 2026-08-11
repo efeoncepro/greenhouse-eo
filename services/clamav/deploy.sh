@@ -46,7 +46,16 @@ fi
 #   cpu=1        el scan de un PDF es de milisegundos una vez cargada la base.
 #   concurrency  clamd serializa por instancia; 4 alcanza y evita contención.
 #   timeout=120  muy por encima del timeout del adapter (10 s por defecto).
-MIN_INSTANCES="1"
+#
+# Costo: cada servicio con min=1 son ≈USD 19/mes. Staging y producción a la vez
+# son ≈USD 38/mes, no 19 — staging existe para el gate de EICAR, no para quedarse
+# prendido. Al terminar la verificación, bajarlo:
+#   gcloud run services delete clamav-staging --region us-east4
+#   # o dejarlo frío:  MIN_INSTANCES=0 ENV=staging bash services/clamav/deploy.sh
+# Con min=0 el primer scan paga 30-60 s de carga de firmas y el adapter corta a
+# los 10 s: el veredicto sería `scanner_timeout`. Sirve para tenerlo desplegado
+# sin gasto, NO para verificar contra él.
+MIN_INSTANCES="${MIN_INSTANCES:-1}"
 MAX_INSTANCES="3"
 MEMORY="2Gi"
 CPU="1"
@@ -73,6 +82,16 @@ ENV_VARS="${ENV_VARS},CLAMAV_SIGNATURE_STALE_HOURS=${CLAMAV_SIGNATURE_STALE_HOUR
 
 echo "=== Deploying ${SERVICE_NAME} to Cloud Run (${REGION}) ==="
 
+# Startup probe HTTP contra /ready — NO es cosmético, es load-bearing.
+#
+# Cloud Run da CPU plena sólo hasta que el startup probe pasa. El shim abre el
+# puerto en ~1 s, así que con el probe TCP por defecto el boost se corta ahí y
+# clamd queda cargando 3,6 M de firmas con CPU throttled a casi cero: nunca
+# termina, /health responde `clamd: down` para siempre y el servicio queda
+# inservible aunque Cloud Run lo reporte Ready=True (detectado live 2026-08-11;
+# el síntoma se confunde con falta de memoria y NO lo es — con 4 GiB pasaba igual).
+# El probe contra /ready mantiene el boost hasta que clamd contesta PONG.
+#
 # Ingress: DEFAULT (all), NO 'internal'.
 #
 # Vercel sale por internet pública, así que un Cloud Run con ingress restringido
@@ -94,6 +113,8 @@ gcloud run deploy "${SERVICE_NAME}" \
   --concurrency="${CONCURRENCY}" \
   --ingress=all \
   --no-allow-unauthenticated \
+  --cpu-boost \
+  --startup-probe="httpGet.path=/ready,initialDelaySeconds=10,periodSeconds=10,failureThreshold=30,timeoutSeconds=5" \
   --set-env-vars="${ENV_VARS}" \
   --quiet
 

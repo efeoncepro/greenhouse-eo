@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
@@ -52,12 +52,25 @@ describe('clamav deploy — postura de red', () => {
 })
 
 describe('clamav deploy — capacidad', () => {
-  it('mantiene min-instances=1: clamd tarda 20-40 s en cargar las firmas', () => {
+  it('default min-instances=1: clamd tarda 20-40 s en cargar las firmas', () => {
     const script = deployScript()
 
     // Escalar a cero haría que el primer CV pague el cold start y el submit
-    // público expire. Es el costo deliberado que el operador aprobó.
-    expect(script).toContain('MIN_INSTANCES="1"')
+    // público expire. Es el costo deliberado que el operador aprobó. El override
+    // existe sólo para dejar staging frío después del gate de EICAR.
+    expect(script).toContain('MIN_INSTANCES="${MIN_INSTANCES:-1}"')
+  })
+
+  // Sin este probe el servicio queda inservible pero Ready=True: clamd carga
+  // 3,6 M de firmas con CPU throttled y nunca termina. Se verificó live que NO
+  // es un problema de memoria (con 4 GiB fallaba igual) — es el fin del CPU
+  // boost cuando el probe TCP pasa al segundo de arrancar el shim.
+  it('gatea el arranque con /ready para no perder el CPU boost', () => {
+    const script = deployScript()
+
+    expect(script).toContain('--startup-probe=')
+    expect(script).toContain('httpGet.path=/ready')
+    expect(script).toContain('--cpu-boost')
   })
 
   it('reserva memoria para la base de firmas residente', () => {
@@ -70,6 +83,30 @@ describe('clamav deploy — capacidad', () => {
     const script = deployScript()
 
     expect(script).toContain('REGION="us-east4"')
+  })
+})
+
+describe('clamav Dockerfile — la imagen lleva todo el runtime', () => {
+  // Bug real 2026-08-11: extraer `clamd-protocol.mjs` del shim sin agregar su
+  // COPY dejó una imagen que buildeaba y pusheaba VERDE, y recién moría en
+  // Cloud Run con ERR_MODULE_NOT_FOUND. Un build exitoso no prueba que el
+  // contenedor arranque.
+  it('copia todos los .mjs del servicio', () => {
+    const dockerfile = readFileSync(resolve(process.cwd(), 'services/clamav/Dockerfile'), 'utf8')
+    const modules = readdirSync(resolve(process.cwd(), 'services/clamav')).filter(name => name.endsWith('.mjs'))
+
+    expect(modules.length).toBeGreaterThan(0)
+
+    for (const moduleName of modules) {
+      expect(dockerfile, `${moduleName} no se copia a la imagen`).toContain(moduleName)
+    }
+  })
+
+  it('hornea la base de firmas en build, no en el primer arranque', () => {
+    const dockerfile = readFileSync(resolve(process.cwd(), 'services/clamav/Dockerfile'), 'utf8')
+
+    expect(dockerfile).toContain('AS signatures')
+    expect(dockerfile).toContain('COPY --from=signatures')
   })
 })
 
