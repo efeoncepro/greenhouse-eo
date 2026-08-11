@@ -1,5 +1,29 @@
 # Handoff activo
 
+### TASK-1378 — ClamAV: staging operativo, producción con gate humano (2026-08-11)
+
+El escáner de firmas dejó de ser código muerto. Servicio `clamav-staging` en Cloud Run (us-east4, 2 GiB, `min=1`,
+cerrado por IAM), adapter cableado con OIDC y flag ON en Vercel staging. Verificado end-to-end **por la cadena WIF
+de Vercel**, no sólo ADC local: PDF limpio → `clean`, EICAR → `infected`, sin credencial → 403, servicio caído →
+`error` bloqueante.
+
+**Producción está bloqueada a propósito.** Falta ejercitar una postulación REAL en staging: el endpoint público
+exige Turnstile, así que el route handler completo (multipart → asset pendiente → gate → cuarentena → outbox →
+signal) todavía no corrió. Alguien sube un CV desde el navegador en el apply de staging y se confirma en PG que la
+fila quedó con `scanner='structural+clamav-http'`; recién ahí se prende producción. Es la regla dura que la propia
+task declaró.
+
+Pendiente inmediato: el run 31493298296 (`ClamAV Scanner Deploy`, environment `production`) está esperando approval
+en GitHub para crear el servicio de producción. **NO agregar `ASSET_MALWARE_SCAN_ENABLED` a Production antes de que
+ese servicio exista** — sin endpoint es `error` bloqueante sobre TODAS las subidas, con `EO-OPN-0009` publicada.
+
+Costo: cada servicio con `min=1` son ≈USD 19/mes. Dejar producción en `min=0` mientras el flag esté OFF y bajar
+`clamav-staging` al cerrar. De paso quedó corregida en el ledger la calibración que decía "todo Cloud Run cuesta
+USD 7,32/30d": son ≈USD 169/30d, con run-rate ≈USD 321/mes desde el 2026-07-23 por los workers de Globe.
+
+Alcance que conviene no olvidar: el puerto es domain-free. Prender el flag cubre CV público, Growth Forms, y los
+`proposal_rfp`/`proposal_deliverable` que TASK-1392 sumó al enforcement — no sólo vacantes.
+
 ### ISSUE-149 RESUELTA — drift TS↔DB de route_group_scope (2026-08-11)
 
 El avatar vacío que reportó el operador tras TASK-1388 era drift de DATOS: 3 filas de
@@ -564,19 +588,3 @@ búsqueda**, ortogonal a la severidad— porque sin él la higiene de sitio asce
 medición de **laboratorio** (Google rankea con datos de campo). Queda declarada, sin dueño, una
 cobertura que el audit NO tiene: acceso de crawlers de IA en `robots.txt`, ausencia de JSON-LD,
 conflicto noindex+robots y salud de sitemap.
-
-### Cutover `seo_v1 → seo_v2` — expand aplicado, falta migrar y contraer (2026-08-08)
-
-El rename de la clave del módulo era **breaking en los dos sentidos**: migración primero deja al
-código vivo pidiendo `seo_v1` ya superseded; código primero pide `seo_v2` que la base no tiene. Y no
-es sólo UI — el mismo predicado gatea los tres batches que le pagan al proveedor, que en la ventana
-saltarían con `no_entitlement` **en silencio**.
-
-Se aplicó la fase **expand**: `SEO_MODULE_KEY` queda para escritura y las lecturas usan
-`SEO_MODULE_KEYS_READ = ['seo_v2','seo_v1']` con `ANY($n::text[])` en los 5 consumidores. Verificado
-contra PG real con la base todavía en `seo_v1`: ambas orgs resuelven `hasModule=true` sin bloqueo.
-El contenido de la lista está fijado por test para que la contracción sea deliberada.
-
-**Pendiente, en este orden:** desplegar el expand → aplicar
-`migrations/20260808131441444_task-1310-seo-client-view-codes.sql` → verificar en staging con Berel →
-**recién ahí** contraer a `seo_v2` sola (dueño `TASK-1310`). Detalle: `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §10.7.
