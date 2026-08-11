@@ -1,5 +1,24 @@
 # Handoff activo
 
+### ISSUE-149 RESUELTA — drift TS↔DB de route_group_scope (2026-08-11)
+
+El avatar vacío que reportó el operador tras TASK-1388 era drift de DATOS: 3 filas de
+`greenhouse_core.roles.route_group_scope` (efeonce_admin/operations/hr_payroll) drifteadas del mapeo
+TS que es solo fallback. Migration de paridad aplicada + verificada; las sesiones vivas se auto-sanaron
+por el refresh de claims (5 min) sin re-login — verificado en la sesión real del operador. El fix del
+trigger ⌘K (lenguaje topbar) salió en el mismo lote. Deuda señalada en la issue: 2 roles fantasma en DB
+(`employee`, `finance_manager`) y falta un drift-guard mecánico TS↔DB de route groups.
+
+### Campaña de vacantes en grupos de Facebook (2026-08-11)
+
+Se difundieron los openings públicos `EO-OPN-0061` (Content Creator) y `EO-OPN-0009`
+(Account Manager) en grupos ya unidos y afines. La expansión cerró con diez envíos adicionales por rol:
+nueve visibles y uno enviado a moderación en cada caso. El detalle de copy, beneficios aprobados, grupos,
+estados y decisión de publicar sin imágenes vive en
+`docs/operations/hiring/2026-08-11-facebook-vacancy-distribution.md`. No cambió el runtime ni el estado
+de Hiring, por lo que no requiere ADR. Pendiente operativo opcional: revisar las dos publicaciones en
+moderación antes de contarlas como visibles.
+
 ### Proceso reusable — radar Wherex con CLI Playwright (2026-08-11)
 
 Quedó canonizado para futuras solicitudes en la skill `greenhouse-public-private-tenders` y el manual
