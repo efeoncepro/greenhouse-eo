@@ -28,6 +28,23 @@ export const GH_CLIENT_NAV = {
 // nomenclature contract defined in Greenhouse_Nomenclatura_Portal_v3.md.
 export const GH_INTERNAL_NAV = {
   home: { label: 'Home', subtitle: 'Nexa y operación de hoy' },
+
+  // TASK-1388 — zonas del rail interno (headings `isSection`) + dominios/secciones
+  // del árbol reestructurado. La key vive acá (SoT) y se reexporta locale-aware
+  // por `greenhouse-navigation-copy.ts`; si falta allá, el dashboard revienta 500.
+  zoneOperacion: { label: 'Operación', subtitle: 'Dominios operativos del día a día' },
+  zoneAdministracion: { label: 'Administración', subtitle: 'Configuración y gobierno de la plataforma' },
+  zoneRecursos: { label: 'Recursos', subtitle: 'Utilidades transversales' },
+  domainAgencia: { label: 'Agencia', subtitle: 'Operación de la agencia' },
+  domainPersonas: { label: 'Personas', subtitle: 'Directorio, nómina y HR' },
+  domainFinanzas: { label: 'Finanzas', subtitle: 'Flujo, tesorería e inteligencia' },
+  sectionAgenciaResumen: { label: 'Resumen', subtitle: 'Agencia, Spaces y economía' },
+  sectionNomina: { label: 'Nómina', subtitle: 'Liquidación y proyección' },
+  sectionSupervision: { label: 'Supervisión', subtitle: 'Equipo, aprobaciones y departamentos' },
+  sectionOrganizacion: { label: 'Organización', subtitle: 'Jerarquía, permisos y asistencia' },
+  sectionDesarrollo: { label: 'Desarrollo', subtitle: 'Objetivos y evaluaciones' },
+  adminPlatform: { label: 'Plataforma', subtitle: 'Infraestructura y observabilidad' },
+  adminTenantsDisambiguated: { label: 'Spaces (admin)', subtitle: 'Spaces, acceso y gobierno del portal' },
   internalDashboard: { label: 'Torre de control', subtitle: 'Operacion interna de spaces' },
   adminCenter: { label: 'Admin Center', subtitle: 'Gobernanza institucional del portal' },
   adminTenants: { label: 'Spaces', subtitle: 'Spaces, acceso y gobierno del portal' },
@@ -172,6 +189,9 @@ export const GH_HR_NAV = {
 
 export const GH_MY_NAV = {
   dashboard: { label: 'Mi Greenhouse', subtitle: 'Tu operación personal' },
+
+  // TASK-1686 — heading de la sección personal del rail (antes literal en JSX).
+  fichaSection: { label: 'Mi Ficha', subtitle: 'Tu espacio personal' },
   assignments: { label: 'Mis Asignaciones', subtitle: 'Clientes, FTE y capacidad' },
   performance: { label: 'Mi Desempeño', subtitle: 'ICO, OTD y métricas' },
   delivery: { label: 'Mi Delivery', subtitle: 'Tareas, proyectos y CRM' },

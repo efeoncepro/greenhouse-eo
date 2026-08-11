@@ -69,7 +69,12 @@ Por default el target es git HEAD. La base del diff NO es la punta de la rama: e
 pnpm release:preflight --override-batch-policy --fail-on-error
 ```
 
-Solo cuando el check `release_batch_policy` reporta `requires_break_glass` (e.g. release legitimo que mezcla auth_access + cloud_release con dependencia documentada). Requiere capability `platform.release.preflight.override_batch_policy` (EFEONCE_ADMIN solo) + audit row con reason >= 20 chars. Downgrade error → warning, NO blocker.
+Solo cuando el check `release_batch_policy` reporta `requires_break_glass`. Requiere capability `platform.release.preflight.override_batch_policy` (EFEONCE_ADMIN solo) + audit row con reason >= 20 chars. Downgrade error → warning, NO blocker.
+
+**Ojo con dos cosas que la doc previa mezclaba:**
+
+- `requires_break_glass` lo dispara **cualquier** dominio irreversible, **con mezcla o sin ella** — no hace falta que se mezclen dos. El marker `[release-coupled: …]` resuelve el otro veredicto (`split_batch`, mezcla de dominios sensibles independientes) y **no** éste.
+- La razón se redacta con **hechos verificables**, no con adjetivos. Ejemplo real que pasó a la primera: *"db_migrations ya aplicadas en la unica instancia Cloud SQL (verificado en pgmigrations); auth_access es la causa raiz unica del release; rollback = revert del PR sin undo de schema"*. Y sí: hay **una sola instancia Cloud SQL**, compartida por producción, staging y local — así que una migración aplicada "en dev" ya está aplicada para producción, y eso es citable.
 
 ## Que significan los estados
 
@@ -130,10 +135,11 @@ Consecuencia esperada: **en la corrida local, antes de mergear, el marker no pue
 | `ci_green warning "aun corriendo"` | CI todavia en progreso | Esperar 5-10 min y re-run |
 | `release_batch_policy split_batch` | Diff mezcla payroll + finance independientes | Dividir en 2 PRs separados, o agregar `[release-coupled: <razon>]` abriendo una linea del body del squash |
 | `release_batch_policy unknown "Diff vacio"` | El target coincide con el ultimo release desplegado, o falta `git fetch` | Verificar `--target-sha`; NO tratarlo como aprobacion |
-| `release_batch_policy requires_break_glass` | Tocas migrations, auth, payroll, finance, o cloud_release | Si es legitimo: `--override-batch-policy` con capability + audit |
+| `release_batch_policy requires_break_glass` | Tocas **cualquier** dominio irreversible (migrations, auth_access, payroll, finance, cloud_release) — con mezcla o sin ella | Si es legitimo: `--override-batch-policy` con capability + audit. 🔴 **El marker `[release-coupled: …]` NO sirve acá**: sólo limpia `split_batch`. El classifier evalúa `split_batch` primero, así que si te dio `requires_break_glass` el par de dominios no estaba en la lista de independientes y ponerle marker no cambia nada. Consecuencia: **todo release que toque `migrations/` va a pedir bypass** |
 | `pending_without_jobs error` | Hay zombie runs queued (sintoma deadlock TASK-848) | `gh run cancel <id>` para los runs zombie ANTES de re-run |
 | `stale_approvals error >=7d` | Run waiting Production approval > 7 dias | `gh run cancel <id>` o aprobar |
 | `vercel_readiness error` | Latest production deploy ERROR/BUILDING | Investigar Vercel logs; resolver antes de promover |
+| `vercel_readiness warning` — "Production READY, pero staging deploy CANCELED" | Un push **docs-only** a `develop` justo antes del release: el Ignored Build Step lo cancela a propósito. Severidad `warning` pero **exit 1**, o sea quema el run del orquestador | 🔴 **`vercel redeploy` NO lo arregla**: reevalúa el mismo diff docs-only y vuelve a cancelar. Producí un build real tocando un doc del set `deployControlDocs` de `scripts/ci/vercel-ignore-build.mjs` (control plane spec, ledger de flags, playbook, runbooks y manuales de release) — si de todos modos tenés que documentar el release, ese commit produce la evidencia como efecto. Pre-empción: secuenciar los pushes docs-only **después** del release |
 | `postgres_health error` | pg:doctor fallo | Verificar Cloud SQL Proxy + GCP ADC + secret rotation reciente |
 | `postgres_migrations error` | Hay migrations pendientes | `pnpm pg:connect:migrate` para aplicarlas |
 | `gcp_wif_subject error` | WIF provider drift attribute mapping | Reaplicar terraform/bicep que provisiona el WIF |

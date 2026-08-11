@@ -1,9 +1,9 @@
 # Sistema de Identidad, Roles y Acceso
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.5
+> **Version:** 1.9
 > **Creado:** 2026-04-05 por Claude (TASK-248)
-> **Ultima actualizacion:** 2026-04-29 por Claude (TASK-727 — caso canonico Creative Lead supervisora con menu detallado y matriz de capacidades)
+> **Ultima actualizacion:** 2026-08-11 por Claude (TASK-1685: la visibilidad del portal cliente la decide una sola regla — modulos contratados menos revocaciones por persona)
 > **Documentacion tecnica:** [GREENHOUSE_IDENTITY_ACCESS_V2.md](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md), [GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md](../../architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md), [GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md)
 
 ---
@@ -100,6 +100,29 @@ Cada scope (organizacion, space, proyecto, departamento) puede tener un responsa
 
 ## El menu: que ve cada persona al entrar
 
+> **Delta 2026-08-10 (TASK-1388) — la navegación interna se reparte entre 3 superficies.** El QUÉ ve
+> cada persona no cambió (mismos roles, mismas vistas, mismas rutas); cambió el DÓNDE:
+>
+> - **Sidebar interno**: ahora son 3 zonas — **Operación** (dominios Agencia · Comercial · Finanzas ·
+>   Personas), **Administración** (Admin Center; "Spaces (admin)" desambiguado) y **Recursos**
+>   (Knowledge · Design System). Un dominio abierto a la vez (acordeón).
+> - **"Mi Ficha" (rutas personales `/my/*`)**: para usuarios internos ya **no** vive en el sidebar —
+>   está en el **menú del avatar** (esquina superior derecha), con el header de perfil clickeable
+>   hacia Mi Perfil. El colaborador puro (solo `my`) la conserva en su sidebar, porque ahí es su
+>   contenido principal.
+> - **Buscador ⌘K**: una sola superficie (Cmd/Ctrl+K o el botón de búsqueda), con resultados
+>   filtrados por lo que tu rol puede ver, recientes y la acción de cerrar sesión.
+>
+> Las filas de la tabla siguiente describen el CONJUNTO visible por rol, que sigue vigente; leer
+> "Mi Ficha" como "en el menú del avatar" cuando la persona es interna.
+>
+> **Delta 2026-08-10 (TASK-1686) — el colaborador puro tiene su propia proyección.** Quien solo tiene
+> el rol Colaborador (sin roles internos ni cliente) ve un portal SOLO personal: su sidebar es
+> Mi Greenhouse + "Mi Ficha" (sus hojas personales) + los recursos de plataforma que tenga concedidos,
+> y su menú del avatar es identidad + Mi Perfil + cerrar sesión. Ya no ve enlaces del portal cliente
+> (Proyectos, Ciclos, etc.) que antes aparecían aunque no pudiera abrirlos. Quien combina Colaborador
+> con un rol cliente conserva la vista cliente de siempre más su bloque personal.
+
 Cuando alguien inicia sesion, el sistema calcula que secciones del menu mostrar basandose en sus roles:
 
 | Persona                       | Que ve en el menu                                                                   |
@@ -108,9 +131,28 @@ Cuando alguien inicia sesion, el sistema calcula que secciones del menu mostrar 
 | Operaciones                   | "Gestion" (agencia, clientes, delivery) + "Personas"                                |
 | Nomina                        | "Gestion" + "Equipo/HR" + "Personas"                                                |
 | Superadministrador            | Todo: Gestion, Administracion, Finanzas, HR, Personas, IA, Mi Ficha, Portal cliente |
-| Cliente Ejecutivo             | Solo su portal: Pulse, proyectos, ciclos, equipo                                    |
+| Cliente Ejecutivo             | Solo su portal, y **lo que ve no lo decide su rol**: ver la nota de abajo                |
 
-Cada vista individual del portal (53 en total) esta registrada en un catalogo. Si tu rol no te da acceso al grupo requerido, esa vista no aparece en tu menu.
+Cada vista individual del portal esta registrada en un catalogo. Si tu rol no te da acceso al grupo requerido, esa vista no aparece en tu menu.
+
+> **Los usuarios cliente son la excepcion, y es a proposito.** Lo que abre un cliente no depende de su
+> rol sino de los **modulos que su organizacion tiene contratados**: los tres roles cliente
+> (`client_executive`, `client_manager`, `client_specialist`) se diferencian en que puede hacer una
+> persona dentro de una pantalla, no en que compro la empresa. Solo tres pantallas abren para cualquier
+> organizacion sin contratar nada —Notificaciones, Configuracion y Novedades—; el resto depende del
+> modulo. Desde el 2026-08-10 (TASK-1685) esto es literal de punta a punta: **una sola regla** decide a
+> la vez el menu, el buscador ⌘K y la puerta de cada pagina cliente — modulos contratados de la
+> organizacion, menos las pantallas **revocadas individualmente** a una persona (una revocacion cierra
+> menu, puerta y buscador juntos). Los permisos de vista por rol no gobiernan ninguna pantalla del
+> portal cliente: sus filas quedaron inertes. Senales en `/admin/operations`:
+> `identity.view_access.client_role_without_grants` y `identity.client_portal.menu_gate_divergence`,
+> ambas steady cero.
+>
+> Consecuencia para diagnostico: **nunca resuelvas "el cliente no ve X" tocando los permisos de vista
+> por rol.** Ponerlos en otorgado no agrega el enlace ni abre la puerta — no hace nada. El carril
+> correcto es la asignacion de modulo (y, si un solo usuario de la organizacion no ve algo que sus
+> companeros si, revisar si tiene una revocacion individual):
+> [Menu dinamico y acceso a modulos](../client-portal/menu-dinamico-y-acceso-a-modulos.md).
 
 **Mi Perfil** muestra la informacion completa del colaborador: nombre, email, avatar (sincronizado desde Microsoft Entra), cargo, departamento, nivel, tipo de empleo, fecha de ingreso, telefono, y los sistemas vinculados (Entra, Notion, HubSpot, etc.). Esta informacion se sincroniza automaticamente desde Microsoft Entra ID mediante un cron diario que actualiza fotos, cargos y datos profesionales. Si un usuario recien creado aun no tiene todos los datos sincronizados, se muestra la informacion disponible de la sesion sin mostrar un error.
 

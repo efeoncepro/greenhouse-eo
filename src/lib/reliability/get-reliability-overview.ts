@@ -36,6 +36,8 @@ import {
 } from './queries/expense-distribution'
 import { getClientPortalResolverFailureRateSignal } from './queries/client-portal-resolver-failure-rate'
 import { getClientRoleWithoutViewGrantsSignal } from './queries/client-role-without-view-grants'
+import { getClientPortalAssignedViewWithoutRouteSignal } from './queries/client-portal-assigned-view-without-route'
+import { getClientPortalMenuGateDivergenceSignal } from './queries/client-portal-menu-gate-divergence'
 import { getClientUserWithoutOrganizationSignal } from './queries/client-user-without-organization'
 import { getEntraWebhookSubscriptionHealthSignal } from './queries/entra-webhook-subscription-health'
 import { getExpensePaymentsClpDriftSignal } from './queries/expense-payments-clp-drift'
@@ -199,6 +201,7 @@ import { getSeoRankCaptureLagSignal } from './queries/seo-rank-capture-lag'
 // TASK-1082 — Knowledge Platform ingestion signals (moduleKey 'knowledge').
 import { getKnowledgeNotionIngestDeadLetterSignal } from './queries/knowledge-notion-ingest-dead-letter'
 import { getAssetScanOpenQuarantineSignal } from './queries/asset-scan-open-quarantine'
+import { getAssetScanSignatureFreshnessSignal } from './queries/asset-scan-signature-freshness'
 import { getHiringCandidateRetentionOverdueSignal } from './queries/hiring-candidate-retention-overdue'
 // TASK-356 — Hiring handoff workflow signals (moduleKey 'hiring').
 import { getHiringHandoffBlockedStaleSignal } from './queries/hiring-handoff-blocked-stale'
@@ -691,6 +694,7 @@ interface ReliabilityOverviewSources {
   /** TASK-1082 — Knowledge ingestion signals (quarantine count + failed sync source). */
   knowledgeQuarantineCount?: ReliabilitySignal | null
   assetScanOpenQuarantine?: ReliabilitySignal | null
+  assetScanSignatureFreshness?: ReliabilitySignal | null
   hiringCandidateRetentionOverdue?: ReliabilitySignal | null
   hiringHandoffBlockedStale?: ReliabilitySignal | null
   hiringInternalHireAwaitingOnboarding?: ReliabilitySignal | null
@@ -889,6 +893,8 @@ interface ReliabilityOverviewSources {
   clientPortalResolverFailureRate?: ReliabilitySignal | null
   clientRoleWithoutViewGrants?: ReliabilitySignal | null
   clientUserWithoutOrganization?: ReliabilitySignal | null
+  clientPortalAssignedViewWithoutRoute?: ReliabilitySignal | null
+  clientPortalMenuGateDivergence?: ReliabilitySignal | null
 
   /**
    * TASK-613 Slice 3 — Finance Clients ↔ Organization canonical link signal:
@@ -1174,6 +1180,7 @@ export const buildReliabilityOverview = (
     // TASK-1082 — Knowledge ingestion: quarantine count + failed sync source.
     ...(sources.knowledgeQuarantineCount ? [sources.knowledgeQuarantineCount] : []),
     ...(sources.assetScanOpenQuarantine ? [sources.assetScanOpenQuarantine] : []),
+    ...(sources.assetScanSignatureFreshness ? [sources.assetScanSignatureFreshness] : []),
     ...(sources.hiringCandidateRetentionOverdue ? [sources.hiringCandidateRetentionOverdue] : []),
     ...(sources.hiringHandoffBlockedStale ? [sources.hiringHandoffBlockedStale] : []),
     ...(sources.hiringInternalHireAwaitingOnboarding ? [sources.hiringInternalHireAwaitingOnboarding] : []),
@@ -1256,6 +1263,9 @@ export const buildReliabilityOverview = (
     ...(sources.clientPortalResolverFailureRate ? [sources.clientPortalResolverFailureRate] : []),
     ...(sources.clientRoleWithoutViewGrants ? [sources.clientRoleWithoutViewGrants] : []),
     ...(sources.clientUserWithoutOrganization ? [sources.clientUserWithoutOrganization] : []),
+    ...(sources.clientPortalAssignedViewWithoutRoute ? [sources.clientPortalAssignedViewWithoutRoute] : []),
+    // TASK-1685 Slice 3 — el menú ofrece algo que la puerta niega (o al revés). Steady = 0.
+    ...(sources.clientPortalMenuGateDivergence ? [sources.clientPortalMenuGateDivergence] : []),
     // TASK-613 Slice 3 — Finance Clients ↔ Organization canonical link signal.
     ...(sources.financeClientProfileUnlinked ? [sources.financeClientProfileUnlinked] : []),
     // TASK-841 — Nubox raw/conformed/projection freshness.
@@ -1780,6 +1790,14 @@ export const getReliabilityOverview = async (
       ? preloadedSources.assetScanOpenQuarantine
       : await getAssetScanOpenQuarantineSignal().catch(() => null)
 
+  // TASK-1378 — Firmas envejecidas: el scanner responde pero ya no reconoce nada
+  // nuevo. Falla silenciosa por definición; `open_quarantine` no la ve porque no
+  // produce veredictos `error`.
+  const assetScanSignatureFreshness =
+    preloadedSources.assetScanSignatureFreshness !== undefined
+      ? preloadedSources.assetScanSignatureFreshness
+      : await getAssetScanSignatureFreshnessSignal().catch(() => null)
+
   // TASK-1362 — PII de candidatos no contratados fuera de la ventana de retención (Ley 21.719).
   const hiringCandidateRetentionOverdue =
     preloadedSources.hiringCandidateRetentionOverdue !== undefined
@@ -2213,6 +2231,22 @@ export const getReliabilityOverview = async (
       ? preloadedSources.clientUserWithoutOrganization
       : await getClientUserWithoutOrganizationSignal().catch(() => null)
 
+  // TASK-1679 follow-up — viewCodes que un cliente PUEDE alcanzar y cuya pagina no existe.
+  // La condicion la crea un ASSIGNMENT (cambio de dato), no un deploy, asi que ningun gate de
+  // codigo la ve. Complementa a route-reachability-gate, que cubre la direccion contraria.
+  const clientPortalAssignedViewWithoutRoute =
+    preloadedSources.clientPortalAssignedViewWithoutRoute !== undefined
+      ? preloadedSources.clientPortalAssignedViewWithoutRoute
+      : await getClientPortalAssignedViewWithoutRouteSignal().catch(() => null)
+
+  // TASK-1685 Slice 3 — divergencia entre lo que el menu del portal cliente OFRECE y lo que la
+  // puerta ABRE. Es el invariante que ISSUE-148 encontro roto (36 pares medidos, 8 de 8
+  // usuarios) y que ninguna de las dos mitades podia observar desde la otra. Steady = 0.
+  const clientPortalMenuGateDivergence =
+    preloadedSources.clientPortalMenuGateDivergence !== undefined
+      ? preloadedSources.clientPortalMenuGateDivergence
+      : await getClientPortalMenuGateDivergenceSignal().catch(() => null)
+
   // TASK-613 Slice 3 — Finance Clients ↔ Organization canonical link signal.
   // Single reader; degrada honestamente a `unknown` si la query falla.
   const financeClientProfileUnlinked =
@@ -2616,6 +2650,7 @@ export const getReliabilityOverview = async (
     globeCreditFundingStaleProposals,
     knowledgeQuarantineCount,
     assetScanOpenQuarantine,
+    assetScanSignatureFreshness,
     hiringCandidateRetentionOverdue,
     hiringHandoffBlockedStale,
     hiringInternalHireAwaitingOnboarding,
@@ -2673,6 +2708,8 @@ export const getReliabilityOverview = async (
     clientPortalResolverFailureRate,
     clientRoleWithoutViewGrants,
     clientUserWithoutOrganization,
+    clientPortalAssignedViewWithoutRoute,
+    clientPortalMenuGateDivergence,
     financeClientProfileUnlinked,
     nuboxSourceFreshness,
     notionConformedDrainFreshness,

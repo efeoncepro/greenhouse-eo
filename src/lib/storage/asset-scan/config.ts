@@ -27,3 +27,28 @@ export const getAssetMalwareScanTimeoutMs = () => {
 
   return Number.isFinite(raw) && raw > 0 ? raw : DEFAULT_TIMEOUT_MS
 }
+
+/**
+ * TASK-1378 — Audiencia del ID token OIDC.
+ *
+ * El servicio ClamAV corre en Cloud Run con `--no-allow-unauthenticated`, y el
+ * `aud` que Cloud Run valida es el origin del servicio. Por eso se deriva del
+ * endpoint en vez de configurarse aparte: dos variables que siempre tienen que
+ * coincidir son dos variables que algún día no van a coincidir.
+ *
+ * `null` cuando el endpoint no es https (dev local contra un ClamAV sin IAM):
+ * ahí no hay token que pedir ni Cloud Run que lo valide.
+ */
+export const getAssetMalwareScanAudience = () => {
+  const endpoint = getAssetMalwareScanEndpoint()
+
+  if (!endpoint) return null
+
+  try {
+    const url = new URL(endpoint)
+
+    return url.protocol === 'https:' ? url.origin : null
+  } catch {
+    return null
+  }
+}

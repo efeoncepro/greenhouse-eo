@@ -92,6 +92,16 @@ Prefer questions like:
 
 Write the complete markdown file following `docs/tasks/TASK_TEMPLATE.md`.
 
+#### Canonical-template gate — mandatory for every new task
+
+Start by copying the template file's structure; do not reconstruct its headings or comments from memory. The task linter distinguishes a canonical task from a legacy task by the literal HTML comments that delimit Zones 0–4, not by headings with equivalent names.
+
+- preserve the five full `<!-- ... ZONE N ... -->` blocks verbatim, including the deliberately empty Zone 2 block
+- populate Zones 0, 1, 3, and 4 only; do not write a plan inside Zone 2
+- run `pnpm task:lint --task TASK-###` immediately after writing the task file and before changing the registry, README, Handoff, or committing
+- registration is permitted only when the summary reports `scanned=1 template=1 legacy=0` and `errors=0 warnings=0`
+- `legacy=1` is a blocking template failure even if `errors=0`: restore the literal Zone markers from `docs/tasks/TASK_TEMPLATE.md` and rerun the command; never describe this as a harmless lint result
+
 Rules:
 
 - fill Zones 0, 1, 3, and 4
@@ -102,6 +112,7 @@ Rules:
 - if `Execution profile = ui-ux` or `UI impact != none`, include a completed `## UI/UX Contract` section copied from `docs/tasks/TASK_UI_UX_ADDENDUM.md` and write `Wireframe: docs/ui/wireframes/TASK-###-short-slug.md` in Status, pointing to an existing wireframe file
 - if `UI impact = flow` or the UI coordinates sidecars, drawers, modals, popovers, or route/screen transitions, write `Flow: docs/ui/flows/TASK-###-short-slug-flow.md` in Status, pointing to an existing flow contract file
 - if `UI impact = motion` or the UI introduces non-trivial motion/microinteractions, write `Motion: docs/ui/motion/TASK-###-short-slug-motion.md` in Status, pointing to an existing motion contract file
+- if the task adds a **visible navigation destination** (new route/page reachable by users), the `## UI/UX Contract` → Surface & system decision MUST declare `Nav placement: sidebar|avatar|command-palette|shortcuts|none` (operativo → sidebar dentro de una zona · personal → avatar dropdown · cola larga → ⌘K command palette · frecuente → shortcuts; `none` = no agrega destino nuevo). Prohibido duplicar un destino en dos superficies y prohibido colgar del primer nivel del rail fuera de una zona (solo el Home pineado). El presupuesto es real y con gate: `MAX_TOP_LEVEL_SLOTS=8` / `MAX_INTERACTIVE_DEPTH=2`, `pnpm nav:budget` en severidad `error` (un ítem que rompe el presupuesto ROMPE el build). Contrato: `docs/architecture/agent-invariants/NAVIGATION_SURFACE_ALLOCATION_CONTRACT.md` (TASK-1389)
 - if `Execution profile = backend-data` or `Backend impact != none`, include a completed `## Backend/Data Contract` section copied from `docs/tasks/TASK_BACKEND_DATA_ADDENDUM.md`
 - if `UI impact != none` and `Backend impact != none`, prefer split into two linked tasks: a `backend-data` foundation first, then a `ui-ux` consumer blocked by that foundation
 - if an intentional hybrid task is kept, include `## Hybrid Execution Justification` with `Why not split`, `Primary execution profile`, `Contract boundary`, and `Risk controls`
@@ -141,9 +152,10 @@ Wait for confirmation before registering the task in the repo.
 After confirmation:
 
 1. write the task file to `docs/tasks/to-do/TASK-###-short-slug.md`
-2. add the ID to `docs/tasks/TASK_ID_REGISTRY.md`
-3. update `docs/tasks/README.md`
-4. leave the repo documentation consistent with the new task
+2. pass the canonical-template gate (`template=1`, `legacy=0`, zero errors and warnings)
+3. add the ID to `docs/tasks/TASK_ID_REGISTRY.md`
+4. update `docs/tasks/README.md`
+5. leave the repo documentation consistent with the new task
 
 ## Quality Rules
 
@@ -162,7 +174,7 @@ use `code complete, rollout pendiente` until consumers are verified in their run
 - Slices must describe deliverables, not investigation.
 - If the task is `umbrella` or `policy`, keep verification manual and documentary.
 - If the task touches UI/UX, do not create a generic implementation task. Set `Execution profile: ui-ux`, classify `UI impact`, register an existing wireframe under `docs/ui/wireframes/`, register an existing flow contract under `docs/ui/flows/` when interaction crosses surfaces/routes, register an existing motion contract under `docs/ui/motion/` when motion/microinteractions are non-trivial, and complete `## UI/UX Contract`.
-- UI/UX tasks must specify experience brief, surface/system decision, state inventory, interaction contract, motion/microinteractions, and visual verification.
+- UI/UX tasks must specify experience brief, surface/system decision (including `Nav placement` when the task adds a visible navigation destination), state inventory, interaction contract, motion/microinteractions, and visual verification.
 - Do not make GVC optional for `ui-standard` or `ui-platform` unless the task explicitly explains why runtime visual evidence does not apply.
 - If the task touches backend/data, do not leave it as a generic implementation task. Set `Execution profile: backend-data`, classify `Backend impact`, and complete `## Backend/Data Contract`.
 - Backend/data tasks must specify source of truth, contract surface, data invariants, tenant/access boundary, idempotency/concurrency, migration/backfill/rollback posture, sensitive data/error posture, audit/signal posture, and runtime evidence.

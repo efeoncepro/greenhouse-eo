@@ -1198,7 +1198,7 @@ Los invariantes operativos del dominio contractor — engagements, invoice asset
 
 ### Navigation Reachability Governance — invariantes (TASK-982)
 
-Los invariantes del contrato de alcanzabilidad de rutas (toda `(dashboard)/**/page.tsx` debe ser alcanzable por nav) viven en **`docs/tasks/complete/TASK-982-navigation-reachability-governance-contract.md` → §`Invariantes operativos para agentes`** (gate `pnpm route-reachability-gate`, manifest `src/lib/navigation/route-reachability-manifest.ts`). **NUNCA** crear un `page.tsx` bajo `(dashboard)` sin hacerlo alcanzable (href literal / child en el manifest / dinámica `[id]`); **NUNCA** declarar una ruta-hija sin `parent`+`via`+`reason`.
+Los invariantes del contrato de alcanzabilidad de rutas (toda `(dashboard)/**/page.tsx` debe ser alcanzable por nav) viven en **`docs/tasks/complete/TASK-982-navigation-reachability-governance-contract.md` → §`Invariantes operativos para agentes`** (gate `pnpm route-reachability-gate`, manifest `src/lib/navigation/route-reachability-manifest.ts`). **NUNCA** crear un `page.tsx` bajo `(dashboard)` sin hacerlo alcanzable (href literal / child en el manifest / dinámica `[id]`); **NUNCA** declarar una ruta-hija sin `parent`+`via`+`reason`. Superficie + presupuesto del sidebar (TASK-1389): `agent-invariants/NAVIGATION_SURFACE_ALLOCATION_CONTRACT.md` + gate `pnpm nav:budget`; todo destino visible nuevo declara `Nav placement` en el addendum UI.
 
 ### Identity Bridge Cutover Protocol — invariantes (TASK-877 follow-up)
 

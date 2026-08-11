@@ -7,6 +7,29 @@ import { deriveRouteGroupsForSingleRole } from '@/lib/tenant/role-route-mapping'
 /**
  * Client Role Visibility Matrix — TASK-285 (V1.0) + TASK-827 (V1.4 forward-looking)
  *
+ * ⛔ **LEER ESTO ANTES DE CONCLUIR NADA DE QUE ESTE ARCHIVO ESTÉ VERDE.**
+ *
+ * Desde `TASK-1685` (2026-08-10, decisión (a′), cierra `ISSUE-148`) este archivo **NO prueba
+ * visibilidad**. Prueba la **forma del dato sembrado** en `role_view_assignments` y su paridad con
+ * `VIEW_REGISTRY` — que sigue siendo gobernanza valiosa — pero ese carril **ya no gobierna las vistas
+ * `cliente.*`**. Lo que decide hoy es un solo primitive:
+ *
+ *     acceso = interna ∨ ( ¬revocadaParaLaPersona ∧ ( vistaBase ∨ móduloDeLaOrgLaDeclara ) )
+ *
+ * en `src/lib/client-portal/visibility/`, consumido por el page guard, la lista base del menú, el ⌘K y
+ * los layouts de ruta. Sus tests viven en
+ * `src/lib/client-portal/visibility/client-portal-view-visibility.test.ts` y en `VerticalMenu.test.tsx`.
+ *
+ * En concreto: el caso `client_specialist ... is denied 6` de más abajo describe **filas de una tabla**,
+ * no lo que un specialist puede o no puede abrir. Dentro de una misma organización los tres roles
+ * cliente ven exactamente lo mismo. Un test verde acá **no** significa que la diferenciación de
+ * `TASK-285` esté en vigor: no lo está (ver su `## Delta 2026-08-10`).
+ *
+ * El nombre del archivo se conserva porque la migración y los docs lo referencian por ruta. Si algún día
+ * se renombra, actualizar `TASK-285`, `GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md` §3 y esta nota.
+ *
+ * ---
+ *
  * Documents the persisted `role_view_assignments` seeded by two canonical migrations:
  *   - TASK-285 (20260416095444700) — 11 viewCodes V1.0 con contract específico de specialist
  *     (specialist NO ve `analytics`, `campanas`, `equipo`)
@@ -248,7 +271,10 @@ describe('Client role visibility matrix (TASK-285 V1.0 + TASK-827 V1.4)', () => 
     ])
   })
 
-  it('client_specialist sees 19 views and is denied 6 (3 legacy + AEO + SEO module-gated)', () => {
+  // Este caso describe FILAS SEMBRADAS, no acceso efectivo: desde TASK-1685 el carril de rol no
+  // gobierna vistas `cliente.*`. Un specialist ve lo que su organización contrató, igual que los
+  // otros dos roles. Ver la nota del encabezado.
+  it('la matriz sembrada niega 6 a client_specialist (dato, NO acceso efectivo desde TASK-1685)', () => {
     const granted = Object.entries(CLIENT_VISIBILITY_MATRIX.client_specialist)
       .filter(([, v]) => v)
       .map(([k]) => k)
@@ -268,7 +294,9 @@ describe('Client role visibility matrix (TASK-285 V1.0 + TASK-827 V1.4)', () => 
     expect(denied).toContain('cliente.growth_seo_report')
   })
 
-  it('specialist retains access to core navigation views (TASK-285 AC #5)', () => {
+  // "retains access" es histórico: hoy el acceso no sale de esta matriz. Lo que fija este caso es que
+  // el seed nunca le quitó al specialist las vistas de navegación básicas.
+  it('el seed conserva las vistas núcleo para specialist (TASK-285 AC #5, histórico)', () => {
     expect(CLIENT_VISIBILITY_MATRIX.client_specialist['cliente.pulse']).toBe(true)
     expect(CLIENT_VISIBILITY_MATRIX.client_specialist['cliente.proyectos']).toBe(true)
     expect(CLIENT_VISIBILITY_MATRIX.client_specialist['cliente.revisiones']).toBe(true)

@@ -103,4 +103,74 @@ describe('createClamAvHttpScanner', () => {
 
     expect(result.findings.every(finding => finding.severity === 'blocking')).toBe(true)
   })
+
+  // TASK-1378 — El servicio real corre en Cloud Run con --no-allow-unauthenticated.
+  describe('autenticación OIDC contra Cloud Run', () => {
+    it('manda Authorization: Bearer cuando hay proveedor de token', async () => {
+      const fetchSpy = vi.fn<typeof fetch>(async () => jsonResponse({ status: 'ok' }))
+
+      vi.stubGlobal('fetch', fetchSpy)
+
+      const authenticated = createClamAvHttpScanner({
+        endpoint: 'https://clamav.internal/',
+        timeoutMs: 50,
+        getAuthToken: async () => 'id-token-123',
+      })
+
+      await authenticated.scan(input)
+
+      const headers = fetchSpy.mock.calls[0]?.[1]?.headers as Record<string, string>
+
+      expect(headers.authorization).toBe('Bearer id-token-123')
+    })
+
+    it('no manda Authorization cuando no hay proveedor (dev local sin IAM)', async () => {
+      const fetchSpy = vi.fn<typeof fetch>(async () => jsonResponse({ status: 'ok' }))
+
+      vi.stubGlobal('fetch', fetchSpy)
+      await scanner.scan(input)
+
+      const headers = fetchSpy.mock.calls[0]?.[1]?.headers as Record<string, string>
+
+      expect(headers.authorization).toBeUndefined()
+    })
+
+    it('fail-closed: si no se puede obtener el token emite error, nunca clean', async () => {
+      const fetchSpy = vi.fn<typeof fetch>(async () => jsonResponse({ status: 'ok' }))
+
+      vi.stubGlobal('fetch', fetchSpy)
+
+      const broken = createClamAvHttpScanner({
+        endpoint: 'https://clamav.internal/',
+        timeoutMs: 50,
+        getAuthToken: async () => {
+          throw new Error('WIF not configured')
+        },
+      })
+
+      const result = await broken.scan(input)
+
+      expect(result.verdict).toBe('error')
+      expect(result.findings[0]?.code).toBe('scanner_auth_failed')
+      expect(result.findings[0]?.severity).toBe('blocking')
+
+      // Y no llegó a llamar al servicio: sin credencial no se mandan los bytes.
+      expect(fetchSpy).not.toHaveBeenCalled()
+    })
+
+    it('no filtra el detalle técnico del error de credencial', async () => {
+      const broken = createClamAvHttpScanner({
+        endpoint: 'https://clamav.internal/',
+        timeoutMs: 50,
+        getAuthToken: async () => {
+          throw new Error('service account greenhouse-portal@ lacks roles/run.invoker')
+        },
+      })
+
+      const result = await broken.scan(input)
+
+      expect(result.findings[0]?.detail).not.toContain('greenhouse-portal@')
+      expect(result.findings[0]?.detail).not.toContain('run.invoker')
+    })
+  })
 })

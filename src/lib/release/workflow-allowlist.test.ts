@@ -7,12 +7,13 @@ import {
   findWorkflow
 } from './workflow-allowlist'
 
-describe('workflow-allowlist — canonical 8 workflows (6 deploy workers + orchestrator + watchdog)', () => {
-  it('contains exactly the 8 production release workflows', () => {
+describe('workflow-allowlist — canonical 9 workflows (7 deploy workers + orchestrator + watchdog)', () => {
+  it('contains exactly the 9 production release workflows', () => {
     expect(RELEASE_DEPLOY_WORKFLOWS.map((w) => w.workflowName).sort()).toEqual(
       [
         'Azure Teams Bot Deploy',
         'Azure Teams Deploy',
+        'ClamAV Scanner Deploy',
         'Commercial Cost Worker Deploy',
         'HubSpot Greenhouse Integration Deploy',
         'ICO Batch Worker Deploy',
@@ -29,7 +30,7 @@ describe('workflow-allowlist — canonical 8 workflows (6 deploy workers + orche
   })
 
   it('Set is read-only (preserve canonical immutability)', () => {
-    expect(RELEASE_DEPLOY_WORKFLOW_NAMES.size).toBe(8)
+    expect(RELEASE_DEPLOY_WORKFLOW_NAMES.size).toBe(9)
   })
 
   // Anti-regression: el orchestrator DEBE estar en el allowlist para que
@@ -71,6 +72,18 @@ describe('workflow-allowlist — canonical 8 workflows (6 deploy workers + orche
 describe('workflow-allowlist — Cloud Run drift detection mapping', () => {
   it('maps 4 workflows to Cloud Run services', () => {
     expect(WORKFLOWS_WITH_CLOUD_RUN_DRIFT_DETECTION).toHaveLength(4)
+  })
+
+  // TASK-1378 — El scanner está en el allowlist (lo necesita para ci_green y
+  // stale-approval) pero NO en drift detection: el orquestador production no lo
+  // despliega, así que su GIT_SHA quedaría desalineado en CADA release y el
+  // detector gritaría siempre. Su salud se mide por /health y por el signal
+  // storage.asset_scan.open_quarantine, no por el SHA.
+  it('ClamAV Scanner Deploy has NO Cloud Run mapping', () => {
+    const scanner = findWorkflow('ClamAV Scanner Deploy')
+
+    expect(scanner).not.toBeNull()
+    expect(scanner?.cloudRunService).toBeUndefined()
   })
 
   it('maps Ops Worker Deploy to ops-worker us-east4', () => {

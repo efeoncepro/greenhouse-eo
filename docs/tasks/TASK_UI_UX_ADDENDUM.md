@@ -111,6 +111,7 @@ Declarar el nivel dentro de `## UI/UX Contract`.
 ### Surface & system decision
 
 - Surface:
+- Nav placement: `sidebar|avatar|command-palette|shortcuts|none` — [obligatorio si la task agrega un destino de navegación visible; regla y presupuesto en `docs/architecture/agent-invariants/NAVIGATION_SURFACE_ALLOCATION_CONTRACT.md` (TASK-1389); `none` = la surface no agrega destino nuevo]
 - Composition Shell: `aplica|no aplica` — [razon]
 - Primitive decision: `reuse|extend|new|one-off` — [primitive/variant/kind]
 - Adaptive density / The Seam: `aplica|no aplica` — [razon]

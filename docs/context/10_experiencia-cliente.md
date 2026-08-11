@@ -43,6 +43,17 @@ Un *greenhouse* es un espacio de condiciones controladas para que algo crezca. A
 | Jardinero | Equipo de cuenta + owner | Alguien que monitorea y optimiza siempre |
 | **Paredes de cristal** | **Transparencia (portal, Notion, Frame.io)** | **Ve todo, sin cajas negras** |
 
+> **Precisión sobre "paredes de cristal" (2026-08).** "Ve todo" significa **transparencia total sobre lo que
+> contrató**, no acceso a todo el catálogo del portal. El portal cliente habilita superficies por **módulo
+> contratado por organización**, así que un cliente sin un servicio no ve ese módulo — y eso es correcto y
+> honesto. Lo que **sí** rompe la promesa es que una superficie no contratada se presente como una falla del
+> sistema: decir *"el servicio no está disponible"* cuando la respuesta verdadera es *"tu organización no
+> tiene este módulo"* convierte una frontera comercial legítima en una caja negra. Regla de experiencia: la
+> pared de cristal puede estar cerrada, pero nunca debe estar empañada. Y como el cierre es una frontera
+> comercial, también es una afordancia de upsell — el momento correcto para conversar el alcance, no para
+> mostrar un error. Ojo con el contraste: notificaciones, configuración de la cuenta y novedades **nunca**
+> se contratan; son parte del portal base y deben abrir siempre.
+
 > Principio central: *la experiencia de marca no es lo que decimos que somos; es lo que el cliente vive cuando trabaja con nosotros.* Greenhouse convierte lo que hoy es accidental (buena operación) en sistema reproducible **sin depender del instinto del founder**. Cada feature que sistematiza un "momento de marca" reduce esa dependencia.
 
 > **Esta experiencia ES el Why de Efeonce hecho vivencia.** "Ver todo, entender todo, mejorar cada ciclo" es exactamente la creencia central (*no te entregamos crecimiento, lo construimos contigo*): el crecimiento se **co-construye** (operas con nosotros en vivo, no recibes un reporte), se **educa** (entiendes, no solo recibes) y es **integral** (cada ciclo compone sobre el anterior). Cada mejora de experiencia en Greenhouse es una prueba del Why, no un adorno. SSOT del Why: `09_marca-agencia.md` → §El Golden Circle de Efeonce.

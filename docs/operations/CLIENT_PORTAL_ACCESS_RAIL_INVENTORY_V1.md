@@ -3,7 +3,22 @@
 > **Tipo de documento:** Inventario de deuda (medición puntual, no contrato)
 > **Medido:** 2026-08-09 por Claude, con cuatro análisis paralelos sobre el código y contra PG
 > **Motivo:** responder con números a *"llevamos task tras task sobre esto y no termina — ¿qué tanto falta?"*
-> **Estado:** los hallazgos están verificados en código y en datos; el plan es propuesta
+> **Estado:** los hallazgos están verificados en código y en datos; **el plan se ejecutó completo** (ver
+> delta abajo)
+
+> **Delta 2026-08-10 — el programa cerró, y esta medición tenía un punto ciego.**
+> `TASK-1678`/`1679`/`1680` y después `TASK-1685` (cierra `ISSUE-148`) están todas en `complete/`.
+> Resultado: el carril de rol **ya no gobierna vistas `cliente.*`** — un solo primitive lo decide todo
+> (`acceso = interna ∨ (¬revocadaParaLaPersona ∧ (vistaBase ∨ móduloDeLaOrgLaDeclara))`,
+> `src/lib/client-portal/visibility/`), consumido por el page guard, la lista base del menú, el ⌘K y los
+> layouts de ruta.
+>
+> **El punto ciego:** este inventario midió el carril *hacia adentro* —quién lee `authorizedViews`— y
+> nunca comparó **lo que el menú ofrece contra lo que la puerta abre**. Esa dirección tenía 36 enlaces
+> muertos sobre 8 de 8 usuarios cliente, y ninguno de los "~86 puntos de decisión legítimos" lo
+> mostraba: cada lado era internamente correcto. Es la lección portable de este inventario —
+> **contar callsites no mide coherencia entre superficies**. Hoy esa dirección la vigila la señal
+> `identity.client_portal.menu_gate_divergence`.
 
 ## La respuesta corta
 
@@ -46,11 +61,18 @@ Los defectos reales son **tres**, y dos de ellos son una función y una línea:
 **Nueve de las páginas del portal cliente no abren hoy.** Ese era el titular al medir, y no estaba en
 ningún issue antes de esta medición.
 
-> **Estado al 2026-08-09, después de `TASK-1678` + `TASK-1679`:** las nueve **dejaron de mentir**, que
-> es una cosa distinta de abrir. Tres abren (las vistas base) y seis muestran el empty state honesto
-> porque su módulo no está asignado a ninguna organización. La parte que queda no es código: es
-> decidir y asignar módulos. El titular corregido sería *"nueve páginas reportaban una falla de
-> servicio para decir seis cosas distintas, y ninguna de las seis era una falla"*.
+> **Estado al 2026-08-09, después de `TASK-1678` + `TASK-1679` + `TASK-1680`:** las nueve **dejaron de
+> mentir**, que es una cosa distinta de abrir. El titular corregido sería *"nueve páginas reportaban una
+> falla de servicio para decir seis cosas distintas, y ninguna de las seis era una falla"*.
+>
+> ⚠️ **Cuántas abren depende de los assignments y cambia sin que cambie el código.** El mismo día:
+> antes de asignarle `creative_hub_globe_v1` a Sky Airlines, las 4 organizaciones abrían 3 (las base);
+> después, SKY abre 7 y las demás siguen en 3. **NUNCA** heredes un conteo de este doc como expectativa
+> — derivalo de los datos, que es lo que hace `scripts/identity/client-portal-page-access-check.ts`
+> (su primera versión fijaba "3 y 6" y reportó desvíos por hacer lo correcto). Patrón canónico §7 de
+> `GREENHOUSE_CANONICAL_PATTERNS_V1.md`.
+>
+> Y la parte que queda no es código: es decidir y asignar módulos.
 
 ## Lo que se midió
 
@@ -161,9 +183,14 @@ cliente no puede entrar a su propia configuración de cuenta.**
    declare) o son module-gated (y entonces falta el módulo)? Nadie puede escribir ese fix sin la
    decisión.
 3. **El defecto 2 es una línea**, pero va después de la decisión anterior para no desplegar dos veces.
-4. **Cerrar la canilla**: el lint `no-untokenized-business-line-branching` está en `warn` desde mayo.
-   Mientras siga así, el carril viejo puede crecer mientras se limpia. Nota: su override block exime 7
-   paths, uno de ellos `VerticalMenu (1).tsx`, un archivo muerto.
+4. ~~**Cerrar la canilla**: el lint `no-untokenized-business-line-branching` está en `warn` desde mayo.~~
+   ✅ **CERRADO 2026-08-09 por `TASK-1680`.** El lint está en **`error`**, así que escribir branching
+   legacy nuevo falla el CI. Y la medición corrigió el diagnóstico de este punto: el override no exime
+   7 paths útiles sino **1** — de las 6 entradas que tenía, **cuatro eximían paths que la regla nunca
+   miró** (`isUiFile` excluye `src/app/api/**` y sólo evalúa `src/(components|views|app)/**`), una era
+   especulativa y otra era `VerticalMenu (1).tsx`, que además resultó ser una familia de **6** archivos
+   muertos del commit `eec326410`, todos borrados. Queda una exención medida y con dueño declarado
+   (`VerticalMenu.tsx` → follow-up `capability-modules-resolver-migration`).
 
 ## Lo que NO hay que hacer
 

@@ -19,6 +19,7 @@ argument-hint: "[país/etapa del bid o pregunta concreta]"
 - Cotizar, dimensionar garantías y evaluar cashflow/factoring del pago estatal.
 - Presentar, responder foro de aclaraciones, seguir evaluación, y gestionar adjudicación/impugnación.
 - Mapear un portal LATAM nuevo o un RFP corporativo privado.
+- Revisar Wherex mediante la CLI Playwright protegida, leyendo ficha y adjuntos antes de clasificar el fit → `wherex-radar-chrome-playwright.md`.
 
 **Cuándo NO:** decisiones legales definitivas (esta skill orienta y cita norma; **la validación legal la hace un humano**); construir el schema/ingesta del módulo (eso es `arch-architect` + `greenhouse-backend` sobre RESEARCH-007).
 
@@ -43,6 +44,7 @@ argument-hint: "[país/etapa del bid o pregunta concreta]"
 │  sectores (minería/energía/retail/banca) y precalificación .. privado-plataformas-sectores.md
 ├─ Admisibilidad, probidad, conflicto de interés, sanciones ... compliance-riesgo-integridad.md
 ├─ API Mercado Público, POC, conexión al módulo, MCP .......... data-sources-apis.md
+├─ Radar Wherex con CLI Playwright protegida .................. wherex-radar-chrome-playwright.md
 └─ OPERAR/EVOLUCIONAR el runtime SHIPPED (Proposal aggregate,
    render jobs, artifact-worker, agentes propose→confirm) ..... proposal-studio-runtime.md
 ```
@@ -82,7 +84,7 @@ En una licitación de contenidos **todas las ofertas dicen lo mismo** ("optimiza
 3. **Nunca un GO sin margen proyectado sobre loaded cost.** Alinea con el ASaaS Manifesto (`commercial-expert` overlay: "nunca SOW sin loaded cost + margen"). Un score de fit alto con margen negativo es un NO-BID.
 4. **No identidades paralelas.** La oportunidad extiende el modelo canónico 360: `public_opportunity → deal → quote → SOW → delivery`. El comprador público mapea a `organization/account`. Ver `data-sources-apis.md` + `arch-architect`.
 5. **Señales no canónicas ≠ servicios.** Los hits de medios/PR/influencers/staff-aug que aún no son servicio canónico del catálogo se guardan como `signals`, **nunca** dentro de `servicios_matched` (hallazgo TASK-673).
-6. **Human-in-control en la presentación.** La skill/agente **prepara** el paquete; **nunca** envía una oferta ni firma sin confirmación humana explícita. No almacenar credenciales ni cookies de los portales.
+6. **Human-in-control en la presentación.** La skill/agente **prepara** el paquete; **nunca** envía una oferta ni firma sin confirmación humana explícita. No almacenar credenciales ni cookies de los portales, salvo el runner local de Wherex autorizado expresamente: `.auth/` ignorado, `0600`, perfil aislado y sin exponer valores.
 7. **Evidence-first.** Toda clasificación (fit, monto, plazo, riesgo) cita el campo/documento que la sustenta (nombre vs bases técnicas vs items). Nombre pesa menos que bases técnicas.
 8. **es-CL neutro, tuteo.** Sin voseo ni modismos rioplatenses. Copy visible pasa por `copywriting` / `greenhouse-ux-writing`.
 9. **Creative Studio se cotiza por capas, no por una falsa tarifa por pieza.** Si el bid incluye producción generativa, separa acceso/gobernanza, capacidad humana, Studio Credits, implementación/IP y derechos/licencias/pass-through. El precio total exigido por las bases puede consolidarse hacia afuera, pero la hoja económica interna conserva las cinco líneas y su margen.
@@ -149,4 +151,5 @@ Esta skill **decide y estructura**; delega el craft especializado. Declara siemp
 | `privado-plataformas-sectores.md` | E-procurement (SAP Ariba, Coupa, Jaggaer, GEP, Oracle, SAP Fieldglass/VMS), precalificación y registros (Achilles, SICEP, REPRO, TVEC privado), y playbooks por sector (minería, energía, retail, banca, telco, salud privada) |
 | `compliance-riesgo-integridad.md` | Checklist de admisibilidad, inhabilidades, probidad/conflicto de interés, subcontratación, PI/confidencialidad, multas y sanciones |
 | `data-sources-apis.md` | API Mercado Público v1 (ticket DCCP) + Compra Ágil v2 Beta, adjuntos WebForms, POC `scripts/research/mercadopublico-poc/`, conexión al módulo RESEARCH-007, MCP Legal Data Hunter, HubSpot/Notion |
+| `wherex-radar-chrome-playwright.md` | Radar privado de Wherex con `pnpm wherex:radar`: Chrome aislado en `.auth/`, estados Nueva + Editando, lectura de ficha y adjuntos, clasificación evidence-first y límite read-only; continuidad de adjuntos originales en OneDrive y empresa/deal/asociación verificados por MCP HubSpot |
 | `proposal-studio-runtime.md` | **El runtime SHIPPED (TASK-1392/1393/1391 + 1415, 2026-07-12→16)**: cómo USAR el pipeline completo (Proposal → evidencia → manifest → render job gobernado → `artifact-worker` → PDF versionado en asset store → ver/descargar en el portal) y cómo EVOLUCIONARLO (costuras: catálogo nuevo, outputTarget, brand pack, fase agéntica con el molde propose→confirm→execute, **un chapter-author nuevo** — implementar la interface de `proposals/authoring/`, jamás tocarla —, failure codes, constraints del RFP) — lo primero que lee un agente nuevo que va a tocar el motor |

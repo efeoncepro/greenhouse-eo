@@ -1,9 +1,9 @@
 # Preview de Correos — Herramienta de Vista Previa y Prueba de Emails
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-04-06 por Claude (asistido por Julio Reyes)
-> **Ultima actualizacion:** 2026-04-06 por Claude
+> **Ultima actualizacion:** 2026-08-10 por Claude (TASK-1388 — ruta de acceso via zona Administracion → Admin Center → Plataforma)
 > **Documentacion tecnica:** `docs/architecture/GREENHOUSE_EMAIL_PREVIEW_V1.md`
 
 ## Que es
@@ -14,8 +14,8 @@ No es un editor visual — no permite modificar el diseno de los templates. Su p
 
 ## Como acceder
 
-1. Ir a **Admin Center** en el menu lateral
-2. Dentro de la seccion **Platform**, seleccionar **Preview de correos**
+1. En el menu lateral, zona **Administracion**, abrir **Admin Center**
+2. Dentro del submenu **Plataforma**, seleccionar **Preview de correos**
 
 **Requisito de acceso:** solo usuarios con rol `efeonce_admin` o con el permiso `administracion.email_delivery` asignado en su set de permisos pueden acceder.
 

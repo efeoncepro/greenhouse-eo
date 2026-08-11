@@ -1,16 +1,19 @@
 # Mi Perfil — Vista personal del colaborador
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-04-06 por Claude (TASK-272)
-> **Ultima actualizacion:** 2026-04-06 por Claude (TASK-272)
+> **Ultima actualizacion:** 2026-08-10 por Claude (TASK-1388/TASK-1686 — acceso via menu del avatar para usuarios internos)
 > **Documentacion tecnica:** docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md
 
 ---
 
 ## Que es Mi Perfil
 
-Mi Perfil es la vista personal de cada colaborador en el portal Greenhouse. Permite ver la propia informacion laboral, equipos, proyectos y colegas en un solo lugar. Se accede desde `/my/profile` en el menu lateral del portal.
+Mi Perfil es la vista personal de cada colaborador en el portal Greenhouse. Permite ver la propia informacion laboral, equipos, proyectos y colegas en un solo lugar. La ruta es `/my/profile` y se llega distinto segun el tipo de usuario:
+
+- **Usuarios internos** (operan modulos como Agencia, Finanzas o Personas): desde el **menu del avatar** (esquina superior derecha) — ahi viven todas las paginas personales (`/my/*`), incluida Mi Perfil. Ya no aparecen en el menu lateral.
+- **Colaborador puro** (solo rol Colaborador): desde la seccion **Mi Ficha** de su menu lateral, que es su portal completo.
 
 Es una vista de solo lectura: el usuario puede consultar su informacion pero no editarla directamente desde esta pantalla.
 

@@ -1,5 +1,16 @@
 # TASK-516 — NextAuth v4 → Auth.js v5 migration
 
+## Delta 2026-08-09
+
+- **Resuelta la duda del inventario de Fase 1.** El archivo listaba «la copia `VerticalMenu (1).tsx` —
+  verificar si es activa»: era código muerto y ya no existe. `TASK-1680` la borró junto a otras 5 copias con
+  el mismo patrón ` (1).` (`capability-registry (1).ts`, `resolve-capabilities (1).ts`,
+  `capabilities (1).ts`, y dos rutas de `capabilities/[moduleId]`), commit `d81447fd1`. El inventario de
+  `useSession` de esta task queda con **un solo** `src/components/layout/vertical/VerticalMenu.tsx`.
+- Vale re-correr el conteo de callsites antes de empezar: el inventario de este archivo es de abril y la
+  superficie de sesión se movió varias veces desde entonces (entre otras, el menú del portal cliente pasó a
+  resolverse per-org en `(dashboard)/layout.tsx` con `TASK-1675`).
+
 ## Delta 2026-04-26
 
 - Pre-requisito **TASK-515 (`jose`) cerrado**. `jose@6.2.2` ya está en `package.json` como dep directa; `jsonwebtoken` removido. La fundación está lista — esta task ya no está bloqueada.
@@ -240,7 +251,7 @@ Ejecutar el playbook `az` documentado más arriba en este mismo archivo (secció
 
 - `src/lib/auth.ts` — el callsite directo `getServerSession` se mueve al wrapper (line 82).
 - 12 archivos con `useSession`:
-  - `src/components/layout/vertical/VerticalMenu.tsx` (y la copia `VerticalMenu (1).tsx` — verificar si es activa).
+  - `src/components/layout/vertical/VerticalMenu.tsx` (la copia `VerticalMenu (1).tsx` era código muerto y se borró en `TASK-1680` — ver Delta 2026-08-09).
   - `src/components/layout/shared/UserDropdown.tsx`
   - `src/views/greenhouse/GreenhouseSettings.tsx`
   - `src/views/greenhouse/organizations/OrganizationView.tsx`

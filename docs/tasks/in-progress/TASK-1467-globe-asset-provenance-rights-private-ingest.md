@@ -1,5 +1,18 @@
 # TASK-1467 — Globe Asset Provenance, Rights and Private Ingest
 
+## Delta 2026-08-11
+
+- Greenhouse ya tiene un escáner de firmas gobernado y operativo: servicio Cloud Run **único** `clamav`
+  (us-east4, `min=1`, `--no-allow-unauthenticated`, invoker sólo para `greenhouse-portal@`, contrato
+  `POST /scan` → `{status:'ok'|'found', signature?}`), consumido detrás del puerto domain-free `AssetScanner`.
+  ON en staging, OFF en producción hasta promover `develop`→`main` — actualizado por TASK-1378.
+- **No cierra nada de esta task**, pero cambia el punto de partida del Slice 2 (`malware/type checks`): el
+  ClamAV que hoy corre embebido en el Job `globe-asset-governance` resuelve el camino asíncrono, no el
+  request-path del ingest. Antes de levantar una tercera instancia, evaluar consumir el servicio compartido
+  (es HTTP + OIDC, ya ejercitado contra el servicio real). Dos advertencias medidas en TASK-1378: `min-instances`
+  es **por revisión, no por servicio** (una revisión canary heredada en `min=1` cuesta lo mismo que el servicio),
+  y un contenedor frío tarda 30-60 s en cargar firmas — más que cualquier timeout razonable de request path.
+
 ## Delta 2026-07-20
 
 Cerrado por TASK-1490 (cross-model edit/refine), que cambió dos supuestos de esta task:

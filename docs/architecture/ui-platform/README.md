@@ -56,6 +56,7 @@ componentes MUI/Vuexy a Globe ni conviertas el Lab en una dependencia de runtime
 | Pasar un color del theme a un chart ApexCharts sin que reviente bajo `cssVariables` (`resolveApexColor`) | [PRIMITIVES.md § ApexCharts Runtime Wrapper](./PRIMITIVES.md#apexcharts-runtime-wrapper) |
 | Implementar mocks de Claude Design (.dc.html) — tabla mock→tokens + checklist | [CLAUDE_DESIGN_TO_GREENHOUSE_BRIDGE.md](./CLAUDE_DESIGN_TO_GREENHOUSE_BRIDGE.md) |
 | Gobernanza de vistas (route groups + authorizedViews + entitlements) | [GOVERNANCE.md](./GOVERNANCE.md) |
+| Superficie de un destino de navegación (sidebar/avatar/⌘K/shortcuts) + presupuesto del rail interno (gate `pnpm nav:budget`) | [NAVIGATION_SURFACE_ALLOCATION_CONTRACT.md](../agent-invariants/NAVIGATION_SURFACE_ALLOCATION_CONTRACT.md) |
 | Historial cronológico (todas las deltas datadas + version log) | [HISTORIAL.md](./HISTORIAL.md) |
 
 ## ADRs / specs dedicadas relacionadas (autoridad por tema)

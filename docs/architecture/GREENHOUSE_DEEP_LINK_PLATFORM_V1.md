@@ -3,7 +3,7 @@
 > **Tipo de documento:** Spec de arquitectura
 > **Version:** 1.0
 > **Creado:** 2026-04-26
-> **Ultima actualizacion:** 2026-04-30
+> **Ultima actualizacion:** 2026-08-11 (TASK-1685: §8.2 — las entradas cliente de la palette filtran por el primitive de visibilidad, no por el claim)
 > **Scope:** Deep links, route references, action URLs, share links, unfurls y navegacion cross-surface de Greenhouse
 > **Docs relacionados:** `GREENHOUSE_ARCHITECTURE_V1.md`, `GREENHOUSE_IDENTITY_ACCESS_V2.md`, `GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`, `GREENHOUSE_PORTAL_VIEWS_V1.md`, `GREENHOUSE_NOTIFICATION_HUB_V1.md`, `GREENHOUSE_TEAMS_BOT_INTERACTION_V1.md`, `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
 
@@ -388,12 +388,12 @@ El menu debe converger gradualmente desde `href` inline a referencias canonicas 
 
 ### 8.2 Command palette / search
 
-Search no debe depender de `src/data/searchData.ts` como lista estatica. Debe derivar destinos de:
+Estado 2026-08-10 (TASK-1388): la unica palette ⌘K del portal es la `CommandPalette` de TASK-696 (`src/components/greenhouse/CommandPalette/`), montada globalmente via `src/components/layout/shared/GlobalCommandPalette.tsx`. Ya deriva sus rutas de `VIEW_REGISTRY` filtrado por audiencia (routeGroup + authorizedViews) + recientes client-side; la `NavSearch` legacy (que exponia `searchData.ts` estatico) fue eliminada.
 
-- `VIEW_REGISTRY`
-- `DeepLinkRegistry`
-- permisos efectivos del usuario
-- entidades recientes o buscadas si aplica
+**Matiz cliente (TASK-1685, 2026-08-10):** el filtro por claim (`authorizedViews`) aplica a las entradas de routeGroups internos. Las entradas con `routeGroup === 'client'` se filtran con el **primitive unico de visibilidad del portal cliente** (`canSeeClientPortalView(viewCode)`, via el provider `client-portal-visibility-context`): modulos contratados de la organizacion menos revocaciones per-persona, el mismo predicado que consumen `VerticalMenu` y los page guards. El claim de rol NO gobierna vistas `cliente.*` en la palette — lint `greenhouse/no-client-portal-view-visibility-bypass`. Convergencia pendiente:
+
+- `DeepLinkRegistry` como fuente adicional de destinos
+- entidades recientes o buscadas server-aware si aplica
 
 ### 8.3 Notificaciones
 
@@ -518,7 +518,7 @@ Reglas:
 
 ### Slice 3 — Search y menu
 
-- Generar command palette desde registry + permissions.
+- ~~Generar command palette desde registry + permissions.~~ Hecho por TASK-1388 (2026-08-10): `GlobalCommandPalette` deriva de `VIEW_REGISTRY` + permisos de audiencia (ver §8.2). Falta la integracion con `DeepLinkRegistry`.
 - Reconciliar `VIEW_REGISTRY.routePath` con `DeepLinkRegistry`.
 - Marcar rutas legacy sin definition.
 

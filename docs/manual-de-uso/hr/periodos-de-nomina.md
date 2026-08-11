@@ -1,9 +1,9 @@
 # Periodos de Nomina
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-04-30 por Codex
-> **Ultima actualizacion:** 2026-05-16 por Codex (TASK-894 — contrato internacional interno)
+> **Ultima actualizacion:** 2026-08-10 por Claude (TASK-1388 — ruta de menu: dominio Personas en la zona Operacion)
 > **Modulo:** HR / Nomina
 > **Ruta en portal:** `/hr/payroll`
 > **Documentacion relacionada:** [GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md), [Periodos de nomina](../../documentation/hr/periodos-de-nomina.md)
@@ -22,7 +22,7 @@ Cada periodo representa el **mes imputable** de la nomina, no necesariamente el 
 
 ## Crear un periodo nuevo
 
-1. Entra a `Personas y HR > Nomina > Nomina mensual`.
+1. En el menu lateral, zona **Operacion**, abre el dominio `Personas > Nomina > Nomina mensual`.
 2. Haz clic en `Nuevo periodo`.
 3. Completa `Año` y `Mes`.
 4. Revisa el campo informativo `Version tributaria Chile esperada`.

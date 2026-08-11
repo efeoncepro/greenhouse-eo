@@ -51,6 +51,24 @@ export const RELEASE_DEPLOY_WORKFLOWS: readonly ReleaseDeployWorkflow[] = [
     cloudRunRegion: 'us-central1'
   },
   {
+    // TASK-1378 — Scanner de firmas de assets de candidato. Registrado ANTES
+    // del primer deploy production, como exige la regla dura del control plane.
+    //
+    // SIN cloudRunService a propósito, igual que los deploys de Azure: el
+    // orquestador production NO lo despliega (no está en los `uses:` de
+    // production-release.yml) porque su imagen no cambia con el código del
+    // portal — sólo con `services/clamav/**`, y rebuildearla hornea la base de
+    // firmas, varios minutos por promoción. Con mapping, el drift por GIT_SHA
+    // marcaría este servicio como desalineado en CADA release, para siempre, y
+    // un detector que siempre grita deja de ser un detector.
+    //
+    // La pregunta de salud correcta para este servicio no es "¿su SHA coincide
+    // con el release?" sino "¿está arriba y con firmas frescas?". Eso lo
+    // responden `/health` y el signal `storage.asset_scan.open_quarantine`, que
+    // se llena de veredictos `error` si el scanner deja de responder.
+    workflowName: 'ClamAV Scanner Deploy'
+  },
+  {
     workflowName: 'Azure Teams Deploy'
     // Azure deploys: no Cloud Run revision para drift detection
   },

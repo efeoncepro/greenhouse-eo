@@ -113,3 +113,29 @@
 **Check #4 release_batch_policy** (mas novel): clasifica diff `origin/main...target_sha` por dominio (`payroll`, `finance`, `auth_access`, `cloud_release`, `db_migrations`, `ui`, `docs`, `tests`, `config`, `unclassified`), detecta sensitive paths, computa irreversibility flags. Decision tree:
 - Empty → `ship`
 - INDEPENDENT sensitive mix sin marker `[release-coupled: <razon>]` en commit body → `split_batch` (error)
+
+# 2026-08-09 (TASK-1678, cierra ISSUE-147): las tres lineas describian la
+# telemetria `role_view_fallback_used` como si cubriera TODOS los viewCodes.
+# Desde que el carril `client` falla hacia cerrado, no los cubre: el fallback
+# solo emite warning cuando OTORGA, asi que un viewCode `cliente.*` sin seed no
+# produce ruido Sentry — produce una vista que nunca abre, en silencio. Su
+# detector es la senal `identity.view_access.client_role_without_grants`.
+# Las DOS reglas NUNCA sobreviven con su instruccion INTACTA en
+# GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md (lineas 832 y 834):
+# lo unico que cambio es la justificacion, y quedo mas fuerte — en el carril
+# cliente la migration de seed no es higiene, es la condicion de existencia de
+# la vista. Conservar el texto viejo seria conservar una afirmacion falsa sobre
+# donde esta el detector, que es peor que no tenerla: mandaria a un agente a
+# buscar un warning que nunca va a llegar. Reword legitimo y obligatorio.
+- **NUNCA** agregar entry a `VIEW_REGISTRY` TS sin migration acompañante en el mismo PR. La telemetría `role_view_fallback_used` lo detectará en producción y genera ruido Sentry.
+- **NUNCA** parchear el fallback heurístico para "evitar" el warning. La solución canonical es seed migration; el warning ES el detector.
+**Por qué**: el helper `roleCanAccessViewFallback()` en `src/lib/admin/view-access-store.ts:99-125` opera como signal de gobernanza pendiente. Cuando un viewCode NO tiene fila explícita en `role_view_assignments`, el fallback heurístico resuelve `granted=true` por route_group match Y emite WARNING `role_view_fallback_used` (Sentry domain=identity) — funciona correctamente operacionalmente, pero es ruido de gobernanza incompleta.
+
+# 2026-08-10 — TASK-1388/1686 barrido post-cierre: el invariante de shortcuts
+# (TASK-553) en UI_FEATURE_AGENT_INVARIANTS.md se reescribio porque la command
+# palette dejo de ser "futura": la CommandPalette global YA existe (TASK-1388)
+# y NO es surface de shortcuts (deriva de VIEW_REGISTRY, no del resolver).
+# Conservar el texto viejo afirmaria que una surface viva es hipotetica y
+# omitiria la frontera nueva palette≠shortcuts. Reword legitimo.
+Toda surface que renderice atajos top-level de navegación (header `<ShortcutsDropdown />`, Home `recommendedShortcuts`, futuras command palettes, Mi Greenhouse, settings personales) **debe** consumir el resolver canónico desde `src/lib/shortcuts/resolver.ts`. Reemplaza los arrays hardcodeados de shortcuts que vivían en `NavbarContent.tsx` (vertical + horizontal) y los desacopla del catálogo Home.
+- Cuando emerja una surface adaptativa nueva (Mi Greenhouse, command palette, settings personales con atajos), debe consumir el resolver — no copiar el catálogo ni reimplementar el gate.

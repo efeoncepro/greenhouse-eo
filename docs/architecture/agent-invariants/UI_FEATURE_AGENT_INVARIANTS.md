@@ -5,6 +5,8 @@
 ## Invariantes operativos para agentes — UI/feature platforms (TASK-553…1059)
 
 > **Relocados de `CLAUDE.md` por TASK-1160 (2026-06-16), verbatim.** UI/feature platforms + metodología de verificación visual. Contrato por sub-área en sus specs/task-specs (citadas en cada bloque). Dedup = Slice 4.
+>
+> **Navegación (TASK-1389):** la asignación de superficies de navegación (operativo→sidebar en zonas · personal→avatar · cola larga→⌘K · frecuente→shortcuts) y el presupuesto del rail interno (`MAX_TOP_LEVEL_SLOTS=8`, `MAX_INTERACTIVE_DEPTH=2`; gate `pnpm nav:budget` en severidad `error`) se gobiernan en el companion [`NAVIGATION_SURFACE_ALLOCATION_CONTRACT.md`](NAVIGATION_SURFACE_ALLOCATION_CONTRACT.md) — cargar ese contrato antes de agregar cualquier destino de navegación visible.
 
 ### Home Rollout Flag Platform (TASK-780)
 
@@ -90,7 +92,7 @@ Toda surface que necesite "navegar al detail de un Nexa Insight" (Home bento, Ag
 
 ### Quick Access Shortcuts Platform (TASK-553)
 
-Toda surface que renderice atajos top-level de navegación (header `<ShortcutsDropdown />`, Home `recommendedShortcuts`, futuras command palettes, Mi Greenhouse, settings personales) **debe** consumir el resolver canónico desde `src/lib/shortcuts/resolver.ts`. Reemplaza los arrays hardcodeados de shortcuts que vivían en `NavbarContent.tsx` (vertical + horizontal) y los desacopla del catálogo Home.
+Toda surface que renderice atajos top-level de navegación (header `<ShortcutsDropdown />`, Home `recommendedShortcuts`, Mi Greenhouse, settings personales) **debe** consumir el resolver canónico desde `src/lib/shortcuts/resolver.ts`. Reemplaza los arrays hardcodeados de shortcuts que vivían en `NavbarContent.tsx` (vertical + horizontal) y los desacopla del catálogo Home. Nota (TASK-1388): la `CommandPalette` global ⌘K (`GlobalCommandPalette`) NO es una surface de shortcuts — deriva sus rutas de `VIEW_REGISTRY` filtrado por audiencia; si alguna vez incorpora atajos adaptativos, esos atajos deben salir del resolver.
 
 **Read API canónico**:
 
@@ -119,7 +121,7 @@ Auth: `getServerAuthSession` + `can(subject, 'home.shortcuts', 'read')` + `valid
 - **NUNCA** mostrar un shortcut pineado sin re-validar acceso al render. El reader del API ya lo filtra; cualquier consumer alternativo debe pasar por el resolver.
 - **NUNCA** mezclar el shape de header (`{key, label, subtitle, route, icon, module}`) con el legacy de Home (`{id, label, route, icon, module}`). Use `projectShortcutForHome` cuando se necesite el shape legacy.
 - **NUNCA** introducir un nuevo gate (e.g. `requiredFeatureFlag`) sin extender `CanonicalShortcut` + `isShortcutAccessible` en el resolver. Cero branching inline en consumers.
-- Cuando emerja una surface adaptativa nueva (Mi Greenhouse, command palette, settings personales con atajos), debe consumir el resolver — no copiar el catálogo ni reimplementar el gate.
+- Cuando emerja una surface adaptativa nueva con atajos (Mi Greenhouse, settings personales, o la `CommandPalette` global si suma atajos adaptativos), debe consumir el resolver — no copiar el catálogo ni reimplementar el gate.
 
 **Spec canónica**: `docs/tasks/complete/TASK-553-quick-access-shortcuts-platform.md`. Doc funcional: `docs/documentation/plataforma/accesos-rapidos.md`. Manual: `docs/manual-de-uso/plataforma/accesos-rapidos.md`. Delta UI Platform: `docs/architecture/ui-platform/HISTORIAL.md` (2026-05-04).
 

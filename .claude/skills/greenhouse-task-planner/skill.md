@@ -103,6 +103,16 @@ Write the complete `.md` file following the structure of `docs/tasks/TASK_TEMPLA
 
 **Zone 2 is NOT filled in.** It is the responsibility of the agent that takes the task, not the one that creates it.
 
+#### Canonical-template gate — mandatory for every new task
+
+Copy the structure from `docs/tasks/TASK_TEMPLATE.md`; never rebuild it from remembered headings. `task:lint` identifies a canonical task through the literal HTML comments that delimit Zones 0–4, not through semantically equivalent markdown headings.
+
+- Preserve the five full `<!-- ... ZONE N ... -->` blocks verbatim, including the deliberately empty Zone 2 block.
+- Populate only Zones 0, 1, 3, and 4; do not write a plan inside Zone 2.
+- Immediately after writing the task file — and before registry, README, Handoff, or commit — run `pnpm task:lint --task TASK-###`.
+- Register the task only when the summary is exactly compatible with `scanned=1 template=1 legacy=0 errors=0 warnings=0`.
+- `legacy=1` blocks registration even when errors are zero. Restore the literal markers from the template, then rerun the lint; never normalize this as a harmless outcome.
+
 **Execution profile, UI impact, UI ready, and Backend impact are always written in Status.**
 
 - Default: `Execution profile: standard`, `UI impact: none`, `UI ready: n/a`, and `Backend impact: none`.
@@ -111,7 +121,8 @@ Write the complete `.md` file following the structure of `docs/tasks/TASK_TEMPLA
 - If `Execution profile = ui-ux` or `UI impact != none`, include a completed `## UI/UX Contract` section copied from `docs/tasks/TASK_UI_UX_ADDENDUM.md` and write `Wireframe: docs/ui/wireframes/TASK-###-short-slug.md` in Status, pointing to an existing wireframe file.
 - If `UI impact = flow` or the UI coordinates sidecars, drawers, modals, popovers, or route/screen transitions, write `Flow: docs/ui/flows/TASK-###-short-slug-flow.md` in Status, pointing to an existing flow contract file.
 - If `UI impact = motion` or the UI introduces non-trivial motion/microinteractions, write `Motion: docs/ui/motion/TASK-###-short-slug-motion.md` in Status, pointing to an existing motion contract file.
-- UI/UX tasks must specify experience brief, surface/system decision, state inventory, interaction contract, motion/microinteractions, and visual verification.
+- If the task adds a **visible navigation destination** (new route/page reachable by users), the `## UI/UX Contract` → Surface & system decision MUST declare `Nav placement: sidebar|avatar|command-palette|shortcuts|none` (operativo → sidebar dentro de una zona · personal → avatar dropdown · cola larga → ⌘K command palette · frecuente → shortcuts; `none` = no agrega destino nuevo). Prohibido duplicar un destino en dos superficies y prohibido colgar del primer nivel del rail fuera de una zona (solo el Home pineado). El presupuesto es real y con gate: `MAX_TOP_LEVEL_SLOTS=8` / `MAX_INTERACTIVE_DEPTH=2`, `pnpm nav:budget` en severidad `error` (un ítem que rompe el presupuesto ROMPE el build). Contrato: `docs/architecture/agent-invariants/NAVIGATION_SURFACE_ALLOCATION_CONTRACT.md` (TASK-1389).
+- UI/UX tasks must specify experience brief, surface/system decision (including `Nav placement` when the task adds a visible navigation destination), state inventory, interaction contract, motion/microinteractions, and visual verification.
 - UI/UX acceptance criteria must be binary: primitive decision, copy source, state coverage, motion/reduced-motion, GVC evidence when applicable, and page-level horizontal scroll checks when layout changes.
 - UI/UX acceptance criteria must include the `UI ready` gate: it remains `no` until implementation mapping, GVC scenario plan and design decision log are complete; if it is `yes`, focal task lint must pass.
 - For `ui-standard` and `ui-platform`, GVC desktop + mobile evidence is required unless the task explicitly explains why runtime visual evidence does not apply.
@@ -164,9 +175,10 @@ Wait for confirmation. If the user requests changes, apply them and re-present.
 After user confirmation:
 
 1. Write the task file to `docs/tasks/to-do/TASK-###-short-slug.md`
-2. Add the ID to `docs/tasks/TASK_ID_REGISTRY.md`
-3. Update `docs/tasks/README.md` with the next available ID
-4. Commit with message: `docs: create TASK-### — [short title]`
+2. Pass the canonical-template gate (`template=1`, `legacy=0`, zero errors and warnings)
+3. Add the ID to `docs/tasks/TASK_ID_REGISTRY.md`
+4. Update `docs/tasks/README.md` with the next available ID
+5. Commit with message: `docs: create TASK-### — [short title]`
 
 ## EPIC-026 Modular Placement Contract
 

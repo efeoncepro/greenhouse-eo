@@ -1,5 +1,25 @@
 # TASK-828 — Client Portal Cascade from Client Lifecycle V1
 
+## Delta 2026-08-09
+
+Causado por `TASK-1678` / `TASK-1679` (complete, en producción).
+
+- **El `module_assignments` que esta cascada materializa es hoy el único insumo que abre una superficie del
+  portal cliente de punta a punta.** El page guard `requireViewCodeAccess`
+  ([src/lib/client-portal/guards/require-view-code-access.ts](../../../src/lib/client-portal/guards/require-view-code-access.ts))
+  resuelve por módulo contratado —llaveado por `organizationId` desde `TASK-1679`, ya no por `clientId`—
+  más 3 vistas base sin módulo (`CLIENT_PORTAL_BASE_VIEW_CODES`); y `TASK-1678` quitó el default permisivo
+  del carril de rol para las vistas `cliente.*`. **Ya no hay fallback que tape una cascada que no corrió**:
+  si no materializa (o churn-ea de más), el cliente simplemente no ve la superficie.
+- **Consecuencia para la verificación de esta task:** confirmar la fila en `module_assignments` no basta.
+  La evidencia de cierre debe incluir abrir una ruta real del portal con la organización afectada (las
+  personas agente `agent-client@…` o una org real), porque el guard depende además de que la sesión traiga
+  `organizationId` — hay una señal dedicada para su ausencia
+  (`identity.client_portal.client_without_organization`).
+- **No cambiar la semántica de acceso desde acá.** Qué carril gatea una vista cliente está en revisión en
+  `TASK-1685` (hallazgo en `ISSUE-148`): rol y módulo son ortogonales y ninguno se aplica de punta a punta.
+  Esta cascada sigue siendo el productor del dato; la decisión de gating no es suya.
+
 ## Status
 
 - Lifecycle: `to-do`

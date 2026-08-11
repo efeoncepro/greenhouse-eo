@@ -84,7 +84,7 @@
 ## GVC / Micro Evidence
 
 - Scenario: acordeón del rail + apertura ⌘K.
-- Scenario file: `scripts/frontend/scenarios/task-1388-vertical-menu-restructure.ts`.
+- Scenario file: `scripts/frontend/scenarios/task-1388-vertical-menu-restructure.scenario.ts`.
 - Route: `/home` (o `portalHomePath`) con `agent@greenhouse.efeonce.org`.
 - Viewports: desktop 1440 + mobile 390.
 - Required steps: abrir dominio A (capturar), abrir dominio B (verificar que A colapsa), abrir ⌘K, repetir con `prefers-reduced-motion`.

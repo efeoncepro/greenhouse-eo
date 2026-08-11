@@ -12,6 +12,24 @@
   `MODULE_COMPOSED_NAV_ROUTES`, la categoría de rutas que SÍ son ítem de menú pero cuyo `href` se
   compone en runtime. `/growth/seo/report` se queda como child route `header-cta`, que sí es correcto.
 - El rollout productivo de ambas sigue gated por la misma promoción `develop → main`.
+- **Queda desactualizada la atribución del hermano AEO que hace el Delta 2026-08-08.** Ahí dice que
+  `cliente.ai_visibility_report` «cae al fallback y sí figura en `authorizedViews`, emitiendo
+  `role_view_fallback_used`». Eso dejó de ser cierto el 2026-08-09: `TASK-1678` invirtió el default del
+  fallback para `view.routeGroup === 'client'` — `computeRoleCanAccessViewFallback`
+  ([src/lib/admin/view-access-store.ts](../../../src/lib/admin/view-access-store.ts)) retorna `false`
+  antes de emitir telemetría — y la medición de esa task registra que **el único** viewCode que apagó por
+  rol cliente fue exactamente `cliente.ai_visibility_report`. Hoy no está en `authorizedViews` de ningún
+  rol cliente sin fila explícita, y ya no emite `role_view_fallback_used`. La referencia sigue siendo
+  válida como precedente de **alcanzabilidad** (deep-link declarado a propósito), no como descripción del
+  carril de views.
+- **Lo que esta task declara sobre el gate quedó literalmente cierto, no sólo recomendado.** El criterio
+  «gate per-org via `module_assignments`, NUNCA por rol» es ahora el único carril de punta a punta:
+  `requireViewCodeAccess` pasó a llavear por `organizationId` (`TASK-1679`) y resuelve por módulo
+  contratado. No hay que cambiar nada del diseño de esta task por eso.
+- **Ojo si el dashboard o el report usan `authorizedViews` / `canSeeView` para decidir algo:** en una
+  sesión cliente ese claim ya no describe lo que la persona puede abrir, y el camino degradado del
+  resolver (`SCHEMA_NOT_READY`) ahora devuelve **lista vacía** para tenants `client`. La señal
+  `identity.view_access.client_role_without_grants` es el detector de vistas cliente sin grant.
 
 
 ## Delta 2026-08-08

@@ -40,6 +40,16 @@ const NO_VERCEL = argv.includes('--no-vercel')
 
 const codeFlags = new Set()
 
+/**
+ * ISSUE-150 — flag → archivos que lo LEEN, en rutas relativas al repo.
+ *
+ * Hace falta para poder preguntarle a `main` si ese código existe allá. Un flag
+ * prendido en Production sobre código que sólo está en `develop` es un
+ * fail-closed esperando gente: producción ejecuta la rama vieja, que no sabe
+ * nada del comportamiento nuevo.
+ */
+const flagReaders = new Map()
+
 const walk = dir => {
   let entries
 
@@ -67,7 +77,15 @@ const walk = dir => {
       let m
 
       FLAG_RE.lastIndex = 0
-      while ((m = FLAG_RE.exec(text)) !== null) codeFlags.add(m[1])
+
+      while ((m = FLAG_RE.exec(text)) !== null) {
+        codeFlags.add(m[1])
+
+        const relative = full.startsWith(ROOT) ? full.slice(ROOT.length + 1) : full
+
+        if (!flagReaders.has(m[1])) flagReaders.set(m[1], new Set())
+        flagReaders.get(m[1]).add(relative)
+      }
     }
   }
 }
@@ -155,6 +173,82 @@ if (vercelOk) {
 
 const orphanEnv = vercelOk ? [...vercelFlags.keys()].filter(f => !codeFlags.has(f)).sort() : []
 
+// ── 4b. ISSUE-150 — flags ON en Production sin su código en `main` ───────────
+//
+// Producción sirve `main`. Si el código que lee el flag sólo existe en
+// `develop`, prenderlo en Production activa una promesa que ese runtime no
+// puede cumplir. Con semántica fail-closed —como el escáner de assets— eso no
+// degrada: bloquea usuarios reales. Pasó el 2026-08-11 con
+// ASSET_MALWARE_SCAN_ENABLED: cinco CV de candidatos en cuarentena por 403.
+const prodWithoutCodeOnMain = []
+const prodOnDriftedCode = []
+
+if (vercelOk) {
+  let mainReachable = true
+
+  try {
+    execSync('git rev-parse --verify origin/main', { stdio: 'ignore' })
+  } catch {
+    mainReachable = false
+  }
+
+  if (mainReachable) {
+    for (const f of sortedCode) {
+      const envs = vercelFlags.get(f)
+
+      if (!envs || ![...envs].some(isProd)) continue
+
+      const readers = [...(flagReaders.get(f) ?? [])]
+
+      // Basta con que UN lector exista en main: el flag tiene a quién activar.
+      const presentOnMain = readers.some(rel => {
+        try {
+          const onMain = execSync(`git show origin/main:${rel}`, {
+            encoding: 'utf8',
+            stdio: ['ignore', 'pipe', 'ignore'],
+            maxBuffer: 20 * 1024 * 1024
+          })
+
+          return onMain.includes(f)
+        } catch {
+          return false
+        }
+      })
+
+      if (!presentOnMain) prodWithoutCodeOnMain.push({ flag: f, readers })
+    }
+
+    // El chequeo de arriba sólo ve el caso extremo: el flag no existe en main.
+    // El incidente real fue más sutil — el flag SÍ estaba en main desde una task
+    // anterior, y lo que faltaba era el comportamiento nuevo que activaba. Por
+    // eso importa la DERIVA: si un flag está ON en Production y su código lector
+    // difiere entre main y la rama de trabajo, producción está ejecutando una
+    // versión distinta de lo que se probó.
+    for (const f of sortedCode) {
+      const envs = vercelFlags.get(f)
+
+      if (!envs || ![...envs].some(isProd)) continue
+      if (prodWithoutCodeOnMain.some(i => i.flag === f)) continue
+
+      const drifted = [...(flagReaders.get(f) ?? [])].filter(rel => {
+        try {
+          const onMain = execSync(`git show origin/main:${rel}`, {
+            encoding: 'utf8',
+            stdio: ['ignore', 'pipe', 'ignore'],
+            maxBuffer: 20 * 1024 * 1024
+          })
+
+          return onMain !== readFileSync(join(ROOT, rel), 'utf8')
+        } catch {
+          return true
+        }
+      })
+
+      if (drifted.length > 0) prodOnDriftedCode.push({ flag: f, drifted })
+    }
+  }
+}
+
 // ── 5. Reporte ───────────────────────────────────────────────────────────────
 
 const C = { reset: '\x1b[0m', dim: '\x1b[2m', bold: '\x1b[1m', yellow: '\x1b[33m', red: '\x1b[31m', green: '\x1b[32m', cyan: '\x1b[36m' }
@@ -194,7 +288,26 @@ if (vercelOk) {
   )
 }
 
+if (vercelOk) {
+  section('🚨', 'ON en Production pero su código NO está en `main` (ISSUE-150)', prodWithoutCodeOnMain, item =>
+    `${c('red', item.flag)} ${c('dim', `→ lectores sólo en develop: ${item.readers.join(', ')}`)}`
+  )
+  section('⚠️', 'ON en Production con código lector que difiere de `main` (ISSUE-150)', prodOnDriftedCode, item =>
+    `${c('yellow', item.flag)} ${c('dim', `→ producción ejecuta otra versión de: ${item.drifted.join(', ')}`)}`
+  )
+}
+
 console.log(`\n${c('dim', 'Verdad live = `vercel env ls`. Ledger humano = docs/operations/FEATURE_FLAG_STATE_LEDGER.md')}\n`)
+
+if (prodWithoutCodeOnMain.length > 0) {
+  // Falla SIEMPRE, no sólo en --strict: esto no es higiene documental, es un
+  // flag activo en producción sobre código que producción no tiene.
+  console.log(
+    c('red', `❌ ${prodWithoutCodeOnMain.length} flag(s) prendidos en Production sin su código en \`main\`.`)
+  )
+  console.log(c('dim', '   Promover develop→main por el release control plane, o apagar el flag. Ver ISSUE-150.'))
+  process.exit(1)
+}
 
 if (STRICT && unregistered.length > 0) {
   console.log(c('red', `❌ ${unregistered.length} flag(s) en código sin registrar en el ledger (--strict).`))

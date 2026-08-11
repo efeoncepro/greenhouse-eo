@@ -1,17 +1,17 @@
 # Operar el Motor de Formularios de Growth
 
 > **Tipo:** Manual de uso / runbook operativo
-> **Version:** 1.3 — 2026-07-01 (Codex, AEO `/aeo-2/` live renderer premium)
+> **Version:** 1.4 — 2026-08-10 (Claude, TASK-1388 — Growth vive como seccion del dominio Comercial)
 > **Doc funcional:** [docs/documentation/growth/motor-formularios-publicos.md](../../documentation/growth/motor-formularios-publicos.md)
 > **Estado de flags (SoT humano):** [docs/operations/FEATURE_FLAG_STATE_LEDGER.md](../../operations/FEATURE_FLAG_STATE_LEDGER.md)
 
 ## Para que sirve
 
-Operar (prender, verificar, revertir) el motor de formularios publicos de Growth y su entrega a HubSpot. La operación humana diaria vive en **Growth → Forms** (`/admin/growth/forms`); las APIs siguen siendo el contrato gobernado para automatización, Nexa, MCP, scripts y verificación.
+Operar (prender, verificar, revertir) el motor de formularios publicos de Growth y su entrega a HubSpot. La operación humana diaria vive en **Comercial → Growth → Forms** (`/admin/growth/forms`, zona Operación del menú lateral); las APIs siguen siendo el contrato gobernado para automatización, Nexa, MCP, scripts y verificación.
 
 ## Usar el cockpit visual
 
-1. Entra al menú vertical **Growth → Forms**.
+1. En el menú lateral, zona **Operación**, abre **Comercial → Growth → Forms**.
 2. Revisa el **Pulso operativo**: cobertura publicada, retry queue, dead letters y surfaces gobernadas.
 3. Selecciona un formulario en el command center. El inspector muestra readiness, host surfaces, destinos, submissions recientes y evidence ledger.
 4. Para authoring básico, usa **Nuevo formulario**. Crea un draft low-risk con email, organización, interés y consentimiento explícito.

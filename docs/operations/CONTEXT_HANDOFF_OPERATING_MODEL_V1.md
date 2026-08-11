@@ -157,6 +157,43 @@ Debe revisar como minimo:
 - existencia de referencias a este modelo desde `AGENTS.md`, `CLAUDE.md`, `project_context.md` y prompt operativo de Codex;
 - presencia de `Estado vigente para agentes` en `project_context.md`.
 
+### Orden de los gates: el context gate va ultimo
+
+`pnpm docs:context-check:strict` mide un **estado**, no una intencion: cuenta entradas, lineas y tokens
+de los archivos tal como estan en disco. Cualquier edicion posterior a `Handoff.md` o `changelog.md`
+invalida el resultado que ya viste, aunque el comando haya salido en 0/0.
+
+`pnpm docs:closure-check` **no lo reemplaza**: audita si la documentacion acompaña al cambio
+(arquitectura, funcional, manuales, flags, lifecycle) y no verifica ningun techo de contexto. Los dos
+gates miran cosas distintas y ninguno cubre al otro.
+
+Orden seguro de cierre:
+
+1. todas las ediciones documentales, incluidas `Handoff.md` y `changelog.md`;
+2. `pnpm docs:closure-check`;
+3. `pnpm docs:context-rotate --apply` si el gate lo pide;
+4. `pnpm docs:context-check:strict`;
+5. commit.
+
+**Regla:** si tocas `Handoff.md` o `changelog.md` despues de correr el context gate, vuelve a correrlo.
+Caso fuente (2026-08-09, run `31340366010` rojo en `develop`): context gate en 0/0 → se agrego una entrada
+al changelog → `closure-check` en 0 warnings → commit, y el CI rechazo `changelog.md has 61 entries`. En el
+cierre de un release se tocan casi siempre los dos archivos, asi que este orden no es opcional ahi.
+
+### Defecto conocido del rotador: se lleva la referencia al archive
+
+`pnpm docs:context-rotate --apply` archiva `Handoff.md` por bloques, y cuando la linea
+`> Historial rotado: [Handoff.archive.md](Handoff.archive.md)` cae dentro del bloque archivado, se va con
+el. `pnpm docs:context-check:strict` exige esa referencia, asi que **la rotacion deja rojo el gate que ella
+misma existe para satisfacer**. Ocurrio dos veces el 2026-08-09 en la misma sesion. Task de cierre:
+`TASK-1683`.
+
+Mientras no este arreglado: despues de cada `docs:context-rotate --apply`, verificar que la linea
+`> Historial rotado:` siga en `Handoff.md` y restaurarla si falta. Lo importante no es el minuto de
+restaurarla — es que el error que aparece (`must reference Handoff.archive.md`) **no se parece** al que
+motivo la rotacion, asi que un agente que ve `Errors: 1` sospecha primero de su propio cambio. Si acabas de
+rotar y el gate falla por la referencia, es la herramienta, no tu diff.
+
 ## Integracion Con Agentes
 
 - `AGENTS.md` debe declarar preflight, router, fallback historico y gates para Codex/agentes genericos.

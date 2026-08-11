@@ -1,9 +1,9 @@
 # Operar el motor de CTAs (`/growth/ctas` + API)
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-07-17 por Claude (TASK-1339)
-> **Ultima actualizacion:** 2026-07-18 por Claude (TASK-1431: acciones de navegación gobernada en el authoring — code complete, rollout pendiente)
+> **Ultima actualizacion:** 2026-08-10 por Claude (TASK-1388 — Growth vive como seccion del dominio Comercial)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md)
 > **Skill de dominio (agentes):** `greenhouse-growth-ctas`
 
@@ -135,7 +135,7 @@ El motor decide server-side si un visitante debe volver a ver un CTA y, con `GRO
 
 ## Usar el cockpit (TASK-1430)
 
-1. Entra a `/growth/ctas` (menú Growth → CTAs). A la izquierda está el inventario; a la derecha,
+1. Entra a `/growth/ctas` (menú lateral, zona Operación → Comercial → Growth → CTAs). A la izquierda está el inventario; a la derecha,
    el detalle del CTA seleccionado. En pantallas angostas el detalle se abre como panel.
 2. **Crear un CTA:** botón «Crear CTA» → recorre los 8 pasos. En «Acción» las opciones y campos
    vienen del registro canónico (formulario, URL, herramienta Think, agenda legacy o scheduler nativo). Para

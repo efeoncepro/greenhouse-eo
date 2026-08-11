@@ -31,9 +31,13 @@ import { getMode, getSystemMode } from '@core/utils/serverHelpers'
 
 // Lib Imports
 import { requireServerSession } from '@/lib/auth/require-server-session'
+import { resolveAvatarUrl } from '@/lib/person-360/resolve-avatar'
 import { composeNavItemsFromModules } from '@/lib/client-portal/composition/menu-builder'
 import type { ClientNavItem } from '@/lib/client-portal/composition/menu-builder-shape'
 import { resolveClientPortalModulesForOrganization } from '@/lib/client-portal/readers/native/module-resolver'
+import { ClientPortalVisibilityProvider } from '@/lib/client-portal/visibility/client-portal-visibility-context'
+import type { ClientPortalViewVisibilityInputs } from '@/lib/client-portal/visibility/client-portal-view-visibility'
+import { resolveClientPortalVisibilityInputs } from '@/lib/client-portal/visibility/resolve-client-portal-visibility'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 // El layout depende de cookies/headers via NextAuth — siempre dynamic.
@@ -61,6 +65,11 @@ const Layout = async (props: ChildrenType) => {
   // server-side con degradación honesta (default = comportamiento vigente del flotante).
   const nexaInteractionMode = await resolveNexaInteractionModeForUser(session.user.userId)
 
+  // TASK-1388 — el avatar del chrome se resuelve acá (server) con el helper
+  // canónico `resolveAvatarUrl` (server-only) y viaja como prop: el cliente
+  // nunca compone la URL del proxy de media.
+  const chromeAvatarUrl = resolveAvatarUrl(session.user.avatarUrl ?? null, session.user.userId ?? null)
+
   // TASK-1675 — ítems de menú de los módulos que la organización tiene contratados.
   //
   // Éste es el único punto server con sesión que gobierna el menú, y el resolver
@@ -74,6 +83,25 @@ const Layout = async (props: ChildrenType) => {
   // "nadie entra al portal". Degrada al menú de siempre, nunca a un menú vacío.
   let clientNavItems: readonly ClientNavItem[] = []
 
+  // TASK-1685 Slice 2 — los insumos del primitive de visibilidad, resueltos UNA vez.
+  //
+  // Es el punto donde menú y puerta dejan de poder discrepar: los dos evalúan el mismo
+  // predicado (`canSeeClientPortalView`) y, desde acá, sobre los mismos insumos. Hasta esta
+  // task el menú preguntaba por el ROL (`authorizedViews`) y la página por el MÓDULO, y nadie
+  // podía ver la diferencia desde ninguno de los dos lados — 36 enlaces muertos medidos.
+  //
+  // El default cerrado importa: si el resolver falla, el cliente ve un menú incompleto, no un
+  // menú que promete lo que la puerta va a negar.
+  let clientPortalVisibility: ClientPortalViewVisibilityInputs = {
+    isInternalSession:
+      // client-portal-allowed: no es branching por business line — es el bypass D1 del portal,
+      // el MISMO discriminador que usa `requireViewCodeAccess` para dejar entrar a un operador
+      // interno a una superficie cliente. Derivarlo de otra cosa desalinearía menú y puerta.
+      session.user.tenantType === 'efeonce_internal',
+    moduleViewCodes: [],
+    revokedViewCodes: []
+  }
+
   if (
     // client-portal-allowed: el `tenantType` acá no decide visibilidad — decide si
     // vale la pena consultar al resolver. La visibilidad la resuelve el resolver
@@ -82,9 +110,17 @@ const Layout = async (props: ChildrenType) => {
     session.user.organizationId
   ) {
     try {
-      const modules = await resolveClientPortalModulesForOrganization(session.user.organizationId)
+      const [modules, visibilityInputs] = await Promise.all([
+        resolveClientPortalModulesForOrganization(session.user.organizationId),
+        resolveClientPortalVisibilityInputs({
+          userId: session.user.userId,
+          organizationId: session.user.organizationId,
+          isInternalSession: false
+        })
+      ])
 
       clientNavItems = composeNavItemsFromModules(modules)
+      clientPortalVisibility = visibilityInputs
     } catch (error) {
       captureWithDomain(error, 'client_portal', {
         tags: { source: 'vertical_menu', stage: 'resolver' },
@@ -99,6 +135,7 @@ const Layout = async (props: ChildrenType) => {
           NexaContextScope) y el NexaFloatingButton (que la lee) → prompts contextuales
           con el nombre real (Tier 1.5). */}
       <NexaContextProvider>
+        <ClientPortalVisibilityProvider inputs={clientPortalVisibility}>
         <NexaInteractionModeProvider initialMode={nexaInteractionMode}>
         <AdaptiveSidecarShellProvider>
           <LayoutWrapper
@@ -106,7 +143,7 @@ const Layout = async (props: ChildrenType) => {
             verticalLayout={
               <VerticalLayout
                 navigation={<Navigation mode={mode} clientNavItems={clientNavItems} />}
-                navbar={<Navbar />}
+                navbar={<Navbar avatarUrl={chromeAvatarUrl} />}
                 footer={<VerticalFooter />}
               >
                 {/* TASK-1079 — host del modo lane: passthrough byte-idéntico salvo modo lane. */}
@@ -114,7 +151,7 @@ const Layout = async (props: ChildrenType) => {
               </VerticalLayout>
             }
             horizontalLayout={
-              <HorizontalLayout header={<Header />} footer={<HorizontalFooter />}>
+              <HorizontalLayout header={<Header avatarUrl={chromeAvatarUrl} />} footer={<HorizontalFooter />}>
                 <NexaLaneContentHost>{children}</NexaLaneContentHost>
               </HorizontalLayout>
             }
@@ -131,6 +168,7 @@ const Layout = async (props: ChildrenType) => {
         <RecentsTracker />
         <ChunkRecoveryClear />
         </NexaInteractionModeProvider>
+        </ClientPortalVisibilityProvider>
       </NexaContextProvider>
     </Providers>
   )

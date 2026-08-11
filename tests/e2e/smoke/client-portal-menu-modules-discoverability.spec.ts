@@ -67,8 +67,14 @@ test.describe('TASK-1675 discoverability — el menú del cliente compone sus m�
     // La lista base se sigue expandiendo en el push; el merge sólo le agrega.
     expect(content).toMatch(/menuData\.push\(\s*\.\.\.clientPrimaryItems,\s*\.\.\.moduleItems\.primary/)
 
-    // Y el filtro es por ruta ya tomada — no un reemplazo.
-    expect(content).toMatch(/filter\(item => !takenRoutes\.has\(item\.route\)\)/)
+    // Y el filtro es por ruta ya tomada — no un reemplazo. (Prefijo tolerante:
+    // TASK-1685 sumó la conjunción con el primitive de visibilidad al mismo
+    // filtro; el dedup por takenRoutes sigue siendo la invariante.)
+    expect(content).toMatch(/filter\(\s*item => !takenRoutes\.has\(item\.route\)/)
+
+    // TASK-1685 — los ítems de módulo también pasan por el primitive único de
+    // visibilidad (el mismo que consumen el page guard y el ⌘K).
+    expect(content).toMatch(/canSeeClientView\(item\.viewCode\)/)
   })
 
   test('el informe SEO está declarado como ruta hija y no compite por un ítem', async () => {

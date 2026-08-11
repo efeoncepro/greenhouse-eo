@@ -1,5 +1,17 @@
 # TASK-1423 — ANAM Client Billing Data Foundation + No-Write Workbook Profiler
 
+## Delta 2026-08-11
+
+- El supuesto "asset-scan ya implementado" sigue siendo cierto, pero cambió de contenido: el puerto es
+  **domain-free** y ahora compone un escáner de **firmas** real (servicio Cloud Run `clamav`, us-east4, cerrado
+  por IAM) encima del estructural. Está **ON en staging** y **OFF en producción** hasta que se promueva
+  `develop`→`main` — actualizado por TASK-1378.
+- Consecuencia para esta task: si el workbook de ANAM entra por un contexto declarado en
+  `SCAN_REQUIRED_ATTACH_CONTEXTS`, hereda la cobertura de firmas sin escribir una línea — pero también hereda la
+  semántica **fail-closed**: sin veredicto `clean` no hay attach, y un scanner caído bloquea la carga en vez de
+  degradar. Hoy los contextos cubiertos son CV público, Growth Forms, `proposal_rfp` y `proposal_deliverable`;
+  agregar uno para `client_billing_*` es decisión explícita de esta task — actualizado por TASK-1378.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

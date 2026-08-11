@@ -23,7 +23,23 @@
  * Mockup routes (`**​/mockup/**`) are excluded.
  */
 
-export type ChildRouteVia = 'header-cta' | 'row-action' | 'inline-link' | 'wizard-step' | 'tab' | 'redirect-alias' // legacy URL that only redirects to the canonical surface (kept for old bookmarks)
+/**
+ * TASK-1389 — superficie de navegación donde vive el destino (Contrato de
+ * Asignación de Superficies). Opcional: las rutas que son ítems literales del
+ * rail no la declaran (su superficie ES el sidebar); se usa para rutas cuya
+ * superficie no es obvia desde el `via` (p.ej. las `/my/*` del avatar).
+ * El gate `pnpm nav:budget` cross-checkea que ninguna `/my/*` declare 'sidebar'.
+ */
+export type NavSurface = 'sidebar' | 'avatar' | 'command-palette' | 'shortcuts'
+
+export type ChildRouteVia =
+  | 'header-cta'
+  | 'row-action'
+  | 'inline-link'
+  | 'wizard-step'
+  | 'tab'
+  | 'redirect-alias' // legacy URL that only redirects to the canonical surface (kept for old bookmarks)
+  | 'avatar-dropdown' // TASK-1388 — reached from the global topbar avatar dropdown (UserDropdown), present on every page
 
 export interface ChildRouteDeclaration {
   /** The child route that is intentionally NOT a top-level menu item. */
@@ -34,7 +50,20 @@ export interface ChildRouteDeclaration {
   via: ChildRouteVia
   /** Why it's a sub-action and not its own menu item. */
   reason: string
+
+  /** TASK-1389 — superficie donde vive el destino (ver NavSurface). */
+  surface?: NavSurface
 }
+
+/**
+ * TASK-1388 — motivo compartido del rehome de lo personal (sidebar → avatar).
+ * Las hojas `/my/*` siguen teniendo `href` literal en la rama no-interna de
+ * VerticalMenu (el colaborador puro conserva "Mi Ficha" en su rail), pero la
+ * superficie del portal INTERNO es el dropdown del avatar (UserDropdown,
+ * builder canónico `buildMyNavItems`, gating idéntico).
+ */
+const AVATAR_REHOME_REASON =
+  'TASK-1388 — hoja personal rehomed: para usuarios internos se alcanza desde el dropdown del avatar (topbar global, presente en toda página); para colaboradores puros sigue en el rail (rama no-interna de VerticalMenu).'
 
 export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
   {
@@ -434,7 +463,29 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
     via: 'header-cta',
     reason:
       'SEO report artifact (TASK-1310) — child del dashboard, alcanzable mediante "Ver informe"; no duplica el ítem de navegación y requiere growth.seo.report.read_client.'
-  }
+  },
+
+  // ── TASK-1388 — rehome de lo personal: sidebar → dropdown del avatar ──
+  //
+  // Para el portal interno, las hojas `/my/*` ya NO son ítems del rail: viven
+  // en el dropdown del avatar (UserDropdown, builder canónico
+  // `buildMyNavItems`). Siguen teniendo `href` literal en la rama no-interna
+  // de VerticalMenu (el colaborador puro conserva su sección "Mi Ficha"), así
+  // que el gate no las marcaría huérfanas — estas declaraciones documentan la
+  // superficie interna vigente, que es el contrato que el gate protege.
+  { route: '/my/assignments', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
+  { route: '/my/performance', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
+  { route: '/my/delivery', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
+  { route: '/my/profile', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
+  { route: '/my/payroll', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
+  { route: '/my/contractor', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
+  { route: '/my/offers', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
+  { route: '/my/contracts', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
+  { route: '/my/payment-profile', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
+  { route: '/my/leave', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
+  { route: '/my/goals', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
+  { route: '/my/evaluations', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
+  { route: '/my/organization', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON }
 ]
 
 export const DECLARED_CHILD_ROUTE_PATHS: readonly string[] = DECLARED_CHILD_ROUTES.map(d => d.route)

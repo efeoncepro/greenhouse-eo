@@ -19,10 +19,15 @@ import menuItemStyles from '@core/styles/vertical/menuItemStyles'
 import menuSectionStyles from '@core/styles/vertical/menuSectionStyles'
 
 import { GenerateVerticalMenu } from '@/components/GenerateMenu'
+import { getMicrocopy } from '@/lib/copy'
 import { getGreenhouseNavigationCopy } from '@/config/greenhouse-navigation-copy'
 import { ROLE_CODES } from '@/config/role-codes'
 import { resolveCapabilityModules } from '@/lib/capabilities/resolve-capabilities'
 import { groupNavItems, type ClientNavItem } from '@/lib/client-portal/composition/menu-builder-shape'
+import { useClientPortalViewVisibility } from '@/lib/client-portal/visibility/client-portal-visibility-context'
+import { buildMyNavItems } from '@/lib/navigation/my-nav-items'
+
+const microcopy = getMicrocopy()
 
 type RenderExpandIconProps = {
   open?: boolean
@@ -76,6 +81,7 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
   const isPeopleRouteGroup = session?.user?.routeGroups?.includes('people') ?? false
   const isAiToolingUser = session?.user?.routeGroups?.includes('ai_tooling') ?? false
   const isMyUser = session?.user?.routeGroups?.includes('my') ?? false
+  const isClientUser = session?.user?.routeGroups?.includes('client') ?? false
 
   const isInternalPortalUser =
     isInternalUser ||
@@ -85,6 +91,11 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
     isHrUser ||
     isPeopleRouteGroup ||
     isAiToolingUser
+
+  // TASK-1686 — colaborador puro: SOLO routeGroup `my`. El predicado decide si
+  // se aplica la proyección personal aislada; nunca recorta a un híbrido
+  // (my+client conserva la salida cliente vigente, decisión pineada en la spec).
+  const isPureCollaborator = isMyUser && !isInternalPortalUser && !isClientUser
 
   const isAgencyUser = isInternalUser || isAdminUser
   const roleCodes = session?.user?.roleCodes ?? []
@@ -135,6 +146,24 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
     return authorizedViews.includes(viewCode)
   }
 
+  /**
+   * TASK-1685 Slice 2 — el predicado ÚNICO de visibilidad del portal cliente.
+   *
+   * Reemplaza a `canSeeView('cliente.*', true)` en la lista base. La diferencia no es de
+   * estilo: `canSeeView` pregunta por el ROL (`authorizedViews`, derivado de
+   * `role_view_assignments`) y el page guard pregunta por el MÓDULO contratado. Las dos
+   * mitades nunca se conocieron, y el resultado medido el 2026-08-10 eran **36 enlaces que
+   * este menú ofrecía y la puerta negaba**, sobre 8 de 8 usuarios cliente.
+   *
+   * Ahora los dos lados evalúan el mismo predicado sobre los mismos insumos, resueltos una
+   * sola vez en `(dashboard)/layout.tsx`.
+   *
+   * **NUNCA** volver a filtrar un ítem `cliente.*` con `canSeeView`: reintroduce la segunda
+   * fuente de verdad. El lint `greenhouse/no-client-portal-view-visibility-bypass` lo
+   * enforcea, y la señal `identity.client_portal.menu_gate_divergence` lo mide.
+   */
+  const canSeeClientView = useClientPortalViewVisibility()
+
   const canSeeAnyView = (viewCodes: string[], fallback: boolean) => {
     if (authorizedViews.length === 0) return fallback
 
@@ -179,15 +208,33 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
       icon: 'tabler-smart-home'
     })
 
-    // ── GESTIÓN (section: 3 flat + 2 collapsibles) ──
+    // ═══ ZONA OPERACIÓN (TASK-1388) ═══
+    // Dominios colapsables uniformes bajo una zona `isSection`. El orden es el
+    // del wireframe: Agencia · Comercial · Finanzas · Personas.
+    const operacionChildren: VerticalMenuDataType[] = []
+
+    // ── Dominio Agencia (antes sección "Gestión") ──
     if (isAgencyUser) {
-      menuData.push({
-        isSection: true,
-        label: 'Gestión',
+      operacionChildren.push({
+        label: nl(GH_INTERNAL_NAV.domainAgencia),
+        icon: 'tabler-building',
         children: [
-          { label: nl(GH_AGENCY_NAV.workspace), href: '/agency', icon: 'tabler-building' },
-          { label: nl(GH_AGENCY_NAV.spaces), href: '/agency/spaces', icon: 'tabler-grid-4x4' },
-          { label: nl(GH_AGENCY_NAV.economics), href: '/agency/economics', icon: 'tabler-chart-line' },
+          // Sección "Resumen" — agrupa las 3 hojas antes sueltas (elimina altitud mezclada)
+          {
+            label: nl(GH_INTERNAL_NAV.sectionAgenciaResumen),
+            icon: 'tabler-layout-dashboard',
+            children: [
+              { label: nl(GH_AGENCY_NAV.workspace), href: '/agency', icon: 'tabler-building' },
+              { label: nl(GH_AGENCY_NAV.spaces), href: '/agency/spaces', icon: 'tabler-grid-4x4' },
+              { label: nl(GH_AGENCY_NAV.economics), href: '/agency/economics', icon: 'tabler-chart-line' }
+            ].filter(item => {
+              if (item.href === '/agency') return canSeeView('gestion.agencia', true)
+              if (item.href === '/agency/spaces') return canSeeView('gestion.spaces', true)
+              if (item.href === '/agency/economics') return canSeeView('gestion.economia', true)
+
+              return true
+            })
+          },
 
           // Collapsible "Equipo y talento"
           {
@@ -208,7 +255,8 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
             })
           },
 
-          // Collapsible "Operaciones"
+          // Collapsible "Operaciones" — Sample Sprints ya NO vive acá: su hogar
+          // único es el dominio Comercial (dedup TASK-1388).
           {
             label: nl(GH_AGENCY_NAV.operationsGroup),
             icon: 'tabler-cpu',
@@ -218,7 +266,6 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
               { label: nl(GH_AGENCY_NAV.organizations), href: '/agency/organizations' },
               { label: nl(GH_AGENCY_NAV.newClient), href: '/agency/clients/onboarding', icon: 'tabler-user-plus' },
               { label: nl(GH_AGENCY_NAV.services), href: '/agency/services' },
-              { label: nl(GH_AGENCY_NAV.sampleSprints), href: '/agency/sample-sprints', icon: 'tabler-rocket' },
               { label: nl(GH_AGENCY_NAV.operations), href: '/agency/operations' }
             ].filter(item => {
               if (item.href === '/agency/delivery') return canSeeView('gestion.delivery', true)
@@ -239,19 +286,12 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
               }
 
               if (item.href === '/agency/services') return canSeeView('gestion.servicios', true)
-              if (item.href === '/agency/sample-sprints') return canSeeView('gestion.sample_sprints', true)
               if (item.href === '/agency/operations') return canSeeView('gestion.operaciones', true)
 
               return true
             })
           }
-        ].filter(item => {
-          if (item.href === '/agency') return canSeeView('gestion.agencia', true)
-          if (item.href === '/agency/spaces') return canSeeView('gestion.spaces', true)
-          if (item.href === '/agency/economics') return canSeeView('gestion.economia', true)
-
-          return true
-        })
+        ]
       })
     }
 
@@ -269,53 +309,94 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
     // del MISMO viewCode, así que no suman ítems de menú.
     const canSeeGrowthSeo = canSeeView('administracion.growth_seo', isAdminUser)
 
-    if (canSeeGrowthForms || canSeeGrowthAiVisibility || canSeeGrowthAeo || canSeeGrowthCtas || canSeeGrowthSeo) {
-      menuData.push({
-        label: nl(GH_INTERNAL_NAV.growth),
-        icon: 'tabler-trending-up',
+    // Growth ya no es un micro-grupo top-level: es una sección del dominio
+    // Comercial (TASK-1388). Mismos flags, mismas hojas.
+    const growthChildren: VerticalMenuDataType[] = [
+      ...(canSeeGrowthAeo
+        ? [
+            {
+              label: nl(GH_INTERNAL_NAV.growthAeo),
+              href: '/growth/aeo',
+              icon: 'tabler-radar-2'
+            }
+          ]
+        : []),
+      ...(canSeeGrowthCtas
+        ? [
+            {
+              label: nl(GH_INTERNAL_NAV.growthCtas),
+              href: '/growth/ctas',
+              icon: 'tabler-hand-click'
+            }
+          ]
+        : []),
+      ...(canSeeGrowthForms
+        ? [
+            {
+              label: nl(GH_INTERNAL_NAV.growthForms),
+              href: '/admin/growth/forms',
+              icon: 'tabler-forms'
+            }
+          ]
+        : []),
+      ...(canSeeGrowthAiVisibility
+        ? [
+            {
+              label: nl(GH_INTERNAL_NAV.growthAiVisibility),
+              href: '/admin/growth/ai-visibility',
+              icon: 'tabler-robot'
+            }
+          ]
+        : []),
+      ...(canSeeGrowthSeo
+        ? [
+            {
+              label: nl(GH_INTERNAL_NAV.growthSeo),
+              href: '/admin/growth/seo',
+              icon: 'tabler-chart-arrows-vertical'
+            }
+          ]
+        : [])
+    ]
+
+    // ── Dominio Comercial (incluye la sección Growth y el hogar único de
+    // Sample Sprints). Renderiza también para quien sólo ve Growth, para no
+    // dejar esas hojas sin superficie.
+    if (isCommercialUser || isFinanceUser || isAdminUser || growthChildren.length > 0) {
+      operacionChildren.push({
+        label: nl(GH_COMMERCIAL_NAV.root),
+        icon: 'tabler-briefcase',
         children: [
-          ...(canSeeGrowthAeo
+          ...[
+            { label: nl(GH_COMMERCIAL_NAV.pipeline), href: '/finance/intelligence/pipeline', icon: 'tabler-stack-2' },
+            { label: nl(GH_COMMERCIAL_NAV.quotes), href: '/finance/quotes', icon: 'tabler-file-dollar' },
+            { label: nl(GH_COMMERCIAL_NAV.contracts), href: '/finance/contracts', icon: 'tabler-file-description' },
+            {
+              label: nl(GH_COMMERCIAL_NAV.masterAgreements),
+              href: '/finance/master-agreements',
+              icon: 'tabler-file-certificate'
+            },
+            { label: nl(GH_COMMERCIAL_NAV.sampleSprints), href: '/agency/sample-sprints', icon: 'tabler-rocket' },
+            { label: nl(GH_COMMERCIAL_NAV.products), href: '/finance/products', icon: 'tabler-packages' }
+          ].filter(item => {
+            if (item.href === '/finance/intelligence/pipeline') {
+              return canSeeAnyView(['comercial.pipeline', 'finanzas.inteligencia'], false) || isCommercialUser || isFinanceUser || isAdminUser
+            }
+
+            if (item.href === '/finance/quotes') return canSeeAnyView(['comercial.cotizaciones', 'finanzas.cotizaciones'], true)
+            if (item.href === '/finance/contracts') return canSeeAnyView(['comercial.contratos', 'comercial.sow'], true)
+            if (item.href === '/finance/master-agreements') return canSeeView('comercial.acuerdos_marco', true)
+            if (item.href === '/agency/sample-sprints') return canSeeView('gestion.sample_sprints', isCommercialUser || isAdminUser)
+            if (item.href === '/finance/products') return canSeeView('comercial.productos', true)
+
+            return true
+          }),
+          ...(growthChildren.length > 0
             ? [
                 {
-                  label: nl(GH_INTERNAL_NAV.growthAeo),
-                  href: '/growth/aeo',
-                  icon: 'tabler-radar-2'
-                }
-              ]
-            : []),
-          ...(canSeeGrowthCtas
-            ? [
-                {
-                  label: nl(GH_INTERNAL_NAV.growthCtas),
-                  href: '/growth/ctas',
-                  icon: 'tabler-hand-click'
-                }
-              ]
-            : []),
-          ...(canSeeGrowthForms
-            ? [
-                {
-                  label: nl(GH_INTERNAL_NAV.growthForms),
-                  href: '/admin/growth/forms',
-                  icon: 'tabler-forms'
-                }
-              ]
-            : []),
-          ...(canSeeGrowthAiVisibility
-            ? [
-                {
-                  label: nl(GH_INTERNAL_NAV.growthAiVisibility),
-                  href: '/admin/growth/ai-visibility',
-                  icon: 'tabler-robot'
-                }
-              ]
-            : []),
-          ...(canSeeGrowthSeo
-            ? [
-                {
-                  label: nl(GH_INTERNAL_NAV.growthSeo),
-                  href: '/admin/growth/seo',
-                  icon: 'tabler-chart-arrows-vertical'
+                  label: nl(GH_INTERNAL_NAV.growth),
+                  icon: 'tabler-trending-up',
+                  children: growthChildren
                 }
               ]
             : [])
@@ -323,7 +404,7 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
       })
     }
 
-    // ── PERSONAS Y HR (section: 1 flat + 3 collapsibles, conditional) ──
+    // ── Dominio Personas (antes sección "Personas y HR") ──
     const hasHrAccess = isHrUser || isAdminUser
 
     // TASK-727 — `canSeeHrTeamWorkspace` ahora consume `supervisorAccess` canónico desde el JWT
@@ -335,7 +416,7 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
       ? [
           // Collapsible "Nómina"
           {
-            label: <NavLabel label='Nómina' subtitle='Liquidación y proyección' show={showSub} />,
+            label: nl(GH_INTERNAL_NAV.sectionNomina),
             icon: 'tabler-receipt',
             children: [
               { label: nl(GH_HR_NAV.payroll), href: '/hr/payroll' },
@@ -357,7 +438,7 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
 
           // Collapsible "Supervisión"
           {
-            label: <NavLabel label='Supervisión' subtitle='Equipo, aprobaciones y departamentos' show={showSub} />,
+            label: nl(GH_INTERNAL_NAV.sectionSupervision),
             icon: 'tabler-users-group',
             children: [
               { label: nl(GH_HR_NAV.team), href: '/hr/team' },
@@ -380,7 +461,7 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
 
           // Collapsible "Organización"
           {
-            label: <NavLabel label='Organización' subtitle='Jerarquía, permisos y asistencia' show={showSub} />,
+            label: nl(GH_INTERNAL_NAV.sectionOrganizacion),
             icon: 'tabler-sitemap',
             children: [
               { label: nl(GH_HR_NAV.hierarchy), href: '/hr/hierarchy' },
@@ -396,11 +477,23 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
               return true
             })
           },
-          ...(canSeeView('equipo.objetivos', true)
-            ? [{ label: nl(GH_HR_NAV.goals), href: '/hr/goals', icon: 'tabler-target' }]
-            : []),
-          ...(canSeeView('equipo.evaluaciones', true)
-            ? [{ label: nl(GH_HR_NAV.evaluations), href: '/hr/evaluations', icon: 'tabler-clipboard-check' }]
+          // Sección "Desarrollo" — agrupa las hojas antes sueltas (objetivos +
+          // evaluaciones) para que el dominio no mezcle altitudes.
+          ...(canSeeView('equipo.objetivos', true) || canSeeView('equipo.evaluaciones', true)
+            ? [
+                {
+                  label: nl(GH_INTERNAL_NAV.sectionDesarrollo),
+                  icon: 'tabler-target',
+                  children: [
+                    ...(canSeeView('equipo.objetivos', true)
+                      ? [{ label: nl(GH_HR_NAV.goals), href: '/hr/goals', icon: 'tabler-target' }]
+                      : []),
+                    ...(canSeeView('equipo.evaluaciones', true)
+                      ? [{ label: nl(GH_HR_NAV.evaluations), href: '/hr/evaluations', icon: 'tabler-clipboard-check' }]
+                      : [])
+                  ]
+                }
+              ]
             : [])
         ]
       : []
@@ -413,10 +506,15 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
         ]
       : []
 
+    // El dominio Personas se resuelve acá pero se agrega DESPUÉS de Finanzas,
+    // para respetar el orden del wireframe (Agencia · Comercial · Finanzas ·
+    // Personas) sin duplicar la lógica de visibilidad.
+    let personasEntry: VerticalMenuDataType | null = null
+
     if (canSeePeople && hasHrAccess) {
-      menuData.push({
-        isSection: true,
-        label: 'Personas y HR',
+      personasEntry = {
+        label: nl(GH_INTERNAL_NAV.domainPersonas),
+        icon: 'tabler-users-group',
         children: [
           { label: nl(GH_PEOPLE_NAV.people), href: '/people', icon: 'tabler-address-book' },
           ...(canSeeWorkforceActivation
@@ -424,72 +522,41 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
             : []),
           ...hrItems
         ]
-      })
+      }
     } else if (canSeePeople && supervisorScopeItems.length > 0) {
-      menuData.push({
-        isSection: true,
-        label: 'Personas y HR',
+      personasEntry = {
+        label: nl(GH_INTERNAL_NAV.domainPersonas),
+        icon: 'tabler-users-group',
         children: [
           { label: nl(GH_PEOPLE_NAV.people), href: '/people', icon: 'tabler-address-book' },
           ...supervisorScopeItems
         ]
-      })
+      }
     } else if (canSeePeople) {
-      menuData.push({
+      // Rol con directorio solamente: hoja directa, sin dominio de un solo ítem.
+      personasEntry = {
         label: nl(GH_PEOPLE_NAV.people),
         href: '/people',
         icon: 'tabler-address-book'
-      })
+      }
     } else if (supervisorScopeItems.length > 0) {
-      menuData.push({
-        isSection: true,
-        label: 'Personas y HR',
+      personasEntry = {
+        label: nl(GH_INTERNAL_NAV.domainPersonas),
+        icon: 'tabler-users-group',
         children: supervisorScopeItems
-      })
+      }
     } else if (hasHrAccess) {
-      menuData.push({
-        isSection: true,
-        label: 'Personas y HR',
+      personasEntry = {
+        label: nl(GH_INTERNAL_NAV.domainPersonas),
+        icon: 'tabler-users-group',
         children: hrItems
-      })
+      }
     }
 
-    // ── COMERCIAL (top-level commercial domain over legacy /finance paths) ──
-    if (isCommercialUser || isFinanceUser || isAdminUser) {
-      menuData.push({
-        label: nl(GH_COMMERCIAL_NAV.root),
-        icon: 'tabler-briefcase',
-        children: [
-          { label: nl(GH_COMMERCIAL_NAV.pipeline), href: '/finance/intelligence/pipeline', icon: 'tabler-stack-2' },
-          { label: nl(GH_COMMERCIAL_NAV.quotes), href: '/finance/quotes', icon: 'tabler-file-dollar' },
-          { label: nl(GH_COMMERCIAL_NAV.contracts), href: '/finance/contracts', icon: 'tabler-file-description' },
-          {
-            label: nl(GH_COMMERCIAL_NAV.masterAgreements),
-            href: '/finance/master-agreements',
-            icon: 'tabler-file-certificate'
-          },
-          { label: nl(GH_COMMERCIAL_NAV.sampleSprints), href: '/agency/sample-sprints', icon: 'tabler-rocket' },
-          { label: nl(GH_COMMERCIAL_NAV.products), href: '/finance/products', icon: 'tabler-packages' }
-        ].filter(item => {
-          if (item.href === '/finance/intelligence/pipeline') {
-            return canSeeAnyView(['comercial.pipeline', 'finanzas.inteligencia'], false) || isCommercialUser || isFinanceUser || isAdminUser
-          }
-
-          if (item.href === '/finance/quotes') return canSeeAnyView(['comercial.cotizaciones', 'finanzas.cotizaciones'], true)
-          if (item.href === '/finance/contracts') return canSeeAnyView(['comercial.contratos', 'comercial.sow'], true)
-          if (item.href === '/finance/master-agreements') return canSeeView('comercial.acuerdos_marco', true)
-          if (item.href === '/agency/sample-sprints') return canSeeView('gestion.sample_sprints', isCommercialUser || isAdminUser)
-          if (item.href === '/finance/products') return canSeeView('comercial.productos', true)
-
-          return true
-        })
-      })
-    }
-
-    // ── FINANZAS (collapsible top-level with nested submenus) ──
+    // ── Dominio Finanzas ──
     if (isFinanceUser || isAdminUser) {
-      menuData.push({
-        label: 'Finanzas',
+      operacionChildren.push({
+        label: nl(GH_INTERNAL_NAV.domainFinanzas),
         icon: 'tabler-report-money',
         children: [
           // Flujo operativo submenu (business operations: sales, purchases, masters)
@@ -573,10 +640,27 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
       })
     }
 
-    // ── Herramientas IA (standalone for non-admin ai_tooling users) ──
+    // El dominio Personas cierra la zona Operación (orden del wireframe).
+    if (personasEntry) {
+      operacionChildren.push(personasEntry)
+    }
+
+    if (operacionChildren.length > 0) {
+      menuData.push({
+        isSection: true,
+        label: GH_INTERNAL_NAV.zoneOperacion.label,
+        children: operacionChildren
+      })
+    }
+
+    // ═══ ZONA ADMINISTRACIÓN (TASK-1388) ═══
+    const administracionChildren: VerticalMenuDataType[] = []
+
+    // ── Herramientas IA (standalone for non-admin ai_tooling users; para
+    // admins vive UNA sola vez dentro de Admin Center → Plataforma) ──
     if (isAiToolingUser && !isAdminUser) {
       if (canSeeView('ia.herramientas', true)) {
-        menuData.push({
+        administracionChildren.push({
           label: nl(GH_INTERNAL_NAV.adminAiTools),
           href: '/admin/ai-tools',
           icon: 'tabler-robot'
@@ -584,10 +668,10 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
       }
     }
 
-    // ── ADMIN CENTER (collapsible top-level with nested submenus) ──
+    // ── ADMIN CENTER (collapsible domain with nested submenus) ──
     if (isAdminUser) {
-      menuData.push({
-        label: GH_INTERNAL_NAV.adminCenter.label,
+      administracionChildren.push({
+        label: nl(GH_INTERNAL_NAV.adminCenter),
         icon: 'tabler-shield-lock',
         children: [
           // Identidad y acceso submenu
@@ -600,7 +684,8 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
               { label: nl(GH_INTERNAL_NAV.adminRoles), href: '/admin/roles' },
               { label: nl(GH_INTERNAL_NAV.adminViews), href: '/admin/views' },
               { label: nl(GH_INTERNAL_NAV.adminAccounts), href: '/admin/accounts' },
-              { label: nl(GH_INTERNAL_NAV.adminTenants), href: '/admin/tenants' }
+              // TASK-1388 — desambiguado de Agencia→Spaces (clientes vs tenants).
+              { label: nl(GH_INTERNAL_NAV.adminTenantsDisambiguated), href: '/admin/tenants' }
             ].filter(item => {
               if (item.href === '/admin') return canSeeView('administracion.admin_center', true)
               if (item.href === '/admin/users') return canSeeView('administracion.usuarios', true)
@@ -652,7 +737,7 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
 
           // Platform submenu
           {
-            label: <NavLabel label='Platform' subtitle='Infraestructura y observabilidad' show={showSub} />,
+            label: nl(GH_INTERNAL_NAV.adminPlatform),
             icon: 'tabler-server',
             children: [
               { label: nl(GH_INTERNAL_NAV.adminOperationalCalendar), href: '/admin/operational-calendar' },
@@ -684,64 +769,72 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
       })
     }
 
-    // ── MI FICHA (section with children, conditional) ──
-    if (isMyUser) {
+    if (administracionChildren.length > 0) {
       menuData.push({
         isSection: true,
-        label: 'Mi Ficha',
-        children: [
-          { label: nl(GH_MY_NAV.assignments), href: '/my/assignments', icon: 'tabler-users' },
-          { label: nl(GH_MY_NAV.performance), href: '/my/performance', icon: 'tabler-chart-bar' },
-          { label: nl(GH_MY_NAV.delivery), href: '/my/delivery', icon: 'tabler-list-check' },
-          { label: nl(GH_MY_NAV.profile), href: '/my/profile', icon: 'tabler-user-circle' },
-          { label: nl(GH_MY_NAV.payroll), href: '/my/payroll', icon: 'tabler-receipt' },
-          { label: nl(GH_MY_NAV.contractor), href: '/my/contractor', icon: 'tabler-briefcase' },
-          { label: nl(GH_MY_NAV.offers), href: '/my/offers', icon: 'tabler-file-text' },
-          { label: nl(GH_MY_NAV.contracts), href: '/my/contracts', icon: 'tabler-file-certificate' },
-          { label: nl(GH_MY_NAV.paymentProfile), href: '/my/payment-profile', icon: 'tabler-credit-card' },
-          { label: nl(GH_MY_NAV.leave), href: '/my/leave', icon: 'tabler-calendar-event' },
-          { label: nl(GH_MY_NAV.goals), href: '/my/goals', icon: 'tabler-target' },
-          { label: nl(GH_MY_NAV.evaluations), href: '/my/evaluations', icon: 'tabler-clipboard-check' },
-          { label: nl(GH_MY_NAV.organization), href: '/my/organization', icon: 'tabler-building' }
-        ].filter(item => {
-          if (item.href === '/my/assignments') return canSeeView('mi_ficha.mis_asignaciones', true)
-          if (item.href === '/my/performance') return canSeeView('mi_ficha.mi_desempeno', true)
-          if (item.href === '/my/delivery') return canSeeView('mi_ficha.mi_delivery', true)
-          if (item.href === '/my/profile') return canSeeView('mi_ficha.mi_perfil', true)
-          if (item.href === '/my/payroll') return canSeeView('mi_ficha.mi_nomina', true)
-          // TASK-796 — dynamic: only show when the member has a live contractor engagement.
-          if (item.href === '/my/contractor') return hasActiveContractorEngagement && canSeeView('mi_ficha.mi_contratacion', true)
-          // TASK-1022 — dynamic: only show when the collaborator has a contracting document.
-          if (item.href === '/my/offers') return hasWorkforceContractingDocument && canSeeView('mi_ficha.mis_contratos', true)
-          if (item.href === '/my/contracts') return hasWorkforceContractingDocument && canSeeView('mi_ficha.mis_contratos', true)
-          if (item.href === '/my/payment-profile') return canSeeView('mi_ficha.mi_cuenta_pago', true)
-          if (item.href === '/my/leave') return canSeeView('mi_ficha.mis_permisos', true)
-          if (item.href === '/my/goals') return canSeeView('mi_ficha.mis_objetivos', true)
-          if (item.href === '/my/evaluations') return canSeeView('mi_ficha.mis_evaluaciones', true)
-          if (item.href === '/my/organization') return canSeeView('mi_ficha.mi_organizacion', true)
-
-          return true
-        })
+        label: GH_INTERNAL_NAV.zoneAdministracion.label,
+        children: administracionChildren
       })
     }
+
+    // ═══ ZONA RECURSOS (TASK-1388) ═══
+    // Absorbe los micro-grupos transversales (Knowledge + Design System) para
+    // el portal interno. La rama no-interna los conserva standalone más abajo
+    // (los colaboradores llegan por ahí).
+    const recursosChildren: VerticalMenuDataType[] = []
+
+    if (canSeeView('plataforma.knowledge', false)) {
+      recursosChildren.push({
+        label: nl(GH_INTERNAL_NAV.knowledge),
+        href: '/knowledge',
+        icon: 'tabler-books'
+      })
+    }
+
+    if (canSeeView('plataforma.design_system', false)) {
+      recursosChildren.push({
+        label: nl(GH_INTERNAL_NAV.adminDesignSystem),
+        icon: 'tabler-palette',
+        children: [
+          { label: nl(GH_INTERNAL_NAV.adminDesignCatalog), href: '/design-system', icon: 'tabler-layout-list' },
+          { label: nl(GH_INTERNAL_NAV.adminDesignHandoff), href: '/design-system/handoff', icon: 'tabler-layout-kanban' }
+        ]
+      })
+    }
+
+    if (recursosChildren.length > 0) {
+      menuData.push({
+        isSection: true,
+        label: GH_INTERNAL_NAV.zoneRecursos.label,
+        children: recursosChildren
+      })
+    }
+
+    // ── MI FICHA — rehomed (TASK-1388) ──
+    // Lo personal ya no vive en el rail interno: las hojas `/my/*` se sirven
+    // desde el dropdown del avatar (`UserDropdown`, mismo builder canónico
+    // `buildMyNavItems`, mismo gating). El colaborador puro conserva su
+    // sección en la rama no-interna de más abajo.
   }
 
   // ═══════════════════════════════════════════════════════════════════════
   // CLIENT USERS (external portal)
   // ═══════════════════════════════════════════════════════════════════════
   //
-  // TASK-827 D2 + TASK-1675 — dos carriles, uno de ellos ya migrado.
+  // TASK-827 D2 + TASK-1675 + TASK-1685 — un solo predicado de visibilidad.
   //
-  // La LISTA BASE de este bloque sigue saliendo de `canSeeView('cliente.*')`,
-  // que se deriva de `session.user.authorizedViews[]` (TASK-136) y por tanto de
-  // `role_view_assignments`: rol → vista, nunca módulos.
+  // La LISTA BASE de este bloque se filtra con `canSeeClientView('cliente.*')`,
+  // el primitive único del portal cliente (módulos contratados de la organización
+  // + revocaciones per-persona) — el MISMO predicado que consumen los page guards
+  // y ⌘K. Ya NO sale de `canSeeView`/`authorizedViews` (rol): TASK-1685 retiró
+  // ese carril para vistas `cliente.*` (ISSUE-148: 36 enlaces que el menú
+  // ofrecía y la puerta negaba).
   //
-  // Los ÍTEMS DE MÓDULO ya no. TASK-1675 cerró la deuda sin ID
-  // `client-portal-vertical-menu-resolver-migration` que TASK-827 dejó nombrada:
-  // llegan por la prop `clientNavItems`, compuestos server-side en
-  // `(dashboard)/layout.tsx` desde el resolver canónico (TASK-825) contra
-  // `module_assignments` — el mismo origen que gatea cada page. El merge está
-  // más abajo y es aditivo.
+  // Los ÍTEMS DE MÓDULO llegan por la prop `clientNavItems` (TASK-1675),
+  // compuestos server-side en `(dashboard)/layout.tsx` desde el resolver
+  // canónico (TASK-825) contra `module_assignments` — el mismo origen que gatea
+  // cada page — y también pasan por el primitive (un `revoke` per-persona debe
+  // cerrar el enlace, no sólo la puerta). El merge está más abajo y es aditivo.
   //
   // Se descartó montar `<ClientPortalNavigation>` acá: trae su propio chrome
   // (MUI `List`, section headers, active state propio) y dejaría dos sistemas de
@@ -750,13 +843,39 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
   // Lo que queda de deuda es el bloque `capabilityModules`
   // (`businessLines`/`serviceModules`), follow-up `capability-modules-resolver-migration`.
   //
-  // client-portal-allowed: legacy canSeeView pattern en la lista base (los ítems de módulo ya salen del resolver)
+  // client-portal-allowed: bloque legacy `capabilityModules` (businessLines/serviceModules) todavía sin migrar al resolver
 
-  if (!isInternalPortalUser) {
-    // Pure collaborator home
+  if (!isInternalPortalUser && isPureCollaborator) {
+    // ── TASK-1686 — proyección del colaborador puro ──
+    //
+    // El rail ES su contenido: home `/my` + sección "Mi Ficha" servida por el
+    // builder canónico. NUNCA construye las colecciones cliente: eso elimina
+    // tanto las rutas cliente que con claims vacíos aparecían por fallback
+    // permisivo como el heading "Mi Cuenta" vacío que veía el colaborador real.
+    // Los recursos plataforma (Knowledge/Design System) llegan por el bloque
+    // no-interno de más abajo, gated con fallback cerrado.
+    menuData.push({
+      label: nl(GH_MY_NAV.dashboard),
+      href: '/my',
+      icon: 'tabler-smart-home'
+    })
+
+    menuData.push({
+      isSection: true,
+      label: GH_MY_NAV.fichaSection.label,
+      children: buildMyNavItems({
+        authorizedViews,
+        hasActiveContractorEngagement,
+        hasWorkforceContractingDocument
+      }).map(item => ({ label: nl(GH_MY_NAV[item.copyKey]), href: item.href, icon: item.icon }))
+    })
+  }
+
+  if (!isInternalPortalUser && !isPureCollaborator) {
+    // Home personal del híbrido my+client — conducta vigente byte-a-byte.
     if (isMyUser) {
       menuData.splice(0, 0, {
-        label: <NavLabel label='Mi Greenhouse' subtitle='Tu operación personal' show={showSub} />,
+        label: nl(GH_MY_NAV.dashboard),
         href: '/my',
         icon: 'tabler-smart-home'
       })
@@ -772,23 +891,29 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
       { label: nl(GH_CLIENT_NAV.analytics), href: '/analytics', icon: 'tabler-chart-dots' },
       { label: nl(GH_CLIENT_NAV.campaigns), href: '/campanas', icon: 'tabler-speakerphone' }
     ].filter(item => {
-      if (item.href === dashboardHref) return canSeeView('cliente.pulse', true)
-      if (item.href === '/proyectos') return canSeeView('cliente.proyectos', true)
-      if (item.href === '/sprints') return canSeeView('cliente.ciclos', true)
-      if (item.href === '/equipo') return canSeeView('cliente.equipo', true)
+      // `/home` es el terminator del portal: es adonde el guard redirige cuando deniega, así
+      // que no está guardada y no se filtra. Ocultarla dejaría al cliente sin salida.
+      if (item.href === dashboardHref) return true
+      if (item.href === '/proyectos') return canSeeClientView('cliente.proyectos')
+      if (item.href === '/sprints') return canSeeClientView('cliente.ciclos')
+      if (item.href === '/equipo') return canSeeClientView('cliente.equipo')
       // TASK-1679 Slice 6 — `cliente.reviews` es el canónico (el que declara el módulo).
-      // Ambos viewCodes tienen grant para los 3 roles cliente, así que el cambio es neutro
-      // para el menú; lo que se alinea es que el ítem y el guard de la página pregunten por
-      // lo MISMO. Antes el menú ofrecía la ruta con un viewCode y el guard pedía otro.
-      if (item.href === '/reviews') return canSeeView('cliente.reviews', true)
-      if (item.href === '/analytics') return canSeeView('cliente.analytics', true)
-      if (item.href === '/campanas') return canSeeView('cliente.campanas', true)
+      if (item.href === '/reviews') return canSeeClientView('cliente.reviews')
+      if (item.href === '/analytics') return canSeeClientView('cliente.analytics')
+      if (item.href === '/campanas') return canSeeClientView('cliente.campanas')
 
       return true
     })
 
     // Capability modules (legacy `businessLines`/`serviceModules` — deuda hermana
     // `capability-modules-resolver-migration`, todavía sin migrar al resolver).
+    //
+    // client-portal-visibility-allowed: `cliente.modulos` no gatea una superficie vendida —
+    // gatea este bloque legacy, cuyos ítems salen de `resolveCapabilityModules` sobre
+    // `session.user.businessLines`/`serviceModules`, NO de `module_assignments`. Pasarlo al
+    // primitive lo apagaría entero (ningún módulo declara `cliente.modulos`) sin que exista
+    // todavía el carril de reemplazo. Dueño: `capability-modules-resolver-migration`; su
+    // layout (`capabilities/[moduleId]`) lleva el mismo marker.
     const capabilityModuleItems =
       capabilityModules.length > 0 && canSeeView('cliente.modulos', true)
         ? capabilityModules.map(module => ({
@@ -803,9 +928,11 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
       { label: nl(GH_CLIENT_NAV.notifications), href: '/notifications', icon: 'tabler-notification' },
       { label: nl(GH_CLIENT_NAV.settings), href: '/settings', icon: 'tabler-settings' }
     ].filter(item => {
-      if (item.href === '/updates') return canSeeView('cliente.actualizaciones', true)
-      if (item.href === '/notifications') return canSeeView('cliente.notificaciones', true)
-      if (item.href === '/settings') return canSeeView('cliente.configuracion', true)
+      // Las tres son vistas base del portal: el primitive las abre sin módulo contratado, y
+      // sólo un `revoke` per-persona las cierra.
+      if (item.href === '/updates') return canSeeClientView('cliente.actualizaciones')
+      if (item.href === '/notifications') return canSeeClientView('cliente.notificaciones')
+      if (item.href === '/settings') return canSeeClientView('cliente.configuracion')
 
       return true
     })
@@ -833,7 +960,12 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
       ...clientAccountItems.map(item => item.href)
     ])
 
-    const moduleItems = groupNavItems(clientNavItems.filter(item => !takenRoutes.has(item.route)))
+    // Los ítems de módulo también pasan por el primitive: si no, un `revoke` per-persona
+    // ocultaría el ítem de la lista base y dejaría visible el mismo destino cuando llega por
+    // el merge — la revocación cerraría la puerta y no el enlace.
+    const moduleItems = groupNavItems(
+      clientNavItems.filter(item => !takenRoutes.has(item.route) && canSeeClientView(item.viewCode))
+    )
 
     const toMenuItem = (item: ClientNavItem) => ({ label: item.label, href: item.route, icon: item.icon })
 
@@ -856,44 +988,18 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
       children: [...clientAccountItems, ...moduleItems.account.map(toMenuItem)]
     })
 
-    // Mi Ficha for collaborators with my routeGroup
+    // Mi Ficha del híbrido my+client — conducta vigente byte-a-byte (el
+    // colaborador PURO ya no pasa por acá: tiene su proyección propia arriba,
+    // TASK-1686). Mismo builder canónico que alimenta el dropdown del avatar.
     if (isMyUser) {
       menuData.push({
         isSection: true,
-        label: 'Mi Ficha',
-        children: [
-          { label: nl(GH_MY_NAV.assignments), href: '/my/assignments', icon: 'tabler-users' },
-          { label: nl(GH_MY_NAV.performance), href: '/my/performance', icon: 'tabler-chart-bar' },
-          { label: nl(GH_MY_NAV.delivery), href: '/my/delivery', icon: 'tabler-list-check' },
-          { label: nl(GH_MY_NAV.profile), href: '/my/profile', icon: 'tabler-user-circle' },
-          { label: nl(GH_MY_NAV.payroll), href: '/my/payroll', icon: 'tabler-receipt' },
-          { label: nl(GH_MY_NAV.contractor), href: '/my/contractor', icon: 'tabler-briefcase' },
-          { label: nl(GH_MY_NAV.offers), href: '/my/offers', icon: 'tabler-file-text' },
-          { label: nl(GH_MY_NAV.contracts), href: '/my/contracts', icon: 'tabler-file-certificate' },
-          { label: nl(GH_MY_NAV.paymentProfile), href: '/my/payment-profile', icon: 'tabler-credit-card' },
-          { label: nl(GH_MY_NAV.leave), href: '/my/leave', icon: 'tabler-calendar-event' },
-          { label: nl(GH_MY_NAV.goals), href: '/my/goals', icon: 'tabler-target' },
-          { label: nl(GH_MY_NAV.evaluations), href: '/my/evaluations', icon: 'tabler-clipboard-check' },
-          { label: nl(GH_MY_NAV.organization), href: '/my/organization', icon: 'tabler-building' }
-        ].filter(item => {
-          if (item.href === '/my/assignments') return canSeeView('mi_ficha.mis_asignaciones', true)
-          if (item.href === '/my/performance') return canSeeView('mi_ficha.mi_desempeno', true)
-          if (item.href === '/my/delivery') return canSeeView('mi_ficha.mi_delivery', true)
-          if (item.href === '/my/profile') return canSeeView('mi_ficha.mi_perfil', true)
-          if (item.href === '/my/payroll') return canSeeView('mi_ficha.mi_nomina', true)
-          // TASK-796 — dynamic: only show when the member has a live contractor engagement.
-          if (item.href === '/my/contractor') return hasActiveContractorEngagement && canSeeView('mi_ficha.mi_contratacion', true)
-          // TASK-1022 — dynamic: only show when the collaborator has a contracting document.
-          if (item.href === '/my/offers') return hasWorkforceContractingDocument && canSeeView('mi_ficha.mis_contratos', true)
-          if (item.href === '/my/contracts') return hasWorkforceContractingDocument && canSeeView('mi_ficha.mis_contratos', true)
-          if (item.href === '/my/payment-profile') return canSeeView('mi_ficha.mi_cuenta_pago', true)
-          if (item.href === '/my/leave') return canSeeView('mi_ficha.mis_permisos', true)
-          if (item.href === '/my/goals') return canSeeView('mi_ficha.mis_objetivos', true)
-          if (item.href === '/my/evaluations') return canSeeView('mi_ficha.mis_evaluaciones', true)
-          if (item.href === '/my/organization') return canSeeView('mi_ficha.mi_organizacion', true)
-
-          return true
-        })
+        label: GH_MY_NAV.fichaSection.label,
+        children: buildMyNavItems({
+          authorizedViews,
+          hasActiveContractorEngagement,
+          hasWorkforceContractingDocument
+        }).map(item => ({ label: nl(GH_MY_NAV[item.copyKey]), href: item.href, icon: item.icon }))
       })
     }
 
@@ -909,29 +1015,46 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
     }
   }
 
-  // ── Knowledge (standalone — cross-cutting INTERNAL resource) ──
-  if (canSeeView('plataforma.knowledge', false)) {
-    menuData.push({
-      label: nl(GH_INTERNAL_NAV.knowledge),
-      href: '/knowledge',
-      icon: 'tabler-books'
-    })
+  // ── Knowledge + Design System (standalone — SOLO rama no-interna) ──
+  // Para el portal interno estos recursos viven en la zona "Recursos" del rail
+  // (TASK-1388). Acá quedan para el staff que NO es `isInternalPortalUser`
+  // (p.ej. `collaborator` con el grant `plataforma.*`) — y NUNCA clientes (el
+  // viewCode no se otorga a roles `client_*`).
+  if (!isInternalPortalUser) {
+    if (canSeeView('plataforma.knowledge', false)) {
+      menuData.push({
+        label: nl(GH_INTERNAL_NAV.knowledge),
+        href: '/knowledge',
+        icon: 'tabler-books'
+      })
+    }
+
+    if (canSeeView('plataforma.design_system', false)) {
+      menuData.push({
+        label: nl(GH_INTERNAL_NAV.adminDesignSystem),
+        icon: 'tabler-palette',
+        children: [
+          { label: nl(GH_INTERNAL_NAV.adminDesignCatalog), href: '/design-system', icon: 'tabler-layout-list' },
+          { label: nl(GH_INTERNAL_NAV.adminDesignHandoff), href: '/design-system/handoff', icon: 'tabler-layout-kanban' }
+        ]
+      })
+    }
   }
 
-  // ── Design System (standalone — cross-cutting INTERNAL resource) ──
-  // Out of Admin Center (it is not an admin domain). Rendered for ANY staff with
-  // the `plataforma.design_system` grant — all internal roles incl. `collaborator`
-  // (who are not `isInternalPortalUser`) — and NEVER clients (the viewCode is never
-  // granted to client_* roles). Placed after both portal branches so collaborators
-  // (route group `my`) reach it too.
-  if (canSeeView('plataforma.design_system', false)) {
-    menuData.push({
-      label: nl(GH_INTERNAL_NAV.adminDesignSystem),
-      icon: 'tabler-palette',
-      children: [
-        { label: nl(GH_INTERNAL_NAV.adminDesignCatalog), href: '/design-system', icon: 'tabler-layout-list' },
-        { label: nl(GH_INTERNAL_NAV.adminDesignHandoff), href: '/design-system/handoff', icon: 'tabler-layout-kanban' }
-      ]
+  // TASK-1388 (a11y) — anillo de foco visible al tabular por el rail: los
+  // estilos base de Vuexy solo comunican el foco con un fondo tenue.
+  const baseMenuItemStyles = menuItemStyles(verticalNavOptions, theme)
+
+  const accessibleMenuItemStyles: typeof baseMenuItemStyles = {
+    ...baseMenuItemStyles,
+    button: params => ({
+      ...(typeof baseMenuItemStyles.button === 'function'
+        ? baseMenuItemStyles.button(params)
+        : baseMenuItemStyles.button),
+      '&:focus-visible': {
+        outline: '2px solid var(--mui-palette-primary-main)',
+        outlineOffset: '-2px'
+      }
     })
   }
 
@@ -939,7 +1062,12 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
     <ScrollWrapper
       {...(isBreakpointReached
         ? {
+            // TASK-1388 (a11y) — región scrollable alcanzable por teclado:
+            // sin role/label/tabIndex, un usuario de teclado no podía llegar.
             className: 'bs-full overflow-y-auto overflow-x-hidden',
+            role: 'region',
+            tabIndex: 0,
+            'aria-label': microcopy.aria.mainNavigation,
             onScroll: container => scrollMenu(container, false)
           }
         : {
@@ -949,7 +1077,7 @@ const VerticalMenu = ({ scrollMenu, clientNavItems = [] }: Props) => {
     >
       <Menu
         popoutMenuOffset={{ mainAxis: 23 }}
-        menuItemStyles={menuItemStyles(verticalNavOptions, theme)}
+        menuItemStyles={accessibleMenuItemStyles}
         renderExpandIcon={({ open }) => <RenderExpandIcon open={open} transitionDuration={transitionDuration} />}
         renderExpandedMenuItemIcon={{ icon: <i className='tabler-circle text-xs' /> }}
         menuSectionStyles={menuSectionStyles(verticalNavOptions, theme)}

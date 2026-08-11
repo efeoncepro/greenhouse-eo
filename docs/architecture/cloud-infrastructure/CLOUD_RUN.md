@@ -1,6 +1,6 @@
 # Cloud Infrastructure — Cloud Run (services, Functions legacy, Jobs)
 
-> **Estado vigente** · Updated: 2026-08-05 (TASK-1646) · Cronología: [HISTORIAL.md](HISTORIAL.md)
+> **Estado vigente** · Updated: 2026-08-11 (TASK-1378) · Cronología: [HISTORIAL.md](HISTORIAL.md)
 > **SoT:** `services/<worker>/deploy.sh` (config declarativa) + `gcloud run services|jobs list`
 > (estado live). Inventario live completo auditado por última vez el 2026-04-23 (`13`
 > serverless: 5 Cloud Run custom + 8 Functions Gen 2); re-baseline pendiente (`TASK-127`).
@@ -14,6 +14,7 @@
 | `ico-batch-worker` | `us-east4` | `greenhouse-portal@...` | IAM only | **mixto** | mantiene `GREENHOUSE_POSTGRES_PASSWORD` en env plano (gap en [SECURITY.md](SECURITY.md)) |
 | `hubspot-greenhouse-integration` | `us-central1` | default compute SA | **public** (`allUsers`) | parcial | revisar si el exposure público es realmente el deseado |
 | `notion-bq-sync` | `us-central1` | default compute SA | **public** (`allUsers`) | Secret Manager | exposición pública innecesaria para un sync interno; `minScale=0` desde 2026-04-24 |
+| `clamav` | `us-east4` | `greenhouse-portal@...` | IAM only (ingress `all` + `--no-allow-unauthenticated`) | **ninguno** — no lee secretos ni toca PostgreSQL | Escáner de firmas de assets de candidato (TASK-1378). `mem=2Gi`, `cpu=1`, `min=1`, `max=3`, `concurrency=4`, `timeout=120s`. **Servicio ÚNICO para staging y producción** (ver abajo). ≈USD 19/mes |
 
 ## Cloud Run Jobs
 
@@ -81,6 +82,48 @@ El catálogo completo vive en `services/ops-worker/server.ts` + los jobs que los
 - Endpoints de roles / quote repricing / margin feedback nacieron `501` reservados hasta las
   tasks del programa que los completen.
 
+## `clamav`
+
+Escáner de firmas (ClamAV + shim HTTP `POST /scan`) que consume el adapter
+`src/lib/storage/asset-scan/clamav-http.ts`. Source: `services/clamav/` — **no bundlea `src/lib`**:
+el contrato entre el portal y el servicio es HTTP, no código compartido.
+
+- **Un solo servicio para los dos entornos**, a diferencia del resto de los workers. Es stateless:
+  recibe bytes y devuelve un veredicto; no lee secretos, no toca PostgreSQL, no conoce tenants ni
+  entornos — y staging y producción ya comparten la misma base
+  (`efeonce-group:us-east4:greenhouse-pg-dev`), que es lo único que podría necesitar aislamiento.
+  Duplicarlo sólo agregaba ≈USD 19/mes de `min-instances=1` sin aislar nada.
+- **El canary de una imagen nueva sale por revisión etiquetada sin tráfico**, no por un servicio
+  aparte: `ENV=staging` despliega `--no-traffic --tag canary` con **`min=0`** y `ENV=production`
+  promueve la revisión a 100% del tráfico. El `min=0` del canary hay que forzarlo: `minScale` es por
+  **revisión**, no por servicio, así que un canary con `min=1` factura igual que un servicio
+  duplicado aunque sirva 0% del tráfico. Contrapartida: el canary arranca frío y cargar las firmas
+  toma 30-60 s mientras el adapter corta a los 10 s — hay que calentarlo antes de ejercitarlo.
+- **Ingress `all`, no `internal`.** Vercel sale por internet pública, así que un Cloud Run
+  restringido a la VPC sería inalcanzable desde el route handler que sube el CV — y con el flag ON
+  eso es fail-closed sobre todas las postulaciones. El cierre es por IAM:
+  `--no-allow-unauthenticated` + `roles/run.invoker` sólo para `greenhouse-portal@`, y el adapter
+  presenta un **ID token OIDC** con audiencia derivada del endpoint. `deploy.sh` aborta si aparece
+  `allUsers` en la IAM policy.
+- **La imagen hornea la base de firmas en build** (etapa `freshclam` del Dockerfile). Sin eso la
+  primera instancia arranca descargando ~250 MB y el startup probe expira.
+- **El startup probe HTTP contra `/ready` es load-bearing, no cosmético.** Cloud Run da CPU plena
+  sólo hasta que el probe pasa; el shim abre el puerto en ~1 s, así que con el probe TCP por defecto
+  el boost se corta ahí y clamd queda cargando 3,6 M de firmas con CPU throttled a casi cero: nunca
+  termina, `/health` responde `clamd: down` para siempre y el servicio queda inservible **con Cloud
+  Run reportando `Ready=True`**. El síntoma se confunde con falta de memoria y no lo es (con 4 GiB
+  pasaba igual).
+- **`min=1` no se baja** en el runtime que atiende subidas reales: clamd tarda 20-40 s en cargar las
+  firmas y el primer CV del día pagaría ese cold start contra un adapter que corta a los 10 s
+  (`scanner_timeout`, bloqueante).
+- Health del servicio: `/health` (expone `clamd` y `signatureAgeHours`) + el signal
+  `storage.asset_scan.signature_freshness`. **No** está mapeado a `cloudRunService` en el
+  workflow-allowlist: `production-release.yml` no lo despliega y su imagen sólo cambia con
+  `services/clamav/**`, así que la detección de drift por `GIT_SHA` lo marcaría desalineado en cada
+  promoción, para siempre.
+- Spec: [`../../tasks/in-progress/TASK-1378-clamav-malware-scanner-provisioning-decision.md`](../../tasks/in-progress/TASK-1378-clamav-malware-scanner-provisioning-decision.md).
+  Runbook: `docs/manual-de-uso/plataforma/operar-scanner-malware-assets.md`.
+
 ## Deploy scripts — reglas compartidas
 
 - `--set-env-vars` de los `deploy.sh` es **destructivo**: toda var agregada out-of-band
@@ -88,7 +131,8 @@ El catálogo completo vive en `services/ops-worker/server.ts` + los jobs que los
 - Los deploy scripts que otorgan `roles/secretmanager.secretAccessor` usan el helper compartido
   `services/_shared/gcloud-secret-iam.sh` (ver [SECRETS.md](SECRETS.md)).
 - `deploy.sh` del ops-worker exige `ENV` explícito, sin default silencioso (topología
-  compartida).
+  compartida). El de `clamav` también, aunque su `ENV` no nombra el servicio: elige entre promover
+  la revisión (`production`) o dejarla como canary sin tráfico (`staging`).
 
 ## Logs / health (lectura puntual 2026-04-23)
 

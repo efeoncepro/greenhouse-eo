@@ -93,6 +93,9 @@ verdict. Codex and Claude skill names are not assumed to match.
    - Are there flags/env vars/redeploys/backfills/migrations/webhooks/secrets
      still missing?
    - Are docs/task lifecycle/handoff synced with the actual runtime state?
+   - ¿Qué afirmación de este cierre viene de un doc/handoff/turno anterior y no de
+     una verificación propia? ¿Algún gate tiene su expectativa escrita como literal?
+     ¿Alguna exención nueva de lint fue medida? Ver §Integridad de la evidencia.
 
 7. Verdict.
    - Use `evidence-format.md` and `verdict-format.md`.
@@ -126,6 +129,68 @@ and testable. A successful package publish is not consumer runtime evidence and 
   endpoints where canonical primitives/contracts exist.
 - Cross-agent QA that reports only Codex injected skills when Claude also needs
   a different skill or an explicit fallback.
+- Any of the three fake-evidence forms below (hardcoded gate expectation, lint
+  exemption outside the rule's scope, runtime claim sourced from a doc).
+
+## Integridad de la evidencia — cuando el artefacto de verificación miente (2026-08-09)
+
+`tests passing is evidence, not a verdict` tiene un corolario que se olvida: **el
+artefacto de verificación también miente, y miente pareciendo verde.** Estas tres
+formas se detectaron en UNA sesión (cierre del carril de acceso del portal cliente,
+`TASK-1678/1679/1680`, dos releases a producción) y ninguna la atrapó un gate:
+las tres se veían bien hasta que alguien miró el runtime. Búscalas en el paso 6
+(Adversarial review), no al final.
+
+1. 🔴 **Una nota del `Handoff.md` —o de un doc, o de un turno anterior— NO es
+   evidencia de runtime.** Caso fuente: durante toda la sesión se repitió que
+   "`/api/auth/agent-session` devuelve 403 en producción por diseño", tomado de una
+   nota del handoff y nunca verificado. Era **falso**: `AGENT_AUTH_ALLOW_PRODUCTION`
+   estaba seteada en Production desde hacía 90 días y las sesiones de agente SÍ
+   funcionaban ahí (comprobado después con un `curl` de diez segundos). Qué se
+   rompe: se declaró "pendiente del operador" una verificación que el agente podía
+   hacer solo, y un release estuvo a punto de cerrarse con una casilla sin marcar
+   **por una creencia**. Una creencia heredada es peor que una duda: no se
+   investiga.
+   **Regla: toda afirmación sobre runtime se verifica contra el runtime** — `curl`
+   al endpoint real, `vercel env ls`, `gcloud run services describe`, el reader, la
+   consulta a PG. Nunca contra `Handoff.md`, un doc de arquitectura, un runbook o
+   la memoria de la sesión: **un doc describe el día en que se escribió**, y las
+   env vars, flags y revisiones cambian sin tocarlo. Si no se puede verificar, se
+   reporta como *no verificada* — no como hecho, y tampoco como "pendiente del
+   operador" cuando el agente tiene el CLI en la mano. Esto vale igual para
+   afirmaciones cómodas ("eso está apagado", "eso ya se probó") que para incómodas.
+
+2. **Un gate cuya expectativa está hardcodeada no prueba el motor: prueba que el
+   estado de hoy sigue igual.** Caso fuente: el script de verificación del carril
+   de acceso fijaba "3 rutas abren y 6 muestran empty state". Al asignarle un
+   módulo a un cliente —el comportamiento CORRECTO— el script reportó **4 desvíos
+   por hacer lo correcto**, y la salida fácil era editar los esperados. Se corrigió
+   derivando la expectativa de los datos. Qué se rompe: el gate degenera en test de
+   regresión del snapshot con que se escribió, cada cambio legítimo lo "rompe", y la
+   presión es siempre silenciarlo en vez de leerlo.
+   **Regla: los conteos y selectores esperados se DERIVAN del mismo estado que el
+   motor lee** (consulta las asignaciones y computa cuántas rutas deben abrir),
+   nunca se escriben como literal. Olfato: *si un cambio legítimo obliga a editar
+   el gate, está mal el gate, no el cambio.* Es la 4.ª trampa del ejercicio del
+   SEGUNDO CONSUMIDOR (`arch-architect` en Claude / `software-architect-2026` en
+   Codex) aplicada a un segundo **estado de datos** en vez de a un segundo cliente:
+   no hace falta un segundo consumidor para desnudarla.
+
+3. **Una exención de lint sobre un path que la regla nunca evalúa no exime nada — y
+   hace ver la gobernanza más estricta de lo que es.** Caso fuente: el override de
+   `greenhouse/no-untokenized-business-line-branching` tenía 6 entradas; medido
+   corriendo la regla en `error` con el override vacío, **4 eximían paths fuera de
+   su alcance** (su `isUiFile` excluye `src/app/api/**` y sólo evalúa
+   `src/(components|views|app)/**`), 1 era especulativa ("si emergen casos" — nunca
+   emergieron) y 1 apuntaba a un archivo muerto. Quedó **una** exención real, con
+   dueño y condición de retiro. Qué se rompe: nadie puede distinguir cuál exención
+   es deuda real, y retirar la regla parece más caro de lo que es — la lista protege
+   al ruido y esconde al deudor.
+   **Regla: antes de agregar un path a un override, corre la regla en `error` con el
+   override vacío y confirma que ESE path produce una violación.** Si no la produce,
+   el path no va. Un override es deuda declarada con dueño y condición de retiro, no
+   una lista por si acaso; y cada entrada nueva declara por qué existe y qué trabajo
+   la retira.
 
 ## CLI
 

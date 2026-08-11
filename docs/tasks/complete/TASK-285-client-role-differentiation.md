@@ -1,5 +1,78 @@
 # TASK-285 — Client Role Differentiation for Globe Enterprise
 
+## Delta 2026-08-10 — el resultado de esta task ya NO está en vigor
+
+Cerrado por `TASK-1685` (decisión (a′), cierra `ISSUE-148`). Esta task sigue en `complete/` porque **se
+implementó y se verificó como decía**; lo que cambió es el sistema debajo. Lo que sigue es lo que un
+agente necesita saber antes de citar cualquier cosa de este archivo.
+
+### Qué dejó de ser cierto
+
+**La diferenciación de `client_specialist` no se aplica en ninguna parte.** Desde `TASK-1685`, la
+visibilidad de una vista `cliente.*` la decide un solo primitive:
+
+```
+acceso = interna ∨ ( ¬revocadaParaLaPersona ∧ ( vistaBase ∨ móduloDeLaOrgLaDeclara ) )
+```
+
+`role_view_assignments` **no participa**. Las 3 filas `granted=FALSE` que esta task sembró
+(`cliente.equipo`, `cliente.analytics`, `cliente.campanas` para `client_specialist`) **siguen en la
+tabla y no hacen nada**. No se borraron: la tabla es append-only y su intención está registrada.
+
+**La "Cadena de enforcement" de §Implementation Notes está superseded, y su paso 3 nunca fue del todo
+cierto.** Medido el 2026-08-10:
+
+| Paso declarado | Estado real entonces | Estado hoy |
+|---|---|---|
+| 1. `resolveAuthorizedViewsForUser` → `JWT.authorizedViews` | cierto | cierto, pero no gobierna vistas `cliente.*` |
+| 2. `canSeeView()` filtra el menú | cierto (3 de 3 vistas ocultas) | **reemplazado** por el primitive |
+| 3. page guard bloquea el acceso directo | **1 de 3** | **reemplazado** por el primitive |
+
+El paso 3 es el que conviene mirar. `requireViewCodeAccess` —el page guard canónico desde `TASK-827`—
+**nunca** leyó `authorizedViews`: resuelve por módulo contratado. De las 3 vistas negadas, sólo
+`/campanas` tenía además un `layout.tsx` que gateaba por el carril de rol; `/equipo` y `/analytics`
+tienen `page.tsx` y nada más. O sea que un `client_specialist` de una organización con el módulo podía
+abrir Equipo y Analytics escribiendo la URL desde que existe ese guard. El menú se las ocultaba, y eso
+bastó para que nadie lo notara.
+
+**Nunca fue observable con usuarios reales.** Al 2026-08-10 no existe ningún usuario `client_specialist`
+puro: el único que tiene ese rol es la persona agente de Berel, que tiene los tres, y la derivación es
+una **unión** — el grant de executive gana. La diferenciación estuvo sembrada, parcialmente cableada y
+sin ejercitar durante cuatro meses.
+
+### Acceptance criteria que ya no se sostienen
+
+- ❌ *"Un usuario `client_specialist` NO ve Analytics, Campanas, Equipo en el menú"* — el menú ya no
+  consulta el rol. Lo que ve depende de los módulos que su organización contrató.
+- ⚠️ *"`client_executive`, `client_manager` y `client_specialist` tienen visibilidad diferenciada"* — no
+  la tienen. Dentro de una misma organización, los tres roles ven lo mismo.
+- ✅ El resto sigue en pie: no se rompió acceso existente, el default `client_executive` sigue vigente, y
+  la infraestructura de `role_view_assignments` sigue siendo el carril canónico **del portal interno**.
+
+### Dónde vive esa capacidad ahora, si se vuelve a necesitar
+
+La necesidad de negocio que originó esta task —*"un VP Marketing y un Content Specialist tienen
+necesidades distintas"*— **sigue siendo válida y hoy no tiene carril**. `TASK-1685` §D2 lo declaró como
+renuncia explícita, no como olvido. Si vuelve a hacer falta:
+
+- **El instrumento es `user_view_overrides` per-persona** (`override_type='revoke'`), que existe, tiene
+  `reason` y `expires_at`, y desde `TASK-1685` **sí cierra la puerta** — antes era decorativo ahí.
+- **NUNCA** volver a expresarlo como deny per-**rol** sobre una vista que el módulo concede: el rol es
+  un conjunto que se acumula, así que reintroduce la paradoja de que *ganar un rol te quita acceso* —
+  exactamente lo que hace que estas 3 filas no afecten a la persona agente de Berel.
+- Si la diferenciación es **comercial** (un plan que incluye Analytics y otro que no), el carril correcto
+  no es el rol sino **el módulo**: dos productos distintos, no dos permisos.
+
+Lo que deliberadamente **no** se decidió: si Efeonce quiere recuperar la diferenciación per-clase. Se
+declaró el seam, no se construyó, porque al 2026-08-10 no hay un solo consumidor que lo ejercite y un
+input que nadie ejerce deriva.
+
+### Referencias
+
+- `docs/tasks/complete/TASK-1685-client-portal-single-visibility-primitive.md` §Slice 1 (D1/D2)
+- `docs/issues/resolved/ISSUE-148-...md` §Resolución
+- `GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md` §12.1 y §12.2 (Deltas TASK-1685)
+
 ## Status
 
 - Lifecycle: `complete`

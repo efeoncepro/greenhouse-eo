@@ -358,6 +358,12 @@ export default [
       // declarada con dueño en el override block más abajo). El resto del barrido lo
       // cerraron TASK-1675/1678/1679.
       'greenhouse/no-untokenized-business-line-branching': 'error',
+      // TASK-1685 Slice 2 — `error` desde commit-1, sin período de gracia. El barrido ya está
+      // hecho: los tres consumers (`VerticalMenu`, `GlobalCommandPalette`, el page guard)
+      // migraron al primitive en este mismo cambio, así que la regla nace con cero
+      // violaciones. Dejarla en `warn` sólo daría lugar a que la segunda fuente de verdad
+      // vuelva a entrar mientras nadie mira — que es literalmente cómo nació ISSUE-148.
+      'greenhouse/no-client-portal-view-visibility-bypass': 'error',
       // TASK-890 Slice 3 — modo warn durante V1.0 (gate legacy en postgres-store.ts
       // grandfathered behind flag PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED=false).
       // Promote a `error` post 30d steady o cuando flag default flip a true.

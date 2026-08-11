@@ -42,6 +42,21 @@ El suite es **smoke**, no integracion: verifica que los pages renderizan sin 5xx
 | `PLAYWRIGHT_START_WEB_SERVER` | Si es `true`, Playwright levanta `pnpm dev` automaticamente. | No |
 | `PLAYWRIGHT_SKIP_AUTH_SETUP` | Si es `true`, salta el global setup y requiere `.auth/storageState.json` pre-existente. | No |
 | `AGENT_AUTH_STORAGE_PATH` | Path custom para `storageState.json`. Default: `.auth/storageState.json`. | No |
+| `AGENT_AUTH_ALLOW_PRODUCTION` | Habilita `/api/auth/agent-session` cuando `VERCEL_ENV === 'production'`. **Ya esta seteada en Production** — ver la nota de abajo. | No |
+
+> ⚠️ **`agent-session` SI funciona contra produccion** (verificado 2026-08-09). El endpoint devuelve 403
+> cuando `VERCEL_ENV === 'production'` **solo si** `AGENT_AUTH_ALLOW_PRODUCTION` no esta en `'true'`, y en
+> el proyecto de Production esa variable esta seteada desde ~2026-05. Es decir: la nota historica de que
+> "en produccion da 403 por diseño" es **falsa** para este runtime, y arrastrarla tiene dos costos —
+> declarar como pendiente-de-operador una verificacion que un agente puede hacer solo, y no ver la postura
+> de seguridad real: la credencial de la persona agente esta documentada en `CLAUDE.md` y puede acuñar
+> sesion productiva como superadmin.
+>
+> La postura (mantener, restringir por persona, o rotar a un secreto no documentado) esta abierta en
+> `TASK-1684`. Mientras no se decida, tratar cualquier verificacion contra produccion como **read-only y
+> declarada en el handoff**: el suite es smoke y no muta, pero **este endpoint no escribe en el ledger
+> `auth_attempts`** — solo loggea el fallo del lookup de tenant. O sea que una sesion productiva acuñada
+> por un agente no deja rastro propio; el unico registro es el que el agente escriba.
 
 `playwright.config.ts` y `scripts/playwright-auth-setup.mjs` cargan `.env.local` y luego `.env` automaticamente, sin sobrescribir variables ya exportadas por la shell o por CI. En local no es necesario hacer `source .env.local` para que el suite encuentre `AGENT_AUTH_SECRET`, `AGENT_AUTH_EMAIL` o `VERCEL_AUTOMATION_BYPASS_SECRET`.
 

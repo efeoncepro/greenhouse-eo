@@ -12,6 +12,7 @@ import { styled } from '@mui/material/styles'
 import Avatar from '@mui/material/Avatar'
 import Badge from '@mui/material/Badge'
 import Button from '@mui/material/Button'
+import ButtonBase from '@mui/material/ButtonBase'
 import ClickAwayListener from '@mui/material/ClickAwayListener'
 import Divider from '@mui/material/Divider'
 import Fade from '@mui/material/Fade'
@@ -23,7 +24,14 @@ import Typography from '@mui/material/Typography'
 
 import { useSettings } from '@core/hooks/useSettings'
 import { getGreenhouseNavigationCopy } from '@/config/greenhouse-navigation-copy'
+import { getMicrocopy } from '@/lib/copy'
 import { GH_MESSAGES } from '@/lib/copy/client-portal'
+import { buildMyNavItems } from '@/lib/navigation/my-nav-items'
+import { getInitials } from '@/utils/getInitials'
+
+const microcopy = getMicrocopy()
+
+const USER_MENU_ID = 'gh-user-dropdown-menu'
 
 const BadgeContentSpan = styled('span')({
   width: 8,
@@ -34,22 +42,60 @@ const BadgeContentSpan = styled('span')({
   boxShadow: '0 0 0 2px var(--mui-palette-background-paper)'
 })
 
-const UserDropdown = () => {
+type Props = {
+  /**
+   * TASK-1388 — avatar resuelto server-side con `resolveAvatarUrl` (server-only)
+   * en `(dashboard)/layout.tsx` y pasado como prop: el cliente nunca compone la
+   * URL del proxy de media. Sin valor → fallback a iniciales.
+   */
+  avatarUrl?: string | null
+}
+
+const UserDropdown = ({ avatarUrl = null }: Props) => {
   const [open, setOpen] = useState(false)
-  const anchorRef = useRef<HTMLDivElement>(null)
+  const anchorRef = useRef<HTMLButtonElement>(null)
   const router = useRouter()
   const { settings } = useSettings()
   const { data: session } = useSession()
   const locale = useLocale()
   const dashboardHref = session?.user?.portalHomePath || '/home'
-  const isInternalUser = session?.user?.routeGroups?.includes('internal') ?? false
-  const isAdminUser = session?.user?.routeGroups?.includes('admin') ?? false
-  const { client: GH_CLIENT_NAV, internal: GH_INTERNAL_NAV } = getGreenhouseNavigationCopy(locale)
+  const routeGroups = session?.user?.routeGroups ?? []
 
-  const avatarSrc =
-    session?.user?.avatarUrl && session.user.userId
-      ? `/api/media/users/${session.user.userId}/avatar`
-      : '/images/avatars/1.png'
+  // Mismo predicado que `VerticalMenu` — el dropdown y el rail reparten las
+  // superficies de la MISMA población (TASK-1388).
+  const isInternalPortalUser = ['internal', 'admin', 'commercial', 'finance', 'hr', 'people', 'ai_tooling'].some(
+    group => routeGroups.includes(group)
+  )
+
+  const isMyUser = routeGroups.includes('my')
+  const isClientUser = routeGroups.includes('client')
+
+  // TASK-1686 — mismo predicado que VerticalMenu: solo decide si se aplica la
+  // proyección collaborator-pura; my+client conserva la salida cliente vigente.
+  const isPureCollaborator = isMyUser && !isInternalPortalUser && !isClientUser
+
+  const authorizedViews = session?.user?.authorizedViews ?? []
+  const { client: GH_CLIENT_NAV, my: GH_MY_NAV } = getGreenhouseNavigationCopy(locale)
+
+  const myNavItems = isMyUser
+    ? buildMyNavItems(
+        {
+          authorizedViews,
+          hasActiveContractorEngagement: session?.user?.hasActiveContractorEngagement ?? false,
+          hasWorkforceContractingDocument: session?.user?.hasWorkforceContractingDocument ?? false
+        },
+        { includeHome: true }
+      )
+    : []
+
+  const profileHref = myNavItems.find(item => item.href === '/my/profile')?.href ?? null
+  const userName = session?.user?.name || ''
+
+  // Solo letras/números para las iniciales: un nombre como "Agente (E2E)"
+  // no debe rendir "A(" en el avatar.
+  const userInitials = userName
+    ? getInitials(userName.replace(/[^\p{L}\p{N}\s]/gu, ' ').trim()).slice(0, 2).toUpperCase() || null
+    : null
 
   const handleDropdownOpen = () => {
     setOpen(previous => !previous)
@@ -71,22 +117,45 @@ const UserDropdown = () => {
     await signOut({ callbackUrl: '/login' })
   }
 
+  const profileHeader = (
+    <div className='flex items-center plb-2 pli-6 gap-2'>
+      <Avatar alt={userName || 'Greenhouse'} src={avatarUrl ?? undefined}>
+        {userInitials}
+      </Avatar>
+      <div className='flex items-start flex-col'>
+        <Typography className='font-medium' color='text.primary'>
+          {session?.user?.name || 'Greenhouse Demo'}
+        </Typography>
+        <Typography variant='caption'>{session?.user?.email || 'client.portal@efeonce.com'}</Typography>
+      </div>
+    </div>
+  )
+
   return (
     <>
+      {/* TASK-1686 (a11y) — el trigger es un control semántico único: botón real
+          con nombre, teclado (Enter/Espacio nativos), aria-haspopup/expanded/
+          controls. Antes eran un Badge y un Avatar con onClick duplicado. */}
       <Badge
-        ref={anchorRef}
         overlap='circular'
-        badgeContent={<BadgeContentSpan onClick={handleDropdownOpen} />}
+        badgeContent={<BadgeContentSpan />}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         className='mis-2'
       >
-        <Avatar
+        <ButtonBase
           ref={anchorRef}
-          alt='Greenhouse Workspace'
-          src={avatarSrc}
           onClick={handleDropdownOpen}
-          className='cursor-pointer bs-[38px] is-[38px]'
-        />
+          aria-label={microcopy.aria.userMenu}
+          aria-haspopup='menu'
+          aria-expanded={open || undefined}
+          aria-controls={open ? USER_MENU_ID : undefined}
+          className='rounded-full'
+          data-capture='avatar-trigger'
+        >
+          <Avatar alt={userName || 'Greenhouse'} src={avatarUrl ?? undefined} className='bs-[38px] is-[38px]'>
+            {userInitials}
+          </Avatar>
+        </ButtonBase>
       </Badge>
       <Popper
         open={open}
@@ -105,31 +174,53 @@ const UserDropdown = () => {
           >
             <Paper className={settings.skin === 'bordered' ? 'border shadow-none' : 'shadow-lg'}>
               <ClickAwayListener onClickAway={e => handleDropdownClose(e as MouseEvent | TouchEvent)}>
-                <MenuList>
-                  <div className='flex items-center plb-2 pli-6 gap-2' tabIndex={-1}>
-                    <Avatar alt='Greenhouse Workspace' src={avatarSrc} />
-                    <div className='flex items-start flex-col'>
-                      <Typography className='font-medium' color='text.primary'>
-                        {session?.user?.name || 'Greenhouse Demo'}
-                      </Typography>
-                      <Typography variant='caption'>{session?.user?.email || 'client.portal@efeonce.com'}</Typography>
-                    </div>
-                  </div>
-                  <Divider className='mlb-1' />
-                  <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, dashboardHref)}>
-                    <i className='tabler-layout-dashboard' />
-                    <Typography color='text.primary'>
-                      {isInternalUser ? GH_INTERNAL_NAV.home.label : GH_CLIENT_NAV.dashboard.label}
-                    </Typography>
-                  </MenuItem>
-                  {isInternalUser ? (
-                    <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/admin')}>
-                      <i className='tabler-shield-lock' />
-                      <Typography color='text.primary'>{GH_INTERNAL_NAV.adminCenter.label}</Typography>
+                <MenuList
+                  id={USER_MENU_ID}
+                  className='max-bs-[70vh] overflow-y-auto'
+                  data-capture='avatar-dropdown'
+                  onKeyDown={event => {
+                    // Flow contract TASK-1388/1686: Esc cierra y restaura el foco al trigger.
+                    if (event.key === 'Escape') {
+                      setOpen(false)
+                      anchorRef.current?.focus()
+                    }
+                  }}
+                >
+                  {/* TASK-1388 — header de perfil clickeable: es la puerta a Mi Perfil. */}
+                  {profileHref ? (
+                    <MenuItem className='p-0' onClick={e => handleDropdownClose(e, profileHref)}>
+                      {profileHeader}
                     </MenuItem>
-                  ) : null}
-                  {!isInternalUser ? (
+                  ) : (
+                    <div tabIndex={-1}>{profileHeader}</div>
+                  )}
+                  <Divider className='mlb-1' />
+                  {isInternalPortalUser ? (
+                    // TASK-1388 — el dropdown del avatar es el hogar de lo personal
+                    // (`/my/*`). Los atajos admin que duplicaban el sidebar se
+                    // retiraron: la zona Administración del rail los cubre.
+                    myNavItems.map(item => (
+                      <MenuItem key={item.href} className='mli-2 gap-3' onClick={e => handleDropdownClose(e, item.href)}>
+                        <i className={item.icon} />
+                        <Typography color='text.primary'>{GH_MY_NAV[item.copyKey].label}</Typography>
+                      </MenuItem>
+                    ))
+                  ) : isPureCollaborator ? (
+                    // TASK-1686 — colaborador puro: identidad + Mi Perfil + salir.
+                    // Su rail ES el índice de Mi Ficha (guardrail TASK-1388): acá
+                    // NO se espejan las 13 hojas ni se muestran shortcuts cliente.
+                    profileHref ? (
+                      <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, profileHref)}>
+                        <i className='tabler-user-circle' />
+                        <Typography color='text.primary'>{GH_MY_NAV.profile.label}</Typography>
+                      </MenuItem>
+                    ) : null
+                  ) : (
                     <>
+                      <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, dashboardHref)}>
+                        <i className='tabler-layout-dashboard' />
+                        <Typography color='text.primary'>{GH_CLIENT_NAV.dashboard.label}</Typography>
+                      </MenuItem>
                       <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/proyectos')}>
                         <i className='tabler-folders' />
                         <Typography color='text.primary'>{GH_CLIENT_NAV.projects.label}</Typography>
@@ -147,31 +238,7 @@ const UserDropdown = () => {
                         <Typography color='text.primary'>{GH_CLIENT_NAV.updates.label}</Typography>
                       </MenuItem>
                     </>
-                  ) : null}
-                  {isAdminUser ? (
-                    <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/admin/commercial/parties')}>
-                      <i className='tabler-building-community' />
-                      <Typography color='text.primary'>{GH_INTERNAL_NAV.adminCommercialParties.label}</Typography>
-                    </MenuItem>
-                  ) : null}
-                  {isAdminUser ? (
-                    <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/admin/tenants')}>
-                      <i className='tabler-building-community' />
-                      <Typography color='text.primary'>{GH_INTERNAL_NAV.adminTenants.label}</Typography>
-                    </MenuItem>
-                  ) : null}
-                  {isAdminUser ? (
-                    <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/admin/users')}>
-                      <i className='tabler-shield' />
-                      <Typography color='text.primary'>{GH_INTERNAL_NAV.adminUsers.label}</Typography>
-                    </MenuItem>
-                  ) : null}
-                  {isAdminUser ? (
-                    <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/admin/roles')}>
-                      <i className='tabler-shield-lock' />
-                      <Typography color='text.primary'>{GH_INTERNAL_NAV.adminRoles.label}</Typography>
-                    </MenuItem>
-                  ) : null}
+                  )}
                   <div className='flex items-center plb-2 pli-3'>
                     <Button
                       fullWidth

@@ -1,3 +1,61 @@
+## Delta 2026-08-10 — la decisión se tomó, y desbloquea esta task con una premisa distinta
+
+`TASK-1685` cerró la decisión (opción **(a′)**) e `ISSUE-148` quedó resuelta. Lo que eso significa para
+esta task, concretamente:
+
+- 🟢 **Desbloqueada.** Ya no hay que coordinar: la semántica está fija.
+- 🔴 **Pero su premisa central cambió.** El carril `role_view_assignments` **no gobierna vistas
+  `cliente.*`** — ni las otorga ni las niega. Registrar 10 viewCodes nuevos y sembrarles grants por rol
+  **no produce acceso a nada**. El carril para que una superficie cliente sea alcanzable es
+  **declararla en el `view_codes[]` del módulo que la vende** (`greenhouse_client_portal.modules`, que
+  es append-only: se supersede con una versión nueva del módulo, no se edita in-place).
+- El modelo de "capabilities finas sobre el carril de views" que esta task proponía queda sin sustrato
+  del lado cliente. Si la intención sigue siendo diferenciar acceso **dentro** de una organización, el
+  instrumento canónico es `user_view_overrides` per-persona (deny), **nunca** un grant o deny per-rol —
+  el rol es un conjunto que se acumula y reintroduce la paradoja de que *ganar un rol te quita acceso*.
+- Antes de escribir migración, re-leer `TASK-1685` §Slice 1 (D1/D2) y
+  `GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md` §12.1/§12.2. El lint
+  `greenhouse/no-client-portal-view-visibility-bypass` está en `error` y bloquea el patrón que esta
+  task asumía.
+
+## Delta 2026-08-09 — el carril que esta task iba a usar cambió de default, y la decisión de diseño está abierta
+
+Causado por `TASK-1678` / `TASK-1679` / `TASK-1680` (complete, en producción) + `ISSUE-148` / `TASK-1685` (nuevas).
+
+- 🔴 **COORDINAR con `TASK-1685` antes de tomar esta task.** `TASK-1685` abre la decisión de diseño de
+  **qué carril gatea una vista cliente** (tres opciones, ninguna elegida todavía) y declara en su
+  §Impacta a que el modelo de capabilities finas de esta task «se solapa con esta decisión; coordinar
+  antes de tomar cualquiera de las dos». Si `TASK-286` se implementa primero, construye ~10 capabilities
+  sobre un carril cuya semántica está en revisión. El hallazgo completo está en
+  `docs/issues/open/ISSUE-148-client-portal-role-and-module-neither-enforced-end-to-end.md`.
+- **El default del carril de rol se invirtió para el portal cliente.** `computeRoleCanAccessViewFallback`
+  ([src/lib/admin/view-access-store.ts](../../../src/lib/admin/view-access-store.ts)) retorna `false`
+  cuando `view.routeGroup === 'client'`: sin fila `granted=TRUE` en `role_view_assignments`, un viewCode
+  `cliente.*` nuevo **no** entra en `session.user.authorizedViews`, y `hasAuthorizedViewCode` /
+  `hasAnyAuthorizedViewCode` dejaron de otorgar con claim vacío en sesiones cliente. Consecuencia
+  directa para esta task: «cada view code asignado a los roles correctos» pasó de higiene de governance
+  a **requisito de funcionamiento** — registrar sin sembrar deja la vista invisible. El portal interno
+  no cambió.
+- **La puerta de página NO lee ese carril.** `requireViewCodeAccess`
+  ([src/lib/client-portal/guards/require-view-code-access.ts](../../../src/lib/client-portal/guards/require-view-code-access.ts))
+  resuelve por módulo contratado (`greenhouse_client_portal.module_assignments`, llaveado por
+  `organizationId` desde `TASK-1679`) más las 3 vistas base de `CLIENT_PORTAL_BASE_VIEW_CODES`. Hoy un
+  grant o un denial per-rol **no abre ni cierra** la puerta. Diseñar capabilities finas asumiendo que el
+  carril de views gatea la página sería diseñar sobre algo que no ocurre — es exactamente el hallazgo de
+  `ISSUE-148`.
+- **Re-baselinear el conteo antes de escribir migración.** El premise «hoy hay 11 view codes `cliente.*`»
+  quedó viejo: el catálogo tiene **25**, y crecieron por otra vía (los `view_codes[]` de los bundles de
+  módulo del seed `TASK-824`), no por esta task. La nomenclatura además divergió de la propuesta acá
+  (`cliente.reviews` en vez de `cliente.mis_revisiones`, `cliente.roi_reports` en vez de
+  `cliente.reportes`). Verificado: los 10 viewCodes que esta task propone siguen **sin existir** en
+  `view-access-catalog.ts`, pero varias de esas superficies pueden estar cubiertas con otro nombre —
+  chequear una por una antes de agregar duplicados semánticos.
+- **`client_admin` y `client_viewer` no existen.** `src/config/role-codes.ts` sólo declara
+  `client_executive`, `client_manager` y `client_specialist`. La matriz de `role_entitlement_defaults`
+  de esta task nombra dos roles fantasma; corregirla antes de sembrar.
+- **`cliente.revisiones` quedó retirado.** `/reviews` se unificó en `cliente.reviews`; el viewCode legacy
+  sigue en el catálogo (append-only) pero ninguna ruta lo gatea. No agregarle assignments nuevos.
+
 ## Delta 2026-04-17 — expansión de alcance: capa de capabilities + bindings + role defaults
 
 Cuando esta task se diseñó, el modelo de autorización del portal solo manejaba view codes + role-view assignments. Desde entonces se operacionalizó la capa fina (TASK-403 Entitlements Runtime Foundation + TASK-404 Entitlements Governance Admin Center, ambas complete):

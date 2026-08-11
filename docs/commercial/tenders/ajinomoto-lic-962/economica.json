@@ -1,0 +1,78 @@
+{
+  "$comment": "Datos de la oferta económica. FUENTE única; el .xlsx brandeado se emite con `pnpm economica:build <este archivo>`. NUNCA un precio unitario por artículo (04_PRICING #2).",
+  "output": "propuesta-economica-ajinomoto-lic-962.xlsx",
+  "title": "PROPUESTA ECONÓMICA",
+  "subtitle": "Programa influen-SER Team 2026–2027 — Ajinomoto del Perú S.A.",
+  "currency": "PEN",
+  "ivaRate": 0,
+  "meta": {
+    "Oferente": "Efeonce Group SpA",
+    "Licitación": "LIC-962 · Wherex",
+    "Fecha": "agosto de 2026",
+    "Validez de la oferta": "30 días calendario"
+  },
+  "sections": [
+    {
+      "type": "value-table",
+      "title": "1. Valor del servicio",
+      "columns": [
+        "Plan",
+        "Alcance de la operación mensual",
+        "Valor mensual (sin IGV peruano)"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Operación integral influen-SER Team",
+            "Gobernanza, estrategia y calendario LinkedIn–Workvivo, formación comprometida, activación de comunidad, acompañamiento editorial, línea de Gerencia General y reporte mensual.",
+            7000
+          ],
+          "strong": true
+        }
+      ]
+    },
+    {
+      "type": "totals",
+      "title": "Detalle del valor mensual",
+      "basis": 7000,
+      "label": "Valor mensual ofertado, sin IGV peruano"
+    },
+    {
+      "type": "keyvalue",
+      "title": "2. Condiciones comerciales",
+      "rows": [
+        {
+          "cells": [
+            "Moneda",
+            "Soles peruanos (PEN)"
+          ]
+        },
+        {
+          "cells": [
+            "Vigencia contractual de referencia",
+            "12 meses · total referencial S/ 84.000"
+          ]
+        },
+        {
+          "cells": [
+            "Facturación y pago",
+            "Factura mensual desde Chile; pago a 45 días calendario después de la recepción de factura."
+          ]
+        },
+        {
+          "cells": [
+            "Impuestos",
+            "No incluye IGV peruano. Impuestos y retenciones aplicables se tratarán conforme a la normativa vigente."
+          ]
+        },
+        {
+          "cells": [
+            "Adicionales no incluidos",
+            "Audiovisual, diseño de alto volumen, presencialidad, pauta, premios, licencias, traslados y creadores externos."
+          ]
+        }
+      ]
+    }
+  ],
+  "footerNote": "Documento integrante de la oferta económica. Valores en soles peruanos (PEN), sin IGV peruano."
+}

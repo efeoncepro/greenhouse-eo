@@ -1,8 +1,9 @@
 # Manual de uso — Clientes finanzas (vista de detalle)
 
 > **Tipo:** Manual de uso — operador del portal
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-05-08 por Claude (TASK-613)
+> **Ultima actualizacion:** 2026-08-10 por Claude (TASK-1388 — ruta de menu: dominio Finanzas en la zona Operacion)
 > **Documentacion funcional:** [clientes-finanzas](../../documentation/finance/clientes-finanzas.md)
 
 ## Para que sirve
@@ -17,7 +18,7 @@ Para revisar y operar un cliente finanzas: ver lo que debe, las facturas vigente
 
 ## Paso a paso
 
-1. Entra a `/finance/clients` (en el menú lateral, sección Finance > Clientes).
+1. Entra a `/finance/clients` (menú lateral, zona Operación → dominio Finanzas → Flujo operativo → Clientes).
 2. Click en la fila del cliente que quieres ver.
 3. La URL cambia a `/finance/clients/<id>`.
 4. Verás:

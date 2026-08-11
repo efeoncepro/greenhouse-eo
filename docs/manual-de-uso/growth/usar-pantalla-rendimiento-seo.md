@@ -1,7 +1,7 @@
 > **Tipo de documento:** Manual de uso (operador del portal)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-08-07 por Claude (TASK-1307)
-> **Ultima actualizacion:** 2026-08-07 por Claude (TASK-1307 — verificado contra la pantalla construida: grupos, lectura del periodo, marcadores de AI Overview, granularidad, bandas de updates y leyenda de fuentes)
+> **Ultima actualizacion:** 2026-08-10 por Claude (TASK-1388 — Growth vive como seccion del dominio Comercial)
 > **Documentacion funcional:** [modulo-seo-search-visibility-360.md](../../documentation/growth/modulo-seo-search-visibility-360.md)
 
 # Rendimiento — Ver cómo evoluciona en el tiempo lo que elegiste
@@ -37,7 +37,7 @@ Dos cosas que conviene tener claras antes de leer un número:
 
 ## Paso a paso
 
-1. Entra por **Growth → SEO** y abre la pestaña **Rendimiento**.
+1. En el menu lateral, zona **Operacion**, entra por **Comercial → Growth → SEO** y abre la pestaña **Rendimiento**.
 
 2. **Fija el alcance en la cabecera.** Space, **Período** y **Dispositivo** viven arriba y
    aplican a todo lo que veas debajo.

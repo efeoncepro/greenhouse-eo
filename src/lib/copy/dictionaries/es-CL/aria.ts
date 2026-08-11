@@ -17,6 +17,7 @@ export const aria: AriaCopy = {
   closeDrawer: 'Cerrar panel',
   closeMenu: 'Cerrar menú',
   openMenu: 'Abrir menú',
+  mainNavigation: 'Navegación principal',
   openSettings: 'Abrir configuración',
   toggleSidebar: 'Alternar barra lateral',
   navigateBack: 'Volver',

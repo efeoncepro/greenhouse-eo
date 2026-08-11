@@ -9,7 +9,12 @@ import { useAdaptiveSidecarShell } from '@/components/greenhouse/primitives'
 
 const toCssSize = (value: number | string) => (typeof value === 'number' ? `${value}px` : value)
 
-const Navbar = () => {
+type Props = {
+  /** TASK-1388 — avatar del chrome resuelto server-side en `(dashboard)/layout.tsx`. */
+  avatarUrl?: string | null
+}
+
+const Navbar = ({ avatarUrl = null }: Props) => {
   const shell = useAdaptiveSidecarShell()
   const reservation = shell?.reservation
   const reservedWidth = reservation ? reservation.width + (reservation.resizeHandleWidth ?? 0) : 0
@@ -74,7 +79,7 @@ const Navbar = () => {
 
   return (
     <LayoutNavbar overrideStyles={overrideStyles}>
-      <NavbarContent />
+      <NavbarContent avatarUrl={avatarUrl} />
     </LayoutNavbar>
   )
 }

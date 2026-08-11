@@ -166,6 +166,35 @@ escalan a error).
   (TASK-356). Se ancla por `identity_profile_id` / `candidate_facet_id` / `application_id`.
 - **NUNCA** pedir el documento de identidad en el apply público. `captureCandidateIdentityDocument` exige actor
   autenticado Y una decisión favorable (`selected`/`backup_selected`) — el guardrail es código, no comentario.
+
+### Delta 2026-08-11 — ClamAV provisionado (TASK-1378)
+
+El adapter `clamav-http` dejó de ser código latente: existe el servicio Cloud Run `services/clamav/` y el adapter se
+ejerció contra él. **El flag `ASSET_MALWARE_SCAN_ENABLED` sigue OFF en Vercel** — el flip es rollout pendiente.
+
+**El puerto de escaneo NO es de Hiring.** `scanAssetBytes` recibe bytes y devuelve un veredicto; no sabe de vacantes.
+Hoy lo consumen `hiring/public-careers/cv-upload.ts` y `growth/forms/file-uploads.ts`, y el guard del attach exige
+veredicto limpio para `hiring_application_cv`, `hiring_candidate_portfolio_file`, `proposal_rfp` y
+`proposal_deliverable` (TASK-1392). Extenderlo a otro contexto es agregarlo a `SCAN_REQUIRED_ATTACH_CONTEXTS` y llamar
+al gate en su upload — no hay trabajo de ClamAV involucrado. Prender el flag sube la cobertura de **todos** esos
+caminos a la vez.
+
+Invariantes del servicio (contrato completo en `services/clamav/` + `deploy-contract.test.ts`):
+
+- **NUNCA** desplegar el scanner con `--allow-unauthenticated`: recibiría bytes de cualquiera. La postura canónica es
+  ingress abierto + `--no-allow-unauthenticated` + `roles/run.invoker` sólo para `greenhouse-portal@`, y el adapter
+  presenta un ID token OIDC (`fetchGoogleIdTokenForAudience`). El `deploy.sh` aborta si detecta `allUsers`.
+- **NUNCA** restringir su ingress a la VPC. Vercel sale por internet pública: el servicio quedaría inalcanzable y, con
+  el flag ON, eso es fail-closed sobre **todas** las subidas gateadas.
+- **NUNCA** quitar el startup probe HTTP contra `/ready`. Cloud Run da CPU plena sólo hasta que el probe pasa; el shim
+  abre el puerto en ~1 s, así que con el probe TCP por defecto clamd queda cargando 3,6 M de firmas con CPU throttled y
+  **nunca termina**, con el servicio reportando `Ready=True`. No es un problema de memoria (verificado con 4 GiB).
+- **NUNCA** aplicar configuración del servicio sólo con `gcloud run services update`: `deploy.sh` usa `--set-env-vars`
+  destructivo y el próximo deploy la borra en silencio. Todo cambio vuelve al script.
+- **NUNCA** dejar `min-instances=0` en el runtime que atiende uploads reales: el primer scan pagaría 30-60 s de carga
+  de firmas y el adapter corta a los 10 s. El override existe sólo para enfriar staging después del gate.
+- **NUNCA** dar por buena la frescura de las firmas sin mirar `/health`: `signatureAgeHours` es el dato. Un ClamAV con
+  firmas viejas da falsa confianza, que es peor que no tenerlo.
 - **NUNCA** exponer `value_full` de un documento de identidad por el resolver. Sale sólo por el reveal auditado de
   TASK-784 (capability + reason ≥5 chars + audit append-only).
 - **NUNCA** crear una columna de portafolio nueva: `candidate_facet.portfolio_url`/`linkedin_url` existen desde

@@ -1,9 +1,9 @@
 # Diagnosticar un modulo contratado que no aparece en el menu del cliente
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.1
+> **Version:** 1.3
 > **Creado:** 2026-08-09 por Claude (TASK-1675)
-> **Ultima actualizacion:** 2026-08-09 por Claude (TASK-1678/1679/1680 — la pagina ya dice por que deniega)
+> **Ultima actualizacion:** 2026-08-11 por Claude (TASK-1685: la lista heredada ya no se muestra por rol; revocaciones por persona; senal de divergencia menu ↔ puerta)
 > **Modulo:** Client Portal
 > **Rutas en portal:** `/admin/client-portal/organizations/[organizationId]/modules`, `/admin/client-portal/catalog`
 > **Documentacion relacionada:** [Menu del Portal Cliente — modulos contratados](../../documentation/client-portal/menu-portal-cliente-modulos.md), [Menu dinamico y empty states — operacion](menu-dinamico-y-empty-states.md), [GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md](../../architecture/GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md) §12.1
@@ -26,10 +26,18 @@ acorta el diagnostico a un paso:
 muestra la URL final despues del rebote. Si el cliente te manda una captura, el parametro despues del
 `?` es el que importa.
 
-> Ojo con un caso conocido **de operador interno, no de cliente**: si abres `/proyectos` con tu propia
-> sesion interna y recibe la pagina de no-autorizado, es un defecto conocido, arreglado y pendiente de
-> promover a produccion — no es un problema del cliente ni de su modulo. Las otras ocho paginas
-> cliente abren normal con sesion interna.
+**Con tu propia sesion interna abres las nueve paginas cliente.** Es el bypass de soporte y no
+necesitas ningun modulo. Si alguna te devuelve la pagina de no autorizado, eso es un defecto del portal
+—no un problema del cliente ni de su modulo— y va a plataforma. Ocurrio con `/proyectos`, que era la
+unica de las nueve que conservaba un candado viejo por grupo de rutas encima del canonico; quedo
+corregido y verificado en produccion el 2026-08-09.
+
+**Antes de diagnosticar, ten presente que dos paginas no abren para nadie hoy.** Ciclos (`/sprints`) y
+Analytics (`/analytics`) quedaron dependiendo de un modulo y ningun modulo del catalogo las declara, asi
+que muestran el empty state para todas las organizaciones. Si el reporte es sobre una de esas dos, no
+hay nada que activar desde la pantalla de modulos: es deuda conocida y se cierra declarandolas en el
+modulo que corresponda. Y las cuatro paginas Creative —Proyectos, Campanas, Equipo, Revisiones— hoy solo
+abren para **Sky Airlines**, que es la unica organizacion con el modulo Creative Hub Globe.
 
 ## Para que sirve
 
@@ -125,7 +133,7 @@ Ademas de estos estados, dos fechas apagan el enlace aunque el estado se vea bie
 
 ## Que no hacer
 
-- **No toques la tabla de permisos de vista por rol para "arreglar" esto.** No agrega enlaces de modulo, y en las pantallas que dependen de un modulo esta escrita a proposito con el permiso en "no": ponerlo en "si" convierte el acceso en visibilidad por rol para **todos** los clientes con ese rol, hayan contratado o no. Esa tabla ademas solo se agrega, nunca se borra.
+- **No toques la tabla de permisos de vista por rol para "arreglar" esto.** Desde el 2026-08-10 (TASK-1685) esa tabla no gobierna ninguna pantalla del portal cliente: ponerle "si" a una vista cliente no agrega el enlace ni abre la puerta. Sus filas de vistas cliente quedaron inertes, y la tabla ademas solo se agrega, nunca se borra.
 - **No edites asignaciones con SQL.** Ni `INSERT`, ni `UPDATE`, ni `DELETE`. Las acciones de la pantalla de administracion dejan auditoria, emiten evento y refrescan el portal; el SQL a mano deja el sistema inconsistente y sin rastro de quien lo hizo.
 - **No pidas agregar el enlace al codigo del menu.** El enlace tiene que salir de lo contratado. Un enlace escrito a mano se ve para clientes que no compraron el modulo y hay que repetirlo en cada cliente nuevo.
 - **No dejes la direccion directa como solucion.** Es un parche de una conversacion, no un arreglo: el cliente no la va a recordar y el resto de su equipo nunca la va a tener.
@@ -142,6 +150,9 @@ Ademas de estos estados, dos fechas apagan el enlace aunque el estado se vea bie
 | Un usuario interno de Efeonce no ve el modulo del cliente | Es lo esperado: los internos no arman su menu desde modulos contratados | Para dar soporte, los internos entran a las pantallas de cliente por direccion directa |
 | La pantalla existe y funciona, pero nunca tuvo linea propia en el menu | Es una pantalla hija | Explica desde donde se alcanza (paso 6) |
 | Se ve un enlace de un modulo que no aparece en la tabla de asignaciones | Viene del bloque antiguo que arma unos pocos enlaces desde la linea de negocio y los servicios de la cuenta | Deuda conocida, pendiente de migrar; no la "arregles" borrando asignaciones |
+| El cliente ve un enlace pero al entrar le dice que el modulo no esta activado | **Desde TASK-1685 (2026-08-10) no deberia pasar**: los seis enlaces heredados dejaron de mostrarse por rol y todo el menu decide con la misma regla que la puerta (modulos contratados menos revocaciones por persona) | Si pasa, menu y puerta divergieron: revisa la senal `identity.client_portal.menu_gate_divergence` en `/admin/operations` (steady cero) y los modulos de la organizacion. **No** toques los permisos de vista por rol |
+| Un usuario concreto no ve (ni puede abrir) una pantalla que sus companeros de la misma organizacion si ven | Puede tener una revocacion individual (`user_view_overrides` con `override_type='revoke'`), que cierra menu, puerta y ⌘K a la vez | Confirma con plataforma si la revocacion es intencional (verificacion, caso de soporte) antes de tocar nada |
+| Un cliente con Creative Hub Globe reporta que el enlace "Creative Hub" no lleva a ninguna parte | Tiene razon: el modulo declara esa superficie y la direccion todavia no existe en el portal | No hay nada que activar. Es la deuda de paginas placeholder; registra el reporte y sigue |
 
 ## Referencias tecnicas
 

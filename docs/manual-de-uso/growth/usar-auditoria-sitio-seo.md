@@ -1,7 +1,7 @@
 > **Tipo de documento:** Manual de uso (operador del portal)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-08-08 por Claude (TASK-1309)
-> **Ultima actualizacion:** 2026-08-08 por Claude (TASK-1309 — al día con la pantalla final: filtro por gravedad, movimiento contra el crawl anterior, exportar el grupo, y las tres aclaraciones que evitan reportar de más: tope del crawl, velocidad de laboratorio y alcance del puntaje)
+> **Ultima actualizacion:** 2026-08-10 por Claude (TASK-1388 — Growth vive como seccion del dominio Comercial)
 > **Documentacion funcional:** [Modulo SEO — Search Visibility 360](../../documentation/growth/modulo-seo-search-visibility-360.md)
 
 # Auditoria del sitio — leer la salud tecnica y priorizar
@@ -20,14 +20,14 @@ rastrea el sitio.
 
 | Necesitas | Como saber si lo tienes |
 |---|---|
-| Acceso al modulo SEO | Ves `Growth > SEO` en el menu. Si no, pidele a un administrador que habilite el modulo para tu usuario. |
+| Acceso al modulo SEO | Ves `Comercial > Growth > SEO` en la zona Operacion del menu. Si no, pidele a un administrador que habilite el modulo para tu usuario. |
 | Que el Space tenga el modulo SEO asignado | El selector **Space** de la pantalla lista solo los Spaces habilitados. Si el tuyo no aparece, ver [Asignar el modulo SEO a una organizacion](asignar-modulo-seo-organizacion.md). |
 | Que el Space tenga un sitio configurado | Si no lo tiene, la pantalla te lo dice con esas palabras en vez de mostrarte una auditoria vacia. |
 | Permiso para **correr** auditorias | Es un permiso aparte del de ver. Si no lo tienes, ves el diagnostico completo pero no el boton "Correr auditoria". Es a proposito: correr una auditoria le cuesta dinero a la empresa. |
 
 ## Paso a paso
 
-1. Entra a **Growth > SEO** y elige la pestaña **Auditoria**.
+1. Entra a **Comercial > Growth > SEO** (zona Operacion del menu lateral) y elige la pestaña **Auditoria**.
 2. Arriba a la derecha, elige el **Space** del cliente. La pantalla recuerda tu eleccion al moverte
    entre las pestañas del modulo.
 3. Mira primero **el "Ultimo crawl"**, en la cabecera. Todo lo que sigue vale lo que valga esa fecha.

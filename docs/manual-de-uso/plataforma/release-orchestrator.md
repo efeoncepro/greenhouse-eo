@@ -1,8 +1,8 @@
 > **Tipo de documento:** Manual de uso (operador)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-05-10 por Claude
-> **Ultima actualizacion:** 2026-07-09 por Codex
-> **Documentacion tecnica:** [CLAUDE.md §Production Release Orchestrator invariants (TASK-851)](../../../CLAUDE.md), [Spec TASK-851](../../tasks/in-progress/TASK-851-production-release-orchestrator-workflow.md), [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md)
+> **Ultima actualizacion:** 2026-08-09 por Claude
+> **Documentacion tecnica:** [CLAUDE.md §Production Release Orchestrator invariants (TASK-851)](../../../CLAUDE.md), [Spec TASK-851](../../tasks/complete/TASK-851-production-release-orchestrator-workflow.md), [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md)
 
 # Production Release Orchestrator
 
@@ -23,6 +23,11 @@ El orquestador (`production-release.yml`) hace los 8 pasos en una sola corrida, 
   `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md`: agente, fecha,
   release ID, run ID, SHA, **tiempo agente end-to-end** como KPI principal,
   workflow, manifest, runtime verde, fases y bloqueo principal.
+- Al cerrar, el **context gate va último**: `docs:closure-check` no lo incluye y
+  cualquier edición posterior a `Handoff.md`/`changelog.md` invalida
+  `docs:context-check:strict`. Orden: ediciones → `docs:closure-check` →
+  `docs:context-rotate --apply` si hace falta → `docs:context-check:strict` → commit
+  (runbook gotcha #9).
 - El SHA target debe estar **ya pusheado a `main`** (Vercel deploys automáticamente al push; el orquestador espera el READY).
 - Tener capability `platform.release.execute` (EFEONCE_ADMIN o DEVOPS_OPERATOR).
 - Si vas a usar `bypass_preflight_reason`: además capability `platform.release.bypass_preflight` (EFEONCE_ADMIN solo) + reason >= 20 chars con post-mortem comprometido.
@@ -147,13 +152,14 @@ Codex **no usa archivos de slash command** `.md`. Sus alias slash (`/implement-t
 | Síntoma | Causa probable | Fix |
 |---|---|---|
 | `preflight` falla con `release_batch_policy=split_batch` | Diff mezcla dominios sensibles independientes (e.g. payroll + finance) | Dividir release en 2 batches O agregar `[release-coupled: <razon>]` en commit body |
-| `preflight` falla con `release_batch_policy=requires_break_glass` | Diff toca migrations / auth / payroll / finance / cloud_release | Si legítimo: `bypass_preflight_reason` con razón completa + post-mortem |
+| `preflight` falla con `release_batch_policy=requires_break_glass` | Diff toca migrations / auth / payroll / finance / cloud_release | **El marker `[release-coupled:]` NO lo limpia** — sólo limpia `split_batch` (fila de arriba); la única salida de `requires_break_glass` es `bypass_preflight_reason` con razón completa + post-mortem. Para redactar la razón cuando el dominio es `db_migrations`: hay **una sola instancia Cloud SQL**, así que una migración ya aplicada "en dev" ya está aplicada para producción — compruébalo (`SELECT name, run_on FROM public.pgmigrations WHERE name LIKE '%<task-id>%'`) y cítalo como hecho auditable (runbook gotcha #7) |
+| `preflight` falla con staging `CANCELED` y el último commit de `develop` es **docs-only** | El Ignored Build Step canceló el build de staging a propósito, y `vercel_readiness` mira el deploy más reciente sin importar su estado | **`vercel redeploy` NO sirve**: reevalúa el mismo diff y cancela otra vez (verificado). Toca un doc del set `deployControlDocs` de `scripts/ci/vercel-ignore-build.mjs` (runbooks/manuales de release, control plane, ledger de flags) — no cuenta como docs-only y fuerza el build; si de todos modos tienes que documentar el release, ese commit produce la evidencia como efecto. Nunca inventes un cambio de código. Runbook gotcha #8 |
 | `release_batch_policy=requires_break_glass` señalando `deploy.sh` u otro archivo **que no cambió** en este release | Falso positivo por divergencia squash-merge (classifier three-dot resucita archivos ya en prod) — ISSUE-114 | Confirma el fantasma: `git diff origin/main..target -- <archivo>` = 0 líneas. Post-merge (target=HEAD de main) el batch-policy pasa solo; para el preflight pre-PR usa `bypass_preflight_reason` documentado |
-| `gh pr merge` develop→main falla: "merge commit cannot be cleanly created" | Divergencia squash (main no es ancestro de develop; ambos editaron docs/código desde una merge-base vieja) | En `develop`: `git merge origin/main -X ours --no-edit` (develop autoritativo) → verifica `git log origin/main --not develop` vacío + código intacto → push develop → el PR queda MERGEABLE. NUNCA cherry-pick a main |
+| `gh pr merge` develop→main falla: "merge commit cannot be cleanly created" | Divergencia squash (main no es ancestro de develop; ambos editaron docs/código desde una merge-base vieja) | En `develop`: `git merge origin/main -X ours --no-edit` (develop autoritativo) → verifica `git log origin/main --not develop` vacío + código intacto → push develop → el PR queda MERGEABLE. NUNCA cherry-pick a main. ⚠️ Las dos verificaciones sólo miran `src/ scripts/ services/ migrations/`, así que **no ven la bitácora**: el merge puede comerse la sección de `Handoff.md` y la entrada de `changelog.md` escritas en la rama del release (develop las editó en paralelo — pasó el 2026-08-08). Revísalas después del merge. Los conflictos `modify/delete` y la salida `-s ours` están en el runbook §Paso A |
 | `preflight` marca `readyToDeploy=false` con **solo warnings** `playwright_smoke` (0 runs) / `ci_green` (aún corriendo) | El smoke/CI corren en `develop` (ya verdes); el commit squash fresco de `main` no tiene su propio run | Espera el CI de `main` verde y re-dispatcha con `bypass_preflight_reason` documentado (baja los warnings sin errors). Es el path canónico de estos releases |
 | Tras el release, `ops-worker` quedó con un GIT_SHA **anterior** al target | Normal si `ops-worker-deploy` saltó el rebuild (`deploy_needed=false`) y el diff de rutas runtime entre Cloud Run y target es vacío | No forzar redeploy solo para alinear el label. Documentar el residual y ver runbook §4.1.1 |
 | `transition-released` queda queued/stale después de runtime verde | GitHub Actions runner/concurrency quedó atascado al final, no necesariamente el runtime | No usar SQL. Si health/smoke/watchdog aplicable están verificados y el operador aprueba, cerrar con `pnpm release:orchestrator-transition-state --release-id=<id> --to-state=released --reason=<razon>` y documentar run/release/evidencia |
-| `record-started` falla con "release ya activo en main" | Otro release en `preflight|ready|deploying|verifying` | Esperar terminación o abortar manualmente via `pnpm release:orchestrator-transition-state --to-state=aborted` |
+| `record-started` falla con "release ya activo en main" | Otro release en `preflight`/`ready`/`deploying`/`verifying` | Esperar terminación o abortar manualmente via `pnpm release:orchestrator-transition-state --to-state=aborted` |
 | Worker deploy falla con "GIT_SHA mismatch" | Cloud Build cache stale, tag drift, deploy aborted mid-flight | Re-run el workflow; si persiste investigar Cloud Build console |
 | `wait-vercel` timeout 900s | Vercel deploy lento o no triggered | Verificar `vercel ls greenhouse-eo --environment=production`; si no hay deployment, push manual a main |
 | `post-release-health` soft-fail (release `degraded`) | `/api/auth/health` no devolvió 200 en 3 attempts | Inspeccionar `/admin/operations` dashboard; decidir rollback (`pnpm release:rollback`) o forward-fix |
@@ -162,7 +168,7 @@ Codex **no usa archivos de slash command** `.md`. Sus alias slash (`/implement-t
 
 ## Referencias técnicas
 
-- Spec: [TASK-851](../../tasks/in-progress/TASK-851-production-release-orchestrator-workflow.md)
+- Spec: [TASK-851](../../tasks/complete/TASK-851-production-release-orchestrator-workflow.md)
 - Workflow: [.github/workflows/production-release.yml](../../../.github/workflows/production-release.yml)
 - CLI scripts: [scripts/release/orchestrator-record-started.ts](../../../scripts/release/orchestrator-record-started.ts), [scripts/release/orchestrator-transition-state.ts](../../../scripts/release/orchestrator-transition-state.ts)
 - Helpers: [src/lib/release/manifest-store.ts](../../../src/lib/release/manifest-store.ts), [src/lib/release/state-machine.ts](../../../src/lib/release/state-machine.ts)

@@ -370,6 +370,7 @@ El agente DEBE hacer estas acciones antes de producir un plan:
    - correr `pnpm ui:flow-check --task TASK-###` si `UI impact: flow` o hay sidecar/drawer/modal/popover/navegacion;
    - correr `pnpm ui:motion-check --task TASK-###` si `UI impact: motion` o hay motion/microinteracciones no triviales;
    - decidir reuse / extend / new primitive + variant/kind;
+   - declarar `Nav placement` (`sidebar|avatar|command-palette|shortcuts|none`) si la task agrega un destino de navegación visible — regla y presupuesto en `docs/architecture/agent-invariants/NAVIGATION_SURFACE_ALLOCATION_CONTRACT.md` (TASK-1389, gate `pnpm nav:budget`);
    - resolver Composition Shell, Adaptive Card density, Floating Surface/Sidecar/Dialog si aplica;
    - declarar estados visuales obligatorios;
    - declarar copy source;
@@ -518,6 +519,20 @@ Cuando el checkpoint es auto-aprobable:
   7. **desbloquear a quien te citaba** — ver abajo; lo verifica `task:lint`
 - Si el trabajo implementado quedo listo pero falta alguno de los puntos anteriores, el estado correcto sigue siendo `in-progress`
 - El agente no debe responder "listo", "cerrado" o equivalente mientras la task siga viva en `docs/tasks/in-progress/`
+
+⚠️ **Orden de los gates de cierre: el context gate va ÚLTIMO** (desde 2026-08-09). `docs:closure-check`
+**no** incluye `docs:context-check:strict` — son gates distintos (`closure-check` = closure documental +
+`feature-flags-audit --strict` + doc-index de creative studio). Y `context-check:strict` mide techos de
+`Handoff.md`/`project_context.md`, así que **cualquier edición posterior a esos archivos lo invalida**:
+los pasos 4 y 5 de arriba son justamente ediciones a `Handoff.md` y `changelog.md`. Orden seguro:
+
+```text
+ediciones (Handoff/changelog/docs) → pnpm docs:closure-check
+  → pnpm docs:context-rotate --apply (si el gate lo pide) → pnpm docs:context-check:strict → commit
+```
+
+Correr el context gate antes de escribir el Handoff da un verde que ya no describe el árbol que vas a
+commitear. Dueño del contrato: `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md`.
 
 ### Desbloquear a quien te citaba (regla `stale-blocker`, desde 2026-08-08)
 

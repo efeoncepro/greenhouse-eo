@@ -1,9 +1,9 @@
 # Habilitar colaborador en Workforce Activation
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 2.1
-> **Ultima actualizacion:** 2026-06-01
-> **Modulo:** Personas y HR / Workforce Activation
+> **Version:** 2.2
+> **Ultima actualizacion:** 2026-08-10 por Claude (TASK-1388 — ruta de menu: dominio Personas en la zona Operacion)
+> **Modulo:** Personas / Workforce Activation
 > **Ruta principal:** `/hr/workforce/activation`
 > **Ruta admin:** `/admin/workforce/activation` (governance/transicional)
 > **Permisos:** `workforce.member.activation_readiness.read`, `workforce.member.intake.update`, `workforce.member.complete_intake`
@@ -16,7 +16,7 @@ La pantalla no reemplaza People, Nomina, Legal Profile, Payment Profiles ni Pers
 
 ## Donde aparece
 
-- Menu lateral: **Personas y HR → Workforce Activation**.
+- Menu lateral: zona **Operacion** → dominio **Personas → Workforce Activation**.
 - Directorio `/people`: colaboradores pendientes muestran accion que navega a `/hr/workforce/activation?memberId=<id>`.
 - Detalle `/people/[memberId]`: si la ficha esta pendiente o en revision, la accion tambien lleva al workspace de activacion.
 
@@ -48,7 +48,7 @@ Lanes principales:
 
 ## Flujo recomendado
 
-1. Entra a **Personas y HR → Workforce Activation**.
+1. Entra a **Personas → Workforce Activation** (zona Operacion del menu lateral).
 2. Selecciona una persona en la cola.
 3. Lee el inspector derecho. No partas por **Completar ficha** si hay blockers.
 4. Presiona **Resolver blockers**.

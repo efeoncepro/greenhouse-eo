@@ -7,6 +7,167 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-11 — Escaneo de malware activo sobre los archivos que suben desde afuera
+
+El escáner de firmas dejó de ser código latente y quedó operativo en staging y en
+producción. Todo archivo que entra desde afuera pasa ahora por dos revisiones
+complementarias: la estructural, que mira los bytes reales y detecta un ejecutable
+renombrado a `.pdf`, y ClamAV, que reconoce firmas de malware dentro de archivos que
+sí son del tipo que dicen ser. El peor veredicto gana. No es una función de
+reclutamiento: cubre el CV público, los adjuntos de Growth Forms y los pliegos y
+entregables que se cargan a una propuesta.
+
+Se verificó con postulaciones reales por el formulario público, no con mocks: un PDF
+válido queda adjunto y un archivo de prueba EICAR queda en cuarentena, sin que la
+persona que lo subió reciba ninguna señal distinta — avisarle a un atacante que su
+archivo fue rechazado le diría qué probar después. Si el escáner no puede
+pronunciarse, el archivo también se bloquea: es deliberado, y por eso una mala
+configuración es más peligrosa que no tener antivirus.
+
+Corre en un único servicio Cloud Run cerrado por IAM, ≈USD 19/mes, con las firmas
+actualizándose solas dentro del contenedor. De paso quedó corregida en el flag ledger
+una calibración de costo que estaba desfasada 24×: Cloud Run no cuesta USD 7,32 cada
+30 días sino ≈USD 169.
+
+## 2026-08-11 — Distribución de vacantes en Facebook, trazable y reusable
+
+Se difundieron las vacantes públicas `EO-OPN-0061` (Content Creator) y `EO-OPN-0009`
+(Account Manager) en grupos de Facebook ya unidos y afines; la expansión dejó diez
+envíos adicionales por rol, con nueve visibles y uno a moderación en cada caso al
+momento de verificar. El registro operativo conserva copy, beneficios aprobados,
+destinos, evidencia de estado y la decisión explícita de continuar sin imágenes.
+Hiring Desk, el manual de Careers y las skills espejo ahora separan con claridad la
+publicación canónica del opening de su distribución externa: confirmación humana,
+sin grupos nuevos ni DMs no autorizados, y nunca reintentar un estado ambiguo sin
+verificar antes el texto exacto.
+
+## 2026-08-11 — Radar Wherex reutilizable y documentado
+
+La skill de licitaciones incorpora el companion `wherex-radar-chrome-playwright.md`, el manual comercial y la
+CLI `pnpm wherex:radar`. Su setup aislado guarda la cuenta sólo en `.auth/` con `0600` y Git ignore; el runner
+usa un perfil Chrome separado, revisa **Nueva** y **Editando**, lee fichas y adjuntos técnicos temporales, y deja
+un reporte local protegido. Su salida es read-only y evidence-first; participar, responder, cargar o firmar sigue
+bajo control humano explícito. El flujo documentado continúa con el archivo de originales en OneDrive y con la
+verificación/alta por MCP HubSpot de empresa, deal y asociación en dos confirmaciones; no se eluden visores
+protegidos ni se guardan URLs firmadas. El dictamen exige leer la descripción completa y el Centro de mensajes →
+Preguntas, porque ahí pueden estar el máximo de presupuesto, pago, alcance, inicio, facturación y exclusiones; si
+el reporte no contiene esas aclaraciones, se revisan en la UI autenticada antes de clasificar. La misma fuente ahora
+documenta el cierre de una postulación: precio desde cotización aprobada → condiciones/adjuntos → reconciliación
+en resumen → aceptación y envío únicamente con confirmación humana final.
+
+## 2026-08-11 — Oferta completa para Ajinomoto LIC-962
+
+Se redactó la propuesta técnica y económica para el programa influen-SER Team de Ajinomoto del Perú, con ledger
+trazable al brief y a las respuestas de Wherex, matriz de cumplimiento, límites de alcance y condiciones de
+facturación Chile–Perú. La oferta fija S/ 7.000 mensuales sin IGV peruano y S/ 84.000 referenciales para los 12
+meses de la ficha; no promete resultados de plataforma ni producción ilimitada. Se emitió la cotización XLSX y
+se compuso una presentación técnica de 11 láminas, validada por el composer. Ningún precio, adjunto, término o
+envío fue ingresado en Wherex. El blueprint interno conserva el gate de Finanzas por costo cargado/squad y la
+revisión tributaria previa a adjudicación.
+
+## 2026-08-10 — TASK-1685 cerrada: el portal cliente tiene un solo primitive de visibilidad
+
+El menú del portal cliente y la puerta de cada página dejaron de decidir por su cuenta. Existe un solo
+predicado —`acceso = interna ∨ (¬revocada ∧ (vistaBase ∨ móduloDeLaOrgLaDeclara))`— y lo consumen los
+cuatro caminos: page guard, lista base del menú, ⌘K y layouts de ruta. Antes el menú preguntaba por el
+ROL y la puerta por el MÓDULO contratado, y ninguna de las dos mitades podía observar a la otra:
+medidos contra PG, eran **36 enlaces que el menú ofrecía y la puerta negaba**, sobre los 8 usuarios
+cliente activos, incluidos los 3 reales de Sky Airlines. Hoy el menú muestra exactamente lo que se
+puede abrir. Un `user_view_overrides` con `override_type='revoke'` pasó de decorativo a cerrar la
+puerta de verdad.
+
+Cambio de acceso, no sólo de experiencia: cuatro rutas de detalle del portal (`/proyectos/[id]`,
+`/campanas/[campaignId]`, `/sprints/[id]`, `/notifications/preferences`) no tienen guard propio y su
+única puerta era un layout que gateaba por el carril de rol — un cliente cuyo rol concedía la vista
+pero cuya organización no tenía el módulo entraba al detalle por URL. Los cuatro pasan al guard
+canónico.
+
+Verificado contra PG antes y después: los 24 pares usuario×vista contratados quedaron intactos —ningún
+cliente perdió una superficie que su organización pagó— y los enlaces muertos bajaron de 36 a 0. Sin
+migraciones y sin feature flag: la tabla de overrides estaba vacía, así que el delta de acceso es cero.
+`role_view_assignments` deja de gobernar vistas `cliente.*` (para el portal interno sigue siendo el
+carril canónico) y un lint en `error` impide reintroducir la segunda fuente. Cierra `ISSUE-148`.
+
+## 2026-08-10 — Task planner: un resultado `legacy=1` deja de ser registrable
+
+Se corrigió TASK-1686 para preservar los cinco marcadores HTML `ZONE` del template y se endurecieron los
+planners `.codex` y `.claude`: antes de tocar registry/README o commitear, toda task nueva debe pasar
+`pnpm task:lint --task TASK-###` con `template=1 legacy=0 errors=0 warnings=0`. La salida `legacy=1`,
+aunque tenga cero errores, es un fallo bloqueante. La reparación también completó los contratos
+wireframe/flow/motion/readiness de TASK-1686; no cambió runtime, rutas, acceso ni la implementación de
+la task.
+
+## 2026-08-10 — TASK-1389 cerrada: la navegación quedó con candado anti-regresión
+
+Cierra el programa de navegación del día (1388 → 1686 → 1389): Contrato de Asignación de Superficies
+canónico (qué destino va a qué superficie, sin duplicar, nada nuevo colgado del primer nivel fuera de
+zonas) + campo `Nav placement` obligatorio en tasks con destino visible + gate `pnpm nav:budget` que
+mide el árbol real del rail interno contra el presupuesto (8 slots top-level · profundidad 2 · cero
+`/my/*`) y el manifest. Nació directo en `error` con 0 violaciones medidas; doble cobertura CI (suite
++ job en design-contract.yml). Lo que infló el sidebar a 96 hojas ya no puede repetirse en silencio.
+
+## 2026-08-10 — TASK-1686 cerrada: el colaborador puro deja de ver un portal ajeno
+
+Continuación directa de TASK-1388, mismo día: la rama no-interna del menú bifurca con
+`isPureCollaborator` y el colaborador (solo rol Colaborador) ve exclusivamente su portal — rail =
+Mi Greenhouse + Mi Ficha + recursos concedidos; avatar = identidad + Mi Perfil + salir. Se cierran
+los shortcuts cliente sin gating del avatar, el heading "Mi Cuenta" vacío y el borde de claims
+vacíos. El trigger del avatar pasa a botón semántico (aria + teclado + Esc/restore) para TODAS las
+audiencias. Cliente, interno e híbrido my+client conservan su salida byte-a-byte (tests de control
+19+7). Evidencia GVC con la persona collaborator real, baselines durables y scorecard 5.0.
+
+## 2026-08-10 — TASK-1388 cerrada: la navegación interna se reparte entre sus 3 superficies
+
+Reequilibrio del portal interno en develop (5 commits, sin push): el rail pasa de 12 grupos top-level
+a 3 zonas (Operación · Administración · Recursos) con dominios colapsables uniformes; las hojas
+personales `/my/*` viven ahora en el dropdown del avatar (header de perfil clickeable, sin atajos
+admin duplicados) servidas por el builder canónico `src/lib/navigation/my-nav-items.ts`; y hay UNA
+sola palette ⌘K (la `CommandPalette` de TASK-696, ahora con filtro de audiencia + recientes +
+acciones — la `NavSearch` retirada exponía el `VIEW_REGISTRY` completo sin filtrar).
+
+- Cero cambios de ruta/URL ni de gating: el set de hojas por rol quedó fijado por test de identidad
+  (`VerticalMenu.test.tsx`, interno + no-interno).
+- Dedup: Sample Sprints con hogar único en Comercial, Growth como sección de Comercial, "Spaces
+  (admin)" desambiguado, Herramientas IA una sola vez, `verticalMenuData.tsx` legacy borrado.
+- Los 4 hallazgos a11y del chrome que TASK-1675 midió quedaron cerrados: focus ring en el rail,
+  región scrollable con role/label/foco, toggle del drawer accesible, desborde de 8px del panel.
+- Evidencia GVC premium (3 scenarios, desktop+390px) + scorecard 4.93 + baselines durables
+  promovidos. Cerrada el mismo día con autorización del operador: build de producción verde, test
+  full (10.447), `UI ready: yes` (card-sort formal queda como validación posterior no bloqueante).
+
+## 2026-08-09 — Barrido documental del carril cliente: el doc de contrato estaba invertido
+
+Tres auditorías paralelas (arquitectura, docs funcionales/manuales, skills) tras los dos releases.
+
+- 🔴 **El §0 Status de `GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1` afirmaba que no existían cuatro piezas que
+  se implementaron entre `TASK-824` y `TASK-828`** — carpeta, namespace de API, schema y modelo de
+  módulos. Tres meses así, y es lo primero que lee un agente que abre el doc de contrato del dominio.
+- ⚠️ **Defecto vivo que causó el assignment de hoy:** `/creative-hub` no existe y Sky Airlines ve el
+  enlace. Señal nueva `identity.client_portal.assigned_view_without_route` (hoy en 1). La condición la
+  crea un cambio de DATO, no un deploy, así que ningún gate de código la veía — y
+  `route-reachability-gate` sólo cubre la dirección contraria.
+- Los dos companions de invariantes no tenían nada del page guard ni de la derivación invertida, que es
+  justo lo que un agente carga al tocar el dominio. Agregados.
+- Cinco aprendizajes de proceso a sus skills dueñas: el context gate va último, un gate con expectativa
+  hardcodeada no prueba el motor, un override de lint fuera del alcance de la regla no protege nada,
+  `VERCEL_ENV` nunca `NODE_ENV`, y una nota del Handoff no es evidencia.
+
+## 2026-08-09 — El carril del portal cliente, cerrado y verificado EN PRODUCCIÓN (release `ee0d568b8614`)
+
+Segundo release del día. Manifest `released`, watchdog `drift_count=0`, **sin bypass del batch policy**
+(cero migraciones — el contraste con el release de la mañana, que sí lo necesitó, muestra que la
+diferencia es la presencia de migraciones y no el tamaño del batch).
+
+- **Verificación completa en producción:** 9 rutas × 3 personas con sesión real. Las 3 vistas base
+  sirven `200`, las 6 module-gated redirigen a `/home?denied=<slug>`, cero `resolver_unavailable`, y
+  `/proyectos` sirve `200` al operador interno donde antes devolvía `/401`.
+- 🔴 **Corrección de un supuesto propio:** `agent-session` **sí** funciona en producción
+  (`AGENT_AUTH_ALLOW_PRODUCTION` seteada desde ~90 días). Lo negué toda la sesión tomándolo de una nota
+  del Handoff sin verificarlo. Postura abierta en `TASK-1684`.
+- Dos aprendizajes de release documentados en runbook + ambas skills: `vercel redeploy` no arregla un
+  staging cancelado por docs-only, y el context gate va último porque `docs:closure-check` no lo
+  reemplaza.
+
 ## 2026-08-09 — La verificación en staging del portal cliente encontró dos defectos más
 
 Recorrí las 9 rutas × 3 personas con sesión real contra staging. El fix quedó confirmado en runtime
@@ -1035,205 +1196,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   fingerprint—, el Slice 4 de rutas legacy y los mecanismos declarados con evidencia por proveedor. Los canaries de
   Omni siguen bloqueados por el transporte, que pertenece a `TASK-1504`; por eso el peso reordenado es una mejora
   razonada, no verificada.
-
-## 2026-08-02 — Contrato route-driven del Producer y corrección planificada de Omni
-
-- Se registró TASK-1633 como foundation backend-critical: operación, slots/roles de entrada, controles creativos,
-  mecanismo `native-parameter|prompt-semantic|reference-conditioned|preprocessed|postprocessed|unsupported` y
-  output contract pasan a ser dato versionado de ruta consumido por UI/BFF/SDK/MCP/CLI/workers.
-- TASK-1504 quedó corregida documentalmente: Omni no demuestra `{video,audio}` separado, reference-to-video acepta
-  imágenes, duración/ratio deben llegar a Vertex y text/image/reference requieren rutas/promociones independientes;
-  edit/continuidad permanecen en TASK-1573.
-- TASK-1552 conserva ownership único del composer: prompt persistente, referencias transversales, cámara separada
-  de motion transfer y modelo estable. El rollout exige una generación UI nueva de Seedance y una Omni con cobro,
-  playback, retención, lineage y governance verificados, sin repetir evaluación/promoción/fondeo de Seedance.
-- TASK-1469 puede avanzar en paralelo con TASK-1633 y debe cerrar antes de TASK-1632; el wake event-driven queda
-  explícitamente post-Omni estable/canary-confirm. No hubo código, provider calls, gasto, deploy ni runtime.
-- La reserva provisional Finance `TASK-1633…1643` nunca se materializó; sus candidatas deben reenumerarse desde
-  TASK-1634 si se confirman.
-
-## 2026-08-02 — Cotización headless y composición opcional de Proposal Studio
-
-- ADR-021 quedó aceptado: Finance Core nace con plan de cuentas versionado, entidad/ledger, períodos, money/FX/UF,
-  dimensiones, eventos económicos y contratos de diario; Cost Subledger es la primera vertical y General
-  Accounting extiende después la misma foundation. No se autorizó posting, migraciones ni sustitución de Nubox/SII.
-- El ADR propuesto de cotización agentic define el límite headless: kernel determinista compartido,
-  consumidores UI/Nexa/API/MCP/agentes y autonomía graduada sin bypass de identidad, approval ni auditoría.
-- Proposal Studio distingue evaluación económica interna, versión de cotización, paquete económico congelado
-  y proyección client-facing. Las propuestas pueden ser técnicas solas, económicas solas, separadas,
-  combinadas o mixtas; cualquier monto embebido deriva del mismo SSOT económico.
-- Se registraron como gaps —no como capacidad implementada— el `quote_id` universal post-GO, el snapshot
-  parcial de cabecera, el cross-check económico y la proyección de render incompletos. La skill de licitaciones
-  quedó alineada en Codex y Claude.
-- El orden se corrige a Finance Core reference → Economic Event/journal shadow → Live Cost Subledger → Profile
-  Resolution/CostCard/golden set → `TASK-609` read-only → economic package/Proposal → MCP/provider y writes
-  gobernados → Q2C/actual-vs-standard → General Accounting. No hubo cambios de schema ni runtime.
-- `EPIC-012` y `EPIC-029` registran 11 candidatos sin IDs reservados; tras asignar TASK-1633 a Globe deben
-  reenumerarse desde TASK-1634 si superan el checkpoint de confirmación del task planner.
-- En SKY se agregó una V2 técnica append-only enriquecida de 29 láminas con evidencia viva por enlace y estado local
-  `workshop_only`; se recuperaron Stack Operativo, diagnóstico, escalera IA, informe, Content Hub, portal y prueba social.
-  El primer borrador comprimido de 17 láminas se conserva como histórico; se construyó también la económica V2 separada: Core de **CLP 3.000.000 netos/mes sin IVA**,
-  IVA 19% de **CLP 570.000** y total mensual con IVA de **CLP 3.570.000**, con newsletter incluida, Addons
-  separados, deck `PricingFull` de 9 láminas y Excel generado. La validación de capacidad y margen sigue
-  pendiente antes del registro productivo.
-- Actualización 2026-08-03: Word queda únicamente como contexto del flujo actual en documentación interna;
-  la técnica, la económica, ambos decks, el Excel y el correo proponen Notion/Content Hub para grilla, briefs,
-  fuentes, comentarios, estados, QA, aprobaciones y ciclo de vida. Se recompusieron los decks, se regeneró el
-  Excel desde su JSON fuente y la síntesis quedó en HubSpot como nota `114121518673` sobre el deal `62535094842`;
-  no se alteraron la etapa ni el monto del deal. El cierre sigue `workshop_only`.
-
-## 2026-08-02 — Gemini Omni: evidencia legal corregida y checkpoint durable
-
-- Globe `62337b483` quedó en `main` con driver gobernado y simetría de configuración/secret/IAM entre API y
-  Producer worker para `ref/motion/reference-v1 / vertex-omni / gemini-omni-flash-preview / preview`; CI
-  `30743786928` terminó verde.
-- Globe `fa286dbd` corrigió la idempotencia de `auto-promote` para incorporar la atestación/policy sin duplicar la
-  route revision; CI `30744034457` terminó verde. API `30744857697` y worker `30744857698` quedaron desplegados;
-  OpenTofu aplicó `1 add, 2 change, 0 destroy`, sin deploy de Studio.
-- `auto-promote` `30745031010`, policy reader `30745219391` y la saga
-  `promotion_922157fa-b708-45cc-8bbf-b08d761afb21` terminaron correctamente. La policy
-  `arp_8090d31ae570c016f84cad0f7aee09ba84578f1dbd3622074a38cfa03a839ff5` conserva la atestación corregida,
-  `no-sublicense` y el digest de términos exacto; los readbacks finales reconciliaron saga `activated` rev. 7,
-  readiness promovido, route rev. 7, binding habilitado y circuito cerrado.
-- El candidato de evaluación retenido no se reutilizó como canary productivo.
-- La atestación anterior declaraba sublicencia y términos genéricos incorrectos. El Producer autenticado firmó
-  una nueva atestación inmutable con uso comercial/entrega permitidos, sublicencia denegada y digest exacto
-  `sha256:04e949c5…e53d4b`. El Producer sigue mostrando 784 créditos y el modelo exacto, pero `Elementos` está
-  deshabilitado en dos pestañas con `Todavía no hay un modelo publicado para este modo`; no se ejecutó gasto,
-  run, output ni `canary-confirm`. Queda pendiente una única ejecución cuando la superficie gobernada lo exponga.
-- TASK-1632 permanece separada y `to-do`: formaliza dentro de Globe el wake event-driven desde completion del
-  proveedor hasta Asset Governance; no es un handoff Greenhouse ni reabre TASK-1614.
-
-## 2026-08-02 — Cierres canónicos: TASK-1614 y Proposal Studio
-
-- Se agregó `proposal-studio.json` al workspace scaffoldeado y `pnpm tender:canonical-gate <slug>` como gate
-  fail-closed: `deck:compose`/`.captures` se reconocen como taller, no como cierre productivo.
-- El gate exige Proposal registrada con actor humano, `ResolvedCompositionManifest` usado por un render job,
-  PDF/previews versionados en el asset store, vínculo `proposal_assets` y verificación autenticada en Portal/API.
-- `pnpm qa:gates --changed` detecta el workspace modificado y reporta `BLOCK` si la cadena no está completa.
-  Brightcell quedó registrada honestamente como `workshop_only`; no se mutó runtime ni se creó una Proposal.
-- TASK-1614 quedó `complete` tras un canary único de Seedance R2V: run `bbe6dfff…`, output MP4
-  `sha256:93adbf46…`, 16 créditos, playback/governance verificados y saga `promotion_557d…` en `canary_passed` rev. 9
-  (`30742268557`).
-
-## 2026-08-01 — Cierre de WIP documental y comercial
-
-- Se registraron ADR-019 (evaluación asíncrona durable de Globe, Accepted e implementada) y ADR-020 (export a
-  Salesforce Marketing Cloud Content Builder, Proposed y sin autorización runtime), ambos enlazados desde los
-  índices canónicos.
-- Brightcell LIC-95 quedó consistente: implementación única + tres paquetes mensuales, propuesta/deck económico
-  separados, IVA explícito, HubSpot Free acotado y gate de Finance. El Composer produjo 9 láminas y todas fueron
-  revisadas visualmente sin recortes antes del cierre.
-- Polpaico LIC-6533 quedó clasificada como discovery interno en HOLD/NO-BID provisional. Se retiró el stub
-  económico renderizable de monto cero, se corrigieron referencias a decks inexistentes y se minimizaron enlaces
-  profundos/identificadores personales; no se emitió ni envió una oferta.
-
-## 2026-08-01 — Studio Credits operativo por UI y OAuth PKCE
-
-- Greenhouse `develop` y Globe `main` quedaron desplegados con migraciones y OAuth activos. La operación live
-  `23db5b0e-89dd-4661-9b8d-c12f9be4ad7a` aseguró 800 créditos efectivos sobre cap 1500 mediante un único acto
-  atribuido, sin segundo confirmante obligatorio ni break-glass.
-- `ensure-funded` crea o reutiliza el pool mensual determinístico dentro de la misma transacción económica. La UI
-  Greenhouse, el CLI OAuth PKCE y Producer devolvieron 800 efectivos, funding 800, cap/remaining 1500 y cero
-  blockers. ISSUE-124 pasó a resolved.
-- Globe conserva `main` como rama predeterminada/integración/release; Greenhouse permanece en `develop`. No se
-  creó ningún worktree ni se ejecutó un release completo de Greenhouse. El contrato quedó endurecido en el
-  `AGENTS.md` y CI de Globe, el proceso/template/planners de tasks y las 97 tasks activas de EPIC-028; el helper
-  histórico de sincronización de worktrees quedó retirado fail-closed, pre-commit dejó de crear stashes temporales
-  y el harness Codex ahora detecta regresiones.
-- El worker de expiry quedó promovido desde Globe `main` con scheduler minutely, flag y observabilidad activos.
-  El digest `sha256:d8295862…bae9` pasó deploy exacto, canary y OpenTofu sin drift. Dos holds históricos
-  `submission_unknown` se reconcilian/difieren con `failed=0`; no se liberan a ciegas.
-
-## 2026-08-01 — Studio Credits: workbench y self-view desplegados
-
-- TASK-1483 agrega proyecciones fail-closed de pools, grants, budgets, forecast, alertas y ledger, contexto de
-  audience/período/freshness, preview antes del ensure y evidencia navegable sin duplicar lógica económica.
-- TASK-1628 endurece el self-status con coverage/freshness, aislamiento del daily fence, loading/retry/last-good
-  stale, ARIA/foco/click-away y cifra efectiva visible en mobile.
-- Pasaron GVC premium desktop/mobile para el workbench, su drawer mobile y Producer (14 frames), además de
-  teclado, reduced motion, accesibilidad, overflow y runtime. Greenhouse `f899d951b` quedó Ready en staging y
-  Globe `e31518b430b8` desplegó API/Studio con SHA exacto y tráfico 100 %.
-- El smoke Chrome autenticado confirmó ambas superficies, readback 800/800/1500/0/0, daily fence 500/120/380 y
-  cero errores de consola. Fue sólo lectura: no hubo nuevo fondeo, release completo de Greenhouse ni worktree.
-
-## 2026-08-01 — Operación multiagente: checkout compartido único
-
-- Se retiraron dos worktrees temporales de MCP creados incorrectamente y se prohibieron los worktrees, checkouts
-  aislados y carpetas clonadas como workaround operativo. Ante WIP, conflictos o divergencias, los agentes deben
-  preservar el checkout compartido y pedir dirección al operador.
-- El contrato se canonizó en `REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md`, con routers, prompts, skills y la
-  memoria global de Claude alineados; el modelo histórico de worktrees quedó explícitamente superseded.
-- Globe ADR-018 queda actualizado como dirección **continuity-first y native-first para Android/iOS**: React Native +
-  Expo development builds/CNG para la companion, web/PWA como fallback, desktop para composición profunda y Globe
-  cloud como autoridad. El vertical slice debe validar PKCE, deep links, captura, upload interrumpible, push
-  reconciliable, handoff y compatibilidad binary/API; la skill existente `greenhouse-globe`, los docs
-  funcional/manual y Handoff contienen las invariantes. No hay app publicada ni cambios de runtime, flags, auth,
-  push, billing, créditos, providers, distribución ni rollout externo.
-
-## 2026-08-01 — TASK-1630: convergencia del control plane de créditos de Globe
-
-- Se registró `TASK-1630` como umbrella P0 y se rebaselinaron TASK-1468/1482/1483/1586/1628/1629 contra el runtime
-  observado: ledger histórico, funding vigente, caps/holds y operaciones de fondeo dejan de tratarse como una sola
-  cifra implícita.
-- La secuencia queda fijada como truth/ensure-funded → holds/expiry/settlement → lifecycle/status/recovery →
-  autoridad one-shot + adapters one-command → workbench Greenhouse → self-view Producer → paridad
-  MCP/comercial. Globe conserva la máquina de estados económica; Greenhouse sólo proyecta/adapta.
-- ADR-015 ahora aprueba que una instrucción atribuida del CEO pueda autorizar una operación acotada y que el
-  mismo agente autenticado puede proponer y confirmar end-to-end cuando la política del workspace no exige segundo
-  confirmante. La autoridad one-shot y sus carriles `oauth|browser` están desplegados y verificados live para el
-  workspace interno; clientes externos y fondeo comercial siguen gated.
-- La primera corrección ejecutable ya cierra el aislamiento de workspace: API Platform conserva los bindings
-  emitidos por OAuth y tanto el bearer como las rutas admin rechazan un `globeWorkspaceId` no vinculado antes de
-  invocar el broker. No hubo fondeo, deploy, migración, release ni promoción a `main`.
-- El workbench Greenhouse conecta `Asegurar capacidad` a la misma state machine one-shot y agrega recovery
-  readback-first para `outcome_unknown`; TASK-1483 y TASK-1628 cerraron rollout y smoke live.
-- TASK-1630 cerró live: MCP `globe.credits.funding.ensure` pasó OAuth/Entra + WIF + RFC 8693 + Greenhouse command;
-  los dos outcomes antiguos liberaron 14+16 mediante decisions Finance gobernadas; los 500.000 se conservaron
-  append-only y se retiraron de toda proyección operativa UI/API/CLI/MCP.
-- La documentación funcional y el manual quedaron reconciliados con el sistema live: UI recomendada, paridad
-  API/CLI/MCP sobre un solo ledger, autoridad CEO one-shot, `ensure` readback-first y saldo posterior a Seedance
-  `800 → 784` bajo cap 1500. Studio Credits no se presentan como dinero, revenue ni tokens de proveedor.
-
-## 2026-08-01 — Efeonce MCP: Globe fleet reader end-to-end
-
-- Se habilitó únicamente `globe.producer.fleet.list`: el gateway llama el reader canónico `POST /v1/readers`,
-  sin importar base de datos, storage ni SDKs de proveedor. La respuesta conserva rutas de disponibilidad pero no
-  house, provider slug, costo de vendor ni margen.
-- Studio Credits reutiliza este mismo gateway mediante el write interno one-shot `globe.credits.funding.ensure`;
-  no se creó otro MCP. El acceso de clientes externos continúa gated por identidad B2B/multitenant.
-- Globe `#84` (`001ce1b`) quedó desplegado como `globe-api-internal-00179-qcz`; el gateway `ce593f2` como
-  `efeonce-mcp-gateway-00009-9c6`, ambos con tráfico 100%. El canary Entra PKCE real pasó initialize, discovery
-  y la tool de fleet por `https://mcp.efeonce.org/mcp`.
-- El principal downstream tiene exclusivamente `globe.producer.catalog.read` y el binding
-  `greenhouse-org:efeonce`. No se habilitaron writes, runs, assets, review, delivery, créditos ni reveal-house.
-- El gateway limita inicialmente Cloud Run a `concurrency=80` y `maxScale=5` efectivo. Clientes externos siguen
-  bloqueados: el cliente interno Entra emite ambos scopes incluso cuando solicita el base, por lo que falta
-  separar asignación/consentimiento de entitlements y repetir el deny con identidad base-only.
-- La skill espejo `efeonce-mcp-platform` y sus matrices de verificación ahora codifican esa excepción internal-only
-  y exigen evidencia real de entitlement/revocación base-only antes de cualquier rollout B2B.
-- La decisión de identidad cliente y `TASK-1631` aclaran la relación con el login Greenhouse: los runtimes,
-  cookies, sesiones y audiencias permanecen separados, pero un cliente existente se enlaza al mismo
-  `identity_profile` y Account 360. La coexistencia inicial debe converger después al mismo plano externo de
-  autenticación; no se permite una segunda identidad o contraseña permanente. La revisión ahora documenta que
-  Greenhouse ya tiene NextAuth + broker OAuth sister-platform reutilizable, pero todavía no un authorization server
-  MCP público: TASK-1631 compara WorkOS, broker extraído independientemente a `auth.efeonce.org` y hybrid, sin
-  compartir cookie/`NEXTAUTH_SECRET` ni hacer que un release Greenhouse sea el rollback de OAuth externo.
-- Las skills de arquitectura globales y locales (`arch-architect` de Claude y `software-architect-2026` de Codex)
-  ahora cargan el router MCP, el provider dueño y este mismo gate antes de proponer otra tool, OAuth surface o
-  binding cross-runtime.
-
-## 2026-08-01 — Efeonce MCP: gateway independiente, OAuth Entra y front door
-
-- Se creó `efeoncepro/efeonce-mcp` como repo privado independiente con Node 24, TypeScript, Fastify, SDK MCP
-  v2, CI, container no-root, OpenTofu y delivery keyless por GitHub WIF. El PR `#2` quedó fusionado a `main`
-  en `d9c0c69` con CI verde.
-- El gateway corre en Cloud Run `efeonce-group/southamerica-west1`; un canary Entra authorization code + PKCE
-  validó resource, issuer, audience y scope reales: initialize `200` y Globe sin scope `403`.
-- Se promovió el Global External ALB sobre `34.111.78.237`; Cloud Run acepta sólo tráfico del load balancer y
-  `mcp.efeonce.org` ya resuelve desde HostGator y resolvers públicos. El certificado administrado quedó `ACTIVE`;
-  health/discovery OAuth respondieron `200` y `/mcp` anónimo rechazó `401` como corresponde.
-- Globe ya tiene su primer reader operativo; el resto de capabilities y cualquier write permanece fuera del
-  gateway hasta sus gates propios. El gateway no importa lógica, DB, storage ni credenciales de Globe.
-- Se incorporó la skill espejo `efeonce-mcp-platform` para Codex y Claude: enruta gateway, OAuth, edge e
-  integración de providers hacia las skills dueñas, y mantiene una verificación mecánica de paridad.

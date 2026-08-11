@@ -1,5 +1,276 @@
 # Handoff activo
 
+### TASK-1378 — ClamAV OPERATIVO en staging y producción (2026-08-11)
+
+El escáner de firmas está prendido en ambos entornos, con redeploy aplicado. **Un solo servicio `clamav`** en us-east4 (2 GiB, `min=1`, cerrado por IAM, 3,6 M firmas, `freshclam` dentro del
+contenedor) atendiendo a los dos entornos de Vercel.
+
+**Gate end-to-end cerrado con postulación real por el formulario público**, no con mocks. Turnstile no se manipuló:
+la app trae su propio camino de dev (`local-dev-captcha` cuando no hay site key fuera de producción). PDF válido →
+`clean` con `scanner=structural+clamav-http`, `attached`. **EICAR → `infected` + `quarantined`** con la firma
+`Eicar-Test-Signature`. Ambos devolvieron 202 genérico al usuario, como está diseñado.
+
+Quedan dos postulaciones de prueba en el Hiring Desk con identidad inequívoca (`PRUEBA TASK-1378 / NO CONTACTAR`,
+correos `task-1378-scan-*@efeonce.org`) sobre `EO-OPN-0009`. No se borraron: `asset_scan_results` es append-only y
+borrar filas de la BD productiva compartida no es decisión del agente. HR las descarta en el Desk.
+
+Pendiente menor: confirmar la primera postulación PRODUCTIVA registrando `structural+clamav-http` en
+`asset_scan_results`. El flujo recibe ~13/día (campaña de Facebook de `EO-OPN-0061`/`EO-OPN-0009`). Si algo fallara,
+rollback = `vercel env rm ASSET_MALWARE_SCAN_ENABLED production` + redeploy, <10 min.
+
+Dato para no repetir un error: **producción resuelve credenciales GCP por `service_account_key`, no por WIF**
+(staging sí usa WIF). Ambos caminos quedaron verificados por separado contra su propio servicio.
+
+Costo steady: **≈USD 19/mes**. Había desplegado dos servicios copiando el patrón de los otros workers; el operador
+señaló que staging y producción comparten UNA sola base, y eso desarmó la justificación: el scanner es stateless y
+duplicarlo no aislaba nada. Se borró `clamav-staging` y el canary de imagen nueva sale por revisión etiquetada sin
+tráfico, que Cloud Run da gratis. De paso quedó corregida en el ledger la calibración que decía "todo Cloud Run
+cuesta USD 7,32/30d": son ≈USD 169/30d.
+
+### ISSUE-149 RESUELTA — drift TS↔DB de route_group_scope (2026-08-11)
+
+El avatar vacío que reportó el operador tras TASK-1388 era drift de DATOS: 3 filas de
+`greenhouse_core.roles.route_group_scope` (efeonce_admin/operations/hr_payroll) drifteadas del mapeo
+TS que es solo fallback. Migration de paridad aplicada + verificada; las sesiones vivas se auto-sanaron
+por el refresh de claims (5 min) sin re-login — verificado en la sesión real del operador. El fix del
+trigger ⌘K (lenguaje topbar) salió en el mismo lote. Deuda señalada en la issue: 2 roles fantasma en DB
+(`employee`, `finance_manager`) y falta un drift-guard mecánico TS↔DB de route groups.
+
+### Campaña de vacantes en grupos de Facebook (2026-08-11)
+
+Se difundieron los openings públicos `EO-OPN-0061` (Content Creator) y `EO-OPN-0009`
+(Account Manager) en grupos ya unidos y afines. La expansión cerró con diez envíos adicionales por rol:
+nueve visibles y uno enviado a moderación en cada caso. El detalle de copy, beneficios aprobados, grupos,
+estados y decisión de publicar sin imágenes vive en
+`docs/operations/hiring/2026-08-11-facebook-vacancy-distribution.md`. No cambió el runtime ni el estado
+de Hiring, por lo que no requiere ADR. Pendiente operativo opcional: revisar las dos publicaciones en
+moderación antes de contarlas como visibles.
+
+### Proceso reusable — radar Wherex con CLI Playwright (2026-08-11)
+
+Quedó canonizado para futuras solicitudes en la skill `greenhouse-public-private-tenders` y el manual
+`docs/manual-de-uso/comercial/revisar-licitaciones-wherex-con-chrome.md`. `pnpm wherex:radar:setup` guarda
+correo y clave sólo en `.auth/` con `0600`; `pnpm wherex:radar` usa un perfil Chrome aislado, revisa **Nueva** y
+**Editando**, lee fichas y adjuntos, y genera el reporte protegido local. El dictamen exige además leer la
+descripción/comentarios generales y el Centro de mensajes → Preguntas: presupuesto, alcance o condiciones pueden
+vivir allí; no se infieren desde el título ni el brief. No participa, responde, carga,
+presenta ni firma. Pendiente operativo: correr el setup una vez en una terminal interactiva y calibrar selectores
+si Wherex cambió su interfaz. La continuidad de candidatas también quedó canonizada: los originales se archivan
+en OneDrive `Alineación/4. Comercial/Licitaciones/<Comprador>/` sin URLs firmadas; empresa, deal y asociación se
+verifican por MCP HubSpot y toda escritura requiere propuesta/confirmación, con la asociación confirmada una vez
+que la empresa tiene ID. Caso real del 2026-08-11: Ajinomoto y CINTERMEX creados/verificados; Polpaico ya existía
+y no se duplicó. Si el visor bloquea un guardado soportado, no se elude: se requiere una copia local verificable.
+Para Ajinomoto LIC-962, el expediente `docs/commercial/tenders/ajinomoto-lic-962/research/` conserva la evidencia
+de descripción, preguntas y mecanismo de postulación: servicio de 12 meses, cotización y presentación obligatorias
+(20 MB), condiciones y aceptación final. Aún no se ingresó precio, adjuntó archivo, aceptó término ni envió oferta.
+La mecánica reutilizable de postulación quedó además en la skill, el manual y la documentación funcional: servicio
+→ condiciones/adjuntos → resumen/reconciliación → aceptación y envío sólo con confirmación humana final.
+
+La oferta de Ajinomoto quedó redactada y renderizada en el mismo expediente: `oferta-tecnica.md`,
+`oferta-economica.md`, `economica.json`, `deck-plan.json` y
+`propuesta-economica-ajinomoto-lic-962.xlsx`. La presentación técnica de 11 láminas se validó y renderizó
+localmente en `.captures/ajinomoto-lic-962/AJINOMOTO-LIC-962-TECHNICAL.pdf` (2,2 MB); no se cargó a Wherex.
+La propuesta oferta S/ 7.000 mensuales sin IGV peruano (S/ 84.000 referenciales por 12 meses), cubre operación
+remota de comunidad y deja audiovisual, diseño de alto volumen, presencialidad, pauta, premios y creadores
+externos como adicionales. Antes de presentar, quedan cuatro gates concretos: validar identificador de marca,
+asignar squad/capacidad y costeo cargado con Finanzas, confirmar documentación tributaria Chile–Perú y revisar la
+definición de embajador activo/corte FY 2026. No suplir esos gates con una aceptación de términos ni con un envío.
+
+### TASK-1685 CERRADA — un solo primitive de visibilidad del portal cliente; `ISSUE-148` resuelta (2026-08-10)
+
+Cuarta task de navegación del mismo día, en `develop`, local-first, **sin push**. Decisión del Slice 1
+delegada por el operador a `arch-architect` + overlay del repo: **(a′)** — el módulo autoriza, un
+`revoke` per-persona cierra, y **el menú consume el mismo predicado que la puerta**
+(`src/lib/client-portal/visibility/`, puro + adaptador server + contexto). Cuatro consumers, no dos:
+page guard, lista base del menú, ⌘K y layouts de ruta.
+
+**Medir cambió el diagnóstico dos veces, y por eso (a) literal no alcanzaba.** (1) La divergencia viva
+eran **36 enlaces muertos** en la dirección *el menú promete y la puerta niega*, sobre **8 de 8**
+usuarios cliente —incluidos los 3 reales de Sky Airlines— y **0** en la dirección que `ISSUE-148`
+enfatizaba (el merge aditivo de TASK-1675 repone todo ítem de módulo). (2) La intención de los 9 denials
+**estaba escrita** en sus migraciones: 6 son plomería anti-fallback que TASK-1678 dejó vestigial, 3 son
+diferenciación per-rol que hoy no afecta a nadie. No hizo falta preguntarle a nadie.
+
+**Hallazgo de ACCESO que la spec no tenía, y lo encontró el lint nuevo:** los layouts de `/proyectos`,
+`/campanas`, `/sprints` y `/notifications` gateaban por el carril de rol, y sus rutas de detalle
+(`[id]`, `[campaignId]`, `preferences`) **no tienen guard propio** — un cliente cuyo rol concedía la
+vista pero cuya organización no tenía el módulo entraba al detalle por URL. Los cuatro pasan al guard
+canónico.
+
+Verificado contra PG: **24 pares contratados intactos** (nadie perdió nada), enlaces muertos **36 → 0**,
+`revoke` cierra la puerta. Gates: `local:check`, `test:lint-rules` (21), suites focales 867. Sin
+migraciones, sin flags — `user_view_overrides` está vacía, así que el delta de acceso es cero exacto.
+
+**Continuidad:**
+- **Rollout pendiente**: falta ejercitar las 9 rutas con las personas agente contra staging/producción
+  (pasos 2-5 de §Production verification sequence). El código está completo y medido en local.
+- La señal `identity.client_portal.menu_gate_divergence` queda en **warning con 2**, y es honesto:
+  `cliente.ciclos` y `cliente.analytics` no las vende **ningún** módulo del catálogo, así que ninguna
+  organización puede alcanzarlas. Antes eran enlaces muertos; no se perdió acceso. Decisión pendiente:
+  venderlas en un módulo o retirarlas del catálogo y sus rutas.
+- **`TASK-1687` creada**: `/creative-hub` no existe y el bundle de SKY lo declara. Separada a propósito
+  (catálogo comercial ≠ semántica de autorización). **Nunca** quitarle el módulo a SKY.
+- **`TASK-286` desbloqueada con premisa nueva**: sembrar grants por rol para una vista `cliente.*` ya
+  no produce acceso; el carril es declararla en el módulo que la vende. Delta escrito allá.
+- Sigue abierto el bloque legacy de capability modules (`capability-modules-resolver-migration`, sin
+  ID): sus dos callsites quedaron con marker y dueño declarado.
+
+### TASK-1389 CERRADA — el candado anti-regresión de la navegación quedó armado (2026-08-10)
+
+Tercera task del programa de navegación cerrada el mismo día: Contrato de Asignación de Superficies
+(`agent-invariants/NAVIGATION_SURFACE_ALLOCATION_CONTRACT.md` + pointer en CLAUDE.md al límite del
+budget — quedan ~45 tokens de headroom — + campo `Nav placement` en el addendum UI) y gate
+`pnpm nav:budget` que mide el árbol REAL (evaluador puro + harness superadmin, cero drift de parser)
+contra el presupuesto medido (8 slots · profundidad 2 · zonas-solo-raíz · cero `/my/*` derivado del
+builder) + cross-check `surface` del manifest. **Nació directo en `error` con 0 violaciones**
+(la condición warn→error de la spec quedó cumplida por TASK-1388/1686 el mismo día; `--warn` es el
+escape documentado). Doble cobertura CI: test en la suite + job `nav-budget` en design-contract.yml.
+Continuidad: el tope del carril cliente/collaborator se calibra en su follow-up (module-driven — el
+insumo sería el resolver, no este evaluador); considerar extender el contrato a la topbar.
+
+### TASK-1686 CERRADA — el colaborador puro tiene su propia proyección (2026-08-10)
+
+Implementada el mismo día que su antecesora TASK-1388, en `develop` (4 slices, local): predicado
+`isPureCollaborator` en rail y avatar — el colaborador ve SOLO su portal (rail `/my` + Mi Ficha +
+plataforma concedida; avatar identidad + Mi Perfil + salir), se cerraron los shortcuts cliente sin
+gating, el heading "Mi Cuenta" vacío y el borde de claims vacíos; el trigger del avatar es un botón
+semántico cross-audiencia. my+client/client/internal byte-equivalentes fijado por tests de control
+(19+7). Gates TODOS verdes (suite full 10.460, build prod, 4 gates UI con scorecard 5.0,
+reachability 0 orphans); GVC con `agent-collaborator` + baselines durables promovidos. Continuidad:
+TASK-1685 hereda TRES consumers del predicado de visibilidad (Delta escrito allá); la deuda
+`aria-expanded` del chrome @menu sigue siendo la única abierta (dueña: scorecard TASK-1388).
+
+**Barrido documental post-cierre (3 subagentes, mismo día):** 29 docs/skills sincronizados con la
+navegación nueva — 7 de arquitectura (status de `GREENHOUSE_SIDEBAR_ARCHITECTURE_V1` superseded,
+Identity Access §Sidebar Composition reescrita, deep-link §palette, invariantes de shortcuts), 21
+funcionales/manuales (todas las rutas de menú "Growth top-level"/"Personas y HR"/"Mi Ficha en
+sidebar" → estructura vigente, con version bump), la skill `info-architecture`, manual NUEVO
+`docs/manual-de-uso/plataforma/navegar-el-portal.md` (las 3 superficies — el ⌘K no tenía doc en
+ninguna parte) y `src/data/searchData.ts` borrado (huérfano sin consumers tras retirar NavSearch;
+typecheck verde). Pendiente decidible: `roadmap-cockpit.md` internamente inconsistente (pre-existente
+a estas tasks — su ítem de menú se retiró el 2026-07-15 y el paso a paso aún lo cita).
+
+### TASK-1388 CERRADA — la navegación interna repartida en sus 3 superficies (2026-08-10)
+
+Implementación completa en `develop`, autorizada a cierre total por el operador ("termina todo lo que
+falta"): rail interno en 3 zonas (Operación · Administración · Recursos, acordeón nativo), `/my/*`
+rehomed al avatar (builder canónico `src/lib/navigation/my-nav-items.ts`), ⌘K único
+(`GlobalCommandPalette` sobre la `CommandPalette` de TASK-696, con filtro de audiencia — la
+`NavSearch` retirada exponía el registry completo), dedup + legacy borrado + los 4 fixes a11y de
+TASK-1675. Cero cambios de rutas/gating (test de identidad interno + no-interno). Gates TODOS verdes
+incluido `pnpm build` de producción y `pnpm test` full (10.447); baselines GVC durables promovidos
+(`scripts/frontend/baselines/task-1388-*`); scorecard 4.93. `UI ready: yes` con sign-off del operador.
+
+**Continuidad para quien siga:** (1) `TASK-1389` quedó desbloqueada — el sidebar está bajo el tope,
+su gate `nav:budget` es promovible a `error` (Delta escrito allá); (2) card-sort formal de nombres de
+zonas queda como validación posterior NO bloqueante (rename = 1 línea en `GH_INTERNAL_NAV`); (3) gap
+conocido del chrome: `@menu` no expone `aria-expanded` en triggers de submenú (intocable; estado
+canónico = clase `ts-open`, documentado en el scorecard) — decidir como deuda de chrome aparte;
+(4) la rama no-interna del menú quedó con punto de extensión limpio para `TASK-1685` (Delta escrito).
+
+### Cerrada — la decisión pendiente del portal cliente y las lecciones de la sesión del 2026-08-09
+
+**La decisión ya se tomó** (`TASK-1685`, entrada de arriba): opción (a′). La parada de esa sesión
+cumplió su propósito — decidir con cabeza fresca y midiendo — y el "no lo resuelvas con un `AND` en la
+puerta" se confirmó correcto: habría cerrado 6 pares contratados sin arreglar ninguno de los 36 enlaces
+muertos que eran el defecto real.
+
+**Lo que sigue siendo continuidad activa de esa sesión:**
+
+- `TASK-1684` — la postura de `AGENT_AUTH_ALLOW_PRODUCTION`, seteada desde ~90 días. Sigue abierta.
+- `TASK-1687` — `/creative-hub` no existe y el bundle de SKY lo declara; señal en 1.
+- **Una nota de este archivo no es evidencia.** Es la lección que produjo los tres errores de esa
+  sesión (afirmar sin verificar): el 403 "por diseño" de `agent-session` salió de una nota de acá y era
+  falso. Verificar contra runtime o PG antes de construir encima.
+
+### Barrido documental post-release: tres auditorías paralelas y dos defectos vivos (2026-08-09)
+
+Tres subagentes auditaron arquitectura, docs funcionales/manuales y skills. Encontraron cosas que el
+trabajo de código no había visto.
+
+**Lo que necesita quien siga:**
+
+1. 🔴 **El §0 Status del doc de contrato del portal cliente estaba INVERTIDO** y lo estuvo tres meses:
+   decía "NO existe `src/lib/client-portal/`", "NO existe `/api/client-portal/`", "NO existe schema
+   `greenhouse_client_portal`" y "NO existe modelo de módulos on-demand". Las cuatro se implementaron
+   entre `TASK-824` y `TASK-828`. Es lo primero que lee un agente que abre ese doc, así que lo mandaba
+   a construir de cero lo que ya existía — el carril paralelo que el spec vino a evitar. Corregido y
+   verificado contra filesystem y PG. **Lección:** un bloque "estado actual del repo" escrito cuando un
+   spec era propuesta se vuelve activamente peligroso si nadie lo da vuelta al implementarlo.
+2. ⚠️ **`/creative-hub` NO EXISTE y Sky Airlines ve el enlace.** Lo causé hoy: el bundle
+   `creative_hub_globe_v1` declara `cliente.creative_hub` → `/creative-hub`, y esa página nunca se
+   materializó. El defecto era latente desde el seed de `TASK-824`; **lo activó el assignment**, no un
+   deploy. Señal nueva `identity.client_portal.assigned_view_without_route` (warning, hoy en **1**).
+   Decidir: materializar la página o retirar el viewCode del bundle — **NUNCA** quitarle el módulo a
+   SKY, eso le saca superficies que sí funcionan.
+3. **`route-reachability-gate` sólo cubre una dirección.** Verifica página → enlace ("0 huérfanas") y
+   NO enlace → página, así que el enlace muerto pasa. Y no lo podría atrapar de todos modos: la
+   condición la crea un **assignment**, o sea un cambio de dato. Por eso el complemento es una señal y
+   no un test. Además hay **10 viewCodes cliente** apuntando a rutas no materializadas, y eso es
+   legítimo por diseño (regla vigente: declarar el `routePath` canónico aunque la página sea
+   forward-looking) — el riesgo aparece al asignarlos.
+4. **El menú del cliente puede prometer de más.** La lista base de 6 enlaces (Proyectos, Ciclos,
+   Equipo, Revisiones, Analytics, Campañas) se sigue mostrando **por rol**, no por módulo. No es fuga
+   de acceso —la puerta decide por módulo— pero ahora que las páginas dicen la verdad, es la confusión
+   de soporte más probable: enlace visible + empty state al entrar. Quitar el permiso al rol apagaría
+   enlaces legítimos de otros clientes, así que no es el fix.
+5. **`pnpm skills:mirrors` sólo valida 3 skills del manifest** (`efeonce-mcp-platform`,
+   `greenhouse-globe`, `greenhouse-globe-model-fleet`). NO cubre `qa-release-auditor` ni
+   `documentation-governor`: su paridad Claude↔Codex se verificó a mano. Si agregas una skill espejada,
+   no asumas que el gate la cuida.
+6. **`CLAUDE.md` está en 34.903/35.000 tokens — 97 de headroom.** Los cinco aprendizajes de proceso de
+   hoy se escribieron en su skill dueña y en `AGENTS.md`, no ahí, a propósito.
+
+### Barrido final de docs (2026-08-09) — tres cosas que necesitan tu decisión
+
+Un barrido de cierre corrigió lo que el trabajo del día dejó stale, **incluidas dos contradicciones en
+docs que yo mismo edité hoy** (el inventario del carril seguía diciendo que el lint estaba en `warn`, y
+el ledger de flags listaba `NODE_ENV` en la columna de runtime mientras su descripción decía
+`VERCEL_ENV`). Ambas corregidas. Y el conteo "3 abren, 6 empty state" **dejó de ser un dato del doc**:
+cambió el mismo día al asignarle Creative a SKY, así que ahora el inventario declara la regla —
+derivarlo de los datos, nunca heredarlo de un doc.
+
+Lo que **NO** decidí por ti:
+
+1. **`TASK-286` (client view catalog expansion) tiene la premisa vencida**: dice "11 view codes" y hoy
+   hay 25, y su alcance se solapa con `TASK-1685`. Reescribirla o cerrarla es tu llamada.
+2. **`TASK-1675`/`1678`/`1679`/`1680`/`1685` declaran `Epic: none`** aunque son el carril de
+   `EPIC-015`. Consecuencia mecánica: `epic-child-parity` las excluye del denominador, así que el
+   avance del epic se ve más chico de lo que es. Reasignarlas es trivial pero cambia métricas.
+3. **`/api/client-portal/*` no está en `GREENHOUSE_API_REFERENCE_V1.md`.** Documentarlo ahí depende de
+   si esa referencia pretende ser exhaustiva o sólo cubrir las lanes de plataforma.
+
+### Release 2026-08-09 (2.º del día) — el carril del portal cliente cerrado y VERIFICADO EN PRODUCCIÓN
+
+Manifest `ee0d568b8614-1ff03476-6a82-4e03-8dfc-2d49e3c30ce3` en `released`, run `31343569815`, target
+`ee0d568b86140d92224f9fdcad75cd6e1a6dcae4`, PR #186. Watchdog `drift_count=0`. **Sin bypass**: el batch
+policy dio `ship` (cero migraciones).
+
+**Lo que necesita quien siga:**
+
+1. ✅ **La verificación que dos releases dejaron pendiente está HECHA, en producción.** 9 rutas × 3
+   personas con sesión real contra `greenhouse.efeoncepro.com`: las 3 base sirven `200`, las 6
+   module-gated redirigen a `/home?denied=<slug>`, cero `?error=resolver_unavailable`, y `/proyectos`
+   sirve `200` al operador interno donde antes daba `/401`.
+2. 🔴 **`agent-session` SÍ funciona en producción — y yo dije lo contrario toda la sesión.**
+   `AGENT_AUTH_ALLOW_PRODUCTION` está seteada en Production desde hace ~90 días. Lo repetí tomándolo de
+   una nota de este mismo Handoff, sin verificarlo, y por eso declaré como "pendiente del operador" una
+   verificación que podía hacer yo. **La regla: una afirmación sobre runtime se verifica contra el
+   runtime.** Postura de seguridad abierta en `TASK-1684` (P2): la credencial de las personas agente
+   vive escrita en `CLAUDE.md`, así que endpoint + credencial documentada alcanzan para operar
+   producción como superadmin.
+3. **`vercel redeploy` NO arregla un staging `Canceled` por docs-only** — el gotcha #7 lo recomienda y
+   es un consejo incompleto: el redeploy reevalúa el mismo diff y cancela otra vez. La salida es tocar
+   un doc del set `deployControlDocs` de `vercel-ignore-build.mjs` (no cuenta como docs-only y fuerza
+   el build); si de todos modos hay que documentar el release, ese commit produce la evidencia como
+   efecto. Documentado en runbook + ambas skills como gotcha #11.
+4. **El context gate va ÚLTIMO y `docs:closure-check` NO lo reemplaza.** Dejé un run rojo en `develop`
+   (`31340366010`) por correr context-check, después agregar una entrada al changelog, y commitear con
+   closure-check verde. Orden seguro: ediciones documentales → closure-check → context-rotate si hace
+   falta → context-check:strict → commit.
+5. **Contraste útil entre los dos releases de hoy:** el de la mañana necesitó bypass del batch policy y
+   el de la tarde no. La diferencia fue **cero migraciones**, no el tamaño del batch.
+
 ### Verificación en staging del portal cliente, y dos defectos que salieron de ella (2026-08-09)
 
 Recorrí las 9 rutas × 3 personas con sesión de agente real contra **staging** (producción no acepta
@@ -320,272 +591,3 @@ búsqueda**, ortogonal a la severidad— porque sin él la higiene de sitio asce
 medición de **laboratorio** (Google rankea con datos de campo). Queda declarada, sin dueño, una
 cobertura que el audit NO tiene: acceso de crawlers de IA en `robots.txt`, ausencia de JSON-LD,
 conflicto noindex+robots y salud de sitemap.
-
-### Cutover `seo_v1 → seo_v2` — expand aplicado, falta migrar y contraer (2026-08-08)
-
-El rename de la clave del módulo era **breaking en los dos sentidos**: migración primero deja al
-código vivo pidiendo `seo_v1` ya superseded; código primero pide `seo_v2` que la base no tiene. Y no
-es sólo UI — el mismo predicado gatea los tres batches que le pagan al proveedor, que en la ventana
-saltarían con `no_entitlement` **en silencio**.
-
-Se aplicó la fase **expand**: `SEO_MODULE_KEY` queda para escritura y las lecturas usan
-`SEO_MODULE_KEYS_READ = ['seo_v2','seo_v1']` con `ANY($n::text[])` en los 5 consumidores. Verificado
-contra PG real con la base todavía en `seo_v1`: ambas orgs resuelven `hasModule=true` sin bloqueo.
-El contenido de la lista está fijado por test para que la contracción sea deliberada.
-
-**Pendiente, en este orden:** desplegar el expand → aplicar
-`migrations/20260808131441444_task-1310-seo-client-view-codes.sql` → verificar en staging con Berel →
-**recién ahí** contraer a `seo_v2` sola (dueño `TASK-1310`). Detalle: `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §10.7.
-
-### TASK-1310 — surfaces cliente SEO implementadas (2026-08-08)
-
-`TASK-1310` sigue `in-progress`: dashboard `/growth/seo`, quadrant y report `/growth/seo/report`
-reusan `ReportArtifactModel`; guard = assignment per-org + `growth.seo.report.read_client` `own`.
-La migración pendiente crea `seo_v2`, supersede el assignment `seo_v1` de Berel preservando tier/metadata
-y publica los viewCodes; sin aplicarla no hay navegación compuesta. Próximo paso: staging, sesión Berel,
-menú/rutas/denial sin módulo, baseline diff y revisión mobile. Sin push/deploy autorizado.
-
-**Verificación 2026-08-08 (deuda cerrada por Claude).** El barrido con subagentes encontró que el
-código estaba adelante de sus documentos y de sus gates, así que se corrigió lo documental y **se
-hizo fallar a propósito lo que estaba verde de mentira**:
-
-- **Señal de fiabilidad falsa-sana.** `seo-rank-capture-lag.ts` tenía `module_key = 'seo_v2'`
-  hardcodeado: veía 0 orgs y reportaba `ok`. Con el expand aplicado reporta `warning` con un hallazgo
-  real. Su test pinneaba el bug (asertaba el literal); ahora aserta el contrato. Commit `2f21dd46e`.
-- **GVC corría con la persona equivocada.** Los tres scenarios cliente capturaban con sesión de
-  operador contra una superficie client-gated, así que el frame decía "SEO no está activo en tu plan"
-  y el visual-gate daba BLOCK por una razón que no era la UI. Se agregó `requiresStorageState` al
-  contrato de scenario, exigido **antes** de lanzar el browser. `ui:visual-gate --task TASK-1310`
-  pasó de BLOCK a PASS. Commit `ec3fa82c6`.
-- **El scorecard estaba verde y la auditoría en BLOCK.** El scorecard de las 10:03 daba PASS 4.61 y
-  afirmaba "axe sin violaciones" cuando la auditoría de las 10:25 tiene 2 violaciones de contraste y
-  economía de superficies en 1.8. Se regeneró desde la auditoría: **`ui:quality --task TASK-1310`
-  ahora da BLOCK con `average=2.29 floor=1.8`**, que es el estado correcto para una task con
-  `UI ready: no`. El scorecard viejo queda declarado en el campo `supersedes`.
-- **Drift documental del `masterDetail`.** El wireframe y el flow todavía describían un navigator
-  lateral que la implementación descartó; era la ruta por la que el siguiente cambio reintroducía la
-  composición equivocada. Corregidos a `composition='single'` + tabs, con el "por qué no" escrito.
-- **Doc funcional + manual.** La superficie cliente salió de "Que NO existe todavía" y ganó su
-  sección con el estado de rollout declarado; se escribió el manual que faltaba
-  (`docs/manual-de-uso/growth/habilitar-portal-seo-cliente.md`) con el orden exacto del rollout y por
-  qué **no** se valida con la persona agente superadmin. README, EPIC-022 y el ledger de flags
-  quedaron sincronizados.
-
-Lo que **no** hice y sigue abierto: los 7 lotes de la auditoría premium (trabajo de Codex, vive en
-`/growth/seo/mockup`), el push de los commits locales y la migración —bloqueada porque `main` no
-tiene todavía el catálogo TS y `syncViewRegistryCatalog` desactivaría las filas.
-
-### TASK-1309 — CERRADA (2026-08-08)
-
-**Cerrada.** El build de producción salió verde con autorización del operador (exit 0, árbol completo
-de rutas), que era el último gate: `pnpm test` full + `pnpm build` prod + los 4 gates de UI +
-reachability. Lifecycle `complete`, archivo movido, registry/README/EPIC-022 sincronizados, y delta de
-impacto cruzado en las tres tasks que la citan como base (1670, 1672, 1673). **Con ella el conmutador
-de Search Visibility queda completo: las 4 tabs del operador navegan.**
-
-**El bloqueo había desaparecido solo.** 1309 estaba `code complete` frenada por 2 rojos ajenos en
-`client-role-visibility.test.ts`, causados por 1310 al registrar viewCodes sin migración de
-`role_view_assignments`. Esa migración se aplicó hoy en el rollout de 1310 y los cerró:
-**`pnpm test` completo en 1429 archivos / 10377 tests / 0 rojos**, `ui:quality` PASS 4.63,
-reachability 232 rutas / 0 huérfanas. Falta sólo `pnpm build` de producción sobre el último commit
-para moverla a `complete` (no se corrió: ~30 GB, va con autorización del operador).
-
-**Dos subagentes cerraron el ciclo documental**, con dominios de archivos disjuntos para no chocar.
-Lo que encontraron vale más que el trabajo mecánico:
-
-- 🔴 **§10.6 de la arquitectura SEO se auto-contradecía**, y fue culpa mía: el delta que agregué esta
-  mañana cambiaba el orden a tres ejes, pero el contrato 4 de arriba seguía declarando la regla vieja
-  de dos. Un agente que leyera el ítem sin bajar al delta implementaba lo equivocado.
-- **Cinco commits de feature aterrizaron DESPUÉS del pase documental** (`4c81306d5`), así que las tres
-  capas describían una pantalla anterior a la construida. El pase documental "ya hecho" no era
-  garantía de nada: lo que garantiza es mirar el delta.
-- Los hallazgos se **generalizaron más allá de SEO**, que es donde está el valor: `dataviz-design`
-  ahora advierte que **cualquier** chart que derive su tamaño del contenedor es sospechoso (tabs
-  ocultas, acordeones, y el `fullPage` de Playwright que produce cards vacías que parecen bug y no lo
-  son); `state-design` fija que el resultado de un job async tiene **seis** estados y no dos (nunca
-  corrió · corriendo · limpio · parcial · con techo · fallido); y los dos gates de UI review suman
-  como blocker el número cuya procedencia difiere de sus vecinos sin declararlo.
-
-**Deuda detectada de paso:** `greenhouse-ui-enterprise-review` existe en `.claude/` y `.codex/` pero
-**no está en el manifiesto de espejos** y ya divergía. Se le aplicó el mismo bloque a las dos copias
-para que el gate sea idéntico entre agentes, sin reconciliar la divergencia previa. Alguien debería.
-
-### TASK-1310 — verificado con sesión de cliente: funciona, pero NO es alcanzable (2026-08-08)
-
-Cerré el paso 5 del rollout con sesión real de Grupo Berel. Dos resultados, y el segundo es el que
-importa:
-
-✅ **El gate per-org pasa y la superficie es real.** Migración aplicada, `/growth/seo` renderiza con
-datos medidos: posición media 1.5, 31 keywords, 19 en primera página, cobertura 61%, procedencia
-declarada (medido ● / estimado ◑). Evidencia `.captures/2026-08-08T19-29-36_growth-seo-client`.
-
-🔴 **El menú del portal cliente NO compone SEO** — y no es el catálogo:
-
-1. `VerticalMenu.tsx` arma el menú cliente con una **lista hardcodeada de 7 ítems** filtrada por
-   `canSeeView('cliente.*')`. SEO no está en la lista, así que ningún seed lo agrega.
-2. Su único bloque dinámico (`capabilityModules`) sale de `businessLines`/`serviceModules` de la
-   sesión — **otro sistema**, no `module_assignments`.
-3. El resolver canónico module-based (`composeNavItemsFromModules` / `<ClientPortalNavigation>`)
-   existe y **sólo lo consume el mockup** `/mockup/cliente-portal-legacy`. Cablearlo es la task
-   derivada de TASK-827 que quedó como "V1.0 acepta path híbrido".
-
-**Además, el manifest de alcanzabilidad declara un enlace que no existe:** `/growth/seo` figura con
-`parent: '/home'`, `via: 'inline-link'`, y no hay ningún enlace desde `/home`. El gate da `0 orphans`
-porque comprueba que la ruta esté **declarada**, no que el enlace declarado **exista**. Hoy el único
-camino real es el cross-link desde el informe AEO, que sólo sirve a clientes que además tengan AEO.
-
-**Confirmado con subagentes, y corrige una atribución errónea que hice en el camino:**
-`authorizedViews` se deriva **sólo** de `role_view_assignments` + fallback heurístico + permission
-sets + overrides — **nunca de `module_assignments`**. Llegué a decir que "el módulo concede y el
-denial vetea"; es falso. AEO figura en las 23 views de Berel porque **no tiene fila de rol y cae al
-fallback**, no porque su módulo la conceda.
-
-**Y AEO tampoco aparece en el menú lateral.** Se alcanza por deep-link, declarado a propósito en el
-manifest. Así que el estado de SEO **no es una regresión: es el diseño vigente del portal cliente.**
-Lo que falta es la task derivada de TASK-827 que monta el nav module-driven
-(`ClientPortalNavigation` + `/api/client-portal/modules`, ambos completos y con **cero consumidores**
-en runtime).
-
-Descartado con dato: no era sesión desactualizada — los claims se auto-refrescan cada ≤5 min y una
-sesión recién emitida tampoco los trae.
-
-**No lo parché.** Empujar SEO a la lista hardcodeada haría desaparecer el síntoma y consolidaría el
-diseño equivocado: el portal cliente debe componer su menú desde `module_assignments`, que es lo que
-el resolver canónico ya sabe hacer y nadie cableó.
-
-### 🔴 ISSUE-143 — rompí SEO en producción aplicando la migración de TASK-1310 (2026-08-08)
-
-**Resuelto el mismo día, ~25 min de caída.** Apliqué la migración de catálogo tras el push+deploy y el
-canary del provider contra `greenhouse.efeoncepro.com` pasó de `domainQuadrant=riesgo keywords=50` a
-`hasModule=false` + `greenhouse_seo_lane_404` en los cinco lanes.
-
-**La causa no fue el orden del rollout: fue la forma de la migración.** El archivo de viewCodes hace
-expand **y contract en el mismo paso** — crea `seo_v2`, le asigna las orgs y en el mismo statement
-supersede `seo_v1`. Eso anula el dual-read `SEO_MODULE_KEYS_READ` que habíamos aplicado a los 5
-consumidores: su valor entero era que existiera un período con ambas claves vigentes, y la migración
-lo borró en el mismo commit en que lo creaba. Vercel producción corre `main`, que pide `seo_v1`
-literal.
-
-**El ops-worker NO se vio afectado** — su deploy ya tenía el dual-read, así que los tres batches que le
-pagan a DataForSEO siguieron sanos. El daño fue de lectura, no de gasto ni de datos.
-
-Restaurado reabriendo la ventana (`effective_to = NULL` en los `seo_v1`), verificado con el canary
-real, y hecho durable por `20260808184512073_…-reopen-seo-module-cutover-window`, que hornea el
-invariante: mientras el cutover esté abierto, ambas claves cubren exactamente las mismas orgs; una
-ventana asimétrica aborta la migración. Sin doble conteo de cuota: el resolver hace `LIMIT 1` sobre el
-`ANY(...)`.
-
-**Dos lecciones, y la segunda es la que importa:**
-
-1. Una migración nunca contiene el expand y el contract del mismo cutover. Hay **cinco runtimes con
-   despliegues independientes**; "lo desplegué a develop" no es "lo desplegué".
-2. **El diseño era correcto y aun así se cayó.** §10.7 de la arquitectura describía bien el patrón y
-   el dual-read estaba fijado por test — pero nada impedía escribir el contract en el mismo archivo,
-   porque la regla vivía en prosa. Ahora vive en un test que escanea `migrations/` y falla si una
-   migración nueva supersede una clave que `SEO_MODULE_KEYS_READ` todavía acepta. **Probado por
-   mutación**: sacando la migración culpable de su allowlist, el test la nombra.
-
-Contribuyó una causa de método: verifiqué la migración con un `SELECT`, que es la mitad del contrato.
-La otra mitad es qué versión de código la lee en cada runtime. La verificación correcta es el
-consumidor real contra el host real.
-
-**Delta 2026-08-09 — el release cumplió la precondición.** Verificado runtime por runtime: `main` con
-el dual-read, canary del provider contra producción **100% verde** (con `track`/`untrack` ya en `400`
-en vez de `404`, o sea que esas rutas existen), y el ops-worker en una revisión ancestro de `main`. El
-contract pasa a **`TASK-1677`**, separado de `TASK-1310` para no atar una operación de datos de 20
-minutos a un ciclo de diseño abierto. La señal de simetría de la ventana sigue sin dueño, pero deja de
-ser urgente cuando la ventana se cierre.
-
-**Colateral arreglado de raíz:** rotando este mismo Handoff descubrí que `docs:context-rotate` estaba
-ciego y **reventaba** (`TypeError` sobre `matches[0]`): su patrón buscaba secciones `##` con fecha y el
-archivo usa `###` hace rato — 0 de 23. Segunda vez que se queda ciego por la misma causa (el propio
-código documenta la primera). El nivel de heading ahora **se descubre** en vez de asumirse, porque el
-ancla estable es la fecha; sin secciones fechadas degrada con un mensaje accionable en lugar de un
-stack. El script quedó importable y con suite (5 tests, uno contra el `Handoff.md` real). Si vuelve a
-fallar, la respuesta es extender `DATED_SECTION_LEVELS`, no rotar a mano: rotar a mano es como se
-corrompen los marcadores de integridad de los shards.
-
-### Search Visibility — header canónico (2026-08-07)
-
-TASK-1307/1308 siguen `complete`: Resumen, Rendimiento y Keywords comparten `SurfaceRecipe` +
-`WorkbenchHeader` (alcance/meta/tabs), sin chrome sobre canvas ni duplicación en estados vacíos. 579
-tests focales, typecheck/lint y 5 GVC OK (1440/390). Pendiente: promoción `develop → main` batcheada
-con 1308/1655; el export GSC nativo de Berel requiere Owner fuera del repo.
-
-### Carril de keywords OBJETIVO — TASK-1659…1662 (2026-08-07)
-
-Salió de que el operador cuestionara por qué TASK-1308 no usó los ejes especificados. La respuesta
-corta era correcta; la larga destapó que **el módulo tiene TRES preguntas y sólo una tenía
-superficie**: (1) qué empujo de lo que ya tengo — construida; (2) dónde quiere estar el cliente;
-(3) qué me pierdo entero. Ninguna de las 12 tasks abiertas de EPIC-022 cubría 2 ni 3.
-
-🔴 **GSC es ciego por construcción a 2 y 3**: sin top ~100 no hay impresiones, así que esas
-búsquedas NO EXISTEN en los datos. Ninguna superficie sobre esa fuente va a contestarlas.
-
-⚠️ **Corrección al criterio anterior:** para una keyword donde el cliente SÍ rankea, el dato de
-mercado es enriquecimiento y los ejes medidos mandan. Para una donde NO rankea, GSC no da nada y
-volumen+dificultad son la ÚNICA forma de contestar "¿vale la pena?" y "¿cuánto cuesta?". Ahí son
-**dependencia dura**, no opcional.
-
-⚠️ **`TASK-1300` SÍ está complete** — yo repetía lo contrario desde un comentario obsoleto de
-`contracts.ts`. Entregó el registry (`labs` es llamable) pero es *infra de cliente, no capability*:
-falta fetch, columnas (`search_volume` no existe) y reader. Corregido en la fuente y en el doc, que
-se contradecía. **Y `trackKeywords` acepta strings arbitrarios**: seguir una keyword no rankeada ya
-funciona por contrato, sólo falta el botón — Full API Parity al revés.
-
-Orden de dependencia: `1659` (modelo de intención, migración) → `1660` (lente Objetivos, UI) →
-`1661` (datos de mercado) → `1662` (keyword gap). Las 4 con `task:lint` en 0/0.
-
-**Superado el mismo día: el operating mode.** El operador señaló que el módulo tiene los **mismos
-tres modelos de servicio que Globe** (`efeonce-managed` | `co-operated` | `client-operated`; "que el
-cliente contrate la herramienta" NO es un cuarto modo sino `client-operated` × delivery model de
-plataforma). El vocabulario YA era canónico y Globe YA lo materializó (SPEC-008, desplegado) — pero
-vive en SU Postgres, y en Greenhouse `delivery-model.ts` es de cotización, no de esto. Creado como
-`TASK-1663` + ADR `GREENHOUSE_OPERATING_RESPONSIBILITY_DECISION_V1.md`.
-
-🔴 **La regla que sostiene todo, verbatim de Globe: el modo NUNCA es input de autorización.** No
-decide quién PUEDE declarar (eso es `can(...)`), decide qué superficie DEBE existir y quién responde.
-Si el modo otorgara acceso, cambiar una etiqueta comercial cambiaría en silencio quién puede
-comprometer gasto. El entregable más importante de 1663 es el **test que lo prueba**.
-
-**Tres ejes ortogonales:** quién puede (capability) · quién responde (modo) · quién paga (comercial). ⚠️ **Y NO se construye ahora** (el operador lo acotó el mismo día): el ADR quedó `Proposed` y
-`TASK-1663` en `P3` con condición de activación = un segundo consumidor real. Hoy hay **cero
-asignaciones declaradas**, así que sería infraestructura de un problema que no tenemos. `1659`/`1660`
-se construyen **como están especificadas**, sin esperar y sin conciencia de modo "por si acaso".
-
-### TASK-1308 — Keyword Opportunities COMPLETE + doctrina de scopes MCP (2026-08-07)
-
-Ruta `/admin/growth/seo/keywords` cerrada. Nació `Backend impact: none` y terminó con migración, dos
-commands, dos rutas app-lane, dos del lane ecosystem y **dos tools MCP federadas** — porque
-`trackKeywords`, que la spec daba por construido por TASK-1303, no existía. La idea que ordenó todo:
-seguir una keyword es un **compromiso de gasto diferido**. Detalle completo en la task, el ADR del
-gateway y `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`; acá sólo lo que un agente siguiente necesita.
-
-**Doctrina de scopes OAuth (con `arch-architect`):** un scope por **CLASE de blast-radius**, nunca
-uno por capability. Corolario: la escritura N+1 de un dominio con scope **no toca Entra**. Completa
-en el ADR del gateway y en ambos bundles de `efeonce-mcp-platform`.
-
-🔴 **FRONTERA DE GRANT — lo más importante que dejó esta task.** El scope existe en `Efeonce MCP
-Resource` (type `Admin`, id `17f923ad-537a-4c2f-ab5b-2a14ed650183`; round-trip verificado: 4 scopes,
-ninguno perdido, `requestedAccessTokenVersion: 2` intacto). Pero **NO se cableó al cliente PKCE
-compartido** `32617b87-e7ef-493a-838f-1ff3f0213b93` y **NUNCA debe cablearse**: en el lane ecosystem
-el actor es `mcp:<consumer>` —la MÁQUINA, sin chequeo de capability por humano— y el hop va con token
-de consumer fijo, así que **ese scope es la única puerta de la cadena que depende de la persona**.
-Cablearlo daría poder de gasto a todo el tenant y **nada fallaría**. El write de Globe tampoco está
-ahí. Camino correcto: `TASK-1631`.
-
-**PENDIENTE:** push del gateway `efeonce-mcp` — commits `cb316cc`, `41dca07`, `bfbdf3a`, `1d0ebcc`.
-Deploy productivo en push. Las tools quedan federadas y **fail-closed a propósito**, igual que el
-único otro write del gateway.
-
-**Follow-ups:** `TASK-1658` (drift de federación + punto ciego del guard) · `TASK-1657` (hidratación
-`useId` + tokens de canvas).
-
-### Seedance 2.5 — inventario Fal y TASK-1656 (2026-08-07)
-
-Fal Model Search/OpenAPI confirma tres endpoints activos: T2V, I2V y R2V; Globe permanece `provider-supported / gated`.
-Se dejaron el inventario API, route card, registry, fleet ledger y skills espejo actualizados; no se tocó runtime de Globe.
-`TASK-1656` registra la integración backend-data: roles multimodales, audio, frame final, queue/webhook, ingest, rates,
-rights, evaluación, canary, settlement y promotion por ruta. Reutiliza el adapter Fal y el control plane existente;
-la UI queda en `TASK-1552` y el contrato compartido en `TASK-1633`. No habilitar 4K/1080p, tres minutos, edit/masks,
-storyboard, stems, streaming, realtime, seed de entrada ni BytePlus 2.5 sin contrato verificable.

@@ -70,7 +70,7 @@ Convención operativa para la UI:
 
 Cuando nazca una nueva superficie gobernable:
 - agregar `view_code` en `src/lib/admin/view-access-catalog.ts`
-- alinear menú si corresponde
+- alinear menú si corresponde — la superficie donde vive el destino (sidebar en zonas / avatar / ⌘K / shortcuts) y el presupuesto del rail interno se rigen por el Contrato de Asignación de Superficies (`docs/architecture/agent-invariants/NAVIGATION_SURFACE_ALLOCATION_CONTRACT.md`, TASK-1389; gate `pnpm nav:budget` en severidad `error`)
 - agregar guard page-level o layout-level
 - reflejarla automáticamente en `/admin/views`
 

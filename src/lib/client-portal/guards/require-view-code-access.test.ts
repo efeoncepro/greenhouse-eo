@@ -23,7 +23,7 @@ const mockRedirect = vi.fn((target: string) => {
 })
 
 const mockRequireServerSession = vi.fn()
-const mockHasViewCodeAccess = vi.fn()
+const mockCanOpenClientPortalView = vi.fn()
 const mockCaptureWithDomain = vi.fn()
 const mockResolveOrganizationId = vi.fn()
 
@@ -35,8 +35,11 @@ vi.mock('@/lib/auth/require-server-session', () => ({
   requireServerSession: () => mockRequireServerSession()
 }))
 
-vi.mock('@/lib/client-portal/readers/native/module-resolver', () => ({
-  hasViewCodeAccess: (...args: unknown[]) => mockHasViewCodeAccess(...args)
+// TASK-1685 Slice 2 — el guard dejó de consumir la mitad ORGANIZACIÓN
+// (`hasViewCodeAccess`) para consumir el primitive completo, que además aplica la dimensión
+// PERSONA (`user_view_overrides`) y el bypass interno. El mock sigue al consumer real.
+vi.mock('@/lib/client-portal/visibility/resolve-client-portal-visibility', () => ({
+  canOpenClientPortalView: (...args: unknown[]) => mockCanOpenClientPortalView(...args)
 }))
 
 vi.mock('@/lib/observability/capture', () => ({
@@ -79,23 +82,27 @@ describe('requireViewCodeAccess (TASK-1679)', () => {
   })
 
   it('resolves access against the ORGANIZATION id, never the client id (ISSUE-146)', async () => {
-    mockHasViewCodeAccess.mockResolvedValue(true)
+    mockCanOpenClientPortalView.mockResolvedValue(true)
 
     await requireViewCodeAccess('cliente.campanas')
 
-    expect(mockHasViewCodeAccess).toHaveBeenCalledWith('org-32333527', 'cliente.campanas')
+    expect(mockCanOpenClientPortalView).toHaveBeenCalledWith('cliente.campanas', {
+      userId: 'user-client-1',
+      organizationId: 'org-32333527',
+      isInternalSession: false
+    })
 
-    // Contrato duro: el valor pasado al resolver tiene que ser del espacio `org-*`. Si
+    // Contrato duro: el valor pasado al primitive tiene que ser del espacio `org-*`. Si
     // alguien vuelve a pasar un clientId (`cli-*`, `hubspot-company-*`,
     // `greenhouse-demo-client`), este assert lo detiene — es la clase de bug de ISSUE-146.
-    const [passedId] = mockHasViewCodeAccess.mock.calls[0] as [string]
+    const [, subject] = mockCanOpenClientPortalView.mock.calls[0] as [string, { organizationId: string }]
 
-    expect(passedId).toMatch(/^org-/)
-    expect(passedId).not.toBe(clientSession.user.clientId)
+    expect(subject.organizationId).toMatch(/^org-/)
+    expect(subject.organizationId).not.toBe(clientSession.user.clientId)
   })
 
   it('reaches the denied path with a public slug instead of the degraded banner (defecto 3)', async () => {
-    mockHasViewCodeAccess.mockResolvedValue(false)
+    mockCanOpenClientPortalView.mockResolvedValue(false)
 
     const target = await captureRedirect('cliente.campanas')
 
@@ -106,7 +113,7 @@ describe('requireViewCodeAccess (TASK-1679)', () => {
   })
 
   it('does NOT report a legitimate denial to Sentry', async () => {
-    mockHasViewCodeAccess.mockResolvedValue(false)
+    mockCanOpenClientPortalView.mockResolvedValue(false)
 
     await captureRedirect('cliente.campanas')
 
@@ -116,7 +123,7 @@ describe('requireViewCodeAccess (TASK-1679)', () => {
   })
 
   it('still degrades honestly when the resolver actually throws', async () => {
-    mockHasViewCodeAccess.mockRejectedValue(new Error('PG down'))
+    mockCanOpenClientPortalView.mockRejectedValue(new Error('PG down'))
 
     const target = await captureRedirect('cliente.campanas')
 
@@ -132,7 +139,7 @@ describe('requireViewCodeAccess (TASK-1679)', () => {
     // Son dos estados distintos y el usuario merece saber cuál le pasó: sin organización no
     // hay contra qué evaluar módulos, así que no se puede decir "no tienes este módulo".
     expect(target).toBe('/home?error=organization_unresolved')
-    expect(mockHasViewCodeAccess).not.toHaveBeenCalled()
+    expect(mockCanOpenClientPortalView).not.toHaveBeenCalled()
   })
 
   it('keeps the internal support bypass without touching the resolver (D1)', async () => {
@@ -142,7 +149,7 @@ describe('requireViewCodeAccess (TASK-1679)', () => {
 
     await expect(requireViewCodeAccess('cliente.campanas')).resolves.toBeUndefined()
 
-    expect(mockHasViewCodeAccess).not.toHaveBeenCalled()
+    expect(mockCanOpenClientPortalView).not.toHaveBeenCalled()
     expect(mockRedirect).not.toHaveBeenCalled()
   })
 })

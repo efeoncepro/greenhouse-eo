@@ -890,6 +890,7 @@ export interface AriaCopy {
   closeDrawer: string
   closeMenu: string
   openMenu: string
+  mainNavigation: string
   openSettings: string
   toggleSidebar: string
   navigateBack: string

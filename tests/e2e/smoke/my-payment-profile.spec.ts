@@ -99,9 +99,23 @@ test.describe('TASK-753 /my/payment-profile self-service contract', () => {
 
     expect(status).toBeLessThan(500)
 
-    // If we end up on /my/payment-profile, the heading should be there.
+    // If we end up on /my/payment-profile, the page must show a DESIGNED state:
+    // - member enlazado → heading "Mi cuenta de pago" (happy path), o
+    // - member NO enlazado → banner canónico `member_identity_not_linked`
+    //   ("Tu cuenta aún no está enlazada a un colaborador…"), que es el path
+    //   documentado para el agent user (sin fila en team_members por diseño —
+    //   ver el header de este spec) y un estado de degradación honesta, no un
+    //   defecto. Antes de TASK-1388 el locator del heading pasaba de rebote
+    //   porque el sidebar interno tenía el ítem "Mi Cuenta de Pago"; con el
+    //   rehome al avatar, exigir el heading acoplaba el test al estado mutable
+    //   del enlace member↔user en la DB compartida.
     if (page.url().includes('/my/payment-profile')) {
-      await expect(page.getByText(/Mi cuenta de pago/i).first()).toBeVisible({ timeout: 15_000 })
+      await expect(
+        page
+          .getByText(/Mi cuenta de pago/i)
+          .or(page.getByText(/aún no está enlazada a un colaborador/i))
+          .first()
+      ).toBeVisible({ timeout: 15_000 })
     }
   })
 

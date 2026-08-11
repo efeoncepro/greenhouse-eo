@@ -395,6 +395,75 @@ export const createAmbientImpersonatedGoogleIdTokenClientFactory = ({
   }
 }
 
+/**
+ * TASK-1378 — Token OIDC para invocar un Cloud Run protegido por IAM.
+ *
+ * Un Cloud Run desplegado con `--no-allow-unauthenticated` exige un ID token
+ * cuyo `aud` sea la URL del servicio. Esta es la pieza que faltaba para que el
+ * portal (Vercel) pueda llamar a un worker sin abrirlo al mundo: el mismo patrón
+ * que ya usa el SDK de Globe, extraído acá para que no se re-implemente por
+ * consumer.
+ *
+ * Resuelve credencial igual que el resto del módulo: WIF en Vercel, ADC ambiente
+ * (o impersonación explícita vía `GCP_SERVICE_ACCOUNT_EMAIL`) fuera de Vercel.
+ */
+export const fetchGoogleIdTokenForAudience = async (
+  audience: string,
+  env: NodeJS.ProcessEnv = process.env
+): Promise<string> => {
+  const normalizedAudience = normalizeIdTokenAudience(audience)
+
+  const provider = await resolveGoogleIdTokenProvider(normalizedAudience, env)
+  const token = await provider.fetchIdToken(normalizedAudience)
+
+  // Un token con salto de línea rompería el header Authorization y podría
+  // habilitar response splitting aguas abajo.
+  if (!token || /[\r\n]/.test(token)) {
+    throw new Error('Google ID token is empty or malformed')
+  }
+
+  return token
+}
+
+const resolveGoogleIdTokenProvider = async (audience: string, env: NodeJS.ProcessEnv) => {
+  if (shouldUseWorkloadIdentity(env)) {
+    const { idTokenProvider } = await createVercelWifGoogleIdTokenClientFactory({
+      provider: getWorkloadIdentityProvider(env) ?? '',
+      serviceAccountEmail: env.GCP_SERVICE_ACCOUNT_EMAIL?.trim() ?? '',
+      env
+    }).getIdTokenClient()
+
+    return idTokenProvider
+  }
+
+  const serviceAccountEmail = env.GCP_SERVICE_ACCOUNT_EMAIL?.trim()
+  const projectId = getGoogleProjectId(env)
+
+  if (serviceAccountEmail && projectId) {
+    const { idTokenProvider } = await createAmbientImpersonatedGoogleIdTokenClientFactory({
+      projectId,
+      serviceAccountEmail
+    }).getIdTokenClient()
+
+    return idTokenProvider
+  }
+
+  const client = await new GoogleAuth().getIdTokenClient(audience)
+
+  return client.idTokenProvider
+}
+
+/** El `aud` de un ID token de Cloud Run es el origin del servicio, sin path ni query. */
+const normalizeIdTokenAudience = (value: string) => {
+  const url = new URL(value.trim())
+
+  if (url.protocol !== 'https:' || url.username || url.password || url.search || url.hash) {
+    throw new Error('Google ID token audience must be a bare https origin')
+  }
+
+  return url.origin
+}
+
 const getWorkloadIdentityAuthClient = ({
   env = process.env,
   scopes

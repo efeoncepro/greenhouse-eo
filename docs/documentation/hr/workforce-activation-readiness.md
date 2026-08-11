@@ -1,7 +1,7 @@
 # Workforce Activation Readiness
 
 > **Tipo:** documentación funcional
-> **Módulo:** Personas y HR
+> **Módulo:** Personas (dominio del menú desde TASK-1388; antes "Personas y HR")
 > **Ruta principal:** `/hr/workforce/activation`
 > **Task:** TASK-874 + TASK-875 + TASK-876
 

@@ -1,0 +1,202 @@
+{
+  "_readme": [
+    "Presentación técnica de Ajinomoto LIC-962 / Wherex.",
+    "Fuente narrativa: oferta-tecnica.md. Las cifras de la presentación remiten al ledger E1–E5 de esa oferta.",
+    "Portada usa el SVG global de Ajinomoto, atribuido a Ajinomoto Co., Inc. en Wikimedia Commons, en variante monocroma inversa para contraste sobre fondo oscuro; validar la aplicación local con el manual de marca antes de distribución final.",
+    "Componer: pnpm deck:compose docs/commercial/tenders/ajinomoto-lic-962/deck-plan.json --out .captures/ajinomoto-lic-962"
+  ],
+  "tenderId": "AJINOMOTO-LIC-962-TECHNICAL",
+  "slides": [
+    {
+      "slideId": "portada",
+      "contentType": "cover",
+      "template": "CoverFull",
+      "slots": {
+        "clientLogo": { "src": "assets/clients/ajinomoto-on-dark.svg" },
+        "proposalKind": "technical"
+      }
+    },
+    {
+      "slideId": "agenda",
+      "contentType": "agenda",
+      "template": "AgendaFull",
+      "slots": {
+        "sectionLabel": "PROGRAMA INFLUEN-SER TEAM",
+        "title": "Comunidad con propósito",
+        "deckMeta": "<b>6</b> capítulos · propuesta técnica",
+        "chapters": [
+          { "number": "01", "title": "El desafío", "description": "De una buena primera edición a una rutina sostenida", "targetSlideId": "desafio" },
+          { "number": "02", "title": "La base", "description": "Resultados que ya prueban el potencial", "targetSlideId": "base" },
+          { "number": "03", "title": "El sistema", "description": "Gobernar, habilitar, activar y medir", "targetSlideId": "sistema" },
+          { "number": "04", "title": "La operación", "description": "Ciclo mensual, canales y Gerencia General", "targetSlideId": "operacion" },
+          { "number": "05", "title": "El plan", "description": "Primeros 90 días y continuidad", "targetSlideId": "plan" },
+          { "number": "06", "title": "El control", "description": "KPI, gobernanza y cumplimiento", "targetSlideId": "control" }
+        ],
+        "footerLabel": "Propuesta técnica · Ajinomoto del Perú"
+      }
+    },
+    {
+      "slideId": "desafio",
+      "contentType": "narrative",
+      "template": "NarrativeSplit",
+      "slots": {
+        "sectionLabel": "EL DESAFÍO",
+        "title": "No se trata de pedir más publicaciones: se trata de <em>sostener una comunidad</em>",
+        "body": [
+          "<b>Ajinomoto ya comprobó que sus colaboradores pueden amplificar la cultura con credibilidad.</b> La siguiente etapa debe convertir ese impulso en una rutina que las personas quieran mantener.",
+          "<b>La operación debe reducir fricción, no reemplazar la voz individual.</b> La estrategia, el calendario y el acompañamiento existen para que cada embajador pueda participar con contexto, seguridad y autonomía."
+        ],
+        "closing": "El programa se gobierna como comunidad, no como pauta de publicaciones.",
+        "conceptLabel": "LA TESIS",
+        "conceptTitle": "Propósito, práctica y evidencia",
+        "conceptLegend": [
+          { "layer": "Propósito", "definition": "Una razón clara para participar", "tone": "outer" },
+          { "layer": "Práctica", "definition": "Una rutina editorial que cabe en la agenda", "tone": "middle" },
+          { "layer": "Evidencia", "definition": "Medición para aprender y ajustar", "tone": "core" }
+        ]
+      }
+    },
+    {
+      "slideId": "base",
+      "contentType": "several-kpis",
+      "template": "MetricsSplit",
+      "slots": {
+        "title": "Una base lista para escalar",
+        "subtitle": { "client": "influen-SER Team", "context": "mayo–diciembre de 2025" },
+        "kpis": [
+          { "kind": "visibility", "value": "289", "unit": "posts", "label": "Publicaciones en LinkedIn", "qual": "Contenido generado por participantes del programa.", "evidenceRef": "E1 · Brief Ajinomoto" },
+          { "kind": "engines", "value": "580K", "unit": "", "label": "Impresiones", "qual": "Alcance acumulado.", "evidenceRef": "E1 · Brief Ajinomoto (580.535)" },
+          { "kind": "authority", "value": "8K", "unit": "", "label": "Interacciones", "qual": "Respuesta de la comunidad.", "evidenceRef": "E1 · Brief Ajinomoto (7.986)" },
+          { "kind": "gap", "value": "20", "unit": "posts", "label": "Publicaciones en Workvivo", "qual": "Punto de partida para integrar ambos canales.", "evidenceRef": "E1 · Brief Ajinomoto" }
+        ],
+        "readEyebrow": "LA OPORTUNIDAD",
+        "readLead": "El reto es <em>sostener el impulso</em>",
+        "readBody": "El brief identifica una caída de participación después de los talleres y una oportunidad de involucrar más a líderes. La operación propuesta convierte formación aislada en acompañamiento continuo.",
+        "source": "Brief Influenser Team · Ajinomoto del Perú · E1 y E2"
+      }
+    },
+    {
+      "slideId": "sistema",
+      "contentType": "four-pillars",
+      "template": "FourPillarsFull",
+      "slots": {
+        "sectionLabel": "EL SISTEMA",
+        "title": "Cuatro frentes que hacen que la comunidad <em>se sostenga</em>",
+        "context": [
+          "Cada frente deja una capacidad: reglas claras, embajadores habilitados, contenido y decisiones con datos.",
+          "La operación se adapta mes a mes sin perder propósito ni trazabilidad."
+        ],
+        "thesis": "El alcance se vuelve sostenible cuando <em>comunidad y operación</em> trabajan como un mismo sistema.",
+        "pillars": [
+          { "kind": "method", "title": "Gobernar", "body": "Propósito, roles, criterios, pautas y flujo de aprobación.", "detail": "Una base común para publicar con seguridad y coherencia." },
+          { "kind": "human", "title": "Habilitar", "body": "Onboarding, práctica y formación para nuevos y actuales embajadores.", "detail": "La capacidad se instala en las personas, no en plantillas genéricas." },
+          { "kind": "ai", "title": "Activar", "body": "Calendario, disparadores, clínica y acompañamiento editorial.", "detail": "Cada persona adapta el mensaje desde su propia experiencia." },
+          { "kind": "data", "title": "Medir", "body": "Participación, publicaciones, alcance, interacción y aprendizaje.", "detail": "Los datos orientan el siguiente ciclo, no solo documentan el anterior." }
+        ]
+      }
+    },
+    {
+      "slideId": "operacion",
+      "contentType": "process-sequential",
+      "template": "ProcessStepsFull",
+      "slots": {
+        "sectionLabel": "LA OPERACIÓN MENSUAL",
+        "title": "Un ciclo que conecta LinkedIn, Workvivo y <em>la voz de los líderes</em>",
+        "steps": [
+          { "title": "Leer", "description": "Revisar datos, participación, hitos y fricciones del ciclo anterior.", "deliverable": "Prioridades y alertas" },
+          { "title": "Planificar", "description": "Definir estrategia y calendario mensual para LinkedIn y Workvivo.", "deliverable": "Ruta editorial accionable" },
+          { "title": "Activar", "description": "Facilitar clínica, pautas y disparadores para embajadores y líderes.", "deliverable": "Contenido con voz propia" },
+          { "title": "Acompañar", "description": "Consolidar consultas, reconocer participación y apoyar casos de baja activación.", "deliverable": "Comunidad sostenida" },
+          { "title": "Decidir", "description": "Reportar KPI, aprendizajes y acciones correctivas con la contraparte.", "deliverable": "Mejora del ciclo siguiente" }
+        ]
+      }
+    },
+    {
+      "slideId": "plan",
+      "contentType": "timeline",
+      "template": "TimelineFull",
+      "slots": {
+        "sectionLabel": "PRIMEROS 90 DÍAS",
+        "title": "Primero ordenar la base; después, <em>hacer crecer el ritmo</em>",
+        "meta": "Inicio posterior a adjudicación · operación de referencia: 12 meses",
+        "timeUnit": "month",
+        "timeAxis": ["Mes 1", "Mes 2", "Mes 3"],
+        "milestones": [
+          { "at": 1, "label": "Hoja de ruta y línea de base", "caption": "Fin mes 1" },
+          { "at": 2, "label": "Nuevos embajadores habilitados", "caption": "Fin mes 2" },
+          { "at": 3, "label": "Primer ajuste de operación", "caption": "Fin mes 3" }
+        ],
+        "phases": [
+          { "kind": "work", "startUnit": 1, "endUnit": 1, "title": "Puesta en marcha", "description": "Propósito, datos, roles, criterios y calendario.", "barLabel": "Alinear antes de activar" },
+          { "kind": "work", "startUnit": 2, "endUnit": 2, "title": "Incorporación", "description": "Dos sesiones y acompañamiento inicial.", "barLabel": "Convertir formación en práctica" },
+          { "kind": "continuous", "startUnit": 3, "endUnit": 3, "title": "Ritmo sostenido", "description": "Clínica, activación, reporte y mejora mensual.", "barLabel": "Escalar con evidencia" }
+        ]
+      }
+    },
+    {
+      "slideId": "alcance",
+      "contentType": "capabilities-grid",
+      "template": "CardGridFull",
+      "slots": {
+        "eyebrow": "QUÉ COMPRA LA OPERACIÓN",
+        "headline": "Un programa de embajadores que <em>puede operar y aprender</em>",
+        "intro": "El servicio cubre la gestión necesaria para pasar de talleres aislados a una práctica de comunidad continua.",
+        "highlight": "Audiovisual, diseño de alto volumen y presencialidad se cotizan aparte.",
+        "panelQuestion": "¿Qué queda instalado en Ajinomoto?",
+        "capabilities": [
+          { "kind": "governance", "title": "Gobernanza", "description": "Hoja de ruta, criterios y ritmo de coordinación." },
+          { "kind": "conversation", "title": "Formación", "description": "Dos sesiones para nuevos y una para toda la comunidad." },
+          { "kind": "authoring", "title": "Contenido", "description": "Calendario, pautas y acompañamiento para LinkedIn y Workvivo." },
+          { "kind": "conversation", "title": "Gerencia General", "description": "Narrativa, paquete editorial y revisión de presencia digital." },
+          { "kind": "data", "title": "Reportería", "description": "KPI, aprendizaje, alertas y recomendaciones mensuales." }
+        ]
+      }
+    },
+    {
+      "slideId": "control",
+      "contentType": "requirements-table",
+      "template": "RequirementsTableFull",
+      "slots": {
+        "sectionLabel": "CUMPLIMIENTO Y CONTROL",
+        "title": "Requisito por requisito, <em>con cobertura explícita</em>",
+        "summary": { "value": "8 de 8", "label": "Requerimientos del brief cubiertos", "detail": "Detalle en la matriz de cumplimiento de la oferta técnica." },
+        "requirements": [
+          { "kind": "excluyente", "requirement": "Incorporación y fidelización de embajadores", "evidence": "Gobernanza, onboarding, clínica y seguimiento de activación", "status": "cubierto" },
+          { "kind": "excluyente", "requirement": "Formación de nuevos y comunidad completa", "evidence": "Dos sesiones de onboarding y una sesión especial", "status": "cubierto" },
+          { "kind": "puntúa", "requirement": "Soporte LinkedIn y Workvivo", "evidence": "Calendario mensual, pautas, clínica y reporte", "status": "cubierto" },
+          { "kind": "puntúa", "requirement": "Posicionamiento de Gerencia General", "evidence": "Narrativa, perfil, paquete editorial y revisión mensual", "status": "cubierto" },
+          { "kind": "puntúa", "requirement": "Reportes e iniciativas entre canales", "evidence": "KPI, análisis y activaciones conectadas LinkedIn–Workvivo", "status": "cubierto" }
+        ]
+      }
+    },
+    {
+      "slideId": "medicion",
+      "contentType": "dual-list",
+      "template": "DualListSplit",
+      "slots": {
+        "leftEyebrow": "LO QUE MEDIMOS",
+        "leftTitle": "Actividad, calidad de participación y aprendizaje",
+        "leftItems": [
+          { "lead": "Comunidad", "body": "Embajadores incorporados, activos y con riesgo de desactivación." },
+          { "lead": "LinkedIn", "body": "Publicaciones, impresiones, interacciones y comentarios disponibles." },
+          { "lead": "Workvivo", "body": "Publicaciones y participación según analítica disponible." },
+          { "lead": "Contenido", "body": "Temas y formatos que habilitan conversación y participación." }
+        ],
+        "rightEyebrow": "CÓMO SE USA",
+        "rightTitle": "El reporte no es un cierre: es el inicio del siguiente ciclo",
+        "rightItems": [
+          { "lead": "Línea de base", "body": "Definiciones, fuentes y corte de cada KPI se validan en kickoff." },
+          { "lead": "Revisión mensual", "body": "La contraparte prioriza aprendizajes y acciones correctivas con Efeonce." },
+          { "lead": "Metas FY 2026", "body": "Se reportan en el periodo que Ajinomoto confirme al inicio." },
+          { "lead": "Resultado responsable", "body": "Los KPI se gestionan; participación individual y algoritmo no se garantizan." }
+        ]
+      }
+    },
+    {
+      "slideId": "cierre",
+      "contentType": "back-cover",
+      "template": "BackCoverFull",
+      "slots": {}
+    }
+  ]
+}

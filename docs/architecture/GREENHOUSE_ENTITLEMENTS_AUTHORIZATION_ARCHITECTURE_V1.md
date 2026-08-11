@@ -595,8 +595,33 @@ Eso es deliberado desde TASK-1678, no un descuido:
 denial de rol. **NUNCA** tomes un `granted=FALSE` de rol como garantía de que nadie con ese
 rol ve la vista: si tiene otro rol que la otorga, la ve.
 
-Riesgo residual aceptado: para las 18 vistas cliente gobernadas por módulo, el gate
-efectivo es el resolver de módulos, así que la unión en el carril rol→vista no las expone.
+#### Delta TASK-1685 (2026-08-10) — el `revoke` ahora sí cierra, y el rol dejó de gobernar `cliente.*`
+
+El párrafo de arriba recomendaba `user_view_overrides` como "la capa de veto que ya existe y es la
+correcta". Era la recomendación correcta sobre un instrumento que **no cerraba nada**: los overrides se
+aplican dentro de `resolveAuthorizedViewsForUser`, o sea sobre el claim, y el page guard del portal
+cliente nunca leía el claim (`ISSUE-148`). Desde `TASK-1685` la puerta lo honra.
+
+También queda retirado el "riesgo residual aceptado" que decía que *para las 18 vistas cliente
+gobernadas por módulo el gate efectivo es el resolver*. Era cierto para el gate y **falso para la
+navegación**: la lista base del menú se filtraba por el carril de rol, y medido contra PG el 2026-08-10
+producía **36 enlaces que el menú ofrecía y la puerta negaba**, sobre 8 de 8 usuarios cliente.
+
+Vigente para vistas `cliente.*`:
+
+```
+acceso = interna ∨ ( ¬revocadaParaLaPersona ∧ ( vistaBase ∨ móduloDeLaOrgLaDeclara ) )
+```
+
+**El carril `role_view_assignments` NO gobierna vistas `cliente.*`.** Ni las otorga ni las niega:
+menú, ⌘K y page guards consumen el primitive `canSeeClientPortalView`
+(`src/lib/client-portal/visibility/`). Sus filas cliente quedan inertes —no se borran, la tabla es
+append-only— y la intención con que se sembraron está registrada en `TASK-1685` §D2. Para el portal
+**interno** este carril sigue siendo el canónico y nada de esto le aplica.
+
+Consecuencia para quien diseñe una vista cliente nueva: **sembrar `granted=TRUE` no la hace
+alcanzable**. El carril es declararla en el módulo que la vende. Lint que lo enforcea:
+`greenhouse/no-client-portal-view-visibility-bypass`.
 
 ---
 
@@ -782,7 +807,12 @@ Cualquier `viewCode` agregado a `VIEW_REGISTRY` en `src/lib/admin/view-access-ca
 1. INSERT en `greenhouse_core.view_registry` (gobernanza persistida)
 2. INSERT en `greenhouse_core.role_view_assignments` con `granted=TRUE` para CADA role que deba acceder ese viewCode
 
-**Por qué**: el helper `roleCanAccessViewFallback()` en `src/lib/admin/view-access-store.ts:99-125` opera como signal de gobernanza pendiente. Cuando un viewCode NO tiene fila explícita en `role_view_assignments`, el fallback heurístico resuelve `granted=true` por route_group match Y emite WARNING `role_view_fallback_used` (Sentry domain=identity) — funciona correctamente operacionalmente, pero es ruido de gobernanza incompleta.
+**Por qué**: el helper `roleCanAccessViewFallback()` en `src/lib/admin/view-access-store.ts` opera como signal de gobernanza pendiente. Cuando un viewCode **interno** NO tiene fila explícita en `role_view_assignments`, el fallback heurístico resuelve `granted=true` por route_group match Y emite WARNING `role_view_fallback_used` (Sentry domain=identity) — funciona correctamente operacionalmente, pero es ruido de gobernanza incompleta.
+
+**Desde TASK-1678 el carril `client` NO tiene ese default** (ver §8.2 → `Delta TASK-1678`): para una vista con `routeGroup === 'client'` el fallback devuelve `false`. Consecuencias que cambian cómo se detecta el gap:
+
+- **La telemetría `role_view_fallback_used` NO cubre el carril cliente.** Sólo emite cuando el fallback otorga, así que un viewCode `cliente.*` sin seed no produce warning: produce una vista que **nunca abre**, en silencio. El detector de ese carril es la señal `identity.view_access.client_role_without_grants` (kind `data_quality`, steady 0, reader `src/lib/reliability/queries/client-role-without-view-grants.ts`) más el empty state del guard de módulos.
+- **`active = FALSE` en DB ahora apaga de verdad una vista cliente.** El merge `toRegistryRows` repone desde `VIEW_REGISTRY` TS las vistas que no vienen de la DB —lo que también reponía las desactivadas, porque `getPersistedViewRegistry` filtra `active = TRUE`—; desde TASK-1678 ese merge **excluye** `routeGroup === 'client'`. Para las superficies internas el merge se conserva (hace visible una vista nueva antes de que corra su seed).
 
 **Bug class detectado live (TASK-827 Slice 0, 2026-05-13)**: agregué 11 viewCodes nuevos al TS registry sin migration acompañante → Sentry emitió 10 warnings en sesión cliente real (alert JAVASCRIPT-NEXTJS-4X). Causa raíz: gap entre TS source-of-truth y DB seed. Solución canónica: migration de seed (44 filas: 11 viewCodes × 4 roles), NO patch del fallback ni desactivar telemetría.
 
@@ -824,9 +854,10 @@ WHERE updated_by = 'migration:TASK-XXX';
 
 **⚠️ Reglas duras**:
 
-- **NUNCA** agregar entry a `VIEW_REGISTRY` TS sin migration acompañante en el mismo PR. La telemetría `role_view_fallback_used` lo detectará en producción y genera ruido Sentry.
+- **NUNCA** agregar entry a `VIEW_REGISTRY` TS sin migration acompañante en el mismo PR. Para un viewCode interno la telemetría `role_view_fallback_used` lo detectará en producción y genera ruido Sentry; para un viewCode `cliente.*` **no hay warning** —el carril falla hacia cerrado— y el síntoma es una vista muerta. En el carril cliente la migration de seed no es higiene: es la condición de existencia de la vista.
 - **NUNCA** desactivar el helper `roleCanAccessViewFallback` ni la captureMessageWithDomain del path. ES la señal canonical de drift gobernanza — load-bearing.
-- **NUNCA** parchear el fallback heurístico para "evitar" el warning. La solución canonical es seed migration; el warning ES el detector.
+- **NUNCA** parchear el fallback heurístico para "evitar" el warning. La solución canonical es seed migration; el warning ES el detector **del carril interno** (en el cliente el detector es `identity.view_access.client_role_without_grants`).
+- **NUNCA** reintroducir un default permisivo por routeGroup para vistas `cliente.*` — ni en el fallback, ni en el merge del registry, ni en el camino degradado, ni en el fallback de claim vacío de `hasAuthorizedViewCode`. Los cuatro se cerraron juntos porque cada uno por separado anulaba a los otros (§8.2 → `Delta TASK-1678`).
 - **NUNCA** borrar filas de `role_view_assignments` (append-only governance). Down migration marca `granted=FALSE` preservando audit trail.
 - **NUNCA** definir un viewCode sin `routePath` válido (incluso si la página es placeholder forward-looking — declara el path canonical, page se crea en TASK derivada).
 - **SIEMPRE** que un viewCode se vuelva accesible para más roles (e.g. nuevo addon), migration nueva con INSERT ON CONFLICT DO UPDATE para los grants adicionales. NO modificar la migration original.

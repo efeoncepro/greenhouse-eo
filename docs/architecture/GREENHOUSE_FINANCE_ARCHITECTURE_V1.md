@@ -330,7 +330,7 @@ Caso D: drain inline + cron concurrente en step 2 → `outbox_reactive_log` tien
 | ViewCode | `src/lib/admin/view-access-catalog.ts` | `mi_ficha.mi_cuenta_pago` con `routePath: /my/payment-profile`, `routeGroup: my` |
 | Access persistido | `migrations/20260505183808725_seed-my-payment-profile-view-access.sql` | Siembra `mi_ficha.mi_cuenta_pago` y `mi_ficha.onboarding` en `greenhouse_core.view_registry` + grants para roles internos con `mi_ficha` completa |
 | Nomenclatura | `src/config/greenhouse-nomenclature.ts` | `GH_MY_NAV.paymentProfile = { label: 'Mi Cuenta de Pago', subtitle: 'Donde recibes tus pagos' }` |
-| Discovery | `src/components/layout/vertical/VerticalMenu.tsx` | Item en sección "Mi Ficha" gated por `canSeeView('mi_ficha.mi_cuenta_pago', true)` (defense in depth: capability + viewCode + page guard) |
+| Discovery | `src/lib/navigation/my-nav-items.ts` (`buildMyNavItems`) | Hoja `paymentProfile` (`/my/payment-profile`) del builder canónico de navegación personal, gated por `canSeeView('mi_ficha.mi_cuenta_pago', true)`; desde TASK-1388 las hojas `/my/*` se sirven en el dropdown del avatar (`UserDropdown`) para internos y en la sección "Mi Ficha" del rail del colaborador puro (TASK-1686) — ya no en el sidebar interno (defense in depth: capability + viewCode + page guard) |
 | Discovery (alterno) | `src/views/greenhouse/my/MyProfileView.tsx` | Tab "Cuenta de pago" que renderiza el mismo `<MyPaymentProfileView />` (single source of truth en React) |
 
 ### Reglas duras (TASK-753 invariants)

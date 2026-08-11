@@ -1,9 +1,9 @@
 # Propuestas en el portal — ver estado y descargar versiones
 
 > **Tipo de documento:** Manual de uso (runbook operador)
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-07-15 por Claude (TASK-1413)
-> **Última actualización:** 2026-07-15 por Claude
+> **Última actualización:** 2026-08-10 por Claude (TASK-1388 — Propuestas vive dentro de Admin Center → Equipo y operaciones)
 > **Documentación técnica:** [GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md) · task specs TASK-1412/TASK-1413
 
 ## Para qué sirve
@@ -20,7 +20,7 @@ oferta económica, etc.), y deja bajar el archivo real de cualquier versión con
 
 ## Paso a paso
 
-1. En el menú lateral, entra a **Administración → Propuestas** (ruta `/admin/commercial/proposals`).
+1. En el menú lateral, zona **Administración**, entra a **Admin Center → Equipo y operaciones → Propuestas** (ruta `/admin/commercial/proposals`).
 2. La tabla lista las propuestas con origen, estado, deadline y cuántos artefactos tienen. Los chips de
    arriba filtran por estado; «Todos los estados» incluye también las cerradas (ganadas/perdidas/declinadas).
 3. Haz clic en una fila: se abre el panel lateral con los **artefactos agrupados por tipo**. Cada tipo

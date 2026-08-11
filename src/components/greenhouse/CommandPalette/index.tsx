@@ -5,6 +5,8 @@ import type { ReactNode } from 'react'
 
 import { useRouter, usePathname } from 'next/navigation'
 
+import IconButton from '@mui/material/IconButton'
+
 import { Command } from 'cmdk'
 import { Dialog, DialogPortal, DialogOverlay, DialogContent, DialogTitle, DialogDescription } from '@radix-ui/react-dialog'
 
@@ -56,6 +58,12 @@ export interface CommandPaletteProps {
   triggerLabel?: string
   showTrigger?: boolean
   enableGlobalShortcut?: boolean
+
+  /** TASK-1388 — trigger icon-only (mobile / layout horizontal). */
+  compactTrigger?: boolean
+
+  /** TASK-1388 — notifica cada navegación elegida (el caller registra recientes). */
+  onNavigate?: (route: PaletteRoute) => void
 }
 
 const DEFAULT_ICON_FOR_SECTION: Record<GovernanceSection, string> = {
@@ -148,7 +156,9 @@ export const CommandPalette = ({
   recentItems,
   triggerLabel = 'Buscar ⌘K',
   showTrigger = true,
-  enableGlobalShortcut = true
+  enableGlobalShortcut = true,
+  compactTrigger = false,
+  onNavigate
 }: CommandPaletteProps) => {
   const router = useRouter()
   const currentPath = usePathname() ?? '/'
@@ -183,9 +193,10 @@ export const CommandPalette = ({
     if (!open && search) setSearch('')
   }, [open, search])
 
-  const handleNavigate = (routePath: string) => {
+  const handleNavigate = (route: PaletteRoute) => {
     setOpen(false)
-    router.push(routePath)
+    onNavigate?.(route)
+    router.push(route.routePath)
   }
 
   const handleAction = (action: PaletteAction) => {
@@ -196,20 +207,25 @@ export const CommandPalette = ({
   return (
     <>
       {showTrigger ? (
-        <button
-          type='button'
-          className='gh-cmdk-trigger'
+        // TASK-1388 follow-up visual: el trigger replica el lenguaje de las
+        // utilidades de la topbar (IconButton borderless + label muted), que es
+        // exactamente el tratamiento que tenía el NavSearch retirado — no un
+        // chip bordeado ajeno al chrome. `.gh-cmdk-trigger` se conserva como
+        // hook semántico de los scenarios GVC.
+        <div
+          className={compactTrigger ? 'gh-cmdk-trigger flex items-center' : 'gh-cmdk-trigger flex items-center gap-2 cursor-pointer'}
           onClick={() => setOpen(true)}
-          aria-label={TASK407_ARIA_ABRIR_BUSCADOR_RAPIDO}
         >
-          <i className='tabler-search' />
-          <span>{triggerLabel}</span>
-        </button>
+          <IconButton aria-label={TASK407_ARIA_ABRIR_BUSCADOR_RAPIDO} className='text-textPrimary'>
+            <i className='tabler-search text-2xl' />
+          </IconButton>
+          {compactTrigger ? null : <div className='whitespace-nowrap select-none text-textDisabled'>{triggerLabel}</div>}
+        </div>
       ) : null}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogPortal>
           <DialogOverlay className='gh-cmdk-overlay' />
-          <DialogContent className='gh-cmdk-dialog' aria-describedby='gh-cmdk-description'>
+          <DialogContent className='gh-cmdk-dialog' aria-describedby='gh-cmdk-description' data-capture='cmdk-open'>
             <DialogTitle hidden>Greenhouse Command Palette</DialogTitle>
             <DialogDescription id='gh-cmdk-description' hidden>
               Buscar vistas, acciones y atajos en Greenhouse. ⌘K para abrir, esc para cerrar.
@@ -234,7 +250,7 @@ export const CommandPalette = ({
                         value={`${item.label} ${item.viewCode} reciente`}
                         routePath={item.routePath}
                         currentPath={currentPath}
-                        onSelect={() => handleNavigate(item.routePath)}
+                        onSelect={() => handleNavigate(item)}
                       >
                         <i className={item.icon ?? DEFAULT_ICON_FOR_SECTION[item.section]} />
                         <span>{item.label}</span>
@@ -268,7 +284,7 @@ export const CommandPalette = ({
                         routePath={item.routePath}
                         currentPath={currentPath}
                         shortcut={item.shortcut}
-                        onSelect={() => handleNavigate(item.routePath)}
+                        onSelect={() => handleNavigate(item)}
                       >
                         <i className={item.icon ?? DEFAULT_ICON_FOR_SECTION[group.section]} />
                         <span>{item.label}</span>

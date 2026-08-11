@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.23
+> **Version:** 1.24
 > **Creado:** 2026-06-24 por Claude (TASK-1226)
-> **Ultima actualizacion:** 2026-07-17 por Claude (TASK-1276 — vista operador Growth/AEO + facet Account 360)
+> **Ultima actualizacion:** 2026-08-10 por Claude (TASK-1388 — Growth vive como seccion del dominio Comercial en el menu)
 > **Documentacion tecnica:** [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 
 # AI Visibility Grader — Motor de Providers (Growth)
@@ -231,7 +231,7 @@ Mostrar el resultado en pantalla no basta: si el prospecto cierra la pestaña, p
 
 El operador interno (Growth/Account) tiene su propia superficie del programa, fuera de `/admin`:
 
-- **Cockpit `/growth/aeo`** (menú Growth → AEO): lista los clientes con módulo AEO activo con su score
+- **Cockpit `/growth/aeo`** (menú lateral, zona Operación → Comercial → Growth → AEO): lista los clientes con módulo AEO activo con su score
   (semáforo; "Sin medición" cuando no hay run con score — nunca un 0 inventado), tier y último run.
   Los filtros por motion (Con AEO / Expansión / Prospecto) muestran además los targets de cross-sell:
   clientes sin AEO y prospectos sincronizados desde HubSpot.

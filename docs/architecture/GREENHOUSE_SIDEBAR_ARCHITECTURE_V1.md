@@ -1,11 +1,22 @@
 # Greenhouse Sidebar Architecture
 
 > **Tipo de documento:** Spec de arquitectura (documento vivo)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-04-11 por Claude (auditoria completa del sidebar)
-> **Ultima actualizacion:** 2026-05-07 — TASK-555 agrega `routeGroup: commercial` y view codes `comercial.*` sobre paths legacy `/finance/...`.
+> **Ultima actualizacion:** 2026-08-11 — TASK-1685: la visibilidad de los ítems `cliente.*` la decide el primitive único del portal cliente, no el gate por rol (ver nota de status). Previo: TASK-1388 + TASK-1686 supersede el inventario de secciones internas; TASK-1389 instala el contrato de superficies + gate `pnpm nav:budget`.
 > **Archivo fuente:** `src/components/layout/vertical/VerticalMenu.tsx`
-> **Documentacion tecnica:** `GREENHOUSE_IDENTITY_ACCESS_V2.md`, `GREENHOUSE_UI_PLATFORM_V1.md`
+> **Documentacion tecnica:** `GREENHOUSE_IDENTITY_ACCESS_V2.md`, `docs/architecture/ui-platform/README.md`
+
+> ⚠️ **Status (2026-08-10):** el inventario de secciones/items INTERNAS de este documento (§2.2, §3.1, §4.1–4.6, §5, §7, §9) describe la estructura previa a `TASK-1388` y quedó **superseded**. El runtime vigente es:
+>
+> - **Sidebar interno = 3 zonas `isSection`** — `Operación` (dominios acordeón `Agencia · Comercial · Finanzas · Personas`), `Administración` (Admin Center) y `Recursos` (Knowledge + Design System) — con acordeón nativo Vuexy (un dominio abierto a la vez). "Spaces (admin)" desambiguado, Sample Sprints con hogar único en Comercial, Growth como sección de Comercial.
+> - **Las hojas personales `/my/*` ya NO viven en el sidebar interno**: viven en el dropdown del avatar (`UserDropdown`), servidas por el builder canónico `src/lib/navigation/my-nav-items.ts` (`buildMyNavItems`, 13 hojas + `MY_NAV_HOME` + gates dinámicos). Declaradas alcanzables vía `via: 'avatar-dropdown'` en `route-reachability-manifest.ts`.
+> - **Colaborador puro** (`isMyUser && !isInternalPortalUser && !isClientUser`, `TASK-1686`): rail = `/my` + sección `Mi Ficha` (builder) + plataforma concedida; avatar = identidad + Mi Perfil + salir. Los perfiles my+client/client/internal conservan su salida vigente.
+> - **`NavSearch` fue eliminada** (`src/components/layout/shared/search/` borrada; `src/data/navigation/verticalMenuData.tsx` borrado). La única palette ⌘K es la `CommandPalette` de TASK-696 (`src/components/greenhouse/CommandPalette/`), montada globalmente vía `src/components/layout/shared/GlobalCommandPalette.tsx` (filtro de audiencia routeGroup+authorizedViews para routeGroups internos; desde `TASK-1685` las entradas `routeGroup === 'client'` se filtran con el primitive de visibilidad del portal cliente `canSeeClientPortalView`, no con el claim; recientes client-side, acción de salir).
+> - Labels de zonas/dominios/secciones tokenizados en `GH_INTERNAL_NAV` (`src/config/greenhouse-nomenclature.ts`) + espejo en-US.
+> - **El rail interno ahora opera con contrato + presupuesto mecánico (`TASK-1389`)**: cada tipo de destino tiene UNA superficie (operativo→sidebar en zonas · personal→avatar · cola larga→⌘K · frecuente→shortcuts), prohibido duplicar destinos o colgar ítems de primer nivel fuera de zonas, y el gate `pnpm nav:budget` (`scripts/ci/nav-budget-gate.mjs`, severidad `error`; corre en `pnpm test` y en el job `nav-budget` de `design-contract.yml`) mide el árbol real contra `MAX_TOP_LEVEL_SLOTS=8` + `MAX_INTERACTIVE_DEPTH=2` y cross-checkea el manifest (`/my/*` con `surface: 'sidebar'` = violación). Contrato canónico: `docs/architecture/agent-invariants/NAVIGATION_SURFACE_ALLOCATION_CONTRACT.md`.
+>
+> El menú **cliente** (§3.2, §4.7) no cambió con TASK-1388, pero **sí con `TASK-1685` (2026-08-10)**: la visibilidad de todo ítem `cliente.*` —lista base incluida— la decide el **primitive único del portal cliente** (`canSeeClientPortalView`: módulos contratados de la organización + revocaciones per-persona), el mismo predicado que los page guards y ⌘K. El gate `canSeeView(viewCode)` por rol descrito en §2/§4.7 sigue vigente **sólo para el portal interno**; para vistas `cliente.*` está prohibido (lint `greenhouse/no-client-portal-view-visibility-bypass`). Canon: `GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md` §12.1 + `ORG_CLIENT_AGENT_INVARIANTS.md`. Las reglas de permisos (§2.3), reglas de extensión (§10) y archivos clave (§11) siguen vigentes en lo conceptual; ante cualquier duda, la fuente de verdad es `VerticalMenu.tsx` + `my-nav-items.ts` + las specs `docs/tasks/complete/TASK-1388-vertical-menu-restructure.md` y `docs/tasks/complete/TASK-1686-pure-collaborator-navigation.md`.
 
 ---
 
@@ -203,7 +214,7 @@ TASK-554 crea `Comercial` como dominio top-level de navegación. TASK-555 agrega
 | Proyectos | `GH_CLIENT_NAV.projects` | `tabler-folders` | `/proyectos` | `cliente.proyectos` |
 | Ciclos | `GH_CLIENT_NAV.sprints` | `tabler-bolt` | `/sprints` | `cliente.ciclos` |
 | Equipo | `GH_CLIENT_NAV.team` | `tabler-users-group` | `/equipo` | `cliente.equipo` |
-| Revisiones | `GH_CLIENT_NAV.reviews` | `tabler-git-pull-request` | `/reviews` | `cliente.revisiones` |
+| Revisiones | `GH_CLIENT_NAV.reviews` | `tabler-git-pull-request` | `/reviews` | `cliente.reviews` |
 | Analytics | `GH_CLIENT_NAV.analytics` | `tabler-chart-dots` | `/analytics` | `cliente.analytics` |
 | Campanas | `GH_CLIENT_NAV.campaigns` | `tabler-speakerphone` | `/campanas` | `cliente.campanas` |
 | Novedades | `GH_CLIENT_NAV.updates` | `tabler-bell` | `/updates` | `cliente.actualizaciones` |
@@ -379,6 +390,8 @@ Un `efeonce_admin` ve hasta **64 items** en el sidebar. Aun con Finanzas y Admin
 
 ## 10. Reglas de extension
 
+> **Precondición (TASK-1389):** antes de agregar cualquier destino de navegación, decidir su superficie según el Contrato de Asignación de Superficies (`docs/architecture/agent-invariants/NAVIGATION_SURFACE_ALLOCATION_CONTRACT.md`): operativo→sidebar dentro de una zona, personal `/my/*`→avatar, cola larga→⌘K, frecuente→shortcuts. El rail interno tiene presupuesto (`MAX_TOP_LEVEL_SLOTS=8`, `MAX_INTERACTIVE_DEPTH=2`) verificado por `pnpm nav:budget` en severidad `error`; duplicar un destino en dos superficies o colgar un ítem de primer nivel fuera de una zona es violación. La task que agrega el destino declara `Nav placement` en su `## UI/UX Contract`.
+
 ### 10.1 Como agregar un nuevo modulo al sidebar
 
 1. **Definir el view code** en `src/lib/admin/view-access-catalog.ts` (ej: `nuevo_modulo.vista_principal`)
@@ -425,3 +438,4 @@ Submenus    → Agrupar por dominio/workflow, no por tipo de dato
 | Fecha | Version | Cambio |
 |-------|---------|--------|
 | 2026-04-11 | 1.0 | Documento inicial. Inventario completo de 67 rutas, 54 view codes, 5 variantes por rol. Hallazgos de densidad, iconos duplicados, labels hardcodeados documentados. |
+| 2026-08-10 | 1.1 | TASK-1388 + TASK-1686 supersede el inventario interno: 3 zonas `isSection` con acordeón de dominios, `/my/*` al dropdown del avatar (`buildMyNavItems`), `NavSearch` eliminada (⌘K único = `CommandPalette` vía `GlobalCommandPalette`), predicado colaborador puro. Nota de status agregada al encabezado; el detalle vive en las task-specs. |

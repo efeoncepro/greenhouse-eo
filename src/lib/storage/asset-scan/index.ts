@@ -2,6 +2,7 @@ import 'server-only'
 
 import { createClamAvHttpScanner } from './clamav-http'
 import {
+  getAssetMalwareScanAudience,
   getAssetMalwareScanEndpoint,
   getAssetMalwareScanTimeoutMs,
   isAssetMalwareScanEnabled,
@@ -57,7 +58,29 @@ export const scanAssetBytes = async (input: AssetScanInput): Promise<AssetScanRe
         detail: 'ASSET_MALWARE_SCAN_ENABLED está prendido pero falta ASSET_MALWARE_SCAN_ENDPOINT.',
       })
     } else {
-      const clamav = await createClamAvHttpScanner({ endpoint, timeoutMs: getAssetMalwareScanTimeoutMs() }).scan(input)
+      // TASK-1378 — El servicio vive en Cloud Run detrás de IAM. La audiencia se
+      // deriva del propio endpoint; si no es https (dev local sin IAM) no se
+      // pide token y el adapter llama sin header.
+      const audience = getAssetMalwareScanAudience()
+
+      // `import()` diferido y no import estático: `google-auth-library` es pesado
+      // y este módulo está en el path de TODA subida. Con el flag OFF —el default
+      // en todos los runtimes— no hay razón para que el SDK de auth entre siquiera
+      // al grafo. Estático, se cargaba en cada archivo que toca uploads y empujaba
+      // la memoria del runner de CI hasta matarlo en un render de react-pdf.
+      const getAuthToken = audience
+        ? async () => {
+            const { fetchGoogleIdTokenForAudience } = await import('@/lib/google-credentials')
+
+            return fetchGoogleIdTokenForAudience(audience)
+          }
+        : undefined
+
+      const clamav = await createClamAvHttpScanner({
+        endpoint,
+        timeoutMs: getAssetMalwareScanTimeoutMs(),
+        ...(getAuthToken ? { getAuthToken } : {}),
+      }).scan(input)
 
       verdict = worstVerdict(verdict, clamav.verdict)
       findings.push(...clamav.findings)

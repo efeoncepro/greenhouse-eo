@@ -4,6 +4,28 @@
 > **Creado:** 2026-04-08 por Claude (asistido)
 > **Ultima actualizacion:** 2026-04-09
 > **Status:** Spec completa — baseline + propuesta + readiness assessment. Lista para derivar tasks
+> **⚠️ Vigencia:** documento **descriptivo/predecesor**. El contrato vigente del dominio es
+> `GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md`; ante conflicto, gana ése. Ver §Corrección 2026-08-09.
+
+---
+
+## Corrección 2026-08-09 — el viewCode canónico de `/reviews` es `cliente.reviews`
+
+Este documento cita **`cliente.revisiones`** para `/reviews` en seis lugares (las tablas de grants, el
+catálogo de viewCodes y las tres tablas de propuesta/priorización). **Ese viewCode quedó retirado.**
+
+`TASK-1679` unificó la ruta en **`cliente.reviews`**, que es el que declara el módulo
+`creative_hub_globe_v1` en `greenhouse_client_portal.modules.view_codes`. Eran dos strings distintos
+para la misma ruta —el guard pedía uno y el módulo declaraba el otro—, así que la página no podía abrir
+ni con la llave de organización correcta. `cliente.revisiones` se conserva en el `VIEW_REGISTRY` porque
+el registry es append-only, marcado como retirado, y **ninguna ruta lo gatea**.
+
+Las citas de abajo se dejan sin reescribir a propósito: pertenecen al baseline y a las tablas de
+propuesta de abril, y reescribirlas volvería irrastreable qué se decidió cuándo. Al leer cualquiera de
+ellas, sustituir mentalmente por `cliente.reviews`.
+
+> **NUNCA** usar `cliente.revisiones` en código nuevo. El canónico vigente y el guard real están en
+> `GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md` §12.2, que es el documento de contrato de este dominio.
 
 ---
 
@@ -117,9 +139,31 @@ Tres roles definidos en `src/config/role-codes.ts`:
 - Los tres roles mapean al **mismo route group**: `['client']` (`src/lib/tenant/role-route-mapping.ts`).
 - Los roles cliente tienen la prioridad mas baja en `ROLE_PRIORITY`, despues de todos los roles internos.
 
-### Diferenciacion de roles (TASK-285, 2026-04-16)
+### Diferenciacion de roles (TASK-285, 2026-04-16) — ⛔ RETIRADA el 2026-08-10
 
-La diferenciacion se implementa via `role_view_assignments` en `greenhouse_core`, NO via route groups separados. Los tres roles comparten route group `['client']` pero tienen asignaciones de view codes distintas:
+> **Esta subsección describe un mecanismo que ya no existe.** Se conserva porque explica de dónde salen
+> las filas que siguen en la tabla, **no** como contrato. `TASK-1685` (decisión (a′), cierra `ISSUE-148`)
+> retiró `role_view_assignments` como carril de las vistas `cliente.*`: ni las otorga ni las niega.
+>
+> **Lo vigente:**
+> ```
+> acceso = interna ∨ ( ¬revocadaParaLaPersona ∧ ( vistaBase ∨ móduloDeLaOrgLaDeclara ) )
+> ```
+> Un solo primitive (`src/lib/client-portal/visibility/`) consumido por el page guard, la lista base del
+> menú, el ⌘K y los layouts de ruta. **Dentro de una misma organización, los tres roles cliente ven lo
+> mismo.** Contrato: `GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md` §12.1 y §12.2.
+>
+> **La "Cadena de enforcement" de más abajo es la parte que más desorienta**, y su paso 3 nunca fue del
+> todo cierto: `requireViewCodeAccess` —el page guard canónico desde `TASK-827`— nunca leyó
+> `authorizedViews`. De las 3 vistas negadas al specialist, sólo `/campanas` tenía además un layout que
+> gateaba por rol; `/equipo` y `/analytics` no. Hoy los cuatro layouts del portal consumen el primitive.
+>
+> **NUNCA** sembrar `granted=TRUE` en `role_view_assignments` esperando habilitar una vista cliente: no
+> la hace alcanzable. El carril es declararla en el `view_codes[]` del módulo que la vende. El lint
+> `greenhouse/no-client-portal-view-visibility-bypass` está en `error`. Para el portal **interno** este
+> carril sigue siendo el canónico y nada de esto le aplica.
+
+La diferenciacion se implementaba via `role_view_assignments` en `greenhouse_core`, NO via route groups separados. Los tres roles comparten route group `['client']` y tenian asignaciones de view codes distintas — las filas siguen en la tabla (append-only) y hoy son inertes:
 
 | View Code | client_executive | client_manager | client_specialist |
 |-----------|:---:|:---:|:---:|
@@ -135,17 +179,29 @@ La diferenciacion se implementa via `role_view_assignments` en `greenhouse_core`
 | cliente.configuracion | granted | granted | granted |
 | cliente.notificaciones | granted | granted | granted |
 
-**Cadena de enforcement:**
-1. Login → `resolveAuthorizedViewsForUser()` lee `role_view_assignments` → JWT.authorizedViews
-2. Menu → `canSeeView()` en VerticalMenu.tsx filtra items por `authorizedViews`
-3. Page guard → `hasAuthorizedViewCode()` en cada page bloquea acceso directo y redirige a portalHomePath
+**Cadena de enforcement (histórica — ⛔ ninguno de los 3 pasos gobierna hoy una vista `cliente.*`):**
+1. ~~Login → `resolveAuthorizedViewsForUser()` lee `role_view_assignments` → JWT.authorizedViews~~ — el
+   claim se sigue derivando, pero ya no gobierna vistas cliente.
+2. ~~Menu → `canSeeView()` en VerticalMenu.tsx filtra items por `authorizedViews`~~ — reemplazado por el
+   primitive (`TASK-1685`). Antes de eso ocultaba las 3 vistas, y por eso el hueco del paso 3 pasó
+   desapercibido cuatro meses.
+3. ~~Page guard → `hasAuthorizedViewCode()` en cada page bloquea acceso directo~~ — **nunca fue cierto
+   para las 3 vistas**: sólo `/campanas` tenía un layout en ese carril. Hoy los layouts y el guard
+   consumen el primitive.
 
-**Governance runtime:** la matriz es editable desde Admin Center (`/admin/views`) sin deploy.
+**Governance runtime:** la matriz sigue editable desde Admin Center (`/admin/views`) sin deploy, y sigue
+gobernando el **portal interno**. Editar ahí una fila `cliente.*` no cambia nada — es el instrumento
+decorativo que `ISSUE-148` encontró.
 
 **Migration:** `20260416095444700_seed-client-role-view-assignments.sql`
 **Test:** `src/lib/admin/client-role-visibility.test.ts`
 
-> Nota: executive y manager son identicos para las 11 vistas actuales. Su diferenciacion se activara cuando se registren los view codes nuevos de §12.5 (TASK-286+).
+> Nota: executive y manager son identicos para las 11 vistas actuales. ~~Su diferenciacion se activara
+> cuando se registren los view codes nuevos de §12.5 (TASK-286+).~~ **No se va a activar por esa vía**:
+> `TASK-286` quedó con su premisa invalidada por `TASK-1685` (ver su `## Delta 2026-08-10`). Registrar
+> view codes y sembrarles grants por rol no produce acceso en el portal cliente. Si la diferenciación
+> entre roles vuelve a hacer falta, el instrumento es `user_view_overrides` per-persona (deny), y si es
+> una diferencia **comercial**, el carril es el módulo: dos productos, no dos permisos.
 
 ---
 
@@ -238,7 +294,9 @@ Se renderizan si `capabilityModules.length > 0` y `canSeeView('cliente.modulos')
 
 ### Gap: seccion "Mi Ficha"
 
-Existe una seccion "Mi Ficha" con 7 items (assignments, performance, delivery, perfil, payroll, permisos, organizacion) que solo se muestra si el usuario tiene route group `my`. Hoy ningun rol de cliente incluye `my`, pero la infraestructura esta lista si se quisiera habilitar una experiencia de colaborador para usuarios que son a la vez cliente y colaborador.
+Existe una seccion "Mi Ficha" que solo se muestra si el usuario tiene route group `my`. Hoy ningun rol de cliente incluye `my`, pero la infraestructura esta lista si se quisiera habilitar una experiencia de colaborador para usuarios que son a la vez cliente y colaborador.
+
+Desde TASK-1388/TASK-1686 las hojas de esa seccion salen del builder canonico `src/lib/navigation/my-nav-items.ts` (`buildMyNavItems`), el mismo que sirve el dropdown del avatar de los usuarios internos. El **colaborador puro** (`my` sin `internal` ni `client`) ya no cae en el menu cliente: tiene su propio predicado en `VerticalMenu.tsx` con rail = `/my` + seccion "Mi Ficha" + plataforma concedida, sin destinos cliente. Para usuarios my+client el menu cliente conserva su salida vigente sin cambios.
 
 ---
 

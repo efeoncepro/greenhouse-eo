@@ -1,5 +1,25 @@
 # TASK-402 — Universal Adaptive Home Orchestration
 
+## Delta 2026-08-09
+
+Causado por `TASK-1678` / `TASK-1679` (complete, en producción) + `TASK-1685` (nueva, `to-do`).
+
+- **El principio que esta task ya declaraba —«`routeGroups` y `authorizedViews` no deben reutilizarse como
+  único criterio para decidir el startup home»— pasó de recomendación a requisito duro en el carril
+  cliente.** Para un tenant `client`, `authorizedViews` ya no describe lo que la persona puede abrir: el
+  acceso a una superficie cliente lo decide el **módulo contratado**
+  (`greenhouse_client_portal.module_assignments`) vía `requireViewCodeAccess`
+  ([src/lib/client-portal/guards/require-view-code-access.ts](../../../src/lib/client-portal/guards/require-view-code-access.ts)),
+  mientras `authorizedViews` sólo refleja `role_view_assignments` + permission sets + overrides.
+- **Y el claim puede venir vacío legítimamente.** `resolveAuthorizedViewsForUser` invirtió su default para
+  `view.routeGroup === 'client'` (sin fila `granted=TRUE` no hay acceso) y su camino degradado devuelve
+  **lista vacía** para tenants `client`. Un orquestador de home que trate «lista no vacía» como señal de
+  salud, o que elija destino contando views, computa mal para clientes.
+- **No recomponer la respuesta acá.** `TASK-1685` va a producir **un** primitive server-side que responde
+  «¿esta persona puede ver esta vista?», consumido por el menú y por el page guard. Si esta task necesita
+  esa respuesta para elegir el startup home, consumir ese primitive en vez de derivarla de claims de
+  sesión. La semántica todavía se está decidiendo (`ISSUE-148`).
+
 ## Delta 2026-04-26
 
 - **Absorbida parcialmente por TASK-696** (Smart Home v2 Enterprise-grade redesign).
