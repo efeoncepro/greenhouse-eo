@@ -68,11 +68,53 @@ echo "    Contexto: ${SCRIPT_DIR} (NO la raíz del repo — este servicio no com
 IMAGE="gcr.io/${PROJECT_ID}/clamav"
 
 # El build hornea la base de firmas en la imagen; tarda varios minutos y pesa.
-gcloud builds submit "${SCRIPT_DIR}" \
+#
+# `--async` + poll y no streaming: en GitHub Actions el deployer no es
+# Viewer/Owner del bucket de logs por defecto, así que `gcloud builds submit`
+# síncrono sale con exit 1 ("can only stream logs if you are Viewer/Owner")
+# aunque el build esté corriendo bien. El estado del build es la verdad, no la
+# capacidad de leer sus logs.
+BUILD_ID="$(gcloud builds submit "${SCRIPT_DIR}" \
   --project="${PROJECT_ID}" \
   --tag="${IMAGE}" \
   --timeout=1800s \
-  --quiet
+  --async \
+  --format='value(id)' \
+  --quiet)"
+
+if [ -z "${BUILD_ID}" ]; then
+  echo "ERROR: Cloud Build no devolvió un id de build."
+  exit 1
+fi
+
+echo "    Build ${BUILD_ID} en curso (hornear las firmas toma varios minutos)..."
+
+BUILD_DEADLINE=$((SECONDS + 1800))
+
+while [ ${SECONDS} -lt ${BUILD_DEADLINE} ]; do
+  BUILD_STATUS="$(gcloud builds describe "${BUILD_ID}" \
+    --project="${PROJECT_ID}" \
+    --format='value(status)' 2>/dev/null || echo 'UNKNOWN')"
+
+  case "${BUILD_STATUS}" in
+    SUCCESS)
+      echo "    Build ${BUILD_ID}: SUCCESS"
+      break
+      ;;
+    FAILURE | TIMEOUT | CANCELLED | EXPIRED)
+      echo "ERROR: build ${BUILD_ID} terminó en ${BUILD_STATUS}."
+      echo "       Logs: https://console.cloud.google.com/cloud-build/builds/${BUILD_ID}?project=${PROJECT_ID}"
+      exit 1
+      ;;
+  esac
+
+  sleep 15
+done
+
+if [ "${BUILD_STATUS:-}" != "SUCCESS" ]; then
+  echo "ERROR: build ${BUILD_ID} no terminó dentro de 1800 s (último estado: ${BUILD_STATUS:-desconocido})."
+  exit 1
+fi
 
 # TASK-849/851 — GIT_SHA para la detección de drift del watchdog de release.
 EXPECTED_SHA="${EXPECTED_SHA:-${GITHUB_SHA:-$(git rev-parse HEAD 2>/dev/null || echo 'unknown')}}"

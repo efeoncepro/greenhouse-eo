@@ -86,6 +86,27 @@ describe('clamav deploy — capacidad', () => {
   })
 })
 
+describe('clamav deploy — el build no depende de poder leer sus logs', () => {
+  // Bug real 2026-08-11 (run 31491426010): `gcloud builds submit` síncrono sale
+  // con exit 1 en GitHub Actions porque el deployer no es Viewer/Owner del
+  // bucket de logs — con el build corriendo bien y terminando en SUCCESS.
+  // El estado del build es la verdad, no la capacidad de leer sus logs.
+  it('lanza el build async y consulta su estado', () => {
+    const script = deployScript()
+
+    expect(script).toContain('--async')
+    expect(script).toContain('gcloud builds describe')
+  })
+
+  it('trata FAILURE/TIMEOUT/CANCELLED/EXPIRED como fallo del deploy', () => {
+    const script = deployScript()
+
+    for (const status of ['FAILURE', 'TIMEOUT', 'CANCELLED', 'EXPIRED']) {
+      expect(script, `el poll no contempla ${status}`).toContain(status)
+    }
+  })
+})
+
 describe('clamav Dockerfile — la imagen lleva todo el runtime', () => {
   // Bug real 2026-08-11: extraer `clamd-protocol.mjs` del shim sin agregar su
   // COPY dejó una imagen que buildeaba y pusheaba VERDE, y recién moría en
