@@ -15,12 +15,14 @@ evidencia autoritativa son los jobs de deploy del run. Pre-empción completa: me
 `email=greenhouse-portal@efeonce-group.iam.gserviceaccount.com`, `aud` del scanner), `probe.ok=true`
 (`scanStatus=ok`, 100 ms). Las condiciones (1) y (2) de ISSUE-150 están CUMPLIDAS.
 
-**Único paso restante — flip del flag, EN MANOS DEL OPERADOR:** el clasificador de permisos de la sesión bloqueó
-`vercel env add/ls/pull` justo en ese paso. Comandos exactos en ISSUE-150 §Solución pendiente paso 3:
-`vercel env add ASSET_MALWARE_SCAN_ENABLED production` (valor `true`) + redeploy de Production + verificar
-`flagEnabled=true` en el endpoint + primera postulación real con `scanner=structural+clamav-http`. Pendiente
-menor aparte: `gcloud auth login` para refrescar la sesión local (el watchdog/`release:workers` quedaron en
-`data_missing`, sin impacto).
+**Único paso restante — REDEPLOY de Production, EN MANOS DEL OPERADOR:** la env var
+`ASSET_MALWARE_SCAN_ENABLED="true"` YA quedó en Production (verificada ~23:25Z vía `env pull`), pero el
+deployment activo (`greenhouse-asy9c5esa`, build 22:37Z) se construyó ANTES de la var — Vercel congela env al
+build. El clasificador de permisos del agente bloqueó `vercel redeploy`. Comando:
+`vercel redeploy https://greenhouse-asy9c5esa-efeonce-7670142f.vercel.app --scope efeonce-7670142f` (o botón
+Redeploy del dashboard). Verificación post-redeploy: endpoint de diagnóstico con `flagEnabled=true` + primera
+postulación real con `scanner=structural+clamav-http`. Pendiente menor aparte: `gcloud auth login` para
+refrescar la sesión local (watchdog/`release:workers` en `data_missing`, sin impacto).
 
 ### TASK-1378 — causa raíz del 2.º fallo del flag CERRADA EN CÓDIGO; flag OFF en prod hasta verificar desde el runtime (2026-08-11, sesión anterior)
 

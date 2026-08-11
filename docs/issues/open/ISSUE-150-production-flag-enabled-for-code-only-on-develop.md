@@ -141,22 +141,20 @@ eso lo cierra el endpoint de diagnóstico en producción.
    (`version=a90951d`): `credentialPlan=service_account_key`, `mint.ok=true` en 53 ms con
    `email=greenhouse-portal@efeonce-group.iam.gserviceaccount.com` y `aud` del scanner, `probe.ok=true`
    con `scanStatus=ok` en 100 ms. La rama nueva funciona EN el runtime de producción.
-3. **PENDIENTE (único paso restante):** prender `ASSET_MALWARE_SCAN_ENABLED` en Vercel Production +
-   redeploy, mirando la primera postulación real. El agente no pudo ejecutarlo: el clasificador de
-   permisos de la sesión bloqueó `vercel env add/ls/pull` en ese momento. Comandos exactos para el
-   operador:
+3. **PARCIALMENTE CUMPLIDO 2026-08-11 ~23:25Z:** la env var `ASSET_MALWARE_SCAN_ENABLED="true"` YA está en
+   Vercel Production (verificada vía `vercel env pull`). **Falta ÚNICAMENTE el redeploy de Production**
+   para que el build la hornee (Vercel congela las env vars al build; el deployment activo
+   `greenhouse-asy9c5esa` se construyó antes de la var). El clasificador de permisos del agente bloqueó
+   `vercel redeploy`; comando exacto para el operador (o botón "Redeploy" del dashboard sobre el
+   deployment de Production actual):
 
    ```bash
-   vercel env add ASSET_MALWARE_SCAN_ENABLED production
-   # valor: true
+   vercel redeploy https://greenhouse-asy9c5esa-efeonce-7670142f.vercel.app --scope efeonce-7670142f
    ```
 
-   ```bash
-   vercel redeploy $(vercel ls greenhouse-eo --scope efeonce-7670142f 2>/dev/null | grep -m1 Production | awk '{print $2}') --scope efeonce-7670142f
-   ```
-
-   Verificación post-flip: el mismo endpoint de diagnóstico debe mostrar `flagEnabled=true`, y la
-   primera postulación real debe registrar `scanner=structural+clamav-http` en `asset_scan_results`.
+   Verificación post-redeploy: `GET /api/internal/health/scanner-auth?probe=scan&key=$CRON_SECRET` debe
+   mostrar `flagEnabled=true` (mint/probe ya están verdes), y la primera postulación real debe registrar
+   `scanner=structural+clamav-http` en `asset_scan_results`.
 
 ## Prevención
 
