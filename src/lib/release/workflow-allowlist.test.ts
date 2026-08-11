@@ -70,18 +70,20 @@ describe('workflow-allowlist — canonical 9 workflows (7 deploy workers + orche
 })
 
 describe('workflow-allowlist — Cloud Run drift detection mapping', () => {
-  it('maps 5 workflows to Cloud Run services', () => {
-    expect(WORKFLOWS_WITH_CLOUD_RUN_DRIFT_DETECTION).toHaveLength(5)
+  it('maps 4 workflows to Cloud Run services', () => {
+    expect(WORKFLOWS_WITH_CLOUD_RUN_DRIFT_DETECTION).toHaveLength(4)
   })
 
-  // TASK-1378 — El scanner participa en drift detection porque su veredicto
-  // gatea el upload público con semántica fail-closed: una revisión caída o
-  // desalineada bloquea postulaciones, no es un detalle de infraestructura.
-  it('maps ClamAV Scanner Deploy to clamav us-east4', () => {
-    const w = findWorkflow('ClamAV Scanner Deploy')
+  // TASK-1378 — El scanner está en el allowlist (lo necesita para ci_green y
+  // stale-approval) pero NO en drift detection: el orquestador production no lo
+  // despliega, así que su GIT_SHA quedaría desalineado en CADA release y el
+  // detector gritaría siempre. Su salud se mide por /health y por el signal
+  // storage.asset_scan.open_quarantine, no por el SHA.
+  it('ClamAV Scanner Deploy has NO Cloud Run mapping', () => {
+    const scanner = findWorkflow('ClamAV Scanner Deploy')
 
-    expect(w?.cloudRunService).toBe('clamav')
-    expect(w?.cloudRunRegion).toBe('us-east4')
+    expect(scanner).not.toBeNull()
+    expect(scanner?.cloudRunService).toBeUndefined()
   })
 
   it('maps Ops Worker Deploy to ops-worker us-east4', () => {

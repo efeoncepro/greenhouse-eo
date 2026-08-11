@@ -164,6 +164,8 @@ describe('release-worker-revision-drift signal', () => {
     const signal = await getReleaseWorkerRevisionDriftSignal()
 
     // 4 workflows have cloudRunService mapping (3 workers + 1 hubspot bridge).
+    // TASK-1378 — ClamAV Scanner Deploy queda FUERA del mapping a propósito: el
+    // orquestador no lo despliega, así que su GIT_SHA marcaría drift en cada release.
     const workersChecked = signal.evidence?.find((e) => e.label === 'workers_checked')
 
     expect(workersChecked?.value).toBe('4')
