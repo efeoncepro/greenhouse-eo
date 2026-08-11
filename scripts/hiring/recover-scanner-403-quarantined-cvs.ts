@@ -44,7 +44,12 @@ const AFFECTED_SQL = `
   WHERE a.status = 'quarantined'
     AND r.verdict = 'error'
     AND r.resolution_status = 'open'
-    AND r.findings_json::text LIKE '%scanner_http_error%'
+    -- Cualquier falla de credencial o transporte del scanner: el archivo nunca
+    -- fue el problema. NO incluye infected ni suspicious, que son veredictos
+    -- reales sobre el contenido y necesitan ojos humanos.
+    AND (r.findings_json::text LIKE '%scanner_http_error%'
+         OR r.findings_json::text LIKE '%scanner_auth_failed%'
+         OR r.findings_json::text LIKE '%scanner_unreachable%')
   ORDER BY a.created_at ASC
 `
 
@@ -121,7 +126,7 @@ const main = async () => {
           WHERE scan_id = $1`,
         [
           asset.scan_id,
-          'TASK-1378 — bloqueado por HTTP 403 del scanner (Vercel sin run.invoker), no por el contenido. Re-escaneado limpio.',
+          'TASK-1378 — bloqueado por falla de credencial/transporte del scanner, no por el contenido. Re-escaneado limpio.',
         ],
       )
 

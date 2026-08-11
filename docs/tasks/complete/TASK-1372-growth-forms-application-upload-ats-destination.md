@@ -98,7 +98,7 @@ Revisar y respetar:
 - `docs/tasks/complete/TASK-1232-growth-forms-admin-cockpit-first-migration.md`
 - `docs/tasks/complete/TASK-1367-careers-apply-intake-service.md`
 - `docs/tasks/to-do/TASK-1362-candidate-document-capture.md`
-- `docs/tasks/in-progress/TASK-354-public-careers-landing-apply-intake.md`
+- `docs/tasks/complete/TASK-354-public-careers-landing-apply-intake.md`
 
 Reglas obligatorias:
 

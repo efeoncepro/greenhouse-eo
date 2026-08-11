@@ -59,10 +59,10 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 
 ### Phase 2 — Public Entry + Internal Desk
 
-- `TASK-354` — construye careers público, detail de openings y apply intake.
-- `TASK-355` — construye Hiring Desk interno, Demand Desk, Pipeline Board, Application 360 y Publication Desk.
-- Pueden avanzar en paralelo solo después de `TASK-353`.
-- Gate para avanzar: apply público crea/reconcilia `Person` + `CandidateFacet` + `HiringApplication`; desk interno opera `HiringApplication`, no personas sueltas.
+- `TASK-354` — careers público, detalle de openings y formulario de apply. **✓ complete**; no reabrir por campos de intake.
+- `TASK-355` — Hiring Desk interno, Demand Desk, Pipeline Board, Application 360 y Publication Desk. **✓ complete**.
+- `TASK-1688` — corrección vertical de contacto: teléfono opcional, país de residencia explícito y mensaje persistido; paridad Careers/Growth Forms + lectura autorizada en Application 360.
+- Gate para avanzar: apply público crea/reconcilia `Person` + `CandidateFacet` + `HiringApplication`; desk interno opera `HiringApplication`, no personas sueltas. `TASK-1688` no crea un pipeline nuevo ni infiere datos históricos.
 
 ### Phase 3 — Handoff + Reactive Bridges
 
@@ -80,8 +80,9 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 
 - `TASK-352` — Program umbrella and coordination for Hiring / ATS.
 - `TASK-353` — Domain foundation: aggregates, schema, services, API baseline and publication contract. **✓ complete (2026-07-07).**
-- `TASK-354` — Public careers landing and apply intake.
-- `TASK-355` — Internal Hiring Desk, pipeline and publication governance.
+- `TASK-354` — Public careers landing and apply intake. **✓ complete; residual de datos absorbido por TASK-1688 (2026-08-11).**
+- `TASK-355` — Internal Hiring Desk, pipeline and publication governance. **✓ complete.**
+- `TASK-1688` — Careers application contact completeness: persistencia/lectura de teléfono, residencia y mensaje con un único command de Hiring.
 - `TASK-356` — Handoff, reactive events/signals and downstream bridges.
 - `TASK-770` — HRIS/People activation closure for `internal_hire`.
 
@@ -99,6 +100,10 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - `TASK-1371` — **Hiring Vacancy Publication Operator Command**: structured backend-data operator `dryRun|execute|publish` for publishing openings from approved briefs without release/SQL/UI-only flow. Adds structured public fields (`public_work_mode`, `public_hiring_region`, location, `public_area`, `public_skill_tags`, optional compensation band), publish guards, CLI/API internal surface and idempotency via the API Platform command ledger. **✓ complete/released (PR #152, 2026-07-09).**
 - `TASK-1372` — **Growth Forms Application Upload + ATS Projection Foundation**: complete local; Growth Forms is now the application-form source of truth for CV/private upload and the `growth_hiring_application_from_submission` projection into Hiring/ATS.
 - `TASK-1373` — **Careers Apply Native Growth Form Migration**: complete/staging live; `/public/careers/[publicId]/apply` renders the native `<greenhouse-form>` behind `CAREERS_NATIVE_GROWTH_FORM_ENABLED`, with production still OFF pending explicit release sign-off.
+
+### Contact completeness correction (Delta 2026-08-11)
+
+- `TASK-1688` — corrección del contrato que detectó la auditoría de postulaciones reales: teléfono y mensaje alcanzaban el schema pero el command no los persistía, y país de residencia no existía. Exige ADR antes de migrar, no permite inferencia/backfill histórico y gobierna ambas entradas públicas hacia el mismo command/reader.
 
 ## Existing Related Work
 
@@ -125,7 +130,7 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 ## Exit Criteria
 
 - [ ] `TASK-353` delivered foundation and no downstream task uses mocks or parallel schema.
-- [ ] `TASK-354` delivered public careers/apply without exposing internal opening metadata or unsafe assets.
+- [x] `TASK-354` delivered public careers/apply without exposing internal opening metadata or unsafe assets; contact persistence residual is owned by `TASK-1688`.
 - [x] `TASK-355` delivered internal desk with `HiringApplication` as board unit and capability-aware PII handling.
 - [ ] `TASK-356` delivered auditable `HiringHandoff`, versioned events and downstream signals.
 - [ ] `TASK-770` delivered selected candidate -> collaborator active closure for `internal_hire`.

@@ -1,31 +1,36 @@
 # Handoff activo
 
-### TASK-1378 — ClamAV OPERATIVO en staging y producción (2026-08-11)
+### TASK-1378 — causa raíz del 2.º fallo del flag CERRADA EN CÓDIGO; flag OFF en prod hasta verificar desde el runtime (2026-08-11)
 
-El escáner de firmas está prendido en ambos entornos, con redeploy aplicado. **Un solo servicio `clamav`** en us-east4 (2 GiB, `min=1`, cerrado por IAM, 3,6 M firmas, `freshclam` dentro del
-contenedor) atendiendo a los dos entornos de Vercel.
+Estado real: **staging ON y operativo** (gate E2E con postulaciones reales); **Production OFF** — el flag falló
+DOS veces el 2026-08-11 (ISSUE-150) y quedó revertido. Todos los CV afectados (5+1) recuperados.
 
-**Gate end-to-end cerrado con postulación real por el formulario público**, no con mocks. Turnstile no se manipuló:
-la app trae su propio camino de dev (`local-dev-captcha` cuando no hay site key fuera de producción). PDF válido →
-`clean` con `scanner=structural+clamav-http`, `attached`. **EICAR → `infected` + `quarantined`** con la firma
-`Eicar-Test-Signature`. Ambos devolvieron 202 genérico al usuario, como está diseñado.
+**Causa raíz del 2.º fallo, encontrada y corregida esta sesión:** Production corre con
+`GCP_AUTH_PREFERENCE=service_account_key` (postura transicional, TASK-800) y `resolveGoogleIdTokenProvider`
+(`src/lib/google-credentials.ts`) no tenía rama de service account key — caía a impersonación ambiente sin ADC
+en Vercel → excepción en 21 ms → fail-closed `scanner_auth_failed`. Staging pasó su gate porque sin la
+preferencia toma la rama WIF. **Fix:** rama `service_account_key` enrutada por `getGoogleIdTokenProviderPlan()`
+(exportado, 6 tests con los shapes exactos de prod/staging) + **endpoint de diagnóstico
+`GET /api/internal/health/scanner-auth`** (`?probe=scan`; guard `CRON_SECRET` o tenant agency) que acuña el
+token EN el runtime donde corre. Sanity honesto ejecutado: con la SA key REAL de producción (no la ADC del
+operador), mint 120 ms + Cloud Run aceptó (clean `ok` / EICAR `found`).
 
-Quedan dos postulaciones de prueba en el Hiring Desk con identidad inequívoca (`PRUEBA TASK-1378 / NO CONTACTAR`,
-correos `task-1378-scan-*@efeonce.org`) sobre `EO-OPN-0009`. No se borraron: `asset_scan_results` es append-only y
-borrar filas de la BD productiva compartida no es decisión del agente. HR las descarta en el Desk.
+**Condición vigente para re-prender en Production** (la anterior — "código en main" — se cumplió y NO bastó):
+(1) fix + endpoint promovidos a `main` vía release control plane; (2) `?probe=scan` contra
+`greenhouse.efeoncepro.com` con `mint.ok=true` + `probe.ok=true`; (3) flip mirando la primera postulación real
+(~13/día por la campaña de Facebook de `EO-OPN-0061`/`EO-OPN-0009`). Rollback <10 min.
 
-Pendiente menor: confirmar la primera postulación PRODUCTIVA registrando `structural+clamav-http` en
-`asset_scan_results`. El flujo recibe ~13/día (campaña de Facebook de `EO-OPN-0061`/`EO-OPN-0009`). Si algo fallara,
-rollback = `vercel env rm ASSET_MALWARE_SCAN_ENABLED production` + redeploy, <10 min.
+Docs sincronizados: ISSUE-150 (§Segundo fallo), flag ledger, timing ledger del release `64c80f61d4a4`
+(run `31530324227`), task file, runbook `operar-scanner-malware-assets.md` (paso 5 nuevo + troubleshooting).
+`recover-scanner-403-quarantined-cvs.ts` generalizado a `scanner_auth_failed`/`scanner_unreachable`.
+TASK-1378 sigue `in-progress` (no se cierra con el flag OFF en prod).
 
-Dato para no repetir un error: **producción resuelve credenciales GCP por `service_account_key`, no por WIF**
-(staging sí usa WIF). Ambos caminos quedaron verificados por separado contra su propio servicio.
+Nota histórica: la afirmación previa de este Handoff — "ambos caminos de credencial verificados por separado" —
+era falsa: la prueba local usó la ADC del operador (que tiene `serviceAccountTokenCreator`), un camino que
+Vercel no tiene. Detalle en ISSUE-150 §Prevención.
 
-Costo steady: **≈USD 19/mes**. Había desplegado dos servicios copiando el patrón de los otros workers; el operador
-señaló que staging y producción comparten UNA sola base, y eso desarmó la justificación: el scanner es stateless y
-duplicarlo no aislaba nada. Se borró `clamav-staging` y el canary de imagen nueva sale por revisión etiquetada sin
-tráfico, que Cloud Run da gratis. De paso quedó corregida en el ledger la calibración que decía "todo Cloud Run
-cuesta USD 7,32/30d": son ≈USD 169/30d.
+Servicio: **un solo `clamav`** en us-east4 (2 GiB, `min=1`, IAM-only, ≈USD 19/mes). Quedan dos postulaciones de
+prueba identificadas (`PRUEBA TASK-1378 / NO CONTACTAR`) en el Hiring Desk para que HR las descarte.
 
 ### ISSUE-149 RESUELTA — drift TS↔DB de route_group_scope (2026-08-11)
 
@@ -45,6 +50,14 @@ estados y decisión de publicar sin imágenes vive en
 `docs/operations/hiring/2026-08-11-facebook-vacancy-distribution.md`. No cambió el runtime ni el estado
 de Hiring, por lo que no requiere ADR. Pendiente operativo opcional: revisar las dos publicaciones en
 moderación antes de contarlas como visibles.
+
+### TASK-1688 — completar contacto de postulaciones Careers (2026-08-11)
+
+`TASK-354` quedó cerrada y `TASK-355` ya estaba correctamente cerrada: la postulación de Hector Tolmo sí quedó en
+Account; el Pipeline sólo seleccionaba Content por defecto. La auditoría descubrió aparte que teléfono/mensaje se
+validaban pero no se persistían y que no existía país de residencia. `TASK-1688` gobierna el arreglo vertical:
+ADR previo, migración aditiva, paridad Careers/Growth Forms y lectura autorizada en Application 360; prohíbe
+inferir/backfillear datos históricos o exponer PII. No hay implementación ni migración aplicada aún.
 
 ### Proceso reusable — radar Wherex con CLI Playwright (2026-08-11)
 
@@ -576,18 +589,3 @@ en `Ready=True` sirviendo `e048ef3a47e9` — ni siquiera el residual change-gate
    todo comando copiado de la doc antes de concluir que el sistema está roto.
 7. **`data_missing` del watchdog casi siempre es tu sesión `gcloud`, no deriva.** `pnpm
    gcloud:auth:playwright -- --force` renueva CLI **y** ADC. Antes: `data_missing_count=4`; después: `0`.
-
-### TASK-1309 — Auditoría del sitio (2026-08-08)
-
-`TASK-1309` está `in-progress` con código completo: cuarta tab `/admin/growth/seo/audit`, datos reales
-de Berel (95 · 0 críticos · 138 avisos · 381 menores · 100 páginas) y UI quality 4.59. El bloqueo
-heredado de TASK-1310 ya tiene fix local, pero faltan migración y staging (ver cutover más abajo).
-No repetir build ni suite global sin autorización (~30 GB).
-Evidencia: `.captures/2026-08-08T13-48-58_growth-seo-audit`.
-
-Auditada con `seo-aeo` y `greenhouse-ui-review`: el orden de la lista ganó un tercer eje —**valor de
-búsqueda**, ortogonal a la severidad— porque sin él la higiene de sitio ascendía por puro alcance
-(favicon en 91 páginas por encima de `alt` en 50), y los checks de performance ahora declaran que son
-medición de **laboratorio** (Google rankea con datos de campo). Queda declarada, sin dueño, una
-cobertura que el audit NO tiene: acceso de crawlers de IA en `robots.txt`, ausencia de JSON-LD,
-conflicto noindex+robots y salud de sitemap.

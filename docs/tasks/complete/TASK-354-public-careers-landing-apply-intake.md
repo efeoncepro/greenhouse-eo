@@ -64,7 +64,7 @@ Revisión con `greenhouse-talent-people-operator` + `forms-ux` + `greenhouse-ux-
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -77,7 +77,7 @@ Revisión con `greenhouse-talent-people-operator` + `forms-ux` + `greenhouse-ux-
 - Motion: `docs/ui/motion/TASK-354-public-careers-landing-motion.md`
 - Backend impact: `api`
 - Epic: `EPIC-011`
-- Status real: `Code complete; production route live; opening real EO-OPN-0009 publicado; submit smoke pendiente`
+- Status real: `Complete — Careers público y apply están live; el residual de persistencia de teléfono/país/mensaje fue separado y absorbido por TASK-1688`
 - Rank: `TBD`
 - Domain: `agency`
 - Blocked by: `none`
@@ -88,6 +88,12 @@ Revisión con `greenhouse-talent-people-operator` + `forms-ux` + `greenhouse-ux-
 ## Summary
 
 La landing pública de vacantes de Efeonce: listing de openings publicados, detalle por vacante y formulario de postulación, como **cliente delgado** del apply intake service (TASK-1367) y del publication contract (TASK-353). Es la puerta de entrada visible de candidatos al dominio `Hiring / ATS`, sin abrir un pipeline paralelo.
+
+## Delta 2026-08-11 — Cierre y absorción de residual
+
+- Se confirmó en runtime que el apply público crea la postulación en la vacante correcta: el problema reportado de Account vs. Content era la selección por defecto de la vista Pipeline, no una reasignación de `opening_id`.
+- Esta task queda cerrada como la entrega de Careers público, su formulario, la ruta de producción y sus contratos visuales históricos. No debe reabrirse para añadir campos de intake.
+- La auditoría detectó un defecto distinto de backend/datos: teléfono y mensaje se validaban pero no se persistían, y no existía país de residencia. `TASK-1688` absorbe íntegramente esa corrección vertical (ADR, migración, paridad Careers/Growth Forms y lectura interna) sin crear un intake paralelo ni inferir datos históricos.
 
 ## Why This Task Exists
 
@@ -358,7 +364,7 @@ Implementar DESDE el wireframe + flow + master flow (son el contrato de diseño;
 
 ## Closing Protocol
 
-- [x] `Lifecycle` sincronizado (`in-progress` hasta smoke productivo)
+- [x] `Lifecycle` sincronizado (`complete`; residual de contacto absorbido por TASK-1688)
 - [x] archivo en la carpeta correcta
 - [x] `docs/tasks/README.md` sincronizado
 - [x] `Handoff.md` + `changelog.md` actualizados
@@ -376,6 +382,7 @@ Implementar DESDE el wireframe + flow + master flow (son el contrato de diseño;
 
 ## Follow-ups
 
+- `TASK-1688` — persistencia gobernada de teléfono, país de residencia y mensaje, con paridad de Growth Forms y Application 360.
 - `TASK-1362` doc capture → portfolio-file, identity docs, resolver documental unificado y scan/quarantine formal.
 - `TASK-1363` reusa el shell público para `/assessment/[token]`.
 - `TASK-355` cablea `revalidatePath('/public/careers')` y detalle/apply al publish/unpublish real.

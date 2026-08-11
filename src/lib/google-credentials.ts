@@ -425,8 +425,34 @@ export const fetchGoogleIdTokenForAudience = async (
   return token
 }
 
-const resolveGoogleIdTokenProvider = async (audience: string, env: NodeJS.ProcessEnv) => {
+/**
+ * Plan de credencial para ID tokens, alineado con `getGoogleCredentialSource`.
+ *
+ * Existe como función aparte (y exportada) porque la elección de rama es lo que
+ * falló en producción el 2026-08-11 (ISSUE-150, segunda causa): Production corre
+ * con `GCP_AUTH_PREFERENCE=service_account_key` (postura transicional, TASK-800)
+ * y el resolver no tenía rama de key — caía a impersonación ambiente, que exige
+ * ADC, inexistente en Vercel. El fallo era instantáneo (~21 ms) y fail-closed:
+ * `scanner_auth_failed` bloqueando CVs reales. Este plan se puede testear sin red.
+ */
+export type GoogleIdTokenProviderPlan = 'wif' | 'service_account_key' | 'ambient_impersonated' | 'ambient_adc'
+
+export const getGoogleIdTokenProviderPlan = (env: NodeJS.ProcessEnv = process.env): GoogleIdTokenProviderPlan => {
   if (shouldUseWorkloadIdentity(env)) {
+    return 'wif'
+  }
+
+  if (getGoogleCredentialSource(env) === 'service_account_key') {
+    return 'service_account_key'
+  }
+
+  return hasValue(env.GCP_SERVICE_ACCOUNT_EMAIL) ? 'ambient_impersonated' : 'ambient_adc'
+}
+
+const resolveGoogleIdTokenProvider = async (audience: string, env: NodeJS.ProcessEnv) => {
+  const plan = getGoogleIdTokenProviderPlan(env)
+
+  if (plan === 'wif') {
     const { idTokenProvider } = await createVercelWifGoogleIdTokenClientFactory({
       provider: getWorkloadIdentityProvider(env) ?? '',
       serviceAccountEmail: env.GCP_SERVICE_ACCOUNT_EMAIL?.trim() ?? '',
@@ -436,13 +462,18 @@ const resolveGoogleIdTokenProvider = async (audience: string, env: NodeJS.Proces
     return idTokenProvider
   }
 
-  const serviceAccountEmail = env.GCP_SERVICE_ACCOUNT_EMAIL?.trim()
-  const projectId = getGoogleProjectId(env)
+  if (plan === 'service_account_key') {
+    // La key firma su propio JWT con `target_audience`; no depende de ADC ni de
+    // impersonación. Es el mismo source que ya usan BigQuery/GCS en producción.
+    const client = await createGoogleAuth({ env }).getIdTokenClient(audience)
 
-  if (serviceAccountEmail && projectId) {
+    return client.idTokenProvider
+  }
+
+  if (plan === 'ambient_impersonated') {
     const { idTokenProvider } = await createAmbientImpersonatedGoogleIdTokenClientFactory({
-      projectId,
-      serviceAccountEmail
+      projectId: getGoogleProjectId(env),
+      serviceAccountEmail: env.GCP_SERVICE_ACCOUNT_EMAIL?.trim() ?? ''
     }).getIdTokenClient()
 
     return idTokenProvider
