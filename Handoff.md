@@ -1,27 +1,28 @@
 # Handoff activo
 
-### TASK-1378 — ClamAV: staging operativo, producción con gate humano (2026-08-11)
+### TASK-1378 — ClamAV desplegado en ambos entornos; falta un solo flag (2026-08-11)
 
-El escáner de firmas dejó de ser código muerto. Servicio `clamav-staging` en Cloud Run (us-east4, 2 GiB, `min=1`,
-cerrado por IAM), adapter cableado con OIDC y flag ON en Vercel staging. Verificado end-to-end **por la cadena WIF
-de Vercel**, no sólo ADC local: PDF limpio → `clean`, EICAR → `infected`, sin credencial → 403, servicio caído →
-`error` bloqueante.
+El escáner de firmas dejó de ser código muerto. **Staging: ON y operativo.** **Producción: servicio desplegado y
+verificado (`https://clamav-y6egnifl6a-uk.a.run.app`, EICAR → `found`), endpoint ya puesto en Vercel Production,
+pero `ASSET_MALWARE_SCAN_ENABLED` SIN setear.**
 
-**Producción está bloqueada a propósito.** Falta ejercitar una postulación REAL en staging: el endpoint público
-exige Turnstile, así que el route handler completo (multipart → asset pendiente → gate → cuarentena → outbox →
-signal) todavía no corrió. Alguien sube un CV desde el navegador en el apply de staging y se confirma en PG que la
-fila quedó con `scanner='structural+clamav-http'`; recién ahí se prende producción. Es la regla dura que la propia
-task declaró.
+**Lo único que falta para prender producción: una postulación REAL en staging.** El endpoint público exige
+Turnstile, así que el route handler completo (multipart → asset pendiente → gate → cuarentena → outbox → signal)
+nunca corrió; lo verificado es puerto + adapter + servicio, incluida la cadena WIF de Vercel (OIDC → STS →
+impersonation → `fetchIdToken` → Cloud Run). Procedimiento: alguien sube un CV desde el navegador en el apply de
+staging → se confirma en PG que la fila nueva de `asset_scan_results` trae `scanner='structural+clamav-http'` →
+`vercel env add ASSET_MALWARE_SCAN_ENABLED production` (`true`) + **redeploy de Production** → repetir las tres
+pruebas.
 
-Pendiente inmediato: el run 31493298296 (`ClamAV Scanner Deploy`, environment `production`) está esperando approval
-en GitHub para crear el servicio de producción. **NO agregar `ASSET_MALWARE_SCAN_ENABLED` a Production antes de que
-ese servicio exista** — sin endpoint es `error` bloqueante sobre TODAS las subidas, con `EO-OPN-0009` publicada.
+Decisión deliberada con costo: el endpoint de Production quedó puesto ANTES que el flag, y ambos servicios quedan
+calientes (`min=1`, ≈USD 38/mes). Este repo ya tuvo un lote «prende todos los flags pendientes» (ledger, delta
+2026-07-16); así ese lote descuidado funciona en vez de romper todas las postulaciones con `EO-OPN-0009`
+publicada. Bajar `clamav-staging` al cerrar el gate.
 
-Costo: cada servicio con `min=1` son ≈USD 19/mes. Dejar producción en `min=0` mientras el flag esté OFF y bajar
-`clamav-staging` al cerrar. De paso quedó corregida en el ledger la calibración que decía "todo Cloud Run cuesta
-USD 7,32/30d": son ≈USD 169/30d, con run-rate ≈USD 321/mes desde el 2026-07-23 por los workers de Globe.
+De paso quedó corregida en el ledger la calibración que decía "todo Cloud Run cuesta USD 7,32/30d": son
+≈USD 169/30d, run-rate ≈USD 321/mes desde el 2026-07-23 por los workers de Globe en southamerica-west1.
 
-Alcance que conviene no olvidar: el puerto es domain-free. Prender el flag cubre CV público, Growth Forms, y los
+Alcance que conviene no olvidar: el puerto es domain-free. Prender el flag cubre CV público, Growth Forms y los
 `proposal_rfp`/`proposal_deliverable` que TASK-1392 sumó al enforcement — no sólo vacantes.
 
 ### ISSUE-149 RESUELTA — drift TS↔DB de route_group_scope (2026-08-11)
