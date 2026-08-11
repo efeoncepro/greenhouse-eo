@@ -86,7 +86,7 @@ Revisar y respetar:
 - `docs/ui/wireframes/TASK-354-public-careers-landing.md`
 - `docs/ui/flows/TASK-354-public-careers-landing-flow.md`
 - `docs/tasks/complete/TASK-1372-growth-forms-application-upload-ats-destination.md`
-- `docs/tasks/in-progress/TASK-354-public-careers-landing-apply-intake.md`
+- `docs/tasks/complete/TASK-354-public-careers-landing-apply-intake.md`
 
 Reglas obligatorias:
 

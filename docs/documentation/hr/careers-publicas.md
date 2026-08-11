@@ -216,7 +216,7 @@ detalle `EO-OPN-0009`, apply y 404 en desktop1440, wide2048 y mobile390.
 
 ## Documentación técnica relacionada
 
-- `docs/tasks/in-progress/TASK-354-public-careers-landing-apply-intake.md`
+- `docs/tasks/complete/TASK-354-public-careers-landing-apply-intake.md`
 - `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`
 - `docs/architecture/ui-platform/PATTERNS.md#public-anonymous-surface-shell-pattern`
 - `docs/ui/wireframes/TASK-354-public-careers-landing.md`

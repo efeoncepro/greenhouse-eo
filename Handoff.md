@@ -46,6 +46,14 @@ estados y decisión de publicar sin imágenes vive en
 de Hiring, por lo que no requiere ADR. Pendiente operativo opcional: revisar las dos publicaciones en
 moderación antes de contarlas como visibles.
 
+### TASK-1688 — completar contacto de postulaciones Careers (2026-08-11)
+
+`TASK-354` quedó cerrada y `TASK-355` ya estaba correctamente cerrada: la postulación de Hector Tolmo sí quedó en
+Account; el Pipeline sólo seleccionaba Content por defecto. La auditoría descubrió aparte que teléfono/mensaje se
+validaban pero no se persistían y que no existía país de residencia. `TASK-1688` gobierna el arreglo vertical:
+ADR previo, migración aditiva, paridad Careers/Growth Forms y lectura autorizada en Application 360; prohíbe
+inferir/backfillear datos históricos o exponer PII. No hay implementación ni migración aplicada aún.
+
 ### Proceso reusable — radar Wherex con CLI Playwright (2026-08-11)
 
 Quedó canonizado para futuras solicitudes en la skill `greenhouse-public-private-tenders` y el manual
@@ -576,18 +584,3 @@ en `Ready=True` sirviendo `e048ef3a47e9` — ni siquiera el residual change-gate
    todo comando copiado de la doc antes de concluir que el sistema está roto.
 7. **`data_missing` del watchdog casi siempre es tu sesión `gcloud`, no deriva.** `pnpm
    gcloud:auth:playwright -- --force` renueva CLI **y** ADC. Antes: `data_missing_count=4`; después: `0`.
-
-### TASK-1309 — Auditoría del sitio (2026-08-08)
-
-`TASK-1309` está `in-progress` con código completo: cuarta tab `/admin/growth/seo/audit`, datos reales
-de Berel (95 · 0 críticos · 138 avisos · 381 menores · 100 páginas) y UI quality 4.59. El bloqueo
-heredado de TASK-1310 ya tiene fix local, pero faltan migración y staging (ver cutover más abajo).
-No repetir build ni suite global sin autorización (~30 GB).
-Evidencia: `.captures/2026-08-08T13-48-58_growth-seo-audit`.
-
-Auditada con `seo-aeo` y `greenhouse-ui-review`: el orden de la lista ganó un tercer eje —**valor de
-búsqueda**, ortogonal a la severidad— porque sin él la higiene de sitio ascendía por puro alcance
-(favicon en 91 páginas por encima de `alt` en 50), y los checks de performance ahora declaran que son
-medición de **laboratorio** (Google rankea con datos de campo). Queda declarada, sin dueño, una
-cobertura que el audit NO tiene: acceso de crawlers de IA en `robots.txt`, ausencia de JSON-LD,
-conflicto noindex+robots y salud de sitemap.

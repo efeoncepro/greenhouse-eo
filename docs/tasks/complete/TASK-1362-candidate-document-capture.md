@@ -111,7 +111,7 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `docs/tasks/in-progress/TASK-354-public-careers-landing-apply-intake.md`
+- `docs/tasks/complete/TASK-354-public-careers-landing-apply-intake.md`
 - `docs/epics/to-do/EPIC-011-hiring-ats-end-to-end-program.md` (§`Delta 2026-07-08`)
 
 ## Dependencies & Impact
