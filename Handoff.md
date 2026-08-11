@@ -1,6 +1,28 @@
 # Handoff activo
 
-### TASK-1378 — causa raíz del 2.º fallo del flag CERRADA EN CÓDIGO; flag OFF en prod hasta verificar desde el runtime (2026-08-11)
+### TASK-1378 — RELEASE HECHO + diagnóstico VERDE en producción; falta SOLO el flip del flag (operador) (2026-08-11 23:15Z)
+
+**Actualización de la misma fecha, sesión "avanza con lo necesario":** la promoción develop→main se ejecutó
+completa y A LA PRIMERA por el control plane: PR #188 → squash `a90951dba` → orquestador run `31544667630` →
+manifest `a90951dba3b7-73da976e-f460-4241-8708-5772421fa49d` en `released` (workflow 11m45s, ambos gates
+`production` aprobados por el loop, Azure no-op esperado, 4 workers success, post-release health verde). Watchdog
+local: `drift_count=0` con `data_missing_count=4` — la sesión gcloud expiró a mitad de release; NO es drift, la
+evidencia autoritativa son los jobs de deploy del run. Pre-empción completa: merge canónico verificado (verif 1 y
+2 vacías), `decision=ship` sin marker ni bypass, smoke producido sobre `main` (run `31543221610`), staging READY.
+
+**El diagnóstico nuevo respondió VERDE desde el runtime de producción** (`greenhouse.efeoncepro.com`,
+`version=a90951d`): `credentialPlan=service_account_key`, `mint.ok=true` (53 ms,
+`email=greenhouse-portal@efeonce-group.iam.gserviceaccount.com`, `aud` del scanner), `probe.ok=true`
+(`scanStatus=ok`, 100 ms). Las condiciones (1) y (2) de ISSUE-150 están CUMPLIDAS.
+
+**Único paso restante — flip del flag, EN MANOS DEL OPERADOR:** el clasificador de permisos de la sesión bloqueó
+`vercel env add/ls/pull` justo en ese paso. Comandos exactos en ISSUE-150 §Solución pendiente paso 3:
+`vercel env add ASSET_MALWARE_SCAN_ENABLED production` (valor `true`) + redeploy de Production + verificar
+`flagEnabled=true` en el endpoint + primera postulación real con `scanner=structural+clamav-http`. Pendiente
+menor aparte: `gcloud auth login` para refrescar la sesión local (el watchdog/`release:workers` quedaron en
+`data_missing`, sin impacto).
+
+### TASK-1378 — causa raíz del 2.º fallo del flag CERRADA EN CÓDIGO; flag OFF en prod hasta verificar desde el runtime (2026-08-11, sesión anterior)
 
 Estado real: **staging ON y operativo** (gate E2E con postulaciones reales); **Production OFF** — el flag falló
 DOS veces el 2026-08-11 (ISSUE-150) y quedó revertido. Todos los CV afectados (5+1) recuperados.
@@ -546,46 +568,3 @@ Ahora el layout resuelve per-org server-side y `VerticalMenu` hace merge **aditi
    interno — la assertion falla después con un diagnóstico engañoso. Usar `pnpm fe:capture` directo y
    regenerar la persona antes. Y promover baselines de un escenario multi-variante exige promover
    **cada subdirectorio de variante por separado**.
-
-### Releases del 2026-08-08/09 — `ISSUE-114` cerrada y batch SEO en producción
-
-`main` = `e048ef3a4` (batch SEO). Antes, `b99b7ad97` (fix de `ISSUE-114`). Ambos manifiestos
-`released`; **watchdog `aggregateSeverity: ok`**, tres señales en cero, y los 4 workers de Cloud Run
-en `Ready=True` sirviendo `e048ef3a47e9` — ni siquiera el residual change-gated habitual del
-`ops-worker`.
-
-**Lo que necesita quien siga:**
-
-1. **`ISSUE-114` resuelta: el batch policy computaba el diff sobre una base congelada.** Usaba
-   three-dot (`origin/main...target`), que parte de la merge-base que el squash-merge deja vieja, y
-   resucitaba archivos byte-idénticos a producción como cambios del release. Ahora es two-dot vía
-   `buildReleaseDiffRange`. **Si el classifier reporta un dominio irreversible, ahora es REAL** — no
-   lo tapes con `[release-coupled: …]` por costumbre, como venía pasando en los 4 releases previos.
-2. **`ISSUE-145` (ALTA) — léela antes del próximo release.** El batch policy del **orquestador** es
-   decorativo: corre con el `target_sha` ya mergeado, ve un rango vacío y aprueba sin mirar nada
-   (verificado en los `preflight-result.json` de 3 releases; uno con 1045 archivos y 14 migraciones
-   reportó `filesChanged=0`). Y el marker `[release-coupled: …]` nunca se lee donde el runbook dice,
-   **pero se dispara solo con prosa**: una cita en un commit de docs de growth/MCP neutralizó
-   `split_batch` para todo un batch. El ancla correcta es el `target_sha` del release anterior.
-3. **`ISSUE-144`** — `vercel_readiness` confunde un build cancelado a propósito por el `ignoreCommand`
-   con uno fallido. **Y `vercel redeploy` NO lo resuelve**: vuelve a correr el ignore-step y cancela
-   igual. Lo que sí funciona es un push con código a `develop` (el merge canónico `main`→`develop`
-   sirve doble).
-4. **Se canceló el run zombie `31126022507`** (`Ops Worker Deploy`, 56h en `queued` con 0 jobs). Era
-   lo único que dejaba el watchdog en `error`, y su entrada en la lista forense expiraba el
-   **2026-08-21**, o sea habría vuelto a bloquear el preflight ese día. La entrada en
-   `src/lib/release/preflight/ignored-pending-runs.ts` ya es letra muerta: quitarla en el próximo
-   cambio que toque ese archivo.
-5. **⚠️ El merge canónico `-X ours` se come el `Handoff.md` y el `changelog.md` del release.** Pasó
-   en este mismo release: la sección y la entrada escritas en la rama de fix llegaron a `main` en el
-   squash, y el merge `main`→`develop` las descartó porque `develop` había editado esos mismos
-   archivos en paralelo — que es lo habitual. Todo lo demás (código, issues, índice, runbook, ambas
-   skills) sobrevivió intacto. **Al cerrar un release, verificar explícitamente que Handoff y
-   changelog conservan su entrada después del merge**; las dos verificaciones del gotcha #1 no lo
-   detectan porque sólo miran `src/`, `scripts/`, `services/` y `migrations/`.
-6. **Dos comandos documentados que ya no funcionan** (corregidos): `vercel ls --target=` →
-   `--environment=` (CLI 50.x) y el `gcloud run services describe --format="value(...filter(...))"`
-   del runbook §4.1, que crashea con `TransformFilter() takes 2 positional arguments`. Sospecha de
-   todo comando copiado de la doc antes de concluir que el sistema está roto.
-7. **`data_missing` del watchdog casi siempre es tu sesión `gcloud`, no deriva.** `pnpm
-   gcloud:auth:playwright -- --force` renueva CLI **y** ADC. Antes: `data_missing_count=4`; después: `0`.
