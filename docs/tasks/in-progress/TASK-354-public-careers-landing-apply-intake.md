@@ -1,5 +1,17 @@
 # TASK-354 — Public Careers Landing
 
+## Delta 2026-08-11
+
+- El CV del apply público ya no queda sólo con el escáner estructural: existe un escáner de firmas real
+  (servicio Cloud Run `clamav`, us-east4, cerrado por IAM) que se compone encima vía el puerto `AssetScanner`.
+  **ON en staging** (verificado end-to-end con postulaciones reales: PDF → `clean` con
+  `scanner=structural+clamav-http`; EICAR → `infected` + `quarantined`) y **OFF en producción** hasta que se
+  promueva `develop`→`main` — actualizado por TASK-1378.
+- El residual "V1 PDF-only marca `scanStatus='not_scanned_pdf_only_v1'`" quedó superado: el path canónico es
+  `scanAndGateUploadedAsset`, **fail-closed** — sin veredicto `clean` el CV no se adjunta. Consecuencia operativa
+  para esta superficie: un scanner caído o mal configurado no degrada, **saca candidatos reales**. Pasó el
+  2026-08-11 (`ISSUE-150`, 5 CV en cuarentena 89 min, recuperados) — actualizado por TASK-1378.
+
 ## Delta 2026-07-08 (revisión de arquitectura — `arch-architect`, 4 pilares)
 
 Gaps arquitectónicos cerrados antes de implementar:

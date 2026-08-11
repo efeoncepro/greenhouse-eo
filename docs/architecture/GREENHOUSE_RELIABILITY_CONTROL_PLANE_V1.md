@@ -2,10 +2,37 @@
 
 > Spec canónica del `Reliability Control Plane` de Greenhouse EO. Define el registry por módulo, el modelo unificado de señales, el contrato de evidencia y cómo `Admin Center`, `Ops Health` y `Cloud & Integrations` consumen la lectura consolidada sin duplicar fuentes.
 >
-> Versión: `1.13`
+> Versión: `1.14`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-08-11` por TASK-1685 (signal de divergencia menú ↔ puerta del portal cliente)
+> Última actualización: `2026-08-11` por TASK-1378 (signal de frescura de firmas del escáner de malware)
+
+## Delta 2026-08-11 — TASK-1378: signal de frescura de firmas del escáner de malware
+
+Una señal nueva bajo `moduleKey='hiring'` (`kind='freshness'`), hermana de
+`storage.asset_scan.open_quarantine`. Existe porque aquella detecta el scanner **caído** —se llena de
+veredictos `error`— y esta detecta el scanner **vivo pero ciego**: un ClamAV con firmas viejas responde,
+devuelve `clean` y no produce ningún veredicto de error, así que su falla es invisible por definición.
+Un scanner con firmas de hace seis meses es peor que no tener scanner, porque nadie lo sabe.
+
+| `signalId` | Qué mide | Severidad | Steady |
+| --- | --- | --- | --- |
+| `storage.asset_scan.signature_freshness` | Edad de la base de firmas del servicio Cloud Run `clamav`, leída de su `/health` (`clamd`, `signatureAgeHours`). Reader: [`asset-scan-signature-freshness.ts`](../../src/lib/reliability/queries/asset-scan-signature-freshness.ts) | `>168 h → error` (falsa confianza); `>24 h → warning` (`freshclam` chequea cada 2 h, así que a las 24 h algo ya está fallando); `clamd` caído o sin base cargada `→ error`; flag ON sin `ASSET_MALWARE_SCAN_ENDPOINT` `→ error` (fail-closed: toda subida gateada está bloqueada); flag OFF `→ ok` explícito | **`ok`** |
+
+Notas de contrato:
+
+- **La fuente NO es PostgreSQL**, a diferencia del resto de las señales: la edad de la base vive en el
+  filesystem del contenedor y sólo el propio servicio la conoce. Se consulta su `/health` con timeout de
+  5 s y un ID token OIDC, para no colgar la página de operaciones contra un contenedor lento. Compuesta
+  en `get-reliability-overview.ts` con `.catch(() => null)`, como el resto.
+- Si no se puede consultar el `/health` (timeout, red, cuerpo no interpretable), degrada a **`unknown`,
+  no a `error`**: no poder preguntar no prueba que el scanner esté mal. Quien sí lo probaría es
+  `open_quarantine`, que se llenaría de veredictos `error` reales.
+- Con el flag apagado el estado es `ok` **explícito**, no un hallazgo: el único escáner activo es
+  `structural`, que no usa base de firmas y no tiene nada que envejecer.
+
+Servicio: [`cloud-infrastructure/CLOUD_RUN.md`](cloud-infrastructure/CLOUD_RUN.md) §`clamav`.
+Runbook: `docs/manual-de-uso/plataforma/operar-scanner-malware-assets.md`. Task dueña: `TASK-1378`.
 
 ## Delta 2026-08-11 — TASK-1685: signal de divergencia menú ↔ puerta del portal cliente
 

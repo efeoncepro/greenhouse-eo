@@ -152,6 +152,18 @@ with `greenhouse-production-release` only when the request changes code,
 schema/migrations, flags/env vars, infrastructure, public renderer, apply
 contract, or initial cutover smoke.
 
+## Uploaded-file malware scanning (TASK-1378, flag `ASSET_MALWARE_SCAN_ENABLED`)
+
+There is a real malware scanner behind files uploaded from outside (Cloud Run `services/clamav/`; adapter `src/lib/storage/asset-scan/`). Invariants:
+
+- **The scan port is domain-free — it is NOT a recruiting feature.** `scanAssetBytes` takes bytes and returns a verdict; it knows nothing about vacancies. Today it covers the public CV upload, Growth Forms, `proposal_rfp` and `proposal_deliverable`. Extending it to another context = adding it to `SCAN_REQUIRED_ATTACH_CONTEXTS` + calling the gate in that upload.
+- `attachAssetToAggregate` **refuses those contexts without a clean verdict**; the guard aggregates over **all** verdicts of the asset, and a single blocking `open` quarantine vetoes the attach.
+- **Fail-closed**: if the scanner cannot produce a verdict (timeout, HTTP error, unreachable), the upload is blocked. Never "let it through and scan later".
+- **An application whose CV is quarantined is still ACCEPTED**, and the candidate sees the **same** message as everyone else. Telling an attacker their file was rejected tells them what to try next. The bytes are preserved and the desk still finds the document via `metadata_json->>'candidateFacetId'`.
+- `greenhouse_core.asset_scan_results` is **append-only** (trigger with `RAISE EXCEPTION` on DELETE); only the `resolution_*` columns change (false positive / recovered).
+- Runbook: `docs/manual-de-uso/plataforma/operar-scanner-malware-assets.md`. Service/deploy invariants: `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-08-11.
+- Flag flip is a production-release matter (`greenhouse-production-release`), and only after the reading code is on `main` — `ISSUE-150`.
+
 ## Person model (never duplicate a human)
 
 - Root: `greenhouse_core.identity_profiles` (`profile_id`). A candidate is a **Person with a `candidate_facet`**, not a separate record. Reconcile with `resolvePersonIdentifier`.
