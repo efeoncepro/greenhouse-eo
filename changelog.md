@@ -7,6 +7,40 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-11 — Escaneo de malware activo sobre los archivos que suben desde afuera
+
+El escáner de firmas dejó de ser código latente y quedó operativo en staging y en
+producción. Todo archivo que entra desde afuera pasa ahora por dos revisiones
+complementarias: la estructural, que mira los bytes reales y detecta un ejecutable
+renombrado a `.pdf`, y ClamAV, que reconoce firmas de malware dentro de archivos que
+sí son del tipo que dicen ser. El peor veredicto gana. No es una función de
+reclutamiento: cubre el CV público, los adjuntos de Growth Forms y los pliegos y
+entregables que se cargan a una propuesta.
+
+Se verificó con postulaciones reales por el formulario público, no con mocks: un PDF
+válido queda adjunto y un archivo de prueba EICAR queda en cuarentena, sin que la
+persona que lo subió reciba ninguna señal distinta — avisarle a un atacante que su
+archivo fue rechazado le diría qué probar después. Si el escáner no puede
+pronunciarse, el archivo también se bloquea: es deliberado, y por eso una mala
+configuración es más peligrosa que no tener antivirus.
+
+Corre en un único servicio Cloud Run cerrado por IAM, ≈USD 19/mes, con las firmas
+actualizándose solas dentro del contenedor. De paso quedó corregida en el flag ledger
+una calibración de costo que estaba desfasada 24×: Cloud Run no cuesta USD 7,32 cada
+30 días sino ≈USD 169.
+
+## 2026-08-11 — Distribución de vacantes en Facebook, trazable y reusable
+
+Se difundieron las vacantes públicas `EO-OPN-0061` (Content Creator) y `EO-OPN-0009`
+(Account Manager) en grupos de Facebook ya unidos y afines; la expansión dejó diez
+envíos adicionales por rol, con nueve visibles y uno a moderación en cada caso al
+momento de verificar. El registro operativo conserva copy, beneficios aprobados,
+destinos, evidencia de estado y la decisión explícita de continuar sin imágenes.
+Hiring Desk, el manual de Careers y las skills espejo ahora separan con claridad la
+publicación canónica del opening de su distribución externa: confirmación humana,
+sin grupos nuevos ni DMs no autorizados, y nunca reintentar un estado ambiguo sin
+verificar antes el texto exacto.
+
 ## 2026-08-11 — Radar Wherex reutilizable y documentado
 
 La skill de licitaciones incorpora el companion `wherex-radar-chrome-playwright.md`, el manual comercial y la
@@ -1162,49 +1196,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   fingerprint—, el Slice 4 de rutas legacy y los mecanismos declarados con evidencia por proveedor. Los canaries de
   Omni siguen bloqueados por el transporte, que pertenece a `TASK-1504`; por eso el peso reordenado es una mejora
   razonada, no verificada.
-
-## 2026-08-02 — Contrato route-driven del Producer y corrección planificada de Omni
-
-- Se registró TASK-1633 como foundation backend-critical: operación, slots/roles de entrada, controles creativos,
-  mecanismo `native-parameter|prompt-semantic|reference-conditioned|preprocessed|postprocessed|unsupported` y
-  output contract pasan a ser dato versionado de ruta consumido por UI/BFF/SDK/MCP/CLI/workers.
-- TASK-1504 quedó corregida documentalmente: Omni no demuestra `{video,audio}` separado, reference-to-video acepta
-  imágenes, duración/ratio deben llegar a Vertex y text/image/reference requieren rutas/promociones independientes;
-  edit/continuidad permanecen en TASK-1573.
-- TASK-1552 conserva ownership único del composer: prompt persistente, referencias transversales, cámara separada
-  de motion transfer y modelo estable. El rollout exige una generación UI nueva de Seedance y una Omni con cobro,
-  playback, retención, lineage y governance verificados, sin repetir evaluación/promoción/fondeo de Seedance.
-- TASK-1469 puede avanzar en paralelo con TASK-1633 y debe cerrar antes de TASK-1632; el wake event-driven queda
-  explícitamente post-Omni estable/canary-confirm. No hubo código, provider calls, gasto, deploy ni runtime.
-- La reserva provisional Finance `TASK-1633…1643` nunca se materializó; sus candidatas deben reenumerarse desde
-  TASK-1634 si se confirman.
-
-## 2026-08-02 — Cotización headless y composición opcional de Proposal Studio
-
-- ADR-021 quedó aceptado: Finance Core nace con plan de cuentas versionado, entidad/ledger, períodos, money/FX/UF,
-  dimensiones, eventos económicos y contratos de diario; Cost Subledger es la primera vertical y General
-  Accounting extiende después la misma foundation. No se autorizó posting, migraciones ni sustitución de Nubox/SII.
-- El ADR propuesto de cotización agentic define el límite headless: kernel determinista compartido,
-  consumidores UI/Nexa/API/MCP/agentes y autonomía graduada sin bypass de identidad, approval ni auditoría.
-- Proposal Studio distingue evaluación económica interna, versión de cotización, paquete económico congelado
-  y proyección client-facing. Las propuestas pueden ser técnicas solas, económicas solas, separadas,
-  combinadas o mixtas; cualquier monto embebido deriva del mismo SSOT económico.
-- Se registraron como gaps —no como capacidad implementada— el `quote_id` universal post-GO, el snapshot
-  parcial de cabecera, el cross-check económico y la proyección de render incompletos. La skill de licitaciones
-  quedó alineada en Codex y Claude.
-- El orden se corrige a Finance Core reference → Economic Event/journal shadow → Live Cost Subledger → Profile
-  Resolution/CostCard/golden set → `TASK-609` read-only → economic package/Proposal → MCP/provider y writes
-  gobernados → Q2C/actual-vs-standard → General Accounting. No hubo cambios de schema ni runtime.
-- `EPIC-012` y `EPIC-029` registran 11 candidatos sin IDs reservados; tras asignar TASK-1633 a Globe deben
-  reenumerarse desde TASK-1634 si superan el checkpoint de confirmación del task planner.
-- En SKY se agregó una V2 técnica append-only enriquecida de 29 láminas con evidencia viva por enlace y estado local
-  `workshop_only`; se recuperaron Stack Operativo, diagnóstico, escalera IA, informe, Content Hub, portal y prueba social.
-  El primer borrador comprimido de 17 láminas se conserva como histórico; se construyó también la económica V2 separada: Core de **CLP 3.000.000 netos/mes sin IVA**,
-  IVA 19% de **CLP 570.000** y total mensual con IVA de **CLP 3.570.000**, con newsletter incluida, Addons
-  separados, deck `PricingFull` de 9 láminas y Excel generado. La validación de capacidad y margen sigue
-  pendiente antes del registro productivo.
-- Actualización 2026-08-03: Word queda únicamente como contexto del flujo actual en documentación interna;
-  la técnica, la económica, ambos decks, el Excel y el correo proponen Notion/Content Hub para grilla, briefs,
-  fuentes, comentarios, estados, QA, aprobaciones y ciclo de vida. Se recompusieron los decks, se regeneró el
-  Excel desde su JSON fuente y la síntesis quedó en HubSpot como nota `114121518673` sobre el deal `62535094842`;
-  no se alteraron la etapa ni el monto del deal. El cierre sigue `workshop_only`.
