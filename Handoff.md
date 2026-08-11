@@ -6,7 +6,7 @@ El escáner de firmas dejó de ser código muerto. **Staging: ON y operativo.** 
 verificado (`https://clamav-y6egnifl6a-uk.a.run.app`, EICAR → `found`), endpoint ya puesto en Vercel Production,
 pero `ASSET_MALWARE_SCAN_ENABLED` SIN setear.**
 
-**Lo único que falta para prender producción: una postulación REAL en staging.** El endpoint público exige
+**Lo único que falta para prender producción: una postulación REAL en staging — y ahora es obligatorio, no prudente.** El 2026-08-11 entraron 13 postulaciones reales (12 CV entre 07:19 y 09:43 CL, todas `clean` por `structural`) por la campaña de Facebook de `EO-OPN-0061`/`EO-OPN-0009`, contra cero en los 7 días previos. El flujo está vivo: un scanner mal prendido en producción deja fuera a candidatos reales el mismo día. El endpoint público exige
 Turnstile, así que el route handler completo (multipart → asset pendiente → gate → cuarentena → outbox → signal)
 nunca corrió; lo verificado es puerto + adapter + servicio, incluida la cadena WIF de Vercel (OIDC → STS →
 impersonation → `fetchIdToken` → Cloud Run). Procedimiento: alguien sube un CV desde el navegador en el apply de
