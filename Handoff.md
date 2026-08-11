@@ -1,29 +1,28 @@
 # Handoff activo
 
-### TASK-1378 — ClamAV desplegado en ambos entornos; falta un solo flag (2026-08-11)
+### TASK-1378 — ClamAV OPERATIVO en staging y producción (2026-08-11)
 
-El escáner de firmas dejó de ser código muerto. **Staging: ON y operativo.** **Producción: servicio desplegado y
-verificado (`https://clamav-y6egnifl6a-uk.a.run.app`, EICAR → `found`), endpoint ya puesto en Vercel Production,
-pero `ASSET_MALWARE_SCAN_ENABLED` SIN setear.**
+El escáner de firmas está prendido en ambos entornos, con redeploy aplicado. Servicios `clamav` y `clamav-staging`
+en us-east4 (2 GiB, `min=1`, cerrados por IAM, 3,6 M firmas, `freshclam` dentro del contenedor).
 
-**Lo único que falta para prender producción: una postulación REAL en staging — y ahora es obligatorio, no prudente.** El 2026-08-11 entraron 13 postulaciones reales (12 CV entre 07:19 y 09:43 CL, todas `clean` por `structural`) por la campaña de Facebook de `EO-OPN-0061`/`EO-OPN-0009`, contra cero en los 7 días previos. El flujo está vivo: un scanner mal prendido en producción deja fuera a candidatos reales el mismo día. El endpoint público exige
-Turnstile, así que el route handler completo (multipart → asset pendiente → gate → cuarentena → outbox → signal)
-nunca corrió; lo verificado es puerto + adapter + servicio, incluida la cadena WIF de Vercel (OIDC → STS →
-impersonation → `fetchIdToken` → Cloud Run). Procedimiento: alguien sube un CV desde el navegador en el apply de
-staging → se confirma en PG que la fila nueva de `asset_scan_results` trae `scanner='structural+clamav-http'` →
-`vercel env add ASSET_MALWARE_SCAN_ENABLED production` (`true`) + **redeploy de Production** → repetir las tres
-pruebas.
+**Gate end-to-end cerrado con postulación real por el formulario público**, no con mocks. Turnstile no se manipuló:
+la app trae su propio camino de dev (`local-dev-captcha` cuando no hay site key fuera de producción). PDF válido →
+`clean` con `scanner=structural+clamav-http`, `attached`. **EICAR → `infected` + `quarantined`** con la firma
+`Eicar-Test-Signature`. Ambos devolvieron 202 genérico al usuario, como está diseñado.
 
-Decisión deliberada con costo: el endpoint de Production quedó puesto ANTES que el flag, y ambos servicios quedan
-calientes (`min=1`, ≈USD 38/mes). Este repo ya tuvo un lote «prende todos los flags pendientes» (ledger, delta
-2026-07-16); así ese lote descuidado funciona en vez de romper todas las postulaciones con `EO-OPN-0009`
-publicada. Bajar `clamav-staging` al cerrar el gate.
+Quedan dos postulaciones de prueba en el Hiring Desk con identidad inequívoca (`PRUEBA TASK-1378 / NO CONTACTAR`,
+correos `task-1378-scan-*@efeonce.org`) sobre `EO-OPN-0009`. No se borraron: `asset_scan_results` es append-only y
+borrar filas de la BD productiva compartida no es decisión del agente. HR las descarta en el Desk.
 
-De paso quedó corregida en el ledger la calibración que decía "todo Cloud Run cuesta USD 7,32/30d": son
-≈USD 169/30d, run-rate ≈USD 321/mes desde el 2026-07-23 por los workers de Globe en southamerica-west1.
+Pendiente menor: confirmar la primera postulación PRODUCTIVA registrando `structural+clamav-http` en
+`asset_scan_results`. El flujo recibe ~13/día (campaña de Facebook de `EO-OPN-0061`/`EO-OPN-0009`). Si algo fallara,
+rollback = `vercel env rm ASSET_MALWARE_SCAN_ENABLED production` + redeploy, <10 min.
 
-Alcance que conviene no olvidar: el puerto es domain-free. Prender el flag cubre CV público, Growth Forms y los
-`proposal_rfp`/`proposal_deliverable` que TASK-1392 sumó al enforcement — no sólo vacantes.
+Dato para no repetir un error: **producción resuelve credenciales GCP por `service_account_key`, no por WIF**
+(staging sí usa WIF). Ambos caminos quedaron verificados por separado contra su propio servicio.
+
+Costo steady: ≈USD 38/mes por los dos servicios con `min=1` (≈19 si se decide dejar staging sin cobertura). De paso
+quedó corregida en el ledger la calibración que decía "todo Cloud Run cuesta USD 7,32/30d": son ≈USD 169/30d.
 
 ### ISSUE-149 RESUELTA — drift TS↔DB de route_group_scope (2026-08-11)
 
