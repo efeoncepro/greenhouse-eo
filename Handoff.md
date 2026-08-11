@@ -1,31 +1,36 @@
 # Handoff activo
 
-### TASK-1378 — ClamAV OPERATIVO en staging y producción (2026-08-11)
+### TASK-1378 — causa raíz del 2.º fallo del flag CERRADA EN CÓDIGO; flag OFF en prod hasta verificar desde el runtime (2026-08-11)
 
-El escáner de firmas está prendido en ambos entornos, con redeploy aplicado. **Un solo servicio `clamav`** en us-east4 (2 GiB, `min=1`, cerrado por IAM, 3,6 M firmas, `freshclam` dentro del
-contenedor) atendiendo a los dos entornos de Vercel.
+Estado real: **staging ON y operativo** (gate E2E con postulaciones reales); **Production OFF** — el flag falló
+DOS veces el 2026-08-11 (ISSUE-150) y quedó revertido. Todos los CV afectados (5+1) recuperados.
 
-**Gate end-to-end cerrado con postulación real por el formulario público**, no con mocks. Turnstile no se manipuló:
-la app trae su propio camino de dev (`local-dev-captcha` cuando no hay site key fuera de producción). PDF válido →
-`clean` con `scanner=structural+clamav-http`, `attached`. **EICAR → `infected` + `quarantined`** con la firma
-`Eicar-Test-Signature`. Ambos devolvieron 202 genérico al usuario, como está diseñado.
+**Causa raíz del 2.º fallo, encontrada y corregida esta sesión:** Production corre con
+`GCP_AUTH_PREFERENCE=service_account_key` (postura transicional, TASK-800) y `resolveGoogleIdTokenProvider`
+(`src/lib/google-credentials.ts`) no tenía rama de service account key — caía a impersonación ambiente sin ADC
+en Vercel → excepción en 21 ms → fail-closed `scanner_auth_failed`. Staging pasó su gate porque sin la
+preferencia toma la rama WIF. **Fix:** rama `service_account_key` enrutada por `getGoogleIdTokenProviderPlan()`
+(exportado, 6 tests con los shapes exactos de prod/staging) + **endpoint de diagnóstico
+`GET /api/internal/health/scanner-auth`** (`?probe=scan`; guard `CRON_SECRET` o tenant agency) que acuña el
+token EN el runtime donde corre. Sanity honesto ejecutado: con la SA key REAL de producción (no la ADC del
+operador), mint 120 ms + Cloud Run aceptó (clean `ok` / EICAR `found`).
 
-Quedan dos postulaciones de prueba en el Hiring Desk con identidad inequívoca (`PRUEBA TASK-1378 / NO CONTACTAR`,
-correos `task-1378-scan-*@efeonce.org`) sobre `EO-OPN-0009`. No se borraron: `asset_scan_results` es append-only y
-borrar filas de la BD productiva compartida no es decisión del agente. HR las descarta en el Desk.
+**Condición vigente para re-prender en Production** (la anterior — "código en main" — se cumplió y NO bastó):
+(1) fix + endpoint promovidos a `main` vía release control plane; (2) `?probe=scan` contra
+`greenhouse.efeoncepro.com` con `mint.ok=true` + `probe.ok=true`; (3) flip mirando la primera postulación real
+(~13/día por la campaña de Facebook de `EO-OPN-0061`/`EO-OPN-0009`). Rollback <10 min.
 
-Pendiente menor: confirmar la primera postulación PRODUCTIVA registrando `structural+clamav-http` en
-`asset_scan_results`. El flujo recibe ~13/día (campaña de Facebook de `EO-OPN-0061`/`EO-OPN-0009`). Si algo fallara,
-rollback = `vercel env rm ASSET_MALWARE_SCAN_ENABLED production` + redeploy, <10 min.
+Docs sincronizados: ISSUE-150 (§Segundo fallo), flag ledger, timing ledger del release `64c80f61d4a4`
+(run `31530324227`), task file, runbook `operar-scanner-malware-assets.md` (paso 5 nuevo + troubleshooting).
+`recover-scanner-403-quarantined-cvs.ts` generalizado a `scanner_auth_failed`/`scanner_unreachable`.
+TASK-1378 sigue `in-progress` (no se cierra con el flag OFF en prod).
 
-Dato para no repetir un error: **producción resuelve credenciales GCP por `service_account_key`, no por WIF**
-(staging sí usa WIF). Ambos caminos quedaron verificados por separado contra su propio servicio.
+Nota histórica: la afirmación previa de este Handoff — "ambos caminos de credencial verificados por separado" —
+era falsa: la prueba local usó la ADC del operador (que tiene `serviceAccountTokenCreator`), un camino que
+Vercel no tiene. Detalle en ISSUE-150 §Prevención.
 
-Costo steady: **≈USD 19/mes**. Había desplegado dos servicios copiando el patrón de los otros workers; el operador
-señaló que staging y producción comparten UNA sola base, y eso desarmó la justificación: el scanner es stateless y
-duplicarlo no aislaba nada. Se borró `clamav-staging` y el canary de imagen nueva sale por revisión etiquetada sin
-tráfico, que Cloud Run da gratis. De paso quedó corregida en el ledger la calibración que decía "todo Cloud Run
-cuesta USD 7,32/30d": son ≈USD 169/30d.
+Servicio: **un solo `clamav`** en us-east4 (2 GiB, `min=1`, IAM-only, ≈USD 19/mes). Quedan dos postulaciones de
+prueba identificadas (`PRUEBA TASK-1378 / NO CONTACTAR`) en el Hiring Desk para que HR las descarte.
 
 ### ISSUE-149 RESUELTA — drift TS↔DB de route_group_scope (2026-08-11)
 

@@ -7,6 +7,28 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-11 — El flag del escáner falló dos veces en producción; causa raíz cerrada en código
+
+Corrección al estado que reporta la entrada siguiente: en producción el escáner de
+firmas quedó **apagado**. Prenderlo falló dos veces el mismo día bloqueando CVs de
+candidatos reales (recuperados todos, 5+1): primero porque el código estaba sólo en
+`develop` y producción sirve `main`; después —con el código ya promovido— porque
+producción resuelve credenciales GCP por service account key (postura transicional,
+TASK-800) y el camino de ID tokens del scanner no tenía esa rama: caía a un método
+que exige credenciales ambiente que Vercel no tiene, y fallaba en 21 ms. Staging
+nunca lo mostró porque usa la rama WIF, que sí existía.
+
+El fix agrega la rama de service account key al resolver canónico
+(`src/lib/google-credentials.ts`), con el plan de credencial exportado y testeado
+contra los shapes exactos de producción y staging, y nace el endpoint de diagnóstico
+`GET /api/internal/health/scanner-auth`: acuña el ID token en el runtime donde corre
+y opcionalmente golpea el `/scan` real, sin tocar el path de uploads. Es la
+verificación que faltó dos veces — probar con la identidad del operador no prueba
+nada sobre el runtime. Verificado con la credencial real de producción: token en
+120 ms y el Cloud Run lo aceptó. El flag se re-prende recién cuando el endpoint
+responda verde EN producción (ISSUE-150 tiene la secuencia exacta). Staging sigue
+operativo end-to-end.
+
 ## 2026-08-11 — Escaneo de malware activo sobre los archivos que suben desde afuera
 
 El escáner de firmas dejó de ser código latente y quedó operativo en staging y en
@@ -1162,37 +1184,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   que sigue abierto por eso.
 - Los códigos de rechazo del contrato creativo de ruta y el rechazo sin cobro de un control no honrado quedaron
   registrados en la entrada siguiente de este mismo día; acá sólo se registra lo que ocurrió después.
-
-## 2026-08-03 — Globe Producer: el contrato creativo de ruta empieza a aplicarse
-
-- Cinco commits de Globe desplegados a producción y verificados contra la revisión activa (`8986b45`, `ac1999f`,
-  `e300c4e`, `1b580f8`, `91d1f71`; API `00194-l4s` → `00197-f9z` y el worker con el digest de cada SHA).
-  `pnpm check` + `pnpm build` en exit 0 en todos; `outboxDeadLetter` se mantuvo en 1 —el preexistente— y
-  `retryStorm` en 0 después de cada despliegue, así que ningún rollout mató una corrida viva.
-- **Cuando algo se rechaza, ahora dice qué lo rechazó** (`8986b45`). Un solo código del contrato de ruta colapsaba
-  nueve causas con remedios opuestos —re-preparar, cambiar la operación, cambiar el asset, convertir el archivo— y
-  se abre en ocho códigos propios. Media type y MIME quedan separados porque uno pide otro asset y el otro pide
-  convertir el que ya tienes. La tabla de causas está probada en rojo y una aserción de unicidad impide la recaída.
-  Es la décima aparición del bug class de `ISSUE-127`, cerrada.
-- **Una corrida con un fallo determinista muere al primer intento** (`ac1999f`). De las 35 razones que el compiler
-  sabe nombrar, sólo dos estaban clasificadas en la política de reintentos: las otras 33 gastaban tres entregas
-  cada una en algo que jamás iba a cambiar. Quedan 38 `terminal`, 3 `transient` y 2 `unknown` con su razón
-  declarada, y un test rompe el build si una razón nueva nace sin clasificar. El tope de `ISSUE-135` había estado
-  escondiendo el defecto: tres reintentos no llaman la atención de nadie.
-- **Duración, relación de aspecto y resolución dejan de ser controles creativos** (`e300c4e`, catálogo
-  1.6.0 → 1.7.0, ADR-022 Delta (b)). Son forma de salida y su dueño ya era `RouteConstraintsV1`/`OutputShapeV1`;
-  declararlas dos veces era duplicar el SSOT dentro del mismo contrato. Nace `valueShape` en el descriptor, que es
-  lo que permite validar un control antes del gasto.
-- **Un solo vocabulario de dirección creativa** (`1b580f8`). El brief pide y el contrato de ruta declara si se
-  honra: los dos lados quedan alineados 1:1 (`light` → `lighting`, `framing` → `composition`, más los controles e
-  ingredientes que sólo existían de un lado), con un test que impide que vuelvan a divergir.
-- **Un pedido que la ruta no honra da error sin cobrar** (`91d1f71`, ADR-022 Delta (c), primera mitad). La
-  compilación del prompt deja de ser un molde único: recibe el contrato de la ruta y rechaza antes del estimate y
-  de la reserva. Pedir estilo en una operación de upscale antes generaba ignorando lo pedido y cobraba igual.
-  Además el peso ordena la oración y ya no viaja al modelo como texto (`[weight=0.820]`), que un encoder de
-  difusión lee como palabras y no condiciona.
-- Estado honesto: **TASK-1633 sigue `in-progress`, con 10 de 17 criterios cerrados**. Falta el eje de aplicación
-  por ruta —la compilación todavía no vive detrás del adapter y no existe `promptCompilerRevision` en ningún
-  fingerprint—, el Slice 4 de rutas legacy y los mecanismos declarados con evidencia por proveedor. Los canaries de
-  Omni siguen bloqueados por el transporte, que pertenece a `TASK-1504`; por eso el peso reordenado es una mejora
-  razonada, no verificada.

@@ -5,6 +5,7 @@ import {
   getGoogleCredentialDiagnostics,
   getGoogleCredentialSource,
   getGoogleCredentials,
+  getGoogleIdTokenProviderPlan,
   getGoogleProjectId,
   hasPersistedLocalVercelOidcToken,
   shouldUseWorkloadIdentity
@@ -220,6 +221,77 @@ describe('google credentials helpers', () => {
     })
 
     expect(authOptions.authClient).toBeDefined()
+  })
+
+  describe('getGoogleIdTokenProviderPlan (ISSUE-150 segunda causa)', () => {
+    it('uses the service account key when production forces that preference in a vercel runtime', () => {
+      // Shape EXACTO de Production al 2026-08-11: preferencia explícita de key
+      // (postura transicional TASK-800) + key presente + WIF configurado pero
+      // desactivado por la preferencia. Antes del fix este shape caía a
+      // impersonación ambiente (sin ADC en Vercel) y el scan moría en
+      // `scanner_auth_failed` en ~21 ms.
+      const env = asEnv({
+        GCP_AUTH_PREFERENCE: 'service_account_key',
+        GOOGLE_APPLICATION_CREDENTIALS_JSON:
+          '{"project_id":"efeonce-group","client_email":"runtime@example.com","private_key":"key"}',
+        GCP_SERVICE_ACCOUNT_EMAIL: 'greenhouse-portal@efeonce-group.iam.gserviceaccount.com',
+        GCP_WORKLOAD_IDENTITY_PROVIDER: 'projects/123/locations/global/workloadIdentityPools/vercel/providers/greenhouse-eo',
+        GCP_PROJECT: 'efeonce-group',
+        VERCEL: '1',
+        VERCEL_ENV: 'production',
+        VERCEL_URL: 'greenhouse.vercel.app'
+      })
+
+      expect(getGoogleIdTokenProviderPlan(env)).toBe('service_account_key')
+    })
+
+    it('keeps wif as the plan for staging-shaped vercel runtimes without a preference', () => {
+      const env = asEnv({
+        GOOGLE_APPLICATION_CREDENTIALS_JSON: '',
+        GCP_SERVICE_ACCOUNT_EMAIL: 'greenhouse-portal@efeonce-group.iam.gserviceaccount.com',
+        GCP_WORKLOAD_IDENTITY_PROVIDER: 'projects/123/locations/global/workloadIdentityPools/vercel/providers/greenhouse-eo',
+        GCP_PROJECT: 'efeonce-group',
+        VERCEL: '1',
+        VERCEL_ENV: 'preview',
+        VERCEL_URL: 'greenhouse-staging.vercel.app'
+      })
+
+      expect(getGoogleIdTokenProviderPlan(env)).toBe('wif')
+    })
+
+    it('uses the service account key outside vercel when only the key is configured', () => {
+      const env = asEnv({
+        GOOGLE_APPLICATION_CREDENTIALS_JSON:
+          '{"project_id":"efeonce-group","client_email":"runtime@example.com","private_key":"key"}',
+        GCP_PROJECT: 'efeonce-group'
+      })
+
+      expect(getGoogleIdTokenProviderPlan(env)).toBe('service_account_key')
+    })
+
+    it('plans ambient impersonation for local operator identities with an explicit target', () => {
+      const env = asEnv({
+        GCP_SERVICE_ACCOUNT_EMAIL: 'greenhouse-portal@efeonce-group.iam.gserviceaccount.com',
+        GCP_PROJECT: 'efeonce-group'
+      })
+
+      expect(getGoogleIdTokenProviderPlan(env)).toBe('ambient_impersonated')
+    })
+
+    it('plans bare ambient adc when nothing else is configured', () => {
+      expect(getGoogleIdTokenProviderPlan(asEnv({ GCP_PROJECT: 'efeonce-group' }))).toBe('ambient_adc')
+    })
+
+    it('honors an explicit ambient preference over a present key', () => {
+      const env = asEnv({
+        GCP_AUTH_PREFERENCE: 'ambient_adc',
+        GOOGLE_APPLICATION_CREDENTIALS_JSON:
+          '{"project_id":"efeonce-group","client_email":"runtime@example.com","private_key":"key"}',
+        GCP_PROJECT: 'efeonce-group'
+      })
+
+      expect(getGoogleIdTokenProviderPlan(env)).toBe('ambient_adc')
+    })
   })
 
   it('flags persisted local vercel oidc tokens in diagnostics', () => {

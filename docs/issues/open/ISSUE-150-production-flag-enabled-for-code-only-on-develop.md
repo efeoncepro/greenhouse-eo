@@ -1,5 +1,10 @@
 # ISSUE-150 — Flag prendido en producción para código que sólo existía en `develop`
 
+> **Delta 2026-08-11 (mismo día, segundo fallo):** este issue ya no documenta un incidente sino un **bug class**:
+> prender `ASSET_MALWARE_SCAN_ENABLED` sobre un camino de credencial jamás verificado desde el runtime real.
+> El flag falló DOS veces el mismo día por dos causas distintas. La segunda está en § "Segundo fallo". Causa raíz
+> encontrada y corregida en código (pendiente de llegar a `main`).
+
 ## Ambiente
 
 production
@@ -73,10 +78,67 @@ Usar las variables de producción hace que una prueba *parezca* de producción. 
    registra el veredicto nuevo y adjunta el CV a su postulación. **5/5 recuperados y limpios.** El signal
    `storage.asset_scan.open_quarantine` volvió a steady 0.
 
+## Segundo fallo — 2026-08-11, post-release (`scanner_auth_failed` en 21 ms)
+
+Con el código del adapter YA en `main` (release `64c80f61d4a4`, release_id
+`64c80f61d4a4-8a2e7278-9260-43ed-bd2e-963e5002e2ad`, run `31530324227`), el flag se prendió de nuevo y volvió a
+fallar: 1 CV real (Brandon Valdés) en cuarentena con finding `scanner_auth_failed` en **21 ms** — demasiado rápido
+para ser red. La credencial nunca se obtuvo. Recuperado con el mismo script (filtro generalizado a
+`scanner_auth_failed`/`scanner_unreachable`).
+
+### Causa raíz (encontrada 2026-08-11, sesión siguiente)
+
+**Production corre con `GCP_AUTH_PREFERENCE="service_account_key"` + `GOOGLE_APPLICATION_CREDENTIALS_JSON`**
+(postura transicional deliberada desde hace ~130 días; el cutover a WIF-only es `TASK-800`, aún to-do). Staging no
+tiene esa preferencia y resuelve por WIF.
+
+La cadena exacta en producción:
+
+1. `shouldUseWorkloadIdentity()` → `false` (la preferencia explícita desactiva WIF).
+2. `resolveGoogleIdTokenProvider()` en `src/lib/google-credentials.ts` **no tenía rama para service account
+   key** — el camino de ID tokens (TASK-1378) sólo contemplaba WIF, impersonación ambiente y ADC pelada.
+3. Caía a impersonación ambiente: `new GoogleAuth({...}).getClient()` exige ADC — **inexistente en Vercel** →
+   excepción inmediata (los 21 ms) → fail-closed `scanner_auth_failed`.
+
+La ironía operativa: la key de `greenhouse-portal@` estaba EN el runtime de producción y puede acuñar ID tokens
+directamente (es el mismo source que BigQuery/GCS usan en producción todos los días). El código simplemente no la
+usaba para ese camino.
+
+### Por qué staging pasó el gate end-to-end y producción no
+
+No era "staging tiene algo más": staging **no tiene** `GCP_AUTH_PREFERENCE`, así que tomó la rama WIF, que sí
+existía. El gate de staging validó un camino de credencial que producción tiene deshabilitado por diseño. Dos
+environments, dos ramas de código distintas, una sola probada.
+
+### Fix aplicado (código, 2026-08-11)
+
+- `resolveGoogleIdTokenProvider()` ahora enruta por `getGoogleIdTokenProviderPlan()` (exportado y testeable sin
+  red): `wif` → `service_account_key` → `ambient_impersonated` → `ambient_adc`, alineado con
+  `getGoogleCredentialSource()`. La rama nueva usa `createGoogleAuth({ env }).getIdTokenClient(audience)`.
+- Tests unitarios con el shape EXACTO de Production (preferencia + key + WIF configurado-pero-desactivado) y el
+  shape de staging.
+- **Endpoint de diagnóstico `GET /api/internal/health/scanner-auth`** (guard: `CRON_SECRET` o tenant agency):
+  acuña el ID token EN el runtime donde corre y reporta plan/diagnóstico/claims sin exponer el token; con
+  `?probe=scan` hace además un POST real a `/scan` con bytes limpios (no toca el path de uploads ni puede crear
+  cuarentenas). Es la verificación "desde el runtime de producción" que faltó dos veces.
+
+### Verificación (2026-08-11, local con credencial REAL de producción)
+
+Sanity ejecutado con la SA key bajada de Vercel Production (la identidad del runtime, **no** la ADC del
+operador), pasando por el código nuevo: plan `service_account_key`, token acuñado en 120 ms con
+`aud=https://clamav-y6egnifl6a-uk.a.run.app` y `email=greenhouse-portal@efeonce-group.iam.gserviceaccount.com`;
+el Cloud Run lo aceptó: bytes limpios → `{"status":"ok"}`, EICAR → `{"status":"found"}`. Esto confirma causa
+raíz, permiso de invoker y fix. Lo único que NO prueba es el parsing de la env var dentro del runtime Vercel —
+eso lo cierra el endpoint de diagnóstico en producción.
+
 ## Solución pendiente
 
-El flag **no se vuelve a prender en producción hasta que el código esté en `main`** vía el release control plane.
-No es opcional ni acelerable: es la condición que faltaba.
+1. El fix + endpoint de diagnóstico deben llegar a `main` vía el release control plane.
+2. En producción: `GET /api/internal/health/scanner-auth?probe=scan` debe responder `mint.ok=true` y
+   `probe.ok=true` (y en staging seguir `ok` por la rama WIF).
+3. Recién entonces prender `ASSET_MALWARE_SCAN_ENABLED` en Production, mirando la primera postulación real.
+
+El flag **no se vuelve a prender en producción hasta cumplir 1→2**. No es opcional ni acelerable.
 
 ## Prevención
 
@@ -88,6 +150,10 @@ producción**, y que el agente la trató como equivalente. Dos guardrails:
    `git show origin/main:<archivo> | grep <símbolo>`. Si no está, el flag no se prende: se promueve primero.
 2. **Chequeo mecánico** en `pnpm flags:audit`: para cada flag prendido en Production, confirmar que su código
    lector está presente en `origin/main`. Un flag ON sobre código ausente es un fail-closed esperando gente.
+3. **(Del segundo fallo)** Toda prueba de credencial vale sólo para la RAMA de credencial que ejercita. Si los
+   environments difieren en `GCP_AUTH_PREFERENCE` (o cualquier selector de source), el gate de staging NO cubre
+   producción. Verificación canónica: el endpoint `GET /api/internal/health/scanner-auth?probe=scan` corrido en
+   CADA runtime donde el flag vaya a prenderse, antes de prenderlo.
 
 ## Referencias
 
