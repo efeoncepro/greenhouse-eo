@@ -51,6 +51,26 @@ describe('clamav deploy — postura de red', () => {
   })
 })
 
+describe('clamav deploy — un solo servicio para ambos entornos', () => {
+  // Staging y producción comparten la MISMA base de datos, y este servicio es
+  // stateless (bytes → veredicto, sin base, sin secretos, sin tenants). Duplicarlo
+  // no aislaba nada y costaba ≈USD 19/mes extra por un canary que Cloud Run ya
+  // da gratis con revisiones etiquetadas sin tráfico.
+  it('no crea un servicio aparte por entorno', () => {
+    const script = deployScript()
+
+    expect(script).toContain('SERVICE_NAME="clamav"')
+    expect(script).not.toMatch(/SERVICE_NAME="clamav-staging"/)
+  })
+
+  it('staging despliega una revisión canary sin tráfico', () => {
+    const script = deployScript()
+
+    expect(script).toContain('--no-traffic')
+    expect(script).toContain('--tag canary')
+  })
+})
+
 describe('clamav deploy — capacidad', () => {
   it('default min-instances=1: clamd tarda 20-40 s en cargar las firmas', () => {
     const script = deployScript()

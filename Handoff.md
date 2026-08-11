@@ -2,8 +2,8 @@
 
 ### TASK-1378 — ClamAV OPERATIVO en staging y producción (2026-08-11)
 
-El escáner de firmas está prendido en ambos entornos, con redeploy aplicado. Servicios `clamav` y `clamav-staging`
-en us-east4 (2 GiB, `min=1`, cerrados por IAM, 3,6 M firmas, `freshclam` dentro del contenedor).
+El escáner de firmas está prendido en ambos entornos, con redeploy aplicado. **Un solo servicio `clamav`** en us-east4 (2 GiB, `min=1`, cerrado por IAM, 3,6 M firmas, `freshclam` dentro del
+contenedor) atendiendo a los dos entornos de Vercel.
 
 **Gate end-to-end cerrado con postulación real por el formulario público**, no con mocks. Turnstile no se manipuló:
 la app trae su propio camino de dev (`local-dev-captcha` cuando no hay site key fuera de producción). PDF válido →
@@ -21,8 +21,11 @@ rollback = `vercel env rm ASSET_MALWARE_SCAN_ENABLED production` + redeploy, <10
 Dato para no repetir un error: **producción resuelve credenciales GCP por `service_account_key`, no por WIF**
 (staging sí usa WIF). Ambos caminos quedaron verificados por separado contra su propio servicio.
 
-Costo steady: ≈USD 38/mes por los dos servicios con `min=1` (≈19 si se decide dejar staging sin cobertura). De paso
-quedó corregida en el ledger la calibración que decía "todo Cloud Run cuesta USD 7,32/30d": son ≈USD 169/30d.
+Costo steady: **≈USD 19/mes**. Había desplegado dos servicios copiando el patrón de los otros workers; el operador
+señaló que staging y producción comparten UNA sola base, y eso desarmó la justificación: el scanner es stateless y
+duplicarlo no aislaba nada. Se borró `clamav-staging` y el canary de imagen nueva sale por revisión etiquetada sin
+tráfico, que Cloud Run da gratis. De paso quedó corregida en el ledger la calibración que decía "todo Cloud Run
+cuesta USD 7,32/30d": son ≈USD 169/30d.
 
 ### ISSUE-149 RESUELTA — drift TS↔DB de route_group_scope (2026-08-11)
 

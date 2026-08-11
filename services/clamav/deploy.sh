@@ -29,12 +29,29 @@ REGION="us-east4"
 SERVICE_ACCOUNT="greenhouse-portal@${PROJECT_ID}.iam.gserviceaccount.com"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# UN SOLO servicio para los dos entornos, a diferencia del resto de los workers.
+#
+# Los demás workers se duplican con razón: manejan secretos, tocan PostgreSQL,
+# tienen estado por entorno. Este no. Recibe bytes por HTTP y devuelve un
+# veredicto: no conoce la base, ni tenants, ni entornos. Dos contenedores
+# idénticos y sin estado no aíslan nada — y menos cuando staging y producción ya
+# comparten la MISMA base (`efeonce-group:us-east4:greenhouse-pg-dev`), que es lo
+# único que podría necesitar aislamiento.
+#
+# Lo único que compraba un servicio aparte era probar una imagen nueva antes de
+# producción, y eso Cloud Run ya lo da con revisiones etiquetadas sin tráfico.
+# Un `min-instances=1` extra son ≈USD 19/mes por algo que la plataforma regala.
+SERVICE_NAME="clamav"
+
 if [ "${ENV}" = "production" ]; then
-  SERVICE_NAME="clamav"
-  echo "=== PRODUCTION deployment ==="
+  # Promueve la revisión nueva a 100% del tráfico.
+  TRAFFIC_ARGS=()
+  echo "=== PRODUCTION deployment (revisión servida) ==="
 else
-  SERVICE_NAME="clamav-staging"
-  echo "=== STAGING deployment ==="
+  # Canary: despliega la revisión SIN tráfico y la expone en una URL etiquetada.
+  # Staging apunta ahí para ejercitar una imagen nueva sin tocar a los candidatos.
+  TRAFFIC_ARGS=(--no-traffic --tag canary)
+  echo "=== STAGING deployment (revisión canary, sin tráfico) ==="
 fi
 
 # Cloud Run — por qué estos números:
@@ -47,14 +64,11 @@ fi
 #   concurrency  clamd serializa por instancia; 4 alcanza y evita contención.
 #   timeout=120  muy por encima del timeout del adapter (10 s por defecto).
 #
-# Costo: cada servicio con min=1 son ≈USD 19/mes. Staging y producción a la vez
-# son ≈USD 38/mes, no 19 — staging existe para el gate de EICAR, no para quedarse
-# prendido. Al terminar la verificación, bajarlo:
-#   gcloud run services delete clamav-staging --region us-east4
-#   # o dejarlo frío:  MIN_INSTANCES=0 ENV=staging bash services/clamav/deploy.sh
-# Con min=0 el primer scan paga 30-60 s de carga de firmas y el adapter corta a
-# los 10 s: el veredicto sería `scanner_timeout`. Sirve para tenerlo desplegado
-# sin gasto, NO para verificar contra él.
+# Costo: ≈USD 19/mes por el único servicio. El canary de staging NO agrega costo
+# fijo: es una revisión del mismo servicio y sólo consume mientras se la ejercita.
+# NUNCA bajar min a 0 en el runtime que atiende subidas reales — el primer scan
+# pagaría 30-60 s de carga de firmas y el adapter corta a los 10 s
+# (`scanner_timeout`, que es bloqueante).
 MIN_INSTANCES="${MIN_INSTANCES:-1}"
 MAX_INSTANCES="3"
 MEMORY="2Gi"
@@ -158,12 +172,23 @@ gcloud run deploy "${SERVICE_NAME}" \
   --cpu-boost \
   --startup-probe="httpGet.path=/ready,initialDelaySeconds=10,periodSeconds=10,failureThreshold=30,timeoutSeconds=5" \
   --set-env-vars="${ENV_VARS}" \
+  "${TRAFFIC_ARGS[@]}" \
   --quiet
 
 SERVICE_URL=$(gcloud run services describe "${SERVICE_NAME}" \
   --project="${PROJECT_ID}" \
   --region="${REGION}" \
   --format="value(status.url)")
+
+if [ "${ENV}" != "production" ]; then
+  # La URL del canary es la que debe consumir staging; la del servicio sigue
+  # sirviendo la revisión estable a producción.
+  CANARY_URL=$(gcloud run services describe "${SERVICE_NAME}" \
+    --project="${PROJECT_ID}" \
+    --region="${REGION}" \
+    --format="value(status.traffic[].url)" | tr ';' '\n' | grep -m1 'canary' || true)
+  [ -n "${CANARY_URL}" ] && SERVICE_URL="${CANARY_URL}"
+fi
 
 READY="$(gcloud run services describe "${SERVICE_NAME}" \
   --project="${PROJECT_ID}" \
@@ -234,7 +259,7 @@ fi
 echo ""
 echo "=== Próximo paso (NO automático) ==="
 echo "  1. Verificar EICAR contra el servicio antes de prender nada."
-echo "  2. vercel env add ASSET_MALWARE_SCAN_ENDPOINT  → ${SERVICE_URL}"
+echo "  2. ASSET_MALWARE_SCAN_ENDPOINT para este entorno → ${SERVICE_URL}"
 echo "  3. vercel env add ASSET_MALWARE_SCAN_ENABLED   → true"
 echo "  4. Redeploy de Vercel (las env vars no se toman en caliente)."
 echo "  5. Actualizar docs/operations/FEATURE_FLAG_STATE_LEDGER.md con runtime + fecha + evidencia."
