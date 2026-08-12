@@ -142,6 +142,7 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 ### HR y Nomina
 
 - [Guía de autoría de preguntas de assessment (SME)](hr/assessment-question-authoring-guide.md) — work-sample-first, anatomía de una buena pregunta, rúbricas contestables, sesgos prohibidos y el flujo draft→revisión SME→activación; incluye la matriz de cobertura vigente.
+- [Emails del Ciclo de Hiring](hr/emails-ciclo-hiring.md) — los 6 correos automáticos del proceso: aviso interno a People con los datos del postulante, acuse al candidato, test asignado, avance de etapa candidate-facing y decisión (seleccionado / no seleccionado); reglas de etapa, dedupe y kill-switch por tipo.
 - [Hiring Desk y Handoff](hr/hiring-desk.md) — dominio Hiring/ATS: demanda, pipeline, assessment template→application→token→review, decisión estructurada, publicación allowlist y handoff downstream (decisión seleccionada → ficha auditable que HRIS/Staff Aug aprueban y completan con evidencia; nada se contrata solo).
 - [People, Workforce, Payroll y Contractors end-to-end](hr/people-workforce-payroll-contractors-end-to-end.md) — mapa funcional completo reconciliado contra codigo y DB: Workforce Activation, HR Core, Payroll, honorarios, Deel/internacional, Contractors, payables, offboarding/finiquitos y puente con Finance; separa automatico vs operador y evita mezclar contractors con nomina dependiente.
 - [Sistema de Permisos y Licencias](hr/sistema-permisos-leave.md) — tipos de permiso, medio dia (AM/PM), calculo de dias habiles, flujo de aprobacion, saldo y acumulacion

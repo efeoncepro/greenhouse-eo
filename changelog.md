@@ -7,6 +7,18 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-12 — El proceso de contratación ahora avisa por correo en cada hito (TASK-1689)
+
+Greenhouse deja de estar mudo durante el hiring: al llegar una postulación, People recibe un aviso
+con los datos del postulante y el candidato un acuse de recibo; al asignarle un test le llega su
+link de acceso (con token re-emitido de forma canónica — nunca viaja por el outbox); al avanzar a
+una etapa candidate-facing (Preselección/Entrevista, nunca etapas internas) se le informa; y la
+decisión final llega como felicitación o como agradecimiento cuidado si no quedó. Todo corre como
+consumers reactivos en el ops-worker sobre la plataforma de email canónica, idempotente ante
+retries, con kill-switch por tipo (el de rechazo pausable aparte) y detrás de
+`HIRING_LIFECYCLE_EMAILS_ENABLED` default OFF. Code complete con suite completa verde; el flip
+espera deploy del worker, ejercicio en staging y revisión del copy por Talent.
+
 ## 2026-08-12 — Sentry separa el ruido del bridge de Facebook de los errores reales de Careers
 
 El cliente de Sentry filtra exclusivamente la firma del bridge nativo que Facebook inyecta en
@@ -1150,22 +1162,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   route cards, schema, validador determinista y gate de paridad. La primera ficha machine-readable es FLUX 3 Video.
 - La ficha separa evidencia del proveedor, cables de integración y disponibilidad live; no crea catálogo, adapter,
   rate ledger ni promoción paralelos. FLUX 3 permanece gated y el runtime de Globe no fue modificado.
-
-## 2026-08-04 — Globe: la captura de completitud tenía trece huecos y ningún contrato escrito
-
-- **ADR-021 nace porque el contrato no existía.** Ningún doc de arquitectura mencionaba «webhook»: la captura de
-  completitud vivía sólo en el código, y esa ausencia dejó acumular **13 defectos** sin que nadie los viera —
-  tres terminaban en un asset **generado, facturado e irrecuperable**, y ninguno producía error visible.
-- **Cada proveedor avisa distinto, y eso es la decisión**: Fal por webhook **por request**, OpenAI **no emite
-  eventos de imagen** (su `poll` es correcto por diseño), Vertex sólo por operación de larga duración.
-- **12 de 13 cerrados y desplegados**, verificados con una generación real (run `completed`, experimento
-  `candidate_ready`, governance `eligible`). Queda D12, que ya no es pérdida sino ventana de latencia.
-- **Convergencia terminal como invariante enumerable** (`TASK-1469`): 4 experimentos huérfanos → 0, y tres
-  señales de outbox pasaron de imprimirse a mirarse. `outboxDeadLetter` **medía filas en vez de intentos** —
-  decía 3 para uno.
-- **Cierre documental**: ADR-021 + doc funcional + manual + dos runbooks + las dos skills espejadas y el overlay
-  de arquitectura, donde se corrigieron **cuatro contradicciones activas**.
-- **FLUX 3 queda documentado y gated:** Fal expone once endpoints activos (cinco estándar, cinco drafts y
-  `draft-enhance`), mientras BFL mantiene el producto/API directo en Early Access. `TASK-1642` y su propuesta
-  registran la discrepancia de namespace, keyframes, `duration: auto`, audio evidence, `draft_cache`, rates,
-  rights, evaluación, canary y rollback; el runtime de Globe no fue modificado.

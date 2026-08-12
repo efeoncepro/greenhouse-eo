@@ -20,6 +20,38 @@ Este documento fija:
 - Domain: `agency` + `people` + `hris` + `staff augmentation` + `finance` + `capacity`
 - Date: `2026-04-11`
 
+## Delta 2026-08-12 — TASK-1689: emails transaccionales del ciclo de vida (consumers reactivos)
+
+Los 4 eventos del pipeline que ya se emitían como audit ahora tienen consumers de email en el
+**ops-worker** (domain `notifications`, lane `ops-reactive-notifications`), detrás de
+`HIRING_LIFECYCLE_EMAILS_ENABLED` (default OFF, vive SOLO en el worker) + kill-switch por tipo en
+`greenhouse_notifications.email_type_config` (seed aplicado; `hiring_decision_rejected` pausable
+independiente):
+
+| Evento | Consumer | Email |
+|---|---|---|
+| `hiring.application.created` | `hiring_application_created_emails` | aviso interno a People (buzón `HIRING_INTERNAL_NOTIFICATIONS_EMAIL`, default `people@efeoncepro.com`) + acuse al candidato |
+| `hiring.assessment.assigned` | `hiring_assessment_assigned_email` | link de evaluación al candidato — SOLO `method=candidate_test` (un scorecard de entrevistador JAMÁS emailea al candidato) |
+| `hiring.application.stage_changed` | `hiring_stage_changed_email` | avance de etapa — SOLO allowlist candidate-facing (`shortlisted`→"Preselección", `interview`→"Entrevista"); etapas internas nunca llegan a copy |
+| `hiring.application.decided` | `hiring_application_decided_email` | `selected` (felicitación) / `rejected` (agradecimiento); anti-stale: re-verifica la decisión vigente en PG antes de enviar |
+
+**Invariantes:**
+
+- La política (flag, buzón interno, allowlist de etapas, resolver de recipient) vive en
+  `src/lib/hiring/notifications/**`; los consumers (`src/lib/sync/projections/hiring-lifecycle-emails.ts`)
+  son thin wrappers. Todo envío pasa por `sendEmail` canónico; dedupe explícito con
+  `wasEmailAlreadySent(eventId, entityId, email)` — un replay del dispatcher nunca re-envía.
+- **El token del candidate_test nunca viaja por el outbox** (sincroniza a BigQuery). El consumer usa
+  `reissueCandidateTestTokenForEmail` (`assessment/instances.ts`): rota hash+expiry y marca `sent`
+  SOLO si el estado sigue en `assigned`/`sent`, y SIEMPRE después del check de dedupe (rotar tras un
+  envío exitoso invalidaría el link entregado). `in_progress`/`submitted`/`expired` → skip honesto.
+- Eventos re-leídos de PG por ID: PII (email/nombre del candidato, título de vacante) se resuelve al
+  consumir; los mensajes del reactive log y las capturas (`captureWithDomain('hiring')`) llevan sólo IDs.
+- Candidate-facing emails envían como **Efeonce** (AGENCY_BRANDED); el aviso interno usa el sender
+  plataforma. Templates en `src/emails/Hiring*.tsx` (es/en; default es).
+- Rollout: ledger `FEATURE_FLAG_STATE_LEDGER.md` §Pendientes — flip exige ejercicio end-to-end en
+  staging + revisión humana de Talent del copy (especialmente el rechazo).
+
 ## Delta 2026-07-16 — TASK-1385: AI-assisted vacancy public copy (propose→confirm)
 
 La redacción del payload público de una vacante ahora tiene asistencia IA gobernada, extendiendo

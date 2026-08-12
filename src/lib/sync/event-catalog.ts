@@ -1144,7 +1144,9 @@ export const EVENT_TYPES = {
   hiringActivationLinked: 'hiring.activation.linked',
   hiringActivationCompleted: 'hiring.activation.completed',
 
-  // TASK-1360 — Assessment Engine. Sin consumer reactivo en V1 (audit/observabilidad).
+  // TASK-1360 — Assessment Engine. template_created/submitted sin consumer reactivo
+  // (audit/observabilidad); `assigned` tiene consumer de email desde TASK-1689
+  // (hiring_assessment_assigned_email, sólo method=candidate_test).
   hiringAssessmentTemplateCreated: 'hiring.assessment.template_created',
   hiringAssessmentAssigned: 'hiring.assessment.assigned',
   hiringAssessmentSubmitted: 'hiring.assessment.submitted',

@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `sync`
 - Epic: `EPIC-011`
-- Status real: `Diseño confirmado; no implementada`
+- Status real: `Code complete; rollout pendiente (flag OFF, deploy del ops-worker pendiente de push)`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`

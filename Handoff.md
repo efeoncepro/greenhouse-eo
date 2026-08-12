@@ -2,12 +2,20 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
-### TASK-1689 — emails transaccionales del ciclo de Hiring (en ejecución, 2026-08-12)
+### TASK-1689 CERRADA — emails del ciclo de Hiring: code complete, rollout pendiente (2026-08-12)
 
-En `in-progress` sobre `develop` (checkout compartido, sin worktrees). Objetivo: 6 emails sobre eventos hiring ya
-emitidos (aviso interno a People + acuse, test asignado, avance de etapa, decisión selected/rejected) vía
-consumers reactivos en ops-worker + plataforma email canónica, flag `HIRING_LIFECYCLE_EMAILS_ENABLED` default
-OFF. Ejecuta esta sesión Claude; sigue TASK-1688 al cierre.
+Los 6 emails (aviso interno a People + acuse al candidato en `hiring.application.created`, test asignado en
+`hiring.assessment.assigned` sólo `candidate_test`, avance de etapa allowlisted en `stage_changed`, decisión
+selected/rejected anti-stale en `decided`) quedaron cableados como 4 consumers reactivos domain `notifications`
+(lane existente `ops-reactive-notifications`), con política en `src/lib/hiring/notifications/**`, dedupe
+`wasEmailAlreadySent` y re-emisión canónica del token del test (`reissueCandidateTestTokenForEmail` — el token
+nunca viaja por el outbox). Gates: 10.577 tests verdes, lint/typecheck 0, worker gates OK; el `pnpm build` de
+producción NO se corrió por la preferencia del operador (memoria: build cuelga la máquina) — el CI lo cubre al
+push. **Rollout pendiente:** flag `HIRING_LIFECYCLE_EMAILS_ENABLED` default OFF en `deploy.sh` (seed
+`email_type_config` YA aplicado en la DB compartida, benigno con flag OFF); el flip exige deploy del ops-worker
++ ejercicio end-to-end en staging + revisión de Talent del copy (especialmente `hiring_decision_rejected`,
+pausable aparte). Ledger actualizado. La migración ajena de ISSUE-151 (timestamp posterior) quedó SIN aplicar a
+propósito — su plan exige código desplegado primero; se aplicó selectivamente con `pnpm migrate:up 1`.
 
 ### ISSUE-151 — dos alertas Sentry investigadas; corrección local lista, rollout pendiente (2026-08-12)
 

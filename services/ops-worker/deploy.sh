@@ -391,6 +391,21 @@ ensure_secret_accessor_binding "${NOTION_KNOWLEDGE_TOKEN_SECRET_REF}:latest"
 GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED="${GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED=${GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED}"
 
+# TASK-1689 — Emails transaccionales del ciclo de Hiring. Los 4 consumers reactivos
+# (hiring_application_created_emails / hiring_assessment_assigned_email /
+# hiring_stage_changed_email / hiring_application_decided_email, lane
+# ops-reactive-notifications) leen el flag SOLO acá — prenderlo en Vercel no hace nada.
+# Default OFF hasta ejercicio end-to-end en staging + revisión humana de Talent del copy
+# (especialmente hiring_decision_rejected, pausable aparte en email_type_config).
+# Declarativo acá para que `--set-env-vars` (destructivo) NO lo borre en cada redeploy.
+# Rollback (<5min): `gcloud run services update ops-worker --update-env-vars HIRING_LIFECYCLE_EMAILS_ENABLED=false`.
+HIRING_LIFECYCLE_EMAILS_ENABLED="${HIRING_LIFECYCLE_EMAILS_ENABLED:-false}"
+ENV_VARS="${ENV_VARS},HIRING_LIFECYCLE_EMAILS_ENABLED=${HIRING_LIFECYCLE_EMAILS_ENABLED}"
+
+# Buzón interno de People para el aviso de postulación nueva (configurable; default en código).
+HIRING_INTERNAL_NOTIFICATIONS_EMAIL="${HIRING_INTERNAL_NOTIFICATIONS_EMAIL:-people@efeoncepro.com}"
+ENV_VARS="${ENV_VARS},HIRING_INTERNAL_NOTIFICATIONS_EMAIL=${HIRING_INTERNAL_NOTIFICATIONS_EMAIL}"
+
 if [ -n "${RESEND_API_KEY_SECRET_REF}" ]; then
   ENV_VARS="${ENV_VARS},RESEND_API_KEY_SECRET_REF=${RESEND_API_KEY_SECRET_REF}"
 else
