@@ -1683,6 +1683,11 @@ registerPreviewMeta('growth_ebook_delivery', {
 interface HiringInternalReceivedContext extends EmailTemplateContext {
   candidateName: string
   candidateEmail: string
+  candidatePhone?: string | null
+  candidateResidenceCountry?: string | null
+  candidateMessage?: string | null
+  portfolioUrl?: string | null
+  linkedinUrl?: string | null
   openingTitle: string
   applicationPublicId: string
   source: string
@@ -1694,19 +1699,27 @@ registerTemplate('hiring_application_received_internal', (context: HiringInterna
   react: HiringApplicationReceivedInternalEmail({
     candidateName: context.candidateName,
     candidateEmail: context.candidateEmail,
+    candidatePhone: context.candidatePhone ?? null,
+    candidateResidenceCountry: context.candidateResidenceCountry ?? null,
+    candidateMessage: context.candidateMessage ?? null,
+    portfolioUrl: context.portfolioUrl ?? null,
+    linkedinUrl: context.linkedinUrl ?? null,
     openingTitle: context.openingTitle,
     applicationPublicId: context.applicationPublicId,
     source: context.source,
     applicationUrl: context.applicationUrl,
   }),
   text: [
-    'Nueva postulación recibida',
+    `${context.candidateName} postuló a ${context.openingTitle}`,
     '',
-    `Postulante: ${context.candidateName}`,
     `Correo: ${context.candidateEmail}`,
-    `Vacante: ${context.openingTitle}`,
+    `Teléfono: ${context.candidatePhone ?? 'No informado'}`,
+    `País de residencia: ${context.candidateResidenceCountry ?? 'No informado'}`,
+    ...(context.portfolioUrl ? [`Portafolio: ${context.portfolioUrl}`] : []),
+    ...(context.linkedinUrl ? [`LinkedIn: ${context.linkedinUrl}`] : []),
     `Postulación: ${context.applicationPublicId}`,
     `Origen: ${context.source}`,
+    ...(context.candidateMessage ? ['', `Mensaje del candidato:`, context.candidateMessage] : []),
     '',
     `Revisar: ${context.applicationUrl}`,
   ].join('\n'),
@@ -1722,8 +1735,12 @@ interface HiringConfirmationContext extends EmailTemplateContext {
 registerTemplate('hiring_application_confirmation', (context: HiringConfirmationContext) => {
   const isEn = context.locale === 'en'
 
+  const first = context.recipientName?.split(' ')[0]
+
   return {
-    subject: isEn ? 'We received your application — Efeonce' : 'Recibimos tu postulación — Efeonce',
+    subject: isEn
+      ? `${first ? `${first}, ` : ''}we received your application for «${context.openingTitle}» — Efeonce`
+      : `${first ? `${first}, ` : ''}recibimos tu postulación a «${context.openingTitle}» — Efeonce`,
     react: HiringApplicationConfirmationEmail({
       recipientName: context.recipientName,
       openingTitle: context.openingTitle,
@@ -1754,8 +1771,12 @@ interface HiringAssessmentAssignedContext extends EmailTemplateContext {
 registerTemplate('hiring_assessment_assigned', (context: HiringAssessmentAssignedContext) => {
   const isEn = context.locale === 'en'
 
+  const first = context.recipientName?.split(' ')[0]
+
   return {
-    subject: isEn ? 'You have a pending assessment — Efeonce' : 'Tienes una evaluación pendiente — Efeonce',
+    subject: isEn
+      ? `${first ? `${first}, ` : ''}you have a pending assessment — Efeonce`
+      : `${first ? `${first}, ` : ''}tienes una evaluación pendiente — Efeonce`,
     react: HiringAssessmentAssignedEmail({
       recipientName: context.recipientName,
       openingTitle: context.openingTitle,
@@ -1787,8 +1808,12 @@ interface HiringStageAdvancedContext extends EmailTemplateContext {
 registerTemplate('hiring_stage_advanced', (context: HiringStageAdvancedContext) => {
   const isEn = context.locale === 'en'
 
+  const first = context.recipientName?.split(' ')[0]
+
   return {
-    subject: isEn ? 'Your application moved forward — Efeonce' : 'Tu postulación avanzó — Efeonce',
+    subject: isEn
+      ? `${first ? `${first}, ` : ''}your application moved to ${context.stageLabel} — Efeonce`
+      : `${first ? `${first}, ` : ''}tu postulación avanzó a ${context.stageLabel} — Efeonce`,
     react: HiringStageAdvancedEmail({
       recipientName: context.recipientName,
       openingTitle: context.openingTitle,
@@ -1816,8 +1841,12 @@ interface HiringDecisionContext extends EmailTemplateContext {
 registerTemplate('hiring_decision_selected', (context: HiringDecisionContext) => {
   const isEn = context.locale === 'en'
 
+  const first = context.recipientName?.split(' ')[0]
+
   return {
-    subject: isEn ? 'Good news about your application — Efeonce' : 'Buenas noticias sobre tu postulación — Efeonce',
+    subject: isEn
+      ? `${first ? `${first}, ` : ''}good news about your application — Efeonce`
+      : `${first ? `${first}, ` : ''}buenas noticias sobre tu postulación — Efeonce`,
     react: HiringDecisionEmail({
       recipientName: context.recipientName,
       openingTitle: context.openingTitle,
@@ -1825,11 +1854,11 @@ registerTemplate('hiring_decision_selected', (context: HiringDecisionContext) =>
       locale: context.locale ?? 'es',
     }),
     text: [
-      isEn ? 'You were selected' : 'Quedaste seleccionado/a',
+      isEn ? 'We chose you' : '¡Te elegimos!',
       '',
       isEn
-        ? `We have good news: you were selected for «${context.openingTitle}» at Efeonce. Our team will contact you with the next steps.`
-        : `Tenemos buenas noticias: quedaste seleccionado/a para «${context.openingTitle}» en Efeonce. Nuestro equipo te contactará con los próximos pasos.`,
+        ? `We have good news: we chose you for «${context.openingTitle}» at Efeonce. Our team will contact you with the next steps.`
+        : `Tenemos buenas noticias: te elegimos para «${context.openingTitle}» en Efeonce. Nuestro equipo te contactará con los próximos pasos.`,
       '',
       '— Efeonce · efeoncepro.com',
     ].join('\n'),
@@ -1839,8 +1868,12 @@ registerTemplate('hiring_decision_selected', (context: HiringDecisionContext) =>
 registerTemplate('hiring_decision_rejected', (context: HiringDecisionContext) => {
   const isEn = context.locale === 'en'
 
+  const first = context.recipientName?.split(' ')[0]
+
   return {
-    subject: isEn ? 'An update about your application — Efeonce' : 'Sobre tu postulación — Efeonce',
+    subject: isEn
+      ? `${first ? `${first}, ` : ''}about your application to «${context.openingTitle}» — Efeonce`
+      : `${first ? `${first}, ` : ''}sobre tu postulación a «${context.openingTitle}» — Efeonce`,
     react: HiringDecisionEmail({
       recipientName: context.recipientName,
       openingTitle: context.openingTitle,
@@ -1851,8 +1884,8 @@ registerTemplate('hiring_decision_rejected', (context: HiringDecisionContext) =>
       isEn ? 'About your application' : 'Sobre tu postulación',
       '',
       isEn
-        ? `Thank you for applying to «${context.openingTitle}» at Efeonce. After reviewing the process, we decided not to move forward on this occasion. We would be glad to see you apply to future openings.`
-        : `Gracias por postular a «${context.openingTitle}» en Efeonce. Después de revisar el proceso, decidimos no avanzar en esta oportunidad. Nos encantaría verte postular a futuras vacantes.`,
+        ? `Thank you for the time you put into your application to «${context.openingTitle}» at Efeonce. After completing the process, we decided not to move forward on this occasion. We would be glad to see you apply to future openings closer to your profile.`
+        : `Gracias por el tiempo que pusiste en tu postulación a «${context.openingTitle}» en Efeonce. Después de completar el proceso, decidimos no avanzar en esta oportunidad. Nos encantaría verte postular a futuras vacantes que se acerquen más a tu perfil.`,
       '',
       '— Efeonce · efeoncepro.com',
     ].join('\n'),
@@ -1867,6 +1900,10 @@ registerPreviewMeta('hiring_application_received_internal', {
   defaultProps: {
     candidateName: 'María González',
     candidateEmail: 'maria@ejemplo.com',
+    candidatePhone: '+56 9 1234 5678',
+    candidateResidenceCountry: 'Chile',
+    candidateMessage: 'Me interesa el rol porque llevo 4 años creando contenido para marcas B2B.',
+    portfolioUrl: 'https://portafolio.ejemplo.com',
     openingTitle: 'Content Creator',
     applicationPublicId: 'EO-APP-0001',
     source: 'public_careers',
@@ -1875,6 +1912,10 @@ registerPreviewMeta('hiring_application_received_internal', {
   propsSchema: [
     { key: 'candidateName', label: 'Nombre del postulante', type: 'text' },
     { key: 'candidateEmail', label: 'Correo del postulante', type: 'text' },
+    { key: 'candidatePhone', label: 'Teléfono', type: 'text' },
+    { key: 'candidateResidenceCountry', label: 'País de residencia', type: 'text' },
+    { key: 'candidateMessage', label: 'Mensaje del candidato', type: 'text' },
+    { key: 'portfolioUrl', label: 'Portafolio', type: 'text' },
     { key: 'openingTitle', label: 'Vacante', type: 'text' },
     { key: 'applicationPublicId', label: 'ID público de la postulación', type: 'text' },
     { key: 'source', label: 'Origen', type: 'text' },

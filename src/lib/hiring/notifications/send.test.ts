@@ -43,8 +43,13 @@ const contextRow = (overrides: Record<string, unknown> = {}) => ({
   stage: 'screening',
   source: 'public_careers',
   decision: null,
+  candidate_message: 'Me interesa el rol por X e Y.',
   canonical_email: 'maria@ejemplo.com',
   full_name: 'María González',
+  phone_e164: '+56912345678',
+  residence_country_code: 'CL',
+  portfolio_url: 'https://portafolio.ejemplo.com',
+  linkedin_url: null,
   opening_id: 'hopn-1',
   opening_public_id: 'EO-OPN-0061',
   internal_title: 'Content Creator (interno)',
@@ -119,6 +124,11 @@ describe('TASK-1689 hiring lifecycle emails', () => {
       expect(internal.emailType).toBe('hiring_application_received_internal')
       expect(internal.recipients[0].email).toBe('people@efeoncepro.com')
       expect(internal.context.candidateEmail).toBe('maria@ejemplo.com')
+      // TASK-1688 — el aviso interno lleva el contacto completo (país como NOMBRE, no código).
+      expect(internal.context.candidatePhone).toBe('+56912345678')
+      expect(internal.context.candidateResidenceCountry).toBe('Chile')
+      expect(internal.context.candidateMessage).toBe('Me interesa el rol por X e Y.')
+      expect(internal.context.portfolioUrl).toBe('https://portafolio.ejemplo.com')
       expect(internal.context.applicationUrl).toContain('/agency/hiring/applications/happ-1')
       expect(internal.sourceEventId).toBe('evt-1')
 
@@ -159,6 +169,20 @@ describe('TASK-1689 hiring lifecycle emails', () => {
       expect(msg).toContain('internal dedupe')
       expect(msg).toContain('confirmation dedupe')
       expect(mockSendEmail).not.toHaveBeenCalled()
+    })
+
+    it('legacy sin contacto: el interno sale con nulls (el template muestra "No informado")', async () => {
+      mockRunQuery.mockResolvedValue([
+        contextRow({ phone_e164: null, residence_country_code: null, candidate_message: null, portfolio_url: null }),
+      ])
+
+      await sendHiringApplicationCreatedEmails('happ-1', {})
+
+      const internal = mockSendEmail.mock.calls[0][0]
+
+      expect(internal.context.candidatePhone).toBeNull()
+      expect(internal.context.candidateResidenceCountry).toBeNull()
+      expect(internal.context.candidateMessage).toBeNull()
     })
 
     it('no-ops when the application does not exist', async () => {

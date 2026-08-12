@@ -13,7 +13,7 @@ tenga que acordarse de escribirlos:
 
 | Momento | Quién lo recibe | Qué dice |
 |---|---|---|
-| Llega una postulación nueva | Buzón de People (`people@efeoncepro.com`) | Datos del postulante (nombre, correo, vacante, origen) + link para revisarla en el Hiring Desk |
+| Llega una postulación nueva | Buzón de People (`people@efeoncepro.com`) | Datos completos del postulante (nombre, correo, teléfono, país de residencia, portafolio/LinkedIn, mensaje, vacante, origen) + link para revisarla en el Hiring Desk. Sin dato = "No informado" |
 | Llega una postulación nueva | El candidato | Acuse de recibo: "recibimos tu postulación, esto es lo que sigue" |
 | Se le asigna un test al candidato | El candidato | Link de acceso a su evaluación, tiempo estimado y vigencia del link |
 | La postulación avanza a Preselección o Entrevista | El candidato | "Tu postulación avanzó" con el nombre de la etapa |
@@ -33,6 +33,8 @@ tenga que acordarse de escribirlos:
   resto — útil si Talent quiere controlar el momento del envío.
 - **Los correos al candidato salen a nombre de Efeonce** (la agencia); el aviso interno usa el
   remitente de la plataforma.
+- **Los correos se sienten personales**: el asunto y el saludo usan el nombre del candidato y el
+  nombre de la vacante (p. ej. "María, recibimos tu postulación a «Content Creator»").
 - Todo el sistema está detrás de un interruptor general (`HIRING_LIFECYCLE_EMAILS_ENABLED`,
   apagado por defecto hasta completar la verificación en staging y la revisión de copy).
 

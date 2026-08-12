@@ -15,6 +15,12 @@ export interface HiringApplicationEmailContext {
   decision: string | null
   candidateEmail: string | null
   candidateName: string | null
+  /** TASK-1688 — contacto durable del facet + contexto de la postulación (para el aviso interno). */
+  candidatePhoneE164: string | null
+  candidateResidenceCountryCode: string | null
+  candidateMessage: string | null
+  candidatePortfolioUrl: string | null
+  candidateLinkedinUrl: string | null
   openingId: string
   openingPublicId: string
   /** Título candidate-facing: public_title si existe, si no internal_title. */
@@ -28,8 +34,13 @@ interface Row extends Record<string, unknown> {
   stage: string
   source: string
   decision: string | null
+  candidate_message: string | null
   canonical_email: string | null
   full_name: string | null
+  phone_e164: string | null
+  residence_country_code: string | null
+  portfolio_url: string | null
+  linkedin_url: string | null
   opening_id: string
   opening_public_id: string
   internal_title: string
@@ -47,8 +58,13 @@ export const resolveHiringApplicationEmailContext = async (
             ha.stage,
             ha.source,
             ha.decision,
+            ha.candidate_message,
             ip.canonical_email,
             ip.full_name,
+            cf.phone_e164,
+            cf.residence_country_code,
+            cf.portfolio_url,
+            cf.linkedin_url,
             ho.opening_id,
             ho.public_id AS opening_public_id,
             ho.internal_title,
@@ -57,6 +73,7 @@ export const resolveHiringApplicationEmailContext = async (
             ho.published_at
      FROM greenhouse_hiring.hiring_application ha
      JOIN greenhouse_core.identity_profiles ip ON ip.profile_id = ha.identity_profile_id
+     JOIN greenhouse_hiring.candidate_facet cf ON cf.candidate_facet_id = ha.candidate_facet_id
      JOIN greenhouse_hiring.hiring_opening ho ON ho.opening_id = ha.opening_id
      WHERE ha.application_id = $1`,
     [applicationId],
@@ -74,6 +91,11 @@ export const resolveHiringApplicationEmailContext = async (
     decision: row.decision,
     candidateEmail: row.canonical_email?.trim() || null,
     candidateName: row.full_name?.trim() || null,
+    candidatePhoneE164: row.phone_e164?.trim() || null,
+    candidateResidenceCountryCode: row.residence_country_code?.trim() || null,
+    candidateMessage: row.candidate_message?.trim() || null,
+    candidatePortfolioUrl: row.portfolio_url?.trim() || null,
+    candidateLinkedinUrl: row.linkedin_url?.trim() || null,
     openingId: row.opening_id,
     openingPublicId: row.opening_public_id,
     openingTitle: row.public_title?.trim() || row.internal_title,

@@ -342,8 +342,19 @@ Decisiones que el agente ejecutor debe cerrar en plan mode (Zone 2): (a) allowli
 - [ ] Se revisó impacto sobre TASK-1688 (enriquecer email interno cuando existan teléfono/país/mensaje → dejar Delta allí).
 - [ ] No queda evidencia versionada con PII de candidatos.
 
+## Delta 2026-08-12 (post-cierre)
+
+- Auditoría con skills `copywriting` + `greenhouse-email` + `greenhouse-ux` (pedida por el operador
+  antes del rollout): asuntos y previews personalizados con nombre + vacante en los 5 tipos; decisión
+  reformulada sin desdoblamiento de género («¡Te elegimos!» / «Te damos la bienvenida»); rechazo sin
+  tono terapia (calce específico de la búsqueda, puerta abierta); línea anti-ansiedad en el email de
+  evaluación; plaintexts alineados.
+- Follow-up "enriquecer el email interno con TASK-1688" **cerrado**: el aviso a People ahora incluye
+  teléfono, país de residencia (nombre textual), portafolio/LinkedIn y el mensaje del candidato, con
+  "No informado" honesto para legacy.
+
 ## Follow-ups
 
-- Enriquecer el email interno con teléfono/país/mensaje cuando TASK-1688 aterrice.
+- ~~Enriquecer el email interno con teléfono/país/mensaje cuando TASK-1688 aterrice.~~ Cerrado 2026-08-12 (ver Delta).
 - Notificación in-app/Teams para People como canal adicional, si el email interno resulta insuficiente.
 - Recordatorio automático de test no completado (requiere política de plazos propia).

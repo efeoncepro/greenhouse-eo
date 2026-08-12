@@ -35,7 +35,8 @@ export default function HiringAssessmentAssignedEmail({
           heading: 'You have a pending assessment',
           greeting: (n?: string) => (n ? `Hi ${n},` : 'Hi,'),
           intro: (title: string) =>
-            `As part of your application to «${title}» at Efeonce, we assigned you an assessment. It helps us get to know your profile better.`,
+            `As part of your application to «${title}» at Efeonce, we assigned you an assessment. It helps us get to know how you work — there are no trick questions.`,
+          reassurance: 'Pick a calm moment without interruptions. What matters is showing how you think.',
           cardEyebrow: 'Your assessment',
           timeLimit: (min: number) => `Estimated time: ${min} minutes once you start.`,
           expiry: (days: number) => `The access link expires in ${days} days.`,
@@ -47,7 +48,8 @@ export default function HiringAssessmentAssignedEmail({
           heading: 'Tienes una evaluación pendiente',
           greeting: (n?: string) => (n ? `Hola ${n},` : 'Hola,'),
           intro: (title: string) =>
-            `Como parte de tu postulación a «${title}» en Efeonce, te asignamos una evaluación. Nos ayuda a conocer mejor tu perfil.`,
+            `Como parte de tu postulación a «${title}» en Efeonce, te asignamos una evaluación. Nos ayuda a conocer cómo trabajas — no hay preguntas con trampa.`,
+          reassurance: 'Elige un momento tranquilo y sin interrupciones. Lo que importa es mostrar cómo piensas.',
           cardEyebrow: 'Tu evaluación',
           timeLimit: (min: number) => `Tiempo estimado: ${min} minutos una vez que comiences.`,
           expiry: (days: number) => `El link de acceso vence en ${days} días.`,
@@ -76,8 +78,12 @@ export default function HiringAssessmentAssignedEmail({
         {t.greeting(firstName)}
       </Text>
 
-      <Text style={{ fontSize: '15px', color: EMAIL_COLORS.secondary, lineHeight: '24px', margin: '0 0 24px' }}>
+      <Text style={{ fontSize: '15px', color: EMAIL_COLORS.secondary, lineHeight: '24px', margin: '0 0 8px' }}>
         {t.intro(openingTitle)}
+      </Text>
+
+      <Text style={{ fontSize: '15px', color: EMAIL_COLORS.secondary, lineHeight: '24px', margin: '0 0 24px' }}>
+        {t.reassurance}
       </Text>
 
       <Section

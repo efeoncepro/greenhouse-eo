@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { sendEmail, wasEmailAlreadySent } from '@/lib/email/delivery'
+import { getCountryName } from '@/lib/locale/countries'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 import { getAssessmentById, reissueCandidateTestTokenForEmail } from '../assessment/instances'
@@ -62,6 +63,14 @@ export const sendHiringApplicationCreatedEmails = async (
       context: {
         candidateName: ctx.candidateName ?? 'Sin nombre registrado',
         candidateEmail: ctx.candidateEmail ?? 'sin correo',
+        // TASK-1688 — contacto completo para que People opere sin abrir el portal.
+        candidatePhone: ctx.candidatePhoneE164,
+        candidateResidenceCountry: ctx.candidateResidenceCountryCode
+          ? getCountryName(ctx.candidateResidenceCountryCode) ?? ctx.candidateResidenceCountryCode
+          : null,
+        candidateMessage: ctx.candidateMessage,
+        portfolioUrl: ctx.candidatePortfolioUrl,
+        linkedinUrl: ctx.candidateLinkedinUrl,
         openingTitle: ctx.openingTitle,
         applicationPublicId: ctx.applicationPublicId,
         source: ctx.source,
