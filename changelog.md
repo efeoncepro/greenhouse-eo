@@ -7,6 +7,22 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-12 — Los emails de hiring y el contacto completo de Careers quedaron VIVOS en producción
+
+Rollout completo en una sesión: el flag de los 6 emails del ciclo de contratación quedó prendido en
+el ops-worker (con default durable en deploy.sh), un ejercicio E2E real con los commands canónicos
+recorrió postulación → preselección → evaluación → rechazo y los 5 correos salieron `sent` con
+asuntos personalizados (el aviso interno llegó a people@efeoncepro.com con teléfono, país y mensaje
+del candidato). El Growth Form de careers se republicó (v4) con el país de residencia para cerrar la
+paridad nativa, y el release `393144e9f` promovió todo a producción por el control plane (manifest
+`released`, watchdog ok, campo país verificado en vivo). Quedan como pendientes menores la revisión
+de Privacy, el flip del país a requerido-en-parser y el scorecard GVC formal.
+
+## 2026-08-12 — Archivo puntual de adjuntos Wherex
+
+- `wherex:radar` incorpora `--tender-id` + `--archive-originals <carpeta>`: guarda y analiza originales únicamente cuando Wherex emite una descarga nativa; el visor protegido queda explícitamente en `manual-save-required`, sin extraer enlaces firmados.
+- Para una sesión Chrome principal expresamente autorizada, el manual y ambas skills documentan el fallback visible: activar temporalmente **Descargar archivos PDF**, validar cada descarga individual y restaurar el visor cuando corresponda. Sika LIC-1120 quedó archivada en OneDrive; sus anexos contienen una discrepancia de plazo que exige aclaración antes de cotizar.
+
 ## 2026-08-12 — El formulario de Careers ya no pierde el contacto del candidato (TASK-1688)
 
 Se cerró la pérdida silenciosa que descubrió la auditoría de postulaciones: teléfono y mensaje se
@@ -1112,61 +1128,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   video-to-image de Nano Banana y Seedream 5 Lite. También conservan como blocker el circuito `not_found` de Nano
   Banana Pro. No cambió el runtime de Globe, secrets, bindings, rates, deploy ni disponibilidad; el reader sigue siendo
   la autoridad live.
-
-## 2026-08-04 — Globe: la promoción de una ruta vuelve a poder sellarse (y el sello deja de quemar promociones)
-
-- **Una promoción se moría con la evidencia perfecta** (`efeonce-globe@38c528d`). El último paso de la saga de
-  ADR-009 —el canary que sella la promoción— devolvía `internal_error` 500 aunque la corrida, el intento, el output
-  retenido y la decisión de governance estuvieran todos donde debían. Como `activated` no es terminal y la ventana
-  vence, **cada promoción quedaba condenada a revertirse sola: 10 de 12 históricas terminaron `rolled_back`**,
-  varias segundos después de su vencimiento. El diseño no se relajó; lo que faltaba era que su último paso pudiera
-  ejecutarse.
-- **La causa era de forma, no de datos.** El resolver del canary hace JOIN por linaje contra la vista
-  `generated_asset_rights_authority_effective`, que proyectaba **3 columnas** mientras el consumidor usa **14**:
-  PostgreSQL fallaba en **planificación** con `42703`, así que ningún dato podía salvarlo. La migración `0050` la
-  lleva a **16 columnas** —todo el linaje más `rights_policy_purpose`— y la razón es de dominio: **una corrección
-  corrige los DERECHOS, no el origen.** La tabla de correcciones no tiene columnas de linaje y tiene FK a la base,
-  así que el linaje es invariante por construcción; el `UNION ALL` anterior lo perdía por accidente.
-- **La migración committeada no arreglaba nada, y no se veía leyéndola.** Dos defectos fatales, hallados
-  ejercitándola contra PG real dentro de una transacción con `ROLLBACK`: `CREATE OR REPLACE VIEW` **no puede
-  reordenar ni renombrar** columnas (aborta con `42P16`, así que va `DROP` + `CREATE` sin `CASCADE`, re-otorgando
-  los GRANT), y el runner de migraciones de Globe **ejecuta el archivo completo sin parsear markers**, de modo que
-  la sección `-- Down Migration` re-creaba la vista rota tres líneas después de arreglarla — y habría quedado
-  registrada como aplicada.
-- **Reintentar el sello ya no quema una promoción.** El checkpoint `activated → verifying_canary` se escribía
-  **antes** de leer la evidencia, que es una lectura pura; y de `verifying_canary` no se vuelve. Ahora se lee
-  primero y el checkpoint cubre sólo el sello.
-- **Un `DatabaseError` deja de ser un 500 opaco:** las clases de infraestructura (`08`, `40`, `53`, `55`, `57`) →
-  `dependency_unavailable`; las deterministas (`42703`, `23505`, …) siguen en `internal_error`, **que es la
-  verdad** — prometer reintento sobre un defecto de código manda a reintentar para siempre. Todo error de Postgres
-  emite además su SQLSTATE en `globe.dispatch.database_error`.
-- **La frontera consumidor↔schema queda cubierta por los dos lados**, probada en rojo y en verde: `consumidor ⊆
-  contrato declarado` (test sin base, en cada `pnpm check`) y `contrato ⊆ vista real` (bloque `DO`, en cada apply),
-  más un test en vivo opt-in que ejecuta la query real. El defecto vivía exactamente entre los dos gates.
-- **Runtime: las dos rutas de video quedaron promovidas, selladas y habilitadas.**
-  `ref/motion/reference-v1` (Gemini Omni Flash) quedó **`canary_passed`** — promoción sellada, binding habilitado,
-  circuito cerrado. `ref/video/frames-v1` (Veo 3.1) también quedó **`canary_passed`** (revisión 9, terminal:
-  ya no expira): canary con run `d2788195…`, attempt `68a75b70…`, output `sha256:3a49d5ba…`, governance
-  `eligible` y **32 créditos reservados = 32 gastados**; salida 720p / 8 s / 16:9 / `silent` con `inputMode
-  {kind:'frames', hasEndFrame:false}` y primer cuadro tomado de un output ya gobernado, declarado como
-  `authorizedInputs` con `rights: internal-owned`.
-- **El canary de Veo no se produjo desde la UI del Producer**, sino por el **carril gobernado**, con los commands
-  canónicos del spine (`estimate` → `prepare` → `execute`). La UI sigue sin poder producirlo: el botón «Usar como
-  referencia» del feed no despacha ningún command y sin referencia el estimado no se calcula; la subida ingesta
-  pero Asset Governance falla en `inspecting` con la causa enmascarada. **Ambos bloqueos son ajenos a TASK-1641**
-  y quedaron registrados aparte; ya no ponen en riesgo la promoción, pero **el Scope 1 de TASK-1641 —un canary de
-  ruta arbitraria canónico y committeado— sigue pendiente**, y la generación desde el Producer para rutas con
-  entrada obligatoria sigue bloqueada.
-
-## 2026-08-04 — Globe: el inventario de video deja de mezclar modelos y variantes
-
-- La skill compartida `greenhouse-globe-model-fleet` ahora enlaza fichas auditadas para Gemini Omni, Veo 3.1 y
-  Seedance 2.0, además de FLUX 3; Codex y Claude reciben el mismo método y la misma separación de evidencias.
-- La auditoría confirma que las rutas públicas de Seedance usan `seedance-2.0` (text-to-video) y
-  `seedance-2.0-r2v` (R2V). `seedance-2.0-i2v` / `bytedance/seedance-2.0/mini/image-to-video` existe solo en
-  el adapter Fal para `video-extend`, sin routeId público, binding gobernado ni canary de producción.
-- La ruta sellada de Veo usa `veo-3.1-generate-001`; `veo-3.1-fast-generate-001` queda documentado como superficie
-  Lab separada. Omni queda documentado como `gemini-omni-flash-preview` por Vertex Interactions, con sus límites de
-  contrato actuales y sus superficies proveedoras diferidas.
-- No cambió el runtime de Globe, el catálogo, los adapters, los secrets ni la disponibilidad. Las fichas son mapas de
-  evidencia; `globe.producer.fleet.list` conserva la autoridad live.

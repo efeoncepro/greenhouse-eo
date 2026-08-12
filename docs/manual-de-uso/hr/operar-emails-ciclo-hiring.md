@@ -17,14 +17,16 @@ y no seleccionado).
   hace nada.
 - El buzón interno por defecto es `people@efeoncepro.com`; se cambia con la env var
   `HIRING_INTERNAL_NOTIFICATIONS_EMAIL` del ops-worker.
-- Antes del primer encendido en producción: ejercicio completo en staging + revisión del copy
-  de los templates por Talent (en especial el de rechazo).
+- El primer encendido en producción ya se hizo el 2026-08-12, con ejercicio E2E real
+  (EO-APP-0090: 5 tipos con `status=sent` y asuntos personalizados). Las instrucciones de esta
+  guía aplican ahora para pausar, re-encender o diagnosticar el sistema.
 
 ## Prender / apagar el sistema completo
 
 El flag `HIRING_LIFECYCLE_EMAILS_ENABLED` está declarado en `services/ops-worker/deploy.sh`
-(default `false`). Para prenderlo de forma durable: cambiar el default (o exportar la var) y
-redeployar el worker. Para efecto inmediato SIN esperar deploy:
+(default `true` desde el 2026-08-12; revisión `ops-worker-00548-x52`). Para cambiarlo de forma
+durable: cambiar el default (o exportar la var) y redeployar el worker. Para efecto inmediato
+SIN esperar deploy:
 
 ```bash
 gcloud run services update ops-worker --region us-east4 --project efeonce-group --update-env-vars HIRING_LIFECYCLE_EMAILS_ENABLED=true

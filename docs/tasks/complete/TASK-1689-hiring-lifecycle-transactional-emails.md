@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `sync`
 - Epic: `EPIC-011`
-- Status real: `Code complete; rollout pendiente (flag OFF, deploy del ops-worker pendiente de push)`
+- Status real: `LIVE en producción (2026-08-12): flag ON rev ops-worker-00548-x52, E2E real 5 tipos sent, release 393144e9f`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
@@ -341,6 +341,16 @@ Decisiones que el agente ejecutor debe cerrar en plan mode (Zone 2): (a) allowli
 - [ ] `Handoff.md` y `changelog.md` actualizados.
 - [ ] Se revisó impacto sobre TASK-1688 (enriquecer email interno cuando existan teléfono/país/mensaje → dejar Delta allí).
 - [ ] No queda evidencia versionada con PII de candidatos.
+
+## Delta 2026-08-12 (rollout LIVE)
+
+- Rollout completado por orden del operador: flag `HIRING_LIFECYCLE_EMAILS_ENABLED` ON (rev
+  `ops-worker-00548-x52` + default `true` en `deploy.sh`); ejercicio E2E real con commands
+  canónicos (EO-APP-0090, opening real): 5 tipos con `status=sent` en `email_deliveries`
+  (interno a people@ con contacto completo, acuse, avance a Preselección, evaluación con token
+  rotado, rechazo) y asuntos personalizados; outbox 0 failed/dead_letter. Release a producción
+  `393144e9f` (manifest `released`). `hiring_decision_selected` queda cubierto por tests
+  (pipeline+template compartidos con rejected) hasta su primer uso real.
 
 ## Delta 2026-08-12 (post-cierre)
 

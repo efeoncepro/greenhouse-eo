@@ -2,6 +2,25 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+### ROLLOUT COMPLETO TASK-1688/1689 — emails de hiring LIVE + contacto Careers en producción (2026-08-12)
+
+Release `393144e9f` (PR #190) → manifest `393144e9fb3b-8d17b9bc-…` en **`released`** (run `31593198609`,
+workflow 9m54s, ambos gates `production` aprobados por loop, bypass forense por `db_migrations` ya aplicadas en
+la instancia única + `cloud_release` ya aplicado en vivo). Verificación: health 3 providers `ready`, watchdog
+`ok`, 3 workers en target + `ops-worker` residual change-gated con diff runtime 0 (su SHA `e8078fe08` ya contiene
+los consumers). **Emails LIVE**: flag ON (rev `ops-worker-00548-x52` + default true en deploy.sh), ejercicio E2E
+real EO-APP-0090 con 5 tipos `sent` (interno a people@efeoncepro.com con contacto completo + acuse + Preselección
++ evaluación + rechazo, asuntos personalizados). **Contacto Careers LIVE**: campo país en el form custom de prod
+(curl verificado) y Growth Form v4 publicado (paridad nativa; el campo cae en «Datos adicionales» del renderer —
+deuda visual menor). La postulación de prueba `EO-APP-0090` (Prueba TASK-1689 NO CONTACTAR) queda en el Desk para
+descarte de HR. **Pendientes menores:** revisión Legal/Privacy de los 3 campos; flip país→requerido-en-parser
+tras ventana de observación; scorecard GVC formal; sacar la fila del flag de §Pendientes del ledger tras la
+primera postulación real con emails verificados.
+
+### Sika México LIC-1120 — paquete de bid preparado, sin precio ni envío (2026-08-12)
+
+Se creó [`docs/commercial/tenders/sika-lic-1120/`](docs/commercial/tenders/sika-lic-1120/): originales en OneDrive, evidencia Wherex, admisibilidad, blueprint interno, técnica, estructura económica y deck de taller. La propuesta se enfoca en continuidad comercial: Search por intención y ubicación → landing/ficha de destino → canal de atención → medición y optimización; **no** promete transferir 50% de ventas. El deck técnico de ocho láminas pasó slots y revisión visual local, pero sigue siendo taller (sin `Proposal`/render gobernado). La pregunta propia continúa en **0/1 respondidas** al 12-08 11:14: faltan fecha/destino/stock por cierre, línea base/fuente de ventas y canal autorizado. El precio recomendado para aprobación es MXN 150.000 antes de impuestos, incluido medio, pero está sólo en `pricing-brief-INTERNO.md`; no existe cotización aprobada. Wherex muestra 45 días, pero también condiciona el crédito a lo convenido con Sika: no asumirlo como término cerrado. La oferta Wherex sigue en edición, sin adjuntos, términos aceptados ni envío; tab queda en handoff.
+
 ### TASK-1688 CERRADA — contacto completo en postulaciones Careers: code complete, rollout pendiente (2026-08-12)
 
 ADR aceptado y registrado (Delta en la arquitectura Hiring + `DECISIONS_INDEX`): `phone_e164` y
@@ -164,6 +183,15 @@ y no se duplicó. Si el visor bloquea un guardado soportado, no se elude: se req
 Para Ajinomoto LIC-962, el expediente `docs/commercial/tenders/ajinomoto-lic-962/research/` conserva la evidencia
 de descripción, preguntas y mecanismo de postulación: servicio de 12 meses, cotización y presentación obligatorias
 (20 MB), condiciones y aceptación final. Aún no se ingresó precio, adjuntó archivo, aceptó término ni envió oferta.
+El runner ahora incluye `--tender-id <ID> --archive-originals <carpeta>` para archivar originales sólo cuando
+Wherex emite una descarga nativa; si abre el visor protegido, informa `manual-save-required` sin extraer enlaces.
+La primera ejecución real sigue bloqueada hasta completar el setup de la credencial aislada.
+Para una sesión Chrome principal autorizada, se verificó el fallback visible y reversible: activar **Descargar archivos
+PDF** en `chrome://settings/content/pdfDocuments`, descargar cada adjunto individualmente, validar el archivo local y
+archivarlo en OneDrive; se restaura **Abrir archivos PDF en Chrome** para volver al visor. Caso Sika LIC-1120:
+ambos PDF quedaron archivados y leídos en `Alineación/4. Comercial/Licitaciones/Sika/`; el brief y la estrategia
+discrepan en duración (agosto–septiembre vs. septiembre–diciembre), por lo que no se debe cotizar duración sin
+aclaración del comprador.
 La mecánica reutilizable de postulación quedó además en la skill, el manual y la documentación funcional: servicio
 → condiciones/adjuntos → resumen/reconciliación → aceptación y envío sólo con confirmación humana final.
 
@@ -371,69 +399,3 @@ policy dio `ship` (cero migraciones).
    falta → context-check:strict → commit.
 5. **Contraste útil entre los dos releases de hoy:** el de la mañana necesitó bypass del batch policy y
    el de la tarde no. La diferencia fue **cero migraciones**, no el tamaño del batch.
-
-### Verificación en staging del portal cliente, y dos defectos que salieron de ella (2026-08-09)
-
-Recorrí las 9 rutas × 3 personas con sesión de agente real contra **staging** (producción no acepta
-agent-session por diseño). El fix de `TASK-1679` quedó confirmado en runtime desplegado: las 3 base
-sirven `200`, las 6 module-gated redirigen a `/home?denied=<slug>` con el slug user-facing correcto, y
-**cero** `?error=resolver_unavailable` — que era el síntoma de las nueve.
-
-**Lo que necesita quien siga:**
-
-1. ⚠️ **PRODUCCIÓN HOY: `/proyectos` devuelve `/401` al operador interno.** Arreglado en `develop`,
-   **no promovido**. Si soporte reporta que no puede abrir Proyectos de un cliente, es esto y está
-   conocido. Clasificado `MENOR` por el árbol §7 del runbook: es fail-closed **de más** (niega acceso
-   que debería conceder), no expone dato de nadie, y las otras 8 páginas cliente abren normal. Va en
-   el próximo release — que incluya este commit no es opcional.
-2. **La causa era un gate legacy por route group ENCIMA del guard canónico**, y `/proyectos` era la
-   única de las 9 que lo conservaba, con el comentario de al lado diciendo que el canónico ya lo
-   reemplazaba. Corría primero, así que ganaba, y el `route_group_scope` del operador interno
-   (`admin, commercial, internal, my`) no incluye `client`. Migración incompleta de `TASK-827`,
-   invisible en review porque las dos líneas se leen como defensa en profundidad. Fijado por
-   `src/lib/client-portal/guards/no-route-group-gate-above-view-code-guard.test.ts`, que barre las 9
-   páginas.
-3. 🔴 **El override de organización usaba `NODE_ENV` y por eso era solo-local.** Vercel compila
-   **todos** los deployments con `NODE_ENV=production`, así que mi bloqueo apagaba el flag también en
-   staging. El discriminador canónico del repo es **`VERCEL_ENV`** — mismo que
-   `src/app/api/auth/agent-session/route.ts` y `src/proxy.ts`; staging reporta `preview`, verificado
-   contra el runtime. Corregido. **Regla:** para distinguir staging de producción en este repo,
-   `VERCEL_ENV`, nunca `NODE_ENV`.
-4. **El override NO tiene válvula de escape de producción, y la divergencia con `agent-session` es
-   deliberada.** Ese endpoint admite `AGENT_AUTH_ALLOW_PRODUCTION`; éste no, porque concede lectura
-   **cross-tenant** del portal de cualquier organización con una credencial documentada en
-   `CLAUDE.md`. Hay un test que detiene a quien agregue una.
-5. **Sigue sin verificar en navegador: las 4 páginas Creative de SKY.** No hay persona cliente de SKY
-   y sus usuarios son personas reales. Con el fix de `VERCEL_ENV` ya se puede hacer prendiendo el flag
-   en staging (`vercel env add` + redeploy, porque Vercel congela las env vars al build). El resolver
-   sí está verificado contra la base que lee producción: 36 combinaciones, 0 desvíos.
-
-### Cierre del carril de acceso del portal cliente — las 3 piezas post-release (2026-08-09)
-
-**Lo que necesita quien siga:**
-
-1. **Sky Airlines ya tiene `creative_hub_globe_v1`** (assignment
-   `cpma-ec0041f7-e416-442f-acab-73f645c06f56`, vía `enableClientPortalModule`, audit row `enabled`).
-   Sus 3 usuarios activos ahora ven `/proyectos`, `/campanas`, `/equipo`, `/reviews`, más
-   `cliente.pulse`, `cliente.creative_hub` y 4 capabilities de lectura — el bundle otorga más que las
-   4 páginas y eso quedó escrito en `scripts/client-portal/assign-creative-hub-to-sky.ts`. **Si hay
-   que revertirlo, es `pause`/`expire`, nunca DELETE.**
-2. 🔴 **Un gate cuya expectativa está hardcodeada no prueba el motor: prueba que el primer consumidor
-   sigue igual.** `client-portal-page-access-check.ts` fijaba "3 abren y 6 empty state" y al asignarle
-   el módulo a SKY reportó 4 desvíos por hacer lo correcto — la salida fácil habría sido editar los
-   esperados. Ahora deriva la expectativa de los datos (base ∪ módulos vigentes de esa org) y
-   sobrevive a cualquier assignment. Vale el patrón para cualquier gate nuevo.
-3. **`TASK-1680` cerrada, y su hallazgo transferible:** el override block del lint tenía 6 entradas y
-   **4 eximían paths que la regla nunca miró** (`isUiFile` excluye `src/app/api/**` y sólo evalúa
-   `src/(components|views|app)/**`). Antes de agregar un path a un override, comprobá que la regla
-   realmente lo mire — si no, la exención no protege nada y esconde cuál es la real.
-4. **Queda UNA exención viva:** `VerticalMenu.tsx` (2 violaciones, el bloque
-   `resolveCapabilityModules`). Su dueño de retiro es el follow-up
-   `capability-modules-resolver-migration`, todavía **sin ID** desde mayo de 2026. Cuando ese trabajo
-   migre el bloque al resolver, el override block desaparece completo.
-5. **`cliente.ciclos` y `cliente.analytics` siguen sin módulo que las declare** — deuda rastreada en
-   `PENDING_MODULE_DECLARATION_VIEW_CODES` (`view-codes/parity.ts`), no allowlisteada en silencio.
-   Decidir en qué módulo van es lo único que las hace alcanzables.
-6. **Sigue pendiente el smoke con sesión cliente REAL en producción**, de este release y del de
-   `TASK-1675`. El endpoint de agent-session da 403 en prod por diseño, así que es manual. Dos
-   releases con la misma casilla sin marcar.
