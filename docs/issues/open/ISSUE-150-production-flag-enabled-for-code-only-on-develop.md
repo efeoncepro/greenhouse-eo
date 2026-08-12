@@ -133,12 +133,23 @@ eso lo cierra el endpoint de diagnóstico en producción.
 
 ## Solución pendiente
 
-1. El fix + endpoint de diagnóstico deben llegar a `main` vía el release control plane.
-2. En producción: `GET /api/internal/health/scanner-auth?probe=scan` debe responder `mint.ok=true` y
-   `probe.ok=true` (y en staging seguir `ok` por la rama WIF).
-3. Recién entonces prender `ASSET_MALWARE_SCAN_ENABLED` en Production, mirando la primera postulación real.
+1. ~~El fix + endpoint de diagnóstico deben llegar a `main` vía el release control plane.~~ **CUMPLIDO
+   2026-08-11 23:10Z** — release `a90951dba3b7-73da976e-f460-4241-8708-5772421fa49d` (run `31544667630`,
+   PR #188, manifest `released`, pre-empción completa: `decision=ship` sin marker ni bypass).
+2. ~~En producción: `GET /api/internal/health/scanner-auth?probe=scan` debe responder `mint.ok=true` y
+   `probe.ok=true`.~~ **CUMPLIDO 2026-08-11 23:15Z** — respuesta desde `greenhouse.efeoncepro.com`
+   (`version=a90951d`): `credentialPlan=service_account_key`, `mint.ok=true` en 53 ms con
+   `email=greenhouse-portal@efeonce-group.iam.gserviceaccount.com` y `aud` del scanner, `probe.ok=true`
+   con `scanStatus=ok` en 100 ms. La rama nueva funciona EN el runtime de producción.
+3. ~~Prender el flag + redeploy.~~ **CUMPLIDO 2026-08-12 ~05:52Z** — env var `ASSET_MALWARE_SCAN_ENABLED="true"`
+   en Vercel Production + redeploy `greenhouse-aivcug5f5` (ejecutado por el agente con autorización explícita
+   del operador; el bloqueo previo del clasificador de permisos fue transitorio), `READY` y aliaseado a
+   `greenhouse.efeoncepro.com`. **Verificación post-flip desde el runtime de producción:** `flagEnabled=true`,
+   `credentialPlan=service_account_key`, `mint.ok=true` (94 ms), `probe.ok=true` (`scanStatus=ok`, 147 ms).
 
-El flag **no se vuelve a prender en producción hasta cumplir 1→2**. No es opcional ni acelerable.
+**Único pendiente para mover este issue a `resolved/`:** la primera postulación real registrando
+`scanner=structural+clamav-http` con veredicto `clean` + asset `attached` en `asset_scan_results` (el flujo
+recibe ~13/día; el flip ocurrió de madrugada Chile, así que llega durante el día del 2026-08-12).
 
 ## Prevención
 
