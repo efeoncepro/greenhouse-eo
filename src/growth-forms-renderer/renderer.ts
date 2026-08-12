@@ -978,10 +978,23 @@ export class FormRenderer {
     const list = el(this.doc, 'div', { class: 'ghf-select-list', id: listId, role: 'listbox', hidden: 'hidden' })
 
     const renderSelected = () => {
-      const selected = options.find(option => option.value === this.values[field.key]) ?? options[0]
+      const selected = options.find(option => option.value === this.values[field.key])
 
-      valueText.textContent = selected?.label ?? ''
-      trigger.dataset.placeholder = selected?.value ? 'false' : 'true'
+      // TASK-1688 — sin valor seteado, el trigger muestra el placeholder REAL (no la primera
+      // opción como si estuviera elegida): un select requerido que "muestra Chile" con valor
+      // vacío deja pasar al submit y revienta con un error genérico confuso. Sin placeholder
+      // declarado se conserva el fallback legacy a options[0].
+      if (!selected && field.placeholder) {
+        valueText.textContent = field.placeholder
+        trigger.dataset.placeholder = 'true'
+
+        return
+      }
+
+      const shown = selected ?? options[0]
+
+      valueText.textContent = shown?.label ?? ''
+      trigger.dataset.placeholder = selected ? 'false' : 'true'
     }
 
     const setActive = (index: number) => {
