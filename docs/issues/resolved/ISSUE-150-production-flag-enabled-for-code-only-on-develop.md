@@ -1,9 +1,15 @@
 # ISSUE-150 — Flag prendido en producción para código que sólo existía en `develop`
 
+> **RESUELTO 2026-08-12.** Verificación de cierre completa: fix en `main` (release `a90951dba`), diagnóstico
+> post-flip verde EN producción (`flagEnabled=true`, `credentialPlan=service_account_key`, `mint.ok` 94 ms,
+> `probe.ok` 147 ms), y **postulación de prueba por el formulario público REAL de producción** (identidad
+> `PRUEBA TASK-1378 / NO CONTACTAR`, `task-1378-postflip-prod@efeonce.org`) cuyo CV atravesó el camino completo:
+> `scan_id ascan-e6a62b39-de96-4279-87ba-172587040068`, `scanner=structural+clamav-http`, `verdict=clean`,
+> asset `attached`, 129 ms. HR descarta la postulación de prueba en el Desk.
+>
 > **Delta 2026-08-11 (mismo día, segundo fallo):** este issue ya no documenta un incidente sino un **bug class**:
 > prender `ASSET_MALWARE_SCAN_ENABLED` sobre un camino de credencial jamás verificado desde el runtime real.
-> El flag falló DOS veces el mismo día por dos causas distintas. La segunda está en § "Segundo fallo". Causa raíz
-> encontrada y corregida en código (pendiente de llegar a `main`).
+> El flag falló DOS veces el mismo día por dos causas distintas. La segunda está en § "Segundo fallo".
 
 ## Ambiente
 

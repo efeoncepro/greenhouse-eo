@@ -21,19 +21,20 @@ pero el perfil local no declara `GREENHOUSE_POSTGRES_OPS_USER`/`ADMIN_USER`, por
 se improvisó una credencial. La API Sentry local continúa devolviendo 403 por scope. ISSUE-151 permanece abierta y
 contiene la evidencia/plan exactos.
 
-### TASK-1378 — SCANNER LIVE EN PRODUCCIÓN, verificado post-flip desde el runtime (2026-08-12 05:52Z)
+### TASK-1378 CERRADA + ISSUE-150 RESUELTA — scanner LIVE en producción, verificado en 3 capas (2026-08-12 06:10Z)
 
-**Cierre del flip:** con autorización explícita del operador ("ejecutala tú"), el agente corrió
-`vercel redeploy` → deployment `greenhouse-aivcug5f5` `READY` aliaseado a `greenhouse.efeoncepro.com`.
-Diagnóstico post-flip EN producción: `flagEnabled=true`, `credentialPlan=service_account_key`,
-`mint.ok=true` (94 ms, identidad `greenhouse-portal@`), `probe.ok=true` (`scanStatus=ok`, 147 ms).
-El bloqueo previo del clasificador de permisos sobre `vercel env/redeploy` resultó transitorio.
+**Cierre completo, autorizado por el operador ("terminemos todo lo que falte"):** (1) redeploy
+`greenhouse-aivcug5f5` con el flag horneado; (2) diagnóstico post-flip EN producción: `flagEnabled=true`,
+`credentialPlan=service_account_key`, `mint.ok` (94 ms), `probe.ok` (147 ms); (3) **camino completo de upload
+productivo**: postulación de prueba por el formulario público REAL (`PRUEBA TASK-1378 / NO CONTACTAR`,
+`task-1378-postflip-prod@efeonce.org`, Turnstile real auto-verificado, CV inyectado vía DataTransfer) →
+`scan_id ascan-e6a62b39-de96-4279-87ba-172587040068`, `scanner=structural+clamav-http`, `verdict=clean`,
+asset `attached`, 129 ms. **HR descarta esa postulación en el Desk** (tercera de prueba identificada).
 
-**Único pendiente para cerrar TASK-1378 y mover ISSUE-150 a resolved:** la primera postulación real del
-2026-08-12 registrando `scanner=structural+clamav-http` + `clean` + `attached` en `asset_scan_results`
-(~13/día; el flip fue de madrugada Chile). Si algo fallara: rollback `vercel env rm` + redeploy <10 min, y
-recovery `scripts/hiring/recover-scanner-403-quarantined-cvs.ts`. El cierre de task exige además el gate
-full test + build (pedir autorización para `pnpm build` — memoria: cuelga el equipo).
+ISSUE-150 movida a `resolved/` (índice actualizado); TASK-1378 movida a `complete/` con sección de cierre;
+flag ledger con Production ON en el snapshot; delta de impacto cruzado en TASK-1423. Gates de cierre (full
+test + build) corridos en el commit de cierre. El bloqueo del clasificador de permisos sobre
+`vercel env/redeploy` resultó transitorio.
 
 ### (histórico) TASK-1378 — RELEASE HECHO + diagnóstico VERDE en producción; falta SOLO el flip del flag (2026-08-11 23:15Z)
 

@@ -20,6 +20,19 @@ añade el registry y el único grant que autoriza su contrato (`efeonce_admin`),
 fallback que hoy genera `role_view_fallback_used` durante el refresh de claims. La migration se
 aplica sólo después de desplegar el catálogo ya existente en todos los runtimes que comparten DB.
 
+## 2026-08-12 — El escáner de malware quedó vivo en producción, verificado de punta a punta
+
+Cierre de la historia que las dos entradas siguientes cuentan: el escáner de firmas
+está operativo en staging y en producción, y esta vez la verificación corrió donde
+tenía que correr. Tres capas independientes, todas desde el runtime real: el
+endpoint de diagnóstico acuñó la credencial y el servicio la aceptó ANTES de
+prender el flag; después del flip el mismo endpoint confirmó el flag horneado; y
+una postulación de prueba por el formulario público real atravesó el camino
+completo — escaneada por los dos motores, limpia y adjunta en 129 ms. La issue del
+doble incidente quedó resuelta y la task de provisión cerrada. Costo steady del
+servicio: ≈USD 19/mes. Recursos Humanos descarta la postulación de prueba desde el
+Hiring Desk.
+
 ## 2026-08-11 — El flag del escáner falló dos veces en producción; causa raíz cerrada en código
 
 Corrección al estado que reporta la entrada siguiente: en producción el escáner de
@@ -1156,13 +1169,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   `draft-enhance`), mientras BFL mantiene el producto/API directo en Early Access. `TASK-1642` y su propuesta
   registran la discrepancia de namespace, keyframes, `duration: auto`, audio evidence, `draft_cache`, rates,
   rights, evaluación, canary y rollback; el runtime de Globe no fue modificado.
-
-## 2026-08-04 — Globe Asset Governance: la latencia deja de multiplicarse por el cron
-
-- **ISSUE-137 resuelto en runtime** con `efeonce-globe@d78ce01`: Terraform cambió
-  `asset_governance_schedule` de `*/5` a `*/1`; plan/apply supervisados quedaron en `0 to destroy` y
-  el Scheduler live en `southamerica-east1` lee `*/1 * * * * ENABLED`.
-- Verificación post-arreglo sin gasto nuevo: el video durable terminó en `candidate_ready` en
-  `473,958 s / 7,90 min`, governance en `183,780 s`, output retenido y settlement exacto de 16
-  créditos. La imagen post-arreglo midió `472 s / 183 s`; la coincidencia entre modalidades confirma
-  que el cuello era cadence-bound, no size-bound. El drain loop no se tocó.

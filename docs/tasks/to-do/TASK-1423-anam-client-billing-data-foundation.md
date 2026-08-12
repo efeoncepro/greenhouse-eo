@@ -1,11 +1,17 @@
 # TASK-1423 — ANAM Client Billing Data Foundation + No-Write Workbook Profiler
 
+## Delta 2026-08-12
+
+- El escáner de firmas quedó **ON también en producción** (TASK-1378 cerrada, ISSUE-150 resuelta): verificado
+  post-flip desde el runtime + postulación real. El supuesto de cobertura del delta anterior ya no tiene
+  asterisco de environment.
+
 ## Delta 2026-08-11
 
 - El supuesto "asset-scan ya implementado" sigue siendo cierto, pero cambió de contenido: el puerto es
   **domain-free** y ahora compone un escáner de **firmas** real (servicio Cloud Run `clamav`, us-east4, cerrado
-  por IAM) encima del estructural. Está **ON en staging** y **OFF en producción** hasta que se promueva
-  `develop`→`main` — actualizado por TASK-1378.
+  por IAM) encima del estructural. ~~Está **ON en staging** y **OFF en producción** hasta que se promueva
+  `develop`→`main`~~ (cerrado, ver Delta 2026-08-12) — actualizado por TASK-1378.
 - Consecuencia para esta task: si el workbook de ANAM entra por un contexto declarado en
   `SCAN_REQUIRED_ATTACH_CONTEXTS`, hereda la cobertura de firmas sin escribir una línea — pero también hereda la
   semántica **fail-closed**: sin veredicto `clean` no hay attach, y un scanner caído bloquea la carga en vez de
