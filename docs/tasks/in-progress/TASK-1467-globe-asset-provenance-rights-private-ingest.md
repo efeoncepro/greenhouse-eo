@@ -1,5 +1,11 @@
 # TASK-1467 — Globe Asset Provenance, Rights and Private Ingest
 
+## Delta 2026-08-12
+
+- El escáner compartido `clamav` ya está **LIVE en staging Y producción** (`ASSET_MALWARE_SCAN_ENABLED=true`
+  en ambos; TASK-1378 complete, ISSUE-150 resuelta) — supersede el "OFF en producción" del delta 2026-08-11.
+  Verificación por-runtime de la credencial OIDC: `GET /api/internal/health/scanner-auth?probe=scan`.
+
 ## Delta 2026-08-11
 
 - Greenhouse ya tiene un escáner de firmas gobernado y operativo: servicio Cloud Run **único** `clamav`

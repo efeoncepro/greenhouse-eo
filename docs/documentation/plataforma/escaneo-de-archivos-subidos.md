@@ -1,9 +1,9 @@
 # Escaneo de archivos subidos
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-08-11 por Claude (TASK-1378)
-> **Ultima actualizacion:** 2026-08-11 por Claude (TASK-1378)
+> **Ultima actualizacion:** 2026-08-12 por Claude (TASK-1378)
 > **Documentacion tecnica:** [GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md) (§Candidate document capture + Delta 2026-08-11)
 > **Manual de uso:** [Operar el scanner de malware de assets](../../manual-de-uso/plataforma/operar-scanner-malware-assets.md)
 
@@ -69,11 +69,15 @@ protegiendo mientras tanto.
 
 | Entorno | Escáner estructural | Escáner de firmas |
 |---|---|---|
-| Producción | Activo | **Desplegado y verificado, todavía no encendido** |
+| Producción | Activo | **Activo** (desde 2026-08-12) |
 | Staging | Activo | Activo |
 
-El de firmas está pendiente de una última verificación: que una postulación real de punta a punta en staging deje
-registro de haber pasado por ambos escáneres.
+Ambos escáneres operan en los dos entornos. El encendido en producción se verificó con una postulación real de
+prueba por el formulario público: el CV pasó por los dos escáneres, salió limpio y quedó adjunto.
 
 > Detalle técnico: puerto y adaptadores en `src/lib/storage/asset-scan/`; servicio en `services/clamav/`; estado del
-> encendido en [FEATURE_FLAG_STATE_LEDGER.md](../../operations/FEATURE_FLAG_STATE_LEDGER.md).
+> encendido en [FEATURE_FLAG_STATE_LEDGER.md](../../operations/FEATURE_FLAG_STATE_LEDGER.md). Para verificar que el
+> runtime puede autenticarse contra el scanner existe un endpoint de diagnóstico para operadores:
+> `GET /api/internal/health/scanner-auth` (con `?probe=scan` hace una prueba real contra el servicio; requiere
+> `?key=CRON_SECRET` o sesión interna agency). Es el paso 5 del
+> [manual de operación](../../manual-de-uso/plataforma/operar-scanner-malware-assets.md).

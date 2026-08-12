@@ -129,7 +129,8 @@ escaneo dejó de ser un preventivo y se implementó como remediación, antes que
 - `structural` — magic bytes, coherencia MIME↔contenido, hazards de PDF (`/Launch`, `/EmbeddedFile`, `/RichMedia`,
   `/XFA` bloquean; `/JavaScript` y `/OpenAction` son advisory porque los emiten exportadores legítimos). Corre
   SIEMPRE, in-process, sin infraestructura.
-- `clamav-http` — behind `ASSET_MALWARE_SCAN_ENABLED` (default OFF). Composición, no reemplazo: el peor veredicto gana.
+- `clamav-http` — behind `ASSET_MALWARE_SCAN_ENABLED` (default OFF en código; **ON en staging y producción desde
+  2026-08-12**, ver Delta 2026-08-12). Composición, no reemplazo: el peor veredicto gana.
 
 Lifecycle: `pending → scan → attached | quarantined`. `quarantined` es terminal — los bytes se preservan para triage
 forense, el asset nunca se adjunta y `downloadPrivateAsset` lo rechaza sin importar la capability del actor.
@@ -171,6 +172,7 @@ escalan a error).
 
 El adapter `clamav-http` dejó de ser código latente: existe el servicio Cloud Run `services/clamav/` y el adapter se
 ejerció contra él. **El flag `ASSET_MALWARE_SCAN_ENABLED` sigue OFF en Vercel** — el flip es rollout pendiente.
+*(Superado por el Delta 2026-08-12: el flag está ON en staging y producción.)*
 
 **El puerto de escaneo NO es de Hiring.** `scanAssetBytes` recibe bytes y devuelve un veredicto; no sabe de vacantes.
 Hoy lo consumen `hiring/public-careers/cv-upload.ts` y `growth/forms/file-uploads.ts`, y el guard del attach exige
@@ -201,6 +203,42 @@ Invariantes del servicio (contrato completo en `services/clamav/` + `deploy-cont
   TASK-1367 y ya vienen saneados (`isSafeHttpUrl`, https-only, sin fetch server-side).
 - **NUNCA** borrar documentos de candidatos automáticamente. `retention.ts` detecta y alerta; el borrado de PII de
   personas reales es un comando gobernado con humano en el loop (owner People Ops).
+
+### Delta 2026-08-12 — Scanner LIVE en staging y producción (TASK-1378 cerrada; ISSUE-150 resuelta)
+
+El flip ocurrió: **`ASSET_MALWARE_SCAN_ENABLED=true` en staging Y producción de Vercel desde 2026-08-12**
+(Production desde el redeploy `greenhouse-aivcug5f5`). Toda subida gateada (`hiring_application_cv`,
+`hiring_candidate_portfolio_file`, `proposal_rfp`, `proposal_deliverable`) corre la composición
+`structural + clamav-http` — el peor veredicto gana — contra el servicio Cloud Run único `clamav`
+(us-east4, `min=1`, invoker sólo `greenhouse-portal@`; ver `cloud-infrastructure/CLOUD_RUN.md` §`clamav`).
+
+El flip falló DOS veces el 2026-08-11 (`docs/issues/resolved/ISSUE-150-*`): (1) el código OIDC vivía sólo en
+develop mientras producción sirve main; (2) producción corre `GCP_AUTH_PREFERENCE=service_account_key` (postura
+transicional, TASK-800) y `resolveGoogleIdTokenProvider` (`src/lib/google-credentials.ts`) no tenía rama de
+service account key — caía a impersonación ambiente, que exige ADC (inexistente en Vercel) → excepción en ~21 ms
+→ fail-closed `scanner_auth_failed` bloqueando CVs reales. Staging no lo mostró porque sin la preferencia usa la
+rama WIF: **una prueba de credencial vale sólo para la rama de credencial que ejercita**. Fix en main (release
+`a90951dba`, run 31544667630): el resolver enruta por `getGoogleIdTokenProviderPlan(env)` (exportado, testeable
+sin red) con 4 planes — `wif` → `service_account_key` → `ambient_impersonated` → `ambient_adc` — alineado con
+`getGoogleCredentialSource`; la rama nueva usa `createGoogleAuth({ env }).getIdTokenClient(audience)` (la SA key
+firma su propio JWT, sin ADC ni impersonación).
+
+Endpoint de diagnóstico: **`GET /api/internal/health/scanner-auth`**
+(`src/app/api/internal/health/scanner-auth/route.ts`; guard `?key=CRON_SECRET` o tenant agency autenticado).
+Acuña el ID token **en el runtime donde corre** para la audiencia del scanner y reporta `flagEnabled`,
+`credentialPlan`, `credentialDiagnostics` y `mint{ok,durationMs,claims(aud/azp/email/expiresInSeconds)}` — nunca
+el token crudo. Con `?probe=scan` además hace un POST real de bytes limpios a `<endpoint>/scan` con el token y
+reporta `probe{ok,httpStatus,scanStatus,durationMs}`. No toca el path de uploads ni puede crear cuarentenas.
+
+Verificación de cierre en 3 capas desde el runtime real: (1) diagnóstico pre-flip verde en producción;
+(2) post-flip `flagEnabled=true` + `mint.ok` 94 ms + `probe.ok` 147 ms; (3) postulación de prueba por el
+formulario público real → `asset_scan_results` con `scanner=structural+clamav-http`, `verdict=clean`, asset
+`attached`, 129 ms.
+
+Invariante del bug class (detalle en `agent-invariants/INTEGRATIONS_INFRA_AGENT_INVARIANTS.md` §ID tokens OIDC
+hacia Cloud Run): **NUNCA** prender un flag que dependa de una credencial sin correr el diagnóstico EN cada
+runtime destino — si los environments difieren en `GCP_AUTH_PREFERENCE` (o cualquier selector de source), el
+gate de staging NO cubre producción.
 
 ### Resolver unificado
 

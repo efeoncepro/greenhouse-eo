@@ -1,5 +1,11 @@
 # TASK-800 — Production GCP WIF-Only Auth Posture Hardening
 
+## Delta 2026-08-12
+
+- **ISSUE-150 es caso fuente NUEVO del riesgo de esta postura mixta.** Producción corre `GCP_AUTH_PREFERENCE=service_account_key` + `GOOGLE_APPLICATION_CREDENTIALS_JSON`, y el camino de ID tokens hacia Cloud Run (`resolveGoogleIdTokenProvider` en `src/lib/google-credentials.ts`) no tenía rama de service account key: falló fail-closed en producción el 2026-08-11 bloqueando CVs reales del hiring intake (scanner ClamAV inaccesible). El fix (release `a90951dba`, TASK-1378/ISSUE-150) agregó la rama y el plan testeable `getGoogleIdTokenProviderPlan(env)` con 4 planes: `wif | service_account_key | ambient_impersonated | ambient_adc`.
+- **Herramienta nueva útil para ESTA task:** el endpoint `GET /api/internal/health/scanner-auth?probe=scan` (guard `CRON_SECRET` o tenant agency) acuña el ID token EN el runtime donde corre y reporta plan/diagnóstico/claims sin exponer el token. Al ejecutar el cutover WIF-only, correrlo en el canary y en producción valida la rama WIF de ID tokens con evidencia real — exactamente el tipo de validación por-consumer que esta task exige (agregarlo a los checks de Slice 3/4 junto a `/api/internal/health`).
+- **Al retirar la key**, el plan de producción pasa de `service_account_key` a `wif` y los consumers de ID tokens ya lo soportan por construcción (el resolver enruta por `getGoogleIdTokenProviderPlan()`), así que el cutover no requiere cambios de código adicionales en ese camino.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

@@ -161,8 +161,10 @@ There is a real malware scanner behind files uploaded from outside (Cloud Run `s
 - **Fail-closed**: if the scanner cannot produce a verdict (timeout, HTTP error, unreachable), the upload is blocked. Never "let it through and scan later".
 - **An application whose CV is quarantined is still ACCEPTED**, and the candidate sees the **same** message as everyone else. Telling an attacker their file was rejected tells them what to try next. The bytes are preserved and the desk still finds the document via `metadata_json->>'candidateFacetId'`.
 - `greenhouse_core.asset_scan_results` is **append-only** (trigger with `RAISE EXCEPTION` on DELETE); only the `resolution_*` columns change (false positive / recovered).
+- **Status: LIVE in staging AND production since 2026-08-12** (`ASSET_MALWARE_SCAN_ENABLED=true` in both; single Cloud Run service `clamav`, `us-east4`, IAM-only). Per-runtime diagnostic: `GET /api/internal/health/scanner-auth?probe=scan` (reports `flagEnabled`, `credentialPlan`, `mint.ok`, `probe.ok`; never the token).
+- Recovery for CVs quarantined by scanner failures (`scanner_http_error`/`scanner_auth_failed`/`scanner_unreachable`): `scripts/hiring/recover-scanner-403-quarantined-cvs.ts`.
 - Runbook: `docs/manual-de-uso/plataforma/operar-scanner-malware-assets.md`. Service/deploy invariants: `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-08-11.
-- Flag flip is a production-release matter (`greenhouse-production-release`), and only after the reading code is on `main` — `ISSUE-150`.
+- Any future flag change remains a production-release matter (`greenhouse-production-release`), and only after the reading code is on `main` — `ISSUE-150` (resolved 2026-08-12).
 
 ## Person model (never duplicate a human)
 

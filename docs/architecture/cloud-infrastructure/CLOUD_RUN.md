@@ -1,6 +1,6 @@
 # Cloud Infrastructure — Cloud Run (services, Functions legacy, Jobs)
 
-> **Estado vigente** · Updated: 2026-08-11 (TASK-1378) · Cronología: [HISTORIAL.md](HISTORIAL.md)
+> **Estado vigente** · Updated: 2026-08-12 (TASK-1378 cerrada — scanner LIVE) · Cronología: [HISTORIAL.md](HISTORIAL.md)
 > **SoT:** `services/<worker>/deploy.sh` (config declarativa) + `gcloud run services|jobs list`
 > (estado live). Inventario live completo auditado por última vez el 2026-04-23 (`13`
 > serverless: 5 Cloud Run custom + 8 Functions Gen 2); re-baseline pendiente (`TASK-127`).
@@ -14,7 +14,7 @@
 | `ico-batch-worker` | `us-east4` | `greenhouse-portal@...` | IAM only | **mixto** | mantiene `GREENHOUSE_POSTGRES_PASSWORD` en env plano (gap en [SECURITY.md](SECURITY.md)) |
 | `hubspot-greenhouse-integration` | `us-central1` | default compute SA | **public** (`allUsers`) | parcial | revisar si el exposure público es realmente el deseado |
 | `notion-bq-sync` | `us-central1` | default compute SA | **public** (`allUsers`) | Secret Manager | exposición pública innecesaria para un sync interno; `minScale=0` desde 2026-04-24 |
-| `clamav` | `us-east4` | `greenhouse-portal@...` | IAM only (ingress `all` + `--no-allow-unauthenticated`) | **ninguno** — no lee secretos ni toca PostgreSQL | Escáner de firmas de assets de candidato (TASK-1378). `mem=2Gi`, `cpu=1`, `min=1`, `max=3`, `concurrency=4`, `timeout=120s`. **Servicio ÚNICO para staging y producción** (ver abajo). ≈USD 19/mes |
+| `clamav` | `us-east4` | `greenhouse-portal@...` | IAM only (ingress `all` + `--no-allow-unauthenticated`, invoker sólo `greenhouse-portal@`) | **ninguno** — no lee secretos ni toca PostgreSQL | Escáner de firmas de assets de candidato (TASK-1378). **PRODUCTIVO desde 2026-08-12**: `ASSET_MALWARE_SCAN_ENABLED=true` en staging Y producción de Vercel (ISSUE-150 resuelta). `mem=2Gi`, `cpu=1`, `min=1`, `max=3`, `concurrency=4`, `timeout=120s`, 3,6 M firmas. **Servicio ÚNICO para staging y producción** (ver abajo). ≈USD 19/mes |
 
 ## Cloud Run Jobs
 
@@ -88,6 +88,13 @@ Escáner de firmas (ClamAV + shim HTTP `POST /scan`) que consume el adapter
 `src/lib/storage/asset-scan/clamav-http.ts`. Source: `services/clamav/` — **no bundlea `src/lib`**:
 el contrato entre el portal y el servicio es HTTP, no código compartido.
 
+**Estado: PRODUCTIVO desde 2026-08-12.** `ASSET_MALWARE_SCAN_ENABLED=true` en staging Y producción de
+Vercel (Production desde el redeploy `greenhouse-aivcug5f5`); el servicio único atiende los uploads
+gateados de ambos environments. El flip a producción falló dos veces el 2026-08-11 por la rama de
+credencial (`GCP_AUTH_PREFERENCE=service_account_key` sin rama en el resolver de ID tokens) —
+`ISSUE-150` resuelta; diagnóstico canónico por runtime: `GET /api/internal/health/scanner-auth`
+(`?probe=scan` ejercita un POST real contra `/scan`).
+
 - **Un solo servicio para los dos entornos**, a diferencia del resto de los workers. Es stateless:
   recibe bytes y devuelve un veredicto; no lee secretos, no toca PostgreSQL, no conoce tenants ni
   entornos — y staging y producción ya comparten la misma base
@@ -121,8 +128,9 @@ el contrato entre el portal y el servicio es HTTP, no código compartido.
   workflow-allowlist: `production-release.yml` no lo despliega y su imagen sólo cambia con
   `services/clamav/**`, así que la detección de drift por `GIT_SHA` lo marcaría desalineado en cada
   promoción, para siempre.
-- Spec: [`../../tasks/in-progress/TASK-1378-clamav-malware-scanner-provisioning-decision.md`](../../tasks/in-progress/TASK-1378-clamav-malware-scanner-provisioning-decision.md).
-  Runbook: `docs/manual-de-uso/plataforma/operar-scanner-malware-assets.md`.
+- Spec: [`../../tasks/complete/TASK-1378-clamav-malware-scanner-provisioning-decision.md`](../../tasks/complete/TASK-1378-clamav-malware-scanner-provisioning-decision.md).
+  Runbook: `docs/manual-de-uso/plataforma/operar-scanner-malware-assets.md`. Incidente del flip:
+  `docs/issues/resolved/ISSUE-150-production-flag-enabled-for-code-only-on-develop.md`.
 
 ## Deploy scripts — reglas compartidas
 
