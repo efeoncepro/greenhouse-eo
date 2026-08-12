@@ -398,8 +398,10 @@ ENV_VARS="${ENV_VARS},GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED=${GROWTH_EBOOK_EMAIL_D
 # Default OFF hasta ejercicio end-to-end en staging + revisión humana de Talent del copy
 # (especialmente hiring_decision_rejected, pausable aparte en email_type_config).
 # Declarativo acá para que `--set-env-vars` (destructivo) NO lo borre en cada redeploy.
-# Rollback (<5min): `gcloud run services update ops-worker --update-env-vars HIRING_LIFECYCLE_EMAILS_ENABLED=false`.
-HIRING_LIFECYCLE_EMAILS_ENABLED="${HIRING_LIFECYCLE_EMAILS_ENABLED:-false}"
+# Prendido 2026-08-12 (rollout autorizado por el operador tras la revisión de copy; ejercicio E2E
+# en staging en la misma sesión). Rollback (<5min):
+# `gcloud run services update ops-worker --update-env-vars HIRING_LIFECYCLE_EMAILS_ENABLED=false`.
+HIRING_LIFECYCLE_EMAILS_ENABLED="${HIRING_LIFECYCLE_EMAILS_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},HIRING_LIFECYCLE_EMAILS_ENABLED=${HIRING_LIFECYCLE_EMAILS_ENABLED}"
 
 # Buzón interno de People para el aviso de postulación nueva (configurable; default en código).
