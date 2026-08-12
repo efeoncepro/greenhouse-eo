@@ -38,5 +38,6 @@ export const aria: AriaCopy = {
   dismissHelper: 'Dismiss helper',
   leaderboardRunSelect: 'Select leaderboard period',
   leaderboardPagination: 'Leaderboard pagination',
-  leaderboardRowsCollapsed: 'Collapsed leaderboard rows'
+  leaderboardRowsCollapsed: 'Collapsed leaderboard rows',
+  backToTop: 'Back to top'
 }

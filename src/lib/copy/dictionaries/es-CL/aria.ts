@@ -50,5 +50,6 @@ export const aria: AriaCopy = {
   dismissHelper: 'Ocultar ayuda contextual',
   leaderboardRunSelect: 'Seleccionar periodo de leaderboard',
   leaderboardPagination: 'Paginación del leaderboard',
-  leaderboardRowsCollapsed: 'Filas de leaderboard colapsadas'
+  leaderboardRowsCollapsed: 'Filas de leaderboard colapsadas',
+  backToTop: 'Volver arriba'
 }
