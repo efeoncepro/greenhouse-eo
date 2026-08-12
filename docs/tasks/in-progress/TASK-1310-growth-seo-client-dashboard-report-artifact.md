@@ -1,5 +1,69 @@
 # TASK-1310 — Growth SEO: Client Dashboard + Report Artifact + 360 Quadrant
 
+## Delta 2026-08-12 — la ronda premium estaba hecha y sin medir; quedan dos cosas
+
+**El scorecard juzgaba una UI que ya no existía.** El BLOCK de `average=2.29` se generó sobre
+capturas de las 10:25 del 2026-08-08; el commit `5f622386d` (19:29 del mismo día) ejecutó los lotes
+de la auditoría premium y nadie volvió a medir. La corrida del 2026-08-12 contradice sus dos
+hallazgos técnicos: el dashboard daba `exitCode 1` con **2 violaciones axe de contraste** y 15
+warnings de targets de 23 px; hoy da `exitCode 0` con **`qualityFindings` vacío en desktop y
+mobile**. Los lotes 0–4 se verifican mirando los frames: canvas abierto sin card soup, estrella
+única para AEO, veredicto dinámico, dato escaso que **cambia de forma** en vez de estirar un
+gráfico vacío, y quadrant que declara que su eje AEO es del dominio en vez de inventar citabilidad
+por keyword. `ui:quality` pasa a **PASS 4.52** con el scorecard regenerado desde esa evidencia.
+
+**Dos defectos reales que ningún gate veía, corregidos:**
+
+1. 🔴 **El informe web contradecía su propia métrica.** El bloque más visible del entregable decía
+   "Aún no hay una posición media para leer" con **#13.3 impreso al lado**: el adapter web
+   hardcodeaba el título de estado vacío mientras renderizaba el promedio real. El dashboard y el
+   adapter print sí ramificaban por `null` — cada render con su copia de la regla. Ahora el
+   veredicto se deriva en `resolveSeoLeadTitle`, en el módulo que dashboard e informe ya comparten,
+   con test de regresión. Commit `cb8d60b9b`. **Salió mirando el frame, con `exitCode 0`.**
+2. **El FAB global "volver arriba" no tenía nombre accesible** (`button-name`, impacto *critical*,
+   en TODAS las rutas del portal). Aparecía como violación axe del informe sin serlo. Cerrado en su
+   causa, con label desde el namespace `aria` canónico. Commit `756d9970d`.
+
+Además se retiró el hover lift del canvas del informe: un entregable que se lee y se reenvía no es
+un control (auditoría §6).
+
+**Lo que BLOQUEA el cierre — uno solo, y no es de código:** `pnpm ui:visual-gate --task TASK-1310`
+sigue en BLOCK porque exige una captura del scenario **real** (`growth-seo-client`, el que atraviesa
+el gate per-org) más su `review-dossier.md`, y **no pude montar una sesión de cliente de la
+organización contratada**:
+
+- La persona canónica `agent-client@greenhouse.efeonce.org` **no pertenece a esa organización**, así
+  que `/growth/seo` le responde la card de bloqueo y la captura muere en el marker — el gate
+  funcionando, no un defecto. (El manual de este módulo apuntaba además a un dominio inexistente,
+  `efeoncepro.org`; corregido.)
+- Resolver el usuario cliente correcto exige el mapeo organización↔cliente, que **no está donde lo
+  busqué**: `greenhouse_core.client_users` enlaza por `client_id`, y ni `greenhouse_core.clients` ni
+  `greenhouse_core.organizations` exponen la FK del otro (verificado contra `information_schema`).
+- ⚠️ **Sobrescribí `.auth/storageState.local-berel-client.json`** con la sesión de la persona
+  genérica al intentarlo. El original era del 2026-08-09 y su token ya estaba vencido, así que no se
+  perdió acceso, pero el archivo ya no corresponde a su nombre: hay que volver a emitirlo con un
+  usuario de la organización contratada.
+
+**Lo que la evidencia nueva NO prueba, dicho explícitamente:** la corrida usa el arnés de fixture
+determinista (`/growth/seo/mockup`), que es el correcto para un gate visual —no cambia entre
+corridas— pero **no revalida el gate per-org ni el dato vivo**. Eso quedó verificado con sesión Berel
+el 2026-08-08 y sigue pendiente en staging.
+
+### Follow-up de generalización (no es de esta task, y tiene dato)
+
+La sonda de población dice que la superficie tiene **una sola organización cliente**: Berel. Efeonce
+tiene `module_assignment` activo pero es tenant interno, y `requireClientTenantContext()` impide que
+la superficie cliente renderice para un interno — o sea, no hay un segundo tenant que delate un
+supuesto. Con ese N=1 emerge un defecto de diseño que ningún dato actual puede mostrar:
+`connection.state` se decide con **GSC** (`read-overview-connection.ts`) pero el Resumen deriva sus
+números de **rank snapshots**. Un tenant con Search Console conectado y captura de rank todavía sin
+correr —**el día 1 de todo cliente nuevo**, porque el OAuth es barato y va primero mientras la
+captura cuesta por keyword— no cae en el empty state de página: renderiza el dashboard completo con
+el KPI principal en "sin dato" y un Quadrant poblado debajo, porque el eje SEO del gap también sale
+de GSC. Merece task propia: un fixture por estado de la población (`onboarding`, `sin GSC`,
+`sin AEO`, `parcial`, `locked`) y la decisión de si el Resumen declara su fuente faltante o deriva de
+GSC cuando no hay snapshots.
+
 ## Delta 2026-08-09
 
 - **El criterio de alcanzabilidad por nav cliente quedó cerrado** por `TASK-1675`, que cableó el menú
@@ -536,10 +600,10 @@ Slice 1 (shell+gate+estados) → Slice 2 (Resumen+Evolución) → Slice 3 (Quadr
 - [x] Honest degradation: sin GSC → empty accionable (nunca ceros); quadrant sin AEO → "falta la mitad IA" (`sin_dato` ≠ 0); cuota → degrada a medido; medido ● / estimado ◑ con leyenda.
 - [x] Disclosure `clientPortal`/`attachment` (público-safe): sin engine snapshot crudo, sin razón interna, sin costo.
 - [x] Copy reusable en `src/lib/copy/growth.ts` (`GH_GROWTH_SEO_CLIENT`, es-CL tono cliente, `greenhouse-ux-writing`).
-- [ ] GVC desktop+mobile capturado y mirado **en loop** (dashboard + report); `scrollWidth==clientWidth`; gate axe verde. Código y capturas locales están completas; staging y los warnings del shell global siguen pendientes.
-- [ ] Focus/keyboard validados; navigator active state; charts sin entrada bajo movimiento reducido (WCAG 2.3.3). El contrato y atributos están implementados; falta la pasada manual/final en staging.
+- [x] GVC desktop+mobile capturado y mirado **en loop** (dashboard + report + print). Corrida 2026-08-12: `growth-seo-client-mockup` `exitCode 0` con `qualityFindings` **vacío** en ambos viewports; `growth-seo-report-mockup` y `growth-seo-report-print-mockup` sin violaciones axe. Los frames se miraron uno por uno —de ahí salió el defecto del veredicto del informe, invisible para los gates—. Los warnings de overflow que persisten en mobile son del `aside[data-capture="portal-vertical-nav"]` global en su posición off-canvas, no de contenido SEO.
+- [x] Focus/keyboard validados; navigator active state; charts sin entrada bajo movimiento reducido (WCAG 2.3.3). Probes `report-cta-focus` y `section-switch` verdes con `requireVisibleFocusRing: true` + `reducedMotionCheck: true`, y el anillo de foco confirmado visualmente en `04-keyboard-report-cta-focus.png`.
 - [x] El flow doc referencia el master `EPIC-022-search-visibility-360-UI-FLOW.md` y declara sus nodos (S5/S6/S7).
-- [ ] `UI ready` pasa a `yes` solo cuando `pnpm task:lint --task TASK-1310` queda sin findings. Hoy sigue en `no` por la auditoría premium abierta — este criterio no puede marcarse antes que los criterios 2/10/11.
+- [ ] `UI ready` pasa a `yes` solo cuando `pnpm task:lint --task TASK-1310` queda sin findings. `task:lint` ya reporta `errors=0 warnings=0` y los criterios 2/10/11 quedaron cerrados, pero el criterio se mantiene **sin marcar a propósito**: `pnpm ui:visual-gate --task TASK-1310` sigue en BLOCK por falta de la captura del scenario **real** + su `review-dossier.md`, y eso exige una sesión de cliente de la organización contratada que no se pudo emitir (ver Delta 2026-08-12). Marcar `UI ready: yes` con ese gate en rojo sería exactamente el scorecard-verde-sobre-auditoría-BLOCK que esta task ya cometió una vez.
 
 ## Verification
 

@@ -130,8 +130,20 @@ Usa la persona agente de cliente, no la de superadmin — el punto es probar el 
 atraviesa por otras razones:
 
 ```bash
-AGENT_AUTH_EMAIL=agent-client@greenhouse.efeoncepro.org AGENT_AUTH_SECRET=<secret> node scripts/playwright-auth-setup.mjs
+AGENT_AUTH_EMAIL=agent-client@greenhouse.efeonce.org AGENT_AUTH_SECRET=<secret> node scripts/playwright-auth-setup.mjs
 ```
+
+> **El dominio es `efeonce.org`, no `efeoncepro.org`** — con el segundo el endpoint responde
+> `404 No tenant user found`. Corregido el 2026-08-12 después de que fallara en vivo; la lista
+> canónica de personas agente vive en `CLAUDE.md` §Agent Auth.
+>
+> ⚠️ **Y esa persona NO sirve para verificar ESTE módulo.** `agent-client@greenhouse.efeonce.org`
+> es la persona cliente genérica y no pertenece a la organización que tiene el módulo SEO
+> contratado, así que `/growth/seo` le responde su card de bloqueo — que es el gate funcionando,
+> no un defecto. Para verificar la superficie con datos hay que usar un usuario cliente **de la
+> organización contratada**. Mientras no exista una persona agente de esa organización, la
+> verificación visual determinista se hace con el arnés de fixture (`/growth/seo/mockup`) y la
+> verificación del gate con dato real queda como paso manual.
 
 Con esa sesion, revisa tres cosas:
 
