@@ -96,7 +96,6 @@ if [ "${ENV}" = "production" ]; then
   DEFAULT_GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF="greenhouse-integration-api-token"
   DEFAULT_NUBOX_BEARER_TOKEN_SECRET_REF="greenhouse-nubox-bearer-token-production"
   DEFAULT_NUBOX_X_API_KEY_SECRET_REF="greenhouse-nubox-x-api-key-production"
-  DEFAULT_GREENHOUSE_PORTAL_BASE_URL="https://greenhouse.efeoncepro.com"
   DEFAULT_AZURE_AD_CLIENT_SECRET_REF="greenhouse-azure-ad-client-secret-production:latest"
   echo "=== PRODUCTION deployment ==="
 else
@@ -107,10 +106,14 @@ else
   DEFAULT_GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF="greenhouse-integration-api-token"
   DEFAULT_NUBOX_BEARER_TOKEN_SECRET_REF="greenhouse-nubox-bearer-token-staging"
   DEFAULT_NUBOX_X_API_KEY_SECRET_REF="greenhouse-nubox-x-api-key-staging"
-  DEFAULT_GREENHOUSE_PORTAL_BASE_URL="https://dev-greenhouse.efeoncepro.com"
   DEFAULT_AZURE_AD_CLIENT_SECRET_REF="greenhouse-azure-ad-client-secret-staging:latest"
   echo "=== STAGING deployment ==="
 fi
+
+# ops-worker is a shared runtime for staging and production. Its identity smoke
+# must probe the public production domain: staging is protected by Vercel SSO
+# and would turn every successful staging deploy into a false Sentry failure.
+DEFAULT_GREENHOUSE_PORTAL_BASE_URL="https://greenhouse.efeoncepro.com"
 
 NEXTAUTH_SECRET_REF="${NEXTAUTH_SECRET_REF:-${DEFAULT_NEXTAUTH_SECRET_REF}}"
 PG_PASSWORD_REF="${PG_PASSWORD_REF:-${DEFAULT_PG_PASSWORD_REF}}"
