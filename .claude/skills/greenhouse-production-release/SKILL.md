@@ -396,6 +396,21 @@ El flujo de **squash-merge** produce condiciones recurrentes que NO son fallas r
     release y faltarle sólo docs. Es una tensión entre dos mecanismos propios; el check igual sale con
     exit 1, así que hay que producirle el deploy.
 
+12. **Un warning de Sentry no identifica por sí solo el blocker del preflight.** Lee el JSON y el
+    log del job: sólo un check con severidad `error` explica el exit no-cero; un warning de
+    `sentry_critical_issues` requiere investigación y evidencia, pero no autoriza a ignorar una
+    migración pendiente u otro error estricto. Si el cambio repara un grant de identidad, aplica la
+    migración antes del re-dispatch y verifica tanto `public.pgmigrations` como la fila efectiva de
+    `role_view_assignments`; que un fallback permita entrar no prueba que el acceso persistido quedó
+    corregido.
+
+    Para un smoke de identidad ejecutado por un worker compartido entre staging y producción, inspecciona
+    la variable efectiva de la revisión activa y el endpoint real. Un portal staging protegido por SSO
+    puede responder `302` aunque la aplicación esté sana; no lo clasifiques como fallo de autenticación
+    sin confirmar el destino. La corrección durable vive en el `deploy.sh` del worker (source of truth)
+    **y** requiere actualizar la revisión activa. Después, ejecuta el smoke programado y conserva al
+    menos dos resultados consecutivos completos antes de cerrar la alerta.
+
 ## What The Orchestrator Owns
 
 `production-release.yml` owns the production release lifecycle:

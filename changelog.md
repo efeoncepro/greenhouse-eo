@@ -25,12 +25,15 @@ El cliente de Sentry filtra exclusivamente la firma del bridge nativo que Facebo
 Android cuando el objeto Java desaparece durante el ciclo de vida de su WebView: exige el mensaje,
 navegador y frame `app://` exactos. No toca Careers, Turnstile ni la captura de otros errores de
 Facebook/Android. La investigación comprobó que la página pública y el formulario nativo responden
-correctamente; el filtro queda pendiente de promoción y verificación en el runtime.
+correctamente; el cambio llegó a producción por `d139726ff` y 8W no tuvo recurrencias posteriores al rollout.
 
 En el mismo cierre se recupera la gobernanza persistida de `/admin/globe/credits`: una migration
 añade el registry y el único grant que autoriza su contrato (`efeonce_admin`), eliminando el
-fallback que hoy genera `role_view_fallback_used` durante el refresh de claims. La migration se
-aplica sólo después de desplegar el catálogo ya existente en todos los runtimes que comparten DB.
+fallback que generaba `role_view_fallback_used` durante el refresh de claims. La migration quedó aplicada y
+el grant se verificó en Cloud SQL. También se corrigió el smoke de identidad: el `ops-worker` compartido
+consultaba el portal staging protegido por SSO (HTTP 302); al usar el portal público dos runs fueron 5/5 y
+la health fue `ready`. Los tickets remotos de Sentry quedan por marcar como resueltos cuando exista una
+sesión o token con escritura.
 
 ## 2026-08-12 — El escáner de malware quedó vivo en producción, verificado de punta a punta
 

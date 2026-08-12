@@ -154,7 +154,7 @@ Cada capa cubre un modo de falla distinto. Juntas garantizan: detección automá
 - `azure_authorize_endpoint` falla con `AADSTS700016` → app deleted o client_id wrong
 - `microsoft_oidc_discovery` falla → DNS / red / Microsoft incident
 - `in_process_readiness` falla con `jwt_self_test_failed` → `NEXTAUTH_SECRET` corrupto
-- `portal_auth_health` falla → la app misma está caída (no auth-related, pero detectado igual)
+- `portal_auth_health` falla → confirmar primero el destino efectivo del worker y la respuesta HTTP. Debe usar el portal público canónico: el `ops-worker` es compartido entre staging y producción, y consultar el host staging protegido por SSO devuelve HTTP 302 aunque la aplicación esté sana (caso `ISSUE-151`, 2026-08-12). Sólo después de descartar esa configuración se clasifica como caída de la app.
 
 ### Capa 7 — Rotation playbook + Azure App auditor
 

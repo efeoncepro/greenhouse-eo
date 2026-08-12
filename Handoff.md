@@ -17,24 +17,20 @@ push. **Rollout pendiente:** flag `HIRING_LIFECYCLE_EMAILS_ENABLED` default OFF 
 pausable aparte). Ledger actualizado. La migración ajena de ISSUE-151 (timestamp posterior) quedó SIN aplicar a
 propósito — su plan exige código desplegado primero; se aplicó selectivamente con `pnpm migrate:up 1`.
 
-### ISSUE-151 — dos alertas Sentry investigadas; corrección local lista, rollout pendiente (2026-08-12)
+### ISSUE-151 RESUELTA — bridge Facebook, grant Globe y smoke de identidad verificados (2026-08-12)
 
-**JAVASCRIPT-NEXTJS-8W no es un defecto de Careers:** `Error invoking postMessage: Java object is gone`
-viene del bridge nativo inyectado por Facebook Android (`app://navigation_performance_logger_android`), no de
-Greenhouse. La ruta pública respondió 200 con los UA Facebook Android y Chrome Android; Careers usa
-`<greenhouse-form>` sin iframe ni `postMessage`. Se añadió un `beforeSend` que descarta sólo la combinación
-exacta mensaje + navegador Facebook + frame del bridge, preservando errores reales de Careers, Turnstile y
-Android. **JAVASCRIPT-NEXTJS-8V sí descubrió un drift:** `administracion.globe_credits` entró al catálogo TS sin
-su seed DB; el fallback interno concede a `efeonce_admin` por `admin` y emite el warning. La migration
-`20260812093000000_issue-151-seed-globe-credits-view-access.sql` persiste el registry y el único grant correcto.
+`d139726ff` llegó a `main` por PR #189 y el release de producción terminó correctamente. El filtro Sentry para
+`JAVASCRIPT-NEXTJS-8W` descarta sólo el bridge Facebook Android `Java object is gone`; Careers siguió respondiendo
+200 con `<greenhouse-form>` y sin `postMessage`/iframe. La migration
+`20260812093000000_issue-151-seed-globe-credits-view-access.sql` quedó aplicada en Cloud SQL: registry activo y
+único grant `efeonce_admin → administracion.globe_credits` con `granted=true`.
 
-Focal local verde: 22 tests, ESLint focal, typecheck y diff check. No se desplegó, aplicó migration ni resolvió
-la issue Sentry: primero promover código a todos los runtimes con catálogo compartido; después aplicar la
-migration y comprobar la fila/grant, renovar o esperar claims (5 min) y revisar Sentry durante 7–14 días. GCP
-CLI y ADC ya están renovados y alineados para `efeonce-group`; el intento de consulta llegó al proxy de Cloud SQL,
-pero el perfil local no declara `GREENHOUSE_POSTGRES_OPS_USER`/`ADMIN_USER`, por lo que no se consultó la fila ni
-se improvisó una credencial. La API Sentry local continúa devolviendo 403 por scope. ISSUE-151 permanece abierta y
-contiene la evidencia/plan exactos.
+Se cerró además el falso positivo `JAVASCRIPT-NEXTJS-4S`: el `ops-worker` compartido consultaba el portal staging,
+que responde 302 por su SSO; quedó apuntando al portal público. Dos ejecuciones consecutivas de
+`ops-identity-auth-smoke` pasaron 5/5, incluido `portal_auth_health`, y la health pública devolvió `ready`. 8W no
+recibió eventos tras el rollout. Los dos tickets remotos siguen *unresolved* sólo porque la sesión de Sentry no está
+autenticada y el token API disponible es read-only (403 al resolver); hace falta una sesión/token con escritura para
+marcarlos en Sentry. El artefacto interno vive en `docs/issues/resolved/ISSUE-151-…`.
 
 ### TASK-1378 CERRADA + ISSUE-150 RESUELTA — scanner LIVE en producción, verificado en 3 capas (2026-08-12 06:10Z)
 
