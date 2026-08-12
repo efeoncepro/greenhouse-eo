@@ -16,7 +16,12 @@ import SeoPrimaryMetric from '@/components/growth/seo/SeoPrimaryMetric'
 import { SignalStrip } from '@/components/greenhouse/primitives'
 import { GH_GROWTH_SEO_CLIENT } from '@/lib/copy/growth'
 import type { ReportArtifactModel } from '@/components/growth/ai-visibility/report-artifact/model'
-import { resolveCoverageTone, resolveOpportunityTone, resolvePositionTone } from '@/lib/growth/seo/client/resolve-seo-metric-signal'
+import {
+  resolveCoverageTone,
+  resolveOpportunityTone,
+  resolvePositionTone,
+  resolveSeoLeadTitle
+} from '@/lib/growth/seo/client/resolve-seo-metric-signal'
 import useReducedMotion from '@/hooks/useReducedMotion'
 import { motion } from '@/libs/FramerMotion'
 
@@ -128,11 +133,11 @@ const SeoReportArtifact = ({ model }: SeoReportArtifactProps) => {
             borderTopWidth: 3,
             borderTopColor: 'primary.main',
             backgroundColor: alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.08 : 0.018),
-            boxShadow: theme.greenhouseElevation.raised.boxShadow,
-            transition: theme.transitions.create(['box-shadow', 'transform'], { duration: theme.transitions.duration.shorter }),
-            '@media (prefers-reduced-motion: no-preference)': {
-              '&:hover': { boxShadow: theme.greenhouseElevation.floating.boxShadow, transform: 'translateY(-2px)' }
-            }
+            // Sin hover lift: el informe es un entregable que se lee y se reenvía, no un
+            // control. Levantar la superficie al pasar el mouse promete una acción que no
+            // existe (auditoría premium §6 "Motion objetivo": el hover resalta fila, serie
+            // o link — nunca eleva cards).
+            boxShadow: theme.greenhouseElevation.raised.boxShadow
           })}
         >
           <CardContent>
@@ -141,7 +146,7 @@ const SeoReportArtifact = ({ model }: SeoReportArtifactProps) => {
                 {GH_GROWTH_SEO_CLIENT.report.eyebrow}
               </Typography>
               <Typography variant='h4' component='h2'>
-                {GH_GROWTH_SEO_CLIENT.summary.leadTitle}
+                {resolveSeoLeadTitle(seo.summary.positionAverage)}
               </Typography>
               <SeoPrimaryMetric
                 label={GH_GROWTH_SEO_CLIENT.report.metricPosition}
