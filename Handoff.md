@@ -2,6 +2,13 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+### TASK-1689 — emails transaccionales del ciclo de Hiring (en ejecución, 2026-08-12)
+
+En `in-progress` sobre `develop` (checkout compartido, sin worktrees). Objetivo: 6 emails sobre eventos hiring ya
+emitidos (aviso interno a People + acuse, test asignado, avance de etapa, decisión selected/rejected) vía
+consumers reactivos en ops-worker + plataforma email canónica, flag `HIRING_LIFECYCLE_EMAILS_ENABLED` default
+OFF. Ejecuta esta sesión Claude; sigue TASK-1688 al cierre.
+
 ### ISSUE-151 — dos alertas Sentry investigadas; corrección local lista, rollout pendiente (2026-08-12)
 
 **JAVASCRIPT-NEXTJS-8W no es un defecto de Careers:** `Error invoking postMessage: Java object is gone`
