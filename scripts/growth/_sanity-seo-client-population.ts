@@ -85,6 +85,29 @@ const main = async () => {
     console.log(`${row.organization_id} · dias=${row.days} · ultimo=${row.last_capture}`)
   }
 
+  // `greenhouse_serving.session_360` es la proyección canónica de sesión: ya cruza usuario ↔
+  // organización, que es justo el mapeo que no vive en `client_users`/`clients`/`organizations`.
+  const sessionUsers = await runGreenhousePostgresQuery<{
+    email: string
+    organization_id: string
+    tenant_type: string
+    active: boolean
+  }>(
+    `SELECT email, organization_id, tenant_type, active
+       FROM greenhouse_serving.session_360
+      WHERE organization_id IN (
+        SELECT DISTINCT organization_id FROM greenhouse_growth.seo_targets WHERE status = 'active'
+      )
+      ORDER BY organization_id, tenant_type, email`,
+    []
+  )
+
+  console.log('\n--- usuarios de orgs con SEO (session_360) ---')
+
+  for (const row of sessionUsers) {
+    console.log(`${row.organization_id} · ${row.tenant_type} · ${row.email} · active=${row.active}`)
+  }
+
   const linkColumns = await runGreenhousePostgresQuery<{ table_schema: string; table_name: string; column_name: string }>(
     `SELECT table_schema, table_name, column_name
        FROM information_schema.columns
@@ -100,12 +123,12 @@ const main = async () => {
     console.log(`${row.table_schema}.${row.table_name}.${row.column_name}`)
   }
 
-  // El mapeo organización↔cliente NO está en estas dos tablas: `client_users` enlaza por
-  // `client_id`, y ni `greenhouse_core.clients` ni `greenhouse_core.organizations` exponen la FK
-  // del otro. Queda como pendiente para emitir una sesión de cliente de la organización
-  // contratada (ver TASK-1310, Delta 2026-08-12); la introspección de arriba es el punto de
-  // partida para quien lo retome.
-
+  // Por qué la introspección de arriba está acá: buscar el usuario cliente de una organización
+  // en `client_users`/`clients`/`organizations` es un callejón sin salida — `client_users` enlaza
+  // por `client_id` y ninguna de las otras dos expone la FK del otro lado. El mapeo vive en
+  // `greenhouse_serving.session_360`, que es donde el runtime mismo lo resuelve
+  // (`identity-store.ts`). Con eso se emite la sesión de agente para verificar una superficie
+  // client-gated (ver TASK-1310).
 }
 
 main()

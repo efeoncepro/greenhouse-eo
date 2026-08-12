@@ -52,7 +52,7 @@ export const scenario: CaptureScenario = {
       probes: [
         {
           name: 'report-action-focus',
-          startSelector: 'button:has-text("Descargar informe")',
+          startSelector: '[data-capture="seo-report-print-trigger"]',
           keys: ['Tab'],
           requireVisibleFocusRing: true
         }
@@ -79,7 +79,7 @@ export const scenario: CaptureScenario = {
     { kind: 'wait', selector: '[data-capture="seo-client-report"] canvas', timeout: 15000 },
     { kind: 'sleep', ms: 1200 },
     { kind: 'mark', label: 'web', clipSelector: '[data-capture="seo-client-report"]', note: 'Trust Report Artifact web con veredicto, KPIs, quadrant y evolución' },
-    { kind: 'click', selector: 'button:has-text("Descargar informe")' },
+    { kind: 'click', selector: '[data-capture="seo-report-print-trigger"]' },
     { kind: 'sleep', ms: 300 },
     { kind: 'mark', label: 'print-triggered', clipSelector: '[data-capture="seo-client-report"]', note: 'La acción de salida queda disponible sin duplicar el modelo de datos' }
   ]

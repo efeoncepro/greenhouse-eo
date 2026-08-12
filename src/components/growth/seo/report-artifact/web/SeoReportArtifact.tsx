@@ -92,6 +92,10 @@ const SeoReportArtifact = ({ model }: SeoReportArtifactProps) => {
             <Button
               variant='outlined'
               size='small'
+              // Hook estable para GVC: el label de este botón cambió con la auditoría premium
+              // ("Descargar informe" → el nombre real del comportamiento) y los scenarios que lo
+              // buscaban por texto quedaron rotos. La captura se ata al marker, no a la copy.
+              data-capture='seo-report-print-trigger'
               startIcon={<i className='tabler-printer' aria-hidden='true' />}
               onClick={() => window.print()}
               sx={theme => ({
