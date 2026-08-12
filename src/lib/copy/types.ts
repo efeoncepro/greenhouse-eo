@@ -403,6 +403,10 @@ export interface HiringDeskCopy {
     match: string
     nextStep: string
     source: string
+    phoneLabel: string
+    residenceCountryLabel: string
+    notProvided: string
+    candidateMessageTitle: string
     assessmentTitle: string
     assessmentPending: string
     assignAssessment: string
@@ -651,6 +655,7 @@ export interface CareersCopy {
       firstName: string
       lastName: string
       email: string
+      residenceCountry: string
       phone: string
       portfolio: string
       linkedin: string
@@ -659,6 +664,7 @@ export interface CareersCopy {
     }
     placeholders: {
       email: string
+      residenceCountry: string
       phone: string
       portfolio: string
       linkedin: string
@@ -694,6 +700,7 @@ export interface CareersCopy {
       pendingTitle: string
     }
     phoneCountryAria: string
+    residenceCountryHelp: string
     submit: string
     submitting: string
     successTitle: string
@@ -705,6 +712,7 @@ export interface CareersCopy {
       lastName: string
       emailRequired: string
       emailInvalid: string
+      residenceCountryRequired: string
       phoneInvalid: string
       urlInvalid: string
       consent: string

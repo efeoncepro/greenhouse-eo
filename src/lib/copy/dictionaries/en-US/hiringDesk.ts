@@ -34,6 +34,10 @@ export const hiringDesk: HiringDeskCopy = {
   application: {
     ...esCL.application,
     back: 'Back',
+    phoneLabel: 'Phone',
+    residenceCountryLabel: 'Country of residence',
+    notProvided: 'Not provided',
+    candidateMessageTitle: 'Candidate message',
     overview: 'Overview',
     assessment: 'Assessment',
     documents: 'Documents',

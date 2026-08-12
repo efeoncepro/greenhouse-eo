@@ -1,5 +1,6 @@
 import { EFEONCE_URL_HTTPS } from '@/config/efeonce-brand'
 import type { CareersCopy, Locale } from '@/lib/copy'
+import { COUNTRIES_SORTED } from '@/lib/locale/countries'
 import type { CareersOpeningViewModel } from '@/lib/hiring/public-careers/view-model'
 import type { RenderContract } from '@/growth-forms-renderer/contract'
 import { RENDERER_CONTRACT_VERSION } from '@/growth-forms-renderer/version'
@@ -86,6 +87,19 @@ export const buildCareersApplicationFormContract = ({
       maxLength: 200,
     },
     {
+      // TASK-1688 — país de residencia AUTODECLARADO (requerido). Select textual desde el
+      // SSOT src/lib/locale/countries.ts; NUNCA se deduce del prefijo telefónico.
+      key: 'residenceCountryCode',
+      type: 'select',
+      label: copy.apply.fields.residenceCountry,
+      placeholder: copy.apply.placeholders.residenceCountry,
+      required: true,
+      dataClass: 'contact_pii',
+      presentation: { icon: 'globe' },
+      options: COUNTRIES_SORTED.map(country => ({ value: country.code, label: country.name })),
+      maxLength: 2,
+    },
+    {
       key: 'phone',
       type: 'tel',
       label: copy.apply.fields.phone,
@@ -163,6 +177,8 @@ export const buildCareersApplicationFormContract = ({
     submit: copy.apply.submit,
     successTitle: copy.apply.successTitle,
     successBody: copy.apply.successBody,
+    // TASK-1688 — ayuda del país (el renderer la lee como `<key>.help`).
+    'residenceCountryCode.help': copy.apply.residenceCountryHelp,
   },
   consent: {
     consentPolicyVersion: 'efeonce-careers-2026-07',
