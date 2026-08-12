@@ -2,6 +2,22 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+### CIERRE END-TO-END TASK-1688/1689 — segundo release del día, cero pendientes (2026-08-12)
+
+Release `950f5bdb4` (PR #191) → manifest `950f5bdb4043-71cc7e1a-…` en **`released`** (run `31639297861`, sin
+bypass: batch sin migraciones). Cierra TODO lo que quedaba: **flip expand→contract** del país (requerido en
+parser; verificado en staging con POST sin país → `invalid`), país en «01 Tus datos» del form nativo, **fix del
+select premium** (placeholder real — mostraba la primera opción como elegida con valor vacío), **email
+`selected` ejercitado live** (supersede controlado sobre EO-APP-0090, `sent`; re-decidida rejected), **scorecard
+GVC PASS** (avg 4.6, capturas 1440+390 de ambas superficies), **revisión de privacidad documentada**
+(`docs/operations/hiring/2026-08-12-revision-privacidad-contacto-careers.md`; 2 recomendaciones no bloqueantes:
+completitud del aviso público en efeoncepro.com/privacy + purga del mensaje en la política de retención) y fila
+del flag movida a §Snapshot (los 6 tipos con evidencia live). **Hallazgo de CI:** el run de `main` quedó rojo con
+10.582 tests verdes por un flake pre-existente (timer del email-verify del renderer dispara post-teardown sin el
+global `CSS` → unhandled rejection); rerun verde + guard commiteado en develop (`a349d0088`, viaja en el próximo
+release). `ops-worker` en `63625ccdd` = residual change-gated (diff runtime 0). Único follow-up humano restante:
+las 2 recomendaciones de la revisión de privacidad.
+
 ### ROLLOUT COMPLETO TASK-1688/1689 — emails de hiring LIVE + contacto Careers en producción (2026-08-12)
 
 Release `393144e9f` (PR #190) → manifest `393144e9fb3b-8d17b9bc-…` en **`released`** (run `31593198609`,
@@ -368,34 +384,3 @@ Lo que **NO** decidí por ti:
    avance del epic se ve más chico de lo que es. Reasignarlas es trivial pero cambia métricas.
 3. **`/api/client-portal/*` no está en `GREENHOUSE_API_REFERENCE_V1.md`.** Documentarlo ahí depende de
    si esa referencia pretende ser exhaustiva o sólo cubrir las lanes de plataforma.
-
-### Release 2026-08-09 (2.º del día) — el carril del portal cliente cerrado y VERIFICADO EN PRODUCCIÓN
-
-Manifest `ee0d568b8614-1ff03476-6a82-4e03-8dfc-2d49e3c30ce3` en `released`, run `31343569815`, target
-`ee0d568b86140d92224f9fdcad75cd6e1a6dcae4`, PR #186. Watchdog `drift_count=0`. **Sin bypass**: el batch
-policy dio `ship` (cero migraciones).
-
-**Lo que necesita quien siga:**
-
-1. ✅ **La verificación que dos releases dejaron pendiente está HECHA, en producción.** 9 rutas × 3
-   personas con sesión real contra `greenhouse.efeoncepro.com`: las 3 base sirven `200`, las 6
-   module-gated redirigen a `/home?denied=<slug>`, cero `?error=resolver_unavailable`, y `/proyectos`
-   sirve `200` al operador interno donde antes daba `/401`.
-2. 🔴 **`agent-session` SÍ funciona en producción — y yo dije lo contrario toda la sesión.**
-   `AGENT_AUTH_ALLOW_PRODUCTION` está seteada en Production desde hace ~90 días. Lo repetí tomándolo de
-   una nota de este mismo Handoff, sin verificarlo, y por eso declaré como "pendiente del operador" una
-   verificación que podía hacer yo. **La regla: una afirmación sobre runtime se verifica contra el
-   runtime.** Postura de seguridad abierta en `TASK-1684` (P2): la credencial de las personas agente
-   vive escrita en `CLAUDE.md`, así que endpoint + credencial documentada alcanzan para operar
-   producción como superadmin.
-3. **`vercel redeploy` NO arregla un staging `Canceled` por docs-only** — el gotcha #7 lo recomienda y
-   es un consejo incompleto: el redeploy reevalúa el mismo diff y cancela otra vez. La salida es tocar
-   un doc del set `deployControlDocs` de `vercel-ignore-build.mjs` (no cuenta como docs-only y fuerza
-   el build); si de todos modos hay que documentar el release, ese commit produce la evidencia como
-   efecto. Documentado en runbook + ambas skills como gotcha #11.
-4. **El context gate va ÚLTIMO y `docs:closure-check` NO lo reemplaza.** Dejé un run rojo en `develop`
-   (`31340366010`) por correr context-check, después agregar una entrada al changelog, y commitear con
-   closure-check verde. Orden seguro: ediciones documentales → closure-check → context-rotate si hace
-   falta → context-check:strict → commit.
-5. **Contraste útil entre los dos releases de hoy:** el de la mañana necesitó bypass del batch policy y
-   el de la tarde no. La diferencia fue **cero migraciones**, no el tamaño del batch.

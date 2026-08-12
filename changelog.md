@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-12 — El contrato de contacto de Careers quedó cerrado de punta a punta
+
+Segundo release del día (`950f5bdb4`): el país de residencia pasó a ser requerido también en el
+parser (antes sólo la UI lo exigía), el formulario nativo lo muestra en «Tus datos» junto al correo
+—ya no relegado a una sección genérica— y el selector dejó de mostrar la primera opción como si
+estuviera elegida cuando no hay valor. El sexto y último correo del ciclo (seleccionado) se
+ejercitó en vivo, el scorecard visual formal quedó en PASS con capturas de escritorio y móvil, y la
+revisión de privacidad de los tres campos quedó documentada con dos recomendaciones no bloqueantes.
+De paso se cazó un flake real del CI (timer de verificación de email que dispara tras el teardown).
+
 ## 2026-08-12 — Los emails de hiring y el contacto completo de Careers quedaron VIVOS en producción
 
 Rollout completo en una sesión: el flag de los 6 emails del ciclo de contratación quedó prendido en
@@ -1113,18 +1123,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   persistente queda pendiente.
 - Gates: `pnpm local:check`, `pnpm test` (10.064 pass) y `pnpm build` verdes; menú verificado en runtime
   con Playwright (solo Panel/Lateral, switch a Lateral y vuelta con PATCH 200, cero errores de consola).
-
-## 2026-08-04 — Globe: inventario de imagen por ruta para GPT Image 2, Seedream y Nano Banana
-
-- La skill compartida `greenhouse-globe-model-fleet` ahora enlaza cuatro fichas machine-readable de imagen, espejadas
-  para Codex y Claude: GPT Image 2, Seedream 5 Pro, Nano Banana 2 y Nano Banana Pro.
-- “Imagen 2 de ChatGPT” quedó resuelto como OpenAI `gpt-image-2`; Google `imagen-2` no tiene routeId, adapter ni
-  binding en Globe y no se documenta como integración.
-- El runtime auditado conserva identidades separadas: Seedream T2I (`ref/still/rrss-v1`) por Fal está disponible;
-  Seedream Edit (`ref/still/reference-v1`) tiene adapter/provider cableados pero el último reader readback lo devuelve
-  `gated` por binding deshabilitado; Nano Banana Pro usa `gemini-3-pro-image` en `global`; Nano Banana 2 usa
-  `gemini-3.1-flash-image` en `global`; GPT Image 2 usa `openai.gpt-image-2` con `poll`.
-- Las fichas declaran capacidades de proveedor que todavía no son rutas públicas: edición multipart de OpenAI, edición/
-  video-to-image de Nano Banana y Seedream 5 Lite. También conservan como blocker el circuito `not_found` de Nano
-  Banana Pro. No cambió el runtime de Globe, secrets, bindings, rates, deploy ni disponibilidad; el reader sigue siendo
-  la autoridad live.

@@ -1,0 +1,40 @@
+{
+  "task": "TASK-1688",
+  "surface": "Careers apply (nativo Growth Form v4) + Application 360 — bloque de contacto",
+  "date": "2026-08-12",
+  "reviewer": "Claude (sesión de rollout, capturas GVC staging + verificación en producción)",
+  "baseline": "source-led desde TASK-354 (careers-apply-v1) y Application 360 vigente (hiring-application-360-v1); sólo delta contractual, sin rediseño",
+  "evidence": {
+    "captures": [
+      ".captures/2026-08-12T19-11-38_inline-agency-hiring-applications-happ-*/ (Application 360 desktop 1440 — Teléfono/País/Mensaje + 'Datos enmascarados por defecto')",
+      ".captures/2026-08-12T19-12-21_inline-agency-hiring-applications-happ-*/ (Application 360 iPhone 12 390 — apilado, sin overflow)",
+      ".captures/2026-08-12T20-13-15_inline-public-careers-eo-opn-0061-apply/ (form nativo desktop — país en '01 Tus datos' tras email, placeholder 'Selecciona tu país', ayuda anti-inferencia)",
+      ".captures/2026-08-12T20-13-30_inline-public-careers-eo-opn-0061-apply/ (form nativo iPhone 12 390)"
+    ],
+    "runtime": [
+      "POST staging sin residenceCountryCode → outcome=invalid genérico (parser requerido activo)",
+      "E2E EO-APP-0090: phone_e164/residence_country_code/candidate_message persistidos y visibles en Application 360",
+      "curl producción: campo 'País de residencia' presente en el apply del release 393144e9f"
+    ],
+    "notes": "PII de la evidencia = datos de prueba marcados NO CONTACTAR; email enmascarado en las capturas."
+  },
+  "scores": {
+    "jerarquia_visual": 4.6,
+    "economia_de_superficies": 4.7,
+    "impacto_visual": 4.5,
+    "fidelidad_al_wireframe": 4.8,
+    "resistencia_a_template_generico": 4.5,
+    "estados_y_accesibilidad": 4.5,
+    "responsive_390": 4.6
+  },
+  "average": 4.6,
+  "floor": 4.5,
+  "verdict": "PASS",
+  "findings": [
+    "Resuelto en esta sesión: el país caía en la sección fallback 'Datos adicionales' del form nativo — ahora vive en '01 Tus datos' tras email (paridad con el wireframe).",
+    "Resuelto en esta sesión: el select premium mostraba la primera opción como si estuviera elegida con valor vacío — ahora muestra el placeholder real.",
+    "Sin overflow horizontal en 1440 ni 390 en las cuatro capturas; labels visibles; ayuda del país nunca depende de tooltip.",
+    "El prefijo telefónico permanece independiente del país de residencia (verificado en captura y en parser)."
+  ],
+  "known_debt": []
+}
