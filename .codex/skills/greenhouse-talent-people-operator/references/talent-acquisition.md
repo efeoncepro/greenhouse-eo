@@ -58,6 +58,10 @@ The public offer is a conversion asset, not the internal job brief. After intake
 - compensation/location transparency;
 - nurture path through Talent Pool/Growth Forms when the candidate is not a fit today.
 
+### Distribución externa en grupos
+
+La vacante ya publicada puede distribuirse como activo de inbound recruiting, pero esa distribución no reemplaza la publicación canónica de Hiring ni crea una fuente de verdad paralela. Antes de publicar en un grupo, valida detalle y apply URL públicos, usa solo copy candidato-facing aprobado y obtiene confirmación humana para el lote. Publica únicamente en grupos a los que el operador ya pertenece —salvo autorización expresa para unirse—, respeta sus reglas y registra cada resultado como `visible`, `enviada a aprobación`, `sin editor` o `no verificable`. Nunca reintentes un envío ambiguo sin buscar primero el texto exacto; tampoco forces una carga de imagen. El procedimiento operativo está en `social-media-studio/efeonce/facebook-vacancy-distribution.md`; el manual de Careers conserva el vínculo con el opening.
+
 ### Head hunting / executive search (outbound for senior + scarce)
 
 For senior, scarce, or confidential roles, inbound is not enough — you hunt.

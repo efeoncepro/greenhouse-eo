@@ -140,6 +140,20 @@ Si un agente no tiene sesion/capability para llamar la API, no debe saltar a SQL
 debe usar el command server-side canonico de Hiring en contexto autenticado o
 pedir la ejecucion a un operador con permisos.
 
+## Difundir una vacante publicada
+
+La distribución en redes o grupos externos ocurre **después** de publicar y verificar el opening en Careers. No crea otro opening ni cambia el estado de Hiring.
+
+1. Abre el detalle y el apply de la vacante pública y confirma que ambos cargan.
+2. Usa solamente el copy candidato-facing aprobado y el apply URL de ese opening. No copies budget, rate bands, notas internas ni datos de candidatos.
+3. Selecciona grupos/canales autorizados y afines al rol. Para Facebook, usa solo grupos a los que el operador ya pertenece, salvo autorización explícita para unirse a otros; respeta sus reglas.
+4. Obtén confirmación humana antes de publicar el lote. Publica una oferta por vez y espera el resultado antes de navegar a otro destino.
+5. Registra cada resultado como `visible`, `enviada a aprobación`, `sin editor` o `no verificable`. Una solicitud de moderación no es una publicación visible.
+6. Si el estado queda ambiguo, vuelve a buscar el texto exacto en el grupo antes de reintentar. No dupliques avisos por un timeout o una interfaz lenta.
+7. Adjunta una imagen solo si el mecanismo de carga funciona; no fuerces ni eludas el selector de archivos. Publica sin imagen únicamente con autorización explícita y deja la decisión registrada.
+
+Conserva el registro de campaña bajo `docs/operations/hiring/` con opening, URL, copy aprobado, destinos, estado observado y moderaciones pendientes. Ejemplo: [distribución de Facebook del 2026-08-11](../../operations/hiring/2026-08-11-facebook-vacancy-distribution.md).
+
 ## Verificar rutas
 
 1. Abre `/public/careers`.
@@ -276,6 +290,21 @@ Si el Banco de Talento usa Growth Forms, debe tener `formKind`/slug/version
 propios y destination/submit contract documentado. Si se decide escribir directo
 en Hiring, debe crear o reconciliar Person + `candidate_facet` como talento
 general, no esconder leads en una tabla auxiliar ni en un webhook unico.
+
+## Datos de contacto en el formulario (TASK-1688)
+
+El apply pide país de residencia (obligatorio, select con nombre textual — sin banderas como
+único significado), teléfono opcional con prefijo sólo para formato, y mensaje opcional. Reglas
+al operar/verificar:
+
+- El país es autodeclarado: cambiar el prefijo del teléfono NO cambia el país y viceversa.
+- Si un candidato reporta que "el formulario no acepta su país", verificar que el select cargó
+  (catálogo ISO completo) antes de asumir bug de validación.
+- Los valores llegan a la Postulación 360 (`/agency/hiring/applications/[id]`); las
+  postulaciones anteriores a 2026-08-12 muestran "No informado" y eso es correcto — no se
+  backfillea.
+- El mismo contrato aplica al Growth Form nativo: si un campo aparece en una superficie y no en
+  la otra, es un bug de paridad (reportar como issue).
 
 ## Smoke E2E recomendado
 

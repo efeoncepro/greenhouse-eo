@@ -571,3 +571,45 @@ export const assertAssessmentMethod = (method: string): AssessmentMethod => {
   
 return method as AssessmentMethod
 }
+
+// ── TASK-1689 — Re-emisión del token para el email de "evaluación asignada" ──
+
+/**
+ * Rota el token de acceso de un candidate_test para que el consumer reactivo de email
+ * (`hiring_assessment_assigned_email`) pueda construir el link público SIN que el token
+ * viaje por el outbox (el outbox sincroniza a BigQuery: un token crudo ahí sería un leak).
+ *
+ * Sólo rota cuando el candidato AÚN no comenzó (`assigned`/`sent`): un test `in_progress`,
+ * `submitted` o `expired` devuelve null y el consumer hace skip honesto. Marca `sent`.
+ * El consumer DEBE chequear su dedupe (wasEmailAlreadySent) ANTES de llamar acá — rotar
+ * después de un envío exitoso invalidaría el link ya entregado.
+ */
+export const reissueCandidateTestTokenForEmail = async (
+  assessmentId: string,
+): Promise<{ token: string; timeLimitMinutes: number | null; tokenTtlDays: number } | null> => {
+  const rawToken = randomBytes(24).toString('base64url')
+
+  return withGreenhousePostgresTransaction(async (client) => {
+    const rows = await runQuery<{ assessment_id: string; time_limit_minutes: number | string | null }>(
+      client,
+      `UPDATE greenhouse_hiring.hiring_assessment
+       SET access_token_hash = $2,
+           token_expires_at = NOW() + make_interval(days => ${TOKEN_TTL_DAYS}),
+           status = 'sent',
+           updated_at = NOW()
+       WHERE assessment_id = $1 AND method = 'candidate_test' AND status IN ('assigned', 'sent')
+       RETURNING assessment_id, time_limit_minutes`,
+      [assessmentId, hashToken(rawToken)],
+    )
+
+    if (!rows[0]) return null
+
+    const rawLimit = rows[0].time_limit_minutes
+
+    return {
+      token: rawToken,
+      timeLimitMinutes: rawLimit == null ? null : Number(rawLimit),
+      tokenTtlDays: TOKEN_TTL_DAYS,
+    }
+  })
+}

@@ -1,8 +1,8 @@
-# Invariantes operativos para agentes — Integraciones/infra cross-runtime (TASK-490…846)
+# Invariantes operativos para agentes — Integraciones/infra cross-runtime (TASK-490…1378)
 
 ---
 
-## Invariantes operativos para agentes — Integraciones/infra cross-runtime (TASK-490…846)
+## Invariantes operativos para agentes — Integraciones/infra cross-runtime (TASK-490…1378)
 
 > **Relocados de `CLAUDE.md` por TASK-1160 (2026-06-16), verbatim — cero cambio semántico.** Espejo operativo de signature platform, sample-sprint outbound, cross-runtime observability (Sentry init), PostgreSQL connection pooling, HubSpot companies inbound. Contrato por sub-área en sus specs/task-specs (citadas en cada bloque). Dedup = TASK-1160 Slice 4.
 
@@ -263,3 +263,18 @@ Los 3 hacen UPSERT idempotente por `hubspot_company_id`. Si convergen al mismo c
 **Tests**: `pnpm test src/lib/webhooks/handlers/hubspot-companies` (6 tests cubren signature validation, timestamp expiry, dedup, partial failures, retry semantics).
 
 **Spec canónica**: `docs/architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md` (sección HubSpot inbound).
+
+### ID tokens OIDC hacia Cloud Run IAM-protegido — plan de credencial por runtime (TASK-1378 / ISSUE-150, desde 2026-08-12)
+
+Todo consumer que llama un Cloud Run desplegado con `--no-allow-unauthenticated` (hoy: el adapter `clamav-http` del escáner de malware; mañana: cualquier worker IAM-only invocado desde Vercel) acuña su ID token vía `fetchGoogleIdTokenForAudience` (`src/lib/google-credentials.ts`). La elección de rama de credencial vive en `getGoogleIdTokenProviderPlan(env)` (exportado, testeable sin red), alineado con `getGoogleCredentialSource`, con **4 planes**: `wif` → `service_account_key` → `ambient_impersonated` → `ambient_adc`.
+
+**Contexto root cause** (ISSUE-150, 2026-08-11): el flip de `ASSET_MALWARE_SCAN_ENABLED` en Production falló dos veces. Producción corre `GCP_AUTH_PREFERENCE=service_account_key` (postura transicional, TASK-800) y el resolver de ID tokens no tenía rama de service account key — caía a impersonación ambiente, que exige ADC (inexistente en Vercel) → excepción en ~21 ms → fail-closed `scanner_auth_failed` bloqueando CVs reales. Staging no lo mostró porque sin la preferencia usa la rama WIF. Fix en main (release `a90951dba`): la rama `service_account_key` usa `createGoogleAuth({ env }).getIdTokenClient(audience)` — la key firma su propio JWT con `target_audience`, sin ADC ni impersonación.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** asumir que la rama WIF cubre producción. Producción corre `GCP_AUTH_PREFERENCE=service_account_key` hasta que TASK-800 complete el cutover; staging sin la preferencia usa WIF. Una prueba de credencial vale SOLO para la rama de credencial que ejercita: si los environments difieren en `GCP_AUTH_PREFERENCE` (o cualquier selector de source), el gate de staging NO cubre producción.
+- **NUNCA** agregar un consumer nuevo de ID tokens (ni prender un flag que dependa de uno) sin verificarlo desde el runtime destino. El patrón canónico es un endpoint de diagnóstico que acuña el token EN el runtime donde corre y reporta plan + mint + probe sin exponer el token crudo — referencia: `GET /api/internal/health/scanner-auth` (`src/app/api/internal/health/scanner-auth/route.ts`; guard `?key=CRON_SECRET` o tenant agency autenticado; `?probe=scan` hace un POST real contra el servicio). Caso fuente: ISSUE-150.
+- **NUNCA** re-implementar el mint de ID tokens por consumer (fetch manual del metadata server, JWT hand-rolled, SDK paralelo). El primitive canónico es `fetchGoogleIdTokenForAudience`; extenderlo, no rodearlo.
+- **SIEMPRE** que se agregue una fuente de credencial nueva al módulo (`getGoogleCredentialSource`), cubrir las 4 ramas del plan en `getGoogleIdTokenProviderPlan` + sus tests sin red en el mismo PR. Una fuente que existe para access tokens pero no para ID tokens reproduce exactamente el bug class de ISSUE-150.
+
+**Spec canónica**: `docs/tasks/complete/TASK-1378-clamav-malware-scanner-provisioning-decision.md`. Incidente fuente: `docs/issues/resolved/ISSUE-150-production-flag-enabled-for-code-only-on-develop.md`. Consumer de referencia: `src/lib/storage/asset-scan/clamav-http.ts` + `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-08-12.

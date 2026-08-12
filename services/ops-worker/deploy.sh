@@ -96,7 +96,6 @@ if [ "${ENV}" = "production" ]; then
   DEFAULT_GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF="greenhouse-integration-api-token"
   DEFAULT_NUBOX_BEARER_TOKEN_SECRET_REF="greenhouse-nubox-bearer-token-production"
   DEFAULT_NUBOX_X_API_KEY_SECRET_REF="greenhouse-nubox-x-api-key-production"
-  DEFAULT_GREENHOUSE_PORTAL_BASE_URL="https://greenhouse.efeoncepro.com"
   DEFAULT_AZURE_AD_CLIENT_SECRET_REF="greenhouse-azure-ad-client-secret-production:latest"
   echo "=== PRODUCTION deployment ==="
 else
@@ -107,10 +106,14 @@ else
   DEFAULT_GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF="greenhouse-integration-api-token"
   DEFAULT_NUBOX_BEARER_TOKEN_SECRET_REF="greenhouse-nubox-bearer-token-staging"
   DEFAULT_NUBOX_X_API_KEY_SECRET_REF="greenhouse-nubox-x-api-key-staging"
-  DEFAULT_GREENHOUSE_PORTAL_BASE_URL="https://dev-greenhouse.efeoncepro.com"
   DEFAULT_AZURE_AD_CLIENT_SECRET_REF="greenhouse-azure-ad-client-secret-staging:latest"
   echo "=== STAGING deployment ==="
 fi
+
+# ops-worker is a shared runtime for staging and production. Its identity smoke
+# must probe the public production domain: staging is protected by Vercel SSO
+# and would turn every successful staging deploy into a false Sentry failure.
+DEFAULT_GREENHOUSE_PORTAL_BASE_URL="https://greenhouse.efeoncepro.com"
 
 NEXTAUTH_SECRET_REF="${NEXTAUTH_SECRET_REF:-${DEFAULT_NEXTAUTH_SECRET_REF}}"
 PG_PASSWORD_REF="${PG_PASSWORD_REF:-${DEFAULT_PG_PASSWORD_REF}}"
@@ -387,6 +390,23 @@ ensure_secret_accessor_binding "${NOTION_KNOWLEDGE_TOKEN_SECRET_REF}:latest"
 # Rollback (<5min): `gcloud run services update ops-worker --update-env-vars GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED=false`.
 GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED="${GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED=${GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED}"
+
+# TASK-1689 — Emails transaccionales del ciclo de Hiring. Los 4 consumers reactivos
+# (hiring_application_created_emails / hiring_assessment_assigned_email /
+# hiring_stage_changed_email / hiring_application_decided_email, lane
+# ops-reactive-notifications) leen el flag SOLO acá — prenderlo en Vercel no hace nada.
+# Default OFF hasta ejercicio end-to-end en staging + revisión humana de Talent del copy
+# (especialmente hiring_decision_rejected, pausable aparte en email_type_config).
+# Declarativo acá para que `--set-env-vars` (destructivo) NO lo borre en cada redeploy.
+# Prendido 2026-08-12 (rollout autorizado por el operador tras la revisión de copy; ejercicio E2E
+# en staging en la misma sesión). Rollback (<5min):
+# `gcloud run services update ops-worker --update-env-vars HIRING_LIFECYCLE_EMAILS_ENABLED=false`.
+HIRING_LIFECYCLE_EMAILS_ENABLED="${HIRING_LIFECYCLE_EMAILS_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},HIRING_LIFECYCLE_EMAILS_ENABLED=${HIRING_LIFECYCLE_EMAILS_ENABLED}"
+
+# Buzón interno de People para el aviso de postulación nueva (configurable; default en código).
+HIRING_INTERNAL_NOTIFICATIONS_EMAIL="${HIRING_INTERNAL_NOTIFICATIONS_EMAIL:-people@efeoncepro.com}"
+ENV_VARS="${ENV_VARS},HIRING_INTERNAL_NOTIFICATIONS_EMAIL=${HIRING_INTERNAL_NOTIFICATIONS_EMAIL}"
 
 if [ -n "${RESEND_API_KEY_SECRET_REF}" ]; then
   ENV_VARS="${ENV_VARS},RESEND_API_KEY_SECRET_REF=${RESEND_API_KEY_SECRET_REF}"

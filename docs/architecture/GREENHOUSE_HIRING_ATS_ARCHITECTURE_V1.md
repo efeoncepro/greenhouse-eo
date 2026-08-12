@@ -20,6 +20,72 @@ Este documento fija:
 - Domain: `agency` + `people` + `hris` + `staff augmentation` + `finance` + `capacity`
 - Date: `2026-04-11`
 
+## Delta 2026-08-12 — TASK-1688 (ADR): completitud de contacto del candidato — ubicación física y contrato
+
+**Decisión (Accepted 2026-08-12).** Los tres datos que el apply público aceptaba pero el command
+descartaba quedan persistidos así:
+
+| Dato | Ubicación física | Semántica |
+|---|---|---|
+| Teléfono | `greenhouse_hiring.candidate_facet.phone_e164` (TEXT NULL) | Contacto durable **person-first**, normalizado E.164; opcional |
+| País de residencia | `greenhouse_hiring.candidate_facet.residence_country_code` (TEXT NULL, CHECK `^[A-Z]{2}$`) | **Autodeclarado** ISO 3166-1 alpha-2; requerido en UI para postulaciones nuevas; NULL = legacy "No informado" |
+| Mensaje | `greenhouse_hiring.hiring_application.candidate_message` (TEXT NULL, CHECK ≤4000) | Contexto de **esa** postulación; nunca se copia al facet |
+
+**Alternativas rechazadas:** inferir país desde prefijo telefónico/IP/CV (dato insuficiente y
+engañoso — prohibido); guardar todo en la aplicación (el contacto es de la persona, no de una
+postulación); backfill de filas históricas (imposible de forma fiable; se muestra "No informado").
+
+**Invariantes:**
+
+- **Un solo parser/command** para ambas entradas: `parsePublicHiringApplication` →
+  `submitPublicHiringApplication`. Careers estándar y el native Growth Form (projection TASK-1372)
+  consumen exactamente el mismo contrato; no existe write path alterno.
+- **Expand/contract del país:** la UI lo exige (`required`); el parser lo acepta
+  opcional-pero-validado contra el SSOT `src/lib/locale/countries.ts` (sin truncación — `'Chile'`
+  truncado daría `'CH'`=Suiza; longitud ≠ 2 → rechazo). El flip a requerido-en-parser es un paso
+  de rollout explícito tras verificar ambas superficies en producción.
+- **El país de residencia puede servir como hint de formato local del teléfono, NUNCA al revés**
+  (residencia jamás se infiere del prefijo).
+- **Anti-wipe:** el upsert del facet usa `COALESCE(EXCLUDED.x, existente)` — una entrada opcional
+  omitida nunca borra un valor previo de la misma persona.
+- **PII interna:** los tres campos se leen sólo en Application 360 (gate `hiring.application.read`
+  existente); el teléfono se muestra completo ahí (la finalidad es operar el contacto; el email
+  conserva su máscara actual). Nunca aparecen en `PublicOpeningPayload`, clientes, analítica ni logs.
+- Sin flag nuevo: es corrección contractual del intake ya gateado por
+  `HIRING_PUBLIC_APPLICATIONS_ENABLED`.
+
+## Delta 2026-08-12 — TASK-1689: emails transaccionales del ciclo de vida (consumers reactivos)
+
+Los 4 eventos del pipeline que ya se emitían como audit ahora tienen consumers de email en el
+**ops-worker** (domain `notifications`, lane `ops-reactive-notifications`), detrás de
+`HIRING_LIFECYCLE_EMAILS_ENABLED` (default OFF, vive SOLO en el worker) + kill-switch por tipo en
+`greenhouse_notifications.email_type_config` (seed aplicado; `hiring_decision_rejected` pausable
+independiente):
+
+| Evento | Consumer | Email |
+|---|---|---|
+| `hiring.application.created` | `hiring_application_created_emails` | aviso interno a People (buzón `HIRING_INTERNAL_NOTIFICATIONS_EMAIL`, default `people@efeoncepro.com`) + acuse al candidato |
+| `hiring.assessment.assigned` | `hiring_assessment_assigned_email` | link de evaluación al candidato — SOLO `method=candidate_test` (un scorecard de entrevistador JAMÁS emailea al candidato) |
+| `hiring.application.stage_changed` | `hiring_stage_changed_email` | avance de etapa — SOLO allowlist candidate-facing (`shortlisted`→"Preselección", `interview`→"Entrevista"); etapas internas nunca llegan a copy |
+| `hiring.application.decided` | `hiring_application_decided_email` | `selected` (felicitación) / `rejected` (agradecimiento); anti-stale: re-verifica la decisión vigente en PG antes de enviar |
+
+**Invariantes:**
+
+- La política (flag, buzón interno, allowlist de etapas, resolver de recipient) vive en
+  `src/lib/hiring/notifications/**`; los consumers (`src/lib/sync/projections/hiring-lifecycle-emails.ts`)
+  son thin wrappers. Todo envío pasa por `sendEmail` canónico; dedupe explícito con
+  `wasEmailAlreadySent(eventId, entityId, email)` — un replay del dispatcher nunca re-envía.
+- **El token del candidate_test nunca viaja por el outbox** (sincroniza a BigQuery). El consumer usa
+  `reissueCandidateTestTokenForEmail` (`assessment/instances.ts`): rota hash+expiry y marca `sent`
+  SOLO si el estado sigue en `assigned`/`sent`, y SIEMPRE después del check de dedupe (rotar tras un
+  envío exitoso invalidaría el link entregado). `in_progress`/`submitted`/`expired` → skip honesto.
+- Eventos re-leídos de PG por ID: PII (email/nombre del candidato, título de vacante) se resuelve al
+  consumir; los mensajes del reactive log y las capturas (`captureWithDomain('hiring')`) llevan sólo IDs.
+- Candidate-facing emails envían como **Efeonce** (AGENCY_BRANDED); el aviso interno usa el sender
+  plataforma. Templates en `src/emails/Hiring*.tsx` (es/en; default es).
+- Rollout: ledger `FEATURE_FLAG_STATE_LEDGER.md` §Pendientes — flip exige ejercicio end-to-end en
+  staging + revisión humana de Talent del copy (especialmente el rechazo).
+
 ## Delta 2026-07-16 — TASK-1385: AI-assisted vacancy public copy (propose→confirm)
 
 La redacción del payload público de una vacante ahora tiene asistencia IA gobernada, extendiendo
@@ -129,7 +195,8 @@ escaneo dejó de ser un preventivo y se implementó como remediación, antes que
 - `structural` — magic bytes, coherencia MIME↔contenido, hazards de PDF (`/Launch`, `/EmbeddedFile`, `/RichMedia`,
   `/XFA` bloquean; `/JavaScript` y `/OpenAction` son advisory porque los emiten exportadores legítimos). Corre
   SIEMPRE, in-process, sin infraestructura.
-- `clamav-http` — behind `ASSET_MALWARE_SCAN_ENABLED` (default OFF). Composición, no reemplazo: el peor veredicto gana.
+- `clamav-http` — behind `ASSET_MALWARE_SCAN_ENABLED` (default OFF en código; **ON en staging y producción desde
+  2026-08-12**, ver Delta 2026-08-12). Composición, no reemplazo: el peor veredicto gana.
 
 Lifecycle: `pending → scan → attached | quarantined`. `quarantined` es terminal — los bytes se preservan para triage
 forense, el asset nunca se adjunta y `downloadPrivateAsset` lo rechaza sin importar la capability del actor.
@@ -171,6 +238,7 @@ escalan a error).
 
 El adapter `clamav-http` dejó de ser código latente: existe el servicio Cloud Run `services/clamav/` y el adapter se
 ejerció contra él. **El flag `ASSET_MALWARE_SCAN_ENABLED` sigue OFF en Vercel** — el flip es rollout pendiente.
+*(Superado por el Delta 2026-08-12: el flag está ON en staging y producción.)*
 
 **El puerto de escaneo NO es de Hiring.** `scanAssetBytes` recibe bytes y devuelve un veredicto; no sabe de vacantes.
 Hoy lo consumen `hiring/public-careers/cv-upload.ts` y `growth/forms/file-uploads.ts`, y el guard del attach exige
@@ -201,6 +269,42 @@ Invariantes del servicio (contrato completo en `services/clamav/` + `deploy-cont
   TASK-1367 y ya vienen saneados (`isSafeHttpUrl`, https-only, sin fetch server-side).
 - **NUNCA** borrar documentos de candidatos automáticamente. `retention.ts` detecta y alerta; el borrado de PII de
   personas reales es un comando gobernado con humano en el loop (owner People Ops).
+
+### Delta 2026-08-12 — Scanner LIVE en staging y producción (TASK-1378 cerrada; ISSUE-150 resuelta)
+
+El flip ocurrió: **`ASSET_MALWARE_SCAN_ENABLED=true` en staging Y producción de Vercel desde 2026-08-12**
+(Production desde el redeploy `greenhouse-aivcug5f5`). Toda subida gateada (`hiring_application_cv`,
+`hiring_candidate_portfolio_file`, `proposal_rfp`, `proposal_deliverable`) corre la composición
+`structural + clamav-http` — el peor veredicto gana — contra el servicio Cloud Run único `clamav`
+(us-east4, `min=1`, invoker sólo `greenhouse-portal@`; ver `cloud-infrastructure/CLOUD_RUN.md` §`clamav`).
+
+El flip falló DOS veces el 2026-08-11 (`docs/issues/resolved/ISSUE-150-*`): (1) el código OIDC vivía sólo en
+develop mientras producción sirve main; (2) producción corre `GCP_AUTH_PREFERENCE=service_account_key` (postura
+transicional, TASK-800) y `resolveGoogleIdTokenProvider` (`src/lib/google-credentials.ts`) no tenía rama de
+service account key — caía a impersonación ambiente, que exige ADC (inexistente en Vercel) → excepción en ~21 ms
+→ fail-closed `scanner_auth_failed` bloqueando CVs reales. Staging no lo mostró porque sin la preferencia usa la
+rama WIF: **una prueba de credencial vale sólo para la rama de credencial que ejercita**. Fix en main (release
+`a90951dba`, run 31544667630): el resolver enruta por `getGoogleIdTokenProviderPlan(env)` (exportado, testeable
+sin red) con 4 planes — `wif` → `service_account_key` → `ambient_impersonated` → `ambient_adc` — alineado con
+`getGoogleCredentialSource`; la rama nueva usa `createGoogleAuth({ env }).getIdTokenClient(audience)` (la SA key
+firma su propio JWT, sin ADC ni impersonación).
+
+Endpoint de diagnóstico: **`GET /api/internal/health/scanner-auth`**
+(`src/app/api/internal/health/scanner-auth/route.ts`; guard `?key=CRON_SECRET` o tenant agency autenticado).
+Acuña el ID token **en el runtime donde corre** para la audiencia del scanner y reporta `flagEnabled`,
+`credentialPlan`, `credentialDiagnostics` y `mint{ok,durationMs,claims(aud/azp/email/expiresInSeconds)}` — nunca
+el token crudo. Con `?probe=scan` además hace un POST real de bytes limpios a `<endpoint>/scan` con el token y
+reporta `probe{ok,httpStatus,scanStatus,durationMs}`. No toca el path de uploads ni puede crear cuarentenas.
+
+Verificación de cierre en 3 capas desde el runtime real: (1) diagnóstico pre-flip verde en producción;
+(2) post-flip `flagEnabled=true` + `mint.ok` 94 ms + `probe.ok` 147 ms; (3) postulación de prueba por el
+formulario público real → `asset_scan_results` con `scanner=structural+clamav-http`, `verdict=clean`, asset
+`attached`, 129 ms.
+
+Invariante del bug class (detalle en `agent-invariants/INTEGRATIONS_INFRA_AGENT_INVARIANTS.md` §ID tokens OIDC
+hacia Cloud Run): **NUNCA** prender un flag que dependa de una credencial sin correr el diagnóstico EN cada
+runtime destino — si los environments difieren en `GCP_AUTH_PREFERENCE` (o cualquier selector de source), el
+gate de staging NO cubre producción.
 
 ### Resolver unificado
 

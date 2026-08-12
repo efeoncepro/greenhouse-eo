@@ -49,7 +49,9 @@ export const hiringDesk: HiringDeskCopy = {
   application: {
     back: 'Volver', overview: 'Resumen', assessment: 'Evaluación', documents: 'Documentos',
     decision: 'Decisión', decideAction: 'Decidir', activity: 'Actividad', candidate: 'Candidato', contact: 'Contacto protegido', opening: 'Vacante',
-    score: 'Score', match: 'Match', nextStep: 'Próximo paso', source: 'Fuente', assessmentTitle: 'Assessment y scorecard',
+    score: 'Score', match: 'Match', nextStep: 'Próximo paso', source: 'Fuente',
+    phoneLabel: 'Teléfono', residenceCountryLabel: 'País de residencia', notProvided: 'No informado',
+    candidateMessageTitle: 'Mensaje del candidato', assessmentTitle: 'Assessment y scorecard',
     assessmentPending: 'Sin evaluación asignada', assignAssessment: 'Asignar test',
     assignmentLink: 'Enlace único de rendición', copyLink: 'Copiar enlace', documentsTitle: 'Documentos del candidato',
     reviewAssessment: 'Revisar evaluación', reviewPending: 'Pendiente de corrección', aiSuggestion: 'Sugerencia IA',

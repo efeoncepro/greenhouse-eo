@@ -1842,6 +1842,12 @@
   font-size: 0.8125rem;
 }
 
+.helpText {
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
 .cvDrop {
   position: relative;
   display: flex;

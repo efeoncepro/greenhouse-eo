@@ -10,6 +10,7 @@ Hiring Desk es el espacio interno para operar la demanda de talento, el pipeline
 - **Pipeline:** seis lanes visuales sobre las etapas canónicas. Una tarjeta representa una `HiringApplication`; se mueve por drag o por menú de etapa y vuelve a su posición anterior si el write falla.
 - **Application 360:** resumen con PII enmascarada, assessment/scorecard advisory, documentos, decisión estructurada, handoff bridge hacia Activation Lane y actividad append-only.
 - **Publicación:** compara la verdad interna con el payload público allowlist y confirma publicar, pausar o cerrar.
+- **Distribución externa:** una vez que el opening está publicado, el equipo puede difundir su URL de postulación en canales aprobados. Es una actividad de inbound recruiting, no una segunda publicación de Hiring: no altera `HiringOpening`, no reemplaza el apply canónico y debe conservar evidencia de grupo/canal y estado de moderación.
 
 ## Modelo assessment operativo
 
@@ -52,6 +53,7 @@ No crear instancias por SQL, no leer tokens desde logs y no exponer rúbricas/an
 - La IA también puede redactar el borrador del aviso público de una vacante (TASK-1385): propone solo texto desde datos seguros, con lenguaje neutro y sin señales de género/edad; una persona lo revisa, edita y confirma. La IA nunca escribe el opening ni publica.
 - La decisión exige motivo humano estructurado, soporta re-decisión con supersede y conserva historial append-only.
 - Publicación solo expone `buildPublicOpeningPayload()`; compensación, notas y riesgo internos no se publican.
+- La difusión en grupos externos usa únicamente el copy público aprobado y requiere confirmación humana. Un resultado `enviada a aprobación` no equivale a una publicación visible; cada destino se registra y se verifica antes de reintentar. Manual: `docs/manual-de-uso/hr/operar-careers-publicas.md` §Difundir una vacante publicada.
 - El correo agregado está enmascarado. El reveal de identidad/documentos requiere el resolver, capability, motivo y auditoría de TASK-1362; mientras no esté disponible, la interfaz lo comunica como degradación real.
 - Los outcomes terminales no se alcanzan arrastrando una tarjeta: selección/rechazo/espera pasan por la decisión estructurada.
 
@@ -73,6 +75,22 @@ Cuando una postulación se decide como **seleccionada**, Greenhouse materializa 
 - Para contratación interna, el **bridge de activación** (TASK-770) toma el handoff aprobado y crea la ficha de colaborador **sobre la misma persona** (nunca una identidad nueva), en estado "pendiente de intake" — invisible para nómina hasta que HR completa la ficha por Workforce Activation. El cierre siempre exige evidencia (la ficha creada) y los conflictos de identidad quedan bloqueados para revisión humana, nunca se fusionan solos.
 - Application 360 muestra el handoff real cuando la decisión es `selected` + destino `internal_hire`. Si el handoff está pendiente y el actor tiene `hiring.handoff.approve`, puede aprobarlo desde la pestaña **Decisión**; si está aprobado o en ejecución, **Abrir Activation Lane** lleva a `/hr/onboarding?lane=hiring-activation&applicationId=...&handoffId=...`.
 - La Activation Lane de TASK-1368 es la UI People Ops de N11. Consume el bridge de TASK-770 y el resolver de blockers de TASK-1400; si el target todavía no está en la cola, muestra estado honesto en vez de seleccionar otro caso.
+
+## Datos de contacto del candidato (TASK-1688)
+
+Desde 2026-08-12, cada postulación nueva del apply público (formulario estándar o Growth Form
+nativo) guarda tres datos que antes se perdían:
+
+- **Teléfono** (opcional, formato internacional E.164) y **país de residencia** (obligatorio,
+  autodeclarado por el candidato) — viven en el perfil de la persona candidata y se conservan
+  entre postulaciones. El país NUNCA se deduce del prefijo telefónico.
+- **Mensaje del candidato** (opcional, hasta 4.000 caracteres) — pertenece a esa postulación
+  específica.
+
+Los tres se leen únicamente en la Postulación 360 (bloque "Perfil del candidato"), sólo para
+usuarios internos autorizados. Las postulaciones históricas muestran "No informado": no se
+rellenan con suposiciones. Estos datos son PII interna y no aparecen en vistas públicas,
+portales de cliente, analítica ni exportaciones.
 
 ## Referencias
 

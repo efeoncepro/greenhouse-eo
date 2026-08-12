@@ -19,6 +19,11 @@ import BeneficiaryPaymentProfileChangedEmail, {
   type PaymentProfileEmailKind
 } from '@/emails/BeneficiaryPaymentProfileChangedEmail'
 import ContractorRemittanceEmail from '@/emails/ContractorRemittanceEmail'
+import HiringApplicationConfirmationEmail from '@/emails/HiringApplicationConfirmationEmail'
+import HiringApplicationReceivedInternalEmail from '@/emails/HiringApplicationReceivedInternalEmail'
+import HiringAssessmentAssignedEmail from '@/emails/HiringAssessmentAssignedEmail'
+import HiringDecisionEmail from '@/emails/HiringDecisionEmail'
+import HiringStageAdvancedEmail from '@/emails/HiringStageAdvancedEmail'
 import QuoteSharePromptEmail from '@/emails/QuoteSharePromptEmail'
 import WeeklyExecutiveDigestEmail from '@/emails/WeeklyExecutiveDigestEmail'
 import { getMicrocopy } from '@/lib/copy'
@@ -1666,6 +1671,349 @@ registerPreviewMeta('growth_ebook_delivery', {
     { key: 'downloadUrl', label: 'URL de descarga (gated)', type: 'text' },
     { key: 'bridgeLabel', label: 'Texto del puente', type: 'text' },
     { key: 'bridgeUrl', label: 'URL del puente', type: 'text' },
+    { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] },
+  ],
+})
+
+// ═══════════════════════════════════════════════════════════
+// TASK-1689 — Hiring lifecycle transactional emails
+// Consumers: src/lib/sync/projections/hiring-*.ts (ops-worker)
+// ═══════════════════════════════════════════════════════════
+
+interface HiringInternalReceivedContext extends EmailTemplateContext {
+  candidateName: string
+  candidateEmail: string
+  candidatePhone?: string | null
+  candidateResidenceCountry?: string | null
+  candidateMessage?: string | null
+  portfolioUrl?: string | null
+  linkedinUrl?: string | null
+  openingTitle: string
+  applicationPublicId: string
+  source: string
+  applicationUrl: string
+}
+
+registerTemplate('hiring_application_received_internal', (context: HiringInternalReceivedContext) => ({
+  subject: `Nueva postulación: ${context.candidateName} — ${context.openingTitle}`,
+  react: HiringApplicationReceivedInternalEmail({
+    candidateName: context.candidateName,
+    candidateEmail: context.candidateEmail,
+    candidatePhone: context.candidatePhone ?? null,
+    candidateResidenceCountry: context.candidateResidenceCountry ?? null,
+    candidateMessage: context.candidateMessage ?? null,
+    portfolioUrl: context.portfolioUrl ?? null,
+    linkedinUrl: context.linkedinUrl ?? null,
+    openingTitle: context.openingTitle,
+    applicationPublicId: context.applicationPublicId,
+    source: context.source,
+    applicationUrl: context.applicationUrl,
+  }),
+  text: [
+    `${context.candidateName} postuló a ${context.openingTitle}`,
+    '',
+    `Correo: ${context.candidateEmail}`,
+    `Teléfono: ${context.candidatePhone ?? 'No informado'}`,
+    `País de residencia: ${context.candidateResidenceCountry ?? 'No informado'}`,
+    ...(context.portfolioUrl ? [`Portafolio: ${context.portfolioUrl}`] : []),
+    ...(context.linkedinUrl ? [`LinkedIn: ${context.linkedinUrl}`] : []),
+    `Postulación: ${context.applicationPublicId}`,
+    `Origen: ${context.source}`,
+    ...(context.candidateMessage ? ['', `Mensaje del candidato:`, context.candidateMessage] : []),
+    '',
+    `Revisar: ${context.applicationUrl}`,
+  ].join('\n'),
+}))
+
+interface HiringConfirmationContext extends EmailTemplateContext {
+  recipientName?: string
+  openingTitle: string
+  openingUrl?: string
+  locale?: 'es' | 'en'
+}
+
+registerTemplate('hiring_application_confirmation', (context: HiringConfirmationContext) => {
+  const isEn = context.locale === 'en'
+
+  const first = context.recipientName?.split(' ')[0]
+
+  return {
+    subject: isEn
+      ? `${first ? `${first}, ` : ''}we received your application for «${context.openingTitle}» — Efeonce`
+      : `${first ? `${first}, ` : ''}recibimos tu postulación a «${context.openingTitle}» — Efeonce`,
+    react: HiringApplicationConfirmationEmail({
+      recipientName: context.recipientName,
+      openingTitle: context.openingTitle,
+      openingUrl: context.openingUrl,
+      locale: context.locale ?? 'es',
+    }),
+    text: [
+      isEn ? 'We received your application' : 'Recibimos tu postulación',
+      '',
+      isEn
+        ? `Thanks for applying to «${context.openingTitle}» at Efeonce. Our team reviews every application; if your profile matches, we will contact you by email.`
+        : `Gracias por postular a «${context.openingTitle}» en Efeonce. Nuestro equipo revisa cada postulación; si tu perfil calza, te contactaremos por correo.`,
+      '',
+      '— Efeonce · efeoncepro.com',
+    ].join('\n'),
+  }
+})
+
+interface HiringAssessmentAssignedContext extends EmailTemplateContext {
+  recipientName?: string
+  openingTitle: string
+  assessmentUrl: string
+  timeLimitMinutes?: number | null
+  tokenTtlDays?: number
+  locale?: 'es' | 'en'
+}
+
+registerTemplate('hiring_assessment_assigned', (context: HiringAssessmentAssignedContext) => {
+  const isEn = context.locale === 'en'
+
+  const first = context.recipientName?.split(' ')[0]
+
+  return {
+    subject: isEn
+      ? `${first ? `${first}, ` : ''}you have a pending assessment — Efeonce`
+      : `${first ? `${first}, ` : ''}tienes una evaluación pendiente — Efeonce`,
+    react: HiringAssessmentAssignedEmail({
+      recipientName: context.recipientName,
+      openingTitle: context.openingTitle,
+      assessmentUrl: context.assessmentUrl,
+      timeLimitMinutes: context.timeLimitMinutes ?? null,
+      tokenTtlDays: context.tokenTtlDays,
+      locale: context.locale ?? 'es',
+    }),
+    text: [
+      isEn ? 'You have a pending assessment' : 'Tienes una evaluación pendiente',
+      '',
+      isEn
+        ? `As part of your application to «${context.openingTitle}» at Efeonce, we assigned you an assessment. Start it here:`
+        : `Como parte de tu postulación a «${context.openingTitle}» en Efeonce, te asignamos una evaluación. Comiénzala aquí:`,
+      context.assessmentUrl,
+      '',
+      '— Efeonce · efeoncepro.com',
+    ].join('\n'),
+  }
+})
+
+interface HiringStageAdvancedContext extends EmailTemplateContext {
+  recipientName?: string
+  openingTitle: string
+  stageLabel: string
+  locale?: 'es' | 'en'
+}
+
+registerTemplate('hiring_stage_advanced', (context: HiringStageAdvancedContext) => {
+  const isEn = context.locale === 'en'
+
+  const first = context.recipientName?.split(' ')[0]
+
+  return {
+    subject: isEn
+      ? `${first ? `${first}, ` : ''}your application moved to ${context.stageLabel} — Efeonce`
+      : `${first ? `${first}, ` : ''}tu postulación avanzó a ${context.stageLabel} — Efeonce`,
+    react: HiringStageAdvancedEmail({
+      recipientName: context.recipientName,
+      openingTitle: context.openingTitle,
+      stageLabel: context.stageLabel,
+      locale: context.locale ?? 'es',
+    }),
+    text: [
+      isEn ? 'Your application moved forward' : 'Tu postulación avanzó',
+      '',
+      isEn
+        ? `Good news: your application to «${context.openingTitle}» at Efeonce moved to the stage «${context.stageLabel}». Our team will contact you with the details.`
+        : `Buenas noticias: tu postulación a «${context.openingTitle}» en Efeonce avanzó a la etapa «${context.stageLabel}». Nuestro equipo te contactará con los detalles.`,
+      '',
+      '— Efeonce · efeoncepro.com',
+    ].join('\n'),
+  }
+})
+
+interface HiringDecisionContext extends EmailTemplateContext {
+  recipientName?: string
+  openingTitle: string
+  locale?: 'es' | 'en'
+}
+
+registerTemplate('hiring_decision_selected', (context: HiringDecisionContext) => {
+  const isEn = context.locale === 'en'
+
+  const first = context.recipientName?.split(' ')[0]
+
+  return {
+    subject: isEn
+      ? `${first ? `${first}, ` : ''}good news about your application — Efeonce`
+      : `${first ? `${first}, ` : ''}buenas noticias sobre tu postulación — Efeonce`,
+    react: HiringDecisionEmail({
+      recipientName: context.recipientName,
+      openingTitle: context.openingTitle,
+      variant: 'selected',
+      locale: context.locale ?? 'es',
+    }),
+    text: [
+      isEn ? 'We chose you' : '¡Te elegimos!',
+      '',
+      isEn
+        ? `We have good news: we chose you for «${context.openingTitle}» at Efeonce. Our team will contact you with the next steps.`
+        : `Tenemos buenas noticias: te elegimos para «${context.openingTitle}» en Efeonce. Nuestro equipo te contactará con los próximos pasos.`,
+      '',
+      '— Efeonce · efeoncepro.com',
+    ].join('\n'),
+  }
+})
+
+registerTemplate('hiring_decision_rejected', (context: HiringDecisionContext) => {
+  const isEn = context.locale === 'en'
+
+  const first = context.recipientName?.split(' ')[0]
+
+  return {
+    subject: isEn
+      ? `${first ? `${first}, ` : ''}about your application to «${context.openingTitle}» — Efeonce`
+      : `${first ? `${first}, ` : ''}sobre tu postulación a «${context.openingTitle}» — Efeonce`,
+    react: HiringDecisionEmail({
+      recipientName: context.recipientName,
+      openingTitle: context.openingTitle,
+      variant: 'rejected',
+      locale: context.locale ?? 'es',
+    }),
+    text: [
+      isEn ? 'About your application' : 'Sobre tu postulación',
+      '',
+      isEn
+        ? `Thank you for the time you put into your application to «${context.openingTitle}» at Efeonce. After completing the process, we decided not to move forward on this occasion. We would be glad to see you apply to future openings closer to your profile.`
+        : `Gracias por el tiempo que pusiste en tu postulación a «${context.openingTitle}» en Efeonce. Después de completar el proceso, decidimos no avanzar en esta oportunidad. Nos encantaría verte postular a futuras vacantes que se acerquen más a tu perfil.`,
+      '',
+      '— Efeonce · efeoncepro.com',
+    ].join('\n'),
+  }
+})
+
+registerPreviewMeta('hiring_application_received_internal', {
+  label: 'Hiring — aviso interno de postulación',
+  description: 'Aviso al buzón de People con los datos del postulante cuando llega una postulación nueva',
+  domain: 'hr',
+  supportsLocale: false,
+  defaultProps: {
+    candidateName: 'María González',
+    candidateEmail: 'maria@ejemplo.com',
+    candidatePhone: '+56 9 1234 5678',
+    candidateResidenceCountry: 'Chile',
+    candidateMessage: 'Me interesa el rol porque llevo 4 años creando contenido para marcas B2B.',
+    portfolioUrl: 'https://portafolio.ejemplo.com',
+    openingTitle: 'Content Creator',
+    applicationPublicId: 'EO-APP-0001',
+    source: 'public_careers',
+    applicationUrl: 'https://greenhouse.efeoncepro.com/agency/hiring',
+  },
+  propsSchema: [
+    { key: 'candidateName', label: 'Nombre del postulante', type: 'text' },
+    { key: 'candidateEmail', label: 'Correo del postulante', type: 'text' },
+    { key: 'candidatePhone', label: 'Teléfono', type: 'text' },
+    { key: 'candidateResidenceCountry', label: 'País de residencia', type: 'text' },
+    { key: 'candidateMessage', label: 'Mensaje del candidato', type: 'text' },
+    { key: 'portfolioUrl', label: 'Portafolio', type: 'text' },
+    { key: 'openingTitle', label: 'Vacante', type: 'text' },
+    { key: 'applicationPublicId', label: 'ID público de la postulación', type: 'text' },
+    { key: 'source', label: 'Origen', type: 'text' },
+    { key: 'applicationUrl', label: 'URL del Hiring Desk', type: 'text' },
+  ],
+})
+
+registerPreviewMeta('hiring_application_confirmation', {
+  label: 'Hiring — acuse de recibo al candidato',
+  description: 'Confirmación al candidato de que su postulación llegó y qué sigue',
+  domain: 'hr',
+  supportsLocale: true,
+  defaultProps: {
+    recipientName: 'María González',
+    openingTitle: 'Content Creator',
+    openingUrl: 'https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0061',
+    locale: 'es',
+  },
+  propsSchema: [
+    { key: 'recipientName', label: 'Nombre del candidato', type: 'text' },
+    { key: 'openingTitle', label: 'Vacante', type: 'text' },
+    { key: 'openingUrl', label: 'URL de la vacante', type: 'text' },
+    { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] },
+  ],
+})
+
+registerPreviewMeta('hiring_assessment_assigned', {
+  label: 'Hiring — evaluación asignada',
+  description: 'Aviso al candidato con el link de acceso a su evaluación',
+  domain: 'hr',
+  supportsLocale: true,
+  defaultProps: {
+    recipientName: 'María González',
+    openingTitle: 'Content Creator',
+    assessmentUrl: 'https://greenhouse.efeoncepro.com/public/assessment/preview-token',
+    timeLimitMinutes: 45,
+    tokenTtlDays: 7,
+    locale: 'es',
+  },
+  propsSchema: [
+    { key: 'recipientName', label: 'Nombre del candidato', type: 'text' },
+    { key: 'openingTitle', label: 'Vacante', type: 'text' },
+    { key: 'assessmentUrl', label: 'URL de la evaluación', type: 'text' },
+    { key: 'timeLimitMinutes', label: 'Tiempo límite (min)', type: 'number' },
+    { key: 'tokenTtlDays', label: 'Vigencia del link (días)', type: 'number' },
+    { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] },
+  ],
+})
+
+registerPreviewMeta('hiring_stage_advanced', {
+  label: 'Hiring — avance de etapa',
+  description: 'Aviso al candidato cuando su postulación avanza a una etapa candidate-facing',
+  domain: 'hr',
+  supportsLocale: true,
+  defaultProps: {
+    recipientName: 'María González',
+    openingTitle: 'Content Creator',
+    stageLabel: 'Entrevista',
+    locale: 'es',
+  },
+  propsSchema: [
+    { key: 'recipientName', label: 'Nombre del candidato', type: 'text' },
+    { key: 'openingTitle', label: 'Vacante', type: 'text' },
+    { key: 'stageLabel', label: 'Etapa (nombre público)', type: 'text' },
+    { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] },
+  ],
+})
+
+registerPreviewMeta('hiring_decision_selected', {
+  label: 'Hiring — candidato seleccionado',
+  description: 'Felicitación al candidato seleccionado con los próximos pasos',
+  domain: 'hr',
+  supportsLocale: true,
+  defaultProps: {
+    recipientName: 'María González',
+    openingTitle: 'Content Creator',
+    locale: 'es',
+  },
+  propsSchema: [
+    { key: 'recipientName', label: 'Nombre del candidato', type: 'text' },
+    { key: 'openingTitle', label: 'Vacante', type: 'text' },
+    { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] },
+  ],
+})
+
+registerPreviewMeta('hiring_decision_rejected', {
+  label: 'Hiring — candidato no seleccionado',
+  description: 'Agradecimiento al candidato no seleccionado, con la puerta abierta a futuras vacantes',
+  domain: 'hr',
+  supportsLocale: true,
+  defaultProps: {
+    recipientName: 'María González',
+    openingTitle: 'Content Creator',
+    locale: 'es',
+  },
+  propsSchema: [
+    { key: 'recipientName', label: 'Nombre del candidato', type: 'text' },
+    { key: 'openingTitle', label: 'Vacante', type: 'text' },
     { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] },
   ],
 })

@@ -7,18 +7,58 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-12 — El formulario de Careers ya no pierde el contacto del candidato (TASK-1688)
+
+Se cerró la pérdida silenciosa que descubrió la auditoría de postulaciones: teléfono y mensaje se
+validaban en el navegador pero el command los descartaba, y no existía país de residencia. Ahora el
+apply (estándar y Growth Form nativo, mismo parser/command) pide país de residencia autodeclarado
+(select textual del catálogo ISO — jamás deducido del prefijo telefónico), guarda el teléfono E.164
+opcional en el perfil del candidato con política anti-wipe y el mensaje como contexto de esa
+postulación. El reclutador lo lee en la Postulación 360; las postulaciones históricas muestran "No
+informado" sin inventar datos. ADR registrado, migración aditiva aplicada, país requerido primero
+en UI (expand/contract). Pendiente de rollout: ejercicio en staging + GVC, revisión de Privacy y el
+flip a requerido en parser.
+
+## 2026-08-12 — El proceso de contratación ahora avisa por correo en cada hito (TASK-1689)
+
+Greenhouse deja de estar mudo durante el hiring: al llegar una postulación, People recibe un aviso
+con los datos del postulante y el candidato un acuse de recibo; al asignarle un test le llega su
+link de acceso (con token re-emitido de forma canónica — nunca viaja por el outbox); al avanzar a
+una etapa candidate-facing (Preselección/Entrevista, nunca etapas internas) se le informa; y la
+decisión final llega como felicitación o como agradecimiento cuidado si no quedó. Todo corre como
+consumers reactivos en el ops-worker sobre la plataforma de email canónica, idempotente ante
+retries, con kill-switch por tipo (el de rechazo pausable aparte) y detrás de
+`HIRING_LIFECYCLE_EMAILS_ENABLED` default OFF. Code complete con suite completa verde; el flip
+espera deploy del worker, ejercicio en staging y revisión del copy por Talent.
+
 ## 2026-08-12 — Sentry separa el ruido del bridge de Facebook de los errores reales de Careers
 
 El cliente de Sentry filtra exclusivamente la firma del bridge nativo que Facebook inyecta en
 Android cuando el objeto Java desaparece durante el ciclo de vida de su WebView: exige el mensaje,
 navegador y frame `app://` exactos. No toca Careers, Turnstile ni la captura de otros errores de
 Facebook/Android. La investigación comprobó que la página pública y el formulario nativo responden
-correctamente; el filtro queda pendiente de promoción y verificación en el runtime.
+correctamente; el cambio llegó a producción por `d139726ff` y 8W no tuvo recurrencias posteriores al rollout.
 
 En el mismo cierre se recupera la gobernanza persistida de `/admin/globe/credits`: una migration
 añade el registry y el único grant que autoriza su contrato (`efeonce_admin`), eliminando el
-fallback que hoy genera `role_view_fallback_used` durante el refresh de claims. La migration se
-aplica sólo después de desplegar el catálogo ya existente en todos los runtimes que comparten DB.
+fallback que generaba `role_view_fallback_used` durante el refresh de claims. La migration quedó aplicada y
+el grant se verificó en Cloud SQL. También se corrigió el smoke de identidad: el `ops-worker` compartido
+consultaba el portal staging protegido por SSO (HTTP 302); al usar el portal público dos runs fueron 5/5 y
+la health fue `ready`. Los tickets remotos de Sentry quedan por marcar como resueltos cuando exista una
+sesión o token con escritura.
+
+## 2026-08-12 — El escáner de malware quedó vivo en producción, verificado de punta a punta
+
+Cierre de la historia que las dos entradas siguientes cuentan: el escáner de firmas
+está operativo en staging y en producción, y esta vez la verificación corrió donde
+tenía que correr. Tres capas independientes, todas desde el runtime real: el
+endpoint de diagnóstico acuñó la credencial y el servicio la aceptó ANTES de
+prender el flag; después del flip el mismo endpoint confirmó el flag horneado; y
+una postulación de prueba por el formulario público real atravesó el camino
+completo — escaneada por los dos motores, limpia y adjunta en 129 ms. La issue del
+doble incidente quedó resuelta y la task de provisión cerrada. Costo steady del
+servicio: ≈USD 19/mes. Recursos Humanos descarta la postulación de prueba desde el
+Hiring Desk.
 
 ## 2026-08-11 — El flag del escáner falló dos veces en producción; causa raíz cerrada en código
 
@@ -1130,39 +1170,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   contrato actuales y sus superficies proveedoras diferidas.
 - No cambió el runtime de Globe, el catálogo, los adapters, los secrets ni la disponibilidad. Las fichas son mapas de
   evidencia; `globe.producer.fleet.list` conserva la autoridad live.
-
-## 2026-08-04 — Globe: skill compartida para integrar modelos por ruta
-
-- **ADR-023 implementa `greenhouse-globe-model-fleet`** como skill espejada para Codex y Claude, con contrato de
-  route cards, schema, validador determinista y gate de paridad. La primera ficha machine-readable es FLUX 3 Video.
-- La ficha separa evidencia del proveedor, cables de integración y disponibilidad live; no crea catálogo, adapter,
-  rate ledger ni promoción paralelos. FLUX 3 permanece gated y el runtime de Globe no fue modificado.
-
-## 2026-08-04 — Globe: la captura de completitud tenía trece huecos y ningún contrato escrito
-
-- **ADR-021 nace porque el contrato no existía.** Ningún doc de arquitectura mencionaba «webhook»: la captura de
-  completitud vivía sólo en el código, y esa ausencia dejó acumular **13 defectos** sin que nadie los viera —
-  tres terminaban en un asset **generado, facturado e irrecuperable**, y ninguno producía error visible.
-- **Cada proveedor avisa distinto, y eso es la decisión**: Fal por webhook **por request**, OpenAI **no emite
-  eventos de imagen** (su `poll` es correcto por diseño), Vertex sólo por operación de larga duración.
-- **12 de 13 cerrados y desplegados**, verificados con una generación real (run `completed`, experimento
-  `candidate_ready`, governance `eligible`). Queda D12, que ya no es pérdida sino ventana de latencia.
-- **Convergencia terminal como invariante enumerable** (`TASK-1469`): 4 experimentos huérfanos → 0, y tres
-  señales de outbox pasaron de imprimirse a mirarse. `outboxDeadLetter` **medía filas en vez de intentos** —
-  decía 3 para uno.
-- **Cierre documental**: ADR-021 + doc funcional + manual + dos runbooks + las dos skills espejadas y el overlay
-  de arquitectura, donde se corrigieron **cuatro contradicciones activas**.
-- **FLUX 3 queda documentado y gated:** Fal expone once endpoints activos (cinco estándar, cinco drafts y
-  `draft-enhance`), mientras BFL mantiene el producto/API directo en Early Access. `TASK-1642` y su propuesta
-  registran la discrepancia de namespace, keyframes, `duration: auto`, audio evidence, `draft_cache`, rates,
-  rights, evaluación, canary y rollback; el runtime de Globe no fue modificado.
-
-## 2026-08-04 — Globe Asset Governance: la latencia deja de multiplicarse por el cron
-
-- **ISSUE-137 resuelto en runtime** con `efeonce-globe@d78ce01`: Terraform cambió
-  `asset_governance_schedule` de `*/5` a `*/1`; plan/apply supervisados quedaron en `0 to destroy` y
-  el Scheduler live en `southamerica-east1` lee `*/1 * * * * ENABLED`.
-- Verificación post-arreglo sin gasto nuevo: el video durable terminó en `candidate_ready` en
-  `473,958 s / 7,90 min`, governance en `183,780 s`, output retenido y settlement exacto de 16
-  créditos. La imagen post-arreglo midió `472 s / 183 s`; la coincidencia entre modalidades confirma
-  que el cuello era cadence-bound, no size-bound. El drain loop no se tocó.

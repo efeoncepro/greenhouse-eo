@@ -8,6 +8,7 @@ import 'server-only'
 
 import { EFEONCE_URL_HTTPS } from '@/config/efeonce-brand'
 import { getMicrocopy } from '@/lib/copy'
+import { COUNTRIES_SORTED } from '@/lib/locale/countries'
 import { authorDraftForm, deprecateForm, publishForm, reviewForm } from '@/lib/growth/forms/commands'
 import {
   getFormDefinitionById,
@@ -95,6 +96,19 @@ const FIELD_SCHEMA = [
     inputMode: 'email',
     validator: 'email_syntax',
     maxLength: 200,
+  },
+  {
+    // TASK-1688 — país de residencia AUTODECLARADO (requerido). Opciones desde el SSOT
+    // src/lib/locale/countries.ts; NUNCA se deduce del prefijo telefónico.
+    key: 'residenceCountryCode',
+    type: 'select',
+    label: copy.apply.fields.residenceCountry,
+    placeholder: copy.apply.placeholders.residenceCountry,
+    required: true,
+    dataClass: 'contact_pii',
+    presentation: { icon: 'globe' },
+    options: COUNTRIES_SORTED.map(country => ({ value: country.code, label: country.name })),
+    maxLength: 2,
   },
   {
     key: 'phone',
@@ -187,6 +201,8 @@ const COPY_REFS = {
   copy: {
     submit: copy.apply.submit,
     'cvFile.help': `${copy.apply.cv.body} ${copy.apply.cv.hint}`,
+    // TASK-1688 — ayuda anti-inferencia del país de residencia.
+    'residenceCountryCode.help': copy.apply.residenceCountryHelp,
     'consent.error.required': copy.apply.errors.consent,
   },
   noticeText: `${copy.apply.consent.bodyPrefix} ${copy.apply.consent.link} ${copy.apply.consent.bodySuffix}`,

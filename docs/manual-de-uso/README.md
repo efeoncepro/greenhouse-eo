@@ -90,6 +90,7 @@ La diferencia con otras capas de documentacion:
 
 ### HR y Nomina
 
+- [Operar los Emails del Ciclo de Hiring](hr/operar-emails-ciclo-hiring.md) — prender/apagar el sistema (flag del ops-worker), pausar un correo puntual en caliente (kill-switch por tipo, incluido el de rechazo), leer las señales del reactive log y diagnosticar por qué un correo no llegó.
 - [Operar el Hiring Desk](hr/operar-hiring-desk.md) — demanda de talento, pipeline de postulaciones, Application 360, asignación de assessments por postulación, revisión/corrección, decisión estructurada, handoff y publicación de vacantes.
 - [Activar colaborador desde Hiring](hr/activar-colaborador-desde-hiring.md) — el bridge que convierte un handoff aprobado en colaborador: reclamar el caso, crear/enlazar la ficha sin duplicar identidad, abrir onboarding y cerrar con evidencia; bloqueos y señal de atascos.
 - [Operar el Hiring Handoff](hr/operar-hiring-handoff.md) — qué pasa cuando decides una postulación como seleccionada: aprobar/preparar/completar/cancelar el handoff, estados y bloqueos, evidencia de cierre, señales de operaciones y backfill/smoke.

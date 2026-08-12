@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-07-10 por Claude (TASK-1362)
-> **Ultima actualizacion:** 2026-07-10 por Claude (TASK-1362)
+> **Ultima actualizacion:** 2026-08-12 por Claude (TASK-1378)
 > **Documentacion tecnica:** [GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md)
 
 # Documentos de Candidatos — Captura, Escaneo y Retencion
@@ -31,7 +31,7 @@ Greenhouse no confia en que alguien recuerde esta regla: el sistema **rechaza** 
 
 Todo archivo que llega desde la web publica se revisa **antes** de quedar asociado a la postulacion.
 
-La revision comprueba que el archivo sea realmente lo que dice ser. Alguien puede tomar un programa ejecutable, renombrarlo a `curriculum.pdf` y subirlo: el navegador lo declara como PDF, pero sus primeros bytes lo delatan. Tambien se revisa que un PDF no traiga contenido activo peligroso, como un archivo incrustado o una accion que lance un programa.
+La revision comprueba que el archivo sea realmente lo que dice ser. Alguien puede tomar un programa ejecutable, renombrarlo a `curriculum.pdf` y subirlo: el navegador lo declara como PDF, pero sus primeros bytes lo delatan. Tambien se revisa que un PDF no traiga contenido activo peligroso, como un archivo incrustado o una accion que lance un programa. Ademas, un segundo escaner (ClamAV) compara el contenido contra una base de firmas de malware conocido; entre las dos revisiones, el peor veredicto gana.
 
 Si el archivo no pasa la revision:
 
@@ -44,7 +44,7 @@ En la ficha del candidato, un documento bloqueado se muestra como tal. No desapa
 
 Los CV que entraron antes de que existiera esta revision se marcan como "no escaneados". Se pueden seguir descargando, pero queda registrado que nadie verifico su contenido.
 
-> Detalle tecnico: el escaneo vive en `src/lib/storage/asset-scan/`. El escaner estructural corre siempre y no necesita infraestructura. Un escaner de firmas de malware (ClamAV) se puede sumar encima activando `ASSET_MALWARE_SCAN_ENABLED`; hoy esta apagado. Ver `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
+> Detalle tecnico: el escaneo vive en `src/lib/storage/asset-scan/`. El escaner estructural corre siempre y no necesita infraestructura. El escaner de firmas de malware (ClamAV, flag `ASSET_MALWARE_SCAN_ENABLED`) esta **operativo en staging y produccion desde 2026-08-12**. Ver `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` y la documentacion funcional de plataforma: [Escaneo de archivos subidos](../plataforma/escaneo-de-archivos-subidos.md).
 
 ## Quien puede ver los documentos
 

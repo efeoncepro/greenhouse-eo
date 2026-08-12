@@ -30,6 +30,7 @@ import { TurnstileTokenClient } from '@/growth-forms-renderer/turnstile'
 import { RENDERER_VERSION } from '@/growth-forms-renderer/version'
 import type { CareersCopy } from '@/lib/copy'
 import { validateE164PhoneValue } from '@/lib/growth/forms/validators/phone'
+import { COUNTRIES_SORTED } from '@/lib/locale/countries'
 import {
   PUBLIC_CAREERS_CV_ACCEPTED_MIME_TYPES,
   formatPublicCareersCvFileSize,
@@ -53,6 +54,7 @@ interface ApplicationFormValues {
   firstName: string
   lastName: string
   email: string
+  residenceCountryCode: string
   phone: string
   portfolioUrl: string
   linkedinUrl: string
@@ -69,6 +71,7 @@ const INITIAL_VALUES: ApplicationFormValues = {
   firstName: '',
   lastName: '',
   email: '',
+  residenceCountryCode: '',
   phone: '',
   portfolioUrl: '',
   linkedinUrl: '',
@@ -81,6 +84,7 @@ const FIELD_ORDER: Array<ApplicationField | 'captcha'> = [
   'firstName',
   'lastName',
   'email',
+  'residenceCountryCode',
   'phone',
   'portfolioUrl',
   'linkedinUrl',
@@ -283,6 +287,9 @@ export const CareersApplyClient = ({ copy, formContract, opening }: CareersApply
     if (!email) nextErrors.email = copy.apply.errors.emailRequired
     else if (!EMAIL_RE.test(email)) nextErrors.email = copy.apply.errors.emailInvalid
 
+    // TASK-1688 — país de residencia requerido y autodeclarado (nunca desde el prefijo).
+    if (!values.residenceCountryCode) nextErrors.residenceCountryCode = copy.apply.errors.residenceCountryRequired
+
     if (values.phone.trim()) {
       const phoneResult = validateE164PhoneValue(values.phone, { country: phoneCountry })
 
@@ -386,6 +393,7 @@ export const CareersApplyClient = ({ copy, formContract, opening }: CareersApply
         firstName: values.firstName.trim(),
         lastName: values.lastName.trim(),
         email: values.email.trim(),
+        residenceCountryCode: values.residenceCountryCode || null,
         phone: values.phone.trim() || null,
         portfolioUrl: values.portfolioUrl.trim() || null,
         linkedinUrl: values.linkedinUrl.trim() || null,
@@ -545,6 +553,41 @@ export const CareersApplyClient = ({ copy, formContract, opening }: CareersApply
             type='email'
             value={values.email}
           />
+          <div className={styles.field} data-capture='careers-residence-country'>
+            <label className={styles.label} htmlFor={fieldId('residenceCountryCode')}>
+              {copy.apply.fields.residenceCountry}
+              <span className={styles.visuallyHidden}> {copy.aria.required}</span>
+            </label>
+            <select
+              className={styles.select}
+              id={fieldId('residenceCountryCode')}
+              name='residenceCountryCode'
+              value={values.residenceCountryCode}
+              onChange={event => setValue('residenceCountryCode', event.target.value)}
+              aria-describedby={
+                errors.residenceCountryCode
+                  ? `${errorId('residenceCountryCode')} ${fieldId('residenceCountryCode')}-help`
+                  : `${fieldId('residenceCountryCode')}-help`
+              }
+              aria-invalid={Boolean(errors.residenceCountryCode)}
+            >
+              <option value=''>{copy.apply.placeholders.residenceCountry}</option>
+              {COUNTRIES_SORTED.map(country => (
+                <option value={country.code} key={country.code}>
+                  {country.name}
+                </option>
+              ))}
+            </select>
+            <span className={styles.helpText} id={`${fieldId('residenceCountryCode')}-help`}>
+              {copy.apply.residenceCountryHelp}
+            </span>
+            {errors.residenceCountryCode ? (
+              <span className={styles.errorText} id={errorId('residenceCountryCode')}>
+                <i className='tabler-alert-circle' aria-hidden='true' />
+                {errors.residenceCountryCode}
+              </span>
+            ) : null}
+          </div>
           <PhoneField
             country={phoneCountry}
             error={errors.phone}

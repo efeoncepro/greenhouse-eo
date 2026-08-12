@@ -82,6 +82,12 @@ import { sampleSprintHubSpotOutboundProjection } from './sample-sprint-hubspot-o
 import { sampleSprintRuntimeCacheInvalidationProjection } from './sample-sprint-runtime-cache-invalidation'
 import { growthAeoDiagnosticGraderRunProjection } from './growth-aeo-diagnostic-grader-run-from-submission'
 import { growthEbookDeliveryFromSubmissionProjection } from './growth-ebook-delivery-from-submission'
+import {
+  hiringApplicationCreatedEmailsProjection,
+  hiringApplicationDecidedEmailProjection,
+  hiringAssessmentAssignedEmailProjection,
+  hiringStageChangedEmailProjection,
+} from './hiring-lifecycle-emails'
 import { growthGraderRunFromSubmissionProjection } from './growth-grader-run-from-submission'
 import { growthHiringApplicationFromSubmissionProjection } from './growth-hiring-application-from-submission'
 import { growthAiVisibilityLeadHandoffProjection } from './growth-ai-visibility-lead-handoff'
@@ -183,6 +189,10 @@ registerProjection(contractorPayableExpenseMaterializeProjection)
   registerProjection(knowledgeNotionIngestProjection) // TASK-1094 — re-fetch + gate + re-ingest idempotente | deprecación de páginas de knowledge Notion (webhook-triggered); gated upstream por NOTION_KNOWLEDGE_WEBHOOK_ENABLED
   registerProjection(growthGraderRunFromSubmissionProjection) // TASK-1251 — growth.forms.submission_accepted (grader-form) → enqueue grader run + materialize lead linked to submission (idempotent, PII-safe); drenado por ops-reactive-growth
   registerProjection(growthEbookDeliveryFromSubmissionProjection) // TASK-1375 — growth.forms.submission_accepted (ebook form) → email de respaldo con link gated de descarga (genérico por ebook, idempotente); drenado por ops-reactive-growth
+  registerProjection(hiringApplicationCreatedEmailsProjection) // TASK-1689 — hiring.application.created → aviso interno People + acuse candidato; flag HIRING_LIFECYCLE_EMAILS_ENABLED (ops-worker); drenado por ops-reactive-notifications
+  registerProjection(hiringAssessmentAssignedEmailProjection) // TASK-1689 — hiring.assessment.assigned (candidate_test) → email con link de evaluación (token re-emitido canónico)
+  registerProjection(hiringStageChangedEmailProjection) // TASK-1689 — hiring.application.stage_changed → avance de etapa candidate-facing (allowlist)
+  registerProjection(hiringApplicationDecidedEmailProjection) // TASK-1689 — hiring.application.decided → selected/rejected (rejected pausable via email_type_config)
   registerProjection(growthHiringApplicationFromSubmissionProjection) // TASK-1372 — growth.forms.submission_accepted (application forms) → ATS application + scanned private CV asset; sin destination interno; drenado por ops-reactive-growth
   registerProjection(growthAeoDiagnosticGraderRunProjection) // TASK-1321 — growth.forms.submission_accepted (/aeo-2/ efeonce-aeo-diagnostic) → remap + brand-intelligence category + cost-cap → enqueue grader run + materialize lead (kill-switch GROWTH_AEO_FORM_GRADER_INTAKE_ENABLED default-ON); drenado por ops-reactive-growth
   registerProjection(growthAiVisibilityLeadHandoffProjection) // TASK-1242 — growth.ai_visibility.lead_handoff_requested → upsert contact/company en HubSpot (in-app directo, idempotente, consent+score gated); drenado por ops-reactive-growth

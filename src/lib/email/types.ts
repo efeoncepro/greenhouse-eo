@@ -23,6 +23,12 @@ export type EmailType =
   | 'contractor_remittance_paid'
   | 'ai_visibility_grader_report'
   | 'growth_ebook_delivery'
+  | 'hiring_application_received_internal'
+  | 'hiring_application_confirmation'
+  | 'hiring_assessment_assigned'
+  | 'hiring_stage_advanced'
+  | 'hiring_decision_selected'
+  | 'hiring_decision_rejected'
 
 export type EmailDeliveryStatus = 'pending' | 'sent' | 'failed' | 'skipped' | 'rate_limited' | 'delivered' | 'dead_letter'
 
@@ -54,6 +60,13 @@ export const EMAIL_PRIORITY_MAP: Record<string, EmailPriority> = {
   contractor_remittance_paid:   'transactional',
   ai_visibility_grader_report:  'transactional',
   growth_ebook_delivery:        'transactional',
+  // TASK-1689 — ciclo de vida de Hiring (consumers reactivos en ops-worker)
+  hiring_application_received_internal: 'transactional',
+  hiring_application_confirmation:      'transactional',
+  hiring_assessment_assigned:           'transactional',
+  hiring_stage_advanced:                'transactional',
+  hiring_decision_selected:             'transactional',
+  hiring_decision_rejected:             'transactional',
 }
 
 export interface EmailRecipient {
@@ -129,7 +142,14 @@ export interface SendEmailInput<TContext extends EmailTemplateContext = EmailTem
 export const AGENCY_FROM_ADDRESS = 'Efeonce <greenhouse@efeoncepro.com>'
 export const AGENCY_BRANDED_EMAIL_TYPES: ReadonlySet<EmailType> = new Set<EmailType>([
   'ai_visibility_grader_report',
-  'growth_ebook_delivery'
+  'growth_ebook_delivery',
+  // TASK-1689 — candidate-facing hiring: el candidato es externo y conoce a Efeonce, no al
+  // portal. El aviso interno (hiring_application_received_internal) NO va acá: sender plataforma.
+  'hiring_application_confirmation',
+  'hiring_assessment_assigned',
+  'hiring_stage_advanced',
+  'hiring_decision_selected',
+  'hiring_decision_rejected'
 ])
 
 export interface SendEmailResult {

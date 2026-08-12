@@ -37,6 +37,7 @@ import {
 } from '@/components/greenhouse/primitives'
 import type { HiringAssessmentCopy, HiringDeskCopy } from '@/lib/copy'
 import { formatDate, formatDateTime } from '@/lib/format'
+import { getCountryName } from '@/lib/locale/countries'
 import type {
   DecideHiringApplicationResult,
   HiringDecision,
@@ -177,19 +178,33 @@ const CandidateContextCard = ({ item, copy }: CandidateContextCardProps) => {
         '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
       })}
     >
-      <Stack spacing={condensed ? 2 : 2.75}>
+      <Stack spacing={condensed ? 2 : 2.75} data-capture='application-contact-summary'>
         <Typography variant='h6'>Perfil del candidato</Typography>
         {[
           [copy.application.opening, item.openingTitle],
           [copy.application.source, item.application.source === 'public_careers' ? 'Careers público' : item.application.source.replaceAll('_', ' ')],
           ['Postulación', formatDate(item.application.createdAt, { dateStyle: 'medium' }, 'es-CL')],
           ['Email', item.maskedEmail ?? 'c•••••@•••••.com'],
-        ].map(([label, value], index) => (
-          <Stack key={label} direction='row' alignItems='center' justifyContent='space-between' spacing={3} sx={{ py: 2.75, borderBlockEnd: index < 3 ? 1 : 0, borderColor: 'divider' }}>
+          // TASK-1688 — contacto durable del facet; legacy sin dato = "No informado" (nunca inferido).
+          [copy.application.phoneLabel, item.phoneE164 ?? copy.application.notProvided],
+          [
+            copy.application.residenceCountryLabel,
+            item.residenceCountryCode
+              ? getCountryName(item.residenceCountryCode) ?? item.residenceCountryCode
+              : copy.application.notProvided,
+          ],
+        ].map(([label, value], index, rows) => (
+          <Stack key={label} direction='row' alignItems='center' justifyContent='space-between' spacing={3} sx={{ py: 2.75, borderBlockEnd: index < rows.length - 1 ? 1 : 0, borderColor: 'divider' }}>
             <Typography variant='body2' color='text.secondary'>{label}</Typography>
-            <Typography variant='body2' color={label === 'Email' ? 'text.disabled' : 'text.primary'} fontWeight={650} textAlign='right'>{value}</Typography>
+            <Typography variant='body2' color={label === 'Email' ? 'text.disabled' : 'text.primary'} fontWeight={650} textAlign='right' sx={{ overflowWrap: 'anywhere' }}>{value}</Typography>
           </Stack>
         ))}
+        {item.application.candidateMessage ? (
+          <Stack spacing={1} sx={{ pt: 2.25, borderBlockStart: 1, borderColor: 'divider' }} data-capture='application-candidate-message'>
+            <Typography variant='body2' color='text.secondary'>{copy.application.candidateMessageTitle}</Typography>
+            <Typography variant='body2' sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{item.application.candidateMessage}</Typography>
+          </Stack>
+        ) : null}
       </Stack>
     </Paper>
   )

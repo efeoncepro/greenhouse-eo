@@ -82,6 +82,9 @@ export const submitPublicHiringApplication = async (
       availability: input.availability ?? undefined,
       portfolioUrl: input.portfolioUrl ?? undefined,
       linkedinUrl: input.linkedinUrl ?? undefined,
+      // TASK-1688 — contacto durable person-first; omitir preserva el valor existente (anti-wipe).
+      phoneE164: input.phone ?? undefined,
+      residenceCountryCode: input.residenceCountryCode ?? undefined,
     },
     null,
   )
@@ -123,6 +126,8 @@ export const submitPublicHiringApplication = async (
         identityProfileId,
         candidateFacetId: facet.candidateFacetId,
         source: 'public_careers',
+        // TASK-1688 — el mensaje es contexto de ESTA postulación, nunca del perfil.
+        candidateMessage: input.message ?? null,
         dedupeFingerprint,
       },
       null,

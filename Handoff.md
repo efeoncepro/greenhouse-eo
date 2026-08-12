@@ -2,38 +2,67 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
-### ISSUE-151 — dos alertas Sentry investigadas; corrección local lista, rollout pendiente (2026-08-12)
+### TASK-1688 CERRADA — contacto completo en postulaciones Careers: code complete, rollout pendiente (2026-08-12)
 
-**JAVASCRIPT-NEXTJS-8W no es un defecto de Careers:** `Error invoking postMessage: Java object is gone`
-viene del bridge nativo inyectado por Facebook Android (`app://navigation_performance_logger_android`), no de
-Greenhouse. La ruta pública respondió 200 con los UA Facebook Android y Chrome Android; Careers usa
-`<greenhouse-form>` sin iframe ni `postMessage`. Se añadió un `beforeSend` que descarta sólo la combinación
-exacta mensaje + navegador Facebook + frame del bridge, preservando errores reales de Careers, Turnstile y
-Android. **JAVASCRIPT-NEXTJS-8V sí descubrió un drift:** `administracion.globe_credits` entró al catálogo TS sin
-su seed DB; el fallback interno concede a `efeonce_admin` por `admin` y emite el warning. La migration
-`20260812093000000_issue-151-seed-globe-credits-view-access.sql` persiste el registry y el único grant correcto.
+ADR aceptado y registrado (Delta en la arquitectura Hiring + `DECISIONS_INDEX`): `phone_e164` y
+`residence_country_code` (autodeclarado, ISO, CHECK) viven en `candidate_facet` con upsert anti-wipe;
+`candidate_message` (≤4000) en `hiring_application`. Migración `20260812094000000` aditiva aplicada y verificada
+contra PG real — su timestamp es 09:40 porque la migración de ISSUE-151 (nombrada a mano con hora futura 09:30) ya
+estaba aplicada y node-pg-migrate rechaza timestamps anteriores. El parser único valida el país contra el SSOT
+`countries.ts` SIN truncar (`'Chile'`→`'CH'` habría sido Suiza — atrapado por test) y lo usa sólo como hint de
+formato del teléfono; el command persiste los tres campos (test anti-regresión del bug class "el form acepta y el
+command descarta"). Paridad: select de país requerido en `CareersApplyClient` + contrato del native Growth Form,
+copy es-CL/en-US tokenizado; Application 360 muestra Teléfono completo / País (nombre textual) / Mensaje, con "No
+informado" para legacy. Suite completa 10.585 tests + lint/typecheck 0; `design-contract:lint` y `ui:code-lint`
+PASS. **Rollout pendiente:** ejercicio en staging + GVC premium 1440/390 (el preview harness local no levantó el
+dev server esta sesión), revisión Legal/Privacy de retención/aviso, y el flip expand→contract que hace el país
+requerido a nivel parser tras verificar ambas superficies en producción.
 
-Focal local verde: 22 tests, ESLint focal, typecheck y diff check. No se desplegó, aplicó migration ni resolvió
-la issue Sentry: primero promover código a todos los runtimes con catálogo compartido; después aplicar la
-migration y comprobar la fila/grant, renovar o esperar claims (5 min) y revisar Sentry durante 7–14 días. GCP
-CLI y ADC ya están renovados y alineados para `efeonce-group`; el intento de consulta llegó al proxy de Cloud SQL,
-pero el perfil local no declara `GREENHOUSE_POSTGRES_OPS_USER`/`ADMIN_USER`, por lo que no se consultó la fila ni
-se improvisó una credencial. La API Sentry local continúa devolviendo 403 por scope. ISSUE-151 permanece abierta y
-contiene la evidencia/plan exactos.
+### TASK-1689 CERRADA — emails del ciclo de Hiring: code complete, rollout pendiente (2026-08-12)
 
-### TASK-1378 — SCANNER LIVE EN PRODUCCIÓN, verificado post-flip desde el runtime (2026-08-12 05:52Z)
+Los 6 emails (aviso interno a People + acuse al candidato en `hiring.application.created`, test asignado en
+`hiring.assessment.assigned` sólo `candidate_test`, avance de etapa allowlisted en `stage_changed`, decisión
+selected/rejected anti-stale en `decided`) quedaron cableados como 4 consumers reactivos domain `notifications`
+(lane existente `ops-reactive-notifications`), con política en `src/lib/hiring/notifications/**`, dedupe
+`wasEmailAlreadySent` y re-emisión canónica del token del test (`reissueCandidateTestTokenForEmail` — el token
+nunca viaja por el outbox). Gates: 10.577 tests verdes, lint/typecheck 0, worker gates OK; el `pnpm build` de
+producción NO se corrió por la preferencia del operador (memoria: build cuelga la máquina) — el CI lo cubre al
+push. **Rollout pendiente:** flag `HIRING_LIFECYCLE_EMAILS_ENABLED` default OFF en `deploy.sh` (seed
+`email_type_config` YA aplicado en la DB compartida, benigno con flag OFF); el flip exige deploy del ops-worker
++ ejercicio end-to-end en staging + revisión de Talent del copy (especialmente `hiring_decision_rejected`,
+pausable aparte). Ledger actualizado. El seed se aplicó selectivamente con `pnpm migrate:up 1` para no adelantar la migración de
+ISSUE-151, que en ese momento exigía código desplegado primero (la sesión de ISSUE-151 la aplicó después por su
+propio carril — ver su entrada).
 
-**Cierre del flip:** con autorización explícita del operador ("ejecutala tú"), el agente corrió
-`vercel redeploy` → deployment `greenhouse-aivcug5f5` `READY` aliaseado a `greenhouse.efeoncepro.com`.
-Diagnóstico post-flip EN producción: `flagEnabled=true`, `credentialPlan=service_account_key`,
-`mint.ok=true` (94 ms, identidad `greenhouse-portal@`), `probe.ok=true` (`scanStatus=ok`, 147 ms).
-El bloqueo previo del clasificador de permisos sobre `vercel env/redeploy` resultó transitorio.
+### ISSUE-151 RESUELTA — bridge Facebook, grant Globe y smoke de identidad verificados (2026-08-12)
 
-**Único pendiente para cerrar TASK-1378 y mover ISSUE-150 a resolved:** la primera postulación real del
-2026-08-12 registrando `scanner=structural+clamav-http` + `clean` + `attached` en `asset_scan_results`
-(~13/día; el flip fue de madrugada Chile). Si algo fallara: rollback `vercel env rm` + redeploy <10 min, y
-recovery `scripts/hiring/recover-scanner-403-quarantined-cvs.ts`. El cierre de task exige además el gate
-full test + build (pedir autorización para `pnpm build` — memoria: cuelga el equipo).
+`d139726ff` llegó a `main` por PR #189 y el release de producción terminó correctamente. El filtro Sentry para
+`JAVASCRIPT-NEXTJS-8W` descarta sólo el bridge Facebook Android `Java object is gone`; Careers siguió respondiendo
+200 con `<greenhouse-form>` y sin `postMessage`/iframe. La migration
+`20260812093000000_issue-151-seed-globe-credits-view-access.sql` quedó aplicada en Cloud SQL: registry activo y
+único grant `efeonce_admin → administracion.globe_credits` con `granted=true`.
+
+Se cerró además el falso positivo `JAVASCRIPT-NEXTJS-4S`: el `ops-worker` compartido consultaba el portal staging,
+que responde 302 por su SSO; quedó apuntando al portal público. Dos ejecuciones consecutivas de
+`ops-identity-auth-smoke` pasaron 5/5, incluido `portal_auth_health`, y la health pública devolvió `ready`. 8W no
+recibió eventos tras el rollout. Los dos tickets remotos siguen *unresolved* sólo porque la sesión de Sentry no está
+autenticada y el token API disponible es read-only (403 al resolver); hace falta una sesión/token con escritura para
+marcarlos en Sentry. El artefacto interno vive en `docs/issues/resolved/ISSUE-151-…`.
+
+### TASK-1378 CERRADA + ISSUE-150 RESUELTA — scanner LIVE en producción, verificado en 3 capas (2026-08-12 06:10Z)
+
+**Cierre completo, autorizado por el operador ("terminemos todo lo que falte"):** (1) redeploy
+`greenhouse-aivcug5f5` con el flag horneado; (2) diagnóstico post-flip EN producción: `flagEnabled=true`,
+`credentialPlan=service_account_key`, `mint.ok` (94 ms), `probe.ok` (147 ms); (3) **camino completo de upload
+productivo**: postulación de prueba por el formulario público REAL (`PRUEBA TASK-1378 / NO CONTACTAR`,
+`task-1378-postflip-prod@efeonce.org`, Turnstile real auto-verificado, CV inyectado vía DataTransfer) →
+`scan_id ascan-e6a62b39-de96-4279-87ba-172587040068`, `scanner=structural+clamav-http`, `verdict=clean`,
+asset `attached`, 129 ms. **HR descarta esa postulación en el Desk** (tercera de prueba identificada).
+
+ISSUE-150 movida a `resolved/` (índice actualizado); TASK-1378 movida a `complete/` con sección de cierre;
+flag ledger con Production ON en el snapshot; delta de impacto cruzado en TASK-1423. Gates de cierre (full
+test + build) corridos en el commit de cierre. El bloqueo del clasificador de permisos sobre
+`vercel env/redeploy` resultó transitorio.
 
 ### (histórico) TASK-1378 — RELEASE HECHO + diagnóstico VERDE en producción; falta SOLO el flip del flag (2026-08-11 23:15Z)
 

@@ -105,6 +105,25 @@ verdict. Codex and Claude skill names are not assumed to match.
    - Use `operativamente bloqueado` when the behavior cannot exist until an
      external action or missing dependency is resolved.
 
+## Cierre de incidentes Sentry
+
+Para un incidente de cliente o identidad, separa corrección, evidencia de runtime y estado de
+Sentry. Ninguna de las tres sustituye a otra.
+
+- Un filtro cliente sólo es admisible si usa una conjunción de señales estables y específicas del
+  incidente (origen/entorno, mensaje y frame o mecanismo conocido). Nunca suprimas por user-agent,
+  proveedor, texto parcial o familia de error de forma amplia: conserva eventos que no satisfagan
+  todas las condiciones y cúbrelo con casos positivos y negativos.
+- Un acceso reparado mediante migración debe probar el estado persistido: migración registrada,
+  view activa, grant exacto y persona/rol esperado. Un fallback que deja pasar la ruta es evidencia
+  de compatibilidad, no de que la proyección de permisos quedó sana.
+- Antes de declarar una issue de Sentry resuelta, confirma que el principal realmente puede mutar su
+  estado. Un token de sólo lectura puede listar eventos pero no resolverlos; ante un `403`, registra
+  la limitación sin exponer el token y usa una sesión o credencial con alcance de escritura autorizada.
+- Tras producción, verifica el runtime que generaba el evento, la salud o smoke asociado y la
+  frescura de eventos durante una ventana explícita. "No hubo eventos desde el deploy" no equivale
+  a cierre si no se inspeccionó la misma organización, entorno y issue.
+
 ## Non-Negotiable Blockers
 
 ### AXIS Shared UI Platform Gate

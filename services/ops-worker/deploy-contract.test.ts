@@ -28,6 +28,16 @@ describe('ops-worker deploy Nubox contract', () => {
   })
 })
 
+describe('ops-worker deploy identity smoke contract', () => {
+  it('keeps the shared worker probe on the public production portal in every deploy mode', () => {
+    const script = deployScript()
+
+    expect(script).toContain('DEFAULT_GREENHOUSE_PORTAL_BASE_URL="https://greenhouse.efeoncepro.com"')
+    expect(script).not.toContain('DEFAULT_GREENHOUSE_PORTAL_BASE_URL="https://dev-greenhouse.efeoncepro.com"')
+    expect(script).toContain('staging is protected by Vercel SSO')
+  })
+})
+
 describe('ops-worker deploy Notion status-transition contract', () => {
   it('requires the productive Notion token secret before deploy can continue', () => {
     const script = deployScript()

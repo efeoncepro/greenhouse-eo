@@ -30,6 +30,8 @@ type CandidateFacetLinkRow = {
   candidate_facet_id: string
   portfolio_url: string | null
   linkedin_url: string | null
+  phone_e164: string | null
+  residence_country_code: string | null
 }
 
 type OpeningCountRow = {
@@ -113,7 +115,7 @@ export const getHiringDeskSnapshot = async (
       : Promise.resolve([]),
     facetIds.length > 0
       ? runGreenhousePostgresQuery<CandidateFacetLinkRow>(
-          `SELECT candidate_facet_id, portfolio_url, linkedin_url
+          `SELECT candidate_facet_id, portfolio_url, linkedin_url, phone_e164, residence_country_code
            FROM greenhouse_hiring.candidate_facet
            WHERE candidate_facet_id = ANY($1::text[])`,
           [facetIds],
@@ -165,6 +167,8 @@ export const getHiringDeskSnapshot = async (
         maskedEmail: maskHiringEmail(identity?.canonical_email ?? null),
         portfolioUrl: facet?.portfolio_url ?? null,
         linkedinUrl: facet?.linkedin_url ?? null,
+        phoneE164: facet?.phone_e164 ?? null,
+        residenceCountryCode: facet?.residence_country_code ?? null,
         openingTitle: opening.publicTitle ?? opening.internalTitle,
         openingPublicId: opening.publicId,
         area,

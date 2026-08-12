@@ -52,6 +52,41 @@ describe('parsePublicHiringApplication', () => {
     expect(out?.phone).toBe('+56912345678')
     expect(parsePublicHiringApplication({ ...valid, phone: '123' })).toBeNull()
   })
+
+  // TASK-1688 — país de residencia autodeclarado (expand/contract: opcional-pero-validado)
+  it('acepta residenceCountryCode ISO válido (case-insensitive) y lo normaliza a mayúsculas', () => {
+    expect(parsePublicHiringApplication({ ...valid, residenceCountryCode: 'cl' })?.residenceCountryCode).toBe('CL')
+    expect(parsePublicHiringApplication({ ...valid, residenceCountryCode: 'VE' })?.residenceCountryCode).toBe('VE')
+  })
+
+  it('rechaza residenceCountryCode inválido (nunca persistir un país inventado)', () => {
+    expect(parsePublicHiringApplication({ ...valid, residenceCountryCode: 'ZZ' })).toBeNull()
+    expect(parsePublicHiringApplication({ ...valid, residenceCountryCode: 'Chile' })).toBeNull()
+  })
+
+  it('residenceCountryCode ausente sigue siendo válido durante el expand (legacy/clientes cacheados)', () => {
+    expect(parsePublicHiringApplication(valid)?.residenceCountryCode).toBeNull()
+  })
+
+  it('el país de residencia sirve como hint de formato del teléfono, nunca al revés', () => {
+    // Número local chileno con residencia declarada CL → normaliza con +56.
+    const out = parsePublicHiringApplication({ ...valid, phone: '9 1234 5678', residenceCountryCode: 'CL' })
+
+    expect(out?.phone).toBe('+56912345678')
+
+    // Teléfono internacional completo NO altera el país declarado.
+    const intl = parsePublicHiringApplication({ ...valid, phone: '+34 600 000 000', residenceCountryCode: 'VE' })
+
+    expect(intl?.phone).toBe('+34600000000')
+    expect(intl?.residenceCountryCode).toBe('VE')
+  })
+
+  it('conserva el mensaje application-scoped hasta 4000 caracteres', () => {
+    const out = parsePublicHiringApplication({ ...valid, message: 'Hola equipo, me interesa la vacante.' })
+
+    expect(out?.message).toBe('Hola equipo, me interesa la vacante.')
+    expect(parsePublicHiringApplication({ ...valid, message: 'x'.repeat(5000) })?.message).toHaveLength(4000)
+  })
 })
 
 describe('isSafeHttpUrl', () => {
