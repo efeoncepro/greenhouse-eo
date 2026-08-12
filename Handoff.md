@@ -2,6 +2,43 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+### TASK-1310 — la ronda premium estaba hecha y sin medir; queda UN bloqueo, y no es de código (2026-08-12)
+
+**Sigue `in-progress`.** El scorecard en BLOCK (`average=2.29`) juzgaba capturas de las 10:25 del
+2026-08-08; el commit `5f622386d` de las 19:29 ejecutó los lotes de la auditoría premium y **nadie
+volvió a medir**. Medido hoy: el dashboard pasó de `exitCode 1` con 2 violaciones axe de contraste y
+15 targets de 23 px, a **`exitCode 0` con `qualityFindings` vacío** en desktop y mobile.
+`ui:quality` queda **PASS 4.52**. Antes de rehacer trabajo en una task con auditoría abierta,
+**medir**: acá los 7 lotes estaban ejecutados.
+
+**Lo que necesita quien siga:**
+
+1. 🔴 **El único bloqueo es `pnpm ui:visual-gate --task TASK-1310`**, que exige captura del scenario
+   **real** (`growth-seo-client`, el que atraviesa el gate per-org) + su `review-dossier.md`. No pude
+   emitirla: `agent-client@greenhouse.efeonce.org` **no pertenece a la organización contratada**, así
+   que recibe la card de bloqueo y la captura muere en el marker. Resolverlo exige el mapeo
+   organización↔cliente, que **no está donde uno lo busca**: `greenhouse_core.client_users` enlaza por
+   `client_id` y ni `clients` ni `organizations` exponen la FK del otro (verificado contra
+   `information_schema`; la sonda `scripts/growth/_sanity-seo-client-population.ts` deja la
+   introspección lista). Con esa sesión, el cierre son dos comandos.
+2. ⚠️ **Sobrescribí `.auth/storageState.local-berel-client.json`** con la persona genérica al
+   intentarlo. Su token ya estaba vencido (era del 09-08), así que no se perdió acceso, pero **el
+   archivo ya no corresponde a su nombre** y tres scenarios lo declaran en `requiresStorageState`.
+3. **Dos defectos reales que ningún gate veía, corregidos.** El informe web decía "Aún no hay una
+   posición media para leer" con **#13.3 impreso al lado**, con `exitCode 0` — cada render derivaba su
+   propio título. Y el FAB global "volver arriba" no tenía nombre accesible (`button-name`, impacto
+   *critical*, en **todas** las rutas del portal). Commits `cb8d60b9b` y `756d9970d`. Los dos salieron
+   **mirando frames**, no leyendo JSON.
+4. 🔴 **`pnpm test` está rojo en el árbol por trabajo AJENO:** `catalog-portability.test.ts` falla por
+   un `../../../../../public/branding/...` en `deck-axis/back-cover-full.html`, que es WIP no
+   commiteado del deck ANAM/HubSpot (en HEAD hay cero ocurrencias). El guardrail está haciendo su
+   trabajo: ese path relativo escapa del catálogo. 10.588 tests pasan. No lo toqué — no es mío.
+5. **Follow-up con dato, sin task todavía:** la superficie cliente tiene **una sola organización**
+   (Efeonce tiene assignment pero es tenant interno y `requireClientTenantContext()` lo excluye). Con
+   N=1 nadie delata que `connection.state` se decide con **GSC** mientras el Resumen deriva de **rank
+   snapshots**: un cliente con Search Console conectado y captura de rank sin correr —**el día 1 de
+   todo cliente nuevo**— ve el KPI principal en "sin dato" con el Quadrant poblado debajo.
+
 ### CIERRE END-TO-END TASK-1688/1689 — segundo release del día, cero pendientes (2026-08-12)
 
 Release `950f5bdb4` (PR #191) → manifest `950f5bdb4043-71cc7e1a-…` en **`released`** (run `31639297861`, sin
