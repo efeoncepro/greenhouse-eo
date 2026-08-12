@@ -131,6 +131,16 @@ Revisar al menos: instrucciones/consentimiento, timer, autosave, avance, scoreca
 4. Revisa y EDITA el borrador como humano responsable: título, resumen y descripción son obligatorios; verifica el recordatorio anti-sesgo (sin señales de género/edad ni requisitos no laborales).
 5. `Aplicar al aviso` escribe el copy al opening (requiere permiso de edición) — o `Descartar borrador` lo rechaza. La IA nunca escribe ni publica sola: publicar sigue siendo el paso 4 de la sección anterior.
 
+## Los correos que disparan tus acciones (TASK-1689)
+
+Algunas acciones del Desk envían un correo automático al candidato. Conviene saberlo antes de hacer clic:
+
+- **Mover la etapa a `Preselección` o `Entrevista`** → el candidato recibe un email de avance de proceso.
+- **Asignar un test al candidato** → el candidato recibe un email con el link para rendirlo. Ojo: **re-asignar el test rota el token e invalida el link anterior** — si el candidato tenía el correo viejo guardado, ese link ya no sirve.
+- **Decidir `selected` o `rejected`** → el candidato recibe el email de decisión. El correo de rechazo se puede pausar por configuración (`email_type_config`).
+
+Para pausar un tipo de correo, diagnosticar por qué no llegó o revisar el historial de envíos, usa el manual [Operar los emails del ciclo de hiring](operar-emails-ciclo-hiring.md).
+
 ## Problemas comunes
 
 - **No ves Hiring Desk:** solicita la vista correspondiente; no se resuelve ampliando capabilities a ciegas.

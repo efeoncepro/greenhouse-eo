@@ -9,6 +9,15 @@
 > Domain: `growth` (`GREENHOUSE_GROWTH_DOMAIN_ARCHITECTURE_V1.md`)
 > Runtime contract: `greenhouse-growth-public-forms.v1` (planned)
 
+## Delta 2026-08-12 — TASK-1688/1689: variant careers en el renderer, placeholder del select premium y paridad contrato↔script de publicación (§19)
+
+Cambios de runtime del renderer (`src/growth-forms-renderer/renderer.ts`) y regla operativa del lifecycle de publicación, con el republish v4 de `efeonce-careers-application` como caso fuente:
+
+- **Secciones hardcodeadas del style variant `careers-html-fidelity`:** la agrupación de campos en secciones («01 Tus datos», «02 …», etc.) vive como listas de field keys **hardcodeadas en el renderer** (~línea 413). Ahora «01 Tus datos» incluye `residenceCountryCode` (tras `email`, antes de `phone`). Consecuencia operativa: un campo nuevo del form **cae al fallback «04 Datos adicionales»** salvo que se agregue explícitamente a la lista de su sección en el renderer.
+- **Placeholder del select premium (`renderPremiumSelectControl`, variants `diagnostic_premium` y `careers-html-fidelity`):** cuando el field NO tiene valor seteado, el control ahora muestra el `placeholder` declarado del field en vez de renderizar la primera opción como si estuviera elegida. Bug real que motiva el cambio: un select requerido "mostraba Chile" con valor vacío y el candidato enviaba el form recibiendo un error genérico. Si el field no declara `placeholder`, se conserva el fallback legacy a `options[0]` (backward compat).
+- **Guard de `CSS.escape` en `patchEmailVerifyDom`:** el timer del debounce de verificación de email puede disparar post-teardown en un entorno sin el global `CSS` (flake real de CI); el patch ahora guarda contra su ausencia en vez de lanzar.
+- **Regla operativa — paridad contrato↔script de publicación:** el form `efeonce-careers-application` v4 se publicó por el lifecycle gobernado (`scripts/growth/publish-careers-application-form.ts --apply --force`) con el campo `residenceCountryCode` (select requerido, 250 opciones del SSOT `src/lib/locale/countries.ts`, help text anti-inferencia). El `FIELD_SCHEMA` de ese script está **DUPLICADO** respecto de `buildCareersApplicationFormContract` (brecha de paridad conocida, sin cerrar): al agregar un campo al contrato hay que agregarlo TAMBIÉN al script **y republicar** una versión nueva del form. El republish v4 es el caso fuente de esta regla.
+
 ## Delta 2026-07-13 — TASK-1372 application forms, private file upload and Hiring projection
 
 Growth Forms can now act as the write-path source of truth for `form_kind='application'` forms that collect a CV/file.

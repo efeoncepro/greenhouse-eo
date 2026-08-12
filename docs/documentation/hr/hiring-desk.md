@@ -87,6 +87,10 @@ nativo) guarda tres datos que antes se perdían:
 - **Mensaje del candidato** (opcional, hasta 4.000 caracteres) — pertenece a esa postulación
   específica.
 
+Desde el 2026-08-12 el país de residencia es obligatorio también en el servidor (flip de
+contrato): una postulación que llegue sin país válido se rechaza con un error genérico, aunque
+provenga de un formulario que no muestre el campo.
+
 Los tres se leen únicamente en la Postulación 360 (bloque "Perfil del candidato"), sólo para
 usuarios internos autorizados. Las postulaciones históricas muestran "No informado": no se
 rellenan con suposiciones. Estos datos son PII interna y no aparecen en vistas públicas,
