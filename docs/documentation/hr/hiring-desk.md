@@ -76,6 +76,22 @@ Cuando una postulación se decide como **seleccionada**, Greenhouse materializa 
 - Application 360 muestra el handoff real cuando la decisión es `selected` + destino `internal_hire`. Si el handoff está pendiente y el actor tiene `hiring.handoff.approve`, puede aprobarlo desde la pestaña **Decisión**; si está aprobado o en ejecución, **Abrir Activation Lane** lleva a `/hr/onboarding?lane=hiring-activation&applicationId=...&handoffId=...`.
 - La Activation Lane de TASK-1368 es la UI People Ops de N11. Consume el bridge de TASK-770 y el resolver de blockers de TASK-1400; si el target todavía no está en la cola, muestra estado honesto en vez de seleccionar otro caso.
 
+## Datos de contacto del candidato (TASK-1688)
+
+Desde 2026-08-12, cada postulación nueva del apply público (formulario estándar o Growth Form
+nativo) guarda tres datos que antes se perdían:
+
+- **Teléfono** (opcional, formato internacional E.164) y **país de residencia** (obligatorio,
+  autodeclarado por el candidato) — viven en el perfil de la persona candidata y se conservan
+  entre postulaciones. El país NUNCA se deduce del prefijo telefónico.
+- **Mensaje del candidato** (opcional, hasta 4.000 caracteres) — pertenece a esa postulación
+  específica.
+
+Los tres se leen únicamente en la Postulación 360 (bloque "Perfil del candidato"), sólo para
+usuarios internos autorizados. Las postulaciones históricas muestran "No informado": no se
+rellenan con suposiciones. Estos datos son PII interna y no aparecen en vistas públicas,
+portales de cliente, analítica ni exportaciones.
+
 ## Referencias
 
 - Arquitectura: `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`

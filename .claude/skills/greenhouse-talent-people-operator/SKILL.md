@@ -132,6 +132,18 @@ Governance: flag `HIRING_LIFECYCLE_EMAILS_ENABLED` **default OFF and lives ONLY 
 
 Docs: manual `docs/manual-de-uso/hr/operar-emails-ciclo-hiring.md` · functional `docs/documentation/hr/emails-ciclo-hiring.md` · architecture `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (Delta 2026-08-12) · flag ledger `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
 
+## Candidate contact completeness (TASK-1688 — code complete, rollout pendiente)
+
+Public Careers applications now capture durable candidate contact, person-first:
+
+- **Where each datum lives**: `greenhouse_hiring.candidate_facet.phone_e164` (E.164, optional) + `candidate_facet.residence_country_code` (ISO 3166-1 alpha-2) are person-level; `greenhouse_hiring.hiring_application.candidate_message` (≤4000) belongs to THAT application and is never copied to the profile.
+- **Autodeclarado ≠ inferido**: residence country is what the candidate declares — NEVER inferred from phone prefix, IP, or CV. Required in the UI for new applications; the parser-level required flip is a later expand/contract rollout step.
+- **Anti-wipe upsert**: the candidate facet upsert uses COALESCE — a later application with empty contact fields never wipes previously captured values.
+- **Entry parity**: one parser/command (`parsePublicHiringApplication` → `submitPublicHiringApplication`) serves BOTH public entries — native Growth Form and standard apply have exact parity. Never fork a second intake path.
+- **Read surface**: contact data renders ONLY in Application 360 ("Perfil del candidato": full phone, country as textual name, message). Legacy applications show "No informado" — backfill/inference is prohibited. Candidate PII never reaches public/client payloads, analytics, or logs.
+
+Docs: ADR Delta 2026-08-12 in `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (+ row in `DECISIONS_INDEX.md`) · functional `docs/documentation/hr/hiring-desk.md` §Datos de contacto del candidato · manual `docs/manual-de-uso/hr/operar-careers-publicas.md` §Datos de contacto en el formulario.
+
 ## First reads (before acting inside Greenhouse)
 
 - `CLAUDE.md`, `AGENTS.md`, `project_context.md`, `Handoff.md`

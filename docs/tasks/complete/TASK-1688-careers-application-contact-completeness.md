@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-011`
-- Status real: `Diseño confirmado; no implementada`
+- Status real: `Code complete (Slices 0-3 + tests); rollout pendiente: staging + GVC + revisión Privacy + flip país-requerido en parser`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
@@ -437,6 +437,23 @@ La residencia se muestra como select accesible con nombre textual del país y c�
 
 - Captura/remediación explícita de datos de contacto para candidatos históricos, sólo si Hiring/Privacy definen finalidad, consentimiento y canal; nunca por inferencia.
 - Cualquier automatización CRM o de contacto posterior requiere contrato separado de consentimiento, retención e integración.
+
+## Cierre 2026-08-12 — code complete, rollout pendiente
+
+**Implementado y verificado local (suite completa 10.585 tests, lint/typecheck 0):**
+
+- ADR registrado (Delta 2026-08-12 en `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` + fila en `DECISIONS_INDEX.md`): `phone_e164` + `residence_country_code` en `candidate_facet` (person-first, anti-wipe), `candidate_message` en `hiring_application`.
+- Migración `20260812094000000` aditiva aplicada y verificada contra PG real (3 columnas + CHECKs). El timestamp salta al `2026-08-12 09:40` porque la migración de ISSUE-151 (`…093000000`, nombrada a mano con hora futura) ya estaba aplicada y node-pg-migrate rechaza timestamps anteriores; forward-fix documentado.
+- Parser único extendido (`residenceCountryCode` opcional-pero-validado contra `src/lib/locale/countries.ts`, sin truncación `'Chile'→'CH'`; país como hint de formato del teléfono, nunca al revés) + command persiste los 3 campos; test anti-regresión "el form acepta y el command descarta".
+- Paridad de entradas: campo select en Careers estándar (`CareersApplyClient`, con ayuda anti-inferencia, foco-al-primer-error y aria) y en el contrato del native Growth Form; copy es-CL/en-US tokenizado.
+- Application 360: Teléfono (completo — la finalidad es operar el contacto; decisión en el ADR), País de residencia (nombre textual) y Mensaje del candidato, con `No informado` para legacy y `data-capture` markers.
+
+**Rollout pendiente (bloqueado por deploy + operador):**
+
+1. Push/deploy a staging + ejercicio real de ambas superficies + Application 360 (GVC premium 1440/390 según el plan del wireframe; el dev server local no levantó vía preview harness esta sesión).
+2. Revisión Legal/Privacy de retención/aviso para los 3 campos (out-of-band declarado en la spec).
+3. Flip expand→contract: hacer `residenceCountryCode` requerido a nivel parser tras verificar ambas superficies en producción (hoy sólo la UI lo exige).
+4. Scorecard visual `docs/ui/reviews/TASK-1688-….scorecard.json` con las capturas de staging.
 
 ## Delta 2026-08-11
 

@@ -2,6 +2,22 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+### TASK-1688 CERRADA — contacto completo en postulaciones Careers: code complete, rollout pendiente (2026-08-12)
+
+ADR aceptado y registrado (Delta en la arquitectura Hiring + `DECISIONS_INDEX`): `phone_e164` y
+`residence_country_code` (autodeclarado, ISO, CHECK) viven en `candidate_facet` con upsert anti-wipe;
+`candidate_message` (≤4000) en `hiring_application`. Migración `20260812094000000` aditiva aplicada y verificada
+contra PG real — su timestamp es 09:40 porque la migración de ISSUE-151 (nombrada a mano con hora futura 09:30) ya
+estaba aplicada y node-pg-migrate rechaza timestamps anteriores. El parser único valida el país contra el SSOT
+`countries.ts` SIN truncar (`'Chile'`→`'CH'` habría sido Suiza — atrapado por test) y lo usa sólo como hint de
+formato del teléfono; el command persiste los tres campos (test anti-regresión del bug class "el form acepta y el
+command descarta"). Paridad: select de país requerido en `CareersApplyClient` + contrato del native Growth Form,
+copy es-CL/en-US tokenizado; Application 360 muestra Teléfono completo / País (nombre textual) / Mensaje, con "No
+informado" para legacy. Suite completa 10.585 tests + lint/typecheck 0; `design-contract:lint` y `ui:code-lint`
+PASS. **Rollout pendiente:** ejercicio en staging + GVC premium 1440/390 (el preview harness local no levantó el
+dev server esta sesión), revisión Legal/Privacy de retención/aviso, y el flip expand→contract que hace el país
+requerido a nivel parser tras verificar ambas superficies en producción.
+
 ### TASK-1689 CERRADA — emails del ciclo de Hiring: code complete, rollout pendiente (2026-08-12)
 
 Los 6 emails (aviso interno a People + acuse al candidato en `hiring.application.created`, test asignado en
@@ -14,8 +30,9 @@ producción NO se corrió por la preferencia del operador (memoria: build cuelga
 push. **Rollout pendiente:** flag `HIRING_LIFECYCLE_EMAILS_ENABLED` default OFF en `deploy.sh` (seed
 `email_type_config` YA aplicado en la DB compartida, benigno con flag OFF); el flip exige deploy del ops-worker
 + ejercicio end-to-end en staging + revisión de Talent del copy (especialmente `hiring_decision_rejected`,
-pausable aparte). Ledger actualizado. La migración ajena de ISSUE-151 (timestamp posterior) quedó SIN aplicar a
-propósito — su plan exige código desplegado primero; se aplicó selectivamente con `pnpm migrate:up 1`.
+pausable aparte). Ledger actualizado. El seed se aplicó selectivamente con `pnpm migrate:up 1` para no adelantar la migración de
+ISSUE-151, que en ese momento exigía código desplegado primero (la sesión de ISSUE-151 la aplicó después por su
+propio carril — ver su entrada).
 
 ### ISSUE-151 RESUELTA — bridge Facebook, grant Globe y smoke de identidad verificados (2026-08-12)
 

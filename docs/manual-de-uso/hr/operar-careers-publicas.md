@@ -291,6 +291,21 @@ propios y destination/submit contract documentado. Si se decide escribir directo
 en Hiring, debe crear o reconciliar Person + `candidate_facet` como talento
 general, no esconder leads en una tabla auxiliar ni en un webhook unico.
 
+## Datos de contacto en el formulario (TASK-1688)
+
+El apply pide país de residencia (obligatorio, select con nombre textual — sin banderas como
+único significado), teléfono opcional con prefijo sólo para formato, y mensaje opcional. Reglas
+al operar/verificar:
+
+- El país es autodeclarado: cambiar el prefijo del teléfono NO cambia el país y viceversa.
+- Si un candidato reporta que "el formulario no acepta su país", verificar que el select cargó
+  (catálogo ISO completo) antes de asumir bug de validación.
+- Los valores llegan a la Postulación 360 (`/agency/hiring/applications/[id]`); las
+  postulaciones anteriores a 2026-08-12 muestran "No informado" y eso es correcto — no se
+  backfillea.
+- El mismo contrato aplica al Growth Form nativo: si un campo aparece en una superficie y no en
+  la otra, es un bug de paridad (reportar como issue).
+
 ## Smoke E2E recomendado
 
 Para cerrar una publicacion real:

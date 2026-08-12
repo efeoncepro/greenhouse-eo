@@ -7,6 +7,18 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-12 — El formulario de Careers ya no pierde el contacto del candidato (TASK-1688)
+
+Se cerró la pérdida silenciosa que descubrió la auditoría de postulaciones: teléfono y mensaje se
+validaban en el navegador pero el command los descartaba, y no existía país de residencia. Ahora el
+apply (estándar y Growth Form nativo, mismo parser/command) pide país de residencia autodeclarado
+(select textual del catálogo ISO — jamás deducido del prefijo telefónico), guarda el teléfono E.164
+opcional en el perfil del candidato con política anti-wipe y el mensaje como contexto de esa
+postulación. El reclutador lo lee en la Postulación 360; las postulaciones históricas muestran "No
+informado" sin inventar datos. ADR registrado, migración aditiva aplicada, país requerido primero
+en UI (expand/contract). Pendiente de rollout: ejercicio en staging + GVC, revisión de Privacy y el
+flip a requerido en parser.
+
 ## 2026-08-12 — El proceso de contratación ahora avisa por correo en cada hito (TASK-1689)
 
 Greenhouse deja de estar mudo durante el hiring: al llegar una postulación, People recibe un aviso
@@ -1158,10 +1170,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   contrato actuales y sus superficies proveedoras diferidas.
 - No cambió el runtime de Globe, el catálogo, los adapters, los secrets ni la disponibilidad. Las fichas son mapas de
   evidencia; `globe.producer.fleet.list` conserva la autoridad live.
-
-## 2026-08-04 — Globe: skill compartida para integrar modelos por ruta
-
-- **ADR-023 implementa `greenhouse-globe-model-fleet`** como skill espejada para Codex y Claude, con contrato de
-  route cards, schema, validador determinista y gate de paridad. La primera ficha machine-readable es FLUX 3 Video.
-- La ficha separa evidencia del proveedor, cables de integración y disponibilidad live; no crea catálogo, adapter,
-  rate ledger ni promoción paralelos. FLUX 3 permanece gated y el runtime de Globe no fue modificado.

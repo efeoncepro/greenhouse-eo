@@ -20,6 +20,40 @@ Este documento fija:
 - Domain: `agency` + `people` + `hris` + `staff augmentation` + `finance` + `capacity`
 - Date: `2026-04-11`
 
+## Delta 2026-08-12 — TASK-1688 (ADR): completitud de contacto del candidato — ubicación física y contrato
+
+**Decisión (Accepted 2026-08-12).** Los tres datos que el apply público aceptaba pero el command
+descartaba quedan persistidos así:
+
+| Dato | Ubicación física | Semántica |
+|---|---|---|
+| Teléfono | `greenhouse_hiring.candidate_facet.phone_e164` (TEXT NULL) | Contacto durable **person-first**, normalizado E.164; opcional |
+| País de residencia | `greenhouse_hiring.candidate_facet.residence_country_code` (TEXT NULL, CHECK `^[A-Z]{2}$`) | **Autodeclarado** ISO 3166-1 alpha-2; requerido en UI para postulaciones nuevas; NULL = legacy "No informado" |
+| Mensaje | `greenhouse_hiring.hiring_application.candidate_message` (TEXT NULL, CHECK ≤4000) | Contexto de **esa** postulación; nunca se copia al facet |
+
+**Alternativas rechazadas:** inferir país desde prefijo telefónico/IP/CV (dato insuficiente y
+engañoso — prohibido); guardar todo en la aplicación (el contacto es de la persona, no de una
+postulación); backfill de filas históricas (imposible de forma fiable; se muestra "No informado").
+
+**Invariantes:**
+
+- **Un solo parser/command** para ambas entradas: `parsePublicHiringApplication` →
+  `submitPublicHiringApplication`. Careers estándar y el native Growth Form (projection TASK-1372)
+  consumen exactamente el mismo contrato; no existe write path alterno.
+- **Expand/contract del país:** la UI lo exige (`required`); el parser lo acepta
+  opcional-pero-validado contra el SSOT `src/lib/locale/countries.ts` (sin truncación — `'Chile'`
+  truncado daría `'CH'`=Suiza; longitud ≠ 2 → rechazo). El flip a requerido-en-parser es un paso
+  de rollout explícito tras verificar ambas superficies en producción.
+- **El país de residencia puede servir como hint de formato local del teléfono, NUNCA al revés**
+  (residencia jamás se infiere del prefijo).
+- **Anti-wipe:** el upsert del facet usa `COALESCE(EXCLUDED.x, existente)` — una entrada opcional
+  omitida nunca borra un valor previo de la misma persona.
+- **PII interna:** los tres campos se leen sólo en Application 360 (gate `hiring.application.read`
+  existente); el teléfono se muestra completo ahí (la finalidad es operar el contacto; el email
+  conserva su máscara actual). Nunca aparecen en `PublicOpeningPayload`, clientes, analítica ni logs.
+- Sin flag nuevo: es corrección contractual del intake ya gateado por
+  `HIRING_PUBLIC_APPLICATIONS_ENABLED`.
+
 ## Delta 2026-08-12 — TASK-1689: emails transaccionales del ciclo de vida (consumers reactivos)
 
 Los 4 eventos del pipeline que ya se emitían como audit ahora tienen consumers de email en el
