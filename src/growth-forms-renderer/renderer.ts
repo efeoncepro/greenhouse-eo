@@ -411,7 +411,9 @@ export class FormRenderer {
     const shell = el(this.doc, 'div', { class: 'ghf-careers-fields' })
 
     const sections = [
-      { marker: '01', title: 'Tus datos', fieldKeys: ['firstName', 'lastName', 'email', 'phone'] },
+      // TASK-1688 — residenceCountryCode va tras email y antes de phone (wireframe: el país es
+      // dato personal explícito; nunca queda relegado al fallback "Datos adicionales").
+      { marker: '01', title: 'Tus datos', fieldKeys: ['firstName', 'lastName', 'email', 'residenceCountryCode', 'phone'] },
       { marker: '02', title: 'Tu perfil', fieldKeys: ['portfolioUrl', 'linkedinUrl', 'availability', 'cvFile'] },
       { marker: '03', title: 'Cuéntanos más', fieldKeys: ['message'] }
     ]
