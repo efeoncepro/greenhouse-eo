@@ -2356,7 +2356,15 @@ export class FormRenderer {
 
   /** Inserta/actualiza el indicador "verificando…" + el affordance typo-suggest. */
   private patchEmailVerifyDom(field: RendererFieldDefinition): void {
-    const control = this.opts.root.querySelector<HTMLElement>(`[name="${CSS.escape(field.key)}"]`)
+    // `CSS.escape` no existe en todos los entornos (el timer del debounce puede disparar
+    // post-teardown en jsdom/node y reventar como unhandled rejection — flake real de CI).
+    // Los field keys del contrato son identificadores simples; el fallback los escapa a mano.
+    const escapeKey =
+      typeof CSS !== 'undefined' && typeof CSS.escape === 'function'
+        ? CSS.escape(field.key)
+        : field.key.replace(/["\\\]]/g, '\\$&')
+
+    const control = this.opts.root.querySelector<HTMLElement>(`[name="${escapeKey}"]`)
     const wrap = control?.closest('.ghf-field')
 
     if (!wrap) return
