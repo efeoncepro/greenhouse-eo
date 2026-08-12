@@ -216,6 +216,21 @@ Reglas obligatorias:
 - Actualizar `Handoff.md` con comandos, deployment URLs, verificaciones y riesgo residual.
 - Actualizar `changelog.md` si cambia protocolo operacional o health behavior.
 
+## Rollout Plan & Risk Matrix
+
+Rollout progresivo por los slices del Scope: canary production sin trafico (Slice 2) → validacion de
+consumidores reales en el canary (Slice 3) → cutover de Production real (Slice 4) → retiro/disable de la key
+solo despues de observar que ya no se usa (Slice 5). Cada etapa conserva rollback explicito: restaurar
+`GCP_AUTH_PREFERENCE=service_account_key` + re-inyectar la key desde Secret Manager + redeploy (<10 min);
+la key NO se destruye hasta cerrar el soak.
+
+| Riesgo | Impacto | Mitigacion |
+|---|---|---|
+| WIF falla en Production para un consumer que el canary no ejercito (Cloud SQL, BigQuery, GCS, Vertex, **ID tokens hacia Cloud Run IAM-only**) | Outage del consumer; con semantica fail-closed (p. ej. scanner de malware) bloquea usuarios reales — caso fuente ISSUE-150 | Slice 3 valida consumidores reales en canary ANTES del cutover; para ID tokens correr `GET /api/internal/health/scanner-auth?probe=scan` en el canary y en Production post-cutover (verifica la rama `wif` del plan desde el runtime real, ver Delta 2026-08-12) |
+| Token OIDC de Vercel ausente/expirado en runtime | `shouldUseWorkloadIdentity` degrada o el mint falla rapido | Diagnostico `getGoogleCredentialDiagnostics` via `/api/internal/health` + endpoint scanner-auth; rollback env |
+| Retiro prematuro de la key mientras algo aun la usa | Outage silencioso diferido | Slice 5 exige ventana de observacion sin uso de la key antes de disable; disable reversible antes de delete |
+| Sesiones/consumidores cacheando el modo anterior tras el cutover | Errores intermitentes post-flip | Redeploy completo (Vercel congela env al build) + smoke de los mismos checks del canary sobre el dominio real |
+
 ## Out of Scope
 
 - Migrar todos los secretos legacy a Secret Manager.
