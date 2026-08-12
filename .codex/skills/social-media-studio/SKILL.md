@@ -55,6 +55,9 @@ La narrativa de venta es el sistema de autoridad y demanda; Trendjacking, reels,
 4. **Si hay que ejecutar** (producir/programar/medir), abre `efeonce/STUDIO_TOOLING.md`
    y usa el pipeline con las herramientas conectadas — **con confirmación humana antes
    de publicar** (§4).
+   Para distribuir una vacante de Efeonce en grupos de Facebook, carga además
+   `efeonce/facebook-vacancy-distribution.md` y compón con
+   `greenhouse-talent-people-operator`.
 5. **Aterriza a Efeonce** si el trabajo es de canales propios o de un cliente internacional:
    `efeonce/EFEONCE_OVERLAY.md` / `efeonce/CLIENT_DELIVERY.md`. Globe es un adaptador futuro gated, no una dependencia.
 6. **Cierra con un artefacto** de `templates/` (brief, calendario, guion, reporte…),
