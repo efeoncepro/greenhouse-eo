@@ -7,6 +7,24 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-12 — El portal SEO del cliente quedó cerrado, y su propio scorecard estaba equivocado
+
+`TASK-1310` cierra la cara cliente del módulo SEO: dashboard `/growth/seo` con Resumen, Evolución y
+Quadrant 360, más el informe `/growth/seo/report` en web e imprimible sobre el mismo modelo de
+artefacto que el AEO. Con ella el módulo tiene sus dos caras —las cuatro pestañas del operador y el
+portal del cliente— y la pata visible del criterio de paridad queda cubierta.
+
+El cierre empezó desmintiendo su propia evidencia: el scorecard vigente bloqueaba la task con 2.29
+sobre capturas tomadas nueve horas antes del commit que ejecutó la ronda premium, así que describía
+una interfaz que ya no existía. Medida de nuevo contra el código real —tres superficies, escritorio y
+móvil, con sesión de un cliente de verdad atravesando el gate por organización— las tres cierran sin
+un solo hallazgo de calidad y los cuatro gates de UI quedan en verde.
+
+En el camino aparecieron dos defectos que ningún gate podía ver porque ninguno es un error técnico:
+el informe anunciaba "Aún no hay una posición media para leer" con la posición impresa al lado, y el
+botón global de "volver arriba" no tenía nombre accesible en ninguna ruta del portal. Los dos
+salieron mirando las capturas, no leyendo los reportes.
+
 ## 2026-08-12 — El contrato de contacto de Careers quedó cerrado de punta a punta
 
 Segundo release del día (`950f5bdb4`): el país de residencia pasó a ser requerido también en el
@@ -1105,21 +1123,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   Diamond ni capacidad para crear oportunidades.
 - Se documentó el plan de activación: Services/Co-sell como ruta principal, Artificial Intelligence como primera
   competencia, un pod interno pequeño, dos casos Google-ready y reventa con Ingram/Xvantage como carril paralelo.
-
-## 2026-08-05 — Nexa: se retiró el modo "Compacto" (el chat viejo que sobrevivió al cutover)
-
-- El selector "Modo de Nexa" queda en **Panel** (piso incondicional) y **Lateral**. El modo `dock`
-  ("Compacto") era el panel efímero previo a TASK-1078 — runtime local, sin historial persistido — que
-  quedó como opción del selector después de que el panel ampliable pasó a ser el comportamiento base.
-- Salió también su código muerto en `NexaFloatingButton` (Drawer mobile / Card desktop / adapter local /
-  auto-envío de semilla) y el flag de cutover `NEXA_FLOATING_EXPANDABLE_ENABLED` + su mirror
-  `NEXT_PUBLIC_*`, cuyo único fallback era ese modo. **Env vars huérfanas en Vercel: pendiente borrarlas.**
-- `coerceNexaInteractionMode('dock', …)` → `expandible`, así que ninguna preferencia legacy rompe el
-  layout. Migración `20260805110418197`: filas `dock` → NULL + CHECK cerrado a `('expandible','lane')`,
-  aplicado y verificado contra Cloud SQL (0 filas afectadas; ningún usuario estaba en ese modo).
-- Hallazgo documentado como deuda: el `focusRef` + pregunta semilla de TASK-1182 vivía **solo** en el
-  panel legacy, así que el CTA "Pregúntale a Nexa" ya estaba inoperante en producción antes del retiro
-  (el modo default era `expandible`). Los CTAs siguen abriendo el chat; portar el ancla al runtime
-  persistente queda pendiente.
-- Gates: `pnpm local:check`, `pnpm test` (10.064 pass) y `pnpm build` verdes; menú verificado en runtime
-  con Playwright (solo Panel/Lateral, switch a Lateral y vuelta con PATCH 200, cero errores de consola).

@@ -1,8 +1,8 @@
 {
   "taskId": "TASK-1310",
-  "scenario": "growth-seo-client-mockup, growth-seo-report-mockup, growth-seo-report-print-mockup",
+  "scenario": "growth-seo-client, growth-seo-report, growth-seo-report-print",
   "reviewedAt": "2026-08-12",
-  "reviewer": "claude (revisión visual de 3 superficies × 2 viewports sobre capturas del 2026-08-12 23:15–23:21)",
+  "reviewer": "claude (revisión visual de 3 superficies × 2 viewports sobre las capturas del 2026-08-12 23:40–23:44, con sesión de cliente real de la organización contratada)",
   "supersedes": {
     "reviewedAt": "2026-08-08",
     "verdict": "blocked",
@@ -10,22 +10,23 @@
     "why": "Ese scorecard juzgaba capturas de las 10:25 del 2026-08-08 y era correcto para ese estado. El commit 5f622386d (19:29 del mismo día) ejecutó los lotes de la auditoría premium y nadie volvió a medir: el scorecard quedó describiendo una UI que ya no existía. La medición del 2026-08-12 sobre el código vigente contradice sus dos hallazgos técnicos: el dashboard daba exitCode 1 con 2 violaciones axe de contraste en tabs y 15 warnings de targets de 23 px; hoy da exitCode 0 con qualityFindings vacío en desktop y mobile."
   },
   "evidence": {
-    "desktop": ".captures/2026-08-12T23-21-41_growth-seo-client-mockup/01-desktop/frames/01-summary.png",
-    "mobile": ".captures/2026-08-12T23-21-41_growth-seo-client-mockup/02-mobile/frames/02-evolution.png",
-    "reportWeb": ".captures/2026-08-12T23-18-04_growth-seo-report-mockup/01-desktop/frames/01-report.png",
-    "reportPrint": ".captures/2026-08-12T23-21-18_growth-seo-report-print-mockup/01-desktop/frames/01-attachment.png",
-    "focus": ".captures/2026-08-12T23-21-41_growth-seo-client-mockup/01-desktop/frames/04-keyboard-report-cta-focus.png",
-    "dossier": "docs/ui/reviews/TASK-1310-growth-seo-client-dashboard-report-artifact-audit-2026-08-08.md"
+    "desktop": ".captures/2026-08-12T23-40-46_growth-seo-client/01-desktop/frames/01-summary.png",
+    "mobile": ".captures/2026-08-12T23-40-46_growth-seo-client/02-mobile/frames/02-evolution.png",
+    "reportWeb": ".captures/2026-08-12T23-43-21_growth-seo-report/01-desktop/frames/01-web.png",
+    "reportPrint": ".captures/2026-08-12T23-43-58_growth-seo-report-print/01-desktop/frames/01-attachment.png",
+    "focus": ".captures/2026-08-12T23-40-46_growth-seo-client/01-desktop/frames/05-keyboard-report-cta-focus.png",
+    "dossier": ".captures/2026-08-12T23-40-46_growth-seo-client/review-dossier.md",
+    "auditSource": "docs/ui/reviews/TASK-1310-growth-seo-client-dashboard-report-artifact-audit-2026-08-08.md"
   },
   "technicalBaseline": {
-    "dashboard": "exitCode 0 — qualityFindings vacío en desktop y mobile; probes de teclado con anillo de foco visible en el CTA del informe y en el cambio de sección",
-    "reportWeb": "exitCode 0 — axe sin violaciones tras nombrar el FAB global; queda 1 warning de transferencia propio del dev server local",
-    "reportPrint": "exitCode 0 — desktop sin findings; es la superficie más sobria de las tres"
+    "dashboard": "exitCode 0 — qualityFindings VACÍO en desktop y mobile, con sesión de cliente real de la organización contratada; probes de teclado con anillo de foco visible en el CTA del informe y en el cambio de sección",
+    "reportWeb": "exitCode 0 — qualityFindings vacío en ambos viewports tras nombrar el FAB global",
+    "reportPrint": "exitCode 0 — qualityFindings vacío en ambos viewports; es la superficie más sobria de las tres"
   },
   "evidenceCaveats": [
-    "La corrida usa el arnés de fixture determinista (`/growth/seo/mockup`), no el tenant real. Es deliberado para el gate visual —el fixture no cambia entre corridas— pero significa que esta evidencia NO revalida el gate per-org ni el dato vivo; eso quedó verificado con sesión Berel el 2026-08-08 y sigue pendiente en staging.",
-    "El fixture es un único caso poblado. Los estados que un cliente recién onboardeado ve el día 1 (Search Console conectado y captura de rank todavía sin correr) no tienen fixture ni captura: ver el follow-up de generalización en la task.",
-    "Los warnings de `layout_element_overflow` que persisten en mobile son del `aside[data-capture=\"portal-vertical-nav\"]` global en su posición off-canvas (left=-260), no de contenido SEO. Deuda de chrome compartida, con dueño en el chip `client-portal-menu-focus-ring`."
+    "La corrida atraviesa el gate per-org con la persona cliente de la organización contratada (`agent-berel-client@…`) sobre dato vivo, no sobre fixture: el resumen mide 31 keywords, 19 en primera página y 61% de cobertura; la evolución declara 6 de 90 días. Queda pendiente la corrida equivalente contra staging con el deployment vigente.",
+    "El caso más común de la población NO está cubierto por esta evidencia: un cliente con Search Console conectado y captura de rank todavía sin correr —el día 1 de todo cliente nuevo— renderiza el dashboard con el KPI principal en 'sin dato' y el Quadrant poblado, porque una y otro leen fuentes distintas. Ningún tenant actual puede producir ese estado. Follow-up declarado en la task.",
+    "El mapa apila los puntos en la coordenada AEO del dominio porque las keywords todavía no tienen citabilidad propia medida. Es el tratamiento honesto que pidió la auditoría (sin jitter y sin score fusionado) y la superficie lo declara en palabras, pero con 50 keywords se lee como una columna: la lectura fina la da la tabla priorizada, no el mapa."
   ],
   "dimensions": {
     "hierarchy": {

@@ -2,38 +2,38 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
-### TASK-1310 — la ronda premium estaba hecha y sin medir; queda UN bloqueo, y no es de código (2026-08-12)
+### TASK-1310 CERRADA — portal SEO del cliente completo; su propio scorecard estaba equivocado (2026-08-12)
 
-**Sigue `in-progress`.** El scorecard en BLOCK (`average=2.29`) juzgaba capturas de las 10:25 del
-2026-08-08; el commit `5f622386d` de las 19:29 ejecutó los lotes de la auditoría premium y **nadie
-volvió a medir**. Medido hoy: el dashboard pasó de `exitCode 1` con 2 violaciones axe de contraste y
-15 targets de 23 px, a **`exitCode 0` con `qualityFindings` vacío** en desktop y mobile.
-`ui:quality` queda **PASS 4.52**. Antes de rehacer trabajo en una task con auditoría abierta,
-**medir**: acá los 7 lotes estaban ejecutados.
+**`complete`, promoción `develop → main` pendiente.** Con ella el módulo SEO tiene sus dos caras
+(4 tabs de operador + portal cliente) y la pata visible del exit criterion de parity queda cubierta.
+Los 4 gates UI en verde: `design-contract:lint` · `ui:code-lint` · `ui:visual-gate` · `ui:quality`
+**PASS 4.52**. Verificado con **sesión de cliente real de la organización contratada**: 3 superficies
+× 2 viewports, `qualityFindings` **vacío** en las seis corridas.
 
 **Lo que necesita quien siga:**
 
-1. 🔴 **El único bloqueo es `pnpm ui:visual-gate --task TASK-1310`**, que exige captura del scenario
-   **real** (`growth-seo-client`, el que atraviesa el gate per-org) + su `review-dossier.md`. No pude
-   emitirla: `agent-client@greenhouse.efeonce.org` **no pertenece a la organización contratada**, así
-   que recibe la card de bloqueo y la captura muere en el marker. Resolverlo exige el mapeo
-   organización↔cliente, que **no está donde uno lo busca**: `greenhouse_core.client_users` enlaza por
-   `client_id` y ni `clients` ni `organizations` exponen la FK del otro (verificado contra
-   `information_schema`; la sonda `scripts/growth/_sanity-seo-client-population.ts` deja la
-   introspección lista). Con esa sesión, el cierre son dos comandos.
-2. ⚠️ **Sobrescribí `.auth/storageState.local-berel-client.json`** con la persona genérica al
-   intentarlo. Su token ya estaba vencido (era del 09-08), así que no se perdió acceso, pero **el
-   archivo ya no corresponde a su nombre** y tres scenarios lo declaran en `requiresStorageState`.
-3. **Dos defectos reales que ningún gate veía, corregidos.** El informe web decía "Aún no hay una
-   posición media para leer" con **#13.3 impreso al lado**, con `exitCode 0` — cada render derivaba su
-   propio título. Y el FAB global "volver arriba" no tenía nombre accesible (`button-name`, impacto
-   *critical*, en **todas** las rutas del portal). Commits `cb8d60b9b` y `756d9970d`. Los dos salieron
-   **mirando frames**, no leyendo JSON.
-4. 🔴 **`pnpm test` está rojo en el árbol por trabajo AJENO:** `catalog-portability.test.ts` falla por
-   un `../../../../../public/branding/...` en `deck-axis/back-cover-full.html`, que es WIP no
-   commiteado del deck ANAM/HubSpot (en HEAD hay cero ocurrencias). El guardrail está haciendo su
-   trabajo: ese path relativo escapa del catálogo. 10.588 tests pasan. No lo toqué — no es mío.
-5. **Follow-up con dato, sin task todavía:** la superficie cliente tiene **una sola organización**
+1. 🔴 **Un scorecard es una foto con fecha, no un estado.** El de esta task bloqueaba con 2.29 sobre
+   capturas de las 10:25 del 08-08, y el commit `5f622386d` de las 19:29 ya había ejecutado los 7
+   lotes premium. Cuatro días el veredicto vigente describió una UI inexistente. **Ante una task con
+   auditoría abierta: medir antes de rehacer.** Acá casi rehago trabajo terminado.
+2. **Los gates no ven contradicciones de contenido.** El informe anunciaba "Aún no hay una posición
+   media para leer" con `#13.3` al lado, con `exitCode 0` y axe limpio. Causa: tres renders del mismo
+   modelo derivando cada uno su regla. Ahora se deriva una vez (`resolveSeoLeadTitle`) con test de
+   regresión. **Mirar el frame no es opcional.**
+3. **Para verificar una superficie client-gated hace falta la persona de ESA organización.** La
+   genérica `agent-client@…` recibe la card de bloqueo y se lee como defecto de producto. La de Berel
+   ya existía: `agent-berel-client@greenhouse.efeonce.org`. El mapeo usuario↔organización **no** está
+   en `client_users`/`clients`/`organizations` — está en `greenhouse_serving.session_360`, que es
+   donde el runtime mismo lo resuelve. La sonda `scripts/growth/_sanity-seo-client-population.ts`
+   deja esa consulta lista.
+4. **Fix global de paso:** el FAB "volver arriba" del layout `(dashboard)` no tenía nombre accesible
+   (`button-name`, *critical*) en **todas** las rutas del portal. Cerrado con label del namespace
+   `aria` canónico (`756d9970d`).
+5. 🔴 **`pnpm test` está rojo en el árbol por trabajo AJENO:** `catalog-portability.test.ts` falla por
+   un `../../../../../public/branding/...` en `deck-axis/back-cover-full.html`, WIP no commiteado del
+   deck ANAM/HubSpot (en HEAD hay cero ocurrencias). El guardrail hace su trabajo: ese path escapa del
+   catálogo. 10.588 tests pasan. No lo toqué — no es mío, y quien lo tenga en curso debe verlo.
+6. **Follow-up con dato, sin task todavía:** la superficie cliente tiene **una sola organización**
    (Efeonce tiene assignment pero es tenant interno y `requireClientTenantContext()` lo excluye). Con
    N=1 nadie delata que `connection.state` se decide con **GSC** mientras el Resumen deriva de **rank
    snapshots**: un cliente con Search Console conectado y captura de rank sin correr —**el día 1 de
@@ -402,22 +402,3 @@ trabajo de código no había visto.
    no asumas que el gate la cuida.
 6. **`CLAUDE.md` está en 34.903/35.000 tokens — 97 de headroom.** Los cinco aprendizajes de proceso de
    hoy se escribieron en su skill dueña y en `AGENTS.md`, no ahí, a propósito.
-
-### Barrido final de docs (2026-08-09) — tres cosas que necesitan tu decisión
-
-Un barrido de cierre corrigió lo que el trabajo del día dejó stale, **incluidas dos contradicciones en
-docs que yo mismo edité hoy** (el inventario del carril seguía diciendo que el lint estaba en `warn`, y
-el ledger de flags listaba `NODE_ENV` en la columna de runtime mientras su descripción decía
-`VERCEL_ENV`). Ambas corregidas. Y el conteo "3 abren, 6 empty state" **dejó de ser un dato del doc**:
-cambió el mismo día al asignarle Creative a SKY, así que ahora el inventario declara la regla —
-derivarlo de los datos, nunca heredarlo de un doc.
-
-Lo que **NO** decidí por ti:
-
-1. **`TASK-286` (client view catalog expansion) tiene la premisa vencida**: dice "11 view codes" y hoy
-   hay 25, y su alcance se solapa con `TASK-1685`. Reescribirla o cerrarla es tu llamada.
-2. **`TASK-1675`/`1678`/`1679`/`1680`/`1685` declaran `Epic: none`** aunque son el carril de
-   `EPIC-015`. Consecuencia mecánica: `epic-child-parity` las excluye del denominador, así que el
-   avance del epic se ve más chico de lo que es. Reasignarlas es trivial pero cambia métricas.
-3. **`/api/client-portal/*` no está en `GREENHOUSE_API_REFERENCE_V1.md`.** Documentarlo ahí depende de
-   si esa referencia pretende ser exhaustiva o sólo cubrir las lanes de plataforma.

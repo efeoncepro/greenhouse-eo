@@ -1,6 +1,6 @@
 # TASK-1310 — Growth SEO: Client Dashboard + Report Artifact + 360 Quadrant
 
-## Delta 2026-08-12 — la ronda premium estaba hecha y sin medir; quedan dos cosas
+## Delta 2026-08-12 — cierre: la ronda premium estaba hecha y sin medir
 
 **El scorecard juzgaba una UI que ya no existía.** El BLOCK de `average=2.29` se generó sobre
 capturas de las 10:25 del 2026-08-08; el commit `5f622386d` (19:29 del mismo día) ejecutó los lotes
@@ -27,27 +27,31 @@ por keyword. `ui:quality` pasa a **PASS 4.52** con el scorecard regenerado desde
 Además se retiró el hover lift del canvas del informe: un entregable que se lee y se reenvía no es
 un control (auditoría §6).
 
-**Lo que BLOQUEA el cierre — uno solo, y no es de código:** `pnpm ui:visual-gate --task TASK-1310`
-sigue en BLOCK porque exige una captura del scenario **real** (`growth-seo-client`, el que atraviesa
-el gate per-org) más su `review-dossier.md`, y **no pude montar una sesión de cliente de la
-organización contratada**:
+**Verificación final con la superficie real, no con el fixture.** Las tres superficies se
+capturaron atravesando el gate per-org con la persona cliente de la organización contratada
+(`agent-berel-client@greenhouse.efeonce.org`, que ya existía en `greenhouse_serving.session_360`) y
+las tres cierran en **`exitCode 0` con `qualityFindings` VACÍO en desktop y en 390 px**:
 
-- La persona canónica `agent-client@greenhouse.efeonce.org` **no pertenece a esa organización**, así
-  que `/growth/seo` le responde la card de bloqueo y la captura muere en el marker — el gate
-  funcionando, no un defecto. (El manual de este módulo apuntaba además a un dominio inexistente,
-  `efeoncepro.org`; corregido.)
-- Resolver el usuario cliente correcto exige el mapeo organización↔cliente, que **no está donde lo
-  busqué**: `greenhouse_core.client_users` enlaza por `client_id`, y ni `greenhouse_core.clients` ni
-  `greenhouse_core.organizations` exponen la FK del otro (verificado contra `information_schema`).
-- ⚠️ **Sobrescribí `.auth/storageState.local-berel-client.json`** con la sesión de la persona
-  genérica al intentarlo. El original era del 2026-08-09 y su token ya estaba vencido, así que no se
-  perdió acceso, pero el archivo ya no corresponde a su nombre: hay que volver a emitirlo con un
-  usuario de la organización contratada.
+| Superficie | Captura | Dato vivo que muestra |
+|---|---|---|
+| Dashboard | `.captures/2026-08-12T23-40-46_growth-seo-client` | posición media 1.3 · 31 keywords · 19 en primera página · 61% de cobertura |
+| Informe web | `.captures/2026-08-12T23-43-21_growth-seo-report` | veredicto 1.3 coherente con la métrica · 8 señales prioritarias de 50 con disclosure |
+| Informe imprimible | `.captures/2026-08-12T23-43-58_growth-seo-report-print` | tablas sobrias · `Sin dato` en los huecos · procedencia al cierre |
 
-**Lo que la evidencia nueva NO prueba, dicho explícitamente:** la corrida usa el arnés de fixture
-determinista (`/growth/seo/mockup`), que es el correcto para un gate visual —no cambia entre
-corridas— pero **no revalida el gate per-org ni el dato vivo**. Eso quedó verificado con sesión Berel
-el 2026-08-08 y sigue pendiente en staging.
+Con dato real la evolución declara **6 de 90 días con medición (7%)** y cambia de forma a cortes
+observados en vez de dibujar una tendencia: la muestra escasa no es un borde del producto, es su
+estado normal, y la superficie lo dice en palabras.
+
+**Dos cosas que aparecieron al montar esa verificación y quedaron corregidas en su causa:**
+
+- **El manual del módulo mandaba a un dominio inexistente** (`agent-client@greenhouse.efeoncepro.org`
+  → 404) y además a la persona equivocada: la genérica no pertenece a la organización contratada, así
+  que recibe la card de bloqueo — el gate funcionando, no un defecto. El manual ahora nombra la
+  persona correcta y explica por qué la genérica no sirve.
+- **El scenario del informe buscaba el botón por su texto viejo** ("Descargar informe"), que la
+  auditoría había renombrado al nombre real del comportamiento. La captura moría en un `click`. Se
+  ató al marker `data-capture="seo-report-print-trigger"`: un scenario no vuelve a romperse porque
+  cambie una copy.
 
 ### Follow-up de generalización (no es de esta task, y tiene dato)
 
@@ -146,20 +150,20 @@ nunca `tabler-sparkles`, en las superficies de esta task.
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P3`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1310-growth-seo-client-dashboard-report-artifact.md`
 - Flow: `docs/ui/flows/TASK-1310-growth-seo-client-dashboard-report-artifact-flow.md`
 - Motion: `none`
 - Backend impact: `access catalog migration`
 - Epic: `EPIC-022`
-- Status real: `Avanzada, premium rework en progreso` — baseline funcional local; rollout bloqueado por auditoría visual/GVC
+- Status real: `Complete` — ronda premium verificada con sesión de cliente real y los cuatro gates UI en verde; promoción `develop → main` pendiente
 - Rank: `TBD`
 - Domain: `growth|ui|ai`
 - Blocked by: `none`
@@ -603,7 +607,7 @@ Slice 1 (shell+gate+estados) → Slice 2 (Resumen+Evolución) → Slice 3 (Quadr
 - [x] GVC desktop+mobile capturado y mirado **en loop** (dashboard + report + print). Corrida 2026-08-12: `growth-seo-client-mockup` `exitCode 0` con `qualityFindings` **vacío** en ambos viewports; `growth-seo-report-mockup` y `growth-seo-report-print-mockup` sin violaciones axe. Los frames se miraron uno por uno —de ahí salió el defecto del veredicto del informe, invisible para los gates—. Los warnings de overflow que persisten en mobile son del `aside[data-capture="portal-vertical-nav"]` global en su posición off-canvas, no de contenido SEO.
 - [x] Focus/keyboard validados; navigator active state; charts sin entrada bajo movimiento reducido (WCAG 2.3.3). Probes `report-cta-focus` y `section-switch` verdes con `requireVisibleFocusRing: true` + `reducedMotionCheck: true`, y el anillo de foco confirmado visualmente en `04-keyboard-report-cta-focus.png`.
 - [x] El flow doc referencia el master `EPIC-022-search-visibility-360-UI-FLOW.md` y declara sus nodos (S5/S6/S7).
-- [ ] `UI ready` pasa a `yes` solo cuando `pnpm task:lint --task TASK-1310` queda sin findings. `task:lint` ya reporta `errors=0 warnings=0` y los criterios 2/10/11 quedaron cerrados, pero el criterio se mantiene **sin marcar a propósito**: `pnpm ui:visual-gate --task TASK-1310` sigue en BLOCK por falta de la captura del scenario **real** + su `review-dossier.md`, y eso exige una sesión de cliente de la organización contratada que no se pudo emitir (ver Delta 2026-08-12). Marcar `UI ready: yes` con ese gate en rojo sería exactamente el scorecard-verde-sobre-auditoría-BLOCK que esta task ya cometió una vez.
+- [x] `UI ready` pasa a `yes` solo cuando `pnpm task:lint --task TASK-1310` queda sin findings. `task:lint` reporta `errors=0 warnings=0` y los **cuatro gates UI pasan**: `design-contract:lint` PASS · `ui:code-lint` PASS · `ui:visual-gate` PASS (captura del scenario real + `review-dossier.md`) · `ui:quality` PASS `average=4.52 floor=4.4`.
 
 ## Verification
 
@@ -626,10 +630,12 @@ Slice 1 (shell+gate+estados) → Slice 2 (Resumen+Evolución) → Slice 3 (Quadr
 - [x] route/nav/reachability actualizados
 - [x] `FEATURE_FLAG_STATE_LEDGER.md` refleja `GROWTH_SEO_ENABLED` si la task lo toca (delta cliente agregado 2026-08-08)
 
-> **Nota de honestidad (2026-08-08):** el Closing Protocol está completo porque son ítems de higiene
-> documental que sí ocurrieron. **No implica cierre de la task**: los criterios 2, 10, 11 y 13 siguen
-> abiertos y el `Lifecycle` correcto es `in-progress`. Cerrar esta task exige la ronda premium + el
-> rollout (aplicar la migración de catálogo y verificar con sesión cliente real).
+> **Nota de honestidad — resuelta el 2026-08-12.** El aviso anterior decía que el Closing Protocol
+> estaba completo por higiene documental pero que los criterios 2, 10, 11 y 13 seguían abiertos. Los
+> cuatro están cerrados: el 2 por `TASK-1675`, y el 10/11/13 por la verificación con sesión de cliente
+> real de la organización contratada (tres superficies, dos viewports, `qualityFindings` vacío) más los
+> cuatro gates UI en verde. Lo único que queda es la promoción `develop → main`, que la auditoría §10
+> excluye de este loop a propósito.
 
 ## Follow-ups
 

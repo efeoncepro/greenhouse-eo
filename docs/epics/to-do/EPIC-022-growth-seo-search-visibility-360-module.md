@@ -131,6 +131,7 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 ### Plataforma del módulo
 
 - `TASK-1655` — [en curso] Historical Data Platform del módulo SEO (semilla histórica de rank vía `historical_serps`).
+- `TASK-1677` — [**complete**, backend-data] Cierre de la fase **contract** del cutover `seo_v1 → seo_v2`; la ventana expand/contract dejó de estar abierta. Se lista acá para cerrar el denominador del epic (lo declaraba en su campo `Epic:` y no figuraba en esta lista).
 - `TASK-1658` — [planificada, backend-data] drift de federación MCP + punto ciego del guard de paridad: 3 tools SEO viven en el MCP interno de Greenhouse y no están ni federadas ni excluidas en el gateway, y el guard no puede verlo porque compara contra lo registrado EN EL GATEWAY, nunca contra Greenhouse.
 
 - `TASK-1305` — [planificada] `readSeoAeoGap` derived read cross-módulo (report layer).
@@ -142,7 +143,7 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1672` — [creada 2026-08-08, ui-ux/layout] **Artefacto de la auditoría técnica (web + print).** El diagnóstico deja de morir en la pantalla. El escenario real no es que el cliente arregle: **reenvía a una agencia**, seamos nosotros u otra — y eso define dos lectores, quien DECIDE (magnitud y urgencia) y quien EJECUTA (la lista y el orden). Se resuelve con **un documento de dos densidades**, no con dos documentos que se desincronizan: portada ejecutiva de una plana + detalle completo, reusando `ReportArtifactModel` de TASK-1310 con su `variant`. Los hallazgos de SITIO van antes que la lista porque la invalidan. Y la procedencia viaja CON el dato: en pantalla es contexto, en un PDF reenviado es lo único que impide que atribuyan a nuestro juicio lo que mide el proveedor. Client-safe por construcción. Blocked by `TASK-1670`.
 - `TASK-1673` — [creada 2026-08-08, backend-data/command] **Compartir y enviar el informe.** Enlace con código corto, caducidad, **revocación** y tracking de apertura, más envío por correo del operador. **Enlace por defecto, adjunto como opción declarada**: el repo ya divide adjunto para registros inmutables (cotización, comprobante) y enlace para diagnósticos vivos (informe AEO), y el audit tiene contrato de frescura que un PDF congela — queda vigente para siempre en un inbox ajeno. 🔴 El cliente NO envía desde nuestro dominio: genera y reenvía desde su inbox, que llega mejor a su agencia y no arriesga la reputación de envío con la que mandamos facturas. Enviar ≠ ver. Blocked by `TASK-1672`.
 - **`TASK-1674` [RESERVADA, sin escribir] — la 4.ª sección del portal cliente.** El cliente ya tiene su navegador de 3 secciones (`Resumen · Evolución · Quadrant`, TASK-1310) y la auditoría entra ahí como **cuarta**, espejando las 4 tabs del operador: la misma estructura mental de los dos lados, con distinta profundidad. Se descartó una ruta cliente paralela (`/growth/seo/audit-report`) — sería fragmentar su portal para reflejar nuestro organigrama. Y se descartó **fusionar** la auditoría dentro del informe de 1310, por dos costos concretos: las frescuras no coinciden (el audit corre semanal, la serie de Search Console diaria, y un documento con dos as-of deshace justo lo que 1309 corrigió) y reenviar la lista técnica a una agencia obligaría a compartir de paso la posición competitiva del cliente, que ese trabajo no necesita. **NO se agrega a TASK-1310**: a esa task le queda rollout (migración + staging), no construcción, y una sección nueva le reinicia la verificación en la última milla. Se escribe cuando `TASK-1672` esté en ejecución y la forma del documento esté decidida.
-- `TASK-1310` — [**in-progress 2026-08-08**, ui-ux] Cliente + Report Artifact `/growth/seo` + quadrant 360 — **nodos S5/S6/S7**. Construida y verificada con datos reales de Berel: navegador cliente de 3 secciones (`Resumen · Evolución · Quadrant`), informe web + `?print=1` sobre el `ReportArtifactModel` compartido, y el cruce recíproco SEO↔AEO. Le quedan la ronda premium de la auditoría visual y el rollout (la migración de catálogo `seo_v2` **no está aplicada**, así que el portal todavía no compone las rutas en el menú). `UI ready: no`.
+- `TASK-1310` — [**COMPLETE 2026-08-12**, ui-ux] Cliente + Report Artifact `/growth/seo` + quadrant 360 — **nodos S5/S6/S7**. Navegador cliente de 3 secciones (`Resumen · Evolución · Quadrant`), informe web + `?print=1` sobre el `ReportArtifactModel` compartido, y el cruce recíproco SEO↔AEO. **Con ella la pata UI/Nexa del exit criterion de parity queda cerrada: el módulo tiene sus dos caras, operador y cliente.** El cierre desmintió su propio scorecard —estaba en BLOCK 2.29 juzgando capturas de 9 horas antes del commit que ejecutó los lotes premium— y verificó las 3 superficies × 2 viewports con **sesión de cliente real de la organización contratada**: `qualityFindings` vacío en todas y los 4 gates UI en verde (`ui:quality` PASS 4.52). Dos defectos corregidos en el camino, ambos invisibles para los gates y visibles al mirar el frame: el informe web anunciaba "Aún no hay una posición media para leer" con la posición impresa al lado, y el FAB global "volver arriba" no tenía nombre accesible (`button-name` *critical*, en TODAS las rutas del portal). `UI ready: yes`. Promoción `develop → main` pendiente.
 - `TASK-1311` — [planificada, backend-data] AEO citation attribution URL-level + grounded queries (reader/rollup sobre las citas que el grader YA captura).
 - `TASK-1312` — [planificada, backend-data] Topic Cluster como entidad de primera clase (`seo_topic_clusters`) + rollup SEO+AEO.
 - `TASK-1313` — [planificada, backend-data] Unified Page/Cluster Visibility 360 read (`readPageVisibility360`/`readClusterVisibility360`).
@@ -537,3 +538,34 @@ El orden de implementación queda:
 El epic no se considera “crear y optimizar” completo por tener candidates o drafts: debe poder
 explicar qué se decidió, qué se produjo, qué se verificó, qué resultado se observó y cuál es el
 siguiente paso permitido.
+
+## Delta 2026-08-12 — la cara cliente cierra, y con ella la pata UI del exit criterion
+
+`TASK-1310` queda **complete**. El módulo SEO tiene ahora sus dos caras: las 4 tabs del operador
+(`1306`/`1307`/`1308`/`1309`) y el portal del cliente (`/growth/seo` + `/growth/seo/report`). El exit
+criterion de Full API Parity queda cubierto en su pata visible; lo que sigue abierto del epic es
+capacidad nueva, no la superficie.
+
+**Lo que este cierre le enseña a las tasks que vienen:**
+
+1. 🔴 **Un scorecard es una foto con fecha, no un estado.** El de 1310 decía BLOCK 2.29 y era
+   correcto para las capturas de las 10:25 del 08-08 — pero el commit de las 19:29 ejecutó los lotes
+   premium y nadie volvió a medir. Cuatro días después el veredicto vigente describía una UI que ya no
+   existía. **Ante una task con auditoría abierta, medir antes de rehacer.**
+2. **Los gates no ven contradicciones de contenido.** El informe cliente anunciaba "Aún no hay una
+   posición media para leer" con `#13.3` impreso al lado, con `exitCode 0` y axe limpio. Salió mirando
+   el frame. El patrón que lo causó vale para todo el epic: **tres renders del mismo modelo derivando
+   cada uno su propia regla**. El veredicto ahora se deriva una vez y los tres lo consumen.
+3. **Un scenario atado a una copy se rompe cuando la copy mejora.** El del informe buscaba el botón
+   por el texto que la propia auditoría había mandado a renombrar. Los scenarios de este epic apuntan a
+   `data-capture`, no a strings.
+4. **La persona agente importa tanto como la ruta.** Verificar una superficie client-gated con la
+   persona equivocada produce la card de bloqueo y se lee como defecto de producto. Cada organización
+   contratada necesita su persona cliente; la de Berel ya existe en `greenhouse_serving.session_360`.
+
+**Hallazgo de población que el epic debería resolver antes de sumar el segundo cliente:** la
+superficie cliente tiene hoy **una sola organización**. `connection.state` se decide con GSC pero el
+Resumen deriva de rank snapshots, así que un tenant con Search Console conectado y captura de rank
+sin correr —**el día 1 de todo cliente nuevo**— renderiza el KPI principal en "sin dato" con el
+Quadrant poblado debajo. Con N=1 nadie lo delata. Merece task propia: fixtures por estado de la
+población y la decisión de fuente del Resumen.
