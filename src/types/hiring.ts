@@ -215,6 +215,10 @@ export interface CandidateFacet {
   verificationSignals: Record<string, unknown>
   portfolioUrl: string | null
   linkedinUrl: string | null
+  /** TASK-1688 — teléfono E.164 opcional (PII interna; nunca en payloads públicos). */
+  phoneE164: string | null
+  /** TASK-1688 — país de residencia AUTODECLARADO (ISO 3166-1 alpha-2); null = no informado. */
+  residenceCountryCode: string | null
   status: CandidateFacetStatus
   notes: string | null
   createdBy: string | null
@@ -236,6 +240,8 @@ export interface HiringApplication {
   nextStepAt: string | null
   source: CandidateSource
   notes: string | null
+  /** TASK-1688 — mensaje del candidato, application-scoped (≤4000); PII interna. */
+  candidateMessage: string | null
   explainability: Record<string, unknown>
   dedupeFingerprint: string | null
   decision: HiringDecision | null
@@ -290,6 +296,9 @@ export interface HiringDeskApplicationSummary {
   maskedEmail: string | null
   portfolioUrl: string | null
   linkedinUrl: string | null
+  /** TASK-1688 — contacto durable del facet; null = "No informado" (legacy sin backfill). */
+  phoneE164: string | null
+  residenceCountryCode: string | null
   openingTitle: string
   openingPublicId: string
   area: string | null
@@ -441,6 +450,9 @@ export interface ReconcileCandidateFacetInput {
   sourceAttribution?: string | null
   portfolioUrl?: string | null
   linkedinUrl?: string | null
+  /** TASK-1688 — omitir/null preserva el valor existente (política anti-wipe del upsert). */
+  phoneE164?: string | null
+  residenceCountryCode?: string | null
   memberId?: string | null
   notes?: string | null
 }
@@ -457,6 +469,8 @@ export interface CreateHiringApplicationInput {
   blockingIssues?: string[]
   nextStepAt?: string | null
   notes?: string | null
+  /** TASK-1688 — mensaje del candidato (application-scoped, ≤4000). */
+  candidateMessage?: string | null
   dedupeFingerprint?: string | null
 }
 

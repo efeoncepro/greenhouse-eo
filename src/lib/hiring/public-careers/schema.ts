@@ -2,6 +2,7 @@
 // estilo grader public-intake, NO Zod). Sin IO. Normaliza email + valida URLs browser-safe.
 
 import { validateE164PhoneValue } from '@/lib/growth/forms/validators/phone'
+import { isValidCountryCode } from '@/lib/locale/countries'
 
 export interface PublicHiringApplicationInput {
   openingPublicId: string
@@ -9,6 +10,9 @@ export interface PublicHiringApplicationInput {
   lastName: string
   email: string
   phone?: string | null
+  /** TASK-1688 — ISO 3166-1 alpha-2 autodeclarado. La UI lo exige; el parser lo valida si viene
+   * (expand/contract: se vuelve requerido a nivel parser tras verificar ambas superficies en prod). */
+  residenceCountryCode?: string | null
   portfolioUrl?: string | null
   linkedinUrl?: string | null
   availability?: string | null
@@ -47,6 +51,7 @@ export interface NormalizedApplicationInput {
   fullName: string
   email: string
   phone: string | null
+  residenceCountryCode: string | null
   portfolioUrl: string | null
   linkedinUrl: string | null
   availability: string | null
@@ -81,7 +86,19 @@ export const parsePublicHiringApplication = (raw: unknown): NormalizedApplicatio
   if (portfolioRaw && !isSafeHttpUrl(portfolioRaw)) return null
   if (linkedinRaw && !isSafeHttpUrl(linkedinRaw)) return null
 
-  const phoneResult = phoneRaw ? validateE164PhoneValue(phoneRaw, { country: 'CL' }) : null
+  // TASK-1688 — país de residencia autodeclarado. Opcional-pero-validado (expand/contract:
+  // la UI lo exige; el parser lo hace requerido tras verificar ambas superficies en prod).
+  // Un valor presente pero inválido = payload inválido (nunca persistir un país inventado).
+  // OJO: NO truncar — 'Chile'.slice(0,2)='CH' sería Suiza. Exactamente 2 chars ISO o rechazo.
+  const residenceRaw = asTrimmed(body.residenceCountryCode, 10).toUpperCase()
+
+  if (residenceRaw && (residenceRaw.length !== 2 || !isValidCountryCode(residenceRaw))) return null
+
+  // El país de residencia SÓLO sirve como hint de formato local del teléfono cuando el
+  // candidato no escribe el prefijo internacional — nunca al revés (residencia no se infiere).
+  const phoneResult = phoneRaw
+    ? validateE164PhoneValue(phoneRaw, { country: residenceRaw || 'CL' })
+    : null
 
   if (phoneResult && !phoneResult.valid) return null
 
@@ -92,6 +109,7 @@ export const parsePublicHiringApplication = (raw: unknown): NormalizedApplicatio
     fullName: `${firstName} ${lastName}`.trim(),
     email,
     phone: phoneResult ? String(phoneResult.normalized) : null,
+    residenceCountryCode: residenceRaw || null,
     portfolioUrl: portfolioRaw || null,
     linkedinUrl: linkedinRaw || null,
     availability: asTrimmed(body.availability, MAX_NAME) || null,

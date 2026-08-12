@@ -350,6 +350,8 @@ type CandidateFacetRow = {
   verification_signals_json: unknown
   portfolio_url: unknown
   linkedin_url: unknown
+  phone_e164: unknown
+  residence_country_code: unknown
   status: unknown
   notes: unknown
   created_by: unknown
@@ -377,6 +379,8 @@ const normalizeCandidateFacet = (row: CandidateFacetRow): CandidateFacet => ({
   verificationSignals: toJsonObject(row.verification_signals_json),
   portfolioUrl: toNullableStr(row.portfolio_url),
   linkedinUrl: toNullableStr(row.linkedin_url),
+  phoneE164: toNullableStr(row.phone_e164),
+  residenceCountryCode: toNullableStr(row.residence_country_code),
   status: toStr(row.status) as CandidateFacet['status'],
   notes: toNullableStr(row.notes),
   createdBy: toNullableStr(row.created_by),
@@ -398,6 +402,7 @@ export type HiringApplicationRow = {
   next_step_at: unknown
   source: unknown
   notes: unknown
+  candidate_message: unknown
   explainability_json: unknown
   dedupe_fingerprint: unknown
   decision: unknown
@@ -427,6 +432,7 @@ export const normalizeHiringApplication = (row: HiringApplicationRow): HiringApp
   nextStepAt: toTimestamp(row.next_step_at),
   source: toStr(row.source) as HiringApplication['source'],
   notes: toNullableStr(row.notes),
+  candidateMessage: toNullableStr(row.candidate_message),
   explainability: toJsonObject(row.explainability_json),
   dedupeFingerprint: toNullableStr(row.dedupe_fingerprint),
   decision: (toNullableStr(row.decision) as HiringApplication['decision']) ?? null,
@@ -462,11 +468,11 @@ const CANDIDATE_FACET_COLUMNS = `
   candidate_facet_id, public_id, identity_profile_id, member_id, source, readiness, availability,
   seniority, expected_rate, expected_rate_currency, rate_band, consent_status, consent_policy_version,
   consent_captured_at, retention_policy, source_attribution, verification_signals_json, portfolio_url,
-  linkedin_url, status, notes, created_by, created_at, updated_at`
+  linkedin_url, phone_e164, residence_country_code, status, notes, created_by, created_at, updated_at`
 
 export const HIRING_APPLICATION_COLUMNS = `
   application_id, public_id, opening_id, identity_profile_id, candidate_facet_id, owner_user_id, stage,
-  score, match_score, blocking_issues, next_step_at, source, notes, explainability_json,
+  score, match_score, blocking_issues, next_step_at, source, notes, candidate_message, explainability_json,
   dedupe_fingerprint, decision, decision_at, decision_by, selected_destination, tentative_start_date,
   expected_legal_entity, expected_context, prerequisites_snapshot_json, created_by, created_at, updated_at`
 
@@ -997,8 +1003,9 @@ export const reconcileCandidateFacet = async (
       `INSERT INTO greenhouse_hiring.candidate_facet (
          identity_profile_id, member_id, source, readiness, availability, seniority, expected_rate,
          expected_rate_currency, rate_band, consent_status, consent_policy_version, consent_captured_at,
-         retention_policy, source_attribution, portfolio_url, linkedin_url, notes, created_by
-       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, COALESCE($10, 'not_captured'), $11, $12, $13, $14, $15, $16, $17, $18)
+         retention_policy, source_attribution, portfolio_url, linkedin_url, notes, created_by,
+         phone_e164, residence_country_code
+       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, COALESCE($10, 'not_captured'), $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
        ON CONFLICT (identity_profile_id) DO UPDATE SET
          member_id = COALESCE(EXCLUDED.member_id, greenhouse_hiring.candidate_facet.member_id),
          source = EXCLUDED.source,
@@ -1015,6 +1022,8 @@ export const reconcileCandidateFacet = async (
          source_attribution = COALESCE(EXCLUDED.source_attribution, greenhouse_hiring.candidate_facet.source_attribution),
          portfolio_url = COALESCE(EXCLUDED.portfolio_url, greenhouse_hiring.candidate_facet.portfolio_url),
          linkedin_url = COALESCE(EXCLUDED.linkedin_url, greenhouse_hiring.candidate_facet.linkedin_url),
+         phone_e164 = COALESCE(EXCLUDED.phone_e164, greenhouse_hiring.candidate_facet.phone_e164),
+         residence_country_code = COALESCE(EXCLUDED.residence_country_code, greenhouse_hiring.candidate_facet.residence_country_code),
          notes = COALESCE(EXCLUDED.notes, greenhouse_hiring.candidate_facet.notes)
        RETURNING ${CANDIDATE_FACET_COLUMNS}`,
       [
@@ -1036,6 +1045,8 @@ export const reconcileCandidateFacet = async (
         input.linkedinUrl ?? null,
         input.notes ?? null,
         actorUserId,
+        input.phoneE164 ?? null,
+        input.residenceCountryCode ?? null,
       ],
     )
 
@@ -1123,8 +1134,8 @@ export const createHiringApplication = async (
       client,
       `INSERT INTO greenhouse_hiring.hiring_application (
          opening_id, identity_profile_id, candidate_facet_id, owner_user_id, stage, score, match_score,
-         blocking_issues, next_step_at, source, notes, dedupe_fingerprint, created_by
-       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+         blocking_issues, next_step_at, source, notes, candidate_message, dedupe_fingerprint, created_by
+       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
        RETURNING ${HIRING_APPLICATION_COLUMNS}`,
       [
         openingId,
@@ -1138,6 +1149,7 @@ export const createHiringApplication = async (
         input.nextStepAt ?? null,
         source,
         input.notes ?? null,
+        input.candidateMessage ?? null,
         input.dedupeFingerprint ?? null,
         actorUserId,
       ],

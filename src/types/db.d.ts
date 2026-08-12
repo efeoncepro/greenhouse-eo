@@ -7583,10 +7583,18 @@ export interface GreenhouseHiringCandidateFacet {
   linkedin_url: string | null;
   member_id: string | null;
   notes: string | null;
+  /**
+   * TASK-1688 — teléfono de contacto normalizado E.164 (opcional; PII interna; nunca en payloads públicos). No infiere residencia.
+   */
+  phone_e164: string | null;
   portfolio_url: string | null;
   public_id: Generated<string>;
   rate_band: string | null;
   readiness: Generated<string>;
+  /**
+   * TASK-1688 — país de residencia AUTODECLARADO (ISO 3166-1 alpha-2). No es dirección, nacionalidad ni elegibilidad laboral. NULL = legacy/no informado (sin backfill).
+   */
+  residence_country_code: string | null;
   retention_policy: string | null;
   seniority: string | null;
   source: Generated<string>;
@@ -7600,6 +7608,10 @@ export interface GreenhouseHiringHiringApplication {
   application_id: Generated<string>;
   blocking_issues: Generated<string[]>;
   candidate_facet_id: string;
+  /**
+   * TASK-1688 — mensaje del candidato, application-scoped (≤4000). PII interna: nunca se copia al facet ni a payloads públicos.
+   */
+  candidate_message: string | null;
   created_at: Generated<Timestamp>;
   created_by: string | null;
   decision: string | null;
