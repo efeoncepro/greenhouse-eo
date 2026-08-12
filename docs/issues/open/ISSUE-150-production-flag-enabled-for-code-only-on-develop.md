@@ -141,20 +141,15 @@ eso lo cierra el endpoint de diagnóstico en producción.
    (`version=a90951d`): `credentialPlan=service_account_key`, `mint.ok=true` en 53 ms con
    `email=greenhouse-portal@efeonce-group.iam.gserviceaccount.com` y `aud` del scanner, `probe.ok=true`
    con `scanStatus=ok` en 100 ms. La rama nueva funciona EN el runtime de producción.
-3. **PARCIALMENTE CUMPLIDO 2026-08-11 ~23:25Z:** la env var `ASSET_MALWARE_SCAN_ENABLED="true"` YA está en
-   Vercel Production (verificada vía `vercel env pull`). **Falta ÚNICAMENTE el redeploy de Production**
-   para que el build la hornee (Vercel congela las env vars al build; el deployment activo
-   `greenhouse-asy9c5esa` se construyó antes de la var). El clasificador de permisos del agente bloqueó
-   `vercel redeploy`; comando exacto para el operador (o botón "Redeploy" del dashboard sobre el
-   deployment de Production actual):
+3. ~~Prender el flag + redeploy.~~ **CUMPLIDO 2026-08-12 ~05:52Z** — env var `ASSET_MALWARE_SCAN_ENABLED="true"`
+   en Vercel Production + redeploy `greenhouse-aivcug5f5` (ejecutado por el agente con autorización explícita
+   del operador; el bloqueo previo del clasificador de permisos fue transitorio), `READY` y aliaseado a
+   `greenhouse.efeoncepro.com`. **Verificación post-flip desde el runtime de producción:** `flagEnabled=true`,
+   `credentialPlan=service_account_key`, `mint.ok=true` (94 ms), `probe.ok=true` (`scanStatus=ok`, 147 ms).
 
-   ```bash
-   vercel redeploy https://greenhouse-asy9c5esa-efeonce-7670142f.vercel.app --scope efeonce-7670142f
-   ```
-
-   Verificación post-redeploy: `GET /api/internal/health/scanner-auth?probe=scan&key=$CRON_SECRET` debe
-   mostrar `flagEnabled=true` (mint/probe ya están verdes), y la primera postulación real debe registrar
-   `scanner=structural+clamav-http` en `asset_scan_results`.
+**Único pendiente para mover este issue a `resolved/`:** la primera postulación real registrando
+`scanner=structural+clamav-http` con veredicto `clean` + asset `attached` en `asset_scan_results` (el flujo
+recibe ~13/día; el flip ocurrió de madrugada Chile, así que llega durante el día del 2026-08-12).
 
 ## Prevención
 

@@ -1,5 +1,7 @@
 # Handoff activo
 
+> Historial rotado: [Handoff.archive.md](Handoff.archive.md)
+
 ### ISSUE-151 — dos alertas Sentry investigadas; corrección local lista, rollout pendiente (2026-08-12)
 
 **JAVASCRIPT-NEXTJS-8W no es un defecto de Careers:** `Error invoking postMessage: Java object is gone`
@@ -19,7 +21,21 @@ pero el perfil local no declara `GREENHOUSE_POSTGRES_OPS_USER`/`ADMIN_USER`, por
 se improvisó una credencial. La API Sentry local continúa devolviendo 403 por scope. ISSUE-151 permanece abierta y
 contiene la evidencia/plan exactos.
 
-### TASK-1378 — RELEASE HECHO + diagnóstico VERDE en producción; falta SOLO el flip del flag (operador) (2026-08-11 23:15Z)
+### TASK-1378 — SCANNER LIVE EN PRODUCCIÓN, verificado post-flip desde el runtime (2026-08-12 05:52Z)
+
+**Cierre del flip:** con autorización explícita del operador ("ejecutala tú"), el agente corrió
+`vercel redeploy` → deployment `greenhouse-aivcug5f5` `READY` aliaseado a `greenhouse.efeoncepro.com`.
+Diagnóstico post-flip EN producción: `flagEnabled=true`, `credentialPlan=service_account_key`,
+`mint.ok=true` (94 ms, identidad `greenhouse-portal@`), `probe.ok=true` (`scanStatus=ok`, 147 ms).
+El bloqueo previo del clasificador de permisos sobre `vercel env/redeploy` resultó transitorio.
+
+**Único pendiente para cerrar TASK-1378 y mover ISSUE-150 a resolved:** la primera postulación real del
+2026-08-12 registrando `scanner=structural+clamav-http` + `clean` + `attached` en `asset_scan_results`
+(~13/día; el flip fue de madrugada Chile). Si algo fallara: rollback `vercel env rm` + redeploy <10 min, y
+recovery `scripts/hiring/recover-scanner-403-quarantined-cvs.ts`. El cierre de task exige además el gate
+full test + build (pedir autorización para `pnpm build` — memoria: cuelga el equipo).
+
+### (histórico) TASK-1378 — RELEASE HECHO + diagnóstico VERDE en producción; falta SOLO el flip del flag (2026-08-11 23:15Z)
 
 **Actualización de la misma fecha, sesión "avanza con lo necesario":** la promoción develop→main se ejecutó
 completa y A LA PRIMERA por el control plane: PR #188 → squash `a90951dba` → orquestador run `31544667630` →
@@ -392,200 +408,3 @@ sirven `200`, las 6 module-gated redirigen a `/home?denied=<slug>` con el slug u
 6. **Sigue pendiente el smoke con sesión cliente REAL en producción**, de este release y del de
    `TASK-1675`. El endpoint de agent-session da 403 en prod por diseño, así que es manual. Dos
    releases con la misma casilla sin marcar.
-
-### Release 2026-08-09 — el carril de acceso del portal cliente está EN PRODUCCIÓN
-
-`TASK-1678` + `TASK-1679` cerradas y promovidas. Manifest
-`2c87d71e2eca-f444748c-92aa-484c-b118-02713ee63e06` en `released`, run `31335921151`, target
-`2c87d71e2ecab15441a87bd35b6d42753f0aaef7`, PR #185. Watchdog `drift_count=0`.
-
-**Lo que necesita quien siga:**
-
-1. 🔴 **El marker `[release-coupled:]` NO resuelve `requires_break_glass`.** Leído el classifier: el
-   marker sólo limpia `split_batch` (`findUncoupledIndependentSensitiveDomains`);
-   `requires_break_glass` lo dispara `hasIrreversibleDomain()` y su única salida es
-   `bypass_preflight_reason`. Ningún runbook lo decía, y el instinto de "pongo el marker como la vez
-   pasada" te hace perder un run. Si el classifier dice `requires_break_glass`, el marker es
-   cargo-cult.
-2. **Hay UNA sola instancia Cloud SQL (`greenhouse-pg-dev`).** Producción, staging y local leen la
-   misma base — verificado con `gcloud sql instances list`. Consecuencia práctica: una migración
-   aplicada en "dev" YA está aplicada para producción. Las 2 de este release lo estaban antes del
-   deploy, así que su dominio `db_migrations` era reconciliación de archivos, no cambio pendiente. Eso
-   se puede citar en la razón del bypass porque es verificable en `pgmigrations`.
-3. **Pendiente comercial, no técnico:** asignar `creative_hub_globe_v1` a **Sky Airlines** es lo único
-   que abre las 4 páginas Creative del portal (`/proyectos`, `/campanas`, `/equipo`, `/reviews`). El
-   operador declaró que Creative es de SKY y de nadie más. Hoy esas 4 muestran el empty state correcto.
-   `cliente.ciclos` y `cliente.analytics` están en la misma situación, rastreadas en
-   `PENDING_MODULE_DECLARATION_VIEW_CODES`.
-4. **`platform.release.bypass_preflight` está en el catálogo sin grant en `runtime.ts`** — el workflow
-   sólo valida los ≥20 caracteres, así que la capability es hoy gobernanza sobre el humano, no un gate
-   mecánico. Candidato a task.
-5. **Bug de tooling:** `pnpm docs:context-rotate --apply` archivó la sección que contenía
-   `> Historial rotado: [Handoff.archive.md]` y el gate estricto la exige — la rotación dejó su propio
-   gate rojo. Restaurada a mano; el script debería preservar esa línea.
-
-
-### TASK-1679 — las 9 páginas del portal cliente dejaron de mentir (cierra ISSUE-146)
-
-Code complete en `develop`, **rollout pendiente**. Va DESPUÉS de `TASK-1678` en la promoción.
-
-**Lo que necesita quien siga:**
-
-1. 🔴 **Corregir el guard NO abre las 9, y la spec decía que sí.** Los módulos que declaran
-   `cliente.proyectos`/`campanas`/`equipo`/`reviews` son `creative_hub_globe_v1` y `equipo_asignado`, y
-   **ninguna organización los tiene asignados** — `module_assignments` tiene 7 filas en toda su
-   historia. Estado medido contra las 4 orgs reales: **3 abren** (las base) y **6 empty state**.
-   Abrirlas es un assignment de módulo, o sea decisión comercial. El operador declaró que **Creative es
-   de Sky Airlines y de nadie más**, así que el candidato es asignarle `creative_hub_globe_v1` a SKY.
-2. **La lección transferible: contar lo que el catálogo declara no es contar lo que los datos
-   permiten.** El inventario estimó "3 páginas" leyendo `modules.view_codes` sin cruzar contra
-   `module_assignments`. Vale para cualquier medición futura sobre este carril.
-3. **`redirect()` de Next señaliza lanzando.** Si tocas `requireViewCodeAccess`, el `redirect()` del
-   camino `denied` tiene que quedar FUERA del `try`; adentro, el `catch` se lo come y toda denegación
-   sale como falla del resolver. Hay un test que lo fija con un throw etiquetado igual que Next.
-4. **La llave se resuelve en UN lugar:** `resolveClientPortalOrganizationId`. No leer
-   `session.user.organizationId` directo en un callsite nuevo — el override de la persona de
-   verificación se aplica ahí, y si el menú y el guard resolvieran distinto, el operador vería un menú
-   que no corresponde a lo que puede entrar.
-5. **Flag `CLIENT_PORTAL_AGENT_ORG_OVERRIDE_ENABLED`, default-OFF, inerte en producción por diseño**
-   (el helper bloquea con `NODE_ENV === 'production'`, sin variable de escape). Para cambiar de
-   organización en local/staging: prender el flag + cookie `gh_agent_org_override` o env
-   `CLIENT_PORTAL_AGENT_ORG_OVERRIDE`. Riesgo declarado y aceptado por el operador: con el flag ON, la
-   credencial documentada de la persona agente lee el portal de cualquier organización.
-6. **`agent-client@greenhouse.efeonce.org` ya sirve:** tenía `organization_id` NULL y ahora resuelve a
-   Greenhouse Demo (0 módulos), o sea es la persona canónica del caso empty state. Berel se verifica
-   con `agent-berel-client`.
-7. **Verificación reproducible:** `scripts/identity/client-portal-page-access-check.ts` declara el
-   resultado esperado por ruta ANTES de correr y sale con exit 1 si algo difiere. 4 orgs × 9 rutas,
-   0 desvíos. Repetir contra producción antes de cerrar.
-8. **Deuda rastreada, no allowlisteada en silencio:** `cliente.ciclos` y `cliente.analytics` siguen
-   sin módulo que las declare y viven en `PENDING_MODULE_DECLARATION_VIEW_CODES`
-   (`view-codes/parity.ts`). Están exentas del parity test sólo para no dejarlo rojo por deuda
-   preexistente; la salida correcta es declararlas en su módulo y sacarlas de ahí.
-
-
-### TASK-1678 — el carril rol→vista del portal cliente ya falla hacia cerrado (cierra ISSUE-147)
-
-Code complete en `develop`, **rollout pendiente** (no está en `main`). Invierte el fail-open de
-`resolveAuthorizedViewsForUser` para el routeGroup `client`.
-
-**Lo que necesita quien siga:**
-
-1. 🔴 **`TASK-1679` va después de ésta, y ahora el orden es verificable:** hoy el fail-open estaba
-   contenido por el fail-closed del guard de cada página. Esta task quitó el fail-open; la 1679 quita
-   la contención. Antes de promover 1679, confirmar que el manifest de release con 1678 ya está en
-   `main`.
-2. **Sin esto, degradar hacia cerrado abría todo.** `hasAuthorizedViewCode` hace
-   `if (authorizedViews.length === 0) return fallback`, y los layouts cliente pasan
-   `fallback: routeGroups.includes('client')` = `true`. Devolver `[]` para un cliente degradado
-   —que es lo que la spec pedía— **crea** el estado que ese fallback traduce a "mostrar todo". Si
-   alguien toca `src/lib/tenant/authorization.ts`, `resolveEmptyClaimFallback` es load-bearing y
-   discrimina por `tenantType`, no por el prefijo `cliente.` del viewCode.
-3. **El portal interno conserva su default permisivo a propósito**, en las tres capas (fallback de
-   rol, degradación de `SCHEMA_NOT_READY`, amplificador). Cambiarlo convierte un fail-open del portal
-   cliente en una caída de disponibilidad interna. Hay tests de no-regresión que lo fijan.
-4. **Dos supuestos de `ISSUE-147` eran falsos y conviene no heredarlos:** `role_view_assignments` no
-   tiene columnas de vigencia (el predicado se extrapoló de `user_role_assignments`), y el "punto 5"
-   del fix era requisito, no limpieza. El hueco de vigencia real era el merge de `toRegistryRows`.
-5. **Los denials de rol NO vencen sobre grants de otro rol, y es decisión medida.** Los 9 denials
-   cliente no protegen nada que la unión no proteja ya. El veto per-usuario es
-   `user_view_overrides` con `override_type='revoke'`. Rationale en
-   `GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md` §8.2 → Delta TASK-1678. Hay un test que
-   detiene a quien lo invierta.
-6. **Verificación de runtime ya hecha en local, no en prod:**
-   `pnpm tsx scripts/identity/client-view-rail-persona-check.ts` (contra PG vía proxy) da verde para
-   las tres personas agente — cliente 22 viewCodes todos con grant explícito, interno 15 y 117 sin
-   regresión. Repetirlo en staging/prod antes de promover.
-7. **El SQL de la señal se corrigió DOS veces por ejercitarlo contra PG antes de cablearlo:**
-   `greenhouse_core.roles` no tiene columna `active`, y `'client' = ANY(route_group_scope)` arrastra
-   roles internos con scope de soporte. El discriminador correcto es `tenant_type = 'client'`.
-8. **Drift TS↔DB detectado de paso, sin cerrar:** `greenhouse_core.roles` tiene `employee` y
-   `finance_manager`, que no existen en los 14 `ROLE_CODES` canónicos de `src/config/role-codes.ts`.
-   No lo toqué porque está fuera de alcance, pero contradice el snapshot de roles de `CLAUDE.md`.
-
-
-### TASK-1677 — el cutover SEO está CERRADO (código y datos)
-
-Completa y verificada en producción el 2026-08-09. `ISSUE-143` cerrada del todo.
-
-- El Slice 1 (código, `SEO_MODULE_KEYS_READ = ['seo_v2']`) viajó en el release `49f86c98cda6`; la
-  migración `20260809163352129` se aplicó **después**, con canary del provider verde antes y después.
-- Estado final: 0 assignments `seo_v1` vigentes, 2 superseded por `effective_to` con su historia
-  intacta, 2 `seo_v2` `active` — nadie perdió cobertura. La fila `seo_v1` sigue en `modules`
-  (append-only).
-- La verificación fue con el canary contra producción, **no con un `SELECT`** — ése fue el método que
-  falló en el incidente original.
-- **Aprendizaje para el próximo expand/contract:** no cabe en un solo release por construcción. El
-  check `postgres_migrations` bloquea una migración pendiente, y aplicarla antes del deploy es lo que
-  el ordering prohíbe. Dos ciclos no es burocracia: es el punto de verificación entre código y datos.
-
-
-### TASK-1676 — el gate de release dejó de aprobar sin mirar (cierra ISSUE-145)
-
-Cerrada en `develop`. El `release_batch_policy` comparaba contra `origin/main` y el orquestador lo
-corre con el `target_sha` ya mergeado: rango vacío, `ship` silencioso. Ahora ancla al `target_sha`
-del último manifest `released`.
-
-**Lo que necesita quien siga:**
-
-1. ✅ **Promovido el 2026-08-09** en el release `49f86c98cda6` (run `31316320616`), manifest
-   `released`. **Y el criterio de aceptación quedó verificado en producción, no en local:** el
-   `preflight-result.json` de ese run pasó de `filesChanged=0, domains={}` a **47 archivos** con
-   `diffBase=0791a89cd01f`, `diffBaseSource=last_released_manifest` y `diffBaseReleaseId`. El gate
-   evaluó de verdad el release que lo contiene.
-   Se promovió en DOS releases separados a propósito: `--override-batch-policy` degrada el check
-   ENTERO a warning, así que el bypass debía caer sobre el batch más chico. R1 (portal cliente) pasó
-   **sin bypass**; sólo R2 lo necesitó.
-2. **Un `filesChanged=0` ya no es aprobación: es `unknown`.** Si lo ves, o el target coincide con el
-   último release desplegado, o la base no se pudo resolver. El summary dice contra qué base comparó y
-   de qué release id salió — el artefacto por fin es auditable.
-3. **El marker `[release-coupled: …]` cambió de formato y ahora es estricto.** Tiene que ABRIR una
-   línea del cuerpo del squash, y se lee SÓLO de ese commit. Un marker a mitad de línea ya no cuenta.
-   Antes bastaba mencionarlo en cualquier commit del rango — y una cita en prosa neutralizaba
-   `split_batch` para un batch entero. **Estrenado en su propio release** (`49f86c98cda6`) y funcionó:
-   neutralizó el `split_batch` de `auth_access + cloud_release`. Dato útil para la próxima vez: ese
-   `auth_access` eran CINCO COMENTARIOS renombrando `seo_v1`→`seo_v2` — **el classifier clasifica por
-   path, no por contenido del diff**, así que antes de partir un batch conviene mirar si el dominio
-   "sensible" sólo cambió prosa.
-4. **Open Question viva, y es de proceso, no de código:** el classifier marca `requires_break_glass`
-   ante UN SOLO dominio irreversible, sin mezcla. La matriz del runbook §2.2 considera legítimo un
-   release de migración acoplado a su consumer. Con el gate arreglado eso deja de ser teórico: todo
-   release que toque `src/lib/release/**`, `migrations/` o `.github/workflows/` va a pedir break-glass.
-   O se relaja la severidad, o se endurece la matriz.
-5. **`pnpm release:workers`** reemplaza el `gcloud run services describe` crudo del runbook §4.1 (el
-   que crasheaba con `TransformFilter()`). Si falla por flags, cambió la herramienta: se corrige el
-   wrapper, no cada bloque de doc.
-6. La lista forense de `ignored-pending-runs.ts` quedó **vacía**: el run 31126022507 se verificó por
-   API como `cancelled`.
-
-
-### TASK-1675 — el menú del portal cliente ya compone sus módulos (EN PRODUCCIÓN)
-
-Cerrada en `develop`. El menú del cliente leía `authorizedViews` mientras el gate de cada page leía
-`module_assignments`: un módulo contratado funcionaba y era inalcanzable salvo escribiendo la URL.
-Ahora el layout resuelve per-org server-side y `VerticalMenu` hace merge **aditivo**.
-
-**Lo que necesita quien siga:**
-
-1. ✅ **Promovido el 2026-08-09** en el release `0791a89cd01f` (run `31313368159`), manifest
-   `released`, watchdog `drift_count=0`. **Queda una verificación que NO se pudo automatizar:** las
-   tres sesiones en producción —cliente de Berel (debe ver `SEO`), cliente sin el módulo (no debe
-   verlo, menú intacto) y colaborador interno (menú intacto)—. El endpoint de agent-session devuelve
-   403 en producción por diseño, así que esto es manual. Confirmar también que no haya filas
-   `view_registry.active=false, updated_by='system'` para los viewCodes SEO.
-2. **Si tocas `VerticalMenu.tsx`, el merge aditivo es load-bearing.** La rama `!isInternalPortalUser`
-   es la rama **no-interno**: los colaboradores puros caen ahí, así que reemplazar la lista base los
-   deja sin menú. Hay un test de identidad que lo fija (`VerticalMenu.test.tsx`, el primer test que
-   ese componente tiene). `TASK-1388` toca el mismo archivo y rebasa sobre esto.
-3. **Cuatro hallazgos de accesibilidad del chrome quedaron medidos y sin arreglar**, a propósito:
-   ningún ítem del menú muestra anillo de foco al tabular, la región scrollable del drawer no es
-   alcanzable por teclado, el toggle es un `<i>` sin role, y el panel desborda 8px. Son globales y
-   preexistentes — el escenario GVC negativo es el control que lo prueba, porque su probe parte de un
-   ítem base de siempre y da el mismo resultado. Están registrados en los manifests, con los flags
-   relajados y el motivo escrito inline. Dueño: `client-portal-menu-focus-ring` (chip abierto).
-4. **Trampas de herramienta que cuestan una hora si no las sabes:** `pnpm fe:capture:review` corre
-   contra **staging** por default, produce 0 frames aun con `--env=local`, y su
-   `ensureStorageStateFresh` **pisa el storageState de la persona declarada** con el del agente
-   interno — la assertion falla después con un diagnóstico engañoso. Usar `pnpm fe:capture` directo y
-   regenerar la persona antes. Y promover baselines de un escenario multi-variante exige promover
-   **cada subdirectorio de variante por separado**.
