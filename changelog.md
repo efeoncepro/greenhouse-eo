@@ -7,6 +7,19 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-12 — Sentry separa el ruido del bridge de Facebook de los errores reales de Careers
+
+El cliente de Sentry filtra exclusivamente la firma del bridge nativo que Facebook inyecta en
+Android cuando el objeto Java desaparece durante el ciclo de vida de su WebView: exige el mensaje,
+navegador y frame `app://` exactos. No toca Careers, Turnstile ni la captura de otros errores de
+Facebook/Android. La investigación comprobó que la página pública y el formulario nativo responden
+correctamente; el filtro queda pendiente de promoción y verificación en el runtime.
+
+En el mismo cierre se recupera la gobernanza persistida de `/admin/globe/credits`: una migration
+añade el registry y el único grant que autoriza su contrato (`efeonce_admin`), eliminando el
+fallback que hoy genera `role_view_fallback_used` durante el refresh de claims. La migration se
+aplica sólo después de desplegar el catálogo ya existente en todos los runtimes que comparten DB.
+
 ## 2026-08-11 — El flag del escáner falló dos veces en producción; causa raíz cerrada en código
 
 Corrección al estado que reporta la entrada siguiente: en producción el escáner de
@@ -1153,34 +1166,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   `473,958 s / 7,90 min`, governance en `183,780 s`, output retenido y settlement exacto de 16
   créditos. La imagen post-arreglo midió `472 s / 183 s`; la coincidencia entre modalidades confirma
   que el cuello era cadence-bound, no size-bound. El drain loop no se tocó.
-
-## 2026-08-03 — Globe Producer: una corrida deja de morir esperando, y la pieza deja de quedar «generando»
-
-- **Una corrida que espera a Asset Governance ya no se confunde con un fallo** (`deffbd4`, `bbbc9c1`; los tres
-  runtimes en `d58bc6f`). El paso donde se verifica el output —C2PA, scan, elegibilidad— es una espera, no un
-  error, y tres capas lo trataban como error hasta matarlo: el nombre real se borraba camino al genérico, el
-  genérico caía en la clase «no clasificado» con tope 3, y al tercer intento la corrida moría **con el gasto ya
-  hecho**. El caso medido: una imagen aceptada y cobrada (748 → 738 créditos) murió esperando algo que el día
-  anterior había tardado doce entregas y terminado bien. Ahora la espera conserva su nombre, se reconoce como
-  espera, y **abandonar después de cobrar exige más margen que abandonar antes** — que es una diferencia de
-  plata, no de código.
-- **Y vuelve a mirar en segundos en vez de minutos.** El backoff creciente existe para no martillar un sistema
-  caído; governance no está caído, está trabajando. Aplicárselo sólo agregaba latencia **después** de que la
-  pieza ya estaba lista: en la décima entrega el techo de 5 minutos la dejaba terminada y sin publicar todo ese
-  rato. Una espera vuelve a mirar a los 10 segundos; un error conserva el backoff, que es donde sirve.
-- **Una pieza cuya corrida muere ya no queda «generando» para siempre** (`bbbc9c1`). La corrida y el experimento
-  son registros distintos y sus estados divergían: el sistema marcaba la corrida como fallida y nadie tocaba el
-  experimento, que es lo que la pantalla lee. Ahora un cierre terminal cierra su experimento con el motivo real.
-  No toca créditos a propósito: la liquidación ya decidió y meter dinero ahí arriesgaría un segundo movimiento.
-- **El composer ya no reconstruye su paleta de comandos en cada tecla** (`011d0eb`, `ISSUE-136` resuelto).
-  Escribir en el prompt encadenaba decenas de actualizaciones y React cortaba con su error #185 una vez por
-  sesión. La pantalla respondía igual, así que ninguna verificación visual lo habría visto — **lo encontró el
-  operador preguntando si alguien había abierto la UI**, tras cuatro despliegues declarados «verificados en
-  runtime». El canary del composer ahora escucha la consola y escribe tecla por tecla; antes hacía las dos cosas
-  mal y por eso no lo vio.
-- Estado honesto: **las dos señales de salud de la outbox (`outboxDeadLetter`, `outboxRetryStorm`) se calculan en
-  cada vuelta del worker y no las lee nada** — no hay métrica ni alerta que las consuma. Todo lo que se encontró
-  hoy lo encontró un humano preguntando, no el sistema avisando. Es el próximo paso recomendado de `ISSUE-135`,
-  que sigue abierto por eso.
-- Los códigos de rechazo del contrato creativo de ruta y el rechazo sin cobro de un control no honrado quedaron
-  registrados en la entrada siguiente de este mismo día; acá sólo se registra lo que ocurrió después.

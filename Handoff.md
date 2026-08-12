@@ -1,5 +1,24 @@
 # Handoff activo
 
+### ISSUE-151 — dos alertas Sentry investigadas; corrección local lista, rollout pendiente (2026-08-12)
+
+**JAVASCRIPT-NEXTJS-8W no es un defecto de Careers:** `Error invoking postMessage: Java object is gone`
+viene del bridge nativo inyectado por Facebook Android (`app://navigation_performance_logger_android`), no de
+Greenhouse. La ruta pública respondió 200 con los UA Facebook Android y Chrome Android; Careers usa
+`<greenhouse-form>` sin iframe ni `postMessage`. Se añadió un `beforeSend` que descarta sólo la combinación
+exacta mensaje + navegador Facebook + frame del bridge, preservando errores reales de Careers, Turnstile y
+Android. **JAVASCRIPT-NEXTJS-8V sí descubrió un drift:** `administracion.globe_credits` entró al catálogo TS sin
+su seed DB; el fallback interno concede a `efeonce_admin` por `admin` y emite el warning. La migration
+`20260812093000000_issue-151-seed-globe-credits-view-access.sql` persiste el registry y el único grant correcto.
+
+Focal local verde: 22 tests, ESLint focal, typecheck y diff check. No se desplegó, aplicó migration ni resolvió
+la issue Sentry: primero promover código a todos los runtimes con catálogo compartido; después aplicar la
+migration y comprobar la fila/grant, renovar o esperar claims (5 min) y revisar Sentry durante 7–14 días. GCP
+CLI y ADC ya están renovados y alineados para `efeonce-group`; el intento de consulta llegó al proxy de Cloud SQL,
+pero el perfil local no declara `GREENHOUSE_POSTGRES_OPS_USER`/`ADMIN_USER`, por lo que no se consultó la fila ni
+se improvisó una credencial. La API Sentry local continúa devolviendo 403 por scope. ISSUE-151 permanece abierta y
+contiene la evidencia/plan exactos.
+
 ### TASK-1378 — RELEASE HECHO + diagnóstico VERDE en producción; falta SOLO el flip del flag (operador) (2026-08-11 23:15Z)
 
 **Actualización de la misma fecha, sesión "avanza con lo necesario":** la promoción develop→main se ejecutó

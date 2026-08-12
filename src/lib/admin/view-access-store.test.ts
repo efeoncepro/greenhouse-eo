@@ -15,17 +15,24 @@ vi.mock('@/lib/sync/publish-event', () => ({
   publishOutboxEvent: vi.fn()
 }))
 
+vi.mock('@/lib/observability/capture', () => ({
+  captureMessageWithDomain: vi.fn()
+}))
+
 const { VIEW_REGISTRY } = await import('./view-access-catalog')
 const { runGreenhousePostgresQuery } = await import('@/lib/postgres/client')
+const { captureMessageWithDomain } = await import('@/lib/observability/capture')
 const { resolveAuthorizedViewsForUser, syncViewRegistryCatalog } = await import('./view-access-store')
 
 const mockedRunGreenhousePostgresQuery = vi.mocked(runGreenhousePostgresQuery)
+const mockedCaptureMessageWithDomain = vi.mocked(captureMessageWithDomain)
 
 describe('syncViewRegistryCatalog', () => {
   beforeEach(() => {
     mockClientQuery.mockReset()
     mockClientQuery.mockResolvedValue({ rows: [] })
     mockedRunGreenhousePostgresQuery.mockReset()
+    mockedCaptureMessageWithDomain.mockReset()
   })
 
   it('bulk upserts the view registry instead of issuing one query per view', async () => {
@@ -147,6 +154,7 @@ describe('client rail fails closed (TASK-1678)', () => {
     mockClientQuery.mockReset()
     mockClientQuery.mockResolvedValue({ rows: [] })
     mockedRunGreenhousePostgresQuery.mockReset()
+    mockedCaptureMessageWithDomain.mockReset()
   })
 
   it('does NOT grant a cliente.* view that has no explicit assignment row', async () => {
@@ -189,6 +197,34 @@ describe('client rail fails closed (TASK-1678)', () => {
     })
 
     expect(access.authorizedViews).toContain('cliente.campanas')
+  })
+
+  it('uses the persisted Globe credits grant without emitting fallback telemetry', async () => {
+    const globeCreditsView = {
+      view_code: 'administracion.globe_credits',
+      section: 'administracion',
+      label: 'Créditos Globe',
+      description: null,
+      route_group: 'admin',
+      route_path: '/admin/globe/credits',
+      display_order: 1,
+      active: true
+    }
+
+    mockStore({
+      registry: [globeCreditsView],
+      assignments: [{ role_code: 'efeonce_admin', view_code: 'administracion.globe_credits', granted: true }]
+    })
+
+    const access = await resolveAuthorizedViewsForUser({
+      userId: 'user-admin',
+      roleCodes: ['efeonce_admin'],
+      tenantType: 'efeonce_internal',
+      fallbackRouteGroups: ['internal', 'admin']
+    })
+
+    expect(access.authorizedViews).toContain('administracion.globe_credits')
+    expect(mockedCaptureMessageWithDomain).not.toHaveBeenCalled()
   })
 
   it('does not resurrect a cliente.* view that is inactive in the DB registry', async () => {
