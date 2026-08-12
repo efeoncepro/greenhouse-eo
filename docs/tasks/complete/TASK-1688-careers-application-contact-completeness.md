@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-011`
-- Status real: `Code complete (Slices 0-3 + tests); rollout pendiente: staging + GVC + revisión Privacy + flip país-requerido en parser`
+- Status real: `LIVE en producción (2026-08-12, release 393144e9f): E2E real verificado; pendientes menores: revisión Privacy, flip país-requerido en parser, scorecard GVC formal`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
@@ -454,6 +454,21 @@ La residencia se muestra como select accesible con nombre textual del país y c�
 2. Revisión Legal/Privacy de retención/aviso para los 3 campos (out-of-band declarado en la spec).
 3. Flip expand→contract: hacer `residenceCountryCode` requerido a nivel parser tras verificar ambas superficies en producción (hoy sólo la UI lo exige).
 4. Scorecard visual `docs/ui/reviews/TASK-1688-….scorecard.json` con las capturas de staging.
+
+## Delta 2026-08-12 (rollout LIVE)
+
+- Release `393144e9f` a producción (manifest `released`); el campo «País de residencia» está
+  VIVO en el careers productivo (form custom) — verificado con curl post-release.
+- Growth Form `efeonce-careers-application` **v4** publicado por el lifecycle gobernado
+  (`scripts/growth/publish-careers-application-form.ts --apply --force`) con el campo país
+  (250 opciones del SSOT, requerido + ayuda anti-inferencia): paridad nativa cerrada. En el
+  form nativo el campo cae en la sección «Datos adicionales» del renderer (no junto a email
+  como en el custom) — deuda visual menor anotada, no bloqueante.
+- E2E real con commands canónicos (EO-APP-0090): teléfono E.164, país VE y mensaje persistidos
+  y visibles; el aviso interno a People incluye el contacto completo.
+- Pendientes que siguen abiertos: revisión Legal/Privacy de retención/aviso (out-of-band),
+  flip expand→contract del país a requerido-en-parser (tras ventana de observación en prod),
+  y scorecard GVC formal (existe captura del form nativo staging con el campo y ayuda).
 
 ## Delta 2026-08-11
 

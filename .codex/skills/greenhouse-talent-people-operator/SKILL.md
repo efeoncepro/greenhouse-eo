@@ -119,7 +119,7 @@ Use the People guide at `docs/documentation/hr/efeonce-operating-code-hiring-onb
 - **SIEMPRE** make selection **structured, documented, and contestable** (a candidate can be told why; a recruiter can override AI).
 - **SIEMPRE** keep the human recruiter–candidate relationship central; AI removes toil, not judgment.
 
-## Hiring lifecycle emails (TASK-1689 — code complete, rollout pendiente)
+## Hiring lifecycle emails (TASK-1689 — LIVE en producción 2026-08-12)
 
 The Hiring cycle emits 6 transactional emails as reactive consumers in the **ops-worker** (consumers `src/lib/sync/projections/hiring-lifecycle-emails.ts`; domain policy `src/lib/hiring/notifications/**`; templates `src/emails/Hiring*.tsx`):
 
@@ -128,13 +128,13 @@ The Hiring cycle emits 6 transactional emails as reactive consumers in the **ops
 - `hiring.application.stage_changed` → progress email **only for candidate-facing stages** (allowlist: `shortlisted`="Preselección", `interview`="Entrevista"); internal stage names never reach candidate copy.
 - `hiring.application.decided` → `selected` (congratulations) / `rejected` (thank-you; type `hiring_decision_rejected` is independently pausable).
 
-Governance: flag `HIRING_LIFECYCLE_EMAILS_ENABLED` **default OFF and lives ONLY in the ops-worker** (declared in `services/ops-worker/deploy.sh` — flipping it in Vercel does nothing); per-type kill-switch in `greenhouse_notifications.email_type_config`; dedupe via `wasEmailAlreadySent`. EmailTypes: `hiring_application_received_internal`, `hiring_application_confirmation`, `hiring_assessment_assigned`, `hiring_stage_advanced`, `hiring_decision_selected`, `hiring_decision_rejected`.
+Governance: flag `HIRING_LIFECYCLE_EMAILS_ENABLED` **ON in production since 2026-08-12** (rev `ops-worker-00548-x52`, default `true` in `services/ops-worker/deploy.sh`) — **it lives ONLY in the ops-worker** (flipping it in Vercel does nothing); per-type kill-switch in `greenhouse_notifications.email_type_config`; dedupe via `wasEmailAlreadySent`. EmailTypes: `hiring_application_received_internal`, `hiring_application_confirmation`, `hiring_assessment_assigned`, `hiring_stage_advanced`, `hiring_decision_selected`, `hiring_decision_rejected`. Real E2E exercised (EO-APP-0090): 5 types `status=sent`; `hiring_decision_selected` is covered by tests until its first real use. Remaining open items: Legal/Privacy review of retention/notice, parser-level required flip for country, formal GVC scorecard.
 
 Docs: manual `docs/manual-de-uso/hr/operar-emails-ciclo-hiring.md` · functional `docs/documentation/hr/emails-ciclo-hiring.md` · architecture `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (Delta 2026-08-12) · flag ledger `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
 
-## Candidate contact completeness (TASK-1688 — code complete, rollout pendiente)
+## Candidate contact completeness (TASK-1688 — LIVE en producción 2026-08-12)
 
-Public Careers applications now capture durable candidate contact, person-first:
+Public Careers applications now capture durable candidate contact, person-first. Live in production since 2026-08-12 (release `393144e9f`): the «País de residencia» field is live in the productive custom form and Growth Form `efeonce-careers-application` v4 is published with it. Remaining open items: Legal/Privacy review of retention/notice for the 3 fields, parser-level required flip for country (after the observation window), formal GVC scorecard.
 
 - **Where each datum lives**: `greenhouse_hiring.candidate_facet.phone_e164` (E.164, optional) + `candidate_facet.residence_country_code` (ISO 3166-1 alpha-2) are person-level; `greenhouse_hiring.hiring_application.candidate_message` (≤4000) belongs to THAT application and is never copied to the profile.
 - **Autodeclarado ≠ inferido**: residence country is what the candidate declares — NEVER inferred from phone prefix, IP, or CV. Required in the UI for new applications; the parser-level required flip is a later expand/contract rollout step.

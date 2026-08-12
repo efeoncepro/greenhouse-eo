@@ -9,6 +9,8 @@ const valid = {
   firstName: 'Ada',
   lastName: 'Lovelace',
   email: 'Ada@Example.com',
+  // TASK-1688 flip 2026-08-12: el país es requerido; el fixture válido lo incluye.
+  residenceCountryCode: 'CL',
   consent: true,
 }
 
@@ -64,8 +66,13 @@ describe('parsePublicHiringApplication', () => {
     expect(parsePublicHiringApplication({ ...valid, residenceCountryCode: 'Chile' })).toBeNull()
   })
 
-  it('residenceCountryCode ausente sigue siendo válido durante el expand (legacy/clientes cacheados)', () => {
-    expect(parsePublicHiringApplication(valid)?.residenceCountryCode).toBeNull()
+  it('residenceCountryCode ausente = payload inválido (flip contract 2026-08-12, país requerido)', () => {
+    const sinPais: Record<string, unknown> = { ...valid }
+
+    delete sinPais.residenceCountryCode
+
+    expect(parsePublicHiringApplication(sinPais)).toBeNull()
+    expect(parsePublicHiringApplication({ ...valid, residenceCountryCode: '' })).toBeNull()
   })
 
   it('el país de residencia sirve como hint de formato del teléfono, nunca al revés', () => {

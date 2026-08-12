@@ -53,12 +53,19 @@ postulación); backfill de filas históricas (imposible de forma fiable; se mues
   conserva su máscara actual). Nunca aparecen en `PublicOpeningPayload`, clientes, analítica ni logs.
 - Sin flag nuevo: es corrección contractual del intake ya gateado por
   `HIRING_PUBLIC_APPLICATIONS_ENABLED`.
+- **Rollout:** a producción el 2026-08-12 (release `393144e9f`, manifest `released`): el campo
+  «País de residencia» está vivo en el form custom productivo y el Growth Form
+  `efeonce-careers-application` v4 quedó publicado con el campo (en el form nativo cae en la
+  sección «Datos adicionales» del renderer — deuda visual menor conocida). El flip a
+  requerido-en-parser sigue pendiente (ventana de observación), igual que la revisión
+  Legal/Privacy de retención/aviso de los 3 campos.
 
 ## Delta 2026-08-12 — TASK-1689: emails transaccionales del ciclo de vida (consumers reactivos)
 
 Los 4 eventos del pipeline que ya se emitían como audit ahora tienen consumers de email en el
 **ops-worker** (domain `notifications`, lane `ops-reactive-notifications`), detrás de
-`HIRING_LIFECYCLE_EMAILS_ENABLED` (default OFF, vive SOLO en el worker) + kill-switch por tipo en
+`HIRING_LIFECYCLE_EMAILS_ENABLED` (default OFF al nacer; ON en producción desde 2026-08-12 — ver
+Rollout abajo; vive SOLO en el worker) + kill-switch por tipo en
 `greenhouse_notifications.email_type_config` (seed aplicado; `hiring_decision_rejected` pausable
 independiente):
 
@@ -83,8 +90,12 @@ independiente):
   consumir; los mensajes del reactive log y las capturas (`captureWithDomain('hiring')`) llevan sólo IDs.
 - Candidate-facing emails envían como **Efeonce** (AGENCY_BRANDED); el aviso interno usa el sender
   plataforma. Templates en `src/emails/Hiring*.tsx` (es/en; default es).
-- Rollout: ledger `FEATURE_FLAG_STATE_LEDGER.md` §Pendientes — flip exige ejercicio end-to-end en
-  staging + revisión humana de Talent del copy (especialmente el rechazo).
+- Rollout: ledger `FEATURE_FLAG_STATE_LEDGER.md` — flip exige ejercicio end-to-end + revisión
+  humana de Talent del copy (especialmente el rechazo). **El flip se ejecutó el 2026-08-12**: flag
+  ON en el ops-worker (rev `ops-worker-00548-x52`, default `true` en `deploy.sh`), ejercicio E2E
+  real EO-APP-0090 (5 tipos `status=sent`; `hiring_decision_selected` cubierto por tests hasta su
+  primer uso real) y release `393144e9f` a producción. Quedan abiertos: revisión Legal/Privacy de
+  retención/aviso, flip del país a requerido-en-parser y scorecard GVC formal.
 
 ## Delta 2026-07-16 — TASK-1385: AI-assisted vacancy public copy (propose→confirm)
 

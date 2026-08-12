@@ -86,13 +86,14 @@ export const parsePublicHiringApplication = (raw: unknown): NormalizedApplicatio
   if (portfolioRaw && !isSafeHttpUrl(portfolioRaw)) return null
   if (linkedinRaw && !isSafeHttpUrl(linkedinRaw)) return null
 
-  // TASK-1688 — país de residencia autodeclarado. Opcional-pero-validado (expand/contract:
-  // la UI lo exige; el parser lo hace requerido tras verificar ambas superficies en prod).
-  // Un valor presente pero inválido = payload inválido (nunca persistir un país inventado).
+  // TASK-1688 — país de residencia autodeclarado, REQUERIDO (flip contract 2026-08-12: ambas
+  // superficies verificadas en producción con release 393144e9f; ver ADR delta en la
+  // arquitectura Hiring). Un valor ausente o inválido = payload inválido (nunca persistir un
+  // país inventado ni aceptar postulación sin residencia declarada).
   // OJO: NO truncar — 'Chile'.slice(0,2)='CH' sería Suiza. Exactamente 2 chars ISO o rechazo.
   const residenceRaw = asTrimmed(body.residenceCountryCode, 10).toUpperCase()
 
-  if (residenceRaw && (residenceRaw.length !== 2 || !isValidCountryCode(residenceRaw))) return null
+  if (residenceRaw.length !== 2 || !isValidCountryCode(residenceRaw)) return null
 
   // El país de residencia SÓLO sirve como hint de formato local del teléfono cuando el
   // candidato no escribe el prefijo internacional — nunca al revés (residencia no se infiere).

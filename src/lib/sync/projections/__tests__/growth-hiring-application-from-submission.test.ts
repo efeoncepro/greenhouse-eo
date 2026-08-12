@@ -40,6 +40,8 @@ const applicationSubmission = () => ({
     firstName: 'Ana',
     lastName: 'Silva',
     email: 'ANA@EMPRESA.COM',
+    // TASK-1688 flip 2026-08-12: el país es requerido por el parser.
+    residenceCountryCode: 'CL',
     phone: '+56912345678',
     portfolioUrl: 'https://ana.example.com',
     linkedinUrl: 'https://linkedin.com/in/ana',
@@ -96,6 +98,7 @@ describe('TASK-1372 — growthHiringApplicationFromSubmissionProjection', () => 
       lastName: 'Silva',
       fullName: 'Ana Silva',
       email: 'ana@empresa.com',
+      residenceCountryCode: 'CL',
       consentPolicyVersion: 'careers-v1'
     })
     expect(options.cvAsset).toEqual({

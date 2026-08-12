@@ -35,8 +35,9 @@ tenga que acordarse de escribirlos:
   remitente de la plataforma.
 - **Los correos se sienten personales**: el asunto y el saludo usan el nombre del candidato y el
   nombre de la vacante (p. ej. "María, recibimos tu postulación a «Content Creator»").
-- Todo el sistema está detrás de un interruptor general (`HIRING_LIFECYCLE_EMAILS_ENABLED`,
-  apagado por defecto hasta completar la verificación en staging y la revisión de copy).
+- Todo el sistema está detrás de un interruptor general (`HIRING_LIFECYCLE_EMAILS_ENABLED`),
+  prendido en producción desde el 2026-08-12; el interruptor y los kill-switch por tipo siguen
+  disponibles para pausar el sistema completo o un correo específico.
 
 > Detalle técnico: consumers en `src/lib/sync/projections/hiring-lifecycle-emails.ts`, política en
 > `src/lib/hiring/notifications/`, templates en `src/emails/Hiring*.tsx`.
