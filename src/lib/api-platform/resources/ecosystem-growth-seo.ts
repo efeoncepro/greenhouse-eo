@@ -6,6 +6,7 @@ import { readBacklinkProfile } from '@/lib/growth/seo/backlinks/reader'
 import { readSeoAeoGap } from '@/lib/growth/seo/gap/read-seo-aeo-gap'
 import { normalizeMarketKeyword, readKeywordMarketDataForTarget } from '@/lib/growth/seo/keyword-market-data'
 import { readKeywordOpportunities } from '@/lib/growth/seo/keyword-opportunities-reader'
+import { resolveSeoTargetForMarket, type SeoMarketTarget } from '@/lib/growth/seo/resolve-target'
 import { readSeoPerformance } from '@/lib/growth/seo/performance/read-performance'
 import { readSeoPerformanceCatalog } from '@/lib/growth/seo/performance/read-performance-catalog'
 import { readRankEvolution } from '@/lib/growth/seo/rank-evolution-reader'
@@ -28,7 +29,6 @@ import type {
 } from '@/lib/growth/seo/contracts'
 import { resolveSeoEntitlement, type SeoTier } from '@/lib/growth/seo/entitlement'
 import { isSeoModuleEnabled } from '@/lib/growth/seo/flags'
-import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 /**
  * TASK-1645 — Lane ecosystem del módulo SEO (downstream de API Platform, consumido por
@@ -99,6 +99,11 @@ interface SeoLaneSubject {
   organizationId: string
   seoTargetId: string | null
   tier: SeoTier | null
+  /**
+   * Mercado que ESTA respuesta sirve (ISSUE-153). Toda respuesta del lane lo declara: un
+   * número de posición o de volumen sin país es ambiguo para una org multi-mercado.
+   */
+  servedMarket: { market: string | null; locationCode: string; languageCode: string } | null
 }
 
 /**
@@ -123,22 +128,48 @@ const resolveSeoLaneSubject = async (
     })
   }
 
-  const targets = await runGreenhousePostgresQuery<{ seo_target_id: string }>(
-    `SELECT seo_target_id
-       FROM greenhouse_growth.seo_targets
-      WHERE organization_id = $1
-        AND status = 'active'
-      ORDER BY created_at DESC
-      LIMIT 1`,
-    [organizationId]
-  )
+  // ISSUE-153 — el mercado es una dimensión EXPLÍCITA, nunca un `LIMIT 1` silencioso.
+  // `?market=MX` (ISO-2 del target) o `?market=2484` (location_code) fija el mercado; sin
+  // selector, un solo activo resuelve solo y varios activos se DECLARAN en vez de elegirse.
+  const url = new URL(request.url)
+  const requestedMarket = url.searchParams.get('market')
+
+  const resolution = await resolveSeoTargetForMarket(organizationId, { market: requestedMarket })
+
+  if (resolution.status === 'multiple_markets' || resolution.status === 'market_not_found') {
+    const markets = resolution.markets.map(describeMarket)
+
+    // Machine-readable y centralizado: los 10 payloads del lane y las tools MCP lo heredan
+    // sin tocarse. No es anti-oracle: los mercados son de la org que el binding ya ve.
+    throw new ApiPlatformError(
+      resolution.status === 'multiple_markets'
+        ? 'The organization has multiple active SEO markets. Pass ?market=<ISO-2|location_code> to choose one.'
+        : `No active SEO market matches "${resolution.requestedMarket}".`,
+      {
+        statusCode: 409,
+        errorCode: resolution.status,
+        details: { markets }
+      }
+    )
+  }
+
+  if (resolution.status === 'none') {
+    return { organizationId, seoTargetId: null, tier: entitlement.tier, servedMarket: null }
+  }
 
   return {
     organizationId,
-    seoTargetId: targets[0]?.seo_target_id ?? null,
-    tier: entitlement.tier
+    seoTargetId: resolution.target.seoTargetId,
+    tier: entitlement.tier,
+    servedMarket: describeMarket(resolution.target)
   }
 }
+
+const describeMarket = (target: SeoMarketTarget) => ({
+  market: target.market,
+  locationCode: target.locationCode,
+  languageCode: target.languageCode
+})
 
 /** Payload honesto cuando la org está entitled pero sin target SEO configurado. */
 export interface SeoTargetNotConfiguredPayload {
@@ -202,7 +233,7 @@ export const getEcosystemSeoKeywordOpportunitiesPayload = async ({
 
   return {
     data: result,
-    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId }
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
   }
 }
 
@@ -247,7 +278,7 @@ export const getEcosystemSeoKeywordMarketDataPayload = async ({
   if (keywords.length === 0) {
     return {
       data: { ok: false, errorCode: 'no_keywords', status: null },
-      meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId }
+      meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
     }
   }
 
@@ -287,7 +318,7 @@ export const getEcosystemSeoKeywordMarketDataPayload = async ({
         }
       })
     },
-    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId }
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
   }
 }
 
@@ -316,7 +347,7 @@ export const getEcosystemSeoVisibility360Payload = async ({
 
   return {
     data: result,
-    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId }
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
   }
 }
 
@@ -369,7 +400,7 @@ export const getEcosystemSeoRankEvolutionPayload = async ({
 
   return {
     data: result,
-    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId }
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
   }
 }
 
@@ -411,7 +442,7 @@ export const getEcosystemSeoOverviewKpisPayload = async ({
 
   return {
     data: { ok: true, organizationId: subject.organizationId, ...result },
-    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId }
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
   }
 }
 
@@ -442,7 +473,7 @@ export const getEcosystemSeoSiteAuditReportPayload = async ({
 
   return {
     data: result,
-    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId }
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
   }
 }
 
@@ -481,7 +512,7 @@ export const getEcosystemSeoBacklinkProfilePayload = async ({
 
   return {
     data: result,
-    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId }
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
   }
 }
 
@@ -553,7 +584,7 @@ export const getEcosystemSeoPerformancePayload = async ({
 
   return {
     data: result,
-    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId }
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
   }
 }
 
@@ -595,7 +626,7 @@ export const getEcosystemSeoPerformanceCatalogPayload = async ({
 
   return {
     data: result,
-    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId }
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
   }
 }
 
@@ -725,7 +756,7 @@ export const trackEcosystemSeoKeywordsPayload = async ({
 
   return {
     data: result,
-    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId }
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
   }
 }
 
@@ -789,6 +820,6 @@ export const untrackEcosystemSeoKeywordsPayload = async ({
 
   return {
     data: result,
-    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId }
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
   }
 }

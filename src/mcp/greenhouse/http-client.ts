@@ -164,23 +164,25 @@ export class GreenhouseApiPlatformClient {
   // TASK-1645 — Growth SEO (read-only, mandato MCP-first del operador 2026-08-05).
   // El lane resuelve la org por binding: para bindings internos `organizationId` es
   // requerido; para bindings org-scoped se omite (o debe coincidir con el binding).
-  async getSeoKeywordOpportunities(input: { organizationId?: string; limit?: number }) {
+  async getSeoKeywordOpportunities(input: { organizationId?: string; market?: string; limit?: number }) {
     return this.request('/api/platform/ecosystem/growth/seo/keyword-opportunities', {
       organizationId: input.organizationId,
+      market: input.market,
       limit: input.limit
     })
   }
 
   // TASK-1661 — lente ◑ ESTIMADA de mercado. Exige selección explícita de keywords: el lane
   // no ofrece "todas las de la org" a propósito.
-  async getSeoKeywordMarketData(input: { organizationId?: string; keywords: string[] }) {
+  async getSeoKeywordMarketData(input: { organizationId?: string; market?: string; keywords: string[] }) {
     return this.request('/api/platform/ecosystem/growth/seo/keyword-market-data', {
       organizationId: input.organizationId,
+      market: input.market,
       keywords: input.keywords.join(',')
     })
   }
 
-  async getSeoVisibility360(input: { organizationId?: string }) {
+  async getSeoVisibility360(input: { organizationId?: string; market?: string }) {
     return this.request('/api/platform/ecosystem/growth/seo/visibility-360', {
       organizationId: input.organizationId
     })
@@ -195,6 +197,7 @@ export class GreenhouseApiPlatformClient {
   // TASK-1303 — serie temporal de posiciones (rank evolution, DataForSEO).
   async getSeoRankEvolution(input: {
     organizationId?: string
+    market?: string
     rangeDays?: number
     engine?: string
     device?: string
@@ -202,6 +205,7 @@ export class GreenhouseApiPlatformClient {
   }) {
     return this.request('/api/platform/ecosystem/growth/seo/rank-evolution', {
       organizationId: input.organizationId,
+      market: input.market,
       rangeDays: input.rangeDays,
       engine: input.engine,
       device: input.device,
@@ -212,6 +216,7 @@ export class GreenhouseApiPlatformClient {
   // TASK-1307 — rendimiento en el tiempo de un SET de keywords/URLs (pantalla ancla).
   async getSeoPerformance(input: {
     organizationId?: string
+    market?: string
     mode?: string
     items?: string[]
     metric?: string
@@ -221,6 +226,7 @@ export class GreenhouseApiPlatformClient {
   }) {
     return this.request('/api/platform/ecosystem/growth/seo/performance', {
       organizationId: input.organizationId,
+      market: input.market,
       mode: input.mode,
       items: input.items && input.items.length > 0 ? input.items.join(',') : undefined,
       metric: input.metric,
@@ -231,9 +237,10 @@ export class GreenhouseApiPlatformClient {
   }
 
   // TASK-1307 — qué keywords/URLs se pueden elegir para comparar.
-  async getSeoPerformanceCatalog(input: { organizationId?: string; mode?: string; windowDays?: number; limit?: number }) {
+  async getSeoPerformanceCatalog(input: { organizationId?: string; market?: string; mode?: string; windowDays?: number; limit?: number }) {
     return this.request('/api/platform/ecosystem/growth/seo/performance-catalog', {
       organizationId: input.organizationId,
+      market: input.market,
       mode: input.mode,
       windowDays: input.windowDays,
       limit: input.limit
@@ -241,25 +248,28 @@ export class GreenhouseApiPlatformClient {
   }
 
   // TASK-1306 — KPIs norte del cockpit Overview (GSC medido, agregado del período).
-  async getSeoOverviewKpis(input: { organizationId?: string; rangeDays?: number }) {
+  async getSeoOverviewKpis(input: { organizationId?: string; market?: string; rangeDays?: number }) {
     return this.request('/api/platform/ecosystem/growth/seo/overview-kpis', {
       organizationId: input.organizationId,
+      market: input.market,
       rangeDays: input.rangeDays
     })
   }
 
   // TASK-1304 — reporte del site audit técnico (OnPage, health + findings por severidad).
-  async getSeoSiteAuditReport(input: { organizationId?: string; auditRunId?: string }) {
+  async getSeoSiteAuditReport(input: { organizationId?: string; market?: string; auditRunId?: string }) {
     return this.request('/api/platform/ecosystem/growth/seo/site-audit-report', {
       organizationId: input.organizationId,
+      market: input.market,
       auditRunId: input.auditRunId
     })
   }
 
   // TASK-1304 — serie semanal del perfil de enlaces (referring domains, rank, toxicidad).
-  async getSeoBacklinkProfile(input: { organizationId?: string; rangeDays?: number }) {
+  async getSeoBacklinkProfile(input: { organizationId?: string; market?: string; rangeDays?: number }) {
     return this.request('/api/platform/ecosystem/growth/seo/backlink-profile', {
       organizationId: input.organizationId,
+      market: input.market,
       rangeDays: input.rangeDays
     })
   }

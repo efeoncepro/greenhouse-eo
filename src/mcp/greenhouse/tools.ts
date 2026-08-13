@@ -386,7 +386,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   // ecosystem (entitlement per-org seo_v2 + anti-oracle server-side); cero lógica de
   // dominio acá. Las degradaciones honestas del reader (disabled / target_not_configured /
   // no_seo_data / no_aeo_data) llegan en data.ok=false — el agente NO debe inventar datos.
-  async getSeoKeywordOpportunities(input: { organizationId?: string; limit?: number }) {
+  async getSeoKeywordOpportunities(input: { organizationId?: string; market?: string; limit?: number }) {
     return callReadTool(
       result => {
         const data = result.data as { ok?: boolean; opportunities?: unknown[]; errorCode?: string }
@@ -402,7 +402,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
       () => client.getSeoKeywordOpportunities(input)
     )
   },
-  async getSeoKeywordMarketData(input: { organizationId?: string; keywords: string[] }) {
+  async getSeoKeywordMarketData(input: { organizationId?: string; market?: string; keywords: string[] }) {
     return callReadTool(
       result => {
         const data = result.data as {
@@ -426,7 +426,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
       () => client.getSeoKeywordMarketData(input)
     )
   },
-  async getSeoVisibility360(input: { organizationId?: string }) {
+  async getSeoVisibility360(input: { organizationId?: string; market?: string }) {
     return callReadTool(
       result => {
         const data = result.data as {
@@ -472,6 +472,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   // TASK-1303 — la serie temporal de posiciones (pantalla ancla de EPIC-022).
   async getSeoRankEvolution(input: {
     organizationId?: string
+    market?: string
     rangeDays?: number
     engine?: string
     device?: string
@@ -503,6 +504,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   // TASK-1307 — rendimiento en el tiempo de un SET elegido (pantalla ancla de EPIC-022).
   async getSeoPerformance(input: {
     organizationId?: string
+    market?: string
     mode?: string
     items?: string[]
     metric?: string
@@ -540,6 +542,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   // TASK-1307 — qué keywords/URLs se pueden pedirle a `get_seo_performance`.
   async getSeoPerformanceCatalog(input: {
     organizationId?: string
+    market?: string
     mode?: string
     windowDays?: number
     limit?: number
@@ -560,7 +563,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     )
   },
   // TASK-1306 — KPIs norte del cockpit Overview (Search Console medido).
-  async getSeoOverviewKpis(input: { organizationId?: string; rangeDays?: number }) {
+  async getSeoOverviewKpis(input: { organizationId?: string; market?: string; rangeDays?: number }) {
     return callReadTool(
       result => {
         const data = result.data as {
@@ -590,7 +593,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     )
   },
   // TASK-1304 — reporte del site audit técnico (OnPage: health + findings por severidad).
-  async getSeoSiteAuditReport(input: { organizationId?: string; auditRunId?: string }) {
+  async getSeoSiteAuditReport(input: { organizationId?: string; market?: string; auditRunId?: string }) {
     return callReadTool(
       result => {
         const data = result.data as {
@@ -620,7 +623,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     )
   },
   // TASK-1304 — serie semanal del perfil de enlaces.
-  async getSeoBacklinkProfile(input: { organizationId?: string; rangeDays?: number }) {
+  async getSeoBacklinkProfile(input: { organizationId?: string; market?: string; rangeDays?: number }) {
     return callReadTool(
       result => {
         const data = result.data as {

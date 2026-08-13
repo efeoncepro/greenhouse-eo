@@ -1,6 +1,9 @@
 import 'server-only'
 
-import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { captureMessageWithDomain } from '@/lib/observability/capture'
+
+
+import { resolveUnambiguousSeoTarget } from '../resolve-target'
 
 import { readRankEvolution } from '../rank-evolution-reader'
 import { readSeoAeoGap } from '../gap/read-seo-aeo-gap'
@@ -84,17 +87,20 @@ export interface ActiveSeoTarget {
  * SELECT — que es justo lo que pasó en la ruta de keywords.
  */
 export const resolveActiveSeoTarget = async (organizationId: string): Promise<ActiveSeoTarget | null> => {
-  const rows = await runGreenhousePostgresQuery<{ seo_target_id: string; root_domain: string }>(
-    `SELECT seo_target_id, root_domain
-       FROM greenhouse_growth.seo_targets
-      WHERE organization_id = $1
-        AND status = 'active'
-      ORDER BY created_at DESC
-      LIMIT 1`,
-    [organizationId]
-  )
+  // ISSUE-153: resolución canónica. Con varios mercados activos el sidebar NO adivina el
+  // país: degrada a null (sus regiones ya renderizan honesto "sin datos") y lo deja
+  // observable — servir un país al azar era el bug.
+  const { target, conflict } = await resolveUnambiguousSeoTarget(organizationId)
 
-  const row = rows[0]
+  if (conflict) {
+    captureMessageWithDomain(
+      `[ISSUE-153] sidebar SEO sin selector de mercado: la org tiene ${conflict.length} mercados activos`,
+      'growth',
+      { level: 'warning', tags: { source: 'seo_overview_sidebar_market_conflict' } }
+    )
+  }
+
+  const row = target ? { seo_target_id: target.seoTargetId, root_domain: target.rootDomain } : undefined
 
   return row ? { seoTargetId: row.seo_target_id, rootDomain: row.root_domain } : null
 }

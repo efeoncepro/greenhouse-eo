@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 
 import { can } from '@/lib/entitlements/runtime'
 import { isSeoModuleEnabled } from '@/lib/growth/seo/flags'
+import { resolveUnambiguousSeoTarget } from '@/lib/growth/seo/resolve-target'
 import { readKeywordOpportunities } from '@/lib/growth/seo/keyword-opportunities-reader'
 import { listSeoEligibleSpaces } from '@/lib/growth/seo/overview/list-seo-spaces'
 import { readSeoOverviewConnection } from '@/lib/growth/seo/overview/read-overview-connection'
@@ -157,17 +158,14 @@ export default async function Page({ searchParams }: PageProps) {
     )
   }
 
-  const target = (
-    await runGreenhousePostgresQuery<{ seo_target_id: string; root_domain: string }>(
-      `SELECT seo_target_id, root_domain
-         FROM greenhouse_growth.seo_targets
-        WHERE organization_id = $1
-          AND status = 'active'
-        ORDER BY created_at DESC
-        LIMIT 1`,
-      [selectedSpace.organizationId]
-    )
-  )[0]
+  // ISSUE-153: resolución canónica del target — jamás `LIMIT 1` inline. Con varios mercados
+  // activos y sin selector de mercado en esta superficie (follow-up de producto), la página
+  // degrada al mismo estado honesto de "sin target" en vez de servir un país al azar.
+  const resolved = await resolveUnambiguousSeoTarget(selectedSpace.organizationId)
+
+  const target = resolved.target
+    ? { seo_target_id: resolved.target.seoTargetId, root_domain: resolved.target.rootDomain }
+    : undefined
 
   if (!target) {
     return (

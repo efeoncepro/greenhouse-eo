@@ -12,6 +12,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 vi.mock('server-only', () => ({}))
 
 const state = {
+  targets: [] as Array<Record<string, unknown>>,
   flagOn: true,
   hasModule: true,
   tier: 'contracted' as string | null,
@@ -59,7 +60,14 @@ vi.mock('@/lib/growth/seo/gap/read-seo-aeo-gap', () => ({
 }))
 
 vi.mock('@/lib/postgres/client', () => ({
-  runGreenhousePostgresQuery: async () => (state.targetId ? [{ seo_target_id: state.targetId }] : []),
+  // ISSUE-153 — el resolver canónico lee la lista completa de targets activos; `targets`
+  // permite simular una org multi-mercado. `targetId` se mantiene como atajo mono-mercado.
+  runGreenhousePostgresQuery: async () =>
+    state.targets.length > 0
+      ? state.targets
+      : state.targetId
+        ? [{ seo_target_id: state.targetId, root_domain: 'x.com', location_code: '2152', language_code: 'es', market: 'CL' }]
+        : [],
   // TASK-1308 — el lane ahora importa el command, que arrastra `withTransaction` vía
   // `@/lib/db`. Sin este export el mock rompe la carga del módulo entero.
   withGreenhousePostgresTransaction: async () => {
@@ -105,6 +113,7 @@ beforeEach(() => {
   state.hasModule = true
   state.tier = 'contracted'
   state.targetId = 'seot-1'
+  state.targets = []
   state.entitlementCalls = []
   state.trackCalls = []
   state.untrackCalls = []
@@ -166,6 +175,42 @@ describe('gates del lane', () => {
 
     expect(r.data).toEqual({ ok: false, errorCode: 'disabled', status: null })
     expect(state.entitlementCalls).toEqual([])
+  })
+
+  it('ISSUE-153 — dos mercados activos sin selector → 409 multiple_markets con la lista', async () => {
+    state.targets = [
+      { seo_target_id: 'seot-cl', root_domain: 'x.com', location_code: '2152', language_code: 'es', market: 'CL' },
+      { seo_target_id: 'seot-mx', root_domain: 'x.com', location_code: '2484', language_code: 'es', market: 'MX' }
+    ]
+
+    await expect(
+      getEcosystemSeoVisibility360Payload({ context: orgCtx, request: req() })
+    ).rejects.toMatchObject({
+      statusCode: 409,
+      errorCode: 'multiple_markets',
+      details: { markets: [{ market: 'CL' }, { market: 'MX' }] }
+    })
+  })
+
+  it('ISSUE-153 — con ?market=MX elige ese mercado y el meta lo declara', async () => {
+    state.targets = [
+      { seo_target_id: 'seot-cl', root_domain: 'x.com', location_code: '2152', language_code: 'es', market: 'CL' },
+      { seo_target_id: 'seot-mx', root_domain: 'x.com', location_code: '2484', language_code: 'es', market: 'MX' }
+    ]
+    state.gapResult = { ok: true, quadrants: [] }
+
+    const r = await getEcosystemSeoVisibility360Payload({ context: orgCtx, request: req('market=MX') })
+
+    expect(r.data).toBe(state.gapResult)
+    expect(r.meta).toMatchObject({ servedMarket: { market: 'MX', locationCode: '2484', languageCode: 'es' } })
+  })
+
+  it('ISSUE-153 — selector que no matchea → 409 market_not_found', async () => {
+    state.targetId = 'seot-cl'
+
+    await expect(
+      getEcosystemSeoVisibility360Payload({ context: orgCtx, request: req('market=PE') })
+    ).rejects.toMatchObject({ statusCode: 409, errorCode: 'market_not_found' })
   })
 
   it('passthrough: el payload ES el resultado del reader (cero re-mapeo)', async () => {
