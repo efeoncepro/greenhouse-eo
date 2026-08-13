@@ -51,7 +51,12 @@ Consecuencias:
 - El report cliente de `TASK-1310` mostraría un país incorrecto.
 - La captura de mercado de `TASK-1661` heredó el error: las 31 capturas de hoy son de Chile.
 
-## Causa raíz (probable, requiere confirmación humana)
+## Confirmado por el operador (2026-08-13)
+
+**Berel es de México.** El mercado correcto es `2484`/`es`. La hipótesis del dato queda confirmada y
+la pregunta "¿será expansión deliberada a Chile?" queda descartada.
+
+## Causa raíz
 
 El target se creó en fase 0 con el mercado por defecto del portafolio (Chile, que es donde opera
 Efeonce) en vez del mercado del cliente. No hay validación que contraste el mercado declarado contra
@@ -60,21 +65,21 @@ dónde está la demanda real de las keywords del set.
 ## Por qué NO se corrigió de una vez
 
 Cambiar `location_code` **bifurca la serie histórica**: los 238 snapshots existentes son mediciones de
-Chile y la tabla es append-only (no se pueden reescribir ni borrar). Hay que decidir explícitamente
-qué pasa con ellos — conservarlos como historia de otro mercado, marcarlos, o abrir un target nuevo.
-Es una decisión de datos con dueño humano, no un `UPDATE`.
-
-También cabe que el mercado sea **deliberado** (Berel expandiéndose a Chile). El dato lo desmiente con
-fuerza, pero quien tiene el contrato es el operador.
+Chile y la tabla es append-only (no se pueden reescribir ni borrar). Qué pasa con ellos es una
+decisión de datos con dueño humano, no un `UPDATE`.
 
 ## Solución propuesta
 
-1. **Confirmar con el operador** cuál es el mercado objetivo real del cliente.
-2. Si es México: decidir el tratamiento de la serie histórica antes de tocar nada — target nuevo
-   (preserva ambas series limpias, recomendado) vs. cambio in-place (rompe la comparabilidad de la
-   serie sin dejar rastro).
-3. Revisar si **otros targets** tienen el mismo default heredado.
-4. **Guardrail para que no se repita:** al configurar un target, contrastar el volumen del nombre de
+1. ~~Confirmar con el operador cuál es el mercado objetivo real.~~ **Confirmado: México.**
+2. **Target nuevo para México + pausar el de Chile.** NO cambiar `location_code` in-place: los 238
+   snapshots de Chile quedarían colgando de un target que dice ser México, mezclando dos mercados
+   bajo una misma serie **sin ningún marcador que lo delate**. Eso es peor que el problema original.
+   Con target nuevo, ambas series quedan íntegras y el lane sirve la de México porque el de Chile
+   deja de estar `active`.
+3. Re-trackear las 31 keywords sobre el target de México (`trackKeywords`); la membresía es
+   append-only y por target, así que no se pierde nada.
+4. Revisar si **otros targets** tienen el mismo default heredado.
+5. **Guardrail para que no se repita:** al configurar un target, contrastar el volumen del nombre de
    marca en el mercado declarado contra los mercados vecinos y advertir cuando la demanda esté
    claramente en otro país. Es barato (una llamada) y ataca la causa, no el síntoma.
 
@@ -96,3 +101,11 @@ no es "sin dato": es un 0 afirmado que se leería como "trivialmente fácil".
 
 **Mientras no se contraste con una segunda fuente, la columna de dificultad no se muestra a un
 cliente.** El volumen sí es utilizable; la dificultad no.
+
+
+## Relación con ISSUE-153
+
+El fix propuesto (dos targets, uno pausado) funciona **sólo porque el de Chile deja de estar
+`active`**: el lane resuelve el target con `ORDER BY created_at DESC LIMIT 1` entre los activos. Si
+alguien reactiva el de Chile, el lane cambia de país **en silencio**. Esa fragilidad es
+`ISSUE-153` y no la introduce este fix — la expone.
