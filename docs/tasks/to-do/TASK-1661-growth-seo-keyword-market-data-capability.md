@@ -99,6 +99,18 @@ Reglas obligatorias:
 - `TASK-1662` — keyword gap: sin volumen no hay forma de priorizar lo que se descubre
 - `TASK-1660` — la superficie de objetivos renderiza las columnas cuando esto exista
 - `TASK-1308` (complete) — la tabla ya las contempla; el contrato es `number | null` y no cambia
+- `TASK-1664` — **bloqueada por esta task** (confirmado 2026-08-13 en su Discovery, skills
+  `arch-architect` + `seo-aeo`). Delta de alcance que esta task debe absorber al diseñar su Slice 1:
+  **la tabla de mercado nace con más de un productor**. 1664 escribe en ella las métricas que ya
+  vienen inline y pagadas en las respuestas de discovery (`keyword_suggestions`, `related_keywords`,
+  `keyword_ideas`), y `TASK-1662` hará lo mismo desde `domain_intersection`. Consecuencias duras para
+  el schema: (a) la clave es `(normalized_keyword, location_code, language_code, captured_at)` y
+  **NO** lleva FK a `seo_keyword_set_members` ni a `seo_targets` — una keyword candidata todavía no
+  es de nadie; (b) conviene una columna de procedencia del productor (`source_endpoint`) para
+  auditar de dónde salió cada captura; (c) el reader debe exponer frescura para que un consumidor
+  decida si hace top-up con `keyword_overview` o si el ciclo mensual vigente alcanza. Alcance V1 de
+  fetch (sólo set monitoreado) **no cambia**: lo que cambia es que la tabla no puede asumir que toda
+  keyword suya está trackeada.
 
 ### Files owned
 

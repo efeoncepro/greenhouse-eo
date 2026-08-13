@@ -105,6 +105,19 @@ Reglas obligatorias:
   mercado estimada (`◑`). Nunca se promedian ni se sustituye una por otra silenciosamente.
 - **No auto-track:** crear una fila de candidato no crea ni modifica `seo_keyword_set_members`; la
   promoción usa después `trackKeywords`/`untrackKeywords` y su intención declarada.
+- **La métrica de mercado NO es un hecho de esta task.** `search_volume`, `keyword_difficulty`,
+  `competition`, `intent` y `core_keyword` son propiedades de `(keyword, location_code, language_code,
+  as-of)` con frescura **mensual** (ciclo Google Ads) y no dependen de si la keyword se sigue o se
+  acaba de descubrir. Su SSOT es el store de `TASK-1661`; 1664 es un **segundo productor** de ese
+  mismo hecho, nunca un segundo almacén. El candidato guarda **sólo procedencia**
+  (`run`, `seed`, `source_endpoint`, `source_rank`) y referencia la métrica por
+  `(normalized_keyword, location_code, language_code)`. Prueba del boundary: `TASK-1662` descubre
+  keywords con volumen desde `domain_intersection` — si el hecho viviera en `candidates`, 1662 no
+  tendría dónde escribirlo sin abrir un tercer almacén.
+- **El enriquecimiento se paga una vez.** Los endpoints de discovery devuelven `keyword_info` y
+  `keyword_properties` **inline, ya cobrados** en la misma respuesta: el runner los persiste en el
+  store de mercado y NO los descarta. `keyword_overview` queda como **top-up del faltante o vencido**
+  (fuera del ciclo mensual), no como llamada fija por corrida.
 - **No keyword gap duplicado:** `domain_intersection`/`page_intersection` y la derivación competitiva
   pertenecen a `TASK-1662`; 1664 sólo descubre desde seeds, GSC, set monitoreado y dominio propio.
 - **No AI Optimization duplicado:** `ai_optimization`/LLM Mentions/SoV de proveedor pertenecen a
@@ -132,6 +145,15 @@ Reglas obligatorias:
 - `TASK-1301` — capability y gate `enforceSeoRunEntitlement` per-org.
 - `TASK-1661` — primitive de datos de mercado y reader de volumen/dificultad. 1664 no duplica sus
   columnas ni sus snapshots; consume el contrato para enriquecer candidatos.
+  🔴 **Bloqueo confirmado 2026-08-13 (Discovery de 1664, skills `arch-architect` + `seo-aeo`).** No es
+  ordenamiento burocrático: la métrica de mercado es **un solo hecho** con SSOT en 1661, y 1664 es su
+  **segundo productor** (escribe lo que ya viene inline y pagado en las respuestas de discovery).
+  Construir 1664 primero obliga a que su tabla `candidates` posea columnas de mercado — dos adapters
+  de `keyword_overview` y dos almacenes del mismo hecho estimado, con frescura mensual compartida y
+  divergencia garantizada dentro del mismo mes. Y es **puerta de una sola dirección**: la política
+  append-only prohíbe el DELETE, y en cuanto `TASK-1665`, `TASK-1666` y `TASK-1310` lean esas
+  columnas, mover el hecho cuesta una migración coordinada de cuatro tasks. **1661 se ejecuta
+  primero** (`Blocked by: none`, Effort Medio).
 - `src/lib/growth/seo/keyword-opportunities-reader.ts` — consulta de oportunidades GSC ya materializada.
 - `src/lib/growth/seo/track-keywords.ts` — command posterior que convierte una decisión explícita en
   seguimiento recurrente.
@@ -160,7 +182,8 @@ Reglas obligatorias:
 - `services/ops-worker/deploy.sh`
 - `src/app/api/admin/growth/seo/keyword-discovery/route.ts`
 - `src/app/api/platform/ecosystem/growth/seo/keyword-discovery/route.ts`
-- `src/mcp/greenhouse/seo/keyword-discovery.ts`
+- `src/mcp/greenhouse/server.ts` (las tools SEO viven ahí; **no existe** `src/mcp/greenhouse/seo/`)
+- `services/ops-worker/deploy.sh` (Cloud Scheduler `ops-seo-keyword-discovery-drain`, nace pausado)
 - `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`
 
 ## Current Repo State
@@ -246,11 +269,16 @@ Reglas obligatorias:
 
 Una fila representa una solicitud de discovery y su estado operativo. Campos mínimos:
 
+⚠️ **Tipos de ID — corregido 2026-08-13 contra el schema real.** `greenhouse_growth` usa **`TEXT`
+con prefijo** (`DEFAULT ('seokdr-' || gen_random_uuid()::text)`), NO `uuid`:
+`greenhouse_core.organizations.organization_id` y `greenhouse_growth.seo_targets.seo_target_id` son
+`TEXT` (migración `20260805134439202_task-1299`). Con `uuid` las FK no compilan.
+
 | Campo | Tipo | Regla |
 |---|---|---|
-| `run_id` | `uuid` | PK, ID de la corrida que se comparte con workers/readers |
-| `organization_id` | `uuid` | tenant obligatorio; nunca se deriva desde un query param confiable |
-| `seo_target_id` | `uuid` | FK al target; la consulta valida que pertenece a `organization_id` |
+| `run_id` | `text` | PK `seokdr-<uuid>`, ID de la corrida que se comparte con workers/readers |
+| `organization_id` | `text` | tenant obligatorio; nunca se deriva desde un query param confiable |
+| `seo_target_id` | `text` | FK al target; la consulta valida que pertenece a `organization_id` |
 | `source_kind` | `text` | enum cerrado: `manual`, `gsc_queries`, `tracked_keywords`, `target_domain`, `mixed` |
 | `seed_inputs_json` | `jsonb` | seeds normalizadas y referencias de GSC/set; sin secretos ni HTML crudo |
 | `methods_json` | `jsonb` | endpoints elegidos y límites exactos de la corrida |
@@ -276,19 +304,15 @@ Una fila es un hecho de una respuesta concreta del proveedor:
 
 | Campo | Tipo | Regla |
 |---|---|---|
-| `candidate_id` | `uuid` | PK |
-| `run_id` | `uuid` | FK a la corrida; no se reasigna a otra corrida |
-| `organization_id`/`seo_target_id` | `uuid` | se guardan para tenant/index y se validan contra run |
+| `candidate_id` | `text` | PK `seokdc-<uuid>` |
+| `run_id` | `text` | FK a la corrida; no se reasigna a otra corrida |
+| `organization_id`/`seo_target_id` | `text` | se guardan para tenant/index y se validan contra run |
 | `keyword` | `text` | texto devuelto; máximo 80 caracteres y 10 palabras por el límite Labs |
 | `normalized_keyword` | `text` | NFKC, trim, lowercase y espacios colapsados; no elimina tildes |
 | `seed_keywords_json` | `jsonb` | seeds que originaron el resultado |
 | `source_endpoint` | `text` | enum cerrado: `keyword_suggestions`, `related_keywords`, `keyword_ideas`, `keywords_for_site` |
 | `source_rank` | `integer nullable` | posición del resultado dentro de esa respuesta |
 | `core_keyword` | `text nullable` | agrupador entregado por Labs; no se construye clustering propio |
-| `search_volume`/`keyword_difficulty` | `integer nullable` | estimados Labs; `null` si proveedor no tiene dato |
-| `competition` | `numeric nullable` | competencia paga 0–1; nunca se etiqueta como dificultad orgánica |
-| `intent`/`intent_probability` | `text nullable`/`numeric nullable` | vocabulario Labs; no se mezcla con `intent` de TASK-1659 |
-| `provider_last_updated_at` | `timestamptz nullable` | fecha que devuelve Labs para la métrica |
 | `captured_at` | `timestamptz` | fecha en que Greenhouse capturó la respuesta |
 | `market_source` | `text` | fijo `dataforseo_labs`; disclosure `estimated` |
 | `raw_payload_hash` | `text` | hash para diagnóstico; no se persiste payload completo |
@@ -296,6 +320,14 @@ Una fila es un hecho de una respuesta concreta del proveedor:
 Índice único: `(run_id, normalized_keyword, source_endpoint, location_code, language_code)`.
 Una misma keyword proveniente de dos endpoints conserva ambas procedencias; el reader puede deduplicar
 para la vista, pero no destruye evidencia.
+
+🔴 **La tabla NO tiene columnas de métrica de mercado** (`search_volume`, `keyword_difficulty`,
+`competition`, `intent`, `intent_probability`, `core_keyword`, `provider_last_updated_at`).
+Ese hecho pertenece al store de `TASK-1661`, se escribe con la misma clave
+`(normalized_keyword, location_code, language_code, captured_at)` y el reader lo compone en memoria.
+El candidato guarda sólo **procedencia**. Motivo: el volumen de una keyword no cambia según cómo se
+descubrió, su frescura es mensual, y duplicarlo garantiza divergencia dentro del mismo mes entre dos
+filas que describen el mismo hecho.
 
 #### `greenhouse_growth.seo_keyword_discovery_actions`
 
@@ -332,7 +364,7 @@ Todos los endpoints siguientes son Google Labs Live y se llaman mediante `postDa
 | Relacionadas | `/v3/dataforseo_labs/google/related_keywords/live` | `keyword`, mercado, `depth=1`, `include_serp_info=false` | una llamada por seed; hasta 10 seeds; `limit` 50 default/100 max |
 | Ideas | `/v3/dataforseo_labs/google/keyword_ideas/live` | `keywords[]`, mercado, `closely_variants=false`, filtros de `search_volume > 0` | una llamada para todas las seeds; máximo 10 seeds; `limit` 50 default/100 max |
 | Dominio propio | `/v3/dataforseo_labs/google/keywords_for_site/live` | `target` sin scheme, mercado, `limit`, `order_by=["relevance,desc"]` | una llamada opcional por corrida; apagada por default |
-| Enriquecimiento | `/v3/dataforseo_labs/google/keyword_overview/live` | `keywords[]` deduplicadas, máximo 100; sin clickstream | una llamada final por corrida; `keyword_overview` no crea seeds |
+| Enriquecimiento (top-up) | `/v3/dataforseo_labs/google/keyword_overview/live` | `keywords[]` deduplicadas, máximo 100 por llamada; sin clickstream | **sólo las keywords sin métrica vigente** en el store de `TASK-1661`; `ceil(faltantes/100)` llamadas, máximo 2 por corrida; `keyword_overview` no crea seeds |
 
 No se llaman `keywords_data`, `bulk_keyword_difficulty`, `domain_intersection` ni `search_intent` en
 V1. `keyword_overview` entrega el conjunto enriquecido para evitar joins de APIs y su `keyword_difficulty`
@@ -366,9 +398,13 @@ Límites duros por corrida:
 - `keywords_for_site` es opcional y cuenta como cuarto método sólo si el operador lo activa;
 - máximo 100 resultados solicitados por endpoint/seed;
 - máximo 500 candidatos antes de deduplicación final y máximo 200 candidatos enriquecidos por
-  `keyword_overview`;
-- máximo 30 llamadas Labs por corrida (10 sugerencias + 10 relacionadas + 1 ideas + 1 dominio + 1
-  overview = 23 en el caso máximo V1; el margen restante es para reintentos controlados);
+  `keyword_overview` (**200 / 100 por llamada = hasta 2 llamadas**, no una: la redacción anterior era
+  internamente contradictoria);
+- máximo 30 llamadas Labs por corrida (10 sugerencias + 10 relacionadas + 1 ideas + 1 dominio + 2
+  overview = 24 en el peor caso V1; el margen restante es para reintentos controlados);
+- el enriquecimiento es **top-up**: las métricas que ya vinieron inline en las respuestas de discovery
+  se persisten y no se vuelven a comprar, y una corrida repetida dentro del mismo ciclo mensual del
+  proveedor gasta **cero** en `keyword_overview`;
 - si el costo estimado supera el presupuesto restante o la cuota, no se ejecuta ninguna llamada;
 - si el fence se agota a mitad de corrida, se conserva lo materializado y el run termina
   `budget_blocked`/`partial` con costo real y candidatos ya escritos.
@@ -379,7 +415,9 @@ aprobación propios.
 
 ### Access, privacy and error contract
 
-- Leer discovery exige `growth.seo.observation.read` y assignment `seo_v1` vigente.
+- Leer discovery exige `growth.seo.observation.read` y assignment **`seo_v2`** vigente
+  (`SEO_MODULE_KEYS_READ = ['seo_v2']`, `src/lib/growth/seo/entitlement.ts:73`). La ventana `seo_v1`
+  quedó **cerrada en código** por `TASK-1677` (complete, 2026-08-09): citarla acá era drift.
 - Encolar/ejecutar exige `growth.seo.target.configure` además del assignment; MCP requiere también
   binding interno y `efeonce.mcp.seo.write` para el write.
 - `organization_id`, target y mercado se derivan/validan server-side; jamás se confía en el `orgId` del
@@ -397,8 +435,17 @@ aprobación propios.
   `services/ops-worker/deploy.sh`; registrar en `FEATURE_FLAG_STATE_LEDGER.md`.
 - La ruta app crea run y outbox en una transacción; responde `202` con `runId` sólo si la corrida queda
   durable. No llama provider.
-- El worker consume `growth.seo.keyword_discovery.requested`, reclama `pending`, procesa endpoints y
-  escribe candidatos/run/outbox en transacciones acotadas.
+- 🔴 **Despertador del worker — corregido 2026-08-13.** En este dominio **el outbox NO es cola de
+  trabajo**: se usa para mirror BQ y trazabilidad, y el disparo real de todo batch SEO es
+  **Cloud Scheduler → HTTP al ops-worker** (rank capture, audit enqueue/collect, backlinks, GSC).
+  Un consumer reactivo de `growth.seo.keyword_discovery.requested` sería un patrón nuevo en el
+  dominio. El contrato es: Cloud Scheduler **`ops-seo-keyword-discovery-drain`** (declarativo en
+  `services/ops-worker/deploy.sh`, **nace pausado**) → `POST /seo/keyword-discovery/drain` → claim de
+  runs `pending` con `SELECT … FOR UPDATE SKIP LOCKED`, calcado de `collectSiteAuditRuns`
+  (`src/lib/growth/seo/site-audit/collect.ts`). El evento outbox se conserva para trazabilidad, no
+  como mecanismo de despacho. Sigue vigente la prohibición de Vercel cron.
+- El worker reclama `pending → running`, procesa endpoints y escribe candidatos/run/outbox en
+  transacciones acotadas.
 - La señal `seo.keyword_discovery.stuck_runs` alerta corridas `running` por más de 15 minutos; la
   señal `seo.keyword_discovery.provider_errors` cuenta fallas de proveedor por familia; la señal
   `seo.provider.cost_over_budget` sigue siendo la alarma de presupuesto.
