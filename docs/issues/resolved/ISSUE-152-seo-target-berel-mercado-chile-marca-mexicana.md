@@ -142,3 +142,32 @@ vecinos al configurar un target) queda como mejora futura del alta de targets; e
 solución propuesta sigue vigente como pendiente no bloqueante, junto con la auditoría del resto de
 los targets (hoy sólo existe el de Efeonce, revisado: Chile es correcto para su HQ, y su realidad
 multi-país es `ISSUE-153`).
+
+
+## Delta 2026-08-13 (tarde) — el KD 0 quedó EXPLICADO, no sólo vetado
+
+Investigación en la documentación del proveedor a pedido del operador ("¿la KD no mejora con el
+país?"). Respuesta: el país SÍ importa (la doc declara la métrica country-specific, y `berel` pasa
+de `null` en CL a `8` en MX), **pero el 0 no es falta de dato: es el piso de la fórmula.**
+
+Fórmula oficial: por cada top-10, `(domain_rank×0.1 + page_rank×0.9)/500`; KD =
+`(max(mediana, promedio) − 0.2)/0.8 × 100`, **clampeada a 0**. Verificada empíricamente
+reproduciendo los valores del API con `avg_backlinks_info`:
+
+| Keyword (MX) | KD proveedor | KD por fórmula | page_rank top-10 | score vs umbral 0.2 |
+|---|---:|---:|---:|---|
+| `berel` | 8 | 6.9 | 89.9 | 0.255 → sobre |
+| `comex` | 18 | 14.6 | 102.3 | 0.317 → sobre |
+| `pintura` | 0 | 0.0 | 60.9 | **0.185 → bajo el piso** |
+| `pintura para piso` | 0 | 0.0 | 5.2 | **0.109 → bajo el piso** |
+
+El 90% del peso es el backlink rank de la URL específica que rankea, y en SERPs es-LATAM el top-10
+son páginas de categoría/producto casi sin backlinks a nivel URL → una porción enorme de keywords
+colapsa a 0 exacto. La métrica es coherente con su definición, pero su definición no discrimina en
+este mercado.
+
+**Consecuencia práctica:** el veto de mostrar KD a cliente se mantiene, ahora con causa conocida.
+La señal cruda utilizable es `avg_backlinks_info` (page_rank/domain_rank/referring domains promedio
+del top-10), que viene **gratis en la misma respuesta** y hoy NO se persiste — derivar de ahí una
+dificultad propia es decisión de producto. Gotcha canonizado en
+`.claude/skills/dataforseo-operator/references/02-labs.md` §7.

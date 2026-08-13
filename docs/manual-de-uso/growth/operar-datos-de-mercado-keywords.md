@@ -104,6 +104,11 @@ nada, **algo esta mal**: significa que el runtime llamo al proveedor sin el regi
   se trae el ciclo viejo al mismo precio.
 - **No leer `competition` como dificultad.** Es competencia **paga** (Google Ads). La dificultad
   organica es `keyword_difficulty`.
+- **No mostrar `keyword_difficulty` a un cliente en mercados es-LATAM.** Es una metrica pura de
+  backlinks con un piso duro: si las URLs del top-10 tienen pocos backlinks propios (lo normal en
+  SERPs de LATAM), colapsa a 0 exacto aunque la keyword tenga 135.000 busquedas/mes. Un 0 se lee
+  como "trivialmente facil" y es falso. Detalle y formula verificada:
+  `.claude/skills/dataforseo-operator/references/02-labs.md` §7.
 - **No mostrar un volumen sin su fecha**, ni promediarlo con datos de Search Console. Son dos lentes
   distintas: una es medida, la otra estimada.
 - **No rellenar con `0` una celda vacia.** Vacio significa "no lo consultamos" o "el proveedor no lo

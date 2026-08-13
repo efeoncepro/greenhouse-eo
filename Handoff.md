@@ -19,8 +19,12 @@ próximo ciclo (itera targets `active`).
   multi-mercado se materialice; declarado en ISSUE-153 §Follow-up.
 - Guardrail de alta de target (contrastar volumen del nombre de marca vs mercados vecinos) —
   ISSUE-152 §4.
-- `keyword_difficulty` del proveedor sigue sin ser confiable en español (KD 0 con 135k
-  búsquedas): NO mostrar esa columna a cliente sin segunda fuente.
+- `keyword_difficulty`: causa raíz ENCONTRADA (doc del proveedor + fórmula reproducida
+  empíricamente). Es métrica pura de backlinks con piso duro en 0: en SERPs es-LATAM el top-10
+  casi no tiene backlinks a nivel URL y una porción enorme de keywords colapsa a 0 exacto. El
+  veto de mostrarla a cliente se mantiene; la señal utilizable es `avg_backlinks_info` (gratis
+  en la misma respuesta, hoy NO se persiste) — derivar dificultad propia es decisión de
+  producto. Gotcha canonizado en la skill `dataforseo-operator` (02-labs §7).
 
 ### TASK-1661 — datos de mercado por keyword: code complete, rollout PENDIENTE (2026-08-13)
 
