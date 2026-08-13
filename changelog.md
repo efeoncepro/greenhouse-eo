@@ -7,6 +7,27 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-13 — Berel se mide donde vive su mercado, y el país deja de elegirse en silencio
+
+Una pregunta del operador sobre un dato dudoso destapó dos problemas reales, y los dos quedaron
+resueltos el mismo día.
+
+**El primero era de datos.** El seguimiento SEO de Berel llevaba un año midiendo Chile — y Berel es
+una marca mexicana. Su propio nombre tiene 1.650 veces más búsquedas en México que en Chile, y nada
+en el dashboard lo delataba porque la serie se veía poblada y sana. La corrección respetó la regla
+de oro del histórico: no se reescribió nada. Se creó un target nuevo para México, el de Chile quedó
+pausado con su serie íntegra, y las 31 keywords se re-trackearon por el command canónico. La
+verificación con capturas reales contó el final de la historia: **Berel es #1 en México en sus
+términos de marca** — la marca siempre fue real; el país era el equivocado.
+
+**El segundo era de arquitectura, y era más profundo.** El módulo asumía que una organización tiene
+UN mercado, y esa suposición vivía escondida en un `LIMIT 1` copiado en cuatro lugares: con dos
+países activos, cada pantalla servía el más nuevo sin error, sin señal y sin decir cuál. Efeonce
+misma —que opera en Chile, México, Colombia y Perú— es el caso que ese código no sabía describir.
+Ahora la resolución vive en un solo lugar y dice la verdad: un mercado resuelve solo, varios exigen
+elegir (con la lista de opciones en la respuesta), y toda lectura declara qué país está sirviendo.
+Las posiciones de países distintos jamás se promedian: son experimentos distintos.
+
 ## 2026-08-13 — El módulo SEO deja de leer "volumen: sin dato", y un smoke real destapa una fuga de costo
 
 Durante meses la tabla de oportunidades mostraba las columnas de volumen y dificultad vacías, y eso
@@ -1145,12 +1166,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   en el catálogo del client portal (parity `data_sources` al union TS).
 - Chokepoint único `enforceSeoRunEntitlement` per-org (tier/allowance/budget con env-knobs, consumer-agnóstico
   para UI/Nexa/MCP) verificado con smoke E2E contra PG real. Full suite 10076/0 + build prod verdes.
-
-## 2026-08-05 — Growth SEO (EPIC-022): schema fundacional aplicado + mandato Full API Parity/MCP
-
-- TASK-1299: migración `20260805134439202` aplicada en `greenhouse-pg-dev` — 8 tablas `seo_*` en
-  `greenhouse_growth` (config + serie temporal append-only por `capture_date`), UNIQUEs de idempotencia,
-  triggers anti-mutation, GRANTs least-privilege, `db.d.ts` regenerado. Smoke live verificado con rollback.
-- Directiva del operador: todo el módulo SEO nace Full API Parity y usable por MCP. Se creó `TASK-1645`
-  (lane ecosystem + MCP tools, espejo TASK-1086), exit criterion nuevo en EPIC-022 y DoD consumer-agnóstico
-  en TASK-1301.

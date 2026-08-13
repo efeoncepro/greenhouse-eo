@@ -1,6 +1,6 @@
 # ISSUE-152 — El target SEO de Berel mide Chile para una marca cuya demanda está en México
 
-- **Estado:** `open`
+- **Estado:** `resolved` (2026-08-13)
 - **Detectado:** 2026-08-13, durante la verificación de `TASK-1661` (datos de mercado por keyword)
 - **Ambiente:** Producción (base compartida; el cron `ops-seo-rank-capture` está ACTIVO)
 - **Severidad:** Alta — no rompe nada, y eso es lo peligroso: produce una serie que se ve sana y no
@@ -109,3 +109,36 @@ El fix propuesto (dos targets, uno pausado) funciona **sólo porque el de Chile 
 `active`**: el lane resuelve el target con `ORDER BY created_at DESC LIMIT 1` entre los activos. Si
 alguien reactiva el de Chile, el lane cambia de país **en silencio**. Esa fragilidad es
 `ISSUE-153` y no la introduce este fix — la expone.
+
+
+## Resolución ejecutada (2026-08-13)
+
+Cutover **target nuevo + pausa**, jamás cambio de `location_code` in-place:
+
+1. `seot-berel-mx` creado (`2484`/`es`/`MX`, activo) — idempotente por la UNIQUE del schema.
+2. Las 31 keywords re-trackeadas por el **command canónico** `trackKeywords` (set
+   "Rank tracking v1 (GSC top medidas)" preservado; outcome `tracked: 31`; source `backfill`).
+3. `seot-berel-fase0` (Chile) **pausado** con sus 238 snapshots íntegros.
+
+### Verificación end-to-end con capturas reales
+
+| Qué | Resultado |
+|---|---|
+| Mercado MX (`captureKeywordMarketData`) | 30 capturadas + 1 `no_market_data`, USD 0.0156 |
+| Rankings MX (`captureRankSnapshot`) | **31/31 capturados**, USD 0.1225 |
+| Sanidad del dato | **Berel es #1 en México en sus términos de marca** (`berel`, `berel pintura`, `berel colores` → posición 1) — la marca era real, el país era el equivocado |
+| Tabla de mercado | Los dos países conviven separados por `location_code` (`berel`: 30 CL vs 49.500 MX) |
+| Reader compuesto | `readKeywordOpportunities('seot-berel-mx')` → `market: available` |
+| Ledger | Todo atribuido a la org en `seo_provider_spend_daily` |
+| Resolución del lane | `resolveSeoTargetForMarket` → `seot-berel-mx`; pedir `market=CL` → `market_not_found` honesto (CL está pausado) |
+
+El cron diario `ops-seo-rank-capture` (05:00 CLT) toma el target MX automáticamente desde el
+próximo ciclo — itera targets `active`, y el activo ahora es México.
+
+Gasto total de esta resolución: **USD ~0.14**.
+
+El guardrail para que no se repita (contrastar el volumen del nombre de marca contra mercados
+vecinos al configurar un target) queda como mejora futura del alta de targets; el punto 4 de la
+solución propuesta sigue vigente como pendiente no bloqueante, junto con la auditoría del resto de
+los targets (hoy sólo existe el de Efeonce, revisado: Chile es correcto para su HQ, y su realidad
+multi-país es `ISSUE-153`).

@@ -1,6 +1,6 @@
 # ISSUE-153 — El módulo SEO sirve un solo mercado por organización, y elige cuál en silencio
 
-- **Estado:** `open`
+- **Estado:** `resolved` (2026-08-13)
 - **Detectado:** 2026-08-13, al confirmar con el operador que Efeonce opera en **Chile, México,
   Colombia y Perú**
 - **Ambiente:** Producción (lane ecosystem + MCP + readers de superficie)
@@ -82,3 +82,34 @@ consumidores ya en producción.
   degradación explícita.
 - La respuesta declara siempre el mercado servido.
 - Existe un test con una org multi-mercado — hoy no hay ninguno, y por eso nada falló.
+
+
+## Resolución (2026-08-13, commit `bc7cafe77`)
+
+Diseño validado con `arch-architect` (helper canónico, cero recomputación por callsite) +
+`seo-aeo` §06 (el mercado es una dimensión explícita del análisis, jamás un promedio).
+
+- **`src/lib/growth/seo/resolve-target.ts`** — resolución canónica única. Los CUATRO
+  copy-pastes del `LIMIT 1` (lane, performance, sidebar, página de keywords) migrados; cero
+  restantes (verificado por grep).
+- **Lane ecosystem**: `?market=` (ISO-2 o `location_code`) selecciona; `multiple_markets` /
+  `market_not_found` → **409 machine-readable con la lista de mercados** — centralizado en el
+  chokepoint, los 10 payloads y las tools MCP lo heredan; todo meta declara `servedMarket`.
+- **Superficies sin selector** degradan a su estado honesto existente con el conflicto
+  observable (warning a Sentry en el sidebar) en vez de servir un país al azar.
+- **MCP**: las 9 tools SEO de lectura aceptan `market` opcional.
+
+### Verificación al cerrar (los 3 criterios del issue)
+
+- ✅ Org con dos targets activos → 409 `multiple_markets` con la lista (test de lane) o
+  selección explícita por `?market=`.
+- ✅ La respuesta declara siempre el mercado servido (`meta.servedMarket`).
+- ✅ Existe el test con org multi-mercado: `resolve-target.test.ts` (10 casos) + 3 casos de
+  lane. Antes no había ninguno — por eso nada falló.
+
+### Follow-up de producto (no bloqueante, queda declarado)
+
+Las superficies admin (cockpit, keywords) no tienen aún **selector de mercado en la UI**: con
+una org multi-mercado degradan a su empty state honesto. Ese picker es trabajo de producto/UI
+que corresponde a la superficie de keywords (`TASK-1660`/`TASK-1665` territory) cuando una org
+multi-mercado se materialice — Efeonce midiendo sus 4 países será el caso.

@@ -266,6 +266,19 @@ cablea al cliente público compartido"; el camino correcto es `TASK-1631`).
 
 Exposición parity del mismo PR (mandato del dominio): lane `/api/platform/ecosystem/growth/seo/overview-kpis` + MCP tool `get_seo_overview_kpis`.
 
+**Resolución de target por organización — el mercado es EXPLÍCITO (ISSUE-153, 2026-08-13).**
+`resolveSeoTargetForMarket` / `resolveUnambiguousSeoTarget` (`src/lib/growth/seo/resolve-target.ts`)
+son el ÚNICO camino para resolver el target de una org. **NUNCA** volver a un
+`ORDER BY created_at DESC LIMIT 1` inline: con dos mercados activos servía un país al azar sin
+declararlo (había 4 copias del patrón). Contrato: 1 activo → `resolved` (la respuesta **declara** el
+mercado servido en `meta.servedMarket`); N activos + `?market=` (ISO-2 o `location_code`) →
+`resolved`; N sin selector → **409 `multiple_markets`** con la lista, jamás elección silenciosa;
+selector sin match → 409 `market_not_found`. Las posiciones de mercados distintos **NUNCA se
+promedian** (son SERPs distintos). Las 9 MCP tools de lectura aceptan `market` opcional. Superficies
+sin selector de mercado degradan a su empty state honesto con el conflicto observable (warning
+Sentry); el picker de mercado en la UI admin es follow-up de producto para cuando una org
+multi-mercado se materialice (Efeonce CL/MX/CO/PE es el caso).
+
 Todo reader retorna `{ ok: true, ... } | { ok: false, errorCode, status }` (espejo `SearchConsoleAnalyticsResult`).
 
 ---

@@ -2,6 +2,26 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+### ISSUE-152 + ISSUE-153 resueltos — mercado de Berel corregido + contrato multi-mercado (2026-08-13)
+
+**Berel migrado a México** (autorización del operador: "Berel es de México" + "solucionalo
+end-to-end"): `seot-berel-mx` activo con 31 keywords, `seot-berel-fase0` (CL) pausado con sus 238
+snapshots íntegros. Verificado con capturas reales (USD ~0.14): 31/31 rankings MX — **#1 en sus
+términos de marca** —, mercado 30/31, ledger atribuido. El cron diario toma MX solo desde el
+próximo ciclo (itera targets `active`).
+
+**Contrato multi-mercado shipped** (`bc7cafe77`): helper canónico `resolve-target.ts` (los 4
+`LIMIT 1` copy-pasteados migrados), lane con `?market=` + 409 `multiple_markets`/`market_not_found`,
+`meta.servedMarket` en toda respuesta, 9 MCP tools con `market` opcional. Suite 10.629 verde.
+
+**Pendientes que dejaron estos cierres (no bloqueantes):**
+- Selector de mercado en la UI admin (cockpit/keywords) — producto, para cuando una org
+  multi-mercado se materialice; declarado en ISSUE-153 §Follow-up.
+- Guardrail de alta de target (contrastar volumen del nombre de marca vs mercados vecinos) —
+  ISSUE-152 §4.
+- `keyword_difficulty` del proveedor sigue sin ser confiable en español (KD 0 con 135k
+  búsquedas): NO mostrar esa columna a cliente sin segunda fuente.
+
 ### TASK-1661 — datos de mercado por keyword: code complete, rollout PENDIENTE (2026-08-13)
 
 `greenhouse_growth.seo_keyword_market_data` **ya existe en la base** (migración `20260813171143226`
@@ -381,21 +401,3 @@ sidebar" → estructura vigente, con version bump), la skill `info-architecture`
 ninguna parte) y `src/data/searchData.ts` borrado (huérfano sin consumers tras retirar NavSearch;
 typecheck verde). Pendiente decidible: `roadmap-cockpit.md` internamente inconsistente (pre-existente
 a estas tasks — su ítem de menú se retiró el 2026-07-15 y el paso a paso aún lo cita).
-
-### TASK-1388 CERRADA — la navegación interna repartida en sus 3 superficies (2026-08-10)
-
-Implementación completa en `develop`, autorizada a cierre total por el operador ("termina todo lo que
-falta"): rail interno en 3 zonas (Operación · Administración · Recursos, acordeón nativo), `/my/*`
-rehomed al avatar (builder canónico `src/lib/navigation/my-nav-items.ts`), ⌘K único
-(`GlobalCommandPalette` sobre la `CommandPalette` de TASK-696, con filtro de audiencia — la
-`NavSearch` retirada exponía el registry completo), dedup + legacy borrado + los 4 fixes a11y de
-TASK-1675. Cero cambios de rutas/gating (test de identidad interno + no-interno). Gates TODOS verdes
-incluido `pnpm build` de producción y `pnpm test` full (10.447); baselines GVC durables promovidos
-(`scripts/frontend/baselines/task-1388-*`); scorecard 4.93. `UI ready: yes` con sign-off del operador.
-
-**Continuidad para quien siga:** (1) `TASK-1389` quedó desbloqueada — el sidebar está bajo el tope,
-su gate `nav:budget` es promovible a `error` (Delta escrito allá); (2) card-sort formal de nombres de
-zonas queda como validación posterior NO bloqueante (rename = 1 línea en `GH_INTERNAL_NAV`); (3) gap
-conocido del chrome: `@menu` no expone `aria-expanded` en triggers de submenú (intocable; estado
-canónico = clase `ts-open`, documentado en el scorecard) — decidir como deuda de chrome aparte;
-(4) la rama no-interna del menú quedó con punto de extensión limpio para `TASK-1685` (Delta escrito).
