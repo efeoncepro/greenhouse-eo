@@ -32,15 +32,26 @@ qué se absorbió y qué claims, precios, nombres o capacidades no deben reutili
 
 ## Servicios canónicos
 
-| Servicio | Clave estable | Resultado principal | Evidencia ANAM |
-|---|---|---|---|
-| [Customer Agent gestionado](hubspot-customer-agent-managed-service.md) | `hubspot.customer-agent-managed` | Atención conversacional documentada, gobernada y transferible a humanos. | Configuración, 23 fuentes, catálogo técnico, QA, handoff y canal. |
-| [Arquitectura RevOps, automatización y paneles](hubspot-revops-architecture-automation-and-dashboards.md) | `hubspot.revops-managed` | CRM observable y operable con modelo de datos, calidad, automatización y medición gobernada. | Growth, Data Quality, Service piloto, workflow y paneles Retención/Fidelización. |
+| Servicio                                                                                                  | Clave estable                    | Resultado principal                                                                          | Evidencia ANAM                                                                   |
+| --------------------------------------------------------------------------------------------------------- | -------------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| [Customer Agent gestionado](hubspot-customer-agent-managed-service.md)                                    | `hubspot.customer-agent-managed` | Atención conversacional documentada, gobernada y transferible a humanos.                     | Configuración, 23 fuentes, catálogo técnico, QA, handoff y canal.                |
+| [Arquitectura RevOps, automatización y paneles](hubspot-revops-architecture-automation-and-dashboards.md) | `hubspot.revops-managed`         | CRM observable y operable con modelo de datos, calidad, automatización y medición gobernada. | Growth, Data Quality, Service piloto, workflow y paneles Retención/Fidelización. |
 
 Ambos son servicios, no tareas aisladas. Pueden contratarse como workstreams separados o como un programa
 HubSpot as a Service coordinado. Customer Agent depende de conocimiento, gobierno y handoff; RevOps depende de
 identidad, modelo de datos y disciplina de captura. Cuando se combinan, comparten discovery, control de cambios,
 QA, reporting y cadencia de Managed Ops sin mezclar sus criterios de aceptación.
+
+## Artefacto reusable
+
+- [Glosario operativo de HubSpot — PDF](glosario-operativo-hubspot.pdf)
+- [Fuente Markdown del glosario](glosario-operativo-hubspot.md)
+- [Primitivas de badges HubSpot Solutions Partner](../../../public/branding/partners/hubspot/solution-partner/README.md)
+- [Logo ANAM para fondos claros — exportación Figma](../../../src/lib/artifact-composer/catalogs/deck-axis/assets/clients/anam-figma-light.svg)
+
+El PDF se regenera desde el Markdown con `pnpm hubspot:glossary:render`. El
+renderer admite `--variant dark`, `--variant light` y `--variant orange`; el
+artefacto versionado usa `orange` por su contraste con la portada clara.
 
 ## Contrato común de prestación
 

@@ -3,8 +3,10 @@
 /**
  * Revisa el radar de Wherex con Playwright en un perfil Chrome aislado.
  *
- * No presenta ofertas, no responde mensajes, no descarga archivos de forma
- * permanente y no muestra credenciales, cookies ni URLs firmadas.
+ * No presenta ofertas, no responde mensajes y no muestra credenciales,
+ * cookies ni URLs firmadas. La descarga permanente sólo existe en el modo
+ * explícito --tender-id + --archive-originals y depende del evento nativo de
+ * descarga de Wherex; nunca intenta extraer archivos desde su visor protegido.
  */
 
 import { chmod, mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises'
@@ -53,8 +55,11 @@ async function main() {
   const { chromium } = await import('playwright')
   const startedAt = new Date().toISOString()
 
-  await mkdir(profilePath, { recursive: true })
-  await mkdir(reportsDir, { recursive: true })
+  await mkdir(profilePath, { recursive: true, mode: 0o700 })
+  await chmod(profilePath, 0o700)
+  await mkdir(reportsDir, { recursive: true, mode: 0o700 })
+  await chmod(reportsDir, 0o700)
+
   tempDir = `${PROJECT_ROOT}/.auth/wherex-radar-tmp-${process.pid}-${Date.now()}`
   await mkdir(tempDir, { recursive: true, mode: 0o700 })
 
@@ -62,7 +67,7 @@ async function main() {
     channel: 'chrome',
     headless: false,
     viewport: { width: 1440, height: 980 },
-    acceptDownloads: false
+    acceptDownloads: Boolean(options.archiveDir)
   })
 
   if (options.forceLogin) {
@@ -78,6 +83,23 @@ async function main() {
   await page.goto(defaultUrl, { waitUntil: 'domcontentloaded', timeout: 45_000 })
   await ensureAuthenticated(page, credentials)
   await navigateToTenders(page)
+
+  if (options.tenderId) {
+    const opportunity = await archiveTenderOriginals(page, options.tenderId)
+
+    const reportPath = await writeReport({
+      schema: 'efeonce.wherex-radar.v1',
+      createdAt: startedAt,
+      mode: 'archive-originals',
+      sourceStates: ['Nueva', 'Editando'],
+      opportunities: [opportunity]
+    })
+
+    console.log(`[WHEREX_RADAR] Archivo de originales completado: ${opportunity.attachments.length} adjuntos revisados.`)
+    console.log(`[WHEREX_RADAR] Reporte local protegido: ${relative(PROJECT_ROOT, reportPath)}`)
+
+    return
+  }
 
   const opportunities = []
 
@@ -108,7 +130,15 @@ async function main() {
 }
 
 function parseArgs(args) {
-  const parsed = { checkOnly: false, forceLogin: false, help: false, maxPages: 20, output: null }
+  const parsed = {
+    checkOnly: false,
+    forceLogin: false,
+    help: false,
+    maxPages: 20,
+    output: null,
+    tenderId: null,
+    archiveDir: null
+  }
 
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index]
@@ -143,12 +173,38 @@ function parseArgs(args) {
       continue
     }
 
+    if (arg === '--tender-id') {
+      const value = String(args[index + 1] || '').trim()
+
+      if (!/^[A-Za-z0-9-]{2,80}$/.test(value)) throw new Error('--tender-id requiere un identificador alfanumérico válido')
+      parsed.tenderId = value
+      index += 1
+      continue
+    }
+
+    if (arg === '--archive-originals') {
+      const value = args[index + 1]
+
+      if (!value) throw new Error('--archive-originals requiere una carpeta destino explícita')
+      parsed.archiveDir = resolve(value)
+      index += 1
+      continue
+    }
+
     if (arg === '--help' || arg === '-h') {
       parsed.help = true
       continue
     }
 
     throw new Error(`opción no reconocida: ${arg}`)
+  }
+
+  if (parsed.archiveDir && !parsed.tenderId) {
+    throw new Error('--archive-originals requiere --tender-id para evitar archivar adjuntos masivamente')
+  }
+
+  if (parsed.tenderId && !parsed.archiveDir) {
+    throw new Error('--tender-id requiere --archive-originals <carpeta destino>')
   }
 
   return parsed
@@ -161,10 +217,13 @@ function printUsage() {
   pnpm wherex:radar -- --force-login
   pnpm wherex:radar -- --max-pages 30
   pnpm wherex:radar -- --output .auth/wherex-radar-reports/mi-revision.json
+  pnpm wherex:radar -- --tender-id 1120 --archive-originals "/ruta/a/Licitaciones/Sika"
 
 El comando opera sólo en lectura: revisa Nueva y Editando, abre las fichas y
 extrae los adjuntos técnicos disponibles. No participa, no responde, no sube
-archivos y no firma.`)
+archivos y no firma. El modo de archivo sólo guarda un original cuando Wherex
+emite una descarga nativa; si abre el visor protegido, lo informa sin intentar
+extraer la URL ni el contenido del visor.`)
 }
 
 async function readCredentials() {
@@ -480,6 +539,190 @@ async function readOpportunity(candidate, status) {
   } finally {
     await detailPage.close().catch(() => {})
   }
+}
+
+async function archiveTenderOriginals(page, tenderId) {
+  const candidate = await findTenderCandidate(page, tenderId)
+  const detailPage = await context.newPage()
+
+  try {
+    await detailPage.goto(candidate.href, { waitUntil: 'domcontentloaded', timeout: 45_000 })
+    await detailPage.waitForTimeout(500)
+
+    const body = redactUrls(
+      await detailPage
+        .locator('body')
+        .innerText({ timeout: 10_000 })
+        .catch(() => candidate.preview)
+    )
+
+    const headings = await detailPage
+      .locator('h1, h2')
+      .allTextContents()
+      .catch(() => [])
+
+    const attachments = await archiveNativeDownloads(detailPage)
+
+    return {
+      status: candidate.status,
+      title: normalizeText(headings.find(Boolean) || firstUsefulLine(body) || 'Sin título detectable'),
+      id: extractId(body) || tenderId,
+      buyer: extractBuyer(body),
+      close: extractClose(body),
+      detail: truncate(body, maxDocumentCharacters),
+      attachments
+    }
+  } finally {
+    await detailPage.close().catch(() => {})
+  }
+}
+
+async function findTenderCandidate(page, tenderId) {
+  const matcher = new RegExp(`(?:^|\\D)${escapeRegExp(tenderId)}(?:\\D|$)`, 'i')
+
+  for (const status of ['Nueva', 'Editando']) {
+    await activateStatus(page, status)
+    const candidates = await collectCandidatesAcrossPages(page, status)
+    const matches = candidates.filter(candidate => matcher.test(candidate.preview))
+
+    if (matches.length === 1) return matches[0]
+    if (matches.length > 1) throw new Error(`la licitación ${tenderId} aparece más de una vez; requiere calibración`)
+  }
+
+  throw new Error(`no se encontró la licitación ${tenderId} en Nueva ni Editando`)
+}
+
+async function archiveNativeDownloads(page) {
+  const archiveDir = await assertArchiveDirectory()
+  const controls = page.locator('[title="Descargar"]')
+  const count = await controls.count()
+  const attachments = []
+
+  for (let index = 0; index < count; index += 1) {
+    const control = controls.nth(index)
+
+    if (!(await isVisible(control))) continue
+
+    const fallbackName = `adjunto-${index + 1}`
+    const name = await attachmentName(control, fallbackName)
+    const outcome = await waitForNativeDownloadOrViewer(page, control)
+
+    if (outcome.type === 'download') {
+      const filename = safeAttachmentName(outcome.download.suggestedFilename() || name)
+      const destination = await uniqueArchivePath(archiveDir, filename)
+
+      await outcome.download.saveAs(destination)
+      await chmod(destination, 0o600)
+
+      const metadata = await stat(destination)
+
+      if (metadata.size === 0) throw new Error(`Wherex descargó ${filename} vacío`)
+      if (metadata.size > maxAttachmentBytes) throw new Error(`${filename} supera el límite de lectura`)
+
+      const buffer = await readFile(destination)
+      const text = await extractDocumentText(destination, '', buffer)
+
+      if (!text.trim()) {
+        attachments.push({
+          name: filename,
+          archival: 'ok',
+          extraction: 'unreadable',
+          sizeBytes: metadata.size,
+          reason: 'El original fue archivado, pero no contiene texto extraíble; requiere revisión visual.'
+        })
+        continue
+      }
+
+      attachments.push({
+        name: filename,
+        archival: 'ok',
+        extraction: 'ok',
+        sizeBytes: metadata.size,
+        text: truncate(redactUrls(text), maxDocumentCharacters)
+      })
+      continue
+    }
+
+    if (outcome.type === 'viewer') {
+      await outcome.viewer.close().catch(() => {})
+      attachments.push({
+        name,
+        archival: 'manual-save-required',
+        extraction: 'unreadable',
+        reason: 'Wherex abrió el visor protegido en lugar de emitir una descarga nativa.'
+      })
+      continue
+    }
+
+    attachments.push({
+      name,
+      archival: 'unreadable',
+      extraction: 'unreadable',
+      reason: 'Wherex no emitió una descarga nativa ni abrió un visor identificable.'
+    })
+  }
+
+  return attachments
+}
+
+async function attachmentName(control, fallback) {
+  const rowText = await control
+    .evaluate(element => element.closest('tr')?.innerText || '')
+    .catch(() => '')
+
+  const match = rowText.match(/[^\n]+?\.(?:pdf|docx?|xlsx?|pptx?)(?:\s|$)/i)
+
+  return safeAttachmentName(match?.[0] || fallback)
+}
+
+async function waitForNativeDownloadOrViewer(page, control) {
+  const never = () => new Promise(() => {})
+
+  const download = page
+    .waitForEvent('download', { timeout: 10_000 })
+    .then(value => ({ type: 'download', download: value }))
+    .catch(never)
+
+  const viewer = context
+    .waitForEvent('page', { timeout: 10_000 })
+    .then(value => ({ type: 'viewer', viewer: value }))
+    .catch(never)
+
+  const timeout = page.waitForTimeout(10_250).then(() => ({ type: 'timeout' }))
+
+  await control.click({ timeout: 5_000 })
+
+  return Promise.race([download, viewer, timeout])
+}
+
+async function assertArchiveDirectory() {
+  if (!options.archiveDir) throw new Error('falta carpeta de archivo para guardar originales')
+
+  if (options.archiveDir === '/' || options.archiveDir === PROJECT_ROOT) {
+    throw new Error('la carpeta de archivo debe ser una carpeta de licitación específica')
+  }
+
+  await mkdir(options.archiveDir, { recursive: true, mode: 0o700 })
+
+  return options.archiveDir
+}
+
+async function uniqueArchivePath(directory, filename) {
+  const extension = extname(filename)
+  const stem = extension ? filename.slice(0, -extension.length) : filename
+
+  for (let suffix = 0; suffix < 1_000; suffix += 1) {
+    const candidate = resolve(directory, suffix === 0 ? filename : `${stem} (${suffix + 1})${extension}`)
+
+    try {
+      await stat(candidate)
+    } catch (error) {
+      if (error?.code === 'ENOENT') return candidate
+      throw error
+    }
+  }
+
+  throw new Error(`no se pudo reservar un nombre de archivo para ${filename}`)
 }
 
 async function extractAttachments(page) {

@@ -1,0 +1,21 @@
+{
+  "$schema": "../PROPOSAL_STUDIO_CLOSURE_SCHEMA.md",
+  "schemaVersion": 1,
+  "deal": "sika-lic-1120",
+  "workspacePath": "docs/commercial/tenders/sika-lic-1120",
+  "status": "workshop_only",
+  "proposalId": null,
+  "registration": null,
+  "composition": {
+    "sourcePlans": [
+      "deck-plan.json"
+    ]
+  },
+  "renderJobs": [],
+  "deliverables": [],
+  "verification": null,
+  "notes": [
+    "La salida de pnpm deck:compose es local/exploratoria y no cuenta como Proposal ni como asset versionado.",
+    "Actualizar este registro solo con evidencia del camino canónico Proposal → render job → asset versionado → verificación autenticada."
+  ]
+}

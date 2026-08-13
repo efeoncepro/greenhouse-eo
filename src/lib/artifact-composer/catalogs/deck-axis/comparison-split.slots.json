@@ -63,7 +63,7 @@
         "mode": {
           "type": "enum",
           "required": true,
-          "values": ["proposal", "diagnostic"],
+          "values": ["proposal", "diagnostic", "neutral"],
           "resolver": "comparison-presentation",
           "consumer": "resolver-only"
         }
@@ -74,7 +74,8 @@
     "defaultVariant": "proposal",
     "variants": {
       "proposal": "panel de propuesta con firma Efeonce",
-      "diagnostic": "panel neutral de errores; oculta wordmark y URL de Efeonce"
+      "diagnostic": "panel neutral de errores; oculta wordmark y URL de Efeonce",
+      "neutral": "panel de comparación sin firma de marca; conserva los controles semánticos de una comparación informativa"
     }
   }
 }

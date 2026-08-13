@@ -1,0 +1,34 @@
+{
+  "$comment": "BORRADOR NO EMITIBLE. No ejecutar pnpm economica:build hasta que Comercial y Finanzas aprueben una cotización en MXN con impuestos, FX, margen y media reconciliados.",
+  "output": "propuesta-economica-sika-lic-1120-NO-EMITIR.xlsx",
+  "title": "PROPUESTA ECONÓMICA — BORRADOR",
+  "subtitle": "Campaña digital de continuidad comercial — Sika Mexicana",
+  "currency": "MXN",
+  "ivaRate": 0,
+  "meta": {
+    "Oferente": "Efeonce Group SpA",
+    "Licitación": "LIC-1120 · Wherex",
+    "Fecha": "agosto de 2026",
+    "Validez de la oferta": "Pendiente de aprobación"
+  },
+  "sections": [
+    {
+      "type": "value-table",
+      "title": "No emitir: cotización pendiente",
+      "columns": ["Plan", "Alcance", "Valor total"],
+      "rows": [
+        {
+          "cells": ["Pendiente de aprobación", "Estrategia, creatividad, landing, gestión de Search, medición e inversión de media a reconciliar.", 0],
+          "strong": true
+        }
+      ]
+    },
+    {
+      "type": "totals",
+      "title": "No emitir",
+      "basis": 0,
+      "label": "Monto no aprobado"
+    }
+  ],
+  "footerNote": "Borrador interno no utilizable para presentación ni para la planilla de Wherex."
+}
