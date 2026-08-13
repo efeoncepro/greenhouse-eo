@@ -197,6 +197,7 @@ import { getGrowthAiVisibilityEntitlementSignals } from './queries/growth-ai-vis
 import { getGrowthAiVisibilityRegradeSignals } from './queries/growth-ai-visibility-regrade-signals'
 import { getGrowthSearchConsoleTokenHealthSignal } from './queries/growth-search-console-token-health'
 import { getSeoAuditStuckTasksSignal } from './queries/seo-audit-stuck-tasks'
+import { getSeoMarketDataFreshnessSignal } from './queries/seo-market-data-freshness'
 import { getSeoRankCaptureLagSignal } from './queries/seo-rank-capture-lag'
 // TASK-1082 — Knowledge Platform ingestion signals (moduleKey 'knowledge').
 import { getKnowledgeNotionIngestDeadLetterSignal } from './queries/knowledge-notion-ingest-dead-letter'
@@ -673,6 +674,7 @@ interface ReliabilityOverviewSources {
   growthAiVisibilityRegrade?: ReliabilitySignal[] | null
   growthSearchConsoleTokenHealth?: ReliabilitySignal | null
   seoRankCaptureLag?: ReliabilitySignal | null
+  seoMarketDataFreshness?: ReliabilitySignal | null
   seoAuditStuckTasks?: ReliabilitySignal | null
 
   /** TASK-1201 — Finance AI anomaly-materialization staleness (heartbeat del SoT de signals). */
@@ -1113,6 +1115,7 @@ export const buildReliabilityOverview = (
     ...(sources.growthAiVisibilityRegrade ?? []),
     ...(sources.growthSearchConsoleTokenHealth ? [sources.growthSearchConsoleTokenHealth] : []),
     ...(sources.seoRankCaptureLag ? [sources.seoRankCaptureLag] : []),
+    ...(sources.seoMarketDataFreshness ? [sources.seoMarketDataFreshness] : []),
     ...(sources.seoAuditStuckTasks ? [sources.seoAuditStuckTasks] : []),
     // TASK-812 — Previred/LRE artifact registry drift.
     ...(sources.payrollComplianceExportDrift ? [sources.payrollComplianceExportDrift] : []),
@@ -1628,6 +1631,11 @@ export const getReliabilityOverview = async (
     preloadedSources.seoRankCaptureLag !== undefined
       ? preloadedSources.seoRankCaptureLag
       : await getSeoRankCaptureLagSignal().catch(() => null)
+
+  const seoMarketDataFreshness =
+    preloadedSources.seoMarketDataFreshness !== undefined
+      ? preloadedSources.seoMarketDataFreshness
+      : await getSeoMarketDataFreshnessSignal().catch(() => null)
 
   const seoAuditStuckTasks =
     preloadedSources.seoAuditStuckTasks !== undefined
@@ -2629,6 +2637,7 @@ export const getReliabilityOverview = async (
     growthAiVisibilityRegrade,
     growthSearchConsoleTokenHealth,
     seoRankCaptureLag,
+    seoMarketDataFreshness,
     seoAuditStuckTasks,
     payrollComplianceExportDrift,
     payrollContractorDoubleRailOverlap,

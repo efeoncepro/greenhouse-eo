@@ -190,6 +190,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   | 'getSeoBacklinkProfile'
   | 'trackSeoKeywords'
   | 'untrackSeoKeywords'
+  | 'getSeoKeywordMarketData'
 >) => ({
   async getContext() {
     return callReadTool(
@@ -399,6 +400,30 @@ export const createGreenhouseMcpHandlers = (client: Pick<
         return `Loaded ${count} SEO keyword opportunities (measured GSC striking-distance) (${result.requestId}).`
       },
       () => client.getSeoKeywordOpportunities(input)
+    )
+  },
+  async getSeoKeywordMarketData(input: { organizationId?: string; keywords: string[] }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          keywords?: Array<{ found?: boolean }>
+          freshness?: { latestCaptureDate?: string | null }
+        }
+
+        if (data.ok === false) {
+          return `SEO keyword market data unavailable (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        const rows = Array.isArray(data.keywords) ? data.keywords : []
+        const found = rows.filter(row => row.found).length
+        const asOf = data.freshness?.latestCaptureDate ?? 'unknown'
+
+        // El as-of viaja SIEMPRE: un volumen sin fecha se lee como vigente para siempre.
+        return `Market data (estimated, DataForSEO Labs) for ${found}/${rows.length} keyword(s), as-of ${asOf}. Missing keywords were never queried — do NOT report them as zero (${result.requestId}).`
+      },
+      () => client.getSeoKeywordMarketData(input)
     )
   },
   async getSeoVisibility360(input: { organizationId?: string }) {

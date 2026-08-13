@@ -359,7 +359,24 @@ describe('captureKeywordMarketData — contrato de gasto', () => {
 
     expect(result.ok && result.noMarketData).toBe(1)
     expect(result.ok && result.providerErrors).toBe(0)
-    expect(state.inserts).toHaveLength(0)
+  })
+
+  it('REGISTRA la keyword que el proveedor no tiene, para no re-comprarla cada corrida', async () => {
+    // Bug encontrado en el smoke real (2026-08-13): sin fila, el pre-check de frescura nunca la
+    // veía y la corrida siguiente volvía a pagar por una respuesta vacía. Tres estados: fila
+    // ausente = nunca preguntamos; fila con NULL = preguntamos y no hay; 0 = demanda cero real.
+    state.trackedKeywords = [{ keyword: 'nicho inexistente' }]
+    providerMock.mockResolvedValue(providerOk([]))
+
+    await captureKeywordMarketData('seot-1')
+
+    expect(state.inserts).toHaveLength(1)
+
+    // La fila se escribe con métricas NULL, nunca con 0.
+    const params = state.inserts[0].params
+
+    expect(params[4]).toBeNull()
+    expect(params[5]).toBeNull()
   })
 
   it('atribuye el costo del batch a UNA sola fila para no multiplicar el gasto real', async () => {
@@ -370,6 +387,7 @@ describe('captureKeywordMarketData — contrato de gasto', () => {
 
     const costs = state.inserts.map(call => call.params[call.params.length - 1])
 
+    // Sólo la PRIMERA fila escrita del lote lleva el costo del batch.
     expect(costs).toEqual([0.02, 0])
   })
 

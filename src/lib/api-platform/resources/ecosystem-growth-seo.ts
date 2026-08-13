@@ -4,6 +4,7 @@ import type { ApiPlatformRequestContext, ApiPlatformSuccessResult } from '@/lib/
 import { ApiPlatformError } from '@/lib/api-platform/core/errors'
 import { readBacklinkProfile } from '@/lib/growth/seo/backlinks/reader'
 import { readSeoAeoGap } from '@/lib/growth/seo/gap/read-seo-aeo-gap'
+import { normalizeMarketKeyword, readKeywordMarketDataForTarget } from '@/lib/growth/seo/keyword-market-data'
 import { readKeywordOpportunities } from '@/lib/growth/seo/keyword-opportunities-reader'
 import { readSeoPerformance } from '@/lib/growth/seo/performance/read-performance'
 import { readSeoPerformanceCatalog } from '@/lib/growth/seo/performance/read-performance-catalog'
@@ -149,6 +150,29 @@ export interface SeoTargetNotConfiguredPayload {
 export type EcosystemSeoKeywordOpportunitiesPayload = KeywordOpportunitiesResult | SeoTargetNotConfiguredPayload
 export type EcosystemSeoVisibility360Payload = SeoAeoGapResult | SeoTargetNotConfiguredPayload
 
+export type EcosystemSeoKeywordMarketDataPayload =
+  | {
+      ok: true
+      measurementKind: 'estimated_market'
+      source: 'dataforseo_labs'
+      market: 'available' | 'unavailable'
+      locationCode: string
+      languageCode: string
+      freshness: { freshKeywords: number; latestCaptureDate: string | null }
+      keywords: Array<{
+        keyword: string
+        found: boolean
+        searchVolume: number | null
+        keywordDifficulty: number | null
+        competition: number | null
+        competitionLevel: 'low' | 'medium' | 'high' | null
+        coreKeyword: string | null
+        providerLastUpdatedAt: string | null
+      }>
+    }
+  | { ok: false; errorCode: 'disabled' | 'no_keywords'; status: null }
+  | SeoTargetNotConfiguredPayload
+
 /** GET /api/platform/ecosystem/growth/seo/keyword-opportunities */
 export const getEcosystemSeoKeywordOpportunitiesPayload = async ({
   context,
@@ -178,6 +202,91 @@ export const getEcosystemSeoKeywordOpportunitiesPayload = async ({
 
   return {
     data: result,
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId }
+  }
+}
+
+/**
+ * GET /api/platform/ecosystem/growth/seo/keyword-market-data — TASK-1661.
+ *
+ * Lente ◑ ESTIMADA de mercado (DataForSEO Labs), nunca la demanda medida ● de GSC. El mercado
+ * (país + idioma) sale del target, no del caller: el volumen de una keyword no es global.
+ *
+ * ⚠️ Exige una selección EXPLÍCITA de keywords (`?keywords=a,b,c`, máximo 100). No existe el
+ * modo "todas las keywords de la org": este reader es un lookup acotado, y dejarlo abierto
+ * convertiría una lectura en un barrido del corpus de otro tenant.
+ */
+export const getEcosystemSeoKeywordMarketDataPayload = async ({
+  context,
+  request
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+}): Promise<ApiPlatformSuccessResult<EcosystemSeoKeywordMarketDataPayload>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  const subject = await resolveSeoLaneSubject(context, request)
+
+  if (!subject.seoTargetId) {
+    return {
+      data: { ok: false, errorCode: 'target_not_configured', organizationId: subject.organizationId },
+      meta: { module: 'growth.seo', tier: subject.tier }
+    }
+  }
+
+  const url = new URL(request.url)
+
+  const keywords = (url.searchParams.get('keywords') ?? '')
+    .split(',')
+    .map(value => value.trim())
+    .filter(Boolean)
+    .slice(0, 100)
+
+  if (keywords.length === 0) {
+    return {
+      data: { ok: false, errorCode: 'no_keywords', status: null },
+      meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId }
+    }
+  }
+
+  const result = await readKeywordMarketDataForTarget(subject.seoTargetId, keywords)
+
+  if (!result) {
+    return {
+      data: { ok: false, errorCode: 'target_not_configured', organizationId: subject.organizationId },
+      meta: { module: 'growth.seo', tier: subject.tier }
+    }
+  }
+
+  return {
+    data: {
+      ok: true,
+      // Contrato de honestidad: el consumer debe poder distinguir estimado de medido.
+      measurementKind: 'estimated_market',
+      source: 'dataforseo_labs',
+      market: result.market,
+      locationCode: result.locationCode,
+      languageCode: result.languageCode,
+      freshness: result.freshness,
+      // Se proyecta a array: un Map no sobrevive la serialización JSON.
+      keywords: keywords.map(keyword => {
+        const datum = result.byKeyword.get(normalizeMarketKeyword(keyword))
+
+        return {
+          keyword,
+          // Ausencia = no consultado. NUNCA se rellena con 0.
+          found: Boolean(datum),
+          searchVolume: datum?.searchVolume ?? null,
+          keywordDifficulty: datum?.keywordDifficulty ?? null,
+          competition: datum?.competition ?? null,
+          competitionLevel: datum?.competitionLevel ?? null,
+          coreKeyword: datum?.coreKeyword ?? null,
+          providerLastUpdatedAt: datum?.providerLastUpdatedAt ?? null
+        }
+      })
+    },
     meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId }
   }
 }

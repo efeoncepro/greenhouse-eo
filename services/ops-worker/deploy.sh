@@ -1187,6 +1187,26 @@ upsert_scheduler_job \
   "false"
 echo "  -> ops-seo-backlink-capture: 0 7 * * 1 ACTIVO (backlink snapshot semanal, TASK-1304 — despausado 2026-08-06)"
 
+# Datos de mercado por keyword — TASK-1661.
+#
+# ⚠️ MENSUAL, no diario ni semanal. DataForSEO refresca las métricas de keyword UNA VEZ AL MES
+# siguiendo el ciclo de Google Ads; un cron más frecuente pagaría varias veces por el mismo
+# número. Día 15 porque el proveedor documenta que "a mitad de mes ya hay data fresca del mes
+# anterior": correr el día 1 traería el ciclo viejo al mismo precio.
+#
+# 🔴 NACE PAUSADO y además el flag `GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED` nace en `false`:
+# son DOS frenos independientes, porque esta corrida GASTA. Despausar sin prender el flag no
+# gasta (el command devuelve `disabled`); prender el flag sin despausar tampoco.
+# Antes de despausar: correr el dry-run (`{"dryRun": true}`), mirar el costo estimado y tener
+# la autorización del operador. Costo medido del alcance V1: ~USD 0.016 (31 keywords, Berel).
+upsert_scheduler_job \
+  "ops-seo-keyword-market-data" \
+  "0 8 15 * *" \
+  "/seo/keyword-market-data/capture-batch" \
+  '{}' \
+  "true"
+echo "  -> ops-seo-keyword-market-data: 0 8 15 * * PAUSADO (captura mensual de mercado, TASK-1661 — gasta; requiere dry-run + autorización)"
+
 # Email deliverability monitor — TASK-775 Slice 2.
 #
 # Cron 0 */6 * * * America/Santiago: 4 runs/día. Cómputa bounce/complaint rate

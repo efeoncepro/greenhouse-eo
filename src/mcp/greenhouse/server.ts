@@ -251,7 +251,7 @@ export const createGreenhouseMcpServer = (
     {
       title: 'Get SEO Keyword Opportunities',
       description:
-        'List measured striking-distance SEO keyword opportunities for an organization (Google Search Console data: weighted position, impressions, estimated click gain, quick wins, cannibalization). Requires the organization to have the SEO module (seo_v2) assigned. When data.ok is false, report the errorCode (disabled, target_not_configured, no_data) honestly instead of inventing results.',
+        'List measured striking-distance SEO keyword opportunities for an organization (Google Search Console data: weighted position, impressions, estimated click gain, quick wins, cannibalization). Requires the organization to have the SEO module (seo_v2) assigned. TASK-1661: searchVolume and difficulty are OPTIONAL enrichment from the DataForSEO Labs monthly snapshot — an ESTIMATE of the wider market, not measured demand for this site. A null value means it was never queried; NEVER report it as zero, and never rank by it as if it were measured. The market field says whether that enrichment is available at all. When data.ok is false, report the errorCode (disabled, target_not_configured, no_data) honestly instead of inventing results.',
       inputSchema: {
         organizationId: z.string().trim().min(1).optional(),
         limit: z.number().int().positive().max(50).optional()
@@ -259,6 +259,24 @@ export const createGreenhouseMcpServer = (
       outputSchema: greenhouseMcpToolOutputSchema
     },
     async args => handlers.getSeoKeywordOpportunities(args)
+  )
+
+  // TASK-1661 — lente ◑ ESTIMADA de mercado (Labs), complementaria a la demanda MEDIDA ● de
+  // GSC. La description es parte del contrato: le dice al agente que un dato ausente NO es cero
+  // y que la cifra siempre viaja con su as-of.
+  server.registerTool(
+    'get_seo_keyword_market_data',
+    {
+      title: 'Get SEO Keyword Market Data',
+      description:
+        'Look up ESTIMATED market data (monthly search volume, organic keyword difficulty 0-100, paid competition, core keyword) for an explicit list of keywords, from the DataForSEO Labs snapshot. This is an ESTIMATE of the wider market refreshed monthly, NOT the measured Search Console demand of this site: never average it with, or substitute it for, get_seo_keyword_opportunities data. The market (country + language) comes from the organization SEO target, because search volume is not global. Every value carries capturedAt/providerLastUpdatedAt: always report the as-of date. A keyword returned with found=false was never queried — report it as unknown, NEVER as zero. Also note competition is PAID competition, not organic difficulty.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        keywords: z.array(z.string().trim().min(1)).min(1).max(100)
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getSeoKeywordMarketData(args)
   )
 
   server.registerTool(

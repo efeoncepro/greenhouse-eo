@@ -16,6 +16,8 @@ const state = {
   threshold: '10',
   opportunities: [] as Array<Record<string, string>>,
   curve: [] as Array<{ position_bucket: string; ctr: string }>,
+  /** TASK-1661 — capturas de mercado (lente ◑). Vacío = nunca se consultó. */
+  marketData: [] as Array<Record<string, unknown>>,
   thrown: null as Error | null
 }
 
@@ -25,6 +27,10 @@ vi.mock('@/lib/postgres/client', () => ({
     if (sql.includes('FROM greenhouse_growth.seo_targets')) return state.target
     if (sql.includes('PERCENTILE_CONT')) return [{ threshold: state.threshold }]
     if (sql.includes('position_bucket')) return state.curve
+    // Explícito y NO por catch-all: el fallback de abajo devolvía las filas de oportunidades
+    // para cualquier query desconocida, así que la de mercado veía datos que nunca existieron
+    // y el reader reportaba `available` sin una sola captura.
+    if (sql.includes('FROM greenhouse_growth.seo_keyword_market_data')) return state.marketData
 
     return state.opportunities
   }
@@ -49,6 +55,7 @@ beforeEach(() => {
   state.threshold = '10'
   state.opportunities = []
   state.curve = []
+  state.marketData = []
   state.thrown = null
 })
 
@@ -76,7 +83,7 @@ describe('readKeywordOpportunities — contrato', () => {
     }
   })
 
-  it('declara el mercado no disponible mientras TASK-1300 no aterrice, sin perder valor', async () => {
+  it('sin capturas de mercado declara `unavailable` SIN perder el striking-distance', async () => {
     state.opportunities = [opportunityRow()]
 
     const result = await readKeywordOpportunities('seot-1')
@@ -85,9 +92,72 @@ describe('readKeywordOpportunities — contrato', () => {
 
     if (result.ok) {
       expect(result.market).toBe('unavailable')
-      // El striking-distance NO depende del mercado: sigue habiendo oportunidad.
+      // El striking-distance es demanda MEDIDA de GSC: no depende del enriquecimiento.
       expect(result.opportunities).toHaveLength(1)
       expect(result.opportunities[0]?.searchVolume).toBeNull()
+      expect(result.opportunities[0]?.difficulty).toBeNull()
+    }
+  })
+
+  it('TASK-1661 — con captura de mercado enriquece y declara `available`', async () => {
+    state.opportunities = [opportunityRow()]
+    state.marketData = [
+      {
+        normalized_keyword: 'zapatos rojos',
+        keyword: 'zapatos rojos',
+        search_volume: 2400,
+        keyword_difficulty: 38,
+        competition: '0.4200',
+        competition_level: 'medium',
+        cpc_usd: '0.5100',
+        search_intent: 'commercial',
+        search_intent_probability: '0.9100',
+        core_keyword: 'zapatos',
+        provider_last_updated_at: new Date('2026-07-15T00:00:00.000Z'),
+        capture_date: '2026-08-01',
+        is_fresh: true
+      }
+    ]
+
+    const result = await readKeywordOpportunities('seot-1')
+
+    expect(result.ok).toBe(true)
+
+    if (result.ok) {
+      expect(result.market).toBe('available')
+      expect(result.opportunities[0]?.searchVolume).toBe(2400)
+      expect(result.opportunities[0]?.difficulty).toBe(38)
+    }
+  })
+
+  it('TASK-1661 — una keyword SIN captura queda en null, nunca en 0', async () => {
+    state.opportunities = [opportunityRow({ keyword: 'sin dato de mercado' })]
+    state.marketData = [
+      {
+        normalized_keyword: 'otra keyword',
+        keyword: 'otra keyword',
+        search_volume: 900,
+        keyword_difficulty: 10,
+        competition: null,
+        competition_level: null,
+        cpc_usd: null,
+        search_intent: null,
+        search_intent_probability: null,
+        core_keyword: null,
+        provider_last_updated_at: null,
+        capture_date: '2026-08-01',
+        is_fresh: true
+      }
+    ]
+
+    const result = await readKeywordOpportunities('seot-1')
+
+    expect(result.ok).toBe(true)
+
+    if (result.ok) {
+      // Hay dato para la selección, pero NO para esta keyword: `null`, jamás 0.
+      expect(result.opportunities[0]?.searchVolume).toBeNull()
+      expect(result.opportunities[0]?.searchVolume).not.toBe(0)
     }
   })
 })

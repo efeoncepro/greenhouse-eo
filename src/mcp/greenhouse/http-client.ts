@@ -171,6 +171,15 @@ export class GreenhouseApiPlatformClient {
     })
   }
 
+  // TASK-1661 — lente ◑ ESTIMADA de mercado. Exige selección explícita de keywords: el lane
+  // no ofrece "todas las de la org" a propósito.
+  async getSeoKeywordMarketData(input: { organizationId?: string; keywords: string[] }) {
+    return this.request('/api/platform/ecosystem/growth/seo/keyword-market-data', {
+      organizationId: input.organizationId,
+      keywords: input.keywords.join(',')
+    })
+  }
+
   async getSeoVisibility360(input: { organizationId?: string }) {
     return this.request('/api/platform/ecosystem/growth/seo/visibility-360', {
       organizationId: input.organizationId

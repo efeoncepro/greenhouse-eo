@@ -134,6 +134,7 @@ import { runRankCaptureBatch } from '@/lib/growth/seo/rank-capture-batch'
 import { runSiteAuditEnqueueBatch } from '@/lib/growth/seo/site-audit/enqueue-batch'
 import { collectSiteAuditRuns } from '@/lib/growth/seo/site-audit/collect'
 import { runBacklinkCaptureBatch } from '@/lib/growth/seo/backlinks/capture'
+import { runKeywordMarketDataBatch } from '@/lib/growth/seo/keyword-market-data-batch'
 import { isSeoModuleEnabled } from '@/lib/growth/seo/flags'
 
 // TASK-1303 — el rank capture pega familias DataForSEO que GASTAN: sin este side-effect
@@ -2068,6 +2069,54 @@ const handleSeoBacklinkCaptureBatch = async (req: IncomingMessage, res: ServerRe
   }
 }
 
+// ─── /seo/keyword-market-data/capture-batch ─────────────────────────────────
+//
+// TASK-1661 — captura MENSUAL de volumen/dificultad (DataForSEO Labs `keyword_overview`).
+//
+// 🔴 Este handler GASTA. Doble gate: el módulo (`GROWTH_SEO_ENABLED`) y el flag propio
+// (`GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED`, default OFF), que el command verifica por dentro.
+// `{"dryRun": true}` reporta qué se compraría y cuánto, sin llamar al proveedor.
+const handleSeoKeywordMarketDataCaptureBatch = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+  const maxTargets = typeof body.maxTargets === 'number' && body.maxTargets > 0 ? Math.floor(body.maxTargets) : undefined
+  const dryRun = body.dryRun === true
+
+  if (!isSeoModuleEnabled()) {
+    json(res, 200, { ok: true, skipped: 'seo_module_disabled', targets: 0, captured: 0 })
+
+    return
+  }
+
+  console.log(`[ops-worker] POST /seo/keyword-market-data/capture-batch — dryRun=${dryRun} maxTargets=${maxTargets ?? 'all'}`)
+
+  try {
+    const summary = await runKeywordMarketDataBatch({ maxTargets, dryRun })
+
+    console.log(
+      `[ops-worker] /seo/keyword-market-data/capture-batch done — dryRun=${summary.dryRun} ` +
+      `targets=${summary.targets} captured=${summary.captured} skipped=${summary.skipped} ` +
+      `blocked=${summary.blocked} failed=${summary.failed} costUsd=${summary.costUsd}`
+    )
+
+    // Elegibles > 0 con 0 capturados y fallas del proveedor NO es éxito silencioso.
+    if (!summary.dryRun && summary.failed > 0) {
+      captureMessageWithDomain(
+        `[TASK-1661] captura de mercado falló en ${summary.failed} target(s)`,
+        'growth',
+        { level: 'warning', tags: { source: 'ops_worker_seo_keyword_market_data' } }
+      )
+    }
+
+    json(res, 200, { ok: true, ...summary })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown SEO keyword market data error'
+
+    console.error('[ops-worker] /seo/keyword-market-data/capture-batch failed:', message)
+    captureWithDomain(error, 'growth', { tags: { source: 'ops_worker_seo_keyword_market_data' } })
+    json(res, 502, { error: message })
+  }
+}
+
 // ─── /email-deliverability-monitor ──────────────────────────────────────────
 //
 // TASK-775 Slice 2 — Email deliverability monitor migrado de Vercel cron a
@@ -2769,6 +2818,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/seo/backlinks/capture-batch') {
       await handleSeoBacklinkCaptureBatch(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/seo/keyword-market-data/capture-batch') {
+      await handleSeoKeywordMarketDataCaptureBatch(req, res)
 
       return
     }

@@ -547,23 +547,40 @@ export const captureKeywordMarketData = async (
         if (datum) byNormalized.set(datum.normalizedKeyword, datum)
       }
 
-      for (const keyword of chunk) {
-        const datum = byNormalized.get(keyword)
+      let rowsWrittenInChunk = 0
 
-        if (!datum) {
-          // El proveedor respondió bien pero no tiene esta keyword: hecho, no error.
-          noMarketData += 1
-          outcomes.push({
-            keyword: originalByNormalized.get(keyword) ?? keyword,
-            status: 'no_market_data',
-            errorCode: null
-          })
-          continue
+      for (const keyword of chunk) {
+        const found = byNormalized.get(keyword)
+
+        // 🔴 TRES estados, no dos — descubierto en el smoke real del 2026-08-13:
+        //   fila ausente        = nunca preguntamos;
+        //   fila con NULL       = preguntamos y el proveedor NO tiene el dato;
+        //   fila con 0          = el proveedor dice demanda cero.
+        //
+        // La primera versión no escribía nada cuando el proveedor no tenía la keyword. Como el
+        // pre-check de frescura mira filas, esas keywords nunca quedaban "frescas" y se
+        // RE-COMPRABAN en cada corrida, para siempre: el smoke lo mostró cobrando USD 0.012 en
+        // una corrida que capturó cero. Registrar el intento cierra la fuga y además es más
+        // honesto: "preguntamos y no hay" es un hecho que merece su fecha.
+        const datum: SeoKeywordMarketDatum = found ?? {
+          normalizedKeyword: keyword,
+          keyword: originalByNormalized.get(keyword) ?? keyword,
+          locationCode: target.location_code,
+          languageCode: target.language_code,
+          searchVolume: null,
+          keywordDifficulty: null,
+          competition: null,
+          competitionLevel: null,
+          cpcUsd: null,
+          searchIntent: null,
+          searchIntentProbability: null,
+          coreKeyword: null,
+          providerLastUpdatedAt: null
         }
 
-        // El costo del provider es por BATCH: se atribuye a la primera fila del chunk y las
-        // demás quedan en 0, para que la suma de `provider_cost` no multiplique el gasto real.
-        const rowCost = captured === 0 ? providerCostUsd : 0
+        // El costo del provider es por BATCH: se atribuye a la primera fila escrita del chunk y
+        // las demás quedan en 0, para que la suma de `provider_cost` no multiplique el gasto.
+        const rowCost = rowsWrittenInChunk === 0 ? providerCostUsd : 0
 
         await runGreenhousePostgresQuery(
           `INSERT INTO greenhouse_growth.seo_keyword_market_data
@@ -595,12 +612,25 @@ export const captureKeywordMarketData = async (
           ]
         )
 
-        captured += 1
-        outcomes.push({
-          keyword: originalByNormalized.get(keyword) ?? keyword,
-          status: 'captured',
-          errorCode: null
-        })
+        rowsWrittenInChunk += 1
+
+        if (found) {
+          captured += 1
+          outcomes.push({
+            keyword: originalByNormalized.get(keyword) ?? keyword,
+            status: 'captured',
+            errorCode: null
+          })
+        } else {
+          // El proveedor respondió bien pero no tiene esta keyword: hecho, no error. Queda
+          // registrado con su fecha para no volver a comprarlo dentro del mismo ciclo mensual.
+          noMarketData += 1
+          outcomes.push({
+            keyword: originalByNormalized.get(keyword) ?? keyword,
+            status: 'no_market_data',
+            errorCode: null
+          })
+        }
       }
     } catch (error) {
       captureWithDomain(error, 'growth', {
@@ -633,4 +663,148 @@ export const captureKeywordMarketData = async (
     costUsd,
     outcomes
   }
+}
+
+/** Frescura del dato de mercado de un target: alimenta el reader y la señal de confiabilidad. */
+export interface SeoMarketDataFreshness {
+  /** Keywords del set con captura vigente (dentro de la ventana). */
+  freshKeywords: number
+  /** Fecha de la captura más reciente disponible para ese mercado. */
+  latestCaptureDate: string | null
+}
+
+export interface ReadKeywordMarketDataResult {
+  market: 'available' | 'unavailable'
+  /** Indexado por `normalizedKeyword`. Ausencia = no consultado, NUNCA cero. */
+  byKeyword: Map<string, SeoKeywordMarketDatum>
+  freshness: SeoMarketDataFreshness
+}
+
+/**
+ * Reader canónico del dato de mercado. ÚNICO consumo: ni la UI, ni Nexa, ni MCP, ni el
+ * enriquecimiento de oportunidades tocan la tabla directo.
+ *
+ * ⚠️ Recibe una selección EXPLÍCITA y acotada de keywords (contrato del Delta 2026-08-08 con
+ * TASK-1664): nunca una consulta libre que permita traer todas las keywords de una org.
+ *
+ * Devuelve la captura MÁS RECIENTE por keyword vía `DISTINCT ON`, sin ventana de frescura: si
+ * el dato existe pero está viejo, el consumer merece verlo CON su `capturedAt` y decidir — es
+ * lo contrario de esconderlo y mostrar un hueco.
+ */
+export const readKeywordMarketData = async (input: {
+  keywords: string[]
+  locationCode: string
+  languageCode: string
+}): Promise<ReadKeywordMarketDataResult> => {
+  const normalized = [...new Set(input.keywords.map(normalizeMarketKeyword))].filter(Boolean)
+
+  const empty: ReadKeywordMarketDataResult = {
+    market: 'unavailable',
+    byKeyword: new Map(),
+    freshness: { freshKeywords: 0, latestCaptureDate: null }
+  }
+
+  if (normalized.length === 0) return empty
+
+  const rows = await runGreenhousePostgresQuery<{
+    normalized_keyword: string
+    keyword: string
+    search_volume: number | null
+    keyword_difficulty: number | null
+    competition: string | null
+    competition_level: string | null
+    cpc_usd: string | null
+    search_intent: string | null
+    search_intent_probability: string | null
+    core_keyword: string | null
+    provider_last_updated_at: Date | null
+    capture_date: Date | string
+    is_fresh: boolean
+  }>(
+    `SELECT DISTINCT ON (normalized_keyword)
+            normalized_keyword, keyword, search_volume, keyword_difficulty, competition,
+            competition_level, cpc_usd, search_intent, search_intent_probability, core_keyword,
+            provider_last_updated_at, capture_date,
+            ((CURRENT_DATE - capture_date) < $4) AS is_fresh
+       FROM greenhouse_growth.seo_keyword_market_data
+      WHERE normalized_keyword = ANY($1::text[])
+        AND location_code = $2
+        AND language_code = $3
+      ORDER BY normalized_keyword, capture_date DESC`,
+    [normalized, input.locationCode, input.languageCode, MARKET_DATA_FRESHNESS_DAYS]
+  )
+
+  if (rows.length === 0) return empty
+
+  const byKeyword = new Map<string, SeoKeywordMarketDatum>()
+  let freshKeywords = 0
+  let latestCaptureDate: string | null = null
+
+  const asNumber = (value: string | null): number | null => {
+    if (value === null) return null
+
+    const parsed = Number(value)
+
+    return Number.isFinite(parsed) ? parsed : null
+  }
+
+  for (const row of rows) {
+    const captureDate =
+      row.capture_date instanceof Date ? row.capture_date.toISOString().slice(0, 10) : String(row.capture_date).slice(0, 10)
+
+    if (latestCaptureDate === null || captureDate > latestCaptureDate) latestCaptureDate = captureDate
+    if (row.is_fresh) freshKeywords += 1
+
+    byKeyword.set(row.normalized_keyword, {
+      normalizedKeyword: row.normalized_keyword,
+      keyword: row.keyword,
+      locationCode: input.locationCode,
+      languageCode: input.languageCode,
+      searchVolume: row.search_volume,
+      keywordDifficulty: row.keyword_difficulty,
+      competition: asNumber(row.competition),
+      competitionLevel:
+        row.competition_level === 'low' || row.competition_level === 'medium' || row.competition_level === 'high'
+          ? row.competition_level
+          : null,
+      cpcUsd: asNumber(row.cpc_usd),
+      searchIntent: INTENTS.includes(row.search_intent ?? '') ? (row.search_intent as SeoSearchIntent) : null,
+      searchIntentProbability: asNumber(row.search_intent_probability),
+      coreKeyword: row.core_keyword,
+      providerLastUpdatedAt: row.provider_last_updated_at ? row.provider_last_updated_at.toISOString() : null
+    })
+  }
+
+  return {
+    // `available` significa "hay dato para al menos una keyword de la selección". El detalle
+    // por keyword lo dice la ausencia en el Map, que el consumer proyecta como `null`.
+    market: 'available',
+    byKeyword,
+    freshness: { freshKeywords, latestCaptureDate }
+  }
+}
+
+/**
+ * Variante por target: resuelve el mercado (país + idioma) desde el propio target en vez de
+ * confiar en lo que mande el caller.
+ *
+ * Existe para que ningún consumer —lane, MCP, UI— tenga que saber cómo derivar el mercado. El
+ * volumen de una keyword NO es global; dejar que el caller elija el país abriría la puerta a
+ * leer el mercado equivocado y a que dos superficies muestren cifras distintas para lo mismo.
+ */
+export const readKeywordMarketDataForTarget = async (
+  seoTargetId: string,
+  keywords: string[]
+): Promise<(ReadKeywordMarketDataResult & { locationCode: string; languageCode: string }) | null> => {
+  const target = await loadTarget(seoTargetId)
+
+  if (!target) return null
+
+  const result = await readKeywordMarketData({
+    keywords,
+    locationCode: target.location_code,
+    languageCode: target.language_code
+  })
+
+  return { ...result, locationCode: target.location_code, languageCode: target.language_code }
 }
