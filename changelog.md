@@ -7,6 +7,25 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-13 — La credencial de partner entra al deck sin duplicar la contraportada
+
+El badge de HubSpot Solutions Partner apuntaba a una carpeta fuera del catálogo, y eso rompía la
+regla que mantiene los decks reproducibles: un catálogo tiene que renderizar igual en cualquier
+máquina, y una referencia que se sale funciona en el repo del autor y falla en el worker. El badge se
+mudó adentro del catálogo y ahora se pide por una clave cerrada, el mismo trato que los logos de
+cliente: una acreditación que no se tiene no se puede presentar por accidente.
+
+No hizo falta una contraportada nueva. La misma lámina ya sirve las dos versiones —con y sin
+credencial— porque el motor borra el elemento cuando el plan no lo declara; una segunda plantilla
+casi idéntica solo habría garantizado que las dos se separaran con el tiempo.
+
+Los aprendizajes quedaron escritos donde se van a leer: el runbook del gate visual explica por qué
+declarar un slot nuevo siempre mueve la imagen de referencia de esa lámina, y cómo distinguir un
+drift propio de un baseline viejo; el estándar premium de UI incorpora que un scorecard es una foto
+con fecha (uno vencido bloqueó cuatro días un trabajo ya terminado) y que ningún gate lee lo que la
+pantalla dice; y la skill de captura registra que una superficie gateada por organización exige la
+persona de esa organización, con la consulta que la encuentra.
+
 ## 2026-08-12 — El portal SEO del cliente quedó cerrado, y su propio scorecard estaba equivocado
 
 `TASK-1310` cierra la cara cliente del módulo SEO: dashboard `/growth/seo` con Resumen, Evolución y
@@ -1112,14 +1131,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   recientes hasta cumplir tanto el límite de sesiones como el límite de 600 líneas.
 - Se agregó una prueba de regresión para el caso que rompía CI: 20 sesiones o menos, pero `Handoff.md` demasiado
   largo. La rotación canónica vuelve a resolver el warning que `docs:context-check:strict` reporta.
-
-## 2026-08-05 — Registro maestro de partnerships y providers
-
-- Se creó [`EFEONCE_PARTNERSHIP_REGISTRY_V1.md`](docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md) como fuente
-  operativa para registrar estados, evidencia, owners y próximos pasos de Google Cloud, Claude, OpenAI, BytePlus,
-  Runway, ElevenLabs, FLUX, AWS, Salesforce, HubSpot y demás relaciones.
-- El refresh de Google Cloud corrige la interpretación comercial: Efeonce está registrada en Partner Network Hub,
-  pero la due diligence sigue en curso, las rutas aparecen como `Registrado` y no hay aún un nivel Select/Premier/
-  Diamond ni capacidad para crear oportunidades.
-- Se documentó el plan de activación: Services/Co-sell como ruta principal, Artificial Intelligence como primera
-  competencia, un pod interno pequeño, dos casos Google-ready y reventa con Ingram/Xvantage como carril paralelo.

@@ -80,6 +80,16 @@ explica, no se propone). **El manifest se valida, NO se reescribe** (`.passthrou
 - **NUNCA** un `@import` de Google Fonts: las fuentes salen del font pack del brand pack (OFL +
   checksums; `pnpm composer:brand-pack --check` sincroniza).
 
+- **El catálogo es DATO autocontenido.** **NUNCA** un asset fuera de su árbol (`public/`, `file://`,
+  `../../`): viaja solo al worker y revienta con `missing_asset` (bug class del deck SKY). Se copia
+  adentro (`assets/<familia>/…`) y se referencia relativo (`catalog-portability.test.ts` audita todas
+  las plantillas). **NUNCA** una credencial de partner como asset libre — clave cerrada
+  (`partner-badge-asset`), igual que un logo de cliente. **NUNCA** registres una plantilla nueva para
+  "la misma lámina con un elemento más": un slot **opcional** ya da las dos versiones (el renderer
+  borra el nodo con `absent-optional`), y su costo es una línea en `BASELINE_DELTAS.md` — porque
+  declarar un slot mueve el frame del probe del gate visual (el probe rellena todo slot no-`fixed-` y
+  usa `assets/url-lum.svg` para los `asset`; runbook §4bis).
+
 Una oferta es un **documento contractual que evalúa un comité**. De ahí las 3 reglas raíz:
 
 1. **Anti-fabricación** — **NUNCA** una cifra sin `evidenceRef`, **NUNCA** geometría dibujada a mano (la barra sale del número o no sale), **NUNCA** una cara del squad generada con IA (es tergiversación, no un tema estético).

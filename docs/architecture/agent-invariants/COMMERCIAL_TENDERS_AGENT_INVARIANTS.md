@@ -188,8 +188,31 @@ del contrato si se adjudica. De ahí salen los tres principios; todo lo demás s
 - **NUNCA** afirmes un negativo sin medirlo. Decir "la IA no cita a la marca" sin correr el AI Visibility
   Grader es afirmar algo falso en un documento contractual. **Mide, no infieras** (caso SKY: la primera
   versión afirmó un negativo que el grader desmintió).
+- **NUNCA** una credencial de partner como asset libre. Una acreditación (HubSpot Solutions Partner y
+  las que vengan) es del mismo tipo que un logo de cliente: presentar una que no se tiene es
+  tergiversación ante un comité. Va por **clave cerrada** — `partner-badge-asset` sobre el mapa
+  `PARTNER_BADGE` de `resolvers.ts`, espejo exacto de `client-logo-asset` —, con
+  `agentMayOverridePresentation: false`. Un slot `type: "asset"` **sin resolver** deja entrar cualquier
+  imagen como credencial: ése es el agujero, no el archivo.
 - `consumer: validation-only` (p. ej. `evidenceRef`) **NUNCA** se pinta: es munición interna, no copy
   para el comité.
+
+### El catálogo es DATO autocontenido — y un slot opcional ya es una variante
+
+Dos reglas que salieron de agregar la credencial de partner a la contraportada (2026-08-13):
+
+- 🔴 **NUNCA** referencies un asset fuera del árbol del catálogo. Ni `public/`, ni `file://`, ni
+  `../../`. Funciona en el repo del autor y **revienta en el worker**, donde el catálogo viaja solo:
+  es la bug class que tumbó el deck de SKY con `missing_asset` (2026-07-12). El asset se **copia
+  adentro** (`catalogs/deck-axis/assets/<familia>/…`) y se referencia relativo, como todos sus
+  hermanos. Lo fija `catalog-portability.test.ts`, que audita **todas** las plantillas.
+- **NUNCA** registres una plantilla nueva sólo para tener "la misma lámina con un elemento más". El
+  renderer **borra el nodo** de un slot opcional no declarado (`absent-optional`), así que una sola
+  plantilla ya sirve las dos versiones: la que declara la credencial la lleva, la que no queda
+  idéntica a la de siempre. Un segundo archivo casi igual driftea (cambias el teléfono en uno y te
+  olvidas del otro) y obliga a inventar un `contentType` para que el selector lo alcance. El costo
+  real de la variante es **una línea en `BASELINE_DELTAS.md`** — porque declarar un slot nuevo mueve
+  el frame del probe del gate visual (runbook `composer-visual-gate.md` §4bis).
 
 ## Fail-closed (principio 2) — las 3 bug classes que ya nos mordieron
 

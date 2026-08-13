@@ -2,6 +2,27 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+### Credencial de partner en el deck + los aprendizajes documentados (2026-08-13)
+
+**Sin commitear todavía: conviven con el WIP del deck ANAM/HubSpot en el árbol.** El badge de HubSpot
+rompía `catalog-portability.test.ts` (apuntaba a `public/` con `../../../../../`). Corregido: el asset
+vive en `catalogs/deck-axis/assets/partners/` y el slot resuelve por clave cerrada
+(`partner-badge-asset`, espejo de `client-logo-asset`). Suite del composer verde: 18 archivos, 223 tests.
+
+**Lo que necesita quien siga:**
+
+1. 🔴 **`pnpm composer:visual-gate` sigue rojo en DOS láminas, y ninguna es regresión.**
+   `BackCoverFull` (1.787 px) driftea porque **declarar un slot mueve el frame del probe**: el gate
+   compone con slots sintéticos y para cualquier `asset` usa `assets/url-lum.svg` — por eso aparece una
+   burbuja de URL dentro de la caja del badge. Es delta intencional del carril ANAM, a declarar en
+   `BASELINE_DELTAS.md`. `NarrativeSplit` (58.846 px) es **baseline viejo en `HEAD`**: su plantilla está
+   commiteada desde `f7761988f` y limpia en el árbol. **No congelé**: el runbook prohíbe `--freeze` con
+   el composer sucio por otro agente, y lo está.
+2. **El dueño del carril ANAM decide si mis cambios viajan con su commit o van aparte.** Son 4 archivos:
+   el SVG copiado, `back-cover-full.html`, `back-cover-full.slots.json` y `resolvers.ts`.
+3. **Queda una duplicación de asset por decidir:** el badge existe ahora en `public/branding/partners/…`,
+   en `src/lib/brand-assets/` (módulo TS, untracked) y dentro del catálogo. Tres hogares para un SVG.
+
 ### TASK-1310 CERRADA — portal SEO del cliente completo; su propio scorecard estaba equivocado (2026-08-12)
 
 **`complete`, promoción `develop → main` pendiente.** Con ella el módulo SEO tiene sus dos caras
@@ -72,7 +93,7 @@ primera postulación real con emails verificados.
 
 ### Sika México LIC-1120 — paquete de bid preparado, sin precio ni envío (2026-08-12)
 
-Se creó [`docs/commercial/tenders/sika-lic-1120/`](docs/commercial/tenders/sika-lic-1120/): originales en OneDrive, evidencia Wherex, admisibilidad, blueprint interno, técnica, estructura económica y deck de taller. La propuesta se enfoca en continuidad comercial: Search por intención y ubicación → landing/ficha de destino → canal de atención → medición y optimización; **no** promete transferir 50% de ventas. El deck técnico de ocho láminas pasó slots y revisión visual local, pero sigue siendo taller (sin `Proposal`/render gobernado). La pregunta propia continúa en **0/1 respondidas** al 12-08 11:14: faltan fecha/destino/stock por cierre, línea base/fuente de ventas y canal autorizado. El precio recomendado para aprobación es MXN 150.000 antes de impuestos, incluido medio, pero está sólo en `pricing-brief-INTERNO.md`; no existe cotización aprobada. Wherex muestra 45 días, pero también condiciona el crédito a lo convenido con Sika: no asumirlo como término cerrado. La oferta Wherex sigue en edición, sin adjuntos, términos aceptados ni envío; tab queda en handoff.
+Se creó [`docs/commercial/tenders/sika-lic-1120/`](docs/commercial/tenders/sika-lic-1120/): originales en OneDrive, evidencia Wherex, admisibilidad, blueprint interno, técnica, estructura económica y deck de taller. La propuesta se enfoca en continuidad comercial: Search por intención y ubicación → landing/ficha de destino → canal de atención → medición y optimización; **no** promete transferir 50% de ventas. El deck técnico de ocho láminas pasó slots y revisión visual local, pero sigue siendo taller (sin `Proposal`/render gobernado). La pregunta propia continúa en **0/1 respondidas** al 12-08 11:14: faltan fecha/destino/stock por cierre, línea base/fuente de ventas y canal autorizado. **Corrección 2026-08-13:** el brief confirma MXN 100–150 mil para desarrollo y ejecución, pero no dice explícitamente que incluya pauta; una lectura anterior atribuye creatividad/pauta/fee a la respuesta del comprador, y debe revalidarse antes de fijar precio. No existe cotización aprobada. Wherex muestra 45 días, pero también condiciona el crédito a lo convenido con Sika: no asumirlo como término cerrado. La oferta Wherex sigue en edición, sin adjuntos, términos aceptados ni envío; tab queda en handoff.
 
 ### TASK-1688 CERRADA — contacto completo en postulaciones Careers: code complete, rollout pendiente (2026-08-12)
 
@@ -364,41 +385,3 @@ muertos que eran el defecto real.
 - **Una nota de este archivo no es evidencia.** Es la lección que produjo los tres errores de esa
   sesión (afirmar sin verificar): el 403 "por diseño" de `agent-session` salió de una nota de acá y era
   falso. Verificar contra runtime o PG antes de construir encima.
-
-### Barrido documental post-release: tres auditorías paralelas y dos defectos vivos (2026-08-09)
-
-Tres subagentes auditaron arquitectura, docs funcionales/manuales y skills. Encontraron cosas que el
-trabajo de código no había visto.
-
-**Lo que necesita quien siga:**
-
-1. 🔴 **El §0 Status del doc de contrato del portal cliente estaba INVERTIDO** y lo estuvo tres meses:
-   decía "NO existe `src/lib/client-portal/`", "NO existe `/api/client-portal/`", "NO existe schema
-   `greenhouse_client_portal`" y "NO existe modelo de módulos on-demand". Las cuatro se implementaron
-   entre `TASK-824` y `TASK-828`. Es lo primero que lee un agente que abre ese doc, así que lo mandaba
-   a construir de cero lo que ya existía — el carril paralelo que el spec vino a evitar. Corregido y
-   verificado contra filesystem y PG. **Lección:** un bloque "estado actual del repo" escrito cuando un
-   spec era propuesta se vuelve activamente peligroso si nadie lo da vuelta al implementarlo.
-2. ⚠️ **`/creative-hub` NO EXISTE y Sky Airlines ve el enlace.** Lo causé hoy: el bundle
-   `creative_hub_globe_v1` declara `cliente.creative_hub` → `/creative-hub`, y esa página nunca se
-   materializó. El defecto era latente desde el seed de `TASK-824`; **lo activó el assignment**, no un
-   deploy. Señal nueva `identity.client_portal.assigned_view_without_route` (warning, hoy en **1**).
-   Decidir: materializar la página o retirar el viewCode del bundle — **NUNCA** quitarle el módulo a
-   SKY, eso le saca superficies que sí funcionan.
-3. **`route-reachability-gate` sólo cubre una dirección.** Verifica página → enlace ("0 huérfanas") y
-   NO enlace → página, así que el enlace muerto pasa. Y no lo podría atrapar de todos modos: la
-   condición la crea un **assignment**, o sea un cambio de dato. Por eso el complemento es una señal y
-   no un test. Además hay **10 viewCodes cliente** apuntando a rutas no materializadas, y eso es
-   legítimo por diseño (regla vigente: declarar el `routePath` canónico aunque la página sea
-   forward-looking) — el riesgo aparece al asignarlos.
-4. **El menú del cliente puede prometer de más.** La lista base de 6 enlaces (Proyectos, Ciclos,
-   Equipo, Revisiones, Analytics, Campañas) se sigue mostrando **por rol**, no por módulo. No es fuga
-   de acceso —la puerta decide por módulo— pero ahora que las páginas dicen la verdad, es la confusión
-   de soporte más probable: enlace visible + empty state al entrar. Quitar el permiso al rol apagaría
-   enlaces legítimos de otros clientes, así que no es el fix.
-5. **`pnpm skills:mirrors` sólo valida 3 skills del manifest** (`efeonce-mcp-platform`,
-   `greenhouse-globe`, `greenhouse-globe-model-fleet`). NO cubre `qa-release-auditor` ni
-   `documentation-governor`: su paridad Claude↔Codex se verificó a mano. Si agregas una skill espejada,
-   no asumas que el gate la cuida.
-6. **`CLAUDE.md` está en 34.903/35.000 tokens — 97 de headroom.** Los cinco aprendizajes de proceso de
-   hoy se escribieron en su skill dueña y en `AGENTS.md`, no ahí, a propósito.

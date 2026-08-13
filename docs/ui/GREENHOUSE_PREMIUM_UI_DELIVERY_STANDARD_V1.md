@@ -172,6 +172,37 @@ Pass:
 Automated heuristics inform review; they cannot assign honest aesthetic scores
 by themselves.
 
+### A scorecard is a dated photo, not a state
+
+The verdict describes **the captures it names, at the timestamp it names** — nothing more. A verdict
+whose evidence predates the last commit to the surface is describing a UI that no longer exists, and
+it is wrong in both directions: a stale PASS certifies work that regressed, and a stale BLOCK freezes
+work that was already fixed.
+
+- **Before acting on any open audit or BLOCK, re-measure.** Compare the scorecard's `reviewedAt` and
+  its evidence paths against `git log` for the surface. If code landed after the captures, the
+  verdict is void until a fresh run replaces it.
+- **Re-scoring is not editing the file to pass.** Regenerate from new captures, keep the previous
+  verdict in `supersedes` with *why* it no longer holds, and keep any dimension that is still weak at
+  its honest number — a debt you disguise to clear a gate comes back as a surprise.
+- Precedent: `TASK-1310` sat blocked at `average=2.29` for four days over captures taken nine hours
+  **before** the commit that executed the premium round. Re-measured, the same surface produced
+  `exitCode 0` with empty `qualityFindings` and scored 4.52. The near-miss was rebuilding work that
+  was already done.
+
+### Gates do not read; they measure. Look at the frame.
+
+Every automated gate can be green while the surface says something false, because no gate reads for
+meaning. In `TASK-1310` the client report announced *"Aún no hay una posición media para leer"* with
+`#13.3` printed beside it — `exitCode 0`, axe clean, zero quality findings. Three renders of one model
+each derived its own verdict rule; two branched on `null` and one did not.
+
+- **Read the captured frames one by one** before declaring a visual surface done. The scorecard's
+  evidence is not a formality: it is the only step where a human-shaped error can surface.
+- When the same model feeds several renders (web, print, dashboard), **derive the sentence once** and
+  let every render consume it. A rule duplicated per render is a contradiction waiting for the render
+  nobody re-read.
+
 ### Chrome budget and spatial composition
 
 - A card is a semantic containment boundary, not the default section wrapper.
