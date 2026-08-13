@@ -132,6 +132,7 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 
 - `TASK-1655` — [en curso] Historical Data Platform del módulo SEO (semilla histórica de rank vía `historical_serps`).
 - `TASK-1677` — [**complete**, backend-data] Cierre de la fase **contract** del cutover `seo_v1 → seo_v2`; la ventana expand/contract dejó de estar abierta. Se lista acá para cerrar el denominador del epic (lo declaraba en su campo `Epic:` y no figuraba en esta lista).
+- `TASK-1690` — [creada 2026-08-13, backend-data] **La superficie cliente sirve a la POBLACIÓN, no al tenant con historia.** La página decide si hay datos con GSC y calcula el KPI principal con rank snapshots: una organización con Search Console conectado y captura de rank sin correr —el día 1 de todo cliente nuevo— ve el KPI en "sin dato" con el Quadrant poblado debajo. Invisible hasta hoy porque la superficie tiene UNA organización cliente y tiene ambas fuentes. Expone la cobertura por fuente en el contrato + familia de fixtures por estado + guard anti-reincidencia. Sin migración. Sale del cierre de `TASK-1310`.
 - `TASK-1658` — [planificada, backend-data] drift de federación MCP + punto ciego del guard de paridad: 3 tools SEO viven en el MCP interno de Greenhouse y no están ni federadas ni excluidas en el gateway, y el guard no puede verlo porque compara contra lo registrado EN EL GATEWAY, nunca contra Greenhouse.
 
 - `TASK-1305` — [planificada] `readSeoAeoGap` derived read cross-módulo (report layer).
