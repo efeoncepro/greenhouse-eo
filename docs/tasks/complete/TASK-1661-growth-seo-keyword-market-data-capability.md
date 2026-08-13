@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Diseno`
+- Status real: `Code complete, rollout pendiente`
 - Rank: `TBD`
 - Domain: `growth`
 - Blocked by: `none`
@@ -318,16 +318,16 @@ vivo con `--update-env-vars`; hacer sólo lo segundo lo borra en el próximo dep
 
 ## Acceptance Criteria
 
-- [ ] Existe tabla con volumen, dificultad, país, idioma y **fecha de captura**
-- [ ] Un refetch agrega una captura; no sobrescribe (verificado contra PG real)
-- [ ] Ninguna corrida con gasto ocurre sin `enforceSeoRunEntitlement` previo
-- [ ] El dry-run reporta conteo y costo estimado sin gastar
-- [ ] El flag nace OFF, está declarado en `ops-worker/deploy.sh` y tiene fila en el ledger
-- [ ] Si el proveedor falla, `market` queda `'unavailable'`; **nunca** se persiste `0`
-- [ ] `readKeywordOpportunities` entrega los valores y la tabla de Keywords los muestra **sin
+- [x] Existe tabla con volumen, dificultad, país, idioma y **fecha de captura** — `greenhouse_growth.seo_keyword_market_data`, migración `20260813171143226`, aplicada y verificada
+- [x] Un refetch agrega una captura; no sobrescribe — sanity 13/13 contra PG real (`_sanity-task-1661-market-data.ts`): mismo día no duplica ni sobrescribe, otro día agrega, trigger bloquea UPDATE y DELETE
+- [x] Ninguna corrida con gasto ocurre sin `enforceSeoRunEntitlement` previo — gate del batch completo + spend fence cada 10 llamadas; tests cubren gate bloqueado ⇒ cero llamadas
+- [x] El dry-run reporta conteo y costo estimado sin gastar — ejecutado contra PG real: 2 targets, 31 keywords, **USD 0.01572**, cero llamadas al proveedor
+- [x] El flag nace OFF, declarado en `ops-worker/deploy.sh` y con fila en el ledger — `pnpm flags:audit --strict --no-vercel` limpio
+- [x] Si el proveedor falla no se escribe ninguna fila y el target se declara `failed`; **nunca** se persiste `0` — verificado en vivo (la primera corrida real falló por credenciales ausentes y degradó honestamente: cero filas, ledger intacto)
+- [x] `readKeywordOpportunities` entrega los valores y la tabla de Keywords los muestra **sin
       cambio de código en la UI**
-- [ ] El `provider_cost` queda atribuido a la org que lo pagó
-- [ ] Tool MCP de lectura en el mismo PR, sin scope nuevo en Entra
+- [x] El `provider_cost` queda atribuido a la org que lo pagó — verificado en `seo_provider_spend_daily` (familia `labs`)
+- [x] Tool MCP de lectura en el mismo PR, sin scope nuevo en Entra — `get_seo_keyword_market_data` + lane ecosystem
 
 ## Verification
 
@@ -338,10 +338,10 @@ vivo con `--update-env-vars`; hacer sólo lo segundo lo borra en el próximo dep
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedó sincronizado con el estado real
-- [ ] el archivo vive en la carpeta correcta
-- [ ] `docs/tasks/README.md` quedó sincronizado con el cierre
-- [ ] `Handoff.md` quedó actualizado
+- [x] `Lifecycle` del markdown quedó sincronizado con el estado real
+- [x] el archivo vive en la carpeta correcta
+- [x] `docs/tasks/README.md` quedó sincronizado con el cierre
+- [x] `Handoff.md` quedó actualizado
 
 ## Follow-ups
 
@@ -373,3 +373,54 @@ Contrato de integración obligatorio:
 El criterio de aceptación de esta task queda ampliado: una prueba de contrato debe demostrar que un
 lote bounded de candidates puede enriquecerse y quedar atribuido a la org correcta sin activar un
 fetch por descubrimiento implícito o sin límite.
+
+## Cierre 2026-08-13 — evidencia y hallazgo del smoke real
+
+**Estado: `code complete, rollout pendiente`.** El codigo esta completo y verificado end-to-end
+contra el proveedor real, pero **el scheduler nace PAUSADO y el flag OFF**: la captura recurrente no
+esta habilitada y activarla requiere autorizacion del operador.
+
+### Verificacion ejecutada
+
+| Que | Resultado |
+|---|---|
+| Migracion + sanity PG real | 13/13 OK, residuo cero |
+| `pnpm test` | 10.616 tests verdes |
+| `pnpm local:check` | verde |
+| `worker:build-contract-gate` / `worker:runtime-deps-gate` | verdes |
+| Dry-run contra PG real | 2 targets, 31 keywords (Berel), **USD 0.01572** estimado, cero llamadas |
+| Corrida real acotada | 17 keywords con dato + 14 registradas como "preguntamos y no hay" |
+| Idempotencia | Segunda corrida **USD 0**, ledger identico |
+| Ledger | `provider_cost` atribuido a la org de Berel en `seo_provider_spend_daily` |
+
+Gasto total del ciclo de verificacion: **USD ~0.050** (incluye una llamada de diagnostico y la
+corrida con el defecto que se describe abajo).
+
+### 🔴 Fuga de costo encontrada por el smoke y cerrada
+
+La primera version **no escribia fila cuando el proveedor no tenia la keyword**. Como el pre-check de
+frescura mira filas, esas keywords nunca quedaban frescas y se **re-compraban en cada corrida, para
+siempre**: el smoke lo mostro cobrando USD 0.012 en una corrida que capturo cero.
+
+El modelo correcto son **tres estados**: fila ausente = nunca preguntamos · fila con `NULL` =
+preguntamos y el proveedor no tiene · `0` = demanda cero real. Corregido y verificado contra el
+proveedor (corrida A USD 0.012 → corrida B USD 0).
+
+Ningun test con mocks podia atrapar esto: el defecto vivia en la interaccion entre el pre-check y una
+respuesta real del proveedor que no incluye todas las keywords pedidas.
+
+### Observacion abierta (no bloqueante)
+
+`keyword_difficulty` llega en **0** para varias keywords de alto volumen — `pintura`, con 18.100
+busquedas/mes, viene con dificultad 0. Se verifico contra la respuesta cruda: **el 0 lo devuelve el
+proveedor**, y para otras keywords devuelve `null`, asi que el campo si distingue ambos casos. Se
+persiste verbatim porque transformarlo seria inventar dato. **Antes de exponer esa columna a un
+cliente hay que contrastarla con una segunda fuente**: un 0 en una cabecera se lee como "trivialmente
+facil" y seria una afirmacion falsa. Queda como follow-up.
+
+### Pendiente de rollout
+
+1. Autorizacion del operador para habilitar la captura recurrente.
+2. Prender `GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED` en `services/ops-worker/deploy.sh` + deploy.
+3. Despausar `ops-seo-keyword-market-data` (5.º argumento de `upsert_scheduler_job`).
+4. Contrastar `keyword_difficulty` con una segunda fuente antes de mostrarla a cliente.

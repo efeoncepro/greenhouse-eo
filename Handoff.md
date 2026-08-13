@@ -2,6 +2,35 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+### TASK-1661 — datos de mercado por keyword: code complete, rollout PENDIENTE (2026-08-13)
+
+`greenhouse_growth.seo_keyword_market_data` **ya existe en la base** (migración `20260813171143226`
+aplicada; base compartida dev/staging/prod). `readKeywordOpportunities` ya no cablea
+`market: 'unavailable'`. Commits: `261b2919a` (schema) · `739734512` (fetch) · `efc76b8b0` (reader,
+worker, MCP, señal + fix). Suite completa 10.616 verde; sanity PG 13/13.
+
+**Lo que FALTA para que esto funcione en runtime (nada de esto está hecho):**
+
+1. Autorización tuya para habilitar la captura recurrente — **gasta saldo DataForSEO**.
+2. `GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED=true` en `services/ops-worker/deploy.sh` + deploy.
+   El flag vive **sólo en el ops-worker**; en Vercel es inerte.
+3. Despausar `ops-seo-keyword-market-data` (5.º arg de `upsert_scheduler_job`, hoy `"true"`).
+
+Hasta eso, el estado correcto es **`code complete, rollout pendiente`**, no "listo".
+
+**Riesgo abierto que hay que cerrar antes de mostrar la columna a un cliente:** el proveedor devuelve
+`keyword_difficulty = 0` para cabeceras de alto volumen (`pintura`, 18.100 búsquedas/mes). Se verificó
+contra la respuesta cruda: el 0 es del proveedor, y para otras keywords devuelve `null`, así que el
+campo sí distingue. Se persiste verbatim (transformarlo sería inventar), pero un 0 se lee como
+"trivialmente fácil" y sería una afirmación falsa. Contrastar con una segunda fuente.
+
+**Gasto real ya incurrido en verificación: USD ~0.05** (dry-run gratis + corrida real + una llamada
+de diagnóstico + la corrida con el defecto que se corrigió).
+
+**Desbloqueadas por este cierre:** `TASK-1662` y `TASK-1664` pasaron a `Blocked by: none`. 1664 tiene
+además su spec recalibrada (commit `a98aaf4c7`): entitlement `seo_v2`, IDs `TEXT`, despertador por
+Cloud Scheduler y el boundary de ownership del dato de mercado.
+
 ### Credencial de partner en el deck + los aprendizajes documentados (2026-08-13)
 
 **Sin commitear todavía: conviven con el WIP del deck ANAM/HubSpot en el árbol.** El badge de HubSpot
@@ -370,18 +399,3 @@ zonas queda como validación posterior NO bloqueante (rename = 1 línea en `GH_I
 conocido del chrome: `@menu` no expone `aria-expanded` en triggers de submenú (intocable; estado
 canónico = clase `ts-open`, documentado en el scorecard) — decidir como deuda de chrome aparte;
 (4) la rama no-interna del menú quedó con punto de extensión limpio para `TASK-1685` (Delta escrito).
-
-### Cerrada — la decisión pendiente del portal cliente y las lecciones de la sesión del 2026-08-09
-
-**La decisión ya se tomó** (`TASK-1685`, entrada de arriba): opción (a′). La parada de esa sesión
-cumplió su propósito — decidir con cabeza fresca y midiendo — y el "no lo resuelvas con un `AND` en la
-puerta" se confirmó correcto: habría cerrado 6 pares contratados sin arreglar ninguno de los 36 enlaces
-muertos que eran el defecto real.
-
-**Lo que sigue siendo continuidad activa de esa sesión:**
-
-- `TASK-1684` — la postura de `AGENT_AUTH_ALLOW_PRODUCTION`, seteada desde ~90 días. Sigue abierta.
-- `TASK-1687` — `/creative-hub` no existe y el bundle de SKY lo declara; señal en 1.
-- **Una nota de este archivo no es evidencia.** Es la lección que produjo los tres errores de esa
-  sesión (afirmar sin verificar): el 403 "por diseño" de `agent-session` salió de una nota de acá y era
-  falso. Verificar contra runtime o PG antes de construir encima.

@@ -22,10 +22,14 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|seo|data`
-- Blocked by: `TASK-1661`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Delta 2026-08-13 — desbloqueada
+
+El primitive de mercado de `TASK-1661` está **complete** (2026-08-13): `readKeywordMarketData`, `readKeywordMarketDataForTarget` y la tabla `seo_keyword_market_data` existen y están verificados contra el proveedor real. 1664 ya puede arrancar: escribe en ESA tabla el `keyword_info` inline de sus respuestas de discovery y usa `keyword_overview` sólo como top-up del faltante.
 
 ## Summary
 
