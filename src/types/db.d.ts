@@ -7470,6 +7470,29 @@ export interface GreenhouseGrowthSeoGscDaily {
   site_url: string;
 }
 
+export interface GreenhouseGrowthSeoKeywordMarketData {
+  capture_date: Timestamp;
+  captured_at: Generated<Timestamp>;
+  captured_by_organization_id: string;
+  competition: Numeric | null;
+  competition_level: string | null;
+  core_keyword: string | null;
+  cpc_usd: Numeric | null;
+  created_at: Generated<Timestamp>;
+  keyword: string;
+  keyword_difficulty: number | null;
+  language_code: string;
+  location_code: string;
+  market_data_id: Generated<string>;
+  normalized_keyword: string;
+  provider_cost: Generated<Numeric>;
+  provider_last_updated_at: Timestamp | null;
+  search_intent: string | null;
+  search_intent_probability: Numeric | null;
+  search_volume: number | null;
+  source_endpoint: string;
+}
+
 export interface GreenhouseGrowthSeoKeywordSetMembers {
   created_at: Generated<Timestamp>;
   /**
@@ -12202,6 +12225,7 @@ export interface DB {
   "greenhouse_growth.seo_backlink_snapshots": GreenhouseGrowthSeoBacklinkSnapshots;
   "greenhouse_growth.seo_competitors": GreenhouseGrowthSeoCompetitors;
   "greenhouse_growth.seo_gsc_daily": GreenhouseGrowthSeoGscDaily;
+  "greenhouse_growth.seo_keyword_market_data": GreenhouseGrowthSeoKeywordMarketData;
   "greenhouse_growth.seo_keyword_set_members": GreenhouseGrowthSeoKeywordSetMembers;
   "greenhouse_growth.seo_keyword_sets": GreenhouseGrowthSeoKeywordSets;
   "greenhouse_growth.seo_provider_spend_daily": GreenhouseGrowthSeoProviderSpendDaily;
