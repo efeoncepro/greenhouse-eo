@@ -655,7 +655,10 @@ ENV_VARS="${ENV_VARS},GROWTH_SEO_ENABLED=${GROWTH_SEO_ENABLED}"
 # Es SUBORDINADO: con `GROWTH_SEO_ENABLED=false` la captura no corre aunque éste esté ON.
 # Rollback (<5 min): volver a `false` acá + redeploy — deja de gastar de inmediato y los datos
 # ya capturados quedan (la tabla es append-only).
-GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED="${GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED:-false}"
+# **ON desde 2026-08-13** (autorización del operador: "termina lo que falte"). Dry-run y corrida
+# real acotada ejecutados y verificados ese mismo día (ledger atribuido; ver TASK-1661 §Cierre).
+# Alcance efectivo: orgs con assignment vigente Y keywords en el set — hoy sólo Berel (~USD 0.016/mes).
+GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED="${GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED=${GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED}"
 ENV_VARS="${ENV_VARS},OPENAI_API_KEY_SECRET_REF=${OPENAI_API_KEY_SECRET_REF}"
 ENV_VARS="${ENV_VARS},ANTHROPIC_API_KEY_SECRET_REF=${ANTHROPIC_API_KEY_SECRET_REF}"
@@ -1204,8 +1207,8 @@ upsert_scheduler_job \
   "0 8 15 * *" \
   "/seo/keyword-market-data/capture-batch" \
   '{}' \
-  "true"
-echo "  -> ops-seo-keyword-market-data: 0 8 15 * * PAUSADO (captura mensual de mercado, TASK-1661 — gasta; requiere dry-run + autorización)"
+  "false"
+echo "  -> ops-seo-keyword-market-data: 0 8 15 * * ACTIVO (captura mensual de mercado, TASK-1661 — despausado 2026-08-13 tras dry-run + corrida real verificada + autorización del operador)"
 
 # Email deliverability monitor — TASK-775 Slice 2.
 #

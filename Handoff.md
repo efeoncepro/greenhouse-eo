@@ -32,14 +32,11 @@ aplicada; base compartida dev/staging/prod). `readKeywordOpportunities` ya no ca
 `market: 'unavailable'`. Commits: `261b2919a` (schema) · `739734512` (fetch) · `efc76b8b0` (reader,
 worker, MCP, señal + fix). Suite completa 10.616 verde; sanity PG 13/13.
 
-**Lo que FALTA para que esto funcione en runtime (nada de esto está hecho):**
-
-1. Autorización tuya para habilitar la captura recurrente — **gasta saldo DataForSEO**.
-2. `GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED=true` en `services/ops-worker/deploy.sh` + deploy.
-   El flag vive **sólo en el ops-worker**; en Vercel es inerte.
-3. Despausar `ops-seo-keyword-market-data` (5.º arg de `upsert_scheduler_job`, hoy `"true"`).
-
-Hasta eso, el estado correcto es **`code complete, rollout pendiente`**, no "listo".
+**Rollout EJECUTADO (2026-08-13, autorización "termina lo que falte"):** flag `true` + scheduler
+ACTIVO declarativos en `deploy.sh`; federación al gateway en `efeonce-mcp@c4e0fcd` (5 piezas +
+parity + canary, tests 39/39). **Pendiente que NO depende de esta task:** el deploy del gateway
+espera el próximo release develop→main (su canary apunta a producción y el lane aún no está ahí);
+verificar el primer run del scheduler el día 15 (esperado: `already_fresh`, costo ~0).
 
 **Riesgo abierto que hay que cerrar antes de mostrar la columna a un cliente:** el proveedor devuelve
 `keyword_difficulty = 0` para cabeceras de alto volumen (`pintura`, 18.100 búsquedas/mes). Se verificó

@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Code complete, rollout pendiente`
+- Status real: `Complete (staging+worker); exposicion en produccion pendiente del proximo release`
 - Rank: `TBD`
 - Domain: `growth`
 - Blocked by: `none`
@@ -424,3 +424,20 @@ facil" y seria una afirmacion falsa. Queda como follow-up.
 2. Prender `GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED` en `services/ops-worker/deploy.sh` + deploy.
 3. Despausar `ops-seo-keyword-market-data` (5.º argumento de `upsert_scheduler_job`).
 4. Contrastar `keyword_difficulty` con una segunda fuente antes de mostrarla a cliente.
+
+## Delta 2026-08-13 (cierre final) — federación al gateway + rollout ejecutado
+
+Por mandato del operador ("hay que federarlo, siempre debe quedar en el mcp oficial"):
+
+- **Federación a `mcp.efeonce.org`** (repo `efeonce-mcp`, commit `c4e0fcd`): las 5 piezas del
+  contrato en el mismo commit — provider (`getKeywordMarketData` → lane), interface, `registerTool`
+  (BASE_READ_SCOPE, sin scope nuevo en Entra), entrada en el parity guard y canary extendido.
+  Tests del gateway 39/39.
+- **Rollout del worker ejecutado**: `GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED=true` + scheduler
+  `ops-seo-keyword-market-data` ACTIVO, ambos declarativos en `deploy.sh`. El primer run programado
+  es el día 15 a las 08:00 CLT; como todo se capturó hoy, debe salir `already_fresh`/`skipped` con
+  costo ~0.
+- **Frontera pendiente (fuera de esta task)**: el canary del gateway apunta a producción, y el lane
+  llega a producción con el próximo release develop→main. Hasta entonces la tool federada existe en
+  el código del gateway pero su deploy espera ese release — desplegarla antes mostraría una tool
+  que responde error contra producción.
