@@ -6,6 +6,22 @@
     "height": 1080
   },
   "slots": {
+    "partnerBadge": {
+      "selector": "[data-slot='partnerBadge']",
+      "type": "asset",
+      "required": false,
+      "audience": "client_facing",
+      "resolver": "partner-badge-asset",
+      "agentInput": "assetId",
+      "agentMayOverridePresentation": false,
+      "constraints": {
+        "allowedKinds": ["brand-badge"],
+        "fit": "contain",
+        "noHumanPortrait": true,
+        "overflow": "reject"
+      },
+      "note": "Credencial opcional de partner; se muestra solo cuando el deck la declara. Clave cerrada a través del resolver `partner-badge-asset` (mismo trato que un logo de cliente: una acreditación que no se tiene no se puede presentar). Sin declararla, el renderer BORRA el nodo y la contraportada queda idéntica a la de siempre — por eso NO hace falta una segunda contraportada. La plantilla la ubica arriba a la derecha sin competir con la firma de Efeonce."
+    },
     "efeonceLogo": {
       "selector": "[data-slot='efeonceLogo']",
       "type": "fixed-asset",

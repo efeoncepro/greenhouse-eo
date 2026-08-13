@@ -170,9 +170,26 @@ const CLIENT_LOGO: Record<string, { src: string; label: string }> = {
 }
 
 
+/**
+ * Credenciales de partner. El asset vive DENTRO del catálogo: un catálogo es dato autocontenido y
+ * tiene que renderizar igual en cualquier máquina o contenedor — apuntar a `public/` funciona en el
+ * repo y revienta en el worker (bug class del deck de SKY, 2026-07-12).
+ *
+ * Una sola clave por credencial + superficie. El badge trae su propia superficie de color, así que
+ * la variante se elige por CONTRASTE del fondo donde se posa: la naranja va sobre la contraportada
+ * navy. Si algún día hace falta sobre fondo claro, se agrega `…-light` con su SVG — no se recolorea
+ * éste (el artwork oficial no se edita).
+ */
+const PARTNER_BADGE: Record<string, { src: string; label: string }> = {
+  'hubspot-solution-partner': {
+    src: 'assets/partners/hubspot-solution-partner.svg',
+    label: 'HubSpot Solutions Partner'
+  }
+}
+
 export const deckAxisResolvers: ResolverRegistry = {
   'comparison-presentation': {
-    known: ['proposal', 'diagnostic'],
+    known: ['proposal', 'diagnostic', 'neutral'],
     build: value => [{ selector: ':self', attr: 'data-variant', value }]
   },
 
@@ -356,6 +373,32 @@ export const deckAxisResolvers: ResolverRegistry = {
             { selector: ':field', attr: 'src', value: client.src },
             { selector: ':field', attr: 'alt', value: client.label },
             { selector: ':field', attr: 'data-client', value }
+          ]
+        : null
+    }
+  },
+
+  /**
+   * `partner-badge-asset` — misma forma que `client-logo-asset`, para credenciales de partner.
+   *
+   * La credencial es DATO del deck, no una decoración de la plantilla: una contraportada con badge y
+   * una sin badge son el MISMO template. El slot es opcional y el renderer BORRA el `<img>` cuando el
+   * plan no lo declara (`absent-optional`), así que no hace falta una segunda contraportada que
+   * mantener en paralelo — y ningún deck arrastra la credencial por defecto.
+   *
+   * Clave cerrada y sin fallback: presentar una acreditación que no se tiene sería tergiversación en
+   * un documento que evalúa un comité, exactamente igual que un logo de cliente que no es cliente.
+   */
+  'partner-badge-asset': {
+    known: Object.keys(PARTNER_BADGE),
+    build: value => {
+      const partner = PARTNER_BADGE[value]
+
+      return partner
+        ? [
+            { selector: ':field', attr: 'src', value: partner.src },
+            { selector: ':field', attr: 'alt', value: partner.label },
+            { selector: ':field', attr: 'data-partner', value }
           ]
         : null
     }
