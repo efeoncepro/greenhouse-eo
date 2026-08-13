@@ -32,11 +32,15 @@ aplicada; base compartida dev/staging/prod). `readKeywordOpportunities` ya no ca
 `market: 'unavailable'`. Commits: `261b2919a` (schema) · `739734512` (fetch) · `efc76b8b0` (reader,
 worker, MCP, señal + fix). Suite completa 10.616 verde; sanity PG 13/13.
 
-**Rollout EJECUTADO (2026-08-13, autorización "termina lo que falte"):** flag `true` + scheduler
-ACTIVO declarativos en `deploy.sh`; federación al gateway en `efeonce-mcp@c4e0fcd` (5 piezas +
-parity + canary, tests 39/39). **Pendiente que NO depende de esta task:** el deploy del gateway
-espera el próximo release develop→main (su canary apunta a producción y el lane aún no está ahí);
-verificar el primer run del scheduler el día 15 (esperado: `already_fresh`, costo ~0).
+**Rollout EJECUTADO Y VERIFICADO EN RUNTIME (2026-08-13 noche):** push de develop (14 commits) →
+8 workflows verdes incl. Ops Worker Deploy; revisión `ops-worker-00551-pc2` con el flag `true`;
+scheduler `ops-seo-keyword-market-data` **ENABLED** (`0 8 15 * *`). **Canary del gateway contra
+staging: COMPLETO VERDE** — la tool federada respondió `market=available found=2/2 asOf=2026-08-13
+servedMarket=2484/es` (México, el mercado corregido) + deny anti-oracle OK. Gateway pusheado
+(`efeonce-mcp@c4e0fcd`; su deploy es `workflow_dispatch`, NO automático). **Pendientes:** (1) el
+próximo release develop→main lleva el lane a producción → recién entonces **dispatch del deploy
+del gateway** para que la tool federada viva en `mcp.efeonce.org` sin 404 upstream; (2) verificar
+el primer run del scheduler el día 15 (esperado: `already_fresh`, costo ~0).
 
 **Riesgo abierto que hay que cerrar antes de mostrar la columna a un cliente:** el proveedor devuelve
 `keyword_difficulty = 0` para cabeceras de alto volumen (`pintura`, 18.100 búsquedas/mes). Se verificó
