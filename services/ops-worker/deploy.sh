@@ -637,6 +637,26 @@ ensure_secret_accessor_binding "${GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_SECRET_SECR
 # Rollback (<5 min): `GROWTH_SEO_ENABLED=false` acá + redeploy, o pausar el scheduler.
 GROWTH_SEO_ENABLED="${GROWTH_SEO_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},GROWTH_SEO_ENABLED=${GROWTH_SEO_ENABLED}"
+
+# TASK-1661 — Captura de datos de mercado por keyword (DataForSEO Labs `keyword_overview`).
+#
+# 🔴 **OFF por defecto, y esto NO es simetría con el flag de arriba.** `GROWTH_SEO_ENABLED` gatea
+# lecturas y batches ya presupuestados; éste habilita una corrida que le PAGA AL PROVEEDOR por
+# cada fila devuelta. Nace apagado y se enciende por organización, con el dry-run visto antes.
+#
+# Costo medido del alcance V1 (set monitoreado, 2026-08-13): 31 keywords = 1 llamada =
+# USD 0.012 (task setup) + 31 × USD 0.00012 = ~USD 0.016 por corrida. El techo por target son
+# 200 keywords, que siguen siendo una sola llamada (~USD 0.036).
+#
+# ⚠️ Lo lee el ops-worker, NO Vercel: el fetch es async. Declararlo acá y no sólo con
+# `gcloud run services update` es obligatorio — `--set-env-vars` es destructivo y lo borraría
+# en el próximo deploy, en silencio (CLAUDE.md §Feature Flag State Ledger).
+#
+# Es SUBORDINADO: con `GROWTH_SEO_ENABLED=false` la captura no corre aunque éste esté ON.
+# Rollback (<5 min): volver a `false` acá + redeploy — deja de gastar de inmediato y los datos
+# ya capturados quedan (la tabla es append-only).
+GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED="${GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED:-false}"
+ENV_VARS="${ENV_VARS},GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED=${GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED}"
 ENV_VARS="${ENV_VARS},OPENAI_API_KEY_SECRET_REF=${OPENAI_API_KEY_SECRET_REF}"
 ENV_VARS="${ENV_VARS},ANTHROPIC_API_KEY_SECRET_REF=${ANTHROPIC_API_KEY_SECRET_REF}"
 ENV_VARS="${ENV_VARS},PERPLEXITY_API_KEY_SECRET_REF=${PERPLEXITY_API_KEY_SECRET_REF}"
