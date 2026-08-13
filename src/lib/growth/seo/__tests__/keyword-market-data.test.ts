@@ -413,3 +413,28 @@ describe('captureKeywordMarketData — contrato de gasto', () => {
     expect(providerMock).not.toHaveBeenCalled()
   })
 })
+
+describe('classifyLinkBarrier (ISSUE-152 — presentación de la lente de enlaces)', () => {
+  it('null = no consultado, se queda null (nunca se inventa un nivel)', async () => {
+    const { classifyLinkBarrier } = await import('../contracts')
+
+    expect(classifyLinkBarrier(null)).toBeNull()
+  })
+
+  it('0 es barrera BAJA — una oportunidad, no "trivial"', async () => {
+    const { classifyLinkBarrier } = await import('../contracts')
+
+    expect(classifyLinkBarrier(0)).toBe('low')
+    expect(classifyLinkBarrier(8)).toBe('low')
+    expect(classifyLinkBarrier(14)).toBe('low')
+  })
+
+  it('buckets del oficio para KD basadas en enlaces: 15–49 media, 50+ alta', async () => {
+    const { classifyLinkBarrier } = await import('../contracts')
+
+    expect(classifyLinkBarrier(15)).toBe('medium')
+    expect(classifyLinkBarrier(49)).toBe('medium')
+    expect(classifyLinkBarrier(50)).toBe('high')
+    expect(classifyLinkBarrier(100)).toBe('high')
+  })
+})

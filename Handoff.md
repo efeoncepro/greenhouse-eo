@@ -19,12 +19,11 @@ próximo ciclo (itera targets `active`).
   multi-mercado se materialice; declarado en ISSUE-153 §Follow-up.
 - Guardrail de alta de target (contrastar volumen del nombre de marca vs mercados vecinos) —
   ISSUE-152 §4.
-- `keyword_difficulty`: causa raíz ENCONTRADA (doc del proveedor + fórmula reproducida
-  empíricamente). Es métrica pura de backlinks con piso duro en 0: en SERPs es-LATAM el top-10
-  casi no tiene backlinks a nivel URL y una porción enorme de keywords colapsa a 0 exacto. El
-  veto de mostrarla a cliente se mantiene; la señal utilizable es `avg_backlinks_info` (gratis
-  en la misma respuesta, hoy NO se persiste) — derivar dificultad propia es decisión de
-  producto. Gotcha canonizado en la skill `dataforseo-operator` (02-labs §7).
+- `keyword_difficulty`: RESUELTO con presentación, no con veto. Es métrica pura de enlaces
+  (contrastada vs Semrush: 0 vs 50 para `pintura` MX — dos escuelas, no un dato roto). La UI la
+  muestra como **Barrera de enlaces: Baja/Media/Alta** (`classifyLinkBarrier`), nunca el número
+  crudo; verificado visual con datos reales de Berel (desktop+390). `avg_backlinks_info` (gratis,
+  no persistido) queda como mejora futura si se quiere una dificultad blended propia.
 
 ### TASK-1661 — datos de mercado por keyword: code complete, rollout PENDIENTE (2026-08-13)
 

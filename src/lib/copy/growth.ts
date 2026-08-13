@@ -2233,7 +2233,18 @@ export const GH_GROWTH_SEO_KEYWORDS = {
     colGainHint:
       'Clics adicionales por mes si llegaras a la posición objetivo, según la curva de CTR de tu propio sitio.',
     colVolume: 'Volumen',
-    colDifficulty: 'Dificultad',
+    // ⚠️ NO es "Dificultad" (ISSUE-152): la métrica del proveedor mide SOLO la barrera de
+    // enlaces del top-10, y en SERPs LATAM colapsa a 0 — mostrado como "Dificultad: 0" se lee
+    // "trivial", que es falso (Semrush le pone 50 a la misma keyword). Se nombra lo que mide.
+    colLinkBarrier: 'Barrera de enlaces',
+    colLinkBarrierHint:
+      'Qué tan atrincherado con backlinks está el top 10 para esta búsqueda. Baja = se compite con contenido y autoridad, no con enlaces: una oportunidad para un dominio fuerte, no una búsqueda "fácil".',
+    linkBarrierLow: 'Baja',
+    linkBarrierMedium: 'Media',
+    linkBarrierHigh: 'Alta',
+    linkBarrierLowHint: 'El top 10 casi no tiene backlinks propios: se compite con contenido y autoridad de dominio.',
+    linkBarrierMediumHint: 'El top 10 tiene un perfil de enlaces moderado: entrar exige contenido fuerte y algunos enlaces.',
+    linkBarrierHighHint: 'El top 10 está atrincherado con backlinks: entrar exige una estrategia de enlaces sostenida.',
     // El estado honesto de las columnas de mercado: ni 0 ni un guion ambiguo.
     //
     // ⚠️ CORTO A PROPÓSITO (hallazgo del GVC). "Sin dato de mercado" completo se envolvía en

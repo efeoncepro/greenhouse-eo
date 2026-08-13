@@ -104,10 +104,12 @@ nada, **algo esta mal**: significa que el runtime llamo al proveedor sin el regi
   se trae el ciclo viejo al mismo precio.
 - **No leer `competition` como dificultad.** Es competencia **paga** (Google Ads). La dificultad
   organica es `keyword_difficulty`.
-- **No mostrar `keyword_difficulty` a un cliente en mercados es-LATAM.** Es una metrica pura de
-  backlinks con un piso duro: si las URLs del top-10 tienen pocos backlinks propios (lo normal en
-  SERPs de LATAM), colapsa a 0 exacto aunque la keyword tenga 135.000 busquedas/mes. Un 0 se lee
-  como "trivialmente facil" y es falso. Detalle y formula verificada:
+- **No mostrar `keyword_difficulty` como numero crudo.** La metrica mide SOLO la barrera de
+  enlaces del top-10 y en SERPs de LATAM colapsa a 0 aunque la keyword tenga 135.000
+  busquedas/mes — mostrado como "Dificultad: 0" se lee "trivial", que es falso (Semrush le pone
+  50 a la misma keyword porque mezcla mas factores). La UI la presenta como **Barrera de
+  enlaces: Baja / Media / Alta** (`classifyLinkBarrier`), donde "Baja" significa "se compite con
+  contenido y autoridad, no con enlaces" — una oportunidad, no una trivialidad. Detalle:
   `.claude/skills/dataforseo-operator/references/02-labs.md` §7.
 - **No mostrar un volumen sin su fecha**, ni promediarlo con datos de Search Console. Son dos lentes
   distintas: una es medida, la otra estimada.

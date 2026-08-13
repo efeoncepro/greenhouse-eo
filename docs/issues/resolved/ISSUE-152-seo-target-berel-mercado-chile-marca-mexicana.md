@@ -171,3 +171,20 @@ La señal cruda utilizable es `avg_backlinks_info` (page_rank/domain_rank/referr
 del top-10), que viene **gratis en la misma respuesta** y hoy NO se persiste — derivar de ahí una
 dificultad propia es decisión de producto. Gotcha canonizado en
 `.claude/skills/dataforseo-operator/references/02-labs.md` §7.
+
+
+## Delta 2026-08-13 (noche) — veredicto FINAL de la KD: se muestra, renombrada y en niveles
+
+El operador cuestionó el veto y tenía razón en cuestionarlo. Contraste con Semrush (mismas
+keywords, México): `pintura` DataForSEO **0** / Semrush **50** · `comex` **18** / **67** · `berel`
+**8** / **34**. Semrush SÍ discrimina en LATAM — el framing anterior ("la métrica no puede
+funcionar en este mercado") era incorrecto. Lo que pasa: hay dos escuelas de KD. La de DataForSEO
+(y Ahrefs) mide SOLO la barrera de enlaces del top-10; la de Semrush mezcla más factores. El 0
+link-based es un dato real y útil: *"acá se compite con contenido y autoridad, no con backlinks"*
+— una oportunidad para un dominio fuerte como Berel, no una trivialidad.
+
+**Resolución shipped:** la columna se renombró a **"Barrera de enlaces"** y muestra
+**Baja / Media / Alta** (`classifyLinkBarrier`, buckets 0–14/15–49/50+) con tooltips que explican
+la semántica; el número crudo no se muestra nunca. Verificado visualmente con datos reales de
+Berel MX (desktop + 390px): `pintura` → volumen 135.000 + barrera **Baja**, que es exactamente la
+historia comercial correcta. Sin dato sigue siendo "Sin dato", jamás un nivel inventado.
