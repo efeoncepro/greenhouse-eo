@@ -34,6 +34,7 @@ import { readRankEvolution } from '@/lib/growth/seo/rank-evolution-reader'
 import { readSeoOverviewKpis } from '@/lib/growth/seo/overview/read-overview-kpis'
 import { readSiteAuditReport } from '@/lib/growth/seo/site-audit/reader'
 import { trackKeywords, untrackKeywords } from '@/lib/growth/seo/track-keywords'
+import { isSeoKeywordIntent, SEO_KEYWORD_INTENTS } from '@/lib/growth/seo/contracts'
 import type {
   BacklinkProfileResult,
   KeywordOpportunitiesResult,
@@ -723,6 +724,16 @@ export const getEcosystemSeoEntitlementPayload = async ({
 export interface EcosystemSeoTrackKeywordsBody {
   organizationId?: unknown
   keywords?: unknown
+  /**
+   * TASK-1659 — `target` | `opportunity`. Opcional: un consumer que no declara no clasifica,
+   * y la membresía queda con intención `NULL` en vez de una inventada.
+   */
+  intent?: unknown
+  /**
+   * TASK-1659 — a quién se le atribuye el compromiso cuando el agente actúa por encargo. El
+   * `actor` sigue siendo la máquina (procedencia real del write); esto es la autoría humana.
+   */
+  intentDeclaredBy?: unknown
 }
 
 export const trackEcosystemSeoKeywordsPayload = async ({
@@ -758,6 +769,19 @@ export const trackEcosystemSeoKeywordsPayload = async ({
     })
   }
 
+  // TASK-1659 — vocabulario cerrado validado en la frontera. Un valor fuera del enum es un
+  // 400 explícito, no un `undefined` silencioso: el consumer tiene que enterarse de que su
+  // declaración no se guardó.
+  if (body?.intent !== undefined && !isSeoKeywordIntent(body.intent)) {
+    throw new ApiPlatformError(`"intent" must be one of: ${SEO_KEYWORD_INTENTS.join(', ')}.`, {
+      statusCode: 400,
+      errorCode: 'bad_request'
+    })
+  }
+
+  const intent = body?.intent
+  const intentDeclaredBy = typeof body?.intentDeclaredBy === 'string' ? body.intentDeclaredBy.trim() : ''
+
   const subject = await resolveSeoLaneSubject(context, request, requestedOrganizationId)
 
   if (!subject.seoTargetId) {
@@ -772,7 +796,9 @@ export const trackEcosystemSeoKeywordsPayload = async ({
   // `publicId` y no `consumerId`: la procedencia queda legible para quien audite el gasto
   // sin tener que resolver un id interno contra otra tabla.
   const result = await trackKeywords(subject.seoTargetId, keywords, `mcp:${context.consumer.publicId}`, {
-    source: 'mcp'
+    source: 'mcp',
+    ...(intent ? { intent } : {}),
+    ...(intent && intentDeclaredBy ? { intentDeclaredBy } : {})
   })
 
   return {

@@ -657,7 +657,12 @@ export const createGreenhouseMcpHandlers = (client: Pick<
    * viera "ok" reportaría "listo, las seguí todas" cuando el techo rebotó la mitad. Lo que
    * se rechazó tiene que llegar al usuario con esas palabras.
    */
-  async trackSeoKeywords(input: { organizationId?: string; keywords: string[] }) {
+  async trackSeoKeywords(input: {
+    organizationId?: string
+    keywords: string[]
+    intent?: 'target' | 'opportunity'
+    intentDeclaredBy?: string
+  }) {
     return callReadTool(
       result => {
         const data = result.data as {
@@ -675,10 +680,14 @@ export const createGreenhouseMcpHandlers = (client: Pick<
         const outcomes = Array.isArray(data.outcomes) ? data.outcomes : []
         const count = (status: string) => outcomes.filter(outcome => outcome.status === status).length
         const rejected = count('capacity_exceeded')
+        // TASK-1659 — el cambio de intención se enumera aparte: fundirlo en `already_tracked`
+        // le diría al agente que no pasó nada, cuando se cerró una membresía y se abrió otra.
+        const reclassified = count('intent_changed')
 
         const parts = [
           `${count('tracked')} newly tracked`,
           `${count('already_tracked')} already tracked`,
+          `${reclassified} reclassified (intent changed)`,
           `${rejected} rejected (set at capacity)`,
           `${count('invalid')} invalid`
         ]

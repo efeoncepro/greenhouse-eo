@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { canonicalErrorResponse } from '@/lib/api/canonical-error-response'
 import type { CanonicalErrorCode } from '@/lib/api/canonical-error-response'
 import { can } from '@/lib/entitlements/runtime'
+import { isSeoKeywordIntent, SEO_KEYWORD_INTENTS } from '@/lib/growth/seo/contracts'
 import { trackKeywords } from '@/lib/growth/seo/track-keywords'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { requireInternalTenantContext } from '@/lib/tenant/authorization'
@@ -27,6 +28,8 @@ export const dynamic = 'force-dynamic'
 interface TrackKeywordsBody {
   seoTargetId?: unknown
   keywords?: unknown
+  /** TASK-1659 — `target` | `opportunity`. Opcional: quien no declara, no clasifica. */
+  intent?: unknown
 }
 
 /** El contrato del primitive se traduce 1:1 a códigos canónicos: sin prosa inventada acá. */
@@ -69,8 +72,22 @@ export async function POST(request: Request) {
     })
   }
 
+  // TASK-1659 — el body es `unknown`, así que la intención se valida contra el vocabulario
+  // cerrado ANTES de llegar al command. Un valor fuera del enum se rechaza explícito en vez de
+  // degradarse a `undefined`: silenciarlo dejaría al caller creyendo que declaró algo.
+  if (body.intent !== undefined && !isSeoKeywordIntent(body.intent)) {
+    return canonicalErrorResponse('seo_keywords_invalid_input', {
+      extra: { reason: 'invalid_intent', allowed: SEO_KEYWORD_INTENTS }
+    })
+  }
+
+  const intent = body.intent
+
   try {
-    const result = await trackKeywords(seoTargetId, keywords, tenant.userId, { source: 'operator_ui' })
+    const result = await trackKeywords(seoTargetId, keywords, tenant.userId, {
+      source: 'operator_ui',
+      ...(intent ? { intent } : {})
+    })
 
     if (!result.ok) {
       const code = ERROR_CODE_MAP[result.errorCode] ?? 'internal_error'

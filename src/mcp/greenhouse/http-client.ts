@@ -280,13 +280,26 @@ export class GreenhouseApiPlatformClient {
    * POST porque persiste: agrega keywords al set monitoreado, y eso compromete gasto
    * DataForSEO recurrente. El lane sólo lo acepta desde bindings de scope `internal`.
    */
-  async trackSeoKeywords(input: { organizationId?: string; keywords: string[] }) {
+  async trackSeoKeywords(input: {
+    organizationId?: string
+    keywords: string[]
+    /** TASK-1659 — `target` | `opportunity`; se omite del body si el agente no la declaró. */
+    intent?: 'target' | 'opportunity'
+    intentDeclaredBy?: string
+  }) {
     return this.request(
       '/api/platform/ecosystem/growth/seo/keywords/track',
       {},
       {
         method: 'POST',
-        body: { organizationId: input.organizationId, keywords: input.keywords }
+        body: {
+          organizationId: input.organizationId,
+          keywords: input.keywords,
+          // Se omite en vez de mandar `undefined`/`null`: el lane distingue "no declaró" de
+          // un valor inválido, y mandar la llave vacía convertiría lo primero en lo segundo.
+          ...(input.intent ? { intent: input.intent } : {}),
+          ...(input.intent && input.intentDeclaredBy ? { intentDeclaredBy: input.intentDeclaredBy } : {})
+        }
       }
     )
   }

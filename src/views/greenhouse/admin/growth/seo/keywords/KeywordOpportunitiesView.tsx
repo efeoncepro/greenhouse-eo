@@ -61,6 +61,17 @@ const TRACK_ENDPOINT = '/api/admin/growth/seo/keywords/track'
 const UNTRACK_ENDPOINT = '/api/admin/growth/seo/keywords/untrack'
 
 /**
+ * TASK-1659 — la intención que declara ESTA lente.
+ *
+ * El command no asume ninguna: quien no declara escribe `NULL`, porque inventar una
+ * clasificación es peor que no tenerla. Pero acá sí hay alguien diciéndolo — el operador está
+ * mirando el mapa de oportunidades medidas y decide empujar una. Un objetivo (un compromiso
+ * acordado con el cliente, que puede estar en la posición 60) se declara desde su propia
+ * superficie, no desde este listado.
+ */
+const TRACK_INTENT = 'opportunity' as const
+
+/**
  * Ids ESTABLES para los dos controles de contexto.
  *
  * 🔴 Sin esto MUI los deriva de `useId`, y el `htmlFor` del label salía distinto en servidor
@@ -226,7 +237,7 @@ const KeywordOpportunitiesView = ({
       const response = await fetch(TRACK_ENDPOINT, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ seoTargetId, keywords: [keyword] })
+        body: JSON.stringify({ seoTargetId, keywords: [keyword], intent: TRACK_INTENT })
       })
 
       await throwIfNotOk(response, copy.follow.feedbackError.replace('{keyword}', keyword))
@@ -390,7 +401,7 @@ const KeywordOpportunitiesView = ({
       const response = await fetch(UNTRACK_ENDPOINT, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ seoTargetId, keywords: [keyword] })
+        body: JSON.stringify({ seoTargetId, keywords: [keyword], intent: TRACK_INTENT })
       })
 
       await throwIfNotOk(response, copy.follow.feedbackUntrackError.replace('{keyword}', keyword))
@@ -440,7 +451,7 @@ const KeywordOpportunitiesView = ({
       const response = await fetch(TRACK_ENDPOINT, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ seoTargetId, keywords })
+        body: JSON.stringify({ seoTargetId, keywords, intent: TRACK_INTENT })
       })
 
       await throwIfNotOk(response, copy.follow.feedbackError.replace('{keyword}', keywords[0]))
