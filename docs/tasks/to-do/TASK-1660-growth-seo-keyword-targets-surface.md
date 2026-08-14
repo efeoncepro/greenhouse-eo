@@ -4,6 +4,25 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-14 — TASK-1659 complete: desbloqueada
+
+El modelo de intención existe y está verificado contra PG real. Lo que esta task puede dar por
+sentado al implementar la lente `Objetivos`:
+
+- `trackKeywords(seoTargetId, keywords, actor, { intent: 'target', intentDeclaredBy? })` — la
+  intención NO tiene default: si esta lente no la declara, la membresía queda `NULL`, no
+  `opportunity`.
+- Declarar un objetivo sobre una keyword ya seguida como oportunidad devuelve el outcome
+  **`intent_changed`** (no `already_tracked`), cierra la membresía anterior y abre otra. Ese
+  historial —`intent_declared_at` de cada ventana— es la fuente de "objetivo desde marzo"; el Δ
+  contra la primera medición POSTERIOR que pide esta task se calcula desde ahí, no desde
+  `effective_from` de la fila vigente.
+- El cambio de intención **no consume cupo**, así que la UI no debe presentarlo como si gastara
+  un slot del techo.
+- Las keywords seguidas antes de 2026-08-14 tienen `intent = NULL`. La lente debe mostrar ese
+  estado como "sin intención declarada" y NUNCA contarlas como objetivos ni como oportunidades.
+- El reader de la lente todavía no existe: `readKeywordTargets` es trabajo de esta task.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -22,7 +41,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth`
-- Blocked by: `TASK-1659`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

@@ -4,6 +4,66 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-14 — auditoría de discovery: cinco supuestos que no resistieron el repo
+
+Auditoría previa a JSX (los tres docs UI se leyeron completos y NO son stubs: wireframe 342
+líneas, flow 316, dirección 207). Lo que cambió respecto de lo que esta task supone:
+
+1. **`Declarar objetivo` / `Seguir oportunidad` ya son implementables — pero recién ahora.**
+   Cuando se escribió esta task, `trackKeywords` **no tenía** eje de intención: la spec citaba
+   `intent='target'` / `intent='opportunity'` como si existieran. Los aporta `TASK-1659`
+   (complete 2026-08-14). Usar `trackKeywords(..., { intent })`; declarar sobre una keyword ya
+   seguida devuelve **`intent_changed`**, no `already_tracked`, y **no consume cupo**.
+2. **`Descubrir` es la SEGUNDA lente, no la tercera.** `TASK-1660` (`Objetivos`) sigue en
+   `to-do`. El link "Ver en Objetivos" del outcome **no tiene destino todavía**: o se omite o se
+   renderiza disabled con razón, nunca apuntando a una lente que no existe.
+3. **No existe "el patrón de links/tabs existente" para lentes.** Ninguna `page.tsx` del
+   dashboard usa `?view=` hoy. El conmutador de lentes hay que **crearlo** acá (y `TASK-1660` lo
+   reusa): clonar la forma de `SeoSearchVisibilityTabs` — `CustomTabsNav role='navigation'` +
+   `<Tab component={Link}>`, **nunca** el `TabList` de `@mui/lab` (clona `aria-controls` hacia
+   TabPanels inexistentes = violación axe crítica). El helper debe propagar `space` **y** `view`.
+4. 🔴 **"Dificultad `◑ N/100`" está SUPERSEDED por ISSUE-152.** La presentación vigente es
+   **"Barrera de enlaces" en niveles Baja/Media/Alta**, derivada server-side por
+   `deriveLinkBarrier` desde el perfil de enlaces real del top-10 — **nunca** la
+   `keyword_difficulty`, que colapsa a 0 en SERPs es-LATAM y se leería como "trivial". El DTO ya
+   trae `linkBarrier`. `unknown`/`null` se pinta **"Sin dato"**, jamás "Baja". Consecuencia
+   directa: **el filtro `maxDifficulty` sale del contrato de URL** (el reader sólo filtra por KD,
+   que ya no se muestra; ofrecerlo filtraría por una cifra que la pantalla no enseña).
+5. **El filtro `state` no tiene equivalente server.** El reader ofrece `excludeTracked`,
+   `status` (del run), `intent`, `query`, `sourceEndpoint`, `minSearchVolume` — no un filtro por
+   estado del candidato. En V1 `state` se limita a lo que el reader sostiene; filtrar en cliente
+   sobre un cursor paginado mentiría sobre el universo filtrado.
+
+Además, dos cosas que la spec no nombra y la implementación necesita:
+
+- **`createGroundedQueryDraft` exige un `profileId` AEO.** Se resuelve server-side con
+  `getGraderProfileForOrganization(organizationId)`; sin perfil, la acción va disabled con razón.
+  Requiere además `growth.ai_visibility.prompt_set.manage`, así que la page tiene que calcular
+  **dos** capabilities, no una.
+- **El `intent:'preview'` del route exige `growth.seo.target.configure`**, igual que el queue. Un
+  operador read-only no puede pedir el preview de costo: ve el builder como explicación, sin
+  cifras y sin CTA.
+
+Y dos correcciones de la propia task, ambas parte de lo que falta para que sea `UI ready`:
+
+- **Le faltan los markers `ZONE 2` y `ZONE 3`**, por lo que `task:lint` la reporta `legacy=1` y no
+  la valida contra el template.
+- 🔴 **`Motion: none` es incorrecto.** El flow especifica comportamiento de motion no trivial:
+  `prefers-reduced-motion` que elimina entrance/stagger del canvas conservando el estado final, y
+  transición tokenizada del drawer. Antes de JSX hay que crear
+  `docs/ui/motion/TASK-1665-growth-seo-keyword-discovery-workbench-motion.md` y declararlo — no
+  como stub para pasar el gate, sino con el contrato real. `task:lint` ya lo advierte
+  (`ui-motion-contract`).
+
+> Nota de tooling (no bloquea esta task): esa advertencia apareció recién al agregar este delta,
+> pese a que el contenido que la dispara (`Goal`, `Verification`) es idéntico al de antes y la
+> regla sólo escanea secciones que ya lo contenían. Es decir: **una sección `## Delta` nueva antes
+> de `## Status` cambió el veredicto de una regla sobre contenido que no se tocó.** No se
+> diagnosticó el mecanismo; queda anotado porque un lint cuyo resultado depende de ediciones no
+> relacionadas es poco confiable como gate.
+
+Este delta **no** cambia `UI ready: no`.
+
 ## Delta 2026-08-14 — TASK-1666 complete: desbloqueada por completo
 
 - El puente grounded existe y está verificado live: la acción `Preparar grounded queries` del

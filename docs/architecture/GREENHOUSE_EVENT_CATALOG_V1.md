@@ -1264,7 +1264,9 @@ Spec: `docs/tasks/in-progress/TASK-1175-design-handoff-control-plane-full-api-pa
 | --- | --- | --- | --- | --- |
 | `growth.seo.keyword_set.updated` | v1 | `seo_target` (`seot-{uuid}`) | commands `trackKeywords` y `untrackKeywords` (`src/lib/growth/seo/track-keywords.ts`), **dentro de la misma transacción** que muta las membresías y sólo si el set REALMENTE cambió (`inserted > 0` en el alta, `closed > 0` en la baja — ver el delta del reverso abajo) | ninguno todavía — es **rastro de auditoría de un compromiso de gasto**, no un disparador de proyección |
 
-**Payload v1**: `{ seoTargetId, organizationId, keywordSetId, trackedCount, activeKeywordCount, source, actor }` — coordenadas del scope, nunca las keywords: cualquier consumer futuro **re-lee PG** por `keywordSetId`.
+**Payload v1**: `{ seoTargetId, organizationId, keywordSetId, trackedCount, intentChangedCount, declaredIntent, activeKeywordCount, source, actor }` — coordenadas del scope, nunca las keywords: cualquier consumer futuro **re-lee PG** por `keywordSetId`.
+
+**Delta TASK-1659 (intención declarada).** `intentChangedCount` y `declaredIntent` se agregaron al payload v1 (extensión aditiva: los consumers existentes —ninguno todavía— no cambian de forma). Y con ellos cambió la **condición de emisión**: ahora también se emite cuando `intentChangedCount > 0` aunque `trackedCount` sea 0. Un cambio de intención cierra una membresía y abre otra, así que el set SÍ cambió aunque `activeKeywordCount` no se mueva; emitir sólo por `inserted > 0` dejaría esa transición invisible para todo downstream — y es justamente la transición que responde *"¿desde cuándo esto es un compromiso con el cliente?"*.
 
 **Por qué existe un evento sin consumer.** Seguir una keyword es un **compromiso de gasto diferido**: el rank capture diario (TASK-1303) le paga al proveedor por cada keyword vigente del set, en cada ciclo, hasta que alguien la deje de seguir. La pregunta que llega cuando el gasto sube es *"¿quién agregó esto y cuándo?"*, y la fila de membresía sola no la responde con el contexto del lote. El evento la responde, y es append-only por construcción.
 

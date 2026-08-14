@@ -103,11 +103,36 @@ Reglas de lectura:
 - Funciona aunque el sitio este pausado: bloquear la salida congelaria el gasto sin forma de
   bajarlo.
 
+## Objetivo u oportunidad: por que la keyword esta en el set
+
+Desde 2026-08-14 cada keyword del set puede declarar **por que** esta ahi. Son dos cosas
+distintas y el sistema ya no las confunde:
+
+| Intencion | Que significa | Como se lee su posicion |
+|---|---|---|
+| **Oportunidad** | demanda que tu sitio YA capta y estas empujando | estar en la 12 y querer la 5 |
+| **Objetivo** | un compromiso acordado con el cliente | estar en la 60 puede ser normal: es la distancia que falta, no un fracaso |
+
+Tres cosas que conviene saber:
+
+- **"Seguir" desde esta pantalla declara `oportunidad`**, porque eso es exactamente lo que estas
+  haciendo: mirar demanda medida y decidir empujarla. Declarar un **objetivo** es otra accion, con
+  su propia superficie.
+- **Las keywords que ya estaban seguidas antes de esta fecha no tienen intencion declarada**, y
+  aparecen asi: sin dato. No se las marco como oportunidad automaticamente — nadie las clasifico,
+  y decir lo contrario habria inflado el conteo de oportunidades con filas que nadie miro.
+- **Cambiar la intencion de una keyword no borra su historia.** Queda registrado desde cuando es
+  objetivo, para poder decir despues *"es objetivo desde marzo, y en marzo estaba en la 45"*. Y no
+  consume cupo del techo: se puede reclasificar aunque el set este lleno.
+
 ## Que NO hacer
 
 - **No sigas keywords "por si acaso".** Cada una entra al ciclo diario de captura y se le paga al
   proveedor por consulta, todos los dias, hasta que alguien la deje de seguir. El costo no es del clic:
   es recurrente.
+- **No leas un objetivo en la posicion 60 como un problema de rendimiento.** Si alguien lo declaro
+  como compromiso, esa distancia es el trabajo pendiente. Promediarlo con las oportunidades ensucia
+  cualquier lectura agregada.
 - **No trates una keyword canibalizada como una oportunidad mas.** Empujarla es empujar dos paginas tuyas
   a competir mas fuerte entre si. Primero se consolida.
 - **No leas un "Sin dato" como "0 busquedas".** Significa que esa keyword no se consulto al proveedor.

@@ -7,6 +7,26 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-14 — El set monitoreado ahora sabe POR QUÉ una keyword está ahí (TASK-1659)
+
+Hasta hoy, "estoy en la 12 y quiero la 5" y "el cliente quiere rankear acá y estoy en la 60" eran
+la misma fila. Nada distinguía una **oportunidad** que se está empujando de un **objetivo**
+acordado con el cliente, así que un compromiso lejano se leía como fracaso permanente en cualquier
+lectura agregada y no existía narrativa de avance. Ahora cada membresía puede declarar su
+intención, con autor y fecha propios — y el autor del compromiso se guarda aparte de quién ejecutó
+el write, porque un agente puede declarar por encargo.
+
+Dos decisiones que valen más que la columna: **nada se backfilleó y el command no asume nada.**
+Marcar lo viejo como "oportunidad" habría afirmado que alguien lo clasificó, e inflado el conteo
+con filas que nadie miró; la ausencia se propaga honesta hasta la pantalla. Y **cambiar la
+intención no sobrescribe: cierra la membresía y abre otra**, porque el dato que sirve para reportar
+no es "esta keyword es un objetivo" sino "es objetivo desde marzo, y en marzo estaba en la 45".
+Reclasificar no consume cupo del techo, así que se puede hacer con el set lleno — que es cuando más
+falta hace.
+
+Salió de intentar construir el workbench de discovery (TASK-1665) y descubrir que dos de sus
+acciones citaban un contrato que no existía. Desbloquea la lente de Objetivos.
+
 ## 2026-08-14 — La auditoría del oficio afinó el discovery y el puente antes de congelarlos (TASK-1664/1666)
 
 Una tri-auditoría con las skills de SEO/AEO revisó los dos cierres del día y encontró lo que los
@@ -1167,37 +1187,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
 - Hallazgo transversal: el patrón `BEGIN`/`ROLLBACK` de los sanity scripts **no es transaccionalmente seguro**
   (el helper toma una conexión del pool por llamada). Este se reescribió sobre `withGreenhousePostgresTransaction`;
   verificado que ningún otro sanity del repo lo usaba (el de 1301 ya limpiaba en `finally`); la regla de decisión quedó canonizada en `SQL_DATE_MATH_AGENT_INVARIANTS`.
-
-## 2026-08-05 — Growth SEO (EPIC-022): serie GSC propia + striking-distance (TASK-1302)
-
-- Google Search Console deja de ser read-through: `greenhouse_growth.seo_gsc_daily` materializa query×page por
-  `capture_date` y la serie sobrevive la ventana de 16 meses de Google. Anclada a `organization_id` (grano de la
-  propiedad verificada) y no a `seo_target_id`, que tiene grano más fino que GSC no particiona.
-- El primitive GSC compartido ganó paginación real (`startRow` aditivo): antes cortaba en 100 filas **sin señal**,
-  lo que sobre una serie histórica es pérdida permanente. Si se topa el techo se declara `truncated` + warning.
-- `readKeywordOpportunities`: striking-distance 8–20 con posición ponderada por impresiones, umbral por percentil
-  de la propia org y score en **clics incrementales estimados** con curva de CTR derivada de la propia
-  organización — no depende de datos de mercado, así que aterrizó sin esperar a TASK-1300.
-- Batch diario en Cloud Scheduler + ops-worker (nunca Vercel cron), resiliente per-org. Job creado **pausado** y
-  `GROWTH_SEO_ENABLED` default OFF: `code complete, rollout pendiente`.
-- Sanity live 9/9 contra PG real destapó un bug de alias SQL↔TS que ningún mock atrapaba. Suite 10102/0 + build
-  prod verdes.
-- **Rollout ejecutado el mismo día: LIVE.** 26.192 filas reales de `sc-domain:berel.com`, scheduler activo, 375
-  keywords en striking-distance. El rollout destapó dos defectos que ningún test podía ver: (a) el ops-worker no
-  tenía NINGUNA variable de Search Console —TASK-1302 fue su primer consumer del reader GSC— y prender el flag
-  habría degradado todas las orgs en silencio (bug class ISSUE-113); (b) **GSC no publica D-1**, así que apuntar a
-  "ayer" habría escrito días vacíos para siempre sin volver por ellos → ventana móvil de 5 días, que de paso
-  corrige el consolidado tardío de Google. Una sola instancia Cloud SQL y un solo ops-worker compartido
-  staging+prod ⇒ la capacidad quedó viva sin promoción a `main`.
-
-- **Cierre documental (3 subagentes).** Capa funcional (`docs/documentation/growth/` v1.1) + manual de operación
-  nuevo (`operar-serie-search-console.md`, por CLI/logs: verificar el job, forzar corrida, leer el batch,
-  re-materializar un día, rollback). Las tres trampas del rollout canonizadas en
-  `OPS_RELIABILITY_AGENT_INVARIANTS.md` + `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` (su Delta 2026-04-15 decía
-  "por ahora" sobre la topología compartida del ops-worker; quedó marcado superseded — es canónica). Los hallazgos
-  de oficio (GSC no publica D-1, posición ponderada por impresiones, striking-distance sin datos de mercado)
-  entraron a la skill `seo-aeo` marcados como **medidos**, y a `seo-aeo-practice` como segundo diagnóstico gratis.
-- **Dos deudas con dueño:** `CLAUDE.md` llegó al 100% de su presupuesto (34.998/35.000) y bloqueó una invariante
-  que quedó sólo en el companion → `## Delta` en TASK-1160, cuyo Slice 5 pasa a desbloqueante. Y la skill
-  `seo-aeo` tiene su copia Claude fuera del repo (sin versionar): le faltaban 2 referencias, incluida la de la API
-  de GSC; el gate `skills:mirrors` no puede ver ese drift porque la skill no está en su manifiesto.

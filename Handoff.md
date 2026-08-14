@@ -2,6 +2,40 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+### TASK-1659 COMPLETE — intención declarada de una keyword (2026-08-14)
+
+Salió de intentar tomar **TASK-1665** (workbench `Descubrir`): la auditoría destapó que dos de
+sus cinco acciones de candidato — `Declarar objetivo` / `Seguir oportunidad` — citaban
+`trackKeywords(intent=...)` **que no existía**. El operador eligió parar 1665 e implementar 1659
+primero, así que el workbench queda con su contrato completo cuando se retome.
+
+Los 3 slices en `develop` (SIN push): migración `20260814221022082` (aplicada — base compartida,
+migrar desde local ES el cambio productivo), command y las 3 lanes. **16/16 contra PG real**
+(incluido el invariante de las DOS filas tras un cambio de intención) + suite **10.747 verde**.
+
+**Diseño load-bearing:** `intent` (`target|opportunity`, CHECK cerrado) es ortogonal a `source`
+(procedencia del write) y va en columna propia con autoría separada — `intent_declared_by` ≠
+`created_by` porque un agente puede declarar por encargo, y un CHECK acopla ambas a la existencia
+de `intent`. **Sin backfill y sin default**: la ausencia se propaga hasta la UI, y es el *caller*
+quien declara (la lente Oportunidades manda `intent: 'opportunity'` explícito). **Cambiar la
+intención cierra la membresía y abre otra** con `clock_timestamp()` — el dato de reporte es "es
+objetivo desde marzo, y en marzo estaba en la 45" —, **no consume cupo** y emite outbox aunque
+`activeKeywordCount` no se mueva. Outcome propio `intent_changed`. `[verificar]` de capability
+resuelto: reusa `growth.seo.target.configure`. Sin flags, sin scope nuevo en Entra.
+
+**Desbloquea TASK-1660** (lente Objetivos) — `Blocked by: none`, con delta de lo que puede dar por
+sentado.
+
+**TASK-1665 queda con su auditoría escrita en el archivo** (cinco supuestos que no resistieron el
+repo). Los tres que más cuestan si se descubren tarde: no existe ningún `?view=` en el dashboard,
+así que el conmutador de lentes hay que **crearlo**; "Dificultad ◑ N/100" está **superseded por
+ISSUE-152** (va "Barrera de enlaces" en niveles, y el filtro `maxDifficulty` sale del contrato de
+URL); y `Objetivos` sigue en `to-do`, así que `Descubrir` es la **segunda** lente y el link "Ver en
+Objetivos" no tiene destino. Además `Motion: none` es incorrecto: falta el contrato de motion.
+
+**Pendiente de esta sesión:** `pnpm build` de producción no se corrió (requiere autorización — se
+come ~30GB). Nada más queda pendiente de rollout: no hay flags que prender.
+
 ### Auditoría SEO/AEO post-cierre 1664+1666 — CORREGIDA (2026-08-14)
 
 Tri-auditoría por subagentes con skills SEO (craft 1664 · AEO craft 1666 · economics DataForSEO).
@@ -374,11 +408,3 @@ estados y decisión de publicar sin imágenes vive en
 `docs/operations/hiring/2026-08-11-facebook-vacancy-distribution.md`. No cambió el runtime ni el estado
 de Hiring, por lo que no requiere ADR. Pendiente operativo opcional: revisar las dos publicaciones en
 moderación antes de contarlas como visibles.
-
-### TASK-1688 — completar contacto de postulaciones Careers (2026-08-11)
-
-`TASK-354` quedó cerrada y `TASK-355` ya estaba correctamente cerrada: la postulación de Hector Tolmo sí quedó en
-Account; el Pipeline sólo seleccionaba Content por defecto. La auditoría descubrió aparte que teléfono/mensaje se
-validaban pero no se persistían y que no existía país de residencia. `TASK-1688` gobierna el arreglo vertical:
-ADR previo, migración aditiva, paridad Careers/Growth Forms y lectura autorizada en Application 360; prohíbe
-inferir/backfillear datos históricos o exponer PII. No hay implementación ni migración aplicada aún.

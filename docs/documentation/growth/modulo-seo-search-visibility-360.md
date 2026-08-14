@@ -375,6 +375,16 @@ y hacer crecer la factura son dos permisos distintos), el cupo del set se muestr
 tope el boton se deshabilita explicando por que en vez de fallar al enviarlo. Si una keyword ya estaba
 seguida, volver a seguirla no hace nada ni cuesta nada.
 
+**Una keyword seguida puede decir por que esta ahi.** Un **objetivo** es un compromiso acordado con
+el cliente; una **oportunidad** es demanda que el sitio ya capta y se esta empujando. La diferencia
+importa para leer la posicion: un objetivo en la 60 no es un fracaso, es la distancia que falta, y
+promediarlo con las oportunidades ensucia cualquier lectura agregada. "Seguir" desde el mapa declara
+`oportunidad` —que es literalmente lo que el operador esta haciendo ahi—; declarar un objetivo es
+otra accion. Las keywords que ya estaban seguidas antes de que existiera esta distincion **quedan sin
+intencion declarada**, no marcadas como oportunidad: nadie las clasifico, y decir lo contrario habria
+inflado el conteo. Cambiar la intencion conserva la historia (queda registrado desde cuando es
+objetivo) y no consume cupo del set.
+
 **Y se puede deshacer.** Dejar de seguir saca la keyword del ciclo diario y libera cupo al
 instante. No borra nada: la medicion historica se conserva y lo que se cierra es la ventana
 de seguimiento. Se puede volver a seguir despues, pero empieza una ventana NUEVA — los dias
