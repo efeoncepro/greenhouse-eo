@@ -91,6 +91,11 @@ export interface ReadKeywordDiscoveryInput {
   intent?: SeoSearchIntent
   minSearchVolume?: number
   maxDifficulty?: number
+  /**
+   * TASK-1666 — selección explícita de candidatos (requiere `runId`). SQL-side y tenant-safe:
+   * un ID ajeno simplemente no aparece — el caller decide si la ausencia es error.
+   */
+  candidateIds?: readonly string[]
   limit?: number
   cursor?: string | null
 }
@@ -240,8 +245,15 @@ export const readKeywordDiscovery = async (
         AND organization_id = $2
         AND ($3::text IS NULL OR source_endpoint = $3)
         AND ($4::text IS NULL OR keyword ILIKE '%' || $4 || '%')
+        AND ($5::text[] IS NULL OR candidate_id = ANY($5::text[]))
       ORDER BY captured_at DESC, candidate_id ASC`,
-    [input.runId, input.organizationId, input.sourceEndpoint ?? null, input.query?.trim() || null]
+    [
+      input.runId,
+      input.organizationId,
+      input.sourceEndpoint ?? null,
+      input.query?.trim() || null,
+      input.candidateIds && input.candidateIds.length > 0 ? [...input.candidateIds] : null
+    ]
   )
 
   const normalizedKeywords = [...new Set(candidateRows.map(row => row.normalized_keyword))]
