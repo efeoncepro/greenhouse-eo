@@ -69,7 +69,7 @@ export interface AuthorGraderPromptSetDraftInput {
   createdBy: string
   /**
    * TASK-1666 — Contexto de keyword discovery SEO (opcional, backward-compatible). Presente ⇒
-   * la autoría usa el cerebro `aeo-author.seo-grounded.v1`, los refs `seo.discovery.*` entran a
+   * la autoría usa el cerebro `aeo-author.seo-grounded.v2`, los refs `seo.discovery.*` entran a
    * `grounding_sources_json` y cada prompt lleva `groundingRef` honesto: el `contextRef` cuando
    * la salida fue realmente autorada con el contexto, o `baseline_not_candidate_specific` cuando
    * cayó al baseline — jamás una causalidad falsa.

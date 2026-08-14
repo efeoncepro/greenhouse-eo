@@ -53,17 +53,56 @@ export interface AuthorPromptSetResult {
 
 const normalizeText = (value: string): string => value.trim().toLowerCase().replace(/\s+/g, ' ')
 
+const escapeRegExp = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+export interface SanitizeAuthoredPromptsOptions {
+  /**
+   * TASK-1666 v2 (auditoría AEO B2) — con la marca declarada, un texto que la nombra LITERAL
+   * (sin placeholder) fuerza `namesBrand=true`: el tag refleja la realidad del texto, no lo
+   * que el LLM dijo. Sin esto, una marca literal tagueada discovery corrompe la medición a
+   * ciegas en silencio.
+   */
+  brandName?: string
+  /**
+   * Competidores declarados: un nombre literal en el texto se NORMALIZA a `{{competitor}}`
+   * (el smoke v1 materializó "y Comex" literal violando el contrato de placeholders). La
+   * normalización mantiene la regla "se descartan si no hay competidor declarado" operante.
+   */
+  competitors?: string[]
+  /**
+   * TASK-1666 v2 (auditoría AEO M1) — pisos de distribución para el modo grounded: ≥1 prompt
+   * por fanOutType y ≥50% descubrimiento (`namesBrand=false`). Un set degenerado (todo
+   * branded, o sin un tipo de fan-out) devuelve null → fallback honesto al baseline.
+   */
+  enforceDistribution?: boolean
+}
+
 /**
  * Valida + sanitiza el output del LLM contra el vocabulario CERRADO + NO-LEADING. Descarta
  * prompts mal formados; asigna ids estables (`llm01`…); dedup por texto; corrige `namesBrand`
- * a la realidad (un prompt con {{brand}} SÍ nombra la marca). Devuelve null si quedan muy pocos.
+ * a la realidad (un prompt con {{brand}} O con la marca literal nombra la marca); normaliza
+ * competidores literales a `{{competitor}}`. Devuelve null si quedan muy pocos o si (en modo
+ * grounded) la distribución es degenerada.
  */
-export const sanitizeAuthoredPrompts = (raw: unknown): PromptSetPrompt[] | null => {
+export const sanitizeAuthoredPrompts = (
+  raw: unknown,
+  options: SanitizeAuthoredPromptsOptions = {}
+): PromptSetPrompt[] | null => {
   if (typeof raw !== 'object' || raw === null) return null
 
   const data = raw as { prompts?: unknown }
 
   if (!Array.isArray(data.prompts)) return null
+
+  const brandPattern =
+    options.brandName && options.brandName.trim().length >= 3
+      ? new RegExp(`\\b${escapeRegExp(options.brandName.trim())}\\b`, 'i')
+      : null
+
+  const competitorPatterns = (options.competitors ?? [])
+    .map(name => name.trim())
+    .filter(name => name.length >= 3)
+    .map(name => new RegExp(`\\b${escapeRegExp(name)}\\b`, 'gi'))
 
   const seen = new Set<string>()
   const result: PromptSetPrompt[] = []
@@ -72,7 +111,7 @@ export const sanitizeAuthoredPrompts = (raw: unknown): PromptSetPrompt[] | null 
     if (typeof draft !== 'object' || draft === null) continue
 
     const d = draft as Record<string, unknown>
-    const text = typeof d.text === 'string' ? d.text.trim() : ''
+    let text = typeof d.text === 'string' ? d.text.trim() : ''
 
     if (
       text.length === 0 ||
@@ -83,13 +122,18 @@ export const sanitizeAuthoredPrompts = (raw: unknown): PromptSetPrompt[] | null 
       continue
     }
 
+    // Competidor LITERAL → placeholder (el contrato de templates exige {{competitor}}).
+    for (const pattern of competitorPatterns) {
+      text = text.replace(pattern, '{{competitor}}')
+    }
+
     const key = normalizeText(text)
 
     if (seen.has(key)) continue
     seen.add(key)
 
-    // NO-LEADING: el tag debe reflejar la realidad — un texto con {{brand}} nombra la marca.
-    const mentionsBrand = /\{\{brand\}\}/.test(text)
+    // NO-LEADING: el tag debe reflejar la realidad — {{brand}} o la marca LITERAL nombran la marca.
+    const mentionsBrand = /\{\{brand\}\}/.test(text) || (brandPattern !== null && brandPattern.test(text))
     const namesBrand = mentionsBrand ? true : Boolean(d.namesBrand)
 
     result.push({
@@ -105,7 +149,18 @@ export const sanitizeAuthoredPrompts = (raw: unknown): PromptSetPrompt[] | null 
     if (result.length >= MAX_AUTHORED_PROMPTS) break
   }
 
-  return result.length >= MIN_AUTHORED_PROMPTS ? result : null
+  if (result.length < MIN_AUTHORED_PROMPTS) return null
+
+  if (options.enforceDistribution) {
+    const discoveryShare = result.filter(prompt => !prompt.namesBrand).length / result.length
+    const fanOutTypes = new Set(result.map(prompt => prompt.fanOutType))
+
+    // Piso grounded: los 4 tipos de fan-out presentes y ≥50% descubrimiento. Un set que no
+    // los cumple no sirve para MEDIR visibilidad — mejor el baseline honesto que un panel cojo.
+    if (discoveryShare < 0.5 || fanOutTypes.size < 4) return null
+  }
+
+  return result
 }
 
 const resolveGroundingSources = (input: AuthorPromptSetInput): string[] =>
@@ -244,7 +299,14 @@ export const authorPromptSet = async (
 
   try {
     const { data, model } = await provider.generate(input, system)
-    const prompts = sanitizeAuthoredPrompts(data)
+
+    const prompts = sanitizeAuthoredPrompts(data, {
+      brandName: input.brandName,
+      competitors: input.competitors,
+      // Los pisos de distribución aplican SOLO al modo grounded (v2): el authoring base v1
+      // conserva su contrato original sin cambios de comportamiento.
+      enforceDistribution: Boolean(input.seoContext && input.seoContext.candidates.length > 0)
+    })
 
     if (!prompts) {
       return result(null, 'schema_invalid', provider.id, model, version, grounding)

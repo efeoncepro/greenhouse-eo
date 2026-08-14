@@ -80,6 +80,7 @@ vi.mock('@/lib/observability/capture', () => ({
 import {
   computeSeoGroundingContextRef,
   createGroundedQueryDraft,
+  GROUNDED_QUERY_COVERAGE_NOTICE,
   GROUNDED_QUERY_FALLBACK_NOTICE
 } from '../grounded-query-bridge'
 
@@ -107,7 +108,7 @@ const draftRow = (overrides: Record<string, unknown> = {}) => ({
   version: 3,
   status: 'draft',
   generationStrategy: 'llm',
-  systemPromptVersion: 'aeo-author.seo-grounded.v1',
+  systemPromptVersion: 'aeo-author.seo-grounded.v2',
   groundingSources: ['category:Pinturas', 'seo.discovery.run:seokdr-1', 'seo.discovery.candidate:seokdc-1'],
   prompts: [],
   createdBy: 'user-1',
@@ -299,6 +300,11 @@ describe('createGroundedQueryDraft — gates', () => {
 
 describe('createGroundedQueryDraft — creación y honestidad', () => {
   it('happy path grounded: pasa contexto delimitable al command AEO y devuelve grounded_llm', async () => {
+    state.authorResult = {
+      draft: draftRow({ prompts: [{ text: '¿Qué pintura para pisos de garage me recomiendas?' }] }),
+      authoringStatus: 'ok'
+    }
+
     const result = await createGroundedQueryDraft(baseInput)
 
     expect(result.ok).toBe(true)
@@ -308,6 +314,10 @@ describe('createGroundedQueryDraft — creación y honestidad', () => {
     expect(result.groundingMode).toBe('grounded_llm')
     expect(result.fallbackNotice).toBeNull()
     expect(result.deduped).toBe(false)
+
+    // v2 (auditoría B1): la cobertura por seed se VERIFICA, no se asume por la etiqueta grounded.
+    expect(result.seedCoverage).toEqual({ coveredCandidateIds: ['seokdc-1'], uncoveredCandidateIds: [] })
+    expect(result.coverageNotice).toBeNull()
 
     // El command AEO recibió el brand context AUTORIZADO del profile + el contexto SEO con hash.
     const call = state.authorCalls[0]
@@ -335,6 +345,28 @@ describe('createGroundedQueryDraft — creación y honestidad', () => {
 
     expect(result.groundingMode).toBe('baseline_fallback')
     expect(result.fallbackNotice).toBe(GROUNDED_QUERY_FALLBACK_NOTICE)
+
+    // El baseline no promete cobertura por seed: la señal viaja como null, no como [].
+    expect(result.seedCoverage).toBeNull()
+    expect(result.coverageNotice).toBeNull()
+  })
+
+  it('v2 (auditoría B1): seed sin huella temática en el draft grounded ⇒ coverageNotice declarado', async () => {
+    // El caso real del smoke v1: el set autorado no dejó NINGUNA pregunta de "pintura para piso".
+    state.authorResult = {
+      draft: draftRow({ prompts: [{ text: '¿Qué recubrimiento epóxico me recomiendas para un taller?' }] }),
+      authoringStatus: 'ok'
+    }
+
+    const result = await createGroundedQueryDraft(baseInput)
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) return
+
+    expect(result.groundingMode).toBe('grounded_llm')
+    expect(result.seedCoverage?.uncoveredCandidateIds).toEqual(['seokdc-1'])
+    expect(result.coverageNotice).toBe(GROUNDED_QUERY_COVERAGE_NOTICE)
   })
 
   it('idempotencia: draft existente del mismo contexto ⇒ deduped, CERO segunda autoría', async () => {

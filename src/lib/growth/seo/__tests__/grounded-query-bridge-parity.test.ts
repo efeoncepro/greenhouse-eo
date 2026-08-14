@@ -109,7 +109,7 @@ const readOk = {
   version: 2,
   status: 'draft',
   generationStrategy: 'llm',
-  systemPromptVersion: 'aeo-author.seo-grounded.v1',
+  systemPromptVersion: 'aeo-author.seo-grounded.v2',
   groundingMode: 'grounded_llm',
   prompts: [],
   sourceRefs: [],

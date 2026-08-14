@@ -28,7 +28,9 @@ import {
 } from '@/lib/growth/ai-visibility/prompt-packs/prompt-set-command'
 import {
   AUTHOR_SEO_GROUNDED_SYSTEM_PROMPT_VERSION,
-  type SeoGroundedKeywordContext
+  computeSeoSeedCoverage,
+  type SeoGroundedKeywordContext,
+  type SeoSeedCoverage
 } from '@/lib/growth/ai-visibility/prompt-packs/authoring/author-system-prompt'
 import { type GraderPromptSetRow } from '@/lib/growth/ai-visibility/prompt-packs/prompt-set-store'
 import { type AuthorPromptSetStatus } from '@/lib/growth/ai-visibility/prompt-packs/authoring/author-prompt-set'
@@ -87,6 +89,14 @@ export type GroundedQueryDraftResult =
       deduped: boolean
       /** Presente sólo en fallback: el copy honesto que el consumer DEBE mostrar. */
       fallbackNotice: string | null
+      /**
+       * v2 (auditoría AEO B1) — cobertura temática POR seed en el set autorado (sólo camino
+       * grounded no-deduped; `null` en fallback/dedupe). Si `uncoveredCandidateIds` no está
+       * vacío, `coverageNotice` viaja OBLIGATORIO: el draft existe pero la brecha se declara
+       * para el review — `grounded_llm` con huecos jamás se presenta como cobertura total.
+       */
+      seedCoverage: SeoSeedCoverage | null
+      coverageNotice: string | null
     }
   | { ok: false; errorCode: GroundedQueryErrorCode; status: number }
 
@@ -94,6 +104,11 @@ export type GroundedQueryDraftResult =
 export const GROUNDED_QUERY_FALLBACK_NOTICE =
   'Se creó un draft base para revisión. La autoría grounded no estaba disponible; las preguntas no se ' +
   'consideran específicas de estas keywords hasta que se vuelva a generar el draft con el authoring activo.'
+
+/** Copy de brecha de cobertura (v2): el review decide si regenerar o aprobar con el hueco a la vista. */
+export const GROUNDED_QUERY_COVERAGE_NOTICE =
+  'La autoría no dejó huella temática de todos los candidatos seleccionados. Revisa la brecha antes de ' +
+  'aprobar: puedes regenerar el draft o aceptar que esos candidatos no quedaron representados.'
 
 // ─── Context hash (forma EXACTA de la spec) ─────────────────────────────────────────
 
@@ -309,7 +324,9 @@ export const createGroundedQueryDraft = async (
           candidateCount: selected.length,
           authoringStatus: wasGrounded ? ('ok' as const) : ('disabled' as const),
           deduped: true,
-          fallbackNotice: wasGrounded ? null : GROUNDED_QUERY_FALLBACK_NOTICE
+          fallbackNotice: wasGrounded ? null : GROUNDED_QUERY_FALLBACK_NOTICE,
+          seedCoverage: null,
+          coverageNotice: null
         }
       }
 
@@ -331,6 +348,10 @@ export const createGroundedQueryDraft = async (
 
       const grounded = authoringStatus === 'ok'
 
+      // v2 (auditoría AEO B1): la etiqueta grounded no basta — se VERIFICA que cada seed dejó
+      // huella temática; una brecha se declara para el review, jamás se esconde.
+      const seedCoverage = grounded ? computeSeoSeedCoverage(draft.prompts, seoContext) : null
+
       return {
         ok: true as const,
         draft,
@@ -339,7 +360,10 @@ export const createGroundedQueryDraft = async (
         candidateCount: selected.length,
         authoringStatus,
         deduped: false,
-        fallbackNotice: grounded ? null : GROUNDED_QUERY_FALLBACK_NOTICE
+        fallbackNotice: grounded ? null : GROUNDED_QUERY_FALLBACK_NOTICE,
+        seedCoverage,
+        coverageNotice:
+          seedCoverage && seedCoverage.uncoveredCandidateIds.length > 0 ? GROUNDED_QUERY_COVERAGE_NOTICE : null
       }
     })
   } catch (error) {
