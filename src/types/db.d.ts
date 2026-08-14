@@ -7559,6 +7559,18 @@ export interface GreenhouseGrowthSeoKeywordSetMembers {
   created_by: string | null;
   effective_from: Generated<Timestamp>;
   effective_to: Timestamp | null;
+  /**
+   * TASK-1659 — por qué la keyword está en el set: target (compromiso declarado con el cliente) | opportunity (demanda detectada que se está empujando). NULL = nadie la declaró; NO significa oportunidad. Ortogonal a `source` (procedencia del write).
+   */
+  intent: string | null;
+  /**
+   * TASK-1659 — cuándo se declaró la intención de ESTA membresía. Como el cambio de intención cierra y reabre la ventana, el histórico de la keyword reconstruye desde cuándo es objetivo.
+   */
+  intent_declared_at: Timestamp | null;
+  /**
+   * TASK-1659 — actor que declaró la intención. Distinto de `created_by` (quién ejecutó el INSERT): difieren cuando un agente mete la keyword por encargo de una persona.
+   */
+  intent_declared_by: string | null;
   keyword: string;
   keyword_set_id: string;
   keyword_set_member_id: Generated<string>;
