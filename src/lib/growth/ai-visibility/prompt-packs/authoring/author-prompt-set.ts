@@ -24,6 +24,8 @@ import { isPromptFamily, isPromptFanOutType, isPromptIntentStage } from '../tag-
 import { type PromptSetPrompt } from '../prompt-set-store'
 import {
   AUTHOR_PROMPT_SET_JSON_SCHEMA,
+  AUTHOR_SEO_GROUNDED_SYSTEM_PROMPT,
+  AUTHOR_SEO_GROUNDED_SYSTEM_PROMPT_VERSION,
   AUTHOR_SYSTEM_PROMPT,
   AUTHOR_SYSTEM_PROMPT_VERSION,
   buildAuthorPromptSetPrompt,
@@ -112,23 +114,38 @@ const resolveGroundingSources = (input: AuthorPromptSetInput): string[] =>
     input.fineCategory ? 'brand_intelligence:fine_category' : null,
     `category:${input.categoryLabel}`,
     `business_model:${input.businessModel}`,
-    input.competitors.length > 0 ? 'competitors' : null
+    input.competitors.length > 0 ? 'competitors' : null,
+    // TASK-1666 — provenance SEO como refs OPACAS (jamás la keyword cruda): las fuentes AEO
+    // existentes se conservan y estas se AGREGAN, nunca las sustituyen.
+    ...(input.seoContext
+      ? [
+          `seo.discovery.run:${input.seoContext.runId}`,
+          ...input.seoContext.candidates.map(candidate => `seo.discovery.candidate:${candidate.candidateId}`),
+          input.seoContext.contextRef
+        ]
+      : [])
   ].filter((source): source is string => source !== null)
+
+/** TASK-1666 — el cerebro y la versión dependen de si hay contexto SEO (dos artefactos versionados). */
+const resolveSystemPrompt = (input: AuthorPromptSetInput): { system: string; version: string } =>
+  input.seoContext && input.seoContext.candidates.length > 0
+    ? { system: AUTHOR_SEO_GROUNDED_SYSTEM_PROMPT, version: AUTHOR_SEO_GROUNDED_SYSTEM_PROMPT_VERSION }
+    : { system: AUTHOR_SYSTEM_PROMPT, version: AUTHOR_SYSTEM_PROMPT_VERSION }
 
 interface AuthorProvider {
   id: 'gemini' | 'openai' | 'anthropic'
   isConfigured: () => Promise<boolean>
-  generate: (input: AuthorPromptSetInput) => Promise<{ data: AuthorPromptSetRawOutput; model: string }>
+  generate: (input: AuthorPromptSetInput, system: string) => Promise<{ data: AuthorPromptSetRawOutput; model: string }>
 }
 
 const PROVIDERS: AuthorProvider[] = [
   {
     id: 'gemini',
     isConfigured: async () => isGeminiConfigured(),
-    generate: async input => {
+    generate: async (input, system) => {
       const r = await generateStructuredGemini<AuthorPromptSetRawOutput>({
         model: process.env.GROWTH_AI_VISIBILITY_PROMPT_AUTHORING_MODEL_GEMINI?.trim() || undefined,
-        system: AUTHOR_SYSTEM_PROMPT,
+        system,
         prompt: buildAuthorPromptSetPrompt(input),
         jsonSchema: AUTHOR_PROMPT_SET_JSON_SCHEMA as unknown as Record<string, unknown>,
         maxOutputTokens: input.maxTokens,
@@ -141,10 +158,10 @@ const PROVIDERS: AuthorProvider[] = [
   {
     id: 'openai',
     isConfigured: () => isOpenAIConfigured(),
-    generate: async input => {
+    generate: async (input, system) => {
       const r = await generateStructuredOpenAI<AuthorPromptSetRawOutput>({
         model: process.env.GROWTH_AI_VISIBILITY_PROMPT_AUTHORING_MODEL_OPENAI?.trim() || undefined,
-        system: AUTHOR_SYSTEM_PROMPT,
+        system,
         prompt: buildAuthorPromptSetPrompt(input),
         schemaName: AUTHOR_TOOL_NAME,
         jsonSchema: AUTHOR_PROMPT_SET_JSON_SCHEMA as unknown as Record<string, unknown>,
@@ -158,10 +175,10 @@ const PROVIDERS: AuthorProvider[] = [
   {
     id: 'anthropic',
     isConfigured: () => isAnthropicConfigured(),
-    generate: async input => {
+    generate: async (input, system) => {
       const r = await generateStructuredAnthropic<AuthorPromptSetRawOutput>({
         model: process.env.GROWTH_AI_VISIBILITY_PROMPT_AUTHORING_MODEL_ANTHROPIC?.trim() || 'claude-haiku-4-5-20251001',
-        system: AUTHOR_SYSTEM_PROMPT,
+        system,
         prompt: buildAuthorPromptSetPrompt(input),
         toolName: AUTHOR_TOOL_NAME,
         toolDescription: 'Propone el Query Fan-Out de buyer-intent de una marca para medición AEO.',
@@ -180,13 +197,14 @@ const result = (
   status: AuthorPromptSetStatus,
   providerId: string | null,
   model: string | null,
+  systemPromptVersion: string,
   groundingSources: string[]
 ): AuthorPromptSetResult => ({
   prompts,
   status,
   providerId,
   model,
-  systemPromptVersion: AUTHOR_SYSTEM_PROMPT_VERSION,
+  systemPromptVersion,
   groundingSources
 })
 
@@ -199,9 +217,10 @@ export const authorPromptSet = async (
   options?: { provider?: AuthorProvider['id']; telemetry?: Record<string, string | null> }
 ): Promise<AuthorPromptSetResult> => {
   const grounding = resolveGroundingSources(input)
+  const { system, version } = resolveSystemPrompt(input)
 
   if (!isPromptAuthoringEnabled()) {
-    return result(null, 'disabled', null, null, grounding)
+    return result(null, 'disabled', null, null, version, grounding)
   }
 
   const ordered = options?.provider
@@ -220,25 +239,25 @@ export const authorPromptSet = async (
   }
 
   if (!provider) {
-    return result(null, 'not_configured', options?.provider ?? null, null, grounding)
+    return result(null, 'not_configured', options?.provider ?? null, null, version, grounding)
   }
 
   try {
-    const { data, model } = await provider.generate(input)
+    const { data, model } = await provider.generate(input, system)
     const prompts = sanitizeAuthoredPrompts(data)
 
     if (!prompts) {
-      return result(null, 'schema_invalid', provider.id, model, grounding)
+      return result(null, 'schema_invalid', provider.id, model, version, grounding)
     }
 
-    return result(prompts, 'ok', provider.id, model, grounding)
+    return result(prompts, 'ok', provider.id, model, version, grounding)
   } catch (error) {
     captureWithDomain(error, 'growth', {
       tags: { source: 'growth_ai_visibility_prompt_authoring', provider: provider.id },
       extra: { ...options?.telemetry }
     })
 
-    return result(null, 'provider_error', provider.id, null, grounding)
+    return result(null, 'provider_error', provider.id, null, version, grounding)
   }
 }
 
