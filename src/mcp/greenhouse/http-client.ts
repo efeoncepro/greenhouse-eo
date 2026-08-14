@@ -322,6 +322,7 @@ export class GreenhouseApiPlatformClient {
     intent?: string
     minSearchVolume?: number
     maxDifficulty?: number
+    excludeTracked?: boolean
     limit?: number
     cursor?: string
   }) {
@@ -335,6 +336,7 @@ export class GreenhouseApiPlatformClient {
       intent: input.intent,
       minSearchVolume: input.minSearchVolume,
       maxDifficulty: input.maxDifficulty,
+      excludeTracked: input.excludeTracked ? 'true' : undefined,
       limit: input.limit,
       cursor: input.cursor
     })

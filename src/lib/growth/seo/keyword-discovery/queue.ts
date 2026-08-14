@@ -388,8 +388,14 @@ const normalizeMethods = (
 // ─── Idempotencia ───────────────────────────────────────────────────────────────────
 
 /**
- * Intent canónico: org + target + seeds normalizadas + mercado + methods + actor. El mismo
- * intent devuelve la corrida existente sin otra llamada al proveedor.
+ * Intent canónico: org + target + seeds normalizadas + mercado + methods + actor + ciclo
+ * mensual. El mismo intent DENTRO del ciclo devuelve la corrida existente sin otra llamada al
+ * proveedor.
+ *
+ * Auditoría SEO 2026-08-14: el componente `cycle` (YYYY-MM) alinea la dedupe con el ciclo de
+ * refresh del proveedor (las métricas Labs son mensuales, ciclo Google Ads). Sin él, repetir
+ * el mismo intent en un mes NUEVO devolvía para siempre la corrida vieja — congelaba el
+ * descubrimiento en el primer snapshot y jamás traía keywords emergentes.
  */
 const deriveIdempotencyKey = (input: {
   organizationId: string
@@ -408,7 +414,8 @@ const deriveIdempotencyKey = (input: {
     source: input.sourceKind,
     seeds: [...input.seeds.map(seed => seed.normalizedKeyword)].sort(),
     methods: [...input.methods].sort((a, b) => a.method.localeCompare(b.method)),
-    actor: input.actor
+    actor: input.actor,
+    cycle: new Date().toISOString().slice(0, 7)
   })
 
   return `auto-${createHash('sha256').update(canonical).digest('hex').slice(0, 40)}`

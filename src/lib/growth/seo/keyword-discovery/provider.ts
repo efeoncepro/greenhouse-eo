@@ -174,7 +174,13 @@ export const callKeywordSuggestions = (
     context
   )
 
-/** Una llamada POR seed. Términos del bloque "searches related to" con `depth=1`. */
+/**
+ * Una llamada POR seed. Términos del bloque "searches related to".
+ *
+ * `depth=2` (auditoría SEO 2026-08-14): depth 1 devuelve ~8 términos del primer anillo del
+ * grafo — demasiado poco para descubrir. depth 2 expande el segundo anillo (~72 máx) al MISMO
+ * costo por task; el `limit` sigue acotando cuánto se trae.
+ */
 export const callRelatedKeywords = (
   input: { seed: string; limit: number },
   context: DiscoveryCallContext
@@ -185,7 +191,7 @@ export const callRelatedKeywords = (
       keyword: input.seed,
       location_code: Number(context.locationCode),
       language_code: context.languageCode,
-      depth: 1,
+      depth: 2,
       include_serp_info: false,
       include_clickstream_data: false,
       limit: input.limit
@@ -213,7 +219,11 @@ export const callKeywordIdeas = (
     context
   )
 
-/** UNA llamada opcional por corrida. El target viene del dominio canónico, sin scheme. */
+/**
+ * UNA llamada opcional por corrida. El target viene del dominio canónico, sin scheme.
+ * `order_by: relevance,desc` verificado contra sandbox.dataforseo.com (2026-08-14): el campo
+ * es válido para este endpoint (un campo inventado devuelve 40501 "Invalid Field: order_by").
+ */
 export const callKeywordsForSite = (
   input: { targetDomain: string; limit: number },
   context: DiscoveryCallContext

@@ -69,6 +69,10 @@ export interface SeoDiscoveryCandidateView {
   difficulty: number | null
   /** ⚠️ Competencia PAGA (Google Ads) 0–1. NUNCA renombrarla a dificultad. */
   competition: number | null
+  /** Nivel de competencia paga del proveedor (low/medium/high) — misma advertencia. */
+  competitionLevel: 'low' | 'medium' | 'high' | null
+  /** CPC estimado (USD) — señal comercial de la lente ◑, ya pagada en la misma respuesta. */
+  cpcUsd: number | null
   intent: SeoSearchIntent | null
   coreKeyword: string | null
   linkBarrier: SeoLinkBarrierLevel | null
@@ -96,6 +100,8 @@ export interface ReadKeywordDiscoveryInput {
    * un ID ajeno simplemente no aparece — el caller decide si la ausencia es error.
    */
   candidateIds?: readonly string[]
+  /** Excluye candidatos ya seguidos por el target (para revisar sólo lo accionable). */
+  excludeTracked?: boolean
   limit?: number
   cursor?: string | null
 }
@@ -126,6 +132,9 @@ const RUNS_LIST_LIMIT = 20
 
 export const TRACKING_COST_DISCLOSURE =
   'Seguir una keyword compromete gasto recurrente: el rank capture diario le paga al proveedor por cada keyword vigente hasta dejar de seguirla.'
+
+/** Orden de la barrera de enlaces para el desempate: low < medium < high < unknown (Sin dato al final). */
+const LINK_BARRIER_SORT: Record<SeoLinkBarrierLevel, number> = { low: 0, medium: 1, high: 2, unknown: 3 }
 
 // ─── Row shapes ─────────────────────────────────────────────────────────────────────
 
@@ -348,6 +357,8 @@ export const readKeywordDiscovery = async (
       searchVolume: datum?.searchVolume ?? null,
       difficulty: datum?.keywordDifficulty ?? null,
       competition: datum?.competition ?? null,
+      competitionLevel: datum?.competitionLevel ?? null,
+      cpcUsd: datum?.cpcUsd ?? null,
       intent: datum?.searchIntent ?? null,
       coreKeyword: datum?.coreKeyword ?? null,
       linkBarrier: market.linkBarrierByKeyword.get(row.normalized_keyword) ?? null,
@@ -376,7 +387,11 @@ export const readKeywordDiscovery = async (
     )
   }
 
-  // Orden por defecto de la spec (7 llaves, desempate estable). No inventa un score único.
+  if (input.excludeTracked) {
+    candidates = candidates.filter(candidate => !candidate.alreadyTracked)
+  }
+
+  // Orden por defecto de la spec (8 llaves, desempate estable). No inventa un score único.
   candidates.sort((a, b) => {
     const pendingA = a.latestAction === null ? 0 : 1
     const pendingB = b.latestAction === null ? 0 : 1
@@ -388,6 +403,13 @@ export const readKeywordDiscovery = async (
 
     if (seedA !== seedB) return seedA - seedB
 
+    // Auditoría SEO 2026-08-14: oportunidad MEDIDA primero — el Space YA recibe impresiones
+    // por la keyword (●) y todavía no la sigue: es la decisión de mayor valor del inbox.
+    const measuredA = a.measuredGsc !== null && !a.alreadyTracked ? 0 : 1
+    const measuredB = b.measuredGsc !== null && !b.alreadyTracked ? 0 : 1
+
+    if (measuredA !== measuredB) return measuredA - measuredB
+
     const coreA = a.coreKeyword !== null ? 0 : 1
     const coreB = b.coreKeyword !== null ? 0 : 1
 
@@ -398,10 +420,13 @@ export const readKeywordDiscovery = async (
 
     if (volumeA !== volumeB) return volumeB - volumeA
 
-    const difficultyA = a.difficulty ?? Number.POSITIVE_INFINITY
-    const difficultyB = b.difficulty ?? Number.POSITIVE_INFINITY
+    // Auditoría SEO 2026-08-14: el desempate de dificultad usa la BARRERA DE ENLACES canónica
+    // (deriveLinkBarrier), no keyword_difficulty — KD colapsa a 0 en SERPs es-LATAM. `null`
+    // ("Sin dato") ordena al final, jamás como "baja".
+    const barrierA = LINK_BARRIER_SORT[a.linkBarrier ?? 'unknown']
+    const barrierB = LINK_BARRIER_SORT[b.linkBarrier ?? 'unknown']
 
-    if (difficultyA !== difficultyB) return difficultyA - difficultyB
+    if (barrierA !== barrierB) return barrierA - barrierB
 
     if (a.capturedAt !== b.capturedAt) return a.capturedAt < b.capturedAt ? 1 : -1
 

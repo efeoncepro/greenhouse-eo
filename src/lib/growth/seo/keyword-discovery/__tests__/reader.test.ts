@@ -248,6 +248,93 @@ describe('readKeywordDiscovery — orden y filtros', () => {
     expect(order).toEqual(['seokdc-b', 'seokdc-c', 'seokdc-d', 'seokdc-a'])
   })
 
+  it('auditoría SEO: oportunidad MEDIDA (GSC sin seguir) ordena antes que volumen estimado', async () => {
+    state.runs = [runRow()]
+    state.candidates = [
+      candidateRow({ candidate_id: 'seokdc-est', keyword: 'estimada grande', normalized_keyword: 'estimada grande' }),
+      candidateRow({ candidate_id: 'seokdc-med', keyword: 'medida chica', normalized_keyword: 'medida chica' }),
+      candidateRow({ candidate_id: 'seokdc-trk', keyword: 'medida seguida', normalized_keyword: 'medida seguida' })
+    ]
+    state.gscRows = [
+      { query: 'medida chica', impressions: '40', weighted_position: '18.0' },
+      { query: 'medida seguida', impressions: '900', weighted_position: '4.0' }
+    ]
+    state.tracked = [{ keyword: 'medida seguida' }]
+    marketMock.mockResolvedValue({
+      market: 'available',
+      byKeyword: new Map([['estimada grande', datum('estimada grande', { searchVolume: 9000, coreKeyword: null })]]),
+      linkBarrierByKeyword: new Map(),
+      freshness: { freshKeywords: 1, latestCaptureDate: '2026-08-13' }
+    })
+
+    const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) return
+
+    // La keyword que el Space YA recibe (●) y no sigue es la decisión de mayor valor, aunque
+    // su volumen estimado sea menor; la ya seguida no salta la fila.
+    expect(result.candidates.map(candidate => candidate.candidateId)[0]).toBe('seokdc-med')
+  })
+
+  it('auditoría SEO: a igual volumen desempata la barrera de enlaces (low < high < Sin dato), no KD', async () => {
+    state.runs = [runRow()]
+    state.candidates = [
+      candidateRow({ candidate_id: 'seokdc-x', keyword: 'kw x', normalized_keyword: 'kw x' }),
+      candidateRow({ candidate_id: 'seokdc-y', keyword: 'kw y', normalized_keyword: 'kw y' }),
+      candidateRow({ candidate_id: 'seokdc-z', keyword: 'kw z', normalized_keyword: 'kw z' })
+    ]
+    marketMock.mockResolvedValue({
+      market: 'available',
+      byKeyword: new Map([
+        // KD invertido a propósito: si el desempate usara difficulty, 'x' (KD 5) iría primero.
+        ['kw x', datum('kw x', { searchVolume: 1000, keywordDifficulty: 5, coreKeyword: null })],
+        ['kw y', datum('kw y', { searchVolume: 1000, keywordDifficulty: 80, coreKeyword: null })],
+        ['kw z', datum('kw z', { searchVolume: 1000, keywordDifficulty: 1, coreKeyword: null })]
+      ]),
+      linkBarrierByKeyword: new Map([
+        ['kw x', 'high'],
+        ['kw y', 'low']
+        // 'kw z' sin barrera → "Sin dato" ordena al final, jamás como "baja".
+      ]),
+      freshness: { freshKeywords: 3, latestCaptureDate: '2026-08-13' }
+    })
+
+    const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) return
+
+    expect(result.candidates.map(candidate => candidate.candidateId)).toEqual(['seokdc-y', 'seokdc-x', 'seokdc-z'])
+  })
+
+  it('excludeTracked deja fuera lo ya seguido y el DTO expone cpcUsd/competitionLevel', async () => {
+    state.runs = [runRow()]
+    state.candidates = [
+      candidateRow({ candidate_id: 'seokdc-1', keyword: 'nueva', normalized_keyword: 'nueva' }),
+      candidateRow({ candidate_id: 'seokdc-2', keyword: 'ya seguida', normalized_keyword: 'ya seguida' })
+    ]
+    state.tracked = [{ keyword: 'ya seguida' }]
+    marketMock.mockResolvedValue({
+      market: 'available',
+      byKeyword: new Map([['nueva', datum('nueva', { cpcUsd: 1.35, competitionLevel: 'high' })]]),
+      linkBarrierByKeyword: new Map(),
+      freshness: { freshKeywords: 1, latestCaptureDate: '2026-08-13' }
+    })
+
+    const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1', excludeTracked: true })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) return
+
+    expect(result.candidates.map(candidate => candidate.candidateId)).toEqual(['seokdc-1'])
+    expect(result.candidates[0].cpcUsd).toBe(1.35)
+    expect(result.candidates[0].competitionLevel).toBe('high')
+  })
+
   it('minSearchVolume exige dato presente: null queda excluido por el filtro explícito', async () => {
     state.runs = [runRow()]
     state.candidates = [

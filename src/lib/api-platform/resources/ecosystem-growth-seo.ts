@@ -889,6 +889,7 @@ export const getEcosystemSeoKeywordDiscoveryPayload = async ({
     intent: (url.searchParams.get('intent')?.trim() || undefined) as SeoSearchIntent | undefined,
     minSearchVolume: parseNumber(url.searchParams.get('minSearchVolume')),
     maxDifficulty: parseNumber(url.searchParams.get('maxDifficulty')),
+    excludeTracked: url.searchParams.get('excludeTracked') === 'true',
     limit: parseNumber(url.searchParams.get('limit')),
     cursor: url.searchParams.get('cursor')
   })

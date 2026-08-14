@@ -253,6 +253,40 @@ describe('queueKeywordDiscovery — enqueue transaccional', () => {
     expect(client).toBeDefined()
   })
 
+  it('auditoría SEO: la key auto derivada cambia con el ciclo mensual (mismo intent, otro mes)', async () => {
+    const autoKeyOf = () => {
+      const insert = state.calls.find(
+        call => call.sql.includes('INSERT INTO greenhouse_growth.seo_keyword_discovery_runs')
+      )
+
+      return insert?.params.find(param => typeof param === 'string' && param.startsWith('auto-'))
+    }
+
+    vi.useFakeTimers()
+
+    try {
+      vi.setSystemTime(new Date('2026-08-14T12:00:00Z'))
+      await queueKeywordDiscovery(baseInput)
+
+      const augustKey = autoKeyOf()
+
+      state.calls = []
+      vi.setSystemTime(new Date('2026-09-02T12:00:00Z'))
+      await queueKeywordDiscovery(baseInput)
+
+      const septemberKey = autoKeyOf()
+
+      // Mismo intent: dentro del mes dedupea; un mes nuevo permite una corrida fresca (las
+      // métricas Labs refrescan mensualmente — congelar el intent para siempre mataba el
+      // descubrimiento de keywords emergentes).
+      expect(augustKey).toBeDefined()
+      expect(septemberKey).toBeDefined()
+      expect(augustKey).not.toBe(septemberKey)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it('el mismo intent devuelve la corrida existente sin insertar ni emitir outbox', async () => {
     state.insertRunReturns = false
     state.existingRun = { run_id: 'seokdr-existing', estimated_cost_usd: '0.03' }

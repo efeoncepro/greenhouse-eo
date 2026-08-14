@@ -208,17 +208,31 @@ const executeClaimedRun = async (run: ClaimedRun): Promise<RunKeywordDiscoveryRe
   let fenceTripped = false
   let breakerOpen = false
 
+  // Auditoría SEO 2026-08-14 (patrón TASK-1303/1661): el fence re-verifica contra el costo REAL
+  // del remanente planificado, no contra "una llamada más". Subllamadas del plan: una por seed
+  // en suggestions/related, una total en ideas/site, más el peor caso del top-up de overview.
+  const plannedSubcallsTotal =
+    methods.reduce(
+      (total, spec) =>
+        total + (spec.method === 'keyword_suggestions' || spec.method === 'related_keywords' ? seeds.length : 1),
+      0
+    ) + Math.ceil(MAX_DISCOVERY_ENRICHMENT_KEYWORDS / MAX_DISCOVERY_OVERVIEW_KEYWORDS_PER_CALL)
+
+  // Peor caso por subllamada (task + 100 filas) — el mismo shape que usa el estimador canónico.
+  const worstCasePerCallUsd = estimateDiscoveryCost({
+    seedCount: 1,
+    methods: [{ method: 'keyword_ideas', resultsPerCall: 100 }],
+    enrichmentKeywords: 0
+  }).estimatedCostUsd
+
   const checkFence = async (): Promise<boolean> => {
     if (fenceTripped) return false
 
     if (chargedCalls > 0 && chargedCalls % SPEND_FENCE_RECHECK_EVERY === 0) {
+      const remainingSubcalls = Math.max(1, plannedSubcallsTotal - providerCalls)
+
       const fence = await enforceSeoRunEntitlement(run.organization_id, {
-        // Conservador: lo que falta se estima como el costo de una llamada máxima.
-        estimatedCostUsd: estimateDiscoveryCost({
-          seedCount: 1,
-          methods: [{ method: 'keyword_ideas', resultsPerCall: 100 }],
-          enrichmentKeywords: 0
-        }).estimatedCostUsd,
+        estimatedCostUsd: remainingSubcalls * worstCasePerCallUsd,
         consumesAuditAllowance: false
       })
 

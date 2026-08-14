@@ -740,6 +740,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     intent?: string
     minSearchVolume?: number
     maxDifficulty?: number
+    excludeTracked?: boolean
     limit?: number
     cursor?: string
   }) {
@@ -883,6 +884,8 @@ export const createGreenhouseMcpHandlers = (client: Pick<
           candidateCount?: number
           deduped?: boolean
           fallbackNotice?: string | null
+          coverageNotice?: string | null
+          seedCoverage?: { uncoveredCandidateIds?: string[] } | null
         }
 
         if (data.ok === false) {
@@ -893,6 +896,12 @@ export const createGreenhouseMcpHandlers = (client: Pick<
           data.candidateCount ?? 0
         )} candidate(s), mode=${String(data.groundingMode ?? '?')}${data.deduped ? ' (deduped: same context already had a draft, nothing new was authored)' : ''}.${
           data.fallbackNotice ? ` WARNING: ${String(data.fallbackNotice)}` : ''
+        }${
+          data.coverageNotice
+            ? ` COVERAGE WARNING: ${String(data.coverageNotice)} Uncovered: ${String(
+                (data.seedCoverage?.uncoveredCandidateIds ?? []).join(', ')
+              )}.`
+            : ''
         } It is a DRAFT pending human review; approval uses the existing AEO command and this tool never activates anything (${result.requestId}).`
       },
       () => client.prepareSeoGroundedQueries(input)
