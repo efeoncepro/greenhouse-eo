@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -477,7 +477,43 @@ una prueba de paridad que demuestre que app, Nexa, ecosystem y MCP convergen en 
      ZONE 2 — PLAN MODE
      ═══════════════════════════════════════════════════════════ -->
 
-<!-- El agente que tome la task debe llenar esta zona con Discovery y plan aprobado. -->
+## Discovery 2026-08-14 (Claude)
+
+Verificado contra el repo real + PG (proxy vivo, `pgmigrations` al día):
+
+- **Supuestos correctos:** transporte `postDataForSeoTask` (POST-only, breaker por familia, costo del
+  batch en `json.cost`, throw sin spend recorder — `dataforseo.ts:179`); `enforceSeoRunEntitlement`
+  con `consumesAuditAllowance:false` + fence cada 10 llamadas (patrón `keyword-market-data.ts`);
+  store 1661 multi-productor con CHECK que YA acepta los 4 endpoints de discovery + `keyword_overview`
+  (`source_endpoint`, migración 1661); IDs TEXT prefijados; scheduler declarativo `upsert_scheduler_job`
+  con 5.º arg de pausa (`deploy.sh:919`); claim `FOR UPDATE SKIP LOCKED` calcado de
+  `collectSiteAuditRuns`; `publishOutboxEvent(event, client)` transaccional; `resolveSeoTargetForMarket`
+  (ISSUE-153) para mercado explícito; `normalizeMarketKeyword` (NFKC) es la normalización canónica.
+- **Supuestos desactualizados (delta menor, no bloquean):**
+  1. La señal `seo.provider.cost_over_budget` citada por la spec **no existe en código** (las señales
+     reales son `seo.rank.capture_lag`, `seo.audit.stuck_tasks`, `seo.market_data.freshness`). No se
+     crea acá; el freno de presupuesto es el chokepoint + fence.
+  2. La tabla de campos de `candidates` lista `core_keyword`, pero la nota 🔴 posterior (2026-08-13)
+     lo excluye como métrica de mercado. Manda la nota: `core_keyword` vive SOLO en el store 1661.
+  3. El índice único de candidates cita `location_code/language_code`, que son constantes del run:
+     se implementa `(run_id, source_endpoint, normalized_keyword)` — misma semántica, sin duplicar
+     columnas de mercado en candidates.
+  4. No existe test cross-lane `*parity*` en el dominio; la paridad hoy se prueba por passthrough en
+     3 archivos (route-contract + resource + MCP handler). Se crea el archivo de paridad que la spec
+     pide, con ese mismo enfoque (todos los lanes → el MISMO primitive mockeado).
+  5. Nexa hoy NO tiene ninguna tool SEO (ninguno de los 9 readers de 1645+ la tiene); la paridad Nexa
+     se satisface a nivel capability (mismo primitive, cero camino paralelo), consistente con todo el
+     dominio. No se agrega tool Nexa en esta task.
+  6. Admin lane SEO existente es POST-only (reads = server pages → reader). La spec pide GET además:
+     se implementa GET en la route admin (útil para paridad y para TASK-1665).
+- **Reutilizable:** `parseKeywordOverviewItem` + `SeoKeywordMarketDatum` + `estimateMarketDataCost` +
+  constantes de costo Labs (`keyword-market-data.ts`); el INSERT de mercado se **extrae a un writer
+  compartido exportado** (`persistKeywordMarketData`) para que 1664 sea segundo productor sin segundo
+  almacén; `loadFreshKeywords` se exporta como pre-check de frescura del top-up.
+- **Decisión GSC-only:** `methods: []` es corrida válida (0 llamadas provider, costo 0) — materializa
+  la resolución de seeds y valida el pipeline queue→claim→close sin gastar (Slice 5 paso 1).
+
+<!-- Plan detallado impreso en sesión 2026-08-14; slices = ZONE 3. Checkpoint P1 pendiente de OK. -->
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
