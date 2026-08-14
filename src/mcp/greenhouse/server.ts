@@ -506,6 +506,44 @@ export const createGreenhouseMcpServer = (
     async args => handlers.discoverSeoKeywords({ ...args, methods: args.methods ?? [] })
   )
 
+  // TASK-1666 — lectura del draft grounded (prompts AEO con provenance SEO).
+  server.registerTool(
+    'get_seo_grounded_query_draft',
+    {
+      title: 'Get SEO Grounded Query Draft',
+      description:
+        'Read an AEO grounded-query DRAFT created from SEO keyword-discovery candidates, with its provenance (opaque seo.discovery.* source refs and per-prompt groundingRef). groundingMode tells the truth: grounded_llm means the questions were authored WITH the SEO context; baseline_fallback means a generic archetype baseline was used and the questions are NOT candidate-specific — always surface the fallbackNotice when present. A draft is NEVER active: approval happens only through the existing AEO review flow. When data.ok is false, report the errorCode honestly.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        market: z.string().trim().min(2).max(12).optional(),
+        profileId: z.string().trim().min(1),
+        setId: z.string().trim().min(1)
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getSeoGroundedQueryDraft(args)
+  )
+
+  // TASK-1666 — el write del puente SEO → AEO: crea un DRAFT, jamás activa ni ejecuta.
+  server.registerTool(
+    'prepare_seo_grounded_queries',
+    {
+      title: 'Prepare SEO Grounded Queries',
+      description:
+        'Create an AEO grounded-query DRAFT from up to 20 selected keyword-discovery candidates. THIS WRITES a draft prompt set (it never approves, never activates, never runs the grader — a keyword is research context, not a measured prompt). Propose the exact candidate selection to the human and get confirmation BEFORE calling. Idempotent per context: repeating the same selection returns the existing draft without a second authoring call. The response says groundingMode honestly (grounded_llm vs baseline_fallback + mandatory warning). NOTE: with the shared machine identity this command is FAIL-CLOSED (aeo_forbidden) until per-user client grants exist (TASK-1631) — report that state honestly instead of retrying.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        market: z.string().trim().min(2).max(12).optional(),
+        profileId: z.string().trim().min(1),
+        seoTargetId: z.string().trim().min(1),
+        discoveryRunId: z.string().trim().min(1),
+        candidateIds: z.array(z.string().trim().min(1)).min(1).max(20)
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.prepareSeoGroundedQueries(args)
+  )
+
   // Resource addressable: el mismo documento read-only por URI estable.
   server.registerResource(
     'knowledge_document',

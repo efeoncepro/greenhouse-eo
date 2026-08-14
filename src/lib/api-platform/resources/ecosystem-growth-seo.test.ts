@@ -72,7 +72,9 @@ vi.mock('@/lib/postgres/client', () => ({
   // `@/lib/db`. Sin este export el mock rompe la carga del módulo entero.
   withGreenhousePostgresTransaction: async () => {
     throw new Error('la transacción no debe alcanzarse en estos tests')
-  }
+  },
+  // TASK-1666 — el bridge arrastra `@/lib/db`, que registra un reset hook al cargarse.
+  onGreenhousePostgresReset: () => undefined
 }))
 
 // El command se mockea entero: acá se prueba el LANE (scope, resolución de org, validación),

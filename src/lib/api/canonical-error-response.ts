@@ -153,6 +153,7 @@ export type CanonicalErrorCode =
   | 'seo_provider_unavailable'
   | 'seo_discovery_invalid_input'
   | 'seo_discovery_run_not_found'
+  | 'seo_grounded_query_not_found'
   // Proposal Studio F0 (TASK-1392).
   | 'proposal_not_found'
   | 'proposal_invalid_input'
@@ -690,6 +691,12 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   seo_discovery_run_not_found: {
     status: 404,
     message: 'La corrida de discovery no existe para esta organización.',
+    actionable: false
+  },
+  // TASK-1666 — anti-oracle del puente grounded: perfil, candidato o draft ajeno "no existe".
+  seo_grounded_query_not_found: {
+    status: 404,
+    message: 'El recurso de grounded queries no existe para esta organización.',
     actionable: false
   },
   // Breaker abierto o falla del proveedor: transitorio de verdad, así que acá el reintento

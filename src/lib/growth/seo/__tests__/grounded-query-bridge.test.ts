@@ -247,7 +247,7 @@ describe('createGroundedQueryDraft — gates', () => {
 
     const missing = await createGroundedQueryDraft(baseInput)
 
-    state.profile = { ...state.profile, profileId: 'prof-1', organizationId: 'org-AJENA' } as never
+    state.profile = { profileId: 'prof-1', organizationId: 'org-AJENA' }
 
     const foreign = await createGroundedQueryDraft(baseInput)
 

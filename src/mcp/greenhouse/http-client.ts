@@ -374,6 +374,54 @@ export class GreenhouseApiPlatformClient {
     )
   }
 
+  /**
+   * TASK-1666 — lectura del draft grounded (prompts AEO con provenance SEO). Sólo bindings
+   * `internal` en el lane.
+   */
+  async getSeoGroundedQueryDraft(input: {
+    organizationId?: string
+    market?: string
+    profileId: string
+    setId: string
+  }) {
+    return this.request('/api/platform/ecosystem/growth/seo/grounded-queries', {
+      organizationId: input.organizationId,
+      market: input.market,
+      profileId: input.profileId,
+      setId: input.setId
+    })
+  }
+
+  /**
+   * TASK-1666 — preparar un DRAFT de grounded queries desde candidatos de discovery.
+   *
+   * POST porque persiste un draft AEO. ⚠️ Con la identidad máquina compartida el command
+   * responde `aeo_forbidden` fail-closed (capability humana requerida; TASK-1631 lo abre).
+   */
+  async prepareSeoGroundedQueries(input: {
+    organizationId?: string
+    market?: string
+    profileId: string
+    seoTargetId: string
+    discoveryRunId: string
+    candidateIds: string[]
+  }) {
+    return this.request(
+      '/api/platform/ecosystem/growth/seo/grounded-queries',
+      { market: input.market },
+      {
+        method: 'POST',
+        body: {
+          organizationId: input.organizationId,
+          profileId: input.profileId,
+          seoTargetId: input.seoTargetId,
+          discoveryRunId: input.discoveryRunId,
+          candidateIds: input.candidateIds
+        }
+      }
+    )
+  }
+
   // TASK-1211 — Cotizador (read-only). Resolver de servicios + simulación de precio
   // (estimado referencial NO vinculante). Lane ecosystem; scope por binding.
   async searchServices(input: { query?: string; limit?: number }) {

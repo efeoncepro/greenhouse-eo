@@ -23,6 +23,9 @@ import {
   type RecordKeywordDiscoveryActionResult
 } from '@/lib/growth/seo/keyword-discovery/queue'
 import { readKeywordDiscovery, type ReadKeywordDiscoveryResult } from '@/lib/growth/seo/keyword-discovery/reader'
+import { createGroundedQueryDraft, type GroundedQueryDraftResult } from '@/lib/growth/seo/grounded-query-bridge'
+import { readGroundedQueryDraft, type ReadGroundedQueryDraftResult } from '@/lib/growth/seo/grounded-query-reader'
+import { type TenantEntitlementSubject } from '@/lib/entitlements/types'
 import type { SeoSearchIntent } from '@/lib/growth/seo/keyword-market-data'
 import { resolveSeoTargetForMarket, type SeoMarketTarget } from '@/lib/growth/seo/resolve-target'
 import { readSeoPerformance } from '@/lib/growth/seo/performance/read-performance'
@@ -1070,6 +1073,139 @@ export const recordEcosystemSeoDiscoveryActionPayload = async ({
       errorCode: 'not_found'
     })
   }
+
+  return {
+    data: result,
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
+  }
+}
+
+/**
+ * ═══ TASK-1666 — grounded queries (puente SEO → AEO) en el lane ecosystem ═══
+ *
+ * Passthrough de `createGroundedQueryDraft` / `readGroundedQueryDraft` — los MISMOS primitives
+ * del app lane. Sólo bindings `internal` (V1 es operador interno; un binding cliente no prepara
+ * prompts AEO).
+ *
+ * 🔴 Estado de authz del write en el lane máquina: el bridge y el command AEO se auto-protegen
+ * con `can()` sobre un subject HUMANO (`growth.ai_visibility.prompt_set.manage`). El actor de
+ * este lane es la máquina (`mcp:<consumer>`, sin roles), así que el write responde
+ * `aeo_forbidden` FAIL-CLOSED hasta que exista un cliente con identidad/grants por usuario
+ * (TASK-1631) — el mismo estado operativo que las tools de escritura SEO con su scope sin
+ * cablear al cliente público. Se federa igual (parity + deny canary honesto), no se debilita
+ * ningún gate para "hacerla andar".
+ */
+
+const machineSubject = (context: ApiPlatformRequestContext): TenantEntitlementSubject => ({
+  userId: `mcp:${context.consumer.publicId}`,
+  tenantType: 'efeonce_internal',
+  roleCodes: [],
+  primaryRoleCode: '',
+  routeGroups: [],
+  authorizedViews: []
+})
+
+export interface EcosystemSeoGroundedQueriesBody {
+  organizationId?: unknown
+  profileId?: unknown
+  seoTargetId?: unknown
+  discoveryRunId?: unknown
+  candidateIds?: unknown
+}
+
+/** POST /api/platform/ecosystem/growth/seo/grounded-queries */
+export const prepareEcosystemSeoGroundedQueriesPayload = async ({
+  context,
+  request,
+  body
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+  body: EcosystemSeoGroundedQueriesBody | null
+}): Promise<ApiPlatformSuccessResult<GroundedQueryDraftResult | { ok: false; errorCode: 'disabled'; status: null }>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  if (context.binding.greenhouseScopeType !== 'internal') {
+    throw new ApiPlatformError('Preparing grounded queries is not allowed for the resolved binding scope.', {
+      statusCode: 403,
+      errorCode: 'scope_not_allowed'
+    })
+  }
+
+  const requestedOrganizationId = typeof body?.organizationId === 'string' ? body.organizationId : null
+  const subject = await resolveSeoLaneSubject(context, request, requestedOrganizationId)
+
+  const profileId = typeof body?.profileId === 'string' ? body.profileId.trim() : ''
+  const seoTargetId = typeof body?.seoTargetId === 'string' ? body.seoTargetId.trim() : ''
+  const discoveryRunId = typeof body?.discoveryRunId === 'string' ? body.discoveryRunId.trim() : ''
+
+  const candidateIds = Array.isArray(body?.candidateIds)
+    ? body.candidateIds.filter((item): item is string => typeof item === 'string')
+    : []
+
+  if (!profileId || !seoTargetId || !discoveryRunId || candidateIds.length === 0) {
+    throw new ApiPlatformError('profileId, seoTargetId, discoveryRunId and candidateIds are required.', {
+      statusCode: 400,
+      errorCode: 'bad_request'
+    })
+  }
+
+  const result = await createGroundedQueryDraft({
+    subject: machineSubject(context),
+    organizationId: subject.organizationId,
+    profileId,
+    seoTargetId,
+    discoveryRunId,
+    candidateIds,
+    createdBy: `mcp:${context.consumer.publicId}`
+  })
+
+  return {
+    data: result,
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
+  }
+}
+
+/** GET /api/platform/ecosystem/growth/seo/grounded-queries */
+export const getEcosystemSeoGroundedQueryDraftPayload = async ({
+  context,
+  request
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+}): Promise<ApiPlatformSuccessResult<ReadGroundedQueryDraftResult | { ok: false; errorCode: 'disabled'; status: null }>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  if (context.binding.greenhouseScopeType !== 'internal') {
+    throw new ApiPlatformError('Reading grounded query drafts is not allowed for the resolved binding scope.', {
+      statusCode: 403,
+      errorCode: 'scope_not_allowed'
+    })
+  }
+
+  const subject = await resolveSeoLaneSubject(context, request)
+
+  const url = new URL(request.url)
+  const profileId = url.searchParams.get('profileId')?.trim() ?? ''
+  const setId = url.searchParams.get('setId')?.trim() ?? ''
+
+  if (!profileId || !setId) {
+    throw new ApiPlatformError('profileId and setId are required.', {
+      statusCode: 400,
+      errorCode: 'bad_request'
+    })
+  }
+
+  const result = await readGroundedQueryDraft({
+    subject: machineSubject(context),
+    organizationId: subject.organizationId,
+    profileId,
+    setId
+  })
 
   return {
     data: result,

@@ -193,6 +193,8 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   | 'getSeoKeywordMarketData'
   | 'getSeoKeywordDiscovery'
   | 'discoverSeoKeywords'
+  | 'getSeoGroundedQueryDraft'
+  | 'prepareSeoGroundedQueries'
 >) => ({
   async getContext() {
     return callReadTool(
@@ -823,6 +825,77 @@ export const createGreenhouseMcpHandlers = (client: Pick<
         )} provider call(s). The run executes ASYNC in the ops worker; poll get_seo_keyword_discovery with this runId for candidates — do NOT claim results exist yet (${result.requestId}).`
       },
       () => client.discoverSeoKeywords(input)
+    )
+  },
+  /**
+   * TASK-1666 — lectura del draft grounded. El summary declara el modo con honestidad: un
+   * baseline fallback JAMÁS se reporta como grounded en los candidates.
+   */
+  async getSeoGroundedQueryDraft(input: { organizationId?: string; market?: string; profileId: string; setId: string }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          setId?: string
+          version?: number
+          status?: string
+          groundingMode?: string
+          prompts?: unknown[]
+          sourceRefs?: string[]
+          fallbackNotice?: string | null
+        }
+
+        if (data.ok === false) {
+          return `SEO grounded query draft unavailable (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        return `Grounded query draft ${String(data.setId ?? '?')} v${String(data.version ?? '?')} [${String(
+          data.status ?? '?'
+        )}]: ${String(data.prompts?.length ?? 0)} prompts, mode=${String(data.groundingMode ?? '?')}, ${String(
+          data.sourceRefs?.length ?? 0
+        )} SEO source ref(s).${
+          data.fallbackNotice ? ` WARNING: ${String(data.fallbackNotice)}` : ''
+        } Approval happens ONLY through the AEO review flow — never claim this draft is active (${result.requestId}).`
+      },
+      () => client.getSeoGroundedQueryDraft(input)
+    )
+  },
+  /**
+   * TASK-1666 — el write del puente. Reporta el draft creado y su modo; nunca lo describe como
+   * aprobado/activo ni como medición ya existente.
+   */
+  async prepareSeoGroundedQueries(input: {
+    organizationId?: string
+    market?: string
+    profileId: string
+    seoTargetId: string
+    discoveryRunId: string
+    candidateIds: string[]
+  }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          draft?: { setId?: string; version?: number }
+          groundingMode?: string
+          candidateCount?: number
+          deduped?: boolean
+          fallbackNotice?: string | null
+        }
+
+        if (data.ok === false) {
+          return `SEO grounded query preparation rejected (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        return `Grounded query DRAFT ${String(data.draft?.setId ?? '?')} v${String(data.draft?.version ?? '?')} created from ${String(
+          data.candidateCount ?? 0
+        )} candidate(s), mode=${String(data.groundingMode ?? '?')}${data.deduped ? ' (deduped: same context already had a draft, nothing new was authored)' : ''}.${
+          data.fallbackNotice ? ` WARNING: ${String(data.fallbackNotice)}` : ''
+        } It is a DRAFT pending human review; approval uses the existing AEO command and this tool never activates anything (${result.requestId}).`
+      },
+      () => client.prepareSeoGroundedQueries(input)
     )
   }
 })
