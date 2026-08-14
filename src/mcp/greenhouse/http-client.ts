@@ -308,6 +308,72 @@ export class GreenhouseApiPlatformClient {
     )
   }
 
+  /**
+   * TASK-1664 — lectura de corridas y candidatos de keyword discovery. Con `runId` incluye
+   * los candidatos compuestos (mercado ◑ + GSC ● + tracking + última acción).
+   */
+  async getSeoKeywordDiscovery(input: {
+    organizationId?: string
+    market?: string
+    runId?: string
+    status?: string
+    sourceEndpoint?: string
+    query?: string
+    intent?: string
+    minSearchVolume?: number
+    maxDifficulty?: number
+    limit?: number
+    cursor?: string
+  }) {
+    return this.request('/api/platform/ecosystem/growth/seo/keyword-discovery', {
+      organizationId: input.organizationId,
+      market: input.market,
+      runId: input.runId,
+      status: input.status,
+      sourceEndpoint: input.sourceEndpoint,
+      query: input.query,
+      intent: input.intent,
+      minSearchVolume: input.minSearchVolume,
+      maxDifficulty: input.maxDifficulty,
+      limit: input.limit,
+      cursor: input.cursor
+    })
+  }
+
+  /**
+   * TASK-1664 — encola (o previsualiza con `preview: true`) una corrida de discovery.
+   *
+   * POST porque GASTA: cada corrida paga a DataForSEO por request y por fila. El lane sólo
+   * lo acepta desde bindings de scope `internal`.
+   */
+  async discoverSeoKeywords(input: {
+    organizationId?: string
+    market?: string
+    seedSource: string
+    manualSeeds?: string[]
+    mixedMeasuredSource?: string
+    methods?: Array<string | { method: string; resultsPerCall?: number }>
+    idempotencyKey?: string
+    preview?: boolean
+  }) {
+    return this.request(
+      '/api/platform/ecosystem/growth/seo/keyword-discovery',
+      { market: input.market },
+      {
+        method: 'POST',
+        body: {
+          organizationId: input.organizationId,
+          seedSource: input.seedSource,
+          manualSeeds: input.manualSeeds,
+          mixedMeasuredSource: input.mixedMeasuredSource,
+          methods: input.methods,
+          idempotencyKey: input.idempotencyKey,
+          preview: input.preview
+        }
+      }
+    )
+  }
+
   // TASK-1211 — Cotizador (read-only). Resolver de servicios + simulación de precio
   // (estimado referencial NO vinculante). Lane ecosystem; scope por binding.
   async searchServices(input: { query?: string; limit?: number }) {

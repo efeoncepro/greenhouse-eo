@@ -660,6 +660,15 @@ ENV_VARS="${ENV_VARS},GROWTH_SEO_ENABLED=${GROWTH_SEO_ENABLED}"
 # Alcance efectivo: orgs con assignment vigente Y keywords en el set — hoy sólo Berel (~USD 0.016/mes).
 GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED="${GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED=${GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED}"
+
+# TASK-1664 — keyword discovery (DataForSEO Labs Live: seed expansion + enrichment).
+# 🔴 Default OFF: prenderlo habilita corridas que GASTAN (cada request y cada fila cuestan).
+# Lo leen DOS runtimes (Vercel gatea enqueue/lanes; este worker gatea el drain) y el scheduler
+# `ops-seo-keyword-discovery-drain` nace PAUSADO: dos frenos independientes, patrón TASK-1661.
+# Prender exige: smoke staging (Slice 5 de la task) + sign-off del operador para gasto.
+# Rollback (<5 min): `false` acá + redeploy + pausar el scheduler; los facts append-only quedan.
+GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED="${GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED:-false}"
+ENV_VARS="${ENV_VARS},GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED=${GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED}"
 ENV_VARS="${ENV_VARS},OPENAI_API_KEY_SECRET_REF=${OPENAI_API_KEY_SECRET_REF}"
 ENV_VARS="${ENV_VARS},ANTHROPIC_API_KEY_SECRET_REF=${ANTHROPIC_API_KEY_SECRET_REF}"
 ENV_VARS="${ENV_VARS},PERPLEXITY_API_KEY_SECRET_REF=${PERPLEXITY_API_KEY_SECRET_REF}"
@@ -1209,6 +1218,23 @@ upsert_scheduler_job \
   '{}' \
   "false"
 echo "  -> ops-seo-keyword-market-data: 0 8 15 * * ACTIVO (captura mensual de mercado, TASK-1661 — despausado 2026-08-13 tras dry-run + corrida real verificada + autorización del operador)"
+
+# TASK-1664 — drain de corridas de keyword discovery (Labs Live, bajo demanda del operador).
+# Cada 10 minutos alcanza de sobra: el enqueue es humano/agente (no hay cadencia diaria en V1)
+# y una corrida pendiente se procesa en el siguiente tick.
+#
+# 🔴 NACE PAUSADO y además `GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED` nace en `false`: DOS frenos
+# independientes, porque el drain GASTA (patrón TASK-1661). Despausar sin prender el flag no
+# gasta (el runner devuelve `disabled`); prender el flag sin despausar tampoco dispara nada.
+# Antes de despausar: smoke staging de la task (GSC-only primero, luego 1 seed/limit 10) +
+# autorización del operador para gasto DataForSEO.
+upsert_scheduler_job \
+  "ops-seo-keyword-discovery-drain" \
+  "*/10 * * * *" \
+  "/seo/keyword-discovery/drain" \
+  '{}' \
+  "true"
+echo "  -> ops-seo-keyword-discovery-drain: */10 * * * * PAUSADO (keyword discovery, TASK-1664 — despausar sólo tras smoke staging + flag ON + autorización de gasto)"
 
 # Email deliverability monitor — TASK-775 Slice 2.
 #

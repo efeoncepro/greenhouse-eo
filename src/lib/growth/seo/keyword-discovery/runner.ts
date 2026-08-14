@@ -81,7 +81,9 @@ export interface DrainKeywordDiscoverySummary {
   outcomes: Array<{ runId: string; status: string }>
 }
 
-interface ClaimedRun {
+// `type` y no `interface`: el genérico de `runGreenhousePostgresQuery` exige
+// `Record<string, unknown>`, y una interface no lo satisface (sin index signature implícito).
+type ClaimedRun = {
   run_id: string
   organization_id: string
   seo_target_id: string

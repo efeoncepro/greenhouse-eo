@@ -44,7 +44,9 @@ describe('createGreenhouseMcpHandlers', () => {
       getSeoPerformanceCatalog: vi.fn(),
       trackSeoKeywords: vi.fn(),
       untrackSeoKeywords: vi.fn(),
-      getSeoKeywordMarketData: vi.fn()
+      getSeoKeywordMarketData: vi.fn(),
+      getSeoKeywordDiscovery: vi.fn(),
+      discoverSeoKeywords: vi.fn()
     })
 
     const result = await handlers.getContext()
@@ -134,7 +136,9 @@ describe('createGreenhouseMcpHandlers', () => {
       getSeoPerformanceCatalog: vi.fn(),
       trackSeoKeywords: vi.fn(),
       untrackSeoKeywords: vi.fn(),
-      getSeoKeywordMarketData: vi.fn()
+      getSeoKeywordMarketData: vi.fn(),
+      getSeoKeywordDiscovery: vi.fn(),
+      discoverSeoKeywords: vi.fn()
     })
 
     const forbiddenResult = await handlers.getOrganization({ id: 'org-1' })

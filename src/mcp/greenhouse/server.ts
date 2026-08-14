@@ -456,6 +456,56 @@ export const createGreenhouseMcpServer = (
     async args => handlers.untrackSeoKeywords(args)
   )
 
+  // TASK-1664 — keyword discovery: lectura de corridas/candidatos.
+  server.registerTool(
+    'get_seo_keyword_discovery',
+    {
+      title: 'Get SEO Keyword Discovery',
+      description:
+        'Read keyword-discovery runs and their candidates for an organization. Without runId it lists recent runs (with status: pending | running | succeeded | partial | no_results | failed | budget_blocked); with runId it returns the composed candidates. Candidate volumes/difficulty/intent are ESTIMATED market data from the provider (monthly refresh, ◑); measuredGsc carries the measured demand of the client itself (●) as a SEPARATE lens — never merge or average them, and never present competition (paid) as difficulty (organic). A candidate is a suggestion, NOT a tracked keyword: promoting one to tracking is a separate explicit command (track_seo_keywords) with its own recurring-spend disclosure. Accepts optional market (ISO-2 or location_code) for multi-market organizations. Filters: status, sourceEndpoint, query, intent, minSearchVolume, maxDifficulty, limit (max 200), cursor.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        market: z.string().trim().min(1).optional(),
+        runId: z.string().trim().min(1).optional(),
+        status: z.string().trim().min(1).optional(),
+        sourceEndpoint: z.string().trim().min(1).optional(),
+        query: z.string().trim().min(1).optional(),
+        intent: z.string().trim().min(1).optional(),
+        minSearchVolume: z.number().int().min(0).optional(),
+        maxDifficulty: z.number().int().min(0).max(100).optional(),
+        limit: z.number().int().min(1).max(200).optional(),
+        cursor: z.string().trim().min(1).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getSeoKeywordDiscovery(args)
+  )
+
+  // TASK-1664 — el write de discovery: encolar una corrida que GASTA presupuesto DataForSEO.
+  server.registerTool(
+    'discover_seo_keywords',
+    {
+      title: 'Discover SEO Keywords',
+      description:
+        'Queue a keyword-discovery run: expands up to 10 seeds via DataForSEO Labs (keyword_suggestions | related_keywords | keyword_ideas | keywords_for_site) and enriches candidates with market data. THIS WRITES AND SPENDS PROVIDER BUDGET (each Live call and each returned row is billed), so ALWAYS call it first with preview: true, show the human the estimated cost formula and get explicit confirmation BEFORE queueing — never queue speculatively. The run executes ASYNC in the ops worker: the 202 response only means it was durably queued; poll get_seo_keyword_discovery with the returned runId for candidates, and never claim results exist right after queueing. Idempotent: the same intent (org + target + seeds + market + methods + actor) returns the existing run without spending again. seedSource: manual (provide manualSeeds) | gsc_queries (top measured queries, no provider cost to resolve) | tracked_keywords | target_domain (keywords_for_site only) | mixed. Queueing NEVER auto-tracks: candidates enter the monitored set only through track_seo_keywords after human review. When data.ok is false, report the errorCode honestly.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        market: z.string().trim().min(1).optional(),
+        seedSource: z.enum(['manual', 'gsc_queries', 'tracked_keywords', 'target_domain', 'mixed']),
+        manualSeeds: z.array(z.string().trim().min(1)).max(10).optional(),
+        mixedMeasuredSource: z.enum(['gsc_queries', 'tracked_keywords']).optional(),
+        methods: z
+          .array(z.enum(['keyword_suggestions', 'related_keywords', 'keyword_ideas', 'keywords_for_site']))
+          .max(4)
+          .optional(),
+        idempotencyKey: z.string().trim().min(1).optional(),
+        preview: z.boolean().optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.discoverSeoKeywords({ ...args, methods: args.methods ?? [] })
+  )
+
   // Resource addressable: el mismo documento read-only por URI estable.
   server.registerResource(
     'knowledge_document',

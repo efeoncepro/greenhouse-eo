@@ -197,6 +197,10 @@ import { getGrowthAiVisibilityEntitlementSignals } from './queries/growth-ai-vis
 import { getGrowthAiVisibilityRegradeSignals } from './queries/growth-ai-visibility-regrade-signals'
 import { getGrowthSearchConsoleTokenHealthSignal } from './queries/growth-search-console-token-health'
 import { getSeoAuditStuckTasksSignal } from './queries/seo-audit-stuck-tasks'
+import {
+  getSeoKeywordDiscoveryProviderErrorsSignal,
+  getSeoKeywordDiscoveryStuckRunsSignal
+} from './queries/seo-keyword-discovery-health'
 import { getSeoMarketDataFreshnessSignal } from './queries/seo-market-data-freshness'
 import { getSeoRankCaptureLagSignal } from './queries/seo-rank-capture-lag'
 // TASK-1082 — Knowledge Platform ingestion signals (moduleKey 'knowledge').
@@ -676,6 +680,8 @@ interface ReliabilityOverviewSources {
   seoRankCaptureLag?: ReliabilitySignal | null
   seoMarketDataFreshness?: ReliabilitySignal | null
   seoAuditStuckTasks?: ReliabilitySignal | null
+  seoKeywordDiscoveryStuckRuns?: ReliabilitySignal | null
+  seoKeywordDiscoveryProviderErrors?: ReliabilitySignal | null
 
   /** TASK-1201 — Finance AI anomaly-materialization staleness (heartbeat del SoT de signals). */
   financeAiStaleMaterialization?: ReliabilitySignal | null
@@ -1117,6 +1123,8 @@ export const buildReliabilityOverview = (
     ...(sources.seoRankCaptureLag ? [sources.seoRankCaptureLag] : []),
     ...(sources.seoMarketDataFreshness ? [sources.seoMarketDataFreshness] : []),
     ...(sources.seoAuditStuckTasks ? [sources.seoAuditStuckTasks] : []),
+    ...(sources.seoKeywordDiscoveryStuckRuns ? [sources.seoKeywordDiscoveryStuckRuns] : []),
+    ...(sources.seoKeywordDiscoveryProviderErrors ? [sources.seoKeywordDiscoveryProviderErrors] : []),
     // TASK-812 — Previred/LRE artifact registry drift.
     ...(sources.payrollComplianceExportDrift ? [sources.payrollComplianceExportDrift] : []),
     // TASK-863 V1.5.2 — Final settlement PDF status drift (DB document_status vs
@@ -1641,6 +1649,17 @@ export const getReliabilityOverview = async (
     preloadedSources.seoAuditStuckTasks !== undefined
       ? preloadedSources.seoAuditStuckTasks
       : await getSeoAuditStuckTasksSignal().catch(() => null)
+
+  // TASK-1664 — keyword discovery: corridas atascadas + fallas de proveedor (24h).
+  const seoKeywordDiscoveryStuckRuns =
+    preloadedSources.seoKeywordDiscoveryStuckRuns !== undefined
+      ? preloadedSources.seoKeywordDiscoveryStuckRuns
+      : await getSeoKeywordDiscoveryStuckRunsSignal().catch(() => null)
+
+  const seoKeywordDiscoveryProviderErrors =
+    preloadedSources.seoKeywordDiscoveryProviderErrors !== undefined
+      ? preloadedSources.seoKeywordDiscoveryProviderErrors
+      : await getSeoKeywordDiscoveryProviderErrorsSignal().catch(() => null)
 
   // TASK-957 Slice A — Contractor double-rail overlap. Corre regardless del flag
   // PAYROLL_CONTRACTOR_ENGAGEMENT_EXCLUSION_ENABLED (detector temprano). Steady=0:
@@ -2639,6 +2658,8 @@ export const getReliabilityOverview = async (
     seoRankCaptureLag,
     seoMarketDataFreshness,
     seoAuditStuckTasks,
+    seoKeywordDiscoveryStuckRuns,
+    seoKeywordDiscoveryProviderErrors,
     payrollComplianceExportDrift,
     payrollContractorDoubleRailOverlap,
     payrollDeelMemberWithoutContractId,

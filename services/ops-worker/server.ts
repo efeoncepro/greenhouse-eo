@@ -135,6 +135,7 @@ import { runSiteAuditEnqueueBatch } from '@/lib/growth/seo/site-audit/enqueue-ba
 import { collectSiteAuditRuns } from '@/lib/growth/seo/site-audit/collect'
 import { runBacklinkCaptureBatch } from '@/lib/growth/seo/backlinks/capture'
 import { runKeywordMarketDataBatch } from '@/lib/growth/seo/keyword-market-data-batch'
+import { drainKeywordDiscoveryRuns } from '@/lib/growth/seo/keyword-discovery/runner'
 import { isSeoModuleEnabled } from '@/lib/growth/seo/flags'
 
 // TASK-1303 — el rank capture pega familias DataForSEO que GASTAN: sin este side-effect
@@ -2117,6 +2118,55 @@ const handleSeoKeywordMarketDataCaptureBatch = async (req: IncomingMessage, res:
   }
 }
 
+// ─── /seo/keyword-discovery/drain ───────────────────────────────────────────
+//
+// TASK-1664 — drena corridas de keyword discovery `pending` (DataForSEO Labs Live).
+//
+// 🔴 Este handler GASTA. Doble gate: el módulo (`GROWTH_SEO_ENABLED`) y el flag propio
+// (`GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED`, default OFF), que el runner verifica por dentro.
+// El disparo es Cloud Scheduler `ops-seo-keyword-discovery-drain` (nace PAUSADO); el outbox
+// del dominio es trazabilidad, NUNCA cola de trabajo. Cada corrida ya pasó el gate de
+// entitlement al encolarse y lo vuelve a pasar acá antes de la primera llamada.
+const handleSeoKeywordDiscoveryDrain = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+  const maxRuns = typeof body.maxRuns === 'number' && body.maxRuns > 0 ? Math.floor(body.maxRuns) : undefined
+
+  if (!isSeoModuleEnabled()) {
+    json(res, 200, { ok: true, skipped: 'seo_module_disabled', pending: 0, processed: 0 })
+
+    return
+  }
+
+  console.log(`[ops-worker] POST /seo/keyword-discovery/drain — maxRuns=${maxRuns ?? 'default'}`)
+
+  try {
+    const summary = await drainKeywordDiscoveryRuns({ maxRuns })
+
+    console.log(
+      `[ops-worker] /seo/keyword-discovery/drain done — pending=${summary.pending} ` +
+        `processed=${summary.processed} succeeded=${summary.succeeded} partial=${summary.partial} ` +
+        `noResults=${summary.noResults} budgetBlocked=${summary.budgetBlocked} failed=${summary.failed}`
+    )
+
+    // Pendientes > 0 con fallas NO es éxito silencioso: se observa con contexto.
+    if (summary.failed > 0 || summary.budgetBlocked > 0) {
+      captureMessageWithDomain(
+        `[TASK-1664] keyword discovery drain — failed=${summary.failed} budgetBlocked=${summary.budgetBlocked}`,
+        'growth',
+        { level: 'warning', tags: { source: 'ops_worker_seo_keyword_discovery' } }
+      )
+    }
+
+    json(res, 200, { ok: true, ...summary })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown SEO keyword discovery error'
+
+    console.error('[ops-worker] /seo/keyword-discovery/drain failed:', message)
+    captureWithDomain(error, 'growth', { tags: { source: 'ops_worker_seo_keyword_discovery' } })
+    json(res, 502, { error: message })
+  }
+}
+
 // ─── /email-deliverability-monitor ──────────────────────────────────────────
 //
 // TASK-775 Slice 2 — Email deliverability monitor migrado de Vercel cron a
@@ -2824,6 +2874,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/seo/keyword-market-data/capture-batch') {
       await handleSeoKeywordMarketDataCaptureBatch(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/seo/keyword-discovery/drain') {
+      await handleSeoKeywordDiscoveryDrain(req, res)
 
       return
     }

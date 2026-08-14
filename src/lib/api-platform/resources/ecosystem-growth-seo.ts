@@ -6,6 +6,24 @@ import { readBacklinkProfile } from '@/lib/growth/seo/backlinks/reader'
 import { readSeoAeoGap } from '@/lib/growth/seo/gap/read-seo-aeo-gap'
 import { normalizeMarketKeyword, readKeywordMarketDataForTarget } from '@/lib/growth/seo/keyword-market-data'
 import { readKeywordOpportunities } from '@/lib/growth/seo/keyword-opportunities-reader'
+import {
+  SEO_DISCOVERY_ACTION_KINDS,
+  SEO_DISCOVERY_SOURCE_KINDS,
+  type SeoDiscoveryActionKind,
+  type SeoDiscoveryMethod,
+  type SeoDiscoveryRunStatus,
+  type SeoDiscoverySourceKind
+} from '@/lib/growth/seo/keyword-discovery/contracts'
+import {
+  previewKeywordDiscovery,
+  queueKeywordDiscovery,
+  recordKeywordDiscoveryAction,
+  type PreviewKeywordDiscoveryResult,
+  type QueueKeywordDiscoveryResult,
+  type RecordKeywordDiscoveryActionResult
+} from '@/lib/growth/seo/keyword-discovery/queue'
+import { readKeywordDiscovery, type ReadKeywordDiscoveryResult } from '@/lib/growth/seo/keyword-discovery/reader'
+import type { SeoSearchIntent } from '@/lib/growth/seo/keyword-market-data'
 import { resolveSeoTargetForMarket, type SeoMarketTarget } from '@/lib/growth/seo/resolve-target'
 import { readSeoPerformance } from '@/lib/growth/seo/performance/read-performance'
 import { readSeoPerformanceCatalog } from '@/lib/growth/seo/performance/read-performance-catalog'
@@ -817,6 +835,241 @@ export const untrackEcosystemSeoKeywordsPayload = async ({
   }
 
   const result = await untrackKeywords(subject.seoTargetId, keywords, `mcp:${context.consumer.publicId}`)
+
+  return {
+    data: result,
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
+  }
+}
+
+/**
+ * ═══ TASK-1664 — keyword discovery en el lane ecosystem ═══
+ *
+ * Passthrough de los primitives `readKeywordDiscovery` / `queueKeywordDiscovery` /
+ * `recordKeywordDiscoveryAction` — los MISMOS que consumen la route admin y (vía este lane)
+ * el MCP. La lectura respeta el binding org-scoped; el write (que compromete gasto de
+ * proveedor) sólo se acepta desde bindings de scope `internal`, igual que track/untrack:
+ * un binding cliente puede leer sus candidatos pero no hacer crecer su propia factura.
+ */
+
+/** GET /api/platform/ecosystem/growth/seo/keyword-discovery */
+export const getEcosystemSeoKeywordDiscoveryPayload = async ({
+  context,
+  request
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+}): Promise<ApiPlatformSuccessResult<ReadKeywordDiscoveryResult | { ok: false; errorCode: 'disabled'; status: null }>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  const subject = await resolveSeoLaneSubject(context, request)
+
+  const url = new URL(request.url)
+
+  const parseNumber = (value: string | null): number | undefined => {
+    if (value === null || value.trim() === '') return undefined
+
+    const parsed = Number(value)
+
+    return Number.isFinite(parsed) ? parsed : undefined
+  }
+
+  const result = await readKeywordDiscovery({
+    organizationId: subject.organizationId,
+    seoTargetId: subject.seoTargetId ?? undefined,
+    runId: url.searchParams.get('runId')?.trim() || undefined,
+    status: (url.searchParams.get('status')?.trim() || undefined) as SeoDiscoveryRunStatus | undefined,
+    sourceEndpoint: (url.searchParams.get('sourceEndpoint')?.trim() || undefined) as SeoDiscoveryMethod | undefined,
+    query: url.searchParams.get('query')?.trim() || undefined,
+    intent: (url.searchParams.get('intent')?.trim() || undefined) as SeoSearchIntent | undefined,
+    minSearchVolume: parseNumber(url.searchParams.get('minSearchVolume')),
+    maxDifficulty: parseNumber(url.searchParams.get('maxDifficulty')),
+    limit: parseNumber(url.searchParams.get('limit')),
+    cursor: url.searchParams.get('cursor')
+  })
+
+  if (!result.ok && result.errorCode === 'run_not_found') {
+    // Anti-oracle: un run ajeno "no existe" para este binding.
+    throw new ApiPlatformError('SEO resource not found for the resolved scope.', {
+      statusCode: 404,
+      errorCode: 'not_found'
+    })
+  }
+
+  return {
+    data: result,
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
+  }
+}
+
+export interface EcosystemSeoDiscoverBody {
+  organizationId?: unknown
+  seoTargetId?: unknown
+  market?: unknown
+  seedSource?: unknown
+  manualSeeds?: unknown
+  mixedMeasuredSource?: unknown
+  methods?: unknown
+  idempotencyKey?: unknown
+  preview?: unknown
+  candidateId?: unknown
+  actionKind?: unknown
+  metadata?: unknown
+}
+
+const parseEcosystemMethods = (value: unknown): Array<{ method: SeoDiscoveryMethod; resultsPerCall?: number }> => {
+  if (!Array.isArray(value)) return []
+
+  const methods: Array<{ method: SeoDiscoveryMethod; resultsPerCall?: number }> = []
+
+  for (const entry of value) {
+    if (typeof entry === 'string') {
+      methods.push({ method: entry as SeoDiscoveryMethod })
+
+      continue
+    }
+
+    if (typeof entry === 'object' && entry !== null && typeof (entry as { method?: unknown }).method === 'string') {
+      const spec = entry as { method: string; resultsPerCall?: unknown }
+
+      methods.push({
+        method: spec.method as SeoDiscoveryMethod,
+        resultsPerCall: typeof spec.resultsPerCall === 'number' ? spec.resultsPerCall : undefined
+      })
+    }
+  }
+
+  return methods
+}
+
+/**
+ * POST /api/platform/ecosystem/growth/seo/keyword-discovery — encola (o previsualiza) una
+ * corrida. 🔴 Sólo bindings `internal`: comprometer gasto DataForSEO no es para bindings
+ * cliente. `preview: true` = dry-run sin insert ni gasto.
+ */
+export const discoverEcosystemSeoKeywordsPayload = async ({
+  context,
+  request,
+  body
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+  body: EcosystemSeoDiscoverBody | null
+}): Promise<
+  ApiPlatformSuccessResult<
+    QueueKeywordDiscoveryResult | PreviewKeywordDiscoveryResult | { ok: false; errorCode: 'disabled'; status: null }
+  >
+> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  if (context.binding.greenhouseScopeType !== 'internal') {
+    throw new ApiPlatformError('Queueing SEO keyword discovery is not allowed for the resolved binding scope.', {
+      statusCode: 403,
+      errorCode: 'scope_not_allowed'
+    })
+  }
+
+  const requestedOrganizationId = typeof body?.organizationId === 'string' ? body.organizationId : null
+  const seedSource = typeof body?.seedSource === 'string' ? (body.seedSource as SeoDiscoverySourceKind) : null
+
+  if (!seedSource || !SEO_DISCOVERY_SOURCE_KINDS.includes(seedSource)) {
+    throw new ApiPlatformError('A valid "seedSource" is required.', {
+      statusCode: 400,
+      errorCode: 'bad_request'
+    })
+  }
+
+  const subject = await resolveSeoLaneSubject(context, request, requestedOrganizationId)
+
+  const input = {
+    organizationId: subject.organizationId,
+    seoTargetId: subject.seoTargetId ?? undefined,
+    seedSource,
+    manualSeeds: Array.isArray(body?.manualSeeds)
+      ? body.manualSeeds.filter((item): item is string => typeof item === 'string')
+      : undefined,
+    mixedMeasuredSource:
+      body?.mixedMeasuredSource === 'tracked_keywords' ? ('tracked_keywords' as const) : undefined,
+    methods: parseEcosystemMethods(body?.methods),
+    // Actor máquina: la procedencia dice la verdad sobre quién comprometió el gasto.
+    actor: `mcp:${context.consumer.publicId}`,
+    idempotencyKey: typeof body?.idempotencyKey === 'string' ? body.idempotencyKey : undefined
+  }
+
+  const result = body?.preview === true ? await previewKeywordDiscovery(input) : await queueKeywordDiscovery(input)
+
+  if (!result.ok && (result.errorCode === 'invalid_seed' || result.errorCode === 'limit_exceeded')) {
+    throw new ApiPlatformError('The discovery request is outside the allowed limits.', {
+      statusCode: 400,
+      errorCode: 'bad_request',
+      details: { reason: result.reason ?? result.errorCode }
+    })
+  }
+
+  return {
+    data: result,
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
+  }
+}
+
+/**
+ * POST /api/platform/ecosystem/growth/seo/keyword-discovery/actions — acción append-only
+ * sobre un candidato. Sólo bindings `internal` (es una decisión operativa, no de cliente).
+ * JAMÁS trackea por sí sola.
+ */
+export const recordEcosystemSeoDiscoveryActionPayload = async ({
+  context,
+  request,
+  body
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+  body: EcosystemSeoDiscoverBody | null
+}): Promise<ApiPlatformSuccessResult<RecordKeywordDiscoveryActionResult | { ok: false; errorCode: 'disabled'; status: null }>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  if (context.binding.greenhouseScopeType !== 'internal') {
+    throw new ApiPlatformError('Recording SEO discovery actions is not allowed for the resolved binding scope.', {
+      statusCode: 403,
+      errorCode: 'scope_not_allowed'
+    })
+  }
+
+  const requestedOrganizationId = typeof body?.organizationId === 'string' ? body.organizationId : null
+  const candidateId = typeof body?.candidateId === 'string' ? body.candidateId.trim() : ''
+  const actionKind = typeof body?.actionKind === 'string' ? (body.actionKind as SeoDiscoveryActionKind) : null
+
+  if (!candidateId || !actionKind || !SEO_DISCOVERY_ACTION_KINDS.includes(actionKind)) {
+    throw new ApiPlatformError('A "candidateId" and a valid "actionKind" are required.', {
+      statusCode: 400,
+      errorCode: 'bad_request'
+    })
+  }
+
+  const subject = await resolveSeoLaneSubject(context, request, requestedOrganizationId)
+
+  const result = await recordKeywordDiscoveryAction({
+    organizationId: subject.organizationId,
+    candidateId,
+    actionKind,
+    actor: `mcp:${context.consumer.publicId}`,
+    idempotencyKey: typeof body?.idempotencyKey === 'string' ? body.idempotencyKey : undefined,
+    metadata:
+      typeof body?.metadata === 'object' && body?.metadata !== null ? (body.metadata as Record<string, unknown>) : undefined
+  })
+
+  if (!result.ok && result.errorCode === 'run_not_found') {
+    throw new ApiPlatformError('SEO resource not found for the resolved scope.', {
+      statusCode: 404,
+      errorCode: 'not_found'
+    })
+  }
 
   return {
     data: result,

@@ -191,6 +191,8 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   | 'trackSeoKeywords'
   | 'untrackSeoKeywords'
   | 'getSeoKeywordMarketData'
+  | 'getSeoKeywordDiscovery'
+  | 'discoverSeoKeywords'
 >) => ({
   async getContext() {
     return callReadTool(
@@ -720,6 +722,107 @@ export const createGreenhouseMcpHandlers = (client: Pick<
         }).`
       },
       () => client.untrackSeoKeywords(input)
+    )
+  },
+  /**
+   * TASK-1664 — lectura de discovery. El summary declara la lente: candidatos = mercado
+   * ESTIMADO (◑); la demanda medida GSC viaja como campo separado, nunca fusionada.
+   */
+  async getSeoKeywordDiscovery(input: {
+    organizationId?: string
+    market?: string
+    runId?: string
+    status?: string
+    sourceEndpoint?: string
+    query?: string
+    intent?: string
+    minSearchVolume?: number
+    maxDifficulty?: number
+    limit?: number
+    cursor?: string
+  }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          runs?: unknown[]
+          run?: { runId?: string; status?: string } | null
+          candidates?: unknown[]
+          totalCandidates?: number
+          marketAvailability?: string
+          marketFreshness?: string | null
+        }
+
+        if (data.ok === false) {
+          return `SEO keyword discovery unavailable (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        if (data.run) {
+          return `SEO keyword discovery run ${String(data.run.runId ?? '?')} [${String(data.run.status ?? '?')}]: ${String(
+            data.totalCandidates ?? 0
+          )} candidates (market data: ${String(data.marketAvailability ?? 'unavailable')}, as-of ${String(
+            data.marketFreshness ?? 'n/a'
+          )}). Volumes/difficulty are ESTIMATED market data (◑); measuredGsc is the client's own measured demand (●) — never merge them (${result.requestId}).`
+        }
+
+        return `SEO keyword discovery: ${String((data.runs ?? []).length)} run(s) listed. Pass runId to inspect candidates (${result.requestId}).`
+      },
+      () => client.getSeoKeywordDiscovery(input)
+    )
+  },
+  /**
+   * TASK-1664 — el write. El summary reporta runId + costo estimado y deja claro que la
+   * corrida es ASYNC: un agente que declare candidatos listos tras el 202 estaría
+   * describiendo resultados que aún no existen.
+   */
+  async discoverSeoKeywords(input: {
+    organizationId?: string
+    market?: string
+    seedSource: string
+    manualSeeds?: string[]
+    mixedMeasuredSource?: string
+    methods?: Array<string | { method: string; resultsPerCall?: number }>
+    idempotencyKey?: string
+    preview?: boolean
+  }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          runId?: string
+          deduped?: boolean
+          estimatedCostUsd?: number
+          providerCalls?: number
+          formula?: string
+          seeds?: unknown[]
+          estimate?: { estimatedCostUsd?: number; providerCalls?: number; formula?: string }
+          wouldBeAllowed?: boolean
+          blockedReason?: string | null
+        }
+
+        if (data.ok === false) {
+          return `SEO keyword discovery rejected (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        if (input.preview === true || data.estimate) {
+          return `SEO keyword discovery PREVIEW: ${String(data.seeds?.length ?? 0)} seed(s), estimated USD ${String(
+            data.estimate?.estimatedCostUsd ?? 0
+          )} across ${String(data.estimate?.providerCalls ?? 0)} provider call(s) [${String(
+            data.estimate?.formula ?? ''
+          )}]. Allowed: ${String(data.wouldBeAllowed ?? false)}${
+            data.blockedReason ? ` (blocked: ${String(data.blockedReason)})` : ''
+          }. Nothing was queued or spent (${result.requestId}).`
+        }
+
+        return `SEO keyword discovery run ${String(data.runId ?? '?')} queued${
+          data.deduped ? ' (deduped: same intent already existed, nothing new will be spent)' : ''
+        } — estimated USD ${String(data.estimatedCostUsd ?? 0)} across ${String(
+          data.providerCalls ?? 0
+        )} provider call(s). The run executes ASYNC in the ops worker; poll get_seo_keyword_discovery with this runId for candidates — do NOT claim results exist yet (${result.requestId}).`
+      },
+      () => client.discoverSeoKeywords(input)
     )
   }
 })
