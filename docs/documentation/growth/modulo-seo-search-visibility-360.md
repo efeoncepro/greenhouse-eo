@@ -567,6 +567,27 @@ workbench) es TASK-1665.
 > §7 (primitives) y §8 (drain + costos) · runbook
 > [`operar-keyword-discovery-seo.md`](../../manual-de-uso/growth/operar-keyword-discovery-seo.md)
 
+### Del descubrimiento SEO a las preguntas de IA: el puente grounded (TASK-1666, 2026-08-14)
+
+Una keyword de Google y una pregunta a un motor de IA son cosas distintas: copiar la keyword como
+prompt sesga la medición AEO. El puente grounded resuelve el cruce sin mezclar los motores:
+
+- El operador selecciona hasta 20 candidatos de una corrida de discovery y pide una propuesta de
+  **grounded queries**. El sistema usa las keywords como **tema de investigación** (dato, no
+  instrucción) y la identidad de marca ya autorizada del perfil AEO para redactar preguntas
+  naturales — verificado con una autoría real: 15 preguntas, cero copias literales, y las de
+  descubrimiento jamás nombran la marca.
+- El resultado es siempre un **borrador** del set de prompts AEO existente, con la trazabilidad
+  completa (qué corrida, qué candidatos, qué contexto exacto — como referencias opacas, nunca la
+  keyword en logs). Aprobarlo y activarlo sigue siendo el flujo AEO de siempre, con revisión
+  humana; el puente no aprueba, no activa y no ejecuta mediciones.
+- Si la autoría con IA no está disponible, el borrador se crea con la base genérica del arquetipo
+  y **lo dice**: esas preguntas no son específicas de las keywords hasta regenerar con la autoría
+  activa. Repetir la misma selección devuelve el mismo borrador sin costo extra.
+
+> Detalle técnico: [`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
+> §7 · runbook [`preparar-grounded-queries-desde-seo.md`](../../manual-de-uso/growth/preparar-grounded-queries-desde-seo.md)
+
 ## Relacion con el AI Visibility Grader (motores hermanos)
 
 SEO y AEO son los dos motores de **Search Visibility 360** y se diseñaron como espejo deliberado:

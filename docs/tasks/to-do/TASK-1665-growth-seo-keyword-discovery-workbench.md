@@ -4,6 +4,14 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-14 — TASK-1666 complete: desbloqueada por completo
+
+- El puente grounded existe y está verificado live: la acción `Preparar grounded queries` del
+  drawer invoca `createGroundedQueryDraft` (route `POST /api/admin/growth/seo/grounded-queries`)
+  y distingue `draft_created` (`grounded_llm`) de `baseline_fallback` (con `fallbackNotice`
+  OBLIGATORIO en la UI) y errores tipados — cero lógica de prompts en JSX, tal como exige el
+  contrato de esta task. El reader del draft es `GET` del mismo route.
+
 ## Delta 2026-08-14 — TASK-1664 complete: dependencia desbloqueada
 
 - El primitive de discovery existe y está verificado live: `queueKeywordDiscovery` /
@@ -31,7 +39,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|seo|ui`
-- Blocked by: `TASK-1666`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

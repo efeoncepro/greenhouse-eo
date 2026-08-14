@@ -2,14 +2,26 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
-### TASK-1666 en ejecución — puente SEO → grounded queries AEO (2026-08-14)
+### TASK-1666 COMPLETE — puente SEO → grounded queries AEO (2026-08-14)
 
-Rama `develop` (sin worktrees). Intake hecho; Discovery en curso sobre
-`src/lib/growth/ai-visibility/prompt-packs/**` (authoring/lifecycle de TASK-1290). Hallazgo
-temprano: los commands de prompt set (`createGraderPromptSetDraft`/`authorGraderPromptSetDraft`/
-`approveGraderPromptSet`) NO tienen ningún consumer HTTP/MCP/Nexa todavía — capacidad pura de
-librería; el files-owned `src/mcp/greenhouse/seo/grounded-queries.ts` de la spec es stale (las
-tools MCP viven en `src/mcp/greenhouse/{server,tools,http-client}.ts`, igual que en 1664).
+End-to-end en la misma sesión que 1664: suite completa **10.721 verde**, sanity PG real **16/16
+con autoría LLM real** (1 llamada Gemini, centavos) sobre candidatos reales del smoke de 1664 —
+draft baseline (USD 0, aviso obligatorio) + draft grounded v2 con **15 preguntas evaluadas a mano**
+(naturales, seeds como tema — 0 copias 1:1 —, no-leading limpio), refs opacas verificadas en
+`grounding_sources_json`, active intacto, cero grader runs, dedupe real USD 0.
+
+**Diseño load-bearing:** authoring AEO extendido backward-compatible (cerebro grounded versionado
+aparte `aeo-author.seo-grounded.v1`; `aeo-author.v1` **byte a byte intacto** — probado); bridge =
+adapter con doble capability, anti-oracle, `contextRef` sha256 canónico e idempotencia por modo
+esperado con `pg_advisory_xact_lock` en conexión fijada (un baseline previo NO bloquea re-generar
+grounded). 🔴 **Write máquina (ecosystem/MCP) = `aeo_forbidden` FAIL-CLOSED hasta TASK-1631**: la
+capability humana de prompt sets no se fabrica para la máquina (documentado en lane/tool/parity).
+
+**Rollout:** el lane app/ecosystem viaja con el deploy de Vercel del próximo push de develop (este
+cierre lo incluye); gateway federado (`efeonce-mcp@ac778e8`, 41/41 tests, canary con denies del
+puente) — su **deploy dispatch va con el próximo release develop→main** (junto con el de 1664).
+Cero flags nuevos. **Desbloqueada: TASK-1665 (`Blocked by: none`)** — el workbench ya tiene sus
+dos dependencias completas.
 
 ### TASK-1664 COMPLETE — keyword discovery: code complete, rollout PENDIENTE (2026-08-14)
 
@@ -390,42 +402,3 @@ remota de comunidad y deja audiovisual, diseño de alto volumen, presencialidad,
 externos como adicionales. Antes de presentar, quedan cuatro gates concretos: validar identificador de marca,
 asignar squad/capacidad y costeo cargado con Finanzas, confirmar documentación tributaria Chile–Perú y revisar la
 definición de embajador activo/corte FY 2026. No suplir esos gates con una aceptación de términos ni con un envío.
-
-### TASK-1685 CERRADA — un solo primitive de visibilidad del portal cliente; `ISSUE-148` resuelta (2026-08-10)
-
-Cuarta task de navegación del mismo día, en `develop`, local-first, **sin push**. Decisión del Slice 1
-delegada por el operador a `arch-architect` + overlay del repo: **(a′)** — el módulo autoriza, un
-`revoke` per-persona cierra, y **el menú consume el mismo predicado que la puerta**
-(`src/lib/client-portal/visibility/`, puro + adaptador server + contexto). Cuatro consumers, no dos:
-page guard, lista base del menú, ⌘K y layouts de ruta.
-
-**Medir cambió el diagnóstico dos veces, y por eso (a) literal no alcanzaba.** (1) La divergencia viva
-eran **36 enlaces muertos** en la dirección *el menú promete y la puerta niega*, sobre **8 de 8**
-usuarios cliente —incluidos los 3 reales de Sky Airlines— y **0** en la dirección que `ISSUE-148`
-enfatizaba (el merge aditivo de TASK-1675 repone todo ítem de módulo). (2) La intención de los 9 denials
-**estaba escrita** en sus migraciones: 6 son plomería anti-fallback que TASK-1678 dejó vestigial, 3 son
-diferenciación per-rol que hoy no afecta a nadie. No hizo falta preguntarle a nadie.
-
-**Hallazgo de ACCESO que la spec no tenía, y lo encontró el lint nuevo:** los layouts de `/proyectos`,
-`/campanas`, `/sprints` y `/notifications` gateaban por el carril de rol, y sus rutas de detalle
-(`[id]`, `[campaignId]`, `preferences`) **no tienen guard propio** — un cliente cuyo rol concedía la
-vista pero cuya organización no tenía el módulo entraba al detalle por URL. Los cuatro pasan al guard
-canónico.
-
-Verificado contra PG: **24 pares contratados intactos** (nadie perdió nada), enlaces muertos **36 → 0**,
-`revoke` cierra la puerta. Gates: `local:check`, `test:lint-rules` (21), suites focales 867. Sin
-migraciones, sin flags — `user_view_overrides` está vacía, así que el delta de acceso es cero exacto.
-
-**Continuidad:**
-- **Rollout pendiente**: falta ejercitar las 9 rutas con las personas agente contra staging/producción
-  (pasos 2-5 de §Production verification sequence). El código está completo y medido en local.
-- La señal `identity.client_portal.menu_gate_divergence` queda en **warning con 2**, y es honesto:
-  `cliente.ciclos` y `cliente.analytics` no las vende **ningún** módulo del catálogo, así que ninguna
-  organización puede alcanzarlas. Antes eran enlaces muertos; no se perdió acceso. Decisión pendiente:
-  venderlas en un módulo o retirarlas del catálogo y sus rutas.
-- **`TASK-1687` creada**: `/creative-hub` no existe y el bundle de SKY lo declara. Separada a propósito
-  (catálogo comercial ≠ semántica de autorización). **Nunca** quitarle el módulo a SKY.
-- **`TASK-286` desbloqueada con premisa nueva**: sembrar grants por rol para una vista `cliente.*` ya
-  no produce acceso; el carril es declararla en el módulo que la vende. Delta escrito allá.
-- Sigue abierto el bloque legacy de capability modules (`capability-modules-resolver-migration`, sin
-  ID): sus dos callsites quedaron con marker y dueño declarado.

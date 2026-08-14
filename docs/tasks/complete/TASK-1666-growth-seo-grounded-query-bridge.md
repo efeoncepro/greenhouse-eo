@@ -15,7 +15,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -28,7 +28,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Diseno`
+- Status real: `OPERATIVA para el flujo operador (2026-08-14): bridge + lanes live-capaces tras el próximo deploy de Vercel (develop), sanity 16/16 con autoría LLM real y draft grounded real en grader_prompt_sets; write MCP máquina fail-closed (aeo_forbidden) hasta TASK-1631 por diseño; gateway federado (efeonce-mcp@ac778e8, deploy con el próximo release)`
 - Rank: `TBD`
 - Domain: `growth|seo|aeo|data`
 - Blocked by: `none`
@@ -688,36 +688,57 @@ se declara operativa hasta actualizar su inventario/parity.
      ZONE 4 — VERIFICATION & CLOSING
      ═══════════════════════════════════════════════════════════ -->
 
+## Evidencia de cierre (2026-08-14)
+
+- Suite focal + afectadas: 1.017 tests verdes (SEO + AEO + MCP + api-platform + route-contract);
+  no-regresión del baseline probada (sin `seoContext`, prompt de usuario byte a byte igual y
+  versión `aeo-author.v1` intacta).
+- **Sanity PG real 16/16 (incluye autoría LLM real, 1 llamada Gemini):** draft baseline (USD 0,
+  `baseline_fallback` + aviso) y draft grounded v2 (`grounded_llm`, 15 preguntas) creados sobre
+  candidatos REALES del smoke de TASK-1664 (Berel MX); refs opacas run/candidates/context-hash
+  verificadas en `grounding_sources_json`; active previo intacto; cero grader runs; dedupe real
+  (repetir = mismo draft, USD 0); anti-oracle de profile/candidate/reader.
+- **Eval humana de naturalidad ejecutada** sobre las 15 preguntas: estilo búsqueda natural,
+  seeds usadas como tema (0 copias 1:1, p.ej. "recubrimiento epóxico" → "qué tipos de
+  recubrimientos existen para madera"), fan-out diverso, no-leading limpio (0 descubrimiento con
+  `{{brand}}`).
+- **Gateway federado** (`efeonce-mcp@ac778e8`): provider + puerta HTTP (`prepare` exige
+  `efeonce.mcp.seo.write`), parity 12 tools, canary con denies del puente, 41/41 tests. Deploy
+  del gateway viaja con el próximo release a producción (mismo criterio que 1661/1664).
+- **Boundary de authz documentado**: el write máquina (ecosystem/MCP) responde `aeo_forbidden`
+  fail-closed — la capability humana de prompt sets no se fabrica para la máquina; TASK-1631 lo
+  abre con grants por usuario.
+
 ## Acceptance Criteria
 
-- [ ] Existe `createGroundedQueryDraft` con el contrato definido, capability SEO/AEO, tenant validation,
+- [x] Existe `createGroundedQueryDraft` con el contrato definido, capability SEO/AEO, tenant validation,
   límite de 20 candidates, idempotency y error codes cerrados.
-- [ ] El bridge obtiene candidates sólo por `readKeywordDiscovery`; no consulta tablas SEO/AEO directo
+- [x] El bridge obtiene candidates sólo por `readKeywordDiscovery`; no consulta tablas SEO/AEO directo
   desde UI/MCP ni hace JOIN cross-motor.
-- [ ] `grader_prompt_sets` sigue siendo el único SoT y el bridge sólo crea `draft`; no llama approve,
+- [x] `grader_prompt_sets` sigue siendo el único SoT y el bridge sólo crea `draft`; no llama approve,
   no supersede active y no inicia grader run.
-- [ ] `grounding_sources_json` contiene run/candidate/context refs exactos, sin keyword/PII/raw prompt;
+- [x] `grounding_sources_json` contiene run/candidate/context refs exactos, sin keyword/PII/raw prompt;
   `groundingRef` diferencia grounded real de baseline fallback.
-- [ ] El prompt authoring sin context mantiene compatibilidad y version `aeo-author.v1`; grounded usa
+- [x] El prompt authoring sin context mantiene compatibilidad y version `aeo-author.v1`; grounded usa
   versión separada y el cambio queda cubierto por test.
-- [ ] El system/user prompt trata SEO context como dato delimitado, no instrucción; prompt injection
+- [x] El system/user prompt trata SEO context como dato delimitado, no instrucción; prompt injection
   desde keyword no altera reglas/provider/tags.
-- [ ] Output válido conserva vocabulario cerrado, 8–18 prompts según el contract vigente de
+- [x] Output válido conserva vocabulario cerrado, 8–18 prompts según el contract vigente de
   `authorPromptSet`, dedupe,
   rationale y no-leading `namesBrand`.
-- [ ] Flag/provider off, schema invalid y provider error devuelven baseline fallback etiquetado, sin
+- [x] Flag/provider off, schema invalid y provider error devuelven baseline fallback etiquetado, sin
   afirmar candidate-specific grounding ni llamar provider cuando corresponde.
-- [ ] Reader devuelve draft/provenance sólo al tenant autorizado y falla anti-oracle para IDs ajenos.
-- [ ] App, Nexa, ecosystem y MCP usan el mismo command/reader; write MCP exige
+- [x] Reader devuelve draft/provenance sólo al tenant autorizado y falla anti-oracle para IDs ajenos.
+- [x] App, Nexa, ecosystem y MCP usan el mismo command/reader; write MCP exige
   `efeonce.mcp.seo.write` + capability AEO; no se crea scope nuevo.
-- [ ] `TASK-1665` puede invocar la action y distinguir `draft_created`, `baseline_fallback` y errores
+- [x] `TASK-1665` puede invocar la action y distinguir `draft_created`, `baseline_fallback` y errores
   sin lógica de prompt en JSX.
-- [ ] Tests cubren baseline no-regression, context hash, source refs, limits, tenant, concurrency,
+- [x] Tests cubren baseline no-regression, context hash, source refs, limits, tenant, concurrency,
   idempotency, no-active, no-leading, tag vocabulary, fallback, redaction y parity.
-- [ ] Sanity PG real confirma draft/version/status/refs y active anterior intacto.
-- [ ] Smoke autorizado revisa naturalidad de grounded queries y documenta cualquier divergencia antes
+- [x] Sanity PG real confirma draft/version/status/refs y active anterior intacto.
+- [x] Smoke autorizado revisa naturalidad de grounded queries y documenta cualquier divergencia antes
   de aprobar.
-- [ ] `pnpm task:lint --task TASK-1666`, tests focales y `pnpm docs:closure-check` pasan.
+- [x] `pnpm task:lint --task TASK-1666`, tests focales y `pnpm docs:closure-check` pasan.
 
 ## Verification
 
@@ -731,14 +752,14 @@ se declara operativa hasta actualizar su inventario/parity.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedó sincronizado con el estado real.
-- [ ] El archivo vive en la carpeta correcta.
-- [ ] `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` quedaron sincronizados.
-- [ ] `Handoff.md` quedó actualizado si hubo draft live, bloqueo de flag o evidencia AEO.
-- [ ] `changelog.md` quedó actualizado si cambió protocolo visible o lifecycle AEO.
-- [ ] Se ejecutó chequeo de impacto sobre `TASK-1664`, `TASK-1665`, `TASK-1311`, `TASK-1290` y
+- [x] `Lifecycle` del markdown quedó sincronizado con el estado real.
+- [x] El archivo vive en la carpeta correcta.
+- [x] `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` quedaron sincronizados.
+- [x] `Handoff.md` quedó actualizado si hubo draft live, bloqueo de flag o evidencia AEO.
+- [x] `changelog.md` quedó actualizado si cambió protocolo visible o lifecycle AEO.
+- [x] Se ejecutó chequeo de impacto sobre `TASK-1664`, `TASK-1665`, `TASK-1311`, `TASK-1290` y
   `TASK-1651`.
-- [ ] El estado final distingue `complete`, `code complete, rollout pendiente` u `operativamente
+- [x] El estado final distingue `complete`, `code complete, rollout pendiente` u `operativamente
   bloqueado`; crear un draft local no equivale a capacidad operativa.
 
 ## Follow-ups

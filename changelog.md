@@ -7,6 +7,28 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-14 — Las keywords descubiertas ahora saben llegar a los motores de IA (TASK-1666)
+
+El mismo día que el discovery quedó operativo, se cerró el puente que faltaba hacia el otro
+internet de búsqueda: un operador selecciona hasta 20 candidatos de una corrida y pide un
+**borrador de grounded queries** para el grader AEO. La regla central es semántica: una keyword
+de Google no es una pregunta a ChatGPT — el sistema la usa como **tema de investigación** (dato
+delimitado, inmune a prompt injection) y redacta preguntas naturales con la identidad de marca ya
+autorizada del perfil. La prueba real lo mostró: de "recubrimiento epóxico" salió "qué tipos de
+recubrimientos existen para madera", no una copia; y ninguna pregunta de descubrimiento nombra la
+marca (la medición a ciegas sigue siendo a ciegas).
+
+La honestidad quedó cableada, no prometida: el modo `grounded_llm` sólo existe cuando la autoría
+usó de verdad el contexto (cerebro versionado aparte; el authoring sin contexto quedó byte a byte
+idéntico y probado); sin autoría disponible el borrador sale del baseline **y lo dice** con un
+aviso obligatorio. La trazabilidad viaja como referencias opacas (corrida, candidatos y hash
+verificable del contexto exacto) — jamás la keyword en logs. Y el puente sólo crea borradores:
+aprobar y activar sigue siendo el flujo AEO con revisión humana, sin atajos.
+
+Verificado contra el mundo real: 16/16 checks contra PG incluyendo una autoría LLM real de 15
+preguntas evaluadas a mano, idempotencia que devuelve el mismo borrador sin segundo gasto, y el
+active previo intacto. Con esto TASK-1665 (el workbench visual) quedó sin bloqueos.
+
 ## 2026-08-14 — Descubrir keywords deja de ser un viaje a otra herramienta (TASK-1664)
 
 El módulo SEO contestaba qué empujar de lo que ya aparece en Search Console; no contestaba cómo
@@ -1176,10 +1198,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
 - Smoke live del lane con quadrant real; rollout pendiente: smoke e2e HTTP con binding, flag en Vercel y
   federación al gateway `mcp.efeonce.org` (TASK-1647 creada). Todo reader SEO futuro nace con su tool
   (criterio en 7 tasks).
-
-## 2026-08-05 — Search Visibility 360: el cruce SEO↔AEO existe (TASK-1305)
-
-- `readSeoAeoGap` + matriz quadrant 360 (dominante/riesgo/oportunidad/invisible): posición orgánica medida
-  (GSC) × citabilidad IA (grader), cruce en memoria por org con boundary duro verificado por test.
-- Primera señal real en el smoke live: Berel #1.75 orgánico × AEO 44.5 → `riesgo` (autoridad sin
-  citabilidad → CTA cruzado al AEO). Consumers siguientes: tool MCP (TASK-1645) y UI (TASK-1310).
