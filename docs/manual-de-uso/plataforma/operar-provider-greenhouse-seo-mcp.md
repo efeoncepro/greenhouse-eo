@@ -1,9 +1,9 @@
 # Operar el provider Greenhouse-SEO del MCP
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-08-06 por Claude (TASK-1647)
-> **Ultima actualizacion:** 2026-08-06 por Claude
+> **Ultima actualizacion:** 2026-08-14 por Claude (inventario federado real: 9 tools — incluye `get_seo_keyword_market_data` y las 2 de escritura; 3 tools internas aún sin federar)
 > **Endpoint canonico:** `https://mcp.efeonce.org/mcp`
 > **Documentacion funcional:** [Search Visibility 360 por MCP](../../documentation/growth/search-visibility-360-por-mcp.md)
 > **Runbook tecnico:** [Efeonce MCP Platform Runbook](../../operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md) §Provider Greenhouse-SEO
@@ -11,9 +11,33 @@
 ## Para que sirve
 
 Este manual es para el operador que necesita **verificar, diagnosticar o apagar** el provider `greenhouse-seo`
-del gateway MCP de Efeonce — las consultas de Search Visibility 360 (`get_seo_entitlement`,
-`get_seo_keyword_opportunities`, `get_seo_visibility_360`, `get_seo_overview_kpis`) que un cliente MCP puede hacer contra
-`mcp.efeonce.org`.
+del gateway MCP de Efeonce — lo que un cliente MCP puede hacer contra `mcp.efeonce.org`.
+
+El inventario federado hoy son **9 tools** (fuente de verdad: el allowlist de paridad
+`src/providers/greenhouse-seo-tool-parity.ts` del repo `efeonce-mcp`, cuyo test rompe el CI si diverge
+de lo realmente registrado en el gateway):
+
+| Tool | Qué es |
+|---|---|
+| `get_seo_entitlement` | Estado del módulo por organización (sin anti-oracle, por diseño) |
+| `get_seo_keyword_opportunities` | Striking distance **medido** (Search Console) |
+| `get_seo_keyword_market_data` | Volumen + barrera de enlaces **estimados** por lista explícita de keywords (TASK-1661) |
+| `get_seo_visibility_360` | Quadrant SEO × AEO |
+| `get_seo_rank_evolution` | Serie temporal de posiciones exactas |
+| `get_seo_site_audit_report` | Audit técnico OnPage |
+| `get_seo_backlink_profile` | Serie semanal del perfil de enlaces |
+| `track_seo_keywords` ✍️ | **Escribe**: mete keywords al ciclo diario y compromete gasto recurrente |
+| `untrack_seo_keywords` ✍️ | **Escribe**: el reverso, cierra la ventana sin borrar historia |
+
+⚠️ **`get_seo_overview_kpis`, `get_seo_performance` y `get_seo_performance_catalog` NO están
+federadas**: existen en el MCP interno de Greenhouse pero no en el gateway. La federación es por
+allowlist explícito con revisión humana por tool (decisión TASK-1647: nunca auto-federación). Si un
+cliente externo las pide, la respuesta correcta es "todavía no está federada", no "está caída".
+
+⚠️ **Las dos de escritura no comparten el scope de lectura.** Viven en `efeonce.mcp.seo.write`
+(constante `SEO_WRITE_SCOPE` en `src/config.ts` del gateway) porque comprometen gasto recurrente del
+proveedor, y el lane las acepta solo desde bindings de scope `internal`. Un `403 insufficient_scope`
+sobre ellas con el scope base es el comportamiento correcto.
 
 No cubre el uso conversacional (para eso está la doc funcional) ni el gateway completo (para eso está
 [Operar Efeonce MCP Gateway](operar-efeonce-mcp-gateway.md)).
@@ -178,9 +202,12 @@ respuesta real era `no_seo_data`, eso es un bug del consumidor, no del provider.
 
 **401 anónimo con `WWW-Authenticate`** no es una falla: es el comportamiento correcto del resource server.
 
-**403 `insufficient_scope`.** Falta el scope base `efeonce.mcp.read`. Las tres consultas SEO viven en ese scope
-base — no existe un scope SEO propio. Si un cliente tiene el scope base y aun así recibe `403`, revisa el
-consentimiento de la aplicación en Entra antes de tocar el gateway.
+**403 `insufficient_scope`.** Depende de qué tool. Las **7 de lectura** viven en el scope base
+`efeonce.mcp.read` — no tienen scope de lectura propio. Las **2 de escritura** (`track_seo_keywords` /
+`untrack_seo_keywords`) exigen `efeonce.mcp.seo.write`, un scope aparte: un cliente con solo el scope
+base recibe `403` sobre ellas **y eso es correcto**, no una falla. Si un cliente tiene el scope que
+corresponde y aun así recibe `403`, revisa el consentimiento de la aplicación en Entra antes de tocar
+el gateway.
 
 **403 `scope_not_allowed` desde el lane.** El binding usado no es de scope `internal` ni está ligado a una
 organización. Es un problema de configuración del consumer en Greenhouse (`EO-SPK-0004` / `EO-SPB-0004`), no del
@@ -197,7 +224,7 @@ Tres niveles, de menor a mayor alcance. Elige el mínimo que resuelva el problem
 **1. Apagar solo el provider SEO del gateway.** El resto del gateway (Globe, OAuth, front door) sigue operando.
 
 - Pon `GREENHOUSE_SEO_PROVIDER_ENABLED=false` en las variables del repo `efeonce-mcp` y redespliega por el
-  workflow. Las tres tools pasan a `503 greenhouse_seo_policy_blocked`.
+  workflow. Las **9 tools** federadas pasan a `503 greenhouse_seo_policy_blocked`.
 - Alternativa inmediata: mover 100% del tráfico a la revisión previa verificada del gateway.
   **[verificar]** la revisión previa exacta no quedó registrada en esta sesión; obtenla con
   `gcloud run revisions list --service=efeonce-mcp-gateway --region=southamerica-west1 --project=efeonce-group`.

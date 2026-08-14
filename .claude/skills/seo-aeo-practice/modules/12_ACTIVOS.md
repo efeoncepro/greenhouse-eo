@@ -60,7 +60,7 @@ producto con mejor ROI de la práctica.**
 
 **EPIC-022 "Search Visibility 360" pasó de fundación a motor en un día (delta 2026-08-05, fin de jornada):
 COMPLETE — TASK-1299 (schema `greenhouse_growth.seo_*` — 8 tablas config + serie temporal append-only por
-`capture_date`), TASK-1301 (5 capabilities `growth.seo.*` + módulo per-org `seo_v1` + chokepoint único
+`capture_date`), TASK-1301 (5 capabilities `growth.seo.*` + módulo per-org — **hoy la clave viva es `seo_v2`**, ver delta abajo — + chokepoint único
 `enforceSeoRunEntitlement` en `src/lib/growth/seo/entitlement.ts`), TASK-1300 (registry DataForSEO + ledger de
 costo), TASK-1302 (materializer GSC + `readKeywordOpportunities` — CON ROLLOUT LIVE) y TASK-1305
 (`readSeoAeoGap` + quadrant SEO×AEO del 360 — **primer quadrant real: Berel #1.75 orgánico × AEO 44.5 →
@@ -74,12 +74,31 @@ y cruce SEO↔AEO real — pero para el cliente el portal sigue mostrando NADA d
 
 > **Delta 2026-08-07 — cockpit INTERNO + las 2 primeras escrituras.** TASK-1306/1307/1308 complete: el equipo
 > entra a `/admin/growth/seo` (overview · rank & URL performance · mapa de oportunidades de keyword) y puede
-> **seguir/dejar de seguir keywords** desde la pantalla. Inventario MCP hoy: **9 lecturas + 2 escrituras**
-> (`track_seo_keywords` / `untrack_seo_keywords`). 🔴 Seguir una keyword **compromete gasto recurrente del
+> **seguir/dejar de seguir keywords** desde la pantalla. Inventario MCP del dominio SEO hoy (verificado contra
+> `src/mcp/greenhouse/server.ts` el 2026-08-14): **10 lecturas + 2 escrituras**
+> (`track_seo_keywords` / `untrack_seo_keywords`); la 10.ª lectura es `get_seo_keyword_market_data`
+> (TASK-1661, complete y en producción). 🔴 Seguir una keyword **compromete gasto recurrente del
 > proveedor** —el rank capture paga por cada keyword vigente en cada ciclo—, así que el command lleva techo por
 > target, entitlement per-ORG, outcome por keyword y su reverso; las tools quedan federadas y **fail-closed**
 > hasta que exista un cliente OAuth con grant revocable (TASK-1631). **Nada de esto es cara de cliente**: la
 > fila de abajo sigue diciendo la verdad para lo que el cliente ve solo.
+
+> **Delta 2026-08-14 — la clave del módulo per-org es `seo_v2`, no `seo_v1`.** `TASK-1677` cerró la fase
+> CONTRACT del cutover (migración `20260809163352129`): **no queda ni un assignment `seo_v1` vigente** —
+> la migración aborta si quedara alguno — y el código lee sólo `seo_v2`. Cualquier consulta, propuesta o
+> criterio que filtre por `seo_v1` devuelve **cero orgs**, y ese cero se lee como "no hay clientes", no como
+> "la clave está mala".
+
+> 🔴 **Delta 2026-08-13 — `ISSUE-152`: Berel se mide en MÉXICO, no en Chile.** El target original
+> `seot-berel-fase0` estaba configurado con `location_code 2152` (Chile) para una marca mexicana: `berel`
+> tiene **30 búsquedas/mes en Chile contra 49.500 en México** (1.650×). Se corrigió con **target nuevo
+> `seot-berel-mx`** (`2484`/`es`/`MX`, activo) + las 31 keywords re-trackeadas por el command canónico, y
+> **pausa del target de Chile, sin borrar** sus 238 snapshots (tabla append-only; cambiar el `location_code`
+> in-place habría mezclado dos mercados bajo una misma serie sin marcador). **Al armar propuesta o report de
+> Berel, el país es México**; el año de serie previo describe el SERP equivocado y no se presenta como
+> evolución de posiciones del cliente. Hallazgo hermano: `keyword_difficulty` no es creíble en español
+> (`pintura` = KD 0 con 135.000 búsquedas/mes en México), así que **la dificultad no se muestra a un cliente**
+> — el volumen sí. Por eso la barrera de enlaces se deriva del perfil real del top-10, no de la KD.
 
 > 🧭 **Directivas vigentes (2026-08-05, cutover cerrado el 2026-08-06):** **MCP-first** — SV360 se opera por
 > MCP antes que por UI (TASK-1645 + TASK-1647 complete, espejo del TASK-1086 de Knowledge; el provider
@@ -88,7 +107,7 @@ y cruce SEO↔AEO real — pero para el cliente el portal sigue mostrando NADA d
 > provider-facing (costo DataForSEO) pasa por `enforceSeoRunEntitlement`, y **todo reader SEO/E-E-A-T futuro
 > expone su MCP tool EN EL MISMO PR** (criterio ya sembrado en 1303/1304/1311-1314/1317).
 > Own-brand: Efeonce quedó provisionada como org canónica `EO-ORG-0007` (4 perfiles grader ligados = lente
-> AEO propia disponible, assignment `seo_v1`, target `efeoncepro.com`); SKY tiene su lente AEO ligada.
+> AEO propia disponible, assignment **`seo_v2`**, target `efeoncepro.com`); SKY tiene su lente AEO ligada.
 > El 360 de cualquier org = 3 piezas: assignment + lente AEO ligada + GSC conectada (o
 > TASK-1303/DataForSEO para marcas ajenas — **ya no se espera: el rank capture corre en producción
 > desde 2026-08-06**, ver fila Rank tracking).

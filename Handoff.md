@@ -53,11 +53,11 @@ próximo ciclo (itera targets `active`).
   multi-mercado se materialice; declarado en ISSUE-153 §Follow-up.
 - Guardrail de alta de target (contrastar volumen del nombre de marca vs mercados vecinos) —
   ISSUE-152 §4.
-- `keyword_difficulty`: RESUELTO con presentación, no con veto. Es métrica pura de enlaces
-  (contrastada vs Semrush: 0 vs 50 para `pintura` MX — dos escuelas, no un dato roto). La UI la
-  muestra como **Barrera de enlaces: Baja/Media/Alta** (`classifyLinkBarrier`), nunca el número
-  crudo; verificado visual con datos reales de Berel (desktop+390). `avg_backlinks_info` (gratis,
-  no persistido) queda como mejora futura si se quiere una dificultad blended propia.
+- `keyword_difficulty`: RESUELTO, y desde `fc0019e43` ya **no gobierna la presentación**. La UI
+  muestra **Barrera de enlaces: Baja/Media/Alta** derivada por `deriveLinkBarrier`
+  (`src/lib/growth/seo/keyword-market-data.ts`) desde el perfil de enlaces del top-10 real
+  (`avg_backlinks_info`), ponderando **diversidad de dominios referentes + page rank, nunca el
+  conteo de enlaces** — explícitamente NO la KD. `classifyLinkBarrier` fue eliminada.
 
 ### TASK-1661 — datos de mercado por keyword: code complete, rollout PENDIENTE (2026-08-13)
 
@@ -76,11 +76,9 @@ próximo release develop→main lleva el lane a producción → recién entonces
 del gateway** para que la tool federada viva en `mcp.efeonce.org` sin 404 upstream; (2) verificar
 el primer run del scheduler el día 15 (esperado: `already_fresh`, costo ~0).
 
-**Riesgo abierto que hay que cerrar antes de mostrar la columna a un cliente:** el proveedor devuelve
-`keyword_difficulty = 0` para cabeceras de alto volumen (`pintura`, 18.100 búsquedas/mes). Se verificó
-contra la respuesta cruda: el 0 es del proveedor, y para otras keywords devuelve `null`, así que el
-campo sí distingue. Se persiste verbatim (transformarlo sería inventar), pero un 0 se lee como
-"trivialmente fácil" y sería una afirmación falsa. Contrastar con una segunda fuente.
+**Riesgo de la KD 0: CERRADO por `fc0019e43`.** La KD dejó de gobernar la presentación: se persiste
+verbatim, pero la barrera se deriva del perfil de enlaces del top-10, no de ella. Verificado contra el
+proveedor: `pintura` y `pintura para piso` (ambas KD=0) ahora separan en `high` y `low`.
 
 **Gasto real ya incurrido en verificación: USD ~0.05** (dry-run gratis + corrida real + una llamada
 de diagnóstico + la corrida con el defecto que se corrigió).

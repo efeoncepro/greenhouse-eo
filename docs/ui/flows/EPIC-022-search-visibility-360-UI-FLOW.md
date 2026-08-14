@@ -110,7 +110,11 @@ Operador (internal):
 /admin/growth/seo/performance?urls=…&keywords=…&range=90d&engine=google&device=desktop
 /admin/growth/seo/keywords                     Keyword opportunities (lente Oportunidades, vista por defecto)
 /admin/growth/seo/keywords?space=…&window=28|90&q=…&action=quickWin|striking|cannibalized&position=firstPage|secondPage
-   (vigente desde 2026-08-07 — `intent`/`maxDiff` no existen: no hay fuente de intención ni de dificultad)
+   (vigente desde 2026-08-07 — la lente Oportunidades no expone hoy filtros `intent`/`maxDiff` en la URL.
+    ⚠️ Corregido 2026-08-14: la premisa original de esa nota — "no hay fuente de intención ni de dificultad" —
+    dejó de ser cierta con TASK-1661: `greenhouse_growth.seo_keyword_market_data` persiste `search_intent`,
+    `search_intent_probability` y `keyword_difficulty`. Que no sean query params es una decisión de alcance
+    de la pantalla, no una ausencia de fuente)
 /admin/growth/seo/keywords?space=…&view=targets     Lente Objetivos (TASK-1660)
 /admin/growth/seo/keywords?space=…&view=discovery&discoveryRun=…&q=…&source=…&intent=…&state=…&minVolume=…&maxDifficulty=…
    (lente Descubrir: `view=discovery` es la única selección de lente; `discoveryRun` y filtros son query state allowlisted)
@@ -260,9 +264,16 @@ atribuir citas sólo después de que exista un prompt aprobado y una observació
 
 ## 9. Reliability signals (arch §8, subsistema Growth Health)
 
-Visibles en `/admin/operations`: `seo.rank.capture_lag` (steady=0), `seo.audit.stuck_tasks`,
-`seo.keyword_discovery.stuck_runs`, `seo.keyword_discovery.provider_errors` y
-`seo.provider.cost_over_budget`. Las superficies operador (S1/S4) enlazan a estos signals cuando
+**Implementadas y visibles hoy en `/admin/operations` (verificado 2026-08-14 contra
+`src/lib/reliability/queries/`):** `seo.rank.capture_lag` (steady=0), `seo.audit.stuck_tasks` y
+`seo.market_data.freshness` (TASK-1661 — cobertura de dato de mercado vigente sobre el set seguido;
+con `GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED` apagado, la cobertura parcial es lo esperado).
+
+**Previstas, aún NO implementadas** (no asumir que existen al diseñar una superficie):
+`seo.keyword_discovery.stuck_runs`, `seo.keyword_discovery.provider_errors` (dueñas: TASK-1664/1665) y
+`seo.provider.cost_over_budget`.
+
+Las superficies operador (S1/S4) enlazan a estos signals cuando
 muestran freshness/degradación; S3/Descubrir muestra el estado de la corrida y su costo, pero no
 calcula salud en cliente ni oculta una corrida atascada.
 
@@ -301,6 +312,10 @@ calcula salud en cliente ni oculta una corrida atascada.
 ---
 
 ## Delta 2026-08-07 — S3 (Keyword opportunities) implementada: cuatro supuestos del flujo no resistieron el runtime
+
+> ⚠️ **Los puntos 1 y 4 de este delta quedaron SUPERSEDIDOS por el
+> [Delta 2026-08-14](#delta-2026-08-14--el-enriquecimiento-de-mercado-llegó-supersede-los-puntos-1-y-4-del-delta-2026-08-07).**
+> Se conservan como histórico: describen el estado real entre el 2026-08-07 y el 2026-08-13, no el contrato vigente.
 
 `/admin/growth/seo/keywords` está viva (TASK-1308). Hereda el shell de S1 sin construir navegación
 local, entra en `route-reachability-manifest.ts` con `parent: '/admin/growth/seo'` + `via: 'tab'`, y
@@ -426,3 +441,45 @@ ni un segundo estado editorial en el browser.
 
 Este delta actualiza el master flow; no constituye evidencia de runtime ni cambia el estado `UI ready:
 no` de `TASK-1665`.
+
+## Delta 2026-08-14 — el enriquecimiento de mercado llegó: supersede los puntos 1 y 4 del Delta 2026-08-07
+
+`TASK-1661` aterrizó la lente ◑ estimada. Lo que el Delta 2026-08-07 declaraba como ausencia de fuente
+**ya no es cierto**, y este delta fija el contrato vigente para todos los consumers.
+
+**Lo que cambió respecto de ese delta:**
+
+1. **Existe fuente de mercado, y existe fuente de intención.**
+   `greenhouse_growth.seo_keyword_market_data` persiste `search_volume`, `keyword_difficulty`,
+   `search_intent`, `search_intent_probability`, `competition` (⚠️ **paga**, no dificultad) y el perfil
+   de enlaces del top-10, cada fila con su `capture_date` / `provider_last_updated_at`.
+   `readKeywordOpportunities` devuelve `market: 'available' | 'unavailable'` según haya o no captura
+   para esa lectura — ya no está cableado a `'unavailable'`.
+2. **Las columnas *Volumen* y *Barrera de enlaces* SÍ se renderizan** cuando `market === 'available'`.
+   La no-renderización sigue siendo el comportamiento correcto **solo** en el caso `'unavailable'`
+   (con la nota `● Medido · Search Console` + el motivo, una vez, al pie del mapa).
+3. **La columna se llama "Barrera de enlaces", NUNCA "Dificultad"** (ISSUE-152), y se muestra en
+   niveles **Baja / Media / Alta**, jamás como número crudo. El nivel se deriva server-side
+   (`deriveLinkBarrier`) del perfil de enlaces **real del top-10** — diversidad de dominios referentes
+   + page rank —, **no** del `keyword_difficulty` del proveedor, que en SERPs LATAM colapsa a 0 y se
+   leería como "trivial". **"Baja" = se compite con contenido y autoridad, no con enlaces**: una
+   oportunidad para un dominio fuerte, no una búsqueda fácil.
+4. **`unknown` se pinta "Sin dato", nunca "Baja" y nunca `0`.** Un hueco presentado como barrera baja
+   afirma una oportunidad que nadie midió. El invariante del §8 se mantiene entero.
+
+**Lo que NO cambió (y es la parte importante):**
+
+- **El encoding del scatter sigue siendo medido**: X = posición ponderada, Y = impresiones (log),
+  tamaño = clics incrementales, color + forma = acción. El punto 1 del delta anterior tenía razón en la
+  **decisión** aunque su premisa expiró: el mercado estimado **es columna y filtro, nunca eje**. Los
+  ejes medidos son correctos con o sin él.
+- **El orden de la tabla sigue saliendo de la ganancia estimada** (dato medido). El volumen de mercado
+  dimensiona y explica; no prioriza.
+- **● y ◑ no se promedian ni se sustituyen jamás**, y toda cifra estimada viaja con su as-of.
+
+**Deuda visible declarada (no cerrada por este delta):** cuando `market === 'available'`, la pantalla
+**no** renderiza hoy ninguna leyenda de origen — la nota `● Medido · Search Console` sólo aparece en el
+caso `'unavailable'` — y tampoco imprime el `capturedAt` del dato de mercado. El §8 pide leyenda
+persistente y as-of explícito para lo estimado: eso queda pendiente de una task de UI. El as-of sí viaja
+en el contrato programático (`get_seo_keyword_market_data` devuelve `capturedAt` /
+`providerLastUpdatedAt`).

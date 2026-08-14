@@ -1,9 +1,9 @@
 # MCP Greenhouse Read-Only
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-04-30 por Codex
-> **Ultima actualizacion:** 2026-08-06 por Claude (gateway `mcp.efeonce.org` acepta clientes MCP estándar con login de usuario; federación de `get_seo_rank_evolution` completada)
+> **Ultima actualizacion:** 2026-08-14 por Claude (inventario SEO real: 10 tools de lectura + 2 de escritura; 9 federadas al gateway, 3 aún no)
 > **Modulo:** plataforma / MCP
 > **Ruta en portal:** `N/A` (server MCP local `stdio` o remoto HTTP)
 > **Documentacion relacionada:** [API Platform Ecosystem](../../documentation/plataforma/api-platform-ecosystem.md), [Platform Health API](../../documentation/plataforma/platform-health-api.md), [GREENHOUSE_MCP_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md)
@@ -107,7 +107,7 @@ Desde el 2026-08-06 el gateway público `mcp.efeonce.org` acepta **clientes MCP 
 claude mcp add --transport http efeonce-mcp https://mcp.efeonce.org/mcp
 ```
 
-Luego, en una sesión interactiva, ejecuta `/mcp`, elige el server y usa `Authenticate`: se abre el login Entra en el navegador y al volver el server queda `connected` con las 4 tools SEO federadas (más el lector de Globe).
+Luego, en una sesión interactiva, ejecuta `/mcp`, elige el server y usa `Authenticate`: se abre el login Entra en el navegador y al volver el server queda `connected` con las **9 tools SEO federadas** hoy (7 de lectura + 2 de escritura; inventario exacto en el §8), más el lector de Globe.
 
 **claude.ai / Claude Desktop:** `Settings` → `Connectors` → `Add custom connector` con la URL `https://mcp.efeonce.org/mcp`, y autentica con la misma cuenta Entra.
 
@@ -200,19 +200,36 @@ Reglas que el agente debe respetar:
 - Un documento marcado como "no usado por agentes", borrador, deprecado o no-interno **no aparece** (responde `404` por id, o simplemente no entra en la búsqueda). Lo que queda fuera por política se **cuenta** sin mostrar su contenido.
 - Es **read-only**: estas tools nunca crean, editan ni publican conocimiento.
 
-### 8. SEO / Search Visibility 360 (TASK-1645 + TASK-1303 + TASK-1304)
+### 8. SEO / Search Visibility 360 (TASK-1645 · 1303 · 1304 · 1306 · 1307 · 1308 · 1661)
+
+Hoy son **12 tools SEO: 10 de lectura y 2 de escritura**. Las de escritura son la excepción al
+carácter read-only del resto de este MCP y están marcadas como tales.
+
+**Lectura (10):**
 
 - `get_seo_entitlement`
 - `get_seo_keyword_opportunities`
+- `get_seo_keyword_market_data`
 - `get_seo_visibility_360`
 - `get_seo_rank_evolution`
+- `get_seo_overview_kpis`
+- `get_seo_performance`
+- `get_seo_performance_catalog`
 - `get_seo_site_audit_report`
 - `get_seo_backlink_profile`
+
+**Escritura (2) — comprometen gasto recurrente del proveedor:**
+
+- `track_seo_keywords`
+- `untrack_seo_keywords`
 
 Qué entregan:
 
 - `get_seo_entitlement` dice si una organización tiene el módulo SEO (`seo_v2`) asignado, su tier (`contracted`/`trial`/`pilot`), cuántos site-audits le quedan en el mes y cuánto presupuesto de proveedor (USD) le queda. **Úsala PRIMERO**, antes de proponer cualquier operación SEO.
-- `get_seo_keyword_opportunities` lista las oportunidades striking-distance **medidas** (Google Search Console): posición ponderada, impresiones, clics incrementales estimados, quick wins y canibalización.
+- `get_seo_keyword_opportunities` lista las oportunidades striking-distance **medidas** (Google Search Console): posición ponderada, impresiones, clics incrementales estimados, quick wins y canibalización. Desde TASK-1661 puede traer además `searchVolume` y `difficulty` como **enriquecimiento opcional ◑ estimado**; `null` significa "nunca se consultó", **jamás cero**, y el campo `market` dice si ese enriquecimiento existe para esa organización.
+- `get_seo_keyword_market_data` (TASK-1661) resuelve el dato de mercado **◑ estimado** para una **lista explícita de keywords** (no existe el modo "todas las de la org"): volumen mensual, dificultad orgánica 0–100, competencia **paga** y core keyword, desde el snapshot mensual de DataForSEO Labs. El mercado (país + idioma) sale del target SEO, porque el volumen no es global. Cada valor viaja con `capturedAt`/`providerLastUpdatedAt`: **siempre se reporta el as-of**. `found=false` = nunca se consultó, se reporta como desconocido. La dificultad es una métrica de **barrera de enlaces** y se presenta como nivel (baja 0–14 / media 15–49 / alta 50+), nunca como número crudo: un 0 significa "entrar no está bloqueado por enlaces", **no** que rankear sea trivial.
+- `get_seo_overview_kpis` (TASK-1306) devuelve los KPIs norte del cockpit Overview desde datos **medidos** de Search Console: clics, impresiones, posición media **ponderada por impresiones** (nunca un promedio plano) y CTR (clics totales / impresiones totales), más la serie diaria y la ventana anterior comparable. `previous: null` significa "sin comparación disponible", **nunca** un cambio de 100%.
+- `get_seo_performance` y `get_seo_performance_catalog` (TASK-1307) son el par de la pantalla Rendimiento: el catálogo lista los ítems comparables (keywords o URLs, más los **grupos nombrados** que el operador configuró) y `get_seo_performance` devuelve la serie diaria + el standing de un set elegido. La fuente resuelta viaja en `data.source` y **debe declararse** al reportar números; un punto `value=null` es un hueco de medición, nunca un cero.
 - `get_seo_visibility_360` cruza los dos internets de búsqueda: posición orgánica medida (GSC) × citabilidad IA (score del AEO grader). Devuelve la **matriz quadrant** por keyword y del dominio: `dominante` (rankea y la IA lo cita), `riesgo` (rankea pero la IA NO lo cita — autoridad sin citabilidad, la señal de venta cruzada al AEO), `oportunidad` (citado sin rankear) e `invisible`.
 - `get_seo_rank_evolution` devuelve la serie temporal de **posiciones exactas por keyword** (fuente DataForSEO SERP; la captura diaria ya corrió sola — la tool solo lee). Parámetros opcionales: `organizationId` (obligatorio para binding `internal`), `rangeDays` (ventana en días, máx 1825), `engine`, `device` (`desktop`/`mobile`/`tablet`) y `keywords` (subset, máx 100). Ejemplo: `get_seo_rank_evolution {"organizationId": "…", "rangeDays": 30, "device": "desktop", "keywords": ["pintura para piscinas"]}` → `{ series: [{ keyword, points: [{ date, position, url }] }] }`.
 - `get_seo_site_audit_report` (TASK-1304) devuelve el **audit técnico del sitio**: health score sitewide (0–100), páginas crawleadas y findings agrupados por severidad (`critical`/`warning`/`notice`) con `issueType` estable (p. ej. `is_4xx_code`, `no_description`, `has_micromarkup_errors`). Un run `running` significa "crawl en curso" (hecho, no error); un `succeeded` con 0 findings significa sitio técnicamente limpio. Parámetro opcional `auditRunId` para leer un run histórico puntual.
@@ -225,13 +242,22 @@ Reglas que el agente debe respetar:
 - **Una lente faltante es un estado, no un cero.** `no_seo_data` / `no_aeo_data` / `target_not_configured` / `disabled` se reportan tal cual; NUNCA inventes un quadrant ni rellenes con ceros.
 - **Los dos ejes del 360 nunca se promedian**: rankeo y citabilidad son verdades ortogonales de motores distintos.
 - **En `get_seo_rank_evolution`, `position: null` en una fecha significa que el dominio no rankeó ese día.** Es una medición válida, no un error ni un hueco a rellenar. Y esa serie (DataForSEO) **nunca se promedia** con la serie de GSC — son fuentes distintas.
-- Es **read-only**: ninguna de estas tools dispara capturas ni gasta presupuesto de proveedor.
+- **Medido ● y estimado ◑ nunca se promedian ni se sustituyen.** El volumen de mercado de `get_seo_keyword_market_data` es una estimación del mercado; las impresiones de `get_seo_keyword_opportunities` son la demanda medida de ESE sitio. Son dos hechos distintos y ambos ciertos.
+- **Las 10 tools de lectura son read-only**: no disparan capturas ni gastan presupuesto de proveedor.
+- **Las 2 de escritura sí comprometen gasto recurrente.** `track_seo_keywords` factura cada keyword al proveedor en **cada ciclo diario** hasta que alguien la saque, así que la lista exacta se propone al humano y se confirma **antes** de llamarla — nunca especulativamente. Ambas son idempotentes y devuelven un **outcome por keyword** (`tracked` / `already_tracked` / `capacity_exceeded` / `invalid`, y `untracked` / `not_tracked` / `invalid`): reportar `data.ok` sin leer ese arreglo describe un cambio que puede no haber ocurrido. El lane las acepta **solo desde bindings de scope `internal`**.
 
-Desde el 2026-08-06 las cuatro primeras tools están **federadas al gateway público `mcp.efeonce.org`**
-(TASK-1647; `get_seo_rank_evolution` se federó ese mismo día vía TASK-1653), así que un cliente MCP externo
-autenticado por OAuth las alcanza sin levantar este server. Es el mismo lane y el mismo entitlement: el
-gateway solo transporta. Las dos de TASK-1304 (`get_seo_site_audit_report`, `get_seo_backlink_profile`)
-viven por ahora solo en este MCP interno de producción. Lectura funcional en
+**Qué está federado al gateway público `mcp.efeonce.org`.** Verificado contra el allowlist de paridad
+del repo hermano `efeonce-mcp` (`src/providers/greenhouse-seo-tool-parity.ts`, cuyo test rompe el CI si
+diverge de las tools realmente registradas en el gateway): hoy son **9 tools** — `get_seo_entitlement`,
+`get_seo_keyword_opportunities`, `get_seo_visibility_360`, `get_seo_rank_evolution`,
+`get_seo_site_audit_report`, `get_seo_backlink_profile`, `get_seo_keyword_market_data` (TASK-1661,
+verificada verde contra **producción** el 2026-08-14) y las dos de escritura `track_seo_keywords` /
+`untrack_seo_keywords`. Es el mismo lane y el mismo entitlement: el gateway solo transporta.
+
+**Qué NO está federado todavía** y por ahora vive solo en este MCP interno: `get_seo_overview_kpis`,
+`get_seo_performance` y `get_seo_performance_catalog`. La federación es por **allowlist explícito con
+revisión humana por tool** (decisión TASK-1647: nunca auto-federación), así que la ausencia es un
+pendiente declarado, no un bug. Lectura funcional en
 [Search Visibility 360 por MCP](../../documentation/growth/search-visibility-360-por-mcp.md); operación en
 [Operar el provider Greenhouse-SEO del MCP](operar-provider-greenhouse-seo-mcp.md).
 
@@ -242,7 +268,7 @@ Este MCP no hace lo siguiente:
 - no crea subscriptions
 - no actualiza subscriptions
 - no reintenta deliveries
-- no hace writes de ningún tipo
+- no hace writes **salvo** las dos excepciones gobernadas del §8 (`track_seo_keywords` / `untrack_seo_keywords`, TASK-1308), que exigen binding `internal`, entitlement, techo de capacidad e idempotencia; fuera de ese par, este MCP no escribe nada
 - no consulta rutas legacy como source primaria
 - no expone OAuth hosted/multiusuario
 - no expone ICO por MCP todavía

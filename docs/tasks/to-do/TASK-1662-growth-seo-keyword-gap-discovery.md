@@ -82,7 +82,7 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `docs/tasks/to-do/TASK-1661-growth-seo-keyword-market-data-capability.md` — su dependencia dura
+- `docs/tasks/complete/TASK-1661-growth-seo-keyword-market-data-capability.md` — su dependencia dura (**complete** desde 2026-08-13; el primitive de mercado ya existe en producción)
 - `docs/epics/to-do/EPIC-022-growth-seo-search-visibility-360-module.md`
 
 ## Dependencies & Impact
