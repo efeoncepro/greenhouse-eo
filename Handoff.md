@@ -2,6 +2,30 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+### Release a producción 2026-08-14 — `3754a17d3b1d` RELEASED
+
+`release_id=3754a17d3b1d-4ae924ca-eb20-4c54-9ddb-e15a7ecfe26a`, run `31793370954`, PR #192.
+**Manifest `released`** (verificado en `greenhouse_sync.release_manifests`, no sólo en GitHub).
+Pasó a la primera: 0 retries, 0 runs quemados. E2E agente 1h04m; workflow 11m33s.
+
+**Verificado en runtime, no asumido:** 4 workers Cloud Run `Ready=True` (3 con el target SHA;
+`ops-worker` en `9edd4a0e1e0f` = **residual change-gated legítimo**, diff de rutas runtime vacío —
+NO forzar redeploy, runbook §4.1) · watchdog 3/3 `ok` · `/api/auth/health` 200 · **canary del
+gateway contra PRODUCCIÓN completo verde**, incluida la tool nueva
+(`keyword-market-data: market=available found=2/2 asOf=2026-08-13 servedMarket=2484/es`).
+
+**Break-glass usado con razón verificada** (no formulaica): `db_migrations` es dominio irreversible,
+pero la migración `20260813171143226` ya figuraba en `pgmigrations` (2026-08-13 21:13Z) y hay UNA
+sola instancia Cloud SQL — el dominio era reconciliación de archivos con un estado ya realizado.
+Rollback = revert del PR #192, sin undo de schema.
+
+**Gateway MCP:** deploy dispatchado (`efeonce-mcp` run `31794233777`, sha `c4e0fcd`) DESPUÉS de
+confirmar el lane vivo en producción. Verificar que cierre y correr el canary contra
+`mcp.efeonce.org`.
+
+**Pendiente menor:** primer run del scheduler `ops-seo-keyword-market-data` el día 15 08:00 CLT
+(esperado `already_fresh`, costo ~0).
+
 ### ISSUE-152 + ISSUE-153 resueltos — mercado de Berel corregido + contrato multi-mercado (2026-08-13)
 
 **Berel migrado a México** (autorización del operador: "Berel es de México" + "solucionalo
