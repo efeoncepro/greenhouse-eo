@@ -2,6 +2,16 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+### TASK-1664 en ejecución — keyword discovery (2026-08-14)
+
+Rama `develop` (sin worktrees). Intake + Discovery hechos (Zone 2 de la spec tiene el delta de
+baseline). Plan de 6 slices impreso en sesión; **checkpoint P1 esperando OK del operador** antes de
+implementar. Diseño clave: candidates guardan SOLO procedencia; el `keyword_info` inline se persiste
+en el store de TASK-1661 vía un writer compartido nuevo (`persistKeywordMarketData`, extraído del
+INSERT inline de `captureKeywordMarketData`); despertador = Cloud Scheduler
+`ops-seo-keyword-discovery-drain` (nace PAUSADO) → `POST /seo/keyword-discovery/drain`; flag
+`GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED` default OFF en ambos runtimes.
+
 ### Release a producción 2026-08-14 — `3754a17d3b1d` RELEASED
 
 `release_id=3754a17d3b1d-4ae924ca-eb20-4c54-9ddb-e15a7ecfe26a`, run `31793370954`, PR #192.
