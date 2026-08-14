@@ -7471,6 +7471,16 @@ export interface GreenhouseGrowthSeoGscDaily {
 }
 
 export interface GreenhouseGrowthSeoKeywordMarketData {
+  /**
+   * Conteo bruto de enlaces del top-10. Auditoría y completitud — NO gobierna la barrera: alto conteo con pocos dominios es concentración, no dificultad.
+   */
+  avg_backlinks: Numeric | null;
+  avg_main_domain_rank: Numeric | null;
+  avg_page_rank: Numeric | null;
+  /**
+   * Dominios referentes promedio del top-10. Señal PRINCIPAL de la barrera de enlaces: la diversidad pesa más que el conteo (seo-aeo 05). NULL = no capturado, nunca "sin barrera".
+   */
+  avg_referring_domains: Numeric | null;
   capture_date: Timestamp;
   captured_at: Generated<Timestamp>;
   captured_by_organization_id: string;

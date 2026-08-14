@@ -272,7 +272,11 @@ export const readKeywordOpportunities = async (
           cannibalized: competingPages > 1,
           competingPages,
           searchVolume: market?.searchVolume ?? null,
-          difficulty: market?.keywordDifficulty ?? null
+          difficulty: market?.keywordDifficulty ?? null,
+          // Derivada del perfil de enlaces del top-10, NO de `difficulty` — ese índice colapsa
+          // a 0 en SERPs es-LATAM y no discrimina (ISSUE-152 delta 2026-08-14).
+          linkBarrier:
+            marketData.linkBarrierByKeyword.get(normalizeMarketKeyword(row.keyword ?? '')) ?? 'unknown'
         }
       })
       .sort((a, b) => b.estimatedClickGain - a.estimatedClickGain)

@@ -113,3 +113,26 @@ Las superficies admin (cockpit, keywords) no tienen aún **selector de mercado e
 una org multi-mercado degradan a su empty state honesto. Ese picker es trabajo de producto/UI
 que corresponde a la superficie de keywords (`TASK-1660`/`TASK-1665` territory) cuando una org
 multi-mercado se materialice — Efeonce midiendo sus 4 países será el caso.
+
+
+## Delta 2026-08-14 — el selector de mercado NO se construye todavía (decisión, no olvido)
+
+Evaluado con `arch-architect` al cerrar los follow-ups. **Veredicto: no construirlo.** El catálogo
+de anti-patrones lo nombra — *premature abstraction*, con la regla de Fowler: no abstraigas hasta
+ver el patrón tres veces, dos es coincidencia. Acá no se ha visto **ninguna**: cero organizaciones
+con dos targets activos (Berel tiene MX activo + CL pausado; Efeonce tiene uno).
+
+Lo que SÍ exigía la skill es su ejercicio del segundo consumidor — *mientras exista un solo
+consumidor, la reutilización es una hipótesis, no un hecho; escribe el segundo aunque sea de
+juguete*. **Eso ya está cubierto**: `resolve-target.test.ts` ejercita dos mercados activos sin
+selector (→ `multiple_markets`), con selector ISO-2, con `location_code` y el caso que no matchea;
+`ecosystem-growth-seo.test.ts` ejercita los dos 409 del lane. El motor está probado sin UI.
+
+**Disparador para construirlo:** el día que una organización tenga **dos targets activos** — es
+decir, cuando alguien mida un segundo país de verdad (el caso natural es Efeonce midiéndose en
+CL/MX/CO/PE). Recién ahí se sabrá si el selector vive en el sidebar, en la URL o en el Space
+picker, en vez de adivinarlo hoy y quedar casado con la respuesta equivocada.
+
+**Lo que ya está cerrado y era el bug:** el read path **nunca elige un país en silencio**. Con dos
+mercados activos el lane responde `409 multiple_markets` con la lista y las superficies degradan
+honestamente. La comodidad falta; la incorrección no.

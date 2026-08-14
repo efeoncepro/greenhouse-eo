@@ -85,6 +85,7 @@ import {
   LABS_TASK_SETUP_USD,
   MAX_KEYWORDS_PER_OVERVIEW_CALL,
   captureKeywordMarketData,
+  deriveLinkBarrier,
   estimateMarketDataCost,
   normalizeMarketKeyword,
   parseKeywordOverviewItem,
@@ -179,7 +180,12 @@ describe('parseKeywordOverviewItem', () => {
       searchIntent: 'commercial',
       searchIntentProbability: 0.87,
       coreKeyword: 'pintura industrial',
-      providerLastUpdatedAt: '2026-07-15 00:00:00 +00:00'
+      providerLastUpdatedAt: '2026-07-15 00:00:00 +00:00',
+      // Sin `avg_backlinks_info` en el item, el perfil de enlaces queda NULL: "no capturado".
+      avgPageRank: null,
+      avgMainDomainRank: null,
+      avgBacklinks: null,
+      avgReferringDomains: null
     })
   })
 
@@ -385,7 +391,12 @@ describe('captureKeywordMarketData — contrato de gasto', () => {
 
     await captureKeywordMarketData('seot-1')
 
-    const costs = state.inserts.map(call => call.params[call.params.length - 1])
+    // `provider_cost` es $15 del INSERT. Se referencia por su posición SEMÁNTICA y no como
+    // "el último parámetro": agregar una columna al final movería el índice y el test pasaría
+    // a medir otra cosa en silencio — que es exactamente lo que ocurrió al sumar los cuatro
+    // campos de avg_backlinks_info.
+    const providerCostParamIndex = 14
+    const costs = state.inserts.map(call => call.params[providerCostParamIndex])
 
     // Sólo la PRIMERA fila escrita del lote lleva el costo del batch.
     expect(costs).toEqual([0.02, 0])
@@ -414,27 +425,78 @@ describe('captureKeywordMarketData — contrato de gasto', () => {
   })
 })
 
-describe('classifyLinkBarrier (ISSUE-152 — presentación de la lente de enlaces)', () => {
-  it('null = no consultado, se queda null (nunca se inventa un nivel)', async () => {
-    const { classifyLinkBarrier } = await import('../contracts')
-
-    expect(classifyLinkBarrier(null)).toBeNull()
+describe('deriveLinkBarrier (barrera de enlaces desde la evidencia del top-10)', () => {
+  it('sin ninguna señal → unknown; un hueco JAMÁS se pinta como "baja"', () => {
+    expect(deriveLinkBarrier({ avgReferringDomains: null, avgPageRank: null })).toBe('unknown')
   })
 
-  it('0 es barrera BAJA — una oportunidad, no "trivial"', async () => {
-    const { classifyLinkBarrier } = await import('../contracts')
+  it('gobierna la DIVERSIDAD de dominios, no el conteo de enlaces (caso berel vs pintura)', () => {
+    // Medido 2026-08-13 en MX. berel: 5.125 backlinks pero sólo 30,4 dominios (concentración).
+    // pintura: 232 backlinks y 52,6 dominios (diversidad real).
+    const berel = deriveLinkBarrier({ avgReferringDomains: 30.4, avgPageRank: 89.9 })
+    const pintura = deriveLinkBarrier({ avgReferringDomains: 52.6, avgPageRank: 60.9 })
 
-    expect(classifyLinkBarrier(0)).toBe('low')
-    expect(classifyLinkBarrier(8)).toBe('low')
-    expect(classifyLinkBarrier(14)).toBe('low')
+    // Ambas altas, pero por razones distintas y NINGUNA por el conteo de enlaces:
+    // berel por page_rank (URLs individualmente fuertes), pintura por diversidad de dominios.
+    expect(berel).toBe('high')
+    expect(pintura).toBe('high')
   })
 
-  it('buckets del oficio para KD basadas en enlaces: 15–49 media, 50+ alta', async () => {
-    const { classifyLinkBarrier } = await import('../contracts')
+  it('distingue lo que keyword_difficulty colapsaba: ambas daban KD 0', () => {
+    // `pintura` (135.000 búsquedas/mes) y `pintura para piso` salían las dos KD 0.
+    const pintura = deriveLinkBarrier({ avgReferringDomains: 52.6, avgPageRank: 60.9 })
+    const pisos = deriveLinkBarrier({ avgReferringDomains: 0.1, avgPageRank: 5.2 })
 
-    expect(classifyLinkBarrier(15)).toBe('medium')
-    expect(classifyLinkBarrier(49)).toBe('medium')
-    expect(classifyLinkBarrier(50)).toBe('high')
-    expect(classifyLinkBarrier(100)).toBe('high')
+    expect(pintura).toBe('high')
+    expect(pisos).toBe('low')
+    expect(pintura).not.toBe(pisos)
+  })
+
+  it('page rank muy alto implica barrera alta aunque los dominios sean pocos', () => {
+    expect(deriveLinkBarrier({ avgReferringDomains: 2, avgPageRank: 95 })).toBe('high')
+  })
+
+  it('umbrales de dominios referentes: <10 baja, 10–39 media, 40+ alta', () => {
+    expect(deriveLinkBarrier({ avgReferringDomains: 9.9, avgPageRank: 10 })).toBe('low')
+    expect(deriveLinkBarrier({ avgReferringDomains: 10, avgPageRank: 10 })).toBe('medium')
+    expect(deriveLinkBarrier({ avgReferringDomains: 39.9, avgPageRank: 10 })).toBe('medium')
+    expect(deriveLinkBarrier({ avgReferringDomains: 40, avgPageRank: 10 })).toBe('high')
+  })
+
+  it('sin dominios pero con page rank bajo → unknown, no "baja"', () => {
+    // Es la diferencia entre "no lo capturamos" y "medimos que no hay barrera".
+    expect(deriveLinkBarrier({ avgReferringDomains: null, avgPageRank: 12 })).toBe('unknown')
+  })
+
+  it('0 dominios medidos SÍ es barrera baja: es una medición, no un hueco', () => {
+    expect(deriveLinkBarrier({ avgReferringDomains: 0, avgPageRank: 0 })).toBe('low')
+  })
+})
+
+describe('parseKeywordOverviewItem — perfil de enlaces', () => {
+  const context = { locationCode: '2484', languageCode: 'es' }
+
+  it('proyecta avg_backlinks_info, incluidos los promedios fraccionarios', () => {
+    const datum = parseKeywordOverviewItem(
+      overviewItem('pintura para piso', {
+        avg_backlinks_info: { backlinks: 0.1, referring_main_domains: 0.1, rank: 5.2, main_domain_rank: 496.7 }
+      }),
+      context
+    )
+
+    expect(datum?.avgBacklinks).toBe(0.1)
+    expect(datum?.avgReferringDomains).toBe(0.1)
+    expect(datum?.avgPageRank).toBe(5.2)
+    expect(datum?.avgMainDomainRank).toBe(496.7)
+  })
+
+  it('sin avg_backlinks_info todo queda null — no capturado, no "sin barrera"', () => {
+    const datum = parseKeywordOverviewItem(overviewItem('x', { avg_backlinks_info: null }), context)
+
+    expect(datum?.avgReferringDomains).toBeNull()
+    expect(deriveLinkBarrier({
+      avgReferringDomains: datum?.avgReferringDomains ?? null,
+      avgPageRank: datum?.avgPageRank ?? null
+    })).toBe('unknown')
   })
 })

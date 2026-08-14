@@ -25,7 +25,7 @@ import { GreenhouseAsyncActionButton, GreenhouseChip } from '@/components/greenh
 import type { GreenhouseAsyncActionState } from '@/components/greenhouse/primitives/GreenhouseAsyncActionButton'
 import { GH_GROWTH_SEO_KEYWORDS } from '@/lib/copy/growth'
 import { formatInteger } from '@/lib/format'
-import { classifyLinkBarrier, type KeywordOpportunity } from '@/lib/growth/seo/contracts'
+import { type KeywordOpportunity, type SeoLinkBarrierLevel } from '@/lib/growth/seo/contracts'
 
 import { resolveKeywordAction, type KeywordAction } from './keyword-opportunity-action'
 
@@ -277,10 +277,10 @@ const KeywordOpportunityTable = ({
    * mide sólo enlaces y en SERPs LATAM colapsa a 0 — "Dificultad: 0" se leería "trivial", que
    * es falso. Se muestra el nivel con su tooltip; `null` conserva el estado "Sin dato".
    */
-  const linkBarrierCell = (difficulty: number | null) => {
-    const level = classifyLinkBarrier(difficulty)
-
-    if (level === null) return marketCell(null)
+  const linkBarrierCell = (level: SeoLinkBarrierLevel) => {
+    // `unknown` = no lo capturamos. Se pinta como "Sin dato", JAMÁS como "Baja": un hueco
+    // presentado como barrera baja se lee como oportunidad y es una afirmación que no medimos.
+    if (level === 'unknown') return marketCell(null)
 
     const label =
       level === 'low' ? copy.table.linkBarrierLow : level === 'medium' ? copy.table.linkBarrierMedium : copy.table.linkBarrierHigh
@@ -652,7 +652,7 @@ const KeywordOpportunityTable = ({
                           <TableCell align='right' sx={{ fontVariantNumeric: 'tabular-nums' }}>
                             {marketCell(row.searchVolume)}
                           </TableCell>
-                          <TableCell align='right'>{linkBarrierCell(row.difficulty)}</TableCell>
+                          <TableCell align='right'>{linkBarrierCell(row.linkBarrier)}</TableCell>
                         </>
                       )}
                       {canTrack ? <TableCell align='right'>{rowAction(row)}</TableCell> : null}
