@@ -25,12 +25,22 @@ const state = {
   target: [{ organization_id: 'org-1', status: 'active' }] as Array<Record<string, unknown>>,
   hasModule: true,
   activeKeywords: [] as string[],
+  /** TASK-1659 — intención vigente por keyword; ausente = `NULL` (nadie la declaró). */
+  activeIntents: {} as Record<string, string | null>,
   insertRowCount: null as number | null,
   calls: [] as QueryCall[],
   outboxEvents: [] as Array<Record<string, unknown>>,
   thrown: null as Error | null,
   captured: [] as unknown[]
 }
+
+/**
+ * El array de keywords es el ÚLTIMO parámetro de ambos INSERT y del UPDATE de reapertura.
+ * Buscarlo por forma en vez de por índice fijo evita que la suite se rompa —o peor, quede
+ * verde midiendo el parámetro equivocado— cada vez que el command agrega una columna.
+ */
+const keywordsParam = (params: unknown[]): string[] =>
+  (params.filter(param => Array.isArray(param)).at(-1) as string[] | undefined) ?? []
 
 vi.mock('@/lib/postgres/client', () => ({
   runGreenhousePostgresQuery: async (sql: string, params: unknown[]) => {
@@ -52,7 +62,13 @@ vi.mock('@/lib/db', () => ({
         }
 
         if (sql.includes('FROM greenhouse_growth.seo_keyword_set_members')) {
-          return { rows: state.activeKeywords.map(keyword => ({ keyword })), rowCount: state.activeKeywords.length }
+          return {
+            rows: state.activeKeywords.map(keyword => ({
+              keyword,
+              intent: state.activeIntents[keyword] ?? null
+            })),
+            rowCount: state.activeKeywords.length
+          }
         }
 
         if (sql.includes('UPDATE greenhouse_growth.seo_keyword_set_members')) {
@@ -67,7 +83,7 @@ vi.mock('@/lib/db', () => ({
         }
 
         if (sql.includes('INSERT INTO greenhouse_growth.seo_keyword_set_members')) {
-          const inserted = (params[3] as string[]).length
+          const inserted = keywordsParam(params).length
 
           return { rows: [], rowCount: state.insertRowCount ?? inserted }
         }
@@ -115,6 +131,7 @@ beforeEach(() => {
   state.target = [{ organization_id: 'org-1', status: 'active' }]
   state.hasModule = true
   state.activeKeywords = []
+  state.activeIntents = {}
   state.insertRowCount = null
   state.calls = []
   state.outboxEvents = []
@@ -255,7 +272,19 @@ describe('trackKeywords — persistencia y evento', () => {
     expect(insert).toBeDefined()
     expect(insert?.params[1]).toBe('user-42')
     expect(insert?.params[2]).toBe('nexa')
-    expect(insert?.params[3]).toEqual(['berel'])
+    expect(keywordsParam(insert?.params ?? [])).toEqual(['berel'])
+  })
+
+  it('sin intención declarada persiste NULL, no `opportunity` (no inventa el hecho)', async () => {
+    await trackKeywords('seot-1', ['berel'], 'user-42', { env: ENV_ON })
+
+    const insert = state.calls.find(call =>
+      call.sql.includes('INSERT INTO greenhouse_growth.seo_keyword_set_members')
+    )
+
+    // params: [setId, actor, source, intent, intentDeclaredBy, keywords]
+    expect(insert?.params[3]).toBeNull()
+    expect(insert?.params[4]).toBeNull()
   })
 
   it('emite el evento outbox con coordenadas, no con los datos', async () => {
@@ -293,6 +322,139 @@ describe('trackKeywords — persistencia y evento', () => {
 
     expect(result).toEqual({ ok: false, errorCode: 'query_failed', status: null })
     expect(state.captured).toHaveLength(1)
+  })
+})
+
+/**
+ * TASK-1659 — la intención declarada.
+ *
+ * Lo que se prueba acá NO es "¿guarda la columna?": es que la distinción entre un compromiso
+ * con el cliente y una oportunidad detectada no se pueda perder ni inventar. Dos invariantes
+ * cargan todo el peso: no se asume intención cuando nadie la declaró, y cambiarla historia la
+ * anterior en vez de sobrescribirla.
+ *
+ * El SQL real del cierre+reapertura contra el índice único parcial se ejercita en
+ * `scripts/growth/_sanity-task-1659-keyword-intent.ts` — los mocks no lo cubren.
+ */
+describe('trackKeywords — intención declarada (TASK-1659)', () => {
+  it('persiste intención y autoría cuando se declara', async () => {
+    await trackKeywords('seot-1', ['berel'], 'user-42', { env: ENV_ON, intent: 'target' })
+
+    const insert = state.calls.find(call =>
+      call.sql.includes('INSERT INTO greenhouse_growth.seo_keyword_set_members')
+    )
+
+    expect(insert?.params[3]).toBe('target')
+    expect(insert?.params[4]).toBe('user-42')
+  })
+
+  it('el autor del compromiso puede diferir de quien ejecuta el INSERT', async () => {
+    await trackKeywords('seot-1', ['berel'], 'mcp:agent-7', {
+      env: ENV_ON,
+      source: 'mcp',
+      intent: 'target',
+      intentDeclaredBy: 'user-42'
+    })
+
+    const insert = state.calls.find(call =>
+      call.sql.includes('INSERT INTO greenhouse_growth.seo_keyword_set_members')
+    )
+
+    expect(insert?.params[1]).toBe('mcp:agent-7')
+    expect(insert?.params[4]).toBe('user-42')
+  })
+
+  it('declarar la misma intención dos veces es no-op idempotente, no una fila nueva', async () => {
+    state.activeKeywords = ['berel']
+    state.activeIntents = { berel: 'target' }
+
+    const result = await trackKeywords('seot-1', ['berel'], 'user-1', { env: ENV_ON, intent: 'target' })
+
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+
+    expect(statusOf(result.outcomes, 'berel')).toBe('already_tracked')
+    expect(state.outboxEvents).toHaveLength(0)
+  })
+
+  it('un caller que no declara intención NO reescribe la que ya existe', async () => {
+    state.activeKeywords = ['berel']
+    state.activeIntents = { berel: 'target' }
+
+    const result = await trackKeywords('seot-1', ['berel'], 'user-1', { env: ENV_ON })
+
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+
+    expect(statusOf(result.outcomes, 'berel')).toBe('already_tracked')
+    expect(result.outcomes[0]?.intent).toBe('target')
+    expect(
+      state.calls.some(call => call.sql.includes('UPDATE greenhouse_growth.seo_keyword_set_members'))
+    ).toBe(false)
+  })
+
+  it('cambiar la intención cierra la membresía anterior y abre otra — nunca un UPDATE de la columna', async () => {
+    state.activeKeywords = ['berel']
+    state.activeIntents = { berel: 'opportunity' }
+
+    const result = await trackKeywords('seot-1', ['berel'], 'user-1', { env: ENV_ON, intent: 'target' })
+
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+
+    expect(statusOf(result.outcomes, 'berel')).toBe('intent_changed')
+    expect(result.outcomes[0]?.previousIntent).toBe('opportunity')
+    expect(result.outcomes[0]?.intent).toBe('target')
+
+    const close = state.calls.find(call => call.sql.includes('SET effective_to = clock_timestamp()'))
+
+    expect(close).toBeDefined()
+    // 🔴 `NOW()` daría `effective_to = effective_from` y reventaría el CHECK (23514).
+    expect(close?.sql).not.toContain('NOW()')
+    // La columna NUNCA se sobrescribe: el histórico "es objetivo desde marzo" es el dato.
+    expect(state.calls.some(call => /SET\s+intent\s*=/.test(call.sql))).toBe(false)
+  })
+
+  it('declarar una intención sobre una membresía sin intención también es un cambio historiado', async () => {
+    state.activeKeywords = ['berel']
+
+    const result = await trackKeywords('seot-1', ['berel'], 'user-1', { env: ENV_ON, intent: 'opportunity' })
+
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+
+    expect(statusOf(result.outcomes, 'berel')).toBe('intent_changed')
+    expect(result.outcomes[0]?.previousIntent).toBeUndefined()
+  })
+
+  it('el cambio de intención NO consume cupo del techo', async () => {
+    state.activeKeywords = ['berel', 'pintura']
+    state.activeIntents = { berel: 'opportunity' }
+
+    const result = await trackKeywords('seot-1', ['berel'], 'user-1', {
+      env: envWithCapacity(2),
+      intent: 'target'
+    })
+
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+
+    // Con el set lleno, reclasificar sigue siendo posible — es justo cuando más falta hace.
+    expect(statusOf(result.outcomes, 'berel')).toBe('intent_changed')
+    expect(result.activeKeywordCount).toBe(2)
+  })
+
+  it('un cambio de intención emite evento aunque el conteo vigente no se mueva', async () => {
+    state.activeKeywords = ['berel']
+    state.activeIntents = { berel: 'opportunity' }
+
+    await trackKeywords('seot-1', ['berel'], 'user-1', { env: ENV_ON, intent: 'target' })
+
+    expect(state.outboxEvents).toHaveLength(1)
+
+    const event = state.outboxEvents[0] as { payload: Record<string, unknown> }
+
+    expect(event.payload).toMatchObject({ trackedCount: 0, intentChangedCount: 1, declaredIntent: 'target' })
   })
 })
 

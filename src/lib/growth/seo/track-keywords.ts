@@ -34,6 +34,23 @@
  * dejar de seguir es cerrar la ventana con `effective_to` y es OTRO command (follow-up
  * declarado en la task). Mezclar ambos acá haría que un "Seguir" con un bug pudiera cerrar
  * membresías vigentes.
+ *
+ * ═══ TASK-1659 — la intención declarada ═══
+ *
+ * Una membresía ahora puede declarar POR QUÉ existe: `target` (compromiso con el cliente) u
+ * `opportunity` (demanda medida que se está empujando). Es un eje ORTOGONAL a `source`, que
+ * dice quién ejecutó el write.
+ *
+ * Dos decisiones que rigen todo lo de abajo:
+ *
+ * 1. **Sin default.** Quien no declara escribe `NULL`. Asumir `opportunity` sería el mismo
+ *    error que backfillear la columna: afirmar que alguien clasificó la keyword cuando nadie
+ *    lo hizo, e inflar el KPI de oportunidades con filas que nadie miró.
+ * 2. **Cambiar de intención es cerrar + abrir, nunca un `UPDATE`.** El dato que sostiene el
+ *    reporte de avance no es "esta keyword es objetivo" sino "es objetivo desde marzo, y en
+ *    marzo estaba en la 45". Un `UPDATE` destruye justo eso. Y ese cambio **no consume cupo**:
+ *    el conteo vigente no se mueve, así que reclasificar sigue siendo posible con el set lleno
+ *    — que es cuando más falta hace.
  */
 
 import 'server-only'
@@ -46,6 +63,7 @@ import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import {
   SEO_KEYWORD_SET_UPDATED_EVENT,
   SEO_RANK_SNAPSHOT_AGGREGATE_TYPE,
+  type SeoKeywordIntent,
   type SeoKeywordTrackOutcome,
   type SeoKeywordTrackSource,
   type SeoKeywordUntrackOutcome,
@@ -104,6 +122,26 @@ export interface TrackKeywordsOptions {
   source?: SeoKeywordTrackSource
   /** Nombre del set destino. Por defecto el set principal del target. */
   keywordSetName?: string
+  /**
+   * TASK-1659 — intención declarada de la membresía.
+   *
+   * 🔴 **Sin default.** Es tentador asumir `opportunity` para no romper callers viejos, y
+   * sería el mismo error que backfillear la columna: afirmar que alguien clasificó la
+   * keyword cuando nadie lo hizo. Quien no declara escribe `NULL`, y los readers tratan la
+   * ausencia explícita. La lente Oportunidades declara `opportunity` en su propia llamada —
+   * ahí sí hay alguien diciéndolo.
+   *
+   * Pasar una intención distinta a la vigente CIERRA la membresía actual y abre otra: el dato
+   * de reporte no es "esta keyword es objetivo" sino "es objetivo desde marzo, y en marzo
+   * estaba en la 45".
+   */
+  intent?: SeoKeywordIntent
+  /**
+   * TASK-1659 — quién asumió el compromiso, cuando difiere de `actor` (quién ejecutó el
+   * INSERT). Es el caso de un agente que agrega la keyword por encargo de una persona. Por
+   * defecto es `actor`.
+   */
+  intentDeclaredBy?: string
   env?: NodeJS.ProcessEnv
 }
 
@@ -127,6 +165,10 @@ export interface ApplyKeywordTrackingInput {
   capacity: number
   actor: string
   source: SeoKeywordTrackSource
+  /** TASK-1659 — intención declarada; `undefined` = el caller no declaró nada. */
+  intent?: SeoKeywordIntent
+  /** TASK-1659 — autor del compromiso. Sólo se usa si `intent` viene declarada. */
+  intentDeclaredBy?: string
   /** Keywords ya normalizadas y deduplicadas, con su validez resuelta. */
   requested: Array<{ keyword: string; valid: boolean }>
 }
@@ -135,6 +177,8 @@ export interface ApplyKeywordTrackingResult {
   keywordSetId: string
   outcomes: SeoKeywordTrackOutcome[]
   activeKeywordCount: number
+  /** TASK-1659 — cuántas membresías cambiaron de intención (cerradas y reabiertas). */
+  intentChangedCount: number
 }
 
 /**
@@ -174,8 +218,11 @@ export const applyKeywordTracking = async (
   //
   // `FOR UPDATE OF m` serializa dos "Seguir" concurrentes contra el mismo techo: sin esto,
   // dos clicks simultáneos leerían 199 los dos y ambos insertarían.
-  const activeRows = await client.query<{ keyword: string }>(
-    `SELECT m.keyword
+  // TASK-1659 — se trae también la intención vigente: sin ella no se puede distinguir
+  // "ya la seguíamos igual" (no-op) de "ya la seguíamos como oportunidad y ahora es un
+  // compromiso" (cambio real que hay que historiar).
+  const activeRows = await client.query<{ keyword: string; intent: string | null }>(
+    `SELECT m.keyword, m.intent
        FROM greenhouse_growth.seo_keyword_set_members m
        JOIN greenhouse_growth.seo_keyword_sets s ON s.keyword_set_id = m.keyword_set_id
       WHERE s.seo_target_id = $1
@@ -184,9 +231,18 @@ export const applyKeywordTracking = async (
     [input.seoTargetId]
   )
 
-  const active = new Set(activeRows.rows.map(row => row.keyword))
+  const activeIntentByKeyword = new Map<string, SeoKeywordIntent | null>(
+    activeRows.rows.map(row => [row.keyword, (row.intent as SeoKeywordIntent | null) ?? null])
+  )
+
+  const active = new Set(activeIntentByKeyword.keys())
   const outcomes: SeoKeywordTrackOutcome[] = []
   const toInsert: string[] = []
+  const toRedeclare: Array<{ keyword: string; previousIntent: SeoKeywordIntent | null }> = []
+
+  // La autoría acompaña a la declaración o no se escribe ninguna de las dos: es el CHECK
+  // `seo_keyword_set_members_intent_authorship_check` expresado del lado del command.
+  const declaredBy = input.intent ? (input.intentDeclaredBy ?? input.actor) : null
 
   for (const entry of input.requested) {
     if (!entry.valid) {
@@ -195,7 +251,30 @@ export const applyKeywordTracking = async (
     }
 
     if (active.has(entry.keyword)) {
-      outcomes.push({ keyword: entry.keyword, status: 'already_tracked' })
+      const currentIntent = activeIntentByKeyword.get(entry.keyword) ?? null
+
+      // Sin intención pedida no se toca nada: un caller viejo no debe reescribir la historia
+      // de una membresía que alguien ya declaró. Y declarar lo mismo dos veces es un no-op
+      // idempotente, no un error ni una fila nueva.
+      if (!input.intent || input.intent === currentIntent) {
+        outcomes.push({
+          keyword: entry.keyword,
+          status: 'already_tracked',
+          ...(currentIntent ? { intent: currentIntent } : {})
+        })
+        continue
+      }
+
+      // Cambio real de intención. NO consume cupo: el conteo vigente no se mueve porque se
+      // cierra una y se abre otra. Cobrarle techo a un cambio de intención bloquearía
+      // reclasificar justo cuando el set está lleno, que es cuando más falta hace.
+      toRedeclare.push({ keyword: entry.keyword, previousIntent: currentIntent })
+      outcomes.push({
+        keyword: entry.keyword,
+        status: 'intent_changed',
+        intent: input.intent,
+        ...(currentIntent ? { previousIntent: currentIntent } : {})
+      })
       continue
     }
 
@@ -207,7 +286,50 @@ export const applyKeywordTracking = async (
     }
 
     toInsert.push(entry.keyword)
-    outcomes.push({ keyword: entry.keyword, status: 'tracked' })
+    outcomes.push({
+      keyword: entry.keyword,
+      status: 'tracked',
+      ...(input.intent ? { intent: input.intent } : {})
+    })
+  }
+
+  // ── TASK-1659: cambio de intención = cerrar + abrir, NUNCA un UPDATE de la columna ──────
+  //
+  // Un `UPDATE intent = 'target'` destruiría exactamente el dato que hace posible el reporte
+  // de avance ("es objetivo desde marzo, y en marzo estaba en la 45"). La tabla ya es
+  // append-only con ventanas: se reusa ese mecanismo.
+  //
+  // El cierre va ANTES del INSERT dentro de la MISMA transacción, porque el índice único
+  // parcial `(keyword_set_id, keyword) WHERE effective_to IS NULL` no admite dos vigentes.
+  if (toRedeclare.length > 0) {
+    const redeclareKeywords = toRedeclare.map(entry => entry.keyword)
+
+    // 🔴 `clock_timestamp()` y NO `NOW()`: `NOW()` devuelve el timestamp de INICIO de la
+    // transacción, así que cerrar una membresía creada en esa misma transacción produciría
+    // `effective_to = effective_from` y reventaría el CHECK (23514) — el `>` es estricto.
+    // Mismo hallazgo que `untrackKeywords`, y los mocks no lo atrapan.
+    await client.query(
+      `UPDATE greenhouse_growth.seo_keyword_set_members m
+          SET effective_to = clock_timestamp()
+         FROM greenhouse_growth.seo_keyword_sets s
+        WHERE s.keyword_set_id = m.keyword_set_id
+          AND s.seo_target_id = $1
+          AND m.effective_to IS NULL
+          AND m.keyword = ANY($2::text[])`,
+      [input.seoTargetId, redeclareKeywords]
+    )
+
+    // La membresía nueva nace en el set destino de ESTE command. Si la anterior vivía en otro
+    // set del mismo target, el cambio de intención la consolida acá — el techo y el gasto son
+    // del target, no del set.
+    await client.query(
+      `INSERT INTO greenhouse_growth.seo_keyword_set_members
+                   (keyword_set_id, keyword, created_by, source, intent, intent_declared_by, intent_declared_at)
+            SELECT $1, keyword, $2, $3, $4, $5, clock_timestamp()
+              FROM UNNEST($6::text[]) AS keyword
+       ON CONFLICT (keyword_set_id, keyword) WHERE effective_to IS NULL DO NOTHING`,
+      [keywordSetId, input.actor, input.source, input.intent, declaredBy, redeclareKeywords]
+    )
   }
 
   let inserted = 0
@@ -218,11 +340,12 @@ export const applyKeywordTracking = async (
     // rebota, la membresía ya existe — que es el estado deseado.
     const insertResult = await client.query(
       `INSERT INTO greenhouse_growth.seo_keyword_set_members
-                   (keyword_set_id, keyword, created_by, source)
-            SELECT $1, keyword, $2, $3
-              FROM UNNEST($4::text[]) AS keyword
+                   (keyword_set_id, keyword, created_by, source, intent, intent_declared_by, intent_declared_at)
+            SELECT $1, keyword, $2, $3, $4, $5,
+                   CASE WHEN $4::text IS NULL THEN NULL ELSE clock_timestamp() END
+              FROM UNNEST($6::text[]) AS keyword
        ON CONFLICT (keyword_set_id, keyword) WHERE effective_to IS NULL DO NOTHING`,
-      [keywordSetId, input.actor, input.source, toInsert]
+      [keywordSetId, input.actor, input.source, input.intent ?? null, declaredBy, toInsert]
     )
 
     inserted = insertResult.rowCount ?? 0
@@ -237,7 +360,13 @@ export const applyKeywordTracking = async (
   //
   // Sólo cuando el set REALMENTE cambió: un evento por cada click idempotente llenaría la
   // tabla de ruido que ningún consumer necesita procesar.
-  if (inserted > 0) {
+  //
+  // TASK-1659 — un cambio de intención TAMBIÉN es un cambio real del set aunque
+  // `activeKeywordCount` no se mueva: cerró una membresía y abrió otra. Emitir sólo por
+  // `inserted > 0` dejaría esa transición invisible para todo downstream.
+  const intentChangedCount = toRedeclare.length
+
+  if (inserted > 0 || intentChangedCount > 0) {
     await publishOutboxEvent(
       {
         aggregateType: SEO_RANK_SNAPSHOT_AGGREGATE_TYPE,
@@ -249,6 +378,8 @@ export const applyKeywordTracking = async (
           organizationId: input.organizationId,
           keywordSetId,
           trackedCount: inserted,
+          intentChangedCount,
+          declaredIntent: input.intent ?? null,
           activeKeywordCount,
           source: input.source,
           actor: input.actor
@@ -258,7 +389,7 @@ export const applyKeywordTracking = async (
     )
   }
 
-  return { keywordSetId, outcomes, activeKeywordCount }
+  return { keywordSetId, outcomes, activeKeywordCount, intentChangedCount }
 }
 
 export const trackKeywords = async (
@@ -337,6 +468,8 @@ export const trackKeywords = async (
         capacity,
         actor,
         source,
+        intent: options.intent,
+        intentDeclaredBy: options.intentDeclaredBy,
         requested
       })
     )

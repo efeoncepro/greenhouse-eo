@@ -84,6 +84,125 @@ const main = async () => {
 
   checks.push(['filas previas a la migración siguen en NULL (sin backfill)', legacy[0]?.con_intent === '0'])
 
+  // ── Bloque B — el command contra PG real, en una transacción que ABORTA ─────────────────
+  //
+  // La tabla tiene trigger anti-DELETE: las filas de prueba no se pueden borrar, así que la
+  // única salida limpia es el rollback. Y tiene que correr sobre una conexión FIJADA, porque
+  // `runGreenhousePostgresQuery` toma una del pool por llamada — un BEGIN suelto no cubriría
+  // lo que sigue y las escrituras quedarían permanentes pese al ROLLBACK (hallazgo TASK-1300).
+  const { withGreenhousePostgresTransaction } = await import('@/lib/postgres/client')
+  const { applyKeywordTracking } = await import('@/lib/growth/seo/track-keywords')
+
+  const target = (
+    await runGreenhousePostgresQuery<{ seo_target_id: string; organization_id: string }>(
+      `SELECT seo_target_id, organization_id FROM greenhouse_growth.seo_targets ORDER BY created_at LIMIT 1`
+    )
+  )[0]
+
+  if (!target) {
+    console.error('No hay seo_targets: no se puede ejercitar el SQL del command.')
+    process.exit(1)
+  }
+
+  const SANITY_SET_NAME = 'Sanity TASK-1659 (rollback)'
+  const KEYWORD = `sanity-1659-${Date.now()}`
+
+  try {
+    await withGreenhousePostgresTransaction(async client => {
+      const base = {
+        seoTargetId: target.seo_target_id,
+        organizationId: target.organization_id,
+        setName: SANITY_SET_NAME,
+        capacity: 10_000,
+        actor: 'sanity-1659',
+        source: 'seed' as const
+      }
+
+      // 1) Alta declarando `opportunity`.
+      const first = await applyKeywordTracking(client, {
+        ...base,
+        intent: 'opportunity',
+        requested: [{ keyword: KEYWORD, valid: true }]
+      })
+
+      checks.push(['alta con intención → outcome `tracked`', first.outcomes[0]?.status === 'tracked'])
+
+      // 2) Cambio a `target`: cierra la anterior y abre otra, contra el índice único parcial
+      //    y el CHECK `effective_to > effective_from`. Acá es donde `NOW()` reventaría (23514).
+      const second = await applyKeywordTracking(client, {
+        ...base,
+        intent: 'target',
+        requested: [{ keyword: KEYWORD, valid: true }]
+      })
+
+      checks.push(['cambio de intención → outcome `intent_changed`', second.outcomes[0]?.status === 'intent_changed'])
+      checks.push(['reporta la intención anterior', second.outcomes[0]?.previousIntent === 'opportunity'])
+      checks.push(['el cambio de intención no infla el conteo vigente', second.activeKeywordCount === first.activeKeywordCount])
+
+      const history = await client.query<{ intent: string | null; effective_to: string | null }>(
+        `SELECT m.intent, m.effective_to::text AS effective_to
+           FROM greenhouse_growth.seo_keyword_set_members m
+           JOIN greenhouse_growth.seo_keyword_sets s ON s.keyword_set_id = m.keyword_set_id
+          WHERE s.seo_target_id = $1 AND m.keyword = $2
+          ORDER BY m.effective_from`,
+        [target.seo_target_id, KEYWORD]
+      )
+
+      // El invariante que sostiene todo el reporte de avance: DOS filas, no una sobrescrita.
+      checks.push(['el historial conserva DOS filas (no un UPDATE)', history.rows.length === 2])
+      checks.push([
+        'la primera quedó cerrada con `opportunity`',
+        history.rows[0]?.intent === 'opportunity' && history.rows[0]?.effective_to !== null
+      ])
+      checks.push([
+        'la vigente es `target` y está abierta',
+        history.rows[1]?.intent === 'target' && history.rows[1]?.effective_to === null
+      ])
+
+      const activeCount = await client.query<{ n: string }>(
+        `SELECT COUNT(*)::text AS n
+           FROM greenhouse_growth.seo_keyword_set_members m
+           JOIN greenhouse_growth.seo_keyword_sets s ON s.keyword_set_id = m.keyword_set_id
+          WHERE s.seo_target_id = $1 AND m.keyword = $2 AND m.effective_to IS NULL`,
+        [target.seo_target_id, KEYWORD]
+      )
+
+      checks.push(['el índice único parcial deja UNA sola vigente', activeCount.rows[0]?.n === '1'])
+
+      // 3) Re-declarar lo mismo es no-op: no debe aparecer una tercera fila.
+      const third = await applyKeywordTracking(client, {
+        ...base,
+        intent: 'target',
+        requested: [{ keyword: KEYWORD, valid: true }]
+      })
+
+      checks.push(['re-declarar la misma intención → `already_tracked`', third.outcomes[0]?.status === 'already_tracked'])
+
+      const afterNoop = await client.query<{ n: string }>(
+        `SELECT COUNT(*)::text AS n
+           FROM greenhouse_growth.seo_keyword_set_members m
+           JOIN greenhouse_growth.seo_keyword_sets s ON s.keyword_set_id = m.keyword_set_id
+          WHERE s.seo_target_id = $1 AND m.keyword = $2`,
+        [target.seo_target_id, KEYWORD]
+      )
+
+      checks.push(['el no-op no agrega una tercera fila', afterNoop.rows[0]?.n === '2'])
+
+      // Salida limpia: la tabla es append-only, así que el rollback es la ÚNICA forma de no
+      // dejar basura. El throw es intencional.
+      throw new Error('sanity-rollback')
+    })
+  } catch (error) {
+    if (!(error instanceof Error) || error.message !== 'sanity-rollback') throw error
+  }
+
+  const leftovers = await runGreenhousePostgresQuery<{ n: string }>(
+    `SELECT COUNT(*)::text AS n FROM greenhouse_growth.seo_keyword_set_members WHERE keyword = $1`,
+    [KEYWORD]
+  )
+
+  checks.push(['el rollback no dejó filas de prueba', leftovers[0]?.n === '0'])
+
   const failed = checks.filter(([, ok]) => !ok)
 
   for (const [label, ok] of checks) console.log(`${ok ? '✅' : '❌'} ${label}`)

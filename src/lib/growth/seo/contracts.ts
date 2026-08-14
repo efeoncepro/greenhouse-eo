@@ -719,12 +719,44 @@ export type SeoLinkBarrierLevel = 'low' | 'medium' | 'high' | 'unknown'
 
 export type SeoKeywordTrackSource = 'operator_ui' | 'nexa' | 'mcp' | 'seed' | 'backfill'
 
+/**
+ * TASK-1659 — POR QUÉ la keyword está en el set. Eje ORTOGONAL a `SeoKeywordTrackSource`,
+ * que dice quién ejecutó el write.
+ *
+ * - `target`: compromiso declarado con el cliente. Puede estar en la posición 60 y eso NO es
+ *   un fracaso: es la distancia que falta. Cualquier KPI que promedie objetivos con
+ *   oportunidades miente.
+ * - `opportunity`: demanda ya medida que se está empujando (el caso de la lente Oportunidades).
+ *
+ * 🔴 **No existe un tercer valor "desconocido".** La ausencia se representa con `undefined`
+ * en el command y `NULL` en la columna: un enum `unknown` invitaría a escribirlo, y escribir
+ * "no sé" es distinto de no haber declarado nada.
+ */
+export type SeoKeywordIntent = 'target' | 'opportunity'
+
+/**
+ * Vocabulario en runtime para validar lo que entra por HTTP/MCP, donde el body es `unknown`
+ * y el tipo de arriba no existe. Espeja el CHECK `seo_keyword_set_members_intent_check`: si
+ * alguien agrega un valor acá sin migración, PostgreSQL rechaza el INSERT — el schema es el
+ * backstop, no la primera línea.
+ */
+export const SEO_KEYWORD_INTENTS: readonly SeoKeywordIntent[] = ['target', 'opportunity']
+
+export const isSeoKeywordIntent = (value: unknown): value is SeoKeywordIntent =>
+  typeof value === 'string' && (SEO_KEYWORD_INTENTS as readonly string[]).includes(value)
+
 /** Qué pasó con UNA keyword del lote. */
 export type SeoKeywordTrackStatus =
   /** Nueva membresía vigente creada. Entra al rank capture del próximo ciclo. */
   | 'tracked'
-  /** Ya tenía membresía vigente. Cero writes, cero gasto nuevo — el command es idempotente. */
+  /** Ya tenía membresía vigente con la misma intención (o sin intención pedida). Cero writes, cero gasto nuevo — el command es idempotente. */
   | 'already_tracked'
+  /**
+   * TASK-1659 — la keyword ya se seguía y su intención CAMBIÓ: la membresía anterior quedó
+   * cerrada y se abrió una nueva. No es `already_tracked` (que sería mentira: sí pasó algo) ni
+   * `tracked` (que sugeriría gasto nuevo, y el conteo vigente no se movió).
+   */
+  | 'intent_changed'
   /** Vacía, sólo espacios o más larga que el máximo: no se persiste basura. */
   | 'invalid'
   /** El set llegó a su techo gobernado. Se rechaza explícito, NUNCA en silencio. */
@@ -734,6 +766,14 @@ export interface SeoKeywordTrackOutcome {
   /** La keyword normalizada (lo que quedó o habría quedado en la tabla). */
   keyword: string
   status: SeoKeywordTrackStatus
+  /**
+   * TASK-1659 — intención de la membresía VIGENTE tras el command. `undefined` cuando nadie
+   * la declaró (filas previas al modelo, o un caller que no la pasa): la ausencia se propaga
+   * tal cual hasta la UI en vez de degradar a `opportunity`, que sería inventar el hecho.
+   */
+  intent?: SeoKeywordIntent
+  /** TASK-1659 — intención anterior cuando `status === 'intent_changed'`. */
+  previousIntent?: SeoKeywordIntent
 }
 
 export type TrackKeywordsResult =
