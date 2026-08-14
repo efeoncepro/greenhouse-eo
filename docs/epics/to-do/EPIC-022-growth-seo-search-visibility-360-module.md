@@ -51,7 +51,10 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 >
 > Estado real: **de las 15 abiertas, 11 se pueden tomar ya**; las 4 restantes esperan sólo a otras
 > abiertas (`1313`←1311+1312 · `1314`←1312+1313 · `1316`←1315 · `1317`←1315+1316), más `1660`←1659
-> y `1662`←1661 del carril de objetivos. `TASK-1310` (dashboard cliente) ya está **in-progress**.
+> del carril de objetivos. `TASK-1310` (dashboard cliente) ya está **in-progress**.
+>
+> **Actualización 2026-08-13:** `TASK-1661` quedó **complete** y con eso `1662` y `1664` dejaron de
+> estar bloqueadas (`Blocked by: none` en ambas).
 >
 > ⚠️ Al cerrar una task, revisar quién la citaba como blocker. Un `Blocked by` obsoleto es fricción
 > inventada, y no hay gate que lo detecte.
@@ -83,8 +86,8 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 
 - `TASK-1659` — [planificada, backend-data] modelo de **intención** en el set monitoreado: objetivo declarado vs oportunidad detectada, con autoría. `source` (TASK-1308) es procedencia, no intención. Append-only: cambiar la intención cierra y abre, nunca `UPDATE`.
 - `TASK-1660` — [planificada, ui-ux] lente **Objetivos** sobre `/admin/growth/seo/keywords` — extiende el **nodo S3** del master UI flow. Full API Parity al revés: `trackKeywords` **ya** acepta keywords que el cliente no rankea y no tiene botón. Bloqueada por `TASK-1659`.
-- `TASK-1661` — [planificada, backend-data] volumen y dificultad por keyword. ⚠️ **No es esperar a `TASK-1300`**, que está complete: falta el fetch, las columnas y el reader. Alcance V1 acotado al set monitoreado.
-- `TASK-1662` — [planificada, backend-data] **keyword gap**: qué gana la competencia donde el cliente es invisible. La superficie va aparte. Bloqueada por `TASK-1661`.
+- `TASK-1661` — [**complete 2026-08-13**, backend-data] volumen y **barrera de enlaces** por keyword. Trae el dato de mercado desde DataForSEO Labs (`keyword_overview`) a la tabla append-only `seo_keyword_market_data`, con país, idioma y `captured_at` en la clave; `readKeywordOpportunities` deja de cablear `market: 'unavailable'` y la tabla de `TASK-1308` muestra las columnas **sin cambio de código en la UI**. Captura **mensual** (el proveedor refresca una vez al mes), acotada al set monitoreado, con dry-run de costo previo. Costo real medido: **USD ~0.02/org/mes**. Tool MCP `get_seo_keyword_market_data` + federación al gateway en el mismo cierre. **Desbloquea `1660`/`1662`/`1664`.**
+- `TASK-1662` — [planificada, backend-data] **keyword gap**: qué gana la competencia donde el cliente es invisible. La superficie va aparte. **`Blocked by: none`** desde el cierre de `TASK-1661` (2026-08-13). Escribe en la **misma** tabla de mercado — es multi-productor por diseño, nunca un segundo almacén.
 
 ### Carril de discovery y acción diaria (creado 2026-08-08)
 
@@ -98,7 +101,8 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
   `keywords_for_site`, `keyword_overview`), muestra preview de costo antes de gastar, materializa una
   corrida bounded en `ops-worker`, deduplica y expone candidates con volumen/dificultad/intent,
   procedencia y as-of. No crea `seo_keyword_set_members`, no hace keyword gap (`1662`) y no llama
-  `ai_optimization` (`1651`). Blocked by `TASK-1661`.
+  `ai_optimization` (`1651`). **`Blocked by: none`** desde el cierre de `TASK-1661` (2026-08-13);
+  **in-progress** desde entonces. Escribe en la **misma** tabla de mercado que `1661` y `1662`.
 - `TASK-1666` — [creada, backend-data/integration, backend-critical] **puente SEO → grounded queries
   AEO**. Toma hasta 20 candidates seleccionados, valida ownership y contexto, y crea un draft en el
   `grader_prompt_sets` existente mediante el authoring AEO canónico. Conserva source refs de corrida y
@@ -570,3 +574,58 @@ Resumen deriva de rank snapshots, así que un tenant con Search Console conectad
 sin correr —**el día 1 de todo cliente nuevo**— renderiza el KPI principal en "sin dato" con el
 Quadrant poblado debajo. Con N=1 nadie lo delata. Merece task propia: fixtures por estado de la
 población y la decisión de fuente del Resumen.
+
+## Delta 2026-08-13/14 — el dato de mercado aterriza: `TASK-1661` complete y el carril aspiracional se destraba
+
+`TASK-1661` queda **complete**. Con ella el módulo deja de responder sólo *"¿qué empujo de lo que ya
+tengo?"*: `readKeywordOpportunities` ya no cablea `market: 'unavailable'`, y la tabla de `TASK-1308`
+muestra volumen y barrera de enlaces **sin una línea de cambio en la UI** — el contrato
+`number | null` que 1308 dejó previsto se llenó solo. La captura es **mensual** (el proveedor
+refresca una vez al mes; consultarlo más seguido es pagar varias veces por el mismo número), acotada
+al set monitoreado, con **dry-run de costo antes de gastar**. Costo real medido: **USD ~0.02 por
+organización al mes**.
+
+**Efecto en el backlog:** `TASK-1662` (keyword gap) y `TASK-1664` (keyword discovery) quedan
+**`Blocked by: none`**; `1664` está in-progress. `TASK-1660` (lente Objetivos) recupera su insumo:
+sin volumen no se puede aceptar un objetivo declarado sin saber *¿vale la pena?* y *¿qué tan cuesta
+arriba es?*.
+
+**Lo que este cierre le enseña a las tasks que vienen:**
+
+1. 🔴 **La tabla de mercado nace multi-productor, y eso es una decisión de schema, no un accidente.**
+   `seo_keyword_market_data` tiene clave `(normalized_keyword, location_code, language_code,
+   captured_at)` y **NO** lleva FK a `seo_keyword_set_members` ni a `seo_targets`: el volumen es un
+   hecho de *(keyword, país, idioma, as-of)*, y una keyword candidata todavía no es de nadie.
+   `1664` y `1662` escriben en **la misma tabla** el `keyword_info` que ya viene pagado en sus
+   respuestas de discovery. **Ninguna de las dos crea un segundo almacén de datos de mercado** ni un
+   segundo transporte: el reader existente proyecta ambos orígenes y la UI no los distingue por tabla.
+2. **Un dato que el proveedor no tiene también se escribe.** El smoke real destapó una **fuga de
+   costo**: la primera versión no escribía fila cuando el proveedor no tenía la keyword, así que el
+   pre-check de frescura nunca las veía y **se re-compraban en cada corrida, para siempre**. El
+   modelo correcto son **tres estados**: fila ausente = nunca preguntamos · fila con `NULL` =
+   preguntamos y el proveedor no tiene · `0` = demanda cero real. Ningún test con mocks podía
+   atraparlo: vivía en la interacción entre el pre-check y una respuesta real que no incluye todas
+   las keywords pedidas. **Todo enriquecimiento pago futuro hereda esta regla.**
+3. **Una métrica del proveedor no se muestra cruda sólo porque llegó.** `keyword_difficulty` mide
+   **una sola cosa** —qué tan atrincherado está el top-10 por enlaces— y colapsa a `0` en SERPs
+   es-LATAM: `pintura` (135.000 búsquedas/mes en MX) y `pintura para piso` caían **ambas** en el
+   mismo cajón con perfiles de top-10 opuestos. La columna se renombró **"Barrera de enlaces"**, se
+   muestra en **niveles** y se **deriva del perfil real del top-10** (`avg_backlinks_info`, que venía
+   gratis en cada respuesta ya pagada y se descartaba), ponderando la **diversidad de dominios
+   referentes** y no el conteo de enlaces. La derivación vive **server-side, una sola vez**: si la
+   regla viviera en la UI, cada superficie tendría su versión. Y `unknown` es estado propio, pintado
+   **"Sin dato"** y jamás "Baja" — un hueco presentado como barrera baja afirma una oportunidad que
+   nadie midió.
+4. **El país dejó de ser implícito, y costó un año de serie descubrirlo.** `ISSUE-152`: el target de
+   Berel medía **Chile** para una marca **mexicana** (30 búsquedas/mes de su propia marca en CL vs
+   49.500 en MX) — 238 snapshots, USD ~1 pagado, y **nada en el tablero lo delataba** porque la serie
+   se veía poblada y sana. Se corrigió con **target nuevo para México + pausa del de Chile**, jamás
+   un cambio de `location_code` in-place: eso habría mezclado dos mercados bajo una misma serie sin
+   marcador. `ISSUE-153` cerró la causa sistémica: el lane elegía mercado con un `LIMIT 1`
+   silencioso; ahora **toda respuesta declara el país que sirve** y, con varios sin elegir, lo dice
+   en vez de escoger callado. **Toda superficie multi-mercado del epic hereda este contrato.**
+
+**Rollout:** worker con `GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED=true` y scheduler
+`ops-seo-keyword-market-data` activo (ambos declarativos en `deploy.sh`); la tool federada
+`get_seo_keyword_market_data` existe en el gateway y su exposición en producción viaja con el
+próximo release `develop → main`.

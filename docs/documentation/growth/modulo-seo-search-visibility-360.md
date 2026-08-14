@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.11
+> **Version:** 1.12
 > **Creado:** 2026-08-05 por Claude (TASK-1299 + TASK-1301)
-> **Ultima actualizacion:** 2026-08-09 por Claude (TASK-1677 Slice 1: la clave del módulo es `seo_v2` y es la única que el runtime lee; delta previo 2026-08-08 TASK-1309 — la Auditoría del sitio al día con la pantalla construida: el orden mira tres cosas y no dos (se suma el valor de búsqueda), las tres aclaraciones que evitan una conclusión falsa (tope del crawl, velocidad de laboratorio, alcance del puntaje), el movimiento contra el crawl anterior, el filtro por gravedad, la exportación del grupo, y lo que la auditoría todavía NO revisa)
+> **Ultima actualizacion:** 2026-08-14 por Claude (TASK-1661 + follow-ups: las columnas de mercado se llenan solas, la captura es mensual y acotada con simulacro de costo previo, "Dificultad" pasa a ser **Barrera de enlaces** en niveles con "Sin dato" como estado propio, todo dato de mercado viaja con su fecha, y cada respuesta declara el país que muestra — incluida la corrección del caso Berel (ISSUE-152/153); delta previo 2026-08-09 TASK-1677 Slice 1: la clave del módulo es `seo_v2` y es la única que el runtime lee)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
 
 # Modulo SEO — Search Visibility 360 (Growth)
@@ -64,7 +64,7 @@ Los cupos por tier salen de env-knobs con defaults sanos:
 | `trial` | 1 | $2 |
 | `pilot` | 2 (override por org vía `metadata_json.seo_audit_runs_per_month`) | $10 |
 
-El presupuesto consumido se calcula sumando el `provider_cost` de los snapshots del mes — o sea, el gasto real registrado en la serie temporal, no un contador aparte (eso cambia de fuente cuando exista `seo_provider_spend_daily` en TASK-1300).
+El presupuesto consumido sale de un **registro único de gasto** (`seo_provider_spend_daily`): cada llamada que se le paga al proveedor queda anotada ahí, atribuida a la organización que la pagó. No es un contador aparte ni una estimación — es el gasto real, y es la misma fuente para cualquier corrida del módulo (rankings, auditoría, enlaces o datos de mercado).
 
 > Detalle técnico: [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md §9](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) (entitlements) · chokepoint en [`src/lib/growth/seo/entitlement.ts`](../../../src/lib/growth/seo/entitlement.ts) · sanity live [`scripts/growth/_sanity-seo-entitlement.ts`](../../../scripts/growth/_sanity-seo-entitlement.ts).
 
@@ -314,22 +314,50 @@ sino por **que hay que hacer con ellas**, porque son trabajos distintos:
 **medido por Search Console**: son las impresiones y posiciones reales de la busqueda del propio
 cliente. Es la lente **medida**.
 
-Desde `TASK-1661` existe ademas una segunda lente, **estimada**: el *volumen de busqueda* y la
-*dificultad de mercado* que trae DataForSEO. Son dos cosas distintas y el modulo no las promedia
-nunca. La lente medida dice "asi te fue a ti"; la estimada dice "asi de grande es el mercado". Cada
-una contesta una pregunta que la otra no puede: para una busqueda donde el cliente **ya** aparece,
-Search Console es mejor insumo que cualquier promedio; para una donde **no** aparece, Search Console
-no entrega absolutamente nada — cero impresiones, sin posicion — y el volumen es la unica forma de
-saber si vale la pena.
+Desde el 2026-08-13 hay ademas una segunda lente, **estimada**: el **volumen de busqueda** y la
+**barrera de enlaces** del mercado. Son las dos columnas que antes se mostraban siempre vacias;
+ahora **se llenan solas cuando hay dato capturado**. La lente medida dice "asi te fue a ti"; la
+estimada dice "asi de grande es el mercado", y el modulo no las promedia nunca.
 
-Tres detalles que importan al leer esas dos columnas:
+Cada una contesta una pregunta que la otra no puede. Para una keyword donde el cliente **ya**
+aparece en Google, Search Console alcanza y es mejor insumo que cualquier promedio: son sus clics e
+impresiones reales. Pero para una keyword donde **no** aparece —justo las que quiere conquistar—
+Search Console no entrega nada: cero impresiones, sin posicion. El volumen de mercado es la unica
+forma de contestar *¿vale la pena?* y *¿que tan cuesta arriba es?*. Sin eso se aceptaban objetivos
+a ciegas.
 
-- **El dato de mercado se refresca una vez al mes**, no todos los dias. Por eso siempre viaja con su
-  fecha de captura: un volumen sin fecha se lee como vigente para siempre.
-- **El volumen es del pais y el idioma del cliente**, no un numero global. El de Chile no es el de
-  Mexico.
-- **Una celda vacia significa "no lo consultamos" o "el proveedor no tiene ese dato"**, y son cosas
-  distintas de "nadie lo busca". Lo que **nunca** aparece es un `0` inventado.
+**La captura cuesta dinero, y por eso esta acotada.** Preguntarle al proveedor por una keyword se
+paga, asi que el modulo pregunta lo menos posible:
+
+- **Corre una vez al mes.** El proveedor refresca su dato mensualmente; consultarlo mas seguido
+  seria pagar varias veces por el mismo numero.
+- **Solo sobre las keywords que el cliente ya tiene en seguimiento.** El set monitoreado tiene
+  techo, asi que el gasto es predecible. Traer datos de mercado para toda oportunidad detectada es
+  una lista abierta que crece con el sitio, y es una decision posterior.
+- **Hay un simulacro previo.** Antes de gastar un peso se puede pedir el ensayo: dice cuantas
+  keywords consultaria y cuanto costaria, sin llamar al proveedor.
+- **Costo real medido:** alrededor de **dos centavos de dolar por cliente al mes**. Repetir la
+  corrida el mismo ciclo no vuelve a cobrar.
+
+**"Barrera de enlaces", no "Dificultad".** La columna cambio de nombre y de forma: se muestra en
+**niveles — Baja / Media / Alta**, nunca como numero. La razon es funcional: el numero del proveedor
+mide **una sola cosa** —que tan atrincherado esta el top-10 por enlaces de otros sitios— y en
+mercados de habla hispana da 0 muy seguido, incluso para keywords con cientos de miles de busquedas
+al mes. Mostrado como "Dificultad: 0" se leeria como "facilisimo", que es falso. El nivel dice lo que
+la metrica realmente mide: **"Baja" significa "aca se compite con contenido y autoridad, no con
+enlaces"** — una oportunidad, no una trivialidad.
+
+Y **"Sin dato" no es "Baja"**. Una keyword que no consultamos aparece como "Sin dato", con su propia
+etiqueta: pintarla como barrera baja afirmaria una oportunidad que nadie midio.
+
+Tres reglas de honestidad mas que esas columnas no negocian:
+
+- **Todo dato de mercado viaja con su fecha de captura.** Un volumen sin fecha envejece en silencio
+  y se sigue leyendo como vigente para siempre.
+- **Nunca se promedia ni se mezcla con Search Console.** Son dos lentes distintas: una es medida
+  (lo que le paso al cliente), la otra estimada (lo que pasa en el mercado).
+- **Vacio nunca significa cero.** "No lo consultamos" y "nadie busca eso" son hechos distintos, y el
+  modulo los distingue. Lo que **nunca** aparece es un `0` inventado.
 
 Mientras el enriquecimiento este apagado para una organizacion, esas dos columnas simplemente no se
 muestran y la ausencia se declara una vez, con palabras, al pie del mapa — una columna que no puede
@@ -337,7 +365,7 @@ traer datos no gana su ancho. La priorizacion no lo necesita: la demanda ya esta
 del mapa jamas dependieron de ese dato.
 
 > Detalle tecnico: `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §7
-> (`readKeywordMarketData`) · operacion paso a paso:
+> (`readKeywordMarketData`, derivacion de la barrera de enlaces) · operacion paso a paso:
 > `docs/manual-de-uso/growth/operar-datos-de-mercado-keywords.md`
 
 **"Seguir" cuesta plata, y la pantalla lo dice antes del clic.** Seguir una keyword la agrega al set
@@ -369,6 +397,32 @@ seleccion **no se renderizan** — un analista lee el mapa completo sin poder ha
 > `src/views/greenhouse/admin/growth/seo/keywords/`. Mismos commands para la UI, el lane `app`,
 > el lane `ecosystem` y las tools MCP `track_seo_keywords` / `untrack_seo_keywords` (estas ultimas
 > fail-closed hasta que el scope `efeonce.mcp.seo.write` quede cableado a un cliente).
+
+### El país deja de estar implícito: cada respuesta declara qué mercado muestra (2026-08-13)
+
+Efeonce opera en Chile, México, Colombia y Perú, y **el volumen de una keyword en Chile no es el de
+México**. Hasta ahora eso era un supuesto silencioso: si una organización tenía más de un mercado
+configurado, el sistema mostraba uno **sin decir cuál**.
+
+Ahora toda respuesta del módulo **declara el país que está mostrando**, y cuando hay varios sin uno
+elegido, lo dice en vez de escoger callado. La diferencia no es cosmética: un número correcto para
+un país es un número equivocado para otro, y sin la etiqueta nadie puede darse cuenta.
+
+**El caso que lo destapó.** Verificando la captura de datos de mercado se descubrió que el cliente
+Berel —una marca **mexicana**— estaba configurado midiendo **Chile**. La evidencia fue inmediata: su
+propio nombre de marca tiene 30 búsquedas al mes en Chile y 49.500 en México. Eran **casi un año de
+mediciones de posición contra el país equivocado**, y nada en el tablero lo delataba: la serie se veía
+poblada y sana.
+
+**Cómo se corrigió, y por qué así.** Se creó un target nuevo para México y se pausó el de Chile,
+**sin borrar el histórico**. Cambiar el país "en su lugar" habría dejado un año de mediciones
+chilenas colgando de una configuración que dice México — dos mercados mezclados bajo una misma serie
+sin ninguna marca que lo delate, que es peor que el problema original. Con dos configuraciones
+separadas, la serie vieja sigue explicando lo que se midió y se pagó entonces, y la nueva empieza
+limpia en el mercado correcto.
+
+> Detalle técnico: `docs/issues/resolved/ISSUE-152-seo-target-berel-mercado-chile-marca-mexicana.md`
+> (el caso y su cutover) y `ISSUE-153` (la elección silenciosa de mercado, corregida).
 
 ### Auditoria del sitio: que esta roto y que conviene arreglar primero (TASK-1309, 2026-08-08)
 
