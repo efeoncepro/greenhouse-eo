@@ -4,6 +4,40 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-14 (post-cierre) — Auditoría SEO: defaults que congelaban el contrato
+
+Tri-auditoría con skills SEO/AEO/DataForSEO sobre el cierre (economics: LOW risk, sin blockers
+de gasto). 4 defaults corregidos el mismo día ANTES de que TASK-1665 (workbench UI) congelara
+el contrato (commit `fix(growth-seo): TASK-1664 auditoría SEO ...`):
+
+- **Orden accionable del reader:** nueva llave "oportunidad medida" (candidato con `measuredGsc`
+  ● y aún sin seguir) ordena antes del volumen estimado — es la decisión de mayor valor del
+  inbox; y el desempate de dificultad usa la BARRERA DE ENLACES canónica (low<medium<high<
+  `Sin dato` al final), nunca `keyword_difficulty` (KD colapsa a 0 en SERPs es-LATAM).
+- **Ciclo mensual en la idempotency key `auto-`:** componente `YYYY-MM` — el mismo intent
+  dedupea dentro del mes y un mes nuevo permite corrida fresca. Sin esto el discovery quedaba
+  congelado para siempre en el primer snapshot (las métricas Labs refrescan mensualmente).
+- **Spend fence real en el runner:** re-verifica contra el costo del remanente PLANIFICADO
+  (subllamadas restantes × peor caso + top-up), patrón TASK-1303/1661 — antes estimaba "una
+  llamada más".
+- **Provider:** `related_keywords` con `depth: 2` (el 2.º anillo del grafo al mismo costo por
+  task; depth 1 traía ~8 términos); `keywords_for_site` `order_by relevance,desc` VERIFICADO
+  contra sandbox.dataforseo.com (campo inventado → 40501; `relevance` → 20000).
+- **DTO:** `cpcUsd` + `competitionLevel` expuestos (ya venían pagados en la misma respuesta);
+  filtro `excludeTracked` en las 3 lanes (app + ecosystem + MCP `get_seo_keyword_discovery`).
+
+### Follow-ups V1.1 (documentados, no bloqueantes)
+
+- Seeds `tracked_keywords`: muestreo con sesgo alfabético (`ORDER BY keyword LIMIT 10`) —
+  muestrear por señal (volumen/impresiones) cuando haya >10.
+- Seeds `gsc_queries`: sin exclusión de marca ni banda de posición — las queries branded
+  dominan impresiones y expanden hacia lo ya ganado.
+- Homogeneizar el filtro `search_volume > 0` entre métodos (hoy suggestions/ideas lo llevan;
+  related/site no).
+- Cap de 500 candidatos y top-up de 200: hoy FIFO por orden de llegada — priorizar por señal.
+- Rollup de convergencia multi-endpoint (candidato visto por 2+ endpoints = señal fuerte).
+- Lente GSC del reader: scoping por `site_url` del target cuando una org tenga 2+ properties.
+
 ## Status
 
 - Lifecycle: `complete`

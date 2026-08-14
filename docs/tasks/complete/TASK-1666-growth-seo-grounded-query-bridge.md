@@ -4,6 +4,28 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-14 (post-cierre) — Auditoría AEO: v2 del cerebro grounded
+
+Tri-auditoría con skills SEO/AEO sobre el cierre encontró 2 blockers de producto,
+corregidos el mismo día (commit `fix(growth-seo): TASK-1666 auditoría AEO ...`):
+
+- **B1 (cobertura por seed):** el smoke v1 perdió la seed "pintura para piso" por completo y el
+  resultado igual decía `grounded_llm`. Fix: cerebro `aeo-author.seo-grounded.v2` con cobertura
+  OBLIGATORIA por candidate + `computeSeoSeedCoverage` (verificación determinista, pura) — el
+  bridge ahora declara `seedCoverage` + `coverageNotice` en el resultado y el summary MCP
+  reporta el COVERAGE WARNING. La etiqueta grounded ya no se asume: se verifica.
+- **B2 (placeholders):** el smoke v1 materializó "y Comex" literal. Fix: `sanitizeAuthoredPrompts`
+  recibe `brandName`/`competitors` — competidor literal se normaliza a `{{competitor}}` y una
+  marca literal fuerza `namesBrand=true` (el tag refleja la realidad del texto).
+- **M1 (distribución):** pisos grounded (≥50% discovery + los 4 fanOutTypes); set degenerado →
+  `null` → fallback honesto al baseline.
+- **M6/M7:** hardening del bloque delimitado (colapso de `===`, techo 120 chars) y `vol:` viaja
+  como señal de prioridad; el prompt exige descubrimiento que ELICITE marcas y una pregunta
+  "alternativas a {{competitor}}".
+
+`aeo-author.v1` (base sin contexto) sigue byte a byte intacto. La eval (TASK-1292) distingue
+ambos cerebros por versión.
+
 ## Delta 2026-08-14 — TASK-1664 complete: dependencia desbloqueada
 
 - El primitive de discovery existe y está verificado live: `queueKeywordDiscovery` /
@@ -441,7 +463,7 @@ Verificado contra el repo real:
      `grounded_query_disabled`), y `PROMPT_AUTHORING` sólo decide `grounded_llm` vs
      `baseline_fallback`, nunca bloquea.
 - **Decisiones de diseño:** `generation_strategy` conserva el union cerrado (`llm`/`template_baseline`)
-  — grounded se distingue por `systemPromptVersion='aeo-author.seo-grounded.v1'` + refs
+  — grounded se distingue por `systemPromptVersion='aeo-author.seo-grounded.v2'` (v1 en el cierre original; v2 post-auditoría, ver Delta) + refs
   `seo.discovery.*`; idempotencia = draft existente con el mismo `seo.discovery.context:<hash>` + misma
   versión de author (advisory lock xact para serializar check+create; el LLM se llama fuera del lock —
   doble llamada teórica en carrera exacta, jamás doble draft); lanes ecosystem de grounded-queries
@@ -458,7 +480,7 @@ Verificado contra el repo real:
 ### Slice 0 — Boundary, schema de contrato y versionado de authoring
 
 - Añadir `SeoGroundingContext`, `GroundedQueryDraftResult`, error codes, mode y source-ref format.
-- Añadir versión separada `aeo-author.seo-grounded.v1`/system prompt grounded; dejar
+- Añadir versión separada `aeo-author.seo-grounded.v1`/system prompt grounded (hoy `v2`, ver Delta post-cierre); dejar
   `AUTHOR_SYSTEM_PROMPT_VERSION='aeo-author.v1'` intacta para authoring no grounded.
 - Extender `AuthorPromptSetInput` de forma backward-compatible con contexto SEO opcional y mantener
   output baseline bit-for-bit cuando el contexto está ausente.

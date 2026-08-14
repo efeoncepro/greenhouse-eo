@@ -7,6 +7,18 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-14 — La auditoría del oficio afinó el discovery y el puente antes de congelarlos (TASK-1664/1666)
+
+Una tri-auditoría con las skills de SEO/AEO revisó los dos cierres del día y encontró lo que los
+tests verdes no ven: el set "grounded" real había perdido una seed completa y traía un competidor
+con nombre y apellido. Ahora la cobertura por seed se **verifica** (el draft declara qué candidatos
+quedaron sin huella y lo advierte al revisor), los nombres literales se normalizan a placeholders,
+y un set degenerado cae honesto al baseline. En el discovery, el inbox ordena primero la
+oportunidad medida (lo que el sitio ya recibe y no sigue), el desempate usa la barrera de enlaces
+canónica en vez del KD que colapsa en es-LATAM, y repetir el mismo intent en un mes nuevo vuelve a
+descubrir (antes quedaba congelado para siempre). Todo corregido el mismo día, antes de que el
+workbench (TASK-1665) congelara el contrato.
+
 ## 2026-08-14 — Las keywords descubiertas ahora saben llegar a los motores de IA (TASK-1666)
 
 El mismo día que el discovery quedó operativo, se cerró el puente que faltaba hacia el otro
@@ -1189,12 +1201,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   que quedó sólo en el companion → `## Delta` en TASK-1160, cuyo Slice 5 pasa a desbloqueante. Y la skill
   `seo-aeo` tiene su copia Claude fuera del repo (sin versionar): le faltaban 2 referencias, incluida la de la API
   de GSC; el gate `skills:mirrors` no puede ver ese drift porque la skill no está en su manifiesto.
-
-## 2026-08-05 — SEO operable por MCP (TASK-1645, code complete)
-
-- Lane ecosystem machine-authed + 3 MCP tools read-only (`get_seo_keyword_opportunities`,
-  `get_seo_visibility_360`, `get_seo_entitlement`) sobre los primitives gobernados del módulo SEO;
-  entitlement per-org con 404 anti-oracle y degradaciones honestas passthrough.
-- Smoke live del lane con quadrant real; rollout pendiente: smoke e2e HTTP con binding, flag en Vercel y
-  federación al gateway `mcp.efeonce.org` (TASK-1647 creada). Todo reader SEO futuro nace con su tool
-  (criterio en 7 tasks).

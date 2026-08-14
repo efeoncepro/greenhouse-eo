@@ -2,6 +2,25 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+### Auditoría SEO/AEO post-cierre 1664+1666 — CORREGIDA (2026-08-14)
+
+Tri-auditoría por subagentes con skills SEO (craft 1664 · AEO craft 1666 · economics DataForSEO).
+Veredictos: economics LOW risk sin blockers de gasto; 1664 sólido con 4 defaults que congelaban
+contrato; 1666 con 2 blockers de producto medidos en el smoke real. **Todo corregido y commiteado
+en `develop` (SIN push): commits `3ada31d57` (Lote B/1666) + `522460b17` (Lote A/1664).**
+
+- **1666 v2:** cerebro grounded `aeo-author.seo-grounded.v2` (cobertura obligatoria por seed,
+  verificada con `computeSeoSeedCoverage` → `seedCoverage`/`coverageNotice` en el resultado);
+  sanitizer normaliza competidor literal → `{{competitor}}` y marca literal fuerza
+  `namesBrand=true`; pisos grounded (≥50% discovery + 4 fanOutTypes). `aeo-author.v1` intacto.
+- **1664:** orden accionable (oportunidad medida ● primero; desempate por linkBarrier, no KD);
+  idempotency key `auto-` con ciclo `YYYY-MM`; spend fence sobre el remanente real;
+  `related_keywords` depth 2; `order_by relevance` de keywords_for_site verificado contra
+  sandbox DataForSEO; DTO +`cpcUsd`/`competitionLevel`; `excludeTracked` en las 3 lanes.
+- Gateway `efeonce-mcp@5ae17ab` (wording idempotencia mensual; deploy dispatch sigue diferido al
+  próximo release develop→main). Deltas + backlog V1.1 en los dos task files.
+- **Próximo paso: TASK-1665 (workbench UI)** — el contrato del reader ya quedó estable post-fix.
+
 ### TASK-1666 COMPLETE — puente SEO → grounded queries AEO (2026-08-14)
 
 End-to-end en la misma sesión que 1664: suite completa **10.721 verde**, sanity PG real **16/16
@@ -363,42 +382,3 @@ Account; el Pipeline sólo seleccionaba Content por defecto. La auditoría descu
 validaban pero no se persistían y que no existía país de residencia. `TASK-1688` gobierna el arreglo vertical:
 ADR previo, migración aditiva, paridad Careers/Growth Forms y lectura autorizada en Application 360; prohíbe
 inferir/backfillear datos históricos o exponer PII. No hay implementación ni migración aplicada aún.
-
-### Proceso reusable — radar Wherex con CLI Playwright (2026-08-11)
-
-Quedó canonizado para futuras solicitudes en la skill `greenhouse-public-private-tenders` y el manual
-`docs/manual-de-uso/comercial/revisar-licitaciones-wherex-con-chrome.md`. `pnpm wherex:radar:setup` guarda
-correo y clave sólo en `.auth/` con `0600`; `pnpm wherex:radar` usa un perfil Chrome aislado, revisa **Nueva** y
-**Editando**, lee fichas y adjuntos, y genera el reporte protegido local. El dictamen exige además leer la
-descripción/comentarios generales y el Centro de mensajes → Preguntas: presupuesto, alcance o condiciones pueden
-vivir allí; no se infieren desde el título ni el brief. No participa, responde, carga,
-presenta ni firma. Pendiente operativo: correr el setup una vez en una terminal interactiva y calibrar selectores
-si Wherex cambió su interfaz. La continuidad de candidatas también quedó canonizada: los originales se archivan
-en OneDrive `Alineación/4. Comercial/Licitaciones/<Comprador>/` sin URLs firmadas; empresa, deal y asociación se
-verifican por MCP HubSpot y toda escritura requiere propuesta/confirmación, con la asociación confirmada una vez
-que la empresa tiene ID. Caso real del 2026-08-11: Ajinomoto y CINTERMEX creados/verificados; Polpaico ya existía
-y no se duplicó. Si el visor bloquea un guardado soportado, no se elude: se requiere una copia local verificable.
-Para Ajinomoto LIC-962, el expediente `docs/commercial/tenders/ajinomoto-lic-962/research/` conserva la evidencia
-de descripción, preguntas y mecanismo de postulación: servicio de 12 meses, cotización y presentación obligatorias
-(20 MB), condiciones y aceptación final. Aún no se ingresó precio, adjuntó archivo, aceptó término ni envió oferta.
-El runner ahora incluye `--tender-id <ID> --archive-originals <carpeta>` para archivar originales sólo cuando
-Wherex emite una descarga nativa; si abre el visor protegido, informa `manual-save-required` sin extraer enlaces.
-La primera ejecución real sigue bloqueada hasta completar el setup de la credencial aislada.
-Para una sesión Chrome principal autorizada, se verificó el fallback visible y reversible: activar **Descargar archivos
-PDF** en `chrome://settings/content/pdfDocuments`, descargar cada adjunto individualmente, validar el archivo local y
-archivarlo en OneDrive; se restaura **Abrir archivos PDF en Chrome** para volver al visor. Caso Sika LIC-1120:
-ambos PDF quedaron archivados y leídos en `Alineación/4. Comercial/Licitaciones/Sika/`; el brief y la estrategia
-discrepan en duración (agosto–septiembre vs. septiembre–diciembre), por lo que no se debe cotizar duración sin
-aclaración del comprador.
-La mecánica reutilizable de postulación quedó además en la skill, el manual y la documentación funcional: servicio
-→ condiciones/adjuntos → resumen/reconciliación → aceptación y envío sólo con confirmación humana final.
-
-La oferta de Ajinomoto quedó redactada y renderizada en el mismo expediente: `oferta-tecnica.md`,
-`oferta-economica.md`, `economica.json`, `deck-plan.json` y
-`propuesta-economica-ajinomoto-lic-962.xlsx`. La presentación técnica de 11 láminas se validó y renderizó
-localmente en `.captures/ajinomoto-lic-962/AJINOMOTO-LIC-962-TECHNICAL.pdf` (2,2 MB); no se cargó a Wherex.
-La propuesta oferta S/ 7.000 mensuales sin IGV peruano (S/ 84.000 referenciales por 12 meses), cubre operación
-remota de comunidad y deja audiovisual, diseño de alto volumen, presencialidad, pauta, premios y creadores
-externos como adicionales. Antes de presentar, quedan cuatro gates concretos: validar identificador de marca,
-asignar squad/capacidad y costeo cargado con Finanzas, confirmar documentación tributaria Chile–Perú y revisar la
-definición de embajador activo/corte FY 2026. No suplir esos gates con una aceptación de términos ni con un envío.

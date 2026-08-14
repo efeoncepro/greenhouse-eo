@@ -69,7 +69,7 @@ curl -s -X POST https://<host>/api/admin/growth/seo/grounded-queries \
 
 - Bridge/reader: `src/lib/growth/seo/grounded-query-{bridge,reader}.ts`
 - Authoring AEO extendido: `src/lib/growth/ai-visibility/prompt-packs/authoring/*` (cerebro
-  grounded `aeo-author.seo-grounded.v1`; el base `aeo-author.v1` quedó intacto)
+  grounded `aeo-author.seo-grounded.v2`; el base `aeo-author.v1` quedó intacto)
 - Lanes: `src/app/api/admin/growth/seo/grounded-queries/route.ts` ·
   `src/app/api/platform/ecosystem/growth/seo/grounded-queries/route.ts` · MCP
   `src/mcp/greenhouse/{server,tools,http-client}.ts`
