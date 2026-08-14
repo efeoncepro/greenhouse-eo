@@ -9,6 +9,32 @@
 
 ---
 
+## Delta 2026-08-14 — intención declarada en el body de `keywords/track` (TASK-1659)
+
+`POST /api/platform/ecosystem/growth/seo/keywords/track` acepta dos campos opcionales más:
+`intent` (`target` | `opportunity`) e `intentDeclaredBy`. El contrato del lane no cambia de forma —
+sigue siendo el mismo command route, el mismo boundary `internal` y el mismo command canónico— pero
+sí gana dos reglas de frontera que un consumer programático tiene que conocer:
+
+🔴 **Un `intent` fuera del enum es `400 bad_request`, nunca un `undefined` silencioso.** Es la
+diferencia entre "no declaré intención" (omitir el campo, legítimo y frecuente) y "declaré una y se
+perdió en el camino". Descartar en silencio un valor inválido dejaría al consumer creyendo que
+clasificó algo que quedó sin clasificar, y ese error solo se descubre semanas después leyendo un
+reporte que no cuadra.
+
+**El `actor` sigue siendo `mcp:<consumer>` — la máquina.** `intentDeclaredBy` no lo reemplaza: la
+procedencia del write (quién comprometió el gasto) y la autoría de la declaración (por encargo de
+quién se clasificó) son dos hechos distintos y se auditan por separado. Una autoría sin intención se
+descarta, porque no hay a qué atribuirla.
+
+El outcome por keyword que el lane hace passthrough suma un valor: `intent_changed`. Un consumer que
+solo conozca `tracked|already_tracked|capacity_exceeded|invalid` lo leerá como desconocido, y
+fundirlo en `already_tracked` diría que no pasó nada cuando sí se cerró una membresía y se abrió
+otra. Semántica completa del eje, invariantes de reporte y modelo de datos en
+`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` (canónico); acá solo vive lo que es contrato del lane.
+
+---
+
 ## Delta 2026-08-07 — los dos primeros COMMANDS del lane SEO (TASK-1308)
 
 El lane ecosystem de Growth SEO nació read-only (delta TASK-1645, abajo). TASK-1308 le suma sus

@@ -56,6 +56,10 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 > **Actualización 2026-08-13:** `TASK-1661` quedó **complete** y con eso `1662` y `1664` dejaron de
 > estar bloqueadas (`Blocked by: none` en ambas).
 >
+> **Actualización 2026-08-14:** `TASK-1659` quedó **complete**, así que `1660` (lente Objetivos)
+> también queda `Blocked by: none`. Con eso el carril de objetivos ya no espera backend: sólo falta
+> su superficie.
+>
 > ⚠️ Al cerrar una task, revisar quién la citaba como blocker. Un `Blocked by` obsoleto es fricción
 > inventada, y no hay gate que lo detecte.
 
@@ -74,7 +78,7 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 > | Pregunta | Fuente | Estado |
 > |---|---|---|
 > | ¿Qué empujo de lo que ya tengo? | GSC medido | **construida** (TASK-1308) |
-> | ¿Dónde quiere estar el cliente? | **declarado por humano** | `TASK-1659` + `TASK-1660` |
+> | ¿Dónde quiere estar el cliente? | **declarado por humano** | `TASK-1659` (**complete 2026-08-14**, el eje ya existe en el command) + `TASK-1660` (superficie) |
 > | ¿Qué me pierdo entero? | competencia + Labs | `TASK-1661` + `TASK-1662` |
 >
 > La segunda es la que ancla comercialmente a las otras dos, porque es el compromiso con el cliente
@@ -84,8 +88,8 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 > aspiracional: es la única forma de contestar *¿vale la pena?* y *¿cuánto cuesta?* antes de
 > aceptar un objetivo.
 
-- `TASK-1659` — [planificada, backend-data] modelo de **intención** en el set monitoreado: objetivo declarado vs oportunidad detectada, con autoría. `source` (TASK-1308) es procedencia, no intención. Append-only: cambiar la intención cierra y abre, nunca `UPDATE`.
-- `TASK-1660` — [planificada, ui-ux] lente **Objetivos** sobre `/admin/growth/seo/keywords` — extiende el **nodo S3** del master UI flow. Full API Parity al revés: `trackKeywords` **ya** acepta keywords que el cliente no rankea y no tiene botón. Bloqueada por `TASK-1659`.
+- `TASK-1659` — [**complete 2026-08-14**, backend-data] modelo de **intención** en el set monitoreado: objetivo declarado vs oportunidad detectada, con autoría. `source` (TASK-1308) es procedencia, no intención. Append-only: cambiar la intención cierra y abre, nunca `UPDATE` — outcome propio `intent_changed`, que **no consume cupo** del techo. `intent` (`target` | `opportunity`) **sin default**: quien no declara escribe `NULL` y no existe un tercer valor "desconocido"; `intentDeclaredBy` separa a quien asumió el compromiso de quien ejecutó el INSERT. Migración `20260814221022082`. Parity en las 3 lanes (app · ecosystem · MCP `track_seo_keywords`) con vocabulario validado en cada frontera; **sin capability, scope ni flags nuevos**. **Desbloquea `1660`.**
+- `TASK-1660` — [planificada, ui-ux] lente **Objetivos** sobre `/admin/growth/seo/keywords` — extiende el **nodo S3** del master UI flow. Full API Parity al revés: `trackKeywords` **ya** acepta keywords que el cliente no rankea y no tiene botón, y desde `TASK-1659` acepta además la **intención declarada**. **`Blocked by: none`** desde el cierre de `TASK-1659` (2026-08-14).
 - `TASK-1661` — [**complete 2026-08-13**, backend-data] volumen y **barrera de enlaces** por keyword. Trae el dato de mercado desde DataForSEO Labs (`keyword_overview`) a la tabla append-only `seo_keyword_market_data`, con país, idioma y `captured_at` en la clave; `readKeywordOpportunities` deja de cablear `market: 'unavailable'` y la tabla de `TASK-1308` muestra las columnas **sin cambio de código en la UI**. Captura **mensual** (el proveedor refresca una vez al mes), acotada al set monitoreado, con dry-run de costo previo. Costo real medido: **USD ~0.02/org/mes**. Tool MCP `get_seo_keyword_market_data` + federación al gateway en el mismo cierre. **Desbloquea `1660`/`1662`/`1664`.**
 - `TASK-1662` — [planificada, backend-data] **keyword gap**: qué gana la competencia donde el cliente es invisible. La superficie va aparte. **`Blocked by: none`** desde el cierre de `TASK-1661` (2026-08-13). Escribe en la **misma** tabla de mercado — es multi-productor por diseño, nunca un segundo almacén.
 
@@ -137,6 +141,7 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1655` — [en curso] Historical Data Platform del módulo SEO (semilla histórica de rank vía `historical_serps`).
 - `TASK-1677` — [**complete**, backend-data] Cierre de la fase **contract** del cutover `seo_v1 → seo_v2`; la ventana expand/contract dejó de estar abierta. Se lista acá para cerrar el denominador del epic (lo declaraba en su campo `Epic:` y no figuraba en esta lista).
 - `TASK-1690` — [creada 2026-08-13, backend-data] **La superficie cliente sirve a la POBLACIÓN, no al tenant con historia.** La página decide si hay datos con GSC y calcula el KPI principal con rank snapshots: una organización con Search Console conectado y captura de rank sin correr —el día 1 de todo cliente nuevo— ve el KPI en "sin dato" con el Quadrant poblado debajo. Invisible hasta hoy porque la superficie tiene UNA organización cliente y tiene ambas fuentes. Expone la cobertura por fuente en el contrato + familia de fixtures por estado + guard anti-reincidencia. Sin migración. Sale del cierre de `TASK-1310`.
+- `TASK-1691` — [creada 2026-08-13, ui-ux] **Declarar la lente estimada y su fecha de captura en la tabla de oportunidades.** Cierra `ISSUE-154`: cuando `market === 'available'` la pantalla renderiza Volumen y Barrera de enlaces **sin leyenda de origen y sin `capturedAt`** — la nota `● Medido · Search Console` sólo aparece en el caso `'unavailable'`. El §8 del master flow pide leyenda persistente y as-of explícito para lo estimado; el as-of ya viaja en el contrato programático, sólo falta la superficie.
 - `TASK-1658` — [planificada, backend-data] drift de federación MCP + punto ciego del guard de paridad: 3 tools SEO viven en el MCP interno de Greenhouse y no están ni federadas ni excluidas en el gateway, y el guard no puede verlo porque compara contra lo registrado EN EL GATEWAY, nunca contra Greenhouse.
 
 - `TASK-1305` — [planificada] `readSeoAeoGap` derived read cross-módulo (report layer).

@@ -27,6 +27,30 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-08-14 — la intención declarada existe: el gap deja de ser binario
+
+`TASK-1659` está **complete**: una membresía del set del cliente ahora puede llevar intención
+declarada — `target` (compromiso acordado con el cliente), `opportunity` (demanda medida que se está
+empujando) o `NULL` (nadie la clasificó). Lo que esta task puede dar por sentado, y lo que tiene que
+ajustar:
+
+🔴 **La taxonomía del reader está escrita como binaria y ya no alcanza.** `readKeywordGap` separa
+"el cliente no aparece" de "el cliente aparece peor". Una keyword declarada **`target`** que hoy está
+en la posición 60 —o directamente sin rankear— cae exacta en "el cliente no aparece", pero **no es un
+hallazgo: es un compromiso en curso**. Presentarla como gap descubierto en la reunión de primera vez
+le vende al cliente algo que ya le prometimos, y borra que la distancia era conocida y aceptada.
+El tercer estado —"no aparezco, pero ya es objetivo declarado desde tal fecha"— tiene que estar en el
+contrato del reader, no resolverse en la superficie.
+
+- El cruce contra el set del cliente ahora tiene una columna más que leer. `NULL` es un **cuarto**
+  estado (seguida, sin intención declarada), no un sinónimo de `opportunity`: hoy son todas las
+  keywords seguidas antes del 2026-08-14.
+- El eje declarado **nunca se promedia** con el eje de gap, ni entre sus valores. "Objetivos" y
+  "oportunidades" responden preguntas comerciales distintas.
+- Ojo con el homónimo: la palabra "oportunidad" de esta task (gap de contenido vs. gap de
+  optimización) no es el valor `opportunity` de la intención declarada. Si ambas aparecen en la misma
+  superficie, hay que desambiguarlas.
+
 ## Delta 2026-08-13 — desbloqueada
 
 El primitive de mercado de `TASK-1661` está **complete** (2026-08-13): `readKeywordMarketData` y la tabla `seo_keyword_market_data` existen. 1662 escribe en ESA tabla el `keyword_info` que ya viene inline y pagado en `domain_intersection` — nunca abre un segundo almacén.

@@ -4,6 +4,29 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-14 — existe un segundo eje que tampoco se mezcla (TASK-1659)
+
+`TASK-1659` está **complete**: una keyword seguida puede llevar intención declarada — `target`
+(compromiso acordado con el cliente), `opportunity` (demanda medida que se empuja) o `NULL` (nadie la
+clasificó). **No es una fuente**, así que no agrega slices a la cobertura por fuente ni cambia el
+alcance de esta task. Tres cosas sí la tocan:
+
+- El invariante "**NUNCA** promediar ni mezclar la señal medida de Search Console con la de
+  seguimiento de posición" está formulado **por fuente**. Ahora hay un segundo eje que tampoco se
+  mezcla y que vive **dentro** de la fuente de rank: objetivos y oportunidades responden preguntas
+  distintas y no se promedian entre sí. El agregado "31 keywords · posición media · top-10" se calcula
+  hoy sobre un set de intención heterogénea sin declararlo.
+- Consecuencia concreta ya en código: `selectFeaturedRankSeries`
+  (`src/lib/growth/seo/client/select-featured-series.ts`) ordena por mejor posición y corta en 5, así
+  que **un objetivo declarado en la posición 60 es estructuralmente imposible de destacar** y entra al
+  promedio como un fracaso permanente. Es exactamente el caso que `TASK-1659` existe para dejar de
+  contar mal.
+- Para los fixtures: **hoy el 100% de la población tiene intención `NULL`** (todas las keywords se
+  seguían desde antes del 2026-08-14). Un fixture que asuma objetivos declarados sería ficción hasta
+  que exista la lente que los declara (`TASK-1660`, aún en `to-do`).
+
+Esto es una nota de contrato, no un re-scope: declarar intención sigue fuera del alcance de esta task.
+
 ## Status
 
 - Lifecycle: `to-do`

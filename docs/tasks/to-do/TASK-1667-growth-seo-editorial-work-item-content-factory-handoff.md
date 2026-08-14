@@ -4,6 +4,41 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-14 — TASK-1659 complete: la intención declarada ya existe
+
+La mitad `TASK-1659` de la dependencia `TASK-1659`/`TASK-1660` está **complete**. Lo que esta task
+puede dar por sentado:
+
+- `seo_keyword_set_members.intent` (`target` | `opportunity` | `NULL`) con `intent_declared_by` +
+  `intent_declared_at` acoplados por CHECK. La cláusula de fallback de la dependencia ("si esos
+  contratos aún no están disponibles, el command debe exigir los campos explícitos equivalentes")
+  **ya no aplica al eje de intención**: se lee del dominio, no se re-declara en el work item.
+  `TASK-1660`, la lente que lo opera, sigue en `to-do`.
+- Un work item nacido de una keyword ya seguida ancla su procedencia a la **ventana de membresía
+  vigente**, no a un campo copiado: `intent_declared_at` es lo que sostiene "este trabajo nació de un
+  objetivo acordado en marzo". Cambiar la intención cierra una ventana y abre otra (outcome
+  `intent_changed`), así que la ref apunta a la ventana, no a "la keyword".
+- 🔴 **`NULL` significa "nadie la clasificó", jamás `opportunity`.** Las keywords seguidas antes del
+  2026-08-14 la tienen en `NULL`. Un work item que derive la acción `opportunity` de esa ausencia
+  afirma una decisión comercial que nadie tomó.
+Tres puntos del diseño de esta task que hay que ajustar al vocabulario ya cerrado:
+
+- **`decision_kind`** declara el enum `objective|opportunity|discovery_candidate|technical_fix|manual`.
+  El valor canónico del dominio es **`target`**, no `objective` — dos nombres para lo mismo obligan a
+  un mapeo que se desincroniza. Y el enum no tiene valor para una keyword seguida con intención
+  `NULL`, que hoy son **todas** las anteriores al 2026-08-14.
+- **`intent_snapshot_json`** dice "intención declarada o estimada" en una sola columna. Son dos ejes
+  distintos con el mismo nombre: la intención **declarada** de la membresía (`target`/`opportunity`,
+  con autor y ventana) y el search intent **estimado** que el proveedor trae en los candidates de
+  discovery. Fundirlos mezcla una estimación de mercado con un compromiso con el cliente; si la
+  columna guarda ambos, tiene que decir cuál es cuál.
+- **"Resolver candidate/target/intent server-side mediante los readers de 1664/1659/1660"**:
+  `TASK-1659` entregó un **command**, no un reader — hoy ningún reader de `src/lib/growth/seo/**`
+  expone la intención de una membresía, y el de `TASK-1660` sigue pendiente. O esta task se apoya en
+  ese reader cuando exista, o mantiene la vía de campos explícitos para la mitad de intención.
+- Ruta actualizada en `## Normative Docs`:
+  `docs/tasks/complete/TASK-1659-growth-seo-keyword-target-intent-model.md`.
+
 ## Delta 2026-08-14 — TASK-1664 complete: dependencia desbloqueada
 
 - El primitive de discovery existe y está verificado live: `queueKeywordDiscovery` /

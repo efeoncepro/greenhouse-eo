@@ -142,9 +142,11 @@ Login interno → nav Growth → Search Visibility → SEO
         └─ contextual: "Ver keywords de esta URL" → S3
   → S3 Keywords: sub-navegación Oportunidades · Objetivos · Descubrir
         ├─ Oportunidades: veredicto (leyenda+filtro) + scatter medido (posición×impresiones) + tabla
-        │      → acciones gobernadas "Seguir" / "Dejar de seguir" (trackKeywords / untrackKeywords)
+        │      → acciones gobernadas "Seguir" / "Dejar de seguir"
+        │        (trackKeywords(intent=opportunity) — la lente declara su intención — / untrackKeywords)
         ├─ Objetivos: declaración explícita + trayectoria contra la primera medición posterior
-        │      → trackKeywords(intent=target) / readKeywordTargets
+        │      → trackKeywords(intent=target) — el eje YA existe en el command (TASK-1659) —
+        │        + reader de la lente (pendiente, TASK-1660)
         ├─ Descubrir: seeds → preview de costo → confirmación → corrida async → candidates
         │      → "Declarar objetivo" / "Seguir oportunidad" / "Preparar grounded queries" / "Descartar"
         │      → queueKeywordDiscovery / readKeywordDiscovery / recordKeywordDiscoveryAction
@@ -187,7 +189,8 @@ Toda acción visible mapea a un command gobernado server-side (capability-gated,
 | Acción visible | Command | Capability | Superficie |
 |---|---|---|---|
 | Configurar target/keywords/competidores | `configureSeoTarget` / `trackKeywords` / `setBacklinkTracking` | `growth.seo.target.configure` | S1, S3 |
-| "Seguir" keyword (agregar al set monitoreado) | `trackKeywords(keywordSetId, [kw], actor)` | `growth.seo.target.configure` | S3 |
+| "Seguir" keyword (agregar al set monitoreado) | `trackKeywords(seoTargetId, [kw], actor, { intent?, intentDeclaredBy? })` — el caller **declara** la intención (`opportunity` en la lente Oportunidades); sin declaración se escribe `NULL`, nunca un default | `growth.seo.target.configure` | S3 |
+| "Declarar objetivo" / reclasificar una keyword ya seguida | `trackKeywords(..., { intent: 'target' })` — cierra la membresía vigente y abre otra (outcome `intent_changed`); **no consume cupo** ni es un `UPDATE` | `growth.seo.target.configure` | S3 · Objetivos |
 | "Dejar de seguir" (cerrar la ventana de seguimiento) | `untrackKeywords(seoTargetId, [kw], actor)` — append-only, cierra con `clock_timestamp()`; **nunca borra** | `growth.seo.target.configure` | S3 |
 | "Descubrir keywords" (crear corrida) | `queueKeywordDiscovery(input)` → `pending` + outbox; el worker ejecuta Labs tras el preview/fence | `growth.seo.target.configure` + `enforceSeoRunEntitlement` | S3 · Descubrir |
 | Leer corrida/candidates | `readKeywordDiscovery({runId?, filters?, cursor?})` | `growth.seo.observation.read` | S3 · Descubrir · Nexa · ecosystem · MCP |
@@ -483,3 +486,29 @@ caso `'unavailable'` — y tampoco imprime el `capturedAt` del dato de mercado. 
 persistente y as-of explícito para lo estimado: eso queda pendiente de una task de UI. El as-of sí viaja
 en el contrato programático (`get_seo_keyword_market_data` devuelve `capturedAt` /
 `providerLastUpdatedAt`).
+
+## Delta 2026-08-14 — la intención declarada aterrizó: el eje "objetivo vs oportunidad" ya existe en el command
+
+`TASK-1659` quedó **complete**. El set monitoreado dejó de tener un solo eje: además de `source`
+(procedencia del write) cada membresía puede llevar `intent` (`target` | `opportunity`) con su autoría.
+Lo que hasta ahora era un supuesto del §5 —"Objetivos" como lente futura— ya tiene contrato server-side.
+
+**Lo que los consumers pueden dar por sentado (`TASK-1660` y `TASK-1665`):**
+
+1. **`trackKeywords` acepta `intent` y `intentDeclaredBy`, y no asume ninguno.** Sin declaración escribe
+   `NULL`; no existe un tercer valor "desconocido". La UI **pinta la ausencia como ausencia**, jamás
+   como "oportunidad", igual que `unknown` de la barrera de enlaces se pinta "Sin dato".
+2. **La lente Oportunidades ya declara `intent: 'opportunity'` en cada "Seguir".** Ninguna lente nueva
+   hereda intención por defecto: la que no la declara no la escribe.
+3. **Reclasificar es una acción legítima y visible.** Cambiar la intención cierra la membresía vigente y
+   abre otra (`intent_changed` en el outcome, con `previousIntent`), **no consume cupo** del techo y
+   **nunca** es un `UPDATE`. La UI debe leer el outcome por keyword —no `ok: true`— y distinguir
+   `tracked` (gasto nuevo) de `intent_changed` (reclasificación sin gasto nuevo) en su feedback.
+4. **Objetivo y oportunidad nunca se promedian.** Una keyword `target` en la posición 60 es la distancia
+   que falta, no un fracaso: cualquier KPI, orden o veredicto que las mezcle miente sobre ambas.
+5. **Sin capability, scope ni flag nuevos**: la acción sigue detrás de `growth.seo.target.configure`, y
+   las 3 lanes (app · ecosystem · MCP) ya validan el vocabulario con 400 explícito.
+
+**Lo que este delta NO declara:** no existe todavía reader ni superficie de la lente Objetivos —es el
+alcance de `TASK-1660`— y este delta actualiza el master flow sin constituir evidencia de runtime ni
+cambiar el estado `UI ready` de ninguna task consumidora.

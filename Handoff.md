@@ -33,8 +33,31 @@ ISSUE-152** (va "Barrera de enlaces" en niveles, y el filtro `maxDifficulty` sal
 URL); y `Objetivos` sigue en `to-do`, así que `Descubrir` es la **segunda** lente y el link "Ver en
 Objetivos" no tiene destino. Además `Motion: none` es incorrecto: falta el contrato de motion.
 
-**Pendiente de esta sesión:** `pnpm build` de producción no se corrió (requiere autorización — se
-come ~30GB). Nada más queda pendiente de rollout: no hay flags que prender.
+**Rollout cerrado:** `pnpm build` verde, push a `develop` hecho y **CI 8/8 en verde**. No hay flags
+que prender.
+
+**Propagación documental (3 subagentes):** regla auto-load `growth-seo.md` (4.ª cláusula del write),
+skills `dataforseo-operator` + `efeonce-mcp-platform` (con sus espejos Codex, `skills:mirrors` verde),
+arquitectura §7, API Platform, master flow EPIC-022 §5/§6, epic file, doc funcional y manual del MCP.
+
+**Impacto cruzado detectado — dos cosas que valen más que el resto:**
+- `TASK-1662` (keyword gap): su taxonomía es **binaria** ("no aparece" vs "aparece peor") y ahora es
+  ternaria. Un `target` en la posición 60 cae en "no aparece" pero **no es un hallazgo, es un
+  compromiso en curso**: presentarlo como gap en la reunión de primera vez le vende al cliente algo
+  que ya le prometimos. El tercer estado va en el contrato del reader, no en la superficie.
+- `TASK-1690` (superficie cliente): `selectFeaturedRankSeries` ordena por mejor posición y corta en 5,
+  así que un objetivo en la 60 es **estructuralmente imposible de destacar** y entra al promedio como
+  fracaso permanente.
+- Menores, con delta escrito: `TASK-1667` (usa `objective` donde el valor canónico es `target`; funde
+  intención declarada con search intent estimado en una columna; y cita "readers de 1659" que no
+  existen — 1659 entregó un *command*) y `TASK-1669` (`intent` es homónimo dentro del mismo bundle de
+  evidencia).
+
+**Deuda documental declarada, NO cerrada:** el doc funcional y el manual del MCP no enumeran las tools
+de TASK-1664/1666 (`get_seo_keyword_discovery`, `discover_seo_keywords`, `get_seo_grounded_query_draft`,
+`prepare_seo_grounded_queries`); el manual sigue diciendo "10 de lectura + 2 de escritura". Se corrigió
+la afirmación falsa de alcance ("nada que escriba"), pero el inventario le toca al cierre de esas tasks.
+`TASK-1667` y `TASK-1669` están `legacy=1` en `task:lint` (les faltan markers ZONE) — preexistente.
 
 ### Auditoría SEO/AEO post-cierre 1664+1666 — CORREGIDA (2026-08-14)
 

@@ -1,9 +1,9 @@
 # MCP Greenhouse Read-Only
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-04-30 por Codex
-> **Ultima actualizacion:** 2026-08-14 por Claude (inventario SEO real: 10 tools de lectura + 2 de escritura; 9 federadas al gateway, 3 aún no)
+> **Ultima actualizacion:** 2026-08-14 por Claude (TASK-1659: intención declarada en `track_seo_keywords` + outcome `intent_changed`)
 > **Modulo:** plataforma / MCP
 > **Ruta en portal:** `N/A` (server MCP local `stdio` o remoto HTTP)
 > **Documentacion relacionada:** [API Platform Ecosystem](../../documentation/plataforma/api-platform-ecosystem.md), [Platform Health API](../../documentation/plataforma/platform-health-api.md), [GREENHOUSE_MCP_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md)
@@ -244,7 +244,8 @@ Reglas que el agente debe respetar:
 - **En `get_seo_rank_evolution`, `position: null` en una fecha significa que el dominio no rankeó ese día.** Es una medición válida, no un error ni un hueco a rellenar. Y esa serie (DataForSEO) **nunca se promedia** con la serie de GSC — son fuentes distintas.
 - **Medido ● y estimado ◑ nunca se promedian ni se sustituyen.** El volumen de mercado de `get_seo_keyword_market_data` es una estimación del mercado; las impresiones de `get_seo_keyword_opportunities` son la demanda medida de ESE sitio. Son dos hechos distintos y ambos ciertos.
 - **Las 10 tools de lectura son read-only**: no disparan capturas ni gastan presupuesto de proveedor.
-- **Las 2 de escritura sí comprometen gasto recurrente.** `track_seo_keywords` factura cada keyword al proveedor en **cada ciclo diario** hasta que alguien la saque, así que la lista exacta se propone al humano y se confirma **antes** de llamarla — nunca especulativamente. Ambas son idempotentes y devuelven un **outcome por keyword** (`tracked` / `already_tracked` / `capacity_exceeded` / `invalid`, y `untracked` / `not_tracked` / `invalid`): reportar `data.ok` sin leer ese arreglo describe un cambio que puede no haber ocurrido. El lane las acepta **solo desde bindings de scope `internal`**.
+- **Las 2 de escritura sí comprometen gasto recurrente.** `track_seo_keywords` factura cada keyword al proveedor en **cada ciclo diario** hasta que alguien la saque, así que la lista exacta se propone al humano y se confirma **antes** de llamarla — nunca especulativamente. Ambas son idempotentes y devuelven un **outcome por keyword** (`tracked` / `already_tracked` / `intent_changed` / `capacity_exceeded` / `invalid`, y `untracked` / `not_tracked` / `invalid`): reportar `data.ok` sin leer ese arreglo describe un cambio que puede no haber ocurrido. El lane las acepta **solo desde bindings de scope `internal`**.
+- **La intención de una keyword se declara, no se adivina** (TASK-1659). `track_seo_keywords` acepta `intent` opcional: `target` (compromiso acordado con el cliente — puede estar en la posición 60, y eso es la **distancia que falta**, no un fracaso) u `opportunity` (demanda medida que se está empujando). **Omítelo salvo que un humano lo haya declarado**: adivinarlo fabrica una clasificación que nadie hizo. Los dos **nunca se promedian** al reportar. Cambiar la intención de una keyword ya seguida devuelve `intent_changed` (no `already_tracked`: sí pasó algo), **no consume cupo** —cierra la membresía vigente y abre otra— y preserva desde cuándo es objetivo. `intentDeclaredBy` lleva la **autoría humana** cuando el agente actúa por encargo; el actor del write sigue siendo la máquina (`mcp:<consumer>`), que es la procedencia real del gasto, y una autoría sin intención se descarta. Las keywords seguidas antes del 2026-08-14 no tienen intención declarada: eso significa **"nadie la declaró"**, jamás "oportunidad".
 
 **Qué está federado al gateway público `mcp.efeonce.org`.** Verificado contra el allowlist de paridad
 del repo hermano `efeonce-mcp` (`src/providers/greenhouse-seo-tool-parity.ts`, cuyo test rompe el CI si

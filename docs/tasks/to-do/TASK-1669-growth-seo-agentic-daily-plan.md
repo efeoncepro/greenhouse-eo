@@ -4,6 +4,30 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-14 — TASK-1659 complete: la intención declarada existe (y `intent` es homónimo)
+
+`TASK-1659` está **complete**. El input `target/intent declarado de 1659/1660` del `seo_researcher`
+ya tiene mitad de respaldo real: la intención vive en la membresía (`target` | `opportunity` | `NULL`)
+con autor y fecha, y cambiarla cierra una ventana y abre otra. Cuatro ajustes concretos:
+
+- 🔴 **`intent` significa dos cosas distintas dentro del mismo snapshot de evidencia.** El researcher
+  recibe, en bullets contiguos, el `intent` **estimado** de los candidates de discovery (search intent
+  del proveedor) y el `intent` **declarado** de una membresía (compromiso con el cliente). La lista de
+  prohibiciones impide inventar métricas, pero no impide **confundir estos dos**, y un agente los va a
+  fundir. Hay que nombrarlos distinto en el bundle en vez de confiar en el contexto.
+- **`NULL` es un tercer estado, y hoy es la población entera.** Toda keyword seguida antes del
+  2026-08-14 tiene intención `NULL` = "nadie la clasificó". La regla de no inferir del
+  `editorial_planner` tiene que decirlo explícito: `NULL` **no** se lee como `opportunity`; un plan
+  que cuente "oportunidades" incluyéndolas infla el número con keywords que nadie clasificó.
+- **`declared_target_without_owner` todavía no tiene reader donde pararse.** `TASK-1659` entregó un
+  **command**, no un reader: ningún reader de `src/lib/growth/seo/**` expone hoy la intención de una
+  membresía, y el de `TASK-1660` sigue en `to-do`. Bajo `Readers primero, LLM después`, esa regla de
+  fallback y el nivel 2 de prioridad dependen de ese reader — y **`TASK-1659`/`TASK-1660` no figuran
+  hoy en `### Depends on`**.
+- Invariante de reporte que hereda el plan: objetivos y oportunidades **nunca se promedian**. Un
+  objetivo en la posición 60 es la distancia que falta, no un fracaso, y no debe escalar como
+  urgencia sólo por su posición cruda.
+
 ## Delta 2026-08-14 — TASK-1664 complete: dependencia desbloqueada
 
 - El primitive de discovery existe y está verificado live: `queueKeywordDiscovery` /
