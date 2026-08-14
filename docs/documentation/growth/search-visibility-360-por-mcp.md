@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-08-06 por Claude (TASK-1645 + TASK-1647)
-> **Ultima actualizacion:** 2026-08-14 por Claude (TASK-1659: intención declarada al seguir una keyword; corrección del alcance "solo lectura")
+> **Ultima actualizacion:** 2026-08-14 por Claude (TASK-1664/1666: descubrir keywords + preparar grounded queries AEO — sección nueva y alcance de escrituras actualizado)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) · [EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md](../../architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md)
 > **Manual de uso:** [Operar el provider Greenhouse-SEO del MCP](../../manual-de-uso/plataforma/operar-provider-greenhouse-seo-mcp.md)
 
@@ -31,7 +31,7 @@ La consecuencia práctica: **conectar un asistente de IA no otorga ningún permi
 
 Las **cuatro consultas** que se explican abajo son el núcleo de lectura del módulo: ninguna dispara una medición nueva ni gasta presupuesto de proveedor, y las cuatro están federadas en el punto de acceso público (la cuarta se federó el mismo 6 de agosto, `TASK-1653`).
 
-No son lo único que hay. El inventario creció desde entonces —hay más lecturas y, desde el 7 de agosto, **un grupo acotado de escrituras gobernadas** (ver [Seguir keywords: la escritura gobernada](#seguir-keywords-la-escritura-gobernada))—. El inventario exacto de lo que está federado en cada momento vive en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md), que se verifica contra el allowlist de paridad del gateway; este documento explica el sentido de las piezas, no lleva la cuenta.
+No son lo único que hay. El inventario creció desde entonces —hay más lecturas y, desde el 7 de agosto, **un grupo acotado de escrituras gobernadas** (ver [Seguir keywords: la escritura gobernada](#seguir-keywords-la-escritura-gobernada)); desde el 14 de agosto se sumaron **descubrir keywords nuevas** y **preparar borradores de preguntas para el grader AEO** (ver [Descubrir keywords y prepararlas para la IA](#descubrir-keywords-y-prepararlas-para-la-ia))—. El inventario exacto de lo que está federado en cada momento vive en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md), que se verifica contra el allowlist de paridad del gateway; este documento explica el sentido de las piezas, no lleva la cuenta.
 
 ### 1. Estado del módulo (`get_seo_entitlement`)
 
@@ -116,6 +116,39 @@ Tres reglas que un asistente está obligado a respetar:
 
 Junto a la intención puede viajar **a quién se le atribuye** esa declaración cuando el agente actúa por encargo de una persona. Los dos datos son distintos a propósito: quién ejecutó el write sigue siendo la máquina —esa es la procedencia real del gasto y así queda auditable—, y la autoría humana se registra aparte. Una autoría sin intención declarada se descarta: no hay a qué atribuirla.
 
+## Descubrir keywords y prepararlas para la IA
+
+Desde el 14 de agosto de 2026 (`TASK-1664`/`TASK-1666`) el módulo puede además **descubrir keywords
+que la marca todavía no sigue** y **convertir las elegidas en borradores de preguntas** para el
+AI Visibility Grader. Son cuatro piezas, dos de lectura y dos de escritura:
+
+- **Descubrir** (`discover_seo_keywords`, escribe y **gasta por corrida**): expande hasta 10 seeds
+  contra el proveedor y devuelve candidatos con su dato de mercado. A diferencia de seguir una
+  keyword (gasto recurrente diferido), acá el gasto es **inmediato y por corrida** — cada llamada y
+  cada fila devuelta se facturan. Por eso el flujo obligatorio es: primero el **preview** (gratis,
+  muestra la fórmula de costo estimado), después la confirmación humana, y recién ahí se encola. La
+  corrida corre **asíncrona**: encolar no es tener resultados, y repetir el mismo pedido dentro del
+  mismo mes devuelve la corrida existente sin gastar de nuevo.
+- **Revisar candidatos** (`get_seo_keyword_discovery`, lectura): cada candidato viaja con sus dos
+  lentes separadas — el mercado **estimado** ◑ (volumen, intención, barrera de enlaces) y la demanda
+  **medida** ● del propio sitio (Search Console) — más si ya está seguido y qué decisión se tomó
+  sobre él. Un candidato es una **sugerencia**: entrar al set monitoreado sigue pasando por
+  `track_seo_keywords`, con su confirmación de gasto propia.
+- **Preparar grounded queries** (`prepare_seo_grounded_queries`, escribe sin gastar proveedor): toma
+  hasta 20 candidatos elegidos por un humano y produce un **borrador** de preguntas para el grader
+  AEO. El resultado dice honestamente si las preguntas se generaron CON el contexto de esos
+  candidatos (`grounded_llm`) o si cayó a un baseline genérico (`baseline_fallback`, con aviso), y
+  desde la auditoría del mismo día también **qué candidatos quedaron sin representación** en el set
+  (`seedCoverage`): esa brecha se muestra al revisor, nunca se esconde. El borrador **jamás queda
+  activo solo**: la aprobación es del flujo de revisión AEO de siempre.
+- **Leer el borrador** (`get_seo_grounded_query_draft`, lectura): el draft con su procedencia
+  (referencias opacas a la corrida y los candidatos, nunca la keyword cruda en los logs).
+
+Regla de acceso que cambia acá: con la identidad máquina compartida del gateway,
+`prepare_seo_grounded_queries` responde **denegado** aunque el conector tenga el scope de escritura —
+es un cierre deliberado (fail-closed) hasta que existan credenciales por usuario (`TASK-1631`), porque
+crear borradores del grader es una capacidad de persona, no de máquina.
+
 ## Que pasa cuando falta una lente
 
 Esta es la regla más importante para leer una respuesta y **la que un asistente de IA está obligado a respetar**: cuando un dato no está, se dice que no está. Nunca se rellena con ceros.
@@ -145,8 +178,8 @@ Sobre una organización **sin** el módulo, las dos consultas de datos responden
 
 ## Que NO se puede hacer por aquí
 
-- **Nada que escriba, salvo el par gobernado de arriba.** Las consultas son de lectura: no configuran targets, no disparan auditorías, no cambian entitlements. Lo único que escribe es seguir/dejar de seguir keywords, y solo desde el lado interno, con techo, resultado por keyword y reverso.
-- **Ninguna lectura cuesta dinero.** Las consultas no llaman al proveedor pagado: leen lo ya capturado. Lo que sí compromete gasto —seguir una keyword, que la mete al ciclo diario de captura— pasa por el entitlement y el techo del módulo, y por eso exige confirmación humana explícita antes de llamarse.
+- **Nada que escriba, salvo las escrituras gobernadas de arriba.** Las consultas son de lectura: no configuran targets, no disparan auditorías, no cambian entitlements. Lo que escribe es acotado y gobernado: seguir/dejar de seguir keywords (techo, resultado por keyword y reverso), descubrir keywords (preview + confirmación de costo antes de gastar) y preparar borradores AEO (nunca activan nada) — todo solo desde el lado interno.
+- **Ninguna lectura cuesta dinero.** Las consultas no llaman al proveedor pagado: leen lo ya capturado. Lo que sí gasta —seguir una keyword (gasto recurrente diario) o descubrir keywords (gasto inmediato por corrida)— pasa por el entitlement y los techos del módulo, y por eso exige confirmación humana explícita antes de llamarse.
 - **Nada fuera del alcance del conector.** Un conector ligado a una organización solo ve la suya. Pedir otra devuelve "no existe".
 
 > Detalle técnico: adaptador del gateway en el repo hermano `efeonce-mcp` (`src/providers/greenhouse-seo.ts`) · lane de Greenhouse en [`src/lib/api-platform/resources/ecosystem-growth-seo.ts`](../../../src/lib/api-platform/resources/ecosystem-growth-seo.ts) · readers canónicos en [`src/lib/growth/seo/`](../../../src/lib/growth/seo/) · runbook operativo en [`EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md`](../../operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md) §Provider Greenhouse-SEO.

@@ -1,9 +1,9 @@
 # MCP Greenhouse Read-Only
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-04-30 por Codex
-> **Ultima actualizacion:** 2026-08-14 por Claude (TASK-1659: intención declarada en `track_seo_keywords` + outcome `intent_changed`)
+> **Ultima actualizacion:** 2026-08-14 por Claude (TASK-1664/1666: inventario a 16 tools SEO — 12 lectura + 4 escritura; allowlist federado 13, producción del gateway aún en 9)
 > **Modulo:** plataforma / MCP
 > **Ruta en portal:** `N/A` (server MCP local `stdio` o remoto HTTP)
 > **Documentacion relacionada:** [API Platform Ecosystem](../../documentation/plataforma/api-platform-ecosystem.md), [Platform Health API](../../documentation/plataforma/platform-health-api.md), [GREENHOUSE_MCP_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md)
@@ -107,7 +107,7 @@ Desde el 2026-08-06 el gateway público `mcp.efeonce.org` acepta **clientes MCP 
 claude mcp add --transport http efeonce-mcp https://mcp.efeonce.org/mcp
 ```
 
-Luego, en una sesión interactiva, ejecuta `/mcp`, elige el server y usa `Authenticate`: se abre el login Entra en el navegador y al volver el server queda `connected` con las **9 tools SEO federadas** hoy (7 de lectura + 2 de escritura; inventario exacto en el §8), más el lector de Globe.
+Luego, en una sesión interactiva, ejecuta `/mcp`, elige el server y usa `Authenticate`: se abre el login Entra en el navegador y al volver el server queda `connected` con las tools SEO federadas (inventario exacto y estado de despliegue en el §8), más el lector de Globe.
 
 **claude.ai / Claude Desktop:** `Settings` → `Connectors` → `Add custom connector` con la URL `https://mcp.efeonce.org/mcp`, y autentica con la misma cuenta Entra.
 
@@ -200,12 +200,12 @@ Reglas que el agente debe respetar:
 - Un documento marcado como "no usado por agentes", borrador, deprecado o no-interno **no aparece** (responde `404` por id, o simplemente no entra en la búsqueda). Lo que queda fuera por política se **cuenta** sin mostrar su contenido.
 - Es **read-only**: estas tools nunca crean, editan ni publican conocimiento.
 
-### 8. SEO / Search Visibility 360 (TASK-1645 · 1303 · 1304 · 1306 · 1307 · 1308 · 1661)
+### 8. SEO / Search Visibility 360 (TASK-1645 · 1303 · 1304 · 1306 · 1307 · 1308 · 1661 · 1664 · 1666)
 
-Hoy son **12 tools SEO: 10 de lectura y 2 de escritura**. Las de escritura son la excepción al
+Hoy son **16 tools SEO: 12 de lectura y 4 de escritura**. Las de escritura son la excepción al
 carácter read-only del resto de este MCP y están marcadas como tales.
 
-**Lectura (10):**
+**Lectura (12):**
 
 - `get_seo_entitlement`
 - `get_seo_keyword_opportunities`
@@ -217,11 +217,20 @@ carácter read-only del resto de este MCP y están marcadas como tales.
 - `get_seo_performance_catalog`
 - `get_seo_site_audit_report`
 - `get_seo_backlink_profile`
+- `get_seo_keyword_discovery` (TASK-1664)
+- `get_seo_grounded_query_draft` (TASK-1666)
 
-**Escritura (2) — comprometen gasto recurrente del proveedor:**
+**Escritura (4):**
 
-- `track_seo_keywords`
-- `untrack_seo_keywords`
+- `track_seo_keywords` — compromete gasto recurrente del proveedor
+- `untrack_seo_keywords` — el reverso: cierra la ventana de gasto sin borrar historia
+- `discover_seo_keywords` (TASK-1664) — **gasta presupuesto de proveedor por corrida** (cada
+  llamada Live y cada fila devuelta se facturan): SIEMPRE `preview: true` primero + confirmación
+  humana del costo estimado antes de encolar
+- `prepare_seo_grounded_queries` (TASK-1666) — crea un **DRAFT** de grounded queries AEO desde
+  candidatos de discovery (no gasta proveedor; jamás aprueba, activa ni corre el grader). Con la
+  identidad máquina compartida responde `aeo_forbidden` **fail-closed hasta TASK-1631** — se
+  reporta ese estado honesto, no se reintenta
 
 Qué entregan:
 
@@ -234,6 +243,8 @@ Qué entregan:
 - `get_seo_rank_evolution` devuelve la serie temporal de **posiciones exactas por keyword** (fuente DataForSEO SERP; la captura diaria ya corrió sola — la tool solo lee). Parámetros opcionales: `organizationId` (obligatorio para binding `internal`), `rangeDays` (ventana en días, máx 1825), `engine`, `device` (`desktop`/`mobile`/`tablet`) y `keywords` (subset, máx 100). Ejemplo: `get_seo_rank_evolution {"organizationId": "…", "rangeDays": 30, "device": "desktop", "keywords": ["pintura para piscinas"]}` → `{ series: [{ keyword, points: [{ date, position, url }] }] }`.
 - `get_seo_site_audit_report` (TASK-1304) devuelve el **audit técnico del sitio**: health score sitewide (0–100), páginas crawleadas y findings agrupados por severidad (`critical`/`warning`/`notice`) con `issueType` estable (p. ej. `is_4xx_code`, `no_description`, `has_micromarkup_errors`). Un run `running` significa "crawl en curso" (hecho, no error); un `succeeded` con 0 findings significa sitio técnicamente limpio. Parámetro opcional `auditRunId` para leer un run histórico puntual.
 - `get_seo_backlink_profile` (TASK-1304) devuelve la **serie semanal del perfil de enlaces**: dominios referentes, backlinks totales, rank del dominio 0–100 (comparable a DR/DA), `toxicShare` (0–1, proxy del spam score del perfil entrante) y delta new/lost de la ventana de 30 días del proveedor. Parámetro opcional `rangeDays` (default 365).
+- `get_seo_keyword_discovery` (TASK-1664) lee las corridas de descubrimiento de keywords y, con `runId`, sus **candidatos compuestos**: procedencia (seed, endpoint, rank) + lente de mercado **◑ estimada** (volumen, dificultad, intención, CPC, nivel de competencia, barrera de enlaces) + demanda **● medida** del propio sitio (GSC) como campo separado + estado de tracking y última acción. Un candidato es una **sugerencia**, no una keyword seguida: promoverlo pasa por `track_seo_keywords` con su propio disclosure de gasto. Filtros: `status`, `sourceEndpoint`, `query`, `intent`, `minSearchVolume`, `maxDifficulty`, `excludeTracked` (solo lo accionable), `limit`/`cursor`.
+- `get_seo_grounded_query_draft` (TASK-1666) lee un **borrador** de grounded queries AEO creado desde candidatos de discovery, con su provenance opaca (`seo.discovery.*`) y el `groundingMode` honesto: `grounded_llm` = las preguntas se autoraron CON el contexto SEO; `baseline_fallback` = baseline genérico del arquetipo, NO específico de los candidatos (el aviso viaja en `fallbackNotice` y se reporta siempre). Un draft **nunca está activo**: la aprobación es del flujo de revisión AEO existente.
 
 Reglas que el agente debe respetar:
 
@@ -243,17 +254,24 @@ Reglas que el agente debe respetar:
 - **Los dos ejes del 360 nunca se promedian**: rankeo y citabilidad son verdades ortogonales de motores distintos.
 - **En `get_seo_rank_evolution`, `position: null` en una fecha significa que el dominio no rankeó ese día.** Es una medición válida, no un error ni un hueco a rellenar. Y esa serie (DataForSEO) **nunca se promedia** con la serie de GSC — son fuentes distintas.
 - **Medido ● y estimado ◑ nunca se promedian ni se sustituyen.** El volumen de mercado de `get_seo_keyword_market_data` es una estimación del mercado; las impresiones de `get_seo_keyword_opportunities` son la demanda medida de ESE sitio. Son dos hechos distintos y ambos ciertos.
-- **Las 10 tools de lectura son read-only**: no disparan capturas ni gastan presupuesto de proveedor.
-- **Las 2 de escritura sí comprometen gasto recurrente.** `track_seo_keywords` factura cada keyword al proveedor en **cada ciclo diario** hasta que alguien la saque, así que la lista exacta se propone al humano y se confirma **antes** de llamarla — nunca especulativamente. Ambas son idempotentes y devuelven un **outcome por keyword** (`tracked` / `already_tracked` / `intent_changed` / `capacity_exceeded` / `invalid`, y `untracked` / `not_tracked` / `invalid`): reportar `data.ok` sin leer ese arreglo describe un cambio que puede no haber ocurrido. El lane las acepta **solo desde bindings de scope `internal`**.
+- **Las 12 tools de lectura son read-only**: no disparan capturas ni gastan presupuesto de proveedor.
+- **El par track/untrack compromete gasto recurrente.** `track_seo_keywords` factura cada keyword al proveedor en **cada ciclo diario** hasta que alguien la saque, así que la lista exacta se propone al humano y se confirma **antes** de llamarla — nunca especulativamente. Ambas son idempotentes y devuelven un **outcome por keyword** (`tracked` / `already_tracked` / `intent_changed` / `capacity_exceeded` / `invalid`, y `untracked` / `not_tracked` / `invalid`): reportar `data.ok` sin leer ese arreglo describe un cambio que puede no haber ocurrido. El lane acepta las 4 tools de escritura **solo desde bindings de scope `internal`**.
+- **`discover_seo_keywords` gasta al encolar, no al seguir.** Cada corrida paga a DataForSEO por llamada y por fila devuelta: primero `preview: true`, se muestra la fórmula de costo estimado al humano y se confirma ANTES de encolar — nunca especulativamente. La corrida es **async** (el 202 solo significa "encolada durable"): los candidatos se consultan después con `get_seo_keyword_discovery` + `runId`, y declarar resultados recién encolada la corrida describe datos que aún no existen. Es idempotente **dentro del ciclo mensual del proveedor** (mismo intent = misma corrida sin gastar de nuevo; un mes nuevo permite corrida fresca). Encolar **jamás auto-trackea**.
+- **`prepare_seo_grounded_queries` escribe un draft, nunca activa.** Se propone al humano la selección exacta de candidatos (≤20) y se confirma antes de llamar. El resultado declara `groundingMode` honesto, y desde la auditoría 2026-08-14 también la **cobertura por seed** (`seedCoverage`): si algún candidato quedó sin huella temática, viaja `coverageNotice` y se reporta al revisor — la etiqueta grounded se verifica, no se asume. Con la identidad máquina compartida el upstream responde `aeo_forbidden` fail-closed hasta TASK-1631.
 - **La intención de una keyword se declara, no se adivina** (TASK-1659). `track_seo_keywords` acepta `intent` opcional: `target` (compromiso acordado con el cliente — puede estar en la posición 60, y eso es la **distancia que falta**, no un fracaso) u `opportunity` (demanda medida que se está empujando). **Omítelo salvo que un humano lo haya declarado**: adivinarlo fabrica una clasificación que nadie hizo. Los dos **nunca se promedian** al reportar. Cambiar la intención de una keyword ya seguida devuelve `intent_changed` (no `already_tracked`: sí pasó algo), **no consume cupo** —cierra la membresía vigente y abre otra— y preserva desde cuándo es objetivo. `intentDeclaredBy` lleva la **autoría humana** cuando el agente actúa por encargo; el actor del write sigue siendo la máquina (`mcp:<consumer>`), que es la procedencia real del gasto, y una autoría sin intención se descarta. Las keywords seguidas antes del 2026-08-14 no tienen intención declarada: eso significa **"nadie la declaró"**, jamás "oportunidad".
 
 **Qué está federado al gateway público `mcp.efeonce.org`.** Verificado contra el allowlist de paridad
 del repo hermano `efeonce-mcp` (`src/providers/greenhouse-seo-tool-parity.ts`, cuyo test rompe el CI si
-diverge de las tools realmente registradas en el gateway): hoy son **9 tools** — `get_seo_entitlement`,
-`get_seo_keyword_opportunities`, `get_seo_visibility_360`, `get_seo_rank_evolution`,
-`get_seo_site_audit_report`, `get_seo_backlink_profile`, `get_seo_keyword_market_data` (TASK-1661,
-verificada verde contra **producción** el 2026-08-14) y las dos de escritura `track_seo_keywords` /
-`untrack_seo_keywords`. Es el mismo lane y el mismo entitlement: el gateway solo transporta.
+diverge de las tools realmente registradas en el gateway): el allowlist tiene **13 tools** — las 9 de
+lectura federadas (`get_seo_entitlement`, `get_seo_keyword_opportunities`, `get_seo_visibility_360`,
+`get_seo_rank_evolution`, `get_seo_site_audit_report`, `get_seo_backlink_profile`,
+`get_seo_keyword_market_data`, `get_seo_keyword_discovery`, `get_seo_grounded_query_draft`) y las 4 de
+escritura (`track_seo_keywords`, `untrack_seo_keywords`, `discover_seo_keywords`,
+`prepare_seo_grounded_queries`). Es el mismo lane y el mismo entitlement: el gateway solo transporta.
+⚠️ **Estado de despliegue (2026-08-14):** el gateway **en producción** aún sirve la revisión anterior
+(9 tools); las 4 de TASK-1664/1666 están commiteadas en `efeonce-mcp` con canary verde contra staging
+y **su deploy se despacha junto al próximo release develop→main** de Greenhouse (antes, responderían
+404 upstream porque el lane no está en producción — lección TASK-1661).
 
 **Qué NO está federado todavía** y por ahora vive solo en este MCP interno: `get_seo_overview_kpis`,
 `get_seo_performance` y `get_seo_performance_catalog`. La federación es por **allowlist explícito con
