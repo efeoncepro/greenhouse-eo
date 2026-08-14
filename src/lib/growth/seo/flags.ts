@@ -52,3 +52,26 @@ export const GROWTH_SEO_KEYWORD_MARKET_DATA_FLAG = 'GROWTH_SEO_KEYWORD_MARKET_DA
 /** Gate de la captura de mercado. Default OFF: prenderlo compromete gasto de proveedor. */
 export const isSeoKeywordMarketDataEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
   isTrue(env[GROWTH_SEO_KEYWORD_MARKET_DATA_FLAG])
+
+/**
+ * TASK-1664 — Keyword discovery (DataForSEO Labs, seed expansion + enrichment). Default OFF.
+ *
+ * 🔴 **Prender esto habilita corridas que GASTAN** (Labs Live cobra por request y por fila).
+ * Con el flag OFF, `queueKeywordDiscovery` devuelve `disabled` sin insertar run y el runner
+ * del worker no procesa pendientes: cero llamadas, cero costo.
+ *
+ * ⚠️ **Lo leen DOS runtimes** (mismo contrato multi-runtime que `GROWTH_SEO_ENABLED`):
+ *   1. **Vercel** — gatea el enqueue/preview (route admin + lane ecosystem + MCP write).
+ *   2. **ops-worker** (`services/ops-worker/deploy.sh`, SoT declarativo) — gatea el drain
+ *      que ejecuta las corridas. Prenderlo en un solo runtime deja la capacidad coja.
+ *   Además el Cloud Scheduler `ops-seo-keyword-discovery-drain` nace PAUSADO: dos frenos
+ *   independientes, igual que el market-data de TASK-1661.
+ *
+ * Es SUBORDINADO a `GROWTH_SEO_ENABLED`: con el módulo apagado no hay discovery aunque este
+ * flag esté ON. Registrar cambios en docs/operations/FEATURE_FLAG_STATE_LEDGER.md.
+ */
+export const GROWTH_SEO_KEYWORD_DISCOVERY_FLAG = 'GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED'
+
+/** Gate del keyword discovery. Default OFF: prenderlo compromete gasto de proveedor. */
+export const isSeoKeywordDiscoveryEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_SEO_KEYWORD_DISCOVERY_FLAG])
