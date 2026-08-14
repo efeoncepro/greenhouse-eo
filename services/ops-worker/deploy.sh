@@ -662,12 +662,14 @@ GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED="${GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED
 ENV_VARS="${ENV_VARS},GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED=${GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED}"
 
 # TASK-1664 — keyword discovery (DataForSEO Labs Live: seed expansion + enrichment).
-# 🔴 Default OFF: prenderlo habilita corridas que GASTAN (cada request y cada fila cuestan).
-# Lo leen DOS runtimes (Vercel gatea enqueue/lanes; este worker gatea el drain) y el scheduler
-# `ops-seo-keyword-discovery-drain` nace PAUSADO: dos frenos independientes, patrón TASK-1661.
-# Prender exige: smoke staging (Slice 5 de la task) + sign-off del operador para gasto.
+# 🔴 Prenderlo habilita corridas que GASTAN (cada request y cada fila cuestan) — pero SOLO
+# corridas encoladas explícitamente por un operador/agente con entitlement: no existe enqueue
+# automático, así que flag ON + cola vacía = costo cero.
+# Lo leen DOS runtimes (Vercel gatea enqueue/lanes; este worker gatea el drain).
+# **ON desde 2026-08-14** (autorización del operador tras el smoke live verificado de la task:
+# corrida real USD 0.0132 ≤ estimado, idempotencia USD 0, cero auto-track).
 # Rollback (<5 min): `false` acá + redeploy + pausar el scheduler; los facts append-only quedan.
-GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED="${GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED:-false}"
+GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED="${GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED=${GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED}"
 ENV_VARS="${ENV_VARS},OPENAI_API_KEY_SECRET_REF=${OPENAI_API_KEY_SECRET_REF}"
 ENV_VARS="${ENV_VARS},ANTHROPIC_API_KEY_SECRET_REF=${ANTHROPIC_API_KEY_SECRET_REF}"
@@ -1223,18 +1225,17 @@ echo "  -> ops-seo-keyword-market-data: 0 8 15 * * ACTIVO (captura mensual de me
 # Cada 10 minutos alcanza de sobra: el enqueue es humano/agente (no hay cadencia diaria en V1)
 # y una corrida pendiente se procesa en el siguiente tick.
 #
-# 🔴 NACE PAUSADO y además `GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED` nace en `false`: DOS frenos
-# independientes, porque el drain GASTA (patrón TASK-1661). Despausar sin prender el flag no
-# gasta (el runner devuelve `disabled`); prender el flag sin despausar tampoco dispara nada.
-# Antes de despausar: smoke staging de la task (GSC-only primero, luego 1 seed/limit 10) +
-# autorización del operador para gasto DataForSEO.
+# Nació PAUSADO con el flag en `false` (dos frenos, patrón TASK-1661); ambos liberados el
+# 2026-08-14 tras el smoke live verificado + autorización del operador. El drain con cola
+# vacía es no-op (cero llamadas, cero costo): el gasto sólo ocurre cuando alguien encola una
+# corrida, que ya pasó preview + gate de entitlement.
 upsert_scheduler_job \
   "ops-seo-keyword-discovery-drain" \
   "*/10 * * * *" \
   "/seo/keyword-discovery/drain" \
   '{}' \
-  "true"
-echo "  -> ops-seo-keyword-discovery-drain: */10 * * * * PAUSADO (keyword discovery, TASK-1664 — despausar sólo tras smoke staging + flag ON + autorización de gasto)"
+  "false"
+echo "  -> ops-seo-keyword-discovery-drain: */10 * * * * ACTIVO (keyword discovery, TASK-1664 — despausado 2026-08-14 tras smoke live + autorización del operador)"
 
 # Email deliverability monitor — TASK-775 Slice 2.
 #

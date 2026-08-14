@@ -557,9 +557,10 @@ priorizado de términos sin salir a otra herramienta. El **keyword discovery** c
   y fecha.
 - Repetir la misma pregunta no paga dos veces: el mismo intent devuelve la corrida existente.
 
-Estado operativo: **código completo con verificación real** (una corrida live costó USD 0.013 y
-dejó 10 candidatos con mercado) pero **apagado por default** — el flag y el scheduler del worker
-nacen OFF/pausado hasta el rollout autorizado. La superficie visual (lente `Descubrir` del
+Estado operativo: **encendido desde el 2026-08-14** (verificación real previa: una corrida live
+costó USD 0.013 y dejó 10 candidatos con mercado; el operador autorizó el rollout el mismo día).
+No hay corridas automáticas: el sistema sólo gasta cuando alguien encola una corrida que ya pasó
+el preview de costo y el gate de presupuesto. La superficie visual (lente `Descubrir` del
 workbench) es TASK-1665.
 
 > Detalle técnico: [`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
