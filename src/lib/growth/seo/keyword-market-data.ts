@@ -385,10 +385,14 @@ const loadTrackedKeywords = async (seoTargetId: string): Promise<string[]> => {
 /**
  * Keywords con captura DENTRO de la ventana de frescura: no se vuelven a comprar.
  *
+ * Exportado (TASK-1664): el top-up de enriquecimiento del discovery usa EXACTAMENTE este
+ * pre-check para comprar sólo lo que falta o venció — dos pre-checks distintos divergirían
+ * en qué consideran "fresco" y uno de los dos pagaría de más.
+ *
  * ⚠️ `capture_date` es DATE y `CURRENT_DATE` también, así que la resta da `integer` directo
  * (gate TASK-893: `EXTRACT(EPOCH FROM (date - date))` revienta en runtime).
  */
-const loadFreshKeywords = async (
+export const loadFreshMarketKeywords = async (
   normalizedKeywords: string[],
   locationCode: string,
   languageCode: string
@@ -406,6 +410,74 @@ const loadFreshKeywords = async (
   )
 
   return new Set(rows.map(row => row.normalized_keyword))
+}
+
+const loadFreshKeywords = loadFreshMarketKeywords
+
+/**
+ * Writer canónico del store de mercado — la ÚNICA forma de escribir
+ * `seo_keyword_market_data` (TASK-1661 productor #1 vía `keyword_overview`; TASK-1664
+ * productor #2 con el `keyword_info` inline de discovery; TASK-1662 productor #3 futuro).
+ *
+ * Contrato del hecho:
+ * - append-only con `ON CONFLICT ... DO NOTHING` (el trigger de la tabla prohíbe UPDATE);
+ * - una fila con NULLs ES un hecho ("preguntamos y el proveedor no tiene el dato") — el
+ *   caller decide cuándo escribirla (tres estados, jamás colapsar ausencia a 0);
+ * - el costo del proveedor es por BATCH: se atribuye a la PRIMERA fila escrita y las demás
+ *   quedan en 0, para que la suma de `provider_cost` no multiplique el gasto.
+ */
+export const persistKeywordMarketData = async (input: {
+  data: readonly SeoKeywordMarketDatum[]
+  sourceEndpoint: SeoMarketDataSourceEndpoint
+  capturedByOrganizationId: string
+  providerCostUsd: number
+}): Promise<{ rowsWritten: number }> => {
+  let rowsWritten = 0
+
+  for (const datum of input.data) {
+    const rowCost = rowsWritten === 0 ? input.providerCostUsd : 0
+
+    await runGreenhousePostgresQuery(
+      `INSERT INTO greenhouse_growth.seo_keyword_market_data
+         (normalized_keyword, keyword, location_code, language_code, capture_date,
+          search_volume, keyword_difficulty, competition, competition_level, cpc_usd,
+          search_intent, search_intent_probability, core_keyword, source_endpoint,
+          provider_last_updated_at, captured_by_organization_id, provider_cost,
+          avg_page_rank, avg_main_domain_rank, avg_backlinks, avg_referring_domains)
+       VALUES ($1, $2, $3, $4, CURRENT_DATE,
+               $5, $6, $7, $8, $9,
+               $10, $11, $12, $13,
+               $14, $15, $16,
+               $17, $18, $19, $20)
+       ON CONFLICT ON CONSTRAINT seo_keyword_market_data_capture_unique DO NOTHING`,
+      [
+        datum.normalizedKeyword,
+        datum.keyword,
+        datum.locationCode,
+        datum.languageCode,
+        datum.searchVolume,
+        datum.keywordDifficulty,
+        datum.competition,
+        datum.competitionLevel,
+        datum.cpcUsd,
+        datum.searchIntent,
+        datum.searchIntentProbability,
+        datum.coreKeyword,
+        input.sourceEndpoint,
+        datum.providerLastUpdatedAt,
+        input.capturedByOrganizationId,
+        rowCost,
+        datum.avgPageRank,
+        datum.avgMainDomainRank,
+        datum.avgBacklinks,
+        datum.avgReferringDomains
+      ]
+    )
+
+    rowsWritten += 1
+  }
+
+  return { rowsWritten }
 }
 
 /**
@@ -625,7 +697,7 @@ export const captureKeywordMarketData = async (
         if (datum) byNormalized.set(datum.normalizedKeyword, datum)
       }
 
-      let rowsWrittenInChunk = 0
+      const datums: SeoKeywordMarketDatum[] = []
 
       for (const keyword of chunk) {
         const found = byNormalized.get(keyword)
@@ -640,67 +712,27 @@ export const captureKeywordMarketData = async (
         // RE-COMPRABAN en cada corrida, para siempre: el smoke lo mostró cobrando USD 0.012 en
         // una corrida que capturó cero. Registrar el intento cierra la fuga y además es más
         // honesto: "preguntamos y no hay" es un hecho que merece su fecha.
-        const datum: SeoKeywordMarketDatum = found ?? {
-          normalizedKeyword: keyword,
-          keyword: originalByNormalized.get(keyword) ?? keyword,
-          locationCode: target.location_code,
-          languageCode: target.language_code,
-          searchVolume: null,
-          keywordDifficulty: null,
-          competition: null,
-          competitionLevel: null,
-          cpcUsd: null,
-          searchIntent: null,
-          searchIntentProbability: null,
-          coreKeyword: null,
-          providerLastUpdatedAt: null,
-          avgPageRank: null,
-          avgMainDomainRank: null,
-          avgBacklinks: null,
-          avgReferringDomains: null
-        }
-
-        // El costo del provider es por BATCH: se atribuye a la primera fila escrita del chunk y
-        // las demás quedan en 0, para que la suma de `provider_cost` no multiplique el gasto.
-        const rowCost = rowsWrittenInChunk === 0 ? providerCostUsd : 0
-
-        await runGreenhousePostgresQuery(
-          `INSERT INTO greenhouse_growth.seo_keyword_market_data
-             (normalized_keyword, keyword, location_code, language_code, capture_date,
-              search_volume, keyword_difficulty, competition, competition_level, cpc_usd,
-              search_intent, search_intent_probability, core_keyword, source_endpoint,
-              provider_last_updated_at, captured_by_organization_id, provider_cost,
-              avg_page_rank, avg_main_domain_rank, avg_backlinks, avg_referring_domains)
-           VALUES ($1, $2, $3, $4, CURRENT_DATE,
-                   $5, $6, $7, $8, $9,
-                   $10, $11, $12, 'keyword_overview',
-                   $13, $14, $15,
-                   $16, $17, $18, $19)
-           ON CONFLICT ON CONSTRAINT seo_keyword_market_data_capture_unique DO NOTHING`,
-          [
-            datum.normalizedKeyword,
-            datum.keyword,
-            datum.locationCode,
-            datum.languageCode,
-            datum.searchVolume,
-            datum.keywordDifficulty,
-            datum.competition,
-            datum.competitionLevel,
-            datum.cpcUsd,
-            datum.searchIntent,
-            datum.searchIntentProbability,
-            datum.coreKeyword,
-            datum.providerLastUpdatedAt,
-            target.organization_id,
-            rowCost,
-            datum.avgPageRank,
-            datum.avgMainDomainRank,
-            datum.avgBacklinks,
-            datum.avgReferringDomains
-          ]
+        datums.push(
+          found ?? {
+            normalizedKeyword: keyword,
+            keyword: originalByNormalized.get(keyword) ?? keyword,
+            locationCode: target.location_code,
+            languageCode: target.language_code,
+            searchVolume: null,
+            keywordDifficulty: null,
+            competition: null,
+            competitionLevel: null,
+            cpcUsd: null,
+            searchIntent: null,
+            searchIntentProbability: null,
+            coreKeyword: null,
+            providerLastUpdatedAt: null,
+            avgPageRank: null,
+            avgMainDomainRank: null,
+            avgBacklinks: null,
+            avgReferringDomains: null
+          }
         )
-
-        rowsWrittenInChunk += 1
 
         if (found) {
           captured += 1
@@ -720,6 +752,13 @@ export const captureKeywordMarketData = async (
           })
         }
       }
+
+      await persistKeywordMarketData({
+        data: datums,
+        sourceEndpoint: 'keyword_overview',
+        capturedByOrganizationId: target.organization_id,
+        providerCostUsd
+      })
     } catch (error) {
       captureWithDomain(error, 'growth', {
         tags: { source: 'seo_keyword_market_data' },

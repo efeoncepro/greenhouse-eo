@@ -391,11 +391,12 @@ describe('captureKeywordMarketData — contrato de gasto', () => {
 
     await captureKeywordMarketData('seot-1')
 
-    // `provider_cost` es $15 del INSERT. Se referencia por su posición SEMÁNTICA y no como
-    // "el último parámetro": agregar una columna al final movería el índice y el test pasaría
-    // a medir otra cosa en silencio — que es exactamente lo que ocurrió al sumar los cuatro
-    // campos de avg_backlinks_info.
-    const providerCostParamIndex = 14
+    // `provider_cost` es $16 del INSERT canónico (el writer compartido `persistKeywordMarketData`
+    // parametriza también `source_endpoint`, TASK-1664). Se referencia por su posición SEMÁNTICA
+    // y no como "el último parámetro": agregar una columna al final movería el índice y el test
+    // pasaría a medir otra cosa en silencio — que es exactamente lo que ocurrió al sumar los
+    // cuatro campos de avg_backlinks_info.
+    const providerCostParamIndex = 15
     const costs = state.inserts.map(call => call.params[providerCostParamIndex])
 
     // Sólo la PRIMERA fila escrita del lote lleva el costo del batch.
