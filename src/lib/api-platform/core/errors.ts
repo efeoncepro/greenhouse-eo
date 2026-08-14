@@ -14,6 +14,10 @@ export type ApiPlatformErrorCode =
   | 'invalid_refresh_token'
   | 'invalid_session'
   | 'invalid_token'
+  // ISSUE-153 — contrato multi-mercado del lane SEO: la org tiene N mercados activos y el
+  // request no eligió (`multiple_markets`), o eligió uno que no existe (`market_not_found`).
+  | 'market_not_found'
+  | 'multiple_markets'
   | 'kortex_binding_missing'
   | 'kortex_admin_command_disabled'
   | 'kortex_admin_confirmation_required'

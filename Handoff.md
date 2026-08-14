@@ -2,6 +2,133 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+### ISSUE-152 + ISSUE-153 resueltos — mercado de Berel corregido + contrato multi-mercado (2026-08-13)
+
+**Berel migrado a México** (autorización del operador: "Berel es de México" + "solucionalo
+end-to-end"): `seot-berel-mx` activo con 31 keywords, `seot-berel-fase0` (CL) pausado con sus 238
+snapshots íntegros. Verificado con capturas reales (USD ~0.14): 31/31 rankings MX — **#1 en sus
+términos de marca** —, mercado 30/31, ledger atribuido. El cron diario toma MX solo desde el
+próximo ciclo (itera targets `active`).
+
+**Contrato multi-mercado shipped** (`bc7cafe77`): helper canónico `resolve-target.ts` (los 4
+`LIMIT 1` copy-pasteados migrados), lane con `?market=` + 409 `multiple_markets`/`market_not_found`,
+`meta.servedMarket` en toda respuesta, 9 MCP tools con `market` opcional. Suite 10.629 verde.
+
+**Pendientes que dejaron estos cierres (no bloqueantes):**
+- Selector de mercado en la UI admin (cockpit/keywords) — producto, para cuando una org
+  multi-mercado se materialice; declarado en ISSUE-153 §Follow-up.
+- Guardrail de alta de target (contrastar volumen del nombre de marca vs mercados vecinos) —
+  ISSUE-152 §4.
+- `keyword_difficulty`: RESUELTO con presentación, no con veto. Es métrica pura de enlaces
+  (contrastada vs Semrush: 0 vs 50 para `pintura` MX — dos escuelas, no un dato roto). La UI la
+  muestra como **Barrera de enlaces: Baja/Media/Alta** (`classifyLinkBarrier`), nunca el número
+  crudo; verificado visual con datos reales de Berel (desktop+390). `avg_backlinks_info` (gratis,
+  no persistido) queda como mejora futura si se quiere una dificultad blended propia.
+
+### TASK-1661 — datos de mercado por keyword: code complete, rollout PENDIENTE (2026-08-13)
+
+`greenhouse_growth.seo_keyword_market_data` **ya existe en la base** (migración `20260813171143226`
+aplicada; base compartida dev/staging/prod). `readKeywordOpportunities` ya no cablea
+`market: 'unavailable'`. Commits: `261b2919a` (schema) · `739734512` (fetch) · `efc76b8b0` (reader,
+worker, MCP, señal + fix). Suite completa 10.616 verde; sanity PG 13/13.
+
+**Rollout EJECUTADO Y VERIFICADO EN RUNTIME (2026-08-13 noche):** push de develop (14 commits) →
+8 workflows verdes incl. Ops Worker Deploy; revisión `ops-worker-00551-pc2` con el flag `true`;
+scheduler `ops-seo-keyword-market-data` **ENABLED** (`0 8 15 * *`). **Canary del gateway contra
+staging: COMPLETO VERDE** — la tool federada respondió `market=available found=2/2 asOf=2026-08-13
+servedMarket=2484/es` (México, el mercado corregido) + deny anti-oracle OK. Gateway pusheado
+(`efeonce-mcp@c4e0fcd`; su deploy es `workflow_dispatch`, NO automático). **Pendientes:** (1) el
+próximo release develop→main lleva el lane a producción → recién entonces **dispatch del deploy
+del gateway** para que la tool federada viva en `mcp.efeonce.org` sin 404 upstream; (2) verificar
+el primer run del scheduler el día 15 (esperado: `already_fresh`, costo ~0).
+
+**Riesgo abierto que hay que cerrar antes de mostrar la columna a un cliente:** el proveedor devuelve
+`keyword_difficulty = 0` para cabeceras de alto volumen (`pintura`, 18.100 búsquedas/mes). Se verificó
+contra la respuesta cruda: el 0 es del proveedor, y para otras keywords devuelve `null`, así que el
+campo sí distingue. Se persiste verbatim (transformarlo sería inventar), pero un 0 se lee como
+"trivialmente fácil" y sería una afirmación falsa. Contrastar con una segunda fuente.
+
+**Gasto real ya incurrido en verificación: USD ~0.05** (dry-run gratis + corrida real + una llamada
+de diagnóstico + la corrida con el defecto que se corrigió).
+
+**Desbloqueadas por este cierre:** `TASK-1662` y `TASK-1664` pasaron a `Blocked by: none`. 1664 tiene
+además su spec recalibrada (commit `a98aaf4c7`): entitlement `seo_v2`, IDs `TEXT`, despertador por
+Cloud Scheduler y el boundary de ownership del dato de mercado.
+
+### Credencial de partner en el deck + los aprendizajes documentados (2026-08-13)
+
+**Sin commitear todavía: conviven con el WIP del deck ANAM/HubSpot en el árbol.** El badge de HubSpot
+rompía `catalog-portability.test.ts` (apuntaba a `public/` con `../../../../../`). Corregido: el asset
+vive en `catalogs/deck-axis/assets/partners/` y el slot resuelve por clave cerrada
+(`partner-badge-asset`, espejo de `client-logo-asset`). Suite del composer verde: 18 archivos, 223 tests.
+
+**Lo que necesita quien siga:**
+
+1. 🔴 **`pnpm composer:visual-gate` sigue rojo en DOS láminas, y ninguna es regresión.**
+   `BackCoverFull` (1.787 px) driftea porque **declarar un slot mueve el frame del probe**: el gate
+   compone con slots sintéticos y para cualquier `asset` usa `assets/url-lum.svg` — por eso aparece una
+   burbuja de URL dentro de la caja del badge. Es delta intencional del carril ANAM, a declarar en
+   `BASELINE_DELTAS.md`. `NarrativeSplit` (58.846 px) es **baseline viejo en `HEAD`**: su plantilla está
+   commiteada desde `f7761988f` y limpia en el árbol. **No congelé**: el runbook prohíbe `--freeze` con
+   el composer sucio por otro agente, y lo está.
+2. **El dueño del carril ANAM decide si mis cambios viajan con su commit o van aparte.** Son 4 archivos:
+   el SVG copiado, `back-cover-full.html`, `back-cover-full.slots.json` y `resolvers.ts`.
+3. **Queda una duplicación de asset por decidir:** el badge existe ahora en `public/branding/partners/…`,
+   en `src/lib/brand-assets/` (módulo TS, untracked) y dentro del catálogo. Tres hogares para un SVG.
+
+### TASK-1310 CERRADA — portal SEO del cliente completo; su propio scorecard estaba equivocado (2026-08-12)
+
+**`complete`, promoción `develop → main` pendiente.** Con ella el módulo SEO tiene sus dos caras
+(4 tabs de operador + portal cliente) y la pata visible del exit criterion de parity queda cubierta.
+Los 4 gates UI en verde: `design-contract:lint` · `ui:code-lint` · `ui:visual-gate` · `ui:quality`
+**PASS 4.52**. Verificado con **sesión de cliente real de la organización contratada**: 3 superficies
+× 2 viewports, `qualityFindings` **vacío** en las seis corridas.
+
+**Lo que necesita quien siga:**
+
+1. 🔴 **Un scorecard es una foto con fecha, no un estado.** El de esta task bloqueaba con 2.29 sobre
+   capturas de las 10:25 del 08-08, y el commit `5f622386d` de las 19:29 ya había ejecutado los 7
+   lotes premium. Cuatro días el veredicto vigente describió una UI inexistente. **Ante una task con
+   auditoría abierta: medir antes de rehacer.** Acá casi rehago trabajo terminado.
+2. **Los gates no ven contradicciones de contenido.** El informe anunciaba "Aún no hay una posición
+   media para leer" con `#13.3` al lado, con `exitCode 0` y axe limpio. Causa: tres renders del mismo
+   modelo derivando cada uno su regla. Ahora se deriva una vez (`resolveSeoLeadTitle`) con test de
+   regresión. **Mirar el frame no es opcional.**
+3. **Para verificar una superficie client-gated hace falta la persona de ESA organización.** La
+   genérica `agent-client@…` recibe la card de bloqueo y se lee como defecto de producto. La de Berel
+   ya existía: `agent-berel-client@greenhouse.efeonce.org`. El mapeo usuario↔organización **no** está
+   en `client_users`/`clients`/`organizations` — está en `greenhouse_serving.session_360`, que es
+   donde el runtime mismo lo resuelve. La sonda `scripts/growth/_sanity-seo-client-population.ts`
+   deja esa consulta lista.
+4. **Fix global de paso:** el FAB "volver arriba" del layout `(dashboard)` no tenía nombre accesible
+   (`button-name`, *critical*) en **todas** las rutas del portal. Cerrado con label del namespace
+   `aria` canónico (`756d9970d`).
+5. 🔴 **`pnpm test` está rojo en el árbol por trabajo AJENO:** `catalog-portability.test.ts` falla por
+   un `../../../../../public/branding/...` en `deck-axis/back-cover-full.html`, WIP no commiteado del
+   deck ANAM/HubSpot (en HEAD hay cero ocurrencias). El guardrail hace su trabajo: ese path escapa del
+   catálogo. 10.588 tests pasan. No lo toqué — no es mío, y quien lo tenga en curso debe verlo.
+6. **Follow-up con dato, sin task todavía:** la superficie cliente tiene **una sola organización**
+   (Efeonce tiene assignment pero es tenant interno y `requireClientTenantContext()` lo excluye). Con
+   N=1 nadie delata que `connection.state` se decide con **GSC** mientras el Resumen deriva de **rank
+   snapshots**: un cliente con Search Console conectado y captura de rank sin correr —**el día 1 de
+   todo cliente nuevo**— ve el KPI principal en "sin dato" con el Quadrant poblado debajo.
+
+### CIERRE END-TO-END TASK-1688/1689 — segundo release del día, cero pendientes (2026-08-12)
+
+Release `950f5bdb4` (PR #191) → manifest `950f5bdb4043-71cc7e1a-…` en **`released`** (run `31639297861`, sin
+bypass: batch sin migraciones). Cierra TODO lo que quedaba: **flip expand→contract** del país (requerido en
+parser; verificado en staging con POST sin país → `invalid`), país en «01 Tus datos» del form nativo, **fix del
+select premium** (placeholder real — mostraba la primera opción como elegida con valor vacío), **email
+`selected` ejercitado live** (supersede controlado sobre EO-APP-0090, `sent`; re-decidida rejected), **scorecard
+GVC PASS** (avg 4.6, capturas 1440+390 de ambas superficies), **revisión de privacidad documentada**
+(`docs/operations/hiring/2026-08-12-revision-privacidad-contacto-careers.md`; 2 recomendaciones no bloqueantes:
+completitud del aviso público en efeoncepro.com/privacy + purga del mensaje en la política de retención) y fila
+del flag movida a §Snapshot (los 6 tipos con evidencia live). **Hallazgo de CI:** el run de `main` quedó rojo con
+10.582 tests verdes por un flake pre-existente (timer del email-verify del renderer dispara post-teardown sin el
+global `CSS` → unhandled rejection); rerun verde + guard commiteado en develop (`a349d0088`, viaja en el próximo
+release). `ops-worker` en `63625ccdd` = residual change-gated (diff runtime 0). Único follow-up humano restante:
+las 2 recomendaciones de la revisión de privacidad.
+
 ### ROLLOUT COMPLETO TASK-1688/1689 — emails de hiring LIVE + contacto Careers en producción (2026-08-12)
 
 Release `393144e9f` (PR #190) → manifest `393144e9fb3b-8d17b9bc-…` en **`released`** (run `31593198609`,
@@ -19,7 +146,7 @@ primera postulación real con emails verificados.
 
 ### Sika México LIC-1120 — paquete de bid preparado, sin precio ni envío (2026-08-12)
 
-Se creó [`docs/commercial/tenders/sika-lic-1120/`](docs/commercial/tenders/sika-lic-1120/): originales en OneDrive, evidencia Wherex, admisibilidad, blueprint interno, técnica, estructura económica y deck de taller. La propuesta se enfoca en continuidad comercial: Search por intención y ubicación → landing/ficha de destino → canal de atención → medición y optimización; **no** promete transferir 50% de ventas. El deck técnico de ocho láminas pasó slots y revisión visual local, pero sigue siendo taller (sin `Proposal`/render gobernado). La pregunta propia continúa en **0/1 respondidas** al 12-08 11:14: faltan fecha/destino/stock por cierre, línea base/fuente de ventas y canal autorizado. El precio recomendado para aprobación es MXN 150.000 antes de impuestos, incluido medio, pero está sólo en `pricing-brief-INTERNO.md`; no existe cotización aprobada. Wherex muestra 45 días, pero también condiciona el crédito a lo convenido con Sika: no asumirlo como término cerrado. La oferta Wherex sigue en edición, sin adjuntos, términos aceptados ni envío; tab queda en handoff.
+Se creó [`docs/commercial/tenders/sika-lic-1120/`](docs/commercial/tenders/sika-lic-1120/): originales en OneDrive, evidencia Wherex, admisibilidad, blueprint interno, técnica, estructura económica y deck de taller. La propuesta se enfoca en continuidad comercial: Search por intención y ubicación → landing/ficha de destino → canal de atención → medición y optimización; **no** promete transferir 50% de ventas. El deck técnico de ocho láminas pasó slots y revisión visual local, pero sigue siendo taller (sin `Proposal`/render gobernado). La pregunta propia continúa en **0/1 respondidas** al 12-08 11:14: faltan fecha/destino/stock por cierre, línea base/fuente de ventas y canal autorizado. **Corrección 2026-08-13:** el brief confirma MXN 100–150 mil para desarrollo y ejecución, pero no dice explícitamente que incluya pauta; una lectura anterior atribuye creatividad/pauta/fee a la respuesta del comprador, y debe revalidarse antes de fijar precio. No existe cotización aprobada. Wherex muestra 45 días, pero también condiciona el crédito a lo convenido con Sika: no asumirlo como término cerrado. La oferta Wherex sigue en edición, sin adjuntos, términos aceptados ni envío; tab queda en handoff.
 
 ### TASK-1688 CERRADA — contacto completo en postulaciones Careers: code complete, rollout pendiente (2026-08-12)
 
@@ -278,124 +405,3 @@ sidebar" → estructura vigente, con version bump), la skill `info-architecture`
 ninguna parte) y `src/data/searchData.ts` borrado (huérfano sin consumers tras retirar NavSearch;
 typecheck verde). Pendiente decidible: `roadmap-cockpit.md` internamente inconsistente (pre-existente
 a estas tasks — su ítem de menú se retiró el 2026-07-15 y el paso a paso aún lo cita).
-
-### TASK-1388 CERRADA — la navegación interna repartida en sus 3 superficies (2026-08-10)
-
-Implementación completa en `develop`, autorizada a cierre total por el operador ("termina todo lo que
-falta"): rail interno en 3 zonas (Operación · Administración · Recursos, acordeón nativo), `/my/*`
-rehomed al avatar (builder canónico `src/lib/navigation/my-nav-items.ts`), ⌘K único
-(`GlobalCommandPalette` sobre la `CommandPalette` de TASK-696, con filtro de audiencia — la
-`NavSearch` retirada exponía el registry completo), dedup + legacy borrado + los 4 fixes a11y de
-TASK-1675. Cero cambios de rutas/gating (test de identidad interno + no-interno). Gates TODOS verdes
-incluido `pnpm build` de producción y `pnpm test` full (10.447); baselines GVC durables promovidos
-(`scripts/frontend/baselines/task-1388-*`); scorecard 4.93. `UI ready: yes` con sign-off del operador.
-
-**Continuidad para quien siga:** (1) `TASK-1389` quedó desbloqueada — el sidebar está bajo el tope,
-su gate `nav:budget` es promovible a `error` (Delta escrito allá); (2) card-sort formal de nombres de
-zonas queda como validación posterior NO bloqueante (rename = 1 línea en `GH_INTERNAL_NAV`); (3) gap
-conocido del chrome: `@menu` no expone `aria-expanded` en triggers de submenú (intocable; estado
-canónico = clase `ts-open`, documentado en el scorecard) — decidir como deuda de chrome aparte;
-(4) la rama no-interna del menú quedó con punto de extensión limpio para `TASK-1685` (Delta escrito).
-
-### Cerrada — la decisión pendiente del portal cliente y las lecciones de la sesión del 2026-08-09
-
-**La decisión ya se tomó** (`TASK-1685`, entrada de arriba): opción (a′). La parada de esa sesión
-cumplió su propósito — decidir con cabeza fresca y midiendo — y el "no lo resuelvas con un `AND` en la
-puerta" se confirmó correcto: habría cerrado 6 pares contratados sin arreglar ninguno de los 36 enlaces
-muertos que eran el defecto real.
-
-**Lo que sigue siendo continuidad activa de esa sesión:**
-
-- `TASK-1684` — la postura de `AGENT_AUTH_ALLOW_PRODUCTION`, seteada desde ~90 días. Sigue abierta.
-- `TASK-1687` — `/creative-hub` no existe y el bundle de SKY lo declara; señal en 1.
-- **Una nota de este archivo no es evidencia.** Es la lección que produjo los tres errores de esa
-  sesión (afirmar sin verificar): el 403 "por diseño" de `agent-session` salió de una nota de acá y era
-  falso. Verificar contra runtime o PG antes de construir encima.
-
-### Barrido documental post-release: tres auditorías paralelas y dos defectos vivos (2026-08-09)
-
-Tres subagentes auditaron arquitectura, docs funcionales/manuales y skills. Encontraron cosas que el
-trabajo de código no había visto.
-
-**Lo que necesita quien siga:**
-
-1. 🔴 **El §0 Status del doc de contrato del portal cliente estaba INVERTIDO** y lo estuvo tres meses:
-   decía "NO existe `src/lib/client-portal/`", "NO existe `/api/client-portal/`", "NO existe schema
-   `greenhouse_client_portal`" y "NO existe modelo de módulos on-demand". Las cuatro se implementaron
-   entre `TASK-824` y `TASK-828`. Es lo primero que lee un agente que abre ese doc, así que lo mandaba
-   a construir de cero lo que ya existía — el carril paralelo que el spec vino a evitar. Corregido y
-   verificado contra filesystem y PG. **Lección:** un bloque "estado actual del repo" escrito cuando un
-   spec era propuesta se vuelve activamente peligroso si nadie lo da vuelta al implementarlo.
-2. ⚠️ **`/creative-hub` NO EXISTE y Sky Airlines ve el enlace.** Lo causé hoy: el bundle
-   `creative_hub_globe_v1` declara `cliente.creative_hub` → `/creative-hub`, y esa página nunca se
-   materializó. El defecto era latente desde el seed de `TASK-824`; **lo activó el assignment**, no un
-   deploy. Señal nueva `identity.client_portal.assigned_view_without_route` (warning, hoy en **1**).
-   Decidir: materializar la página o retirar el viewCode del bundle — **NUNCA** quitarle el módulo a
-   SKY, eso le saca superficies que sí funcionan.
-3. **`route-reachability-gate` sólo cubre una dirección.** Verifica página → enlace ("0 huérfanas") y
-   NO enlace → página, así que el enlace muerto pasa. Y no lo podría atrapar de todos modos: la
-   condición la crea un **assignment**, o sea un cambio de dato. Por eso el complemento es una señal y
-   no un test. Además hay **10 viewCodes cliente** apuntando a rutas no materializadas, y eso es
-   legítimo por diseño (regla vigente: declarar el `routePath` canónico aunque la página sea
-   forward-looking) — el riesgo aparece al asignarlos.
-4. **El menú del cliente puede prometer de más.** La lista base de 6 enlaces (Proyectos, Ciclos,
-   Equipo, Revisiones, Analytics, Campañas) se sigue mostrando **por rol**, no por módulo. No es fuga
-   de acceso —la puerta decide por módulo— pero ahora que las páginas dicen la verdad, es la confusión
-   de soporte más probable: enlace visible + empty state al entrar. Quitar el permiso al rol apagaría
-   enlaces legítimos de otros clientes, así que no es el fix.
-5. **`pnpm skills:mirrors` sólo valida 3 skills del manifest** (`efeonce-mcp-platform`,
-   `greenhouse-globe`, `greenhouse-globe-model-fleet`). NO cubre `qa-release-auditor` ni
-   `documentation-governor`: su paridad Claude↔Codex se verificó a mano. Si agregas una skill espejada,
-   no asumas que el gate la cuida.
-6. **`CLAUDE.md` está en 34.903/35.000 tokens — 97 de headroom.** Los cinco aprendizajes de proceso de
-   hoy se escribieron en su skill dueña y en `AGENTS.md`, no ahí, a propósito.
-
-### Barrido final de docs (2026-08-09) — tres cosas que necesitan tu decisión
-
-Un barrido de cierre corrigió lo que el trabajo del día dejó stale, **incluidas dos contradicciones en
-docs que yo mismo edité hoy** (el inventario del carril seguía diciendo que el lint estaba en `warn`, y
-el ledger de flags listaba `NODE_ENV` en la columna de runtime mientras su descripción decía
-`VERCEL_ENV`). Ambas corregidas. Y el conteo "3 abren, 6 empty state" **dejó de ser un dato del doc**:
-cambió el mismo día al asignarle Creative a SKY, así que ahora el inventario declara la regla —
-derivarlo de los datos, nunca heredarlo de un doc.
-
-Lo que **NO** decidí por ti:
-
-1. **`TASK-286` (client view catalog expansion) tiene la premisa vencida**: dice "11 view codes" y hoy
-   hay 25, y su alcance se solapa con `TASK-1685`. Reescribirla o cerrarla es tu llamada.
-2. **`TASK-1675`/`1678`/`1679`/`1680`/`1685` declaran `Epic: none`** aunque son el carril de
-   `EPIC-015`. Consecuencia mecánica: `epic-child-parity` las excluye del denominador, así que el
-   avance del epic se ve más chico de lo que es. Reasignarlas es trivial pero cambia métricas.
-3. **`/api/client-portal/*` no está en `GREENHOUSE_API_REFERENCE_V1.md`.** Documentarlo ahí depende de
-   si esa referencia pretende ser exhaustiva o sólo cubrir las lanes de plataforma.
-
-### Release 2026-08-09 (2.º del día) — el carril del portal cliente cerrado y VERIFICADO EN PRODUCCIÓN
-
-Manifest `ee0d568b8614-1ff03476-6a82-4e03-8dfc-2d49e3c30ce3` en `released`, run `31343569815`, target
-`ee0d568b86140d92224f9fdcad75cd6e1a6dcae4`, PR #186. Watchdog `drift_count=0`. **Sin bypass**: el batch
-policy dio `ship` (cero migraciones).
-
-**Lo que necesita quien siga:**
-
-1. ✅ **La verificación que dos releases dejaron pendiente está HECHA, en producción.** 9 rutas × 3
-   personas con sesión real contra `greenhouse.efeoncepro.com`: las 3 base sirven `200`, las 6
-   module-gated redirigen a `/home?denied=<slug>`, cero `?error=resolver_unavailable`, y `/proyectos`
-   sirve `200` al operador interno donde antes daba `/401`.
-2. 🔴 **`agent-session` SÍ funciona en producción — y yo dije lo contrario toda la sesión.**
-   `AGENT_AUTH_ALLOW_PRODUCTION` está seteada en Production desde hace ~90 días. Lo repetí tomándolo de
-   una nota de este mismo Handoff, sin verificarlo, y por eso declaré como "pendiente del operador" una
-   verificación que podía hacer yo. **La regla: una afirmación sobre runtime se verifica contra el
-   runtime.** Postura de seguridad abierta en `TASK-1684` (P2): la credencial de las personas agente
-   vive escrita en `CLAUDE.md`, así que endpoint + credencial documentada alcanzan para operar
-   producción como superadmin.
-3. **`vercel redeploy` NO arregla un staging `Canceled` por docs-only** — el gotcha #7 lo recomienda y
-   es un consejo incompleto: el redeploy reevalúa el mismo diff y cancela otra vez. La salida es tocar
-   un doc del set `deployControlDocs` de `vercel-ignore-build.mjs` (no cuenta como docs-only y fuerza
-   el build); si de todos modos hay que documentar el release, ese commit produce la evidencia como
-   efecto. Documentado en runbook + ambas skills como gotcha #11.
-4. **El context gate va ÚLTIMO y `docs:closure-check` NO lo reemplaza.** Dejé un run rojo en `develop`
-   (`31340366010`) por correr context-check, después agregar una entrada al changelog, y commitear con
-   closure-check verde. Orden seguro: ediciones documentales → closure-check → context-rotate si hace
-   falta → context-check:strict → commit.
-5. **Contraste útil entre los dos releases de hoy:** el de la mañana necesitó bypass del batch policy y
-   el de la tarde no. La diferencia fue **cero migraciones**, no el tamaño del batch.

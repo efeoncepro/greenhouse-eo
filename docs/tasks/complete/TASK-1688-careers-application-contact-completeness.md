@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-011`
-- Status real: `LIVE en producción (2026-08-12, release 393144e9f): E2E real verificado; pendientes menores: revisión Privacy, flip país-requerido en parser, scorecard GVC formal`
+- Status real: `CERRADA end-to-end (2026-08-12, releases 393144e9f + 950f5bdb4): flip país-requerido aplicado, GVC scorecard PASS, revisión de privacidad documentada`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
@@ -454,6 +454,20 @@ La residencia se muestra como select accesible con nombre textual del país y c�
 2. Revisión Legal/Privacy de retención/aviso para los 3 campos (out-of-band declarado en la spec).
 3. Flip expand→contract: hacer `residenceCountryCode` requerido a nivel parser tras verificar ambas superficies en producción (hoy sólo la UI lo exige).
 4. Scorecard visual `docs/ui/reviews/TASK-1688-….scorecard.json` con las capturas de staging.
+
+## Delta 2026-08-12 (cierre end-to-end — release 950f5bdb4)
+
+- **Flip expand→contract EJECUTADO**: `residenceCountryCode` requerido a nivel parser (release
+  `950f5bdb4`, manifest `released`); verificado en staging (POST sin país → `invalid` del
+  parser, mismo SHA en prod). Fixture de la projection Growth Forms actualizado (el CI lo atrapó).
+- **Deuda visual del form nativo cerrada**: el país vive en «01 Tus datos» tras email (renderer)
+  y el select premium muestra el placeholder real («Selecciona tu país») en vez de la primera
+  opción como si estuviera elegida.
+- **Scorecard GVC formal**: `docs/ui/reviews/TASK-1688-careers-application-contact-completeness.scorecard.json`
+  — PASS (avg 4.6, piso 4.5) con capturas staging desktop 1440 + iPhone 390 de ambas superficies.
+- **Revisión de privacidad documentada**: `docs/operations/hiring/2026-08-12-revision-privacidad-contacto-careers.md`
+  (apto para operar; 2 recomendaciones no bloqueantes: completitud del aviso público + purga del
+  mensaje en la política de retención).
 
 ## Delta 2026-08-12 (rollout LIVE)
 

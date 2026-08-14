@@ -27,6 +27,20 @@ pnpm wherex:radar -- --max-pages 30
 El reporte, incluidas fichas y textos de adjuntos, queda bajo `.auth/wherex-radar-reports/` con permisos
 `0600`. No es un artefacto para versionar ni entregar a un cliente.
 
+### Archivo puntual de originales autorizados
+
+Para una candidata que el operador haya identificado y autorizado, el runner admite un modo acotado:
+
+```bash
+pnpm wherex:radar -- --tender-id <ID> --archive-originals "<carpeta-de-licitación-del-comprador>"
+```
+
+El modo abre sólo esa licitación en `Nueva` o `Editando`, pulsa su control visible **Descargar** y archiva el archivo
+solamente si Wherex emite un evento nativo de descarga. Conserva el nombre de origen, evita sobrescrituras, valida un
+tamaño mayor a cero y extrae texto para el reporte local protegido. Nunca intenta obtener enlaces firmados, leer el
+visor PDF protegido ni usar una ruta indirecta: si Wherex abre sólo el visor, marca `manual-save-required` y se
+requiere que el operador guarde el original desde Chrome.
+
 ## Qué hace el runner
 
 1. Inicia Wherex en Chrome visible, con el perfil aislado.
@@ -114,6 +128,18 @@ Si la UI autorizada abre un adjunto en un visor que impide guardarlo de manera s
 URL firmada, inspeccionar el perfil de Chrome ni usar una ruta indirecta para saltar ese control. Declara el
 bloqueo y pide un archivo local o una acción humana de guardado; cuando el archivo local exista, puedes archivarlo
 y analizarlo. El runner `wherex:radar` sólo usa temporales y no sustituye la conservación deliberada del original.
+
+### Sesión Chrome principal: descarga deliberada y reversible
+
+Si el operador autoriza operar su sesión Chrome principal y Wherex abre el visor integrado, puede cambiar de manera
+visible y reversible `chrome://settings/content/pdfDocuments` a **Descargar archivos PDF**. Eso permite que el enlace
+visible de Wherex cree un archivo local para archivar y leer. El cambio afecta ese perfil: mientras esté activo, los
+PDF no se abrirán en el visor; el operador puede restaurar **Abrir archivos PDF en Chrome** cuando lo necesite.
+
+No asumas ni cambies esta preferencia sin autorización explícita. La descarga puede mostrar el diálogo nativo de
+guardado: confirma que el archivo aparezca completo en `Descargas`, cópialo al expediente OneDrive de la licitación,
+comprueba nombre/tamaño/apertura y recién entonces extráelo. Para una ficha con más de un adjunto, descarga y valida
+cada original de forma individual; no declares que `Descargar todos` terminó sólo porque abrió un diálogo.
 
 ### 2. HubSpot: empresa, deal y asociación
 

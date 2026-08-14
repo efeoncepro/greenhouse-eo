@@ -25,7 +25,7 @@ import { GreenhouseAsyncActionButton, GreenhouseChip } from '@/components/greenh
 import type { GreenhouseAsyncActionState } from '@/components/greenhouse/primitives/GreenhouseAsyncActionButton'
 import { GH_GROWTH_SEO_KEYWORDS } from '@/lib/copy/growth'
 import { formatInteger } from '@/lib/format'
-import type { KeywordOpportunity } from '@/lib/growth/seo/contracts'
+import { classifyLinkBarrier, type KeywordOpportunity } from '@/lib/growth/seo/contracts'
 
 import { resolveKeywordAction, type KeywordAction } from './keyword-opportunity-action'
 
@@ -272,6 +272,35 @@ const KeywordOpportunityTable = ({
     )
   }
 
+  /**
+   * Celda de barrera de enlaces (ISSUE-152): NUNCA el número crudo del proveedor. La métrica
+   * mide sólo enlaces y en SERPs LATAM colapsa a 0 — "Dificultad: 0" se leería "trivial", que
+   * es falso. Se muestra el nivel con su tooltip; `null` conserva el estado "Sin dato".
+   */
+  const linkBarrierCell = (difficulty: number | null) => {
+    const level = classifyLinkBarrier(difficulty)
+
+    if (level === null) return marketCell(null)
+
+    const label =
+      level === 'low' ? copy.table.linkBarrierLow : level === 'medium' ? copy.table.linkBarrierMedium : copy.table.linkBarrierHigh
+
+    const hint =
+      level === 'low'
+        ? copy.table.linkBarrierLowHint
+        : level === 'medium'
+          ? copy.table.linkBarrierMediumHint
+          : copy.table.linkBarrierHighHint
+
+    return (
+      <Tooltip title={hint}>
+        <Typography variant='body2' component='span'>
+          {label}
+        </Typography>
+      </Tooltip>
+    )
+  }
+
   /** Celda de mercado: el estado honesto de un dato que todavía no existe. */
   const marketCell = (value: number | null) =>
     value === null ? (
@@ -480,7 +509,11 @@ const KeywordOpportunityTable = ({
                   {marketUnavailable ? null : (
                     <>
                       <TableCell align='right'>{copy.table.colVolume}</TableCell>
-                      <TableCell align='right'>{copy.table.colDifficulty}</TableCell>
+                      <TableCell align='right'>
+                        <Tooltip title={copy.table.colLinkBarrierHint}>
+                          <span>{copy.table.colLinkBarrier}</span>
+                        </Tooltip>
+                      </TableCell>
                     </>
                   )}
                   {canTrack ? <TableCell align='right'>{copy.table.colTracking}</TableCell> : null}
@@ -619,9 +652,7 @@ const KeywordOpportunityTable = ({
                           <TableCell align='right' sx={{ fontVariantNumeric: 'tabular-nums' }}>
                             {marketCell(row.searchVolume)}
                           </TableCell>
-                          <TableCell align='right' sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                            {marketCell(row.difficulty)}
-                          </TableCell>
+                          <TableCell align='right'>{linkBarrierCell(row.difficulty)}</TableCell>
                         </>
                       )}
                       {canTrack ? <TableCell align='right'>{rowAction(row)}</TableCell> : null}

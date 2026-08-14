@@ -1,5 +1,29 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-08-13 — Dos slots opcionales que el probe rellena: `partnerBadge` y el `heroAsset` que llevaba 13 días sin declarar
+
+Ambas láminas driftean por **la misma mecánica**, la del runbook §4bis: el gate no renderiza la
+plantilla cruda, la compone con **slots sintéticos** (`synthesizeProbeSlots`) que rellenan **todo**
+slot no-`fixed-` — incluidos los opcionales — y para cualquier `asset` el placeholder es
+`assets/url-lum.svg`. Declarar un slot mueve el frame del probe aunque ningún deck lo use.
+
+**Frames re-promovidos (2):**
+
+- `templates/BackCoverFull.png` — **slot nuevo `partnerBadge`** (credencial de partner, clave cerrada
+  `partner-badge-asset`). El probe pinta la burbuja de URL en la caja del badge, arriba a la derecha.
+  En un render real el slot no declarado hace que el renderer **borre el nodo**: la contraportada sin
+  credencial queda idéntica a la de siempre. 1.787 px.
+- `templates/NarrativeSplit.png` — **deuda, no cambio de hoy.** El slot opcional `heroAsset` entró el
+  2026-07-31 en `f7761988f` (*Brightcell tender*) y **nadie re-congeló**: el gate quedó rojo 13 días
+  con ~59k px de diff, y el ruido se leía como regresión de quien pasara por ahí. Se declara y se
+  promueve ahora, con la causa escrita para que no vuelva a interpretarse mal.
+
+**Verificado antes de congelar:** ninguna otra lámina difiere (el WIP de deck ANAM en el árbol
+—`comparison-split.*`— renderiza byte-idéntico al baseline, así que la promoción no sella trabajo
+ajeno a medias). `git log` confirma que `narrative-split.html` está commiteada y limpia.
+
+---
+
 ## 2026-07-15 (b) — Muro de clientes: +Grupo Berel (caballo de batalla MX) → grilla 3×3
 
 **Feedback del operador (mismo día):** faltaba **Grupo Berel** (cliente clave de México) en el muro. Se
@@ -288,7 +312,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: eaf06f6bcc47a9fb740de787859d37b01546aed5e46d61b3c27520a311c6e1a9 -->
+<!-- manifest-digest: 85bf36e29053b59a9d64cf1493b7921eca0b39351e2f997ff8a5547657e6ab3b -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

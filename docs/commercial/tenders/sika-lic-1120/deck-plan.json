@@ -1,0 +1,142 @@
+{
+  "_readme": [
+    "Borrador de presentación técnica para Sika LIC-1120.",
+    "Fuente narrativa: oferta-tecnica.md. No contiene precio y no debe renderizarse como propuesta final hasta resolver dependencias y aprobar cotización.",
+    "Componer sólo como taller: pnpm deck:compose docs/commercial/tenders/sika-lic-1120/deck-plan.json --out .captures/sika-lic-1120"
+  ],
+  "tenderId": "SIKA-LIC-1120-TECHNICAL",
+  "slides": [
+    {
+      "slideId": "desafio",
+      "contentType": "narrative",
+      "slots": {
+        "sectionLabel": "EL DESAFÍO",
+        "title": "Cerrar una tienda sin <em>cerrar la continuidad</em>",
+        "body": [
+          "Cuando un profesional busca un punto que dejó de operar, necesita una respuesta local, inmediata y confiable.",
+          "La campaña debe convertir una búsqueda de cierre en una ruta clara hacia atención, inventario y asesoría disponibles."
+        ],
+        "closing": "La campaña no comunica una salida: hace visible la continuidad de Sika.",
+        "conceptLabel": "LA TRANSICIÓN",
+        "conceptTitle": "Búsqueda, ruta y atención",
+        "conceptLegend": [
+          { "layer": "Búsqueda", "definition": "Captura la demanda activa", "tone": "outer" },
+          { "layer": "Ruta", "definition": "Dirige al punto receptor", "tone": "middle" },
+          { "layer": "Atención", "definition": "Convierte la duda en acción", "tone": "core" }
+        ]
+      }
+    },
+    {
+      "slideId": "objetivo",
+      "contentType": "one-metric",
+      "slots": {
+        "eyebrow": "OBJETIVO DE SIKA",
+        "leftVisual": { "src": "assets/stat-opportunity-visual.png", "alt": "Oportunidad de continuidad" },
+        "title": "La meta es transferir demanda; el método la vuelve <em>medible</em>",
+        "narrative": [
+          "Sika define como meta transferir al menos 50% de las ventas históricas de los puntos cerrados hacia los receptores. Efeonce gestiona los indicadores que hacen verificable esa ruta; no garantiza la venta."
+        ],
+        "outcomesEyebrow": "LO QUE SE GESTIONA",
+        "outcomesTitle": "Tres condiciones para medir la continuidad comercial",
+        "goals": [
+          { "kind": "growth", "title": "Meta de transferencia", "metric": "50%", "body": "Objetivo definido por Sika, sujeto a línea de base y fuente oficial de ventas.", "evidenceRef": "E1 · Estrategia de cierre tiendas ARVA y TyP" },
+          { "kind": "learning", "title": "Línea de base", "body": "Ventas históricas por punto y período comparable antes de activar." },
+          { "kind": "visibility", "title": "Puntos receptores", "body": "Destino, horario, stock y canal de atención confirmados antes de cada activación." }
+        ]
+      }
+    },
+    {
+      "slideId": "sistema",
+      "contentType": "four-pillars",
+      "slots": {
+        "sectionLabel": "EL SISTEMA",
+        "title": "Cuatro capas para convertir demanda en <em>continuidad comercial</em>",
+        "context": ["Cada capa conecta una búsqueda con un punto receptor verificable.", "La información operativa gobierna todos los activos de la campaña."],
+        "thesis": "No se trata de anunciar un cierre. Se trata de <em>hacer encontrable la siguiente atención</em>.",
+        "pillars": [
+          { "kind": "data", "title": "Validar", "body": "Fecha, destino, horario, stock y contacto por cierre.", "detail": "Una fuente única antes de activar comunicación." },
+          { "kind": "method", "title": "Capturar", "body": "Google Search por intención y ubicación.", "detail": "Responder a la demanda que ya existe." },
+          { "kind": "method", "title": "Derivar", "body": "Landing y fichas de destino claras.", "detail": "Una acción simple: llegar o contactar." },
+          { "kind": "data", "title": "Aprender", "body": "Señales digitales y contraste con ventas disponibles.", "detail": "Ajustar la siguiente transición con evidencia." }
+        ]
+      }
+    },
+    {
+      "slideId": "operacion",
+      "contentType": "process-sequential",
+      "slots": {
+        "sectionLabel": "OPERACIÓN",
+        "title": "Un ciclo breve para cada <em>transición local</em>",
+        "steps": [
+          { "title": "Preparar", "description": "Validar destino, datos, mensajes y aprobaciones.", "deliverable": "Ficha operativa por punto" },
+          { "title": "Construir", "description": "Crear landing, anuncios y sistema creativo.", "deliverable": "Activos listos para QA" },
+          { "title": "Activar", "description": "Publicar en torno a la fecha de cierre y monitorear demanda.", "deliverable": "Rutas hacia atención vigente" },
+          { "title": "Optimizar", "description": "Ajustar intención, inversión y mensajes con señales disponibles.", "deliverable": "Priorización semanal" },
+          { "title": "Aprender", "description": "Consolidar derivación, incidencias y recomendaciones.", "deliverable": "Base para la siguiente etapa" }
+        ]
+      }
+    },
+    {
+      "slideId": "medicion",
+      "contentType": "dual-list",
+      "slots": {
+        "leftEyebrow": "LO QUE CONTROLAMOS",
+        "leftTitle": "Demanda y derivación digital",
+        "leftItems": [
+          { "lead": "Búsqueda", "body": "Términos, impresiones y clics de Google Search." },
+          { "lead": "Derivación", "body": "Visitas, rutas, contactos y uso de fichas de destino." },
+          { "lead": "Operación", "body": "Datos desactualizados, incidencias y consultas sin respuesta." }
+        ],
+        "rightEyebrow": "LO QUE SIKA DEBE HABILITAR",
+        "rightTitle": "La conexión con transferencia comercial",
+        "rightItems": [
+          { "lead": "Línea de base", "body": "Ventas históricas por punto cerrado y período de comparación." },
+          { "lead": "Fuente oficial", "body": "POS, CRM u otro reporte confirmado por Sika." },
+          { "lead": "Atención", "body": "Canal y responsable para consultas de clientes derivados." }
+        ]
+      }
+    },
+    {
+      "slideId": "cronograma",
+      "contentType": "timeline",
+      "slots": {
+        "sectionLabel": "SEPTIEMBRE–DICIEMBRE",
+        "title": "Una campaña que se activa <em>con cada cierre confirmado</em>",
+        "meta": "Las fechas y destinos por punto se integran al recibir la confirmación operativa de Sika.",
+        "timeUnit": "month",
+        "timeAxis": ["Septiembre", "Octubre", "Noviembre", "Diciembre"],
+        "milestones": [
+          { "at": 1, "label": "Kickoff y matriz de destinos", "caption": "Antes de activar" },
+          { "at": 2, "label": "Optimización por cierre", "caption": "Con datos" },
+          { "at": 4, "label": "Consolidado y aprendizaje", "caption": "Fin de campaña" }
+        ],
+        "phases": [
+          { "kind": "work", "startUnit": 1, "endUnit": 1, "title": "Preparar", "description": "Datos, creatividades, landing y campañas.", "barLabel": "Alinear antes de comunicar" },
+          { "kind": "continuous", "startUnit": 1, "endUnit": 4, "title": "Activar y optimizar", "description": "Search, derivación, reportería e incidencias.", "barLabel": "Operar según cada transición" },
+          { "kind": "continuous", "startUnit": 1, "endUnit": 4, "title": "Medir y aprender", "description": "Contrastar señales digitales y ventas disponibles.", "barLabel": "Corregir la siguiente activación" }
+        ]
+      }
+    },
+    {
+      "slideId": "cumplimiento",
+      "contentType": "requirements-table",
+      "slots": {
+        "sectionLabel": "CUMPLIMIENTO TÉCNICO",
+        "title": "Cobertura explícita de los requerimientos <em>confirmados</em>",
+        "summary": { "value": "5 de 5", "label": "requisitos técnicos cubiertos", "detail": "Presupuesto y dependencias pendientes de validación." },
+        "requirements": [
+          { "kind": "excluyente", "requirement": "Campaña digital septiembre–diciembre", "evidence": "Ciclo de activación por cierre y cronograma de cuatro meses", "status": "cubierto" },
+          { "kind": "excluyente", "requirement": "Google Search", "evidence": "Captura de demanda por intención y ubicación", "status": "cubierto" },
+          { "kind": "excluyente", "requirement": "Landing provista por el proveedor", "evidence": "Landing ligera y fichas de destino bajo control de Efeonce", "status": "cubierto" },
+          { "kind": "puntúa", "requirement": "Propuesta creativa", "evidence": "Sistema de continuidad adaptable por zona", "status": "cubierto" },
+          { "kind": "excluyente", "requirement": "Propuesta 100% digital", "evidence": "Sin materiales de punto de venta", "status": "cubierto" }
+        ]
+      }
+    },
+    {
+      "slideId": "cierre",
+      "contentType": "back-cover",
+      "slots": {}
+    }
+  ]
+}

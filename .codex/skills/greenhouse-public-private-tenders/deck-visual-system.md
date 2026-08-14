@@ -455,6 +455,15 @@ plantilla real.**
 - **NUNCA** caras IA como equipo. **SIEMPRE** fotos reales del squad.
 - **NUNCA** un asset con texto quemado en la imagen (no es reusable).
 - **NUNCA** cifras fabricadas: reales del bid, o **ilustrativas marcadas**.
+- **NUNCA** un asset del catálogo fuera de su árbol (`public/`, `file://`, `../../`): el catálogo
+  viaja solo al worker y revienta con `missing_asset`. Se copia adentro (`assets/<familia>/…`) y se
+  referencia relativo — lo audita `catalog-portability.test.ts`.
+- **NUNCA** una credencial de partner (HubSpot Solutions Partner y las que vengan) como asset libre:
+  va por clave cerrada (`partner-badge-asset`), igual que un logo de cliente. Presentar una
+  acreditación que no se tiene es tergiversación ante un comité.
+- **NUNCA** registrar una plantilla nueva para "la misma lámina con un elemento más": un slot
+  **opcional** ya da las dos versiones, porque el renderer borra el nodo cuando el plan no lo declara.
+  Duplicar la plantilla garantiza drift entre las dos.
 - **SIEMPRE** registro institucional (de usted) en client-facing.
 - **SIEMPRE** verificar la cohesión del set **compuesto sobre el fondo real**, no asset por asset.
 - **SIEMPRE** que el RFP puntúe cronograma / equipo / matriz de cumplimiento / económica, esas

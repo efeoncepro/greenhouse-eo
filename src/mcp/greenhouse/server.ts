@@ -251,14 +251,34 @@ export const createGreenhouseMcpServer = (
     {
       title: 'Get SEO Keyword Opportunities',
       description:
-        'List measured striking-distance SEO keyword opportunities for an organization (Google Search Console data: weighted position, impressions, estimated click gain, quick wins, cannibalization). Requires the organization to have the SEO module (seo_v2) assigned. When data.ok is false, report the errorCode (disabled, target_not_configured, no_data) honestly instead of inventing results.',
+        'List measured striking-distance SEO keyword opportunities for an organization (Google Search Console data: weighted position, impressions, estimated click gain, quick wins, cannibalization). Requires the organization to have the SEO module (seo_v2) assigned. TASK-1661: searchVolume and difficulty are OPTIONAL enrichment from the DataForSEO Labs monthly snapshot — an ESTIMATE of the wider market, not measured demand for this site. A null value means it was never queried; NEVER report it as zero, and never rank by it as if it were measured. The market field says whether that enrichment is available at all. When data.ok is false, report the errorCode (disabled, target_not_configured, no_data) honestly instead of inventing results.',
       inputSchema: {
         organizationId: z.string().trim().min(1).optional(),
+        market: z.string().trim().min(2).max(12).optional(),
         limit: z.number().int().positive().max(50).optional()
       },
       outputSchema: greenhouseMcpToolOutputSchema
     },
     async args => handlers.getSeoKeywordOpportunities(args)
+  )
+
+  // TASK-1661 — lente ◑ ESTIMADA de mercado (Labs), complementaria a la demanda MEDIDA ● de
+  // GSC. La description es parte del contrato: le dice al agente que un dato ausente NO es cero
+  // y que la cifra siempre viaja con su as-of.
+  server.registerTool(
+    'get_seo_keyword_market_data',
+    {
+      title: 'Get SEO Keyword Market Data',
+      description:
+        'Look up ESTIMATED market data (monthly search volume, organic keyword difficulty 0-100, paid competition, core keyword) for an explicit list of keywords, from the DataForSEO Labs snapshot. This is an ESTIMATE of the wider market refreshed monthly, NOT the measured Search Console demand of this site: never average it with, or substitute it for, get_seo_keyword_opportunities data. The market (country + language) comes from the organization SEO target, because search volume is not global. Every value carries capturedAt/providerLastUpdatedAt: always report the as-of date. A keyword returned with found=false was never queried — report it as unknown, NEVER as zero. Also note competition is PAID competition, and keywordDifficulty is a PURE link-competition metric (90% weighted on URL-level backlinks of the top-10, hard-floored at 0): 0 means entry is not gated by links — an opportunity for a strong domain — NOT that ranking is trivial. Present it as a link-barrier level (low 0-14 / medium 15-49 / high 50+), never as raw difficulty.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        market: z.string().trim().min(2).max(12).optional(),
+        keywords: z.array(z.string().trim().min(1)).min(1).max(100)
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getSeoKeywordMarketData(args)
   )
 
   server.registerTool(
@@ -268,7 +288,8 @@ export const createGreenhouseMcpServer = (
       description:
         'Cross the two search internets for an organization: measured organic rank (GSC) vs AI citability (AEO grader score). Returns a 2x2 quadrant per keyword and for the domain — dominante (ranks + cited), riesgo (ranks but NOT cited by AI: organic authority without citability, cross-sell AEO), oportunidad (cited but not ranking), invisible (neither). The two axes are orthogonal and never averaged. When data.ok is false, report the errorCode (no_seo_data, no_aeo_data, target_not_configured, disabled) honestly — a missing lens is a state, not a zero.',
       inputSchema: {
-        organizationId: z.string().trim().min(1).optional()
+        organizationId: z.string().trim().min(1).optional(),
+        market: z.string().trim().min(2).max(12).optional()
       },
       outputSchema: greenhouseMcpToolOutputSchema
     },
@@ -298,6 +319,7 @@ export const createGreenhouseMcpServer = (
         'Time series of exact organic positions (DataForSEO SERP, market truth: includes SERP features like AI Overview presence) for the tracked keywords of an organization. Returns { series: [{ keyword, points: [{date, position, url}] }] }; position=null on a date means the domain did not rank that day (a valid measurement, not an error). Served from the hot window (~180 days, Postgres) or long history (BigQuery) depending on rangeDays. This series is NEVER averaged with GSC data — they are different sources. When data.ok is false, report the errorCode (disabled, target_not_configured, no_data, query_failed) honestly.',
       inputSchema: {
         organizationId: z.string().trim().min(1).optional(),
+        market: z.string().trim().min(2).max(12).optional(),
         rangeDays: z.number().int().positive().max(1825).optional(),
         engine: z.string().trim().min(1).optional(),
         device: z.enum(['desktop', 'mobile', 'tablet']).optional(),
@@ -317,6 +339,7 @@ export const createGreenhouseMcpServer = (
         'Performance over time of a CHOSEN SET of keywords or URLs for an organization: the daily series for the chart plus the standings for the table (current position, 30-day position delta, clicks, impressions, CTR) in a single read. Pass items as the exact keywords (mode=keyword) or page URLs (mode=url) to compare; use get_seo_performance_catalog to discover valid items. SOURCE RULE (never mixed, never averaged): mode=keyword with metric=position is INTENDED to be served from DataForSEO (exact market position, "estimated"), but the reader FALLS BACK to the measured Google Search Console position series when the exact-rank series is younger than the measured one (rank capture recently started); every other combination is served from Search Console ("measured"). The resolved source is returned in data.source and MUST be stated when reporting numbers. POSITION IS INVERTED: a lower number is better, so a NEGATIVE positionDelta30d is an IMPROVEMENT (8 to 3 is -5). A point with value=null means no measurement that day — report it as a gap, NEVER as zero (position zero does not exist and zero clicks would claim "you appeared and nobody clicked"). ctr=null means there were no impressions, which is "not measured", not 0%. positionDelta30d=null means there is nothing to compare against — never invent a change. itemsWithoutData lists requested items with no data at all in the window: name them instead of silently dropping them. When data.ok is false, report the errorCode (disabled, not_connected, no_items, no_data, query_failed) honestly.',
       inputSchema: {
         organizationId: z.string().trim().min(1).optional(),
+        market: z.string().trim().min(2).max(12).optional(),
         mode: z.enum(['keyword', 'url']).optional(),
         items: z.array(z.string().trim().min(1)).min(1).max(25),
         metric: z.enum(['position', 'clicks', 'impressions', 'ctr']).optional(),
@@ -338,6 +361,7 @@ export const createGreenhouseMcpServer = (
         'List the keywords (mode=keyword) or page URLs (mode=url) that can be compared with get_seo_performance for an organization, ordered by measured impressions. In keyword mode the list is the UNION of two universes: keywords with measured Search Console volume AND keywords tracked by rank capture. tracked=true means the keyword has an exact DataForSEO position series; impressions=0 on a tracked keyword means "no impressions recorded yet", NOT a measurement of zero. Use this before get_seo_performance instead of guessing item strings — items must match exactly. In keyword mode the result may also include data.sets: the NAMED keyword sets the operator configured on the active target (e.g. a brand set) with their exact member keywords — prefer offering these curated groups as comparison presets over inventing groupings. When data.ok is false, report the errorCode (disabled, no_data, query_failed) honestly.',
       inputSchema: {
         organizationId: z.string().trim().min(1).optional(),
+        market: z.string().trim().min(2).max(12).optional(),
         mode: z.enum(['keyword', 'url']).optional(),
         windowDays: z.number().int().positive().max(365).optional(),
         limit: z.number().int().positive().max(500).optional()
@@ -356,6 +380,7 @@ export const createGreenhouseMcpServer = (
         'North-star KPIs of the SEO Overview cockpit for an organization, from MEASURED Google Search Console data (first-party truth, never estimated): clicks, impressions, average position and CTR aggregated over the period, plus the daily series and the equivalent previous window for comparison. Average position is weighted BY IMPRESSIONS (never a flat average of daily positions) and CTR is total clicks over total impressions (never an average of daily ratios). Position semantics are INVERTED: a lower number is better, so a negative delta is an improvement. previous=null means there is no comparable previous window — report it as "no comparison available", never as a 100% change. position/ctr are null when there were no impressions; that is "not measured", never zero. When data.ok is false, report the errorCode (disabled, target_not_configured) honestly.',
       inputSchema: {
         organizationId: z.string().trim().min(1).optional(),
+        market: z.string().trim().min(2).max(12).optional(),
         rangeDays: z.number().int().positive().max(365).optional()
       },
       outputSchema: greenhouseMcpToolOutputSchema
@@ -372,6 +397,7 @@ export const createGreenhouseMcpServer = (
         'Technical site audit report (DataForSEO OnPage crawl) for the SEO target of an organization: sitewide health score (0-100), crawled pages, and findings grouped by severity (critical/warning/notice) with stable issue types (e.g. is_4xx_code, no_description, has_micromarkup_errors). A run with status=running means the crawl is still in progress (a fact, not an error); a succeeded run with zero findings means the site is technically clean. Pass auditRunId to read a specific historical run. When data.ok is false, report the errorCode (disabled, target_not_configured, no_data, run_not_found, query_failed) honestly — never fabricate findings.',
       inputSchema: {
         organizationId: z.string().trim().min(1).optional(),
+        market: z.string().trim().min(2).max(12).optional(),
         auditRunId: z.string().trim().min(1).optional()
       },
       outputSchema: greenhouseMcpToolOutputSchema
@@ -388,6 +414,7 @@ export const createGreenhouseMcpServer = (
         'Weekly time series of the backlink profile (DataForSEO Backlinks) for the SEO target of an organization: referring domains, total backlinks, domain rank on a 0-100 scale (comparable to DR/DA), toxic share (0-1 proxy derived from the average spam score of the incoming profile), and new/lost deltas over the provider 30-day window. Points are weekly snapshots; use rangeDays to widen the window (default 365). When data.ok is false, report the errorCode (disabled, target_not_configured, no_data, query_failed) honestly.',
       inputSchema: {
         organizationId: z.string().trim().min(1).optional(),
+        market: z.string().trim().min(2).max(12).optional(),
         rangeDays: z.number().int().positive().max(1825).optional()
       },
       outputSchema: greenhouseMcpToolOutputSchema

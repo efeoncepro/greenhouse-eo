@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `sync`
 - Epic: `EPIC-011`
-- Status real: `LIVE en producción (2026-08-12): flag ON rev ops-worker-00548-x52, E2E real 5 tipos sent, release 393144e9f`
+- Status real: `LIVE en producción (2026-08-12): flag ON, E2E real con LOS 6 tipos sent, releases 393144e9f + 950f5bdb4`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
@@ -341,6 +341,12 @@ Decisiones que el agente ejecutor debe cerrar en plan mode (Zone 2): (a) allowli
 - [ ] `Handoff.md` y `changelog.md` actualizados.
 - [ ] Se revisó impacto sobre TASK-1688 (enriquecer email interno cuando existan teléfono/país/mensaje → dejar Delta allí).
 - [ ] No queda evidencia versionada con PII de candidatos.
+
+## Delta 2026-08-12 (cierre total — los 6 tipos verificados live)
+
+- `hiring_decision_selected` ejercitado EN VIVO por supersede controlado sobre EO-APP-0090
+  (`sent` verificado en `email_deliveries`, asunto personalizado); la postulación de prueba
+  quedó re-decidida `rejected` (descartada). Los 6 tipos tienen ya evidencia live.
 
 ## Delta 2026-08-12 (rollout LIVE)
 

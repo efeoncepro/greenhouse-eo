@@ -18,6 +18,6 @@ pnpm deck:compose docs/commercial/trainings/anam-hubspot-2026-08-12/deck-plan.js
 
 ## Estado de marca y evidencia
 
-La portada usa `CoverFull`, la plantilla aprobada de los decks: Efeonce + ANAM + `Capacitación HubSpot` sobre el degradado institucional. La lámina 26 usa `BackCoverFull`, la contraportada canónica de cierre. HubSpot® queda como plataforma, no como marca dominante. Los mockups son interfaces conceptuales, no capturas del portal de ANAM; todos los valores son ilustrativos. El paquete queda `proof-only` hasta validar autorización para distribución externa y estado live de las funciones.
+La portada usa `CoverFull`, la plantilla aprobada de los decks: Efeonce + ANAM + `Capacitación HubSpot` sobre el degradado institucional. La lámina 26 usa `BackCoverFull`, la contraportada canónica de cierre, con el badge naranja de HubSpot Solutions Partner como credencial secundaria en la esquina superior derecha. HubSpot® queda como plataforma, no como marca dominante. Los mockups son interfaces conceptuales, no capturas del portal de ANAM; todos los valores son ilustrativos. El paquete queda `proof-only` hasta validar autorización para distribución externa y estado live de las funciones.
 
 HubSpot® y sus logotipos son marcas de HubSpot, Inc. Este material es independiente de HubSpot, Inc. y no está autorizado, patrocinado ni aprobado por dicha compañía. Las capacidades se clasifican como operativo/documentado, piloto, validación live o no publicado; ningún mockup sustituye la verificación del portal.

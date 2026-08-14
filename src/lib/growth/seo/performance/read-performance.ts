@@ -4,6 +4,8 @@ import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
+import { resolveUnambiguousSeoTarget } from '../resolve-target'
+
 import { SEO_GSC_HISTORY_DATASET, SEO_GSC_HISTORY_TABLE } from '../gsc-history-bq-mirror'
 
 import type {
@@ -438,17 +440,10 @@ export const readSeoPerformance = async (
 
     const seoTargetId =
       source === 'dataforseo_estimated'
-        ? (
-            await runGreenhousePostgresQuery<{ seo_target_id: string }>(
-              `SELECT seo_target_id
-                 FROM greenhouse_growth.seo_targets
-                WHERE organization_id = $1
-                  AND status = 'active'
-                ORDER BY created_at DESC
-                LIMIT 1`,
-              [organizationId]
-            )
-          )[0]?.seo_target_id ?? null
+        ? // ISSUE-153: resolución canónica, NUNCA `LIMIT 1` inline. Con más de un mercado
+          // activo y sin selector, esta lectura no adivina el país: degrada a null y los
+          // ítems de rank salen por `itemsWithoutData` (la parte medida GSC no depende de esto).
+          (await resolveUnambiguousSeoTarget(organizationId)).target?.seoTargetId ?? null
         : null
 
     // El volumen (clics/impresiones/CTR) SIEMPRE sale de Search Console: la tabla y la

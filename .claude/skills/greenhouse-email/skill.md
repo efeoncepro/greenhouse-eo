@@ -72,6 +72,8 @@ File: `src/lib/email/types.ts`
 Add the new type to `EmailType`:
 
 ```typescript
+// ILLUSTRATIVE ONLY — the real union lives in src/lib/email/types.ts (~26 types).
+// Do NOT treat this snippet as the inventory; always read the source file.
 export type EmailType =
   | 'password_reset'
   | 'invitation'
@@ -578,6 +580,17 @@ const HERO_IMAGE_URL = `https://storage.googleapis.com/${MEDIA_BUCKET}/emails/yo
 - **Max image width: 560px** — matches the `<Container>` max-width in EmailLayout
 - **Keep file size under 200KB** per image — large images get clipped or blocked
 - **SVG animations do NOT work in email** — email clients strip `<style>` and `<script>`. Only use raster PNG in emails
+
+---
+
+## Patrones verificados en producción (TASK-1689)
+
+Patterns proven live by the hiring email cycle (6 reactive consumer emails, rollout 2026-08-12):
+
+1. **Personalized subjects**: build the subject with the recipient's `firstName` + the concrete context (e.g. the vacancy title): `¡Recibimos tu postulación, María! — Diseñador UX Senior`. The `previewText` complements the subject with NEW information — never duplicates it.
+2. **Dedupe pre-check in reactive consumers**: before sending from an outbox/reactive consumer, call `wasEmailAlreadySent(sourceEventId, sourceEntity, recipientEmail)` (`src/lib/email/delivery.ts`). **Rule: run the dedupe check BEFORE any non-idempotent side effect** — e.g. rotating an access token and then skipping the send leaves the recipient with a dead link. Check first, then rotate/mutate, then send.
+3. **External recipients get the agency brand**: candidate/prospect-facing types go into `AGENCY_BRANDED_EMAIL_TYPES` (`src/lib/email/types.ts`) so the sender reads **Efeonce** (`brand='efeonce'`), not the platform sender. Internal notifications (e.g. `hiring_application_received_internal`) stay on the platform sender.
+4. **The ops-worker is a SINGLE service shared by staging and production**: enabling its email flag means production sends immediately — there is no staging-only ops-worker. Template changes require a redeploy: see [ops-worker Cloud Run](#ops-worker-cloud-run-critical-for-production-emails) below.
 
 ---
 

@@ -18,7 +18,7 @@ import { MOTION_DURATION_S, MOTION_EASE, motionCss } from '@/components/greenhou
 import { GH_GROWTH_SEO_CLIENT } from '@/lib/copy/growth'
 import type { SeoClientSurfaceRead } from '@/lib/growth/seo/client/read-seo-client-surface'
 import { formatNumber } from '@/lib/format/number'
-import { resolveOpportunityTone, resolvePositionTone } from '@/lib/growth/seo/client/resolve-seo-metric-signal'
+import { resolveOpportunityTone, resolvePositionTone, resolveSeoLeadTitle } from '@/lib/growth/seo/client/resolve-seo-metric-signal'
 import useReducedMotion from '@/hooks/useReducedMotion'
 import { AnimatePresence, motion } from '@/libs/FramerMotion'
 
@@ -101,9 +101,7 @@ const SummaryDetail = ({ surface, organizationName }: { surface: SeoClientSurfac
   const positionTone = resolvePositionTone(summary.average)
   const opportunityTone = resolveOpportunityTone(summary.opportunities)
 
-  const leadTitle = summary.average === null
-    ? GH_GROWTH_SEO_CLIENT.summary.leadTitle
-    : GH_GROWTH_SEO_CLIENT.summary.titleWithPosition(formatPosition(summary.average))
+  const leadTitle = resolveSeoLeadTitle(summary.average)
 
   const actionItems = [
     { id: 'position', icon: 'tabler-shield-check', text: GH_GROWTH_SEO_CLIENT.summary.actionPosition },

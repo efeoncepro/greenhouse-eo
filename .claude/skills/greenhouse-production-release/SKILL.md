@@ -411,6 +411,19 @@ El flujo de **squash-merge** produce condiciones recurrentes que NO son fallas r
     **y** requiere actualizar la revisión activa. Después, ejecuta el smoke programado y conserva al
     menos dos resultados consecutivos completos antes de cerrar la alerta.
 
+13. **Un CI de `main` rojo con 0 tests fallidos es un unhandled rejection/flake, no una regresión
+    (verificado 2026-08-12, release `950f5bdb4`).** Caso real: un timer del test de email-verify del
+    renderer disparó **después del teardown** de su suite, en un entorno sin el global `CSS` — la
+    suite completa reportó **10.582 passed / 0 failed** y aun así salió con **exit 1** (run
+    `31636173517`). La lectura correcta está en el **resumen de vitest**: si dice `Errors: N` con
+    `0 failed`, el error ocurrió **fuera** de los tests (post-teardown, unhandled rejection) y ningún
+    test del release regresó. La salida: `gh run rerun <run_id> --failed` sobre el **mismo SHA** —
+    produce la evidencia limpia sin quemar un run del orquestador ni tocar el commit; el fix de raíz
+    (el timer/global faltante) va a `develop` para el siguiente release, no bloquea éste. **NUNCA
+    re-dispatchar el orquestador contra un CI rojo sin diagnosticar primero**: si el summary muestra
+    tests fallidos reales, es regresión y el batch no sale; el rerun sólo es legítimo cuando el
+    conteo de fallos es cero y el error es identificable como ajeno a los tests.
+
 ## What The Orchestrator Owns
 
 `production-release.yml` owns the production release lifecycle:

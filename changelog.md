@@ -7,6 +7,104 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-13 — Berel se mide donde vive su mercado, y el país deja de elegirse en silencio
+
+Una pregunta del operador sobre un dato dudoso destapó dos problemas reales, y los dos quedaron
+resueltos el mismo día.
+
+**El primero era de datos.** El seguimiento SEO de Berel llevaba un año midiendo Chile — y Berel es
+una marca mexicana. Su propio nombre tiene 1.650 veces más búsquedas en México que en Chile, y nada
+en el dashboard lo delataba porque la serie se veía poblada y sana. La corrección respetó la regla
+de oro del histórico: no se reescribió nada. Se creó un target nuevo para México, el de Chile quedó
+pausado con su serie íntegra, y las 31 keywords se re-trackearon por el command canónico. La
+verificación con capturas reales contó el final de la historia: **Berel es #1 en México en sus
+términos de marca** — la marca siempre fue real; el país era el equivocado.
+
+**El segundo era de arquitectura, y era más profundo.** El módulo asumía que una organización tiene
+UN mercado, y esa suposición vivía escondida en un `LIMIT 1` copiado en cuatro lugares: con dos
+países activos, cada pantalla servía el más nuevo sin error, sin señal y sin decir cuál. Efeonce
+misma —que opera en Chile, México, Colombia y Perú— es el caso que ese código no sabía describir.
+Ahora la resolución vive en un solo lugar y dice la verdad: un mercado resuelve solo, varios exigen
+elegir (con la lista de opciones en la respuesta), y toda lectura declara qué país está sirviendo.
+Las posiciones de países distintos jamás se promedian: son experimentos distintos.
+
+## 2026-08-13 — El módulo SEO deja de leer "volumen: sin dato", y un smoke real destapa una fuga de costo
+
+Durante meses la tabla de oportunidades mostraba las columnas de volumen y dificultad vacías, y eso
+se leía como "falta integrar DataForSEO". Era falso: la cañería estaba desde hace tiempo; lo que
+faltaba eran las columnas donde guardar el agua. Ahora existen, y `market` deja de estar cableado a
+"no disponible".
+
+La decisión de fondo no fue traer el dato sino **dónde vive**. El volumen de una keyword es un hecho
+de la keyword, el país y la fecha — no de si nosotros la seguimos ni de quién la descubrió: "pintura
+industrial" tiene el mismo volumen en Chile para todos los clientes de la cartera. Por eso la tabla
+no cuelga de un target ni del set monitoreado, y nace **multi-productor**: la captura de hoy la llena
+desde un endpoint, y el descubrimiento de keywords y el análisis de competencia que vienen después
+escribirán en la MISMA tabla el dato que ya viene incluido y pagado en sus propias respuestas.
+Guardarlo dos veces habría garantizado que dos pantallas mostraran cifras distintas para lo mismo
+dentro del mismo mes.
+
+La captura corre **una vez al mes**, porque el proveedor refresca una vez al mes: un cron diario
+pagaría treinta veces por el mismo número. Y nace con dos frenos independientes —el cron pausado y
+el flag apagado— porque a diferencia del resto del módulo, esta corrida le paga al proveedor por cada
+fila.
+
+**Lo que enseñó correrlo de verdad.** El smoke con dinero real (USD 0.05 en total) destapó un defecto
+que ningún test con mocks podía ver: una keyword que el proveedor **no tiene** no escribía fila, y
+como el chequeo previo mira filas, esas keywords nunca quedaban "ya consultadas" y se volvían a
+comprar en cada corrida, para siempre. El modelo correcto son tres estados y no dos —nunca
+preguntamos, preguntamos y no hay, demanda cero real— y con eso la segunda corrida pasó a costar
+exactamente cero. Quedó también una observación honesta sin resolver: el proveedor devuelve
+dificultad 0 para cabeceras de alto volumen, y esa columna no se le muestra a un cliente hasta
+contrastarla con otra fuente.
+
+## 2026-08-13 — La credencial de partner entra al deck sin duplicar la contraportada
+
+El badge de HubSpot Solutions Partner apuntaba a una carpeta fuera del catálogo, y eso rompía la
+regla que mantiene los decks reproducibles: un catálogo tiene que renderizar igual en cualquier
+máquina, y una referencia que se sale funciona en el repo del autor y falla en el worker. El badge se
+mudó adentro del catálogo y ahora se pide por una clave cerrada, el mismo trato que los logos de
+cliente: una acreditación que no se tiene no se puede presentar por accidente.
+
+No hizo falta una contraportada nueva. La misma lámina ya sirve las dos versiones —con y sin
+credencial— porque el motor borra el elemento cuando el plan no lo declara; una segunda plantilla
+casi idéntica solo habría garantizado que las dos se separaran con el tiempo.
+
+Los aprendizajes quedaron escritos donde se van a leer: el runbook del gate visual explica por qué
+declarar un slot nuevo siempre mueve la imagen de referencia de esa lámina, y cómo distinguir un
+drift propio de un baseline viejo; el estándar premium de UI incorpora que un scorecard es una foto
+con fecha (uno vencido bloqueó cuatro días un trabajo ya terminado) y que ningún gate lee lo que la
+pantalla dice; y la skill de captura registra que una superficie gateada por organización exige la
+persona de esa organización, con la consulta que la encuentra.
+
+## 2026-08-12 — El portal SEO del cliente quedó cerrado, y su propio scorecard estaba equivocado
+
+`TASK-1310` cierra la cara cliente del módulo SEO: dashboard `/growth/seo` con Resumen, Evolución y
+Quadrant 360, más el informe `/growth/seo/report` en web e imprimible sobre el mismo modelo de
+artefacto que el AEO. Con ella el módulo tiene sus dos caras —las cuatro pestañas del operador y el
+portal del cliente— y la pata visible del criterio de paridad queda cubierta.
+
+El cierre empezó desmintiendo su propia evidencia: el scorecard vigente bloqueaba la task con 2.29
+sobre capturas tomadas nueve horas antes del commit que ejecutó la ronda premium, así que describía
+una interfaz que ya no existía. Medida de nuevo contra el código real —tres superficies, escritorio y
+móvil, con sesión de un cliente de verdad atravesando el gate por organización— las tres cierran sin
+un solo hallazgo de calidad y los cuatro gates de UI quedan en verde.
+
+En el camino aparecieron dos defectos que ningún gate podía ver porque ninguno es un error técnico:
+el informe anunciaba "Aún no hay una posición media para leer" con la posición impresa al lado, y el
+botón global de "volver arriba" no tenía nombre accesible en ninguna ruta del portal. Los dos
+salieron mirando las capturas, no leyendo los reportes.
+
+## 2026-08-12 — El contrato de contacto de Careers quedó cerrado de punta a punta
+
+Segundo release del día (`950f5bdb4`): el país de residencia pasó a ser requerido también en el
+parser (antes sólo la UI lo exigía), el formulario nativo lo muestra en «Tus datos» junto al correo
+—ya no relegado a una sección genérica— y el selector dejó de mostrar la primera opción como si
+estuviera elegida cuando no hay valor. El sexto y último correo del ciclo (seleccionado) se
+ejercitó en vivo, el scorecard visual formal quedó en PASS con capturas de escritorio y móvil, y la
+revisión de privacidad de los tres campos quedó documentada con dos recomendaciones no bloqueantes.
+De paso se cazó un flake real del CI (timer de verificación de email que dispara tras el teardown).
+
 ## 2026-08-12 — Los emails de hiring y el contacto completo de Careers quedaron VIVOS en producción
 
 Rollout completo en una sesión: el flag de los 6 emails del ciclo de contratación quedó prendido en
@@ -1068,63 +1166,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   en el catálogo del client portal (parity `data_sources` al union TS).
 - Chokepoint único `enforceSeoRunEntitlement` per-org (tier/allowance/budget con env-knobs, consumer-agnóstico
   para UI/Nexa/MCP) verificado con smoke E2E contra PG real. Full suite 10076/0 + build prod verdes.
-
-## 2026-08-05 — Growth SEO (EPIC-022): schema fundacional aplicado + mandato Full API Parity/MCP
-
-- TASK-1299: migración `20260805134439202` aplicada en `greenhouse-pg-dev` — 8 tablas `seo_*` en
-  `greenhouse_growth` (config + serie temporal append-only por `capture_date`), UNIQUEs de idempotencia,
-  triggers anti-mutation, GRANTs least-privilege, `db.d.ts` regenerado. Smoke live verificado con rollback.
-- Directiva del operador: todo el módulo SEO nace Full API Parity y usable por MCP. Se creó `TASK-1645`
-  (lane ecosystem + MCP tools, espejo TASK-1086), exit criterion nuevo en EPIC-022 y DoD consumer-agnóstico
-  en TASK-1301.
-
-## 2026-08-05 — Agent Context Governance: la rotación respeta también el presupuesto de líneas
-
-- Se corrigió `scripts/maintenance/rotate-handoff-context.mjs`: el plan de Handoff ahora conserva las sesiones más
-  recientes hasta cumplir tanto el límite de sesiones como el límite de 600 líneas.
-- Se agregó una prueba de regresión para el caso que rompía CI: 20 sesiones o menos, pero `Handoff.md` demasiado
-  largo. La rotación canónica vuelve a resolver el warning que `docs:context-check:strict` reporta.
-
-## 2026-08-05 — Registro maestro de partnerships y providers
-
-- Se creó [`EFEONCE_PARTNERSHIP_REGISTRY_V1.md`](docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md) como fuente
-  operativa para registrar estados, evidencia, owners y próximos pasos de Google Cloud, Claude, OpenAI, BytePlus,
-  Runway, ElevenLabs, FLUX, AWS, Salesforce, HubSpot y demás relaciones.
-- El refresh de Google Cloud corrige la interpretación comercial: Efeonce está registrada en Partner Network Hub,
-  pero la due diligence sigue en curso, las rutas aparecen como `Registrado` y no hay aún un nivel Select/Premier/
-  Diamond ni capacidad para crear oportunidades.
-- Se documentó el plan de activación: Services/Co-sell como ruta principal, Artificial Intelligence como primera
-  competencia, un pod interno pequeño, dos casos Google-ready y reventa con Ingram/Xvantage como carril paralelo.
-
-## 2026-08-05 — Nexa: se retiró el modo "Compacto" (el chat viejo que sobrevivió al cutover)
-
-- El selector "Modo de Nexa" queda en **Panel** (piso incondicional) y **Lateral**. El modo `dock`
-  ("Compacto") era el panel efímero previo a TASK-1078 — runtime local, sin historial persistido — que
-  quedó como opción del selector después de que el panel ampliable pasó a ser el comportamiento base.
-- Salió también su código muerto en `NexaFloatingButton` (Drawer mobile / Card desktop / adapter local /
-  auto-envío de semilla) y el flag de cutover `NEXA_FLOATING_EXPANDABLE_ENABLED` + su mirror
-  `NEXT_PUBLIC_*`, cuyo único fallback era ese modo. **Env vars huérfanas en Vercel: pendiente borrarlas.**
-- `coerceNexaInteractionMode('dock', …)` → `expandible`, así que ninguna preferencia legacy rompe el
-  layout. Migración `20260805110418197`: filas `dock` → NULL + CHECK cerrado a `('expandible','lane')`,
-  aplicado y verificado contra Cloud SQL (0 filas afectadas; ningún usuario estaba en ese modo).
-- Hallazgo documentado como deuda: el `focusRef` + pregunta semilla de TASK-1182 vivía **solo** en el
-  panel legacy, así que el CTA "Pregúntale a Nexa" ya estaba inoperante en producción antes del retiro
-  (el modo default era `expandible`). Los CTAs siguen abriendo el chat; portar el ancla al runtime
-  persistente queda pendiente.
-- Gates: `pnpm local:check`, `pnpm test` (10.064 pass) y `pnpm build` verdes; menú verificado en runtime
-  con Playwright (solo Panel/Lateral, switch a Lateral y vuelta con PATCH 200, cero errores de consola).
-
-## 2026-08-04 — Globe: inventario de imagen por ruta para GPT Image 2, Seedream y Nano Banana
-
-- La skill compartida `greenhouse-globe-model-fleet` ahora enlaza cuatro fichas machine-readable de imagen, espejadas
-  para Codex y Claude: GPT Image 2, Seedream 5 Pro, Nano Banana 2 y Nano Banana Pro.
-- “Imagen 2 de ChatGPT” quedó resuelto como OpenAI `gpt-image-2`; Google `imagen-2` no tiene routeId, adapter ni
-  binding en Globe y no se documenta como integración.
-- El runtime auditado conserva identidades separadas: Seedream T2I (`ref/still/rrss-v1`) por Fal está disponible;
-  Seedream Edit (`ref/still/reference-v1`) tiene adapter/provider cableados pero el último reader readback lo devuelve
-  `gated` por binding deshabilitado; Nano Banana Pro usa `gemini-3-pro-image` en `global`; Nano Banana 2 usa
-  `gemini-3.1-flash-image` en `global`; GPT Image 2 usa `openai.gpt-image-2` con `poll`.
-- Las fichas declaran capacidades de proveedor que todavía no son rutas públicas: edición multipart de OpenAI, edición/
-  video-to-image de Nano Banana y Seedream 5 Lite. También conservan como blocker el circuito `not_found` de Nano
-  Banana Pro. No cambió el runtime de Globe, secrets, bindings, rates, deploy ni disponibilidad; el reader sigue siendo
-  la autoridad live.

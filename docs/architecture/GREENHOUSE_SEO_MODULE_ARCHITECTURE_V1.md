@@ -241,7 +241,13 @@ cablea al cliente público compartido"; el camino correcto es `TASK-1631`).
   - **"Alta impresión" es un percentil de la propia organización** (default P75), no un número absoluto: un sitio de 100 impresiones/día y uno de 1M no comparten umbral. Con piso estadístico (bajo ~10 impresiones la posición media no es interpretable).
   - **Score = clics incrementales estimados**: `impresiones × max(0, CTR_objetivo − CTR_actual)`. Las impresiones de GSC **ya son demanda medida** — y de la propia SERP, mejor que un volumen estimado por un tercero. La curva de CTR por posición se **deriva de los datos de la propia org**, de modo que absorbe sola el efecto de los AI Overviews en ese sitio; hay una curva pública de fallback sólo para posiciones sin datos propios.
   - **Canibalización se marca, no se descarta** (`cannibalized` + `competingPages`): una query con >1 página es una oportunidad de **consolidación**, no de optimización.
-  - Volumen/dificultad de DataForSEO Labs es **enriquecimiento**, no el corazón: mientras no exista la capability que los trae y los persiste (el registry de `TASK-1300` ya está, falta fetch + columnas + reader), el reader responde `market: 'unavailable'` con el striking-distance completo.
+  - Volumen/dificultad de DataForSEO Labs es **enriquecimiento**, no el corazón. **IMPLEMENTADO (TASK-1661, 2026-08-13):** `market` deja de estar cableado y pasa a `'available'` cuando hay al menos una captura para las keywords de esa lectura. El striking-distance sigue siendo demanda **medida** de GSC y no depende del enriquecimiento: con `market: 'unavailable'` el reader entrega igual la lista completa.
+- `readKeywordMarketData({ keywords, locationCode, languageCode })` → **IMPLEMENTADO (TASK-1661, 2026-08-13)** en `src/lib/growth/seo/keyword-market-data.ts`. Reader canónico del dato de mercado (lente ◑ **estimada**, ciclo de refresh **mensual** del proveedor). Consumers: `readKeywordOpportunities`, lane `/growth/seo/keyword-market-data`, MCP `get_seo_keyword_market_data` y —a futuro— `TASK-1664`/`TASK-1662`. Contratos duros:
+  - 🔴 **La métrica de mercado es UN solo hecho de `(keyword, país, idioma, as-of)`, con SSOT en `greenhouse_growth.seo_keyword_market_data`.** No cuelga de `seo_targets` ni de `seo_keyword_set_members`: no depende de si la keyword se sigue ni de quién la descubrió. La tabla nace **multi-productor** — 1661 escribe desde `keyword_overview`, y `TASK-1664`/`TASK-1662` escribirán el `keyword_info` que ya viene **inline y pagado** en sus respuestas de discovery/gap. **NUNCA** crear una segunda tabla de volumen/dificultad ni un segundo adapter de `keyword_overview`.
+  - **El mercado se deriva del target, jamás del caller** (`readKeywordMarketDataForTarget`): el volumen de una keyword no es global, y dejar que el consumer elija el país produce cifras distintas para lo mismo en dos superficies.
+  - **Selección explícita y acotada de keywords.** No existe el modo "todas las keywords de la org": este reader es un lookup, y abrirlo convertiría una lectura en un barrido del corpus de un tenant.
+  - 🔴 **Tres estados, no dos** (lección del smoke real 2026-08-13): **fila ausente** = nunca preguntamos · **fila con `NULL`** = preguntamos y el proveedor no tiene el dato · **`0`** = el proveedor declara demanda cero. Colapsar los dos primeros produjo una **fuga de costo**: sin fila, el pre-check de frescura nunca veía esas keywords y las **re-compraba en cada corrida, para siempre**. **NUNCA** proyectar la ausencia como `0`.
+  - `competition` es competencia **PAGA** (Google Ads) y `keyword_difficulty` es dificultad **orgánica**. **NUNCA** renombrar una por la otra.
 - `readSeoAeoGap(targetId)` → **derived read cross-módulo — IMPLEMENTADO (TASK-1305, 2026-08-05)** en `src/lib/growth/seo/gap/read-seo-aeo-gap.ts`. V1: lente SEO = `seo_gsc_daily` (posición medida ponderada por impresiones, ventana 28d) × lente AEO = `grader_scores` del último run reportable del org (granularidad `domain`; TASK-1311 la refina a URL). Cruce EN MEMORIA por `organization_id` (boundary §1.1: cero JOIN/VIEW/FK cross-motor, verificado por test dedicado); clasificador puro `classifyQuadrant` (página 1 × score ≥ 50, umbrales overridables, jamás promediados); degradación honesta `no_seo_data`/`no_aeo_data`. Cuando TASK-1303 aterrice, `seo_rank_snapshots` se suma como lente de mercado sin cambiar el contrato. Primer resultado live: Berel #1.75 orgánico × AEO 44.5 → `riesgo` (autoridad sin citabilidad — el CTA cruzado al AEO funcionando).
 
 **Readers de la pantalla ancla (TASK-1307, 2026-08-06/07)** — `src/lib/growth/seo/performance/`. Lane `/api/platform/ecosystem/growth/seo/{performance,performance-catalog}` + MCP tools `get_seo_performance` / `get_seo_performance_catalog` en el mismo PR (mandato parity+MCP).
@@ -259,6 +265,19 @@ cablea al cliente público compartido"; el camino correcto es `TASK-1631`).
 - `readSeoOverviewSidebar(orgId)` → tres regiones (salud del sitio · movers WoW · cruce AEO) que **degradan de forma INDEPENDIENTE** (`Promise.allSettled` + `{ ok } | { ok:false, reason }` por región): que no exista auditoría no puede tumbar los movers ni el cruce. Compone `readSiteAuditReport` + `readRankEvolution` + `readSeoAeoGap`; no consulta las tablas por su cuenta.
 
 Exposición parity del mismo PR (mandato del dominio): lane `/api/platform/ecosystem/growth/seo/overview-kpis` + MCP tool `get_seo_overview_kpis`.
+
+**Resolución de target por organización — el mercado es EXPLÍCITO (ISSUE-153, 2026-08-13).**
+`resolveSeoTargetForMarket` / `resolveUnambiguousSeoTarget` (`src/lib/growth/seo/resolve-target.ts`)
+son el ÚNICO camino para resolver el target de una org. **NUNCA** volver a un
+`ORDER BY created_at DESC LIMIT 1` inline: con dos mercados activos servía un país al azar sin
+declararlo (había 4 copias del patrón). Contrato: 1 activo → `resolved` (la respuesta **declara** el
+mercado servido en `meta.servedMarket`); N activos + `?market=` (ISO-2 o `location_code`) →
+`resolved`; N sin selector → **409 `multiple_markets`** con la lista, jamás elección silenciosa;
+selector sin match → 409 `market_not_found`. Las posiciones de mercados distintos **NUNCA se
+promedian** (son SERPs distintos). Las 9 MCP tools de lectura aceptan `market` opcional. Superficies
+sin selector de mercado degradan a su empty state honesto con el conflicto observable (warning
+Sentry); el picker de mercado en la UI admin es follow-up de producto para cuando una org
+multi-mercado se materialice (Efeonce CL/MX/CO/PE es el caso).
 
 Todo reader retorna `{ ok: true, ... } | { ok: false, errorCode, status }` (espejo `SearchConsoleAnalyticsResult`).
 
@@ -284,7 +303,13 @@ Cloud Scheduler + ops-worker (async-critical), nunca Vercel cron.
   - **Resiliencia per-org:** una org que falla se registra y el batch continúa; un token revocado de un cliente no puede impedir capturar la serie de los demás.
   - Gate: `GROWTH_SEO_ENABLED`. ⚠️ **Lo leen DOS runtimes y el flip es de TRES pasos**: (1) el ops-worker (`deploy.sh`) para el batch diario; (2) **Vercel**, que gatea el lane ecosystem/MCP (TASK-1645) y el reader del cruce SEO↔AEO (TASK-1305); (3) despausar el scheduler, cuyo estado de pausa se declara en el 5.º argumento de `upsert_scheduler_job` y se re-aplica en cada deploy. **Apagarlo sólo en el worker NO apaga el módulo**: el lane de Vercel sigue sirviendo, así que un rollback que sólo toque `deploy.sh` queda incompleto y parece exitoso.
 
-**Reliability signals** (`/admin/operations`, subsistema Growth Health): `seo.rank.capture_lag` (steady=0), `seo.audit.stuck_tasks`, `seo.provider.cost_over_budget`.
+- **Datos de mercado por keyword (TASK-1661, 2026-08-13 — code complete, scheduler PAUSADO + flag OFF):** Cloud Scheduler `ops-seo-keyword-market-data` (`0 8 15 * *` CLT) → `POST /seo/keyword-market-data/capture-batch` en ops-worker → `runKeywordMarketDataBatch` → `captureKeywordMarketData(targetId)` por target.
+  - ⚠️ **MENSUAL y a mitad de mes, no diario.** El proveedor refresca las métricas de keyword una vez al mes siguiendo el ciclo de Google Ads: un cron diario pagaría 30 veces por el mismo número, y el día 1 traería el ciclo viejo al mismo precio.
+  - **Dos frenos independientes:** el scheduler nace PAUSADO **y** `GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED` nace `false`. Despausar sin prender el flag no gasta (el command devuelve `disabled`); prenderlo sin despausar tampoco. El flag es **subordinado** a `GROWTH_SEO_ENABLED` y vive **sólo en el ops-worker** — en Vercel es inerte.
+  - **Gate de costo:** pre-check de **frescura** (no de existencia) ANTES del proveedor + `enforceSeoRunEntitlement` con el estimado del batch + spend fence cada 10 llamadas + `dryRun` que reporta la fórmula y el costo sin gastar. El ledger lo escribe el **transporte**.
+  - **Costo medido (2026-08-13):** 31 keywords de Berel = 1 llamada = **USD 0.0157**; una segunda corrida dentro del mismo ciclo mensual cuesta **USD 0**.
+
+**Reliability signals** (`/admin/operations`, subsistema Growth Health): `seo.rank.capture_lag` (steady=0), `seo.audit.stuck_tasks`, `seo.provider.cost_over_budget`, `seo.market_data.freshness` (TASK-1661; umbral tomado de la MISMA constante que el pre-check de gasto, para que señal y gasto no puedan divergir — sin dato es `warning`, no `error`, porque con el flag OFF ese es el estado correcto).
 
 ---
 

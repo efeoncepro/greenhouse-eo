@@ -37,6 +37,7 @@ import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import { type KeywordOpportunitiesResult, type KeywordOpportunity } from './contracts'
+import { normalizeMarketKeyword, readKeywordMarketData } from './keyword-market-data'
 
 const DEFAULT_WINDOW_DAYS = 28
 const DEFAULT_MIN_POSITION = 8
@@ -188,14 +189,23 @@ export const readKeywordOpportunities = async (
   const limit = Math.max(1, options.limit ?? DEFAULT_LIMIT)
 
   try {
-    const targets = await runGreenhousePostgresQuery<{ organization_id: string }>(
-      `SELECT organization_id FROM greenhouse_growth.seo_targets WHERE seo_target_id = $1`,
+    // TASK-1661: el mercado se resuelve con el target, porque el volumen de una keyword NO es
+    // global — el de Chile no es el de México — y sin país la cifra no es correcta para nadie.
+    const targets = await runGreenhousePostgresQuery<{
+      organization_id: string
+      location_code: string
+      language_code: string
+    }>(
+      `SELECT organization_id, location_code, language_code
+         FROM greenhouse_growth.seo_targets
+        WHERE seo_target_id = $1`,
       [seoTargetId]
     )
 
-    const organizationId = targets[0]?.organization_id
+    const target = targets[0]
+    const organizationId = target?.organization_id
 
-    if (!organizationId) {
+    if (!organizationId || !target) {
       return { ok: false, errorCode: 'target_not_found', status: null }
     }
 
@@ -226,6 +236,16 @@ export const readKeywordOpportunities = async (
     const curve = await readOrgCtrCurve(organizationId, windowDays)
     const targetCtr = expectedCtrAt(targetPosition, curve)
 
+    // TASK-1661 — enriquecimiento de mercado (lente ◑ estimada). Se pide SÓLO por las keywords
+    // que el striking-distance ya seleccionó: una selección explícita y acotada, nunca una
+    // consulta libre sobre toda la org. Si no hay dato, el reader sigue entregando el
+    // striking-distance completo (que es demanda MEDIDA y no depende de esto).
+    const marketData = await readKeywordMarketData({
+      keywords: rows.map(row => row.keyword ?? '').filter(Boolean),
+      locationCode: target.location_code,
+      languageCode: target.language_code
+    })
+
     const opportunities: KeywordOpportunity[] = rows
       .map(row => {
         const impressions = Number(row.impressions)
@@ -233,6 +253,10 @@ export const readKeywordOpportunities = async (
         const position = Number(row.weighted_position)
         const competingPages = Number(row.competing_pages)
         const ctr = impressions > 0 ? clicks / impressions : 0
+
+        // Ausencia en el Map = "no lo consultamos", que se proyecta `null`. NUNCA 0: el
+        // contrato separa "sin dato" de "nadie lo busca" y colapsarlos borraría esa diferencia.
+        const market = marketData.byKeyword.get(normalizeMarketKeyword(row.keyword ?? ''))
 
         return {
           keyword: row.keyword ?? '',
@@ -247,8 +271,8 @@ export const readKeywordOpportunities = async (
           quickWin: position <= 10,
           cannibalized: competingPages > 1,
           competingPages,
-          searchVolume: null,
-          difficulty: null
+          searchVolume: market?.searchVolume ?? null,
+          difficulty: market?.keywordDifficulty ?? null
         }
       })
       .sort((a, b) => b.estimatedClickGain - a.estimatedClickGain)
@@ -259,10 +283,12 @@ export const readKeywordOpportunities = async (
       seoTargetId,
       windowDays,
       impressionsThreshold,
-      // TASK-1300 (family registry DataForSEO Labs) aún no aterrizó. El striking-distance
-      // NO depende de eso — se calcula con datos medidos de GSC — así que el reader
-      // entrega valor completo y sólo declara que el enriquecimiento no está.
-      market: 'unavailable',
+      // TASK-1661: deja de estar cableado. `available` cuando hay al menos una captura de
+      // mercado para las keywords de esta lectura; `unavailable` cuando no se ha consultado
+      // nada todavía. El striking-distance NO depende de esto — se calcula con datos MEDIDOS
+      // de GSC — así que el reader entrega valor completo en ambos casos y sólo declara si el
+      // enriquecimiento estimado (◑) está o no.
+      market: marketData.market,
       opportunities
     }
   } catch (error) {

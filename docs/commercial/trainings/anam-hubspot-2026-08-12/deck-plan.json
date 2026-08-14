@@ -235,7 +235,7 @@
       "slots": {
         "leftTitle": "Clasifica el hecho y el intent",
         "rightTitle": "Deriva al equipo con contexto",
-        "presentation": { "mode": "proposal" },
+        "presentation": { "mode": "neutral" },
         "rows": [
           { "left": { "lead": "Cotizar", "body": "Necesidad, alcance, servicio o decisión de compra." }, "right": { "lead": "Comercial", "body": "Cuenta, negocio, etapa y próximo paso esperado." } },
           { "left": { "lead": "Seguimiento de servicio", "body": "Uso, entrega, continuidad o solicitud sobre un Service." }, "right": { "lead": "Servicios", "body": "Service, fecha, solicitud y respuesta pendiente." } },
@@ -428,7 +428,11 @@
       "slideId": "contraportada",
       "contentType": "back-cover",
       "template": "BackCoverFull",
-      "slots": {}
+      "slots": {
+        "partnerBadge": {
+          "src": "../../../../../public/branding/partners/hubspot/solution-partner/badge-orange-spp-hubspot.svg"
+        }
+      }
     }
   ]
 }

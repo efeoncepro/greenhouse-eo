@@ -170,6 +170,18 @@ jq '.qualityFindings, .runtimeSummary' .captures/<run>/manifest.json
   ```
   ⚠️ El script **EXIGE** `AGENT_AUTH_EMAIL` — **no tiene default** (aborta con `ERROR: AGENT_AUTH_EMAIL is required.`). Para que la expiración falle loud en vez de producir evidencia falsa, declara siempre `assertions: [{ kind: 'noLoginRedirect' }]` + `readiness.absentSelectors: ['[data-testid="login-card"]']`.
 - **Auth**: no re-fumbles el setup. GVC resuelve agent-auth en `scripts/frontend/lib/auth.ts`; para ad-hoc, `node scripts/playwright-auth-setup.mjs` genera `.auth/storageState.json` (personas: superadmin / collaborator / client — usa la de menor privilegio que represente el caso).
+- **Superficie gateada por organización: la persona tiene que ser DE esa organización.** Una persona cliente genérica no la atraviesa — recibe la card de bloqueo, la captura muere en el marker y el gate reporta BLOCK como si fuera defecto de producto (mismo diagnóstico falso que capturar con sesión de operador). Declara la identidad en el scenario (`requiresStorageState: '.auth/storageState.<persona>.json'`) y emítela con el email correcto:
+  ```bash
+  AGENT_AUTH_EMAIL=<persona-de-esa-org> AGENT_AUTH_STORAGE_PATH=.auth/storageState.<persona>.json \
+    node scripts/playwright-auth-setup.mjs
+  ```
+  🔴 **Dónde encontrar esa persona:** el mapeo usuario↔organización **NO** está en `greenhouse_core.client_users` (enlaza por `client_id`) ni en `clients`/`organizations` — ninguna expone la FK de la otra. Vive en **`greenhouse_serving.session_360`**, que es donde el runtime mismo lo resuelve (`src/lib/tenant/identity-store.ts`):
+  ```sql
+  SELECT email, organization_id, tenant_type, active FROM greenhouse_serving.session_360
+   WHERE organization_id = '<org>';
+  ```
+  Buscarlo en las otras tablas cuesta media hora y termina en `column does not exist` (medido, 2026-08-13). Sonda lista: `scripts/growth/_sanity-seo-client-population.ts`.
+- **Un `startSelector`/`selector` atado a una copy se rompe cuando la copy mejora.** Un scenario que busca `button:has-text("Descargar informe")` muere con timeout el día que una auditoría manda renombrar ese botón — y el síntoma (captura fallida) no se parece a la causa (cambió un string). **Ata los steps a `[data-capture="…"]`**, que es un contrato explícito, y agrega el marker al componente si no existe. Caso fuente: TASK-1310, el trigger de impresión del informe.
 - **Staging tras SSO**: `pnpm fe:capture ... --env=staging` ya inyecta el bypass; ad-hoc curl/Playwright a `.vercel.app` requiere header `x-vercel-protection-bypass`.
 - **Steps mutating** (`fill`/`press`/`click` que dispara Server Action): requieren `mutating: true` + `safeForCapture: true`. **⚠️ Crean entidades reales en staging.** Read-only por default.
 - **Labels de `mark`**: `kebab-case`, únicos por scenario (la validación rompe build si duplicas), empezar con `initial-*`.

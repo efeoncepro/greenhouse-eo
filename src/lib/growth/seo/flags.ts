@@ -29,3 +29,26 @@ const isTrue = (value: string | undefined): boolean => value?.trim().toLowerCase
 
 /** Kill switch del módulo SEO. Default OFF. */
 export const isSeoModuleEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => isTrue(env[GROWTH_SEO_FLAG])
+
+/**
+ * TASK-1661 — Captura de datos de mercado por keyword (DataForSEO Labs). Default OFF.
+ *
+ * 🔴 **Prender esto empieza a gastar.** A diferencia de `GROWTH_SEO_ENABLED`, que gatea
+ * lecturas y batches ya presupuestados, este flag habilita una corrida que le paga al
+ * proveedor por cada fila devuelta. Nace apagado y se enciende por organización.
+ *
+ * ⚠️ **Runtime: `ops-worker` ÚNICAMENTE** (el fetch es async). El SoT es
+ * `services/ops-worker/deploy.sh`, cuyos `--set-env-vars` son DESTRUCTIVOS: aplicarlo sólo
+ * en vivo con `--update-env-vars` lo borra en el próximo deploy, en silencio. Declararlo en
+ * Vercel no sirve de nada — ahí no corre el fetch.
+ *
+ * Es SUBORDINADO a `GROWTH_SEO_ENABLED`: con el módulo apagado la captura no corre aunque
+ * este flag esté ON. Dos condiciones independientes, no una.
+ *
+ * Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md (gate docs:closure-check).
+ */
+export const GROWTH_SEO_KEYWORD_MARKET_DATA_FLAG = 'GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED'
+
+/** Gate de la captura de mercado. Default OFF: prenderlo compromete gasto de proveedor. */
+export const isSeoKeywordMarketDataEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_SEO_KEYWORD_MARKET_DATA_FLAG])

@@ -1,110 +1,106 @@
 {
   "taskId": "TASK-1310",
   "scenario": "growth-seo-client, growth-seo-report, growth-seo-report-print",
-  "reviewedAt": "2026-08-08",
-  "reviewer": "claude (auditoría premium 10:25–10:26; supersede el scorecard de las 10:03)",
+  "reviewedAt": "2026-08-12",
+  "reviewer": "claude (revisión visual de 3 superficies × 2 viewports sobre las capturas del 2026-08-12 23:40–23:44, con sesión de cliente real de la organización contratada)",
   "supersedes": {
     "reviewedAt": "2026-08-08",
-    "verdict": "pass",
-    "average": 4.61,
-    "why": "Se generó sobre la corrida de las 10:03, antes de la última ronda de cambios. La auditoría de las 10:25 lo contradice de forma directa: afirmaba 'axe sin violaciones' cuando el dashboard falla axe por contraste en tabs, y afirmaba economía de superficies 4.7 cuando la gramática real es card + strip + mini superficies + contenedores de chart/table. Un scorecard verde sobre una task con auditoría BLOCK abierta es el peor artefacto posible: da por acabado lo que está congelado."
+    "verdict": "blocked",
+    "average": 2.29,
+    "why": "Ese scorecard juzgaba capturas de las 10:25 del 2026-08-08 y era correcto para ese estado. El commit 5f622386d (19:29 del mismo día) ejecutó los lotes de la auditoría premium y nadie volvió a medir: el scorecard quedó describiendo una UI que ya no existía. La medición del 2026-08-12 sobre el código vigente contradice sus dos hallazgos técnicos: el dashboard daba exitCode 1 con 2 violaciones axe de contraste en tabs y 15 warnings de targets de 23 px; hoy da exitCode 0 con qualityFindings vacío en desktop y mobile."
   },
   "evidence": {
-    "desktop": ".captures/2026-08-08T10-25-07_growth-seo-client/01-desktop/frames/01-summary.png",
-    "mobile": ".captures/2026-08-08T10-25-07_growth-seo-client/02-mobile/frames/01-summary.png",
-    "dossier": "docs/ui/reviews/TASK-1310-growth-seo-client-dashboard-report-artifact-audit-2026-08-08.md"
+    "desktop": ".captures/2026-08-12T23-40-46_growth-seo-client/01-desktop/frames/01-summary.png",
+    "mobile": ".captures/2026-08-12T23-40-46_growth-seo-client/02-mobile/frames/02-evolution.png",
+    "reportWeb": ".captures/2026-08-12T23-43-21_growth-seo-report/01-desktop/frames/01-web.png",
+    "reportPrint": ".captures/2026-08-12T23-43-58_growth-seo-report-print/01-desktop/frames/01-attachment.png",
+    "focus": ".captures/2026-08-12T23-40-46_growth-seo-client/01-desktop/frames/05-keyboard-report-cta-focus.png",
+    "dossier": ".captures/2026-08-12T23-40-46_growth-seo-client/review-dossier.md",
+    "auditSource": "docs/ui/reviews/TASK-1310-growth-seo-client-dashboard-report-artifact-audit-2026-08-08.md"
   },
   "technicalBaseline": {
-    "dashboard": "exitCode 1 — 2 violaciones axe de contraste en tabs + 15 warnings de targets de 23 px",
-    "reportWeb": "exitCode 0 — 10 warnings de targets de 23 px; runtime limpio",
-    "reportPrint": "exitCode 0 — qualityFindings vacío; es la superficie más sobria de las tres"
+    "dashboard": "exitCode 0 — qualityFindings VACÍO en desktop y mobile, con sesión de cliente real de la organización contratada; probes de teclado con anillo de foco visible en el CTA del informe y en el cambio de sección",
+    "reportWeb": "exitCode 0 — qualityFindings vacío en ambos viewports tras nombrar el FAB global",
+    "reportPrint": "exitCode 0 — qualityFindings vacío en ambos viewports; es la superficie más sobria de las tres"
   },
+  "evidenceCaveats": [
+    "La corrida atraviesa el gate per-org con la persona cliente de la organización contratada (`agent-berel-client@…`) sobre dato vivo, no sobre fixture: el resumen mide 31 keywords, 19 en primera página y 61% de cobertura; la evolución declara 6 de 90 días. Queda pendiente la corrida equivalente contra staging con el deployment vigente.",
+    "El caso más común de la población NO está cubierto por esta evidencia: un cliente con Search Console conectado y captura de rank todavía sin correr —el día 1 de todo cliente nuevo— renderiza el dashboard con el KPI principal en 'sin dato' y el Quadrant poblado, porque una y otro leen fuentes distintas. Ningún tenant actual puede producir ese estado. Follow-up declarado en la task.",
+    "El mapa apila los puntos en la coordenada AEO del dominio porque las keywords todavía no tienen citabilidad propia medida. Es el tratamiento honesto que pidió la auditoría (sin jitter y sin score fusionado) y la superficie lo declara en palabras, pero con 50 keywords se lee como una columna: la lectura fina la da la tabla priorizada, no el mapa."
+  ],
   "dimensions": {
     "hierarchy": {
-      "score": 2.8,
-      "rationale": "El h1 y el KPI primario existen y se leen, pero los bloques posteriores vuelven a competir por atención en vez de subordinarse a la lectura dominante.",
-      "evidence": "dashboard desktop 01-summary; auditoría §3",
-      "nextAction": "Subordinar señales, evolución y quadrant a la lectura ejecutiva: una sola pieza gana el fold y el resto entra como apoyo, no como pares."
+      "score": 4.6,
+      "rationale": "El veredicto gana el fold y nombra el dato ('Posición media 13.3 con señales SEO × AEO por revisar'); la evidencia y la cobertura entran subordinadas, no como pares que compiten.",
+      "evidence": "dashboard desktop 01-summary"
     },
     "proportions": {
-      "score": 2.4,
-      "rationale": "La proporción no expresa importancia: bloques de peso visual similar cargan información de rango muy distinto, y la evolución ocupa un área grande con 8 de 90 días medidos.",
-      "evidence": "dashboard desktop 02-evolution; auditoría §3 (Charts 2.1)",
-      "nextAction": "Dimensionar cada bloque por su carga informativa real y reducir el área de evolución mientras la cobertura sea parcial."
+      "score": 4.5,
+      "rationale": "Cuando la muestra es escasa la sección cambia de forma en vez de estirar un gráfico vacío: 5 de 30 días se presentan como cortes observados, no como una línea que insinúa tendencia.",
+      "evidence": "dashboard desktop 02-evolution"
     },
     "rhythm": {
-      "score": 2.2,
-      "rationale": "Las pausas entre bloques son uniformes, así que no hay respiración que marque cambio de nivel; quadrant y report serializan demasiada información seguida.",
-      "evidence": "dashboard desktop 04-quadrant; report web desktop; auditoría §3 (Densidad y ritmo 2.2)",
-      "nextAction": "Diferenciar el espaciado entre secciones y dentro de sección para que el salto de nivel se lea sin bordes."
+      "score": 4.5,
+      "rationale": "El salto de nivel se lee por espaciado y filetes, sin encerrar cada bloque en su propio contenedor.",
+      "evidence": "dashboard desktop 01-summary; report web desktop"
     },
     "density": {
-      "score": 2.2,
-      "rationale": "Coexisten zonas vacías (evolución con datos escasos) y muros densos (tabla de 50 filas con zebra y chips) en la misma superficie.",
-      "evidence": "dashboard 03-evolution-table; auditoría §3",
-      "nextAction": "Convertir la tabla en ranking/cola con densidad declarada y resolver la escasez de la serie como cobertura, no como gráfico grande y vacío."
+      "score": 4.5,
+      "rationale": "La tabla declara su alcance ('Mostrando las 4 señales medidas') y el detalle completo queda accesible sin convertir la pantalla en un muro.",
+      "evidence": "dashboard desktop 03-quadrant"
     },
     "depth": {
-      "score": 2.0,
-      "rationale": "Cada bloque intenta demostrar importancia con borde, fondo, rail, icono, color o elevación al mismo tiempo; la profundidad deja de significar algo cuando todos los niveles la usan.",
-      "evidence": "dashboard desktop 01-summary; report web desktop; auditoría §3",
-      "nextAction": "Reservar elevación y contorno para un solo nivel jerárquico y resolver el resto con espaciado y tipografía."
+      "score": 4.5,
+      "rationale": "La elevación quedó reservada a un solo nivel y el hover lift del informe se retiró: un entregable que se reenvía no promete una acción al pasar el mouse.",
+      "evidence": "report web desktop"
     },
     "surfaceEconomy": {
-      "score": 1.8,
-      "rationale": "Card principal + strip contenido + mini superficies + contenedores de chart y table: cuatro planos anidados donde la tarea necesita uno.",
-      "evidence": "dashboard desktop 01-summary; auditoría §3 (peor dimensión del diagnóstico)",
-      "nextAction": "Colapsar a una hoja de análisis por sección: un plano contenido por tarea, sin card dentro de card."
+      "score": 4.5,
+      "rationale": "La pila de card + strip + mini superficies + contenedores que puntuó 1.8 desapareció: hoy cada sección es una hoja con divisores de filete. Queda un solo canvas contenido por superficie, que es el bloque de lectura ejecutiva y se justifica como pieza dominante.",
+      "evidence": "dashboard desktop 01-summary; report web desktop"
     },
     "visualImpact": {
-      "score": 2.0,
-      "rationale": "La evidencia es correcta pero no hay un momento visual dominante; la superficie se lee como un conjunto de módulos equivalentes.",
-      "evidence": "dashboard desktop 01-summary; auditoría §3 (veredicto)",
-      "nextAction": "Elegir y construir el momento dominante de la pantalla (la lectura de visibilidad) y bajar deliberadamente el peso de todo lo demás."
+      "score": 4.5,
+      "rationale": "El mapa SEO × AEO es el momento dominante y es específico de este producto; no es un gráfico intercambiable.",
+      "evidence": "dashboard desktop 03-quadrant"
     },
     "typography": {
-      "score": 2.6,
-      "rationale": "Exceso de overline/versalitas y textos auxiliares repetidos; en móvil la lectura se comprime y pierde la escala de niveles.",
-      "evidence": "dashboard mobile 01-summary; auditoría §3",
-      "nextAction": "Reducir el uso de overline a un solo nivel, eliminar auxiliares duplicados y verificar la escala a 390px."
+      "score": 4.6,
+      "rationale": "Un solo eyebrow por superficie, títulos con balance y párrafos con pretty wrap; los auxiliares dejaron de repetir la misma promesa.",
+      "evidence": "dashboard desktop 01-summary"
     },
     "color": {
-      "score": 2.7,
-      "rationale": "Los estados están diferenciados, pero el color aparece en todos los niveles a la vez y deja de jerarquizar; además el dashboard falla axe por contraste en las tabs.",
-      "evidence": "dashboard 05-keyboard-report-cta-focus.axe.json (2 violaciones); auditoría §3",
-      "nextAction": "Corregir el contraste de tabs a AA y limitar el color semántico a la capa de estado, no a la de contenedor."
+      "score": 4.5,
+      "rationale": "El color quedó como señal semántica (riesgo, invisible) y los washes del cuadrante son de apoyo; ningún estado depende sólo del color.",
+      "evidence": "dashboard desktop 03-quadrant"
     },
     "iconography": {
-      "score": 2.5,
-      "rationale": "Los glyphs son consistentes en familia, pero se usan como recurso de énfasis en bloques que no lo necesitan, sumando ruido a la gramática modular.",
-      "evidence": "dashboard desktop 01-summary; auditoría §3",
-      "nextAction": "Quitar iconos de los bloques que ya tienen etiqueta y contexto; conservarlos donde distinguen categoría."
+      "score": 4.6,
+      "rationale": "AEO usa estrella única en todas las superficies de la task; el resumen usa un icono analítico. Cada estado lleva icono + texto.",
+      "evidence": "dashboard desktop 03-quadrant; report web desktop"
     },
     "responsive": {
-      "score": 2.2,
-      "rationale": "En móvil el chrome fijo del portal tapa el inicio de Evolución, y el report es demasiado largo para escanear en una columna.",
-      "evidence": "dashboard mobile 02-evolution; report mobile; auditoría §3 y §4.1",
-      "nextAction": "Compensar el offset del chrome fijo en el scroll a sección y acortar el report móvil con una estructura de dos densidades."
+      "score": 4.4,
+      "rationale": "El contenido SEO refluye correctamente en 390 px —la evolución pasa a lista apilada y el informe a bloques— pero el chrome global del portal sigue aportando warnings de overflow en su nav off-canvas, y en mobile los FAB flotantes se montan sobre el borde derecho del contenido.",
+      "evidence": "dashboard mobile 02-evolution; report mobile 01-report",
+      "nextAction": "Cerrar la deuda de chrome global (nav off-canvas y dock de FAB en compact) en su dueño compartido, no con un parche local en las superficies SEO."
     },
     "motion": {
-      "score": 1.9,
-      "rationale": "Hay animación técnica (stagger, reveal) pero no feedback de decisión; el hover lift agrega ruido sin confirmar nada al usuario.",
-      "evidence": "scenario premium con reduced-motion check; auditoría §3",
-      "nextAction": "Retirar el lift decorativo y dejar motion solo donde confirma cambio de estado, selección o llegada de datos."
+      "score": 4.5,
+      "rationale": "El motion comunica cambio de sección y cobertura; se retiró el lift decorativo y reduced-motion apaga entradas sin dejar estados a medias.",
+      "evidence": "probes de teclado del manifest; report web desktop"
     },
     "fidelity": {
-      "score": 2.8,
-      "rationale": "La dirección Evidence Narrative se reconoce, pero el report hereda la densidad del dashboard en vez de convertirse en artifact, y el wireframe todavía describe un masterDetail que la implementación descartó.",
-      "evidence": "report web desktop; auditoría §4.1 hallazgo 2 (drift documental)",
-      "nextAction": "Corregir el drift del wireframe a composition single + tabs y diferenciar el report como documento, no como copia del tablero."
+      "score": 4.5,
+      "rationale": "Lo construido corresponde a la dirección Editorial Evidence Canvas aprobada en la auditoría §7: canvas abierto, evidencia agrupada por fuente y provenance junto a la lectura que explica.",
+      "evidence": "dashboard desktop 01-summary; report print desktop"
     },
     "genericTemplateResistance": {
-      "score": 2.0,
-      "rationale": "Las tres superficies repiten la misma gramática de card + strip + módulos coloreados, que es exactamente la firma de un tablero generado automáticamente.",
-      "evidence": "dashboard, report web y print — auditoría §2 (columna 'Lectura visual')",
-      "nextAction": "Darle a cada superficie una forma propia derivada de su tarea, en vez de reinstanciar la misma plantilla de bloques tres veces."
+      "score": 4.6,
+      "rationale": "No se lee como un dashboard de plantilla: el vocabulario (lectura dominante, señales medidas, cortes observados, AEO por dominio) es del dominio y declara los límites del dato en vez de rellenarlos.",
+      "evidence": "dashboard desktop 03-quadrant; report print desktop"
     }
   },
-  "verdict": "blocked",
-  "gateNote": "Este scorecard hace fallar `pnpm ui:quality --task TASK-1310` a propósito. Es el estado correcto: la task tiene `UI ready: no` y una auditoría premium abierta con release gate bloqueado. El gate se desbloquea con evidencia GVC nueva (captura limpia, axe limpio, targets correctos, sin overflow) y una revisión visual que confirme la dirección — no con la sola ausencia de errores."
+  "verdict": "pass",
+  "gateNote": "Puntuado sobre frames mirados uno por uno, no sobre el JSON del manifest. El defecto que decidió esta revisión no aparecía en ningún gate: el informe web anunciaba 'Aún no hay una posición media para leer' con #13.3 impreso al lado, con exitCode 0. Está corregido en el commit cb8d60b9b y verificado en la captura posterior. `responsive` queda en 4.4 a propósito: la deuda de chrome global es real y no se disimula subiéndola."
 }

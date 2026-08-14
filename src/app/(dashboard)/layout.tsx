@@ -24,6 +24,7 @@ import { NexaInteractionModeProvider } from '@/lib/nexa/nexa-interaction-mode-co
 import { resolveNexaInteractionModeForUser } from '@/lib/nexa/interaction-mode.server'
 import RecentsTracker from '@/components/greenhouse/RecentsTracker'
 import ChunkRecoveryClear from '@/components/ChunkRecoveryClear'
+import { getMicrocopy } from '@/lib/copy'
 import { AdaptiveSidecarShellProvider, ShellFloatingActionDock } from '@/components/greenhouse/primitives'
 
 // Util Imports
@@ -159,8 +160,12 @@ const Layout = async (props: ChildrenType) => {
         </AdaptiveSidecarShellProvider>
         <ShellFloatingActionDock>
           <ScrollToTop docked className='mui-fixed'>
-            <Button variant='contained' className='is-10 bs-10 rounded-full p-0 min-is-0 flex items-center justify-center'>
-              <i className='tabler-arrow-up' />
+            <Button
+              variant='contained'
+              aria-label={getMicrocopy().aria.backToTop}
+              className='is-10 bs-10 rounded-full p-0 min-is-0 flex items-center justify-center'
+            >
+              <i className='tabler-arrow-up' aria-hidden='true' />
             </Button>
           </ScrollToTop>
           <NexaFloatingButton docked />

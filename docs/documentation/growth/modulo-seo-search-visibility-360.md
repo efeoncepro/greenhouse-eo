@@ -310,14 +310,35 @@ sino por **que hay que hacer con ellas**, porque son trabajos distintos:
 - **Consolidar** — mas de una pagina tuya compite por esa busqueda y se diluyen entre si. **No se optimiza:
   se consolida** (unificar, redirigir, canonical o diferenciar la intencion). Es otro trabajo, con otro dueño.
 
-**De donde sale el dato, y que todavia no esta.** Todo lo que se ve esta **medido por Search Console**:
-son las impresiones y posiciones reales de la busqueda del propio cliente. El enriquecimiento externo
-de *volumen* y *dificultad de mercado* aun no esta habilitado, y mientras eso sea cierto esas dos
-columnas **no se muestran**: la ausencia se declara una vez, con palabras, al pie del mapa — una
-columna que no puede traer datos no gana su ancho, y repetir "sin dato" cien veces ahogaba los numeros
-que la tabla existe para mostrar. Lo que **nunca** aparece es un `0`, que afirmaria que nadie busca eso.
-Cuando el enriquecimiento aterrice, las columnas vuelven solas sin reescribir la pantalla. La
-priorizacion no lo necesita: la demanda ya esta medida, y los ejes del mapa jamas dependieron de ese dato.
+**De donde sale el dato, y las dos lentes que nunca se mezclan.** Casi todo lo que se ve esta
+**medido por Search Console**: son las impresiones y posiciones reales de la busqueda del propio
+cliente. Es la lente **medida**.
+
+Desde `TASK-1661` existe ademas una segunda lente, **estimada**: el *volumen de busqueda* y la
+*dificultad de mercado* que trae DataForSEO. Son dos cosas distintas y el modulo no las promedia
+nunca. La lente medida dice "asi te fue a ti"; la estimada dice "asi de grande es el mercado". Cada
+una contesta una pregunta que la otra no puede: para una busqueda donde el cliente **ya** aparece,
+Search Console es mejor insumo que cualquier promedio; para una donde **no** aparece, Search Console
+no entrega absolutamente nada — cero impresiones, sin posicion — y el volumen es la unica forma de
+saber si vale la pena.
+
+Tres detalles que importan al leer esas dos columnas:
+
+- **El dato de mercado se refresca una vez al mes**, no todos los dias. Por eso siempre viaja con su
+  fecha de captura: un volumen sin fecha se lee como vigente para siempre.
+- **El volumen es del pais y el idioma del cliente**, no un numero global. El de Chile no es el de
+  Mexico.
+- **Una celda vacia significa "no lo consultamos" o "el proveedor no tiene ese dato"**, y son cosas
+  distintas de "nadie lo busca". Lo que **nunca** aparece es un `0` inventado.
+
+Mientras el enriquecimiento este apagado para una organizacion, esas dos columnas simplemente no se
+muestran y la ausencia se declara una vez, con palabras, al pie del mapa — una columna que no puede
+traer datos no gana su ancho. La priorizacion no lo necesita: la demanda ya esta medida, y los ejes
+del mapa jamas dependieron de ese dato.
+
+> Detalle tecnico: `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §7
+> (`readKeywordMarketData`) · operacion paso a paso:
+> `docs/manual-de-uso/growth/operar-datos-de-mercado-keywords.md`
 
 **"Seguir" cuesta plata, y la pantalla lo dice antes del clic.** Seguir una keyword la agrega al set
 monitoreado, y desde ahi su posicion se mide **todos los dias** con un proveedor externo que se cobra por

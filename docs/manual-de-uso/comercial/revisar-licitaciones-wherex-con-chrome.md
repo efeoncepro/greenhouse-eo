@@ -29,6 +29,31 @@ El runner abre Chrome visible con su perfil aislado. Puedes comprobar la configu
 `pnpm wherex:radar -- --check-only`, forzar una nueva sesión con `--force-login` o limitar la paginación con
 `--max-pages 30`.
 
+### Archivar un original de una candidata concreta
+
+Cuando el operador autorice conservar adjuntos de una licitación ya identificada, usa el modo acotado y una carpeta
+explícita de esa empresa:
+
+```bash
+pnpm wherex:radar -- --tender-id 1120 \
+  --archive-originals "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Sika"
+```
+
+Este modo sigue siendo de lectura comercial: no participa, responde, carga ni presenta. Sólo pulsa el control visible
+**Descargar** y guarda un archivo cuando Wherex emite una descarga nativa. Valida que no esté vacío, conserva el
+nombre de origen sin sobrescribir un archivo existente y extrae el texto para el reporte protegido.
+
+Si Wherex abre su visor PDF protegido, el comando lo registra como `manual-save-required` y se detiene para ese
+adjunto. No intenta leer el visor, capturar enlaces firmados ni obtener el archivo por una vía indirecta. En esa rama,
+el operador guarda el PDF desde Chrome y el agente retoma el archivo y análisis desde la copia local.
+
+Cuando el operador autorice usar su perfil Chrome principal, se puede activar en
+`chrome://settings/content/pdfDocuments` la opción **Descargar archivos PDF**. El cambio es visible y reversible,
+pero afecta a todo ese perfil: los PDF se descargarán en vez de abrirse en el visor hasta restaurar **Abrir archivos
+PDF en Chrome**. No se modifica sin autorización explícita. Descarga cada adjunto individual, espera que el archivo
+aparezca completo en `Descargas`, y recién entonces cópialo al expediente de OneDrive y léelo; `Descargar todos` no
+es evidencia suficiente si abre un diálogo nativo de guardado.
+
 ## Rutina de revisión
 
 1. El runner entra a Wherex y navega por Sourcing → Licitaciones.

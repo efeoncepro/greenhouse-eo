@@ -932,6 +932,7 @@ export interface AriaCopy {
   leaderboardRunSelect: string
   leaderboardPagination: string
   leaderboardRowsCollapsed: string
+  backToTop: string
 }
 
 /**

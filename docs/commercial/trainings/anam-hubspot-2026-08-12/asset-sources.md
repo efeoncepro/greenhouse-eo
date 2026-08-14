@@ -20,6 +20,8 @@
   la portada consume la exportación Figma en `assets/clients/anam-figma-dark.svg`.
 - `hubspot-logo-color.svg` es la fuente vectorial local del wordmark; cada mockup lleva una copia embebida para
   que la exportación SVG sea autónoma y el logo no dependa de una ruta externa.
+- La contraportada usa el SVG naranja exacto de [HubSpot Solutions Partner](../../../../public/branding/partners/hubspot/solution-partner/badge-orange-spp-hubspot.svg),
+  conservado como primitive reutilizable y presentado sin recolor, recorte ni deformación.
 
 ## Referencias oficiales consultadas
 

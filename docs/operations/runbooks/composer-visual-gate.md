@@ -63,6 +63,46 @@ corridas/entornos** aunque nadie cambie la foto — Chromium re-samplea/rasteriz
 - **Reportalo** contra `ISSUE-122` y NO congeles esa lámina hasta que el determinismo de fotos esté
   arreglado (pre-rasterizar avatares al tamaño exacto + pinnear color profile).
 
+## 4bis. Declarar un slot nuevo SIEMPRE mueve el frame de esa lámina
+
+El gate no renderiza la plantilla cruda: la **compone con slots sintéticos**
+(`synthesizeProbeSlots`, `src/lib/artifact-composer/synthesize.ts`), que rellena **todo** slot que no
+empiece con `fixed-` — incluidos los **opcionales**. Y para cualquier slot de tipo `asset` el
+placeholder sintético es **`assets/url-lum.svg`**, la burbuja de URL.
+
+Consecuencia que confunde la primera vez: agregas un slot `asset` opcional a una plantilla, no
+declaras nada en ningún deck, y el gate reporta esa lámina en rojo con **una burbuja de URL dibujada
+donde va tu asset**. No es tu asset filtrándose ni un bug del render — es el probe haciendo su
+trabajo.
+
+- **Es un delta intencional:** declararlo en `BASELINE_DELTAS.md` y `--freeze` (con la regla
+  single-owner de §2).
+- **No lo confundas con "el slot se cuela en los decks":** en un render real el slot opcional no
+  declarado hace que el renderer **borre el nodo** (`absent-optional`, `render.ts`). El probe es el
+  único lugar donde siempre aparece.
+- **Corolario de diseño:** por eso un slot opcional basta para tener "dos variantes" de una lámina
+  (con y sin el elemento) **sin registrar una segunda plantilla** — el costo es una línea en el
+  ledger de deltas, no un archivo duplicado que después driftea.
+
+Caso fuente: `partnerBadge` en `BackCoverFull` (credencial HubSpot Solutions Partner, 2026-08-13).
+
+## 4ter. Atribuir un drift que no es tuyo: mira si la plantilla está commiteada y limpia
+
+Antes de asumir regresión propia —o de culpar al WIP de otro— haz dos preguntas mecánicas sobre la
+plantilla que el gate flagea:
+
+```bash
+git status --short src/lib/artifact-composer/catalogs/deck-axis/<plantilla>.html
+git log --oneline -3 -- src/lib/artifact-composer/catalogs/deck-axis/<plantilla>.html
+```
+
+Si sale **limpia y su último cambio está commiteado**, el drift es entre **plantilla commiteada y
+baseline commiteado**: el baseline quedó viejo en `HEAD` y el gate ya estaba rojo antes de que
+llegaras. No es tuyo, no es del WIP en curso, y no se arregla congelando encima de trabajo ajeno.
+
+Caso fuente: `NarrativeSplit` con ~59k px de drift el 2026-08-13, con la plantilla limpia desde
+`f7761988f` — mientras dos agentes distintos tenían el composer sucio por otras razones.
+
 ## 5. Cómo declarar un delta en `BASELINE_DELTAS.md`
 
 - Una entrada con fecha, **lámina por lámina**, diciendo **qué cambió y por qué** (intención, no "actualicé
@@ -88,6 +128,8 @@ corridas/entornos** aunque nadie cambie la foto — Chromium re-samplea/rasteriz
 | `item_too_long` al recomponer | Copy > límite de chars del filler (`overflow: reject`) | Acorta el copy (el gate fail-closa, no trunca) |
 | `git status` muestra `M` en `resolvers.ts`/`registry.json`/baseline y no fuiste tú | Otro agente tiene el composer sucio | NO congeles; coordina (regla single-owner) |
 | `--selftest` da cero pero el gate global no | Drift entre tu render y el frame congelado por otro | Probablemente ISSUE-122 (fotos) o un freeze ajeno stale |
+| Aparece una **burbuja de URL** donde va un asset tuyo, en una lámina donde acabas de declarar un slot | El probe rellena todo slot no-`fixed-` y usa `assets/url-lum.svg` para los `asset` | Delta intencional: declarar + `--freeze` (§4bis) |
+| Una lámina **sin fotos** que NO tocaste driftea | `git status`/`git log` de esa plantilla: si está limpia y commiteada, el baseline está viejo en `HEAD` | No es tuyo; no congeles sobre WIP ajeno (§4ter) |
 
 ## Referencias
 

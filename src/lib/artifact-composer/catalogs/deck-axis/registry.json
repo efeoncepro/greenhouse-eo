@@ -249,7 +249,8 @@
       "slotsRef": "comparison-split.slots.json",
       "variants": [
         "proposal",
-        "diagnostic"
+        "diagnostic",
+        "neutral"
       ]
     },
     {

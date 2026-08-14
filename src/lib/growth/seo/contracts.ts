@@ -686,6 +686,35 @@ export type SeoPerformanceCatalogResult =
  */
 
 /** Procedencia del write (vocabulario cerrado, espejo del CHECK de la migración 1308). */
+/**
+ * Nivel de barrera de enlaces de una keyword (ISSUE-152 delta 2026-08-13).
+ *
+ * La `keyword_difficulty` de DataForSEO es una métrica PURA de enlaces: mide qué tan
+ * atrincherado con backlinks está el top-10 (90% del peso es el backlink rank de la URL que
+ * rankea), con un piso duro que la colapsa a 0 cuando el top-10 casi no tiene enlaces propios
+ * — lo NORMAL en SERPs es-LATAM. Contrastada contra Semrush (mismas keywords, México): donde
+ * DataForSEO dice 0, Semrush dice 30–50, porque miden cosas distintas.
+ *
+ * Por eso la UI NUNCA muestra el número crudo: un "0" se lee como "trivialmente fácil" y esa
+ * lectura es falsa. Se muestra el NIVEL de lo que la métrica realmente mide — la barrera de
+ * enlaces — donde "baja" significa "acá se compite con contenido y autoridad de dominio, no
+ * con backlinks": una oportunidad, no una trivialidad.
+ */
+export type SeoLinkBarrierLevel = 'low' | 'medium' | 'high'
+
+/**
+ * Clasifica la `keyword_difficulty` (0–100, lente de enlaces) en nivel de barrera.
+ * Umbrales alineados a los buckets del oficio para KD basadas en enlaces (Ahrefs-style):
+ * 0–14 baja · 15–49 media · 50+ alta. `null` = no consultado, se queda `null`.
+ */
+export const classifyLinkBarrier = (difficulty: number | null): SeoLinkBarrierLevel | null => {
+  if (difficulty === null || !Number.isFinite(difficulty)) return null
+  if (difficulty < 15) return 'low'
+  if (difficulty < 50) return 'medium'
+
+  return 'high'
+}
+
 export type SeoKeywordTrackSource = 'operator_ui' | 'nexa' | 'mcp' | 'seed' | 'backfill'
 
 /** Qué pasó con UNA keyword del lote. */
