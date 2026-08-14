@@ -411,7 +411,43 @@ existente, no se resuelve creando un shortcut SEO.
      ZONE 2 — PLAN MODE
      ═══════════════════════════════════════════════════════════ -->
 
-<!-- El agente que tome la task debe llenar esta zona con Discovery y plan aprobado. -->
+## Discovery 2026-08-14 (Claude)
+
+Verificado contra el repo real:
+
+- **Supuestos correctos:** `PromptSetPrompt` ya tiene `rationale?`/`groundingRef?`;
+  `createGraderPromptSetDraft` acepta `groundingSources` + `generationStrategy`; el authoring degrada
+  honesto (`AuthorPromptSetStatus = ok|disabled|not_configured|schema_invalid|provider_error`, nunca
+  lanza); sanitizer con vocabulario cerrado + no-leading flip + dedupe + 8–18; providers canónicos
+  cheap-first (gemini→openai→anthropic); `AUTHOR_SYSTEM_PROMPT_VERSION='aeo-author.v1'`; capability
+  `growth.ai_visibility.prompt_set.manage` con grant al set operador; múltiples drafts por profile son
+  legales (append-only por versión) y `approvePromptSet` es el único chokepoint (supersede en tx).
+- **Supuestos desactualizados / decisiones de baseline:**
+  1. `authorGraderPromptSetDraft` **NO acepta** `groundingSources` custom ni contexto SEO — la spec ya
+     lo anticipa como trabajo de Slice 0 (extender de forma backward-compatible).
+  2. `files owned` cita `src/mcp/greenhouse/seo/grounded-queries.ts`: **stale** — las tools MCP viven
+     en `src/mcp/greenhouse/{server,tools,http-client}.ts` (mismo hallazgo que 1664).
+  3. Los commands de prompt set **no tienen NINGÚN consumer HTTP/MCP/Nexa hoy** (capacidad pura de
+     librería de TASK-1290; la UI de review de TASK-1291 no existe como route). La "revisión en la UI
+     AEO existente" del paso 7 de verificación se hace vía `readGraderPromptSets`/sanity, y el gap de
+     review UI queda documentado (ya era gap declarado del programa EPIC-020).
+  4. El input `CreateGroundedQueryDraftInput.brandContext` de la spec contradice su propio Slice 1
+     ("resolver brand context desde el contexto autorizado; el bridge no acepta identidad de marca
+     arbitraria"). **Manda Slice 1**: el bridge resuelve `getGraderProfile` +
+     `getActiveBrandIntelligence` server-side y NO acepta brandContext del caller.
+  5. `readKeywordDiscovery` (1664) no filtra por `candidateIds`: se agrega filtro aditivo SQL-side.
+  6. Leer candidatos históricos no exige el flag de discovery (política de lectura de 1664); el gate de
+     flags del bridge es `GROWTH_SEO_ENABLED` + `GROWTH_AI_VISIBILITY_GRADER_ENABLED` (→
+     `grounded_query_disabled`), y `PROMPT_AUTHORING` sólo decide `grounded_llm` vs
+     `baseline_fallback`, nunca bloquea.
+- **Decisiones de diseño:** `generation_strategy` conserva el union cerrado (`llm`/`template_baseline`)
+  — grounded se distingue por `systemPromptVersion='aeo-author.seo-grounded.v1'` + refs
+  `seo.discovery.*`; idempotencia = draft existente con el mismo `seo.discovery.context:<hash>` + misma
+  versión de author (advisory lock xact para serializar check+create; el LLM se llama fuera del lock —
+  doble llamada teórica en carrera exacta, jamás doble draft); lanes ecosystem de grounded-queries
+  (read y write) sólo bindings `internal` (V1 es operador interno por spec).
+
+<!-- Plan de 5 slices impreso en sesión 2026-08-14; checkpoint P1. -->
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC

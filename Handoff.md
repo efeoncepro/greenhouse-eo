@@ -2,6 +2,15 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+### TASK-1666 en ejecución — puente SEO → grounded queries AEO (2026-08-14)
+
+Rama `develop` (sin worktrees). Intake hecho; Discovery en curso sobre
+`src/lib/growth/ai-visibility/prompt-packs/**` (authoring/lifecycle de TASK-1290). Hallazgo
+temprano: los commands de prompt set (`createGraderPromptSetDraft`/`authorGraderPromptSetDraft`/
+`approveGraderPromptSet`) NO tienen ningún consumer HTTP/MCP/Nexa todavía — capacidad pura de
+librería; el files-owned `src/mcp/greenhouse/seo/grounded-queries.ts` de la spec es stale (las
+tools MCP viven en `src/mcp/greenhouse/{server,tools,http-client}.ts`, igual que en 1664).
+
 ### TASK-1664 COMPLETE — keyword discovery: code complete, rollout PENDIENTE (2026-08-14)
 
 End-to-end autorizado y ejecutado en una sesión: 6 slices en `develop` (SIN push), suite completa
