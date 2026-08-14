@@ -16,13 +16,19 @@ inline persistido en el store 1661 (top-up 0 llamadas), re-enqueue deduped USD 0
 `ops-seo-keyword-discovery-drain` (**nace PAUSADO**, declarativo en `deploy.sh`) → drain con claim
 atómico; outbox = trazabilidad, no cola.
 
-**Rollout pendiente (quien empuje develop):** (1) el push despliega worker con handler + scheduler
-pausado + flag `GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED=false`; (2) prender = sign-off de gasto +
-flag ON en DOS runtimes + despausar scheduler (ledger de flags tiene la fila); (3) federar
-`get_seo_keyword_discovery`/`discover_seo_keywords` al gateway `efeonce-mcp` (allowlist/parity +
-canary; conviene junto con TASK-1658 — ya hay 3 tools sin federar y ahora son 5). `pnpm build` de
-producción NO corrido localmente (regla de memoria: consume ~30GB); CI lo cubre en el push.
-Desbloqueadas: TASK-1666, TASK-1667 (Blocked by: none) y 1665 sólo espera 1666.
+**Rollout EJECUTADO Y VERIFICADO (2026-08-14, autorización "termina todo lo que está pendiente"):**
+push de develop → Ops Worker Deploy verde ×2 con verificación por paso — base (rev `00552`:
+scheduler PAUSED + flag `false`) y flip (rev `00553`: flag `true` + scheduler **ENABLED**);
+**primer tick del drain disparado y observado en logs** (`pending=0 processed=0`, no-op = costo
+cero con cola vacía); flag en Vercel `Production` + `staging`; CI del push verde (incluye build).
+**Gateway federado** (`efeonce-mcp@0a8c5e4`: provider `getKeywordDiscovery`/`discoverKeywords`,
+puerta HTTP exige `efeonce.mcp.seo.write` para el write, parity 12 tools, canary ampliado, tests
+40/40) y **canary contra staging COMPLETO VERDE** — la lectura de discovery sirvió la corrida real
+del smoke y los denies 404/400 respondieron correcto. **Único pendiente externo:** dispatch del
+deploy del gateway cuando el próximo release develop→main lleve el lane a producción (antes, las
+tools federadas darían 404 upstream — lección TASK-1661). Sin enqueue automático: ON + cola vacía
+= costo cero; cada corrida pasa preview + gate. Desbloqueadas: TASK-1666, TASK-1667
+(`Blocked by: none`) y 1665 sólo espera 1666.
 
 ### Release a producción 2026-08-14 — `3754a17d3b1d` RELEASED
 

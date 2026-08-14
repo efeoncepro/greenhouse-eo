@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Code complete + smoke live verificado; rollout pendiente (flag OFF, scheduler pausado, deploy del worker viaja con el próximo push de develop)`
+- Status real: `OPERATIVO (2026-08-14): worker desplegado (rev 00553, flag ON), scheduler ops-seo-keyword-discovery-drain ACTIVO con primer tick verificado (pending=0 no-op), Vercel Production+staging con flag, gateway federado (efeonce-mcp@0a8c5e4, canary staging verde) — su deploy público viaja con el próximo release develop→main`
 - Rank: `TBD`
 - Domain: `growth|seo|data`
 - Blocked by: `none`
@@ -747,10 +747,16 @@ operativo. No se crean secrets nuevos.
   llamadas); ledger `seo_provider_spend_daily` (labs, día) lo registra; re-enqueue del mismo
   intent = `deduped`, USD 0; runner rechaza re-ejecutar corrida cerrada (`busy`);
   `seo_keyword_set_members` sin cambios.
-- **Rollout pendiente declarado**: flag OFF en ambos runtimes (ledger de flags actualizado),
-  scheduler `ops-seo-keyword-discovery-drain` declarado PAUSADO en `deploy.sh` (se crea con el
-  próximo deploy del worker tras push), federación de las 2 tools al gateway `efeonce-mcp`
-  pendiente (allowlist/parity + canary del repo hermano, junto con TASK-1658).
+- **Rollout EJECUTADO Y VERIFICADO (2026-08-14, autorización "termina todo lo que está
+  pendiente")**: push de develop → Ops Worker Deploy verde × 2 (base con flag OFF/scheduler
+  PAUSED verificado en rev 00552; flip a flag ON/scheduler ENABLED verificado en rev 00553);
+  primer tick del drain disparado y observado en logs (`pending=0 processed=0`, no-op);
+  flag en Vercel `Production` + `staging`; federación al gateway hecha (`efeonce-mcp@0a8c5e4`:
+  provider + puerta HTTP de scope + parity + canary + tests 40/40) con **canary contra staging
+  COMPLETO VERDE** (lectura de discovery sirvió la corrida real del smoke; denies 404/400 OK).
+  Único pendiente externo: **dispatch del deploy del gateway** cuando el próximo release
+  develop→main lleve el lane a producción (antes, las tools federadas darían 404 upstream —
+  lección TASK-1661).
 
 ## Acceptance Criteria
 
