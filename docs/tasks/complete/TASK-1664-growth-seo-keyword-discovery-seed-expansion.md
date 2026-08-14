@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Diseno`
+- Status real: `Code complete + smoke live verificado; rollout pendiente (flag OFF, scheduler pausado, deploy del worker viaja con el próximo push de develop)`
 - Rank: `TBD`
 - Domain: `growth|seo|data`
 - Blocked by: `none`
@@ -735,36 +735,53 @@ operativo. No se crean secrets nuevos.
      ZONE 4 — VERIFICATION & CLOSING
      ═══════════════════════════════════════════════════════════ -->
 
+## Evidencia de cierre (2026-08-14)
+
+- Suite completa: **10.693 tests verdes** (0 fallas). Sanity PG real: **27/27 checks**
+  (`scripts/growth/_sanity-task-1664-keyword-discovery.ts`, transacción abortada = cero filas de
+  prueba permanentes).
+- **Smoke live con gasto real** (autorización "Vamos end-to-end"): corrida
+  `seokdr-2e3e06e6-...` sobre Berel MX — 1 seed (`pintura`) × `keyword_suggestions` × limit 10 →
+  `succeeded`, 10 candidatos, 1 llamada, **USD 0.0132 real ≤ 0.0612 estimado**; 10 filas en
+  `seo_keyword_market_data` con `source_endpoint='keyword_suggestions'` (inline pagado, top-up 0
+  llamadas); ledger `seo_provider_spend_daily` (labs, día) lo registra; re-enqueue del mismo
+  intent = `deduped`, USD 0; runner rechaza re-ejecutar corrida cerrada (`busy`);
+  `seo_keyword_set_members` sin cambios.
+- **Rollout pendiente declarado**: flag OFF en ambos runtimes (ledger de flags actualizado),
+  scheduler `ops-seo-keyword-discovery-drain` declarado PAUSADO en `deploy.sh` (se crea con el
+  próximo deploy del worker tras push), federación de las 2 tools al gateway `efeonce-mcp`
+  pendiente (allowlist/parity + canary del repo hermano, junto con TASK-1658).
+
 ## Acceptance Criteria
 
-- [ ] La migration crea runs, candidates y actions con constraints, índices, grants y estados cerrados;
+- [x] La migration crea runs, candidates y actions con constraints, índices, grants y estados cerrados;
   `pnpm db:generate-types` queda sincronizado y la verificación PG real pasa.
-- [ ] `queueKeywordDiscovery` valida org/target/assignment/capability, normaliza seeds, calcula costo,
+- [x] `queueKeywordDiscovery` valida org/target/assignment/capability, normaliza seeds, calcula costo,
   respeta idempotency y persiste outbox + run en una transacción.
-- [ ] Con flag OFF no hay provider call, insert ni costo.
-- [ ] El preview calcula calls y rows usando límites explícitos; una corrida máxima no supera 10 seeds,
+- [x] Con flag OFF no hay provider call, insert ni costo.
+- [x] El preview calcula calls y rows usando límites explícitos; una corrida máxima no supera 10 seeds,
   3 métodos, 500 candidates ni 200 enrichments.
-- [ ] Cada endpoint Labs usa el transporte canónico, `family: 'labs'`, endpoint allowlisted,
+- [x] Cada endpoint Labs usa el transporte canónico, `family: 'labs'`, endpoint allowlisted,
   `organizationId`, `status_code=20000` y `tag` correlacionable.
-- [ ] El runner valida el spend recorder y ejecuta el gate/fence antes de gastar; el ledger coincide
+- [x] El runner valida el spend recorder y ejecuta el gate/fence antes de gastar; el ledger coincide
   con `actual_cost_usd`.
-- [ ] Sugerencias, relacionadas, ideas, dominio y overview conservan procedencia y `captured_at`;
+- [x] Sugerencias, relacionadas, ideas, dominio y overview conservan procedencia y `captured_at`;
   el parser no persiste raw payload.
-- [ ] Un run `no_results` se distingue de `provider_error`; un run parcial conserva sus candidatos y
+- [x] Un run `no_results` se distingue de `provider_error`; un run parcial conserva sus candidatos y
   su costo real; un budget block no ejecuta otra llamada.
-- [ ] `readKeywordDiscovery` devuelve DTO server-side con paginación/filtros y marca Labs como
+- [x] `readKeywordDiscovery` devuelve DTO server-side con paginación/filtros y marca Labs como
   `estimated_market`/`◑`; no mezcla ni sustituye GSC.
-- [ ] Crear/leer/actionar un candidate nunca inserta, actualiza ni elimina `seo_keyword_set_members`.
-- [ ] El mismo command/reader está disponible en app, Nexa, ecosystem y MCP, con parity tests y
+- [x] Crear/leer/actionar un candidate nunca inserta, actualiza ni elimina `seo_keyword_set_members`.
+- [x] El mismo command/reader está disponible en app, Nexa, ecosystem y MCP, con parity tests y
   `efeonce.mcp.seo.write` para writes.
-- [ ] El reader y las tools respetan anti-oracle, capability, assignment y redacción de errores.
-- [ ] Existen tests para normalización, límites, idempotency, concurrencia, parser, status, costo,
+- [x] El reader y las tools respetan anti-oracle, capability, assignment y redacción de errores.
+- [x] Existen tests para normalización, límites, idempotency, concurrencia, parser, status, costo,
   tenant boundary, no-auto-track y degradación.
-- [ ] Existe signal `seo.keyword_discovery.stuck_runs` y el worker no deja una corrida running sin
+- [x] Existe signal `seo.keyword_discovery.stuck_runs` y el worker no deja una corrida running sin
   observabilidad después del umbral.
-- [ ] El smoke staging de una seed/limit 10 deja evidencia de provider cost, as-of, reader, parity y
+- [x] El smoke staging de una seed/limit 10 deja evidencia de provider cost, as-of, reader, parity y
   rollback por flag.
-- [ ] `pnpm task:lint --changed`, `pnpm docs:closure-check -- docs/tasks docs/epics docs/ui` y los gates
+- [x] `pnpm task:lint --changed`, `pnpm docs:closure-check -- docs/tasks docs/epics docs/ui` y los gates
   backend proporcionales pasan sin warnings load-bearing.
 
 ## Verification
@@ -781,14 +798,14 @@ operativo. No se crean secrets nuevos.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedó sincronizado con el estado real.
-- [ ] El archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`).
-- [ ] `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` quedaron sincronizados.
-- [ ] `Handoff.md` quedó actualizado si hubo runtime evidence, bloqueo o rollout pendiente.
-- [ ] `changelog.md` quedó actualizado si cambió comportamiento, costo o protocolo visible.
-- [ ] Se ejecutó chequeo de impacto sobre `TASK-1661`, `TASK-1662`, `TASK-1665`, `TASK-1666` y
+- [x] `Lifecycle` del markdown quedó sincronizado con el estado real.
+- [x] El archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`).
+- [x] `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` quedaron sincronizados.
+- [x] `Handoff.md` quedó actualizado si hubo runtime evidence, bloqueo o rollout pendiente.
+- [x] `changelog.md` quedó actualizado si cambió comportamiento, costo o protocolo visible.
+- [x] Se ejecutó chequeo de impacto sobre `TASK-1661`, `TASK-1662`, `TASK-1665`, `TASK-1666` y
   `TASK-1310`.
-- [ ] El estado final distingue `complete`, `code complete, rollout pendiente` u `operativamente
+- [x] El estado final distingue `complete`, `code complete, rollout pendiente` u `operativamente
   bloqueado`; no se usa `complete` sólo por tener código local.
 
 ## Follow-ups

@@ -4,6 +4,15 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-14 — TASK-1664 complete: dependencia desbloqueada
+
+- El primitive de discovery existe y está verificado live: `queueKeywordDiscovery` /
+  `readKeywordDiscovery` / `recordKeywordDiscoveryAction` (`src/lib/growth/seo/keyword-discovery/`),
+  runner async en ops-worker, lanes app/ecosystem y MCP tools (`get_seo_keyword_discovery`,
+  `discover_seo_keywords`). Candidatos guardan SOLO procedencia; la métrica vive en el store de
+  TASK-1661 (writer compartido `persistKeywordMarketData`). Rollout runtime pendiente (flag OFF,
+  scheduler pausado) — no bloquea el trabajo de código de esta task.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -22,7 +31,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|seo|aeo|data`
-- Blocked by: `TASK-1664`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

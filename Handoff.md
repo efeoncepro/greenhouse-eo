@@ -2,15 +2,27 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
-### TASK-1664 en ejecución — keyword discovery (2026-08-14)
+### TASK-1664 COMPLETE — keyword discovery: code complete, rollout PENDIENTE (2026-08-14)
 
-Rama `develop` (sin worktrees). Intake + Discovery hechos (Zone 2 de la spec tiene el delta de
-baseline). Plan de 6 slices impreso en sesión; **checkpoint P1 esperando OK del operador** antes de
-implementar. Diseño clave: candidates guardan SOLO procedencia; el `keyword_info` inline se persiste
-en el store de TASK-1661 vía un writer compartido nuevo (`persistKeywordMarketData`, extraído del
-INSERT inline de `captureKeywordMarketData`); despertador = Cloud Scheduler
-`ops-seo-keyword-discovery-drain` (nace PAUSADO) → `POST /seo/keyword-discovery/drain`; flag
-`GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED` default OFF en ambos runtimes.
+End-to-end autorizado y ejecutado en una sesión: 6 slices en `develop` (SIN push), suite completa
+10.693 verde, sanity PG real 27/27 (tx abortada, cero filas de prueba), **smoke live con gasto
+real**: corrida `seokdr-2e3e06e6-…` Berel MX (1 seed × `keyword_suggestions` × limit 10) →
+`succeeded`, 10 candidatos, **USD 0.0132 ≤ 0.0612 estimado**, ledger labs atribuido, `keyword_info`
+inline persistido en el store 1661 (top-up 0 llamadas), re-enqueue deduped USD 0, cero auto-track.
+
+**Diseño load-bearing:** candidates guardan SOLO procedencia (la métrica vive en
+`seo_keyword_market_data`, escrita por el writer canónico nuevo `persistKeywordMarketData` —
+`captureKeywordMarketData` refactorizado para usarlo); despacho = Cloud Scheduler
+`ops-seo-keyword-discovery-drain` (**nace PAUSADO**, declarativo en `deploy.sh`) → drain con claim
+atómico; outbox = trazabilidad, no cola.
+
+**Rollout pendiente (quien empuje develop):** (1) el push despliega worker con handler + scheduler
+pausado + flag `GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED=false`; (2) prender = sign-off de gasto +
+flag ON en DOS runtimes + despausar scheduler (ledger de flags tiene la fila); (3) federar
+`get_seo_keyword_discovery`/`discover_seo_keywords` al gateway `efeonce-mcp` (allowlist/parity +
+canary; conviene junto con TASK-1658 — ya hay 3 tools sin federar y ahora son 5). `pnpm build` de
+producción NO corrido localmente (regla de memoria: consume ~30GB); CI lo cubre en el push.
+Desbloqueadas: TASK-1666, TASK-1667 (Blocked by: none) y 1665 sólo espera 1666.
 
 ### Release a producción 2026-08-14 — `3754a17d3b1d` RELEASED
 
@@ -402,38 +414,3 @@ migraciones, sin flags — `user_view_overrides` está vacía, así que el delta
   no produce acceso; el carril es declararla en el módulo que la vende. Delta escrito allá.
 - Sigue abierto el bloque legacy de capability modules (`capability-modules-resolver-migration`, sin
   ID): sus dos callsites quedaron con marker y dueño declarado.
-
-### TASK-1389 CERRADA — el candado anti-regresión de la navegación quedó armado (2026-08-10)
-
-Tercera task del programa de navegación cerrada el mismo día: Contrato de Asignación de Superficies
-(`agent-invariants/NAVIGATION_SURFACE_ALLOCATION_CONTRACT.md` + pointer en CLAUDE.md al límite del
-budget — quedan ~45 tokens de headroom — + campo `Nav placement` en el addendum UI) y gate
-`pnpm nav:budget` que mide el árbol REAL (evaluador puro + harness superadmin, cero drift de parser)
-contra el presupuesto medido (8 slots · profundidad 2 · zonas-solo-raíz · cero `/my/*` derivado del
-builder) + cross-check `surface` del manifest. **Nació directo en `error` con 0 violaciones**
-(la condición warn→error de la spec quedó cumplida por TASK-1388/1686 el mismo día; `--warn` es el
-escape documentado). Doble cobertura CI: test en la suite + job `nav-budget` en design-contract.yml.
-Continuidad: el tope del carril cliente/collaborator se calibra en su follow-up (module-driven — el
-insumo sería el resolver, no este evaluador); considerar extender el contrato a la topbar.
-
-### TASK-1686 CERRADA — el colaborador puro tiene su propia proyección (2026-08-10)
-
-Implementada el mismo día que su antecesora TASK-1388, en `develop` (4 slices, local): predicado
-`isPureCollaborator` en rail y avatar — el colaborador ve SOLO su portal (rail `/my` + Mi Ficha +
-plataforma concedida; avatar identidad + Mi Perfil + salir), se cerraron los shortcuts cliente sin
-gating, el heading "Mi Cuenta" vacío y el borde de claims vacíos; el trigger del avatar es un botón
-semántico cross-audiencia. my+client/client/internal byte-equivalentes fijado por tests de control
-(19+7). Gates TODOS verdes (suite full 10.460, build prod, 4 gates UI con scorecard 5.0,
-reachability 0 orphans); GVC con `agent-collaborator` + baselines durables promovidos. Continuidad:
-TASK-1685 hereda TRES consumers del predicado de visibilidad (Delta escrito allá); la deuda
-`aria-expanded` del chrome @menu sigue siendo la única abierta (dueña: scorecard TASK-1388).
-
-**Barrido documental post-cierre (3 subagentes, mismo día):** 29 docs/skills sincronizados con la
-navegación nueva — 7 de arquitectura (status de `GREENHOUSE_SIDEBAR_ARCHITECTURE_V1` superseded,
-Identity Access §Sidebar Composition reescrita, deep-link §palette, invariantes de shortcuts), 21
-funcionales/manuales (todas las rutas de menú "Growth top-level"/"Personas y HR"/"Mi Ficha en
-sidebar" → estructura vigente, con version bump), la skill `info-architecture`, manual NUEVO
-`docs/manual-de-uso/plataforma/navegar-el-portal.md` (las 3 superficies — el ⌘K no tenía doc en
-ninguna parte) y `src/data/searchData.ts` borrado (huérfano sin consumers tras retirar NavSearch;
-typecheck verde). Pendiente decidible: `roadmap-cockpit.md` internamente inconsistente (pre-existente
-a estas tasks — su ítem de menú se retiró el 2026-07-15 y el paso a paso aún lo cita).

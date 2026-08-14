@@ -536,6 +536,36 @@ tablero vacío que se lea como "no tienes visibilidad".
 > catálogo). Código: `src/views/greenhouse/growth/seo/client/`,
 > `src/components/growth/seo/report-artifact/`.
 
+### Descubrir keywords nuevas: de una idea a candidatos con datos (TASK-1664, 2026-08-14)
+
+Hasta acá el módulo contestaba qué empujar de lo que **ya aparece** en Search Console. Lo que no
+contestaba era cómo pasar de una hipótesis ("¿habrá demanda para pintura para piso?") a un conjunto
+priorizado de términos sin salir a otra herramienta. El **keyword discovery** cierra ese hueco:
+
+- El operador (o un agente, con confirmación humana) pide una **corrida** con hasta 10 seeds —
+  escritas a mano, tomadas de las consultas reales de Search Console, del set monitoreado o del
+  dominio propio — y elige los métodos de expansión del proveedor (sugerencias long-tail,
+  relacionadas, ideas de categoría, keywords del sitio).
+- **Antes de gastar un peso ve el costo estimado con su fórmula** y el saldo disponible. La corrida
+  se encola y corre después en el worker; cada respuesta del proveedor deja **candidatos** con su
+  procedencia (qué seed, qué método, qué posición) y su dato de mercado (volumen, intención,
+  barrera de enlaces) en la misma tabla de mercado que ya alimenta las oportunidades — el dato que
+  viene incluido en la respuesta **no se vuelve a comprar** después.
+- Un candidato es una **sugerencia, no un compromiso**: descubrirlo no lo agrega al set monitoreado
+  ni gasta de forma recurrente. Seguirlo es una decisión posterior y explícita (el mismo "Seguir"
+  de oportunidades), y cada decisión (descartar, seleccionar, promover) queda registrada con autor
+  y fecha.
+- Repetir la misma pregunta no paga dos veces: el mismo intent devuelve la corrida existente.
+
+Estado operativo: **código completo con verificación real** (una corrida live costó USD 0.013 y
+dejó 10 candidatos con mercado) pero **apagado por default** — el flag y el scheduler del worker
+nacen OFF/pausado hasta el rollout autorizado. La superficie visual (lente `Descubrir` del
+workbench) es TASK-1665.
+
+> Detalle técnico: [`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
+> §7 (primitives) y §8 (drain + costos) · runbook
+> [`operar-keyword-discovery-seo.md`](../../manual-de-uso/growth/operar-keyword-discovery-seo.md)
+
 ## Relacion con el AI Visibility Grader (motores hermanos)
 
 SEO y AEO son los dos motores de **Search Visibility 360** y se diseñaron como espejo deliberado:

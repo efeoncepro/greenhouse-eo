@@ -1273,3 +1273,17 @@ Spec: `docs/tasks/in-progress/TASK-1175-design-handoff-control-plane-full-api-pa
 La constante del event type vive en el dominio (`src/lib/growth/seo/contracts.ts`), no en el catálogo TS central — mismo seam de extracción §17.3 que el evento de captura.
 
 **Delta TASK-1308 (reverso):** `untrackKeywords` emite **el MISMO event type** con payload `{ seoTargetId, organizationId, untrackedCount, activeKeywordCount, actor }`. Un tipo de evento aparte obligaría a cada consumer a manejar dos formas de la misma noticia — lo que downstream necesita saber es que el set CAMBIÓ y cuántas keywords se están midiendo ahora, no en qué dirección se movió. `trackedCount` y `untrackedCount` son mutuamente excluyentes en un mismo evento: cada emisión viene de un command, y ningún command hace las dos cosas.
+
+## Delta 2026-08-14 — TASK-1664: `growth.seo.keyword_discovery.requested` / `.completed` (discovery async)
+
+| Evento | Versión | Aggregate | Emisor | Consumer |
+| --- | --- | --- | --- | --- |
+| `growth.seo.keyword_discovery.requested` | v1 | `seo_target` (`seot-{uuid}`) | command `queueKeywordDiscovery` (`src/lib/growth/seo/keyword-discovery/queue.ts`), **dentro de la misma transacción** que inserta el run `pending` (y sólo cuando se insertó de verdad: un enqueue deduped por idempotencia NO emite) | ninguno — **trazabilidad, NUNCA cola de trabajo** |
+| `growth.seo.keyword_discovery.completed` | v1 | `seo_target` (`seot-{uuid}`) | runner `runKeywordDiscovery` (`keyword-discovery/runner.ts`), en la transacción de cierre junto con candidatos + estado final | ninguno todavía — rastro del resultado (incluye estados `budget_blocked`/`failed`: un cierre infeliz también es noticia) |
+
+**Payload v1 `requested`**: `{ runId, organizationId, seoTargetId, sourceKind, seedCount, methods, estimatedCostUsd, actor }`.
+**Payload v1 `completed`**: `{ runId, organizationId, seoTargetId, status, errorCode, candidateCount, providerCalls, actualCostUsd, actor }` — coordenadas y resumen, nunca la lista de keywords: cualquier consumer futuro **re-lee PG** por `runId`.
+
+🔴 **Por qué el outbox NO despacha el run.** En el dominio SEO el disparo de todo batch es **Cloud Scheduler → HTTP al ops-worker** (rank capture, audits, backlinks, GSC, market data); el drain de discovery (`ops-seo-keyword-discovery-drain` → `POST /seo/keyword-discovery/drain`, claim `pending → running` atómico) sigue exactamente ese patrón. Un consumer reactivo de `requested` sería un mecanismo de despacho nuevo en el dominio, con su propia semántica de retry compitiendo con la del claim. Los eventos existen porque una corrida COMPROMETE GASTO y la pregunta de auditoría es "¿quién la pidió, cuánto se estimó y en qué terminó?" — el run responde el estado actual; los eventos responden la historia.
+
+Las constantes viven en el dominio (`src/lib/growth/seo/keyword-discovery/contracts.ts`) — mismo seam de extracción §17.3.

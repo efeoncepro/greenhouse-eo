@@ -7,6 +7,30 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-14 — Descubrir keywords deja de ser un viaje a otra herramienta (TASK-1664)
+
+El módulo SEO contestaba qué empujar de lo que ya aparece en Search Console; no contestaba cómo
+pasar de una hipótesis a un conjunto priorizado de términos. Hoy existe el primitive completo de
+**keyword discovery**: una corrida recibe hasta 10 seeds (manuales, de las consultas GSC, del set
+monitoreado o del dominio propio), las expande con DataForSEO Labs, deduplica y deja **candidatos**
+con procedencia trazable — y con volumen, intención y barrera de enlaces compuestos desde el store
+de mercado de TASK-1661, porque el `keyword_info` que viene inline y pagado en cada respuesta se
+persiste ahí mediante un writer canónico nuevo (`persistKeywordMarketData`) en vez de tirarse.
+`keyword_overview` quedó como top-up sólo del faltante: en el smoke real, el enriquecimiento costó
+**cero llamadas** porque el inline ya había dejado todo fresco.
+
+Las tres fronteras que la spec exigía quedaron en el código, no en la disciplina: el **costo se ve
+antes de gastar** (preview con fórmula, gate de entitlement y fence cada 10 llamadas); **descubrir
+no es seguir** (ninguna pieza escribe el set monitoreado; las decisiones son un log append-only y
+la promoción usa el command de tracking existente); y **repetir la pregunta no paga dos veces**
+(idempotencia por intent completo — el smoke lo midió: segunda corrida USD 0). Paridad completa en
+el mismo cambio: route admin, lane ecosystem (write sólo bindings internos), tools MCP con preview
+y confirmación humana obligatoria, y dos señales de confiabilidad nuevas.
+
+Verificado contra el mundo real, no contra mocks: sanity de 27 checks contra PG y una corrida live
+de Berel MX que costó **USD 0.0132** (estimado conservador 0.0612) y dejó 10 candidatos. Queda
+apagado por diseño: flag OFF en ambos runtimes y scheduler pausado hasta el sign-off de rollout.
+
 ## 2026-08-13 — Berel se mide donde vive su mercado, y el país deja de elegirse en silencio
 
 Una pregunta del operador sobre un dato dudoso destapó dos problemas reales, y los dos quedaron
@@ -1159,10 +1183,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   (GSC) × citabilidad IA (grader), cruce en memoria por org con boundary duro verificado por test.
 - Primera señal real en el smoke live: Berel #1.75 orgánico × AEO 44.5 → `riesgo` (autoridad sin
   citabilidad → CTA cruzado al AEO). Consumers siguientes: tool MCP (TASK-1645) y UI (TASK-1310).
-
-## 2026-08-05 — Growth SEO (EPIC-022): capabilities + entitlement per-org + chokepoint de costo (TASK-1301)
-
-- 5 capabilities `growth.seo.*` seedeadas (catálogo + registry + grants; coverage verde) y módulo `seo_v1`
-  en el catálogo del client portal (parity `data_sources` al union TS).
-- Chokepoint único `enforceSeoRunEntitlement` per-org (tier/allowance/budget con env-knobs, consumer-agnóstico
-  para UI/Nexa/MCP) verificado con smoke E2E contra PG real. Full suite 10076/0 + build prod verdes.
