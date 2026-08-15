@@ -6,18 +6,52 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-15 (2) — decisión de secuencia verificada: esta task **se DESBLOQUEA**
+
+Se retira `Blocked by: TASK-1697`. El Delta inmediatamente inferior queda **superado en su primer
+punto** (el bloqueo por conflicto de archivo); su segundo punto —la pasada de eval consolidada— sigue
+vigente sin cambios.
+
+**Por qué.** `TASK-1697` se recortó a la **mitad A**: `git mv` del sustrato de sitio
+(`probes/safe-fetch.ts` + `probes/html.ts` + los 3 tipos del fetcher) a
+`src/lib/growth/site-substrate/` con re-export shim, test de frontera, y una lint rule angosta. **Ese
+alcance NO toca `grounded-query-bridge.ts` ni `grounded-query-reader.ts`** — verificado contra el
+alcance recortado: los dos archivos salieron de sus `Files owned`. El conflicto de merge que
+justificaba el bloqueo **ya no existe**.
+
+🔴 **El bloqueo se invierte.** La reescritura de esos dos archivos al barrel de dominio AEO viaja
+ahora con **`TASK-1713`** (lint rule universal + barrel de dominio AEO), que declara
+`Blocked by: TASK-1695` — porque su reescritura debe caer sobre el archivo **ya modificado** por esta
+task, no al revés. Rebasar la reescritura del barrel sobre un `grounded-query-bridge.ts` que después
+cambia de techo de candidatos y de versión del cerebro es hacer el mismo merge dos veces, la segunda
+a ciegas.
+
+⚠️ **La mitad B es `TASK-1713`, NO `TASK-1710`.** El brief la nombró `TASK-1710`, pero ese ID ya
+está tomado por el umbrella P0 de remediación de confiabilidad
+(`docs/tasks/to-do/TASK-1710-reliability-remediation-control-plane-delivery-data.md`), `TASK-1711` y `TASK-1712` quedaron tomados en la misma sesión por otro agente en paralelo. La mitad B se registró como
+`docs/tasks/to-do/TASK-1713-growth-cross-domain-import-lint-and-aeo-barrel.md`. **Nunca citar
+`TASK-1710` para este trabajo.**
+
+**Esta task puede tomarse ya.** No espera a nadie: sus tres slices (techo de candidatos, registro
+neutro + bump, eval) sólo dependen de código que ya está en `develop`.
+
 ## Delta 2026-08-15 — `Blocked by` += `TASK-1697`, y el bump entra en UNA sola pasada de eval
 
 Fuente: `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md` (§1.3 deep
 imports cross-dominio; §5.1 `site-substrate`).
 
-**`Blocked by: TASK-1697` — conflicto de archivo, no de contrato.** `TASK-1697` extrae el sustrato de
-sitio (`site-substrate`) y **le reescribe los imports a `grounded-query-bridge.ts`**, que es uno de los
-archivos `owned` de esta task. La auditoría midió que `growth/seo` importa **10 símbolos internos** de
-`growth/ai-visibility` desde `grounded-query-bridge.ts:23-37` y `grounded-query-reader.ts:15-19` —los
-dos archivos que esta task también toca—. Si ambas avanzan en paralelo, el conflicto no es una línea:
-es la cabecera completa del archivo, y quien resuelva el merge tiene que decidir sobre una frontera de
-dominio en medio de un rebase. `TASK-1697` primero; esta task se apoya en los imports ya reordenados.
+> ⚠️ **SUPERADO por el `## Delta 2026-08-15 (2)`.** El bloqueo se retiró: con `TASK-1697` recortada a
+> su mitad A, esa task ya no toca `grounded-query-bridge.ts` ni `grounded-query-reader.ts`, y el
+> orden se invierte (`TASK-1713` del barrel entra **después** de ésta). El párrafo se conserva
+> como registro de por qué se creyó lo contrario.
+
+~~**`Blocked by: TASK-1697` — conflicto de archivo, no de contrato.**~~ `TASK-1697` extraía el
+sustrato de sitio (`site-substrate`) y **le reescribía los imports a `grounded-query-bridge.ts`**, uno
+de los archivos `owned` de esta task. La auditoría midió que `growth/seo` importa **10 símbolos
+internos** de `growth/ai-visibility` desde `grounded-query-bridge.ts:23-37` y
+`grounded-query-reader.ts:15-19` —los dos archivos que esta task también toca—, así que el conflicto
+no sería una línea sino la cabecera completa. Con el recorte, esa reescritura salió de 1697 y el
+conflicto desapareció.
 
 **Coordinación de evals: hay TRES bumps del cerebro en vuelo y cada uno invalida el golden set.**
 
@@ -59,7 +93,7 @@ Esto **no cambia el alcance** de esta task: cambia el orden y el punto de cierre
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|seo|aeo|data`
-- Blocked by: `TASK-1697`
+- Blocked by: `none` (se retiró `TASK-1697` — ver Delta 2026-08-15 (2); el orden se invirtió y `TASK-1713` del barrel AEO entra después de ésta)
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -186,9 +220,9 @@ Reglas obligatorias:
 - `TASK-1665` (complete) — consumer UI del bridge (`KeywordDiscoveryCandidateDrawer`,
   `keyword-discovery-action.ts`).
 - `TASK-1290` / `TASK-1292` (complete) — cerebro autor versionado y harness de eval AEO.
-- **`TASK-1697` (bloqueante, Delta 2026-08-15)** — extracción de `site-substrate`: reescribe los
-  imports de `grounded-query-bridge.ts`, archivo `owned` por esta task. Conflicto de archivo, no de
-  contrato; ver el Delta.
+- ~~`TASK-1697` (bloqueante)~~ — **retirado el 2026-08-15 (2)**. Con 1697 recortada a su mitad A
+  (`git mv` del sustrato + test de frontera + lint rule angosta), esa task **no toca**
+  `grounded-query-bridge.ts` ni `grounded-query-reader.ts`. Esta task no espera a nadie.
 - **Coordinación de eval con `TASK-1698` y `TASK-1703`** — tres bumps del cerebro en vuelo, una sola
   pasada de eval consolidada. No es dependencia de código: es de evidencia de cierre. Ver el Delta.
 - Flags vigentes: `GROWTH_SEO_ENABLED`, `GROWTH_AI_VISIBILITY_GRADER_ENABLED`,
@@ -205,6 +239,11 @@ Reglas obligatorias:
 - **Dedupe del bridge**: la lock key incluye `AUTHOR_SEO_GROUNDED_SYSTEM_PROMPT_VERSION`, así que el bump
   reabre legítimamente la autoría del mismo intent con el cerebro nuevo (comportamiento deseado, hay que
   declararlo, no descubrirlo).
+- 🔴 **`TASK-1713`** — lint rule universal + barrel de dominio AEO: declara `Blocked by: TASK-1695`. Reescribe `grounded-query-bridge.ts` y
+  `grounded-query-reader.ts` para que consuman el barrel de dominio AEO en vez de deep imports, y esa
+  reescritura debe caer sobre los archivos **ya modificados** por esta task — techo de candidatos y
+  versiones del cerebro incluidos. Al cerrar, dejar el estado final de esos dos archivos declarado en
+  el Handoff para que quien tome la hermana no rebase a ciegas.
 - `TASK-1667`, `TASK-1668`, `TASK-1669` (to-do, carril editorial/agéntico SEO): consumen drafts del mismo
   motor aguas abajo.
 
@@ -661,6 +700,9 @@ nuevo, sin cambio en Vercel/Cloud Run, sin coordinación con proveedores SEO.
       naturalidad ejecutada y registrada, el estado correcto NO es `complete`.
 - [ ] Chequeo de impacto cruzado ejecutado sobre `TASK-1667`, `TASK-1668` y `TASK-1669` (consumers
       editoriales aguas abajo del mismo motor).
+- [ ] El estado final de `grounded-query-bridge.ts` y `grounded-query-reader.ts` quedó declarado en
+      `Handoff.md` para **`TASK-1713`** (barrel AEO), que los reescribe después y no debe
+      rebasar a ciegas sobre el techo de candidatos ni las versiones nuevas del cerebro.
 
 ## Follow-ups
 

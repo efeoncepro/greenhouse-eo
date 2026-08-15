@@ -1,5 +1,68 @@
 # TASK-1697 — Growth: sustrato de sitio compartido, barrel de dominio AEO y detector de imports cross-dominio
 
+## Delta 2026-08-15 (2) — decisión de secuencia verificada: esta task se recorta a la **mitad A**
+
+Cuatro especialistas resolvieron la secuencia del lote. Esta task **se parte**, y se queda con la
+mitad barata y desbloqueante.
+
+**Alcance vigente: Slice 1 (el `git mv` del sustrato) + Slice 2 (test de frontera) + una lint rule
+ANGOSTA.** El barrel de dominio AEO y la lint rule **universal** salen a la task hermana `TASK-1713`. El H1 de
+este archivo conserva su nombre histórico; lo que manda es este alcance.
+
+🔴 **La lint rule universal sale de esta task.** Razón medida, no estética: contra `develop` el
+2026-08-15 hay **30 deep imports cross-dominio vivos** en `src/lib/growth/**` (código de producción,
+sin tests), no 14 — y **18 de ellos están fuera del par `seo↔ai-visibility`**:
+
+| Origen → destino | Deep imports |
+|---|---|
+| `seo` → `ai-visibility` | 12 |
+| `ai-visibility` → `forms` | 8 |
+| `ctas` → `forms` | 5 |
+| `ctas` → `meetings` | 1 |
+| `meetings` → `forms` | 1 |
+| `meetings` → `public-submission` | 1 |
+| `forms` → `public-submission` | 1 |
+| `ai-visibility` → `public-submission` | 1 |
+
+Hacer legales esos 18 exige **decisiones de frontera** (qué es superficie pública de `forms`, de
+`meetings`, de `public-submission`), no un sweep de imports. Con ellos vivos la regla universal **no
+puede nacer en `error` con cero violaciones**, y el patrón canónico #7 prohíbe resolverlo con una
+lista de exenciones que se pudre. Una regla de frontera que nace debiendo una lista de exenciones ya
+perdió.
+
+🔴 **La regla que SÍ sale acá es angosta y se apoya en dos invariantes HOY ciertos** (verificados con
+`grep` sobre `develop` el 2026-08-15, alias `@/` y rutas relativas):
+
+1. **Ningún archivo fuera de `src/lib/growth/ai-visibility/**` importa
+   `@/lib/growth/ai-visibility/probes/**`** — cero ocurrencias en `src/`, `services/` y `scripts/`.
+2. **`src/lib/growth/site-substrate/**` no importa `@/lib/growth/*`** — trivialmente cierto porque el
+   directorio nace en esta task, y la carta lo fija desde el primer commit.
+
+Cero violaciones hoy ⇒ la regla nace en **`error`**, sin exención y **sin fecha de saldo**. Y bloquea
+exactamente el commit que `TASK-1670` / `TASK-1701` podrían escribir mañana: ir a buscar el fetcher a
+las tripas del grader en vez de al sustrato.
+
+🔴 **Corrección de spec — un criterio de aceptación era inalcanzable.** Esta task pedía
+`htmlToReadableText` en el barrel del sustrato, pero esa función **no vive en `probes/html.ts`**: está
+en `src/lib/growth/ai-visibility/brand-intelligence/fetch-site-content.ts:21` y se re-exporta por
+`brand-intelligence/index.ts:8`. `probes/html.ts` exporta `extractJsonLdBlocks`,
+`flattenJsonLdNodes`, `jsonLdTypes`, `DomSemanticsSnapshot` y `analyzeDomSemantics`, y nada más. Como
+estaba, el AC no se podía cumplir sin un tercer movimiento no declarado. **Se resuelve sacándola del
+alcance**: `TASK-1670` no la necesita (evalúa `robots.txt`, JSON-LD y sitemap, no extrae prosa), y su
+único consumidor vivo está dentro del propio `brand-intelligence`. Si un tercer consumidor la pide,
+es un movimiento aparte con su propio diff.
+
+**`Blocks` += `TASK-1670`** (sólo sus Slices 1+2 la bloquean, ver el delta de 1670) **y `TASK-1713`**
+(mitad B: lint rule universal + barrel de dominio AEO).
+
+⚠️ **La mitad B es `TASK-1713`, NO `TASK-1710`.** El brief la nombró `TASK-1710`, pero ese ID ya está
+tomado por el umbrella P0 de remediación de confiabilidad
+(`docs/tasks/to-do/TASK-1710-reliability-remediation-control-plane-delivery-data.md`); `TASK-1711` y
+`TASK-1712` quedaron tomados en la misma sesión por otro agente trabajando en paralelo sobre el
+workspace compartido. La mitad B se registró como
+`docs/tasks/to-do/TASK-1713-growth-cross-domain-import-lint-and-aeo-barrel.md`, que además declara
+`Blocked by: TASK-1695`. **Nunca citar `TASK-1710` para este trabajo: apunta a otra cosa.**
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -31,18 +94,29 @@
 
 ## Summary
 
-`growth/seo` importa hoy de las **tripas** de `growth/ai-visibility` contra una regla que la propia
-arquitectura del módulo declara, y nada lo vigila. Esta task cierra **dos acoplamientos distintos con
-un solo detector**: (1) el **sustrato** —fetcher con guarda SSRF + parseo HTML— se muda a
-`growth/site-substrate/` con re-export shim, así que ningún dependiente cambia una línea; (2) los
-símbolos que `growth/seo` consume del dominio AEO pasan a salir por su **barrel público**. La regla
-la fija una lint rule nueva en modo `error` desde el primer commit y con cero violaciones.
+**(Alcance vigente = mitad A; ver `## Delta 2026-08-15 (2)`.)** El **sustrato** —fetcher con guarda
+SSRF + parseo HTML— se muda a `growth/site-substrate/` con re-export shim, así que **ningún
+dependiente cambia una línea**, y nace con **carta verificable** (test de frontera por allowlist:
+no importa `growth/*`, no persiste). Lo blinda una lint rule **angosta** que nace en `error` con cero
+violaciones y sin exenciones: nadie fuera del dominio AEO entra a `ai-visibility/probes/**`, y el
+sustrato no importa `growth/*`.
+
+El **barrel de dominio AEO** y la lint rule **universal** de fronteras `growth/*` **salieron** a la
+`TASK-1713`: hay 30 deep imports cross-dominio vivos y 18 fuera del par `seo↔ai-visibility`, así que
+la regla universal no puede nacer limpia hoy y el barrel no desbloquea a nadie de este lote.
 
 ## Why This Task Exists
 
 Es el §1.3 de la auditoría
 `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md`, y son dos problemas
 que comparten un único detector.
+
+> ⚠️ **Leer con el `## Delta 2026-08-15 (2)` puesto.** El **Problema 1** (deep imports
+> `seo → ai-visibility` y su detector universal) **salió de esta task** a `TASK-1713`: la
+> medición real es 30 deep imports cross-dominio, 18 de ellos ajenos a este par, y la regla universal
+> no puede nacer limpia hoy. Lo que se queda acá es el **Problema 2** —el sustrato sin dueño— más una
+> rule **angosta** que blinda el resultado. La tabla de abajo se conserva como la medición que
+> justifica el corte, no como alcance.
 
 **Problema 1 — deep imports cross-dominio contra una regla declarada, sin detector.**
 `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §17.3 dice, textual: *"NUNCA importar desde
@@ -96,16 +170,17 @@ disparo legítimo del movimiento es el tercer consumidor, y ya existe.
 - Existe `src/lib/growth/site-substrate/` con el fetcher SSRF-guarded y el parseo HTML/texto, con
   nombres que dicen lo que son (`SiteFetcher`, `createSiteFetcher`, `analyzeDomSemantics`), y **cero
   archivos dependientes modificados** gracias a los re-export shim.
-- La **carta del sustrato es verificable por lint**, no por buena voluntad: no importa nada de
-  `growth/*` y no persiste nada (cero Postgres, cero outbox, cero flags de dominio) — mismo contrato
-  que `artifact-composer` ya tiene.
-- Los 14 símbolos que `growth/seo` consume de `ai-visibility` salen por el barrel de dominio
-  (`ai-visibility/index.ts`), y `grounded-query-bridge.ts` / `grounded-query-reader.ts` importan una
-  sola ruta pública cada uno.
-- `greenhouse/no-cross-domain-import-in-growth` vive en `error` **desde el primer commit** y con
-  **cero violaciones** en el repo.
+- La **carta del sustrato es verificable por lint y por test**, no por buena voluntad: no importa nada
+  de `growth/*` y no persiste nada (cero Postgres, cero outbox, cero flags de dominio) — mismo
+  contrato que `artifact-composer` ya tiene.
+- `greenhouse/growth-substrate-boundary` (rule **angosta**) vive en `error` **desde el primer commit**,
+  con **cero violaciones** y **sin una sola exención**: nadie fuera de `ai-visibility/**` importa
+  `ai-visibility/probes/**`, y `site-substrate/**` no importa `@/lib/growth/*`.
 - §17.3 de la arquitectura SEO y `.claude/rules/growth-seo.md` dejan de describir una aspiración y
-  pasan a describir un invariante con detector.
+  pasan a describir el invariante que **sí** tiene detector hoy, nombrando explícitamente que el
+  detector universal es de `TASK-1713`.
+- **Fuera de alcance (`TASK-1713`):** el barrel de dominio AEO con los símbolos que `growth/seo`
+  consume, y la lint rule universal `no-cross-domain-import-in-growth`.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -177,19 +252,24 @@ Reglas obligatorias:
 
 ### Blocks / Impacts
 
-- **`TASK-1670`** (`to-do`): esta task le entrega el sustrato con nombre propio y el barrel, y
-  corrige su premisa de "cero deep imports" y el nombre de la superficie (§5.4 de la auditoría). Es
-  la relación más fuerte del lote: **si 1670 shippea primero declarando `probes/public.ts`, esta
-  task tiene que renombrar una superficie recién nacida.** Ver `### Slice ordering hard rule`.
-- **Análisis de contenido por URL** (aún sin task): es el tercer consumidor externo del sustrato y
-  el disparo legítimo del movimiento (§5.3 de la auditoría). Nace apuntando a
-  `growth/site-substrate/`, no a `probes/`.
-- **`TASK-1695`** (`to-do`, autoría grounded): toca `author-system-prompt.ts`, uno de los módulos
-  cuyos símbolos pasan a exportarse por el barrel. Conflicto de merge probable, no de diseño.
+- **`TASK-1670`** (`to-do`) — **bloqueada sólo por los Slices 1+2 de esta task** (el `git mv` + su
+  test de frontera; horas de trabajo). El resto de esta task puede correr en paralelo con 1670: la
+  rule angosta y el cierre documental no le entregan nada que 1670 necesite para compilar.
+- **`TASK-1713`** — lint rule universal + barrel de dominio AEO (la **mitad B** de esta task; **no** `TASK-1710`, ver el Delta): hereda el barrel de `ai-visibility/index.ts`, la reescritura de imports de
+  `grounded-query-bridge.ts` / `grounded-query-reader.ts` y la rule universal
+  `no-cross-domain-import-in-growth` con los 18 deep imports fuera del par `seo↔ai-visibility`.
+  Depende de que el sustrato exista (esta task) y de `TASK-1695` (los archivos que reescribe).
+- **`TASK-1701`** (`to-do`, análisis de contenido por URL): es el tercer consumidor externo del
+  sustrato y el disparo legítimo del movimiento (§5.3 de la auditoría). Nace apuntando a
+  `growth/site-substrate/`, no a `probes/` — y la rule angosta se lo impone.
+- **`TASK-1695`** (`to-do`, autoría grounded): **ya no está bloqueada por esta task.** Con el recorte,
+  la mitad A **no toca** `grounded-query-bridge.ts` ni `grounded-query-reader.ts`. El bloqueo se
+  invierte: `TASK-1713` declara `Blocked by: TASK-1695`, porque su reescritura al barrel debe
+  caer sobre el archivo ya modificado por 1695.
 - **`TASK-1666`** (cerrada): dueña original de `grounded-query-bridge.ts` /
-  `grounded-query-reader.ts`, los dos archivos cuyos imports se reescriben.
-- Cualquier task futura de `growth/*` hereda el detector: un deep import cross-dominio pasa a romper
-  el build.
+  `grounded-query-reader.ts` — archivos que esta task **ya no toca**.
+- Cualquier task futura de `growth/*` hereda el detector angosto: entrar a `ai-visibility/probes/**`
+  desde fuera del dominio AEO pasa a romper el build.
 
 ### Files owned
 
@@ -197,9 +277,10 @@ Reglas obligatorias:
 - `src/lib/growth/ai-visibility/probes/safe-fetch.ts` (pasa a re-export shim)
 - `src/lib/growth/ai-visibility/probes/html.ts` (pasa a re-export shim)
 - `src/lib/growth/ai-visibility/probes/contracts.ts` (re-exporta los 3 tipos del sustrato)
-- `src/lib/growth/ai-visibility/index.ts` (barrel: agrega los símbolos que SEO consume)
-- `src/lib/growth/seo/grounded-query-bridge.ts` · `src/lib/growth/seo/grounded-query-reader.ts`
-- `eslint-plugins/greenhouse/rules/no-cross-domain-import-in-growth.mjs` (nuevo) + su test
+- `eslint-plugins/greenhouse/rules/growth-substrate-boundary.mjs` (nuevo, rule **angosta**) + su test
+- ~~`src/lib/growth/ai-visibility/index.ts`~~ · ~~`growth/seo/grounded-query-bridge.ts`~~ ·
+  ~~`growth/seo/grounded-query-reader.ts`~~ — **owned por `TASK-1713`** desde el recorte del
+  2026-08-15 (2). Esta task no los toca, y por eso `TASK-1695` queda desbloqueada.
 - `eslint-plugins/greenhouse/index.mjs` [verificar nombre del archivo de registro del plugin]
 - `eslint.config.mjs`
 - `src/lib/growth/site-substrate/__tests__/package-boundary.test.ts` (nuevo)
@@ -284,8 +365,9 @@ Reglas obligatorias:
 - Source of truth afectado: ninguno. Esta task no toca datos, schemas ni contratos de persistencia.
   Lo que cambia es **la superficie de import** entre módulos del mismo runtime.
 - Consumidores afectados: los 7 archivos de producción que hoy importan el sustrato (todos dentro de
-  `ai-visibility`, y ninguno cambia gracias al shim) + `grounded-query-bridge.ts` y
-  `grounded-query-reader.ts` en `growth/seo` (esos sí reescriben sus imports).
+  `ai-visibility`, y **ninguno cambia** gracias al shim). `grounded-query-bridge.ts` y
+  `grounded-query-reader.ts` salieron del alcance con el recorte: sus imports los reescribe la task
+  hermana.
 - Runtime target: `local` + `production` + `worker` — el mismo código se ejecuta en Vercel y en el
   ops-worker, y el gate del worker (`pnpm worker:runtime-deps-gate`) debe seguir verde.
 
@@ -298,10 +380,12 @@ Reglas obligatorias:
 - Contrato nuevo o modificado:
   - `src/lib/growth/site-substrate/index.ts` — barrel del sustrato, con los nombres canónicos
     (`SiteFetcher`, `SiteFetchInit`, `SiteFetchResult`, `createSiteFetcher`, `resolveSubjectSite`,
-    `analyzeDomSemantics`, `extractJsonLdBlocks`, `htmlToReadableText`).
+    `analyzeDomSemantics`, `extractJsonLdBlocks`, `flattenJsonLdNodes`, `jsonLdTypes`,
+    `DomSemanticsSnapshot`). **`htmlToReadableText` NO entra** — no vive en `probes/html.ts` sino en
+    `brand-intelligence/fetch-site-content.ts:21`; ver el Delta 2026-08-15 (2).
   - `probes/safe-fetch.ts`, `probes/html.ts` y `probes/contracts.ts` conservan sus exports actuales
     como **alias re-exportados** del sustrato.
-  - `ai-visibility/index.ts` agrega los re-exports que `growth/seo` necesita.
+  - ~~`ai-visibility/index.ts` agrega los re-exports que `growth/seo` necesita~~ → `TASK-1713`.
 - Backward compatibility: `compatible`. Ningún export desaparece; los nombres viejos siguen
   resolviendo por alias. Es la condición que hace que los 7 dependientes de producción no cambien
   una línea.
@@ -321,9 +405,10 @@ Reglas obligatorias:
   - **El scoring versionado no se mueve, no se comparte y no se fusiona.** Ni `score_version`, ni la
     config de scoring, ni los review gates, ni la autoría de prompts (esa se queda en AEO y SEO la
     consume vía command, con su sanitizer no-leading intacto).
-  - **El barrel exporta, no envuelve.** `ai-visibility/index.ts` re-exporta símbolos; no introduce
-    una capa de adaptación con lógica propia, que sería un tercer lugar donde el comportamiento puede
-    divergir.
+  - **Los shims re-exportan, no envuelven.** `probes/safe-fetch.ts` / `probes/html.ts` /
+    `probes/contracts.ts` re-exportan alias; no introducen una capa de adaptación con lógica propia,
+    que sería un tercer lugar donde el comportamiento puede divergir. (La misma regla aplicada al
+    barrel de dominio AEO viaja con `TASK-1713`.)
 - Tenant/space boundary: sin cambio. El sustrato no conoce organizaciones; recibe una URL y devuelve
   bytes/estructura.
 - Idempotency/concurrency: sin cambio. El fetcher es read-only sobre superficies públicas y no muta
@@ -407,7 +492,9 @@ fronteras de módulo con detector de CI. Las capabilities que atraviesan los arc
   `SiteFetchResult` / `SiteFetchInit` / `SiteFetcher`.
 - `src/lib/growth/site-substrate/index.ts`: barrel con los nombres canónicos
   (`createSiteFetcher`, `resolveSubjectSite`, `analyzeDomSemantics`, `extractJsonLdBlocks`,
-  `htmlToReadableText`, los 3 tipos).
+  `flattenJsonLdNodes`, `jsonLdTypes`, `DomSemanticsSnapshot`, los 3 tipos del fetcher).
+  **Sin `htmlToReadableText`**: no está en `probes/html.ts` (vive en
+  `brand-intelligence/fetch-site-content.ts:21`) y ningún consumidor de este lote la pide.
 - Shims: `probes/safe-fetch.ts`, `probes/html.ts` y el bloque de tipos de `probes/contracts.ts`
   quedan como `export { createSiteFetcher as createProbeFetcher, ... } from '@/lib/growth/site-substrate'`.
   **Verificación de éxito del slice: `git diff --stat` no muestra ningún otro archivo modificado.**
@@ -430,57 +517,52 @@ fronteras de módulo con detector de CI. Las capabilities que atraviesan los arc
   evidencia y nunca cómo se JUZGA; si necesita persistir o consultar un dominio, no es del
   sustrato.**
 
-### Slice 3 — El barrel de dominio AEO cubre lo que SEO consume
+### Slice 3 — `greenhouse/growth-substrate-boundary` (rule **angosta**), en `error` desde commit-1
 
-- `ai-visibility/index.ts` agrega los re-exports de los 14 símbolos listados en
-  `## Why This Task Exists`, agrupados y comentados por qué son públicos (son el contrato del bridge
-  SEO→AEO de `TASK-1666`, no un volcado del dominio).
-- Cuidado con las colisiones de nombre: el barrel ya hace `export *` de 10 módulos. Si algún símbolo
-  colisiona, se re-exporta nominalmente, nunca con `export *` de un módulo interno nuevo.
-- `grounded-query-bridge.ts:23-37` (7 imports) y `grounded-query-reader.ts:15-19` (5 imports) pasan a
-  **un solo `import ... from '@/lib/growth/ai-visibility'`** cada uno.
-- `pnpm typecheck` verde: es la prueba de que el barrel expone exactamente lo que hacía falta, ni
-  más ni menos.
+Molde: `no-cross-domain-import-from-client-portal.mjs` (`ImportDeclaration` + `ImportExpression` +
+`require` + `export ... from`, `HELPER_HINT` con las salidas legítimas, `meta.docs.url` a §17.3).
 
-### Slice 4 — `greenhouse/no-cross-domain-import-in-growth`, en `error` desde commit-1
+Cubre **exactamente dos invariantes**, ambos verificados con cero violaciones el 2026-08-15:
 
-- `eslint-plugins/greenhouse/rules/no-cross-domain-import-in-growth.mjs`, molde
-  `no-cross-domain-import-from-client-portal.mjs`: `ImportDeclaration` + `ImportExpression` +
-  `require`, `HELPER_HINT` con las salidas legítimas, `meta.docs.url` apuntando a §17.3.
-- Regla, en una frase: **un archivo bajo `src/lib/growth/<dominio>/**` no puede importar un subpath
-  interno de otro `src/lib/growth/<otro-dominio>/**`; sólo la raíz del barrel
-  `@/lib/growth/<otro-dominio>`.**
-  - `@/lib/growth/ai-visibility` → permitido
-  - `@/lib/growth/ai-visibility/flags` → **error**
-  - `@/lib/growth/site-substrate` y sus subpaths → **permitido para todos** (es el sustrato
-    compartido, exento por path en la rule con su razón escrita)
-  - importar `@/lib/growth/*` **desde** `site-substrate/**` → **error** (la carta, en la otra
-    dirección)
-  - imports internos del propio dominio (relativos o `@/lib/growth/<mismo>/...`) → permitido
-- Override block en `eslint.config.mjs` para el archivo de la rule y sus tests.
-- `'greenhouse/no-cross-domain-import-in-growth': 'error'` en `eslint.config.mjs`, junto a la de
-  client-portal.
-- Test de la rule con casos válidos e inválidos, incluida la dirección inversa del sustrato.
-- 🔴 **`pnpm lint` con cero violaciones en el mismo commit.** Si aparece una violación que los slices
-  1–3 no cubrieron, **no se baja la rule a `warn`**: se corrige el import o se agrega la exención con
-  su razón escrita.
+1. **Nadie fuera de `src/lib/growth/ai-visibility/**` importa `@/lib/growth/ai-visibility/probes/**`**
+   (ni por alias ni por ruta relativa que escape del dominio). Ésa es la puerta que `TASK-1670` y
+   `TASK-1701` podrían empujar mañana: ir a buscar el fetcher a las tripas del grader.
+2. **`src/lib/growth/site-substrate/**` no importa `@/lib/growth/*`** — la carta, en la dirección
+   inversa, expresada también como lint y no sólo como test.
 
-### Slice 5 — Cierre documental y corrección de la premisa de `TASK-1670`
+- Override block en `eslint.config.mjs` para el archivo de la rule y sus tests;
+  `'greenhouse/growth-substrate-boundary': 'error'` junto a la de client-portal.
+- Test de la rule con casos válidos e inválidos en **ambas direcciones**.
+- 🔴 **`pnpm lint` con cero violaciones y CERO exenciones en el mismo commit.** No hay lista de
+  excepciones ni fecha de saldo: si hiciera falta una, la regla no es angosta y el trabajo es de la
+  `TASK-1713`.
+- 🔴 **Lo que esta rule NO hace:** no prohíbe deep imports entre dominios `growth/*` en general. Esa
+  es la rule universal `no-cross-domain-import-in-growth`, y no puede nacer hoy en `error` porque hay
+  **30 deep imports cross-dominio vivos**, 18 fuera del par `seo↔ai-visibility` (tabla en el Delta).
+  Legalizar esos 18 exige decidir la superficie pública de `forms`, `meetings` y `public-submission`:
+  es trabajo de frontera, no un sweep, y el patrón canónico #7 prohíbe cerrarlo con exenciones.
+
+### Slice 4 — Cierre documental
 
 - §17.3 de `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`: la regla "NUNCA importar desde otros dominios"
-  gana su detector (`greenhouse/no-cross-domain-import-in-growth`) y la excepción nombrada
-  (`growth/site-substrate`, con su carta).
+  gana **su primer detector real** (`greenhouse/growth-substrate-boundary`) y la excepción nombrada
+  (`growth/site-substrate`, con su carta). Se declara explícito que el detector universal **todavía no
+  existe** y que su dueña es `TASK-1713`, con la cifra medida (30 / 18) — para que nadie lea §17.3
+  como si ya estuviera cubierta.
 - `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`: delta declarando que el sustrato salió
-  de `probes/` y que el barrel es el contrato del bridge SEO→AEO.
+  de `probes/` con shim y que `ai-visibility/probes/**` es privado del dominio, con detector.
 - `.claude/rules/growth-seo.md`: la regla nueva en una línea, para que cargue por path.
-- `## Delta` en `TASK-1670` (lo escribe el agente que ejecute esta task, **no** se toca al crearla):
-  corrige la premisa de "cero deep imports" con la medición real, y cambia el nombre de la superficie
-  — no va en `probes/public.ts`, el contrato es el barrel de dominio ya existente y lo que SEO
-  consume es el **sustrato**, exportado con nombres que lo digan.
 - Doc funcional / manual: proporcional. No hay superficie de operador nueva; basta el delta técnico.
 
 ## Out of Scope
 
+- 🔴 **No se abre el barrel de dominio AEO** (`ai-visibility/index.ts`) ni se reescriben los imports
+  de `grounded-query-bridge.ts` / `grounded-query-reader.ts`. Es de `TASK-1713`, que además debe
+  entrar **después** de `TASK-1695` para no reescribir un archivo que 1695 va a mover.
+- 🔴 **No se crea la lint rule universal `no-cross-domain-import-in-growth`.** Task hermana. Motivo
+  medido: 30 deep imports cross-dominio vivos, 18 fuera del par `seo↔ai-visibility`.
+- **No se mueve `htmlToReadableText`.** No vive en `probes/html.ts` y ningún consumidor de este lote
+  la necesita; moverla sería un tercer movimiento no declarado dentro del mismo PR.
 - **No se mueve el scoring versionado.** Ni `score_version`, ni `scoring/config.ts`, ni
   `scoring/engine.ts`. §5.1 lo marca `duplicar deliberadamente` con costo de equivocarse **máximo**.
 - **No se mueve la autoría de prompts.** Queda en AEO; SEO la consume vía command. El sanitizer
@@ -498,18 +580,26 @@ fronteras de módulo con detector de CI. Las capabilities que atraviesan los arc
 - **No se mejora la guarda SSRF** ni se levanta el bloqueo cross-host de `resolveProbeUrl`.
 - **No se agrega ninguna capacidad**: ni análisis de contenido, ni parseo nuevo, ni un fetcher
   adicional.
-- **No se toca `TASK-1670`** al crear esta task; su `## Delta` lo escribe quien ejecute el Slice 5.
 
 ## Detailed Spec
 
-### Por qué un solo detector cierra dos problemas
+### Por qué el detector angosto va con el sustrato, y el universal no
 
-El sustrato y el barrel parecen dos trabajos y son el mismo invariante mirado desde dos lados:
-**qué puede cruzar la frontera entre dos dominios de `growth`**. Sin la rule, mover el sustrato es
-higiene reversible en el próximo PR; sin el sustrato, la rule tendría una violación legítima el día
-uno (el análisis de contenido necesitaría el fetcher y no tendría de dónde tomarlo sin deep import).
-Por eso van juntos, y por eso la rule llega **al final**: cuando ya no queda ninguna violación que
-justifique bajarla a `warn`.
+El sustrato y su detector son el mismo invariante mirado desde dos lados: **qué puede cruzar la
+frontera del dominio AEO**. Sin la rule, mover el sustrato es higiene reversible en el próximo PR
+—alguien vuelve a entrar a `probes/` y nadie se entera—; sin el sustrato, la rule tendría una
+violación legítima el día uno (el análisis de contenido de `TASK-1701` necesitaría el fetcher y no
+tendría de dónde tomarlo). Por eso van juntos, y por eso la rule llega **al final**: cuando ya no
+queda ninguna violación que justifique bajarla a `warn`.
+
+La rule **universal** no cumple esa condición y por eso salió. Medido el 2026-08-15: 30 deep imports
+cross-dominio vivos en `src/lib/growth/**`, de los cuales **18 no tienen nada que ver con este lote**
+(`ai-visibility→forms` 8, `ctas→forms` 5, `ctas→meetings` 1, `meetings→forms` 1,
+`meetings→public-submission` 1, `forms→public-submission` 1, `ai-visibility→public-submission` 1).
+Cada uno exige decidir qué es superficie pública de esos dominios — trabajo real, con riesgo propio,
+que no debe montarse sobre un `git mv` que quiere ser un diff auditable de una guarda SSRF.
+Mezclarlos tendría exactamente dos salidas, ambas malas: retrasar semanas un movimiento de una tarde,
+o parir la regla con una lista de exenciones que se pudre (patrón canónico #7).
 
 ### Por qué el shim y no reescribir los 7 dependientes
 
@@ -524,33 +614,38 @@ Dos razones, en orden de peso:
 
 La limpieza de los shims es un follow-up explícito, no deuda olvidada.
 
-### Forma de la rule
+### Forma de la rule angosta
 
 ```js
-// Un archivo bajo src/lib/growth/<A>/** que importa @/lib/growth/<B>/<subpath> es un error.
-// Sólo la raíz del barrel, @/lib/growth/<B>, es superficie pública.
-const GROWTH_DOMAIN_FILE = /[/\\]src[/\\]lib[/\\]growth[/\\]([a-z0-9-]+)[/\\]/
-const GROWTH_IMPORT      = /^@\/lib\/growth\/([a-z0-9-]+)(?:\/(.+))?$/
+// (1) probes/** es privado del dominio AEO: sólo archivos bajo
+//     src/lib/growth/ai-visibility/** pueden importarlo.
+const AEO_PROBES_IMPORT = /^@\/lib\/growth\/ai-visibility\/probes(?:\/|$)/
+const AEO_DOMAIN_FILE   = /[/\\]src[/\\]lib[/\\]growth[/\\]ai-visibility[/\\]/
 
-// SHARED_SUBSTRATE = 'site-substrate'
-//   - cualquier dominio puede importarlo, con o sin subpath
-//   - él no puede importar NINGÚN @/lib/growth/*  (la carta, en la otra dirección)
+// (2) la carta del sustrato, en la otra dirección:
+//     un archivo bajo src/lib/growth/site-substrate/** no importa NINGÚN @/lib/growth/*
+const SUBSTRATE_FILE  = /[/\\]src[/\\]lib[/\\]growth[/\\]site-substrate[/\\]/
+const GROWTH_IMPORT   = /^@\/lib\/growth\//
 ```
 
 Casos que la rule debe cubrir además del `import` estático: `import()` dinámico, `require()` y
 `export ... from`. El molde de client-portal cubre los tres primeros; el cuarto se agrega porque un
-barrel que re-exporta de otro dominio es el mismo agujero con otra sintaxis.
+barrel que re-exporta de otro dominio es el mismo agujero con otra sintaxis. También debe atrapar la
+ruta **relativa** que escapa del dominio (`../../ai-visibility/probes/...`), no sólo el alias `@/`.
 
-### Casos legítimos que la rule NO debe romper
+### Verificación previa de que la rule nace limpia
 
-Verificar en el plan, antes de subirla a `error`:
+Ambos invariantes se midieron contra `develop` el 2026-08-15 y dieron **cero**:
 
-- `src/lib/growth/forms/**`, `growth/cta/**`, `growth/meetings/**`, `growth/ga4/**`,
-  `growth/search-console/**` — si alguno cruza hacia otro subdominio de growth por deep import, es un
-  hallazgo nuevo y hay que decidirlo (barrel o exención), no silenciar la rule.
-- `src/app/**`, `src/views/**`, `src/components/**`, `src/mcp/**`, `services/ops-worker/**` — no son
-  archivos de dominio; la rule no aplica (el guard `GROWTH_DOMAIN_FILE` los excluye por path).
-- Tests y fixtures — excluidos igual que en el molde.
+- `grep -rn "growth/ai-visibility/probes"` sobre `src/`, `services/` y `scripts/`, excluyendo
+  `src/lib/growth/ai-visibility/**` → cero ocurrencias, alias y relativas.
+- No hay imports relativos que escapen de un dominio `growth/*` hacia otro (`../../<otro-dominio>`) →
+  cero ocurrencias, así que el alias `@/` es la única superficie que la rule necesita vigilar.
+- `site-substrate/**` no existe todavía: nace en el Slice 1 y con la carta puesta desde el primer
+  commit, así que el segundo invariante no puede violarse "de arrastre".
+
+Excluidos por path, igual que en el molde: `src/app/**`, `src/views/**`, `src/components/**`,
+`src/mcp/**`, `services/**`, tests y fixtures del propio dominio AEO.
 
 ### Nombres: por qué `SiteFetcher` y no `ProbeFetcher`
 
@@ -565,27 +660,26 @@ quiere evitar. §5.4 de la auditoría lo pide explícito: *"exportarlo con nombr
 ### Slice ordering hard rule
 
 - **Slice 1 → Slice 2**: la carta se escribe sobre un directorio que ya existe.
-- **Slice 1 y Slice 3 son independientes** entre sí (uno mueve el sustrato, el otro abre el barrel);
-  pueden ir en cualquier orden.
-- **Slice 4 (la rule) es SIEMPRE el último de código.** Subirla a `error` con violaciones vivas
+- **Slice 3 (la rule) es SIEMPRE el último de código.** Subirla a `error` con violaciones vivas
   obliga a la decisión errada (bajarla a `warn`) y la task pierde su razón de ser.
-- 🔴 **Coordinación con `TASK-1670`.** Si `TASK-1670` todavía no shippeó, esta task debe entrar
-  **antes**, o 1670 debe declarar `Blocked by: TASK-1697`. Si 1670 ya shippeó con
-  `probes/public.ts`, el Slice 3 absorbe esa superficie en el barrel y deja el archivo como shim —
-  **nunca dos superficies públicas conviviendo**, que es el mismo problema con una capa más.
-- **Slice 5 al final**: la doc describe el estado final, no el intermedio.
+- 🔴 **Coordinación con `TASK-1670`: sólo los Slices 1+2 la bloquean.** Apenas el sustrato existe con
+  su carta, 1670 puede arrancar; los Slices 3 y 4 corren en paralelo. Bloquear 1670 contra los cuatro
+  slices sería pagar el riesgo de la lint rule con retraso de la señal de producto, y la señal de
+  producto acá es "un sitio invisible para la IA deja de puntuar 95/100".
+- 🔴 **Coordinación con `TASK-1713`.** El barrel de dominio AEO y la rule universal viven allá, y
+  esa task entra **después de `TASK-1695`** (reescribe archivos que 1695 modifica). Esta task no toca
+  esos archivos, así que **no hay conflicto de merge con 1695** y 1695 queda desbloqueada.
+- **Slice 4 al final**: la doc describe el estado final, no el intermedio.
 
 ### Risk matrix
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
 | El movimiento de `safe-fetch.ts` cambia sin querer un umbral, un host bloqueado o el redirect, y la guarda SSRF se debilita en silencio | growth/seguridad | medium | `git mv` (no copy-paste) + regla de "diff puro" + revisión del diff del Slice 1 aislado + tests de `probes-substrate.test.ts` sin modificar | `growth.ai_visibility.probe_failure_rate`; y un host no público que deje de bloquearse **no** dispara señal — por eso el diff aislado es la mitigación principal |
-| La rule aparece con violaciones fuera de `seo`/`ai-visibility` (forms, cta, ga4, search-console) y se baja a `warn` "temporalmente" | tooling/CI | medium | Barrido completo de `src/lib/growth/**` en Discovery, **antes** de escribir la rule; cada hallazgo se resuelve con barrel o exención razonada, nunca bajando la severidad | `pnpm lint` en rojo — es el punto, no el fallo |
-| El barrel de AEO colisiona nombres al agregar re-exports sobre 10 `export *` existentes | build | medium | Re-export nominal (nunca `export *` de un módulo interno nuevo) + `pnpm typecheck` como gate del Slice 3 | Fallo de compilación inmediato |
-| Ciclo de imports: el barrel de AEO re-exporta algo que termina importando `growth/seo` | build | low | El DAG está verificado direccionalmente limpio (cero imports de `seo` en `ai-visibility`); la rule lo fija a futuro en las dos direcciones | Inestabilidad de build / orden de imports |
+| Alguien reintroduce la rule universal dentro de esta task "ya que estamos", y aparece con 18 violaciones que se silencian con exenciones | tooling/CI | medium | Alcance recortado y escrito en `## Out of Scope`; la rule angosta tiene su nombre propio (`growth-substrate-boundary`) para que no se confunda con la universal | Cualquier exención en el archivo de la rule — la angosta nace con cero |
+| El movimiento del sustrato deja viva alguna ruta a `probes/**` que la rule angosta no cubre (relativa, dinámica, `export … from`) | tooling/CI | medium | Los 4 patrones del molde + test de la rule con casos relativos; barrido verificado en cero antes de subirla | `pnpm lint` verde con un deep import vivo — se detecta en el test de la rule, no en el repo |
 | `site-substrate` se vuelve un tercer dominio por acreción (alguien le agrega una query o un flag) | growth | medium | Carta verificable por test de frontera **y** por lint, desde el mismo PR en que nace | El test de `package-boundary` rompe el build |
-| Conflicto de merge con `TASK-1670` sobre la misma superficie pública | planificación | high | Orden duro declarado arriba + `## Delta` en 1670 como item de cierre | Dos archivos que dicen ser la superficie pública del mismo dominio |
-| Conflicto de merge con `TASK-1695` sobre `author-system-prompt.ts` | planificación | medium | Coordinación de orden con el operador; el conflicto es textual, no de diseño | Conflicto en el rebase |
+| `TASK-1670` arranca antes de que exista el sustrato e improvisa una superficie dentro del motor AEO | planificación | medium | Bloqueo declarado a Slices 1+2 (horas, no semanas) + la rule angosta que lo rompería en CI | Un archivo nuevo bajo `ai-visibility/**` en el PR de 1670 |
 | El bundle del ops-worker rompe porque el sustrato quedó con un import que el worker no resuelve | cross-runtime | low | El allowlist del sustrato es más estricto que lo que el worker exige; `pnpm worker:runtime-deps-gate` en el gate de cierre | Startup crash silencioso del ops-worker |
 
 ### Feature flags / cutover
@@ -601,9 +695,8 @@ para un refactor sin datos es completa.
 |---|---|---|---|
 | Slice 1 | `revert PR` — el `git mv` se deshace y los shims desaparecen. Sin datos involucrados | ~5 min | si |
 | Slice 2 | `revert PR` — quitar el test de frontera. Sin efecto runtime | ~2 min | si |
-| Slice 3 | `revert PR` — el barrel vuelve a su forma anterior y los dos archivos de `seo` a sus deep imports | ~5 min | si |
-| Slice 4 | `revert PR` o bajar la rule en `eslint.config.mjs`. **Bajarla a `warn` NO es rollback: es abandonar la task**; si hace falta, revertir el commit entero | ~2 min | si |
-| Slice 5 | `revert PR` — doc-only | ~2 min | si |
+| Slice 3 | `revert PR` del commit de la rule. **Bajarla a `warn` NO es rollback: es abandonar la task**; si hace falta, revertir el commit entero | ~2 min | si |
+| Slice 4 | `revert PR` — doc-only | ~2 min | si |
 
 ### Production verification sequence
 
@@ -621,8 +714,8 @@ para un refactor sin datos es completa.
    `errorCode` ante host no público.
 8. Verificar en `/admin/operations` que `growth.ai_visibility.probe_failure_rate` no se movió
    respecto de la línea base previa.
-9. Ejercitar el bridge grounded (`grounded-query-bridge`) contra staging para confirmar que la
-   reescritura de imports no cambió el comportamiento del draft AEO ni su `groundingMode`.
+9. ~~Ejercitar el bridge grounded~~ — fuera de alcance con el recorte: esta task ya no reescribe
+   imports de `grounded-query-*`. Esa verificación viaja con `TASK-1713`.
 
 ### Out-of-band coordination required
 
@@ -653,25 +746,28 @@ de `TASK-1670` y `TASK-1695`, que decide el operador.
       `@/lib/sync/*`, cualquier `flags`, `next` o `@core/*`.
 - [ ] `src/lib/growth/site-substrate/**` no contiene una sola query SQL, ni un `outbox`, ni un flag
       de dominio, verificado por ese test.
-- [ ] `grounded-query-bridge.ts` y `grounded-query-reader.ts` tienen **un solo** import de
-      `@/lib/growth/ai-visibility` cada uno; cero subpaths internos.
-- [ ] `ai-visibility/index.ts` exporta los 14 símbolos, agrupados y con un comentario que dice por
-      qué son públicos.
-- [ ] `eslint-plugins/greenhouse/rules/no-cross-domain-import-in-growth.mjs` existe, cubre
-      `ImportDeclaration`, `ImportExpression`, `require` y `export ... from`, y tiene test con casos
-      válidos e inválidos en **ambas direcciones** del sustrato.
-- [ ] La rule está en `'error'` en `eslint.config.mjs` y `pnpm lint` reporta **cero** violaciones en
-      el mismo commit. No existe ninguna instancia de la rule en `warn`.
-- [ ] `growth/site-substrate` está exento por path como sustrato compartido, con la razón escrita en
-      el archivo de la rule.
+- [ ] El barrel del sustrato **no** exporta `htmlToReadableText`, y esa función sigue viviendo intacta
+      en `brand-intelligence/fetch-site-content.ts`.
+- [ ] `eslint-plugins/greenhouse/rules/growth-substrate-boundary.mjs` existe, cubre
+      `ImportDeclaration`, `ImportExpression`, `require` y `export ... from`, atrapa también rutas
+      relativas que escapan del dominio, y tiene test con casos válidos e inválidos en **ambas
+      direcciones**.
+- [ ] La rule está en `'error'` en `eslint.config.mjs`, `pnpm lint` reporta **cero** violaciones en el
+      mismo commit y el archivo de la rule **no contiene ninguna exención** ni fecha de saldo.
+- [ ] Ningún archivo fuera de `src/lib/growth/ai-visibility/**` importa
+      `@/lib/growth/ai-visibility/probes/**`, y `site-substrate/**` no importa `@/lib/growth/*`:
+      ambos verificados por la rule en CI.
+- [ ] Esta task **no** creó `no-cross-domain-import-in-growth` ni tocó `ai-visibility/index.ts`,
+      `grounded-query-bridge.ts` ni `grounded-query-reader.ts` (`git diff --stat` lo prueba).
 - [ ] `pnpm vitest run src/lib/growth` pasa sin haber modificado ningún test preexistente de
       `ai-visibility`.
 - [ ] `pnpm worker:runtime-deps-gate` verde.
 - [ ] Una corrida real de probes contra un dominio público en staging devuelve el mismo status,
       `finalUrl` y `errorCode` que antes del cambio, con la evidencia registrada en el cierre.
-- [ ] §17.3 de `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` nombra el detector y la excepción del
-      sustrato; `.claude/rules/growth-seo.md` lo refleja en una línea.
-- [ ] `TASK-1670` recibió su `## Delta` con la premisa corregida y el nombre de la superficie.
+- [ ] §17.3 de `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` nombra el detector angosto y la excepción
+      del sustrato, **y declara explícito que el detector universal todavía no existe** (30 deep
+      imports vivos, 18 fuera del par `seo↔ai-visibility`) con `TASK-1713` como dueña;
+      `.claude/rules/growth-seo.md` lo refleja en una línea.
 - [ ] No existe `src/lib/growth/search-visibility/` ni ningún `packages/*` nuevo.
 - [ ] `pnpm task:lint --task TASK-1697` reporta `template=1 errors=0`.
 
@@ -697,14 +793,16 @@ de `TASK-1670` y `TASK-1695`, que decide el operador.
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] `TASK-1670` recibe un `## Delta` que (a) corrige la premisa "cero deep imports" con la
-      medición real y (b) cambia el nombre y el lugar de la superficie pública: barrel de dominio,
-      no `probes/public.ts`; sustrato con nombres de sustrato. Los criterios exigibles se agregan
-      como checkboxes en su `## Acceptance Criteria`, no como prosa.
-- [ ] `TASK-1695` recibe un `## Delta` avisando que `author-system-prompt.ts` pasa a exportarse por
-      el barrel, para evitar el conflicto de merge.
-- [ ] Cualquier violación de la rule hallada fuera de `seo`/`ai-visibility` durante Discovery queda
-      documentada: resuelta en esta task, o con task derivada y exención razonada.
+- [x] `TASK-1670` recibió su `## Delta 2026-08-15 (2)`: bloqueo acotado a Slices 1+2 de esta task,
+      y el bloqueante real del cierre del agujero declarado (`TASK-1671`, no esta task).
+- [x] `TASK-1695` recibió su `## Delta 2026-08-15 (2)`: **se desbloquea** — con el recorte esta task
+      no toca `grounded-query-bridge.ts` ni `grounded-query-reader.ts`, y el bloqueo se invierte
+      hacia `TASK-1713`.
+- [ ] La mitad B se cita por su ID real, **`TASK-1713`**, en todo el archivo; no queda ninguna
+      referencia a `TASK-1710` como si fuera este trabajo (ese ID es el umbrella de remediación de
+      confiabilidad).
+- [ ] Cualquier deep import a `ai-visibility/probes/**` hallado durante Discovery fuera de
+      `ai-visibility/**` queda resuelto en esta task, **nunca** con exención.
 
 ## Follow-ups
 
@@ -716,11 +814,12 @@ de `TASK-1670` y `TASK-1695`, que decide el operador.
   convierte en `priority_score` con su config versionada y AEO en evidencia de `citation_quality` con
   la suya. Depende del gate de tokens per-org (`TASK-1696` follow-up) antes de correr a escala de
   sitio.
-- **Extender la rule al resto de `src/lib/**`**: la misma forma sirve para cualquier par de dominios
-  (`finance`, `payroll`, `commercial`). Evaluar después de un ciclo con la versión de `growth`, para
-  no descubrir 200 violaciones legítimas de una vez.
+- **Rule universal `no-cross-domain-import-in-growth` + barrel de dominio AEO** → **`TASK-1713`**. Ahí se decide la superficie pública de `forms`, `meetings` y
+  `public-submission` para poder legalizar los 18 deep imports que hoy la harían nacer sucia.
+- **Extender la rule al resto de `src/lib/**`** (`finance`, `payroll`, `commercial`): sólo después de
+  un ciclo con la universal de `growth`, para no descubrir 200 violaciones legítimas de una vez.
 - **Barrel de `growth/seo`**: hoy `growth/seo` no tiene `index.ts`. Cuando otro dominio lo consuma,
-  la rule lo exigirá; conviene crearlo antes de que sea urgente.
+  la rule universal lo exigirá; conviene crearlo antes de que sea urgente.
 
 ## Open Questions
 
@@ -729,11 +828,10 @@ de `TASK-1670` y `TASK-1695`, que decide el operador.
   es fetch + parse de un sitio. Dejarlo en `growth/` mantiene el blast radius acotado y evita
   discutir hoy una frontera que `EPIC-026` va a discutir igual; si mañana lo consume un dominio de
   fuera de growth, el movimiento es un `git mv` más.
-- ¿El barrel de AEO debe exportar `getGraderProfile` y `getActiveBrandIntelligence` tal cual, o
-  conviene un reader de propósito acotado para el bridge SEO (`readGraderContextForSeoBridge`) que no
-  exponga el store completo? Lo primero es más chico y honesto con lo que hoy existe; lo segundo
-  reduce la superficie pública a lo que realmente se necesita. La task propone lo primero y deja lo
-  segundo como decisión del plan, para no inventar un contrato antes de tener el segundo consumidor.
-- ¿La rule debe permitir imports de subpath **de tipos** (`import type`) entre dominios? Serían
-  inocuos en runtime pero igual acoplan la forma interna. La task propone prohibirlos igual (un tipo
-  público es un export del barrel), pero es el caso donde una exención es más defendible.
+- ~~¿El barrel de AEO debe exportar `getGraderProfile` y `getActiveBrandIntelligence` tal cual, o
+  conviene un reader acotado (`readGraderContextForSeoBridge`)?~~ → **movida a `TASK-1713`** con
+  el recorte del 2026-08-15 (2); acá ya no se abre el barrel.
+- ¿La rule angosta debe permitir imports de subpath **de tipos** (`import type`) desde
+  `ai-visibility/probes/**`? Serían inocuos en runtime pero igual acoplan la forma interna. La task
+  propone prohibirlos igual, y hoy es gratis: hay **cero** de ellos en el repo, así que no cuesta
+  nada nacer estricto y sí costaría mucho relajarlo después.
