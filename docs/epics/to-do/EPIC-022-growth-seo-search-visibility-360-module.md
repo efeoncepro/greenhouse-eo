@@ -225,6 +225,13 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1708` — [creada 2026-08-15, backend-data] Estacionalidad: la serie de 12 meses que ya viene
   en `keyword_info`.
 - `TASK-1709` — [creada 2026-08-15, backend-data] Carril de diagnóstico de prospecto SEO.
+- `TASK-1671` — [creada 2026-08-15, ui-ux] **Superficie de los hallazgos de sitio.** Estaba
+  reservada desde el 2026-08-11 y la resolución de secuencia la destapó como **el bloqueante real**:
+  `TASK-1670` nace con flag OFF y no se prende hasta que esta esté desplegada. Habilita el flip y es
+  precondición de que `TASK-1672` publique artefacto.
+- `TASK-1713` — [creada 2026-08-15, backend-data] **Lint rule universal cross-dominio + barrel AEO.**
+  Mitad B de la partición de `TASK-1697`. 30 deep imports medidos, 18 fuera del par conocido.
+  `Blocked by: TASK-1695` (bloqueo invertido).
 - `TASK-1284` — [**adoptada 2026-08-15**, backend-data] **GA4 multi-tenant como señal per-org.**
   Estaba huérfana (`Epic: none`) y es la única vía a dos cosas que el epic promete: el puente
   «clics → leads» y la medición del **referral real** de `chatgpt.com`/`perplexity.ai` — o sea, lo
@@ -850,6 +857,33 @@ denominador. Agregarle Berel a alguien que hoy tiene Sky 1,0 sube su `total_fte`
 artificialmente el costo laboral de Sky ~17%**. No es un bug: es la aritmética del modelo. Hay que
 recomputar y comunicar **ambos clientes juntos**, o alguien va a leer "Sky mejoró" y estará leyendo
 humo.
+
+### Acción operativa pendiente — captura de FTE de Berel (NO es una task)
+
+**Qué:** declarar 3-4 asignaciones de personas a Grupo Berel
+(`cli-0863869c-eaac-4630-9bd0-af283c56f7fb`) desde `/agency/team` → `AssignMemberDrawer`
+(`POST /api/admin/team/assignments`, UI y write path ya existentes).
+
+**Por qué no es una task:** no hay nada que construir. El motor corre, está fresco, y produce el
+margen de Sky en el mismo período. Falta el insumo, no la maquinaria.
+
+**Quién:** cuenta/delivery de Berel declara el FTE por persona; Finance verifica el recompute.
+**Insumo para decidir el FTE:** el reparto real de tareas de julio 2026 en `greenhouse_delivery.tasks`
+(274 tareas de Berel desde junio; en julio Daniela 53 de sus 497, Julio Reyes 8 de 12, María Fernanda
+1 de 36) traducido con `fte_hours_guide`. **No** hay captura de horas en el sistema y no debe
+construirse: el modelo canónico pide **FTE declarado**, no horas.
+**Esfuerzo:** 1-2 horas. **Sin código.**
+
+**El recompute se dispara solo:** `assignment.created` / `assignment.updated` / `assignment.removed`
+ya están en `CLIENT_ECONOMICS_TRIGGER_EVENTS` (`src/lib/sync/projections/client-economics.ts:155-161`)
+y la lane reactiva `ops-reactive-cost-intelligence` corre cada 10 min. No hace falta llamar ningún
+cron a mano.
+
+🔴 **Comunicar Sky en el mismo movimiento** (ver la trampa del denominador arriba).
+
+⚠️ **Y leer el resultado con el asterisco de `ISSUE-157`:** el margen que salga es **bruto sin
+absorción de overhead**, porque la distribución está en cero desde mayo. El umbral real del piso de
+45% no es 1,93 FTE sino ~0,98 con overhead al último nivel conocido.
 
 ### Lo que la auditoría NO autoriza
 
