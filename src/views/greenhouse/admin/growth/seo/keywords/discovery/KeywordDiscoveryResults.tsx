@@ -1,6 +1,7 @@
 'use client'
 
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Stack from '@mui/material/Stack'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
@@ -40,7 +41,14 @@ import type { SeoDiscoveryCandidateView } from '@/lib/growth/seo/keyword-discove
 interface Props {
   candidates: SeoDiscoveryCandidateView[]
   totalCandidates: number
+  /** Id del candidato abierto en el drawer; alimenta `aria-expanded` del trigger. */
+  openCandidateId: string | null
+  /** El botón que abrió el drawer se registra para poder devolverle el foco al cerrar. */
+  onOpenCandidate: (candidate: SeoDiscoveryCandidateView, trigger: HTMLButtonElement | null) => void
 }
+
+/** Id del panel del sidecar: el trigger lo apunta con `aria-controls`. */
+export const DISCOVERY_DRAWER_ID = 'seo-keyword-discovery-candidate-panel'
 
 const SOURCE_LABEL: Record<SeoDiscoveryMethod, string> = {
   keyword_suggestions: GH_GROWTH_SEO_KEYWORDS.discovery.results.sourceSuggestions,
@@ -76,7 +84,12 @@ const Missing = ({ children }: { children: string }) => (
   </Typography>
 )
 
-const resolveState = (candidate: SeoDiscoveryCandidateView) => {
+/**
+ * Exportado a propósito: la tabla, la card y el drawer proyectan el MISMO estado. Recalcularlo en
+ * el drawer abriría un segundo almacén de la misma verdad, y el día que uno cambie el otro
+ * mentiría sin que nada falle.
+ */
+export const resolveState = (candidate: SeoDiscoveryCandidateView) => {
   const copy = GH_GROWTH_SEO_KEYWORDS.discovery.results
 
   if (candidate.alreadyTracked) return { label: copy.stateTracked, tone: 'info' as const }
@@ -154,7 +167,40 @@ const PresenceValue = ({ candidate }: { candidate: SeoDiscoveryCandidateView }) 
 }
 
 
-const KeywordDiscoveryResults = ({ candidates, totalCandidates }: Props) => {
+/**
+ * El detalle se abre con un BOTÓN, no con un click en la fila.
+ *
+ * ⚠️ Una fila entera clickeable no es alcanzable por teclado sin inventarle `role='button'` +
+ * `tabIndex` + handler de tecla — una tercera vía que ninguna primitive del repo sostiene. El
+ * botón trae foco, `Enter`/`Space` y semántica gratis, y cumple la regla dura del wireframe:
+ * ninguna acción vive detrás de hover.
+ */
+const DetailTrigger = ({
+  candidate,
+  open,
+  onOpenCandidate
+}: {
+  candidate: SeoDiscoveryCandidateView
+  open: boolean
+  onOpenCandidate: Props['onOpenCandidate']
+}) => {
+  const copy = GH_GROWTH_SEO_KEYWORDS.discovery.results
+
+  return (
+    <Button
+      size='small'
+      variant='text'
+      aria-controls={DISCOVERY_DRAWER_ID}
+      aria-expanded={open}
+      aria-label={copy.openDetailAria.replace('{keyword}', candidate.keyword)}
+      onClick={event => onOpenCandidate(candidate, event.currentTarget)}
+    >
+      {copy.openDetail}
+    </Button>
+  )
+}
+
+const KeywordDiscoveryResults = ({ candidates, totalCandidates, openCandidateId, onOpenCandidate }: Props) => {
   const copy = GH_GROWTH_SEO_KEYWORDS.discovery.results
 
   return (
@@ -192,6 +238,7 @@ const KeywordDiscoveryResults = ({ candidates, totalCandidates }: Props) => {
                 <TableCell>{copy.colBarrier}</TableCell>
                 <TableCell>{copy.colPresence}</TableCell>
                 <TableCell>{copy.colState}</TableCell>
+                <TableCell>{copy.colActions}</TableCell>
               </TableRow>
             </TableHead>
 
@@ -248,6 +295,14 @@ const KeywordDiscoveryResults = ({ candidates, totalCandidates }: Props) => {
 
                     <TableCell>
                       <GreenhouseChip kind='status' variant='label' size='small' tone={state.tone} label={state.label} />
+                    </TableCell>
+
+                    <TableCell>
+                      <DetailTrigger
+                        candidate={candidate}
+                        open={openCandidateId === candidate.candidateId}
+                        onOpenCandidate={onOpenCandidate}
+                      />
                     </TableCell>
                   </TableRow>
                 )
@@ -313,6 +368,16 @@ const KeywordDiscoveryResults = ({ candidates, totalCandidates }: Props) => {
                         .join(' · ')}
                     </Typography>
                   ) : null}
+
+                  {/* El trigger sobrevive a 390px: la disclosure puede mover el detalle, nunca
+                      borrar la vía de acción. */}
+                  <Box>
+                    <DetailTrigger
+                      candidate={candidate}
+                      open={openCandidateId === candidate.candidateId}
+                      onOpenCandidate={onOpenCandidate}
+                    />
+                  </Box>
                 </Stack>
               </Box>
             )

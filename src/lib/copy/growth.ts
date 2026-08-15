@@ -2518,8 +2518,119 @@ export const GH_GROWTH_SEO_KEYWORDS = {
       seedTrace: 'Seed: {seed}',
       emptyFiltered: 'Ningún candidato coincide con los filtros.',
 
+      colActions: 'Detalle',
+      openDetail: 'Detalles',
+      openDetailAria: 'Ver el detalle de {keyword}',
+
       trackingCostNotice:
         'Seguir cualquiera de estos términos compromete gasto recurrente: el rank capture diario le paga al proveedor por cada keyword vigente hasta que la dejes de seguir.'
+    },
+
+    /**
+     * TASK-1665 Slice 4 — detalle del candidato y sus decisiones.
+     *
+     * 🔴 El drawer responde "¿cómo llegó esto acá?" ANTES de ofrecer gastar. El orden del
+     * wireframe (R4 §Contenido) no es estético: procedencia → mercado → medición propia →
+     * advertencia → acciones. Poner las acciones arriba invitaría a decidir sin leer en qué
+     * se basa la decisión.
+     */
+    drawer: {
+      eyebrow: 'Candidato',
+      closeLabel: 'Cerrar el detalle',
+
+      provenanceTitle: '¿Cómo llegó acá?',
+      provenanceChain: '{seed} → {method} → corrida del {date}',
+      provenanceNoSeed: 'Sin seed registrada',
+      provenanceRank: 'Puesto {rank} en la respuesta del proveedor',
+      marketTitle: 'Mercado consultado',
+      capturedAtLabel: 'Capturado el {date}',
+      providerUpdatedLabel: 'El proveedor actualizó el dato el {date}',
+
+      marketDataTitle: 'Estimado de mercado',
+      marketDataHint:
+        'Son estimaciones mensuales del proveedor sobre el mercado publicitario, no visitas medidas de tu sitio.',
+      volumeLabel: 'Volumen de búsqueda',
+      barrierLabel: 'Barrera de enlaces',
+      barrierHint:
+        'Nivel derivado de la diversidad de dominios que enlazan al top 10, no del índice crudo de dificultad.',
+      intentLabel: 'Intención estimada',
+      clusterLabel: 'Agrupador',
+      cpcLabel: 'CPC de referencia',
+      cpcHint: 'Precio publicitario, no costo de posicionarse.',
+
+      measuredTitle: 'Medición propia',
+      measuredHint: 'Lo que Search Console midió para tu sitio en este término.',
+      positionLabel: 'Posición promedio',
+      impressionsLabel: 'Impresiones',
+
+      warningTitle: 'Sugerencia no significa seguimiento',
+      warningBody:
+        'Este término está acá porque el proveedor lo relacionó con tus seeds. Nadie lo está midiendo todavía: eso ocurre recién cuando lo sigues, y desde ahí genera gasto en cada ciclo.',
+
+      actionsTitle: 'Qué quieres hacer',
+      noActionsTitle: 'Sin acciones disponibles',
+      noActionsBody: 'Puedes leer el detalle, pero no tienes permiso para comprometer gasto ni preparar consultas.',
+
+      trackedTitle: 'Ya lo estás siguiendo',
+      trackedBody: 'Este término ya está en el seguimiento diario. Revisa su trayectoria en Rendimiento.'
+    },
+
+    /**
+     * Acciones gobernadas. Cada una nombra su CONSECUENCIA, no su mecánica: el operador no
+     * necesita saber qué endpoint se llama, necesita saber qué le va a pasar a la factura.
+     */
+    actions: {
+      declareTarget: 'Declarar objetivo',
+      declareTargetHint: 'Lo incorpora al seguimiento diario y lo marca como una posición que buscas ocupar.',
+      declareTargetConfirm:
+        'Declarar este objetivo lo incorpora al seguimiento diario y puede generar costo recurrente. Revisa el cupo antes de confirmar.',
+
+      followOpportunity: 'Seguir oportunidad',
+      followOpportunityHint: 'Lo incorpora al seguimiento diario sin declararlo como posición buscada.',
+      followOpportunityConfirm: 'Seguir esta oportunidad la incorpora al seguimiento diario. No es sólo guardar la idea.',
+
+      prepareGrounded: 'Preparar grounded queries',
+      prepareGroundedHint: 'Crea un borrador de consultas AEO para revisión humana.',
+      prepareGroundedConfirm:
+        'Preparar consultas crea un borrador AEO para revisión. No activa el set ni ejecuta una corrida.',
+
+      dismiss: 'Descartar',
+      dismissHint: 'Registra tu decisión sin borrar la evidencia.',
+      dismissConfirm: 'Descartar sólo registra tu decisión; no borra la evidencia.',
+
+      viewTrajectory: 'Ver trayectoria',
+      viewTrajectoryHint: 'Abre Rendimiento con este término. No genera gasto.',
+
+      confirmCta: 'Confirmar',
+      cancelCta: 'Cancelar',
+      confirmTitle: 'Confirma la decisión',
+      pendingLabel: 'Procesando…',
+
+      capacityNotice: 'Cupo del seguimiento: {used} de {capacity} términos.',
+
+      /**
+       * 🔴 El feedback es POR keyword, jamás un «Listo» agregado.
+       *
+       * Los outcomes son los del command real (`tracked | already_tracked | intent_changed |
+       * capacity_exceeded | invalid`), NO los del borrador del flow (`declared` /
+       * `already_target`, que nunca existieron en `trackKeywords`). Un 200 con la keyword
+       * rebotada por techo es un resultado que hay que leer, no un éxito.
+       */
+      feedbackTracked: 'Listo: ahora sigues «{keyword}».',
+      feedbackTargetDeclared: 'Listo: «{keyword}» quedó declarada como objetivo.',
+      feedbackAlreadyTracked: 'Ya seguías «{keyword}». No se agregó de nuevo ni se duplicó el gasto.',
+      feedbackIntentChanged: 'Cambiaste la clasificación de «{keyword}». No consume cupo nuevo.',
+      feedbackCapacityExceeded: 'No se agregó «{keyword}»: el seguimiento llegó a su cupo. Deja de seguir algo antes.',
+      feedbackInvalid: 'No se pudo usar «{keyword}»: el término no cumple el formato del proveedor.',
+      feedbackDismissed: 'Descartaste «{keyword}». Queda registrado en la bitácora.',
+      feedbackGroundedDraft: 'Se creó el borrador AEO con «{keyword}». Revísalo antes de activarlo.',
+      feedbackGroundedFallback:
+        'Se creó el borrador base con «{keyword}», sin el modelo: revísalo con más atención antes de activarlo.',
+      feedbackError: 'No se pudo completar la acción sobre «{keyword}».',
+
+      disabledGroundedNoProfile: 'Este Space todavía no tiene un perfil AEO configurado.',
+      disabledGroundedNoPermission: 'No tienes permiso para gestionar consultas AEO.',
+      disabledGroundedFlag: 'El módulo AEO está apagado en este ambiente.'
     }
   },
 

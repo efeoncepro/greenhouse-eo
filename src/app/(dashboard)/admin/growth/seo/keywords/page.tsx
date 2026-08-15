@@ -3,6 +3,8 @@ import { notFound, redirect } from 'next/navigation'
 import type { Metadata } from 'next'
 
 import { can } from '@/lib/entitlements/runtime'
+import { isGraderEnabled } from '@/lib/growth/ai-visibility/flags'
+import { getGraderProfileForOrganization } from '@/lib/growth/ai-visibility/store'
 import { isSeoKeywordDiscoveryEnabled, isSeoModuleEnabled } from '@/lib/growth/seo/flags'
 import { GH_GROWTH_SEO_KEYWORDS } from '@/lib/copy/growth'
 import { readKeywordDiscovery } from '@/lib/growth/seo/keyword-discovery/reader'
@@ -183,6 +185,27 @@ export default async function Page({ searchParams }: PageProps) {
       }
     }
 
+    // ── TASK-1665 Slice 4 — puente grounded (TASK-1666) ──────────────────────────────────
+    //
+    // ⚠️ Son DOS planos de capability, no uno: leer candidatos SEO y gestionar prompts AEO. Y
+    // además hace falta un perfil AEO enlazado al Space, porque `createGroundedQueryDraft` lo
+    // exige. Resolverlo acá —y no en el cliente— evita ofrecer una acción que el command va a
+    // rechazar después: el motivo se dice antes, no se descubre al confirmar.
+    const canManageAeoPrompts = can(tenant, 'growth.ai_visibility.prompt_set.manage', 'execute', 'tenant')
+
+    const graderProfile =
+      selectedSpace && isGraderEnabled() && canManageAeoPrompts
+        ? await getGraderProfileForOrganization(selectedSpace.organizationId)
+        : null
+
+    const groundedDisabledReason = !isGraderEnabled()
+      ? GH_GROWTH_SEO_KEYWORDS.discovery.actions.disabledGroundedFlag
+      : !canManageAeoPrompts
+        ? GH_GROWTH_SEO_KEYWORDS.discovery.actions.disabledGroundedNoPermission
+        : !graderProfile
+          ? GH_GROWTH_SEO_KEYWORDS.discovery.actions.disabledGroundedNoProfile
+          : null
+
     return (
       <KeywordDiscoveryWorkbench
         organizationId={selectedSpace?.organizationId ?? null}
@@ -192,6 +215,8 @@ export default async function Page({ searchParams }: PageProps) {
         canExecute={discoveryEnabled && canTrackKeywords && Boolean(market)}
         disabledReason={discoveryDisabledReason}
         budgetRemainingUsd={null}
+        graderProfileId={graderProfile?.profileId ?? null}
+        groundedDisabledReason={groundedDisabledReason}
         run={discoveryRun}
         candidates={discoveryCandidates}
         totalCandidates={discoveryTotal}
