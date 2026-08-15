@@ -1,7 +1,57 @@
 # El estado real de la práctica SEO/AEO — sin adornos
 
-> **As-of 2026-07-13.** Fuente: operador + repo + benchmark de mercado verificado.
+> **As-of 2026-07-13**, con **corrección estructural del 2026-08-15** *(ver bloque siguiente)*.
+> Fuente: **expediente de licitación** + repo + facturación real + benchmark de mercado verificado.
 > 🔴 **Este documento existe para que ningún agente venda con una realidad que no tenemos.**
+
+---
+
+## 🔴 Corrección 2026-08-15 — el alcance de Berel estaba mal, y la conclusión que salía de ahí estaba invertida
+
+> **Qué decía este documento hasta hoy:** que el alcance de Berel era *"medición · portal · contenido · posteo ·
+> SEO técnico si necesitasen"*, **citando al operador (2026-07-13)** — y de ahí que **el AEO se regalaba** y que
+> había que **desagregarlo por ~USD 900/mes (+30%)**.
+>
+> ## 🔴 Es falso. El AEO de Berel está vendido, contratado y pagado desde el día uno.
+
+**Lo que dice el expediente** *(OneDrive `4. Comercial/Licitaciones/Pinturas Berel/1. SEO/Listo/`)*:
+
+| Fuente | Qué prueba |
+|---|---|
+| **`Alcance del Servicio.pdf`** *(feb-2026)* | Se titula **"SEO + AEO + Producción de Contenido Editorial y Visual"**. Tres escenarios — **Base · Crecimiento · Full Surround** — y **AEO está en los tres** *(básico → completo → completo + PR)* |
+| **`Presupuesto Detallado Abril.pdf`** | *"Pinturas Berel ha seleccionado el **Escenario Crecimiento**"*. **MXN 60.000/mes**, mínimo 6 meses, on-going, facturación mensual en MXN, notice 30 días, **"Herramientas: incluidas en el fee"** |
+| **Su §3 — Answer Engine Optimization** | **AEO avanzado en cada pieza** · **Digital PR 5-10 menciones/mes** · **monitoreo de presencia en ChatGPT, Perplexity, Google AI Overviews y Gemini** · KPI **15-25 AI citations/mes** |
+| **El brief del cliente en wherEX** | Pedía **sólo "SEO + Blog"**. 🎯 **El AEO lo introdujo Efeonce como diferenciador — y Berel lo compró** al elegir Crecimiento |
+| **El runtime** | `migrations/20260628103818271_task-1277-aeo-module-seed-revert-grant.sql:44-58` → `ai_visibility_v1` para Berel con **`aeo_tier: 'contracted'`** |
+| **Se lo declaramos a un tercero** | `docs/commercial/tenders/sky-blog-2026/oferta-tecnica.md:656-658` — citamos a Berel ante SKY como *"servicio recurrente de contenido con SEO y AEO"* |
+
+### 🔴 Las cuatro consecuencias, y ninguna es la que decía este documento
+
+**1. El riesgo se invierte.** No es que dejemos plata en la mesa: es que **tenemos un KPI contratado que no estamos
+midiendo**. El presupuesto compromete **monitoreo mensual de citations** y **15-25 AI citations/mes** — y el
+grader **lleva sin correr desde el 2026-07-17** *(`docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md`)*.
+🔴 **Eso es under-delivery contra una obligación, y es más urgente que cualquier upside de pricing.**
+*(Y el descuento no lo atenúa: **haber bajado el precio no baja el compromiso**.)*
+
+**2. El instrumento comercial cambia.** No es desagregar. 🔴 **"Ahora te cobro el AEO aparte" es la peor frase
+posible: ya está pagado, y decirla nos deja como si hubiéramos cobrado mal.** Las palancas legítimas están más abajo.
+
+**3. El alcance real es MÁS grande de lo que creíamos.** Crecimiento son **12 artículos/mes** *(3 pillar + 9 satélite)*
+\+ Serie Laboratorio + Digital PR + link building + reporting quincenal. 🔴 **Es más que el plan base de SKY (8
+artículos), no menos.** La tabla de sensibilidad de FTE en `modules/04_PRICING.md` § 1 sigue siendo el instrumento
+correcto — pero hay que leerla **desde arriba**, no desde abajo.
+
+**4. Y el fee, ya reconciliado, empeora el cuadro.** ✅ **MXN 52.000/mes es correcto** — pero es el **precio de
+lista de 60.000 menos un 13,3% de descuento**. 🔴 **El descuento se aplicó al precio, no al alcance:** entregamos
+Crecimiento completo *(AEO avanzado, Digital PR, monitoreo mensual, KPI de citations)* **al 87% de lista**.
+**El colchón de margen es más delgado de lo que el presupuesto asumía.** Detalle en § 1.
+
+> ## 🔴 Regla de práctica, y es un invariante
+> **Ningún análisis de pricing de un cliente adjudicado se hace contra la memoria del operador.**
+> **Se hace contra el expediente de la licitación más la facturación real.**
+>
+> *(Este documento tardó un mes en propagar un alcance dictado de memoria hasta una acción comercial que nos
+> habría hecho quedar mal frente al cliente. El expediente estaba en OneDrive todo el tiempo.)*
 
 ---
 
@@ -10,16 +60,44 @@
 | | **Berel** (MX) | **SKY** (CL) |
 |---|---|---|
 | Estado | **Cliente activo, facturando** | 🔴 **Licitación EN CURSO** (Wherex) |
-| Precio | **52.000 MXN/mes** | **CLP 5.200.000/mes** *(plan base)* |
-| **USD equivalente** | **≈ 2.965** | **≈ 5.591** |
-| Alcance declarado | medición · portal · contenido · posteo · SEO técnico *"si necesitasen"* 🔴 | 8 artículos + SEO/AEO + multimedia + reportería + portal |
+| Precio | ✅ **MXN 52.000/mes** — **lista 60.000 − 13,3% de descuento** *(operador, 2026-08-15)*. 🔴 **Alcance Crecimiento COMPLETO al 87% del precio de lista** | **CLP 5.200.000/mes** *(plan base)* |
+| **USD equivalente** | **≈ 2.965** *(FX 17,54 — reverificar)* | **≈ 5.591** |
+| Alcance **real** *(expediente, no memoria)* | ✅ **Escenario Crecimiento: SEO + AEO + producción de contenido editorial y visual.** 12 art/mes · AEO completo · Entity SEO · Digital PR · monitoreo mensual de AI citations · reporting quincenal | 8 artículos + SEO/AEO + multimedia + reportería + portal |
 | **Loaded cost** | 🔴 **DESCONOCIDO** | CLP **2.260.000** (2,2 FTE) |
 | **Piso** | 🔴 **NO EXISTE** | 🔴 **3.900.000 declarado → NO PASA la regla del 45%.** El piso real es **≈ CLP 4.602.000** *(45% + buffer 12% de penalidades/Wherex)* |
 | **Margen** | 🔴 **NO SABEMOS** | **56%** (lista) · **42%** (piso) |
-| Contrato | Sin cláusula FX conocida | **2 años, CLP, SIN reajuste** ⚠️ |
+| Contrato | **Fee fijo MXN · mínimo 6 meses · notice 30 días · herramientas incluidas.** 🔴 **Sin reajuste ni cláusula FX** | **2 años, CLP, SIN reajuste** ⚠️ |
+
+### ✅ El fee de Berel: RESUELTO — lista → descuento → final
+
+**La cadena completa, y la skill ya tenía bien el número final:**
+
+| Eslabón | Cifra | Fuente |
+|---|---|---|
+| **Precio de lista** del Escenario Crecimiento | **MXN 60.000/mes** | `Presupuesto Detallado Abril.pdf` *(banda publicada: 60.000-80.000)* |
+| **Descuentos aplicados** | **−MXN 8.000/mes** *(−13,3%)* | Negociación de adjudicación |
+| ✅ **Fee final adjudicado** | ## **MXN 52.000/mes** | **Operador, 2026-08-15. Es la cifra vigente y correcta** |
+| *Pago inicial* | *MXN 89.960* | *Mes y medio de arranque, facturado a precio de lista (1,5 × 60.000 = 90.000). DTE 110 exento, `dte-foreign-currency.test.ts:7-12`. **Línea de conciliación contable para Finance, no discrepancia de alcance*** |
+
+> ## 🔴 El descuento cambió el PRECIO. **No cambió el ALCANCE.**
+> **Berel tiene contratado el Escenario Crecimiento completo:** AEO avanzado en cada pieza · **Digital PR 5-10
+> menciones/mes** · **monitoreo mensual en ChatGPT, Perplexity, Google AI Overviews y Gemini** · **KPI de 15-25
+> AI citations/mes**. 🔴 **Nada de eso salió del alcance por el descuento.**
+
+**Las tres consecuencias:**
+
+**(a) 🎯 Entregamos el alcance Crecimiento completo al 87% del precio de lista.** Descontar para ganar una
+licitación **es legítimo y no es el hallazgo**. Pero significa que **el colchón de margen es 13% más delgado de lo
+que el presupuesto asumía** — 🔴 **y eso hace del squad blueprint un prerrequisito, no una tarea pendiente.**
+
+**(b) 🔴 Regalar más está definitivamente descartado.** El AEO no sólo está pagado: **está pagado con descuento.**
+
+**(c) 🔴 El riesgo de under-delivery se agrava, no se alivia.** El KPI de 15-25 citations/mes sigue en pie tal cual.
+**Que hayamos descontado el precio no descuenta el compromiso.**
 
 🔴 **Berel puede estar entre 63% y 18% de margen según cuántos FTE consuma. Nadie lo ha medido.**
-→ tabla de sensibilidad completa en `modules/04_PRICING.md` § 1.
+→ tabla de sensibilidad completa en `modules/04_PRICING.md` § 1. ⚠️ **Y ahora sabemos que el alcance real
+(12 art/mes + PR + quincenal) está en la parte ALTA de esa tabla, no en la baja.**
 
 ---
 
@@ -92,8 +170,12 @@ con el cliente que ya tienes.)*
    comprar base + 4 ad-hoc (6,24M). **Un analista de compras lo ve en 30 segundos.**
 2. **El ad-hoc está invertido.** CLP 260.000 vs un marginal de plan de 425.000. **Premiamos salirse del plan** —
    y le entregamos al cliente **la calculadora para comoditizarnos.**
-3. **Regalamos el AEO.** El mercado lo cobra **aparte, desde USD 900/mes** (37% de las agencias que subieron
-   precio en 2025-26 lo hizo por esto). **Nosotros ya hacemos el trabajo.**
+3. 🔴 **~~Regalamos el AEO~~ → CORREGIDO 2026-08-15: el AEO de Berel está PAGADO, y le estamos quedando cortos.**
+   El presupuesto compromete **monitoreo mensual de presencia en ChatGPT/Perplexity/AI Overviews/Gemini** y un KPI
+   de **15-25 AI citations/mes**. 🔴 **El grader lleva dormido desde el 2026-07-17.**
+   **No es revenue perdido: es una obligación contratada que no se está cumpliendo** — y el cliente puede pedir
+   ese reporte cualquier día. *(Que el mercado cobre el AEO aparte desde USD 900/mes sigue siendo cierto, pero es
+   referencia para **clientes nuevos** — no plata sobre la mesa en Berel.)*
 
 ---
 
@@ -102,26 +184,91 @@ con el cliente que ya tienes.)*
 | | Mercado ✅ | Nosotros |
 |---|---|---|
 | Retainer SEO promedio | **USD 3.209/mes** | — |
-| **Mid-market** | **USD 5.000-10.000** | 🔴 **Berel: 2.965** |
+| **Mid-market** | **USD 5.000-10.000** | 🔴 **Berel: 2.965** *(y su propia lista, 60.000 MXN, son 3.421 — **también abajo del tramo**)* |
 | **Enterprise** | **USD 10.000-50.000+** | 🔴 **SKY: 5.591** |
 | Margen bruto sano | **50%+** *(bajo 40% = delivery roto; neto promedio ~13%)* | SKY 56% ✅ · **Berel: ?** 🔴 |
 | Agencias **de nicho** | **40-75% bruto** — *la especialización compra el margen* | Estamos en la parte baja **sin razón** |
 
-> 🎯 **No estamos baratos porque seamos de LATAM. Estamos baratos porque nunca miramos.**
+> 🔴 **Delta 2026-08-15 — la cifra de Berel se sostiene, y el cuadro es PEOR de lo que decía esta tabla.**
+> Los USD 2.965 son correctos, **pero ahora sabemos contra qué alcance**: Escenario Crecimiento completo —
+> **12 artículos/mes**, AEO avanzado, Digital PR, monitoreo mensual, reporting quincenal. **Y a 13,3% bajo su
+> propio precio de lista.** 🎯 **No es que Berel esté barato para lo que creíamos entregar: está barato para
+> mucho más de lo que creíamos entregar.**
+
+> 🎯 **No estamos baratos porque seamos de LATAM. Estamos baratos porque nunca miramos.** *(Vigente para SKY.)*
 > **Berel es un grupo industrial mexicano. SKY es una aerolínea. No son PyMEs sensibles al precio.**
 
 ---
 
-## 6. Las cinco acciones, en orden
+## 6. Las acciones, en orden — **reordenadas 2026-08-15**
 
 | # | Acción | Dueño | Impacto |
 |---|---|---|---|
-| **1** | 🔴 **Squad blueprint de Berel** — saber si ganamos o perdemos plata | Finance + Delivery | **Podría estar al 18%** |
-| **2** | 🔴 **Arreglar la oferta de SKY** *(plan dominado + ad-hoc invertido)* — **está viva** | Comercial | Reputacional en una licitación |
-| **3** | ✅ **Piso del 45% APROBADO (2026-07-13)** → **sembrarlo en el motor** | Dueño ✅ / Ingeniería | Convierte la política en gate automático |
-| **3b** | 🔴 **URGENTE — corregir el piso de SKY: 3,9M → 4,6M** | Comercial | **A 3,9M cerramos al 35%. La negociación real es de CLP 598.000, no de 1,3M** |
-| **4** | 🎯 **Desagregar AEO como línea propia** *(USD 900+/mes)* | Comercial | **+30% de revenue en Berel** |
-| **5** | 🎯 **Conseguir el primer caso citable** *(Berel es el candidato)* | Delivery + Cliente | **Desbloquea vender con prueba** |
+| **0** | 🔴🔴 **Despertar el grader para Berel — es entrega contratada, no mejora.** KPI comprometido: **15-25 AI citations/mes** con **monitoreo mensual**; dormido desde el **2026-07-17** | Delivery + Ingeniería | 🔴 **Under-delivery contra contrato. Es lo primero** |
+| **1** | 🔴🔴 **Squad blueprint de Berel — ahora es PRERREQUISITO, no tarea.** Alcance Crecimiento completo *(12 art/mes + PR + quincenal)* **al 87% del precio de lista** | Finance + Delivery | **Podría estar al 18%, y con 13% menos de colchón** |
+| **2** | ✅ **Fee RESUELTO: MXN 52.000** *(lista 60.000 − 13,3%)*. Sólo queda pasar el pago inicial de 89.960 como **línea de conciliación contable** | Finance | Cerrado — ya no bloquea |
+| **3** | 🔴 **Arreglar la oferta de SKY** *(plan dominado + ad-hoc invertido)* — **está viva** | Comercial | Reputacional en una licitación |
+| **4** | ✅ **Piso del 45% APROBADO (2026-07-13)** → **sembrarlo en el motor** | Dueño ✅ / Ingeniería | Convierte la política en gate automático |
+| **4b** | 🔴 **URGENTE — corregir el piso de SKY: 3,9M → 4,6M** | Comercial | **A 3,9M cerramos al 35%. La negociación real es de CLP 598.000, no de 1,3M** |
+| **5** | ⚠️ **Instrumento comercial de Berel — retirar el descuento en la renovación, NO desagregar el AEO** *(ver abajo)* | Comercial | **Depende del blueprint (#1). No se mueve antes** |
+| **6** | 🎯 **Conseguir el primer caso citable** *(Berel es el candidato)* | Delivery + Cliente | **Desbloquea vender con prueba** |
+
+### ⚠️ Acción 5 — cuál es el instrumento correcto en Berel *(y cuál nos hace daño)*
+
+> 🔴 **NUNCA: "ahora te cobro el AEO aparte".** Ya está pagado desde febrero. Decirlo le informa al cliente que
+> **le cobramos mal**, y pone en duda todo lo demás que le facturamos.
+
+> 🎯 **Y el argumento correcto tampoco es "subo el precio".** Berel paga **52.000 sobre una lista de 60.000**:
+> la conversación limpia y habitual es **retirar o reducir el descuento de entrada**, no inventar un cobro nuevo.
+> *"El descuento de lanzamiento cubría los primeros meses. A partir de la renovación volvemos a lista."*
+> **Eso se dice sin incomodidad, y no pone en duda nada de lo ya facturado.**
+
+**Según lo que muestre el squad blueprint, hay dos palancas legítimas — y las dos usan su propio expediente:**
+
+| Si el blueprint muestra… | Instrumento | Por qué es defendible |
+|---|---|---|
+| **Margen bajo el piso con el alcance actual** | **Retirar o reducir el descuento de entrada en la renovación** *(52.000 → hacia 60.000)*, incorporando además **reajuste** y **cláusula FX** *(hoy no existe ninguna de las dos)* | 🎯 **No es un aumento: es volver al precio de lista que su propio presupuesto publicó.** El techo de la banda Crecimiento son 80.000 MXN — **ni siquiera estamos pidiendo eso** |
+| **Margen sano, y el cliente quiere más** | **Ampliación de alcance con adenda**, usando el escalón publicado: **Crecimiento (60-80k) → Full Surround (100-120k MXN)** | 🎯 **El escalón ya se lo presentamos en febrero.** Es una conversación de crecimiento, no de corrección |
+
+⚠️ **Antes de mover cualquiera de las dos hay que confirmar el timing contractual en el contrato**, no en este
+documento: el mínimo son **6 meses** y el repo fecha la adjudicación en **may-2026**, lo que pondría el fin del
+mínimo cerca de **nov-2026**. 🔴 **No asumas que la ventana de renovación ya está abierta** — es justo el tipo de
+dato que este documento acaba de aprender a no inventar.
+
+---
+
+## 6b. wherEX no es compra pública — la restricción es otra
+
+⚠️ **Berel llegó por wherEX, y eso confunde.** wherEX es **sourcing privado entre empresas**, no un portal de
+compra estatal. 🎯 **No hay prohibición legal de modificar el contrato** — no aplica régimen de contratación
+pública, ni tope de modificación, ni impugnación de terceros.
+
+**Lo que sí restringe, y es suficiente:**
+
+| Restricción | De dónde viene |
+|---|---|
+| **Contractual** | Fee **fijo en MXN** · **mínimo 6 meses** · **notice 30 días** · **"herramientas incluidas en el fee, sin costos adicionales"** *(presupuesto seleccionado)* |
+| 🔴 **Reputacional** | **Estamos citando a Berel como comparable en la licitación VIVA de SKY** *(`oferta-tecnica.md:656-658`)*. Cualquier fricción de precio con Berel ahora **contamina la referencia que estamos usando para ganar SKY** |
+
+🔴 **La restricción reputacional es la que manda en el timing.** No es que no se pueda repricear: es que **no
+conviene abrir esa conversación mientras SKY está evaluando**, salvo que el blueprint muestre que estamos
+perdiendo plata.
+
+---
+
+## 6c. 🔴 Lo que falta verificar **en el contrato** — y no está en el repo
+
+✅ **El fee ya NO está en esta lista: está resuelto (52.000, lista 60.000 − 13,3%).** Lo que queda es **estructural**
+— sale del contrato firmado, no del expediente de la propuesta, y **cada punto cambia el instrumento comercial**:
+
+| # | Qué falta | Por qué importa |
+|---|---|---|
+| **1** | **Fecha real de adjudicación e inicio del servicio** | Define cuándo se cumple el mínimo de 6 meses. El repo dice *"wherEX #5234, may-2026"*; el presupuesto es de abril. **No es lo mismo** |
+| **2** | **Vigencia y régimen de renovación** *(automática · tácita · expresa)* | Determina **si existe un punto de renovación** y cuándo. Sin esto, "retirar el descuento en la renovación" no tiene fecha |
+| **3** | **Régimen de modificación de precio y alcance** | ¿Se puede emitir una adenda? ¿Con qué preaviso? ¿Requiere acuerdo escrito de ambas partes? |
+| **4** | 🔴 **Reajuste** | El presupuesto **no menciona ninguno**. A fee fijo en MXN, la inflación mexicana erosiona el margen en silencio |
+| **5** | 🔴 **Cláusula FX** | **No existe.** Costo mixto *(nómina CLP + contractors USD)* contra ingreso 100% MXN. Ver `modules/04_PRICING.md` § 7 |
+| **6** | ⚠️ **Si el descuento quedó escrito como temporal o como precio permanente** | 🎯 **Es la diferencia entre "vence el descuento" y "renegociar el precio".** La primera conversación es trivial; la segunda no |
 
 ---
 
