@@ -2,6 +2,48 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+### Benchmark de suites AEO + `ISSUE-158` — el relevamiento terminó auditándonos (2026-08-15)
+
+El operador pidió dejar de afirmar ventajas competitivas sin verificarlas, después de corregirme dos
+veces. El benchmark de ~30 suites vive ahora en
+`.claude/skills/seo-aeo-practice/references/BENCHMARK_SUITES_AEO_2026-08.md` (enlazado desde el
+router de `SKILL.md`) con convención de confianza `[V]`/`[I]`/`[C]`/`no verificado`.
+
+**Lo que refutó de lo nuestro.** «Conectar Search Console» es table stakes. «Curva de CTR propia»
+tampoco diferencia: **seoClarity la documenta y la vende** y **Sistrix `CTR Potenziale` lee el GSC del
+cliente**. «Cubrir LATAM» tampoco: Otterly publica 65+ países con México, Chile y Colombia; Evertune
+además declara **servidores en el país seleccionado**; Semrush nombró Chile en su release del
+2026-05-14. **La frase que SÍ resiste es la combinación**: nadie proyecta el alza de clics de un
+**cambio de posición** con la curva del propio GSC — Sistrix, que tiene la curva real, modela snippet
+a **posición constante**. Es un negativo, o sea la afirmación más fácil de equivocar: re-verificar
+antes de usarla comercialmente. Corregido en la auditoría y en `TASK-1700` (`ac45c9f70`), cuya
+**fórmula no cambia** — el hallazgo la valida.
+
+**`ISSUE-158` (nuevo, `295b80cba`).** Ninguno de los cuatro adapters de `answer_engines` pasa
+ubicación geográfica al LLM, y ese resultado se le reporta a Berel como su visibilidad **en México**
+contra un KPI contratado de 15-25 citaciones/mes. Recaída de `ISSUE-152` una capa más arriba.
+⚠️ **El delta no está medido**: Slice 1 es medirlo antes de tocar nada. Contexto que lo hace urgente:
+la ubicación sola movió 97% vs 51% de menciones en la misma pregunta según medición independiente.
+
+**Y el espejo incómodo:** corremos **N=1** donde Evertune corre **100 por prompt** con ±1pt, y
+nuestra propia calibración pidió N≥3 (`TASK-1704`). Medido por terceros: **56,9% de los dominios da
+resultado distinto al re-medirse** (oscilación media 30,8 pts) y **52% de las marcas #1 cambian en el
+mismo prompt**. Un score de una corrida sin intervalo de confianza es ruido con falsa precisión.
+
+**Dos cosas del mercado con fecha.** Adobe cerró la compra de **Semrush** el 2026-04-28 (~USD 1,9-2B)
+y Sitecore compró Scrunch. Y **desde el 2026-09-15 Cloudflare bloquea por defecto** los bots de
+training y agentes en dominios nuevos con publicidad: **va a mover la visibilidad de clientes que no
+hicieron nada**, y ningún vendor lo contempla. Es aviso proactivo disponible.
+
+**Corrección del expediente Berel** (skill, `295b80cba`): contrató **SEO + AEO** en los tres
+escenarios — el riesgo no es que regalemos el AEO, es **under-delivery contra un KPI contratado** con
+el grader sin correr desde el 2026-07-17. Fee cerrado: MXN 60.000 de lista → 13,3% de descuento →
+**MXN 52.000**; los 89.960 fueron mes y medio de arranque a lista. Bajamos precio **sin bajar
+alcance**, que es justo lo que la regla de pricing ya prohibía.
+
+**Pendiente:** todo en `develop`, **sin push**. Lo operacionalmente urgente no es código: correr el
+grader de Berel con ubicación declarada.
+
 ### Favicon canónico — cerrado y empujado (2026-08-15)
 
 `/favicon.ico` respondía **404** desde el 2026-07-30: el commit `879fb9058` borró el `.ico` heredado
