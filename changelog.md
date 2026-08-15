@@ -7,6 +7,40 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-15 — Auditamos Descubrir con dos lentes y la pantalla dejó de prometer cosas que no cumplía (TASK-1665)
+
+La lente se cerró ayer con la captura verde y el build en verde. Igual la pasamos por dos auditorías
+independientes —una de arquitectura, otra del oficio SEO/AEO— y las dos dijeron lo mismo: el fondo
+está bien, lo que fallaba era **cableado**. Capacidades que el motor ya servía y la pantalla no
+pedía, y promesas que la interfaz hacía sin que el runtime las cumpliera.
+
+Tres importaban de verdad. La primera: cuando el sistema rechazaba una corrida —cupo agotado,
+proveedor caído—, el botón se ponía rojo y no decía por qué. El código tenía un comentario
+tranquilizador que aseguraba que el detalle «lo cuenta la banda de estado», pero cuando el rechazo
+ocurre no se crea ninguna corrida, así que esa banda sigue mostrando la anterior. El operador se
+quedaba sin saber si reintentar servía de algo. Ahora el mensaje exacto del servidor aparece en
+pantalla, y el consejo depende de la causa: reintentar sólo se ofrece cuando reintentar sirve.
+
+La segunda: la banda de costo prometía responder «¿me cabe en el presupuesto?» y siempre decía
+«cupo no disponible». El dato existía —el mismo control que autoriza el gasto lo devuelve— y nadie
+se lo pedía. La tercera: al declarar un objetivo, la tabla se actualizaba pero el panel de detalle
+se quedaba congelado en la foto vieja, mostrando los botones de gasto habilitados sobre algo que ya
+se había confirmado.
+
+Después vinieron diez más, del mismo tipo. La tabla decía «Candidatos (312)» y mostraba 50, sin
+avisar: ahora dice «50 de 312» y explica el resto. Una corrida en curso no se actualizaba sola, así
+que la barra animada no podía distinguir «sigue trabajando» de «se congeló». Un candidato ya
+descartado ofrecía un botón que el sistema iba a rechazar al confirmarlo. Y el símbolo `◑`, que
+significa «estimado de mercado», se estaba usando también en cifras de dinero —incluido el costo
+real ya cobrado—, lo que iba borrando la distinción entre lo estimado y lo medido que el resto de
+la pantalla defiende con cuidado.
+
+Lo que no era de esta pantalla quedó escrito como trabajo propio: los estados de candidato que hoy
+nadie puede alcanzar porque ningún proceso los registra, la paginación de verdad, las tres formas de
+partir una búsqueda que el motor soporta y la interfaz todavía no ofrece —incluida la que arranca
+desde lo que Search Console ya midió, que es la de mejor calidad—, y un par de detalles finos del
+generador de preguntas para motores de respuesta.
+
 ## 2026-08-14 — Descubrir keywords deja de ser una API y se convierte en pantalla (TASK-1665)
 
 El motor de descubrimiento existía desde ayer y sólo se podía operar por API, Nexa o MCP. Ahora
@@ -1197,19 +1231,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   fabricaron wireframes para apagarlos (son tasks ya `complete`; crear docs UI de relleno viola el contrato de
   diseño). Requieren cleanup con su dueño. Los otros 12 epics con drift de parity quedan fuera de alcance: cada
   task necesita el juicio de su dueño para decidir si entra a la lista o si el campo `Epic:` está mal.
-
-## 2026-08-05 — Cloud Infrastructure doc reestructurado: temáticos + HISTORIAL + router stub (TASK-1646)
-
-- `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` (1340 líneas, 24 `## Delta` apilados) se particionó siguiendo el
-  precedente ui-platform: **`docs/architecture/cloud-infrastructure/`** con 11 docs temáticos de SÓLO estado
-  vigente (README/TOPOLOGY/CLOUD_SQL/BIGQUERY/STORAGE_BUCKETS/CLOUD_RUN/SCHEDULING/VERCEL/SECRETS/CICD_WIF/
-  SECURITY) + `HISTORIAL.md` con los 25 deltas verbatim y anotaciones de supersede. El path original quedó como
-  router stub (33 líneas) — ningún referrer se rompe. ADR nuevo:
-  `GREENHOUSE_CLOUD_INFRASTRUCTURE_RESTRUCTURE_DECISION_V1.md` (indexado en `DECISIONS_INDEX`).
-- Contradicciones resueltas contra runtime al separar: la topología compartida staging/prod es **canónica** (no
-  "por ahora"); los inventarios estaban congelados en la auditoría 2026-04-23 — hoy son **46 scheduler jobs** del
-  ops-worker (no 16), **8 crons Vercel** (no 13; el event bus ya no depende de Vercel) y **7 workflows de deploy**
-  (no 3). Los inventarios nuevos declaran as-of + source of truth (`deploy.sh`, `vercel.json`, workflows) para que
-  el drift futuro sea detectable; la re-auditoría live completa sigue en TASK-127.
-- `pnpm docs:closure-check` ya no emite `architecture_doc_monolith` para ese path; referrers vivos con anclas
-  `§4.9`/`§5` actualizados a los temáticos.

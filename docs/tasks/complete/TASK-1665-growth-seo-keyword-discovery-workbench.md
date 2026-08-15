@@ -4,6 +4,72 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-15 — auditoría post-cierre (arquitectura + SEO/AEO)
+
+Dos auditorías independientes sobre la implementación ya mergeada, con las skills `arch-architect`
+y `seo-aeo`/`dataforseo-operator`. **Ambas: `CONDITIONAL PASS`.** Cero errores de dominio y cero
+violaciones de frontera; todo lo hallado fue **cableado**: capacidades que el primitive ya servía y
+la UI no consumía, y promesas de la superficie que el runtime no cumplía.
+
+**Corregido en el mismo día (dentro del alcance de esta task):**
+
+1. **El camino de gasto se tragaba el error canónico.** El `catch {}` del builder descartaba el
+   `CanonicalApiError` con un comentario que documentaba una garantía falsa («lo cuenta la banda de
+   estado») — cuando el queue rebota NO se inserta corrida, así que la banda muestra la anterior o
+   nada. Ahora el workbench anuncia la prosa es-CL del servidor en la live region y el hint depende
+   de `actionable`: reintentar sólo se ofrece cuando reintentar sirve.
+2. **La banda de costo prometía el cupo y siempre decía «no disponible»**: `budgetRemainingUsd`
+   estaba hardcodeado en `null`. Se resuelve server-side contra el MISMO chokepoint canónico
+   (`enforceSeoRunEntitlement`, sin `estimatedCostUsd` = pregunta pura por el remanente).
+3. **El drawer quedaba obsoleto tras la reproyección**: guardaba el objeto candidato, no el id, así
+   que tras un track exitoso seguía mostrando chip «Nuevo» y los CTAs de gasto habilitados mientras
+   la tabla ya se había actualizado. Ahora deriva de las props frescas por `candidateId`.
+4. **Sin exclusión mutua entre acciones**: el estado era por-kind, así que con «Declarar objetivo»
+   en vuelo «Seguir oportunidad» seguía clickeable → flip-flop de `intent_changed` y feedback
+   last-wins. Ahora hay un `pendingAction` único a nivel workbench.
+5. **Una corrida `pending`/`running` no convergía sola** (la barra indeterminada no podía distinguir
+   lo que decía distinguir): polling de 20 s acotado a esos dos estados.
+6. **`?discoveryRun=` viejo + corrida nueva**: el refresh reproyectaba la corrida vieja. Ahora la URL
+   se reescribe con el `runId` confirmado ANTES del refresh (`replaceState`, no `push`).
+7. **Avisos obligatorios del bridge omitidos**: `coverageNotice` («un draft con huecos jamás se
+   presenta como cobertura total») y `deduped` se ignoraban → un borrador incompleto se anunciaba
+   como éxito pleno. Cubiertos, con tests.
+8. **Un candidato descartado ofrecía «Preparar consultas»** que el bridge iba a rechazar
+   (`ALLOWED_LATEST_ACTIONS`). Se deshabilita hasta que exista re-selección (`TASK-1692`).
+9. **Conteo honesto**: la tabla decía «Candidatos (312)» sobre 50 filas. Ahora dice «50 de 312» +
+   aviso de truncado. La paginación real es `TASK-1693`.
+10. **`◑` en cifras de costo** (incluido el costo REAL cobrado): diluía el vocabulario `◑` estimado
+    de mercado / `●` medido. Quitado de todo monto en dólares; se conserva en CPC, que sí es
+    estimado de mercado.
+11. **`stale` estaba declarado y muerto**: ahora tiene política de dominio real
+    (`DISCOVERY_RUN_STALE_AFTER_DAYS = 7` + `isDiscoveryRunStale`, en el contrato, no en la vista).
+12. **Drift del DSL de captura, otra vez.** La excepción `NON_ACTIVATING_KEYS` incluía flechas y
+    `Home`/`End` afirmando que «no existe control que se active con ellas» — es falso: sobre un
+    `RadioGroup`, `Slider` o `<select>` cambian el valor y disparan `onChange`, así que un scenario
+    no-mutante podía ejecutar un write. Acotada a `Escape`/`Tab`, con test que fija lo contrario.
+13. **Menores**: `intent`/`status`/`sourceEndpoint` del GET se casteaban con `as` sin validar contra
+    su vocabulario (contrato que consumen Nexa y MCP) → allowlist real; el comentario de
+    `LABS_RESULT_ROW_USD` afirmaba un modelo de cobro que no es el del proveedor (se paga por fila
+    DEVUELTA, no solicitada); la fecha del volumen decía «al {date}» usando nuestra fecha de captura
+    cuando el proveedor no declara as-of → ahora «traído el {date}»; literales `◑ USD` y `—` del
+    drawer tokenizados.
+
+**Derivado a tasks (fuera del alcance de esta lente):** `TASK-1692` (writers de los action kinds
+`selected_for_grounded_query`/`selected_for_target`/`promoted_to_tracking` — hoy nadie los escribe,
+así que un tercio del modelo de estados es inalcanzable y el ledger de decisiones sólo captura
+descartes), `TASK-1693` (paginación por cursor + los 3 modos de seed no cableados, incluido GSC, que
+es el de mejor oficio), `TASK-1694` (filtro por barrera de enlaces en la API + deprecar
+`maxDifficulty`, dedup cross-método y conciencia de canibalización por `coreKeyword`, asimetría del
+filtro `search_volume > 0` entre métodos), `TASK-1695` (techo de 20 candidatos del bridge vs su
+regla de 12–16 preguntas, y voseo del system prompt del autor grounded).
+
+**Lo que ambas auditorías destacaron como excepcional** (no tocar sin leer el porqué): la separación
+`◑`/`●` sostenida de punta a punta sin un solo punto de mezcla; los tres estados del hecho de
+mercado (ausente / NULL preguntado / 0 real); la barrera de enlaces derivada server-side del perfil
+real del top-10; Full API Parity real (routes como transporte puro); idempotencia genuina en los
+tres writes con doble techo de gasto; y el orden por defecto del inbox, que prioriza oportunidad
+MEDIDA no seguida — la traducción correcta de striking distance a un canvas de discovery.
+
 ## Delta 2026-08-14 — auditoría de discovery: cinco supuestos que no resistieron el repo
 
 Auditoría previa a JSX (los tres docs UI se leyeron completos y NO son stubs: wireframe 342

@@ -4,11 +4,10 @@
 
 ### TASK-1665 COMPLETE — lente `Descubrir` (cerrada 2026-08-15)
 
-Slices 0–4 en `develop` **sin push** (`fd7c53402`, `2f3ba87e3`, `51fecb561`, `361f6a151`). Verde:
-`pnpm local:check`, `pnpm ui:code-lint --changed`, `pnpm task:lint --task TASK-1665`
-(`template=1 errors=0 warnings=0`) y 363 tests focales de `growth/seo` (12 nuevos sobre el mapeo de
-outcomes). `pnpm test` completo y `pnpm build` **no se corrieron** — el build local consume ~30 GB y
-requiere autorización del operador.
+Slices 0–5 en `develop` y **empujados** (`fd7c53402` … `ac65a050c`). Verde: `pnpm local:check`,
+`pnpm ui:code-lint --changed`, `pnpm task:lint --task TASK-1665` (`template=1 errors=0 warnings=0`),
+`pnpm test` completo (10.763 passed) y `pnpm build` de producción (exit 0, autorizado por el
+operador el 2026-08-15).
 
 **Lo construido.** Conmutador de lentes (`KeywordLensTabs`), builder + banda de costo, estado de
 corrida (8 estados) y canvas de candidatos venían de los slices previos. El Slice 4 agrega el drawer
@@ -57,8 +56,10 @@ verde:
 **Drift corregido en tooling compartido** (`scripts/frontend/lib/scenario.ts`): el contrato del DSL
 decía que el teclado sobre UI no-mutante está permitido por default, pero gateaba **todo** `press` —
 lo que empujaba a marcar `mutating:true` un scenario que no muta nada, y eso desactiva el gate para
-siempre en ese archivo. Ahora distingue **NAVEGAR vs ACTIVAR**: `Escape`/`Tab`/flechas pasan,
-`Enter`/`Space` siguen gateados. Con test.
+siempre en ese archivo. Ahora distingue **NAVEGAR vs ACTIVAR**: `Escape`/`Tab` pasan,
+`Enter`/`Space` siguen gateados. Con test. (La auditoría del 2026-08-15 acotó la excepción: las
+flechas y `Home`/`End` volvieron a quedar gateadas porque SÍ cambian el valor de un
+`RadioGroup`/`Slider`/`<select>`.)
 
 **No se tocó** el `MuiTabs-list` de `SeoSearchVisibilityTabs` (TASK-1306), origen de los 10 warnings
 de mobile: es `variant='scrollable'`, el desborde es intencional y lo comparten las cuatro pantallas
@@ -73,6 +74,36 @@ contra local con dato vivo; la lente ya es operable en staging/producción por e
 **Impacto cruzado registrado:** `TASK-1660` ya no debe construir el conmutador de lentes (delta en su
 spec, con la forma exacta y la prohibición del `TabList` de `@mui/lab`), y la reclasificación de
 intención (`intent_changed`) quedó declarada como suya.
+
+### Auditoría post-cierre de TASK-1665 (2026-08-15) — 13 fixes aplicados + 4 tasks derivadas
+
+Dos auditorías independientes (skills `arch-architect` y `seo-aeo`/`dataforseo-operator`) sobre el
+código ya mergeado. **Ambas `CONDITIONAL PASS`:** cero errores de dominio, cero violaciones de
+frontera; todo lo hallado fue **cableado** — capacidades que el primitive ya servía y la UI no
+consumía, y promesas de la superficie que el runtime no cumplía.
+
+**Los tres que de verdad tocaban la promesa central**, ya corregidos: (1) el `catch {}` del builder
+se tragaba el `CanonicalApiError` del camino de gasto, con un comentario que documentaba una
+garantía falsa —cuando el queue rebota NO se inserta corrida, así que la «banda de estado» que el
+comentario invocaba muestra la anterior o nada—; (2) `budgetRemainingUsd` estaba hardcodeado en
+`null`, así que la banda prometía el cupo y siempre decía «no disponible» pese a que
+`enforceSeoRunEntitlement` ya lo servía; (3) el drawer guardaba el objeto candidato en vez del id y
+quedaba obsoleto tras la reproyección, mostrando los CTAs de gasto habilitados sobre algo ya
+confirmado. Más: exclusión mutua entre acciones, polling de corrida viva, sincronización de
+`?discoveryRun=`, `coverageNotice`/`deduped` del bridge (un draft con huecos se anunciaba como éxito
+pleno), conteo honesto «50 de 312», `◑` fuera de las cifras de costo, `stale` con política real en
+el contrato, y el DSL de captura acotado a `Escape`/`Tab` (las flechas SÍ cambian el valor de un
+`RadioGroup`/`Slider`, así que un scenario no-mutante podía ejecutar un write).
+
+**Derivado:** `TASK-1692` (writers de los action kinds — hoy nadie escribe
+`selected_for_grounded_query`/`selected_for_target`/`promoted_to_tracking`, así que un tercio del
+modelo de estados es inalcanzable y el ledger sólo captura descartes), `TASK-1693` (paginación por
+cursor + los 3 modos de seed no cableados), `TASK-1694` (barrera de enlaces en la API, dedup
+cross-método, asimetría del filtro de volumen), `TASK-1695` (techo del bridge vs su regla de
+cobertura, y voseo del system prompt del autor grounded).
+
+Verde: `pnpm local:check`, 382 tests de `growth/seo` + DSL de captura. El detalle completo, con
+evidencia por hallazgo, quedó en el delta 2026-08-15 de la spec en `complete/`.
 
 ### TASK-1659 COMPLETE — intención declarada de una keyword (2026-08-14)
 
@@ -484,12 +515,3 @@ Vercel no tiene. Detalle en ISSUE-150 §Prevención.
 
 Servicio: **un solo `clamav`** en us-east4 (2 GiB, `min=1`, IAM-only, ≈USD 19/mes). Quedan dos postulaciones de
 prueba identificadas (`PRUEBA TASK-1378 / NO CONTACTAR`) en el Hiring Desk para que HR las descarte.
-
-### ISSUE-149 RESUELTA — drift TS↔DB de route_group_scope (2026-08-11)
-
-El avatar vacío que reportó el operador tras TASK-1388 era drift de DATOS: 3 filas de
-`greenhouse_core.roles.route_group_scope` (efeonce_admin/operations/hr_payroll) drifteadas del mapeo
-TS que es solo fallback. Migration de paridad aplicada + verificada; las sesiones vivas se auto-sanaron
-por el refresh de claims (5 min) sin re-login — verificado en la sesión real del operador. El fix del
-trigger ⌘K (lenguaje topbar) salió en el mismo lote. Deuda señalada en la issue: 2 roles fantasma en DB
-(`employee`, `finance_manager`) y falta un drift-guard mecánico TS↔DB de route groups.
