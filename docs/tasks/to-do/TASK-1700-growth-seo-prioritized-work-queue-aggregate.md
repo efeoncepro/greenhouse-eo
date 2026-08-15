@@ -757,6 +757,11 @@ Tres razones, y las tres son de oficio, no de implementación:
 
 1. **Sale en la unidad que el cliente verifica.** "Estimamos 340 clics adicionales al mes" se
    comprueba en su propio Search Console en 60 días. Un índice de 0 a 100 no se comprueba con nada.
+   ⚠️ *No confundir esto con una ventaja competitiva: las suites del mercado también conectan Search
+   Console y varias muestran ganancia proyectada de clics. La métrica es table stakes. Lo propio es
+   la **curva de CTR derivada del sitio** en vez de una tabla de industria —absorbe la depresión por
+   AI Overviews de ese vertical sin estimarla— y que el mismo score ordene cuatro orígenes,
+   incluido el gap AEO. No usar «ninguna herramienta puede» en material comercial.*
 2. **La curva propia absorbe el efecto de los AI Overviews en ESE sitio.** No hay que estimar cuánto
    deprime el CTR la respuesta generativa en esa categoría: si lo deprime, ya está adentro de la
    curva medida del cliente. Una curva de industria publicada no tiene esa propiedad.

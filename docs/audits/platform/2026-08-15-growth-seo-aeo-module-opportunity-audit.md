@@ -544,6 +544,26 @@ cero outbox, cero flags de dominio. Mismo patrón que `artifact-composer` ya tie
 
 ## 7. Lo que no se debe prometer todavía
 
+> ⚠️ **Añadido 2026-08-15 tras corrección del operador — sobreventa competitiva.**
+> Este documento afirmó que la métrica de clics incrementales verificable en Search Console era algo
+> que *"ninguna herramienta del mercado puede decir porque no tiene los datos del cliente"*. **Es
+> falso.** Semrush, Ahrefs, SEOClarity, Conductor y BrightEdge **conectan Search Console**, y varias
+> ya exponen *quick wins* / *striking distance* con ganancia proyectada de clics desde esa misma
+> fuente. La métrica es **table stakes**, no diferenciación.
+>
+> Lo que sí es defendible, dicho con precisión: **(a)** la curva de CTR se deriva del **propio sitio**
+> y no de una tabla de industria, lo que absorbe la depresión de clic por AI Overviews en ese
+> vertical sin tener que estimarla ni discutirla; **(b)** el **mismo score ordena cuatro orígenes**
+> —incluido el gap AEO—, que es una integración que las suites no hacen porque no miden el eje AEO
+> con motor propio; y **(c)** la decisión, la acción y su resultado viven en la **misma plataforma**
+> donde se opera la cuenta: una herramienta entrega una lista, no registra quién decidió qué ni qué
+> pasó después.
+>
+> **Nunca usar "ninguna herramienta puede" en material comercial.** Es la misma clase de error que
+> Otterly.ai: una afirmación cómoda que un evaluador desmonta en una búsqueda, y que en esta
+> categoría —donde el comprador ya salió escaldado— cuesta la credibilidad de todo lo demás.
+
+
 - **Comparativa competitiva** (`seo_competitors` sin consumidores).
 - **Tendencia de citación IA** — no porque el re-grade esté "pausado" (**no lo está**, ver §1.4) sino porque **nadie puede inscribir un perfil**: `recurring_regrade_enabled` no tiene writer. Sin inscripción no hay serie.
 - **"Tu sitio está sano"** apoyado en el audit (no detecta bloqueo a crawlers de IA:

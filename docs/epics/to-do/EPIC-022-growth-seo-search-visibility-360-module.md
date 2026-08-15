@@ -779,8 +779,16 @@ abarata por cadencia y muestreo (`TASK-1704`).
   OBTIENE la evidencia; nunca cómo se JUZGA.** Fusionar los scoring es una puerta de una sola
   dirección — recalibrar SEO invalidaría reportes AEO ya entregados.
 - **La cola priorizada es un aggregate persistido**, no un reader en vivo, y su score son **clics
-  incrementales sobre la curva de CTR del propio sitio** — la única unidad que el cliente puede
-  verificar en su propio Search Console en 60 días. **Prohibido ordenar por volumen estimado cuando
+  incrementales sobre la curva de CTR del propio sitio** — una unidad que el cliente puede verificar
+  en su propio Search Console. ⚠️ *Corregido 2026-08-15: la primera redacción decía «la única unidad»
+  y sugería que ninguna otra herramienta puede hacerlo. **Es falso**: Semrush, Ahrefs, SEOClarity,
+  Conductor y BrightEdge conectan Search Console y varias ya muestran quick wins con ganancia
+  proyectada. Lo diferenciable NO es la métrica —eso es table stakes— sino (a) que la curva de CTR
+  sale del **propio sitio** y no de una tabla de industria, lo que absorbe la depresión por AI
+  Overviews de ese vertical, y (b) que el **mismo score ordena cuatro orígenes distintos**, incluido
+  el gap AEO, dentro de la plataforma donde además viven la decisión, la acción y su resultado. Una
+  herramienta entrega una lista; no registra que la decidiste, quién, ni qué pasó después.*
+  **Prohibido ordenar por volumen estimado cuando
   existe demanda medida**: es el invariante ●/◑ aplicado al ORDENAMIENTO, no sólo a la
   visualización.
 - **La cola llega antes que `TASK-1669`.** Es el modo de falla #1: dos ordenamientos que discrepan y
