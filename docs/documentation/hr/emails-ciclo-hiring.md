@@ -1,9 +1,9 @@
 # Emails del Ciclo de Hiring — Notificaciones a Candidatos y People
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-08-12 por Claude (TASK-1689)
-> **Ultima actualizacion:** 2026-08-12 por Claude (TASK-1689)
+> **Ultima actualizacion:** 2026-08-15 por Codex
 > **Documentacion tecnica:** [GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md) (Delta 2026-08-12)
 
 ## Qué hace
@@ -16,6 +16,7 @@ tenga que acordarse de escribirlos:
 | Llega una postulación nueva | Buzón de People (`people@efeoncepro.com`) | Datos completos del postulante (nombre, correo, teléfono, país de residencia, portafolio/LinkedIn, mensaje, vacante, origen) + link para revisarla en el Hiring Desk. Sin dato = "No informado" |
 | Llega una postulación nueva | El candidato | Acuse de recibo: "recibimos tu postulación, esto es lo que sigue" |
 | Se le asigna un test al candidato | El candidato | Link de acceso a su evaluación, tiempo estimado y vigencia del link |
+| El candidato completa el test | Buzón de People (`people@efeoncepro.com`) | Aviso de que las respuestas están listas, fecha de envío, vacante, postulación y link directo para revisar la evaluación |
 | La postulación avanza a Preselección o Entrevista | El candidato | "Tu postulación avanzó" con el nombre de la etapa |
 | El candidato queda seleccionado | El candidato | Felicitación + aviso de que el equipo lo contactará |
 | El candidato no queda seleccionado | El candidato | Agradecimiento genuino, decisión clara y puerta abierta a futuras vacantes |
@@ -27,6 +28,8 @@ tenga que acordarse de escribirlos:
   internos jamás aparecen en un email.
 - **Un scorecard de entrevistador no le escribe al candidato.** Sólo los tests asignados al
   candidato generan el correo de evaluación.
+- **Completar un test no decide al candidato.** El aviso interno no incluye un veredicto ni dispara
+  un avance de etapa; sólo informa que existe evidencia lista para revisión humana.
 - **Sin duplicados.** Si el sistema reintenta procesar el mismo evento, el correo no se envía
   dos veces.
 - **El correo de "no seleccionado" se puede pausar aparte** (kill-switch propio) sin apagar el
@@ -38,6 +41,10 @@ tenga que acordarse de escribirlos:
 - Todo el sistema está detrás de un interruptor general (`HIRING_LIFECYCLE_EMAILS_ENABLED`),
   prendido en producción desde el 2026-08-12; el interruptor y los kill-switch por tipo siguen
   disponibles para pausar el sistema completo o un correo específico.
+
+> Estado de rollout: el aviso interno de test completado está code-complete desde 2026-08-15,
+> pero requiere migración + deploy del ops-worker antes de quedar vivo en producción. Los otros seis
+> correos continúan operativos.
 
 > Detalle técnico: consumers en `src/lib/sync/projections/hiring-lifecycle-emails.ts`, política en
 > `src/lib/hiring/notifications/`, templates en `src/emails/Hiring*.tsx`.

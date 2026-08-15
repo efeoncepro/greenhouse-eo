@@ -8,6 +8,7 @@ export { resolveHiringApplicationEmailContext, type HiringApplicationEmailContex
 export {
   sendHiringApplicationCreatedEmails,
   sendHiringAssessmentAssignedEmail,
+  sendHiringAssessmentSubmittedInternalEmail,
   sendHiringDecisionEmail,
   sendHiringStageAdvancedEmail,
 } from './send'

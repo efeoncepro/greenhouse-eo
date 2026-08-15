@@ -26,6 +26,7 @@ export type EmailType =
   | 'hiring_application_received_internal'
   | 'hiring_application_confirmation'
   | 'hiring_assessment_assigned'
+  | 'hiring_assessment_submitted_internal'
   | 'hiring_stage_advanced'
   | 'hiring_decision_selected'
   | 'hiring_decision_rejected'
@@ -64,6 +65,7 @@ export const EMAIL_PRIORITY_MAP: Record<string, EmailPriority> = {
   hiring_application_received_internal: 'transactional',
   hiring_application_confirmation:      'transactional',
   hiring_assessment_assigned:           'transactional',
+  hiring_assessment_submitted_internal: 'transactional',
   hiring_stage_advanced:                'transactional',
   hiring_decision_selected:             'transactional',
   hiring_decision_rejected:             'transactional',
@@ -144,7 +146,7 @@ export const AGENCY_BRANDED_EMAIL_TYPES: ReadonlySet<EmailType> = new Set<EmailT
   'ai_visibility_grader_report',
   'growth_ebook_delivery',
   // TASK-1689 — candidate-facing hiring: el candidato es externo y conoce a Efeonce, no al
-  // portal. El aviso interno (hiring_application_received_internal) NO va acá: sender plataforma.
+  // portal. Los avisos internos a People NO van acá: usan el sender plataforma.
   'hiring_application_confirmation',
   'hiring_assessment_assigned',
   'hiring_stage_advanced',

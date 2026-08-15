@@ -62,7 +62,7 @@ postulación); backfill de filas históricas (imposible de forma fiable; se mues
 
 ## Delta 2026-08-12 — TASK-1689: emails transaccionales del ciclo de vida (consumers reactivos)
 
-Los 4 eventos del pipeline que ya se emitían como audit ahora tienen consumers de email en el
+Los eventos del pipeline que ya se emitían como audit tienen consumers de email en el
 **ops-worker** (domain `notifications`, lane `ops-reactive-notifications`), detrás de
 `HIRING_LIFECYCLE_EMAILS_ENABLED` (default OFF al nacer; ON en producción desde 2026-08-12 — ver
 Rollout abajo; vive SOLO en el worker) + kill-switch por tipo en
@@ -73,6 +73,7 @@ independiente):
 |---|---|---|
 | `hiring.application.created` | `hiring_application_created_emails` | aviso interno a People (buzón `HIRING_INTERNAL_NOTIFICATIONS_EMAIL`, default `people@efeoncepro.com`) + acuse al candidato |
 | `hiring.assessment.assigned` | `hiring_assessment_assigned_email` | link de evaluación al candidato — SOLO `method=candidate_test` (un scorecard de entrevistador JAMÁS emailea al candidato) |
+| `hiring.assessment.submitted` | `hiring_assessment_submitted_internal_email` | aviso al buzón interno de People cuando un `candidate_test` queda completado y listo para revisión; incluye CTA a Application 360, nunca score ni decisión automática |
 | `hiring.application.stage_changed` | `hiring_stage_changed_email` | avance de etapa — SOLO allowlist candidate-facing (`shortlisted`→"Preselección", `interview`→"Entrevista"); etapas internas nunca llegan a copy |
 | `hiring.application.decided` | `hiring_application_decided_email` | `selected` (felicitación) / `rejected` (agradecimiento); anti-stale: re-verifica la decisión vigente en PG antes de enviar |
 
@@ -88,6 +89,10 @@ independiente):
   envío exitoso invalidaría el link entregado). `in_progress`/`submitted`/`expired` → skip honesto.
 - Eventos re-leídos de PG por ID: PII (email/nombre del candidato, título de vacante) se resuelve al
   consumir; los mensajes del reactive log y las capturas (`captureWithDomain('hiring')`) llevan sólo IDs.
+- El aviso de test completado se deriva sólo de la transición durable `submitted` (o `scored` si el
+  worker procesa el evento después de la corrección) y exige `submitted_at`. Rechaza scorecards,
+  estados previos y expirados; deduplica por evento + assessment + buzón interno. El subject es
+  `Test completado: {candidato} — {vacante}` y el cuerpo no expone respuestas ni score.
 - Candidate-facing emails envían como **Efeonce** (AGENCY_BRANDED); el aviso interno usa el sender
   plataforma. Templates en `src/emails/Hiring*.tsx` (es/en; default es).
 - Rollout: ledger `FEATURE_FLAG_STATE_LEDGER.md` — flip exige ejercicio end-to-end + revisión
@@ -96,6 +101,11 @@ independiente):
   real EO-APP-0090 (5 tipos `status=sent`; `hiring_decision_selected` cubierto por tests hasta su
   primer uso real) y release `393144e9f` a producción. Quedan abiertos: revisión Legal/Privacy de
   retención/aviso, flip del país a requerido-en-parser y scorecard GVC formal.
+
+**Extensión 2026-08-15:** el consumer de `hiring.assessment.submitted` y su tipo
+`hiring_assessment_submitted_internal` están code-complete, con migración aditiva de kill-switch y
+tests focales. Su rollout requiere desplegar el ops-worker y aplicar la migración; hasta entonces no
+se debe describir como correo vivo en producción.
 
 ## Delta 2026-07-16 — TASK-1385: AI-assisted vacancy public copy (propose→confirm)
 

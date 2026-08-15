@@ -27,6 +27,7 @@ vi.mock('../assessment/instances', () => ({
 import {
   sendHiringApplicationCreatedEmails,
   sendHiringAssessmentAssignedEmail,
+  sendHiringAssessmentSubmittedInternalEmail,
   sendHiringDecisionEmail,
   sendHiringStageAdvancedEmail,
 } from './send'
@@ -34,6 +35,7 @@ import {
   hiringApplicationCreatedEmailsProjection,
   hiringApplicationDecidedEmailProjection,
   hiringAssessmentAssignedEmailProjection,
+  hiringAssessmentSubmittedInternalEmailProjection,
   hiringStageChangedEmailProjection,
 } from '@/lib/sync/projections/hiring-lifecycle-emails'
 
@@ -79,12 +81,14 @@ describe('TASK-1689 hiring lifecycle emails', () => {
       expect(hiringApplicationCreatedEmailsProjection.domain).toBe('notifications')
       expect(hiringApplicationCreatedEmailsProjection.triggerEvents).toContain('hiring.application.created')
       expect(hiringAssessmentAssignedEmailProjection.triggerEvents).toContain('hiring.assessment.assigned')
+      expect(hiringAssessmentSubmittedInternalEmailProjection.triggerEvents).toContain('hiring.assessment.submitted')
       expect(hiringStageChangedEmailProjection.triggerEvents).toContain('hiring.application.stage_changed')
       expect(hiringApplicationDecidedEmailProjection.triggerEvents).toContain('hiring.application.decided')
 
       for (const p of [
         hiringApplicationCreatedEmailsProjection,
         hiringAssessmentAssignedEmailProjection,
+        hiringAssessmentSubmittedInternalEmailProjection,
         hiringStageChangedEmailProjection,
         hiringApplicationDecidedEmailProjection,
       ]) {
@@ -101,6 +105,7 @@ describe('TASK-1689 hiring lifecycle emails', () => {
       const results = await Promise.all([
         sendHiringApplicationCreatedEmails('happ-1', {}),
         sendHiringAssessmentAssignedEmail('hass-1', { method: 'candidate_test' }),
+        sendHiringAssessmentSubmittedInternalEmail('hass-1', {}),
         sendHiringStageAdvancedEmail('happ-1', { stage: 'interview' }),
         sendHiringDecisionEmail('happ-1', { decision: 'selected' }),
       ])
@@ -250,6 +255,76 @@ describe('TASK-1689 hiring lifecycle emails', () => {
       expect(call.context.assessmentUrl).toContain('/public/assessment/tok-abc')
       expect(call.context.timeLimitMinutes).toBe(45)
       expect(call.sourceEntity).toBe('hass-1')
+    })
+  })
+
+  describe('assessment submitted', () => {
+    const assessment = {
+      assessmentId: 'hass-1',
+      applicationId: 'happ-1',
+      method: 'candidate_test',
+      status: 'submitted',
+      submittedAt: '2026-08-15T21:30:00.000Z',
+      timeLimitMinutes: 90,
+    }
+
+    it('never emails for interviewer scorecards', async () => {
+      mockGetAssessmentById.mockResolvedValue({ ...assessment, method: 'interviewer_scorecard' })
+
+      const msg = await sendHiringAssessmentSubmittedInternalEmail('hass-1', { _eventId: 'evt-submit' })
+
+      expect(msg).toContain('no es candidate_test')
+      expect(mockSendEmail).not.toHaveBeenCalled()
+    })
+
+    it('requires durable completion state and submitted_at', async () => {
+      mockGetAssessmentById.mockResolvedValue({ ...assessment, status: 'in_progress', submittedAt: null })
+
+      const msg = await sendHiringAssessmentSubmittedInternalEmail('hass-1', { _eventId: 'evt-submit' })
+
+      expect(msg).toContain('no está completado')
+      expect(mockSendEmail).not.toHaveBeenCalled()
+    })
+
+    it('dedupes replay before sending', async () => {
+      mockGetAssessmentById.mockResolvedValue(assessment)
+      mockWasEmailAlreadySent.mockResolvedValue(true)
+
+      const msg = await sendHiringAssessmentSubmittedInternalEmail('hass-1', { _eventId: 'evt-submit' })
+
+      expect(msg).toContain('dedupe')
+      expect(mockSendEmail).not.toHaveBeenCalled()
+    })
+
+    it('notifies the internal People mailbox with review context', async () => {
+      mockGetAssessmentById.mockResolvedValue(assessment)
+
+      const msg = await sendHiringAssessmentSubmittedInternalEmail('hass-1', { _eventId: 'evt-submit' })
+
+      expect(msg).toContain('sent')
+
+      const call = mockSendEmail.mock.calls[0][0]
+
+      expect(call.emailType).toBe('hiring_assessment_submitted_internal')
+      expect(call.recipients).toEqual([{ email: 'people@efeoncepro.com' }])
+      expect(call.context).toMatchObject({
+        candidateName: 'María González',
+        openingTitle: 'Content Creator',
+        applicationPublicId: 'EO-APP-0001',
+        submittedAt: '2026-08-15T21:30:00.000Z',
+        timeLimitMinutes: 90,
+      })
+      expect(call.context.applicationUrl).toContain('/agency/hiring/applications/happ-1')
+      expect(call.sourceEventId).toBe('evt-submit')
+      expect(call.sourceEntity).toBe('hass-1')
+    })
+
+    it('still notifies if the worker consumes after human scoring', async () => {
+      mockGetAssessmentById.mockResolvedValue({ ...assessment, status: 'scored' })
+
+      await sendHiringAssessmentSubmittedInternalEmail('hass-1', {})
+
+      expect(mockSendEmail).toHaveBeenCalledTimes(1)
     })
   })
 

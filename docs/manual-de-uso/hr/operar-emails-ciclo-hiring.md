@@ -1,15 +1,15 @@
 # Operar los Emails del Ciclo de Hiring
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-08-12 por Claude (TASK-1689)
 > **Documentacion funcional:** [emails-ciclo-hiring.md](../../documentation/hr/emails-ciclo-hiring.md)
 
 ## Para qué sirve
 
-Prender, apagar, pausar y diagnosticar los 6 correos automáticos del proceso de contratación
-(aviso interno de postulación, acuse al candidato, test asignado, avance de etapa, seleccionado
-y no seleccionado).
+Prender, apagar, pausar y diagnosticar los 7 correos automáticos del proceso de contratación
+(aviso interno de postulación, acuse al candidato, test asignado, test completado para People,
+avance de etapa, seleccionado y no seleccionado).
 
 ## Antes de empezar
 
@@ -48,8 +48,13 @@ WHERE email_type = 'hiring_decision_rejected';
 
 Para reanudar: `enabled = TRUE, paused_reason = NULL`. Tipos disponibles:
 `hiring_application_received_internal`, `hiring_application_confirmation`,
-`hiring_assessment_assigned`, `hiring_stage_advanced`, `hiring_decision_selected`,
+`hiring_assessment_assigned`, `hiring_assessment_submitted_internal`,
+`hiring_stage_advanced`, `hiring_decision_selected`,
 `hiring_decision_rejected`.
+
+El tipo `hiring_assessment_submitted_internal` queda disponible después de aplicar su migración y
+desplegar el ops-worker que registra el consumer. Antes de ese rollout, una fila habilitada por sí
+sola no crea el envío.
 
 ## Qué significan las señales
 
@@ -76,6 +81,7 @@ Para reanudar: `enabled = TRUE, paused_reason = NULL`. Tipos disponibles:
 | No llega un tipo puntual | Kill-switch pausado | Revisar `email_type_config` |
 | Candidato dice que el link del test no funciona | Token rotado por re-asignación o expirado (14 días) | Re-asignar el test desde el Desk |
 | Correo interno no llega | Buzón mal configurado | Revisar `HIRING_INTERNAL_NOTIFICATIONS_EMAIL` |
+| No llega el aviso de test completado | Worker sin el consumer nuevo, migración pendiente o evento aún no drenado | Verificar revisión activa del ops-worker, fila `hiring_assessment_submitted_internal` y reactive log |
 
 ## Referencias técnicas
 

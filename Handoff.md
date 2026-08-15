@@ -2,6 +2,23 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+### Aviso interno al completar test — code complete, rollout pendiente (2026-08-15)
+
+Se extendió el pipeline reactivo de Hiring para que `hiring.assessment.submitted` envíe una sola
+notificación interna al buzón configurado de People (default `people@efeoncepro.com`). El consumer
+re-lee PG, acepta sólo `candidate_test` en `submitted|scored` con `submitted_at`, deduplica antes de
+enviar y lleva a Application 360; no incluye score ni cambia la etapa. Incluye template de email,
+preview, tipo transaccional, kill-switch aditivo, tests y las tres capas documentales.
+
+Validación: 34/34 tests focales, registry de templates, ESLint focal y `pnpm typecheck` verdes.
+Auditoría read-only del pack actual de Content Creator: 11 preguntas, 8
+competencias, 90 minutos, pesos=100, sin prompts vacíos/duplicados, sin opciones inválidas y sin
+leak de answer key/rúbrica. El smoke sintético completó `assigned → in_progress → submitted`,
+rechazó el submit incompleto, persistió 11/11 respuestas, auto-scoreó 1, encoló 10 para revisión y
+emitió un solo evento; cleanup verificado en cero. No se tocaron tests ni estados de candidatos
+reales. `pnpm pg:connect:status` validó la migración en dry-run, aún pendiente. Falta migración +
+deploy del ops-worker para que el nuevo séptimo correo quede vivo en producción.
+
 ### Los documentos del candidato: un candado que no protegía nada (2026-08-15)
 
 El operador abrió la ficha de una postulante y encontró que para ver su CV había que "REVELAR" —y que
@@ -565,22 +582,6 @@ informado" para legacy. Suite completa 10.585 tests + lint/typecheck 0; `design-
 PASS. **Rollout pendiente:** ejercicio en staging + GVC premium 1440/390 (el preview harness local no levantó el
 dev server esta sesión), revisión Legal/Privacy de retención/aviso, y el flip expand→contract que hace el país
 requerido a nivel parser tras verificar ambas superficies en producción.
-
-### TASK-1689 CERRADA — emails del ciclo de Hiring: code complete, rollout pendiente (2026-08-12)
-
-Los 6 emails (aviso interno a People + acuse al candidato en `hiring.application.created`, test asignado en
-`hiring.assessment.assigned` sólo `candidate_test`, avance de etapa allowlisted en `stage_changed`, decisión
-selected/rejected anti-stale en `decided`) quedaron cableados como 4 consumers reactivos domain `notifications`
-(lane existente `ops-reactive-notifications`), con política en `src/lib/hiring/notifications/**`, dedupe
-`wasEmailAlreadySent` y re-emisión canónica del token del test (`reissueCandidateTestTokenForEmail` — el token
-nunca viaja por el outbox). Gates: 10.577 tests verdes, lint/typecheck 0, worker gates OK; el `pnpm build` de
-producción NO se corrió por la preferencia del operador (memoria: build cuelga la máquina) — el CI lo cubre al
-push. **Rollout pendiente:** flag `HIRING_LIFECYCLE_EMAILS_ENABLED` default OFF en `deploy.sh` (seed
-`email_type_config` YA aplicado en la DB compartida, benigno con flag OFF); el flip exige deploy del ops-worker
-+ ejercicio end-to-end en staging + revisión de Talent del copy (especialmente `hiring_decision_rejected`,
-pausable aparte). Ledger actualizado. El seed se aplicó selectivamente con `pnpm migrate:up 1` para no adelantar la migración de
-ISSUE-151, que en ese momento exigía código desplegado primero (la sesión de ISSUE-151 la aplicó después por su
-propio carril — ver su entrada).
 
 ### ISSUE-151 RESUELTA — bridge Facebook, grant Globe y smoke de identidad verificados (2026-08-12)
 
