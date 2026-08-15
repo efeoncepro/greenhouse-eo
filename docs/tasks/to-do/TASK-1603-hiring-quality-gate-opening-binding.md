@@ -1,4 +1,4 @@
-# TASK-1603 — Hiring Quality Gate and Opening/Template Binding
+# TASK-1603 — Hiring Quality Gate over Opening Assessment Policy
 
 ## Status
 
@@ -18,21 +18,26 @@
 - Status real: `Diseño`
 - Rank: `EPIC-038-phase-1`
 - Domain: `hiring|hr|data`
-- Blocked by: `TASK-1602`
+- Blocked by: `TASK-1602, TASK-1719`
 - Branch: `task/TASK-1603-hiring-quality-gate-opening-binding`
 - GitHub Issue: `none`
 
 ## Summary
 
-Extiende Hiring para que un opening crítico declare su estándar, competencias, assessment template y evidencia mínima antes de una decisión humana.
+Extiende Hiring para que un opening crítico derive y haga exigible su estándar, competencias y evidencia mínima
+antes de una decisión humana. Consume la policy opening→assessment template canónica de `TASK-1719`; no crea
+otro binding ni automatiza la asignación.
 
 ## Why This Task Exists
 
-Hoy la plantilla puede existir sin quedar obligatoriamente vinculada a la demanda/opening y la decisión puede avanzar con evidencia incompleta. Eso permite repetir el fallo de selección observado en Berel.
+Aunque `TASK-1719` vincule opening y template y pueda asignar el test, la decisión todavía puede avanzar con
+evidencia incompleta. Esta task convierte esa policy operacional en un quality gate determinístico y auditable,
+sin apropiarse del lifecycle de asignación.
 
 ## Goal
 
-- Crear un quality gate derivado de `TalentDemand`, `HiringOpening`, `HiringApplication` y assessment existente.
+- Crear un quality gate derivado de `TalentDemand`, `HiringOpening`, `HiringApplication`, policy `TASK-1719` y
+  assessment existente.
 - Bloquear o enrutar como `evidence_incomplete` sin auto-rechazar ni auto-contratar.
 - Mostrar override humano explícito, motivo, actor y evidencia faltante.
 
@@ -47,7 +52,8 @@ Hoy la plantilla puede existir sin quedar obligatoriamente vinculada a la demand
 
 ### Depends on
 
-- `TASK-1602`; `TalentDemand`, `HiringOpening`, `HiringApplication`, assessment templates y `HiringHandoff`.
+- `TASK-1602`, `TASK-1719`; `TalentDemand`, `HiringOpening`, `HiringApplication`, assessment templates y
+  `HiringHandoff`.
 
 ### Blocks / Impacts
 
@@ -64,12 +70,14 @@ Hoy la plantilla puede existir sin quedar obligatoriamente vinculada a la demand
 
 ### Already exists
 
-- Assessment engine, templates, instances y decisión humana.
+- Assessment engine, templates, instances y decisión humana. `TASK-1719` es dueña del binding/policy y la
+  asignación manual/automática.
 - Vacancy publication operator canónico.
 
 ### Gap
 
-- Falta el binding obligatorio/recomendado y el reader de completeness por rol/opening/application.
+- Falta el reader de completeness por rol/opening/application, reason codes y enforcement/override de decisión.
+  El binding operativo faltante queda resuelto upstream por `TASK-1719`.
 
 ## Modular Placement Contract
 
@@ -102,7 +110,7 @@ Hoy la plantilla puede existir sin quedar obligatoriamente vinculada a la demand
 
 ### Slice 1 — Gate contract and reader
 
-- Definir requisitos por role/template y completeness determinística.
+- Consumir la policy versionada de `TASK-1719`; definir requisitos por role/template y completeness determinística.
 - Exponer reason codes, missing evidence, overrideability y freshness.
 
 ### Slice 2 — Decision/handoff integration
@@ -117,9 +125,18 @@ Hoy la plantilla puede existir sin quedar obligatoriamente vinculada a la demand
 ## Acceptance Criteria
 
 - [ ] Opening crítico declara template y evidencia mínima.
+- [ ] El template/binding se lee desde `TASK-1719`; no existe tabla, writer ni policy paralela en esta task.
 - [ ] Application incompleta muestra razones estables y no puede presentarse como verificada.
 - [ ] Override humano queda auditado y reconstruible.
 - [ ] Tests prueban no auto-hire/no auto-reject y no leakage.
+
+## Delta 2026-08-15 — Binding operativo extraído a EPIC-011
+
+- `TASK-1719` pasa a ser dueña de la policy opening→template, assignment manual/por etapa, cancelación y
+  comunicación. Esta task consume ese primitive y conserva ownership exclusivo de completeness, missing evidence,
+  enforcement de decisión/handoff y override humano.
+- Razón: la asignación básica es Hiring/EPIC-011 y no debe quedar bloqueada por el contrato de claims de
+  `TASK-1602`; dos bindings producirían drift de template/policy.
 
 ## Rollout Plan & Risk Matrix
 

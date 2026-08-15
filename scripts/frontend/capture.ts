@@ -19,6 +19,7 @@ import { runBaselineDiffContract } from './lib/baseline-contract'
 import { assertNotRedirectedToLogin, launchCaptureSession } from './lib/browser'
 import { applyCaptureDeterminism } from './lib/capture-masks'
 import { isValidEnv, resolveEnvConfig, type CaptureEnv, type EnvConfig } from './lib/env'
+import { loadLocalEnvFiles } from '../lib/local-env.mjs'
 import { classifyCaptureFailure } from './lib/failure-taxonomy'
 import { composeGif } from './lib/gif'
 import { computeRubricVerdict } from './lib/enterprise-rubric'
@@ -371,6 +372,11 @@ const runOneCapture = async ({
 }
 
 const main = async (): Promise<void> => {
+  // The capture CLI is often called directly via `pnpm fe:capture`; load the
+  // ignored local runtime configuration before resolving a protected target.
+  // `loadLocalEnvFiles` preserves explicitly exported variables as overrides.
+  await loadLocalEnvFiles({ cwd: REPO_ROOT })
+
   const { values, positionals } = parseArgs({
     args: process.argv.slice(2),
     allowPositionals: true,

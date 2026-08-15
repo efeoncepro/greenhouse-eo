@@ -85,6 +85,15 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - `TASK-1688` — Careers application contact completeness: persistencia/lectura de teléfono, residencia y mensaje con un único command de Hiring.
 - `TASK-1714` — Reveal auditado del documento de identidad de un **candidato** (no existía: el de TASK-784 se ancla a `memberId`). **✓ complete (2026-08-15).**
 - `TASK-1715` — Application 360 · panel de Documentos real: cablea el reader, el CV se lee dentro del portal y el candado queda sólo en la identidad. **✓ complete (2026-08-15).**
+- `TASK-1718` — Candidate Review Packet + reader MCP delegado: lectura interna agent-safe de postulación/CV sobre App API, con identidad humana delegada, minimización, audit y provider read-only OFF por defecto.
+- `TASK-1719` — Opening Assessment Policy + Stage-Triggered Assignment: binding operativo opening→template,
+  assignment manual/automático, cancelación y correo único sobre commands Hiring.
+- `TASK-1720` — Delegated MCP Candidate Test Assignment: proposal/confirm/cancel MCP sobre TASK-1719, con write
+  scope separado y fail-closed hasta grant revocable TASK-1631.
+- `TASK-1721` — Governed Hiring Selection Journey Orchestrator: proposal/confirm y saga durable que coordina la
+  decisión atómica con handoff, email y activation sin saltarse gates ni duplicar commands.
+- `TASK-1722` — Delegated MCP Candidate Selection Journey: tools start/status/advance/cancel sobre TASK-1721, con
+  authority por step y write fail-closed hasta grant revocable TASK-1631.
 - `TASK-356` — Handoff, reactive events/signals and downstream bridges.
 - `TASK-770` — HRIS/People activation closure for `internal_hire`.
 
@@ -106,6 +115,37 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 ### Contact completeness correction (Delta 2026-08-11)
 
 - `TASK-1688` — corrección del contrato que detectó la auditoría de postulaciones reales: teléfono y mensaje alcanzaban el schema pero el command no los persistía, y país de residencia no existía. Exige ADR antes de migrar, no permite inferencia/backfill histórico y gobierna ambas entradas públicas hacia el mismo command/reader.
+
+### Agent-safe candidate review extension (Delta 2026-08-15)
+
+- `TASK-1718` agrega la fundación programática para que un agente interno autorizado revise una aplicación y
+  su CV sin automatizar la UI. Greenhouse conserva source of truth, autorización por usuario/recurso, texto
+  derivado y audit; `mcp.efeonce.org` conserva sólo transporte/routing.
+- La task es read-only e internal-only: no asigna assessments, no envía correos, no mueve etapas, no rankea y
+  no decide. `TASK-1608`/`TASK-1610` pueden consumirla después, pero sus claims y gates de Talent Assurance no
+  se adelantan ni se reinterpretan aquí.
+- Gate: provider, reader y worker nacen deshabilitados; no se habilita una opening real sin ADR, revisión
+  Security/Privacy, identidad humana delegada, allow/deny/revocation y pruebas de IDOR/prompt-injection/PII.
+
+### Candidate test policy, automation and MCP write extension (Delta 2026-08-15)
+
+- `TASK-1719` extrae el binding operativo opening→assessment template a EPIC-011, donde pertenece el runtime de
+  Hiring. Manual propose→confirm y entrada a etapa ejecutan el mismo command; el ops-worker reusa el email live de
+  `TASK-1689`, con idempotencia, hold/accommodation, cancelación y reconciliation.
+- `TASK-1603` conserva el quality gate de Talent Assurance y consume esa policy para completeness/evidence; no
+  crea una segunda tabla o binding.
+- `TASK-1720` federa assignment/cancellation en MCP con tools propose→confirm. Reader y writes tienen flags/scopes
+  separados; el write nunca se concede al PKCE público y permanece fail-closed hasta el grant de `TASK-1631`.
+
+### Governed selection journey and MCP extension (Delta 2026-08-15)
+
+- `TASK-1721` agrega coordinación durable sobre los owners existentes: TASK-355 conserva la decisión atómica,
+  TASK-356 materializa/aprueba handoff, TASK-1689 entrega correo y TASK-770 activa internal-hire. El journey usa
+  checkpoints/readback/reconciliation y se detiene ante cada gate; nunca simula una transacción distribuida.
+- `TASK-1722` federa ese primitive en MCP con start/status/advance/cancel propose→confirm. La confirmación inicial
+  no autoriza handoff ni activation; cada boundary recibe una authority/capability nueva.
+- Gate: TASK-1603 debe gobernar evidence completeness antes del confirm productivo; MCP permanece fail-closed hasta
+  TASK-1631 y nunca agrega write scope al cliente PKCE público compartido.
 
 ## Existing Related Work
 

@@ -122,7 +122,8 @@ the dependencies recorded in each task:
 
 ### Phase 1 — Read-only assurance projection
 
-- [TASK-1603](../../tasks/to-do/TASK-1603-hiring-quality-gate-opening-binding.md) — Hiring Quality Gate and opening/template binding.
+- [TASK-1603](../../tasks/to-do/TASK-1603-hiring-quality-gate-opening-binding.md) — Hiring Quality Gate over the
+  canonical opening assessment policy owned by EPIC-011/TASK-1719; completeness/evidence/decision override only.
 - [TASK-1604](../../tasks/to-do/TASK-1604-role-scorecard-assessment-template-pack.md) — critical-role scorecards and assessment templates.
 - [TASK-1605](../../tasks/to-do/TASK-1605-quality-of-hire-outcome-selection-failure.md) — Quality-of-Hire outcomes and selection-failure taxonomy.
 - [TASK-1606](../../tasks/to-do/TASK-1606-client-operator-feedback-continuity-projection.md) — client-operator feedback and continuity projection.
