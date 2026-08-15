@@ -7,6 +7,32 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-15 — El portal dejó de mostrar el favicon de Vuexy antes del suyo
+
+Durante unas dos semanas, cada carga del portal pintaba primero el ícono morado del template Vuexy y
+recién después el isotipo de Greenhouse. El reporte llegó como "carga dos favicon", y la causa no
+estaba donde uno la buscaría: el HTML servido siempre estuvo limpio, con una sola declaración
+apuntando al SVG correcto.
+
+Lo que pasó es que a fines de julio se borró el `favicon.ico` heredado de Vuexy —correcto— pero no se
+lo reemplazó. La marca quedó declarada sólo como SVG desde el código del layout, y `/favicon.ico`
+empezó a responder 404 devolviendo, además, la página de not-found completa: 105 KB de HTML en cada
+carga del portal, para una ruta que el navegador pide de forma implícita **siempre**, sin importar lo
+que declare el `<head>`. Mientras ese 404 resolvía y el navegador lo descartaba, la pestaña mostraba
+el ícono que tuviera guardado de antes.
+
+El arreglo pasa los tres íconos a la convención de archivos de Next (`favicon.ico` multi-tamaño,
+`icon.svg`, `apple-icon.png`), los genera desde el SVG de marca con `pnpm branding:favicon`, y saca
+la declaración duplicada del layout: teniéndola en ambos lados, compiten. Next ahora emite los links
+solo, con huella de contenido, así que un cambio futuro del asset invalida el caché por sí mismo.
+
+Vale la pena registrar por qué el síntoma sobrevivió a un primer intento de arreglo. Los navegadores
+guardan los favicons en una base propia, separada del caché de páginas, que alimenta la barra de
+direcciones y el historial y no se refresca ni con recarga forzada. El operador seguía viendo el
+ícono viejo aunque el servidor ya sirviera el nuevo. De ahí el invariante que quedó escrito: al
+verificar un favicon, no confiar en el navegador propio — verificar el `200 image/x-icon` en el
+runtime y contar los `link[rel*=icon]` en el DOM.
+
 ## 2026-08-15 — Auditamos Descubrir con dos lentes y la pantalla dejó de prometer cosas que no cumplía (TASK-1665)
 
 La lente se cerró ayer con la captura verde y el build en verde. Igual la pasamos por dos auditorías
@@ -1197,37 +1223,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   Es falso: `/aeo-2/` submit → grader → email con PDF + dedupe de HubSpot es una **capacidad propia** (segunda
   superficie self-serve), con 8 criterios de aceptación sin cumplir y dos flags apagados
   (`GROWTH_AEO_FORM_GRADER_INTAKE_ENABLED`, `GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE_ENABLED`). Sigue `in-progress`.
-
-## 2026-08-05 — Registro de epics reconciliado: EPIC-040 nace, gate `epic-child-parity`, 193 childs huérfanas al descubierto
-
-- **El bug class:** el campo `Epic:` de una task y el `## Child Tasks` de su epic son dos escrituras que nada
-  reconciliaba, así que divergían en silencio y el epic reportaba un avance que no era el suyo. `EPIC-020` decía
-  **"12/13 childs complete, sólo falta TASK-1246"** mientras 25 tasks se declaraban suyas fuera de la lista.
-  Conteo canónico real tras reconciliar: **49 childs, 32 `complete`, 17 abiertas** — no una.
-- **Gate mecánico nuevo `epic-child-parity`** en `pnpm epic:lint` (`scripts/ci/ops-artifact-lint.mjs`): barre las
-  ~1.720 tasks del corpus, lee el epic declarado y verifica que el id aparezca en su `## Child Tasks`; también caza
-  tasks que declaran un epic inexistente. **Primer hallazgo: 15 epics con drift, 193 tasks sin listar** (EPIC-028:
-  89 · EPIC-019: 21 · EPIC-013: 20 · EPIC-007: 14). Severidad `warning` por defecto — con 193 violaciones
-  preexistentes, `error` dejaría el lint rojo por deuda ajena; se enciende con `--strict-child-parity` (exit 1),
-  pensado para verificar un epic reconciliado y para promoverse a gate de CI cuando el backlog esté limpio.
-  Test: `scripts/ci/epic-child-parity.test.ts` (8 casos, incluye guardrail contra el repo real).
-- **`EPIC-040` — Growth Public Forms Engine (nuevo).** El motor de formularios no tenía epic dueño: **21 tasks**
-  con `Epic: none`/`optional`, y cuatro colgando de EPIC-020 sólo porque el AEO fue su primer consumer. El AEO
-  **usa** el motor; no es su dueño. Frontera declarada: EPIC-040 = motor · EPIC-035 = distribución del bundle ·
-  EPIC-020/011/019 = consumers. `TASK-1255` (PII Ley 21.719) es la de mayor consecuencia del epic.
-- **Reasignaciones aplicadas en el campo `Epic:` de la task** (que es lo que el gate lee — editar sólo los epics
-  habría dejado el drift intacto): 21 tasks del motor → `EPIC-040` (incluidas `TASK-1335`/`1359`, ex EPIC-020);
-  `TASK-1326` → `EPIC-019`; `TASK-1266`/`1267`/`1279`/`1286` → `EPIC-021` (declaraban EPIC-020 siendo hijas de 021).
-  EPIC-020 conserva los formularios que el AEO usa (`1251`/`1257`/`1263`/`1296`/`1298`/`1327`/`1336`).
-- **Correcciones de estado del programa AEO, verificadas en runtime:** `TASK-1276` (cockpit operador) está
-  `complete`, no `to-do` — el "gap #1" que el doc de programa declaraba ya no existe; y **la cara pública
-  self-serve está LIVE** (`think.efeoncepro.com/brand-visibility` HTTP 200 + definición del form 200 en producción
-  con Turnstile `required`), así que `TASK-1246` dejó de ser "construir el lanzamiento" y su residuo es el smoke
-  E2E + el gate de gobernanza. `EPIC_ID_REGISTRY` tenía `EPIC-021` como `to-do` estando `complete`.
-- Docs: `docs/epics/AEO_PROGRAM_STATUS.md` § Delta 2026-08-05 (b) (método, 4 hallazgos, falsos positivos
-  descartados, decisiones dejadas abiertas), `EPIC-020`/`021`/`022`/`019`/`040`, `README` y registry de epics.
-- **Pendiente conocido:** `pnpm ops:lint --changed` reporta 6 errores `ui-wireframe-contract` **preexistentes**
-  en `TASK-1231`/`1232`/`1256`/`1259`, expuestos sólo porque editar su campo `Epic:` las volvió "changed". No se
-  fabricaron wireframes para apagarlos (son tasks ya `complete`; crear docs UI de relleno viola el contrato de
-  diseño). Requieren cleanup con su dueño. Los otros 12 epics con drift de parity quedan fuera de alcance: cada
-  task necesita el juicio de su dueño para decidir si entra a la lista o si el campo `Epic:` está mal.

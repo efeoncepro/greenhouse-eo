@@ -2,6 +2,28 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+### Favicon canónico — cerrado y empujado (2026-08-15)
+
+`/favicon.ico` respondía **404** desde el 2026-07-30: el commit `879fb9058` borró el `.ico` heredado
+de Vuexy sin reemplazarlo, dejando la marca declarada sólo como SVG vía `metadata.icons`. El
+navegador pide esa ruta de forma implícita **siempre**, así que en cada carga recibía la página de
+not-found (105 KB) y mientras tanto pintaba el ícono viejo — el "doble favicon" que reportó el
+operador.
+
+Los tres íconos pasan a **file convention** de Next (`src/app/{favicon.ico,icon.svg,apple-icon.png}`),
+generados desde el SVG de marca con `pnpm branding:favicon`
+(`scripts/branding/build-favicon.mjs`, idempotente). Se sacó `metadata.icons` del layout: teniéndolo
+en ambos lados compiten. Verificado en dev — los tres en `200`, un solo set de `link[rel*=icon]` en
+el DOM. `pnpm local:check` y `pnpm docs:context-check:strict` verdes.
+
+**Trampa que costó un intento previo de arreglo:** la base de favicons del navegador es persistente y
+separada del caché de páginas; no se refresca ni con recarga forzada. Al verificar un favicon, NO
+confiar en el navegador propio — usar `curl -I /favicon.ico` y contar los `link[rel*=icon]` del DOM.
+Invariante en `agent-invariants/DESIGN_TOKENS_BRAND_AGENT_INVARIANTS.md`; doc funcional en
+`docs/documentation/plataforma/favicon-iconografia-pestana.md`.
+
+**Pendiente:** está en `develop`. Producción sigue sirviendo el 404 hasta el próximo release.
+
 ### TASK-1665 COMPLETE — lente `Descubrir` (cerrada 2026-08-15)
 
 Slices 0–5 en `develop` y **empujados** (`fd7c53402` … `ac65a050c`). Verde: `pnpm local:check`,
