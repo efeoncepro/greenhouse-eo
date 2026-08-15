@@ -151,6 +151,9 @@ export type CanonicalErrorCode =
   | 'seo_budget_exhausted'
   | 'seo_audit_invalid_input'
   | 'seo_provider_unavailable'
+  | 'seo_discovery_invalid_input'
+  | 'seo_discovery_run_not_found'
+  | 'seo_grounded_query_not_found'
   // Proposal Studio F0 (TASK-1392).
   | 'proposal_not_found'
   | 'proposal_invalid_input'
@@ -676,6 +679,25 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
     status: 400,
     message: 'Revisa la solicitud: no llegó el sitio que hay que auditar.',
     actionable: true
+  },
+  // TASK-1664 — keyword discovery: input inválido (seed fuera de límites, método desconocido,
+  // combinación fuente/método imposible). Corregir la solicitud sí resuelve.
+  seo_discovery_invalid_input: {
+    status: 400,
+    message: 'Revisa la solicitud de discovery: hay una seed o un método fuera de los límites permitidos.',
+    actionable: true
+  },
+  // Anti-oracle: una corrida o candidato de otra organización "no existe" para este caller.
+  seo_discovery_run_not_found: {
+    status: 404,
+    message: 'La corrida de discovery no existe para esta organización.',
+    actionable: false
+  },
+  // TASK-1666 — anti-oracle del puente grounded: perfil, candidato o draft ajeno "no existe".
+  seo_grounded_query_not_found: {
+    status: 404,
+    message: 'El recurso de grounded queries no existe para esta organización.',
+    actionable: false
   },
   // Breaker abierto o falla del proveedor: transitorio de verdad, así que acá el reintento
   // SÍ es la acción correcta — al revés que el cupo o el guard de idempotencia.

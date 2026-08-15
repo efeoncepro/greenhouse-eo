@@ -1,5 +1,19 @@
 # TASK-1655 — Growth SEO: Historical Data Platform (backfill GSC→BQ + split OLTP/OLAP + semilla rank)
 
+## Delta 2026-08-14 — la clave del módulo per-org es `seo_v2`, no `seo_v1`
+
+- **Corregidas las tres menciones a `seo_v1`** (Goal, Slice 2, Acceptance Criteria) → **`seo_v2`**.
+  `TASK-1677` ejecutó la fase CONTRACT del cutover `seo_v1 → seo_v2` (migración
+  `20260809163352129`): **no queda ni un assignment `seo_v1` vigente** — la migración aborta si
+  quedara alguno. El código lee sólo `seo_v2` (`SEO_MODULE_KEYS_READ = ['seo_v2']`).
+- **Por qué importa acá:** esta task sigue `in-progress` y su backfill se ejecuta "para TODAS las
+  orgs con el módulo". Filtrar por `seo_v1` habría devuelto **cero orgs** y el resultado se habría
+  leído como "no hay nada que backfillear" — un falso negativo silencioso, no un error visible.
+- **Nota de datos para el backfill de Berel:** por `ISSUE-152`, el target `seot-berel-fase0` (Chile,
+  `2152`) quedó **pausado** y el activo es `seot-berel-mx` (México, `2484`/`es`). La serie de Chile
+  se conserva íntegra, pero cualquier backfill/semilla nueva de Berel debe colgar del target de
+  México — mezclar ambos mercados bajo una misma serie es exactamente lo que el issue evitó.
+
 ## Delta 2026-08-07 — ejecución (Slices 1-4 shipped)
 
 - **Slice 1 ✅** Mirror `seo_gsc_history` (tabla creada vía `bq mk`, particionada+clustered)
@@ -83,7 +97,7 @@ desde su activación y solo para `sc-domain:efeoncepro.com`.
 
 ## Goal
 
-- Toda org con `seo_v1` puede servir **≥6 meses** de serie GSC (clics/impresiones/CTR/
+- Toda org con `seo_v2` puede servir **≥6 meses** de serie GSC (clics/impresiones/CTR/
   posición por query y por page) sin engordar Cloud SQL.
 - Los readers del módulo (performance, overview KPIs, keyword opportunities) sirven
   rangos largos desde BigQuery con el mismo shape y la misma honestidad (`null` ≠ 0).
@@ -246,7 +260,7 @@ Reglas obligatorias:
 ### Slice 2 — Backfill API → BQ por org
 
 - Command `backfillGscHistory(organizationId, { fromDate, toDate })`: loop sobre `materializeGscDailySnapshot` con destino BQ (los días dentro de la ventana caliente también a PG), idempotente y resumible, con reporte por día (`materialized|skipped|failed`).
-- Ejecución para TODAS las orgs con `seo_v1` (hoy Berel + Efeonce), profundidad 16 meses o lo que la API entregue.
+- Ejecución para TODAS las orgs con `seo_v2` (hoy Berel + Efeonce), profundidad 16 meses o lo que la API entregue.
 - Para Efeonce: reconciliar con el export nativo existente (238 días) — el backfill API solo rellena ANTES de `2025-12-10`; el export nativo es autoridad desde su activación.
 
 ### Slice 3 — Split PG/BQ en `readSeoPerformance`
@@ -338,7 +352,7 @@ patrón fuente en `rank-history-bq-mirror.ts`. Puntos load-bearing:
 ## Acceptance Criteria
 
 - [ ] `greenhouse_growth_analytics.seo_gsc_history` existe, particionada por fecha + clustered por org, poblada por MERGE idempotente (nunca DELETE by source).
-- [ ] Backfill ejecutado para TODAS las orgs con `seo_v1`; profundidad ≥6 meses (objetivo 16) verificada con `SELECT MIN(capture_date)` por org.
+- [ ] Backfill ejecutado para TODAS las orgs con `seo_v2`; profundidad ≥6 meses (objetivo 16) verificada con `SELECT MIN(capture_date)` por org.
 - [ ] `readSeoPerformance` sirve rango > ventana caliente desde BQ con `source='bigquery'`; shape y honestidad (`null` ≠ 0) idénticos.
 - [ ] Paridad de posición: fórmula ponderada del mirror == fórmula de `read-overview-kpis` sobre el mismo día (test con datos reales).
 - [ ] Semilla `historical_serps` aplicada con marca de procedencia y granularidad declarada; gasto registrado en el ledger.

@@ -350,6 +350,41 @@ const DEFAULT_READINESS_TIMEOUT = 10000
 const SCROLL_POSITIONS = new Set<ScrollLogicalPosition>(['start', 'center', 'end', 'nearest'])
 const QUALITY_PROFILES = new Set<CaptureQualityProfile>(['legacy', 'diagnostic', 'standard', 'premium'])
 
+/**
+ * Teclas que mueven foco o cierran una superficie, pero **no activan** el control enfocado.
+ *
+ * 🔴 `Enter` y `Space` NO están acá y no deben agregarse: activan el control con foco, así que
+ * una captura podría enviar un formulario o confirmar un gasto sin que el scenario se declare
+ * `mutating`. Esa es exactamente la puerta que el gate existe para cerrar.
+ *
+ * 🔴 Las flechas y `Home`/`End` TAMPOCO están, y la razón no es obvia: sobre un `RadioGroup`, un
+ * `Slider` o un `<select>` nativo con foco, las flechas **cambian el valor** y disparan `onChange`
+ * (y `Home`/`End` en un slider saltan a min/max). En una superficie que persiste on-change —patrón
+ * que existe en el portal para filtros y preferencias— eso es un write real desde un scenario que
+ * se declaró no-mutante. La primera versión de esta lista las incluía afirmando que «no existe
+ * control que se active con ellas»; es falso, y el gate se apoyaba en esa afirmación.
+ *
+ * Lo que queda es lo que de verdad sólo navega o cierra: `Escape` y `Tab`.
+ */
+const NON_ACTIVATING_KEYS = new Set(['Escape', 'Esc', 'Tab'])
+
+/**
+ * `true` si la tecla sólo navega/cierra. Acepta combinaciones con modificadores (`Shift+Tab`):
+ * lo que decide es la tecla FINAL, porque es la que dispara la acción por default del control.
+ */
+const isNonActivatingKey = (key: string | undefined): boolean => {
+  if (!key) return false
+
+  const segments = key.split('+')
+  const finalKey = segments[segments.length - 1]?.trim()
+
+  if (!finalKey) return false
+
+  // Un modificador desconocido no habilita nada: sólo se aceptan los que no cambian la semántica
+  // de activación (Shift/Alt/Control/Meta + una tecla de navegación siguen sin activar).
+  return NON_ACTIVATING_KEYS.has(finalKey)
+}
+
 const mergeQuality = (base: CaptureQualityOptions, override?: CaptureQualityOptions): CaptureQualityOptions => ({
   ...base,
   ...override,
@@ -506,6 +541,24 @@ export const validateScenario = (s: CaptureScenario): void => {
     if ((mutatingKinds.has(step.kind) || mutatingClick) && !s.mutating) {
       // hover + non-mutating click + wait + mark + sleep + scroll permitidos siempre.
       // fill / press / click-when-mutating requieren scenario.mutating=true.
+      //
+      // ⚠️ Excepción acotada — teclas que NAVEGAN pero no ACTIVAN.
+      //
+      // El contrato de arriba (§9-12) dice que el teclado sobre UI no-mutante —tabs, filtros,
+      // drawers, accordions— está permitido por default, pero la implementación gateaba TODO
+      // `press`. Ese drift obligaba a marcar `mutating:true` a un scenario que no muta nada,
+      // y marcarlo así desactiva el gate para siempre en ese archivo: la próxima edición gana
+      // `fill` y click-mutante gratis, sin que nadie lo note. Silenciar el gate para pasarlo es
+      // peor que el problema que resuelve.
+      //
+      // La distinción real no es "teclado sí / teclado no", es si la tecla puede DISPARAR algo.
+      // `Enter` y `Space` activan el control enfocado —pueden enviar un formulario o confirmar
+      // un gasto— y siguen gateados. `Escape`, `Tab` y las flechas mueven foco o cierran una
+      // superficie: no existe control que se active con ellas.
+      if (step.kind === 'press' && isNonActivatingKey(step.key)) {
+        continue
+      }
+
       if (step.kind === 'fill' || step.kind === 'press') {
         throw new Error(`step ${index} (${step.kind}) requiere scenario.mutating:true + safeForCapture:true`)
       }

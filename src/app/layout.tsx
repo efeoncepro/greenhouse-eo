@@ -48,14 +48,13 @@ const poppins = Poppins({
   fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif']
 })
 
+// Favicon: NO declarar `icons` acá. Los assets viven como file convention de Next
+// (`src/app/favicon.ico`, `icon.svg`, `apple-icon.png`) y Next emite los <link> solo.
+// Declararlo en ambos lados sirve /favicon.ico en 404 y deja al navegador mostrando el
+// ícono viejo cacheado antes de pintar el nuestro. Regenerar: pnpm branding:favicon
 export const metadata: Metadata = {
   title: 'Greenhouse Portal',
-  description: 'Client portal for project visibility, delivery performance, and sprint health.',
-  icons: {
-    icon: [{ url: '/images/greenhouse/SVG/favicon-blue-negative.svg', type: 'image/svg+xml' }],
-    shortcut: ['/images/greenhouse/SVG/favicon-blue-negative.svg'],
-    apple: ['/images/greenhouse/SVG/favicon-blue-negative.svg']
-  }
+  description: 'Client portal for project visibility, delivery performance, and sprint health.'
 }
 
 export const viewport: Viewport = {

@@ -130,7 +130,7 @@ Cada job mapea a una capacidad del portal. Esto es lo accionable:
 | "Producir a la velocidad del negocio, máx 2 rondas" (BP6) | RpA / OTD% / FTR (`06`) en el dashboard, con semáforos. Es el corazón del ICO Engine. |
 | "Escalar sin fragmentar" (BP6) | Gobernanza de marca operacionalizada (BCS, brand checks) visible al cliente. |
 | "Foto unificada / dejar de coordinar proveedores" (BP2) | Greenhouse como **hub único** (`03`): un login que reemplaza 4 dashboards. |
-| "Visibilidad en motores de IA" (AEO) | Métricas AEO (Otterly.ai) expuestas como otra capa del dashboard. |
+| "Visibilidad en motores de IA" (AEO) | Métricas AEO del **motor propio** (AI Visibility Grader) expuestas como otra capa del dashboard. |
 | "Una sola fuente de verdad" (BP5) | Confiabilidad del dato = por qué el test coverage en finance/identity no es opcional; revisar arquitectura vigente y `04` antes de tocar esos dominios. |
 
 **Regla para el agente:** antes de construir una feature, identifica la línea de negocio, product brand habilitadora, BP y tier del job. Una feature que no sirve a un job de BP1/BP2/BP5/BP6 (los que usan el portal) probablemente no es prioridad. Para casos reales por ICP usa solo los confirmados (`01`/`06`): Sky (Creative Services), Bresler y Berel (Growth Strategy & Measurement / AEO+SEO).

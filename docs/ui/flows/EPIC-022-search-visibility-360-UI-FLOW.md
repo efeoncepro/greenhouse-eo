@@ -110,7 +110,11 @@ Operador (internal):
 /admin/growth/seo/performance?urls=…&keywords=…&range=90d&engine=google&device=desktop
 /admin/growth/seo/keywords                     Keyword opportunities (lente Oportunidades, vista por defecto)
 /admin/growth/seo/keywords?space=…&window=28|90&q=…&action=quickWin|striking|cannibalized&position=firstPage|secondPage
-   (vigente desde 2026-08-07 — `intent`/`maxDiff` no existen: no hay fuente de intención ni de dificultad)
+   (vigente desde 2026-08-07 — la lente Oportunidades no expone hoy filtros `intent`/`maxDiff` en la URL.
+    ⚠️ Corregido 2026-08-14: la premisa original de esa nota — "no hay fuente de intención ni de dificultad" —
+    dejó de ser cierta con TASK-1661: `greenhouse_growth.seo_keyword_market_data` persiste `search_intent`,
+    `search_intent_probability` y `keyword_difficulty`. Que no sean query params es una decisión de alcance
+    de la pantalla, no una ausencia de fuente)
 /admin/growth/seo/keywords?space=…&view=targets     Lente Objetivos (TASK-1660)
 /admin/growth/seo/keywords?space=…&view=discovery&discoveryRun=…&q=…&source=…&intent=…&state=…&minVolume=…&maxDifficulty=…
    (lente Descubrir: `view=discovery` es la única selección de lente; `discoveryRun` y filtros son query state allowlisted)
@@ -138,9 +142,11 @@ Login interno → nav Growth → Search Visibility → SEO
         └─ contextual: "Ver keywords de esta URL" → S3
   → S3 Keywords: sub-navegación Oportunidades · Objetivos · Descubrir
         ├─ Oportunidades: veredicto (leyenda+filtro) + scatter medido (posición×impresiones) + tabla
-        │      → acciones gobernadas "Seguir" / "Dejar de seguir" (trackKeywords / untrackKeywords)
+        │      → acciones gobernadas "Seguir" / "Dejar de seguir"
+        │        (trackKeywords(intent=opportunity) — la lente declara su intención — / untrackKeywords)
         ├─ Objetivos: declaración explícita + trayectoria contra la primera medición posterior
-        │      → trackKeywords(intent=target) / readKeywordTargets
+        │      → trackKeywords(intent=target) — el eje YA existe en el command (TASK-1659) —
+        │        + reader de la lente (pendiente, TASK-1660)
         ├─ Descubrir: seeds → preview de costo → confirmación → corrida async → candidates
         │      → "Declarar objetivo" / "Seguir oportunidad" / "Preparar grounded queries" / "Descartar"
         │      → queueKeywordDiscovery / readKeywordDiscovery / recordKeywordDiscoveryAction
@@ -183,7 +189,8 @@ Toda acción visible mapea a un command gobernado server-side (capability-gated,
 | Acción visible | Command | Capability | Superficie |
 |---|---|---|---|
 | Configurar target/keywords/competidores | `configureSeoTarget` / `trackKeywords` / `setBacklinkTracking` | `growth.seo.target.configure` | S1, S3 |
-| "Seguir" keyword (agregar al set monitoreado) | `trackKeywords(keywordSetId, [kw], actor)` | `growth.seo.target.configure` | S3 |
+| "Seguir" keyword (agregar al set monitoreado) | `trackKeywords(seoTargetId, [kw], actor, { intent?, intentDeclaredBy? })` — el caller **declara** la intención (`opportunity` en la lente Oportunidades); sin declaración se escribe `NULL`, nunca un default | `growth.seo.target.configure` | S3 |
+| "Declarar objetivo" / reclasificar una keyword ya seguida | `trackKeywords(..., { intent: 'target' })` — cierra la membresía vigente y abre otra (outcome `intent_changed`); **no consume cupo** ni es un `UPDATE` | `growth.seo.target.configure` | S3 · Objetivos |
 | "Dejar de seguir" (cerrar la ventana de seguimiento) | `untrackKeywords(seoTargetId, [kw], actor)` — append-only, cierra con `clock_timestamp()`; **nunca borra** | `growth.seo.target.configure` | S3 |
 | "Descubrir keywords" (crear corrida) | `queueKeywordDiscovery(input)` → `pending` + outbox; el worker ejecuta Labs tras el preview/fence | `growth.seo.target.configure` + `enforceSeoRunEntitlement` | S3 · Descubrir |
 | Leer corrida/candidates | `readKeywordDiscovery({runId?, filters?, cursor?})` | `growth.seo.observation.read` | S3 · Descubrir · Nexa · ecosystem · MCP |
@@ -260,9 +267,16 @@ atribuir citas sólo después de que exista un prompt aprobado y una observació
 
 ## 9. Reliability signals (arch §8, subsistema Growth Health)
 
-Visibles en `/admin/operations`: `seo.rank.capture_lag` (steady=0), `seo.audit.stuck_tasks`,
-`seo.keyword_discovery.stuck_runs`, `seo.keyword_discovery.provider_errors` y
-`seo.provider.cost_over_budget`. Las superficies operador (S1/S4) enlazan a estos signals cuando
+**Implementadas y visibles hoy en `/admin/operations` (verificado 2026-08-14 contra
+`src/lib/reliability/queries/`):** `seo.rank.capture_lag` (steady=0), `seo.audit.stuck_tasks` y
+`seo.market_data.freshness` (TASK-1661 — cobertura de dato de mercado vigente sobre el set seguido;
+con `GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED` apagado, la cobertura parcial es lo esperado).
+
+**Previstas, aún NO implementadas** (no asumir que existen al diseñar una superficie):
+`seo.keyword_discovery.stuck_runs`, `seo.keyword_discovery.provider_errors` (dueñas: TASK-1664/1665) y
+`seo.provider.cost_over_budget`.
+
+Las superficies operador (S1/S4) enlazan a estos signals cuando
 muestran freshness/degradación; S3/Descubrir muestra el estado de la corrida y su costo, pero no
 calcula salud en cliente ni oculta una corrida atascada.
 
@@ -301,6 +315,10 @@ calcula salud en cliente ni oculta una corrida atascada.
 ---
 
 ## Delta 2026-08-07 — S3 (Keyword opportunities) implementada: cuatro supuestos del flujo no resistieron el runtime
+
+> ⚠️ **Los puntos 1 y 4 de este delta quedaron SUPERSEDIDOS por el
+> [Delta 2026-08-14](#delta-2026-08-14--el-enriquecimiento-de-mercado-llegó-supersede-los-puntos-1-y-4-del-delta-2026-08-07).**
+> Se conservan como histórico: describen el estado real entre el 2026-08-07 y el 2026-08-13, no el contrato vigente.
 
 `/admin/growth/seo/keywords` está viva (TASK-1308). Hereda el shell de S1 sin construir navegación
 local, entra en `route-reachability-manifest.ts` con `parent: '/admin/growth/seo'` + `via: 'tab'`, y
@@ -426,3 +444,71 @@ ni un segundo estado editorial en el browser.
 
 Este delta actualiza el master flow; no constituye evidencia de runtime ni cambia el estado `UI ready:
 no` de `TASK-1665`.
+
+## Delta 2026-08-14 — el enriquecimiento de mercado llegó: supersede los puntos 1 y 4 del Delta 2026-08-07
+
+`TASK-1661` aterrizó la lente ◑ estimada. Lo que el Delta 2026-08-07 declaraba como ausencia de fuente
+**ya no es cierto**, y este delta fija el contrato vigente para todos los consumers.
+
+**Lo que cambió respecto de ese delta:**
+
+1. **Existe fuente de mercado, y existe fuente de intención.**
+   `greenhouse_growth.seo_keyword_market_data` persiste `search_volume`, `keyword_difficulty`,
+   `search_intent`, `search_intent_probability`, `competition` (⚠️ **paga**, no dificultad) y el perfil
+   de enlaces del top-10, cada fila con su `capture_date` / `provider_last_updated_at`.
+   `readKeywordOpportunities` devuelve `market: 'available' | 'unavailable'` según haya o no captura
+   para esa lectura — ya no está cableado a `'unavailable'`.
+2. **Las columnas *Volumen* y *Barrera de enlaces* SÍ se renderizan** cuando `market === 'available'`.
+   La no-renderización sigue siendo el comportamiento correcto **solo** en el caso `'unavailable'`
+   (con la nota `● Medido · Search Console` + el motivo, una vez, al pie del mapa).
+3. **La columna se llama "Barrera de enlaces", NUNCA "Dificultad"** (ISSUE-152), y se muestra en
+   niveles **Baja / Media / Alta**, jamás como número crudo. El nivel se deriva server-side
+   (`deriveLinkBarrier`) del perfil de enlaces **real del top-10** — diversidad de dominios referentes
+   + page rank —, **no** del `keyword_difficulty` del proveedor, que en SERPs LATAM colapsa a 0 y se
+   leería como "trivial". **"Baja" = se compite con contenido y autoridad, no con enlaces**: una
+   oportunidad para un dominio fuerte, no una búsqueda fácil.
+4. **`unknown` se pinta "Sin dato", nunca "Baja" y nunca `0`.** Un hueco presentado como barrera baja
+   afirma una oportunidad que nadie midió. El invariante del §8 se mantiene entero.
+
+**Lo que NO cambió (y es la parte importante):**
+
+- **El encoding del scatter sigue siendo medido**: X = posición ponderada, Y = impresiones (log),
+  tamaño = clics incrementales, color + forma = acción. El punto 1 del delta anterior tenía razón en la
+  **decisión** aunque su premisa expiró: el mercado estimado **es columna y filtro, nunca eje**. Los
+  ejes medidos son correctos con o sin él.
+- **El orden de la tabla sigue saliendo de la ganancia estimada** (dato medido). El volumen de mercado
+  dimensiona y explica; no prioriza.
+- **● y ◑ no se promedian ni se sustituyen jamás**, y toda cifra estimada viaja con su as-of.
+
+**Deuda visible declarada (no cerrada por este delta):** cuando `market === 'available'`, la pantalla
+**no** renderiza hoy ninguna leyenda de origen — la nota `● Medido · Search Console` sólo aparece en el
+caso `'unavailable'` — y tampoco imprime el `capturedAt` del dato de mercado. El §8 pide leyenda
+persistente y as-of explícito para lo estimado: eso queda pendiente de una task de UI. El as-of sí viaja
+en el contrato programático (`get_seo_keyword_market_data` devuelve `capturedAt` /
+`providerLastUpdatedAt`).
+
+## Delta 2026-08-14 — la intención declarada aterrizó: el eje "objetivo vs oportunidad" ya existe en el command
+
+`TASK-1659` quedó **complete**. El set monitoreado dejó de tener un solo eje: además de `source`
+(procedencia del write) cada membresía puede llevar `intent` (`target` | `opportunity`) con su autoría.
+Lo que hasta ahora era un supuesto del §5 —"Objetivos" como lente futura— ya tiene contrato server-side.
+
+**Lo que los consumers pueden dar por sentado (`TASK-1660` y `TASK-1665`):**
+
+1. **`trackKeywords` acepta `intent` y `intentDeclaredBy`, y no asume ninguno.** Sin declaración escribe
+   `NULL`; no existe un tercer valor "desconocido". La UI **pinta la ausencia como ausencia**, jamás
+   como "oportunidad", igual que `unknown` de la barrera de enlaces se pinta "Sin dato".
+2. **La lente Oportunidades ya declara `intent: 'opportunity'` en cada "Seguir".** Ninguna lente nueva
+   hereda intención por defecto: la que no la declara no la escribe.
+3. **Reclasificar es una acción legítima y visible.** Cambiar la intención cierra la membresía vigente y
+   abre otra (`intent_changed` en el outcome, con `previousIntent`), **no consume cupo** del techo y
+   **nunca** es un `UPDATE`. La UI debe leer el outcome por keyword —no `ok: true`— y distinguir
+   `tracked` (gasto nuevo) de `intent_changed` (reclasificación sin gasto nuevo) en su feedback.
+4. **Objetivo y oportunidad nunca se promedian.** Una keyword `target` en la posición 60 es la distancia
+   que falta, no un fracaso: cualquier KPI, orden o veredicto que las mezcle miente sobre ambas.
+5. **Sin capability, scope ni flag nuevos**: la acción sigue detrás de `growth.seo.target.configure`, y
+   las 3 lanes (app · ecosystem · MCP) ya validan el vocabulario con 400 explícito.
+
+**Lo que este delta NO declara:** no existe todavía reader ni superficie de la lente Objetivos —es el
+alcance de `TASK-1660`— y este delta actualiza el master flow sin constituir evidencia de runtime ni
+cambiar el estado `UI ready` de ninguna task consumidora.

@@ -3,7 +3,13 @@ import { notFound, redirect } from 'next/navigation'
 import type { Metadata } from 'next'
 
 import { can } from '@/lib/entitlements/runtime'
-import { isSeoModuleEnabled } from '@/lib/growth/seo/flags'
+import { isGraderEnabled } from '@/lib/growth/ai-visibility/flags'
+import { getGraderProfileForOrganization } from '@/lib/growth/ai-visibility/store'
+import { enforceSeoRunEntitlement } from '@/lib/growth/seo/entitlement'
+import { isSeoKeywordDiscoveryEnabled, isSeoModuleEnabled } from '@/lib/growth/seo/flags'
+import { GH_GROWTH_SEO_KEYWORDS } from '@/lib/copy/growth'
+import { readKeywordDiscovery } from '@/lib/growth/seo/keyword-discovery/reader'
+import type { SeoDiscoveryCandidateView, SeoDiscoveryRunView } from '@/lib/growth/seo/keyword-discovery/reader'
 import { resolveUnambiguousSeoTarget } from '@/lib/growth/seo/resolve-target'
 import { readKeywordOpportunities } from '@/lib/growth/seo/keyword-opportunities-reader'
 import { listSeoEligibleSpaces } from '@/lib/growth/seo/overview/list-seo-spaces'
@@ -13,6 +19,7 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 import KeywordOpportunitiesView from '@/views/greenhouse/admin/growth/seo/keywords/KeywordOpportunitiesView'
+import KeywordDiscoveryWorkbench from '@/views/greenhouse/admin/growth/seo/keywords/discovery/KeywordDiscoveryWorkbench'
 
 /**
  * TASK-1308 — Oportunidades de keywords (`EPIC-022` §10.4, nodo S3 del master flow).
@@ -53,8 +60,16 @@ interface PageProps {
     q?: string
     action?: string
     position?: string
+    view?: string
+    discoveryRun?: string
   }>
 }
+
+/**
+ * TASK-1665 — Lentes de la superficie. `Oportunidades` es la vista por defecto, así que
+ * `/keywords` sin `?view=` sigue significando exactamente lo que significaba.
+ */
+const ALLOWED_LENSES = new Set(['opportunities', 'discovery'])
 
 const ALLOWED_ACTIONS = new Set(['quickWin', 'striking', 'cannibalized'])
 const ALLOWED_POSITIONS = new Set(['firstPage', 'secondPage'])
@@ -109,6 +124,130 @@ export default async function Page({ searchParams }: PageProps) {
 
   const canTrackKeywords = can(tenant, 'growth.seo.target.configure', 'execute', 'tenant')
   const capacity = resolveTrackedKeywordCapacity()
+
+  // ── TASK-1665 — lente `Descubrir` ──────────────────────────────────────────────────────
+  //
+  // Se resuelve ANTES de la conexión de Search Console a propósito: descubrir no depende de la
+  // demanda medida (una seed escrita a mano basta), así que exigir GSC bloquearía justo el caso
+  // de un Space nuevo, que es cuando más falta hace investigar.
+  const activeLens = ALLOWED_LENSES.has(params.view ?? '') ? (params.view as 'opportunities' | 'discovery') : 'opportunities'
+
+  if (activeLens === 'discovery') {
+    const discoveryEnabled = isSeoKeywordDiscoveryEnabled()
+    const discoveryTarget = selectedSpace ? await resolveUnambiguousSeoTarget(selectedSpace.organizationId) : null
+    const market = discoveryTarget?.target ?? null
+
+    // El CTA no se renderiza si falta flag, capability o sitio; el motivo se dice en la banda de
+    // costo. Un botón apagado invita a buscar cómo encenderlo — la explicación es más útil.
+    const discoveryDisabledReason = !discoveryEnabled
+      ? GH_GROWTH_SEO_KEYWORDS.discovery.disabledReason.flag
+      : !canTrackKeywords
+        ? GH_GROWTH_SEO_KEYWORDS.discovery.disabledReason.permission
+        : !market
+          ? GH_GROWTH_SEO_KEYWORDS.discovery.disabledReason.noTarget
+          : null
+
+    // Lectura en DOS pasos a propósito: sin `runId` el reader devuelve sólo el historial de
+    // corridas (no candidatos), así que primero se resuelve CUÁL corrida mirar —la del enlace
+    // compartido o la última— y recién entonces se piden sus candidatos. Pedir todo de una haría
+    // que un deep-link a una corrida vieja trajera la nueva.
+    let discoveryRun: SeoDiscoveryRunView | null = null
+    let discoveryCandidates: SeoDiscoveryCandidateView[] = []
+    let discoveryTotal = 0
+
+    if (selectedSpace && market) {
+      const requestedRunId = (params.discoveryRun ?? '').trim() || undefined
+
+      const runs = await readKeywordDiscovery({
+        organizationId: selectedSpace.organizationId,
+        seoTargetId: market.seoTargetId,
+        runId: requestedRunId
+      })
+
+      if (runs.ok) {
+        discoveryRun = runs.run ?? runs.runs[0] ?? null
+
+        // Si el reader ya trajo candidatos (venía `runId`), no se vuelve a preguntar.
+        if (runs.candidates.length > 0 || requestedRunId) {
+          discoveryCandidates = runs.candidates
+          discoveryTotal = runs.totalCandidates
+        } else if (discoveryRun) {
+          const withCandidates = await readKeywordDiscovery({
+            organizationId: selectedSpace.organizationId,
+            seoTargetId: market.seoTargetId,
+            runId: discoveryRun.runId
+          })
+
+          if (withCandidates.ok) {
+            discoveryCandidates = withCandidates.candidates
+            discoveryTotal = withCandidates.totalCandidates
+          }
+        }
+      }
+    }
+
+    /*
+     * ── Cupo del período, resuelto server-side ───────────────────────────────────────────
+     *
+     * La banda de costo promete responder «¿me cabe?» y hasta acá siempre decía «Cupo no
+     * disponible»: el dato existía en el gate y nadie lo pedía, así que el operador descubría el
+     * bloqueo recién con el rebote del enqueue.
+     *
+     * Se consulta el MISMO chokepoint canónico que usan el preview y el enqueue
+     * (`enforceSeoRunEntitlement`) — no una lectura paralela del presupuesto. Sin
+     * `estimatedCostUsd` la llamada es una pregunta pura por el remanente: no reserva, no gasta y
+     * no consume allowance de audits (`consumesAuditAllowance: false`, igual que el rank capture,
+     * porque descubrir tampoco crea `seo_site_audit_runs`).
+     *
+     * ⚠️ Sigue siendo informativa, no autorizante: el command recalcula antes de persistir y
+     * puede bloquear con un cupo distinto si algo gastó en el intertanto.
+     */
+    let discoveryBudgetRemainingUsd: number | null = null
+
+    if (selectedSpace && market && discoveryEnabled && canTrackKeywords) {
+      const gate = await enforceSeoRunEntitlement(selectedSpace.organizationId, { consumesAuditAllowance: false })
+
+      discoveryBudgetRemainingUsd = gate.budgetRemainingUsd ?? null
+    }
+
+    // ── TASK-1665 Slice 4 — puente grounded (TASK-1666) ──────────────────────────────────
+    //
+    // ⚠️ Son DOS planos de capability, no uno: leer candidatos SEO y gestionar prompts AEO. Y
+    // además hace falta un perfil AEO enlazado al Space, porque `createGroundedQueryDraft` lo
+    // exige. Resolverlo acá —y no en el cliente— evita ofrecer una acción que el command va a
+    // rechazar después: el motivo se dice antes, no se descubre al confirmar.
+    const canManageAeoPrompts = can(tenant, 'growth.ai_visibility.prompt_set.manage', 'execute', 'tenant')
+
+    const graderProfile =
+      selectedSpace && isGraderEnabled() && canManageAeoPrompts
+        ? await getGraderProfileForOrganization(selectedSpace.organizationId)
+        : null
+
+    const groundedDisabledReason = !isGraderEnabled()
+      ? GH_GROWTH_SEO_KEYWORDS.discovery.actions.disabledGroundedFlag
+      : !canManageAeoPrompts
+        ? GH_GROWTH_SEO_KEYWORDS.discovery.actions.disabledGroundedNoPermission
+        : !graderProfile
+          ? GH_GROWTH_SEO_KEYWORDS.discovery.actions.disabledGroundedNoProfile
+          : null
+
+    return (
+      <KeywordDiscoveryWorkbench
+        organizationId={selectedSpace?.organizationId ?? null}
+        seoTargetId={market?.seoTargetId ?? null}
+        selectedSpaceId={selectedSpace?.organizationId ?? null}
+        marketLabel={market ? `${market.market ?? market.locationCode} · ${market.languageCode}` : null}
+        canExecute={discoveryEnabled && canTrackKeywords && Boolean(market)}
+        disabledReason={discoveryDisabledReason}
+        budgetRemainingUsd={discoveryBudgetRemainingUsd}
+        graderProfileId={graderProfile?.profileId ?? null}
+        groundedDisabledReason={groundedDisabledReason}
+        run={discoveryRun}
+        candidates={discoveryCandidates}
+        totalCandidates={discoveryTotal}
+      />
+    )
+  }
 
   if (!selectedSpace) {
     // Pasar el gate y no tener NINGÚN Space con el módulo no es un error: es el estado

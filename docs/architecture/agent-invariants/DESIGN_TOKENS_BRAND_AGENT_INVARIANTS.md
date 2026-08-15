@@ -34,6 +34,37 @@ Hechos de marca canónicos — NO hardcodear en otro lado, importar del SSOT. Do
 - **Eslogan "Empower your Growth"** — elemento de **brand-zone** (header/masthead), **NUNCA** el footer legal. Tipografía Poppins: `Empower` = ExtraBold Italic (800 italic), `your` = ExtraBold (800), `Growth` = Black Italic (900 italic). **Color canónico gris `#848484`** (= token `text-disabled`; `EFEONCE_SLOGAN_COLOR` en el SSOT, es el default de ambos componentes — override solo sobre fondo oscuro). Fuentes en `src/assets/fonts/Poppins-{ExtraBold,ExtraBoldItalic,Black,BlackItalic}.ttf` (Google Fonts v24 Latin, SIL OFL 1.1), registradas en `src/lib/finance/pdf/register-fonts.ts`. Render canónico: web `src/components/greenhouse/brand/EfeonceSlogan.tsx`, PDF `src/lib/finance/pdf/efeonce-slogan-pdf.tsx` — NUNCA re-implementar inline.
   - **Logo y eslogan son elementos SEPARADOS** — se usan solos o compuestos, **nunca fusionados en un único asset**. En un lockup (logo + eslogan): el eslogan es **subordinado** (claramente más pequeño, NO compite ni iguala el ancho del logo) y va **centrado** debajo del logo con separación mínima. El **tamaño del eslogan es contextual** (depende del tamaño del logo en esa superficie) — elige un `fontSize` que lo mantenga visiblemente menor; NO hay un pt fijo (el reporte de contractors usa ~7.5pt contra logo ~116pt como ejemplo de la **proporción**, no como regla). Detalle en `DESIGN.md` → "Slogan".
 - **Footer PDF reusable**: `src/lib/finance/pdf/efeonce-pdf-footer.tsx` (`EfeoncePdfFooter`) — footer institucional canónico de **todos** los PDFs Efeonce (entidad · RUT + dirección + `efeoncepro.com` + generado/página). Lleva **solo identidad legal/contacto**; el eslogan va en la brand-zone, no acá. PDFs nuevos reusan este footer, no rollean uno propio.
+
+### Favicon / iconografía de pestaña (file convention, 2026-08-15)
+
+Los íconos de pestaña viven como **file convention de Next App Router** en la raíz de `src/app/`:
+`favicon.ico` (ICO multi-size 16/32/48/64, PNG embebido), `icon.svg` y `apple-icon.png` (180×180, sin
+alpha). Next emite los `<link rel>` solo, con hash de contenido — el cache-busting es automático en
+cada cambio de asset. Los tres se **generan** desde el SVG de marca
+`public/images/greenhouse/SVG/favicon-blue-negative.svg` con `pnpm branding:favicon`
+(`scripts/branding/build-favicon.mjs`); ese SVG es la fuente, los tres archivos son derivados.
+
+**Reglas duras:**
+
+- **NUNCA** declarar `icons` en `metadata` de `src/app/layout.tsx` (ni en un layout anidado) teniendo
+  los archivos de convención. Declararlo en ambos lados es lo que produjo el bug de "doble favicon":
+  compiten, y el navegador termina pintando dos íconos en secuencia.
+- **NUNCA** dejar `/favicon.ico` sin un archivo real. El navegador pide esa ruta de forma implícita
+  **siempre**, sin importar lo que declare el `<head>`. Sin archivo, Next responde el HTML de
+  not-found (~105 KB) con 404 en cada carga, y mientras esa petición resuelve el navegador muestra el
+  ícono que tenga cacheado — el anterior, o el de otro sitio.
+- **NUNCA** editar `favicon.ico` / `icon.svg` / `apple-icon.png` a mano: son derivados. Cambiar la
+  marca significa cambiar el SVG fuente y correr `pnpm branding:favicon`.
+- Al verificar un cambio de favicon, **NO** confiar en el ícono que muestra el navegador propio: la
+  base de favicons del navegador es persistente y separada del caché HTTP. Verificar contra el
+  runtime (`curl -I /favicon.ico` → `200 image/x-icon`) y contra el DOM (un solo set de `link[rel*=icon]`).
+
+**Caso fuente (2026-08-15):** el commit `879fb9058` ("remove legacy starter favicon") borró el
+`favicon.ico` heredado de Vuexy sin reemplazarlo, dejando la marca declarada solo como SVG vía
+`metadata.icons`. `/favicon.ico` quedó en 404 durante ~2 semanas y el portal mostraba el ícono de
+Vuexy antes del de Greenhouse en cada carga. El síntoma sobrevivió a un primer intento de arreglo
+porque la base de favicons del navegador del operador seguía sirviendo el ícono viejo en omnibox e
+historial. Doc funcional: `docs/documentation/plataforma/favicon-iconografia-pestana.md`.
 - `project_context.md` — estado vigente del repo, stack, decisiones y restricciones; leer primero su sección "Estado vigente para agentes"
 - `Handoff.md` — cabina de mando activa: trabajo en curso, riesgos y próximos pasos
 - `Handoff.archive.md` — caja negra histórica; usar para auditoría de resoluciones sin tratar entradas antiguas como contrato vigente

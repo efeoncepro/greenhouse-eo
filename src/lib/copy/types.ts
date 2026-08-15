@@ -423,9 +423,62 @@ export interface HiringDeskCopy {
     finalizeScorecard: string
     scorecardFinalized: string
     documentsTitle: string
-    documentsUnavailable: string
-    documentsBody: string
     revealConfirm: string
+    /**
+     * TASK-1715 — copy del panel de Documentos. Separa las dos clases del modelo
+     * canónico: un archivo se ABRE (autorizado ya por la capability de la pantalla)
+     * y la identidad se REVELA (capability + motivo + audit). El panel anterior las
+     * trataba igual y prometía una auditoría que nunca se escribía.
+     */
+    documentsPanel: {
+      subtitle: string
+      filesGroup: string
+      identityGroup: string
+      sensitiveChip: string
+      open: string
+      download: string
+      cvLabel: string
+      portfolioFileLabel: string
+      portfolioLinkLabel: string
+      linkedinLabel: string
+      uploadedOn: string
+      noCv: string
+      noPortfolio: string
+      statusQuarantined: string
+      quarantinedBody: string
+      statusPending: string
+      pendingBody: string
+      statusLegacy: string
+      legacyBody: string
+      quarantineBanner: string
+      identityEmpty: string
+      identityMaskedHint: string
+      reveal: string
+      revealDialogTitle: string
+      revealDialogBody: string
+      revealAuditNotice: string
+      revealReasonLabel: string
+      revealReasonHelper: string
+      revealed: string
+      copyValue: string
+      copied: string
+      hideValue: string
+      revealDenied: string
+      revealError: string
+      loadError: string
+      openAriaLabel: string
+      downloadAriaLabel: string
+      revealAriaLabel: string
+      viewerTitle: string
+      viewerLoading: string
+      viewerLoadError: string
+      viewerUnsupported: string
+      viewerNoEmbed: string
+      viewerOpenInNewTab: string
+      viewerFrameTitle: string
+      view: string
+      viewAriaLabel: string
+    }
     decisionTitle: string
     decisionIntro: string
     decisionType: string

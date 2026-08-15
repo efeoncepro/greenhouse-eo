@@ -24,12 +24,16 @@
 > De seis bandas de chrome antes del primer dato, a tres.
 
 
-> ## ⚠️ Recalibración 2026-08-07 (implementación) — los ejes de este wireframe no tienen fuente
+> ## ⚠️ Recalibración 2026-08-07 (implementación) — los ejes de este wireframe no son los correctos
+>
+> _Actualizado 2026-08-14: la premisa de ausencia expiró; la decisión no. Ver el bloque siguiente._
 >
 > Este documento especifica el scatter como **X = dificultad, Y = volumen, color = intención**
-> y una tabla con columnas de volumen/dificultad. Al implementar se verificó contra el
-> contrato real: `readKeywordOpportunities` devuelve `searchVolume: null`, `difficulty: null`,
-> `market: 'unavailable'` (TASK-1300 no aterrizó) y **no existe un campo de intención**.
+> y una tabla con columnas de volumen/dificultad. Al implementar (2026-08-07) se verificó contra el
+> contrato de entonces: `readKeywordOpportunities` devolvía `searchVolume: null`, `difficulty: null`,
+> `market: 'unavailable'` y no había campo de intención. **Eso dejó de ser cierto con TASK-1661**
+> (ver el bloque de abajo); lo que se mantiene íntegro es la decisión de encoding, que no dependía
+> de la ausencia.
 >
 > **Lo implementado** (consultada la skill `seo-aeo` §02, método verificado contra la API real
 > de GSC, que lista priorizar por volumen estimado teniendo el GSC propio como un *error*):
@@ -39,20 +43,50 @@
 > | X = dificultad | **X = posición ponderada** (8→20 fijo) | Medido. Izquierda = más cerca de la primera plana |
 > | Y = volumen (mercado) | **Y = impresiones** (log) | Demanda MEDIDA de la SERP propia, mejor dato que un promedio de mercado |
 > | size = clicks | **size = clics incrementales estimados** (área ∝ ganancia) | El score del reader ya está en clics, no en un índice |
-> | color = intención | **color + FORMA = acción** (Empujar / A un paso / Consolidar) | No hay campo de intención; y lo que decide el trabajo es la ACCIÓN |
+> | color = intención | **color + FORMA = acción** (Empujar / A un paso / Consolidar) | Lo que decide el trabajo es la ACCIÓN, no la intención declarada |
 > | facet intención | **facet acción** | ídem |
-> | slider dificultad | **facet posición** (primera/segunda plana) | Sin fuente de dificultad |
-> | col. Volumen / Dificultad | se conservan, con estado **"Sin dato de mercado"** | Ni `0` ni guion ambiguo (Delta 2026-08-05 de la task) |
+> | slider dificultad | **facet posición** (primera/segunda plana) | La posición es medida; la dificultad del proveedor no es un eje honesto |
+> | col. Volumen / Dificultad | se conservan; en 2026-08-07 con estado **"Sin dato de mercado"** | Ni `0` ni guion ambiguo (Delta 2026-08-05 de la task) |
 >
-> 🎯 **Decisión de fondo:** el dato de mercado, cuando llegue, **NO será un eje — será una
-> columna y un filtro**. Los ejes medidos son correctos con o sin él, así que TASK-1300 no
-> obliga a reescribir esta pantalla.
+> 🎯 **Decisión de fondo (vigente, y confirmada por el runtime):** el dato de mercado **NO es un
+> eje — es una columna y un filtro**. Los ejes medidos son correctos con o sin él, así que la
+> llegada del enriquecimiento no obligó a reescribir esta pantalla.
 >
 > ⚠️ **Canibalización quedó como ACCIÓN con verbo propio ("Consolidar"), no como chip
 > decorativo** — como ya pedía el Delta 2026-08-05 de la task.
 >
 > El resto del wireframe (layout, estados, contrato de a11y, copy ledger, plan GVC) se
 > implementó como está escrito.
+
+
+> ## ✅ Delta 2026-08-14 (TASK-1661) — el dato de mercado llegó; la decisión de encoding se sostuvo
+>
+> El bloque de arriba se escribió cuando no existía fuente de mercado. **Ya existe**:
+> `greenhouse_growth.seo_keyword_market_data` persiste `search_volume`, `keyword_difficulty`,
+> `search_intent`, `search_intent_probability` y el perfil de enlaces del top-10, cada fila con su
+> fecha de captura, y `readKeywordOpportunities` devuelve `market: 'available' | 'unavailable'`.
+>
+> **Qué cambia en la pantalla:**
+>
+> - Las columnas **Volumen** y **Barrera de enlaces** se renderizan cuando `market === 'available'`.
+>   No renderizarlas sigue siendo lo correcto **solo** cuando es `'unavailable'`.
+> - La segunda columna se llama **"Barrera de enlaces", nunca "Dificultad"** (ISSUE-152), y se
+>   muestra en niveles **Baja / Media / Alta**, jamás como número. El nivel lo deriva el server
+>   (`deriveLinkBarrier`) del perfil de enlaces real del top-10 — diversidad de dominios referentes +
+>   page rank —, no del `keyword_difficulty` crudo, que en LATAM colapsa a 0 y se leería "trivial".
+>   **"Baja" = se compite con contenido y autoridad, no con enlaces**: oportunidad, no trivialidad.
+> - `unknown` se pinta **"Sin dato"**, nunca "Baja" y nunca `0`.
+>
+> **Qué NO cambia — y por eso este delta no reescribe el wireframe:** el scatter sigue con encoding
+> **medido** (X = posición ponderada, Y = impresiones log, tamaño = clics incrementales, color+forma =
+> acción), el orden de la tabla sigue saliendo de la ganancia estimada, y el mercado sigue siendo
+> **columna + filtro, nunca eje**. La decisión de fondo de 2026-08-07 era correcta con o sin dato:
+> lo único que expiró fue su premisa de ausencia.
+>
+> **Deuda declarada:** con `market === 'available'` la pantalla no muestra hoy leyenda de origen
+> (la nota `● Medido · Search Console` sólo aparece en el caso `'unavailable'`) ni el `capturedAt` del
+> dato estimado. El contrato ● / ◑ del master flow §8 pide ambas cosas para lo estimado — queda como
+> follow-up de UI, no como algo que este wireframe dé por hecho.
 
 
 ## Meta

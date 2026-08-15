@@ -22,6 +22,7 @@ import ContractorRemittanceEmail from '@/emails/ContractorRemittanceEmail'
 import HiringApplicationConfirmationEmail from '@/emails/HiringApplicationConfirmationEmail'
 import HiringApplicationReceivedInternalEmail from '@/emails/HiringApplicationReceivedInternalEmail'
 import HiringAssessmentAssignedEmail from '@/emails/HiringAssessmentAssignedEmail'
+import HiringAssessmentSubmittedInternalEmail from '@/emails/HiringAssessmentSubmittedInternalEmail'
 import HiringDecisionEmail from '@/emails/HiringDecisionEmail'
 import HiringStageAdvancedEmail from '@/emails/HiringStageAdvancedEmail'
 import QuoteSharePromptEmail from '@/emails/QuoteSharePromptEmail'
@@ -1798,6 +1799,43 @@ registerTemplate('hiring_assessment_assigned', (context: HiringAssessmentAssigne
   }
 })
 
+interface HiringAssessmentSubmittedInternalContext extends EmailTemplateContext {
+  candidateName: string
+  openingTitle: string
+  applicationPublicId: string
+  submittedAt: string
+  timeLimitMinutes?: number | null
+  applicationUrl: string
+}
+
+registerTemplate('hiring_assessment_submitted_internal', (context: HiringAssessmentSubmittedInternalContext) => {
+  const submittedAtLabel = formatShortDateTime(context.submittedAt) ?? context.submittedAt
+
+  return {
+    subject: `Test completado: ${context.candidateName} — ${context.openingTitle}`,
+    react: HiringAssessmentSubmittedInternalEmail({
+      candidateName: context.candidateName,
+      openingTitle: context.openingTitle,
+      applicationPublicId: context.applicationPublicId,
+      submittedAtLabel,
+      timeLimitMinutes: context.timeLimitMinutes ?? null,
+      applicationUrl: context.applicationUrl,
+    }),
+    text: [
+      `${context.candidateName} completó el test`,
+      '',
+      `Vacante: ${context.openingTitle}`,
+      `Postulación: ${context.applicationPublicId}`,
+      `Completado: ${submittedAtLabel}`,
+      `Tiempo asignado: ${context.timeLimitMinutes ? `${context.timeLimitMinutes} minutos` : 'Sin límite configurado'}`,
+      '',
+      'Las respuestas quedaron listas para revisión. Este resultado no toma decisiones automáticamente.',
+      '',
+      `Revisar evaluación: ${context.applicationUrl}`,
+    ].join('\n'),
+  }
+})
+
 interface HiringStageAdvancedContext extends EmailTemplateContext {
   recipientName?: string
   openingTitle: string
@@ -1962,6 +2000,29 @@ registerPreviewMeta('hiring_assessment_assigned', {
     { key: 'timeLimitMinutes', label: 'Tiempo límite (min)', type: 'number' },
     { key: 'tokenTtlDays', label: 'Vigencia del link (días)', type: 'number' },
     { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] },
+  ],
+})
+
+registerPreviewMeta('hiring_assessment_submitted_internal', {
+  label: 'Hiring — evaluación completada (People)',
+  description: 'Aviso al buzón interno de People cuando un candidato completa su evaluación',
+  domain: 'hr',
+  supportsLocale: false,
+  defaultProps: {
+    candidateName: 'María González',
+    openingTitle: 'Content Creator',
+    applicationPublicId: 'EO-APP-0001',
+    submittedAt: '2026-08-15T21:30:00.000Z',
+    timeLimitMinutes: 90,
+    applicationUrl: 'https://greenhouse.efeoncepro.com/agency/hiring/applications/happ-preview',
+  },
+  propsSchema: [
+    { key: 'candidateName', label: 'Nombre del candidato', type: 'text' },
+    { key: 'openingTitle', label: 'Vacante', type: 'text' },
+    { key: 'applicationPublicId', label: 'ID público de la postulación', type: 'text' },
+    { key: 'submittedAt', label: 'Fecha de envío (ISO)', type: 'text' },
+    { key: 'timeLimitMinutes', label: 'Tiempo asignado (min)', type: 'number' },
+    { key: 'applicationUrl', label: 'URL de Application 360', type: 'text' },
   ],
 })
 

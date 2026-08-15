@@ -430,10 +430,12 @@ export const createGreenhouseMcpServer = (
     {
       title: 'Track SEO Keywords',
       description:
-        'Add keywords to the monitored set of an organization so they enter daily rank tracking. THIS WRITES AND COMMITS RECURRING SPEND: every tracked keyword is billed to the provider on every rank-capture cycle until it is untracked, so propose the exact list to the human and get confirmation BEFORE calling this — never call it speculatively or to "see what happens". Idempotent: a keyword already tracked returns already_tracked and costs nothing. The set has a governed capacity ceiling; keywords beyond it return capacity_exceeded and are NOT tracked — report those back verbatim instead of implying they were added. Read the per-keyword outcomes array (tracked | already_tracked | capacity_exceeded | invalid), never just data.ok. Discover candidates with get_seo_keyword_opportunities first. When data.ok is false, report the errorCode (disabled, target_not_found, target_not_active, no_entitlement, no_keywords, query_failed) honestly.',
+        'Add keywords to the monitored set of an organization so they enter daily rank tracking. THIS WRITES AND COMMITS RECURRING SPEND: every tracked keyword is billed to the provider on every rank-capture cycle until it is untracked, so propose the exact list to the human and get confirmation BEFORE calling this — never call it speculatively or to "see what happens". Idempotent: a keyword already tracked with the same intent returns already_tracked and costs nothing. The set has a governed capacity ceiling; keywords beyond it return capacity_exceeded and are NOT tracked — report those back verbatim instead of implying they were added. Optional intent declares WHY the keyword is in the set: target (a commitment agreed with the client — it may sit at position 60 and that is the distance left, NOT a failure) or opportunity (measured demand being pushed). Omit intent unless a human actually declared one: guessing it fabricates a classification nobody made, and the two are never averaged in reporting. Changing the intent of an already-tracked keyword closes the current membership and opens a new one (outcome intent_changed) — it consumes no capacity and preserves the history of when it became a target. Read the per-keyword outcomes array (tracked | already_tracked | intent_changed | capacity_exceeded | invalid), never just data.ok. Discover candidates with get_seo_keyword_opportunities first. When data.ok is false, report the errorCode (disabled, target_not_found, target_not_active, no_entitlement, no_keywords, query_failed) honestly.',
       inputSchema: {
         organizationId: z.string().trim().min(1).optional(),
-        keywords: z.array(z.string().trim().min(1)).min(1).max(50)
+        keywords: z.array(z.string().trim().min(1)).min(1).max(50),
+        intent: z.enum(['target', 'opportunity']).optional(),
+        intentDeclaredBy: z.string().trim().min(1).optional()
       },
       outputSchema: greenhouseMcpToolOutputSchema
     },
@@ -454,6 +456,95 @@ export const createGreenhouseMcpServer = (
       outputSchema: greenhouseMcpToolOutputSchema
     },
     async args => handlers.untrackSeoKeywords(args)
+  )
+
+  // TASK-1664 — keyword discovery: lectura de corridas/candidatos.
+  server.registerTool(
+    'get_seo_keyword_discovery',
+    {
+      title: 'Get SEO Keyword Discovery',
+      description:
+        'Read keyword-discovery runs and their candidates for an organization. Without runId it lists recent runs (with status: pending | running | succeeded | partial | no_results | failed | budget_blocked); with runId it returns the composed candidates. Candidate volumes/difficulty/intent are ESTIMATED market data from the provider (monthly refresh, ◑); measuredGsc carries the measured demand of the client itself (●) as a SEPARATE lens — never merge or average them, and never present competition (paid) as difficulty (organic). A candidate is a suggestion, NOT a tracked keyword: promoting one to tracking is a separate explicit command (track_seo_keywords) with its own recurring-spend disclosure. Accepts optional market (ISO-2 or location_code) for multi-market organizations. Filters: status, sourceEndpoint, query, intent, minSearchVolume, maxDifficulty, excludeTracked, limit (max 200), cursor.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        market: z.string().trim().min(1).optional(),
+        runId: z.string().trim().min(1).optional(),
+        status: z.string().trim().min(1).optional(),
+        sourceEndpoint: z.string().trim().min(1).optional(),
+        query: z.string().trim().min(1).optional(),
+        intent: z.string().trim().min(1).optional(),
+        minSearchVolume: z.number().int().min(0).optional(),
+        maxDifficulty: z.number().int().min(0).max(100).optional(),
+        excludeTracked: z.boolean().optional().describe('Exclude candidates the target already tracks (actionable-only review).'),
+        limit: z.number().int().min(1).max(200).optional(),
+        cursor: z.string().trim().min(1).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getSeoKeywordDiscovery(args)
+  )
+
+  // TASK-1664 — el write de discovery: encolar una corrida que GASTA presupuesto DataForSEO.
+  server.registerTool(
+    'discover_seo_keywords',
+    {
+      title: 'Discover SEO Keywords',
+      description:
+        'Queue a keyword-discovery run: expands up to 10 seeds via DataForSEO Labs (keyword_suggestions | related_keywords | keyword_ideas | keywords_for_site) and enriches candidates with market data. THIS WRITES AND SPENDS PROVIDER BUDGET (each Live call and each returned row is billed), so ALWAYS call it first with preview: true, show the human the estimated cost formula and get explicit confirmation BEFORE queueing — never queue speculatively. The run executes ASYNC in the ops worker: the 202 response only means it was durably queued; poll get_seo_keyword_discovery with the returned runId for candidates, and never claim results exist right after queueing. Idempotent within the provider monthly refresh cycle: the same intent (org + target + seeds + market + methods + actor) returns the existing run of the CURRENT month without spending again; a new month allows a fresh run (market metrics refresh monthly). seedSource: manual (provide manualSeeds) | gsc_queries (top measured queries, no provider cost to resolve) | tracked_keywords | target_domain (keywords_for_site only) | mixed. Queueing NEVER auto-tracks: candidates enter the monitored set only through track_seo_keywords after human review. When data.ok is false, report the errorCode honestly.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        market: z.string().trim().min(1).optional(),
+        seedSource: z.enum(['manual', 'gsc_queries', 'tracked_keywords', 'target_domain', 'mixed']),
+        manualSeeds: z.array(z.string().trim().min(1)).max(10).optional(),
+        mixedMeasuredSource: z.enum(['gsc_queries', 'tracked_keywords']).optional(),
+        methods: z
+          .array(z.enum(['keyword_suggestions', 'related_keywords', 'keyword_ideas', 'keywords_for_site']))
+          .max(4)
+          .optional(),
+        idempotencyKey: z.string().trim().min(1).optional(),
+        preview: z.boolean().optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.discoverSeoKeywords({ ...args, methods: args.methods ?? [] })
+  )
+
+  // TASK-1666 — lectura del draft grounded (prompts AEO con provenance SEO).
+  server.registerTool(
+    'get_seo_grounded_query_draft',
+    {
+      title: 'Get SEO Grounded Query Draft',
+      description:
+        'Read an AEO grounded-query DRAFT created from SEO keyword-discovery candidates, with its provenance (opaque seo.discovery.* source refs and per-prompt groundingRef). groundingMode tells the truth: grounded_llm means the questions were authored WITH the SEO context; baseline_fallback means a generic archetype baseline was used and the questions are NOT candidate-specific — always surface the fallbackNotice when present. A draft is NEVER active: approval happens only through the existing AEO review flow. When data.ok is false, report the errorCode honestly.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        market: z.string().trim().min(2).max(12).optional(),
+        profileId: z.string().trim().min(1),
+        setId: z.string().trim().min(1)
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getSeoGroundedQueryDraft(args)
+  )
+
+  // TASK-1666 — el write del puente SEO → AEO: crea un DRAFT, jamás activa ni ejecuta.
+  server.registerTool(
+    'prepare_seo_grounded_queries',
+    {
+      title: 'Prepare SEO Grounded Queries',
+      description:
+        'Create an AEO grounded-query DRAFT from up to 20 selected keyword-discovery candidates. THIS WRITES a draft prompt set (it never approves, never activates, never runs the grader — a keyword is research context, not a measured prompt). Propose the exact candidate selection to the human and get confirmation BEFORE calling. Idempotent per context: repeating the same selection returns the existing draft without a second authoring call. The response says groundingMode honestly (grounded_llm vs baseline_fallback + mandatory warning). NOTE: with the shared machine identity this command is FAIL-CLOSED (aeo_forbidden) until per-user client grants exist (TASK-1631) — report that state honestly instead of retrying.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        market: z.string().trim().min(2).max(12).optional(),
+        profileId: z.string().trim().min(1),
+        seoTargetId: z.string().trim().min(1),
+        discoveryRunId: z.string().trim().min(1),
+        candidateIds: z.array(z.string().trim().min(1)).min(1).max(20)
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.prepareSeoGroundedQueries(args)
   )
 
   // Resource addressable: el mismo documento read-only por URI estable.

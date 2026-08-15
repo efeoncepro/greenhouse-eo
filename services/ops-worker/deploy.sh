@@ -660,6 +660,17 @@ ENV_VARS="${ENV_VARS},GROWTH_SEO_ENABLED=${GROWTH_SEO_ENABLED}"
 # Alcance efectivo: orgs con assignment vigente Y keywords en el set — hoy sólo Berel (~USD 0.016/mes).
 GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED="${GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED=${GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED}"
+
+# TASK-1664 — keyword discovery (DataForSEO Labs Live: seed expansion + enrichment).
+# 🔴 Prenderlo habilita corridas que GASTAN (cada request y cada fila cuestan) — pero SOLO
+# corridas encoladas explícitamente por un operador/agente con entitlement: no existe enqueue
+# automático, así que flag ON + cola vacía = costo cero.
+# Lo leen DOS runtimes (Vercel gatea enqueue/lanes; este worker gatea el drain).
+# **ON desde 2026-08-14** (autorización del operador tras el smoke live verificado de la task:
+# corrida real USD 0.0132 ≤ estimado, idempotencia USD 0, cero auto-track).
+# Rollback (<5 min): `false` acá + redeploy + pausar el scheduler; los facts append-only quedan.
+GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED="${GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED=${GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED}"
 ENV_VARS="${ENV_VARS},OPENAI_API_KEY_SECRET_REF=${OPENAI_API_KEY_SECRET_REF}"
 ENV_VARS="${ENV_VARS},ANTHROPIC_API_KEY_SECRET_REF=${ANTHROPIC_API_KEY_SECRET_REF}"
 ENV_VARS="${ENV_VARS},PERPLEXITY_API_KEY_SECRET_REF=${PERPLEXITY_API_KEY_SECRET_REF}"
@@ -1209,6 +1220,22 @@ upsert_scheduler_job \
   '{}' \
   "false"
 echo "  -> ops-seo-keyword-market-data: 0 8 15 * * ACTIVO (captura mensual de mercado, TASK-1661 — despausado 2026-08-13 tras dry-run + corrida real verificada + autorización del operador)"
+
+# TASK-1664 — drain de corridas de keyword discovery (Labs Live, bajo demanda del operador).
+# Cada 10 minutos alcanza de sobra: el enqueue es humano/agente (no hay cadencia diaria en V1)
+# y una corrida pendiente se procesa en el siguiente tick.
+#
+# Nació PAUSADO con el flag en `false` (dos frenos, patrón TASK-1661); ambos liberados el
+# 2026-08-14 tras el smoke live verificado + autorización del operador. El drain con cola
+# vacía es no-op (cero llamadas, cero costo): el gasto sólo ocurre cuando alguien encola una
+# corrida, que ya pasó preview + gate de entitlement.
+upsert_scheduler_job \
+  "ops-seo-keyword-discovery-drain" \
+  "*/10 * * * *" \
+  "/seo/keyword-discovery/drain" \
+  '{}' \
+  "false"
+echo "  -> ops-seo-keyword-discovery-drain: */10 * * * * ACTIVO (keyword discovery, TASK-1664 — despausado 2026-08-14 tras smoke live + autorización del operador)"
 
 # Email deliverability monitor — TASK-775 Slice 2.
 #

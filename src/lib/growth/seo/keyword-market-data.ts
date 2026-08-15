@@ -27,19 +27,22 @@
 import 'server-only'
 
 import { postDataForSeoTask } from '@/lib/ai/dataforseo'
+
+import { LABS_RESULT_ROW_USD, LABS_TASK_SETUP_USD } from './provider-pricing'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
+import { type SeoLinkBarrierLevel } from './contracts'
 import { enforceSeoRunEntitlement } from './entitlement'
 import { isSeoKeywordMarketDataEnabled, isSeoModuleEnabled } from './flags'
 
 /**
- * Perfil de costo Labs verificado contra la doc oficial (as-of 2026-08-06):
- * modelo dual = se cobra el task setup del request Y cada fila devuelta.
- * `.claude/skills/dataforseo-operator/references/02-labs.md` §5.
+ * Perfil de costo Labs. Los valores viven en `provider-pricing.ts` —módulo PURO, sin
+ * `server-only`— porque el preview del builder los necesita en el browser; declararlos acá
+ * arrastraba `server-only` a cualquier cliente que importara el estimador, de forma transitiva
+ * e invisible para el typecheck. Se re-exportan para no romper a los consumers existentes.
  */
-export const LABS_TASK_SETUP_USD = 0.012
-export const LABS_RESULT_ROW_USD = 0.00012
+export { LABS_RESULT_ROW_USD, LABS_TASK_SETUP_USD } from './provider-pricing'
 
 /**
  * Máximo documentado de `keyword_overview` (ref 02-labs §7 gotcha 8).
@@ -72,6 +75,20 @@ export type SeoMarketDataSourceEndpoint =
 
 export type SeoSearchIntent = 'informational' | 'navigational' | 'commercial' | 'transactional'
 
+/**
+ * Vocabulario cerrado del intent, exportado como VALOR y no sólo como tipo.
+ *
+ * Sin esto, un consumer que recibe el intent por query string sólo puede castear con `as` —el tipo
+ * se borra en runtime— y un valor inventado entra al reader como si fuera legítimo. Acá vive el
+ * SSOT para que las rutas validen contra la misma lista que tipa el dominio.
+ */
+export const SEO_SEARCH_INTENTS: readonly SeoSearchIntent[] = [
+  'informational',
+  'navigational',
+  'commercial',
+  'transactional'
+]
+
 export interface SeoKeywordMarketDatum {
   normalizedKeyword: string
   keyword: string
@@ -87,6 +104,62 @@ export interface SeoKeywordMarketDatum {
   searchIntentProbability: number | null
   coreKeyword: string | null
   providerLastUpdatedAt: string | null
+  /** Perfil de enlaces promedio del top-10 — la evidencia cruda de la barrera. */
+  avgPageRank: number | null
+  avgMainDomainRank: number | null
+  avgBacklinks: number | null
+  avgReferringDomains: number | null
+}
+
+// El TIPO vive en `contracts.ts` (lo consumen los DTOs); la DERIVACIÓN vive acá, junto a la
+// evidencia que la alimenta. Una sola fuente para cada cosa.
+// `unknown` NO es un cuarto nivel de dificultad: es "no lo capturamos", y se mantiene separado
+// a propósito para que ninguna superficie pinte un hueco como "baja".
+
+/**
+ * Umbrales de dominios referentes promedio del top-10. Calibrados sobre las mediciones reales
+ * de 2026-08-13 en MX (ver la migración): `pintura para piso` 0,1 · `berel` 30,4 · `pintura`
+ * 52,6. Son un punto de partida honesto, no una constante universal — si se recalibran, se
+ * recalibran ACÁ y todas las superficies siguen.
+ */
+export const LINK_BARRIER_REFERRING_DOMAINS_MEDIUM = 10
+export const LINK_BARRIER_REFERRING_DOMAINS_HIGH = 40
+
+/** Page rank promedio del top-10 que, por sí solo, ya implica un top-10 atrincherado. */
+export const LINK_BARRIER_PAGE_RANK_HIGH = 80
+
+/**
+ * Deriva la barrera de enlaces del top-10. Pura y exportada: es una regla de producto y tiene
+ * que poder probarse sin base de datos.
+ *
+ * 🔴 **Gobierna la DIVERSIDAD de dominios referentes, no el conteo de enlaces.** El oficio lo
+ * dice (`seo-aeo` §05: "un enlace editorial relevante > 100 enlaces de directorios") y los
+ * datos medidos lo confirman de forma contraintuitiva: `berel` tiene 5.125 backlinks contra los
+ * 232 de `pintura`, pero MENOS dominios referentes (30,4 vs 52,6). Ordenar por conteo pondría a
+ * `berel` como lo más difícil, cuando su perfil es concentrado, no diverso.
+ *
+ * `avgBacklinks` NO participa del cálculo — se persiste sólo para auditoría.
+ */
+export const deriveLinkBarrier = (input: {
+  avgReferringDomains: number | null
+  avgPageRank: number | null
+}): SeoLinkBarrierLevel => {
+  const domains = input.avgReferringDomains
+  const pageRank = input.avgPageRank
+
+  // Sin ninguna de las dos señales no se opina. Un hueco jamás se pinta como "baja".
+  if (domains === null && pageRank === null) return 'unknown'
+
+  // Un top-10 con page rank muy alto está atrincherado aunque los dominios sean pocos:
+  // significa URLs individualmente muy fuertes.
+  if (pageRank !== null && pageRank >= LINK_BARRIER_PAGE_RANK_HIGH) return 'high'
+
+  if (domains === null) return 'unknown'
+
+  if (domains >= LINK_BARRIER_REFERRING_DOMAINS_HIGH) return 'high'
+  if (domains >= LINK_BARRIER_REFERRING_DOMAINS_MEDIUM) return 'medium'
+
+  return 'low'
 }
 
 export type SeoMarketCaptureKeywordStatus =
@@ -184,6 +257,13 @@ const clampProbability = (value: unknown): number | null => {
   return Math.min(1, Math.max(0, value))
 }
 
+/** Decimal >= 0 o null. Los promedios del top-10 son fraccionarios (0,1 backlinks es real). */
+const asNonNegativeNumber = (value: unknown): number | null => {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) return null
+
+  return value
+}
+
 const asNonNegativeInt = (value: unknown): number | null => {
   if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) return null
 
@@ -202,6 +282,13 @@ interface KeywordOverviewItem {
   keyword_properties?: {
     keyword_difficulty?: number | null
     core_keyword?: string | null
+  } | null
+  /** Promedios del top-10 orgánico. Vienen GRATIS en la misma respuesta ya pagada. */
+  avg_backlinks_info?: {
+    backlinks?: number | null
+    referring_main_domains?: number | null
+    rank?: number | null
+    main_domain_rank?: number | null
   } | null
   search_intent_info?: {
     main_intent?: string | null
@@ -232,6 +319,7 @@ export const parseKeywordOverviewItem = (
   const info = item.keyword_info ?? {}
   const properties = item.keyword_properties ?? {}
   const intentInfo = item.search_intent_info ?? {}
+  const backlinksInfo = item.avg_backlinks_info ?? {}
 
   const rawLevel = typeof info.competition_level === 'string' ? info.competition_level.toLowerCase() : null
   const rawIntent = typeof intentInfo.main_intent === 'string' ? intentInfo.main_intent.toLowerCase() : null
@@ -251,7 +339,13 @@ export const parseKeywordOverviewItem = (
     searchIntent: rawIntent !== null && INTENTS.includes(rawIntent) ? (rawIntent as SeoSearchIntent) : null,
     searchIntentProbability: clampProbability(intentInfo.probability),
     coreKeyword: typeof properties.core_keyword === 'string' && properties.core_keyword.trim() ? properties.core_keyword.trim() : null,
-    providerLastUpdatedAt: typeof info.last_updated_time === 'string' && info.last_updated_time ? info.last_updated_time : null
+    providerLastUpdatedAt: typeof info.last_updated_time === 'string' && info.last_updated_time ? info.last_updated_time : null,
+    // Perfil de enlaces del top-10: viene gratis en esta misma respuesta y hasta ahora se
+    // descartaba. Es la evidencia que reemplaza al `keyword_difficulty` que colapsa a 0.
+    avgPageRank: asNonNegativeNumber(backlinksInfo.rank),
+    avgMainDomainRank: asNonNegativeNumber(backlinksInfo.main_domain_rank),
+    avgBacklinks: asNonNegativeNumber(backlinksInfo.backlinks),
+    avgReferringDomains: asNonNegativeNumber(backlinksInfo.referring_main_domains)
   }
 }
 
@@ -307,10 +401,14 @@ const loadTrackedKeywords = async (seoTargetId: string): Promise<string[]> => {
 /**
  * Keywords con captura DENTRO de la ventana de frescura: no se vuelven a comprar.
  *
+ * Exportado (TASK-1664): el top-up de enriquecimiento del discovery usa EXACTAMENTE este
+ * pre-check para comprar sólo lo que falta o venció — dos pre-checks distintos divergirían
+ * en qué consideran "fresco" y uno de los dos pagaría de más.
+ *
  * ⚠️ `capture_date` es DATE y `CURRENT_DATE` también, así que la resta da `integer` directo
  * (gate TASK-893: `EXTRACT(EPOCH FROM (date - date))` revienta en runtime).
  */
-const loadFreshKeywords = async (
+export const loadFreshMarketKeywords = async (
   normalizedKeywords: string[],
   locationCode: string,
   languageCode: string
@@ -328,6 +426,74 @@ const loadFreshKeywords = async (
   )
 
   return new Set(rows.map(row => row.normalized_keyword))
+}
+
+const loadFreshKeywords = loadFreshMarketKeywords
+
+/**
+ * Writer canónico del store de mercado — la ÚNICA forma de escribir
+ * `seo_keyword_market_data` (TASK-1661 productor #1 vía `keyword_overview`; TASK-1664
+ * productor #2 con el `keyword_info` inline de discovery; TASK-1662 productor #3 futuro).
+ *
+ * Contrato del hecho:
+ * - append-only con `ON CONFLICT ... DO NOTHING` (el trigger de la tabla prohíbe UPDATE);
+ * - una fila con NULLs ES un hecho ("preguntamos y el proveedor no tiene el dato") — el
+ *   caller decide cuándo escribirla (tres estados, jamás colapsar ausencia a 0);
+ * - el costo del proveedor es por BATCH: se atribuye a la PRIMERA fila escrita y las demás
+ *   quedan en 0, para que la suma de `provider_cost` no multiplique el gasto.
+ */
+export const persistKeywordMarketData = async (input: {
+  data: readonly SeoKeywordMarketDatum[]
+  sourceEndpoint: SeoMarketDataSourceEndpoint
+  capturedByOrganizationId: string
+  providerCostUsd: number
+}): Promise<{ rowsWritten: number }> => {
+  let rowsWritten = 0
+
+  for (const datum of input.data) {
+    const rowCost = rowsWritten === 0 ? input.providerCostUsd : 0
+
+    await runGreenhousePostgresQuery(
+      `INSERT INTO greenhouse_growth.seo_keyword_market_data
+         (normalized_keyword, keyword, location_code, language_code, capture_date,
+          search_volume, keyword_difficulty, competition, competition_level, cpc_usd,
+          search_intent, search_intent_probability, core_keyword, source_endpoint,
+          provider_last_updated_at, captured_by_organization_id, provider_cost,
+          avg_page_rank, avg_main_domain_rank, avg_backlinks, avg_referring_domains)
+       VALUES ($1, $2, $3, $4, CURRENT_DATE,
+               $5, $6, $7, $8, $9,
+               $10, $11, $12, $13,
+               $14, $15, $16,
+               $17, $18, $19, $20)
+       ON CONFLICT ON CONSTRAINT seo_keyword_market_data_capture_unique DO NOTHING`,
+      [
+        datum.normalizedKeyword,
+        datum.keyword,
+        datum.locationCode,
+        datum.languageCode,
+        datum.searchVolume,
+        datum.keywordDifficulty,
+        datum.competition,
+        datum.competitionLevel,
+        datum.cpcUsd,
+        datum.searchIntent,
+        datum.searchIntentProbability,
+        datum.coreKeyword,
+        input.sourceEndpoint,
+        datum.providerLastUpdatedAt,
+        input.capturedByOrganizationId,
+        rowCost,
+        datum.avgPageRank,
+        datum.avgMainDomainRank,
+        datum.avgBacklinks,
+        datum.avgReferringDomains
+      ]
+    )
+
+    rowsWritten += 1
+  }
+
+  return { rowsWritten }
 }
 
 /**
@@ -547,7 +713,7 @@ export const captureKeywordMarketData = async (
         if (datum) byNormalized.set(datum.normalizedKeyword, datum)
       }
 
-      let rowsWrittenInChunk = 0
+      const datums: SeoKeywordMarketDatum[] = []
 
       for (const keyword of chunk) {
         const found = byNormalized.get(keyword)
@@ -562,57 +728,27 @@ export const captureKeywordMarketData = async (
         // RE-COMPRABAN en cada corrida, para siempre: el smoke lo mostró cobrando USD 0.012 en
         // una corrida que capturó cero. Registrar el intento cierra la fuga y además es más
         // honesto: "preguntamos y no hay" es un hecho que merece su fecha.
-        const datum: SeoKeywordMarketDatum = found ?? {
-          normalizedKeyword: keyword,
-          keyword: originalByNormalized.get(keyword) ?? keyword,
-          locationCode: target.location_code,
-          languageCode: target.language_code,
-          searchVolume: null,
-          keywordDifficulty: null,
-          competition: null,
-          competitionLevel: null,
-          cpcUsd: null,
-          searchIntent: null,
-          searchIntentProbability: null,
-          coreKeyword: null,
-          providerLastUpdatedAt: null
-        }
-
-        // El costo del provider es por BATCH: se atribuye a la primera fila escrita del chunk y
-        // las demás quedan en 0, para que la suma de `provider_cost` no multiplique el gasto.
-        const rowCost = rowsWrittenInChunk === 0 ? providerCostUsd : 0
-
-        await runGreenhousePostgresQuery(
-          `INSERT INTO greenhouse_growth.seo_keyword_market_data
-             (normalized_keyword, keyword, location_code, language_code, capture_date,
-              search_volume, keyword_difficulty, competition, competition_level, cpc_usd,
-              search_intent, search_intent_probability, core_keyword, source_endpoint,
-              provider_last_updated_at, captured_by_organization_id, provider_cost)
-           VALUES ($1, $2, $3, $4, CURRENT_DATE,
-                   $5, $6, $7, $8, $9,
-                   $10, $11, $12, 'keyword_overview',
-                   $13, $14, $15)
-           ON CONFLICT ON CONSTRAINT seo_keyword_market_data_capture_unique DO NOTHING`,
-          [
-            datum.normalizedKeyword,
-            datum.keyword,
-            datum.locationCode,
-            datum.languageCode,
-            datum.searchVolume,
-            datum.keywordDifficulty,
-            datum.competition,
-            datum.competitionLevel,
-            datum.cpcUsd,
-            datum.searchIntent,
-            datum.searchIntentProbability,
-            datum.coreKeyword,
-            datum.providerLastUpdatedAt,
-            target.organization_id,
-            rowCost
-          ]
+        datums.push(
+          found ?? {
+            normalizedKeyword: keyword,
+            keyword: originalByNormalized.get(keyword) ?? keyword,
+            locationCode: target.location_code,
+            languageCode: target.language_code,
+            searchVolume: null,
+            keywordDifficulty: null,
+            competition: null,
+            competitionLevel: null,
+            cpcUsd: null,
+            searchIntent: null,
+            searchIntentProbability: null,
+            coreKeyword: null,
+            providerLastUpdatedAt: null,
+            avgPageRank: null,
+            avgMainDomainRank: null,
+            avgBacklinks: null,
+            avgReferringDomains: null
+          }
         )
-
-        rowsWrittenInChunk += 1
 
         if (found) {
           captured += 1
@@ -632,6 +768,13 @@ export const captureKeywordMarketData = async (
           })
         }
       }
+
+      await persistKeywordMarketData({
+        data: datums,
+        sourceEndpoint: 'keyword_overview',
+        capturedByOrganizationId: target.organization_id,
+        providerCostUsd
+      })
     } catch (error) {
       captureWithDomain(error, 'growth', {
         tags: { source: 'seo_keyword_market_data' },
@@ -677,6 +820,11 @@ export interface ReadKeywordMarketDataResult {
   market: 'available' | 'unavailable'
   /** Indexado por `normalizedKeyword`. Ausencia = no consultado, NUNCA cero. */
   byKeyword: Map<string, SeoKeywordMarketDatum>
+  /**
+   * Barrera de enlaces ya DERIVADA por keyword. Se expone acá para que ningún consumer
+   * re-implemente los umbrales: la regla vive en `deriveLinkBarrier` y punto.
+   */
+  linkBarrierByKeyword: Map<string, SeoLinkBarrierLevel>
   freshness: SeoMarketDataFreshness
 }
 
@@ -701,6 +849,7 @@ export const readKeywordMarketData = async (input: {
   const empty: ReadKeywordMarketDataResult = {
     market: 'unavailable',
     byKeyword: new Map(),
+    linkBarrierByKeyword: new Map(),
     freshness: { freshKeywords: 0, latestCaptureDate: null }
   }
 
@@ -719,12 +868,17 @@ export const readKeywordMarketData = async (input: {
     core_keyword: string | null
     provider_last_updated_at: Date | null
     capture_date: Date | string
+    avg_page_rank: string | null
+    avg_main_domain_rank: string | null
+    avg_backlinks: string | null
+    avg_referring_domains: string | null
     is_fresh: boolean
   }>(
     `SELECT DISTINCT ON (normalized_keyword)
             normalized_keyword, keyword, search_volume, keyword_difficulty, competition,
             competition_level, cpc_usd, search_intent, search_intent_probability, core_keyword,
             provider_last_updated_at, capture_date,
+            avg_page_rank, avg_main_domain_rank, avg_backlinks, avg_referring_domains,
             ((CURRENT_DATE - capture_date) < $4) AS is_fresh
        FROM greenhouse_growth.seo_keyword_market_data
       WHERE normalized_keyword = ANY($1::text[])
@@ -737,6 +891,7 @@ export const readKeywordMarketData = async (input: {
   if (rows.length === 0) return empty
 
   const byKeyword = new Map<string, SeoKeywordMarketDatum>()
+  const linkBarrierByKeyword = new Map<string, SeoLinkBarrierLevel>()
   let freshKeywords = 0
   let latestCaptureDate: string | null = null
 
@@ -771,8 +926,19 @@ export const readKeywordMarketData = async (input: {
       searchIntent: INTENTS.includes(row.search_intent ?? '') ? (row.search_intent as SeoSearchIntent) : null,
       searchIntentProbability: asNumber(row.search_intent_probability),
       coreKeyword: row.core_keyword,
-      providerLastUpdatedAt: row.provider_last_updated_at ? row.provider_last_updated_at.toISOString() : null
+      providerLastUpdatedAt: row.provider_last_updated_at ? row.provider_last_updated_at.toISOString() : null,
+      avgPageRank: asNumber(row.avg_page_rank),
+      avgMainDomainRank: asNumber(row.avg_main_domain_rank),
+      avgBacklinks: asNumber(row.avg_backlinks),
+      avgReferringDomains: asNumber(row.avg_referring_domains)
     })
+  }
+
+  for (const [key, datum] of byKeyword) {
+    linkBarrierByKeyword.set(
+      key,
+      deriveLinkBarrier({ avgReferringDomains: datum.avgReferringDomains, avgPageRank: datum.avgPageRank })
+    )
   }
 
   return {
@@ -780,6 +946,7 @@ export const readKeywordMarketData = async (input: {
     // por keyword lo dice la ausencia en el Map, que el consumer proyecta como `null`.
     market: 'available',
     byKeyword,
+    linkBarrierByKeyword,
     freshness: { freshKeywords, latestCaptureDate }
   }
 }

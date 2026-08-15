@@ -3,7 +3,7 @@ import 'server-only'
 /**
  * TASK-1689 — Consumers reactivos de los emails transaccionales del ciclo de Hiring.
  *
- * Cuatro projections (un archivo: comparten shape y política) sobre eventos que el dominio
+ * Cinco projections (un archivo: comparten shape y política) sobre eventos que el dominio
  * hiring YA emite. Cuerpos en `src/lib/hiring/notifications/send.ts`: re-leen PG por ID
  * (los eventos no llevan PII), pre-chequean dedupe (`wasEmailAlreadySent`) y envían por la
  * plataforma canónica. Gateados por `HIRING_LIFECYCLE_EMAILS_ENABLED` (default OFF; el flag
@@ -17,6 +17,7 @@ import 'server-only'
 import {
   sendHiringApplicationCreatedEmails,
   sendHiringAssessmentAssignedEmail,
+  sendHiringAssessmentSubmittedInternalEmail,
   sendHiringDecisionEmail,
   sendHiringStageAdvancedEmail,
 } from '@/lib/hiring/notifications'
@@ -57,6 +58,23 @@ export const hiringAssessmentAssignedEmailProjection: ProjectionDefinition = {
     return { entityType: 'hiring_assessment', entityId: assessmentId }
   },
   refresh: async (scope, payload) => sendHiringAssessmentAssignedEmail(scope.entityId, payload),
+  maxRetries: 3,
+}
+
+export const hiringAssessmentSubmittedInternalEmailProjection: ProjectionDefinition = {
+  name: 'hiring_assessment_submitted_internal_email',
+  description:
+    'hiring.assessment.submitted (sólo candidate_test) → aviso interno a People cuando las respuestas quedan listas para revisión.',
+  domain: 'notifications',
+  triggerEvents: [EVENT_TYPES.hiringAssessmentSubmitted],
+  extractScope: payload => {
+    const assessmentId = typeof payload.assessmentId === 'string' ? payload.assessmentId.trim() : ''
+
+    if (!assessmentId) return null
+
+    return { entityType: 'hiring_assessment', entityId: assessmentId }
+  },
+  refresh: async (scope, payload) => sendHiringAssessmentSubmittedInternalEmail(scope.entityId, payload),
   maxRetries: 3,
 }
 

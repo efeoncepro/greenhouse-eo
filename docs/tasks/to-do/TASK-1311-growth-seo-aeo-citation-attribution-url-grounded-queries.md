@@ -4,6 +4,49 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-15 — el alcance sube a URLs de TERCEROS, no sólo al dominio propio
+
+Fuente: `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md` (§3.2 brecha A4:
+*"Se sabe QUIÉN gana, no POR QUÉ ni DÓNDE"*).
+
+**Qué se amplía.** Hoy el breakdown competitivo del grader **agrega a dominio registrable**: dice que
+un competidor gana, no *con qué página*. Esta task se define hoy con el filtro estricto "sólo se
+atribuyen las citas cuyo `domain` == dominio propio". Ese filtro deja fuera exactamente el dato que
+convierte un diagnóstico en una acción:
+
+- El nivel URL de **terceros** es lo que traduce **"perdemos"** en **"esta página nos gana"**.
+- La agregación de esas URLs por grounded query produce **la lista de páginas que forman la respuesta
+  de la categoría** — el insumo que ninguna de las capacidades aguas abajo tiene hoy (y que
+  `TASK-1667` necesita para que un brief no nazca sin saber contra qué compite).
+
+Un dominio no se puede reescribir; una página sí se puede superar. Sin el nivel URL de terceros, el
+producto entrega un veredicto sin objeto.
+
+**Cómo se amplía sin romper el invariante.** La atribución al dominio propio **sigue siendo atribución
+y no cambia**. Lo de terceros es un **eje distinto y separado en el contrato**: no se "atribuye" a la
+org, se **observa** como composición de la respuesta. Concretamente:
+
+- Se conserva intacta la regla "una cita a un tercero NUNCA se atribuye a la org" — ninguna URL ajena
+  entra al `citationShare` propio ni a ningún número que se lea como desempeño de la marca.
+- Se agrega un eje `answerComposition` (nombre final en Discovery) que lista, por grounded query +
+  motor + ventana, las **URLs de terceros** que compusieron la respuesta, con su dominio y su
+  frecuencia dentro del grupo. Es descriptivo del canal, no del cliente.
+- Los dos ejes **nunca se suman ni se promedian**: mezclarlos es reintroducir por otra puerta el
+  mismo error que el filtro estricto existía para evitar.
+
+**`Depends on` += `TASK-1652`.** No es una dependencia de contrato: es de **materia prima**. Esta task
+lee `provider_observations.citations`, y hoy esas citas **pueden venir vacías en silencio**: el parser
+de `google_ai_overview` sólo desciende un nivel y las `references[]` de AI Mode viven anidadas; además
+un task fallido se clasifica como `skipped`, no como `failed`. La auditoría midió el resultado: **71%
+de las observaciones de `google_ai_overview` terminan skipped o failed** (84 de 119). Construir el
+breakdown de terceros sobre ese sustrato produce una lista de páginas sesgada hacia los motores que sí
+parsean bien, y **nadie podría distinguir "esta página no aparece" de "el adapter no la leyó"**.
+`TASK-1652` mejora la materia prima; esta task se secuencia detrás.
+
+Un tercer eje que el implementador debe respetar: la cobertura por motor viaja **con** el resultado.
+Si un motor aportó 0 observaciones utilizables en la ventana, la lista de terceros de ese motor se
+declara **no medida**, jamás vacía.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -38,6 +81,8 @@ El AEO Grader dice *si* la IA cita a la marca; §15 del doc maestro sube la reso
 ## Goal
 
 - `readUrlCitationAttribution({ organizationId, domain, url?, range })` en `src/lib/growth/ai-visibility/**` [verificar módulo exacto en Discovery]: reader que atribuye las citas ya capturadas al dominio propio → URL → agrupa por grounded query (prompt) + engine + tiempo + citation share.
+- **Eje de terceros (Delta 2026-08-15):** el mismo reader expone, por grounded query + motor + ventana, las **URLs de terceros** que compusieron la respuesta (`answerComposition`) con dominio y frecuencia — la lista de páginas que forman la respuesta de la categoría. Eje **separado**: nunca entra al citation share propio, nunca se promedia con él.
+- Cobertura por motor explícita: un motor sin observaciones utilizables en la ventana se declara **no medido**, jamás como lista vacía.
 - Confirmar/asegurar persistencia **queryable**: decidir en Discovery entre reader de agregación sobre `provider_observations.citations` (JSONB) vs proyección normalizada `grader_citation_observations` si el JSONB no soporta bien el rollup; documentar la decisión.
 - Degradación honesta: org sin grader run reportable → `{ ok: false, errorCode: 'no_aeo_data', status }`, NUNCA citas fabricadas ni ceros fantasma.
 - Reuso del gate existente `growth.ai_visibility.observation.read` (touch-it), sin duplicar autorización ni tocar el scoring.
@@ -62,7 +107,9 @@ Reglas obligatorias (§15 + §1.1 — load-bearing):
 - **NUNCA tocar el scoring/normalizer** (`grader_scores`, `dimensions`, `normalization/*`). La atribución URL-level es ortogonal al score de citabilidad; no lo recomputa ni lo modifica.
 - **NUNCA cruzar con `seo_*` en esta task.** El eje SEO por-URL y el cruce quadrant granular son TASK-1313. Esta task se queda enteramente del lado AEO (lee solo `grader_*`/`provider_observations`).
 - **NUNCA fabricar citas ni citation share.** Falta de run reportable → `no_aeo_data`; una URL sin citas en el rango → lista vacía honesta, NUNCA un share inventado.
-- **SIEMPRE** resolver el dominio propio de la org server-side (no confiar en un `domain` client-provided sin validar contra la org) y filtrar las citas por `domain` == dominio propio; las citas a terceros NO se atribuyen a la org.
+- **SIEMPRE** resolver el dominio propio de la org server-side (no confiar en un `domain` client-provided sin validar contra la org) y filtrar por `domain` == dominio propio **el eje de atribución**; las citas a terceros **NUNCA se atribuyen a la org** (no entran al citation share propio ni a ninguna cifra de desempeño de la marca).
+- **SIEMPRE** mantener el eje de terceros (`answerComposition`, Delta 2026-08-15) **separado en el contrato** del eje de atribución propio: son dos listas distintas con semántica distinta (desempeño propio vs composición del canal). **NUNCA** sumarlas, promediarlas ni derivar de ellas un "share de categoría" único.
+- **NUNCA** rendir la ausencia de observaciones de un motor como lista vacía de terceros: si el motor no aportó observaciones utilizables en la ventana, se declara **no medido** (ver el 71% de skipped/failed de `google_ai_overview` que `TASK-1652` corrige).
 - **SIEMPRE** exponer esto como **reader gobernado** (report/attribution layer), no como fetch acoplado a una pantalla.
 
 ## Normative Docs
@@ -82,11 +129,13 @@ Reglas obligatorias (§15 + §1.1 — load-bearing):
 - `TASK-1299` — schema/foundation SEO (`greenhouse_growth` extendido). Bloqueador declarado del contrato §15 (aunque esta task lee del lado AEO, se secuencia detrás de la fundación del módulo para nacer con el dominio SEO ya sembrado; confirmar en Discovery si el desbloqueo real es solo de convención de dominio o de una tabla concreta). [verificar acoplamiento exacto]
 - Motor AEO en producción: `provider_observations.citations` (JSONB append-only), `grader_profiles`/`grader_runs`/`getRunObservations` — **ya existe**, reusado por `organization_id`.
 - Capability `growth.ai_visibility.observation.read` — ya seedeada (`runtime.ts` ~L194); se reusa, no se crea.
+- **`TASK-1652`** (corrección del request/parser DataForSEO AI Mode del adapter `google_ai_overview`) — **dependencia de materia prima, no de contrato** (Delta 2026-08-15). Hoy las `citations` pueden llegar `[]` en silencio (parser de un solo nivel + task fallido clasificado como `skipped`): 71% de las observaciones de ese motor terminan skipped/failed. El breakdown de terceros construido sobre ese sustrato queda sesgado y confunde "no aparece" con "no se leyó". Secuenciar detrás; si por prioridad se adelanta, el resultado debe declarar la cobertura degradada de ese motor de forma explícita.
 
 ### Blocks / Impacts
 
 - Bloquea `TASK-1313` (`readPageVisibility360`/`readClusterVisibility360`) — consume el eje AEO por-URL que produce este reader.
 - Es la mitad AEO del "360 granular" (§15): sin la atribución URL-level, el cruce por-página no tiene lente de citabilidad.
+- **`TASK-1667`** (work item editorial): el eje de terceros es el insumo "páginas que hoy forman la respuesta de la categoría" que un brief necesita para no nacer ciego a su competencia.
 
 ### Files owned
 
@@ -123,7 +172,7 @@ Reglas obligatorias (§15 + §1.1 — load-bearing):
 ### Contract surface
 
 - Contrato existente a respetar: `GrowthAiVisibilityCitation` + `GrowthAiVisibilityProviderObservation` (shape de cita/observación, NO redefinir), path org→run (`store.ts`), boundary §1.1 (solo lado AEO), append-only de `provider_observations`, gate `growth.ai_visibility.observation.read`, result shape `{ ok }`.
-- Contrato nuevo o modificado: `readUrlCitationAttribution({ organizationId, domain, url?, range })` → `{ ok: true, groundedQueries: GroundedQueryCitationGroup[], byUrl, byEngine, window } | { ok: false, errorCode: 'no_aeo_data'|'disabled'|'forbidden'|'query_failed', status }`. Sin endpoint nuevo obligatorio en esta task (lo consume TASK-1313). Proyección `grader_citation_observations` = aditiva y condicional.
+- Contrato nuevo o modificado: `readUrlCitationAttribution({ organizationId, domain, url?, range })` → `{ ok: true, groundedQueries: GroundedQueryCitationGroup[], byUrl, byEngine, answerComposition, engineCoverage, window } | { ok: false, errorCode: 'no_aeo_data'|'disabled'|'forbidden'|'query_failed', status }`. `answerComposition` y `engineCoverage` son los campos del Delta 2026-08-15 (URLs de terceros por grounded query + motor + ventana, y cobertura `measured|not_measured` por motor); son aditivos y viven **fuera** del bloque de atribución propia. Sin endpoint nuevo obligatorio en esta task (lo consume TASK-1313). Proyección `grader_citation_observations` = aditiva y condicional.
 - Backward compatibility: `compatible` (reader additive read-only; cero cambio en scoring/consumers existentes; si hay proyección, es tabla nueva aditiva). Gated por el flag del módulo AEO/grader vigente [verificar flag exacto — `GROWTH_AI_VISIBILITY_ENABLED` o equivalente].
 - Full API parity: reader canónico en `src/lib/growth/ai-visibility/**` (un primitive, muchos consumers: TASK-1313 + Nexa + MCP). Ver `## Capability Definition of Done` (touch-it del gate existente).
 
@@ -134,6 +183,8 @@ Reglas obligatorias (§15 + §1.1 — load-bearing):
   - **Cero re-captura:** el reader no llama providers ni parsea DataForSEO; lee evidencia ya persistida.
   - **`provider_observations` append-only intacta:** cero UPDATE/DELETE. Una eventual `grader_citation_observations` se puebla DESDE ella (backfill/reactive), nunca la reescribe, y es ella misma append-only.
   - **Atribución solo al dominio propio:** una cita se atribuye a la org solo si su `domain` == dominio propio de la org (resuelto server-side); citas a terceros NO se atribuyen.
+  - **Eje de terceros separado (Delta 2026-08-15):** las URLs de terceros se **observan** como composición de la respuesta (por grounded query + motor + ventana), nunca se atribuyen a la org. Cero mezcla con el citation share propio; cero número combinado que sume ambos ejes.
+  - **Cobertura declarada por motor:** un motor sin observaciones utilizables en la ventana se rinde como `not_measured`, jamás como lista vacía que se lea "no aparece nadie".
   - **Grounded query = prompt:** la agrupación por "grounded query" usa `prompt_id` de la observación; NO se inventa una taxonomía de query nueva.
   - **Citation share honesto:** share = citas de la URL / total de citas propias en el mismo grounded query+engine+ventana; nunca un promedio cross-motor ni un número fabricado. Sin denominador → sin share (no `0` mentiroso).
   - **Read-only sobre el scoring:** cero escritura a `grader_scores`/`dimensions`.
@@ -199,7 +250,8 @@ Esta task **toca una capability existente** (`growth.ai_visibility.observation.r
 ### Slice 1 — Queryability decision + contract
 
 - **Decisión de persistencia queryable (Discovery-gated):** medir si el rollup por URL/grounded-query/engine/time se resuelve bien con un reader de agregación sobre `provider_observations.citations` (JSONB, vía `jsonb_array_elements`) o si el volumen/índices justifican proyectar a `grader_citation_observations` normalizada. Documentar la decisión en la task + el arch doc (§15). **La captura NO cambia en ninguno de los dos caminos** — solo se decide cómo se LEE.
-- `UrlCitationAttributionResult` + `GroundedQueryCitationGroup` en `contracts.ts`: `{ ok: true, groundedQueries: [{ promptId, groundedQuery, engine, capturedAt, urlCitations: [{ url, domain, title? }], citationShare }], byUrl, byEngine, window } | { ok: false, errorCode, status }`.
+- `UrlCitationAttributionResult` + `GroundedQueryCitationGroup` en `contracts.ts`: `{ ok: true, groundedQueries: [{ promptId, groundedQuery, engine, capturedAt, urlCitations: [{ url, domain, title? }], citationShare, answerComposition: [{ url, domain, occurrences }] }], byUrl, byEngine, engineCoverage, window } | { ok: false, errorCode, status }`.
+- **Separación de ejes en el tipo, no sólo en la doc:** `urlCitations`/`citationShare` = dominio propio; `answerComposition` = URLs de terceros. Tipos distintos, sin un campo compartido que invite a sumarlos.
 - Si (y solo si) se elige la proyección: `migrations/<ts>_task-1311-grader-citation-observations.sql` (marker `-- Up Migration` + DO-block + GRANTs + anti-mutation trigger; poblada por backfill idempotente desde `provider_observations`; Down solo DROP). Regenerar `db.d.ts`.
 
 ### Slice 2 — `readUrlCitationAttribution` reader
@@ -210,6 +262,12 @@ Esta task **toca una capability existente** (`growth.ai_visibility.observation.r
   3. Filtrar las citas cuyo `domain` == dominio propio (reusando `extractCitationDomain`/`normalizeDomain`), opcionalmente acotadas a `url`.
   4. Agrupar por **grounded query (`promptId`) + engine (`provider`) + tiempo (`createdAt`/`capture bucket`)**; calcular **citation share** por URL dentro de cada grupo (URL propia citada / total citas propias del grupo).
 - Tests: atribución correcta, cero re-captura (mock de provider NUNCA invocado), citation share honesto, degradación (`no_aeo_data`, URL sin citas), gate aplicado, tenant boundary (no fuga de citas de orgs ajenas).
+
+### Slice 3 — Eje de terceros: composición de la respuesta (Delta 2026-08-15)
+
+- Dentro de cada grupo (grounded query + motor + ventana), listar las **URLs de terceros** citadas con su dominio y su frecuencia (`answerComposition`) — la lista de páginas que forman la respuesta de la categoría. Sin re-captura: sale de las mismas `citations` ya persistidas.
+- `engineCoverage`: por motor, `measured | not_measured` según si aportó observaciones utilizables en la ventana. Un motor sin observaciones **no** produce una lista vacía de terceros.
+- Tests: (a) una URL de tercero NUNCA aparece en `urlCitations` ni mueve el `citationShare` propio; (b) el mismo dominio de tercero con dos URLs distintas se rinde como dos páginas, no como un dominio; (c) motor sin observaciones → `not_measured`, jamás `[]`; (d) no existe ningún campo derivado que sume los dos ejes.
 
 ## Out of Scope
 
@@ -234,7 +292,8 @@ Ver el contrato en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §15 (granularidad
 
 ### Slice ordering hard rule
 
-- Slice 1 (queryability decision + contract; y la migración condicional si se elige proyección) → Slice 2 (reader). El reader depende del shape decidido en Slice 1. Ambos read-only/aditivos; el orden es de contrato, no de riesgo runtime.
+- Slice 1 (queryability decision + contract; y la migración condicional si se elige proyección) → Slice 2 (reader, eje propio) → Slice 3 (eje de terceros). El reader depende del shape decidido en Slice 1; el eje de terceros va **después** del propio para que la separación de ejes se construya sobre un contrato ya estable, no en paralelo. Todos read-only/aditivos; el orden es de contrato, no de riesgo runtime.
+- **Secuencia con `TASK-1652`:** el Slice 3 se toma preferentemente con `TASK-1652` ya en `develop`. Si se adelanta, el resultado debe declarar la cobertura degradada de `google_ai_overview` (71% skipped/failed medido) — nunca entregar la lista de terceros como si estuviera completa.
 
 ### Risk matrix
 
@@ -243,6 +302,8 @@ Ver el contrato en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §15 (granularidad
 | Un agente "construye la captura" de citas por URL (ya existe) → scope creep + duplicación | growth | medium | regla dura documentada (§15 dice "la captura ya existe") + test que verifica cero call a provider en el reader | code review + test |
 | Rollup sobre JSONB `citations` ineficiente/no indexable a escala | data | medium | decisión de queryability en Slice 1 (JSONB vs proyección normalizada) medida antes de shippear | latencia del reader en staging |
 | Atribuir a la org una cita a un dominio de tercero | growth | medium | filtro estricto `domain == dominio propio` resuelto server-side; test dedicado | test de atribución |
+| El eje de terceros se fusiona con el propio en un "share de categoría" | growth/producto | medium | tipos distintos en el contrato + test que falla si existe un derivado que sume ambos ejes | code review + test |
+| Lista de terceros sesgada por citas vacías del adapter AI Mode (71% skipped/failed) | data | high | secuenciar detrás de `TASK-1652`; `engineCoverage` declara `not_measured` en vez de rendir `[]` | conteo de skipped/failed por motor en la ventana |
 | Citation share fabricado / cross-motor | data | medium | share por grounded-query+engine+ventana; test que falla si el denominador cruza motores o se inventa | test |
 | Mutar `provider_observations` (append-only) al "normalizar" | data | low | reader read-only; si hay proyección, se puebla DESDE la evidencia, nunca la reescribe; trigger DB protege | verificación `pg_trigger` + review |
 | SQL con `EXTRACT(EPOCH FROM DATE-DATE)` o cast erróneo en el bucket temporal | data | low | `created_at`=TIMESTAMPTZ; validar SQL contra PG real (gate TASK-893) | Sentry + lint rule |
@@ -256,7 +317,8 @@ Ver el contrato en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §15 (granularidad
 | Slice | Rollback | Tiempo | Reversible? |
 |---|---|---|---|
 | Slice 1 (contract; migración condicional) | revert PR; si hubo proyección, reverse migration (`DROP` — derivada reconstruible) | <5 min | si |
-| Slice 2 (reader) | revert PR (reader read-only, sin efecto persistente) | <5 min | si |
+| Slice 2 (reader, eje propio) | revert PR (reader read-only, sin efecto persistente) | <5 min | si |
+| Slice 3 (eje de terceros) | revert PR (campos aditivos read-only) | <5 min | si |
 
 ### Production verification sequence
 
@@ -284,6 +346,9 @@ Ver el contrato en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §15 (granularidad
 - [ ] **Cero re-captura verificada:** el reader NO llama providers, NO parsea DataForSEO, NO ejecuta grader runs; lee las citas ya persistidas en `provider_observations.citations` (verificado por test — mock de provider nunca invocado — y por review).
 - [ ] Atribución correcta: solo se atribuyen a la org las citas cuyo `domain` == dominio propio (server-side); se mapean a la URL específica; se agrupan por grounded query (`promptId`) + engine (`provider`) + tiempo.
 - [ ] Citation share honesto: URL propia citada / total citas propias en el mismo grounded-query+engine+ventana; nunca cross-motor ni fabricado; sin denominador → sin share.
+- [ ] **Eje de terceros presente y separado:** por grounded query + motor + ventana el reader lista las URLs de terceros que compusieron la respuesta, a nivel **URL** (no dominio agregado), con dominio y frecuencia.
+- [ ] Ninguna URL de tercero entra a `urlCitations` ni mueve el `citationShare` propio; **no existe ningún campo derivado que sume los dos ejes** (verificado por test).
+- [ ] `engineCoverage` declara `measured|not_measured` por motor; un motor sin observaciones utilizables NUNCA se rinde como lista vacía de terceros.
 - [ ] Degradación honesta: org sin grader run reportable → `no_aeo_data`; URL sin citas en el rango → grupo/lista vacía honesta; NUNCA citas ni share fabricados.
 - [ ] Reusa el path org→run→observaciones (`store.ts`) y la normalización de dominio (`observation.ts`); no re-implementa parsing de citas ni el join org→run; no duplica autorización.
 - [ ] `provider_observations` intacta (append-only, read-only desde esta task). Si hay proyección `grader_citation_observations`, es aditiva, append-only, poblada DESDE la evidencia (backfill idempotente), con marker + DO-block + trigger; Down solo DROP.

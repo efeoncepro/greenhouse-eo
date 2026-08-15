@@ -280,13 +280,26 @@ export class GreenhouseApiPlatformClient {
    * POST porque persiste: agrega keywords al set monitoreado, y eso compromete gasto
    * DataForSEO recurrente. El lane sólo lo acepta desde bindings de scope `internal`.
    */
-  async trackSeoKeywords(input: { organizationId?: string; keywords: string[] }) {
+  async trackSeoKeywords(input: {
+    organizationId?: string
+    keywords: string[]
+    /** TASK-1659 — `target` | `opportunity`; se omite del body si el agente no la declaró. */
+    intent?: 'target' | 'opportunity'
+    intentDeclaredBy?: string
+  }) {
     return this.request(
       '/api/platform/ecosystem/growth/seo/keywords/track',
       {},
       {
         method: 'POST',
-        body: { organizationId: input.organizationId, keywords: input.keywords }
+        body: {
+          organizationId: input.organizationId,
+          keywords: input.keywords,
+          // Se omite en vez de mandar `undefined`/`null`: el lane distingue "no declaró" de
+          // un valor inválido, y mandar la llave vacía convertiría lo primero en lo segundo.
+          ...(input.intent ? { intent: input.intent } : {}),
+          ...(input.intent && input.intentDeclaredBy ? { intentDeclaredBy: input.intentDeclaredBy } : {})
+        }
       }
     )
   }
@@ -304,6 +317,122 @@ export class GreenhouseApiPlatformClient {
       {
         method: 'POST',
         body: { organizationId: input.organizationId, keywords: input.keywords }
+      }
+    )
+  }
+
+  /**
+   * TASK-1664 — lectura de corridas y candidatos de keyword discovery. Con `runId` incluye
+   * los candidatos compuestos (mercado ◑ + GSC ● + tracking + última acción).
+   */
+  async getSeoKeywordDiscovery(input: {
+    organizationId?: string
+    market?: string
+    runId?: string
+    status?: string
+    sourceEndpoint?: string
+    query?: string
+    intent?: string
+    minSearchVolume?: number
+    maxDifficulty?: number
+    excludeTracked?: boolean
+    limit?: number
+    cursor?: string
+  }) {
+    return this.request('/api/platform/ecosystem/growth/seo/keyword-discovery', {
+      organizationId: input.organizationId,
+      market: input.market,
+      runId: input.runId,
+      status: input.status,
+      sourceEndpoint: input.sourceEndpoint,
+      query: input.query,
+      intent: input.intent,
+      minSearchVolume: input.minSearchVolume,
+      maxDifficulty: input.maxDifficulty,
+      excludeTracked: input.excludeTracked ? 'true' : undefined,
+      limit: input.limit,
+      cursor: input.cursor
+    })
+  }
+
+  /**
+   * TASK-1664 — encola (o previsualiza con `preview: true`) una corrida de discovery.
+   *
+   * POST porque GASTA: cada corrida paga a DataForSEO por request y por fila. El lane sólo
+   * lo acepta desde bindings de scope `internal`.
+   */
+  async discoverSeoKeywords(input: {
+    organizationId?: string
+    market?: string
+    seedSource: string
+    manualSeeds?: string[]
+    mixedMeasuredSource?: string
+    methods?: Array<string | { method: string; resultsPerCall?: number }>
+    idempotencyKey?: string
+    preview?: boolean
+  }) {
+    return this.request(
+      '/api/platform/ecosystem/growth/seo/keyword-discovery',
+      { market: input.market },
+      {
+        method: 'POST',
+        body: {
+          organizationId: input.organizationId,
+          seedSource: input.seedSource,
+          manualSeeds: input.manualSeeds,
+          mixedMeasuredSource: input.mixedMeasuredSource,
+          methods: input.methods,
+          idempotencyKey: input.idempotencyKey,
+          preview: input.preview
+        }
+      }
+    )
+  }
+
+  /**
+   * TASK-1666 — lectura del draft grounded (prompts AEO con provenance SEO). Sólo bindings
+   * `internal` en el lane.
+   */
+  async getSeoGroundedQueryDraft(input: {
+    organizationId?: string
+    market?: string
+    profileId: string
+    setId: string
+  }) {
+    return this.request('/api/platform/ecosystem/growth/seo/grounded-queries', {
+      organizationId: input.organizationId,
+      market: input.market,
+      profileId: input.profileId,
+      setId: input.setId
+    })
+  }
+
+  /**
+   * TASK-1666 — preparar un DRAFT de grounded queries desde candidatos de discovery.
+   *
+   * POST porque persiste un draft AEO. ⚠️ Con la identidad máquina compartida el command
+   * responde `aeo_forbidden` fail-closed (capability humana requerida; TASK-1631 lo abre).
+   */
+  async prepareSeoGroundedQueries(input: {
+    organizationId?: string
+    market?: string
+    profileId: string
+    seoTargetId: string
+    discoveryRunId: string
+    candidateIds: string[]
+  }) {
+    return this.request(
+      '/api/platform/ecosystem/growth/seo/grounded-queries',
+      { market: input.market },
+      {
+        method: 'POST',
+        body: {
+          organizationId: input.organizationId,
+          profileId: input.profileId,
+          seoTargetId: input.seoTargetId,
+          discoveryRunId: input.discoveryRunId,
+          candidateIds: input.candidateIds
+        }
       }
     )
   }

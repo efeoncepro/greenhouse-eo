@@ -191,6 +191,10 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   | 'trackSeoKeywords'
   | 'untrackSeoKeywords'
   | 'getSeoKeywordMarketData'
+  | 'getSeoKeywordDiscovery'
+  | 'discoverSeoKeywords'
+  | 'getSeoGroundedQueryDraft'
+  | 'prepareSeoGroundedQueries'
 >) => ({
   async getContext() {
     return callReadTool(
@@ -653,7 +657,12 @@ export const createGreenhouseMcpHandlers = (client: Pick<
    * viera "ok" reportaría "listo, las seguí todas" cuando el techo rebotó la mitad. Lo que
    * se rechazó tiene que llegar al usuario con esas palabras.
    */
-  async trackSeoKeywords(input: { organizationId?: string; keywords: string[] }) {
+  async trackSeoKeywords(input: {
+    organizationId?: string
+    keywords: string[]
+    intent?: 'target' | 'opportunity'
+    intentDeclaredBy?: string
+  }) {
     return callReadTool(
       result => {
         const data = result.data as {
@@ -671,10 +680,14 @@ export const createGreenhouseMcpHandlers = (client: Pick<
         const outcomes = Array.isArray(data.outcomes) ? data.outcomes : []
         const count = (status: string) => outcomes.filter(outcome => outcome.status === status).length
         const rejected = count('capacity_exceeded')
+        // TASK-1659 — el cambio de intención se enumera aparte: fundirlo en `already_tracked`
+        // le diría al agente que no pasó nada, cuando se cerró una membresía y se abrió otra.
+        const reclassified = count('intent_changed')
 
         const parts = [
           `${count('tracked')} newly tracked`,
           `${count('already_tracked')} already tracked`,
+          `${reclassified} reclassified (intent changed)`,
           `${rejected} rejected (set at capacity)`,
           `${count('invalid')} invalid`
         ]
@@ -720,6 +733,187 @@ export const createGreenhouseMcpHandlers = (client: Pick<
         }).`
       },
       () => client.untrackSeoKeywords(input)
+    )
+  },
+  /**
+   * TASK-1664 — lectura de discovery. El summary declara la lente: candidatos = mercado
+   * ESTIMADO (◑); la demanda medida GSC viaja como campo separado, nunca fusionada.
+   */
+  async getSeoKeywordDiscovery(input: {
+    organizationId?: string
+    market?: string
+    runId?: string
+    status?: string
+    sourceEndpoint?: string
+    query?: string
+    intent?: string
+    minSearchVolume?: number
+    maxDifficulty?: number
+    excludeTracked?: boolean
+    limit?: number
+    cursor?: string
+  }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          runs?: unknown[]
+          run?: { runId?: string; status?: string } | null
+          candidates?: unknown[]
+          totalCandidates?: number
+          marketAvailability?: string
+          marketFreshness?: string | null
+        }
+
+        if (data.ok === false) {
+          return `SEO keyword discovery unavailable (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        if (data.run) {
+          return `SEO keyword discovery run ${String(data.run.runId ?? '?')} [${String(data.run.status ?? '?')}]: ${String(
+            data.totalCandidates ?? 0
+          )} candidates (market data: ${String(data.marketAvailability ?? 'unavailable')}, as-of ${String(
+            data.marketFreshness ?? 'n/a'
+          )}). Volumes/difficulty are ESTIMATED market data (◑); measuredGsc is the client's own measured demand (●) — never merge them (${result.requestId}).`
+        }
+
+        return `SEO keyword discovery: ${String((data.runs ?? []).length)} run(s) listed. Pass runId to inspect candidates (${result.requestId}).`
+      },
+      () => client.getSeoKeywordDiscovery(input)
+    )
+  },
+  /**
+   * TASK-1664 — el write. El summary reporta runId + costo estimado y deja claro que la
+   * corrida es ASYNC: un agente que declare candidatos listos tras el 202 estaría
+   * describiendo resultados que aún no existen.
+   */
+  async discoverSeoKeywords(input: {
+    organizationId?: string
+    market?: string
+    seedSource: string
+    manualSeeds?: string[]
+    mixedMeasuredSource?: string
+    methods?: Array<string | { method: string; resultsPerCall?: number }>
+    idempotencyKey?: string
+    preview?: boolean
+  }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          runId?: string
+          deduped?: boolean
+          estimatedCostUsd?: number
+          providerCalls?: number
+          formula?: string
+          seeds?: unknown[]
+          estimate?: { estimatedCostUsd?: number; providerCalls?: number; formula?: string }
+          wouldBeAllowed?: boolean
+          blockedReason?: string | null
+        }
+
+        if (data.ok === false) {
+          return `SEO keyword discovery rejected (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        if (input.preview === true || data.estimate) {
+          return `SEO keyword discovery PREVIEW: ${String(data.seeds?.length ?? 0)} seed(s), estimated USD ${String(
+            data.estimate?.estimatedCostUsd ?? 0
+          )} across ${String(data.estimate?.providerCalls ?? 0)} provider call(s) [${String(
+            data.estimate?.formula ?? ''
+          )}]. Allowed: ${String(data.wouldBeAllowed ?? false)}${
+            data.blockedReason ? ` (blocked: ${String(data.blockedReason)})` : ''
+          }. Nothing was queued or spent (${result.requestId}).`
+        }
+
+        return `SEO keyword discovery run ${String(data.runId ?? '?')} queued${
+          data.deduped ? ' (deduped: same intent already existed, nothing new will be spent)' : ''
+        } — estimated USD ${String(data.estimatedCostUsd ?? 0)} across ${String(
+          data.providerCalls ?? 0
+        )} provider call(s). The run executes ASYNC in the ops worker; poll get_seo_keyword_discovery with this runId for candidates — do NOT claim results exist yet (${result.requestId}).`
+      },
+      () => client.discoverSeoKeywords(input)
+    )
+  },
+  /**
+   * TASK-1666 — lectura del draft grounded. El summary declara el modo con honestidad: un
+   * baseline fallback JAMÁS se reporta como grounded en los candidates.
+   */
+  async getSeoGroundedQueryDraft(input: { organizationId?: string; market?: string; profileId: string; setId: string }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          setId?: string
+          version?: number
+          status?: string
+          groundingMode?: string
+          prompts?: unknown[]
+          sourceRefs?: string[]
+          fallbackNotice?: string | null
+        }
+
+        if (data.ok === false) {
+          return `SEO grounded query draft unavailable (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        return `Grounded query draft ${String(data.setId ?? '?')} v${String(data.version ?? '?')} [${String(
+          data.status ?? '?'
+        )}]: ${String(data.prompts?.length ?? 0)} prompts, mode=${String(data.groundingMode ?? '?')}, ${String(
+          data.sourceRefs?.length ?? 0
+        )} SEO source ref(s).${
+          data.fallbackNotice ? ` WARNING: ${String(data.fallbackNotice)}` : ''
+        } Approval happens ONLY through the AEO review flow — never claim this draft is active (${result.requestId}).`
+      },
+      () => client.getSeoGroundedQueryDraft(input)
+    )
+  },
+  /**
+   * TASK-1666 — el write del puente. Reporta el draft creado y su modo; nunca lo describe como
+   * aprobado/activo ni como medición ya existente.
+   */
+  async prepareSeoGroundedQueries(input: {
+    organizationId?: string
+    market?: string
+    profileId: string
+    seoTargetId: string
+    discoveryRunId: string
+    candidateIds: string[]
+  }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          draft?: { setId?: string; version?: number }
+          groundingMode?: string
+          candidateCount?: number
+          deduped?: boolean
+          fallbackNotice?: string | null
+          coverageNotice?: string | null
+          seedCoverage?: { uncoveredCandidateIds?: string[] } | null
+        }
+
+        if (data.ok === false) {
+          return `SEO grounded query preparation rejected (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        return `Grounded query DRAFT ${String(data.draft?.setId ?? '?')} v${String(data.draft?.version ?? '?')} created from ${String(
+          data.candidateCount ?? 0
+        )} candidate(s), mode=${String(data.groundingMode ?? '?')}${data.deduped ? ' (deduped: same context already had a draft, nothing new was authored)' : ''}.${
+          data.fallbackNotice ? ` WARNING: ${String(data.fallbackNotice)}` : ''
+        }${
+          data.coverageNotice
+            ? ` COVERAGE WARNING: ${String(data.coverageNotice)} Uncovered: ${String(
+                (data.seedCoverage?.uncoveredCandidateIds ?? []).join(', ')
+              )}.`
+            : ''
+        } It is a DRAFT pending human review; approval uses the existing AEO command and this tool never activates anything (${result.requestId}).`
+      },
+      () => client.prepareSeoGroundedQueries(input)
     )
   }
 })

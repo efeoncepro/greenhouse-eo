@@ -1,0 +1,83 @@
+{
+  "taskId": "TASK-1665",
+  "scenario": "growth-seo-keyword-discovery",
+  "reviewedAt": "2026-08-15",
+  "reviewer": "claude (revisión visual de 8 frames × 2 viewports sobre la corrida local del 2026-08-15 12:53, con sesión de operador interno y dato vivo de Grupo Berel)",
+  "evidence": {
+    "desktopFirstFold": ".captures/2026-08-15T12-53-49_growth-seo-keyword-discovery/01-desktop/frames/01-default.png",
+    "desktopResults": ".captures/2026-08-15T12-53-49_growth-seo-keyword-discovery/01-desktop/frames/04-results.png",
+    "desktopDrawer": ".captures/2026-08-15T12-53-49_growth-seo-keyword-discovery/01-desktop/frames/05-candidate-drawer.png",
+    "desktopActions": ".captures/2026-08-15T12-53-49_growth-seo-keyword-discovery/01-desktop/frames/06-candidate-actions.png",
+    "desktopFocusRestore": ".captures/2026-08-15T12-53-49_growth-seo-keyword-discovery/01-desktop/frames/07-drawer-focus-restore.png",
+    "mobileFirstFold": ".captures/2026-08-15T12-53-49_growth-seo-keyword-discovery/02-mobile/frames/01-default.png",
+    "mobileResults": ".captures/2026-08-15T12-53-49_growth-seo-keyword-discovery/02-mobile/frames/04-results.png",
+    "mobileDrawer": ".captures/2026-08-15T12-53-49_growth-seo-keyword-discovery/02-mobile/frames/05-candidate-drawer.png",
+    "mobileActions": ".captures/2026-08-15T12-53-49_growth-seo-keyword-discovery/02-mobile/frames/06-candidate-actions.png",
+    "trace": ".captures/2026-08-15T12-53-49_growth-seo-keyword-discovery/01-desktop/trace.zip"
+  },
+  "technicalBaseline": {
+    "desktop": "exitCode 0 — qualityFindings VACÍO. axe, layout, runtime, teclado y performance sin hallazgos a 1440×900.",
+    "mobile": "exitCode 0 — 10 warnings, TODOS `layout_element_overflow` del mismo origen: el `MuiTabs-list` scrollable de `SeoSearchVisibilityTabs` (TASK-1306), que declara `variant='scrollable'` y por lo tanto extiende su strip más allá del viewport por diseño. No es de esta task y lo comparten las cuatro pantallas SEO. Cero errores; `scrollWidth === clientWidth` a nivel documento.",
+    "assertions": "5/5 passed en ambos viewports: noLoginRedirect, noErrorBoundary y los tres markers visibles (builder, cost, lens-tabs)."
+  },
+  "evidenceCaveats": [
+    "La corrida es LOCAL contra dato vivo de Grupo Berel (10 candidatos reales de una corrida ya materializada), no contra fixture ni contra staging. Queda pendiente la corrida equivalente contra el deployment de staging.",
+    "🔴 Los estados async de la corrida —`queued`, `running`, `partial`, `budget_blocked`, `provider_error`— NO están cubiertos por esta evidencia. Sólo se capturó un run ya `succeeded`. Disparar una corrida desde una captura le pagaría al proveedor en cada pasada de GVC, así que esos estados exigen fixture controlada; el scenario lo declara y la task lo lleva como follow-up. Es el hueco más grande de esta evidencia: la banda de estado de corrida se revisó en código, no en frame.",
+    "El outcome de una acción tampoco está capturado: ejecutar `Declarar objetivo` en la captura comprometería gasto recurrente real del cliente. El drawer se capturó abierto y con sus acciones, no con un resultado. El mapeo outcome→mensaje sí está cubierto por test unitario (12 casos, incluido el 200-con-capacity_exceeded).",
+    "El caso `Ya seguido` se verificó en la corrida de las 12:50 (frame 06 de ese run) y el scenario vigente apunta al candidato `Nuevo`, que es el estado dominante y el de mayor riesgo. Ambos casos fueron mirados; sólo uno queda como evidencia viva."
+  ],
+  "dimensions": {
+    "hierarchy": {
+      "score": 4.6,
+      "rationale": "El first fold ordena la pantalla por decisión, no por componente: título → lentes → builder (seeds a la izquierda, métodos/alcance/mercado a la derecha) → banda de confirmación con el costo y el CTA. La banda `Antes de confirmar` cierra el fold y es lo último que se lee antes de gastar, que es exactamente donde debe estar.",
+      "evidence": "desktopFirstFold"
+    },
+    "surfaceEconomy": {
+      "score": 4.5,
+      "rationale": "Tres superficies y ninguna de más: builder, estado de corrida y canvas. La recipe va con `plane='none'` justamente para no envolver en una card lo que el cuerpo ya define — sin eso habría card-on-card. El drawer es la única superficie flotante.",
+      "evidence": "desktopFirstFold, desktopResults"
+    },
+    "visualImpact": {
+      "score": 4.5,
+      "rationale": "El momento dominante es la tabla de candidatos con sus dos marcadores, no un gráfico decorativo. La dirección visual rechazó el scatter volumen × dificultad y se sostuvo: no hay chart, porque un punto en un plano no sabe decir «sin dato de mercado». La densidad de 10 filas × 9 columnas se lee sin ruido.",
+      "evidence": "desktopResults"
+    },
+    "fidelity": {
+      "score": 4.7,
+      "rationale": "El drawer sigue el orden del wireframe R4 literal (procedencia → mercado → medición propia → advertencia → acciones → trayectoria) y los labels de acción son los del contrato, incluido `Preparar grounded queries`. La columna dice `Barrera de enlaces` y nunca `Dificultad`, y el filtro `maxDifficulty` quedó fuera del contrato de URL como pide ISSUE-152.",
+      "evidence": "desktopDrawer, desktopActions"
+    },
+    "genericTemplateResistance": {
+      "score": 4.6,
+      "rationale": "Ninguna pantalla genérica escribiría «Sin medición propia» en vez de un guion, ni pondría la advertencia «Sugerencia no significa seguimiento» ARRIBA de los botones, ni gastaría una línea entera en aclarar que el CPC es precio publicitario y no costo de posicionarse. La leyenda `● Medido · ◑ Estimado. No se promedian.` es una decisión de producto visible, no relleno.",
+      "evidence": "desktopResults, desktopDrawer"
+    },
+    "responsive": {
+      "score": 4.5,
+      "rationale": "A 390px la tabla no se encoge: se recompone en cards que conservan las nueve propiedades decisorias, incluido el trigger `Detalles`. El `MetricStrip` del drawer pasa a una columna y el drawer ocupa el ancho completo. Sin scroll horizontal propio.",
+      "evidence": "mobileResults, mobileDrawer, mobileActions"
+    },
+    "accessibility": {
+      "score": 4.5,
+      "rationale": "axe limpio en desktop y sin errores en mobile. El detalle se abre con un botón (`aria-controls` + `aria-expanded`), no con click de fila; el foco vuelve al trigger tras `Escape`; `◑`/`●` llevan texto y tooltip; el estado es chip CON label. El contraste del trigger se resolvió sacándolo del hue en vez de perseguir un tono.",
+      "evidence": "desktopFocusRestore, technicalBaseline"
+    },
+    "actionHierarchy": {
+      "score": 4.5,
+      "rationale": "Tres escalones legibles: `Declarar objetivo` contained, `Seguir oportunidad` y `Preparar grounded queries` outlined, `Descartar` en texto. Cada acción lleva su consecuencia escrita debajo, no un tooltip. Con el candidato ya seguido las dos acciones de gasto desaparecen y aparece la señal «Ya lo estás siguiendo» — sin CTA duplicado.",
+      "evidence": "desktopActions"
+    }
+  },
+  "average": 4.55,
+  "verdict": "PASS",
+  "findingsFixedInThisPass": [
+    "Contraste 3.71:1 del trigger `Detalles` sobre el tinte de hover de la fila (axe serious). Se descartaron con medición `primary.dark` (4.42:1) y la variante tonal (3.69:1) antes de resolverlo con `text.primary` + chevron.",
+    "`ContextualSidecarMetricStrip` con 5 ítems degradaba el texto de ayuda a una cinta de una palabra por línea en 460px. Quedaron 2 métricas; el resto pasó a filas de ancho completo.",
+    "El trigger duplicado (tabla `md+` + card `xs`) colgaba la captura a 390px: el selector enganchaba el botón de la tabla oculta. Resuelto con `:visible` en el scenario.",
+    "Jerarquía plana entre acciones constructivas y `Descartar`."
+  ],
+  "openIssuesNotFixed": [
+    "El `MuiTabs-list` de `SeoSearchVisibilityTabs` (TASK-1306) desborda el viewport a 390px en las cuatro pantallas SEO. Es `variant='scrollable'`, así que el desborde es intencional y el gate lo reporta como warning, no error. No se toca desde esta task: cambiarlo afectaría Resumen, Rendimiento, Keywords y Auditoría a la vez y merece su propia decisión.",
+    "Las acciones del drawer quedan bajo el fold y exigen scroll. Es el orden que fija el wireframe (procedencia antes que decisión) y se sostiene a propósito, pero conviene medir si el operador lo siente como fricción cuando triangule muchos candidatos por día."
+  ]
+}

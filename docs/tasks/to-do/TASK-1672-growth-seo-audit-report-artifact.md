@@ -1,5 +1,72 @@
 # TASK-1672 — Growth SEO: artefacto de la auditoría técnica (web + print)
 
+## Delta 2026-08-15 (2) — decisión de secuencia verificada: el candado estaba mal escrito
+
+El gate de esta task se podía cumplir **con el audit todavía ciego**, y hay que arreglarlo.
+
+**El defecto.** El criterio decía: *"`TASK-1670` está en `develop` antes del primer render
+publicable"*. Verificado contra el diseño de 1670: esa task **nace con flag default OFF**, y con el
+flag OFF el collect **materializa cero hallazgos de sitio**. Es decir, `TASK-1670` puede estar en
+`develop` —criterio cumplido, checkbox marcado de buena fe— y el documento sale exactamente igual de
+ciego que hoy: sin la detección de bloqueo a crawlers de IA. **El escenario que esta task declara
+innegociable se colaba por su propia redacción**, y peor: se colaba con la conciencia tranquila de
+quien marcó el checkbox.
+
+**El gate correcto**, que reemplaza al anterior en `## Acceptance Criteria` y en
+`### Slice ordering hard rule`:
+
+> **El flag de hallazgos de sitio está en `ON` en producción, con `TASK-1671` desplegada y una
+> corrida real verificada** que muestre los hallazgos de sitio materializados.
+
+Los tres pedazos son necesarios: el flag ON porque sin él no hay detección; `TASK-1671` porque el
+flip de 1670 depende de ella (sin la superficie, un hallazgo de sitio se renderiza como "1 página
+afectada", que es falso); y la corrida real porque un flag ON sin evidencia es una declaración, no
+una verificación — y este documento sale de la plataforma con nuestro nombre.
+
+`Depends on` += **`TASK-1671`**.
+
+⚠️ **`TASK-1673` hereda el mismo gate por transitividad.** Compartir y enviar mueve este documento a
+un tercero; si el documento pudo nacer ciego, el correo lo distribuye. **Sin excepción por urgencia
+comercial** — es la misma presión que el Delta anterior ya nombró como riesgo `high`, y esta
+corrección existe justamente porque la presión encuentra las redacciones flojas.
+
+## Delta 2026-08-15 — `Depends on` += `TASK-1698`; y `Blocked by: TASK-1670` es innegociable
+
+Fuente: `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md` (§1.1
+`message_alignment` medido contra un posicionamiento que nunca se declara; §3.4 brecha C8).
+
+**Sin cambio de alcance.** Sigue siendo el documento con dos densidades, web + print, reusando
+`ReportArtifactModel`. Cambian dos cosas del contorno.
+
+### `Depends on` += `TASK-1698` (posicionamiento declarado)
+
+La auditoría midió un defecto de fondo: la dimensión **`message_alignment` pesa 10 puntos** y su
+definición canónica es *"la narrativa de la IA coincide con el posicionamiento **deseado**"* — pero
+ese posicionamiento **nunca entra como input**. `ProseExtractionInput` lleva `excerpt`, `subjectBrand`,
+`subjectDomain` y `maxTokens`, y el prompt igual le pide al modelo que detecte desvío. **El modelo
+está infiriendo cuál es el posicionamiento y midiendo contra su propia inferencia.**
+
+En pantalla eso es un número discutible. **En un documento firmado con nuestro nombre, reenviado a un
+tercero, es otra cosa:** son 10 puntos de un puntaje que un cliente puede citar en una decisión, y no
+podríamos defender de dónde salieron. No se firma un documento que incluye una dimensión de 10 puntos
+medida contra un posicionamiento que nunca se declaró. `TASK-1698` inyecta el dato —que además **ya
+existe y está cacheado** en `brand_intelligence.whatTheBrandDoes`— y esta task espera.
+
+### `Blocked by: TASK-1670` sigue en su lugar, y el orden es innegociable
+
+Confirmado: `Blocked by: TASK-1670` permanece en `Status`.
+
+Se refuerza porque el **incentivo comercial de publicar antes es fuerte y va a existir**: el artefacto
+es material de conversación de SOW, hay demanda inmediata, y `TASK-1670` se ve desde afuera como un
+detalle técnico postergables. No lo es. `TASK-1670` es lo que detecta el **bloqueo a crawlers de IA**,
+y sin eso **un sitio invisible para los motores de respuesta puede puntuar 95/100**.
+
+Publicar el artefacto antes de `TASK-1670` es **firmar que está sano un sitio invisible para los
+motores de IA**. Un documento sobrevive fuera de Greenhouse: se lee tres semanas después, reenviado,
+sin nosotros al lado para matizar. El daño no es un número mal puesto en una pantalla que se
+actualiza — es un documento con nuestro nombre que dice lo contrario de la realidad y que ya no
+podemos alcanzar. **Ninguna urgencia comercial revierte este orden.**
+
 ## Delta 2026-08-08 — TASK-1309 cerrada
 
 `TASK-1309` (Auditoría del sitio, `/admin/growth/seo/audit`) pasó a `complete`: suite completa en
@@ -30,7 +97,7 @@ Grupo Berel**, no es supuesto.
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|ui`
-- Blocked by: `TASK-1670`
+- Blocked by: `TASK-1670` (**el gate es su flag en `ON` con corrida verificada, no su merge**) + `TASK-1671` (condición del flip) — ver Delta 2026-08-15 (2)
 - Branch: `Greenhouse develop; local-first, sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -101,15 +168,25 @@ Reglas obligatorias:
 
 ### Depende de
 
-- `TASK-1670` — hallazgos de sitio (crawlers IA, JSON-LD, sitemap). **Bloqueante**: sin eso el
-  documento omite lo más consecuente.
+- `TASK-1670` — hallazgos de sitio (crawlers IA, JSON-LD, sitemap). **Bloqueante e innegociable**:
+  sin eso el documento omite lo más consecuente y puede declarar sano un sitio invisible para los
+  motores de IA (95/100 con crawlers bloqueados). Ver Delta 2026-08-15. ⚠️ El gate **no** es su merge
+  sino su **flag en ON con corrida verificada** — ver Delta 2026-08-15 (2).
+- **`TASK-1671`** — superficie de hallazgos de sitio. Es la condición del flip del flag de
+  `TASK-1670`: sin ella un hallazgo de sitio se renderiza como "1 página afectada", que es falso, y
+  por eso el flag no se prende. Sin flip no hay detección, y sin detección este documento no se emite.
+- **`TASK-1698`** — posicionamiento declarado como input del extractor de prosa (Delta 2026-08-15).
+  Sin él, `message_alignment` —**10 puntos**— se mide contra un posicionamiento que el modelo infiere
+  solo. Aceptable en pantalla; no en un documento firmado que sale de la plataforma.
 - `TASK-1304` — `readSiteAuditReport` (`complete`).
 - `TASK-1309` — `groupAuditIssues` + fichas es-CL de los checks (code complete).
 - `TASK-1310` — `ReportArtifactModel` + el par `web/`/`print/` (in-progress).
 
 ### Blocks / Impacts
 
-- `TASK-1673` `[por crear]` — compartir y enviar. Sin documento no hay nada que mandar.
+- `TASK-1673` `[por crear]` — compartir y enviar. Sin documento no hay nada que mandar, y **hereda
+  el mismo gate por transitividad, sin excepción por urgencia comercial**: si el documento pudo nacer
+  ciego, el correo lo distribuye a un tercero (Delta 2026-08-15 (2)).
 - **La 4.ª sección del portal cliente** `[task por crear]` — el cliente ya tiene navegador de
   3 secciones (`Resumen · Evolución · Quadrant`, TASK-1310) y la auditoría entra ahí como cuarta,
   espejando las 4 tabs del operador. **NO** se agrega a TASK-1310: esa task está en su última
@@ -276,8 +353,16 @@ sitio cerrado a los motores de respuesta.
 
 - Slice 1 → 2 → 3 → 4. La ruta (3) no se expone antes de que el documento (1+2) esté completo:
   una ruta viva con un documento a medias es un informe emitido a medias.
-- Esta task NO empieza antes de `TASK-1670`: el documento no debe nacer omitiendo los hallazgos
-  de sitio.
+- 🔴 **El primer render publicable NO ocurre antes de que el flag de hallazgos de sitio esté en `ON`
+  en producción, con `TASK-1671` desplegada y una corrida real verificada.** El merge de `TASK-1670`
+  a `develop` **no** es el gate: con su flag default OFF, el collect materializa cero hallazgos de
+  sitio y el documento saldría ciego igual (Delta 2026-08-15 (2)). **Innegociable** aunque haya un
+  SOW esperando — publicar antes es firmar que está sano un sitio invisible para los motores de IA.
+  El trabajo de Slices 1–2 (modelo, sin ruta expuesta) sí puede adelantarse; lo que el gate bloquea es
+  **emitir**.
+- `TASK-1698` debe estar en `develop` antes de que el documento incluya `message_alignment`. Si por
+  secuenciación no lo está, el documento **omite esa dimensión** en vez de firmarla; no se publica
+  "con una nota al pie".
 
 ### Risk matrix
 
@@ -289,6 +374,9 @@ sitio cerrado a los motores de respuesta.
 | Documento enorme (200 URLs × N grupos) impide imprimirlo | UI | medium | Techo propio del documento + lo omitido declarado | GVC print |
 | Se emite un informe sin diagnóstico o a medias | data quality | medium | Estados que NO generan documento (sin crawl / en curso) | revisión de código |
 | Divergencia visual con el informe hermano de 1310 | UI | medium | Reuso del mismo `ReportArtifactModel` y adaptadores | revisión de código |
+| **Se publica antes de `TASK-1670` por presión comercial** (SOW en curso, demanda inmediata) | reputación / comercial | **high** | Gate innegociable; un sitio con crawlers de IA bloqueados puede puntuar 95/100 y el documento sale de la plataforma sin nosotros al lado | cualquier intento de shippear con 1670 abierta |
+| **Se publica con `TASK-1670` mergeada pero su flag en OFF** — el gate viejo se cumplía con el audit todavía ciego y el checkbox se marcaba de buena fe | reputación / comercial | **high** | Gate reescrito: flag `ON` en producción + `TASK-1671` desplegada + corrida real verificada (Delta 2026-08-15 (2)) | Un render publicable sin evidencia de corrida con hallazgos de sitio materializados |
+| `message_alignment` (10 pts) medido contra un posicionamiento inferido por el modelo | reputación / medición | high | `Depends on: TASK-1698`; el input existe cacheado en `brand_intelligence.whatTheBrandDoes` | dimensión presente en el documento con 1698 abierta |
 
 ### Feature flags / cutover
 
@@ -306,6 +394,10 @@ sitio cerrado a los motores de respuesta.
 
 ### Production verification sequence
 
+0. **Precondición verificada, no asumida:** el flag de hallazgos de sitio de `TASK-1670` está en `ON`
+   en producción, `TASK-1671` está desplegada, y una corrida real muestra hallazgos de sitio
+   materializados para el target que se va a documentar. Si esa corrida no existe, **no se genera el
+   informe** — ni siquiera para revisión interna, porque un PDF de revisión también se reenvía.
 1. Operador genera el informe de Berel y lo mira en web y en `?print=1`.
 2. Se verifica que la portada cabe en una plana y que la fecha del crawl se lee de inmediato.
 3. Identidad cliente: se comprueba que NO aparece costo, tier, cupo ni ids de máquina.
@@ -328,6 +420,14 @@ sitio cerrado a los motores de respuesta.
 - [ ] La portada cabe en una plana y contiene dominio, **fecha del crawl**, salud con su alcance
       y las tres prioridades.
 - [ ] Los hallazgos de sitio se renderizan **antes** de la lista priorizada.
+- [ ] 🔴 **El flag de hallazgos de sitio de `TASK-1670` está en `ON` en producción, con `TASK-1671`
+      desplegada y una corrida real verificada** que muestre hallazgos de sitio materializados, antes
+      del primer render publicable. **No basta con que `TASK-1670` esté en `develop`**: nace con flag
+      default OFF y con el flag OFF el collect materializa cero hallazgos de sitio — el documento
+      saldría igual de ciego con el checkbox marcado (Delta 2026-08-15 (2)). Ninguna urgencia
+      comercial revierte este orden.
+- [ ] **`TASK-1698` está en `develop`** o el documento **no incluye** la dimensión `message_alignment`:
+      no se firma un puntaje de 10 puntos medido contra un posicionamiento nunca declarado.
 - [ ] Un hallazgo no verificado dice "no pudimos verificarlo" con su razón, nunca "sano".
 - [ ] El bloque de procedencia está presente y cubre: puntaje del proveedor, esfuerzo estimado,
       carga de laboratorio y as-of.

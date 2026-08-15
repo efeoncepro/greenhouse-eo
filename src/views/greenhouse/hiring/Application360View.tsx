@@ -45,6 +45,7 @@ import type {
   HiringDeskApplicationSummary,
   HiringFulfillmentMode,
 } from '@/types/hiring'
+import type { CandidateDocumentsViewModel } from '@/lib/hiring/documents'
 import type { HiringHandoff } from '@/lib/hiring/handoff/types'
 import type { Assessment, AssessmentResponse, AssessmentTemplate, Competency } from '@/types/hiring-assessment'
 import type {
@@ -54,6 +55,7 @@ import type {
 import type { AiProposal } from '@/types/hiring-assessment-ai'
 
 import HiringDeskFrame from './HiringDeskFrame'
+import CandidateDocumentsPanel from './CandidateDocumentsPanel'
 import { hiringRequest } from './hiring-client'
 
 type TabKey = 'overview' | 'assessment' | 'documents' | 'decision' | 'activity'
@@ -218,6 +220,11 @@ interface Application360ViewProps {
   templates: AssessmentTemplate[]
   initialHandoff: HiringHandoff | null
   canApproveHandoff: boolean
+  /** TASK-1715 — paquete documental resuelto en servidor. `null` si falló o si no hay acceso. */
+  documents: CandidateDocumentsViewModel | null
+  /** El reader falló (≠ candidato sin documentos): el panel degrada honesto. */
+  documentsFailed: boolean
+  canRevealIdentity: boolean
 }
 
 const handoffTone = (handoff: HiringHandoff | null) => {
@@ -321,7 +328,18 @@ const HandoffBridgeCard = ({
   )
 }
 
-const Application360View = ({ assessmentCopy, copy, initialItem, initialAssessments, templates, initialHandoff, canApproveHandoff }: Application360ViewProps) => {
+const Application360View = ({
+  assessmentCopy,
+  canApproveHandoff,
+  canRevealIdentity,
+  copy,
+  documents: candidateDocuments,
+  documentsFailed,
+  initialItem,
+  initialAssessments,
+  templates,
+  initialHandoff,
+}: Application360ViewProps) => {
   const [item, setItem] = useState(initialItem)
   const [handoff, setHandoff] = useState(initialHandoff)
   const [tab, setTab] = useState<TabKey>('overview')
@@ -352,22 +370,11 @@ const Application360View = ({ assessmentCopy, copy, initialItem, initialAssessme
   const [showDecisionForm, setShowDecisionForm] = useState(!item.application.decision)
   const [error, setError] = useState<string | null>(null)
   const [toast, setToast] = useState<string | null>(null)
-  const [revealField, setRevealField] = useState<'cv' | 'identity' | null>(null)
-  const [revealReason, setRevealReason] = useState('')
-  const [revealedDocs, setRevealedDocs] = useState<Record<string, boolean>>({})
   const idempotencyKeyRef = useRef<string | null>(null)
 
   useEffect(() => {
     document.getElementById('hiring-application-title')?.focus()
   }, [])
-
-  const confirmReveal = () => {
-    if (!revealField || !revealReason.trim()) return
-    setRevealedDocs((current) => ({ ...current, [revealField]: true }))
-    setRevealField(null)
-    setRevealReason('')
-    setToast('Dato sensible revelado y registrado en auditoría de sesión.')
-  }
 
   const decisionHistory = useMemo(() => historyFrom(item.application.explainability), [item.application.explainability])
   const isInternalHireDecision = item.application.decision === 'selected' && item.application.selectedDestination === 'internal_hire'
@@ -1133,27 +1140,16 @@ const Application360View = ({ assessmentCopy, copy, initialItem, initialAssessme
     </Stack>
   )
 
+  // TASK-1715 — el panel consume el reader canónico resuelto en servidor. Antes de esto
+  // eran tres filas escritas a mano con un candado que no protegía nada.
   const documents = (
-    <Stack spacing={3}>
-      <Box><Typography variant='h5'>{copy.application.documentsTitle}</Typography><Typography color='text.primary' variant='body2'>PII protegida por capability, motivo y auditoría.</Typography></Box>
-      <Alert severity='warning' icon={<i className='tabler-lock' />} sx={{ '& .MuiAlert-message, & .MuiTypography-root': { color: 'text.primary' } }}>
-        <Typography fontWeight={700}>Datos protegidos por capability</Typography>
-        <Typography variant='body2'>Los documentos permanecen enmascarados. Revelar exige un motivo y deja una entrada de auditoría.</Typography>
-      </Alert>
-      <Paper variant='outlined' sx={{ borderRadius: 3, overflow: 'hidden' }}>
-        {[
-          { label: 'Currículum (CV)', detail: revealedDocs.cv ? 'Documento disponible en sesión autorizada' : '•••••••• · Enmascarado', icon: 'tabler-file-cv', href: null, sensitive: true, field: 'cv' as const },
-          { label: 'Portafolio', detail: item.portfolioUrl ? 'Enlace aportado por el candidato' : 'No informado', icon: 'tabler-world', href: item.portfolioUrl, sensitive: false },
-          { label: 'Documento de identidad', detail: revealedDocs.identity ? 'Identidad disponible en sesión autorizada' : '•••• •••• · Enmascarado', icon: 'tabler-id', href: null, sensitive: true, field: 'identity' as const },
-        ].map((document, index) => (
-          <Stack key={document.label} direction={{ xs: 'column', sm: 'row' }} alignItems={{ xs: 'stretch', sm: 'center' }} spacing={2} sx={{ p: 2.5, borderBlockEnd: index < 2 ? 1 : 0, borderColor: 'divider' }}>
-            <Box sx={{ display: 'grid', placeItems: 'center', inlineSize: 44, blockSize: 44, borderRadius: 2, color: document.sensitive ? 'warning.main' : 'primary.main', backgroundColor: document.sensitive ? 'warning.lightOpacity' : 'primary.lightOpacity' }}><i className={document.icon} /></Box>
-            <Box sx={{ minWidth: 0, flex: 1 }}><Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap><Typography fontWeight={650}>{document.label}</Typography>{document.sensitive ? <GreenhouseChip size='small' kind='status' variant='label' tone='warning' label='Sensible' /> : null}</Stack><Typography variant='body2' color='text.secondary' sx={{ overflowWrap: 'anywhere' }}>{document.detail}</Typography></Box>
-            {document.href ? <Button component='a' href={document.href} target='_blank' rel='noreferrer' endIcon={<i className='tabler-external-link' />}>Abrir</Button> : document.sensitive ? <Button startIcon={<i className='tabler-lock' />} onClick={() => setRevealField(document.field ?? 'cv')}>{revealedDocs[document.field ?? 'cv'] ? 'Revelado' : 'Revelar (requiere motivo)'}</Button> : <Button disabled>No disponible</Button>}
-          </Stack>
-        ))}
-      </Paper>
-    </Stack>
+    <CandidateDocumentsPanel
+      copy={copy}
+      candidateName={item.candidateName}
+      documents={candidateDocuments}
+      documentsFailed={documentsFailed}
+      canRevealIdentity={canRevealIdentity}
+    />
   )
 
   const decisionPanel = (
@@ -1425,30 +1421,6 @@ const Application360View = ({ assessmentCopy, copy, initialItem, initialAssessme
         <DialogTitle>{copy.application.confirmTitle}</DialogTitle>
         <DialogContent><Stack spacing={2}><Typography color='text.secondary'>{copy.application.confirmBody}</Typography><Alert severity={decision === 'rejected' ? 'error' : 'warning'}><Typography fontWeight={700}>{DECISION_OPTIONS.find((option) => option.value === decision)?.label}</Typography><Typography variant='body2'>{reason}</Typography></Alert></Stack></DialogContent>
         <DialogActions><Button onClick={() => setConfirmOpen(false)} disabled={deciding}>{copy.common.cancel}</Button><GreenhouseButton tone={decision === 'rejected' ? 'error' : 'primary'} disabled={deciding} onClick={() => void submitDecision()} leadingIcon={deciding ? <CircularProgress size={16} color='inherit' aria-label={copy.common.loading} /> : undefined}>{copy.common.confirm}</GreenhouseButton></DialogActions>
-      </Dialog>
-
-      <Dialog
-        open={Boolean(revealField)}
-        onClose={() => setRevealField(null)}
-        fullWidth
-        maxWidth='sm'
-        {...dialogMotionProps}
-        PaperProps={{
-          ...dialogMotionProps.PaperProps,
-          'data-capture': 'hiring-application-reveal-dialog',
-        }}
-      >
-        <DialogTitle>Revelar dato sensible</DialogTitle>
-        <DialogContent>
-          <Stack spacing={2}>
-            <Typography color='text.secondary'>Esta acción se registra con tu identidad. Explica por qué necesitas acceder a este documento.</Typography>
-            <TextField autoFocus required multiline minRows={3} label='Motivo' value={revealReason} onChange={(event) => setRevealReason(event.target.value)} helperText='El motivo es obligatorio para continuar.' />
-          </Stack>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setRevealField(null)}>{copy.common.cancel}</Button>
-          <GreenhouseButton kind='primaryAction' disabled={!revealReason.trim()} onClick={confirmReveal} leadingIconClassName='tabler-eye'>{copy.application.revealConfirm}</GreenhouseButton>
-        </DialogActions>
       </Dialog>
 
       <Snackbar

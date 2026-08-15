@@ -55,6 +55,9 @@ Decisión de arquitectura (arch + seo + product, 2026-06-29): NO un artefacto mo
 
 - `TASK-1390` ✅ `complete` — **Fix `ISSUE-120` del pipeline de normalización/scoring**: clasificador determinista de `sourceType` para citaciones, domain matching, `fallback reason` visible y retry con backoff del scoring. Trabajo post-cierre del epic sobre el mismo motor.
 - `TASK-1286` ✅ `complete` — **Command gobernado `assignAeoTier`** (asignación de tiers AEO on-demand). Declaraba `Epic: EPIC-020`; corregido a EPIC-021, que es donde vive su bloque de trabajo.
+- `TASK-1698` — **Ground truth de posicionamiento declarado** para la dimensión `message_alignment`; trabajo post-cierre sobre el mismo motor.
+- `TASK-1703` — **Router cheap-first del eje herramienta**; follow-up operativo del motor AEO.
+- `TASK-1707` — **Rollout del re-grade recurrente AEO multi-runtime** con opt-in gobernado; follow-up de despliegue del motor.
 
 ## Existing Related Work
 

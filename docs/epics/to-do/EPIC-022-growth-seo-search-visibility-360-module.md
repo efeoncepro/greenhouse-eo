@@ -51,7 +51,14 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 >
 > Estado real: **de las 15 abiertas, 11 se pueden tomar ya**; las 4 restantes esperan sólo a otras
 > abiertas (`1313`←1311+1312 · `1314`←1312+1313 · `1316`←1315 · `1317`←1315+1316), más `1660`←1659
-> y `1662`←1661 del carril de objetivos. `TASK-1310` (dashboard cliente) ya está **in-progress**.
+> del carril de objetivos. `TASK-1310` (dashboard cliente) ya está **in-progress**.
+>
+> **Actualización 2026-08-13:** `TASK-1661` quedó **complete** y con eso `1662` y `1664` dejaron de
+> estar bloqueadas (`Blocked by: none` en ambas).
+>
+> **Actualización 2026-08-14:** `TASK-1659` quedó **complete**, así que `1660` (lente Objetivos)
+> también queda `Blocked by: none`. Con eso el carril de objetivos ya no espera backend: sólo falta
+> su superficie.
 >
 > ⚠️ Al cerrar una task, revisar quién la citaba como blocker. Un `Blocked by` obsoleto es fricción
 > inventada, y no hay gate que lo detecte.
@@ -71,7 +78,7 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 > | Pregunta | Fuente | Estado |
 > |---|---|---|
 > | ¿Qué empujo de lo que ya tengo? | GSC medido | **construida** (TASK-1308) |
-> | ¿Dónde quiere estar el cliente? | **declarado por humano** | `TASK-1659` + `TASK-1660` |
+> | ¿Dónde quiere estar el cliente? | **declarado por humano** | `TASK-1659` (**complete 2026-08-14**, el eje ya existe en el command) + `TASK-1660` (superficie) |
 > | ¿Qué me pierdo entero? | competencia + Labs | `TASK-1661` + `TASK-1662` |
 >
 > La segunda es la que ancla comercialmente a las otras dos, porque es el compromiso con el cliente
@@ -81,10 +88,10 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 > aspiracional: es la única forma de contestar *¿vale la pena?* y *¿cuánto cuesta?* antes de
 > aceptar un objetivo.
 
-- `TASK-1659` — [planificada, backend-data] modelo de **intención** en el set monitoreado: objetivo declarado vs oportunidad detectada, con autoría. `source` (TASK-1308) es procedencia, no intención. Append-only: cambiar la intención cierra y abre, nunca `UPDATE`.
-- `TASK-1660` — [planificada, ui-ux] lente **Objetivos** sobre `/admin/growth/seo/keywords` — extiende el **nodo S3** del master UI flow. Full API Parity al revés: `trackKeywords` **ya** acepta keywords que el cliente no rankea y no tiene botón. Bloqueada por `TASK-1659`.
-- `TASK-1661` — [planificada, backend-data] volumen y dificultad por keyword. ⚠️ **No es esperar a `TASK-1300`**, que está complete: falta el fetch, las columnas y el reader. Alcance V1 acotado al set monitoreado.
-- `TASK-1662` — [planificada, backend-data] **keyword gap**: qué gana la competencia donde el cliente es invisible. La superficie va aparte. Bloqueada por `TASK-1661`.
+- `TASK-1659` — [**complete 2026-08-14**, backend-data] modelo de **intención** en el set monitoreado: objetivo declarado vs oportunidad detectada, con autoría. `source` (TASK-1308) es procedencia, no intención. Append-only: cambiar la intención cierra y abre, nunca `UPDATE` — outcome propio `intent_changed`, que **no consume cupo** del techo. `intent` (`target` | `opportunity`) **sin default**: quien no declara escribe `NULL` y no existe un tercer valor "desconocido"; `intentDeclaredBy` separa a quien asumió el compromiso de quien ejecutó el INSERT. Migración `20260814221022082`. Parity en las 3 lanes (app · ecosystem · MCP `track_seo_keywords`) con vocabulario validado en cada frontera; **sin capability, scope ni flags nuevos**. **Desbloquea `1660`.**
+- `TASK-1660` — [planificada, ui-ux] lente **Objetivos** sobre `/admin/growth/seo/keywords` — extiende el **nodo S3** del master UI flow. Full API Parity al revés: `trackKeywords` **ya** acepta keywords que el cliente no rankea y no tiene botón, y desde `TASK-1659` acepta además la **intención declarada**. **`Blocked by: none`** desde el cierre de `TASK-1659` (2026-08-14).
+- `TASK-1661` — [**complete 2026-08-13**, backend-data] volumen y **barrera de enlaces** por keyword. Trae el dato de mercado desde DataForSEO Labs (`keyword_overview`) a la tabla append-only `seo_keyword_market_data`, con país, idioma y `captured_at` en la clave; `readKeywordOpportunities` deja de cablear `market: 'unavailable'` y la tabla de `TASK-1308` muestra las columnas **sin cambio de código en la UI**. Captura **mensual** (el proveedor refresca una vez al mes), acotada al set monitoreado, con dry-run de costo previo. Costo real medido: **USD ~0.02/org/mes**. Tool MCP `get_seo_keyword_market_data` + federación al gateway en el mismo cierre. **Desbloquea `1660`/`1662`/`1664`.**
+- `TASK-1662` — [planificada, backend-data] **keyword gap**: qué gana la competencia donde el cliente es invisible. La superficie va aparte. **`Blocked by: none`** desde el cierre de `TASK-1661` (2026-08-13). Escribe en la **misma** tabla de mercado — es multi-productor por diseño, nunca un segundo almacén.
 
 ### Carril de discovery y acción diaria (creado 2026-08-08)
 
@@ -98,7 +105,8 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
   `keywords_for_site`, `keyword_overview`), muestra preview de costo antes de gastar, materializa una
   corrida bounded en `ops-worker`, deduplica y expone candidates con volumen/dificultad/intent,
   procedencia y as-of. No crea `seo_keyword_set_members`, no hace keyword gap (`1662`) y no llama
-  `ai_optimization` (`1651`). Blocked by `TASK-1661`.
+  `ai_optimization` (`1651`). **`Blocked by: none`** desde el cierre de `TASK-1661` (2026-08-13);
+  **in-progress** desde entonces. Escribe en la **misma** tabla de mercado que `1661` y `1662`.
 - `TASK-1666` — [creada, backend-data/integration, backend-critical] **puente SEO → grounded queries
   AEO**. Toma hasta 20 candidates seleccionados, valida ownership y contexto, y crea un draft en el
   `grader_prompt_sets` existente mediante el authoring AEO canónico. Conserva source refs de corrida y
@@ -133,6 +141,7 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1655` — [en curso] Historical Data Platform del módulo SEO (semilla histórica de rank vía `historical_serps`).
 - `TASK-1677` — [**complete**, backend-data] Cierre de la fase **contract** del cutover `seo_v1 → seo_v2`; la ventana expand/contract dejó de estar abierta. Se lista acá para cerrar el denominador del epic (lo declaraba en su campo `Epic:` y no figuraba en esta lista).
 - `TASK-1690` — [creada 2026-08-13, backend-data] **La superficie cliente sirve a la POBLACIÓN, no al tenant con historia.** La página decide si hay datos con GSC y calcula el KPI principal con rank snapshots: una organización con Search Console conectado y captura de rank sin correr —el día 1 de todo cliente nuevo— ve el KPI en "sin dato" con el Quadrant poblado debajo. Invisible hasta hoy porque la superficie tiene UNA organización cliente y tiene ambas fuentes. Expone la cobertura por fuente en el contrato + familia de fixtures por estado + guard anti-reincidencia. Sin migración. Sale del cierre de `TASK-1310`.
+- `TASK-1691` — [creada 2026-08-13, ui-ux] **Declarar la lente estimada y su fecha de captura en la tabla de oportunidades.** Cierra `ISSUE-154`: cuando `market === 'available'` la pantalla renderiza Volumen y Barrera de enlaces **sin leyenda de origen y sin `capturedAt`** — la nota `● Medido · Search Console` sólo aparece en el caso `'unavailable'`. El §8 del master flow pide leyenda persistente y as-of explícito para lo estimado; el as-of ya viaja en el contrato programático, sólo falta la superficie.
 - `TASK-1658` — [planificada, backend-data] drift de federación MCP + punto ciego del guard de paridad: 3 tools SEO viven en el MCP interno de Greenhouse y no están ni federadas ni excluidas en el gateway, y el guard no puede verlo porque compara contra lo registrado EN EL GATEWAY, nunca contra Greenhouse.
 
 - `TASK-1305` — [planificada] `readSeoAeoGap` derived read cross-módulo (report layer).
@@ -157,6 +166,79 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1426` — [reconciliada 2026-08-05, backend-data] **Search Console multi-property + URL Inspection + post-publish discovery.** Declaraba `Epic: EPIC-022` en su cabecera pero no estaba en esta lista (su única traza era la mención en la Ola D). Extiende la conexión GSC de una propiedad única por organización a un contrato multi-property canónico.
 - `TASK-1651` — [creada 2026-08-06, backend-data/integration, backend-critical] **Familia `ai_optimization` (DataForSEO) + fundación SoV de marca en LLMs per-org.** Amplía el allowlist con `/v3/ai_optimization/` (familia + CHECK del spend ledger + parity test en el mismo PR) y funda la captura batch de LLM Mentions (base longitudinal del proveedor: ChatGPT US/EN + Google AI Overview) hacia snapshots append-only per-org, con readers + MCP tools en el mismo PR. Lente ◑ complementaria del SoV per-engine del grader (TASK-1424, EPIC-020) — nunca fusionadas. Blocked by TASK-1303. Investigación fuente: skill `dataforseo-operator` (references/08, as-of 2026-08-06).
 - `TASK-1653` — [creada 2026-08-06, backend-data/integration] **Federar `get_seo_rank_evolution` al gateway `mcp.efeonce.org` + guard de paridad de tools SEO** (repo hermano `efeonce-mcp`; patrón exacto de las 3 tools de TASK-1647). El guard compara el inventario de tools SEO del MCP interno contra el allowlist del gateway y falla loud cuando divergen (el allowlist explícito se conserva; el guard convierte el olvido silencioso en divergencia visible). Su blocker (TASK-1303 en producción) quedó cumplido el mismo 2026-08-06.
+
+### Endurecimiento de la lente `Descubrir` (creado 2026-08-15, auditoría post-cierre de TASK-1665)
+
+> Las cuatro se agrupan en un cierre único: ninguna cambia el día del operador por separado, y juntas
+> sí — 50 candidatos pasan a ser 500 navegables, con seeds de GSC (demanda medida, costo cero de
+> proveedor), sin filas duplicadas, con la barrera correcta y con las cuatro decisiones dejando
+> rastro. Orden interno: `1694 → 1691 → 1693`, porque las tres tocan el mismo camino de lectura y
+> `src/lib/copy/growth.ts`; en paralelo producirían tres encodings de la misma columna.
+
+- `TASK-1692` — [creada 2026-08-15, backend-data] **Writers del ledger de decisiones de discovery.**
+  De los 5 `action_kind` del enum sólo `dismissed` tiene writer, así que un tercio del modelo de
+  estados es inalcanzable y el guard del bridge promete una re-selección que nadie puede escribir. El
+  hecho lo escribe el **primitive** en su propia transacción, no cada consumer. **Bloquea a
+  `TASK-1700`**: su principio es el que la cola debe obedecer para no crear un segundo libro de
+  decisiones sobre los mismos hechos.
+- `TASK-1693` — [creada 2026-08-15, ui-ux] **Paginación por cursor + las fuentes de seed no
+  cableadas.** El reader pagina y devuelve `nextCursor`; la page lo descarta. Y de las cinco fuentes
+  que el primitive soporta sólo `manual` está cableada — la de Search Console, la de mejor oficio
+  (demanda medida, resolución sin costo de proveedor), existe con copy escrito y sin consumidor.
+- `TASK-1694` — [creada 2026-08-15, backend-data] **Contrato de candidatos: barrera filtrable, una
+  fila por keyword, política de inclusión declarada.** La API mantiene `maxDifficulty` sobre la KD
+  cruda que `ISSUE-152` declaró engañosa y no expone filtro por barrera de enlaces; el dedupe por
+  método deja la misma keyword en dos filas con dos CTAs de gasto; y dos de los cuatro métodos
+  filtran el volumen cero en el proveedor y los otros dos no. **Bloqueo duro de `TASK-1700`** y
+  subida a P1: es la única defensa contra que la cola persista duplicados con la barrera engañosa en
+  filas append-only.
+- `TASK-1695` — [creada 2026-08-15, backend-data] **Cobertura y registro del autor grounded.** El
+  techo de 20 candidatos del bridge es aritméticamente incompatible con su propia regla de 12–16
+  preguntas, y el system prompt base está en voseo rioplatense pidiendo salida es-CL — riesgo de
+  exactitud, no cosmético.
+
+### Instrumentación, sustrato y autoridad de orden (creado 2026-08-15, auditoría de oportunidad)
+
+> Detalle, evidencia y secuencia completa en el **Delta 2026-08-15** al final de este documento y en
+> `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md`.
+
+- `TASK-1696` — [creada 2026-08-15, backend-data] Ledger con dimensión de consumidor + gate USD
+  per-org del grader. **P0**, nace en shadow. Desbloquea todo lo que gaste.
+- `TASK-1697` — [creada 2026-08-15, backend-data] `growth/site-substrate` + barrel de dominio AEO +
+  lint rule cross-domain. **P0.** Bloquea a `TASK-1670` y `TASK-1695`.
+- `TASK-1698` — [creada 2026-08-15, backend-data] Posicionamiento declarado (`●`) / observado (`◑`)
+  para `message_alignment`. **P0.** Bloquea a `TASK-1672`.
+- `TASK-1699` — [creada 2026-08-15, backend-data] Persistir el top-N del SERP que ya se paga. **P0**,
+  único trabajo con costo de demora irrecuperable.
+- `TASK-1700` — [creada 2026-08-15, backend-data] Cola priorizada como aggregate persistido con score
+  versionado. **P0.** Llega **antes** que `TASK-1669`.
+- `TASK-1701` — [creada 2026-08-15, backend-data] `analyzeUrlContent`: hechos por URL, cero score.
+- `TASK-1702` — [creada 2026-08-15, backend-data] Señales deterministas de citabilidad +
+  recomendación anclada a URL.
+- `TASK-1703` — [creada 2026-08-15, backend-data] Router cheap-first del eje herramienta, y el
+  contrato herramienta/cobertura.
+- `TASK-1704` — [creada 2026-08-15, backend-data] Cadencia y muestreo declarados: AIO no diario,
+  N≥3 donde la calibración lo exige.
+- `TASK-1705` — [creada 2026-08-15, backend-data] Cosecha de la capacidad OnPage ya pagada (USD 0).
+- `TASK-1706` — [creada 2026-08-15, backend-data] El alta de keyword es un compromiso de gasto.
+- `TASK-1707` — [creada 2026-08-15, backend-data] Rollout del re-grade recurrente multi-runtime.
+- `TASK-1708` — [creada 2026-08-15, backend-data] Estacionalidad: la serie de 12 meses que ya viene
+  en `keyword_info`.
+- `TASK-1709` — [creada 2026-08-15, backend-data] Carril de diagnóstico de prospecto SEO.
+- `TASK-1671` — [creada 2026-08-15, ui-ux] **Superficie de los hallazgos de sitio.** Estaba
+  reservada desde el 2026-08-11 y la resolución de secuencia la destapó como **el bloqueante real**:
+  `TASK-1670` nace con flag OFF y no se prende hasta que esta esté desplegada. Habilita el flip y es
+  precondición de que `TASK-1672` publique artefacto.
+- `TASK-1713` — [creada 2026-08-15, backend-data] **Lint rule universal cross-dominio + barrel AEO.**
+  Mitad B de la partición de `TASK-1697`. 30 deep imports medidos, 18 fuera del par conocido.
+  `Blocked by: TASK-1695` (bloqueo invertido).
+- `TASK-1284` — [**adoptada 2026-08-15**, backend-data] **GA4 multi-tenant como señal per-org.**
+  Estaba huérfana (`Epic: none`) y es la única vía a dos cosas que el epic promete: el puente
+  «clics → leads» y la medición del **referral real** de `chatgpt.com`/`perplexity.ai` — o sea, lo
+  único que prueba que la citación en IA trae gente. Bloquea de hecho la tercera parte de
+  `TASK-1668` (las ventanas de outcome GA4/HubSpot): o se adopta, o ese loop de negocio se declara
+  explícitamente parcial. `src/lib/growth/ga4/` ya tiene cliente con token provider inyectable y el
+  patrón per-org ya corre en producción en Search Console.
 
 ## Existing Related Work
 
@@ -570,3 +652,253 @@ Resumen deriva de rank snapshots, así que un tenant con Search Console conectad
 sin correr —**el día 1 de todo cliente nuevo**— renderiza el KPI principal en "sin dato" con el
 Quadrant poblado debajo. Con N=1 nadie lo delata. Merece task propia: fixtures por estado de la
 población y la decisión de fuente del Resumen.
+
+## Delta 2026-08-13/14 — el dato de mercado aterriza: `TASK-1661` complete y el carril aspiracional se destraba
+
+`TASK-1661` queda **complete**. Con ella el módulo deja de responder sólo *"¿qué empujo de lo que ya
+tengo?"*: `readKeywordOpportunities` ya no cablea `market: 'unavailable'`, y la tabla de `TASK-1308`
+muestra volumen y barrera de enlaces **sin una línea de cambio en la UI** — el contrato
+`number | null` que 1308 dejó previsto se llenó solo. La captura es **mensual** (el proveedor
+refresca una vez al mes; consultarlo más seguido es pagar varias veces por el mismo número), acotada
+al set monitoreado, con **dry-run de costo antes de gastar**. Costo real medido: **USD ~0.02 por
+organización al mes**.
+
+**Efecto en el backlog:** `TASK-1662` (keyword gap) y `TASK-1664` (keyword discovery) quedan
+**`Blocked by: none`**; `1664` está in-progress. `TASK-1660` (lente Objetivos) recupera su insumo:
+sin volumen no se puede aceptar un objetivo declarado sin saber *¿vale la pena?* y *¿qué tan cuesta
+arriba es?*.
+
+**Lo que este cierre le enseña a las tasks que vienen:**
+
+1. 🔴 **La tabla de mercado nace multi-productor, y eso es una decisión de schema, no un accidente.**
+   `seo_keyword_market_data` tiene clave `(normalized_keyword, location_code, language_code,
+   captured_at)` y **NO** lleva FK a `seo_keyword_set_members` ni a `seo_targets`: el volumen es un
+   hecho de *(keyword, país, idioma, as-of)*, y una keyword candidata todavía no es de nadie.
+   `1664` y `1662` escriben en **la misma tabla** el `keyword_info` que ya viene pagado en sus
+   respuestas de discovery. **Ninguna de las dos crea un segundo almacén de datos de mercado** ni un
+   segundo transporte: el reader existente proyecta ambos orígenes y la UI no los distingue por tabla.
+2. **Un dato que el proveedor no tiene también se escribe.** El smoke real destapó una **fuga de
+   costo**: la primera versión no escribía fila cuando el proveedor no tenía la keyword, así que el
+   pre-check de frescura nunca las veía y **se re-compraban en cada corrida, para siempre**. El
+   modelo correcto son **tres estados**: fila ausente = nunca preguntamos · fila con `NULL` =
+   preguntamos y el proveedor no tiene · `0` = demanda cero real. Ningún test con mocks podía
+   atraparlo: vivía en la interacción entre el pre-check y una respuesta real que no incluye todas
+   las keywords pedidas. **Todo enriquecimiento pago futuro hereda esta regla.**
+3. **Una métrica del proveedor no se muestra cruda sólo porque llegó.** `keyword_difficulty` mide
+   **una sola cosa** —qué tan atrincherado está el top-10 por enlaces— y colapsa a `0` en SERPs
+   es-LATAM: `pintura` (135.000 búsquedas/mes en MX) y `pintura para piso` caían **ambas** en el
+   mismo cajón con perfiles de top-10 opuestos. La columna se renombró **"Barrera de enlaces"**, se
+   muestra en **niveles** y se **deriva del perfil real del top-10** (`avg_backlinks_info`, que venía
+   gratis en cada respuesta ya pagada y se descartaba), ponderando la **diversidad de dominios
+   referentes** y no el conteo de enlaces. La derivación vive **server-side, una sola vez**: si la
+   regla viviera en la UI, cada superficie tendría su versión. Y `unknown` es estado propio, pintado
+   **"Sin dato"** y jamás "Baja" — un hueco presentado como barrera baja afirma una oportunidad que
+   nadie midió.
+4. **El país dejó de ser implícito, y costó un año de serie descubrirlo.** `ISSUE-152`: el target de
+   Berel medía **Chile** para una marca **mexicana** (30 búsquedas/mes de su propia marca en CL vs
+   49.500 en MX) — 238 snapshots, USD ~1 pagado, y **nada en el tablero lo delataba** porque la serie
+   se veía poblada y sana. Se corrigió con **target nuevo para México + pausa del de Chile**, jamás
+   un cambio de `location_code` in-place: eso habría mezclado dos mercados bajo una misma serie sin
+   marcador. `ISSUE-153` cerró la causa sistémica: el lane elegía mercado con un `LIMIT 1`
+   silencioso; ahora **toda respuesta declara el país que sirve** y, con varios sin elegir, lo dice
+   en vez de escoger callado. **Toda superficie multi-mercado del epic hereda este contrato.**
+
+**Rollout:** worker con `GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED=true` y scheduler
+`ops-seo-keyword-market-data` activo (ambos declarativos en `deploy.sh`); la tool federada
+`get_seo_keyword_market_data` existe en el gateway y su exposición en producción viaja con el
+próximo release `develop → main`.
+
+## Delta 2026-08-15 — auditoría de oportunidad: el epic mide bien y actúa poco, y el backlog lo perpetúa
+
+Siete análisis independientes con skills especializadas (oficio SEO, AEO/GEO, capacidad DataForSEO,
+valor comercial, motor propio, arquitectura y economía medida contra la base real) sobre EPIC-021 +
+EPIC-022. Documento consolidado:
+**`docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md`**.
+
+### El diagnóstico, con números
+
+**El presupuesto no es la restricción activa. La instrumentación sí.** Contra USD 50/mes por cliente
+autorizados, el consumo real medido es **~USD 4,51 de DataForSEO + ~USD 3 de grader**: el **15%**.
+Pero entre el **15% y el 25%** de lo que sí se gasta **no se ve**.
+
+Y el balance del backlog contradice el propio Outcome de este epic ("el módulo no puede ser sólo un
+dashboard"). De las **25** tasks abiertas del dominio (*conteo corregido 2026-08-15: la primera versión decía 28,
+y sus partes sumaban 27 con porcentajes que daban 96%*): **56% MEDIR · 24% MOSTRAR · 20% ACTUAR**.
+De las cinco de ACTUAR, tres (`1667`→`1668`→`1669`) son `Effort: Alto` y forman **una cadena
+estrictamente serial que no entrega nada intermedio**, mientras las de medir corren en paralelo.
+El conjunto exacto: MEDIR = 1311·1312·1313·1314·1315·1316·1317·1426·1651·1655·1662·1670·1694·1695 ·
+MOSTRAR = 1658·1660·1672·1690·1691·1693 · ACTUAR = 1667·1668·1669·1673·1692.
+Había **siete tasks** para una segunda capa de medición (`1311`…`1317`, todas P3 y todas
+`UI impact: none` — *matiz corregido: sí declaran consumers entre ellas; lo que ninguna declara es un
+consumer **visible con ID de task**, todas dicen «follow-up ui-ux posterior» sin reservarlo*) y
+**cero** para las siete palancas de mejor retorno que la auditoría cuantificó.
+
+Síntoma concreto: el único lugar del producto donde le hablamos de acción al cliente —el bloque
+"Qué revisar ahora" de `/growth/seo`— son **tres frases fijas de copy** que no leen un solo dato de
+ese cliente.
+
+### Tres defectos confirmados en producción (no son oportunidades)
+
+1. **`message_alignment` se calcula contra un posicionamiento que nunca se entrega al modelo.** 10
+   puntos del score client-facing salen de que el modelo infiera cuál es el "posicionamiento real".
+   El dato existe cacheado en `brand_intelligence.whatTheBrandDoes`. → `TASK-1698`.
+2. **El grader le compra a DataForSEO fuera del ledger** declarado como fuente única, y su
+   "presupuesto" cuenta corridas × USD 0,50 en vez de dólares: una org contratada puede gastar
+   USD 17,60/mes sin ningún gate. → `TASK-1696`.
+3. **14 deep imports (7 rutas) `growth/seo` → `ai-visibility`** contra una regla declarada en §17.3 de la
+   arquitectura del módulo, sin ninguna lint rule que lo vea. → `TASK-1697`.
+
+Y un **incidente**: un run terminado sin score mostró "El informe se está preparando… vuelve en unos
+minutos" **durante 15 días a Grupo Berel**. Estaba enterrado como Slice 1 de `TASK-1425` (P2,
+bloqueada). Se extrajo a **`ISSUE-155`**.
+
+### La regla motor propio vs proveedor (directiva del operador)
+
+**El motor propio gana los empates y gana donde alcanza; el proveedor gana donde mide mejor de
+verdad.** Prohibido elegir por inercia hacia cualquier lado.
+
+- **Comprar siempre:** posición SERP, volumen/dificultad/clickstream, backlinks de terceros, AI
+  Overviews (Google no expone API), crawl a escala, parseo de contenido, Core Web Vitals de campo.
+- **Construir siempre:** juicio de citabilidad por URL, exactitud de lo que la IA dice de la marca,
+  percepción en los cuatro chatbots. **No existe producto que lo venda.**
+- **Y el hallazgo que reconcilia ambos:** el proveedor **no compite con el motor propio, lo
+  abarata**. Parsear 100 URLs cuesta USD 0,015 y ahorra hasta USD 2,80 de tokens — retorno 28×–187×.
+  Regla operativa: *nunca le mandes a un modelo un byte que un parseo de USD 0,00015 podía haber
+  comprimido.*
+
+**Distinción que se graba como contrato** (`TASK-1703`): el **eje herramienta** (extracción, juicio
+interno) sí se abarata cambiando de modelo; el **eje cobertura** (qué motores se observan) NO — el
+92% del gasto del grader es OpenAI + Anthropic y eso es cobertura: cambiarlo es dejar de medir dos
+de los cinco motores mientras el número del reporte se ve igual de sano. La cobertura sólo se
+abarata por cadencia y muestreo (`TASK-1704`).
+
+### Decisiones de arquitectura adoptadas
+
+- **No hay "motor de medición canónico".** Dominios separados para siempre; se extrae un primitive
+  mucho más chico: `growth/site-substrate` (fetcher SSRF + parseo). **Regla: se comparte cómo se
+  OBTIENE la evidencia; nunca cómo se JUZGA.** Fusionar los scoring es una puerta de una sola
+  dirección — recalibrar SEO invalidaría reportes AEO ya entregados.
+- **La cola priorizada es un aggregate persistido**, no un reader en vivo, y su score son **clics
+  incrementales sobre la curva de CTR del propio sitio** — una unidad que el cliente puede verificar
+  en su propio Search Console. ⚠️ *Corregido 2026-08-15: la primera redacción decía «la única unidad»
+  y sugería que ninguna otra herramienta puede hacerlo. **Es falso**: Semrush, Ahrefs, SEOClarity,
+  Conductor y BrightEdge conectan Search Console y varias ya muestran quick wins con ganancia
+  proyectada. Lo diferenciable NO es la métrica —eso es table stakes— sino (a) que la curva de CTR
+  sale del **propio sitio** y no de una tabla de industria, lo que absorbe la depresión por AI
+  Overviews de ese vertical, y (b) que el **mismo score ordena cuatro orígenes distintos**, incluido
+  el gap AEO, dentro de la plataforma donde además viven la decisión, la acción y su resultado. Una
+  herramienta entrega una lista; no registra que la decidiste, quién, ni qué pasó después.*
+  **Prohibido ordenar por volumen estimado cuando
+  existe demanda medida**: es el invariante ●/◑ aplicado al ORDENAMIENTO, no sólo a la
+  visualización.
+- **La cola llega antes que `TASK-1669`.** Es el modo de falla #1: dos ordenamientos que discrepan y
+  un operador que ve un #1 en la pantalla y otro en el plan del día.
+
+### Carril nuevo — Instrumentación, sustrato y autoridad de orden (creado 2026-08-15)
+
+- `TASK-1696` — ledger con dimensión de consumidor + gate USD per-org del grader. **P0.** Nace en
+  shadow. Desbloquea todo lo que gaste.
+- `TASK-1697` — `growth/site-substrate` + barrel de dominio AEO + lint rule cross-domain. **P0.**
+- `TASK-1698` — posicionamiento declarado (`●`) / observado (`◑`) para `message_alignment`. **P0.**
+- `TASK-1699` — persistir el top-N del SERP que ya se paga. **P0.** *Único trabajo del plan con
+  costo de demora irrecuperable: el SERP de ayer sólo se recompra.*
+- `TASK-1700` — cola priorizada como aggregate persistido con score versionado. **P0.**
+- `TASK-1701` — `analyzeUrlContent`: hechos por URL, cero score.
+- `TASK-1702` — señales deterministas de citabilidad + recomendación anclada a URL.
+- `TASK-1703` — router cheap-first del eje herramienta (y el contrato herramienta/cobertura).
+- `TASK-1704` — cadencia y muestreo declarados: AIO no diario, N≥3 donde la calibración lo exige.
+- `TASK-1705` — cosecha de la capacidad OnPage ya pagada (USD 0, gratis 30 días post-crawl).
+- `TASK-1706` — el alta de keyword es un compromiso de gasto.
+- `TASK-1707` — rollout del re-grade recurrente multi-runtime.
+- `TASK-1708` — estacionalidad: la serie de 12 meses que ya viene en `keyword_info`.
+- `TASK-1709` — carril de diagnóstico de prospecto SEO. *100 diagnósticos ≈ USD 50.*
+
+### Tasks congeladas, con disparador nombrado (ninguna se mata)
+
+> **Corrección 2026-08-15:** el argumento hablaba de «7 tasks congeladas» incluyendo a `TASK-1311`.
+> **`TASK-1311` NO está congelada: fue ampliada** (alcance sube a URLs de terceros) y sigue P3 con
+> `Blocked by: none`. Las congeladas son **6** —`1312`-`1317`— más `TASK-1281`, que es de EPIC-020 y
+> entró al conteo por coincidencia numérica.
+>
+> 🔴 **Y el caso de `1311` es el opuesto al que contaba el argumento:** `TASK-1667` (P1) declara en su
+> contrato el campo **no-nullable** `categoryAnswerPages` producido por `1311`, la pone en Out of
+> Scope y **no la lista como blocker**. O `1667` entrega ese array siempre vacío —campo decorativo— o
+> está bloqueada de hecho por una P3. `1311` no necesita descongelarse: **necesita subir de prioridad,
+> o `1667` debe declarar ese campo degradable.** Lo mismo con `targetUrl`, producido por `TASK-1702`.
+
+| Tasks | Razón | Disparador para descongelar |
+|---|---|---|
+| `TASK-1281` | Su premisa está superada: Core Web Vitals se resuelve con CrUX gratis (campo) contra headless propio (lab, caro y peor) | Que la mitad **WebMCP**, que no tiene sustituto gratis, se demuestre necesaria sola |
+| `TASK-1315`/`1316`/`1317` | `1316` es un assessment LLM que **produce score**, y choca con el invariante adoptado (lo que puntúa es determinista). Cadena de 3 bloqueos en serie, toda P3, sin consumer visible | `TASK-1702` en producción **y** re-escritura con los pilares como juicio `◑` que no mueve ningún número |
+| `TASK-1312`/`1313`/`1314` | El cluster **declarado** traslada el cuello de botella humano a la capa de cluster: con 8 cuentas esa curación no ocurre nunca, y `1314` —donde está el valor— queda bloqueada detrás de ella. La mitad barata (agrupación derivada) se extrae al contrato de candidatos y a la cola | Cierre del carril editorial con volumen real de work items |
+
+### Contratos a declarar antes de escribir código
+
+Cinco son puertas de una sola dirección: `priority_score_version` + `score_breakdown_json` en el
+**primer** slice de la cola · vocabulario cerrado de `origin` (CHECK) + `evidence_ref` opaca ·
+`consumer` + `cost_basis` + `price_table_version` en el ledger · `analyzeUrlContent` emite hechos y
+cero score · la carta de `site-substrate` (no importa `growth/*`, no persiste nada). Los tres
+restantes: contra qué posicionamiento juzga `message_alignment` y su marca de procedencia · política
+de bump de versión del cerebro AEO (**hay tres bumps en vuelo**: `1698`, `1695`, `1703`, y cada uno
+invalida el golden set) · la distinción eje-cobertura / eje-herramienta.
+
+### Higiene documental que sale de la auditoría
+
+`docs/context/06_glosario-metricas.md:77,224` declara **Otterly.ai** —la herramienta de un
+competidor— como *fuente de verdad* del AEO Citation Rate, y ese contrato de métricas viaja a
+propuestas y SOWs. Retirarlo cuesta cero. **Y el margen de Berel: el bloqueo estaba MAL DECLARADO** (corregido 2026-08-15 tras verificación
+contra la base real). No falta construir nada: la capa V0 está **viva y fresca** —
+`client_labor_cost_allocation`, `member_capacity_economics` (materializada el 2026-08-15 14:02),
+`client_economics`, su reader y el write path de asignaciones en `/agency/team`—. La prueba: en el
+mismo período, **Sky Airline rinde 59,97% de margen bruto con 3,00 FTE** y Berel rinde labor 0 porque
+**tiene cero filas en `client_team_assignments`**. Falta escribir 3-4 filas desde una UI que ya
+existe: **1-2 horas de captura operativa, no una task**.
+
+Y la decisión de precio **ni siquiera lo necesita**: el punto de quiebre del piso de 45% está en
+**1,93 FTE dedicados**, unas 11× la huella de entrega observada (con overhead a full absorption,
+0,98 FTE, todavía 5,7×). **La decisión es robusta a un error de 5× en la estimación**, así que
+desagregar y cobrar la línea AEO (+31% de ingreso sobre la cuenta contra USD 4,9 de costo
+incremental) **está desbloqueado hoy**.
+
+⚠️ **Trampa al capturar:** la VIEW prorratea por FTE y excluye los assignments a Efeonce del
+denominador. Agregarle Berel a alguien que hoy tiene Sky 1,0 sube su `total_fte` y **baja
+artificialmente el costo laboral de Sky ~17%**. No es un bug: es la aritmética del modelo. Hay que
+recomputar y comunicar **ambos clientes juntos**, o alguien va a leer "Sky mejoró" y estará leyendo
+humo.
+
+### Acción operativa pendiente — captura de FTE de Berel (NO es una task)
+
+**Qué:** declarar 3-4 asignaciones de personas a Grupo Berel
+(`cli-0863869c-eaac-4630-9bd0-af283c56f7fb`) desde `/agency/team` → `AssignMemberDrawer`
+(`POST /api/admin/team/assignments`, UI y write path ya existentes).
+
+**Por qué no es una task:** no hay nada que construir. El motor corre, está fresco, y produce el
+margen de Sky en el mismo período. Falta el insumo, no la maquinaria.
+
+**Quién:** cuenta/delivery de Berel declara el FTE por persona; Finance verifica el recompute.
+**Insumo para decidir el FTE:** el reparto real de tareas de julio 2026 en `greenhouse_delivery.tasks`
+(274 tareas de Berel desde junio; en julio Daniela 53 de sus 497, Julio Reyes 8 de 12, María Fernanda
+1 de 36) traducido con `fte_hours_guide`. **No** hay captura de horas en el sistema y no debe
+construirse: el modelo canónico pide **FTE declarado**, no horas.
+**Esfuerzo:** 1-2 horas. **Sin código.**
+
+**El recompute se dispara solo:** `assignment.created` / `assignment.updated` / `assignment.removed`
+ya están en `CLIENT_ECONOMICS_TRIGGER_EVENTS` (`src/lib/sync/projections/client-economics.ts:155-161`)
+y la lane reactiva `ops-reactive-cost-intelligence` corre cada 10 min. No hace falta llamar ningún
+cron a mano.
+
+🔴 **Comunicar Sky en el mismo movimiento** (ver la trampa del denominador arriba).
+
+⚠️ **Y leer el resultado con el asterisco de `ISSUE-157`:** el margen que salga es **bruto sin
+absorción de overhead**, porque la distribución está en cero desde mayo. El umbral real del piso de
+45% no es 1,93 FTE sino ~0,98 con overhead al último nivel conocido.
+
+### Lo que la auditoría NO autoriza
+
+No cambia el estado `validation_only` del epic ni su `Non-goal` de venderlo como producto autónomo.
+No autoriza fusionar scores SEO y AEO en un número único: **la ortogonalidad es lo que se vende**
+—rankear #1 sin ser citado es la señal, no el ruido—. No autoriza prometer comparativa competitiva
+(`seo_competitors` sigue sin consumidores), tendencia de citación IA (**no** porque el re-grade esté
+pausado —**no lo está**, `deploy.sh` lo declara `true` en ambos entornos— sino porque falta el
+command que inscribe perfiles: `recurring_regrade_enabled` no tiene writer), ni atribución de
+ingresos a citación en IA (no existe el modelo).

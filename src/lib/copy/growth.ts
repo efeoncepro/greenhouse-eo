@@ -2314,6 +2314,392 @@ export const GH_GROWTH_SEO_KEYWORDS = {
     viewingSubset: 'Viendo {count} de {total}'
   },
 
+  /**
+   * TASK-1665 — lente `Descubrir`.
+   *
+   * Tres reglas de tono que gobiernan todo este bloque, porque la pantalla compromete plata:
+   *
+   * 1. **Nunca prometer tráfico, ranking ni clientes.** Se descubre demanda y se decide qué
+   *    investigar; lo que pase después no lo controla esta pantalla.
+   * 2. **"Descubrir" ≠ "seguir".** Una sugerencia es una hipótesis; seguirla activa gasto
+   *    recurrente. El copy de cada acción dice su consecuencia exacta, y por eso hay tres verbos
+   *    distintos en vez de un "Agregar" ambiguo.
+   * 3. **La ausencia de dato se nombra, no se rellena.** Nunca `0`, nunca `—` ambiguo, nunca un
+   *    score inventado: "Sin dato de mercado" dice la verdad y deja decidir con eso.
+   */
+  discovery: {
+    lensLabel: 'Descubrir',
+    lensAriaLabel: 'Lentes de keywords',
+    lensOpportunities: 'Oportunidades',
+
+    title: 'Descubrir keywords',
+    subtitle: 'Encuentra términos relacionados a partir de seeds y decide qué hacer con cada uno.',
+
+    builder: {
+      ariaLabel: 'Configuración de la corrida de descubrimiento',
+
+      seedsLabel: 'Seeds para investigar',
+      seedsHelper: 'Una por línea. Una seed es un punto de partida, no una keyword que se empiece a medir.',
+      seedsPlaceholder: 'ej. pintura industrial',
+      seedsCounter: '{count}/{max} seeds',
+      seedsDuplicateRemoved: 'Se quitó {count} duplicado',
+      seedsDuplicatesRemoved: 'Se quitaron {count} duplicados',
+      seedsErrorEmpty: 'Agrega al menos una seed.',
+      seedsErrorTooMany: 'Reduce la lista a {max} seeds.',
+      seedsErrorTooLong: 'La seed "{seed}" es muy larga. Máximo {max} caracteres.',
+      seedsErrorTooManyWords: 'La seed "{seed}" tiene demasiadas palabras. Máximo {max}.',
+
+      sourcesLabel: 'Fuentes de seed',
+      sourceGsc: 'Consultas medidas',
+      sourceGscHelper: 'Consultas reales de tu Search Console de los últimos 28 días. Sin costo de proveedor.',
+      sourceGscUnavailable: 'No hay consultas medidas',
+      sourceTracked: 'Keywords seguidas',
+      sourceTrackedHelper: 'Términos que ya monitoreas. No crea seguimiento nuevo.',
+      sourceTrackedUnavailable: 'Todavía no sigues keywords',
+      sourceManual: 'Seeds escritas',
+      sourceManualHelper: 'El texto que ingresaste como punto de partida.',
+      sourceDomain: 'Dominio propio',
+      sourceDomainHelper: 'Busca keywords asociadas al dominio. Usa datos estimados y tiene costo.',
+
+      methodsLabel: 'Métodos de expansión',
+      methodsHelper: 'Hasta {max}. Definen cómo se amplía cada seed.',
+      methodSuggestions: 'Sugerencias',
+      methodSuggestionsHelper: 'Frases que contienen tu seed con términos añadidos.',
+      methodRelated: 'Relacionadas',
+      methodRelatedHelper: 'Búsquedas relacionadas del índice del proveedor.',
+      methodIdeas: 'Ideas',
+      methodIdeasHelper: 'Términos de la misma categoría. Amplía mucho el resultado.',
+      methodsErrorEmpty: 'Elige al menos un método.',
+
+      marketLabel: 'Mercado',
+      marketHelper: 'Heredado del sitio configurado.',
+
+      scopeLabel: 'Alcance',
+      scopeQuick: 'Rápido · 25 filas',
+      scopeFull: 'Completo · 50 filas',
+      scopeHelper: 'Filas solicitadas por método. "Completo" no significa exhaustivo.',
+
+      submit: 'Descubrir keywords',
+      submitAriaLabel: 'Iniciar la corrida de descubrimiento',
+      submitPending: 'Encolando…'
+    },
+
+    cost: {
+      ariaLabel: 'Costo estimado de la corrida',
+      heading: 'Antes de confirmar',
+      calls: '{count} llamadas estimadas',
+      rows: 'Hasta {count} filas solicitadas',
+      /*
+       * ⚠️ Sin `◑` en las cifras de costo, a propósito.
+       *
+       * `◑` está definido en la leyenda del canvas como «estimado de mercado · DataForSEO Labs»:
+       * es un marcador de PROCEDENCIA de un dato de mercado, no un genérico de «aproximado».
+       * Ponérselo a un monto en dólares —peor todavía al costo REAL que devolvió el proveedor—
+       * le enseña al operador que `◑` significa «número con incertidumbre», y ahí muere la
+       * distinción `◑` estimado / `●` medido que el resto del pipeline sostiene con rigor.
+       * Para el estimado basta la palabra: ya dice «estimado».
+       */
+      estimate: 'Costo máximo estimado US${amount}',
+      estimateFree: 'Sin costo de proveedor',
+      budget: 'Presupuesto disponible US${amount}',
+      budgetUnavailable: 'Cupo no disponible',
+      formula: 'Fórmula: {formula}',
+
+      /*
+       * 🔴 El rebote del enqueue se dice ACÁ, no «en la banda de estado».
+       *
+       * Cuando el command rechaza la corrida no se inserta NINGUNA fila: la banda de estado sigue
+       * mostrando la corrida anterior o nada. Si el error se traga, el operador ve un botón en
+       * rojo sin razón y no distingue «cupo agotado» (no reintentes) de «proveedor caído»
+       * (reintenta después). El servidor ya fabricó la prosa es-CL exacta; se muestra tal cual.
+       */
+      submitErrorFallback: 'No pudimos iniciar la corrida. Intenta de nuevo.',
+      submitErrorRetryHint: 'Puedes reintentar.',
+      submitErrorStructuralHint: 'Reintentar no lo resuelve: revisa el cupo o pide ayuda al equipo.',
+
+      disclaimer:
+        'Los datos de mercado son estimados y la corrida puede quedar parcial. Seguir una keyword después genera gasto recurrente y pide otra confirmación.',
+      announce: 'Costo estimado actualizado: {calls} llamadas, hasta US${amount}.',
+      calculating: 'Calculando el costo…'
+    },
+
+    disabledReason: {
+      flag: 'El descubrimiento todavía no está habilitado para esta organización.',
+      permission: 'Puedes revisar las corridas, pero no iniciar una nueva. Pídele acceso a Growth.',
+      noSeeds: 'Agrega al menos una seed para estimar el costo.',
+      noMethods: 'Elige al menos un método de expansión.',
+      noTarget: 'Este Space todavía no tiene un sitio configurado.',
+      budget: 'El cupo del período no alcanza para esta corrida.'
+    },
+
+    run: {
+      ariaLabel: 'Estado de la corrida',
+      lastRun: 'Última corrida',
+      runId: 'Corrida {id}',
+      queuedTitle: 'Corrida en cola',
+      queuedDetail: 'Se ejecuta fuera de esta pantalla. Puedes salir y volver.',
+      queuedAnnounce: 'La corrida quedó en cola.',
+      runningTitle: 'Investigando seeds',
+      runningDetail: 'Procesando la corrida.',
+      runningDetailStage: 'Procesando {stage}.',
+      runningAnnounce: 'La corrida está procesando.',
+      runningIndicatorAria: 'La corrida sigue en curso',
+      succeededTitle: 'Corrida completada',
+      // Sin `◑`: este monto es lo que el proveedor efectivamente cobró (campo `cost` de su
+      // respuesta). Marcarlo como «estimado de mercado» contradice su propio label.
+      succeededDetail: '{count} candidatos · costo real US${amount}',
+      succeededAnnounce: 'La corrida terminó con {count} candidatos.',
+      partialTitle: 'Corrida parcial',
+      partialDetail: 'Una fuente no terminó. Lo que sí se materializó está abajo.',
+      partialAnnounce: 'La corrida terminó parcialmente.',
+      noResultsTitle: 'No encontramos candidatos',
+      noResultsDetail: 'La respuesta fue válida pero no trajo términos. Prueba otras seeds o método.',
+      noResultsAnnounce: 'La corrida terminó sin candidatos.',
+      budgetBlockedTitle: 'Corrida detenida por cupo',
+      budgetBlockedDetail: 'Se alcanzó el límite de gasto del período. Reduce el alcance o espera al próximo.',
+      budgetBlockedAnnounce: 'La corrida se detuvo por cupo.',
+      providerErrorTitle: 'No pudimos completar la corrida',
+      providerErrorDetail: 'El proveedor no respondió. Puedes iniciar una corrida nueva.',
+      providerErrorAnnounce: 'No pudimos completar la corrida.',
+      staleTitle: 'Datos anteriores',
+      staleDetail: 'Capturados el {date}. Inicia una corrida nueva para actualizarlos.',
+      retry: 'Nueva corrida',
+      refresh: 'Actualizar estado',
+      viewResults: 'Ver candidatos',
+      methodDone: '{method} ✓',
+      methodFailed: '{method} — no terminó',
+      methodSkipped: '{method} — sin ejecutar'
+    },
+
+    empty: {
+      title: 'Todavía no has hecho una corrida',
+      description:
+        'Escribe una o más seeds arriba y elige cómo expandirlas. Vas a ver el costo estimado antes de confirmar.',
+      noTargetTitle: 'Este Space no tiene un sitio configurado',
+      noTargetDescription: 'Configura el sitio y su mercado para poder investigar keywords.'
+    },
+
+    /**
+     * Canvas de candidatos.
+     *
+     * 🔴 La columna se llama **"Barrera de enlaces"**, jamás "Dificultad" (ISSUE-152): el índice
+     * crudo del proveedor colapsa a 0 en SERPs es-LATAM y un "0" se lee como "trivial", que es
+     * falso. Se muestra el NIVEL de lo que la métrica realmente mide, y `unknown` es "Sin dato",
+     * nunca "Baja" — un hueco presentado como barrera baja afirma una oportunidad que nadie midió.
+     */
+    results: {
+      title: 'Candidatos',
+      ariaLabel: 'Candidatos de la corrida',
+      count: '{count} candidatos',
+
+      /*
+       * ⚠️ El conteo afirma el universo; la tabla sirve una página. Cuando no coinciden hay que
+       * DECIRLO: «Candidatos (312)» sobre 50 filas, sin aviso, es mentira por omisión justo en el
+       * canvas donde se decide. El orden gobernado del reader pone primero lo que más importa,
+       * así que la página servida es la buena — pero no es todo, y eso se nombra.
+       * La paginación real (consumir `nextCursor`) es de TASK-1693.
+       */
+      countTruncated: '{shown} de {count} candidatos',
+      truncatedNotice:
+        'Se muestran los {shown} candidatos de mayor prioridad de {count}. El resto queda en la corrida y se podrá recorrer cuando la lente tenga paginación.',
+
+      colKeyword: 'Keyword',
+      colSource: 'Procedencia',
+      colCluster: 'Agrupador',
+      colIntent: 'Intención',
+      colVolume: 'Volumen',
+      colBarrier: 'Barrera de enlaces',
+      colPresence: 'Presencia propia',
+      colState: 'Estado',
+
+      measuredMarker: '● Medido por Search Console',
+      estimatedMarker: '◑ Estimado de mercado · DataForSEO Labs',
+      legend: '● Medido por Search Console · ◑ Estimado de mercado. No se promedian.',
+
+      volumeUnit: '{value}/mes',
+      /*
+       * ⚠️ DOS fechas distintas, dos frases distintas.
+       *
+       * `asOf` es el as-of del PROVEEDOR: cuándo actualizó su snapshot de volumen. `asOfCaptured`
+       * es cuándo lo trajimos nosotros. Cuando el proveedor no declara su fecha, decir «al
+       * {captura}» presenta nuestra fecha como si fuera la del dato — dos hechos distintos bajo el
+       * mismo label. El drawer ya los separa con labels propios; la tabla es donde se decide en
+       * volumen, así que acá también tienen que distinguirse.
+       */
+      asOf: 'al {date}',
+      asOfCaptured: 'traído el {date}',
+
+      noMarketData: 'Sin dato de mercado',
+      noIntent: 'Sin dato de intención',
+      noCluster: 'Sin agrupador',
+      noPresence: 'Sin medición propia',
+      notInSeries: 'No aparece en la serie',
+      position: 'Posición {value}',
+
+      sourceManual: 'Seed manual',
+      sourceGsc: 'GSC medido',
+      sourceTracked: 'Keyword seguida',
+      sourceSuggestions: 'Sugerencias',
+      sourceRelated: 'Relacionadas',
+      sourceIdeas: 'Ideas',
+      sourceDomain: 'Dominio propio',
+
+      barrierLow: 'Baja',
+      barrierMedium: 'Media',
+      barrierHigh: 'Alta',
+      barrierUnknown: 'Sin dato',
+      barrierLowHint: 'Se compite con contenido y autoridad, no con enlaces. No significa fácil.',
+
+      intentInformational: 'Informativa',
+      intentNavigational: 'De navegación',
+      intentCommercial: 'Comercial',
+      intentTransactional: 'Transaccional',
+
+      stateNew: 'Nuevo',
+      stateTracked: 'Ya seguido',
+      stateDismissed: 'Descartado',
+      statePreparingAeo: 'Preparando AEO',
+      stateSelectedForTarget: 'Marcado como objetivo',
+
+      seedTrace: 'Seed: {seed}',
+      emptyFiltered: 'Ningún candidato coincide con los filtros.',
+
+      colActions: 'Detalle',
+      openDetail: 'Detalles',
+      openDetailAria: 'Ver el detalle de {keyword}',
+
+      trackingCostNotice:
+        'Seguir cualquiera de estos términos compromete gasto recurrente: el rank capture diario le paga al proveedor por cada keyword vigente hasta que la dejes de seguir.'
+    },
+
+    /**
+     * TASK-1665 Slice 4 — detalle del candidato y sus decisiones.
+     *
+     * 🔴 El drawer responde "¿cómo llegó esto acá?" ANTES de ofrecer gastar. El orden del
+     * wireframe (R4 §Contenido) no es estético: procedencia → mercado → medición propia →
+     * advertencia → acciones. Poner las acciones arriba invitaría a decidir sin leer en qué
+     * se basa la decisión.
+     */
+    drawer: {
+      eyebrow: 'Candidato',
+      closeLabel: 'Cerrar el detalle',
+
+      provenanceTitle: '¿Cómo llegó acá?',
+      provenanceChain: '{seed} → {method} → corrida del {date}',
+      provenanceNoSeed: 'Sin seed registrada',
+      provenanceRank: 'Puesto {rank} en la respuesta del proveedor',
+      marketTitle: 'Mercado consultado',
+      capturedAtLabel: 'Capturado el {date}',
+      providerUpdatedLabel: 'El proveedor actualizó el dato el {date}',
+
+      marketDataTitle: 'Estimado de mercado',
+      marketDataHint:
+        'Son estimaciones mensuales del proveedor sobre el mercado publicitario, no visitas medidas de tu sitio.',
+      volumeLabel: 'Volumen de búsqueda',
+      barrierLabel: 'Barrera de enlaces',
+      barrierHint:
+        'Nivel derivado de la diversidad de dominios que enlazan al top 10, no del índice crudo de dificultad.',
+      intentLabel: 'Intención estimada',
+      clusterLabel: 'Agrupador',
+      cpcLabel: 'CPC de referencia',
+      /** Sí lleva `◑`: el CPC es un estimado de mercado del proveedor, no un monto que pagamos. */
+      cpcValue: '◑ USD {amount}',
+      cpcHint: 'Precio publicitario, no costo de posicionarse.',
+      /** Ausencia de fecha en una fila del drawer: nunca un placeholder mudo. */
+      dateUnknown: 'Sin fecha',
+
+      measuredTitle: 'Medición propia',
+      measuredHint: 'Lo que Search Console midió para tu sitio en este término.',
+      positionLabel: 'Posición promedio',
+      impressionsLabel: 'Impresiones',
+
+      warningTitle: 'Sugerencia no significa seguimiento',
+      warningBody:
+        'Este término está acá porque el proveedor lo relacionó con tus seeds. Nadie lo está midiendo todavía: eso ocurre recién cuando lo sigues, y desde ahí genera gasto en cada ciclo.',
+
+      actionsTitle: 'Qué quieres hacer',
+      noActionsTitle: 'Sin acciones disponibles',
+      noActionsBody: 'Puedes leer el detalle, pero no tienes permiso para comprometer gasto ni preparar consultas.',
+
+      trackedTitle: 'Ya lo estás siguiendo',
+      trackedBody: 'Este término ya está en el seguimiento diario. Revisa su trayectoria en Rendimiento.'
+    },
+
+    /**
+     * Acciones gobernadas. Cada una nombra su CONSECUENCIA, no su mecánica: el operador no
+     * necesita saber qué endpoint se llama, necesita saber qué le va a pasar a la factura.
+     */
+    actions: {
+      declareTarget: 'Declarar objetivo',
+      declareTargetHint: 'Lo incorpora al seguimiento diario y lo marca como una posición que buscas ocupar.',
+      declareTargetConfirm:
+        'Declarar este objetivo lo incorpora al seguimiento diario y puede generar costo recurrente. Revisa el cupo antes de confirmar.',
+
+      followOpportunity: 'Seguir oportunidad',
+      followOpportunityHint: 'Lo incorpora al seguimiento diario sin declararlo como posición buscada.',
+      followOpportunityConfirm: 'Seguir esta oportunidad la incorpora al seguimiento diario. No es sólo guardar la idea.',
+
+      prepareGrounded: 'Preparar grounded queries',
+      prepareGroundedHint: 'Crea un borrador de consultas AEO para revisión humana.',
+      prepareGroundedConfirm:
+        'Preparar consultas crea un borrador AEO para revisión. No activa el set ni ejecuta una corrida.',
+
+      dismiss: 'Descartar',
+      dismissHint: 'Registra tu decisión sin borrar la evidencia.',
+      dismissConfirm: 'Descartar sólo registra tu decisión; no borra la evidencia.',
+
+      viewTrajectory: 'Ver trayectoria',
+      viewTrajectoryHint: 'Abre Rendimiento con este término. No genera gasto.',
+
+      confirmCta: 'Confirmar',
+      cancelCta: 'Cancelar',
+      confirmTitle: 'Confirma la decisión',
+      pendingLabel: 'Procesando…',
+
+      capacityNotice: 'Cupo del seguimiento: {used} de {capacity} términos.',
+
+      /**
+       * 🔴 El feedback es POR keyword, jamás un «Listo» agregado.
+       *
+       * Los outcomes son los del command real (`tracked | already_tracked | intent_changed |
+       * capacity_exceeded | invalid`), NO los del borrador del flow (`declared` /
+       * `already_target`, que nunca existieron en `trackKeywords`). Un 200 con la keyword
+       * rebotada por techo es un resultado que hay que leer, no un éxito.
+       */
+      feedbackTracked: 'Listo: ahora sigues «{keyword}».',
+      feedbackTargetDeclared: 'Listo: «{keyword}» quedó declarada como objetivo.',
+      feedbackAlreadyTracked: 'Ya seguías «{keyword}». No se agregó de nuevo ni se duplicó el gasto.',
+      feedbackIntentChanged: 'Cambiaste la clasificación de «{keyword}». No consume cupo nuevo.',
+      feedbackCapacityExceeded: 'No se agregó «{keyword}»: el seguimiento llegó a su cupo. Deja de seguir algo antes.',
+      feedbackInvalid: 'No se pudo usar «{keyword}»: el término no cumple el formato del proveedor.',
+      feedbackDismissed: 'Descartaste «{keyword}». Queda registrado en la bitácora.',
+      feedbackGroundedDraft: 'Se creó el borrador AEO con «{keyword}». Revísalo antes de activarlo.',
+      feedbackGroundedFallback:
+        'Se creó el borrador base con «{keyword}», sin el modelo: revísalo con más atención antes de activarlo.',
+
+      /*
+       * 🔴 `coverageNotice` viaja OBLIGATORIO desde el bridge (TASK-1666): un draft `grounded_llm`
+       * con huecos JAMÁS se presenta como cobertura total. Omitirlo acá anunciaría éxito pleno
+       * sobre un borrador que dejó candidatos afuera — exactamente lo que el primitive prohíbe.
+       */
+      feedbackGroundedPartial:
+        'Se creó el borrador AEO con «{keyword}», pero quedó con cobertura incompleta: {notice}',
+      /** Reutilizar un draft vigente NO es crear uno nuevo; decir «se creó» escondería el no-op. */
+      feedbackGroundedDeduped:
+        'Ya existía un borrador AEO vigente con «{keyword}». Se reutilizó, sin generar uno nuevo.',
+
+      feedbackError: 'No se pudo completar la acción sobre «{keyword}».',
+
+      /** Una acción en vuelo bloquea las demás: dos decisiones de gasto en paralelo sobre la
+       *  misma keyword dejan el orden de escritura al azar. */
+      busyHint: 'Hay una acción en curso. Espera a que termine.',
+
+      disabledGroundedNoProfile: 'Este Space todavía no tiene un perfil AEO configurado.',
+      disabledGroundedNoPermission: 'No tienes permiso para gestionar consultas AEO.',
+      disabledGroundedFlag: 'El módulo AEO está apagado en este ambiente.'
+    }
+  },
+
   states: {
     emptyNoOpportunities: {
       title: 'Todavía no hay oportunidades',

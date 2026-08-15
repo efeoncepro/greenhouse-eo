@@ -159,6 +159,7 @@ mueve, y este es el orden"* sí.
 | 🎯 **El arsenal Y CÓMO SE USA CADA ACTIVO** — la cadena Semrush → Grader → Fix-It → reporte → portal *(auditado contra el repo)* | **`modules/12_ACTIVOS.md`** |
 | 🔴 **El estado real de la práctica** — Berel, SKY, el Grader, **cero casos citables** | **`efeonce/ESTADO_ACTUAL.md`** |
 | **Qué se puede afirmar y con qué evidencia** *(+ § Datos que NO se citan)* | **`SOURCES.md`** |
+| 🔴 **BENCHMARK de la competencia** *(set de 4 archivos; entra siempre por el principal, que es el índice)* — lo que **NO** podemos decir (**F-01…F-14**), lo que **SÍ** (**S-01…S-11**), **lo que descubrió sobre nosotros** (N-01…N-06) y los **errores que circulan**. **Cárgalo ANTES de escribir cualquier diferenciador técnico, de citar cobertura LATAM, precio de competencia o robustez de medición.** `as-of 2026-08-15`, **caduca 2026-11-15** | **`references/BENCHMARK_SUITES_AEO_2026-08.md`** → hermanos: `BENCHMARK_METODOS_TRANSPARENCIA_2026-08.md` · `BENCHMARK_VENDORS_PUREPLAYS_2026-08.md` · `BENCHMARK_VENDORS_INCUMBENTES_2026-08.md` · `BENCHMARK_PRECIOS_LATAM_2026-08.md` |
 
 | 🔴 **Lo que NUNCA se hace** *(+ los bugs vivos de Efeonce marcados 🩸)* | **`ANTIPATTERNS.md`** |
 | **El vocabulario de la práctica** *(loaded cost, piso, la cuña, la cicatriz, el puente…)* | **`GLOSSARY.md`** |

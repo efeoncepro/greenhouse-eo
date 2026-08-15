@@ -4,6 +4,98 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-15 — Objetivos NO es una cola de prioridad, y el criterio de "destacar" está roto para lo que esta lente declara
+
+Origen: `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md` (§3.1 brecha S1,
+§5.2 y §5.5 red-team). Tres cosas, y la tercera es un hallazgo de oficio con evidencia en código.
+
+**1. Invariante nuevo: la lente `Objetivos` no compite con `readSeoWorkQueue`.**
+
+Un objetivo declarado en posición 60 es **distancia por recorrer**, no urgencia. La lente Objetivos
+responde *"¿avanzamos contra lo que le prometimos al cliente?"*; la cola priorizada (`TASK-1700`)
+responde *"¿qué hago hoy?"*. Son preguntas distintas y **no se ordenan con el mismo criterio ni se
+promedian entre sí**. Sin decirlo explícitamente, esta lente se convierte en **la quinta lista con
+el quinto criterio** —después de Oportunidades, Descubrir, el gap AEO y la cola— y el operador ve un
+"#1" distinto en cada pantalla. El invariante queda escrito en `Architecture Alignment` y en
+`### Data model and invariants`.
+
+**2. `Blocks` += `TASK-1667`, y `TASK-1669` ya la declara en sus `Depends on`.**
+
+`TASK-1667` (work item editorial → Content Factory) necesita saber **de dónde viene el compromiso**:
+un brief nacido de un objetivo declarado por el cliente no es lo mismo que uno nacido de una
+oportunidad detectada, y esa procedencia sólo la conoce esta lente, que es la dueña de
+`intent = 'target'` con su autoría y su fecha. `TASK-1669` (plan diario agéntico) la declara en sus
+`Depends on` por la misma razón.
+
+**3. Hallazgo de oficio — un objetivo en posición 60 es estructuralmente imposible de destacar, y
+entra al promedio como fracaso permanente.**
+
+Dos hechos verificados:
+
+- **El 100% de la población seguida tiene `intent = NULL`** (`[verificar]` el conteo exacto en
+  Discovery contra PG). Es coherente con el Delta 2026-08-14: la columna nació el 2026-08-14 y el
+  command no tiene default. O sea: hoy no hay ni un objetivo declarado, y el primero que se declare
+  estrena el defecto entero.
+- **`selectFeaturedRankSeries`** (`src/lib/growth/seo/client/select-featured-series.ts`) elige las
+  series a destacar **ordenando por MEJOR POSICIÓN** (`latestPosition` ascendente, sin dato →
+  `+Infinity` al final) y corta en 5. Sus consumers son la cara del cliente:
+  `src/views/greenhouse/growth/seo/client/SeoRankEvolutionChart.tsx` y
+  `src/components/growth/seo/report-artifact/print/SeoReportPrint.tsx`.
+
+Combinados: un objetivo declarado en la 60 **nunca** puede ser destacado —siempre habrá cinco
+keywords mejor posicionadas—, así que es invisible en el chart y en el reporte impreso, y a la vez
+**sí** entra a cualquier agregado de posición como si fuera un fracaso permanente. Destacamos justo
+lo que ya ganamos y escondemos lo que estamos persiguiendo, que es exactamente lo que el cliente
+acordó perseguir.
+
+🔴 **Corrección que esta task incorpora: la serie destacada se ordena por CLICS EN JUEGO — el mismo
+score que usa la cola priorizada (`TASK-1700`): clics incrementales sobre la propia curva de CTR.**
+No por mejor posición, no por un criterio propio de esta lente. **Un criterio, en todas partes.**
+Y sigue siendo cierto que esta lente no es la cola: reusar el score para **elegir qué mostrar** no la
+convierte en un ranking de urgencia — el orden de la tabla de Objetivos sigue siendo avance contra
+compromiso.
+
+## Delta 2026-08-14 — el conmutador de lentes YA EXISTE: no lo construyas de nuevo
+
+Cerrado por `TASK-1665` (code complete el 2026-08-14). Esta task suponía que había que crear la
+selección de lente; ya está hecha y su forma es contrato, no sugerencia:
+
+- **`KeywordLensTabs`** (`src/views/greenhouse/admin/growth/seo/keywords/KeywordLensTabs.tsx`) es el
+  conmutador. Agregar `Objetivos` es sumar una entrada, **no** escribir un componente hermano.
+- La lente se selecciona con **`?view=`** allowlisted en `page.tsx` (`opportunities` es el default,
+  así que `/keywords` pelado sigue significando lo mismo). El valor nuevo es `targets`, y el helper
+  de query **debe propagar `space` y `view`** — perder `space` al cambiar de lente manda al operador
+  al primer Space elegible sin avisar.
+- 🔴 **`CustomTabsNav role='navigation'` + `<Tab component={Link}>`, NUNCA el `TabList` de
+  `@mui/lab`.** El `TabList` clona `aria-controls` hacia TabPanels que no existen: violación axe
+  crítica. La sección `Surface & system decision` de esta task todavía dice sólo "`CustomTabsNav`";
+  esa es la forma exacta.
+- El link **"Ver en Objetivos"** del drawer de descubrimiento **no se renderiza hoy** porque esta
+  lente no existe. Al implementarla, ese enlace es parte del alcance de cierre: revisar
+  `KeywordDiscoveryCandidateDrawer.tsx` y `keyword-discovery-action.ts`.
+- Reclasificar la intención de una membresía vigente (`intent_changed`) quedó **fuera** del drawer de
+  descubrimiento a propósito: `Ya seguido` no ofrece seguir de nuevo, y el DTO de candidatos no trae
+  la intención actual. **Esa reclasificación es de esta lente**, que sí conoce el estado vigente.
+
+## Delta 2026-08-14 — TASK-1659 complete: desbloqueada
+
+El modelo de intención existe y está verificado contra PG real. Lo que esta task puede dar por
+sentado al implementar la lente `Objetivos`:
+
+- `trackKeywords(seoTargetId, keywords, actor, { intent: 'target', intentDeclaredBy? })` — la
+  intención NO tiene default: si esta lente no la declara, la membresía queda `NULL`, no
+  `opportunity`.
+- Declarar un objetivo sobre una keyword ya seguida como oportunidad devuelve el outcome
+  **`intent_changed`** (no `already_tracked`), cierra la membresía anterior y abre otra. Ese
+  historial —`intent_declared_at` de cada ventana— es la fuente de "objetivo desde marzo"; el Δ
+  contra la primera medición POSTERIOR que pide esta task se calcula desde ahí, no desde
+  `effective_from` de la fila vigente.
+- El cambio de intención **no consume cupo**, así que la UI no debe presentarlo como si gastara
+  un slot del techo.
+- Las keywords seguidas antes de 2026-08-14 tienen `intent = NULL`. La lente debe mostrar ese
+  estado como "sin intención declarada" y NUNCA contarlas como objetivos ni como oportunidades.
+- El reader de la lente todavía no existe: `readKeywordTargets` es trabajo de esta task.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -22,7 +114,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth`
-- Blocked by: `TASK-1659`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -74,6 +166,17 @@ Reglas obligatorias:
   mismatch de hidratación de `useId` documentado en `TASK-1657`.
 - Estados honestos: una posición desconocida **nunca** se pinta como `0` ni como `—` ambiguo.
 - Lookup de primitive antes de construir: `CustomTabsNav`, `DataTableShell`, `AppECharts` existen.
+- 🔴 **La lente `Objetivos` NO es una cola de prioridad y no compite con `readSeoWorkQueue`**
+  (`TASK-1700`). Un objetivo declarado en posición 60 es **distancia por recorrer**, no urgencia:
+  esta lente mide avance contra un compromiso, no qué hacer hoy. **NUNCA** ordenar la tabla de
+  Objetivos por un score de prioridad, **NUNCA** mezclar sus filas con las de la cola, **NUNCA**
+  promediar objetivos con oportunidades en un mismo agregado. Si esta lente inventa su propio
+  ranking, el módulo pasa a tener cinco listas con cinco criterios y cinco "#1" distintos.
+- 🔴 **Un criterio para destacar, en todas partes.** Cuando haya que elegir un subconjunto de series
+  para el chart (o para el reporte), el criterio es **clics en juego** —el mismo score de la cola:
+  clics incrementales sobre la propia curva de CTR—, jamás la mejor posición. Ordenar por mejor
+  posición hace estructuralmente indestacable a todo objetivo lejano, que es justamente lo que esta
+  lente existe para mostrar.
 
 ## Normative Docs
 
@@ -92,6 +195,17 @@ Reglas obligatorias:
 
 ### Blocks / Impacts
 
+- `TASK-1667` (`to-do`, work item editorial → Content Factory) — **la procedencia de un compromiso
+  sólo la conoce esta lente**. Un brief nacido de un objetivo declarado (con su autor y su
+  `intent_declared_at`) no es lo mismo que uno nacido de una oportunidad detectada, y `TASK-1667`
+  necesita distinguirlos para no tratar una promesa al cliente como un hallazgo del sistema.
+- `TASK-1669` (`to-do`, plan diario agéntico) — **ya declara esta task en sus `Depends on`**, por la
+  misma procedencia. Recordatorio del red-team de la auditoría: el ordenamiento del plan diario no
+  sale de acá; sale de `readSeoWorkQueue` (`TASK-1700`). Esta lente le entrega el compromiso y su
+  autoría, nunca un ranking.
+- `TASK-1700` (cola priorizada de trabajo SEO) — **coexisten sin competir**: la cola dice qué hacer
+  hoy, esta lente dice si avanzamos contra lo prometido. Comparten un solo criterio de "destacar"
+  (clics en juego) y ningún criterio de orden de tabla.
 - `TASK-1310` — dashboard cliente + reporte: el avance contra objetivo es su insumo
 - `TASK-1661` — enriquece esta superficie con volumen y dificultad, sin rediseñarla
 
@@ -100,6 +214,10 @@ Reglas obligatorias:
 - `src/views/greenhouse/admin/growth/seo/keywords/**`
 - `src/app/(dashboard)/admin/growth/seo/keywords/page.tsx`
 - `src/lib/growth/seo/keyword-targets-reader.ts`
+- `src/lib/growth/seo/client/select-featured-series.ts` (+ su test) — cambia el criterio de
+  selección de mejor posición a clics en juego; sus consumers vigentes son
+  `src/views/greenhouse/growth/seo/client/SeoRankEvolutionChart.tsx` y
+  `src/components/growth/seo/report-artifact/print/SeoReportPrint.tsx`
 - `src/lib/copy/growth.ts`
 - `scripts/frontend/scenarios/growth-seo-keyword-targets.scenario.ts`
 
@@ -268,6 +386,13 @@ Reglas obligatorias:
     histórico completo: un objetivo declarado ayer no puede acreditarse un avance de hace un año
   - Un objetivo sin medición devuelve estado explícito, **nunca** posición `0` ni `100`
   - El reader no infiere la intención: la lee de la columna (TASK-1659)
+  - 🔴 El reader **no emite un score de prioridad ni un orden de urgencia**: la lente Objetivos no es
+    una cola. Su orden por defecto es avance contra compromiso (Δ y fecha de declaración), y una
+    posición lejana es distancia, no atraso. Cualquier ranking de "qué hacer hoy" sale de
+    `readSeoWorkQueue` (`TASK-1700`), nunca de acá
+  - 🔴 La selección de series destacadas usa **clics en juego** (el score de la cola), jamás mejor
+    posición: con el criterio actual un objetivo en la 60 es indestacable por construcción y a la
+    vez cuenta en los agregados como fracaso permanente
 - Tenant/space boundary: heredado del `seo_target_id`
 - Idempotency/concurrency: `n/a` — lectura
 - Audit/outbox/history: `none`
@@ -378,6 +503,12 @@ crea una tab de módulo ni una ruta paralela.
 ### Slice 4 — Trayectoria y cierre visual
 
 - Line chart con eje Y invertido y referencia en posición 10
+- 🔴 Cambiar el criterio de `selectFeaturedRankSeries` de **mejor posición** a **clics en juego** (el
+  score de `TASK-1700`: clics incrementales sobre la propia curva de CTR), con test que fije el caso
+  fuente: un objetivo declarado en posición 60 con demanda alta **sí** puede destacarse, y hoy no
+  puede. Se corrige el primitive compartido, no se agrega una selección paralela para esta lente
+- Verificar los dos consumers vigentes del primitive (`SeoRankEvolutionChart` del portal cliente y
+  `SeoReportPrint`) y declarar el cambio de baseline visual que produzcan
 - Colapso explícito por sobre ~8 series
 - Scenario GVC premium desktop + 390px, con las 4 capturas
 - `ui:quality` ≥ 4.5 promedio, piso 4
@@ -457,6 +588,13 @@ capability. Un operador sin la capability ve la lente sin CTA, que es el estado 
 - [ ] El cambio de intención se comunica como cambio, no como `already_tracked`
 - [ ] Un objetivo sin medición muestra estado explícito; nunca `0` ni `—` ambiguo
 - [ ] El Δ se calcula contra la primera medición posterior a la declaración
+- [ ] La lente **no** ordena por prioridad ni emite score de urgencia: su orden es avance contra
+      compromiso, y el ranking de "qué hacer hoy" queda en `readSeoWorkQueue` (`TASK-1700`)
+- [ ] Un objetivo lejano no se presenta como atraso ni entra a un agregado que lo lea como fracaso
+- [ ] `selectFeaturedRankSeries` selecciona por **clics en juego** y no por mejor posición, con test
+      que prueba que un objetivo declarado en posición 60 con demanda alta puede destacarse
+- [ ] Los dos consumers vigentes de `selectFeaturedRankSeries` (chart cliente y reporte impreso)
+      quedan verificados y su delta de baseline visual declarado
 - [ ] Las columnas de volumen y dificultad **no se renderizan** mientras no exista el dato
 - [ ] Sin `growth.seo.target.configure` el CTA no se renderiza
 - [ ] `UI ready` sólo pasa a `yes` con mapping, plan GVC y decision log completos y lint sin findings

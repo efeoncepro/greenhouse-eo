@@ -1,12 +1,39 @@
 # TASK-1659 — Growth SEO: modelo de keyword OBJETIVO (intención declarada vs oportunidad detectada)
 
+## Delta 2026-08-14 — COMPLETE: tres decisiones de ejecución que difieren de la spec
+
+Los 3 slices están en `develop` (SIN push). Donde la ejecución decidió algo que la spec dejaba
+abierto o decía distinto:
+
+1. **`[verificar]` de Zone 1 resuelto: NO hay capability propia.** Declarar un objetivo reusa
+   `growth.seo.target.configure`. El blast radius es el mismo write de gasto diferido, y una
+   capability nueva sin un rol que la distinga es gobernanza decorativa — además arrastra
+   registry + grant + coverage test para separar dos acciones que hoy hace la misma persona. Si
+   aparece un actor que pueda seguir pero no comprometer, se abre entonces.
+2. **Sin default de `opportunity`, contra lo que decía *Contract surface*.** Esa línea
+   contradecía al *Detailed Spec* del propio archivo ("backfillear afirma que alguien
+   clasificó"). Manda el segundo: el command no asume nada, y es el **caller** quien declara — la
+   lente Oportunidades manda `intent: 'opportunity'` explícito porque ahí sí hay alguien
+   diciéndolo. El "default retrocompatible" se cumple igual: la firma no cambió de forma.
+3. **La autoría es `intent_declared_by`, no `target_declared_by`.** Se generalizó a la intención
+   porque el CHECK que la acopla (`intent` ⇔ autoría) es más simple y más honesto que uno que
+   sólo exija autor para uno de los dos valores.
+
+Verificación: **16/16 contra PG real** (`scripts/growth/_sanity-task-1659-keyword-intent.ts`,
+incluido el invariante de las DOS filas tras un cambio de intención), 29 unitarios del command,
+26 del lane ecosystem, suite completa **10.747 verde**. Sin flags nuevos, sin scope nuevo en
+Entra, sin señal de reliability nueva.
+
+**Rollout:** la migración YA está aplicada — base compartida, aplicarla desde local ES el cambio
+productivo. El código viaja con el próximo push de `develop`. Desbloquea `TASK-1660`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`

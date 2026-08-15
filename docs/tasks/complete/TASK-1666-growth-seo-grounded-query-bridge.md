@@ -4,9 +4,40 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-14 (post-cierre) — Auditoría AEO: v2 del cerebro grounded
+
+Tri-auditoría con skills SEO/AEO sobre el cierre encontró 2 blockers de producto,
+corregidos el mismo día (commit `fix(growth-seo): TASK-1666 auditoría AEO ...`):
+
+- **B1 (cobertura por seed):** el smoke v1 perdió la seed "pintura para piso" por completo y el
+  resultado igual decía `grounded_llm`. Fix: cerebro `aeo-author.seo-grounded.v2` con cobertura
+  OBLIGATORIA por candidate + `computeSeoSeedCoverage` (verificación determinista, pura) — el
+  bridge ahora declara `seedCoverage` + `coverageNotice` en el resultado y el summary MCP
+  reporta el COVERAGE WARNING. La etiqueta grounded ya no se asume: se verifica.
+- **B2 (placeholders):** el smoke v1 materializó "y Comex" literal. Fix: `sanitizeAuthoredPrompts`
+  recibe `brandName`/`competitors` — competidor literal se normaliza a `{{competitor}}` y una
+  marca literal fuerza `namesBrand=true` (el tag refleja la realidad del texto).
+- **M1 (distribución):** pisos grounded (≥50% discovery + los 4 fanOutTypes); set degenerado →
+  `null` → fallback honesto al baseline.
+- **M6/M7:** hardening del bloque delimitado (colapso de `===`, techo 120 chars) y `vol:` viaja
+  como señal de prioridad; el prompt exige descubrimiento que ELICITE marcas y una pregunta
+  "alternativas a {{competitor}}".
+
+`aeo-author.v1` (base sin contexto) sigue byte a byte intacto. La eval (TASK-1292) distingue
+ambos cerebros por versión.
+
+## Delta 2026-08-14 — TASK-1664 complete: dependencia desbloqueada
+
+- El primitive de discovery existe y está verificado live: `queueKeywordDiscovery` /
+  `readKeywordDiscovery` / `recordKeywordDiscoveryAction` (`src/lib/growth/seo/keyword-discovery/`),
+  runner async en ops-worker, lanes app/ecosystem y MCP tools (`get_seo_keyword_discovery`,
+  `discover_seo_keywords`). Candidatos guardan SOLO procedencia; la métrica vive en el store de
+  TASK-1661 (writer compartido `persistKeywordMarketData`). Rollout runtime pendiente (flag OFF,
+  scheduler pausado) — no bloquea el trabajo de código de esta task.
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -19,10 +50,10 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Diseno`
+- Status real: `OPERATIVA para el flujo operador (2026-08-14): bridge + lanes live-capaces tras el próximo deploy de Vercel (develop), sanity 16/16 con autoría LLM real y draft grounded real en grader_prompt_sets; write MCP máquina fail-closed (aeo_forbidden) hasta TASK-1631 por diseño; gateway federado (efeonce-mcp@ac778e8, deploy con el próximo release)`
 - Rank: `TBD`
 - Domain: `growth|seo|aeo|data`
-- Blocked by: `TASK-1664`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -402,7 +433,43 @@ existente, no se resuelve creando un shortcut SEO.
      ZONE 2 — PLAN MODE
      ═══════════════════════════════════════════════════════════ -->
 
-<!-- El agente que tome la task debe llenar esta zona con Discovery y plan aprobado. -->
+## Discovery 2026-08-14 (Claude)
+
+Verificado contra el repo real:
+
+- **Supuestos correctos:** `PromptSetPrompt` ya tiene `rationale?`/`groundingRef?`;
+  `createGraderPromptSetDraft` acepta `groundingSources` + `generationStrategy`; el authoring degrada
+  honesto (`AuthorPromptSetStatus = ok|disabled|not_configured|schema_invalid|provider_error`, nunca
+  lanza); sanitizer con vocabulario cerrado + no-leading flip + dedupe + 8–18; providers canónicos
+  cheap-first (gemini→openai→anthropic); `AUTHOR_SYSTEM_PROMPT_VERSION='aeo-author.v1'`; capability
+  `growth.ai_visibility.prompt_set.manage` con grant al set operador; múltiples drafts por profile son
+  legales (append-only por versión) y `approvePromptSet` es el único chokepoint (supersede en tx).
+- **Supuestos desactualizados / decisiones de baseline:**
+  1. `authorGraderPromptSetDraft` **NO acepta** `groundingSources` custom ni contexto SEO — la spec ya
+     lo anticipa como trabajo de Slice 0 (extender de forma backward-compatible).
+  2. `files owned` cita `src/mcp/greenhouse/seo/grounded-queries.ts`: **stale** — las tools MCP viven
+     en `src/mcp/greenhouse/{server,tools,http-client}.ts` (mismo hallazgo que 1664).
+  3. Los commands de prompt set **no tienen NINGÚN consumer HTTP/MCP/Nexa hoy** (capacidad pura de
+     librería de TASK-1290; la UI de review de TASK-1291 no existe como route). La "revisión en la UI
+     AEO existente" del paso 7 de verificación se hace vía `readGraderPromptSets`/sanity, y el gap de
+     review UI queda documentado (ya era gap declarado del programa EPIC-020).
+  4. El input `CreateGroundedQueryDraftInput.brandContext` de la spec contradice su propio Slice 1
+     ("resolver brand context desde el contexto autorizado; el bridge no acepta identidad de marca
+     arbitraria"). **Manda Slice 1**: el bridge resuelve `getGraderProfile` +
+     `getActiveBrandIntelligence` server-side y NO acepta brandContext del caller.
+  5. `readKeywordDiscovery` (1664) no filtra por `candidateIds`: se agrega filtro aditivo SQL-side.
+  6. Leer candidatos históricos no exige el flag de discovery (política de lectura de 1664); el gate de
+     flags del bridge es `GROWTH_SEO_ENABLED` + `GROWTH_AI_VISIBILITY_GRADER_ENABLED` (→
+     `grounded_query_disabled`), y `PROMPT_AUTHORING` sólo decide `grounded_llm` vs
+     `baseline_fallback`, nunca bloquea.
+- **Decisiones de diseño:** `generation_strategy` conserva el union cerrado (`llm`/`template_baseline`)
+  — grounded se distingue por `systemPromptVersion='aeo-author.seo-grounded.v2'` (v1 en el cierre original; v2 post-auditoría, ver Delta) + refs
+  `seo.discovery.*`; idempotencia = draft existente con el mismo `seo.discovery.context:<hash>` + misma
+  versión de author (advisory lock xact para serializar check+create; el LLM se llama fuera del lock —
+  doble llamada teórica en carrera exacta, jamás doble draft); lanes ecosystem de grounded-queries
+  (read y write) sólo bindings `internal` (V1 es operador interno por spec).
+
+<!-- Plan de 5 slices impreso en sesión 2026-08-14; checkpoint P1. -->
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -413,7 +480,7 @@ existente, no se resuelve creando un shortcut SEO.
 ### Slice 0 — Boundary, schema de contrato y versionado de authoring
 
 - Añadir `SeoGroundingContext`, `GroundedQueryDraftResult`, error codes, mode y source-ref format.
-- Añadir versión separada `aeo-author.seo-grounded.v1`/system prompt grounded; dejar
+- Añadir versión separada `aeo-author.seo-grounded.v1`/system prompt grounded (hoy `v2`, ver Delta post-cierre); dejar
   `AUTHOR_SYSTEM_PROMPT_VERSION='aeo-author.v1'` intacta para authoring no grounded.
 - Extender `AuthorPromptSetInput` de forma backward-compatible con contexto SEO opcional y mantener
   output baseline bit-for-bit cuando el contexto está ausente.
@@ -643,36 +710,57 @@ se declara operativa hasta actualizar su inventario/parity.
      ZONE 4 — VERIFICATION & CLOSING
      ═══════════════════════════════════════════════════════════ -->
 
+## Evidencia de cierre (2026-08-14)
+
+- Suite focal + afectadas: 1.017 tests verdes (SEO + AEO + MCP + api-platform + route-contract);
+  no-regresión del baseline probada (sin `seoContext`, prompt de usuario byte a byte igual y
+  versión `aeo-author.v1` intacta).
+- **Sanity PG real 16/16 (incluye autoría LLM real, 1 llamada Gemini):** draft baseline (USD 0,
+  `baseline_fallback` + aviso) y draft grounded v2 (`grounded_llm`, 15 preguntas) creados sobre
+  candidatos REALES del smoke de TASK-1664 (Berel MX); refs opacas run/candidates/context-hash
+  verificadas en `grounding_sources_json`; active previo intacto; cero grader runs; dedupe real
+  (repetir = mismo draft, USD 0); anti-oracle de profile/candidate/reader.
+- **Eval humana de naturalidad ejecutada** sobre las 15 preguntas: estilo búsqueda natural,
+  seeds usadas como tema (0 copias 1:1, p.ej. "recubrimiento epóxico" → "qué tipos de
+  recubrimientos existen para madera"), fan-out diverso, no-leading limpio (0 descubrimiento con
+  `{{brand}}`).
+- **Gateway federado** (`efeonce-mcp@ac778e8`): provider + puerta HTTP (`prepare` exige
+  `efeonce.mcp.seo.write`), parity 12 tools, canary con denies del puente, 41/41 tests. Deploy
+  del gateway viaja con el próximo release a producción (mismo criterio que 1661/1664).
+- **Boundary de authz documentado**: el write máquina (ecosystem/MCP) responde `aeo_forbidden`
+  fail-closed — la capability humana de prompt sets no se fabrica para la máquina; TASK-1631 lo
+  abre con grants por usuario.
+
 ## Acceptance Criteria
 
-- [ ] Existe `createGroundedQueryDraft` con el contrato definido, capability SEO/AEO, tenant validation,
+- [x] Existe `createGroundedQueryDraft` con el contrato definido, capability SEO/AEO, tenant validation,
   límite de 20 candidates, idempotency y error codes cerrados.
-- [ ] El bridge obtiene candidates sólo por `readKeywordDiscovery`; no consulta tablas SEO/AEO directo
+- [x] El bridge obtiene candidates sólo por `readKeywordDiscovery`; no consulta tablas SEO/AEO directo
   desde UI/MCP ni hace JOIN cross-motor.
-- [ ] `grader_prompt_sets` sigue siendo el único SoT y el bridge sólo crea `draft`; no llama approve,
+- [x] `grader_prompt_sets` sigue siendo el único SoT y el bridge sólo crea `draft`; no llama approve,
   no supersede active y no inicia grader run.
-- [ ] `grounding_sources_json` contiene run/candidate/context refs exactos, sin keyword/PII/raw prompt;
+- [x] `grounding_sources_json` contiene run/candidate/context refs exactos, sin keyword/PII/raw prompt;
   `groundingRef` diferencia grounded real de baseline fallback.
-- [ ] El prompt authoring sin context mantiene compatibilidad y version `aeo-author.v1`; grounded usa
+- [x] El prompt authoring sin context mantiene compatibilidad y version `aeo-author.v1`; grounded usa
   versión separada y el cambio queda cubierto por test.
-- [ ] El system/user prompt trata SEO context como dato delimitado, no instrucción; prompt injection
+- [x] El system/user prompt trata SEO context como dato delimitado, no instrucción; prompt injection
   desde keyword no altera reglas/provider/tags.
-- [ ] Output válido conserva vocabulario cerrado, 8–18 prompts según el contract vigente de
+- [x] Output válido conserva vocabulario cerrado, 8–18 prompts según el contract vigente de
   `authorPromptSet`, dedupe,
   rationale y no-leading `namesBrand`.
-- [ ] Flag/provider off, schema invalid y provider error devuelven baseline fallback etiquetado, sin
+- [x] Flag/provider off, schema invalid y provider error devuelven baseline fallback etiquetado, sin
   afirmar candidate-specific grounding ni llamar provider cuando corresponde.
-- [ ] Reader devuelve draft/provenance sólo al tenant autorizado y falla anti-oracle para IDs ajenos.
-- [ ] App, Nexa, ecosystem y MCP usan el mismo command/reader; write MCP exige
+- [x] Reader devuelve draft/provenance sólo al tenant autorizado y falla anti-oracle para IDs ajenos.
+- [x] App, Nexa, ecosystem y MCP usan el mismo command/reader; write MCP exige
   `efeonce.mcp.seo.write` + capability AEO; no se crea scope nuevo.
-- [ ] `TASK-1665` puede invocar la action y distinguir `draft_created`, `baseline_fallback` y errores
+- [x] `TASK-1665` puede invocar la action y distinguir `draft_created`, `baseline_fallback` y errores
   sin lógica de prompt en JSX.
-- [ ] Tests cubren baseline no-regression, context hash, source refs, limits, tenant, concurrency,
+- [x] Tests cubren baseline no-regression, context hash, source refs, limits, tenant, concurrency,
   idempotency, no-active, no-leading, tag vocabulary, fallback, redaction y parity.
-- [ ] Sanity PG real confirma draft/version/status/refs y active anterior intacto.
-- [ ] Smoke autorizado revisa naturalidad de grounded queries y documenta cualquier divergencia antes
+- [x] Sanity PG real confirma draft/version/status/refs y active anterior intacto.
+- [x] Smoke autorizado revisa naturalidad de grounded queries y documenta cualquier divergencia antes
   de aprobar.
-- [ ] `pnpm task:lint --task TASK-1666`, tests focales y `pnpm docs:closure-check` pasan.
+- [x] `pnpm task:lint --task TASK-1666`, tests focales y `pnpm docs:closure-check` pasan.
 
 ## Verification
 
@@ -686,14 +774,14 @@ se declara operativa hasta actualizar su inventario/parity.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedó sincronizado con el estado real.
-- [ ] El archivo vive en la carpeta correcta.
-- [ ] `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` quedaron sincronizados.
-- [ ] `Handoff.md` quedó actualizado si hubo draft live, bloqueo de flag o evidencia AEO.
-- [ ] `changelog.md` quedó actualizado si cambió protocolo visible o lifecycle AEO.
-- [ ] Se ejecutó chequeo de impacto sobre `TASK-1664`, `TASK-1665`, `TASK-1311`, `TASK-1290` y
+- [x] `Lifecycle` del markdown quedó sincronizado con el estado real.
+- [x] El archivo vive en la carpeta correcta.
+- [x] `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` quedaron sincronizados.
+- [x] `Handoff.md` quedó actualizado si hubo draft live, bloqueo de flag o evidencia AEO.
+- [x] `changelog.md` quedó actualizado si cambió protocolo visible o lifecycle AEO.
+- [x] Se ejecutó chequeo de impacto sobre `TASK-1664`, `TASK-1665`, `TASK-1311`, `TASK-1290` y
   `TASK-1651`.
-- [ ] El estado final distingue `complete`, `code complete, rollout pendiente` u `operativamente
+- [x] El estado final distingue `complete`, `code complete, rollout pendiente` u `operativamente
   bloqueado`; crear un draft local no equivale a capacidad operativa.
 
 ## Follow-ups

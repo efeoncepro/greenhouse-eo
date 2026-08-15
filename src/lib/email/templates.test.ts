@@ -34,6 +34,23 @@ describe('email templates registry', () => {
     expect(template.text).toContain('/agency/services')
   })
 
+  it('renders the internal assessment-completed notice without a score or automatic decision', () => {
+    const template = resolveTemplate('hiring_assessment_submitted_internal', {
+      candidateName: 'María González',
+      openingTitle: 'Content Creator',
+      applicationPublicId: 'EO-APP-0001',
+      submittedAt: '2026-08-15T21:30:00.000Z',
+      timeLimitMinutes: 90,
+      applicationUrl: 'https://greenhouse.efeoncepro.com/agency/hiring/applications/happ-1',
+    })
+
+    expect(template.subject).toBe('Test completado: María González — Content Creator')
+    expect(template.text).toContain('Las respuestas quedaron listas para revisión')
+    expect(template.text).toContain('/agency/hiring/applications/happ-1')
+    expect(template.text.toLowerCase()).not.toContain('seleccionado')
+    expect(template.text.toLowerCase()).not.toContain('score')
+  })
+
   it('resolves the weekly executive digest template with digest context', () => {
     const template = resolveTemplate('weekly_executive_digest', {
       periodLabel: 'Semana del 8 al 14 de abril de 2026',

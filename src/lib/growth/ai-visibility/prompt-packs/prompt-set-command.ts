@@ -14,6 +14,7 @@ import { type TenantEntitlementSubject } from '@/lib/entitlements/types'
 
 import { resolveArchetypeBaselinePack } from './archetypes/baseline-packs'
 import { authorPromptSet, AUTHOR_PROMPT_SET_MAX_OUTPUT_TOKENS, type AuthorPromptSetStatus } from './authoring/author-prompt-set'
+import { type SeoGroundedKeywordContext } from './authoring/author-system-prompt'
 import {
   approvePromptSet,
   createDraftPromptSet,
@@ -66,6 +67,14 @@ export interface AuthorGraderPromptSetDraftInput {
   whatTheBrandDoes?: string | null
   fineCategory?: string | null
   createdBy: string
+  /**
+   * TASK-1666 — Contexto de keyword discovery SEO (opcional, backward-compatible). Presente ⇒
+   * la autoría usa el cerebro `aeo-author.seo-grounded.v2`, los refs `seo.discovery.*` entran a
+   * `grounding_sources_json` y cada prompt lleva `groundingRef` honesto: el `contextRef` cuando
+   * la salida fue realmente autorada con el contexto, o `baseline_not_candidate_specific` cuando
+   * cayó al baseline — jamás una causalidad falsa.
+   */
+  seoContext?: SeoGroundedKeywordContext | null
 }
 
 export interface AuthorGraderPromptSetDraftResult {
@@ -93,15 +102,25 @@ export const authorGraderPromptSetDraft = async (
     competitors: input.competitors,
     whatTheBrandDoes: input.whatTheBrandDoes ?? null,
     fineCategory: input.fineCategory ?? null,
-    maxTokens: AUTHOR_PROMPT_SET_MAX_OUTPUT_TOKENS
+    maxTokens: AUTHOR_PROMPT_SET_MAX_OUTPUT_TOKENS,
+    seoContext: input.seoContext ?? null
   })
 
   // Fallback honesto: sin LLM/flag/schema → el baseline determinista del arquetipo (Slice 1).
   const usingLlm = authored.prompts !== null
 
-  const prompts: PromptSetPrompt[] = usingLlm
+  const basePrompts: PromptSetPrompt[] = usingLlm
     ? authored.prompts!
     : resolveArchetypeBaselinePack(input.businessModel).prompts.map(p => ({ ...p }))
+
+  // TASK-1666 — provenance POR PROMPT sólo cuando hubo contexto SEO. Grounded real apunta al
+  // contextRef verificable; el baseline lo dice sin adornos: NO es específico de esos candidates.
+  const prompts: PromptSetPrompt[] = input.seoContext
+    ? basePrompts.map(prompt => ({
+        ...prompt,
+        groundingRef: usingLlm ? input.seoContext!.contextRef : 'baseline_not_candidate_specific'
+      }))
+    : basePrompts
 
   const draft = await createDraftPromptSet({
     profileId: input.profileId,

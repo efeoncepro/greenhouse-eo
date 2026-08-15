@@ -7,6 +7,228 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-15 — People queda avisado cuando un candidato termina su test
+
+El evento canónico `hiring.assessment.submitted` ahora tiene un consumer idempotente que prepara un
+correo interno a `people@efeoncepro.com` con candidato, vacante, hora de envío y acceso directo a la
+postulación. Sólo acepta `candidate_test` realmente completados, nunca scorecards, y no interpreta
+el resultado ni mueve al candidato de etapa. La extensión está code-complete y probada; queda
+pendiente aplicar la migración y desplegar el ops-worker para activarla en producción.
+
+La revisión read-only del test vigente de Content Creator confirmó 11 preguntas sobre 8
+competencias, pesos que suman 100, límite de 90 minutos, cero prompts vacíos o duplicados, opciones
+objetivas válidas y ninguna clave de respuesta o rúbrica en la proyección pública. Un recorrido
+sintético sin correo completó además `assigned → in_progress → submitted`, probó el bloqueo por
+respuestas pendientes, guardó las 11 respuestas, auto-calificó una y dejó diez en cola humana; el
+fixture y sus eventos se eliminaron al terminar.
+
+## 2026-08-15 — El CV del candidato se puede leer (y el candado se movió a donde protege)
+
+El tab **Documentos** de la Application 360 pasó de mockup a superficie real. Antes mostraba tres
+filas escritas a mano y un "Revelar" que sólo movía un `useState`: el motivo se descartaba y la
+auditoría prometida no se escribía. Ahora consume el reader canónico en servidor y separa las dos
+clases del modelo de dominio: **un archivo se abre** (la capability de la pantalla ya autorizó) y **la
+identidad se revela** (capability propia + motivo + audit append-only, `TASK-1714`).
+
+El CV se lee **dentro del portal**, en un diálogo sobre un blob same-origin. Se descartó `react-pdf`
+con evidencia —no arranca bajo `next dev --webpack` porque `pdfjs-dist` v5 rompe el interop ESM, y aun
+funcionando cuesta ~400 KB para hacer lo que el navegador ya hace— y el hueco de móvil se cierra por
+**capacidad** (`navigator.pdfViewerEnabled`), no por viewport: cuando el navegador no embebe PDF, el
+diálogo lo dice y ofrece salida, en vez de un marco en blanco.
+
+Además dejan de aplastarse en "Enmascarado" los cuatro estados que el escáner sí distingue: un archivo
+bloqueado por el antivirus y un candidato que nunca adjuntó CV se veían idénticos, así que el
+reclutador culpaba al candidato por una falla del sistema.
+
+Impacto operativo: quien opera Hiring ya no necesita pedir el CV por fuera del portal, y People Ops
+tiene un camino auditado para el documento de identidad — antes ese dato salía por mail, sin
+capability, sin motivo y sin trail.
+
+Follow-up abierto: `TASK-1716` mide si el fallo de `react-pdf` alcanza producción (hoy sólo verificado
+en desarrollo) y unifica las **tres** implementaciones de visor que conviven en el repo.
+
+## 2026-08-15 — El portal dejó de mostrar el favicon de Vuexy antes del suyo
+
+Durante unas dos semanas, cada carga del portal pintaba primero el ícono morado del template Vuexy y
+recién después el isotipo de Greenhouse. El reporte llegó como "carga dos favicon", y la causa no
+estaba donde uno la buscaría: el HTML servido siempre estuvo limpio, con una sola declaración
+apuntando al SVG correcto.
+
+Lo que pasó es que a fines de julio se borró el `favicon.ico` heredado de Vuexy —correcto— pero no se
+lo reemplazó. La marca quedó declarada sólo como SVG desde el código del layout, y `/favicon.ico`
+empezó a responder 404 devolviendo, además, la página de not-found completa: 105 KB de HTML en cada
+carga del portal, para una ruta que el navegador pide de forma implícita **siempre**, sin importar lo
+que declare el `<head>`. Mientras ese 404 resolvía y el navegador lo descartaba, la pestaña mostraba
+el ícono que tuviera guardado de antes.
+
+El arreglo pasa los tres íconos a la convención de archivos de Next (`favicon.ico` multi-tamaño,
+`icon.svg`, `apple-icon.png`), los genera desde el SVG de marca con `pnpm branding:favicon`, y saca
+la declaración duplicada del layout: teniéndola en ambos lados, compiten. Next ahora emite los links
+solo, con huella de contenido, así que un cambio futuro del asset invalida el caché por sí mismo.
+
+Vale la pena registrar por qué el síntoma sobrevivió a un primer intento de arreglo. Los navegadores
+guardan los favicons en una base propia, separada del caché de páginas, que alimenta la barra de
+direcciones y el historial y no se refresca ni con recarga forzada. El operador seguía viendo el
+ícono viejo aunque el servidor ya sirviera el nuevo. De ahí el invariante que quedó escrito: al
+verificar un favicon, no confiar en el navegador propio — verificar el `200 image/x-icon` en el
+runtime y contar los `link[rel*=icon]` en el DOM.
+
+## 2026-08-15 — Auditamos Descubrir con dos lentes y la pantalla dejó de prometer cosas que no cumplía (TASK-1665)
+
+La lente se cerró ayer con la captura verde y el build en verde. Igual la pasamos por dos auditorías
+independientes —una de arquitectura, otra del oficio SEO/AEO— y las dos dijeron lo mismo: el fondo
+está bien, lo que fallaba era **cableado**. Capacidades que el motor ya servía y la pantalla no
+pedía, y promesas que la interfaz hacía sin que el runtime las cumpliera.
+
+Tres importaban de verdad. La primera: cuando el sistema rechazaba una corrida —cupo agotado,
+proveedor caído—, el botón se ponía rojo y no decía por qué. El código tenía un comentario
+tranquilizador que aseguraba que el detalle «lo cuenta la banda de estado», pero cuando el rechazo
+ocurre no se crea ninguna corrida, así que esa banda sigue mostrando la anterior. El operador se
+quedaba sin saber si reintentar servía de algo. Ahora el mensaje exacto del servidor aparece en
+pantalla, y el consejo depende de la causa: reintentar sólo se ofrece cuando reintentar sirve.
+
+La segunda: la banda de costo prometía responder «¿me cabe en el presupuesto?» y siempre decía
+«cupo no disponible». El dato existía —el mismo control que autoriza el gasto lo devuelve— y nadie
+se lo pedía. La tercera: al declarar un objetivo, la tabla se actualizaba pero el panel de detalle
+se quedaba congelado en la foto vieja, mostrando los botones de gasto habilitados sobre algo que ya
+se había confirmado.
+
+Después vinieron diez más, del mismo tipo. La tabla decía «Candidatos (312)» y mostraba 50, sin
+avisar: ahora dice «50 de 312» y explica el resto. Una corrida en curso no se actualizaba sola, así
+que la barra animada no podía distinguir «sigue trabajando» de «se congeló». Un candidato ya
+descartado ofrecía un botón que el sistema iba a rechazar al confirmarlo. Y el símbolo `◑`, que
+significa «estimado de mercado», se estaba usando también en cifras de dinero —incluido el costo
+real ya cobrado—, lo que iba borrando la distinción entre lo estimado y lo medido que el resto de
+la pantalla defiende con cuidado.
+
+Lo que no era de esta pantalla quedó escrito como trabajo propio: los estados de candidato que hoy
+nadie puede alcanzar porque ningún proceso los registra, la paginación de verdad, las tres formas de
+partir una búsqueda que el motor soporta y la interfaz todavía no ofrece —incluida la que arranca
+desde lo que Search Console ya midió, que es la de mejor calidad—, y un par de detalles finos del
+generador de preguntas para motores de respuesta.
+
+## 2026-08-14 — Descubrir keywords deja de ser una API y se convierte en pantalla (TASK-1665)
+
+El motor de descubrimiento existía desde ayer y sólo se podía operar por API, Nexa o MCP. Ahora
+tiene cara: la lente **Descubrir** de `Growth > SEO > Keywords` — la misma ruta, el mismo permiso,
+el mismo Space; sólo `?view=discovery`.
+
+Lo interesante no es que ahora se vea, sino **qué se negó a suavizar al hacerse visible**. La banda
+de costo muestra la fórmula completa antes de confirmar, y el estimado es el peor caso a propósito:
+si la corrida sale más barata, esa diferencia no es crédito que puedas volver a gastar. El estimado
+de mercado (`◑`) y lo que Search Console midió de tu sitio (`●`) viven en columnas separadas y no se
+promedian nunca; donde no hay dato dice "Sin dato de mercado", no `0` — porque un cero se lee como
+"no hay demanda", y eso sería inventar. Y la columna que en toda herramienta se llama "dificultad"
+acá se llama **Barrera de enlaces**, en niveles: el índice crudo del proveedor colapsa a 0 en
+búsquedas en español de LATAM y se leería como "trivial" siendo falso.
+
+La decisión que más costó defender fue la más aburrida: **nada se pinta antes de que el command
+confirme**. `trackKeywords` responde HTTP 200 con la keyword rebotada por techo de cupo; tratar ese
+200 como éxito habría pintado "siguiendo" sobre un término que nadie mide, y el error sólo aparece
+cuando llega la factura. Por eso el resultado se lee y se anuncia **por término**, nunca como un
+"Listo" agregado. En la misma línea: ver y gastar son dos permisos, y sin el de gasto los botones no
+aparecen apagados — no aparecen.
+
+Cierra además una deuda que no era suya: no existía forma de conmutar lentes en una `page.tsx` del
+dashboard. Ahora existe, y `TASK-1660` la reusa en vez de inventarla de nuevo.
+
+**Delta 2026-08-15 — mirar los frames cambió cuatro cosas.** La pantalla pasaba lint, tipos, build y
+10.763 tests. Aun así, la primera captura real encontró que el botón `Detalles` rendía 3,71:1 sobre
+el tinte de hover de su propia fila —sobre blanco daba 4,59, o sea que el defecto sólo existía con el
+puntero encima— y que el panel de detalle apretaba cinco métricas en 460 px hasta convertir su texto
+de ayuda en una cinta vertical de una palabra por línea. Ninguna de las dos es detectable sin ojos.
+
+Lo interesante fue el arreglo del contraste: bajar el tono no alcanzaba (4,42) y la variante tonal
+del design system lo empeoró a 3,69 —pinta el azul principal sobre un tinte del mismo azul—, así que
+la salida fue sacar el color de la ecuación y dejar la affordance en el chevron y la columna. Los dos
+intentos fallidos quedaron escritos con su medición, para que nadie los repita.
+
+De paso apareció un desajuste en el propio verificador visual: su contrato decía que el teclado sobre
+interfaces que no mutan nada estaba permitido, pero rechazaba cualquier tecla. Eso empuja a declarar
+"esto sí muta" a un guion que no muta, y esa declaración apaga el resguardo para siempre en ese
+archivo. Ahora distingue teclas que navegan de teclas que activan.
+
+Evidencia: captura verde en 1440 y 390, scorecard 4,55. Queda el build de producción como último
+gate.
+
+## 2026-08-14 — El set monitoreado ahora sabe POR QUÉ una keyword está ahí (TASK-1659)
+
+Hasta hoy, "estoy en la 12 y quiero la 5" y "el cliente quiere rankear acá y estoy en la 60" eran
+la misma fila. Nada distinguía una **oportunidad** que se está empujando de un **objetivo**
+acordado con el cliente, así que un compromiso lejano se leía como fracaso permanente en cualquier
+lectura agregada y no existía narrativa de avance. Ahora cada membresía puede declarar su
+intención, con autor y fecha propios — y el autor del compromiso se guarda aparte de quién ejecutó
+el write, porque un agente puede declarar por encargo.
+
+Dos decisiones que valen más que la columna: **nada se backfilleó y el command no asume nada.**
+Marcar lo viejo como "oportunidad" habría afirmado que alguien lo clasificó, e inflado el conteo
+con filas que nadie miró; la ausencia se propaga honesta hasta la pantalla. Y **cambiar la
+intención no sobrescribe: cierra la membresía y abre otra**, porque el dato que sirve para reportar
+no es "esta keyword es un objetivo" sino "es objetivo desde marzo, y en marzo estaba en la 45".
+Reclasificar no consume cupo del techo, así que se puede hacer con el set lleno — que es cuando más
+falta hace.
+
+Salió de intentar construir el workbench de discovery (TASK-1665) y descubrir que dos de sus
+acciones citaban un contrato que no existía. Desbloquea la lente de Objetivos.
+
+## 2026-08-14 — La auditoría del oficio afinó el discovery y el puente antes de congelarlos (TASK-1664/1666)
+
+Una tri-auditoría con las skills de SEO/AEO revisó los dos cierres del día y encontró lo que los
+tests verdes no ven: el set "grounded" real había perdido una seed completa y traía un competidor
+con nombre y apellido. Ahora la cobertura por seed se **verifica** (el draft declara qué candidatos
+quedaron sin huella y lo advierte al revisor), los nombres literales se normalizan a placeholders,
+y un set degenerado cae honesto al baseline. En el discovery, el inbox ordena primero la
+oportunidad medida (lo que el sitio ya recibe y no sigue), el desempate usa la barrera de enlaces
+canónica en vez del KD que colapsa en es-LATAM, y repetir el mismo intent en un mes nuevo vuelve a
+descubrir (antes quedaba congelado para siempre). Todo corregido el mismo día, antes de que el
+workbench (TASK-1665) congelara el contrato.
+
+## 2026-08-14 — Las keywords descubiertas ahora saben llegar a los motores de IA (TASK-1666)
+
+El mismo día que el discovery quedó operativo, se cerró el puente que faltaba hacia el otro
+internet de búsqueda: un operador selecciona hasta 20 candidatos de una corrida y pide un
+**borrador de grounded queries** para el grader AEO. La regla central es semántica: una keyword
+de Google no es una pregunta a ChatGPT — el sistema la usa como **tema de investigación** (dato
+delimitado, inmune a prompt injection) y redacta preguntas naturales con la identidad de marca ya
+autorizada del perfil. La prueba real lo mostró: de "recubrimiento epóxico" salió "qué tipos de
+recubrimientos existen para madera", no una copia; y ninguna pregunta de descubrimiento nombra la
+marca (la medición a ciegas sigue siendo a ciegas).
+
+La honestidad quedó cableada, no prometida: el modo `grounded_llm` sólo existe cuando la autoría
+usó de verdad el contexto (cerebro versionado aparte; el authoring sin contexto quedó byte a byte
+idéntico y probado); sin autoría disponible el borrador sale del baseline **y lo dice** con un
+aviso obligatorio. La trazabilidad viaja como referencias opacas (corrida, candidatos y hash
+verificable del contexto exacto) — jamás la keyword en logs. Y el puente sólo crea borradores:
+aprobar y activar sigue siendo el flujo AEO con revisión humana, sin atajos.
+
+Verificado contra el mundo real: 16/16 checks contra PG incluyendo una autoría LLM real de 15
+preguntas evaluadas a mano, idempotencia que devuelve el mismo borrador sin segundo gasto, y el
+active previo intacto. Con esto TASK-1665 (el workbench visual) quedó sin bloqueos.
+
+## 2026-08-14 — Descubrir keywords deja de ser un viaje a otra herramienta (TASK-1664)
+
+El módulo SEO contestaba qué empujar de lo que ya aparece en Search Console; no contestaba cómo
+pasar de una hipótesis a un conjunto priorizado de términos. Hoy existe el primitive completo de
+**keyword discovery**: una corrida recibe hasta 10 seeds (manuales, de las consultas GSC, del set
+monitoreado o del dominio propio), las expande con DataForSEO Labs, deduplica y deja **candidatos**
+con procedencia trazable — y con volumen, intención y barrera de enlaces compuestos desde el store
+de mercado de TASK-1661, porque el `keyword_info` que viene inline y pagado en cada respuesta se
+persiste ahí mediante un writer canónico nuevo (`persistKeywordMarketData`) en vez de tirarse.
+`keyword_overview` quedó como top-up sólo del faltante: en el smoke real, el enriquecimiento costó
+**cero llamadas** porque el inline ya había dejado todo fresco.
+
+Las tres fronteras que la spec exigía quedaron en el código, no en la disciplina: el **costo se ve
+antes de gastar** (preview con fórmula, gate de entitlement y fence cada 10 llamadas); **descubrir
+no es seguir** (ninguna pieza escribe el set monitoreado; las decisiones son un log append-only y
+la promoción usa el command de tracking existente); y **repetir la pregunta no paga dos veces**
+(idempotencia por intent completo — el smoke lo midió: segunda corrida USD 0). Paridad completa en
+el mismo cambio: route admin, lane ecosystem (write sólo bindings internos), tools MCP con preview
+y confirmación humana obligatoria, y dos señales de confiabilidad nuevas.
+
+Verificado contra el mundo real, no contra mocks: sanity de 27 checks contra PG y una corrida live
+de Berel MX que costó **USD 0.0132** (estimado conservador 0.0612) y dejó 10 candidatos. Queda
+apagado por diseño: flag OFF en ambos runtimes y scheduler pausado hasta el sign-off de rollout.
+
 ## 2026-08-13 — Berel se mide donde vive su mercado, y el país deja de elegirse en silencio
 
 Una pregunta del operador sobre un dato dudoso destapó dos problemas reales, y los dos quedaron
@@ -1003,166 +1225,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   chokepoint) como plantilla para provisionar otras orgs.
 - **Pendientes:** conectar la propiedad de Google Search Console (segunda lente del 360) y el merge/dedupe del
   registro en HubSpot.
-
-## 2026-08-05 — ISSUE-142: los dos formularios públicos del AEO registran consentimiento a una política que nunca se mostró
-
-- Al cerrar `TASK-1327` quedó anotado "confirmar, no asumir" sobre un `consent.checkboxes` vacío. Confirmado
-  contra producción: **es un hueco de cumplimiento (Ley 21.719)**, no una decisión de diseño.
-- **La cadena:** las definiciones publicadas de `ai-visibility-grader` (landing de Think) y
-  `efeonce-aeo-diagnostic` (`/aeo-2/`) traen `checkboxes: []` **y sin `noticeText`** → `renderConsent()` retorna
-  `null` y no pinta nada en pantalla; pero el renderer envía `consent: true` igual, porque
-  `(checkboxes ?? []).length === 0` cuenta como otorgado. El gate server-side existe y es correcto
-  (`commands.ts:404-406`) — recibe un `true` fabricado por el cliente. La submission queda con
-  `consentPolicyVersion` afirmativo. **El registro es peor que un vacío: documenta algo que no ocurrió.**
-- **No es falla del motor Growth Forms:** auditados los 5 formularios públicos, **3 tienen su bloque de consent
-  correcto** (`efeonce-lead-gen-web`, `efeonce-seo-diagnostic`, `efeonce-web-agentica-ebook`). Los dos afectados
-  son justo los del AEO: se publicaron sin él y el fallback del renderer lo volvió silencioso en vez de ruidoso.
-- **Nada se aplicó.** Publicar texto legal en un formulario público live es decisión de operador + legal. El issue
-  documenta la contención, el fix de las dos definiciones, el fix del bug class (que publicar un form sin bloque
-  de consent **falle**, en vez de registrar consentimiento inventado) y el destino de los leads ya capturados.
-- `TASK-1246` no puede declarar su sign-off legal cumplido mientras `ISSUE-142` siga `open`; queda cruzado en
-  ambas direcciones. Bug class al motor: `EPIC-040` / `TASK-1255`.
-
-## 2026-08-05 — TASK-1327 `complete`: la landing pública del lead magnet está live y verificada en runtime
-
-- `TASK-1327` (landing `think.efeoncepro.com/brand-visibility` + embed del form gobernado) cerrada con
-  **verificación en runtime, no lectura de docs**: HTTP 200 con el `<greenhouse-form>` real
-  (`formKey 69cd5269…`, `surface=fhsf-ai-visibility-grader`), y `GET /api/public/growth/forms/<formKey>` contra
-  **producción** devolviendo 200 con los campos del intake, **Turnstile `required`** con site key real y
-  `consentPolicyVersion = ai-visibility-grader-consent-v1`. EPIC-020 queda en **49 childs: 33 `complete`,
-  16 abiertas**.
-- **Lo que NO se cerró con ella:** el smoke E2E productivo del loop completo sigue siendo de `TASK-1246` (gate de
-  readiness), y `TASK-1335`/`1336` siguen `in-progress` por mérito propio — se les agregó delta de impacto cruzado:
-  ya no bloquean una landing pendiente, sino su propio endurecimiento.
-- ⚠️ **Hallazgo para el sign-off legal:** la definición publicada del form trae `consent.checkboxes` **vacío** —
-  hay versión de política pero ningún checkbox renderizado. Puede ser por diseño o ser un hueco de cumplimiento;
-  queda anotado como input obligatorio de `TASK-1246`, sin asumir cuál de las dos.
-- **Corrección de una recomendación previa:** se había sugerido cerrar también `TASK-1321` por "superseded".
-  Es falso: `/aeo-2/` submit → grader → email con PDF + dedupe de HubSpot es una **capacidad propia** (segunda
-  superficie self-serve), con 8 criterios de aceptación sin cumplir y dos flags apagados
-  (`GROWTH_AEO_FORM_GRADER_INTAKE_ENABLED`, `GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE_ENABLED`). Sigue `in-progress`.
-
-## 2026-08-05 — Registro de epics reconciliado: EPIC-040 nace, gate `epic-child-parity`, 193 childs huérfanas al descubierto
-
-- **El bug class:** el campo `Epic:` de una task y el `## Child Tasks` de su epic son dos escrituras que nada
-  reconciliaba, así que divergían en silencio y el epic reportaba un avance que no era el suyo. `EPIC-020` decía
-  **"12/13 childs complete, sólo falta TASK-1246"** mientras 25 tasks se declaraban suyas fuera de la lista.
-  Conteo canónico real tras reconciliar: **49 childs, 32 `complete`, 17 abiertas** — no una.
-- **Gate mecánico nuevo `epic-child-parity`** en `pnpm epic:lint` (`scripts/ci/ops-artifact-lint.mjs`): barre las
-  ~1.720 tasks del corpus, lee el epic declarado y verifica que el id aparezca en su `## Child Tasks`; también caza
-  tasks que declaran un epic inexistente. **Primer hallazgo: 15 epics con drift, 193 tasks sin listar** (EPIC-028:
-  89 · EPIC-019: 21 · EPIC-013: 20 · EPIC-007: 14). Severidad `warning` por defecto — con 193 violaciones
-  preexistentes, `error` dejaría el lint rojo por deuda ajena; se enciende con `--strict-child-parity` (exit 1),
-  pensado para verificar un epic reconciliado y para promoverse a gate de CI cuando el backlog esté limpio.
-  Test: `scripts/ci/epic-child-parity.test.ts` (8 casos, incluye guardrail contra el repo real).
-- **`EPIC-040` — Growth Public Forms Engine (nuevo).** El motor de formularios no tenía epic dueño: **21 tasks**
-  con `Epic: none`/`optional`, y cuatro colgando de EPIC-020 sólo porque el AEO fue su primer consumer. El AEO
-  **usa** el motor; no es su dueño. Frontera declarada: EPIC-040 = motor · EPIC-035 = distribución del bundle ·
-  EPIC-020/011/019 = consumers. `TASK-1255` (PII Ley 21.719) es la de mayor consecuencia del epic.
-- **Reasignaciones aplicadas en el campo `Epic:` de la task** (que es lo que el gate lee — editar sólo los epics
-  habría dejado el drift intacto): 21 tasks del motor → `EPIC-040` (incluidas `TASK-1335`/`1359`, ex EPIC-020);
-  `TASK-1326` → `EPIC-019`; `TASK-1266`/`1267`/`1279`/`1286` → `EPIC-021` (declaraban EPIC-020 siendo hijas de 021).
-  EPIC-020 conserva los formularios que el AEO usa (`1251`/`1257`/`1263`/`1296`/`1298`/`1327`/`1336`).
-- **Correcciones de estado del programa AEO, verificadas en runtime:** `TASK-1276` (cockpit operador) está
-  `complete`, no `to-do` — el "gap #1" que el doc de programa declaraba ya no existe; y **la cara pública
-  self-serve está LIVE** (`think.efeoncepro.com/brand-visibility` HTTP 200 + definición del form 200 en producción
-  con Turnstile `required`), así que `TASK-1246` dejó de ser "construir el lanzamiento" y su residuo es el smoke
-  E2E + el gate de gobernanza. `EPIC_ID_REGISTRY` tenía `EPIC-021` como `to-do` estando `complete`.
-- Docs: `docs/epics/AEO_PROGRAM_STATUS.md` § Delta 2026-08-05 (b) (método, 4 hallazgos, falsos positivos
-  descartados, decisiones dejadas abiertas), `EPIC-020`/`021`/`022`/`019`/`040`, `README` y registry de epics.
-- **Pendiente conocido:** `pnpm ops:lint --changed` reporta 6 errores `ui-wireframe-contract` **preexistentes**
-  en `TASK-1231`/`1232`/`1256`/`1259`, expuestos sólo porque editar su campo `Epic:` las volvió "changed". No se
-  fabricaron wireframes para apagarlos (son tasks ya `complete`; crear docs UI de relleno viola el contrato de
-  diseño). Requieren cleanup con su dueño. Los otros 12 epics con drift de parity quedan fuera de alcance: cada
-  task necesita el juicio de su dueño para decidir si entra a la lista o si el campo `Epic:` está mal.
-
-## 2026-08-05 — Cloud Infrastructure doc reestructurado: temáticos + HISTORIAL + router stub (TASK-1646)
-
-- `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` (1340 líneas, 24 `## Delta` apilados) se particionó siguiendo el
-  precedente ui-platform: **`docs/architecture/cloud-infrastructure/`** con 11 docs temáticos de SÓLO estado
-  vigente (README/TOPOLOGY/CLOUD_SQL/BIGQUERY/STORAGE_BUCKETS/CLOUD_RUN/SCHEDULING/VERCEL/SECRETS/CICD_WIF/
-  SECURITY) + `HISTORIAL.md` con los 25 deltas verbatim y anotaciones de supersede. El path original quedó como
-  router stub (33 líneas) — ningún referrer se rompe. ADR nuevo:
-  `GREENHOUSE_CLOUD_INFRASTRUCTURE_RESTRUCTURE_DECISION_V1.md` (indexado en `DECISIONS_INDEX`).
-- Contradicciones resueltas contra runtime al separar: la topología compartida staging/prod es **canónica** (no
-  "por ahora"); los inventarios estaban congelados en la auditoría 2026-04-23 — hoy son **46 scheduler jobs** del
-  ops-worker (no 16), **8 crons Vercel** (no 13; el event bus ya no depende de Vercel) y **7 workflows de deploy**
-  (no 3). Los inventarios nuevos declaran as-of + source of truth (`deploy.sh`, `vercel.json`, workflows) para que
-  el drift futuro sea detectable; la re-auditoría live completa sigue en TASK-127.
-- `pnpm docs:closure-check` ya no emite `architecture_doc_monolith` para ese path; referrers vivos con anclas
-  `§4.9`/`§5` actualizados a los temáticos.
-
-## 2026-08-05 — Growth SEO (EPIC-022): registry de familias DataForSEO + ledger de gasto (TASK-1300)
-
-- El cliente DataForSEO deja de estar candado a `/v3/serp/`: allowlist cerrado de 5 familias, con
-  `normalizeEndpoint(endpoint, family)` table-driven y un transporte único (`postDataForSeoTask`).
-  `postDataForSeoSerpLiveAdvanced` delega sin cambiar contrato — el AEO pasó sin tocar ninguno de sus archivos.
-- **Circuit breaker por familia**: una familia caída no arrastra a las demás pese a compartir credenciales.
-- **`seo_provider_spend_daily` pasa a ser la fuente ÚNICA de presupuesto.** Lo escribe el transporte en cada
-  llamada cobrada, así que una captura no puede gastar sin quedar contabilizada; `enforceSeoRunEntitlement` dejó
-  de sumar el `provider_cost` de los snapshots, que contaba el mismo gasto dos veces. Ese hook estaba declarado
-  en TASK-1301 pero sin dueño desde que esa task cerró.
-- Endurecido sobre la spec: `organizationId` obligatorio por tipo en las familias que gastan, y el transporte
-  **lanza** si el runtime no registró el contador — gastar sin contabilizar se descubre en la factura.
-- **`code complete, rollout pendiente`: la cuenta DataForSEO tiene USD 0,90**, así que el smoke por familia está
-  bloqueado por saldo. Sanity live 7/7 contra PG real; suite 10130/0 + build prod verdes.
-- Hallazgo transversal: el patrón `BEGIN`/`ROLLBACK` de los sanity scripts **no es transaccionalmente seguro**
-  (el helper toma una conexión del pool por llamada). Este se reescribió sobre `withGreenhousePostgresTransaction`;
-  verificado que ningún otro sanity del repo lo usaba (el de 1301 ya limpiaba en `finally`); la regla de decisión quedó canonizada en `SQL_DATE_MATH_AGENT_INVARIANTS`.
-
-## 2026-08-05 — Growth SEO (EPIC-022): serie GSC propia + striking-distance (TASK-1302)
-
-- Google Search Console deja de ser read-through: `greenhouse_growth.seo_gsc_daily` materializa query×page por
-  `capture_date` y la serie sobrevive la ventana de 16 meses de Google. Anclada a `organization_id` (grano de la
-  propiedad verificada) y no a `seo_target_id`, que tiene grano más fino que GSC no particiona.
-- El primitive GSC compartido ganó paginación real (`startRow` aditivo): antes cortaba en 100 filas **sin señal**,
-  lo que sobre una serie histórica es pérdida permanente. Si se topa el techo se declara `truncated` + warning.
-- `readKeywordOpportunities`: striking-distance 8–20 con posición ponderada por impresiones, umbral por percentil
-  de la propia org y score en **clics incrementales estimados** con curva de CTR derivada de la propia
-  organización — no depende de datos de mercado, así que aterrizó sin esperar a TASK-1300.
-- Batch diario en Cloud Scheduler + ops-worker (nunca Vercel cron), resiliente per-org. Job creado **pausado** y
-  `GROWTH_SEO_ENABLED` default OFF: `code complete, rollout pendiente`.
-- Sanity live 9/9 contra PG real destapó un bug de alias SQL↔TS que ningún mock atrapaba. Suite 10102/0 + build
-  prod verdes.
-- **Rollout ejecutado el mismo día: LIVE.** 26.192 filas reales de `sc-domain:berel.com`, scheduler activo, 375
-  keywords en striking-distance. El rollout destapó dos defectos que ningún test podía ver: (a) el ops-worker no
-  tenía NINGUNA variable de Search Console —TASK-1302 fue su primer consumer del reader GSC— y prender el flag
-  habría degradado todas las orgs en silencio (bug class ISSUE-113); (b) **GSC no publica D-1**, así que apuntar a
-  "ayer" habría escrito días vacíos para siempre sin volver por ellos → ventana móvil de 5 días, que de paso
-  corrige el consolidado tardío de Google. Una sola instancia Cloud SQL y un solo ops-worker compartido
-  staging+prod ⇒ la capacidad quedó viva sin promoción a `main`.
-
-- **Cierre documental (3 subagentes).** Capa funcional (`docs/documentation/growth/` v1.1) + manual de operación
-  nuevo (`operar-serie-search-console.md`, por CLI/logs: verificar el job, forzar corrida, leer el batch,
-  re-materializar un día, rollback). Las tres trampas del rollout canonizadas en
-  `OPS_RELIABILITY_AGENT_INVARIANTS.md` + `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` (su Delta 2026-04-15 decía
-  "por ahora" sobre la topología compartida del ops-worker; quedó marcado superseded — es canónica). Los hallazgos
-  de oficio (GSC no publica D-1, posición ponderada por impresiones, striking-distance sin datos de mercado)
-  entraron a la skill `seo-aeo` marcados como **medidos**, y a `seo-aeo-practice` como segundo diagnóstico gratis.
-- **Dos deudas con dueño:** `CLAUDE.md` llegó al 100% de su presupuesto (34.998/35.000) y bloqueó una invariante
-  que quedó sólo en el companion → `## Delta` en TASK-1160, cuyo Slice 5 pasa a desbloqueante. Y la skill
-  `seo-aeo` tiene su copia Claude fuera del repo (sin versionar): le faltaban 2 referencias, incluida la de la API
-  de GSC; el gate `skills:mirrors` no puede ver ese drift porque la skill no está en su manifiesto.
-
-## 2026-08-05 — SEO operable por MCP (TASK-1645, code complete)
-
-- Lane ecosystem machine-authed + 3 MCP tools read-only (`get_seo_keyword_opportunities`,
-  `get_seo_visibility_360`, `get_seo_entitlement`) sobre los primitives gobernados del módulo SEO;
-  entitlement per-org con 404 anti-oracle y degradaciones honestas passthrough.
-- Smoke live del lane con quadrant real; rollout pendiente: smoke e2e HTTP con binding, flag en Vercel y
-  federación al gateway `mcp.efeonce.org` (TASK-1647 creada). Todo reader SEO futuro nace con su tool
-  (criterio en 7 tasks).
-
-## 2026-08-05 — Search Visibility 360: el cruce SEO↔AEO existe (TASK-1305)
-
-- `readSeoAeoGap` + matriz quadrant 360 (dominante/riesgo/oportunidad/invisible): posición orgánica medida
-  (GSC) × citabilidad IA (grader), cruce en memoria por org con boundary duro verificado por test.
-- Primera señal real en el smoke live: Berel #1.75 orgánico × AEO 44.5 → `riesgo` (autoridad sin
-  citabilidad → CTA cruzado al AEO). Consumers siguientes: tool MCP (TASK-1645) y UI (TASK-1310).
-
-## 2026-08-05 — Growth SEO (EPIC-022): capabilities + entitlement per-org + chokepoint de costo (TASK-1301)
-
-- 5 capabilities `growth.seo.*` seedeadas (catálogo + registry + grants; coverage verde) y módulo `seo_v1`
-  en el catálogo del client portal (parity `data_sources` al union TS).
-- Chokepoint único `enforceSeoRunEntitlement` per-org (tier/allowance/budget con env-knobs, consumer-agnóstico
-  para UI/Nexa/MCP) verificado con smoke E2E contra PG real. Full suite 10076/0 + build prod verdes.

@@ -7470,7 +7470,65 @@ export interface GreenhouseGrowthSeoGscDaily {
   site_url: string;
 }
 
+export interface GreenhouseGrowthSeoKeywordDiscoveryActions {
+  action_id: Generated<string>;
+  action_kind: string;
+  actor: string;
+  candidate_id: string;
+  created_at: Generated<Timestamp>;
+  idempotency_key: string;
+  metadata_json: Generated<Json>;
+  organization_id: string;
+}
+
+export interface GreenhouseGrowthSeoKeywordDiscoveryCandidates {
+  candidate_id: Generated<string>;
+  captured_at: Generated<Timestamp>;
+  keyword: string;
+  market_source: Generated<string>;
+  normalized_keyword: string;
+  organization_id: string;
+  raw_payload_hash: string | null;
+  run_id: string;
+  seed_keywords_json: Generated<Json>;
+  seo_target_id: string;
+  source_endpoint: string;
+  source_rank: number | null;
+}
+
+export interface GreenhouseGrowthSeoKeywordDiscoveryRuns {
+  actual_cost_usd: Numeric | null;
+  candidate_count: Generated<number>;
+  completed_at: Timestamp | null;
+  created_by: string;
+  error_code: string | null;
+  estimated_cost_usd: Generated<Numeric>;
+  idempotency_key: string;
+  language_code: string;
+  location_code: string;
+  methods_json: Json;
+  organization_id: string;
+  provider_calls: Generated<number>;
+  requested_at: Generated<Timestamp>;
+  run_id: Generated<string>;
+  seed_inputs_json: Json;
+  seo_target_id: string;
+  source_kind: string;
+  started_at: Timestamp | null;
+  status: Generated<string>;
+}
+
 export interface GreenhouseGrowthSeoKeywordMarketData {
+  /**
+   * Conteo bruto de enlaces del top-10. Auditoría y completitud — NO gobierna la barrera: alto conteo con pocos dominios es concentración, no dificultad.
+   */
+  avg_backlinks: Numeric | null;
+  avg_main_domain_rank: Numeric | null;
+  avg_page_rank: Numeric | null;
+  /**
+   * Dominios referentes promedio del top-10. Señal PRINCIPAL de la barrera de enlaces: la diversidad pesa más que el conteo (seo-aeo 05). NULL = no capturado, nunca "sin barrera".
+   */
+  avg_referring_domains: Numeric | null;
   capture_date: Timestamp;
   captured_at: Generated<Timestamp>;
   captured_by_organization_id: string;
@@ -7501,6 +7559,18 @@ export interface GreenhouseGrowthSeoKeywordSetMembers {
   created_by: string | null;
   effective_from: Generated<Timestamp>;
   effective_to: Timestamp | null;
+  /**
+   * TASK-1659 — por qué la keyword está en el set: target (compromiso declarado con el cliente) | opportunity (demanda detectada que se está empujando). NULL = nadie la declaró; NO significa oportunidad. Ortogonal a `source` (procedencia del write).
+   */
+  intent: string | null;
+  /**
+   * TASK-1659 — cuándo se declaró la intención de ESTA membresía. Como el cambio de intención cierra y reabre la ventana, el histórico de la keyword reconstruye desde cuándo es objetivo.
+   */
+  intent_declared_at: Timestamp | null;
+  /**
+   * TASK-1659 — actor que declaró la intención. Distinto de `created_by` (quién ejecutó el INSERT): difieren cuando un agente mete la keyword por encargo de una persona.
+   */
+  intent_declared_by: string | null;
   keyword: string;
   keyword_set_id: string;
   keyword_set_member_id: Generated<string>;
@@ -12225,6 +12295,9 @@ export interface DB {
   "greenhouse_growth.seo_backlink_snapshots": GreenhouseGrowthSeoBacklinkSnapshots;
   "greenhouse_growth.seo_competitors": GreenhouseGrowthSeoCompetitors;
   "greenhouse_growth.seo_gsc_daily": GreenhouseGrowthSeoGscDaily;
+  "greenhouse_growth.seo_keyword_discovery_actions": GreenhouseGrowthSeoKeywordDiscoveryActions;
+  "greenhouse_growth.seo_keyword_discovery_candidates": GreenhouseGrowthSeoKeywordDiscoveryCandidates;
+  "greenhouse_growth.seo_keyword_discovery_runs": GreenhouseGrowthSeoKeywordDiscoveryRuns;
   "greenhouse_growth.seo_keyword_market_data": GreenhouseGrowthSeoKeywordMarketData;
   "greenhouse_growth.seo_keyword_set_members": GreenhouseGrowthSeoKeywordSetMembers;
   "greenhouse_growth.seo_keyword_sets": GreenhouseGrowthSeoKeywordSets;

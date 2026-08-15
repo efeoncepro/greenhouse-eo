@@ -174,7 +174,65 @@ export const sendHiringAssessmentAssignedEmail = async (
   return `hiring_assessment_assigned_email ${assessmentId}: ${result.status}`
 }
 
-// ── 4. Avance de etapa → aviso al candidato (sólo etapas candidate-facing) ──
+// ── 4. Evaluación completada → aviso interno a People (sólo candidate_test) ──
+
+export const sendHiringAssessmentSubmittedInternalEmail = async (
+  assessmentId: string,
+  payload: Record<string, unknown>,
+): Promise<string> => {
+  if (!isHiringLifecycleEmailsEnabled()) return FLAG_OFF_MSG
+
+  const assessment = await getAssessmentById(assessmentId)
+
+  if (!assessment) {
+    return `hiring_assessment_submitted_internal_email no-op: assessment ${assessmentId} no existe`
+  }
+
+  if (assessment.method !== 'candidate_test') {
+    return `hiring_assessment_submitted_internal_email no-op: assessment ${assessmentId} no es candidate_test`
+  }
+
+  // El worker puede consumir el evento después de que un evaluador ya haya puntuado el test.
+  // Ambos estados conservan submitted_at; estados previos o expirados no prueban completitud.
+  if (!['submitted', 'scored'].includes(assessment.status) || !assessment.submittedAt) {
+    return `hiring_assessment_submitted_internal_email skip: assessment ${assessmentId} no está completado`
+  }
+
+  const ctx = await resolveHiringApplicationEmailContext(assessment.applicationId)
+
+  if (!ctx) {
+    captureHiring('assessment completado sin postulación resoluble', { assessmentId })
+
+    return `hiring_assessment_submitted_internal_email skip: application ${assessment.applicationId} no existe`
+  }
+
+  const internalEmail = resolveHiringInternalNotificationsEmail()
+  const eventId = eventIdOr(payload, `hiring-assessment-submitted:${assessmentId}`)
+
+  if (await wasEmailAlreadySent(eventId, assessmentId, internalEmail)) {
+    return `hiring_assessment_submitted_internal_email dedupe: ${assessmentId}`
+  }
+
+  const result = await sendEmail({
+    emailType: 'hiring_assessment_submitted_internal',
+    domain: 'hr',
+    recipients: [{ email: internalEmail }],
+    context: {
+      candidateName: ctx.candidateName ?? 'Sin nombre registrado',
+      openingTitle: ctx.openingTitle,
+      applicationPublicId: ctx.applicationPublicId,
+      submittedAt: assessment.submittedAt,
+      timeLimitMinutes: assessment.timeLimitMinutes,
+      applicationUrl: `${hiringPublicBaseUrl()}/agency/hiring/applications/${assessment.applicationId}`,
+    },
+    sourceEventId: eventId,
+    sourceEntity: assessmentId,
+  })
+
+  return `hiring_assessment_submitted_internal_email ${assessmentId}: ${result.status}`
+}
+
+// ── 5. Avance de etapa → aviso al candidato (sólo etapas candidate-facing) ──
 
 export const sendHiringStageAdvancedEmail = async (
   applicationId: string,
@@ -220,7 +278,7 @@ export const sendHiringStageAdvancedEmail = async (
   return `hiring_stage_changed_email ${applicationId} → ${stage}: ${result.status}`
 }
 
-// ── 5+6. Decisión → seleccionado / no seleccionado ──
+// ── 6+7. Decisión → seleccionado / no seleccionado ──
 
 export const sendHiringDecisionEmail = async (
   applicationId: string,

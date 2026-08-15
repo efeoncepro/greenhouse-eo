@@ -72,7 +72,9 @@ vi.mock('@/lib/postgres/client', () => ({
   // `@/lib/db`. Sin este export el mock rompe la carga del módulo entero.
   withGreenhousePostgresTransaction: async () => {
     throw new Error('la transacción no debe alcanzarse en estos tests')
-  }
+  },
+  // TASK-1666 — el bridge arrastra `@/lib/db`, que registra un reset hook al cargarse.
+  onGreenhousePostgresReset: () => undefined
 }))
 
 // El command se mockea entero: acá se prueba el LANE (scope, resolución de org, validación),
@@ -315,6 +317,61 @@ describe('trackEcosystemSeoKeywordsPayload (TASK-1308) — el primer write del l
 
     expect(r.data).toMatchObject({ ok: false, errorCode: 'disabled' })
     expect(state.trackCalls).toEqual([])
+  })
+
+  // ── TASK-1659 — la intención declarada cruza el lane sin degradarse ──────────────────────
+
+  it('una intención fuera del vocabulario es 400 explícito, no un `undefined` silencioso', async () => {
+    await expect(
+      trackEcosystemSeoKeywordsPayload({
+        context: internalCtx,
+        request: req(),
+        body: body({ organizationId: 'org-1', intent: 'objetivo' })
+      })
+    ).rejects.toMatchObject({ statusCode: 400 })
+
+    // Silenciarlo dejaría al consumer creyendo que declaró algo que no se guardó.
+    expect(state.trackCalls).toEqual([])
+  })
+
+  it('sin intención en el body, el command NO recibe ninguna (no se inventa `opportunity`)', async () => {
+    await trackEcosystemSeoKeywordsPayload({
+      context: internalCtx,
+      request: req(),
+      body: body({ organizationId: 'org-1' })
+    })
+
+    const [, , , options] = state.trackCalls[0] as [string, string[], string, Record<string, unknown>]
+
+    expect(options.intent).toBeUndefined()
+  })
+
+  it('la autoría humana viaja aparte del actor máquina', async () => {
+    await trackEcosystemSeoKeywordsPayload({
+      context: internalCtx,
+      request: req(),
+      body: body({ organizationId: 'org-1', intent: 'target', intentDeclaredBy: 'user-42' })
+    })
+
+    const [, , actor, options] = state.trackCalls[0] as [string, string[], string, Record<string, unknown>]
+
+    // El actor sigue siendo la máquina: la procedencia del write no se falsea para que parezca
+    // que lo hizo una persona. La persona queda en la autoría del compromiso.
+    expect(actor).toMatch(/^mcp:/)
+    expect(options.intent).toBe('target')
+    expect(options.intentDeclaredBy).toBe('user-42')
+  })
+
+  it('la autoría sin intención se descarta: un autor sin compromiso es ruido', async () => {
+    await trackEcosystemSeoKeywordsPayload({
+      context: internalCtx,
+      request: req(),
+      body: body({ organizationId: 'org-1', intentDeclaredBy: 'user-42' })
+    })
+
+    const [, , , options] = state.trackCalls[0] as [string, string[], string, Record<string, unknown>]
+
+    expect(options.intentDeclaredBy).toBeUndefined()
   })
 })
 

@@ -76,9 +76,9 @@ Importadores directos de `@/lib/ai/dataforseo*`:
 
 Menciones sin llamada (comentarios/contratos): `src/lib/growth/seo/{entitlement,contracts,keyword-opportunities-reader}.ts`, `src/lib/growth/seo/gap/read-seo-aeo-gap.ts`, `src/config/entitlements-catalog.ts:2189`, `src/lib/growth/ai-visibility/contracts.ts`, `cost.ts`.
 
-⚠️ **Delta 2026-08-07 — `labs/onpage` YA tienen consumer runtime productivo** (esta sección decía lo contrario hasta TASK-1303/1304): `src/lib/growth/seo/rank-capture.ts` (cron `ops-seo-rank-capture`, 05:00 CLT en ops-worker) y `src/lib/growth/seo/site-audit/**`. `backlinks`/`domain` siguen sin consumer productivo.
+⚠️ **Delta 2026-08-14 — `labs/onpage` YA tienen consumer runtime productivo** (esta sección decía lo contrario hasta TASK-1303/1304), y `labs` ya tiene **DOS**: `src/lib/growth/seo/rank-history-seed.ts` (semilla histórica) y `src/lib/growth/seo/keyword-market-data.ts` (TASK-1661, mensual — §5c). `onpage` = `src/lib/growth/seo/site-audit/**`; `serp` lo consume `rank-capture.ts` (cron `ops-seo-rank-capture`, 05:00 CLT en ops-worker). `backlinks`/`domain` siguen sin consumer productivo — y ojo: el perfil de enlaces que Greenhouse usa hoy **NO** sale de la familia `backlinks`, sale del `avg_backlinks_info` que `labs` regala en la misma respuesta ya pagada (§5c).
 
-## §5b El write que compromete gasto SIN llamar al proveedor (TASK-1308)
+## §5b El write que compromete gasto SIN llamar al proveedor (TASK-1308 · TASK-1659)
 
 `src/lib/growth/seo/track-keywords.ts` — `trackKeywords()` / `untrackKeywords()`. **No llama a DataForSEO ni escribe una sola fila del ledger**, y por eso es el consumer más peligroso del contrato de costo:
 
@@ -88,7 +88,7 @@ Menciones sin llamada (comentarios/contratos): `src/lib/growth/seo/{entitlement,
 |---|---|
 | **Techo gobernado por target** — `GROWTH_SEO_TRACKED_KEYWORDS_PER_TARGET` (default 200), `resolveTrackedKeywordCapacity` | El freno del gasto futuro. El exceso se rechaza con outcome tipado `capacity_exceeded`, **nunca en silencio ni con excepción**: el operador tiene que poder leer "el set está lleno" y decidir qué sacar. |
 | **Entitlement per-ORG `seo_v2`** vigente | Mismo chokepoint conceptual que `enforceSeoRunEntitlement`, pero **sin consumir allowance ni budget**: seguir no gasta hoy, gasta mañana. Cobrar allowance de site-audit por seguir una keyword sería cobrar dos veces por cosas distintas. |
-| **Outcome POR keyword** (`tracked\|already_tracked\|capacity_exceeded\|invalid`), nunca booleano | Un caller que sólo ve `ok: true` no distingue "agregué 3" de "rebotaron 40 contra el techo". |
+| **Outcome POR keyword** (`tracked\|already_tracked\|intent_changed\|capacity_exceeded\|invalid`), nunca booleano | Un caller que sólo ve `ok: true` no distingue "agregué 3" de "rebotaron 40 contra el techo". |
 | **Idempotencia + `FOR UPDATE OF`** | Un bucle de reintentos o dos agentes concurrentes no deben poder sobrepasar el techo. |
 | **`untrackKeywords` en el mismo PR** | Sin reverso el compromiso es permanente. Es **append-only**: cierra `effective_to`, **NUNCA borra** (la tabla tiene trigger anti-DELETE de TASK-1299 e índice único parcial `(keyword_set_id, keyword) WHERE effective_to IS NULL`). |
 
@@ -96,7 +96,47 @@ Menciones sin llamada (comentarios/contratos): `src/lib/growth/seo/{entitlement,
 
 Migración `20260807173706557_task-1308-keyword-set-member-provenance.sql`: `created_by` + `source` en `seo_keyword_set_members` (nullable, sin backfill, CHECK de vocabulario cerrado). Un write gobernado con tres consumers necesita rastro de **quién comprometió el gasto**.
 
+### La intención declarada (TASK-1659) — el otro eje de la misma membresía
+
+Migración `20260814221022082_task-1659-keyword-target-intent.sql`: `intent` (CHECK cerrado `target|opportunity`) + `intent_declared_by` + `intent_declared_at`, nullable y **sin backfill**, con un CHECK extra que **acopla autoría a declaración** (`intent` NULL ⇔ ambas columnas de autoría NULL). Vocabulario en runtime: `SEO_KEYWORD_INTENTS` / `isSeoKeywordIntent` en `contracts.ts`, para validar bodies que llegan por HTTP o MCP como `unknown`.
+
+| Regla | Por qué |
+|---|---|
+| 🔴 **Sin backfill, sin default** — quien no declara escribe `NULL` | `NULL` significa "nadie la clasificó". Backfillear a `opportunity`, o defaultear en el command, afirma que alguien clasificó esas filas cuando nadie lo hizo, e **infla el KPI de oportunidades** con keywords que nadie miró. Declara el **caller**: la lente Oportunidades manda `intent: 'opportunity'` explícito. |
+| 🔴 **Cambiar de intención NO es un `UPDATE`** — cierra la membresía vigente y abre otra | El dato que sostiene el reporte de avance no es "esta keyword es objetivo" sino "es objetivo **desde marzo**, y en marzo estaba en la 45". Un `UPDATE intent = 'target'` destruye exactamente eso. La tabla ya es append-only con ventanas: se reusa ese mecanismo. El cierre va **antes** del INSERT y en la MISMA transacción — el índice único parcial no admite dos vigentes. |
+| 🔴 El cierre usa `clock_timestamp()`, **NUNCA `NOW()`** | Mismo hallazgo que `untrackKeywords` (ver arriba): la membresía puede haber nacido en esa transacción, y `NOW()` daría `effective_to = effective_from` → CHECK 23514. Los mocks no lo atrapan. |
+| **El cambio de intención NO consume cupo** del techo | El conteo vigente no se mueve (cierra una, abre una), así que reclasificar sigue siendo posible **con el set lleno** — que es cuando más falta hace. Cobrarle techo bloquearía justo el caso útil. |
+| **Ortogonal a `source`** | `source` = procedencia del write (`operator_ui\|nexa\|mcp\|seed\|backfill`); `intent` = motivo del compromiso. Fusionarlas daría un producto cartesiano ilegible. Tampoco es el `intent` de los candidatos de discovery, que es el **search intent estimado del proveedor**. |
+| **`intentDeclaredBy` ≠ `actor`** cuando alguien declara por encargo | `actor` ejecutó el INSERT; `intentDeclaredBy` asumió el compromiso. Es el caso de un agente que agrega la keyword por pedido de una persona. Por defecto es `actor`. |
+| Outcome propio **`intent_changed`** (con `intent` y `previousIntent`) | Reportarlo como `already_tracked` sería mentira —sí pasó algo— y como `tracked` sugeriría gasto nuevo, cuando el conteo vigente no se movió. |
+
+El payload del outbox `growth.seo.keyword_set.updated` gana `intentChangedCount` + `declaredIntent`, y **se emite también cuando sólo cambió la intención**, aunque `activeKeywordCount` no se mueva: cerró una membresía y abrió otra, y emitir sólo por `inserted > 0` dejaría esa transición invisible para todo downstream. **Sin capability nueva** (reusa `growth.seo.target.configure`), sin scope nuevo en Entra, sin flag nuevo y sin señal de reliability nueva.
+
 **Contratos programáticos (Full API Parity, los tres sobre el MISMO command):** app-lane `POST /api/admin/growth/seo/keywords/{track,untrack}` (capability `growth.seo.target.configure`) · lane ecosystem `POST /api/platform/ecosystem/growth/seo/keywords/{track,untrack}` (**sólo bindings de scope `internal`** — un binding cliente lee sus oportunidades pero no hace crecer su propia factura) · tools MCP `track_seo_keywords` / `untrack_seo_keywords`, federadas al gateway bajo el scope de dominio `efeonce.mcp.seo.write`. **La frontera de grant es load-bearing y vive en la skill `efeonce-mcp-platform`**: ese scope existe en Entra pero NO está cableado al cliente PKCE público compartido, y nunca debe estarlo.
+
+## §5c El gasto que se repite por CICLO, no por fila (TASK-1661 — `labs` productivo)
+
+`src/lib/growth/seo/keyword-market-data.ts` — `captureKeywordMarketData()` / `previewKeywordMarketDataCapture()` / lectura `readKeywordMarketData()`. Segundo consumer productivo de la familia `labs`, sobre `/v3/dataforseo_labs/google/keyword_overview/live` (volumen + dificultad + competencia + CPC + intención + `core_keyword` + `avg_backlinks_info` en UNA llamada; `bulk_keyword_difficulty` + `search_intent` por separado cuesta más y trae menos). Runtime: **ops-worker únicamente**, mensual (Cloud Scheduler `ops-seo-keyword-market-data`, `0 8 15 * *`, ACTIVO desde 2026-08-14), flag `GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED` — en Vercel el flag es **inerte**, prenderlo ahí no hace nada.
+
+🔴 **La frescura ES el contrato de gasto.** El proveedor refresca las métricas de keyword **una vez al mes** (ciclo Google Ads): re-comprar antes de 30 días paga de nuevo por el mismo número. Por eso el pre-check del patrón TASK-1303 aquí no es de **existencia** sino de **frescura** (`MARKET_DATA_FRESHNESS_DAYS = 30`), y una corrida repetida dentro del mismo ciclo cuesta **cero**. Al diseñar un consumer nuevo, la pregunta correcta no es "¿ya tengo esta fila?" sino "¿el proveedor ya cambió este número desde que lo compré?".
+
+🔴 **Fuga encontrada en el smoke real y cerrada — TRES estados, no dos.** Cuando el proveedor responde OK pero **no tiene** la keyword, hay que **escribir igual la fila con NULLs**:
+
+| Estado de la fila | Significa |
+|---|---|
+| **ausente** | nunca preguntamos |
+| **presente con NULL** | preguntamos y el proveedor no tiene el dato |
+| **presente con 0** | el proveedor dice demanda cero |
+
+La primera versión no escribía nada en el caso del medio. Como el pre-check mira **filas**, esas keywords nunca quedaban "frescas" y **se re-compraban en CADA corrida, para siempre**: el smoke lo mostró cobrando USD 0.012 en una corrida que capturó cero. Los tests con mocks daban la versión con fuga por buena. Registrar el intento cierra el agujero y además es más honesto — "preguntamos y no hay" es un hecho que merece su fecha. Nota adyacente del mismo archivo: el `cost` del proveedor es **por batch**, así que se atribuye a la PRIMERA fila escrita del chunk y las demás van en 0 — sumar `provider_cost` fila a fila multiplicaría el gasto.
+
+🔴 **`keyword_difficulty` NO deriva la barrera de enlaces.** Su fórmula tiene un piso duro y colapsa a 0 en SERPs es-LATAM (`pintura` MX: KD 0 con 135.000 búsquedas/mes) — con la KD, `pintura` y `pintura para piso` caían las dos en "Baja" pese a tener top-10 opuestos. La derivación canónica es **`deriveLinkBarrier()`** en este mismo archivo, sobre el `avg_backlinks_info` que viene **GRATIS en la respuesta ya pagada**, ponderando la **DIVERSIDAD de dominios referentes + page rank, NUNCA el conteo de enlaces** (`berel` tiene 5.125 backlinks contra 232 de `pintura` pero MENOS dominios: 30,4 vs 52,6 — ordenar por conteo invierte el ranking). `classifyLinkBarrier` fue **eliminada**: dos fuentes de la misma regla, y la vieja era la que engañaba. `unknown` es estado propio ("no capturado") y se pinta "Sin dato", jamás "Baja". Detalle de la fórmula oficial y el contraste link-based vs blended: `references/02-labs.md` §7 gotcha 8.
+
+**Tabla multi-productor.** `greenhouse_growth.seo_keyword_market_data` es append-only (triggers de TASK-1299, `ON CONFLICT ... DO NOTHING`) y la escriben **varios** consumers: TASK-1661 desde `keyword_overview`, y a futuro TASK-1664 (discovery) y TASK-1662 (keyword gap) con el `keyword_info` que ya viene **inline y pagado** en SUS respuestas. **NUNCA abrir un segundo almacén del mismo hecho estimado** — el hecho es "qué dice el mercado sobre esta keyword en este mercado", no "qué devolvió mi endpoint".
+
+🔴 **Mercado explícito (ISSUE-153).** Resolver el target de una organización pasa SIEMPRE por `src/lib/growth/seo/resolve-target.ts` (`resolveSeoTargetForMarket` / `resolveUnambiguousSeoTarget`); **NUNCA** SQL inline con `ORDER BY created_at DESC LIMIT 1` en un consumer — eso servía un país al azar sin declararlo, y con Berel operando CL+MX el mismo reader devolvía dos verdades distintas según el orden de inserción. Con varios mercados activos y sin selector el lane responde `409 multiple_markets` con la lista; toda respuesta declara `meta.servedMarket`.
+
+**Contratos programáticos (Full API Parity):** lane ecosystem `GET /api/platform/ecosystem/growth/seo/keyword-market-data` + tool MCP **`get_seo_keyword_market_data`** federada en el gateway `mcp.efeonce.org` (lectura, scope `efeonce.mcp.read` — **sin scope nuevo en Entra**, por la cláusula 2 de la regla auto-load: el scope es por CLASE de blast-radius, no por capability). Señal de fiabilidad: `src/lib/reliability/queries/seo-market-data-freshness.ts` (con el flag OFF, cobertura parcial es lo ESPERADO, no una alerta).
 
 ## §6 Secretos / env
 
@@ -127,7 +167,9 @@ Docs funcionales: `docs/documentation/growth/modulo-seo-search-visibility-360.md
 
 EPIC-022 (SEO) + EPIC-020 (grader). ⚠️ Esta sección se escribió as-of 2026-08-06 y quedó desactualizada en un día — **verifica la carpeta real (`docs/tasks/{to-do,in-progress,complete}/`) antes de citar un estado**, no esta lista.
 
-**Complete:** `TASK-1265` (provider `google_ai_overview` sobre DataForSEO AI Mode, activado en staging; EPIC-020) · `TASK-1299` (schema `greenhouse_growth` time-series foundation) · `TASK-1300` (**family registry DataForSEO**: allowlist 5 familias + breaker + spend ledger) · `TASK-1301` (capabilities `growth.seo.*` + entitlement per-org + `enforceSeoRunEntitlement`) · `TASK-1302` (GSC daily snapshot materializer + keyword opportunities) · `TASK-1305` (SEO↔AEO gap derived read) · `TASK-1645` (ecosystem lane + MCP tools, LIVE prod 2026-08-06) · **`TASK-1303`** (rank capture `labs`/`serp` por target×keyword, cron `ops-seo-rank-capture` 05:00 CLT en ops-worker — cerró el spend fence y el import de `register-provider-spend`) · **`TASK-1304`** (site audit OnPage queue+poll) · **`TASK-1306`** (cockpit SEO: shell, tabs, viewCode `administracion.growth_seo`, Space picker) · **`TASK-1307`** (rank/URL performance) · **`TASK-1308`** (keyword opportunities UI + **el primer write del dominio**: `trackKeywords`/`untrackKeywords`, ver §5b).
+**Complete:** `TASK-1265` (provider `google_ai_overview` sobre DataForSEO AI Mode, activado en staging; EPIC-020) · `TASK-1299` (schema `greenhouse_growth` time-series foundation) · `TASK-1300` (**family registry DataForSEO**: allowlist 5 familias + breaker + spend ledger) · `TASK-1301` (capabilities `growth.seo.*` + entitlement per-org + `enforceSeoRunEntitlement`) · `TASK-1302` (GSC daily snapshot materializer + keyword opportunities) · `TASK-1305` (SEO↔AEO gap derived read) · `TASK-1645` (ecosystem lane + MCP tools, LIVE prod 2026-08-06) · **`TASK-1303`** (rank capture `labs`/`serp` por target×keyword, cron `ops-seo-rank-capture` 05:00 CLT en ops-worker — cerró el spend fence y el import de `register-provider-spend`) · **`TASK-1304`** (site audit OnPage queue+poll) · **`TASK-1306`** (cockpit SEO: shell, tabs, viewCode `administracion.growth_seo`, Space picker) · **`TASK-1307`** (rank/URL performance) · **`TASK-1308`** (keyword opportunities UI + **el primer write del dominio**: `trackKeywords`/`untrackKeywords`, ver §5b) · **`TASK-1659`** (intención declarada de la membresía — `intent` `target|opportunity` con autoría acoplada, sin backfill ni default, cambio = cerrar+abrir sin consumir cupo; ver §5b) · **`TASK-1661`** (keyword market data vía Labs `keyword_overview`; segundo consumer productivo de `labs`, cron mensual + tool MCP `get_seo_keyword_market_data` — ver §5c) · **`TASK-1677`** (cutover del entitlement `seo_v1 → seo_v2`; la ventana de lectura de `seo_v1` quedó CERRADA en código el 2026-08-09 — ver §4).
+
+**Follow-ups directos de TASK-1661** (escriben la MISMA tabla `seo_keyword_market_data`, con el `keyword_info` que ya viene pagado inline en sus respuestas — no abrir almacén nuevo): `TASK-1664` (keyword discovery / seed expansion) · `TASK-1662` (keyword gap). `ISSUE-153` (mercado explícito) quedó cerrado con `resolve-target.ts`.
 
 **In-progress:** `TASK-1631` (cliente OAuth con grant revocable por tenant y capability — **es lo que desbloquea el uso real de las tools de escritura**, hoy federadas y fail-closed).
 

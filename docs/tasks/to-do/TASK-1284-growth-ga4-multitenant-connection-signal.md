@@ -4,6 +4,33 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-15 — deja de ser huérfana: `Epic: none` → `EPIC-022`
+
+Fuente: `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md` (§3.2 brecha A7,
+§3.4 brecha C6).
+
+`Epic: none` la dejaba fuera de toda secuenciación de EPIC-022 pese a ser **la única vía existente a
+dos cosas que el módulo promete y no puede medir**:
+
+1. **"Clics → leads".** El módulo llega hasta clics de Search Console y se detiene ahí. No hay
+   conexión SEO↔GA4/HubSpot; `src/lib/growth/ga4/` ya tiene cliente con token provider inyectable y
+   **cero consumidores**. Sin esta task, la cadena de valor comercial termina en una métrica de
+   tráfico, no en dinero.
+2. **Referral real de motores de IA.** Hoy no se mide una sola visita entrante desde `chatgpt.com` ni
+   `perplexity.ai`. Todo el eje AEO se sostiene en *lo que el motor responde*, nunca en *lo que el
+   motor manda*. Esa es la brecha A7.
+
+**Consecuencia de secuenciación que hay que declarar, no descubrir:** esta task **bloquea de hecho la
+tercera parte de `TASK-1668`** — sus ventanas de outcome nombran GA4 y HubSpot como fuentes de señal.
+Sin GA4 conectado, esa parte del loop no puede producir evidencia. Las dos salidas honestas son: (a)
+adoptar esta task dentro de EPIC-022 y secuenciarla antes de la medición de outcome, o (b) declarar
+**explícitamente** en `TASK-1668` que el loop de negocio es **parcial** y que su outcome llega hasta
+GSC/rank/AEO. Lo que no es aceptable es dejar la dependencia implícita: `TASK-1668` mediría
+`insufficient_data` de forma permanente en su eje de conversión y nadie sabría por qué.
+
+Único campo que cambia en el cuerpo: `Epic: none` → `Epic: EPIC-022`. Alcance, slices, contratos y
+rollout quedan idénticos.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -18,7 +45,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `integration`
-- Epic: `none`
+- Epic: `EPIC-022`
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `data`
@@ -113,6 +140,9 @@ Reglas obligatorias:
   `SearchConsoleConnectionPanel.tsx`) — se crea como task aparte (ver Follow-ups)
 - Follow-up: render del eje "tráfico real / AI-attributed traffic" en el report del grader
 - Grader run-engine / report: nueva señal opcional
+- **`TASK-1668`** (QA/outcome/iteración editorial, EPIC-022): sus ventanas de outcome declaran GA4 y
+  HubSpot como fuentes. Sin esta conexión, ese eje del outcome queda permanentemente en
+  `insufficient_data`. Adoptar esta task o declarar el loop parcial — ver Delta 2026-08-15.
 
 ### Files owned
 

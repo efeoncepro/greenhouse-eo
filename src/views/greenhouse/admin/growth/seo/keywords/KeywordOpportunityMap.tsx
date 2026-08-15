@@ -27,11 +27,11 @@ import { KEYWORD_ACTION_ORDER, resolveKeywordAction, type KeywordAction } from '
  *
  * ═══ POR QUÉ LOS EJES NO SON LOS QUE PEDÍA EL WIREFRAME ═══
  *
- * El wireframe pedía X = dificultad, Y = volumen, color = intención. **Ninguna de las tres
- * existe**: `readKeywordOpportunities` devuelve `searchVolume: null`, `difficulty: null` y
- * `market: 'unavailable'` (el enriquecimiento DataForSEO Labs es TASK-1300 y no aterrizó), y
- * el contrato no tiene campo de intención. Pintarlos habría dado un lienzo vacío o, peor,
- * datos inventados.
+ * El wireframe pedía X = dificultad, Y = volumen, color = intención. Cuando esta pantalla nació
+ * ninguna de las tres existía: `readKeywordOpportunities` cableaba `searchVolume: null`,
+ * `difficulty: null` y `market: 'unavailable'`. Pintarlos habría dado un lienzo vacío o, peor,
+ * datos inventados. (Desde TASK-1661 el reader **sí** devuelve datos de mercado reales y `market`
+ * pasa a `'available'`; el contrato de intención sigue sin existir.)
  *
  * Los ejes que SÍ están medidos son además los metodológicamente correctos: la skill
  * `seo-aeo` (§02, método verificado contra la API real) lista *"priorizar por volumen
@@ -39,10 +39,10 @@ import { KEYWORD_ACTION_ORDER, resolveKeywordAction, type KeywordAction } from '
  * ERROR. Las impresiones de Search Console son demanda medida de TU SERP, con tu país, tu
  * dispositivo y tu mezcla real de queries — mejor dato que un volumen promedio de mercado.
  *
- * 🎯 Y por eso el volumen/dificultad de mercado, cuando TASK-1300 aterrice, NO serán un eje:
- * serán una COLUMNA y un FILTRO. Los ejes medidos son correctos con o sin ese dato, así que
- * el contrato de esta pantalla no se rompe cuando llegue — `searchVolume`/`difficulty` ya
- * existen como `number | null` y la tabla los pinta honestos hoy y reales mañana.
+ * 🎯 Y por eso el volumen/dificultad de mercado, ya disponibles, NO son un eje: son una COLUMNA
+ * y un FILTRO. Los ejes medidos son correctos con o sin ese dato, así que el contrato de esta
+ * pantalla no se rompió al llegar — `searchVolume`/`difficulty` siguen siendo `number | null` y
+ * la tabla los pinta honestos cuando faltan y reales cuando están.
  *
  * ⚠️ CANIBALIZACIÓN ES OTRA ACCIÓN, NO OTRO COLOR. Una query con más de una página no se
  * optimiza: se consolida. Tiene su propia serie, su propia forma y su propio verbo — no un

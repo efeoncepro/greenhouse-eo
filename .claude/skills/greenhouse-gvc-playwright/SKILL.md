@@ -1,6 +1,6 @@
 ---
 name: greenhouse-gvc-playwright
-description: Robust Playwright handling for Greenhouse Visual Capture (GVC), ad-hoc Playwright, and public WordPress/Elementor landing verification — how to observe before authoring and avoid fumbling selectors, waits, readiness, computed styles or captures. Invoke whenever you write or debug a `.scenario.ts`, run `pnpm fe:capture`, work on public-site/WordPress landings, drop to ad-hoc Playwright, or a capture comes back wrong (skeleton/login captured, selector timeout, flaky, clipped, "no encuentro el selector", Turbopack Compiling…). Distills the proven techniques from microsoft/webwright's `local_browser.py` (aria-tree observation, user-facing locators, layered timeouts, graceful degrade) + the Greenhouse-specific GVC/public-site gotchas. Triggers: "GVC", "fe:capture", "scenario", "Playwright", "WordPress landing", "public site", "Elementor", "selector", "readiness", "captura", "aria snapshot", "computed style", "no encuentro el selector", "captura sale mal", "skeleton", "clipSelector", "networkidle", "fullPage", "charts vacíos", "cards vacías en la captura", "qualityProfile", "qualityFindings", "runtimeSummary", "pageErrorCount", "visual_timeout", "layout_element_overflow", "storageState expirado", "grabó login".
+description: Robust Playwright handling for Greenhouse Visual Capture (GVC), ad-hoc Playwright, and public WordPress/Elementor landing verification — how to observe before authoring and avoid fumbling selectors, waits, readiness, computed styles or captures. Invoke whenever you write or debug a `.scenario.ts`, run `pnpm fe:capture`, work on public-site/WordPress landings, drop to ad-hoc Playwright, or a capture comes back wrong (skeleton/login captured, selector timeout, flaky, clipped, "no encuentro el selector", Turbopack Compiling…). Distills the proven techniques from microsoft/webwright's `local_browser.py` (aria-tree observation, user-facing locators, layered timeouts, graceful degrade) + the Greenhouse-specific GVC/public-site gotchas. Triggers: "GVC", "fe:capture", "scenario", "Playwright", "WordPress landing", "public site", "Elementor", "selector", "readiness", "captura", "aria snapshot", "computed style", "no encuentro el selector", "captura sale mal", "skeleton", "clipSelector", "networkidle", "fullPage", "charts vacíos", "cards vacías en la captura", "qualityProfile", "qualityFindings", "runtimeSummary", "pageErrorCount", "visual_timeout", "layout_element_overflow", "storageState expirado", "grabó login", "has-text", "keyboard_focus_ring_missing", "focus trap", "startSelector", "requireVisibleFocusRing", "quality.keyboard", "sonda de teclado", "pdfViewerEnabled", "el assert nunca pasa", "clic en el botón equivocado".
 type: reference
 ---
 
@@ -48,9 +48,11 @@ Con eso escribes `getByRole('button', { name: 'Notifícame' })` **contra lo que 
 | `getByRole('button', { name: 'Registrar pago' })` | `[class*="MuiButton-contained"]` |
 | `getByText('Sin resultados')` | `.empty-state > p` |
 | `[data-capture="timeline"]` (marker estable explícito) | offsets de scroll frágiles |
+| `[data-capture="cv-open-trigger"]` (control que el step acciona) | `button:has-text("Ver")` — **matchea por SUBSTRING** |
 
 - `nth-child`/clases MUI cambian con el render → frágiles. Roles + nombres accesibles son estables (y los lees del `.aria.txt`).
-- Para **regiones de captura**, los markers `data-capture="<seccion>"` son explícitos y estables — preferilos sobre offsets de scroll.
+- Para **regiones de captura**, los markers `data-capture="<seccion>"` son explícitos y estables — prefiérelos sobre offsets de scroll.
+- **`has-text` matchea por substring, y te muerde con palabras que se contienen.** `button:has-text("Ver")` también matchea **"Volver"**. En TASK-1715 el step accionaba el trigger del visor de CV; en el viewport móvil resolvió al botón de retroceso, el tab se reseteó y el scenario "falló" por una razón que no era el producto — dos corridas para entenderlo, porque el frame muestra una pantalla plausible, sólo que la equivocada. Un control que el scenario **acciona** lleva su propio `data-capture` y el selector va contra ese atributo; el texto visible además es copy y cambia (ver el bullet de TASK-1310 abajo). Si de verdad necesitas texto, ánclalo con rol + nombre accesible exacto (`getByRole('button', { name: 'Ver' })`, que matchea el nombre completo), nunca `has-text` suelto.
 
 En el DSL de GVC los `step.selector` aceptan cualquier locator CSS/role; usa selectores de rol (`[role="..."][aria-label="..."]`) o data-markers. Para ad-hoc Playwright, usa `page.getByRole(...)` directo.
 
@@ -137,6 +139,44 @@ jq '.qualityFindings, .runtimeSummary' .captures/<run>/manifest.json
 
 ---
 
+## Regla #4 — Las sondas de calidad corren DESPUÉS de todos los steps (TASK-1715)
+
+`runKeyboardGate` y el enterprise rubric se ejecutan **una vez, sobre el estado final** de la página, cuando el timeline de `steps` ya terminó (`scripts/frontend/lib/recorder.ts`, "runs after the timeline"). El corolario es duro: **el estado en el que dejas la UI en el último step es el estado que las sondas miden.**
+
+**Deja la UI en reposo antes del cierre.** Un scenario que abre un `Dialog` en el último step no mide el control que te importa: mide el modal. En TASK-1715 la sonda de teclado arrancaba en un `startSelector` que quedaba **detrás** del modal; el focus trap de MUI interceptó el `Tab` y la sonda terminó midiendo un **centinela del trap** — un nodo que no es un control — y reportó `keyboard_focus_ring_missing` sobre él. El hallazgo era real como medición y completamente inútil como señal. Cierra diálogos y drawers como último step:
+
+```ts
+{ kind: 'click', selector: '[data-capture="cv-open-trigger"]' },
+{ kind: 'mark', label: 'cv-dialog' },
+{ kind: 'press', key: 'Escape' },        // reposo antes de las sondas
+{ kind: 'mark', label: 'cv-dialog-closed' }   // y de paso, la restauración de foco
+```
+
+`Escape` **no** requiere `mutating: true`: el gate distingue teclas que NAVEGAN (`Escape`, `Tab`, flechas) de las que ACTIVAN (`Enter`, `Space`), y sólo gatea las segundas (`isNonActivatingKey`, `scripts/frontend/lib/scenario.ts`). No marques `mutating: true` para poder cerrar un modal — eso desactiva el gate para siempre en ese archivo y la próxima edición gana `fill` y click-mutante gratis.
+
+**El `startSelector` se elige para que el siguiente tab-stop siga siendo un control DE ESTA TASK.** En TASK-1715 la sonda arrancaba en el último enlace de un grupo, así que el `Tab` caía en el **chrome global de Vuexy**, cuya falta de anillo de foco es deuda preexistente documentada (TASK-1686, TASK-355). El gate reportaba un fallo que la task no había causado ni podía arreglar: ruido puro, y peor, ruido que empuja a "arreglar" código ajeno para poner el gate en verde. **Un gate mide lo que la task construye, no lo que hereda.** Retrocede el `startSelector` un stop, o acota la sonda al primer control propio. Si de verdad hace falta medir chrome heredado, va con `requireVisibleFocusRing: false` **y razón escrita en el scenario** — precedente vivo con el comentario completo: `scripts/frontend/scenarios/client-portal-menu-with-module.scenario.ts`.
+
+---
+
+## Regla #5 — Un assert atado a una capacidad del navegador mide el HARNESS, no el producto (TASK-1715)
+
+El Chromium headless del harness reporta **`navigator.pdfViewerEnabled === false`**: no embebe PDF, igual que un navegador móvil. Un assert que exigía un `iframe` con el PDF renderizado nunca podía pasar — no porque el producto fallara, sino porque el entorno de captura no tiene esa capacidad. El gate estaba midiendo una propiedad del navegador que lo ejecuta.
+
+La regla es general y portátil, más allá del PDF: **si un assert depende de una capacidad del navegador, deja de ser un gate del producto.** Aplica igual a códecs de video, `SharedArrayBuffer`, WebGL, Web Bluetooth, `print()`, plugins nativos, DRM. Asserta la superficie que el producto **sí** controla:
+
+```ts
+// ✗ mide la capacidad del harness
+{ kind: 'assert', selector: 'iframe[type="application/pdf"]', reason: 'el CV se ve' }
+
+// ✓ mide lo que el producto decide
+{ kind: 'assert', selector: '[data-capture="cv-viewer-dialog"]', reason: 'el diálogo abre' },
+{ kind: 'assert', selector: '[data-capture="cv-download-fallback"]', reason: 'degradación honesta cuando el visor no embebe' }
+```
+
+Ese segundo assert además es el que **de verdad** te interesa: que el producto detecte la ausencia de la capacidad y ofrezca la salida honesta es comportamiento propio y verificable. Sanidad rápida cuando sospechas del entorno: `pnpm fe:capture:explore --route=/x --probe='…'` y lee lo que reporta el navegador vivo antes de escribir el assert.
+
+---
+
 ## Falsos positivos conocidos (no los persigas)
 
 - **`layout_element_overflow` sobre la tabla `sr-only` de `MetricTrendCard`** — es el fallback accesible de la serie, renderizado con `visuallyHidden` de MUI, que **posiciona el elemento fuera del viewport a propósito** (`position:absolute` + `width:1px` + `whiteSpace:nowrap`): exactamente la firma que busca el guard. Triage antes de tocar nada:
@@ -181,7 +221,9 @@ jq '.qualityFindings, .runtimeSummary' .captures/<run>/manifest.json
    WHERE organization_id = '<org>';
   ```
   Buscarlo en las otras tablas cuesta media hora y termina en `column does not exist` (medido, 2026-08-13). Sonda lista: `scripts/growth/_sanity-seo-client-population.ts`.
-- **Un `startSelector`/`selector` atado a una copy se rompe cuando la copy mejora.** Un scenario que busca `button:has-text("Descargar informe")` muere con timeout el día que una auditoría manda renombrar ese botón — y el síntoma (captura fallida) no se parece a la causa (cambió un string). **Ata los steps a `[data-capture="…"]`**, que es un contrato explícito, y agrega el marker al componente si no existe. Caso fuente: TASK-1310, el trigger de impresión del informe.
+- **Un `startSelector`/`selector` atado a una copy se rompe cuando la copy mejora.** Un scenario que busca `button:has-text("Descargar informe")` muere con timeout el día que una auditoría manda renombrar ese botón — y el síntoma (captura fallida) no se parece a la causa (cambió un string). **Ata los steps a `[data-capture="…"]`**, que es un contrato explícito, y agrega el marker al componente si no existe. Caso fuente: TASK-1310, el trigger de impresión del informe. Y con `has-text` el riesgo no es sólo que la copy cambie: **matchea por substring** y engancha palabras que se contienen (`"Ver"` → `"Volver"`, TASK-1715) — ver la tabla de Locators.
+- **La sonda de teclado reporta un hallazgo sobre un nodo que no es un control** (un centinela de focus trap), o sobre el chrome global de Vuexy → no es defecto de la task: dejaste un diálogo abierto en el último step, o el `startSelector` está mal elegido. Las sondas corren **después** de todos los steps. Ver Regla #4.
+- **Un assert que nunca pasa aunque el producto se vea bien** → puede estar atado a una capacidad que el Chromium headless no tiene (`navigator.pdfViewerEnabled === false`, códecs, WebGL). Ver Regla #5.
 - **Staging tras SSO**: `pnpm fe:capture ... --env=staging` ya inyecta el bypass; ad-hoc curl/Playwright a `.vercel.app` requiere header `x-vercel-protection-bypass`.
 - **Steps mutating** (`fill`/`press`/`click` que dispara Server Action): requieren `mutating: true` + `safeForCapture: true`. **⚠️ Crean entidades reales en staging.** Read-only por default.
 - **Labels de `mark`**: `kebab-case`, únicos por scenario (la validación rompe build si duplicas), empezar con `initial-*`.
@@ -192,7 +234,7 @@ jq '.qualityFindings, .runtimeSummary' .captures/<run>/manifest.json
 
 El DSL de GVC cubre captura/scroll/interacción/baseline. Cae a Playwright ad-hoc **solo** cuando necesitas console/network/API payloads o una interacción que el DSL no soporta. Reglas:
 - Guarda artifacts bajo `.captures/` y **documenta por qué no bastó GVC**.
-- Si el flujo es repetible, **promovelo a scenario** (`scripts/frontend/scenarios/`) — el artefacto durable es el DSL determinístico, no un `.mjs` huérfano.
+- Si el flujo es repetible, **promuévelo a scenario** (`scripts/frontend/scenarios/`) — el artefacto durable es el DSL determinístico, no un `.mjs` huérfano.
 - Reúsa `lib/auth.ts` + `lib/browser.ts` (auth + lifecycle ya resueltos); no reinventes el setup.
 
 ## Public WordPress / Elementor landing mode

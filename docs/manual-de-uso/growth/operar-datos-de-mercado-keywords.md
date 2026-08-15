@@ -107,10 +107,17 @@ nada, **algo esta mal**: significa que el runtime llamo al proveedor sin el regi
 - **No mostrar `keyword_difficulty` como numero crudo.** La metrica mide SOLO la barrera de
   enlaces del top-10 y en SERPs de LATAM colapsa a 0 aunque la keyword tenga 135.000
   busquedas/mes — mostrado como "Dificultad: 0" se lee "trivial", que es falso (Semrush le pone
-  50 a la misma keyword porque mezcla mas factores). La UI la presenta como **Barrera de
-  enlaces: Baja / Media / Alta** (`classifyLinkBarrier`), donde "Baja" significa "se compite con
-  contenido y autoridad, no con enlaces" — una oportunidad, no una trivialidad. Detalle:
+  50 a la misma keyword porque mezcla mas factores). Detalle:
   `.claude/skills/dataforseo-operator/references/02-labs.md` §7.
+- **La columna "Barrera de enlaces" NO sale de `keyword_difficulty` (desde 2026-08-14).** Se
+  deriva del perfil de enlaces REAL del top-10 (`deriveLinkBarrier`), ponderando la **diversidad
+  de dominios referentes** y el page rank — nunca el conteo de enlaces. Un top-10 con muchos
+  backlinks concentrados en pocos dominios NO es mas dificil que uno con menos enlaces repartidos
+  en muchos: medido en Mexico, `berel` tiene 5.125 backlinks contra 232 de `pintura` pero menos
+  dominios referentes. "Baja" significa "se compite con contenido y autoridad, no con enlaces" —
+  una oportunidad, no una trivialidad.
+- **"Sin dato" no es "Baja".** Las capturas anteriores al 2026-08-14 no traen perfil de enlaces y
+  aparecen como "Sin dato". Pintarlas como barrera baja afirmaria una oportunidad que nadie midio.
 - **No mostrar un volumen sin su fecha**, ni promediarlo con datos de Search Console. Son dos lentes
   distintas: una es medida, la otra estimada.
 - **No rellenar con `0` una celda vacia.** Vacio significa "no lo consultamos" o "el proveedor no lo

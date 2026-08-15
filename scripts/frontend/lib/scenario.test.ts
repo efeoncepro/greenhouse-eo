@@ -18,6 +18,54 @@ describe('frontend capture scenario DSL', () => {
     ]))).not.toThrow()
   })
 
+  /**
+   * El gate de `press` distingue NAVEGAR de ACTIVAR, no "teclado sí / teclado no".
+   *
+   * El contrato del módulo siempre dijo que el teclado sobre UI no-mutante (drawers, tabs,
+   * accordions) está permitido por default; la implementación gateaba TODO `press`, lo que
+   * empujaba a marcar `mutating:true` un scenario que no muta nada — y marcarlo así desactiva
+   * el gate para siempre en ese archivo.
+   */
+  it('permite teclas que navegan o cierran sin declarar el scenario mutating', () => {
+    for (const key of ['Escape', 'Esc', 'Tab', 'Shift+Tab']) {
+      expect(() => validateScenario(baseScenario([{ kind: 'press', key }])), key).not.toThrow()
+    }
+  })
+
+  it('sigue gateando las teclas que ACTIVAN el control enfocado', () => {
+    // Enter/Space sobre un botón con foco pueden enviar un formulario o confirmar un gasto.
+    for (const key of ['Enter', 'Space', 'Control+Enter']) {
+      expect(() => validateScenario(baseScenario([{ kind: 'press', key }])), key).toThrow(
+        'requiere scenario.mutating:true'
+      )
+    }
+  })
+
+  /**
+   * 🔴 Las flechas y `Home`/`End` NO son navegación pura.
+   *
+   * Sobre un `RadioGroup`, un `Slider` o un `<select>` nativo enfocado CAMBIAN el valor y disparan
+   * `onChange`; si esa superficie persiste on-change, un scenario declarado no-mutante ejecuta un
+   * write real. La primera versión de la excepción las incluía afirmando lo contrario.
+   */
+  it('las teclas que cambian el valor de un control siguen gateadas', () => {
+    for (const key of ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Home', 'End']) {
+      expect(() => validateScenario(baseScenario([{ kind: 'press', key }])), key).toThrow(
+        'requiere scenario.mutating:true'
+      )
+    }
+  })
+
+  it('un press sin key no pasa por la excepción', () => {
+    expect(() => validateScenario(baseScenario([{ kind: 'press' }]))).toThrow('requiere scenario.mutating:true')
+  })
+
+  it('fill sigue gateado siempre, sin excepción de teclas', () => {
+    expect(() => validateScenario(baseScenario([{ kind: 'fill', selector: 'input', value: 'x' }]))).toThrow(
+      'requiere scenario.mutating:true'
+    )
+  })
+
   it('accepts full-page marks for long screens', () => {
     expect(() => validateScenario(baseScenario([
       { kind: 'mark', label: 'full-page', fullPage: true }

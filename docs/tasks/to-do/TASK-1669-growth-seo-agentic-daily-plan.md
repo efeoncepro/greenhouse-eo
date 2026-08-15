@@ -4,6 +4,78 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-14 — TASK-1659 complete: la intención declarada existe (y `intent` es homónimo)
+
+`TASK-1659` está **complete**. El input `target/intent declarado de 1659/1660` del `seo_researcher`
+ya tiene mitad de respaldo real: la intención vive en la membresía (`target` | `opportunity` | `NULL`)
+con autor y fecha, y cambiarla cierra una ventana y abre otra. Cuatro ajustes concretos:
+
+- 🔴 **`intent` significa dos cosas distintas dentro del mismo snapshot de evidencia.** El researcher
+  recibe, en bullets contiguos, el `intent` **estimado** de los candidates de discovery (search intent
+  del proveedor) y el `intent` **declarado** de una membresía (compromiso con el cliente). La lista de
+  prohibiciones impide inventar métricas, pero no impide **confundir estos dos**, y un agente los va a
+  fundir. Hay que nombrarlos distinto en el bundle en vez de confiar en el contexto.
+- **`NULL` es un tercer estado, y hoy es la población entera.** Toda keyword seguida antes del
+  2026-08-14 tiene intención `NULL` = "nadie la clasificó". La regla de no inferir del
+  `editorial_planner` tiene que decirlo explícito: `NULL` **no** se lee como `opportunity`; un plan
+  que cuente "oportunidades" incluyéndolas infla el número con keywords que nadie clasificó.
+- **`declared_target_without_owner` todavía no tiene reader donde pararse.** `TASK-1659` entregó un
+  **command**, no un reader: ningún reader de `src/lib/growth/seo/**` expone hoy la intención de una
+  membresía, y el de `TASK-1660` sigue en `to-do`. Bajo `Readers primero, LLM después`, esa regla de
+  fallback y el nivel 2 de prioridad dependen de ese reader — y **`TASK-1659`/`TASK-1660` no figuran
+  hoy en `### Depends on`**.
+- Invariante de reporte que hereda el plan: objetivos y oportunidades **nunca se promedian**. Un
+  objetivo en la posición 60 es la distancia que falta, no un fracaso, y no debe escalar como
+  urgencia sólo por su posición cruda.
+
+## Delta 2026-08-14 — TASK-1664 complete: dependencia desbloqueada
+
+- El primitive de discovery existe y está verificado live: `queueKeywordDiscovery` /
+  `readKeywordDiscovery` / `recordKeywordDiscoveryAction` (`src/lib/growth/seo/keyword-discovery/`),
+  runner async en ops-worker, lanes app/ecosystem y MCP tools (`get_seo_keyword_discovery`,
+  `discover_seo_keywords`). Candidatos guardan SOLO procedencia; la métrica vive en el store de
+  TASK-1661 (writer compartido `persistKeywordMarketData`). Rollout runtime pendiente (flag OFF,
+  scheduler pausado) — no bloquea el trabajo de código de esta task.
+
+## Delta 2026-08-15 — la cola priorizada manda: esta task deja de tener ordenamiento propio
+
+Fuente: `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md` §3.1 (brecha
+S1), §5.2 (la cola como aggregate persistido) y §5.5 (red-team).
+
+🔴 **El modo de falla más probable de este carril no es técnico: es que la cola priorizada se
+construya y esta task la ignore.** Hoy 1669 declara su propio `context-reader.ts` y su propia
+sección `Priority ordering V1` entre sus archivos owned. Si ambas avanzan en paralelo sin contrato
+firmado quedan **dos ordenamientos que discrepan** —uno por score versionado, otro por
+`reason_code`— y el operador ve un #1 en la pantalla y otro en el plan del día. No hay mitigación
+técnica para eso: **la única mitigación real es de secuencia**.
+
+Verificado en disco el 2026-08-15: **`src/lib/growth/seo/agents/` existe y está vacío** — cero
+archivos. Ni el `context-reader` ni el ordenamiento están escritos todavía. **El momento de corregir
+esto es ahora, y cuesta cero**: no hay código que reescribir, sólo una task que ajustar.
+
+Cambios aplicados al cuerpo:
+
+- `### Depends on` suma `TASK-1700` —la cola priorizada: aggregate persistido
+  `greenhouse_growth.seo_work_queue_{snapshots,items}`, append-only, materializado por job en
+  ops-worker, con `priority_score_version` en columna— más `TASK-1659` y `TASK-1660`, que el Delta
+  2026-08-14 ya había señalado como ausentes pese a que la regla `declared_target_without_owner` y
+  el nivel 2 de prioridad dependen del reader de intención declarada.
+- 🔴 **`Priority ordering V1` se retira de los archivos owned de esta task.** Deja de ser código
+  propio y pasa a ser **la config versionada de la cola**. Cambiar un peso obliga a
+  `priority_score_version` nueva; esta task no puede mover el orden sin mover esa versión.
+- `context-reader.ts` **sigue owned, pero como adapter**: envoltorio delgado de `readSeoWorkQueue`
+  que agrega lo que el LLM necesita —health/freshness por fuente, redacción, límites— y **no
+  reordena nada**.
+- Criterio de aceptación nuevo: **test de paridad de orden** contra la cola.
+- Se agregan los marcadores `ZONE 2`/`ZONE 3`/`ZONE 4` que faltaban: sin ellos `pnpm task:lint`
+  clasificaba esta task como `legacy=1` y se saltaba las reglas de template (modular placement,
+  acceptance checkboxes, rollout, backend/data contract). Ahora corren.
+
+Invariantes de la cola que esta task hereda y no puede violar: **nunca se promedian orígenes** —un
+objetivo declarado en la posición 60 es distancia por recorrer, no urgencia—; un origen caído se
+declara en `origin_health_json` y **no baja el score de los demás**; recomputar es fila nueva, jamás
+`UPDATE`.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -22,7 +94,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|seo|ai|nexa|data`
-- Blocked by: `TASK-1664`, `TASK-1667`, `TASK-1668`
+- Blocked by: `TASK-1667`, `TASK-1668`, `TASK-1700` (la cola priorizada — **bloqueo de secuencia**: sin ella nacen dos ordenamientos que discrepan; su Slice ordering ya lo exigía en prosa y el campo no lo declaraba)
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -94,6 +166,10 @@ Reglas obligatorias:
 - **Readers primero, LLM después.** El snapshot del plan se construye desde commands/readers de SEO,
   editorial, QA/outcome, AEO y measurement. El agente no consulta tablas, endpoints internos ni
   providers de forma ad hoc.
+- 🔴 **La cola es la autoridad de orden.** El plan diario consume `readSeoWorkQueue` (`TASK-1700`) y
+  **preserva su orden**. Esta task no tiene score de prioridad propio, no reordena y no "mejora" el
+  ranking de la cola: cambiar el orden se hace cambiando la config versionada de la cola y subiendo
+  su `priority_score_version`.
 - **Una capacidad, muchos consumers.** `generateSeoDailyPlan`/`readSeoDailyPlan` es el primitive;
   Nexa, app, ecosystem y MCP no tienen prompts ni ranking propio.
 - **La IA no es fuente de verdad.** La respuesta del modelo es un dato no confiable que se valida
@@ -135,6 +211,17 @@ Reglas obligatorias:
 
 ### Depends on
 
+- 🔴 **`TASK-1700`** — **la cola priorizada única** (`readSeoWorkQueue` /
+  `materializeSeoWorkQueue` / `recordSeoWorkQueueDecision` sobre
+  `greenhouse_growth.seo_work_queue_{snapshots,items}`, append-only, con `priority_score_version` y
+  `score_breakdown_json` en el primer slice). **Dependencia de secuencia, no sólo de datos**: la
+  cola tiene que llegar antes para que esta task no engendre un segundo ordenamiento. El plan diario
+  **consume** el orden de la cola; no lo produce ni lo corrige.
+- `TASK-1659` (complete) — modelo de intención declarada (`target` | `opportunity` | `NULL`) en la
+  membresía del set. Entregó un **command**, no un reader.
+- `TASK-1660` — superficie de keywords objetivo y su reader: es donde se para
+  `declared_target_without_owner` y el nivel de prioridad correspondiente. Sin ese reader, la regla
+  de fallback no tiene dónde apoyarse.
 - `TASK-1664` — discovery runs/candidates/market and reader.
 - `TASK-1667` — work items, brief/private lifecycle, editorial refs.
 - `TASK-1668` — QA evidence, outcomes, coverage, next actions y no-inference status.
@@ -157,8 +244,14 @@ Reglas obligatorias:
 
 ### Files owned
 
+> Verificado 2026-08-15: `src/lib/growth/seo/agents/` existe en disco y está **vacío**. Nada de lo
+> que sigue está escrito todavía, así que retirar el ordenamiento propio no cuesta una línea de
+> refactor.
+
 - `src/lib/growth/seo/agents/contracts.ts`
-- `src/lib/growth/seo/agents/context-reader.ts`
+- `src/lib/growth/seo/agents/context-reader.ts` — **adapter, no reader propio**: envuelve
+  `readSeoWorkQueue` (TASK-1700) y le agrega health/freshness, redacción y límites para el LLM.
+  **No reordena, no filtra por criterio propio y no recalcula prioridad.**
 - `src/lib/growth/seo/agents/orchestrator.ts`
 - `src/lib/growth/seo/agents/researcher.ts`
 - `src/lib/growth/seo/agents/editorial-planner.ts`
@@ -171,6 +264,11 @@ Reglas obligatorias:
 - `src/lib/growth/seo/agents/__tests__/fallback.test.ts`
 - `src/lib/growth/seo/agents/__tests__/safety.test.ts`
 - `src/lib/growth/seo/agents/__tests__/parity.test.ts`
+- `src/lib/growth/seo/agents/__tests__/queue-order-parity.test.ts` `[nuevo]` — paridad de orden
+  contra `readSeoWorkQueue`
+
+**No owned (y deliberadamente):** el ordenamiento de prioridad. Vive en la config versionada de la
+cola (`TASK-1700`), no en esta task.
 - `migrations/[timestamp]_task-1669-seo-agent-plan.sql`
 - `src/lib/nexa/nexa-contract.ts`
 - `src/lib/nexa/nexa-tools.ts`
@@ -409,8 +507,9 @@ El orchestrator ejecuta siempre esta secuencia bounded:
 3. **Researcher:** analiza discovery/oportunidades y devuelve candidatos/seed recommendations.
 4. **Editorial planner:** consume research + editorial lifecycle; no recibe acceso de escritura.
 5. **QA/measurement:** consume QA/outcomes y recomienda verificación, espera o iteración.
-6. **Policy merger:** deduplica por subject/action, aplica prioridad determinista, cierra vocabulario,
-   fuerza `requiresHumanApproval`, filtra refs inexistentes y establece expiry.
+6. **Policy merger:** deduplica por subject/action, **conserva el orden de la cola** (no aplica
+   prioridad propia), cierra vocabulario, fuerza `requiresHumanApproval`, filtra refs inexistentes y
+   establece expiry.
 7. **Telemetry/audit:** persiste plan run y recommendations estructuradas; no raw prompt/completion.
 
 Límites V1:
@@ -509,12 +608,25 @@ Persistir/emitir únicamente:
 
 Correlacionar con `organization_id` redacted/hash, actor/session, `planRunId` y `correlationId`.
 
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 2 — PLAN MODE
+     El agente que toma esta task ejecuta Discovery y produce
+     plan.md segun TASK_PROCESS.md. No llenar al crear la task.
+     ═══════════════════════════════════════════════════════════ -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 3 — EXECUTION SPEC
+     ═══════════════════════════════════════════════════════════ -->
+
 ## Scope
 
 ### Slice 1 — context/contract/policy
 
 - Definir snapshot, roles, action vocabulary, reason codes, schemas y límites.
-- Implementar context reader sobre readers canónicos, health/freshness y tenant boundary.
+- Implementar el context reader **como adapter de `readSeoWorkQueue`** (health/freshness, redacción,
+  límites y tenant boundary encima; cero reordenamiento) sobre los demás readers canónicos.
+- Test de paridad de orden contra la cola desde este slice: es la evidencia de que no nacieron dos
+  ordenamientos.
 - Implementar safety validator, command allowlist y `requiresHumanApproval` hard gate.
 - Tests de prompt injection, IDs falsos, refs cross-tenant, budgets y output inválido.
 
@@ -547,6 +659,9 @@ Correlacionar con `organization_id` redacted/hash, actor/session, `planRunId` y 
 - Crear un nuevo prompt store, vector DB, framework de agentes, MCP gateway paralelo o SDK provider.
 - Generar contenido final, imágenes, audio, Gutenberg blocks, Elementor manifests o claims editoriales.
 - Cambiar reglas de ranking, inventar score SEO/AEO combinado o reemplazar readers canónicos.
+- 🔴 **Definir, calcular o corregir el orden de prioridad.** Es de `TASK-1700` y de su config
+  versionada. Esta task consume el orden de la cola y lo preserva; si el orden está mal, se arregla
+  en la cola con `priority_score_version` nueva, nunca acá.
 - Llamar DataForSEO/GSC/WordPress/AEO/GA4/HubSpot directamente desde una role implementation.
 - Construir el panel visual del workbench; el consumer está en 1665.
 - Federar writes de agente al gateway externo sin task/ADR, scope y canaries propios.
@@ -554,19 +669,33 @@ Correlacionar con `organization_id` redacted/hash, actor/session, `planRunId` y 
 
 ## Detailed Spec
 
-### Priority ordering V1
+### Priority ordering — lo produce la cola, no esta task
 
-La policy merger ordena recomendaciones en este orden, siempre que exista evidencia suficiente:
+🔴 **Esta task NO define un ordenamiento propio** (delta 2026-08-15). El orden lo produce
+`readSeoWorkQueue` (`TASK-1700`) con su `priority_score_version` y su `score_breakdown_json`, que es
+la **config versionada** de la cola. Lo que la versión anterior de este documento llamaba
+`Priority ordering V1` —una escalera de `reason_code` escrita acá— se retira: dos ordenamientos que
+discrepan es el modo de falla #1 de la auditoría (§5.5), y el operador no puede ver un #1 en la
+pantalla y otro en el plan del día.
 
-1. `qa_block_present` o `publication_not_verified` — bloqueos operativos.
-2. `declared_target_without_owner` o `candidate_has_market_evidence` — decisiones explícitas de
-   estrategia.
-3. `gsc_striking_distance` — oportunidades medidas con URL conocida.
-4. `observed_decline_requires_review` — iteraciones de outcome.
-5. `wait_for_more_data`/`no_action` — honestidad ante ausencia de señal.
+Lo que el **policy merger** de esta task sí hace, y sólo eso:
 
-No ordena sólo por volumen, difficulty, lenguaje del modelo o “impact score” inventado. En empate,
-usa freshness, confidence, luego timestamp y recommendation ID estable.
+- deduplica por `subject`/`action` (dos roles pueden proponer sobre el mismo objeto);
+- cierra el vocabulario de `action`/`reasonCode` y descarta lo que no esté en él;
+- fuerza `requiresHumanApproval=true` y filtra refs inexistentes o cross-tenant;
+- fija `expiresAt` e `inputSnapshotHash`;
+- **preserva el orden que trajo la cola.** Si la cola entrega A, B, C, el plan entrega A, B, C — con
+  las que el merger haya descartado ausentes, nunca reordenadas.
+
+Reglas heredadas de la cola que el merger no puede violar: **nunca promediar orígenes** (un objetivo
+declarado en la posición 60 es distancia por recorrer, no urgencia); un origen caído se declara en
+`origin_health_json` y **no baja el score de los demás**; nada se ordena por volumen, difficulty,
+lenguaje del modelo ni por un "impact score" inventado por el LLM.
+
+Ítems que no vengan de la cola —si Discovery encuentra alguna señal que la cola aún no modela— se
+adjuntan **después** de los que sí, en un bloque etiquetado y con su razón declarada, jamás
+interpolados en el orden de la cola. Esa situación es una brecha de la cola y se reporta como tal,
+no se parcha acá.
 
 ### Cost and confirmation contract
 
@@ -601,6 +730,9 @@ command. Si se desea convertir feedback en evaluación offline, debe existir tas
 
 ### Slice ordering hard rule
 
+- 🔴 **`TASK-1700` (la cola) se mergea ANTES del Slice 1.** No es preferencia de orden: es la única
+  mitigación del modo de falla #1 (§5.5 del audit). Si esta task arranca sin la cola, escribe un
+  ordenamiento propio y después nadie lo borra.
 - Slice 1 (contract/policy) → Slice 2 (orchestrator/fallback) → Slice 3 (Nexa/MCP/parity) → Slice 4
   (shadow/cutover).
 - El fallback determinista MUST funcionar antes de habilitar cualquier llamada de modelo.
@@ -621,6 +753,7 @@ command. Si se desea convertir feedback en evaluación offline, debe existir tas
 | Presupuesto IA se consume en loops | AI/cost | medium | máximo 3 calls, timeout, idempotency, budget gate | `seo.agent.budget_blocked` |
 | Se filtra contenido sensible en telemetry | privacy | medium | no raw prompt/completion, redaction test y cardinality guard | `seo.agent.redaction_failed` |
 | Nexa/MCP tienen prompt/ranking distinto | parity | medium | primitive único + parity tests/allowlist | `seo.agent.parity_failed` |
+| **El plan y la cola muestran un #1 distinto** | producto/confianza | **high si 1700 no llega antes** | la cola es la autoridad de orden; el merger sólo deduplica y filtra; test de paridad de orden en CI desde el Slice 1 | `queue-order-parity.test.ts` en rojo |
 | Recommendation stale crea acción incorrecta | workflow | medium | expiry, hash, command re-read y `stale` | `seo.agent.recommendation_stale` |
 
 ### Feature flags / cutover
@@ -668,9 +801,21 @@ command. Si se desea convertir feedback en evaluación offline, debe existir tas
 - Legal/privacy/creative governance debe validar que el plan no conserve prompts/completions ni contenido
   sensible innecesario.
 
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 4 — VERIFICATION & CLOSING
+     ═══════════════════════════════════════════════════════════ -->
+
 ## Acceptance Criteria
 
 - [ ] Existe un context reader que compone sólo readers canónicos y reporta health/freshness por fuente.
+- [ ] 🔴 **Test de paridad de orden contra la cola**: para un mismo `seoTargetId` y un mismo
+  `inputSnapshotHash`, la secuencia de `subjectRef` del plan es **subsecuencia en orden** de la que
+  devuelve `readSeoWorkQueue`. El test falla si el plan reordena, aunque el conjunto coincida.
+- [ ] El `context-reader` es adapter de `readSeoWorkQueue`: no contiene score, peso, umbral ni
+  escalera de `reason_code` propios (verificable por lectura del archivo).
+- [ ] El plan expone el `priorityScoreVersion` de la cola que usó; si cambia entre dos planes, se ve.
+- [ ] Un origen caído llega como `origin_health_json` degradado y **no** altera el score de los
+  demás orígenes ni promedia entre ellos.
 - [ ] Existen exactamente tres roles V1: `seo_researcher`, `editorial_planner` y `qa_measurement`,
   con inputs/outputs/prohibiciones documentados.
 - [ ] El orchestrator tiene máximo tres llamadas de modelo, límites de candidatos/recomendaciones,
@@ -705,6 +850,8 @@ command. Si se desea convertir feedback en evaluación offline, debe existir tas
 - `pnpm task:lint --task TASK-1669`
 - Tests focales de context reader, role contracts, orchestrator, fallback, safety/redaction, budget,
   stale handling, Nexa tool y parity.
+- `pnpm vitest run src/lib/growth/seo/agents/__tests__/queue-order-parity.test.ts` — paridad de orden
+  contra `readSeoWorkQueue`.
 - Smoke del model router en staging con presupuesto acotado y fixtures no productivos.
 - Verificación de migration/read-only queries y tenant isolation.
 - Comparación de DTO app/Nexa/ecosystem/MCP.

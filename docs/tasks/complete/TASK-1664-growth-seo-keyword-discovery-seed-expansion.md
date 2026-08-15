@@ -4,9 +4,43 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-14 (post-cierre) — Auditoría SEO: defaults que congelaban el contrato
+
+Tri-auditoría con skills SEO/AEO/DataForSEO sobre el cierre (economics: LOW risk, sin blockers
+de gasto). 4 defaults corregidos el mismo día ANTES de que TASK-1665 (workbench UI) congelara
+el contrato (commit `fix(growth-seo): TASK-1664 auditoría SEO ...`):
+
+- **Orden accionable del reader:** nueva llave "oportunidad medida" (candidato con `measuredGsc`
+  ● y aún sin seguir) ordena antes del volumen estimado — es la decisión de mayor valor del
+  inbox; y el desempate de dificultad usa la BARRERA DE ENLACES canónica (low<medium<high<
+  `Sin dato` al final), nunca `keyword_difficulty` (KD colapsa a 0 en SERPs es-LATAM).
+- **Ciclo mensual en la idempotency key `auto-`:** componente `YYYY-MM` — el mismo intent
+  dedupea dentro del mes y un mes nuevo permite corrida fresca. Sin esto el discovery quedaba
+  congelado para siempre en el primer snapshot (las métricas Labs refrescan mensualmente).
+- **Spend fence real en el runner:** re-verifica contra el costo del remanente PLANIFICADO
+  (subllamadas restantes × peor caso + top-up), patrón TASK-1303/1661 — antes estimaba "una
+  llamada más".
+- **Provider:** `related_keywords` con `depth: 2` (el 2.º anillo del grafo al mismo costo por
+  task; depth 1 traía ~8 términos); `keywords_for_site` `order_by relevance,desc` VERIFICADO
+  contra sandbox.dataforseo.com (campo inventado → 40501; `relevance` → 20000).
+- **DTO:** `cpcUsd` + `competitionLevel` expuestos (ya venían pagados en la misma respuesta);
+  filtro `excludeTracked` en las 3 lanes (app + ecosystem + MCP `get_seo_keyword_discovery`).
+
+### Follow-ups V1.1 (documentados, no bloqueantes)
+
+- Seeds `tracked_keywords`: muestreo con sesgo alfabético (`ORDER BY keyword LIMIT 10`) —
+  muestrear por señal (volumen/impresiones) cuando haya >10.
+- Seeds `gsc_queries`: sin exclusión de marca ni banda de posición — las queries branded
+  dominan impresiones y expanden hacia lo ya ganado.
+- Homogeneizar el filtro `search_volume > 0` entre métodos (hoy suggestions/ideas lo llevan;
+  related/site no).
+- Cap de 500 candidatos y top-up de 200: hoy FIFO por orden de llegada — priorizar por señal.
+- Rollup de convergencia multi-endpoint (candidato visto por 2+ endpoints = señal fuerte).
+- Lente GSC del reader: scoping por `site_url` del target cuando una org tenga 2+ properties.
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -19,7 +53,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Diseno`
+- Status real: `OPERATIVO (2026-08-14): worker desplegado (rev 00553, flag ON), scheduler ops-seo-keyword-discovery-drain ACTIVO con primer tick verificado (pending=0 no-op), Vercel Production+staging con flag, gateway federado (efeonce-mcp@0a8c5e4, canary staging verde) — su deploy público viaja con el próximo release develop→main`
 - Rank: `TBD`
 - Domain: `growth|seo|data`
 - Blocked by: `none`
@@ -477,7 +511,43 @@ una prueba de paridad que demuestre que app, Nexa, ecosystem y MCP convergen en 
      ZONE 2 — PLAN MODE
      ═══════════════════════════════════════════════════════════ -->
 
-<!-- El agente que tome la task debe llenar esta zona con Discovery y plan aprobado. -->
+## Discovery 2026-08-14 (Claude)
+
+Verificado contra el repo real + PG (proxy vivo, `pgmigrations` al día):
+
+- **Supuestos correctos:** transporte `postDataForSeoTask` (POST-only, breaker por familia, costo del
+  batch en `json.cost`, throw sin spend recorder — `dataforseo.ts:179`); `enforceSeoRunEntitlement`
+  con `consumesAuditAllowance:false` + fence cada 10 llamadas (patrón `keyword-market-data.ts`);
+  store 1661 multi-productor con CHECK que YA acepta los 4 endpoints de discovery + `keyword_overview`
+  (`source_endpoint`, migración 1661); IDs TEXT prefijados; scheduler declarativo `upsert_scheduler_job`
+  con 5.º arg de pausa (`deploy.sh:919`); claim `FOR UPDATE SKIP LOCKED` calcado de
+  `collectSiteAuditRuns`; `publishOutboxEvent(event, client)` transaccional; `resolveSeoTargetForMarket`
+  (ISSUE-153) para mercado explícito; `normalizeMarketKeyword` (NFKC) es la normalización canónica.
+- **Supuestos desactualizados (delta menor, no bloquean):**
+  1. La señal `seo.provider.cost_over_budget` citada por la spec **no existe en código** (las señales
+     reales son `seo.rank.capture_lag`, `seo.audit.stuck_tasks`, `seo.market_data.freshness`). No se
+     crea acá; el freno de presupuesto es el chokepoint + fence.
+  2. La tabla de campos de `candidates` lista `core_keyword`, pero la nota 🔴 posterior (2026-08-13)
+     lo excluye como métrica de mercado. Manda la nota: `core_keyword` vive SOLO en el store 1661.
+  3. El índice único de candidates cita `location_code/language_code`, que son constantes del run:
+     se implementa `(run_id, source_endpoint, normalized_keyword)` — misma semántica, sin duplicar
+     columnas de mercado en candidates.
+  4. No existe test cross-lane `*parity*` en el dominio; la paridad hoy se prueba por passthrough en
+     3 archivos (route-contract + resource + MCP handler). Se crea el archivo de paridad que la spec
+     pide, con ese mismo enfoque (todos los lanes → el MISMO primitive mockeado).
+  5. Nexa hoy NO tiene ninguna tool SEO (ninguno de los 9 readers de 1645+ la tiene); la paridad Nexa
+     se satisface a nivel capability (mismo primitive, cero camino paralelo), consistente con todo el
+     dominio. No se agrega tool Nexa en esta task.
+  6. Admin lane SEO existente es POST-only (reads = server pages → reader). La spec pide GET además:
+     se implementa GET en la route admin (útil para paridad y para TASK-1665).
+- **Reutilizable:** `parseKeywordOverviewItem` + `SeoKeywordMarketDatum` + `estimateMarketDataCost` +
+  constantes de costo Labs (`keyword-market-data.ts`); el INSERT de mercado se **extrae a un writer
+  compartido exportado** (`persistKeywordMarketData`) para que 1664 sea segundo productor sin segundo
+  almacén; `loadFreshKeywords` se exporta como pre-check de frescura del top-up.
+- **Decisión GSC-only:** `methods: []` es corrida válida (0 llamadas provider, costo 0) — materializa
+  la resolución de seeds y valida el pipeline queue→claim→close sin gastar (Slice 5 paso 1).
+
+<!-- Plan detallado impreso en sesión 2026-08-14; slices = ZONE 3. Checkpoint P1 pendiente de OK. -->
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -699,36 +769,59 @@ operativo. No se crean secrets nuevos.
      ZONE 4 — VERIFICATION & CLOSING
      ═══════════════════════════════════════════════════════════ -->
 
+## Evidencia de cierre (2026-08-14)
+
+- Suite completa: **10.693 tests verdes** (0 fallas). Sanity PG real: **27/27 checks**
+  (`scripts/growth/_sanity-task-1664-keyword-discovery.ts`, transacción abortada = cero filas de
+  prueba permanentes).
+- **Smoke live con gasto real** (autorización "Vamos end-to-end"): corrida
+  `seokdr-2e3e06e6-...` sobre Berel MX — 1 seed (`pintura`) × `keyword_suggestions` × limit 10 →
+  `succeeded`, 10 candidatos, 1 llamada, **USD 0.0132 real ≤ 0.0612 estimado**; 10 filas en
+  `seo_keyword_market_data` con `source_endpoint='keyword_suggestions'` (inline pagado, top-up 0
+  llamadas); ledger `seo_provider_spend_daily` (labs, día) lo registra; re-enqueue del mismo
+  intent = `deduped`, USD 0; runner rechaza re-ejecutar corrida cerrada (`busy`);
+  `seo_keyword_set_members` sin cambios.
+- **Rollout EJECUTADO Y VERIFICADO (2026-08-14, autorización "termina todo lo que está
+  pendiente")**: push de develop → Ops Worker Deploy verde × 2 (base con flag OFF/scheduler
+  PAUSED verificado en rev 00552; flip a flag ON/scheduler ENABLED verificado en rev 00553);
+  primer tick del drain disparado y observado en logs (`pending=0 processed=0`, no-op);
+  flag en Vercel `Production` + `staging`; federación al gateway hecha (`efeonce-mcp@0a8c5e4`:
+  provider + puerta HTTP de scope + parity + canary + tests 40/40) con **canary contra staging
+  COMPLETO VERDE** (lectura de discovery sirvió la corrida real del smoke; denies 404/400 OK).
+  Único pendiente externo: **dispatch del deploy del gateway** cuando el próximo release
+  develop→main lleve el lane a producción (antes, las tools federadas darían 404 upstream —
+  lección TASK-1661).
+
 ## Acceptance Criteria
 
-- [ ] La migration crea runs, candidates y actions con constraints, índices, grants y estados cerrados;
+- [x] La migration crea runs, candidates y actions con constraints, índices, grants y estados cerrados;
   `pnpm db:generate-types` queda sincronizado y la verificación PG real pasa.
-- [ ] `queueKeywordDiscovery` valida org/target/assignment/capability, normaliza seeds, calcula costo,
+- [x] `queueKeywordDiscovery` valida org/target/assignment/capability, normaliza seeds, calcula costo,
   respeta idempotency y persiste outbox + run en una transacción.
-- [ ] Con flag OFF no hay provider call, insert ni costo.
-- [ ] El preview calcula calls y rows usando límites explícitos; una corrida máxima no supera 10 seeds,
+- [x] Con flag OFF no hay provider call, insert ni costo.
+- [x] El preview calcula calls y rows usando límites explícitos; una corrida máxima no supera 10 seeds,
   3 métodos, 500 candidates ni 200 enrichments.
-- [ ] Cada endpoint Labs usa el transporte canónico, `family: 'labs'`, endpoint allowlisted,
+- [x] Cada endpoint Labs usa el transporte canónico, `family: 'labs'`, endpoint allowlisted,
   `organizationId`, `status_code=20000` y `tag` correlacionable.
-- [ ] El runner valida el spend recorder y ejecuta el gate/fence antes de gastar; el ledger coincide
+- [x] El runner valida el spend recorder y ejecuta el gate/fence antes de gastar; el ledger coincide
   con `actual_cost_usd`.
-- [ ] Sugerencias, relacionadas, ideas, dominio y overview conservan procedencia y `captured_at`;
+- [x] Sugerencias, relacionadas, ideas, dominio y overview conservan procedencia y `captured_at`;
   el parser no persiste raw payload.
-- [ ] Un run `no_results` se distingue de `provider_error`; un run parcial conserva sus candidatos y
+- [x] Un run `no_results` se distingue de `provider_error`; un run parcial conserva sus candidatos y
   su costo real; un budget block no ejecuta otra llamada.
-- [ ] `readKeywordDiscovery` devuelve DTO server-side con paginación/filtros y marca Labs como
+- [x] `readKeywordDiscovery` devuelve DTO server-side con paginación/filtros y marca Labs como
   `estimated_market`/`◑`; no mezcla ni sustituye GSC.
-- [ ] Crear/leer/actionar un candidate nunca inserta, actualiza ni elimina `seo_keyword_set_members`.
-- [ ] El mismo command/reader está disponible en app, Nexa, ecosystem y MCP, con parity tests y
+- [x] Crear/leer/actionar un candidate nunca inserta, actualiza ni elimina `seo_keyword_set_members`.
+- [x] El mismo command/reader está disponible en app, Nexa, ecosystem y MCP, con parity tests y
   `efeonce.mcp.seo.write` para writes.
-- [ ] El reader y las tools respetan anti-oracle, capability, assignment y redacción de errores.
-- [ ] Existen tests para normalización, límites, idempotency, concurrencia, parser, status, costo,
+- [x] El reader y las tools respetan anti-oracle, capability, assignment y redacción de errores.
+- [x] Existen tests para normalización, límites, idempotency, concurrencia, parser, status, costo,
   tenant boundary, no-auto-track y degradación.
-- [ ] Existe signal `seo.keyword_discovery.stuck_runs` y el worker no deja una corrida running sin
+- [x] Existe signal `seo.keyword_discovery.stuck_runs` y el worker no deja una corrida running sin
   observabilidad después del umbral.
-- [ ] El smoke staging de una seed/limit 10 deja evidencia de provider cost, as-of, reader, parity y
+- [x] El smoke staging de una seed/limit 10 deja evidencia de provider cost, as-of, reader, parity y
   rollback por flag.
-- [ ] `pnpm task:lint --changed`, `pnpm docs:closure-check -- docs/tasks docs/epics docs/ui` y los gates
+- [x] `pnpm task:lint --changed`, `pnpm docs:closure-check -- docs/tasks docs/epics docs/ui` y los gates
   backend proporcionales pasan sin warnings load-bearing.
 
 ## Verification
@@ -745,14 +838,14 @@ operativo. No se crean secrets nuevos.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedó sincronizado con el estado real.
-- [ ] El archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`).
-- [ ] `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` quedaron sincronizados.
-- [ ] `Handoff.md` quedó actualizado si hubo runtime evidence, bloqueo o rollout pendiente.
-- [ ] `changelog.md` quedó actualizado si cambió comportamiento, costo o protocolo visible.
-- [ ] Se ejecutó chequeo de impacto sobre `TASK-1661`, `TASK-1662`, `TASK-1665`, `TASK-1666` y
+- [x] `Lifecycle` del markdown quedó sincronizado con el estado real.
+- [x] El archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`).
+- [x] `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` quedaron sincronizados.
+- [x] `Handoff.md` quedó actualizado si hubo runtime evidence, bloqueo o rollout pendiente.
+- [x] `changelog.md` quedó actualizado si cambió comportamiento, costo o protocolo visible.
+- [x] Se ejecutó chequeo de impacto sobre `TASK-1661`, `TASK-1662`, `TASK-1665`, `TASK-1666` y
   `TASK-1310`.
-- [ ] El estado final distingue `complete`, `code complete, rollout pendiente` u `operativamente
+- [x] El estado final distingue `complete`, `code complete, rollout pendiente` u `operativamente
   bloqueado`; no se usa `complete` sólo por tener código local.
 
 ## Follow-ups

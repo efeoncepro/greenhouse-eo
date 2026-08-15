@@ -1,0 +1,69 @@
+{
+  "task": "TASK-1715",
+  "surface": "agency.hiring.application360.documents",
+  "verdict": "pass-local",
+  "reviewedAt": "2026-08-15",
+  "reviewer": "claude-opus-5 (frames mirados: desktop 1440 + mobile 390 del capture premium, GVC exit 0 en ambos)",
+  "evidence": {
+    "desktop": ".captures/2026-08-15T19-07-23_task1715-application-documents/01-desktop/frames/01-documents-panel.png",
+    "mobile": ".captures/2026-08-15T19-07-23_task1715-application-documents/02-mobile/frames/01-documents-panel.png",
+    "viewer": ".captures/2026-08-15T19-07-23_task1715-application-documents/01-desktop/frames/03-viewer-dialog.png",
+    "focusRestore": ".captures/2026-08-15T19-07-23_task1715-application-documents/01-desktop/frames/04-viewer-closed-focus-restore.png"
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 4.6,
+      "rationale": "Dos grupos con peso distinto resuelven la tesis de la task: 'Archivos y enlaces' arriba (el trabajo diario, sin candado) e 'Identidad' abajo con chip Sensible (la excepcion). El candado recupera significado porque deja de aparecer donde no protege nada. h5 del tab -> overline por grupo -> label de fila en 650.",
+      "evidence": "01-documents-panel.png"
+    },
+    "proportions": {
+      "score": 4.5,
+      "rationale": "Fila de icon-tile 44px + p 2.5 heredada de TASK-355 sin re-decidir metricas; columna de acciones alineada entre filas para que el ojo baje sin tropezar. El visor usa 90vh: un CV es un documento vertical y necesita alto, no ancho.",
+      "evidence": "01-documents-panel.png"
+    },
+    "rhythm": {
+      "score": 4.4,
+      "rationale": "Spacing 3 entre regiones y divisor de 1px entre filas; la alerta de cuarentena solo aparece cuando aplica, asi que el caso normal no arrastra chrome muerto.",
+      "evidence": "02-documents-panel-fullpage.png"
+    },
+    "density": {
+      "score": 4.4,
+      "rationale": "2 a 5 filas: se descarto tabla porque a este volumen impone headers y alineacion que solo agregan ruido. En 390px la fila colapsa a columna con acciones full-width y sin scroll horizontal (scroll-width verde en ambos viewports).",
+      "evidence": "01-documents-panel.png"
+    },
+    "visualImpact": {
+      "score": 4.3,
+      "rationale": "El momento dominante es el CV abriendose dentro del portal: antes de esta task no habia forma de leerlo. No hay card-on-card ni wallpaper; el peso visual esta puesto en la accion, no en la decoracion.",
+      "evidence": "03-viewer-dialog.png"
+    },
+    "fidelity": {
+      "score": 4.6,
+      "rationale": "Conserva la composicion aprobada del desk y corrige su semantica. Cero HEX literal: tonos por token, anillo de foco por var(--mui-palette-primary-main). El copy vive integro en los diccionarios es-CL/en-US.",
+      "evidence": "01-documents-panel.png"
+    },
+    "templateResistance": {
+      "score": 4.5,
+      "rationale": "No es un listado generico: los cuatro estados del escaner tienen copy y accion propios, la ausencia es una fila con mensaje y el fallo del reader se distingue del vacio. Ningun template produce esas distinciones.",
+      "evidence": "01-documents-panel.png"
+    }
+  },
+  "average": 4.47,
+  "floor": 4.3,
+  "gvc": {
+    "scenario": "task1715-application-documents",
+    "desktopExitCode": 0,
+    "mobileExitCode": 0,
+    "errorFindings": 0,
+    "enterpriseRubric": "pass"
+  },
+  "loopFindings": [
+    "axe: variant tonal rendia 3.69:1 (#0375db sobre #d7e9f9) — se cambio a outlined (~4.9:1).",
+    "keyboard: sx no mapea outlineColor a la paleta, el anillo de foco no se dibujaba — se paso a var(--mui-palette-primary-main).",
+    "arbol de accesibilidad: el dialogo mostraba DOS 'Abrir en pestana nueva' — el primitive ya no dibuja su salida cuando el contenedor la tiene.",
+    "el probe de teclado media un centinela del focus trap con el dialogo abierto — el scenario lo cierra antes de las sondas."
+  ],
+  "knownDebt": [
+    "Los warnings axe del chrome global de Vuexy siguen vigentes (mismo criterio documentado en TASK-355 y TASK-1686).",
+    "El embed nativo no pinta PDF en navegadores con pdfViewerEnabled=false: el diagrama lo declara y ofrece salida, pero el render inline en movil queda pendiente del follow-up de pdf.js."
+  ]
+}

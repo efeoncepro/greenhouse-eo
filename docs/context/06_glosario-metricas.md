@@ -74,7 +74,7 @@ Toda métrica ICO cae en una de cuatro dimensiones. Cada rol recibe un perfil de
 | Sigla | Nombre canónico | Definición | Meta |
 |---|---|---|---|
 | **OTL** | Organic Traffic Lift | Lift trimestral de tráfico orgánico vs. baseline (90 días previos). | ≥15% trimestral |
-| **ACR** | AEO Citation Rate | Crecimiento trimestral de citaciones de marca en ChatGPT, Claude, Perplexity, Gemini. **Fuente de verdad: Otterly.ai** (50 prompts × 4 modelos × 4 corridas/mes). | ≥20% trimestral |
+| **ACR** | AEO Citation Rate | Crecimiento trimestral de citaciones de marca en motores de IA. **Fuente de verdad: el AI Visibility Grader propio** (`src/lib/growth/ai-visibility/**`, EPIC-020/021) — 5 motores en 2 superficies: ChatGPT, Claude, Perplexity y Gemini vía API propia (`answer_engines`), más Google AI Overview / AI Mode vía DataForSEO (`ai_search`, porque Google no expone API). Prompt set brand-aware autorado y congelado por perfil. ⚠️ **La cadencia recurrente no está operativa** (falta el command de inscripción, `ISSUE-156` y `TASK-1707`): hoy el eje es una foto, no una serie — no prometer tendencia. | ≥20% trimestral |
 | **PVR** | Position Value Rate | Movimiento ponderado de posiciones en keywords de alto valor comercial. | Documentado |
 | **MOR** | MQL Origin Rate | % de MQLs con first-touch atribuido a orgánico (SEO/AEO). | Documentado por cliente |
 | **OPC** | Organic Pipeline Contribution | Pipeline atribuible a orgánico (last-touch) sobre pipeline total. | Documentado por cliente |
@@ -221,7 +221,7 @@ La visibilidad se escala por tier (alineado con el modelo ASaaS). **Directamente
 | **Design System** (capa ICO) | Infraestructura visual de componentes/tokens que sube FTR, baja RpA/CT. | Capacidad embebida, no producto standalone. |
 | **Brand Voice para AI** (capa ICO) | Framework que codifica voz para que la IA generativa produzca on-brand. | Capacidad embebida, no producto standalone. |
 | **ASaaS** | Agency Service as a Software. | — |
-| **AEO** | **AI Engine Optimization** | Posicionamiento en motores de IA (ChatGPT, Claude, Perplexity, Gemini). **No** "Answer Engine Optimization". Medición: Otterly.ai. |
+| **AEO** | **AI Engine Optimization** | Posicionamiento en motores de IA (ChatGPT, Claude, Perplexity, Gemini + Google AI Overview). **No** "Answer Engine Optimization". Medición: **motor propio** (AI Visibility Grader), scoring determinista versionado con 7 dimensiones. |
 | **IDD** | Intelligence-Driven Development | Metodología propietaria de Wave. |
 | **CVR** | Creative Velocity Review | Rito trimestral donde se presenta Revenue Enabled al cliente. |
 

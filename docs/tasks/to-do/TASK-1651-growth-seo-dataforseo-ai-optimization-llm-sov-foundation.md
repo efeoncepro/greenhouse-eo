@@ -1,5 +1,54 @@
 # TASK-1651 — Growth SEO: familia `ai_optimization` (DataForSEO) + fundación SoV de marca en LLMs per-org
 
+## Delta 2026-08-15 — la task se parte en dos: `1651-A` sigue P1, `1651-B` baja a P3
+
+Fuente: `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md` §1.2 (gasto
+fuera del ledger), §2.2 (economía medida por observación), §3.3 (advertencia explícita sobre esta
+task) y §8 (higiene documental pendiente).
+
+Dentro de este mismo archivo, el trabajo queda partido en dos bloques con prioridad distinta:
+
+| Bloque | Qué es | Prioridad | Por qué |
+|---|---|---|---|
+| **`1651-A`** | Ampliación gobernada del allowlist: familia `ai_optimization` en `DATAFORSEO_FAMILIES` + CHECK del spend ledger migrado + paridad TS↔CHECK | **P1** (sin cambio) | Infraestructura barata, aditiva y sin gasto. **Habilita toda la sección**, incluido LLM Scraper — que es el endpoint que sí sirve en el mercado del cliente |
+| **`1651-B`** | Captura de LLM Mentions como fundación de SoV (schema, captura batch, readers, MCP tools, señal) | **P3** (baja) | Su valor marginal hoy es una historia longitudinal de una superficie que **ya sabemos mirar**; va detrás del camino es-LATAM |
+
+**Por qué `1651-B` baja.** LLM Mentions cubre **sólo ChatGPT US/English + Google AI Overview**. Para
+Berel (CL/MX) **sólo aplica el lado google** — y esa superficie **ya la observamos nosotros** vía AI
+Mode a través de DataForSEO, con 35 observaciones medidas a USD 0,0026 cada una. O sea: la mitad del
+valor prometido no existe para el cliente que tenemos, y la otra mitad es una superficie que ya está
+en la matriz del grader. Lo que queda de valor marginal, y es real pero acotado, es **la historia
+longitudinal desde 2025-08-01** de esa superficie: profundidad hacia atrás que nuestros propios
+snapshots no tienen y no pueden fabricar. Eso justifica hacerlo; no justifica hacerlo primero.
+
+**Lo que sí conviene mirar antes (nota, no alcance de esta task).** **LLM Scraper funciona en
+es-LATAM y cuesta ~80× menos por observación.** Si el objetivo es más superficie observada por menos
+plata **en el mercado del cliente**, ése es el endpoint, no Mentions. `1651-A` lo deja habilitado;
+construirlo es task aparte, y debería competir por el turno antes que `1651-B`.
+
+**`Depends on` suma `TASK-1696`** — **presupuesto en dólares por organización para el
+gasto de proveedor del carril AI/grader**. Esta task instaura una **compra recurrente** (captura
+batch por cron), y hoy el defecto §1.2 está vivo en el vecindario: las 35 observaciones AI Mode del
+grader no aparecen en ninguna fila de `seo_provider_spend_daily` porque
+`postDataForSeoSerpLiveAdvanced` (`src/lib/ai/dataforseo.ts:303-313`) no pasa `organizationId`, y el
+único tope en USD del entitlement AEO multiplica runs por un `costCeiling(light)` —de ahí que una org
+contratada pueda hacer 20 runs `full` = **USD 17,60/mes sin ningún gate de dinero**—. Prender una
+compra recurrente encima de eso es repetir el defecto con cadencia automática.
+
+**Lo que viene GRATIS y conviene adelantar.** `fan_out_queries` y `brand_entities` llegan **sin costo
+adicional en las tres superficies de la familia** (`[confirmar el detalle por endpoint contra
+`references/08-ai-optimization.md` en Discovery]`). No son un extra decorativo: `fan_out_queries` es
+insumo directo del **modelado de Query Fan-Out**, que hoy está apenas etiquetado —`fanOutType` es un
+tag plano sobre 12–16 preguntas, sin estructura raíz → sub-consultas ni cobertura por raíz (§3.2
+A3)—; y `brand_entities` alimenta el **modelo de entidad**, que hoy no existe: el JSON-LD entregable
+nace con `sameAs: []` (§3.2 A6). Se persisten desde la primera corrida, aunque `1651-B` siga en P3.
+
+🔴 **Invariante nuevo: la cadencia no se promete, se mide.** La frecuencia de refresh de la base
+Mentions **no está publicada por el proveedor**. Sin verificarla empíricamente en staging —comparando
+snapshots consecutivos hasta observar un delta real— **no se le promete cadencia a un cliente**, ni
+en UI, ni en reporte, ni en propuesta comercial. Un `capture_date` diario sobre una base que refresca
+semanal fabrica una serie que parece viva y está muerta.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -7,7 +56,7 @@
 ## Status
 
 - Lifecycle: `to-do`
-- Priority: `P1`
+- Priority: `P1 (1651-A) · P3 (1651-B)`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
@@ -22,21 +71,29 @@
 - Status real: `Definida`
 - Rank: `TBD`
 - Domain: `growth`
-- Blocked by: `none`
+- Blocked by: `TASK-1696` (bloquea `1651-B`; `1651-A` no gasta y puede avanzar)
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
 
-Ampliar el allowlist DataForSEO con la familia **`ai_optimization`** (`/v3/ai_optimization/`) siguiendo
-el proceso gobernado del ADR EPIC-022 (familia + CHECK + entitlement, nunca aflojar el candado), y
-fundar sobre ella la capacidad **SoV de marca en LLMs per-org**: captura batch de **LLM Mentions**
-(base longitudinal del proveedor desde 2025-08-01: menciones/citas de marca en ChatGPT y Google AI
-Overview, con timeseries new/lost y top domains/pages/brands) hacia snapshots append-only en PG, con
-readers per-org y **MCP tools en el mismo PR** (mandato lane ecosystem TASK-1645). Es la lente ◑
+Dos bloques con prioridad distinta dentro de un mismo archivo (ver Delta 2026-08-15).
+
+**`1651-A` — ampliación gobernada del allowlist (P1).** Agregar la familia **`ai_optimization`**
+(`/v3/ai_optimization/`) a `DATAFORSEO_FAMILIES` siguiendo el proceso del ADR EPIC-022 (familia +
+CHECK del spend ledger + entitlement, nunca aflojar el candado). Es infraestructura barata, aditiva
+y **sin gasto**: habilita toda la sección —incluido **LLM Scraper**, que sí funciona en es-LATAM y
+cuesta ~80× menos por observación—, no sólo Mentions.
+
+**`1651-B` — fundación SoV de marca en LLMs per-org (P3).** Captura batch de **LLM Mentions** (base
+longitudinal del proveedor desde 2025-08-01: menciones/citas de marca en ChatGPT US/English y Google
+AI Overview, con timeseries new/lost y top domains/pages/brands) hacia snapshots append-only en PG,
+con readers per-org y **MCP tools en el mismo PR** (mandato lane ecosystem TASK-1645). Es la lente ◑
 "lo que los LLMs de terceros responden y citan", complementaria — nunca fusionada — con el SoV que
-el grader deriva de sus propias observaciones (TASK-1424).
+el grader deriva de sus propias observaciones (TASK-1424). Baja a P3 porque para el mercado del
+cliente sólo aplica el lado google, **superficie que ya observamos vía AI Mode**: lo que aporta de
+nuevo es la profundidad histórica, no la cobertura.
 
 ## Why This Task Exists
 
@@ -51,14 +108,25 @@ análisis manual no gobernado (sin entitlement, sin spend ledger, sin atribució
 
 ## Goal
 
+**`1651-A` (P1):**
+
 - La familia `ai_optimization` existe en `DATAFORSEO_FAMILIES` con `requiresOrganization: true`,
   CHECK de `seo_provider_spend_daily` migrado en el mismo PR y paridad TS↔CHECK verde.
-- Captura batch gobernada de LLM Mentions per-org (entitlement + budget + spend ledger + breaker)
-  materializa snapshots append-only en PG vía Cloud Scheduler + ops-worker.
+- Queda habilitada **toda la sección** —Mentions, Responses, Scraper, AI Keyword Data— para que la
+  siguiente capacidad se elija por valor y no por qué candado está abierto.
+
+**`1651-B` (P3, detrás del camino es-LATAM y de `TASK-1696`):**
+
+- Captura batch gobernada de LLM Mentions per-org (entitlement + **budget en USD por organización** +
+  spend ledger + breaker) materializa snapshots append-only en PG vía Cloud Scheduler + ops-worker.
 - Readers per-org (resumen SoV, timeseries, top domains/pages/brands) expuestos con sus MCP tools
   en el mismo PR; degradación honesta (`no_llm_sov_data`, jamás ceros fantasma).
 - Semántica ◑ (estimado de mercado del proveedor) declarada en el contrato; cobertura real
-  documentada (ChatGPT US/English + Google AI Overview solamente).
+  documentada (**ChatGPT US/English + Google AI Overview solamente**; para CL/MX sólo aplica el lado
+  google, y esa superficie ya la observamos vía AI Mode).
+- `fan_out_queries` y `brand_entities` persistidos desde la primera corrida: vienen gratis y son
+  insumo del modelado de fan-out y del modelo de entidad.
+- La cadencia de captura **se declara sólo después de medirla** en staging.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -106,6 +174,12 @@ Reglas obligatorias:
   batch/spend fence. Esta task NO re-implementa ese cableado: lo reutiliza.
 - `TASK-1645` (complete) — lane ecosystem `/api/platform/ecosystem/growth/seo/*` + patrón MCP tools.
 - Tabla `greenhouse_growth.seo_provider_spend_daily` (migración `20260805194114467_task-1300-*`).
+- 🔴 **`TASK-1696`** — **bloqueo duro de `1651-B`**: presupuesto en dólares por
+  organización para el gasto de proveedor del carril AI/grader, y cierre de la fuga por la que las
+  observaciones AI Mode del grader no llegan al ledger (`postDataForSeoSerpLiveAdvanced` no pasa
+  `organizationId`, `src/lib/ai/dataforseo.ts:303-313`). Esta task instaura una **compra
+  recurrente**: prenderla sin gate en USD es el defecto §1.2 otra vez, ahora con cron. **No bloquea
+  `1651-A`**, que no gasta.
 
 ### Blocks / Impacts
 
@@ -195,8 +269,18 @@ Reglas obligatorias:
   - Semántica ◑ (estimado del proveedor) en el contrato; NUNCA presentar como verdad de primera
     parte ni promediar con el SoV del grader (boundary §1.1).
   - Paridad TS↔CHECK de familias (test existente la fuerza).
-  - Cobertura declarada por superficie: `chatgpt` (US/English) y `google_ai_overview`; ninguna otra
-    superficie se inventa.
+  - Cobertura declarada por superficie: `chatgpt` (**US/English solamente**) y
+    `google_ai_overview`; ninguna otra superficie se inventa. Para una marca CL/MX **sólo el lado
+    google es señal**, y esa superficie ya la observa el grader vía AI Mode: la lente del proveedor
+    aporta profundidad histórica, no cobertura nueva. Ese límite viaja en el contrato y en el
+    reader, no sólo en esta task.
+  - 🔴 **La cadencia no se promete, se mide.** La frecuencia de refresh de la base Mentions **no
+    está publicada por el proveedor**. Hasta verificarla empíricamente en staging —deltas entre
+    corridas consecutivas hasta observar un cambio real—, ninguna superficie (UI, reader, reporte,
+    propuesta comercial) declara periodicidad. Un `capture_date` diario sobre una base semanal
+    fabrica una serie que parece viva y está muerta.
+  - `fan_out_queries` y `brand_entities` se persisten siempre que vengan: son gratis y recuperarlos
+    después obliga a re-comprar la corrida.
 - Tenant/space boundary: todo keyed por `organization_id`; captura solo para orgs con entitlement
   `seo_v1` activo (`module_assignments`).
 - Idempotency/concurrency: batch por org con `capture_date` como clave de idempotencia; breaker por
@@ -270,41 +354,65 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Familia `ai_optimization` en el allowlist (gobernada)
+> Partido en dos bloques con prioridad distinta (Delta 2026-08-15). **`1651-A` es entregable por sí
+> solo** y puede cerrarse sin `1651-B`: la familia habilitada ya tiene valor —desbloquea LLM
+> Scraper, que es el camino es-LATAM— y no gasta un dólar por existir.
+
+## `1651-A` — ampliación gobernada del allowlist (P1)
+
+### Slice A1 — Familia `ai_optimization` en el allowlist (gobernada)
 
 - Agregar `ai_optimization` a `DATAFORSEO_FAMILIES` (`prefix: '/v3/ai_optimization/'`,
-  `requiresOrganization: true`, purpose con cobertura real declarada).
+  `requiresOrganization: true`, purpose con cobertura real declarada **por endpoint**: Mentions es
+  ChatGPT US/EN + Google AI Overview; Scraper y Responses tienen otra cobertura).
 - Migración que amplía el CHECK de `seo_provider_spend_daily` + verificación DO post-DDL.
 - Tests de familia + paridad TS↔CHECK verdes; delta en arch doc §6 (costos as-of 2026-08-06).
+- Delta en la skill `dataforseo-operator` (candidata #1 → integrada) **en este bloque**, no al final:
+  el allowlist queda abierto acá y la skill es el mapa que otros agentes leen.
+- **Cero gasto**: `1651-A` no ejecuta ninguna llamada pagada. La primera llamada real pertenece a
+  `1651-B` (o a la task de LLM Scraper, si esa llega antes).
 
-### Slice 2 — Schema de snapshots LLM SoV (append-only)
+## `1651-B` — fundación SoV de marca en LLMs (P3, detrás del camino es-LATAM y de `TASK-1696`)
+
+### Slice B1 — Schema de snapshots LLM SoV (append-only)
 
 - Migración de tablas nuevas bajo `greenhouse_growth` (naming final según Open Question #1):
   snapshot diario por `organization_id × surface × capture_date` con métricas de menciones (brand
   mentions, total answers, share) + tabla hija o JSONB para top domains/pages/brands `[decidir en
   plan]`; GRANTs runtime; tipos regenerados (`pnpm db:generate-types`).
 - Contracts TS en `src/lib/growth/seo/llm-sov/contracts.ts` con semántica ◑ documentada.
+- **Persistir `fan_out_queries` y `brand_entities` desde el schema inicial.** Vienen gratis y son
+  insumo directo del modelado de Query Fan-Out (hoy sólo etiquetado con un `fanOutType` plano) y del
+  modelo de entidad (hoy inexistente: el JSON-LD entregable nace con `sameAs: []`). Dejarlos fuera
+  obliga a re-comprar la corrida para recuperarlos.
 
-### Slice 3 — Captura batch gobernada (ops-worker + Cloud Scheduler)
+### Slice B2 — Captura batch gobernada (ops-worker + Cloud Scheduler)
 
 - Command `captureLlmSovForOrganizations` `[nombre final en plan]`: resuelve orgs con entitlement →
-  `enforceSeoRunEntitlement` con `estimatedCostUsd` del batch → llama LLM Mentions vía
-  `postDataForSeoTask` (familia `ai_optimization`) → upsert snapshots idempotente.
+  gate de presupuesto **en USD por organización** (`TASK-1696`) + `enforceSeoRunEntitlement` con
+  `estimatedCostUsd` del batch → llama LLM Mentions vía `postDataForSeoTask` (familia
+  `ai_optimization`) → upsert snapshots idempotente.
+- **Toda llamada registra gasto con `organizationId`.** Una compra recurrente que no escribe fila en
+  `seo_provider_spend_daily` es exactamente el defecto §1.2, ahora con cron encima.
 - Endpoint en `services/ops-worker/server.ts` + flag `GROWTH_SEO_LLM_SOV_CAPTURE_ENABLED` (default
   OFF, declarado en `deploy.sh` + ledger) + Cloud Scheduler job (cadencia inicial semanal hasta
-  validar refresh de la base; ver Open Question #2).
+  medir el refresh real de la base; ver Open Question #2 y el invariante de cadencia).
 - Validación de parsing contra sandbox ANTES de la primera llamada pagada.
 
-### Slice 4 — Readers per-org + MCP tools (mismo PR)
+### Slice B3 — Readers per-org + MCP tools (mismo PR)
 
 - Readers: resumen SoV actual, timeseries new/lost, top domains/pages/brands — degradación honesta
   `no_llm_sov_data`.
+- El reader **declara la cobertura y la cadencia medida** en su respuesta: qué superficies cubre y
+  cuál es la frecuencia de refresh observada. Un consumer no puede inferir "diario" de que existan
+  filas diarias.
 - MCP tools correspondientes en la lane ecosystem (patrón TASK-1645), registradas en el mismo PR.
 
-### Slice 5 — Señal de reliability + cierre documental
+### Slice B4 — Señal de reliability + cierre documental
 
 - Señal `seo.llm_sov.capture_stale` `[nombre final]` en el reliability control plane.
-- Delta en skill `dataforseo-operator` (references/08 + sección allowlist: candidata #1 → integrada).
+- Evidencia empírica de la cadencia real de la base (deltas entre corridas consecutivas) registrada
+  en el cierre; sin ella, `1651-B` cierra como `code complete, cadencia no verificada`.
 - Fila del flag en `FEATURE_FLAG_STATE_LEDGER.md`; triple documentación proporcional (delta arch +
   doc funcional growth + manual si aplica).
 
@@ -312,10 +420,14 @@ Reglas obligatorias:
 
 - **UI visible** (panel SoV en LLMs): task `ui-ux` consumer separada, a crear al cerrar esta
   foundation (split canónico backend-data → ui-ux).
-- **LLM Responses / LLM Scraper / AI Keyword Data como capacidades**: la familia queda habilitada
-  para toda la sección, pero esta task solo construye la capacidad Mentions. Consolidar los 4
-  providers LLM del grader sobre LLM Responses es decisión de arquitectura de EPIC-020 (follow-up,
-  requiere `arch-architect`).
+- **LLM Responses / LLM Scraper / AI Keyword Data como capacidades**: `1651-A` habilita la familia
+  para toda la sección, pero acá sólo se construye Mentions. ⚠️ **LLM Scraper merece task propia y
+  probablemente antes que `1651-B`**: funciona en es-LATAM y cuesta ~80× menos por observación —si
+  el objetivo es más superficie observada por menos plata en el mercado del cliente, ése es el
+  endpoint—. Consolidar los 4 providers LLM del grader sobre LLM Responses es decisión de
+  arquitectura de EPIC-020 (follow-up, requiere `arch-architect`).
+- **El gate de presupuesto en USD por organización** para el carril AI/grader: es `TASK-1696`. Esta
+  task lo **consume**, no lo construye — y `1651-B` no se prende sin él.
 - **Tocar `competitiveSov`/`competitiveSovByEngine` del grader** (TASK-1424): lente distinta, cero
   overlap de archivos.
 - **Backfill histórico** de la base del proveedor.
@@ -330,11 +442,18 @@ diseño que el plan debe respetar:
 
 - **Costo Mentions**: $0.1/request + $0.001/fila. Estimación de batch: `orgs × requests_por_org ×
   ($0.1 + filas_esperadas × $0.001)`; pasar al gate como `estimatedCostUsd`.
-- **Cobertura**: solo `chatgpt` (US/English) + `google_ai_overview`. Para marcas es-CL la señal
-  fuerte es el lado google; documentarlo en el contrato y en el reader (campo `surface`).
-- **Variantes Lite**: evaluar en el plan si bastan para el snapshot diario (más baratas); full para
-  el drill de top sources.
-- **`fan_out_queries` + `brand_entities`**: persistirlos (vienen gratis) — insumo entity work AEO.
+- **Cobertura**: solo `chatgpt` (US/English) + `google_ai_overview`. Para marcas es-CL/MX **la única
+  señal aplicable es el lado google**, que el grader ya observa vía AI Mode a USD 0,0026 por
+  observación: lo que Mentions agrega es la **serie desde 2025-08-01**, no una superficie nueva.
+  Documentarlo en el contrato y en el reader (campo `surface`) y no venderlo como cobertura de "los
+  LLMs".
+- **Variantes Lite**: evaluar en el plan si bastan para el snapshot (más baratas); full para el
+  drill de top sources. Ojo con fijar "diario" antes de medir el refresh real de la base.
+- **`fan_out_queries` + `brand_entities`**: persistirlos siempre (vienen gratis en las tres
+  superficies de la familia — `[confirmar detalle por endpoint contra references/08 en Discovery]`).
+  `fan_out_queries` es insumo directo del **modelado de Query Fan-Out** (hoy `fanOutType` es un tag
+  plano sin estructura raíz → sub-consultas); `brand_entities` alimenta el **modelo de entidad**,
+  que hoy no existe y por eso el JSON-LD entregable nace con `sameAs: []`.
 - **Transporte**: endpoints POST-body (compatibles con el cliente POST-only); si Discovery encuentra
   un endpoint GET-por-path necesario, STOP y resolver primero el límite del transporte (no hackear).
 
@@ -342,12 +461,15 @@ diseño que el plan debe respetar:
 
 ### Slice ordering hard rule
 
-- Slice 1 (familia + CHECK) → Slice 2 (schema) → Slice 3 (captura) → Slice 4 (readers/MCP) →
-  Slice 5 (señal + docs).
-- Slice 1 y 2 pueden ir en la MISMA migración pero el CHECK debe migrar ANTES o JUNTO a cualquier
+- `1651-A` (Slice A1) es entregable y cerrable por sí solo. `1651-B` va después, y **detrás de
+  `TASK-1696`** y del turno que se le dé frente al camino es-LATAM (LLM Scraper).
+- Dentro de `1651-B`: Slice B1 (schema) → B2 (captura) → B3 (readers/MCP) → B4 (señal + docs).
+- A1 y B1 pueden ir en la MISMA migración, pero el CHECK debe migrar ANTES o JUNTO a cualquier
   código que registre gasto de la familia (sino: gasto real + INSERT fallido + gate leyendo cero —
   bug class documentado en el parity test).
-- Slice 3 NO se prende (flag OFF) hasta que Slice 4 tenga readers con qué verificar el dato.
+- 🔴 **El Slice B2 no se prende sin el gate de presupuesto en USD por org (`TASK-1696`) operativo.**
+  Es una compra recurrente: sin techo en dólares se repite el defecto §1.2 con cron.
+- Slice B2 NO se prende (flag OFF) hasta que B3 tenga readers con qué verificar el dato.
 - Prohibido ejecutar la primera llamada pagada antes de validar parsing contra sandbox.
 
 ### Risk matrix
@@ -356,7 +478,9 @@ diseño que el plan debe respetar:
 |---|---|---|---|---|
 | Sobregiro de presupuesto por org (gate se consulta una vez, gasto se acumula después) | finance/spend ledger | medium | `estimatedCostUsd` del batch completo + batch acotado por corrida + re-consulta del gate cada K orgs | `seo.provider.cost_over_budget` |
 | Familia en TS sin CHECK migrado → gasto real + INSERT fallido silencioso | migration/outbox | low | parity test rompe build; migración en el mismo PR; bloque DO | test CI + `seo.llm_sov.capture_stale` |
-| Cadencia de captura desalineada con refresh de la base (frecuencia NO publicada) | cron | high | arrancar semanal en staging; medir delta entre corridas antes de prometer cadencia; ajustar scheduler | comparación de snapshots consecutivos (plan) |
+| Cadencia de captura desalineada con refresh de la base (frecuencia NO publicada) | cron | high | arrancar semanal en staging; medir delta entre corridas **antes** de declarar cadencia en UI/reader/reporte/propuesta; ajustar scheduler. Invariante duro, no recomendación | comparación de snapshots consecutivos (plan) |
+| Compra recurrente sin techo en USD por org (defecto §1.2 con cron) | finance/spend | **high si B2 se prende sin `TASK-1696`** | B2 bloqueado por el gate de presupuesto en dólares; toda llamada pasa `organizationId` y escribe fila en el ledger | familia `ai_optimization` con llamadas y sin filas en `seo_provider_spend_daily` |
+| Se vende "SoV en LLMs" y la cobertura real es media superficie para el cliente | comercial/confianza | **high** | cobertura por superficie en el contrato y en el reader; el material comercial dice "ChatGPT US/EN + Google AI Overview", nunca "los LLMs" | una propuesta que promete Claude/Perplexity/Gemini desde esta lente |
 | Breaker de `ai_optimization` abierto apaga captura completa | cron | low | diseño ya aislado por familia (no afecta serp/labs); reintento en corrida siguiente | `seo.llm_sov.capture_stale` |
 | Costo real > estimado (variantes full vs Lite, filas mayores a lo esperado) | finance | medium | primera corrida staging con 1 org allowlist; comparar `cost` real del batch vs estimación; ajustar fórmula | spend diario familia `ai_optimization` en ledger |
 | Confusión de lentes SoV (proveedor ◑ vs grader) en consumers futuros | UI/reporting | medium | semántica ◑ en el contrato + naming `llm_sov_*` explícito + Out of Scope declarado | review humana en la task UI |
@@ -404,10 +528,26 @@ diseño que el plan debe respetar:
 
 ## Acceptance Criteria
 
+**`1651-A`:**
+
 - [ ] `DATAFORSEO_FAMILIES` incluye `ai_optimization` con `requiresOrganization: true` y el parity
       test TS↔CHECK pasa contra la migración aplicada.
 - [ ] Un intento de endpoint fuera del prefijo `/v3/ai_optimization/` con esa familia lanza
       (`normalizeEndpoint`), verificado por test.
+- [ ] `1651-A` cierra **sin haber ejecutado una sola llamada pagada** a la familia nueva.
+- [ ] La skill `dataforseo-operator` refleja el allowlist ampliado y la cobertura real **por
+      endpoint** (Mentions ≠ Scraper ≠ Responses).
+
+**`1651-B`:**
+
+- [ ] `TASK-1696` está operativa: existe techo en USD por organización para el carril, y la captura
+      lo consulta antes de cada batch.
+- [ ] Toda llamada de la familia pasa `organizationId` y deja fila en `seo_provider_spend_daily`;
+      cero llamadas huérfanas del ledger (verificado cruzando conteos tras la primera corrida).
+- [ ] `fan_out_queries` y `brand_entities` quedan persistidos desde la primera corrida.
+- [ ] 🔴 La cadencia declarada al cliente **está respaldada por deltas medidos** entre corridas
+      consecutivas en staging; si no se midió, el cierre dice `code complete, cadencia no
+      verificada` y ninguna superficie promete periodicidad.
 - [ ] La captura con flag OFF no ejecuta ninguna llamada al proveedor (verificado en staging logs).
 - [ ] Una corrida real en staging (1 org) materializa snapshot append-only, registra gasto en
       `seo_provider_spend_daily` con familia `ai_optimization`, y una segunda corrida el mismo día
@@ -416,7 +556,9 @@ diseño que el plan debe respetar:
 - [ ] `enforceSeoRunEntitlement` recibe `estimatedCostUsd` > 0 del batch (test del command).
 - [ ] Readers devuelven `no_llm_sov_data` honesto para org sin snapshots (sin ceros fantasma).
 - [ ] MCP tools de los readers registradas y respondiendo en la lane ecosystem (staging).
-- [ ] El contrato/typedoc declara semántica ◑ y cobertura (`chatgpt` US/EN + `google_ai_overview`).
+- [ ] El contrato/typedoc declara semántica ◑ y cobertura (`chatgpt` **US/EN solamente** +
+      `google_ai_overview`), y advierte que para CL/MX sólo aplica el lado google — superficie que
+      el grader ya observa vía AI Mode.
 - [ ] Flag registrado en `FEATURE_FLAG_STATE_LEDGER.md` con runtime `ops-worker` declarado.
 - [ ] Cero imports/JOIN entre `llm_sov_*` y tablas `grader_*` (grep + review).
 - [ ] Delta aplicado en arch doc §6 y en la skill `dataforseo-operator` (candidata #1 → integrada).
@@ -444,6 +586,9 @@ diseño que el plan debe respetar:
 
 ## Follow-ups
 
+- 🔴 **LLM Scraper en es-LATAM** `[por crear]` — habilitado por `1651-A`, funciona en el mercado del
+  cliente y cuesta ~80× menos por observación que Mentions. Debería competir por el turno **antes**
+  que `1651-B`: más superficie observada por menos plata, y en el idioma y país que importan.
 - Task `ui-ux` consumer: panel SoV en LLMs per-org (cockpit del módulo SEO o vista propia) — crear
   al cerrar esta foundation con wireframe real.
 - Evaluación de arquitectura (EPIC-020 + `arch-architect`): consolidar los providers LLM del grader
@@ -461,6 +606,7 @@ diseño que el plan debe respetar:
    paraguas SEO. Decidir con `arch-architect` en el plan ANTES del DDL.
 2. **Cadencia de captura**: la frecuencia de refresh de la base Mentions no está publicada. Arrancar
    semanal y medir deltas entre corridas en staging; decidir cadencia final con evidencia empírica.
+   Hasta entonces rige el invariante: **no se promete cadencia a un cliente** (ver Delta 2026-08-15).
 3. **Histórico del proveedor**: ¿exponer on-demand el histórico (desde 2025-08-01) vía reader live
    acotado, o solo acumular snapshots propios? Default V1: solo snapshots propios.
 4. **Capability**: ¿reutilizar `growth.seo.*` existente para los reads o acuñar

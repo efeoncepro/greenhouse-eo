@@ -4,6 +4,113 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-15 — dos dependencias nuevas y dos correcciones de oficio
+
+Fuente: `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md` (§3.1 brechas S1
+y S8; §3.2 brecha A2; §5.2 la cola priorizada).
+
+### `Depends on` += `TASK-1700` (la cola priorizada)
+
+Hoy esta task recibe "una decisión humana sobre un candidate u oportunidad" sin decir de **qué lista**
+sale esa decisión. La auditoría midió que hay **tres listas con tres criterios distintos** y que
+discovery ordena por `captured_at DESC` —orden de llegada— sobre hasta **500 candidatos**. Un work
+item que nace del #1 de una lista sin orden no nace de una decisión: nace de una casualidad. `TASK-1700`
+es la cola priorizada con score versionado y snapshot reproducible; el work item se ancla a un ítem de
+esa cola, y el `source_context_hash` deja de ser el hash de una evidencia suelta para ser el hash de
+una posición defendible.
+
+### `Depends on` += `TASK-1702` (citabilidad determinista + recomendación anclada a URL)
+
+Es la brecha **A2** en su forma más literal: *"La recomendación nunca aterriza en una URL"*. Esta task
+ya declara que el brief nace con `target.url` en los campos pendientes y que un refresh/fix sin página
+dueña obliga a pedir `create` explícito. Eso está bien como guard, pero deja el problema donde estaba:
+**un work item que nace con `target_url: pendiente de definir` es la brecha A2 sin resolver, con
+papeleo encima.** `TASK-1702` produce la recomendación ya anclada a una URL concreta; sin ella, el
+handoff a Content Factory arranca con el campo más consecuente vacío.
+
+### Corrección (a) — `decision_kind` no tiene valor para **consolidar**
+
+El enum declarado es `objective|opportunity|discovery_candidate|technical_fix|manual`. **La
+consolidación es una acción SEO de primera clase**, con su propio criterio de éxito: dos URLs se
+funden, una 301 apunta a la otra, y el resultado se mide como recuperación de la página que sobrevive,
+no como mejora de una keyword. Sin valor propio, la canibalización —que el módulo **ya detecta**—
+termina clasificada como `technical_fix` o `manual`, y con eso se pierde: no se puede contar cuánto
+trabajo de consolidación se hizo, ni medirlo con su criterio, ni distinguirlo de un fix de meta title.
+
+**Cambio:** el enum de `decision_kind` incorpora `consolidate`. Y como el criterio de éxito difiere,
+la consolidación no puede compartir el `next_action` genérico: se declara explícita.
+
+**Nota de frontera que Discovery debe cerrar, no heredar:** la fila `work_kind` de la tabla dice hoy
+que `consolidate` *"requiere otra task y no se convierte silenciosamente"*. Esas dos decisiones ya no
+son coherentes entre sí — una consolidación con `decision_kind = consolidate` necesita un `work_kind`
+que la exprese. Resolverlo explícitamente (extender `work_kind`, o mapear a `fix` declarando por qué);
+lo que no se puede es dejar el enum nuevo apuntando a un `work_kind` que lo rechaza.
+
+### Corrección (b) — el brief necesita cinco insumos que hoy no existen
+
+Tal como está especificado, el brief lleva keyword primaria, secundarias, audiencia, objetivo, oferta,
+locale, tono y CTA. Con eso, lo que llega a Content Factory es **una keyword con papeleo**: nada de eso
+le dice a quien escribe *qué forma* debe tener la pieza para ganar. Los cinco insumos faltantes:
+
+1. **Las sub-preguntas del fan-out, literales.** Hoy `fanOutType` es un tag plano (brecha A3): el brief
+   necesita las preguntas concretas, porque son los H2 candidatos y el predictor #1 de citación es la
+   relevancia semántica del H2 frente a la sub-pregunta.
+2. **El formato que la SERP premia.** PAA, video, local pack, shopping ya se capturan y se colapsan a
+   un booleano de AI Overview (brecha S5). Cambian el formato ganador, no sólo el CTR: escribir un
+   ensayo donde la SERP premia una tabla es perder antes de publicar.
+3. **Las páginas que hoy forman la respuesta de la categoría** — el eje de terceros de `TASK-1311`
+   (Delta 2026-08-15). Sin esto el brief no sabe contra qué compite.
+4. **La URL destino** — de `TASK-1702`, no `pendiente de definir`.
+5. **Las entidades que deben aparecer** en la pieza (brecha A6).
+
+Los cinco son **insumos del brief**, no capacidades nuevas de esta task: cada uno tiene su dueño
+declarado. Lo que esta task debe hacer es **dejarles el lugar en el envelope** y no cerrar el contrato
+sin ellos, para no tener que romperlo después.
+
+## Delta 2026-08-14 — TASK-1659 complete: la intención declarada ya existe
+
+La mitad `TASK-1659` de la dependencia `TASK-1659`/`TASK-1660` está **complete**. Lo que esta task
+puede dar por sentado:
+
+- `seo_keyword_set_members.intent` (`target` | `opportunity` | `NULL`) con `intent_declared_by` +
+  `intent_declared_at` acoplados por CHECK. La cláusula de fallback de la dependencia ("si esos
+  contratos aún no están disponibles, el command debe exigir los campos explícitos equivalentes")
+  **ya no aplica al eje de intención**: se lee del dominio, no se re-declara en el work item.
+  `TASK-1660`, la lente que lo opera, sigue en `to-do`.
+- Un work item nacido de una keyword ya seguida ancla su procedencia a la **ventana de membresía
+  vigente**, no a un campo copiado: `intent_declared_at` es lo que sostiene "este trabajo nació de un
+  objetivo acordado en marzo". Cambiar la intención cierra una ventana y abre otra (outcome
+  `intent_changed`), así que la ref apunta a la ventana, no a "la keyword".
+- 🔴 **`NULL` significa "nadie la clasificó", jamás `opportunity`.** Las keywords seguidas antes del
+  2026-08-14 la tienen en `NULL`. Un work item que derive la acción `opportunity` de esa ausencia
+  afirma una decisión comercial que nadie tomó.
+Tres puntos del diseño de esta task que hay que ajustar al vocabulario ya cerrado:
+
+- **`decision_kind`** declara el enum `objective|opportunity|discovery_candidate|technical_fix|manual`.
+  El valor canónico del dominio es **`target`**, no `objective` — dos nombres para lo mismo obligan a
+  un mapeo que se desincroniza. Y el enum no tiene valor para una keyword seguida con intención
+  `NULL`, que hoy son **todas** las anteriores al 2026-08-14.
+- **`intent_snapshot_json`** dice "intención declarada o estimada" en una sola columna. Son dos ejes
+  distintos con el mismo nombre: la intención **declarada** de la membresía (`target`/`opportunity`,
+  con autor y ventana) y el search intent **estimado** que el proveedor trae en los candidates de
+  discovery. Fundirlos mezcla una estimación de mercado con un compromiso con el cliente; si la
+  columna guarda ambos, tiene que decir cuál es cuál.
+- **"Resolver candidate/target/intent server-side mediante los readers de 1664/1659/1660"**:
+  `TASK-1659` entregó un **command**, no un reader — hoy ningún reader de `src/lib/growth/seo/**`
+  expone la intención de una membresía, y el de `TASK-1660` sigue pendiente. O esta task se apoya en
+  ese reader cuando exista, o mantiene la vía de campos explícitos para la mitad de intención.
+- Ruta actualizada en `## Normative Docs`:
+  `docs/tasks/complete/TASK-1659-growth-seo-keyword-target-intent-model.md`.
+
+## Delta 2026-08-14 — TASK-1664 complete: dependencia desbloqueada
+
+- El primitive de discovery existe y está verificado live: `queueKeywordDiscovery` /
+  `readKeywordDiscovery` / `recordKeywordDiscoveryAction` (`src/lib/growth/seo/keyword-discovery/`),
+  runner async en ops-worker, lanes app/ecosystem y MCP tools (`get_seo_keyword_discovery`,
+  `discover_seo_keywords`). Candidatos guardan SOLO procedencia; la métrica vive en el store de
+  TASK-1661 (writer compartido `persistKeywordMarketData`). Rollout runtime pendiente (flag OFF,
+  scheduler pausado) — no bloquea el trabajo de código de esta task.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -22,7 +129,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|seo|content|data`
-- Blocked by: `TASK-1664`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -139,6 +246,13 @@ Reglas obligatorias:
   explícitos equivalentes y no inferirlos.
 - `TASK-1666` — integración opcional para adjuntar un draft de grounded query; el work item base
   `create|refresh|fix` no queda bloqueado por una grounded query ausente.
+- **`TASK-1700`** (cola priorizada, Delta 2026-08-15) — el origen ordenado y reproducible de la
+  decisión. El work item se ancla a un ítem de la cola con su `priority_score_version` y su snapshot;
+  sin ella, la decisión sale de una lista ordenada por `captured_at DESC` sobre 500 candidatos.
+- **`TASK-1702`** (citabilidad determinista + recomendación anclada a URL, Delta 2026-08-15) — provee
+  la **URL destino** del brief. Un work item con `target_url: pendiente de definir` es la brecha A2
+  sin resolver; esta dependencia es lo que evita que el handoff arranque con el campo más consecuente
+  vacío.
 - `src/lib/public-site/content-factory/contracts.ts` — contrato V1 existente, especialmente
   `ContentFactoryBrief`, `ContentFactoryGeneratedDraft` y `ContentFactoryValidation`.
 - `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` — commands/readers y consumers
@@ -282,7 +396,7 @@ mínimos:
 | `seo_target_id` | `uuid` | target validado contra la organización; nullable sólo si el contrato de discovery permite un targetless brief explícito |
 | `status` | `text` | `brief_ready → draft_requested → draft_private`; errores/cancelación son estados terminales gobernados |
 | `work_kind` | `text` | enum `create|refresh|fix`; `consolidate` requiere otra task y no se convierte silenciosamente |
-| `decision_kind` | `text` | enum `objective|opportunity|discovery_candidate|technical_fix|manual` |
+| `decision_kind` | `text` | enum `objective|opportunity|discovery_candidate|technical_fix|consolidate|manual`. **`consolidate` es valor de primera clase** (Delta 2026-08-15): la consolidación tiene criterio de éxito propio y sin valor propio cae en `technical_fix`/`manual` y el trabajo se pierde. Reconciliar con `work_kind` en Discovery — ver el Delta |
 | `source_refs_json` | `jsonb` | refs opacas a run/candidate/GSC opportunity/grounded draft; nunca payload crudo |
 | `source_context_hash` | `text` | SHA-256 de la evidencia normalizada que originó la decisión |
 | `primary_keyword` | `text` | snapshot normalizado, máximo contractual del dominio |
@@ -335,11 +449,33 @@ type SeoEditorialBriefEnvelopeV1 = {
     asOf: string
     signal: 'measured' | 'estimated' | 'declared' | 'derived'
   }>
+  // Delta 2026-08-15 — los cinco insumos sin los cuales el brief es "una keyword con papeleo".
+  // Cada uno tiene dueño declarado fuera de esta task; acá se les reserva el lugar en el contrato.
+  editorialInputs: {
+    fanOutSubQuestions: string[]          // TASK-1666/A3 — literales, son los H2 candidatos
+    serpFormat: {                         // brecha S5 — el formato que la SERP premia
+      features: Array<'paa' | 'video' | 'local_pack' | 'shopping' | 'ai_overview' | 'image_pack'>
+      asOf: string
+    } | null
+    categoryAnswerPages: Array<{          // TASK-1311 (eje de terceros) — contra qué compite
+      url: string
+      domain: string
+      engine: string
+    }>
+    targetUrl: string | null              // TASK-1702 — NUNCA "pendiente de definir" como texto
+    requiredEntities: string[]            // brecha A6 — entidades que deben aparecer
+  }
   brief: ContentFactoryBrief
 }
 ```
 
 Reglas de construcción:
+
+0. **Los cinco insumos editoriales viajan en el envelope, no en prosa del brief.** Un campo ausente se
+   rinde como `null`/`[]` con su razón en `evidence`, **jamás** como el string
+   `"pendiente de definir"`: un placeholder textual convierte una ausencia en una instrucción para
+   quien escribe. `targetUrl` ausente en un `refresh`/`fix` bloquea el handoff (regla 3); ausente en un
+   `create` es legítimo y se declara.
 
 1. `brief.intent` sólo puede ser `create`, `refresh` o `fix`; un candidate descartado o de
    consolidación no puede crear un brief por accidente.
@@ -380,6 +516,16 @@ No existe transición V1 a `published`, `active`, `indexed`, `tracked` o `graded
   `seo_editorial_duplicate`, `seo_editorial_handoff_blocked`, `seo_editorial_provider_unavailable`.
 - El payload de una candidate y cualquier URL/claim proveniente de provider o usuario se trata como
   dato no confiable; no puede inyectar instrucciones al adapter ni cambiar capability/lane.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 2 — PLAN MODE
+     El agente que toma esta task ejecuta Discovery y produce
+     plan.md segun TASK_PROCESS.md. No llenar al crear la task.
+     ═══════════════════════════════════════════════════════════ -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 3 — EXECUTION SPEC
+     ═══════════════════════════════════════════════════════════ -->
 
 ## Scope
 
@@ -575,6 +721,10 @@ No incluir keyword completa, copy, prompt ni URL privada en una métrica de alta
 - No se requiere nueva credencial ni provider externo; cualquier cambio de secret queda fuera de esta
   task y debe tener su propio gate.
 
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 4 — VERIFICATION & CLOSING
+     ═══════════════════════════════════════════════════════════ -->
+
 ## Acceptance Criteria
 
 - [ ] Existe `seo_editorial_work_items` con tenant, target, work kind, decision kind, source refs,
@@ -584,6 +734,14 @@ No incluir keyword completa, copy, prompt ni URL privada en una métrica de alta
 - [ ] El command rechaza candidate/ref/target de otra organización con respuesta anti-oracle.
 - [ ] El command diferencia `create`, `refresh` y `fix`; no transforma `consolidate` o una grounded
   query en otro tipo sin confirmación explícita.
+- [ ] **`decision_kind` incluye `consolidate` como valor propio**: una canibalización detectada NUNCA
+  se persiste como `technical_fix` ni `manual`, y su criterio de éxito se declara aparte.
+- [ ] **La relación `decision_kind: consolidate` ↔ `work_kind` está resuelta y escrita** (extender el
+  enum o mapear con rationale); no queda un valor que el otro enum rechace.
+- [ ] **El envelope lleva los cinco insumos editoriales** (`fanOutSubQuestions`, `serpFormat`,
+  `categoryAnswerPages`, `targetUrl`, `requiredEntities`), cada uno con su fuente y as-of.
+- [ ] **Ningún insumo ausente se rinde como el texto `"pendiente de definir"`**: se rinde `null`/`[]`
+  con razón. Un `refresh`/`fix` sin `targetUrl` bloquea el handoff con error canónico.
 - [ ] El command valida un `ContentFactoryBrief.v1` completo antes de persistir o entregar.
 - [ ] Un refresh/fix sin URL/post/inspección dueña falla con error canónico y no llama Content Factory.
 - [ ] La envolvente conserva por separado source refs, as-of y tipo de señal `measured|estimated|declared|derived`.

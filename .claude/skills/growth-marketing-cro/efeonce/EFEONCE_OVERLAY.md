@@ -54,11 +54,13 @@ NO invade:
 - `docs/architecture/GREENHOUSE_TRACKING_ENGINE_ARCHITECTURE_V1.md` (Proposed)
 - `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` (Search Visibility 360, EPIC-022 — motor real al
   2026-08-05 fin de día: COMPLETE TASK-1299 schema `greenhouse_growth.seo_*` + TASK-1301 entitlement per-org
-  `seo_v1` con chokepoint `enforceSeoRunEntitlement` en `src/lib/growth/seo/entitlement.ts` + TASK-1300 registry
+  **`seo_v2`** (la clave `seo_v1` quedó CERRADA por el cutover de TASK-1677 — sin assignments vigentes) con chokepoint `enforceSeoRunEntitlement` en `src/lib/growth/seo/entitlement.ts` + TASK-1300 registry
   DataForSEO/ledger + TASK-1302 materializer GSC LIVE (`readKeywordOpportunities`) + TASK-1305
   `readSeoAeoGap`/quadrant SEO×AEO (primer quadrant real: Berel → `riesgo`); TASK-1645 lane ecosystem + las
   primeras 3 MCP tools, federadas al gateway por TASK-1647 y **live en producción desde 2026-08-06**. Delta
-  2026-08-07: inventario MCP **9 lecturas + 2 escrituras** y cockpit operador en `/admin/growth/seo`
+  2026-08-07: inventario MCP del dominio SEO **10 lecturas + 2 escrituras** (verificado contra
+  `src/mcp/greenhouse/server.ts` el 2026-08-14; la 10.ª lectura es `get_seo_keyword_market_data`, TASK-1661)
+  y cockpit operador en `/admin/growth/seo`
   (TASK-1306/1307/1308) — `track_seo_keywords`/`untrack_seo_keywords` son las primeras escrituras del dominio y
   **comprometen gasto recurrente del proveedor**, por eso van con techo por target, entitlement per-ORG, outcome
   por keyword y reverso append-only, federadas y fail-closed hasta TASK-1631. Regla: todo reader SEO/E-E-A-T

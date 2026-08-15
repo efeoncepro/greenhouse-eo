@@ -1,7 +1,7 @@
 > **Tipo de documento:** Manual de uso (operador del portal)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-08-07 por Claude (TASK-1308)
-> **Ultima actualizacion:** 2026-08-10 por Claude (TASK-1388 — Growth vive como seccion del dominio Comercial)
+> **Ultima actualizacion:** 2026-08-14 por Claude (TASK-1661 — las columnas de mercado ya traen dato: Volumen y Barrera de enlaces)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §7 y §10.4
 
 # Oportunidades de Keywords — Leer el mapa y seguir keywords
@@ -36,14 +36,38 @@ de posicion. La pantalla vive en `Growth > SEO > Keywords` (`/admin/growth/seo/k
    (pulsa uno para filtrar, pulsalo de nuevo o usa **Ver todas** para soltarlo); ademas hay
    **Buscar keyword** y el selector **Posicion**. Los filtros son locales: no recargan la pagina,
    pero si viajan en la URL, asi que el enlace se comparte ya filtrado.
-7. En la tabla, revisa la keyword, su pagina actual y la ganancia estimada. Viene ordenada por
-   ganancia estimada; puedes reordenar por cualquier columna numerica y cambiar el tamaño de
-   pagina (10 / 25 / 50; por defecto 25).
+7. En la tabla, revisa la keyword, su pagina actual y la ganancia estimada. Si el Space tiene el
+   enriquecimiento de mercado, veras ademas **Volumen** y **Barrera de enlaces** (ver "Las dos
+   lentes" mas abajo). Viene ordenada por ganancia estimada; puedes reordenar por cualquier
+   columna numerica y cambiar el tamaño de pagina (10 / 25 / 50; por defecto 25).
 8. Pulsa **Seguir** en las que quieras medir a diario, o marca varias y usa **Seguir seleccionadas**.
 9. Para sacar una del ciclo, **Dejar de seguir**. Tienes unos segundos para **Deshacer**.
 10. **Exportar CSV** baja lo que estas viendo, con los filtros aplicados.
 11. Un click en la keyword te lleva a **Rendimiento** con su serie aislada. Un click en la URL de
     abajo abre en otra pestaña la pagina que rankea hoy — es la que hay que mirar para consolidar.
+
+## Las dos lentes: lo medido y lo estimado
+
+La pantalla mezcla **dos fuentes que nunca se promedian**. Saber cual estas mirando cambia lo que
+puedes afirmarle a un cliente.
+
+| Lente | Que columnas trae | Que es |
+|---|---|---|
+| **● Medido · Search Console** | Posicion, Impresiones, Clics, CTR, Ganancia est., Paginas | Lo que a **este** sitio le paso de verdad en Google. Es demanda propia, no un promedio |
+| **◑ Estimado · mercado** | **Volumen** y **Barrera de enlaces** | Estimacion del mercado (proveedor externo, refresco mensual). Sirve para dimensionar una busqueda donde el cliente todavia no aparece |
+
+Reglas de lectura:
+
+- **No las promedies ni las mezcles en una sola conclusion.** "Tiene 2.400 de volumen" y "te ve 300
+  veces al mes" son dos hechos distintos y ambos son ciertos.
+- **El volumen estimado no prioriza esta pantalla.** El orden sigue saliendo de la ganancia estimada,
+  que se calcula con datos medidos. El volumen ayuda a *explicar* y a dimensionar, no a rankear.
+- **Las dos columnas de mercado aparecen solo si el Space tiene el enriquecimiento habilitado.** Si
+  no lo tiene, no se renderizan y la pantalla lo declara una vez al pie del mapa. Es a proposito:
+  una columna que no puede traer dato no gana su ancho.
+- **La cifra tiene fecha.** Se captura por corrida y se refresca mensualmente; la pantalla todavia no
+  imprime esa fecha. Si necesitas el "vigente al", mirala en
+  [operar-datos-de-mercado-keywords.md](operar-datos-de-mercado-keywords.md).
 
 ## Que significan las señales
 
@@ -54,8 +78,11 @@ de posicion. La pantalla vive en `Growth > SEO > Keywords` (`/admin/growth/seo/k
 | **Consolidar** | Mas de una pagina tuya compite por esa busqueda. **No se optimiza: se consolida.** Es otro trabajo |
 | Forma del punto en el mapa | Circulo = Empujar · triangulo = A un paso · rombo = Consolidar. La forma existe para que la lectura no dependa del color; la misma etiqueta esta en texto en la tabla |
 | Zona sombreada **"Primera plana"** | Marca las posiciones 8 a 10. Es un **hecho posicional, no una accion**: dentro tambien caen keywords canibalizadas, y esas se consolidan |
-| `● Medido · Search Console` | Al pie del mapa. Todo lo que ves salio de la medicion real del sitio; nada se promedia con una estimacion de mercado |
-| "El volumen y la dificultad de mercado no estan habilitados en este Space" | Va junto a lo anterior, **una sola vez**. Mientras eso sea cierto, las columnas *Volumen* y *Dificultad* **no se muestran**: una columna que no puede traer datos no gana su ancho. Cuando el enriquecimiento externo se habilite vuelven solas, y una celda sin dato dira "Sin dato" (con la explicacion en el tooltip), **nunca 0** |
+| `● Medido · Search Console` | Al pie del mapa, junto al aviso de que el enriquecimiento de mercado no esta habilitado en este Space. Aparece solo en ese caso: significa que **todo** lo que ves salio de la medicion real del sitio |
+| **Volumen** | Busquedas mensuales estimadas de esa keyword en el mercado del target (pais + idioma). Es la lente ◑ estimada: **no** es cuanta gente llego a este sitio (eso son las Impresiones) |
+| **Barrera de enlaces** | Que tan atrincherado con backlinks esta el top 10 de esa busqueda. Se muestra en niveles — **Baja / Media / Alta** — nunca como numero |
+| **Barrera "Baja"** | ⚠️ **No significa "facil".** Significa que ahi **se compite con contenido y autoridad de dominio, no con enlaces**: es una oportunidad para un dominio fuerte. Leerlo como "trivial" es el error clasico |
+| **"Sin dato"** en Volumen o Barrera | Esa keyword **no se consulto** al proveedor, o el proveedor **no la tiene**. Es un hueco: no es un cero y **no es "Baja"** — presentar un hueco como barrera baja afirma una oportunidad que nadie midio |
 | "+N clics/mes est." | Clics adicionales si llegara a la posicion objetivo, segun la curva de CTR **del propio sitio** |
 | "Sin ganancia estimada" | No es falta de dato: esa keyword ya convierte mejor que el promedio de la posicion objetivo |
 | "X de 200 keywords seguidas" | El cupo del set monitoreado. Cada keyword vigente se cobra en cada ciclo diario |
@@ -76,16 +103,47 @@ de posicion. La pantalla vive en `Growth > SEO > Keywords` (`/admin/growth/seo/k
 - Funciona aunque el sitio este pausado: bloquear la salida congelaria el gasto sin forma de
   bajarlo.
 
+## Objetivo u oportunidad: por que la keyword esta en el set
+
+Desde 2026-08-14 cada keyword del set puede declarar **por que** esta ahi. Son dos cosas
+distintas y el sistema ya no las confunde:
+
+| Intencion | Que significa | Como se lee su posicion |
+|---|---|---|
+| **Oportunidad** | demanda que tu sitio YA capta y estas empujando | estar en la 12 y querer la 5 |
+| **Objetivo** | un compromiso acordado con el cliente | estar en la 60 puede ser normal: es la distancia que falta, no un fracaso |
+
+Tres cosas que conviene saber:
+
+- **"Seguir" desde esta pantalla declara `oportunidad`**, porque eso es exactamente lo que estas
+  haciendo: mirar demanda medida y decidir empujarla. Declarar un **objetivo** es otra accion, con
+  su propia superficie.
+- **Las keywords que ya estaban seguidas antes de esta fecha no tienen intencion declarada**, y
+  aparecen asi: sin dato. No se las marco como oportunidad automaticamente — nadie las clasifico,
+  y decir lo contrario habria inflado el conteo de oportunidades con filas que nadie miro.
+- **Cambiar la intencion de una keyword no borra su historia.** Queda registrado desde cuando es
+  objetivo, para poder decir despues *"es objetivo desde marzo, y en marzo estaba en la 45"*. Y no
+  consume cupo del techo: se puede reclasificar aunque el set este lleno.
+
 ## Que NO hacer
 
 - **No sigas keywords "por si acaso".** Cada una entra al ciclo diario de captura y se le paga al
   proveedor por consulta, todos los dias, hasta que alguien la deje de seguir. El costo no es del clic:
   es recurrente.
+- **No leas un objetivo en la posicion 60 como un problema de rendimiento.** Si alguien lo declaro
+  como compromiso, esa distancia es el trabajo pendiente. Promediarlo con las oportunidades ensucia
+  cualquier lectura agregada.
 - **No trates una keyword canibalizada como una oportunidad mas.** Empujarla es empujar dos paginas tuyas
   a competir mas fuerte entre si. Primero se consolida.
-- **No leas la ausencia de las columnas de volumen y dificultad como "0 busquedas".** No estan porque
-  todavia no hay de donde sacarlas, no porque el dato sea cero. La priorizacion de esta pantalla no
-  las necesita.
+- **No leas un "Sin dato" como "0 busquedas".** Significa que esa keyword no se consulto al proveedor.
+  Y si las columnas de mercado no aparecen del todo, es que el Space no tiene el enriquecimiento
+  habilitado — tampoco es un cero. La priorizacion de esta pantalla no las necesita.
+- **No le digas a un cliente que una keyword con barrera "Baja" es facil.** Baja es barrera de
+  **enlaces**: dice que no hace falta una campaña de linkbuilding, no que rankear sea gratis. El
+  trabajo sigue siendo contenido y autoridad.
+- **No mezcles volumen de mercado con impresiones en la misma frase.** Uno es estimacion del mercado
+  y el otro es medicion de este sitio; promediarlos o presentarlos como la misma cifra produce una
+  conclusion falsa con dos datos verdaderos.
 - **No pidas que el mapa use volumen de mercado en el eje.** Es una decision de metodo, no una limitacion:
   la demanda de Search Console es del propio cliente y es mejor insumo que un promedio de mercado.
 - **No selecciones en lote y despues filtres.** Lo que queda fuera del filtro **no se sigue** y la
@@ -116,14 +174,22 @@ keyword agregada. Subirlo requiere revisar el budget del tier de la organizacion
 
 - Commands: `src/lib/growth/seo/track-keywords.ts` — `trackKeywords` (techo, entitlement,
   idempotencia, outbox) y `untrackKeywords` (cierre append-only con `clock_timestamp()`)
-- Reader: `src/lib/growth/seo/keyword-opportunities-reader.ts` (striking-distance medido)
+- Reader: `src/lib/growth/seo/keyword-opportunities-reader.ts` (striking-distance medido; devuelve
+  `market: 'available' | 'unavailable'`, que es lo que decide si las dos columnas de mercado se
+  renderizan)
+- Lente estimada: `src/lib/growth/seo/keyword-market-data.ts` (volumen, `capturedAt` y
+  `deriveLinkBarrier` — el nivel de barrera se deriva del perfil de enlaces REAL del top-10
+  (diversidad de dominios referentes + page rank), **no** del `keyword_difficulty` crudo del
+  proveedor, que en SERPs LATAM colapsa a 0) · captura y costos en
+  [operar-datos-de-mercado-keywords.md](operar-datos-de-mercado-keywords.md) · señal de frescura
+  `seo.market_data.freshness` en `/admin/operations`
 - Contrato programatico: `POST /api/admin/growth/seo/keywords/{track,untrack}` (la puerta que usa
   la pantalla) · lane ecosystem `POST /api/platform/ecosystem/growth/seo/keywords/{track,untrack}`,
   solo desde bindings de scope `internal` · MCP tools `track_seo_keywords` y `untrack_seo_keywords`
   en el MCP interno (`src/mcp/greenhouse/server.ts`)
-- ⚠️ **Las dos tools MCP todavia no se pueden usar desde el gateway publico**: comparten el scope
-  `efeonce.mcp.seo.write`, que existe en Entra pero **no esta cableado a ningun cliente**, y el
-  commit de federacion del gateway sigue sin publicar. Hasta entonces responden
-  `insufficient_scope` — es fail-closed por diseño, no una falla. Seguir y dejar de seguir se
-  operan desde el portal
+- ⚠️ **Las dos tools MCP ya estan registradas en el gateway** (`efeonce-mcp`, allowlist de paridad
+  `EXPECTED_GREENHOUSE_SEO_TOOLS`), pero **siguen sin poder usarse desde un cliente externo**:
+  comparten el scope de escritura `efeonce.mcp.seo.write`, que **[verificar]** no esta cableado a
+  ningun cliente con grant controlable. Hasta entonces responden `insufficient_scope` — es
+  fail-closed por diseño, no una falla. Seguir y dejar de seguir se operan desde el portal
 - Evento: `growth.seo.keyword_set.updated` ([catalogo](../../architecture/GREENHOUSE_EVENT_CATALOG_V1.md))

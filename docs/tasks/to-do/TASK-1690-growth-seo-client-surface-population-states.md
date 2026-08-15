@@ -4,6 +4,61 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-15 — clics y CTR entran a la cara del cliente (Slice 4), sin cambiar el alcance
+
+Fuente: `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md` (§3.4 brecha C4:
+*"Los clics existen y no llegan a la cara del cliente"* — tamaño **S**, el más barato del tablero).
+
+**No hay cambio de alcance.** Esta task sigue siendo el contrato de cobertura por fuente + los
+fixtures de población. Lo que se agrega es un slice que cae exactamente sobre **el mismo archivo y la
+misma verificación** que los tres existentes.
+
+Verificado en el repo hoy:
+
+- `src/lib/growth/seo/overview/read-overview-kpis.ts` **ya calcula clics** (`SUM(clicks)`) y **CTR como
+  razón de sumas** —`clicks / impressions` del período, explícitamente *no* el promedio de los CTR
+  diarios— y **ya trae la ventana previa** (`previous`, que viene `null` cuando no hay período
+  anterior con datos, en vez de fabricar un delta contra cero).
+- `src/lib/growth/seo/client/read-seo-client-surface.ts` expone **sólo** `connection`, `rankEvolution`
+  y `gap`. El cliente ve posición y quadrant; los clics que ya están calculados no cruzan a su
+  superficie.
+
+Es decir: el dato existe, está bien calculado y se queda del lado operador. **Es el primer escalón
+real desde posición hacia plata** — la posición es un proxy, el clic es la primera cifra que un
+cliente reconoce como resultado. Y llega con su comparación de ventana previa y su honestidad ya
+resuelta (`previous: null` en vez de un delta inventado), así que no hay que construir esa parte.
+
+**Nota adicional de oficio, del mismo hallazgo:** `selectFeaturedRankSeries`
+(`src/lib/growth/seo/client/select-featured-series.ts`) ordena por **mejor posición** y corta en 5.
+Esa es la rebanada **menos informativa** posible: destaca lo que ya está ganado y esconde donde hay
+algo en juego. Debe ordenarse por **clics en juego** (los que el dato de este slice pone a
+disposición). Se acopla con el hallazgo de `TASK-1659` ya registrado en el Delta 2026-08-14 —un
+objetivo declarado en la posición 60 es estructuralmente imposible de destacar hoy—: el mismo corte
+produce las dos cegueras, y la misma corrección las cierra.
+
+## Delta 2026-08-14 — existe un segundo eje que tampoco se mezcla (TASK-1659)
+
+`TASK-1659` está **complete**: una keyword seguida puede llevar intención declarada — `target`
+(compromiso acordado con el cliente), `opportunity` (demanda medida que se empuja) o `NULL` (nadie la
+clasificó). **No es una fuente**, así que no agrega slices a la cobertura por fuente ni cambia el
+alcance de esta task. Tres cosas sí la tocan:
+
+- El invariante "**NUNCA** promediar ni mezclar la señal medida de Search Console con la de
+  seguimiento de posición" está formulado **por fuente**. Ahora hay un segundo eje que tampoco se
+  mezcla y que vive **dentro** de la fuente de rank: objetivos y oportunidades responden preguntas
+  distintas y no se promedian entre sí. El agregado "31 keywords · posición media · top-10" se calcula
+  hoy sobre un set de intención heterogénea sin declararlo.
+- Consecuencia concreta ya en código: `selectFeaturedRankSeries`
+  (`src/lib/growth/seo/client/select-featured-series.ts`) ordena por mejor posición y corta en 5, así
+  que **un objetivo declarado en la posición 60 es estructuralmente imposible de destacar** y entra al
+  promedio como un fracaso permanente. Es exactamente el caso que `TASK-1659` existe para dejar de
+  contar mal.
+- Para los fixtures: **hoy el 100% de la población tiene intención `NULL`** (todas las keywords se
+  seguían desde antes del 2026-08-14). Un fixture que asuma objetivos declarados sería ficción hasta
+  que exista la lente que los declara (`TASK-1660`, aún en `to-do`).
+
+Esto es una nota de contrato, no un re-scope: declarar intención sigue fuera del alcance de esta task.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -109,6 +164,8 @@ Reglas obligatorias:
 
 - `src/lib/growth/seo/client/read-seo-client-surface.ts`
 - `src/lib/growth/seo/client/mock-surface.ts`
+- `src/lib/growth/seo/client/select-featured-series.ts` + su test (Slice 4: ordenar por clics en
+  juego, no por mejor posición)
 - `src/app/(dashboard)/growth/seo/mockup/page.tsx` + `report/mockup/page.tsx` (selector `?fixture=`)
 - `scripts/frontend/scenarios/growth-seo-client-mockup*.scenario.ts`
 - tests nuevos en `src/lib/growth/seo/client/`
@@ -120,6 +177,9 @@ Reglas obligatorias:
 - `readSeoClientSurface(organizationId)` compone `readSeoOverviewConnection` + `resolveActiveSeoTargetId`
   + `readRankEvolution` + `readSeoAeoGap` con `Promise.allSettled` y expone `rankReaderFailed`/`gapReaderFailed`.
 - `readSeoOverviewConnection` resuelve `connected | not_connected | no_snapshots` **desde `seo_gsc_daily`**.
+- `readOverviewKpis` (`src/lib/growth/seo/overview/read-overview-kpis.ts`) ya suma `clicks`, calcula
+  CTR como `SUM(clicks)/SUM(impressions)` del período y trae la ventana `previous` con `null` honesto
+  cuando no hay período anterior con datos. **Ningún consumer cliente lo lee** (verificado).
 - `SEO_CLIENT_MOCK_SURFACE`: un único fixture poblado, consumido por las dos rutas `/mockup`.
 - Estados de página ya implementados para `not_connected`, `no_snapshots` y doble fallo de readers.
 
@@ -239,6 +299,25 @@ Reglas obligatorias:
 - Test que falla si la decisión de entrada y el KPI principal se derivan de fuentes distintas sin que la
   cobertura lo declare. Es el detector del bug class, no un assert del caso puntual.
 
+### Slice 4 — Clics y CTR en la cara del cliente (Delta 2026-08-15)
+
+- `readSeoClientSurface` compone también `readOverviewKpis` y expone **clics** y **CTR** con su
+  comparación de ventana previa. Sin consultas nuevas: el reader ya existe, ya suma `clicks`, ya
+  calcula CTR como razón de sumas y ya trae `previous`.
+- **CTR = `SUM(clicks)/SUM(impressions)` del período, NUNCA el promedio de los CTR diarios.** El
+  reader ya lo hace bien; el slice no puede reimplementarlo en la superficie cliente.
+- Sin período anterior con datos, `previous` es `null` y la superficie lo declara ("primer período con
+  datos") — **jamás un delta contra cero**. Esta señal es de Search Console (`●` medida) y viaja
+  etiquetada con su fuente: no se mezcla ni se promedia con la de seguimiento de posición.
+- Si Search Console no tiene cobertura en la ventana, el KPI se declara ausente por la misma vía que
+  el resto (Slice 1), no como `0` clics.
+- **Ordenamiento del destacado:** `selectFeaturedRankSeries` deja de cortar por mejor posición y pasa
+  a ordenar por **clics en juego**. Su test existente (`select-featured-series.test.ts`) se actualiza
+  a la nueva regla; el caso "objetivo en posición 60 con clics" debe poder destacarse.
+- Fixtures: los seis de Slice 2 llevan su bloque de clics/CTR coherente con la cobertura que declaran
+  (el fixture `onboarding` tiene clics y no tiene rank — es justamente el caso que hace visible el
+  valor de este slice el día 1).
+
 ## Out of Scope
 
 - Rediseño visible de cómo se rinde la ausencia declarada → follow-up `ui-ux` (ver Follow-ups).
@@ -262,8 +341,10 @@ sobre la promesa del retainer. **No inventar una tercera** que mezcle ambas fuen
 
 ### Slice ordering hard rule
 
-Slice 1 (contrato) → Slice 2 (fixtures) → Slice 3 (guard). El contrato va primero porque los fixtures
-tipan contra él; el guard va último porque fija la conclusión que los dos anteriores establecen.
+Slice 1 (contrato) → Slice 2 (fixtures) → Slice 3 (guard) → Slice 4 (clics/CTR + orden por clics en
+juego). El contrato va primero porque los fixtures tipan contra él; el guard va antes del Slice 4
+porque es justamente el detector que impide que el KPI nuevo se derive de una fuente distinta a la que
+declara la cobertura.
 
 ### Risk matrix
 
@@ -273,6 +354,8 @@ tipan contra él; el guard va último porque fija la conclusión que los dos ant
 | Elegir "derivar de GSC" y que el número no coincida con el del cockpit operador | data quality | media | una sola derivación compartida; declarar la fuente junto al número | test de paridad operador↔cliente |
 | La cobertura se agrega al DTO y ningún consumer la usa | producto | media | el follow-up UI queda declarado y enlazado desde esta task | revisión al cierre |
 | Fixture con datos de un cliente real | privacidad | baja | dominios y keywords de ejemplo, revisados en review | code review |
+| CTR reimplementado en la superficie como promedio de CTR diarios | data quality | media | el cálculo se consume del reader, no se recalcula; test que compara contra `readOverviewKpis` | test de paridad |
+| Delta de clics contra cero cuando no hay período previo | data quality | media | `previous: null` se rinde como "primer período con datos" | test del caso sin ventana previa |
 
 ### Feature flags / cutover
 
@@ -286,6 +369,7 @@ fuentes pobladas. El gate de exposición sigue siendo `GROWTH_SEO_ENABLED` + `mo
 | Slice 1 | revert del PR (campos aditivos) | <5 min | si |
 | Slice 2 | revert de fixtures y selector | <5 min | si |
 | Slice 3 | revert del test | <5 min | si |
+| Slice 4 | revert del PR (campos aditivos al DTO + orden del destacado) | <5 min | si |
 
 ### Production verification sequence
 
@@ -316,6 +400,15 @@ Ninguna.
 - [ ] El caso feliz (organización con ambas fuentes) no cambia: no-regresión verificada con sesión de
       cliente real.
 - [ ] La decisión sobre el origen del Resumen cuando falta rank queda escrita con su rationale.
+- [ ] La superficie cliente muestra **clics** y **CTR** con comparación de ventana previa, tomados de
+      `readOverviewKpis`; el CTR es razón de sumas del período, nunca promedio de CTR diarios
+      (verificado por test de paridad contra el reader).
+- [ ] Sin período anterior con datos, la superficie declara "primer período con datos" y **no** rinde
+      un delta contra cero.
+- [ ] Sin cobertura de Search Console en la ventana, el KPI de clics se declara ausente por la vía de
+      la cobertura del Slice 1 — nunca como `0` clics.
+- [ ] `selectFeaturedRankSeries` ordena por **clics en juego**, no por mejor posición; su test refleja
+      la nueva regla y cubre el caso "objetivo en posición 60 con clics".
 
 ## Verification
 

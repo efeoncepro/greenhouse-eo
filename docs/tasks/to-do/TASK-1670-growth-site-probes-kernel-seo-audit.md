@@ -1,5 +1,72 @@
 # TASK-1670 — Growth: hallazgos de sitio (crawlers IA, JSON-LD, sitemap) en el audit SEO
 
+## Delta 2026-08-15 (2) — decisión de secuencia verificada: se desbloquea parcialmente, y dos correcciones de oficio
+
+Cuatro especialistas resolvieron la secuencia del lote. Cuatro cambios, en orden de peso.
+
+### 1. `Blocked by: TASK-1697` se acota a **sus Slices 1+2**
+
+`TASK-1697` se recortó a la mitad A: `git mv` del sustrato + test de frontera + una lint rule
+angosta. **Lo único que esta task necesita de allá son los Slices 1+2** —que el sustrato exista en
+`src/lib/growth/site-substrate/` con su carta—, y eso son **horas de trabajo**, no semanas. El Slice
+3 (la lint rule) y el Slice 4 (documentación) de 1697 **corren en paralelo** con esta task.
+
+Se declara explícito porque la lectura perezosa del `Blocked by` cuesta caro: bloquear esta task
+contra los cuatro slices de 1697 sería **pagar el riesgo de una lint rule con retraso de la señal de
+producto**, y la señal de producto acá es que un sitio invisible para los motores de IA deje de
+puntuar 95/100.
+
+### 2. 🔴 El bloqueante REAL del cierre del agujero es `TASK-1671`, no `TASK-1697`
+
+Esta task nace con **flag default OFF**, y su propia regla dice que el flag no se prende hasta que
+`TASK-1671` (superficie de hallazgos de sitio) esté desplegada. Consecuencia que hay que decir en voz
+alta: **mergear esta task sin `TASK-1671` compra código con el detector apagado.** El agujero
+—"un sitio con crawlers de IA bloqueados puntúa 95/100"— **sigue abierto** hasta el flip, no hasta el
+merge. `Blocks` += `TASK-1671`, y el flip es el hito de cierre real.
+
+### 3. 🔴 Retrieval ≠ training: la severidad heredada es incorrecta
+
+El evaluador que esta task hereda (`evaluateRobotsForAiBots`) mete los 10 bots en una bolsa y saca un
+score proporcional. Con la severidad que esta task declaraba —*"robots bloqueando retrieval →
+`critical`"*— un sitio con el **retrieval completamente abierto** que sólo bloquea bots de
+entrenamiento saldría `critical`. Eso es un falso positivo caro: bloquear `GPTBot` o
+`Google-Extended` es una **postura de derechos legítima y frecuente**, no un defecto técnico, y
+marcarla `critical` entrena al cliente a ignorar la severidad más alta del informe.
+
+Corte correcto, que esta task debe implementar:
+
+| Familia | Bots | Bloqueada ⇒ severidad |
+|---|---|---|
+| **Retrieval** (responder citando el sitio) | `OAI-SearchBot`, `PerplexityBot`, `ClaudeBot`, `Claude-SearchBot` | **`critical`** |
+| **Training** (entrenar modelos) | `GPTBot`, `Google-Extended`, `CCBot`, `anthropic-ai` | **`notice`**, con lectura de postura — **nunca `critical`** |
+
+Un bot que no cae limpio en una familia se clasifica explícitamente en Discovery; no se reparte por
+defecto a `critical`.
+
+### 4. 🔴 El chequeo de `robots.txt` no detecta la forma más común del bloqueo
+
+Medición real sobre **12 dominios LatAm/CL** (2026-08-15): 3 con problema de acceso IA, y **2 de esos
+3 bloquean en el borde/WAF, no en `robots.txt`** — devuelven **403 a `OAI-SearchBot`** con un
+`robots.txt` perfectamente limpio. Un audit que sólo parsea `robots.txt` les diría **"acceso
+correcto"**: exactamente el falso sano que esta task existe para cerrar, reproducido con nuestro
+nombre encima.
+
+Se agrega un chequeo barato al alcance: **`GET` del home con User-Agent de un bot de retrieval y
+comparación del status contra el fetch normal.** Dos requests, cero gasto de proveedor. Si el fetch
+con UA de bot devuelve 403/429 y el normal 200, el hallazgo es de **bloqueo en el borde**, con su
+propio `issue_type` y su ficha es-CL — no se disfraza de hallazgo de `robots.txt`, porque la
+remediación es distinta (WAF/CDN, no un archivo de texto).
+
+### 5. Respuesta a la Open Question del sitemap: `notice`, no `warning`
+
+En la misma muestra de 12 dominios, **3 de 12 devuelven 404 en `/sitemap.xml`** y declaran su índice
+en la directiva `Sitemap:` del `robots.txt` — es decir, están **bien** y un `warning` sobre ellos
+sería ruido. Regla: **`notice`** por defecto; **`warning`** sólo si el sitemap **declarado en
+`robots.txt` está roto** (404/5xx/no parseable). La Open Question 3 queda resuelta.
+
+`llms.txt` sigue correctamente **fuera** de alcance (97% de los sitios sin un solo request, Google no
+lo usa). No se agrega.
+
 ## Delta 2026-08-08 — TASK-1309 cerrada
 
 `TASK-1309` (Auditoría del sitio, `/admin/growth/seo/audit`) pasó a `complete`: suite completa en
@@ -7,6 +74,41 @@
 de 1309 —`groupAuditIssues`, las fichas es-CL de los checks con su drift test, `readSiteAuditReport`
 con `run`/`findings`/`totals`/`previous`— **ya está en `develop` y verificado con datos reales de
 Grupo Berel**, no es supuesto.
+
+## Delta 2026-08-15 — la premisa de "cero deep imports" es falsa, y la superficie no es `probes/public.ts`
+
+Fuente: `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md` §1.3, §5.1,
+§5.4 y §8.
+
+🔴 **Se retira la premisa de "cero deep imports".** Verificado con `grep` sobre `develop` el
+2026-08-15: `growth/seo` **ya importa hoy 10 símbolos internos** de `growth/ai-visibility`, desde dos
+archivos productivos:
+
+- `src/lib/growth/seo/grounded-query-reader.ts:15-19` → `ai-visibility/flags`,
+  `.../prompt-packs/authoring/author-system-prompt`, `.../prompt-packs/prompt-set-command`,
+  `.../prompt-packs/prompt-set-store`, `.../store`.
+- `src/lib/growth/seo/grounded-query-bridge.ts:23-37` → esos mismos módulos más
+  `.../brand-intelligence/store` y `.../prompt-packs/authoring/author-prompt-set`.
+
+Cero imports en reversa —el DAG es direccionalmente limpio (SEO → AEO)—, pero **son deep imports, no
+superficie pública**, y ninguna lint rule los vigila: la única regla cross-domain del repo
+(`eslint.config.mjs:333`) protege al client-portal. La regla que esta task declaraba
+—*"`growth/seo` consume EXCLUSIVAMENTE la superficie pública"*— describía una aspiración, no el
+repo. Esta task **no amplía** ese acoplamiento; deja de fingir que no existe.
+
+🔴 **La superficie tampoco es `probes/public.ts`.** Con `TASK-1697` —extracción del
+sustrato (`safe-fetch.ts` + `html.ts` + sus tipos) a `src/lib/growth/site-substrate/` con re-export
+shim, más la lint rule que lo blinda— esta task **deja de agregar archivo alguno al motor AEO**:
+consume `@/lib/growth/site-substrate`. Y lo que consume no es "el probe layer" sino el **sustrato**,
+exportado con nombres que lo digan (`SiteFetcher`, `analyzeDomSemantics`), **nunca `Probe`**. La
+regla del audit §5.1 que ordena el corte: *se comparte cómo se OBTIENE la evidencia; nunca cómo se
+JUZGA* — el juicio de los tres hallazgos se escribe en `growth/seo`.
+
+Cambios aplicados al cuerpo: `Blocked by: TASK-1697`; `Files owned` sin archivo nuevo en
+`ai-visibility/**`; Slice 1 reescrito; risk matrix con la lint rule de 1697 en lugar de "revisión de
+código" —patrón canónico #7: **un deep import lo crea un commit, así que el detector es de CI**, no
+de revisión humana—; y se retira el follow-up "extracción a `search-visibility/`", que la auditoría
+§5.4 declara sobredimensionado y por eso condenado a no pasar nunca.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -30,7 +132,7 @@ Grupo Berel**, no es supuesto.
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|data`
-- Blocked by: `none`
+- Blocked by: `TASK-1697` (**sólo sus Slices 1+2**: el `git mv` del sustrato + su test de frontera; el resto de 1697 corre en paralelo — ver Delta 2026-08-15 (2))
 - Branch: `Greenhouse develop; local-first, sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -38,10 +140,11 @@ Grupo Berel**, no es supuesto.
 ## Summary
 
 El audit SEO pasa a detectar tres cosas que hoy no ve: **acceso de crawlers de IA** en
-`robots.txt`, **ausencia** de JSON-LD y salud de sitemap. Los tres probes ya existen probados
-en el motor AEO; en vez de moverlos, AEO **declara una superficie pública** (archivo nuevo,
-aditivo) y el collect del site audit los consume desde ahí como **hallazgos de SITIO**, detrás
-de flag. Cierra el punto ciego más caro del audit: hoy un sitio que bloquea a los crawlers de
+`robots.txt`, **ausencia** de JSON-LD y salud de sitemap. La evidencia se obtiene con el **sustrato
+de sitio** que extrae `TASK-1697` (`@/lib/growth/site-substrate`: fetcher con guarda SSRF + parseo
+HTML/texto) y el **juicio se escribe en `growth/seo`**: el collect del site audit los materializa
+como **hallazgos de SITIO**, detrás de flag. Esta task **no agrega ni edita un solo archivo del
+motor AEO**. Cierra el punto ciego más caro del audit: hoy un sitio que bloquea a los crawlers de
 IA puntúa 95/100 y se presenta como sano.
 
 ## Why This Task Exists
@@ -49,17 +152,23 @@ IA puntúa 95/100 y se presenta como sano.
 El site audit (TASK-1304/1309) es un passthrough de DataForSEO OnPage, y OnPage **no cubre**
 tres cosas que la doctrina 2026 pone en Capa 1:
 
-1. **Acceso de crawlers de IA en `robots.txt`.** Bloquear `OAI-SearchBot` / `PerplexityBot` /
-   `ClaudeBot` saca al sitio de las respuestas de los motores de IA. Evidencia medida:
-   **−23,1% de tráfico total** en publishers que bloquearon crawlers IA, *sin* reducir de forma
-   fiable las citas (Rutgers/Wharton, dic-2025). Para un módulo que se vende como
+1. **Acceso de crawlers de IA (en `robots.txt` y en el borde).** Bloquear `OAI-SearchBot` /
+   `PerplexityBot` / `ClaudeBot` saca al sitio de las respuestas de los motores de IA. Evidencia
+   medida: **−23,1% de tráfico total** en publishers que bloquearon crawlers IA, *sin* reducir de
+   forma fiable las citas (Rutgers/Wharton, dic-2025). Para un módulo que se vende como
    **Search Visibility 360** —SEO *y* AEO— es la falla que invalida la mitad de la promesa.
+   ⚠️ Dos precisiones del Delta 2026-08-15 (2), ambas medidas: **(a)** bloquear *training* no es lo
+   mismo que bloquear *retrieval* y no puede compartir severidad; **(b)** la forma más común del
+   bloqueo **no está en `robots.txt`** sino en el borde/WAF (403 al UA del bot con `robots.txt`
+   limpio) — 2 de los 3 casos con problema en una muestra de 12 dominios LatAm/CL.
 2. **Ausencia de JSON-LD.** El allowlist de `findings-map.ts` sólo detecta *errores* en marcado
    existente (`has_micromarkup_errors`), no su ausencia — y a propósito: la regla del módulo
    prohíbe invertir checks positivos del proveedor por passthrough.
 3. **Salud de sitemap.**
 
-Los tres **ya existen, probados**, en el probe layer del grader AEO (TASK-1266, `complete`).
+Los tres **ya se evalúan, probados**, en el probe layer del grader AEO (TASK-1266, `complete`), y su
+insumo —fetch guardado + parseo— es exactamente el sustrato que `TASK-1697` deja disponible para
+ambos motores.
 
 Y hay una razón de secuencia: el entregable descargable/compartible de la auditoría (que el
 cliente reenvía a una agencia) **no debe nacer omitiendo esto**. Un artefacto con nuestro
@@ -67,9 +176,14 @@ nombre que declara sano un sitio invisible para la IA es peor que no tener artef
 
 ## Goal
 
-- El audit detecta los tres hallazgos, **sin tocar un solo archivo existente del grader AEO**.
+- El audit detecta los hallazgos, **sin agregar ni tocar un solo archivo del grader AEO**.
 - Degradación honesta: un fetch fallido dice "no pudimos verificar", NUNCA "pasó".
-- `robots.txt` bloqueando retrieval de IA entra como **`critical`**.
+- **Bloqueo de retrieval** (`OAI-SearchBot`, `PerplexityBot`, `ClaudeBot`, `Claude-SearchBot`) entra
+  como **`critical`**; bloqueo de **training** (`GPTBot`, `Google-Extended`, `CCBot`,
+  `anthropic-ai`) entra como **`notice`** con lectura de postura, **nunca `critical`**.
+- El audit detecta también el **bloqueo en el borde/WAF** —403 al UA de un bot de retrieval con
+  `robots.txt` limpio—, que es la forma más común del problema en la muestra medida.
+- Sitemap ausente: **`notice`**; `warning` sólo si el sitemap declarado en `robots.txt` está roto.
 - Cero gasto de proveedor: son fetches propios, no DataForSEO.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -82,21 +196,28 @@ Revisar y respetar:
 
 - `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` — §1.1 (boundary SEO↔AEO),
   §3/§6 (site audit OnPage, degradación honesta), §10.6 (superficie de auditoría, TASK-1309).
-- `docs/tasks/complete/TASK-1266-growth-ai-visibility-site-readiness-probe-layer.md` — el
-  contrato `Probe` / `ProbeContext` / `ProbeOutcome` que se expone.
+- `docs/tasks/complete/TASK-1266-growth-ai-visibility-site-readiness-probe-layer.md` — el probe
+  layer del grader, del que sale el sustrato que `TASK-1697` extrae.
+- `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md` — §1.3 (los 10 deep
+  imports medidos), §5.1 (qué se comparte y qué no), §5.4 (correcciones a esta task).
 - `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`
 - `.claude/skills/seo-aeo/modules/01_SEO_TECHNICAL.md` — §6 (crawlers IA), §5 (datos
   estructurados), §2 (indexación/sitemaps).
 
 Reglas obligatorias:
 
-- 🔴 **NUNCA deep import**: `growth/seo/**` consume EXCLUSIVAMENTE la superficie pública
-  declarada por el probe layer. Nada de `ai-visibility/probes/structural/robots-txt` ni de
-  `.../contracts` directo. La doctrina de modularidad lo nombra: *cross-module deep import;
-  public surface only*.
-- 🔴 **NUNCA mover ni editar archivos existentes del probe layer en esta task.** La superficie
-  pública es **aditiva**: un archivo nuevo que re-exporta. Cualquier cambio dentro de
-  `ai-visibility/probes/**` está fuera de alcance (ver Follow-ups).
+- 🔴 **El consumo es del sustrato, no del probe layer.** `growth/seo/**` importa de
+  `@/lib/growth/site-substrate` (entregado por `TASK-1697`) con nombres de sustrato
+  (`SiteFetcher`, `analyzeDomSemantics`), **nunca `Probe`/`ProbeContext`/`ProbeOutcome`** y nunca
+  `ai-visibility/probes/**` directo. Estado medido al 2026-08-15: `growth/seo` ya arrastra 10 deep
+  imports de `ai-visibility` en `grounded-query-{reader,bridge}.ts` — esta task **no suma ni uno**,
+  y su limpieza es de `TASK-1697` (lint rule), no de aquí.
+- 🔴 **Se comparte cómo se OBTIENE la evidencia; nunca cómo se JUZGA** (audit §5.1). El fetch y el
+  parseo son sustrato compartido; la severidad, el vocabulario de `issue_type` y la ficha es-CL de
+  cada hallazgo viven en `growth/seo`. Duplicar un evaluador determinista es aceptable; compartir un
+  juicio versionado no lo es.
+- 🔴 **Cero archivos nuevos o editados en `ai-visibility/**` en esta task.** Cualquier cambio dentro
+  del motor AEO —incluida la extracción del sustrato— pertenece a `TASK-1697`.
 - **La frontera §1.1 SEO↔AEO se mantiene**: prohíbe JOIN/VIEW/FK entre tablas `seo_*` y
   `grader_*`. Acá no se cruza ninguna tabla — los probes son funciones puras sobre HTTP y cada
   motor persiste su outcome en las suyas (`grader_*` para AEO, `seo_site_audit_findings` para
@@ -115,22 +236,33 @@ Reglas obligatorias:
 
 ### Depende de
 
-- `TASK-1266` — probe layer estructural (`complete`, EPIC-021). Es lo que se expone.
+- **`TASK-1697`, Slices 1+2 únicamente** — bloqueo duro pero **corto**: el `git mv` del sustrato a
+  `src/lib/growth/site-substrate/` (fetcher SSRF-guarded + parseo HTML, con re-export shim para que
+  los dependientes del motor AEO no cambien una línea) y su test de frontera por allowlist. Sin eso
+  esta task volvería a inventar una superficie dentro del motor AEO, que es lo que la auditoría §5.4
+  corrige. **El Slice 3 de 1697 (lint rule angosta) y su Slice 4 (documentación) NO bloquean**: son
+  guardrail y cierre, y esta task puede arrancar en paralelo con ellos.
+- ⚠️ El barrel de dominio AEO y la lint rule **universal** salieron de `TASK-1697` a una task
+  hermana **`TASK-1713`** (**no** `TASK-1710`, que está tomada por el umbrella de remediación de
+  confiabilidad). Nada de eso bloquea a esta task: acá el consumo es del **sustrato**, no del barrel.
+- `TASK-1266` — probe layer estructural (`complete`, EPIC-021). Origen de los tres evaluadores.
 - `TASK-1304` — `collectSiteAuditRuns` + `seo_site_audit_findings` (`complete`).
 
 ### Blocks / Impacts
 
-- `TASK-1671` `[por crear]` — consumer UI: los hallazgos de sitio necesitan tratamiento propio
-  en `/admin/growth/seo/audit` (hoy la lista cuenta "páginas afectadas" y un hallazgo de sitio
-  mostraría "1 página afectada", que es falso). **Ese es el motivo del flag**: sin la UI, los
-  hallazgos nuevos no deben aparecer.
+- 🔴 **`TASK-1671`** (superficie de hallazgos de sitio) — **es el bloqueante real del cierre del
+  agujero, no `TASK-1697`.** Los hallazgos de sitio necesitan tratamiento propio en
+  `/admin/growth/seo/audit`: hoy la lista cuenta "páginas afectadas" y un hallazgo de sitio mostraría
+  "1 página afectada", que es falso. Ése es el motivo del flag — y la consecuencia es que **mergear
+  esta task sin 1671 compra código con el detector apagado**. El hito de cierre del punto ciego es el
+  **flip del flag**, que ocurre con 1671 desplegada; no el merge de esta task.
 - El artefacto descargable de la auditoría (aún sin task) — no debería nacer sin esta cobertura.
 - `TASK-1281` (headless runtime) — NO se toca: `core_web_vitals` queda **fuera de alcance**.
 
 ### Files owned
 
-- `src/lib/growth/ai-visibility/probes/public.ts` `[archivo NUEVO; nombre a confirmar]` — la
-  superficie pública. Único archivo que esta task agrega al motor AEO.
+- `src/lib/growth/seo/site-audit/site-findings.ts` `[archivo NUEVO; nombre final en Discovery]` —
+  evalúa los tres hallazgos de sitio sobre el sustrato. Vive en `growth/seo`, no en el motor AEO.
 - `src/lib/growth/seo/site-audit/collect.ts` — materializa hallazgos de sitio
 - `src/lib/growth/seo/site-audit/findings-map.ts` — allowlist de los `issue_type` nuevos
 - `src/lib/copy/growth.ts` — fichas es-CL de los checks nuevos (el drift test de TASK-1309 las exige)
@@ -144,7 +276,12 @@ Reglas obligatorias:
   `evaluateRobotsForAiBots`.
 - `src/lib/growth/ai-visibility/probes/{contracts,safe-fetch,html}.ts` — el sustrato:
   `Probe`/`ProbeContext`/`ProbeOutcome`, fetcher SSRF-guarded, parseo HTML. **Medido: lo usan
-  23 archivos del probe layer** (agentic, entity, gatherer, registry, store, command).
+  23 archivos del probe layer** (agentic, entity, gatherer, registry, store, command). `safe-fetch`
+  es `server-only`, puro sobre HTTP y sin una sola referencia a `grader_*`; `html.ts` no importa
+  nada. Por eso `TASK-1697` los puede mover con re-export shim sin tocar esos 23 archivos.
+- **Deep imports ya existentes de `growth/seo` hacia `growth/ai-visibility`** (medidos 2026-08-15):
+  10 símbolos internos desde `grounded-query-reader.ts:15-19` y `grounded-query-bridge.ts:23-37`.
+  Contexto, no permiso: esta task no agrega ninguno.
 - `src/lib/growth/seo/site-audit/collect.ts` — el paso donde se materializan findings.
 - `GH_GROWTH_SEO_AUDIT_ISSUES` (`src/lib/copy/growth.ts`) + su test de drift bidireccional
   contra `findings-map.ts`: **un check nuevo sin ficha rompe el test**, por diseño.
@@ -152,23 +289,26 @@ Reglas obligatorias:
 
 ### Gap
 
-- El probe layer **no declara superficie pública**: hay `structural/index.ts`, `agentic/index.ts`
-  y `entity/index.ts`, pero ningún `index`/`public` de nivel superior. Sin eso, cualquier
-  consumidor externo tendría que hacer deep import.
+- **`src/lib/growth/site-substrate/` no existe** (verificado 2026-08-15). Sin él, cualquier
+  consumidor externo tendría que hacer deep import — que es exactamente el estado actual del módulo.
+- Ninguna lint rule vigila imports cross-dominio dentro de `growth/*`: la única del repo
+  (`eslint.config.mjs:333`) protege al client-portal.
 - El collect del site audit sólo materializa findings de PÁGINA desde OnPage.
 - `seo_site_audit_findings` no distingue hallazgo de sitio vs de página.
 
 ## Modular Placement Contract
 
 - Topology impact: `none`
-- Current home: `src/lib/growth/ai-visibility/probes/` (server-side; los probes se quedan donde
-  están) + `src/lib/growth/seo/site-audit/` (el consumidor)
+- Current home: `src/lib/growth/seo/site-audit/` — el código de esta task vive completo ahí. El
+  sustrato vive en `src/lib/growth/site-substrate/`, propiedad de `TASK-1697`.
 - Future candidate home: `remain-shared`
-- Rationale del candidate home: mover el sustrato a un paquete neutral obligaría a re-apuntar
-  23 archivos de un motor que funciona, a cambio de ubicación. Se difiere hasta que exista una
-  razón real (ver Follow-ups).
-- Boundary: la superficie pública nueva del probe layer. Consumers autorizados: `growth/seo`.
-  Los internals de `probes/**` siguen siendo privados.
+- Rationale del candidate home: el sustrato es un primitive chico y domain-free (fetch + parseo) que
+  ya tiene tres consumidores —site audit SEO, probe layer AEO y `fetch-site-content.ts` dentro del
+  propio grader—; ese es el umbral de patrón canónico. La reorganización grande (SEO y AEO como
+  sub-motores de un paraguas) queda descartada, no diferida.
+- Boundary: `@/lib/growth/site-substrate` es la única superficie que esta task consume fuera de su
+  dominio. Los internals de `ai-visibility/probes/**` siguen siendo privados y esta task no los
+  toca.
 - Server/browser split: **server-only** — hace fetch saliente con guarda SSRF; nunca al bundle cliente.
 - Build impact: `none` — el alcance excluye `core_web_vitals`, único probe que arrastra
   Chromium/Lighthouse.
@@ -185,11 +325,11 @@ Reglas obligatorias:
 
 ### Contrato
 
-- Contrato existente a respetar: `Probe`/`ProbeContext`/`ProbeOutcome` (TASK-1266) —
-  **se re-exporta, no se modifica**; `readSiteAuditReport` (TASK-1304), cuyo shape **no cambia**:
-  los hallazgos de sitio son filas más de `seo_site_audit_findings`.
-- Contrato nuevo o modificado: la superficie pública del probe layer (aditiva) + `issue_type`
-  nuevos en el allowlist + marca de alcance sitio/página.
+- Contrato existente a respetar: el sustrato de `TASK-1697` (`SiteFetcher`, `analyzeDomSemantics`) —
+  **se consume, no se modifica**; `readSiteAuditReport` (TASK-1304), cuyo shape **no cambia**: los
+  hallazgos de sitio son filas más de `seo_site_audit_findings`.
+- Contrato nuevo o modificado: los evaluadores de hallazgo de sitio dentro de `growth/seo` +
+  `issue_type` nuevos en el allowlist + marca de alcance sitio/página.
 - Backward compatibility: `gated` — flag default OFF; apagado, el collect se comporta como hoy.
 - Full API parity: sin ruta ni tool nuevas. Los hallazgos viajan por el reader canónico, así que
   UI, Nexa y el lane MCP los reciben por construcción.
@@ -198,10 +338,11 @@ Reglas obligatorias:
 
 - Entidades/tablas/views afectadas: `greenhouse_growth.seo_site_audit_findings`
 - Invariantes que no se pueden romper:
-  - un probe `skipped`/`failed` **NUNCA** se materializa como ausencia de problema;
+  - un fetch `skipped`/`failed` **NUNCA** se materializa como ausencia de problema;
   - los hallazgos de sitio **no** se cuentan como "páginas afectadas";
   - `seo_site_audit_findings` sigue append-only por run (triggers de TASK-1299);
-  - la superficie pública no persiste nada.
+  - el sustrato **no persiste nada, no importa nada de `growth/*` y no tiene flags de dominio**
+    (regla dura de `TASK-1697`, verificable por lint; mismo patrón que `artifact-composer`).
 - Tenant/space boundary: hereda la del run — `seo_target_id` → `organization_id`.
 - Idempotency/concurrency: el collect ya es idempotente por `audit_run_id`; los hallazgos de
   sitio entran en la misma pasada con `ON CONFLICT DO NOTHING` (los triggers de 1299 prohíben
@@ -236,8 +377,8 @@ Reglas obligatorias:
   materializado con el `robots.txt` y el sitemap reales.
 - Verificar el camino de degradación: dominio inalcanzable → "no verificado", no "sano".
 - Confirmar que con el flag OFF el collect materializa exactamente lo mismo que hoy.
-- Confirmar que la suite del motor AEO sigue en 643/643 **sin haber editado ninguno de sus
-  archivos**.
+- Confirmar que la suite del motor AEO sigue en 643/643 **sin haber editado ni agregado ninguno de
+  sus archivos** (`git diff --stat -- src/lib/growth/ai-visibility` vacío).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE (no llenar al crear)
@@ -249,37 +390,64 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Superficie pública del probe layer (aditiva)
+### Slice 1 — Evaluadores de hallazgo de sitio sobre el sustrato
 
-- Archivo NUEVO en `ai-visibility/probes/` que exporta **sólo** lo que un consumidor externo
-  necesita: los 3 probes estructurales + los tipos `Probe`/`ProbeContext`/`ProbeOutcome` + el
-  constructor del contexto con fetcher SSRF-guarded.
-- **Cero ediciones** a archivos existentes. Prueba: `git diff --stat` sobre
-  `ai-visibility/**` muestra exactamente un archivo, y es nuevo.
+- Archivo NUEVO **en `growth/seo/site-audit/`** que consume `@/lib/growth/site-substrate`
+  (`SiteFetcher` + `analyzeDomSemantics`, entregados por los Slices 1+2 de `TASK-1697`) y evalúa los
+  hallazgos: acceso de crawlers de IA en `robots.txt`, **acceso real en el borde**, ausencia de
+  JSON-LD y salud de sitemap.
+- 🔴 **Clasificación por familia, no bolsa única.** El evaluador separa **retrieval**
+  (`OAI-SearchBot`, `PerplexityBot`, `ClaudeBot`, `Claude-SearchBot`) de **training** (`GPTBot`,
+  `Google-Extended`, `CCBot`, `anthropic-ai`) y emite un resultado por familia. El score proporcional
+  sobre los 10 bots juntos que hereda de `evaluateRobotsForAiBots` **no se reusa tal cual**: es el que
+  haría que un sitio con retrieval abierto salga `critical` por bloquear entrenamiento.
+- 🔴 **Chequeo de acceso en el borde** (nuevo, barato): `GET` del home con User-Agent de un bot de
+  retrieval y comparación del status contra el fetch normal. Dos requests, cero gasto de proveedor.
+  403/429 con UA de bot + 200 normal ⇒ hallazgo **de borde/WAF**, con `issue_type` propio — nunca
+  disfrazado de hallazgo de `robots.txt`, porque la remediación es otra (CDN/WAF, no un archivo).
+- **Cero archivos** agregados o editados en `ai-visibility/**`. Prueba:
+  `git diff --stat -- src/lib/growth/ai-visibility` sale vacío.
 - Los 643 tests del motor siguen verdes sin tocarse.
 
 ### Slice 2 — Hallazgos de sitio en el collect del audit
 
-- Tras materializar los findings de página, el collect corre los 3 probes contra el dominio del
-  target y materializa sus outcomes como hallazgos de sitio, detrás de flag.
-- Severidades: `robots.txt` bloqueando retrieval de IA → **`critical`**; JSON-LD ausente →
-  `warning`; sitemap ausente/roto → `warning`.
-- `skipped`/`failed` se materializan como "no verificado" con su razón, distinguible de
+- Tras materializar los findings de página, el collect evalúa los hallazgos contra el dominio del
+  target y los materializa como hallazgos de sitio, detrás de flag.
+- **Severidades canónicas** (corregidas por el Delta 2026-08-15 (2)):
+
+  | Hallazgo | Severidad |
+  |---|---|
+  | Retrieval bloqueado en `robots.txt` | **`critical`** |
+  | Retrieval bloqueado en el borde (403/429 al UA de bot) | **`critical`** |
+  | Training bloqueado (sólo), retrieval abierto | **`notice`** con lectura de postura |
+  | JSON-LD ausente | `warning` |
+  | Sitemap ausente en `/sitemap.xml` | **`notice`** |
+  | Sitemap **declarado en `robots.txt`** y roto (404/5xx/no parseable) | `warning` |
+
+- Un fetch `skipped`/`failed` se materializa como "no verificado" con su razón, distinguible de
   "verificado y sano".
 - Fichas es-CL de los `issue_type` nuevos en `GH_GROWTH_SEO_AUDIT_ISSUES` (el test de drift de
-  TASK-1309 falla hasta que existan — es el guardrail, no un obstáculo).
+  TASK-1309 falla hasta que existan — es el guardrail, no un obstáculo). La ficha de **training
+  bloqueado** se redacta como postura, no como defecto: bloquear entrenamiento es una decisión de
+  derechos legítima y el copy no puede sonar a error.
 
 ### Slice 3 — Verificación runtime + ledger
 
 - Ejercitar contra Berel y efeoncepro.com; comparar contra el `robots.txt` real de cada uno.
+- **Verificar el caso de borde con un dominio que responde 403 al UA de bot con `robots.txt` limpio**
+  — es la forma más común del problema en la muestra medida (2 de los 3 casos), y es exactamente el
+  falso sano que esta task existe para cerrar.
 - Camino de degradación verificado con un dominio inalcanzable.
 - Fila del flag en `FEATURE_FLAG_STATE_LEDGER.md` + runbook de qué runtime lo lee.
 
 ## Out of Scope
 
-- **Mover o refactorizar el probe layer.** Medido: `contracts`/`safe-fetch`/`html` los usan 23
-  archivos de AEO. Reubicarlos obligaría a re-apuntar el motor entero a cambio de estética de
-  carpetas. Se difiere (ver Follow-ups).
+- **Extraer o mover el sustrato.** Eso es `TASK-1697` y es su bloqueo duro: mover
+  `safe-fetch`/`html` a `growth/site-substrate/` con re-export shim (los 23 archivos del motor AEO
+  no cambian una línea) + la lint rule. Esta task lo **consume**, no lo mueve.
+- **Limpiar los 10 deep imports existentes** de `grounded-query-{reader,bridge}.ts`. Son previos a
+  esta task y su dueño es la lint rule de `TASK-1697`; arrastrarlos acá mezclaría dos cambios de
+  riesgo distinto.
 - **`core_web_vitals`**: es Lighthouse (**laboratorio**), igual que lo que OnPage ya da. La
   doctrina es explícita en que Google rankea con **campo** (CrUX), y la señal de campo del
   módulo viene de GSC. Sumarlo agregaría una segunda medición de lab, cero verdad nueva, y
@@ -292,20 +460,26 @@ Reglas obligatorias:
 
 ## Detailed Spec
 
-**Por qué superficie pública y no extracción.** La primera versión de esta task proponía mover
-el sustrato (`contracts` + `safe-fetch` + `html` + los 3 probes) a un paquete neutral. La
-medición lo desmintió: ese sustrato lo consumen **23 archivos** del probe layer — todos los
-probes agentic, todos los de entidad, el gatherer, el registry, el store y `command.ts`. Mover
-eso no es "movimiento puro de tres archivos": es re-apuntar la fundación de un motor que
-funciona y tiene 643 tests, a cambio de ubicación bonita.
+**Por qué sustrato y no superficie pública del motor AEO.** La versión previa de esta task proponía
+declarar una superficie pública **dentro** de `ai-visibility/probes/` (`probes/public.ts`). La
+auditoría del 2026-08-15 (§5.4) la corrigió por dos razones concretas:
 
-La doctrina de modularidad exige *"public surface only"* — prohíbe meter la mano en las
-entrañas de otro módulo, **no** obliga a mudarse. Una superficie pública declarada satisface la
-regla con un archivo aditivo y riesgo cero para el grader.
+1. **El nombre miente sobre lo que se comparte.** Un `Probe`/`ProbeOutcome` es vocabulario del
+   grader: trae consigo un contrato de ejecución episódico con review gate humano. Lo que el site
+   audit necesita es mucho más chico —fetch guardado y parseo de DOM/texto— y se llama
+   `SiteFetcher` / `analyzeDomSemantics`. Compartir el nombre grande invita a compartir el juicio,
+   que es justo lo que **no** debe compartirse: un `score_version` común haría que recalibrar SEO
+   invalidara reportes AEO ya entregados a clientes. Puerta de una sola dirección.
+2. **La extracción real es barata y ya tiene su tercer consumidor.** No son "23 archivos movidos":
+   son 2 archivos puros + sus tipos a `growth/site-substrate/` con re-export shim, y los 23 archivos
+   del motor **no cambian una línea**. El disparador ya existe dentro del propio grader:
+   `fetch-site-content.ts:15` reusa `createProbeFetcher` y su docstring declara que el probe es
+   técnico y no extrae prosa. Tres consumidores = umbral de patrón canónico. Eso es `TASK-1697`.
 
-Costo declarado: `growth/seo` pasa a depender de `growth/ai-visibility`. La dirección es
-SEO → AEO, no circular. Si algún día se extrae AEO a paquete propio, esa dependencia hay que
-resolverla — y ahí sí corresponde la extracción al paraguas (ver Follow-ups).
+Costo declarado: `growth/seo` pasa a depender de `growth/site-substrate`, que es domain-free y no
+persiste nada — a diferencia de la dependencia SEO → AEO que la versión anterior habría formalizado.
+Los 10 deep imports que hoy existen entre esos dos dominios (medidos, §1.3 del audit) siguen ahí y
+son problema de `TASK-1697`, no de esta task.
 
 **Por qué los hallazgos son de SITIO.** Un `robots.txt` no pertenece a una página: es del
 dominio. Materializarlo con la URL raíz y contarlo como "1 página afectada" sería falso, y por
@@ -315,21 +489,29 @@ eso el consumidor UI es prerequisito del flip del flag.
 
 ### Slice ordering hard rule
 
-- Slice 1 (superficie) → Slice 2 (collect) → Slice 3 (verificación).
+- **Slices 1+2 de `TASK-1697` mergeados** (sustrato + su carta) → Slice 1 (evaluadores) → Slice 2
+  (collect) → Slice 3 (verificación). Empezar el Slice 1 sin el sustrato obliga a improvisar una
+  superficie dentro del motor AEO, que es el error que el delta del 2026-08-15 corrige. El Slice 3 de
+  1697 (lint rule angosta) puede entrar antes, después o en paralelo: es guardrail, no dependencia.
 - Slice 2 **NO** puede shippear sin su flag: sin `TASK-1671`, la UI renderizaría un hallazgo de
   sitio como "1 página afectada", que es falso.
-- El flag **NO** se prende hasta que `TASK-1671` esté desplegada.
+- 🔴 **El flag NO se prende hasta que `TASK-1671` esté desplegada — y hasta ese momento el punto
+  ciego sigue abierto.** Mergear esta task no cierra el agujero; lo cierra el flip. No declarar el
+  agujero cerrado en Handoff/changelog antes del flip verificado en producción.
 
 ### Risk matrix
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
-| Romper el grader AEO | AEO / grader | **low** | La superficie es aditiva: cero ediciones a archivos existentes, verificable con `git diff --stat`. Los 643 tests del motor corren sin tocarse | suite `ai-visibility` en CI |
-| Alguien "arregla" el acoplamiento moviendo archivos dentro del alcance de esta task | AEO / grader | medium | Regla dura explícita en Architecture Alignment + criterio de aceptación que exige un solo archivo nuevo | revisión de código |
-| Un probe lento cuelga el collect y el cron se pasa de ventana | cron / ops-worker | medium | Presupuesto de tiempo por probe + contrato "nunca lanza" | `seo.audit.stuck_tasks` |
+| Romper el grader AEO | AEO / grader | **low** | Cero archivos agregados o editados en `ai-visibility/**`, verificable con `git diff --stat`. Los 643 tests del motor corren sin tocarse | suite `ai-visibility` en CI |
+| Un deep import cross-dominio se cuela (a `ai-visibility/**` o desde el sustrato hacia `growth/*`) | AEO / grader | medium | **Lint rule de `TASK-1697`** en CI, no revisión humana: un deep import lo crea un commit, así que el detector es de CI (patrón canónico #7). La regla dura de Architecture Alignment es la doctrina; el gate es la lint | `pnpm lint` en CI (regla cross-domain de `growth/*`) |
+| Un fetch lento cuelga el collect y el cron se pasa de ventana | cron / ops-worker | medium | Presupuesto de tiempo por hallazgo + contrato "nunca lanza" | `seo.audit.stuck_tasks` |
 | Un fetch fallido se lee como "sitio sano" | data quality | **high si no se cuida** | Estado "no verificado" explícito, distinto de verificado-y-sano; invariante declarada | verificación runtime del slice 3 |
+| **Un sitio bloqueado en el borde/WAF sale "acceso correcto"** porque el audit sólo parsea `robots.txt` | data quality / reputación | **high** — medido: 2 de los 3 casos con problema en una muestra de 12 dominios LatAm/CL (2026-08-15) | Chequeo de acceso real: `GET` del home con UA de bot de retrieval vs fetch normal, con `issue_type` propio | Un dominio con `robots.txt` limpio y 403 al UA de bot que el audit declara sano |
+| **Un sitio que sólo bloquea training sale `critical`** y el cliente aprende a ignorar la severidad más alta | data quality / reputación | **high si se hereda el evaluador tal cual** | Separación explícita retrieval vs training, con `notice` + lectura de postura para training | Un hallazgo `critical` en un sitio con `OAI-SearchBot` permitido |
+| El flag se prende antes de `TASK-1671` y la UI muestra "1 página afectada" | UI / confianza | medium | Orden duro declarado; el flip es el hito de cierre, no el merge | GVC de 1671 antes del flip |
 | Hallazgo de sitio contado como "1 página afectada" | UI | high | Flag OFF hasta que `TASK-1671` renderice el alcance correcto | GVC de 1671 |
-| Fetch saliente a un host no deseado (SSRF) | seguridad | low | Se reusa el fetcher guarded tal cual; el dominio lo resuelve el caller desde `seo_targets` | revisión de código |
+| Fetch saliente a un host no deseado (SSRF) | seguridad | low | Se reusa el `SiteFetcher` guarded tal cual —un solo dueño, sin copia: una guarda SSRF divergente es alta y no observable—; el dominio lo resuelve el caller desde `seo_targets` | tests del sustrato en CI + lint que prohíbe un fetcher paralelo |
 
 ### Feature flags / cutover
 
@@ -343,7 +525,7 @@ eso el consumidor UI es prerequisito del flip del flag.
 
 | Slice | Rollback | Tiempo | Reversible? |
 |---|---|---|---|
-| Slice 1 | borrar el archivo nuevo; nada más lo referencia todavía | <5 min | si |
+| Slice 1 | borrar el archivo nuevo de `growth/seo/site-audit/`; nada más lo referencia todavía | <5 min | si |
 | Slice 2 | flag a OFF + redeploy worker | <10 min | si (los hallazgos ya escritos quedan; son append-only) |
 | Slice 3 | sin rollback propio: sólo verifica y documenta, additive y sin impacto de runtime | — | no aplica |
 
@@ -368,21 +550,35 @@ eso el consumidor UI es prerequisito del flip del flag.
 ## Acceptance Criteria
 
 - [ ] Se declaró `Execution profile: backend-data` y `Backend impact: integration`.
-- [ ] `git diff --stat` sobre `src/lib/growth/ai-visibility/**` muestra **exactamente un archivo
-      y es nuevo**. Cero ediciones al motor.
-- [ ] La suite del motor AEO sigue verde (643 tests) **sin editar ninguno de sus archivos**.
-- [ ] `growth/seo/**` no importa nada de `ai-visibility/probes/**` fuera de la superficie pública.
-- [ ] La superficie pública no persiste nada ni recibe tablas propias.
-- [ ] El collect materializa los 3 hallazgos de sitio detrás de flag; con el flag OFF el
+- [ ] `git diff --stat -- src/lib/growth/ai-visibility` sale **vacío**: cero archivos agregados o
+      editados en el motor AEO.
+- [ ] La suite del motor AEO sigue verde (643 tests) **sin tocar ninguno de sus archivos**.
+- [ ] `growth/seo/**` no importa nada de `ai-visibility/probes/**`: el consumo es de
+      `@/lib/growth/site-substrate`, y la lint rule de `TASK-1697` lo verifica en CI.
+- [ ] El código nuevo usa vocabulario de sustrato (`SiteFetcher`, `analyzeDomSemantics`) y **no**
+      `Probe`/`ProbeContext`/`ProbeOutcome`.
+- [ ] El sustrato no persiste nada, no importa nada de `growth/*` y no recibe tablas propias.
+- [ ] El collect materializa los hallazgos de sitio detrás de flag; con el flag OFF el
       comportamiento es idéntico al actual.
-- [ ] `robots.txt` que bloquea retrieval de IA se materializa como **`critical`**.
-- [ ] Un probe `skipped`/`failed` se materializa como "no verificado" con razón, distinguible de
+- [ ] `robots.txt` que bloquea **retrieval** se materializa como **`critical`**.
+- [ ] Un sitio que bloquea **sólo training** con retrieval abierto se materializa como **`notice`**
+      con lectura de postura, y **jamás** como `critical` — verificado con un caso real.
+- [ ] Existe el chequeo de **acceso en el borde**: `GET` del home con UA de bot de retrieval
+      comparado contra el fetch normal, con `issue_type` propio, distinto del de `robots.txt`.
+- [ ] Un dominio con `robots.txt` limpio que devuelve 403/429 al UA de un bot de retrieval **no**
+      se declara sano — verificado contra un caso real de la muestra.
+- [ ] Sitemap ausente en `/sitemap.xml` es **`notice`**; sólo el sitemap declarado en `robots.txt` y
+      roto es `warning`.
+- [ ] Un fetch `skipped`/`failed` se materializa como "no verificado" con razón, distinguible de
       "verificado y sano" — verificado contra un dominio inalcanzable.
 - [ ] Los `issue_type` nuevos tienen ficha es-CL en `GH_GROWTH_SEO_AUDIT_ISSUES` y el test de
       drift bidireccional de TASK-1309 pasa.
 - [ ] Los hallazgos de sitio NO se cuentan como "páginas afectadas".
 - [ ] Evidencia runtime contra Berel y efeoncepro.com, comparada con el `robots.txt` real.
 - [ ] Fila del flag en `FEATURE_FLAG_STATE_LEDGER.md` con el runtime que lo lee declarado.
+- [ ] El cierre distingue **merge** de **flip**: mientras el flag esté OFF, el estado declarado es
+      `code complete, rollout pendiente` y el punto ciego **sigue abierto**. El agujero se declara
+      cerrado sólo con `TASK-1671` desplegada y el flip verificado en producción.
 - [ ] `core_web_vitals` y `llms-txt` NO entran al alcance.
 
 ## Verification
@@ -406,26 +602,35 @@ eso el consumidor UI es prerequisito del flip del flag.
 ## Follow-ups
 
 - `TASK-1671` `[por crear]` — consumer UI de los hallazgos de sitio en `/admin/growth/seo/audit`.
-- **Extracción del sustrato de probes al paraguas `search-visibility/`** `[sin task, sin fecha]`.
-  El paraguas existe de verdad: el doc funcional declara que "el módulo SEO es la mitad
-  *buscadores clásicos* de Search Visibility 360, y la otra mitad es el AI Visibility Grader".
-  Si algún día se reorganiza, el hogar correcto del sustrato compartido **no** es un
-  `site-probes` genérico: es `search-visibility/`, con SEO y AEO como sus dos motores, para que
-  la arquitectura se lea igual que el producto. Es una reorganización de dos motores (23
-  archivos re-apuntados), no un movimiento de tres — merece su propio ADR y una razón real
-  (un tercer consumidor, o extraer AEO a paquete propio). **Hoy no la hay**, y por eso esta
-  task NO la hace.
 - Artefacto descargable/compartible de la auditoría: el cliente no ejecuta, reenvía a una
   agencia; el documento debe llevar la procedencia consigo y no debería nacer sin esta cobertura.
 
+> **Retirado el 2026-08-15:** el follow-up *"extracción del sustrato al paraguas
+> `search-visibility/`"*. La auditoría §5.4 y §6 lo declaran **sobredimensionado** —mover ~70
+> archivos por estética, con SEO y AEO como sub-motores de un paraguas— y por eso condenado a no
+> pasar nunca. El movimiento que sí corresponde es chico y ya tiene dueño: `TASK-1697` mueve 2
+> archivos puros + sus tipos a `growth/site-substrate/` con re-export shim. El veredicto de la
+> auditoría es **dominios separados para siempre**: lo único compartible es cómo se obtiene la
+> evidencia.
+
 ## Open Questions
 
-1. **Nombre y forma de la superficie pública.** ¿`probes/public.ts` o `probes/index.ts`? El
-   segundo es la convención de módulo, pero `probes/` ya tiene índices por familia
-   (`structural/index.ts`, etc.) y podría confundirse. Propuesta: `public.ts`, explícito.
+1. **¿`evaluateRobotsForAiBots` se duplica o se comparte?** El evaluador de `robots.txt` para bots
+   de IA es determinista, chico y hoy vive en `ai-visibility/probes/structural/robots-txt.ts`. La
+   regla del audit §5.1 dice que se comparte cómo se obtiene la evidencia y nunca cómo se juzga,
+   pero este evaluador está en la frontera: no puntúa nada, sólo lee directivas. Propuesta:
+   **duplicarlo en `growth/seo`** —el costo de que diverja es bajo y observable, mientras que el
+   costo de que SEO herede el vocabulario `Probe` del grader es el acoplamiento que este delta
+   acaba de retirar—. Decidir en Discovery, con `TASK-1697` ya mergeada y su frontera a la vista.
 2. **Cómo se marca el alcance sitio vs página.** ¿Columna nueva en `seo_site_audit_findings`
    (migración aditiva) o convención en `detail`? La columna es más honesta y consultable; el
    `detail` evita migración. Propuesta: columna, porque el alcance es una propiedad del hallazgo
    y esconderlo en un JSON lo vuelve invisible para cualquier consumer que no lo sepa leer.
-3. ¿`sitemap` merece `warning` o `notice`? Un sitemap ausente en un sitio chico bien enlazado es
-   casi irrelevante; en uno grande es un problema de descubrimiento real.
+3. ~~¿`sitemap` merece `warning` o `notice`?~~ **RESUELTA — `notice`** (Delta 2026-08-15 (2)). En una
+   muestra medida de 12 dominios LatAm/CL, **3 de 12** devuelven 404 en `/sitemap.xml` y declaran su
+   índice en la directiva `Sitemap:` del `robots.txt`: están bien, y un `warning` sobre ellos sería
+   ruido que erosiona la lista priorizada. `warning` queda reservado para el sitemap **declarado en
+   `robots.txt` y roto**, que sí es un defecto verificable.
+4. ¿Qué familia le corresponde a un bot que no es limpiamente retrieval ni training (p. ej.
+   `Bytespider`, `Amazonbot`)? Se clasifica explícitamente en Discovery, con su razón escrita; el
+   default **nunca** es `critical`.
