@@ -27,6 +27,8 @@
 import 'server-only'
 
 import { postDataForSeoTask } from '@/lib/ai/dataforseo'
+
+import { LABS_RESULT_ROW_USD, LABS_TASK_SETUP_USD } from './provider-pricing'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
@@ -35,12 +37,12 @@ import { enforceSeoRunEntitlement } from './entitlement'
 import { isSeoKeywordMarketDataEnabled, isSeoModuleEnabled } from './flags'
 
 /**
- * Perfil de costo Labs verificado contra la doc oficial (as-of 2026-08-06):
- * modelo dual = se cobra el task setup del request Y cada fila devuelta.
- * `.claude/skills/dataforseo-operator/references/02-labs.md` §5.
+ * Perfil de costo Labs. Los valores viven en `provider-pricing.ts` —módulo PURO, sin
+ * `server-only`— porque el preview del builder los necesita en el browser; declararlos acá
+ * arrastraba `server-only` a cualquier cliente que importara el estimador, de forma transitiva
+ * e invisible para el typecheck. Se re-exportan para no romper a los consumers existentes.
  */
-export const LABS_TASK_SETUP_USD = 0.012
-export const LABS_RESULT_ROW_USD = 0.00012
+export { LABS_RESULT_ROW_USD, LABS_TASK_SETUP_USD } from './provider-pricing'
 
 /**
  * Máximo documentado de `keyword_overview` (ref 02-labs §7 gotcha 8).

@@ -2314,6 +2314,147 @@ export const GH_GROWTH_SEO_KEYWORDS = {
     viewingSubset: 'Viendo {count} de {total}'
   },
 
+  /**
+   * TASK-1665 — lente `Descubrir`.
+   *
+   * Tres reglas de tono que gobiernan todo este bloque, porque la pantalla compromete plata:
+   *
+   * 1. **Nunca prometer tráfico, ranking ni clientes.** Se descubre demanda y se decide qué
+   *    investigar; lo que pase después no lo controla esta pantalla.
+   * 2. **"Descubrir" ≠ "seguir".** Una sugerencia es una hipótesis; seguirla activa gasto
+   *    recurrente. El copy de cada acción dice su consecuencia exacta, y por eso hay tres verbos
+   *    distintos en vez de un "Agregar" ambiguo.
+   * 3. **La ausencia de dato se nombra, no se rellena.** Nunca `0`, nunca `—` ambiguo, nunca un
+   *    score inventado: "Sin dato de mercado" dice la verdad y deja decidir con eso.
+   */
+  discovery: {
+    lensLabel: 'Descubrir',
+    lensAriaLabel: 'Lentes de keywords',
+    lensOpportunities: 'Oportunidades',
+
+    title: 'Descubrir keywords',
+    subtitle: 'Encuentra términos relacionados a partir de seeds y decide qué hacer con cada uno.',
+
+    builder: {
+      ariaLabel: 'Configuración de la corrida de descubrimiento',
+
+      seedsLabel: 'Seeds para investigar',
+      seedsHelper: 'Una por línea. Una seed es un punto de partida, no una keyword que se empiece a medir.',
+      seedsPlaceholder: 'ej. pintura industrial',
+      seedsCounter: '{count}/{max} seeds',
+      seedsDuplicateRemoved: 'Se quitó {count} duplicado',
+      seedsDuplicatesRemoved: 'Se quitaron {count} duplicados',
+      seedsErrorEmpty: 'Agrega al menos una seed.',
+      seedsErrorTooMany: 'Reduce la lista a {max} seeds.',
+      seedsErrorTooLong: 'La seed "{seed}" es muy larga. Máximo {max} caracteres.',
+      seedsErrorTooManyWords: 'La seed "{seed}" tiene demasiadas palabras. Máximo {max}.',
+
+      sourcesLabel: 'Fuentes de seed',
+      sourceGsc: 'Consultas medidas',
+      sourceGscHelper: 'Consultas reales de tu Search Console de los últimos 28 días. Sin costo de proveedor.',
+      sourceGscUnavailable: 'No hay consultas medidas',
+      sourceTracked: 'Keywords seguidas',
+      sourceTrackedHelper: 'Términos que ya monitoreas. No crea seguimiento nuevo.',
+      sourceTrackedUnavailable: 'Todavía no sigues keywords',
+      sourceManual: 'Seeds escritas',
+      sourceManualHelper: 'El texto que ingresaste como punto de partida.',
+      sourceDomain: 'Dominio propio',
+      sourceDomainHelper: 'Busca keywords asociadas al dominio. Usa datos estimados y tiene costo.',
+
+      methodsLabel: 'Métodos de expansión',
+      methodsHelper: 'Hasta {max}. Definen cómo se amplía cada seed.',
+      methodSuggestions: 'Sugerencias',
+      methodSuggestionsHelper: 'Frases que contienen tu seed con términos añadidos.',
+      methodRelated: 'Relacionadas',
+      methodRelatedHelper: 'Búsquedas relacionadas del índice del proveedor.',
+      methodIdeas: 'Ideas',
+      methodIdeasHelper: 'Términos de la misma categoría. Amplía mucho el resultado.',
+      methodsErrorEmpty: 'Elige al menos un método.',
+
+      marketLabel: 'Mercado',
+      marketHelper: 'Heredado del sitio configurado.',
+
+      scopeLabel: 'Alcance',
+      scopeQuick: 'Rápido · 25 filas',
+      scopeFull: 'Completo · 50 filas',
+      scopeHelper: 'Filas solicitadas por método. "Completo" no significa exhaustivo.',
+
+      submit: 'Descubrir keywords',
+      submitAriaLabel: 'Iniciar la corrida de descubrimiento',
+      submitPending: 'Encolando…'
+    },
+
+    cost: {
+      ariaLabel: 'Costo estimado de la corrida',
+      heading: 'Antes de confirmar',
+      calls: '{count} llamadas estimadas',
+      rows: 'Hasta {count} filas solicitadas',
+      estimate: 'Costo máximo estimado ◑ US${amount}',
+      estimateFree: 'Sin costo de proveedor',
+      budget: 'Presupuesto disponible US${amount}',
+      budgetUnavailable: 'Cupo no disponible',
+      formula: 'Fórmula: {formula}',
+      disclaimer:
+        'Los datos de mercado son estimados y la corrida puede quedar parcial. Seguir una keyword después genera gasto recurrente y pide otra confirmación.',
+      announce: 'Costo estimado actualizado: {calls} llamadas, hasta US${amount}.',
+      calculating: 'Calculando el costo…'
+    },
+
+    disabledReason: {
+      flag: 'El descubrimiento todavía no está habilitado para esta organización.',
+      permission: 'Puedes revisar las corridas, pero no iniciar una nueva. Pídele acceso a Growth.',
+      noSeeds: 'Agrega al menos una seed para estimar el costo.',
+      noMethods: 'Elige al menos un método de expansión.',
+      noTarget: 'Este Space todavía no tiene un sitio configurado.',
+      budget: 'El cupo del período no alcanza para esta corrida.'
+    },
+
+    run: {
+      ariaLabel: 'Estado de la corrida',
+      lastRun: 'Última corrida',
+      runId: 'Corrida {id}',
+      queuedTitle: 'Corrida en cola',
+      queuedDetail: 'Se ejecuta fuera de esta pantalla. Puedes salir y volver.',
+      queuedAnnounce: 'La corrida quedó en cola.',
+      runningTitle: 'Investigando seeds',
+      runningDetail: 'Procesando la corrida.',
+      runningDetailStage: 'Procesando {stage}.',
+      runningAnnounce: 'La corrida está procesando.',
+      runningIndicatorAria: 'La corrida sigue en curso',
+      succeededTitle: 'Corrida completada',
+      succeededDetail: '{count} candidatos · costo real ◑ US${amount}',
+      succeededAnnounce: 'La corrida terminó con {count} candidatos.',
+      partialTitle: 'Corrida parcial',
+      partialDetail: 'Una fuente no terminó. Lo que sí se materializó está abajo.',
+      partialAnnounce: 'La corrida terminó parcialmente.',
+      noResultsTitle: 'No encontramos candidatos',
+      noResultsDetail: 'La respuesta fue válida pero no trajo términos. Prueba otras seeds o método.',
+      noResultsAnnounce: 'La corrida terminó sin candidatos.',
+      budgetBlockedTitle: 'Corrida detenida por cupo',
+      budgetBlockedDetail: 'Se alcanzó el límite de gasto del período. Reduce el alcance o espera al próximo.',
+      budgetBlockedAnnounce: 'La corrida se detuvo por cupo.',
+      providerErrorTitle: 'No pudimos completar la corrida',
+      providerErrorDetail: 'El proveedor no respondió. Puedes iniciar una corrida nueva.',
+      providerErrorAnnounce: 'No pudimos completar la corrida.',
+      staleTitle: 'Datos anteriores',
+      staleDetail: 'Capturados el {date}. Inicia una corrida nueva para actualizarlos.',
+      retry: 'Nueva corrida',
+      refresh: 'Actualizar estado',
+      viewResults: 'Ver candidatos',
+      methodDone: '{method} ✓',
+      methodFailed: '{method} — no terminó',
+      methodSkipped: '{method} — sin ejecutar'
+    },
+
+    empty: {
+      title: 'Todavía no has hecho una corrida',
+      description:
+        'Escribe una o más seeds arriba y elige cómo expandirlas. Vas a ver el costo estimado antes de confirmar.',
+      noTargetTitle: 'Este Space no tiene un sitio configurado',
+      noTargetDescription: 'Configura el sitio y su mercado para poder investigar keywords.'
+    }
+  },
+
   states: {
     emptyNoOpportunities: {
       title: 'Todavía no hay oportunidades',

@@ -21,18 +21,16 @@ import CustomTextField from '@core/components/mui/TextField'
 
 import DebouncedInput from '@/components/DebouncedInput'
 import EmptyState from '@/components/greenhouse/EmptyState'
-import { GreenhouseBreadcrumbs } from '@/components/greenhouse/primitives'
 import type { GreenhouseAsyncActionState } from '@/components/greenhouse/primitives/GreenhouseAsyncActionButton'
 import SurfaceRecipe from '@/components/greenhouse/primitives/surface-system/SurfaceRecipe'
-import WorkbenchHeader from '@/components/greenhouse/primitives/surface-system/WorkbenchHeader'
-import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
+
+import KeywordsSurfaceHeader from './KeywordsSurfaceHeader'
 import { throwIfNotOk } from '@/lib/api/parse-error-response'
 import { GH_GROWTH_SEO_KEYWORDS, GH_GROWTH_SEO_OVERVIEW } from '@/lib/copy/growth'
 import type { KeywordOpportunitiesResult, SeoKeywordTrackOutcome } from '@/lib/growth/seo/contracts'
 import type { SeoSpaceOption } from '@/lib/growth/seo/overview/list-seo-spaces'
 import type { SeoConnectionState } from '@/views/greenhouse/admin/growth/seo/overview/SeoOverviewView'
 
-import SeoSearchVisibilityTabs from '../overview/SeoSearchVisibilityTabs'
 import KeywordOpportunityMap from './KeywordOpportunityMap'
 import KeywordOpportunityTable from './KeywordOpportunityTable'
 import KeywordOpportunityVerdict from './KeywordOpportunityVerdict'
@@ -593,33 +591,19 @@ const KeywordOpportunitiesView = ({
    * los controles quedan disponibles SIEMPRE, también en los estados sin datos (que era la
    * razón por la que antes había que repetirlos dentro de cada superficie de estado).
    */
+  // TASK-1665 — el chrome lo posee `KeywordsSurfaceHeader`, compartido con la lente `Descubrir`.
+  // Las dos son hermanas de UNA superficie; resolverlo en dos lugares es condición de parada del
+  // estándar premium. Lo único propio de esta lente son sus controles de alcance (la ventana de
+  // 28/90 días, que sobre candidatos estimados no significaría nada).
   const header = (
-    <Stack spacing={4}>
-      {/* Sin hrefs (misma convención del Overview y Rendimiento): "Growth" es un grupo de
-          menú, y la navegación a las hermanas ES la barra de tabs del propio header. */}
-      <GreenhouseBreadcrumbs
-        items={[
-          { label: GH_INTERNAL_NAV.growth.label },
-          { label: GH_GROWTH_SEO_OVERVIEW.breadcrumbSection },
-          { label: GH_INTERNAL_NAV.growthSeoKeywords.label }
-        ]}
-      />
-
-      <WorkbenchHeader
-        kind='report'
-        titleComponent='h1'
-        dataCapture='seo-keywords-toolbar'
-        title={copy.pageTitle}
-        description={copy.pageSubtitle}
-        meta={contextMeta}
-        secondaryActions={contextControls}
-        supporting={
-          <Box data-capture='seo-keywords-tabs'>
-            <SeoSearchVisibilityTabs activeTab='keywords' spaceId={selectedSpaceId} />
-          </Box>
-        }
-      />
-    </Stack>
+    <KeywordsSurfaceHeader
+      activeLens='opportunities'
+      spaceId={selectedSpaceId}
+      title={copy.pageTitle}
+      description={copy.pageSubtitle}
+      scopeControls={contextControls}
+      meta={contextMeta}
+    />
   )
 
   const renderBody = () => {

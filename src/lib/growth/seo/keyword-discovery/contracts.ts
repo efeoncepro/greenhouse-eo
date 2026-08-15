@@ -15,7 +15,7 @@
  *   de abajo, y la respuesta real del proveedor prevalece en el ledger.
  */
 
-import { LABS_RESULT_ROW_USD, LABS_TASK_SETUP_USD } from '../keyword-market-data'
+import { LABS_RESULT_ROW_USD, LABS_TASK_SETUP_USD } from '../provider-pricing'
 
 // ─── Eventos outbox (trazabilidad, NO cola de trabajo) ──────────────────────────────
 //
