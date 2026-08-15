@@ -66,7 +66,7 @@ talent_demand ──▶ hiring_opening ──(publish)──▶ [público] ─�
 | **N2 Detalle vacante** | Careers | detalle · 404 (opening no publicado) | `getPublicOpeningByPublicId` | 354 |
 | **N3 Apply form** | Careers | idle · validación inline · enviando · confirmación genérica · rate-limited · error | `submitPublicHiringApplication` (1367) | 354 |
 | **N4 Bandeja postulantes** | Desk | loading · lista+filtros · vacía · error | readers de applications (355) | 355 |
-| **N5 Ficha candidato** | Desk | detalle · tabs (perfil/assessment/docs/decisión) | readers 360 + assessment | 355 |
+| **N5 Ficha candidato** | Desk | detalle · tabs (perfil/assessment/docs/decisión) | readers 360 + assessment + `resolveCandidateDocuments` | 355/1715 |
 | **N6 Asignar test** | Desk | picker plantilla · asignado (token generado) | `assignCandidateTest` (1360) | 355/1363 |
 | **N7 Rendición test** | Assessment taking (público) | token válido/expirado/consumido · en progreso · enviado | `resolveAssessmentByToken` + `saveResponse` + `submitAssessment` (1360) | 1363 |
 | **N8 Review scorecard** | Desk | pendiente corrección · IA sugerida (confirmar/editar) · scored | `finalizeAssessment` + `confirmAiProposal` (1361) | 1363/1361 |
@@ -107,6 +107,15 @@ talent_demand ──▶ hiring_opening ──(publish)──▶ [público] ─�
 - El nodo de publicación (Publication Desk, 355 Surface 4) ahora tiene el sub-flujo **"Redactar con IA"**: CTA en la columna pública del diff (variantes ready/locked por flag/pending por ledger) → drawer propose→confirm (`docs/ui/flows/TASK-1422-vacancy-ai-draft-flow.md`). La IA propone COPY desde inputs allowlist-safe (nunca presupuesto/notas internas); el confirm humano escribe vía `updateHiringOpening`; el publish sigue siendo la acción humana existente con su gate 422.
 - Regla transversal reafirmada: "IA propone, humano confirma" ahora cubre preguntas (1361), puntajes (1361/1363) y el aviso público (1385/1422) — mismo ledger `hiring_assessment_ai_proposal`, misma cola de proposals.
 - El Publication Desk ganó selector de vacante (antes fijaba `openings[0]`).
+
+## Delta 2026-08-15 — N5 completa su tab de documentos (TASK-1715 UI · TASK-1714 backend)
+
+- **El seam quedó abierto por construcción, no por olvido.** TASK-1362 levantó el sustrato de captura (assets privados, escaneo, identidad enmascarada) con `UI impact: none` y declaró fuera de alcance *"la UI de subir/ver documentos… desk TASK-355"*. TASK-355 ya estaba cerrada, así que el cable quedó sin dueño: `resolveCandidateDocuments` y `GET /api/hiring/candidate-facets/[id]/documents` existían y ninguna superficie los consumía. El tab **docs** era el único de los cuatro de N5 sin reader real — tres filas escritas a mano y un botón "Revelar" implementado como `useState` local, que descartaba el motivo del operador mientras el banner prometía una entrada de auditoría que nadie escribía.
+- **Abrir ≠ revelar (nuevo DDL del nodo).** El panel separa dos clases del modelo canónico y les pone precios distintos a propósito: un ARCHIVO se **abre** de un clic —la capability de la pantalla, `hiring.application.read`, ya autorizó, y leer el CV es el trabajo del reclutador—; la IDENTIDAD se **revela** con capability propia `hiring.candidate.reveal_identity` + motivo ≥5 caracteres + audit append-only (TASK-1714). El mockup les cobraba lo mismo, y por eso el precio había dejado de significar algo.
+- **El CV se lee dentro del portal.** El visor es un diálogo (`GreenhouseDocumentPreview`) sobre un blob same-origin, no una pestaña nueva: mandar el CV afuera rompe el contexto justo cuando se evalúa a esa persona, y delega los estados al visor del sistema, donde no podemos decir nada honesto sobre un 403, un archivo en cuarentena o una carga lenta.
+- **La degradación de móvil se decide por capacidad, no por viewport.** Cuando el navegador declara que no sabe embeber PDF (`navigator.pdfViewerEnabled === false`), el diálogo lo dice y ofrece Descargar / Abrir en pestaña — y ni siquiera baja los bytes— en vez de pintar un marco en blanco, que es exactamente la degradación silenciosa que esta task vino a eliminar.
+- **Estados honestos en vez de un solo "Enmascarado".** Los cuatro estados del escáner (`available` · `quarantined` · `pending` · `legacy_unscanned`) más la ausencia de documento se expresan por separado, y un fallo del reader se muestra como error con Reintentar, NUNCA como "sin documentos": `resolveCandidateDocuments` es reader canónico del 360 y no degrada en silencio.
+- **Regla transversal ampliada:** "público nunca ve interno" no agota la sensibilidad del sistema. Dentro de la superficie interna también hay dos niveles, y el affordance sigue a la capability: quien no puede revelar no ve un candado que lo invite a intentarlo, ve a quién pedírselo.
 
 ## Cómo se amplía este doc
 

@@ -58,7 +58,7 @@ export const hiringDesk: HiringDeskCopy = {
     aiSuggestionNote: 'La IA propone un puntaje; tú lo confirmas o editas antes de que cuente.', scoreLabel: 'Puntaje', overallScore: 'Score global',
     confirmScore: 'Confirmar puntaje', scoreConfirmed: 'Puntaje confirmado.', finalizeScorecard: 'Finalizar scorecard',
     scorecardFinalized: 'Scorecard finalizado.',
-    documentsUnavailable: 'Resolver documental pendiente', documentsBody: 'Documentos resueltos por el servicio de captura (TASK-1362). La identidad es sensible y exige capability + motivo.', revealConfirm: 'Revelar y registrar',
+    revealConfirm: 'Revelar y registrar',
     documentsPanel: {
       subtitle: 'El CV se abre directo; la identidad se revela con motivo y queda auditada.',
       filesGroup: 'Archivos y enlaces',

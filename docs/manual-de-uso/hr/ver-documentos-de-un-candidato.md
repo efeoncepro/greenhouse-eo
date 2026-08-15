@@ -74,7 +74,7 @@ Pasa tipicamente en el celular: esos navegadores no saben dibujar un PDF dentro 
 **Abrir en pestana nueva** o **Descargar** desde la misma ventana.
 
 **"El CV no carga y sale un error."**
-La ventana te ofrece **Abrir en pestana nueva**; probalo. Si tampoco abre, el archivo puede haberse
+La ventana te ofrece **Abrir en pestana nueva**; pruebalo. Si tampoco abre, el archivo puede haberse
 borrado del almacenamiento — avisa al equipo de plataforma con el ID de la postulacion.
 
 **"Revele el documento y al recargar volvio a estar oculto."**

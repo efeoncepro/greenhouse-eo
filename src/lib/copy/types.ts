@@ -423,8 +423,6 @@ export interface HiringDeskCopy {
     finalizeScorecard: string
     scorecardFinalized: string
     documentsTitle: string
-    documentsUnavailable: string
-    documentsBody: string
     revealConfirm: string
     /**
      * TASK-1715 — copy del panel de Documentos. Separa las dos clases del modelo

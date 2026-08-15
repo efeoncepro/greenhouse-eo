@@ -19,7 +19,7 @@ Load whenever the work happens *inside* the Greenhouse repo (not pure advisory).
 
 - `TASK-1360` Assessment Engine — competency catalog (category × level), question bank (**answer_key sensitive, separate, never candidate-facing**), templates (compose per role; Account Manager seed), instances, objective + human scoring, competency-result rollup into `hiring_application` (**advisory**).
 - `TASK-1361` Assessment AI Assist — AI **proposes** questions + open-answer scores; **human confirms**; eval baseline; flag OFF default. (This is the AI-Act-safe pattern — see `assessment-interviewing.md`.)
-- `TASK-1362` Candidate Document Capture — CV/portfolio on the **private assets platform** (reuse, don't build buckets); **identity docs reuse `person_identity_documents`** (masked/reveal + capability `person.legal_profile.reveal_sensitive` + audit), captured **post-decision**; quarantine/scan for public uploads.
+- `TASK-1362` Candidate Document Capture — CV/portfolio on the **private assets platform** (reuse, don't build buckets); **identity docs reuse the `person_identity_documents` table** (masked storage + append-only audit), captured **post-decision**; quarantine/scan for public uploads. ⚠️ The *reveal* of a candidate's identity document does **not** use `person.legal_profile.reveal_sensitive` — that is the member-scoped path of TASK-784. The candidate path is `hiring.candidate.reveal_identity` (TASK-1714) — see §Candidate documents below.
 - `TASK-1363` Assessment Taking + Review Surface — candidate takes the test via a **public tokenized Greenhouse link** (`/assessment/[token]`, single-use, time-limited); internal review in Application 360 with advisory scorecard, queue and correction drawer. Complete local on 2026-07-13; rollout depends on push/deploy.
 
 ### Assessment operating flow (humans + agents)
@@ -166,6 +166,37 @@ There is a real malware scanner behind files uploaded from outside (Cloud Run `s
 - Runbook: `docs/manual-de-uso/plataforma/operar-scanner-malware-assets.md`. Service/deploy invariants: `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-08-11.
 - Any future flag change remains a production-release matter (`greenhouse-production-release`), and only after the reading code is on `main` — `ISSUE-150` (resolved 2026-08-12).
 
+## Candidate documents — panel + identity reveal (TASK-1714/1715, ✓ 2026-08-15)
+
+Canonical model: `src/lib/hiring/documents/types.ts`. **Two classes of datum, two treatments.**
+
+| Class | Type | Key field | Treatment |
+|---|---|---|---|
+| File (CV, portfolio) | `CandidateDocumentFile` | `downloadUrl` | **Opened.** `hiring.application.read` (the screen's capability) already authorized; the asset route re-verifies per request. No extra padlock. |
+| Identity (RUT/passport) | `CandidateIdentityDocument` | `displayMask` — never the full value | **Revealed.** Own capability + reason + audit entry. |
+
+A padlock that protects nothing teaches the operator to ignore the padlocks that do. Do not "harden" the file group by adding one.
+
+**The reveal (TASK-1714)** — a path of its own, not TASK-784's:
+
+- Capability `hiring.candidate.reveal_identity`, grant **role-only**: `EFEONCE_ADMIN` ∪ `HR_MANAGER` ∪ `EFEONCE_OPERATIONS`. Deliberately **without** routeGroup `internal` — every internal tenant carries that routeGroup, so including it would make revealing PII a de-facto universal permission.
+- **Why not reuse `person.legal_profile.reveal_sensitive`**: it lives in module `hr`, only `FINANCE_ADMIN`/`EFEONCE_ADMIN` carry it, and granting it to the Hiring tier would open the reveal over **every** person in the module (collaborators, ex-collaborators, addresses). TASK-784 also anchors to `memberId`, and a candidate has no member until the handoff.
+- Command `revealCandidateIdentityDocument` (`src/lib/hiring/documents/reveal-identity-document.ts`) verifies the document belongs to the `identity_profile_id` of the path's `candidateFacetId`. **Anti-IDOR: a foreign `documentId` answers `404`, not `403`** — a `403` would confirm its existence to a prober. The lookup runs with `includeArchived: true` on purpose, so an *archived* document of the candidate's own gets the `409` that names the cause instead of a `404` that would assert it does not exist.
+- Route `POST /api/hiring/candidate-facets/[candidateFacetId]/identity-documents/[documentId]/reveal`.
+- **No machinery duplicated**: the append-only audit and the outbox event are written by `revealPersonIdentityDocument` (784). No new event.
+- **Not idempotent by design**: each reveal is a real access and leaves its own entry. Double-fire is prevented by the client disabling the CTA, never by the server deduplicating.
+- **Capture guardrail (pre-existing)**: `captureCandidateIdentityDocument` only writes **after a favorable decision** (`selected` / `backup_selected`). An empty Identidad group is the normal state, not a bug.
+- **Estado operativo honesto**: code-complete, seed verified against PG, but **never exercised end-to-end** — no candidate has identity captured yet. `docs/tasks/complete/TASK-1714-candidate-identity-document-reveal.md` §Delta de cierre.
+
+**The panel (TASK-1715)**:
+
+- `buildCandidateDocumentsViewModel` (`src/lib/hiring/documents/view-model.ts`) turns the domain package into rows already decided, and raises **absence** (`missing`) to a state of its own alongside the three scanner states (`available` / `quarantined` / `pending` / `legacy_unscanned`). All four used to render as "Enmascarado", so a file blocked by the antivirus and a candidate who never attached a CV looked identical — and the recruiter blamed the candidate for a system failure.
+- **The reader resolves in the page, not in the component**: it is `server-only` and a canonical 360 reader, so it does not degrade silently. Its failure travels as `documentsFailed` and the panel says so with a Reintentar; it is **never** shown as "sin documentos".
+- **The affordance follows the capability**: without `hiring.candidate.reveal_identity` the button is not drawn. A button that always fails is worse than no button. The revealed value lives **only in component memory** — a remount re-masks and demands another reveal, which writes another entry, so the trail reflects real accesses rather than open sessions.
+- **Viewer**: `GreenhouseDocumentPreview` (`src/components/greenhouse/documents/`) renders inside the portal, in a dialog over a same-origin blob fetched with the user's session — not a new door; the asset route re-authorizes each request. It uses the **browser's native engine, not `react-pdf`** (which does not boot under `next dev --webpack`, and buys ~400 KB of pdf.js the operator does not need). Mobile is closed by **capability, not viewport**: when `navigator.pdfViewerEnabled === false` the dialog declares it and offers Abrir/Descargar without even fetching the bytes. `TASK-1716` unifies the three parallel fetch→blob→render implementations.
+
+Docs: `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-08-15 (8 invariants) · functional `docs/documentation/hr/documentos-de-candidatos.md` · manual `docs/manual-de-uso/hr/ver-documentos-de-un-candidato.md`.
+
 ## Person model (never duplicate a human)
 
 - Root: `greenhouse_core.identity_profiles` (`profile_id`). A candidate is a **Person with a `candidate_facet`**, not a separate record. Reconcile with `resolvePersonIdentifier`.
@@ -180,8 +211,10 @@ There is a real malware scanner behind files uploaded from outside (Cloud Run `s
 - **Assessment score is advisory** and **orthogonal to payroll/ICO** — it never feeds pay/bonus and **never auto-rejects/hires**. Human decides. (Also EU AI-Act human-oversight.)
 - **answer_key / rubric never in the candidate-facing payload** (allowlist discipline, like `buildPublicOpeningPayload`).
 - **AI proposes, human confirms** (`propose → confirm → execute`) with an eval baseline; no emotion/biometric/personality inference.
-- **Candidate PII** = same rigor as an employee: masked/reveal + capability + audit; never log `value_full`; identity docs captured post-decision, never at public apply.
-- **Anchor candidate assets by** `identity_profile_id` / `candidate_facet_id` / `application_id` — never `member_id` (candidates have no member).
+- **Candidate PII** = same rigor as an employee: masked/reveal + capability + audit; never log `value_full`; identity docs captured post-decision, never at public apply. The candidate reveal is `hiring.candidate.reveal_identity` — **never** `person.legal_profile.reveal_sensitive` (see §Candidate documents).
+- **Anchor candidate assets by** `identity_profile_id` / `candidate_facet_id` / `application_id` — never `member_id` (candidates have no member). Same for the identity reveal path.
+- **A file is opened, an identity is revealed.** Never add a padlock over a file the screen capability already authorized; never expose an identity without capability + reason + audit.
+- **Never `403` a foreign `documentId`** — `404`. And never collapse `quarantined`/`pending`/`legacy_unscanned`/absence into one message, nor show a reader failure as "sin documentos".
 - **Boundary**: hiring **never** writes `member` / `assignment` / `placement` / payroll truth / compensation / `contractor_engagements` / `providers` / `expenses`. The handoff (TASK-356, live) is the explicit exit contract — it carries `selected_destination` (CHECK'd enum) and NEVER a field readable as `contractType`; `expected_legal_entity` is a non-binding proposal. Collaborator activation is HRIS/People (TASK-770). Guarded by `src/lib/hiring/handoff/boundary.test.ts`.
 - **Capabilities → grant coverage**: any new capability is granted to ≥1 real role in the same PR (guard `capability-grant-coverage.test.ts`); real roles only (`src/config/role-codes.ts`), never `client_*`.
 - Observability: `captureWithDomain(err, 'hiring', …)`.
