@@ -831,9 +831,25 @@ invalida el golden set) · la distinción eje-cobertura / eje-herramienta.
 
 `docs/context/06_glosario-metricas.md:77,224` declara **Otterly.ai** —la herramienta de un
 competidor— como *fuente de verdad* del AEO Citation Rate, y ese contrato de métricas viaja a
-propuestas y SOWs. Retirarlo cuesta cero. Y **el margen de Berel sigue sin medirse** pese a que el
-costo variable por org se conoce al dólar: no es higiene documental, **bloquea toda decisión de
-precio de la práctica**.
+propuestas y SOWs. Retirarlo cuesta cero. **Y el margen de Berel: el bloqueo estaba MAL DECLARADO** (corregido 2026-08-15 tras verificación
+contra la base real). No falta construir nada: la capa V0 está **viva y fresca** —
+`client_labor_cost_allocation`, `member_capacity_economics` (materializada el 2026-08-15 14:02),
+`client_economics`, su reader y el write path de asignaciones en `/agency/team`—. La prueba: en el
+mismo período, **Sky Airline rinde 59,97% de margen bruto con 3,00 FTE** y Berel rinde labor 0 porque
+**tiene cero filas en `client_team_assignments`**. Falta escribir 3-4 filas desde una UI que ya
+existe: **1-2 horas de captura operativa, no una task**.
+
+Y la decisión de precio **ni siquiera lo necesita**: el punto de quiebre del piso de 45% está en
+**1,93 FTE dedicados**, unas 11× la huella de entrega observada (con overhead a full absorption,
+0,98 FTE, todavía 5,7×). **La decisión es robusta a un error de 5× en la estimación**, así que
+desagregar y cobrar la línea AEO (+31% de ingreso sobre la cuenta contra USD 4,9 de costo
+incremental) **está desbloqueado hoy**.
+
+⚠️ **Trampa al capturar:** la VIEW prorratea por FTE y excluye los assignments a Efeonce del
+denominador. Agregarle Berel a alguien que hoy tiene Sky 1,0 sube su `total_fte` y **baja
+artificialmente el costo laboral de Sky ~17%**. No es un bug: es la aritmética del modelo. Hay que
+recomputar y comunicar **ambos clientes juntos**, o alguien va a leer "Sky mejoró" y estará leyendo
+humo.
 
 ### Lo que la auditoría NO autoriza
 
