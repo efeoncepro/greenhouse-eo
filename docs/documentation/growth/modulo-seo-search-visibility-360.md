@@ -570,12 +570,41 @@ priorizado de términos sin salir a otra herramienta. El **keyword discovery** c
 Estado operativo: **encendido desde el 2026-08-14** (verificación real previa: una corrida live
 costó USD 0.013 y dejó 10 candidatos con mercado; el operador autorizó el rollout el mismo día).
 No hay corridas automáticas: el sistema sólo gasta cuando alguien encola una corrida que ya pasó
-el preview de costo y el gate de presupuesto. La superficie visual (lente `Descubrir` del
-workbench) es TASK-1665.
+el preview de costo y el gate de presupuesto.
 
 > Detalle técnico: [`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
 > §7 (primitives) y §8 (drain + costos) · runbook
 > [`operar-keyword-discovery-seo.md`](../../manual-de-uso/growth/operar-keyword-discovery-seo.md)
+
+#### La lente `Descubrir`: la cara visible del descubrimiento (TASK-1665, 2026-08-14)
+
+El motor anterior ya existía sin pantalla: se operaba por API, Nexa o MCP. La lente `Descubrir`
+—tercera vista de `Growth > SEO > Keywords`, seleccionada con `?view=discovery`, **sin ruta ni menú
+nuevos**— lo pone frente al operador sin ablandar ninguna de sus consecuencias:
+
+- **El costo se ve antes de gastarse.** La banda de costo responde qué se enviará, cuántas llamadas,
+  cuánto cuesta como máximo y qué pasa después. El estimado es el peor caso a propósito; si la
+  corrida sale más barata, esa diferencia no es crédito reutilizable.
+- **Dos lentes de dato que nunca se promedian.** `◑` es estimación mensual del mercado publicitario
+  (proveedor) y `●` es medición propia de Search Console. Viven en columnas separadas, cada cifra
+  viaja con su marcador y su fecha, y la ausencia se nombra (`Sin dato de mercado`, `Sin medición
+  propia`) en vez de rellenarse con un cero que se leería como "no hay demanda".
+- **"Barrera de enlaces", nunca "dificultad".** Se muestra el nivel derivado del perfil real de
+  enlaces del top 10, no el índice crudo del proveedor —que colapsa a 0 en SERPs en español de
+  LATAM y se leería como "trivial"—. `Baja` no significa fácil, y `Sin dato` jamás se pinta `Baja`.
+- **Cinco decisiones explícitas por candidato**, cada una contra su command canónico y con
+  confirmación: declarar objetivo, seguir como oportunidad, preparar un borrador de consultas AEO,
+  descartar (registro append-only, no borrado) y ver trayectoria (sólo lectura). Ninguna es
+  automática y ninguna se pinta antes de que el command confirme.
+- **Ver y gastar son dos permisos.** Con `growth.seo.observation.read` se lee todo; sin
+  `growth.seo.target.configure` los botones de gasto **no se renderizan** — no aparecen apagados.
+  Preparar consultas AEO exige además la capability AEO y un perfil del Space.
+- **El resultado se dice por término.** Un lote que rebota por cupo responde con la pantalla en
+  verde y el mensaje `No se agregó «X»: el seguimiento llegó a su cupo`. No hay "Listo" genérico que
+  esconda una keyword que nadie está midiendo.
+
+> Paso a paso para operarla:
+> [`descubrir-keywords-seo.md`](../../manual-de-uso/growth/descubrir-keywords-seo.md)
 
 ### Del descubrimiento SEO a las preguntas de IA: el puente grounded (TASK-1666, 2026-08-14)
 

@@ -2,6 +2,49 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+### TASK-1665 CODE COMPLETE — lente `Descubrir` (2026-08-14) · **evidencia GVC pendiente**
+
+Slices 0–4 en `develop` **sin push** (`fd7c53402`, `2f3ba87e3`, `51fecb561`, `361f6a151`). Verde:
+`pnpm local:check`, `pnpm ui:code-lint --changed`, `pnpm task:lint --task TASK-1665`
+(`template=1 errors=0 warnings=0`) y 363 tests focales de `growth/seo` (12 nuevos sobre el mapeo de
+outcomes). `pnpm test` completo y `pnpm build` **no se corrieron** — el build local consume ~30 GB y
+requiere autorización del operador.
+
+**Lo construido.** Conmutador de lentes (`KeywordLensTabs`), builder + banda de costo, estado de
+corrida (8 estados) y canvas de candidatos venían de los slices previos. El Slice 4 agrega el drawer
+de decisión (`AdaptiveSidecarLayout` + `ContextualSidecar`) con las cinco acciones gobernadas contra
+sus commands canónicos: `trackKeywords(intent='target'|'opportunity')`, `createGroundedQueryDraft`,
+`recordKeywordDiscoveryAction('dismissed')` y navegación read-only a Rendimiento.
+
+**Decisiones load-bearing (no revertir sin leer el porqué):**
+
+- **`preferredMode='temporary'`** y no `overlay`/`push`: el `Drawer` de MUI aporta focus trap,
+  `Escape`, click-away y el **apilado de modales** que hace que `Escape` cierre primero la
+  confirmación y sólo después el drawer — la cascada exacta del wireframe. `overlay` no tiene focus
+  trap (habría que reimplementarlo a mano) y `push` encogería una tabla de nueve columnas.
+- **Una acción = un command.** Seguir NO escribe además `promoted_to_tracking`: el `alreadyTracked`
+  del reader ya deriva del set monitoreado, que es su SSOT. Escribirlo abriría un segundo almacén
+  del mismo hecho y, sin transacción cruzada, una falla parcial los dejaría en desacuerdo.
+- **Cero optimistic update + outcome POR keyword.** `trackKeywords` responde 200 con la keyword
+  rebotada por techo; el mapeo vive en `keyword-discovery-action.ts` (con test), no en JSX.
+- **`Descartar` sí pide confirmación**: el contrato decía "no si es reversible" y **no lo es** — el
+  log es append-only y no existe `undismissed`; lo que ocurre es que cualquier decisión posterior lo
+  supersede. No se inventó un "deshacer" que el command no sostiene.
+- **Corrección al borrador del flow:** los outcomes reales son `tracked | already_tracked |
+  intent_changed | capacity_exceeded | invalid`. El flow citaba `declared` / `already_target`, que
+  nunca existieron en el primitive.
+
+**🔴 Bloqueado y por qué.** La **ADC de gcloud está vencida** en la máquina: sin ella el portal local
+responde 500 (`Tenant lookup failed`) y cualquier captura sería basura. Para desbloquear, el operador
+corre `! gcloud auth application-default login` y reinicia `pnpm dev`; recién entonces
+`pnpm fe:capture growth-seo-keyword-discovery` produce frames válidos en 1440 y 390. **El scorecard
+premium NO se escribió a propósito**: redactarlo sin mirar frames reales sería fabricar justo el
+artefacto que el estándar existe para impedir.
+
+**Impacto cruzado registrado:** `TASK-1660` ya no debe construir el conmutador de lentes (delta en su
+spec, con la forma exacta y la prohibición del `TabList` de `@mui/lab`), y la reclasificación de
+intención (`intent_changed`) quedó declarada como suya.
+
 ### TASK-1659 COMPLETE — intención declarada de una keyword (2026-08-14)
 
 Salió de intentar tomar **TASK-1665** (workbench `Descubrir`): la auditoría destapó que dos de
@@ -421,13 +464,3 @@ TS que es solo fallback. Migration de paridad aplicada + verificada; las sesione
 por el refresh de claims (5 min) sin re-login — verificado en la sesión real del operador. El fix del
 trigger ⌘K (lenguaje topbar) salió en el mismo lote. Deuda señalada en la issue: 2 roles fantasma en DB
 (`employee`, `finance_manager`) y falta un drift-guard mecánico TS↔DB de route groups.
-
-### Campaña de vacantes en grupos de Facebook (2026-08-11)
-
-Se difundieron los openings públicos `EO-OPN-0061` (Content Creator) y `EO-OPN-0009`
-(Account Manager) en grupos ya unidos y afines. La expansión cerró con diez envíos adicionales por rol:
-nueve visibles y uno enviado a moderación en cada caso. El detalle de copy, beneficios aprobados, grupos,
-estados y decisión de publicar sin imágenes vive en
-`docs/operations/hiring/2026-08-11-facebook-vacancy-distribution.md`. No cambió el runtime ni el estado
-de Hiring, por lo que no requiere ADR. Pendiente operativo opcional: revisar las dos publicaciones en
-moderación antes de contarlas como visibles.

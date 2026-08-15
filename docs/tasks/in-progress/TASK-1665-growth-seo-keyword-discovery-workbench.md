@@ -530,14 +530,58 @@ first fold esté visualmente aceptado.
 - `KeywordDiscoveryRunStatus` con los 8 estados y `role='status'`.
 - `KeywordDiscoveryResults` sobre `DataTableShell`; columna **Barrera de enlaces**, nunca KD.
 
-### Slice 4 — Drawer + acciones gobernadas
+### Slice 4 — Drawer + acciones gobernadas ✅
 
 - `KeywordDiscoveryCandidateDrawer` con `AdaptiveSidecarLayout` + `ContextualSidecar`.
 - Acciones con confirmación y outcome por candidato.
 
-### Slice 5 — GVC premium + scorecard + docs
+**Decisiones de implementación** (ninguna cambia la semántica del contrato):
 
-- Scenario, captura 1440/390, scorecard en `docs/ui/reviews/`, manual y cierre documental.
+- **`preferredMode='temporary'`.** El `Drawer` de MUI aporta focus trap, `Escape`, click-away y —lo
+  determinante— el apilado de modales que hace que `Escape` cierre PRIMERO la confirmación y sólo
+  después el drawer, que es exactamente la cascada que pide el wireframe. `overlay` no tiene focus
+  trap (habría que reimplementarlo a mano) y `push` encogería una tabla de nueve columnas justo
+  cuando el operador la compara. A 390px el paper es `width: 100%`.
+- **El detalle se abre con un BOTÓN, no con click de fila.** Una fila clickeable exigiría inventarle
+  `role='button'` + `tabIndex` + handler de tecla; el botón trae foco, `Enter`/`Space` y semántica
+  gratis, y cumple "ninguna acción vive detrás de hover".
+- **Una acción = un command.** Seguir/declarar NO escribe además una fila de
+  `recordKeywordDiscoveryAction('promoted_to_tracking')`: el `alreadyTracked` del reader ya deriva
+  del set monitoreado, que es su SSOT. Escribirlo abriría un segundo almacén del mismo hecho y, sin
+  transacción cruzada, una falla parcial dejaría los dos en desacuerdo.
+- **`Descartar` pide confirmación.** El contrato decía "no si es reversible": no lo es — el log es
+  append-only y no existe un `undismissed`. Lo que sí ocurre es que **cualquier decisión posterior
+  lo supersede** (el estado se deriva de `latestAction`). Se confirma y se dice eso, en vez de
+  ofrecer un "deshacer" que el command no sostiene.
+- **`Ya seguido` no ofrece seguir de nuevo** (regla "no duplicate CTA"). Reclasificar
+  (`intent_changed`) existe en el command pero su dueña es `TASK-1660`: el DTO de candidatos no trae
+  la intención vigente, así que ofrecerlo acá prometería un cambio que puede ser un no-op.
+- **Read-only NO renderiza los CTA de gasto** (no los pinta apagados) y el drawer muestra
+  `Sin acciones disponibles`.
+- **Grounded se resuelve server-side**: dos capabilities + perfil AEO del Space + flag del grader.
+  El motivo exacto se dice bajo las acciones, antes de intentar, no al confirmar.
+- **Corrección al borrador del flow:** los outcomes de `trackKeywords` son
+  `tracked | already_tracked | intent_changed | capacity_exceeded | invalid`. El flow citaba
+  `declared` / `already_target`, que **nunca existieron** en el primitive. Manda el command.
+
+### Slice 5 — GVC premium + scorecard + docs — 🟡 parcial
+
+Hecho:
+
+- Scenario extendido con el tramo del drawer (`wait` acotado del trigger → `click` → marker
+  `candidate-drawer` → `Escape` → marker `drawer-focus-restore`).
+- Manual `docs/manual-de-uso/growth/descubrir-keywords-seo.md` + índice de manuales.
+- Doc funcional (`modulo-seo-search-visibility-360.md`) y arquitectura (§12, delta de la lente).
+
+Pendiente y **bloqueado por credencial**:
+
+- 🔴 **Captura GVC 1440/390, axe, keyboard, reduced-motion y `scrollWidth === clientWidth`.** La ADC
+  de gcloud está vencida en la máquina; sin ella el portal local responde 500 (`Tenant lookup
+  failed`) y toda captura sería basura. Requiere `gcloud auth application-default login`
+  (interactivo, lo corre el operador) + reinicio de `pnpm dev`.
+- 🔴 **Scorecard premium en `docs/ui/reviews/`.** **No se escribe sin frames reales.** Un scorecard
+  redactado sin mirar la captura es un artefacto fabricado, y el estándar premium existe justamente
+  para impedir eso.
 
 ## Out of Scope
 
@@ -669,6 +713,20 @@ tracking/AEO requieren autorización del operador; la UI no la infiere.
 - Un cron diario automático requiere consentimiento de presupuesto y task propia.
 - Un primitive de discovery reusable sólo se crea si aparece un segundo consumer real y tras el lookup
   de plataforma.
+- **Selección múltiple de candidatos.** V1 actúa sobre UN candidato por vez (el drawer es de uno), así
+  que el "outcome mixto" del contrato no tiene cómo ocurrir todavía: el plumbing lee outcome por
+  keyword y está listo, pero no hay lote que lo ejercite. `createGroundedQueryDraft` acepta hasta
+  `MAX_GROUNDED_QUERY_CANDIDATES` — el lote es una capacidad ya disponible en el backend sin consumer.
+- **Reclasificar intención desde `Descubrir`.** Bloqueado por dato, no por permiso: el DTO de
+  candidatos expone `alreadyTracked: boolean` pero no la intención vigente, así que la lente no puede
+  saber si "Declarar objetivo" sería un cambio o un no-op. Dueña: `TASK-1660`.
+- **Filtros del canvas (`q`, `source`, `intent`, `minVolume`, `state`).** El contrato de URL los
+  declara y el reader sostiene los cuatro primeros; `state` no tiene equivalente server (delta de
+  auditoría §5) y filtrar en cliente sobre un cursor paginado mentiría sobre el universo filtrado.
+  Fuera de V1 por esa razón, no por tiempo.
+- **Fixtures de estados async para GVC.** `queued`/`running`/`partial`/`mixed_action` sólo se pueden
+  capturar con fixture controlada; el scenario actual captura los estados que el Space real produce.
+  Disparar una corrida desde una captura gastaría presupuesto del proveedor en cada corrida de GVC.
 
 ## Open Questions
 

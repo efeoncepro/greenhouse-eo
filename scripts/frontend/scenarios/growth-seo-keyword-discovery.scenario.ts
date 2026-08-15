@@ -103,6 +103,41 @@ export const scenario: CaptureScenario = {
       label: 'results',
       clipSelector: '[data-capture="seo-keyword-discovery-results"]',
       note: 'estado honesto de "todavía no hay corrida", no una tabla vacía'
+    },
+
+    // ── Slice 4 — drawer de candidato ────────────────────────────────────────────────────
+    //
+    // ⚠️ Estos pasos SÓLO producen frames cuando la corrida del Space ya materializó
+    // candidatos; sin candidatos no hay trigger `Detalles` que abrir. El `wait` acotado es
+    // deliberado: si no hay fila, el scenario NO debe romper —el estado "sin corrida" es
+    // legítimo y ya quedó capturado arriba— pero tampoco debe fingir que capturó el drawer.
+    // Lo que nunca puede pasar inadvertido es un drawer que abre y no restaura el foco.
+    {
+      kind: 'wait',
+      selector: '[data-capture="seo-keyword-discovery-results"] button[aria-controls="seo-keyword-discovery-candidate-panel"]',
+      timeout: 4000,
+      note: 'trigger Detalles de la primera fila; ausente si la corrida aún no materializó candidatos'
+    },
+    {
+      kind: 'click',
+      selector: '[data-capture="seo-keyword-discovery-results"] button[aria-controls="seo-keyword-discovery-candidate-panel"]',
+      note: 'abre el detalle por BOTÓN, no por click de fila: la acción tiene que ser alcanzable por teclado'
+    },
+    {
+      kind: 'mark',
+      label: 'candidate-drawer',
+      clipSelector: '[data-capture="seo-keyword-discovery-candidate-drawer"]',
+      note: 'procedencia, ◑ estimado, ● medido, advertencia y acciones gobernadas con su consecuencia'
+    },
+    {
+      kind: 'press',
+      key: 'Escape',
+      note: 'sin confirmación abierta, Escape cierra el drawer y el foco vuelve al trigger'
+    },
+    {
+      kind: 'mark',
+      label: 'drawer-focus-restore',
+      note: 'evidencia del foco restaurado en la fila que abrió el detalle'
     }
   ]
 }

@@ -7,6 +7,34 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-14 — Descubrir keywords deja de ser una API y se convierte en pantalla (TASK-1665)
+
+El motor de descubrimiento existía desde ayer y sólo se podía operar por API, Nexa o MCP. Ahora
+tiene cara: la lente **Descubrir** de `Growth > SEO > Keywords` — la misma ruta, el mismo permiso,
+el mismo Space; sólo `?view=discovery`.
+
+Lo interesante no es que ahora se vea, sino **qué se negó a suavizar al hacerse visible**. La banda
+de costo muestra la fórmula completa antes de confirmar, y el estimado es el peor caso a propósito:
+si la corrida sale más barata, esa diferencia no es crédito que puedas volver a gastar. El estimado
+de mercado (`◑`) y lo que Search Console midió de tu sitio (`●`) viven en columnas separadas y no se
+promedian nunca; donde no hay dato dice "Sin dato de mercado", no `0` — porque un cero se lee como
+"no hay demanda", y eso sería inventar. Y la columna que en toda herramienta se llama "dificultad"
+acá se llama **Barrera de enlaces**, en niveles: el índice crudo del proveedor colapsa a 0 en
+búsquedas en español de LATAM y se leería como "trivial" siendo falso.
+
+La decisión que más costó defender fue la más aburrida: **nada se pinta antes de que el command
+confirme**. `trackKeywords` responde HTTP 200 con la keyword rebotada por techo de cupo; tratar ese
+200 como éxito habría pintado "siguiendo" sobre un término que nadie mide, y el error sólo aparece
+cuando llega la factura. Por eso el resultado se lee y se anuncia **por término**, nunca como un
+"Listo" agregado. En la misma línea: ver y gastar son dos permisos, y sin el de gasto los botones no
+aparecen apagados — no aparecen.
+
+Cierra además una deuda que no era suya: no existía forma de conmutar lentes en una `page.tsx` del
+dashboard. Ahora existe, y `TASK-1660` la reusa en vez de inventarla de nuevo.
+
+Falta la evidencia visual (captura GVC y scorecard premium): la credencial de GCP está vencida en la
+máquina y sin ella toda captura sería basura. El scorecard no se escribe sin mirar frames reales.
+
 ## 2026-08-14 — El set monitoreado ahora sabe POR QUÉ una keyword está ahí (TASK-1659)
 
 Hasta hoy, "estoy en la 12 y quiero la 5" y "el cliente quiere rankear acá y estoy en la 60" eran
@@ -1169,21 +1197,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   el drift futuro sea detectable; la re-auditoría live completa sigue en TASK-127.
 - `pnpm docs:closure-check` ya no emite `architecture_doc_monolith` para ese path; referrers vivos con anclas
   `§4.9`/`§5` actualizados a los temáticos.
-
-## 2026-08-05 — Growth SEO (EPIC-022): registry de familias DataForSEO + ledger de gasto (TASK-1300)
-
-- El cliente DataForSEO deja de estar candado a `/v3/serp/`: allowlist cerrado de 5 familias, con
-  `normalizeEndpoint(endpoint, family)` table-driven y un transporte único (`postDataForSeoTask`).
-  `postDataForSeoSerpLiveAdvanced` delega sin cambiar contrato — el AEO pasó sin tocar ninguno de sus archivos.
-- **Circuit breaker por familia**: una familia caída no arrastra a las demás pese a compartir credenciales.
-- **`seo_provider_spend_daily` pasa a ser la fuente ÚNICA de presupuesto.** Lo escribe el transporte en cada
-  llamada cobrada, así que una captura no puede gastar sin quedar contabilizada; `enforceSeoRunEntitlement` dejó
-  de sumar el `provider_cost` de los snapshots, que contaba el mismo gasto dos veces. Ese hook estaba declarado
-  en TASK-1301 pero sin dueño desde que esa task cerró.
-- Endurecido sobre la spec: `organizationId` obligatorio por tipo en las familias que gastan, y el transporte
-  **lanza** si el runtime no registró el contador — gastar sin contabilizar se descubre en la factura.
-- **`code complete, rollout pendiente`: la cuenta DataForSEO tiene USD 0,90**, así que el smoke por familia está
-  bloqueado por saldo. Sanity live 7/7 contra PG real; suite 10130/0 + build prod verdes.
-- Hallazgo transversal: el patrón `BEGIN`/`ROLLBACK` de los sanity scripts **no es transaccionalmente seguro**
-  (el helper toma una conexión del pool por llamada). Este se reescribió sobre `withGreenhousePostgresTransaction`;
-  verificado que ningún otro sanity del repo lo usaba (el de 1301 ya limpiaba en `finally`); la regla de decisión quedó canonizada en `SQL_DATE_MATH_AGENT_INVARIANTS`.

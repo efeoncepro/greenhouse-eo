@@ -4,6 +4,28 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-14 — el conmutador de lentes YA EXISTE: no lo construyas de nuevo
+
+Cerrado por `TASK-1665` (code complete el 2026-08-14). Esta task suponía que había que crear la
+selección de lente; ya está hecha y su forma es contrato, no sugerencia:
+
+- **`KeywordLensTabs`** (`src/views/greenhouse/admin/growth/seo/keywords/KeywordLensTabs.tsx`) es el
+  conmutador. Agregar `Objetivos` es sumar una entrada, **no** escribir un componente hermano.
+- La lente se selecciona con **`?view=`** allowlisted en `page.tsx` (`opportunities` es el default,
+  así que `/keywords` pelado sigue significando lo mismo). El valor nuevo es `targets`, y el helper
+  de query **debe propagar `space` y `view`** — perder `space` al cambiar de lente manda al operador
+  al primer Space elegible sin avisar.
+- 🔴 **`CustomTabsNav role='navigation'` + `<Tab component={Link}>`, NUNCA el `TabList` de
+  `@mui/lab`.** El `TabList` clona `aria-controls` hacia TabPanels que no existen: violación axe
+  crítica. La sección `Surface & system decision` de esta task todavía dice sólo "`CustomTabsNav`";
+  esa es la forma exacta.
+- El link **"Ver en Objetivos"** del drawer de descubrimiento **no se renderiza hoy** porque esta
+  lente no existe. Al implementarla, ese enlace es parte del alcance de cierre: revisar
+  `KeywordDiscoveryCandidateDrawer.tsx` y `keyword-discovery-action.ts`.
+- Reclasificar la intención de una membresía vigente (`intent_changed`) quedó **fuera** del drawer de
+  descubrimiento a propósito: `Ya seguido` no ofrece seguir de nuevo, y el DTO de candidatos no trae
+  la intención actual. **Esa reclasificación es de esta lente**, que sí conoce el estado vigente.
+
 ## Delta 2026-08-14 — TASK-1659 complete: desbloqueada
 
 El modelo de intención existe y está verificado contra PG real. Lo que esta task puede dar por

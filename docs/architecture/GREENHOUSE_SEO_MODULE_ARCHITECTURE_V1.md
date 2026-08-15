@@ -788,7 +788,34 @@ acuerde.
 | TASK-1659 / 1660 | backend-data / ui-ux | Objetivo declarado por el cliente (modelo + superficie) — la pregunta "¿dónde quiere estar?" | pendiente |
 | TASK-1661 | backend-data | `seo_keyword_market_data` + capture/preview/reader + `deriveLinkBarrier` + lane + MCP + scheduler mensual | **`complete`, en producción 2026-08-14** (release `3754a17d3b1d`) |
 | TASK-1662 | backend-data | Keyword gap vs competidores (`domain_intersection`) — segundo productor de la tabla de mercado | pendiente |
-| TASK-1664 | backend-data | Keyword discovery / seed expansion — tercer productor (aprovecha el `keyword_info` inline ya pagado) | en progreso |
+| TASK-1664 | backend-data | Keyword discovery / seed expansion — tercer productor (aprovecha el `keyword_info` inline ya pagado) | **`complete`, encendido 2026-08-14** |
+| TASK-1665 | ui-ux | Lente `Descubrir` — la cara visible de 1664: conmutador de lentes, builder, banda de costo, estado de corrida, canvas de candidatos y drawer de decisión | **code complete**, evidencia GVC pendiente |
+| TASK-1666 | backend-data | Puente grounded SEO → AEO (`createGroundedQueryDraft`), consumido por el drawer de 1665 | **`complete` 2026-08-14** |
+
+**Delta 2026-08-14 (`TASK-1665`) — la lente `Descubrir` no es una ruta nueva.** Vive dentro de
+`/admin/growth/seo/keywords` y se selecciona con `?view=discovery`: mismo viewCode
+(`administracion.growth_seo`), mismo guard de tres puertas, mismo Space picker, misma
+`route-reachability`. Tres decisiones estructurales que quedan como contrato para `TASK-1660`
+(la lente hermana `Objetivos`), porque las va a reusar tal cual:
+
+1. **El conmutador de lentes se creó acá.** Ninguna `page.tsx` del dashboard usaba `?view=` antes.
+   `KeywordLensTabs` clona la forma de `SeoSearchVisibilityTabs` (`CustomTabsNav role='navigation'`
+   + `<Tab component={Link}>`) y **nunca** el `TabList` de `@mui/lab`, que clona `aria-controls`
+   hacia TabPanels inexistentes (violación axe crítica). El helper propaga `space` **y** `view`.
+2. **La UI no conoce al proveedor.** Consume `queueKeywordDiscovery` / `readKeywordDiscovery` /
+   `recordKeywordDiscoveryAction` / `trackKeywords` / `createGroundedQueryDraft` por sus rutas del
+   lane app. El mapeo acción → ruta → cuerpo → lectura del outcome vive en un módulo aparte
+   (`keyword-discovery-action.ts`), no en JSX, y el boundary §1.1 se sostiene: la acción AEO llama
+   al puente de `TASK-1666`, jamás a una tabla `grader_*`.
+3. **Cero optimistic update en el camino de gasto.** El estado visual sólo se mueve con un outcome
+   durable, leído **por keyword**: `trackKeywords` responde 200 con la keyword rebotada por techo
+   (`capacity_exceeded`), y tratar ese 200 como éxito pintaría seguimiento sobre algo que nadie
+   mide. `intent_changed` (TASK-1659) se reporta como cambio real, no como `already_tracked`.
+
+Y una consecuencia de `ISSUE-152` que la superficie hace visible: **la columna es "Barrera de
+enlaces", nunca "Dificultad"**, y por eso el filtro `maxDifficulty` **salió del contrato de URL** —
+el reader sólo sabe filtrar por `keyword_difficulty`, y ofrecer un filtro sobre una cifra que la
+pantalla deliberadamente no muestra sería filtrar a ciegas.
 
 Todo gateado por `GROWTH_SEO_ENABLED` (default OFF) + fila en `FEATURE_FLAG_STATE_LEDGER.md`; el carril de mercado suma su propio flag subordinado `GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED` (ops-worker, ON desde 2026-08-14). Camino min-costo/max-valor: `1302 → 1306 → 1307`.
 
