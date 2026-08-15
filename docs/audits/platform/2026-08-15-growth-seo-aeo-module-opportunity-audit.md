@@ -381,6 +381,7 @@ proveedor gana donde mide mejor de verdad. Está prohibido elegir por inercia ha
 | **Parseo de contenido de 100 URLs** | USD 0,27 (gemini) a USD 6,30 (claude) | **USD 0,015** | **Comprar** (18×–420×) |
 | **Juicio de citabilidad de esas 100 URLs** | USD 0,27–2,10 | **no existe producto** | **Construir** |
 | Percepción de marca en 4 chatbots | USD 0,26 `light` / 0,88 `full` | LLM Responses (fuera de allowlist) | **Construir hoy**, evaluar comprar |
+| **Lo que ve un usuario real en ChatGPT / Gemini** | ❌ **imposible** — no hay superficie de consumidor accesible desde una API | `llm_scraper`, **USD 0,0012/pág** (fuera de allowlist) | **Comprar** — ver §4.4 |
 | Exactitud de lo que la IA dice de la marca | detector determinista + LLM | **no existe producto** | **Construir** |
 | Core Web Vitals | headless propio = lab, caro | CrUX gratis (campo) | **Comprar/gratis** |
 
@@ -411,6 +412,88 @@ Dato de mercado agregado (imposible, no caro), crawl a escala, AI Overviews, Cor
 cualquier número que se le muestre al cliente como score, y **fetchear el sitio de un competidor** —
 `resolveProbeUrl` bloquea cross-host por diseño (`safe-fetch.ts:72`), y levantarlo es una decisión
 legal y reputacional, no de implementación.
+
+### 4.4 El eje que el benchmark reabrió: **transporte** (API contra superficie de consumidor)
+
+> Esta sección se agrega el 2026-08-15, después de la 2.ª pasada del benchmark de suites. Es un eje
+> que la tabla de arriba **no contemplaba**: no discute *quién* mide, sino *por dónde entra la
+> consulta*. Fuente: `.claude/skills/seo-aeo-practice/references/` (5 archivos) +
+> `.claude/skills/dataforseo-operator/references/08-ai-optimization.md` (as-of 2026-08-06).
+
+**El hallazgo incómodo.** Los cuatro incumbentes que **sí publican su método** convergen en rechazar
+la API del LLM, y lo dicen con sus palabras: Semrush *"captured from real requests and not via any
+APIs of LLMs"*; Ahrefs *"All prompts run through the free, publicly available web interfaces"*;
+Sistrix *"automatisiertes Crawling statt APIs"*; Botify *"vetted third-party web scraping partners"*.
+El argumento técnico es el mismo en los cuatro: a la respuesta de API **le falta el system prompt de
+consumidor y la navegación por defecto**, así que no reproduce citaciones, enlaces ni resultados de
+shopping. **Nosotros usamos exactamente el carril que ellos declaran insuficiente.**
+
+**Corolario que hay que internalizar antes de comparar números con nadie:** nuestro score **no es
+comparable** con el de otra herramienta. En Gemini el solapamiento entre marcas mencionadas y
+dominios citados baja al **30%**, y Evertune mide bajo *conciencia no asistida* (cuando la marca no
+está en el prompt). Miden objetos distintos, no el mismo objeto con distinta precisión.
+
+#### El atajo: nadie construye el scraper, y nuestro proveedor lo vende
+
+Botify no scrapea: compra. DataForSEO —que ya tenemos contratado— vende esa superficie:
+
+| | `llm_scraper` |
+|---|---|
+| Qué hace | Scrapea **la superficie de producto**, lo que ve un usuario en ChatGPT o Gemini |
+| Costo | **USD 0,0012/pág** estándar · 0,0024 priority · **0,004 live** (≤90 s) |
+| Devuelve de más | `sources[]` que el modelo **realmente citó**, `brand_entities`, `fan_out_queries`, `markdown` completo |
+
+Ese `brand_entities` y ese `fan_out_queries` **hoy los calculamos con un LLM propio**: vienen
+incluidos en el precio de la página. Con las **24 observaciones por corrida** que muestran las
+corridas reales de Berel, el orden de magnitud es **USD 0,03–0,10 por corrida**. El costo no es el
+obstáculo.
+
+#### La trampa: sólo existe para ChatGPT y Gemini
+
+**No hay superficie scrapeable para Claude ni Perplexity.** O sea que «hacerlo como ellos» es
+**estructuralmente imposible de forma completa** — y ellos tampoco lo logran: Botify admite API en
+Perplexity, Otterly declara *"Claude (API)"* en su propia home, y a Peec le encontraron que su claim
+general de UI-scraping **es falso por canal** (su propia API mapea Perplexity a la API). El mercado
+que dice «scrapeamos la UI» es mixto, y varios tienen el claim más limpio que la implementación.
+
+#### La decisión: **no reemplazar, separar**
+
+La mejor arquitectura del relevamiento no es la de Ahrefs ni la de Semrush: es la de **Evertune**, y
+consiste en **no elegir**. Separa el modelo base (API) del producto de consumidor (UI) y los etiqueta
+como ejes distintos, porque responden preguntas distintas — *"Base model data is what a model knows
+from training. Consumer app data is what it says after running a live web search."*
+
+«¿El modelo conoce a la marca?» y «¿el producto ChatGPT la recomienda hoy?» **no son la misma
+medición**, y fusionarlas es el error que la disciplina `◑`/`●` de este módulo existe para evitar.
+
+| Superficie | Motores | Vía | Qué responde |
+|---|---|---|---|
+| `answer_engines` (hoy) | los 4 | API propia | qué sabe el modelo base |
+| **`consumer_surface` (nueva)** | ChatGPT, Gemini | `llm_scraper` | qué ve realmente un usuario |
+| `ai_search` (hoy) | AI Overview | DataForSEO | qué muestra Google |
+
+Es **aditivo** sobre el seam que ya existe —`google-ai-overview-adapter.ts` ya va por DataForSEO— y
+**no rompe la serie histórica**, que es justo lo que sí pasaría migrando los adapters en sitio.
+
+#### El premio suelto: `ISSUE-158` se cierra por el mismo movimiento
+
+`llm_responses` de DataForSEO acepta **`web_search_country_iso_code`** y **`web_search_city`**. Es
+exactamente el parámetro que a nuestros cuatro adapters les falta y que originó `ISSUE-158`. Ese
+carril **resuelve la geolocalización aunque no se toque el scraper**, y sin escribir un adapter nuevo
+por proveedor.
+
+#### Lo que bloquea de verdad (ninguno es técnico)
+
+1. **La AI Optimization API está fuera del allowlist de DataForSEO** — marcada como *candidata #1 a
+   ampliación* desde el 2026-08-06. Ampliarlo es la primera decisión.
+2. **Términos de servicio.** Comprarle el scraping a DataForSEO traslada la exposición
+   contractualmente, **pero no la elimina** — y por eso Botify escribe «partners verificados» y no
+   «nosotros scrapeamos». Se decide con los ojos abiertos, no de rebote.
+3. ⚠️ **Cambiar de transporte NO arregla el `N=1`.** Seguiríamos con una corrida por prompt donde
+   Evertune hace cien con ±1 punto. Migrar de carril sin arreglar la precisión es cambiar de problema.
+   Dueña de eso es `TASK-1704`, no esta decisión.
+
+**Dueña de la ejecución: `TASK-1717`.**
 
 ---
 
