@@ -4,6 +4,65 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-15 — tres invariantes de medición (sin cambio de alcance)
+
+Fuente: `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md` (§3.2 brecha A5;
+§3.4 brecha C6).
+
+**No hay cambio de alcance.** La task sigue siendo el control plane de QA → publicación → outcome →
+iteración. Lo que se agrega son tres reglas de medición que, si no están escritas, se rompen en
+silencio: ninguna de las tres falla un test, todas producen un número creíble y equivocado.
+
+### (a) La ventana de outcome respeta el borde móvil de Search Console
+
+Search Console **no falla** cuando le pides el día anterior: responde `ok` y **devuelve CERO filas**.
+Ese es el modo de falla peligroso — un reader que confunde "cero filas" con "cero clics" registra un
+outcome de fracaso para una pieza que Google todavía no terminó de contar. Google consolida con **~48h
+de retraso**, y el dato de los últimos días sigue subiendo después de leído.
+
+Reglas duras:
+
+- La ventana de outcome **cierra en D-3**, no en D-1. Una ventana que toca D-1 o D-2 no se evalúa: se
+  declara `pending_data_consolidation`, que **no** es lo mismo que `insufficient_data` (una es "todavía
+  no", la otra es "no hay base").
+- La recaptura es **idempotente y convergente**: recapturar la misma ventana con datos ya consolidados
+  produce el mismo resultado; recapturarla mientras aún se consolida **puede** producir un valor mayor,
+  y eso es correcto, no un bug de idempotencia. El `inputHash` debe incluir el as-of de la fuente para
+  que las dos lecturas sean dos hechos, no una sobrescritura.
+- Cero filas con `ok: true` **NUNCA** se materializa como `0`. Es ausencia de dato consolidado.
+
+### (b) La posición se agrega PONDERADA POR IMPRESIONES, nunca `AVG(position)`
+
+`AVG(position)` sobre filas diarias es un **error silencioso**: cada día pesa igual sin importar cuánta
+demanda tuvo, así que los días de cola larga —pocas impresiones, posiciones malas— arrastran el
+promedio hacia abajo. **El resultado muestra peor de lo que estás**, y lo muestra de forma consistente,
+que es lo que impide detectarlo: nadie sospecha de un número que siempre va en la dirección pesimista.
+
+Regla dura: la posición agregada de una ventana es `SUM(position × impressions) / SUM(impressions)`.
+Cualquier `AVG(position)` en un reader/evaluator de outcome es un defecto, no una aproximación
+aceptable. Si no hay impresiones en la ventana, **no hay posición agregada** — no se cae de vuelta al
+promedio simple.
+
+### (c) El lado AEO del outcome se ancla a la trayectoria por `(prompt, motor)`, no al score
+
+Es la brecha **A5**: *"el loop no cierra porque la verificación se ancla al score"*. El score agregado
+del grader **se mueve por varianza de muestreo** — la propia calibración midió señales intermitentes
+que aparecen 1/3 y 2/3 de las veces y recomienda N≥3 para esas dimensiones. Atribuirle a una pieza
+publicada un movimiento de score es atribuirle ruido.
+
+Regla dura: el eje AEO del outcome se lee como **trayectoria por `(prompt, motor)`** —¿esta pregunta
+concreta, en este motor concreto, empezó a citarnos?— consumida vía `TASK-1311`. El score agregado
+puede **acompañar** como contexto, pero **NUNCA** es la señal que sostiene un `observed`.
+
+### Nota de dependencia: la tercera parte de esta task depende de `TASK-1284`
+
+El outcome declara GA4 y HubSpot como fuentes de su eje de conversión. `TASK-1284` (conexión GA4
+multi-tenant) es la única vía a ese dato y hasta hoy estaba huérfana (`Epic: none`, adoptada a
+`EPIC-022` el 2026-08-15). Sin ella, **ese eje mide `insufficient_data` de forma permanente**. Las dos
+salidas honestas: secuenciar `TASK-1284` antes de la medición de outcome, o **declarar explícitamente
+que el loop de negocio es parcial** y que este outcome llega hasta GSC/rank/AEO. Lo inaceptable es
+dejarlo implícito.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -108,6 +167,18 @@ Reglas obligatorias:
   evidencia anterior. Las conclusiones pueden versionarse, nunca borrar la base.
 - **Medido vs estimado siempre visible.** GSC/rank/AEO/GA4/HubSpot se etiquetan por fuente y as-of;
   Labs queda como `estimated`. No se construye un KPI único mezclando escalas incompatibles.
+- **La ventana cierra en D-3 (Delta 2026-08-15).** Search Console responde `ok` con CERO filas para
+  D-1 y consolida con ~48h de retraso. Una ventana que toca D-1/D-2 se declara
+  `pending_data_consolidation`, jamás se evalúa; cero filas NUNCA se materializa como `0`. La
+  recaptura es idempotente y convergente, con el as-of de la fuente dentro del `inputHash`.
+- **Posición agregada = ponderada por impresiones (Delta 2026-08-15).** `SUM(position × impressions) /
+  SUM(impressions)`. **NUNCA `AVG(position)`**: sesga hacia los días de cola larga y muestra peor de lo
+  real, de forma consistente y por eso indetectable. Sin impresiones en la ventana no hay posición
+  agregada — no se cae de vuelta al promedio simple.
+- **El eje AEO del outcome se ancla a la trayectoria por `(prompt, motor)` (Delta 2026-08-15)**, vía
+  `TASK-1311`. **NUNCA** al score agregado del grader, que se mueve por varianza de muestreo (la
+  calibración recomienda N≥3 para las dimensiones intermitentes). El score puede acompañar como
+  contexto; nunca sostiene un `observed`.
 
 ## Normative Docs
 
@@ -144,6 +215,10 @@ Reglas obligatorias:
   rollback y QA live.
 - Contratos de GA4/GTM/HubSpot — sólo como readers/evidence refs; no se crea un ledger paralelo de
   conversiones.
+- **`TASK-1284`** (conexión GA4 multi-tenant, adoptada a `EPIC-022` el 2026-08-15) — **dependencia de
+  hecho del eje de conversión**. Sin ella ese eje reporta `insufficient_data` de forma permanente. O se
+  secuencia antes de la medición de outcome, o esta task declara explícitamente que su loop de negocio
+  es parcial (llega hasta GSC/rank/AEO). Ver Delta 2026-08-15.
 
 ### Blocks / Impacts
 
@@ -369,7 +444,12 @@ por tener sólo un HTTP 200.
 La evaluación debe:
 
 - tomar baseline anterior o declarar `baseline_missing`;
-- usar ventanas configurables, por defecto 7/14/28 días según señal;
+- usar ventanas configurables, por defecto 7/14/28 días según señal, **siempre cerradas en D-3**: una
+  ventana que toque D-1/D-2 se declara `pending_data_consolidation` y no se evalúa (Delta 2026-08-15);
+- agregar la posición **ponderada por impresiones** (`SUM(position × impressions) / SUM(impressions)`);
+  **nunca `AVG(position)`**; sin impresiones en la ventana, sin posición agregada (Delta 2026-08-15);
+- leer el eje AEO como **trayectoria por `(prompt, motor)`** vía `TASK-1311`, nunca como movimiento del
+  score agregado del grader (Delta 2026-08-15);
 - comparar con la misma URL, keyword/cluster y mercado cuando exista cobertura;
 - mostrar coverage, freshness, source y as-of junto a cada variación;
 - no sumar posiciones, clicks, citation share y leads en un número sin contrato;
@@ -378,6 +458,16 @@ La evaluación debe:
 - producir `next_action` cerrado: `wait_for_more_data`, `refresh_title_or_ctr`, `expand_answer`,
   `fix_technical_issue`, `strengthen_internal_links`, `review_citations`, `update_cta`,
   `consolidate_requires_separate_task`, `close_no_action`.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 2 — PLAN MODE
+     El agente que toma esta task ejecuta Discovery y produce
+     plan.md segun TASK_PROCESS.md. No llenar al crear la task.
+     ═══════════════════════════════════════════════════════════ -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 3 — EXECUTION SPEC
+     ═══════════════════════════════════════════════════════════ -->
 
 ## Scope
 
@@ -523,6 +613,9 @@ Si la evaluación periódica requiere worker:
 | URL incorrecta/canonical duplicado | public site/SEO | high | owner resolver, canonical/route QA, block antes de verified | `seo.editorial.qa.blocked` |
 | HTTP 200 se interpreta como indexación | GSC/SEO | high | `TASK-1426` ref obligatoria o estado unavailable | `seo.editorial.indexation_evidence_unavailable` |
 | Outcome mezcla señales incompatibles | data/measurement | medium | DTO por fuente, unidades y disclosures; no score único | `seo.editorial.outcome.mixed_sources` |
+| Ventana leída sobre el borde móvil de GSC: cero filas se toma como cero clics | data/measurement | high | cierre en D-3 + `pending_data_consolidation` + as-of en el `inputHash` | outcome negativo que se corrige solo al recapturar |
+| `AVG(position)` en el evaluator: sesgo pesimista consistente e indetectable | data/measurement | high | agregación ponderada por impresiones + test + grep del anti-patrón | posición agregada peor que la del cockpit operador |
+| Eje AEO anclado al score agregado: se atribuye varianza de muestreo a la pieza | measurement/AEO | high | trayectoria por `(prompt, motor)` vía `TASK-1311`; el score sólo acompaña | `observed` que se revierte sin cambio de contenido |
 | Atribución causal sin base | analytics | high | baseline/window/confidence y reviewer separado | `seo.editorial.attribution_unclaimed` |
 | Reader externo falla parcialmente | integration | medium | degrade honesto, source unavailable, retry bounded | `seo.editorial.outcome.partial_read` |
 | Evaluator duplica outcome o pisa historia | worker/db | medium | unique input hash, append-only y lock de claim | `seo.editorial.outcome.idempotency_replay` |
@@ -569,6 +662,10 @@ Si la evaluación periódica requiere worker:
 - Owner de HubSpot/GA4 debe confirmar qué campos son evidencia de atribución y cuáles son sólo eventos.
 - Cualquier auto-publish futuro requiere aprobación/ADR/task separada; no se coordina como parte de esta.
 
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 4 — VERIFICATION & CLOSING
+     ═══════════════════════════════════════════════════════════ -->
+
 ## Acceptance Criteria
 
 - [ ] La state machine no permite saltar de draft a publish/verified sin QA y approval packet.
@@ -583,6 +680,18 @@ Si la evaluación periódica requiere worker:
 - [ ] Un block no puede avanzar a approval/publish; se conserva razón y evidencia.
 - [ ] Outcome exige baseline, window, coverage, freshness y source refs; la ausencia produce
   `insufficient_data`, no cero ni éxito.
+- [ ] **La ventana cierra en D-3.** Una ventana que toca D-1/D-2 produce `pending_data_consolidation`
+  (distinto de `insufficient_data`) y no se evalúa. Una respuesta `ok` de Search Console con cero filas
+  NUNCA se materializa como `0`. La recaptura de una ventana ya consolidada converge al mismo valor y
+  el `inputHash` incluye el as-of de la fuente.
+- [ ] **La posición agregada es ponderada por impresiones** (`SUM(position × impressions) /
+  SUM(impressions)`). No existe un solo `AVG(position)` en readers/evaluator de outcome (verificado por
+  test y por grep). Sin impresiones en la ventana no se emite posición agregada.
+- [ ] **El eje AEO del outcome se ancla a la trayectoria por `(prompt, motor)`** vía `TASK-1311`; el
+  score agregado del grader NUNCA sostiene por sí solo un `observed`.
+- [ ] El eje de conversión declara su estado real: o `TASK-1284` está disponible y GA4/HubSpot
+  producen señal, o la task declara explícitamente que el loop de negocio es **parcial**. No queda un
+  `insufficient_data` permanente sin explicación.
 - [ ] GSC, rank, Labs, AEO, GA4 y HubSpot aparecen como señales separadas con disclosure de fuente y
   no se agregan en un score causal sin contrato explícito.
 - [ ] La evaluación no reclama causalidad automática; distingue `not_claimed`, `operator_assessed` y

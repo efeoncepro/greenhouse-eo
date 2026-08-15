@@ -6,6 +6,41 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-15 — `Blocked by` += `TASK-1697`, y el bump entra en UNA sola pasada de eval
+
+Fuente: `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md` (§1.3 deep
+imports cross-dominio; §5.1 `site-substrate`).
+
+**`Blocked by: TASK-1697` — conflicto de archivo, no de contrato.** `TASK-1697` extrae el sustrato de
+sitio (`site-substrate`) y **le reescribe los imports a `grounded-query-bridge.ts`**, que es uno de los
+archivos `owned` de esta task. La auditoría midió que `growth/seo` importa **10 símbolos internos** de
+`growth/ai-visibility` desde `grounded-query-bridge.ts:23-37` y `grounded-query-reader.ts:15-19` —los
+dos archivos que esta task también toca—. Si ambas avanzan en paralelo, el conflicto no es una línea:
+es la cabecera completa del archivo, y quien resuelva el merge tiene que decidir sobre una frontera de
+dominio en medio de un rebase. `TASK-1697` primero; esta task se apoya en los imports ya reordenados.
+
+**Coordinación de evals: hay TRES bumps del cerebro en vuelo y cada uno invalida el golden set.**
+
+| Task | Qué bumpea |
+|---|---|
+| `TASK-1695` (esta) | registro es-CL neutro + rango de preguntas compatible con el techo de candidatos |
+| `TASK-1698` | posicionamiento declarado como input (cierra `message_alignment` medido contra nada) |
+| `TASK-1703` | router del eje herramienta (extractor de prosa) |
+
+Cada bump cambia el texto que produjo el golden set, así que **cada uno lo invalida y obliga a
+re-correr la eval completa**. Correrlas por separado es pagar tres veces la misma pasada y —peor—
+comparar cada versión contra un baseline distinto, con lo cual **ningún delta es atribuible**: si la
+naturalidad baja después del tercer bump, nadie puede decir cuál de los tres la movió.
+
+Regla de coordinación: **los tres bumps se consolidan en UNA sola pasada de eval**, con el golden set
+re-corrido una vez contra el estado final y un delta por eje declarado. La task que llegue última
+—cualquiera de las tres— es la que ejecuta la pasada; las dos anteriores dejan su cambio de texto
+listo y declaran el bump pendiente de eval en su cierre. Ninguna de las tres se declara `complete` con
+su propia eval aislada: eso viola la doctrina `TASK-1290`/`TASK-1292` ("cambiar el prompt cambia la
+versión → la eval lo re-valida") aplicada a un solo eje mientras los otros dos ya movieron el suelo.
+
+Esto **no cambia el alcance** de esta task: cambia el orden y el punto de cierre de su evidencia.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -24,7 +59,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|seo|aeo|data`
-- Blocked by: `none`
+- Blocked by: `TASK-1697`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -151,6 +186,11 @@ Reglas obligatorias:
 - `TASK-1665` (complete) — consumer UI del bridge (`KeywordDiscoveryCandidateDrawer`,
   `keyword-discovery-action.ts`).
 - `TASK-1290` / `TASK-1292` (complete) — cerebro autor versionado y harness de eval AEO.
+- **`TASK-1697` (bloqueante, Delta 2026-08-15)** — extracción de `site-substrate`: reescribe los
+  imports de `grounded-query-bridge.ts`, archivo `owned` por esta task. Conflicto de archivo, no de
+  contrato; ver el Delta.
+- **Coordinación de eval con `TASK-1698` y `TASK-1703`** — tres bumps del cerebro en vuelo, una sola
+  pasada de eval consolidada. No es dependencia de código: es de evidencia de cierre. Ver el Delta.
 - Flags vigentes: `GROWTH_SEO_ENABLED`, `GROWTH_AI_VISIBILITY_GRADER_ENABLED`,
   `GROWTH_AI_VISIBILITY_PROMPT_AUTHORING_ENABLED`.
 

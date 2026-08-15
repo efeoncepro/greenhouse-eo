@@ -1,5 +1,42 @@
 # TASK-1672 — Growth SEO: artefacto de la auditoría técnica (web + print)
 
+## Delta 2026-08-15 — `Depends on` += `TASK-1698`; y `Blocked by: TASK-1670` es innegociable
+
+Fuente: `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md` (§1.1
+`message_alignment` medido contra un posicionamiento que nunca se declara; §3.4 brecha C8).
+
+**Sin cambio de alcance.** Sigue siendo el documento con dos densidades, web + print, reusando
+`ReportArtifactModel`. Cambian dos cosas del contorno.
+
+### `Depends on` += `TASK-1698` (posicionamiento declarado)
+
+La auditoría midió un defecto de fondo: la dimensión **`message_alignment` pesa 10 puntos** y su
+definición canónica es *"la narrativa de la IA coincide con el posicionamiento **deseado**"* — pero
+ese posicionamiento **nunca entra como input**. `ProseExtractionInput` lleva `excerpt`, `subjectBrand`,
+`subjectDomain` y `maxTokens`, y el prompt igual le pide al modelo que detecte desvío. **El modelo
+está infiriendo cuál es el posicionamiento y midiendo contra su propia inferencia.**
+
+En pantalla eso es un número discutible. **En un documento firmado con nuestro nombre, reenviado a un
+tercero, es otra cosa:** son 10 puntos de un puntaje que un cliente puede citar en una decisión, y no
+podríamos defender de dónde salieron. No se firma un documento que incluye una dimensión de 10 puntos
+medida contra un posicionamiento que nunca se declaró. `TASK-1698` inyecta el dato —que además **ya
+existe y está cacheado** en `brand_intelligence.whatTheBrandDoes`— y esta task espera.
+
+### `Blocked by: TASK-1670` sigue en su lugar, y el orden es innegociable
+
+Confirmado: `Blocked by: TASK-1670` permanece en `Status`.
+
+Se refuerza porque el **incentivo comercial de publicar antes es fuerte y va a existir**: el artefacto
+es material de conversación de SOW, hay demanda inmediata, y `TASK-1670` se ve desde afuera como un
+detalle técnico postergables. No lo es. `TASK-1670` es lo que detecta el **bloqueo a crawlers de IA**,
+y sin eso **un sitio invisible para los motores de respuesta puede puntuar 95/100**.
+
+Publicar el artefacto antes de `TASK-1670` es **firmar que está sano un sitio invisible para los
+motores de IA**. Un documento sobrevive fuera de Greenhouse: se lee tres semanas después, reenviado,
+sin nosotros al lado para matizar. El daño no es un número mal puesto en una pantalla que se
+actualiza — es un documento con nuestro nombre que dice lo contrario de la realidad y que ya no
+podemos alcanzar. **Ninguna urgencia comercial revierte este orden.**
+
 ## Delta 2026-08-08 — TASK-1309 cerrada
 
 `TASK-1309` (Auditoría del sitio, `/admin/growth/seo/audit`) pasó a `complete`: suite completa en
@@ -101,8 +138,12 @@ Reglas obligatorias:
 
 ### Depende de
 
-- `TASK-1670` — hallazgos de sitio (crawlers IA, JSON-LD, sitemap). **Bloqueante**: sin eso el
-  documento omite lo más consecuente.
+- `TASK-1670` — hallazgos de sitio (crawlers IA, JSON-LD, sitemap). **Bloqueante e innegociable**:
+  sin eso el documento omite lo más consecuente y puede declarar sano un sitio invisible para los
+  motores de IA (95/100 con crawlers bloqueados). Ver Delta 2026-08-15.
+- **`TASK-1698`** — posicionamiento declarado como input del extractor de prosa (Delta 2026-08-15).
+  Sin él, `message_alignment` —**10 puntos**— se mide contra un posicionamiento que el modelo infiere
+  solo. Aceptable en pantalla; no en un documento firmado que sale de la plataforma.
 - `TASK-1304` — `readSiteAuditReport` (`complete`).
 - `TASK-1309` — `groupAuditIssues` + fichas es-CL de los checks (code complete).
 - `TASK-1310` — `ReportArtifactModel` + el par `web/`/`print/` (in-progress).
@@ -277,7 +318,11 @@ sitio cerrado a los motores de respuesta.
 - Slice 1 → 2 → 3 → 4. La ruta (3) no se expone antes de que el documento (1+2) esté completo:
   una ruta viva con un documento a medias es un informe emitido a medias.
 - Esta task NO empieza antes de `TASK-1670`: el documento no debe nacer omitiendo los hallazgos
-  de sitio.
+  de sitio. **Innegociable** aunque haya un SOW esperando — publicar antes es firmar que está sano un
+  sitio invisible para los motores de IA (Delta 2026-08-15).
+- `TASK-1698` debe estar en `develop` antes de que el documento incluya `message_alignment`. Si por
+  secuenciación no lo está, el documento **omite esa dimensión** en vez de firmarla; no se publica
+  "con una nota al pie".
 
 ### Risk matrix
 
@@ -289,6 +334,8 @@ sitio cerrado a los motores de respuesta.
 | Documento enorme (200 URLs × N grupos) impide imprimirlo | UI | medium | Techo propio del documento + lo omitido declarado | GVC print |
 | Se emite un informe sin diagnóstico o a medias | data quality | medium | Estados que NO generan documento (sin crawl / en curso) | revisión de código |
 | Divergencia visual con el informe hermano de 1310 | UI | medium | Reuso del mismo `ReportArtifactModel` y adaptadores | revisión de código |
+| **Se publica antes de `TASK-1670` por presión comercial** (SOW en curso, demanda inmediata) | reputación / comercial | **high** | `Blocked by: TASK-1670` innegociable; un sitio con crawlers de IA bloqueados puede puntuar 95/100 y el documento sale de la plataforma sin nosotros al lado | cualquier intento de shippear con 1670 abierta |
+| `message_alignment` (10 pts) medido contra un posicionamiento inferido por el modelo | reputación / medición | high | `Depends on: TASK-1698`; el input existe cacheado en `brand_intelligence.whatTheBrandDoes` | dimensión presente en el documento con 1698 abierta |
 
 ### Feature flags / cutover
 
@@ -328,6 +375,11 @@ sitio cerrado a los motores de respuesta.
 - [ ] La portada cabe en una plana y contiene dominio, **fecha del crawl**, salud con su alcance
       y las tres prioridades.
 - [ ] Los hallazgos de sitio se renderizan **antes** de la lista priorizada.
+- [ ] **`TASK-1670` está en `develop` antes del primer render publicable.** El documento NUNCA se
+      emite con la detección de bloqueo a crawlers de IA pendiente — ninguna urgencia comercial
+      revierte este orden.
+- [ ] **`TASK-1698` está en `develop`** o el documento **no incluye** la dimensión `message_alignment`:
+      no se firma un puntaje de 10 puntos medido contra un posicionamiento nunca declarado.
 - [ ] Un hallazgo no verificado dice "no pudimos verificarlo" con su razón, nunca "sano".
 - [ ] El bloque de procedencia está presente y cubre: puntaje del proveedor, esfuerzo estimado,
       carga de laboratorio y as-of.

@@ -27,6 +27,57 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-08-15 — el gap es un ORIGEN, no una autoridad de orden; y "priorizado por volumen" es falso
+
+Fuente: `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md` §3.1 (S1, S5),
+§3.3 (capacidad ociosa del proveedor) y §5.2 (la cola priorizada).
+
+**1. El competidor se DESCUBRE, no se asume conocido.** `### Depends on` suma `TASK-1699`
+`[por crear]`: los endpoints `competitors_domain` / `serp_competitors` / `bulk_traffic_estimation`
+cuestan ~USD 0,03 por corrida, y el rank capture **ya paga `depth 20`** —o sea, ya compramos las
+filas de todos los competidores del top-20 y `parseSerpRankObservation`
+(`rank-capture.ts:171-221`) las recorre y las descarta—. Esta task nació asumiendo que alguien ya
+sabe quién es el competidor (la auditoría lo dice con esas palabras, §3.3). La declaración humana
+sigue siendo el acto de gobierno —un competidor mal elegido invalida el análisis río abajo—, pero
+la **propuesta** sale de datos que ya pagamos, no de la memoria de un ejecutivo.
+
+**2. 🔴 Esta task NO produce ordenamiento propio.** Sus hallazgos entran a la cola priorizada
+(`TASK-1700`) como filas con `origin='competitor_gap'` y una `evidence_ref` **opaca** —nunca FK,
+nunca JOIN—. La cola no absorbe al gap: lo **consume**. **El gap es un ORIGEN; la cola es la
+AUTORIDAD DE ORDEN.** Corolario duro: `readKeywordGap` devuelve hechos con su procedencia y su
+fecha, y quien decide qué va primero es la cola con su `priority_score_version`.
+
+**3. 🔴 "Priorizadas por volumen" se corrige — la premisa es falsa.** Estaba literal en tres lugares
+(`### Depends on`, Slice 3 y Acceptance Criteria) y una línea la elevaba a **bloqueo duro**
+diciendo que sin volumen no hay forma de priorizar. No es cierto, por cuatro razones acumulativas:
+
+- el volumen es **◑ estimado**, con agrupación *broad* y redondeo a buckets declarados por el
+  proveedor: no es un conteo;
+- **no contiene la depresión de clic por AI Overviews** — una keyword con AIO puede tener volumen
+  alto y clic casi nulo;
+- **ignora la barrera de enlaces**, que este dominio ya deriva server-side con `deriveLinkBarrier()`
+  del perfil real del top-10 (TASK-1661 follow-up, 2026-08-14) — un gap tras una barrera `alta` no
+  es una oportunidad, es una fantasía cara;
+- **ignora si el gap es recuperable**: ordenar por volumen pone arriba justo lo que no se puede ganar.
+
+Ordenador correcto, y es el que esta task alimenta: **valor recuperable = volumen × CTR esperado en
+la posición alcanzable (curva PROPIA, derivada de nuestras impresiones/clics de GSC, no una curva de
+blog) × factor AIO (de las SERP features que ya capturamos) × señal de valor comercial (`cpc_usd`
+como proxy)**, todo filtrado por `deriveLinkBarrier()`. Los factores se computan y se persisten con
+su procedencia; el peso de cada uno vive en la config versionada de la cola.
+
+**4. 🔴 Invariante nuevo — cuando hay medición, el gap se calla.** Si la keyword **ya tiene
+impresiones en el Search Console del cliente**, manda la lente medida (●) y el gap (◑) no la
+propone ni la ordena: ahí no hay "no aparezco", hay una posición real que la superficie de
+oportunidades ya cubre. Es el invariante ●/◑ aplicado al **ordenamiento**, no sólo a la
+visualización — hoy la task lo respeta al pintar y lo viola al ordenar.
+
+**5. Sin SERP features, la salida dice la keyword y no dice el trabajo.** PAA, video, local pack,
+shopping y AI Overview **ya se capturan** y hoy se colapsan a un booleano de AIO (§3.1 S5). El
+formato ganador cambia el entregable —no es lo mismo "escribe un artículo" que "necesitas un video y
+un bloque de preguntas"—. El reader de gap las expone; si no las tiene, lo declara en vez de
+callarlo.
+
 ## Delta 2026-08-14 — la intención declarada existe: el gap deja de ser binario
 
 `TASK-1659` está **complete**: una membresía del set del cliente ahora puede llevar intención
@@ -79,9 +130,12 @@ decisión postergada, es una ausencia del roadmap.
 
 ## Goal
 
-- Existe un modelo de competidores por sitio, declarado y auditable.
+- Existe un modelo de competidores por sitio, declarado y auditable, **propuesto desde el top-N que
+  el rank capture ya paga** (`TASK-1699`), no desde la memoria de alguien.
 - Se puede responder qué keywords gana un competidor donde el cliente no aparece.
-- El resultado es priorizable, no una lista cruda de miles de filas.
+- El resultado es **priorizable por la cola**: cada hallazgo entra como `origin='competitor_gap'`
+  con los factores de valor recuperable computados y su procedencia, no como una lista cruda de
+  miles de filas ni como un ranking propio de esta task.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -101,8 +155,15 @@ Reglas obligatorias:
   gasta del módulo: el universo de keywords de un competidor no tiene techo natural.
 - Cliente DataForSEO canónico; ningún SDK paralelo.
 - Un competidor es un **hecho declarado**, no una inferencia: quién lo declaró y cuándo quedan
-  registrados. Un competidor mal elegido invalida todo el análisis río abajo.
+  registrados. Un competidor mal elegido invalida todo el análisis río abajo. Que la **propuesta**
+  venga del top-N ya pagado (`TASK-1699`) no cambia eso: propone la máquina, declara el humano.
 - Boundary SEO ↔ AEO intacto: cero JOIN cross-motor.
+- 🔴 **Esta task no ordena.** El gap es un **origen** de la cola priorizada (`TASK-1700`), que es la
+  **autoridad de orden**. `readKeywordGap` entrega hechos con procedencia, fecha y factores; jamás
+  un ranking propio, un "top 40" ni un score compuesto acuñado acá.
+- 🔴 **Cuando hay medición, manda la medición.** Una keyword con impresiones en el GSC del cliente
+  no es gap: es posición conocida, y la cubre la superficie de oportunidades. El reader la excluye
+  del gap en vez de duplicar la conversación en dos pantallas con dos números.
 
 ## Normative Docs
 
@@ -113,8 +174,16 @@ Reglas obligatorias:
 
 ### Depends on
 
-- **`TASK-1661`** — sin volumen no hay forma de priorizar lo descubierto, y una lista de 5.000
-  keywords sin priorizar es ruido, no producto. Es bloqueo duro
+- **`TASK-1661`** (complete) — bloqueo duro, pero **no por el volumen**: lo que hace falta es el
+  primitive de mercado completo, y en particular **`deriveLinkBarrier()`**, que dice si el gap es
+  recuperable. El volumen solo es ◑ estimado, agrupado en *broad* y redondeado a buckets del
+  proveedor; ordenar por él pone arriba justo lo que no se puede ganar (ver Delta 2026-08-15)
+- **`TASK-1699`** `[por crear]` — descubrimiento de competidores desde el top-N que el rank capture
+  **ya paga** (`depth 20`) más `competitors_domain`/`serp_competitors`/`bulk_traffic_estimation`
+  (~USD 0,03/corrida). Sin esto, esta task asume conocido al competidor, que es su supuesto más
+  frágil
+- **`TASK-1700`** — la cola priorizada. Es quien ordena; esta task le entrega filas
+  con `origin='competitor_gap'` y `evidence_ref` opaca (nunca FK, nunca JOIN)
 - `TASK-1300` (complete) — familia `labs` en el allowlist
 - `TASK-1301` (complete) — entitlement y quota per-org
 
@@ -182,6 +251,12 @@ Reglas obligatorias:
     cliente. Persistirlo lo congela y envejece sin avisar
   - "El competidor rankea y el cliente no" ≠ "el cliente rankea peor". Son dos hechos y el contrato
     los separa; colapsarlos produce un gap inflado que nadie puede accionar
+  - 🔴 **Keyword con impresiones en el GSC del cliente ⇒ no es gap.** La lente medida (●) gana sobre
+    la estimada (◑), y gana también en el **ordenamiento**, no sólo en cómo se pinta. El reader la
+    excluye y declara por qué
+  - 🔴 **El reader no devuelve orden propio.** Devuelve hechos + factores (volumen ◑, `cpc_usd`,
+    barrera de enlaces, SERP features, posición alcanzable estimada) con su procedencia y fecha. El
+    peso de cada factor vive en la config versionada de la cola, no acá
   - Techo explícito de competidores por sitio: cada uno multiplica el gasto
 - Tenant/space boundary: competidores por `seo_target_id` → `organization_id`
 - Idempotency/concurrency: declarar dos veces el mismo competidor es no-op idempotente
@@ -228,6 +303,8 @@ Reglas obligatorias:
 
 - Tabla `seo_competitors` con autoría, fecha y techo por sitio
 - Commands `declareCompetitor` / `retireCompetitor`, append-only, con evento
+- **Los candidatos a competidor se proponen** desde `TASK-1699` (top-N ya pagado); la fila sólo
+  existe cuando un humano la declara, y guarda si vino de propuesta o de escritura directa
 - Los 3 lanes (app, ecosystem, MCP) en el mismo PR, sobre el scope de escritura ya existente
 
 ### Slice 2 — Cobertura de keywords del competidor
@@ -236,19 +313,38 @@ Reglas obligatorias:
 - Persistencia con fecha de captura, append-only
 - **Un competidor a la vez** en V1: el costo se mide antes de escalar
 
-### Slice 3 — Reader de gap
+### Slice 3 — Reader de gap (hechos + factores, sin ranking propio)
 
-- `readKeywordGap`: keywords del competidor donde el cliente no aparece, priorizadas por volumen
-  (de `TASK-1661`) y separadas de "el cliente aparece peor"
+- `readKeywordGap`: keywords del competidor donde el cliente no aparece, separadas de "el cliente
+  aparece peor" y **excluyendo las que ya tienen impresiones en el GSC del cliente** (ahí manda la
+  lente medida)
+- Cada fila trae los **factores de valor recuperable** con su procedencia y fecha: volumen ◑,
+  `cpc_usd` como proxy de valor comercial, **barrera de enlaces** (`deriveLinkBarrier()`), factor
+  AIO derivado de las SERP features capturadas y posición alcanzable estimada. **El reader no los
+  combina en un score ni ordena**: eso es de la cola
+- **SERP features expuestas** (PAA, video, local pack, shopping, AI Overview), no colapsadas a un
+  booleano: sin el formato ganador, la salida dice la keyword y no dice el trabajo. Si para una
+  keyword no las tenemos, se declara `sin_dato`, jamás se asume "ninguna"
 - Tool MCP de lectura en el mismo PR
 - Señal de frescura de cobertura
+
+### Slice 4 — Emisión a la cola priorizada
+
+- Los hallazgos se emiten a `TASK-1700` como filas con `origin='competitor_gap'` y `evidence_ref`
+  **opaca**: nunca FK, nunca JOIN. Unir orígenes por SQL es la violación más cara posible acá
+- Un fallo de cobertura del gap se declara en `origin_health_json` de la cola y **no baja el score
+  de los demás orígenes**
 
 ## Out of Scope
 
 - **La superficie visible.** Va en task aparte, con su wireframe y su flow, cuando exista qué
   mostrar. Diseñarla antes de ver la forma real de los datos es adivinar
-- Descubrir competidores automáticamente. Se declaran; un competidor mal elegido invalida todo el
-  análisis y esa decisión es humana
+- **Declarar competidores automáticamente.** La *propuesta* de candidatos sí entra (`TASK-1699`,
+  desde el top-N ya pagado), pero **la declaración sigue siendo humana**: un competidor mal elegido
+  invalida todo el análisis río abajo y esa decisión no se automatiza
+- 🔴 **Ordenar.** Esta task no acuña score de prioridad, ni "top N", ni ranking propio. Emite a la
+  cola (`TASK-1700`) y la cola ordena. Si el orden está mal, se corrige subiendo el
+  `priority_score_version` de la cola, nunca metiendo un orden paralelo acá
 - Análisis de contenido de las páginas del competidor
 - Backlinks del competidor
 
@@ -269,11 +365,45 @@ oportunidad de contenido nuevo. "El competidor rankea mejor que yo" es una oport
 optimización — y ésa ya la cubre la pantalla de oportunidades. Mezclarlas produce una lista enorme
 donde lo verdaderamente nuevo se pierde entre lo que ya sabíamos.
 
+**Por qué el volumen no ordena.** Es la corrección más cara de este documento, y viene del
+Delta 2026-08-15. Cuatro defectos que se acumulan: el volumen es **◑ estimado**, con agrupación
+*broad* y redondeo a buckets del proveedor (no es un conteo, es una banda); **no descuenta la
+depresión de clic de los AI Overviews**, así que una keyword con AIO puede tener volumen alto y
+clic casi nulo; **ignora la barrera de enlaces**, que este dominio ya deriva del perfil real del
+top-10 con `deriveLinkBarrier()` —y que es lo único que dice si el gap es alcanzable—; e **ignora la
+recuperabilidad**, con lo cual pone arriba exactamente lo que no se puede ganar. Un plan ordenado
+por volumen es un plan que empieza por lo más caro y termina sin resultados.
+
+El ordenador correcto es **valor recuperable**:
+
+```
+valor_recuperable = volumen(◑)
+                  × CTR esperado en la posición alcanzable      (curva PROPIA, de nuestro GSC)
+                  × factor AIO                                   (de las SERP features capturadas)
+                  × señal de valor comercial                     (cpc_usd como proxy)
+                  filtrado por deriveLinkBarrier()
+```
+
+La curva de CTR es **propia**, derivada de impresiones/clics reales del cliente en GSC: usar una
+curva publicada de un blog sería sustituir una medición que ya tenemos por un promedio ajeno. Esta
+task **computa y persiste los factores con su procedencia**; **los pesos y la combinación viven en
+la config versionada de la cola** (`TASK-1700`), porque cambiar un peso tiene que dejar rastro en un
+`priority_score_version` y esta task no tiene dónde registrarlo.
+
+**Por qué el gap se calla cuando hay impresiones.** El módulo sostiene la separación ● medido / ◑
+estimado de punta a punta, y hasta ahora la sostenía al **pintar**. Ordenar es también afirmar: si
+una keyword ya tiene impresiones en el Search Console del cliente, existe una posición **medida** y
+la conversación correcta es "estoy en la 14, ¿cómo llego a la 5?", no "no aparezco". Dejar que el
+gap la proponga produce dos pantallas hablando de la misma keyword con dos números distintos y dos
+grados de certeza distintos, y el cliente cree el más optimista.
+
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
 
-- Slice 1 (competidores) → Slice 2 (cobertura) → Slice 3 (gap).
+- Slice 1 (competidores) → Slice 2 (cobertura) → Slice 3 (gap) → Slice 4 (emisión a la cola).
+- El Slice 4 requiere `TASK-1700` mergeada. Si la cola no está, el gap **se queda sin superficie**:
+  no se compensa inventando un orden acá.
 - 🔴 El dry-run del Slice 2 corre **antes** de cualquier corrida con gasto, y la primera es sobre
   **un** competidor de **una** org.
 
@@ -285,7 +415,10 @@ donde lo verdaderamente nuevo se pierde entre lo que ya sabíamos.
 | Gap persistido envejece y se reporta como vigente | data quality | **high** | el gap se deriva al leer; se persisten insumos con fecha | conteos que no cambian entre semanas |
 | Competidores de un cliente visibles a otra org | seguridad | low | boundary por `organization_id` + test de aislamiento | dominio ajeno en un reader |
 | El flag se prende en Vercel y el fetch nunca corre | worker | **high** | el fetch vive en `ops-worker`; flag en `deploy.sh` **y** en vivo | sin gasto en el ledger y sin cobertura |
-| Lista cruda sin priorizar se entrega como producto | producto | medium | `TASK-1661` es bloqueo duro: sin volumen no se prioriza | miles de filas sin orden útil |
+| Lista cruda sin priorizar se entrega como producto | producto | medium | la cola (`TASK-1700`) es la autoridad de orden y el Slice 4 la requiere; esta task entrega factores con procedencia, no filas sueltas | miles de filas sin orden útil |
+| **Se ordena por volumen y el plan empieza por lo inalcanzable** | producto/oficio | **high** | ordenador = valor recuperable filtrado por `deriveLinkBarrier()`; test que falla si el reader devuelve orden propio | gaps `barrera=alta` en los primeros lugares |
+| **El gap propone una keyword que el cliente ya rankea** | data quality / confianza | **high** | exclusión dura por impresiones GSC en el reader, con test; ● gana sobre ◑ también al ordenar | la misma keyword en gap y en oportunidades con dos números |
+| Salida sin SERP features: dice la keyword, no dice el trabajo | producto | medium | el reader expone PAA/video/local/shopping/AIO; `sin_dato` explícito cuando falta | briefs que piden "un artículo" para una SERP de video |
 
 ### Feature flags / cutover
 
@@ -300,6 +433,7 @@ por una.
 | Slice 1 | revert PR; los competidores declarados quedan (append-only, sin daño) | < 10 min | sí |
 | Slice 2 | flag OFF → deja de gastar de inmediato | < 5 min | sí |
 | Slice 3 | revert PR; el gap deja de calcularse, los insumos quedan | < 10 min | sí |
+| Slice 4 | dejar de emitir a la cola; las filas `origin='competitor_gap'` ya escritas quedan (append-only) y la cola declara el origen caído en `origin_health_json` | < 10 min | sí |
 
 ### Production verification sequence
 
@@ -320,11 +454,21 @@ Ninguna en Entra: la escritura usa el scope de dominio ya existente. Sí en `ops
 
 ## Acceptance Criteria
 
-- [ ] Un competidor es un hecho declarado con autor y fecha; no se infiere
+- [ ] Un competidor es un hecho declarado con autor y fecha; no se infiere. La **propuesta** puede
+      venir de `TASK-1699`, y la fila registra si vino de propuesta o de escritura directa
 - [ ] Existe techo de competidores por sitio
 - [ ] El gap se **deriva al leer**; no se persiste como verdad
 - [ ] El reader separa "el cliente no aparece" de "el cliente aparece peor"
-- [ ] El resultado viene priorizado por volumen (`TASK-1661`)
+- [ ] 🔴 **El reader NO devuelve orden propio.** Devuelve hechos + factores con procedencia y fecha;
+      un test falla si el resultado viene ordenado por un score acuñado en esta task
+- [ ] 🔴 Una keyword con impresiones en el GSC del cliente **no aparece como gap**, con test:
+      la lente medida (●) gana sobre la estimada (◑) también al ordenar
+- [ ] Cada fila trae volumen ◑, `cpc_usd`, **barrera de enlaces** (`deriveLinkBarrier()`), factor AIO
+      y posición alcanzable estimada; un factor ausente se declara `sin_dato`, nunca 0 ni "baja"
+- [ ] Las **SERP features** viajan en el contrato (PAA, video, local pack, shopping, AIO), no
+      colapsadas a un booleano
+- [ ] Los hallazgos se emiten a la cola como `origin='competitor_gap'` con `evidence_ref` **opaca**;
+      cero FK y cero JOIN entre el gap y las tablas de la cola
 - [ ] Ninguna llamada al proveedor ocurre sin `enforceSeoRunEntitlement`
 - [ ] El dry-run reporta conteo y costo antes de gastar
 - [ ] El flag nace OFF, está en `ops-worker/deploy.sh` y tiene fila en el ledger
@@ -349,4 +493,7 @@ Ninguna en Entra: la escritura usa el scope de dominio ya existente. Sí en `ops
 
 - Superficie de keyword gap, con wireframe y flow propios.
 - Varios competidores por sitio, con el costo por competidor ya medido.
-- Alimentar el plan de contenidos de `TASK-1314` con el gap priorizado.
+- Alimentar el plan de contenidos de `TASK-1314` con el gap priorizado **por la cola**.
+- Curva de CTR propia por posición: se deriva de impresiones/clics reales del GSC del cliente y la
+  consumen tanto el gap como la superficie de oportunidades. Si `TASK-1700` no la trae, crear task
+  aparte — pero **nunca** sustituirla por una curva publicada de un blog.

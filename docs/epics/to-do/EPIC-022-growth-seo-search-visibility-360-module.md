@@ -225,6 +225,13 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1708` — [creada 2026-08-15, backend-data] Estacionalidad: la serie de 12 meses que ya viene
   en `keyword_info`.
 - `TASK-1709` — [creada 2026-08-15, backend-data] Carril de diagnóstico de prospecto SEO.
+- `TASK-1284` — [**adoptada 2026-08-15**, backend-data] **GA4 multi-tenant como señal per-org.**
+  Estaba huérfana (`Epic: none`) y es la única vía a dos cosas que el epic promete: el puente
+  «clics → leads» y la medición del **referral real** de `chatgpt.com`/`perplexity.ai` — o sea, lo
+  único que prueba que la citación en IA trae gente. Bloquea de hecho la tercera parte de
+  `TASK-1668` (las ventanas de outcome GA4/HubSpot): o se adopta, o ese loop de negocio se declara
+  explícitamente parcial. `src/lib/growth/ga4/` ya tiene cliente con token provider inyectable y el
+  patrón per-org ya corre en producción en Search Console.
 
 ## Existing Related Work
 
@@ -727,7 +734,7 @@ ese cliente.
 2. **El grader le compra a DataForSEO fuera del ledger** declarado como fuente única, y su
    "presupuesto" cuenta corridas × USD 0,50 en vez de dólares: una org contratada puede gastar
    USD 17,60/mes sin ningún gate. → `TASK-1696`.
-3. **10 deep imports `growth/seo` → `ai-visibility`** contra una regla declarada en §17.3 de la
+3. **14 deep imports (7 rutas) `growth/seo` → `ai-visibility`** contra una regla declarada en §17.3 de la
    arquitectura del módulo, sin ninguna lint rule que lo vea. → `TASK-1697`.
 
 Y un **incidente**: un run terminado sin score mostró "El informe se está preparando… vuelve en unos

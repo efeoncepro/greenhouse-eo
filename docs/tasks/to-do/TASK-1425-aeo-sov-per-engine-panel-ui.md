@@ -1,8 +1,38 @@
-# TASK-1425 — AEO: panel "Cómo te ve cada motor" (SoV per-motor) + estado honesto de run sin score
+# TASK-1425 — AEO: panel "Cómo te ve cada motor" (SoV per-motor)
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
+
+## Delta 2026-08-15 — el estado "preparando…" sale del alcance: se va a `ISSUE-155`
+
+Fuente: `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md`.
+
+**Se EXTRAE de esta task el fix del estado engañoso** ("El informe se está preparando… vuelve en unos
+minutos" en un run **terminado sin score**). Pasa a `ISSUE-155` y **shippea independiente**.
+
+Razón: un cliente real —Grupo Berel— vio esa promesa falsa durante **15 días**. Eso no es una
+desviación de mockup pendiente de dato: es un **incidente de runtime en producción**, y el vehículo
+correcto es un `ISSUE`, no el Slice 1 de una task `P2` que además está **bloqueada por `TASK-1424`**.
+Dejarlo acá lo encadena a una dependencia que no necesita: el fix de honestidad no depende de que
+exista el desglose per-motor. Un incidente visible para el cliente no espera a un panel.
+
+Qué cambia en el cuerpo de esta task:
+
+- El título, el Summary, el Why y el Goal pierden la mitad "estado sin score".
+- **Slice 1 (estado honesto) se elimina**; los slices se renumeran (panel → fixture/GVC/cierre).
+- Salen de `Files owned` la page del detalle operador y el command del reader — esta task ya no los
+  toca; son de `ISSUE-155`.
+- Salen el criterio de aceptación, la captura GVC, la fila de riesgo, la fila de rollback y la Open
+  Question del estado sin score.
+- Consecuencia dura: con el Slice 1 fuera, **la task entera queda bloqueada por `TASK-1424`**. Ya no
+  hay nada que adelantar sin el dato.
+
+**Y sube en valor.** La auditoría midió que el solape de dominios citados entre ChatGPT y Perplexity
+es de **~11%**: cada motor arma su respuesta con un conjunto de fuentes casi disjunto. Un SoV agregado
+cross-motor es, por lo tanto, **un número que no describe ningún canal** — promedia mundos que no se
+tocan. El desglose per-motor deja de ser fidelidad al mockup y pasa a ser la única lectura honesta de
+la señal.
 
 ## Status
 
@@ -32,18 +62,21 @@
 Renderizar en el workbench AEO compartido (vista cliente `/aeo` + vista operador
 `/growth/aeo/[organizationId]`) el panel **"Cómo te ve cada motor"** del mockup aprobado de Claude
 Design (Región 7 de "AEO Operator View"): share of voice marca vs competidores POR motor,
-consumiendo el campo aditivo del `ReportArtifactModel` que entrega TASK-1424. Incluye el **fix del
-estado engañoso** detectado en producción con Grupo Berel: un run terminado sin score mostraba
-"El informe se está preparando… vuelve en unos minutos" durante 15 días — debe distinguirse de un
-run realmente en vuelo y ofrecer "Correr AEO".
+consumiendo el campo aditivo del `ReportArtifactModel` que entrega TASK-1424.
+
+El fix del estado engañoso de un run terminado sin score **ya no vive acá**: se extrajo a `ISSUE-155`
+y shippea independiente (ver Delta 2026-08-15).
 
 ## Why This Task Exists
 
 TASK-1276 degradó honesto la Región 7 del mockup aprobado porque el modelo no traía el desglose
 per-motor (solo SoV agregado + presencia por motor). TASK-1424 cierra el dato; esta task cierra el
-render. Además, el caso Berel (2026-07-17, runs `partial` con 0 findings/score de la era pre-fix
-del worker 07-04) demostró que el estado `report_unavailable` mezcla dos realidades distintas: run
-en vuelo (copy correcto) y run terminado sin score (copy falso).
+render.
+
+Y el desglose no es cosmético: con **~11% de solape** entre los dominios que cita ChatGPT y los que
+cita Perplexity (medición de la auditoría 2026-08-15), el SoV agregado cross-motor promedia canales
+que casi no comparten fuentes — es un número que no describe ninguno de los dos. El panel per-motor
+es la lectura honesta de esa señal, no un adorno del mockup.
 
 ## Goal
 
@@ -52,8 +85,6 @@ en vuelo (copy correcto) y run terminado sin score (copy falso).
   cliente Y operador sin fork.
 - Runs sin desglose (anteriores a TASK-1424) NO rompen ni muestran hueco: el panel simplemente no
   se renderiza.
-- Estado "último run terminado sin score" honesto (título + body + CTA Correr AEO en la vista
-  operador) separado del estado "run en vuelo".
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -86,8 +117,9 @@ Reglas obligatorias:
 
 ### Depends on
 
-- **TASK-1424** (campo per-motor en contratos/builder/model) — bloqueante dura del panel.
-- El fix de estado sin-score NO depende de TASK-1424 (puede adelantarse como Slice 1).
+- **TASK-1424** (campo per-motor en contratos/builder/model) — bloqueante dura del panel y, desde el
+  Delta 2026-08-15, **de la task completa**: al salir el fix de estado sin score a `ISSUE-155`, no
+  queda ningún slice adelantable sin el dato.
 
 ### Blocks / Impacts
 
@@ -99,13 +131,13 @@ Reglas obligatorias:
 
 - `src/views/greenhouse/growth/ai-visibility/client/AiVisibilityClientReportView.tsx` (panel nuevo
   en DetailCanvas — aditivo)
-- `src/app/(dashboard)/growth/aeo/[organizationId]/page.tsx` (estado sin-score)
 - `src/lib/copy/growth.ts` (ids del copy ledger)
 - `src/views/greenhouse/growth/ai-visibility/report-artifact/mockup/mock-data.ts` `[verificar]`
   path exacto del fixture `SAMPLE_CLIENT_REPORT`
-- `src/lib/growth/ai-visibility/operator/command.ts` SOLO si distinguir run-en-vuelo vs
-  terminado-sin-score exige un código de error nuevo `[verificar]` en Discovery — preferir lookup
-  del run en la page si evita tocar el reader.
+
+**Ya NO owned** (salieron con el Delta 2026-08-15 → `ISSUE-155`):
+`src/app/(dashboard)/growth/aeo/[organizationId]/page.tsx` y
+`src/lib/growth/ai-visibility/operator/command.ts`.
 
 ## Current Repo State
 
@@ -119,8 +151,9 @@ Reglas obligatorias:
 
 ### Gap
 
-- Región 7 del mockup aprobado sin render (sin dato hasta TASK-1424); estado `report_unavailable`
-  no distingue run en vuelo de run terminado sin score (caso Berel en producción).
+- Región 7 del mockup aprobado sin render (sin dato hasta TASK-1424).
+- (El gap del estado `report_unavailable` que no distingue run en vuelo de run terminado sin score
+  —caso Berel en producción— es de `ISSUE-155`, no de esta task.)
 
 ## UI/UX Contract
 
@@ -129,10 +162,11 @@ Reglas obligatorias:
 - UI rigor: `ui-standard`
 - Usuario / rol: operador Growth/AM + cliente contratado (mismo workbench)
 - Momento del flujo: leer el Resumen del informe y entender la brecha competitiva por canal
-- Resultado perceptible esperado: barras marca vs competidores por motor + estados honestos
-- Friccion que debe reducir: el agregado único esconde la historia por motor; el estado
-  "preparándose" falso confunde al operador (caso Berel)
-- No-goals UX: no re-scorea; no agrega charts nuevos fuera del panel; no toca PDF/email
+- Resultado perceptible esperado: barras marca vs competidores por motor
+- Friccion que debe reducir: el agregado único esconde la historia por motor — y con ~11% de solape
+  de dominios citados entre motores, ese agregado no describe ningún canal real
+- No-goals UX: no re-scorea; no agrega charts nuevos fuera del panel; no toca PDF/email; no toca los
+  estados del detalle operador (`ISSUE-155`)
 
 ### Surface & system decision
 
@@ -156,13 +190,10 @@ Reglas obligatorias:
 - Mobile / compact: 1 columna; sin scroll horizontal en 390
 - Keyboard / focus: contenido informativo; tabla sr-only para lectores
 - Reduced motion: sin motion nuevo
-- **Run terminado sin score (operador): estado propio con CTA Correr AEO — NUNCA "vuelve en unos
-  minutos"** (ese copy queda solo para runs `pending`/`running`)
 
 ### Interaction contract
 
-- Primary interaction: lectura (panel estático); el CTA del estado sin-score reusa
-  `AeoOperatorRunButton`
+- Primary interaction: lectura (panel estático); sin CTA propio
 - Hover / focus / active: title en nombres truncados
 - Pending / disabled: n/a
 - Escape / click-away: n/a
@@ -185,12 +216,11 @@ Reglas obligatorias:
 - Route / surface: `/aeo` + `/growth/aeo/[organizationId]` (workbench compartido)
 - Primitive / variant / kind: PanelShell interno + Box bars (patrón SignalVisualCue/mockup)
 - Component candidates: `EngineSovPanel` interno del view (no exportado)
-- Copy source: `src/lib/copy/growth.ts` (`detail.engineSov*`, `states.noScore*`)
-- Data reader / command: `ReportArtifactModel.competitiveSovByEngine` (TASK-1424); estado sin-score
-  desde el run status server-side
+- Copy source: `src/lib/copy/growth.ts` (`detail.engineSov*`)
+- Data reader / command: `ReportArtifactModel.competitiveSovByEngine` (TASK-1424)
 - API parity: n/a (render puro de modelo existente)
 - Access / capability: heredado
-- States to implement: los del inventory (incluye sin-score operador)
+- States to implement: los del inventory
 
 ### GVC scenario plan
 
@@ -198,9 +228,8 @@ Reglas obligatorias:
   `growth-ai-visibility-client-report` (fixture extendida)
 - Route: `/growth/aeo/[organizationId]` + `/aeo/mockup`
 - Viewports: desktop 1440 + mobile 390
-- Required steps: abrir detalle → panel visible en Resumen; estado sin-score capturado (harness o
-  org real sin score)
-- Required captures: workbench con panel per-motor (desktop+390) + estado sin-score
+- Required steps: abrir detalle → panel visible en Resumen
+- Required captures: workbench con panel per-motor (desktop+390)
 - Required `data-capture` markers: `aeo-engine-sov` (nuevo) + `composition-shell` existente
 - Assertions: noLoginRedirect, noErrorBoundary
 - Scroll-width checks: sin scroll horizontal desktop ni 390
@@ -213,14 +242,13 @@ Reglas obligatorias:
   ECharts (rechazado — coherencia con paneles hermanos Box/Recharts)
 - Why this pattern: regla de oro EPIC-020 (un modelo, renders por disclosure)
 - Reuse / extend / new primitive: `reuse` total
-- Open risks: shape final del campo (TASK-1424) + cómo distinguir run en vuelo vs sin-score
-  (marcado `[verificar]`)
+- Open risks: shape final del campo (TASK-1424)
 
 ### Visual verification
 
 - GVC scenario: los 3 existentes (reusados)
 - Viewports: desktop + mobile
-- Required captures: panel per-motor + estado sin-score
+- Required captures: panel per-motor
 - Required `data-capture` markers: `aeo-engine-sov`
 - Scroll-width check: desktop + 390
 - Accessibility/focus checks: tabla sr-only + labels no color-only
@@ -232,8 +260,8 @@ Reglas obligatorias:
 - Topology impact: `none`
 - Current home: `src/views/greenhouse/growth/ai-visibility/**` + copy en `src/lib/copy/growth.ts`
 - Future candidate home: `remain-shared`
-- Boundary: el panel es render puro del `ReportArtifactModel` (campo de TASK-1424); cero lógica de negocio ni fetch en el view; el estado sin-score se decide server-side en la page con el status real del run.
-- Server/browser split: panel dentro del view `use client` existente; clasificación del estado sin-score server-side en la page.
+- Boundary: el panel es render puro del `ReportArtifactModel` (campo de TASK-1424); cero lógica de negocio ni fetch en el view.
+- Server/browser split: panel dentro del view `use client` existente; el modelo llega resuelto server-side.
 - Build impact: nulo — sin dependencias nuevas.
 - Extraction blocker: ninguno.
 
@@ -250,27 +278,23 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Estado honesto "run terminado sin score" (NO depende de TASK-1424)
-
-- Page del detalle operador distingue run en vuelo (`pending`/`running` → copy actual) de run
-  terminado sin score (estado nuevo: título/body honestos + CTA Correr AEO).
-- Copy ids `states.noScore*` en `growth.ts`; validar contra el caso Berel real.
-
-### Slice 2 — Panel per-motor en el workbench (bloqueado por TASK-1424)
+### Slice 1 — Panel per-motor en el workbench (bloqueado por TASK-1424)
 
 - `EngineSovPanel` interno en DetailCanvas: grid por motor, marca primary + competidores neutral,
   % `tabular-nums`, tabla sr-only, "Sin datos de este motor" honesto; oculto si el campo no existe.
 - Copy ids `detail.engineSov*`; marker `data-capture="aeo-engine-sov"`.
 
-### Slice 3 — Fixture + GVC + cierre
+### Slice 2 — Fixture + GVC + cierre
 
 - Extender `SAMPLE_CLIENT_REPORT` con el desglose (captura determinista) + rebaseline documentado.
-- GVC desktop + 390 mirado (panel + estado sin-score); gates + docs + impacto cruzado (TASK-1276
-  Delta: desviación cerrada).
+- GVC desktop + 390 mirado (panel); gates + docs + impacto cruzado (TASK-1276 Delta: desviación
+  cerrada).
 
 ## Out of Scope
 
 - La derivación del dato (TASK-1424).
+- **El estado honesto de un run terminado sin score** — extraído a `ISSUE-155` (Delta 2026-08-15).
+  Esta task no toca la page del detalle operador ni los códigos de error del reader.
 - Consumir el desglose en PDF (TASK-1273) / email (TASK-1250) — follow-ups propios.
 - Cualquier investigación del motor sobre POR QUÉ un run queda sin findings (si el re-run de Berel
   con el motor actual también falla, se levanta ISSUE aparte).
@@ -278,16 +302,15 @@ Reglas obligatorias:
 ## Detailed Spec
 
 Ver el wireframe declarado (fuente: mockup aprobado Región 7 — layout, jerarquía, leyenda, sr-only
-table y estados vienen de ahí). La distinción run-en-vuelo vs sin-score se resuelve en Discovery:
-preferir lookup del run en la page (ya hace `getLatestClientGraderRun` para el send config) antes
-que tocar el contrato del reader.
+table y estados vienen de ahí). La distinción run-en-vuelo vs terminado-sin-score **ya no se resuelve
+acá**: es de `ISSUE-155`.
 
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
 
-- Slice 1 puede shippear solo (fix de honestidad, sin dependencia). Slice 2 NUNCA antes de que
-  TASK-1424 esté en `develop`. Slice 3 al final.
+- Slice 1 NUNCA antes de que TASK-1424 esté en `develop` (es la dependencia dura del dato). Slice 2
+  al final. Desde el Delta 2026-08-15 no queda ningún slice adelantable sin TASK-1424.
 
 ### Risk matrix
 
@@ -295,25 +318,24 @@ que tocar el contrato del reader.
 |---|---|---|---|---|
 | Rebaseline GVC del scenario cliente | ui/gvc | high (esperado) | declarar rebaseline en el cierre; comparar before/after mirado | diff de capturas |
 | Panel rompe layout en 390 | ui | low | grid auto-fit + scroll-width check en GVC | scroll horizontal |
-| Estado sin-score mal clasificado (oculta un run en vuelo real) | ux | low | clasificar por status real del run (`pending`/`running` vs terminal) + test focal | copy incorrecto en QA |
+| El panel se lee como "el agregado, desglosado" y alguien vuelve a promediar cross-motor | producto | medium | leyenda + sr-only declaran motor por motor; cero agregación en la vista (~11% de solape mide canales distintos) | un KPI cross-motor nuevo en review |
 
 ### Feature flags / cutover
 
-- Sin flag: Slice 2 es render condicionado a la existencia del campo (cutover natural vía
-  TASK-1424); Slice 1 es fix de copy/estado.
+- Sin flag: el panel es render condicionado a la existencia del campo (cutover natural vía
+  TASK-1424).
 
 ### Rollback plan per slice
 
 | Slice | Rollback | Tiempo | Reversible? |
 |---|---|---|---|
-| 1 | revert PR | <5 min | sí |
-| 2 | revert PR (panel aditivo) | <5 min | sí |
-| 3 | n/a (fixture/GVC/docs) | — | sí |
+| 1 | revert PR (panel aditivo) | <5 min | sí |
+| 2 | n/a (fixture/GVC/docs) | — | sí |
 
 ### Production verification sequence
 
-1. GVC local desktop+390 mirado (panel + sin-score).
-2. Staging: detalle de una org con run scoreado (panel visible) + Berel pre-re-run (estado nuevo).
+1. GVC local desktop+390 mirado (panel).
+2. Staging: detalle de una org con run scoreado (panel visible).
 3. Prod vía release batch normal.
 
 ### Out-of-band coordination required
@@ -331,8 +353,7 @@ que tocar el contrato del reader.
 - [ ] Sin el campo (runs pre-1425) el panel no aparece y no deja hueco ni error.
 - [ ] Motor sin menciones muestra "Sin datos de este motor" — cero porcentajes fabricados.
 - [ ] Tabla sr-only presente y completa; valor nunca color-only.
-- [ ] Run terminado sin score muestra el estado honesto nuevo + CTA Correr AEO; "preparándose"
-      queda solo para runs en vuelo (verificado con el caso Berel o harness).
+- [ ] El panel NO deriva ni muestra un SoV agregado cross-motor propio: cada motor se lee solo.
 - [ ] Copy 100% tokenizado en `growth.ts`; GVC desktop+390 mirado sin scroll horizontal.
 - [ ] `UI ready: yes` solo con `pnpm task:lint --task TASK-1425` sin findings.
 
@@ -356,10 +377,11 @@ que tocar el contrato del reader.
 ## Follow-ups
 
 - PDF (TASK-1273) y email (TASK-1250) consumiendo el desglose.
+- `ISSUE-155` — estado honesto de un run terminado sin score (extraído de esta task, ship
+  independiente y sin dependencia de TASK-1424).
 - ISSUE del motor si el re-run de Berel con extracción ON vuelve a quedar sin findings/score.
 
 ## Open Questions
 
-- ¿La distinción run-en-vuelo vs terminado-sin-score se resuelve con lookup del run en la page o
-  con un código nuevo en `OperatorGraderReportError`? Resolver en Discovery (preferir la page si
-  evita tocar el contrato del reader).
+- Ninguna abierta en esta task. La única que había (cómo distinguir run-en-vuelo de
+  terminado-sin-score) se fue con el fix a `ISSUE-155`.

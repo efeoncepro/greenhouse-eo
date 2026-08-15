@@ -94,7 +94,7 @@ llamada cobrada; el lado construido tiene un estimador que escribe el mismo cód
 
 ### 1.3 Deep imports cross-dominio contra una regla declarada, sin detector
 
-`growth/seo` importa **10 símbolos internos** de `growth/ai-visibility` (`flags`,
+`growth/seo` importa **14 símbolos internos desde 7 rutas** de `growth/ai-visibility` (`flags`,
 `prompt-packs/prompt-set-store`, `prompt-packs/authoring`, `brand-intelligence/store`,
 `ai-visibility/store`) desde `grounded-query-bridge.ts:23-37` y `grounded-query-reader.ts:15-19`.
 Cero imports en reversa — el DAG es direccionalmente limpio, pero es *deep import*, no superficie
@@ -114,10 +114,19 @@ deep import lo crea un commit, así que el detector es de CI.
 - **`docs/context/06_glosario-metricas.md:77,224`** declara **Otterly.ai** como "fuente de verdad"
   del AEO Citation Rate. Es la herramienta de un competidor, no está integrada, y tenemos el Grader.
   Ese contrato de métricas viaja a propuestas y SOWs.
-- **El re-grade recurrente está apagado en producción** y el ledger *parece* contradecirse: el flip
-  masivo del 2026-06-30 lo prendió en **Vercel**, pero el flag se lee en el **ops-worker**. Es la
-  trampa multi-runtime ya canonizada en CLAUDE.md. Mientras tanto se vende "los dos internets en el
-  tiempo" y el eje AEO del cliente es una foto sin cadencia garantizada.
+- **El re-grade recurrente no corre, y el motivo NO es el flag.** *(Corregido 2026-08-15 durante la
+  redacción de `TASK-1707`: la primera versión de esta auditoría decía "apagado en producción, es
+  rollout no construcción". Es falso en las dos mitades.)* El flag se lee **sólo** en el ops-worker,
+  y `services/ops-worker/deploy.sh` lo declara `true` con `SCHEDULER_PAUSED=false` en **ambas** ramas
+  de entorno —staging (`:473-474`) y production (`:513-514`), desde TASK-1321— mientras la fila 161
+  del ledger sigue diciendo "prod OFF / scheduler pausado". **El ledger está stale en la dirección
+  contraria a la que se supuso.**
+  El blocker real es otro: **`recurring_regrade_enabled` no tiene ningún writer** en `src/` (6
+  menciones, todas de lectura: el tipo, un mapeo en `store.ts` y el `WHERE` del scheduler). La
+  capability `growth.ai_visibility.regrade.manage` existe y está granteada **sin command** — brecha
+  de Full API Parity. Por eso el scheduler corre y reporta `skipped=no_due_profiles`: no hay forma
+  gobernada de inscribir un perfil. **Prender el flag es un no-evento; el entregable es el command
+  que falta.**
 - **`seteamos validate_micromarkup: true`** —el enabler pagado del crawl OnPage— **y nunca se llama
   al endpoint `/v3/on_page/microdata`** que ese flag habilita.
 - **`seo_competitors` existe en el schema y no tiene un solo consumidor** en `src/` (única aparición:
@@ -271,7 +280,7 @@ observación. Conviene revisar el orden de esa task.
 | # | Brecha | Tamaño |
 |---|---|---|
 | C1 | **El cliente ve estado, no trabajo.** No existe la cadena decisión → acción → resultado. El dato base ya existe: la membresía del set es append-only con `intent_declared_by` e `intent_declared_at`. | M |
-| C2 | **El eje AEO del 360 es una foto, y en producción puede estar vencida** (ver §1.4). | S (rollout) |
+| C2 | **El eje AEO del 360 es una foto, y en producción está vencida** (ver §1.4). ⚠️ **No es rollout: es construcción.** Falta el command que inscribe un perfil (`recurring_regrade_enabled` no tiene writer), no el flag. | M |
 | C3 | **El informe no sale de la plataforma.** Ruta autenticada con `?print=1`; sin enlace compartible, caducidad, revocación ni señal de apertura. El patrón existe dos veces en el repo. | M |
 | C4 | **Los clics existen y no llegan a la cara del cliente.** `read-overview-kpis.ts` ya los calcula; el cliente ve rank y quadrant. Primer escalón real desde posición hacia plata. | **S** |
 | C5 | **Sin competencia no hay marco de renovación.** `seo_competitors` sin consumidores. | M/L |
