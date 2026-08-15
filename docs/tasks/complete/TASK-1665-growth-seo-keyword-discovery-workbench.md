@@ -83,7 +83,7 @@ Este delta **no** cambia `UI ready: no`.
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -719,9 +719,9 @@ Ejecutado el 2026-08-15, todo en verde salvo lo declarado al final:
 - Revisión humana de los frames + scorecard premium **4.55 / PASS**
 - `pnpm docs:closure-check` + `pnpm docs:context-check:strict` → verde
 
-**Pendiente de autorización del operador:** `pnpm build` (producción Turbopack). Es el último gate
-del Task Closing Quality Gate y no se corrió porque consume ~30 GB en esta máquina. Hasta ejecutarlo
-el estado honesto es `code complete + evidencia visual verde`, no `complete`.
+- `pnpm build` (producción Turbopack) → **verde (exit 0)**, ejecutado el 2026-08-15 con
+  autorización del operador. Con esto el Task Closing Quality Gate queda completo y el estado pasa
+  de `code complete + evidencia visual verde` a `complete`.
 
 **Pendiente de rollout:** la captura corrió contra **local con dato vivo**, no contra staging. La
 lente ya está encendida por el flag de `TASK-1664` (`GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED`, ON desde
@@ -729,14 +729,16 @@ lente ya está encendida por el flag de `TASK-1664` (`GROWTH_SEO_KEYWORD_DISCOVE
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedó sincronizado con el estado real.
-- [ ] El archivo vive en la carpeta correcta.
-- [ ] `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` quedaron sincronizados.
-- [ ] `Handoff.md` quedó actualizado si hubo evidencia visual, bloqueo o rollout pendiente.
-- [ ] `changelog.md`/client changelog se revisaron según visibilidad del cambio.
-- [ ] Se ejecutó chequeo de impacto sobre `TASK-1664`, `TASK-1666`, `TASK-1660`, `TASK-1308` y
-  `TASK-1310`.
-- [ ] El cierre distingue `complete`, `code complete, rollout pendiente` u `operativamente bloqueado`.
+- [x] `Lifecycle` del markdown quedó sincronizado con el estado real.
+- [x] El archivo vive en la carpeta correcta.
+- [x] `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` quedaron sincronizados.
+- [x] `Handoff.md` quedó actualizado si hubo evidencia visual, bloqueo o rollout pendiente.
+- [x] `changelog.md`/client changelog se revisaron según visibilidad del cambio (entrada 2026-08-14).
+- [x] Se ejecutó chequeo de impacto sobre `TASK-1664`, `TASK-1666`, `TASK-1660`, `TASK-1308` y
+  `TASK-1310` (delta registrado en TASK-1660: conmutador de lentes + `intent_changed`).
+- [x] El cierre distingue `complete`, `code complete, rollout pendiente` u `operativamente
+  bloqueado`: **complete** (build de producción verde 2026-08-15; sin flag nuevo que prender — la
+  lente va con `GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED` de TASK-1664, ON desde 2026-08-14).
 
 ## Follow-ups
 

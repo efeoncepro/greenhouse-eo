@@ -2,7 +2,7 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
-### TASK-1665 CODE COMPLETE — lente `Descubrir` (2026-08-14) · **evidencia GVC pendiente**
+### TASK-1665 COMPLETE — lente `Descubrir` (cerrada 2026-08-15)
 
 Slices 0–4 en `develop` **sin push** (`fd7c53402`, `2f3ba87e3`, `51fecb561`, `361f6a151`). Verde:
 `pnpm local:check`, `pnpm ui:code-lint --changed`, `pnpm task:lint --task TASK-1665`
@@ -64,11 +64,11 @@ siempre en ese archivo. Ahora distingue **NAVEGAR vs ACTIVAR**: `Escape`/`Tab`/f
 de mobile: es `variant='scrollable'`, el desborde es intencional y lo comparten las cuatro pantallas
 SEO — merece su propia decisión.
 
-**🔴 Único pendiente para cerrar:** `pnpm build` (producción Turbopack), último gate del Task Closing
-Quality Gate. No se corrió porque consume ~30 GB en esta máquina y requiere autorización explícita.
-Hasta ejecutarlo el estado honesto es **`code complete + evidencia visual verde`**, no `complete`, y
-la task sigue en `in-progress/`. No hay flag nuevo que prender: la lente va con el
-`GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED` de TASK-1664, ON desde el 2026-08-14.
+**Cierre 2026-08-15:** `pnpm build` (producción Turbopack) ejecutado con autorización del operador →
+**verde (exit 0)**. Task Closing Quality Gate completo (suite 10.763 + build). Lifecycle movido a
+`complete/` con README/registry sincronizados. No hay flag nuevo que prender: la lente va con el
+`GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED` de TASK-1664, ON desde el 2026-08-14. La captura GVC corrió
+contra local con dato vivo; la lente ya es operable en staging/producción por el flag existente.
 
 **Impacto cruzado registrado:** `TASK-1660` ya no debe construir el conmutador de lentes (delta en su
 spec, con la forma exacta y la prohibición del `TabList` de `@mui/lab`), y la reclasificación de
