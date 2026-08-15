@@ -32,8 +32,24 @@ aparecen apagados — no aparecen.
 Cierra además una deuda que no era suya: no existía forma de conmutar lentes en una `page.tsx` del
 dashboard. Ahora existe, y `TASK-1660` la reusa en vez de inventarla de nuevo.
 
-Falta la evidencia visual (captura GVC y scorecard premium): la credencial de GCP está vencida en la
-máquina y sin ella toda captura sería basura. El scorecard no se escribe sin mirar frames reales.
+**Delta 2026-08-15 — mirar los frames cambió cuatro cosas.** La pantalla pasaba lint, tipos, build y
+10.763 tests. Aun así, la primera captura real encontró que el botón `Detalles` rendía 3,71:1 sobre
+el tinte de hover de su propia fila —sobre blanco daba 4,59, o sea que el defecto sólo existía con el
+puntero encima— y que el panel de detalle apretaba cinco métricas en 460 px hasta convertir su texto
+de ayuda en una cinta vertical de una palabra por línea. Ninguna de las dos es detectable sin ojos.
+
+Lo interesante fue el arreglo del contraste: bajar el tono no alcanzaba (4,42) y la variante tonal
+del design system lo empeoró a 3,69 —pinta el azul principal sobre un tinte del mismo azul—, así que
+la salida fue sacar el color de la ecuación y dejar la affordance en el chevron y la columna. Los dos
+intentos fallidos quedaron escritos con su medición, para que nadie los repita.
+
+De paso apareció un desajuste en el propio verificador visual: su contrato decía que el teclado sobre
+interfaces que no mutan nada estaba permitido, pero rechazaba cualquier tecla. Eso empuja a declarar
+"esto sí muta" a un guion que no muta, y esa declaración apaga el resguardo para siempre en ese
+archivo. Ahora distingue teclas que navegan de teclas que activan.
+
+Evidencia: captura verde en 1440 y 390, scorecard 4,55. Queda el build de producción como último
+gate.
 
 ## 2026-08-14 — El set monitoreado ahora sabe POR QUÉ una keyword está ahí (TASK-1659)
 

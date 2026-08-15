@@ -34,12 +34,41 @@ sus commands canónicos: `trackKeywords(intent='target'|'opportunity')`, `create
   intent_changed | capacity_exceeded | invalid`. El flow citaba `declared` / `already_target`, que
   nunca existieron en el primitive.
 
-**🔴 Bloqueado y por qué.** La **ADC de gcloud está vencida** en la máquina: sin ella el portal local
-responde 500 (`Tenant lookup failed`) y cualquier captura sería basura. Para desbloquear, el operador
-corre `! gcloud auth application-default login` y reinicia `pnpm dev`; recién entonces
-`pnpm fe:capture growth-seo-keyword-discovery` produce frames válidos en 1440 y 390. **El scorecard
-premium NO se escribió a propósito**: redactarlo sin mirar frames reales sería fabricar justo el
-artefacto que el estándar existe para impedir.
+**Slice 5 cerrado el 2026-08-15** (`78b6f8c09`). ADC renovada con el runner canónico
+(`pnpm gcloud:auth:playwright -- --force`, ambos carriles). Captura
+`.captures/2026-08-15T12-53-49_growth-seo-keyword-discovery`: **desktop `exitCode 0` sin hallazgos,
+mobile `exitCode 0`**, 16 frames, 5/5 assertions. Scorecard **4.55 / PASS**. `pnpm test` completo:
+**10.763 passed, 0 failed**.
+
+**Lo que la captura destapó y el resto de la cadena no** — cuatro defectos con lint, tipos y build en
+verde:
+
+1. **Contraste 3.71:1** del trigger `Detalles` sobre el tinte de hover de la fila. Sobre blanco daba
+   4.59:1, así que sólo existía con el puntero encima. Descartados **con medición**: `primary.dark`
+   (4.42:1 — MUI lo deriva oscureciendo `main`, no toma el navy de marca) y la variante tonal
+   (**3.69:1**, 10 violaciones por frame: pinta `primary.main` sobre tinte primary). Quedó
+   `text.primary` + chevron.
+2. **`MetricStrip` con 5 ítems**: reparte `repeat(N,1fr)` y en 460px degradaba el texto de ayuda a una
+   cinta de una palabra por línea.
+3. **Trigger duplicado** (tabla `md+` + card `xs`): sin `:visible` la captura a 390px enganchaba el
+   botón de la tabla oculta.
+4. **Jerarquía plana** entre `Descartar` y las acciones constructivas.
+
+**Drift corregido en tooling compartido** (`scripts/frontend/lib/scenario.ts`): el contrato del DSL
+decía que el teclado sobre UI no-mutante está permitido por default, pero gateaba **todo** `press` —
+lo que empujaba a marcar `mutating:true` un scenario que no muta nada, y eso desactiva el gate para
+siempre en ese archivo. Ahora distingue **NAVEGAR vs ACTIVAR**: `Escape`/`Tab`/flechas pasan,
+`Enter`/`Space` siguen gateados. Con test.
+
+**No se tocó** el `MuiTabs-list` de `SeoSearchVisibilityTabs` (TASK-1306), origen de los 10 warnings
+de mobile: es `variant='scrollable'`, el desborde es intencional y lo comparten las cuatro pantallas
+SEO — merece su propia decisión.
+
+**🔴 Único pendiente para cerrar:** `pnpm build` (producción Turbopack), último gate del Task Closing
+Quality Gate. No se corrió porque consume ~30 GB en esta máquina y requiere autorización explícita.
+Hasta ejecutarlo el estado honesto es **`code complete + evidencia visual verde`**, no `complete`, y
+la task sigue en `in-progress/`. No hay flag nuevo que prender: la lente va con el
+`GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED` de TASK-1664, ON desde el 2026-08-14.
 
 **Impacto cruzado registrado:** `TASK-1660` ya no debe construir el conmutador de lentes (delta en su
 spec, con la forma exacta y la prohibición del `TabList` de `@mui/lab`), y la reclasificación de

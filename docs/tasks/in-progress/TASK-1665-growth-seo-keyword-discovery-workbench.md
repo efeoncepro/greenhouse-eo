@@ -564,24 +564,44 @@ first fold esté visualmente aceptado.
   `tracked | already_tracked | intent_changed | capacity_exceeded | invalid`. El flow citaba
   `declared` / `already_target`, que **nunca existieron** en el primitive. Manda el command.
 
-### Slice 5 — GVC premium + scorecard + docs — 🟡 parcial
+### Slice 5 — GVC premium + scorecard + docs ✅
 
-Hecho:
+- Scenario extendido con el tramo del drawer: `wait` del trigger → `click` → `candidate-drawer` →
+  scroll a las acciones → `candidate-actions` → `Escape` → `drawer-focus-restore`.
+- Manual `docs/manual-de-uso/growth/descubrir-keywords-seo.md` + índice; doc funcional y
+  arquitectura §12 al día.
+- **Captura GVC verde en ambos viewports** (`.captures/2026-08-15T12-53-49_growth-seo-keyword-discovery`):
+  desktop `exitCode 0` sin hallazgos; mobile `exitCode 0` con 10 warnings, todos del mismo origen
+  ajeno (ver abajo). 5/5 assertions en ambos.
+- **Scorecard** `docs/ui/reviews/TASK-1665-…scorecard.json` — promedio **4.55**, `PASS`, con todos
+  los pisos del estándar cumplidos (jerarquía 4.6, economía de superficies 4.5, impacto visual 4.5,
+  fidelidad 4.7, resistencia a template genérico 4.6).
 
-- Scenario extendido con el tramo del drawer (`wait` acotado del trigger → `click` → marker
-  `candidate-drawer` → `Escape` → marker `drawer-focus-restore`).
-- Manual `docs/manual-de-uso/growth/descubrir-keywords-seo.md` + índice de manuales.
-- Doc funcional (`modulo-seo-search-visibility-360.md`) y arquitectura (§12, delta de la lente).
+**Cuatro defectos que sólo aparecieron al mirar frames** (pasaban lint, tipos y build):
 
-Pendiente y **bloqueado por credencial**:
+1. **Contraste 3.71:1 del trigger `Detalles`** sobre el tinte de hover de la fila — axe serious.
+   Sobre blanco daba 4.59:1, así que sólo existía con el puntero encima. Se descartaron **con
+   medición** `primary.dark` (4.42:1 — MUI lo deriva oscureciendo `main`, no toma el navy de marca)
+   y la variante tonal (**3.69:1** y 10 violaciones por frame: pinta `primary.main` sobre tinte
+   primary). Quedó `text.primary` + chevron: color garantizado por el theme, affordance fuera del hue.
+2. **`MetricStrip` con 5 ítems** reparte `repeat(N,1fr)` y en 460px degradaba el `helper` a una
+   cinta de una palabra por línea. Quedan 2 métricas; el resto pasó a filas de ancho completo.
+3. **El trigger existe dos veces por candidato** (tabla `md+` + card `xs`, alternadas por CSS): sin
+   `:visible` la captura a 390px enganchaba el botón de la tabla oculta y colgaba.
+4. **Jerarquía plana**: `Descartar` pesaba igual que las constructivas. Bajó a `text` — con
+   jerarquía, no con color de alarma (el log es append-only; pintarlo rojo mentiría).
 
-- 🔴 **Captura GVC 1440/390, axe, keyboard, reduced-motion y `scrollWidth === clientWidth`.** La ADC
-  de gcloud está vencida en la máquina; sin ella el portal local responde 500 (`Tenant lookup
-  failed`) y toda captura sería basura. Requiere `gcloud auth application-default login`
-  (interactivo, lo corre el operador) + reinicio de `pnpm dev`.
-- 🔴 **Scorecard premium en `docs/ui/reviews/`.** **No se escribe sin frames reales.** Un scorecard
-  redactado sin mirar la captura es un artefacto fabricado, y el estándar premium existe justamente
-  para impedir eso.
+**Drift corregido en el DSL de captura** (`scripts/frontend/lib/scenario.ts`): su contrato decía que
+el teclado sobre UI no-mutante —drawers, tabs, accordions— está permitido por default, pero gateaba
+**todo** `press`. Eso empujaba a marcar `mutating:true` un scenario que no muta nada, y marcarlo así
+desactiva el gate para siempre en ese archivo. Ahora la distinción es **NAVEGAR vs ACTIVAR**:
+`Escape`/`Tab`/flechas pasan; `Enter`/`Space` siguen gateados porque activan el control con foco y
+pueden confirmar un gasto. Con test (4 casos).
+
+**Warnings que NO se tocaron y por qué:** los 10 `layout_element_overflow` de mobile son del
+`MuiTabs-list` de `SeoSearchVisibilityTabs` (TASK-1306), que declara `variant='scrollable'` — el
+desborde es intencional. Es compartido por las cuatro pantallas SEO, así que cambiarlo merece su
+propia decisión y no un efecto colateral de esta task.
 
 ## Out of Scope
 
@@ -687,14 +707,25 @@ tracking/AEO requieren autorización del operador; la UI no la infiere.
 
 ## Verification
 
-- `pnpm task:lint --task TASK-1665`
-- `pnpm ui:readiness-check --task TASK-1665`
-- `pnpm ui:code-lint --changed`
-- tests focales de `src/views/greenhouse/admin/growth/seo/keywords/`
-- `pnpm fe:capture growth-seo-keyword-discovery --env=staging`
-- GVC desktop 1440 + 390, keyboard, axe, reduced-motion y scroll-width
-- revisión humana del frame y scorecard premium
-- `pnpm docs:closure-check`
+Ejecutado el 2026-08-15, todo en verde salvo lo declarado al final:
+
+- `pnpm task:lint --task TASK-1665` → `template=1 errors=0 warnings=0`
+- `pnpm ui:readiness-check --task TASK-1665` → sin hallazgos
+- `pnpm ui:code-lint --changed` → PASS
+- `pnpm local:check` (lint + tsc) → verde
+- `pnpm test` (suite completa) → **10.763 passed, 138 skipped, 0 failed**
+- `pnpm fe:capture growth-seo-keyword-discovery --env=local` → **desktop `exitCode 0` sin hallazgos;
+  mobile `exitCode 0`** (10 warnings del tabs scrollable ajeno). 16 frames, 5/5 assertions.
+- Revisión humana de los frames + scorecard premium **4.55 / PASS**
+- `pnpm docs:closure-check` + `pnpm docs:context-check:strict` → verde
+
+**Pendiente de autorización del operador:** `pnpm build` (producción Turbopack). Es el último gate
+del Task Closing Quality Gate y no se corrió porque consume ~30 GB en esta máquina. Hasta ejecutarlo
+el estado honesto es `code complete + evidencia visual verde`, no `complete`.
+
+**Pendiente de rollout:** la captura corrió contra **local con dato vivo**, no contra staging. La
+lente ya está encendida por el flag de `TASK-1664` (`GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED`, ON desde
+2026-08-14 en Vercel Production/staging y ops-worker); no hay flag nuevo que prender.
 
 ## Closing Protocol
 
