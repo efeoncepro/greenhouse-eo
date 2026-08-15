@@ -114,13 +114,38 @@ export const scenario: CaptureScenario = {
     // Lo que nunca puede pasar inadvertido es un drawer que abre y no restaura el foco.
     {
       kind: 'wait',
-      selector: '[data-capture="seo-keyword-discovery-results"] button[aria-controls="seo-keyword-discovery-candidate-panel"]',
-      timeout: 4000,
+      // `:visible` NO es cosmético. El trigger existe dos veces por candidato —una en la tabla
+      // `md+` y otra en la card `xs`—, porque ambas proyecciones se alternan por CSS y no por
+      // `useMediaQuery` (cambiar el árbol React por ancho reintrodujo mismatch de hidratación en
+      // esta superficie). Sin el filtro, a 390px el selector engancha el botón de la tabla oculta
+      // y la captura espera para siempre por algo que nunca va a ser visible.
+      // `nth=1` y no el primero: en el Space de referencia la fila 1 es una keyword YA seguida,
+      // y ese caso oculta las dos acciones de gasto (regla "no duplicate CTA"). El candidato
+      // `Nuevo` es a la vez el estado dominante y el de mayor riesgo — es donde viven "Declarar
+      // objetivo" y "Seguir oportunidad", que comprometen gasto recurrente. La evidencia del
+      // caso "Ya seguido" se conserva aparte, en el dossier de la corrida del 2026-08-15.
+      selector:
+        '[data-capture="seo-keyword-discovery-results"] button[aria-controls="seo-keyword-discovery-candidate-panel"]:visible >> nth=1',
+      // 12 s y no 4: con 4 s la espera del `nth=1` corría contra el render de la tabla y el
+      // scenario falló de forma intermitente en desktop. Un gate que falla a veces por timing
+      // enseña a reintentarlo hasta que pase, que es la forma más rápida de volverlo decorativo.
+      timeout: 12000,
       note: 'trigger Detalles de la primera fila; ausente si la corrida aún no materializó candidatos'
     },
     {
       kind: 'click',
-      selector: '[data-capture="seo-keyword-discovery-results"] button[aria-controls="seo-keyword-discovery-candidate-panel"]',
+      // `:visible` NO es cosmético. El trigger existe dos veces por candidato —una en la tabla
+      // `md+` y otra en la card `xs`—, porque ambas proyecciones se alternan por CSS y no por
+      // `useMediaQuery` (cambiar el árbol React por ancho reintrodujo mismatch de hidratación en
+      // esta superficie). Sin el filtro, a 390px el selector engancha el botón de la tabla oculta
+      // y la captura espera para siempre por algo que nunca va a ser visible.
+      // `nth=1` y no el primero: en el Space de referencia la fila 1 es una keyword YA seguida,
+      // y ese caso oculta las dos acciones de gasto (regla "no duplicate CTA"). El candidato
+      // `Nuevo` es a la vez el estado dominante y el de mayor riesgo — es donde viven "Declarar
+      // objetivo" y "Seguir oportunidad", que comprometen gasto recurrente. La evidencia del
+      // caso "Ya seguido" se conserva aparte, en el dossier de la corrida del 2026-08-15.
+      selector:
+        '[data-capture="seo-keyword-discovery-results"] button[aria-controls="seo-keyword-discovery-candidate-panel"]:visible >> nth=1',
       note: 'abre el detalle por BOTÓN, no por click de fila: la acción tiene que ser alcanzable por teclado'
     },
     {
@@ -128,6 +153,21 @@ export const scenario: CaptureScenario = {
       label: 'candidate-drawer',
       clipSelector: '[data-capture="seo-keyword-discovery-candidate-drawer"]',
       note: 'procedencia, ◑ estimado, ● medido, advertencia y acciones gobernadas con su consecuencia'
+    },
+    // Las acciones son el ítem 8 del contenido del drawer: quedan BAJO EL FOLD a propósito, para
+    // que nadie comprometa gasto antes de leer procedencia y datos. Por eso hay que ir a buscarlas
+    // — un frame que sólo muestre la parte visible no prueba que existan ni cómo se ven.
+    {
+      kind: 'scroll',
+      selector: '[data-capture="seo-keyword-discovery-candidate-actions"]',
+      scrollBlock: 'center',
+      note: 'baja hasta las acciones dentro del propio drawer'
+    },
+    {
+      kind: 'mark',
+      label: 'candidate-actions',
+      clipSelector: '[data-capture="seo-keyword-discovery-candidate-actions"]',
+      note: 'cada acción con su consecuencia escrita; read-only no renderiza CTA de gasto'
     },
     {
       kind: 'press',

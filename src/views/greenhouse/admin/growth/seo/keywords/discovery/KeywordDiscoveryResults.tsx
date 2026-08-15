@@ -1,7 +1,6 @@
 'use client'
 
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
 import Stack from '@mui/material/Stack'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
@@ -12,7 +11,7 @@ import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
 import DataTableShell from '@/components/greenhouse/data-table/DataTableShell'
-import { GreenhouseChip } from '@/components/greenhouse/primitives'
+import { GreenhouseButton, GreenhouseChip } from '@/components/greenhouse/primitives'
 import { GH_GROWTH_SEO_KEYWORDS } from '@/lib/copy/growth'
 import { formatDate, formatNumber } from '@/lib/format'
 import type { SeoDiscoveryMethod } from '@/lib/growth/seo/keyword-discovery/contracts'
@@ -187,16 +186,40 @@ const DetailTrigger = ({
   const copy = GH_GROWTH_SEO_KEYWORDS.discovery.results
 
   return (
-    <Button
-      size='small'
+    <GreenhouseButton
+      kind='inlineAction'
       variant='text'
+      tone='primary'
+      size='small'
+      trailingIconClassName='tabler-chevron-right'
       aria-controls={DISCOVERY_DRAWER_ID}
       aria-expanded={open}
       aria-label={copy.openDetailAria.replace('{keyword}', candidate.keyword)}
-      onClick={event => onOpenCandidate(candidate, event.currentTarget)}
+      onClick={event => onOpenCandidate(candidate, event.currentTarget as HTMLButtonElement)}
+      /*
+       * 🔴 El color del label NO es el azul de acción, y eso está medido, no supuesto.
+       *
+       * La fila tiene tinte de hover, y sobre ese tinte el azul principal rinde **3.71:1** —
+       * axe serious. Sobre blanco daba 4.59:1, así que el defecto sólo existía con el puntero
+       * encima: invisible para lint, build y tipos. Lo cazó la captura del 2026-08-15 en el
+       * frame de foco restaurado.
+       *
+       * Dos intentos descartados CON MEDICIÓN, no por gusto:
+       * - `primary.dark` → 4.42:1. MUI lo **deriva** oscureciendo `main` en vez de tomar el
+       *   navy de marca, así que se queda corto.
+       * - variante tonal (`label`) → **3.69:1** y 10 violaciones por frame: el tonal pinta
+       *   `primary.main` sobre un tinte primary, o sea el mismo hue contra sí mismo. Peor que
+       *   el punto de partida.
+       *
+       * `text.primary` es el color que el theme garantiza contra sus superficies, en cualquier
+       * modo y con cualquier primary que elija el tenant. La affordance la carga el chevron y
+       * la columna `Detalle` — que además es lo que ya exige el contrato a11y de esta tabla:
+       * nada se comunica sólo por color.
+       */
+      sx={{ color: 'text.primary' }}
     >
       {copy.openDetail}
-    </Button>
+    </GreenhouseButton>
   )
 }
 

@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 import Link from 'next/link'
 
+import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
@@ -131,6 +132,17 @@ const KeywordDiscoveryCandidateDrawer = ({
 
   const hasAnyAction = trackActionsAvailable || groundedAvailable || dismissAvailable
 
+  /*
+   * 🔴 SÓLO DOS métricas en el strip, y sin `helper`.
+   *
+   * `ContextualSidecarMetricStrip` reparte `repeat(N, 1fr)` a lo ancho del sidecar. Con cinco
+   * ítems en 460px cada columna queda en ~85px y el `helper`, que trae `overflowWrap: anywhere`,
+   * se degrada a una cinta vertical de una palabra por línea — ilegible. Lo cazó la captura del
+   * 2026-08-15, no el lint: el build estaba verde y los tipos también.
+   *
+   * Las dos que quedan son las que sostienen la decisión de gasto. El resto baja a filas de
+   * ancho completo, donde su explicación cabe en una línea de lectura de verdad.
+   */
   const marketMetrics: ContextualSidecarMetric[] = [
     {
       label: DRAWER.volumeLabel,
@@ -141,9 +153,11 @@ const KeywordDiscoveryCandidateDrawer = ({
     },
     {
       label: DRAWER.barrierLabel,
-      value: barrier === 'unknown' ? RESULTS.barrierUnknown : `◑ ${BARRIER_LABEL[barrier]}`,
-      helper: barrier === 'low' ? RESULTS.barrierLowHint : DRAWER.barrierHint
-    },
+      value: barrier === 'unknown' ? RESULTS.barrierUnknown : `◑ ${BARRIER_LABEL[barrier]}`
+    }
+  ]
+
+  const marketRows: Array<{ label: string; value: string; hint?: string }> = [
     {
       label: DRAWER.intentLabel,
       value: candidate.intent ? (INTENT_LABEL[candidate.intent] ?? candidate.intent) : RESULTS.noIntent
@@ -157,10 +171,10 @@ const KeywordDiscoveryCandidateDrawer = ({
   // El CPC sólo aparece si existe, y siempre con su desambiguación: es precio publicitario, no
   // el costo de posicionarse orgánicamente. Sin esa línea el número invita a leerlo al revés.
   if (candidate.cpcUsd !== null) {
-    marketMetrics.push({
+    marketRows.push({
       label: DRAWER.cpcLabel,
       value: `◑ USD ${candidate.cpcUsd.toFixed(2)}`,
-      helper: DRAWER.cpcHint
+      hint: DRAWER.cpcHint
     })
   }
 
@@ -168,7 +182,17 @@ const KeywordDiscoveryCandidateDrawer = ({
     <Stack key={kind} spacing={1}>
       <GreenhouseAsyncActionButton
         kind='primaryAction'
-        variant={kind === 'declareTarget' ? 'contained' : 'outlined'}
+        /*
+         * Tres escalones, no dos. `Declarar objetivo` es la decisión principal (contained);
+         * seguir y preparar consultas son alternativas reales (outlined); `Descartar` baja a
+         * texto porque es la salida, no una opción par.
+         *
+         * Se baja con jerarquía y NO con un color de alarma: descartar no destruye nada —el log
+         * es append-only y la evidencia queda—, así que pintarlo de rojo mentiría sobre su
+         * consecuencia. Tampoco se usa el tono `secondary`, que metería un hue nuevo en una
+         * columna de decisiones donde el color ya significa otra cosa.
+         */
+        variant={kind === 'declareTarget' ? 'contained' : kind === 'dismiss' ? 'text' : 'outlined'}
         size='small'
         state={actionState[kind] ?? 'idle'}
         loadingLabel={ACTIONS.pendingLabel}
@@ -236,7 +260,36 @@ const KeywordDiscoveryCandidateDrawer = ({
 
           {/* 5 — Labs `◑`, con la desambiguación pagado vs orgánico en el subtítulo. */}
           <ContextualSidecarSection title={DRAWER.marketDataTitle} subtitle={DRAWER.marketDataHint}>
-            <ContextualSidecarMetricStrip items={marketMetrics} />
+            <Stack spacing={3}>
+              <ContextualSidecarMetricStrip items={marketMetrics} />
+
+              {/* La explicación de la barrera va acá abajo, a ancho completo, y no como `helper`
+                  dentro de la celda: es la línea que evita leer "Baja" como "fácil", así que
+                  tiene que ser legible de corrido. */}
+              <Typography variant='caption' color='text.secondary'>
+                {barrier === 'low' ? RESULTS.barrierLowHint : DRAWER.barrierHint}
+              </Typography>
+
+              <Stack spacing={2}>
+                {marketRows.map(row => (
+                  <Stack key={row.label} spacing={0.25}>
+                    <Stack direction='row' spacing={2} justifyContent='space-between' alignItems='baseline'>
+                      <Typography variant='caption' color='text.secondary'>
+                        {row.label}
+                      </Typography>
+                      <Typography variant='body2' sx={{ textAlign: 'end', minInlineSize: 0 }}>
+                        {row.value}
+                      </Typography>
+                    </Stack>
+                    {row.hint ? (
+                      <Typography variant='caption' color='text.secondary'>
+                        {row.hint}
+                      </Typography>
+                    ) : null}
+                  </Stack>
+                ))}
+              </Stack>
+            </Stack>
           </ContextualSidecarSection>
 
           {/* 6 — GSC `●`. Vive en su propia sección justamente para que nadie la promedie con
@@ -275,6 +328,7 @@ const KeywordDiscoveryCandidateDrawer = ({
 
           {/* 8 — acciones. Read-only NO renderiza CTA de gasto: un botón apagado invita a
               buscar cómo encenderlo; la explicación es más útil y más honesta. */}
+          <Box data-capture='seo-keyword-discovery-candidate-actions'>
           <ContextualSidecarSection title={DRAWER.actionsTitle}>
             {candidate.alreadyTracked ? (
               <ContextualSidecarSignal
@@ -305,6 +359,7 @@ const KeywordDiscoveryCandidateDrawer = ({
               />
             )}
           </ContextualSidecarSection>
+          </Box>
 
           {/* 9 — navegación read-only. No inicia corrida y no gasta. */}
           {organizationId ? (
