@@ -41,8 +41,25 @@ el grader sin correr desde el 2026-07-17. Fee cerrado: MXN 60.000 de lista → 1
 **MXN 52.000**; los 89.960 fueron mes y medio de arranque a lista. Bajamos precio **sin bajar
 alcance**, que es justo lo que la regla de pricing ya prohibía.
 
+**Estado real del grader, medido contra PG el 2026-08-15** (corrige mi propia frase «sin correr desde
+el 2026-07-17», que sonaba a que Berel no tiene nada):
+
+| | dato |
+|---|---|
+| Última corrida del motor, **para cualquiera** | **2026-07-17 — hace 29 días.** El grader lleva un mes inactivo, no sólo para Berel |
+| Corridas de Berel | **3, todas `partial`, ninguna `succeeded`** |
+| Informe vigente de Berel | ✅ **sí lo hay**: la del 17-jul tiene score y `public_delivery_state='ready'`. Las dos del 29-jun quedaron sin score y en `unavailable` — casos de `ISSUE-155`, ya superados |
+| `run_kind` de las 3 corridas de Berel | **`public_diagnostic`** — el mismo tipo que el diagnóstico gratuito de prospecto. **No existe un tipo de corrida de monitoreo contratado** |
+| Estado dominante del motor | **`partial` en 25 de 45 corridas (56%)**; `succeeded` sólo 19 |
+| Sky Airlines | 2 corridas, ambas `partial`, hace 47 días |
+
+👉 **El problema no es que Berel no tenga informe: es que tiene uno de hace 29 días contra un
+compromiso MENSUAL, y que lo que se le entrega es estructuralmente el diagnóstico gratuito de
+prospecto corrido a mano.** El siguiente ya está vencido. Y el 56% de `partial` explica por qué
+`ISSUE-155` no es exótico.
+
 **Pendiente:** todo en `develop`, **sin push**. Lo operacionalmente urgente no es código: correr el
-grader de Berel con ubicación declarada.
+grader de Berel y decidir si la cadencia contratada se sostiene a mano o necesita `TASK-1707`.
 
 ### Favicon canónico — cerrado y empujado (2026-08-15)
 
