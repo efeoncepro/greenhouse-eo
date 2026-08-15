@@ -592,6 +592,19 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       scope: 'tenant',
       source: 'role',
     })
+
+    // TASK-1714 — reveal del documento de identidad de un candidato. Entra a este tier
+    // (role-only, SIN routeGroup `internal`) por la misma razón que `application.decide`:
+    // todo tenant interno porta ese routeGroup incondicionalmente, así que incluirlo
+    // convertiría el reveal de PII en un permiso de facto universal —también para
+    // `collaborator`, `designer` y `people_viewer`.
+    addEntitlement(entries, {
+      module: 'hiring',
+      capability: 'hiring.candidate.reveal_identity',
+      action: 'read',
+      scope: 'tenant',
+      source: 'role',
+    })
   }
 
   if (hasRouteGroup(subject, 'people') || hasAuthorizedView(subject, 'equipo.personas')) {

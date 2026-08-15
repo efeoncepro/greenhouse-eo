@@ -2229,7 +2229,13 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   // Solo PROPONE; el confirm reusa author (pregunta) / score (respuesta). El LLM nunca escribe.
   { key: 'hiring.assessment.ai_assist', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
   // TASK-1365 — aggregate-only fairness reader. More restricted than assessment.read.
-  { key: 'hiring.assessment.fairness_read', module: 'hiring', actions: ['read'] as const, defaultScope: 'tenant' }
+  { key: 'hiring.assessment.fairness_read', module: 'hiring', actions: ['read'] as const, defaultScope: 'tenant' },
+  // TASK-1714 — revelar el valor completo del documento de identidad de un CANDIDATO.
+  // Capability propia y NO `person.legal_profile.reveal_sensitive`: esa vive en el módulo HR,
+  // sólo la portan FINANCE_ADMIN/EFEONCE_ADMIN, y granteársela al tier que opera Hiring abriría
+  // el reveal sobre TODA persona del módulo (colaboradores, ex-colaboradores, direcciones).
+  // El radio de ésta es exacto: la identidad de un candidato, que sólo existe post-decisión.
+  { key: 'hiring.candidate.reveal_identity', module: 'hiring', actions: ['read'] as const, defaultScope: 'tenant' }
 ] as const
 
 export type EntitlementCapabilityDefinition = (typeof ENTITLEMENT_CAPABILITY_CATALOG)[number]

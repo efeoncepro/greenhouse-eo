@@ -10,6 +10,11 @@ export { canAccessHiringCandidateDocument } from './access'
 export { captureCandidateIdentityDocument } from './capture-identity-document'
 export type { CaptureCandidateIdentityDocumentInput } from './capture-identity-document'
 export { resolveCandidateDocuments } from './resolve'
+export { revealCandidateIdentityDocument } from './reveal-identity-document'
+export type {
+  RevealCandidateIdentityDocumentInput,
+  RevealCandidateIdentityDocumentResult,
+} from './reveal-identity-document'
 export {
   CANDIDATE_DOCUMENT_RETENTION_MONTHS,
   listOverdueCandidateRetentions,
