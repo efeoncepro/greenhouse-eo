@@ -17,6 +17,7 @@ import CustomTextField from '@core/components/mui/TextField'
 import { GreenhouseAsyncActionButton } from '@/components/greenhouse/primitives'
 import type { GreenhouseAsyncActionState } from '@/components/greenhouse/primitives/GreenhouseAsyncActionButton'
 import { GH_GROWTH_SEO_KEYWORDS } from '@/lib/copy/growth'
+import { formatNumber } from '@/lib/format'
 import {
   DEFAULT_DISCOVERY_RESULTS_PER_CALL,
   estimateDiscoveryCost,
@@ -90,7 +91,24 @@ export interface KeywordDiscoveryBuilderProps {
   onSubmit?: (input: { seeds: string[]; methods: SeoDiscoveryMethod[]; resultsPerCall: number }) => Promise<void>
 }
 
+/**
+ * Costos de proveedor: hasta 4 decimales, sin ceros de relleno.
+ *
+ * Una llamada Labs cuesta USD 0.012 y una fila USD 0.00012 — redondear a centavos convertiría el
+ * estimado en `US$0.01` o directamente en `US$0`, que es justo la cifra que la banda existe para
+ * no esconder.
+ */
 const formatUsd = (value: number) => value.toFixed(4).replace(/0+$/, '').replace(/\.$/, '')
+
+/**
+ * El presupuesto es dinero a escala humana, no una fracción de centavo: se lee en centavos.
+ *
+ * Con `formatUsd` el cupo salía `US$48.3602` — cuatro decimales en una cifra de decenas de dólares
+ * se leen como error de formato y le restan autoridad justo a la línea que responde «¿me cabe?».
+ * Lo cazó el frame de la captura del 2026-08-15, con el cupo real del gate en pantalla.
+ */
+const formatBudgetUsd = (value: number) =>
+  formatNumber(value, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
 /**
  * Anillo de foco explícito para los grupos de selección.
@@ -444,11 +462,6 @@ const KeywordDiscoveryBuilder = ({
                         : copy.cost.estimateFree}
                     </Typography>
                     <Typography variant='caption' color='text.secondary'>
-                      {budgetRemainingUsd === null
-                        ? copy.cost.budgetUnavailable
-                        : copy.cost.budget.replace('{amount}', formatUsd(budgetRemainingUsd))}
-                    </Typography>
-                    <Typography variant='caption' color='text.secondary'>
                       {copy.cost.formula.replace('{formula}', estimate.formula)}
                     </Typography>
                   </>
@@ -457,6 +470,25 @@ const KeywordDiscoveryBuilder = ({
                     {blockingReason ?? copy.cost.calculating}
                   </Typography>
                 )}
+
+                {/*
+                  🔴 El cupo se dice SIEMPRE que se conozca, dentro y fuera de la rama del estimado.
+                  Es un hecho del PERÍODO, no una propiedad de esta consulta: "¿cuánto me queda?" es
+                  justamente lo que el operador quiere saber ANTES de escribir la primera seed. Vivía
+                  adentro del `estimate ?`, así que la cifra que más pesa en la decisión de gasto sólo
+                  aparecía una vez que ya habías armado la pregunta — lo cazó el frame de la captura,
+                  no el lint. Cuando no se pudo resolver sólo se dice en el momento que importa: con
+                  un estimado en pantalla, es decir a un click de gastar.
+                */}
+                {budgetRemainingUsd !== null ? (
+                  <Typography variant='caption' color='text.secondary'>
+                    {copy.cost.budget.replace('{amount}', formatBudgetUsd(budgetRemainingUsd))}
+                  </Typography>
+                ) : estimate ? (
+                  <Typography variant='caption' color='text.secondary'>
+                    {copy.cost.budgetUnavailable}
+                  </Typography>
+                ) : null}
               </Stack>
 
               {/* El CTA no se deshabilita cuando falta permiso o flag: NO SE RENDERIZA. Un botón
