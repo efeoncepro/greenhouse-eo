@@ -762,6 +762,21 @@ Tres razones, y las tres son de oficio, no de implementación:
    la **curva de CTR derivada del sitio** en vez de una tabla de industria —absorbe la depresión por
    AI Overviews de ese vertical sin estimarla— y que el mismo score ordene cuatro orígenes,
    incluido el gap AEO. No usar «ninguna herramienta puede» en material comercial.*
+
+   ⚠️ **Delta 2026-08-15 (2.ª pasada del benchmark) — la curva propia tampoco diferencia sola.**
+   **seoClarity** documenta y vende la curva de CTR derivada del **GSC del propio cliente**,
+   segmentada mobile/desktop/brand/non-brand; **Sistrix `CTR Potenziale`** también lee «Deine CTR»
+   del GSC del cliente. Lo que en ~30 herramientas relevadas **no apareció** es la **combinación
+   exacta que esta task construye**: proyectar el alza de clics de un **cambio de posición** con la
+   curva del propio GSC. Las dos mitades existen por separado y nunca se juntan — Sistrix, que tiene
+   la curva real del cliente, modela **optimización de snippet a posición constante** (no dice «de
+   posición 12 a 5 ganas N clics»); Ahrefs, Semrush y la `Trafficschätzung` de Sistrix sí modelan
+   CTR-por-posición, pero sobre **clickstream/SERP propios del proveedor**, no sobre tu GSC.
+   **Consecuencia para esta task: la fórmula del §Contrato no cambia** — el hallazgo la valida. Lo
+   que cambia es cómo se enuncia: la frase citable es la combinación, nunca «curva propia» a secas.
+   Y es un **negativo** (nadie lo hace), que es la clase de afirmación más fácil de equivocar: exige
+   re-verificación a la fecha antes de cualquier uso comercial. Fuente:
+   `.claude/skills/seo-aeo-practice/references/BENCHMARK_SUITES_AEO_2026-08.md`.
 2. **La curva propia absorbe el efecto de los AI Overviews en ESE sitio.** No hay que estimar cuánto
    deprime el CTR la respuesta generativa en esa categoría: si lo deprime, ya está adentro de la
    curva medida del cliente. Una curva de industria publicada no tiene esa propiedad.

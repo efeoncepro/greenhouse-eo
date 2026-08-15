@@ -553,7 +553,18 @@ cero outbox, cero flags de dominio. Mismo patrón que `artifact-composer` ya tie
 >
 > Lo que sí es defendible, dicho con precisión: **(a)** la curva de CTR se deriva del **propio sitio**
 > y no de una tabla de industria, lo que absorbe la depresión de clic por AI Overviews en ese
-> vertical sin tener que estimarla ni discutirla; **(b)** el **mismo score ordena cuatro orígenes**
+> vertical sin tener que estimarla ni discutirla — ⚠️ **corregido 2026-08-15 (2.ª pasada del
+> benchmark): la curva propia POR SÍ SOLA tampoco diferencia.** seoClarity documenta y vende la curva
+> derivada del GSC del cliente, segmentada mobile/desktop/brand/non-brand, y afirma que *«GSC is the
+> only source of valid CTR data in the world for any company»*; Sistrix `CTR Potenziale` lee «Deine
+> CTR» del GSC del cliente. Lo que **sí** quedó sin cubrir en ~30 herramientas relevadas es la
+> **combinación**: nadie proyecta el alza de clics de un **cambio de posición** usando la curva del
+> propio GSC. Las dos mitades existen separadas y nunca se juntan — quien tiene la curva real del
+> cliente (Sistrix) modela **snippet a posición constante**, y quien modela CTR-por-posición (Ahrefs,
+> Semrush, `Trafficschätzung` de Sistrix) lo hace sobre datos propios de terceros. Esa frase precisa
+> es citable; «curva propia» a secas, no. Y aun así es un **negativo**, que es lo más fácil de
+> equivocar: sostenerlo en material comercial exige re-verificarlo a la fecha; **(b)** el **mismo
+> score ordena cuatro orígenes**
 > —incluido el gap AEO—, que es una integración que las suites no hacen porque no miden el eje AEO
 > con motor propio; y **(c)** la decisión, la acción y su resultado viven en la **misma plataforma**
 > donde se opera la cuenta: una herramienta entrega una lista, no registra quién decidió qué ni qué
