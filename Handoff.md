@@ -102,8 +102,22 @@ cursor + los 3 modos de seed no cableados), `TASK-1694` (barrera de enlaces en l
 cross-método, asimetría del filtro de volumen), `TASK-1695` (techo del bridge vs su regla de
 cobertura, y voseo del system prompt del autor grounded).
 
-Verde: `pnpm local:check`, 382 tests de `growth/seo` + DSL de captura. El detalle completo, con
-evidencia por hallazgo, quedó en el delta 2026-08-15 de la spec en `complete/`.
+**Evidencia GVC de los fixes** (`.captures/2026-08-15T14-51-29_growth-seo-keyword-discovery`):
+desktop y mobile `exitCode 0`, **0 hallazgos**, **5/5 assertions**, 16 frames, con el cupo real del
+gate en pantalla. Requirió levantar el dev server por Bash en background: `preview_start` queda
+colgado tras el helper de permisos de la app (tres intentos, 0% CPU y sin procesos hijos) — si te
+pasa lo mismo, ese es el atajo.
+
+**La captura destapó dos defectos EN LOS PROPIOS FIXES**, con lint, tipos y tests verdes: (a) el
+cupo recién cableado era invisible porque vivía dentro de la rama `estimate`, que es `null` sin
+seeds — la cifra que responde «¿me cabe?» sólo aparecía después de armar la pregunta; el cupo es un
+hecho del período, no de la consulta; (b) salía `US$48.3602`, porque `formatUsd` usa 4 decimales
+para costos por fila (USD 0.00012) y eso en decenas de dólares se lee como error de formato. Los dos
+sólo se ven mirando el frame.
+
+Verde: `pnpm local:check`, 382 tests de `growth/seo` + DSL de captura, suite completa 10.768. El
+detalle completo, con evidencia por hallazgo, quedó en el delta 2026-08-15 de la spec en
+`complete/`.
 
 ### TASK-1659 COMPLETE — intención declarada de una keyword (2026-08-14)
 

@@ -54,6 +54,27 @@ la UI no consumía, y promesas de la superficie que el runtime no cumplía.
     cuando el proveedor no declara as-of → ahora «traído el {date}»; literales `◑ USD` y `—` del
     drawer tokenizados.
 
+**Evidencia visual de los fixes** — `.captures/2026-08-15T14-51-29_growth-seo-keyword-discovery`:
+desktop y mobile en `exitCode 0`, **0 hallazgos**, **5/5 assertions**, 16 frames, con el cupo real
+del gate de entitlement en pantalla (`Presupuesto disponible US$48,36`).
+
+**Y la captura destapó dos cosas más que la cadena entera daba por buenas** (lint verde, tipos
+verdes, tests verdes) — el mismo patrón del 2026-08-15 por la mañana, ahora sobre los propios fixes:
+
+- **El cupo recién cableado era invisible.** `budgetRemainingUsd` se renderizaba dentro de la rama
+  `estimate ?`, y `estimate` es `null` mientras no haya seeds: la cifra que responde «¿me cabe?»
+  sólo aparecía DESPUÉS de armar la pregunta, justo al revés de cuando se necesita. El cupo es un
+  hecho del **período**, no de la consulta. Ahora se dice siempre que se conozca; `Cupo no
+  disponible` queda reservado para cuando hay un estimado en pantalla — o sea a un click de gastar.
+- **`US$48.3602`.** `formatUsd` usa 4 decimales a propósito (una fila Labs cuesta USD 0.00012 y
+  redondear a centavos la mostraría como `US$0`), pero un presupuesto de decenas de dólares con
+  cuatro decimales se lee como error de formato y le resta autoridad a la línea. Helper aparte sobre
+  `formatNumber` canónico — el primer intento usó `toLocaleString` crudo y lo atrapó el lint
+  `greenhouse/no-raw-locale-formatting`.
+
+Los dos son del mismo tipo que el resto de esta auditoría: **ninguna herramienta automática podía
+verlos**, sólo mirar el frame.
+
 **Derivado a tasks (fuera del alcance de esta lente):** `TASK-1692` (writers de los action kinds
 `selected_for_grounded_query`/`selected_for_target`/`promoted_to_tracking` — hoy nadie los escribe,
 así que un tercio del modelo de estados es inalcanzable y el ledger de decisiones sólo captura
